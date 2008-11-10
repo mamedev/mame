@@ -386,8 +386,8 @@ WRITE16_HANDLER( bonzeadv_cchip_bank_w )
 
 WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 {
-//  if (activecpu_get_pc()!=0xa028)
-//  logerror("%08x:  write %04x %04x cchip\n", activecpu_get_pc(), offset, data);
+//  if (cpu_get_pc(machine->activecpu)!=0xa028)
+//  logerror("%08x:  write %04x %04x cchip\n", cpu_get_pc(machine->activecpu), offset, data);
 
 	if (current_bank == 0)
 	{
@@ -440,7 +440,7 @@ READ16_HANDLER( bonzeadv_cchip_ctrl_r )
 
 READ16_HANDLER( bonzeadv_cchip_ram_r )
 {
-//  logerror("%08x:  read %04x cchip\n", activecpu_get_pc(), offset);
+//  logerror("%08x:  read %04x cchip\n", cpu_get_pc(machine->activecpu), offset);
 
 	if (current_bank == 0)
 	{

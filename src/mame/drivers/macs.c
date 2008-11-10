@@ -112,7 +112,7 @@ static READ8_HANDLER( macs_input_r )
 		case 5: return input_port_read(machine, "DSW3");
 		case 6: return input_port_read(machine, "DSW4");
 		case 7: return input_port_read(machine, "SYS1");
-		default: 	popmessage("Unmapped I/O read at PC = %06x offset = %02x",activecpu_get_pc(),offset+0xc0);
+		default: 	popmessage("Unmapped I/O read at PC = %06x offset = %02x",cpu_get_pc(machine->activecpu),offset+0xc0);
 	}
 
 	return 0xff;

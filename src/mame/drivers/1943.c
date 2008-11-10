@@ -47,8 +47,8 @@ static READ8_HANDLER( c1943_protection_r )
         if a read from this address doesn't return the value it expects.
     */
 
-	int data = activecpu_get_reg(Z80_BC) >> 8;
-//  logerror("protection read, PC: %04x Result:%02x\n",activecpu_get_pc(),data);
+	int data = cpu_get_reg(machine->activecpu, Z80_BC) >> 8;
+//  logerror("protection read, PC: %04x Result:%02x\n",cpu_get_pc(machine->activecpu),data);
 	return data;
 }
 

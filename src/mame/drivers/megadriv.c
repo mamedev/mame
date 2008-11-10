@@ -197,7 +197,7 @@ static UINT16 read_next_instruction(void)
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = program_read_word_16be(activecpu_get_pc());
+	result = program_read_word_16be(cpu_get_pc(machine->activecpu));
 	recurse = 0;
 	return result;
 }
@@ -237,13 +237,13 @@ static void megadriv_z80_bank_w(UINT16 data)
 
 static WRITE16_HANDLER( megadriv_68k_z80_bank_write )
 {
-	//logerror("%06x: 68k writing bit to bank register %01x\n", activecpu_get_pc(),data&0x01);
+	//logerror("%06x: 68k writing bit to bank register %01x\n", cpu_get_pc(machine->activecpu),data&0x01);
 	megadriv_z80_bank_w(data&0x01);
 }
 
 static WRITE8_HANDLER(megadriv_z80_z80_bank_w)
 {
-	//logerror("%04x: z80 writing bit to bank register %01x\n", activecpu_get_pc(),data&0x01);
+	//logerror("%04x: z80 writing bit to bank register %01x\n", cpu_get_pc(machine->activecpu),data&0x01);
 	megadriv_z80_bank_w(data&0x01);
 }
 
@@ -624,7 +624,7 @@ static void megadrive_vdp_set_register(running_machine *machine, int regnum, UIN
 //  if (regnum == 0x0a)
 //      mame_printf_debug("Set HINT Reload Register to %d on scanline %d\n",value, genesis_scanline_counter);
 
-//  mame_printf_debug("%06x Setting VDP Register #%02x to %02x\n",activecpu_get_pc(), regnum,value);
+//  mame_printf_debug("%06x Setting VDP Register #%02x to %02x\n",cpu_get_pc(machine->activecpu), regnum,value);
 }
 
 static void update_megadrive_vdp_code_and_address(void)
@@ -804,7 +804,7 @@ static void handle_dma_bits(running_machine *machine)
 		UINT16 length;
 		source = (MEGADRIVE_REG15_DMASOURCE1 | (MEGADRIVE_REG16_DMASOURCE2<<8) | ((MEGADRIVE_REG17_DMASOURCE3&0xff)<<16))<<1;
 		length = (MEGADRIVE_REG13_DMALENGTH1 | (MEGADRIVE_REG14_DMALENGTH2<<8))<<1;
-	//  mame_printf_debug("%06x 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", activecpu_get_pc(), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
+	//  mame_printf_debug("%06x 68k DMAtran set source %06x length %04x dest %04x enabled %01x code %02x %02x\n", cpu_get_pc(machine->activecpu), source, length, megadrive_vdp_address,MEGADRIVE_REG01_DMA_ENABLE, megadrive_vdp_code,MEGADRIVE_REG0F_AUTO_INC);
 
 	}
 
@@ -1381,7 +1381,7 @@ READ16_HANDLER( megadriv_vdp_r )
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_vdp_ctrl_port_r();
 		//  retvalue = mame_rand(machine);
-		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",activecpu_get_pc(),genesis_scanline_counter, get_hposition(),retvalue);
+		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",cpu_get_pc(machine->activecpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
 		case 0x08:
@@ -1391,7 +1391,7 @@ READ16_HANDLER( megadriv_vdp_r )
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters();
 		//  retvalue = mame_rand(machine);
-		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",activecpu_get_pc(),genesis_scanline_counter, get_hposition(),retvalue);
+		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",cpu_get_pc(machine->activecpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
 		case 0x10:
@@ -1424,7 +1424,7 @@ static READ16_HANDLER( megadriv_68k_YM2612_read)
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access YM2612 (read) without bus\n", activecpu_get_pc());
+		logerror("%06x: 68000 attempting to access YM2612 (read) without bus\n", cpu_get_pc(machine->activecpu));
 		return 0;
 	}
 
@@ -1452,7 +1452,7 @@ static WRITE16_HANDLER( megadriv_68k_YM2612_write)
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access YM2612 (write) without bus\n", activecpu_get_pc());
+		logerror("%06x: 68000 attempting to access YM2612 (write) without bus\n", cpu_get_pc(machine->activecpu));
 	}
 }
 
@@ -2039,7 +2039,7 @@ static READ16_HANDLER( megadriv_68k_io_read )
 	switch (offset)
 	{
 		case 0:
-			logerror("%06x read version register\n", activecpu_get_pc());
+			logerror("%06x read version register\n", cpu_get_pc(machine->activecpu));
 			retdata = megadrive_region_export<<7 | // Export
 			          megadrive_region_pal<<6 | // NTSC
 			          0x20 | // No Sega CD
@@ -2245,7 +2245,7 @@ static READ16_HANDLER( megadriv_68k_read_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", activecpu_get_pc());
+		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", cpu_get_pc(machine->activecpu));
 		return mame_rand(machine);
 	}
 }
@@ -2272,7 +2272,7 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", activecpu_get_pc());
+		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", cpu_get_pc(machine->activecpu));
 	}
 }
 
@@ -2297,13 +2297,13 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
-		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", activecpu_get_pc(),retvalue, mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", cpu_get_pc(machine->activecpu),retvalue, mem_mask);
 		return retvalue;
 
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
 	{
-		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", activecpu_get_pc(),mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", cpu_get_pc(machine->activecpu),mem_mask);
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = 0x0001;
 		else retvalue = 0x0000;
 
@@ -2311,11 +2311,11 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 	}
 	else
 	{
-		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", activecpu_get_pc(),mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", cpu_get_pc(machine->activecpu),mem_mask);
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
-	//  mame_printf_debug("%06x: 68000 check z80 Bus (word access) %04x %04x\n", activecpu_get_pc(),mem_mask, retvalue);
+	//  mame_printf_debug("%06x: 68000 check z80 Bus (word access) %04x %04x\n", cpu_get_pc(machine->activecpu),mem_mask, retvalue);
 		return retvalue;
 	}
 }
@@ -2328,13 +2328,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=0;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=1;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 
@@ -2344,13 +2344,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=0;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=1;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 		}
@@ -2359,13 +2359,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=0;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=1;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
 		}
@@ -2378,13 +2378,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=0;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=1;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
@@ -2394,13 +2394,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=0;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=1;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
@@ -2411,13 +2411,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=0;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE );
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", activecpu_get_pc(),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=1;
 			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
@@ -3645,7 +3645,7 @@ static UINT32 pm_io(running_machine *machine, int reg, int write, UINT32 d)
 		svp.emu_status &= ~SSP_PMC_HAVE_ADDR;
 	}
 
-	if (reg == 4 || (activecpu_get_reg(SSP_ST) & 0x60))
+	if (reg == 4 || (cpu_get_reg(machine->activecpu, SSP_ST) & 0x60))
 	{
 		#define CADDR ((((mode<<16)&0x7f0000)|addr)<<1)
 		UINT16 *dram = (UINT16 *)svp.dram;
@@ -6489,7 +6489,7 @@ static void megadriv_init_common(running_machine *machine)
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_default;
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_TAS_CALLBACK, (void *)megadriv_tas_callback);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_TAS_CALLBACK, (void *)megadriv_tas_callback);
 
 	if ((machine->gamedrv->ipt==ipt_megadri6) || (machine->gamedrv->ipt==ipt_ssf2ghw))
 	{
@@ -6703,8 +6703,8 @@ DRIVER_INIT( _32x )
 	_32x_240mode = 0;
 
 // checking if these help brutal, they don't.
-	cpunum_set_info_int(2, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
-	cpunum_set_info_int(3, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
+	cpu_set_info_int(machine->cpu[2], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
+	cpu_set_info_int(machine->cpu[3], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_COMPATIBLE_OPTIONS);
 
 	DRIVER_INIT_CALL(megadriv);
 }

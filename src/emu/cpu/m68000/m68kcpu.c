@@ -45,7 +45,7 @@ extern void m68040_fpu_op1(m68ki_cpu_core *m68k);
 /* ======================================================================== */
 
 #ifdef M68K_LOG_ENABLE
-const char *const m68ki_cpu_names[] =
+const char *const m68ki_cpu_get_names[] =
 {
 	"Invalid CPU",
 	"M68000",

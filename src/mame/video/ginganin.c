@@ -185,7 +185,7 @@ WRITE16_HANDLER( ginganin_vregs16_w )
 		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:
-		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n",activecpu_get_pc(),offset,data);
+		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n",cpu_get_pc(machine->activecpu),offset,data);
 	}
 }
 

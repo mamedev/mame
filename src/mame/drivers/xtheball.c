@@ -7,6 +7,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "machine/ticket.h"
@@ -101,7 +102,7 @@ static void xtheball_to_shiftreg(UINT32 address, UINT16 *shiftreg)
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(shiftreg, &vram_fg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
 	else
-		logerror("%08X:xtheball_to_shiftreg(%08X)\n", activecpu_get_pc(), address);
+		logerror("%08X:xtheball_to_shiftreg(%08X)\n", cpu_get_pc(Machine->activecpu), address);
 }
 
 
@@ -112,7 +113,7 @@ static void xtheball_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 	else if (address >= 0x02000000 && address <= 0x020fffff)
 		memcpy(&vram_fg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));
 	else
-		logerror("%08X:xtheball_from_shiftreg(%08X)\n", activecpu_get_pc(), address);
+		logerror("%08X:xtheball_from_shiftreg(%08X)\n", cpu_get_pc(Machine->activecpu), address);
 }
 
 
@@ -143,7 +144,7 @@ static WRITE16_HANDLER( bit_controls_w )
 	{
 		if (bitvals[offset] != (data & 1))
 		{
-			logerror("%08x:bit_controls_w(%x,%d)\n", activecpu_get_pc(), offset, data & 1);
+			logerror("%08x:bit_controls_w(%x,%d)\n", cpu_get_pc(machine->activecpu), offset, data & 1);
 
 			switch (offset)
 			{

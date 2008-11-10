@@ -130,7 +130,7 @@ static READ8_HANDLER( aquarium_oki_r )
 
 static WRITE8_HANDLER( aquarium_oki_w )
 {
-	logerror("Z80-PC:%04x Writing %04x to the OKI M6295\n",activecpu_get_previouspc(),aquarium_snd_bitswap(data));
+	logerror("Z80-PC:%04x Writing %04x to the OKI M6295\n",cpu_get_previouspc(machine->activecpu),aquarium_snd_bitswap(data));
 	okim6295_data_0_w( machine, 0, (aquarium_snd_bitswap(data)) );
 }
 

@@ -49,7 +49,7 @@ static READ16_HANDLER( fatfury2_protection_16_r )
 			return ((res & 0xf0) >> 4) | ((res & 0x0f) << 4);
 
 		default:
-logerror("unknown protection read at pc %06x, offset %08x\n",activecpu_get_pc(),offset<<1);
+logerror("unknown protection read at pc %06x, offset %08x\n",cpu_get_pc(machine->activecpu),offset<<1);
 			return 0;
 	}
 }
@@ -94,7 +94,7 @@ static WRITE16_HANDLER( fatfury2_protection_16_w )
 			break;
 
 		default:
-			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n",activecpu_get_pc(),offset,data);
+			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n",cpu_get_pc(machine->activecpu),offset,data);
 			break;
 	}
 }
@@ -125,17 +125,17 @@ static WRITE16_HANDLER ( kof98_prot_w )
 	switch (data)
 	{
 		case 0x0090:
-		logerror ("%06x kof98 - protection 0x0090 old %04x %04x\n",activecpu_get_pc(), mem16[0x100/2], mem16[0x102/2]);
+		logerror ("%06x kof98 - protection 0x0090 old %04x %04x\n",cpu_get_pc(machine->activecpu), mem16[0x100/2], mem16[0x102/2]);
 		mem16[0x100/2] = 0x00c2; mem16[0x102/2] = 0x00fd;
 		break;
 
 		case 0x00f0:
-		logerror ("%06x kof98 - protection 0x00f0 old %04x %04x\n",activecpu_get_pc(), mem16[0x100/2], mem16[0x102/2]);
+		logerror ("%06x kof98 - protection 0x00f0 old %04x %04x\n",cpu_get_pc(machine->activecpu), mem16[0x100/2], mem16[0x102/2]);
 		mem16[0x100/2] = 0x4e45; mem16[0x102/2] = 0x4f2d;
 		break;
 
 		default: // 00aa is written, but not needed?
-		logerror ("%06x kof98 - unknown protection write %04x\n",activecpu_get_pc(), data);
+		logerror ("%06x kof98 - unknown protection write %04x\n",cpu_get_pc(machine->activecpu), data);
 		break;
 	}
 }

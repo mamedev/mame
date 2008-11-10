@@ -106,7 +106,7 @@ static READ8_HANDLER( keyboard_r )
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEY10", "KEY11" };
 
-//  logerror("%04x: keyboard_r\n", activecpu_get_pc());
+//  logerror("%04x: keyboard_r\n", cpu_get_pc(machine->activecpu));
 
 	for (i = 0; i < 12; i++)
 	{
@@ -130,7 +130,7 @@ static READ8_HANDLER( keyboard_r )
 
 static WRITE8_HANDLER( keyboard_select_w )
 {
-//  logerror("%04x: keyboard_select %d = %02x\n",activecpu_get_pc(),offset,data);
+//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
 
 	switch (offset)
 	{

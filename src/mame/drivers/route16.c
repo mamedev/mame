@@ -897,9 +897,9 @@ ROM_END
 
 static READ8_HANDLER( routex_prot_read )
 {
-	if (activecpu_get_pc() == 0x2f) return 0xfb;
+	if (cpu_get_pc(machine->activecpu) == 0x2f) return 0xfb;
 
-	logerror ("cpu #%d (PC=%08X): unmapped prot read\n", cpu_getactivecpu(), activecpu_get_pc());
+	logerror ("cpu #%d (PC=%08X): unmapped prot read\n", cpunum_get_active(), cpu_get_pc(machine->activecpu));
 	return 0x00;
 
 }

@@ -65,7 +65,7 @@ static UINT8 top_board_bank;
 static UINT8 sound_port_bank;
 static UINT8 alternate_bank;
 static UINT8 master_bank;
-void (*leland_update_master_bank)(void);
+void (*leland_update_master_bank)(running_machine *machine);
 
 static UINT32 xrom1_addr;
 static UINT32 xrom2_addr;
@@ -155,7 +155,7 @@ WRITE8_HANDLER( alleymas_joystick_kludge )
 {
 	/* catch the case where they clear this memory location at PC $1827 and change */
 	/* the value written to be a 1 */
-	if (activecpu_get_previouspc() == 0x1827)
+	if (cpu_get_previouspc(machine->activecpu) == 0x1827)
 		*alleymas_kludge_mem = 1;
 	else
 		*alleymas_kludge_mem = data;
@@ -399,7 +399,7 @@ MACHINE_RESET( leland )
 	/* initialize the master banks */
 	master_length = memory_region_length(machine, "master");
 	master_base = memory_region(machine, "master");
-	(*leland_update_master_bank)();
+	(*leland_update_master_bank)(machine);
 
 	/* initialize the slave banks */
 	slave_length = memory_region_length(machine, "slave");
@@ -447,7 +447,7 @@ MACHINE_RESET( ataxx )
 	/* initialize the master banks */
 	master_length = memory_region_length(machine, "master");
 	master_base = memory_region(machine, "master");
-	ataxx_bankswitch();
+	ataxx_bankswitch(machine);
 
 	/* initialize the slave banks */
 	slave_length = memory_region_length(machine, "slave");
@@ -515,9 +515,9 @@ WRITE8_HANDLER( leland_master_alt_bankswitch_w )
 	/* update any bankswitching */
 	if (LOG_BANKSWITCHING_M)
 		if ((alternate_bank ^ data) & 0x0f)
-			logerror("%04X:alternate_bank = %02X\n", safe_activecpu_get_pc(), data & 0x0f);
+			logerror("%04X:alternate_bank = %02X\n", safe_cpu_get_pc(machine->activecpu), data & 0x0f);
 	alternate_bank = data & 15;
-	(*leland_update_master_bank)();
+	(*leland_update_master_bank)(machine);
 
 	/* sound control is in the rest */
 	leland_80186_control_w(machine, offset, data);
@@ -525,14 +525,14 @@ WRITE8_HANDLER( leland_master_alt_bankswitch_w )
 
 
 /* bankswitching for Cerberus */
-void cerberus_bankswitch(void)
+void cerberus_bankswitch(running_machine *machine)
 {
 	/* no bankswitching */
 }
 
 
 /* bankswitching for Mayhem 2002, Power Play, World Series Baseball, and Alley Master */
-void mayhem_bankswitch(void)
+void mayhem_bankswitch(running_machine *machine)
 {
 	UINT8 *address;
 
@@ -547,7 +547,7 @@ void mayhem_bankswitch(void)
 
 
 /* bankswitching for Danger Zone */
-void dangerz_bankswitch(void)
+void dangerz_bankswitch(running_machine *machine)
 {
 	UINT8 *address;
 
@@ -562,7 +562,7 @@ void dangerz_bankswitch(void)
 
 
 /* bankswitching for Baseball the Season II, Super Baseball, and Strike Zone */
-void basebal2_bankswitch(void)
+void basebal2_bankswitch(running_machine *machine)
 {
 	UINT8 *address;
 
@@ -580,7 +580,7 @@ void basebal2_bankswitch(void)
 
 
 /* bankswitching for Red Line Racer */
-void redline_bankswitch(void)
+void redline_bankswitch(running_machine *machine)
 {
 	static const UINT32 bank_list[] = { 0x10000, 0x18000, 0x02000, 0x02000 };
 	UINT8 *address;
@@ -596,7 +596,7 @@ void redline_bankswitch(void)
 
 
 /* bankswitching for Viper, Quarterback, Team Quarterback, and All American Football */
-void viper_bankswitch(void)
+void viper_bankswitch(running_machine *machine)
 {
 	static const UINT32 bank_list[] = { 0x02000, 0x10000, 0x18000, 0x02000 };
 	UINT8 *address;
@@ -606,7 +606,7 @@ void viper_bankswitch(void)
 	address = &master_base[bank_list[alternate_bank & 3]];
 	if (bank_list[alternate_bank & 3] >= master_length)
 	{
-		logerror("%04X:Master bank %02X out of range!\n", safe_activecpu_get_pc(), alternate_bank & 3);
+		logerror("%04X:Master bank %02X out of range!\n", safe_cpu_get_pc(machine->activecpu), alternate_bank & 3);
 		address = &master_base[bank_list[0]];
 	}
 	memory_set_bankptr(1, address);
@@ -617,7 +617,7 @@ void viper_bankswitch(void)
 
 
 /* bankswitching for Super Offroad, Super Offroad Track Pack, and Pig Out */
-void offroad_bankswitch(void)
+void offroad_bankswitch(running_machine *machine)
 {
 	static const UINT32 bank_list[] = { 0x02000, 0x02000, 0x10000, 0x18000, 0x20000, 0x28000, 0x30000, 0x38000 };
 	UINT8 *address;
@@ -627,7 +627,7 @@ void offroad_bankswitch(void)
 	address = &master_base[bank_list[alternate_bank & 7]];
 	if (bank_list[alternate_bank & 7] >= master_length)
 	{
-		logerror("%04X:Master bank %02X out of range!\n", safe_activecpu_get_pc(), alternate_bank & 7);
+		logerror("%04X:Master bank %02X out of range!\n", safe_cpu_get_pc(machine->activecpu), alternate_bank & 7);
 		address = &master_base[bank_list[0]];
 	}
 	memory_set_bankptr(1, address);
@@ -638,7 +638,7 @@ void offroad_bankswitch(void)
 
 
 /* bankswitching for Ataxx, WSF, Indy Heat, and Brute Force */
-void ataxx_bankswitch(void)
+void ataxx_bankswitch(running_machine *machine)
 {
 	static const UINT32 bank_list[] =
 	{
@@ -652,7 +652,7 @@ void ataxx_bankswitch(void)
 	address = &master_base[bank_list[master_bank & 15]];
 	if (bank_list[master_bank & 15] >= master_length)
 	{
-		logerror("%04X:Master bank %02X out of range!\n", safe_activecpu_get_pc(), master_bank & 15);
+		logerror("%04X:Master bank %02X out of range!\n", safe_cpu_get_pc(machine->activecpu), master_bank & 15);
 		address = &master_base[bank_list[0]];
 	}
 	memory_set_bankptr(1, address);
@@ -850,14 +850,14 @@ void ataxx_init_eeprom(UINT8 default_val, const UINT16 *data, UINT8 serial_offse
 READ8_HANDLER( ataxx_eeprom_r )
 {
 	int port = input_port_read(machine, "IN2");
-	if (LOG_EEPROM) logerror("%04X:EE read\n", safe_activecpu_get_pc());
+	if (LOG_EEPROM) logerror("%04X:EE read\n", safe_cpu_get_pc(machine->activecpu));
 	return (port & ~0x01) | eeprom_read_bit();
 }
 
 
 WRITE8_HANDLER( ataxx_eeprom_w )
 {
-	if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", safe_activecpu_get_pc(),
+	if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", safe_cpu_get_pc(machine->activecpu),
 			(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 	eeprom_write_bit     ((data & 0x10) >> 4);
 	eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
@@ -876,11 +876,11 @@ WRITE8_HANDLER( leland_battery_ram_w )
 {
 	if (battery_ram_enable)
 	{
-		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", safe_activecpu_get_pc(), offset, data);
+		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", safe_cpu_get_pc(machine->activecpu), offset, data);
 		battery_ram[offset] = data;
 	}
 	else
-		logerror("%04X:BatteryW@%04X (invalid!)\n", safe_activecpu_get_pc(), offset);
+		logerror("%04X:BatteryW@%04X (invalid!)\n", safe_cpu_get_pc(machine->activecpu), offset);
 }
 
 
@@ -888,13 +888,13 @@ WRITE8_HANDLER( ataxx_battery_ram_w )
 {
 	if (battery_ram_enable)
 	{
-		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", safe_activecpu_get_pc(), offset, data);
+		if (LOG_BATTERY_RAM) logerror("%04X:BatteryW@%04X=%02X\n", safe_cpu_get_pc(machine->activecpu), offset, data);
 		battery_ram[offset] = data;
 	}
 	else if ((master_bank & 0x30) == 0x20)
 		ataxx_qram[((master_bank & 0xc0) << 8) + offset] = data;
 	else
-		logerror("%04X:BatteryW@%04X (invalid!)\n", safe_activecpu_get_pc(), offset);
+		logerror("%04X:BatteryW@%04X (invalid!)\n", safe_cpu_get_pc(machine->activecpu), offset);
 }
 
 
@@ -986,11 +986,11 @@ NVRAM_HANDLER( ataxx )
 
 --------------------------------------------------------------------*/
 
-static int keycard_r(void)
+static int keycard_r(running_machine *machine)
 {
 	int result = 0;
 
-	if (LOG_KEYCARDS_FULL) logerror("  (%04X:keycard_r)\n", safe_activecpu_get_pc());
+	if (LOG_KEYCARDS_FULL) logerror("  (%04X:keycard_r)\n", safe_cpu_get_pc(machine->activecpu));
 
 	/* if we have a valid keycard read state, we're reading from the keycard */
 	if (keycard_state & 0x80)
@@ -1009,12 +1009,12 @@ static int keycard_r(void)
 	return result;
 }
 
-static void keycard_w(int data)
+static void keycard_w(running_machine *machine, int data)
 {
 	int new_state = data & 0xb0;
 	int new_clock = data & 0x40;
 
-	if (LOG_KEYCARDS_FULL) logerror("  (%04X:keycard_w=%02X)\n", safe_activecpu_get_pc(), data);
+	if (LOG_KEYCARDS_FULL) logerror("  (%04X:keycard_w=%02X)\n", safe_cpu_get_pc(machine->activecpu), data);
 
 	/* check for going active */
 	if (!keycard_state && new_state)
@@ -1100,7 +1100,7 @@ READ8_HANDLER( leland_master_analog_key_r )
 			break;
 
 		case 0x02:	/* FF = keycard serial data read */
-			result = keycard_r();
+			result = keycard_r(machine);
 
 			/* bit 7 indicates the analog input is busy for some games */
 			result &= ~0x80;
@@ -1126,13 +1126,13 @@ WRITE8_HANDLER( leland_master_analog_key_w )
 			/* update top board banking for some games */
 			if (LOG_BANKSWITCHING_M)
 				if ((top_board_bank ^ data) & 0xc0)
-					logerror("%04X:top_board_bank = %02X\n", safe_activecpu_get_pc(), data & 0xc0);
+					logerror("%04X:top_board_bank = %02X\n", safe_cpu_get_pc(machine->activecpu), data & 0xc0);
 			top_board_bank = data & 0xc0;
-			(*leland_update_master_bank)();
+			(*leland_update_master_bank)(machine);
 			break;
 
 		case 0x02:	/* FF = keycard data write */
-			keycard_w(data);
+			keycard_w(machine, data);
 			break;
 	}
 }
@@ -1157,7 +1157,7 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x01:	/* /GIN1 */
 			result = input_port_read(machine, "IN1");
-			if (cpunum_get_reg(1, Z80_HALT))
+			if (cpu_get_reg(machine->cpu[1], Z80_HALT))
 				result ^= 0x01;
 			break;
 
@@ -1177,7 +1177,7 @@ READ8_HANDLER( leland_master_input_r )
 
 		case 0x11:	/* /GIN1 */
 			result = input_port_read(machine, "IN3");
-			if (LOG_EEPROM) logerror("%04X:EE read\n", safe_activecpu_get_pc());
+			if (LOG_EEPROM) logerror("%04X:EE read\n", safe_cpu_get_pc(machine->activecpu));
 			result = (result & ~0x01) | eeprom_read_bit();
 			break;
 
@@ -1199,7 +1199,7 @@ WRITE8_HANDLER( leland_master_output_w )
 			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			cpunum_set_input_line(machine, 1, 0, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
-			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", safe_activecpu_get_pc(),
+			if (LOG_EEPROM) logerror("%04X:EE write %d%d%d\n", safe_cpu_get_pc(machine->activecpu),
 					(data >> 6) & 1, (data >> 5) & 1, (data >> 4) & 1);
 			eeprom_write_bit     ((data & 0x10) >> 4);
 			eeprom_set_clock_line((data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
@@ -1240,7 +1240,7 @@ READ8_HANDLER( ataxx_master_input_r )
 
 		case 0x07:	/* /SLVBLK */
 			result = input_port_read(machine, "IN1");
-			if (cpunum_get_reg(1, Z80_HALT))
+			if (cpu_get_reg(machine->cpu[1], Z80_HALT))
 				result ^= 0x01;
 			break;
 
@@ -1266,9 +1266,9 @@ WRITE8_HANDLER( ataxx_master_output_w )
 		case 0x04:	/* /MBNK */
 			if (LOG_BANKSWITCHING_M)
 				if ((master_bank ^ data) & 0xff)
-					logerror("%04X:master_bank = %02X\n", safe_activecpu_get_pc(), data & 0xff);
+					logerror("%04X:master_bank = %02X\n", safe_cpu_get_pc(machine->activecpu), data & 0xff);
 			master_bank = data;
-			ataxx_bankswitch();
+			ataxx_bankswitch(machine);
 			break;
 
 		case 0x05:	/* /SLV0 */
@@ -1319,22 +1319,22 @@ WRITE8_HANDLER( ataxx_paletteram_and_misc_w )
 	else if (offset == 0x7fc)
 	{
 		xrom1_addr = (xrom1_addr & 0xff00) | (data & 0x00ff);
-		if (LOG_XROM) logerror("%04X:XROM1 address low write = %02X (addr=%04X)\n", safe_activecpu_get_pc(), data, xrom1_addr);
+		if (LOG_XROM) logerror("%04X:XROM1 address low write = %02X (addr=%04X)\n", safe_cpu_get_pc(machine->activecpu), data, xrom1_addr);
 	}
 	else if (offset == 0x7fd)
 	{
 		xrom1_addr = (xrom1_addr & 0x00ff) | ((data << 8) & 0xff00);
-		if (LOG_XROM) logerror("%04X:XROM1 address high write = %02X (addr=%04X)\n", safe_activecpu_get_pc(), data, xrom1_addr);
+		if (LOG_XROM) logerror("%04X:XROM1 address high write = %02X (addr=%04X)\n", safe_cpu_get_pc(machine->activecpu), data, xrom1_addr);
 	}
 	else if (offset == 0x7fe)
 	{
 		xrom2_addr = (xrom2_addr & 0xff00) | (data & 0x00ff);
-		if (LOG_XROM) logerror("%04X:XROM2 address low write = %02X (addr=%04X)\n", safe_activecpu_get_pc(), data, xrom2_addr);
+		if (LOG_XROM) logerror("%04X:XROM2 address low write = %02X (addr=%04X)\n", safe_cpu_get_pc(machine->activecpu), data, xrom2_addr);
 	}
 	else if (offset == 0x7ff)
 	{
 		xrom2_addr = (xrom2_addr & 0x00ff) | ((data << 8) & 0xff00);
-		if (LOG_XROM) logerror("%04X:XROM2 address high write = %02X (addr=%04X)\n", safe_activecpu_get_pc(), data, xrom2_addr);
+		if (LOG_XROM) logerror("%04X:XROM2 address high write = %02X (addr=%04X)\n", safe_cpu_get_pc(machine->activecpu), data, xrom2_addr);
 	}
 	else
 		extra_tram[offset] = data;
@@ -1348,13 +1348,13 @@ READ8_HANDLER( ataxx_paletteram_and_misc_r )
 	else if (offset == 0x7fc || offset == 0x7fd)
 	{
 		int result = xrom_base[0x00000 | xrom1_addr | ((offset & 1) << 16)];
-		if (LOG_XROM) logerror("%04X:XROM1 read(%d) = %02X (addr=%04X)\n", safe_activecpu_get_pc(), offset - 0x7fc, result, xrom1_addr);
+		if (LOG_XROM) logerror("%04X:XROM1 read(%d) = %02X (addr=%04X)\n", safe_cpu_get_pc(machine->activecpu), offset - 0x7fc, result, xrom1_addr);
 		return result;
 	}
 	else if (offset == 0x7fe || offset == 0x7ff)
 	{
 		int result = xrom_base[0x20000 | xrom2_addr | ((offset & 1) << 16)];
-		if (LOG_XROM) logerror("%04X:XROM2 read(%d) = %02X (addr=%04X)\n", safe_activecpu_get_pc(), offset - 0x7fc, result, xrom2_addr);
+		if (LOG_XROM) logerror("%04X:XROM2 read(%d) = %02X (addr=%04X)\n", safe_cpu_get_pc(machine->activecpu), offset - 0x7fc, result, xrom2_addr);
 		return result;
 	}
 	else
@@ -1387,9 +1387,9 @@ WRITE8_HANDLER( leland_sound_port_w )
     /* some bankswitching occurs here */
 	if (LOG_BANKSWITCHING_M)
 		if ((sound_port_bank ^ data) & 0x24)
-			logerror("%04X:sound_port_bank = %02X\n", safe_activecpu_get_pc(), data & 0x24);
+			logerror("%04X:sound_port_bank = %02X\n", safe_cpu_get_pc(machine->activecpu), data & 0x24);
     sound_port_bank = data & 0x24;
-    (*leland_update_master_bank)();
+    (*leland_update_master_bank)(machine);
 }
 
 
@@ -1406,12 +1406,12 @@ WRITE8_HANDLER( leland_slave_small_banksw_w )
 
 	if (bankaddress >= slave_length)
 	{
-		logerror("%04X:Slave bank %02X out of range!", safe_activecpu_get_pc(), data & 1);
+		logerror("%04X:Slave bank %02X out of range!", safe_cpu_get_pc(machine->activecpu), data & 1);
 		bankaddress = 0x10000;
 	}
 	memory_set_bankptr(3, &slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", safe_activecpu_get_pc(), data & 1, bankaddress);
+	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", safe_cpu_get_pc(machine->activecpu), data & 1, bankaddress);
 }
 
 
@@ -1421,12 +1421,12 @@ WRITE8_HANDLER( leland_slave_large_banksw_w )
 
 	if (bankaddress >= slave_length)
 	{
-		logerror("%04X:Slave bank %02X out of range!", safe_activecpu_get_pc(), data & 15);
+		logerror("%04X:Slave bank %02X out of range!", safe_cpu_get_pc(machine->activecpu), data & 15);
 		bankaddress = 0x10000;
 	}
 	memory_set_bankptr(3, &slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", safe_activecpu_get_pc(), data & 15, bankaddress);
+	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", safe_cpu_get_pc(machine->activecpu), data & 15, bankaddress);
 }
 
 
@@ -1445,12 +1445,12 @@ WRITE8_HANDLER( ataxx_slave_banksw_w )
 
 	if (bankaddress >= slave_length)
 	{
-		logerror("%04X:Slave bank %02X out of range!", safe_activecpu_get_pc(), data & 0x3f);
+		logerror("%04X:Slave bank %02X out of range!", safe_cpu_get_pc(machine->activecpu), data & 0x3f);
 		bankaddress = 0x2000;
 	}
 	memory_set_bankptr(3, &slave_base[bankaddress]);
 
-	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", safe_activecpu_get_pc(), data, bankaddress);
+	if (LOG_BANKSWITCHING_S) logerror("%04X:Slave bank = %02X (%05X)\n", safe_cpu_get_pc(machine->activecpu), data, bankaddress);
 }
 
 

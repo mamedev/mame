@@ -147,7 +147,7 @@ INLINE attotime get_current_time(void)
 		return callback_timer_expire_time;
 
 	/* if we're executing as a particular CPU, use its local time as a base */
-	activecpu = cpu_getactivecpu();
+	activecpu = cpunum_get_active();
 	if (activecpu >= 0)
 		return cpunum_get_localtime(activecpu);
 
@@ -734,7 +734,7 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 
 	/* if this was inserted as the head, abort the current timeslice and resync */
 	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
-	if (which == timer_head && cpu_getexecutingcpu() >= 0)
+	if (which == timer_head && cpunum_get_executing() >= 0)
 		activecpu_abort_timeslice();
 }
 

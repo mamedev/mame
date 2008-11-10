@@ -242,7 +242,7 @@ WRITE8_HANDLER( gunfight_audio_w )
 		break;
 
 	default:
-		logerror("%04x:  Unknown sh port write %02x\n",activecpu_get_pc(),data);
+		logerror("%04x:  Unknown sh port write %02x\n",cpu_get_pc(machine->activecpu),data);
 		break;
 	}
 }

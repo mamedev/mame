@@ -212,16 +212,16 @@ static MACHINE_RESET( g80v )
  *
  *************************************/
 
-static offs_t decrypt_offset(offs_t offset)
+static offs_t decrypt_offset(running_machine *machine, offs_t offset)
 {
 	offs_t pc;
 
 	/* if no active CPU, don't do anything */
-	if (cpu_getactivecpu() == -1)
+	if (cpunum_get_active() == -1)
 		return offset;
 
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	pc = activecpu_get_previouspc();
+	pc = cpu_get_previouspc(machine->activecpu);
 	if ((UINT16)pc == 0xffff || program_read_byte(pc) != 0x32)
 		return offset;
 
@@ -229,9 +229,9 @@ static offs_t decrypt_offset(offs_t offset)
 	return (offset & 0xff00) | (*sega_decrypt)(pc, program_read_byte(pc + 1));
 }
 
-static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(offset)] = data; }
-static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(machine, decrypt_offset(offset), data); }
-static WRITE8_HANDLER( vectorram_w ) { vectorram[decrypt_offset(offset)] = data; }
+static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(machine, offset)] = data; }
+static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(machine, decrypt_offset(machine, offset), data); }
+static WRITE8_HANDLER( vectorram_w ) { vectorram[decrypt_offset(machine, offset)] = data; }
 
 
 
@@ -385,7 +385,7 @@ static WRITE8_HANDLER( unknown_w )
 	/* writing an 0x04 here enables interrupts */
 	/* some games write 0x00/0x01 here as well */
 	if (data != 0x00 && data != 0x01 && data != 0x04)
-		mame_printf_debug("%04X:unknown_w = %02X\n", activecpu_get_pc(), data);
+		mame_printf_debug("%04X:unknown_w = %02X\n", cpu_get_pc(machine->activecpu), data);
 }
 
 

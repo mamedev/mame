@@ -193,6 +193,7 @@ struct _device_config
 	/* these fields are only valid if the device is live */
 	UINT8					started;				/* TRUE if the start function has succeeded */
 	void *					token;					/* token if device is live */
+	void *					classtoken;				/* class token if device is live */
 	running_machine *		machine;				/* machine if device is live */
 	UINT8 *					region;					/* pointer to region with the device's tag, or NULL */
 	UINT32					regionbytes;			/* size of the region, in bytes */

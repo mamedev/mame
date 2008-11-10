@@ -7,6 +7,7 @@
 **************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "btoads.h"
@@ -307,7 +308,7 @@ void btoads_to_shiftreg(UINT32 address, UINT16 *shiftreg)
 	}
 
 	else
-		logerror("%08X:btoads_to_shiftreg(%08X)\n", activecpu_get_pc(), address);
+		logerror("%08X:btoads_to_shiftreg(%08X)\n", cpu_get_pc(Machine->activecpu), address);
 }
 
 
@@ -332,7 +333,7 @@ void btoads_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 		render_sprite_row(shiftreg, address);
 
 	else
-		logerror("%08X:btoads_from_shiftreg(%08X)\n", activecpu_get_pc(), address);
+		logerror("%08X:btoads_from_shiftreg(%08X)\n", cpu_get_pc(Machine->activecpu), address);
 }
 
 

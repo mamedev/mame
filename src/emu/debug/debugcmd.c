@@ -248,7 +248,7 @@ void debug_command_init(running_machine *machine)
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 	{
 		cpu_debug_init_func debug_init;
-		debug_init = cpunum_get_info_fct(cpunum, CPUINFO_PTR_DEBUG_INIT);
+		debug_init = cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_DEBUG_INIT);
 		if (debug_init != NULL)
 			(*debug_init)();
 	}
@@ -369,7 +369,7 @@ static void global_set(void *ref, UINT64 value)
 
 int debug_command_parameter_number(const char *param, UINT64 *result)
 {
-	EXPRERR err = expression_evaluate(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, &debug_expression_callbacks, result);
+	EXPRERR err = expression_evaluate(param, debug_get_cpu_info(cpunum_get_active())->symtable, &debug_expression_callbacks, result);
 	if (err == EXPRERR_NONE)
 		return 1;
 	debug_console_printf("Error in expression: %s\n", param);
@@ -386,7 +386,7 @@ int debug_command_parameter_number(const char *param, UINT64 *result)
 
 static int debug_command_parameter_expression(const char *param, parsed_expression **result)
 {
-	EXPRERR err = expression_parse(param, debug_get_cpu_info(cpu_getactivecpu())->symtable, &debug_expression_callbacks, result);
+	EXPRERR err = expression_parse(param, debug_get_cpu_info(cpunum_get_active())->symtable, &debug_expression_callbacks, result);
 	if (err == EXPRERR_NONE)
 		return 1;
 	debug_console_printf("Error in expression: %s\n", param);
@@ -601,7 +601,7 @@ static void execute_logerror(running_machine *machine, int ref, int params, cons
 
 static void execute_tracelog(running_machine *machine, int ref, int params, const char *param[])
 {
-	FILE *file = debug_get_cpu_info(cpu_getactivecpu())->trace.file;
+	FILE *file = debug_get_cpu_info(cpunum_get_active())->trace.file;
 	UINT64 values[MAX_COMMAND_PARAMS];
 	char buffer[1024];
 	int i;
@@ -935,7 +935,7 @@ static void execute_comment(running_machine *machine, int ref, int params, const
 	}
 
 	/* Now try adding the comment */
-	debug_comment_add(cpu_getactivecpu(), address, param[1], 0x00ff0000, debug_comment_get_opcode_crc32(address));
+	debug_comment_add(cpunum_get_active(), address, param[1], 0x00ff0000, debug_comment_get_opcode_crc32(address));
 	debug_view_update_type(DVT_DISASSEMBLY);
 }
 
@@ -954,7 +954,7 @@ static void execute_comment_del(running_machine *machine, int ref, int params, c
 
 	/* If it's a number, it must be an address */
 	/* The bankoff and cbn will be pulled from what's currently active */
-	debug_comment_remove(cpu_getactivecpu(), address, debug_comment_get_opcode_crc32(address));
+	debug_comment_remove(cpunum_get_active(), address, debug_comment_get_opcode_crc32(address));
 	debug_view_update_type(DVT_DISASSEMBLY);
 }
 
@@ -983,7 +983,7 @@ static void execute_bpset(running_machine *machine, int ref, int params, const c
 	int bpnum;
 
 	/* make sure that there is an active CPU */
-	if (cpu_getactivecpu() < 0)
+	if (cpunum_get_active() < 0)
 	{
 		debug_console_printf("No active CPU!\n");
 		return;
@@ -1002,7 +1002,7 @@ static void execute_bpset(running_machine *machine, int ref, int params, const c
 		return;
 
 	/* set the breakpoint */
-	bpnum = debug_cpu_breakpoint_set(machine, cpu_getactivecpu(), address, condition, action);
+	bpnum = debug_cpu_breakpoint_set(machine, cpunum_get_active(), address, condition, action);
 	debug_console_printf("Breakpoint %X set\n", bpnum);
 }
 
@@ -1176,7 +1176,7 @@ static void execute_wpset(running_machine *machine, int ref, int params, const c
 		return;
 
 	/* set the watchpoint */
-	wpnum = debug_cpu_watchpoint_set(machine, cpu_getactivecpu(), ref, type, address, length, condition, action);
+	wpnum = debug_cpu_watchpoint_set(machine, cpunum_get_active(), ref, type, address, length, condition, action);
 	debug_console_printf("Watchpoint %X set\n", wpnum);
 }
 
@@ -1362,7 +1362,7 @@ static void execute_hotspot(running_machine *machine, int ref, int params, const
 	}
 
 	/* extract parameters */
-	cpunum = cpu_getactivecpu();
+	cpunum = cpunum_get_active();
 	count = 64;
 	threshhold = 250;
 	if (params > 0 && !debug_command_parameter_number(param[0], &cpunum))
@@ -1386,7 +1386,7 @@ static void execute_hotspot(running_machine *machine, int ref, int params, const
 
 static void execute_save(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 offset, endoffset, length, cpunum = cpu_getactivecpu();
+	UINT64 offset, endoffset, length, cpunum = cpunum_get_active();
 	const debug_cpu_info *info;
 	int spacenum = ref;
 	FILE *f;
@@ -1414,13 +1414,13 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	for (i = offset; i <= endoffset; i++)
 	{
 		UINT8 byte = debug_read_byte(spacenum, i, TRUE);
 		fwrite(&byte, 1, 1, f);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* close the file */
 	fclose(f);
@@ -1434,7 +1434,7 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 
 static void execute_dump(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 offset, endoffset, length, width = 0, ascii = 1, cpunum = cpu_getactivecpu();
+	UINT64 offset, endoffset, length, width = 0, ascii = 1, cpunum = cpunum_get_active();
 	const debug_cpu_info *info;
 	int spacenum = ref;
 	FILE *f = NULL;
@@ -1480,7 +1480,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	for (i = offset; i <= endoffset; i += 16)
 	{
 		char output[200];
@@ -1589,7 +1589,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 		/* output the result */
 		fprintf(f, "%s\n", output);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* close the file */
 	fclose(f);
@@ -1603,7 +1603,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 
 static void execute_find(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 offset, endoffset, length, cpunum = cpu_getactivecpu();
+	UINT64 offset, endoffset, length, cpunum = cpunum_get_active();
 	const debug_cpu_info *info;
 	UINT64 data_to_find[256];
 	UINT8 data_size[256];
@@ -1668,7 +1668,7 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now search */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	for (i = offset; i <= endoffset; i += data_size[0])
 	{
 		int suboffset = 0;
@@ -1695,7 +1695,7 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 			debug_console_printf("Found at %*X\n", info->space[spacenum].logchars, (UINT32)BYTE2ADDR(i, info, spacenum));
 		}
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* print something if not found */
 	if (found == 0)
@@ -1709,7 +1709,7 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 
 static void execute_dasm(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 offset, length, bytes = 1, cpunum = cpu_getactivecpu();
+	UINT64 offset, length, bytes = 1, cpunum = cpunum_get_active();
 	const debug_cpu_info *info;
 	int minbytes, maxbytes, byteswidth;
 	FILE *f = NULL;
@@ -1734,8 +1734,8 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 	info = debug_get_cpu_info(cpunum);
 
 	/* determine the width of the bytes */
-	minbytes = cpunum_min_instruction_bytes(cpunum);
-	maxbytes = cpunum_max_instruction_bytes(cpunum);
+	minbytes = cpu_get_min_opcode_bytes(machine->cpu[cpunum]);
+	maxbytes = cpu_get_max_opcode_bytes(machine->cpu[cpunum]);
 	byteswidth = 0;
 	if (bytes)
 	{
@@ -1752,7 +1752,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 	}
 
 	/* now write the data out */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	for (i = 0; i < length; )
 	{
 		int pcbyte = ADDR2BYTE_MASKED(offset + i, info, ADDRESS_SPACE_PROGRAM);
@@ -1779,7 +1779,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 			}
 
 			/* disassemble the result */
-			i += numbytes = activecpu_dasm(disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			i += numbytes = cpu_dasm(machine->activecpu, disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* print the bytes */
@@ -1841,7 +1841,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		/* output the result */
 		fprintf(f, "%s\n", output);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* close the file */
 	fclose(f);
@@ -1861,7 +1861,7 @@ static void execute_trace_internal(running_machine *machine, int ref, int params
 	const char *mode;
 	UINT64 cpunum;
 
-	cpunum = cpu_getactivecpu();
+	cpunum = cpunum_get_active();
 
 	/* validate parameters */
 	if (params > 1 && !debug_command_parameter_number(param[1], &cpunum))
@@ -1948,7 +1948,7 @@ static void execute_history(running_machine *machine, int ref, int params, const
 	UINT64 cpunum;
 	int i;
 
-	cpunum = cpu_getactivecpu();
+	cpunum = cpunum_get_active();
 
 	/* validate parameters */
 	if (params > 0 && !debug_command_parameter_number(param[0], &cpunum))
@@ -1968,11 +1968,11 @@ static void execute_history(running_machine *machine, int ref, int params, const
 	info = debug_get_cpu_info(cpunum);
 
 	/* loop over lines */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	for (i = 0; i < count; i++)
 	{
 		offs_t pc = info->pc_history[(info->pc_history_index + DEBUG_HISTORY_SIZE - count + i) % DEBUG_HISTORY_SIZE];
-		int maxbytes = activecpu_max_instruction_bytes();
+		int maxbytes = cpu_get_max_opcode_bytes(machine->activecpu);
 		UINT8 opbuf[64], argbuf[64];
 		char buffer[200];
 		offs_t pcbyte;
@@ -1986,11 +1986,11 @@ static void execute_history(running_machine *machine, int ref, int params, const
 			argbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, TRUE);
 		}
 
-		activecpu_dasm(buffer, pc, opbuf, argbuf);
+		cpu_dasm(machine->activecpu, buffer, pc, opbuf, argbuf);
 
 		debug_console_printf("%0*X: %s\n", info->space[ADDRESS_SPACE_PROGRAM].logchars, pc, buffer);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -2059,7 +2059,7 @@ static void execute_source(running_machine *machine, int ref, int params, const 
 
 static void execute_map(running_machine *machine, int ref, int params, const char *param[])
 {
-	UINT64 address, cpunum = cpu_getactivecpu();
+	UINT64 address, cpunum = cpunum_get_active();
 	const debug_cpu_info *info;
 	int spacenum = ref;
 	offs_t taddress;

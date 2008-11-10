@@ -82,7 +82,7 @@ static void handle_coins(running_machine *machine, int coin)
 
 static READ8_HANDLER ( xyonix_io_r )
 {
-	int regPC = activecpu_get_pc();
+	int regPC = cpu_get_pc(machine->activecpu);
 
 	if (regPC == 0x27ba)
 		return 0x88;
@@ -142,7 +142,7 @@ static READ8_HANDLER ( xyonix_io_r )
 
 static WRITE8_HANDLER ( xyonix_io_w )
 {
-//  logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, activecpu_get_pc());
+//  logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(machine->activecpu));
 	e0_data = data;
 }
 

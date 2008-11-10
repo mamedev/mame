@@ -40,7 +40,7 @@ static WRITE32_HANDLER( igs_cg_videoram_w )
 {
 	COMBINE_DATA(&igs_cg_videoram[offset]);
 	//if(data!=0)
-	logerror("PC(%08X) CG @%x = %x!\n",activecpu_get_pc(),offset ,igs_cg_videoram[offset]);
+	logerror("PC(%08X) CG @%x = %x!\n",cpu_get_pc(machine->activecpu),offset ,igs_cg_videoram[offset]);
 
 
 

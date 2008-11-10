@@ -38,7 +38,7 @@ READ16_HANDLER( galpani2_bg8_regs_##_n_##_r ) \
 	{ \
 		case 0x16:	return mame_rand(machine) & 1; \
 		default: \
-			logerror("CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",activecpu_get_pc(),_n_,offset*2); \
+			logerror("CPU #0 PC %06X : Warning, bg8 #%d screen reg %04X read\n",cpu_get_pc(machine->activecpu),_n_,offset*2); \
 	} \
 	return galpani2_bg8_regs_##_n_[offset]; \
 }
@@ -151,7 +151,7 @@ VIDEO_UPDATE( galpani2 )
 {
 	int layers_ctrl = -1;
 
-	galpani2_mcu_run();
+	galpani2_mcu_run(screen->machine);
 
 #ifdef MAME_DEBUG
 if (input_code_pressed(KEYCODE_Z))

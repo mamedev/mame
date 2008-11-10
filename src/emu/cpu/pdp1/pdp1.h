@@ -20,8 +20,8 @@ enum
 	PDP1_IO_COMPLETE	/* hack, do not use directly, use pdp1_pulse_iot_done instead */
 };
 
-#define pdp1_pulse_start_clear()	cpunum_set_reg(0, PDP1_START_CLEAR, 0)
-#define pdp1_pulse_iot_done()		cpunum_set_reg(0, PDP1_IO_COMPLETE, 0)
+#define pdp1_pulse_start_clear()	cpu_set_reg(machine->cpu[0], PDP1_START_CLEAR, 0)
+#define pdp1_pulse_iot_done()		cpu_set_reg(machine->cpu[0], PDP1_IO_COMPLETE, 0)
 
 typedef struct _pdp1_reset_param_t pdp1_reset_param_t;
 struct _pdp1_reset_param_t

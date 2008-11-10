@@ -68,7 +68,7 @@ struct ics2115{
 
 static int caller_get_pc(void)
 {
-	int pc = activecpu_get_pc();
+	int pc = cpu_get_pc(Machine->activecpu);
 #if 0
 	if(pc == 0x14b || pc == 0x26e || pc == 0x284 || pc == 0x28d ||
 	   pc == 0x290 || pc == 0x299 || pc == 0x2a2 || pc == 0x2b3) {

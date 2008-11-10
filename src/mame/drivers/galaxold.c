@@ -383,7 +383,7 @@ TO DO :
 /* Send sound data to the sound cpu and cause an nmi */
 static READ8_HANDLER( drivfrcg_port0_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 		case 0x002e:
 		case 0x0297:
@@ -954,7 +954,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( hexpoola_data_port_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 		case 0x0022:
 			return 0;

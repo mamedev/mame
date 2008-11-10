@@ -136,7 +136,7 @@ popmessage(t);
 				coin_counter_w(1, data & 0x04000000);
 				coin_word = (data >> 16) &0xffff;
 			}
-//logerror("CPU #0 PC %06x: write input %06x\n",activecpu_get_pc(),offset);
+//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(machine->activecpu),offset);
 		}
 	}
 }
@@ -422,7 +422,7 @@ ROM_END
 
 static READ32_HANDLER( main_cycle_r )
 {
-	if (activecpu_get_pc()==0x55a && (gunbustr_ram[0x3acc/4]&0xff000000)==0)
+	if (cpu_get_pc(machine->activecpu)==0x55a && (gunbustr_ram[0x3acc/4]&0xff000000)==0)
 		cpu_spinuntil_int();
 
 	return gunbustr_ram[0x3acc/4];

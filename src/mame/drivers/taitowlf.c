@@ -130,7 +130,7 @@ static UINT8 mxtc_config_r(int function, int reg)
 
 static void mxtc_config_w(running_machine *machine, int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("MXTC: write %d, %02X, %02X at %08X\n", function, reg, data, activecpu_get_pc());
+//  mame_printf_debug("MXTC: write %d, %02X, %02X at %08X\n", function, reg, data, cpu_get_pc(machine->activecpu));
 
 	switch(reg)
 	{
@@ -214,7 +214,7 @@ static UINT8 piix4_config_r(int function, int reg)
 
 static void piix4_config_w(int function, int reg, UINT8 data)
 {
-//  mame_printf_debug("PIIX4: write %d, %02X, %02X at %08X\n", function, reg, data, activecpu_get_pc());
+//  mame_printf_debug("PIIX4: write %d, %02X, %02X at %08X\n", function, reg, data, cpu_get_pc(machine->activecpu));
 	piix4_config_reg[function][reg] = data;
 }
 
@@ -370,9 +370,9 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	result = program_read_byte(page_offset + offset);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return result;
 }
@@ -383,9 +383,9 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	program_write_byte(page_offset + offset, data);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 

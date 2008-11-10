@@ -438,7 +438,7 @@ INLINE int pc_is_valid(running_machine *machine, UINT32 pc, UINT32 flags)
 		return 0;
 	if (pc & 0xff000000)
 		return 0;
-	if (memory_get_op_ptr(machine, cpu_getactivecpu(), pc, 0) == NULL)
+	if (memory_get_op_ptr(machine, cpunum_get_active(), pc, 0) == NULL)
 		return 0;
 	return 1;
 }
@@ -462,7 +462,7 @@ INLINE int addr_is_valid(running_machine *machine, UINT32 addr, UINT32 flags)
 		return 0;
 
 	/* if we're invalid, fail */
-	if (strcmp(memory_get_handler_string(0, cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, addr), "segaic16_memory_mapper_lsb_r") == 0)
+	if (strcmp(memory_get_handler_string(0, cpunum_get_active(), ADDRESS_SPACE_PROGRAM, addr), "segaic16_memory_mapper_lsb_r") == 0)
 		return 2;
 
 	return 1;
@@ -896,7 +896,7 @@ static void execute_fdunlock(running_machine *machine, int ref, int params, cons
 
 	/* support 0 or 1 parameters */
 	if (params != 1 || !debug_command_parameter_number(param[0], &offset))
- 		offset = activecpu_get_pc();
+ 		offset = cpu_get_pc(machine->activecpu);
  	keyaddr = addr_to_keyaddr(offset / 2);
 
 	/* toggle the ignore PC status */
@@ -937,7 +937,7 @@ static void execute_fdignore(running_machine *machine, int ref, int params, cons
 		return;
 	}
 	if (params != 1 || !debug_command_parameter_number(param[0], &offset))
- 		offset = activecpu_get_pc();
+ 		offset = cpu_get_pc(machine->activecpu);
  	offset /= 2;
 
 	/* toggle the ignore PC status */
@@ -1035,10 +1035,10 @@ static void execute_fdpc(running_machine *machine, int ref, int params, const ch
 
 	/* support 0 or 1 parameters */
 	if (!debug_command_parameter_number(param[0], &newpc))
- 		newpc = activecpu_get_pc();
+ 		newpc = cpu_get_pc(machine->activecpu);
 
  	/* set the new PC */
- 	activecpu_set_reg(REG_PC, newpc);
+ 	cpu_set_reg(machine->activecpu, REG_PC, newpc);
 
  	/* recompute around that */
  	instruction_hook(newpc);
@@ -1052,7 +1052,7 @@ static void execute_fdpc(running_machine *machine, int ref, int params, const ch
 
 static void execute_fdsearch(running_machine *machine, int ref, int params, const char **param)
 {
-	int pc = activecpu_get_pc();
+	int pc = cpu_get_pc(machine->activecpu);
 	int length, first = TRUE;
 	UINT8 instrdata[2];
 	UINT16 decoded;
@@ -1090,7 +1090,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 			}
 
 			/* set this as our current PC and run the instruction hook */
-			activecpu_set_reg(REG_PC, pc);
+			cpu_set_reg(machine->activecpu, REG_PC, pc);
 			if (instruction_hook(pc))
 				break;
 		}

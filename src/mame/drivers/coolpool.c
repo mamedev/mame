@@ -215,7 +215,7 @@ static WRITE16_HANDLER( nvram_thrash_data_w )
 
 static WRITE16_HANDLER( amerdart_misc_w )
 {
-	logerror("%08x:IOP_reset_w %04x\n",activecpu_get_pc(),data);
+	logerror("%08x:IOP_reset_w %04x\n",cpu_get_pc(machine->activecpu),data);
 
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
@@ -277,7 +277,7 @@ static TIMER_CALLBACK( amerdart_iop_response )
 
 static WRITE16_HANDLER( amerdart_iop_w )
 {
-	logerror("%08x:IOP write %04x\n", activecpu_get_pc(), data);
+	logerror("%08x:IOP write %04x\n", cpu_get_pc(machine->activecpu), data);
 	COMBINE_DATA(&iop_cmd);
 	timer_set(ATTOTIME_IN_USEC(100), NULL, 0, amerdart_iop_response);
 }
@@ -292,7 +292,7 @@ static WRITE16_HANDLER( amerdart_iop_w )
 
 static WRITE16_HANDLER( coolpool_misc_w )
 {
-	logerror("%08x:IOP_reset_w %04x\n",activecpu_get_pc(),data);
+	logerror("%08x:IOP_reset_w %04x\n",cpu_get_pc(machine->activecpu),data);
 
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
@@ -322,14 +322,14 @@ static TIMER_CALLBACK( deferred_iop_w )
 
 static WRITE16_HANDLER( coolpool_iop_w )
 {
-	logerror("%08x:IOP write %04x\n", activecpu_get_pc(), data);
+	logerror("%08x:IOP write %04x\n", cpu_get_pc(machine->activecpu), data);
 	timer_call_after_resynch(NULL, data, deferred_iop_w);
 }
 
 
 static READ16_HANDLER( coolpool_iop_r )
 {
-	logerror("%08x:IOP read %04x\n",activecpu_get_pc(),iop_answer);
+	logerror("%08x:IOP read %04x\n",cpu_get_pc(machine->activecpu),iop_answer);
 	cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
 
 	return iop_answer;
@@ -347,14 +347,14 @@ static READ16_HANDLER( coolpool_iop_r )
 static READ16_HANDLER( dsp_cmd_r )
 {
 	cmd_pending = 0;
-	logerror("%08x:IOP cmd_r %04x\n",activecpu_get_pc(),iop_cmd);
+	logerror("%08x:IOP cmd_r %04x\n",cpu_get_pc(machine->activecpu),iop_cmd);
 	return iop_cmd;
 }
 
 
 static WRITE16_HANDLER( dsp_answer_w )
 {
-	logerror("%08x:IOP answer %04x\n",activecpu_get_pc(),data);
+	logerror("%08x:IOP answer %04x\n",cpu_get_pc(machine->activecpu),data);
 	iop_answer = data;
 	cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
 }
@@ -471,7 +471,7 @@ static READ16_HANDLER( coolpool_input_r )
 		}
 	}
 
-//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", activecpu_get_pc(),
+//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", cpu_get_pc(machine->activecpu),
 //      newx, newy, oldx, oldy, result);
 	lastresult = result;
 	return result;

@@ -219,7 +219,7 @@ static UINT8 alg_cia_0_porta_r(void)
 
 static UINT8 alg_cia_0_portb_r(void)
 {
-	logerror("%06x:alg_cia_0_portb_r\n", activecpu_get_pc());
+	logerror("%06x:alg_cia_0_portb_r\n", cpu_get_pc(Machine->activecpu));
 	return 0xff;
 }
 
@@ -227,20 +227,20 @@ static UINT8 alg_cia_0_portb_r(void)
 static void alg_cia_0_portb_w(UINT8 data)
 {
 	/* parallel port */
-	logerror("%06x:alg_cia_0_portb_w(%02x)\n", activecpu_get_pc(), data);
+	logerror("%06x:alg_cia_0_portb_w(%02x)\n", cpu_get_pc(Machine->activecpu), data);
 }
 
 
 static UINT8 alg_cia_1_porta_r(void)
 {
-	logerror("%06x:alg_cia_1_porta_r\n", activecpu_get_pc());
+	logerror("%06x:alg_cia_1_porta_r\n", cpu_get_pc(Machine->activecpu));
 	return 0xff;
 }
 
 
 static void alg_cia_1_porta_w(UINT8 data)
 {
-	logerror("%06x:alg_cia_1_porta_w(%02x)\n", activecpu_get_pc(), data);
+	logerror("%06x:alg_cia_1_porta_w(%02x)\n", cpu_get_pc(Machine->activecpu), data);
 }
 
 

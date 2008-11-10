@@ -99,18 +99,18 @@ static READ16_HANDLER( z80_shared_r )
 {
 	UINT16	result = 0xffff;
 
-	cpuintrf_push_context(2);
+	cpu_push_context(machine->cpu[2]);
 	result = program_read_byte(offset);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return result;
 }
 
 static WRITE16_HANDLER( z80_shared_w )
 {
-	cpuintrf_push_context(2);
+	cpu_push_context(machine->cpu[2]);
 	program_write_byte(offset, data & 0xff);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 

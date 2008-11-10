@@ -554,7 +554,7 @@ static READ8_HANDLER( alibaba_mystery_2_r )
 static READ8_HANDLER( maketrax_special_port2_r )
 {
 	int data = input_port_read(machine, "DSW1");
-	int pc = activecpu_get_previouspc();
+	int pc = cpu_get_previouspc(machine->activecpu);
 
 	if ((pc == 0x1973) || (pc == 0x2389)) return data | 0x40;
 
@@ -575,7 +575,7 @@ static READ8_HANDLER( maketrax_special_port2_r )
 
 static READ8_HANDLER( maketrax_special_port3_r )
 {
-	int pc = activecpu_get_previouspc();
+	int pc = cpu_get_previouspc(machine->activecpu);
 
 	if (pc == 0x040e) return 0x20;
 
@@ -597,7 +597,7 @@ static READ8_HANDLER( maketrax_special_port3_r )
 static READ8_HANDLER( korosuke_special_port2_r )
 {
 	int data = input_port_read(machine, "DSW1");
-	int pc = activecpu_get_previouspc();
+	int pc = cpu_get_previouspc(machine->activecpu);
 
 	if ((pc == 0x196e) || (pc == 0x2387)) return data | 0x40;
 
@@ -617,7 +617,7 @@ static READ8_HANDLER( korosuke_special_port2_r )
 
 static READ8_HANDLER( korosuke_special_port3_r )
 {
-	int pc = activecpu_get_previouspc();
+	int pc = cpu_get_previouspc(machine->activecpu);
 
 	if (pc == 0x0445) return 0x20;
 
@@ -692,7 +692,7 @@ static WRITE8_HANDLER( porky_banking_w )
 
 static READ8_HANDLER( drivfrcp_port1_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 		case 0x0030:
 		case 0x0291:
@@ -704,7 +704,7 @@ static READ8_HANDLER( drivfrcp_port1_r )
 
 static READ8_HANDLER( _8bpm_port1_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 		case 0x0030:
 		case 0x0466:
@@ -716,7 +716,7 @@ static READ8_HANDLER( _8bpm_port1_r )
 
 static READ8_HANDLER( porky_port1_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 		case 0x0034:
 			return 0x01;
@@ -5416,7 +5416,7 @@ static READ8_HANDLER( cannonbp_protection_r )
 	switch (offset)
 	{
 		default:
-			logerror("CPU0 %04x: Unhandled protection read, offset %04x\n", activecpu_get_pc(), offset);
+			logerror("CPU0 %04x: Unhandled protection read, offset %04x\n", cpu_get_pc(machine->activecpu), offset);
 			return 0x00;
 
 		case 0x0000: // unknown
@@ -5439,7 +5439,7 @@ static READ8_HANDLER( cannonbp_protection_r )
 			cannonb_bit_to_read = 7;
 			return 0x00;
 		case 0x0001: // affects the ball hitting the blocks as well as jump address after bonus round
-			if (activecpu_get_pc() == 0x2b97)
+			if (cpu_get_pc(machine->activecpu) == 0x2b97)
 				return (BIT(0x46, cannonb_bit_to_read--) << 7);
 			else
 				return 0xff;            /* value taken from the bootlegs */

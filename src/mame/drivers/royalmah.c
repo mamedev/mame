@@ -290,7 +290,7 @@ static WRITE8_HANDLER ( suzume_bank_w )
 
 	suzume_bank = data;
 
-logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
+logerror("%04x: bank %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	/* bits 6, 4 and 3 used for something input related? */
 
@@ -325,7 +325,7 @@ static WRITE8_HANDLER ( tontonb_bank_w )
 	UINT8 *rom = memory_region(machine, "main");
 	int address;
 
-logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
+logerror("%04x: bank %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	if (data == 0) return;	// tontonb fix?
 
@@ -343,7 +343,7 @@ static WRITE8_HANDLER ( dynax_bank_w )
 	UINT8 *rom = memory_region(machine, "main");
 	int address;
 
-//logerror("%04x: bank %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: bank %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	dsw_select = data & 0x60;
 
@@ -582,7 +582,7 @@ static READ8_HANDLER( mjifb_rom_io_r )
 		case 0x9011:	return input_port_read(machine, "SYSTEM");
 	}
 
-	logerror("%04X: unmapped input read at %04X\n", activecpu_get_pc(), offset);
+	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(machine->activecpu), offset);
 	return 0xff;
 }
 
@@ -610,7 +610,7 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 			return;
 	}
 
-	logerror("%04X: unmapped input write at %04X = %02X\n", activecpu_get_pc(), offset,data);
+	logerror("%04X: unmapped input write at %04X = %02X\n", cpu_get_pc(machine->activecpu), offset,data);
 }
 
 static WRITE8_HANDLER( mjifb_videoram_w )
@@ -689,7 +689,7 @@ static READ8_HANDLER( mjdejavu_rom_io_r )
 		case 0x9011:	return input_port_read(machine, "SYSTEM");
 	}
 
-	logerror("%04X: unmapped input read at %04X\n", activecpu_get_pc(), offset);
+	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(machine->activecpu), offset);
 	return 0xff;
 }
 
@@ -714,7 +714,7 @@ static WRITE8_HANDLER( mjdejavu_rom_io_w )
 			return;
 	}
 
-	logerror("%04X: unmapped input write at %04X = %02X\n", activecpu_get_pc(), offset,data);
+	logerror("%04X: unmapped input write at %04X = %02X\n", cpu_get_pc(machine->activecpu), offset,data);
 }
 
 static ADDRESS_MAP_START( mjdejavu_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -805,7 +805,7 @@ static READ8_HANDLER( cafetime_dsw_r )
 		case 0x03: return input_port_read(machine, "DSW4");
 		case 0x04: return input_port_read(machine, "DSWTOP");
 	}
-	logerror("%04X: unmapped dsw read %02X\n", activecpu_get_pc(), dsw_select);
+	logerror("%04X: unmapped dsw read %02X\n", cpu_get_pc(machine->activecpu), dsw_select);
 	return 0xff;
 }
 

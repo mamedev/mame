@@ -207,7 +207,7 @@ INLINE void m6509_take_irq(	m6509_Regs *m6502)
 		P |= F_I;		/* knock out D and set I flag */
 		PCL = RDMEM(EAD);
 		PCH = RDMEM(EAD+1);
-		LOG(("M6509#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
+		LOG(("M6509#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
 		change_pc(PCD);
@@ -241,7 +241,7 @@ static CPU_EXECUTE( m6509 )
 		/* check if the I flag was just reset (interrupts enabled) */
 		if( m6509->after_cli )
 		{
-			LOG(("M6509#%d after_cli was >0", cpu_getactivecpu()));
+			LOG(("M6509#%d after_cli was >0", cpunum_get_active()));
 			m6509->after_cli = 0;
 			if (m6509->irq_state != CLEAR_LINE)
 			{
@@ -272,7 +272,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 		m6509->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6509#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
+			LOG(( "M6509#%d set_nmi_line(ASSERT)\n", cpunum_get_active()));
 			EAD = M6509_NMI_VEC;
 			EAWH = PBWH;
 			m6502->icount -= 2;
@@ -282,7 +282,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 			P |= F_I;		/* knock out D and set I flag */
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
-			LOG(("M6509#%d takes NMI ($%04x)\n", cpu_getactivecpu(), PCD));
+			LOG(("M6509#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
 			change_pc(PCD);
 		}
 	}
@@ -292,7 +292,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 		{
 			if( m6509->so_state && !state )
 			{
-				LOG(( "M6509#%d set overflow\n", cpu_getactivecpu()));
+				LOG(( "M6509#%d set overflow\n", cpunum_get_active()));
 				P|=F_V;
 			}
 			m6509->so_state=state;
@@ -301,7 +301,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 		m6509->irq_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6509#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
+			LOG(( "M6509#%d set_irq_line(ASSERT)\n", cpunum_get_active()));
 			m6509->pending_irq = 1;
 		}
 	}

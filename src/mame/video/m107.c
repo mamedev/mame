@@ -304,7 +304,7 @@ static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const
 WRITE16_HANDLER( m107_spritebuffer_w )
 {
 	if (ACCESSING_BITS_0_7) {
-//      logerror("%04x: buffered spriteram\n",activecpu_get_pc());
+//      logerror("%04x: buffered spriteram\n",cpu_get_pc(machine->activecpu));
 		memcpy(m107_spriteram,spriteram16,0x1000);
 	}
 }

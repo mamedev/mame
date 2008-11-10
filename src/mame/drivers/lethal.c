@@ -422,7 +422,7 @@ static WRITE8_HANDLER( le_4800_w )
 					break;
 
 				default:
-					logerror("Unknown LE 48xx register write: %x to %x (PC=%x)\n", data, offset, activecpu_get_pc());
+					logerror("Unknown LE 48xx register write: %x to %x (PC=%x)\n", data, offset, cpu_get_pc(machine->activecpu));
 					break;
 			}
 		}

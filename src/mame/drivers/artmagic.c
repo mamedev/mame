@@ -118,7 +118,7 @@ static WRITE16_HANDLER( control_w )
 	if (offset == 0)
 		okim6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(machine, "oki"));
 
-	logerror("%06X:control_w(%d) = %04X\n", activecpu_get_pc(), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(machine->activecpu), offset, data);
 }
 
 
@@ -138,7 +138,7 @@ static TIMER_CALLBACK( irq_off )
 static READ16_HANDLER( ultennis_hack_r )
 {
 	/* IRQ5 points to: jsr (a5); rte */
-	if (activecpu_get_pc() == 0x18c2)
+	if (cpu_get_pc(machine->activecpu) == 0x18c2)
 	{
 		hack_irq = 1;
 		update_irq_state(machine);

@@ -783,16 +783,16 @@ static UINT16 get_video_control(running_machine *machine)
 
 	ret = (v_counter << 7) | (neogeo_get_auto_animation_counter() & 0x0007);
 
-	if (VERBOSE) logerror("PC %06x: video_control read (%04x)\n", activecpu_get_pc(), ret);
+	if (VERBOSE) logerror("PC %06x: video_control read (%04x)\n", cpu_get_pc(machine->activecpu), ret);
 
 	return ret;
 }
 
 
-static void set_video_control(UINT16 data)
+static void set_video_control(running_machine *machine, UINT16 data)
 {
 	/* this does much more than this, but I'm not sure exactly what */
-	if (VERBOSE) logerror("%06x: video control write %04x\n", activecpu_get_pc(), data);
+	if (VERBOSE) logerror("%06x: video control write %04x\n", cpu_get_pc(machine->activecpu), data);
 
 	set_auto_animation_speed(data >> 8);
 	set_auto_animation_disabled(data & 0x0008);
@@ -838,8 +838,8 @@ WRITE16_HANDLER( neogeo_video_register_w )
 		case 0x00: set_videoram_offset(data); break;
 		case 0x01: set_videoram_data(data); break;
 		case 0x02: set_videoram_modulo(data); break;
-		case 0x03: set_video_control(data); break;
-		case 0x04: neogeo_set_display_counter_msb(data); break;
+		case 0x03: set_video_control(machine, data); break;
+		case 0x04: neogeo_set_display_counter_msb(machine, data); break;
 		case 0x05: neogeo_set_display_counter_lsb(machine, data); break;
 		case 0x06: neogeo_acknowledge_interrupt(machine, data); break;
 		case 0x07: break; /* unknown, see get_video_control */

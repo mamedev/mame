@@ -284,7 +284,7 @@ static int hnoridur_bank;
 static WRITE8_HANDLER( hnoridur_rombank_w )
 {
 	UINT8 *ROM = memory_region(machine, "main") + 0x10000 + 0x8000*data;
-//logerror("%04x: rom bank = %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: rom bank = %02x\n",cpu_get_pc(machine->activecpu),data);
 	memory_set_bankptr(1,ROM);
 	hnoridur_bank = data;
 }
@@ -675,7 +675,7 @@ static WRITE8_HANDLER( yarunara_blit_romregion_w )
 		case 0x81:	dynax_blit_romregion_w(machine,0,3);	return;
 		case 0x82:	dynax_blit_romregion_w(machine,0,4);	return;	// mjcomv1
 	}
-	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
+	logerror("%04x: unmapped romregion=%02X\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static ADDRESS_MAP_START( yarunara_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1039,7 +1039,7 @@ static READ8_HANDLER( htengoku_dsw_r )
 	if (!(htengoku_dsw & 0x04))	return input_port_read(machine, "DSW2");
 	if (!(htengoku_dsw & 0x08))	return input_port_read(machine, "DSW3");
 	if (!(htengoku_dsw & 0x10))	return input_port_read(machine, "DSW4");
-	logerror("%06x: warning, unknown bits read, htengoku_dsw = %02x\n", activecpu_get_pc(), htengoku_dsw);
+	logerror("%06x: warning, unknown bits read, htengoku_dsw = %02x\n", cpu_get_pc(machine->activecpu), htengoku_dsw);
 
 	return 0xff;
 }
@@ -1063,7 +1063,7 @@ static WRITE8_HANDLER( htengoku_coin_w )
 
 		case 0xff:	break;	// CRT controller?
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", activecpu_get_pc(), htengoku_select,data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n", cpu_get_pc(machine->activecpu), htengoku_select,data);
 	}
 }
 
@@ -1078,7 +1078,7 @@ static READ8_HANDLER( htengoku_input_r )
 		case 0x82:	return input_port_read(machine, keynames0[htengoku_ip++]);
 		case 0x0d:	return 0xff;	// unused
 	}
-	logerror("%04x: input_r with select = %02x\n", activecpu_get_pc(), htengoku_select);
+	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(machine->activecpu), htengoku_select);
 	return 0xff;
 }
 
@@ -1091,7 +1091,7 @@ static READ8_HANDLER( htengoku_coin_r )
 		case 0x02:	return 0xbf | ((htengoku_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0 : (1<<6));;	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:	return htengoku_coins;
 	}
-	logerror("%04x: coin_r with select = %02x\n", activecpu_get_pc(), htengoku_select);
+	logerror("%04x: coin_r with select = %02x\n", cpu_get_pc(machine->activecpu), htengoku_select);
 	return 0xff;
 }
 
@@ -1111,7 +1111,7 @@ static WRITE8_HANDLER( htengoku_blit_romregion_w )
 		case 0x81:	dynax_blit_romregion_w(machine,0,1);	return;
 		case 0x00:	dynax_blit_romregion_w(machine,0,2);	return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
+	logerror("%04x: unmapped romregion=%02X\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static READ8_HANDLER( unk_r )
@@ -1194,7 +1194,7 @@ static WRITE8_HANDLER( tenkai_ip_w )
 				break;
 			return;
 	}
-	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", activecpu_get_pc(), tenkai_ipsel,data);
+	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", cpu_get_pc(machine->activecpu), tenkai_ipsel,data);
 }
 
 static READ8_HANDLER( tenkai_ip_r )
@@ -1212,7 +1212,7 @@ static READ8_HANDLER( tenkai_ip_r )
 					return input_port_read(machine, "IN0");	// coins
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", activecpu_get_pc(), tenkai_ipsel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(machine->activecpu), tenkai_ipsel, offset);
 					return 0xff;
 			}
 		}
@@ -1227,17 +1227,17 @@ static READ8_HANDLER( tenkai_ip_r )
 				// player 2
 				case 0x81:
 					if (tenkai_ip >= 5)
-						logerror("%04x: unmapped tenkai_ip=%02x read\n", activecpu_get_pc(), tenkai_ip);
+						logerror("%04x: unmapped tenkai_ip=%02x read\n", cpu_get_pc(machine->activecpu), tenkai_ip);
 					return 0xff;//input_port_read(machine, keynames1[tenkai_ip++]);
 
 				// player 1
 				case 0x82:
 					if (tenkai_ip >= 5)
-						logerror("%04x: unmapped tenkai_ip=%02x read\n", activecpu_get_pc(), tenkai_ip);
+						logerror("%04x: unmapped tenkai_ip=%02x read\n", cpu_get_pc(machine->activecpu), tenkai_ip);
 					return input_port_read(machine, keynames0[tenkai_ip++]);
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", activecpu_get_pc(), tenkai_ipsel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(machine->activecpu), tenkai_ipsel, offset);
 					return 0xff;
 			}
 		}
@@ -1257,7 +1257,7 @@ static READ8_HANDLER( tenkai_dsw_r )
 	if (~tenkai_dswsel & 0x04) return input_port_read(machine, "DSW2");
 	if (~tenkai_dswsel & 0x08) return input_port_read(machine, "DSW3");
 	if (~tenkai_dswsel & 0x10) return input_port_read(machine, "DSW4");
-	logerror("%04x: unmapped dsw %02x read\n",activecpu_get_pc(),tenkai_dswsel);
+	logerror("%04x: unmapped dsw %02x read\n",cpu_get_pc(machine->activecpu),tenkai_dswsel);
 	return 0xff;
 }
 
@@ -1348,7 +1348,7 @@ static READ8_HANDLER( tenkai_8000_r )
 		return tenkai_palette_r(machine,offset);
 	}
 
-	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",activecpu_get_pc(),offset,rombank);
+	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",cpu_get_pc(machine->activecpu),offset,rombank);
 	return 0x00;
 }
 
@@ -1366,7 +1366,7 @@ static WRITE8_HANDLER( tenkai_8000_w )
 		return;
 	}
 
-	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n",activecpu_get_pc(),offset,data,rombank);
+	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n",cpu_get_pc(machine->activecpu),offset,data,rombank);
 }
 
 static int tenkai_6c, tenkai_70;
@@ -1393,7 +1393,7 @@ static WRITE8_HANDLER( tenkai_blit_romregion_w )
 		case 0x83:	dynax_blit_romregion_w(machine,0,1);	return;
 		case 0x80:	dynax_blit_romregion_w(machine,0,2);	return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n",activecpu_get_pc(),data);
+	logerror("%04x: unmapped romregion=%02X\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static ADDRESS_MAP_START( tenkai_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -484,7 +484,7 @@ ROM_END
 
 static READ32_HANDLER( main_cycle_r )
 {
-	if (activecpu_get_pc()==0x702)
+	if (cpu_get_pc(machine->activecpu)==0x702)
 		cpu_spinuntil_int();
 
 	return superchs_ram[0];
@@ -492,7 +492,7 @@ static READ32_HANDLER( main_cycle_r )
 
 static READ16_HANDLER( sub_cycle_r )
 {
-	if (activecpu_get_pc()==0x454)
+	if (cpu_get_pc(machine->activecpu)==0x454)
 		cpu_spinuntil_int();
 
 	return superchs_ram[2]&0xffff;

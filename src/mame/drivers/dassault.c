@@ -811,7 +811,7 @@ static READ16_HANDLER( dassault_main_skip )
 {
 	int ret=dassault_ram[0];
 
-	if (activecpu_get_previouspc()==0x1170 && ret&0x8000)
+	if (cpu_get_previouspc(machine->activecpu)==0x1170 && ret&0x8000)
 		cpu_spinuntil_int();
 
 	return ret;
@@ -821,7 +821,7 @@ static READ16_HANDLER( thndzone_main_skip )
 {
 	int ret=dassault_ram[0];
 
-	if (activecpu_get_pc()==0x114c && ret&0x8000)
+	if (cpu_get_pc(machine->activecpu)==0x114c && ret&0x8000)
 		cpu_spinuntil_int();
 
 	return ret;

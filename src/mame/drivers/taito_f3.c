@@ -77,7 +77,7 @@ static READ32_HANDLER( f3_control_r )
 			return (coin_word[1]<<16) | input_port_read(machine, "IN3");
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(machine->activecpu), offset);
 	return 0xffffffff;
 }
 
@@ -120,7 +120,7 @@ static WRITE32_HANDLER( f3_control_w )
 			}
 			return;
 	}
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",activecpu_get_pc(),offset,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",cpu_get_pc(machine->activecpu),offset,data);
 }
 
 static WRITE32_HANDLER( f3_sound_reset_0_w )
@@ -3465,7 +3465,7 @@ static void tile_decode(running_machine *machine)
 #define F3_IRQ_SPEEDUP_1_R(GAME, counter, mem_addr, mask) 		\
 static READ32_HANDLER( irq_speedup_r_##GAME )					\
 {																\
-	if (activecpu_get_pc()==counter && (f3_ram[mem_addr]&mask)!=0)	\
+	if (cpu_get_pc(machine->activecpu)==counter && (f3_ram[mem_addr]&mask)!=0)	\
 		cpu_spinuntil_int();									\
 	return f3_ram[mem_addr];									\
 }
@@ -3473,7 +3473,7 @@ static READ32_HANDLER( irq_speedup_r_##GAME )					\
 #define F3_IRQ_SPEEDUP_2_R(GAME, counter, mem_addr, mask) 		\
 static READ32_HANDLER( irq_speedup_r_##GAME )					\
 {																\
-	if (activecpu_get_pc()==counter && (f3_ram[mem_addr]&mask)==0)	\
+	if (cpu_get_pc(machine->activecpu)==counter && (f3_ram[mem_addr]&mask)==0)	\
 		cpu_spinuntil_int();									\
 	return f3_ram[mem_addr];									\
 }
@@ -3482,10 +3482,10 @@ static READ32_HANDLER( irq_speedup_r_##GAME )					\
 static READ32_HANDLER( irq_speedup_r_##GAME )					\
 {																\
 	int ptr;													\
-	if ((activecpu_get_sp()&2)==0) ptr=f3_ram[(activecpu_get_sp()&0x1ffff)/4];	\
-	else ptr=(((f3_ram[(activecpu_get_sp()&0x1ffff)/4])&0x1ffff)<<16) | \
-	(f3_ram[((activecpu_get_sp()&0x1ffff)/4)+1]>>16); 				\
-	if (activecpu_get_pc()==counter && ptr==stack)					\
+	if ((cpu_get_sp(machine->activecpu)&2)==0) ptr=f3_ram[(cpu_get_sp(machine->activecpu)&0x1ffff)/4];	\
+	else ptr=(((f3_ram[(cpu_get_sp(machine->activecpu)&0x1ffff)/4])&0x1ffff)<<16) | \
+	(f3_ram[((cpu_get_sp(machine->activecpu)&0x1ffff)/4)+1]>>16); 				\
+	if (cpu_get_pc(machine->activecpu)==counter && ptr==stack)					\
 		cpu_spinuntil_int();									\
 	return f3_ram[mem_addr];									\
 }

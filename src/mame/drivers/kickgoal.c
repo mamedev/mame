@@ -165,7 +165,7 @@ WRITE16_HANDLER( kickgoal_snd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("PC:%06x Writing %04x to Sound CPU\n",activecpu_get_previouspc(),data);
+		logerror("PC:%06x Writing %04x to Sound CPU\n",cpu_get_previouspc(machine->activecpu),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				okim6295_data_0_w(0,0x40);	/* Stop playing the melody */
@@ -216,7 +216,7 @@ WRITE16_HANDLER( kickgoal_snd_w )
 
 static WRITE16_HANDLER( actionhw_snd_w )
 {
-	logerror("PC:%06x Writing %04x to Sound CPU - mask %04x\n",activecpu_get_previouspc(),data,mem_mask);
+	logerror("PC:%06x Writing %04x to Sound CPU - mask %04x\n",cpu_get_previouspc(machine->activecpu),data,mem_mask);
 
 	if (!ACCESSING_BITS_0_7) data >>= 8;
 

@@ -116,14 +116,14 @@ static void cd32_cia_0_porta_w(UINT8 data)
 static UINT8 cd32_cia_0_portb_r(void)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_r\n", activecpu_get_pc());
+	logerror("%06x:CIA0_portb_r\n", cpu_get_pc(Machine->activecpu));
 	return 0xff;
 }
 
 static void cd32_cia_0_portb_w(UINT8 data)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_w(%02x)\n", activecpu_get_pc(), data);
+	logerror("%06x:CIA0_portb_w(%02x)\n", cpu_get_pc(Machine->activecpu), data);
 }
 
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )

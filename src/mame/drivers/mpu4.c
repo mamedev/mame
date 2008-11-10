@@ -518,7 +518,7 @@ static const ptm6840_interface ptm_ic2_intf =
 /* IC3, lamp data lines + alpha numeric display */
 static WRITE8_HANDLER( pia_ic3_porta_w )
 {
-	LOG_IC3(("%04x IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", activecpu_get_previouspc(),data));
+	LOG_IC3(("%04x IC3 PIA Port A Set to %2x (lamp strobes 1 - 9)\n", cpu_get_previouspc(machine->activecpu),data));
 
 	if(ic23_active)
 	{
@@ -530,7 +530,7 @@ static WRITE8_HANDLER( pia_ic3_porta_w )
 
 static WRITE8_HANDLER( pia_ic3_portb_w )
 {
-	LOG_IC3(("%04x IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", activecpu_get_previouspc(),data));
+	LOG_IC3(("%04x IC3 PIA Port B Set to %2x  (lamp strobes 10 - 17)\n", cpu_get_previouspc(machine->activecpu),data));
 
 	if(ic23_active)
 	{
@@ -542,7 +542,7 @@ static WRITE8_HANDLER( pia_ic3_portb_w )
 
 static WRITE8_HANDLER( pia_ic3_ca2_w )
 {
-	LOG_IC3(("%04x IC3 PIA Write CA2 (alpha data), %02X\n", activecpu_get_previouspc(),data));
+	LOG_IC3(("%04x IC3 PIA Write CA2 (alpha data), %02X\n", cpu_get_previouspc(machine->activecpu),data));
 
 	alpha_data_line = data;
 	ROC10937_draw_16seg(0);
@@ -551,7 +551,7 @@ static WRITE8_HANDLER( pia_ic3_ca2_w )
 
 static WRITE8_HANDLER( pia_ic3_cb2_w )
 {
-	LOG_IC3(("%04x IC3 PIA Write CB (alpha reset), %02X\n",activecpu_get_previouspc(),data));
+	LOG_IC3(("%04x IC3 PIA Write CB (alpha reset), %02X\n",cpu_get_previouspc(machine->activecpu),data));
 
 	if ( data ) ROC10937_reset(0);
 	ROC10937_draw_16seg(0);
@@ -679,14 +679,14 @@ static READ8_HANDLER( pia_ic4_portb_r )
 	if ( lamp_undercurrent ) ic4_input_b |= 0x01;
 	#endif
 
-	LOG_IC3(("%04x IC4 PIA Read of Port B %x\n",activecpu_get_previouspc(),ic4_input_b));
+	LOG_IC3(("%04x IC4 PIA Read of Port B %x\n",cpu_get_previouspc(machine->activecpu),ic4_input_b));
 	return ic4_input_b;
 }
 
 
 static WRITE8_HANDLER( pia_ic4_ca2_w )
 {
-	LOG_IC3(("%04x IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", activecpu_get_previouspc(),data));
+	LOG_IC3(("%04x IC4 PIA Write CA (input MUX strobe /LED B), %02X\n", cpu_get_previouspc(machine->activecpu),data));
 
 	IC23GB = data;
 	ic23_update();
@@ -704,14 +704,14 @@ static const pia6821_interface pia_ic4_intf =
 /* IC5, AUX ports, coin lockouts and AY sound chip select (MODs below 4 only) */
 static READ8_HANDLER( pia_ic5_porta_r )
 {
-	LOG(("%04x IC5 PIA Read of Port A (AUX1)\n",activecpu_get_previouspc()));
+	LOG(("%04x IC5 PIA Read of Port A (AUX1)\n",cpu_get_previouspc(machine->activecpu)));
 	return input_port_read(machine, "AUX1");
 }
 
 
 static READ8_HANDLER( pia_ic5_portb_r )
 {
-	LOG(("%04x IC5 PIA Read of Port B (coin input AUX2)\n",activecpu_get_previouspc()));
+	LOG(("%04x IC5 PIA Read of Port B (coin input AUX2)\n",cpu_get_previouspc(machine->activecpu)));
 	coin_lockout_w(0, (pia_get_output_b(2) & 0x01) );
 	coin_lockout_w(1, (pia_get_output_b(2) & 0x02) );
 	coin_lockout_w(2, (pia_get_output_b(2) & 0x04) );
@@ -722,7 +722,7 @@ static READ8_HANDLER( pia_ic5_portb_r )
 
 static WRITE8_HANDLER( pia_ic5_ca2_w )
 {
-	LOG(("%04x IC5 PIA Write CA2 (Serial Tx) %2x\n",activecpu_get_previouspc(),data));
+	LOG(("%04x IC5 PIA Write CA2 (Serial Tx) %2x\n",cpu_get_previouspc(machine->activecpu),data));
 	serial_data = data;
 }
 
@@ -805,7 +805,7 @@ static const pia6821_interface pia_ic5_intf =
 /* IC6, Reel A and B and AY registers (MODs below 4 only) */
 static WRITE8_HANDLER( pia_ic6_portb_w )
 {
-	LOG(("%04x IC6 PIA Port B Set to %2x (Reel A and B)\n", activecpu_get_previouspc(),data));
+	LOG(("%04x IC6 PIA Port B Set to %2x (Reel A and B)\n", cpu_get_previouspc(machine->activecpu),data));
 	stepper_update(0, data & 0x0F );
 	stepper_update(1, (data>>4) & 0x0F );
 
@@ -824,7 +824,7 @@ static WRITE8_HANDLER( pia_ic6_portb_w )
 
 static WRITE8_HANDLER( pia_ic6_porta_w )
 {
-	LOG(("%04x IC6 PIA Write A %2x\n", activecpu_get_previouspc(),data));
+	LOG(("%04x IC6 PIA Write A %2x\n", cpu_get_previouspc(machine->activecpu),data));
 	if (mod_number <4)
 	{
 	  	ay_data = data;
@@ -835,7 +835,7 @@ static WRITE8_HANDLER( pia_ic6_porta_w )
 
 static WRITE8_HANDLER( pia_ic6_ca2_w )
 {
-	LOG(("%04x IC6 PIA write CA2 %2x (AY8913 BC1)\n", activecpu_get_previouspc(),data));
+	LOG(("%04x IC6 PIA write CA2 %2x (AY8913 BC1)\n", cpu_get_previouspc(machine->activecpu),data));
 	if (mod_number <4)
 	{
 		if ( data ) ay8913_address |=  0x01;
@@ -847,7 +847,7 @@ static WRITE8_HANDLER( pia_ic6_ca2_w )
 
 static WRITE8_HANDLER( pia_ic6_cb2_w )
 {
-	LOG(("%04x IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", activecpu_get_previouspc(),data));
+	LOG(("%04x IC6 PIA write CB2 %2x (AY8913 BCDIR)\n", cpu_get_previouspc(machine->activecpu),data));
 	if (mod_number <4)
 	{
 		if ( data ) ay8913_address |=  0x02;
@@ -868,7 +868,7 @@ static const pia6821_interface pia_ic6_intf =
 /* IC7 Reel C and D, mechanical meters/Reel E and F, input strobe bit A */
 static WRITE8_HANDLER( pia_ic7_porta_w )
 {
-	LOG(("%04x IC7 PIA Port A Set to %2x (Reel C and D)\n", activecpu_get_previouspc(),data));
+	LOG(("%04x IC7 PIA Port A Set to %2x (Reel C and D)\n", cpu_get_previouspc(machine->activecpu),data));
 	stepper_update(2, data & 0x0F );
 	stepper_update(3, (data >> 4)& 0x0F );
 
@@ -910,13 +910,13 @@ all eight meters are driven from this port, giving the 8 line driver chip
 		pia_set_input_b(4, mmtr_data &~0x80);
 	}
 
-	LOG(("%04x IC7 PIA Port B Set to %2x (Meters, Reel E and F)\n", activecpu_get_previouspc(),data));
+	LOG(("%04x IC7 PIA Port B Set to %2x (Meters, Reel E and F)\n", cpu_get_previouspc(machine->activecpu),data));
 }
 
 
 static WRITE8_HANDLER( pia_ic7_ca2_w )
 {
-	LOG(("%04x IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", activecpu_get_previouspc(),data));
+	LOG(("%04x IC7 PIA write CA2 %2x (input strobe bit 0 / LED A)\n", cpu_get_previouspc(machine->activecpu),data));
 
 	IC23GA = data;
 	ic24_setup();
@@ -934,7 +934,7 @@ is on PB7. */
 		pia_set_input_b(4,mmtr_data|0x80);
 		Mechmtr_update(7, cycles, data );
 	}
-	LOG(("%04x IC7 PIA write CB2 %2x \n", activecpu_get_previouspc(),data));
+	LOG(("%04x IC7 PIA write CB2 %2x \n", cpu_get_previouspc(machine->activecpu),data));
 }
 
 
@@ -951,7 +951,7 @@ static READ8_HANDLER( pia_ic8_porta_r )
 {
 	static const char *const portnames[] = { "ORANGE1", "ORANGE2", "BLACK1", "BLACK2", "ORANGE1", "ORANGE2", "DIL1", "DIL2" };
 
-	LOG_IC8(("%04x IC8 PIA Read of Port A (MUX input data)\n", activecpu_get_previouspc()));
+	LOG_IC8(("%04x IC8 PIA Read of Port A (MUX input data)\n", cpu_get_previouspc(machine->activecpu)));
 /* The orange inputs are polled twice as often as the black ones, for reasons of efficiency.
    This is achieved via connecting every input line to an AND gate, thus allowing two strobes
    to represent each orange input bank (strobes are active low). */
@@ -963,7 +963,7 @@ static READ8_HANDLER( pia_ic8_porta_r )
 static WRITE8_HANDLER( pia_ic8_portb_w )
 {
 	int i;
-	LOG_IC8(("%04x IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", activecpu_get_previouspc(),data));
+	LOG_IC8(("%04x IC8 PIA Port B Set to %2x (OUTPUT PORT, TRIACS)\n", cpu_get_previouspc(machine->activecpu),data));
 	for (i = 0; i < 8; i++)
 		if ( data & (1 << i) )		output_set_indexed_value("triac", i, data & (1 << i));
 }
@@ -971,7 +971,7 @@ static WRITE8_HANDLER( pia_ic8_portb_w )
 
 static WRITE8_HANDLER( pia_ic8_ca2_w )
 {
-	LOG_IC8(("%04x IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", activecpu_get_previouspc(), data & 0xFF));
+	LOG_IC8(("%04x IC8 PIA write CA2 (input_strobe bit 2 / LED C) %02X\n", cpu_get_previouspc(machine->activecpu), data & 0xFF));
 
 	IC23GC = data;
 	ic23_update();
@@ -980,7 +980,7 @@ static WRITE8_HANDLER( pia_ic8_ca2_w )
 
 static WRITE8_HANDLER( pia_ic8_cb2_w )
 {
-	LOG_IC8(("%04x IC8 PIA write CB2 (alpha clock) %02X\n", activecpu_get_previouspc(), data & 0xFF));
+	LOG_IC8(("%04x IC8 PIA write CB2 (alpha clock) %02X\n", cpu_get_previouspc(machine->activecpu), data & 0xFF));
 
 	if ( !alpha_clock && (data) )
 	{
@@ -1311,7 +1311,7 @@ static WRITE8_HANDLER( characteriser_w )
 {
 	UINT8 x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", activecpu_get_previouspc(),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(machine->activecpu),offset,data));
 	if (offset == 0)
 	{
 		if (call == 0)
@@ -1355,7 +1355,7 @@ static WRITE8_HANDLER( characteriser_w )
 static READ8_HANDLER( characteriser_r )
 {
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X", activecpu_get_previouspc(),offset));
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X", cpu_get_previouspc(machine->activecpu),offset));
 	if (offset == 0)
 	{
 		LOG_CHR(("Characteriser read data %02X \n",MPU4_chr_data[prot_col]));

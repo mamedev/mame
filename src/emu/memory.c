@@ -408,10 +408,10 @@ static void mem_dump(void);
     the opcode base
 -------------------------------------------------*/
 
-INLINE void force_opbase_update(void)
+INLINE void force_opbase_update(running_machine *machine)
 {
 	opbase.entry = 0xff;
-	memory_set_opbase(activecpu_get_physical_pc_byte());
+	memory_set_opbase(cpu_get_physical_pc_byte(Machine->activecpu));
 }
 
 
@@ -1140,8 +1140,8 @@ void memory_set_decrypted_region(int cpunum, offs_t addrstart, offs_t addrend, v
 				found = TRUE;
 
 				/* if we are executing from here, force an opcode base update */
-				if (cpu_getactivecpu() >= 0 && cpunum == cur_context && opbase.entry == banknum)
-					force_opbase_update();
+				if (cpunum_get_active() >= 0 && cpunum == cur_context && opbase.entry == banknum)
+					force_opbase_update(Machine);
 			}
 
 			/* fatal error if the decrypted region straddles the bank */
@@ -1166,7 +1166,7 @@ opbase_handler_func memory_set_opbase_handler(int cpunum, opbase_handler_func fu
 {
 	opbase_handler_func old = cpudata[cpunum].opbase_handler;
 	cpudata[cpunum].opbase_handler = function;
-	if (cpunum == cpu_getactivecpu())
+	if (cpunum == cpunum_get_active())
 		opbase_handler = function;
 	return old;
 }
@@ -1217,7 +1217,7 @@ void memory_set_opbase(offs_t byteaddress)
 		if (entry == STATIC_COUNT)
 		{
 			logerror("cpu #%d (PC=%08X): warning - op-code execute on mapped I/O\n",
-						cpu_getactivecpu(), activecpu_get_pc());
+						cpunum_get_active(), cpu_get_pc(Machine->activecpu));
 			return;
 		}
 	}
@@ -1423,8 +1423,8 @@ void memory_set_bank(int banknum, int entrynum)
 	bankd_ptr[banknum] = bankdata[banknum].entryd[entrynum];
 
 	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (opbase.entry == banknum && cpu_getactivecpu() >= 0)
-		force_opbase_update();
+	if (opbase.entry == banknum && cpunum_get_active() >= 0)
+		force_opbase_update(Machine);
 }
 
 
@@ -1466,8 +1466,8 @@ void memory_set_bankptr(int banknum, void *base)
 	bank_ptr[banknum] = base;
 
 	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (opbase.entry == banknum && cpu_getactivecpu() >= 0)
-		force_opbase_update();
+	if (opbase.entry == banknum && cpunum_get_active() >= 0)
+		force_opbase_update(Machine);
 }
 
 
@@ -2823,49 +2823,49 @@ static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress)
 
 UINT8 cpu_readop_safe(offs_t byteaddress)
 {
-	activecpu_set_opbase(byteaddress);
+	cpu_set_opbase(Machine->activecpu, byteaddress);
 	return cpu_readop_unsafe(byteaddress);
 }
 
 UINT16 cpu_readop16_safe(offs_t byteaddress)
 {
-	activecpu_set_opbase(byteaddress);
+	cpu_set_opbase(Machine->activecpu, byteaddress);
 	return cpu_readop16_unsafe(byteaddress);
 }
 
 UINT32 cpu_readop32_safe(offs_t byteaddress)
 {
-	activecpu_set_opbase(byteaddress);
+	cpu_set_opbase(Machine->activecpu, byteaddress);
 	return cpu_readop32_unsafe(byteaddress);
 }
 
 UINT64 cpu_readop64_safe(offs_t byteaddress)
 {
-	activecpu_set_opbase(byteaddress);
+	cpu_set_opbase(Machine->activecpu, byteaddress);
 	return cpu_readop64_unsafe(byteaddress);
 }
 
 UINT8 cpu_readop_arg_safe(offs_t byteaddress)
 {
-	activecpu_set_opbase(byteaddress);
+	cpu_set_opbase(Machine->activecpu, byteaddress);
 	return cpu_readop_arg_unsafe(byteaddress);
 }
 
 UINT16 cpu_readop_arg16_safe(offs_t byteaddress)
 {
-	activecpu_set_opbase(byteaddress);
+	cpu_set_opbase(Machine->activecpu, byteaddress);
 	return cpu_readop_arg16_unsafe(byteaddress);
 }
 
 UINT32 cpu_readop_arg32_safe(offs_t byteaddress)
 {
-	activecpu_set_opbase(byteaddress);
+	cpu_set_opbase(Machine->activecpu, byteaddress);
 	return cpu_readop_arg32_unsafe(byteaddress);
 }
 
 UINT64 cpu_readop_arg64_safe(offs_t byteaddress)
 {
-	activecpu_set_opbase(byteaddress);
+	cpu_set_opbase(Machine->activecpu, byteaddress);
 	return cpu_readop_arg64_unsafe(byteaddress);
 }
 
@@ -2876,116 +2876,116 @@ UINT64 cpu_readop_arg64_safe(offs_t byteaddress)
 
 static READ8_HANDLER( mrh8_unmap_program )
 {
-	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory byte read from %08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM], offset));
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM].unmap;
+	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory byte read from %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM], offset));
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM].unmap;
 }
 static READ16_HANDLER( mrh16_unmap_program )
 {
-	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory word read from %08X & %04X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM], offset*2), mem_mask);
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM].unmap;
+	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory word read from %08X & %04X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM], offset*2), mem_mask);
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM].unmap;
 }
 static READ32_HANDLER( mrh32_unmap_program )
 {
-	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory dword read from %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM], offset*4), mem_mask);
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM].unmap;
+	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory dword read from %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM], offset*4), mem_mask);
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM].unmap;
 }
 static READ64_HANDLER( mrh64_unmap_program )
 {
-	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory qword read from %08X & %08X%08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM], offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM].unmap;
+	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory qword read from %08X & %08X%08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM], offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM].unmap;
 }
 
 static WRITE8_HANDLER( mwh8_unmap_program )
 {
-	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory byte write to %08X = %02X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM], offset), data);
+	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory byte write to %08X = %02X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM], offset), data);
 }
 static WRITE16_HANDLER( mwh16_unmap_program )
 {
-	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory word write to %08X = %04X & %04X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM], offset*2), data, mem_mask);
+	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory word write to %08X = %04X & %04X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM], offset*2), data, mem_mask);
 }
 static WRITE32_HANDLER( mwh32_unmap_program )
 {
-	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory dword write to %08X = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM], offset*4), data, mem_mask);
+	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory dword write to %08X = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM], offset*4), data, mem_mask);
 }
 static WRITE64_HANDLER( mwh64_unmap_program )
 {
-	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory qword write to %08X = %08X%08X & %08X%08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM], offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (log_unmap[ADDRESS_SPACE_PROGRAM] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped program memory qword write to %08X = %08X%08X & %08X%08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM], offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 }
 
 static READ8_HANDLER( mrh8_unmap_data )
 {
-	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory byte read from %08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA], offset));
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA].unmap;
+	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory byte read from %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA], offset));
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA].unmap;
 }
 static READ16_HANDLER( mrh16_unmap_data )
 {
-	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory word read from %08X & %04X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA], offset*2), mem_mask);
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA].unmap;
+	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory word read from %08X & %04X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA], offset*2), mem_mask);
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA].unmap;
 }
 static READ32_HANDLER( mrh32_unmap_data )
 {
-	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory dword read from %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA], offset*4), mem_mask);
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA].unmap;
+	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory dword read from %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA], offset*4), mem_mask);
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA].unmap;
 }
 static READ64_HANDLER( mrh64_unmap_data )
 {
-	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory qword read from %08X & %08X%08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA], offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA].unmap;
+	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory qword read from %08X & %08X%08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA], offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA].unmap;
 }
 
 static WRITE8_HANDLER( mwh8_unmap_data )
 {
-	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory byte write to %08X = %02X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA], offset), data);
+	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory byte write to %08X = %02X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA], offset), data);
 }
 static WRITE16_HANDLER( mwh16_unmap_data )
 {
-	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory word write to %08X = %04X & %04X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA], offset*2), data, mem_mask);
+	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory word write to %08X = %04X & %04X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA], offset*2), data, mem_mask);
 }
 static WRITE32_HANDLER( mwh32_unmap_data )
 {
-	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory dword write to %08X = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA], offset*4), data, mem_mask);
+	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory dword write to %08X = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA], offset*4), data, mem_mask);
 }
 static WRITE64_HANDLER( mwh64_unmap_data )
 {
-	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory qword write to %08X = %08X%08X & %08X%08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA], offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (log_unmap[ADDRESS_SPACE_DATA] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped data memory qword write to %08X = %08X%08X & %08X%08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA], offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 }
 
 static READ8_HANDLER( mrh8_unmap_io )
 {
-	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O byte read from %08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO], offset));
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO].unmap;
+	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O byte read from %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO], offset));
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO].unmap;
 }
 static READ16_HANDLER( mrh16_unmap_io )
 {
-	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O word read from %08X & %04X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO], offset*2), mem_mask);
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO].unmap;
+	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O word read from %08X & %04X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO], offset*2), mem_mask);
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO].unmap;
 }
 static READ32_HANDLER( mrh32_unmap_io )
 {
-	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O dword read from %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO], offset*4), mem_mask);
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO].unmap;
+	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O dword read from %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO], offset*4), mem_mask);
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO].unmap;
 }
 static READ64_HANDLER( mrh64_unmap_io )
 {
-	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O qword read from %08X & %08X%08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO], offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
-	return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO].unmap;
+	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O qword read from %08X & %08X%08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO], offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO].unmap;
 }
 
 static WRITE8_HANDLER( mwh8_unmap_io )
 {
-	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O byte write to %08X = %02X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO], offset), data);
+	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O byte write to %08X = %02X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO], offset), data);
 }
 static WRITE16_HANDLER( mwh16_unmap_io )
 {
-	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O word write to %08X = %04X & %04X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO], offset*2), data, mem_mask);
+	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O word write to %08X = %04X & %04X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO], offset*2), data, mem_mask);
 }
 static WRITE32_HANDLER( mwh32_unmap_io )
 {
-	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O dword write to %08X = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO], offset*4), data, mem_mask);
+	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O dword write to %08X = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO], offset*4), data, mem_mask);
 }
 static WRITE64_HANDLER( mwh64_unmap_io )
 {
-	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O qword write to %08X = %08X%08X & %08X%08X\n", cpu_getactivecpu(), activecpu_get_pc(), BYTE2ADDR(&cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO], offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (log_unmap[ADDRESS_SPACE_IO] && !debugger_access) logerror("cpu #%d (PC=%08X): unmapped I/O qword write to %08X = %08X%08X & %08X%08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), BYTE2ADDR(&cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO], offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 }
 
 
@@ -2993,20 +2993,20 @@ static WRITE64_HANDLER( mwh64_unmap_io )
     no-op memory handlers
 -------------------------------------------------*/
 
-static READ8_HANDLER( mrh8_nop_program )   { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM].unmap; }
-static READ16_HANDLER( mrh16_nop_program ) { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM].unmap; }
-static READ32_HANDLER( mrh32_nop_program ) { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM].unmap; }
-static READ64_HANDLER( mrh64_nop_program ) { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_PROGRAM].unmap; }
+static READ8_HANDLER( mrh8_nop_program )   { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM].unmap; }
+static READ16_HANDLER( mrh16_nop_program ) { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM].unmap; }
+static READ32_HANDLER( mrh32_nop_program ) { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM].unmap; }
+static READ64_HANDLER( mrh64_nop_program ) { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_PROGRAM].unmap; }
 
-static READ8_HANDLER( mrh8_nop_data )      { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA].unmap; }
-static READ16_HANDLER( mrh16_nop_data )    { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA].unmap; }
-static READ32_HANDLER( mrh32_nop_data )    { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA].unmap; }
-static READ64_HANDLER( mrh64_nop_data )    { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_DATA].unmap; }
+static READ8_HANDLER( mrh8_nop_data )      { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA].unmap; }
+static READ16_HANDLER( mrh16_nop_data )    { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA].unmap; }
+static READ32_HANDLER( mrh32_nop_data )    { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA].unmap; }
+static READ64_HANDLER( mrh64_nop_data )    { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_DATA].unmap; }
 
-static READ8_HANDLER( mrh8_nop_io )        { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO].unmap; }
-static READ16_HANDLER( mrh16_nop_io )      { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO].unmap; }
-static READ32_HANDLER( mrh32_nop_io )      { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO].unmap; }
-static READ64_HANDLER( mrh64_nop_io )      { return cpudata[cpu_getactivecpu()].space[ADDRESS_SPACE_IO].unmap; }
+static READ8_HANDLER( mrh8_nop_io )        { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO].unmap; }
+static READ16_HANDLER( mrh16_nop_io )      { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO].unmap; }
+static READ32_HANDLER( mrh32_nop_io )      { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO].unmap; }
+static READ64_HANDLER( mrh64_nop_io )      { return cpudata[cpunum_get_active()].space[ADDRESS_SPACE_IO].unmap; }
 
 static WRITE8_HANDLER( mwh8_nop )          {  }
 static WRITE16_HANDLER( mwh16_nop )        {  }

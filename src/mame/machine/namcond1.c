@@ -73,7 +73,7 @@ READ16_HANDLER( namcond1_cuskey_r )
 
         default :
             logerror( "offset $%X accessed from $%X\n",
-                      offset<<1, activecpu_get_pc() );
+                      offset<<1, cpu_get_pc(machine->activecpu) );
             return( 0 );
     }
 }

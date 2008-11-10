@@ -138,7 +138,7 @@ READ32_HANDLER(pci_32le_r)
 	if (LOG_PCI)
 	{
 		logerror("pci_32le_r(): CPU #%d pc=0x%08X offset=%d result=0x%08X\n",
-			cpu_getactivecpu(), (unsigned) activecpu_get_reg(REG_PC), offset, result);
+			cpunum_get_active(), (unsigned) cpu_get_reg(machine->activecpu, REG_PC), offset, result);
 	}
 	return result;
 }
@@ -155,7 +155,7 @@ WRITE32_HANDLER(pci_32le_w)
 	if (LOG_PCI)
 	{
 		logerror("pci_32le_w(): CPU #%d pc=0x%08X offset=%d data=0x%08X\n",
-			cpu_getactivecpu(), (unsigned) activecpu_get_reg(REG_PC), offset, data);
+			cpunum_get_active(), (unsigned) cpu_get_reg(machine->activecpu, REG_PC), offset, data);
 	}
 
 	switch(offset)

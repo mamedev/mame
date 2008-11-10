@@ -71,7 +71,7 @@ static WRITE8_HANDLER( parodius_052109_053245_w )
 
 static WRITE8_HANDLER( parodius_videobank_w )
 {
-	if (videobank & 0xf8) logerror("%04x: videobank = %02x\n",activecpu_get_pc(),data);
+	if (videobank & 0xf8) logerror("%04x: videobank = %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	/* bit 0 = select palette or work RAM at 0000-07ff */
 	/* bit 1 = select 052109 or 053245 at 2000-27ff */
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( parodius_videobank_w )
 
 static WRITE8_HANDLER( parodius_3fc0_w )
 {
-	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",activecpu_get_pc(),data);
+	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	/* bit 0/1 = coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -386,7 +386,7 @@ static void parodius_banking(int lines)
 	UINT8 *RAM = memory_region(Machine, "main");
 	int offs = 0;
 
-	if (lines & 0xf0) logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);
+	if (lines & 0xf0) logerror("%04x: setlines %02x\n",cpu_get_pc(Machine->activecpu),lines);
 
 	offs = 0x10000 + (((lines & 0x0f)^0x0f) * 0x4000);
 	if (offs >= 0x48000) offs -= 0x40000;
@@ -397,7 +397,7 @@ static MACHINE_RESET( parodius )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)parodius_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)parodius_banking);
 
 	paletteram = &memory_region(machine, "main")[0x48000];
 

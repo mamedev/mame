@@ -523,7 +523,7 @@ static WRITE8_HANDLER( controller_w )
 {
 	laserdisc_state *ld = find_ldv1000(machine);
 	if (LOG_STATUS_CHANGES && data != ld->player->status)
-		printf("%04X:CONTROLLER.W=%02X\n", activecpu_get_pc(), data);
+		printf("%04X:CONTROLLER.W=%02X\n", cpu_get_pc(machine->activecpu), data);
 	ld->player->status = data;
 }
 
@@ -538,7 +538,7 @@ static WRITE8_DEVICE_HANDLER( ppi0_porta_w )
 	laserdisc_state *ld = find_ldv1000(device->machine);
 	ld->player->counter_start = data;
 	if (LOG_PORT_IO)
-		printf("%04X:PORTA.0=%02X\n", activecpu_get_pc(), data);
+		printf("%04X:PORTA.0=%02X\n", cpu_get_pc(device->machine->activecpu), data);
 }
 
 
@@ -601,7 +601,7 @@ static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 	player->portc0 = data;
 	if (LOG_PORT_IO && ((data ^ prev) & 0x0f) != 0)
 	{
-		printf("%04X:PORTC.0=%02X", activecpu_get_pc(), data);
+		printf("%04X:PORTC.0=%02X", cpu_get_pc(device->machine->activecpu), data);
 		if (data & 0x01) printf(" PRELOAD");
 		if (!(data & 0x02)) printf(" /MULTIJUMP");
 		if (data & 0x04) printf(" SCANMODE");
@@ -697,7 +697,7 @@ static WRITE8_DEVICE_HANDLER( ppi1_portb_w )
 	player->portb1 = data;
 	if (LOG_PORT_IO && ((data ^ prev) & 0xff) != 0)
 	{
-		printf("%04X:PORTB.1=%02X:", activecpu_get_pc(), data);
+		printf("%04X:PORTB.1=%02X:", cpu_get_pc(device->machine->activecpu), data);
 		if (!(data & 0x01)) printf(" FOCSON");
 		if (!(data & 0x02)) printf(" SPDLRUN");
 		if (!(data & 0x04)) printf(" JUMPTRIG");
@@ -753,7 +753,7 @@ static WRITE8_DEVICE_HANDLER( ppi1_portc_w )
 	player->portc1 = data;
 	if (LOG_PORT_IO && ((data ^ prev) & 0xcf) != 0)
 	{
-		printf("%04X:PORTC.1=%02X", activecpu_get_pc(), data);
+		printf("%04X:PORTC.1=%02X", cpu_get_pc(device->machine->activecpu), data);
 		if (data & 0x01) printf(" AUD1");
 		if (data & 0x02) printf(" AUD2");
 		if (data & 0x04) printf(" AUDEN");

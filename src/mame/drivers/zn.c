@@ -35,9 +35,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -1947,7 +1947,7 @@ static WRITE32_HANDLER( bam2_mcu_w )
 		else if (ACCESSING_BITS_16_31)
 		{
 			bam2_mcu_command = data>>16;
-			logerror("MCU command: %04x (PC %08x)\n", bam2_mcu_command, activecpu_get_pc());
+			logerror("MCU command: %04x (PC %08x)\n", bam2_mcu_command, cpu_get_pc(machine->activecpu));
 		}
 	}
 }
@@ -1957,11 +1957,11 @@ static READ32_HANDLER( bam2_mcu_r )
 	switch (offset)
 	{
 		case 0:
-			logerror("MCU port 0 read @ PC %08x mask %08x\n", activecpu_get_pc(), mem_mask);
+			logerror("MCU port 0 read @ PC %08x mask %08x\n", cpu_get_pc(machine->activecpu), mem_mask);
 			break;
 
 		case 1:
-			logerror("MCU status read @ PC %08x mask %08x\n", activecpu_get_pc(), mem_mask);
+			logerror("MCU status read @ PC %08x mask %08x\n", cpu_get_pc(machine->activecpu), mem_mask);
 
 			switch (bam2_mcu_command)
 			{

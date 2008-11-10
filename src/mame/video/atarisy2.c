@@ -254,20 +254,20 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 READ16_HANDLER( atarisy2_slapstic_r )
 {
 	int result = atarisy2_slapstic[offset];
-	slapstic_tweak(offset);
+	slapstic_tweak(machine, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	videobank = slapstic_tweak(0x1234) * 0x1000;
+	videobank = slapstic_tweak(machine, 0x1234) * 0x1000;
 	return result;
 }
 
 
 WRITE16_HANDLER( atarisy2_slapstic_w )
 {
-	slapstic_tweak(offset);
+	slapstic_tweak(machine, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	videobank = slapstic_tweak(0x1234) * 0x1000;
+	videobank = slapstic_tweak(machine, 0x1234) * 0x1000;
 }
 
 

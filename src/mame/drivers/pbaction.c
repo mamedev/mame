@@ -388,7 +388,7 @@ ROM_END
 static READ8_HANDLER( pbactio3_prot_kludge_r )
 {
 	/* on startup, the game expect this location to NOT act as RAM */
-	if (activecpu_get_pc() == 0xab80)
+	if (cpu_get_pc(machine->activecpu) == 0xab80)
 		return 0;
 
 	return work_ram[0];

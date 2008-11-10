@@ -1366,7 +1366,7 @@ void spc700_set_irq_callback(cpu_irq_callback callback)
 void spc700_state_save(void *file)
 {
 #if 0
-	int cpu = cpu_getactivecpu();
+	int cpu = cpunum_get_active();
 	uint p = GET_REG_P();
 	state_save_UINT16(file,"spc700",cpu,"PC",&REG_PC,2);
 	state_save_UINT16(file,"spc700",cpu,"PPC",&REG_PPC,2);
@@ -1384,7 +1384,7 @@ void spc700_state_save(void *file)
 void spc700_state_load(void *file)
 {
 #if 0
-	int cpu = cpu_getactivecpu();
+	int cpu = cpunum_get_active();
 	uint p;
 	state_load_UINT16(file,"spc700",cpu,"PC",&REG_PC,2);
 	state_load_UINT16(file,"spc700",cpu,"PPC",&REG_PPC,2);

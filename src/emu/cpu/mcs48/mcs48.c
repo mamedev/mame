@@ -216,7 +216,7 @@ INLINE UINT8 argument_fetch(offs_t address)
 
 INLINE void update_regptr(mcs48_state *mcs48)
 {
-	mcs48->regptr = memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_DATA, (PSW & B_FLAG) ? 24 : 0);
+	mcs48->regptr = memory_get_write_ptr(cpunum_get_active(), ADDRESS_SPACE_DATA, (PSW & B_FLAG) ? 24 : 0);
 }
 
 

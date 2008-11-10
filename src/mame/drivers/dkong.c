@@ -497,18 +497,18 @@ static READ8_DEVICE_HANDLER( dk_dma_read_byte )
 {
 	UINT8 result;
 
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	result = program_read_byte(offset);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return result;
 }
 
 static WRITE8_DEVICE_HANDLER( dk_dma_write_byte )
 {
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	program_write_byte(offset, data);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static READ8_DEVICE_HANDLER( hb_dma_read_byte )
@@ -523,9 +523,9 @@ static READ8_DEVICE_HANDLER( hb_dma_read_byte )
 
 	addr = ((bucket<<7) & 0x7c00) | (offset & 0x3ff);
 
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	data = program_read_byte(addr);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return data;
 }
@@ -541,9 +541,9 @@ static WRITE8_DEVICE_HANDLER( hb_dma_write_byte )
 
 	addr = ((bucket<<7) & 0x7c00) | (offset & 0x3ff);
 
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	program_write_byte(addr, data);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static READ8_DEVICE_HANDLER( p8257_ctl_r )
@@ -650,7 +650,7 @@ static WRITE8_HANDLER( s2650_data_w )
 {
 	dkong_state *state = machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("write : pc = %04x, loopback = %02x\n",activecpu_get_pc(), data);
+	logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(machine->activecpu), data);
 #endif
 
 	state->hunchloopback = data;
@@ -660,10 +660,10 @@ static READ8_HANDLER( s2650_port0_r )
 {
 	dkong_state *state = machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("port 0 : pc = %04x, loopback = %02x\n",activecpu_get_pc(), state->hunchloopback);
+	logerror("port 0 : pc = %04x, loopback = %02x\n",cpu_get_pc(machine->activecpu), state->hunchloopback);
 #endif
 
-	switch (COMBINE_TYPE_PC(state->protect_type, activecpu_get_pc()))
+	switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(machine->activecpu)))
 	{
 		case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x00e9):  return 0xff;
 		case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x0114):  return 0xfb; //fb
@@ -679,7 +679,7 @@ static READ8_HANDLER( s2650_port0_r )
 		case DK2650_SHOOTGAL:  return 0x00;
 		case DK2650_SPCLFORC:  return 0x00;
 	}
-	fatalerror("Unhandled read from port 0 : pc = %4x\n",activecpu_get_pc());
+	fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(machine->activecpu));
 }
 
 
@@ -687,10 +687,10 @@ static READ8_HANDLER( s2650_port1_r )
 {
 	dkong_state *state = machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("port 1 : pc = %04x, loopback = %02x\n",activecpu_get_pc(), state->hunchloopback);
+	logerror("port 1 : pc = %04x, loopback = %02x\n",cpu_get_pc(machine->activecpu), state->hunchloopback);
 #endif
 
-	switch (COMBINE_TYPE_PC(state->protect_type, activecpu_get_pc()))
+	switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(machine->activecpu)))
 	{
 		case COMBINE_TYPE_PC(DK2650_EIGHTACT, 0x0021):  return 0x00;
 		case COMBINE_TYPE_PC(DK2650_HERBIEDK, 0x002b):  return 0x00;
@@ -703,7 +703,7 @@ static READ8_HANDLER( s2650_port1_r )
 		case DK2650_EIGHTACT:  return 1;
 		case DK2650_HERBIEDK:  return 1;
 	}
-	fatalerror("Unhandled read from port 1 : pc = %4x\n",activecpu_get_pc());
+	fatalerror("Unhandled read from port 1 : pc = %4x\n",cpu_get_pc(machine->activecpu));
 }
 
 

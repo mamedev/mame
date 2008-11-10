@@ -233,7 +233,7 @@ static CPU_INIT( cop410 )
 
 	/* set clock divider */
 
-	cpunum_set_info_int(index, CPUINFO_INT_CLOCK_DIVIDER, R.intf->cki);
+	cpu_set_info_int(device, CPUINFO_INT_CLOCK_DIVIDER, R.intf->cki);
 
 	/* allocate serial timer */
 

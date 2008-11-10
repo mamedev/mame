@@ -776,7 +776,7 @@ static void vendetta_banking( int lines )
 
 	if ( lines >= 0x1c )
 	{
-		logerror("PC = %04x : Unknown bank selected %02x\n", activecpu_get_pc(), lines );
+		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(Machine->activecpu), lines );
 	}
 	else
 		memory_set_bankptr( 1, &RAM[ 0x10000 + ( lines * 0x2000 ) ] );
@@ -784,7 +784,7 @@ static void vendetta_banking( int lines )
 
 static MACHINE_RESET( vendetta )
 {
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)vendetta_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)vendetta_banking);
 
 	paletteram = &memory_region(machine, "main")[0x48000];
 	irq_enabled = 0;

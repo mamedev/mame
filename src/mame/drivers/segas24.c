@@ -670,13 +670,13 @@ static READ16_HANDLER( hotrod3_ctrl_r )
 
 static READ16_HANDLER( iod_r )
 {
-	logerror("IO daughterboard read %02x (%x)\n", offset, activecpu_get_pc());
+	logerror("IO daughterboard read %02x (%x)\n", offset, cpu_get_pc(machine->activecpu));
 	return 0xffff;
 }
 
 static WRITE16_HANDLER( iod_w )
 {
-	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, activecpu_get_pc());
+	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(machine->activecpu));
 }
 
 
@@ -706,7 +706,7 @@ static void reset_reset(running_machine *machine)
 static void resetcontrol_w(UINT8 data)
 {
 	resetcontrol = data;
-	logerror("Reset control %02x (%x:%x)\n", resetcontrol, cpu_getactivecpu(), activecpu_get_pc());
+	logerror("Reset control %02x (%x:%x)\n", resetcontrol, cpunum_get_active(), cpu_get_pc(Machine->activecpu));
 	reset_reset(Machine);
 }
 
@@ -782,7 +782,7 @@ static WRITE16_HANDLER( mlatch_w )
 		int i;
 		UINT8 mxor = 0;
 		if(!mlatch_table) {
-			logerror("Protection: magic latch accessed but no table loaded (%d:%x)\n", cpu_getactivecpu(), activecpu_get_pc());
+			logerror("Protection: magic latch accessed but no table loaded (%d:%x)\n", cpunum_get_active(), cpu_get_pc(machine->activecpu));
 			return;
 		}
 
@@ -793,9 +793,9 @@ static WRITE16_HANDLER( mlatch_w )
 				if(mlatch & (1<<i))
 					mxor |= 1 << mlatch_table[i];
 			mlatch = data ^ mxor;
-			logerror("Magic latching %02x ^ %02x as %02x (%d:%x)\n", data & 0xff, mxor, mlatch, cpu_getactivecpu(), activecpu_get_pc());
+			logerror("Magic latching %02x ^ %02x as %02x (%d:%x)\n", data & 0xff, mxor, mlatch, cpunum_get_active(), cpu_get_pc(machine->activecpu));
 		} else {
-			logerror("Magic latch reset (%d:%x)\n", cpu_getactivecpu(), activecpu_get_pc());
+			logerror("Magic latch reset (%d:%x)\n", cpunum_get_active(), cpu_get_pc(machine->activecpu));
 			mlatch = 0x00;
 		}
 	}
@@ -897,10 +897,9 @@ static WRITE16_HANDLER(irq_w)
 
 static READ16_HANDLER(irq_r)
 {
-	extern int activecpu;
 	switch(offset) {
 	case 0: {
-		int pc = activecpu_get_pc();
+		int pc = cpu_get_pc(machine->activecpu);
 		static int turns;
 		if(pc == 0x84a4 || pc == 0x84a6)
 			return 0;

@@ -951,7 +951,7 @@ static void add_register(debug_view *view, int regnum, const char *str)
 
 	/* note the register number and info */
 	regdata->reg[view->total_rows].lastval  =
-	regdata->reg[view->total_rows].currval  = cpunum_get_reg(regdata->cpunum, regnum);
+	regdata->reg[view->total_rows].currval  = cpu_get_reg(Machine->cpu[regdata->cpunum], regnum);
 	regdata->reg[view->total_rows].regnum   = regnum;
 	regdata->reg[view->total_rows].tagstart = tagstart;
 	regdata->reg[view->total_rows].taglen   = taglen;
@@ -973,7 +973,7 @@ static void add_register(debug_view *view, int regnum, const char *str)
 static void registers_recompute(debug_view *view)
 {
 	debug_view_registers *regdata = view->extra_data;
-	const int *list = cpunum_debug_register_list(regdata->cpunum);
+	const int *list = cpu_get_debug_register_list(Machine->cpu[regdata->cpunum]);
 	int regnum, maxtaglen, maxvallen;
 
 	/* reset the view parameters */
@@ -1026,7 +1026,7 @@ static void registers_recompute(debug_view *view)
 	regdata->reg[view->total_rows].tagstart = 0;
 	regdata->reg[view->total_rows].taglen   = 5;
 	regdata->reg[view->total_rows].valstart = 6;
-	regdata->reg[view->total_rows].vallen   = (UINT32)strlen(cpunum_flags(regdata->cpunum));
+	regdata->reg[view->total_rows].vallen   = (UINT32)strlen(cpu_get_flags_string(Machine->cpu[regdata->cpunum]));
 	maxtaglen = MAX(maxtaglen, regdata->reg[view->total_rows].taglen);
 	maxvallen = MAX(maxvallen, regdata->reg[view->total_rows].vallen);
 	view->total_rows++;
@@ -1053,7 +1053,7 @@ static void registers_recompute(debug_view *view)
 			break;
 
 		/* retrieve the string for this register */
-		str = cpunum_reg_string(regdata->cpunum, regid);
+		str = cpu_get_reg_string(Machine->cpu[regdata->cpunum], regid);
 
 		/* did we get a string? */
 		if (str && str[0] != '\0' && str[0] != '~')
@@ -1079,7 +1079,7 @@ static void registers_update(debug_view *view)
 	const device_config *screen = Machine->primary_screen;
 
 	/* cannot update if no active CPU */
-	if (cpu_getactivecpu() < 0)
+	if (cpunum_get_active() < 0)
 		return;
 	total_cycles = activecpu_gettotalcycles();
 
@@ -1134,16 +1134,16 @@ static void registers_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 4:
-						sprintf(dummy, "flags:%s", activecpu_flags());
+						sprintf(dummy, "flags:%s", cpu_get_flags_string(Machine->activecpu));
 						break;
 				}
 			}
 			else
 			{
-				data = (char *)cpunum_reg_string(regdata->cpunum, reg->regnum);
+				data = (char *)cpu_get_reg_string(Machine->cpu[regdata->cpunum], reg->regnum);
 				if (regdata->last_update != total_cycles)
 					reg->lastval = reg->currval;
-				reg->currval = cpunum_get_reg(regdata->cpunum, reg->regnum);
+				reg->currval = cpu_get_reg(Machine->cpu[regdata->cpunum], reg->regnum);
 			}
 
 			/* see if we changed */
@@ -1324,8 +1324,8 @@ static void disasm_free(debug_view *view)
 
 static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t startpc, int numinstrs)
 {
-	int minlen = BYTE2ADDR(activecpu_min_instruction_bytes(), cpuinfo, ADDRESS_SPACE_PROGRAM);
-	int maxlen = BYTE2ADDR(activecpu_max_instruction_bytes(), cpuinfo, ADDRESS_SPACE_PROGRAM);
+	int minlen = BYTE2ADDR(cpu_get_min_opcode_bytes(Machine->activecpu), cpuinfo, ADDRESS_SPACE_PROGRAM);
+	int maxlen = BYTE2ADDR(cpu_get_max_opcode_bytes(Machine->activecpu), cpuinfo, ADDRESS_SPACE_PROGRAM);
 	UINT32 addrmask = cpuinfo->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
 	offs_t curpc, lastgoodpc = startpc, temppc;
 	UINT8 opbuf[1024], argbuf[1024];
@@ -1361,7 +1361,7 @@ static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t s
 			/* get the disassembly, but only if mapped */
 			instlen = 1;
 			if (cpuinfo->translate == NULL || (*cpuinfo->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &pcbyte))
-				instlen = activecpu_dasm(dasmbuffer, testpc & addrmask, &opbuf[1000 + testpc - startpc], &argbuf[1000 + testpc - startpc]) & DASMFLAG_LENGTHMASK;
+				instlen = cpu_dasm(Machine->activecpu, dasmbuffer, testpc & addrmask, &opbuf[1000 + testpc - startpc], &argbuf[1000 + testpc - startpc]) & DASMFLAG_LENGTHMASK;
 
 			/* count this one */
 			instcount++;
@@ -1480,13 +1480,13 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 	dasmdata->divider2 = dasmdata->divider1 + 1 + dasmdata->dasm_width + 1;
 
 	/* determine how many bytes we might need to display */
-	minbytes = activecpu_min_instruction_bytes();
-	maxbytes = activecpu_max_instruction_bytes();
+	minbytes = cpu_get_min_opcode_bytes(Machine->activecpu);
+	maxbytes = cpu_get_max_opcode_bytes(Machine->activecpu);
 
 	/* set the width of the third column according to display mode */
 	if (dasmdata->right_column == DVP_DASM_RIGHTCOL_RAW || dasmdata->right_column == DVP_DASM_RIGHTCOL_ENCRYPTED)
 	{
-		chunksize = activecpu_databus_width(ADDRESS_SPACE_PROGRAM) / 8;
+		chunksize = cpu_get_databus_width(Machine->activecpu, ADDRESS_SPACE_PROGRAM) / 8;
 		maxbytes_clamped = maxbytes;
 		if (maxbytes_clamped > DASM_MAX_BYTES)
 			maxbytes_clamped = DASM_MAX_BYTES;
@@ -1550,7 +1550,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 			}
 
 			/* disassemble the result */
-			pc += numbytes = activecpu_dasm(buffer, pc & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			pc += numbytes = cpu_dasm(Machine->activecpu, buffer, pc & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 		else
 			sprintf(buffer, "<unmapped>");
@@ -1568,7 +1568,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 			offs_t comment_address = BYTE2ADDR(dasmdata->address[instr], cpuinfo, ADDRESS_SPACE_PROGRAM) ;
 
 			/* get and add the comment */
-			if (debug_comment_get_text(cpu_getactivecpu(), comment_address, debug_comment_get_opcode_crc32(comment_address)) != 0x00)
+			if (debug_comment_get_text(cpunum_get_active(), comment_address, debug_comment_get_opcode_crc32(comment_address)) != 0x00)
 			{
 				int i ;
 				char bob[DEBUG_COMMENT_MAX_LINE_LENGTH] ;
@@ -1580,7 +1580,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 					destbuf[dasmdata->divider2+i] = pre[i] ;
 
 				// Stick in the comment itself
-				strcpy(bob, debug_comment_get_text(cpu_getactivecpu(), comment_address, debug_comment_get_opcode_crc32(comment_address))) ;
+				strcpy(bob, debug_comment_get_text(cpunum_get_active(), comment_address, debug_comment_get_opcode_crc32(comment_address))) ;
 				for (i = 0; i < (dasmdata->allocated_cols - dasmdata->divider2 - strlen(pre) - 1); i++)
 					destbuf[dasmdata->divider2+i+strlen(pre)] = bob[i] ;
 			}
@@ -1595,7 +1595,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 
 	/* reset the opcode base */
 	if (dasmdata->cpunum == original_cpunum)
-		memory_set_opbase(activecpu_get_physical_pc_byte());
+		memory_set_opbase(cpu_get_physical_pc_byte(Machine->activecpu));
 
 	/* update opcode base information */
 	dasmdata->last_opbase_rom = opbase.rom;
@@ -1618,16 +1618,16 @@ static void disasm_update(debug_view *view)
 	extern opbase_data opbase;
 	debug_view_disasm *dasmdata = view->extra_data;
 	const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
-	offs_t pc = cpunum_get_reg(dasmdata->cpunum, REG_PC);
+	offs_t pc = cpu_get_reg(Machine->cpu[dasmdata->cpunum], REG_PC);
 	offs_t pcbyte = ADDR2BYTE_MASKED(pc, cpuinfo, ADDRESS_SPACE_PROGRAM);
 	debug_view_char *dest = view->viewdata;
-	int original_cpunum = cpu_getactivecpu();
+	int original_cpunum = cpunum_get_active();
 	int recomputed_this_time = FALSE;
 	EXPRERR exprerr;
 	UINT32 row;
 
 	/* switch to the CPU's context */
-	cpuintrf_push_context(dasmdata->cpunum);
+	cpu_push_context(Machine->cpu[dasmdata->cpunum]);
 
 	/* if our expression is dirty, fix it */
 	if (dasmdata->expression_dirty && dasmdata->expression_string)
@@ -1803,7 +1803,7 @@ recompute:
 	}
 
 	/* restore the original CPU context */
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -1851,7 +1851,7 @@ static void disasm_handle_char(debug_view *view, char chval)
 		case DCH_HOME:				/* set the active column to the PC */
 		{
 			const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
-			offs_t pc = cpunum_get_reg(dasmdata->cpunum, REG_PC);
+			offs_t pc = cpu_get_reg(Machine->cpu[dasmdata->cpunum], REG_PC);
 			int i;
 
 			pc = ADDR2BYTE_MASKED(pc, cpuinfo, ADDRESS_SPACE_PROGRAM);
@@ -2380,7 +2380,7 @@ static void memory_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 dat
 
 /* hack for FD1094 editing */
 #ifdef FD1094_HACK
-	if (memdata->raw_base == memory_region(machine, "user2"))
+	if (memdata->raw_base == memory_region(Machine, "user2"))
 	{
 		extern void fd1094_regenerate_key(void);
 		fd1094_regenerate_key();
@@ -2558,7 +2558,7 @@ static void memory_handle_char(debug_view *view, char chval)
 	}
 
 	/* switch off of the current chunk size */
-	cpuintrf_push_context(memdata->cpunum);
+	cpu_push_context(Machine->cpu[memdata->cpunum]);
 	switch (memdata->bytes_per_chunk)
 	{
 		default:
@@ -2622,7 +2622,7 @@ static void memory_handle_char(debug_view *view, char chval)
 			}
 			break;
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* set a new position */
 	memory_set_cursor_pos(view, address, shift);
@@ -2650,7 +2650,7 @@ static void memory_update(debug_view *view)
 
 	/* switch to the CPU's context */
 	if (memdata->raw_base == NULL)
-		cpuintrf_push_context(memdata->cpunum);
+		cpu_push_context(Machine->cpu[memdata->cpunum]);
 
 	/* determine maximum address and number of characters for that */
 	if (memdata->raw_base != NULL)
@@ -2949,7 +2949,7 @@ static void memory_update(debug_view *view)
 
 	/* restore the context */
 	if (memdata->raw_base == NULL)
-		cpuintrf_pop_context();
+		cpu_pop_context();
 }
 
 

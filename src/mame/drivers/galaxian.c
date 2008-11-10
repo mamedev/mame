@@ -388,13 +388,13 @@ static WRITE8_HANDLER( konami_sound_filter_w )
 
 static WRITE8_DEVICE_HANDLER( konami_portc_0_w )
 {
-	logerror("%04X:ppi0_portc_w = %02X\n", activecpu_get_pc(), data);
+	logerror("%04X:ppi0_portc_w = %02X\n", cpu_get_pc(device->machine->activecpu), data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( konami_portc_1_w )
 {
-	logerror("%04X:ppi1_portc_w = %02X\n", activecpu_get_pc(), data);
+	logerror("%04X:ppi1_portc_w = %02X\n", cpu_get_pc(device->machine->activecpu), data);
 }
 
 
@@ -758,7 +758,7 @@ static WRITE8_DEVICE_HANDLER( scorpion_protection_w )
 
 static READ8_HANDLER( scorpion_sound_status_r )
 {
-	logerror("%04X:scorpion_sound_status_r()\n", safe_activecpu_get_pc());
+	logerror("%04X:scorpion_sound_status_r()\n", safe_cpu_get_pc(machine->activecpu));
 	return 1;
 }
 
@@ -766,7 +766,7 @@ static READ8_HANDLER( scorpion_sound_status_r )
 static WRITE8_HANDLER( scorpion_sound_data_w )
 {
 	scorpion_sound_data = data;
-//  logerror("%04X:scorpion_sound_data_w(%02X)\n", safe_activecpu_get_pc(), data);
+//  logerror("%04X:scorpion_sound_data_w(%02X)\n", safe_cpu_get_pc(machine->activecpu), data);
 }
 
 
@@ -774,7 +774,7 @@ static WRITE8_HANDLER( scorpion_sound_control_w )
 {
 	if (!(data & 0x04))
 		mame_printf_debug("Secondary sound = %02X\n", scorpion_sound_data);
-//  logerror("%04X:scorpion_sound_control_w(%02X)\n", safe_activecpu_get_pc(), data);
+//  logerror("%04X:scorpion_sound_control_w(%02X)\n", safe_cpu_get_pc(machine->activecpu), data);
 }
 
 
@@ -978,7 +978,7 @@ static READ8_HANDLER( jumpbug_protection_r )
 		case 0x0235:  return 0x02;
 		case 0x0311:  return 0xff;  /* not checked */
 	}
-	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,activecpu_get_pc());
+	logerror("Unknown protection read. Offset: %04X  PC=%04X\n",0xb000+offset,cpu_get_pc(machine->activecpu));
 	return 0xff;
 }
 
@@ -1005,7 +1005,7 @@ static TIMER_CALLBACK( checkmaj_irq0_gen )
 
 static READ8_HANDLER( checkmaj_protection_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 		case 0x0f15:  return 0xf5;
 		case 0x0f8f:  return 0x7c;
@@ -1014,7 +1014,7 @@ static READ8_HANDLER( checkmaj_protection_r )
 		case 0x10f1:  return 0xaa;
 		case 0x1402:  return 0xaa;
 		default:
-			logerror("Unknown protection read. PC=%04X\n",activecpu_get_pc());
+			logerror("Unknown protection read. PC=%04X\n",cpu_get_pc(machine->activecpu));
 	}
 
 	return 0;

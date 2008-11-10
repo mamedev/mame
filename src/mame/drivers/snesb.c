@@ -148,7 +148,7 @@ static READ8_HANDLER(sb2b_6a6xxx_r)
 		case 0xfb7:	return 0x47;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, activecpu_get_pc());
+	logerror("Unknown protection read read %x @ %x\n",offset, cpu_get_pc(machine->activecpu));
 
 	return 0;
 }

@@ -245,14 +245,14 @@ void darkedge_fd1149_vblank(void)
 WRITE16_HANDLER( darkedge_protection_w )
 {
 	logerror("%06x:darkedge_prot_w(%06X) = %04X & %04X\n",
-		activecpu_get_pc(), 0xa00000 + 2*offset, data, mem_mask);
+		cpu_get_pc(machine->activecpu), 0xa00000 + 2*offset, data, mem_mask);
 }
 
 
 READ16_HANDLER( darkedge_protection_r )
 {
 	logerror("%06x:darkedge_prot_r(%06X) & %04X\n",
-		activecpu_get_pc(), 0xa00000 + 2*offset, mem_mask);
+		cpu_get_pc(machine->activecpu), 0xa00000 + 2*offset, mem_mask);
 	return 0xffff;
 }
 
@@ -287,12 +287,12 @@ READ16_HANDLER( dbzvrvs_protection_r )
 // protection ram is 8-bits wide and only occupies every other address
 READ16_HANDLER(arabfgt_protection_r)
 {
-	int PC = activecpu_get_pc();
+	int PC = cpu_get_pc(machine->activecpu);
 	int cmpVal;
 
 	if (PC == 0xfe0325 || PC == 0xfe01e5 || PC == 0xfe035e || PC == 0xfe03cc)
 	{
-		cmpVal = activecpu_get_reg(1);
+		cmpVal = cpu_get_reg(machine->activecpu, 1);
 
 		// R0 always contains the value the protection is supposed to return (!)
 		return cmpVal;

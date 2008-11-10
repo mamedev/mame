@@ -824,7 +824,7 @@ INLINE UINT32 ARG16(z80_state *z80)
  * RETN
  ***************************************************************/
 #define RETN	{												\
-	LOG(("Z80 #%d RETN IFF1:%d IFF2:%d\n", cpu_getactivecpu(), IFF1, IFF2)); \
+	LOG(("Z80 #%d RETN IFF1:%d IFF2:%d\n", cpunum_get_active(), IFF1, IFF2)); \
 	POP( pc );													\
 	MEMPTR = PC;												\
 	change_pc(PCD);												\
@@ -2173,7 +2173,7 @@ OP(xycb,ff) { A = SET(7, RM(EA) ); WM( EA,A );						} /* SET  7,A=(XY+o)  */
 
 OP(illegal,1) {
 	logerror("Z80 #%d ill. opcode $%02x $%02x\n",
-			cpu_getactivecpu(), cpu_readop((PCD-1)&0xffff), cpu_readop(PCD));
+			cpunum_get_active(), cpu_readop((PCD-1)&0xffff), cpu_readop(PCD));
 }
 
 /**********************************************************
@@ -2761,7 +2761,7 @@ OP(fd,ff) { illegal_1(z80); op_ff(z80);								} /* DB   FD          */
 OP(illegal,2)
 {
 	logerror("Z80 #%d ill. opcode $ed $%02x\n",
-			cpu_getactivecpu(), cpu_readop((PCD-1)&0xffff));
+			cpunum_get_active(), cpu_readop((PCD-1)&0xffff));
 }
 
 /**********************************************************
@@ -3369,7 +3369,7 @@ static void take_interrupt(z80_state *z80)
 	else
 		irq_vector = (*z80->irq_callback)(z80->device, 0);
 
-	LOG(("Z80 #%d single int. irq_vector $%02x\n", cpu_getactivecpu(), irq_vector));
+	LOG(("Z80 #%d single int. irq_vector $%02x\n", cpunum_get_active(), irq_vector));
 
 	/* Interrupt mode 2. Call [z80->i:databyte] */
 	if( IM == 2 )
@@ -3377,7 +3377,7 @@ static void take_interrupt(z80_state *z80)
 		irq_vector = (irq_vector & 0xff) | (I << 8);
 		PUSH( pc );
 		RM16( irq_vector, &z80->pc );
-		LOG(("Z80 #%d IM2 [$%04x] = $%04x\n",cpu_getactivecpu() , irq_vector, PCD));
+		LOG(("Z80 #%d IM2 [$%04x] = $%04x\n",cpunum_get_active() , irq_vector, PCD));
 		/* CALL opcode timing */
 		z80->icount -= cc[Z80_TABLE_op][0xcd];
 	}
@@ -3385,7 +3385,7 @@ static void take_interrupt(z80_state *z80)
 	/* Interrupt mode 1. RST 38h */
 	if( IM == 1 )
 	{
-		LOG(("Z80 #%d IM1 $0038\n",cpu_getactivecpu() ));
+		LOG(("Z80 #%d IM1 $0038\n",cpunum_get_active() ));
 		PUSH( pc );
 		PCD = 0x0038;
 		/* RST $38 + 'interrupt latency' cycles */
@@ -3396,7 +3396,7 @@ static void take_interrupt(z80_state *z80)
 		/* Interrupt mode 0. We check for CALL and JP instructions, */
 		/* if neither of these were found we assume a 1 byte opcode */
 		/* was placed on the databus                                */
-		LOG(("Z80 #%d IM0 $%04x\n",cpu_getactivecpu() , irq_vector));
+		LOG(("Z80 #%d IM0 $%04x\n",cpunum_get_active() , irq_vector));
 		switch (irq_vector & 0xff0000)
 		{
 			case 0xcd0000:	/* call */
@@ -3552,7 +3552,7 @@ static CPU_INIT( z80 )
 	/* Reset registers to their initial values */
 	memset(z80, 0, sizeof(*z80));
 	if (device->static_config != NULL)
-		z80->daisy = z80daisy_init(Machine, Machine->config->cpu[cpu_getactivecpu()].tag, device->static_config);
+		z80->daisy = z80daisy_init(Machine, Machine->config->cpu[cpunum_get_active()].tag, device->static_config);
 	z80->irq_callback = irqcallback;
 	z80->device = device;
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
@@ -3606,7 +3606,7 @@ static CPU_EXECUTE( z80 )
 	/* to just check here */
 	if (z80->nmi_pending)
 	{
-		LOG(("Z80 #%d take NMI\n", cpu_getactivecpu()));
+		LOG(("Z80 #%d take NMI\n", cpunum_get_active()));
 		PRVPC = -1;			/* there isn't a valid previous program counter */
 		LEAVE_HALT;			/* Check if processor was halted */
 

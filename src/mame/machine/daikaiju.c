@@ -175,7 +175,7 @@ WRITE8_HANDLER( daikaiju_mcu_w )
 			case MCU_ID: 				SET_COMMAND(MCU_ID_LENGTH); break;
 			default:
 				daikaiju_command=data;
-				logerror("Unknown MCU command W %x %x \n",data,activecpu_get_pc());
+				logerror("Unknown MCU command W %x %x \n",data,cpu_get_pc(machine->activecpu));
 		}
 	}
 	else
@@ -332,7 +332,7 @@ READ8_HANDLER( daikaiju_mcu_r )
 			return n;
 		}
 	}
-	logerror("Unknown MCU R %x %x %x %x\n",activecpu_get_pc(), daikaiju_command, daikaiju_length, daikaiju_prev);
+	logerror("Unknown MCU R %x %x %x %x\n",cpu_get_pc(machine->activecpu), daikaiju_command, daikaiju_length, daikaiju_prev);
 	return 0xff;
 }
 

@@ -119,7 +119,7 @@ WRITE8_HANDLER( taitol_bankc_w )
 	if (bankc[offset] != data)
 	{
 		bankc[offset] = data;
-//      logerror("Bankc %d, %02x (%04x)\n", offset, data, activecpu_get_pc());
+//      logerror("Bankc %d, %02x (%04x)\n", offset, data, cpu_get_pc(machine->activecpu));
 
 		tilemap_mark_all_tiles_dirty(bg18_tilemap);
 		tilemap_mark_all_tiles_dirty(bg19_tilemap);
@@ -134,7 +134,7 @@ READ8_HANDLER( taitol_bankc_r )
 
 WRITE8_HANDLER( taitol_control_w )
 {
-//  logerror("Control Write %02x (%04x)\n", data, activecpu_get_pc());
+//  logerror("Control Write %02x (%04x)\n", data, cpu_get_pc(machine->activecpu));
 
 	cur_ctrl = data;
 //popmessage("%02x",data);
@@ -154,7 +154,7 @@ WRITE8_HANDLER( taitol_control_w )
 
 READ8_HANDLER( taitol_control_r )
 {
-//  logerror("Control Read %02x (%04x)\n", cur_ctrl, activecpu_get_pc());
+//  logerror("Control Read %02x (%04x)\n", cur_ctrl, cpu_get_pc(machine->activecpu));
 	return cur_ctrl;
 }
 

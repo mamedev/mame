@@ -579,7 +579,7 @@ static void interrupt_reset(running_machine *machine)
 static TIMER_CALLBACK( clear_all_lines )
 {
 	int cpunum = param;
-	int inputcount = cpunum_input_lines(cpunum);
+	int inputcount = cpu_get_input_lines(machine->cpu[cpunum]);
 	int line;
 
 	/* clear NMI and all inputs */
@@ -614,7 +614,7 @@ void cpu_interrupt_enable(int cpunum, int enabled)
 
 WRITE8_HANDLER( interrupt_enable_w )
 {
-	int activecpu = cpu_getactivecpu();
+	int activecpu = cpunum_get_active();
 	assert_always(activecpu >= 0, "interrupt_enable_w() called with no active cpu!");
 	cpu_interrupt_enable(activecpu, data);
 }
@@ -627,7 +627,7 @@ WRITE8_HANDLER( interrupt_enable_w )
 
 READ8_HANDLER( interrupt_enable_r )
 {
-	int activecpu = cpu_getactivecpu();
+	int activecpu = cpunum_get_active();
 	assert_always(activecpu >= 0, "interrupt_enable_r() called with no active cpu!");
 	return interrupt_enable[activecpu];
 }

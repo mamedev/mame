@@ -195,7 +195,7 @@ static MACHINE_RESET( common )
 	}
 
 	/* initialize the ADSP Tx callback */
-	cpunum_set_info_fct(2, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)adsp_tx_callback);
+	cpu_set_info_fct(machine->cpu[2], CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)adsp_tx_callback);
 
 	/* allocate a timer for feeding the autobuffer */
 	adsp_autobuffer_timer = timer_alloc(adsp_autobuffer_irq, NULL);
@@ -309,7 +309,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 static WRITE16_HANDLER( sound_data_w )
 {
-	logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+	logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
 }
@@ -325,7 +325,7 @@ static READ16_HANDLER( sound_data_r )
 
 static READ16_HANDLER( sound_status_r )
 {
-	logerror("%06X:sound_status_r(%02X) = %02X\n", activecpu_get_pc(), offset, sound_status);
+	logerror("%06X:sound_status_r(%02X) = %02X\n", cpu_get_pc(machine->activecpu), offset, sound_status);
 	if (ACCESSING_BITS_0_7)
 		return sound_status;
 	return 0xffff;
@@ -367,7 +367,7 @@ static WRITE16_HANDLER( analog_port_clock_w )
 		}
 	}
 	else
-		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 
@@ -385,7 +385,7 @@ static WRITE16_HANDLER( analog_port_latch_w )
 		}
 	}
 	else
-		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 
@@ -398,7 +398,7 @@ static WRITE16_HANDLER( analog_port_latch_w )
 
 static READ32_HANDLER( tms_m68k_ram_r )
 {
-//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", activecpu_get_pc(), offset, !(offset & 1) ? ((INT32)m68k_ram_base[offset/2] >> 16) : (int)(INT16)m68k_ram_base[offset/2]);
+//  logerror("%06X:tms_m68k_ram_r(%04X) = %08X\n", cpu_get_pc(machine->activecpu), offset, !(offset & 1) ? ((INT32)m68k_ram_base[offset/2] >> 16) : (int)(INT16)m68k_ram_base[offset/2]);
 	return (INT32)(INT16)m68k_ram_base[offset ^ tms_offset_xor];
 }
 
@@ -427,7 +427,7 @@ static WRITE16_HANDLER( tms_reset_w )
 {
 	/* this is set to 0 while data is uploaded, then set to $ffff after it is done */
 	/* it does not ever appear to be touched after that */
-	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+	logerror("%06X:tms_reset_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data == 0xffff) ? CLEAR_LINE : ASSERT_LINE);
 }
 
@@ -436,7 +436,7 @@ static WRITE16_HANDLER( tms_irq_w )
 {
 	/* this is written twice, 0,1, in quick succession */
 	/* done after uploading, and after modifying the comm area */
-	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+	logerror("%06X:tms_irq_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
 		cpunum_set_input_line(machine, 1, 0, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 }
@@ -444,14 +444,14 @@ static WRITE16_HANDLER( tms_irq_w )
 
 static WRITE16_HANDLER( tms_control3_w )
 {
-	logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+	logerror("%06X:tms_control3_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 
 static WRITE16_HANDLER( tms_comm_w )
 {
 	COMBINE_DATA(&tms_comm_base[offset ^ tms_offset_xor]);
-	logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset*2, data, mem_mask);
+	logerror("%06X:tms_comm_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*2, data, mem_mask);
 }
 
 
@@ -545,7 +545,7 @@ static WRITE16_HANDLER( adsp_rombank_w )
 static TIMER_CALLBACK( adsp_autobuffer_irq )
 {
 	/* get the index register */
-	int reg = cpunum_get_reg(2, ADSP2100_I0 + adsp_ireg);
+	int reg = cpu_get_reg(machine->cpu[2], ADSP2100_I0 + adsp_ireg);
 
 	/* copy the current data into the buffer */
 // logerror("ADSP buffer: I%d=%04X incs=%04X size=%04X\n", adsp_ireg, reg, adsp_incs, adsp_size);
@@ -566,7 +566,7 @@ static TIMER_CALLBACK( adsp_autobuffer_irq )
 	}
 
 	/* store it */
-	cpunum_set_reg(2, ADSP2100_I0 + adsp_ireg, reg);
+	cpu_set_reg(machine->cpu[2], ADSP2100_I0 + adsp_ireg, reg);
 }
 
 
@@ -594,15 +594,15 @@ static void adsp_tx_callback(int port, INT32 data)
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = cpunum_get_reg(2, ADSP2100_I0 + adsp_ireg);
-			adsp_incs = cpunum_get_reg(2, ADSP2100_M0 + mreg);
-			adsp_size = cpunum_get_reg(2, ADSP2100_L0 + lreg);
+			source = cpu_get_reg(Machine->cpu[2], ADSP2100_I0 + adsp_ireg);
+			adsp_incs = cpu_get_reg(Machine->cpu[2], ADSP2100_M0 + mreg);
+			adsp_size = cpu_get_reg(Machine->cpu[2], ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= adsp_incs;
 
 			/* make it go back one so we dont lose the first sample */
-			cpunum_set_reg(2, ADSP2100_I0 + adsp_ireg, source);
+			cpu_set_reg(Machine->cpu[2], ADSP2100_I0 + adsp_ireg, source);
 
 			/* save it as it is now */
 			adsp_ireg_base = source;
@@ -648,36 +648,36 @@ static WRITE32_HANDLER( unknown_107_w )
 {
 	/* arbitrary data written */
 	if (ACCESSING_BITS_0_7)
-		logerror("%06X:unknown_107_w = %02X\n", activecpu_get_pc(), data & 0xff);
+		logerror("%06X:unknown_107_w = %02X\n", cpu_get_pc(machine->activecpu), data & 0xff);
 	else
-		logerror("%06X:unknown_107_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+		logerror("%06X:unknown_107_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown_127_w )
 {
 	/* arbitrary data written */
 	if (ACCESSING_BITS_0_7)
-		logerror("%06X:unknown_127_w = %02X\n", activecpu_get_pc(), data & 0xff);
+		logerror("%06X:unknown_127_w = %02X\n", cpu_get_pc(machine->activecpu), data & 0xff);
 	else
-		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+		logerror("%06X:unknown_127_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown_137_w )
 {
 	/* only written $00 or $ff */
 	if (ACCESSING_BITS_0_7)
-		logerror("%06X:unknown_137_w = %02X\n", activecpu_get_pc(), data & 0xff);
+		logerror("%06X:unknown_137_w = %02X\n", cpu_get_pc(machine->activecpu), data & 0xff);
 	else
-		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+		logerror("%06X:unknown_137_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown_13a_w )
 {
 	/* only written $0000 or $0001 */
 	if (ACCESSING_BITS_0_15)
-		logerror("%06X:unknown_13a_w = %04X\n", activecpu_get_pc(), data & 0xffff);
+		logerror("%06X:unknown_13a_w = %04X\n", cpu_get_pc(machine->activecpu), data & 0xffff);
 	else
-		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+		logerror("%06X:unknown_13a_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 

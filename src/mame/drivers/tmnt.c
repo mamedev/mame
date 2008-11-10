@@ -385,8 +385,8 @@ static READ16_HANDLER( ssriders_protection_r )
 			return data;
 
 		default:
-			popmessage("%06x: unknown protection read",activecpu_get_pc());
-			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",activecpu_get_pc(),(UINT32)activecpu_get_reg(M68K_D7),cmd,data);
+			popmessage("%06x: unknown protection read",cpu_get_pc(machine->activecpu));
+			logerror("%06x: read 1c0800 (D7=%02x 1058fc=%02x 105a0a=%02x)\n",cpu_get_pc(machine->activecpu),(UINT32)cpu_get_reg(machine->activecpu, M68K_D7),cmd,data);
 			return 0xffff;
     }
 }

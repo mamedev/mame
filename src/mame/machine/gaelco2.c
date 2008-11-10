@@ -239,7 +239,7 @@ WRITE16_HANDLER( wrally2_adc_clk )
 		}
 	}
 	else
-		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+		logerror("%06X:analog_port_clock_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 
@@ -255,7 +255,7 @@ WRITE16_HANDLER( wrally2_adc_cs )
 		}
 	}
 	else
-		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", activecpu_get_pc(), offset, data, mem_mask);
+		logerror("%06X:analog_port_latch_w(%02X) = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 /***************************************************************************
@@ -325,13 +325,13 @@ UINT16 *snowboar_protection;
 
 READ16_HANDLER( snowboar_protection_r )
 {
-	logerror("%06x: protection read from %04x\n", activecpu_get_pc(), offset*2);
+	logerror("%06x: protection read from %04x\n", cpu_get_pc(machine->activecpu), offset*2);
 	return 0x0000;
 }
 
 WRITE16_HANDLER( snowboar_protection_w )
 {
 	COMBINE_DATA(&snowboar_protection[offset]);
-	logerror("%06x: protection write %04x to %04x\n", activecpu_get_pc(), data, offset*2);
+	logerror("%06x: protection write %04x to %04x\n", cpu_get_pc(machine->activecpu), data, offset*2);
 
 }

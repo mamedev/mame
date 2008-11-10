@@ -3707,9 +3707,9 @@ static UINT32 *rddsp32_speedup;
 static offs_t rddsp32_speedup_pc;
 static READ32_HANDLER( rddsp32_speedup_r )
 {
-	if (activecpu_get_pc() == rddsp32_speedup_pc && (*rddsp32_speedup >> 16) == 0)
+	if (cpu_get_pc(machine->activecpu) == rddsp32_speedup_pc && (*rddsp32_speedup >> 16) == 0)
 	{
-		UINT32 r14 = activecpu_get_reg(DSP32_R14);
+		UINT32 r14 = cpu_get_reg(machine->activecpu, DSP32_R14);
 		UINT32 r1 = program_read_word(r14 - 0x14);
 		int cycles_to_burn = 17 * 4 * (0x2bc - r1 - 2);
 		if (cycles_to_burn > 20 * 4)

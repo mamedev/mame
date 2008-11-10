@@ -1077,7 +1077,7 @@ WRITE8_HANDLER( balsente_chip_select_w )
 					"PULSE_WIDTH",
 					"WAVE_SELECT"
 				};
-				logerror("s%04X:   CEM#%d:%s=%f\n", activecpu_get_previouspc(), i, names[dac_register], voltage);
+				logerror("s%04X:   CEM#%d:%s=%f\n", cpu_get_previouspc(machine->activecpu), i, names[dac_register], voltage);
 			}
 #endif
 		}
@@ -1204,7 +1204,7 @@ static void update_grudge_steering(running_machine *machine)
 
 READ8_HANDLER( grudge_steering_r )
 {
-	logerror("%04X:grudge_steering_r(@%d)\n", activecpu_get_pc(), video_screen_get_vpos(machine->primary_screen));
+	logerror("%04X:grudge_steering_r(@%d)\n", cpu_get_pc(machine->activecpu), video_screen_get_vpos(machine->primary_screen));
 	grudge_steering_result |= 0x80;
 	return grudge_steering_result;
 }

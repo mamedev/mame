@@ -10,7 +10,7 @@
  ***********************************/
 OP_HANDLER( illegal )
 {
-	logerror("i8x41 #%d: illegal opcode at 0x%03x: %02x\n", cpu_getactivecpu(), PC, ROP(PC));
+	logerror("i8x41 #%d: illegal opcode at 0x%03x: %02x\n", cpunum_get_active(), PC, ROP(PC));
 }
 
 /***********************************

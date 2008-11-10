@@ -31,7 +31,7 @@
 /*----------- defined in drivers/neogeo.c -----------*/
 
 void neogeo_set_display_position_interrupt_control(UINT16 data);
-void neogeo_set_display_counter_msb(UINT16 data);
+void neogeo_set_display_counter_msb(running_machine *machine, UINT16 data);
 void neogeo_set_display_counter_lsb(running_machine *machine, UINT16 data);
 void neogeo_acknowledge_interrupt(running_machine *machine, UINT16 data);
 void neogeo_set_main_cpu_bank_address(running_machine *machine, UINT32 bank_address);

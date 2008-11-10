@@ -178,7 +178,7 @@ static UINT16 *tx_vram;
 static UINT16 *shared_ram;
 static UINT16 *io_ram;
 
-#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU%d:%08x  0x%08x 0x%04x & 0x%04x\n", cpu_getactivecpu(), activecpu_get_pc(), offset*2, data, mem_mask);
+#define LOG_UNKNOWN_WRITE logerror("unknown io write CPU%d:%08x  0x%08x 0x%04x & 0x%04x\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), offset*2, data, mem_mask);
 #define IGNORE_MISSING_ROM 1
 
 static TILE_GET_INFO( get_tx_tile_info )

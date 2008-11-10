@@ -920,19 +920,19 @@ static READ16_HANDLER( mpu4_vid_scn2674_r )
         */
 
 		case 0:
-			LOGSTUFF(("Read Irq Register %06x\n",activecpu_get_pc()));
+			LOGSTUFF(("Read Irq Register %06x\n",cpu_get_pc(machine->activecpu)));
 			return scn2674_irq_register;
 
 		case 1:
-			LOGSTUFF(("Read Status Register %06x\n",activecpu_get_pc()));
+			LOGSTUFF(("Read Status Register %06x\n",cpu_get_pc(machine->activecpu)));
 			return scn2674_status_register;
 
-		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",activecpu_get_pc()));return scn2674_screen1_l;
-		case 3: LOGSTUFF(("Read Screen1_h Register %06x\n",activecpu_get_pc()));return scn2674_screen1_h;
-		case 4: LOGSTUFF(("Read Cursor_l Register %06x\n",activecpu_get_pc()));return scn2674_cursor_l;
-		case 5: LOGSTUFF(("Read Cursor_h Register %06x\n",activecpu_get_pc()));return scn2674_cursor_h;
-		case 6:	LOGSTUFF(("Read Screen2_l Register %06x\n",activecpu_get_pc()));return scn2674_screen2_l;
-		case 7: LOGSTUFF(("Read Screen2_h Register %06x\n",activecpu_get_pc()));return scn2674_screen2_h;
+		case 2: LOGSTUFF(("Read Screen1_l Register %06x\n",cpu_get_pc(machine->activecpu)));return scn2674_screen1_l;
+		case 3: LOGSTUFF(("Read Screen1_h Register %06x\n",cpu_get_pc(machine->activecpu)));return scn2674_screen1_h;
+		case 4: LOGSTUFF(("Read Cursor_l Register %06x\n",cpu_get_pc(machine->activecpu)));return scn2674_cursor_l;
+		case 5: LOGSTUFF(("Read Cursor_h Register %06x\n",cpu_get_pc(machine->activecpu)));return scn2674_cursor_h;
+		case 6:	LOGSTUFF(("Read Screen2_l Register %06x\n",cpu_get_pc(machine->activecpu)));return scn2674_screen2_l;
+		case 7: LOGSTUFF(("Read Screen2_h Register %06x\n",cpu_get_pc(machine->activecpu)));return scn2674_screen2_h;
 	}
 
 	return 0xffff;
@@ -1388,7 +1388,7 @@ static WRITE16_HANDLER( characteriser16_w )
 {
 	int x;
 	int call=data;
-	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", activecpu_get_previouspc(),offset,data));
+	LOG_CHR_FULL(("%04x Characteriser write offset %02X data %02X", cpu_get_previouspc(machine->activecpu),offset,data));
 	for (x = prot_col; x < 64; x++)
 	{
 		if (call == 0)
@@ -1410,7 +1410,7 @@ static WRITE16_HANDLER( characteriser16_w )
 
 static READ16_HANDLER( characteriser16_r )
 {
-	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", activecpu_get_previouspc(),offset,MPU4_chr_data[prot_col]));
+	LOG_CHR_FULL(("%04x Characteriser read offset %02X,data %02X", cpu_get_previouspc(machine->activecpu),offset,MPU4_chr_data[prot_col]));
 	LOG_CHR(("Characteriser read offset %02X \n",offset));
 	LOG_CHR(("Characteriser read data %02X \n",MPU4_chr_data[prot_col]));
 	return MPU4_chr_data[prot_col];

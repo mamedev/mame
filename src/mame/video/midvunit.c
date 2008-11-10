@@ -379,7 +379,7 @@ static void process_dma_queue(running_machine *machine)
 WRITE32_HANDLER( midvunit_dma_queue_w )
 {
 	if (LOG_DMA && input_code_pressed(KEYCODE_L))
-		logerror("%06X:queue(%X) = %08X\n", activecpu_get_pc(), dma_data_index, data);
+		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(machine->activecpu), dma_data_index, data);
 	if (dma_data_index < 16)
 		dma_data[dma_data_index++] = data;
 }
@@ -397,7 +397,7 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 	if (offset)
 	{
 		if (LOG_DMA && input_code_pressed(KEYCODE_L))
-			logerror("%06X:trigger\n", activecpu_get_pc());
+			logerror("%06X:trigger\n", cpu_get_pc(machine->activecpu));
 		process_dma_queue(machine);
 		dma_data_index = 0;
 	}

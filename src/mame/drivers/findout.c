@@ -98,7 +98,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 	/* bit 7 goes directly to the sound amplifier */
 	dac_data_w(0,((data & 0x80) >> 7) * 255);
 
-//  logerror("%04x: sound_w %02x\n",activecpu_get_pc(),data);
+//  logerror("%04x: sound_w %02x\n",cpu_get_pc(machine->activecpu),data);
 //  popmessage("%02x",data);
 }
 
@@ -130,7 +130,7 @@ static MACHINE_RESET( findout )
 
 static READ8_HANDLER( catchall )
 {
-	int pc = activecpu_get_pc();
+	int pc = cpu_get_pc(machine->activecpu);
 
 	if (pc != 0x3c74 && pc != 0x0364 && pc != 0x036d)	/* weed out spurious blit reads */
 		logerror("%04x: unmapped memory read from %04x\n",pc,offset);

@@ -794,7 +794,7 @@ static UINT8 bit_xor;
 static struct slapstic_data slapstic;
 
 
-static void slapstic_log(offs_t offset);
+static void slapstic_log(running_machine *machine, offs_t offset);
 static FILE *slapsticlog;
 
 
@@ -862,7 +862,7 @@ int slapstic_bank(void)
  *
  *************************************/
 
-static int alt2_kludge(offs_t offset)
+static int alt2_kludge(running_machine *machine, offs_t offset)
 {
 	/* Of the 3 alternate addresses, only the middle one needs to actually hit
        in the slapstic region; the first and third ones can be anywhere in the
@@ -874,15 +874,15 @@ static int alt2_kludge(offs_t offset)
 	if (access_68k)
 	{
 		/* first verify that the prefetched PC matches the first alternate */
-		if (MATCHES_MASK_VALUE(activecpu_get_pc() >> 1, slapstic.alt1))
+		if (MATCHES_MASK_VALUE(cpu_get_pc(machine->activecpu) >> 1, slapstic.alt1))
 		{
 			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			UINT16 opcode = cpu_readop16(activecpu_get_previouspc() & 0xffffff);
+			UINT16 opcode = cpu_readop16(cpu_get_previouspc(machine->activecpu) & 0xffffff);
 			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
 			{
 				/* fetch the value of the register for the second operand, and see */
 				/* if it matches the third alternate */
-				UINT32 regval = activecpu_get_reg(M68K_A0 + ((opcode >> 9) & 7)) >> 1;
+				UINT32 regval = cpu_get_reg(machine->activecpu, M68K_A0 + ((opcode >> 9) & 7)) >> 1;
 				if (MATCHES_MASK_VALUE(regval, slapstic.alt3))
 				{
 					alt_bank = (regval >> slapstic.altshift) & 3;
@@ -909,7 +909,7 @@ static int alt2_kludge(offs_t offset)
  *
  *************************************/
 
-int slapstic_tweak(offs_t offset)
+int slapstic_tweak(running_machine *machine, offs_t offset)
 {
 	/* reset is universal */
 	if (offset == 0x0000)
@@ -951,7 +951,7 @@ int slapstic_tweak(offs_t offset)
 				/* the first one was missed (since it's usually an opcode fetch) */
 				else if (MATCHES_MASK_VALUE(offset, slapstic.alt2))
 				{
-					state = alt2_kludge(offset);
+					state = alt2_kludge(machine, offset);
 				}
 
 				/* check for standard bankswitches */
@@ -1119,7 +1119,7 @@ int slapstic_tweak(offs_t offset)
 
 	/* log this access */
 	if (LOG_SLAPSTIC)
-		slapstic_log(offset);
+		slapstic_log(machine, offset);
 
 	/* return the active bank */
 	return current_bank;
@@ -1133,7 +1133,7 @@ int slapstic_tweak(offs_t offset)
  *
  *************************************/
 
-static void slapstic_log(offs_t offset)
+static void slapstic_log(running_machine *machine, offs_t offset)
 {
 	static attotime last_time;
 
@@ -1147,7 +1147,7 @@ static void slapstic_log(offs_t offset)
 			fprintf(slapsticlog, "------------------------------------\n");
 		last_time = time;
 
-		fprintf(slapsticlog, "%06X: %04X B=%d ", activecpu_get_previouspc(), offset, current_bank);
+		fprintf(slapsticlog, "%06X: %04X B=%d ", cpu_get_previouspc(machine->activecpu), offset, current_bank);
 		switch (state)
 		{
 			case DISABLED:

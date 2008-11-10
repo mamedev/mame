@@ -421,7 +421,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 {
 	nmi_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: nmi_enable = %02x\n",activecpu_get_pc(),data);
+		logerror("PC %06X: nmi_enable = %02x\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static int irq_enable;
@@ -429,7 +429,7 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	irq_enable = data & 1;
 	if (data & (~1))
-		logerror("PC %06X: irq_enable = %02x\n",activecpu_get_pc(),data);
+		logerror("PC %06X: irq_enable = %02x\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static UINT8 input_select;
@@ -471,7 +471,7 @@ static READ8_HANDLER( input_r )
 		case 0x34:	return 0x32;
 
 		default:
-			logerror("PC %06X: input %02x read\n",activecpu_get_pc(),input_select);
+			logerror("PC %06X: input %02x read\n",cpu_get_pc(machine->activecpu),input_select);
 			return 0xff;
 	}
 }

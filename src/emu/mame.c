@@ -560,7 +560,7 @@ void mame_schedule_exit(running_machine *machine)
 		mame->exit_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	if (cpu_getactivecpu() >= 0)
+	if (cpunum_get_active() >= 0)
 		activecpu_adjust_icount(-activecpu_get_icount() - 1);
 
 	/* if we're autosaving on exit, schedule a save as well */
@@ -580,7 +580,7 @@ void mame_schedule_hard_reset(running_machine *machine)
 	mame->hard_reset_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	if (cpu_getactivecpu() >= 0)
+	if (cpunum_get_active() >= 0)
 		activecpu_adjust_icount(-activecpu_get_icount() - 1);
 }
 
@@ -600,7 +600,7 @@ void mame_schedule_soft_reset(running_machine *machine)
 	mame_pause(machine, FALSE);
 
 	/* if we're executing, abort out immediately */
-	if (cpu_getactivecpu() >= 0)
+	if (cpunum_get_active() >= 0)
 		activecpu_adjust_icount(-activecpu_get_icount() - 1);
 }
 
@@ -617,7 +617,7 @@ void mame_schedule_new_driver(running_machine *machine, const game_driver *drive
 	mame->new_driver_pending = driver;
 
 	/* if we're executing, abort out immediately */
-	if (cpu_getactivecpu() >= 0)
+	if (cpunum_get_active() >= 0)
 		activecpu_adjust_icount(-activecpu_get_icount() - 1);
 }
 
@@ -1624,7 +1624,7 @@ static TIMER_CALLBACK( soft_reset )
 	/* unfortunately, we can't rely on callbacks to reset the interrupt */
 	/* structures, as these need to happen before we call the reset */
 	/* functions registered by the drivers */
-	cpuint_reset();
+	cpuint_reset(machine);
 
 	/* run the driver's reset callbacks */
 	if (machine->config->machine_reset != NULL)
@@ -1739,7 +1739,7 @@ static void handle_save(running_machine *machine)
 		/* loop over CPUs */
 		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 		{
-			cpuintrf_push_context(cpunum);
+			cpu_push_context(machine->cpu[cpunum]);
 
 			/* make sure banking is set */
 			activecpu_reset_banking();
@@ -1749,7 +1749,7 @@ static void handle_save(running_machine *machine)
 			state_save_save_continue(machine);
 			state_save_pop_tag();
 
-			cpuintrf_pop_context();
+			cpu_pop_context();
 		}
 
 		/* finish and close */
@@ -1821,7 +1821,7 @@ static void handle_load(running_machine *machine)
 			/* loop over CPUs */
 			for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 			{
-				cpuintrf_push_context(cpunum);
+				cpu_push_context(machine->cpu[cpunum]);
 
 				/* make sure banking is set */
 				activecpu_reset_banking();
@@ -1834,7 +1834,7 @@ static void handle_load(running_machine *machine)
 				/* make sure banking is set */
 				activecpu_reset_banking();
 
-				cpuintrf_pop_context();
+				cpu_pop_context();
 			}
 
 			/* finish and close */

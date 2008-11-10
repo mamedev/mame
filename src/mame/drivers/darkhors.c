@@ -234,7 +234,7 @@ static NVRAM_HANDLER( darkhors )
 static WRITE32_HANDLER( darkhors_eeprom_w )
 {
 	if (data & ~0xff000000)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %08X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %08X\n",cpu_get_pc(machine->activecpu),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{

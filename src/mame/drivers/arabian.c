@@ -165,7 +165,7 @@ static READ8_HANDLER( custom_cpu_r )
 
 		/* error cases */
 		default:
-			logerror("Input Port %04X read.  PC=%04X\n", offset+0xd7f0, activecpu_get_pc());
+			logerror("Input Port %04X read.  PC=%04X\n", offset+0xd7f0, cpu_get_pc(machine->activecpu));
 	}
 	return 0;
 }

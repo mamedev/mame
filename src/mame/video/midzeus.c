@@ -405,11 +405,11 @@ READ32_HANDLER( zeus_r )
 		if (logit)
 		{
 			if (offset & 1)
-				logerror("%06X:zeus32_r(%02X) = %08X -- unexpected in 32-bit mode\n", activecpu_get_pc(), offset, result);
+				logerror("%06X:zeus32_r(%02X) = %08X -- unexpected in 32-bit mode\n", cpu_get_pc(machine->activecpu), offset, result);
 			else if (offset != 0xe0)
-				logerror("%06X:zeus32_r(%02X) = %08X\n", activecpu_get_pc(), offset, result);
+				logerror("%06X:zeus32_r(%02X) = %08X\n", cpu_get_pc(machine->activecpu), offset, result);
 			else
-				logerror("%06X:zeus32_r(%02X) = %08X\n", activecpu_get_pc(), offset, result);
+				logerror("%06X:zeus32_r(%02X) = %08X\n", cpu_get_pc(machine->activecpu), offset, result);
 		}
 	}
 
@@ -421,7 +421,7 @@ READ32_HANDLER( zeus_r )
 		else
 			result &= 0xffff;
 		if (logit)
-			logerror("%06X:zeus16_r(%02X) = %04X\n", activecpu_get_pc(), offset, result);
+			logerror("%06X:zeus16_r(%02X) = %04X\n", cpu_get_pc(machine->activecpu), offset, result);
 	}
 	return result;
 }
@@ -439,7 +439,7 @@ WRITE32_HANDLER( zeus_w )
 	int logit = zeus_enable_logging || ((offset < 0xb0 || offset > 0xb7) && (offset < 0xe0 || offset > 0xe1));
 
 	if (logit)
-		logerror("%06X:zeus_w", activecpu_get_pc());
+		logerror("%06X:zeus_w", cpu_get_pc(machine->activecpu));
 
 	/* 32-bit mode */
 	if (zeusbase[0x80] & 0x00020000)

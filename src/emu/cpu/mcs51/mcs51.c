@@ -675,8 +675,8 @@ INLINE UINT8 r_psw(mcs51_state_t *mcs51_state) { return SFR_A(ADDR_PSW); }
 
 INLINE void update_ptrs(mcs51_state_t *mcs51_state)
 {
-	mcs51_state->internal_ram = memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_DATA, 0x00);
-	mcs51_state->sfr_ram = memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_DATA, 0x100);
+	mcs51_state->internal_ram = memory_get_write_ptr(cpunum_get_active(), ADDRESS_SPACE_DATA, 0x00);
+	mcs51_state->sfr_ram = memory_get_write_ptr(cpunum_get_active(), ADDRESS_SPACE_DATA, 0x100);
 }
 
 
@@ -2006,7 +2006,7 @@ static void mcs51_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 dat
 		case ADDR_SCON:
 			break;
 		default:
-			LOG(("mcs51 #%d: attemping to write to an invalid/non-implemented SFR address: %zx at 0x%04x, data=%x\n", cpu_getactivecpu(), offset,PC,data));
+			LOG(("mcs51 #%d: attemping to write to an invalid/non-implemented SFR address: %zx at 0x%04x, data=%x\n", cpunum_get_active(), offset,PC,data));
 			/* no write in this case according to manual */
 			return;
 	}
@@ -2046,7 +2046,7 @@ static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 			return data_read_byte_8le((size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
-			LOG(("mcs51 #%d: attemping to read an invalid/non-implemented SFR address: %zx at 0x%04x\n", cpu_getactivecpu(), offset,PC));
+			LOG(("mcs51 #%d: attemping to read an invalid/non-implemented SFR address: %zx at 0x%04x\n", cpunum_get_active(), offset,PC));
 			/* according to the manual, the read may return random bits */
 			return 0xff;
 	}
@@ -2298,8 +2298,8 @@ static CPU_INIT( i80c31 )
 #if 1 //#ifdef MCS51_TO_BE_ENABLED_LATER
 
 
-#define DS5_LOGW(a, d) 	LOG(("ds5002fp #%d: write to  " # a " register at 0x%04x, data=%x\n", cpu_getactivecpu(), PC, d))
-#define DS5_LOGR(a, d) 	LOG(("ds5002fp #%d: read from " # a " register at 0x%04x\n", cpu_getactivecpu(), PC))
+#define DS5_LOGW(a, d) 	LOG(("ds5002fp #%d: write to  " # a " register at 0x%04x, data=%x\n", cpunum_get_active(), PC, d))
+#define DS5_LOGR(a, d) 	LOG(("ds5002fp #%d: read from " # a " register at 0x%04x\n", cpunum_get_active(), PC))
 
 INLINE UINT8 ds5002fp_protected(mcs51_state_t *mcs51_state, size_t offset, UINT8 data, UINT8 ta_mask, UINT8 mask)
 {
@@ -2325,7 +2325,7 @@ static void ds5002fp_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 
 			if ((data == 0xaa) && (mcs51_state->ds5002fp.ta_window == 0))
 			{
 				mcs51_state->ds5002fp.ta_window = 6; /* 4*12 + 2*12 */
-				LOG(("ds5002fp #%d: TA window initiated at 0x%04x\n", cpu_getactivecpu(), PC));
+				LOG(("ds5002fp #%d: TA window initiated at 0x%04x\n", cpunum_get_active(), PC));
 			}
 			break;
 		case ADDR_MCON: 	data = ds5002fp_protected(mcs51_state, ADDR_MCON, data, 0x0f, 0xf7);	DS5_LOGW(MCON, data); break;

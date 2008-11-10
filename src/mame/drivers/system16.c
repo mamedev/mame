@@ -299,7 +299,7 @@ static WRITE8_HANDLER( tturfbl_soundbank_w )
 			break;
 		default:
 			tturfbl_soundbank_ptr = NULL;
-			logerror("Invalid bank setting %02X (%04X)\n", data, activecpu_get_pc());
+			logerror("Invalid bank setting %02X (%04X)\n", data, cpu_get_pc(machine->activecpu));
 			break;
 	}
 }

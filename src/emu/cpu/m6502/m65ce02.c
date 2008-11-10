@@ -151,7 +151,7 @@ INLINE void m65ce02_take_irq(void)
 		P = (P & ~F_D) | F_I;		/* knock out D and set I flag */
 		PCL = RDMEM(EAD);
 		PCH = RDMEM(EAD+1);
-		LOG(("M65ce02#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
+		LOG(("M65ce02#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m65ce02.irq_callback) (*m65ce02.irq_callback)(m65ce02.device, 0);
 		change_pc(PCD);
@@ -182,7 +182,7 @@ static CPU_EXECUTE( m65ce02 )
 		/* check if the I flag was just reset (interrupts enabled) */
 		if( m65ce02.after_cli )
 		{
-			LOG(("M65ce02#%d after_cli was >0", cpu_getactivecpu()));
+			LOG(("M65ce02#%d after_cli was >0", cpunum_get_active()));
 			m65ce02.after_cli = 0;
 			if (m65ce02.irq_state != CLEAR_LINE)
 			{
@@ -211,7 +211,7 @@ static void m65ce02_set_irq_line(int irqline, int state)
 		m65ce02.nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(("M65ce02#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
+			LOG(("M65ce02#%d set_nmi_line(ASSERT)\n", cpunum_get_active()));
 			EAD = M65CE02_NMI_VEC;
 			m65ce02->icount -= 7;
 			PUSH(PCH);
@@ -220,7 +220,7 @@ static void m65ce02_set_irq_line(int irqline, int state)
 			P = (P & ~F_D) | F_I;		/* knock out D and set I flag */
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
-			LOG(("M65ce02#%d takes NMI ($%04x)\n", cpu_getactivecpu(), PCD));
+			LOG(("M65ce02#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
 			change_pc(PCD);
 		}
 	}
@@ -229,7 +229,7 @@ static void m65ce02_set_irq_line(int irqline, int state)
 		m65ce02.irq_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(("M65ce02#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
+			LOG(("M65ce02#%d set_irq_line(ASSERT)\n", cpunum_get_active()));
 			m65ce02.pending_irq = 1;
 		}
 	}

@@ -8,7 +8,7 @@
 
 void meadows_sh_start(void);
 void meadows_sh_dac_w(int data);
-void meadows_sh_update(void);
+void meadows_sh_update(running_machine *machine);
 extern UINT8 meadows_0c00;
 extern UINT8 meadows_0c01;
 extern UINT8 meadows_0c02;

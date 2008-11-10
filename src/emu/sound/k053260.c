@@ -390,7 +390,7 @@ static UINT8 k053260_read( int chip, offs_t offset )
 				ic->channels[0].pos += ( 1 << 16 );
 
 				if ( offs > ic->rom_size ) {
-					logerror("%06x: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n",activecpu_get_pc(),offs,ic->rom_size );
+					logerror("%06x: K53260: Attempting to read past rom size in rom Read Mode (offs = %06x, size = %06x).\n",cpu_get_pc(Machine->activecpu),offs,ic->rom_size );
 
 					return 0;
 				}

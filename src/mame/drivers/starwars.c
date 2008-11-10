@@ -90,9 +90,9 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static void esb_slapstic_tweak(offs_t offset)
+static void esb_slapstic_tweak(running_machine *machine, offs_t offset)
 {
-	int new_bank = slapstic_tweak(offset);
+	int new_bank = slapstic_tweak(machine, offset);
 
 	/* update for the new bank */
 	if (new_bank != slapstic_current_bank)
@@ -106,14 +106,14 @@ static void esb_slapstic_tweak(offs_t offset)
 static READ8_HANDLER( esb_slapstic_r )
 {
 	int result = slapstic_base[offset];
-	esb_slapstic_tweak(offset);
+	esb_slapstic_tweak(machine, offset);
 	return result;
 }
 
 
 static WRITE8_HANDLER( esb_slapstic_w )
 {
-	esb_slapstic_tweak(offset);
+	esb_slapstic_tweak(machine, offset);
 }
 
 
@@ -129,7 +129,7 @@ static OPBASE_HANDLER( esb_setopbase )
 	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
 	{
-		offs_t pc = activecpu_get_pc();
+		offs_t pc = cpu_get_pc(machine->activecpu);
 
 		/* filter out duplicates; we get these because the handler gets called for
            multiple reasons:
@@ -140,7 +140,7 @@ static OPBASE_HANDLER( esb_setopbase )
 		{
 			slapstic_last_pc = pc;
 			slapstic_last_address = address;
-			esb_slapstic_tweak(address & 0x1fff);
+			esb_slapstic_tweak(machine, address & 0x1fff);
 		}
 		return ~0;
 	}

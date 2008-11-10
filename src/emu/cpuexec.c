@@ -34,11 +34,11 @@ extern const cpu_irq_callback cpu_irq_callbacks[];
 ***************************************************************************/
 
 #define VERIFY_ACTIVECPU(name) \
-	int activecpu = cpu_getactivecpu(); \
+	int activecpu = cpunum_get_active(); \
 	assert_always(activecpu >= 0, #name "() called with no active cpu!")
 
 #define VERIFY_EXECUTINGCPU(name) \
-	int activecpu = cpu_getexecutingcpu(); \
+	int activecpu = cpunum_get_executing(); \
 	assert_always(activecpu >= 0, #name "() called with no executing cpu!")
 
 #define VERIFY_CPUNUM(name) \
@@ -210,7 +210,7 @@ static void cpuexec_reset(running_machine *machine)
 		cpu[cpunum].totalcycles = 0;
 
 		/* then reset the CPU directly */
-		cpunum_reset(cpunum);
+		cpu_reset(machine->cpu[cpunum]);
 	}
 }
 
@@ -272,11 +272,11 @@ void cpuexec_timeslice(running_machine *machine)
 				/* via the call to the cpunum_execute */
 				cycles_stolen = 0;
 				if (!call_debugger)
-					ran = cpunum_execute(cpunum, cycles_running);
+					ran = cpu_execute(machine->cpu[cpunum], cycles_running);
 				else
 				{
 					debugger_start_cpu_hook(machine, cpunum, target);
-					ran = cpunum_execute(cpunum, cycles_running);
+					ran = cpu_execute(machine->cpu[cpunum], cycles_running);
 					debugger_stop_cpu_hook(machine, cpunum);
 				}
 
@@ -362,7 +362,7 @@ void activecpu_abort_timeslice(void)
 	int current_icount;
 
 	VERIFY_EXECUTINGCPU(activecpu_abort_timeslice);
-	LOG(("activecpu_abort_timeslice (CPU=%d, cycles_left=%d)\n", cpu_getexecutingcpu(), activecpu_get_icount() + 1));
+	LOG(("activecpu_abort_timeslice (CPU=%d, cycles_left=%d)\n", cpunum_get_executing(), activecpu_get_icount() + 1));
 
 	/* swallow the remaining cycles */
 	current_icount = activecpu_get_icount() + 1;
@@ -383,7 +383,7 @@ void cpunum_suspend(int cpunum, int reason, int eatcycles)
 	LOG(("cpunum_suspend (CPU=%d, r=%X, eat=%d)\n", cpunum, reason, eatcycles));
 	cpu[cpunum].nextsuspend |= reason;
 	cpu[cpunum].nexteatcycles = eatcycles;
-	if (cpu_getexecutingcpu() >= 0)
+	if (cpunum_get_executing() >= 0)
 		activecpu_abort_timeslice();
 }
 
@@ -398,7 +398,7 @@ void cpunum_resume(int cpunum, int reason)
 	VERIFY_CPUNUM(cpunum_resume);
 	LOG(("cpunum_resume (CPU=%d, r=%X)\n", cpunum, reason));
 	cpu[cpunum].nextsuspend &= ~reason;
-	if (cpu_getexecutingcpu() >= 0)
+	if (cpunum_get_executing() >= 0)
 		activecpu_abort_timeslice();
 }
 
@@ -519,7 +519,7 @@ attotime cpunum_get_localtime(int cpunum)
 
 	/* if we're active, add in the time from the current slice */
 	result = cpu[cpunum].localtime;
-	if (cpunum == cpu_getexecutingcpu())
+	if (cpunum == cpunum_get_executing())
 	{
 		int cycles = cycles_running - activecpu_get_icount();
 		result = attotime_add(result, ATTOTIME_IN_CYCLES(cycles, cpunum));
@@ -537,7 +537,7 @@ attotime cpunum_get_localtime(int cpunum)
 UINT64 activecpu_gettotalcycles(void)
 {
 	VERIFY_ACTIVECPU(activecpu_gettotalcycles);
-	if (activecpu == cpu_getexecutingcpu())
+	if (activecpu == cpunum_get_executing())
 		return cpu[activecpu].totalcycles + cycles_running - activecpu_get_icount();
 	else
 		return cpu[activecpu].totalcycles;
@@ -553,7 +553,7 @@ UINT64 activecpu_gettotalcycles(void)
 UINT64 cpunum_gettotalcycles(int cpunum)
 {
 	VERIFY_CPUNUM(cpunum_gettotalcycles);
-	if (cpunum == cpu_getexecutingcpu())
+	if (cpunum == cpunum_get_executing())
 		return cpu[cpunum].totalcycles + cycles_running - activecpu_get_icount();
 	else
 		return cpu[cpunum].totalcycles;
@@ -600,7 +600,7 @@ static void cpunum_suspend_until_trigger(int cpunum, int trigger, int eatcycles)
 
 void cpu_yield(void)
 {
-	int cpunum = cpu_getexecutingcpu();
+	int cpunum = cpunum_get_executing();
 	VERIFY_EXECUTINGCPU(cpu_yield);
 	cpunum_suspend(cpunum, SUSPEND_REASON_TIMESLICE, FALSE);
 }
@@ -613,7 +613,7 @@ void cpu_yield(void)
 
 void cpu_spin(void)
 {
-	int cpunum = cpu_getexecutingcpu();
+	int cpunum = cpunum_get_executing();
 	VERIFY_EXECUTINGCPU(cpu_spin);
 	cpunum_suspend(cpunum, SUSPEND_REASON_TIMESLICE, TRUE);
 }
@@ -626,7 +626,7 @@ void cpu_spin(void)
 
 void cpu_spinuntil_trigger(int trigger)
 {
-	int cpunum = cpu_getexecutingcpu();
+	int cpunum = cpunum_get_executing();
 	VERIFY_EXECUTINGCPU(cpu_yielduntil_trigger);
 	cpunum_suspend_until_trigger(cpunum, trigger, TRUE);
 }
@@ -651,7 +651,7 @@ void cpunum_spinuntil_trigger(int cpunum, int trigger)
 
 void cpu_spinuntil_int(void)
 {
-	int cpunum = cpu_getexecutingcpu();
+	int cpunum = cpunum_get_executing();
 	VERIFY_EXECUTINGCPU(cpu_spinuntil_int);
 	cpunum_suspend_until_trigger(cpunum, TRIGGER_INT + cpunum, TRUE);
 }
@@ -665,7 +665,7 @@ void cpu_spinuntil_int(void)
 void cpu_spinuntil_time(attotime duration)
 {
 	static int timetrig = 0;
-	int cpunum = cpu_getexecutingcpu();
+	int cpunum = cpunum_get_executing();
 	VERIFY_EXECUTINGCPU(cpu_spinuntil_time);
 	cpunum_suspend_until_trigger(cpunum, TRIGGER_SUSPENDTIME + timetrig, TRUE);
 	cpu_triggertime(duration, TRIGGER_SUSPENDTIME + timetrig);
@@ -687,7 +687,7 @@ void cpu_trigger(running_machine *machine, int trigger)
 	int cpunum;
 
 	/* cause an immediate resynchronization */
-	if (cpu_getexecutingcpu() >= 0)
+	if (cpunum_get_executing() >= 0)
 		activecpu_abort_timeslice();
 
 	/* look for suspended CPUs waiting for this trigger and unsuspend them */
@@ -797,9 +797,9 @@ static void on_vblank(const device_config *device, void *param, int vblank_state
 			{
 				if (!cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 				{
-					cpuintrf_push_context(cpunum);
+					cpu_push_context(device->machine->cpu[cpunum]);
 					(*config->vblank_interrupt)(device->machine, cpunum);
-					cpuintrf_pop_context();
+					cpu_pop_context();
 				}
 
 				/* if we have more than one interrupt per frame, start the timer now to trigger the rest of them */
@@ -833,9 +833,9 @@ static TIMER_CALLBACK( trigger_partial_frame_interrupt )
 	/* call the interrupt handler */
 	if (!cpunum_is_suspended(cpunum, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
-		cpuintrf_push_context(cpunum);
+		cpu_push_context(machine->cpu[cpunum]);
 		(*config->vblank_interrupt)(machine, cpunum);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 
 	/* more? */
@@ -854,9 +854,9 @@ static TIMER_CALLBACK( cpu_timedintcallback )
 	/* bail if there is no routine */
 	if (machine->config->cpu[param].timed_interrupt != NULL && !cpunum_is_suspended(param, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
-		cpuintrf_push_context(param);
+		cpu_push_context(machine->cpu[param]);
 		(*machine->config->cpu[param].timed_interrupt)(machine, param);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 }
 

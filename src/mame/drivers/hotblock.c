@@ -73,8 +73,8 @@ static READ8_HANDLER( hotblock_port4_r )
 
 static WRITE8_HANDLER( hotblock_port4_w )
 {
-//  mame_printf_debug("port4_w: pc = %06x : data %04x\n",activecpu_get_pc(),data);
-//  popmessage("port4_w: pc = %06x : data %04x",activecpu_get_pc(),data);
+//  mame_printf_debug("port4_w: pc = %06x : data %04x\n",cpu_get_pc(machine->activecpu),data);
+//  popmessage("port4_w: pc = %06x : data %04x",cpu_get_pc(machine->activecpu),data);
 	hotblock_port4=data;
 }
 
@@ -82,7 +82,7 @@ static WRITE8_HANDLER( hotblock_port4_w )
 
 static WRITE8_HANDLER( hotblock_port0_w )
 {
-//  popmessage("port4_w: pc = %06x : data %04x",activecpu_get_pc(),data);
+//  popmessage("port4_w: pc = %06x : data %04x",cpu_get_pc(machine->activecpu),data);
 	hotblock_port0=data;
 }
 

@@ -1432,7 +1432,7 @@ static void SetPostShortcuts( int reg )
 
 			if (yTile >= ygv608.page_y)
 				logerror ("setting pny(%d) >= page_y(%d) @ $%X\n",
-						yTile, ygv608.page_y, activecpu_get_pc() );
+						yTile, ygv608.page_y, cpu_get_pc(Machine->activecpu) );
 			yTile &= (ygv608.page_y - 1);
 			ygv608.regs.s.r0 &= ~r0_pny;
 			ygv608.regs.s.r0 |= yTile;
@@ -1445,7 +1445,7 @@ static void SetPostShortcuts( int reg )
 
 			if (xTile >= ygv608.page_x)
 				logerror ("setting pnx(%d) >= page_x(%d) @ $%X\n",
-						xTile, ygv608.page_x, activecpu_get_pc() );
+						xTile, ygv608.page_x, cpu_get_pc(Machine->activecpu) );
 			xTile &= (ygv608.page_x - 1);
 			ygv608.regs.s.r1 &= ~r1_pnx;
 			ygv608.regs.s.r1 |= xTile;

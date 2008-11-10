@@ -53,7 +53,7 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 {
 	UINT8 *rom = memory_region(machine, "main");
 
-//  logerror("%04x: port c0 = %02x\n",activecpu_get_pc(),data);
+//  logerror("%04x: port c0 = %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	/* bit 0 = NMI enable */
 	interrupt_enable_w(machine,0,data & 1);

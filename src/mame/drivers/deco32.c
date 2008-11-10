@@ -286,7 +286,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 //      return 0xffffff80 | vblank | (0x40); //test for lock load guns
 	}
 
-	logerror("%08x: Unmapped IRQ read %08x (%08x)\n",activecpu_get_pc(),offset,mem_mask);
+	logerror("%08x: Unmapped IRQ read %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset,mem_mask);
 	return 0xffffffff;
 }
 
@@ -296,7 +296,7 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 
 	switch (offset) {
 	case 0: /* IRQ enable - probably an irq mask, but only values used are 0xc8 and 0xca */
-//      logerror("%08x:  IRQ write %d %08x\n",activecpu_get_pc(),offset,data);
+//      logerror("%08x:  IRQ write %d %08x\n",cpu_get_pc(machine->activecpu),offset,data);
 		raster_enable=(data&0xff)==0xc8; /* 0xca seems to be off */
 		break;
 
@@ -334,7 +334,7 @@ static READ32_HANDLER( captaven_prot_r )
 	case 0xed4: return input_port_read(machine, "IN2"); /* Misc */
 	}
 
-	logerror("%08x: Unmapped protection read %04x\n",activecpu_get_pc(),offset<<2);
+	logerror("%08x: Unmapped protection read %04x\n",cpu_get_pc(machine->activecpu),offset<<2);
 	return 0xffffffff;
 }
 
@@ -372,13 +372,13 @@ static WRITE32_HANDLER( fghthist_eeprom_w )
 
 static READ32_HANDLER( dragngun_service_r )
 {
-//  logerror("%08x:Read service\n",activecpu_get_pc());
+//  logerror("%08x:Read service\n",cpu_get_pc(machine->activecpu));
 	return input_port_read(machine, "IN2");
 }
 
 static READ32_HANDLER( lockload_gun_mirror_r )
 {
-//logerror("%08x:Read gun %d\n",activecpu_get_pc(),offset);
+//logerror("%08x:Read gun %d\n",cpu_get_pc(machine->activecpu),offset);
 //return ((mame_rand(machine)%0xffff)<<16) | mame_rand(machine)%0xffff;
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
 		return input_port_read(machine, "IN4") | ((mame_rand(machine)%0xff)<<16);
@@ -387,7 +387,7 @@ static READ32_HANDLER( lockload_gun_mirror_r )
 
 static READ32_HANDLER( dragngun_prot_r )
 {
-//  logerror("%08x:Read prot %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
+//  logerror("%08x:Read prot %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
 
 	static int strobe=0;
 	if (!strobe) strobe=8;
@@ -438,7 +438,7 @@ static WRITE32_HANDLER( dragngun_eeprom_w )
 		eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 		return;
 	}
-	logerror("%08x:Write control 1 %08x %08x\n",activecpu_get_pc(),offset,data);
+	logerror("%08x:Write control 1 %08x %08x\n",cpu_get_pc(machine->activecpu),offset,data);
 }
 
 static READ32_HANDLER(dragngun_oki_2_r)
@@ -463,7 +463,7 @@ static READ32_HANDLER( tattass_prot_r )
 	case 0x35a: return tattass_eprom_bit << 16;
 	}
 
-	logerror("%08x:Read prot %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
+	logerror("%08x:Read prot %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
 
 	return 0xffffffff;
 }
@@ -626,7 +626,7 @@ static READ32_HANDLER( nslasher_prot_r )
 	case 0x35a: return (eeprom_read_bit()<< 16) | 0xffff; // Debug switch in low word??
 	}
 
-	//logerror("%08x: Read unmapped prot %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
+	//logerror("%08x: Read unmapped prot %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
 
 	return 0xffffffff;
 }
@@ -646,7 +646,7 @@ static WRITE32_HANDLER( nslasher_eeprom_w )
 
 static WRITE32_HANDLER( nslasher_prot_w )
 {
-	//logerror("%08x:write prot %08x (%08x) %08x\n",activecpu_get_pc(),offset<<1,mem_mask,data);
+	//logerror("%08x:write prot %08x (%08x) %08x\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask,data);
 
 	/* Only sound port of chip is used - no protection */
 	if (offset==0x700/4) {

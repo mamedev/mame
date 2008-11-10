@@ -93,11 +93,11 @@ static void btime_decrypt(running_machine *machine)
 	/* xxxx xxx1 xxxx x1xx are encrypted. */
 
 	/* get the address of the next opcode */
-	addr = activecpu_get_pc();
+	addr = cpu_get_pc(machine->activecpu);
 
 	/* however if the previous instruction was JSR (which caused a write to */
 	/* the stack), fetch the address of the next instruction. */
-	addr1 = activecpu_get_previouspc();
+	addr1 = cpu_get_previouspc(machine->activecpu);
 	src1 = (addr1 < 0x9000) ? rambase : memory_region(machine, "main");
 	if (decrypted[addr1] == 0x20)	/* JSR $xxxx */
 		addr = src1[addr1+1] + 256 * src1[addr1+2];
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( lnc_w )
 	else if (offset == 0x9000)                     { return; }  /* SMH_NOP */
 	else if (offset == 0x9002)                     { audio_command_w(machine,0,data); return; }
 	else if (offset >= 0xb000 && offset <= 0xb1ff)   ;
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
 
 	rambase[offset] = data;
 
@@ -140,7 +140,7 @@ static WRITE8_HANDLER( mmonkey_w )
 	else if (offset == 0x9000)                     { return; }  /* SMH_NOP */
 	else if (offset == 0x9002)                     { audio_command_w(machine,0,data); return; }
 	else if (offset >= 0xb000 && offset <= 0xbfff) { mmonkey_protection_w(machine,offset - 0xb000, data); return; }
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
 
 	rambase[offset] = data;
 
@@ -158,7 +158,7 @@ static WRITE8_HANDLER( btime_w )
 	else if (offset == 0x4002)                     btime_video_control_w(machine,0,data);
 	else if (offset == 0x4003)                     audio_command_w(machine,0,data);
 	else if (offset == 0x4004)                     bnj_scroll1_w(machine,0,data);
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
 
 	rambase[offset] = data;
 
@@ -176,7 +176,7 @@ static WRITE8_HANDLER( zoar_w )
 	else if (offset == 0x9804)                     bnj_scroll2_w(machine,0,data);
 	else if (offset == 0x9805)                     bnj_scroll1_w(machine,0,data);
 	else if (offset == 0x9806)                     audio_command_w(machine,0,data);
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
 
 	rambase[offset] = data;
 
@@ -190,7 +190,7 @@ static WRITE8_HANDLER( disco_w )
 	else if (offset >= 0x8000 && offset <= 0x881f) ;
 	else if (offset == 0x9a00)                     audio_command_w(machine,0,data);
 	else if (offset == 0x9c00)                     disco_video_control_w(machine,0,data);
-	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
 
 	rambase[offset] = data;
 

@@ -1266,16 +1266,16 @@ DRIVER_INIT( mightybj )
 
 static WRITE8_HANDLER( vstennis_vrom_banking )
 {
-	int other_cpu = cpu_getactivecpu() ^ 1;
+	int other_cpu = cpunum_get_active() ^ 1;
 
 	/* switch vrom */
-	ppu2c0x_set_videorom_bank( cpu_getactivecpu(), 0, 8, ( data & 4 ) ? 1 : 0, 512 );
+	ppu2c0x_set_videorom_bank( cpunum_get_active(), 0, 8, ( data & 4 ) ? 1 : 0, 512 );
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
 	cpunum_set_input_line(machine, other_cpu, 0, ( data & 2 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	/* move along */
-	if ( cpu_getactivecpu() == 0 )
+	if ( cpunum_get_active() == 0 )
 		vsnes_in0_w( machine, offset, data );
 	else
 		vsnes_in0_1_w( machine, offset, data );

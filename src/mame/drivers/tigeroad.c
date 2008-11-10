@@ -90,7 +90,7 @@ static void f1dream_protection_w(running_machine *machine)
 {
 	int indx;
 	int value = 255;
-	int prevpc = activecpu_get_previouspc();
+	int prevpc = cpu_get_previouspc(machine->activecpu);
 
 	if (prevpc == 0x244c)
 	{
@@ -151,7 +151,7 @@ static void f1dream_protection_w(running_machine *machine)
 
 static WRITE16_HANDLER( f1dream_control_w )
 {
-	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",activecpu_get_pc(), ram16[0x3fe0/2]);
+	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(machine->activecpu), ram16[0x3fe0/2]);
 	f1dream_protection_w(machine);
 }
 

@@ -125,7 +125,7 @@ static NVRAM_HANDLER( overdriv )
 
 static WRITE16_HANDLER( eeprom_w )
 {
-//logerror("%06x: write %04x to eeprom_w\n",activecpu_get_pc(),data);
+//logerror("%06x: write %04x to eeprom_w\n",cpu_get_pc(machine->activecpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -172,7 +172,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 		coin_counter_w(0,data & 0x10);
 		coin_counter_w(1,data & 0x20);
 
-//logerror("%06x: write %04x to cpuA_ctrl_w\n",activecpu_get_pc(),data);
+//logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 

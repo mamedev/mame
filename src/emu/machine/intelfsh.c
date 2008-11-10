@@ -212,7 +212,7 @@ UINT32 intelflash_read(int chip, UINT32 address)
 		break;
 	}
 
-//  logerror( "%08x: intelflash_read( %d, %08x ) %08x\n", activecpu_get_pc(), chip, address, data );
+//  logerror( "%08x: intelflash_read( %d, %08x ) %08x\n", cpu_get_pc(machine->activecpu), chip, address, data );
 
 	return data;
 }
@@ -227,7 +227,7 @@ void intelflash_write(int chip, UINT32 address, UINT32 data)
 	}
 	c = &chips[ chip ];
 
-//  logerror( "%08x: intelflash_write( %d, %08x, %08x )\n", activecpu_get_pc(), chip, address, data );
+//  logerror( "%08x: intelflash_write( %d, %08x, %08x )\n", cpu_get_pc(machine->activecpu), chip, address, data );
 
 	switch( c->flash_mode )
 	{

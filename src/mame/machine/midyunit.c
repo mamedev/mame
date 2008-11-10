@@ -56,7 +56,7 @@ static UINT16 *t2_hack_mem;
 
 WRITE16_HANDLER( midyunit_cmos_w )
 {
-	logerror("%08x:CMOS Write @ %05X\n", activecpu_get_pc(), offset);
+	logerror("%08x:CMOS Write @ %05X\n", cpu_get_pc(machine->activecpu), offset);
 	COMBINE_DATA(&midyunit_cmos_ram[offset + midyunit_cmos_page]);
 }
 
@@ -78,7 +78,7 @@ WRITE16_HANDLER( midyunit_cmos_enable_w )
 {
 	cmos_w_enable = (~data >> 9) & 1;
 
-	logerror("%08x:Protection write = %04X\n", activecpu_get_pc(), data);
+	logerror("%08x:Protection write = %04X\n", cpu_get_pc(machine->activecpu), data);
 
 	/* only go down this path if we have a data structure */
 	if (prot_data)
@@ -127,7 +127,7 @@ WRITE16_HANDLER( midyunit_cmos_enable_w )
 READ16_HANDLER( midyunit_protection_r )
 {
 	/* return the most recently clocked value */
-	logerror("%08X:Protection read = %04X\n", activecpu_get_pc(), prot_result);
+	logerror("%08X:Protection read = %04X\n", cpu_get_pc(machine->activecpu), prot_result);
 	return prot_result;
 }
 
@@ -190,7 +190,7 @@ static WRITE16_HANDLER( term2_sound_w )
 
 static WRITE16_HANDLER( term2_hack_w )
 {
-    if (offset == 0 && activecpu_get_pc() == 0xffce5230)
+    if (offset == 0 && cpu_get_pc(machine->activecpu) == 0xffce5230)
     {
         t2_hack_mem[offset] = 0;
         return;
@@ -200,7 +200,7 @@ static WRITE16_HANDLER( term2_hack_w )
 
 static WRITE16_HANDLER( term2la2_hack_w )
 {
-    if (offset == 0 && activecpu_get_pc() == 0xffce4b80)
+    if (offset == 0 && cpu_get_pc(machine->activecpu) == 0xffce4b80)
     {
         t2_hack_mem[offset] = 0;
         return;
@@ -210,7 +210,7 @@ static WRITE16_HANDLER( term2la2_hack_w )
 
 static WRITE16_HANDLER( term2la1_hack_w )
 {
-    if (offset == 0 && activecpu_get_pc() == 0xffce33f0)
+    if (offset == 0 && cpu_get_pc(machine->activecpu) == 0xffce33f0)
     {
         t2_hack_mem[offset] = 0;
         return;
@@ -558,7 +558,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 	/* check for out-of-bounds accesses */
 	if (offset)
 	{
-		logerror("%08X:Unexpected write to sound (hi) = %04X\n", activecpu_get_pc(), data);
+		logerror("%08X:Unexpected write to sound (hi) = %04X\n", cpu_get_pc(machine->activecpu), data);
 		return;
 	}
 

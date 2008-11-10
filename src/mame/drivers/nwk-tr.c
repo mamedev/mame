@@ -685,7 +685,7 @@ WRITE32_HANDLER(K001604_reg_w)
 
 	if (offset != 0x08 && offset != 0x09 && offset != 0x0a /*&& offset != 0x17 && offset != 0x18*/)
 	{
-		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, activecpu_get_pc());
+		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, cpu_get_pc(machine->activecpu));
 	}
 }
 
@@ -853,7 +853,7 @@ static READ32_HANDLER( lanc1_r )
 
 		default:
 		{
-			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
 			return 0xffffffff;
 		}
 	}
@@ -861,7 +861,7 @@ static READ32_HANDLER( lanc1_r )
 
 static WRITE32_HANDLER( lanc1_w )
 {
-	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 }
 
 static READ32_HANDLER( lanc2_r )
@@ -889,7 +889,7 @@ static READ32_HANDLER( lanc2_r )
 		}
 	}
 
-	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
 
 	return r;
 }
@@ -913,7 +913,7 @@ static WRITE32_HANDLER( lanc2_w )
 
 			fpga_uploaded = 1;
 
-			//printf("lanc2_fpga_w: %02X at %08X\n", value, activecpu_get_pc());
+			//printf("lanc2_fpga_w: %02X at %08X\n", value, cpu_get_pc(machine->activecpu));
 		}
 		else if (ACCESSING_BITS_0_7)
 		{
@@ -922,7 +922,7 @@ static WRITE32_HANDLER( lanc2_w )
 		}
 		else
 		{
-			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 		}
 	}
 	if (offset == 4)
@@ -941,7 +941,7 @@ static WRITE32_HANDLER( lanc2_w )
 		}
 	}
 
-	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 }
 
 /*****************************************************************************/
@@ -949,14 +949,14 @@ static WRITE32_HANDLER( lanc2_w )
 static MACHINE_START( nwktr )
 {
 	/* set conservative DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static ADDRESS_MAP_START( nwktr_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1161,8 +1161,8 @@ static DRIVER_INIT(nwktr)
 	K056800_init(sound_irq_callback);
 	K033906_init();
 
-//  cpunum_set_info_fct(0, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
-//  cpunum_set_info_fct(0, CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
+//  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
+//  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);
 
 	adc1213x_init(0, adc12138_input_callback);
 	lanc2_init();

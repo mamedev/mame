@@ -56,7 +56,7 @@ static WRITE8_DEVICE_HANDLER( ppi0_portc_w )
 
 static READ8_DEVICE_HANDLER( ppi0_portc_r )
 {
-//  popmessage("%04x",activecpu_get_pc());
+//  popmessage("%04x",cpu_get_pc(machine->activecpu));
 	return (~(eeprom_read_bit()<<1) & 2);
 }
 

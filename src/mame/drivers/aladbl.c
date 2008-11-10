@@ -138,17 +138,17 @@ static WRITE16_HANDLER( aladbl_w )
       - aladbl_w : 1b2d18 - data = aa00 (only once on reset)
       - aladbl_w : 1b2d42 - data = 0000 (only once on reset)
     */
-	logerror("aladbl_w : %06x - data = %04x\n",activecpu_get_pc(),data);
+	logerror("aladbl_w : %06x - data = %04x\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static READ16_HANDLER( aladbl_r )
 {
-	if (activecpu_get_pc()==0x1b2a56) return (input_port_read(machine, "MCU") & 0xff0f);             // coins
-	if (activecpu_get_pc()==0x1b2a72) return 0x0000;
-	if (activecpu_get_pc()==0x1b2d24) return (input_port_read(machine, "MCU") & 0x00f0) | 0x1200;    // difficulty
-	if (activecpu_get_pc()==0x1b2d4e) return 0x0000;
+	if (cpu_get_pc(machine->activecpu)==0x1b2a56) return (input_port_read(machine, "MCU") & 0xff0f);             // coins
+	if (cpu_get_pc(machine->activecpu)==0x1b2a72) return 0x0000;
+	if (cpu_get_pc(machine->activecpu)==0x1b2d24) return (input_port_read(machine, "MCU") & 0x00f0) | 0x1200;    // difficulty
+	if (cpu_get_pc(machine->activecpu)==0x1b2d4e) return 0x0000;
 
-	logerror("aladbl_r : %06x\n",activecpu_get_pc());
+	logerror("aladbl_r : %06x\n",cpu_get_pc(machine->activecpu));
 
 	return 0x0000;
 }

@@ -279,7 +279,7 @@ static VIDEO_UPDATE( filetto )
 
 static READ8_HANDLER( vga_regs_r )
 {
-	logerror("(PC=%05x) Warning: VGA reg port read\n",activecpu_get_pc());
+	logerror("(PC=%05x) Warning: VGA reg port read\n",cpu_get_pc(machine->activecpu));
 	return 0xff;
 }
 
@@ -299,7 +299,7 @@ static WRITE8_HANDLER( vga_regs_w )
 			//logerror("write %02x to video register [%02x]",data,video_index);
 		}
 		else
-			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",activecpu_get_pc(),video_index,data);
+			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",cpu_get_pc(machine->activecpu),video_index,data);
 	}
 }
 
@@ -323,7 +323,7 @@ static UINT8 disk_data[2];
 
 static READ8_HANDLER( disk_iobank_r )
 {
-	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,activecpu_get_pc());
+	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(machine->activecpu));
 	//if(offset == 0) return input_port_read(machine, "DSW");
 	if(offset == 1) return input_port_read(machine, "IN1");
 
@@ -500,7 +500,7 @@ static UINT8 status;
 static READ8_HANDLER( fdc765_status_r )
 {
 	static UINT8 tmp,clr_status;
-//	popmessage("Read FDC status @ PC=%05x",activecpu_get_pc());
+//	popmessage("Read FDC status @ PC=%05x",cpu_get_pc(machine->activecpu));
 	tmp = status | 0x80;
 	clr_status++;
 	if(clr_status == 0x10)
@@ -544,9 +544,9 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	result = program_read_byte(page_offset + offset);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return result;
 }
@@ -557,9 +557,9 @@ static DMA8237_MEM_WRITE( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	program_write_byte(page_offset + offset, data);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static READ8_HANDLER(dma_page_select_r)

@@ -159,7 +159,7 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 					ret &= input_port_read(machine, "KEY4");
 					break;
 		default:	ret = 0xff;
-					logerror("PC:%04X unknown %02X\n", activecpu_get_pc(), ojankohs_portselect);
+					logerror("PC:%04X unknown %02X\n", cpu_get_pc(machine->activecpu), ojankohs_portselect);
 					break;
 	}
 

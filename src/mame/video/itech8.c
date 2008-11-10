@@ -230,7 +230,7 @@ WRITE8_HANDLER( itech8_palette_w )
 WRITE8_HANDLER( itech8_page_w )
 {
 	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-	logerror("%04x:display_page = %02X (%d)\n", activecpu_get_pc(), data, video_screen_get_vpos(machine->primary_screen));
+	logerror("%04x:display_page = %02X (%d)\n", cpu_get_pc(machine->activecpu), data, video_screen_get_vpos(machine->primary_screen));
 	page_select = data;
 }
 
@@ -467,7 +467,7 @@ READ8_HANDLER( itech8_blitter_r )
 	static const char *const portnames[] = { "AN_C", "AN_D", "AN_E", "AN_F" };
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", activecpu_get_previouspc(), offset / 2);
+	if (FULL_LOGGING) logerror("%04x:blitter_r(%02x)\n", cpu_get_previouspc(machine->activecpu), offset / 2);
 
 	/* low bit seems to be ignored */
 	offset /= 2;
@@ -527,7 +527,7 @@ WRITE8_HANDLER( itech8_blitter_w )
 	}
 
 	/* debugging */
-	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", activecpu_get_previouspc(), offset, data);
+	if (FULL_LOGGING) logerror("%04x:blitter_w(%02x)=%02x\n", cpu_get_previouspc(machine->activecpu), offset, data);
 }
 
 

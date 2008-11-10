@@ -362,7 +362,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				break;
 
 			/* CPU parameters */
-			case MCONFIG_TOKEN_CPU_FLAGS:
+			case MCONFIG_TOKEN_cpu_get_flags:
 				assert(cpu != NULL);
 				TOKEN_UNGET_UINT32(tokens);
 				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, cpu->flags, 24);

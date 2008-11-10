@@ -106,7 +106,7 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 			break;
 
 		default:
-			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", activecpu_get_pc(), offset);
+			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", cpu_get_pc(machine->activecpu), offset);
 			portdata = 0xff;
 			break;
 	}
@@ -134,7 +134,7 @@ static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 			break;
 
 		default:
-			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", activecpu_get_pc(), offset, data);
+			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", cpu_get_pc(machine->activecpu), offset, data);
 			break;
 	}
 }

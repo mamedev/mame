@@ -7,6 +7,7 @@
 
 #include <stdarg.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/adc083x.h"
 
 #define VERBOSE_LEVEL ( 0 )
@@ -20,9 +21,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{

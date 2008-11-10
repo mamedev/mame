@@ -31,16 +31,16 @@ static CUSTOM_INPUT( dorachan_protection_r )
 {
 	UINT8 ret = 0;
 
-	if ((cpu_getactivecpu() >= 0))
+	if ((cpunum_get_active() >= 0))
 	{
-		switch (activecpu_get_previouspc())
+		switch (cpu_get_previouspc(field->port->machine->activecpu))
 		{
 		case 0x70ce: ret = 0xf2; break;
 		case 0x72a2: ret = 0xd5; break;
 		case 0x72b5: ret = 0xcb; break;
 
 		default:
-			mame_printf_debug("unhandled $2400 read @ %x\n",activecpu_get_previouspc());
+			mame_printf_debug("unhandled $2400 read @ %x\n",cpu_get_previouspc(field->port->machine->activecpu));
 			break;
 		}
 	}

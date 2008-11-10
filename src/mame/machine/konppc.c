@@ -1,6 +1,7 @@
 /* Konami PowerPC-based 3D games common functions */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/sharc/sharc.h"
 #include "video/voodoo.h"
 #include "konppc.h"
@@ -132,7 +133,7 @@ READ32_HANDLER( cgboard_dsp_comm_r_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-//      mame_printf_debug("dsp_cmd_r: (board %d) %08X, %08X at %08X\n", cgboard_id, offset, mem_mask, activecpu_get_pc());
+//      mame_printf_debug("dsp_cmd_r: (board %d) %08X, %08X at %08X\n", cgboard_id, offset, mem_mask, cpu_get_pc(machine->activecpu));
 		return dsp_comm_sharc[cgboard_id][offset] | (dsp_state[cgboard_id] << 16);
 	}
 	else
@@ -144,7 +145,7 @@ READ32_HANDLER( cgboard_dsp_comm_r_ppc )
 WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 {
 	int dsp = (cgboard_id == 0) ? 2 : 3;
-//  mame_printf_debug("dsp_cmd_w: (board %d) %08X, %08X, %08X at %08X\n", cgboard_id, data, offset, mem_mask, activecpu_get_pc());
+//  mame_printf_debug("dsp_cmd_w: (board %d) %08X, %08X, %08X at %08X\n", cgboard_id, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -224,9 +225,9 @@ static void dsp_comm_sharc_w(running_machine *machine, int board, int offset, UI
 		case CGBOARD_TYPE_GTICLUB:
 		{
 			//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG0, ASSERT_LINE);
-			cpuintrf_push_context(2);
+			cpu_push_context(machine->cpu[2]);
 			sharc_set_flag_input(0, ASSERT_LINE);
-			cpuintrf_pop_context();
+			cpu_pop_context();
 
 			if (offset == 1)
 			{
@@ -245,9 +246,9 @@ static void dsp_comm_sharc_w(running_machine *machine, int board, int offset, UI
 
 				if (data & 0x01 || data & 0x10)
 				{
-					cpuintrf_push_context((board == 0) ? 2 : 3);
+					cpu_push_context(machine->cpu[board == 0 ? 2 : 3]);
 					sharc_set_flag_input(1, ASSERT_LINE);
-					cpuintrf_pop_context();
+					cpu_pop_context();
 				}
 
 				if (texture_bank[board] != -1)
@@ -275,7 +276,7 @@ static void dsp_comm_sharc_w(running_machine *machine, int board, int offset, UI
 		}
 	}
 
-//  printf("cgboard_dsp_comm_w_sharc: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+//  printf("cgboard_dsp_comm_w_sharc: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 
 	dsp_comm_sharc[board][offset] = data;
 }
@@ -358,28 +359,28 @@ static UINT32 nwk_fifo_r(int board)
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
 	{
-		cpuintrf_push_context(cpu);
+		cpu_push_context(Machine->cpu[cpu]);
 		sharc_set_flag_input(1, CLEAR_LINE);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 	else
 	{
-		cpuintrf_push_context(cpu);
+		cpu_push_context(Machine->cpu[cpu]);
 		sharc_set_flag_input(1, ASSERT_LINE);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_full)
 	{
-		cpuintrf_push_context(cpu);
+		cpu_push_context(Machine->cpu[cpu]);
 		sharc_set_flag_input(2, ASSERT_LINE);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 	else
 	{
-		cpuintrf_push_context(cpu);
+		cpu_push_context(Machine->cpu[cpu]);
 		sharc_set_flag_input(2, CLEAR_LINE);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 
 	data = nwk_fifo[board][nwk_fifo_read_ptr[board]];
@@ -395,20 +396,20 @@ static void nwk_fifo_w(int board, UINT32 data)
 
 	if (nwk_fifo_write_ptr[board] < nwk_fifo_half_full_w)
 	{
-		cpuintrf_push_context(cpu);
+		cpu_push_context(Machine->cpu[cpu]);
 		sharc_set_flag_input(1, ASSERT_LINE);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 	else
 	{
-		cpuintrf_push_context(cpu);
+		cpu_push_context(Machine->cpu[cpu]);
 		sharc_set_flag_input(1, CLEAR_LINE);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 
-	cpuintrf_push_context(cpu);
+	cpu_push_context(Machine->cpu[cpu]);
 	sharc_set_flag_input(2, ASSERT_LINE);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	nwk_fifo[board][nwk_fifo_write_ptr[board]] = data;
 	nwk_fifo_write_ptr[board]++;
@@ -446,7 +447,7 @@ static UINT32 K033906_r(int chip, int reg)
 		case 0x0f:		return K033906_reg[chip][0x0f];		// interrupt_line, interrupt_pin, min_gnt, max_lat
 
 		default:
-			fatalerror("K033906_r: %d, %08X at %08X", chip, reg, activecpu_get_pc());
+			fatalerror("K033906_r: %d, %08X at %08X", chip, reg, cpu_get_pc(Machine->activecpu));
 	}
 	return 0;
 }
@@ -495,7 +496,7 @@ static void K033906_w(running_machine *machine, int chip, int reg, UINT32 data)
 			break;
 
 		default:
-			fatalerror("K033906_w: %d, %08X, %08X at %08X", chip, data, reg, activecpu_get_pc());
+			fatalerror("K033906_w: %d, %08X, %08X at %08X", chip, data, reg, cpu_get_pc(machine->activecpu));
 	}
 }
 

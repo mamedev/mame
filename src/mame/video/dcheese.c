@@ -222,7 +222,7 @@ static void do_blit(running_machine *machine)
 	if (blitter_xparam[8] != 0 || blitter_xparam[9] != 0 || blitter_xparam[10] != 0 || blitter_xparam[11] != 0 ||
 		blitter_yparam[8] != 0 || blitter_yparam[9] != 0 || blitter_yparam[10] != 0 || blitter_yparam[11] != 0)
 	{
-		logerror("%06X:blit! (%04X)\n", activecpu_get_pc(), blitter_color[0]);
+		logerror("%06X:blit! (%04X)\n", cpu_get_pc(machine->activecpu), blitter_color[0]);
 		logerror("   %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X - %04X %04X %04X %04X\n",
 				blitter_xparam[0], blitter_xparam[1], blitter_xparam[2], blitter_xparam[3],
 				blitter_xparam[4], blitter_xparam[5], blitter_xparam[6], blitter_xparam[7],
@@ -300,7 +300,7 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		default:
-			logerror("%06X:write to %06X = %04X & %04x\n", activecpu_get_pc(), 0x2a0000 + 2 * offset, data, mem_mask);
+			logerror("%06X:write to %06X = %04X & %04x\n", cpu_get_pc(machine->activecpu), 0x2a0000 + 2 * offset, data, mem_mask);
 			break;
 	}
 }
@@ -309,7 +309,7 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 WRITE16_HANDLER( madmax_blitter_unknown_w )
 {
 	/* written to just before the blitter command register is written */
-  logerror("%06X:write to %06X = %04X & %04X\n", activecpu_get_pc(), 0x300000 + 2 * offset, data, mem_mask);
+  logerror("%06X:write to %06X = %04X & %04X\n", cpu_get_pc(machine->activecpu), 0x300000 + 2 * offset, data, mem_mask);
 }
 
 
@@ -326,6 +326,6 @@ READ16_HANDLER( madmax_blitter_vidparam_r )
 		return 0xffff ^ (1 << 5);
 
 	/* log everything else */
-	logerror("%06X:read from %06X\n", activecpu_get_pc(), 0x2a0000 + 2 * offset);
+	logerror("%06X:read from %06X\n", cpu_get_pc(machine->activecpu), 0x2a0000 + 2 * offset);
 	return 0xffff;
 }

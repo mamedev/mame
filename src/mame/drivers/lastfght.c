@@ -154,21 +154,21 @@ static int lastfght_x, lastfght_y, lastfght_w, lastfght_h;
 // high byte of a 16 bit register
 static WRITE16_HANDLER( lastfght_hi_w )
 {
-	if (ACCESSING_BITS_8_15)	logerror("%06x: 600000.b = %02x\n", activecpu_get_pc(),data>>8);
+	if (ACCESSING_BITS_8_15)	logerror("%06x: 600000.b = %02x\n", cpu_get_pc(machine->activecpu),data>>8);
 	if (ACCESSING_BITS_0_7)
 	{
 		lastfght_hi	=	data << 8;
-		//logerror("%06x: lastfght_hi  = %02x\n", activecpu_get_pc(),data);
+		//logerror("%06x: lastfght_hi  = %02x\n", cpu_get_pc(machine->activecpu),data);
 	}
 }
 // screen x
 static WRITE16_HANDLER( lastfght_x_w )
 {
-	if (ACCESSING_BITS_8_15)	logerror("%06x: 800008.b = %02x\n", activecpu_get_pc(),data>>8);
+	if (ACCESSING_BITS_8_15)	logerror("%06x: 800008.b = %02x\n", cpu_get_pc(machine->activecpu),data>>8);
 	if (ACCESSING_BITS_0_7)
 	{
 		lastfght_x	=	lastfght_hi | data;
-		//logerror("%06x: lastfght_x   = %02x\n", activecpu_get_pc(),data);
+		//logerror("%06x: lastfght_x   = %02x\n", cpu_get_pc(machine->activecpu),data);
 	}
 }
 // screen y, screen width - 1
@@ -177,12 +177,12 @@ static WRITE16_HANDLER( lastfght_yw_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		lastfght_y	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_y   = %02x\n", activecpu_get_pc(),data>>8);
+		//logerror("%06x: lastfght_y   = %02x\n", cpu_get_pc(machine->activecpu),data>>8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		lastfght_w	=	lastfght_hi | data;
-		//logerror("%06x: lastfght_w   = %02x\n", activecpu_get_pc(),data);
+		//logerror("%06x: lastfght_w   = %02x\n", cpu_get_pc(machine->activecpu),data);
 	}
 }
 // screen height - 1
@@ -191,9 +191,9 @@ static WRITE16_HANDLER( lastfght_h_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		lastfght_h	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_h   = %02x\n", activecpu_get_pc(),data>>8);
+		//logerror("%06x: lastfght_h   = %02x\n", cpu_get_pc(machine->activecpu),data>>8);
 	}
-	if (ACCESSING_BITS_0_7)	logerror("%06x: 80000d.b = %02x\n", activecpu_get_pc(),data);
+	if (ACCESSING_BITS_0_7)	logerror("%06x: 80000d.b = %02x\n", cpu_get_pc(machine->activecpu),data);
 }
 // source delta x << 6, source x << 6
 static WRITE16_HANDLER( lastfght_sx_w )
@@ -201,12 +201,12 @@ static WRITE16_HANDLER( lastfght_sx_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		lastfght_dsx	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_dsx = %02x\n", activecpu_get_pc(),data>>8);
+		//logerror("%06x: lastfght_dsx = %02x\n", cpu_get_pc(machine->activecpu),data>>8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		lastfght_sx	=	lastfght_hi | data;
-		//logerror("%06x: lastfght_sx  = %02x\n", activecpu_get_pc(),data);
+		//logerror("%06x: lastfght_sx  = %02x\n", cpu_get_pc(machine->activecpu),data);
 	}
 }
 // source y << 6, source y1 << 6
@@ -215,12 +215,12 @@ static WRITE16_HANDLER( lastfght_sy_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		lastfght_sy	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_sy  = %02x\n", activecpu_get_pc(),data>>8);
+		//logerror("%06x: lastfght_sy  = %02x\n", cpu_get_pc(machine->activecpu),data>>8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		lastfght_sy1	=	lastfght_hi | data;
-		//logerror("%06x: lastfght_sy1 = %02x\n", activecpu_get_pc(),data);
+		//logerror("%06x: lastfght_sy1 = %02x\n", cpu_get_pc(machine->activecpu),data);
 	}
 }
 // source rom (0x200000 bytes), source page (512x256 bytes)
@@ -229,12 +229,12 @@ static WRITE16_HANDLER( lastfght_sr_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		lastfght_sp	=	(lastfght_hi>>8) >> 4;
-		//logerror("%06x: lastfght_sp  = %02x\n", activecpu_get_pc(),data>>8);
+		//logerror("%06x: lastfght_sp  = %02x\n", cpu_get_pc(machine->activecpu),data>>8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		lastfght_sr	=	data;
-		//logerror("%06x: lastfght_sr  = %02x\n", activecpu_get_pc(),data);
+		//logerror("%06x: lastfght_sr  = %02x\n", cpu_get_pc(machine->activecpu),data);
 	}
 }
 // source x1 << 6, source delta y << 6
@@ -243,12 +243,12 @@ static WRITE16_HANDLER( lastfght_sd_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		lastfght_sx1	=	lastfght_hi | (data >> 8);
-		//logerror("%06x: lastfght_sx1 = %02x\n", activecpu_get_pc(),data>>8);
+		//logerror("%06x: lastfght_sx1 = %02x\n", cpu_get_pc(machine->activecpu),data>>8);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
 		lastfght_dsy	=	lastfght_hi | data;
-		//logerror("%06x: lastfght_dsy = %02x\n", activecpu_get_pc(),data);
+		//logerror("%06x: lastfght_dsy = %02x\n", cpu_get_pc(machine->activecpu),data);
 	}
 }
 // start blit
@@ -261,7 +261,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 		bitmap_t *dest = lastfght_bitmap[lastfght_dest];
 
 #if 0
-		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", activecpu_get_pc(),
+		logerror("%06x: blit x %03x, y %03x, w %03x, h %03x, sx %03x.%02x, sx1 %03x.%02x, dsx %03x.%02x, sy %03x.%02x, sy1 %03x.%02x, dsy %03x.%02x, sp %02x, sr %02x, data %02x\n", cpu_get_pc(machine->activecpu),
 				lastfght_x,lastfght_y,lastfght_w+1,lastfght_h+1,
 				lastfght_sx>>6,lastfght_sx&0x3f,	lastfght_sx1>>6,lastfght_dsx&0x3f,	lastfght_sx1>>6,lastfght_sx1&0x3f,
 				lastfght_sy>>6,lastfght_sy&0x3f,	lastfght_sy1>>6,lastfght_dsy&0x3f,	lastfght_sy1>>6,lastfght_sy1&0x3f,
@@ -285,7 +285,7 @@ static WRITE16_HANDLER( lastfght_blit_w )
 			}
 		}
 	}
-	if (ACCESSING_BITS_0_7)	logerror("%06x: 600007.b = %02x\n", activecpu_get_pc(),data);
+	if (ACCESSING_BITS_0_7)	logerror("%06x: 600007.b = %02x\n", cpu_get_pc(machine->activecpu),data);
 }
 // toggle framebuffer
 static WRITE16_HANDLER( lastfght_dest_w )
@@ -338,8 +338,8 @@ static READ16_HANDLER( lastfght_sound_r )
 
 static WRITE16_HANDLER( lastfght_sound_w )
 {
-	if (ACCESSING_BITS_8_15)	logerror("%06x: sound_w msb = %02x\n", activecpu_get_pc(),data>>8);
-	if (ACCESSING_BITS_0_7)	logerror("%06x: sound_w lsb = %02x\n", activecpu_get_pc(),data);
+	if (ACCESSING_BITS_8_15)	logerror("%06x: sound_w msb = %02x\n", cpu_get_pc(machine->activecpu),data>>8);
+	if (ACCESSING_BITS_0_7)	logerror("%06x: sound_w lsb = %02x\n", cpu_get_pc(machine->activecpu),data);
 }
 
 /***************************************************************************

@@ -317,24 +317,24 @@ READ32_HANDLER( K001005_r )
 				if (K001005_fifo_read_ptr < 0x3ff)
 				{
 					//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, CLEAR_LINE);
-					cpuintrf_push_context(2);
+					cpu_push_context(machine->cpu[2]);
 					sharc_set_flag_input(1, CLEAR_LINE);
-					cpuintrf_pop_context();
+					cpu_pop_context();
 				}
 				else
 				{
 					//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
-					cpuintrf_push_context(2);
+					cpu_push_context(machine->cpu[2]);
 					sharc_set_flag_input(1, ASSERT_LINE);
-					cpuintrf_pop_context();
+					cpu_pop_context();
 				}
 			}
 			else
 			{
 				//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
-				cpuintrf_push_context(2);
+				cpu_push_context(machine->cpu[2]);
 				sharc_set_flag_input(1, ASSERT_LINE);
-				cpuintrf_pop_context();
+				cpu_pop_context();
 			}
 
 			K001005_fifo_read_ptr++;
@@ -359,7 +359,7 @@ READ32_HANDLER( K001005_r )
 			}
 
 		default:
-			mame_printf_debug("K001005_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+			mame_printf_debug("K001005_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
 			break;
 	}
 	return 0;
@@ -376,27 +376,27 @@ WRITE32_HANDLER( K001005_w )
 				if (K001005_fifo_write_ptr < 0x400)
 				{
 					//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
-					cpuintrf_push_context(2);
+					cpu_push_context(machine->cpu[2]);
 					sharc_set_flag_input(1, ASSERT_LINE);
-					cpuintrf_pop_context();
+					cpu_pop_context();
 				}
 				else
 				{
 					//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, CLEAR_LINE);
-					cpuintrf_push_context(2);
+					cpu_push_context(machine->cpu[2]);
 					sharc_set_flag_input(1, CLEAR_LINE);
-					cpuintrf_pop_context();
+					cpu_pop_context();
 				}
 			}
 			else
 			{
 				//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
-				cpuintrf_push_context(2);
+				cpu_push_context(machine->cpu[2]);
 				sharc_set_flag_input(1, ASSERT_LINE);
-				cpuintrf_pop_context();
+				cpu_pop_context();
 			}
 
-	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, activecpu_get_pc());
+	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, cpu_get_pc(machine->activecpu));
 			K001005_fifo[K001005_fifo_write_ptr] = data;
 			K001005_fifo_write_ptr++;
 			K001005_fifo_write_ptr &= 0x7ff;
@@ -404,13 +404,13 @@ WRITE32_HANDLER( K001005_w )
 			K001005_3d_fifo[K001005_3d_fifo_ptr++] = data;
 
 			// !!! HACK to get past the FIFO B test (GTI Club & Thunder Hurricane) !!!
-			if (activecpu_get_pc() == 0x201ee)
+			if (cpu_get_pc(machine->activecpu) == 0x201ee)
 			{
 				// This is used to make the SHARC timeout
 				cpu_spinuntil_trigger(10000);
 			}
 			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
-			if (activecpu_get_pc() == 0x201e6)
+			if (cpu_get_pc(machine->activecpu) == 0x201e6)
 			{
 				// This is used to make the SHARC timeout
 				cpu_spinuntil_trigger(10000);
@@ -460,7 +460,7 @@ WRITE32_HANDLER( K001005_w )
 			break;
 
 		default:
-			//mame_printf_debug("K001005_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+			//mame_printf_debug("K001005_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 			break;
 	}
 
@@ -1059,9 +1059,9 @@ VIDEO_UPDATE( gticlub )
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);
 
 	//cpunum_set_input_line(screen->machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
-	cpuintrf_push_context(2);
+	cpu_push_context(screen->machine->cpu[2]);
 	sharc_set_flag_input(1, ASSERT_LINE);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return 0;
 }
 

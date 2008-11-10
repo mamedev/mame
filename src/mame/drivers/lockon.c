@@ -73,65 +73,65 @@ static READ16_HANDLER( main_gnd_r )
 {
 	UINT16 result;
 
-	cpuintrf_push_context(GROUND_CPU);
+	cpu_push_context(machine->cpu[GROUND_CPU]);
 	result = program_read_word(V30_GND_ADDR | offset * 2);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return result;
 }
 
 static WRITE16_HANDLER( main_gnd_w )
 {
-	cpuintrf_push_context(GROUND_CPU);
+	cpu_push_context(machine->cpu[GROUND_CPU]);
 
 	if (ACCESSING_BITS_0_7)
 		program_write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
 	if (ACCESSING_BITS_8_15)
 		program_write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static READ16_HANDLER( main_obj_r )
 {
 	UINT16 result;
 
-	cpuintrf_push_context(OBJECT_CPU);
+	cpu_push_context(machine->cpu[OBJECT_CPU]);
 	result = program_read_word(V30_OBJ_ADDR | offset * 2);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return result;
 }
 
 static WRITE16_HANDLER( main_obj_w )
 {
-	cpuintrf_push_context(OBJECT_CPU);
+	cpu_push_context(machine->cpu[OBJECT_CPU]);
 
 	if (ACCESSING_BITS_0_7)
 		program_write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
 	if (ACCESSING_BITS_8_15)
 		program_write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static WRITE16_HANDLER( tst_w )
 {
 	if (offset < 0x800)
 	{
-		cpuintrf_push_context(GROUND_CPU);
+		cpu_push_context(machine->cpu[GROUND_CPU]);
 		if (ACCESSING_BITS_0_7)
 			program_write_byte(V30_GND_ADDR | (offset * 2 + 0), data);
 		if (ACCESSING_BITS_8_15)
 			program_write_byte(V30_GND_ADDR | (offset * 2 + 1), data >> 8);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 
-		cpuintrf_push_context(OBJECT_CPU);
+		cpu_push_context(machine->cpu[OBJECT_CPU]);
 		if (ACCESSING_BITS_0_7)
 			program_write_byte(V30_OBJ_ADDR | (offset * 2 + 0), data);
 		if (ACCESSING_BITS_8_15)
 			program_write_byte(V30_OBJ_ADDR | (offset * 2 + 1), data >> 8);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 }
 
@@ -139,18 +139,18 @@ static READ16_HANDLER( main_z80_r )
 {
 	UINT16 val;
 
-	cpuintrf_push_context(SOUND_CPU);
+	cpu_push_context(machine->cpu[SOUND_CPU]);
 	val = program_read_byte(offset);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return 0xff00 | val;
 }
 
 static WRITE16_HANDLER( main_z80_w )
 {
-	cpuintrf_push_context(SOUND_CPU);
+	cpu_push_context(machine->cpu[SOUND_CPU]);
 	program_write_byte(offset, data);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static WRITE16_HANDLER( inten_w )

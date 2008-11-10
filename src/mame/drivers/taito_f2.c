@@ -369,7 +369,7 @@ static READ16_HANDLER( growl_dsw_r )
               return input_port_read(machine, "DSWB");
     }
 
-	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -389,7 +389,7 @@ static READ16_HANDLER( growl_input_r )
 
     }
 
-	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -423,7 +423,7 @@ static READ16_HANDLER( footchmp_input_r )
 			return input_port_read(machine, "IN4");
     }
 
-	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -457,7 +457,7 @@ static READ16_HANDLER( ninjak_input_r )
 //          return (coin_word & mem_mask);
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -482,7 +482,7 @@ static READ16_HANDLER( cameltry_paddle_r )
 			return res;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0;
 }
@@ -498,7 +498,7 @@ static READ16_HANDLER( driftout_paddle_r )
               return input_port_read(machine, "PADDLE2");
     }
 
-	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped paddle offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
         return 0xff;
 }
@@ -526,7 +526,7 @@ static READ16_HANDLER( deadconx_input_r )
 			return input_port_read(machine, "IN1");
     }
 
-	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -546,7 +546,7 @@ static READ16_HANDLER( mjnquest_dsw_r )
         }
     }
 
-    logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", activecpu_get_pc(), offset);
+    logerror("CPU #0 PC %06x: warning - read unmapped dsw_r offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
     return 0xff;
 }
@@ -572,7 +572,7 @@ static READ16_HANDLER( mjnquest_input_r )
 
     }
 
-	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", activecpu_get_pc(), mjnquest_input);
+	logerror("CPU #0 mjnquest_input %06x: warning - read unknown input %06x\n", cpu_get_pc(machine->activecpu), mjnquest_input);
 
 	return 0xff;
 }
@@ -593,7 +593,7 @@ static READ16_HANDLER( quizhq_input1_r )
               return input_port_read(machine, "IN0");
     }
 
-	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -612,7 +612,7 @@ static READ16_HANDLER( quizhq_input2_r )
               return input_port_read(machine, "IN2");
     }
 
-	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -631,7 +631,7 @@ static READ16_HANDLER( yesnoj_input_r )
               return input_port_read(machine, "IN2");
     }
 #ifdef MAME_DEBUG
-	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped input_r offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 #endif
 
 	return 0x0;

@@ -417,17 +417,17 @@ static WRITE32_HANDLER( light_ctrl_2_w )
 
 static WRITE32_HANDLER( unknown590000_w )
 {
-	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, mem_mask);
+	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", cpu_get_previouspc(machine->activecpu), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown802000_w )
 {
-	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, mem_mask);
+	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", cpu_get_previouspc(machine->activecpu), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknownc02000_w )
 {
-	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", activecpu_get_previouspc(), offset, data, mem_mask);
+	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", cpu_get_previouspc(machine->activecpu), offset, data, mem_mask);
 }
 
 

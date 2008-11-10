@@ -4,6 +4,8 @@
  */
 
 #include "psx.h"
+#include "driver.h"
+#include "deprecat.h"
 
 static char *make_signed_hex_str_16( UINT32 value )
 {
@@ -122,10 +124,10 @@ static char *effective_address( UINT32 pc, UINT32 op )
 {
 	static char s_address[ 20 ];
 #ifndef STANDALONE
-	if( pc == activecpu_get_pc() )
+	if( pc == cpu_get_pc(Machine->activecpu) )
 	{
 		sprintf( s_address, "%s(%s) ; 0x%08x", make_signed_hex_str_16( INS_IMMEDIATE( op ) ), s_cpugenreg[ INS_RS( op ) ],
-			(UINT32)( activecpu_get_reg( MIPS_R0 + INS_RS( op ) ) + (INT16)INS_IMMEDIATE( op ) ) );
+			(UINT32)( cpu_get_reg( Machine->activecpu, MIPS_R0 + INS_RS( op ) ) + (INT16)INS_IMMEDIATE( op ) ) );
 		return s_address;
 	}
 #endif
@@ -137,9 +139,9 @@ static UINT32 relative_address( UINT32 pc, UINT32 op )
 {
 	UINT32 nextpc = pc + 4;
 #ifndef STANDALONE
-	if( pc == activecpu_get_pc() && activecpu_get_reg( MIPS_DELAYR ) == 32 )
+	if( pc == cpu_get_pc(Machine->activecpu) && cpu_get_reg( Machine->activecpu, MIPS_DELAYR ) == 32 )
 	{
-		nextpc = activecpu_get_reg( MIPS_DELAYV );
+		nextpc = cpu_get_reg( Machine->activecpu, MIPS_DELAYV );
 	}
 #endif
 	return nextpc + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 );
@@ -149,9 +151,9 @@ static UINT32 jump_address( UINT32 pc, UINT32 op )
 {
 	UINT32 nextpc = pc + 4;
 #ifndef STANDALONE
-	if( pc == activecpu_get_pc() && activecpu_get_reg( MIPS_DELAYR ) == 32 )
+	if( pc == cpu_get_pc(Machine->activecpu) && cpu_get_reg( Machine->activecpu, MIPS_DELAYR ) == 32 )
 	{
-		nextpc = activecpu_get_reg( MIPS_DELAYV );
+		nextpc = cpu_get_reg( Machine->activecpu, MIPS_DELAYV );
 	}
 #endif
 	return ( nextpc & 0xf0000000 ) + ( INS_TARGET( op ) << 2 );

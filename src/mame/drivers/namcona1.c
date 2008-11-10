@@ -639,7 +639,7 @@ static void namcona1_blit( running_machine *machine )
 	(void)src0;
 /*
     logerror( "0x%08x: blt(%08x,%08x,numBytes=%04x);src=%04x %04x %04x; dst=%04x %04x %04x; gfx=%04x\n",
-        activecpu_get_pc(),
+        cpu_get_pc(machine->activecpu),
         dst_baseaddr,src_baseaddr,num_bytes,
         src0,src1,src2,
         dst0,dst1,dst2,
@@ -789,7 +789,7 @@ static READ16_HANDLER( na1mcu_shared_r )
 #if 0
 	if (offset >= 0x70000/2)
 	{
-		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, activecpu_get_pc());
+		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, cpu_get_pc(machine->activecpu));
 	}
 #endif
 
@@ -843,7 +843,7 @@ static WRITE8_HANDLER( port4_w )
 {
 	if ((data & 0x08) && !(mcu_port4 & 0x08))
 	{
-		logerror("launching 68k, PC=%x\n", activecpu_get_pc());
+		logerror("launching 68k, PC=%x\n", cpu_get_pc(machine->activecpu));
 
 		// reset and launch the 68k
 		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);

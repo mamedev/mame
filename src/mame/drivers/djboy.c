@@ -401,7 +401,7 @@ static WRITE8_HANDLER( beast_data_w )
 {
 	prot_busy_count = 1;
 
-	logerror( "0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
+	logerror( "0x%04x: prot_w(0x%02x)\n", cpu_get_pc(machine->activecpu), data );
 
 	watchdog_reset_w(machine,0,0);
 
@@ -601,7 +601,7 @@ static WRITE8_HANDLER( beast_data_w )
 		default:
 		case 0x97:
 		case 0x9a:
-			logerror( "!!0x%04x: prot_w(0x%02x)\n", activecpu_get_pc(), data );
+			logerror( "!!0x%04x: prot_w(0x%02x)\n", cpu_get_pc(machine->activecpu), data );
 			break;
 		}
 	}
@@ -624,7 +624,7 @@ static READ8_HANDLER( beast_data_r )
 	{
 		logerror( "prot_r: data expected!\n" );
 	}
-	logerror( "0x%04x: prot_r() == 0x%02x\n", activecpu_get_pc(), data );
+	logerror( "0x%04x: prot_r() == 0x%02x\n", cpu_get_pc(machine->activecpu), data );
 	return data;
 } /* beast_data_r */
 

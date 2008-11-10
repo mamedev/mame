@@ -313,14 +313,14 @@ static void blockhl_banking( int lines )
 
 	/* other bits unknown */
 
-	if ((lines & 0x84) != 0x80) logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);
+	if ((lines & 0x84) != 0x80) logerror("%04x: setlines %02x\n",cpu_get_pc(Machine->activecpu),lines);
 }
 
 static MACHINE_RESET( blockhl )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)blockhl_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)blockhl_banking);
 
 	paletteram = &RAM[0x18000];
 }

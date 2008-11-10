@@ -37,10 +37,6 @@ enum
 	HOLD_LINE,					/* hold interrupt line until acknowledged */
 	PULSE_LINE,					/* pulse interrupt line for one instruction */
 
-	/* internal flags (not for use by drivers!) */
-	INTERNAL_CLEAR_LINE = 100 + CLEAR_LINE,
-	INTERNAL_ASSERT_LINE = 100 + ASSERT_LINE,
-
 	/* input lines */
 	MAX_INPUT_LINES = 32+3,
 	INPUT_LINE_IRQ0 = 0,
@@ -373,33 +369,16 @@ int	cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *confi
 void cpuintrf_exit_cpu(int cpunum);
 
 /* remember the previous context and set a new one */
-void cpuintrf_push_context(int cpunum);
+void cpu_push_context(const device_config *cpu);
 
 /* restore the previous context */
-void cpuintrf_pop_context(void);
+void cpu_pop_context(void);
 
 /* circular string buffer */
 char *cpuintrf_temp_str(void);
 
 /* set the dasm override handler */
-void cpuintrf_set_dasm_override(int cpunum, offs_t (*dasm_override)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram));
-
-
-
-/***************************************************************************
-    ACTIVE CPU ACCCESSORS
-***************************************************************************/
-
-/* get info accessors */
-INT64 activecpu_get_info_int(UINT32 state);
-void *activecpu_get_info_ptr(UINT32 state);
-genf *activecpu_get_info_fct(UINT32 state);
-const char *activecpu_get_info_string(UINT32 state);
-
-/* set info accessors */
-void activecpu_set_info_int(UINT32 state, INT64 data);
-void activecpu_set_info_ptr(UINT32 state, void *data);
-void activecpu_set_info_fct(UINT32 state, genf *data);
+void cpu_set_dasm_override(const device_config *cpu, cpu_disassemble_func dasm_override);
 
 /* apply a +/- to the current icount */
 void activecpu_adjust_icount(int delta);
@@ -410,117 +389,75 @@ int activecpu_get_icount(void);
 /* ensure banking is reset properly */
 void activecpu_reset_banking(void);
 
-/* set the input line on a CPU -- drivers use cpu_set_input_line() */
-void activecpu_set_input_line(int irqline, int state);
-
-/* return the PC, corrected to a byte offset, on the active CPU */
-offs_t activecpu_get_physical_pc_byte(void);
-
-/* update the banking on the active CPU */
-void activecpu_set_opbase(offs_t val);
-
-/* disassemble a line at a given PC on the active CPU */
-offs_t activecpu_dasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-
-#define activecpu_context_size()				activecpu_get_info_int(CPUINFO_INT_CONTEXT_SIZE)
-#define activecpu_input_lines()					activecpu_get_info_int(CPUINFO_INT_INPUT_LINES)
-#define activecpu_output_lines()				activecpu_get_info_int(CPUINFO_INT_OUTPUT_LINES)
-#define activecpu_default_irq_vector()			activecpu_get_info_int(CPUINFO_INT_DEFAULT_IRQ_VECTOR)
-#define activecpu_endianness()					activecpu_get_info_int(CPUINFO_INT_ENDIANNESS)
-#define activecpu_clock_multiplier()			activecpu_get_info_int(CPUINFO_INT_CLOCK_MULTIPLIER)
-#define activecpu_clock_divider()				activecpu_get_info_int(CPUINFO_INT_CLOCK_DIVIDER)
-#define activecpu_min_instruction_bytes()		activecpu_get_info_int(CPUINFO_INT_MIN_INSTRUCTION_BYTES)
-#define activecpu_max_instruction_bytes()		activecpu_get_info_int(CPUINFO_INT_MAX_INSTRUCTION_BYTES)
-#define activecpu_min_cycles()					activecpu_get_info_int(CPUINFO_INT_MIN_CYCLES)
-#define activecpu_max_cycles()					activecpu_get_info_int(CPUINFO_INT_MAX_CYCLES)
-#define activecpu_databus_width(space)			activecpu_get_info_int(CPUINFO_INT_DATABUS_WIDTH + (space))
-#define activecpu_addrbus_width(space)			activecpu_get_info_int(CPUINFO_INT_ADDRBUS_WIDTH + (space))
-#define activecpu_addrbus_shift(space)			activecpu_get_info_int(CPUINFO_INT_ADDRBUS_SHIFT + (space))
-#define activecpu_logaddr_width(space)			activecpu_get_info_int(CPUINFO_INT_LOGADDR_WIDTH + (space))
-#define activecpu_page_shift(space)				activecpu_get_info_int(CPUINFO_INT_PAGE_SHIFT + (space))
-#define activecpu_get_reg(reg)					activecpu_get_info_int(CPUINFO_INT_REGISTER + (reg))
-#define activecpu_debug_register_list()			activecpu_get_info_ptr(CPUINFO_PTR_DEBUG_REGISTER_LIST)
-#define activecpu_name()						activecpu_get_info_string(CPUINFO_STR_NAME)
-#define activecpu_core_family()					activecpu_get_info_string(CPUINFO_STR_CORE_FAMILY)
-#define activecpu_core_version()				activecpu_get_info_string(CPUINFO_STR_CORE_VERSION)
-#define activecpu_core_file()					activecpu_get_info_string(CPUINFO_STR_CORE_FILE)
-#define activecpu_core_credits()				activecpu_get_info_string(CPUINFO_STR_CORE_CREDITS)
-#define activecpu_flags()						activecpu_get_info_string(CPUINFO_STR_FLAGS)
-#define activecpu_irq_string(irq)				activecpu_get_info_string(CPUINFO_STR_IRQ_STATE + (irq))
-#define activecpu_reg_string(reg)				activecpu_get_info_string(CPUINFO_STR_REGISTER + (reg))
-
-#define activecpu_set_reg(reg, val)				activecpu_set_info_int(CPUINFO_INT_REGISTER + (reg), (val))
-
 
 
 /***************************************************************************
-    SPECIFIC CPU ACCCESSORS
+    CORE CPU ACCCESSORS
 ***************************************************************************/
 
 /* get info accessors */
-INT64 cpunum_get_info_int(int cpunum, UINT32 state);
-void *cpunum_get_info_ptr(int cpunum, UINT32 state);
-genf *cpunum_get_info_fct(int cpunum, UINT32 state);
-const char *cpunum_get_info_string(int cpunum, UINT32 state);
+INT64 cpu_get_info_int(const device_config *cpu, UINT32 state);
+void *cpu_get_info_ptr(const device_config *cpu, UINT32 state);
+genf *cpu_get_info_fct(const device_config *cpu, UINT32 state);
+const char *cpu_get_info_string(const device_config *cpu, UINT32 state);
 
 /* set info accessors */
-void cpunum_set_info_int(int cpunum, UINT32 state, INT64 data);
-void cpunum_set_info_ptr(int cpunum, UINT32 state, void *data);
-void cpunum_set_info_fct(int cpunum, UINT32 state, genf *data);
+void cpu_set_info_int(const device_config *cpu, UINT32 state, INT64 data);
+void cpu_set_info_ptr(const device_config *cpu, UINT32 state, void *data);
+void cpu_set_info_fct(const device_config *cpu, UINT32 state, genf *data);
 
 /* execute the requested cycles on a given CPU */
-int cpunum_execute(int cpunum, int cycles);
+int cpu_execute(const device_config *cpu, int cycles);
 
 /* signal a reset for a given CPU */
-void cpunum_reset(int cpunum);
+void cpu_reset(const device_config *cpu);
 
 /* read a byte from another CPU's memory space */
-UINT8 cpunum_read_byte(int cpunum, offs_t address);
+UINT8 cpu_read_byte(const device_config *cpu, offs_t address);
 
 /* write a byte from another CPU's memory space */
-void cpunum_write_byte(int cpunum, offs_t address, UINT8 data);
-
-/* return a pointer to the saved context of a given CPU, or NULL if the
-   context is active (and contained within the CPU core */
-void *cpunum_get_context_ptr(int cpunum);
+void cpu_write_byte(const device_config *cpu, offs_t address, UINT8 data);
 
 /* return the PC, corrected to a byte offset, on a given CPU */
-offs_t cpunum_get_physical_pc_byte(int cpunum);
+offs_t cpu_get_physical_pc_byte(const device_config *cpu);
 
 /* update the banking on a given CPU */
-void cpunum_set_opbase(int cpunum, offs_t val);
+void cpu_set_opbase(const device_config *cpu, offs_t val);
 
 /* disassemble a line at a given PC on a given CPU */
-offs_t cpunum_dasm(int cpunum, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+offs_t cpu_dasm(const device_config *cpu, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
-#define cpunum_context_size(cpunum)				cpunum_get_info_int(cpunum, CPUINFO_INT_CONTEXT_SIZE)
-#define cpunum_input_lines(cpunum)				cpunum_get_info_int(cpunum, CPUINFO_INT_INPUT_LINES)
-#define cpunum_output_lines(cpunum)				cpunum_get_info_int(cpunum, CPUINFO_INT_OUTPUT_LINES)
-#define cpunum_default_irq_vector(cpunum)		cpunum_get_info_int(cpunum, CPUINFO_INT_DEFAULT_IRQ_VECTOR)
-#define cpunum_endianness(cpunum)				cpunum_get_info_int(cpunum, CPUINFO_INT_ENDIANNESS)
-#define cpunum_clock_multiplier(cpunum)			cpunum_get_info_int(cpunum, CPUINFO_INT_CLOCK_MULTIPLIER)
-#define cpunum_clock_divider(cpunum)			cpunum_get_info_int(cpunum, CPUINFO_INT_CLOCK_DIVIDER)
-#define cpunum_min_instruction_bytes(cpunum)	cpunum_get_info_int(cpunum, CPUINFO_INT_MIN_INSTRUCTION_BYTES)
-#define cpunum_max_instruction_bytes(cpunum)	cpunum_get_info_int(cpunum, CPUINFO_INT_MAX_INSTRUCTION_BYTES)
-#define cpunum_min_cycles(cpunum)				cpunum_get_info_int(cpunum, CPUINFO_INT_MIN_CYCLES)
-#define cpunum_max_cycles(cpunum)				cpunum_get_info_int(cpunum, CPUINFO_INT_MAX_CYCLES)
-#define cpunum_databus_width(cpunum, space)		cpunum_get_info_int(cpunum, CPUINFO_INT_DATABUS_WIDTH + (space))
-#define cpunum_addrbus_width(cpunum, space)		cpunum_get_info_int(cpunum, CPUINFO_INT_ADDRBUS_WIDTH + (space))
-#define cpunum_addrbus_shift(cpunum, space)		cpunum_get_info_int(cpunum, CPUINFO_INT_ADDRBUS_SHIFT + (space))
-#define cpunum_logaddr_width(cpunum, space)		cpunum_get_info_int(cpunum, CPUINFO_INT_LOGADDR_WIDTH + (space))
-#define cpunum_page_shift(cpunum, space)		cpunum_get_info_int(cpunum, CPUINFO_INT_PAGE_SHIFT + (space))
-#define cpunum_get_reg(cpunum, reg)				cpunum_get_info_int(cpunum, CPUINFO_INT_REGISTER + (reg))
-#define cpunum_debug_register_list(cpunum)		cpunum_get_info_ptr(cpunum, CPUINFO_PTR_DEBUG_REGISTER_LIST)
-#define cpunum_name(cpunum)						cpunum_get_info_string(cpunum, CPUINFO_STR_NAME)
-#define cpunum_core_family(cpunum)				cpunum_get_info_string(cpunum, CPUINFO_STR_CORE_FAMILY)
-#define cpunum_core_version(cpunum)				cpunum_get_info_string(cpunum, CPUINFO_STR_CORE_VERSION)
-#define cpunum_core_file(cpunum)				cpunum_get_info_string(cpunum, CPUINFO_STR_CORE_FILE)
-#define cpunum_core_credits(cpunum)				cpunum_get_info_string(cpunum, CPUINFO_STR_CORE_CREDITS)
-#define cpunum_flags(cpunum)					cpunum_get_info_string(cpunum, CPUINFO_STR_FLAGS)
-#define cpunum_irq_string(cpunum, irq)			cpunum_get_info_string(cpunum, CPUINFO_STR_IRQ_STATE + (irq))
-#define cpunum_reg_string(cpunum, reg)			cpunum_get_info_string(cpunum, CPUINFO_STR_REGISTER + (reg))
+#define cpu_get_context_size(cpu)				cpu_get_info_int(cpu, CPUINFO_INT_CONTEXT_SIZE)
+#define cpu_get_input_lines(cpu)				cpu_get_info_int(cpu, CPUINFO_INT_INPUT_LINES)
+#define cpu_get_output_lines(cpu)				cpu_get_info_int(cpu, CPUINFO_INT_OUTPUT_LINES)
+#define cpu_get_default_irq_vector(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_DEFAULT_IRQ_VECTOR)
+#define cpu_get_endianness(cpu)					cpu_get_info_int(cpu, CPUINFO_INT_ENDIANNESS)
+#define cpu_get_clock_multiplier(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_CLOCK_MULTIPLIER)
+#define cpu_get_clock_divider(cpu)				cpu_get_info_int(cpu, CPUINFO_INT_CLOCK_DIVIDER)
+#define cpu_get_min_opcode_bytes(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_MIN_INSTRUCTION_BYTES)
+#define cpu_get_max_opcode_bytes(cpu)			cpu_get_info_int(cpu, CPUINFO_INT_MAX_INSTRUCTION_BYTES)
+#define cpu_get_min_cycles(cpu)					cpu_get_info_int(cpu, CPUINFO_INT_MIN_CYCLES)
+#define cpu_get_max_cycles(cpu)					cpu_get_info_int(cpu, CPUINFO_INT_MAX_CYCLES)
+#define cpu_get_databus_width(cpu, space)		cpu_get_info_int(cpu, CPUINFO_INT_DATABUS_WIDTH + (space))
+#define cpu_get_addrbus_width(cpu, space)		cpu_get_info_int(cpu, CPUINFO_INT_ADDRBUS_WIDTH + (space))
+#define cpu_get_addrbus_shift(cpu, space)		cpu_get_info_int(cpu, CPUINFO_INT_ADDRBUS_SHIFT + (space))
+#define cpu_get_logaddr_width(cpu, space)		cpu_get_info_int(cpu, CPUINFO_INT_LOGADDR_WIDTH + (space))
+#define cpu_get_page_shift(cpu, space)			cpu_get_info_int(cpu, CPUINFO_INT_PAGE_SHIFT + (space))
+#define cpu_get_reg(cpu, reg)					cpu_get_info_int(cpu, CPUINFO_INT_REGISTER + (reg))
+#define	cpu_get_previouspc(cpu)					((offs_t)cpu_get_info_int(cpu, REG_PREVIOUSPC))
+#define	cpu_get_pc(cpu)							((offs_t)cpu_get_reg(cpu, REG_PC))
+#define	cpu_get_sp(cpu)							cpu_get_reg(cpu, REG_SP)
+#define cpu_get_debug_register_list(cpu)		cpu_get_info_ptr(cpu, CPUINFO_PTR_DEBUG_REGISTER_LIST)
+#define cpu_get_name(cpu)						cpu_get_info_string(cpu, CPUINFO_STR_NAME)
+#define cpu_get_core_family(cpu)				cpu_get_info_string(cpu, CPUINFO_STR_CORE_FAMILY)
+#define cpu_get_core_version(cpu)				cpu_get_info_string(cpu, CPUINFO_STR_CORE_VERSION)
+#define cpu_get_core_file(cpu)					cpu_get_info_string(cpu, CPUINFO_STR_CORE_FILE)
+#define cpu_get_core_credits(cpu)				cpu_get_info_string(cpu, CPUINFO_STR_CORE_CREDITS)
+#define cpu_get_flags_string(cpu)				cpu_get_info_string(cpu, CPUINFO_STR_FLAGS)
+#define cpu_get_irq_string(cpu, irq)			cpu_get_info_string(cpu, CPUINFO_STR_IRQ_STATE + (irq))
+#define cpu_get_reg_string(cpu, reg)			cpu_get_info_string(cpu, CPUINFO_STR_REGISTER + (reg))
 
-#define cpunum_set_reg(cpunum, reg, val)		cpunum_set_info_int(cpunum, CPUINFO_INT_REGISTER + (reg), (val))
+#define cpu_set_reg(cpu, reg, val)			cpu_set_info_int(cpu, CPUINFO_INT_REGISTER + (reg), (val))
 
 
 
@@ -559,16 +496,6 @@ const char *cputype_get_info_string(cpu_type cputype, UINT32 state);
 
 
 /***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define		activecpu_get_previouspc()			((offs_t)activecpu_get_reg(REG_PREVIOUSPC))
-#define		activecpu_get_pc()					((offs_t)activecpu_get_reg(REG_PC))
-#define		activecpu_get_sp()					activecpu_get_reg(REG_SP)
-
-
-
-/***************************************************************************
     CPU INTERFACE ACCESSORS
 ***************************************************************************/
 
@@ -580,19 +507,27 @@ INLINE const cpu_interface *cputype_get_interface(cpu_type cputype)
 }
 
 
-/* return a the index of the active CPU */
-INLINE int cpu_getactivecpu(void)
+/* return the index of the active CPU */
+INLINE int cpunum_get_active(void)
 {
-	extern int activecpu;
-	return activecpu;
+	extern int activecpunum;
+	return activecpunum;
 }
 
 
-/* return a the index of the executing CPU */
-INLINE int cpu_getexecutingcpu(void)
+/* return a pointer to the executing CPU */
+INLINE const device_config *cpu_get_executing(void)
 {
-	extern int executingcpu;
+	extern const device_config *executingcpu;
 	return executingcpu;
+}
+
+
+/* return the index of the executing CPU */
+INLINE int cpunum_get_executing(void)
+{
+	extern int executingcpunum;
+	return executingcpunum;
 }
 
 
@@ -605,9 +540,9 @@ INLINE int cpu_gettotalcpu(void)
 
 
 /* return the current PC or ~0 if no CPU is active */
-INLINE offs_t safe_activecpu_get_pc(void)
+INLINE offs_t safe_cpu_get_pc(const device_config *cpu)
 {
-	return (cpu_getactivecpu() >= 0) ? activecpu_get_pc() : ~0;
+	return (cpu != NULL) ? cpu_get_pc(cpu) : ~0;
 }
 
 

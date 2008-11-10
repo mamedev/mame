@@ -149,7 +149,7 @@ static MACHINE_RESET( atetris )
 static READ8_HANDLER( atetris_slapstic_r )
 {
 	int result = slapstic_base[0x2000 + offset];
-	int new_bank = slapstic_tweak(offset) & 1;
+	int new_bank = slapstic_tweak(machine, offset) & 1;
 
 	/* update for the new bank */
 	if (new_bank != current_bank)

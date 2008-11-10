@@ -107,7 +107,7 @@ static TIMER_CALLBACK( snes_hirq_tick_callback )
 static TIMER_CALLBACK( snes_scanline_tick )
 {
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
-	cpuintrf_push_context(0);
+	cpu_push_context(machine->cpu[0]);
 
 	/* Increase current line - we want to latch on this line during it, not after it */
 	snes_ppu.beam.current_vert = video_screen_get_vpos(machine->primary_screen);
@@ -232,7 +232,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		cpunum_set_input_line(machine, 0, G65816_LINE_NMI, CLEAR_LINE );
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	timer_adjust_oneshot(snes_scanline_timer, attotime_never, 0);
 	timer_adjust_oneshot(snes_hblank_timer, video_screen_get_time_until_pos(machine->primary_screen, snes_ppu.beam.current_vert, hblank_offset*snes_htmult), 0);
@@ -249,7 +249,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 	timer_adjust_oneshot(snes_hblank_timer, attotime_never, 0);
 
 	// we must guarantee the 65816's context for HDMA to work
-  	cpuintrf_push_context(0);
+  	cpu_push_context(machine->cpu[0]);
 
 	/* draw a scanline */
 	if (snes_ppu.beam.current_vert <= snes_ppu.beam.last_visible_line)
@@ -264,7 +264,7 @@ static TIMER_CALLBACK( snes_hblank_tick )
 		}
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	// signal hblank
 	snes_ram[HVBJOY] |= 0x40;
@@ -571,7 +571,7 @@ READ8_HANDLER( snes_r_io )
 //      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc
 
 		default:
-			mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,activecpu_get_pc());
+			mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(machine->activecpu));
 #endif	/* MESS */
 
 	}
@@ -1542,12 +1542,12 @@ static void snes_init_ram(running_machine *machine)
 
 	/* Init work RAM - 0x55 isn't exactly right but it's close */
 	/* make sure it happens to the 65816 (CPU 0) */
-	cpuintrf_push_context(0);
+	cpu_push_context(machine->cpu[0]);
 	for (i = 0; i < (128*1024); i++)
 	{
 		program_write_byte(0x7e0000 + i, 0x55);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* Inititialize registers/variables */
 	snes_ppu.update_windows = 1;

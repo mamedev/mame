@@ -74,7 +74,7 @@ WRITE16_HANDLER(nile_sndctrl_w)
 
 	COMBINE_DATA(&info->ctrl);
 
-//  printf("CTRL: %04x -> %04x (PC=%x)\n", ctrl, info->ctrl, activecpu_get_pc());
+//  printf("CTRL: %04x -> %04x (PC=%x)\n", ctrl, info->ctrl, cpu_get_pc(machine->activecpu));
 
 	ctrl^=info->ctrl;
 }
@@ -129,7 +129,7 @@ WRITE16_HANDLER(nile_snd_w)
 		info->vpos[v] = info->frac[v] = info->lponce[v] = 0;
 	}
 
-//  printf("v%02d: %04x to reg %02d (PC=%x)\n", v, nile_sound_regs[offset], r, activecpu_get_pc());
+//  printf("v%02d: %04x to reg %02d (PC=%x)\n", v, nile_sound_regs[offset], r, cpu_get_pc(machine->activecpu));
 }
 
 static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)

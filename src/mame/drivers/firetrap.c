@@ -114,7 +114,7 @@ static MACHINE_RESET( firetrap )
 
 static READ8_HANDLER( firetrap_8751_r )
 {
-	//logerror("PC:%04x read from 8751\n",activecpu_get_pc());
+	//logerror("PC:%04x read from 8751\n",cpu_get_pc(machine->activecpu));
 	return i8751_return;
 }
 
@@ -189,7 +189,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 		i8751_return=3;
 	else {
 		i8751_return=0xff;
-		logerror("%04x: Unknown i8751 command %02x!\n",activecpu_get_pc(),data);
+		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(machine->activecpu),data);
 	}
 
 	/* Signal main cpu task is complete */

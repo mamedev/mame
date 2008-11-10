@@ -317,7 +317,7 @@ static READ8_HANDLER( dip_switch_r )
 {
 	UINT8 ret = 0x00;
 
-if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, activecpu_get_pc(), protection_data);
+if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, cpu_get_pc(machine->activecpu), protection_data);
 	switch (offset)
 	{
 	case 0x01:
@@ -328,7 +328,7 @@ if (LOG_PROT) logerror("DIP SW Read: %x at %x (prot data %x)\n", offset, activec
 		break;
 
 	case 0x02:
-		if (activecpu_get_pc() == 0x07e5)
+		if (cpu_get_pc(machine->activecpu) == 0x07e5)
 			ret = 0xaa;
 		else
 			ret = 0xf4;
@@ -363,7 +363,7 @@ static READ8_HANDLER( sound_latch_r )
 
 static WRITE8_HANDLER( protection_data_w )
 {
-if (LOG_PROT) logerror("Protection Data Write: %x at %x\n", data, safe_activecpu_get_pc());
+if (LOG_PROT) logerror("Protection Data Write: %x at %x\n", data, safe_cpu_get_pc(machine->activecpu));
 	protection_data = data;
 }
 

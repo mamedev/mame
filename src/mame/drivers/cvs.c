@@ -153,7 +153,7 @@ UINT8 cvs_get_character_banking_mode(void)
 
 READ8_HANDLER( cvs_video_or_color_ram_r )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		return cvs_video_ram[offset];
 	else
 		return cvs_color_ram[offset];
@@ -161,7 +161,7 @@ READ8_HANDLER( cvs_video_or_color_ram_r )
 
 WRITE8_HANDLER( cvs_video_or_color_ram_w )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		cvs_video_ram[offset] = data;
 	else
 		cvs_color_ram[offset] = data;
@@ -170,7 +170,7 @@ WRITE8_HANDLER( cvs_video_or_color_ram_w )
 
 READ8_HANDLER( cvs_bullet_ram_or_palette_r )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		return cvs_palette_ram[offset & 0x0f];
 	else
 		return cvs_bullet_ram[offset];
@@ -178,7 +178,7 @@ READ8_HANDLER( cvs_bullet_ram_or_palette_r )
 
 WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		cvs_palette_ram[offset & 0x0f] = data;
 	else
 		cvs_bullet_ram[offset] = data;
@@ -187,7 +187,7 @@ WRITE8_HANDLER( cvs_bullet_ram_or_palette_w )
 
 READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		return cvs_character_ram[(0 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
 		return cvs_s2636_0_ram[offset];
@@ -195,7 +195,7 @@ READ8_HANDLER( cvs_s2636_0_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		cvs_character_ram[(0 * 0x800) | 0x400 | character_ram_page_start | offset] = data;
 	else
 		cvs_s2636_0_ram[offset] = data;
@@ -204,7 +204,7 @@ WRITE8_HANDLER( cvs_s2636_0_or_character_ram_w )
 
 READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		return cvs_character_ram[(1 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
 		return cvs_s2636_1_ram[offset];
@@ -212,7 +212,7 @@ READ8_HANDLER( cvs_s2636_1_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		cvs_character_ram[(1 * 0x800) | 0x400 | character_ram_page_start | offset] = data;
 	else
 		cvs_s2636_1_ram[offset] = data;
@@ -221,7 +221,7 @@ WRITE8_HANDLER( cvs_s2636_1_or_character_ram_w )
 
 READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		return cvs_character_ram[(2 * 0x800) | 0x400 | character_ram_page_start | offset];
 	else
 		return cvs_s2636_2_ram[offset];
@@ -229,7 +229,7 @@ READ8_HANDLER( cvs_s2636_2_or_character_ram_r )
 
 WRITE8_HANDLER( cvs_s2636_2_or_character_ram_w )
 {
-	if (activecpu_get_reg(S2650_FO))
+	if (cpu_get_reg(machine->activecpu, S2650_FO))
 		cvs_character_ram[(2 * 0x800) | 0x400 | character_ram_page_start | offset] = data;
 	else
 		cvs_s2636_2_ram[offset] = data;
@@ -283,7 +283,7 @@ static READ8_HANDLER( cvs_input_r )
 	case 0x04:  ret = input_port_read(machine, "IN3"); break;
 	case 0x06:  ret = input_port_read(machine, "DSW3"); break;
 	case 0x07:  ret = input_port_read(machine, "DSW2"); break;
-	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", activecpu_get_pc(), offset & 0x0f); break;
+	default:    logerror("%04x : CVS: Reading unmapped input port 0x%02x\n", cpu_get_pc(machine->activecpu), offset & 0x0f); break;
 	}
 
 	return ret;
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( cvs_speech_rom_address_lo_w )
 {
 	/* assuming that d0-d2 are cleared here */
 	speech_rom_bit_address = (speech_rom_bit_address & 0xf800) | (data << 3);
-	LOG(("%04x : CVS: Speech Address = %04x\n", activecpu_get_pc(), speech_rom_bit_address >> 3));
+	LOG(("%04x : CVS: Speech Address = %04x\n", cpu_get_pc(machine->activecpu), speech_rom_bit_address >> 3));
 }
 
 static WRITE8_HANDLER( cvs_speech_rom_address_hi_w )
@@ -400,7 +400,7 @@ static WRITE8_HANDLER( cvs_speech_rom_address_hi_w )
 static void cvs_set_speech_command_w(running_machine *machine, UINT8 data)
 {
 	soundlatch2_w(machine, 0, data & 0x7f);
-	if (~data & 0x40) LOG(("%04x : CVS: Speech Command W = %04x\n", activecpu_get_pc(), data & 0x7f));
+	if (~data & 0x40) LOG(("%04x : CVS: Speech Command W = %04x\n", cpu_get_pc(machine->activecpu), data & 0x7f));
 }
 
 
@@ -470,7 +470,7 @@ static WRITE8_HANDLER( audio_command_w )
 	   	soundlatch_w(machine, 0, data);
 		cvs_dac_cpu_interrupt();
 
-		LOG(("%04x : CVS: Audio command = %02x\n", activecpu_get_pc(), data));
+		LOG(("%04x : CVS: Audio command = %02x\n", cpu_get_pc(machine->activecpu), data));
 	}
 
 	cvs_set_speech_command_w(machine, data);

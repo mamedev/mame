@@ -100,7 +100,7 @@ static int copro_fifoin_pop(UINT32 *result)
 		if (dsp_type == DSP_TYPE_TGP)
 			return 0;
 
-		fatalerror("Copro FIFOIN underflow (at %08X)", activecpu_get_pc());
+		fatalerror("Copro FIFOIN underflow (at %08X)", cpu_get_pc(Machine->activecpu));
 		return 0;
 	}
 
@@ -116,15 +116,15 @@ static int copro_fifoin_pop(UINT32 *result)
 	{
 		if (copro_fifoin_num == 0)
 		{
-			cpuintrf_push_context(2);
+			cpu_push_context(Machine->cpu[2]);
 			sharc_set_flag_input(0, ASSERT_LINE);
-			cpuintrf_pop_context();
+			cpu_pop_context();
 		}
 		else
 		{
-			cpuintrf_push_context(2);
+			cpu_push_context(Machine->cpu[2]);
 			sharc_set_flag_input(0, CLEAR_LINE);
-			cpuintrf_pop_context();
+			cpu_pop_context();
 		}
 	}
 
@@ -137,11 +137,11 @@ static void copro_fifoin_push(UINT32 data)
 {
 	if (copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
-		fatalerror("Copro FIFOIN overflow (at %08X)", activecpu_get_pc());
+		fatalerror("Copro FIFOIN overflow (at %08X)", cpu_get_pc(Machine->activecpu));
 		return;
 	}
 
-	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", activecpu_get_pc(), data, *(float*)&data);
+	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", cpu_get_pc(Machine->activecpu), data, *(float*)&data);
 
 	copro_fifoin_data[copro_fifoin_wpos++] = data;
 	if (copro_fifoin_wpos == COPRO_FIFOIN_SIZE)
@@ -154,9 +154,9 @@ static void copro_fifoin_push(UINT32 data)
 	// clear FIFO empty flag on SHARC
 	if (dsp_type == DSP_TYPE_SHARC)
 	{
-		cpuintrf_push_context(2);
+		cpu_push_context(Machine->cpu[2]);
 		sharc_set_flag_input(0, CLEAR_LINE);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 }
 
@@ -196,15 +196,15 @@ static UINT32 copro_fifoout_pop(void)
 	{
 		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			cpuintrf_push_context(2);
+			cpu_push_context(Machine->cpu[2]);
 			sharc_set_flag_input(1, ASSERT_LINE);
-			cpuintrf_pop_context();
+			cpu_pop_context();
 		}
 		else
 		{
-			cpuintrf_push_context(2);
+			cpu_push_context(Machine->cpu[2]);
 			sharc_set_flag_input(1, CLEAR_LINE);
-			cpuintrf_pop_context();
+			cpu_pop_context();
 		}
 	}
 
@@ -216,7 +216,7 @@ static void copro_fifoout_push(UINT32 data)
 	//if (copro_fifoout_wpos == copro_fifoout_rpos)
 	if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 	{
-		fatalerror("Copro FIFOOUT overflow (at %08X)", activecpu_get_pc());
+		fatalerror("Copro FIFOOUT overflow (at %08X)", cpu_get_pc(Machine->activecpu));
 		return;
 	}
 
@@ -235,17 +235,17 @@ static void copro_fifoout_push(UINT32 data)
 	{
 		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			cpuintrf_push_context(2);
+			cpu_push_context(Machine->cpu[2]);
 			sharc_set_flag_input(1, ASSERT_LINE);
-			cpuintrf_pop_context();
+			cpu_pop_context();
 
 			//cpunum_set_input_line(Machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
 		}
 		else
 		{
-			cpuintrf_push_context(2);
+			cpu_push_context(Machine->cpu[2]);
 			sharc_set_flag_input(1, CLEAR_LINE);
-			cpuintrf_pop_context();
+			cpu_pop_context();
 
 			//cpunum_set_input_line(Machine, 2, SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
@@ -570,9 +570,9 @@ static WRITE32_HANDLER(copro_fifo_w)
 	{
 		if (dsp_type == DSP_TYPE_SHARC)
 		{
-			cpuintrf_push_context(2);
+			cpu_push_context(machine->cpu[2]);
 			sharc_external_dma_write(model2_coprocnt, data & 0xffff);
-			cpuintrf_pop_context();
+			cpu_pop_context();
 		}
 		else if (dsp_type == DSP_TYPE_TGP)
 		{
@@ -583,7 +583,7 @@ static WRITE32_HANDLER(copro_fifo_w)
 	}
 	else
 	{
-		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 		copro_fifoin_push(data);
 	}
 }
@@ -597,9 +597,9 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 		(strcmp(machine->gamedrv->name, "vstriker" ) == 0) ||
 		(strcmp(machine->gamedrv->name, "gunblade" ) == 0))
 	{
-		cpuintrf_push_context(2);
+		cpu_push_context(machine->cpu[2]);
 		sharc_external_iop_write(offset, data);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 	else
 	{
@@ -610,9 +610,9 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 		else
 		{
 			iop_data |= (data & 0xffff) << 16;
-			cpuintrf_push_context(2);
+			cpu_push_context(machine->cpu[2]);
 			sharc_external_iop_write(offset, iop_data);
-			cpuintrf_pop_context();
+			cpu_pop_context();
 		}
 		iop_write_num++;
 	}
@@ -687,15 +687,15 @@ static WRITE32_HANDLER(geo_sharc_fifo_w)
 {
     if (model2_geoctl & 0x80000000)
     {
-        cpuintrf_push_context(3);
+        cpu_push_context(machine->cpu[3]);
         sharc_external_dma_write(model2_geocnt, data & 0xffff);
-        cpuintrf_pop_context();
+        cpu_pop_context();
 
         model2_geocnt++;
     }
     else
     {
-        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
     }
 }
 
@@ -705,9 +705,9 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
 {
     if ((strcmp(machine->gamedrv->name, "schamp" ) == 0))
     {
-        cpuintrf_push_context(3);
+        cpu_push_context(machine->cpu[3]);
         sharc_external_iop_write(offset, data);
-        cpuintrf_pop_context();
+        cpu_pop_context();
     }
     else
     {
@@ -718,9 +718,9 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
         else
         {
             geo_iop_data |= (data & 0xffff) << 16;
-            cpuintrf_push_context(3);
+            cpu_push_context(machine->cpu[3]);
             sharc_external_iop_write(offset, geo_iop_data);
-            cpuintrf_pop_context();
+            cpu_pop_context();
         }
         geo_iop_write_num++;
     }
@@ -767,7 +767,7 @@ static READ32_HANDLER( geo_r )
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	mame_printf_debug("geo_r: PC:%08x - %08X\n", safe_activecpu_get_pc(), address);
+	mame_printf_debug("geo_r: PC:%08x - %08X\n", safe_cpu_get_pc(machine->activecpu), address);
 
 	return 0;
 }
@@ -901,7 +901,7 @@ static int to_68k;
 
 static int snd_68k_ready_r(void)
 {
-	int sr = cpunum_get_reg(1, M68K_SR);
+	int sr = cpu_get_reg(Machine->cpu[1], M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
@@ -1005,7 +1005,7 @@ static READ32_HANDLER( model2_prot_r )
 		else
 			return 0xfff0;
 	}
-	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, activecpu_get_pc());
+	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
 
 	return retval;
 }
@@ -1075,7 +1075,7 @@ static WRITE32_HANDLER( model2_prot_w )
 			strcpy((char *)protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00");
 		}
 	}
-	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, activecpu_get_pc());
+	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 
 }
 
@@ -1744,7 +1744,7 @@ static const scsp_interface scsp_config =
 static READ32_HANDLER(copro_sharc_input_fifo_r)
 {
 	UINT32 result;
-	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", activecpu_get_pc());
+	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(machine->activecpu));
 
 	copro_fifoin_pop(&result);
 	return result;
@@ -1763,7 +1763,7 @@ static READ32_HANDLER(copro_sharc_buffer_r)
 
 static WRITE32_HANDLER(copro_sharc_buffer_w)
 {
-	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, activecpu_get_pc(), data, *(float*)&data);
+	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(machine->activecpu), data, *(float*)&data);
 	model2_bufferram[offset & 0x7fff] = data;
 }
 

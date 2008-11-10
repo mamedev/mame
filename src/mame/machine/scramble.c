@@ -88,7 +88,7 @@ static WRITE8_DEVICE_HANDLER( scramble_protection_w )
 
 static READ8_DEVICE_HANDLER( scramble_protection_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(device->machine->activecpu))
 	{
 	case 0x00a8: return 0xf0;
 	case 0x00be: return 0xb0;
@@ -99,7 +99,7 @@ static READ8_DEVICE_HANDLER( scramble_protection_r )
 	case 0x1ca2: return 0x00;  /* I don't think it's checked */
 	case 0x1d7e: return 0xb0;
 	default:
-		logerror("%04x: read protection\n",activecpu_get_pc());
+		logerror("%04x: read protection\n",cpu_get_pc(device->machine->activecpu));
 		return 0;
 	}
 }
@@ -118,16 +118,16 @@ static READ8_HANDLER( mariner_protection_2_r )
 
 READ8_HANDLER( triplep_pip_r )
 {
-	logerror("PC %04x: triplep read port 2\n",activecpu_get_pc());
-	if (activecpu_get_pc() == 0x015a) return 0xff;
-	else if (activecpu_get_pc() == 0x0886) return 0x05;
+	logerror("PC %04x: triplep read port 2\n",cpu_get_pc(machine->activecpu));
+	if (cpu_get_pc(machine->activecpu) == 0x015a) return 0xff;
+	else if (cpu_get_pc(machine->activecpu) == 0x0886) return 0x05;
 	else return 0;
 }
 
 READ8_HANDLER( triplep_pap_r )
 {
-	logerror("PC %04x: triplep read port 3\n",activecpu_get_pc());
-	if (activecpu_get_pc() == 0x015d) return 0x04;
+	logerror("PC %04x: triplep read port 3\n",cpu_get_pc(machine->activecpu));
+	if (cpu_get_pc(machine->activecpu) == 0x015d) return 0x04;
 	else return 0;
 }
 

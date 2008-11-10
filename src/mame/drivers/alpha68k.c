@@ -246,7 +246,7 @@ static WRITE16_HANDLER( tnexspce_coin_counters_w )
 
 static WRITE16_HANDLER( tnexspce_unknown_w )
 {
-	logerror("tnexspce_unknown_w : PC = %04x - offset = %04x - data = %04x\n",activecpu_get_pc(),offset,data);
+	logerror("tnexspce_unknown_w : PC = %04x - offset = %04x - data = %04x\n",cpu_get_pc(machine->activecpu),offset,data);
 	if (offset==0)
 	{
 		alpha68k_flipscreen_w(data & 0x100);
@@ -255,7 +255,7 @@ static WRITE16_HANDLER( tnexspce_unknown_w )
 
 static WRITE16_HANDLER( alpha_microcontroller_w )
 {
-	logerror("%04x:  Alpha write trigger at %04x (%04x)\n",activecpu_get_pc(),offset,data);
+	logerror("%04x:  Alpha write trigger at %04x (%04x)\n",cpu_get_pc(machine->activecpu),offset,data);
 	/* 0x44 = coin clear signal to microcontroller? */
 	if (offset==0x2d && ACCESSING_BITS_0_7)
 		alpha68k_flipscreen_w(data & 1);
@@ -437,7 +437,7 @@ static READ16_HANDLER( kyros_alpha_trigger_r )
 			break;
 	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n",activecpu_get_pc(),offset);
+	logerror("%04x:  Alpha read trigger at %04x\n",cpu_get_pc(machine->activecpu),offset);
 
 	return 0; /* Values returned don't matter */
 }
@@ -533,7 +533,7 @@ static READ16_HANDLER( alpha_II_trigger_r )
 			break;
 	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n",activecpu_get_pc(),offset);
+	logerror("%04x:  Alpha read trigger at %04x\n",cpu_get_pc(machine->activecpu),offset);
 
 	return 0; /* Values returned don't matter */
 }
@@ -679,7 +679,7 @@ static READ16_HANDLER( alpha_V_trigger_r )
 			break;
 	}
 
-	logerror("%04x:  Alpha read trigger at %04x\n",activecpu_get_pc(),offset);
+	logerror("%04x:  Alpha read trigger at %04x\n",cpu_get_pc(machine->activecpu),offset);
 
 	return 0; /* Values returned don't matter */
 }
@@ -3029,7 +3029,7 @@ static READ16_HANDLER( timesold_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x9ea2 && (ret&0xff00)==0) {
+	if (cpu_get_pc(machine->activecpu)==0x9ea2 && (ret&0xff00)==0) {
 		cpu_spinuntil_int();
 		return 0x100 | (ret&0xff);
 	}
@@ -3041,7 +3041,7 @@ static READ16_HANDLER( timesol1_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x9e20 && (ret&0xff00)==0) {
+	if (cpu_get_pc(machine->activecpu)==0x9e20 && (ret&0xff00)==0) {
 		cpu_spinuntil_int();
 		return 0x100 | (ret&0xff);
 	}
@@ -3053,7 +3053,7 @@ static READ16_HANDLER( btlfield_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x9e1c && (ret&0xff00)==0) {
+	if (cpu_get_pc(machine->activecpu)==0x9e1c && (ret&0xff00)==0) {
 		cpu_spinuntil_int();
 		return 0x100 | (ret&0xff);
 	}
@@ -3065,7 +3065,7 @@ static READ16_HANDLER( skysoldr_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x1f4e && (ret&0xff00)==0) {
+	if (cpu_get_pc(machine->activecpu)==0x1f4e && (ret&0xff00)==0) {
 		cpu_spinuntil_int();
 		return 0x100 | (ret&0xff);
 	}
@@ -3077,7 +3077,7 @@ static READ16_HANDLER( skyadvnt_cycle_r )
 {
 	int ret=shared_ram[0x4];
 
-	if (activecpu_get_pc()==0x1f78 && (ret&0xff00)==0) {
+	if (cpu_get_pc(machine->activecpu)==0x1f78 && (ret&0xff00)==0) {
 		cpu_spinuntil_int();
 		return 0x100 | (ret&0xff);
 	}
@@ -3089,7 +3089,7 @@ static READ16_HANDLER( gangwars_cycle_r )
 {
 	int ret=shared_ram[0x103];
 
-	if (activecpu_get_pc()==0xbbb6) {
+	if (cpu_get_pc(machine->activecpu)==0xbbb6) {
 		cpu_spinuntil_int();
 		return (ret+2) & 0xff;
 	}
@@ -3101,7 +3101,7 @@ static READ16_HANDLER( gangwarb_cycle_r )
 {
 	int ret=shared_ram[0x103];
 
-	if (activecpu_get_pc()==0xbbca) {
+	if (cpu_get_pc(machine->activecpu)==0xbbca) {
 		cpu_spinuntil_int();
 		return (ret+2) & 0xff;
 	}

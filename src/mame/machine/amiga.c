@@ -306,7 +306,7 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 
 static void amiga_m68k_reset(void)
 {
-	logerror("Executed RESET at PC=%06x\n", activecpu_get_pc());
+	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(Machine->activecpu));
 
 	/* Initialize the various chips */
 	cia_reset();
@@ -323,7 +323,7 @@ static void amiga_m68k_reset(void)
 		amiga_cia_w(Machine, 0x1001/2, 1, 0xffff);
 	}
 
-	if (activecpu_get_pc() < 0x80000)
+	if (cpu_get_pc(Machine->activecpu) < 0x80000)
 		memory_set_opbase(0);
 }
 
@@ -331,7 +331,7 @@ static void amiga_m68k_reset(void)
 MACHINE_RESET( amiga )
 {
 	/* set m68k reset  function */
-	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)amiga_m68k_reset);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)amiga_m68k_reset);
 
 	/* Initialize the various chips */
 	cia_reset();
@@ -999,7 +999,7 @@ static void blitter_setup(void)
 	/* is there another blitting in progress? */
 	if (CUSTOM_REG(REG_DMACON) & 0x4000)
 	{
-		logerror("PC: %08x - This program is playing tricks with the blitter\n", safe_activecpu_get_pc() );
+		logerror("PC: %08x - This program is playing tricks with the blitter\n", safe_cpu_get_pc(Machine->activecpu) );
 		return;
 	}
 
@@ -1079,7 +1079,7 @@ READ16_HANDLER( amiga_cia_r )
 	data = cia_read(machine, which, offset >> 7);
 
 	if (LOG_CIA)
-		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", safe_activecpu_get_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
+		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", safe_cpu_get_pc(machine->activecpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
 
 	return data << shift;
 }
@@ -1097,7 +1097,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	int which;
 
 	if (LOG_CIA)
-		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", safe_activecpu_get_pc(), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
+		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", safe_cpu_get_pc(machine->activecpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
 
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
@@ -1263,7 +1263,7 @@ READ16_HANDLER( amiga_custom_r )
 	}
 
 	if (LOG_CUSTOM)
-		logerror("%06X:read from custom %s\n", safe_activecpu_get_pc(), amiga_custom_names[offset & 0xff]);
+		logerror("%06X:read from custom %s\n", safe_cpu_get_pc(machine->activecpu), amiga_custom_names[offset & 0xff]);
 
 	return 0xffff;
 }
@@ -1292,7 +1292,7 @@ WRITE16_HANDLER( amiga_custom_w )
 	offset &= 0xff;
 
 	if (LOG_CUSTOM)
-		logerror("%06X:write to custom %s = %04X\n", safe_activecpu_get_pc(), amiga_custom_names[offset & 0xff], data);
+		logerror("%06X:write to custom %s = %04X\n", safe_cpu_get_pc(machine->activecpu), amiga_custom_names[offset & 0xff], data);
 
 	switch (offset)
 	{

@@ -54,7 +54,7 @@ static TIMER_CALLBACK(cop410_serial_tick)
 {
     int cpunum = param;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 
 	if (BIT(EN, 0))
 	{
@@ -126,7 +126,7 @@ static TIMER_CALLBACK(cop410_serial_tick)
 		SIO = ((SIO << 1) | IN_SI()) & 0x0f;
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 INLINE void WRITE_Q(UINT8 data)

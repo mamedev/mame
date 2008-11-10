@@ -195,13 +195,13 @@ static int from_mcu_pending, from_z80_pending, invert_coin_lockout;
 
 static READ8_HANDLER( in4_mcu_r )
 {
-//  logerror("%04x: in4_mcu_r\n",activecpu_get_pc());
+//  logerror("%04x: in4_mcu_r\n",cpu_get_pc(machine->activecpu));
 	return input_port_read(machine, "P2") | (from_mcu_pending << 6) | (from_z80_pending << 7);
 }
 
 static READ8_HANDLER( sqix_from_mcu_r )
 {
-//  logerror("%04x: read mcu answer (%02x)\n",activecpu_get_pc(),from_mcu);
+//  logerror("%04x: read mcu answer (%02x)\n",cpu_get_pc(machine->activecpu),from_mcu);
 	return from_mcu;
 }
 
@@ -220,7 +220,7 @@ static READ8_HANDLER( mcu_acknowledge_r )
 
 static WRITE8_HANDLER( sqix_z80_mcu_w )
 {
-//  logerror("%04x: sqix_z80_mcu_w %02x\n",activecpu_get_pc(),data);
+//  logerror("%04x: sqix_z80_mcu_w %02x\n",cpu_get_pc(machine->activecpu),data);
 	portb = data;
 }
 
@@ -256,7 +256,7 @@ static WRITE8_HANDLER( mcu_p1_w )
 		case 7:
 			if ((data & 1) == 0)
 			{
-//              logerror("%04x: MCU -> Z80 %02x\n",activecpu_get_pc(),port3);
+//              logerror("%04x: MCU -> Z80 %02x\n",cpu_get_pc(machine->activecpu),port3);
 				from_mcu = port3_latch;
 				from_mcu_pending = 1;
 				from_z80_pending = 0;	// ????
@@ -277,7 +277,7 @@ static READ8_HANDLER( mcu_p3_r )
 	}
 	else if ((port1 & 0x40) == 0)
 	{
-//      logerror("%04x: read Z80 command %02x\n",activecpu_get_pc(),from_z80);
+//      logerror("%04x: read Z80 command %02x\n",cpu_get_pc(machine->activecpu),from_z80);
 		from_z80_pending = 0;
 		return from_z80;
 	}
@@ -379,7 +379,7 @@ static UINT8 portA_in, portB_out, portC;
 
 static READ8_HANDLER( hotsmash_68705_portA_r )
 {
-//logerror("%04x: 68705 reads port A = %02x\n",activecpu_get_pc(),portA_in);
+//logerror("%04x: 68705 reads port A = %02x\n",cpu_get_pc(machine->activecpu),portA_in);
 	return portA_in;
 }
 
@@ -414,7 +414,7 @@ static WRITE8_HANDLER( hotsmash_68705_portC_w )
 
 			case 0x3:	// command from Z80
 				portA_in = from_z80;
-logerror("%04x: z80 reads command %02x\n",activecpu_get_pc(),from_z80);
+logerror("%04x: z80 reads command %02x\n",cpu_get_pc(machine->activecpu),from_z80);
 				break;
 
 			case 0x4:
@@ -442,14 +442,14 @@ static WRITE8_HANDLER( hotsmash_z80_mcu_w )
 
 static READ8_HANDLER(hotsmash_from_mcu_r)
 {
-logerror("%04x: z80 reads answer %02x\n",activecpu_get_pc(),from_mcu);
+logerror("%04x: z80 reads answer %02x\n",cpu_get_pc(machine->activecpu),from_mcu);
 	from_mcu_pending = 0;
 	return from_mcu;
 }
 
 static READ8_HANDLER(hotsmash_ay_port_a_r)
 {
-//logerror("%04x: ay_port_a_r and mcu_pending is %d\n",activecpu_get_pc(),from_mcu_pending);
+//logerror("%04x: ay_port_a_r and mcu_pending is %d\n",cpu_get_pc(machine->activecpu),from_mcu_pending);
 	return input_port_read(machine, "SYSTEM") | ((from_mcu_pending^1) << 7);
 }
 
@@ -478,13 +478,13 @@ static READ8_HANDLER(pbillian_from_mcu_r)
 		case 0x81: curr_player = 1; return 0;
 	}
 
-	logerror("408[%x] r at %x\n",from_z80,activecpu_get_pc());
+	logerror("408[%x] r at %x\n",from_z80,cpu_get_pc(machine->activecpu));
 	return 0;
 }
 
 static READ8_HANDLER(pbillian_ay_port_a_r)
 {
-//  logerror("%04x: ay_port_a_r\n",activecpu_get_pc());
+//  logerror("%04x: ay_port_a_r\n",cpu_get_pc(machine->activecpu));
 	 /* bits 76------  MCU status bits */
 	return (mame_rand(machine) & 0xc0) | input_port_read(machine, "BUTTONS");
 }

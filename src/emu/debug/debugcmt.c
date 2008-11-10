@@ -21,6 +21,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "xmlfile.h"
 #include "debugcmt.h"
 #include "debugcpu.h"
@@ -300,14 +301,14 @@ UINT32 debug_comment_all_change_count(void)
 
 UINT32 debug_comment_get_opcode_crc32(offs_t address)
 {
-	const debug_cpu_info *info = debug_get_cpu_info(cpu_getactivecpu());
+	const debug_cpu_info *info = debug_get_cpu_info(cpunum_get_active());
 	int i;
 	UINT32 crc;
 	UINT8 opbuf[64], argbuf[64];
 	char buff[256];
 	offs_t numbytes;
-	int maxbytes = activecpu_max_instruction_bytes();
-	UINT32 addrmask = (debug_get_cpu_info(cpu_getactivecpu()))->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
+	int maxbytes = cpu_get_max_opcode_bytes(Machine->activecpu);
+	UINT32 addrmask = (debug_get_cpu_info(cpunum_get_active()))->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
 
 	memset(opbuf, 0x00, sizeof(opbuf));
 	memset(argbuf, 0x00, sizeof(argbuf));
@@ -319,7 +320,7 @@ UINT32 debug_comment_get_opcode_crc32(offs_t address)
 		argbuf[i] = debug_read_opcode(address + i, 1, TRUE);
 	}
 
-	numbytes = activecpu_dasm(buff, address & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+	numbytes = cpu_dasm(Machine->activecpu, buff, address & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 	numbytes = ADDR2BYTE(numbytes, info, ADDRESS_SPACE_PROGRAM);
 
 	crc = crc32(0, argbuf, numbytes);

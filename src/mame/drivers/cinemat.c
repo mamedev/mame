@@ -155,7 +155,7 @@ static UINT8 joystick_read(void)
 		return 0;
 	else
 	{
-		int xval = (INT16)(cpunum_get_reg(0, CCPU_X) << 4) >> 4;
+		int xval = (INT16)(cpu_get_reg(Machine->cpu[0], CCPU_X) << 4) >> 4;
 		return (input_port_read_safe(Machine, mux_select ? "ANALOGX" : "ANALOGY", 0) - xval) < 0x800;
 	}
 }
@@ -281,7 +281,7 @@ static READ8_HANDLER( qb3_frame_r )
 
 static WRITE8_HANDLER( qb3_ram_bank_w )
 {
-	memory_set_bank(1, cpunum_get_reg(0, CCPU_P) & 3);
+	memory_set_bank(1, cpu_get_reg(machine->cpu[0], CCPU_P) & 3);
 }
 
 

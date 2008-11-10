@@ -817,14 +817,14 @@ static WRITE32_HANDLER( tms2_trigger_w )
 
 static READ32_HANDLER( drivedge_tms1_speedup_r )
 {
-	if (tms1_ram[0x382] == 0 && activecpu_get_pc() == 0xee) START_TMS_SPINNING(0);
+	if (tms1_ram[0x382] == 0 && cpu_get_pc(machine->activecpu) == 0xee) START_TMS_SPINNING(0);
 	return tms1_ram[0x382];
 }
 
 
 static READ32_HANDLER( drivedge_tms2_speedup_r )
 {
-	if (tms2_ram[0x382] == 0 && activecpu_get_pc() == 0x809808) START_TMS_SPINNING(1);
+	if (tms2_ram[0x382] == 0 && cpu_get_pc(machine->activecpu) == 0x809808) START_TMS_SPINNING(1);
 	return tms2_ram[0x382];
 }
 
@@ -946,10 +946,10 @@ static UINT8 written[0x8000];
 
 static READ32_HANDLER( test1_r )
 {
-	if (ACCESSING_BITS_24_31 && !written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+0);
-	if (ACCESSING_BITS_16_23 && !written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+1);
-	if (ACCESSING_BITS_8_15 && !written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+2);
-	if (ACCESSING_BITS_0_7 && !written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0x100 + offset*4+3);
+	if (ACCESSING_BITS_24_31 && !written[0x100 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(machine->activecpu), 0x100 + offset*4+0);
+	if (ACCESSING_BITS_16_23 && !written[0x100 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(machine->activecpu), 0x100 + offset*4+1);
+	if (ACCESSING_BITS_8_15 && !written[0x100 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(machine->activecpu), 0x100 + offset*4+2);
+	if (ACCESSING_BITS_0_7 && !written[0x100 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(machine->activecpu), 0x100 + offset*4+3);
 	return ((UINT32 *)main_ram)[0x100/4 + offset];
 }
 
@@ -964,10 +964,10 @@ static WRITE32_HANDLER( test1_w )
 
 static READ32_HANDLER( test2_r )
 {
-	if (ACCESSING_BITS_24_31 && !written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+0);
-	if (ACCESSING_BITS_16_23 && !written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+1);
-	if (ACCESSING_BITS_8_15 && !written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+2);
-	if (ACCESSING_BITS_0_7 && !written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", activecpu_get_pc(), 0xc00 + offset*4+3);
+	if (ACCESSING_BITS_24_31 && !written[0xc00 + offset*4+0]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(machine->activecpu), 0xc00 + offset*4+0);
+	if (ACCESSING_BITS_16_23 && !written[0xc00 + offset*4+1]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(machine->activecpu), 0xc00 + offset*4+1);
+	if (ACCESSING_BITS_8_15 && !written[0xc00 + offset*4+2]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(machine->activecpu), 0xc00 + offset*4+2);
+	if (ACCESSING_BITS_0_7 && !written[0xc00 + offset*4+3]) logerror("%06X:read from uninitialized memory %04X\n", cpu_get_pc(machine->activecpu), 0xc00 + offset*4+3);
 	return ((UINT32 *)main_ram)[0xc00/4 + offset];
 }
 

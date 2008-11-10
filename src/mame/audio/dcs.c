@@ -904,7 +904,7 @@ static void dcs_register_state(void)
 }
 
 
-void dcs_init(void)
+void dcs_init(running_machine *machine)
 {
 	memset(&dcs, 0, sizeof(dcs));
 	dcs_sram = NULL;
@@ -915,8 +915,8 @@ void dcs_init(void)
 	dcs.channels = 1;
 
 	/* initialize the ADSP Tx and timer callbacks */
-	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
-	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
+	cpu_set_info_fct(machine->cpu[dcs.cpunum], CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
+	cpu_set_info_fct(machine->cpu[dcs.cpunum], CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
 
 	/* configure boot and sound ROMs */
 	dcs.bootrom = (UINT16 *)memory_region(Machine, "dcs");
@@ -966,8 +966,8 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	dcs.channels = 2;
 
 	/* initialize the ADSP Tx and timer callbacks */
-	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
-	cpunum_set_info_fct(dcs.cpunum, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
+	cpu_set_info_fct(machine->cpu[dcs.cpunum], CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)sound_tx_callback);
+	cpu_set_info_fct(machine->cpu[dcs.cpunum], CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
 
 	/* always boot from the base of "dcs" */
 	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
@@ -1407,19 +1407,19 @@ static WRITE16_HANDLER( denver_w )
 WRITE32_HANDLER( dsio_idma_addr_w )
 {
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_addr = %04X\n", activecpu_get_pc(), data);
-	cpuintrf_push_context(dcs.cpunum);
+		logerror("%08X:IDMA_addr = %04X\n", cpu_get_pc(machine->activecpu), data);
+	cpu_push_context(machine->cpu[dcs.cpunum]);
 	adsp2181_idma_addr_w(data);
 	if (data == 0)
 		dsio.start_on_next_write = 2;
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
 WRITE32_HANDLER( dsio_idma_data_w )
 {
-	UINT32 pc = activecpu_get_pc();
-	cpuintrf_push_context(dcs.cpunum);
+	UINT32 pc = cpu_get_pc(machine->activecpu);
+	cpu_push_context(machine->cpu[dcs.cpunum]);
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS)
@@ -1432,7 +1432,7 @@ WRITE32_HANDLER( dsio_idma_data_w )
 			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(), data >> 16);
 		adsp2181_idma_data_w(data >> 16);
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
 		logerror("Starting DSIO CPU\n");
@@ -1444,11 +1444,11 @@ WRITE32_HANDLER( dsio_idma_data_w )
 READ32_HANDLER( dsio_idma_data_r )
 {
 	UINT32 result;
-	cpuintrf_push_context(dcs.cpunum);
+	cpu_push_context(machine->cpu[dcs.cpunum]);
 	result = adsp2181_idma_data_r();
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_data_r(%04X) = %04X\n", activecpu_get_pc(), adsp2181_idma_addr_r(), result);
+		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(machine->activecpu), adsp2181_idma_addr_r(), result);
 	return result;
 }
 
@@ -1486,7 +1486,7 @@ void dcs_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		logerror("%08x: DCS reset = %d\n", safe_activecpu_get_pc(), state);
+		logerror("%08x: DCS reset = %d\n", safe_cpu_get_pc(Machine->activecpu), state);
 
 		/* just run through the init code again */
 		timer_call_after_resynch(NULL, 0, dcs_reset);
@@ -1531,7 +1531,7 @@ static READ16_HANDLER( fifo_input_r )
 static void dcs_delayed_data_w(running_machine *machine, int data)
 {
 	if (LOG_DCS_IO)
-		logerror("%08X:dcs_data_w(%04X)\n", activecpu_get_pc(), data);
+		logerror("%08X:dcs_data_w(%04X)\n", cpu_get_pc(machine->activecpu), data);
 
 	/* boost the interleave temporarily */
 	cpu_boost_interleave(machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
@@ -1583,7 +1583,7 @@ static READ16_HANDLER( input_latch_r )
 	if (dcs.auto_ack)
 		input_latch_ack_w(machine,0,0,0xffff);
 	if (LOG_DCS_IO)
-		logerror("%08X:input_latch_r(%04X)\n", activecpu_get_pc(), dcs.input_data);
+		logerror("%08X:input_latch_r(%04X)\n", cpu_get_pc(machine->activecpu), dcs.input_data);
 	return dcs.input_data;
 }
 
@@ -1605,7 +1605,7 @@ static TIMER_CALLBACK( latch_delayed_w )
 static WRITE16_HANDLER( output_latch_w )
 {
 	if (LOG_DCS_IO)
-		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", activecpu_get_pc(), data, IS_OUTPUT_EMPTY());
+		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", cpu_get_pc(machine->activecpu), data, IS_OUTPUT_EMPTY());
 	timer_call_after_resynch(NULL, data, latch_delayed_w);
 }
 
@@ -1637,7 +1637,7 @@ int dcs_data_r(void)
 		delayed_ack_w();
 
 	if (LOG_DCS_IO)
-		logerror("%08X:dcs_data_r(%04X)\n", activecpu_get_pc(), dcs.output_data);
+		logerror("%08X:dcs_data_r(%04X)\n", cpu_get_pc(Machine->activecpu), dcs.output_data);
 	return dcs.output_data;
 }
 
@@ -1659,7 +1659,7 @@ static TIMER_CALLBACK( output_control_delayed_w )
 static WRITE16_HANDLER( output_control_w )
 {
 	if (LOG_DCS_IO)
-		logerror("%04X:output_control = %04X\n", activecpu_get_pc(), data);
+		logerror("%04X:output_control = %04X\n", cpu_get_pc(machine->activecpu), data);
 	timer_call_after_resynch(NULL, data, output_control_delayed_w);
 }
 
@@ -1746,7 +1746,7 @@ static void reset_timer(void)
 	{
 		/* Road Burners: @ 28: JMP $0032  18032F, same code at $32 */
 
-		cpuintrf_push_context(dcs.cpunum);
+		cpu_push_context(Machine->cpu[dcs.cpunum]);
 		if (program_read_dword(0x18*4) == 0x0c0030 &&		/* ENA SEC_REG */
 			program_read_dword(0x19*4) == 0x804828 &&		/* SI = DM($0482) */
 			program_read_dword(0x1a*4) == 0x904828 &&		/* DM($0482) = SI */
@@ -1755,7 +1755,7 @@ static void reset_timer(void)
 		{
 			dcs.timer_ignore = TRUE;
 		}
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 
 	/* adjust the timer if not optimized */
@@ -1844,7 +1844,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			/* bit 9 forces a reset */
 			if (data & 0x0200)
 			{
-				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", activecpu_get_pc());
+				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", cpu_get_pc(machine->activecpu));
 				cpunum_set_input_line(machine, dcs.cpunum, INPUT_LINE_RESET, PULSE_LINE);
 				dcs_boot();
 				dcs.control_regs[SYSCONTROL_REG] = 0;
@@ -1912,7 +1912,7 @@ static WRITE16_HANDLER( adsp_control_w )
 static TIMER_CALLBACK( dcs_irq )
 {
 	/* get the index register */
-	int reg = cpunum_get_reg(dcs.cpunum, ADSP2100_I0 + dcs.ireg);
+	int reg = cpu_get_reg(machine->cpu[dcs.cpunum], ADSP2100_I0 + dcs.ireg);
 
 	/* copy the current data into the buffer */
 	{
@@ -1920,13 +1920,13 @@ static TIMER_CALLBACK( dcs_irq )
 		INT16 buffer[0x400];
 		int i;
 
-		cpuintrf_push_context(dcs.cpunum);
+		cpu_push_context(machine->cpu[dcs.cpunum]);
 		for (i = 0; i < count; i++)
 		{
 			buffer[i] = data_read_word_16le(reg * 2);
 			reg += dcs.incs;
 		}
-		cpuintrf_pop_context();
+		cpu_pop_context();
 
 		if (dcs.channels)
 			dmadac_transfer(0, dcs.channels, 1, dcs.channels, (dcs.size / 2) / dcs.channels, buffer);
@@ -1943,7 +1943,7 @@ static TIMER_CALLBACK( dcs_irq )
 	}
 
 	/* store it */
-	cpunum_set_reg(dcs.cpunum, ADSP2100_I0 + dcs.ireg, reg);
+	cpu_set_reg(machine->cpu[dcs.cpunum], ADSP2100_I0 + dcs.ireg, reg);
 }
 
 
@@ -2002,15 +2002,15 @@ static void sound_tx_callback(int port, INT32 data)
 
 			/* now get the register contents in a more legible format */
 			/* we depend on register indexes to be continuous (wich is the case in our core) */
-			source = cpunum_get_reg(dcs.cpunum, ADSP2100_I0 + dcs.ireg);
-			dcs.incs = cpunum_get_reg(dcs.cpunum, ADSP2100_M0 + mreg);
-			dcs.size = cpunum_get_reg(dcs.cpunum, ADSP2100_L0 + lreg);
+			source = cpu_get_reg(Machine->cpu[dcs.cpunum], ADSP2100_I0 + dcs.ireg);
+			dcs.incs = cpu_get_reg(Machine->cpu[dcs.cpunum], ADSP2100_M0 + mreg);
+			dcs.size = cpu_get_reg(Machine->cpu[dcs.cpunum], ADSP2100_L0 + lreg);
 
 			/* get the base value, since we need to keep it around for wrapping */
 			source -= dcs.incs;
 
 			/* make it go back one so we dont lose the first sample */
-			cpunum_set_reg(dcs.cpunum, ADSP2100_I0 + dcs.ireg, source);
+			cpu_set_reg(Machine->cpu[dcs.cpunum], ADSP2100_I0 + dcs.ireg, source);
 
 			/* save it as it is now */
 			dcs.ireg_base = source;
@@ -2116,7 +2116,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 			if (data == 0x001a)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%08X:DCS Transfer command %04X\n", activecpu_get_pc(), data);
+					logerror("%08X:DCS Transfer command %04X\n", cpu_get_pc(machine->activecpu), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2126,7 +2126,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 			else if (data == 0x002a)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%08X:DCS State change %04X\n", activecpu_get_pc(), data);
+					logerror("%08X:DCS State change %04X\n", cpu_get_pc(machine->activecpu), data);
 				transfer.dcs_state = 1;
 			}
 
@@ -2207,7 +2207,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 			if (transfer.hle_enabled)
 			{
 				/* write the new data to memory */
-				cpuintrf_push_context(dcs.cpunum);
+				cpu_push_context(machine->cpu[dcs.cpunum]);
 				if (transfer.type == 0)
 				{
 					if (transfer.writes_left & 1)
@@ -2217,7 +2217,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 				}
 				else
 					data_write_word(transfer.start++ * 2, data);
-				cpuintrf_pop_context();
+				cpu_pop_context();
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)
@@ -2252,7 +2252,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 			if (data == 0x55d0 || data == 0x55d1)
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%08X:DCS Transfer command %04X\n", activecpu_get_pc(), data);
+					logerror("%08X:DCS Transfer command %04X\n", cpu_get_pc(machine->activecpu), data);
 				transfer.state++;
 				if (transfer.hle_enabled)
 					return 1;
@@ -2262,7 +2262,7 @@ static int preprocess_stage_2(running_machine *machine, UINT16 data)
 			else
 			{
 				if (LOG_DCS_TRANSFERS)
-					logerror("%08X:Command: %04X\n", activecpu_get_pc(), data);
+					logerror("%08X:Command: %04X\n", cpu_get_pc(machine->activecpu), data);
 			}
 			break;
 

@@ -89,7 +89,7 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 			return (mame_rand(machine) & 0xffff);
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",activecpu_get_pc(),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
 	}
 
 	return 0;
@@ -112,7 +112,7 @@ WRITE16_HANDLER(galpanib_calc_w)
 		case 0x12/2: hit.mult_b = data; break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",activecpu_get_pc(),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
 	}
 }
 
@@ -136,7 +136,7 @@ WRITE16_HANDLER(bloodwar_calc_w)
 		case 0x38/2: break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",activecpu_get_pc(),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
 	}
 }
 
@@ -230,7 +230,7 @@ READ16_HANDLER(bloodwar_calc_r)
 		case 0x32/2: return hit.y2s;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",activecpu_get_pc(),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
 	}
 
 	return 0;
@@ -322,7 +322,7 @@ static void calc3_mcu_run(running_machine *machine)
 	if (mcu_command == 0) return;
 
 	logerror("CPU #0 PC %06X : MCU executed command at %04X: %04X\n",
-	 	activecpu_get_pc(),calc3_mcu_command_offset*2,mcu_command);
+	 	cpu_get_pc(machine->activecpu),calc3_mcu_command_offset*2,mcu_command);
 
 	switch (mcu_command)
 	{
@@ -573,7 +573,7 @@ TOYBOX_MCU_COM_W(3)
 */
 READ16_HANDLER( toybox_mcu_status_r )
 {
-	logerror("CPU #%d (PC=%06X) : read MCU status\n", cpu_getactivecpu(), activecpu_get_previouspc());
+	logerror("CPU #%d (PC=%06X) : read MCU status\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu));
 	return 0; // most games test bit 0 for failure
 }
 
@@ -598,7 +598,7 @@ void bloodwar_mcu_run(running_machine *machine)
 				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -610,20 +610,20 @@ void bloodwar_mcu_run(running_machine *machine)
 				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x03:	// DSW
 		{
 			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
-			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:	// Protection
 		{
-			logerror("PC=%06X : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
 
 			switch(mcu_data)
 			{
@@ -687,7 +687,7 @@ void bloodwar_mcu_run(running_machine *machine)
 		break;
 
 		default:
-			logerror("PC=%06X : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }
@@ -713,7 +713,7 @@ void bonkadv_mcu_run(running_machine *machine)
 				mame_fread(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (load NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -725,7 +725,7 @@ void bonkadv_mcu_run(running_machine *machine)
 				mame_fwrite(f,&kaneko16_mcu_ram[mcu_offset], 128);
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (save NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
@@ -737,20 +737,20 @@ void bonkadv_mcu_run(running_machine *machine)
 				mame_fwrite(f, bonkadv_mcu_43, sizeof(bonkadv_mcu_43));
 				mame_fclose(f);
 			}
-			logerror("PC=%06X : MCU executed command: %04X %04X (restore default NVRAM settings)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (restore default NVRAM settings)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x03:	// DSW
 		{
 			kaneko16_mcu_ram[mcu_offset] = input_port_read(machine, "DSW1");
-			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", activecpu_get_pc(), mcu_command, mcu_offset*2);
+			logerror("PC=%06X : MCU executed command: %04X %04X (read DSW)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2);
 		}
 		break;
 
 		case 0x04:	// Protection
 		{
-			logerror("PC=%06X : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
 
 			switch(mcu_data)
 			{
@@ -799,7 +799,7 @@ void bonkadv_mcu_run(running_machine *machine)
 		break;
 
 		default:
-			logerror("PC=%06X : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+			logerror("PC=%06X : MCU executed command: %04X %04X %04X (UNKNOWN COMMAND)\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
 		break;
 	}
 }
@@ -822,7 +822,7 @@ void gtmr_mcu_run(running_machine *machine)
 	UINT16 mcu_offset	=	kaneko16_mcu_ram[0x0012/2] / 2;
 	UINT16 mcu_data		=	kaneko16_mcu_ram[0x0014/2];
 
-	logerror("CPU #0 PC %06X : MCU executed command: %04X %04X %04X\n", activecpu_get_pc(), mcu_command, mcu_offset*2, mcu_data);
+	logerror("CPU #0 PC %06X : MCU executed command: %04X %04X %04X\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_offset*2, mcu_data);
 
 	switch (mcu_command >> 8)
 	{

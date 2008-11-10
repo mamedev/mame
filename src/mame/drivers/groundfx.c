@@ -467,11 +467,11 @@ ROM_END
 static READ32_HANDLER( irq_speedup_r_groundfx )
 {
 	int ptr;
-	if ((activecpu_get_sp()&2)==0) ptr=groundfx_ram[(activecpu_get_sp()&0x1ffff)/4];
-	else ptr=(((groundfx_ram[(activecpu_get_sp()&0x1ffff)/4])&0x1ffff)<<16) |
-	(groundfx_ram[((activecpu_get_sp()&0x1ffff)/4)+1]>>16);
+	if ((cpu_get_sp(machine->activecpu)&2)==0) ptr=groundfx_ram[(cpu_get_sp(machine->activecpu)&0x1ffff)/4];
+	else ptr=(((groundfx_ram[(cpu_get_sp(machine->activecpu)&0x1ffff)/4])&0x1ffff)<<16) |
+	(groundfx_ram[((cpu_get_sp(machine->activecpu)&0x1ffff)/4)+1]>>16);
 
-	if (activecpu_get_pc()==0x1ece && ptr==0x1b9a)
+	if (cpu_get_pc(machine->activecpu)==0x1ece && ptr==0x1b9a)
 		cpu_spinuntil_int();
 
 	return groundfx_ram[0xb574/4];

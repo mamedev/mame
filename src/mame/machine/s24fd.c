@@ -45,7 +45,7 @@ static void s24_fd1094_setstate_and_decrypt(int state)
 
 	fd1094_state = state;
 
-	cpunum_set_info_int(1, CPUINFO_INT_REGISTER + M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
+	cpu_set_reg(Machine->cpu[1], M68K_PREF_ADDR, 0x0010);	// force a flush of the prefetch cache
 
 	/* set the s24_fd1094 state ready to decrypt.. */
 	state = fd1094_set_state(s24_fd1094_key,state) & 0xff;
@@ -132,8 +132,8 @@ void s24_fd1094_machine_init(void)
 	s24_fd1094_setstate_and_decrypt(FD1094_STATE_RESET);
 	s24_fd1094_kludge_reset_values();
 
-	cpunum_set_info_fct(1, CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)s24_fd1094_cmp_callback);
-	cpunum_set_info_fct(1, CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)s24_fd1094_rte_callback);
+	cpu_set_info_fct(Machine->cpu[1], CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)s24_fd1094_cmp_callback);
+	cpu_set_info_fct(Machine->cpu[1], CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)s24_fd1094_rte_callback);
 	cpunum_set_irq_callback(1, s24_fd1094_int_callback);
 }
 

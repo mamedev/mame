@@ -95,19 +95,19 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX ti990_10
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( ti990_10 )
-	#define TMS99XX_CPU_NAME "TI990/10"
+	#define TMS99XX_cpu_get_name "TI990/10"
 
 #elif (TMS99XX_MODEL == TMS9900_ID)
 
 	#define TMS99XX_PREFIX tms9900
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9900 )
-	#define TMS99XX_CPU_NAME "TMS9900"
+	#define TMS99XX_cpu_get_name "TMS9900"
 
 #elif (TMS99XX_MODEL == TMS9940_ID)
 
 	#define TMS99XX_PREFIX tms9940
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9940 )
-	#define TMS99XX_CPU_NAME "TMS9940"
+	#define TMS99XX_cpu_get_name "TMS9940"
 
 	#error "tms9940 is not yet supported"
 
@@ -115,13 +115,13 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms9980a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9980a )
-	#define TMS99XX_CPU_NAME "TMS9980A/TMS9981"
+	#define TMS99XX_cpu_get_name "TMS9980A/TMS9981"
 
 #elif (TMS99XX_MODEL == TMS9985_ID)
 
 	#define TMS99XX_PREFIX tms9985
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9985 )
-	#define TMS99XX_CPU_NAME "TMS9985"
+	#define TMS99XX_cpu_get_name "TMS9985"
 
 	#error "tms9985 is not yet supported"
 
@@ -129,7 +129,7 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms9989
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9989 )
-	#define TMS99XX_CPU_NAME "TMS9989"
+	#define TMS99XX_cpu_get_name "TMS9989"
 
 	#error "tms9989 is not yet supported"
 
@@ -137,13 +137,13 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms9995
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms9995 )
-	#define TMS99XX_CPU_NAME "TMS9995"
+	#define TMS99XX_cpu_get_name "TMS9995"
 
 #elif (TMS99XX_MODEL == TMS99000_ID)
 
 	#define TMS99XX_PREFIX tms99000
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99000 )
-	#define TMS99XX_CPU_NAME "TMS99000"
+	#define TMS99XX_cpu_get_name "TMS99000"
 
 	#error "tms99000 is not yet supported"
 
@@ -151,7 +151,7 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms99105a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99105a )
-	#define TMS99XX_CPU_NAME "TMS99105A"
+	#define TMS99XX_cpu_get_name "TMS99105A"
 
 	#error "tms99105a is not yet supported"
 
@@ -159,7 +159,7 @@ Other references can be found on spies.com:
 
 	#define TMS99XX_PREFIX tms99110a
 	#define TMS99XX_GET_INFO CPU_GET_INFO_NAME( tms99110a )
-	#define TMS99XX_CPU_NAME "TMS99110A"
+	#define TMS99XX_cpu_get_name "TMS99110A"
 
 	#error "tms99110a is not yet supported"
 
@@ -932,7 +932,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			/* read decrementer */
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				return ceil(ATTOTIME_TO_CYCLES(cpu_getactivecpu(), attotime_div(timer_timeleft(I.timer), 16)));
+				return ceil(ATTOTIME_TO_CYCLES(cpunum_get_active(), attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				return I.decrementer_count;
@@ -996,7 +996,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				value = ceil(ATTOTIME_TO_CYCLES(cpu_getactivecpu(), attotime_div(timer_timeleft(I.timer), 16)));
+				value = ceil(ATTOTIME_TO_CYCLES(cpunum_get_active(), attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				value = I.decrementer_count;
@@ -1827,7 +1827,7 @@ static void reset_decrementer(void)
 
 	if (I.decrementer_enabled && ! (I.flag & 1))
 		{	/* timer */
-		attotime period = ATTOTIME_IN_CYCLES(I.decrementer_interval * 16L, cpu_getactivecpu());
+		attotime period = ATTOTIME_IN_CYCLES(I.decrementer_interval * 16L, cpunum_get_active());
 		timer_adjust_periodic(I.timer, period, 0, period);
 	}
 }
@@ -4815,7 +4815,7 @@ void TMS99XX_GET_INFO(UINT32 state, cpuinfo *info)
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &TMS99XX_ICOUNT;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, TMS99XX_CPU_NAME);		break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, TMS99XX_cpu_get_name);		break;
 		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Texas Instruments 9900"); break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "2.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;

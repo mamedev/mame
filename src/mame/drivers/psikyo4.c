@@ -1056,7 +1056,7 @@ PC  :00001B46: TST     R2,R2
 PC  :00001B48: BT      $00001B3C
 */
 
-	if (activecpu_get_pc()==0x00001B3E) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x00001B3E) cpu_spinuntil_int();
 	return ps4_ram[0x000020/4];
 }
 
@@ -1072,7 +1072,7 @@ PC  :00001B52: TST     R2,R2
 PC  :00001B54: BT      $00001B48
 */
 
-	if (activecpu_get_pc()==0x00001B4A) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x00001B4A) cpu_spinuntil_int();
 	return ps4_ram[0x000020/4];
 }
 
@@ -1088,7 +1088,7 @@ PC  :000029F6: TST     R3,R3
 PC  :000029F8: BT      $000029EC
 */
 
-	if (activecpu_get_pc()==0x000029EE) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x000029EE) cpu_spinuntil_int();
 	return ps4_ram[0x00001c/4];
 }
 

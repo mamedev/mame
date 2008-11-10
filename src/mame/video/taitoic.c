@@ -2923,9 +2923,9 @@ WRITE16_HANDLER( TC0360PRI_halfword_w )
 		TC0360PRI_w(machine,offset,data & 0xff);
 #if 0
 if (data & 0xff00)
-{ logerror("CPU #0 PC %06x: warning - write %02x to MSB of TC0360PRI address %02x\n",activecpu_get_pc(),data,offset); }
+{ logerror("CPU #0 PC %06x: warning - write %02x to MSB of TC0360PRI address %02x\n",cpu_get_pc(machine->activecpu),data,offset); }
 	else
-{ logerror("CPU #0 PC %06x: warning - write %02x to MSB of TC0360PRI address %02x\n",activecpu_get_pc(),data,offset); }
+{ logerror("CPU #0 PC %06x: warning - write %02x to MSB of TC0360PRI address %02x\n",cpu_get_pc(machine->activecpu),data,offset); }
 #endif
 	}
 }
@@ -2937,9 +2937,9 @@ WRITE16_HANDLER( TC0360PRI_halfword_swap_w )
 		TC0360PRI_w(machine,offset,(data >> 8) & 0xff);
 #if 0
 if (data & 0xff)
-{ logerror("CPU #0 PC %06x: warning - write %02x to LSB of TC0360PRI address %02x\n",activecpu_get_pc(),data,offset); }
+{ logerror("CPU #0 PC %06x: warning - write %02x to LSB of TC0360PRI address %02x\n",cpu_get_pc(machine->activecpu),data,offset); }
 	else
-{ logerror("CPU #0 PC %06x: warning - write %02x to LSB of TC0360PRI address %02x\n",activecpu_get_pc(),data,offset); }
+{ logerror("CPU #0 PC %06x: warning - write %02x to LSB of TC0360PRI address %02x\n",cpu_get_pc(machine->activecpu),data,offset); }
 #endif
 	}
 }
@@ -4770,7 +4770,7 @@ READ16_HANDLER( TC0110PCR_word_r )
 			return TC0110PCR_ram[0][(TC0110PCR_addr[0])];
 
 		default:
-logerror("PC %06x: warning - read TC0110PCR address %02x\n",activecpu_get_pc(),offset);
+logerror("PC %06x: warning - read TC0110PCR address %02x\n",cpu_get_pc(machine->activecpu),offset);
 			return 0xff;
 	}
 }
@@ -4783,7 +4783,7 @@ READ16_HANDLER( TC0110PCR_word_1_r )
 			return TC0110PCR_ram[1][(TC0110PCR_addr[1])];
 
 		default:
-logerror("PC %06x: warning - read second TC0110PCR address %02x\n",activecpu_get_pc(),offset);
+logerror("PC %06x: warning - read second TC0110PCR address %02x\n",cpu_get_pc(machine->activecpu),offset);
 			return 0xff;
 	}
 }
@@ -4796,7 +4796,7 @@ READ16_HANDLER( TC0110PCR_word_2_r )
 			return TC0110PCR_ram[2][(TC0110PCR_addr[2])];
 
 		default:
-logerror("PC %06x: warning - read third TC0110PCR address %02x\n",activecpu_get_pc(),offset);
+logerror("PC %06x: warning - read third TC0110PCR address %02x\n",cpu_get_pc(machine->activecpu),offset);
 			return 0xff;
 	}
 }
@@ -4819,7 +4819,7 @@ WRITE16_HANDLER( TC0110PCR_word_w )
 		}
 
 		default:
-logerror("PC %06x: warning - write %04x to TC0110PCR address %02x\n",activecpu_get_pc(),data,offset);
+logerror("PC %06x: warning - write %04x to TC0110PCR address %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }
@@ -4841,7 +4841,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_w )
 		}
 
 		default:
-logerror("PC %06x: warning - write %04x to TC0110PCR address %02x\n",activecpu_get_pc(),data,offset);
+logerror("PC %06x: warning - write %04x to TC0110PCR address %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }
@@ -4864,7 +4864,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_1_w )
 		}
 
 		default:
-logerror("PC %06x: warning - write %04x to second TC0110PCR offset %02x\n",activecpu_get_pc(),data,offset);
+logerror("PC %06x: warning - write %04x to second TC0110PCR offset %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }
@@ -4887,7 +4887,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_2_w )
 		}
 
 		default:
-logerror("PC %06x: warning - write %04x to third TC0110PCR offset %02x\n",activecpu_get_pc(),data,offset);
+logerror("PC %06x: warning - write %04x to third TC0110PCR offset %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }
@@ -4911,7 +4911,7 @@ WRITE16_HANDLER( TC0110PCR_step1_rbswap_word_w )
 		}
 
 		default:
-logerror("PC %06x: warning - write %04x to TC0110PCR offset %02x\n",activecpu_get_pc(),data,offset);
+logerror("PC %06x: warning - write %04x to TC0110PCR offset %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }
@@ -4935,7 +4935,7 @@ WRITE16_HANDLER( TC0110PCR_step1_4bpg_word_w )
 		}
 
 		default:
-logerror("PC %06x: warning - write %04x to TC0110PCR address %02x\n",activecpu_get_pc(),data,offset);
+logerror("PC %06x: warning - write %04x to TC0110PCR address %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }
@@ -4969,7 +4969,7 @@ READ8_HANDLER( TC0220IOC_r )
 			return input_port_read(machine, "IN2");
 
 		default:
-logerror("PC %06x: warning - read TC0220IOC address %02x\n",activecpu_get_pc(),offset);
+logerror("PC %06x: warning - read TC0220IOC address %02x\n",cpu_get_pc(machine->activecpu),offset);
 			return 0xff;
 	}
 }
@@ -4991,12 +4991,12 @@ WRITE8_HANDLER( TC0220IOC_w )
 			coin_counter_w(1,data & 0x08);
 
 //if (data &0xf0)
-//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",activecpu_get_pc(),data,offset);
+//logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 
 			break;
 
 		default:
-logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",activecpu_get_pc(),data,offset);
+logerror("PC %06x: warning - write %02x to TC0220IOC address %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }
@@ -5080,7 +5080,7 @@ WRITE16_HANDLER( TC0220IOC_halfword_w )
 		TC0220IOC_w(machine,offset,(data >> 8) & 0xff);
 
 		if (offset)		/* ainferno writes watchdog in msb */
-logerror("CPU #0 PC %06x: warning - write to MSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
+logerror("CPU #0 PC %06x: warning - write to MSB of TC0220IOC address %02x\n",cpu_get_pc(machine->activecpu),offset);
 	}
 }
 
@@ -5097,7 +5097,7 @@ WRITE16_HANDLER( TC0220IOC_halfword_byteswap_w )
 	{
 		TC0220IOC_w(machine,offset,data & 0xff);
 
-logerror("CPU #0 PC %06x: warning - write to LSB of TC0220IOC address %02x\n",activecpu_get_pc(),offset);
+logerror("CPU #0 PC %06x: warning - write to LSB of TC0220IOC address %02x\n",cpu_get_pc(machine->activecpu),offset);
 	}
 }
 
@@ -5130,7 +5130,7 @@ READ8_HANDLER( TC0510NIO_r )
 			return input_port_read(machine, "IN2");
 
 		default:
-logerror("PC %06x: warning - read TC0510NIO address %02x\n",activecpu_get_pc(),offset);
+logerror("PC %06x: warning - read TC0510NIO address %02x\n",cpu_get_pc(machine->activecpu),offset);
 			return 0xff;
 	}
 }
@@ -5153,7 +5153,7 @@ WRITE8_HANDLER( TC0510NIO_w )
 			break;
 
 		default:
-logerror("PC %06x: warning - write %02x to TC0510NIO address %02x\n",activecpu_get_pc(),data,offset);
+logerror("PC %06x: warning - write %02x to TC0510NIO address %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }
@@ -5170,7 +5170,7 @@ WRITE16_HANDLER( TC0510NIO_halfword_w )
 	else
 	{
 		/* driftout writes the coin counters here - bug? */
-logerror("CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",activecpu_get_pc(),offset);
+logerror("CPU #0 PC %06x: warning - write to MSB of TC0510NIO address %02x\n",cpu_get_pc(machine->activecpu),offset);
 		TC0510NIO_w(machine,offset,(data >> 8) & 0xff);
 	}
 }
@@ -5213,7 +5213,7 @@ READ8_HANDLER( TC0640FIO_r )
 			return input_port_read(machine, "IN2");
 
 		default:
-logerror("PC %06x: warning - read TC0640FIO address %02x\n",activecpu_get_pc(),offset);
+logerror("PC %06x: warning - read TC0640FIO address %02x\n",cpu_get_pc(machine->activecpu),offset);
 			return 0xff;
 	}
 }
@@ -5236,7 +5236,7 @@ WRITE8_HANDLER( TC0640FIO_w )
 			break;
 
 		default:
-logerror("PC %06x: warning - write %02x to TC0640FIO address %02x\n",activecpu_get_pc(),data,offset);
+logerror("PC %06x: warning - write %02x to TC0640FIO address %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }
@@ -5253,7 +5253,7 @@ WRITE16_HANDLER( TC0640FIO_halfword_w )
 	else
 	{
 		TC0640FIO_w(machine,offset,(data >> 8) & 0xff);
-logerror("CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
+logerror("CPU #0 PC %06x: warning - write to MSB of TC0640FIO address %02x\n",cpu_get_pc(machine->activecpu),offset);
 	}
 }
 
@@ -5269,7 +5269,7 @@ WRITE16_HANDLER( TC0640FIO_halfword_byteswap_w )
 	else
 	{
 		TC0640FIO_w(machine,offset,data & 0xff);
-logerror("CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",activecpu_get_pc(),offset);
+logerror("CPU #0 PC %06x: warning - write to LSB of TC0640FIO address %02x\n",cpu_get_pc(machine->activecpu),offset);
 	}
 }
 

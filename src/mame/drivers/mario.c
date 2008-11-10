@@ -129,18 +129,18 @@ static READ8_DEVICE_HANDLER(mario_dma_read_byte)
 {
 	UINT8 result;
 
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	result = program_read_byte(offset);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return result;
 }
 
 static WRITE8_DEVICE_HANDLER(mario_dma_write_byte)
 {
-	cpuintrf_push_context(0);
+	cpu_push_context(device->machine->cpu[0]);
 	program_write_byte(offset, data);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 /*************************************

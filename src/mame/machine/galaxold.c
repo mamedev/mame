@@ -125,7 +125,7 @@ WRITE8_HANDLER( galaxold_leds_w )
 
 static READ8_HANDLER( checkmaj_protection_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 	case 0x0f15:  return 0xf5;
 	case 0x0f8f:  return 0x7c;
@@ -134,7 +134,7 @@ static READ8_HANDLER( checkmaj_protection_r )
 	case 0x10f1:  return 0xaa;
 	case 0x1402:  return 0xaa;
 	default:
-		logerror("Unknown protection read. PC=%04X\n",activecpu_get_pc());
+		logerror("Unknown protection read. PC=%04X\n",cpu_get_pc(machine->activecpu));
 	}
 
 	return 0;
@@ -217,23 +217,23 @@ DRIVER_INIT( dingoe )
 
 READ8_HANDLER( scramblb_protection_1_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 	case 0x01da: return 0x80;
 	case 0x01e4: return 0x00;
 	default:
-		logerror("%04x: read protection 1\n",activecpu_get_pc());
+		logerror("%04x: read protection 1\n",cpu_get_pc(machine->activecpu));
 		return 0;
 	}
 }
 
 READ8_HANDLER( scramblb_protection_2_r )
 {
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 	case 0x01ca: return 0x90;
 	default:
-		logerror("%04x: read protection 2\n",activecpu_get_pc());
+		logerror("%04x: read protection 2\n",cpu_get_pc(machine->activecpu));
 		return 0;
 	}
 }

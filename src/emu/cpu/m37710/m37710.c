@@ -274,13 +274,13 @@ static TIMER_CALLBACK( m37710_timer_cb )
 	int curirq = M37710_LINE_TIMERA0 - which;
 	int cpunum = param;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	timer_adjust_oneshot(m37710i_cpu.timers[which], m37710i_cpu.reload[which], cpunum);
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[curirq]] |= 0x04;
 	m37710_set_irq_line(curirq, PULSE_LINE);
 	cpu_triggerint(machine, cpunum);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static void m37710_external_tick(int timer, int state)
@@ -315,7 +315,7 @@ static void m37710_external_tick(int timer, int state)
 
 static void m37710_recalc_timer(int timer)
 {
-	int cpunum = cpu_getactivecpu();
+	int cpunum = cpunum_get_active();
 	int tval;
 	static const int tcr[8] = { 0x56, 0x57, 0x58, 0x59, 0x5a, 0x5b, 0x5c, 0x5d };
 	attotime time;
@@ -338,7 +338,7 @@ static void m37710_recalc_timer(int timer)
 			switch (m37710i_cpu.m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	      	// timer mode
-					time = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpu_getactivecpu())), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
+					time = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpunum_get_active())), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
 					#if M37710_DEBUG
@@ -373,7 +373,7 @@ static void m37710_recalc_timer(int timer)
 			switch (m37710i_cpu.m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	      	// timer mode
-					time = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpu_getactivecpu())), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
+					time = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpunum_get_active())), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
 					#if M37710_DEBUG

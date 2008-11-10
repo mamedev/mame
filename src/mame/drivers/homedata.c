@@ -319,7 +319,7 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 			dac_signed_data_w(0,data);
 			break;
 		default:
-			logerror("%04x: I/O write to port %04x\n",activecpu_get_pc(),offset);
+			logerror("%04x: I/O write to port %04x\n",cpu_get_pc(machine->activecpu),offset);
 			break;
 	}
 }
@@ -363,7 +363,7 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
        1 \ ROM bank
        0 /
       */
-//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n",activecpu_get_pc(),data,BIT(data,2),BIT(data,6));
+//  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n",cpu_get_pc(machine->activecpu),data,BIT(data,2),BIT(data,6));
 
 
 	memory_set_bankptr(2,memory_region(machine, "audio") + 0x10000 * (data & 0x03));
@@ -407,7 +407,7 @@ static READ8_HANDLER( reikaids_io_r )
 
 	vblank = 0;
 
-//logerror("%04x: io_r %02x\n",activecpu_get_pc(),res);
+//logerror("%04x: io_r %02x\n",cpu_get_pc(machine->activecpu),res);
 
 	return res;
 }
@@ -416,14 +416,14 @@ static int snd_command;
 
 static READ8_HANDLER( reikaids_snd_command_r )
 {
-//logerror("%04x: sndmcd_r (%02x)\n",activecpu_get_pc(),snd_command);
+//logerror("%04x: sndmcd_r (%02x)\n",cpu_get_pc(machine->activecpu),snd_command);
 	return snd_command;
 }
 
 static WRITE8_HANDLER( reikaids_snd_command_w )
 {
 	snd_command = data;
-//logerror("%04x: coprocessor_command_w %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: coprocessor_command_w %02x\n",cpu_get_pc(machine->activecpu),data);
 }
 
 
@@ -440,13 +440,13 @@ static int to_cpu,from_cpu;
 
 static WRITE8_HANDLER( pteacher_snd_command_w )
 {
-//logerror("%04x: snd_command_w %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: snd_command_w %02x\n",cpu_get_pc(machine->activecpu),data);
 	from_cpu = data;
 }
 
 static READ8_HANDLER( pteacher_snd_r )
 {
-//logerror("%04x: pteacher_snd_r %02x\n",activecpu_get_pc(),to_cpu);
+//logerror("%04x: pteacher_snd_r %02x\n",cpu_get_pc(machine->activecpu),to_cpu);
 	return to_cpu;
 }
 
@@ -471,7 +471,7 @@ static READ8_HANDLER( pteacher_keyboard_r )
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5" };
 	int dips = input_port_read(machine, "DSW");
 
-//  logerror("%04x: keyboard_r with port A = %02x\n",activecpu_get_pc(),upd7807_porta);
+//  logerror("%04x: keyboard_r with port A = %02x\n",cpu_get_pc(machine->activecpu),upd7807_porta);
 
 	if (upd7807_porta & 0x80)
 	{
@@ -494,7 +494,7 @@ static READ8_HANDLER( pteacher_upd7807_porta_r )
 	if (!BIT(upd7807_portc,6))
 		upd7807_porta = from_cpu;
 	else
-logerror("%04x: read PA with PC *not* clear\n",activecpu_get_pc());
+logerror("%04x: read PA with PC *not* clear\n",cpu_get_pc(machine->activecpu));
 
 	return upd7807_porta;
 }
@@ -502,7 +502,7 @@ logerror("%04x: read PA with PC *not* clear\n",activecpu_get_pc());
 static WRITE8_HANDLER( pteacher_snd_answer_w )
 {
 	to_cpu = data;
-//logerror("%04x: to_cpu = %02x\n",activecpu_get_pc(),to_cpu);
+//logerror("%04x: to_cpu = %02x\n",cpu_get_pc(machine->activecpu),to_cpu);
 }
 
 static WRITE8_HANDLER( pteacher_upd7807_porta_w )
@@ -523,7 +523,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
        0 input (coin)
       */
 
-//  logerror("%04x: port C wr %02x\n",activecpu_get_pc(),data);
+//  logerror("%04x: port C wr %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	memory_set_bankptr(2,memory_region(machine, "audio") + 0x10000 * ((data & 0x0c) >> 2));
 

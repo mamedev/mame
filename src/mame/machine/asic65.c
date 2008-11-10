@@ -215,7 +215,7 @@ WRITE16_HANDLER( asic65_data_w )
 	else
 	{
 		int command = (data < MAX_COMMANDS) ? command_map[asic65.type][data] : OP_UNKNOWN;
-		if (asic65.log) fprintf(asic65.log, "\n(%06X)%c%04X:", activecpu_get_previouspc(), (command == OP_UNKNOWN) ? '*' : ' ', data);
+		if (asic65.log) fprintf(asic65.log, "\n(%06X)%c%04X:", cpu_get_previouspc(machine->activecpu), (command == OP_UNKNOWN) ? '*' : ' ', data);
 
 		/* set the command number and reset the parameter/result indices */
 		asic65.command = data;

@@ -180,10 +180,10 @@ static READ16_HANDLER( bmc_random_read )
 
 static READ16_HANDLER( bmc_protection_r )
 {
-	switch(activecpu_get_previouspc())
+	switch(cpu_get_previouspc(machine->activecpu))
 	{
 		case 0xca68:
-			switch(activecpu_get_reg(M68K_D2))
+			switch(cpu_get_reg(machine->activecpu, M68K_D2))
 			{
 				case 0: 		 return 0x37<<8;
 				case 0x1013: return 0;
@@ -191,7 +191,7 @@ static READ16_HANDLER( bmc_protection_r )
 			}
 			break;
 	}
-	logerror("Protection read @ %X\n",activecpu_get_previouspc());
+	logerror("Protection read @ %X\n",cpu_get_previouspc(machine->activecpu));
 	return mame_rand(machine);
 }
 
@@ -449,7 +449,7 @@ static READ8_HANDLER(dips1_r)
 			case 0x00:	return  input_port_read(machine, "IN1");
 			case 0x40:	return  input_port_read(machine, "IN2");
 	}
-	logerror("unknown input - %X (PC=%X)\n",bmc_input,activecpu_get_previouspc());
+	logerror("unknown input - %X (PC=%X)\n",bmc_input,cpu_get_previouspc(machine->activecpu));
 	return 0xff;
 }
 

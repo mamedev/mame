@@ -113,13 +113,13 @@ static UINT8 key[8];
 
 static READ8_HANDLER( no_key_r )
 {
-	popmessage("CPU #%d PC %08x: keychip read %04x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+	popmessage("CPU #%d PC %08x: keychip read %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset);
 	return 0;
 }
 
 static WRITE8_HANDLER( no_key_w )
 {
-	popmessage("CPU #%d PC %08x: keychip write %04x=%02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset,data);
+	popmessage("CPU #%d PC %08x: keychip write %04x=%02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset,data);
 }
 
 
@@ -224,7 +224,7 @@ CPU #0 PC e3d4: keychip read 0003     [AND #$37 = key no.]
 */
 static READ8_HANDLER( key_type1_r )
 {
-//  logerror("CPU #%d PC %04x: keychip read %04x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+//  logerror("CPU #%d PC %04x: keychip read %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset);
 
 	if (offset < 3)
 	{
@@ -255,7 +255,7 @@ static READ8_HANDLER( key_type1_r )
 
 static WRITE8_HANDLER( key_type1_w )
 {
-//  logerror("CPU #%d PC %04x: keychip write %04x=%02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset,data);
+//  logerror("CPU #%d PC %04x: keychip write %04x=%02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset,data);
 
 	if (offset < 4)
 		key[offset] = data;
@@ -407,7 +407,7 @@ CPU #0 PC e574: keychip read 0001
 
 static READ8_HANDLER( key_type2_r )
 {
-//  logerror("CPU #%d PC %04x: keychip read %04x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+//  logerror("CPU #%d PC %04x: keychip read %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset);
 
 	key_numerator_high_word = 0;
 
@@ -426,7 +426,7 @@ static READ8_HANDLER( key_type2_r )
 
 static WRITE8_HANDLER( key_type2_w )
 {
-//  logerror("CPU #%d PC %04x: keychip write %04x=%02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset,data);
+//  logerror("CPU #%d PC %04x: keychip write %04x=%02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset,data);
 
 	if (offset < 5)
 	{
@@ -535,7 +535,7 @@ static READ8_HANDLER( key_type3_r )
 {
 	int op;
 
-//  logerror("CPU #%d PC %04x: keychip read %04x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+//  logerror("CPU #%d PC %04x: keychip read %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset);
 
 	/* I need to handle blastoff's read from 0858. The game previously writes to 0858,
        using it as temporary storage, so maybe it expects to act as RAM, however
@@ -551,14 +551,14 @@ static READ8_HANDLER( key_type3_r )
 	if (op == key_bottom4)	return (offset << 4) | (key[key_swap4_arg] & 0x0f);
 	if (op == key_top4)		return (offset << 4) | (key[key_swap4_arg] >> 4);
 
-	popmessage("CPU #%d PC %08x: keychip read %04x",cpu_getactivecpu(),activecpu_get_pc(),offset);
+	popmessage("CPU #%d PC %08x: keychip read %04x",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset);
 
 	return 0;
 }
 
 static WRITE8_HANDLER( key_type3_w )
 {
-//  logerror("CPU #%d PC %04x: keychip write %04x=%02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset,data);
+//  logerror("CPU #%d PC %04x: keychip write %04x=%02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset,data);
 
 	key[(offset & 0x70) >> 4] = data;
 }
@@ -594,7 +594,7 @@ static int chip[16];
 
 WRITE8_HANDLER( namcos1_cpu_control_w )
 {
-//  logerror("reset control pc=%04x %02x\n",activecpu_get_pc(),data);
+//  logerror("reset control pc=%04x %02x\n",cpu_get_pc(machine->activecpu),data);
 	if ((data & 1) ^ namcos1_reset)
 	{
 		mcu_patch_data = 0;
@@ -610,7 +610,7 @@ WRITE8_HANDLER( namcos1_cpu_control_w )
 
 WRITE8_HANDLER( namcos1_watchdog_w )
 {
-	wdog |= 1 << (cpu_getactivecpu());
+	wdog |= 1 << (cpunum_get_active());
 	if (wdog == 7 || !namcos1_reset)
 	{
 		wdog = 0;
@@ -661,21 +661,21 @@ static WRITE8_HANDLER( soundram_w )
 
 static WRITE8_HANDLER( rom_w )
 {
-	logerror("CPU #%d PC %04x: warning - write %02x to rom address %04x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+	logerror("CPU #%d PC %04x: warning - write %02x to rom address %04x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
 }
 
 /* error handlers */
 static READ8_HANDLER( unknown_r )
 {
-	logerror("CPU #%d PC %04x: warning - read from unknown chip\n",cpu_getactivecpu(),activecpu_get_pc() );
-//  popmessage("CPU #%d PC %04x: read from unknown chip",cpu_getactivecpu(),activecpu_get_pc() );
+	logerror("CPU #%d PC %04x: warning - read from unknown chip\n",cpunum_get_active(),cpu_get_pc(machine->activecpu) );
+//  popmessage("CPU #%d PC %04x: read from unknown chip",cpunum_get_active(),cpu_get_pc(machine->activecpu) );
 	return 0;
 }
 
 static WRITE8_HANDLER( unknown_w )
 {
-	logerror("CPU #%d PC %04x: warning - wrote to unknown chip\n",cpu_getactivecpu(),activecpu_get_pc() );
-//  popmessage("CPU #%d PC %04x: wrote to unknown chip",cpu_getactivecpu(),activecpu_get_pc() );
+	logerror("CPU #%d PC %04x: warning - wrote to unknown chip\n",cpunum_get_active(),cpu_get_pc(machine->activecpu) );
+//  popmessage("CPU #%d PC %04x: wrote to unknown chip",cpunum_get_active(),cpu_get_pc(machine->activecpu) );
 }
 
 /* Main bankswitching routine */
@@ -739,19 +739,19 @@ static void namcos1_bankswitch(running_machine *machine, int cpu, offs_t offset,
 	/* unmapped bank warning */
 	if( namcos1_active_bank[bank].bank_handler_r == unknown_r)
 	{
-		logerror("CPU #%d PC %04x:warning unknown chip selected bank %x=$%04x\n", cpu , activecpu_get_pc(), bank , chip[bank] );
-//          if (chip) popmessage("CPU #%d PC %04x:unknown chip selected bank %x=$%04x", cpu , activecpu_get_pc(), bank , chip[bank] );
+		logerror("CPU #%d PC %04x:warning unknown chip selected bank %x=$%04x\n", cpu , cpu_get_pc(machine->activecpu), bank , chip[bank] );
+//          if (chip) popmessage("CPU #%d PC %04x:unknown chip selected bank %x=$%04x", cpu , cpu_get_pc(machine->activecpu), bank , chip[bank] );
 	}
 
 	/* renew pc base */
-//  change_pc(activecpu_get_pc());
+//  change_pc(cpu_get_pc(machine->activecpu));
 }
 
 WRITE8_HANDLER( namcos1_bankswitch_w )
 {
-//  logerror("cpu %d: namcos1_bankswitch_w offset %04x data %02x\n",cpu_getactivecpu(),offset,data);
+//  logerror("cpu %d: namcos1_bankswitch_w offset %04x data %02x\n",cpunum_get_active(),offset,data);
 
-	namcos1_bankswitch(machine, cpu_getactivecpu(), offset, data);
+	namcos1_bankswitch(machine, cpunum_get_active(), offset, data);
 }
 
 /* Sub cpu set start bank port */
@@ -943,7 +943,7 @@ WRITE8_HANDLER( namcos1_mcu_bankswitch_w )
 
 WRITE8_HANDLER( namcos1_mcu_patch_w )
 {
-	//logerror("mcu C000 write pc=%04x data=%02x\n",activecpu_get_pc(),data);
+	//logerror("mcu C000 write pc=%04x data=%02x\n",cpu_get_pc(machine->activecpu),data);
 	if (mcu_patch_data == 0xa6) return;
 	mcu_patch_data = data;
 	namcos1_triram[0] = data;

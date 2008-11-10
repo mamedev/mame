@@ -185,7 +185,7 @@ static void update_irq_state(running_machine *machine)
 /* For games that supply an *IRQ Vector* on the data bus */
 static IRQ_CALLBACK(metro_irq_callback)
 {
-//  logerror("CPU #0 PC %06X: irq callback returns %04X\n",activecpu_get_pc(),metro_irq_vectors[int_level]);
+//  logerror("CPU #0 PC %06X: irq callback returns %04X\n",cpu_get_pc(machine->activecpu),metro_irq_vectors[int_level]);
 	return metro_irq_vectors[irqline]&0xff;
 }
 
@@ -198,7 +198,7 @@ static MACHINE_RESET( metro )
 
 static WRITE16_HANDLER( metro_irq_cause_w )
 {
-//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n",activecpu_get_pc(),data);
+//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n",cpu_get_pc(machine->activecpu),data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -576,14 +576,14 @@ static WRITE16_HANDLER( metro_coin_lockout_1word_w )
 //      coin_lockout_w(0, data & 1);
 //      coin_lockout_w(1, data & 2);
 	}
-	if (data & ~3)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",activecpu_get_pc(),data);
+	if (data & ~3)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(machine->activecpu),data);
 }
 
 
 static WRITE16_HANDLER( metro_coin_lockout_4words_w )
 {
 //  coin_lockout_w( (offset >> 1) & 1, offset & 1 );
-	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",activecpu_get_pc(),data);
+	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(machine->activecpu),data);
 }
 
 
@@ -688,7 +688,7 @@ INLINE void blt_write(running_machine *machine, const int tmap, const offs_t off
 		case 2:	metro_vram_1_w(machine,offs,data,mask);	break;
 		case 3:	metro_vram_2_w(machine,offs,data,mask);	break;
 	}
-//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",activecpu_get_pc(),tmap,offs,data,mask);
+//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",cpu_get_pc(machine->activecpu),tmap,offs,data,mask);
 }
 
 
@@ -711,7 +711,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 		int shift			=	(dst_offs & 0x80) ? 0 : 8;
 		UINT16 mask		=	(dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",activecpu_get_pc(),tmap,src_offs,dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",cpu_get_pc(machine->activecpu),tmap,src_offs,dst_offs);
 
 		dst_offs >>= 7+1;
 		switch( tmap )
@@ -721,7 +721,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",activecpu_get_pc(),tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",cpu_get_pc(machine->activecpu),tmap);
 				return;
 		}
 
@@ -731,7 +731,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 			src_offs %= src_len;
 			b1 = blt_read(src,src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",activecpu_get_pc(),b1,src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",cpu_get_pc(machine->activecpu),b1,src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -815,7 +815,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",activecpu_get_pc(),b1,src_offs-1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",cpu_get_pc(machine->activecpu),b1,src_offs-1);
 					return;
 			}
 
@@ -921,7 +921,7 @@ static READ16_HANDLER( balcube_dsw_r )
 		case 0x17FFE:	return (dsw2 & 0x40) ? 0x40 : 0;
 		case 0x0FFFE:	return (dsw2 & 0x80) ? 0x40 : 0;
 	}
-	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n",activecpu_get_pc(),offset);
+	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n",cpu_get_pc(machine->activecpu),offset);
 	return 0xffff;
 }
 

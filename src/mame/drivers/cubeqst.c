@@ -115,7 +115,7 @@ static VIDEO_UPDATE( cubeqst )
 	/* Bit 3 selects LD/#GRAPHICS */
 	fillbitmap(bitmap, colormap[255], cliprect);
 
-	cpuintrf_push_context(LINE_CPU);
+	cpu_push_context(screen->machine->cpu[LINE_CPU]);
 
 	/* TODO: Add 1 for linebuffering? */
 	for (y = cliprect->min_y; y <= cliprect->max_y; ++y)
@@ -174,7 +174,7 @@ static VIDEO_UPDATE( cubeqst )
 		}
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return 0;
 }
 
@@ -249,13 +249,13 @@ static WRITE16_HANDLER( control_w )
 
 static TIMER_CALLBACK( delayed_bank_swap )
 {
-	cpuintrf_push_context(LINE_CPU);
+	cpu_push_context(machine->cpu[LINE_CPU]);
 	cubeqcpu_swap_line_banks();
 
 	/* TODO: This is a little dubious */
 	clear_stack();
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 

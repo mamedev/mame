@@ -3610,8 +3610,8 @@ static CPU_SET_INFO( sh4 )
 		case CPUINFO_STR_REGISTER + SH4_XF15:			sh4.xf[15] = info->i; break;
 #endif
 
-		case CPUINFO_INT_SH4_IRLn_INPUT:				sh4_set_irln_input(cpu_getactivecpu(), info->i); break;
-		case CPUINFO_INT_SH4_FRT_INPUT:					sh4_set_frt_input(cpu_getactivecpu(), info->i); break;
+		case CPUINFO_INT_SH4_IRLn_INPUT:				sh4_set_irln_input(cpunum_get_active(), info->i); break;
+		case CPUINFO_INT_SH4_FRT_INPUT:					sh4_set_frt_input(cpunum_get_active(), info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_SH4_FTCSR_READ_CALLBACK:		sh4.ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;

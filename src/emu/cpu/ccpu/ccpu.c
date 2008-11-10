@@ -704,7 +704,7 @@ static CPU_SET_INFO( ccpu )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + CCPU_PC:			ccpu.PC = info->i;						break;
-		case CPUINFO_INT_REGISTER + CCPU_FLAGS:
+		case CPUINFO_INT_REGISTER + Ccpu_get_flags:
 				ccpu.a0flag = (info->i & 0x01) ? 1 : 0;
 				ccpu.ncflag = (info->i & 0x02) ? 0x0000 : 0x1000;
 				ccpu.cmpacc = 1;
@@ -760,7 +760,7 @@ CPU_GET_INFO( ccpu )
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + CCPU_PC: 			info->i = ccpu.PC;						break;
-		case CPUINFO_INT_REGISTER + CCPU_FLAGS:			info->i = 0;
+		case CPUINFO_INT_REGISTER + Ccpu_get_flags:			info->i = 0;
 				if (TEST_A0()) info->i |= 0x01;
 				if (TEST_NC()) info->i |= 0x02;
 				if (TEST_LT()) info->i |= 0x04;
@@ -807,7 +807,7 @@ CPU_GET_INFO( ccpu )
 	        		TEST_DR() ? 'D' : 'd');
 	        break;
 
-        case CPUINFO_STR_REGISTER + CCPU_FLAGS:
+        case CPUINFO_STR_REGISTER + Ccpu_get_flags:
     		sprintf(info->s, "FL:%c%c%c%c%c%c",
 	        		TEST_A0() ? '0' : 'o',
 	        		TEST_NC() ? 'N' : 'n',

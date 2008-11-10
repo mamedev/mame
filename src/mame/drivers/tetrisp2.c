@@ -197,7 +197,7 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 
 			memcpy(memory_region(machine, "oki"), rom + (bank_lo * 0x80000), 0x20000);
 
-//          logerror("PC:%06X sound bank_lo = %02X\n",activecpu_get_pc(),bank_lo);
+//          logerror("PC:%06X sound bank_lo = %02X\n",cpu_get_pc(machine->activecpu),bank_lo);
 		}
 		else
 		{
@@ -205,7 +205,7 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 
 			memcpy(memory_region(machine, "oki") + 0x20000, rom + (bank_lo * 0x80000) + (bank_hi * 0x20000), 0x20000);
 
-//          logerror("PC:%06X sound bank_hi = %02X\n",activecpu_get_pc(),bank_hi);
+//          logerror("PC:%06X sound bank_hi = %02X\n",cpu_get_pc(machine->activecpu),bank_hi);
 		}
 	}
 }

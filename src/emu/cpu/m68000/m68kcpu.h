@@ -355,7 +355,7 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #if M68K_LOG_ENABLE
 	#include <stdio.h>
 	extern FILE* M68K_LOG_FILEHANDLE
-	extern const char *const m68ki_cpu_names[];
+	extern const char *const m68ki_cpu_get_names[];
 
 	#define M68K_DO_LOG(A) if(M68K_LOG_FILEHANDLE) fprintf A
 	#if M68K_LOG_1010_1111
@@ -1625,7 +1625,7 @@ INLINE void m68ki_exception_1010(m68ki_cpu_core *m68k)
 	UINT32 sr;
 #if M68K_LOG_1010_1111 == OPT_ON
 	M68K_DO_LOG_EMU((M68K_LOG_FILEHANDLE "%s at %08x: called 1010 instruction %04x (%s)\n",
-					 m68ki_cpu_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PPC), m68k->ir,
+					 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PPC), m68k->ir,
 					 m68ki_disassemble_quick(ADDRESS_68K(m68k, REG_PPC))));
 #endif
 
@@ -1644,7 +1644,7 @@ INLINE void m68ki_exception_1111(m68ki_cpu_core *m68k)
 
 #if M68K_LOG_1010_1111 == OPT_ON
 	M68K_DO_LOG_EMU((M68K_LOG_FILEHANDLE "%s at %08x: called 1111 instruction %04x (%s)\n",
-					 m68ki_cpu_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PPC), m68k->ir,
+					 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PPC), m68k->ir,
 					 m68ki_disassemble_quick(ADDRESS_68K(m68k, REG_PPC))));
 #endif
 
@@ -1662,7 +1662,7 @@ INLINE void m68ki_exception_illegal(m68ki_cpu_core *m68k)
 	UINT32 sr;
 
 	M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: illegal instruction %04x (%s)\n",
-				 m68ki_cpu_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PPC), m68k->ir,
+				 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PPC), m68k->ir,
 				 m68ki_disassemble_quick(ADDRESS_68K(m68k, REG_PPC))));
 
 	sr = m68ki_init_exception(m68k);
@@ -1749,7 +1749,7 @@ void m68ki_exception_interrupt(m68ki_cpu_core *m68k, UINT32 int_level)
 	else if(vector > 255)
 	{
 		M68K_DO_LOG_EMU((M68K_LOG_FILEHANDLE "%s at %08x: Interrupt acknowledge returned invalid vector $%x\n",
-				 m68ki_cpu_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PC), vector));
+				 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PC), vector));
 		return;
 	}
 

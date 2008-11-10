@@ -230,7 +230,7 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK(cop420_counter_tick)
 {
-	cpuintrf_push_context(param);
+	cpu_push_context(machine->cpu[param]);
 
 	R.counter++;
 
@@ -240,7 +240,7 @@ static TIMER_CALLBACK(cop420_counter_tick)
 		R.timerlatch = 1;
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 /* IN Latches */
@@ -250,7 +250,7 @@ static TIMER_CALLBACK(cop420_inil_tick)
 	UINT8 in;
 	int i;
 
-	cpuintrf_push_context(param);
+	cpu_push_context(machine->cpu[param]);
 
 	in = IN_IN();
 	for (i = 0; i < 4; i++)
@@ -263,7 +263,7 @@ static TIMER_CALLBACK(cop420_inil_tick)
 		}
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 /* Microbus */
@@ -272,7 +272,7 @@ static TIMER_CALLBACK(cop420_microbus_tick)
 {
 	UINT8 in;
 
-	cpuintrf_push_context(param);
+	cpu_push_context(machine->cpu[param]);
 
 	in = IN_IN();
 
@@ -298,7 +298,7 @@ static TIMER_CALLBACK(cop420_microbus_tick)
 		}
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 /****************************************************************************
@@ -322,7 +322,7 @@ static CPU_INIT( cop420 )
 
 	/* set clock divider */
 
-	cpunum_set_info_int(index, CPUINFO_INT_CLOCK_DIVIDER, R.intf->cki);
+	cpu_set_info_int(device, CPUINFO_INT_CLOCK_DIVIDER, R.intf->cki);
 
 	/* allocate serial timer */
 

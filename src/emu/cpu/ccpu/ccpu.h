@@ -23,7 +23,7 @@
 enum
 {
 	CCPU_PC=1,
-	CCPU_FLAGS,
+	Ccpu_get_flags,
 	CCPU_A,
 	CCPU_B,
 	CCPU_I,

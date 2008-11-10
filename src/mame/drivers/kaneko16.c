@@ -399,7 +399,7 @@ static WRITE16_HANDLER( bakubrkr_oki_bank_sw )
 {
 	if (ACCESSING_BITS_0_7) {
 		okim6295_set_bank_base(0, 0x40000 * (data & 0x7) );
-		logerror("PC:%06X  Selecting OKI bank %02X\n",activecpu_get_pc(),data&0xff);
+		logerror("PC:%06X  Selecting OKI bank %02X\n",cpu_get_pc(machine->activecpu),data&0xff);
 	}
 }
 
@@ -470,7 +470,7 @@ static WRITE16_HANDLER( bloodwar_oki_0_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(0, 0x40000 * (data & 0xf) );
-//      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",activecpu_get_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -479,7 +479,7 @@ static WRITE16_HANDLER( bloodwar_oki_1_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(1, 0x40000 * data );
-//      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",activecpu_get_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -540,7 +540,7 @@ static WRITE16_HANDLER( bonkadv_oki_0_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(0, 0x40000 * (data & 0xF));
-		logerror("CPU #0 PC %06X : OKI0  bank %08X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC %06X : OKI0  bank %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -549,7 +549,7 @@ static WRITE16_HANDLER( bonkadv_oki_1_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(1, 0x40000 * data );
-		logerror("CPU #0 PC %06X : OKI1  bank %08X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC %06X : OKI1  bank %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -619,7 +619,7 @@ static WRITE16_HANDLER( gtmr_oki_0_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(0, 0x40000 * (data & 0xF) );
-//      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",activecpu_get_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -628,7 +628,7 @@ static WRITE16_HANDLER( gtmr_oki_1_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(1, 0x40000 * (data & 0x1) );
-//      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",activecpu_get_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -637,7 +637,7 @@ static WRITE16_HANDLER( gtmr_oki_0_data_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_data_0_w(machine,0,data);
-//      logerror("CPU #0 PC %06X : OKI0 <- %08X\n",activecpu_get_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI0 <- %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -646,7 +646,7 @@ static WRITE16_HANDLER( gtmr_oki_1_data_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_data_1_w(machine,0,data);
-//      logerror("CPU #0 PC %06X : OKI1 <- %08X\n",activecpu_get_pc(),data);
+//      logerror("CPU #0 PC %06X : OKI1 <- %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -725,7 +725,7 @@ static READ16_HANDLER( gtmr2_wheel_r )
 			return	(input_port_read(machine, "WHEEL2") << 8);
 			break;
 		default:
-			logerror("gtmr2_wheel_r : read at %06x with joystick\n", activecpu_get_pc());
+			logerror("gtmr2_wheel_r : read at %06x with joystick\n", cpu_get_pc(machine->activecpu));
 			return	(~0);
 			break;
 	}

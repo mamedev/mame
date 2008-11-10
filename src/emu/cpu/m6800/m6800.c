@@ -524,7 +524,7 @@ INLINE void WM16( UINT32 Addr, PAIR *p )
 /* IRQ enter */
 static void ENTER_INTERRUPT(const char *message,UINT16 irq_vector)
 {
-	LOG((message, cpu_getactivecpu()));
+	LOG((message, cpunum_get_active()));
 	if( m68xx.wai_state & (M6800_WAI|M6800_SLP) )
 	{
 		if( m68xx.wai_state & M6800_WAI )
@@ -674,9 +674,9 @@ static TIMER_CALLBACK(m6800_tx_tick)
 				// send stop bit '1'
 				m68xx.tx = 1;
 
-			    cpuintrf_push_context(cpunum);
+			    cpu_push_context(machine->cpu[cpunum]);
 				CHECK_IRQ_LINES();
-				cpuintrf_pop_context();
+				cpu_pop_context();
 
 				m68xx.txbits = M6800_SERIAL_START;
 				break;
@@ -746,9 +746,9 @@ static TIMER_CALLBACK(m6800_rx_tick)
 
 						m68xx.trcsr |= M6800_TRCSR_ORFE;
 
-					    cpuintrf_push_context(cpunum);
+					    cpu_push_context(machine->cpu[cpunum]);
 						CHECK_IRQ_LINES();
-						cpuintrf_pop_context();
+						cpu_pop_context();
 					}
 					else
 					{
@@ -760,9 +760,9 @@ static TIMER_CALLBACK(m6800_rx_tick)
 							// set RDRF flag
 							m68xx.trcsr |= M6800_TRCSR_RDRF;
 
-							cpuintrf_push_context(cpunum);
+							cpu_push_context(machine->cpu[cpunum]);
 							CHECK_IRQ_LINES();
-							cpuintrf_pop_context();
+							cpu_pop_context();
 						}
 					}
 				}
@@ -779,9 +779,9 @@ static TIMER_CALLBACK(m6800_rx_tick)
 					m68xx.trcsr |= M6800_TRCSR_ORFE;
 					m68xx.trcsr &= ~M6800_TRCSR_RDRF;
 
-					cpuintrf_push_context(cpunum);
+					cpu_push_context(machine->cpu[cpunum]);
 					CHECK_IRQ_LINES();
-					cpuintrf_pop_context();
+					cpu_pop_context();
 				}
 
 				m68xx.rxbits = M6800_SERIAL_START;
@@ -927,7 +927,7 @@ static void set_irq_line(int irqline, int state)
 	if (irqline == INPUT_LINE_NMI)
 	{
 		if (m68xx.nmi_state == state) return;
-		LOG(("M6800#%d set_nmi_line %d \n", cpu_getactivecpu(), state));
+		LOG(("M6800#%d set_nmi_line %d \n", cpunum_get_active(), state));
 		m68xx.nmi_state = state;
 		if (state == CLEAR_LINE) return;
 
@@ -939,7 +939,7 @@ static void set_irq_line(int irqline, int state)
 		int eddge;
 
 		if (m68xx.irq_state[irqline] == state) return;
-		LOG(("M6800#%d set_irq_line %d,%d\n", cpu_getactivecpu(), irqline, state));
+		LOG(("M6800#%d set_irq_line %d,%d\n", cpunum_get_active(), irqline, state));
 		m68xx.irq_state[irqline] = state;
 
 		switch(irqline)
@@ -2348,7 +2348,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x0e:
 			return (m68xx.input_capture >> 8) & 0xff;
 		case 0x0f:
-			logerror("CPU #%d PC %04x: warning - read from unsupported register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+			logerror("CPU #%d PC %04x: warning - read from unsupported register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset);
 			return 0;
 		case 0x10:
 			return m68xx.rmcr;
@@ -2365,7 +2365,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x13:
 			return m68xx.tdr;
 		case 0x14:
-			logerror("CPU #%d PC %04x: read RAM control register\n",cpu_getactivecpu(),activecpu_get_pc());
+			logerror("CPU #%d PC %04x: read RAM control register\n",cpunum_get_active(),cpu_get_pc(machine->activecpu));
 			return m68xx.ram_ctrl;
 		case 0x15:
 		case 0x16:
@@ -2379,7 +2379,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x1e:
 		case 0x1f:
 		default:
-			logerror("CPU #%d PC %04x: warning - read from reserved internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),offset);
+			logerror("CPU #%d PC %04x: warning - read from reserved internal register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset);
 			return 0;
 	}
 }
@@ -2412,7 +2412,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 						| (io_read_byte_8be(M6803_PORT2) & (m68xx.port2_ddr ^ 0xff)));
 
 				if (m68xx.port2_ddr & 2)
-					logerror("CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpu_getactivecpu(),activecpu_get_pc());
+					logerror("CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpunum_get_active(),cpu_get_pc(machine->activecpu));
 			}
 			break;
 		case 0x02:
@@ -2511,10 +2511,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x0d:
 		case 0x0e:
 		case 0x12:
-			logerror("CPU #%d PC %04x: warning - write %02x to read only internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+			logerror("CPU #%d PC %04x: warning - write %02x to read only internal register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
 			break;
 		case 0x0f:
-			logerror("CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+			logerror("CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
 			break;
 		case 0x10:
 			m68xx.rmcr = data & 0x0f;
@@ -2532,8 +2532,8 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 				{
 					int divisor = M6800_RMCR_SS[m68xx.rmcr & M6800_RMCR_SS_MASK];
 
-					timer_adjust_periodic(m6800_rx_timer, attotime_zero, cpu_getactivecpu(), ATTOTIME_IN_HZ(m68xx.clock / divisor));
-					timer_adjust_periodic(m6800_tx_timer, attotime_zero, cpu_getactivecpu(), ATTOTIME_IN_HZ(m68xx.clock / divisor));
+					timer_adjust_periodic(m6800_rx_timer, attotime_zero, cpunum_get_active(), ATTOTIME_IN_HZ(m68xx.clock / divisor));
+					timer_adjust_periodic(m6800_tx_timer, attotime_zero, cpunum_get_active(), ATTOTIME_IN_HZ(m68xx.clock / divisor));
 				}
 				break;
 			}
@@ -2554,7 +2554,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			m68xx.tdr = data;
 			break;
 		case 0x14:
-			logerror("CPU #%d PC %04x: write %02x to RAM control register\n",cpu_getactivecpu(),activecpu_get_pc(),data);
+			logerror("CPU #%d PC %04x: write %02x to RAM control register\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data);
 			m68xx.ram_ctrl = data;
 			break;
 		case 0x15:
@@ -2569,7 +2569,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x1e:
 		case 0x1f:
 		default:
-			logerror("CPU #%d PC %04x: warning - write %02x to reserved internal register %02x\n",cpu_getactivecpu(),activecpu_get_pc(),data,offset);
+			logerror("CPU #%d PC %04x: warning - write %02x to reserved internal register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
 			break;
 	}
 }

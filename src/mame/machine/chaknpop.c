@@ -73,21 +73,21 @@ static void mcu_update_seed(UINT8 data)
 
 READ8_HANDLER( chaknpop_mcu_portA_r )
 {
-	//logerror("%04x: MCU portA read\n", activecpu_get_pc());
+	//logerror("%04x: MCU portA read\n", cpu_get_pc(machine->activecpu));
 	return mcu_result;
 }
 
 
 READ8_HANDLER( chaknpop_mcu_portB_r )
 {
-	//logerror("%04x: MCU portB read\n", activecpu_get_pc());
+	//logerror("%04x: MCU portB read\n", cpu_get_pc(machine->activecpu));
 
 	return 0xff;
 }
 
 READ8_HANDLER( chaknpop_mcu_portC_r )
 {
-	//logerror("%04x: MCU portC read\n", activecpu_get_pc());
+	//logerror("%04x: MCU portC read\n", cpu_get_pc(machine->activecpu));
 	return 0x00;
 }
 
@@ -107,7 +107,7 @@ WRITE8_HANDLER( chaknpop_mcu_portA_w )
 
 		mcu_update_seed(mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", activecpu_get_pc(), mcu_command, mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_result);
 	}
 	else if (mcu_command >= 0x28 && mcu_command <= 0x2a)
 	{
@@ -118,7 +118,7 @@ WRITE8_HANDLER( chaknpop_mcu_portA_w )
 
 		mcu_update_seed(mcu_result);
 
-		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", activecpu_get_pc(), mcu_command, mcu_result);
+		logerror("%04x: MCU command 0x%02x, result 0x%02x\n", cpu_get_pc(machine->activecpu), mcu_command, mcu_result);
 	}
 	else if (mcu_command < 0x80)
 	{
@@ -128,25 +128,25 @@ WRITE8_HANDLER( chaknpop_mcu_portA_w )
 		{
 			mcu_select = mcu_command - 0x40;
 
-			logerror("%04x: MCU select 0x%02x\n", activecpu_get_pc(), mcu_select);
+			logerror("%04x: MCU select 0x%02x\n", cpu_get_pc(machine->activecpu), mcu_select);
 		}
 	}
 	else if (mcu_command == 0x9c|| mcu_command == 0xde)
 	{
 		mcu_update_seed(data);
 
-		logerror("%04x: MCU command 0x%02x\n", activecpu_get_pc(), mcu_command);
+		logerror("%04x: MCU command 0x%02x\n", cpu_get_pc(machine->activecpu), mcu_command);
 	}
 }
 
 WRITE8_HANDLER( chaknpop_mcu_portB_w )
 {
-	//logerror("%04x: MCU portB write 0x%02x\n", activecpu_get_pc(), data);
+	//logerror("%04x: MCU portB write 0x%02x\n", cpu_get_pc(machine->activecpu), data);
 }
 
 WRITE8_HANDLER( chaknpop_mcu_portC_w )
 {
-	//logerror("%04x: MCU portC write 0x%02x\n", activecpu_get_pc(), data);
+	//logerror("%04x: MCU portC write 0x%02x\n", cpu_get_pc(machine->activecpu), data);
 }
 
 

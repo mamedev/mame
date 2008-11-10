@@ -37,7 +37,7 @@ static UINT8 clear_tv;
 
 static READ8_HANDLER( port_b_u3_r )
 {
-	logerror("%04x: read DIP\n",activecpu_get_pc());
+	logerror("%04x: read DIP\n",cpu_get_pc(machine->activecpu));
 	return input_port_read(machine, "DSW");
 }
 

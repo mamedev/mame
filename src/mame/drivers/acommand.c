@@ -274,7 +274,7 @@ static UINT16 *ac_devram;
 
 static READ16_HANDLER(ac_devices_r)
 {
-  	logerror("(PC=%06x) read at %04x\n",activecpu_get_pc(),offset*2);
+  	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(machine->activecpu),offset*2);
 
 	switch(offset)
 	{

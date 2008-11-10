@@ -303,7 +303,7 @@ READ8_HANDLER( segag80r_video_port_r )
 {
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_r(%d)\n", activecpu_get_pc(), offset);
+		logerror("%04X:segag80r_video_port_r(%d)\n", cpu_get_pc(machine->activecpu), offset);
 		return 0xff;
 	}
 	else
@@ -323,7 +323,7 @@ WRITE8_HANDLER( segag80r_video_port_w )
 {
 	if (offset == 0)
 	{
-		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", activecpu_get_pc(), offset, data);
+		logerror("%04X:segag80r_video_port_w(%d) = %02X\n", cpu_get_pc(machine->activecpu), offset, data);
 	}
 	else
 	{

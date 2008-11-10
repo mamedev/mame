@@ -816,13 +816,13 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 		if (diffs & 0x02)
 			reload_count(counter);
 
-		LOG(("%06X:Counter %d control = %02X\n", activecpu_get_previouspc(), counter, data));
+		LOG(("%06X:Counter %d control = %02X\n", cpu_get_previouspc(machine->activecpu), counter, data));
 	}
 
 	/* offsets 2, 4, and 6 are MSB buffer registers */
 	else if ((offset & 1) == 0)
 	{
-		LOG(("%06X:MSB = %02X\n", activecpu_get_previouspc(), data));
+		LOG(("%06X:MSB = %02X\n", cpu_get_previouspc(machine->activecpu), data));
 		m6840_msb_buffer = data;
 	}
 
@@ -840,7 +840,7 @@ static WRITE8_HANDLER( mcr68_6840_w_common )
 		if (!(m6840_state[counter].control & 0x10))
 			reload_count(counter);
 
-		LOG(("%06X:Counter %d latch = %04X\n", activecpu_get_previouspc(), counter, m6840_state[counter].latch));
+		LOG(("%06X:Counter %d latch = %04X\n", cpu_get_previouspc(machine->activecpu), counter, m6840_state[counter].latch));
 	}
 }
 
@@ -854,7 +854,7 @@ static READ16_HANDLER( mcr68_6840_r_common )
 	/* offset 1 is the status register */
 	else if (offset == 1)
 	{
-		LOG(("%06X:Status read = %04X\n", activecpu_get_previouspc(), m6840_status));
+		LOG(("%06X:Status read = %04X\n", cpu_get_previouspc(machine->activecpu), m6840_status));
 		m6840_status_read_since_int |= m6840_status & 0x07;
 		return m6840_status;
 	}
@@ -872,7 +872,7 @@ static READ16_HANDLER( mcr68_6840_r_common )
 
 		m6840_lsb_buffer = result & 0xff;
 
-		LOG(("%06X:Counter %d read = %04X\n", activecpu_get_previouspc(), counter, result));
+		LOG(("%06X:Counter %d read = %04X\n", cpu_get_previouspc(machine->activecpu), counter, result));
 		return result >> 8;
 	}
 
@@ -949,7 +949,7 @@ WRITE8_HANDLER( mcr_ipu_laserdisk_w )
 	/* bit 1 enables (1) LD left channel audio */
 	/* bit 0 enables (1) LD video if PIX SW == 1 */
 	if (data != 0)
-		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", activecpu_get_pc(), offset, data);
+		logerror("%04X:mcr_ipu_laserdisk_w(%d) = %02X\n", cpu_get_pc(machine->activecpu), offset, data);
 }
 
 

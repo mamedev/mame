@@ -4,6 +4,7 @@
 
 ***************************************************************************/
 #include "driver.h"
+#include "deprecat.h"
 #include "debugger.h"
 #include "machine/8255ppi.h"
 #include "tx1.h"
@@ -194,7 +195,7 @@ static void sn_divide(void)
 
 	if ( SN74S516.X == 0 )
 	{
-		mame_printf_debug("SN74S516 tried to divide by zero (PC=%x)\n", activecpu_get_pc());
+		mame_printf_debug("SN74S516 tried to divide by zero (PC=%x)\n", cpu_get_pc(Machine->activecpu));
 		SN74S516.ZW.Z = 0xffff;
 		SN74S516.ZW.W = 0xffff;
 		SN74S516.ZWfl = 0;
@@ -336,7 +337,7 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 			if (SN74S516.code == 0x6666)
 			{
 				CLEAR_SEQUENCE;
-				mame_printf_debug("Code 6666: PROMADDR:%x PC:%x\n", math.promaddr, activecpu_get_pc());
+				mame_printf_debug("Code 6666: PROMADDR:%x PC:%x\n", math.promaddr, cpu_get_pc(Machine->activecpu));
 			}
 
 			UPDATE_SEQUENCE;
@@ -423,7 +424,7 @@ static void kick_sn74s516(UINT16 *data, const int ins)
 	}
 
 	math.dbgaddr = math.promaddr;
-	math.dbgpc = activecpu_get_previouspc();
+	math.dbgpc = cpu_get_previouspc(Machine->activecpu);
 }
 
 

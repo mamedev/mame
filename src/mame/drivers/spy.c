@@ -50,12 +50,12 @@ static READ8_HANDLER( spy_bankedram1_r )
 	{
 		if (pmcbank)
 		{
-			//logerror("%04x read pmcram %04x\n",activecpu_get_pc(),offset);
+			//logerror("%04x read pmcram %04x\n",cpu_get_pc(machine->activecpu),offset);
 			return pmcram[offset];
 		}
 		else
 		{
-			//logerror("%04x read pmc internal ram %04x\n",activecpu_get_pc(),offset);
+			//logerror("%04x read pmc internal ram %04x\n",cpu_get_pc(machine->activecpu),offset);
 			return 0;
 		}
 	}
@@ -73,11 +73,11 @@ static WRITE8_HANDLER( spy_bankedram1_w )
 	{
 		if (pmcbank)
 		{
-			//logerror("%04x pmcram %04x = %02x\n",activecpu_get_pc(),offset,data);
+			//logerror("%04x pmcram %04x = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
 			pmcram[offset] = data;
 		}
 		//else
-			//logerror("%04x pmc internal ram %04x = %02x\n",activecpu_get_pc(),offset,data);
+			//logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
 	}
 	else
 		ram[offset] = data;
@@ -304,7 +304,7 @@ static WRITE8_HANDLER( spy_3f90_w )
 	/* bit 7 = PMC-BK */
 	pmcbank = (data & 0x80) >> 7;
 
-//logerror("%04x: 3f90_w %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 3f90_w %02x\n",cpu_get_pc(machine->activecpu),data);
 	/* bit 6 = PMC-START */
 	if ((data & 0x40) && !(old & 0x40))
 	{

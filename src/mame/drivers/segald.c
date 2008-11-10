@@ -97,26 +97,26 @@ static READ8_HANDLER( astron_DISC_read )
 	if (nmi_enable)
 		ldv1000_input_latch = laserdisc_data_r(laserdisc);
 
-	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", ldv1000_input_latch, offset, activecpu_get_pc());
+	logerror("DISC read   (0x%04x) @ 0x%04x [0x%x]\n", ldv1000_input_latch, offset, cpu_get_pc(machine->activecpu));
 
 	return ldv1000_input_latch;
 }
 
 static READ8_HANDLER( astron_OUT_read )
 {
-	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", out_RAM[offset], offset, activecpu_get_pc());
+	logerror("OUT read   (0x%04x) @ 0x%04x [0x%x]\n", out_RAM[offset], offset, cpu_get_pc(machine->activecpu));
 	return out_RAM[offset];
 }
 
 static READ8_HANDLER( astron_OBJ_read )
 {
-	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", obj_RAM[offset], offset, activecpu_get_pc());
+	logerror("OBJ read   (0x%04x) @ 0x%04x [0x%x]\n", obj_RAM[offset], offset, cpu_get_pc(machine->activecpu));
 	return obj_RAM[offset];
 }
 
 static READ8_HANDLER( astron_COLOR_read )
 {
-	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", color_RAM[offset], offset, activecpu_get_pc());
+	logerror("COLOR read   (0x%04x) @ 0x%04x [0x%x]\n", color_RAM[offset], offset, cpu_get_pc(machine->activecpu));
 	return color_RAM[offset];
 }
 
@@ -124,7 +124,7 @@ static READ8_HANDLER( astron_COLOR_read )
 /* WRITES */
 static WRITE8_HANDLER( astron_DISC_write )
 {
-	logerror("DISC write : 0x%04x @  0x%04x [0x%x]\n", data, offset, activecpu_get_pc());
+	logerror("DISC write : 0x%04x @  0x%04x [0x%x]\n", data, offset, cpu_get_pc(machine->activecpu));
 
 	ldv1000_output_latch = data;
 
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( astron_DISC_write )
 
 static WRITE8_HANDLER( astron_OUT_write )
 {
-	logerror("OUT write : 0x%04x @  0x%04x [0x%x]\n", data, offset, activecpu_get_pc());
+	logerror("OUT write : 0x%04x @  0x%04x [0x%x]\n", data, offset, cpu_get_pc(machine->activecpu));
 
 	switch(offset)
 	{
@@ -171,7 +171,7 @@ static WRITE8_HANDLER( astron_OUT_write )
 static WRITE8_HANDLER( astron_OBJ_write )
 {
 	obj_RAM[offset] = data;
-	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, activecpu_get_pc());
+	logerror("OBJ write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(machine->activecpu));
 }
 
 static WRITE8_HANDLER( astron_COLOR_write )
@@ -194,13 +194,13 @@ static WRITE8_HANDLER( astron_COLOR_write )
 	a = (highBits & 0x80) ? 0 : 255;
 
 	palette_set_color(machine, palIndex, MAKE_ARGB(a, r, g, b));
-	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, activecpu_get_pc());
+	logerror("COLOR write : 0x%04x @   0x%04x [0x%x]\n", data, offset, cpu_get_pc(machine->activecpu));
 }
 
 static WRITE8_HANDLER( astron_FIX_write )
 {
 	fix_RAM[offset] = data;
-	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, activecpu_get_pc()); */
+	/* logerror("FIX write : 0x%04x @ 0x%04x [0x%x]\n", data, offset, cpu_get_pc(machine->activecpu)); */
 }
 
 static WRITE8_HANDLER( astron_io_bankswitch_w )

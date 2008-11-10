@@ -48,7 +48,7 @@ static READ8_HANDLER( aeroboto_201_r )
 	/* serie of values to be returned from 3004, and display "PASS 201" if it is */
 	static const UINT8 res[4] = { 0xff,0x9f,0x1b,0x03};
 	static int count;
-	logerror("PC %04x: read 3004\n",activecpu_get_pc());
+	logerror("PC %04x: read 3004\n",cpu_get_pc(machine->activecpu));
 	return res[(count++)&3];
 }
 

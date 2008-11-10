@@ -111,7 +111,7 @@ static CUSTOM_INPUT( z80_nmi_r )
 		/* main CPU might be waiting for sound CPU to finish NMI,
            so set a timer to give sound CPU a chance to run */
 		timer_call_after_resynch(NULL, 0, NULL);
-//      logerror("PC %06X - Read coin port during Z80 NMI\n", activecpu_get_pc());
+//      logerror("PC %06X - Read coin port during Z80 NMI\n", cpu_get_pc(machine->activecpu));
 	}
 
 	return ret;
@@ -150,7 +150,7 @@ static READ32_HANDLER( sngkace_input_r )
 		case 0x0:	return input_port_read(machine, "P1_P2");
 		case 0x1:	return input_port_read(machine, "DSW");
 		case 0x2:	return input_port_read(machine, "COIN");
-		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset * 2);
+		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(machine->activecpu), offset * 2);
 					return 0;
 	}
 }
@@ -161,7 +161,7 @@ static READ32_HANDLER( gunbird_input_r )
 	{
 		case 0x0:	return input_port_read(machine, "P1_P2");
 		case 0x1:	return input_port_read(machine, "DSW");
-		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(machine->activecpu), offset*2);
 					return 0;
 	}
 }
@@ -280,12 +280,12 @@ static WRITE32_HANDLER( s1945_mcu_w )
 			s1945_mcu_latching |= 4;
 			break;
 		default:
-//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, s1945_mcu_direction, s1945_mcu_latch1, s1945_mcu_latch2, activecpu_get_pc());
+//          logerror("MCU: function %02x, direction %02x, latch1 %02x, latch2 %02x (%x)\n", data, s1945_mcu_direction, s1945_mcu_latch1, s1945_mcu_latch2, cpu_get_pc(machine->activecpu));
 			break;
 		}
 		break;
 	default:
-//      logerror("MCU.w %x, %02x (%x)\n", offset, data, activecpu_get_pc());
+//      logerror("MCU.w %x, %02x (%x)\n", offset, data, cpu_get_pc(machine->activecpu));
 		;
 	}
 }
@@ -318,7 +318,7 @@ static READ32_HANDLER( s1945_input_r )
 		case 0x0:	return input_port_read(machine, "P1_P2");
 		case 0x1:	return (input_port_read(machine, "DSW") & 0xffff000f) | s1945_mcu_r(machine, offset-1, mem_mask);
 		case 0x2:	return s1945_mcu_r(machine, offset-1, mem_mask);
-		default:	logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+		default:	logerror("PC %06X - Read input %02X !\n", cpu_get_pc(machine->activecpu), offset*2);
 					return 0;
 	}
 }

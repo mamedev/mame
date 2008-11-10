@@ -55,13 +55,13 @@ static READ16_HANDLER( shangha3_prot_r )
 	static int count;
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
-logerror("PC %04x: read 20004e\n",activecpu_get_pc());
+logerror("PC %04x: read 20004e\n",cpu_get_pc(machine->activecpu));
 
 	return result[count++ % 9];
 }
 static WRITE16_HANDLER( shangha3_prot_w )
 {
-logerror("PC %04x: write %02x to 20004e\n",activecpu_get_pc(),data);
+logerror("PC %04x: write %02x to 20004e\n",cpu_get_pc(machine->activecpu),data);
 }
 
 

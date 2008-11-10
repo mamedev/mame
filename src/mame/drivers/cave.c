@@ -251,7 +251,7 @@ static READ16_HANDLER( soundlatch_ack_r )
 		return data;
 	}
 	else
-	{	logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n",activecpu_get_pc());
+	{	logerror("CPU #1 - PC %04X: Sound Buffer 2 Underflow Error\n",cpu_get_pc(machine->activecpu));
 		return 0xff;	}
 }
 
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( soundlatch_ack_w )
 	if (soundbuf.len<32)
 		soundbuf.len++;
 	else
-		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n",activecpu_get_pc());
+		logerror("CPU #1 - PC %04X: Sound Buffer 2 Overflow Error\n",cpu_get_pc(machine->activecpu));
 }
 
 
@@ -312,7 +312,7 @@ static int cave_region_byte;
 static WRITE16_HANDLER( cave_eeprom_msb_w )
 {
 	if (data & ~0xfe00)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(machine->activecpu),data);
 
 	if ( ACCESSING_BITS_8_15 )  // even address
 	{
@@ -356,7 +356,7 @@ static WRITE16_HANDLER( hotdogst_eeprom_msb_w )
 static WRITE16_HANDLER( cave_eeprom_lsb_w )
 {
 	if (data & ~0x00ef)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(machine->activecpu),data);
 
 	if ( ACCESSING_BITS_0_7 )  // odd address
 	{
@@ -391,7 +391,7 @@ static WRITE16_HANDLER( gaia_coin_lsb_w )
 static WRITE16_HANDLER( metmqstr_eeprom_msb_w )
 {
 	if (data & ~0xff00)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(machine->activecpu),data);
 
 	if ( ACCESSING_BITS_8_15 )  // even address
 	{
@@ -833,7 +833,7 @@ static WRITE16_HANDLER( korokoro_eeprom_msb_w )
 {
 	if (data & ~0x7000)
 	{
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(machine->activecpu),data);
 		COMBINE_DATA( &leds[1] );
 		show_leds();
 	}
@@ -1067,7 +1067,7 @@ static READ16_HANDLER( agallet_irq_cause_r )
 	if (offset == 0)
 	{
 // Speed hack for agallet
-		if ((activecpu_get_pc() == 0xcdca) && (irq_cause & 4))
+		if ((cpu_get_pc(machine->activecpu) == 0xcdca) && (irq_cause & 4))
 			cpu_spinuntil_int();
 	}
 
@@ -1174,7 +1174,7 @@ static WRITE8_HANDLER( hotdogst_rombank_w )
 {
 	UINT8 *RAM = memory_region(machine, "audio");
 	int bank = data & 0x0f;
-	if ( data & ~0x0f )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if ( data & ~0x0f )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(machine->activecpu),data);
 	if (bank > 1)	bank+=2;
 	memory_set_bankptr(2, &RAM[ 0x4000 * bank ]);
 }
@@ -1227,7 +1227,7 @@ static WRITE8_HANDLER( mazinger_rombank_w )
 {
 	UINT8 *RAM = memory_region(machine, "audio");
 	int bank = data & 0x07;
-	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(machine->activecpu),data);
 	if (bank > 1)	bank+=2;
 	memory_set_bankptr(2, &RAM[ 0x4000 * bank ]);
 }
@@ -1271,7 +1271,7 @@ static WRITE8_HANDLER( metmqstr_rombank_w )
 {
 	UINT8 *ROM = memory_region(machine, "audio");
 	int bank = data & 0xf;
-	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(machine->activecpu),data);
 	if (bank >= 2)	bank += 2;
 	memory_set_bankptr(1, &ROM[ 0x4000 * bank ]);
 }
@@ -1334,7 +1334,7 @@ static WRITE8_HANDLER( pwrinst2_rombank_w )
 {
 	UINT8 *ROM = memory_region(machine, "audio");
 	int bank = data & 0x07;
-	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(machine->activecpu),data);
 	if (bank > 2)	bank+=1;
 	memory_set_bankptr(1, &ROM[ 0x4000 * bank ]);
 }
@@ -1392,7 +1392,7 @@ static WRITE8_HANDLER( sailormn_rombank_w )
 {
 	UINT8 *RAM = memory_region(machine, "audio");
 	int bank = data & 0x1f;
-	if ( data & ~0x1f )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if ( data & ~0x1f )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(machine->activecpu),data);
 	if (bank > 1)	bank+=2;
 	memory_set_bankptr(1, &RAM[ 0x4000 * bank ]);
 }

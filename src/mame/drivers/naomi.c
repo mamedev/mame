@@ -788,7 +788,7 @@ static READ64_HANDLER( naomi_rom_board_r )
 	}
 	else
 	{
-		mame_printf_verbose("ROM: read mask %llx @ %x (PC=%x)\n", mem_mask, offset, activecpu_get_pc());
+		mame_printf_verbose("ROM: read mask %llx @ %x (PC=%x)\n", mem_mask, offset, cpu_get_pc(machine->activecpu));
 	}
 
 	return U64(0xffffffffffffffff);
@@ -825,7 +825,7 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 	{
 		// ROM_DATA
 		// Doa2 writes here (16 bit decryption key ?)
-		mame_printf_verbose("ROM: write %llx to 5f7008 (PC=%x)\n", data, activecpu_get_pc());
+		mame_printf_verbose("ROM: write %llx to 5f7008 (PC=%x)\n", data, cpu_get_pc(machine->activecpu));
 	}
 	else if ((offset == 15) && ACCESSING_BITS_0_15)
 	{
@@ -862,7 +862,7 @@ static WRITE64_HANDLER( naomi_rom_board_w )
 	}
 	else
 	{
-		mame_printf_verbose("ROM: write %llx to %x, mask %llx (PC=%x)\n", data, offset, mem_mask, activecpu_get_pc());
+		mame_printf_verbose("ROM: write %llx to %x, mask %llx (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 	}
 }
 

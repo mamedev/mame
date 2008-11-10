@@ -93,7 +93,7 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 		case 0xf: mjsister_vrambank = 1 ; break;
 
 		default:
-			logerror("%04x p30_w:%02x\n",activecpu_get_pc(),data);
+			logerror("%04x p30_w:%02x\n",cpu_get_pc(machine->activecpu),data);
 	}
 
 	if (tmp != mjsister_colorbank)
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( mjsister_banksel2_w )
 		case 0xd: rombank1 = 1; break;
 
 		default:
-			logerror("%04x p31_w:%02x\n",activecpu_get_pc(),data);
+			logerror("%04x p31_w:%02x\n",cpu_get_pc(machine->activecpu),data);
 	}
 
 	memory_set_bankptr(1,&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);

@@ -400,7 +400,7 @@ static INTERRUPT_GEN(st0016_int)
 	if(!cpu_getiloops())
 		cpunum_set_input_line(machine, 0,0,HOLD_LINE);
 	else
-		if(activecpu_get_reg(Z80_IFF1)) /* dirty hack ... */
+		if(cpu_get_reg(machine->activecpu, Z80_IFF1)) /* dirty hack ... */
 			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE );
 }
 

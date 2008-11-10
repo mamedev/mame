@@ -81,7 +81,7 @@ static READ8_HANDLER( mole_protection_r )
 	{
 	case 0x08: return 0xb0; /* random mole placement */
 	case 0x26:
-		if (activecpu_get_pc() == 0x53d7)
+		if (cpu_get_pc(machine->activecpu) == 0x53d7)
 		{
 			return 0x06; /* bonus round */
 		}

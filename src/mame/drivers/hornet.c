@@ -308,6 +308,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "cpu/sharc/sharc.h"
 #include "machine/eeprom.h"
@@ -1006,14 +1007,14 @@ static MACHINE_START( hornet )
 	memset(jvs_sdata, 0, 1024);
 
 	/* set conservative DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x003fffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 
 	state_save_register_global(led_reg0);
 	state_save_register_global(led_reg1);
@@ -1191,19 +1192,19 @@ static int jvs_encode_data(UINT8 *in, int length)
 		if (b == 0xe0)
 		{
 			sum += 0xd0 + 0xdf;
-			ppc4xx_spu_receive_byte(0, 0xd0);
-			ppc4xx_spu_receive_byte(0, 0xdf);
+			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xd0);
+			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xdf);
 		}
 		else if (b == 0xd0)
 		{
 			sum += 0xd0 + 0xcf;
-			ppc4xx_spu_receive_byte(0, 0xd0);
-			ppc4xx_spu_receive_byte(0, 0xcf);
+			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xd0);
+			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xcf);
 		}
 		else
 		{
 			sum += b;
-			ppc4xx_spu_receive_byte(0, b);
+			ppc4xx_spu_receive_byte(Machine->cpu[0], b);
 		}
 	}
 	return sum;
@@ -1292,11 +1293,11 @@ static void jamma_jvs_cmd_exec(void)
 
 	// write jvs return data
 	sum = 0x00 + (rdata_ptr+1);
-	ppc4xx_spu_receive_byte(0, 0xe0);			// sync
-	ppc4xx_spu_receive_byte(0, 0x00);			// node
-	ppc4xx_spu_receive_byte(0, rdata_ptr+1);	// num of bytes
+	ppc4xx_spu_receive_byte(Machine->cpu[0], 0xe0);			// sync
+	ppc4xx_spu_receive_byte(Machine->cpu[0], 0x00);			// node
+	ppc4xx_spu_receive_byte(Machine->cpu[0], rdata_ptr+1);	// num of bytes
 	sum += jvs_encode_data(rdata, rdata_ptr);
-	ppc4xx_spu_receive_byte(0, sum - 1);		// checksum
+	ppc4xx_spu_receive_byte(Machine->cpu[0], sum - 1);		// checksum
 
 	jvs_sdata_ptr = 0;
 }
@@ -1326,7 +1327,7 @@ static DRIVER_INIT(hornet)
 
 	led_reg0 = led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(machine->cpu[0], jamma_jvs_w);
 }
 
 static DRIVER_INIT(hornet_2board)
@@ -1340,7 +1341,7 @@ static DRIVER_INIT(hornet_2board)
 
 	led_reg0 = led_reg1 = 0x7f;
 
-	ppc4xx_spu_set_tx_handler(0, jamma_jvs_w);
+	ppc4xx_spu_set_tx_handler(machine->cpu[0], jamma_jvs_w);
 }
 
 /*****************************************************************************/

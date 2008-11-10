@@ -895,7 +895,7 @@ static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap
 		case 0x9c:		/* Unknown */
 			break;
 		default:
-			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, activecpu_get_pc());
+			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(Machine->activecpu));
 			break;
 	}
 }
@@ -978,14 +978,14 @@ static void model3_exit(running_machine *machine)
 static void configure_fast_ram(running_machine *machine)
 {
 	/* set conservative DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS - PPCDRC_ACCURATE_SINGLES);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x007fffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x007fffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static MACHINE_START(model3_10)
@@ -1200,7 +1200,7 @@ static WRITE64_HANDLER( model3_ctrl_w )
 						}
 						break;
 					default:
-						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), activecpu_get_pc());
+						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), cpu_get_pc(machine->activecpu));
 						break;
 				}
 			}
@@ -1354,14 +1354,14 @@ static WRITE64_HANDLER(model3_sound_w)
 static UINT64 network_ram[0x10000];
 static READ64_HANDLER(network_r)
 {
-	mame_printf_debug("network_r: %02X at %08X\n", offset, activecpu_get_pc());
+	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(machine->activecpu));
 	return network_ram[offset];
 }
 
 static WRITE64_HANDLER(network_w)
 {
 	COMBINE_DATA(network_ram + offset);
-	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), activecpu_get_pc());
+	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(machine->activecpu));
 }
 
 static int prot_data_ptr = 0;

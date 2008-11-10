@@ -550,11 +550,11 @@ switch(offset)
                         	cpunum_set_input_line_and_vector(machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
                         }
                         cpunum_set_input_line(machine, 2, MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
-                        mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,activecpu_get_pc());
+                        mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,cpu_get_pc(machine->activecpu));
 #endif
                         M68681.SRB &=~0x0400;                   // Data has been sent - TX ready for more.
                         cpunum_set_input_line(machine, 2, MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
-                        mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,activecpu_get_pc());
+                        mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,cpu_get_pc(machine->activecpu));
                         break;
 
       case 0x0c:        //mame_printf_debug("IVR: %d",value);
@@ -567,7 +567,7 @@ switch(offset)
                         if(value & 0x20)
                         {
 //                              cpunum_set_reset_line(2 CLEAR_LINE);
-                              logerror("8031 running at:%x (val=%x).\n",activecpu_get_pc(),value);
+                              logerror("8031 running at:%x (val=%x).\n",cpu_get_pc(machine->activecpu),value);
                         }
                         break;
 
@@ -575,7 +575,7 @@ switch(offset)
                         if(value & 0x20)
                         {
 //                              cpunum_set_reset_line(2, ASSERT_LINE);
-                              logerror("8031 reset at:%x (val=%x).\n",activecpu_get_pc(),value);
+                              logerror("8031 reset at:%x (val=%x).\n",cpu_get_pc(machine->activecpu),value);
                         }
                         break;
 

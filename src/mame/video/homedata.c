@@ -583,7 +583,7 @@ WRITE8_HANDLER( pteacher_videoram_w )
 WRITE8_HANDLER( reikaids_gfx_bank_w )
 {
 
-//logerror( "%04x: [setbank %02x]\n",activecpu_get_pc(),data);
+//logerror( "%04x: [setbank %02x]\n",cpu_get_pc(machine->activecpu),data);
 
 	if (reikaids_gfx_bank[reikaids_which] != data)
 	{
@@ -596,7 +596,7 @@ WRITE8_HANDLER( reikaids_gfx_bank_w )
 
 WRITE8_HANDLER( pteacher_gfx_bank_w )
 {
-//  logerror( "%04x: gfxbank:=%02x\n", activecpu_get_pc(), data );
+//  logerror( "%04x: gfxbank:=%02x\n", cpu_get_pc(machine->activecpu), data );
 	if (pteacher_gfx_bank != data)
 	{
 		pteacher_gfx_bank = data;
@@ -606,7 +606,7 @@ WRITE8_HANDLER( pteacher_gfx_bank_w )
 
 WRITE8_HANDLER( homedata_blitter_param_w )
 {
-//logerror("%04x: blitter_param_w %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: blitter_param_w %02x\n",cpu_get_pc(machine->activecpu),data);
 	blitter_param[blitter_param_count] = data;
 	blitter_param_count++;
 	blitter_param_count&=3;

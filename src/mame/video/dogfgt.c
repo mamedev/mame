@@ -175,7 +175,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 	flip_screen_set(data & 0x80);
 
 	/* other bits unused? */
-	logerror("PC %04x: 1800 = %02x\n",activecpu_get_pc(),data);
+	logerror("PC %04x: 1800 = %02x\n",cpu_get_pc(machine->activecpu),data);
 }
 
 

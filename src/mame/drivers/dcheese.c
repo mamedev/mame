@@ -182,7 +182,7 @@ static WRITE8_HANDLER( sound_control_w )
 	if ((diff & 0x40) && (data & 0x40))
 		sndti_reset(SOUND_BSMT2000, 0);
 	if (data != 0x40 && data != 0x60)
-		logerror("%04X:sound_control_w = %02X\n", activecpu_get_pc(), data);
+		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(machine->activecpu), data);
 }
 
 

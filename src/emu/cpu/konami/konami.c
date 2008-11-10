@@ -438,7 +438,7 @@ static void set_irq_line(int irqline, int state)
 	{
 		if (konami.nmi_state == state) return;
 		konami.nmi_state = state;
-		LOG(("KONAMI#%d set_nmi_line %d\n", cpu_getactivecpu(), state));
+		LOG(("KONAMI#%d set_nmi_line %d\n", cpunum_get_active(), state));
 		if( state == CLEAR_LINE ) return;
 
 		/* if the stack was not yet initialized */
@@ -470,7 +470,7 @@ static void set_irq_line(int irqline, int state)
 	}
 	else if (irqline < 2)
 	{
-	    LOG(("KONAMI#%d set_irq_line %d, %d\n", cpu_getactivecpu(), irqline, state));
+	    LOG(("KONAMI#%d set_irq_line %d, %d\n", cpunum_get_active(), irqline, state));
 		konami.irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
 		CHECK_IRQ_LINES;

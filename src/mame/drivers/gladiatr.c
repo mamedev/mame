@@ -1019,7 +1019,7 @@ static DRIVER_INIT( gladiatr )
 
 static READ8_HANDLER(f6a3_r)
 {
-	if(activecpu_get_previouspc()==0x8e)
+	if(cpu_get_previouspc(machine->activecpu)==0x8e)
 		generic_nvram[0x6a3]=1;
 
 	return generic_nvram[0x6a3];

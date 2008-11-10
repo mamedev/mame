@@ -54,43 +54,43 @@ static int inport16_step,inport17_step,inport23_step;
 
 static READ8_HANDLER( inport16_r )
 {
-//  logerror("IN  $16 : pc = %04x - data = %02x\n",activecpu_get_pc(),inport16_step);
+//  logerror("IN  $16 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),inport16_step);
 	return(inport16_step);
 }
 
 static READ8_HANDLER( inport1c_r )
 {
-//  logerror("IN  $1c : pc = %04x - data = 0x80\n",activecpu_get_pc());
+//  logerror("IN  $1c : pc = %04x - data = 0x80\n",cpu_get_pc(machine->activecpu));
 	return(0x80);	// infinite loop (at 0x0fb3) until bit 7 is set
 }
 
 static READ8_HANDLER( inport22_r )
 {
-//  logerror("IN  $22 : pc = %04x - data = %02x\n",activecpu_get_pc(),inport17_step);
+//  logerror("IN  $22 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),inport17_step);
 	return(inport17_step);
 }
 
 static READ8_HANDLER( inport23_r )
 {
-//  logerror("IN  $23 : pc = %04x - step = %02x\n",activecpu_get_pc(),inport23_step);
+//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(machine->activecpu),inport23_step);
 	return(inport23_step);
 }
 
 static WRITE8_HANDLER( outport16_w )
 {
-//  logerror("OUT $16 : pc = %04x - data = %02x\n",activecpu_get_pc(),data);
+//  logerror("OUT $16 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),data);
 	inport16_step = data;
 }
 
 static WRITE8_HANDLER( outport17_w )
 {
-//  logerror("OUT $17 : pc = %04x - data = %02x\n",activecpu_get_pc(),data);
+//  logerror("OUT $17 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),data);
 	inport17_step = data;
 }
 
 static WRITE8_HANDLER( outport24_w )
 {
-//  logerror("OUT $24 : pc = %04x - data = %02x\n",activecpu_get_pc(),data);
+//  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),data);
 	inport23_step = data;
 }
 

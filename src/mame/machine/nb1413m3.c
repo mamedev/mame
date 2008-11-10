@@ -243,7 +243,7 @@ READ8_HANDLER( nb1413m3_sndrom_r )
 	int rombank;
 
 	/* get top 8 bits of the I/O port address */
-	offset = (offset << 8) | (activecpu_get_reg(Z80_BC) >> 8);
+	offset = (offset << 8) | (cpu_get_reg(machine->activecpu, Z80_BC) >> 8);
 
 	switch (nb1413m3_type)
 	{

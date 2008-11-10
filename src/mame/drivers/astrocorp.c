@@ -118,7 +118,7 @@ static WRITE16_HANDLER( astrocorp_sound_bank_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		okim6295_set_bank_base(0, 0x40000 * ((data >> 8) & 1) );
-//      logerror("CPU #0 PC %06X: OKI bank %08X\n",activecpu_get_pc(),data);
+//      logerror("CPU #0 PC %06X: OKI bank %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -147,7 +147,7 @@ static WRITE16_HANDLER( astrocorp_enable_w )
 	COMBINE_DATA( &astrocorp_screen_enable );
 //  popmessage("%04X",data);
 	if (data & (~1))
-		logerror("CPU #0 PC %06X: screen enable = %04X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC %06X: screen enable = %04X\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static READ16_HANDLER( astrocorp_unk_r )

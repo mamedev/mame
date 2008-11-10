@@ -96,25 +96,25 @@ READ16_HANDLER( apache3_v30_v20_r )
 	else if ((tatsumi_control_word&0xe0)==0x80)
 		offset+=0x00000; // main ram
 	else
-		logerror("%08x: unmapped read z80 rom %08x\n",activecpu_get_pc(),offset);
+		logerror("%08x: unmapped read z80 rom %08x\n",cpu_get_pc(machine->activecpu),offset);
 
-	cpuintrf_push_context(2);
+	cpu_push_context(machine->cpu[2]);
 	value = program_read_byte(offset);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return value | 0xff00;
 }
 
 WRITE16_HANDLER( apache3_v30_v20_w )
 {
 	if ((tatsumi_control_word&0xe0)!=0x80)
-		logerror("%08x: write unmapped v30 rom %08x\n",activecpu_get_pc(),offset);
+		logerror("%08x: write unmapped v30 rom %08x\n",cpu_get_pc(machine->activecpu),offset);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
 	{
-		cpuintrf_push_context(2);
+		cpu_push_context(machine->cpu[2]);
 		program_write_byte(offset, data&0xff);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 }
 
@@ -160,9 +160,9 @@ READ16_HANDLER( roundup_v30_z80_r )
 	if (tatsumi_control_word&0x20)
 		offset+=0x8000; /* Upper half */
 
-	cpuintrf_push_context(2);
+	cpu_push_context(machine->cpu[2]);
 	value = program_read_byte(offset);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return value | 0xff00;
 }
 
@@ -174,9 +174,9 @@ WRITE16_HANDLER( roundup_v30_z80_w )
 		if (tatsumi_control_word&0x20)
 			offset+=0x8000; /* Upper half of Z80 address space */
 
-		cpuintrf_push_context(2);
+		cpu_push_context(machine->cpu[2]);
 		program_write_byte(offset, data&0xff);
-		cpuintrf_pop_context();
+		cpu_pop_context();
 	}
 }
 
@@ -196,7 +196,7 @@ WRITE16_HANDLER( roundup5_control_w )
 		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
 
 //  if (offset==1 && (tatsumi_control_w&0xfeff)!=(last_bank&0xfeff))
-//      logerror("%08x:  Changed bank to %04x (%d)\n",activecpu_get_pc(),tatsumi_control_w,offset);
+//      logerror("%08x:  Changed bank to %04x (%d)\n",cpu_get_pc(machine->activecpu),tatsumi_control_w,offset);
 
 //todo - watchdog
 
@@ -242,7 +242,7 @@ WRITE16_HANDLER( roundup5_control_w )
 WRITE16_HANDLER( roundup5_d0000_w )
 {
 	COMBINE_DATA(&roundup5_d0000_ram[offset]);
-//  logerror("d_68k_d0000_w %06x %04x\n",activecpu_get_pc(),data);
+//  logerror("d_68k_d0000_w %06x %04x\n",cpu_get_pc(machine->activecpu),data);
 }
 
 WRITE16_HANDLER( roundup5_e0000_w )
@@ -254,14 +254,14 @@ WRITE16_HANDLER( roundup5_e0000_w )
 	COMBINE_DATA(&roundup5_e0000_ram[offset]);
 	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 
-//  logerror("d_68k_e0000_w %06x %04x\n",activecpu_get_pc(),data);
+//  logerror("d_68k_e0000_w %06x %04x\n",cpu_get_pc(machine->activecpu),data);
 }
 
 /******************************************************************************/
 
 READ16_HANDLER(cyclwarr_control_r)
 {
-//  logerror("%08x:  control_r\n",activecpu_get_pc());
+//  logerror("%08x:  control_r\n",cpu_get_pc(machine->activecpu));
 	return tatsumi_control_word;
 }
 
@@ -270,7 +270,7 @@ WRITE16_HANDLER(cyclwarr_control_w)
 	COMBINE_DATA(&tatsumi_control_word);
 
 //  if ((tatsumi_control_word&0xfe)!=(tatsumi_last_control&0xfe))
-//      logerror("%08x:  control_w %04x\n",activecpu_get_pc(),data);
+//      logerror("%08x:  control_w %04x\n",cpu_get_pc(machine->activecpu),data);
 
 /*
 
@@ -293,7 +293,7 @@ WRITE16_HANDLER(cyclwarr_control_w)
 
 
 	// hack
-	if (activecpu_get_pc()==0x2c3c34) {
+	if (cpu_get_pc(machine->activecpu)==0x2c3c34) {
 //      cpu_set_reset_line(1, CLEAR_LINE);
 	//  logerror("hack 68k2 on\n");
 	}
@@ -307,12 +307,12 @@ READ16_HANDLER( tatsumi_v30_68000_r )
 {
 	const UINT16* rom=(UINT16*)memory_region(machine, "sub");
 
-logerror("%05X:68000_r(%04X),cw=%04X\n", activecpu_get_pc(), offset*2, tatsumi_control_word);
+logerror("%05X:68000_r(%04X),cw=%04X\n", cpu_get_pc(machine->activecpu), offset*2, tatsumi_control_word);
 	/* Read from 68k RAM */
 	if ((tatsumi_control_word&0x1f)==0x18)
 	{
 		// hack to make roundup 5 boot
-		if (activecpu_get_pc()==0xec575)
+		if (cpu_get_pc(machine->activecpu)==0xec575)
 		{
 			UINT8 *dst = memory_region(machine, "main");
 			dst[BYTE_XOR_LE(0xec57a)]=0x46;
@@ -351,9 +351,9 @@ READ8_HANDLER(tatsumi_hack_ym2151_r)
 {
 	int r=ym2151_status_port_0_r(machine,0);
 
-	if (activecpu_get_pc()==0x2aca || activecpu_get_pc()==0x29fe
-		|| activecpu_get_pc()==0xf9721
-		|| activecpu_get_pc()==0x1b96 || activecpu_get_pc()==0x1c65) // BigFight
+	if (cpu_get_pc(machine->activecpu)==0x2aca || cpu_get_pc(machine->activecpu)==0x29fe
+		|| cpu_get_pc(machine->activecpu)==0xf9721
+		|| cpu_get_pc(machine->activecpu)==0x1b96 || cpu_get_pc(machine->activecpu)==0x1c65) // BigFight
 		return 0x80;
 	return r;
 }
@@ -364,14 +364,14 @@ READ8_HANDLER(tatsumi_hack_oki_r)
 {
 	int r=okim6295_status_0_r(machine,0);
 
-	if (activecpu_get_pc()==0x2b70 || activecpu_get_pc()==0x2bb5
-		|| activecpu_get_pc()==0x2acc
-		|| activecpu_get_pc()==0x1c79 // BigFight
-		|| activecpu_get_pc()==0x1cbe // BigFight
-		|| activecpu_get_pc()==0xf9881)
+	if (cpu_get_pc(machine->activecpu)==0x2b70 || cpu_get_pc(machine->activecpu)==0x2bb5
+		|| cpu_get_pc(machine->activecpu)==0x2acc
+		|| cpu_get_pc(machine->activecpu)==0x1c79 // BigFight
+		|| cpu_get_pc(machine->activecpu)==0x1cbe // BigFight
+		|| cpu_get_pc(machine->activecpu)==0xf9881)
 		return 0xf;
-	if (activecpu_get_pc()==0x2ba3 || activecpu_get_pc()==0x2a9b || activecpu_get_pc()==0x2adc
-		|| activecpu_get_pc()==0x1cac) // BigFight
+	if (cpu_get_pc(machine->activecpu)==0x2ba3 || cpu_get_pc(machine->activecpu)==0x2a9b || cpu_get_pc(machine->activecpu)==0x2adc
+		|| cpu_get_pc(machine->activecpu)==0x1cac) // BigFight
 		return 0;
 	return r;
 }

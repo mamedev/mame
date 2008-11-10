@@ -260,7 +260,7 @@ static WRITE8_HANDLER( audio_hardware_w )
 				break;
 			logerror("audio_w ctr1 preset $%x amp %d\n", data & 15, data >> 4);
 			meadows_0c01 = data;
-			meadows_sh_update();
+			meadows_sh_update(machine);
 			break;
 
 		case 2: /* counter clk 5 MHz / 32 (/ 2 or / 4) */
@@ -268,7 +268,7 @@ static WRITE8_HANDLER( audio_hardware_w )
                 break;
 			logerror("audio_w ctr2 preset $%02x\n", data);
 			meadows_0c02 = data;
-			meadows_sh_update();
+			meadows_sh_update(machine);
             break;
 
 		case 3: /* audio enable */
@@ -276,7 +276,7 @@ static WRITE8_HANDLER( audio_hardware_w )
                 break;
 			logerror("audio_w enable ctr2/2:%d ctr2:%d dac:%d ctr1:%d\n", data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1);
 			meadows_0c03 = data;
-			meadows_sh_update();
+			meadows_sh_update(machine);
             break;
 	}
 }

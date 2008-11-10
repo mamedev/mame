@@ -413,7 +413,7 @@ static WRITE32_HANDLER( taitojc_palette_w )
 static READ32_HANDLER ( jc_control_r )
 {
 	UINT32 r = 0;
-//  mame_printf_debug("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+//  mame_printf_debug("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
 	switch(offset)
 	{
 		case 0x0:
@@ -523,7 +523,7 @@ static UINT8 mcu_comm_reg_r(int reg)
 		}
 		default:
 		{
-			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, activecpu_get_pc());
+			//mame_printf_debug("hc11_reg_r: %02X at %08X\n", reg, cpu_get_pc(machine->activecpu));
 			break;
 		}
 	}
@@ -548,7 +548,7 @@ static void mcu_comm_reg_w(int reg, UINT8 data)
 		}
 		default:
 		{
-			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, activecpu_get_pc());
+			//mame_printf_debug("hc11_reg_w: %02X, %02X at %08X\n", reg, data, cpu_get_pc(machine->activecpu));
 			break;
 		}
 	}
@@ -748,7 +748,7 @@ static void debug_dsp_command(void)
 static int first_dsp_reset;
 static WRITE32_HANDLER(dsp_shared_w)
 {
-	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, activecpu_get_pc());
+	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(machine->activecpu));
 	if (ACCESSING_BITS_24_31)
 	{
 		dsp_shared_ram[offset] &= 0x00ff;
@@ -899,7 +899,7 @@ static READ16_HANDLER( dsp_rom_r )
 {
 	UINT16 *rom = (UINT16*)memory_region(machine, "gfx2");
 	UINT16 data = rom[dsp_rom_pos++];
-	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
 	return data;
 }
 
@@ -943,7 +943,7 @@ static READ16_HANDLER( dsp_texaddr_r )
 static WRITE16_HANDLER( dsp_texaddr_w )
 {
 	dsp_tex_address = data;
-//  mame_printf_debug("texaddr = %08X at %08X\n", data, activecpu_get_pc());
+//  mame_printf_debug("texaddr = %08X at %08X\n", data, cpu_get_pc(machine->activecpu));
 
 	texture_x = (((data >> 0) & 0x1f) << 1) | ((data >> 12) & 0x1);
 	texture_y = (((data >> 5) & 0x1f) << 1) | ((data >> 13) & 0x1);

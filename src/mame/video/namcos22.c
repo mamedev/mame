@@ -2420,7 +2420,7 @@ Dump( FILE *f, unsigned addr1, unsigned addr2, const char *name )
       int i;
       for( i=0; i<16; i++ )
       {
-         data[i] = cpunum_read_byte( 0, addr+i );
+         data[i] = cpu_read_byte(Machine->cpu[0], addr+i );
          if( data[i] )
          {
             bHasNonZero = 1;
@@ -2481,7 +2481,7 @@ WRITE32_HANDLER(namcos22_port800000_w)
 {
    /* 00000011011111110000100011111111001001111110111110110001 */
    UINT16 word = data>>16;
-   logerror( "%x: C304/C399: 0x%04x\n", activecpu_get_previouspc(), word );
+   logerror( "%x: C304/C399: 0x%04x\n", cpu_get_previouspc(machine->activecpu), word );
    if( word == 0x4038 )
    {
       mbSpotlightEnable = 1;

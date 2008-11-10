@@ -2100,7 +2100,7 @@ READ8_HANDLER( K052109_r )
 			else if (offset >= 0x3a00 && offset < 0x3c00)
 			{	/* B x scroll */	}
 //          else
-//logerror("%04x: read from unknown 052109 address %04x\n",activecpu_get_pc(),offset);
+//logerror("%04x: read from unknown 052109 address %04x\n",cpu_get_pc(machine->activecpu),offset);
 		}
 
 		return K052109_ram[offset];
@@ -2123,7 +2123,7 @@ else
 		addr = (code << 5) + (offset & 0x1f);
 		addr &= memory_region_length(machine, K052109_memory_region)-1;
 
-//      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n",activecpu_get_pc(),offset,K052109_romsubbank,bank,addr);
+//      logerror("%04x: off = %04x sub = %02x (bnk = %x) adr = %06x\n",cpu_get_pc(machine->activecpu),offset,K052109_romsubbank,bank,addr);
 
 		return memory_region(machine, K052109_memory_region)[addr];
 	}
@@ -2150,13 +2150,13 @@ WRITE8_HANDLER( K052109_w )
 			if (K052109_scrollctrl != data)
 			{
 //popmessage("scrollcontrol = %02x",data);
-//logerror("%04x: rowscrollcontrol = %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: rowscrollcontrol = %02x\n",cpu_get_pc(machine->activecpu),data);
 				K052109_scrollctrl = data;
 			}
 		}
 		else if (offset == 0x1d00)
 		{
-//logerror("%04x: 052109 register 1d00 = %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 052109 register 1d00 = %02x\n",cpu_get_pc(machine->activecpu),data);
 			/* bit 2 = irq enable */
 			/* the custom chip can also generate NMI and FIRQ, for use with a 6809 */
 			K052109_irq_enabled = data & 0x04;
@@ -2186,12 +2186,12 @@ WRITE8_HANDLER( K052109_w )
 		}
 		else if (offset == 0x1e00 || offset == 0x3e00) // Surprise Attack uses offset 0x3e00
 		{
-//logerror("%04x: 052109 register 1e00 = %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: 052109 register 1e00 = %02x\n",cpu_get_pc(machine->activecpu),data);
 			K052109_romsubbank = data;
 		}
 		else if (offset == 0x1e80)
 		{
-//if ((data & 0xfe)) logerror("%04x: 052109 register 1e80 = %02x\n",activecpu_get_pc(),data);
+//if ((data & 0xfe)) logerror("%04x: 052109 register 1e80 = %02x\n",cpu_get_pc(machine->activecpu),data);
 			tilemap_set_flip(K052109_tilemap[0],(data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			tilemap_set_flip(K052109_tilemap[1],(data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 			tilemap_set_flip(K052109_tilemap[2],(data & 1) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
@@ -2242,7 +2242,7 @@ WRITE8_HANDLER( K052109_w )
 			K052109_charrombank_2[3] = (data >> 4) & 0x0f;
 		}
 //      else
-//          logerror("%04x: write %02x to unknown 052109 address %04x\n",activecpu_get_pc(),data,offset);
+//          logerror("%04x: write %02x to unknown 052109 address %04x\n",cpu_get_pc(machine->activecpu),data,offset);
 	}
 }
 
@@ -2590,7 +2590,7 @@ static int K051960_fetchromdata(running_machine *machine, int byte)
 	addr = (code << 7) | (off1 << 2) | byte;
 	addr &= memory_region_length(machine, K051960_memory_region)-1;
 
-//  popmessage("%04x: addr %06x",activecpu_get_pc(),addr);
+//  popmessage("%04x: addr %06x",cpu_get_pc(machine->activecpu),addr);
 
 	return memory_region(machine, K051960_memory_region)[addr];
 }
@@ -2640,7 +2640,7 @@ READ8_HANDLER( K051937_r )
 			/* some games need bit 0 to pulse */
 			return (counter++) & 1;
 		}
-//logerror("%04x: read unknown 051937 address %x\n",activecpu_get_pc(),offset);
+//logerror("%04x: read unknown 051937 address %x\n",cpu_get_pc(machine->activecpu),offset);
 		return 0;
 	}
 }
@@ -2667,12 +2667,12 @@ WRITE8_HANDLER( K051937_w )
 
 		/* bit 5 = enable gfx ROM reading */
 		K051960_readroms = data & 0x20;
-//logerror("%04x: write %02x to 051937 address %x\n",activecpu_get_pc(),data,offset);
+//logerror("%04x: write %02x to 051937 address %x\n",cpu_get_pc(machine->activecpu),data,offset);
 	}
 	else if (offset == 1)
 	{
-//  popmessage("%04x: write %02x to 051937 address %x",activecpu_get_pc(),data,offset);
-//logerror("%04x: write %02x to unknown 051937 address %x\n",activecpu_get_pc(),data,offset);
+//  popmessage("%04x: write %02x to 051937 address %x",cpu_get_pc(machine->activecpu),data,offset);
+//logerror("%04x: write %02x to unknown 051937 address %x\n",cpu_get_pc(machine->activecpu),data,offset);
 	}
 	else if (offset >= 2 && offset < 5)
 	{
@@ -2680,8 +2680,8 @@ WRITE8_HANDLER( K051937_w )
 	}
 	else
 	{
-//  popmessage("%04x: write %02x to 051937 address %x",activecpu_get_pc(),data,offset);
-//logerror("%04x: write %02x to unknown 051937 address %x\n",activecpu_get_pc(),data,offset);
+//  popmessage("%04x: write %02x to 051937 address %x",cpu_get_pc(machine->activecpu),data,offset);
+//logerror("%04x: write %02x to unknown 051937 address %x\n",cpu_get_pc(machine->activecpu),data,offset);
 	}
 }
 
@@ -3136,7 +3136,7 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 			| ((offset & 3) ^ 1);
 		addr &= memory_region_length(machine, K053245_memory_region[chip])-1;
 
-//  popmessage("%04x: offset %02x addr %06x",activecpu_get_pc(),offset&3,addr);
+//  popmessage("%04x: offset %02x addr %06x",cpu_get_pc(machine->activecpu),offset&3,addr);
 
 		return memory_region(machine, K053245_memory_region[chip])[addr];
 	}
@@ -3147,7 +3147,7 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 	}
 	else
 	{
-//logerror("%04x: read from unknown 053244 address %x\n",activecpu_get_pc(),offset);
+//logerror("%04x: read from unknown 053244 address %x\n",cpu_get_pc(machine->activecpu),offset);
 		return 0;
 	}
 }
@@ -3167,7 +3167,7 @@ static void K053244_chip_w(int chip, int offset, int data)
 //          popmessage("053244 reg 05 = %02x",data);
 		/* bit 2 = unknown, Parodius uses it */
 		/* bit 5 = unknown, Rollergames uses it */
-//      logerror("%04x: write %02x to 053244 address 5\n",activecpu_get_pc(),data);
+//      logerror("%04x: write %02x to 053244 address 5\n",cpu_get_pc(machine->activecpu),data);
 		break;
 	}
 	case 0x06:
@@ -4097,7 +4097,7 @@ READ16_HANDLER( K055673_GX6bpp_rom_word_r )
 		       	return ROM[romofs+2];
 			break;
 		default:
-			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, activecpu_get_pc()));
+			LOG(("55673_rom_word_r: Unknown read offset %x (PC=%x)\n", offset, cpu_get_pc(machine->activecpu)));
 			break;
 	}
 
@@ -4113,12 +4113,12 @@ READ8_HANDLER( K053246_r )
 		addr = (K053246_regs[6] << 17) | (K053246_regs[7] << 9) | (K053246_regs[4] << 1) | ((offset & 1) ^ 1);
 		addr &= memory_region_length(machine, K053247_memory_region)-1;
 		if (VERBOSE)
-			popmessage("%04x: offset %02x addr %06x",activecpu_get_pc(),offset,addr);
+			popmessage("%04x: offset %02x addr %06x",cpu_get_pc(machine->activecpu),offset,addr);
 		return memory_region(machine, K053247_memory_region)[addr];
 	}
 	else
 	{
-		LOG(("%04x: read from unknown 053246 address %x\n",activecpu_get_pc(),offset));
+		LOG(("%04x: read from unknown 053246 address %x\n",cpu_get_pc(machine->activecpu),offset));
 		return 0;
 	}
 }
@@ -4799,13 +4799,13 @@ static int K051316_rom_r(running_machine *machine, int chip, int offset)
 		if (K051316_bpp[chip] <= 4) addr /= 2;
 		addr &= memory_region_length(machine, K051316_memory_region[chip])-1;
 
-//  popmessage("%04x: offset %04x addr %04x",activecpu_get_pc(),offset,addr);
+//  popmessage("%04x: offset %04x addr %04x",cpu_get_pc(machine->activecpu),offset,addr);
 
 		return memory_region(machine, K051316_memory_region[chip])[addr];
 	}
 	else
 	{
-//logerror("%04x: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n",activecpu_get_pc(),offset);
+//logerror("%04x: read 051316 ROM offset %04x but reg 0x0c bit 0 not clear\n",cpu_get_pc(machine->activecpu),offset);
 		return 0;
 	}
 }
@@ -4830,7 +4830,7 @@ READ8_HANDLER( K051316_rom_2_r )
 static void K051316_ctrl_w(int chip,int offset,int data)
 {
 	K051316_ctrlram[chip][offset] = data;
-//if (offset >= 0x0c) logerror("%04x: write %02x to 051316 reg %x\n",activecpu_get_pc(),data,offset);
+//if (offset >= 0x0c) logerror("%04x: write %02x to 051316 reg %x\n",cpu_get_pc(machine->activecpu),data,offset);
 }
 
 WRITE8_HANDLER( K051316_ctrl_0_w )
@@ -5189,7 +5189,7 @@ static UINT8 K054000_ram[0x20];
 
 WRITE8_HANDLER( K054000_w )
 {
-//logerror("%04x: write %02x to 054000 address %02x\n",activecpu_get_pc(),data,offset);
+//logerror("%04x: write %02x to 054000 address %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 
 	K054000_ram[offset] = data;
 }
@@ -5199,7 +5199,7 @@ READ8_HANDLER( K054000_r )
 	int Acx,Acy,Aax,Aay;
 	int Bcx,Bcy,Bax,Bay;
 
-//logerror("%04x: read 054000 address %02x\n",activecpu_get_pc(),offset);
+//logerror("%04x: read 054000 address %02x\n",cpu_get_pc(machine->activecpu),offset);
 
 	if (offset != 0x18) return 0;
 
@@ -5254,7 +5254,7 @@ static UINT8 K051733_ram[0x20];
 
 WRITE8_HANDLER( K051733_w )
 {
-//logerror("%04x: write %02x to 051733 address %02x\n",activecpu_get_pc(),data,offset);
+//logerror("%04x: write %02x to 051733 address %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 
 	K051733_ram[offset] = data;
 }
@@ -5288,7 +5288,7 @@ READ8_HANDLER( K051733_r )
 	int yobj2c = (K051733_ram[0x0c] << 8) | K051733_ram[0x0d];
 	int xobj2c = (K051733_ram[0x0e] << 8) | K051733_ram[0x0f];
 
-//logerror("%04x: read 051733 address %02x\n",activecpu_get_pc(),offset);
+//logerror("%04x: read 051733 address %02x\n",cpu_get_pc(machine->activecpu),offset);
 
 	switch(offset){
 		case 0x00:
@@ -5893,7 +5893,7 @@ READ16_HANDLER( K056832_5bpp_rom_word_r )
 	}
 	else
 	{
-		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", activecpu_get_pc(), mem_mask));
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(machine->activecpu), mem_mask));
 	}
 	return 0;
 }
@@ -5918,7 +5918,7 @@ READ32_HANDLER( K056832_5bpp_rom_long_r )
 	}
 	else
 	{
-		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", activecpu_get_pc(), mem_mask));
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(machine->activecpu), mem_mask));
 	}
 	return 0;
 }
@@ -5943,7 +5943,7 @@ READ32_HANDLER( K056832_6bpp_rom_long_r )
 	}
 	else
 	{
-		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", activecpu_get_pc(), mem_mask));
+		LOG(("Non-byte read of tilemap ROM, PC=%x (mask=%x)\n", cpu_get_pc(machine->activecpu), mem_mask));
 	}
 	return 0;
 }

@@ -334,7 +334,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 		return 1;
 		break;
 	default:
-		logerror("Unknown protection question %02X at %04X\n", pleiads_protection_question, safe_activecpu_get_pc());
+		logerror("Unknown protection question %02X at %04X\n", pleiads_protection_question, safe_cpu_get_pc(field->port->machine->activecpu));
 		return 0;
 	}
 }

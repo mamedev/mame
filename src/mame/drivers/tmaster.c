@@ -308,7 +308,7 @@ static WRITE16_HANDLER( tmaster_color_w )
 	COMBINE_DATA( &tmaster_color );
 #if 0
 	if (tmaster_color & ~7)
-		logerror("%06x: color %04x\n", activecpu_get_pc(), tmaster_color);
+		logerror("%06x: color %04x\n", cpu_get_pc(machine->activecpu), tmaster_color);
 #endif
 }
 
@@ -345,7 +345,7 @@ static void tmaster_draw(running_machine *machine)
 	addr <<= 1;
 
 #if 0
-	logerror("%06x: blit w %03x, h %02x, x %03x, y %02x, addr %06x, mode %02x\n", activecpu_get_pc(),
+	logerror("%06x: blit w %03x, h %02x, x %03x, y %02x, addr %06x, mode %02x\n", cpu_get_pc(machine->activecpu),
 			sw,sh,sx,sy, addr, mode
 	);
 #endif
@@ -369,7 +369,7 @@ static void tmaster_draw(running_machine *machine)
 		case 0x00:							// blit with transparency
 			if (addr > size - sw*sh)
 			{
-				logerror("%06x: blit error, addr %06x out of bounds\n", activecpu_get_pc(),addr);
+				logerror("%06x: blit error, addr %06x out of bounds\n", cpu_get_pc(machine->activecpu),addr);
 				addr = size - sw*sh;
 			}
 
@@ -486,7 +486,7 @@ static READ16_HANDLER( galgames_eeprom_r )
 static WRITE16_HANDLER( galgames_eeprom_w )
 {
 	if (data & ~0x0003)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(machine->activecpu),data);
 
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -575,12 +575,12 @@ static WRITE16_HANDLER( galgames_cart_clock_w )
 		{
 			memory_set_bank(1, 1);	// ram
 			memory_set_bank(3, 0);	// rom
-			logerror("%06x: romram bank = %04x\n", activecpu_get_pc(), data);
+			logerror("%06x: romram bank = %04x\n", cpu_get_pc(machine->activecpu), data);
 		}
 		else
 		{
 			memory_set_bank(1, 0);	// rom
-			logerror("%06x: unknown romram bank = %04x\n", activecpu_get_pc(), data);
+			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(machine->activecpu), data);
 		}
 	}
 }

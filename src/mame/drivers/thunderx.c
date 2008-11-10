@@ -67,12 +67,12 @@ static READ8_HANDLER( thunderx_bankedram_r )
 	{
 		if (pmcbank)
 		{
-//          logerror("%04x read pmcram %04x\n",activecpu_get_pc(),offset);
+//          logerror("%04x read pmcram %04x\n",cpu_get_pc(machine->activecpu),offset);
 			return pmcram[offset];
 		}
 		else
 		{
-			logerror("%04x read pmc internal ram %04x\n",activecpu_get_pc(),offset);
+			logerror("%04x read pmc internal ram %04x\n",cpu_get_pc(machine->activecpu),offset);
 			return 0;
 		}
 	}
@@ -89,11 +89,11 @@ static WRITE8_HANDLER( thunderx_bankedram_w )
 //          if (offset == 0x200)    debug_signal_breakpoint(1);
 		if (pmcbank)
 		{
-			logerror("%04x pmcram %04x = %02x\n",activecpu_get_pc(),offset,data);
+			logerror("%04x pmcram %04x = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
 			pmcram[offset] = data;
 		}
 		else
-			logerror("%04x pmc internal ram %04x = %02x\n",activecpu_get_pc(),offset,data);
+			logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
 	}
 	else
 		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
@@ -295,7 +295,7 @@ static READ8_HANDLER( thunderx_1f98_r )
 
 static WRITE8_HANDLER( thunderx_1f98_w )
 {
-// logerror("%04x: 1f98_w %02x\n",activecpu_get_pc(),data);
+// logerror("%04x: 1f98_w %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	/* bit 0 = enable char ROM reading through the video RAM */
 	K052109_set_RMRD_line((data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
@@ -320,7 +320,7 @@ static WRITE8_HANDLER( scontra_bankswitch_w )
 	UINT8 *RAM = memory_region(machine, "main");
 	int offs;
 
-//logerror("%04x: bank switch %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: bank switch %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	/* bits 0-3 ROM bank */
 	offs = 0x10000 + (data & 0x0f)*0x2000;
@@ -339,7 +339,7 @@ static WRITE8_HANDLER( scontra_bankswitch_w )
 
 static WRITE8_HANDLER( thunderx_videobank_w )
 {
-//logerror("%04x: select video ram bank %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: select video ram bank %02x\n",cpu_get_pc(machine->activecpu),data);
 	/* 0x01 = work RAM at 4000-5fff */
 	/* 0x00 = palette at 5800-5fff */
 	/* 0x10 = unknown RAM at 5800-5fff */
@@ -1025,7 +1025,7 @@ static void thunderx_banking( int lines )
 	UINT8 *RAM = memory_region(Machine, "main");
 	int offs;
 
-//  logerror("thunderx %04x: bank select %02x\n", activecpu_get_pc(), lines );
+//  logerror("thunderx %04x: bank select %02x\n", cpu_get_pc(machine->activecpu), lines );
 
 	offs = 0x10000 + (((lines & 0x0f) ^ 0x08) * 0x2000);
 	if (offs >= 0x28000) offs -= 0x20000;
@@ -1043,7 +1043,7 @@ static MACHINE_RESET( thunderx )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)thunderx_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)thunderx_banking);
 	memory_set_bankptr( 1, &RAM[0x10000] ); /* init the default bank */
 
 	paletteram = &RAM[0x28000];

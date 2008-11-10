@@ -78,7 +78,7 @@ static WRITE16_HANDLER(blitter_9b8000_w)
 	dx<<=1;
 
 #if 0
-	printf("[%x] %x blit %x -> %x,%x  (%x*%x ) [%x] %x - %.4x %.4x - %.4x - %.4x\n",data,activecpu_get_pc(),of,x0,y0,dx,dy,data_9b0000,data_9a8000,data_9a0000,data_998000,data_990000,data_988000);
+	printf("[%x] %x blit %x -> %x,%x  (%x*%x ) [%x] %x - %.4x %.4x - %.4x - %.4x\n",data,cpu_get_pc(machine->activecpu),of,x0,y0,dx,dy,data_9b0000,data_9a8000,data_9a0000,data_998000,data_990000,data_988000);
 #endif
 
 	for(y=0;y<dy;++y)
@@ -134,12 +134,12 @@ static WRITE16_HANDLER(mcu_w)
 
 static WRITE16_HANDLER(unk_w)
 {
-	switch(activecpu_get_pc())
+	switch(cpu_get_pc(machine->activecpu))
 	{
 		case 0x1348: mainram[0x00932/2]=0xffff; break; //dirt way to exit loop
 /*      case 0x16ce:
         {
-            int addr=(activecpu_get_reg(M68K_D2)+0x089c)>>1;
+            int addr=(cpu_get_reg(machine->activecpu, M68K_D2)+0x089c)>>1;
             mainram[addr&0x7fff]=0xffff;//mame_rand(machine);
         }
         break;*/

@@ -544,7 +544,7 @@ static INTERRUPT_GEN( dwarfd_interrupt )
 {
 	if(cpu_getiloops() < NUM_LINES)
 	{
-		cpunum_set_info_fct(0, CPUINFO_PTR_I8085_SOD_CALLBACK, (void*)dwarfd_sod_callback);
+		cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_I8085_SOD_CALLBACK, (void*)dwarfd_sod_callback);
 		cpunum_set_input_line(machine, 0,I8085_RST65_LINE,HOLD_LINE); // 34 - every 8th line
 		line=cpu_getiloops();
 		idx=0;
@@ -776,7 +776,7 @@ static DRIVER_INIT(dwarfd)
 	//      src[i] = src[i]&0xe0;
 	}
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_I8085_SOD_CALLBACK, (void*)dwarfd_sod_callback);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_I8085_SOD_CALLBACK, (void*)dwarfd_sod_callback);
 
 	videobuf=auto_malloc(0x8000);
 	dwarfd_ram=auto_malloc(0x1000);

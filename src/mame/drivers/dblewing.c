@@ -269,7 +269,7 @@ static READ16_HANDLER ( dlbewing_prot_r )
 	if ((offset*2)==0x748) return 0;//dblwings_408_data; // dblwings_408_data // 3rd player 1st level?
 	if ((offset*2)==0x786) return 0;
 
-	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n",activecpu_get_pc(), offset*2, mem_mask);
+	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(machine->activecpu), offset*2, mem_mask);
 
 	return 0;//mame_rand(machine);
 }
@@ -295,7 +295,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 	if ((offset*2)==0x78a) { dblwings_78a_data = data; return; }
 	if ((offset*2)==0x788) { dblwings_788_data = data; return; }
 
-	mame_printf_debug("dblewing prot w %08x, %04x, %04x %04x\n",activecpu_get_pc(), offset*2, mem_mask,data);
+	mame_printf_debug("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(machine->activecpu), offset*2, mem_mask,data);
 }
 
 static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )

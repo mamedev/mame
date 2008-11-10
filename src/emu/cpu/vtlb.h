@@ -56,7 +56,7 @@ typedef struct _vtlb_state vtlb_state;
 /* ----- initialization/teardown ----- */
 
 /* allocate a new VTLB for the given CPU */
-vtlb_state *vtlb_alloc(int cpunum, int space, int fixed_entries, int dynamic_entries);
+vtlb_state *vtlb_alloc(const device_config *cpu, int space, int fixed_entries, int dynamic_entries);
 
 /* free an allocated VTLB */
 void vtlb_free(vtlb_state *vtlb);

@@ -347,7 +347,7 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 	cchip_ram[(current_bank * 0x400) + offset]=data;
 
 //  if (offset!=0x8)
-//      logerror("%08x:  volfied c write %04x %04x\n", activecpu_get_pc(), offset,data);
+//      logerror("%08x:  volfied c write %04x %04x\n", cpu_get_pc(machine->activecpu), offset,data);
 
 	if (current_bank == 0)
 	{
@@ -446,8 +446,8 @@ READ16_HANDLER( volfied_cchip_ram_r )
 		}
 	}
 
-//  if (activecpu_get_pc()!=0x15ca8 && activecpu_get_pc()!=0x15cd8 && activecpu_get_pc()!=0x15cde)
-//      logerror("%08x:  volfied c read %04x (bank %04x)\n", activecpu_get_pc(), offset, current_bank);
+//  if (cpu_get_pc(machine->activecpu)!=0x15ca8 && cpu_get_pc(machine->activecpu)!=0x15cd8 && cpu_get_pc(machine->activecpu)!=0x15cde)
+//      logerror("%08x:  volfied c read %04x (bank %04x)\n", cpu_get_pc(machine->activecpu), offset, current_bank);
 
 	/* Unknown */
 	if (current_bank == 2 && offset == 0x005)

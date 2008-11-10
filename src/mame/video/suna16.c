@@ -68,7 +68,7 @@ WRITE16_HANDLER( suna16_flipscreen_w )
 		flip_screen_set( data & 1 );
 		color_bank =   ( data & 4 ) >> 2;
 	}
-	if (data & ~(1|4))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", activecpu_get_pc(), data);
+	if (data & ~(1|4))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(machine->activecpu), data);
 }
 
 WRITE16_HANDLER( bestbest_flipscreen_w )
@@ -78,7 +78,7 @@ WRITE16_HANDLER( bestbest_flipscreen_w )
 		flip_screen_set( data & 0x10 );
 //      color_bank =   ( data & 0x07 );
 	}
-	if (data & ~(0x10))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", activecpu_get_pc(), data);
+	if (data & ~(0x10))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(machine->activecpu), data);
 }
 
 

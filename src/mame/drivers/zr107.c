@@ -237,9 +237,9 @@ static VIDEO_UPDATE( jetwave )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	cpuintrf_push_context(2);
+	cpu_push_context(screen->machine->cpu[2]);
 	sharc_set_flag_input(1, ASSERT_LINE);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return 0;
 }
 
@@ -293,9 +293,9 @@ static VIDEO_UPDATE( zr107 )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	cpuintrf_push_context(2);
+	cpu_push_context(screen->machine->cpu[2]);
 	sharc_set_flag_input(1, ASSERT_LINE);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return 0;
 }
 
@@ -463,14 +463,14 @@ static UINT32 *workram;
 static MACHINE_START( zr107 )
 {
 	/* set conservative DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static ADDRESS_MAP_START( zr107_map, ADDRESS_SPACE_PROGRAM, 32 )

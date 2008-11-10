@@ -111,7 +111,7 @@ READ16_HANDLER( segaic16_open_bus_r )
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = program_read_word_16be(activecpu_get_pc());
+	result = program_read_word_16be(cpu_get_pc(machine->activecpu));
 	recurse = 0;
 	return result;
 }
@@ -239,17 +239,17 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			if (data == 0x01)
 			{
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
-				cpuintrf_push_context(mame_find_cpu_index(machine, chip->cpu));
+				cpu_push_context(machine->cpu[mame_find_cpu_index(machine, chip->cpu)]);
 				program_write_word_16be(addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
-				cpuintrf_pop_context();
+				cpu_pop_context();
 			}
 			else if (data == 0x02)
 			{
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
-				cpuintrf_push_context(mame_find_cpu_index(machine, chip->cpu));
+				cpu_push_context(machine->cpu[mame_find_cpu_index(machine, chip->cpu)]);
 				result = program_read_word_16be(addr);
-				cpuintrf_pop_context();
+				cpu_pop_context();
 				chip->regs[0x00] = result >> 8;
 				chip->regs[0x01] = result;
 			}
@@ -545,12 +545,12 @@ static UINT16 divide_r(int which, offs_t offset, UINT16 mem_mask)
 }
 
 
-static void divide_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void divide_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	int a4 = offset & 8;
 	int a3 = offset & 4;
 
-	if (LOG_DIVIDE) logerror("%06X:divide%d_w(%X) = %04X\n", activecpu_get_pc(), which, offset, data);
+	if (LOG_DIVIDE) logerror("%06X:divide%d_w(%X) = %04X\n", cpu_get_pc(machine->activecpu), which, offset, data);
 
 	/* only 4 effective write registers */
 	offset &= 3;
@@ -570,9 +570,9 @@ static void divide_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 READ16_HANDLER( segaic16_divide_0_r )  { return divide_r(0, offset, mem_mask); }
 READ16_HANDLER( segaic16_divide_1_r )  { return divide_r(1, offset, mem_mask); }
 READ16_HANDLER( segaic16_divide_2_r )  { return divide_r(2, offset, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_0_w ) { divide_w(0, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_1_w ) { divide_w(1, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(2, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_divide_0_w ) { divide_w(machine, 0, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_divide_1_w ) { divide_w(machine, 1, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(machine, 2, offset, data, mem_mask); }
 
 
 
@@ -648,7 +648,7 @@ static void timer_interrupt_ack(running_machine *machine, int which)
 static UINT16 compare_timer_r(running_machine *machine, int which, offs_t offset, UINT16 mem_mask)
 {
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%06X:compare%d_r(%X) = %04X\n", activecpu_get_pc(), which, offset, compare_timer[which].regs[offset]);
+	if (LOG_COMPARE) logerror("%06X:compare%d_r(%X) = %04X\n", cpu_get_pc(machine->activecpu), which, offset, compare_timer[which].regs[offset]);
 	switch (offset)
 	{
 		case 0x0:	return compare_timer[which].regs[0];
@@ -669,7 +669,7 @@ static UINT16 compare_timer_r(running_machine *machine, int which, offs_t offset
 static void compare_timer_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%06X:compare%d_w(%X) = %04X\n", activecpu_get_pc(), which, offset, data);
+	if (LOG_COMPARE) logerror("%06X:compare%d_w(%X) = %04X\n", cpu_get_pc(machine->activecpu), which, offset, data);
 	switch (offset)
 	{
 		case 0x0:	COMBINE_DATA(&compare_timer[which].regs[0]); update_compare(which, 0); break;

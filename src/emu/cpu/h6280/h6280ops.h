@@ -558,7 +558,7 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
  *  set I flag, reset D flag and jump via IRQ vector
  ***************************************************************/
 #define BRK 													\
-	logerror("BRK %04x\n",activecpu_get_pc());	\
+	logerror("BRK %04x\n",cpu_get_pc(Machine->activecpu));	\
 	CLEAR_T;													\
 	PCW++;														\
 	PUSH(PCH);													\
@@ -1106,7 +1106,7 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
  ***************************************************************/
 #define SET 													\
 	P |= _fT;													\
-	logerror("%04x: WARNING H6280 SET\n",activecpu_get_pc())
+	logerror("%04x: WARNING H6280 SET\n",cpu_get_pc(Machine->activecpu))
 
 /* 6280 ********************************************************
  *  SMB Set memory bit

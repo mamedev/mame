@@ -172,7 +172,7 @@ void sh4_exception(const char *message, int exception) // handle exception
 		sh4.m[INTEVT] = 0x1c0;
 		vector = 0x600;
 		sh4.irq_callback(sh4.device, INPUT_LINE_NMI);
-		LOG(("SH-4 #%d nmi exception after [%s]\n", cpu_getactivecpu(), message));
+		LOG(("SH-4 #%d nmi exception after [%s]\n", cpunum_get_active(), message));
 	} else {
 //      if ((sh4.m[ICR] & 0x4000) && (sh4.nmi_line_state == ASSERT_LINE))
 //          return;
@@ -186,7 +186,7 @@ void sh4_exception(const char *message, int exception) // handle exception
 			sh4.irq_callback(sh4.device, SH4_INTC_IRL0-exception+SH4_IRL0);
 		else
 			sh4.irq_callback(sh4.device, SH4_IRL3+1);
-		LOG(("SH-4 #%d interrupt exception #%d after [%s]\n", cpu_getactivecpu(), exception, message));
+		LOG(("SH-4 #%d interrupt exception #%d after [%s]\n", cpunum_get_active(), exception, message));
 	}
 	sh4_exception_checkunrequest(exception);
 
@@ -259,7 +259,7 @@ static TIMER_CALLBACK( sh4_refresh_timer_callback )
 {
 	int cpunum = param;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	sh4.m[RTCNT] = 0;
 	sh4_refresh_timer_recompute();
 	sh4.m[RTCSR] |= 128;
@@ -272,7 +272,7 @@ static TIMER_CALLBACK( sh4_refresh_timer_callback )
 			sh4.m[RTCSR] |= 4;
 		}
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static void increment_rtc_time(int mode)
@@ -372,7 +372,7 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 {
 	int cpunum = param;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	timer_adjust_oneshot(sh4.rtc_timer, ATTOTIME_IN_HZ(128), cpunum);
 	sh4.m[R64CNT] = (sh4.m[R64CNT]+1) & 0x7f;
 	if (sh4.m[R64CNT] == 64)
@@ -381,7 +381,7 @@ static TIMER_CALLBACK( sh4_rtc_timer_callback )
 		increment_rtc_time(0);
 		//sh4_exception_request(SH4_INTC_NMI); // TEST
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static TIMER_CALLBACK( sh4_timer_callback )
@@ -391,13 +391,13 @@ static TIMER_CALLBACK( sh4_timer_callback )
 	int cpunum = param;
 	int idx = tcr[which];
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	sh4.m[tcnt[which]] = sh4.m[tcor[which]];
 	sh4_timer_recompute(which);
 	sh4.m[idx] = sh4.m[idx] | 0x100;
 	if (sh4.m[idx] & 0x20)
 		sh4_exception_request(tuni[which]);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static TIMER_CALLBACK( sh4_dmac_callback )
@@ -405,7 +405,7 @@ static TIMER_CALLBACK( sh4_dmac_callback )
 	int cpunum = param >> 8;
 	int channel = param & 255;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	LOG(("SH4.%d: DMA %d complete\n", cpunum, channel));
 	sh4.dma_timer_active[channel] = 0;
 	switch (channel)
@@ -435,7 +435,7 @@ static TIMER_CALLBACK( sh4_dmac_callback )
 			sh4_exception_request(SH4_INTC_DMTE3);
 		break;
 	}
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar, UINT32 *dar, UINT32 *dmatcr)
@@ -974,10 +974,10 @@ void sh4_set_frt_input(int cpunum, int state)
 		return;
 	}
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 
 	if(sh4.frt_input == state) {
-		cpuintrf_pop_context();
+		cpu_pop_context();
 		return;
 	}
 
@@ -985,12 +985,12 @@ void sh4_set_frt_input(int cpunum, int state)
 
 	if(sh4.m[5] & 0x8000) {
 		if(state == CLEAR_LINE) {
-			cpuintrf_pop_context();
+			cpu_pop_context();
 			return;
 		}
 	} else {
 		if(state == ASSERT_LINE) {
-			cpuintrf_pop_context();
+			cpu_pop_context();
 			return;
 		}
 	}
@@ -1002,7 +1002,7 @@ void sh4_set_frt_input(int cpunum, int state)
 	logerror("SH4.%d: ICF activated (%x)\n", sh4.cpu_number, sh4.pc & AM);
 	sh4_recalc_irq();
 #endif
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 void sh4_set_irln_input(int cpunum, int value)
@@ -1025,7 +1025,7 @@ int s;
 		{
 			if ((state == CLEAR_LINE) && (sh4.nmi_line_state == ASSERT_LINE))  // rising
 			{
-				LOG(("SH-4 #%d assert nmi\n", cpu_getactivecpu()));
+				LOG(("SH-4 #%d assert nmi\n", cpunum_get_active()));
 				sh4_exception_request(SH4_INTC_NMI);
 				sh4_dmac_nmi();
 			}
@@ -1034,7 +1034,7 @@ int s;
 		{
 			if ((state == ASSERT_LINE) && (sh4.nmi_line_state == CLEAR_LINE)) // falling
 			{
-				LOG(("SH-4 #%d assert nmi\n", cpu_getactivecpu()));
+				LOG(("SH-4 #%d assert nmi\n", cpunum_get_active()));
 				sh4_exception_request(SH4_INTC_NMI);
 				sh4_dmac_nmi();
 			}
@@ -1057,12 +1057,12 @@ int s;
 
 			if( state == CLEAR_LINE )
 			{
-				LOG(("SH-4 #%d cleared external irq IRL%d\n", cpu_getactivecpu(), irqline));
+				LOG(("SH-4 #%d cleared external irq IRL%d\n", cpunum_get_active(), irqline));
 				sh4_exception_unrequest(SH4_INTC_IRL0+irqline-SH4_IRL0);
 			}
 			else
 			{
-				LOG(("SH-4 #%d assert external irq IRL%d\n", cpu_getactivecpu(), irqline));
+				LOG(("SH-4 #%d assert external irq IRL%d\n", cpunum_get_active(), irqline));
 				sh4_exception_request(SH4_INTC_IRL0+irqline-SH4_IRL0);
 			}
 		}
@@ -1076,7 +1076,7 @@ int s;
 				sh4_exception_unrequest(SH4_INTC_IRLn0+s);
 			if (sh4.irln < 15)
 				sh4_exception_request(SH4_INTC_IRLn0+sh4.irln);
-			LOG(("SH-4 #%d IRLn0-IRLn3 level #%d\n", cpu_getactivecpu(), sh4.irln));
+			LOG(("SH-4 #%d IRLn0-IRLn3 level #%d\n", cpunum_get_active(), sh4.irln));
 		}
 	}
 	if (sh4.test_irq && (!sh4.delay))

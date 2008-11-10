@@ -18,7 +18,7 @@
 // to change if a different ROM set ever surfaces.
 static READ8_HANDLER( fastfred_custom_io_r )
 {
-    switch (activecpu_get_pc())
+    switch (cpu_get_pc(machine->activecpu))
     {
     case 0x03c0: return 0x9d;
     case 0x03e6: return 0x9f;
@@ -44,14 +44,14 @@ static READ8_HANDLER( fastfred_custom_io_r )
     case 0x7b58: return 0x20;
     }
 
-    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, activecpu_get_pc());
+    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, cpu_get_pc(machine->activecpu));
     return 0x00;
 }
 
 static READ8_HANDLER( flyboy_custom1_io_r )
 {
 
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 	 case 0x049d: return 0xad;	/* compare */
 	 case 0x04b9:			/* compare with 0x9e ??? When ??? */
@@ -72,14 +72,14 @@ static READ8_HANDLER( flyboy_custom1_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, activecpu_get_pc());
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, cpu_get_pc(machine->activecpu));
 	return 0x00;
 }
 
 static READ8_HANDLER( flyboy_custom2_io_r )
 {
 
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 	 case 0x0395: return 0xf7;	/* $C900 compare         */
 	 case 0x03f5:			/* $c8fd                 */
@@ -97,7 +97,7 @@ static READ8_HANDLER( flyboy_custom2_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, activecpu_get_pc());
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, cpu_get_pc(machine->activecpu));
 	return 0x00;
 }
 

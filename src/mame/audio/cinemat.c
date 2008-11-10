@@ -1591,7 +1591,7 @@ MACHINE_DRIVER_END
 
 static WRITE8_HANDLER( qb3_sound_w )
 {
-	UINT16 rega = cpunum_get_reg(0, CCPU_A);
+	UINT16 rega = cpu_get_reg(machine->cpu[0], CCPU_A);
 	demon_sound_w(0x00 | (~rega & 0x0f), 0x10);
 }
 

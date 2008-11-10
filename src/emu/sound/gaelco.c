@@ -190,7 +190,7 @@ static void gaelco_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 READ16_HANDLER( gaelcosnd_r )
 {
-	LOG_READ_WRITES(("%06x: (GAE1): read from %04x\n", activecpu_get_pc(), offset));
+	LOG_READ_WRITES(("%06x: (GAE1): read from %04x\n", cpu_get_pc(machine->activecpu), offset));
 
 	return gaelco_sndregs[offset];
 }
@@ -204,7 +204,7 @@ WRITE16_HANDLER( gaelcosnd_w )
 	struct GAELCOSND *info = sndti_token(chip_type, 0);
 	struct gaelcosnd_channel *channel = &info->channel[offset >> 3];
 
-	LOG_READ_WRITES(("%06x: (GAE1): write %04x to %04x\n", activecpu_get_pc(), data, offset));
+	LOG_READ_WRITES(("%06x: (GAE1): write %04x to %04x\n", cpu_get_pc(machine->activecpu), data, offset));
 
 	/* first update the stream to this point in time */
 	stream_update(info->stream);

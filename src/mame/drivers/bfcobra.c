@@ -440,7 +440,7 @@ static void RunBlit(running_machine *machine)
 		/* This debug is now wrong ! */
 		if (DEBUG_BLITTER)
 		{
-			mame_printf_debug("\nBlitter (%x): Running command from 0x%.5x\n\n", activecpu_get_previouspc(), blitter.program.addr - 12);
+			mame_printf_debug("\nBlitter (%x): Running command from 0x%.5x\n\n", cpu_get_previouspc(machine->activecpu), blitter.program.addr - 12);
 			mame_printf_debug("Command Reg         %.2x",	blitter.command);
 			mame_printf_debug("		%s %s %s %s %s %s %s\n",
 				blitter.command & CMD_RUN ? "RUN" : "     ",
@@ -730,7 +730,7 @@ static READ8_HANDLER( ramdac_r )
 		}
 		default:
 		{
-			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", activecpu_get_previouspc());
+			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", cpu_get_previouspc(machine->activecpu));
 		}
 	}
 
@@ -868,7 +868,7 @@ static READ8_HANDLER( chipset_r )
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, activecpu_get_previouspc());
+			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, cpu_get_previouspc(machine->activecpu));
 		}
 	}
 
@@ -884,7 +884,7 @@ static WRITE8_HANDLER( chipset_w )
 		case 0x03:
 		{
 			if (data > 0x3f)
-				popmessage("%x: Unusual bank access (%x)\n", activecpu_get_previouspc(), data);
+				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(machine->activecpu), data);
 
 			data &= 0x3f;
 			bank[offset] = data;
@@ -958,7 +958,7 @@ static WRITE8_HANDLER( chipset_w )
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, activecpu_get_previouspc());
+			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, cpu_get_previouspc(machine->activecpu));
 		}
 	}
 }

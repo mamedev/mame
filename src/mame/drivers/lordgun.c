@@ -116,7 +116,7 @@ static WRITE8_DEVICE_HANDLER( lordgun_eeprom_w )
 	if (data & ~0xfd)
 	{
 //      popmessage("EE: %02x", data);
-		logerror("PC %06X - Unknown EEPROM bit written %02X\n",activecpu_get_pc(),data);
+		logerror("PC %06X - Unknown EEPROM bit written %02X\n",cpu_get_pc(device->machine->activecpu),data);
 	}
 
 	coin_counter_w(0, data & 0x01);
@@ -236,7 +236,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( lordgun_okibank_w )
 {
 	okim6295_set_bank_base(0, (data & 2) ? 0x40000 : 0);
-	if (data & ~3)	logerror("%04x: unknown okibank bits %02x\n", activecpu_get_pc(), data);
+	if (data & ~3)	logerror("%04x: unknown okibank bits %02x\n", cpu_get_pc(machine->activecpu), data);
 //  popmessage("OKI %x", data);
 }
 

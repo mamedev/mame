@@ -74,13 +74,13 @@ UINT16 *f1gpstr2_ioready;
 #define SHOW_READ_ERROR(_format_,_offset_)\
 {\
 	popmessage(_format_,_offset_);\
-	logerror("CPU #0 PC %06X : Warning, ",activecpu_get_pc()); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(machine->activecpu)); \
 	logerror(_format_ "\n",_offset_);\
 }
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 {\
 	popmessage(_format_,_offset_,_data_);\
-	logerror("CPU #0 PC %06X : Warning, ",activecpu_get_pc()); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(machine->activecpu)); \
 	logerror(_format_ "\n",_offset_,_data_); \
 }
 
@@ -88,12 +88,12 @@ UINT16 *f1gpstr2_ioready;
 
 #define SHOW_READ_ERROR(_format_,_offset_)\
 {\
-	logerror("CPU #0 PC %06X : Warning, ",activecpu_get_pc()); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(machine->activecpu)); \
 	logerror(_format_ "\n",_offset_);\
 }
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 {\
-	logerror("CPU #0 PC %06X : Warning, ",activecpu_get_pc()); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(machine->activecpu)); \
 	logerror(_format_ "\n",_offset_,_data_); \
 }
 

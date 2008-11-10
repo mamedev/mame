@@ -506,7 +506,7 @@ static CPU_EXECUTE( jaguargpu )
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar.ctrl[G_CTRL] & 1))
 	{
-		cpunum_set_input_line(Machine, cpu_getactivecpu(), INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(Machine, cpunum_get_active(), INPUT_LINE_HALT, ASSERT_LINE);
 		return cycles;
 	}
 
@@ -518,7 +518,7 @@ static CPU_EXECUTE( jaguargpu )
 	change_pc(jaguar.PC);
 
 	/* remember that we're executing */
-	executing_cpu = cpu_getactivecpu();
+	executing_cpu = cpunum_get_active();
 
 	/* core execution loop */
 	do
@@ -552,7 +552,7 @@ static CPU_EXECUTE( jaguardsp )
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar.ctrl[G_CTRL] & 1))
 	{
-		cpunum_set_input_line(Machine, cpu_getactivecpu(), INPUT_LINE_HALT, ASSERT_LINE);
+		cpunum_set_input_line(Machine, cpunum_get_active(), INPUT_LINE_HALT, ASSERT_LINE);
 		return cycles;
 	}
 
@@ -564,7 +564,7 @@ static CPU_EXECUTE( jaguardsp )
 	change_pc(jaguar.PC);
 
 	/* remember that we're executing */
-	executing_cpu = cpu_getactivecpu();
+	executing_cpu = cpunum_get_active();
 
 	/* core execution loop */
 	do
@@ -1299,12 +1299,12 @@ UINT32 jaguargpu_ctrl_r(int cpunum, offs_t offset)
 {
 	UINT32 result;
 
-	if (LOG_GPU_IO) logerror("%08X/%d:GPU read register @ F021%02X\n", activecpu_get_previouspc(), cpu_getactivecpu(), offset * 4);
+	if (LOG_GPU_IO) logerror("%08X/%d:GPU read register @ F021%02X\n", cpu_get_previouspc(Machine->activecpu), cpunum_get_active(), offset * 4);
 
 	/* switch to the target context */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 	result = jaguar.ctrl[offset];
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return result;
 }
@@ -1315,10 +1315,10 @@ void jaguargpu_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 	UINT32 			oldval, newval;
 
 	if (LOG_GPU_IO && offset != G_HIDATA)
-		logerror("%08X/%d:GPU write register @ F021%02X = %08X\n", activecpu_get_previouspc(), cpu_getactivecpu(), offset * 4, data);
+		logerror("%08X/%d:GPU write register @ F021%02X = %08X\n", cpu_get_previouspc(Machine->activecpu), cpunum_get_active(), offset * 4, data);
 
 	/* switch to the target context */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 
 	/* remember the old and set the new */
 	oldval = jaguar.ctrl[offset];
@@ -1367,7 +1367,7 @@ void jaguargpu_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 			if ((oldval ^ newval) & 0x01)
 			{
 				cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
-				if (cpu_getexecutingcpu() >= 0)
+				if (cpunum_get_executing() >= 0)
 					cpu_yield();
 			}
 			if (newval & 0x02)
@@ -1395,7 +1395,7 @@ void jaguargpu_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 	}
 
 	/* restore old context */
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -1409,12 +1409,12 @@ UINT32 jaguardsp_ctrl_r(int cpunum, offs_t offset)
 	UINT32 result;
 
 	if (LOG_DSP_IO && offset != D_FLAGS)
-		logerror("%08X/%d:DSP read register @ F1A1%02X\n", activecpu_get_previouspc(), cpu_getactivecpu(), offset * 4);
+		logerror("%08X/%d:DSP read register @ F1A1%02X\n", cpu_get_previouspc(Machine->activecpu), cpunum_get_active(), offset * 4);
 
 	/* switch to the target context */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 	result = jaguar.ctrl[offset];
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	return result;
 }
@@ -1425,10 +1425,10 @@ void jaguardsp_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 	UINT32 			oldval, newval;
 
 	if (LOG_DSP_IO && offset != D_FLAGS)
-		logerror("%08X/%d:DSP write register @ F1A1%02X = %08X\n", activecpu_get_previouspc(), cpu_getactivecpu(), offset * 4, data);
+		logerror("%08X/%d:DSP write register @ F1A1%02X = %08X\n", cpu_get_previouspc(Machine->activecpu), cpunum_get_active(), offset * 4, data);
 
 	/* switch to the target context */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 
 	/* remember the old and set the new */
 	oldval = jaguar.ctrl[offset];
@@ -1478,7 +1478,7 @@ void jaguardsp_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 			if ((oldval ^ newval) & 0x01)
 			{
 				cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
-				if (cpu_getexecutingcpu() >= 0)
+				if (cpunum_get_executing() >= 0)
 					cpu_yield();
 			}
 			if (newval & 0x02)
@@ -1506,7 +1506,7 @@ void jaguardsp_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 	}
 
 	/* restore old context */
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 

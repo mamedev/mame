@@ -190,7 +190,7 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
-	ppc->cpunum = cpu_getactivecpu();
+	ppc->cpunum = cpunum_get_active();
 	ppc->flavor = flavor;
 	ppc->cap = cap;
 	ppc->cache_line_size = 32;
@@ -202,7 +202,7 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	ppc->tb_divisor = (ppc->tb_divisor * clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
 
 	/* allocate the virtual TLB */
-	ppc->vtlb = vtlb_alloc(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, (cap & PPCCAP_603_MMU) ? PPC603_FIXED_TLB_ENTRIES : 0, POWERPC_TLB_ENTRIES);
+	ppc->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, (cap & PPCCAP_603_MMU) ? PPC603_FIXED_TLB_ENTRIES : 0, POWERPC_TLB_ENTRIES);
 
 	/* allocate a timer for the compare interrupt */
 	if (cap & PPCCAP_OEA)
@@ -429,7 +429,7 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	for (hashnum = 0; hashnum < 2; hashnum++)
 	{
 		offs_t ptegaddr = hashbase | ((hash << 6) & hashmask);
-		UINT32 *ptegptr = memory_get_read_ptr(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, ptegaddr);
+		UINT32 *ptegptr = memory_get_read_ptr(cpunum_get_active(), ADDRESS_SPACE_PROGRAM, ptegaddr);
 
 		/* should only have valid memory here, but make sure */
 		if (ptegptr != NULL)
@@ -1378,10 +1378,10 @@ static int ppc4xx_dma_fetch_transmit_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* fetch the data */
-	cpuintrf_push_context(ppc->cpunum);
+	cpu_push_context(Machine->cpu[ppc->cpunum]);
 	*byte = program_read_byte(dmaregs[DCR4XX_DMADA0]++);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return TRUE;
 }
 
@@ -1404,10 +1404,10 @@ static int ppc4xx_dma_handle_receive_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* store the data */
-	cpuintrf_push_context(ppc->cpunum);
+	cpu_push_context(Machine->cpu[ppc->cpunum]);
 	program_write_byte(dmaregs[DCR4XX_DMADA0]++, byte);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return TRUE;
 }
 
@@ -1723,7 +1723,7 @@ updateirq:
 
 static READ8_HANDLER( ppc4xx_spu_r )
 {
-	powerpc_state *ppc = activecpu_get_info_ptr(CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = cpu_get_info_ptr(machine->activecpu, CPUINFO_PTR_CONTEXT);
 	UINT8 result = 0xff;
 
 	switch (offset)
@@ -1750,7 +1750,7 @@ static READ8_HANDLER( ppc4xx_spu_r )
 
 static WRITE8_HANDLER( ppc4xx_spu_w )
 {
-	powerpc_state *ppc = activecpu_get_info_ptr(CPUINFO_PTR_CONTEXT);
+	powerpc_state *ppc = cpu_get_info_ptr(machine->activecpu, CPUINFO_PTR_CONTEXT);
 	UINT8 oldstate, newstate;
 
 	if (PRINTF_SPU)

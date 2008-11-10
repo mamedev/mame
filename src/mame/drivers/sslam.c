@@ -321,7 +321,7 @@ static WRITE16_HANDLER( sslam_snd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("PC:%06x Writing %04x to Sound CPU\n",activecpu_get_previouspc(),data);
+		logerror("PC:%06x Writing %04x to Sound CPU\n",cpu_get_previouspc(machine->activecpu),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				/* This should reset the sound MCU and stop audio playback, but here, it */

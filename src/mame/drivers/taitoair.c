@@ -248,7 +248,7 @@ static WRITE16_HANDLER( system_control_w )
 
 	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
-	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n",activecpu_get_previouspc(),data,((data & 4) ? "Clear" : "Assert"),((data & 1) ? "Clear" : "Assert"));
+	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n",cpu_get_previouspc(machine->activecpu),data,((data & 4) ? "Clear" : "Assert"),((data & 1) ? "Clear" : "Assert"));
 }
 
 static READ16_HANDLER( lineram_r )
@@ -276,7 +276,7 @@ static WRITE16_HANDLER( dspram_w )
 static READ16_HANDLER( dsp_HOLD_signal_r )
 {
 	/* HOLD signal is active low */
-	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n",activecpu_get_previouspc(),dsp_HOLD_signal);
+	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n",cpu_get_previouspc(machine->activecpu),dsp_HOLD_signal);
 
 	return dsp_HOLD_signal;
 }
@@ -284,7 +284,7 @@ static READ16_HANDLER( dsp_HOLD_signal_r )
 static WRITE16_HANDLER( dsp_HOLDA_signal_w )
 {
 	if (offset)
-		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n",activecpu_get_previouspc(),data);
+		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n",cpu_get_previouspc(machine->activecpu),data);
 }
 
 

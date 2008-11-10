@@ -55,7 +55,7 @@ static WRITE16_HANDLER( suna16_soundlatch_w )
 	{
 		soundlatch_w( machine, 0, data & 0xff );
 	}
-	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", activecpu_get_pc(), data);
+	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", cpu_get_pc(machine->activecpu), data);
 }
 
 
@@ -69,7 +69,7 @@ static WRITE16_HANDLER( bssoccer_leds_w )
 		set_led_status(3, data & 0x08);
 		coin_counter_w(0, data & 0x10);
 	}
-	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", activecpu_get_pc(), data);
+	if (data & ~0x1f)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(machine->activecpu), data);
 }
 
 
@@ -81,7 +81,7 @@ static WRITE16_HANDLER( uballoon_leds_w )
 		set_led_status(0, data & 0x02);
 		set_led_status(1, data & 0x04);
 	}
-	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", activecpu_get_pc(), data);
+	if (data & ~0x07)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(machine->activecpu), data);
 }
 
 
@@ -91,7 +91,7 @@ static WRITE16_HANDLER( bestbest_coin_w )
 	{
 		coin_counter_w(0, data & 0x04);
 	}
-	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", activecpu_get_pc(), data);
+	if (data & ~0x04)	logerror("CPU#0 PC %06X - Leds unknown bits: %04X\n", cpu_get_pc(machine->activecpu), data);
 }
 
 
@@ -212,7 +212,7 @@ static WRITE16_HANDLER( bestbest_prot_w )
 			case 0x00:	prot = prot ^ 0x0009;	break;
 			case 0x08:	prot = prot ^ 0x0002;	break;
 			case 0x0c:	prot = prot ^ 0x0003;	break;
-//          default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", activecpu_get_pc(), data);
+//          default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", cpu_get_pc(machine->activecpu), data);
 		}
 	}
 }
@@ -338,7 +338,7 @@ static WRITE8_HANDLER( bssoccer_pcm_1_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(machine, "pcm1");
 	int bank = data & 7;
-	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", activecpu_get_pc(), data);
+	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(machine->activecpu), data);
 	memory_set_bankptr(1, &RAM[bank * 0x10000 + 0x1000]);
 }
 
@@ -346,7 +346,7 @@ static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(machine, "pcm2");
 	int bank = data & 7;
-	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", activecpu_get_pc(), data);
+	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(machine->activecpu), data);
 	memory_set_bankptr(2, &RAM[bank * 0x10000 + 0x1000]);
 }
 
@@ -410,7 +410,7 @@ static WRITE8_HANDLER( uballoon_pcm_1_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(machine, "pcm");
 	int bank = data & 1;
-	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", activecpu_get_pc(), data);
+	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(machine->activecpu), data);
 	memory_set_bankptr(1, &RAM[bank * 0x10000 + 0x400]);
 }
 

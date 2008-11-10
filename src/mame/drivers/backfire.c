@@ -235,14 +235,14 @@ static READ32_HANDLER(backfire_eeprom_r)
 
 static READ32_HANDLER(backfire_control2_r)
 {
-//  logerror("%08x:Read eprom %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
 	return (eeprom_read_bit()<<24) | input_port_read(machine, "IN1") | (input_port_read(machine, "IN1")<<16);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER(backfire_control3_r)
 {
-//  logerror("%08x:Read eprom %08x (%08x)\n",activecpu_get_pc(),offset<<1,mem_mask);
+//  logerror("%08x:Read eprom %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
 	return (eeprom_read_bit()<<24) | input_port_read(machine, "IN2") | (input_port_read(machine, "IN2")<<16);
 }
 #endif
@@ -250,7 +250,7 @@ static READ32_HANDLER(backfire_control3_r)
 
 static WRITE32_HANDLER(backfire_eeprom_w)
 {
-	logerror("%08x:write eprom %08x (%08x) %08x\n",activecpu_get_pc(),offset<<1,mem_mask,data);
+	logerror("%08x:write eprom %08x (%08x) %08x\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7) {
 		eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(data & 0x1);
@@ -666,10 +666,10 @@ static void descramble_sound( running_machine *machine )
 
 static READ32_HANDLER( backfire_speedup_r )
 {
-//  mame_printf_debug( "%08x\n",activecpu_get_pc());
+//  mame_printf_debug( "%08x\n",cpu_get_pc(machine->activecpu));
 
-	if (activecpu_get_pc()==0xce44)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400)); // backfire
-	if (activecpu_get_pc()==0xcee4)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400)); // backfira
+	if (cpu_get_pc(machine->activecpu)==0xce44)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400)); // backfire
+	if (cpu_get_pc(machine->activecpu)==0xcee4)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400)); // backfira
 
 	return backfire_mainram[0x18/4];
 }

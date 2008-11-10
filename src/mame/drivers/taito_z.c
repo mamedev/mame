@@ -940,7 +940,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )	/* assumes Z80 sandwiched between 68Ks */
 		output_set_lamp_value(1, (data&0x40) ? 1 : 0);
 	}
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static WRITE16_HANDLER( cpua_noz80_ctrl_w )	/* assumes no Z80 */
@@ -951,7 +951,7 @@ static WRITE16_HANDLER( cpua_noz80_ctrl_w )	/* assumes no Z80 */
 
 	parse_control_noz80(machine);
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(machine->activecpu),data);
 }
 
 
@@ -1218,7 +1218,7 @@ static READ16_HANDLER( bshark_stick_r )
 			return input_port_read(machine, "Y_ADJUST");
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -1241,7 +1241,7 @@ static READ16_HANDLER( nightstr_stick_r )
 			return input_port_read(machine, "Y_ADJUST");
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped stick offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -1289,7 +1289,7 @@ static READ16_HANDLER( sci_steer_input_r )
 			return (steer & 0xff00) >> 8;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %06x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0xff;
 }
@@ -1372,7 +1372,7 @@ static READ16_HANDLER( dblaxle_steer_input_r )
 			return steer & 0xff;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", activecpu_get_pc(), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped steer input offset %02x\n", cpu_get_pc(machine->activecpu), offset);
 
 	return 0x00;
 }
@@ -1389,7 +1389,7 @@ static READ16_HANDLER( chasehq_motor_r )
 			return 0x55;	/* motor cpu status ? */
 
 		default:
-logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",activecpu_get_pc(),offset);
+logerror("CPU #0 PC %06x: warning - read motor cpu %03x\n",cpu_get_pc(machine->activecpu),offset);
 			return 0;
 	}
 }
@@ -1398,7 +1398,7 @@ static WRITE16_HANDLER( chasehq_motor_w )
 {
 	/* Writes $e00000-25 and $e00200-219 */
 
-logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",activecpu_get_pc(),data,offset);
+logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(machine->activecpu),data,offset);
 
 }
 

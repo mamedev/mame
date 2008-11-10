@@ -158,7 +158,7 @@ WRITE32_HANDLER( policetr_video_w )
 {
 	/* we assume 4-byte accesses */
 	if (mem_mask)
-		logerror("%08X: policetr_video_w access with mask %08X\n", activecpu_get_previouspc(), mem_mask);
+		logerror("%08X: policetr_video_w access with mask %08X\n", cpu_get_previouspc(machine->activecpu), mem_mask);
 
 	/* 4 offsets */
 	switch (offset)
@@ -208,7 +208,7 @@ WRITE32_HANDLER( policetr_video_w )
 
 				/* log anything else */
 				default:
-					logerror("%08X: policetr_video_w(2) = %08X & %08X with latch %02X\n", activecpu_get_previouspc(), data, mem_mask, video_latch);
+					logerror("%08X: policetr_video_w(2) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
 					break;
 			}
 			break;
@@ -222,7 +222,7 @@ WRITE32_HANDLER( policetr_video_w )
 				/* latch 0x00 is unknown; 0, 1, and 2 get written into the upper 12 bits before rendering */
 				case 0x00:
 					if (data != (0 << 20) && data != (1 << 20) && data != (2 << 20))
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", activecpu_get_previouspc(), data, mem_mask, video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
 					break;
 
 				/* latch 0x10 specifies destination bitmap X and Y offsets */
@@ -234,13 +234,13 @@ WRITE32_HANDLER( policetr_video_w )
 				/* latch 0x20 is unknown; either 0xef or 0x100 is written every IRQ4 */
 				case 0x20:
 					if (data != (0x100 << 12) && data != (0xef << 12))
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", activecpu_get_previouspc(), data, mem_mask, video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
 					break;
 
 				/* latch 0x40 is unknown; a 0 is written every IRQ4 */
 				case 0x40:
 					if (data != 0)
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", activecpu_get_previouspc(), data, mem_mask, video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
 					break;
 
 				/* latch 0x50 clears IRQ4 */
@@ -255,7 +255,7 @@ WRITE32_HANDLER( policetr_video_w )
 
 				/* log anything else */
 				default:
-					logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", activecpu_get_previouspc(), data, mem_mask, video_latch);
+					logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
 					break;
 			}
 			break;
@@ -315,7 +315,7 @@ READ32_HANDLER( policetr_video_r )
 	}
 
 	/* log anything else */
-	logerror("%08X: policetr_video_r with latch %02X\n", activecpu_get_previouspc(), video_latch);
+	logerror("%08X: policetr_video_r with latch %02X\n", cpu_get_previouspc(machine->activecpu), video_latch);
 	return 0;
 }
 

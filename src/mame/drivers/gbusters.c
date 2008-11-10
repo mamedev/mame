@@ -59,7 +59,7 @@ static WRITE8_HANDLER( gbusters_1f98_w )
 
 	/* other bits unused/unknown */
 	if (data & 0xfe){
-		//logerror("%04x: (1f98) write %02x\n",activecpu_get_pc(), data);
+		//logerror("%04x: (1f98) write %02x\n",cpu_get_pc(machine->activecpu), data);
 		//popmessage("$1f98 = %02x", data);
 	}
 }
@@ -86,13 +86,13 @@ static WRITE8_HANDLER( gbusters_coin_counter_w )
 		sprintf(baf,"ccnt = %02x", data);
 		popmessage(baf);
 #endif
-		logerror("%04x: (ccount) write %02x\n",activecpu_get_pc(), data);
+		logerror("%04x: (ccount) write %02x\n",cpu_get_pc(machine->activecpu), data);
 	}
 }
 
 static WRITE8_HANDLER( gbusters_unknown_w )
 {
-	logerror("%04x: write %02x to 0x1f9c\n",activecpu_get_pc(), data);
+	logerror("%04x: write %02x to 0x1f9c\n",cpu_get_pc(machine->activecpu), data);
 
 {
 char baf[40];
@@ -424,7 +424,7 @@ static void gbusters_banking( int lines )
 	memory_set_bankptr( 1, &RAM[offs] );
 
 	if (lines & 0xf0){
-		//logerror("%04x: (lines) write %02x\n",activecpu_get_pc(), lines);
+		//logerror("%04x: (lines) write %02x\n",cpu_get_pc(machine->activecpu), lines);
 		//popmessage("lines = %02x", lines);
 	}
 
@@ -435,7 +435,7 @@ static MACHINE_RESET( gbusters )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)gbusters_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)gbusters_banking);
 
 	/* mirror address for banked ROM */
 	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000 );

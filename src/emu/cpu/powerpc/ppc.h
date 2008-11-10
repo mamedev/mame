@@ -192,15 +192,15 @@ CPU_GET_INFO( mpc8240 );
     INLINE FUNCTIONS
 ***************************************************************************/
 
-INLINE void ppc4xx_spu_set_tx_handler(int cpunum, ppc4xx_spu_tx_handler handler)
+INLINE void ppc4xx_spu_set_tx_handler(const device_config *cpu, ppc4xx_spu_tx_handler handler)
 {
-	cpunum_set_info_fct(cpunum, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)handler);
+	cpu_set_info_fct(cpu, CPUINFO_PTR_SPU_TX_HANDLER, (genf *)handler);
 }
 
 
-INLINE void ppc4xx_spu_receive_byte(int cpunum, UINT8 byteval)
+INLINE void ppc4xx_spu_receive_byte(const device_config *cpu, UINT8 byteval)
 {
-	cpunum_set_info_int(cpunum, CPUINFO_INT_PPC_RX_DATA, byteval);
+	cpu_set_info_int(cpu, CPUINFO_INT_PPC_RX_DATA, byteval);
 }
 
 

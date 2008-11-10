@@ -79,7 +79,7 @@ static WRITE8_HANDLER( yunsung8_bankswitch_w )
 	int bank				=	data & 7;		// ROM bank
 	yunsung8_layers_ctrl	=	data & 0x30;	// Layers enable
 
-	if (data & ~0x37)	logerror("CPU #0 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if (data & ~0x37)	logerror("CPU #0 - PC %04X: Bank %02X\n",cpu_get_pc(machine->activecpu),data);
 
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( yunsung8_sound_bankswitch_w )
 	UINT8 *RAM = memory_region(machine, "audio");
 	int bank = data & 7;
 
-	if ( bank != (data&(~0x20)) ) 	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if ( bank != (data&(~0x20)) ) 	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(machine->activecpu),data);
 
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];

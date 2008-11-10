@@ -511,20 +511,20 @@ static MACHINE_START( seattle )
 	galileo.timer[3].timer = timer_alloc(galileo_timer_callback, NULL);
 
 	/* set the fastest DRC options, but strict verification */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_DRC_OPTIONS, MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x007fffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x007fffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rambase);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 0);
 
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_SELECT, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_START, 0x1fc00000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_END, 0x1fc7ffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_MIPS3_FASTRAM_BASE, rombase);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* register for save states */
 	state_save_register_global_array(galileo.reg);
@@ -574,8 +574,8 @@ static MACHINE_RESET( seattle )
 	}
 	else if (mame_find_cpu_index(machine, "cage") != -1)
 	{
-		cage_control_w(0);
-		cage_control_w(3);
+		cage_control_w(machine, 0);
+		cage_control_w(machine, 3);
 	}
 
 	/* reset the other devices */
@@ -764,7 +764,7 @@ static void vblank_assert(running_machine *machine, int state)
  *
  *************************************/
 
-static UINT32 pci_bridge_r(UINT8 reg, UINT8 type)
+static UINT32 pci_bridge_r(running_machine *machine, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_bridge_regs[reg];
 
@@ -780,16 +780,16 @@ static UINT32 pci_bridge_r(UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, result);
+		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_bridge_w(UINT8 reg, UINT8 type, UINT32 data)
+static void pci_bridge_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
 }
 
 
@@ -800,7 +800,7 @@ static void pci_bridge_w(UINT8 reg, UINT8 type, UINT32 data)
  *
  *************************************/
 
-static UINT32 pci_3dfx_r(UINT8 reg, UINT8 type)
+static UINT32 pci_3dfx_r(running_machine *machine, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_3dfx_regs[reg];
 
@@ -816,12 +816,12 @@ static UINT32 pci_3dfx_r(UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, result);
+		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_3dfx_w(UINT8 reg, UINT8 type, UINT32 data)
+static void pci_3dfx_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_3dfx_regs[reg] = data;
 
@@ -838,7 +838,7 @@ static void pci_3dfx_w(UINT8 reg, UINT8 type, UINT32 data)
 			break;
 	}
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, data);
+		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
 }
 
 
@@ -849,7 +849,7 @@ static void pci_3dfx_w(UINT8 reg, UINT8 type, UINT32 data)
  *
  *************************************/
 
-static UINT32 pci_ide_r(UINT8 reg, UINT8 type)
+static UINT32 pci_ide_r(running_machine *machine, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_ide_regs[reg];
 
@@ -865,16 +865,16 @@ static UINT32 pci_ide_r(UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, result);
+		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_ide_w(UINT8 reg, UINT8 type, UINT32 data)
+static void pci_ide_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_ide_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", activecpu_get_pc(), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
 }
 
 
@@ -1102,7 +1102,7 @@ static READ32_HANDLER( galileo_r )
 			activecpu_eat_cycles(100);
 
 			if (LOG_TIMERS)
-				logerror("%08X:hires_timer_r = %08X\n", activecpu_get_pc(), result);
+				logerror("%08X:hires_timer_r = %08X\n", cpu_get_pc(machine->activecpu), result);
 			break;
 		}
 
@@ -1121,21 +1121,21 @@ static READ32_HANDLER( galileo_r )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				result = pci_bridge_r(reg, type);
+				result = pci_bridge_r(machine, reg, type);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				result = pci_3dfx_r(reg, type);
+				result = pci_3dfx_r(machine, reg, type);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				result = pci_ide_r(reg, type);
+				result = pci_ide_r(machine, reg, type);
 
 			/* anything else, just log */
 			else
 			{
 				result = ~0;
-				logerror("%08X:PCIBus read: bus %d unit %d func %d reg %d type %d = %08X\n", activecpu_get_pc(), bus, unit, func, reg, type, result);
+				logerror("%08X:PCIBus read: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), bus, unit, func, reg, type, result);
 			}
 			break;
 		}
@@ -1145,11 +1145,11 @@ static READ32_HANDLER( galileo_r )
 		case GREG_INT_MASK:
 		case GREG_TIMER_CONTROL:
 //          if (LOG_GALILEO)
-//              logerror("%08X:Galileo read from offset %03X = %08X\n", activecpu_get_pc(), offset*4, result);
+//              logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(machine->activecpu), offset*4, result);
 			break;
 
 		default:
-			logerror("%08X:Galileo read from offset %03X = %08X\n", activecpu_get_pc(), offset*4, result);
+			logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(machine->activecpu), offset*4, result);
 			break;
 	}
 
@@ -1173,7 +1173,7 @@ static WRITE32_HANDLER( galileo_w )
 			int which = offset % 4;
 
 			if (LOG_DMA)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, data, mem_mask);
 
 			/* keep the read only activity bit */
 			galileo.reg[offset] &= ~0x4000;
@@ -1203,7 +1203,7 @@ static WRITE32_HANDLER( galileo_w )
 			if (!timer->active)
 				timer->count = data;
 			if (LOG_TIMERS)
-				logerror("%08X:timer/counter %d count = %08X [start=%08X]\n", activecpu_get_pc(), offset % 4, data, timer->count);
+				logerror("%08X:timer/counter %d count = %08X [start=%08X]\n", cpu_get_pc(machine->activecpu), offset % 4, data, timer->count);
 			break;
 		}
 
@@ -1212,7 +1212,7 @@ static WRITE32_HANDLER( galileo_w )
 			int which, mask;
 
 			if (LOG_TIMERS)
-				logerror("%08X:timer/counter control = %08X\n", activecpu_get_pc(), data);
+				logerror("%08X:timer/counter control = %08X\n", cpu_get_pc(machine->activecpu), data);
 			for (which = 0, mask = 0x01; which < 4; which++, mask <<= 2)
 			{
 				galileo_timer *timer = &galileo.timer[which];
@@ -1259,19 +1259,19 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				pci_bridge_w(reg, type, data);
+				pci_bridge_w(machine, reg, type, data);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				pci_3dfx_w(reg, type, data);
+				pci_3dfx_w(machine, reg, type, data);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				pci_ide_w(reg, type, data);
+				pci_ide_w(machine, reg, type, data);
 
 			/* anything else, just log */
 			else
-				logerror("%08X:PCIBus write: bus %d unit %d func %d reg %d type %d = %08X\n", activecpu_get_pc(), bus, unit, func, reg, type, data);
+				logerror("%08X:PCIBus write: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), bus, unit, func, reg, type, data);
 			break;
 		}
 
@@ -1282,11 +1282,11 @@ static WRITE32_HANDLER( galileo_w )
 		case GREG_CONFIG_ADDRESS:
 		case GREG_INT_MASK:
 			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, data, mem_mask);
 			break;
 
 		default:
-			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -1320,7 +1320,7 @@ static WRITE32_DEVICE_HANDLER( seattle_voodoo_w )
 
 	/* spin until we send the magic trigger */
 	cpunum_spinuntil_trigger(0, 45678);
-	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", activecpu_get_pc());
+	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", cpu_get_pc(device->machine->activecpu));
 }
 
 
@@ -1339,7 +1339,7 @@ static void voodoo_stall(const device_config *device, int stall)
 		}
 		else
 		{
-			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", activecpu_get_pc());
+			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(device->machine->activecpu));
 			cpunum_spinuntil_trigger(0, 45678);
 		}
 	}
@@ -1359,9 +1359,9 @@ static void voodoo_stall(const device_config *device, int stall)
 				galileo.dma_stalled_on_voodoo[which] = FALSE;
 
 				/* resume execution */
-				cpuintrf_push_context(0);
+				cpu_push_context(device->machine->cpu[0]);
 				galileo_perform_dma(device->machine, which);
-				cpuintrf_pop_context();
+				cpu_pop_context();
 				break;
 			}
 
@@ -1399,7 +1399,7 @@ static WRITE32_HANDLER( analog_port_w )
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 
 	if (data < 8 || data > 15)
-		logerror("%08X:Unexpected analog port select = %08X\n", activecpu_get_pc(), data);
+		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(machine->activecpu), data);
 	pending_analog_read = input_port_read(machine, portnames[data & 7]);
 }
 
@@ -2785,12 +2785,12 @@ static void init_common(running_machine *machine, int ioasic, int serialnum, int
 	speedup_index = 0;
 }
 
-static void add_speedup(offs_t pc, UINT32 op)
+static void add_speedup(running_machine *machine, offs_t pc, UINT32 op)
 {
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_SELECT, speedup_index++);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_PC, pc);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, op);
-	cpunum_set_info_int(0, CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 250);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_SELECT, speedup_index++);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_PC, pc);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_OPCODE, op);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_HOTSPOT_CYCLES, 250);
 }
 
 
@@ -2800,9 +2800,9 @@ static DRIVER_INIT( wg3dh )
 	init_common(machine, MIDWAY_IOASIC_STANDARD, 310/* others? */, 80, PHOENIX_CONFIG);
 
 	/* speedups */
-	add_speedup(0x8004413C, 0x0C0054B4);		/* confirmed */
-	add_speedup(0x80094930, 0x00A2102B);		/* confirmed */
-	add_speedup(0x80092984, 0x3C028011);		/* confirmed */
+	add_speedup(machine, 0x8004413C, 0x0C0054B4);		/* confirmed */
+	add_speedup(machine, 0x80094930, 0x00A2102B);		/* confirmed */
+	add_speedup(machine, 0x80092984, 0x3C028011);		/* confirmed */
 }
 
 
@@ -2812,7 +2812,7 @@ static DRIVER_INIT( mace )
 	init_common(machine, MIDWAY_IOASIC_MACE, 319/* others? */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(0x800108F8, 0x8C420000);		/* confirmed */
+	add_speedup(machine, 0x800108F8, 0x8C420000);		/* confirmed */
 }
 
 
@@ -2822,9 +2822,9 @@ static DRIVER_INIT( sfrush )
 	init_common(machine, MIDWAY_IOASIC_STANDARD, 315/* no alternates */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	add_speedup(0x80059F34, 0x3C028012);		/* confirmed */
-	add_speedup(0x800A5AF4, 0x8E300010);		/* confirmed */
-	add_speedup(0x8004C260, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x80059F34, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x800A5AF4, 0x8E300010);		/* confirmed */
+	add_speedup(machine, 0x8004C260, 0x3C028012);		/* confirmed */
 }
 
 
@@ -2834,10 +2834,10 @@ static DRIVER_INIT( sfrushrk )
 	init_common(machine, MIDWAY_IOASIC_SFRUSHRK, 331/* unknown */, 100, FLAGSTAFF_CONFIG);
 
 	/* speedups */
-	add_speedup(0x800343E8, 0x3C028012);		/* confirmed */
-	add_speedup(0x8008F4F0, 0x3C028012);		/* confirmed */
-	add_speedup(0x800A365C, 0x8E300014);		/* confirmed */
-	add_speedup(0x80051DAC, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x800343E8, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x8008F4F0, 0x3C028012);		/* confirmed */
+	add_speedup(machine, 0x800A365C, 0x8E300014);		/* confirmed */
+	add_speedup(machine, 0x80051DAC, 0x3C028012);		/* confirmed */
 }
 
 
@@ -2848,8 +2848,8 @@ static DRIVER_INIT( calspeed )
 	midway_ioasic_set_auto_ack(1);
 
 	/* speedups */
-	add_speedup(0x80032534, 0x02221024);		/* confirmed */
-	add_speedup(0x800B1BE4, 0x8E110014);		/* confirmed */
+	add_speedup(machine, 0x80032534, 0x02221024);		/* confirmed */
+	add_speedup(machine, 0x800B1BE4, 0x8E110014);		/* confirmed */
 }
 
 
@@ -2859,9 +2859,9 @@ static DRIVER_INIT( vaportrx )
 	init_common(machine, MIDWAY_IOASIC_VAPORTRX, 324/* 334? unknown */, 100, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	add_speedup(0x80049F14, 0x3C028020);		/* confirmed */
-	add_speedup(0x8004859C, 0x3C028020);		/* confirmed */
-	add_speedup(0x8005922C, 0x8E020014);		/* confirmed */
+	add_speedup(machine, 0x80049F14, 0x3C028020);		/* confirmed */
+	add_speedup(machine, 0x8004859C, 0x3C028020);		/* confirmed */
+	add_speedup(machine, 0x8005922C, 0x8E020014);		/* confirmed */
 }
 
 
@@ -2883,8 +2883,8 @@ static DRIVER_INIT( blitz )
 	rombase[0x934/4] += 4;
 
 	/* main CPU speedups */
-	add_speedup(0x80135510, 0x3C028024);		/* confirmed */
-	add_speedup(0x800087DC, 0x8E820010);		/* confirmed */
+	add_speedup(machine, 0x80135510, 0x3C028024);		/* confirmed */
+	add_speedup(machine, 0x800087DC, 0x8E820010);		/* confirmed */
 }
 
 
@@ -2894,8 +2894,8 @@ static DRIVER_INIT( blitz99 )
 	init_common(machine, MIDWAY_IOASIC_BLITZ99, 481/* or 484 or 520 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(0x8014E41C, 0x3C038025);		/* confirmed */
-	add_speedup(0x80011F10, 0x8E020018);		/* confirmed */
+	add_speedup(machine, 0x8014E41C, 0x3C038025);		/* confirmed */
+	add_speedup(machine, 0x80011F10, 0x8E020018);		/* confirmed */
 }
 
 
@@ -2905,8 +2905,8 @@ static DRIVER_INIT( blitz2k )
 	init_common(machine, MIDWAY_IOASIC_BLITZ99, 494/* or 498 */, 80, SEATTLE_CONFIG);
 
 	/* speedups */
-	add_speedup(0x8015773C, 0x3C038025);		/* confirmed */
-	add_speedup(0x80012CA8, 0x8E020018);		/* confirmed */
+	add_speedup(machine, 0x8015773C, 0x3C038025);		/* confirmed */
+	add_speedup(machine, 0x80012CA8, 0x8E020018);		/* confirmed */
 }
 
 
@@ -2919,8 +2919,8 @@ static DRIVER_INIT( carnevil )
 	memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x16800000, 0x1680001f, 0, 0, carnevil_gun_r, carnevil_gun_w);
 
 	/* speedups */
-	add_speedup(0x8015176C, 0x3C03801A);		/* confirmed */
-	add_speedup(0x80011FBC, 0x8E020018);		/* confirmed */
+	add_speedup(machine, 0x8015176C, 0x3C03801A);		/* confirmed */
+	add_speedup(machine, 0x80011FBC, 0x8E020018);		/* confirmed */
 }
 
 
@@ -2930,9 +2930,9 @@ static DRIVER_INIT( hyprdriv )
 	init_common(machine, MIDWAY_IOASIC_HYPRDRIV, 469/* unknown */, 80, SEATTLE_WIDGET_CONFIG);
 
 	/* speedups */
-	add_speedup(0x801643BC, 0x3C03801B);		/* confirmed */
-	add_speedup(0x80011FB8, 0x8E020018);		/* confirmed */
-	//add_speedup(0x80136A80, 0x3C02801D);      /* potential */
+	add_speedup(machine, 0x801643BC, 0x3C03801B);		/* confirmed */
+	add_speedup(machine, 0x80011FB8, 0x8E020018);		/* confirmed */
+	//add_speedup(machine, 0x80136A80, 0x3C02801D);      /* potential */
 }
 
 

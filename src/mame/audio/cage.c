@@ -193,7 +193,7 @@ void cage_set_irq_handler(void (*irqhandler)(running_machine *, int))
 void cage_reset_w(int state)
 {
 	if (state)
-		cage_control_w(0);
+		cage_control_w(Machine, 0);
 	cpunum_set_input_line(Machine, cage_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
@@ -381,7 +381,7 @@ static READ32_HANDLER( tms32031_io_r )
 	}
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s read -> %08X\n", activecpu_get_pc(), register_names[offset & 0x7f], result);
+		logerror("CAGE:%06X:%s read -> %08X\n", cpu_get_pc(machine->activecpu), register_names[offset & 0x7f], result);
 	return result;
 }
 
@@ -391,7 +391,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 	COMBINE_DATA(&tms32031_io_regs[offset]);
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s write = %08X\n", activecpu_get_pc(), register_names[offset & 0x7f], tms32031_io_regs[offset]);
+		logerror("CAGE:%06X:%s write = %08X\n", cpu_get_pc(machine->activecpu), register_names[offset & 0x7f], tms32031_io_regs[offset]);
 
 	switch (offset)
 	{
@@ -443,7 +443,7 @@ static WRITE32_HANDLER( tms32031_io_w )
  *
  *************************************/
 
-static void update_control_lines(void)
+static void update_control_lines(running_machine *machine)
 {
 	int val;
 
@@ -461,22 +461,22 @@ static void update_control_lines(void)
 	}
 
 	/* set the IOF input lines */
-	cpuintrf_push_context(cage_cpu);
-	val = activecpu_get_reg(TMS32031_IOF);
+	cpu_push_context(machine->cpu[cage_cpu]);
+	val = cpu_get_reg(machine->activecpu, TMS32031_IOF);
 	val &= ~0x88;
 	if (cpu_to_cage_ready) val |= 0x08;
 	if (cage_to_cpu_ready) val |= 0x80;
-	activecpu_set_reg(TMS32031_IOF, val);
-	cpuintrf_pop_context();
+	cpu_set_reg(machine->activecpu, TMS32031_IOF, val);
+	cpu_pop_context();
 }
 
 
 static READ32_HANDLER( cage_from_main_r )
 {
 	if (LOG_COMM)
-		logerror("%06X:CAGE read command = %04X\n", activecpu_get_pc(), cage_from_main);
+		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(machine->activecpu), cage_from_main);
 	cpu_to_cage_ready = 0;
-	update_control_lines();
+	update_control_lines(machine);
 	cpunum_set_input_line(machine, cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
@@ -485,17 +485,17 @@ static READ32_HANDLER( cage_from_main_r )
 static WRITE32_HANDLER( cage_from_main_ack_w )
 {
 	if (LOG_COMM)
-		logerror("%06X:CAGE ack command = %04X\n", activecpu_get_pc(), cage_from_main);
+		logerror("%06X:CAGE ack command = %04X\n", cpu_get_pc(machine->activecpu), cage_from_main);
 }
 
 
 static WRITE32_HANDLER( cage_to_main_w )
 {
 	if (LOG_COMM)
-		logerror("%06X:Data from CAGE = %04X\n", activecpu_get_pc(), data);
+		logerror("%06X:Data from CAGE = %04X\n", cpu_get_pc(machine->activecpu), data);
 	soundlatch_word_w(machine, 0, data, mem_mask);
 	cage_to_cpu_ready = 1;
-	update_control_lines();
+	update_control_lines(machine);
 }
 
 
@@ -513,9 +513,9 @@ static READ32_HANDLER( cage_io_status_r )
 UINT16 main_from_cage_r(void)
 {
 	if (LOG_COMM)
-		logerror("%06X:main read data = %04X\n", activecpu_get_pc(), soundlatch_word_r(Machine, 0, 0));
+		logerror("%06X:main read data = %04X\n", cpu_get_pc(Machine->activecpu), soundlatch_word_r(Machine, 0, 0));
 	cage_to_cpu_ready = 0;
-	update_control_lines();
+	update_control_lines(Machine);
 	return soundlatch_word_r(Machine, 0, 0xffff);
 }
 
@@ -524,7 +524,7 @@ static TIMER_CALLBACK( deferred_cage_w )
 {
 	cage_from_main = param;
 	cpu_to_cage_ready = 1;
-	update_control_lines();
+	update_control_lines(machine);
 	cpunum_set_input_line(machine, cage_cpu, TMS32031_IRQ0, ASSERT_LINE);
 }
 
@@ -532,7 +532,7 @@ static TIMER_CALLBACK( deferred_cage_w )
 void main_to_cage_w(UINT16 data)
 {
 	if (LOG_COMM)
-		logerror("%06X:Command to CAGE = %04X\n", activecpu_get_pc(), data);
+		logerror("%06X:Command to CAGE = %04X\n", cpu_get_pc(Machine->activecpu), data);
 	timer_call_after_resynch(NULL, data, deferred_cage_w);
 }
 
@@ -550,7 +550,7 @@ UINT16 cage_control_r(void)
 }
 
 
-void cage_control_w(UINT16 data)
+void cage_control_w(running_machine *machine, UINT16 data)
 {
 	cage_control = data;
 
@@ -577,7 +577,7 @@ void cage_control_w(UINT16 data)
 		cpunum_set_input_line(Machine, cage_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 
 	/* update the control state */
-	update_control_lines();
+	update_control_lines(machine);
 }
 
 

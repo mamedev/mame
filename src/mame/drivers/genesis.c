@@ -439,7 +439,7 @@ UINT16 *genesis_io_ram;
 /* megaplay.c uses a local copy 'OLD_megaplay_genesis_io_w' */
 WRITE16_HANDLER ( genesis_io_w )
 {
-//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,activecpu_get_previouspc());
+//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,cpu_get_previouspc(machine->activecpu));
 
 	switch (offset)
 	{

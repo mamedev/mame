@@ -581,11 +581,11 @@ static UINT32 log_bioscall_parameter( int parm )
 {
 	if( parm < 4 )
 	{
-		return activecpu_get_reg( MIPS_R4 + parm );
+		return cpu_get_reg( Machine->activecpu, MIPS_R4 + parm );
 	}
 	else
 	{
-		return mipscpu.readword( activecpu_get_reg( MIPS_R29 ) + ( parm * 4 ) );
+		return mipscpu.readword( cpu_get_reg( Machine->activecpu, MIPS_R29 ) + ( parm * 4 ) );
 	}
 }
 
@@ -675,13 +675,13 @@ static const char *log_bioscall_char( int parm )
 
 static void log_bioscall( void )
 {
-	int address = activecpu_get_reg( MIPS_PC ) - 0x04;
+	int address = cpu_get_reg( Machine->activecpu, MIPS_PC ) - 0x04;
 	if( address == 0xa0 ||
 		address == 0xb0 ||
 		address == 0xc0 )
 	{
 		char buf[ 1024 ];
-		int operation = activecpu_get_reg( MIPS_R9 ) & 0xff;
+		int operation = cpu_get_reg( Machine->activecpu, MIPS_R9 ) & 0xff;
 		int bioscall = 0;
 
 		if( ( address == 0xa0 && operation == 0x3c ) ||
@@ -907,14 +907,14 @@ static void log_bioscall( void )
 		{
 			sprintf( buf, "unknown_%02x_%02x", address, operation );
 		}
-		logerror( "%08x: bioscall %s\n", (unsigned int)activecpu_get_reg( MIPS_R31 ) - 8, buf );
+		logerror( "%08x: bioscall %s\n", (unsigned int)cpu_get_reg( Machine->activecpu, MIPS_R31 ) - 8, buf );
 	}
 }
 
 static void log_syscall( void )
 {
 	char buf[ 1024 ];
-	int operation = activecpu_get_reg( MIPS_R4 );
+	int operation = cpu_get_reg( Machine->activecpu, MIPS_R4 );
 
 	switch( operation )
 	{
@@ -934,7 +934,7 @@ static void log_syscall( void )
 		sprintf( buf, "unknown_%02x", operation );
 		break;
 	}
-	logerror( "%08x: syscall %s\n", (unsigned int)activecpu_get_reg( MIPS_R31 ) - 8, buf );
+	logerror( "%08x: syscall %s\n", (unsigned int)cpu_get_reg( Machine->activecpu, MIPS_R31 ) - 8, buf );
 }
 
 static UINT32 mips_cache_readword( UINT32 offset )
@@ -1251,7 +1251,7 @@ static WRITE32_HANDLER( psx_berr_w )
 
 static void mips_update_scratchpad( running_machine *machine )
 {
-	int cpu = cpu_getactivecpu();
+	int cpu = cpunum_get_active();
 
 	if( ( mipscpu.biu & BIU_RAM ) == 0 )
 	{

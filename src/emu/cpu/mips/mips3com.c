@@ -89,7 +89,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const 
 	mips->memory = *memory_get_accessors(ADDRESS_SPACE_PROGRAM, 32, mips->bigendian ? CPU_IS_BE : CPU_IS_LE);
 
 	/* allocate the virtual TLB */
-	mips->vtlb = vtlb_alloc(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, 2 * MIPS3_TLB_ENTRIES + 2, 0);
+	mips->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, 2 * MIPS3_TLB_ENTRIES + 2, 0);
 
 	/* allocate a timer for the compare interrupt */
 	mips->compare_int_timer = timer_alloc(compare_int_callback, NULL);
@@ -191,11 +191,11 @@ void mips3com_update_cycle_counting(mips3_state *mips)
 		UINT32 count = (activecpu_gettotalcycles() - mips->count_zero_time) / 2;
 		UINT32 compare = mips->cpr[0][COP0_Compare];
 		UINT32 delta = compare - count;
-		attotime newtime = ATTOTIME_IN_CYCLES(((UINT64)delta * 2), cpu_getactivecpu());
-		timer_adjust_oneshot(mips->compare_int_timer, newtime, cpu_getactivecpu());
+		attotime newtime = ATTOTIME_IN_CYCLES(((UINT64)delta * 2), cpunum_get_active());
+		timer_adjust_oneshot(mips->compare_int_timer, newtime, cpunum_get_active());
 		return;
 	}
-	timer_adjust_oneshot(mips->compare_int_timer, attotime_never, cpu_getactivecpu());
+	timer_adjust_oneshot(mips->compare_int_timer, attotime_never, cpunum_get_active());
 }
 
 

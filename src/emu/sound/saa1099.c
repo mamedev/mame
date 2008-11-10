@@ -67,6 +67,7 @@
 #include "streams.h"
 #include "cpuintrf.h"
 #include "saa1099.h"
+#include "deprecat.h"
 #include <math.h>
 
 
@@ -333,7 +334,7 @@ static void saa1099_control_port_w( int chip, int reg, int data )
     if ((data & 0xff) > 0x1c)
 	{
 		/* Error! */
-                logerror("%04x: (SAA1099 #%d) Unknown register selected\n",activecpu_get_pc(), chip);
+                logerror("%04x: (SAA1099 #%d) Unknown register selected\n",cpu_get_pc(Machine->activecpu), chip);
 	}
 
     saa->selected_reg = data & 0x1f;
@@ -419,7 +420,7 @@ static void saa1099_write_port_w( int chip, int offset, int data )
 			int i;
 
 			/* Synch & Reset generators */
-			logerror("%04x: (SAA1099 #%d) -reg 0x1c- Chip reset\n",activecpu_get_pc(), chip);
+			logerror("%04x: (SAA1099 #%d) -reg 0x1c- Chip reset\n",cpu_get_pc(Machine->activecpu), chip);
 			for (i = 0; i < 6; i++)
 			{
                 saa->channels[i].level = 0;
@@ -428,7 +429,7 @@ static void saa1099_write_port_w( int chip, int offset, int data )
 		}
 		break;
 	default:	/* Error! */
-		logerror("%04x: (SAA1099 #%d) Unknown operation (reg:%02x, data:%02x)\n",activecpu_get_pc(), chip, reg, data);
+		logerror("%04x: (SAA1099 #%d) Unknown operation (reg:%02x, data:%02x)\n",cpu_get_pc(Machine->activecpu), chip, reg, data);
 	}
 }
 

@@ -280,13 +280,13 @@ READ16_HANDLER ( pntnpuzl_random_r )
 
 static READ16_HANDLER( pntnpuzl_vid_r )
 {
-//  logerror("read_videoram: pc = %06x : offset %04x reg %04x\n",activecpu_get_pc(),offset*2, pntnpuzl_bank[0]);
+//  logerror("read_videoram: pc = %06x : offset %04x reg %04x\n",cpu_get_pc(machine->activecpu),offset*2, pntnpuzl_bank[0]);
 	return pntnpuzl_3a0000ram[offset+ (pntnpuzl_bank[0]&0x0001)*0x8000 ];
 }
 
 static WRITE16_HANDLER( pntnpuzl_vid_w )
 {
-//  logerror("write_to_videoram: pc = %06x : offset %04x data %04x reg %04x\n",activecpu_get_pc(),offset*2, data, pntnpuzl_bank[0]);
+//  logerror("write_to_videoram: pc = %06x : offset %04x data %04x reg %04x\n",cpu_get_pc(machine->activecpu),offset*2, data, pntnpuzl_bank[0]);
 	COMBINE_DATA(&pntnpuzl_3a0000ram[offset+ (pntnpuzl_bank[0]&0x0001)*0x8000 ]);
 }
 
@@ -336,7 +336,7 @@ static WRITE16_HANDLER( pntnpuzl_200000_w )
 
 static WRITE16_HANDLER( pntnpuzl_280018_w )
 {
-// logerror("%04x: 280018: %04x\n",activecpu_get_pc(),data);
+// logerror("%04x: 280018: %04x\n",cpu_get_pc(machine->activecpu),data);
 	serial >>= 1;
 	if (data & 0x2000)
 		serial |= 0x400;

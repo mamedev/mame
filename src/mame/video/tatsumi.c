@@ -26,7 +26,7 @@ WRITE16_HANDLER(tatsumi_sprite_control_w)
 
 	/* 0xe0 is bank switch, others unknown */
 //  if ((offset==0xe0 && data&0xefff) || offset!=0xe0)
-//      logerror("%08x:  Tatsumi TZB215 sprite control %04x %08x\n", activecpu_get_pc(), offset, data);
+//      logerror("%08x:  Tatsumi TZB215 sprite control %04x %08x\n", cpu_get_pc(machine->activecpu), offset, data);
 }
 
 /******************************************************************************/
@@ -157,7 +157,7 @@ WRITE16_HANDLER( roundup5_crt_w )
 	if (offset==1 && ACCESSING_BITS_0_7) {
 		roundupt_crt_reg[roundupt_crt_selected_reg]=data;
 //      if (roundupt_crt_selected_reg!=0xa && roundupt_crt_selected_reg!=0xb && roundupt_crt_selected_reg!=29)
-//      logerror("%08x:  Crt write %02x %02x\n",activecpu_get_pc(),roundupt_crt_selected_reg,data);
+//      logerror("%08x:  Crt write %02x %02x\n",cpu_get_pc(machine->activecpu),roundupt_crt_selected_reg,data);
 	}
 }
 

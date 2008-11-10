@@ -1136,9 +1136,9 @@ ROM_START( dquizgo2 )
 	ROM_LOAD( "vrom1", 0x00000, 0x40000, CRC(24d5b55f) SHA1(cb4d3a22440831e37df0a7fe5433bea708d60f31) )
 ROM_END
 
-static int irq_active(void)
+static int irq_active(running_machine *machine)
 {
-	UINT32 FCR = activecpu_get_reg(27);
+	UINT32 FCR = cpu_get_reg(machine->activecpu, 27);
 	if( !(FCR&(1<<29)) ) // int 2 (irq 4)
 		return 1;
 	else
@@ -1147,9 +1147,9 @@ static int irq_active(void)
 
 static READ16_HANDLER( vamphalf_speedup_r )
 {
-	if(activecpu_get_pc() == 0x82de)
+	if(cpu_get_pc(machine->activecpu) == 0x82de)
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);
@@ -1160,9 +1160,9 @@ static READ16_HANDLER( vamphalf_speedup_r )
 
 static READ16_HANDLER( misncrft_speedup_r )
 {
-	if(activecpu_get_pc() == 0xecc8)
+	if(cpu_get_pc(machine->activecpu) == 0xecc8)
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);
@@ -1173,9 +1173,9 @@ static READ16_HANDLER( misncrft_speedup_r )
 
 static READ16_HANDLER( coolmini_speedup_r )
 {
-	if(activecpu_get_pc() == 0x75f7a)
+	if(cpu_get_pc(machine->activecpu) == 0x75f7a)
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);
@@ -1186,9 +1186,9 @@ static READ16_HANDLER( coolmini_speedup_r )
 
 static READ16_HANDLER( suplup_speedup_r )
 {
-	if(activecpu_get_pc() == 0xaf18a )
+	if(cpu_get_pc(machine->activecpu) == 0xaf18a )
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);
@@ -1199,9 +1199,9 @@ static READ16_HANDLER( suplup_speedup_r )
 
 static READ16_HANDLER( luplup_speedup_r )
 {
-	if(activecpu_get_pc() == 0xaefac )
+	if(cpu_get_pc(machine->activecpu) == 0xaefac )
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);
@@ -1212,9 +1212,9 @@ static READ16_HANDLER( luplup_speedup_r )
 
 static READ16_HANDLER( luplup29_speedup_r )
 {
-	if(activecpu_get_pc() == 0xae6c0 )
+	if(cpu_get_pc(machine->activecpu) == 0xae6c0 )
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);
@@ -1225,9 +1225,9 @@ static READ16_HANDLER( luplup29_speedup_r )
 
 static READ16_HANDLER( puzlbang_speedup_r )
 {
-	if(activecpu_get_pc() == 0xae6d2 )
+	if(cpu_get_pc(machine->activecpu) == 0xae6d2 )
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);
@@ -1238,9 +1238,9 @@ static READ16_HANDLER( puzlbang_speedup_r )
 
 static READ32_HANDLER( wyvernwg_speedup_r )
 {
-	if(activecpu_get_pc() == 0x10758 )
+	if(cpu_get_pc(machine->activecpu) == 0x10758 )
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);
@@ -1251,9 +1251,9 @@ static READ32_HANDLER( wyvernwg_speedup_r )
 
 static READ32_HANDLER( finalgdr_speedup_r )
 {
-	if(activecpu_get_pc() == 0x1c212 )
+	if(cpu_get_pc(machine->activecpu) == 0x1c212 )
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);
@@ -1264,9 +1264,9 @@ static READ32_HANDLER( finalgdr_speedup_r )
 
 static READ16_HANDLER( dquizgo2_speedup_r )
 {
-	if(activecpu_get_pc() == 0xaa622)
+	if(cpu_get_pc(machine->activecpu) == 0xaa622)
 	{
-		if(irq_active())
+		if(irq_active(machine))
 			cpu_spinuntil_int();
 		else
 			activecpu_eat_cycles(50);

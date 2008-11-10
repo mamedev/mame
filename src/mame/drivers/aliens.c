@@ -497,7 +497,7 @@ static MACHINE_RESET( aliens )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)aliens_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)aliens_banking);
 
 	/* init the default bank */
 	memory_set_bankptr( 1, &RAM[0x10000] );

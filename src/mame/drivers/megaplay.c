@@ -517,7 +517,7 @@ static READ16_HANDLER ( OLD_megaplay_genesis_io_r )
 
 static WRITE16_HANDLER ( OLD_megaplay_genesis_io_w )
 {
-//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,activecpu_get_previouspc());
+//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,cpu_get_previouspc(machine->activecpu));
 
 	switch (offset)
 	{
@@ -681,7 +681,7 @@ static WRITE8_HANDLER( megaplay_game_w )
 		bios_mode = MP_GAME;
 		readpos = 1;
 //      popmessage("Game bank selected: 0x%03x",game_banksel);
-		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n",activecpu_get_previouspc(),game_banksel);
+		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n",cpu_get_previouspc(machine->activecpu),game_banksel);
 	}
 }
 

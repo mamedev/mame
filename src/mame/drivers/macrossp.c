@@ -338,7 +338,7 @@ static READ32_HANDLER ( macrossp_soundstatus_r )
 {
 	static int toggle;
 
-//  logerror("%08x read soundstatus\n",activecpu_get_pc());
+//  logerror("%08x read soundstatus\n",cpu_get_pc(machine->activecpu));
 
 	/* bit 1 is sound status */
 	/* bit 0 unknown - it is expected to toggle, vblank? */
@@ -352,7 +352,7 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		//logerror("%08x write soundcmd %08x (%08x)\n",activecpu_get_pc(),data,mem_mask);
+		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(machine->activecpu),data,mem_mask);
 		soundlatch_word_w(machine,0,data >> 16,0xffff);
 		sndpending = 1;
 		cpunum_set_input_line(machine, 1,2,HOLD_LINE);
@@ -363,7 +363,7 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 
 static READ16_HANDLER( macrossp_soundcmd_r )
 {
-//  logerror("%06x read soundcmd\n",activecpu_get_pc());
+//  logerror("%06x read soundcmd\n",cpu_get_pc(machine->activecpu));
 	sndpending = 0;
 	return soundlatch_word_r(machine,offset,mem_mask);
 }
@@ -778,14 +778,14 @@ PC :0001810A 01810A: cmp.w   $f10140.l, D0
 PC :00018110 018110: beq     18104
 */
 	COMBINE_DATA(&macrossp_mainram[0x10158/4]);
-	if (activecpu_get_pc()==0x001810A) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x001810A) cpu_spinuntil_int();
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE32_HANDLER( quizmoon_speedup_w )
 {
 	COMBINE_DATA(&macrossp_mainram[0x00020/4]);
-	if (activecpu_get_pc()==0x1cc) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x1cc) cpu_spinuntil_int();
 }
 #endif
 

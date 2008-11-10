@@ -474,7 +474,7 @@ static void k88games_banking( int lines )
 	UINT8 *RAM = memory_region(Machine, "main");
 	int offs;
 
-logerror("%04x: bank select %02x\n",activecpu_get_pc(),lines);
+logerror("%04x: bank select %02x\n",cpu_get_pc(Machine->activecpu),lines);
 
 	/* bits 0-2 select ROM bank for 0000-1fff */
 	/* bit 3: when 1, palette RAM at 1000-1fff */
@@ -511,7 +511,7 @@ logerror("%04x: bank select %02x\n",activecpu_get_pc(),lines);
 
 static MACHINE_RESET( 88games )
 {
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)k88games_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)k88games_banking);
 	paletteram = &memory_region(machine, "main")[0x20000];
 }
 

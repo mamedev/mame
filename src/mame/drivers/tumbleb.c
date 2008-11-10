@@ -3328,9 +3328,9 @@ static DRIVER_INIT( fncywld )
 static READ16_HANDLER( bcstory_1a0_read )
 {
 
-	//mame_printf_debug("bcstory_io %06x\n",activecpu_get_pc());
+	//mame_printf_debug("bcstory_io %06x\n",cpu_get_pc(machine->activecpu));
 
-	if (activecpu_get_pc()==0x0560) return 0x1a0;
+	if (cpu_get_pc(machine->activecpu)==0x0560) return 0x1a0;
 	else return input_port_read(machine, "SYSTEM");
 }
 

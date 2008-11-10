@@ -536,7 +536,7 @@ static const ay8910_interface ay8910_config =
 static INTERRUPT_GEN( kingofb_interrupt ) {
 
 	if ( kingofb_nmi_enable )
-		cpunum_set_input_line(machine, cpu_getactivecpu(), INPUT_LINE_NMI, PULSE_LINE);
+		cpunum_set_input_line(machine, cpunum_get_active(), INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( kingofb )

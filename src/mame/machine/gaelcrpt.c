@@ -120,11 +120,11 @@ static int decrypt(int const param1, int const param2, int const enc_prev_word, 
 
 
 
-UINT16 gaelco_decrypt(int offset, int data, int param1, int param2)
+UINT16 gaelco_decrypt(running_machine *machine, int offset, int data, int param1, int param2)
 {
 	static int lastpc, lastoffset, lastencword, lastdecword;
 
-	int thispc = activecpu_get_pc();
+	int thispc = cpu_get_pc(machine->activecpu);
 //  int savedata = data;
 
 	/* check if 2nd half of 32 bit */
@@ -146,7 +146,7 @@ UINT16 gaelco_decrypt(int offset, int data, int param1, int param2)
 
 		lastdecword = data;
 
-//      logerror("%8x : data1 = %4x > %4x @ %8x\n",activecpu_get_pc(),savedata,data,lastoffset);
+//      logerror("%8x : data1 = %4x > %4x @ %8x\n",cpu_get_pc(machine->activecpu),savedata,data,lastoffset);
 	}
 	return data;
 }

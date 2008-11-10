@@ -358,12 +358,12 @@ static WRITE8_HANDLER( namcos1_sub_firq_w )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(machine, cpu_getactivecpu(), 0, CLEAR_LINE);
+	cpunum_set_input_line(machine, cpunum_get_active(), 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( firq_ack_w )
 {
-	cpunum_set_input_line(machine, cpu_getactivecpu(), M6809_FIRQ_LINE, CLEAR_LINE);
+	cpunum_set_input_line(machine, cpunum_get_active(), M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

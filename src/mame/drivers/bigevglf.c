@@ -88,7 +88,7 @@ static TIMER_CALLBACK( from_sound_latch_callback )
 }
 static WRITE8_HANDLER(beg_fromsound_w)	/* write to D800 sets bit 1 in status */
 {
-	timer_call_after_resynch(NULL, (activecpu_get_pc()<<16)|data, from_sound_latch_callback);
+	timer_call_after_resynch(NULL, (cpu_get_pc(machine->activecpu)<<16)|data, from_sound_latch_callback);
 }
 
 static READ8_HANDLER(beg_fromsound_r)

@@ -175,7 +175,7 @@ MCU simulation TODO:
  		break;
 
  		default:
- 			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", activecpu_get_pc(), mcu_val );
+ 			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(machine->activecpu), mcu_val );
  		   	return mcu_val;
  		break;
 	}
@@ -197,7 +197,7 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 	buggychl_mcu_w(offset,data);
 #else
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
-	//  popmessage("PC = %04x %02x",activecpu_get_pc(),data);
+	//  popmessage("PC = %04x %02x",cpu_get_pc(machine->activecpu),data);
 	mcu_val = data;
 #endif
 }

@@ -183,12 +183,12 @@ static WRITE8_HANDLER( trvmadns_tileram_w )
 {
 	if(offset==0)
 	{
-		if(activecpu_get_previouspc()==0x29e9)// || activecpu_get_previouspc()==0x1b3f) //29f5
+		if(cpu_get_previouspc(machine->activecpu)==0x29e9)// || cpu_get_previouspc(machine->activecpu)==0x1b3f) //29f5
 		{
 			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
 		}
 //      else
-//          printf("%x \n", activecpu_get_previouspc());
+//          printf("%x \n", cpu_get_previouspc(machine->activecpu));
 
 	}
 

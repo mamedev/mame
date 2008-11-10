@@ -756,7 +756,7 @@ READ16_HANDLER( copdxbl_0_r )
 	{
 		default:
 		{
-			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(machine->activecpu), retvalue, offset*2);
 			return retvalue;
 		}
 
@@ -782,7 +782,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 
 		default:
 		{
-			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(machine->activecpu), data, offset*2);
 			break;
 		}
 
@@ -990,12 +990,12 @@ WRITE16_HANDLER( raiden2_cop2_w )
 		/* ----- program upload registers ----- */
 
 		case 0x432/2:		/* COP program data */
-			COP_LOG(("%05X:COP Prog Data = %04X\n", activecpu_get_pc(), data));
+			COP_LOG(("%05X:COP Prog Data = %04X\n", cpu_get_pc(machine->activecpu), data));
 			cop->program[cop_ram_r(cop, 0x434)] = data;
 			break;
 
 		case 0x434/2:		/* COP program address */
-			COP_LOG(("%05X:COP Prog Addr = %04X\n", activecpu_get_pc(), data));
+			COP_LOG(("%05X:COP Prog Addr = %04X\n", cpu_get_pc(machine->activecpu), data));
 			assert((data & ~0xff) == 0);
 			temp32 = (data & 0xff) / 8;
 			cop->func_value[temp32] = cop_ram_r(cop, 0x438);
@@ -1005,15 +1005,15 @@ WRITE16_HANDLER( raiden2_cop2_w )
 			break;
 
 		case 0x438/2:		/* COP program entry value (0,4,5,6,7,8,9,F) */
-			COP_LOG(("%05X:COP Prog Val  = %04X\n", activecpu_get_pc(), data));
+			COP_LOG(("%05X:COP Prog Val  = %04X\n", cpu_get_pc(machine->activecpu), data));
 			break;
 
 		case 0x43a/2:		/* COP program entry mask */
-			COP_LOG(("%05X:COP Prog Mask = %04X\n", activecpu_get_pc(), data));
+			COP_LOG(("%05X:COP Prog Mask = %04X\n", cpu_get_pc(machine->activecpu), data));
 			break;
 
 		case 0x43c/2:		/* COP program trigger value */
-			COP_LOG(("%05X:COP Prog Trig = %04X\n", activecpu_get_pc(), data));
+			COP_LOG(("%05X:COP Prog Trig = %04X\n", cpu_get_pc(machine->activecpu), data));
 			break;
 
 		/* ----- ???? ----- */
@@ -1023,13 +1023,13 @@ WRITE16_HANDLER( raiden2_cop2_w )
 			{
 				UINT32 addr = cop_ram_r(cop, 0x478) << 6;
 				int count = (cop_ram_r(cop, 0x47a) + 1) << 5;
-				COP_LOG(("%05X:COP RAM clear from %05X to %05X\n", activecpu_get_pc(), addr, addr + count));
+				COP_LOG(("%05X:COP RAM clear from %05X to %05X\n", cpu_get_pc(machine->activecpu), addr, addr + count));
 				while (count--)
 					program_write_byte(addr++, 0);
 			}
 			else
 			{
-				COP_LOG(("%05X:COP Unknown RAM clear(%04X) = %04X\n", activecpu_get_pc(), cop_ram_r(cop, 0x47e), data));
+				COP_LOG(("%05X:COP Unknown RAM clear(%04X) = %04X\n", cpu_get_pc(machine->activecpu), cop_ram_r(cop, 0x47e), data));
 			}
 			break;
 
@@ -1040,7 +1040,7 @@ WRITE16_HANDLER( raiden2_cop2_w )
 		case 0x4a4/2:		/* COP register high word */
 		case 0x4a6/2:		/* COP register high word */
 			regnum = (offset) % 4;
-			COP_LOG(("%05X:COP RegHi(%d) = %04X\n", activecpu_get_pc(), regnum, data));
+			COP_LOG(("%05X:COP RegHi(%d) = %04X\n", cpu_get_pc(machine->activecpu), regnum, data));
 			cop->reg[regnum] = (cop->reg[regnum] & 0x0000ffff) | (data << 16);
 			break;
 
@@ -1049,14 +1049,14 @@ WRITE16_HANDLER( raiden2_cop2_w )
 		case 0x4c4/2:		/* COP register low word */
 		case 0x4c6/2:		/* COP register low word */
 			regnum = (offset) % 4;
-			COP_LOG(("%05X:COP RegLo(%d) = %04X\n", activecpu_get_pc(), regnum, data));
+			COP_LOG(("%05X:COP RegLo(%d) = %04X\n", cpu_get_pc(machine->activecpu), regnum, data));
 			cop->reg[regnum] = (cop->reg[regnum] & 0xffff0000) | data;
 			break;
 
 		/* ----- program trigger register ----- */
 
 		case 0x500/2:		/* COP trigger */
-			COP_LOG(("%05X:COP Trigger = %04X\n", activecpu_get_pc(), data));
+			COP_LOG(("%05X:COP Trigger = %04X\n", cpu_get_pc(machine->activecpu), data));
 			for (func = 0; func < ARRAY_LENGTH(cop->func_trigger); func++)
 				if (cop->func_trigger[func] == data)
 				{
@@ -1084,13 +1084,13 @@ WRITE16_HANDLER( raiden2_cop2_w )
 					}
 					break;
 				}
-			logerror("%05X:COP Warning - can't find command - func != ARRAY_LENGTH(cop->func_trigger)\n",  activecpu_get_pc());
+			logerror("%05X:COP Warning - can't find command - func != ARRAY_LENGTH(cop->func_trigger)\n",  cpu_get_pc(machine->activecpu));
 			break;
 
 		/* ----- other stuff ----- */
 
 		default:		/* unknown */
-			COP_LOG(("%05X:COP Unknown(%04X) = %04X\n", activecpu_get_pc(), offset*2 + 0x400, data));
+			COP_LOG(("%05X:COP Unknown(%04X) = %04X\n", cpu_get_pc(machine->activecpu), offset*2 + 0x400, data));
 			break;
 	}
 }
@@ -1099,7 +1099,7 @@ WRITE16_HANDLER( raiden2_cop2_w )
 READ16_HANDLER( raiden2_cop2_r )
 {
 	cop_state *cop = &cop_data;
-	COP_LOG(("%05X:COP Read(%04X) = %04X\n", activecpu_get_pc(), offset*2 + 0x400, cop->ram[offset]));
+	COP_LOG(("%05X:COP Read(%04X) = %04X\n", cpu_get_pc(machine->activecpu), offset*2 + 0x400, cop->ram[offset]));
 	return cop->ram[offset];
 }
 #endif
@@ -1123,7 +1123,7 @@ static READ16_HANDLER( generic_cop_r )
 	switch (offset)
 	{
 		default:
-			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", activecpu_get_pc(), retvalue, offset*2);
+			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(machine->activecpu), retvalue, offset*2);
 			return retvalue;
 			break;
 
@@ -1145,7 +1145,7 @@ static WRITE16_HANDLER( generic_cop_w )
 	switch (offset)
 	{
 		default:
-			seibu_cop_log("%06x: COPX unhandled write data %04x at offset %04x\n", activecpu_get_pc(), data, offset*2);
+			seibu_cop_log("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(machine->activecpu), data, offset*2);
 			break;
 
 		/* BCD Protection */
@@ -1164,14 +1164,14 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x078/2): /* clear address */
 		{
 			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
-			seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(machine->activecpu), data, data<<6);
 			break;
 		}
 
 		case (0x07a/2): /* clear length */
 		{
 			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
-			seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<5);
+			seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(machine->activecpu), data, data<<5);
 
 			break;
 		}
@@ -1179,7 +1179,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x07c/2): /* clear value? */
 		{
 			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
-			seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", activecpu_get_pc(), data, data<<6);
+			seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(machine->activecpu), data, data<<6);
 			break;
 		}
 
@@ -1187,7 +1187,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x07e/2):
 		{
 			cop_clearfill_lasttrigger = data;
-			seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", activecpu_get_pc(), data);
+			seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", cpu_get_pc(machine->activecpu), data);
 			if (data>=0x1ff)
 			{
 				seibu_cop_log("invalid!, >0x1ff\n");
@@ -1219,7 +1219,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			int i;
 			int command;
 
-			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", activecpu_get_pc(), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
+			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", cpu_get_pc(machine->activecpu), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
 
 			command = -1;
 			/* search the uploaded 'trigger' table for a matching trigger*/
@@ -1258,7 +1258,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		/* hmm, this would be strange the 6xx range should be video regs?? */
 		case (0x2fc/2):
 		{
-			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", activecpu_get_pc(), data);
+			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(machine->activecpu), data);
 
 			// I think the value it writes here must match the other value for anything to happen.. maybe */
 			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
@@ -1370,7 +1370,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 					break;
 				}
 				default:
-					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],activecpu_get_previouspc());
+					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],cpu_get_previouspc(machine->activecpu));
 			}
 			break;
 		}
@@ -1775,7 +1775,7 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 					break;
 				}
 				default:
-					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],activecpu_get_previouspc());
+					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],cpu_get_previouspc(machine->activecpu));
 			}
 			break;
 		}

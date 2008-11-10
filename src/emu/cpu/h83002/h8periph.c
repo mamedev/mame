@@ -9,6 +9,7 @@
 ****************************************************************************/
 
 #include "debugger.h"
+#include "deprecat.h"
 #include "h83002.h"
 #include "h8priv.h"
 
@@ -515,7 +516,7 @@ UINT8 h8_3007_itu_read8(UINT8 reg)
 
 void h8_3007_itu_write8(UINT8 reg, UINT8 val)
 {
-	//logerror("%06x: h8/3007 reg %02x = %02x\n",activecpu_get_pc(),reg,val);
+	//logerror("%06x: h8/3007 reg %02x = %02x\n",cpu_get_pc(machine->activecpu),reg,val);
 	h8.per_regs[reg] = val;
 	switch(reg)
 	{
@@ -687,7 +688,7 @@ UINT8 h8_3007_register1_read8(UINT32 address)
 		case 0xfee018:	return h8.per_regs[0xF8];	// IPRA
 	}
 
-	logerror("cpu #%d (PC=%08X): unmapped I/O(1) byte read from %08X\n",cpu_getactivecpu(),activecpu_get_pc(),address);
+	logerror("cpu #%d (PC=%08X): unmapped I/O(1) byte read from %08X\n",cpunum_get_active(),cpu_get_pc(Machine->activecpu),address);
 	return 0;
 }
 
@@ -699,7 +700,7 @@ void h8_3007_register1_write8(UINT32 address, UINT8 val)
 		case 0xfee016:	h8_ISR_w(val);				return;	// ISR
 		case 0xfee018:	h8.per_regs[0xF8] = val;	return;	// IPRA
 	}
-	logerror("cpu #%d (PC=%08X): unmapped I/O(1) byte write to %08X = %02X\n",cpu_getactivecpu(),activecpu_get_pc(),address,val);
+	logerror("cpu #%d (PC=%08X): unmapped I/O(1) byte write to %08X = %02X\n",cpunum_get_active(),cpu_get_pc(Machine->activecpu),address,val);
 }
 
 void h8_3007_itu_init(void)
@@ -721,7 +722,7 @@ void h8_itu_init(void)
 
 	h8_itu_reset();
 
-	h8.cpu_number = cpu_getactivecpu();
+	h8.cpu_number = cpunum_get_active();
 }
 
 void h8_itu_reset(void)

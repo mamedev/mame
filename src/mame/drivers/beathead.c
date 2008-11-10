@@ -479,7 +479,7 @@ static UINT32 *speedup_data;
 static READ32_HANDLER( speedup_r )
 {
 	int result = *speedup_data;
-	if ((activecpu_get_previouspc() & 0xfffff) == 0x006f0 && result == activecpu_get_reg(ASAP_R3))
+	if ((cpu_get_previouspc(machine->activecpu) & 0xfffff) == 0x006f0 && result == cpu_get_reg(machine->activecpu, ASAP_R3))
 		cpu_spinuntil_int();
 	return result;
 }
@@ -489,11 +489,11 @@ static UINT32 *movie_speedup_data;
 static READ32_HANDLER( movie_speedup_r )
 {
 	int result = *movie_speedup_data;
-	if ((activecpu_get_previouspc() & 0xfffff) == 0x00a88 && (activecpu_get_reg(ASAP_R28) & 0xfffff) == 0x397c0 &&
-		movie_speedup_data[4] == activecpu_get_reg(ASAP_R1))
+	if ((cpu_get_previouspc(machine->activecpu) & 0xfffff) == 0x00a88 && (cpu_get_reg(machine->activecpu, ASAP_R28) & 0xfffff) == 0x397c0 &&
+		movie_speedup_data[4] == cpu_get_reg(machine->activecpu, ASAP_R1))
 	{
 		UINT32 temp = (INT16)result + movie_speedup_data[4] * 262;
-		if (temp - (UINT32)activecpu_get_reg(ASAP_R15) < (UINT32)activecpu_get_reg(ASAP_R23))
+		if (temp - (UINT32)cpu_get_reg(machine->activecpu, ASAP_R15) < (UINT32)cpu_get_reg(machine->activecpu, ASAP_R23))
 			cpu_spinuntil_int();
 	}
 	return result;

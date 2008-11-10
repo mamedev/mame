@@ -17,4 +17,4 @@ void cage_reset_w(int state);
 UINT16 main_from_cage_r(void);
 UINT16 cage_control_r(void);
 void main_to_cage_w(UINT16 data);
-void cage_control_w(UINT16 data);
+void cage_control_w(running_machine *machine, UINT16 data);

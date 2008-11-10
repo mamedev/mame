@@ -232,9 +232,9 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpu_getactivecpu() != -1 )
+		if( cpunum_get_active() != -1 )
 		{
-			logerror( "%08x: %s", activecpu_get_pc(), buf );
+			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}
 		else
 		{
@@ -635,7 +635,7 @@ static READ32_HANDLER( atapi_r )
 			break;
 		}
 
-//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, activecpu_get_pc());
+//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(machine->activecpu));
 
 		data <<= shift;
 	}
@@ -791,11 +791,11 @@ static WRITE32_HANDLER( atapi_w )
 		}
 
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, activecpu_get_pc());
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, activecpu_get_pc());
+//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(machine->activecpu));
 
 			switch (data)
 			{
@@ -1048,7 +1048,7 @@ static READ32_HANDLER( flash_r )
 
 	if( flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", activecpu_get_pc(), offset, mem_mask, control );
+		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(machine->activecpu), offset, mem_mask, control );
 		data = 0xffffffff;
 	}
 	else
@@ -1084,7 +1084,7 @@ static WRITE32_HANDLER( flash_w )
 
 	if( flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", activecpu_get_pc(), offset, mem_mask, data, control );
+		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(machine->activecpu), offset, mem_mask, data, control );
 	}
 	else
 	{
@@ -2142,7 +2142,7 @@ static READ32_HANDLER( gx894pwbba_r )
 	}
 
 	verboselog( 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", activecpu_get_pc(), offset, mem_mask, data );
+//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(machine->activecpu), offset, mem_mask, data );
 	return data;
 }
 

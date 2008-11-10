@@ -169,7 +169,7 @@ static WRITE32_HANDLER( control_w )
 
 	/* log any unknown bits */
 	if (data & 0x4f1fffff)
-		logerror("%08X: control_w = %08X & %08X\n", activecpu_get_previouspc(), data, mem_mask);
+		logerror("%08X: control_w = %08X & %08X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask);
 }
 
 
@@ -216,7 +216,7 @@ static WRITE32_HANDLER( speedup_w )
 	COMBINE_DATA(speedup_data);
 
 	/* see if the PC matches */
-	if ((activecpu_get_previouspc() & 0x1fffffff) == speedup_pc)
+	if ((cpu_get_previouspc(machine->activecpu) & 0x1fffffff) == speedup_pc)
 	{
 		UINT64 curr_cycles = activecpu_gettotalcycles();
 

@@ -36,7 +36,7 @@ static UINT32 *namcoc7x_hostram;
 
 static READ16_HANDLER( speedup_r )
 {
-	if ((activecpu_get_pc() == 0xc12d) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(machine->activecpu) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
 		cpu_spinuntil_int();
 	}

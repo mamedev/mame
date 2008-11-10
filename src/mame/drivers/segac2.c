@@ -529,7 +529,7 @@ static WRITE16_HANDLER( control_w )
 /* protection chip reads */
 static READ16_HANDLER( prot_r )
 {
-	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", activecpu_get_previouspc(), prot_func ? prot_read_buf : 0xff);
+	if (LOG_PROTECTION) logerror("%06X:protection r=%02X\n", cpu_get_previouspc(machine->activecpu), prot_func ? prot_read_buf : 0xff);
 	return prot_read_buf | 0xf0;
 }
 
@@ -554,7 +554,7 @@ static WRITE16_HANDLER( prot_w )
 	/* determine the value to return, should a read occur */
 	if (prot_func)
 		prot_read_buf = prot_func(table_index);
-	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", activecpu_get_previouspc(), data & 0x0f, prot_read_buf);
+	if (LOG_PROTECTION) logerror("%06X:protection w=%02X, new result=%02X\n", cpu_get_previouspc(machine->activecpu), data & 0x0f, prot_read_buf);
 
 	/* if the palette changed, force an update */
 	if (new_sp_palbase != sp_palbase || new_bg_palbase != bg_palbase)

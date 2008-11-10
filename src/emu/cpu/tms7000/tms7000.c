@@ -186,7 +186,7 @@ static CPU_SET_CONTEXT( tms7000 )
 
 static CPU_INIT( tms7000 )
 {
-	int cpu = cpu_getactivecpu();
+	int cpu = cpunum_get_active();
 
 	tms7000.irq_callback = irqcallback;
 	tms7000.device = device;
@@ -386,7 +386,7 @@ void tms7000_set_irq_line(int irqline, int state)
 	{	/* check for transition */
 		tms7000.irq_state[irqline] = state;
 
-		LOG(("tms7000: (cpu #%d) set_irq_line (INT%d, state %d)\n", cpu_getactivecpu(), irqline+1, state));
+		LOG(("tms7000: (cpu #%d) set_irq_line (INT%d, state %d)\n", cpunum_get_active(), irqline+1, state));
 
 		if (state == CLEAR_LINE)
 		{
@@ -562,7 +562,7 @@ static void tms7000_service_timer1( void )
         if( --tms7000.t1_decrementer < 0 ) /* Decrement timer1 register and check for underflow */
         {
             tms7000.t1_decrementer = tms7000.pf[2]; /* Reload decrementer (8 bit) */
-			cpunum_set_input_line(Machine, cpu_getactivecpu(), TMS7000_IRQ2_LINE, HOLD_LINE);
+			cpunum_set_input_line(Machine, cpunum_get_active(), TMS7000_IRQ2_LINE, HOLD_LINE);
             //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", activecpu_gettotalcycles(), activecpu_gettotalcycles() - tick, tms7000_cycles_per_INT2-(activecpu_gettotalcycles() - tick) );
 			//tick = activecpu_gettotalcycles() );
             /* Also, cascade out to timer 2 - timer 2 unimplemented */

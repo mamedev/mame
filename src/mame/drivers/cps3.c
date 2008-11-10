@@ -725,7 +725,7 @@ static DRIVER_INIT( cps3 )
 	int i;
 
 	// set strict verify
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY);
 
 	cps3_key1 = -1;
 	cps3_key2 = -1;
@@ -2604,7 +2604,7 @@ static UINT32 cps3_dma_callback(UINT32 src, UINT32 dst, UINT32 data, int size)
 	}
 	else
 	{
-		//printf("PC %08x :src %08x, dst %08x, returning %08x\n", activecpu_get_pc(), src, dst, data);
+		//printf("PC %08x :src %08x, dst %08x, returning %08x\n", cpu_get_pc(machine->activecpu), src, dst, data);
 	}
 
 	/* I doubt this is endian safe.. needs checking / fixing */

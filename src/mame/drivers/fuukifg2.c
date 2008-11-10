@@ -132,7 +132,7 @@ static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 	if (data <= 2)
 		memory_set_bankptr(1, memory_region(machine, "audio") + 0x8000 * data + 0x10000);
 	else
-	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",activecpu_get_pc(),data);
+	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static WRITE8_HANDLER( fuuki16_oki_banking_w )

@@ -141,6 +141,9 @@ struct _running_machine
 	/* configuration data */
 	const machine_config *	config;				/* points to the constructed machine_config */
 	const input_port_config *portconfig;		/* points to a list of input port configurations */
+
+	/* CPU information */
+	const device_config *	activecpu;			/* active CPU (or NULL) */
 	const device_config *	cpu[MAX_CPU];		/* array of CPU devices */
 
 	/* game-related information */

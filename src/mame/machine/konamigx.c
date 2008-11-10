@@ -1962,7 +1962,7 @@ WRITE16_HANDLER( K055550_word_w )
 			break;
 
 			default:
-//              logerror("%06x: unknown K055550 command %02x\n", activecpu_get_pc(), data);
+//              logerror("%06x: unknown K055550 command %02x\n", cpu_get_pc(machine->activecpu), data);
 			break;
 		}
 	}

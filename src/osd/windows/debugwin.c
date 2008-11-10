@@ -225,13 +225,13 @@ static void memory_update_menu(debugwin_info *info);
 static int memory_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lparam);
 static int memory_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam);
 
-static void disasm_create_window(void);
+static void disasm_create_window(running_machine *machine);
 static void disasm_recompute_children(debugwin_info *info);
 static void disasm_process_string(debugwin_info *info, const char *string);
 static void disasm_update_menu(debugwin_info *info);
 static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lparam);
 static int disasm_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam);
-static void disasm_update_caption(HWND wnd);
+static void disasm_update_caption(running_machine *machine, HWND wnd);
 
 static void console_create_window(running_machine *machine);
 static void console_recompute_children(debugwin_info *info);
@@ -261,7 +261,7 @@ void osd_wait_for_debugger(running_machine *machine, int firststop)
 
 	// update the views in the console to reflect the current CPU
 	if (main_console != NULL)
-		console_set_cpunum(machine, cpu_getactivecpu());
+		console_set_cpunum(machine, cpunum_get_active());
 
 	// when we are first stopped, adjust focus to us
 	if (firststop && main_console != NULL)
@@ -1780,7 +1780,7 @@ static void memory_determine_combo_items(running_machine *machine)
 					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
 
 					t_tag = tstring_from_utf8(machine->config->cpu[cpunum].tag);
-					t_name = tstring_from_utf8(cpunum_name(cpunum));
+					t_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
 					t_space = tstring_from_utf8(address_space_names[spacenum]);
 					_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU #%d \"%s\" (%s) %s memory"), cpunum, t_tag, t_name, t_space);
 					free(t_space),
@@ -1874,7 +1874,7 @@ static void memory_update_selection(debugwin_info *info, memorycombo_item *ci)
 
 static void memory_create_window(running_machine *machine)
 {
-	int curcpu = cpu_getactivecpu(), cursel = 0;
+	int curcpu = cpunum_get_active(), cursel = 0;
 	memorycombo_item *ci, *selci = NULL;
 	debugwin_info *info;
 	HMENU optionsmenu;
@@ -2204,9 +2204,9 @@ static int memory_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 //  disasm_create_window
 //============================================================
 
-static void disasm_create_window(void)
+static void disasm_create_window(running_machine *machine)
 {
-	int curcpu = cpu_getactivecpu(), cursel = 0;
+	int curcpu = cpunum_get_active(), cursel = 0;
 	debugwin_info *info;
 	HMENU optionsmenu;
 	UINT32 cpunum;
@@ -2265,7 +2265,7 @@ static void disasm_create_window(void)
 			{
 				TCHAR name[100];
 				int item;
-				t_cpunum_name = tstring_from_utf8(cpunum_name(cpunum));
+				t_cpunum_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
 				_sntprintf(name, ARRAY_LENGTH(name), TEXT("CPU #%d (%s)"), cpunum, t_cpunum_name);
 				free(t_cpunum_name);
 				t_cpunum_name = NULL;
@@ -2284,7 +2284,7 @@ static void disasm_create_window(void)
 	debug_view_set_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM, (curcpu == -1) ? 0 : curcpu);
 
 	// set the caption
-	disasm_update_caption(info->wnd);
+	disasm_update_caption(machine, info->wnd);
 
 	// recompute the children once to get the maxwidth
 	disasm_recompute_children(info);
@@ -2412,7 +2412,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 								debug_view_begin_update(info->view[0].view);
 								debug_view_set_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM, cpunum);
 								debug_view_end_update(info->view[0].view);
-								disasm_update_caption(info->wnd);
+								disasm_update_caption(Machine, info->wnd);
 							}
 				}
 
@@ -2558,7 +2558,7 @@ static int disasm_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 //  disasm_update_caption
 //============================================================
 
-static void disasm_update_caption(HWND wnd)
+static void disasm_update_caption(running_machine *machine, HWND wnd)
 {
 	debugwin_info *info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	char title[100];
@@ -2568,7 +2568,7 @@ static void disasm_update_caption(HWND wnd)
 	cpunum = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
 
 	// then update the caption
-	sprintf(title, "Disassembly: CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpunum_name(cpunum));
+	sprintf(title, "Disassembly: CPU #%d \"%s\" (%s)", cpunum, Machine->config->cpu[cpunum].tag, cpu_get_name(machine->cpu[cpunum]));
 	win_set_window_text_utf8(wnd, title);
 }
 
@@ -2791,7 +2791,7 @@ static void console_set_cpunum(running_machine *machine, int cpunum)
 		debug_view_set_property_UINT32(main_console->view[1].view, DVP_REGS_CPUNUM, cpunum);
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpu_getactivecpu(), Machine->config->cpu[cpu_getactivecpu()].tag, activecpu_name());
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU #%d \"%s\" (%s)", machine->gamedrv->name, cpunum_get_active(), Machine->config->cpu[cpunum_get_active()].tag, cpu_get_name(machine->activecpu));
 	win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
 	if (strcmp(title, curtitle))
 		win_set_window_text_utf8(main_console->wnd, title);
@@ -2857,7 +2857,7 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 				return 1;
 
 			case ID_NEW_DISASM_WND:
-				disasm_create_window();
+				disasm_create_window(Machine);
 				return 1;
 
 			case ID_NEW_LOG_WND:

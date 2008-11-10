@@ -515,7 +515,7 @@ static OPBASE_HANDLER( atarigen_slapstic_setopbase )
 	address &= ~atarigen_slapstic_mirror;
 	if (address >= atarigen_slapstic_base && address < atarigen_slapstic_base + 0x8000)
 	{
-		offs_t pc = activecpu_get_previouspc();
+		offs_t pc = cpu_get_previouspc(machine->activecpu);
 		if (pc != atarigen_slapstic_last_pc || address != atarigen_slapstic_last_address)
 		{
 			atarigen_slapstic_last_pc = pc;
@@ -588,7 +588,7 @@ void atarigen_slapstic_reset(void)
 
 WRITE16_HANDLER( atarigen_slapstic_w )
 {
-	update_bank(slapstic_tweak(offset));
+	update_bank(slapstic_tweak(machine, offset));
 }
 
 
@@ -603,7 +603,7 @@ READ16_HANDLER( atarigen_slapstic_r )
 	int result = atarigen_slapstic[offset & 0xfff];
 
 	/* then determine the new one */
-	update_bank(slapstic_tweak(offset));
+	update_bank(slapstic_tweak(machine, offset));
 	return result;
 }
 

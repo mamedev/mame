@@ -319,7 +319,7 @@ static READ32_HANDLER(PS7500_IO_r)
 
 		case IOLINES: //TODO: eeprom  24c01
 #if 0
-		mame_printf_debug("IOLINESR %i @%x\n", offset, activecpu_get_pc());
+		mame_printf_debug("IOLINESR %i @%x\n", offset, cpu_get_pc(machine->activecpu));
 #endif
 
 		if(flashType == 1)
@@ -351,7 +351,7 @@ static READ32_HANDLER(PS7500_IO_r)
 			return PS7500_IO[offset];
 
 		//default:
-			//mame_printf_debug("ior %i @%x\n",offset,activecpu_get_pc());
+			//mame_printf_debug("ior %i @%x\n",offset,cpu_get_pc(machine->activecpu));
 	}
 	return mame_rand(machine);//PS7500_IO[offset];
 }
@@ -369,13 +369,13 @@ static WRITE32_HANDLER(PS7500_IO_w)
 				if(data&0xc0)
 					adrLatch=0;
 
-			if(activecpu_get_pc() == 0xbac0 && flashType == 1)
+			if(cpu_get_pc(machine->activecpu) == 0xbac0 && flashType == 1)
 			{
 				flashN=data&1;
 			}
 
 #if 0
-				logerror("IOLINESW %i = %x  @%x\n",offset,data,activecpu_get_pc());
+				logerror("IOLINESW %i = %x  @%x\n",offset,data,cpu_get_pc(machine->activecpu));
 #endif
 			break;
 
@@ -453,7 +453,7 @@ static WRITE32_HANDLER(io_w)
 	COMBINE_DATA(&temp);
 
 #if 0
-	logerror("[io_w] = %x @%x [latch=%x]\n",data,activecpu_get_pc(),adrLatch);
+	logerror("[io_w] = %x @%x [latch=%x]\n",data,cpu_get_pc(machine->activecpu),adrLatch);
 #endif
 
 	if(adrLatch==1)

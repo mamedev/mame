@@ -76,8 +76,8 @@ static READ8_HANDLER( keyboard_r )
 {
 	static const char *const keynames[] = { "KEY0", "KEY1" };
 
-	logerror("%04x: keyboard_r\n",activecpu_get_pc());
-	switch(activecpu_get_pc())
+	logerror("%04x: keyboard_r\n",cpu_get_pc(machine->activecpu));
+	switch(cpu_get_pc(machine->activecpu))
 	{
 		/* read keyboard */
 		case 0x0aba:	// rmhaihai, rmhaisei
@@ -124,7 +124,7 @@ static READ8_HANDLER( keyboard_r )
 
 static WRITE8_HANDLER( keyboard_w )
 {
-logerror("%04x: keyboard_w %02x\n",activecpu_get_pc(),data);
+logerror("%04x: keyboard_w %02x\n",cpu_get_pc(machine->activecpu),data);
 	keyboard_cmd = data;
 }
 

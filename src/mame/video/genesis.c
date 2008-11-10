@@ -48,7 +48,7 @@ static const device_config *genesis_screen;
     Function Prototypes
 ******************************************************************************/
 
-static int  vdp_data_r(void);
+static int  vdp_data_r(running_machine *machine);
 static void vdp_data_w(running_machine *machine, int data);
 static int  vdp_control_r(running_machine *machine);
 static void vdp_control_w(running_machine *machine, int data);
@@ -335,7 +335,7 @@ READ16_HANDLER( genesis_vdp_r )
 	{
 		case 0x00:	/* Read Data */
 		case 0x01:
-			return vdp_data_r();
+			return vdp_data_r(machine);
 
 		case 0x02:	/* Status Register */
 		case 0x03:
@@ -418,7 +418,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 ******************************************************************************/
 
 /* Games needing Read to Work .. bloxeed (attract) .. puyo puyo .. probably more */
-static int vdp_data_r(void)
+static int vdp_data_r(running_machine *machine)
 {
 	int read = 0;
 
@@ -437,7 +437,7 @@ static int vdp_data_r(void)
 			break;
 
 		default:		/* Illegal read attempt */
-			logerror("%06x: VDP illegal read type %02x\n", activecpu_get_previouspc(), vdp_code);
+			logerror("%06x: VDP illegal read type %02x\n", cpu_get_previouspc(machine->activecpu), vdp_code);
 			read = 0x00;
 			break;
 	}
@@ -498,7 +498,7 @@ static void vdp_data_w(running_machine *machine, int data)
 			break;
 
 		default:		/* Illegal write attempt */
-			logerror("PC:%06x: VDP illegal write type %02x data %04x\n", activecpu_get_previouspc(), vdp_code, data);
+			logerror("PC:%06x: VDP illegal write type %02x data %04x\n", cpu_get_previouspc(machine->activecpu), vdp_code, data);
 			break;
 	}
 

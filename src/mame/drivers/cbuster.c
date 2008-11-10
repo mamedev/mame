@@ -83,7 +83,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 
 		break;
 	}
-	logerror("Warning %04x- %02x written to control %02x\n",activecpu_get_pc(),data,offset);
+	logerror("Warning %04x- %02x written to control %02x\n",cpu_get_pc(machine->activecpu),data,offset);
 }
 
 static READ16_HANDLER( twocrude_control_r )
@@ -97,7 +97,7 @@ static READ16_HANDLER( twocrude_control_r )
 			return input_port_read(machine, "DSW");
 
 		case 4: /* Protection */
-			logerror("%04x : protection control read at 30c000 %d\n",activecpu_get_pc(),offset);
+			logerror("%04x : protection control read at 30c000 %d\n",cpu_get_pc(machine->activecpu),offset);
 			return prot;
 
 		case 6: /* Credits, VBL in byte 7 */

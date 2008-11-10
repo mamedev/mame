@@ -32,8 +32,8 @@ WRITE32_HANDLER( dc_arm_aica_w );
 MACHINE_START( dc );
 MACHINE_RESET( dc );
 
-int compute_interrupt_level(void);
-void update_interrupt_status(void);
+int dc_compute_interrupt_level(running_machine *machine);
+void dc_update_interrupt_status(running_machine *machine);
 INPUT_CHANGED( dc_coin_slots_callback );
 
 extern UINT32 dc_sysctrl_regs[0x200/4];

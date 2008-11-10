@@ -425,7 +425,7 @@ READ32_HANDLER( zeus2_r )
 #endif
 
 	if (logit)
-		logerror("%06X:zeus2_r(%02X)\n", activecpu_get_pc(), offset);
+		logerror("%06X:zeus2_r(%02X)\n", cpu_get_pc(machine->activecpu), offset);
 
 	switch (offset)
 	{
@@ -471,7 +471,7 @@ WRITE32_HANDLER( zeus2_w )
 				 offset != 0x40 && offset != 0x41 && offset != 0x48 && offset != 0x49 && offset != 0x4e &&
 				 offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e);
 	if (logit)
-		logerror("%06X:zeus2_w", activecpu_get_pc());
+		logerror("%06X:zeus2_w", cpu_get_pc(machine->activecpu));
 	zeus_register32_w(machine, offset, data, logit);
 }
 

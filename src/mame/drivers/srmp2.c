@@ -472,7 +472,7 @@ static WRITE8_HANDLER( srmp3_input_1_w )
     ---- -x-- : Player 2 side flag ?
 */
 
-	logerror("PC:%04X DATA:%02X  srmp3_input_1_w\n", activecpu_get_pc(), data);
+	logerror("PC:%04X DATA:%02X  srmp3_input_1_w\n", cpu_get_pc(machine->activecpu), data);
 
 	srmp2_port_select = 0;
 
@@ -496,7 +496,7 @@ static WRITE8_HANDLER( srmp3_input_2_w )
 
 	/* Key matrix reading related ? */
 
-	logerror("PC:%04X DATA:%02X  srmp3_input_2_w\n", activecpu_get_pc(), data);
+	logerror("PC:%04X DATA:%02X  srmp3_input_2_w\n", cpu_get_pc(machine->activecpu), data);
 
 	srmp2_port_select = 1;
 
@@ -514,12 +514,12 @@ static READ8_HANDLER( srmp3_input_r )
 	int keydata = 0xff;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
-	logerror("PC:%04X          srmp3_input_r\n", activecpu_get_pc());
+	logerror("PC:%04X          srmp3_input_r\n", cpu_get_pc(machine->activecpu));
 
 	// PC:0x8903    ROM:0xC903
 	// PC:0x7805    ROM:0x7805
 
-	if ((activecpu_get_pc() == 0x8903) || (activecpu_get_pc() == 0x7805))	/* Panel keys */
+	if ((cpu_get_pc(machine->activecpu) == 0x8903) || (cpu_get_pc(machine->activecpu) == 0x7805))	/* Panel keys */
 	{
 		int i, j, t;
 
@@ -540,7 +540,7 @@ static READ8_HANDLER( srmp3_input_r )
 	// PC:0x8926    ROM:0xC926
 	// PC:0x7822    ROM:0x7822
 
-	if ((activecpu_get_pc() == 0x8926) || (activecpu_get_pc() == 0x7822))	/* Analizer and memory reset keys */
+	if ((cpu_get_pc(machine->activecpu) == 0x8926) || (cpu_get_pc(machine->activecpu) == 0x7822))	/* Analizer and memory reset keys */
 	{
 		keydata = input_port_read(machine, "SERVICE");
 	}

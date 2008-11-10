@@ -510,9 +510,9 @@ static MACHINE_RESET( missile )
  *
  *************************************/
 
-INLINE int get_madsel(void)
+INLINE int get_madsel(running_machine *machine)
 {
-	UINT16 pc = activecpu_get_previouspc();
+	UINT16 pc = cpu_get_previouspc(machine->activecpu);
 
 	/* if we're at a different instruction than last time, reset our delay counter */
 	if (pc != madsel_lastpc)
@@ -663,7 +663,7 @@ static VIDEO_UPDATE( missile )
 static WRITE8_HANDLER( missile_w )
 {
 	/* if we're in MADSEL mode, write to video RAM */
-	if (get_madsel())
+	if (get_madsel(machine))
 	{
 		write_vram(offset, data);
 		return;
@@ -712,7 +712,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown write to %04X = %02X\n", activecpu_get_pc(), offset, data);
+		logerror("%04X:Unknown write to %04X = %02X\n", cpu_get_pc(machine->activecpu), offset, data);
 }
 
 
@@ -721,7 +721,7 @@ static READ8_HANDLER( missile_r )
 	UINT8 result = 0xff;
 
 	/* if we're in MADSEL mode, read from video RAM */
-	if (get_madsel())
+	if (get_madsel(machine))
 		return read_vram(offset);
 
 	/* otherwise, strip A15 and handle manually */
@@ -763,7 +763,7 @@ static READ8_HANDLER( missile_r )
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown read from %04X\n", activecpu_get_pc(), offset);
+		logerror("%04X:Unknown read from %04X\n", cpu_get_pc(machine->activecpu), offset);
 	return result;
 }
 

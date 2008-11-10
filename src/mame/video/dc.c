@@ -107,7 +107,7 @@ READ64_HANDLER( pvr_ctrl_r )
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, activecpu_get_pc());
+	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(machine->activecpu));
 	#endif
 
 	return (UINT64)pvrctrl_regs[reg] << shift;
@@ -154,7 +154,7 @@ READ64_HANDLER( pvr_ta_r )
 
 	#if DEBUG_PVRTA_REGS
 	if (reg != 0x43)
-		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, activecpu_get_pc());
+		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, cpu_get_pc(machine->activecpu));
 	#endif
 	return (UINT64)pvrta_regs[reg] << shift;
 }
@@ -448,7 +448,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 				break;
 			}
 			dc_sysctrl_regs[SB_ISTNRM] |= a;
-			update_interrupt_status();
+			dc_update_interrupt_status(machine);
 			state_ta.tafifo_listtype= -1; // no list being received
 			state_ta.listtype_used |= (2+8);
 		}
@@ -1025,7 +1025,7 @@ UINT32 a;
 
 	a=dc_sysctrl_regs[SB_ISTNRM] | IST_VBL_OUT;
 	dc_sysctrl_regs[SB_ISTNRM] = a; // V Blank-out interrupt
-	update_interrupt_status();
+	dc_update_interrupt_status(machine);
 
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 }
@@ -1078,7 +1078,7 @@ static int useframebuffer=1;
 		state_ta.start_render_received=0;
 		state_ta.renderselect= -1;
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render
-		update_interrupt_status();
+		dc_update_interrupt_status(screen->machine);
 		return 0;
 	}
 	else
@@ -1088,7 +1088,7 @@ static int useframebuffer=1;
 void dc_vblank(running_machine *machine)
 {
 	dc_sysctrl_regs[SB_ISTNRM] |= IST_VBL_IN; // V Blank-in interrupt
-	update_interrupt_status();
+	dc_update_interrupt_status(machine);
 
 	timer_adjust_oneshot(vbout_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }

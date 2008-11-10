@@ -628,7 +628,7 @@ static void adjust_timer_interrupt(void)
 	UINT64 cycles_since_base = activecpu_gettotalcycles() - hyperstone.tr_base_cycles;
 	UINT64 clocks_since_base = cycles_since_base >> hyperstone.clock_scale;
 	UINT64 cycles_until_next_clock = cycles_since_base - (clocks_since_base << hyperstone.clock_scale);
-	int cpunum = cpu_getactivecpu();
+	int cpunum = cpunum_get_active();
 
 	if (cycles_until_next_clock == 0)
 		cycles_until_next_clock = (UINT64)(1 << hyperstone.clock_scale);
@@ -669,7 +669,7 @@ static TIMER_CALLBACK( e132xs_timer_callback )
 	int update = param & 1;
 	int cpunum = param >> 1;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 
 	/* update the values if necessary */
 	if (update)
@@ -683,7 +683,7 @@ static TIMER_CALLBACK( e132xs_timer_callback )
 	else
 		adjust_timer_interrupt();
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 

@@ -102,7 +102,7 @@ static READ32_HANDLER( eolith_custom_r )
         bit 8 = ???
         bit 9 = ???
     */
-	eolith_speedup_read();
+	eolith_speedup_read(machine);
 
 	return (input_port_read(machine, "IN0") & ~0x300) | (mame_rand(machine) & 0x300);
 }

@@ -34,17 +34,17 @@ static WRITE8_HANDLER( solomon_sh_command_w )
 
 static READ8_HANDLER( solomon_0xe603_r )
 {
-	if (activecpu_get_pc()==0x161) // all the time .. return 0 to act as before  for coin / startup etc.
+	if (cpu_get_pc(machine->activecpu)==0x161) // all the time .. return 0 to act as before  for coin / startup etc.
 	{
 		return 0;
 	}
-	else if (activecpu_get_pc()==0x4cf0) // stop it clearing the screen at certain scores
+	else if (cpu_get_pc(machine->activecpu)==0x4cf0) // stop it clearing the screen at certain scores
 	{
-		return (activecpu_get_reg(Z80_BC) & 0x08);
+		return (cpu_get_reg(machine->activecpu, Z80_BC) & 0x08);
 	}
 	else
 	{
-		mame_printf_debug("unhandled solomon_0xe603_r %04x\n",activecpu_get_pc());
+		mame_printf_debug("unhandled solomon_0xe603_r %04x\n",cpu_get_pc(machine->activecpu));
 		return 0;
 	}
 }

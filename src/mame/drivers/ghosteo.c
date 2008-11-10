@@ -77,7 +77,7 @@ static struct lcd_config
 
 static READ32_HANDLER( r1 )
 {
-//  int pc = activecpu_get_pc();
+//  int pc = cpu_get_pc(machine->activecpu);
 //  if(pc != 0x9a0 && pc != 0x7b4) printf("r1 @ %X\n",pc);
 
 	return 1;
@@ -85,7 +85,7 @@ static READ32_HANDLER( r1 )
 
 static READ32_HANDLER( r2 )
 {
-//  int pc = activecpu_get_pc();
+//  int pc = cpu_get_pc(machine->activecpu);
 //  if(pc != 0xd64 && pc != 0xd3c )printf("r2 @ %X\n",pc);
 
 	return 2;

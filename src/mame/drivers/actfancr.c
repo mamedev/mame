@@ -546,7 +546,7 @@ ROM_END
 
 static READ8_HANDLER( cycle_r )
 {
-	int pc=activecpu_get_pc();
+	int pc=cpu_get_pc(machine->activecpu);
 	int ret=actfancr_ram[0x26];
 
 	if (offset==1) return actfancr_ram[0x27];
@@ -561,7 +561,7 @@ static READ8_HANDLER( cycle_r )
 
 static READ8_HANDLER( cyclej_r )
 {
-	int pc=activecpu_get_pc();
+	int pc=cpu_get_pc(machine->activecpu);
 	int ret=actfancr_ram[0x26];
 
 	if (offset==1) return actfancr_ram[0x27];

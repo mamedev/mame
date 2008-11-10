@@ -406,7 +406,7 @@ static void meritm_switch_banks( void )
 static WRITE8_HANDLER(meritm_psd_a15_w)
 {
 	meritm_psd_a15 = data;
-	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, activecpu_get_pc() );
+	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(machine->activecpu) );
 	meritm_switch_banks();
 };
 

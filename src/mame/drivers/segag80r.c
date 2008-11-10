@@ -183,16 +183,16 @@ static MACHINE_RESET( pignewt )
  *
  *************************************/
 
-static offs_t decrypt_offset(offs_t offset)
+static offs_t decrypt_offset(running_machine *machine, offs_t offset)
 {
 	offs_t pc;
 
 	/* if no active CPU, don't do anything */
-	if (cpu_getactivecpu() == -1)
+	if (cpunum_get_active() == -1)
 		return offset;
 
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	pc = activecpu_get_previouspc();
+	pc = cpu_get_previouspc(machine->activecpu);
 	if ((UINT16)pc == 0xffff || program_read_byte(pc) != 0x32)
 		return offset;
 
@@ -200,12 +200,12 @@ static offs_t decrypt_offset(offs_t offset)
 	return (offset & 0xff00) | (*sega_decrypt)(pc, program_read_byte(pc + 1));
 }
 
-static WRITE8_HANDLER( mainram_w )         { mainram[decrypt_offset(offset)] = data; }
-static WRITE8_HANDLER( vidram_w )          { segag80r_videoram_w(machine, decrypt_offset(offset), data); }
-static WRITE8_HANDLER( monsterb_vidram_w ) { monsterb_videoram_w(machine, decrypt_offset(offset), data); }
-static WRITE8_HANDLER( pignewt_vidram_w )  { pignewt_videoram_w(machine, decrypt_offset(offset), data); }
-static WRITE8_HANDLER( sindbadm_vidram_w ) { sindbadm_videoram_w(machine, decrypt_offset(offset), data); }
-static WRITE8_HANDLER( usb_ram_w )         { sega_usb_ram_w(machine, decrypt_offset(offset), data); }
+static WRITE8_HANDLER( mainram_w )         { mainram[decrypt_offset(machine, offset)] = data; }
+static WRITE8_HANDLER( vidram_w )          { segag80r_videoram_w(machine, decrypt_offset(machine, offset), data); }
+static WRITE8_HANDLER( monsterb_vidram_w ) { monsterb_videoram_w(machine, decrypt_offset(machine, offset), data); }
+static WRITE8_HANDLER( pignewt_vidram_w )  { pignewt_videoram_w(machine, decrypt_offset(machine, offset), data); }
+static WRITE8_HANDLER( sindbadm_vidram_w ) { sindbadm_videoram_w(machine, decrypt_offset(machine, offset), data); }
+static WRITE8_HANDLER( usb_ram_w )         { sega_usb_ram_w(machine, decrypt_offset(machine, offset), data); }
 
 
 

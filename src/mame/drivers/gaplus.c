@@ -287,7 +287,7 @@ static WRITE8_HANDLER( gaplus_sreset_w )
 static WRITE8_HANDLER( gaplus_freset_w )
 {
 	int bit = !BIT(offset,11);
-logerror("%04x: freset %d\n",activecpu_get_pc(),bit);
+logerror("%04x: freset %d\n",cpu_get_pc(machine->activecpu),bit);
 	namcoio_set_reset_line(0, bit ? CLEAR_LINE : ASSERT_LINE);
 	namcoio_set_reset_line(1, bit ? CLEAR_LINE : ASSERT_LINE);
 }

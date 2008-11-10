@@ -411,8 +411,8 @@ static int last;
 static WRITE8_HANDLER( out_0_w ) { mame_printf_debug("out0 = %02X\n", data); }
 static WRITE8_HANDLER( out_2_w ) { mame_printf_debug("out2 = %02X\n", data); }
 
-static READ8_HANDLER( adc_r )  { mame_printf_debug("%04X:ADC read\n", activecpu_get_pc()); return 0xff; }
-static WRITE8_HANDLER( adc_w ) { mame_printf_debug("%04X:ADC write = %02X\n", activecpu_get_pc(), data); }
+static READ8_HANDLER( adc_r )  { mame_printf_debug("%04X:ADC read\n", cpu_get_pc(machine->activecpu)); return 0xff; }
+static WRITE8_HANDLER( adc_w ) { mame_printf_debug("%04X:ADC write = %02X\n", cpu_get_pc(machine->activecpu), data); }
 
 static WRITE8_HANDLER( plr2_w )
 {

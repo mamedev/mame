@@ -97,7 +97,7 @@ WRITE8_HANDLER( hexion_gfxrom_select_w );
 
 static WRITE8_HANDLER( coincntr_w )
 {
-//logerror("%04x: coincntr_w %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: coincntr_w %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	/* bits 0/1 = coin counters */
 	coin_counter_w(0,data & 0x01);

@@ -145,7 +145,7 @@ static READ16_HANDLER( esd_eeprom_r )
 		return ((eeprom_read_bit() & 0x01) << 15);
 	}
 
-//  logerror("(0x%06x) unk EEPROM read: %04x\n", activecpu_get_pc(), mem_mask);
+//  logerror("(0x%06x) unk EEPROM read: %04x\n", cpu_get_pc(machine->activecpu), mem_mask);
 	return 0;
 }
 
@@ -163,7 +163,7 @@ static WRITE16_HANDLER( esd_eeprom_w )
 		eeprom_set_cs_line((data & 0x0100) ? CLEAR_LINE : ASSERT_LINE );
 	}
 
-//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", activecpu_get_pc(), data, mem_mask);
+//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(machine->activecpu), data, mem_mask);
 }
 
 static ADDRESS_MAP_START( hedpanic_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -278,7 +278,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( esd16_sound_rombank_w )
 {
 	int bank = data & 0xf;
-	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",activecpu_get_pc(),data);
+	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(machine->activecpu),data);
 	if (bank >= 3)	bank += 1;
 	memory_set_bankptr(1, memory_region(machine, "audio") + 0x4000 * bank);
 }

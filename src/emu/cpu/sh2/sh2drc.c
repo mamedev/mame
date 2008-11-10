@@ -725,7 +725,7 @@ static CPU_INIT( sh2 )
 	/* initialize the front-end helper */
 	if (SINGLE_INSTRUCTION_MODE)
 		feconfig.max_sequence = 1;
-	sh2->drcfe = drcfe_init(&feconfig, sh2);
+	sh2->drcfe = drcfe_init(device, &feconfig, sh2);
 
 	/* compute the register parameters */
 	for (regnum = 0; regnum < 16; regnum++)
@@ -968,7 +968,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, seqhead->physpc) != NULL)
+		if (memory_get_write_ptr(cpunum_get_active(), ADDRESS_SPACE_PROGRAM, seqhead->physpc) != NULL)
 			generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 		/* label this instruction, if it may be jumped to locally */
@@ -3395,7 +3395,7 @@ static CPU_SET_INFO( sh2 )
 		case CPUINFO_INT_REGISTER + SH2_R15:			sh2->r[15] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH2_EA:				sh2->ea = info->i;						break;
 
-		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(cpu_getactivecpu(), info->i); break;
+		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(cpunum_get_active(), info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK:		sh2->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;

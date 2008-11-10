@@ -46,7 +46,7 @@ static READ8_HANDLER( pettanp_protection_r )
 {
 	int res;
 
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 		case 0x6066:	res = 0xa5;	break;
 		case 0x60dc:	res = 0x20;	break;	/* bits 0-3 unknown */
@@ -57,7 +57,7 @@ static READ8_HANDLER( pettanp_protection_r )
 		default:		res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",activecpu_get_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(machine->activecpu),res);
 	return res;
 }
 
@@ -65,7 +65,7 @@ static READ8_HANDLER( banbam_protection_r )
 {
 	int res;
 
-	switch (activecpu_get_pc())
+	switch (cpu_get_pc(machine->activecpu))
 	{
 		case 0x6094:	res = 0xa5;	break;
 		case 0x6118:	res = 0x20;	break;	/* bits 0-3 unknown */
@@ -76,13 +76,13 @@ static READ8_HANDLER( banbam_protection_r )
 		default:		res = 0xff; break;
 	}
 
-	logerror("%04x: protection_r -> %02x\n",activecpu_get_pc(),res);
+	logerror("%04x: protection_r -> %02x\n",cpu_get_pc(machine->activecpu),res);
 	return res;
 }
 
 static WRITE8_HANDLER( protection_w )
 {
-	logerror("%04x: protection_w %02x\n",activecpu_get_pc(),data);
+	logerror("%04x: protection_w %02x\n",cpu_get_pc(machine->activecpu),data);
 }
 
 /****************************************************************************/

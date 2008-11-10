@@ -61,7 +61,7 @@ static WRITE8_HANDLER( bankedram_w )
 
 static WRITE8_HANDLER( surpratk_videobank_w )
 {
-logerror("%04x: videobank = %02x\n",activecpu_get_pc(),data);
+logerror("%04x: videobank = %02x\n",cpu_get_pc(machine->activecpu),data);
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
 	/* bit 2 = select palette bank 0 or 1 */
@@ -70,7 +70,7 @@ logerror("%04x: videobank = %02x\n",activecpu_get_pc(),data);
 
 static WRITE8_HANDLER( surpratk_5fc0_w )
 {
-	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",activecpu_get_pc(),data);
+	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(machine->activecpu),data);
 
 	/* bit 0/1 = coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -330,7 +330,7 @@ static void surpratk_banking(int lines)
 	UINT8 *RAM = memory_region(Machine, "main");
 	int offs = 0;
 
-logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);
+logerror("%04x: setlines %02x\n",cpu_get_pc(Machine->activecpu),lines);
 
 	offs = 0x10000 + ((lines & 0x1f) * 0x2000);
 	if (offs >= 0x48000) offs -= 0x40000;
@@ -339,7 +339,7 @@ logerror("%04x: setlines %02x\n",activecpu_get_pc(),lines);
 
 static MACHINE_RESET( surpratk )
 {
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)surpratk_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)surpratk_banking);
 
 	paletteram = &memory_region(machine, "main")[0x48000];
 }

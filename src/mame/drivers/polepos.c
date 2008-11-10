@@ -249,7 +249,7 @@ static READ16_HANDLER( polepos2_ic25_r )
 		last_result = (INT8)last_signed * (UINT8)last_unsigned;
 	}
 
-//  logerror("%04X: read IC25 @ %04X = %02X\n", activecpu_get_pc(), offset, result);
+//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(machine->activecpu), offset, result);
 
 	return result | (result << 8);
 }
@@ -328,7 +328,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 
 static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 {
-	int which = cpu_getactivecpu();
+	int which = cpunum_get_active();
 
 	data &= 1;
 

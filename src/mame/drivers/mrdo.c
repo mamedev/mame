@@ -34,7 +34,7 @@ VIDEO_UPDATE( mrdo );
 static READ8_HANDLER( mrdo_SECRE_r )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	return RAM[ activecpu_get_reg(Z80_HL) ];
+	return RAM[ cpu_get_reg(machine->activecpu, Z80_HL) ];
 }
 
 

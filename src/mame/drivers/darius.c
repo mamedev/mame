@@ -167,7 +167,7 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 	parse_control(machine);
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",activecpu_get_pc(),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(machine->activecpu),data);
 }
 
 static WRITE16_HANDLER( darius_watchdog_w )
@@ -203,7 +203,7 @@ static READ16_HANDLER( darius_ioc_r )
 			return input_port_read(machine, "DSW");
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",activecpu_get_pc(),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped ioc offset %06x\n",cpu_get_pc(machine->activecpu),offset);
 
 	return 0xff;
 }
@@ -238,7 +238,7 @@ static WRITE16_HANDLER( darius_ioc_w )
 			return;
 	}
 
-logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",activecpu_get_pc(),offset,data);
+logerror("CPU #0 PC %06x: warning - write unmapped ioc offset %06x with %04x\n",cpu_get_pc(machine->activecpu),offset,data);
 }
 
 
@@ -528,7 +528,7 @@ static const msm5205_interface msm5205_config =
 
 static READ8_HANDLER( adpcm_command_read )
 {
-	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, activecpu_get_pc() ); */
+	/* logerror("read port 0: %02x  PC=%4x\n",adpcm_command, cpu_get_pc(machine->activecpu) ); */
 	return adpcm_command;
 }
 
@@ -545,13 +545,13 @@ static READ8_HANDLER( readport3 )
 static WRITE8_HANDLER ( adpcm_nmi_disable )
 {
 	nmi_enable = 0;
-	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, activecpu_get_pc() ); */
+	/* logerror("write port 0: NMI DISABLE  PC=%4x\n", data, cpu_get_pc(machine->activecpu) ); */
 }
 
 static WRITE8_HANDLER ( adpcm_nmi_enable )
 {
 	nmi_enable = 1;
-	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", activecpu_get_pc() ); */
+	/* logerror("write port 1: NMI ENABLE   PC=%4x\n", cpu_get_pc(machine->activecpu) ); */
 }
 
 static WRITE8_HANDLER( adpcm_data_w )

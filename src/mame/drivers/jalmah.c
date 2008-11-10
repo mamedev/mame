@@ -874,7 +874,7 @@ static WRITE16_HANDLER( jalmah_okirom_w )
 		oki_za = (data & 2) ? 1 : 0;
 		memcpy(&oki[0x20000], &oki[(oki_rom * 0x80000) + ((oki_bank+oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
-	//popmessage("PC=%06x %02x %02x %02x",activecpu_get_pc(),oki_rom,oki_za,oki_bank);
+	//popmessage("PC=%06x %02x %02x %02x",cpu_get_pc(machine->activecpu),oki_rom,oki_za,oki_bank);
 }
 
 static WRITE16_HANDLER( jalmah_okibank_w )
@@ -885,7 +885,7 @@ static WRITE16_HANDLER( jalmah_okibank_w )
 		oki_bank = data & 3;
 		memcpy(&oki[0x20000], &oki[(oki_rom * 0x80000) + ((oki_bank+oki_za) * 0x20000) + 0x40000], 0x20000);
 	}
-	//popmessage("PC=%06x %02x %02x %02x",activecpu_get_pc(),oki_rom,oki_za,oki_bank);
+	//popmessage("PC=%06x %02x %02x %02x",cpu_get_pc(machine->activecpu),oki_rom,oki_za,oki_bank);
 }
 
 static WRITE16_HANDLER( jalmah_flip_screen_w )
@@ -1575,7 +1575,7 @@ static READ16_HANDLER( urashima_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
+//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(machine->activecpu),res);
 
 	return res;
 }
@@ -1791,7 +1791,7 @@ static READ16_HANDLER( daireika_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
+//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(machine->activecpu),res);
 
 	return res;
 }
@@ -2067,7 +2067,7 @@ static READ16_HANDLER( mjzoomin_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  logerror("%04x: mcu_r %02x\n",activecpu_get_pc(),res);
+//  logerror("%04x: mcu_r %02x\n",cpu_get_pc(machine->activecpu),res);
 
 	return res;
 }
@@ -2202,7 +2202,7 @@ static READ16_HANDLER( kakumei_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  popmessage("%04x: mcu_r %02x",activecpu_get_pc(),res);
+//  popmessage("%04x: mcu_r %02x",cpu_get_pc(machine->activecpu),res);
 
 	return res;
 }
@@ -2223,7 +2223,7 @@ static READ16_HANDLER( suchipi_mcu_r )
 	res = resp[respcount++];
 	if (respcount >= sizeof(resp)/sizeof(resp[0])) respcount = 0;
 
-//  popmessage("%04x: mcu_r %02x",activecpu_get_pc(),res);
+//  popmessage("%04x: mcu_r %02x",cpu_get_pc(machine->activecpu),res);
 
 	return res;
 }

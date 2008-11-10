@@ -1706,7 +1706,7 @@ static void null_iot(int op2, int nac, int mb, int *io, int ac)
 	if (LOG_IOT_EXTRA)
 	{
 		if (op2 == 000)
-			logerror("IOT sync instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpunum_get_reg(0, PDP1_PC));
+			logerror("IOT sync instruction: mb=0%06o, pc=0%06o\n", (unsigned) mb, (unsigned) cpu_get_reg(Machine->cpu[0], PDP1_PC));
 	}
 	if (LOG)
 	{

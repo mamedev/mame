@@ -591,11 +591,11 @@ static void blit_vert_line(void)
 
 
 
-INLINE void log_blit(int data)
+INLINE void log_blit(running_machine *machine, int data)
 {
 #if 1
 	logerror("%06x: blit src %06x x %03x y %03x flags %02x layer %02x pen %02x penmode %02x w %03x h %03x linelen %03x clip: ctrl %x xy %03x %03x wh %03x %03x\n",
-			activecpu_get_pc(),
+			cpu_get_pc(machine->activecpu),
 			ddenlovr_blit_address,ddenlovr_blit_x,ddenlovr_blit_y,data,
 			ddenlovr_dest_layer,ddenlovr_blit_pen,ddenlovr_blit_pen_mode,ddenlovr_rect_width,ddenlovr_rect_height,ddenlovr_line_length,
 			ddenlovr_clip_ctrl,ddenlovr_clip_x,ddenlovr_clip_y, ddenlovr_clip_width,ddenlovr_clip_height	);
@@ -703,7 +703,7 @@ profiler_mark(PROFILER_VIDEO);
 
 		case 0x24:
 
-			log_blit(data);
+			log_blit(machine, data);
 
 			switch (data)
 			{
@@ -734,7 +734,7 @@ profiler_mark(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x",data);
-					logerror("%06x: unknown blitter command %02x\n", activecpu_get_pc(), data);
+					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(machine->activecpu), data);
 				#endif
 			}
 
@@ -753,7 +753,7 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", activecpu_get_pc(), blitter, ddenlovr_blit_reg[blitter], data);
+			logerror("%06x: Blitter %d reg %02x = %02x\n", cpu_get_pc(machine->activecpu), blitter, ddenlovr_blit_reg[blitter], data);
 			break;
 		}
 	}
@@ -866,7 +866,7 @@ profiler_mark(PROFILER_VIDEO);
 
 		case 0x24:
 
-			log_blit(data);
+			log_blit(machine, data);
 
 			switch (data)
 			{
@@ -903,7 +903,7 @@ profiler_mark(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x",data);
-					logerror("%06x: unknown blitter command %02x\n", activecpu_get_pc(), data);
+					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(machine->activecpu), data);
 				#endif
 			}
 
@@ -911,7 +911,7 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", activecpu_get_pc(), blitter, ddenlovr_blit_reg[blitter], data);
+			logerror("%06x: Blitter %d reg %02x = %02x\n", cpu_get_pc(machine->activecpu), blitter, ddenlovr_blit_reg[blitter], data);
 			break;
 		}
 	}
@@ -1070,7 +1070,7 @@ profiler_mark(PROFILER_VIDEO);
 
 		case 0x90:
 
-			log_blit(data);
+			log_blit(machine, data);
 
 			switch (data)
 			{
@@ -1101,7 +1101,7 @@ profiler_mark(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x",data);
-					logerror("%06x: unknown blitter command %02x\n", activecpu_get_pc(), data);
+					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(machine->activecpu), data);
 				#endif
 			}
 
@@ -1110,7 +1110,7 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter 0 reg %02x = %02x\n", activecpu_get_pc(), ddenlovr_blit_reg, data);
+			logerror("%06x: Blitter 0 reg %02x = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_blit_reg, data);
 			break;
 	}
 
@@ -1155,7 +1155,7 @@ static READ8_HANDLER( rongrong_gfxrom_r )
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", activecpu_get_pc(), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(machine->activecpu), address);
 		address %= size;
 	}
 
@@ -1486,7 +1486,7 @@ static WRITE16_HANDLER( ddenlovr_select2_16_w )
 
 static READ8_HANDLER( rongrong_input2_r )
 {
-//  logerror("%04x: input2_r offset %d select %x\n",activecpu_get_pc(),offset,ddenlovr_select2 );
+//  logerror("%04x: input2_r offset %d select %x\n",cpu_get_pc(machine->activecpu),offset,ddenlovr_select2 );
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch( ddenlovr_select2 )
 	{
@@ -1510,7 +1510,7 @@ static READ8_HANDLER( quiz365_input_r )
 
 static READ16_HANDLER( quiz365_input2_r )
 {
-//  logerror("%04x: input2_r offset %d select %x\n",activecpu_get_pc(),offset,ddenlovr_select2 );
+//  logerror("%04x: input2_r offset %d select %x\n",cpu_get_pc(machine->activecpu),offset,ddenlovr_select2 );
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch( ddenlovr_select2 )
 	{
@@ -1527,7 +1527,7 @@ static WRITE8_HANDLER( rongrong_blitter_busy_w )
 {
 	rongrong_blitter_busy_select = data;
 	if (data != 0x18)
-		logerror("%04x: rongrong_blitter_busy_w data = %02x\n",activecpu_get_pc(),data);
+		logerror("%04x: rongrong_blitter_busy_w data = %02x\n",cpu_get_pc(machine->activecpu),data);
 }
 static READ8_HANDLER( rongrong_blitter_busy_r )
 {
@@ -1536,7 +1536,7 @@ static READ8_HANDLER( rongrong_blitter_busy_r )
 		case 0x18:	return 0;	// bit 5 = blitter busy
 
 		default:
-			logerror("%04x: rongrong_blitter_busy_r with select = %02x\n",activecpu_get_pc(),rongrong_blitter_busy_select);
+			logerror("%04x: rongrong_blitter_busy_r with select = %02x\n",cpu_get_pc(machine->activecpu),rongrong_blitter_busy_select);
 	}
 	return 0xff;
 }
@@ -1826,7 +1826,7 @@ static WRITE8_HANDLER( rongrong_select_w )
 {
 	UINT8 *rom = memory_region(machine, "main");
 
-//logerror("%04x: rongrong_select_w %02x\n",activecpu_get_pc(),data);
+//logerror("%04x: rongrong_select_w %02x\n",cpu_get_pc(machine->activecpu),data);
 	/* bits 0-4 = **both** ROM bank **AND** input select */
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x1f)]);
 	ddenlovr_select = data;
@@ -2139,7 +2139,7 @@ static READ8_HANDLER( funkyfig_dsw_r )
 	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
 	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
 	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW3");
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", activecpu_get_pc(), ddenlovr_select);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select);
 	return 0xff;
 }
 
@@ -2152,7 +2152,7 @@ static READ8_HANDLER( funkyfig_coin_r )
 		case 0x22:	return input_port_read(machine, "IN2");
 		case 0x23:	return funkyfig_lockout;
 	}
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2);
 	return 0xff;
 }
 
@@ -2163,7 +2163,7 @@ static READ8_HANDLER( funkyfig_key_r )
 		case 0x20:	return input_port_read(machine, "IN0");
 		case 0x21:	return input_port_read(machine, "IN1");
 	}
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2);
 	return 0xff;
 }
 
@@ -2176,13 +2176,13 @@ static WRITE8_HANDLER( funkyfig_lockout_w )
 			coin_counter_w(0,  data  & 0x01);
 			coin_lockout_w(0,(~data) & 0x02);
 			if (data & ~0x03)
-				logerror("%06x: warning, unknown bits written, lockout = %02x\n", activecpu_get_pc(), data);
+				logerror("%06x: warning, unknown bits written, lockout = %02x\n", cpu_get_pc(machine->activecpu), data);
 			break;
 
 //      case 0xef:  16 bytes on startup
 
 		default:
-			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", activecpu_get_pc(), ddenlovr_select2, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2, data);
 	}
 }
 
@@ -2306,7 +2306,7 @@ static READ8_HANDLER( hanakanz_gfxrom_r )
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", activecpu_get_pc(), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(machine->activecpu), address);
 		address %= size;
 	}
 
@@ -2336,7 +2336,7 @@ static WRITE8_HANDLER( hanakanz_coincounter_w )
 	coin_counter_w(0, data & 1);
 
 	if (data & 0xf0)
-		logerror("%04x: warning, coin counter = %02x\n", activecpu_get_pc(), data);
+		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(machine->activecpu), data);
 
 #ifdef MAME_DEBUG
 //      popmessage("93 = %02x",data);
@@ -2503,7 +2503,7 @@ static void mjchuuka_get_romdata(running_machine *machine)
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", activecpu_get_pc(), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(machine->activecpu), address);
 		address %= size;
 	}
 
@@ -2554,7 +2554,7 @@ static WRITE8_HANDLER( mjchuuka_coincounter_w )
 	coin_lockout_w(0,(~data) & 0x08);
 
 	if (data & 0x74)
-		logerror("%04x: warning, coin counter = %02x\n", activecpu_get_pc(), data);
+		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(machine->activecpu), data);
 
 #ifdef MAME_DEBUG
 //    popmessage("40 = %02x",data);
@@ -2624,7 +2624,7 @@ static WRITE8_HANDLER( mjmyster_rambank_w )
 {
 	UINT8 *rom = memory_region(machine, "main");
 	memory_set_bankptr(2, &rom[0x90000 + 0x1000 * (data & 0x07)]);
-//  logerror("%04x: rambank = %02x\n", activecpu_get_pc(), data);
+//  logerror("%04x: rambank = %02x\n", cpu_get_pc(machine->activecpu), data);
 }
 
 static WRITE8_HANDLER( mjmyster_select2_w )
@@ -2644,7 +2644,7 @@ static READ8_HANDLER( mjmyster_coins_r )
 		case 0x03:	return 0xff;
 	}
 
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2);
 
 	return 0xff;
 }
@@ -2658,7 +2658,7 @@ static READ8_HANDLER( mjmyster_keyb_r )
 	else if	(keyb & 0x04)	ret = input_port_read(machine, "KEY2");
 	else if	(keyb & 0x08)	ret = input_port_read(machine, "KEY3");
 	else if	(keyb & 0x10)	ret = input_port_read(machine, "KEY4");
-	else	logerror("%06x: warning, unknown bits read, keyb = %02x\n", activecpu_get_pc(), keyb);
+	else	logerror("%06x: warning, unknown bits read, keyb = %02x\n", cpu_get_pc(machine->activecpu), keyb);
 
 	keyb <<= 1;
 
@@ -2672,7 +2672,7 @@ static READ8_HANDLER( mjmyster_dsw_r )
 	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW2");
 	if (!(ddenlovr_select & 0x08))	return input_port_read(machine, "DSW1");
 	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW5");
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", activecpu_get_pc(), ddenlovr_select);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select);
 	return 0xff;
 }
 
@@ -2690,7 +2690,7 @@ static WRITE8_HANDLER( mjmyster_coincounter_w )
 			break;
 
 		default:
-			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", activecpu_get_pc(), ddenlovr_select2, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2, data);
 	}
 }
 
@@ -2775,7 +2775,7 @@ static READ8_HANDLER( hginga_dsw_r )
 	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW2");
 	if (!(ddenlovr_select & 0x08))	return input_port_read(machine, "DSW1");
 	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW5");
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", activecpu_get_pc(), ddenlovr_select);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select);
 	return 0xff;
 }
 
@@ -2796,7 +2796,7 @@ static READ8_HANDLER( hginga_coins_r )
 		case 0x22:	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x23:	return hginga_coins;
 	}
-	logerror("%04x: coins_r with select = %02x\n", activecpu_get_pc(), hginga_select);
+	logerror("%04x: coins_r with select = %02x\n", cpu_get_pc(machine->activecpu), hginga_select);
 	return 0xff;
 }
 
@@ -2824,7 +2824,7 @@ static WRITE8_HANDLER( hginga_coins_w )
 			hginga_coins = data;
 			break;
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", activecpu_get_pc(), hginga_select, data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n", cpu_get_pc(machine->activecpu), hginga_select, data);
 	}
 }
 
@@ -2846,7 +2846,7 @@ static READ8_HANDLER( hginga_input_r )
 		case 0xa2:
 			return input_port_read(machine, keynames1[hginga_ip++]);
 	}
-	logerror("%04x: input_r with select = %02x\n", activecpu_get_pc(), hginga_select);
+	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(machine->activecpu), hginga_select);
 	return 0xff;
 }
 
@@ -2940,7 +2940,7 @@ static READ8_HANDLER( hgokou_input_r )
 		case 0x22:	return hgokou_player_r(machine, 0);
 		case 0x23:	return hginga_coins;
 	}
-	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", activecpu_get_pc(), hginga_select);
+	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", cpu_get_pc(machine->activecpu), hginga_select);
 	return 0xff;
 }
 
@@ -2965,7 +2965,7 @@ static WRITE8_HANDLER( hgokou_input_w )
 		case 0x2f:	break;	// ? written with 2f
 
 		default:
-			logerror("%04x: input_w with select = %02x, data = %02x\n",activecpu_get_pc(),hginga_select,data);
+			logerror("%04x: input_w with select = %02x, data = %02x\n",cpu_get_pc(machine->activecpu),hginga_select,data);
 	}
 }
 
@@ -3055,7 +3055,7 @@ static READ8_HANDLER( hparadis_input_r )
 		case 0x80:	return input_port_read(machine, keynames0[hginga_ip++]);	// P1 (Keys)
 		case 0x81:	return input_port_read(machine, keynames1[hginga_ip++]);	// P2 (Keys)
 	}
-	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", activecpu_get_pc(), hginga_select);
+	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", cpu_get_pc(machine->activecpu), hginga_select);
 	return 0xff;
 }
 
@@ -3076,7 +3076,7 @@ static WRITE8_HANDLER( hparadis_coin_w )
 		case 0x0c:	coin_counter_w(0, data & 1);	break;
 		case 0x0d:	break;
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n",activecpu_get_pc(),hginga_select,data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n",cpu_get_pc(machine->activecpu),hginga_select,data);
 	}
 }
 
@@ -3135,7 +3135,7 @@ static READ8_HANDLER( mjmywrld_coins_r )
 		case 0x83:	return 0x00;
 	}
 
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", activecpu_get_pc(), ddenlovr_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2);
 
 	return 0xff;
 }
@@ -3322,7 +3322,7 @@ static WRITE8_HANDLER( mjflove_coincounter_w )
 
 	if (data & 0xfe)
 	{
-		logerror("%04x: warning, coin counter = %02x\n", activecpu_get_pc(), data);
+		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(machine->activecpu), data);
 //      popmessage("COIN = %02x",data);
 	}
 }
@@ -6594,7 +6594,7 @@ static INTERRUPT_GEN( quizchq_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise quizchq would lock up. */
-	if (cpunum_get_info_int(0,CPUINFO_INT_INPUT_STATE + 0))
+	if (cpu_get_info_int(machine->cpu[0],CPUINFO_INT_INPUT_STATE + 0))
 		return;
 
 	if ((++count % 60) == 0)
@@ -6674,7 +6674,7 @@ static INTERRUPT_GEN( mmpanic_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise the game would lock up. */
-	if (cpunum_get_info_int(0,CPUINFO_INT_INPUT_STATE + 0))
+	if (cpu_get_info_int(machine->cpu[0],CPUINFO_INT_INPUT_STATE + 0))
 		return;
 
 	if ((++count % 60) == 0)
@@ -6746,7 +6746,7 @@ static INTERRUPT_GEN( hanakanz_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise quizchq would lock up. */
-	if (cpunum_get_info_int(0,CPUINFO_INT_INPUT_STATE + 0))
+	if (cpu_get_info_int(machine->cpu[0],CPUINFO_INT_INPUT_STATE + 0))
 		return;
 
 	if ((++count % 60) == 0)
@@ -6822,7 +6822,7 @@ static INTERRUPT_GEN( mjchuuka_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise quizchq would lock up. */
-	if (cpunum_get_info_int(0,CPUINFO_INT_INPUT_STATE + 0))
+	if (cpu_get_info_int(machine->cpu[0],CPUINFO_INT_INPUT_STATE + 0))
 		return;
 
 	if ((++count % 60) == 0)
@@ -6880,7 +6880,7 @@ static INTERRUPT_GEN( mjmyster_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise quizchq would lock up. */
-	if (cpunum_get_info_int(0,CPUINFO_INT_INPUT_STATE + 0))
+	if (cpu_get_info_int(machine->cpu[0],CPUINFO_INT_INPUT_STATE + 0))
 		return;
 
 	switch( cpu_getiloops() )
@@ -6936,7 +6936,7 @@ static INTERRUPT_GEN( hginga_irq )
 	/* I haven't found a irq ack register, so I need this kludge to
        make sure I don't lose any interrupt generated by the blitter,
        otherwise hginga would lock up. */
-	if (cpunum_get_info_int(0,CPUINFO_INT_INPUT_STATE + 0))
+	if (cpu_get_info_int(machine->cpu[0],CPUINFO_INT_INPUT_STATE + 0))
 		return;
 
 	if ((++count % 60) == 0)

@@ -452,17 +452,6 @@ static CPU_DISASSEMBLE( dsp32c )
     PARALLEL INTERFACE WRITES
 ***************************************************************************/
 
-/* context finder */
-#ifdef UNUSED_FUNCTION
-INLINE dsp32_regs *FINDCONTEXT(int cpu)
-{
-	dsp32_regs *context = cpunum_get_context_ptr(cpu);
-	if (!context)
-		context = &dsp32;
-	return context;
-}
-#endif
-
 static const UINT32 regmap[4][16] =
 {
 	{	/* DSP32 compatible mode */
@@ -560,7 +549,7 @@ void dsp32c_pio_w(int cpunum, int reg, int data)
 	UINT16 mask;
 	UINT8 mode;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 
 	/* look up register and mask */
 	mode = ((dsp32.pcr >> 8) & 2) | ((dsp32.pcr >> 1) & 1);
@@ -628,7 +617,7 @@ void dsp32c_pio_w(int cpunum, int reg, int data)
 			break;
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 
@@ -642,7 +631,7 @@ int dsp32c_pio_r(int cpunum, int reg)
 	UINT16 mask, result = 0xffff;
 	UINT8 mode, shift = 0;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 
 	/* look up register and mask */
 	mode = ((dsp32.pcr >> 8) & 2) | ((dsp32.pcr >> 1) & 1);
@@ -702,7 +691,7 @@ int dsp32c_pio_r(int cpunum, int reg)
 			break;
 	}
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 	return (result >> shift) & ~mask;
 }
 

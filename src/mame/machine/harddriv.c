@@ -852,12 +852,12 @@ WRITE16_HANDLER( hd68k_adsp_data_w )
 	/* any write to $1FFF is taken to be a trigger; synchronize the CPUs */
 	if (offset == 0x1fff)
 	{
-		logerror("%06X:ADSP sync address written (%04X)\n", activecpu_get_previouspc(), data);
+		logerror("%06X:ADSP sync address written (%04X)\n", cpu_get_previouspc(machine->activecpu), data);
 		timer_call_after_resynch(NULL, 0, 0);
 		cpu_triggerint(machine, hdcpu_adsp);
 	}
 	else
-		logerror("%06X:ADSP W@%04X (%04X)\n", activecpu_get_previouspc(), offset, data);
+		logerror("%06X:ADSP W@%04X (%04X)\n", cpu_get_previouspc(machine->activecpu), offset, data);
 }
 
 
@@ -1007,7 +1007,7 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 
 WRITE16_HANDLER( hd68k_adsp_irq_clear_w )
 {
-	logerror("%06X:68k clears ADSP interrupt\n", activecpu_get_previouspc());
+	logerror("%06X:68k clears ADSP interrupt\n", cpu_get_previouspc(machine->activecpu));
 	adsp_irq_state = 0;
 	atarigen_update_interrupts(machine);
 }
@@ -1018,7 +1018,7 @@ READ16_HANDLER( hd68k_adsp_irq_state_r )
 	int result = 0xfffd;
 	if (adsp_xflag) result ^= 2;
 	if (adsp_irq_state) result ^= 1;
-	logerror("%06X:68k reads ADSP interrupt state = %04x\n", activecpu_get_previouspc(), result);
+	logerror("%06X:68k reads ADSP interrupt state = %04x\n", cpu_get_previouspc(machine->activecpu), result);
 	return result;
 }
 
@@ -1050,7 +1050,7 @@ READ16_HANDLER( hdadsp_special_r )
 			break;
 
 		default:
-			logerror("%04X:hdadsp_special_r(%04X)\n", activecpu_get_previouspc(), offset);
+			logerror("%04X:hdadsp_special_r(%04X)\n", cpu_get_previouspc(machine->activecpu), offset);
 			break;
 	}
 	return 0;
@@ -1078,7 +1078,7 @@ WRITE16_HANDLER( hdadsp_special_w )
 			break;
 
 		case 6:	/* /GINT */
-			logerror("%04X:ADSP signals interrupt\n", activecpu_get_previouspc());
+			logerror("%04X:ADSP signals interrupt\n", cpu_get_previouspc(machine->activecpu));
 			adsp_irq_state = 1;
 			atarigen_update_interrupts(machine);
 			break;
@@ -1088,7 +1088,7 @@ WRITE16_HANDLER( hdadsp_special_w )
 			break;
 
 		default:
-			logerror("%04X:hdadsp_special_w(%04X)=%04X\n", activecpu_get_previouspc(), offset, data);
+			logerror("%04X:hdadsp_special_w(%04X)=%04X\n", cpu_get_previouspc(machine->activecpu), offset, data);
 			break;
 	}
 }
@@ -1193,25 +1193,25 @@ READ16_HANDLER( hd68k_ds3_girq_state_r )
 
 READ16_HANDLER( hd68k_ds3_gdata_r )
 {
-	offs_t pc = activecpu_get_pc();
+	offs_t pc = cpu_get_pc(machine->activecpu);
 
 	ds3_gflag = 0;
 	update_ds3_irq();
 
-	logerror("%06X:hd68k_ds3_gdata_r(%04X)\n", activecpu_get_previouspc(), ds3_gdata);
+	logerror("%06X:hd68k_ds3_gdata_r(%04X)\n", cpu_get_previouspc(machine->activecpu), ds3_gdata);
 
 	/* attempt to optimize the transfer if conditions are right */
-	if (cpu_getactivecpu() == 0 && pc == hdds3_transfer_pc &&
+	if (cpunum_get_active() == 0 && pc == hdds3_transfer_pc &&
 		!(!ds3_g68flag && ds3_g68irqs) && !(ds3_gflag && ds3_gfirqs))
 	{
-		UINT32 destaddr = activecpu_get_reg(M68K_A1);
-		UINT16 count68k = activecpu_get_reg(M68K_D1);
-		UINT16 mstat = cpunum_get_reg(hdcpu_adsp, ADSP2100_MSTAT);
-		UINT16 i6 = cpunum_get_reg(hdcpu_adsp, (mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC);
-		UINT16 l6 = cpunum_get_reg(hdcpu_adsp, ADSP2100_L6) - 1;
-		UINT16 m7 = cpunum_get_reg(hdcpu_adsp, ADSP2100_M7);
+		UINT32 destaddr = cpu_get_reg(machine->activecpu, M68K_A1);
+		UINT16 count68k = cpu_get_reg(machine->activecpu, M68K_D1);
+		UINT16 mstat = cpu_get_reg(machine->cpu[hdcpu_adsp], ADSP2100_MSTAT);
+		UINT16 i6 = cpu_get_reg(machine->cpu[hdcpu_adsp], (mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC);
+		UINT16 l6 = cpu_get_reg(machine->cpu[hdcpu_adsp], ADSP2100_L6) - 1;
+		UINT16 m7 = cpu_get_reg(machine->cpu[hdcpu_adsp], ADSP2100_M7);
 
-		logerror("%06X:optimizing 68k transfer, %d words\n", activecpu_get_previouspc(), count68k);
+		logerror("%06X:optimizing 68k transfer, %d words\n", cpu_get_previouspc(machine->activecpu), count68k);
 
 		while (count68k > 0 && hdadsp_data_memory[0x16e6] > 0)
 		{
@@ -1223,8 +1223,8 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 			}
 			count68k--;
 		}
-		activecpu_set_reg(M68K_D1, count68k);
-		cpunum_set_reg(hdcpu_adsp, (mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC, i6);
+		cpu_set_reg(machine->activecpu, M68K_D1, count68k);
+		cpu_set_reg(machine->cpu[hdcpu_adsp], (mstat & 1) ? ADSP2100_MR0 : ADSP2100_MR0_SEC, i6);
 		adsp_speedup_count[1]++;
 	}
 
@@ -1240,7 +1240,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 
 WRITE16_HANDLER( hd68k_ds3_gdata_w )
 {
-	logerror("%06X:hd68k_ds3_gdata_w(%04X)\n", activecpu_get_previouspc(), ds3_gdata);
+	logerror("%06X:hd68k_ds3_gdata_w(%04X)\n", cpu_get_previouspc(machine->activecpu), ds3_gdata);
 
 	COMBINE_DATA(&ds3_g68data);
 	ds3_g68flag = 1;
@@ -1317,7 +1317,7 @@ WRITE16_HANDLER( hdds3_special_w )
 	switch (offset & 7)
 	{
 		case 0:
-			logerror("%04X:ADSP sets gdata to %04X\n", activecpu_get_previouspc(), data);
+			logerror("%04X:ADSP sets gdata to %04X\n", cpu_get_previouspc(machine->activecpu), data);
 			ds3_gdata = data;
 			ds3_gflag = 1;
 			update_ds3_irq();
@@ -1327,7 +1327,7 @@ WRITE16_HANDLER( hdds3_special_w )
 			break;
 
 		case 1:
-			logerror("%04X:ADSP sets interrupt = %d\n", activecpu_get_previouspc(), (data >> 1) & 1);
+			logerror("%04X:ADSP sets interrupt = %d\n", cpu_get_previouspc(machine->activecpu), (data >> 1) & 1);
 			adsp_irq_state = (data >> 1) & 1;
 			hd68k_update_interrupts(machine);
 			break;
@@ -1617,13 +1617,13 @@ WRITE16_HANDLER( hddspcom_control_w )
 
 WRITE16_HANDLER( rd68k_slapstic_w )
 {
-	slapstic_tweak(offset & 0x3fff);
+	slapstic_tweak(machine, offset & 0x3fff);
 }
 
 
 READ16_HANDLER( rd68k_slapstic_r )
 {
-	int bank = slapstic_tweak(offset & 0x3fff) * 0x4000;
+	int bank = slapstic_tweak(machine, offset & 0x3fff) * 0x4000;
 	return hd68k_slapstic_base[bank + (offset & 0x3fff)];
 }
 
@@ -1762,7 +1762,7 @@ READ16_HANDLER( hdgsp_speedup_r )
 	/* if both this address and the other important address are not $ffff */
 	/* then we can spin until something gets written */
 	if (result != 0xffff && hdgsp_speedup_addr[1][0] != 0xffff &&
-		cpu_getactivecpu() == hdcpu_gsp && activecpu_get_pc() == hdgsp_speedup_pc)
+		cpunum_get_active() == hdcpu_gsp && cpu_get_pc(machine->activecpu) == hdgsp_speedup_pc)
 	{
 		gsp_speedup_count[0]++;
 		cpu_spinuntil_int();
@@ -1806,8 +1806,8 @@ READ16_HANDLER( rdgsp_speedup1_r )
 	int result = hdgsp_speedup_addr[0][offset];
 
 	/* if this address is equal to $f000, spin until something gets written */
-	if (cpu_getactivecpu() == hdcpu_gsp && activecpu_get_pc() == hdgsp_speedup_pc &&
-		(result & 0xff) < activecpu_get_reg(TMS34010_A1))
+	if (cpunum_get_active() == hdcpu_gsp && cpu_get_pc(machine->activecpu) == hdgsp_speedup_pc &&
+		(result & 0xff) < cpu_get_reg(machine->activecpu, TMS34010_A1))
 	{
 		gsp_speedup_count[0]++;
 		cpu_spinuntil_int();
@@ -1820,7 +1820,7 @@ READ16_HANDLER( rdgsp_speedup1_r )
 WRITE16_HANDLER( rdgsp_speedup1_w )
 {
 	COMBINE_DATA(&hdgsp_speedup_addr[0][offset]);
-	if (cpu_getactivecpu() != hdcpu_gsp)
+	if (cpunum_get_active() != hdcpu_gsp)
 		cpu_triggerint(machine, hdcpu_gsp);
 }
 
@@ -1841,7 +1841,7 @@ READ16_HANDLER( hdmsp_speedup_r )
 {
 	int data = hdmsp_speedup_addr[offset];
 
-	if (data == 0 && activecpu_get_pc() == hdmsp_speedup_pc && cpu_getactivecpu() == hdcpu_msp)
+	if (data == 0 && cpu_get_pc(machine->activecpu) == hdmsp_speedup_pc && cpunum_get_active() == hdcpu_msp)
 	{
 		msp_speedup_count[0]++;
 		cpu_spinuntil_int();
@@ -1873,7 +1873,7 @@ READ16_HANDLER( stmsp_speedup_r )
 		stmsp_sync[2][0] == 0xffff && 	/* 99d30 */
 		stmsp_sync[2][1] == 0xffff && 	/* 99d40 */
 		stmsp_sync[2][2] == 0 &&	 	/* 99d50 */
-		activecpu_get_pc() == 0x3c0)
+		cpu_get_pc(machine->activecpu) == 0x3c0)
 	{
 		msp_speedup_count[0]++;
 		cpu_spinuntil_int();
@@ -1898,7 +1898,7 @@ READ16_HANDLER( hdadsp_speedup_r )
 {
 	int data = hdadsp_data_memory[0x1fff];
 
-	if (data == 0xffff && activecpu_get_pc() <= 0x3b && cpu_getactivecpu() == hdcpu_adsp)
+	if (data == 0xffff && cpu_get_pc(machine->activecpu) <= 0x3b && cpunum_get_active() == hdcpu_adsp)
 	{
 		adsp_speedup_count[0]++;
 		cpu_spinuntil_int();
@@ -1912,7 +1912,7 @@ READ16_HANDLER( hdds3_speedup_r )
 {
 	int data = *hdds3_speedup_addr;
 
-	if (data != 0 && activecpu_get_pc() == hdds3_speedup_pc && cpu_getactivecpu() == hdcpu_adsp)
+	if (data != 0 && cpu_get_pc(machine->activecpu) == hdds3_speedup_pc && cpunum_get_active() == hdcpu_adsp)
 	{
 		adsp_speedup_count[2]++;
 		cpu_spinuntil_int();

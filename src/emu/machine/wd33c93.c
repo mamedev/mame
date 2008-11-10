@@ -12,6 +12,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "state.h"
 #include "wd33c93.h"
 
@@ -293,7 +294,7 @@ static void wd33c93_complete_cmd( UINT8 status )
 /* command handlers */
 static void wd33c93_invalid_cmd( void )
 {
-	logerror( "Unknown/Unimplemented SCSI controller command: %02x (PC=%x)\n", scsi_data.regs[WD_COMMAND], activecpu_get_pc() );
+	logerror( "Unknown/Unimplemented SCSI controller command: %02x (PC=%x)\n", scsi_data.regs[WD_COMMAND], cpu_get_pc(Machine->activecpu) );
 
 	/* complete the command */
 	wd33c93_complete_cmd( CSR_INVALID );
@@ -526,7 +527,7 @@ WRITE8_HANDLER(wd33c93_w)
 
 		case 1:
 		{
-			LOG(( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", safe_activecpu_get_pc(), scsi_data.sasr, data ));
+			LOG(( "WD33C93: PC=%08x - Write REG=%02x, data = %02x\n", safe_cpu_get_pc(machine->activecpu), scsi_data.sasr, data ));
 
 			/* update the register */
 			scsi_data.regs[scsi_data.sasr] = data;
@@ -534,7 +535,7 @@ WRITE8_HANDLER(wd33c93_w)
 			/* if we receive a command, schedule to process it */
 			if ( scsi_data.sasr == WD_COMMAND )
 			{
-				LOG(( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", safe_activecpu_get_pc(), data, wd33c93_getunit() ));
+				LOG(( "WDC33C93: PC=%08x - Executing command %08x - unit %d\n", safe_cpu_get_pc(machine->activecpu), data, wd33c93_getunit() ));
 
 				/* signal we're processing it */
 				scsi_data.regs[WD_AUXILIARY_STATUS] |= ASR_CIP;
@@ -685,7 +686,7 @@ READ8_HANDLER(wd33c93_r)
 					intf->irq_callback(machine, 0);
 				}
 
-				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", safe_activecpu_get_pc(), scsi_data.regs[WD_SCSI_STATUS] ));
+				LOG(( "WD33C93: PC=%08x - Status read (%02x)\n", safe_cpu_get_pc(machine->activecpu), scsi_data.regs[WD_SCSI_STATUS] ));
 			}
 			else if ( scsi_data.sasr == WD_DATA )
 			{
@@ -754,7 +755,7 @@ READ8_HANDLER(wd33c93_r)
 				}
 			}
 
-			LOG(( "WD33C93: PC=%08x - Data read (%02x)\n", safe_activecpu_get_pc(), scsi_data.regs[WD_DATA] ));
+			LOG(( "WD33C93: PC=%08x - Data read (%02x)\n", safe_cpu_get_pc(machine->activecpu), scsi_data.regs[WD_DATA] ));
 
 			/* get the register value */
 			ret = scsi_data.regs[scsi_data.sasr];

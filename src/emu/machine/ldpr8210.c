@@ -637,7 +637,7 @@ static READ8_HANDLER( pr8210_pia_r )
 			break;
 
 		default:
-			mame_printf_debug("%03X:Unknown PR-8210 PIA read from offset %02X\n", activecpu_get_pc(), offset);
+			mame_printf_debug("%03X:Unknown PR-8210 PIA read from offset %02X\n", cpu_get_pc(machine->activecpu), offset);
 			break;
 	}
 	return result;
@@ -712,7 +712,7 @@ static WRITE8_HANDLER( pr8210_pia_w )
 
 		/* no other writes known */
 		default:
-			mame_printf_debug("%03X:Unknown PR-8210 PIA write to offset %02X = %02X\n", activecpu_get_pc(), offset, data);
+			mame_printf_debug("%03X:Unknown PR-8210 PIA write to offset %02X = %02X\n", cpu_get_pc(machine->activecpu), offset, data);
 			break;
 	}
 }
@@ -1239,13 +1239,13 @@ static WRITE8_HANDLER( simutrek_port2_w )
 	{
 		int direction = (data & 0x08) ? 1 : -1;
 		if (LOG_SIMUTREK)
-			printf("%3d:JUMP TRG (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), activecpu_get_pc());
+			printf("%3d:JUMP TRG (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), cpu_get_pc(machine->activecpu));
 		ldcore_advance_slider(ld, direction);
 	}
 
 	/* bit $04 controls who owns the JUMP TRG command */
 	if (LOG_SIMUTREK && ((data ^ prev) & 0x04))
-		printf("%3d:Simutrek ownership line = %d (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), (data >> 2) & 1, activecpu_get_pc());
+		printf("%3d:Simutrek ownership line = %d (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), (data >> 2) & 1, cpu_get_pc(machine->activecpu));
 	player->simutrek.controlnext = (~data >> 2) & 1;
 
 	/* bits $03 control something (status?) */

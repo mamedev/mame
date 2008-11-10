@@ -1115,7 +1115,7 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 	}
 	else
 	{
-		/* printf("rom access at pc = %4x\n",activecpu_get_pc()); */
+		/* printf("rom access at pc = %4x\n",cpu_get_pc(machine->activecpu)); */
 		return (state->snd_rom[0x1000+(page & 7)*256+offset]);
 	}
 }

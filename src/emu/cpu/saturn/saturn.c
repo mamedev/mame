@@ -163,7 +163,7 @@ INLINE void saturn_take_irq(void)
 	saturn_push(saturn.pc);
 	saturn.pc=IRQ_ADDRESS;
 
-	LOG(("Saturn#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), saturn.pc));
+	LOG(("Saturn#%d takes IRQ ($%04x)\n", cpunum_get_active(), saturn.pc));
 
 	if (saturn.irq_callback) (*saturn.irq_callback)(saturn.device, SATURN_IRQ_LINE);
 	change_pc(saturn.pc);
@@ -208,7 +208,7 @@ static void saturn_set_nmi_line(int state)
 	saturn.nmi_state = state;
 	if ( state != CLEAR_LINE )
 	{
-		LOG(( "SATURN#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
+		LOG(( "SATURN#%d set_nmi_line(ASSERT)\n", cpunum_get_active()));
 		saturn.pending_irq = 1;
 	}
 }
@@ -219,7 +219,7 @@ static void saturn_set_irq_line(int state)
 	saturn.irq_state = state;
 	if ( state != CLEAR_LINE && saturn.irq_enable )
 	{
-		LOG(( "SATURN#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
+		LOG(( "SATURN#%d set_irq_line(ASSERT)\n", cpunum_get_active()));
 		saturn.pending_irq = 1;
 	}
 }
@@ -228,7 +228,7 @@ static void saturn_set_wakeup_line(int state)
 {
 	if (saturn.sleeping && state==1)
 	{
-		LOG(( "SATURN#%d set_wakeup_line(ASSERT)\n", cpu_getactivecpu()));
+		LOG(( "SATURN#%d set_wakeup_line(ASSERT)\n", cpunum_get_active()));
 		if (saturn.irq_callback) (*saturn.irq_callback)(saturn.device, SATURN_WAKEUP_LINE);
 		saturn.sleeping = 0;
 	}

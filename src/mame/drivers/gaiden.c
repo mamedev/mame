@@ -198,7 +198,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",activecpu_get_pc(),data);
+//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(machine->activecpu),data);
 
 		switch (data & 0xf0)
 		{
@@ -236,7 +236,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 
 static READ16_HANDLER( wildfang_protection_r )
 {
-//  logerror("PC %06x: read prot %02x\n",activecpu_get_pc(),prot);
+//  logerror("PC %06x: read prot %02x\n",cpu_get_pc(machine->activecpu),prot);
 	return prot;
 }
 
@@ -326,7 +326,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",activecpu_get_pc(),data);
+//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(machine->activecpu),data);
 
 		switch (data & 0xf0)
 		{
@@ -372,7 +372,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 
 static READ16_HANDLER( raiga_protection_r )
 {
-//  logerror("PC %06x: read prot %02x\n",activecpu_get_pc(),prot);
+//  logerror("PC %06x: read prot %02x\n",cpu_get_pc(machine->activecpu),prot);
 	return prot;
 }
 

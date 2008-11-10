@@ -876,7 +876,7 @@ static READ8_HANDLER( tshoot_input_port_0_3_r )
 static WRITE8_HANDLER( tshoot_maxvol_w )
 {
 	/* something to do with the sound volume */
-	logerror("tshoot maxvol = %d (pc:%x)\n", data, activecpu_get_pc());
+	logerror("tshoot maxvol = %d (pc:%x)\n", data, cpu_get_pc(machine->activecpu));
 }
 
 

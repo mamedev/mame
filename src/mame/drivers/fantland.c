@@ -64,7 +64,7 @@ static WRITE8_HANDLER( fantland_nmi_enable_w )
 	fantland_nmi_enable = data;
 
 	if ((fantland_nmi_enable != 0) && (fantland_nmi_enable != 8))
-		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", activecpu_get_pc(), data);
+		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", cpu_get_pc(machine->activecpu), data);
 }
 
 static WRITE16_HANDLER( fantland_nmi_enable_16_w )
@@ -165,7 +165,7 @@ static WRITE8_HANDLER( borntofi_nmi_enable_w )
 	// data & 0x31 changes when lightgun fires
 
 	if ((fantland_nmi_enable != 0) && (fantland_nmi_enable != 8))
-		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", activecpu_get_pc(), data);
+		logerror("CPU #0 PC = %04X: nmi_enable = %02x\n", cpu_get_pc(machine->activecpu), data);
 
 //  popmessage("%02X",data);
 }
@@ -300,7 +300,7 @@ static void borntofi_adpcm_start(int voice)
 	msm5205_reset_w(voice,0);
 	borntofi_adpcm[voice].playing = 1;
 	borntofi_adpcm[voice].nibble  = 0;
-//  logerror("CPU #0 PC = %04X: adpcm start = %06x, stop = %06x\n", activecpu_get_pc(), borntofi_adpcm[voice].addr[0], borntofi_adpcm[voice].addr[1]);
+//  logerror("CPU #0 PC = %04X: adpcm start = %06x, stop = %06x\n", cpu_get_pc(machine->activecpu), borntofi_adpcm[voice].addr[0], borntofi_adpcm[voice].addr[1]);
 }
 
 static void borntofi_adpcm_stop(int voice)
@@ -321,7 +321,7 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 		{
 			case 0x00:		borntofi_adpcm_stop(voice);			break;
 			case 0x03:		borntofi_adpcm_start(voice);		break;
-			default:		logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", activecpu_get_pc(), reg, data);
+			default:		logerror("CPU #0 PC = %04X: adpcm reg %d <- %02x\n", cpu_get_pc(machine->activecpu), reg, data);
 		}
 	}
 	else

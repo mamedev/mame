@@ -967,7 +967,7 @@ ROM_END
 
 static READ32_HANDLER( dynabomb_speedup_r )
 {
-	if(activecpu_get_pc() == 0xc25b8)
+	if(cpu_get_pc(machine->activecpu) == 0xc25b8)
 	{
 		activecpu_eat_cycles(50);
 	}
@@ -977,7 +977,7 @@ static READ32_HANDLER( dynabomb_speedup_r )
 
 static READ32_HANDLER( legendoh_speedup_r )
 {
-	if(activecpu_get_pc() == 0x23e32)
+	if(cpu_get_pc(machine->activecpu) == 0x23e32)
 	{
 		activecpu_eat_cycles(50);
 	}
@@ -987,7 +987,7 @@ static READ32_HANDLER( legendoh_speedup_r )
 
 static READ32_HANDLER( sb2003_speedup_r )
 {
-	if(activecpu_get_pc() == 0x26da4)
+	if(cpu_get_pc(machine->activecpu) == 0x26da4)
 	{
 		activecpu_eat_cycles(50);
 	}
@@ -997,7 +997,7 @@ static READ32_HANDLER( sb2003_speedup_r )
 
 static READ32_HANDLER( spotty_speedup_r )
 {
-	if(activecpu_get_pc() == 0x8560)
+	if(cpu_get_pc(machine->activecpu) == 0x8560)
 	{
 		activecpu_eat_cycles(50);
 	}

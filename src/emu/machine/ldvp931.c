@@ -475,7 +475,7 @@ static WRITE8_HANDLER( output0_w )
 
 	if (LOG_PORTS && (player->out0 ^ data) & 0xff)
 	{
-		printf("%03X:out0:", activecpu_get_pc());
+		printf("%03X:out0:", cpu_get_pc(machine->activecpu));
 		if ( (data & 0x80)) printf(" ???");
 		if ( (data & 0x40)) printf(" LED1");
 		if ( (data & 0x20)) printf(" LED2");
@@ -517,7 +517,7 @@ static WRITE8_HANDLER( output1_w )
 
 	if (LOG_PORTS && (player->out1 ^ data) & 0x08)
 	{
-		mame_printf_debug("%03X:out1:", activecpu_get_pc());
+		mame_printf_debug("%03X:out1:", cpu_get_pc(machine->activecpu));
 		if (!(data & 0x08)) mame_printf_debug(" SMS");
 		mame_printf_debug("\n");
 		player->out1 = data;
@@ -678,7 +678,7 @@ static WRITE8_HANDLER( port1_w )
 
 	if (LOG_PORTS && (player->port1 ^ data) & 0x1f)
 	{
-		printf("%03X:port1:", activecpu_get_pc());
+		printf("%03X:port1:", cpu_get_pc(machine->activecpu));
 		if (!(data & 0x10)) printf(" SPEED");
 		if (!(data & 0x08)) printf(" TIMENABLE");
 		if (!(data & 0x04)) printf(" REV");

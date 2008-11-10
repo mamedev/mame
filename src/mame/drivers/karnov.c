@@ -84,7 +84,7 @@ static void karnov_i8751_w(running_machine *machine, int data)
 	if (data==0x401) i8751_return=0x4138; /* ^Whistling wind */
 	if (data==0x408) i8751_return=0x4276; /* ^Heavy Gates */
 
-//  if (!i8751_return && data!=0x300) logerror("CPU %04x - Unknown Write %02x intel\n",activecpu_get_pc(),data);
+//  if (!i8751_return && data!=0x300) logerror("CPU %04x - Unknown Write %02x intel\n",cpu_get_pc(machine->activecpu),data);
 
 	cpunum_set_input_line(machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;
@@ -114,7 +114,7 @@ static void wndrplnt_i8751_w(running_machine *machine, int data)
 			case 0x18:	i8751_return=0x5341; break;
 		}
 	}
-//  else logerror("CPU %04x - Unknown Write %02x intel\n",activecpu_get_pc(),data);
+//  else logerror("CPU %04x - Unknown Write %02x intel\n",cpu_get_pc(machine->activecpu),data);
 
 	/* These are 68k function call addresses - different address for each power-up */
 	if (data==0x400) i8751_return=0x594;
@@ -248,7 +248,7 @@ static void chelnov_i8751_w(running_machine *machine, int data)
 		}
 	}
 
-//  logerror("CPU %04x - Unknown Write %02x intel\n",activecpu_get_pc(),data);
+//  logerror("CPU %04x - Unknown Write %02x intel\n",cpu_get_pc(machine->activecpu),data);
 
 	cpunum_set_input_line(machine, 0,6,HOLD_LINE); /* Signal main cpu task is complete */
 	i8751_needs_ack=1;

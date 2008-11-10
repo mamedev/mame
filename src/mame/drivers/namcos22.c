@@ -1629,7 +1629,7 @@ static WRITE16_HANDLER( upload_code_to_slave_dsp_w )
 		else
 		{
 			logerror( "%08x: master port#7: 0x%04x\n",
-				activecpu_get_previouspc(), data );
+				cpu_get_previouspc(machine->activecpu), data );
 		}
 		break;
 
@@ -2119,7 +2119,7 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 				if(offs<4 || offs>=8)
 				{
 					mame_printf_debug( "%08x: sys[0x%02x] := 0x%02x\n",
-						activecpu_get_previouspc(),
+						cpu_get_previouspc(machine->activecpu),
 						offs,
 						dat>>24 );
 				}
@@ -2386,12 +2386,12 @@ static WRITE32_HANDLER( alpinesa_prot_w )
 	}
 #else
 	int i;
-	unsigned sptr = activecpu_get_sp();
+	unsigned sptr = cpu_get_sp(machine->activecpu);
 	mAlpineSurferProtData = 0;
 	for(i=0;i<4;i++)
 	{
 		mAlpineSurferProtData<<=8;
-		mAlpineSurferProtData |= cpunum_read_byte( 0, sptr+4+i );
+		mAlpineSurferProtData |= cpu_read_byte(machine->cpu[0], sptr+4+i );
 	}
 #endif
 } /* alpinesa_prot_w */
@@ -5055,7 +5055,7 @@ static UINT16 su_82;
 // for MCU BIOS v1.41
 static READ16_HANDLER( mcu141_speedup_r )
 {
-	if ((activecpu_get_pc() == 0xc12d) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(machine->activecpu) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
 		cpu_spinuntil_int();
 	}
@@ -5071,7 +5071,7 @@ static WRITE16_HANDLER( mcu_speedup_w )
 // for MCU BIOS v1.30
 static READ16_HANDLER( mcu130_speedup_r )
 {
-	if ((activecpu_get_pc() == 0xc12a) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(machine->activecpu) == 0xc12a) && (!(su_82 & 0xff00)))
 	{
 		cpu_spinuntil_int();
 	}
@@ -5082,7 +5082,7 @@ static READ16_HANDLER( mcu130_speedup_r )
 // for NSTX7702 v1.00 (C74)
 static READ16_HANDLER( mcuc74_speedup_r )
 {
-	if (((activecpu_get_pc() == 0xc0df) || (activecpu_get_pc() == 0xc101)) && (!(su_82 & 0xff00)))
+	if (((cpu_get_pc(machine->activecpu) == 0xc0df) || (cpu_get_pc(machine->activecpu) == 0xc101)) && (!(su_82 & 0xff00)))
 	{
 		cpu_spinuntil_int();
 	}

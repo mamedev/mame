@@ -695,12 +695,12 @@ static int fifoout_read_request = 0;
 
 static UINT8 sb_coin_latch = 0;
 
-static UINT8 z80_fifoout_pop(void)
+static UINT8 z80_fifoout_pop(running_machine *machine)
 {
 	UINT8 r;
 	if (fifoout_wpos == fifoout_rpos)
 	{
-		logerror("Sound FIFOOUT underflow at %08X\n", activecpu_get_pc());
+		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(machine->activecpu));
 	}
 	r = fifoout_data[fifoout_rpos++];
 	if(fifoout_rpos == FIFO_SIZE)
@@ -716,7 +716,7 @@ static UINT8 z80_fifoout_pop(void)
 	return r;
 }
 
-static void z80_fifoout_push(UINT8 data)
+static void z80_fifoout_push(running_machine *machine, UINT8 data)
 {
 	fifoout_data[fifoout_wpos++] = data;
 	if (fifoout_wpos == FIFO_SIZE)
@@ -725,18 +725,18 @@ static void z80_fifoout_push(UINT8 data)
 	}
 	if(fifoout_wpos == fifoout_rpos)
 	{
-		fatalerror("Sound FIFOOUT overflow at %08X", activecpu_get_pc());
+		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(machine->activecpu));
 	}
 
 	fifoout_read_request = 1;
 }
 
-static UINT8 z80_fifoin_pop(void)
+static UINT8 z80_fifoin_pop(running_machine *machine)
 {
 	UINT8 r;
 	if (fifoin_wpos == fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN underflow at %08X", activecpu_get_pc());
+		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(machine->activecpu));
 	}
 	r = fifoin_data[fifoin_rpos++];
 	if(fifoin_rpos == FIFO_SIZE)
@@ -752,7 +752,7 @@ static UINT8 z80_fifoin_pop(void)
 	return r;
 }
 
-static void z80_fifoin_push(UINT8 data)
+static void z80_fifoin_push(running_machine *machine, UINT8 data)
 {
 	fifoin_data[fifoin_wpos++] = data;
 	if(fifoin_wpos == FIFO_SIZE)
@@ -761,7 +761,7 @@ static void z80_fifoin_push(UINT8 data)
 	}
 	if(fifoin_wpos == fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN overflow at %08X", activecpu_get_pc());
+		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(machine->activecpu));
 	}
 
 	fifoin_read_request = 1;
@@ -785,7 +785,7 @@ static WRITE8_HANDLER( sb_coin_w )
 
 static READ32_HANDLER( sound_fifo_r )
 {
-	UINT8 r = z80_fifoout_pop();
+	UINT8 r = z80_fifoout_pop(machine);
 
 	return r;
 }
@@ -793,7 +793,7 @@ static READ32_HANDLER( sound_fifo_r )
 static WRITE32_HANDLER( sound_fifo_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		z80_fifoin_push(data & 0xff);
+		z80_fifoin_push(machine, data & 0xff);
 	}
 }
 
@@ -934,14 +934,14 @@ static WRITE32_HANDLER( spi_6295_1_w )
 
 static READ8_HANDLER( z80_soundfifo_r )
 {
-	UINT8 r = z80_fifoin_pop();
+	UINT8 r = z80_fifoin_pop(machine);
 
 	return r;
 }
 
 static WRITE8_HANDLER( z80_soundfifo_w )
 {
-	z80_fifoout_push(data);
+	z80_fifoout_push(machine, data);
 }
 
 static READ8_HANDLER( z80_soundfifo_status_r )
@@ -1818,25 +1818,25 @@ MACHINE_DRIVER_END
 
 static READ32_HANDLER ( senkyu_speedup_r )
 {
-	if (activecpu_get_pc()==0x00305bb2) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x00305bb2) cpu_spinuntil_int(); // idle
 	return spimainram[(0x0018cb4-0x800)/4];
 }
 
 static READ32_HANDLER( senkyua_speedup_r )
 {
-	if (activecpu_get_pc()== 0x30582e) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)== 0x30582e) cpu_spinuntil_int(); // idle
 	return spimainram[(0x0018c9c-0x800)/4];
 }
 
 static READ32_HANDLER ( batlball_speedup_r )
 {
-//  printf("activecpu_get_pc() %06x\n", activecpu_get_pc());
+//  printf("cpu_get_pc(machine->activecpu) %06x\n", cpu_get_pc(machine->activecpu));
 
 	/* batlbalu */
-	if (activecpu_get_pc()==0x00305996) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x00305996) cpu_spinuntil_int(); // idle
 
 	/* batlball */
-	if (activecpu_get_pc()==0x003058aa) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x003058aa) cpu_spinuntil_int(); // idle
 
 	return spimainram[(0x0018db4-0x800)/4];
 }
@@ -1844,21 +1844,21 @@ static READ32_HANDLER ( batlball_speedup_r )
 static READ32_HANDLER ( rdft_speedup_r )
 {
 	/* rdft */
-	if (activecpu_get_pc()==0x0203f0a) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f0a) cpu_spinuntil_int(); // idle
 
 	/* rdftau */
-	if (activecpu_get_pc()==0x0203f16) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f16) cpu_spinuntil_int(); // idle
 
 	/* rdftj */
-	if (activecpu_get_pc()==0x0203f22) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f22) cpu_spinuntil_int(); // idle
 
 	/* rdftdi */
-	if (activecpu_get_pc()==0x0203f46) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f46) cpu_spinuntil_int(); // idle
 
 	/* rdftu */
-	if (activecpu_get_pc()==0x0203f3a) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f3a) cpu_spinuntil_int(); // idle
 
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 
 	return spimainram[(0x00298d0-0x800)/4];
 }
@@ -1866,15 +1866,15 @@ static READ32_HANDLER ( rdft_speedup_r )
 static READ32_HANDLER ( viprp1_speedup_r )
 {
 	/* viprp1 */
-	if (activecpu_get_pc()==0x0202769) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0202769) cpu_spinuntil_int(); // idle
 
 	/* viprp1s */
-	if (activecpu_get_pc()==0x02027e9) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x02027e9) cpu_spinuntil_int(); // idle
 
 	/* viprp1ot */
-	if (activecpu_get_pc()==0x02026bd) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x02026bd) cpu_spinuntil_int(); // idle
 
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 
 	return spimainram[(0x001e2e0-0x800)/4];
 }
@@ -1882,8 +1882,8 @@ static READ32_HANDLER ( viprp1_speedup_r )
 static READ32_HANDLER ( viprp1o_speedup_r )
 {
 	/* viperp1o */
-	if (activecpu_get_pc()==0x0201f99) cpu_spinuntil_int(); // idle
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+	if (cpu_get_pc(machine->activecpu)==0x0201f99) cpu_spinuntil_int(); // idle
+//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 	return spimainram[(0x001d49c-0x800)/4];
 }
 
@@ -1891,8 +1891,8 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 // causes input problems?
 READ32_HANDLER ( ejanhs_speedup_r )
 {
-// mame_printf_debug("%08x\n",activecpu_get_pc());
- if (activecpu_get_pc()==0x03032c7) cpu_spinuntil_int(); // idle
+// mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
+ if (cpu_get_pc(machine->activecpu)==0x03032c7) cpu_spinuntil_int(); // idle
  return spimainram[(0x002d224-0x800)/4];
 }
 #endif
@@ -1901,18 +1901,18 @@ static READ32_HANDLER ( rf2_speedup_r )
 {
 
 	/* rdft22kc */
-	if (activecpu_get_pc()==0x0203926) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203926) cpu_spinuntil_int(); // idle
 
 	/* rdft2, rdft2j */
-	if (activecpu_get_pc()==0x0204372) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0204372) cpu_spinuntil_int(); // idle
 
 	/* rdft2us */
-	if (activecpu_get_pc()==0x020420e) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x020420e) cpu_spinuntil_int(); // idle
 
 	/* rdft2a */
-	if (activecpu_get_pc()==0x0204366) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0204366) cpu_spinuntil_int(); // idle
 
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 
 	return spimainram[(0x0282AC-0x800)/4];
 }
@@ -1920,10 +1920,10 @@ static READ32_HANDLER ( rf2_speedup_r )
 static READ32_HANDLER ( rfjet_speedup_r )
 {
 	/* rfjet, rfjetu, rfjeta */
-	if (activecpu_get_pc()==0x0206082) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0206082) cpu_spinuntil_int(); // idle
 
 	/* rfjetus */
-	if (activecpu_get_pc()==0x0205b39)
+	if (cpu_get_pc(machine->activecpu)==0x0205b39)
 	{
 		UINT32 r;
 		cpu_spinuntil_int(); // idle
@@ -1933,9 +1933,9 @@ static READ32_HANDLER ( rfjet_speedup_r )
 	}
 
 	/* rfjetj */
-	if (activecpu_get_pc()==0x0205f2e) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0205f2e) cpu_spinuntil_int(); // idle
 
-//  mame_printf_debug("%08x\n",activecpu_get_pc());
+//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 
 
 	return spimainram[(0x002894c-0x800)/4];

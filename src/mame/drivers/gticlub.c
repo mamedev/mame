@@ -539,7 +539,7 @@ READ8_HANDLER( K056230_r )
 		}
 	}
 
-//  mame_printf_debug("K056230_r: %d at %08X\n", offset, activecpu_get_pc());
+//  mame_printf_debug("K056230_r: %d at %08X\n", offset, cpu_get_pc(machine->activecpu));
 
 	return 0;
 }
@@ -577,19 +577,19 @@ WRITE8_HANDLER( K056230_w )
 			break;
 		}
 	}
-//  mame_printf_debug("K056230_w: %d, %02X at %08X\n", offset, data, activecpu_get_pc());
+//  mame_printf_debug("K056230_w: %d, %02X at %08X\n", offset, data, cpu_get_pc(machine->activecpu));
 }
 
 UINT32 *lanc_ram;
 READ32_HANDLER( lanc_ram_r )
 {
-//  mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, activecpu_get_pc());
+//  mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
 	return lanc_ram[offset & 0x7ff];
 }
 
 WRITE32_HANDLER( lanc_ram_w )
 {
-//  mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, activecpu_get_pc());
+//  mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 	COMBINE_DATA(lanc_ram + (offset & 0x7ff));
 }
 
@@ -598,14 +598,14 @@ WRITE32_HANDLER( lanc_ram_w )
 static MACHINE_START( gticlub )
 {
 	/* set conservative DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x000fffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static ADDRESS_MAP_START( gticlub_map, ADDRESS_SPACE_PROGRAM, 32 )

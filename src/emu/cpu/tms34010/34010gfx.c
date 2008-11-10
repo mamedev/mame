@@ -83,7 +83,7 @@ static int apply_window(const char *inst_name,int srcbpp, UINT32 *srcaddr, XY *d
 		int diff, cycles = 3;
 
 		if (WINDOW_CHECKING == 2)
-			logerror("%08x: %s apply_window window mode %d not supported!\n", activecpu_get_pc(), inst_name, WINDOW_CHECKING);
+			logerror("%08x: %s apply_window window mode %d not supported!\n", cpu_get_pc(Machine->activecpu), inst_name, WINDOW_CHECKING);
 
 		CLR_V;
 		if (WINDOW_CHECKING == 1)

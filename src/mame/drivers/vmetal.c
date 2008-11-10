@@ -172,7 +172,7 @@ static WRITE16_HANDLER( vmetal_control_w )
 		es8712_set_bank_base(0, 0x000000);
 
 	if (data & 0xa0)
-		logerror("PC:%06x - Writing unknown bits %04x to $200000\n",activecpu_get_previouspc(),data);
+		logerror("PC:%06x - Writing unknown bits %04x to $200000\n",cpu_get_previouspc(machine->activecpu),data);
 }
 
 static WRITE16_HANDLER( vmetal_es8712_w )
@@ -208,7 +208,7 @@ static WRITE16_HANDLER( vmetal_es8712_w )
     */
 
 	es8712_data_0_lsb_w(machine, offset, data, mem_mask);
-	logerror("PC:%06x - Writing %04x to ES8712 offset %02x\n",activecpu_get_previouspc(),data,offset);
+	logerror("PC:%06x - Writing %04x to ES8712 offset %02x\n",cpu_get_previouspc(machine->activecpu),data,offset);
 }
 
 

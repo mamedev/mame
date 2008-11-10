@@ -29,7 +29,7 @@
 
 void cpuint_init(running_machine *machine);
 
-void cpuint_reset(void);
+void cpuint_reset(running_machine *machine);
 
 
 

@@ -257,7 +257,7 @@ static MACHINE_RESET( outrun )
 	segaic16_tilemap_reset(0);
 
 	/* hook the RESET line, which resets CPU #1 */
-	cpunum_set_info_fct(0, CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);
 
 	/* start timers to track interrupts */
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 223, 0), NULL, 223, scanline_callback);
@@ -271,52 +271,52 @@ static MACHINE_RESET( outrun )
  *
  *************************************/
 
-static void log_unknown_ppi_read( unsigned port )
+static void log_unknown_ppi_read( running_machine *machine, unsigned port )
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:read from 8255 port %c\n", activecpu_get_pc(), ports[port]);
+	logerror("%06X:read from 8255 port %c\n", cpu_get_pc(machine->activecpu), ports[port]);
 }
 
 
-static void log_unknown_ppi_write( unsigned port, UINT8 data )
+static void log_unknown_ppi_write( running_machine *machine, unsigned port, UINT8 data )
 {
 	static const char ports[] = "ABC";
 
-	logerror("%06X:write %02X to 8255 port %c\n", activecpu_get_pc(), data, ports[port]);
+	logerror("%06X:write %02X to 8255 port %c\n", cpu_get_pc(machine->activecpu), data, ports[port]);
 }
 
 
 static READ8_DEVICE_HANDLER( unknown_porta_r )
 {
-	log_unknown_ppi_read(0);
+	log_unknown_ppi_read(device->machine, 0);
 	return 0;
 }
 
 
 static READ8_DEVICE_HANDLER( unknown_portb_r )
 {
-	log_unknown_ppi_read(1);
+	log_unknown_ppi_read(device->machine, 1);
 	return 0;
 }
 
 
 static READ8_DEVICE_HANDLER( unknown_portc_r )
 {
-	log_unknown_ppi_read(2);
+	log_unknown_ppi_read(device->machine, 2);
 	return 0;
 }
 
 
 static WRITE8_DEVICE_HANDLER( unknown_porta_w )
 {
-	log_unknown_ppi_write(0, data);
+	log_unknown_ppi_write(device->machine, 0, data);
 }
 
 
 static WRITE8_DEVICE_HANDLER( unknown_portb_w )
 {
-	log_unknown_ppi_write(1, data);
+	log_unknown_ppi_write(device->machine, 1, data);
 }
 
 
@@ -347,7 +347,7 @@ static READ16_HANDLER( misc_io_r )
 {
 	if (custom_io_r)
 		return custom_io_r(machine, offset, mem_mask);
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
 	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
@@ -359,7 +359,7 @@ static WRITE16_HANDLER( misc_io_w )
 		custom_io_w(machine, offset, data, mem_mask);
 		return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
 }
 
 
@@ -387,7 +387,7 @@ static READ16_HANDLER( outrun_custom_io_r )
 			return watchdog_reset_r(machine,0);
 	}
 
-	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
 	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
@@ -425,7 +425,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 			segaic16_sprites_draw_0_w(machine, offset, data, mem_mask);
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
 }
 
 
@@ -449,7 +449,7 @@ static READ16_HANDLER( shangon_custom_io_r )
 			return input_port_read_safe(machine, ports[adc_select], 0x0010);
 		}
 	}
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
 	return segaic16_open_bus_r(machine,0,mem_mask);
 }
 
@@ -483,7 +483,7 @@ static WRITE16_HANDLER( shangon_custom_io_w )
 			/* ADC trigger */
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
 }
 
 

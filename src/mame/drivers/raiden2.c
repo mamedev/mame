@@ -682,18 +682,18 @@ WRITE16_HANDLER(sprcpt_flags_2_w)
 // XXX
 // write only: 4c0 4c1 500 501 502 503
 
-static UINT16 handle_io_r(int offset)
+static UINT16 handle_io_r(running_machine *machine, int offset)
 {
-	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], activecpu_get_pc());
+	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], cpu_get_pc(machine->activecpu));
 	return mainram[offset];
 }
 
-static void handle_io_w(int offset, UINT16 data, UINT16 mem_mask)
+static void handle_io_w(running_machine *machine, int offset, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&mainram[offset]);
 	switch(offset) {
 	default:
-		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
+		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(machine->activecpu));
 	}
 }
 
@@ -702,7 +702,7 @@ static READ16_HANDLER(any_r)
 	c_r[offset]++;
 
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		return handle_io_r(offset);
+		return handle_io_r(machine, offset);
 
 	return mainram[offset];
 }
@@ -711,22 +711,22 @@ static WRITE16_HANDLER(any_w)
 {
 	int show = 0;
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		handle_io_w(offset, data, mem_mask);
+		handle_io_w(machine, offset, data, mem_mask);
 
 	c_w[offset]++;
-	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, activecpu_get_pc());
+	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, cpu_get_pc(machine->activecpu));
 	if(mainram[offset] != data && offset >= 0x400 && offset < 0x800) {
 		if(0 &&
 		   offset != 0x4c0/2 && offset != 0x500/2 &&
 		   offset != 0x444/2 && offset != 0x6de/2 && offset != 0x47e/2 &&
 		   offset != 0x4a0/2 && offset != 0x620/2 && offset != 0x6c6/2 &&
 		   offset != 0x628/2 && offset != 0x62a/2)
-			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
+			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(machine->activecpu));
 	}
 
 	if(0 && c_w[offset]>1000 && !c_r[offset]) {
 		if(offset != 0x4c0/2 && (offset<0x500/2 || offset > 0x503/2))
-			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, c_w[offset], c_r[offset], activecpu_get_pc());
+			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, c_w[offset], c_r[offset], cpu_get_pc(machine->activecpu));
 	}
 
 	//  if(offset == 0x471 || (offset >= 0xb146 && offset < 0xb156))
@@ -737,7 +737,7 @@ static WRITE16_HANDLER(any_w)
 	//  show = offset == 0x704 || offset == 0x710 || offset == 0x71c;
 
 	if(show)
-		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, activecpu_get_pc());
+		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(machine->activecpu));
 
 	//  if(offset == 0x700)
 	//      cpu_setbank(2, memory_region(machine, "user1")+0x20000*data);
@@ -749,7 +749,7 @@ static WRITE16_HANDLER(w1x)
 {
 	COMBINE_DATA(&w1ram[offset]);
 	if(0 && offset < 0x800/2)
-		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask, activecpu_get_pc());
+		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask, cpu_get_pc(machine->activecpu));
 }
 
 #ifdef UNUSED_FUNCTION
@@ -2049,7 +2049,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( rdx_v33_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, cpu_getactivecpu(), 0, HOLD_LINE, 0xc0/4);	/* VBL */
+	cpunum_set_input_line_and_vector(machine, cpunum_get_active(), 0, HOLD_LINE, 0xc0/4);	/* VBL */
 	logerror("VSYNC\n");
 }
 

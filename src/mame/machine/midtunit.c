@@ -84,7 +84,7 @@ WRITE16_HANDLER( midtunit_cmos_w )
 	}
 	else
 	{
-		logerror("%08X:Unexpected CMOS W @ %05X\n", activecpu_get_pc(), offset);
+		logerror("%08X:Unexpected CMOS W @ %05X\n", cpu_get_pc(machine->activecpu), offset);
 		popmessage("Bad CMOS write");
 	}
 }
@@ -132,12 +132,12 @@ static const UINT8 mk_prot_values[] =
 
 static READ16_HANDLER( mk_prot_r )
 {
-	logerror("%08X:Protection R @ %05X = %04X\n", activecpu_get_pc(), offset, mk_prot_values[mk_prot_index] << 9);
+	logerror("%08X:Protection R @ %05X = %04X\n", cpu_get_pc(machine->activecpu), offset, mk_prot_values[mk_prot_index] << 9);
 
 	/* just in case */
 	if (mk_prot_index >= sizeof(mk_prot_values))
 	{
-		logerror("%08X:Unexpected protection R @ %05X\n", activecpu_get_pc(), offset);
+		logerror("%08X:Unexpected protection R @ %05X\n", cpu_get_pc(machine->activecpu), offset);
 		mk_prot_index = 0;
 	}
 
@@ -162,11 +162,11 @@ static WRITE16_HANDLER( mk_prot_w )
 		/* just in case */
 		if (i == sizeof(mk_prot_values))
 		{
-			logerror("%08X:Unhandled protection W @ %05X = %04X\n", activecpu_get_pc(), offset, data);
+			logerror("%08X:Unhandled protection W @ %05X = %04X\n", cpu_get_pc(machine->activecpu), offset, data);
 			mk_prot_index = 0;
 		}
 
-		logerror("%08X:Protection W @ %05X = %04X\n", activecpu_get_pc(), offset, data);
+		logerror("%08X:Protection W @ %05X = %04X\n", cpu_get_pc(machine->activecpu), offset, data);
 	}
 }
 
@@ -319,7 +319,7 @@ static const UINT8 jdredd_prot_values_80020[] =
 
 static WRITE16_HANDLER( jdredd_prot_w )
 {
-	logerror("%08X:jdredd_prot_w(%04X,%04X)\n", activecpu_get_previouspc(), offset*16, data);
+	logerror("%08X:jdredd_prot_w(%04X,%04X)\n", cpu_get_previouspc(machine->activecpu), offset*16, data);
 
 	switch (offset)
 	{
@@ -367,7 +367,7 @@ static READ16_HANDLER( jdredd_prot_r )
 	if (jdredd_prot_table && jdredd_prot_index < jdredd_prot_max)
 		result = jdredd_prot_table[jdredd_prot_index++] << 9;
 
-	logerror("%08X:jdredd_prot_r(%04X) = %04X\n", activecpu_get_previouspc(), offset*16, result);
+	logerror("%08X:jdredd_prot_r(%04X) = %04X\n", cpu_get_previouspc(machine->activecpu), offset*16, result);
 	return result;
 }
 
@@ -376,7 +376,7 @@ static READ16_HANDLER( jdredd_prot_r )
 static UINT16 *jdredd_hack;
 static READ16_HANDLER( jdredd_hack_r )
 {
-	if (activecpu_get_pc() == 0xFFBA7EB0)
+	if (cpu_get_pc(machine->activecpu) == 0xFFBA7EB0)
 	{
 		fprintf(stderr, "jdredd_hack_r\n");
 		return 0;
@@ -423,7 +423,7 @@ static void init_tunit_generic(running_machine *machine, int sound)
 			break;
 
 		case SOUND_DCS:
-			dcs_init();
+			dcs_init(machine);
 			break;
 	}
 
@@ -573,7 +573,7 @@ MACHINE_RESET( midtunit )
 
 READ16_HANDLER( midtunit_sound_state_r )
 {
-/*  logerror("%08X:Sound status read\n", activecpu_get_pc());*/
+/*  logerror("%08X:Sound status read\n", cpu_get_pc(machine->activecpu));*/
 
 	if (chip_type == SOUND_DCS)
 		return dcs_control_r() >> 4;
@@ -588,7 +588,7 @@ READ16_HANDLER( midtunit_sound_state_r )
 
 READ16_HANDLER( midtunit_sound_r )
 {
-	logerror("%08X:Sound data read\n", activecpu_get_pc());
+	logerror("%08X:Sound data read\n", cpu_get_pc(machine->activecpu));
 
 	if (chip_type == SOUND_DCS)
 		return dcs_data_r() & 0xff;
@@ -601,7 +601,7 @@ WRITE16_HANDLER( midtunit_sound_w )
 	/* check for out-of-bounds accesses */
 	if (!offset)
 	{
-		logerror("%08X:Unexpected write to sound (lo) = %04X\n", activecpu_get_pc(), data);
+		logerror("%08X:Unexpected write to sound (lo) = %04X\n", cpu_get_pc(machine->activecpu), data);
 		return;
 	}
 
@@ -619,7 +619,7 @@ WRITE16_HANDLER( midtunit_sound_w )
 				break;
 
 			case SOUND_DCS:
-				logerror("%08X:Sound write = %04X\n", activecpu_get_pc(), data);
+				logerror("%08X:Sound write = %04X\n", cpu_get_pc(machine->activecpu), data);
 				dcs_reset_w(~data & 0x100);
 				dcs_data_w(data & 0xff);
 				/* the games seem to check for $82 loops, so this should be just barely enough */

@@ -311,7 +311,7 @@ static void blit(int offset)
 
 #if HALLEYS_DEBUG
 if (0) {
-	logerror("%04x:[%04x]", activecpu_get_pc(), offset);
+	logerror("%04x:[%04x]", cpu_get_pc(machine->activecpu), offset);
 	for (ecx=0; ecx<16; ecx++) logerror(" %02x", param[ecx]);
 	logerror("\n"); }
 #endif
@@ -968,7 +968,7 @@ static WRITE8_HANDLER( bgtile_w )
 
 static READ8_HANDLER( blitter_status_r )
 {
-	if (game_id==GAME_HALLEYS && activecpu_get_pc()==0x8017) return(0x55); // HACK: trick SRAM test on startup
+	if (game_id==GAME_HALLEYS && cpu_get_pc(machine->activecpu)==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
 	return(0);
 }
@@ -1038,7 +1038,7 @@ static READ8_HANDLER( collision_id_r )
     UPDATE: re-implemented pixel collision to accompany the hack method.
 */
 
-	if (game_id==GAME_HALLEYS && activecpu_get_pc()==halleys_collision_detection) // HACK: collision detection bypass
+	if (game_id==GAME_HALLEYS && cpu_get_pc(machine->activecpu)==halleys_collision_detection) // HACK: collision detection bypass
 	{
 		if (collision_count) { collision_count--; return(collision_list[collision_count]); }
 

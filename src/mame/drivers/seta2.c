@@ -429,7 +429,7 @@ static WRITE16_HANDLER( seta2_sound_bank_w )
 		int banks = (memory_region_length( machine, "x1" ) - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
-			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",activecpu_get_pc(),data);
+			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(machine->activecpu),data);
 			data %= banks;
 		}
 		memcpy(ROM + offset * 0x20000, ROM + 0x100000 + data * 0x20000, 0x20000);

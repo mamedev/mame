@@ -182,7 +182,7 @@ static void leland_video_addr_w(int offset, int data, int num)
  *
  *************************************/
 
-static int leland_vram_port_r(int offset, int num)
+static int leland_vram_port_r(running_machine *machine, int offset, int num)
 {
 	struct vram_state_data *state = vram_state + num;
 	int addr = state->addr;
@@ -209,14 +209,14 @@ static int leland_vram_port_r(int offset, int num)
 
 		default:
 			logerror("CPU #%d %04x Warning: Unknown video port %02x read (address=%04x)\n",
-						cpu_getactivecpu(),activecpu_get_pc(), offset, addr);
+						cpunum_get_active(),cpu_get_pc(machine->activecpu), offset, addr);
 			ret = 0;
 			break;
 	}
 	state->addr = addr;
 
 	if (LOG_COMM && addr >= 0xf000)
-		logerror("%04X:%s comm read %04X = %02X\n", activecpu_get_previouspc(), num ? "slave" : "master", addr, ret);
+		logerror("%04X:%s comm read %04X = %02X\n", cpu_get_previouspc(machine->activecpu), num ? "slave" : "master", addr, ret);
 
 	return ret;
 	}
@@ -243,7 +243,7 @@ static void leland_vram_port_w(running_machine *machine, int offset, int data, i
 		video_screen_update_partial(machine->primary_screen, scanline - 1);
 
 	if (LOG_COMM && addr >= 0xf000)
-		logerror("%04X:%s comm write %04X = %02X\n", activecpu_get_previouspc(), num ? "slave" : "master", addr, data);
+		logerror("%04X:%s comm write %04X = %02X\n", cpu_get_previouspc(machine->activecpu), num ? "slave" : "master", addr, data);
 
 	/* based on the low 3 bits of the offset, update the destination */
 	switch (offset & 7)
@@ -295,7 +295,7 @@ static void leland_vram_port_w(running_machine *machine, int offset, int data, i
 
 		default:
 			logerror("CPU #%d %04x Warning: Unknown video port write (address=%04x value=%02x)\n",
-						cpu_getactivecpu(),activecpu_get_pc(), offset, addr);
+						cpunum_get_active(),cpu_get_pc(machine->activecpu), offset, addr);
 			break;
 	}
 
@@ -334,7 +334,7 @@ WRITE8_HANDLER( leland_mvram_port_w )
 
 READ8_HANDLER( leland_mvram_port_r )
 {
-	return leland_vram_port_r(offset, 0);
+	return leland_vram_port_r(machine, offset, 0);
 }
 
 
@@ -359,7 +359,7 @@ WRITE8_HANDLER( leland_svram_port_w )
 
 READ8_HANDLER( leland_svram_port_r )
 {
-	return leland_vram_port_r(offset, 1);
+	return leland_vram_port_r(machine, offset, 1);
 }
 
 
@@ -394,14 +394,14 @@ WRITE8_HANDLER( ataxx_svram_port_w )
 READ8_HANDLER( ataxx_mvram_port_r )
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	return leland_vram_port_r(offset, 0);
+	return leland_vram_port_r(machine, offset, 0);
 }
 
 
 READ8_HANDLER( ataxx_svram_port_r )
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	return leland_vram_port_r(offset, 1);
+	return leland_vram_port_r(machine, offset, 1);
 }
 
 

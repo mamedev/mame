@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "includes/atari.h"
 #include "video/gtia.h"
 
@@ -1197,16 +1198,16 @@ static TIMER_CALLBACK( antic_scanline_render )
             if( antic.w.dmactl & DMA_MISSILE )
             {
                 antic.steal_cycles += 1;
-                atari_gtia_w(machine, 0x11, RDPMGFXD(3*256));
+                atari_gtia_w(machine, 0x11, RDPMGFXD(machine->cpu[0], 3*256));
             }
             /* transport player data to GTIA ? */
             if( antic.w.dmactl & DMA_PLAYER )
             {
                 antic.steal_cycles += 4;
-                atari_gtia_w(machine, 0x0d, RDPMGFXD(4*256));
-                atari_gtia_w(machine, 0x0e, RDPMGFXD(5*256));
-                atari_gtia_w(machine, 0x0f, RDPMGFXD(6*256));
-                atari_gtia_w(machine, 0x10, RDPMGFXD(7*256));
+                atari_gtia_w(machine, 0x0d, RDPMGFXD(machine->cpu[0], 4*256));
+                atari_gtia_w(machine, 0x0e, RDPMGFXD(machine->cpu[0], 5*256));
+                atari_gtia_w(machine, 0x0f, RDPMGFXD(machine->cpu[0], 6*256));
+                atari_gtia_w(machine, 0x10, RDPMGFXD(machine->cpu[0], 7*256));
             }
         }
         else
@@ -1216,17 +1217,17 @@ static TIMER_CALLBACK( antic_scanline_render )
             {
 				if( (antic.scanline & 1) == 0 ) 	 /* even line ? */
 					antic.steal_cycles += 1;
-                atari_gtia_w(machine, 0x11, RDPMGFXS(3*128));
+                atari_gtia_w(machine, 0x11, RDPMGFXS(machine->cpu[0], 3*128));
             }
             /* transport player data to GTIA ? */
             if( antic.w.dmactl & DMA_PLAYER )
             {
 				if( (antic.scanline & 1) == 0 ) 	 /* even line ? */
 					antic.steal_cycles += 4;
-                atari_gtia_w(machine, 0x0d, RDPMGFXS(4*128));
-                atari_gtia_w(machine, 0x0e, RDPMGFXS(5*128));
-                atari_gtia_w(machine, 0x0f, RDPMGFXS(6*128));
-                atari_gtia_w(machine, 0x10, RDPMGFXS(7*128));
+                atari_gtia_w(machine, 0x0d, RDPMGFXS(machine->cpu[0], 4*128));
+                atari_gtia_w(machine, 0x0e, RDPMGFXS(machine->cpu[0], 5*128));
+                atari_gtia_w(machine, 0x0f, RDPMGFXS(machine->cpu[0], 6*128));
+                atari_gtia_w(machine, 0x10, RDPMGFXS(machine->cpu[0], 7*128));
             }
         }
     }
@@ -1250,9 +1251,9 @@ INLINE void LMS(int new_cmd)
      **************************************************************/
     if( new_cmd & ANTIC_LMS )
     {
-		int addr = RDANTIC();
+		int addr = RDANTIC(Machine->cpu[0]);
         antic.doffs = ++antic.doffs & DOFFS;
-        addr += 256 * RDANTIC();
+        addr += 256 * RDANTIC(Machine->cpu[0]);
         antic.doffs = ++antic.doffs & DOFFS;
         antic.vpage = addr & VPAGE;
         antic.voffs = addr & VOFFS;
@@ -1287,7 +1288,7 @@ static void antic_scanline_dma(running_machine *machine, int param)
 				UINT8 vscrol_subtract = 0;
 				UINT8 new_cmd;
 
-				new_cmd = RDANTIC();
+				new_cmd = RDANTIC(machine->cpu[0]);
 				antic.doffs = ++antic.doffs & DOFFS;
 				/* steal at one clock cycle from the CPU for fetching the command */
                 antic.steal_cycles += 1;
@@ -1350,9 +1351,9 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					/* load memory scan bit set ? */
 					if( new_cmd & ANTIC_LMS )
 					{
-						int addr = RDANTIC();
+						int addr = RDANTIC(machine->cpu[0]);
                         antic.doffs = ++antic.doffs & DOFFS;
-                        addr += 256 * RDANTIC();
+                        addr += 256 * RDANTIC(machine->cpu[0]);
                         antic.dpage = addr & DPAGE;
                         antic.doffs = addr & DOFFS;
                         /* produce empty scanlines until vblank start */
@@ -1363,9 +1364,9 @@ static void antic_scanline_dma(running_machine *machine, int param)
 					}
 					else
 					{
-						int addr = RDANTIC();
+						int addr = RDANTIC(machine->cpu[0]);
                         antic.doffs = ++antic.doffs & DOFFS;
-                        addr += 256 * RDANTIC();
+                        addr += 256 * RDANTIC(machine->cpu[0]);
                         antic.dpage = addr & DPAGE;
                         antic.doffs = addr & DOFFS;
                         /* produce a single empty scanline */

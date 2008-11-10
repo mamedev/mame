@@ -28,11 +28,11 @@ READ16_HANDLER( dec0_controls_r )
 			return input_port_read(machine, "DSW");
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", activecpu_get_pc(), 0x30c000+offset);
+			//logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(machine->activecpu), 0x30c000+offset);
 			return i8751_return;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", activecpu_get_pc(), 0x30c000+offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(machine->activecpu), 0x30c000+offset);
 	return ~0;
 }
 
@@ -80,7 +80,7 @@ READ16_HANDLER( midres_controls_r )
 			return 0;	/* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n", activecpu_get_pc(), 0x180000+offset);
+	logerror("PC %06x unknown control read at %02x\n", cpu_get_pc(machine->activecpu), 0x180000+offset);
 	return ~0;
 }
 
@@ -114,7 +114,7 @@ READ16_HANDLER( slyspy_protection_r )
 		case 6:		return 0x2;
 	}
 
-	logerror("%04x, Unknown protection read at 30c000 %d\n", activecpu_get_pc(), offset);
+	logerror("%04x, Unknown protection read at 30c000 %d\n", cpu_get_pc(machine->activecpu), offset);
 	return 0;
 }
 
@@ -177,7 +177,7 @@ WRITE16_HANDLER( slyspy_240000_w )
 			else if (offset<0x10) dec0_pf2_control_1_w(machine,offset-0x8,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 240000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);
+	logerror("Wrote to 240000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_242000_w )
@@ -191,7 +191,7 @@ WRITE16_HANDLER( slyspy_242000_w )
 			else if (offset<0x300) COMBINE_DATA(&dec0_pf2_rowscroll[offset-0x200]);
 			return;
 	}
-	logerror("Wrote to 242000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);
+	logerror("Wrote to 242000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_246000_w )
@@ -201,7 +201,7 @@ WRITE16_HANDLER( slyspy_246000_w )
 			dec0_pf2_data_w(machine,offset,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 246000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);
+	logerror("Wrote to 246000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_248000_w )
@@ -218,7 +218,7 @@ WRITE16_HANDLER( slyspy_248000_w )
 			else if (offset<0x10) dec0_pf1_control_1_w(machine,offset-0x8,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 248000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);
+	logerror("Wrote to 248000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_24c000_w )
@@ -232,7 +232,7 @@ WRITE16_HANDLER( slyspy_24c000_w )
 			else if (offset<0x300) COMBINE_DATA(&dec0_pf1_rowscroll[offset-0x200]);
 			return;
 	}
-	logerror("Wrote to 24c000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);
+	logerror("Wrote to 24c000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_24e000_w )
@@ -243,7 +243,7 @@ WRITE16_HANDLER( slyspy_24e000_w )
 			dec0_pf1_data_w(machine,offset,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 24e000 %02x at %04x %04x (Trap %02x)\n",offset,activecpu_get_pc(),data,slyspy_state);
+	logerror("Wrote to 24e000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
 }
 
 /******************************************************************************/
@@ -331,7 +331,7 @@ static void hbarrel_i8751_write(int data)
 			break;
 		case 0x06:	/* Controls appearance & placement of special weapons */
 			i8751_return=weapons_table[level][data&0x1f];
-			//logerror("CPU #0 PC %06x: warning - write %02x to i8751, returning %04x\n",activecpu_get_pc(),data,i8751_return);
+			//logerror("CPU #0 PC %06x: warning - write %02x to i8751, returning %04x\n",cpu_get_pc(machine->activecpu),data,i8751_return);
 			break;
 		case 0xb:	/* Initialise the variables? */
 			i8751_return=0;
@@ -358,10 +358,10 @@ static void hbarrel_i8751_write(int data)
 		/* We have to use a state as the microcontroller remembers previous commands */
 	}
 
-//logerror("CPU #0 PC %06x: warning - write %02x to i8751\n",activecpu_get_pc(),data);
+//logerror("CPU #0 PC %06x: warning - write %02x to i8751\n",cpu_get_pc(machine->activecpu),data);
 }
 
-static void baddudes_i8751_write(int data)
+static void baddudes_i8751_write(running_machine *machine, int data)
 {
 	i8751_return=0;
 
@@ -384,10 +384,10 @@ static void baddudes_i8751_write(int data)
 		case 0x75b: i8751_return=0x70f; break;
 	}
 
-	if (!i8751_return) logerror("%04x: warning - write unknown command %02x to 8571\n",activecpu_get_pc(),data);
+	if (!i8751_return) logerror("%04x: warning - write unknown command %02x to 8571\n",cpu_get_pc(machine->activecpu),data);
 }
 
-static void birdtry_i8751_write(int data)
+static void birdtry_i8751_write(running_machine *machine, int data)
 {
 	static int 	pwr,
 				hgt;
@@ -453,7 +453,7 @@ static void birdtry_i8751_write(int data)
 		/*These are activated after a shot (???)*/
 		case 0x6ca: i8751_return = 0xff;      break;
 		case 0x7ff: i8751_return = 0x200;     break;
-		default: logerror("%04x: warning - write unknown command %02x to 8571\n",activecpu_get_pc(),data);
+		default: logerror("%04x: warning - write unknown command %02x to 8571\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 
@@ -474,8 +474,8 @@ void dec0_i8751_write(running_machine *machine, int data)
 {
 	/* Writes to this address cause an IRQ to the i8751 microcontroller */
 	if (GAME==1) hbarrel_i8751_write(data);
-	if (GAME==2) baddudes_i8751_write(data);
-	if (GAME==3) birdtry_i8751_write(data);
+	if (GAME==2) baddudes_i8751_write(machine, data);
+	if (GAME==3) birdtry_i8751_write(machine, data);
 
 	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
 
@@ -494,7 +494,7 @@ See the code about 0xb60 (USA version)
 
 */
 
-logerror("CPU #0 PC %06x: warning - write %02x to i8751\n",activecpu_get_pc(),data);
+logerror("CPU #0 PC %06x: warning - write %02x to i8751\n",cpu_get_pc(machine->activecpu),data);
 
 }
 
@@ -514,14 +514,14 @@ static WRITE16_HANDLER( sprite_mirror_w )
 
 static READ16_HANDLER( robocop_68000_share_r )
 {
-//logerror("%08x: Share read %04x\n",activecpu_get_pc(),offset);
+//logerror("%08x: Share read %04x\n",cpu_get_pc(machine->activecpu),offset);
 
 	return robocop_shared_ram[offset];
 }
 
 static WRITE16_HANDLER( robocop_68000_share_w )
 {
-//  logerror("%08x: Share write %04x %04x\n",activecpu_get_pc(),offset,data);
+//  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(machine->activecpu),offset,data);
 
 	robocop_shared_ram[offset]=data&0xff;
 

@@ -201,7 +201,7 @@ static READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
 
-	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, activecpu_get_pc());
+	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, cpu_get_pc(machine->activecpu));
 
 	return value;
 }
@@ -215,7 +215,7 @@ static WRITE32_HANDLER( shared_ram_write )
 																              0xc000 + (offset<<1),
 																              0xc000 +((offset<<1)+1),
 																		      mem_mask,
-																		      activecpu_get_pc());
+																		      cpu_get_pc(machine->activecpu));
 
 	/* write to the current dsp56k word */
 	if (mem_mask | (0xffff0000))

@@ -471,7 +471,7 @@ int ptm6840_read(running_machine *machine, int which, int offset)
 
 		case PTM_6840_STATUS:
 		{
-			PLOG(("%06X: MC6840 #%d: Status read = %04X\n", activecpu_get_previouspc(), which, currptr->status_reg));
+			PLOG(("%06X: MC6840 #%d: Status read = %04X\n", cpu_get_previouspc(machine->activecpu), which, currptr->status_reg));
 			currptr->status_read_since_int |= currptr->status_reg & 0x07;
 			val = currptr->status_reg;
 			break;
@@ -493,7 +493,7 @@ int ptm6840_read(running_machine *machine, int which, int offset)
 
 			currptr->lsb_buffer = result & 0xff;
 
-			PLOG(("%06X: MC6840 #%d: Counter %d read = %04X\n", activecpu_get_previouspc(), which, idx, result >> 8));
+			PLOG(("%06X: MC6840 #%d: Counter %d read = %04X\n", cpu_get_previouspc(machine->activecpu), which, idx, result >> 8));
 			val = result >> 8;
 			break;
 		}
@@ -609,7 +609,7 @@ void ptm6840_write (running_machine *machine, int which, int offset, int data)
 			if (!(currptr->control_reg[idx] & 0x10))
 				reload_count(machine, which,idx);
 
-			PLOG(("%06X:MC6840 #%d: Counter %d latch = %04X\n", activecpu_get_previouspc(), which, idx, currptr->latch[idx]));
+			PLOG(("%06X:MC6840 #%d: Counter %d latch = %04X\n", cpu_get_previouspc(machine->activecpu), which, idx, currptr->latch[idx]));
 			break;
 		}
 	}

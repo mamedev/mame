@@ -154,11 +154,11 @@ static READ16_HANDLER( bankswitch_r )
 static READ16_HANDLER( bankrom_r )
 {
 	/* this is the banked ROM read */
-	logerror("%06X: %04X\n", activecpu_get_previouspc(), offset);
+	logerror("%06X: %04X\n", cpu_get_previouspc(machine->activecpu), offset);
 
 	/* if the values are $3e000 or $3e002 are being read by code just below the
         ROM bank area, we need to return the correct value to give the proper checksum */
-	if ((offset == 0x3000 || offset == 0x3001) && activecpu_get_previouspc() > 0x37000)
+	if ((offset == 0x3000 || offset == 0x3001) && cpu_get_previouspc(machine->activecpu) > 0x37000)
 	{
 		UINT32 checksum = (program_read_word(0x3fd210) << 16) | program_read_word(0x3fd212);
 		UINT32 us = 0xaaaa5555 - checksum;
@@ -195,7 +195,7 @@ static UINT16 *spritecache_count;
 
 static READ16_HANDLER( spritecache_count_r )
 {
-	int prevpc = activecpu_get_previouspc();
+	int prevpc = cpu_get_previouspc(machine->activecpu);
 
 	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
 	if (prevpc == 0x99f8 || prevpc == 0x9992)
@@ -250,7 +250,7 @@ static UINT16 *unknown_verify_base;
 
 static READ16_HANDLER( unknown_verify_r )
 {
-	int prevpc = activecpu_get_previouspc();
+	int prevpc = cpu_get_previouspc(machine->activecpu);
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
 		return unknown_verify_base[offset];
 	else

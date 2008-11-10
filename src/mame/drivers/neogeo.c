@@ -140,7 +140,7 @@ static UINT8 led2_value;
  *************************************/
 
 static void calendar_clock(void);
-static void set_output_latch(UINT8 data);
+static void set_output_latch(running_machine *machine, UINT8 data);
 static void set_output_data(UINT8 data);
 
 
@@ -175,11 +175,11 @@ void neogeo_set_display_position_interrupt_control(UINT16 data)
 }
 
 
-void neogeo_set_display_counter_msb(UINT16 data)
+void neogeo_set_display_counter_msb(running_machine *machine, UINT16 data)
 {
 	display_counter = (display_counter & 0x0000ffff) | ((UINT32)data << 16);
 
-	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", activecpu_get_pc(), display_counter);
+	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", cpu_get_pc(machine->activecpu), display_counter);
 }
 
 
@@ -187,7 +187,7 @@ void neogeo_set_display_counter_lsb(running_machine *machine, UINT16 data)
 {
 	display_counter = (display_counter & 0xffff0000) | data;
 
-	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", activecpu_get_pc(), display_counter);
+	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", cpu_get_pc(machine->activecpu), display_counter);
 
 	if (display_position_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
 	{
@@ -356,7 +356,7 @@ static WRITE16_HANDLER( io_control_w )
 	switch (offset)
 	{
 	case 0x00: select_controller(data & 0x00ff); break;
-	case 0x18: set_output_latch(data & 0x00ff); break;
+	case 0x18: set_output_latch(machine, data & 0x00ff); break;
 	case 0x20: set_output_data(data & 0x00ff); break;
 	case 0x28: pd4990a_control_16_w(machine, 0, data, mem_mask); break;
 //  case 0x30: break; // coin counters
@@ -365,7 +365,7 @@ static WRITE16_HANDLER( io_control_w )
 //  case 0x33: break; // coui lockout
 
 	default:
-		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", activecpu_get_pc(), offset, data);
+		logerror("PC: %x  Unmapped I/O control write.  Offset: %x  Data: %x\n", cpu_get_pc(machine->activecpu), offset, data);
 		break;
 	}
 }
@@ -392,7 +392,7 @@ READ16_HANDLER( neogeo_unmapped_r )
 	else
 	{
 		recurse = 1;
-		ret = program_read_word(activecpu_get_pc());
+		ret = program_read_word(cpu_get_pc(machine->activecpu));
 		recurse = 0;
 	}
 
@@ -561,7 +561,7 @@ static WRITE16_HANDLER( audio_command_w )
 		/* boost the interleave to let the audio CPU read the command */
 		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
 
-		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", activecpu_get_pc(), data, mem_mask);
+		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(machine->activecpu), data, mem_mask);
 	}
 }
 
@@ -570,7 +570,7 @@ static READ8_HANDLER( audio_command_r )
 {
 	UINT8 ret = soundlatch_r(machine, 0);
 
-	if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", activecpu_get_pc(), ret);
+	if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", cpu_get_pc(machine->activecpu), ret);
 
 	/* this is a guess */
 	audio_cpu_clear_nmi_w(machine, 0, 0);
@@ -581,7 +581,7 @@ static READ8_HANDLER( audio_command_r )
 
 static WRITE8_HANDLER( audio_result_w )
 {
-	if (LOG_CPU_COMM && (audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", activecpu_get_pc(), data);
+	if (LOG_CPU_COMM && (audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", cpu_get_pc(machine->activecpu), data);
 
 	audio_result = data;
 }
@@ -591,7 +591,7 @@ static CUSTOM_INPUT( get_audio_result )
 {
 	UINT32 ret = audio_result;
 
-//  if (LOG_CPU_COMM && (cpu_getactivecpu() >= 0)) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", activecpu_get_pc(), ret);
+//  if (LOG_CPU_COMM && (cpunum_get_active() >= 0)) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(machine->activecpu), ret);
 
 	return ret;
 }
@@ -626,7 +626,7 @@ static void _set_main_cpu_bank_address(running_machine *machine)
 
 void neogeo_set_main_cpu_bank_address(running_machine *machine, UINT32 bank_address)
 {
-	if (LOG_MAIN_CPU_BANKING) logerror("MAIN CPU PC %06x: neogeo_set_main_cpu_bank_address %06x\n", safe_activecpu_get_pc(), bank_address);
+	if (LOG_MAIN_CPU_BANKING) logerror("MAIN CPU PC %06x: neogeo_set_main_cpu_bank_address %06x\n", safe_cpu_get_pc(machine->activecpu), bank_address);
 
 	main_cpu_bank_address = bank_address;
 
@@ -640,14 +640,14 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 	UINT32 len = memory_region_length(machine, "main");
 
 	if ((len <= 0x100000) && (data & 0x07))
-		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", activecpu_get_pc(), data);
+		logerror("PC %06x: warning: bankswitch to %02x but no banks available\n", cpu_get_pc(machine->activecpu), data);
 	else
 	{
 		bank_address = ((data & 0x07) + 1) * 0x100000;
 
 		if (bank_address >= len)
 		{
-			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", activecpu_get_pc(), data);
+			logerror("PC %06x: warning: bankswitch to empty bank %02x\n", cpu_get_pc(machine->activecpu), data);
 			bank_address = 0x100000;
 		}
 
@@ -686,9 +686,9 @@ static void set_audio_cpu_banking(void)
 }
 
 
-static void audio_cpu_bank_select(int region, UINT8 bank)
+static void audio_cpu_bank_select(running_machine *machine, int region, UINT8 bank)
 {
-	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", safe_activecpu_get_pc(), region, bank);
+	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", safe_cpu_get_pc(machine->activecpu), region, bank);
 
 	audio_cpu_banks[region] = bank;
 
@@ -698,7 +698,7 @@ static void audio_cpu_bank_select(int region, UINT8 bank)
 
 static READ8_HANDLER( audio_cpu_bank_select_f000_f7ff_r )
 {
-	audio_cpu_bank_select(0, offset >> 8);
+	audio_cpu_bank_select(machine, 0, offset >> 8);
 
 	return 0;
 }
@@ -706,7 +706,7 @@ static READ8_HANDLER( audio_cpu_bank_select_f000_f7ff_r )
 
 static READ8_HANDLER( audio_cpu_bank_select_e000_efff_r )
 {
-	audio_cpu_bank_select(1, offset >> 8);
+	audio_cpu_bank_select(machine, 1, offset >> 8);
 
 	return 0;
 }
@@ -714,7 +714,7 @@ static READ8_HANDLER( audio_cpu_bank_select_e000_efff_r )
 
 static READ8_HANDLER( audio_cpu_bank_select_c000_dfff_r )
 {
-	audio_cpu_bank_select(2, offset >> 8);
+	audio_cpu_bank_select(machine, 2, offset >> 8);
 
 	return 0;
 }
@@ -722,7 +722,7 @@ static READ8_HANDLER( audio_cpu_bank_select_c000_dfff_r )
 
 static READ8_HANDLER( audio_cpu_bank_select_8000_bfff_r )
 {
-	audio_cpu_bank_select(3, offset >> 8);
+	audio_cpu_bank_select(machine, 3, offset >> 8);
 
 	return 0;
 }
@@ -742,7 +742,7 @@ static void _set_audio_cpu_rom_source(running_machine *machine)
 
 		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
 
-		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", safe_activecpu_get_pc(), audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
+		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", safe_cpu_get_pc(machine->activecpu), audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}
 }
 
@@ -821,11 +821,11 @@ static WRITE16_HANDLER( system_control_w )
 		case 0x02: /* unknown - HC32 middle pin 1 */
 		case 0x03: /* unknown - uPD4990 pin ? */
 		case 0x04: /* unknown - HC32 middle pin 10 */
-			logerror("PC: %x  Unmapped system control write.  Offset: %x  Data: %x\n", safe_activecpu_get_pc(), offset & 0x07, bit);
+			logerror("PC: %x  Unmapped system control write.  Offset: %x  Data: %x\n", safe_cpu_get_pc(machine->activecpu), offset & 0x07, bit);
 			break;
 		}
 
-		if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", safe_activecpu_get_pc(), offset & 0x07, bit);
+		if (LOG_VIDEO_SYSTEM && ((offset & 0x07) != 0x06)) logerror("PC: %x  System control write.  Offset: %x  Data: %x\n", safe_cpu_get_pc(machine->activecpu), offset & 0x07, bit);
 	}
 }
 
@@ -900,7 +900,7 @@ static void set_outputs(void)
 }
 
 
-static void set_output_latch(UINT8 data)
+static void set_output_latch(running_machine *machine, UINT8 data)
 {
 	/* looks like the LEDs are set on the
        falling edge */
@@ -916,7 +916,7 @@ static void set_output_latch(UINT8 data)
     	led2_value = ~output_data;
 
   	if (falling_bits & 0xc7)
-		logerror("PC: %x  Unmaped LED write.  Data: %x\n", activecpu_get_pc(), falling_bits);
+		logerror("PC: %x  Unmaped LED write.  Data: %x\n", cpu_get_pc(machine->activecpu), falling_bits);
 
 	output_latch = data;
 

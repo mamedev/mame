@@ -109,6 +109,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/powerpc/ppc.h"
 #include "machine/intelfsh.h"
 #include "machine/scsicd.h"
@@ -578,8 +579,8 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 
 	if (reg != 0x70 && chip == 0)
 	{
-		//printf("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, activecpu_get_pc());
-		//logerror("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, activecpu_get_pc());
+		//printf("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+		//logerror("gcu%d_w: %08X, %08X, %08X at %08X\n", chip, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
 	}
 
 	switch(reg)
@@ -973,7 +974,7 @@ static void atapi_command_reg_w(running_machine *machine, int reg, UINT16 data)
 
 	if (reg == ATAPI_REG_DATA)
 	{
-//      printf("ATAPI: packet write %04x at %08X\n", data, activecpu_get_pc());
+//      printf("ATAPI: packet write %04x at %08X\n", data, cpu_get_pc(machine->activecpu));
 		atapi_data[atapi_data_ptr] = data;
 		atapi_data_ptr++;
 
@@ -1763,14 +1764,14 @@ static UINT32 *work_ram;
 static MACHINE_START( firebeat )
 {
 	/* set conservative DRC options */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_DRC_OPTIONS, PPCDRC_COMPATIBLE_OPTIONS);
 
 	/* configure fast RAM regions for DRC */
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_END, 0x01ffffff);
-	cpunum_set_info_ptr(0, CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
-	cpunum_set_info_int(0, CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_START, 0x00000000);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_END, 0x01ffffff);
+	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, work_ram);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 }
 
 static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -2255,7 +2256,7 @@ static void security_w(UINT8 data)
 {
 	int r = ibutton_w(data);
 	if (r >= 0)
-		ppc4xx_spu_receive_byte(0, r);
+		ppc4xx_spu_receive_byte(Machine->cpu[0], r);
 }
 
 /*****************************************************************************/
@@ -2290,7 +2291,7 @@ static void init_firebeat(running_machine *machine)
 
 	cur_cab_data = cab_data;
 
-	ppc4xx_spu_set_tx_handler(0, security_w);
+	ppc4xx_spu_set_tx_handler(machine->cpu[0], security_w);
 
 	set_ibutton(rom);
 

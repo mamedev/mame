@@ -109,7 +109,7 @@ TIMER_CALLBACK( sh2_timer_callback )
 	UINT16 frc;
 	int cpunum = param;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	sh2_timer_resync();
 
 	frc = sh2->frc;
@@ -131,7 +131,7 @@ TIMER_CALLBACK( sh2_timer_callback )
 	sh2_recalc_irq();
 	sh2_timer_activate();
 
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 TIMER_CALLBACK( sh2_dmac_callback )
@@ -139,12 +139,12 @@ TIMER_CALLBACK( sh2_dmac_callback )
 	int cpunum = param >> 1;
 	int dma = param & 1;
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 	LOG(("SH2.%d: DMA %d complete\n", cpunum, dma));
 	sh2->m[0x63+4*dma] |= 2;
 	sh2->dma_timer_active[dma] = 0;
 	sh2_recalc_irq();
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 static void sh2_dmac_check(int dma)
@@ -300,7 +300,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	//      logerror("sh2_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfffffe00+offset*4, offset, data, mem_mask);
 
 //    if(offset != 0x20)
-//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, activecpu_get_pc());
+//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, cpu_get_pc(machine->activecpu));
 
 	switch( offset )
 	{
@@ -360,7 +360,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		{
 			INT32 a = sh2->m[0x41];
 			INT32 b = sh2->m[0x40];
-			LOG(("SH2 #%d div+mod %d/%d\n", cpu_getactivecpu(), a, b));
+			LOG(("SH2 #%d div+mod %d/%d\n", cpunum_get_active(), a, b));
 			if (b)
 			{
 				sh2->m[0x45] = a / b;
@@ -388,7 +388,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		{
 			INT64 a = sh2->m[0x45] | ((UINT64)(sh2->m[0x44]) << 32);
 			INT64 b = (INT32)sh2->m[0x40];
-			LOG(("SH2 #%d div+mod %lld/%lld\n", cpu_getactivecpu(), a, b));
+			LOG(("SH2 #%d div+mod %lld/%lld\n", cpunum_get_active(), a, b));
 			if (b)
 			{
 				INT64 q = a / b;
@@ -509,10 +509,10 @@ void sh2_set_frt_input(int cpunum, int state)
 		return;
 	}
 
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(Machine->cpu[cpunum]);
 
 	if(sh2->frt_input == state) {
-		cpuintrf_pop_context();
+		cpu_pop_context();
 		return;
 	}
 
@@ -520,12 +520,12 @@ void sh2_set_frt_input(int cpunum, int state)
 
 	if(sh2->m[5] & 0x8000) {
 		if(state == CLEAR_LINE) {
-			cpuintrf_pop_context();
+			cpu_pop_context();
 			return;
 		}
 	} else {
 		if(state == ASSERT_LINE) {
-			cpuintrf_pop_context();
+			cpu_pop_context();
 			return;
 		}
 	}
@@ -535,7 +535,7 @@ void sh2_set_frt_input(int cpunum, int state)
 	sh2->m[4] |= ICF;
 	logerror("SH2.%d: ICF activated (%x)\n", sh2->cpu_number, sh2->pc & AM);
 	sh2_recalc_irq();
-	cpuintrf_pop_context();
+	cpu_pop_context();
 }
 
 void sh2_set_irq_line(int irqline, int state)
@@ -548,11 +548,11 @@ void sh2_set_irq_line(int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 #%d cleared nmi\n", cpu_getactivecpu()));
+			LOG(("SH-2 #%d cleared nmi\n", cpunum_get_active()));
 		}
 		else
 		{
-			LOG(("SH-2 #%d assert nmi\n", cpu_getactivecpu()));
+			LOG(("SH-2 #%d assert nmi\n", cpunum_get_active()));
 
 			sh2_exception("Set IRQ line", 16);
 
@@ -569,12 +569,12 @@ void sh2_set_irq_line(int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 #%d cleared irq #%d\n", cpu_getactivecpu(), irqline));
+			LOG(("SH-2 #%d cleared irq #%d\n", cpunum_get_active(), irqline));
 			sh2->pending_irq &= ~(1 << irqline);
 		}
 		else
 		{
-			LOG(("SH-2 #%d assert irq #%d\n", cpu_getactivecpu(), irqline));
+			LOG(("SH-2 #%d assert irq #%d\n", cpunum_get_active(), irqline));
 			sh2->pending_irq |= 1 << irqline;
 			#ifdef USE_SH2DRC
 			sh2->test_irq = 1;
@@ -645,27 +645,27 @@ void sh2_exception(const char *message, int irqline)
 		if (sh2->internal_irq_level == irqline)
 		{
 			vector = sh2->internal_irq_vector;
-			LOG(("SH-2 #%d exception #%d (internal vector: $%x) after [%s]\n", cpu_getactivecpu(), irqline, vector, message));
+			LOG(("SH-2 #%d exception #%d (internal vector: $%x) after [%s]\n", cpunum_get_active(), irqline, vector, message));
 		}
 		else
 		{
 			if(sh2->m[0x38] & 0x00010000)
 			{
 				vector = sh2->irq_callback(sh2->device, irqline);
-				LOG(("SH-2 #%d exception #%d (external vector: $%x) after [%s]\n", cpu_getactivecpu(), irqline, vector, message));
+				LOG(("SH-2 #%d exception #%d (external vector: $%x) after [%s]\n", cpunum_get_active(), irqline, vector, message));
 			}
 			else
 			{
 				sh2->irq_callback(sh2->device, irqline);
 				vector = 64 + irqline/2;
-				LOG(("SH-2 #%d exception #%d (autovector: $%x) after [%s]\n", cpu_getactivecpu(), irqline, vector, message));
+				LOG(("SH-2 #%d exception #%d (autovector: $%x) after [%s]\n", cpunum_get_active(), irqline, vector, message));
 			}
 		}
 	}
 	else
 	{
 		vector = 11;
-		LOG(("SH-2 #%d nmi exception (autovector: $%x) after [%s]\n", cpu_getactivecpu(), vector, message));
+		LOG(("SH-2 #%d nmi exception (autovector: $%x) after [%s]\n", cpunum_get_active(), vector, message));
 	}
 
 	#ifdef USE_SH2DRC

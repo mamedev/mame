@@ -122,7 +122,7 @@ INLINE void desc_free(drcfe_state *drcfe, opcode_desc *desc)
     drcfe_init - initializate the drcfe state
 -------------------------------------------------*/
 
-drcfe_state *drcfe_init(const drcfe_config *config, void *param)
+drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, void *param)
 {
 	drcfe_state *drcfe;
 
@@ -142,14 +142,14 @@ drcfe_state *drcfe_init(const drcfe_config *config, void *param)
 	drcfe->param = param;
 
 	/* initialize the state */
-	drcfe->pageshift = activecpu_page_shift(ADDRESS_SPACE_PROGRAM);
-	drcfe->translate = (cpu_translate_func)activecpu_get_info_fct(CPUINFO_PTR_TRANSLATE);
+	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
+	drcfe->translate = (cpu_translate_func)cpu_get_info_fct(cpu, CPUINFO_PTR_TRANSLATE);
 #ifdef LSB_FIRST
-	if (activecpu_endianness() == CPU_IS_BE)
+	if (cpu_get_endianness(cpu) == CPU_IS_BE)
 #else
-	if (activecpu_endianness() == CPU_IS_LE)
+	if (cpu_get_endianness(cpu) == CPU_IS_LE)
 #endif
-		drcfe->codexor = (activecpu_databus_width(ADDRESS_SPACE_PROGRAM) / 8 / activecpu_min_instruction_bytes() - 1) * activecpu_min_instruction_bytes();
+		drcfe->codexor = (cpu_get_databus_width(cpu, ADDRESS_SPACE_PROGRAM) / 8 / cpu_get_min_opcode_bytes(cpu) - 1) * cpu_get_min_opcode_bytes(cpu);
 
 	return drcfe;
 }

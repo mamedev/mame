@@ -86,7 +86,7 @@ static WRITE16_HANDLER(main_w)
 static READ16_HANDLER(main_r)
 {
 	if(offset>0x502d/2 && offset<0x56c0/2)
-		logerror("R %x @%x\n",offset*2,activecpu_get_pc());
+		logerror("R %x @%x\n",offset*2,cpu_get_pc(machine->activecpu));
 	return mainram[offset];
 }
 

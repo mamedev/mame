@@ -218,7 +218,7 @@ static WRITE8_HANDLER( shdancbl_bankctrl_w )
 			break;
 		default:
 			shdancbl_soundbank_ptr = NULL;
-			logerror("Invalid bank setting %02X (%04X)\n", data, activecpu_get_pc());
+			logerror("Invalid bank setting %02X (%04X)\n", data, cpu_get_pc(machine->activecpu));
 			break;
 	}
 }
@@ -545,11 +545,11 @@ static READ16_HANDLER( sys18_io_r )
 				return -1;
 
 			case 0x2000/2: /* Unused */
-				logerror("read video control latch %06X (%06X)\n", offset, activecpu_get_pc());
+				logerror("read video control latch %06X (%06X)\n", offset, cpu_get_pc(machine->activecpu));
 				return -1;
 
 			case 0x3000/2: /* Expansion connector */
-				logerror("read expansion area %06X (%06X)\n", offset, activecpu_get_pc());
+				logerror("read expansion area %06X (%06X)\n", offset, cpu_get_pc(machine->activecpu));
 				return -1;
 		}
 	}
@@ -617,11 +617,11 @@ static WRITE16_HANDLER( sys18_io_w )
 				break;
 
 			case 0x2000/2: /* Video control latch */
-				logerror("write video control latch %06X = %04X (%06X)\n", offset, data, activecpu_get_pc());
+				logerror("write video control latch %06X = %04X (%06X)\n", offset, data, cpu_get_pc(machine->activecpu));
 				break;
 
 			case 0x3000/2: /* Expansion connector */
-//              logerror("write expansion area %06X = %04X (%06X)\n", offset, data, activecpu_get_pc());
+//              logerror("write expansion area %06X = %04X (%06X)\n", offset, data, cpu_get_pc(machine->activecpu));
 				break;
 		}
 	}
@@ -738,7 +738,7 @@ static MACHINE_RESET( shdancbl )
 }
 
 static READ16_HANDLER( shdancbl_skip_r ){
-	if (activecpu_get_pc()==0x2f76) {cpu_spinuntil_int(); return 0xffff;}
+	if (cpu_get_pc(machine->activecpu)==0x2f76) {cpu_spinuntil_int(); return 0xffff;}
 	return sys16_workingram[0];
 }
 
@@ -771,7 +771,7 @@ static DRIVER_INIT( shdancbl )
 /***************************************************************************/
 
 static READ16_HANDLER( mwalkbl_skip_r ){
-	if (activecpu_get_pc()==0x308a) {cpu_spinuntil_int(); return 0xffff;}
+	if (cpu_get_pc(machine->activecpu)==0x308a) {cpu_spinuntil_int(); return 0xffff;}
 	return sys16_workingram[0x202c/2];
 }
 

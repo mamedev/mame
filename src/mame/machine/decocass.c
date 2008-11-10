@@ -103,7 +103,7 @@ WRITE8_HANDLER( decocass_coin_counter_w )
 
 WRITE8_HANDLER( decocass_sound_command_w )
 {
-	LOG(2,("CPU #%d sound command -> $%02x\n", cpu_getactivecpu(), data));
+	LOG(2,("CPU #%d sound command -> $%02x\n", cpunum_get_active(), data));
 	soundlatch_w(machine,0,data);
 	decocass_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
@@ -114,20 +114,20 @@ WRITE8_HANDLER( decocass_sound_command_w )
 READ8_HANDLER( decocass_sound_data_r )
 {
 	UINT8 data = soundlatch2_r(machine, 0);
-	LOG(2,("CPU #%d sound data    <- $%02x\n", cpu_getactivecpu(), data));
+	LOG(2,("CPU #%d sound data    <- $%02x\n", cpunum_get_active(), data));
 	return data;
 }
 
 READ8_HANDLER( decocass_sound_ack_r )
 {
 	UINT8 data = decocass_sound_ack;	/* D6+D7 */
-	LOG(4,("CPU #%d sound ack     <- $%02x\n", cpu_getactivecpu(), data));
+	LOG(4,("CPU #%d sound ack     <- $%02x\n", cpunum_get_active(), data));
 	return data;
 }
 
 WRITE8_HANDLER( decocass_sound_data_w )
 {
-	LOG(2,("CPU #%d sound data    -> $%02x\n", cpu_getactivecpu(), data));
+	LOG(2,("CPU #%d sound data    -> $%02x\n", cpunum_get_active(), data));
 	soundlatch2_w(machine, 0, data);
 	decocass_sound_ack |= 0x40;
 }
@@ -135,7 +135,7 @@ WRITE8_HANDLER( decocass_sound_data_w )
 READ8_HANDLER( decocass_sound_command_r )
 {
 	UINT8 data = soundlatch_r(machine, 0);
-	LOG(4,("CPU #%d sound command <- $%02x\n", cpu_getactivecpu(), data));
+	LOG(4,("CPU #%d sound command <- $%02x\n", cpunum_get_active(), data));
 	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, CLEAR_LINE);
 	decocass_sound_ack &= ~0x80;
 	return data;
@@ -148,14 +148,14 @@ static TIMER_CALLBACK( decocass_sound_nmi_pulse )
 
 WRITE8_HANDLER( decocass_sound_nmi_enable_w )
 {
-	LOG(2,("CPU #%d sound NMI enb -> $%02x\n", cpu_getactivecpu(), data));
+	LOG(2,("CPU #%d sound NMI enb -> $%02x\n", cpunum_get_active(), data));
 	timer_adjust_periodic(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
 }
 
 READ8_HANDLER( decocass_sound_nmi_enable_r )
 {
 	UINT8 data = 0xff;
-	LOG(2,("CPU #%d sound NMI enb <- $%02x\n", cpu_getactivecpu(), data));
+	LOG(2,("CPU #%d sound NMI enb <- $%02x\n", cpunum_get_active(), data));
 	timer_adjust_periodic(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
 	return data;
 }
@@ -163,14 +163,14 @@ READ8_HANDLER( decocass_sound_nmi_enable_r )
 READ8_HANDLER( decocass_sound_data_ack_reset_r )
 {
 	UINT8 data = 0xff;
-	LOG(2,("CPU #%d sound ack rst <- $%02x\n", cpu_getactivecpu(), data));
+	LOG(2,("CPU #%d sound ack rst <- $%02x\n", cpunum_get_active(), data));
 	decocass_sound_ack &= ~0x40;
 	return data;
 }
 
 WRITE8_HANDLER( decocass_sound_data_ack_reset_w )
 {
-	LOG(2,("CPU #%d sound ack rst -> $%02x\n", cpu_getactivecpu(), data));
+	LOG(2,("CPU #%d sound ack rst -> $%02x\n", cpunum_get_active(), data));
 	decocass_sound_ack &= ~0x40;
 }
 
@@ -280,7 +280,7 @@ READ8_HANDLER( decocass_input_r )
 
 WRITE8_HANDLER( decocass_reset_w )
 {
-	LOG(1,("%9.7f 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+	LOG(1,("%9.7f 6502-PC: %04x decocass_reset_w(%02x): $%02x\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 	decocass_reset = data;
 
 	/* CPU #1 active hight reset */
@@ -593,13 +593,13 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_STAT);
+			data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
 		else
 			data = 0xff;
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -623,7 +623,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_DATA);
+			data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
 		else
 			data = 0xff;
 
@@ -647,7 +647,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_3_inv_2_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_latch_26_pass_3_inv_2_r(%02x): $%02x\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -672,13 +672,13 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_STAT);
+			data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
 		else
 			data = 0xff;
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x <- (%s %s)\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -702,7 +702,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_DATA);
+			data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
 		else
 			data = 0xff;
 
@@ -726,7 +726,7 @@ static READ8_HANDLER( decocass_type1_pass_136_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_pass_136_r(%02x): $%02x\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -751,13 +751,13 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_STAT);
+			data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
 		else
 			data = 0xff;
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -781,7 +781,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_DATA);
+			data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
 		else
 			data = 0xff;
 
@@ -805,7 +805,7 @@ static READ8_HANDLER( decocass_type1_latch_27_pass_3_inv_2_r )
 			(((latch1 >> MAP7(type1_inmap)) & 1)	   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_latch_27_pass_3_inv_2_r(%02x): $%02x\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -830,13 +830,13 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_STAT);
+			data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
 		else
 			data = 0xff;
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x <- (%s %s)\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -860,7 +860,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_DATA);
+			data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
 		else
 			data = 0xff;
 
@@ -884,7 +884,7 @@ static READ8_HANDLER( decocass_type1_latch_26_pass_5_inv_2_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_latch_26_pass_5_inv_2_r(%02x): $%02x\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -911,13 +911,13 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 	if (1 == (offset & 1))
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_STAT);
+			data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
 		else
 			data = 0xff;
 
 		data = (BIT0(data) << 0) | (BIT1(data) << 1) | 0x7c;
 		LOG(4,("%9.7f 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x <- (%s %s)\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data,
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data,
 			(data & 1) ? "OBF" : "-",
 			(data & 2) ? "IBF" : "-"));
 	}
@@ -941,7 +941,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 		}
 
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, I8X41_DATA);
+			data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
 		else
 			data = 0xff;
 
@@ -965,7 +965,7 @@ static READ8_HANDLER( decocass_type1_latch_16_pass_3_inv_1_r )
 			(((prom[promaddr] >> 4) & 1)			   << MAP7(type1_outmap));
 
 		LOG(3,("%9.7f 6502-PC: %04x decocass_type1_latch_16_pass_3_inv_1_r(%02x): $%02x\n",
-			attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 
 		latch1 = save;		/* latch the data for the next A0 == 0 read */
 	}
@@ -994,7 +994,7 @@ static READ8_HANDLER( decocass_type2_r )
 		{
 			UINT8 *prom = memory_region(machine, "user1");
 			data = prom[256 * type2_d2_latch + type2_promaddr];
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, 256 * type2_d2_latch + type2_promaddr));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- prom[%03x]\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, 256 * type2_d2_latch + type2_promaddr));
 		}
 		else
 		{
@@ -1004,11 +1004,11 @@ static READ8_HANDLER( decocass_type2_r )
 	else
 	{
 		if (0 == (offset & E5XX_MASK))
-			data = cpunum_get_reg(2, offset & 1 ? I8X41_STAT : I8X41_DATA);
+			data = cpu_get_reg(machine->cpu[2], offset & 1 ? I8X41_STAT : I8X41_DATA);
 		else
 			data = offset & 0xff;
 
-		LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- 8041-%s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "STATUS" : "DATA"));
+		LOG(3,("%9.7f 6502-PC: %04x decocass_type2_r(%02x): $%02x <- 8041-%s\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, offset & 1 ? "STATUS" : "DATA"));
 	}
 	return data;
 }
@@ -1019,18 +1019,18 @@ static WRITE8_HANDLER( decocass_type2_w )
 	{
 		if (1 == (offset & 1))
 		{
-			LOG(4,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM+D2 latch", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM+D2 latch", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 		}
 		else
 		{
 			type2_promaddr = data;
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM addr $%02x\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type2_promaddr));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> set PROM addr $%02x\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, type2_promaddr));
 			return;
 		}
 	}
 	else
 	{
-		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s ", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041 DATA"));
+		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s ", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, offset & 1 ? "8041-CMND" : "8041 DATA"));
 	}
 	if (1 == (offset & 1))
 	{
@@ -1041,7 +1041,7 @@ static WRITE8_HANDLER( decocass_type2_w )
 			LOG(3,("PROM:%s D2:%d", type2_xx_latch ? "on" : "off", type2_d2_latch));
 		}
 	}
-	cpunum_set_reg(2, offset & 1 ? I8X41_CMND : I8X41_DATA, data);
+	cpu_set_reg(machine->cpu[2], offset & 1 ? I8X41_CMND : I8X41_DATA, data);
 
 #ifdef MAME_DEBUG
 	decocass_fno(offset, data);
@@ -1074,7 +1074,7 @@ static READ8_HANDLER( decocass_type3_r )
 		{
 			UINT8 *prom = memory_region(machine, "user1");
 			data = prom[type3_ctrs];
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type3_ctrs));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- prom[$%03x]\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, type3_ctrs));
 			if (++type3_ctrs == 4096)
 				type3_ctrs = 0;
 		}
@@ -1082,13 +1082,13 @@ static READ8_HANDLER( decocass_type3_r )
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				data = cpunum_get_reg(2, I8X41_STAT);
-				LOG(4,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+				data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
+				LOG(4,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+				LOG(4,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 			}
 		}
 	}
@@ -1097,13 +1097,13 @@ static READ8_HANDLER( decocass_type3_r )
 		if (1 == type3_pal_19)
 		{
 			save = data = 0xff;    /* open data bus? */
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x <- open bus", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 		}
 		else
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				save = cpunum_get_reg(2, I8X41_DATA);
+				save = cpu_get_reg(machine->cpu[2], I8X41_DATA);
 				switch (type3_swap)
 				{
 				case TYPE3_SWAP_01:
@@ -1228,7 +1228,7 @@ static READ8_HANDLER( decocass_type3_r )
 						(BIT7(save) << 7);
 				}
 				type3_d0_latch = save & 1;
-				LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- 8041-DATA\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
@@ -1242,7 +1242,7 @@ static READ8_HANDLER( decocass_type3_r )
 					(BIT5(save) << 5) |
 					(BIT6(save) << 7) |
 					(BIT7(save) << 6);
-				LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+				LOG(3,("%9.7f 6502-PC: %04x decocass_type3_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, (data >= 32) ? data : '.'));
 				type3_d0_latch = save & 1;
 			}
 		}
@@ -1258,7 +1258,7 @@ static WRITE8_HANDLER( decocass_type3_w )
 		if (1 == type3_pal_19)
 		{
 			type3_ctrs = data << 4;
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, "LDCTRS"));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, "LDCTRS"));
 			return;
 		}
 		else
@@ -1270,12 +1270,12 @@ static WRITE8_HANDLER( decocass_type3_w )
 		if (1 == type3_pal_19)
 		{
 			/* write nowhere?? */
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, "nowhere?"));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, "nowhere?"));
 			return;
 		}
 	}
-	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-	cpunum_set_reg(2, offset & 1 ? I8X41_CMND : I8X41_DATA, data);
+	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	cpu_set_reg(machine->cpu[2], offset & 1 ? I8X41_CMND : I8X41_DATA, data);
 }
 
 /***************************************************************************
@@ -1298,13 +1298,13 @@ static READ8_HANDLER( decocass_type4_r )
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = cpunum_get_reg(2, I8X41_STAT);
-			LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
+			LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 		}
 	}
 	else
@@ -1314,20 +1314,20 @@ static READ8_HANDLER( decocass_type4_r )
 			UINT8 *prom = memory_region(machine, "user1");
 
 			data = prom[type4_ctrs];
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.', type4_ctrs));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- PROM[%04x]\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, (data >= 32) ? data : '.', type4_ctrs));
 			type4_ctrs = (type4_ctrs+1) & 0x7fff;
 		}
 		else
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				data = cpunum_get_reg(2, I8X41_DATA);
-				LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+				data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
+				LOG(3,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+				LOG(4,("%9.7f 6502-PC: %04x decocass_type4_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 			}
 		}
 	}
@@ -1342,7 +1342,7 @@ static WRITE8_HANDLER( decocass_type4_w )
 		if (1 == type4_latch)
 		{
 			type4_ctrs = (type4_ctrs & 0x00ff) | ((data & 0x7f) << 8);
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type4_ctrs));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS MSB (%04x)\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, type4_ctrs));
 			return;
 		}
 		else
@@ -1356,12 +1356,12 @@ static WRITE8_HANDLER( decocass_type4_w )
 		if (type4_latch)
 		{
 			type4_ctrs = (type4_ctrs & 0xff00) | data;
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, type4_ctrs));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> CTRS LSB (%04x)\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, type4_ctrs));
 			return;
 		}
 	}
-	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-	cpunum_set_reg(2, offset & 1 ? I8X41_CMND : I8X41_DATA, data);
+	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	cpu_set_reg(machine->cpu[2], offset & 1 ? I8X41_CMND : I8X41_DATA, data);
 }
 
 /***************************************************************************
@@ -1381,13 +1381,13 @@ static READ8_HANDLER( decocass_type5_r )
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = cpunum_get_reg(2, I8X41_STAT);
-			LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
+			LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 		}
 	}
 	else
@@ -1395,19 +1395,19 @@ static READ8_HANDLER( decocass_type5_r )
 		if (type5_latch)
 		{
 			data = 0x55;	/* Only a fixed value? It looks like this is all we need to do */
-			LOG(3,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- fixed value???\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- fixed value???\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
 		{
 			if (0 == (offset & E5XX_MASK))
 			{
-				data = cpunum_get_reg(2, I8X41_DATA);
-				LOG(3,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+				data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
+				LOG(3,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, (data >= 32) ? data : '.'));
 			}
 			else
 			{
 				data = 0xff;	/* open data bus? */
-				LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+				LOG(4,("%9.7f 6502-PC: %04x decocass_type5_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 			}
 		}
 	}
@@ -1421,7 +1421,7 @@ static WRITE8_HANDLER( decocass_type5_w )
 	{
 		if (1 == type5_latch)
 		{
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, "latch #2??"));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, "latch #2??"));
 			return;
 		}
 		else
@@ -1433,12 +1433,12 @@ static WRITE8_HANDLER( decocass_type5_w )
 		if (type5_latch)
 		{
 			/* write nowhere?? */
-			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, "nowhere?"));
+			LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, "nowhere?"));
 			return;
 		}
 	}
-	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-	cpunum_set_reg(2, offset & 1 ? I8X41_CMND : I8X41_DATA, data);
+	LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+	cpu_set_reg(machine->cpu[2], offset & 1 ? I8X41_CMND : I8X41_DATA, data);
 }
 
 /***************************************************************************
@@ -1457,26 +1457,26 @@ static READ8_HANDLER( decocass_nodong_r )
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = cpunum_get_reg(2, I8X41_STAT);
-			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
+			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- 8041 STATUS\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 		}
 	}
 	else
 	{
 		if (0 == (offset & E5XX_MASK))
 		{
-			data = cpunum_get_reg(2, I8X41_DATA);
-			LOG(3,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, (data >= 32) ? data : '.'));
+			data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
+			LOG(3,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x '%c' <- open bus (D0 replaced with latch)\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, (data >= 32) ? data : '.'));
 		}
 		else
 		{
 			data = 0xff;	/* open data bus? */
-			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+			LOG(4,("%9.7f 6502-PC: %04x decocass_nodong_r(%02x): $%02x <- open bus\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 		}
 	}
 
@@ -1508,7 +1508,7 @@ READ8_HANDLER( decocass_e5xx_r )
 
 		LOG(4,("%9.7f 6502-PC: %04x decocass_e5xx_r(%02x): $%02x <- STATUS (%s%s%s%s%s%s%s%s)\n",
 			attotime_to_double(timer_get_time()),
-			activecpu_get_previouspc(),
+			cpu_get_previouspc(machine->activecpu),
 			offset, data,
 			data & 0x01 ? "" : "REQ/",
 			data & 0x02 ? "" : " FNO/",
@@ -1539,15 +1539,15 @@ WRITE8_HANDLER( decocass_e5xx_w )
 
 	if (0 == (offset & E5XX_MASK))
 	{
-		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
-		cpunum_set_reg(2, offset & 1 ? I8X41_CMND : I8X41_DATA, data);
+		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> %s\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data, offset & 1 ? "8041-CMND" : "8041-DATA"));
+		cpu_set_reg(machine->cpu[2], offset & 1 ? I8X41_CMND : I8X41_DATA, data);
 #ifdef MAME_DEBUG
 		decocass_fno(offset, data);
 #endif
 	}
 	else
 	{
-		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), offset, data));
+		LOG(3,("%9.7f 6502-PC: %04x decocass_e5xx_w(%02x): $%02x -> dongle\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(machine->activecpu), offset, data));
 	}
 }
 
@@ -1995,7 +1995,7 @@ WRITE8_HANDLER( i8041_p1_w )
 	{
 		LOG(4,("%9.7f 8041-PC: %03x i8041_p1_w: $%02x (%s%s%s%s%s%s%s%s)\n",
 			attotime_to_double(timer_get_time()),
-			activecpu_get_previouspc(),
+			cpu_get_previouspc(machine->activecpu),
 			data,
 			data & 0x01 ? "" : "DATA-WRT",
 			data & 0x02 ? "" : " DATA-CLK",
@@ -2087,7 +2087,7 @@ READ8_HANDLER( i8041_p1_r )
 	{
 		LOG(4,("%9.7f 8041-PC: %03x i8041_p1_r: $%02x (%s%s%s%s%s%s%s%s)\n",
 			attotime_to_double(timer_get_time()),
-			activecpu_get_previouspc(),
+			cpu_get_previouspc(machine->activecpu),
 			data,
 			data & 0x01 ? "" : "DATA-WRT",
 			data & 0x02 ? "" : " DATA-CLK",
@@ -2110,7 +2110,7 @@ WRITE8_HANDLER( i8041_p2_w )
 	{
 		LOG(4,("%9.7f 8041-PC: %03x i8041_p2_w: $%02x (%s%s%s%s%s%s%s%s)\n",
 			attotime_to_double(timer_get_time()),
-			activecpu_get_previouspc(),
+			cpu_get_previouspc(machine->activecpu),
 			data,
 			data & 0x01 ? "" : "FNO/",
 			data & 0x02 ? "" : " EOT/",
@@ -2138,7 +2138,7 @@ READ8_HANDLER( i8041_p2_r )
 	{
 		LOG(4,("%9.7f 8041-PC: %03x i8041_p2_r: $%02x (%s%s%s%s%s%s%s%s)\n",
 			attotime_to_double(timer_get_time()),
-			activecpu_get_previouspc(),
+			cpu_get_previouspc(machine->activecpu),
 			data,
 			data & 0x01 ? "" : "FNO/",
 			data & 0x02 ? "" : " EOT/",

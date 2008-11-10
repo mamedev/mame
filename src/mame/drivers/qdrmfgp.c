@@ -247,10 +247,10 @@ static READ16_DEVICE_HANDLER( gp2_ide_std_r )
 	{
 		if (offset == 0x07)
 		{
-			switch (activecpu_get_previouspc())
+			switch (cpu_get_previouspc(device->machine->activecpu))
 			{
 				case 0xdb4c:
-					if ((workram[0x5fa4/2] - activecpu_get_reg(M68K_D0)) <= 0x10)
+					if ((workram[0x5fa4/2] - cpu_get_reg(device->machine->activecpu, M68K_D0)) <= 0x10)
 						gp2_irq_control = 1;
 					break;
 				case 0xdec2:

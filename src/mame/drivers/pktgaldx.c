@@ -127,7 +127,7 @@ static WRITE16_HANDLER( paletteram16_xRGB_w )
 
 static READ16_HANDLER( pckgaldx_protection_r )
 {
-	logerror("pckgaldx_protection_r address %06x\n",activecpu_get_pc());
+	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(machine->activecpu));
 	return -1;
 }
 

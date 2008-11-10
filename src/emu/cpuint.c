@@ -126,7 +126,7 @@ void cpuint_init(running_machine *machine)
  *
  *************************************/
 
-void cpuint_reset(void)
+void cpuint_reset(running_machine *machine)
 {
 	int cpunum, line;
 
@@ -134,7 +134,7 @@ void cpuint_reset(void)
 	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
 		for (line = 0; line < MAX_INPUT_LINES; line++)
 		{
-			interrupt_vector[cpunum][line] = cpunum_default_irq_vector(cpunum);
+			interrupt_vector[cpunum][line] = cpu_get_default_irq_vector(machine->cpu[cpunum]);
 			input_event_index[cpunum][line] = 0;
 		}
 }
@@ -161,7 +161,7 @@ static TIMER_CALLBACK( cpunum_empty_event_queue )
 	int i;
 
 	/* swap to the CPU's context */
-	cpuintrf_push_context(cpunum);
+	cpu_push_context(machine->cpu[cpunum]);
 
 	/* loop over all events */
 	for (i = 0; i < input_event_index[cpunum][line]; i++)
@@ -187,7 +187,7 @@ static TIMER_CALLBACK( cpunum_empty_event_queue )
 				/* if we're clearing the line that was previously asserted, or if we're just */
 				/* pulsing the line, reset the CPU */
 				if ((state == CLEAR_LINE && cpunum_is_suspended(cpunum, SUSPEND_REASON_RESET)) || state == PULSE_LINE)
-					cpunum_reset(cpunum);
+					cpu_reset(machine->cpu[cpunum]);
 
 				/* if we're clearing the line, make sure the CPU is not halted */
 				cpunum_resume(cpunum, SUSPEND_REASON_RESET);
@@ -215,17 +215,17 @@ static TIMER_CALLBACK( cpunum_empty_event_queue )
 				case PULSE_LINE:
 					/* temporary: PULSE_LINE only makes sense for NMI lines on Z80 */
 					assert(machine->config->cpu[cpunum].type != CPU_Z80 || line == INPUT_LINE_NMI);
-					activecpu_set_input_line(line, INTERNAL_ASSERT_LINE);
-					activecpu_set_input_line(line, INTERNAL_CLEAR_LINE);
+					cpu_set_info_int(machine->activecpu, CPUINFO_INT_INPUT_STATE + line, ASSERT_LINE);
+					cpu_set_info_int(machine->activecpu, CPUINFO_INT_INPUT_STATE + line, CLEAR_LINE);
 					break;
 
 				case HOLD_LINE:
 				case ASSERT_LINE:
-					activecpu_set_input_line(line, INTERNAL_ASSERT_LINE);
+					cpu_set_info_int(machine->activecpu, CPUINFO_INT_INPUT_STATE + line, ASSERT_LINE);
 					break;
 
 				case CLEAR_LINE:
-					activecpu_set_input_line(line, INTERNAL_CLEAR_LINE);
+					cpu_set_info_int(machine->activecpu, CPUINFO_INT_INPUT_STATE + line, CLEAR_LINE);
 					break;
 
 				default:
@@ -239,7 +239,7 @@ static TIMER_CALLBACK( cpunum_empty_event_queue )
 	}
 
 	/* swap back */
-	cpuintrf_pop_context();
+	cpu_pop_context();
 
 	/* reset counter */
 	input_event_index[cpunum][line] = 0;
@@ -409,7 +409,7 @@ INLINE int generic_irq_callback(running_machine *machine, int cpunum, int line)
 	if (input_line_state[cpunum][line] == HOLD_LINE)
 	{
 		LOG(("->set_irq_line(%d,%d,%d)\n", cpunum, line, CLEAR_LINE));
-		activecpu_set_input_line(line, INTERNAL_CLEAR_LINE);
+		cpu_set_info_int(machine->activecpu, CPUINFO_INT_INPUT_STATE + line, CLEAR_LINE);
 		input_line_state[cpunum][line] = CLEAR_LINE;
 	}
 

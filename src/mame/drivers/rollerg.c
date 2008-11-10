@@ -27,7 +27,7 @@ static int readzoomroms;
 
 static WRITE8_HANDLER( rollerg_0010_w )
 {
-logerror("%04x: write %02x to 0010\n",activecpu_get_pc(),data);
+logerror("%04x: write %02x to 0010\n",cpu_get_pc(machine->activecpu),data);
 
 	/* bits 0/1 are coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -343,7 +343,7 @@ static void rollerg_banking( int lines )
 
 static MACHINE_RESET( rollerg )
 {
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)rollerg_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)rollerg_banking);
 
 	readzoomroms = 0;
 }

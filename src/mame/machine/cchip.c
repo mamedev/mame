@@ -98,7 +98,7 @@ WRITE16_HANDLER( cchip1_ram_w )
 	}
 	else
 	{
-logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",activecpu_get_pc(),current_bank,offset,data);
+logerror("cchip1_w pc: %06x bank %02x offset %04x: %02x\n",cpu_get_pc(machine->activecpu),current_bank,offset,data);
 	}
 }
 
@@ -163,7 +163,7 @@ UINT16 *cchip2_ram;
 
 WRITE16_HANDLER( cchip2_word_w )
 {
-    logerror("cchip2_w pc: %06x offset %04x: %02x\n", activecpu_get_pc(), offset, data);
+    logerror("cchip2_w pc: %06x offset %04x: %02x\n", cpu_get_pc(machine->activecpu), offset, data);
 
     COMBINE_DATA(&cchip2_ram[offset]);
 }

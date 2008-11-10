@@ -983,7 +983,7 @@ static int sprint_arg(char *buffer, UINT32 pc, const char *pre, const e_mode mod
 		case MODE_R16D8:	return	sprintf( buffer, "%s%s%c$%02X",		pre,	r16_names[r],	(rb&0x80)?'-':'+',	(rb&0x80)?((rb^0xff)+1):rb	);
 
 		default:
-			fatalerror("%04x: unimplemented addr mode = %d\n",activecpu_get_pc(),mode);
+			fatalerror("%04x: unimplemented addr mode = %d\n",cpu_get_pc(Machine->activecpu),mode);
 	}
 
 	return 0;
@@ -1020,7 +1020,7 @@ INLINE UINT16 r8( const e_r r )
 		case L:	return T90.hl.b.l;
 
 		default:
-			fatalerror("%04x: unimplemented r8 register index = %d\n",activecpu_get_pc(),r);
+			fatalerror("%04x: unimplemented r8 register index = %d\n",cpu_get_pc(Machine->activecpu),r);
 	}
 }
 
@@ -1037,7 +1037,7 @@ INLINE void w8( const e_r r, UINT16 value )
 		case L:	T90.hl.b.l = value;	return;
 
 		default:
-			fatalerror("%04x: unimplemented w8 register index = %d\n",activecpu_get_pc(),r);
+			fatalerror("%04x: unimplemented w8 register index = %d\n",cpu_get_pc(Machine->activecpu),r);
 	}
 }
 
@@ -1058,7 +1058,7 @@ case AF2:	return (T90.af2.w.l & (~IF)) | (T90.af.w.l & IF);
 		case PC:	return T90.pc.w.l;
 
 		default:
-			fatalerror("%04x: unimplemented r16 register index = %d\n",activecpu_get_pc(),r);
+			fatalerror("%04x: unimplemented r16 register index = %d\n",cpu_get_pc(Machine->activecpu),r);
 	}
 }
 
@@ -1077,7 +1077,7 @@ INLINE void w16( const e_r r, UINT16 value )
 		case PC:	change_pc( T90.pc.d = value );	return;
 
 		default:
-			fatalerror("%04x: unimplemented w16 register index = %d\n",activecpu_get_pc(),r);
+			fatalerror("%04x: unimplemented w16 register index = %d\n",cpu_get_pc(Machine->activecpu),r);
 	}
 }
 
@@ -1105,7 +1105,7 @@ INLINE UINT8 Read##N##_8(void)	{ \
 			} \
 			return RM8((UINT16)(r16(r##N) + (INT8)r##N##b)); \
 		default: \
-			fatalerror("%04x: unimplemented Read%d_8 mode = %d\n",activecpu_get_pc(),N,mode##N); \
+			fatalerror("%04x: unimplemented Read%d_8 mode = %d\n",cpu_get_pc(Machine->activecpu),N,mode##N); \
 	} \
 	return 0; \
 } \
@@ -1130,7 +1130,7 @@ INLINE UINT16 Read##N##_16(void)	{ \
 			} \
 			return RM16((UINT16)(r16(r##N) + (INT8)r##N##b)); \
 		default: \
-			fatalerror("%04x: unimplemented Read%d_16 modes = %d\n",activecpu_get_pc(),N,mode##N); \
+			fatalerror("%04x: unimplemented Read%d_16 modes = %d\n",cpu_get_pc(Machine->activecpu),N,mode##N); \
 	} \
 	return 0; \
 }
@@ -1156,7 +1156,7 @@ INLINE void Write##N##_8( UINT8 value )	{ \
 			} \
 			WM8((UINT16)(r16(r##N) + (INT8)r##N##b), value);	return; \
 		default: \
-			fatalerror("%04x: unimplemented Write%d_8 mode = %d\n",activecpu_get_pc(),N,mode##N); \
+			fatalerror("%04x: unimplemented Write%d_8 mode = %d\n",cpu_get_pc(Machine->activecpu),N,mode##N); \
 	} \
 } \
 INLINE void Write##N##_16( UINT16 value ) \
@@ -1178,7 +1178,7 @@ INLINE void Write##N##_16( UINT16 value ) \
 			} \
 			WM16((UINT16)(r16(r##N) + (INT8)r##N##b), value);	return; \
 		default: \
-			fatalerror("%04x: unimplemented Write%d_16 mode = %d\n",activecpu_get_pc(),N,mode##N); \
+			fatalerror("%04x: unimplemented Write%d_16 mode = %d\n",cpu_get_pc(Machine->activecpu),N,mode##N); \
 	} \
 }
 
@@ -1209,7 +1209,7 @@ INLINE int Test( UINT8 cond )
 		case NZ:	return !(F & ZF);
 		case NC:	return !(F & CF);
 		default:
-			fatalerror("%04x: unimplemented condition = %d\n",activecpu_get_pc(),cond);
+			fatalerror("%04x: unimplemented condition = %d\n",cpu_get_pc(Machine->activecpu),cond);
 	}
 	return 0;
 }
@@ -1331,7 +1331,7 @@ static CPU_EXECUTE( t90 )
 	do
 	{
 		T90.prvpc.d = T90.pc.d;
-		debugger_instruction_hook(Machine, T90.pc.d);
+		debugger_instruction_hook(device->machine, T90.pc.d);
 
 		check_interrupts();
 
@@ -1948,7 +1948,7 @@ static CPU_EXECUTE( t90 )
 				break;
 
 			default:
-				fatalerror("%04x: unimplemented opcode, op=%02x\n",activecpu_get_pc(),op);
+				fatalerror("%04x: unimplemented opcode, op=%02x\n",cpu_get_pc(device),op);
 		}
 
 		if ( op != EI )
@@ -2320,22 +2320,22 @@ static void t90_start_timer(int i)
 			// 16-bit mode
 			if (i & 1)
 			{
-				logerror("%04X: CPU Timer %d clocked by Timer %d overflow signal\n", activecpu_get_pc(), i,i-1);
+				logerror("%04X: CPU Timer %d clocked by Timer %d overflow signal\n", cpu_get_pc(Machine->activecpu), i,i-1);
 				return;
 			}
 			break;
 		case 2:
-			logerror("%04X: CPU Timer %d, unsupported PPG mode\n", activecpu_get_pc(), i);
+			logerror("%04X: CPU Timer %d, unsupported PPG mode\n", cpu_get_pc(Machine->activecpu), i);
 			return;
 		case 3:
-			logerror("%04X: CPU Timer %d, unsupported PWM mode\n", activecpu_get_pc(), i);
+			logerror("%04X: CPU Timer %d, unsupported PWM mode\n", cpu_get_pc(Machine->activecpu), i);
 			return;
 	}
 
 	switch((T90.internal_registers[ T90_TCLK - T90_IOBASE ] >> (i * 2)) & 0x03)
 	{
-		case 0:	if (i & 1)	logerror("%04X: CPU Timer %d clocked by Timer %d match signal\n", activecpu_get_pc(), i,i-1);
-				else		logerror("%04X: CPU Timer %d, unsupported TCLK = 0\n", activecpu_get_pc(), i);
+		case 0:	if (i & 1)	logerror("%04X: CPU Timer %d clocked by Timer %d match signal\n", cpu_get_pc(Machine->activecpu), i,i-1);
+				else		logerror("%04X: CPU Timer %d, unsupported TCLK = 0\n", cpu_get_pc(Machine->activecpu), i);
 				return;
 		case 2:	prescaler =  16;	break;
 		case 3:	prescaler = 256;	break;
@@ -2348,7 +2348,7 @@ static void t90_start_timer(int i)
 
 	timer_adjust_periodic(T90.timer[i], period, i, period);
 
-	logerror("%04X: CPU Timer %d started at %lf Hz\n", activecpu_get_pc(), i, 1.0 / attotime_to_double(period));
+	logerror("%04X: CPU Timer %d started at %lf Hz\n", cpu_get_pc(Machine->activecpu), i, 1.0 / attotime_to_double(period));
 }
 
 static void t90_start_timer4(void)
@@ -2362,7 +2362,7 @@ static void t90_start_timer4(void)
 	{
 		case 1:		prescaler =   1;	break;
 		case 2:		prescaler =  16;	break;
-		default:	logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", activecpu_get_pc(),T90.internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03);
+		default:	logerror("%04X: CPU Timer 4, unsupported T4MOD = %d\n", cpu_get_pc(Machine->activecpu),T90.internal_registers[ T90_T4MOD - T90_IOBASE ] & 0x03);
 					return;
 	}
 
@@ -2370,14 +2370,14 @@ static void t90_start_timer4(void)
 
 	timer_adjust_periodic(T90.timer[4], period, 4, period);
 
-	logerror("%04X: CPU Timer 4 started at %lf Hz\n", activecpu_get_pc(), 1.0 / attotime_to_double(period));
+	logerror("%04X: CPU Timer 4 started at %lf Hz\n", cpu_get_pc(Machine->activecpu), 1.0 / attotime_to_double(period));
 }
 
 
 static void t90_stop_timer(int i)
 {
 	timer_adjust_oneshot(T90.timer[i], attotime_never, i);
-	logerror("%04X: CPU Timer %d stopped\n", activecpu_get_pc(), i);
+	logerror("%04X: CPU Timer %d stopped\n", cpu_get_pc(Machine->activecpu), i);
 }
 
 static void t90_stop_timer4(void)
@@ -2655,7 +2655,7 @@ static CPU_INIT( t90 )
 	T90.irq_callback = irqcallback;
 	T90.device = device;
 
-	T90.timer_period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpu_getactivecpu())), 8);
+	T90.timer_period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpunum_get_active())), 8);
 
 	// Reset registers to their initial values
 

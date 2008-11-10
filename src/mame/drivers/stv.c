@@ -459,9 +459,9 @@ static UINT8 stv_SMPC_r8 (running_machine *machine, int offset)
 //  if (offset == 0x33) //country code
 //      return_data = input_port_read(machine, "FAKE");
 
-	if (activecpu_get_pc()==0x060020E6) return_data = 0x10;//???
+	if (cpu_get_pc(machine->activecpu)==0x060020E6) return_data = 0x10;//???
 
-	//if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", cpu_getactivecpu(), activecpu_get_pc(), offset, return_data);
+	//if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), offset, return_data);
 
 
 	return return_data;
@@ -684,7 +684,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 				break;
 			default:
-				if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: undocumented Command %02x\n", cpu_getactivecpu(), activecpu_get_pc(), data);
+				if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: undocumented Command %02x\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), data);
 		}
 
 		// we've processed the command, clear status flag
@@ -871,7 +871,7 @@ static int port_i;
 
 static READ32_HANDLER ( stv_io_r32 )
 {
-//  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", activecpu_get_pc(), offset*4, mem_mask);
+//  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, mem_mask);
 //  popmessage("SEL: %02x MUX: %02x %02x %02x %02x %02x",port_sel,mux_data,ioga[1],ioga[2],ioga[3],ioga[5]);
 
 	switch(offset)
@@ -950,8 +950,8 @@ static READ32_HANDLER ( stv_io_r32 )
 		{
 			case 0x77:
 			{
-				//popmessage("(PC=%06x) offs 5 %04x %02x",activecpu_get_pc(),port_sel,((ioga[5] & 0xff0000) >> 16));
-				logerror("(PC=%06x) offs 5 %04x %02x\n",activecpu_get_pc(),port_sel,((ioga[5] & 0xff0000) >> 16));
+				//popmessage("(PC=%06x) offs 5 %04x %02x",cpu_get_pc(machine->activecpu),port_sel,((ioga[5] & 0xff0000) >> 16));
+				logerror("(PC=%06x) offs 5 %04x %02x\n",cpu_get_pc(machine->activecpu),port_sel,((ioga[5] & 0xff0000) >> 16));
 
 				//stv_workram_h[0x8e830/4] = ((ioga[5] & 0xff0000) >> 16) ^ 0x3;
 				//stv_workram_h[0x8e834/4] = ((ioga[5] & 0xff0000) >> 16) ^ 0x3;
@@ -966,8 +966,8 @@ static READ32_HANDLER ( stv_io_r32 )
 			case 0x60:  return ioga[5];
 			case 0x77:
 			{
-				//popmessage("(PC=%06x) offs 6 %04x %02x",activecpu_get_pc(),port_sel,((ioga[5] & 0xff0000) >> 16));
-				logerror("(PC=%06x) offs 6 %04x %02x\n",activecpu_get_pc(),port_sel,((ioga[5] & 0xff0000) >> 16));
+				//popmessage("(PC=%06x) offs 6 %04x %02x",cpu_get_pc(machine->activecpu),port_sel,((ioga[5] & 0xff0000) >> 16));
+				logerror("(PC=%06x) offs 6 %04x %02x\n",cpu_get_pc(machine->activecpu),port_sel,((ioga[5] & 0xff0000) >> 16));
 				return 0;//sound board status,non-zero = processing
 			}
 			default:
@@ -976,7 +976,7 @@ static READ32_HANDLER ( stv_io_r32 )
 		}
 		break;
 		case 7:
-		if(LOG_IOGA) logerror("(PC %d=%06x) Warning: READ from PORT_AD\n",cpu_getactivecpu(), activecpu_get_pc());
+		if(LOG_IOGA) logerror("(PC %d=%06x) Warning: READ from PORT_AD\n",cpunum_get_active(), cpu_get_pc(machine->activecpu));
 		popmessage("Read from PORT_AD");
 		port_i++;
 		return port_ad[port_i & 7];
@@ -987,7 +987,7 @@ static READ32_HANDLER ( stv_io_r32 )
 
 static WRITE32_HANDLER ( stv_io_w32 )
 {
-//  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+//  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, data, mem_mask);
 
 	switch(offset)
 	{
@@ -1160,7 +1160,7 @@ static READ32_HANDLER( stv_scu_r32 )
 	//}
 	if (offset == 31)
 	{
-		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",activecpu_get_pc());
+		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(machine->activecpu));
 		return stv_scu[offset];
 	}
 	else if ( offset == 35 )
@@ -1170,18 +1170,18 @@ static READ32_HANDLER( stv_scu_r32 )
     }
     else if( offset == 41)
     {
-		logerror("(PC=%08x) IRQ status reg read\n",activecpu_get_pc());
+		logerror("(PC=%08x) IRQ status reg read\n",cpu_get_pc(machine->activecpu));
 		/*TODO:for now we're activating everything here,but we need to return the proper active irqs*/
 		return 0xffffffff;
 	}
 	else if( offset == 50 )
 	{
-		logerror("(PC=%08x) SCU version reg read\n",activecpu_get_pc());
+		logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(machine->activecpu));
 		return 0x00000000;/*SCU Version 0*/
 	}
     else
     {
-    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",activecpu_get_pc(),offset,stv_scu[offset]);
+    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(machine->activecpu),offset,stv_scu[offset]);
     	return stv_scu[offset];
    	}
 }
@@ -1398,7 +1398,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		   stv_scu[40] != 0xffffffff)
 		{
 			if(LOG_SCU) logerror("cpu #%d (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
-			cpu_getactivecpu(), activecpu_get_pc(),
+			cpunum_get_active(), cpu_get_pc(machine->activecpu),
 			stv_scu[offset],
 			stv_scu[offset] & 0x8000 ? 1 : 0, /*A-Bus irq*/
 			stv_scu[offset] & 0x4000 ? 1 : 0, /*<reserved>*/
@@ -1991,17 +1991,17 @@ static WRITE32_HANDLER( stv_scsp_regs_w32 )
  * Enter into Radiant Silver Gun specific menu for a test...                       */
 static WRITE32_HANDLER( minit_w )
 {
-	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
+	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpunum_get_active(), cpu_get_pc(machine->activecpu),data);
 	cpu_boost_interleave(machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
 	cpu_trigger(machine, 1000);
-	cpunum_set_info_int(1, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
+	cpu_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
-	logerror("cpu #%d (PC=%08X) SINIT write = %08x\n",cpu_getactivecpu(), activecpu_get_pc(),data);
+	logerror("cpu #%d (PC=%08X) SINIT write = %08x\n",cpunum_get_active(), cpu_get_pc(machine->activecpu),data);
 	cpu_boost_interleave(machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
 
@@ -2319,7 +2319,7 @@ static WRITE32_HANDLER ( w60ffc44_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc44/4]);
 
-	logerror("cpu #%d (PC=%08X): 60ffc44_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask);
+	logerror("cpu #%d (PC=%08X): 60ffc44_write write = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), data, mem_mask);
 	//sinit_w(offset,data,mem_mask);
 }
 
@@ -2327,7 +2327,7 @@ static WRITE32_HANDLER ( w60ffc48_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc48/4]);
 
-	logerror("cpu #%d (PC=%08X): 60ffc48_write write = %08X & %08X\n", cpu_getactivecpu(), activecpu_get_pc(), data, mem_mask);
+	logerror("cpu #%d (PC=%08X): 60ffc48_write write = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), data, mem_mask);
 	//minit_w(offset,data,mem_mask);
 }
 
@@ -2356,8 +2356,8 @@ DRIVER_INIT ( stv )
 	// do strict overwrite verification - maruchan and rsgun crash after coinup without this.
 	// cottonbm needs strict PCREL
 	// todo: test what games need this and don't turn it on for them...
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
-	cpunum_set_info_int(1, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
+	cpu_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_STRICT_VERIFY|SH2DRC_STRICT_PCREL);
 
 	/* debug .. watch the command buffer rsgun, cottonbm etc. appear to use to communicate between cpus */
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc44, 0x60ffc47, 0, 0, w60ffc44_write );

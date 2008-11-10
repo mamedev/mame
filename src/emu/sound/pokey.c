@@ -853,7 +853,7 @@ static int pokey_register_r(int chip, int offs)
 			}
 		}
 		else
-		logerror("PC %04x: warning - read p[chip] #%d POT%d\n", activecpu_get_pc(), chip, pot);
+		logerror("PC %04x: warning - read p[chip] #%d POT%d\n", cpu_get_pc(Machine->activecpu), chip, pot);
 		break;
 
     case ALLPOT_C:

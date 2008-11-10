@@ -234,7 +234,7 @@ WRITE8_HANDLER( sraider_misc_w )
 			sraider_0x38 = data&0x3f;
 			break;
 		default:
-			mame_printf_debug("(%04X) write to %02X\n",activecpu_get_pc(),offset);
+			mame_printf_debug("(%04X) write to %02X\n",cpu_get_pc(machine->activecpu),offset);
 			break;
 	}
 }

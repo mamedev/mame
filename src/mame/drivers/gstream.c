@@ -478,7 +478,7 @@ ROM_END
 
 static READ32_HANDLER( gstream_speedup_r )
 {
-	if (activecpu_get_pc()==0xc0001592)
+	if (cpu_get_pc(machine->activecpu)==0xc0001592)
 	{
 		activecpu_eat_cycles(50);
 	}

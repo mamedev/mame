@@ -225,7 +225,7 @@ static READ8_HANDLER( bking3_68705_portC_r )
 	int portC_in = 0;
 	if (main_sent) portC_in |= 0x01;
 	if (!mcu_sent) portC_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",activecpu_get_pc(),portC_in);
+//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(machine->activecpu),portC_in);
 	return portC_in;
 }
 #endif

@@ -21,8 +21,8 @@ enum
 	TX0_IO_COMPLETE		/* hack, do not use directly, use tx0_pulse_io_complete instead */
 };
 
-#define tx0_pulse_reset()		cpunum_set_reg(0, TX0_RESET, 0)
-#define tx0_pulse_io_complete()	cpunum_set_reg(0, TX0_IO_COMPLETE, 0)
+#define tx0_pulse_reset()		cpu_set_reg(machine->cpu[0], TX0_RESET, 0)
+#define tx0_pulse_io_complete()	cpu_set_reg(machine->cpu[0], TX0_IO_COMPLETE, 0)
 
 typedef struct _tx0_reset_param_t tx0_reset_param_t;
 struct _tx0_reset_param_t

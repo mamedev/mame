@@ -150,9 +150,9 @@ static STATE_POSTLOAD( cdp1869_state_save_postload )
 
 /* CDP1802 X Register */
 
-static UINT16 cdp1802_get_r_x(void)
+static UINT16 cdp1802_get_r_x(running_machine *machine)
 {
-	return activecpu_get_reg(CDP1802_R0 + activecpu_get_reg(CDP1802_X));
+	return cpu_get_reg(machine->activecpu, CDP1802_R0 + cpu_get_reg(machine->activecpu, CDP1802_X));
 }
 
 /* Palette Initialization */
@@ -383,7 +383,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out4_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x();
+	UINT16 word = cdp1802_get_r_x(device->machine);
 
 	/*
       bit   description
@@ -422,7 +422,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x();
+	UINT16 word = cdp1802_get_r_x(device->machine);
 
 	/*
       bit   description
@@ -479,7 +479,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out6_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x();
+	UINT16 word = cdp1802_get_r_x(device->machine);
 
 	/*
       bit   description
@@ -509,7 +509,7 @@ WRITE8_DEVICE_HANDLER( cdp1869_out7_w )
 {
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
-	UINT16 word = cdp1802_get_r_x();
+	UINT16 word = cdp1802_get_r_x(device->machine);
 
 	/*
       bit   description

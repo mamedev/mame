@@ -80,17 +80,17 @@ static MACHINE_RESET( galpani2 )
 	kaneko16_sprite_yoffs = 0x000;
 }
 
-static void galpani2_write_kaneko(void)
+static void galpani2_write_kaneko(running_machine *machine)
 {
-	cpunum_write_byte(0,0x100000,0x4b);
-	cpunum_write_byte(0,0x100001,0x41);
-	cpunum_write_byte(0,0x100002,0x4e);
-	cpunum_write_byte(0,0x100003,0x45);
-	cpunum_write_byte(0,0x100004,0x4b);
-	cpunum_write_byte(0,0x100005,0x4f);
+	cpu_write_byte(machine->cpu[0],0x100000,0x4b);
+	cpu_write_byte(machine->cpu[0],0x100001,0x41);
+	cpu_write_byte(machine->cpu[0],0x100002,0x4e);
+	cpu_write_byte(machine->cpu[0],0x100003,0x45);
+	cpu_write_byte(machine->cpu[0],0x100004,0x4b);
+	cpu_write_byte(machine->cpu[0],0x100005,0x4f);
 }
 
-void galpani2_mcu_run(void)
+void galpani2_mcu_run(running_machine *machine)
 {
 	int i,x;
 
@@ -99,30 +99,30 @@ void galpani2_mcu_run(void)
 	x  = 0;
 
 	for (i = 0x100000; i < 0x100007; i++)
-		x |= cpunum_read_byte(0,i);
+		x |= cpu_read_byte(machine->cpu[0],i);
 
 	if	( x == 0 )
 	{
-		galpani2_write_kaneko();
-		cpunum_write_byte(1,0x100006,1);
+		galpani2_write_kaneko(machine);
+		cpu_write_byte(machine->cpu[1],0x100006,1);
 		logerror("MCU executes CHECK0\n");
 	}
 }
 
-static void galpani2_mcu_nmi(void)
+static void galpani2_mcu_nmi(running_machine *machine)
 {
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_src, mcu_dst, mcu_size;
 
 	/* "Last Check" */
-	galpani2_write_kaneko();
+	galpani2_write_kaneko(machine);
 
 	for ( mcu_list = 0x100020; mcu_list < (0x100020 + 0x40); mcu_list += 4 )
 	{
-		mcu_command		=	cpunum_read_byte(0, mcu_list + 1 );
+		mcu_command		=	cpu_read_byte(machine->cpu[0], mcu_list + 1 );
 
 		mcu_address		=	0x100000 +
-							(cpunum_read_byte(0, mcu_list + 2)<<8) +
-							(cpunum_read_byte(0, mcu_list + 3)<<0) ;
+							(cpu_read_byte(machine->cpu[0], mcu_list + 2)<<8) +
+							(cpu_read_byte(machine->cpu[0], mcu_list + 3)<<0) ;
 
 		switch (mcu_command)
 		{
@@ -130,47 +130,47 @@ static void galpani2_mcu_nmi(void)
 			break;
 
 		case 0x0a:	// Copy N bytes from RAM1 to RAM2
-			mcu_src		=	(cpunum_read_byte(0, mcu_address + 2)<<8) +
-							(cpunum_read_byte(0, mcu_address + 3)<<0) ;
+			mcu_src		=	(cpu_read_byte(machine->cpu[0], mcu_address + 2)<<8) +
+							(cpu_read_byte(machine->cpu[0], mcu_address + 3)<<0) ;
 
-			mcu_dst		=	(cpunum_read_byte(0, mcu_address + 6)<<8) +
-							(cpunum_read_byte(0, mcu_address + 7)<<0) ;
+			mcu_dst		=	(cpu_read_byte(machine->cpu[0], mcu_address + 6)<<8) +
+							(cpu_read_byte(machine->cpu[0], mcu_address + 7)<<0) ;
 
-			mcu_size	=	(cpunum_read_byte(0, mcu_address + 8)<<8) +
-							(cpunum_read_byte(0, mcu_address + 9)<<0) ;
+			mcu_size	=	(cpu_read_byte(machine->cpu[0], mcu_address + 8)<<8) +
+							(cpu_read_byte(machine->cpu[0], mcu_address + 9)<<0) ;
 
-			logerror("CPU #0 PC %06X : MCU executes command $A, %04X %02X-> %04x\n",activecpu_get_pc(),mcu_src,mcu_size,mcu_dst);
+			logerror("CPU #0 PC %06X : MCU executes command $A, %04X %02X-> %04x\n",cpu_get_pc(machine->activecpu),mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
 				mcu_src &= 0xffff;	mcu_dst &= 0xffff;
-				cpunum_write_byte(1,0x100000 + mcu_dst,cpunum_read_byte(0,0x100000 + mcu_src));
+				cpu_write_byte(machine->cpu[1],0x100000 + mcu_dst,cpu_read_byte(machine->cpu[0],0x100000 + mcu_src));
 				mcu_src ++;			mcu_dst ++;
 			}
 
 			/* Raise a "job done" flag */
-			cpunum_write_byte(0,mcu_address+0,0xff);
-			cpunum_write_byte(0,mcu_address+1,0xff);
+			cpu_write_byte(machine->cpu[0],mcu_address+0,0xff);
+			cpu_write_byte(machine->cpu[0],mcu_address+1,0xff);
 
 			break;
 
 		default:
 			/* Raise a "job done" flag */
-			cpunum_write_byte(0,mcu_address+0,0xff);
-			cpunum_write_byte(0,mcu_address+1,0xff);
+			cpu_write_byte(machine->cpu[0],mcu_address+0,0xff);
+			cpu_write_byte(machine->cpu[0],mcu_address+1,0xff);
 
-			logerror("CPU #0 PC %06X : MCU ERROR, unknown command %02X\n",activecpu_get_pc(),mcu_command);
+			logerror("CPU #0 PC %06X : MCU ERROR, unknown command %02X\n",cpu_get_pc(machine->activecpu),mcu_command);
 		}
 
 		/* Erase command? */
-		cpunum_write_byte(0,mcu_list + 1,0x00);
+		cpu_write_byte(machine->cpu[0],mcu_list + 1,0x00);
 	}
 }
 
 static WRITE16_HANDLER( galpani2_mcu_nmi_w )
 {
 	static UINT16 old = 0;
-	if ( (data & 1) && !(old & 1) )	galpani2_mcu_nmi();
+	if ( (data & 1) && !(old & 1) )	galpani2_mcu_nmi(machine);
 	old = data;
 }
 
@@ -203,7 +203,7 @@ static WRITE16_HANDLER( galpani2_oki_0_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *ROM = memory_region(machine, "oki1");
-		logerror("CPU #0 PC %06X : OKI 0 bank %08X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC %06X : OKI 0 bank %08X\n",cpu_get_pc(machine->activecpu),data);
 		memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 	}
 }
@@ -213,7 +213,7 @@ static WRITE16_HANDLER( galpani2_oki_1_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(1, 0x40000 * (data & 0xf) );
-		logerror("CPU #0 PC %06X : OKI 1 bank %08X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC %06X : OKI 1 bank %08X\n",cpu_get_pc(machine->activecpu),data);
 	}
 }
 

@@ -7,6 +7,7 @@
 ******************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 
@@ -257,19 +258,19 @@ void antic_mode_0_xx(VIDEO *video)
 
 void antic_mode_2_32(VIDEO *video)
 {
-	PREPARE_TXT2(32);
+	PREPARE_TXT2(Machine->cpu[0], 32);
 	REP32(MODE2);
 	POST_TXT(32);
 }
 void antic_mode_2_40(VIDEO *video)
 {
-	PREPARE_TXT2(40);
+	PREPARE_TXT2(Machine->cpu[0], 40);
 	REP40(MODE2);
 	POST_TXT(40);
 }
 void antic_mode_2_48(VIDEO *video)
 {
-	PREPARE_TXT2(48);
+	PREPARE_TXT2(Machine->cpu[0], 48);
 	REP48(MODE2);
 	POST_TXT(48);
 }
@@ -281,19 +282,19 @@ void antic_mode_2_48(VIDEO *video)
 
 void antic_mode_3_32(VIDEO *video)
 {
-	PREPARE_TXT3(32);
+	PREPARE_TXT3(Machine->cpu[0], 32);
 	REP32(MODE3);
 	POST_TXT(32);
 }
 void antic_mode_3_40(VIDEO *video)
 {
-	PREPARE_TXT3(40);
+	PREPARE_TXT3(Machine->cpu[0], 40);
 	REP40(MODE3);
 	POST_TXT(40);
 }
 void antic_mode_3_48(VIDEO *video)
 {
-	PREPARE_TXT3(48);
+	PREPARE_TXT3(Machine->cpu[0], 48);
 	REP48(MODE3);
 	POST_TXT(48);
 }
@@ -305,19 +306,19 @@ void antic_mode_3_48(VIDEO *video)
 
 void antic_mode_4_32(VIDEO *video)
 {
-	PREPARE_TXT45(32,0);
+	PREPARE_TXT45(Machine->cpu[0], 32,0);
 	REP32(MODE4);
 	POST_TXT(32);
 }
 void antic_mode_4_40(VIDEO *video)
 {
-	PREPARE_TXT45(40,0);
+	PREPARE_TXT45(Machine->cpu[0], 40,0);
 	REP40(MODE4);
 	POST_TXT(40);
 }
 void antic_mode_4_48(VIDEO *video)
 {
-	PREPARE_TXT45(48,0);
+	PREPARE_TXT45(Machine->cpu[0], 48,0);
 	REP48(MODE4);
 	POST_TXT(48);
 }
@@ -329,19 +330,19 @@ void antic_mode_4_48(VIDEO *video)
 
 void antic_mode_5_32(VIDEO *video)
 {
-	PREPARE_TXT45(32,1);
+	PREPARE_TXT45(Machine->cpu[0], 32,1);
 	REP32(MODE5);
 	POST_TXT(32);
 }
 void antic_mode_5_40(VIDEO *video)
 {
-	PREPARE_TXT45(40,1);
+	PREPARE_TXT45(Machine->cpu[0], 40,1);
 	REP40(MODE5);
 	POST_TXT(40);
 }
 void antic_mode_5_48(VIDEO *video)
 {
-	PREPARE_TXT45(48,1);
+	PREPARE_TXT45(Machine->cpu[0], 48,1);
 	REP48(MODE5);
 	POST_TXT(48);
 }
@@ -353,19 +354,19 @@ void antic_mode_5_48(VIDEO *video)
 
 void antic_mode_6_32(VIDEO *video)
 {
-	PREPARE_TXT67(16,0);
+	PREPARE_TXT67(Machine->cpu[0], 16,0);
 	REP16(MODE6);
 	POST_TXT(16);
 }
 void antic_mode_6_40(VIDEO *video)
 {
-	PREPARE_TXT67(20,0);
+	PREPARE_TXT67(Machine->cpu[0], 20,0);
 	REP20(MODE6);
 	POST_TXT(20);
 }
 void antic_mode_6_48(VIDEO *video)
 {
-	PREPARE_TXT67(24,0);
+	PREPARE_TXT67(Machine->cpu[0], 24,0);
 	REP24(MODE6);
 	POST_TXT(24);
 }
@@ -377,19 +378,19 @@ void antic_mode_6_48(VIDEO *video)
 
 void antic_mode_7_32(VIDEO *video)
 {
-	PREPARE_TXT67(16,1);
+	PREPARE_TXT67(Machine->cpu[0], 16,1);
 	REP16(MODE7);
 	POST_TXT(16);
 }
 void antic_mode_7_40(VIDEO *video)
 {
-	PREPARE_TXT67(20,1);
+	PREPARE_TXT67(Machine->cpu[0], 20,1);
 	REP20(MODE7);
 	POST_TXT(20);
 }
 void antic_mode_7_48(VIDEO *video)
 {
-	PREPARE_TXT67(24,1);
+	PREPARE_TXT67(Machine->cpu[0], 24,1);
 	REP24(MODE7);
 	POST_TXT(24);
 }
@@ -401,19 +402,19 @@ void antic_mode_7_48(VIDEO *video)
 
 void antic_mode_8_32(VIDEO *video)
 {
-	PREPARE_GFX8(8);
+	PREPARE_GFX8(Machine->cpu[0], 8);
 	REP08(MODE8);
 	POST_GFX(8);
 }
 void antic_mode_8_40(VIDEO *video)
 {
-	PREPARE_GFX8(10);
+	PREPARE_GFX8(Machine->cpu[0], 10);
 	REP10(MODE8);
 	POST_GFX(10);
 }
 void antic_mode_8_48(VIDEO *video)
 {
-	PREPARE_GFX8(12);
+	PREPARE_GFX8(Machine->cpu[0], 12);
 	REP12(MODE8);
 	POST_GFX(12);
 }
@@ -425,19 +426,19 @@ void antic_mode_8_48(VIDEO *video)
 
 void antic_mode_9_32(VIDEO *video)
 {
-	PREPARE_GFX9BC(16);
+	PREPARE_GFX9BC(Machine->cpu[0], 16);
 	REP16(MODE9);
 	POST_GFX(16);
 }
 void antic_mode_9_40(VIDEO *video)
 {
-	PREPARE_GFX9BC(20);
+	PREPARE_GFX9BC(Machine->cpu[0], 20);
 	REP20(MODE9);
 	POST_GFX(20);
 }
 void antic_mode_9_48(VIDEO *video)
 {
-	PREPARE_GFX9BC(24);
+	PREPARE_GFX9BC(Machine->cpu[0], 24);
 	REP24(MODE9);
 	POST_GFX(24);
 }
@@ -449,19 +450,19 @@ void antic_mode_9_48(VIDEO *video)
 
 void antic_mode_a_32(VIDEO *video)
 {
-	PREPARE_GFXA(16);
+	PREPARE_GFXA(Machine->cpu[0], 16);
 	REP16(MODEA);
 	POST_GFX(16);
 }
 void antic_mode_a_40(VIDEO *video)
 {
-	PREPARE_GFXA(20);
+	PREPARE_GFXA(Machine->cpu[0], 20);
 	REP20(MODEA);
 	POST_GFX(20);
 }
 void antic_mode_a_48(VIDEO *video)
 {
-	PREPARE_GFXA(24);
+	PREPARE_GFXA(Machine->cpu[0], 24);
 	REP24(MODEA);
 	POST_GFX(24);
 }
@@ -473,19 +474,19 @@ void antic_mode_a_48(VIDEO *video)
 
 void antic_mode_b_32(VIDEO *video)
 {
-	PREPARE_GFX9BC(16);
+	PREPARE_GFX9BC(Machine->cpu[0], 16);
 	REP16(MODEB);
 	POST_GFX(16);
 }
 void antic_mode_b_40(VIDEO *video)
 {
-	PREPARE_GFX9BC(20);
+	PREPARE_GFX9BC(Machine->cpu[0], 20);
 	REP20(MODEB);
 	POST_GFX(20);
 }
 void antic_mode_b_48(VIDEO *video)
 {
-	PREPARE_GFX9BC(24);
+	PREPARE_GFX9BC(Machine->cpu[0], 24);
 	REP24(MODEB);
 	POST_GFX(24);
 }
@@ -497,19 +498,19 @@ void antic_mode_b_48(VIDEO *video)
 
 void antic_mode_c_32(VIDEO *video)
 {
-	PREPARE_GFX9BC(16);
+	PREPARE_GFX9BC(Machine->cpu[0], 16);
 	REP16(MODEC);
 	POST_GFX(16);
 }
 void antic_mode_c_40(VIDEO *video)
 {
-	PREPARE_GFX9BC(20);
+	PREPARE_GFX9BC(Machine->cpu[0], 20);
 	REP20(MODEC);
 	POST_GFX(20);
 }
 void antic_mode_c_48(VIDEO *video)
 {
-	PREPARE_GFX9BC(24);
+	PREPARE_GFX9BC(Machine->cpu[0], 24);
 	REP24(MODEC);
 	POST_GFX(24);
 }
@@ -521,19 +522,19 @@ void antic_mode_c_48(VIDEO *video)
 
 void antic_mode_d_32(VIDEO *video)
 {
-	PREPARE_GFXDE(32);
+	PREPARE_GFXDE(Machine->cpu[0], 32);
 	REP32(MODED);
 	POST_GFX(32);
 }
 void antic_mode_d_40(VIDEO *video)
 {
-	PREPARE_GFXDE(40);
+	PREPARE_GFXDE(Machine->cpu[0], 40);
 	REP40(MODED);
 	POST_GFX(40);
 }
 void antic_mode_d_48(VIDEO *video)
 {
-	PREPARE_GFXDE(48);
+	PREPARE_GFXDE(Machine->cpu[0], 48);
 	REP48(MODED);
 	POST_GFX(48);
 }
@@ -545,19 +546,19 @@ void antic_mode_d_48(VIDEO *video)
 
 void antic_mode_e_32(VIDEO *video)
 {
-	PREPARE_GFXDE(32);
+	PREPARE_GFXDE(Machine->cpu[0], 32);
 	REP32(MODEE);
 	POST_GFX(32);
 }
 void antic_mode_e_40(VIDEO *video)
 {
-	PREPARE_GFXDE(40);
+	PREPARE_GFXDE(Machine->cpu[0], 40);
 	REP40(MODEE);
 	POST_GFX(40);
 }
 void antic_mode_e_48(VIDEO *video)
 {
-	PREPARE_GFXDE(48);
+	PREPARE_GFXDE(Machine->cpu[0], 48);
 	REP48(MODEE);
 	POST_GFX(48);
 }
@@ -569,19 +570,19 @@ void antic_mode_e_48(VIDEO *video)
 
 void antic_mode_f_32(VIDEO *video)
 {
-	PREPARE_GFXF(32);
+	PREPARE_GFXF(Machine->cpu[0], 32);
 	REP32(MODEF);
 	POST_GFX(32);
 }
 void antic_mode_f_40(VIDEO *video)
 {
-	PREPARE_GFXF(40);
+	PREPARE_GFXF(Machine->cpu[0], 40);
 	REP40(MODEF);
 	POST_GFX(40);
 }
 void antic_mode_f_48(VIDEO *video)
 {
-	PREPARE_GFXF(48);
+	PREPARE_GFXF(Machine->cpu[0], 48);
 	REP48(MODEF);
 	POST_GFX(48);
 }

@@ -674,17 +674,17 @@ static void write_buffer_to_dma(ide_state *ide)
 			}
 
 			/* fetch the address */
-			ide->dma_address = cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_address = cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_address |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_address |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_address |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_address &= 0xfffffffe;
 
 			/* fetch the length */
-			ide->dma_bytes_left = cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_bytes_left = cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_bytes_left |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_bytes_left |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_bytes_left |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_last_buffer = (ide->dma_bytes_left >> 31) & 1;
 			ide->dma_bytes_left &= 0xfffe;
 			if (ide->dma_bytes_left == 0)
@@ -694,7 +694,7 @@ static void write_buffer_to_dma(ide_state *ide)
 		}
 
 		/* write the next byte */
-		cpunum_write_byte(ide->dma_cpu, ide->dma_address++, *data++);
+		cpu_write_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_address++, *data++);
 		ide->dma_bytes_left--;
 	}
 }
@@ -872,17 +872,17 @@ static void read_buffer_from_dma(ide_state *ide)
 			}
 
 			/* fetch the address */
-			ide->dma_address = cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_address |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_address = cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_address |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_address |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_address |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_address &= 0xfffffffe;
 
 			/* fetch the length */
-			ide->dma_bytes_left = cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_bytes_left |= cpunum_read_byte(ide->dma_cpu, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_bytes_left = cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_bytes_left |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_bytes_left |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_bytes_left |= cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_last_buffer = (ide->dma_bytes_left >> 31) & 1;
 			ide->dma_bytes_left &= 0xfffe;
 			if (ide->dma_bytes_left == 0)
@@ -892,7 +892,7 @@ static void read_buffer_from_dma(ide_state *ide)
 		}
 
 		/* read the next byte */
-		*data++ = cpunum_read_byte(ide->dma_cpu, ide->dma_address++);
+		*data++ = cpu_read_byte(ide->device->machine->cpu[ide->dma_cpu], ide->dma_address++);
 		ide->dma_bytes_left--;
 	}
 }
@@ -1182,7 +1182,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 
 	/* logit */
 //  if (offset != IDE_ADDR_DATA && offset != IDE_ADDR_STATUS_COMMAND && offset != IDE_ADDR_STATUS_CONTROL)
-		LOG(("%08X:IDE read at %03X, size=%d\n", activecpu_get_previouspc(), offset, size));
+		LOG(("%08X:IDE read at %03X, size=%d\n", cpu_get_previouspc(device->machine->activecpu), offset, size));
 
 	switch (offset)
 	{
@@ -1217,7 +1217,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%08X:IDE completed PIO read\n", activecpu_get_previouspc()));
+					LOG(("%08X:IDE completed PIO read\n", cpu_get_previouspc(device->machine->activecpu)));
 					continue_read(ide);
 				}
 			}
@@ -1271,7 +1271,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 
 		/* log anything else */
 		default:
-			logerror("%08X:unknown IDE read at %03X, size=%d\n", activecpu_get_previouspc(), offset, size);
+			logerror("%08X:unknown IDE read at %03X, size=%d\n", cpu_get_previouspc(device->machine->activecpu), offset, size);
 			break;
 	}
 
@@ -1293,7 +1293,7 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 
 	/* logit */
 	if (offset != IDE_ADDR_DATA)
-		LOG(("%08X:IDE write to %03X = %08X, size=%d\n", activecpu_get_previouspc(), offset, data, size));
+		LOG(("%08X:IDE write to %03X = %08X, size=%d\n", cpu_get_previouspc(device->machine->activecpu), offset, data, size));
 
 	switch (offset)
 	{
@@ -1330,7 +1330,7 @@ static void ide_controller_write(const device_config *device, offs_t offset, int
 				/* if we're at the end of the buffer, handle it */
 				if (ide->buffer_offset >= IDE_DISK_SECTOR_SIZE)
 				{
-					LOG(("%08X:IDE completed PIO write\n", activecpu_get_previouspc()));
+					LOG(("%08X:IDE completed PIO write\n", cpu_get_previouspc(device->machine->activecpu)));
 					if (ide->command != IDE_COMMAND_SECURITY_UNLOCK)
 						continue_write(ide);
 					else
@@ -1440,7 +1440,7 @@ static UINT32 ide_bus_master_read(const device_config *device, offs_t offset, in
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%08X:ide_bus_master_read(%d, %d)\n", activecpu_get_previouspc(), offset, size));
+	LOG(("%08X:ide_bus_master_read(%d, %d)\n", cpu_get_previouspc(device->machine->activecpu), offset, size));
 
 	/* command register */
 	if (offset == 0)
@@ -1469,7 +1469,7 @@ static void ide_bus_master_write(const device_config *device, offs_t offset, int
 {
 	ide_state *ide = get_safe_token(device);
 
-	LOG(("%08X:ide_bus_master_write(%d, %d, %08X)\n", activecpu_get_previouspc(), offset, size, data));
+	LOG(("%08X:ide_bus_master_write(%d, %d, %08X)\n", cpu_get_previouspc(device->machine->activecpu), offset, size, data));
 
 	/* command register */
 	if (offset == 0)
@@ -1488,8 +1488,8 @@ static void ide_bus_master_write(const device_config *device, offs_t offset, int
 			ide->dma_bytes_left = 0;
 			ide->dma_last_buffer = 0;
 			ide->dma_descriptor = ide->bus_master_descriptor;
-			ide->dma_cpu = cpu_getactivecpu();
-			ide->dma_address_xor = (activecpu_endianness() == CPU_IS_LE) ? 0 : 3;
+			ide->dma_cpu = cpunum_get_active();
+			ide->dma_address_xor = (cpu_get_endianness(device->machine->activecpu) == CPU_IS_LE) ? 0 : 3;
 
 			/* if we're going live, start the pending read/write */
 			if (ide->dma_active)

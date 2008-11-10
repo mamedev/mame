@@ -26,7 +26,7 @@
 
 #define IR_CPU_STATE \
 	logerror(\
-			"pc: %4x, scanline: %d\n", activecpu_get_previouspc(), video_screen_get_vpos(machine->primary_screen))
+			"pc: %4x, scanline: %d\n", cpu_get_previouspc(machine->activecpu), video_screen_get_vpos(machine->primary_screen))
 
 
 UINT8 irobot_vg_clear;

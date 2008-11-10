@@ -641,7 +641,7 @@ static void akiko_update_cdrom( void )
 
 				if ( cmdbuf[7] == 0x80 )
 				{
-					if (LOG_AKIKO_CD) logerror( "AKIKO CD: PC:%06x Data read - start lba: %08x - end lba: %08x\n", safe_activecpu_get_pc(), startpos, endpos );
+					if (LOG_AKIKO_CD) logerror( "AKIKO CD: PC:%06x Data read - start lba: %08x - end lba: %08x\n", safe_cpu_get_pc(Machine->activecpu), startpos, endpos );
 					akiko.cdrom_speed = (cmdbuf[8] & 0x40) ? 2 : 1;
 					akiko.cdrom_lba_start = startpos;
 					akiko.cdrom_lba_end = endpos;
@@ -751,7 +751,7 @@ READ32_HANDLER(amiga_akiko32_r)
 
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), activecpu_get_pc() );
+		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), cpu_get_pc(machine->activecpu) );
 	}
 
 	switch( offset )
@@ -811,7 +811,7 @@ WRITE32_HANDLER(amiga_akiko32_w)
 {
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, activecpu_get_pc() );
+		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, cpu_get_pc(machine->activecpu) );
 	}
 
 	switch( offset )

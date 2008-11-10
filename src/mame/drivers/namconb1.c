@@ -730,7 +730,7 @@ static READ32_HANDLER( custom_key_r )
 		break; /* no protection? */
 	}
 
-	logerror( "custom_key_r(%d); pc=%08x\n", offset, activecpu_get_pc() );
+	logerror( "custom_key_r(%d); pc=%08x\n", offset, cpu_get_pc(machine->activecpu) );
 	return 0;
 } /* custom_key_r */
 

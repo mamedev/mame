@@ -71,13 +71,13 @@ READ8_HANDLER( ticket_dispenser_r )
 
 READ8_HANDLER( ticket_dispenser_0_r )
 {
-	LOG(("PC: %04X  Ticket Status Read = %02X\n", activecpu_get_pc(), dispenser[0].status));
+	LOG(("PC: %04X  Ticket Status Read = %02X\n", cpu_get_pc(machine->activecpu), dispenser[0].status));
 	return dispenser[0].status;
 }
 
 READ8_HANDLER( ticket_dispenser_1_r )
 {
-	LOG(("PC: %04X  Ticket Status Read = %02X\n", activecpu_get_pc(), dispenser[1].status));
+	LOG(("PC: %04X  Ticket Status Read = %02X\n", cpu_get_pc(machine->activecpu), dispenser[1].status));
 	return dispenser[1].status;
 }
 
@@ -106,7 +106,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 	{
 		if (!dispenser[0].power)
 		{
-			LOG(("PC: %04X  Ticket Power On\n", activecpu_get_pc()));
+			LOG(("PC: %04X  Ticket Power On\n", cpu_get_pc(machine->activecpu)));
 			timer_adjust_oneshot(dispenser[0].timer, ATTOTIME_IN_MSEC(time_msec), 0);
 			dispenser[0].power = 1;
 
@@ -117,7 +117,7 @@ WRITE8_HANDLER( ticket_dispenser_0_w )
 	{
 		if (dispenser[0].power)
 		{
-			LOG(("PC: %04X  Ticket Power Off\n", activecpu_get_pc()));
+			LOG(("PC: %04X  Ticket Power Off\n", cpu_get_pc(machine->activecpu)));
 			timer_adjust_oneshot(dispenser[0].timer, attotime_never, 0);
 			set_led_status(2,0);
 			dispenser[0].power = 0;
@@ -132,7 +132,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 	{
 		if (!dispenser[1].power)
 		{
-			LOG(("PC: %04X  Ticket Power On\n", activecpu_get_pc()));
+			LOG(("PC: %04X  Ticket Power On\n", cpu_get_pc(machine->activecpu)));
 			timer_adjust_oneshot(dispenser[1].timer, ATTOTIME_IN_MSEC(time_msec), 0);
 			dispenser[1].power = 1;
 
@@ -143,7 +143,7 @@ WRITE8_HANDLER( ticket_dispenser_1_w )
 	{
 		if (dispenser[1].power)
 		{
-			LOG(("PC: %04X  Ticket Power Off\n", activecpu_get_pc()));
+			LOG(("PC: %04X  Ticket Power Off\n", cpu_get_pc(machine->activecpu)));
 			timer_adjust_oneshot(dispenser[1].timer, attotime_never, 0);
 			set_led_status(2,0);
 			dispenser[1].power = 0;

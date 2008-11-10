@@ -235,7 +235,7 @@ static WRITE8_HANDLER( sandscrp_bankswitch_w )
 	UINT8 *RAM = memory_region(machine, "main");
 	int bank = data & 0x07;
 
-	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",activecpu_get_pc(),data);
+	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(machine->activecpu),data);
 
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];

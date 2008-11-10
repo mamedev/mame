@@ -260,13 +260,13 @@ static READ32_HANDLER( tms32031_control_r )
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
 		INT32 result = attotime_to_double(attotime_mul(timer_timeelapsed(timer[which]), timer_rate));
-//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", activecpu_get_pc(), offset, result);
+//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(machine->activecpu), offset, result);
 		return result;
 	}
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", activecpu_get_pc(), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(machine->activecpu), offset);
 
 	return tms32031_control[offset];
 }
@@ -284,7 +284,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		int which = (offset >> 4) & 1;
-//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);
+//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(machine->activecpu), offset, data);
 		if (data & 0x40)
 			timer_adjust_oneshot(timer[which], attotime_never, 0);
 
@@ -295,7 +295,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 			timer_rate = 10000000.;
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", activecpu_get_pc(), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(machine->activecpu), offset, data);
 }
 
 
@@ -417,7 +417,7 @@ static READ32_HANDLER( midvplus_misc_r )
 	}
 
 	if (offset != 0 && offset != 3)
-		logerror("%06X:midvplus_misc_r(%d) = %08X\n", activecpu_get_pc(), offset, result);
+		logerror("%06X:midvplus_misc_r(%d) = %08X\n", cpu_get_pc(machine->activecpu), offset, result);
 	return result;
 }
 
@@ -446,7 +446,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
 	}
 
 	if (logit)
-		logerror("%06X:midvplus_misc_w(%d) = %08X\n", activecpu_get_pc(), offset, data);
+		logerror("%06X:midvplus_misc_w(%d) = %08X\n", cpu_get_pc(machine->activecpu), offset, data);
 }
 
 
@@ -1524,7 +1524,7 @@ static READ32_HANDLER( generic_speedup_r )
 
 static void init_crusnusa_common(running_machine *machine, offs_t speedup)
 {
-	dcs_init();
+	dcs_init(machine);
 	adc_shift = 24;
 
 	/* speedups */
@@ -1537,7 +1537,7 @@ static DRIVER_INIT( crusnu21 ) { init_crusnusa_common(machine, 0xc051); }
 
 static void init_crusnwld_common(running_machine *machine, offs_t speedup)
 {
-	dcs_init();
+	dcs_init(machine);
 	adc_shift = 16;
 
 	/* control register is different */
@@ -1565,7 +1565,7 @@ static DRIVER_INIT( crusnw13 ) { init_crusnwld_common(machine, 0); }
 
 static DRIVER_INIT( offroadc )
 {
-	dcs_init();
+	dcs_init(machine);
 	adc_shift = 16;
 
 	/* control register is different */

@@ -119,7 +119,7 @@ static READ32_HANDLER(test2_r)
 {
 //  if (offset==0)
 //      return input_port_read(machine, "IN0"); //0xffffffff;
-//   logerror("%08x:  Test2_r %d\n",activecpu_get_pc(),offset);
+//   logerror("%08x:  Test2_r %d\n",cpu_get_pc(machine->activecpu),offset);
 	return mame_rand(machine); //0xffffffff;
 }
 
@@ -131,7 +131,7 @@ static READ32_HANDLER(test3_r)
 */
 //if (offset==0)
 //  return mame_rand(machine)|(mame_rand(machine)<<16);
-//  logerror("%08x:  Test3_r %d\n",activecpu_get_pc(),offset);
+//  logerror("%08x:  Test3_r %d\n",cpu_get_pc(machine->activecpu),offset);
 	return 0xffffffff;
 }
 
@@ -149,7 +149,7 @@ static WRITE32_HANDLER( avengrs_eprom_w )
 		//volume control todo
 	}
 	else
-		logerror("%08x:  eprom_w %08x mask %08x\n",activecpu_get_pc(),data,mem_mask);
+		logerror("%08x:  eprom_w %08x mask %08x\n",cpu_get_pc(machine->activecpu),data,mem_mask);
 }
 
 static WRITE32_HANDLER( avengrs_palette_w )
@@ -164,7 +164,7 @@ static READ32_HANDLER( avengrs_sound_r )
 	if (ACCESSING_BITS_24_31) {
 		return ymz280b_status_0_r(machine,0)<<24;
 	} else {
-		logerror("%08x:  non-byte read from sound mask %08x\n",activecpu_get_pc(),mem_mask);
+		logerror("%08x:  non-byte read from sound mask %08x\n",cpu_get_pc(machine->activecpu),mem_mask);
 	}
 
 	return 0;
@@ -178,7 +178,7 @@ static WRITE32_HANDLER( avengrs_sound_w )
 		else
 			ymz280b_register_0_w(machine,0,data>>24);
 	} else {
-		logerror("%08x:  non-byte written to sound %08x mask %08x\n",activecpu_get_pc(),data,mem_mask);
+		logerror("%08x:  non-byte written to sound %08x mask %08x\n",cpu_get_pc(machine->activecpu),data,mem_mask);
 	}
 }
 
@@ -186,7 +186,7 @@ static READ32_HANDLER( decomlc_vbl_r )
 {
 	static int i=0xffffffff;
 	i ^=0xffffffff;
-//logerror("vbl r %08x\n", activecpu_get_pc());
+//logerror("vbl r %08x\n", cpu_get_pc(machine->activecpu));
 	// Todo: Vblank probably in $10
 	return i;
 }
@@ -273,7 +273,7 @@ static READ32_HANDLER(stadhr96_prot_146_r)
     */
 	offset<<=1;
 
-	logerror("%08x:  Read prot %04x\n", activecpu_get_pc(), offset);
+	logerror("%08x:  Read prot %04x\n", cpu_get_pc(machine->activecpu), offset);
 
 	if (offset==0x5c4)
 		return 0xaa55 << 16;
@@ -713,7 +713,7 @@ static void descramble_sound( running_machine *machine )
 static READ32_HANDLER( avengrgs_speedup_r )
 {
 	UINT32 a=mlc_ram[0x89a0/4];
-	UINT32 p=activecpu_get_pc();
+	UINT32 p=cpu_get_pc(machine->activecpu);
 
 	if ((p==0x3234 || p==0x32dc) && (a&1)) cpu_spinuntil_int();
 
@@ -723,13 +723,13 @@ static READ32_HANDLER( avengrgs_speedup_r )
 static DRIVER_INIT( avengrgs )
 {
 	// init options
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 
 	// set up speed cheat
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x3234);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
-	cpunum_set_info_int(0, CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x32dc);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, 0);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x3234);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, 1);
+	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x32dc);
 
 	mainCpuIsArm=0;
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );

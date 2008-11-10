@@ -430,7 +430,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *
 	/* initialize the front-end helper */
 	if (SINGLE_INSTRUCTION_MODE)
 		feconfig.max_sequence = 1;
-	mips3->impstate->drcfe = drcfe_init(&feconfig, mips3);
+	mips3->impstate->drcfe = drcfe_init(device, &feconfig, mips3);
 
 	/* allocate memory for cache-local state and initialize it */
 	memcpy(mips3->impstate->fpmode, fpmode_source, sizeof(fpmode_source));
@@ -767,7 +767,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(cpu_getactivecpu(), ADDRESS_SPACE_PROGRAM, seqhead->physpc) != NULL)
+		if (memory_get_write_ptr(cpunum_get_active(), ADDRESS_SPACE_PROGRAM, seqhead->physpc) != NULL)
 			generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 		/* label this instruction, if it may be jumped to locally */

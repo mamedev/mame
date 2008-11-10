@@ -375,20 +375,20 @@ static READ16_HANDLER(dspcuskey_r)
 	UINT16 result = 0;
 	if( namcos2_gametype == NAMCOS21_SOLVALOU )
 	{
-		switch( activecpu_get_pc() )
+		switch( cpu_get_pc(machine->activecpu) )
 		{
 		case 0x805e: result = 0x0000; break;
 		case 0x805f: result = 0xfeba; break;
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			logerror( "unk cuskey_r; pc=0x%x\n", activecpu_get_pc() );
+			logerror( "unk cuskey_r; pc=0x%x\n", cpu_get_pc(machine->activecpu) );
 			break;
 		}
 	}
 	else if( namcos2_gametype == NAMCOS21_CYBERSLED )
 	{
-		switch( activecpu_get_pc() )
+		switch( cpu_get_pc(machine->activecpu) )
 		{
 		case 0x8061: result = 0xfe95; break;
 		case 0x8069: result = 0xffff; break;
@@ -399,7 +399,7 @@ static READ16_HANDLER(dspcuskey_r)
 	}
 	else if( namcos2_gametype == NAMCOS21_AIRCOMBAT )
 	{
-		switch( activecpu_get_pc() )
+		switch( cpu_get_pc(machine->activecpu) )
 		{
 		case 0x8062: result = 0xfeb9; break;
 		case 0x806a: result = 0xffff; break;
@@ -569,7 +569,7 @@ ReadWordFromSlaveInput( void )
 		{
 			mpDspState->slaveBytesAdvertised--;
 		}
-		logerror( "-%04x(0x%04x) %x\n", data, mpDspState->slaveBytesAvailable, activecpu_get_pc() );
+		logerror( "-%04x(0x%04x) %x\n", data, mpDspState->slaveBytesAvailable, cpu_get_pc(Machine->activecpu) );
 	}
 	return data;
 } /* ReadWordFromSlaveInput */
@@ -607,7 +607,7 @@ static WRITE16_HANDLER( dspram16_w )
 		}
 		else if( namcos2_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
-					cpu_getactivecpu()==0 )
+					cpunum_get_active()==0 )
 		{ /* hack; synchronization for solvalou */
 			cpu_yield();
 		}
@@ -914,7 +914,7 @@ static WRITE16_HANDLER(slave_port3_w)
 
 static WRITE16_HANDLER( slave_XF_output_w )
 {
-	logerror( "0x%x:slaveXF(%d)\n", activecpu_get_pc(), data );
+	logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(machine->activecpu), data );
 } /* slave_XF_output_w */
 
 static READ16_HANDLER( slave_portf_r )
@@ -968,8 +968,8 @@ static WRITE16_HANDLER( pointram_control_w )
 	/* pointram_control&0x20 : bank for depthcue data */
 /*
     logerror( "dsp_control_w:%x:%x[%x]:=%04x ",
-            cpu_getactivecpu(),
-            activecpu_get_pc(),
+            cpunum_get_active(),
+            cpu_get_pc(machine->activecpu),
             offset,
             pointram_control );
 
@@ -1152,7 +1152,7 @@ static WRITE16_HANDLER( winrun_dspcomram_w )
 
 static READ16_HANDLER( winrun_cuskey_r )
 {
-	int pc = activecpu_get_pc();
+	int pc = cpu_get_pc(machine->activecpu);
 	switch( pc )
 	{
 	case 0x0064: /* winrun91 */

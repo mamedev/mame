@@ -3752,7 +3752,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 		/* don't log multiple identical status reads from the same address */
         if (regnum == status)
         {
-            offs_t pc = activecpu_get_pc();
+            offs_t pc = cpu_get_pc(v->device->machine->activecpu);
             if (pc == v->last_status_pc && result == v->last_status_value)
                 logit = FALSE;
             v->last_status_pc = pc;
@@ -3935,7 +3935,7 @@ static READ32_DEVICE_HANDLER( banshee_agp_r )
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%08X:banshee_r(AGP:%s)\n", activecpu_get_pc(), banshee_agp_reg_name[offset]);
+		logerror("%08X:banshee_r(AGP:%s)\n", cpu_get_pc(v->device->machine->activecpu), banshee_agp_reg_name[offset]);
 	return result;
 }
 
@@ -3954,15 +3954,15 @@ READ32_DEVICE_HANDLER( banshee_r )
 	else if (offset < 0x100000/4)
 		result = banshee_agp_r(device, offset, mem_mask);
 	else if (offset < 0x200000/4)
-		logerror("%08X:banshee_r(2D:%X)\n", activecpu_get_pc(), (offset*4) & 0xfffff);
+		logerror("%08X:banshee_r(2D:%X)\n", cpu_get_pc(device->machine->activecpu), (offset*4) & 0xfffff);
 	else if (offset < 0x600000/4)
 		result = register_r(v, offset & 0x1fffff/4);
 	else if (offset < 0x800000/4)
-		logerror("%08X:banshee_r(TEX:%X)\n", activecpu_get_pc(), (offset*4) & 0x1fffff);
+		logerror("%08X:banshee_r(TEX:%X)\n", cpu_get_pc(device->machine->activecpu), (offset*4) & 0x1fffff);
 	else if (offset < 0xc00000/4)
-		logerror("%08X:banshee_r(RES:%X)\n", activecpu_get_pc(), (offset*4) & 0x3fffff);
+		logerror("%08X:banshee_r(RES:%X)\n", cpu_get_pc(device->machine->activecpu), (offset*4) & 0x3fffff);
 	else if (offset < 0x1000000/4)
-		logerror("%08X:banshee_r(YUV:%X)\n", activecpu_get_pc(), (offset*4) & 0x3fffff);
+		logerror("%08X:banshee_r(YUV:%X)\n", cpu_get_pc(device->machine->activecpu), (offset*4) & 0x3fffff);
 	else if (offset < 0x2000000/4)
 	{
 		UINT8 temp = v->fbi.lfb_stride;
@@ -3985,7 +3985,7 @@ READ32_DEVICE_HANDLER( banshee_fb_r )
 
 	if (offset < v->fbi.lfb_base)
 	{
-		logerror("%08X:banshee_fb_r(%X)\n", activecpu_get_pc(), offset*4);
+		logerror("%08X:banshee_fb_r(%X)\n", cpu_get_pc(device->machine->activecpu), offset*4);
 		if (offset*4 <= v->fbi.mask)
 			result = ((UINT32 *)v->fbi.ram)[offset];
 	}
@@ -4010,7 +4010,7 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
 			if (v->banshee.vga[0x3c1 & 0x1f] < ARRAY_LENGTH(v->banshee.att))
 				result = v->banshee.att[v->banshee.vga[0x3c1 & 0x1f]];
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_att_r(%X)\n", activecpu_get_pc(), v->banshee.vga[0x3c1 & 0x1f]);
+				logerror("%08X:banshee_att_r(%X)\n", cpu_get_pc(device->machine->activecpu), v->banshee.vga[0x3c1 & 0x1f]);
 			break;
 
 		/* Input status 0 */
@@ -4023,7 +4023,7 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
             */
 			result = 0x00;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_vga_r(%X)\n", activecpu_get_pc(), 0x300+offset);
+				logerror("%08X:banshee_vga_r(%X)\n", cpu_get_pc(device->machine->activecpu), 0x300+offset);
 			break;
 
 		/* Sequencer access */
@@ -4031,7 +4031,7 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
 			if (v->banshee.vga[0x3c4 & 0x1f] < ARRAY_LENGTH(v->banshee.seq))
 				result = v->banshee.seq[v->banshee.vga[0x3c4 & 0x1f]];
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_seq_r(%X)\n", activecpu_get_pc(), v->banshee.vga[0x3c4 & 0x1f]);
+				logerror("%08X:banshee_seq_r(%X)\n", cpu_get_pc(device->machine->activecpu), v->banshee.vga[0x3c4 & 0x1f]);
 			break;
 
 		/* Feature control */
@@ -4039,14 +4039,14 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
 			result = v->banshee.vga[0x3da & 0x1f];
 			v->banshee.attff = 0;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_vga_r(%X)\n", activecpu_get_pc(), 0x300+offset);
+				logerror("%08X:banshee_vga_r(%X)\n", cpu_get_pc(device->machine->activecpu), 0x300+offset);
 			break;
 
 		/* Miscellaneous output */
 		case 0x3cc:
 			result = v->banshee.vga[0x3c2 & 0x1f];
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_vga_r(%X)\n", activecpu_get_pc(), 0x300+offset);
+				logerror("%08X:banshee_vga_r(%X)\n", cpu_get_pc(device->machine->activecpu), 0x300+offset);
 			break;
 
 		/* Graphics controller access */
@@ -4054,7 +4054,7 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
 			if (v->banshee.vga[0x3ce & 0x1f] < ARRAY_LENGTH(v->banshee.gc))
 				result = v->banshee.gc[v->banshee.vga[0x3ce & 0x1f]];
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_gc_r(%X)\n", activecpu_get_pc(), v->banshee.vga[0x3ce & 0x1f]);
+				logerror("%08X:banshee_gc_r(%X)\n", cpu_get_pc(device->machine->activecpu), v->banshee.vga[0x3ce & 0x1f]);
 			break;
 
 		/* CRTC access */
@@ -4062,7 +4062,7 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
 			if (v->banshee.vga[0x3d4 & 0x1f] < ARRAY_LENGTH(v->banshee.crtc))
 				result = v->banshee.crtc[v->banshee.vga[0x3d4 & 0x1f]];
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_crtc_r(%X)\n", activecpu_get_pc(), v->banshee.vga[0x3d4 & 0x1f]);
+				logerror("%08X:banshee_crtc_r(%X)\n", cpu_get_pc(device->machine->activecpu), v->banshee.vga[0x3d4 & 0x1f]);
 			break;
 
 		/* Input status 1 */
@@ -4078,13 +4078,13 @@ static READ8_DEVICE_HANDLER( banshee_vga_r )
             */
 			result = 0x04;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_vga_r(%X)\n", activecpu_get_pc(), 0x300+offset);
+				logerror("%08X:banshee_vga_r(%X)\n", cpu_get_pc(device->machine->activecpu), 0x300+offset);
 			break;
 
 		default:
 			result = v->banshee.vga[offset];
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_vga_r(%X)\n", activecpu_get_pc(), 0x300+offset);
+				logerror("%08X:banshee_vga_r(%X)\n", cpu_get_pc(device->machine->activecpu), 0x300+offset);
 			break;
 	}
 	return result;
@@ -4108,7 +4108,7 @@ READ32_DEVICE_HANDLER( banshee_io_r )
 		case io_dacData:
 			result = v->fbi.clut[v->banshee.io[io_dacAddr] & 0x1ff] = v->banshee.io[offset];
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_dac_r(%X)\n", activecpu_get_pc(), v->banshee.io[io_dacAddr] & 0x1ff);
+				logerror("%08X:banshee_dac_r(%X)\n", cpu_get_pc(device->machine->activecpu), v->banshee.io[io_dacAddr] & 0x1ff);
 			break;
 
 		case io_vgab0:	case io_vgab4:	case io_vgab8:	case io_vgabc:
@@ -4128,7 +4128,7 @@ READ32_DEVICE_HANDLER( banshee_io_r )
 		default:
 			result = v->banshee.io[offset];
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_r(%s)\n", activecpu_get_pc(), banshee_io_reg_name[offset]);
+				logerror("%08X:banshee_io_r(%s)\n", cpu_get_pc(device->machine->activecpu), banshee_io_reg_name[offset]);
 			break;
 	}
 
@@ -4138,7 +4138,7 @@ READ32_DEVICE_HANDLER( banshee_io_r )
 
 READ32_DEVICE_HANDLER( banshee_rom_r )
 {
-	logerror("%08X:banshee_rom_r(%X)\n", activecpu_get_pc(), offset*4);
+	logerror("%08X:banshee_rom_r(%X)\n", cpu_get_pc(device->machine->activecpu), offset*4);
 	return 0xffffffff;
 }
 
@@ -4232,7 +4232,7 @@ static WRITE32_DEVICE_HANDLER( banshee_agp_w )
 	}
 
 	if (LOG_REGISTERS)
-		logerror("%08X:banshee_w(AGP:%s) = %08X & %08X\n", activecpu_get_pc(), banshee_agp_reg_name[offset], data, mem_mask);
+		logerror("%08X:banshee_w(AGP:%s) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), banshee_agp_reg_name[offset], data, mem_mask);
 }
 
 
@@ -4249,15 +4249,15 @@ WRITE32_DEVICE_HANDLER( banshee_w )
 	else if (offset < 0x100000/4)
 		banshee_agp_w(device, offset, data, mem_mask);
 	else if (offset < 0x200000/4)
-		logerror("%08X:banshee_w(2D:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0xfffff, data, mem_mask);
+		logerror("%08X:banshee_w(2D:%X) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), (offset*4) & 0xfffff, data, mem_mask);
 	else if (offset < 0x600000/4)
 		register_w(v, offset & 0x1fffff/4, data);
 	else if (offset < 0x800000/4)
-		logerror("%08X:banshee_w(TEX:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0x1fffff, data, mem_mask);
+		logerror("%08X:banshee_w(TEX:%X) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), (offset*4) & 0x1fffff, data, mem_mask);
 	else if (offset < 0xc00000/4)
-		logerror("%08X:banshee_w(RES:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0x3fffff, data, mem_mask);
+		logerror("%08X:banshee_w(RES:%X) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), (offset*4) & 0x3fffff, data, mem_mask);
 	else if (offset < 0x1000000/4)
-		logerror("%08X:banshee_w(YUV:%X) = %08X & %08X\n", activecpu_get_pc(), (offset*4) & 0x3fffff, data, mem_mask);
+		logerror("%08X:banshee_w(YUV:%X) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), (offset*4) & 0x3fffff, data, mem_mask);
 	else if (offset < 0x2000000/4)
 	{
 		UINT8 temp = v->fbi.lfb_stride;
@@ -4287,7 +4287,7 @@ WRITE32_DEVICE_HANDLER( banshee_fb_w )
 		{
 			if (offset*4 <= v->fbi.mask)
 				COMBINE_DATA(&((UINT32 *)v->fbi.ram)[offset]);
-			logerror("%08X:banshee_fb_w(%X) = %08X & %08X\n", activecpu_get_pc(), offset*4, data, mem_mask);
+			logerror("%08X:banshee_fb_w(%X) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), offset*4, data, mem_mask);
 		}
 	}
 	else
@@ -4310,14 +4310,14 @@ static WRITE8_DEVICE_HANDLER( banshee_vga_w )
 			{
 				v->banshee.vga[0x3c1 & 0x1f] = data;
 				if (LOG_REGISTERS)
-					logerror("%08X:banshee_vga_w(%X) = %02X\n", activecpu_get_pc(), 0x3c0+offset, data);
+					logerror("%08X:banshee_vga_w(%X) = %02X\n", cpu_get_pc(device->machine->activecpu), 0x3c0+offset, data);
 			}
 			else
 			{
 				if (v->banshee.vga[0x3c1 & 0x1f] < ARRAY_LENGTH(v->banshee.att))
 					v->banshee.att[v->banshee.vga[0x3c1 & 0x1f]] = data;
 				if (LOG_REGISTERS)
-					logerror("%08X:banshee_att_w(%X) = %02X\n", activecpu_get_pc(), v->banshee.vga[0x3c1 & 0x1f], data);
+					logerror("%08X:banshee_att_w(%X) = %02X\n", cpu_get_pc(device->machine->activecpu), v->banshee.vga[0x3c1 & 0x1f], data);
 			}
 			v->banshee.attff ^= 1;
 			break;
@@ -4327,7 +4327,7 @@ static WRITE8_DEVICE_HANDLER( banshee_vga_w )
 			if (v->banshee.vga[0x3c4 & 0x1f] < ARRAY_LENGTH(v->banshee.seq))
 				v->banshee.seq[v->banshee.vga[0x3c4 & 0x1f]] = data;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_seq_w(%X) = %02X\n", activecpu_get_pc(), v->banshee.vga[0x3c4 & 0x1f], data);
+				logerror("%08X:banshee_seq_w(%X) = %02X\n", cpu_get_pc(device->machine->activecpu), v->banshee.vga[0x3c4 & 0x1f], data);
 			break;
 
 		/* Graphics controller access */
@@ -4335,7 +4335,7 @@ static WRITE8_DEVICE_HANDLER( banshee_vga_w )
 			if (v->banshee.vga[0x3ce & 0x1f] < ARRAY_LENGTH(v->banshee.gc))
 				v->banshee.gc[v->banshee.vga[0x3ce & 0x1f]] = data;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_gc_w(%X) = %02X\n", activecpu_get_pc(), v->banshee.vga[0x3ce & 0x1f], data);
+				logerror("%08X:banshee_gc_w(%X) = %02X\n", cpu_get_pc(device->machine->activecpu), v->banshee.vga[0x3ce & 0x1f], data);
 			break;
 
 		/* CRTC access */
@@ -4343,13 +4343,13 @@ static WRITE8_DEVICE_HANDLER( banshee_vga_w )
 			if (v->banshee.vga[0x3d4 & 0x1f] < ARRAY_LENGTH(v->banshee.crtc))
 				v->banshee.crtc[v->banshee.vga[0x3d4 & 0x1f]] = data;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_crtc_w(%X) = %02X\n", activecpu_get_pc(), v->banshee.vga[0x3d4 & 0x1f], data);
+				logerror("%08X:banshee_crtc_w(%X) = %02X\n", cpu_get_pc(device->machine->activecpu), v->banshee.vga[0x3d4 & 0x1f], data);
 			break;
 
 		default:
 			v->banshee.vga[offset] = data;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_vga_w(%X) = %02X\n", activecpu_get_pc(), 0x3c0+offset, data);
+				logerror("%08X:banshee_vga_w(%X) = %02X\n", cpu_get_pc(device->machine->activecpu), 0x3c0+offset, data);
 			break;
 	}
 }
@@ -4371,7 +4371,7 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 			if ((v->banshee.io[offset] ^ old) & 0x2800)
 				v->fbi.clut_dirty = TRUE;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_dacData:
@@ -4382,14 +4382,14 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 				v->fbi.clut_dirty = TRUE;
 			}
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_dac_w(%X) = %08X & %08X\n", activecpu_get_pc(), v->banshee.io[io_dacAddr] & 0x1ff, data, mem_mask);
+				logerror("%08X:banshee_dac_w(%X) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), v->banshee.io[io_dacAddr] & 0x1ff, data, mem_mask);
 			break;
 
 		case io_miscInit0:
 			COMBINE_DATA(&v->banshee.io[offset]);
 			v->fbi.yorigin = (data >> 18) & 0xfff;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_vidScreenSize:
@@ -4403,14 +4403,14 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 			video_screen_set_visarea(v->screen, 0, v->fbi.width - 1, 0, v->fbi.height - 1);
 			adjust_vblank_timer(v);
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_lfbMemoryConfig:
 			v->fbi.lfb_base = (data & 0x1fff) << 10;
 			v->fbi.lfb_stride = ((data >> 13) & 7) + 9;
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 
 		case io_vgab0:	case io_vgab4:	case io_vgab8:	case io_vgabc:
@@ -4429,7 +4429,7 @@ WRITE32_DEVICE_HANDLER( banshee_io_w )
 		default:
 			COMBINE_DATA(&v->banshee.io[offset]);
 			if (LOG_REGISTERS)
-				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", activecpu_get_pc(), banshee_io_reg_name[offset], data, mem_mask);
+				logerror("%08X:banshee_io_w(%s) = %08X & %08X\n", cpu_get_pc(device->machine->activecpu), banshee_io_reg_name[offset], data, mem_mask);
 			break;
 	}
 }

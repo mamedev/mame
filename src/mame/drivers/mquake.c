@@ -69,14 +69,14 @@ static void mquake_cia_0_porta_w(UINT8 data)
 static UINT8 mquake_cia_0_portb_r(void)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_r\n", activecpu_get_pc());
+	logerror("%06x:CIA0_portb_r\n", cpu_get_pc(Machine->activecpu));
 	return 0xff;
 }
 
 static void mquake_cia_0_portb_w(UINT8 data)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_w(%02x)\n", activecpu_get_pc(), data);
+	logerror("%06x:CIA0_portb_w(%02x)\n", cpu_get_pc(Machine->activecpu), data);
 }
 
 
@@ -118,7 +118,7 @@ static WRITE16_HANDLER( es5503_word_lsb_w )
 static WRITE16_HANDLER( output_w )
 {
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x:output_w(%x) = %02x\n", activecpu_get_pc(), offset, data);
+		logerror("%06x:output_w(%x) = %02x\n", cpu_get_pc(machine->activecpu), offset, data);
 }
 
 
@@ -126,13 +126,13 @@ static READ16_HANDLER( coin_chip_r )
 {
 	if (offset == 1)
 		return input_port_read(machine, "COINCHIP");
-	logerror("%06x:coin_chip_r(%02x) & %04x\n", activecpu_get_pc(), offset, mem_mask);
+	logerror("%06x:coin_chip_r(%02x) & %04x\n", cpu_get_pc(machine->activecpu), offset, mem_mask);
 	return 0xffff;
 }
 
 static WRITE16_HANDLER( coin_chip_w )
 {
-	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", activecpu_get_pc(), offset, data, mem_mask);
+	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
 }
 
 // inputs at 282000, 282002 (full word)

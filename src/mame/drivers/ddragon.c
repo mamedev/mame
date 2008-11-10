@@ -243,7 +243,7 @@ static WRITE8_HANDLER( toffy_bankswitch_w )
 
 static READ8_HANDLER( darktowr_mcu_bank_r )
 {
-	// logerror("BankRead %05x %08x\n",activecpu_get_pc(),offset);
+	// logerror("BankRead %05x %08x\n",cpu_get_pc(machine->activecpu),offset);
 
 	/* Horrible hack - the alternate TStrike set is mismatched against the MCU,
    so just hack around the protection here.  (The hacks are 'right' as I have
@@ -252,9 +252,9 @@ static READ8_HANDLER( darktowr_mcu_bank_r )
 	if (!strcmp(machine->gamedrv->name, "tstrike"))
 	{
 		/* Static protection checks at boot-up */
-		if (activecpu_get_pc() == 0x9ace)
+		if (cpu_get_pc(machine->activecpu) == 0x9ace)
 			return 0;
-		if (activecpu_get_pc() == 0x9ae4)
+		if (cpu_get_pc(machine->activecpu) == 0x9ae4)
 			return 0x63;
 
 		/* Just return whatever the code is expecting */
@@ -271,7 +271,7 @@ static READ8_HANDLER( darktowr_mcu_bank_r )
 
 static WRITE8_HANDLER( darktowr_mcu_bank_w )
 {
-	logerror("BankWrite %05x %08x %08x\n", activecpu_get_pc(), offset, data);
+	logerror("BankWrite %05x %08x %08x\n", cpu_get_pc(machine->activecpu), offset, data);
 
 	if (offset == 0x1400 || offset == 0)
 	{
@@ -374,14 +374,14 @@ static CUSTOM_INPUT( sub_cpu_busy )
 
 static WRITE8_HANDLER( darktowr_mcu_w )
 {
-	logerror("McuWrite %05x %08x %08x\n",activecpu_get_pc(),offset,data);
+	logerror("McuWrite %05x %08x %08x\n",cpu_get_pc(machine->activecpu),offset,data);
 	darktowr_mcu_ports[offset]=data;
 }
 
 
 static READ8_HANDLER( ddragon_hd63701_internal_registers_r )
 {
-	logerror("%04x: read %d\n", activecpu_get_pc(), offset);
+	logerror("%04x: read %d\n", cpu_get_pc(machine->activecpu), offset);
 	return 0;
 }
 
@@ -413,7 +413,7 @@ static WRITE8_HANDLER( ddragon_hd63701_internal_registers_w )
 static READ8_HANDLER( ddragon_spriteram_r )
 {
 	/* Double Dragon crash fix - see notes above */
-	if (offset == 0x49 && activecpu_get_pc() == 0x6261 && ddragon_spriteram[offset] == 0x1f)
+	if (offset == 0x49 && cpu_get_pc(machine->activecpu) == 0x6261 && ddragon_spriteram[offset] == 0x1f)
 		return 0x1;
 
 	return ddragon_spriteram[offset];
@@ -422,7 +422,7 @@ static READ8_HANDLER( ddragon_spriteram_r )
 
 static WRITE8_HANDLER( ddragon_spriteram_w )
 {
-	if (cpu_getactivecpu() == 1 && offset == 0)
+	if (cpunum_get_active() == 1 && offset == 0)
 		dd_sub_cpu_busy = 1;
 
 	ddragon_spriteram[offset] = data;

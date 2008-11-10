@@ -78,7 +78,7 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 {
 	COMBINE_DATA(&sshangha_prot_data[offset]);
 
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",activecpu_get_pc(),offset<<1,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(machine->activecpu),offset<<1,data);
 
 	if (offset == (0x260 >> 1)) {
 		//soundlatch_w(0,data&0xff);
@@ -107,7 +107,7 @@ static READ16_HANDLER( sshangha_protection16_r )
 		// Protection TODO
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",activecpu_get_pc(),offset<<1);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
 	return sshangha_prot_data[offset];
 }
 

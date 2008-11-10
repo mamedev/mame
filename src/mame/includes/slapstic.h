@@ -15,4 +15,4 @@ void slapstic_init(running_machine *machine, int chip);
 void slapstic_reset(void);
 
 int slapstic_bank(void);
-int slapstic_tweak(offs_t offset);
+int slapstic_tweak(running_machine *machine, offs_t offset);

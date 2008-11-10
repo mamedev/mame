@@ -169,7 +169,7 @@ static WRITE8_HANDLER( jingbell_nmi_and_coins_w )
 {
 	if ((nmi_enable ^ data) & (~0xdd))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n",activecpu_get_pc(),data);
+		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(machine->activecpu),data);
 //      popmessage("%02x",data);
 	}
 
@@ -226,7 +226,7 @@ static WRITE8_HANDLER( jingbell_magic_w )
 
 		default:
 //          popmessage("magic %x <- %04x",igs_magic[0],data);
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", activecpu_get_pc(), igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(machine->activecpu), igs_magic[0], data);
 	}
 }
 
@@ -240,11 +240,11 @@ static READ8_HANDLER( jingbell_magic_r )
 			if ( !(igs_magic[1] & 0x04) )	return input_port_read(machine, "DSW3");
 			if ( !(igs_magic[1] & 0x08) )	return input_port_read(machine, "DSW4");
 			if ( !(igs_magic[1] & 0x10) )	return input_port_read(machine, "DSW5");
-			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", activecpu_get_pc(), igs_magic[1]);
+			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", cpu_get_pc(machine->activecpu), igs_magic[1]);
 			break;
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", activecpu_get_pc(), igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(machine->activecpu), igs_magic[0]);
 	}
 
 	return 0;

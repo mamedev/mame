@@ -426,7 +426,7 @@ static READ32_HANDLER( undrfire_lightgun_r )
 		}
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",activecpu_get_pc(),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",cpu_get_pc(machine->activecpu),offset);
 
 	return 0x0;
 }

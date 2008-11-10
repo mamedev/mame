@@ -995,5 +995,5 @@ OPHANDLER( xrl_a_r )
 //illegal opcodes
 OPHANDLER( illegal )
 {
-	LOG(("i8051 #%d: illegal opcode at 0x%03x: %02x\n", cpu_getactivecpu(), PC-1, r));
+	LOG(("i8051 #%d: illegal opcode at 0x%03x: %02x\n", cpunum_get_active(), PC-1, r));
 }

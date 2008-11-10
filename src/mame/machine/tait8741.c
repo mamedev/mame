@@ -275,7 +275,7 @@ static int I8741_status_r(running_machine *machine, int num)
 {
 	I8741 *st = &taito8741[num];
 	taito8741_update(machine, num);
-	LOG(("8741-%d ST Read %02x PC=%04x\n",num,st->status,activecpu_get_pc()));
+	LOG(("8741-%d ST Read %02x PC=%04x\n",num,st->status,cpu_get_pc(machine->activecpu)));
 	return st->status;
 }
 
@@ -285,7 +285,7 @@ static int I8741_data_r(running_machine *machine, int num)
 	I8741 *st = &taito8741[num];
 	int ret = st->toData;
 	st->status &= 0xfe;
-	LOG(("8741-%d DATA Read %02x PC=%04x\n",num,ret,activecpu_get_pc()));
+	LOG(("8741-%d DATA Read %02x PC=%04x\n",num,ret,cpu_get_pc(machine->activecpu)));
 
 	/* update chip */
 	taito8741_update(machine, num);
@@ -303,7 +303,7 @@ static int I8741_data_r(running_machine *machine, int num)
 static void I8741_data_w(running_machine *machine, int num, int data)
 {
 	I8741 *st = &taito8741[num];
-	LOG(("8741-%d DATA Write %02x PC=%04x\n",num,data,activecpu_get_pc()));
+	LOG(("8741-%d DATA Write %02x PC=%04x\n",num,data,cpu_get_pc(machine->activecpu)));
 	st->fromData = data;
 	st->status |= 0x02;
 	/* update chip */
@@ -314,7 +314,7 @@ static void I8741_data_w(running_machine *machine, int num, int data)
 static void I8741_command_w(running_machine *machine, int num, int data)
 {
 	I8741 *st = &taito8741[num];
-	LOG(("8741-%d CMD Write %02x PC=%04x\n",num,data,activecpu_get_pc()));
+	LOG(("8741-%d CMD Write %02x PC=%04x\n",num,data,cpu_get_pc(machine->activecpu)));
 	st->fromCmd = data;
 	st->status |= 0x04;
 	/* update chip */
@@ -447,7 +447,7 @@ static void josvolly_8741_w(running_machine *machine,int num,int offset,int data
 
 	if(offset==1)
 	{
-		LOG(("PC=%04X 8741[%d] CW %02X\n",activecpu_get_pc(),num,data));
+		LOG(("PC=%04X 8741[%d] CW %02X\n",cpu_get_pc(machine->activecpu),num,data));
 
 		/* read pointer */
 		mcu->cmd = data;
@@ -485,7 +485,7 @@ static void josvolly_8741_w(running_machine *machine,int num,int offset,int data
 	else
 	{
 		/* data */
-		LOG(("PC=%04X 8741[%d] DW %02X\n",activecpu_get_pc(),num,data));
+		LOG(("PC=%04X 8741[%d] DW %02X\n",cpu_get_pc(machine->activecpu),num,data));
 
 		mcu->txd  = data^0x40; /* parity reverce ? */
 		mcu->sts  |= 0x02;     /* TXD busy         */
@@ -514,14 +514,14 @@ static INT8 josvolly_8741_r(running_machine *machine,int num,int offset)
 		if(mcu->rst)
 			mcu->rxd = (mcu->initReadPort)(machine,0); /* port in */
 		ret = mcu->sts;
-		LOG(("PC=%04X 8741[%d]       SR %02X\n",activecpu_get_pc(),num,ret));
+		LOG(("PC=%04X 8741[%d]       SR %02X\n",cpu_get_pc(machine->activecpu),num,ret));
 	}
 	else
 	{
 		/* clear status port */
 		mcu->sts &= ~0x01; /* RD ready */
 		ret = mcu->rxd;
-		LOG(("PC=%04X 8741[%d]       DR %02X\n",activecpu_get_pc(),num,ret));
+		LOG(("PC=%04X 8741[%d]       DR %02X\n",cpu_get_pc(machine->activecpu),num,ret));
 		mcu->rst = 0;
 	}
 	return ret;

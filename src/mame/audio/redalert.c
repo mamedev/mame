@@ -183,8 +183,8 @@ static int sid_callback(void)
 
 static SOUND_START( redalert_voice )
 {
-	cpunum_set_info_fct(2, CPUINFO_PTR_I8085_SOD_CALLBACK, (void *)sod_callback);
-	cpunum_set_info_fct(2, CPUINFO_PTR_I8085_SID_CALLBACK, (void *)sid_callback);
+	cpu_set_info_fct(machine->cpu[2], CPUINFO_PTR_I8085_SOD_CALLBACK, (void *)sod_callback);
+	cpu_set_info_fct(machine->cpu[2], CPUINFO_PTR_I8085_SID_CALLBACK, (void *)sid_callback);
 }
 
 

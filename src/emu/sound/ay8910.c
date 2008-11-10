@@ -796,7 +796,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->intf->portAread)
 			psg->regs[AY_PORTA] = (*psg->intf->portAread)(Machine, 0);
 		else
-			logerror("PC %04x: warning - read 8910 #%d Port A\n",activecpu_get_pc(),psg->index);
+			logerror("PC %04x: warning - read 8910 #%d Port A\n",cpu_get_pc(Machine->activecpu),psg->index);
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
@@ -804,7 +804,7 @@ int ay8910_read_ym(void *chip)
 		if (psg->intf->portBread)
 			psg->regs[AY_PORTB] = (*psg->intf->portBread)(Machine, 0);
 		else
-			logerror("PC %04x: warning - read 8910 #%d Port B\n",activecpu_get_pc(),psg->index);
+			logerror("PC %04x: warning - read 8910 #%d Port B\n",cpu_get_pc(Machine->activecpu),psg->index);
 		break;
 	}
 	return psg->regs[r];

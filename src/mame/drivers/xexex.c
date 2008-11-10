@@ -189,7 +189,7 @@ static WRITE16_HANDLER( spriteram16_mirror_w )
 
 static READ16_HANDLER( xexex_waitskip_r )
 {
-	if (activecpu_get_pc() == 0x1158)
+	if (cpu_get_pc(machine->activecpu) == 0x1158)
 	{
 		cpu_spinuntil_trigger(resume_trigger);
 		suspension_active = 1;

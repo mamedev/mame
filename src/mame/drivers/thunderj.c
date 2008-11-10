@@ -117,10 +117,10 @@ static READ16_HANDLER( shared_ram_r )
 	/* look for a byte access, and then check for the high bit and a TAS opcode */
 	if (mem_mask != 0xffff && (result & mem_mask & 0x8080))
 	{
-		offs_t ppc = activecpu_get_previouspc();
+		offs_t ppc = cpu_get_previouspc(machine->activecpu);
 		if (ppc < 0xa0000)
 		{
-			int cpunum = cpu_getactivecpu();
+			int cpunum = cpunum_get_active();
 			UINT16 opcode = rom_base[cpunum][ppc / 2];
 
 			/* look for TAS or BTST #$7; both CPUs spin waiting for these in order to */

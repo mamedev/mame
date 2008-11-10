@@ -123,7 +123,7 @@ MACHINE_RESET( simpsons )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpunum_set_info_fct(0, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)simpsons_banking);
+	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)simpsons_banking);
 
 	paletteram = &RAM[0x88000];
 	simpsons_xtraram = &RAM[0x89000];

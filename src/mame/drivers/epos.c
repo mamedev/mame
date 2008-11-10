@@ -45,7 +45,7 @@ static WRITE8_HANDLER( dealer_decrypt_rom )
 	else
 		counter = (counter - 1) & 0x03;
 
-//  logerror("PC %08x: ctr=%04x\n",activecpu_get_pc(),counter);
+//  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(machine->activecpu),counter);
 
 	memory_set_bankptr(1, rom + 0x10000 * counter);
 

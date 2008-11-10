@@ -1322,7 +1322,7 @@ static struct st_chip {
 /*------------------------------
     uppdate timer
 ------------------------------*/
-static void uPD71054_update_timer( int no )
+static void uPD71054_update_timer( running_machine *machine, int no )
 {
 	UINT16 max = uPD71054.max[no]&0xffff;
 
@@ -1332,7 +1332,7 @@ static void uPD71054_update_timer( int no )
 	} else {
 		timer_adjust_oneshot( uPD71054.timer[no], attotime_never, no);
 		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
-				activecpu_get_pc(), no );
+				cpu_get_pc(machine->activecpu), no );
 	}
 }
 
@@ -1344,7 +1344,7 @@ static void uPD71054_update_timer( int no )
 static TIMER_CALLBACK( uPD71054_timer_callback )
 {
 	cpunum_set_input_line(machine, 0, 4, HOLD_LINE );
-	uPD71054_update_timer( param );
+	uPD71054_update_timer( machine, param );
 }
 
 
@@ -1390,7 +1390,7 @@ static WRITE16_HANDLER( timer_regs_w )
 			uPD71054.max[offset] = (uPD71054.max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054.max[offset] != 0 ) {
-			uPD71054_update_timer( offset );
+			uPD71054_update_timer( machine, offset );
 		}
 		break;
 	  case 0x0003:
@@ -1457,7 +1457,7 @@ static READ16_HANDLER( mirror_ram_r )
 static WRITE16_HANDLER( mirror_ram_w )
 {
 	COMBINE_DATA(&mirror_ram[offset]);
-//  logerror("PC %06X - Mirror RAM Written: %04X <- %04X\n", activecpu_get_pc(), offset*2, data);
+//  logerror("PC %06X - Mirror RAM Written: %04X <- %04X\n", cpu_get_pc(machine->activecpu), offset*2, data);
 }
 
 
@@ -1672,7 +1672,7 @@ static READ16_HANDLER ( calibr50_ip_r )
 		case 0x16/2:	return (dir2>>8);			// upper 4 bits of p2 rotation
 		case 0x18/2:	return 0xffff;				// ? (value's read but not used)
 		default:
-			logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(machine->activecpu), offset*2);
 			return 0;
 	}
 }
@@ -2395,7 +2395,7 @@ static READ16_HANDLER( krzybowl_input_r )
 		case 0xc/2:	return dir2y & 0xff;
 		case 0xe/2:	return dir2y >> 8;
 		default:
-			logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(machine->activecpu), offset*2);
 			return 0;
 	}
 }
@@ -2618,7 +2618,7 @@ static READ16_HANDLER( kiwame_input_r )
 		case 0x08/2:	return 0xffff;
 
 		default:
-			logerror("PC %06X - Read input %02X !\n", activecpu_get_pc(), offset*2);
+			logerror("PC %06X - Read input %02X !\n", cpu_get_pc(machine->activecpu), offset*2);
 			return 0x0000;
 	}
 }
@@ -2654,12 +2654,12 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( thunderl_protection_r )
 {
-//  logerror("PC %06X - Protection Read\n", activecpu_get_pc());
+//  logerror("PC %06X - Protection Read\n", cpu_get_pc(machine->activecpu));
 	return 0x00dd;
 }
 static WRITE16_HANDLER( thunderl_protection_w )
 {
-//  logerror("PC %06X - Protection Written: %04X <- %04X\n", activecpu_get_pc(), offset*2, data);
+//  logerror("PC %06X - Protection Written: %04X <- %04X\n", cpu_get_pc(machine->activecpu), offset*2, data);
 }
 
 /* Similar to downtown etc. */
@@ -3021,14 +3021,14 @@ static READ16_HANDLER( pairlove_prot_r )
 {
 	int retdata;
 	retdata = pairslove_protram[offset];
-	//mame_printf_debug("pairs love protection? read %06x %04x %04x\n",activecpu_get_pc(), offset,retdata);
+	//mame_printf_debug("pairs love protection? read %06x %04x %04x\n",cpu_get_pc(machine->activecpu), offset,retdata);
 	pairslove_protram[offset]=pairslove_protram_old[offset];
 	return retdata;
 }
 
 static WRITE16_HANDLER( pairlove_prot_w )
 {
-//  mame_printf_debug("pairs love protection? write %06x %04x %04x\n",activecpu_get_pc(), offset,data);
+//  mame_printf_debug("pairs love protection? write %06x %04x %04x\n",cpu_get_pc(machine->activecpu), offset,data);
 	pairslove_protram_old[offset]=pairslove_protram[offset];
 	pairslove_protram[offset]=data;
 }
@@ -3120,7 +3120,7 @@ static READ16_HANDLER( inttoote_key_r )
 		case 0x40:	return input_port_read(machine, "BET3");
 		case 0x80:	return input_port_read(machine, "BET4");
 	}
-	logerror("%06X: unknown read, select = %04x\n",activecpu_get_pc(),*inttoote_key_select);
+	logerror("%06X: unknown read, select = %04x\n",cpu_get_pc(machine->activecpu),*inttoote_key_select);
 	return 0xffff;
 }
 
@@ -9293,12 +9293,12 @@ static READ16_HANDLER( twineagl_debug_r )
 static UINT8 xram[8];
 static READ16_HANDLER( twineagl_200100_r )
 {
-logerror("%04x: twineagl_200100_r %d\n",activecpu_get_pc(),offset);
+logerror("%04x: twineagl_200100_r %d\n",cpu_get_pc(machine->activecpu),offset);
 	return xram[offset];
 }
 static WRITE16_HANDLER( twineagl_200100_w )
 {
-logerror("%04x: twineagl_200100_w %d = %02x\n",activecpu_get_pc(),offset,data);
+logerror("%04x: twineagl_200100_w %d = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
 	if (ACCESSING_BITS_0_7)
 		xram[offset] = data & 0xff;
 }

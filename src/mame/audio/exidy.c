@@ -410,11 +410,11 @@ static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 oldd
 		if ((olddata & 0x01) && !(newdata & 0x01))
 		{
 			riot6532_porta_in_set(riot, tms5220_status_r(device->machine, 0), 0xff);
-			logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), tms5220_status_r(device->machine, 0));
+			logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(device->machine->activecpu), tms5220_status_r(device->machine, 0));
 		}
 		if ((olddata & 0x02) && !(newdata & 0x02))
 		{
-			logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time()), activecpu_get_previouspc(), riot6532_porta_out_get(riot));
+			logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(device->machine->activecpu), riot6532_porta_out_get(riot));
 			tms5220_data_w(device->machine, 0, riot6532_porta_out_get(riot));
 		}
 	}
@@ -505,7 +505,7 @@ static READ8_HANDLER( exidy_sh8253_r )
 
 static READ8_HANDLER( exidy_sh6840_r )
 {
-	logerror("%04X:exidy_sh6840_r - unexpected read", activecpu_get_pc());
+	logerror("%04X:exidy_sh6840_r - unexpected read", cpu_get_pc(machine->activecpu));
 	return 0;
 }
 
@@ -788,7 +788,7 @@ READ8_HANDLER( victory_sound_response_r )
 {
 	UINT8 ret = pia_get_output_b(1);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", activecpu_get_previouspc(), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", cpu_get_previouspc(machine->activecpu), ret);
 
 	pia_set_input_cb1(1, 0);
 
@@ -800,7 +800,7 @@ READ8_HANDLER( victory_sound_status_r )
 {
 	UINT8 ret = (pia_get_input_ca1(1) << 7) | (pia_get_input_cb1(1) << 6);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", activecpu_get_previouspc(), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", cpu_get_previouspc(machine->activecpu), ret);
 
 	return ret;
 }
@@ -814,7 +814,7 @@ static TIMER_CALLBACK( delayed_command_w )
 
 WRITE8_HANDLER( victory_sound_command_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", activecpu_get_previouspc(), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", cpu_get_previouspc(machine->activecpu), data);
 
 	timer_call_after_resynch(NULL, data, delayed_command_w);
 }
@@ -822,7 +822,7 @@ WRITE8_HANDLER( victory_sound_command_w )
 
 static WRITE8_HANDLER( victory_sound_irq_clear_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound IRQ clear = %02X\n", activecpu_get_previouspc(), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound IRQ clear = %02X\n", cpu_get_previouspc(machine->activecpu), data);
 
 	if (!data) pia_set_input_ca1(1, 1);
 }
@@ -830,7 +830,7 @@ static WRITE8_HANDLER( victory_sound_irq_clear_w )
 
 static WRITE8_HANDLER( victory_main_ack_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound Main ACK W = %02X\n", activecpu_get_previouspc(), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound Main ACK W = %02X\n", cpu_get_previouspc(machine->activecpu), data);
 
 	if (victory_sound_response_ack_clk && !data)
 		pia_set_input_cb1(1, 1);

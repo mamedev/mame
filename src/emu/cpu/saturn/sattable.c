@@ -38,25 +38,25 @@ static const int sub_right[]={B,C,A,C, I,I,I,I, A,B,C,D, B,C,A,C};
 static void saturn_invalid3( int op1, int op2, int op3 )
 {
 	logerror( "SATURN#%d invalid opcode %x%x%x at %05x\n",
-		  cpu_getactivecpu(), op1, op2, op3, saturn.pc-3 );
+		  cpunum_get_active(), op1, op2, op3, saturn.pc-3 );
 }
 
 static void saturn_invalid4( int op1, int op2, int op3, int op4 )
 {
 	logerror( "SATURN#%d invalid opcode %x%x%x%x at %05x\n",
-		  cpu_getactivecpu(), op1, op2, op3, op4, saturn.pc-4 );
+		  cpunum_get_active(), op1, op2, op3, op4, saturn.pc-4 );
 }
 
 static void saturn_invalid5( int op1, int op2, int op3, int op4, int op5 )
 {
 	logerror( "SATURN#%d invalid opcode %x%x%x%x%x at %05x\n",
-		  cpu_getactivecpu(), op1, op2, op3, op4, op5, saturn.pc-5 );
+		  cpunum_get_active(), op1, op2, op3, op4, op5, saturn.pc-5 );
 }
 
 static void saturn_invalid6( int op1, int op2, int op3, int op4, int op5, int op6 )
 {
 	logerror( "SATURN#%d invalid opcode %x%x%x%x%x%x at %05x\n",
-		  cpu_getactivecpu(), op1, op2, op3, op4, op5, op6, saturn.pc-6 );
+		  cpunum_get_active(), op1, op2, op3, op4, op5, op6, saturn.pc-6 );
 }
 
 

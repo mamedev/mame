@@ -281,7 +281,7 @@ static READ16_HANDLER( standard_io_r )
 		case 0x2000/2:
 			return input_port_read(machine, (offset & 1) ? "DSW2" : "DSW1");
 	}
-	logerror("%06X:standard_io_r - unknown read access to address %04X\n", activecpu_get_pc(), offset * 2);
+	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
 	return 0xffff;
 }
 
@@ -298,7 +298,7 @@ static WRITE16_HANDLER( standard_io_w )
 				timer_call_after_resynch(NULL, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", activecpu_get_pc(), offset * 2, data, mem_mask);
+	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
 }
 
 

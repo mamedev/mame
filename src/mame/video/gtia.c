@@ -9,6 +9,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/atari.h"
 #include "video/gtia.h"
@@ -1068,19 +1069,19 @@ void gtia_render(VIDEO *video)
 
 void gtia_mode_1_32(VIDEO *video)
 {
-	PREPARE_GFXG1(32);
+	PREPARE_GFXG1(Machine->cpu[0], 32);
 	REP32(GTIA1);
 	POST_GFX(32);
 }
 void gtia_mode_1_40(VIDEO *video)
 {
-	PREPARE_GFXG1(40);
+	PREPARE_GFXG1(Machine->cpu[0], 40);
 	REP40(GTIA1);
 	POST_GFX(40);
 }
 void gtia_mode_1_48(VIDEO *video)
 {
-	PREPARE_GFXG1(48);
+	PREPARE_GFXG1(Machine->cpu[0], 48);
 	REP48(GTIA1);
 	POST_GFX(48);
 }
@@ -1092,19 +1093,19 @@ void gtia_mode_1_48(VIDEO *video)
 
 void gtia_mode_2_32(VIDEO *video)
 {
-	PREPARE_GFXG2(32);
+	PREPARE_GFXG2(Machine->cpu[0], 32);
 	REP32(GTIA2);
 	POST_GFX(32);
 }
 void gtia_mode_2_40(VIDEO *video)
 {
-	PREPARE_GFXG2(40);
+	PREPARE_GFXG2(Machine->cpu[0], 40);
 	REP40(GTIA2);
 	POST_GFX(40);
 }
 void gtia_mode_2_48(VIDEO *video)
 {
-	PREPARE_GFXG2(48);
+	PREPARE_GFXG2(Machine->cpu[0], 48);
 	REP48(GTIA2);
 	POST_GFX(48);
 }
@@ -1116,19 +1117,19 @@ void gtia_mode_2_48(VIDEO *video)
 
 void gtia_mode_3_32(VIDEO *video)
 {
-	PREPARE_GFXG3(32);
+	PREPARE_GFXG3(Machine->cpu[0], 32);
 	REP32(GTIA3);
 	POST_GFX(32);
 }
 void gtia_mode_3_40(VIDEO *video)
 {
-	PREPARE_GFXG3(40);
+	PREPARE_GFXG3(Machine->cpu[0], 40);
 	REP40(GTIA3);
 	POST_GFX(40);
 }
 void gtia_mode_3_48(VIDEO *video)
 {
-	PREPARE_GFXG3(48);
+	PREPARE_GFXG3(Machine->cpu[0], 48);
 	REP48(GTIA3);
 	POST_GFX(48);
 }

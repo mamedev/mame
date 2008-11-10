@@ -265,7 +265,7 @@ INLINE void m4510_take_irq(m4510_Regs *m4510)
 		P = (P & ~F_D) | F_I;		/* knock out D and set I flag */
 		PCL = RDMEM(EAD);
 		PCH = RDMEM(EAD+1);
-		LOG(("M4510#%d takes IRQ ($%04x)\n", cpu_getactivecpu(), PCD));
+		LOG(("M4510#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m4510->irq_callback) (*m4510->irq_callback)(m4510->device, 0);
 		CHANGE_PC;
@@ -298,7 +298,7 @@ static CPU_EXECUTE( m4510 )
 		/* check if the I flag was just reset (interrupts enabled) */
 		if( m4510->after_cli )
 		{
-			LOG(("M4510#%d after_cli was >0", cpu_getactivecpu()));
+			LOG(("M4510#%d after_cli was >0", cpunum_get_active()));
 			m4510->after_cli = 0;
 			if (m4510->irq_state != CLEAR_LINE)
 			{
@@ -327,7 +327,7 @@ static void m4510_set_irq_line(m4510_Regs *m4510, int irqline, int state)
 		m4510->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(("M4510#%d set_nmi_line(ASSERT)\n", cpu_getactivecpu()));
+			LOG(("M4510#%d set_nmi_line(ASSERT)\n", cpunum_get_active()));
 			EAD = M4510_NMI_VEC;
 			m4510->icount -= 7;
 			PUSH(PCH);
@@ -336,7 +336,7 @@ static void m4510_set_irq_line(m4510_Regs *m4510, int irqline, int state)
 			P = (P & ~F_D) | F_I;		/* knock out D and set I flag */
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
-			LOG(("M4510#%d takes NMI ($%04x)\n", cpu_getactivecpu(), PCD));
+			LOG(("M4510#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
 			CHANGE_PC;
 		}
 	}
@@ -345,7 +345,7 @@ static void m4510_set_irq_line(m4510_Regs *m4510, int irqline, int state)
 		m4510->irq_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(("M4510#%d set_irq_line(ASSERT)\n", cpu_getactivecpu()));
+			LOG(("M4510#%d set_irq_line(ASSERT)\n", cpunum_get_active()));
 			m4510->pending_irq = 1;
 		}
 	}

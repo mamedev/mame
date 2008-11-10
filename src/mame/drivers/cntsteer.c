@@ -310,7 +310,7 @@ static WRITE8_HANDLER( cntsteer_sound_w )
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
 {
-	logerror("CTRL: %04x: %04x: %04x\n",activecpu_get_pc(),offset,data);
+	logerror("CTRL: %04x: %04x: %04x\n",cpu_get_pc(machine->activecpu),offset,data);
 //  if (offset==0) cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this

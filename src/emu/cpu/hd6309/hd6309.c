@@ -575,7 +575,7 @@ static void set_irq_line(int irqline, int state)
 	{
 		if (hd6309.nmi_state == state) return;
 		hd6309.nmi_state = state;
-		LOG(("HD6309#%d set_irq_line (NMI) %d (PC=%4.4X)\n", cpu_getactivecpu(), state, pPC.d));
+		LOG(("HD6309#%d set_irq_line (NMI) %d (PC=%4.4X)\n", cpunum_get_active(), state, pPC.d));
 		if( state == CLEAR_LINE ) return;
 
 		/* if the stack was not yet initialized */
@@ -614,7 +614,7 @@ static void set_irq_line(int irqline, int state)
 	}
 	else if (irqline < 2)
 	{
-		LOG(("HD6309#%d set_irq_line %d, %d (PC=%4.4X)\n", cpu_getactivecpu(), irqline, state, pPC.d));
+		LOG(("HD6309#%d set_irq_line %d, %d (PC=%4.4X)\n", cpunum_get_active(), irqline, state, pPC.d));
 		hd6309.irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
 		CHECK_IRQ_LINES();

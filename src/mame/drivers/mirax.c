@@ -101,7 +101,7 @@ static READ8_HANDLER(snd_read)
 
 static WRITE8_HANDLER(audio_w)
 {
-	if(activecpu_get_previouspc()==0x2fd)
+	if(cpu_get_previouspc(machine->activecpu)==0x2fd)
 	{
 		nAyCtrl=offset;
 		nAyData=data;
@@ -111,7 +111,7 @@ static WRITE8_HANDLER(audio_w)
 
 static WRITE8_HANDLER(ay1_sel)
 {
-	if(activecpu_get_previouspc()==0x309)
+	if(cpu_get_previouspc(machine->activecpu)==0x309)
 	{
 		ay8910_control_port_0_w(machine,0,nAyCtrl);
 		ay8910_write_port_0_w(machine,0,nAyData);
@@ -121,7 +121,7 @@ static WRITE8_HANDLER(ay1_sel)
 static WRITE8_HANDLER(ay2_sel)
 {
 
-	if(activecpu_get_previouspc()==0x309)
+	if(cpu_get_previouspc(machine->activecpu)==0x309)
 	{
 		ay8910_control_port_1_w(machine,0,nAyCtrl);
 		ay8910_write_port_1_w(machine,0,nAyData);

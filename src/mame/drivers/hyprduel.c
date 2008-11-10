@@ -131,7 +131,7 @@ static WRITE16_HANDLER( hyprduel_irq_cause_w )
 
 static WRITE16_HANDLER( hypr_subcpu_control_w )
 {
-	int pc = activecpu_get_pc();
+	int pc = cpu_get_pc(machine->activecpu);
 
 	if (data & 0x01)
 	{
@@ -318,7 +318,7 @@ INLINE void blt_write(running_machine *machine, const int tmap, const offs_t off
 		case 2:	hyprduel_vram_1_w(machine,offs,data,mask);	break;
 		case 3:	hyprduel_vram_2_w(machine,offs,data,mask);	break;
 	}
-//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",activecpu_get_pc(),tmap,offs,data,mask);
+//  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",cpu_get_pc(machine->activecpu),tmap,offs,data,mask);
 }
 
 
@@ -343,7 +343,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 		int shift			=	(dst_offs & 0x80) ? 0 : 8;
 		UINT16 mask		=	(dst_offs & 0x80) ? 0xff00 : 0x00ff;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",activecpu_get_pc(),tmap,src_offs,dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",cpu_get_pc(machine->activecpu),tmap,src_offs,dst_offs);
 
 		dst_offs >>= 7+1;
 		switch( tmap )
@@ -353,7 +353,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",activecpu_get_pc(),tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",cpu_get_pc(machine->activecpu),tmap);
 				return;
 		}
 
@@ -363,7 +363,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 			src_offs %= src_len;
 			b1 = blt_read(src,src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",activecpu_get_pc(),b1,src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",cpu_get_pc(machine->activecpu),b1,src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -447,7 +447,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",activecpu_get_pc(),b1,src_offs-1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",cpu_get_pc(machine->activecpu),b1,src_offs-1);
 					return;
 			}
 

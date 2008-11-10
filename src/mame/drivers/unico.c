@@ -252,7 +252,7 @@ static WRITE32_HANDLER( zeropnt2_leds_w )
 static WRITE32_HANDLER( zeropnt2_eeprom_w )
 {
 	if (data & ~0xfe00000)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",activecpu_get_pc(),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(machine->activecpu),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{
