@@ -259,7 +259,7 @@ READ16_HANDLER( hd68k_gsp_io_r )
 	UINT16 result;
 	offset = (offset / 2) ^ 1;
 	hd34010_host_access = 1;
-	result = tms34010_host_r(hdcpu_gsp, offset);
+	result = tms34010_host_r(machine->cpu[hdcpu_gsp], offset);
 	hd34010_host_access = 0;
 	return result;
 }
@@ -269,7 +269,7 @@ WRITE16_HANDLER( hd68k_gsp_io_w )
 {
 	offset = (offset / 2) ^ 1;
 	hd34010_host_access = 1;
-	tms34010_host_w(hdcpu_gsp, offset, data);
+	tms34010_host_w(machine->cpu[hdcpu_gsp], offset, data);
 	hd34010_host_access = 0;
 }
 
@@ -286,7 +286,7 @@ READ16_HANDLER( hd68k_msp_io_r )
 	UINT16 result;
 	offset = (offset / 2) ^ 1;
 	hd34010_host_access = 1;
-	result = (hdcpu_msp != -1) ? tms34010_host_r(hdcpu_msp, offset) : 0xffff;
+	result = (hdcpu_msp != -1) ? tms34010_host_r(machine->cpu[hdcpu_msp], offset) : 0xffff;
 	hd34010_host_access = 0;
 	return result;
 }
@@ -298,7 +298,7 @@ WRITE16_HANDLER( hd68k_msp_io_w )
 	if (hdcpu_msp != -1)
 	{
 		hd34010_host_access = 1;
-		tms34010_host_w(hdcpu_msp, offset, data);
+		tms34010_host_w(machine->cpu[hdcpu_msp], offset, data);
 		hd34010_host_access = 0;
 	}
 }

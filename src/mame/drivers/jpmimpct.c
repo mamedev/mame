@@ -198,12 +198,12 @@ static MACHINE_RESET( jpmimpct )
 
 static WRITE16_HANDLER( m68k_tms_w )
 {
-	tms34010_host_w(1, offset, data);
+	tms34010_host_w(machine->cpu[1], offset, data);
 }
 
 static READ16_HANDLER( m68k_tms_r )
 {
-	return tms34010_host_r(1, offset);
+	return tms34010_host_r(machine->cpu[1], offset);
 }
 
 

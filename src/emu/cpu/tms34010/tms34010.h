@@ -84,20 +84,12 @@ struct _tms34010_config
 
 /* PUBLIC FUNCTIONS - 34010 */
 VIDEO_UPDATE( tms340x0 );
-void tms34010_get_display_params(int cpunum, tms34010_display_params *params);
+void tms34010_get_display_params(const device_config *cpu, tms34010_display_params *params);
 
 CPU_GET_INFO( tms34010 );
 
-int 		tms34010_io_display_blanked(int cpu);
-int 		tms34010_get_DPYSTRT(int cpu);
-
-
 /* PUBLIC FUNCTIONS - 34020 */
 CPU_GET_INFO( tms34020 );
-
-int 		tms34020_io_display_blanked(int cpu);
-int 		tms34020_get_DPYSTRT(int cpu);
-
 
 
 /* Host control interface */
@@ -106,8 +98,8 @@ int 		tms34020_get_DPYSTRT(int cpu);
 #define TMS34010_HOST_DATA			2
 #define TMS34010_HOST_CONTROL		3
 
-void		tms34010_host_w(int cpunum, int reg, int data);
-int			tms34010_host_r(int cpunum, int reg);
+void		tms34010_host_w(const device_config *cpu, int reg, int data);
+int			tms34010_host_r(const device_config *cpu, int reg);
 
 
 /* Reads & writes to the 34010 I/O registers; place at 0xc0000000 */

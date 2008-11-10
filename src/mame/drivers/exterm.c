@@ -117,13 +117,13 @@ static MACHINE_RESET( exterm )
 
 static WRITE16_HANDLER( exterm_host_data_w )
 {
-	tms34010_host_w(1, offset / TOWORD(0x00100000), data);
+	tms34010_host_w(machine->cpu[1], offset / TOWORD(0x00100000), data);
 }
 
 
 static READ16_HANDLER( exterm_host_data_r )
 {
-	return tms34010_host_r(1, offset / TOWORD(0x00100000));
+	return tms34010_host_r(machine->cpu[1], offset / TOWORD(0x00100000));
 }
 
 

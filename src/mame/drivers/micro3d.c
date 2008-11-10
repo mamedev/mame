@@ -718,12 +718,12 @@ static WRITE16_HANDLER( mystery3_w )
 
 static READ16_HANDLER( tms_host_r )
 {
-	return tms34010_host_r(1, offset);
+	return tms34010_host_r(machine->cpu[1], offset);
 }
 
 static WRITE16_HANDLER( tms_host_w )
 {
-	tms34010_host_w(1, offset, data);
+	tms34010_host_w(machine->cpu[1], offset, data);
 }
 
 #ifdef UNUSED_FUNCTION

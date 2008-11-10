@@ -552,10 +552,8 @@ static const struct
 #if (HAS_S2650)
 	{ CPU_S2650, CPU_GET_INFO_NAME(s2650) },
 #endif
-#if (HAS_TMS34010)
+#if (HAS_TMS340X0)
 	{ CPU_TMS34010, CPU_GET_INFO_NAME(tms34010) },
-#endif
-#if (HAS_TMS34020)
 	{ CPU_TMS34020, CPU_GET_INFO_NAME(tms34020) },
 #endif
 #if (HAS_TI990_10)

@@ -1577,21 +1577,19 @@ $(CPUOBJ)/tms9900/ti990_10.o:	$(CPUSRC)/tms9900/ti990_10.c \
 # Texas Instruments TMS340x0 graphics controllers
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_TMS34010=$(if $(filter TMS34010,$(CPUS)),1,0)
-CPUDEFS += -DHAS_TMS34020=$(if $(filter TMS34020,$(CPUS)),1,0)
+CPUDEFS += -DHAS_TMS340X0=$(if $(filter TMS340X0,$(CPUS)),1,0)
 
-ifneq ($(filter TMS34010 TMS34020,$(CPUS)),)
+ifneq ($(filter TMS340X0,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/tms34010
-CPUOBJS += $(CPUOBJ)/tms34010/tms34010.o $(CPUOBJ)/tms34010/34010fld.o
+CPUOBJS += $(CPUOBJ)/tms34010/tms34010.o
 DBGOBJS += $(CPUOBJ)/tms34010/34010dsm.o
 endif
-
-$(CPUOBJ)/tms34010/34010fld.o:  $(CPUSRC)/tms34010/34010fld.c
 
 $(CPUOBJ)/tms34010/tms34010.o:	$(CPUSRC)/tms34010/tms34010.c \
 								$(CPUSRC)/tms34010/tms34010.h \
 								$(CPUSRC)/tms34010/34010ops.c \
 								$(CPUSRC)/tms34010/34010gfx.c \
+								$(CPUSRC)/tms34010/34010fld.c \
 								$(CPUSRC)/tms34010/34010tbl.c
 
 
