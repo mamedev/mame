@@ -6,6 +6,21 @@ MAGMAX
 Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/05 -
 Additional tweaking by Jarek Burczynski
 
+
+Stephh's notes (based on the game M68000 code and some tests) :
+
+  - Player 1 Button 2 shall not exist per se, but pressing it speeds the game.
+    That's why I mapped it to a different key (F1) to avoid confusion.
+    It appears (as well as Player 2 Button 2) in the schematics though.
+    However I don't see it in the wiring connector page.
+  - DSW2 bit 8 is not referenced in the US manual and only has an effect
+    if you have EXACTLY 10 credits after you pressed any START button
+    (which means that you need to have 11 credits if you choose a 1 player game
+    or 12 credits if you choose a 2 players game).
+    When activated, you are giving infinite lives (in fact 0x60 = 60 lives)
+    for both players, you can still lose parts of the ship but not the main ship.
+    See code at 0x0001e6 (ships given at start) and 0x0044e6 (other stuff).
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -239,22 +254,23 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( magmax )
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )	/* Maybe this is just a test button and as such is not available to player */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME("Speed") PORT_CODE(KEYCODE_F1) PORT_TOGGLE   /* see notes */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP  )   PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* see notes */
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -269,42 +285,49 @@ static INPUT_PORTS_START( magmax )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0003, "3" )
 	PORT_DIPSETTING(      0x0002, "4" )
 	PORT_DIPSETTING(      0x0001, "5" )
 	PORT_DIPSETTING(      0x0000, "6" )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x000c, "30000 every" )
-	PORT_DIPSETTING(      0x0004, "70000 every" )
 	PORT_DIPSETTING(      0x0008, "50000 every" )
+	PORT_DIPSETTING(      0x0004, "70000 every" )
 	PORT_DIPSETTING(      0x0000, "90000 every" )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW1:5")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPSETTING(      0x000c, "30k 80k 50k+" )
+	PORT_DIPSETTING(      0x0008, "50k 120k 70k+" )
+	PORT_DIPSETTING(      0x0004, "70k 160k 90k+" )
+	PORT_DIPSETTING(      0x0000, "90k 200k 110k+" )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW1:5")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( Cocktail ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0040, 0x0040, "SW1:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW1:8" )
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0100, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5")
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5")
 	PORT_DIPSETTING(      0x1000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW2:6")
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW2:6")     /* undocumented in the US manual */
 	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x4000, 0x4000, "SW2:7" )
-	PORT_DIPUNKNOWN_DIPLOC( 0x8000, 0x8000, "SW2:8" )
+	PORT_DIPUNUSED_DIPLOC( 0x4000, 0x4000, "SW2:7" )
+	PORT_DIPNAME( 0x8000, 0x8000, "Debug Mode" )            PORT_DIPLOCATION("SW2:8")     /* see notes */
+	PORT_DIPSETTING(      0x8000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
 
@@ -444,4 +467,3 @@ ROM_END
 
 
 GAME( 1985, magmax, 0, magmax, magmax, 0, ROT0, "Nichibutsu", "Mag Max", GAME_SUPPORTS_SAVE )
-
