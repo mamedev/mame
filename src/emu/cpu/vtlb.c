@@ -30,6 +30,7 @@
 /* VTLB state */
 struct _vtlb_state
 {
+	const device_config *device;			/* CPU device */
 	int					space;				/* address space */
 	int 				dynamic;			/* number of dynamic entries */
 	int					fixed;				/* number of fixed entries */
@@ -64,6 +65,7 @@ vtlb_state *vtlb_alloc(const device_config *cpu, int space, int fixed_entries, i
 	memset(vtlb, 0, sizeof(*vtlb));
 
 	/* fill in CPU information */
+	vtlb->device = cpu;
 	vtlb->space = space;
 	vtlb->dynamic = dynamic_entries;
 	vtlb->fixed = fixed_entries;
@@ -152,7 +154,7 @@ int vtlb_fill(vtlb_state *vtlb, offs_t address, int intention)
 
 	/* ask the CPU core to translate for us */
 	taddress = address;
-	if (!(*vtlb->translate)(vtlb->space, intention, &taddress))
+	if (!(*vtlb->translate)(vtlb->device, vtlb->space, intention, &taddress))
 	{
 		if (PRINTF_TLB)
 			printf("failed: no translation\n");

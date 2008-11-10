@@ -62,7 +62,7 @@ enum
 };
 
 CPU_GET_INFO( i960 );
-void i960_noburst(void);
-void i960_stall(void);
+void i960_noburst(const device_config *device);
+void i960_stall(const device_config *device);
 
 #endif /* __I960_H__ */

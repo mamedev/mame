@@ -209,7 +209,6 @@ static void writecache_le_dword(offs_t offset, UINT32 data);
 
 static void *token;
 
-
 static const memory_accessors be_memory =
 {
 	program_read_byte_32be,  program_read_word_32be,  program_read_dword_32be,
@@ -321,17 +320,6 @@ static CPU_GET_CONTEXT( r3000 )
 
 static CPU_SET_CONTEXT( r3000 )
 {
-	r3000_state *r3000;
-
-	/* copy the context */
-	if (src)
-		token = src;
-
-	r3000 = token;
-	change_pc(r3000->pc);
-
-	/* check for IRQs */
-	check_irqs(r3000);
 }
 
 
@@ -736,12 +724,17 @@ INLINE void handle_cop3(r3000_state *r3000, UINT32 op)
 static CPU_EXECUTE( r3000 )
 {
 	r3000_state *r3000 = device->token;
+	
+	token = device->token;
 
 	/* count cycles and interrupt cycles */
 	r3000->icount = cycles;
 	r3000->icount -= r3000->interrupt_cycles;
 	r3000->interrupt_cycles = 0;
 	change_pc(r3000->pc);
+
+	/* check for IRQs */
+	check_irqs(r3000);
 
 	/* core execution loop */
 	do
@@ -934,16 +927,20 @@ static CPU_EXECUTE( r3000 )
     DISASSEMBLY HOOK
 ***************************************************************************/
 
-static CPU_DISASSEMBLE( r3000 )
+static CPU_DISASSEMBLE( r3000be )
 {
 	extern unsigned dasmr3k(char *, unsigned, UINT32);
-	r3000_state *r3000 = token;
 	UINT32 op = *(UINT32 *)oprom;
-	if (r3000->bigendian)
-		op = BIG_ENDIANIZE_INT32(op);
-	else
-		op = LITTLE_ENDIANIZE_INT32(op);
+	op = BIG_ENDIANIZE_INT32(op);
+	return dasmr3k(buffer, pc, op);
+}
 
+
+static CPU_DISASSEMBLE( r3000le )
+{
+	extern unsigned dasmr3k(char *, unsigned, UINT32);
+	UINT32 op = *(UINT32 *)oprom;
+	op = LITTLE_ENDIANIZE_INT32(op);
 	return dasmr3k(buffer, pc, op);
 }
 
@@ -1162,7 +1159,7 @@ static void swr_le(r3000_state *r3000, UINT32 op)
 
 static CPU_SET_INFO( r3000 )
 {
-	r3000_state *r3000 = token;
+	r3000_state *r3000 = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1221,7 +1218,7 @@ static CPU_SET_INFO( r3000 )
 
 static CPU_GET_INFO( r3000 )
 {
-	r3000_state *r3000 = token;
+	r3000_state *r3000 = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1302,7 +1299,7 @@ static CPU_GET_INFO( r3000 )
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(r3000);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(r3000);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					/* provided per-CPU */				break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &r3000->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -1366,6 +1363,7 @@ CPU_GET_INFO( r3000be )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000be);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (big)");			break;
@@ -1384,6 +1382,7 @@ CPU_GET_INFO( r3000le )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000le);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3000 (little)");		break;
@@ -1402,6 +1401,7 @@ CPU_GET_INFO( r3041be )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000be);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (big)");			break;
@@ -1420,6 +1420,7 @@ CPU_GET_INFO( r3041le )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(r3000le);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "R3041 (little)");		break;

@@ -4679,7 +4679,7 @@ static CPU_SET_INFO( tms99xx )
  * Generic get_info
  **************************************************************************/
 
-void TMS99XX_GET_INFO(UINT32 state, cpuinfo *info)
+void TMS99XX_GET_INFO(const device_config *device, UINT32 state, cpuinfo *info)
 {
 	switch (state)
 	{

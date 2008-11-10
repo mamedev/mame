@@ -171,12 +171,6 @@ struct _mcs48_opcode
 
 
 /***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-static void *token;
-
-/***************************************************************************
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
@@ -703,8 +697,6 @@ static void mcs48_init(const device_config *device, int index, int clock, cpu_ir
 {
 	mcs48_state *mcs48 = device->token;
 
-	token = device->token;	// temporary
-
 	/* External access line
      * EA=1 : read from external rom
      * EA=0 : read from internal rom
@@ -925,6 +917,9 @@ static CPU_EXECUTE( mcs48 )
 	mcs48_state *mcs48 = device->token;
 	unsigned opcode;
 
+	update_regptr(mcs48);
+	change_pc(PC);
+
 	mcs48->icount = cycles;
 
 	/* external interrupts may have been set since we last checked */
@@ -1002,12 +997,6 @@ static CPU_GET_CONTEXT( mcs48 )
 
 static CPU_SET_CONTEXT( mcs48 )
 {
-	mcs48_state *mcs48;
-	if( src )
-		token = src;
-	mcs48 = token;
-	update_regptr(mcs48);
-	change_pc(PC);
 }
 
 /*-------------------------------------------------
@@ -1017,7 +1006,7 @@ static CPU_SET_CONTEXT( mcs48 )
 
 static CPU_SET_INFO( mcs48 )
 {
-	mcs48_state *mcs48 = token;
+	mcs48_state *mcs48 = device->token;
 
 	switch (state)
 	{
@@ -1053,7 +1042,7 @@ static CPU_SET_INFO( mcs48 )
 
 static CPU_GET_INFO( mcs48 )
 {
-	mcs48_state *mcs48 = token;
+	mcs48_state *mcs48 = (device != NULL) ? device->token : NULL;
 
 	switch (state)
 	{

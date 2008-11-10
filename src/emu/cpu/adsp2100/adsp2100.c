@@ -269,8 +269,6 @@ typedef struct
     PRIVATE GLOBAL VARIABLES
 ***************************************************************************/
 
-static void *token;
-
 static UINT16 *reverse_table = 0;
 static UINT16 *mask_table = 0;
 static UINT8 *condition_table = 0;
@@ -557,15 +555,6 @@ static CPU_GET_CONTEXT( adsp21xx )
 
 static CPU_SET_CONTEXT( adsp21xx )
 {
-	/* copy the context */
-	if (src)
-	{
-		adsp2100_state *adsp;
-		token = src;
-		adsp = token;
-		CHANGEPC(adsp);
-		check_irqs(adsp);
-	}
 }
 
 
@@ -577,8 +566,6 @@ static CPU_SET_CONTEXT( adsp21xx )
 static adsp2100_state *adsp21xx_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
 	adsp2100_state *adsp = device->token;
-
-	token = device->token;	// temporary
 
 	/* create the tables */
 	if (!create_tables())
@@ -917,13 +904,14 @@ static CPU_EXECUTE( adsp21xx )
 	int check_debugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 	adsp2100_state *adsp = device->token;
 
+	CHANGEPC(adsp);
+	check_irqs(adsp);
+
 	/* reset the core */
 	set_mstat(adsp, adsp->mstat);
 
 	/* count cycles and interrupt cycles */
 	adsp->icount = cycles;
-
-	CHANGEPC(adsp);
 
 	do
 	{
@@ -1679,7 +1667,7 @@ extern CPU_DISASSEMBLE( adsp21xx );
 
 static CPU_SET_INFO( adsp21xx )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1792,7 +1780,7 @@ static CPU_SET_INFO( adsp21xx )
 
 static CPU_GET_INFO( adsp21xx )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -2076,7 +2064,7 @@ static CPU_INIT( adsp2100 )
 
 static CPU_SET_INFO( adsp2100 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -2093,7 +2081,7 @@ static CPU_SET_INFO( adsp2100 )
 
 CPU_GET_INFO( adsp2100 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -2134,7 +2122,7 @@ static CPU_INIT( adsp2101 )
 
 static CPU_SET_INFO( adsp2101 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -2158,7 +2146,7 @@ static CPU_SET_INFO( adsp2101 )
 
 CPU_GET_INFO( adsp2101 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -2209,7 +2197,7 @@ void adsp2104_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 
 static CPU_SET_INFO( adsp2104 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -2233,7 +2221,7 @@ static CPU_SET_INFO( adsp2104 )
 
 CPU_GET_INFO( adsp2104 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -2284,7 +2272,7 @@ void adsp2105_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 
 static CPU_SET_INFO( adsp2105 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -2305,7 +2293,7 @@ static CPU_SET_INFO( adsp2105 )
 
 CPU_GET_INFO( adsp2105 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -2353,7 +2341,7 @@ void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 
 static CPU_SET_INFO( adsp2115 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -2377,7 +2365,7 @@ static CPU_SET_INFO( adsp2115 )
 
 CPU_GET_INFO( adsp2115 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -2428,7 +2416,7 @@ void adsp2181_load_boot_data(UINT8 *srcdata, UINT32 *dstdata)
 
 static CPU_SET_INFO( adsp2181 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -2455,7 +2443,7 @@ static CPU_SET_INFO( adsp2181 )
 
 CPU_GET_INFO( adsp2181 )
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -2491,22 +2479,22 @@ CPU_GET_INFO( adsp2181 )
 	}
 }
 
-void adsp2181_idma_addr_w(UINT16 data)
+void adsp2181_idma_addr_w(const device_config *device, UINT16 data)
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	adsp->idma_addr = data;
 	adsp->idma_offs = 0;
 }
 
-UINT16 adsp2181_idma_addr_r(void)
+UINT16 adsp2181_idma_addr_r(const device_config *device)
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	return adsp->idma_addr;
 }
 
-void adsp2181_idma_data_w(UINT16 data)
+void adsp2181_idma_data_w(const device_config *device, UINT16 data)
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 
 	/* program memory? */
 	if (!(adsp->idma_addr & 0x4000))
@@ -2531,9 +2519,9 @@ void adsp2181_idma_data_w(UINT16 data)
 		WWORD_DATA(adsp->idma_addr++ & 0x3fff, data);
 }
 
-UINT16 adsp2181_idma_data_r(void)
+UINT16 adsp2181_idma_data_r(const device_config *device)
 {
-	adsp2100_state *adsp = token;
+	adsp2100_state *adsp = device->token;
 	UINT16 result = 0xffff;
 
 	/* program memory? */

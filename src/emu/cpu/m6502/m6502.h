@@ -177,7 +177,7 @@ extern CPU_GET_INFO( n2a03 );
    Bit 7 of address $4011 (the PSG's DPCM control register), when set,
    causes an IRQ to be generated.  This function allows the IRQ to be called
    from the PSG core when such an occasion arises. */
-extern void n2a03_irq(void);
+extern void n2a03_irq(const device_config *device);
 #endif
 
 

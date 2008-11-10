@@ -172,7 +172,7 @@ static UINT32 copro_fifoout_pop(void)
 	if (copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
-		i960_stall();
+		i960_stall(Machine->activecpu);
 
 		/* spin the main cpu and let the TGP catch up */
 		cpu_spinuntil_time(ATTOTIME_IN_USEC(100));
@@ -278,7 +278,7 @@ static NVRAM_HANDLER( model2 )
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 static READ32_HANDLER( timers_r )
 {
-	i960_noburst();
+	i960_noburst(machine->activecpu);
 
 	// if timer is running, calculate current value
 	if (model2_timerrun[offset])
@@ -297,7 +297,7 @@ static WRITE32_HANDLER( timers_w )
 {
 	attotime period;
 
-	i960_noburst();
+	i960_noburst(machine->activecpu);
 	COMBINE_DATA(&model2_timervals[offset]);
 
 	model2_timerorig[offset] = model2_timervals[offset];
@@ -874,7 +874,7 @@ static READ32_HANDLER(desert_unk_r)
 
 static READ32_HANDLER(model2_irq_r)
 {
-	i960_noburst();
+	i960_noburst(machine->activecpu);
 
 	if (offset)
 	{
@@ -886,7 +886,7 @@ static READ32_HANDLER(model2_irq_r)
 
 static WRITE32_HANDLER(model2_irq_w)
 {
-	i960_noburst();
+	i960_noburst(machine->activecpu);
 
 	if (offset)
 	{

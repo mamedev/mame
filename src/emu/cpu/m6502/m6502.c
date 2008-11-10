@@ -345,9 +345,9 @@ static CPU_INIT( n2a03 )
    Bit 7 of address $4011 (the PSG's DPCM control register), when set,
    causes an IRQ to be generated.  This function allows the IRQ to be called
    from the PSG core when such an occasion arises. */
-void n2a03_irq()
+void n2a03_irq(const device_config *device)
 {
-	m6502_Regs *m6502 = token;
+	m6502_Regs *m6502 = device->token;
 
 	m6502_take_irq(m6502);
 }
@@ -692,7 +692,7 @@ static CPU_EXECUTE( deco16 )
 
 static CPU_SET_INFO( m6502 )
 {
-	m6502_Regs *m6502 = token;
+	m6502_Regs *m6502 = device->token;
 
 	switch (state)
 	{
@@ -726,7 +726,7 @@ static CPU_SET_INFO( m6502 )
 
 CPU_GET_INFO( m6502 )
 {
-	m6502_Regs *m6502 = token;
+	m6502_Regs *m6502 = (device != NULL) ? device->token : NULL;
 
 	switch (state)
 	{
@@ -843,7 +843,7 @@ CPU_GET_INFO( n2a03 )
 
 static CPU_SET_INFO( m6510 )
 {
-	m6502_Regs *m6502 = token;
+	m6502_Regs *m6502 = device->token;
 
 	switch (state)
 	{
@@ -857,7 +857,7 @@ static CPU_SET_INFO( m6510 )
 
 CPU_GET_INFO( m6510 )
 {
-	m6502_Regs *m6502 = token;
+	m6502_Regs *m6502 = (device != NULL) ? device->token : NULL;
 
 	switch (state)
 	{
@@ -943,7 +943,7 @@ CPU_GET_INFO( m8502 )
 
 static CPU_SET_INFO( m65c02 )
 {
-	m6502_Regs *m6502 = token;
+	m6502_Regs *m6502 = device->token;
 
 	switch (state)
 	{
@@ -1007,7 +1007,7 @@ CPU_GET_INFO( m65sc02 )
 
 static CPU_SET_INFO( deco16 )
 {
-	m6502_Regs *m6502 = token;
+	m6502_Regs *m6502 = device->token;
 
 	switch (state)
 	{

@@ -141,8 +141,6 @@ struct _upi41_state_t {
 	int		icount;
 };
 
-static void *token;
-
 #define RM(a)	program_read_byte_8le(a)
 
 #define IRAM_R(a)	data_read_byte_8le((a) & upi41_state->ram_mask)
@@ -840,8 +838,6 @@ static CPU_INIT( i8x41 )
 {
 	upi41_state_t *upi41_state = device->token;
 	
-	token = device->token;
-	
 	upi41_state->irq_callback = irqcallback;
 	upi41_state->device = device;
 	upi41_state->subtype = 8041;
@@ -866,9 +862,8 @@ static CPU_INIT( i8x41 )
 
 static CPU_INIT( i8042 )
 {
-	upi41_state_t *upi41_state;
+	upi41_state_t *upi41_state = device->token;
 	CPU_INIT_CALL(i8x41);
-	upi41_state = token;
 	upi41_state->subtype = 8042;
 	upi41_state->ram_mask = I8X42_intRAM_MASK;
 }
@@ -1023,7 +1018,6 @@ static CPU_GET_CONTEXT( i8x41 )
 
 static CPU_SET_CONTEXT( i8x41 )
 {
-	token = src;
 }
 
 /****************************************************************************
@@ -1103,7 +1097,7 @@ ADDRESS_MAP_END
 
 static CPU_SET_INFO( i8x41 )
 {
-	upi41_state_t *upi41_state = token;
+	upi41_state_t *upi41_state = device->token;
 	
 	switch (state)
 	{
@@ -1195,7 +1189,7 @@ static CPU_SET_INFO( i8x41 )
 
 CPU_GET_INFO( i8041 )
 {
-	upi41_state_t *upi41_state = token;
+	upi41_state_t *upi41_state = (device != NULL) ? device->token : NULL;
 	
 	switch (state)
 	{

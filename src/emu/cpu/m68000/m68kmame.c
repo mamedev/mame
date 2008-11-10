@@ -5,8 +5,6 @@
 
 /* global access */
 
-static void *token;
-
 m68k_memory_interface m68k_memory_intf;
 offs_t m68k_encrypted_opcode_start[MAX_CPU];
 offs_t m68k_encrypted_opcode_end[MAX_CPU];
@@ -156,7 +154,6 @@ static void set_irq_line(m68ki_cpu_core *m68k, int irqline, int state)
 static CPU_INIT( m68000 )
 {
 	m68ki_cpu_core *m68k = device->token;
-	token = device->token;	// temporary
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68000);
 	m68k_memory_intf = interface_d16;
@@ -187,7 +184,6 @@ static CPU_SET_CONTEXT( m68000 )
 {
 	if (m68k_memory_intf.read8 != program_read_byte_16be)
 		m68k_memory_intf = interface_d16;
-	token = src;
 }
 
 static CPU_DISASSEMBLE( m68000 )
@@ -203,7 +199,6 @@ static CPU_DISASSEMBLE( m68000 )
 static CPU_INIT( m68008 )
 {
 	m68ki_cpu_core *m68k = device->token;
-	token = device->token;	// temporary
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68008);
 	m68k_memory_intf = interface_d8;
@@ -234,7 +229,6 @@ static CPU_SET_CONTEXT( m68008 )
 {
 	if (m68k_memory_intf.read8 != program_read_byte_8be)
 		m68k_memory_intf = interface_d8;
-	token = src;
 }
 
 static CPU_DISASSEMBLE( m68008 )
@@ -252,7 +246,6 @@ static CPU_DISASSEMBLE( m68008 )
 static CPU_INIT( m68010 )
 {
 	m68ki_cpu_core *m68k = device->token;
-	token = device->token;	// temporary
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68010);
 	m68k_memory_intf = interface_d16;
@@ -274,7 +267,6 @@ static CPU_DISASSEMBLE( m68010 )
 static CPU_INIT( m68020 )
 {
 	m68ki_cpu_core *m68k = device->token;
-	token = device->token;	// temporary
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68020);
 	m68k_memory_intf = interface_d32;
@@ -305,7 +297,6 @@ static CPU_SET_CONTEXT( m68020 )
 {
 	if (m68k_memory_intf.read8 != program_read_byte_32be)
 		m68k_memory_intf = interface_d32;
-	token = src;
 }
 
 static CPU_DISASSEMBLE( m68020 )
@@ -322,7 +313,6 @@ static CPU_DISASSEMBLE( m68020 )
 static CPU_INIT( m68ec020 )
 {
 	m68ki_cpu_core *m68k = device->token;
-	token = device->token;	// temporary
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68EC020);
 	m68k_memory_intf = interface_d32;
@@ -345,7 +335,6 @@ static CPU_DISASSEMBLE( m68ec020 )
 static CPU_INIT( m68040 )
 {
 	m68ki_cpu_core *m68k = device->token;
-	token = device->token;	// temporary
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68040);
 	m68k_memory_intf = interface_d32;
@@ -376,7 +365,6 @@ static CPU_SET_CONTEXT( m68040 )
 {
 	if (m68k_memory_intf.read8 != program_read_byte_32be)
 		m68k_memory_intf = interface_d32;
-	token = src;
 }
 
 static CPU_DISASSEMBLE( m68040 )
@@ -392,7 +380,7 @@ static CPU_DISASSEMBLE( m68040 )
 
 static CPU_SET_INFO( m68000 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -444,7 +432,7 @@ static CPU_SET_INFO( m68000 )
 
 CPU_GET_INFO( m68000 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
 	int sr;
 
 	switch (state)
@@ -578,7 +566,7 @@ CPU_GET_INFO( m68000 )
 
 static CPU_SET_INFO( m68008 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -624,7 +612,7 @@ static CPU_SET_INFO( m68008 )
 
 CPU_GET_INFO( m68008 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
 	int sr;
 
 	switch (state)
@@ -763,7 +751,7 @@ CPU_GET_INFO( m68008 )
 
 static CPU_SET_INFO( m68010 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -777,7 +765,7 @@ static CPU_SET_INFO( m68010 )
 
 CPU_GET_INFO( m68010 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -808,7 +796,7 @@ CPU_GET_INFO( m68010 )
 
 static CPU_SET_INFO( m68020 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -860,7 +848,7 @@ static CPU_SET_INFO( m68020 )
 
 CPU_GET_INFO( m68020 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
 	int sr;
 
 	switch (state)
@@ -1010,7 +998,7 @@ CPU_GET_INFO( m68020 )
 
 static CPU_SET_INFO( m68ec020 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1022,7 +1010,7 @@ static CPU_SET_INFO( m68ec020 )
 
 CPU_GET_INFO( m68ec020 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -1050,7 +1038,7 @@ CPU_GET_INFO( m68ec020 )
 #if HAS_M68040
 static CPU_SET_INFO( m68040 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1102,7 +1090,7 @@ static CPU_SET_INFO( m68040 )
 
 CPU_GET_INFO( m68040 )
 {
-	m68ki_cpu_core *m68k = token;
+	m68ki_cpu_core *m68k = (device != NULL) ? device->token : NULL;
 	int sr;
 
 	switch (state)

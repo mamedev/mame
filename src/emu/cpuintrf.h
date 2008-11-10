@@ -207,20 +207,12 @@ enum
 ***************************************************************************/
 
 #define CPU_GET_INFO_NAME(name)		cpu_get_info_##name
-#define CPU_GET_INFO(name)			void CPU_GET_INFO_NAME(name)(UINT32 state, cpuinfo *info)
-#define CPU_GET_INFO_CALL(name)		CPU_GET_INFO_NAME(name)(state, info)
+#define CPU_GET_INFO(name)			void CPU_GET_INFO_NAME(name)(const device_config *device, UINT32 state, cpuinfo *info)
+#define CPU_GET_INFO_CALL(name)		CPU_GET_INFO_NAME(name)(device, state, info)
 
 #define CPU_SET_INFO_NAME(name)		cpu_set_info_##name
-#define CPU_SET_INFO(name)			void CPU_SET_INFO_NAME(name)(UINT32 state, cpuinfo *info)
-#define CPU_SET_INFO_CALL(name)		CPU_SET_INFO_NAME(name)(state, info)
-
-#define CPU_GET_CONTEXT_NAME(name)	cpu_get_context_##name
-#define CPU_GET_CONTEXT(name)		void CPU_GET_CONTEXT_NAME(name)(void *dst)
-#define CPU_GET_CONTEXT_CALL(name)	CPU_GET_CONTEXT_NAME(name)(buffer)
-
-#define CPU_SET_CONTEXT_NAME(name)	cpu_set_context_##name
-#define CPU_SET_CONTEXT(name)		void CPU_SET_CONTEXT_NAME(name)(void *src)
-#define CPU_SET_CONTEXT_CALL(name)	CPU_SET_CONTEXT_NAME(name)(buffer)
+#define CPU_SET_INFO(name)			void CPU_SET_INFO_NAME(name)(const device_config *device, UINT32 state, cpuinfo *info)
+#define CPU_SET_INFO_CALL(name)		CPU_SET_INFO_NAME(name)(device, state, info)
 
 #define CPU_INIT_NAME(name)			cpu_init_##name
 #define CPU_INIT(name)				void CPU_INIT_NAME(name)(const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
@@ -242,33 +234,41 @@ enum
 #define CPU_BURN(name)				void CPU_BURN_NAME(name)(const device_config *device, int cycles)
 #define CPU_BURN_CALL(name)			CPU_BURN_NAME(name)(device, cycles)
 
+#define CPU_TRANSLATE_NAME(name)	cpu_translate_##name
+#define CPU_TRANSLATE(name)			int CPU_TRANSLATE_NAME(name)(const device_config *device, int space, int intention, offs_t *address)
+#define CPU_TRANSLATE_CALL(name)	CPU_TRANSLATE_NAME(name)(device, space, intention, address)
+
+#define CPU_READ_NAME(name)			cpu_read_##name
+#define CPU_READ(name)				int CPU_READ_NAME(name)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value)
+#define CPU_READ_CALL(name)			CPU_READ_NAME(name)(device, space, offset, size, value)
+
+#define CPU_WRITE_NAME(name)		cpu_write_##name
+#define CPU_WRITE(name)				int CPU_WRITE_NAME(name)(const device_config *device, int space, UINT32 offset, int size, UINT64 value)
+#define CPU_WRITE_CALL(name)		CPU_WRITE_NAME(name)(device, space, offset, size, value)
+
+#define CPU_READOP_NAME(name)		cpu_readop_##name
+#define CPU_READOP(name)			int CPU_READOP_NAME(name)(const device_config *device, UINT32 offset, int size, UINT64 *value)
+#define CPU_READOP_CALL(name)		CPU_READOP_NAME(name)(device, offset, size, value)
+
+#define CPU_DEBUG_INIT_NAME(name) 	cpu_debug_init_##name
+#define CPU_DEBUG_INIT(name)		void CPU_DEBUG_INIT_NAME(name)(const device_config *device)
+#define CPU_DEBUG_INIT_CALL(name)	CPU_DEBUG_INIT_NAME(name)(device)
+
 #define CPU_DISASSEMBLE_NAME(name)	cpu_disassemble_##name
 #define CPU_DISASSEMBLE(name)		offs_t CPU_DISASSEMBLE_NAME(name)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 #define CPU_DISASSEMBLE_CALL(name)	CPU_DISASSEMBLE_NAME(name)(buffer, pc, oprom, opram)
 
-#define CPU_TRANSLATE_NAME(name)	cpu_translate_##name
-#define CPU_TRANSLATE(name)			int CPU_TRANSLATE_NAME(name)(int space, int intention, offs_t *address)
-#define CPU_TRANSLATE_CALL(name)	CPU_TRANSLATE_NAME(name)(space, intention, address)
-
-#define CPU_READ_NAME(name)			cpu_read_##name
-#define CPU_READ(name)				int CPU_READ_NAME(name)(int space, UINT32 offset, int size, UINT64 *value)
-#define CPU_READ_CALL(name)			CPU_READ_NAME(name)(space, offset, size, value)
-
-#define CPU_WRITE_NAME(name)		cpu_write_##name
-#define CPU_WRITE(name)				int CPU_WRITE_NAME(name)(int space, UINT32 offset, int size, UINT64 value)
-#define CPU_WRITE_CALL(name)		CPU_WRITE_NAME(name)(space, offset, size, value)
-
-#define CPU_READOP_NAME(name)		cpu_readop_##name
-#define CPU_READOP(name)			int CPU_READOP_NAME(name)(UINT32 offset, int size, UINT64 *value)
-#define CPU_READOP_CALL(name)		CPU_READOP_NAME(name)(offset, size, value)
-
-#define CPU_DEBUG_INIT_NAME(name) 	cpu_debug_init_##name
-#define CPU_DEBUG_INIT(name)		void CPU_DEBUG_INIT_NAME(name)(void)
-#define CPU_DEBUG_INIT_CALL(name)	CPU_DEBUG_INIT_NAME(name)()
-
 #define CPU_VALIDITY_CHECK_NAME(name)	cpu_validity_check_##name
 #define CPU_VALIDITY_CHECK(name)		int CPU_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const void *config)
 #define CPU_VALIDITY_CHECK_CALL(name)	CPU_VALIDITY_CHECK_NAME(name)(driver, config)
+
+#define CPU_GET_CONTEXT_NAME(name)	cpu_get_context_##name
+#define CPU_GET_CONTEXT(name)		void CPU_GET_CONTEXT_NAME(name)(void *dst)
+#define CPU_GET_CONTEXT_CALL(name)	CPU_GET_CONTEXT_NAME(name)(buffer)
+
+#define CPU_SET_CONTEXT_NAME(name)	cpu_set_context_##name
+#define CPU_SET_CONTEXT(name)		void CPU_SET_CONTEXT_NAME(name)(void *src)
+#define CPU_SET_CONTEXT_CALL(name)	CPU_SET_CONTEXT_NAME(name)(buffer)
 
 
 
@@ -283,22 +283,23 @@ typedef union _cpuinfo cpuinfo;
 /* define the various callback functions */
 typedef int (*cpu_irq_callback)(const device_config *device, int irqnum);
 
-typedef void (*cpu_get_info_func)(UINT32 state, cpuinfo *info);
-typedef void (*cpu_set_info_func)(UINT32 state, cpuinfo *info);
-typedef void (*cpu_get_context_func)(void *buffer);
-typedef void (*cpu_set_context_func)(void *buffer);
+typedef void (*cpu_get_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
+typedef void (*cpu_set_info_func)(const device_config *device, UINT32 state, cpuinfo *info);
 typedef void (*cpu_init_func)(const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
 typedef void (*cpu_reset_func)(const device_config *device);
 typedef void (*cpu_exit_func)(const device_config *device);
 typedef int	(*cpu_execute_func)(const device_config *device, int cycles);
 typedef void (*cpu_burn_func)(const device_config *device, int cycles);
-typedef offs_t (*cpu_disassemble_func)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-typedef int	(*cpu_translate_func)(int space, int intention, offs_t *address);
-typedef int	(*cpu_read_func)(int space, UINT32 offset, int size, UINT64 *value);
-typedef int	(*cpu_write_func)(int space, UINT32 offset, int size, UINT64 value);
-typedef int	(*cpu_readop_func)(UINT32 offset, int size, UINT64 *value);
-typedef void (*cpu_debug_init_func)(void);
+typedef int	(*cpu_translate_func)(const device_config *device, int space, int intention, offs_t *address);
+typedef int	(*cpu_read_func)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value);
+typedef int	(*cpu_write_func)(const device_config *device, int space, UINT32 offset, int size, UINT64 value);
+typedef int	(*cpu_readop_func)(const device_config *device, UINT32 offset, int size, UINT64 *value);
+typedef void (*cpu_debug_init_func)(const device_config *device);
+
 typedef int (*cpu_validity_check_func)(const game_driver *driver, const void *config);
+typedef offs_t (*cpu_disassemble_func)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+typedef void (*cpu_get_context_func)(void *buffer);
+typedef void (*cpu_set_context_func)(void *buffer);
 
 
 /* cpuinfo union used to pass data to/from the get_info/set_info functions */
@@ -317,12 +318,12 @@ union _cpuinfo
 	cpu_exit_func			exit;						/* CPUINFO_PTR_EXIT */
 	cpu_execute_func		execute;					/* CPUINFO_PTR_EXECUTE */
 	cpu_burn_func			burn;						/* CPUINFO_PTR_BURN */
-	cpu_disassemble_func	disassemble;				/* CPUINFO_PTR_DISASSEMBLE */
 	cpu_translate_func		translate;					/* CPUINFO_PTR_TRANSLATE */
 	cpu_read_func			read;						/* CPUINFO_PTR_READ */
 	cpu_write_func			write;						/* CPUINFO_PTR_WRITE */
 	cpu_readop_func			readop;						/* CPUINFO_PTR_READOP */
 	cpu_debug_init_func		debug_init;					/* CPUINFO_PTR_DEBUG_INIT */
+	cpu_disassemble_func	disassemble;				/* CPUINFO_PTR_DISASSEMBLE */
 	cpu_validity_check_func	validity_check;				/* CPUINFO_PTR_VALIDITY_CHECK */
 	int *					icount;						/* CPUINFO_PTR_INSTRUCTION_COUNTER */
 	const addrmap8_token *	internal_map8;				/* CPUINFO_PTR_INTERNAL_MEMORY_MAP */
@@ -345,8 +346,8 @@ struct _cpu_interface
 	cpu_exit_func			exit;
 	cpu_execute_func		execute;
 	cpu_burn_func			burn;
-	cpu_disassemble_func	disassemble;
 	cpu_translate_func		translate;
+	cpu_disassemble_func	disassemble;
 
 	/* other info */
 	size_t					context_size;

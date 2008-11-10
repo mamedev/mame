@@ -2191,15 +2191,15 @@ static CPU_READ( tms32025 )
 			*value = ((UINT16 *)ptr)[(offset & 0xff) / 2];
 			break;
 		case 4:
-			CPU_READ_NAME(tms32025)(space, offset + 0, 2, &temp);
+			CPU_READ_NAME(tms32025)(device, space, offset + 0, 2, &temp);
 			*value = temp << 16;
-			CPU_READ_NAME(tms32025)(space, offset + 2, 2, &temp);
+			CPU_READ_NAME(tms32025)(device, space, offset + 2, 2, &temp);
 			*value |= temp & 0xffff;
 			break;
 		case 8:
-			CPU_READ_NAME(tms32025)(space, offset + 0, 4, &temp);
+			CPU_READ_NAME(tms32025)(device, space, offset + 0, 4, &temp);
 			*value = temp << 32;
-			CPU_READ_NAME(tms32025)(space, offset + 4, 4, &temp);
+			CPU_READ_NAME(tms32025)(device, space, offset + 4, 4, &temp);
 			*value |= temp & 0xffffffff;
 			break;
 	}
@@ -2241,12 +2241,12 @@ static CPU_WRITE( tms32025 )
 			((UINT16 *)ptr)[(offset & 0xff) / 2] = value;
 			break;
 		case 4:
-			CPU_WRITE_NAME(tms32025)(space, offset + 0, 2, value >> 16);
-			CPU_WRITE_NAME(tms32025)(space, offset + 2, 2, value);
+			CPU_WRITE_NAME(tms32025)(device, space, offset + 0, 2, value >> 16);
+			CPU_WRITE_NAME(tms32025)(device, space, offset + 2, 2, value);
 			break;
 		case 8:
-			CPU_WRITE_NAME(tms32025)(space, offset + 0, 4, value >> 32);
-			CPU_WRITE_NAME(tms32025)(space, offset + 4, 4, value);
+			CPU_WRITE_NAME(tms32025)(device, space, offset + 0, 4, value >> 32);
+			CPU_WRITE_NAME(tms32025)(device, space, offset + 4, 4, value);
 			break;
 	}
 	return 1;

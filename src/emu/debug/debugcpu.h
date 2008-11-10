@@ -165,6 +165,7 @@ struct _debug_cpu_info
 	UINT32			pc_history_index;			/* current history index */
 	int				hotspot_count;				/* number of hotspots */
 	int				hotspot_threshhold;			/* threshhold for the number of hits to print */
+	const device_config *device;				/* CPU device object */
 	cpu_translate_func translate;				/* address translation routine */
 	cpu_read_func	read; 						/* memory read routine */
 	cpu_write_func	write;						/* memory write routine */

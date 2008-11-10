@@ -226,14 +226,15 @@ void debug_cpu_init(running_machine *machine)
 		/* reset the PC data */
 		info->valid = TRUE;
 		info->flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
-		info->endianness = cpu_get_endianness(machine->cpu[cpunum]);
-		info->opwidth = cpu_get_min_opcode_bytes(machine->cpu[cpunum]);
+		info->device = machine->cpu[cpunum];
+		info->endianness = cpu_get_endianness(info->device);
+		info->opwidth = cpu_get_min_opcode_bytes(info->device);
 
 		/* fetch the memory accessors */
-		info->translate = (cpu_translate_func)cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_TRANSLATE);
-		info->read = (cpu_read_func)cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_READ);
-		info->write = (cpu_write_func)cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_WRITE);
-		info->readop = (cpu_readop_func)cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_READOP);
+		info->translate = (cpu_translate_func)cpu_get_info_fct(info->device, CPUINFO_PTR_TRANSLATE);
+		info->read = (cpu_read_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READ);
+		info->write = (cpu_write_func)cpu_get_info_fct(info->device, CPUINFO_PTR_WRITE);
+		info->readop = (cpu_readop_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READOP);
 
 		/* allocate a symbol table */
 		info->symtable = symtable_alloc(global_symtable);
@@ -244,7 +245,7 @@ void debug_cpu_init(running_machine *machine)
 		/* add all registers into it */
 		for (regnum = 0; regnum < MAX_REGS; regnum++)
 		{
-			const char *str = cpu_get_reg_string(machine->cpu[cpunum], regnum);
+			const char *str = cpu_get_reg_string(info->device, regnum);
 			const char *colon;
 			char symname[256];
 			int charnum;
@@ -272,11 +273,11 @@ void debug_cpu_init(running_machine *machine)
 		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
 			debug_space_info *spaceinfo = &info->space[spacenum];
-			int datawidth = cpu_get_databus_width(machine->cpu[cpunum], spacenum);
-			int logwidth = cpu_get_logaddr_width(machine->cpu[cpunum], spacenum);
-			int physwidth = cpu_get_addrbus_width(machine->cpu[cpunum], spacenum);
-			int addrshift = cpu_get_addrbus_shift(machine->cpu[cpunum], spacenum);
-			int pageshift = cpu_get_page_shift(machine->cpu[cpunum], spacenum);
+			int datawidth = cpu_get_databus_width(info->device, spacenum);
+			int logwidth = cpu_get_logaddr_width(info->device, spacenum);
+			int physwidth = cpu_get_addrbus_width(info->device, spacenum);
+			int addrshift = cpu_get_addrbus_shift(info->device, spacenum);
+			int pageshift = cpu_get_page_shift(info->device, spacenum);
 
 			if (logwidth == 0)
 				logwidth = physwidth;
@@ -1678,11 +1679,11 @@ UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 	memory_set_debugger_access(global.debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, return 0xff */
-	if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
+	if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_READ_DEBUG, &address))
 		result = 0xff;
 
 	/* if there is a custom read handler, and it returns TRUE, use that value */
-	else if (info->read && (*info->read)(spacenum, address, 1, &custom))
+	else if (info->read && (*info->read)(info->device, spacenum, address, 1, &custom))
 		result = custom;
 
 	/* otherwise, call the byte reading function for the translated address */
@@ -1729,11 +1730,11 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffff */
-		if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
+		if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_READ_DEBUG, &address))
 			result = 0xffff;
 
 		/* if there is a custom read handler, and it returns TRUE, use that value */
-		else if (info->read && (*info->read)(spacenum, address, 2, &custom))
+		else if (info->read && (*info->read)(info->device, spacenum, address, 2, &custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1782,11 +1783,11 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffff */
-		if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
+		if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_READ_DEBUG, &address))
 			result = 0xffffffff;
 
 		/* if there is a custom read handler, and it returns TRUE, use that value */
-		else if (info->read && (*info->read)(spacenum, address, 4, &custom))
+		else if (info->read && (*info->read)(info->device, spacenum, address, 4, &custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1835,11 +1836,11 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
-		if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_READ_DEBUG, &address))
+		if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_READ_DEBUG, &address))
 			result = ~(UINT64)0;
 
 		/* if there is a custom read handler, and it returns TRUE, use that value */
-		else if (info->read && (*info->read)(spacenum, address, 8, &custom))
+		else if (info->read && (*info->read)(info->device, spacenum, address, 8, &custom))
 			result = custom;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1870,11 +1871,11 @@ void debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_transl
 	memory_set_debugger_access(global.debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, we're done */
-	if (apply_translation && info->translate != NULL && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
+	if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_WRITE_DEBUG, &address))
 		;
 
 	/* if there is a custom write handler, and it returns TRUE, use that */
-	else if (info->write && (*info->write)(spacenum, address, 1, data))
+	else if (info->write && (*info->write)(info->device, spacenum, address, 1, data))
 		;
 
 	/* otherwise, call the byte reading function for the translated address */
@@ -1921,11 +1922,11 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && info->translate && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
+		if (apply_translation && info->translate && !(*info->translate)(info->device, spacenum, TRANSLATE_WRITE_DEBUG, &address))
 			;
 
 		/* if there is a custom write handler, and it returns TRUE, use that */
-		else if (info->write && (*info->write)(spacenum, address, 2, data))
+		else if (info->write && (*info->write)(info->device, spacenum, address, 2, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -1973,11 +1974,11 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && info->translate && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
+		if (apply_translation && info->translate && !(*info->translate)(info->device, spacenum, TRANSLATE_WRITE_DEBUG, &address))
 			;
 
 		/* if there is a custom write handler, and it returns TRUE, use that */
-		else if (info->write && (*info->write)(spacenum, address, 4, data))
+		else if (info->write && (*info->write)(info->device, spacenum, address, 4, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -2024,11 +2025,11 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 		memory_set_debugger_access(global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
-		if (apply_translation && info->translate && !(*info->translate)(spacenum, TRANSLATE_WRITE_DEBUG, &address))
+		if (apply_translation && info->translate && !(*info->translate)(info->device, spacenum, TRANSLATE_WRITE_DEBUG, &address))
 			;
 
 		/* if there is a custom write handler, and it returns TRUE, use that */
-		else if (info->write && (*info->write)(spacenum, address, 8, data))
+		else if (info->write && (*info->write)(info->device, spacenum, address, 8, data))
 			;
 
 		/* otherwise, call the byte reading function for the translated address */
@@ -2060,7 +2061,7 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
 	if (info->readop)
 	{
 		UINT64 result;
-		if ((*info->readop)(address, size, &result))
+		if ((*info->readop)(info->device, address, size, &result))
 			return result;
 	}
 
@@ -2078,7 +2079,7 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
 	}
 
 	/* translate to physical first */
-	if (info->translate && !(*info->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &address))
+	if (info->translate && !(*info->translate)(info->device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &address))
 		return ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size));
 
 	/* keep in physical range */

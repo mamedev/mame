@@ -636,8 +636,6 @@ struct _mcs51_state_t
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static void *token;
-
 static void (*hold_serial_tx_callback)(int data);
 static int (*hold_serial_rx_callback)(void);
 
@@ -1909,6 +1907,9 @@ static CPU_EXECUTE( mcs51 )
 	mcs51_state_t *mcs51_state = device->token;
 	UINT8 op;
 
+	change_pc(PC);
+	update_ptrs(mcs51_state);
+
 	mcs51_state->icount = cycles;
 
 	/* external interrupts may have been set since we last checked */
@@ -2056,8 +2057,6 @@ static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 static CPU_INIT( mcs51 )
 {
 	mcs51_state_t *mcs51_state = device->token;
-
-	token = device->token;	// temporary
 
 	mcs51_state->irq_callback = irqcallback;
 	mcs51_state->device = device;
@@ -2419,14 +2418,6 @@ static CPU_GET_CONTEXT( mcs51 )
 
 static CPU_SET_CONTEXT( mcs51 )
 {
-	mcs51_state_t *mcs51_state;
-
-	if( src )
-		token = src;
-
-	mcs51_state = token;
-	change_pc(PC);
-	update_ptrs(mcs51_state);
 }
 
 /**************************************************************************
@@ -2435,7 +2426,7 @@ static CPU_SET_CONTEXT( mcs51 )
 
 static CPU_SET_INFO( mcs51 )
 {
-	mcs51_state_t *mcs51_state = token;
+	mcs51_state_t *mcs51_state = device->token;
 
 	switch (state)
 	{
@@ -2477,7 +2468,7 @@ static CPU_SET_INFO( mcs51 )
 
 static CPU_GET_INFO( mcs51 )
 {
-	mcs51_state_t *mcs51_state = token;
+	mcs51_state_t *mcs51_state = (device != NULL) ? device->token : NULL;
 
 	switch (state)
 	{

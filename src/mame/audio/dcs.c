@@ -1409,7 +1409,7 @@ WRITE32_HANDLER( dsio_idma_addr_w )
 	if (LOG_DCS_TRANSFERS)
 		logerror("%08X:IDMA_addr = %04X\n", cpu_get_pc(machine->activecpu), data);
 	cpu_push_context(machine->cpu[dcs.cpunum]);
-	adsp2181_idma_addr_w(data);
+	adsp2181_idma_addr_w(machine->cpu[dcs.cpunum], data);
 	if (data == 0)
 		dsio.start_on_next_write = 2;
 	cpu_pop_context();
@@ -1423,14 +1423,14 @@ WRITE32_HANDLER( dsio_idma_data_w )
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS)
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(), data & 0xffff);
-		adsp2181_idma_data_w(data & 0xffff);
+			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(machine->cpu[dcs.cpunum]), data & 0xffff);
+		adsp2181_idma_data_w(machine->cpu[dcs.cpunum], data & 0xffff);
 	}
 	if (ACCESSING_BITS_16_31)
 	{
 		if (LOG_DCS_TRANSFERS)
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(), data >> 16);
-		adsp2181_idma_data_w(data >> 16);
+			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(machine->cpu[dcs.cpunum]), data >> 16);
+		adsp2181_idma_data_w(machine->cpu[dcs.cpunum], data >> 16);
 	}
 	cpu_pop_context();
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
@@ -1445,10 +1445,10 @@ READ32_HANDLER( dsio_idma_data_r )
 {
 	UINT32 result;
 	cpu_push_context(machine->cpu[dcs.cpunum]);
-	result = adsp2181_idma_data_r();
+	result = adsp2181_idma_data_r(machine->cpu[dcs.cpunum]);
 	cpu_pop_context();
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(machine->activecpu), adsp2181_idma_addr_r(), result);
+		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(machine->activecpu), adsp2181_idma_addr_r(machine->cpu[dcs.cpunum]), result);
 	return result;
 }
 
@@ -1818,7 +1818,7 @@ static READ16_HANDLER( adsp_control_r )
 			break;
 
 		case IDMA_CONTROL_REG:
-			result = adsp2181_idma_addr_r();
+			result = adsp2181_idma_addr_r(machine->cpu[dcs.cpunum]);
 			break;
 
 		case TIMER_COUNT_REG:
@@ -1899,7 +1899,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			break;
 
 		case IDMA_CONTROL_REG:
-			adsp2181_idma_addr_w(data);
+			adsp2181_idma_addr_w(machine->cpu[dcs.cpunum], data);
 			break;
 	}
 }

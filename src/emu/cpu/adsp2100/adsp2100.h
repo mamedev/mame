@@ -157,10 +157,10 @@ extern void adsp2115_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
 
 extern CPU_GET_INFO( adsp2181 );
 extern void adsp2181_load_boot_data(UINT8 *srcdata, UINT32 *dstdata);
-extern void adsp2181_idma_addr_w(UINT16 data);
-extern UINT16 adsp2181_idma_addr_r(void);
-extern void adsp2181_idma_data_w(UINT16 data);
-extern UINT16 adsp2181_idma_data_r(void);
+extern void adsp2181_idma_addr_w(const device_config *device, UINT16 data);
+extern UINT16 adsp2181_idma_addr_r(const device_config *device);
+extern void adsp2181_idma_data_w(const device_config *device, UINT16 data);
+extern UINT16 adsp2181_idma_data_r(const device_config *device);
 #endif /* (HAS_ADSP2181) */
 
 #endif /* __ADSP2100_H__ */

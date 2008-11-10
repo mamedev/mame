@@ -56,6 +56,7 @@ struct _drcfe_state
 	void *				param;						/* parameter for the callback */
 
 	/* CPU parameters */
+	const device_config *device;					/* CPU device object */
 	offs_t				pageshift;					/* shift to convert address to a page index */
 	cpu_translate_func	translate;					/* pointer to translation function */
 	offs_t				codexor;					/* XOR to reach code */
@@ -142,6 +143,7 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 	drcfe->param = param;
 
 	/* initialize the state */
+	drcfe->device = cpu;
 	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->translate = (cpu_translate_func)cpu_get_info_fct(cpu, CPUINFO_PTR_TRANSLATE);
 #ifdef LSB_FIRST
@@ -288,7 +290,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc, const opcode_
 	desc->targetpc = BRANCH_TARGET_DYNAMIC;
 
 	/* compute the physical PC */
-	if (drcfe->translate != NULL && !(*drcfe->translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &desc->physpc))
+	if (drcfe->translate != NULL && !(*drcfe->translate)(drcfe->device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &desc->physpc))
 	{
 		/* uh-oh: a page fault; leave the description empty and just if this is the first instruction, leave it empty and */
 		/* mark as needing to validate; otherwise, just end the sequence here */

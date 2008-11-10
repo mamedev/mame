@@ -313,7 +313,7 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 
 static CPU_SET_INFO( m6509 )
 {
-	m6509_Regs *m6509 = token;
+	m6509_Regs *m6509 = device->token;
 	m6509_Regs *m6502 = m6509;
 
 	switch (state)
@@ -350,7 +350,7 @@ static CPU_SET_INFO( m6509 )
 
 CPU_GET_INFO( m6509 )
 {
-	m6509_Regs *m6502 = token;
+	m6509_Regs *m6502 = (device != NULL) ? device->token : NULL;
 	m6509_Regs *m6509 = m6502;
 
 	switch (state)

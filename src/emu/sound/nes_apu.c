@@ -366,7 +366,7 @@ static int8 apu_dpcm(struct nesapu_info *info, dpcm_t *chan)
                if (chan->regs[0] & 0x80) /* IRQ Generator */
                {
                   chan->irq_occurred = TRUE;
-                  n2a03_irq();
+                  n2a03_irq(Machine->cpu[info->APU.dpcm.cpu_num]);
                }
                break;
             }

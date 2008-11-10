@@ -207,8 +207,6 @@ struct _z80_state
 #define IFF2 z80->iff2
 #define HALT z80->halt
 
-static z80_state *token;
-
 static UINT8 SZ[256];		/* zero and sign flags */
 static UINT8 SZ_BIT[256];	/* zero, sign and parity/overflow (=zero) flags for BIT opcode */
 static UINT8 SZP[256];		/* zero, sign and parity flags */
@@ -3430,8 +3428,6 @@ static CPU_INIT( z80 )
 	z80_state *z80 = device->token;
 	int i, p;
 
-	token = device->token;	// temporary
-
 	/* setup cycle tables */
 	cc[Z80_TABLE_op] = cc_op;
 	cc[Z80_TABLE_cb] = cc_cb;
@@ -3600,6 +3596,7 @@ static CPU_EXECUTE( z80 )
 	z80_state *z80 = device->token;
 
 	z80->icount = cycles;
+	change_pc(PCD);
 
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
@@ -3640,7 +3637,7 @@ static CPU_EXECUTE( z80 )
  ****************************************************************************/
 static CPU_BURN( z80 )
 {
-	z80_state *z80 = token;
+	z80_state *z80 = device->token;
 
 	if( cycles > 0 )
 	{
@@ -3663,11 +3660,6 @@ static CPU_GET_CONTEXT( z80 )
  ****************************************************************************/
 static CPU_SET_CONTEXT( z80 )
 {
-	z80_state *z80;
-	if( src )
-		token = src;
-	z80 = token;
-	change_pc(PCD);
 }
 
 /****************************************************************************
@@ -3701,7 +3693,7 @@ static void set_irq_line(z80_state *z80, int irqline, int state)
 
 static CPU_SET_INFO( z80 )
 {
-	z80_state *z80 = token;
+	z80_state *z80 = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -3755,7 +3747,7 @@ static CPU_SET_INFO( z80 )
 
 CPU_GET_INFO( z80 )
 {
-	z80_state *z80 = token;
+	z80_state *z80 = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

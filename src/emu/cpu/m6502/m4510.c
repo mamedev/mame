@@ -275,7 +275,7 @@ INLINE void m4510_take_irq(m4510_Regs *m4510)
 
 static CPU_EXECUTE( m4510 )
 {
-	m4510_Regs *m4510 = token;
+	m4510_Regs *m4510 = device->token;
 
 	m4510->icount = cycles;
 
@@ -399,7 +399,7 @@ ADDRESS_MAP_END
 
 static CPU_TRANSLATE( m4510 )
 {
-	m4510_Regs *m4510 = token;
+	m4510_Regs *m4510 = device->token;
 
 	if (space == ADDRESS_SPACE_PROGRAM)
 		*address = M4510_MEM(*address);
@@ -412,7 +412,7 @@ static CPU_TRANSLATE( m4510 )
 
 static CPU_SET_INFO( m4510 )
 {
-	m4510_Regs *m4510 = token;
+	m4510_Regs *m4510 = device->token;
 
 	switch (state)
 	{
@@ -459,7 +459,7 @@ static CPU_SET_INFO( m4510 )
 
 CPU_GET_INFO( m4510 )
 {
-	m4510_Regs *m4510 = token;
+	m4510_Regs *m4510 = (device != NULL) ? device->token : NULL;
 
 	switch (state)
 	{

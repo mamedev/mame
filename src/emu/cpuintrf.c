@@ -304,8 +304,8 @@ cpu_interface cpuintrf[CPU_COUNT];
 
 static const struct
 {
-	int		cputype;
-	void	(*get_info)(UINT32 state, cpuinfo *info);
+	int					cputype;
+	cpu_get_info_func 	get_info;
 } cpuintrf_map[] =
 {
 	{ CPU_DUMMY, CPU_GET_INFO_NAME(dummy) },
@@ -1062,43 +1062,43 @@ void cpuintrf_init(running_machine *machine)
 
 		/* bootstrap the rest of the function pointers */
 		info.setinfo = NULL;
-		(*intf->get_info)(CPUINFO_PTR_SET_INFO, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_SET_INFO, &info);
 		intf->set_info = info.setinfo;
 
 		info.getcontext = NULL;
-		(*intf->get_info)(CPUINFO_PTR_GET_CONTEXT, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_GET_CONTEXT, &info);
 		intf->get_context = info.getcontext;
 
 		info.setcontext = NULL;
-		(*intf->get_info)(CPUINFO_PTR_SET_CONTEXT, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_SET_CONTEXT, &info);
 		intf->set_context = info.setcontext;
 
 		info.init = NULL;
-		(*intf->get_info)(CPUINFO_PTR_INIT, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_INIT, &info);
 		intf->init = info.init;
 
 		info.reset = NULL;
-		(*intf->get_info)(CPUINFO_PTR_RESET, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_RESET, &info);
 		intf->reset = info.reset;
 
 		info.exit = NULL;
-		(*intf->get_info)(CPUINFO_PTR_EXIT, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_EXIT, &info);
 		intf->exit = info.exit;
 
 		info.execute = NULL;
-		(*intf->get_info)(CPUINFO_PTR_EXECUTE, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_EXECUTE, &info);
 		intf->execute = info.execute;
 
 		info.burn = NULL;
-		(*intf->get_info)(CPUINFO_PTR_BURN, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_BURN, &info);
 		intf->burn = info.burn;
 
 		info.disassemble = NULL;
-		(*intf->get_info)(CPUINFO_PTR_DISASSEMBLE, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_DISASSEMBLE, &info);
 		intf->disassemble = info.disassemble;
 
 		info.translate = NULL;
-		(*intf->get_info)(CPUINFO_PTR_TRANSLATE, &info);
+		(*intf->get_info)(NULL, CPUINFO_PTR_TRANSLATE, &info);
 		intf->translate = info.translate;
 
 		/* get other miscellaneous stuff */
@@ -1215,7 +1215,7 @@ int cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *confi
 
 	/* get the instruction count pointer */
 	info.icount = NULL;
-	(*cpudata->intf.get_info)(CPUINFO_PTR_INSTRUCTION_COUNTER, &info);
+	(*cpudata->intf.get_info)(cpudata->device, CPUINFO_PTR_INSTRUCTION_COUNTER, &info);
 	cpudata->icount = info.icount;
 	return 0;
 }
@@ -1297,7 +1297,7 @@ INT64 cpu_get_info_int(const device_config *cpu, UINT32 state)
 	VERIFY_CPU(cpu_get_info_int);
 	cpu_push_context(cpu);
 	info.i = 0;
-	(*cpudata->intf.get_info)(state, &info);
+	(*cpudata->intf.get_info)(cpu, state, &info);
 	cpu_pop_context();
 	return info.i;
 }
@@ -1310,7 +1310,7 @@ void *cpu_get_info_ptr(const device_config *cpu, UINT32 state)
 	VERIFY_CPU(cpu_get_info_ptr);
 	cpu_push_context(cpu);
 	info.p = NULL;
-	(*cpudata->intf.get_info)(state, &info);
+	(*cpudata->intf.get_info)(cpu, state, &info);
 	cpu_pop_context();
 	return info.p;
 }
@@ -1323,7 +1323,7 @@ genf *cpu_get_info_fct(const device_config *cpu, UINT32 state)
 	VERIFY_CPU(cpu_get_info_fct);
 	cpu_push_context(cpu);
 	info.f = NULL;
-	(*cpudata->intf.get_info)(state, &info);
+	(*cpudata->intf.get_info)(cpu, state, &info);
 	cpu_pop_context();
 	return info.f;
 }
@@ -1336,7 +1336,7 @@ const char *cpu_get_info_string(const device_config *cpu, UINT32 state)
 	VERIFY_CPU(cpu_get_info_string);
 	cpu_push_context(cpu);
 	info.s = cpuintrf_temp_str();
-	(*cpudata->intf.get_info)(state, &info);
+	(*cpudata->intf.get_info)(cpu, state, &info);
 	cpu_pop_context();
 	return info.s;
 }
@@ -1354,7 +1354,7 @@ void cpu_set_info_int(const device_config *cpu, UINT32 state, INT64 data)
 	VERIFY_CPU(cpu_set_info_int);
 	info.i = data;
 	cpu_push_context(cpu);
-	(*cpudata->intf.set_info)(state, &info);
+	(*cpudata->intf.set_info)(cpu, state, &info);
 	cpu_pop_context();
 }
 
@@ -1366,7 +1366,7 @@ void cpu_set_info_ptr(const device_config *cpu, UINT32 state, void *data)
 	VERIFY_CPU(cpu_set_info_ptr);
 	info.p = data;
 	cpu_push_context(cpu);
-	(*cpudata->intf.set_info)(state, &info);
+	(*cpudata->intf.set_info)(cpu, state, &info);
 	cpu_pop_context();
 }
 
@@ -1378,7 +1378,7 @@ void cpu_set_info_fct(const device_config *cpu, UINT32 state, genf *data)
 	VERIFY_CPU(cpu_set_info_ptr);
 	info.f = data;
 	cpu_push_context(cpu);
-	(*cpudata->intf.set_info)(state, &info);
+	(*cpudata->intf.set_info)(cpu, state, &info);
 	cpu_pop_context();
 }
 
@@ -1470,7 +1470,7 @@ offs_t cpu_get_physical_pc_byte(const device_config *cpu)
 	else
 		pc >>= shift;
 	if (cpudata->intf.translate != NULL)
-		(cpudata->intf.translate)(ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &pc);
+		(cpudata->intf.translate)(cpu, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &pc);
 	cpu_pop_context();
 	return pc;
 }
@@ -1566,7 +1566,7 @@ INT64 cputype_get_info_int(cpu_type cputype, UINT32 state)
 
 	VERIFY_CPUTYPE(cputype_get_info_int);
 	info.i = 0;
-	(*cpuintrf[cputype].get_info)(state, &info);
+	(*cpuintrf[cputype].get_info)(NULL, state, &info);
 	return info.i;
 }
 
@@ -1576,7 +1576,7 @@ void *cputype_get_info_ptr(cpu_type cputype, UINT32 state)
 
 	VERIFY_CPUTYPE(cputype_get_info_ptr);
 	info.p = NULL;
-	(*cpuintrf[cputype].get_info)(state, &info);
+	(*cpuintrf[cputype].get_info)(NULL, state, &info);
 	return info.p;
 }
 
@@ -1586,7 +1586,7 @@ genf *cputype_get_info_fct(cpu_type cputype, UINT32 state)
 
 	VERIFY_CPUTYPE(cputype_get_info_fct);
 	info.f = NULL;
-	(*cpuintrf[cputype].get_info)(state, &info);
+	(*cpuintrf[cputype].get_info)(NULL, state, &info);
 	return info.f;
 }
 
@@ -1596,7 +1596,7 @@ const char *cputype_get_info_string(cpu_type cputype, UINT32 state)
 
 	VERIFY_CPUTYPE(cputype_get_info_string);
 	info.s = cpuintrf_temp_str();
-	(*cpuintrf[cputype].get_info)(state, &info);
+	(*cpuintrf[cputype].get_info)(NULL, state, &info);
 	return info.s;
 }
 
