@@ -8,21 +8,73 @@ Sound: YM2203 (x2)
 Phil Stroffolino
 ptroffo@yahoo.com
 
+
+Stephh's notes (based on the games Z80 code and some tests) :
+
+1) 'lkage'
+
+  - There is an ingame bug about the way difficulty is handled : if you look at code
+    at 0xa05a, you'll notice that DSW3 bit 3 is tested as well as DSW3 bit 4.
+    But DSW3 bit 4 also determines if coinage info shall be displayed (code at 0x1295) !
+    In fact, DSW3 bit 4 is tested only when DSW3 bit 3 is ON ("Normal" difficulty),
+    so you have 3 different "levels" of difficulty :
+
+      bit 3   bit 4    Difficulty
+       OFF     OFF       Easy
+       OFF     ON        Easy
+       ON      OFF       Normal
+       ON      ON        Hard
+
+    Flame length/color (and perhaps some other stuff) is also affected by DSW3 bit 3.
+  - DSW3 bit 7 is supposed to determine how many coin slots there are (again, check
+    the coingae display routine and code at 0x1295), but if you look at coinage insertion
+    routines (0x091b for COIN1 and 0x0991 for COIN2), you'll notice that DSW3 bit 7
+    is NOT tested !
+
+2) 'lkageo'
+
+  - Bugs are the same as in 'lkage'. Some routines addresses vary though :
+      * difficulty : 0x9f50
+      * coinage display : 0x128f
+  - This set does more tests/things when TILT is pressed before jumping to 0x0000
+    (see numerous instructions/calls at 0x0318 - most of them related to MCU).
+
+3) 'lkageb*'
+
+  - The difficulty bug is fixed : see code at 0x9e42 which reads DSW3 bits 2 and 3.
+    So you have 4 different "levels" of difficulty :
+
+      bit 2   bit 3    Difficulty
+       OFF     OFF       Easy
+       OFF     ON        Normal
+       ON      OFF       Hard
+       ON      ON        Hardest
+
+    However DSW3 bit 3 isn't tested anywhere else, so flame length/color is constant.
+  - The coin slots bug is not fixed as coinage insertion routines are unchanged
+    (coinage display routine is now at 0x13f6).
+  - These bootlegs are based on 'lkageo' (call to 0x0318 when TILT is pressed).
+  - Hi-scores, scores, and as a consequence bonus lives, have been divided by 10,
+    but it's only a cosmetical effect as data from 0xe200 to 0xe22f is unchanged.
+
+
 TODO:
 
-- The high score display uses a video attribute flag whose pupose isn't known.
+  - The high score display uses a video attribute flag whose pupose isn't known.
 
-- purpose of the 0x200 byte prom, "a54-10.2" is unknown.  It contains values in range 0x0..0xf.
+  - purpose of the 0x200 byte prom, "a54-10.2" is unknown.  It contains values in range 0x0..0xf.
 
-- SOUND: lots of unknown writes to the YM2203 I/O ports
+  - SOUND: lots of unknown writes to the YM2203 I/O ports
 
-- Note that all the bootlegs are derived from a different version of the
-  original which hasn't been found yet.
+  - Note that all the bootlegs are derived from a different version of the
+    original which hasn't been found yet.
 
-- lkage is verfied to be an original set, but it seems to work regardless of what
-  the mcu does. Moreover, the mcu returns a checksum which is different from what
-  is expected - the MCU computes 0x89, but the main CPU expects 0x5d.
-  The game works anyway, it never gives the usual Taito "BAD HW" message.
+  - lkage is verfied to be an original set, but it seems to work regardless of what
+    the mcu does. Moreover, the mcu returns a checksum which is different from what
+    is expected - the MCU computes 0x89, but the main CPU expects 0x5d.
+    The game works anyway, it never gives the usual Taito "BAD HW" message
+    (because there is no test at 0x033b after call at routine at 0xde1d).
+    
 
 ***************************************************************************/
 
@@ -146,11 +198,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( lkage )
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x03, "30000 100000" ) /* unverified */
-	PORT_DIPSETTING(    0x02, "30000 70000" ) /* unverified */
-	PORT_DIPSETTING(    0x01, "20000 70000" ) /* unverified */
-	PORT_DIPSETTING(    0x00, "20000 50000" ) /* unverified */
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )       /* table at 0x04b8 */
+	PORT_DIPSETTING(    0x03, "200k 700k 500k+" )
+	PORT_DIPSETTING(    0x02, "200k 900k 700k+" )
+	PORT_DIPSETTING(    0x01, "300k 1000k 700k+" )
+	PORT_DIPSETTING(    0x00, "300k 1300k 1000k+" )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -159,9 +211,7 @@ static INPUT_PORTS_START( lkage )
 	PORT_DIPSETTING(    0x10, "4" )
 	PORT_DIPSETTING(    0x08, "5" )
 	PORT_DIPSETTING(	0x00, "255 (Cheat)")
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -206,34 +256,31 @@ static INPUT_PORTS_START( lkage )
 	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
 
 	PORT_START("DSW3")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x02, 0x02, "Initial Season" )
 	PORT_DIPSETTING(    0x02, "Spring" )
-	PORT_DIPSETTING(    0x00, "Winter" )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x0c, DEF_STR( Easiest ) )
+	PORT_DIPSETTING(    0x00, "Winter" )                    /* same as if you saved the princess twice ("HOWEVER ...") */
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Difficulty ) )       /* see notes */
 	PORT_DIPSETTING(    0x08, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hard ) )
-	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )
-	PORT_DIPSETTING(    0x10, "Coins/Credits" )
-	PORT_DIPSETTING(    0x00, "Insert Coin" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )
+	PORT_DIPNAME( 0x10, 0x10, "Coinage Display" )           /* see notes */
+	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Yes ) )
 	PORT_DIPNAME( 0x20, 0x20, "Year Display" )
 	PORT_DIPSETTING(    0x00, "1985" )
-	PORT_DIPSETTING(    0x20, "MCMLXXXIV" ) /* 1984(!) */
+	PORT_DIPSETTING(    0x20, "MCMLXXXIV" )                 /* 1984(!) */
 	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x80, 0x80, "Coin Slots" )
-	PORT_DIPSETTING(    0x80, "A and B" )
-	PORT_DIPSETTING(    0x00, "A only" )
+	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x80, "2" )
 
 	PORT_START("SYSTEM")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
@@ -243,23 +290,42 @@ static INPUT_PORTS_START( lkage )
 	PORT_START("P1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( lkageb )
+	PORT_INCLUDE( lkage )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )       /* table at 0x04b8 */
+	PORT_DIPSETTING(    0x03, "20k 70k 50k+" )
+	PORT_DIPSETTING(    0x02, "20k 90k 70k+" )
+	PORT_DIPSETTING(    0x01, "30k 100k 70k+" )
+	PORT_DIPSETTING(    0x00, "30k 130k 100k+" )
+
+	PORT_MODIFY("DSW3")
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Difficulty ) )       /* see notes */
+	PORT_DIPSETTING(    0x0c, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+INPUT_PORTS_END
+
 
 static const gfx_layout tile_layout =
 {
@@ -367,7 +433,7 @@ static MACHINE_DRIVER_START( lkageb )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 31*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(2*8, 32*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(lkage)
 	MDRV_PALETTE_LENGTH(1024)
@@ -460,9 +526,6 @@ ROM_START( lkageb )
 
 	ROM_REGION( 0x10000, "audio", 0 ) /* Z80 code (sound CPU) */
 	ROM_LOAD( "a54-04.54",   0x0000, 0x8000, CRC(541faf9a) SHA1(b142ff3bd198f700697ec06ea92db3109ab5818e) )
-
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* 68705 MCU code */
-	ROM_LOAD( "mcu",   0x0000, 0x0800, NO_DUMP )
 
 	ROM_REGION( 0x4000, "user1", 0 ) /* data */
 	ROM_LOAD( "a54-03.51",   0x0000, 0x4000, CRC(493e76d8) SHA1(13c6160edd94ba2801fd89bb33bcae3a1e3454ff) )
@@ -576,8 +639,8 @@ static DRIVER_INIT( lkageb )
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf062, 0xf062, 0, 0, fake_mcu_w );
 }
 
-GAME( 1984, lkage,   0,     lkage,  lkage, 0,       ROT0, "Taito Corporation", "The Legend of Kage", 0 )
-GAME( 1984, lkageo,  lkage, lkage,  lkage, 0,       ROT0, "Taito Corporation", "The Legend of Kage (older)", 0 )
-GAME( 1984, lkageb,  lkage, lkageb, lkage, lkageb,  ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", 0 )
-GAME( 1984, lkageb2, lkage, lkageb, lkage, lkageb,  ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", 0 )
-GAME( 1984, lkageb3, lkage, lkageb, lkage, lkageb,  ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", 0 )
+GAME( 1984, lkage,    0,        lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage", GAME_NO_COCKTAIL )
+GAME( 1984, lkageo,   lkage,    lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage (older)", GAME_NO_COCKTAIL )
+GAME( 1984, lkageb,   lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", GAME_NO_COCKTAIL )
+GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", GAME_NO_COCKTAIL )
+GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", GAME_NO_COCKTAIL )
