@@ -1387,21 +1387,19 @@ static CPU_INIT( i8085 )
 static CPU_RESET( i8085 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 	void (*save_sodcallback)(int);
 	int (*save_sidcallback)(void);
 	int cputype_bak = I.cputype;
 
 	init_tables();
-	save_device = I.device;
 	save_irqcallback = I.irq_callback;
 	save_sodcallback = I.sod_callback;
 	save_sidcallback = I.sid_callback;
 	memset(&I, 0, sizeof(i8085_Regs));
-	I.device = save_device;
 	I.irq_callback = save_irqcallback;
 	I.sod_callback = save_sodcallback;
 	I.sid_callback = save_sidcallback;
+	I.device = device;
 	change_pc(I.PC.d);
 
 	I.cputype = cputype_bak;

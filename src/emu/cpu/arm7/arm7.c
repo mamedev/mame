@@ -103,7 +103,7 @@ static CPU_INIT( arm7 )
 static CPU_RESET( arm7 )
 {
     // must call core reset
-    arm7_core_reset();
+    arm7_core_reset(device);
 }
 
 static CPU_EXIT( arm7 )

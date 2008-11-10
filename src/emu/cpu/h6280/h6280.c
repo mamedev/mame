@@ -193,15 +193,13 @@ static CPU_INIT( h6280 )
 static CPU_RESET( h6280 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 	int i;
 
 	/* wipe out the h6280 structure */
 	save_irqcallback = h6280.irq_callback;
-	save_device = h6280.device;
 	memset(&h6280, 0, sizeof(h6280_Regs));
 	h6280.irq_callback = save_irqcallback;
-	h6280.device = save_device;
+	h6280.device = device;
 
 	/* set I and B flags */
 	P = _fI | _fB;

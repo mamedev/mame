@@ -1536,13 +1536,11 @@ static CPU_RESET( f8 )
 	UINT8 data;
 	int i;
 	cpu_irq_callback save_callback;
-	const device_config *save_device;
 
 	save_callback = f8.irq_callback;
-	save_device = f8.device;
 	memset(&f8, 0, sizeof(f8_Regs));
 	f8.irq_callback = save_callback;
-	f8.device = save_device;
+	f8.device = device;
     f8.w&=~I;
 
 	/* save PC0 to PC1 and reset PC0 */

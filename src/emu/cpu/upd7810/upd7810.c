@@ -1607,15 +1607,13 @@ static CPU_RESET( upd7810 )
 {
 	UPD7810_CONFIG save_config;
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_config = upd7810.config;
 	save_irqcallback = upd7810.irq_callback;
-	save_device = upd7810.device;
 	memset(&upd7810, 0, sizeof(upd7810));
 	upd7810.config = save_config;
 	upd7810.irq_callback = save_irqcallback;
-	upd7810.device = save_device;
+	upd7810.device = device;
 
 	upd7810.opXX = opXX_7810;
 	upd7810.op48 = op48;

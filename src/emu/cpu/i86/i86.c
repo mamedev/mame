@@ -160,16 +160,14 @@ static CPU_INIT( i8088 )
 static CPU_RESET( i8086 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
     memory_interface save_mem;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	save_mem = I.mem;
 	memset(&I, 0, sizeof (I));
-	I.device = save_device;
 	I.irq_callback = save_irqcallback;
 	I.mem = save_mem;
+	I.device = device;
 
 	I.sregs[CS] = 0xf000;
 	I.base[CS] = SegBase(CS);

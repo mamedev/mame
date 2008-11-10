@@ -789,10 +789,9 @@ static CPU_INIT( s2650 )
 static CPU_RESET( s2650 )
 {
 	cpu_irq_callback save_irqcallback = S.irq_callback;
-	const device_config *save_device = S.device;
 	memset(&S, 0, sizeof(S));
 	S.irq_callback = save_irqcallback;
-	S.device = save_device;
+	S.device = device;
 	S.psl = COM | WC;
 	S.psu = 0;
 }

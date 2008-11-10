@@ -304,10 +304,9 @@ INLINE void SetRegister( int rIndex, UINT32 value )
 static CPU_RESET( arm )
 {
 	cpu_irq_callback save_irqcallback = arm.irq_callback;
-	const device_config *save_device = arm.device;
 	memset(&arm, 0, sizeof(arm));
 	arm.irq_callback = save_irqcallback;
-	arm.device = save_device;
+	arm.device = device;
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;

@@ -1940,7 +1940,6 @@ static CPU_RESET( z180 )
 {
 	z80_daisy_state *save_daisy;
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 	int i, p;
 #if BIG_FLAGS_ARRAY
 	int oldval, newval, val;
@@ -2021,7 +2020,6 @@ static CPU_RESET( z180 )
 
 	save_daisy = Z180.daisy;
 	save_irqcallback = Z180.irq_callback;
-	save_device = Z180.device;
 	memset(&Z180, 0, sizeof(Z180));
 	Z180.daisy = save_daisy;
 	Z180.irq_callback = save_irqcallback;
@@ -2040,6 +2038,7 @@ static CPU_RESET( z180 )
 	Z180.read_tcr_tmdr[1] = 0;
 	Z180.tmdr_value[0] = 0xffff;
 	Z180.tmdr_value[1] = 0xffff;
+	Z180.device = device;
 
 	/* reset io registers */
 	IO_CNTLA0  = Z180_CNTLA0_RESET;

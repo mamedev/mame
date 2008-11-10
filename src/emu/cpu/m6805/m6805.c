@@ -451,10 +451,9 @@ static CPU_INIT( m6805 )
 static CPU_RESET( m6805 )
 {
 	cpu_irq_callback save_irqcallback = m6805.irq_callback;
-	const device_config *save_device = m6805.device;
 	memset(&m6805, 0, sizeof(m6805));
 	m6805.irq_callback = save_irqcallback;
-	m6805.device = save_device;
+	m6805.device = device;
 	/* Force CPU sub-type and relevant masks */
 	m6805.subtype	= SUBTYPE_M6805;
 	SP_MASK = 0x07f;

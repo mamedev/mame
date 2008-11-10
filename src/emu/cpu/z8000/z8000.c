@@ -463,10 +463,9 @@ INLINE void Interrupt(void)
 static CPU_RESET( z8000 )
 {
 	cpu_irq_callback save_irqcallback = Z.irq_callback;
-	const device_config *save_device = Z.device;
 	memset(&Z, 0, sizeof(z8000_Regs));
 	Z.irq_callback = save_irqcallback;
-	Z.device = save_device;
+	Z.device = device;
 	FCW = RDMEM_W( 2 ); /* get reset FCW */
 	PC	= RDMEM_W( 4 ); /* get reset PC  */
 	change_pc(PC);

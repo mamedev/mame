@@ -1725,10 +1725,9 @@ static void BuildTable(void)
 static CPU_RESET( SE3208 )
 {
 	cpu_irq_callback save_irqcallback = Context.irq_callback;
-	const device_config *save_device = Context.device;
 	memset(&Context,0,sizeof(_SE3208Context));
 	Context.irq_callback = save_irqcallback;
-	Context.device = save_device;
+	Context.device = device;
 	Context.PC=SE3208_Read32(0);
 	Context.SR=0;
 	Context.IRQ=CLEAR_LINE;

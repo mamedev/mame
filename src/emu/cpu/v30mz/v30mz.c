@@ -112,13 +112,11 @@ static CPU_RESET( nec )
     unsigned int i,j,c;
     static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	memset( &I, 0, sizeof(I) );
 	I.irq_callback = save_irqcallback;
-	I.device = save_device;
+	I.device = device;
 
 	I.sregs[CS] = 0xffff;
 

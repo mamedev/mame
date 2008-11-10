@@ -1724,15 +1724,13 @@ static CPU_RESET( hyperstone )
 	//TODO: Add different reset initializations for BCR, MCR, FCR, TPR
 
 	emu_timer *save_timer;
-	const device_config *save_device;
 	cpu_irq_callback save_irqcallback;
 
 	save_timer = hyperstone.timer;
 	save_irqcallback = hyperstone.irq_callback;
-	save_device = hyperstone.device;
 	memset(&hyperstone, 0, sizeof(hyperstone_regs));
 	hyperstone.irq_callback = save_irqcallback;
-	hyperstone.device = save_device;
+	hyperstone.device = device;
 	hyperstone.timer = save_timer;
 
 	hyperstone.tr_clocks_per_tick = 2;

@@ -3248,7 +3248,6 @@ static CPU_RESET( sh4 )
 
 	void (*f)(UINT32 data);
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	cpunum = sh4.cpu_number;
 	m = sh4.m;
@@ -3264,7 +3263,6 @@ static CPU_RESET( sh4 )
 
 	f = sh4.ftcsr_read_callback;
 	save_irqcallback = sh4.irq_callback;
-	save_device = sh4.device;
 	save_is_slave = sh4.is_slave;
 	savecpu_clock = sh4.cpu_clock;
 	savebus_clock = sh4.bus_clock;
@@ -3276,7 +3274,7 @@ static CPU_RESET( sh4 )
 	sh4.pm_clock = savepm_clock;
 	sh4.ftcsr_read_callback = f;
 	sh4.irq_callback = save_irqcallback;
-	sh4.device = save_device;
+	sh4.device = device;
 
 	sh4.dma_timer[0] = tsaved[0];
 	sh4.dma_timer[1] = tsaved[1];

@@ -684,7 +684,6 @@ static CPU_RESET( tms34010 )
 	const device_config *screen = tms.screen;
 	UINT16 *shiftreg = tms.shiftreg;
 	cpu_irq_callback save_irqcallback = tms.irq_callback;
-	const device_config *save_device = tms.device;
 	emu_timer *save_scantimer = tms.scantimer;
 
 	memset(&tms, 0, sizeof(tms));
@@ -693,8 +692,8 @@ static CPU_RESET( tms34010 )
 	tms.screen = screen;
 	tms.shiftreg = shiftreg;
 	tms.irq_callback = save_irqcallback;
-	tms.device = save_device;
 	tms.scantimer = save_scantimer;
+	tms.device = device;
 
 	/* fetch the initial PC and reset the state */
 	PC = RLONG(0xffffffe0) & 0xfffffff0;

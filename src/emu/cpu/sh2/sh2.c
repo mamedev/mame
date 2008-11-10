@@ -2146,7 +2146,6 @@ static CPU_RESET( sh2 )
 
 	void (*f)(UINT32 data);
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	cpunum = sh2->cpu_number;
 	m = sh2->m;
@@ -2156,7 +2155,6 @@ static CPU_RESET( sh2 )
 
 	f = sh2->ftcsr_read_callback;
 	save_irqcallback = sh2->irq_callback;
-	save_device = sh2->device;
 	save_is_slave = sh2->is_slave;
 	dma_callback_kludge = sh2->dma_callback_kludge;
 
@@ -2166,7 +2164,7 @@ static CPU_RESET( sh2 )
 	sh2->is_slave = save_is_slave;
 	sh2->ftcsr_read_callback = f;
 	sh2->irq_callback = save_irqcallback;
-	sh2->device = save_device;
+	sh2->device = device;
 
 	sh2->timer = tsave;
 	sh2->dma_timer[0] = tsaved0;

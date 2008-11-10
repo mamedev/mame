@@ -616,13 +616,11 @@ static void build_opcode_table(UINT32 features)
 static CPU_RESET( i386 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
-	I.device = save_device;
+	I.device = device;
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
@@ -1074,13 +1072,11 @@ static CPU_INIT( i486 )
 static CPU_RESET( i486 )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
-	I.device = save_device;
+	I.device = device;
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
@@ -1184,13 +1180,11 @@ static CPU_INIT( pentium )
 static CPU_RESET( pentium )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
-	I.device = save_device;
+	I.device = device;
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
@@ -1314,13 +1308,11 @@ static CPU_INIT( mediagx )
 static CPU_RESET( mediagx )
 {
 	cpu_irq_callback save_irqcallback;
-	const device_config *save_device;
 
 	save_irqcallback = I.irq_callback;
-	save_device = I.device;
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
-	I.device = save_device;
+	I.device = device;
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;
