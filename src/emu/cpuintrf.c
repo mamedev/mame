@@ -557,7 +557,7 @@ static const struct
 	{ CPU_TMS34020, CPU_GET_INFO_NAME(tms34020) },
 #endif
 #if (HAS_TI990_10)
-	{ CPU_TI990_10, ti990_CPU_GET_INFO_NAME(10) },
+	{ CPU_TI990_10, CPU_GET_INFO_NAME(ti990_10) },
 #endif
 #if (HAS_TMS9900)
 	{ CPU_TMS9900, CPU_GET_INFO_NAME(tms9900) },

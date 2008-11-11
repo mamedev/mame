@@ -570,14 +570,14 @@ static CPU_SET_INFO( m68008 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:			set_irq_line(0, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 1:			set_irq_line(1, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 2:			set_irq_line(2, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 3:			set_irq_line(3, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 4:			set_irq_line(4, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 5:			set_irq_line(5, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 6:			set_irq_line(6, info->i);					break;
-		case CPUINFO_INT_INPUT_STATE + 7:			set_irq_line(7, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + 0:			set_irq_line(m68k, 0, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + 1:			set_irq_line(m68k, 1, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + 2:			set_irq_line(m68k, 2, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + 3:			set_irq_line(m68k, 3, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + 4:			set_irq_line(m68k, 4, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + 5:			set_irq_line(m68k, 5, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + 6:			set_irq_line(m68k, 6, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + 7:			set_irq_line(m68k, 7, info->i);					break;
 
 		case CPUINFO_INT_PC:  						m68k_set_reg(m68k, M68K_REG_PC, info->i&0x00ffffff); break;
 		case CPUINFO_INT_REGISTER + M68K_PC:  		m68k_set_reg(m68k, M68K_REG_PC, info->i);			break;

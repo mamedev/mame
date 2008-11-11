@@ -121,7 +121,7 @@ static CPU_INIT( minx )
 }
 
 
-static void minx_reset( void )
+static CPU_RESET( minx )
 {
 	regs.SP = regs.BA = regs.HL = regs.X = regs.Y = 0;
 	regs.U = regs.V = regs.F = regs.E = regs.I = regs.XI = regs.YI = 0;
@@ -132,7 +132,7 @@ static void minx_reset( void )
 }
 
 
-static void minx_exit( void )
+static CPU_EXIT( minx )
 {
 }
 
@@ -159,7 +159,7 @@ INLINE UINT16 rdop16( void )
 #include "minxops.h"
 
 
-static int minx_execute( int cycles )
+static CPU_EXECUTE( minx )
 {
 	UINT32	oldpc;
 	UINT8	op;
@@ -204,18 +204,18 @@ static int minx_execute( int cycles )
 }
 
 
-static void minx_burn( int cycles )
+static CPU_BURN( minx )
 {
 	minx_icount = 0;
 }
 
 
-static void minx_set_context( void *src )
+static CPU_SET_CONTEXT( minx )
 {
 }
 
 
-static void minx_get_context( void *dst )
+static CPU_GET_CONTEXT( minx )
 {
 }
 
@@ -282,7 +282,7 @@ static void minx_set_irq_line( int irqline, int state )
 }
 
 
-static void minx_set_info( UINT32 state, cpuinfo *info )
+static CPU_SET_INFO( minx )
 {
 	switch( state )
 	{
@@ -308,7 +308,7 @@ static void minx_set_info( UINT32 state, cpuinfo *info )
 }
 
 
-void minx_get_info( UINT32 state, cpuinfo *info )
+CPU_GET_INFO( minx )
 {
 	switch( state )
 	{
@@ -356,7 +356,7 @@ void minx_get_info( UINT32 state, cpuinfo *info )
 	case CPUINFO_PTR_RESET:										info->reset = CPU_RESET_NAME(minx); break;
 	case CPUINFO_PTR_EXIT:										info->exit = CPU_EXIT_NAME(minx); break;
 	case CPUINFO_PTR_EXECUTE:									info->execute = CPU_EXECUTE_NAME(minx); break;
-	case CPUINFO_PTR_BURN:										info->burn = CPU_GET_BURN_NAME(minx); break;
+	case CPUINFO_PTR_BURN:										info->burn = CPU_BURN_NAME(minx); break;
 	case CPUINFO_PTR_DISASSEMBLE:								info->disassemble = CPU_DISASSEMBLE_NAME(minx); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:						info->icount = &minx_icount; break;
 	case CPUINFO_STR_NAME:										strcpy( info->s = cpuintrf_temp_str(), "Minx" ); break;
