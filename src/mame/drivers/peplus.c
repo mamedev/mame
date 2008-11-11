@@ -189,9 +189,7 @@ static UINT8 *sd000_ram;
 static UINT8 *sf000_ram;
 
 /* Variables used instead of CRTC6845 system */
-static UINT8 vid_register = 0;
-static UINT8 vid_low = 0;
-static UINT8 vid_high = 0;
+static UINT16 vid_address = 0;
 
 /* Holds upper video address and palette number */
 static UINT8 *palette_ram;
@@ -212,6 +210,10 @@ static int sda_dir = 0;
 #define CMOS_NVRAM_SIZE     0x2000
 #define eeprom_NVRAM_SIZE   0x200 // 4k Bit
 
+/* prototypes */
+static MC6845_ON_VSYNC_CHANGED(crtc_vsync);
+static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr);
+
 static const mc6845_interface mc6845_intf =
 {
 	"main",					/* screen we are acting on */
@@ -222,7 +224,8 @@ static const mc6845_interface mc6845_intf =
 	NULL,					/* after pixel update callback */
 	NULL,					/* callback for display state changes */
 	NULL,					/* HSYNC callback */
-	NULL					/* VSYNC callback */
+	crtc_vsync,				/* VSYNC callback */
+	crtc_addr				/* update address callback */
 };
 
 /*****************
@@ -289,51 +292,55 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
     The current CRTC6845 driver does not support these
     additional registers (R18, R19, R31)
 */
+
+static MC6845_ON_UPDATE_ADDR_CHANGED(crtc_addr)
+{
+	vid_address = address;
+}
+
+
 static WRITE8_DEVICE_HANDLER( peplus_crtc_mode_w )
 {
-	/* Mode Control - Register 8 */
-	/* Sets CRT to Transparent Memory Addressing Mode */
+	/* Reset timing logic */
 }
 
-static WRITE8_DEVICE_HANDLER( peplus_crtc_register_w )
+static TIMER_CALLBACK(assert_lp_cb)
 {
-    vid_register = data;
-    mc6845_address_w(device, offset, data);
+	mc6845_assert_light_pen_input((const device_config *) ptr);
 }
 
-static WRITE8_DEVICE_HANDLER( peplus_crtc_address_w )
+static void handle_lightpen( const device_config *device )
 {
-	switch(vid_register) {
-		case 0x12:  /* Update Address High */
-			vid_high = data & 0x3f;
-			break;
-		case 0x13:  /* Update Address Low */
-			vid_low = data;
-			break;
-	}
-    mc6845_register_w(device, offset, data);
+    int x_val = input_port_read_safe(device->machine, "TOUCH_X",0x00);
+    int y_val = input_port_read_safe(device->machine, "TOUCH_Y",0x00);
+    const rectangle *vis_area = video_screen_get_visible_area(device->machine->primary_screen);
+    int xt, yt;
+    
+    xt = x_val * (vis_area->max_x - vis_area->min_x) / 1024 + vis_area->min_x;
+    yt = y_val * (vis_area->max_y - vis_area->min_y) / 1024 + vis_area->min_y;
+
+     timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, yt, xt), (void *) device, 0, assert_lp_cb);
+ }
+
+static MC6845_ON_VSYNC_CHANGED(crtc_vsync)
+{
+	cputag_set_input_line(device->machine, "main", 0, vsync ? ASSERT_LINE : CLEAR_LINE);
+	handle_lightpen(device);
 }
+
 
 static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 {
-	UINT16 vid_address = (vid_high<<8) | vid_low;
-
 	videoram[vid_address] = data;
 	palette_ram[vid_address] = io_port[1];
 	tilemap_mark_tile_dirty(bg_tilemap, vid_address);
-
-	/* Transparent Memory Addressing increments the update address register */
-	if (vid_low == 0xff) {
-		vid_high++;
-	}
-	vid_low++;
+	
+	/* An access here triggers a device read !*/
+	(void) mc6845_register_r(device, 0);
 }
 
 static WRITE8_HANDLER( peplus_io_w )
 {
-	if (offset == 2)
-		cputag_set_input_line(machine, "main", 0, CLEAR_LINE);
-
 	io_port[offset] = data;
 }
 
@@ -428,42 +435,6 @@ static WRITE8_HANDLER(i2c_nvram_w)
 /****************
 * Read Handlers *
 ****************/
-
-static READ8_DEVICE_HANDLER( peplus_crtc_display_r )
-{
-	UINT16 vid_address = ((vid_high<<8) | vid_low) + 1;
-    vid_high = (vid_address>>8) & 0x3f;
-    vid_low = vid_address& 0xff;
-
-    return 0x00;
-}
-
-static READ8_DEVICE_HANDLER( peplus_crtc_lpen1_r )
-{
-	return mc6845_status_r(device, offset);
-	//return 0x40;
-}
-
-static READ8_DEVICE_HANDLER( peplus_crtc_lpen2_r )
-{
-    UINT8 ret_val = 0x00;
-    UINT8 x_val = input_port_read_safe(device->machine, "TOUCH_X",0x00);
-    UINT8 y_val = (0x19 - input_port_read_safe(device->machine, "TOUCH_Y",0x00));
-    UINT16 t_val = y_val * 0x28 + (x_val+1);
-
-	switch(vid_register) {
-		case 0x10:  /* Light Pen Address High */
-			ret_val = (t_val >> 8) & 0x3f;
-			break;
-		case 0x11:  /* Light Pen Address Low */
-			ret_val = t_val & 0xff;
-			break;
-		default:
-			ret_val = mc6845_register_r(device, offset);
-	}
-
-    return ret_val;
-}
 
 static READ8_HANDLER( peplus_io_r )
 {
@@ -730,10 +701,10 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_BASE(&cmos_ram)
 
 	// CRT Controller
-	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE(MC6845, "crtc", peplus_crtc_mode_w)
-	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE(MC6845, "crtc", peplus_crtc_lpen1_r, peplus_crtc_register_w)
-	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE(MC6845, "crtc", peplus_crtc_lpen2_r, peplus_crtc_address_w)
-	AM_RANGE(0x2083, 0x2083) AM_DEVREADWRITE(MC6845, "crtc", peplus_crtc_display_r, peplus_crtc_display_w)
+	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE(R6545_1, "crtc", peplus_crtc_mode_w)
+	AM_RANGE(0x2080, 0x2080) AM_DEVREADWRITE(R6545_1, "crtc", mc6845_status_r, mc6845_address_w)
+	AM_RANGE(0x2081, 0x2081) AM_DEVREADWRITE(R6545_1, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x2083, 0x2083) AM_DEVREADWRITE(R6545_1, "crtc", mc6845_register_r, peplus_crtc_display_w)
 
     // Superboard Data
 	AM_RANGE(0x3000, 0x3fff) AM_READWRITE(peplus_s3000_r, peplus_s3000_w) AM_BASE(&s3000_ram)
@@ -930,13 +901,13 @@ static INPUT_PORTS_START( peplus_keno )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_BUTTON15 ) PORT_NAME("Bill Acceptor") PORT_CODE(KEYCODE_U)
 
 	PORT_START("TOUCH_X")
-	PORT_BIT( 0xff, 0x08, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 0x28) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
+	PORT_BIT( 0xffff, 0x200, IPT_LIGHTGUN_X ) PORT_MINMAX(0x00, 1024) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 	PORT_START("TOUCH_Y")
-	PORT_BIT( 0xff, 0x08, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 0x19) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
+	PORT_BIT( 0xffff, 0x200, IPT_LIGHTGUN_Y ) PORT_MINMAX(0x00, 1024) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(13)
 
 	PORT_START("IN0")
 	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK1")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Light Pen") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x70, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(peplus_input_r, "IN_BANK2")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1019,9 +990,7 @@ static MACHINE_DRIVER_START( peplus )
 	// basic machine hardware
 	MDRV_CPU_ADD("main", I80C32, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(peplus_map, 0)
-	//MDRV_CPU_DATA_MAP(peplus_datamap, 0)
 	MDRV_CPU_IO_MAP(peplus_iomap, 0)
-	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
 	MDRV_MACHINE_RESET(peplus)
 	MDRV_NVRAM_HANDLER(peplus)
@@ -1029,8 +998,7 @@ static MACHINE_DRIVER_START( peplus )
 	// video hardware
 
 	MDRV_SCREEN_ADD("main", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE((52+1)*8, (31+1)*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 25*8-1)
@@ -1038,7 +1006,7 @@ static MACHINE_DRIVER_START( peplus )
 	MDRV_GFXDECODE(peplus)
 	MDRV_PALETTE_LENGTH(16*16)
 
-	MDRV_DEVICE_ADD("crtc", MC6845)
+	MDRV_DEVICE_ADD("crtc", R6545_1)
 	MDRV_DEVICE_CONFIG(mc6845_intf)
 
 	MDRV_PALETTE_INIT(peplus)
