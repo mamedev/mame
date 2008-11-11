@@ -43,6 +43,8 @@ typedef void (*mc6845_on_hsync_changed_func)(const device_config *device, int hs
 typedef void (*mc6845_on_vsync_changed_func)(const device_config *device, int vsync);
 #define MC6845_ON_VSYNC_CHANGED(name)	void name(const device_config *device, int vsync)
 
+typedef void (*mc6845_on_update_addr_changed_func)(const device_config *device, int address, int strobe);
+#define MC6845_ON_UPDATE_ADDR_CHANGED(name)	void name(const device_config *device, int address, int strobe)
 
 /* interface */
 typedef struct _mc6845_interface mc6845_interface;
@@ -74,6 +76,12 @@ struct _mc6845_interface
 
 	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
 	mc6845_on_vsync_changed_func	on_vsync_changed;
+
+	/* Called whenenever the update address changes 
+	 * For vblank/hblank timing strobe indicates the physical update.
+	 * vblank/hblank timing not supported yet! */
+
+	mc6845_on_update_addr_changed_func	on_update_addr_changed;
 };
 
 

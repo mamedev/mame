@@ -26,7 +26,7 @@
 #include "mc6845.h"
 
 
-#define LOG		(0)
+#define LOG		(1)
 
 
 /* device types */
@@ -43,6 +43,13 @@ enum
 	NUM_TYPES
 };
 
+/* mode macros */
+
+#define MODE_TRANSPARENT(d)				(((d)->mode_control & 0x08) != 0)
+#define MODE_TRANSPARENT_PHI2(d)		(((d)->mode_control & 0x88) == 0x88)
+/* FIXME: not supported yet */
+#define MODE_TRANSPARENT_BLANK(d)		(((d)->mode_control & 0x88) == 0x08)
+#define MODE_UPDATE_STROBE(d)			(((d)->mode_control & 0x40) != 0)
 
 /* tags for state saving */
 static const char * const device_tags[NUM_TYPES] = {     "mc6845", "mc6845-1", "c6545-1", "r6545-1", "h46505", "hd6845", "sy6545-1" };
@@ -52,6 +59,9 @@ static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE,       TRUE,   
 static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,       TRUE,      TRUE,      TRUE,    FALSE,     TRUE,       TRUE };
 static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
 static const int supports_status_reg_d6[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE };
+
+/* FIXME: check other variants */
+static const int supports_transparent[NUM_TYPES]       = { FALSE,      FALSE,     FALSE,      TRUE,    FALSE,    FALSE,      FALSE };
 
 
 typedef struct _mc6845_t mc6845_t;
@@ -77,6 +87,7 @@ struct _mc6845_t
 	UINT16	disp_start_addr;	/* 0x0c/0x0d */
 	UINT16	cursor_addr;		/* 0x0e/0x0f */
 	UINT16	light_pen_addr;		/* 0x10/0x11 */
+	UINT16	update_addr;		/* 0x12/0x13 */
 
 	/* other internal state */
 	UINT64	clock;
@@ -138,6 +149,28 @@ static STATE_POSTLOAD( mc6845_state_save_postload )
 }
 
 
+static TIMER_CALLBACK( on_update_address_cb )
+{
+	const device_config *device = ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
+	int addr = (param >> 8);
+	int strobe = (param & 0xff);
+
+	/* call the callback function -- we know it exists */
+	mc6845->intf->on_update_addr_changed(device, addr, strobe);
+}
+
+INLINE void call_on_update_address(const device_config *device, int strobe)
+{
+	mc6845_t *mc6845 = get_safe_token(device);
+
+	if (mc6845->intf->on_update_addr_changed)
+		timer_set(attotime_zero, (void *) device, (mc6845->update_addr << 8) | strobe, on_update_address_cb);
+	else
+		fatalerror("M6845: transparent memory mode without handler\n");
+}
+
+
 WRITE8_DEVICE_HANDLER( mc6845_address_w )
 {
 	mc6845_t *mc6845 = get_safe_token(device);
@@ -176,6 +209,14 @@ READ8_DEVICE_HANDLER( mc6845_register_r )
 		case 0x0f:  ret = (mc6845->cursor_addr    >> 0) & 0xff; break;
 		case 0x10:  ret = (mc6845->light_pen_addr >> 8) & 0xff; mc6845->light_pen_latched = FALSE; break;
 		case 0x11:  ret = (mc6845->light_pen_addr >> 0) & 0xff; mc6845->light_pen_latched = FALSE; break;
+		case 0x1f:  
+			if (supports_transparent[mc6845->device_type] && MODE_TRANSPARENT(mc6845))
+			{
+				mc6845->update_addr++;
+				mc6845->update_addr &= 0x3fff;
+				call_on_update_address(device, 0);
+			}
+			break;
 
 		/* all other registers are write only and return 0 */
 		default: break;
@@ -211,12 +252,35 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 		case 0x0f:  mc6845->cursor_addr      = ((data & 0xff) << 0) | (mc6845->cursor_addr & 0xff00); break;
 		case 0x10: /* read-only */ break;
 		case 0x11: /* read-only */ break;
+		case 0x12:  
+			if (supports_transparent[mc6845->device_type])
+			{
+				mc6845->update_addr = ((data & 0x3f) << 8) | (mc6845->update_addr & 0x00ff);
+				call_on_update_address(device, 0);
+			}				
+			break;
+		case 0x13:
+			if (supports_transparent[mc6845->device_type])
+			{
+				mc6845->update_addr = ((data & 0xff) << 0) | (mc6845->update_addr & 0xff00);
+				call_on_update_address(device, 0);
+			}
+			break;
+		case 0x1f:  
+			if (supports_transparent[mc6845->device_type] && MODE_TRANSPARENT(mc6845))
+			{
+				mc6845->update_addr++;
+				mc6845->update_addr &= 0x3fff;
+				call_on_update_address(device, 0);
+			}
+			break;
 		default: break;
 	}
 
 	/* display message if the Mode Control register is not zero */
 	if ((mc6845->register_address_latch == 0x08) && (mc6845->mode_control != 0))
-		popmessage("Mode Control %02X is not supported!!!", mc6845->mode_control);
+		if (!(supports_transparent[mc6845->device_type] && MODE_TRANSPARENT_PHI2(mc6845)))
+			popmessage("Mode Control %02X is not supported!!!", mc6845->mode_control);
 
 	recompute_parameters(mc6845, FALSE);
 }
@@ -746,6 +810,7 @@ static device_start_err common_start(const device_config *device, int device_typ
 	state_save_register_item(unique_tag, 0, mc6845->light_pen_latched);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_state);
 	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
+	state_save_register_item(unique_tag, 0, mc6845->update_addr);
 
 	return DEVICE_START_OK;
 }
