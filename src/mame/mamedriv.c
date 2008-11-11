@@ -1055,6 +1055,7 @@ const game_driver * const drivers[] =
 	DRIVER( rbibba )	/* (c) 1987 Namco */
 	DRIVER( suprmrio )	/* (c) 1986 Nintendo */
 	DRIVER( suprmria )	/* (c) 1986 Nintendo */
+	DRIVER( skatekds )	/* (c) 1988 (hack) */
 	DRIVER( vsskykid )	/* (c) 1986 Namco */
 	DRIVER( tkoboxng )	/* (c) 1987 Data East */
 	DRIVER( smgolf )	/* (c) 1984 Nintendo */
