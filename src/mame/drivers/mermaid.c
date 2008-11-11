@@ -80,6 +80,37 @@ Notes:
           Vsync: 60Hz
           HSync: 15.24kHz
 
+
+
+Stephh's notes (based on the games Z80 code and some tests) :
+
+1) 'mermaid'
+
+  - Player 2 uses 2nd set of inputs ONLY when "Cabinet" Dip Switch is set to "Cokctail".
+  - Continue Play is determined via DSW bit 3. When it's ON, insert a coin when
+    the message is displayed on the screen. Beware that there is no visible timer !
+
+2) 'yachtmn'
+
+  - Player 2 uses 2nd set of inputs ONLY when "Cabinet" Dip Switch is set to "Cokctail".
+  - Continue Play is always possible provided that you insert a coin when the
+    message (much shorter than in 'mermaid') is displayed on the screen (there is
+    also no timer). Then when you press START, you need to press START again when
+    "YES" is displayed on screen (display switches 3 times between "YES" and "NO").
+  - Settings BOTH DSW bits 2 and 3 to ON gives you infinite credits and lives.
+    This isn't "Free Play" though as you still need to have one credit first.
+    This is done by setting "Bonus Life" Dip Switch to "None".
+
+3) 'rougien'
+
+  - Player 2 WLAYS uses 2nd set of inputs regardless of "Cabinet" Dip Switch.
+  - Continue Play is always possible provided that you insert a coin when the
+    message is displayed on the screen (there is a 6 "seconds" timer to do so).
+  - Settings BOTH DSW bits 2 and 3 to ON gives you infinite credits and lives.
+    This isn't "Free Play" though as you still need to have one credit first.
+    This is done by setting "Bonus Life" Dip Switch to "70k" and "Difficulty"
+    Dip Switch to "Hard".
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -105,6 +136,7 @@ VIDEO_START( mermaid );
 VIDEO_UPDATE( mermaid );
 VIDEO_EOF( mermaid );
 
+
 /* Read/Write Handlers */
 
 static UINT8 *mermaid_ay8910_enable;
@@ -120,6 +152,7 @@ static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 	if (mermaid_ay8910_enable[0]) ay8910_control_port_0_w(machine, offset, data);
 	if (mermaid_ay8910_enable[1]) ay8910_control_port_1_w(machine, offset, data);
 }
+
 
 /* Memory Map */
 
@@ -154,6 +187,7 @@ static ADDRESS_MAP_START( mermaid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_ay8910_control_port_w)
 ADDRESS_MAP_END
 
+
 /* Input Ports */
 
 static INPUT_PORTS_START( mermaid )
@@ -165,8 +199,8 @@ static INPUT_PORTS_START( mermaid )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x00, "20K" )
-	PORT_DIPSETTING(    0x04, "30K" )
+	PORT_DIPSETTING(    0x00, "20k" )
+	PORT_DIPSETTING(    0x04, "30k" )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Yes ) )
@@ -182,25 +216,85 @@ static INPUT_PORTS_START( mermaid )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
 
 	PORT_START("P1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 )
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 
 	PORT_START("P2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
 INPUT_PORTS_END
+
+static INPUT_PORTS_START( yachtmn )
+	PORT_INCLUDE( mermaid )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0c, 0x00, DEF_STR( Bonus_Life ) )       /* see notes */
+	PORT_DIPSETTING(    0x00, "10k" )
+	PORT_DIPSETTING(    0x04, "20k" )
+	PORT_DIPSETTING(    0x08, "30k" )
+	PORT_DIPSETTING(    0x0c, DEF_STR( None ) )
+INPUT_PORTS_END
+
+
+/* I know I could have used PORT_INCLUDE macro, but it's easier to understand ports this way - see notes */
+static INPUT_PORTS_START( rougien )
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Bonus_Life ) )       /* see notes */
+	PORT_DIPSETTING(    0x00, "50k" )
+	PORT_DIPSETTING(    0x04, "70k" )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Difficulty ) )       /* see notes */
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Hard ) )
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x00, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x20, "5" )
+	PORT_DIPSETTING(    0x30, "6" )
+	PORT_DIPNAME( 0xc0, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 1C_3C ) )
+
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP )    PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_COIN2 )
+INPUT_PORTS_END
+
 
 /* Graphics Layouts */
 
@@ -389,6 +483,6 @@ ROM_END
 
 /* Game Drivers */
 
-GAME( 1982, mermaid, 0,       mermaid, mermaid, 0, ROT0, "[Sanritsu] Rock-Ola", "Mermaid", 0 )
-GAME( 1982, yachtmn, mermaid, mermaid, mermaid, 0, ROT0, "[Sanritsu] Esco", "Yachtsman", 0 )
-GAME( 1982, rougien, 0,       mermaid, mermaid, 0, ROT0, "Sanritsu", "Rougien", 0 )
+GAME( 1982, mermaid,  0,        mermaid,  mermaid,  0, ROT0, "[Sanritsu] Rock-Ola", "Mermaid", 0 )
+GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn,  0, ROT0, "[Sanritsu] Esco", "Yachtsman", 0 )
+GAME( 1982, rougien,  0,        mermaid,  rougien,  0, ROT0, "Sanritsu", "Rougien", 0 )
