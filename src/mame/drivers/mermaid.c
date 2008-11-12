@@ -97,16 +97,16 @@ Stephh's notes (based on the games Z80 code and some tests) :
     message (much shorter than in 'mermaid') is displayed on the screen (there is
     also no timer). Then when you press START, you need to press START again when
     "YES" is displayed on screen (display switches 3 times between "YES" and "NO").
-  - Settings BOTH DSW bits 2 and 3 to ON gives you infinite credits and lives.
+  - Setting BOTH DSW bits 2 and 3 to ON gives you infinite credits and lives.
     This isn't "Free Play" though as you still need to have one credit first.
     This is done by setting "Bonus Life" Dip Switch to "None".
 
 3) 'rougien'
 
-  - Player 2 WLAYS uses 2nd set of inputs regardless of "Cabinet" Dip Switch.
+  - Player 2 AWLAYS uses 2nd set of inputs regardless of "Cabinet" Dip Switch.
   - Continue Play is always possible provided that you insert a coin when the
     message is displayed on the screen (there is a 6 "seconds" timer to do so).
-  - Settings BOTH DSW bits 2 and 3 to ON gives you infinite credits and lives.
+  - Setting BOTH DSW bits 2 and 3 to ON gives you infinite credits and lives.
     This isn't "Free Play" though as you still need to have one credit first.
     This is done by setting "Bonus Life" Dip Switch to "70k" and "Difficulty"
     Dip Switch to "Hard".
