@@ -414,7 +414,7 @@ static void discrete_reset(void *chip)
 			(*node->module.step)(node);
 
 		/* and register save state */
-		state_save_register_item_array("discrete", nodenum, node->output);
+		state_save_register_item_array("discrete", nodenum | (info->sndindex << 16 ), node->output);
 	}
 
 	discrete_current_context = NULL;

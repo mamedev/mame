@@ -30,10 +30,9 @@ struct dss_adjustment_context
 	double		scale;
 };
 
-
-READ8_HANDLER(discrete_sound_r)
+UINT8 discrete_sound_n_r(void *chip, offs_t offset)
 {
-	discrete_info    *info = sndti_token(SOUND_DISCRETE, 0);
+	discrete_info    *info = chip;
 	node_description *node = discrete_find_node(info, offset);
 
 	UINT8 data = 0;
@@ -57,9 +56,29 @@ READ8_HANDLER(discrete_sound_r)
     return data;
 }
 
-WRITE8_HANDLER(discrete_sound_w)
+READ8_HANDLER(discrete_sound_r)
 {
-	discrete_info    *info = sndti_token(SOUND_DISCRETE, 0);
+	return discrete_sound_n_r(sndti_token(SOUND_DISCRETE, 0), offset);
+}
+
+READ8_HANDLER(discrete_sound_1_r)
+{
+	return discrete_sound_n_r(sndti_token(SOUND_DISCRETE, 1), offset);
+}
+
+READ8_HANDLER(discrete_sound_2_r)
+{
+	return discrete_sound_n_r(sndti_token(SOUND_DISCRETE, 2), offset);
+}
+
+READ8_HANDLER(discrete_sound_3_r)
+{
+	return discrete_sound_n_r(sndti_token(SOUND_DISCRETE, 3), offset);
+}
+
+void discrete_sound_n_w(void *chip, offs_t offset, UINT8 data)
+{
+	discrete_info    *info = chip;
 	node_description *node = discrete_find_node(info, offset);
 
 	/* Update the node input value if it's a proper input node */
@@ -99,6 +118,25 @@ WRITE8_HANDLER(discrete_sound_w)
 	}
 }
 
+WRITE8_HANDLER(discrete_sound_w)
+{
+	discrete_sound_n_w(sndti_token(SOUND_DISCRETE, 0), offset, data);
+}
+
+WRITE8_HANDLER(discrete_sound_1_w)
+{
+	discrete_sound_n_w(sndti_token(SOUND_DISCRETE, 1), offset, data);
+}
+
+WRITE8_HANDLER(discrete_sound_2_w)
+{
+	discrete_sound_n_w(sndti_token(SOUND_DISCRETE, 2), offset, data);
+}
+
+WRITE8_HANDLER(discrete_sound_3_w)
+{
+	discrete_sound_n_w(sndti_token(SOUND_DISCRETE, 3), offset, data);
+}
 
 /************************************************************************
  *

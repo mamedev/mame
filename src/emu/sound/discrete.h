@@ -4290,7 +4290,17 @@ extern discrete_info *discrete_current_context;
 
 node_description *discrete_find_node(void *chip, int node);
 
+void discrete_sound_n_w(void *chip, offs_t offset, UINT8 data);
+UINT8 discrete_sound_n_r(void *chip, offs_t offset);
+
 WRITE8_HANDLER(discrete_sound_w);
-READ8_HANDLER( discrete_sound_r);
+WRITE8_HANDLER(discrete_sound_1_w);
+WRITE8_HANDLER(discrete_sound_2_w);
+WRITE8_HANDLER(discrete_sound_3_w);
+
+READ8_HANDLER(discrete_sound_r);
+READ8_HANDLER(discrete_sound_1_r);
+READ8_HANDLER(discrete_sound_2_r);
+READ8_HANDLER(discrete_sound_3_r);
 
 #endif /* __DISCRETE_H__ */
