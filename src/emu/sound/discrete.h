@@ -3271,6 +3271,20 @@
 #define RC_DISCHARGE_EXP_DT(rc, dt)		(exp(-(dt) / (rc)))
 #define RC_DISCHARGE_NEG_EXP_DT(rc, dt)	(exp((dt) / (rc)))
 
+/*************************************
+ *
+ *  Interface & Naming
+ *
+ *************************************/
+
+#define DISCRETE_STEP_NAME( _func )  _func ## _step
+#define DISCRETE_RESET_NAME( _func ) _func ## _reset
+
+#define DISCRETE_STEP(_func) void DISCRETE_STEP_NAME(_func) (node_description *node)
+#define DISCRETE_RESET(_func) void DISCRETE_RESET_NAME(_func) (node_description *node)
+
+#define DISCRETE_STEP_CALL(_func) DISCRETE_STEP_NAME(_func) (node)
+#define DISCRETE_RESET_CALL(_func) DISCRETE_RESET_NAME(_func) (node)
 
 /*************************************
  *

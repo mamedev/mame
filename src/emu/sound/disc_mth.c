@@ -178,7 +178,7 @@ struct dst_tvca_op_amp_context
 #define DST_ADDER__IN2		(*(node->input[3]))
 #define DST_ADDER__IN3		(*(node->input[4]))
 
-static void dst_adder_step(node_description *node)
+static DISCRETE_STEP(dst_adder)
 {
 	if(DST_ADDER__ENABLE)
 	{
@@ -203,7 +203,7 @@ static void dst_adder_step(node_description *node)
  ************************************************************************/
 #define DST_COMP_ADDER__SELECT	(*(node->input[0]))
 
-static void dst_comp_adder_step(node_description *node)
+static DISCRETE_STEP(dst_comp_adder)
 {
 	struct dst_comp_adder_context    *context = node->context;
 	int select;
@@ -213,7 +213,7 @@ static void dst_comp_adder_step(node_description *node)
 	node->output[0] = context->total[select];
 }
 
-static void dst_comp_adder_reset(node_description *node)
+static DISCRETE_RESET(dst_comp_adder)
 {
 	const  discrete_comp_adder_table *info = node->custom;
 	struct dst_comp_adder_context    *context = node->context;
@@ -265,7 +265,7 @@ static void dst_comp_adder_reset(node_description *node)
 #define DST_CLAMP__MAX		(*(node->input[3]))
 #define DST_CLAMP__CLAMP	(*(node->input[4]))
 
-static void dst_clamp_step(node_description *node)
+static DISCRETE_STEP(dst_clamp)
 {
 	if(DST_CLAMP__ENABLE)
 	{
@@ -296,7 +296,7 @@ static void dst_clamp_step(node_description *node)
 #define DST_DAC_R1__DATA		(*(node->input[1]))
 #define DST_DAC_R1__VON			(*(node->input[2]))
 
-static void dst_dac_r1_step(node_description *node)
+static DISCRETE_STEP(dst_dac_r1)
 {
 	const  discrete_dac_r1_ladder *info    = node->custom;
 	struct dst_dac_r1_context     *context = node->context;
@@ -353,7 +353,7 @@ static void dst_dac_r1_step(node_description *node)
 	}
 }
 
-static void dst_dac_r1_reset(node_description *node)
+static DISCRETE_RESET(dst_dac_r1)
 {
 	const discrete_dac_r1_ladder *info = node->custom;
 	struct dst_dac_r1_context *context = node->context;
@@ -418,7 +418,7 @@ static void dst_dac_r1_reset(node_description *node)
 #define DST_DIODE_MIX_INP_OFFSET	0
 #define DST_DIODE_MIX__INP(addr)	(*(node->input[DST_DIODE_MIX_INP_OFFSET + addr]))
 
-static void dst_diode_mix_step(node_description *node)
+static DISCRETE_STEP(dst_diode_mix)
 {
 	struct	dst_diode_mix__context *context = node->context;
 
@@ -434,7 +434,7 @@ static void dst_diode_mix_step(node_description *node)
 	node->output[0] = max;
 }
 
-static void dst_diode_mix_reset(node_description *node)
+static DISCRETE_RESET(dst_diode_mix)
 {
 	const  double *info = node->custom;
 	struct dst_diode_mix__context *context = node->context;
@@ -457,7 +457,7 @@ static void dst_diode_mix_reset(node_description *node)
 			context->v_junction[addr] = *info++;
 		}
 	}
-	dst_diode_mix_step(node);
+	DISCRETE_STEP_CALL(dst_diode_mix);
 }
 
 
@@ -474,7 +474,7 @@ static void dst_diode_mix_reset(node_description *node)
 #define DST_DIVIDE__IN		(*(node->input[1]))
 #define DST_DIVIDE__DIV		(*(node->input[2]))
 
-static void dst_divide_step(node_description *node)
+static DISCRETE_STEP(dst_divide)
 {
 	if(DST_DIVIDE__ENABLE)
 	{
@@ -510,7 +510,7 @@ static void dst_divide_step(node_description *node)
 #define DST_GAIN__GAIN		(*(node->input[2]))
 #define DST_GAIN__OFFSET	(*(node->input[3]))
 
-static void dst_gain_step(node_description *node)
+static DISCRETE_STEP(dst_gain)
 {
 	if(DST_GAIN__ENABLE)
 	{
@@ -572,7 +572,7 @@ int dst_trigger_function(int trig0, int trig1, int trig2, int function)
 	return (result);
 }
 
-static void dst_integrate_step(node_description *node)
+static DISCRETE_STEP(dst_integrate)
 {
 	const  discrete_integrate_info *info    = node->custom;
 	struct dst_integrate_context   *context = node->context;
@@ -617,7 +617,7 @@ static void dst_integrate_step(node_description *node)
 	if (node->output[0] > context->v_max_out) node->output[0] = context->v_max_out;
 }
 
-static void dst_integrate_reset(node_description *node)
+static DISCRETE_RESET(dst_integrate)
 {
 	const discrete_integrate_info *info = node->custom;
 	struct dst_integrate_context *context = node->context;
@@ -653,7 +653,7 @@ static void dst_integrate_reset(node_description *node)
 #define DST_LOGIC_INV__ENABLE	(*(node->input[0]))
 #define DST_LOGIC_INV__IN		(*(node->input[1]))
 
-static void dst_logic_inv_step(node_description *node)
+static DISCRETE_STEP(dst_logic_inv)
 {
 	if(DST_LOGIC_INV__ENABLE)
 	{
@@ -682,7 +682,7 @@ static void dst_logic_inv_step(node_description *node)
 #define DST_LOGIC_AND__IN2		(*(node->input[3]))
 #define DST_LOGIC_AND__IN3		(*(node->input[4]))
 
-static void dst_logic_and_step(node_description *node)
+static DISCRETE_STEP(dst_logic_and)
 {
 	if(DST_LOGIC_AND__ENABLE)
 	{
@@ -711,7 +711,7 @@ static void dst_logic_and_step(node_description *node)
 #define DST_LOGIC_NAND__IN2		(*(node->input[3]))
 #define DST_LOGIC_NAND__IN3		(*(node->input[4]))
 
-static void dst_logic_nand_step(node_description *node)
+static DISCRETE_STEP(dst_logic_nand)
 {
 	if(DST_LOGIC_NAND__ENABLE)
 	{
@@ -740,7 +740,7 @@ static void dst_logic_nand_step(node_description *node)
 #define DST_LOGIC_OR__IN2		(*(node->input[3]))
 #define DST_LOGIC_OR__IN3		(*(node->input[4]))
 
-static void dst_logic_or_step(node_description *node)
+static DISCRETE_STEP(dst_logic_or)
 {
 	if(DST_LOGIC_OR__ENABLE)
 	{
@@ -769,7 +769,7 @@ static void dst_logic_or_step(node_description *node)
 #define DST_LOGIC_NOR__IN2		(*(node->input[3]))
 #define DST_LOGIC_NOR__IN3		(*(node->input[4]))
 
-static void dst_logic_nor_step(node_description *node)
+static DISCRETE_STEP(dst_logic_nor)
 {
 	if(DST_LOGIC_NOR__ENABLE)
 	{
@@ -794,7 +794,7 @@ static void dst_logic_nor_step(node_description *node)
 #define DST_LOGIC_XOR__IN0		(*(node->input[1]))
 #define DST_LOGIC_XOR__IN1		(*(node->input[2]))
 
-static void dst_logic_xor_step(node_description *node)
+static DISCRETE_STEP(dst_logic_xor)
 {
 	if(DST_LOGIC_XOR__ENABLE)
 	{
@@ -819,7 +819,7 @@ static void dst_logic_xor_step(node_description *node)
 #define DST_LOGIC_XNOR__IN0		(*(node->input[1]))
 #define DST_LOGIC_XNOR__IN1		(*(node->input[2]))
 
-static void dst_logic_nxor_step(node_description *node)
+static DISCRETE_STEP(dst_logic_nxor)
 {
 	if(DST_LOGIC_XNOR__ENABLE)
 	{
@@ -849,7 +849,7 @@ static void dst_logic_nxor_step(node_description *node)
 #define DST_LOGIC_DFF__CLOCK	 (*(node->input[3]))
 #define DST_LOGIC_DFF__DATA 	 (*(node->input[4]))
 
-static void dst_logic_dff_step(node_description *node)
+static DISCRETE_STEP(dst_logic_dff)
 {
 	struct dst_flipflop_context *context = node->context;
 
@@ -871,7 +871,7 @@ static void dst_logic_dff_step(node_description *node)
 	context->last_clk = clk;
 }
 
-static void dst_logic_ff_reset(node_description *node)
+static DISCRETE_RESET(dst_logic_ff)
 {
 	struct dst_flipflop_context *context = node->context;
 
@@ -899,7 +899,7 @@ static void dst_logic_ff_reset(node_description *node)
 #define DST_LOGIC_JKFF__J 		 (*(node->input[4]))
 #define DST_LOGIC_JKFF__K	 	 (*(node->input[5]))
 
-static void dst_logic_jkff_step(node_description *node)
+static DISCRETE_STEP(dst_logic_jkff)
 {
 	struct dst_flipflop_context *context = node->context;
 
@@ -957,7 +957,7 @@ static void dst_logic_jkff_step(node_description *node)
 #define DST_LOOKUP_TABLE__IN		(*(node->input[1]))
 #define DST_LOOKUP_TABLE__SIZE		(*(node->input[2]))
 
-static void dst_lookup_table_step(node_description *node)
+static DISCRETE_STEP(dst_lookup_table)
 {
 	const double *table = node->custom;
 
@@ -1023,7 +1023,7 @@ static void dst_lookup_table_step(node_description *node)
 #define DST_MIXER__ENABLE		(*(node->input[0]))
 #define DST_MIXER__IN(bit)		(*(node->input[bit + 1]))
 
-static void dst_mixer_step(node_description *node)
+static DISCRETE_STEP(dst_mixer)
 {
 	const  discrete_mixer_desc *info    = node->custom;
 	struct dst_mixer_context   *context = node->context;
@@ -1166,7 +1166,7 @@ static void dst_mixer_step(node_description *node)
 	}
 }
 
-static void dst_mixer_reset(node_description *node)
+static DISCRETE_RESET(dst_mixer)
 {
 	const  discrete_mixer_desc *info    = node->custom;
 	struct dst_mixer_context   *context = node->context;
@@ -1290,7 +1290,7 @@ static void dst_mixer_reset(node_description *node)
 #define DST_MULTIPLEX__ADDR			(*(node->input[1]))
 #define DST_MULTIPLEX__INP(addr)	(*(node->input[2 + addr]))
 
-static void dst_multiplex_step(node_description *node)
+static DISCRETE_STEP(dst_multiplex)
 {
 	struct dst_size_context *context = node->context;
 
@@ -1315,13 +1315,13 @@ static void dst_multiplex_step(node_description *node)
 	}
 }
 
-static void dst_multiplex_reset(node_description *node)
+static DISCRETE_RESET(dst_multiplex)
 {
 	struct dst_size_context *context = node->context;
 
 	context->size = node->active_inputs - 2;
 
-	dst_multiplex_step(node);
+	DISCRETE_STEP_CALL(dst_multiplex);
 }
 
 
@@ -1343,7 +1343,7 @@ static void dst_multiplex_reset(node_description *node)
 #define DST_ONESHOT__WIDTH	(*(node->input[3]))
 #define DST_ONESHOT__TYPE	(int)(*(node->input[4]))
 
-static void dst_oneshot_step(node_description *node)
+static DISCRETE_STEP(dst_oneshot)
 {
 	struct dst_oneshot_context *context = node->context;
 
@@ -1403,7 +1403,7 @@ static void dst_oneshot_step(node_description *node)
 }
 
 
-static void dst_oneshot_reset(node_description *node)
+static DISCRETE_RESET(dst_oneshot)
 {
 	struct dst_oneshot_context *context = node->context;
 
@@ -1434,7 +1434,7 @@ static void dst_oneshot_reset(node_description *node)
 #define DST_RAMP__END		(*(node->input[4]))
 #define DST_RAMP__CLAMP		(*(node->input[5]))
 
-static void dst_ramp_step(node_description *node)
+static DISCRETE_STEP(dst_ramp)
 {
 	struct dss_ramp_context *context = node->context;
 
@@ -1461,7 +1461,7 @@ static void dst_ramp_step(node_description *node)
 	}
 }
 
-static void dst_ramp_reset(node_description *node)
+static DISCRETE_RESET(dst_ramp)
 {
 	struct dss_ramp_context *context = node->context;
 
@@ -1487,7 +1487,7 @@ static void dst_ramp_reset(node_description *node)
 #define DST_SAMPHOLD__CLOCK		(*(node->input[2]))
 #define DST_SAMPHOLD__TYPE		(*(node->input[3]))
 
-static void dst_samphold_step(node_description *node)
+static DISCRETE_STEP(dst_samphold)
 {
 	struct dst_samphold_context *context = node->context;
 
@@ -1524,7 +1524,7 @@ static void dst_samphold_step(node_description *node)
 	context->last_input = DST_SAMPHOLD__CLOCK;
 }
 
-static void dst_samphold_reset(node_description *node)
+static DISCRETE_RESET(dst_samphold)
 {
 	struct dst_samphold_context *context = node->context;
 
@@ -1532,7 +1532,7 @@ static void dst_samphold_reset(node_description *node)
 	context->last_input = -1;
 	/* Only stored in here to speed up and save casting in the step function */
 	context->clocktype = (int)DST_SAMPHOLD__TYPE;
-	dst_samphold_step(node);
+	DISCRETE_STEP_CALL(dst_samphold);
 }
 
 
@@ -1551,7 +1551,7 @@ static void dst_samphold_reset(node_description *node)
 #define DSS_SWITCH__IN0		(*(node->input[2]))
 #define DSS_SWITCH__IN1		(*(node->input[3]))
 
-static void dst_switch_step(node_description *node)
+static DISCRETE_STEP(dst_switch)
 {
 	if(DSS_SWITCH__ENABLE)
 	{
@@ -1579,7 +1579,7 @@ static void dst_switch_step(node_description *node)
 #define DSS_ASWITCH__THRESHOLD	(*(node->input[3]))
 
 
-static void dst_aswitch_step(node_description *node)
+static DISCRETE_STEP(dst_aswitch)
 {
 	if(DSS_SWITCH__ENABLE)
 	{
@@ -1626,7 +1626,7 @@ INLINE void dst_transform_push(double *stack, int *pointer, double value)
 	stack[(*pointer)++] = value;
 }
 
-static void dst_transform_step(node_description *node)
+static DISCRETE_STEP(dst_transform)
 {
 	double	trans_stack[MAX_TRANS_STACK];
 	double	number1,top;
@@ -1736,7 +1736,7 @@ static void dst_transform_step(node_description *node)
 #define DST_OP_AMP__INP0	(*(node->input[1]))
 #define DST_OP_AMP__INP1	(*(node->input[2]))
 
-static void dst_op_amp_step(node_description *node)
+static DISCRETE_STEP(dst_op_amp)
 {
 	const  discrete_op_amp_info *info    = node->custom;
 	struct dst_op_amp_context   *context = node->context;
@@ -1796,7 +1796,7 @@ static void dst_op_amp_step(node_description *node)
 		node->output[0] = 0;
 }
 
-static void dst_op_amp_reset(node_description *node)
+static DISCRETE_RESET(dst_op_amp)
 {
 	const discrete_op_amp_info *info = node->custom;
 	struct dst_op_amp_context *context = node->context;
@@ -1838,7 +1838,7 @@ static void dst_op_amp_reset(node_description *node)
  ************************************************************************/
 #define DST_OP_AMP_1SHT__TRIGGER	(*(node->input[0]))
 
-static void dst_op_amp_1sht_step(node_description *node)
+static DISCRETE_STEP(dst_op_amp_1sht)
 {
 	const  discrete_op_amp_1sht_info *info    = node->custom;
 	struct dst_op_amp_1sht_context   *context = node->context;
@@ -1878,7 +1878,7 @@ static void dst_op_amp_1sht_step(node_description *node)
 		context->v_cap1 += ((node->output[0] - OP_AMP_NORTON_VBE) * context->r34ratio + OP_AMP_NORTON_VBE - context->v_cap1) * context->exponent1c;
 }
 
-static void dst_op_amp_1sht_reset(node_description *node)
+static DISCRETE_RESET(dst_op_amp_1sht)
 {
 	const  discrete_op_amp_1sht_info *info    = node->custom;
 	struct dst_op_amp_1sht_context   *context = node->context;
@@ -1913,7 +1913,7 @@ static void dst_op_amp_1sht_reset(node_description *node)
 #define DST_TVCA_OP_AMP__INP0	(*(node->input[3]))
 #define DST_TVCA_OP_AMP__INP1	(*(node->input[4]))
 
-static void dst_tvca_op_amp_step(node_description *node)
+static DISCRETE_STEP(dst_tvca_op_amp)
 {
 	const  discrete_op_amp_tvca_info *info    = node->custom;
 	struct dst_tvca_op_amp_context   *context = node->context;
@@ -1993,7 +1993,7 @@ static void dst_tvca_op_amp_step(node_description *node)
 	if (node->output[0] > context->v_out_max) node->output[0] = context->v_out_max;
 }
 
-static void dst_tvca_op_amp_reset(node_description *node)
+static DISCRETE_RESET(dst_tvca_op_amp)
 {
 	const  discrete_op_amp_tvca_info *info    = node->custom;
 	struct dst_tvca_op_amp_context   *context = node->context;
@@ -2028,5 +2028,5 @@ static void dst_tvca_op_amp_reset(node_description *node)
 	context->exponent3[0] = RC_CHARGE_EXP(info->r11 * info->c3);
 	context->exponent3[1] = RC_CHARGE_EXP(RES_2_PARALLEL(info->r10, info->r11) * info->c3);
 
-	dst_tvca_op_amp_step(node);
+	DISCRETE_STEP_CALL(dst_tvca_op_amp);
 }
