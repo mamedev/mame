@@ -3153,7 +3153,7 @@ static void menu_select_game_populate(running_machine *machine, ui_menu *menu, s
 	{
 		ui_menu_item_append(menu, "No "GAMESNOUN" found. Please check the rompath specified in the "CONFIGNAME".ini file.\n\n"
 								  "If this is your first time using "APPNAME", please see the config.txt file in "
-								  "the docs directory for information on configuring "APPNAME, NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
+								  "the docs directory for information on configuring "APPNAME".", NULL, MENU_FLAG_MULTILINE | MENU_FLAG_REDTEXT, NULL);
 		return;
 	}
 

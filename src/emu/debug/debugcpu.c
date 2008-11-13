@@ -2726,12 +2726,13 @@ void debug_cpu_flush_traces(void)
 {
 	int cpunum;
 
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(Machine->cpu); cpunum++)
-		if (Machine->cpu[cpunum] != NULL)
-		{
-			if (global.cpuinfo[cpunum].trace.file)
-				fflush(global.cpuinfo[cpunum].trace.file);
-		}
+	if (Machine != NULL)
+		for (cpunum = 0; cpunum < ARRAY_LENGTH(Machine->cpu); cpunum++)
+			if (Machine->cpu[cpunum] != NULL)
+			{
+				if (global.cpuinfo[cpunum].trace.file)
+					fflush(global.cpuinfo[cpunum].trace.file);
+			}
 }
 
 

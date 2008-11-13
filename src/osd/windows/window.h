@@ -78,6 +78,8 @@ struct _win_window_info
 
 	// drawing data
 	void *				drawdata;
+	
+	running_machine *	machine;
 };
 
 

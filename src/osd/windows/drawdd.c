@@ -20,7 +20,6 @@
 #include "render.h"
 #include "rendutil.h"
 #include "options.h"
-#include "deprecat.h"
 
 // MAMEOS headers
 #include "winmain.h"
@@ -166,9 +165,9 @@ static void compute_blit_surface_size(win_window_info *window);
 static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight);
 
 // video modes
-static int config_adapter_mode(running_machine *machine, win_window_info *window);
+static int config_adapter_mode(win_window_info *window);
 static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor);
-static void pick_best_mode(running_machine *machine, win_window_info *window);
+static void pick_best_mode(win_window_info *window);
 
 // rendering
 static void drawdd_rgb888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
@@ -255,7 +254,7 @@ static int drawdd_window_init(win_window_info *window)
 	window->drawdata = dd;
 
 	// configure the adapter for the mode we want
-	if (config_adapter_mode(Machine, window))
+	if (config_adapter_mode(window))
 		goto error;
 
 	// create the ddraw object
@@ -1101,7 +1100,7 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 //  config_adapter_mode
 //============================================================
 
-static int config_adapter_mode(running_machine *machine, win_window_info *window)
+static int config_adapter_mode(win_window_info *window)
 {
 	DDDEVICEIDENTIFIER2 identifier;
 	dd_info *dd = window->drawdata;
@@ -1148,7 +1147,7 @@ static int config_adapter_mode(running_machine *machine, win_window_info *window
 
 		// if we're allowed to switch resolutions, override with something better
 		if (video_config.switchres)
-			pick_best_mode(machine, window);
+			pick_best_mode(window);
 	}
 
 	// release the DirectDraw object
@@ -1286,9 +1285,9 @@ static HRESULT WINAPI enum_modes_callback(LPDDSURFACEDESC2 desc, LPVOID context)
 //  pick_best_mode
 //============================================================
 
-static void pick_best_mode(running_machine *machine, win_window_info *window)
+static void pick_best_mode(win_window_info *window)
 {
-	const device_config *primary_screen = video_screen_first(machine->config);
+	const device_config *primary_screen = video_screen_first(window->machine->config);
 	dd_info *dd = window->drawdata;
 	mode_enum_info einfo;
 	HRESULT result;

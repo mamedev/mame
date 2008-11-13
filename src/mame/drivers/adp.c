@@ -148,7 +148,6 @@ Video board has additional chips:
 #include "video/hd63484.h"
 #include "machine/microtch.h"
 #include "machine/68681.h"
-#include "deprecat.h"
 
 static UINT8 register_active;
 static struct
@@ -182,7 +181,7 @@ static void microtouch_tx(UINT8 data)
 
 static UINT8 duart_input(const device_config *device)
 {
-	return input_port_read(Machine, "DSW1");
+	return input_port_read(device->machine, "DSW1");
 }
 
 static MACHINE_START( skattv )
