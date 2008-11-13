@@ -2293,7 +2293,6 @@ static CPU_INIT( i80c31 )
 /****************************************************************************
  * DS5002FP Section
  ****************************************************************************/
-#if 1 //#ifdef MCS51_TO_BE_ENABLED_LATER
 
 
 #define DS5_LOGW(a, d) 	LOG(("ds5002fp #%d: write to  " # a " register at 0x%04x, data=%x\n", cpunum_get_active(), PC, d))
@@ -2382,7 +2381,6 @@ static CPU_INIT( ds5002fp )
 	state_save_register_item("mcs51", index, mcs51_state->ds5002fp.range );
 
 }
-#endif
 
 /***************************************************************************
     ADDRESS MAPS
