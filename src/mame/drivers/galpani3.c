@@ -75,6 +75,8 @@ Dumped by Uki
 
 ***************************************************************************/
 
+static UINT16* galpani3_priority_buffer;
+
 static UINT16 *galpani3_sprregs, *galpani3_spriteram;
 static UINT32* galpani3_spriteram32, *galpani3_spc_regs;
 static bitmap_t *sprite_bitmap_1;
@@ -114,6 +116,24 @@ static VIDEO_UPDATE(galpani3)
 
 	fillbitmap(bitmap, 0x0000, cliprect);
 
+	{
+		int yy,xx;
+		int offset = 0;
+		for (yy=0;yy<512;yy++)
+		{
+			for (xx=0;xx<512;xx++)
+			{
+				UINT8 dat = galpani3_priority_buffer[offset];
+				UINT16* dst = BITMAP_ADDR16(bitmap, yy, xx);
+				offset++;
+
+				if (dat==0x2f) dst[0] = mame_rand(Machine)&0xff;
+
+
+			}
+		}
+	}
+
 	//skns_draw_sprites(screen->machine,bitmap,cliprect);
 	fillbitmap(sprite_bitmap_1, 0x0000, cliprect);
 
@@ -135,6 +155,9 @@ static VIDEO_UPDATE(galpani3)
 			}
 		}
 	}
+
+
+
 
 	return 0;
 }
@@ -398,27 +421,48 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	// GRAP2 1?
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM // ??? see subroutine $39f42 (R?)
+	AM_RANGE(0x800400, 0x800401) AM_WRITE(SMH_NOP) // scroll?
 	AM_RANGE(0x800800, 0x800bff) AM_RAM // ??? see subroutine $39f42 (R?)
+	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(SMH_NOP) // scroll?
+	AM_RANGE(0x800c06, 0x800c07) AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0x800c10, 0x800c11) AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0x800c12, 0x800c13) AM_WRITE(SMH_NOP) // ?
+	// 800c18 / 800c1a --- rom data start address?
 	AM_RANGE(0x800c00, 0x800c1f) AM_READ(galpani3_regs1_r)// ? R layer regs ? see subroutine $3a03e
 	AM_RANGE(0x880000, 0x8801ff) AM_RAM // area [G] - R area ? linescroll ?
 	AM_RANGE(0x900000, 0x97ffff) AM_RAM // area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// GRAP2 2?
 	AM_RANGE(0xa00000, 0xa003ff) AM_RAM // ??? see subroutine $39f42 (G?)
+	AM_RANGE(0xa00400, 0xa00401) AM_WRITE(SMH_NOP) // scroll?
 	AM_RANGE(0xa00800, 0xa00bff) AM_RAM // ??? see subroutine $39f42 (G?)
+	AM_RANGE(0xa00c00, 0xa00c01) AM_WRITE(SMH_NOP) // scroll?
+	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0xa00c10, 0xa00c11) AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0xa00c12, 0xa00c13) AM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0xa00c00, 0xa00c1f) AM_READ(galpani3_regs2_r) // ? G layer regs ? see subroutine $3a03e
+	// a00c18 / a00c1a --- rom data start address?
 	AM_RANGE(0xa80000, 0xa801ff) AM_RAM // area [H] - G area ? linescroll ?
 	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// GRAP2 3?
 	AM_RANGE(0xc00000, 0xc003ff) AM_RAM // ??? see subroutine $39f42 (B?)
+	AM_RANGE(0xc00400, 0xc00401) AM_WRITE(SMH_NOP) // scroll?
 	AM_RANGE(0xc00800, 0xc00bff) AM_RAM // ??? see subroutine $39f42 (B?)
+	AM_RANGE(0xc00c00, 0xc00c01) AM_WRITE(SMH_NOP) // scroll?
+	AM_RANGE(0xc00c06, 0xc00c07) AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0xc00c10, 0xc00c11) AM_WRITE(SMH_NOP) // ?
+	AM_RANGE(0xc00c12, 0xc00c13) AM_WRITE(SMH_NOP) // ?
+	// c00c18 / c00c1a --- rom data start address?
 	AM_RANGE(0xc00c00, 0xc00c1f) AM_READ(galpani3_regs3_r) // ? B layer regs ? see subroutine $3a03e
 	AM_RANGE(0xc80000, 0xc801ff) AM_RAM // area [I] - B area ? linescroll ?
 	AM_RANGE(0xd00000, 0xd7ffff) AM_RAM // area [F] - B area ? odd bytes only, initialized 00..ff,00..ff,...
 
-	// ??
-	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
+	// ?? priority / alpha buffer?
+	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_BASE(&galpani3_priority_buffer) // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(SMH_NOP) // scroll?
+	AM_RANGE(0xe80002, 0xe80003) AM_WRITE(SMH_NOP) // scroll?
+
 
 	AM_RANGE(0xf00000, 0xf00001) AM_NOP // ? written once (2nd opcode, $1.b)
 	AM_RANGE(0xf00010, 0xf00011) AM_READ_PORT("P1")
@@ -448,7 +492,8 @@ static MACHINE_DRIVER_START( galpani3 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	//MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
 
 	MDRV_PALETTE_LENGTH(0x10000)
 
