@@ -76,6 +76,8 @@ Dumped by Uki
 ***************************************************************************/
 
 static UINT16 *galpani3_sprregs, *galpani3_spriteram;
+static UINT32* galpani3_spriteram32, *galpani3_spc_regs;
+static bitmap_t *sprite_bitmap_1;
 
 static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
 {
@@ -93,17 +95,46 @@ extern int suprnova_alt_enable_sprites;
 static VIDEO_START(galpani3)
 {
 	/* so we can use suprnova.c */
-	buffered_spriteram32 = auto_malloc ( 0x4000 );
+	galpani3_spriteram32 = auto_malloc ( 0x4000 );
 	spriteram_size = 0x4000;
-	skns_spc_regs = auto_malloc (0x40);
+	galpani3_spc_regs = auto_malloc (0x40);
 	suprnova_alt_enable_sprites = 1;
+
+
+	sprite_bitmap_1 = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+
 }
 
 static VIDEO_UPDATE(galpani3)
 {
+	int x,y;
+	UINT16* src1;
+	UINT16* dst;
+	UINT16 pixdata1;
+
 	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-//	skns_draw_sprites(screen->machine,bitmap,cliprect);
-	skns_draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram32, spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), skns_spc_regs );
+
+	//skns_draw_sprites(screen->machine,bitmap,cliprect);
+	fillbitmap(sprite_bitmap_1, 0x0000, cliprect);
+
+	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, galpani3_spriteram32, spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), galpani3_spc_regs );
+
+	// ignoring priority bits for now..
+	for (y=0;y<240;y++)
+	{
+		src1 = BITMAP_ADDR16(sprite_bitmap_1, y, 0);
+		dst =  BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x=0;x<320;x++)
+		{
+			pixdata1 = src1[x];
+
+			if (pixdata1 & 0x3fff)
+			{
+				dst[x] = (pixdata1 & 0x3fff);
+			}
+		}
+	}
 
 	return 0;
 }
@@ -171,19 +202,15 @@ INPUT_PORTS_END
 static WRITE16_HANDLER( galpani3_suprnova_sprite32_w )
 {
 	COMBINE_DATA(&galpani3_spriteram[offset]);
-
-	/* put in buffered_spriteram32 for suprnova.c */
 	offset>>=1;
-	buffered_spriteram32[offset]=(galpani3_spriteram[offset*2+1]<<16) | (galpani3_spriteram[offset*2]);
+	galpani3_spriteram32[offset]=(galpani3_spriteram[offset*2+1]<<16) | (galpani3_spriteram[offset*2]);
 }
 
 static WRITE16_HANDLER( galpani3_suprnova_sprite32regs_w )
 {
 	COMBINE_DATA(&galpani3_sprregs[offset]);
-
-	/* put in skns_spc_regs for suprnova.c */
 	offset>>=1;
-	skns_spc_regs[offset]=(galpani3_sprregs[offset*2+1]<<16) | (galpani3_sprregs[offset*2]);
+	galpani3_spc_regs[offset]=(galpani3_sprregs[offset*2+1]<<16) | (galpani3_sprregs[offset*2]);
 }
 
 
