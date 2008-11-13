@@ -485,7 +485,7 @@ static WRITE16_HANDLER( jchan_ctrl_w )
 {
 	//printf("jchan_ctrl_w %d %04x %04x\n", offset, data,mem_mask);
 	jchan_irq_sub_enable = data & 0x8000; // hack / guess!
-
+#if 0
 // Player 1 buttons C/D for are ON
 // Coin 1 affects Button C and sometimes(!) makes Player 2 buttons C/D both ON definitively
 // Coin 2 affects Button D and sometimes(!) makes Player 2 buttons C/D both ON definitively
@@ -493,6 +493,7 @@ static WRITE16_HANDLER( jchan_ctrl_w )
 
 // both players C/D buttons don't work
 	jchan_ctrl[6/2] = -1;
+#endif
 }
 
 static READ16_HANDLER ( jchan_ctrl_r )
@@ -501,6 +502,8 @@ static READ16_HANDLER ( jchan_ctrl_r )
 	{
 		case 0/2: return input_port_read(machine, "P1");
 		case 2/2: return input_port_read(machine, "P2");
+		case 4/2: return input_port_read(machine, "SYSTEM");
+		case 6/2: return input_port_read(machine, "EXTRA");
 		default: logerror("jchan_ctrl_r unknown!"); break;
 	}
 	return jchan_ctrl[offset];
@@ -580,9 +583,7 @@ static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
 
-	AM_RANGE(0xf00000, 0xf00003) AM_READWRITE(jchan_ctrl_r, jchan_ctrl_w) AM_BASE(&jchan_ctrl)
-	AM_RANGE(0xf00004, 0xf00005) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0xf00006, 0xf00007) AM_RAM // ???
+	AM_RANGE(0xf00000, 0xf00007) AM_READWRITE(jchan_ctrl_r, jchan_ctrl_w) AM_BASE(&jchan_ctrl)
 
 	AM_RANGE(0xf80000, 0xf80001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END
@@ -671,11 +672,8 @@ GFXDECODE_END
 
 /* input ports */
 
+/* BUTTON1 : weak punch - BUTTON2 : strong punch - BUTTON3 : weak kick - BUTTON 4 : strong kick */
 static INPUT_PORTS_START( jchan )
-
-/* TO BE VERIFIED: Player 1 & 2 - see subroutine $21e2a of main68k IT1 */
-/* TO BE VERIFIED: dips assignements according infos by BrianT at http://www.crazykong.com - seems ok */
-
 	PORT_START("P1")		/* $f00000.w (-> $2000b1.b) */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN	) PORT_8WAY PORT_PLAYER(1)
@@ -683,8 +681,9 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P2")		/* $f00002.w (-> $2000b5.b) */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP	) PORT_8WAY PORT_PLAYER(2)
@@ -693,30 +692,43 @@ static INPUT_PORTS_START( jchan )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT	) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("SYSTEM")	/* $f00004.b */
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_START1	)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_START2	)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_COIN1 ) PORT_IMPULSE(2)
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_COIN2 ) PORT_IMPULSE(2)
-	PORT_SERVICE_NO_TOGGLE( 0x1000, IP_ACTIVE_LOW	)
-	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_TILT		)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1	)
-	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN	)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_NAME( DEF_STR( Test ) ) PORT_CODE(KEYCODE_F1)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("EXTRA")		/* $f00006.b */
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_UNKNOWN )                PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x8000)
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2) PORT_CONDITION("DSW",0x8000,PORTCOND_EQUALS,0x0000)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_UNKNOWN )               /* duplicated Player 1 Button 4 (whatever the layout is) */
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_UNKNOWN )               /* duplicated Player 2 Button 4 (whatever the layout is) */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW")		/* provided by the MCU - $200098.b <- $300200 */
-	PORT_DIPNAME( 0x0100, 0x0100, "Test Mode" )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_SERVICE( 0x0100, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Stereo ) )
+	PORT_DIPNAME( 0x0800, 0x0800, "Sound" )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Mono ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( Stereo ) )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Free_Play ) )
@@ -724,13 +736,21 @@ static INPUT_PORTS_START( jchan )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x2000, 0x2000, "Blood Mode" )
 	PORT_DIPSETTING(      0x2000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0000, "Bloody" )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )	/* impacts $200008.l many times */
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Unknown ) )	/* impacts $200116.l once! -> impacts reading of controls @ $21e2a */
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( High ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Special Prize Available" )    /* impacts $200008.l many times -> see high-score tables - WTF is it ? */
+	PORT_DIPSETTING(      0x4000, DEF_STR( No ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Yes ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Buttons Layout" )             /* impacts $200116.l once! -> impacts reading of controls at 0x00021e2a */
+	PORT_DIPSETTING(      0x8000, "3+1" )
+	PORT_DIPSETTING(      0x0000, "2+2" )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( jchan2 )
+	PORT_INCLUDE( jchan )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )                      /* only read in the "test mode" ("Input Test" screen) */
+//	PORT_DIPNAME( 0x8000, 0x8000, "Buttons Layout" )             /* impacts $20011e.l once! -> impacts reading of controls at 0x0002a9b2 */
 INPUT_PORTS_END
 
 
@@ -868,11 +888,11 @@ static DRIVER_INIT( jchan )
 	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, sub2main_cmd_w );
 
 
-	memset(jchan_mcu_com, 0, 4 * sizeof( UINT16) );
+	memset(jchan_mcu_com, 0, 4 * sizeof( UINT16 ) );
 }
 
 
 /* game drivers */
-GAME( 1995, jchan,      0, jchan, jchan, jchan, ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", GAME_NOT_WORKING )
-GAME( 1995, jchan2, jchan, jchan, jchan, jchan, ROT0, "Kaneko", "Jackie Chan in Fists of Fire", GAME_NOT_WORKING )
+GAME( 1995, jchan,     0,        jchan,    jchan,    jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", GAME_NOT_WORKING )
+GAME( 1995, jchan2,    jchan,    jchan,    jchan2,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire", GAME_NOT_WORKING )
 
