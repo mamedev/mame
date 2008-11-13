@@ -30,11 +30,11 @@ OSC:    28.6363MHz
 EEPROM: 93C46
 Chips.: GRAP2 x3                <- R/G/B Chips?
         APRIO-GL
-        BABY004                 <- Sprites, see suprnova.c
+        BABY004
         GCNT2
         TBSOP01                 <- ToyBox NEC uPD78324 series MCU with 32K internal rom
-        CG24173 6186
-        CG24143 4181
+        CG24173 6186            <- Sprites, see suprnova.c
+        CG24143 4181            <- ^
 
 
 G3P0J1.71     prg.
@@ -320,6 +320,61 @@ static READ16_HANDLER( galpani3_mcu_status_r )
 	return 0;
 }
 
+// might be blitter regs? - there are 3, probably GRAP2 chips
+READ16_HANDLER( galpani3_regs1_r )
+{
+
+	logerror("cpu #%d (PC=%06X): galpani3_regs1_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), offset, mem_mask);
+	switch (offset)
+	{
+		case 0xb:
+		{
+			static int i = 0;
+			i^=1;
+			if (i) return 0xfffe;
+			else return 0xffff;
+		}
+
+	}
+
+	return 0x0000;
+
+}
+
+READ16_HANDLER( galpani3_regs2_r )
+{
+	logerror("cpu #%d (PC=%06X): galpani3_regs2_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), offset, mem_mask);
+	switch (offset)
+	{
+		case 0xb:
+		{
+			static int i = 0;
+			i^=1;
+			if (i) return 0xfffe;
+			else return 0xffff;
+		}
+
+	}
+
+	return 0x0000;}
+
+READ16_HANDLER( galpani3_regs3_r )
+{
+	logerror("cpu #%d (PC=%06X): galpani3_regs3_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), offset, mem_mask);
+	switch (offset)
+	{
+		case 0xb:
+		{
+			static int i = 0;
+			i^=1;
+			if (i) return 0xfffe;
+			else return 0xffff;
+		}
+
+	}
+
+	return 0x0000;
+}
 
 
 
@@ -340,9 +395,9 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(galpani3_mcu_com3_w)	// ] then bit #0 of $780000.l is tested: 0 = OK!
 	AM_RANGE(0x780000, 0x780001) AM_READ(galpani3_mcu_status_r)
 
-	AM_RANGE(0x800c00, 0x800c1f) AM_RAM // ? R layer regs ? see subroutine $3a03e
-	AM_RANGE(0xa00c00, 0xa00c1f) AM_RAM // ? G layer regs ? see subroutine $3a03e
-	AM_RANGE(0xc00c00, 0xc00c1f) AM_RAM // ? B layer regs ? see subroutine $3a03e
+	AM_RANGE(0x800c00, 0x800c1f) AM_READ(galpani3_regs1_r)// ? R layer regs ? see subroutine $3a03e
+	AM_RANGE(0xa00c00, 0xa00c1f) AM_READ(galpani3_regs2_r) // ? G layer regs ? see subroutine $3a03e
+	AM_RANGE(0xc00c00, 0xc00c1f) AM_READ(galpani3_regs3_r) // ? B layer regs ? see subroutine $3a03e
 
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM // ??? see subroutine $39f42 (R?)
 	AM_RANGE(0x800800, 0x800bff) AM_RAM // ??? see subroutine $39f42 (R?)
@@ -434,12 +489,12 @@ ROM_END
 
 static DRIVER_INIT( galpani3 )
 {
-	UINT16 *patchrom = (UINT16 *)memory_region(machine, "main");
+//	UINT16 *patchrom = (UINT16 *)memory_region(machine, "main");
 
 	// weird checks of supposed tilemap registers
-	patchrom[0x3a0c6/2] = 0x4e71;
-	patchrom[0x3a0d6/2] = 0x4e71;
-	patchrom[0x3a0e0/2] = 0x4e71;
+//	patchrom[0x3a0c6/2] = 0x4e71;
+//	patchrom[0x3a0d6/2] = 0x4e71;
+//	patchrom[0x3a0e0/2] = 0x4e71;
 
 	DRIVER_INIT_CALL( decrypt_toybox_rom );
 
