@@ -112,7 +112,7 @@ static VIDEO_UPDATE(galpani3)
 	UINT16* dst;
 	UINT16 pixdata1;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	fillbitmap(bitmap, 0x0000, cliprect);
 
 	//skns_draw_sprites(screen->machine,bitmap,cliprect);
 	fillbitmap(sprite_bitmap_1, 0x0000, cliprect);
@@ -395,37 +395,40 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(galpani3_mcu_com3_w)	// ] then bit #0 of $780000.l is tested: 0 = OK!
 	AM_RANGE(0x780000, 0x780001) AM_READ(galpani3_mcu_status_r)
 
-	AM_RANGE(0x800c00, 0x800c1f) AM_READ(galpani3_regs1_r)// ? R layer regs ? see subroutine $3a03e
-	AM_RANGE(0xa00c00, 0xa00c1f) AM_READ(galpani3_regs2_r) // ? G layer regs ? see subroutine $3a03e
-	AM_RANGE(0xc00c00, 0xc00c1f) AM_READ(galpani3_regs3_r) // ? B layer regs ? see subroutine $3a03e
 
+	// GRAP2 1?
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM // ??? see subroutine $39f42 (R?)
 	AM_RANGE(0x800800, 0x800bff) AM_RAM // ??? see subroutine $39f42 (R?)
+	AM_RANGE(0x800c00, 0x800c1f) AM_READ(galpani3_regs1_r)// ? R layer regs ? see subroutine $3a03e
+	AM_RANGE(0x880000, 0x8801ff) AM_RAM // area [G] - R area ? linescroll ?
+	AM_RANGE(0x900000, 0x97ffff) AM_RAM // area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
+
+	// GRAP2 2?
 	AM_RANGE(0xa00000, 0xa003ff) AM_RAM // ??? see subroutine $39f42 (G?)
 	AM_RANGE(0xa00800, 0xa00bff) AM_RAM // ??? see subroutine $39f42 (G?)
+	AM_RANGE(0xa00c00, 0xa00c1f) AM_READ(galpani3_regs2_r) // ? G layer regs ? see subroutine $3a03e
+	AM_RANGE(0xa80000, 0xa801ff) AM_RAM // area [H] - G area ? linescroll ?
+	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
+
+	// GRAP2 3?
 	AM_RANGE(0xc00000, 0xc003ff) AM_RAM // ??? see subroutine $39f42 (B?)
 	AM_RANGE(0xc00800, 0xc00bff) AM_RAM // ??? see subroutine $39f42 (B?)
-
-	AM_RANGE(0x900000, 0x97ffff) AM_RAM // area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0xc00c00, 0xc00c1f) AM_READ(galpani3_regs3_r) // ? B layer regs ? see subroutine $3a03e
+	AM_RANGE(0xc80000, 0xc801ff) AM_RAM // area [I] - B area ? linescroll ?
 	AM_RANGE(0xd00000, 0xd7ffff) AM_RAM // area [F] - B area ? odd bytes only, initialized 00..ff,00..ff,...
+
+	// ??
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
 
-	AM_RANGE(0x880000, 0x8801ff) AM_RAM // area [G] - R area ? linescroll ?
-	AM_RANGE(0xa80000, 0xa801ff) AM_RAM // area [H] - G area ? linescroll ?
-	AM_RANGE(0xc80000, 0xc801ff) AM_RAM // area [I] - B area ? linescroll ?
-
 	AM_RANGE(0xf00000, 0xf00001) AM_NOP // ? written once (2nd opcode, $1.b)
-	AM_RANGE(0xf00050, 0xf00051) AM_NOP // ? written once (3rd opcode, $30.b)
-
 	AM_RANGE(0xf00010, 0xf00011) AM_READ_PORT("P1")
 	AM_RANGE(0xf00012, 0xf00013) AM_READ_PORT("P2")
 	AM_RANGE(0xf00014, 0xf00015) AM_READ_PORT("COIN")
 	AM_RANGE(0xf00016, 0xf00017) AM_NOP // ? read, but overwritten
-
 	AM_RANGE(0xf00020, 0xf00021) AM_WRITE(ymz280b_register_0_lsb_w)	// sound
 	AM_RANGE(0xf00022, 0xf00023) AM_WRITE(ymz280b_data_0_lsb_w)		//
 	AM_RANGE(0xf00040, 0xf00041) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
+	AM_RANGE(0xf00050, 0xf00051) AM_NOP // ? written once (3rd opcode, $30.b)
 ADDRESS_MAP_END
 
 
@@ -470,7 +473,7 @@ ROM_START( galpani3 )
 	ROM_REGION( 0x200000, "gfx1", 0 ) /* Sprites - RLE encoded */
 	ROM_LOAD( "gp320000.1", 0x000000, 0x200000, CRC(a0112827) SHA1(0a6c78d71b75a1d78215aab3104176aa1769b14f) )
 
-	ROM_REGION( 0xa00000, "gfx2", 0 ) /* Backgrounds - RLE encoded */
+	ROM_REGION( 0x1000000, "gfx2", 0 ) /* Backgrounds - RLE encoded */
 	ROM_LOAD( "gp340000.123", 0x000000, 0x200000, CRC(a58a26b1) SHA1(832d70cce1b4f04fa50fc221962ff6cc4287cb92) )		// 19950414GROMACap
 	ROM_LOAD( "gp340100.122", 0x200000, 0x200000, CRC(746fe4a8) SHA1(a5126ae9e83d556277d31b166296a708c311a902) )		// 19950414GROMBCap
 	ROM_LOAD( "gp340200.121", 0x400000, 0x200000, CRC(e9bc15c8) SHA1(2c6a10e768709d1937d9206970553f4101ce9016) )		// 19950414GROMCCap
@@ -489,13 +492,6 @@ ROM_END
 
 static DRIVER_INIT( galpani3 )
 {
-//	UINT16 *patchrom = (UINT16 *)memory_region(machine, "main");
-
-	// weird checks of supposed tilemap registers
-//	patchrom[0x3a0c6/2] = 0x4e71;
-//	patchrom[0x3a0d6/2] = 0x4e71;
-//	patchrom[0x3a0e0/2] = 0x4e71;
-
 	DRIVER_INIT_CALL( decrypt_toybox_rom );
 
 	memset(galpani3_mcu_com, 0, 4 * sizeof( UINT16) );
