@@ -2741,6 +2741,35 @@ V-V                           TP-027
 	DRIVER( hsf2j )		/* 22/12/2003 (c) 2003 Hyper Street Fighter 2 (Japan) */
 	DRIVER( hsf2 )		/* 02/02/2004 (c) 2004 Hyper Street Fighter 2 (Asia) */
 
+	/* CPS2 'Phoenix' bootlegs */
+	DRIVER( ssf2ud )
+	DRIVER( ddtodd )
+	DRIVER( avspd )
+	DRIVER( dstlku1d )
+	DRIVER( ringdstd )
+	DRIVER( xmcotad )
+	DRIVER( nwarrud )
+	DRIVER( sfad )
+	DRIVER( mshud )
+	DRIVER( 19xxd )
+	DRIVER( sfz2ad )
+	DRIVER( spf2xjd )
+	DRIVER( ddsomud )
+	DRIVER( megamn2d )
+	DRIVER( sfz2aad )
+	DRIVER( xmvsfu1d )
+	DRIVER( batcird )
+	DRIVER( vsavd )
+	DRIVER( mvscud )
+	DRIVER( sfa3ud )
+	DRIVER( gwingjd )
+	DRIVER( 1944d )
+	DRIVER( progerjd )
+	DRIVER( hsf2d )
+	DRIVER( ssf2tbd )
+	DRIVER( ssf2xjd )
+	DRIVER( sgemfd )
+
 	/* Capcom CPS3 games */
 	DRIVER( sfiii )		/* 04/02/1997 (c) 1997 Capcom */
 	DRIVER( sfiiiu )	/* 04/02/1997 (c) 1997 Capcom */
