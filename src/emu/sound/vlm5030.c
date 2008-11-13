@@ -156,7 +156,7 @@ SPC SPB SPA
  0   0   1  fast      (01h)     : 20.2ms  (75%) : 30sample
  0   1   x  more fast (02h,03h) : 12.2ms  (50%) : 20sample
 */
-static const int VLM5030_speed_table[8] =
+static const int vlm5030_speed_table[8] =
 {
  IP_SIZE_NORMAL,
  IP_SIZE_FAST,
@@ -444,13 +444,13 @@ phase_stop:
 }
 
 /* realtime update */
-static void VLM5030_update(struct vlm5030_info *chip)
+static void vlm5030_update(struct vlm5030_info *chip)
 {
 	stream_update(chip->channel);
 }
 
 /* setup parameteroption when RST=H */
-static void VLM5030_setup_parameter(struct vlm5030_info *chip, UINT8 param)
+static void vlm5030_setup_parameter(struct vlm5030_info *chip, UINT8 param)
 {
 	/* latch parameter value */
 	chip->parameter = param;
@@ -464,7 +464,7 @@ static void VLM5030_setup_parameter(struct vlm5030_info *chip, UINT8 param)
 		chip->interp_step = 1; /* 2400bps : 4 interporator */
 
 	/* bit 3,4,5 : speed (frame size) */
-	chip->frame_size = VLM5030_speed_table[(param>>3) &7];
+	chip->frame_size = vlm5030_speed_table[(param>>3) &7];
 
 	/* bit 6,7 : low / high pitch */
 	if(param&0x80)	/* bit7=1 , high pitch */
@@ -476,14 +476,14 @@ static void VLM5030_setup_parameter(struct vlm5030_info *chip, UINT8 param)
 }
 
 
-static STATE_POSTLOAD( VLM5030_restore_state )
+static STATE_POSTLOAD( vlm5030_restore_state )
 {
 	struct vlm5030_info *chip = param;
 	int i;
 
 	int interp_effect = FR_SIZE - (chip->interp_count%FR_SIZE);
 	/* restore parameter data */
-	VLM5030_setup_parameter(chip, chip->parameter);
+	vlm5030_setup_parameter(chip, chip->parameter);
 
 	/* restore current energy,pitch & filter */
 	chip->current_energy = chip->old_energy + (chip->target_energy - chip->old_energy) * interp_effect / FR_SIZE;
@@ -494,7 +494,7 @@ static STATE_POSTLOAD( VLM5030_restore_state )
 }
 
 
-static SND_RESET( VLM5030 )
+static SND_RESET( vlm5030 )
 {
 	struct vlm5030_info *chip = token;
 	chip->phase = PH_RESET;
@@ -513,7 +513,7 @@ static SND_RESET( VLM5030 )
 	chip->interp_count = chip->sample_count = chip->pitch_count = 0;
 	memset(chip->x, 0, sizeof(chip->x));
 	/* reset parameters */
-	VLM5030_setup_parameter(chip, 0x00);
+	vlm5030_setup_parameter(chip, 0x00);
 }
 
 /* set speech rom address */
@@ -527,7 +527,7 @@ void vlm5030_set_rom(void *speech_rom)
 int vlm5030_bsy(void)
 {
 	struct vlm5030_info *chip = sndti_token(SOUND_VLM5030, 0);
-	VLM5030_update(chip);
+	vlm5030_update(chip);
 	return chip->pin_BSY;
 }
 
@@ -547,7 +547,7 @@ void vlm5030_rst (int pin )
 		if( !pin )
 		{	/* H -> L : latch parameters */
 			chip->pin_RST = 0;
-			VLM5030_setup_parameter(chip, chip->latch_data);
+			vlm5030_setup_parameter(chip, chip->latch_data);
 		}
 	}
 	else
@@ -557,7 +557,7 @@ void vlm5030_rst (int pin )
 			chip->pin_RST = 1;
 			if( chip->pin_BSY )
 			{
-				SND_RESET_NAME( VLM5030 )(chip);
+				SND_RESET_NAME( vlm5030 )(chip);
 			}
 		}
 	}
@@ -609,7 +609,7 @@ if( chip->interp_step != 1)
 	popmessage("No %d %dBPS parameter",table/2,chip->interp_step*2400);
 #endif
 				}
-				VLM5030_update(chip);
+				vlm5030_update(chip);
 				/* logerror("VLM5030 %02X start adr=%04X\n",table/2,chip->address ); */
 				/* reset process status */
 				chip->sample_count = chip->frame_size;
@@ -649,7 +649,7 @@ static SND_START( vlm5030 )
 	chip->pin_RST = chip->pin_ST = chip->pin_VCU= 0;
 	chip->latch_data = 0;
 
-	SND_RESET_NAME( VLM5030 )(chip);
+	SND_RESET_NAME( vlm5030 )(chip);
 	chip->phase = PH_IDLE;
 
 	chip->rom = memory_region(Machine, tag);
@@ -682,7 +682,7 @@ static SND_START( vlm5030 )
 	state_save_register_item(VLM_NAME,sndindex,chip->target_pitch);
 	state_save_register_item_array(VLM_NAME,sndindex,chip->target_k);
 	state_save_register_item_array(VLM_NAME,sndindex,chip->x);
-	state_save_register_postload(Machine, VLM5030_restore_state, chip);
+	state_save_register_postload(Machine, vlm5030_restore_state, chip);
 
 	return chip;
 }
@@ -711,7 +711,7 @@ SND_GET_INFO( vlm5030 )
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( vlm5030 );		break;
 		case SNDINFO_PTR_START:							info->start = SND_START_NAME( vlm5030 );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( vlm5030 );break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "VLM5030";					break;

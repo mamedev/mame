@@ -314,9 +314,9 @@ SND_GET_INFO( msm5205 )
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( msm5205 );		break;
-		case SNDINFO_PTR_START:							info->start = SND_START_NAME( msm5205 );			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( msm5205 );break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							/* nothing */							break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( msm5205 );break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "MSM5205";					break;

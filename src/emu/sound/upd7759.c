@@ -790,7 +790,7 @@ SND_GET_INFO( upd7759 )
 		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( upd7759 );		break;
 		case SNDINFO_PTR_START:							info->start = SND_START_NAME( upd7759 );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							/* Nothing */							break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( upd7759 );							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "UPD7759";					break;
