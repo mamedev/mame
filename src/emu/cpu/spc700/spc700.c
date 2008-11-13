@@ -62,7 +62,6 @@ Address  Function Register  R/W  When Reset          Remarks
 
 #include <limits.h>
 #include "debugger.h"
-#include "deprecat.h"
 #include "spc700.h"
 
 /* ======================================================================== */
@@ -1411,7 +1410,7 @@ CPU_EXECUTE( spc700 )
 	while(CLOCKS > 0)
 	{
 		REG_PPC = REG_PC;
-		debugger_instruction_hook(Machine, REG_PC);
+		debugger_instruction_hook(device->machine, REG_PC);
 		REG_PC++;
 
 #if 0

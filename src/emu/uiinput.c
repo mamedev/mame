@@ -14,7 +14,6 @@
 #include "inptport.h"
 #include "profiler.h"
 #include "render.h"
-#include "deprecat.h"
 
 
 /***************************************************************************

@@ -987,7 +987,7 @@ static CPU_EXECUTE( m6800 )
 		else
 		{
 			pPPC = pPC;
-			debugger_instruction_hook(Machine, PCD);
+			debugger_instruction_hook(device->machine, PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 
@@ -1337,7 +1337,7 @@ static CPU_EXECUTE( m6803 )
 		else
 		{
 			pPPC = pPC;
-			debugger_instruction_hook(Machine, PCD);
+			debugger_instruction_hook(device->machine, PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 
@@ -1679,7 +1679,7 @@ static CPU_EXECUTE( hd63701 )
 		else
 		{
 			pPPC = pPC;
-			debugger_instruction_hook(Machine, PCD);
+			debugger_instruction_hook(device->machine, PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 
@@ -2011,7 +2011,7 @@ static CPU_EXECUTE( nsc8105 )
 		else
 		{
 			pPPC = pPC;
-			debugger_instruction_hook(Machine, PCD);
+			debugger_instruction_hook(device->machine, PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 

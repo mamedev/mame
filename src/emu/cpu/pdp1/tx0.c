@@ -10,7 +10,6 @@
 
 #include "cpuintrf.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "tx0.h"
 
 #define LOG 0
@@ -183,7 +182,7 @@ static CPU_EXECUTE( tx0_64kw )
 
 	do
 	{
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 
 
 		if (tx0.ioh && tx0.ios)
@@ -291,7 +290,7 @@ static CPU_EXECUTE( tx0_8kw )
 
 	do
 	{
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 
 
 		if (tx0.ioh && tx0.ios)

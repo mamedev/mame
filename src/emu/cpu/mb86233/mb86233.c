@@ -15,7 +15,6 @@
 
 #include "mb86233.h"
 #include "debugger.h"
-#include "deprecat.h"
 
 /***************************************************************************
     STRUCTURES & TYPEDEFS
@@ -134,7 +133,7 @@ static CPU_INIT( mb86233 )
 	memset( mb86233.RAM, 0, 2 * 0x200 * sizeof(UINT32) );
 	mb86233.ARAM = &mb86233.RAM[0];
 	mb86233.BRAM = &mb86233.RAM[0x200];
-	mb86233.Tables = (UINT32*) memory_region(Machine, _config->tablergn);
+	mb86233.Tables = (UINT32*) memory_region(device->machine, _config->tablergn);
 
 	state_save_register_global_pointer(mb86233.RAM,2 * 0x200 * sizeof(UINT32));
 }
@@ -974,7 +973,7 @@ static CPU_EXECUTE( mb86233 )
 		UINT32		val;
 		UINT32		opcode;
 
-		debugger_instruction_hook(Machine, GETPC());
+		debugger_instruction_hook(device->machine, GETPC());
 
 		opcode = ROPCODE(GETPC());
 

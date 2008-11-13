@@ -54,7 +54,6 @@
 
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "tms32010.h"
 
 
@@ -790,7 +789,7 @@ static CPU_EXECUTE( tms32010 )
 
 		R.PREVPC = R.PC;
 
-		debugger_instruction_hook(Machine, R.PC);
+		debugger_instruction_hook(device->machine, R.PC);
 
 		R.opcode.d = M_RDOP(R.PC);
 		R.PC++;

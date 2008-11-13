@@ -115,7 +115,6 @@
 */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "i8x41.h"
 
 typedef struct _upi41_state_t upi41_state_t;
@@ -924,7 +923,7 @@ static CPU_EXECUTE( i8x41 )
 
 		PPC = PC;
 
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 
 		PC += 1;
 		upi41_state->icount  -= i8x41_cycles[op];

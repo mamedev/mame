@@ -103,7 +103,6 @@
 *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "hd6309.h"
 
 #define VERBOSE 0
@@ -532,7 +531,7 @@ static CPU_INIT( hd6309 )
 	state_save_register_item("hd6309", index, DP);
 	state_save_register_item("hd6309", index, CC);
 	state_save_register_item("hd6309", index, MD);
-	state_save_register_postload(Machine, hd6309_postload, NULL);
+	state_save_register_postload(device->machine, hd6309_postload, NULL);
 	state_save_register_item("hd6309", index, hd6309.int_state);
 	state_save_register_item("hd6309", index, hd6309.nmi_state);
 	state_save_register_item("hd6309", index, hd6309.irq_state[0]);
@@ -632,7 +631,7 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 
 	if (hd6309.int_state & (HD6309_CWAI | HD6309_SYNC))
 	{
-		debugger_instruction_hook(Machine, PCD);
+		debugger_instruction_hook(device->machine, PCD);
 		hd6309_ICount = 0;
 	}
 	else
@@ -641,7 +640,7 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 		{
 			pPPC = pPC;
 
-			debugger_instruction_hook(Machine, PCD);
+			debugger_instruction_hook(device->machine, PCD);
 
 			hd6309.ireg = ROP(PCD);
 			PC++;

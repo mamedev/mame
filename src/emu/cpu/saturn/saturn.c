@@ -179,7 +179,7 @@ static CPU_EXECUTE( saturn )
 	{
 		saturn.oldpc = saturn.pc;
 
-		debugger_instruction_hook(Machine, saturn.pc);
+		debugger_instruction_hook(device->machine, saturn.pc);
 
 		if ( saturn.sleeping )
 		{

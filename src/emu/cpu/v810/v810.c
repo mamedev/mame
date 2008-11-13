@@ -17,7 +17,6 @@
 ********************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "v810.h"
 
 #define clkIF 3
@@ -976,7 +975,7 @@ static CPU_EXECUTE( v810 )
 	while(v810_ICount>=0)
 	{
 		v810.PPC=PC;
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 		OP=R_OP(PC);
 		PC+=2;
 		v810_ICount-= OpCodeTable[OP>>10]();

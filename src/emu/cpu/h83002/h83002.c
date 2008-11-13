@@ -31,7 +31,6 @@
 ****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "h83002.h"
 #include "h8priv.h"
 
@@ -339,7 +338,7 @@ static CPU_INIT( h8 )
 	state_save_register_item("H8/3002", index, h8.h8TSTR);
 	state_save_register_item_array("H8/3002", index, h8.h8TCNT);
 
-	state_save_register_postload(Machine, h8_onstateload, NULL);
+	state_save_register_postload(device->machine, h8_onstateload, NULL);
 
 	h8_itu_init();
 }
@@ -474,7 +473,7 @@ static CPU_EXECUTE( h8 )
 	{
 		h8.ppc = h8.pc;
 
-		debugger_instruction_hook(Machine, h8.pc);
+		debugger_instruction_hook(device->machine, h8.pc);
 
 		opcode = cpu_readop16(h8.pc);
 //      mame_printf_debug("[%06x]: %04x => %x\n", h8.pc, opcode, (opcode>>12)&0xf);

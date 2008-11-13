@@ -60,7 +60,7 @@ struct _z80_daisy_chain
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-z80_daisy_state *z80daisy_init(running_machine *machine, const char *cputag, const z80_daisy_chain *daisy);
+z80_daisy_state *z80daisy_init(const device_config *cpudevice, const z80_daisy_chain *daisy);
 
 void z80daisy_reset(z80_daisy_state *daisy);
 int z80daisy_update_irq_state(z80_daisy_state *chain);

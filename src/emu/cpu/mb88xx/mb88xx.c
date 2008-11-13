@@ -14,7 +14,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "mb88xx.h"
 
 /***************************************************************************
@@ -239,7 +238,7 @@ static CPU_EXECUTE( mb88 )
 		UINT8 opcode, arg, oc;
 
 		/* fetch the opcode */
-		debugger_instruction_hook(Machine, GETPC());
+		debugger_instruction_hook(device->machine, GETPC());
 		opcode = READOP(GETPC());
 
 		/* increment the PC */

@@ -119,7 +119,6 @@ Table 3-2.  TMS32025/26 Memory Blocks
 
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "tms32025.h"
 
 
@@ -1986,7 +1985,7 @@ static CPU_EXECUTE( tms32025 )
 	while (R.idle && tms32025_icount > 0)
 		process_timer(tms32025_icount);
 
-	if (tms32025_icount <= 0) debugger_instruction_hook(Machine, R.PC);
+	if (tms32025_icount <= 0) debugger_instruction_hook(device->machine, R.PC);
 
 
 	while (tms32025_icount > 0)
@@ -1999,7 +1998,7 @@ static CPU_EXECUTE( tms32025 )
 
 		R.PREVPC = R.PC;
 
-		debugger_instruction_hook(Machine, R.PC);
+		debugger_instruction_hook(device->machine, R.PC);
 
 		R.opcode.d = M_RDOP(R.PC);
 		R.PC++;
@@ -2024,7 +2023,7 @@ static CPU_EXECUTE( tms32025 )
 		if (R.init_load_addr == 2) {		/* Repeat next instruction */
 			R.PREVPC = R.PC;
 
-			debugger_instruction_hook(Machine, R.PC);
+			debugger_instruction_hook(device->machine, R.PC);
 
 			R.opcode.d = M_RDOP(R.PC);
 			R.PC++;

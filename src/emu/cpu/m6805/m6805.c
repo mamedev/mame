@@ -32,7 +32,6 @@
 
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "m6805.h"
 
 #define IRQ_LEVEL_DETECT 0
@@ -530,7 +529,7 @@ static CPU_EXECUTE( m6805 )
 			}
 		}
 
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 
 		ireg=M_RDOP(PC++);
 

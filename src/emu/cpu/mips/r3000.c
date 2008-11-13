@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "r3000.h"
 
 
@@ -745,7 +744,7 @@ static CPU_EXECUTE( r3000 )
 
 		/* debugging */
 		r3000->ppc = r3000->pc;
-		debugger_instruction_hook(Machine, r3000->pc);
+		debugger_instruction_hook(device->machine, r3000->pc);
 
 		/* instruction fetch */
 		op = ROPCODE(r3000->pc);

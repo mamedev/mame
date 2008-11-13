@@ -18,7 +18,6 @@
  *
  *****************************************************************************/
 #include "debugger.h"
-#include "deprecat.h"
 
 #include "lh5801.h"
 
@@ -133,7 +132,7 @@ static CPU_EXECUTE( lh5801 )
 		{
 			lh5801.oldpc = P;
 
-			debugger_instruction_hook(Machine, P);
+			debugger_instruction_hook(device->machine, P);
 			lh5801_instruction();
 
 		} while (lh5801_icount > 0);

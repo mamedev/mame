@@ -1598,7 +1598,7 @@ static CPU_RESET( mips )
 
 	mips_update_memory_handlers();
 	mips_update_address_masks();
-	mips_update_scratchpad(Machine);
+	mips_update_scratchpad(device->machine);
 
 	mips_set_cp0r( CP0_SR, SR_BEV );
 	mips_set_cp0r( CP0_CAUSE, 0x00000000 );
@@ -1796,7 +1796,7 @@ static CPU_EXECUTE( mips )
 	do
 	{
 		if (LOG_BIOSCALL) log_bioscall();
-		debugger_instruction_hook(Machine,  mipscpu.pc );
+		debugger_instruction_hook(device->machine,  mipscpu.pc );
 
 		mipscpu.op = cpu_readop32( mipscpu.pc );
 		switch( INS_OP( mipscpu.op ) )

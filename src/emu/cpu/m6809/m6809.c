@@ -71,7 +71,6 @@
 *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "m6809.h"
 
 /* Enable big switch statement for the main opcodes */
@@ -521,7 +520,7 @@ static CPU_EXECUTE( m6809 )	/* NS 970908 */
 
 	if (m6809.int_state & (M6809_CWAI | M6809_SYNC))
 	{
-		debugger_instruction_hook(Machine, PCD);
+		debugger_instruction_hook(device->machine, PCD);
 		m6809_ICount = 0;
 	}
 	else
@@ -530,7 +529,7 @@ static CPU_EXECUTE( m6809 )	/* NS 970908 */
 		{
 			pPPC = pPC;
 
-			debugger_instruction_hook(Machine, PCD);
+			debugger_instruction_hook(device->machine, PCD);
 
 			m6809.ireg = ROP(PCD);
 			PC++;

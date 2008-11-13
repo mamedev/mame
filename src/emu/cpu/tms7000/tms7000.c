@@ -472,7 +472,7 @@ static CPU_EXECUTE( tms7000 )
 
 	do
 	{
-		debugger_instruction_hook(Machine, pPC);
+		debugger_instruction_hook(device->machine, pPC);
 
 		if( tms7000.idle_state == 0 )
 		{
@@ -511,7 +511,7 @@ static CPU_EXECUTE( tms7000_exl )
 
 	do
 	{
-		debugger_instruction_hook(Machine, pPC);
+		debugger_instruction_hook(device->machine, pPC);
 
 		if( tms7000.idle_state == 0 )
 		{

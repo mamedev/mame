@@ -44,7 +44,6 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "z8000.h"
 #include "z8000cpu.h"
 #include "osd_cpu.h"
@@ -486,7 +485,7 @@ static CPU_EXECUTE( z8000 )
         if (IRQ_REQ)
 			Interrupt();
 
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 
 		if (IRQ_REQ & Z8000_HALT)
         {

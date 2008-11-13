@@ -9,7 +9,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "ccpu.h"
 
 
@@ -213,7 +212,7 @@ static CPU_EXECUTE( ccpu )
 		ccpu.nextmiflag = ccpu.nextnextmiflag;
 
 		/* fetch the opcode */
-		debugger_instruction_hook(Machine, ccpu.PC);
+		debugger_instruction_hook(device->machine, ccpu.PC);
 		opcode = READOP(ccpu.PC++);
 
 		switch (opcode)

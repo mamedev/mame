@@ -521,7 +521,7 @@ static CPU_EXECUTE( tms32031 )
 	if (tms32031.is_idling)
 		return tms32031_icount;
 
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
 		while (tms32031_icount > 0)
 		{
@@ -553,7 +553,7 @@ static CPU_EXECUTE( tms32031 )
 		while (tms32031_icount > 0)
 		{
 			if (IREG(TMR_SP) & 0xff000000)
-				debugger_break(Machine);
+				debugger_break(device->machine);
 			if ((IREG(TMR_ST) & RMFLAG) && tms32031.pc == IREG(TMR_RE) + 1)
 			{
 				if ((INT32)--IREG(TMR_RC) >= 0)
@@ -574,7 +574,7 @@ static CPU_EXECUTE( tms32031 )
 				continue;
 			}
 
-			debugger_instruction_hook(Machine, tms32031.pc);
+			debugger_instruction_hook(device->machine, tms32031.pc);
 			execute_one();
 		}
 	}

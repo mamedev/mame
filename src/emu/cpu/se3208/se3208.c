@@ -1,5 +1,4 @@
 #include "debugger.h"
-#include "deprecat.h"
 #include "se3208.h"
 
 /*
@@ -1772,7 +1771,7 @@ static CPU_EXECUTE( SE3208 )
 	{
 		UINT16 Opcode=cpu_readop16(WORD_XOR_LE(Context.PC));
 
-		debugger_instruction_hook(Machine, Context.PC);
+		debugger_instruction_hook(device->machine, Context.PC);
 
 		OpTable[Opcode](Opcode);
 		Context.PPC=Context.PC;

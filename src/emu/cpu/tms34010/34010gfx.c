@@ -9,6 +9,8 @@
 
 #ifndef RECURSIVE_INCLUDE
 
+#include "deprecat.h"
+
 #define LOG_GFX_OPS 0
 #define LOGGFX(x) do { if (LOG_GFX_OPS && input_code_pressed(KEYCODE_L)) logerror x; } while (0)
 
@@ -83,7 +85,7 @@ static int apply_window(tms34010_state *tms, const char *inst_name,int srcbpp, U
 		int diff, cycles = 3;
 
 		if (WINDOW_CHECKING(tms) == 2)
-			logerror("%08x: %s apply_window window mode %d not supported!\n", cpu_get_pc(Machine->activecpu), inst_name, WINDOW_CHECKING(tms));
+			logerror("%08x: %s apply_window window mode %d not supported!\n", cpu_get_pc(tms->device), inst_name, WINDOW_CHECKING(tms));
 
 		CLR_V(tms);
 		if (WINDOW_CHECKING(tms) == 1)

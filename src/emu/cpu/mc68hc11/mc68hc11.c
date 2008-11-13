@@ -5,7 +5,6 @@
  */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "mc68hc11.h"
 
 enum
@@ -388,7 +387,7 @@ static CPU_EXECUTE( hc11 )
 		UINT8 op;
 
 		hc11.ppc = hc11.pc;
-		debugger_instruction_hook(Machine, hc11.pc);
+		debugger_instruction_hook(device->machine, hc11.pc);
 
 		op = FETCH();
 		hc11_optable[op]();

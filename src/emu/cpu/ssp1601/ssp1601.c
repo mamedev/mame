@@ -18,7 +18,6 @@
  */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "ssp1601.h"
 
 
@@ -540,7 +539,7 @@ static CPU_EXECUTE( ssp1601 )
 
 		PPC = rPC;
 
-		debugger_instruction_hook(Machine, rPC);
+		debugger_instruction_hook(device->machine, rPC);
 
 		op = FETCH();
 

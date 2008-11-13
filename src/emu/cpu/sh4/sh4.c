@@ -3335,7 +3335,7 @@ static CPU_EXECUTE( sh4 )
 		else
 			opcode = cpu_readop16(WORD2_XOR_LE((UINT32)(sh4.pc & AM)));
 
-		debugger_instruction_hook(Machine, sh4.pc & AM);
+		debugger_instruction_hook(device->machine, sh4.pc & AM);
 
 		sh4.delay = 0;
 		sh4.pc += 2;

@@ -624,7 +624,7 @@ static CPU_EXECUTE( pdp1 )
 
 	do
 	{
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 
 
 		/* ioh should be cleared at the end of the instruction cycle, and ios at the

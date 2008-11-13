@@ -406,7 +406,6 @@ STOP            01001000  10111011          12  stop
 
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "upd7810.h"
 
 static UPD7810 upd7810;
@@ -1708,7 +1707,7 @@ static CPU_EXECUTE( upd7810 )
 	{
 		int cc = 0;
 
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 
 		PPC = PC;
 		RDOP(OP);

@@ -342,7 +342,7 @@ static CPU_INIT( cquestsnd )
 	memset(&cquestsnd, 0, sizeof(cquestsnd));
 
 	cquestsnd.dac_w = _config->dac_w;
-	cquestsnd.sound_data = (UINT16*)memory_region(Machine, _config->sound_data_region);
+	cquestsnd.sound_data = (UINT16*)memory_region(device->machine, _config->sound_data_region);
 
 	/* Allocate RAM shared with 68000 */
 	cquestsnd.sram = malloc(4096);
@@ -541,7 +541,7 @@ static int do_sndjmp(int jmp)
 
 static CPU_EXECUTE( cquestsnd )
 {
-	int calldebugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	cquestsnd_icount = cycles;
 
@@ -571,7 +571,7 @@ static CPU_EXECUTE( cquestsnd )
 		int _rin    = (inslow >> 26) & 1;
 
 		if (calldebugger)
-			debugger_instruction_hook(Machine, cquestsnd.pc);
+			debugger_instruction_hook(device->machine, cquestsnd.pc);
 
 		/* Don't think this matters, but just in case */
 		if (rtn)
@@ -875,7 +875,7 @@ INLINE int do_rotjmp(int jmp)
 
 static CPU_EXECUTE( cquestrot )
 {
-	int calldebugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
 	cquestrot_icount = cycles;
 
@@ -907,7 +907,7 @@ static CPU_EXECUTE( cquestrot )
 		UINT16 data_in = 0xffff;
 
 		if (calldebugger)
-			debugger_instruction_hook(Machine, ROT_PC);
+			debugger_instruction_hook(device->machine, ROT_PC);
 
 		/* Handle DRAM accesses - I ought to check this... */
 		if (!(cquestrot.clkcnt & 3))
@@ -1381,7 +1381,7 @@ static CPU_EXECUTE( cquestlin )
 {
 #define LINE_PC ((cquestlin.pc[prog] & 0x7f) | ((prog == BACKGROUND) ? 0x80 : 0))
 
-	int calldebugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int calldebugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 	UINT32	*stack_ram;
 	UINT8	*ptr_ram;
 
@@ -1426,7 +1426,7 @@ static CPU_EXECUTE( cquestlin )
 		UINT16	data_in = 0;
 
 		if (calldebugger)
-			debugger_instruction_hook(Machine, cquestlin.pc[prog]);
+			debugger_instruction_hook(device->machine, cquestlin.pc[prog]);
 
 		/* Handle accesses to and from shared SRAM */
 		if (prog == FOREGROUND)

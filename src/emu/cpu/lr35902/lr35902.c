@@ -37,7 +37,6 @@
 /**                                                         **/
 /*************************************************************/
 #include "debugger.h"
-#include "deprecat.h"
 #include "lr35902.h"
 
 #define FLAG_Z	0x80
@@ -309,7 +308,7 @@ static CPU_EXECUTE( lr35902 )
 		} else {
 			/* Fetch and count cycles */
 			lr35902_ProcessInterrupts ();
-			debugger_instruction_hook(Machine, Regs.w.PC);
+			debugger_instruction_hook(device->machine, Regs.w.PC);
 			if ( Regs.w.enable & HALTED ) {
 				CYCLES_PASSED( Cycles[0x76] );
 				Regs.w.execution_state = 1;

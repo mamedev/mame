@@ -23,7 +23,6 @@
 
 #include "cpuexec.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "cp1610.h"
 
 #define S  0x80
@@ -1551,7 +1550,7 @@ static void cp1610_xori(int d)
 static CPU_RESET( cp1610 )
 {
 	/* This is how we set the reset vector */
-	cpu_set_input_line(Machine->activecpu, CP1610_RESET, PULSE_LINE);
+	cpu_set_input_line(device->machine->activecpu, CP1610_RESET, PULSE_LINE);
 }
 
 /***************************************************
@@ -2168,7 +2167,7 @@ static CPU_EXECUTE( cp1610 )
 
     do
     {
-        debugger_instruction_hook(Machine, cp1610.r[7]);
+        debugger_instruction_hook(device->machine, cp1610.r[7]);
 
 		cp1610.mask_interrupts = 0;
 

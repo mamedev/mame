@@ -96,7 +96,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "adsp2100.h"
 #include <stddef.h>
 
@@ -901,7 +900,7 @@ static CPU_EXIT( adsp21xx )
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( adsp21xx )
 {
-	int check_debugger = ((Machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
+	int check_debugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 	adsp2100_state *adsp = device->token;
 
 	CHANGEPC(adsp);
@@ -921,7 +920,7 @@ static CPU_EXECUTE( adsp21xx )
 		/* debugging */
 		adsp->ppc = adsp->pc;	/* copy PC to previous PC */
 		if (check_debugger)
-			debugger_instruction_hook(Machine, adsp->pc);
+			debugger_instruction_hook(device->machine, adsp->pc);
 
 #if TRACK_HOTSPOTS
 		pcbucket[adsp->pc & 0x3fff]++;

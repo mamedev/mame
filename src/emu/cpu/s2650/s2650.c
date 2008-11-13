@@ -13,7 +13,6 @@
  *************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "s2650.h"
 #include "s2650cpu.h"
 
@@ -868,7 +867,7 @@ static CPU_EXECUTE( s2650 )
 	{
 		S.ppc = S.page + S.iar;
 
-		debugger_instruction_hook(Machine, S.page + S.iar);
+		debugger_instruction_hook(device->machine, S.page + S.iar);
 
 		S.ir = ROP();
 		S.r = S.ir & 3; 		/* register / value */

@@ -971,7 +971,7 @@ static CPU_EXECUTE( v30mz )
 		if (I.no_interrupt)
 			I.no_interrupt--;
 
-		debugger_instruction_hook(Machine, (I.sregs[CS]<<4) + I.ip);
+		debugger_instruction_hook(device->machine, (I.sregs[CS]<<4) + I.ip);
 		nec_instruction[FETCHOP]();
 	}
 

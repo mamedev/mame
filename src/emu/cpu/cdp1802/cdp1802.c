@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "cdp1802.h"
 
 #define CDP1802_CYCLES_RESET 		8
@@ -233,7 +232,7 @@ static void cdp1802_run(running_machine *machine)
 
 		cdp1802_ICount -= CDP1802_CYCLES_RESET;
 
-		debugger_instruction_hook(Machine, cdp1802.r[cdp1802.p]);
+		debugger_instruction_hook(machine, cdp1802.r[cdp1802.p]);
 
 		break;
 
@@ -258,7 +257,7 @@ static void cdp1802_run(running_machine *machine)
 			cdp1802.state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(Machine, cdp1802.r[cdp1802.p]);
+		debugger_instruction_hook(machine, cdp1802.r[cdp1802.p]);
 
 		break;
 
@@ -735,7 +734,7 @@ static void cdp1802_run(running_machine *machine)
 			cdp1802.state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(Machine, cdp1802.r[cdp1802.p]);
+		debugger_instruction_hook(machine, cdp1802.r[cdp1802.p]);
 
 		break;
 
@@ -823,7 +822,7 @@ static void cdp1802_run(running_machine *machine)
 			cdp1802.state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(Machine, cdp1802.r[cdp1802.p]);
+		debugger_instruction_hook(machine, cdp1802.r[cdp1802.p]);
 
 		break;
 	}
@@ -831,12 +830,10 @@ static void cdp1802_run(running_machine *machine)
 
 static CPU_EXECUTE( cdp1802 )
 {
-	running_machine *machine = Machine;
-
 	cdp1802_ICount = cycles;
 
 	cdp1802.prevmode = cdp1802.mode;
-	cdp1802.mode = cdp1802.intf->mode_r(machine);
+	cdp1802.mode = cdp1802.intf->mode_r(device->machine);
 
 	do
 	{
@@ -846,12 +843,12 @@ static CPU_EXECUTE( cdp1802 )
 			I = 0;
 			N = 0;
 			cdp1802.state = CDP1802_STATE_1_EXECUTE;
-			cdp1802_run(machine);
+			cdp1802_run(device->machine);
 			break;
 
 		case CDP1802_MODE_RESET:
 			cdp1802.state = CDP1802_STATE_1_RESET;
-			cdp1802_run(machine);
+			cdp1802_run(device->machine);
 			break;
 
 		case CDP1802_MODE_PAUSE:
@@ -869,17 +866,17 @@ static CPU_EXECUTE( cdp1802 )
 			case CDP1802_MODE_RESET:
 				cdp1802.prevmode = CDP1802_MODE_RUN;
 				cdp1802.state = CDP1802_STATE_1_INIT;
-				cdp1802_run(machine);
+				cdp1802_run(device->machine);
 				break;
 
 			case CDP1802_MODE_PAUSE:
 				cdp1802.prevmode = CDP1802_MODE_RUN;
 				cdp1802.state = CDP1802_STATE_0_FETCH;
-				cdp1802_run(machine);
+				cdp1802_run(device->machine);
 				break;
 
 			case CDP1802_MODE_RUN:
-				cdp1802_run(machine);
+				cdp1802_run(device->machine);
 				break;
 			}
 			break;

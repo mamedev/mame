@@ -2212,7 +2212,7 @@ static CPU_EXECUTE( sh2 )
 		else
 			opcode = cpu_readop16(WORD_XOR_BE((UINT32)(sh2->pc & AM)));
 
-		debugger_instruction_hook(Machine, sh2->pc);
+		debugger_instruction_hook(device->machine, sh2->pc);
 
 		sh2->delay = 0;
 		sh2->pc += 2;

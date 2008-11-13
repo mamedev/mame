@@ -77,7 +77,6 @@ Hitachi HD647180 series:
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "driver.h"
 #include "z180.h"
 #include "cpu/z80/z80daisy.h"
@@ -1902,7 +1901,7 @@ static CPU_INIT( z180 )
 {
 	Z180.daisy = NULL;
 	if (device->static_config)
-		Z180.daisy = z80daisy_init(Machine, Machine->config->cpu[cpunum_get_active()].tag, device->static_config);
+		Z180.daisy = z80daisy_init(device, device->static_config);
 	Z180.irq_callback = irqcallback;
 	Z180.device = device;
 
@@ -2219,7 +2218,7 @@ again:
 		if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 			(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			debugger_instruction_hook(Machine, _PCD);
+			debugger_instruction_hook(device->machine, _PCD);
 
 			z180_dma0();
 			old_icount = handle_timers(z180_icount, old_icount);
@@ -2232,7 +2231,7 @@ again:
 				Z180.after_EI = 0;
 
 				_PPC = _PCD;
-				debugger_instruction_hook(Machine, _PCD);
+				debugger_instruction_hook(device->machine, _PCD);
 				_R++;
 
 				EXEC_INLINE(op,ROP());
@@ -2259,7 +2258,7 @@ again:
 			Z180.after_EI = 0;
 
 			_PPC = _PCD;
-			debugger_instruction_hook(Machine, _PCD);
+			debugger_instruction_hook(device->machine, _PCD);
 			_R++;
 			EXEC_INLINE(op,ROP());
 			old_icount = handle_timers(z180_icount, old_icount);

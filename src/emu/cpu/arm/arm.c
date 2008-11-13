@@ -17,7 +17,6 @@
 
 #include "arm.h"
 #include "debugger.h"
-#include "deprecat.h"
 
 #define READ8(addr)			cpu_read8(addr)
 #define WRITE8(addr,data)	cpu_write8(addr,data)
@@ -326,7 +325,7 @@ static CPU_EXECUTE( arm )
 	arm_icount = cycles;
 	do
 	{
-		debugger_instruction_hook(Machine, R15);
+		debugger_instruction_hook(device->machine, R15);
 
 		/* load instruction */
 		pc = R15;

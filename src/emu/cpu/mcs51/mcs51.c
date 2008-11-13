@@ -138,7 +138,6 @@
  */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "mcs51.h"
 
 #define VERBOSE 1
@@ -1941,7 +1940,7 @@ static CPU_EXECUTE( mcs51 )
 	{
 		/* Read next opcode */
 		PPC = PC;
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 		op = cpu_readop(PC++);
 
 		/* process opcode and count cycles */

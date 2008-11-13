@@ -1479,7 +1479,7 @@ static CPU_EXECUTE( tms99xx )
 			}
 		}
 
-		if ((Machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
+		if ((device->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
 		{
 			#if 0		/* Trace */
 			logerror("> PC %4.4x :%4.4x %4.4x : R=%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x %4.4x%4.4x %4.4x %4.4x %4.4x %4.4x %4.4x :T=%d\n",I.PC,I.STATUS,I.WP,I.FR[0],I.FR[1],I.FR[2],I.FR[3],I.FR[4],I.FR[5],I.FR[6],I.FR[7],I.FR[8],I.FR[9],I.FR[10],I.FR[11],I.FR[12],I.FR[13],I.FR[14],I.FR[15],TMS99XX_ICOUNT);
@@ -1506,7 +1506,7 @@ static CPU_EXECUTE( tms99xx )
 				#endif
 			#endif
 
-			debugger_instruction_hook(Machine, I.IR);
+			debugger_instruction_hook(device->machine, I.IR);
 		}
 
 		if (I.IDLE)

@@ -527,7 +527,7 @@ static CPU_EXECUTE( jaguargpu )
 		/* debugging */
 		//if (jaguar.PC < 0xf03000 || jaguar.PC > 0xf04000) { fatalerror("GPU: jaguar.PC = %06X (ppc = %06X)", jaguar.PC, jaguar.ppc); }
 		jaguar.ppc = jaguar.PC;
-		debugger_instruction_hook(Machine, jaguar.PC);
+		debugger_instruction_hook(device->machine, jaguar.PC);
 
 		/* instruction fetch */
 		jaguar.op = ROPCODE(jaguar.PC);
@@ -573,7 +573,7 @@ static CPU_EXECUTE( jaguardsp )
 		/* debugging */
 		//if (jaguar.PC < 0xf1b000 || jaguar.PC > 0xf1d000) { fatalerror(stderr, "DSP: jaguar.PC = %06X", jaguar.PC); }
 		jaguar.ppc = jaguar.PC;
-		debugger_instruction_hook(Machine, jaguar.PC);
+		debugger_instruction_hook(device->machine, jaguar.PC);
 
 		/* instruction fetch */
 		jaguar.op = ROPCODE(jaguar.PC);

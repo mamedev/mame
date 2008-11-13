@@ -51,8 +51,8 @@
         added save state support.
 */
 
-#include "deprecat.h"
 #include "debugger.h"
+#include "deprecat.h"
 #include "cpuexec.h"
 #include "m37710cm.h"
 
@@ -1041,7 +1041,7 @@ static CPU_INIT( m37710 )
 	state_save_register_item("M377xx", index, m37710i_cpu.reload[7].seconds);
 	state_save_register_item("M377xx", index, m37710i_cpu.reload[7].attoseconds);
 
-	state_save_register_postload(Machine, m37710_restore_state, NULL);
+	state_save_register_postload(device->machine, m37710_restore_state, NULL);
 }
 
 /**************************************************************************

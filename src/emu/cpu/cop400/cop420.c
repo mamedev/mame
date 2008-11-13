@@ -26,7 +26,6 @@
 
 #include "cpuintrf.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "cop400.h"
 
 /* The opcode table now is a combination of cycle counts and function pointers */
@@ -453,7 +452,7 @@ static CPU_EXECUTE( cop420 )
 	{
 		prevPC = PC;
 
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 
 		opcode = ROM(PC);
 

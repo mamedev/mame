@@ -28,7 +28,6 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 
 #include "sc61860.h"
 #include "sc.h"
@@ -117,7 +116,7 @@ static CPU_EXECUTE( sc61860 )
 	{
 		sc61860.oldpc = sc61860.pc;
 
-		debugger_instruction_hook(Machine, sc61860.pc);
+		debugger_instruction_hook(device->machine, sc61860.pc);
 
 		sc61860_instruction();
 

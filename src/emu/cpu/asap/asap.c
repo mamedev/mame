@@ -543,7 +543,7 @@ static CPU_EXECUTE( asap )
 	UPDATEPC();
 
 	/* core execution loop */
-	if ((Machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
 	{
 		do
 		{

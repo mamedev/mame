@@ -23,7 +23,6 @@
 #include "driver.h"
 #include "cpuintrf.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "cop400.h"
 
 /* The opcode table now is a combination of cycle counts and function pointers */
@@ -315,7 +314,7 @@ static CPU_EXECUTE( cop410 )
 	{
 		prevPC = PC;
 
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device->machine, PC);
 
 		if (R.intf->cko == COP400_CKO_HALT_IO_PORT)
 		{

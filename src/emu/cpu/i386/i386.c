@@ -11,7 +11,6 @@
 */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "i386.h"
 #include "i386intf.h"
 
@@ -579,7 +578,7 @@ static CPU_INIT( i386 )
 	state_save_register_item(state_type, index, I.ldtr.flags);
 	state_save_register_item(state_type, index,  I.irq_state);
 	state_save_register_item(state_type, index, I.performed_intersegment_jump);
-	state_save_register_postload(Machine, i386_postload, NULL);
+	state_save_register_postload(device->machine, i386_postload, NULL);
 }
 
 static void build_opcode_table(UINT32 features)
@@ -716,7 +715,7 @@ static CPU_EXECUTE( i386 )
 		I.segment_prefix = 0;
 		I.prev_eip = I.eip;
 
-		debugger_instruction_hook(Machine, I.pc);
+		debugger_instruction_hook(device->machine, I.pc);
 
 		i386_check_irq_line();
 		I386OP(decode_opcode)();

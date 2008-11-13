@@ -5,7 +5,6 @@
 /* 26.March 2000 PeT changed set_irq_line */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "cpuintrf.h"
 
 #include "host.h"
@@ -248,7 +247,7 @@ static CPU_EXECUTE( i8086 )
 		LOG(("[%04x:%04x]=%02x\tF:%04x\tAX=%04x\tBX=%04x\tCX=%04x\tDX=%04x %d%d%d%d%d%d%d%d%d\n",
 				I.sregs[CS], I.pc - I.base[CS], ReadByte(I.pc), I.flags, I.regs.w[AX], I.regs.w[BX], I.regs.w[CX], I.regs.w[DX], I.AuxVal ? 1 : 0, I.OverVal ? 1 : 0,
 				I.SignVal ? 1 : 0, I.ZeroVal ? 1 : 0, I.CarryVal ? 1 : 0, I.ParityVal ? 1 : 0, I.TF, I.IF, I.DirVal < 0 ? 1 : 0));
-		debugger_instruction_hook(Machine, I.pc);
+		debugger_instruction_hook(device->machine, I.pc);
 
 		seg_prefix = FALSE;
 		I.prevpc = I.pc;
@@ -301,7 +300,7 @@ static CPU_EXECUTE( i80186 )
 	{
 		LOG(("[%04x:%04x]=%02x\tAX=%04x\tBX=%04x\tCX=%04x\tDX=%04x\n", I.sregs[CS], I.pc, ReadByte(I.pc), I.regs.w[AX],
 			   I.regs.w[BX], I.regs.w[CX], I.regs.w[DX]));
-		debugger_instruction_hook(Machine, I.pc);
+		debugger_instruction_hook(device->machine, I.pc);
 
 		seg_prefix = FALSE;
 		I.prevpc = I.pc;

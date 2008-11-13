@@ -35,7 +35,6 @@
 *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "konami.h"
 
 #define VERBOSE 0
@@ -499,7 +498,7 @@ static CPU_EXECUTE( konami )
 		{
 			pPPC = pPC;
 
-			debugger_instruction_hook(Machine, PCD);
+			debugger_instruction_hook(device->machine, PCD);
 
 			konami.ireg = ROP(PCD);
 			PC++;

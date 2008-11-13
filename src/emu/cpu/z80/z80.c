@@ -99,7 +99,6 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "driver.h"
 #include "z80.h"
 #include "z80daisy.h"
@@ -3548,7 +3547,7 @@ static CPU_INIT( z80 )
 	/* Reset registers to their initial values */
 	memset(z80, 0, sizeof(*z80));
 	if (device->static_config != NULL)
-		z80->daisy = z80daisy_init(Machine, Machine->config->cpu[cpunum_get_active()].tag, device->static_config);
+		z80->daisy = z80daisy_init(device, device->static_config);
 	z80->irq_callback = irqcallback;
 	z80->device = device;
 	IX = IY = 0xffff; /* IX and IY are FFFF after a reset! */
@@ -3624,7 +3623,7 @@ static CPU_EXECUTE( z80 )
 		z80->after_ei = FALSE;
 
 		PRVPC = PCD;
-		debugger_instruction_hook(Machine, PCD);
+		debugger_instruction_hook(device->machine, PCD);
 		R++;
 		EXEC_INLINE(z80,op,ROP(z80));
 	} while( z80->icount > 0 );

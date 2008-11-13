@@ -325,7 +325,6 @@ field:      X address   D           Function    Y address   D (part 2)
 
 #include "cpuintrf.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include "apexc.h"
 
 typedef struct
@@ -803,7 +802,7 @@ static CPU_EXECUTE( apexc )
 
 	do
 	{
-		debugger_instruction_hook(Machine, effective_address(apexc.ml));
+		debugger_instruction_hook(device->machine, effective_address(apexc.ml));
 
 		if (apexc.running)
 			execute();

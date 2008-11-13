@@ -10,7 +10,6 @@
 */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "sm8500.h"
 
 #define FLAG_C	0x80
@@ -218,7 +217,7 @@ static CPU_EXECUTE( sm8500 )
 		UINT32	d1,d2;
 		UINT32	res;
 
-		debugger_instruction_hook(Machine, regs.PC);
+		debugger_instruction_hook(device->machine, regs.PC);
 		oldpc = regs.PC;
 		mycycles = 0;
 		sm8500_process_interrupts();

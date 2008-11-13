@@ -5,7 +5,6 @@
 
 #include "sharc.h"
 #include "debugger.h"
-#include "deprecat.h"
 
 static CPU_DISASSEMBLE( sharc );
 
@@ -707,7 +706,7 @@ static CPU_EXECUTE( sharc )
 		}
 
 		sharc_icount = 0;
-		debugger_instruction_hook(Machine, sharc.daddr);
+		debugger_instruction_hook(device->machine, sharc.daddr);
 
 		return cycles;
 	}
@@ -742,7 +741,7 @@ static CPU_EXECUTE( sharc )
 		// fetch next instruction
 		sharc.fetch_opcode = ROPCODE(sharc.faddr);
 
-		debugger_instruction_hook(Machine, sharc.pc);
+		debugger_instruction_hook(device->machine, sharc.pc);
 
 		// handle looping
 		if (sharc.pc == (sharc.laddr & 0xffffff))

@@ -356,7 +356,7 @@ static CPU_INIT( g65816 )
 	state_save_register_item("G65816", index, g65816i_cpu.irq_delay);
 	state_save_register_item("G65816", index, g65816i_cpu.stopped);
 
-	state_save_register_postload(Machine, g65816_restore_state, NULL);
+	state_save_register_postload(device->machine, g65816_restore_state, NULL);
 }
 
 /**************************************************************************
