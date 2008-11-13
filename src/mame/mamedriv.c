@@ -5595,6 +5595,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mechatt )	/* A8002 'MA' (c) 1989 */
 	DRIVER( mechattu )	/* A8002 'MA' (c) 1989 */
 	DRIVER( bbusters )	/* A9003 'BB' (c) 1989 */
+	DRIVER( bbusteru )	/* A9003 'BB' (c) 1989 */
 
 	/* Electrocoin on early SNK hardware - gambling game remove once it works */
 	DRIVER( dmndrby )	/* G4001 'DD' (c) 1986 */
