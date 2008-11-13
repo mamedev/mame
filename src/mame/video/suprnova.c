@@ -129,7 +129,7 @@ static UINT8 bright_v3_b_trans = 0x00, bright_v3_g_trans = 0x00, bright_v3_r_tra
 
 // This ignores the alpha values atm.
 static int spc_changed=0, v3_changed=0, palette_updated=0;
-static int suprnova_alt_enable_background, suprnova_alt_enable_sprites;
+int suprnova_alt_enable_background, suprnova_alt_enable_sprites;
 
 WRITE32_HANDLER ( skns_pal_regs_w )
 {
@@ -312,10 +312,10 @@ static void palette_update(running_machine *machine)
 }
 
 
-static int skns_rle_decode ( running_machine *machine, int romoffset, int size )
+static int skns_rle_decode ( running_machine *machine, int romoffset, int size, UINT8*gfx_source, size_t gfx_length )
 {
-	UINT8 *src = memory_region (machine, "gfx1");
-	size_t srcsize = memory_region_length (machine, "gfx1");
+	UINT8 *src = gfx_source;
+	size_t srcsize = gfx_length;
 	UINT8 *dst = decodebuffer;
 	int decodeoffset = 0;
 
@@ -336,7 +336,7 @@ static int skns_rle_decode ( running_machine *machine, int romoffset, int size )
 			} while(code != 0xff);
 		}
 	}
-	return &src[romoffset%srcsize]-memory_region (machine, "gfx1");
+	return &src[romoffset%srcsize]-gfx_source;
 }
 
 void skns_sprite_kludge(int x, int y)
@@ -507,7 +507,7 @@ static void (*const blit_z[4])(bitmap_t *bitmap, const rectangle *cliprect, cons
 	blit_fxy_z,
 };
 
-void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT32* spriteram_source, size_t spriteram_size, UINT8* gfx_source, size_t gfx_length, UINT32* sprite_regs)
 {
 	/*- SPR RAM Format -**
 
@@ -543,10 +543,10 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 
 	/* sprite ram start / end is not really fixed registers change it */
 
-	//printf ("addr %08x\n", (skns_spc_regs[0x14/4]));
+	//printf ("addr %08x\n", (sprite_regs[0x14/4]));
 
 
-	UINT32 *source = spriteram32;
+	UINT32 *source = spriteram_source;
 	UINT32 *finish = source + spriteram_size/4;
 
 	int group_x_offset[4];
@@ -556,7 +556,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 	int sprite_flip;
 	int sprite_x_scroll;
 	int sprite_y_scroll;
-	int disabled = skns_spc_regs[0x04/4] & 0x08; // RWR1
+	int disabled = sprite_regs[0x04/4] & 0x08; // RWR1
 	int xsize,ysize, size, xpos=0,ypos=0, pri=0, romoffset, colour=0, xflip,yflip, joint;
 	int sx,sy;
 	int endromoffs=0, gfxlen;
@@ -566,33 +566,33 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 
 	if ((!disabled) && suprnova_alt_enable_sprites){
 
-		group_enable    = (skns_spc_regs[0x00/4] & 0x0040) >> 6; // RWR0
+		group_enable    = (sprite_regs[0x00/4] & 0x0040) >> 6; // RWR0
 
 		/* Sengekis uses global flip */
-		sprite_flip = (skns_spc_regs[0x04/4] & 0x03); // RWR1
+		sprite_flip = (sprite_regs[0x04/4] & 0x03); // RWR1
 
-		sprite_y_scroll = ((skns_spc_regs[0x08/4] & 0x7fc0) >> 6); // RWR2
-		sprite_x_scroll = ((skns_spc_regs[0x10/4] & 0x7fc0) >> 6); // RWR4
+		sprite_y_scroll = ((sprite_regs[0x08/4] & 0x7fc0) >> 6); // RWR2
+		sprite_x_scroll = ((sprite_regs[0x10/4] & 0x7fc0) >> 6); // RWR4
 		if (sprite_y_scroll&0x100) sprite_y_scroll -= 0x200; // Signed
 		if (sprite_x_scroll&0x100) sprite_x_scroll -= 0x200; // Signed
 
-		group_x_offset[0] = (skns_spc_regs[0x18/4] & 0xffc0) >> 6; // RWR6
-		group_y_offset[0] = (skns_spc_regs[0x1c/4] & 0xffc0) >> 6; // RWR7
+		group_x_offset[0] = (sprite_regs[0x18/4] & 0xffc0) >> 6; // RWR6
+		group_y_offset[0] = (sprite_regs[0x1c/4] & 0xffc0) >> 6; // RWR7
 		if (group_x_offset[0]&0x200) group_x_offset[0] -= 0x400; // Signed
 		if (group_y_offset[0]&0x200) group_y_offset[0] -= 0x400; // Signed
 
-		group_x_offset[1] = (skns_spc_regs[0x20/4] & 0xffc0) >> 6; // RWR8
-		group_y_offset[1] = (skns_spc_regs[0x24/4] & 0xffc0) >> 6; // RWR9
+		group_x_offset[1] = (sprite_regs[0x20/4] & 0xffc0) >> 6; // RWR8
+		group_y_offset[1] = (sprite_regs[0x24/4] & 0xffc0) >> 6; // RWR9
 		if (group_x_offset[1]&0x200) group_x_offset[1] -= 0x400; // Signed
 		if (group_y_offset[1]&0x200) group_y_offset[1] -= 0x400; // Signed
 
-		group_x_offset[2] = (skns_spc_regs[0x28/4] & 0xffc0) >> 6; // RWR10
-		group_y_offset[2] = (skns_spc_regs[0x2c/4] & 0xffc0) >> 6; // RWR11
+		group_x_offset[2] = (sprite_regs[0x28/4] & 0xffc0) >> 6; // RWR10
+		group_y_offset[2] = (sprite_regs[0x2c/4] & 0xffc0) >> 6; // RWR11
 		if (group_x_offset[2]&0x200) group_x_offset[2] -= 0x400; // Signed
 		if (group_y_offset[2]&0x200) group_y_offset[2] -= 0x400; // Signed
 
-		group_x_offset[3] = (skns_spc_regs[0x30/4] & 0xffc0) >> 6; // RWR12
-		group_y_offset[3] = (skns_spc_regs[0x34/4] & 0xffc0) >> 6; // RWR13
+		group_x_offset[3] = (sprite_regs[0x30/4] & 0xffc0) >> 6; // RWR12
+		group_y_offset[3] = (sprite_regs[0x34/4] & 0xffc0) >> 6; // RWR13
 		if (group_x_offset[3]&0x200) group_x_offset[3] -= 0x400; // Signed
 		if (group_y_offset[3]&0x200) group_y_offset[3] -= 0x400; // Signed
 
@@ -612,7 +612,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 		sprite_y_scroll += sprite_kludge_y;
 
 
-		gfxlen = memory_region_length (machine, "gfx1");
+		gfxlen = gfx_length;
 		while( source<finish )
 		{
 			xflip = (source[0] & 0x00000200) >> 9;
@@ -715,7 +715,7 @@ void skns_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectang
 
 			romoffset &= gfxlen-1;
 
-			endromoffs = skns_rle_decode ( machine, romoffset, size );
+			endromoffs = skns_rle_decode ( machine, romoffset, size, gfx_source, gfx_length );
 
 			// in Cyvern
 
@@ -1224,7 +1224,7 @@ VIDEO_UPDATE(skns)
 	}
 
 	fillbitmap(sprite_bitmap, 0x0000, cliprect);
-	skns_draw_sprites(screen->machine, sprite_bitmap, cliprect);
+	skns_draw_sprites(screen->machine, sprite_bitmap, cliprect, spriteram32, spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), skns_spc_regs );
 
 
 	return 0;
@@ -1232,5 +1232,5 @@ VIDEO_UPDATE(skns)
 
 VIDEO_EOF(skns)
 {
-//  buffer_spriteram32_w(machine,0,0,0xffffffff);
+
 }

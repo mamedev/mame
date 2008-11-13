@@ -202,7 +202,17 @@ there are 9 PALS on the pcb (not dumped)
 #include "deprecat.h"
 #include "sound/ymz280b.h"
 #include "includes/suprnova.h"
+#include "kaneko16.h"
 
+static bitmap_t *sprite_bitmap_1;
+static bitmap_t *sprite_bitmap_2;
+
+static UINT32* jchan_sprite_ram32_1;
+static UINT32* jchan_sprite_ram32_2;
+static UINT32* jchan_sprite_regs32_1;
+static UINT32* jchan_sprite_regs32_2;
+
+static int jchan_irq_sub_enable;
 
 /***************************************************************************
 
@@ -239,63 +249,7 @@ static void jchan_mcu_run(running_machine *machine)
 	{
 		case 0x04: /* Protection: during self-test for mcu_subcmd = 0x3d, 0x3e, 0x3f */
 		{
-			switch(mcu_subcmd)
-			{
-				case 0x3d: /* $f3c ($f34-$f66) */
-					/* MCU writes the string "USMM0713-TB1994 " to shared ram */
-					mcu_ram[mcu_offset + 0] = 0x5553; mcu_ram[mcu_offset + 1] = 0x4D4D;
-					mcu_ram[mcu_offset + 2] = 0x3037; mcu_ram[mcu_offset + 3] = 0x3133;
-					mcu_ram[mcu_offset + 4] = 0x2D54; mcu_ram[mcu_offset + 5] = 0x4231;
-					mcu_ram[mcu_offset + 6] = 0x3939; mcu_ram[mcu_offset + 7] = 0x3420;
-					break;
-				case 0x3e:
-					if ( strcmp(machine->gamedrv->name, "jchan") == 0 ) /* $f72 ($f6a-$fc6) */
-					{
-						/* MCU writes the string "1995/05/24 The kung-Fu Master Jackie Chan   " to shared ram */
-						mcu_ram[mcu_offset +  0] = 0x3139; mcu_ram[mcu_offset +  1] = 0x3935;
-						mcu_ram[mcu_offset +  2] = 0x2F30; mcu_ram[mcu_offset +  3] = 0x352F;
-						mcu_ram[mcu_offset +  4] = 0x3234; mcu_ram[mcu_offset +  5] = 0x2054;
-						mcu_ram[mcu_offset +  6] = 0x6865; mcu_ram[mcu_offset +  7] = 0x206B;
-						mcu_ram[mcu_offset +  8] = 0x756E; mcu_ram[mcu_offset +  9] = 0x672D;
-						mcu_ram[mcu_offset + 10] = 0x4675; mcu_ram[mcu_offset + 11] = 0x204D;
-						mcu_ram[mcu_offset + 12] = 0x6173; mcu_ram[mcu_offset + 13] = 0x7465;
-						mcu_ram[mcu_offset + 14] = 0x7220; mcu_ram[mcu_offset + 15] = 0x4A61;
-						mcu_ram[mcu_offset + 16] = 0x636B; mcu_ram[mcu_offset + 17] = 0x6965;
-						mcu_ram[mcu_offset + 18] = 0x2043; mcu_ram[mcu_offset + 19] = 0x6861;
-						mcu_ram[mcu_offset + 20] = 0x6E20; mcu_ram[mcu_offset + 21] = 0x2020;
-					}
-					else if ( strcmp(machine->gamedrv->name, "jchan2") == 0 )
-					{
-						/* MCU writes the string "1995/10/24 Fists Of Fire" to shared ram */
-						mcu_ram[mcu_offset +  0] = 0x3139; mcu_ram[mcu_offset +  1] = 0x3935;
-						mcu_ram[mcu_offset +  2] = 0x2F31; mcu_ram[mcu_offset +  3] = 0x302F;
-						mcu_ram[mcu_offset +  4] = 0x3234; mcu_ram[mcu_offset +  5] = 0x2046;
-						mcu_ram[mcu_offset +  6] = 0x6973; mcu_ram[mcu_offset +  7] = 0x7473;
-						mcu_ram[mcu_offset +  8] = 0x204F; mcu_ram[mcu_offset +  9] = 0x6620;
-						mcu_ram[mcu_offset + 10] = 0x4669; mcu_ram[mcu_offset + 11] = 0x7265;
-						mcu_ram[mcu_offset + 12] = 0x6173; mcu_ram[mcu_offset + 13] = 0x7465;
-					}
-					break;
-				case 0x3f: /* $fd2 ($fca-$101a) */
-					/* MCU writes the string "(C)1995 KANEKO // TEAM JACKIE CHAN  " to shared ram */
-					mcu_ram[mcu_offset +  0] = 0x2843; mcu_ram[mcu_offset +  1] = 0x2931;
-					mcu_ram[mcu_offset +  2] = 0x3939; mcu_ram[mcu_offset +  3] = 0x3520;
-					mcu_ram[mcu_offset +  4] = 0x4B41; mcu_ram[mcu_offset +  5] = 0x4E45;
-					mcu_ram[mcu_offset +  6] = 0x4B4F; mcu_ram[mcu_offset +  7] = 0x202F;
-					mcu_ram[mcu_offset +  8] = 0x2F20; mcu_ram[mcu_offset +  9] = 0x5445;
-					mcu_ram[mcu_offset + 10] = 0x414D; mcu_ram[mcu_offset + 11] = 0x204A;
-					mcu_ram[mcu_offset + 12] = 0x4143; mcu_ram[mcu_offset + 13] = 0x4B49;
-					mcu_ram[mcu_offset + 14] = 0x4520; mcu_ram[mcu_offset + 15] = 0x4348;
-					mcu_ram[mcu_offset + 16] = 0x414E; mcu_ram[mcu_offset + 17] = 0x2020;
-					break;
-
-				case 0x1b: /* $12dbe, $12dd4 */
-				case 0x2d: /* $209f4 */
-				default:   /* $1b3e0, $1ca40, $20a12, $20b0e, $2140a, $21436, $214cc, $21552 (dynamic) */
-					mcu_ram[mcu_offset] = 0x4e75; // faked with an RTS for now
-					logerror("- UNKNOWN PARAMETER %02X", mcu_subcmd);
-			}
-			logerror("\n");
+			 toxboy_handle_04_subcommand(machine,mcu_subcmd,mcu_ram);
 		}
 		break;
 
@@ -398,27 +352,77 @@ static READ16_HANDLER( jchan_mcu_status_r )
 
 static UINT16 *jchan_spriteram;
 
+
+// interrupt generation is NOT understood
 static INTERRUPT_GEN( jchan_vblank )
 {
-	if (!cpu_getiloops())
-		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
-	else
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	int i = cpu_getiloops();
+	switch (i)
+	{
+
+		case 0:
+			cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+			break;
+
+		case 220:
+			cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+			break;
+
+	}
+
+	if (jchan_irq_sub_enable)
+	{
+		switch (i)
+		{
+
+			case 0:
+				cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
+				break;
+
+			case 100:
+				cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
+				break;
+
+			case 220:
+				cpunum_set_input_line(machine, 1, 3, HOLD_LINE);
+				break;
+
+		}
+	}
 }
+
+extern int suprnova_alt_enable_sprites;
 
 static VIDEO_START(jchan)
 {
 	/* so we can use suprnova.c */
-	buffered_spriteram32 = auto_malloc ( 0x4000 );
+	jchan_sprite_ram32_1 = auto_malloc ( 0x4000 );
+	jchan_sprite_ram32_2 = auto_malloc ( 0x4000 );
+
 	spriteram_size = 0x4000;
-	skns_spc_regs = auto_malloc (0x40);
+	jchan_sprite_regs32_1 = auto_malloc (0x40);
+	jchan_sprite_regs32_2 = auto_malloc (0x40);
+
+	sprite_bitmap_1 = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+	sprite_bitmap_2 = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
+
+	suprnova_alt_enable_sprites = 1;
 }
+
+
+static UINT16 *mainsub_shared_ram;
+
+
 
 
 static VIDEO_UPDATE(jchan)
 {
 	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	skns_draw_sprites(screen->machine,bitmap,cliprect);
+	//skns_draw_sprites(screen->machine,bitmap,cliprect);
+	//fillbitmap(sprite_bitmap, 0x0000, cliprect);
+	skns_draw_sprites(screen->machine, bitmap, cliprect, jchan_sprite_ram32_1, 0x4000, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), jchan_sprite_regs32_1 );
+
+
 	return 0;
 }
 
@@ -437,6 +441,9 @@ static UINT16 *jchan_ctrl;
 
 static WRITE16_HANDLER( jchan_ctrl_w )
 {
+	//printf("jchan_ctrl_w %d %04x %04x\n", offset, data,mem_mask);
+	jchan_irq_sub_enable = data & 0x8000; // hack / guess!
+
 // Player 1 buttons C/D for are ON
 // Coin 1 affects Button C and sometimes(!) makes Player 2 buttons C/D both ON definitively
 // Coin 2 affects Button D and sometimes(!) makes Player 2 buttons C/D both ON definitively
@@ -463,81 +470,40 @@ static READ16_HANDLER ( jchan_ctrl_r )
 
 ***************************************************************************/
 
+/* communications - hacky! */
 static UINT16 *mainsub_shared_ram;
-
-#define main2sub_cmd      mainsub_shared_ram[0x03ffe/2]
-#define main2sub_status   mainsub_shared_ram[0x00002/2]
-#define main2sub_result   mainsub_shared_ram[0x00004/2]
-#define main2sub_param(n) mainsub_shared_ram[(0x03c02 + (n))/2]
-#define sub2main_cmd      mainsub_shared_ram[0x00000/2]
 
 static WRITE16_HANDLER( main2sub_cmd_w )
 {
-	COMBINE_DATA(&main2sub_cmd);
-	logerror("cpu #%d (PC=%06X): write cmd %04x to subcpu\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), main2sub_cmd);
+	//printf("main2sub\n");
+
+	COMBINE_DATA(&mainsub_shared_ram[0x03ffe/2]);
 	cpunum_set_input_line(machine, 1, 4, HOLD_LINE);
 }
-static READ16_HANDLER ( main2sub_status_r )
-{
-	return main2sub_status;
-}
-static WRITE16_HANDLER( main2sub_status_w )
-{
-	COMBINE_DATA(&main2sub_status);
-	logerror("cpu #%d (PC=%06X): write status (%04x)\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), main2sub_status);
-}
-static READ16_HANDLER ( main2sub_result_r )
-{
-	logerror("cpu #%d (PC=%06X): read subcpu result (%04x)\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), main2sub_result);
-	return main2sub_result;
-}
-static WRITE16_HANDLER( main2sub_unknown )
-{
-#define mainsub_unknown (0x400100+offset/2)
-	COMBINE_DATA(&mainsub_shared_ram[offset]);
-	logerror("cpu #%d (PC=%06X): write unknown (%06X):%04x to subcpu\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), mainsub_unknown, main2sub_param(offset));
-}
 
-static WRITE16_HANDLER( main2sub_param_w )
-{
-	COMBINE_DATA(&main2sub_param(offset));
-	logerror("cpu #%d (PC=%06X): write param(%d):%04x to subcpu\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), offset, main2sub_param(offset));
-}
-
+// is this called?
 static WRITE16_HANDLER( sub2main_cmd_w )
 {
-	COMBINE_DATA(&sub2main_cmd);
-	logerror("cpu #%d (PC=%06X): write cmd %04x to maincpu\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), sub2main_cmd);
+	//printf("sub2main\n");
+	COMBINE_DATA(&mainsub_shared_ram[0x0000/2]);
 	cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
 }
-static READ16_HANDLER ( sub2main_cmd_r )
-{
-	logerror("cpu #%d (PC=%06X): read cmd %04x from subcpu\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), sub2main_cmd);
-	return sub2main_cmd;
-}
 
+/* ram convert for suprnova (requires 32-bit stuff) */
 static WRITE16_HANDLER( jchan_suprnova_sprite32_w )
 {
-//  UINT32 dat32;
-
 	COMBINE_DATA(&jchan_spriteram[offset]);
-
-	/* put in buffered_spriteram32 for suprnova.c */
 	offset>>=1;
-	buffered_spriteram32[offset]=(jchan_spriteram[offset*2+1]<<16) | (jchan_spriteram[offset*2]);
+	jchan_sprite_ram32_1[offset]=(jchan_spriteram[offset*2+1]<<16) | (jchan_spriteram[offset*2]);
 }
 
 static UINT16* jchan_sprregs;
 
 static WRITE16_HANDLER( jchan_suprnova_sprite32regs_w )
 {
-//  UINT32 dat32;
-
 	COMBINE_DATA(&jchan_sprregs[offset]);
-
-	/* put in skns_spc_regs for suprnova.c */
 	offset>>=1;
-	skns_spc_regs[offset]=(jchan_sprregs[offset*2+1]<<16) | (jchan_sprregs[offset*2]);
+	jchan_sprite_regs32_1[offset]=(jchan_sprregs[offset*2+1]<<16) | (jchan_sprregs[offset*2]);
 }
 
 static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
@@ -551,13 +517,7 @@ static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(jchan_mcu_com3_w)	//  [ for mcu to return its status ?
 	AM_RANGE(0x370000, 0x370001) AM_READ(jchan_mcu_status_r)
 
-	AM_RANGE(0x400000, 0x400001) AM_READ(sub2main_cmd_r) // some subcpu cmd writes @ $400000, IT3 of main reads this location
-	AM_RANGE(0x400002, 0x400003) AM_READWRITE(main2sub_status_r, main2sub_status_w)
-	AM_RANGE(0x400004, 0x400005) AM_READ(main2sub_result_r)
-//  AM_RANGE(0x400006, 0x400007) // ???
-	AM_RANGE(0x400100, 0x400123) AM_WRITE(main2sub_unknown)
-	AM_RANGE(0x403c02, 0x403c09) AM_WRITE(main2sub_param_w) // probably much more, see subcpu routine $7 @ $14aa
-	AM_RANGE(0x403ffe, 0x403fff) AM_WRITE(main2sub_cmd_w)
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&mainsub_shared_ram) AM_SHARE(1)
 
 	/* 1st sprite layer */
 //  AM_RANGE(0x500000, 0x5005ff) AM_RAM //     grid tested ($924-$97c), cleared ($982-$9a4) until $503fff
@@ -584,9 +544,7 @@ static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM // Work RAM - grid tested, cleared ($612-$6dc)
 
-	/* (0x400000, 0x403fff) = mainsub_shared_ram */
-	AM_RANGE(0x400000, 0x400001) AM_WRITE(sub2main_cmd_w) AM_BASE(&mainsub_shared_ram)
-	AM_RANGE(0x400002, 0x403fff) AM_RAM
+	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&mainsub_shared_ram) AM_SHARE(1)
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
 	AM_RANGE(0x500000, 0x500fff) AM_RAM // AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1) // Layers 0
@@ -741,7 +699,7 @@ static MACHINE_DRIVER_START( jchan )
 
 	MDRV_CPU_ADD("main", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_main,0)
-	MDRV_CPU_VBLANK_INT_HACK(jchan_vblank, 2)
+	MDRV_CPU_VBLANK_INT_HACK(jchan_vblank, 224)
 
 	MDRV_CPU_ADD("sub", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_sub,0)
@@ -756,7 +714,7 @@ static MACHINE_DRIVER_START( jchan )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MDRV_PALETTE_LENGTH(0x10000)
 
 	MDRV_VIDEO_START(jchan)
 	MDRV_VIDEO_UPDATE(jchan)
@@ -794,7 +752,7 @@ ROM_START( jchan )
 	ROM_LOAD16_BYTE( "jcs0x3.164", 0x1600000, 0x040000, CRC(9a012cbc) SHA1(b3e7390220c90d55dccfb96397f0af73925e36f9) ) // SPA-7A female portraits
 	ROM_LOAD16_BYTE( "jcs1x3.165", 0x1600001, 0x040000, CRC(57ae7c8d) SHA1(4086f638c2aabcee84e838243f0fd15cec5c040d) ) // SPA-7B female portraits
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* SPB GFX (we haven't used yet, not sure where they map, 2nd sprite layer maybe?) */
+	ROM_REGION( 0x1000000, "gfx2", 0 ) /* SPB GFX (background sprites) */
 	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
 	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
 
@@ -808,8 +766,8 @@ ROM_START( jchan )
 	ROM_REGION( 0x040000, "unknown", 0 ) /* Audio 2? */
 	ROM_LOAD( "jcw0x0.u56", 0x000000, 0x040000, CRC(bcf25c2a) SHA1(b57a563ab5c05b05d133eed3d099c4de997f37e4) )
 
-	ROM_REGION( 0x020000, "user1", 0 ) /* MCU Code? */
-	ROM_LOAD( "jcd0x1.u13", 0x000000, 0x020000, CRC(2a41da9c) SHA1(7b1ba0efc0544e276196b9605df1881fde871708) )
+	ROM_REGION( 0x020000, "mcudata", 0 ) /* MCU Code? */
+	ROM_LOAD16_WORD_SWAP( "jcd0x1.u13", 0x000000, 0x020000, CRC(2a41da9c) SHA1(7b1ba0efc0544e276196b9605df1881fde871708) )
 ROM_END
 
 
@@ -835,7 +793,7 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_LOAD16_BYTE( "j2g1x1.164", 0x1600000, 0x080000, CRC(66a7ea6a) SHA1(605cbc1eb50fb0decbea790f2a11e999d5fde762) ) // SPA-7A female portraits
 	ROM_LOAD16_BYTE( "j2g1x2.165", 0x1600001, 0x080000, CRC(660e770c) SHA1(1e385a6ee83559b269d2179e6c247238c0f3c850) ) // SPA-7B female portraits
 
-	ROM_REGION( 0x1000000, "gfx2", 0 ) /* SPB GFX (we haven't used yet, not sure where they map, 2nd sprite layer maybe?) */
+	ROM_REGION( 0x1000000, "gfx2", 0 ) /* SPB GFX (background sprites) */
 	ROM_LOAD( "jc-106-00.171", 0x000000, 0x200000, CRC(bc65661b) SHA1(da28b8fcd7c7a0de427a54be2cf41a1d6a295164) ) // SPB0
 	ROM_LOAD( "jc-107-00.172", 0x200000, 0x200000, CRC(92a86e8b) SHA1(c37eddbc9d84239deb543504e27b5bdaf2528f79) ) // SPB1
 
@@ -849,12 +807,18 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_REGION( 0x040000, "unknown", 0 ) /* Audio 2? */
 	ROM_LOAD( "j2m1x1.u56", 0x000000, 0x040000, CRC(baf6e25e) SHA1(6b02f3eb1eafcd43022a9f60f98573d02277adfe) )
 
-	ROM_REGION( 0x020000, "user1", 0 ) /* MCU Code? */
-	ROM_LOAD( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
+	ROM_REGION( 0x020000, "mcudata", 0 ) /* MCU Code? */
+	ROM_LOAD16_WORD_SWAP( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
 static DRIVER_INIT( jchan )
 {
+	DRIVER_INIT_CALL( decrypt_toybox_rom );
+	// install these here, putting them in the memory map causes issues
+	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x403ffe, 0x403fff, 0, 0, main2sub_cmd_w );
+	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, sub2main_cmd_w );
+
+
 	memset(jchan_mcu_com, 0, 4 * sizeof( UINT16) );
 }
 

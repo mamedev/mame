@@ -67,7 +67,7 @@ Dumped by Uki
 #include "deprecat.h"
 #include "sound/ymz280b.h"
 #include "includes/suprnova.h"
-
+#include "kaneko16.h"
 
 /***************************************************************************
 
@@ -88,6 +88,7 @@ static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
 }
 
 
+extern int suprnova_alt_enable_sprites;
 
 static VIDEO_START(galpani3)
 {
@@ -95,12 +96,15 @@ static VIDEO_START(galpani3)
 	buffered_spriteram32 = auto_malloc ( 0x4000 );
 	spriteram_size = 0x4000;
 	skns_spc_regs = auto_malloc (0x40);
+	suprnova_alt_enable_sprites = 1;
 }
 
 static VIDEO_UPDATE(galpani3)
 {
 	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	skns_draw_sprites(screen->machine,bitmap,cliprect);
+//	skns_draw_sprites(screen->machine,bitmap,cliprect);
+	skns_draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram32, spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), skns_spc_regs );
+
 	return 0;
 }
 
@@ -245,22 +249,7 @@ static void galpani3_mcu_run(running_machine *machine)
 
 		case 0x04: // $38842 - provides code/data
 		{
-			switch(mcu_subcmd)
-			{
-				int i;
-				case 0x00: /* $1a9c - provides code @ $40f000, length probably 0x1000 max (contains many code snippets, many 'jsr $40fxxx') */
-					for (i=0;i<0x1000/2;i++)
-						mcu_ram[mcu_offset+i] = 0x4e75; // fill 'code page' with RTS
-					//mcu_ram[mcu_offset+0x0098/2] = 0x4e91; // wrong assumption: jsr (A1) :/
-					break;
-
-				case 0x01: /* $1aa8 - provides data @ $400400, length? */
-					break;
-
-				default: /* most likely never happen, unless it's done by code provided by MCU itself */
-					logerror("- UNKNOWN PARAMETER %02X", mcu_subcmd);
-					break;
-			}
+			toxboy_handle_04_subcommand(machine, mcu_subcmd, mcu_ram);
 		}
 		break;
 
@@ -376,7 +365,7 @@ static MACHINE_DRIVER_START( galpani3 )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(0x4000)
+	MDRV_PALETTE_LENGTH(0x10000)
 
 	MDRV_VIDEO_START(galpani3)
 	MDRV_VIDEO_UPDATE(galpani3)
@@ -411,8 +400,8 @@ ROM_START( galpani3 )
 	ROM_LOAD( "gp310100.40", 0x000000, 0x200000, CRC(6a0b1d12) SHA1(11fed80b96d07fddb27599743991c58c12c048e0) )
 	ROM_LOAD( "gp310000.41", 0x200000, 0x100000, CRC(641062ef) SHA1(c8902fc46319eac94b3f95d18afa24bd895078d6) )
 
-	ROM_REGION( 0x20000, "user1", 0 ) /* MCU Code? */
-	ROM_LOAD( "g3d0x0.134", 0x000000, 0x020000, CRC(4ace10f9) SHA1(d19e4540d535ce10d23cb0844be03a3239b3402e) )
+	ROM_REGION( 0x20000, "mcudata", 0 ) /* MCU Code? */
+	ROM_LOAD16_WORD_SWAP( "g3d0x0.134", 0x000000, 0x020000, CRC(4ace10f9) SHA1(d19e4540d535ce10d23cb0844be03a3239b3402e) )
 ROM_END
 
 
@@ -424,6 +413,8 @@ static DRIVER_INIT( galpani3 )
 	patchrom[0x3a0c6/2] = 0x4e71;
 	patchrom[0x3a0d6/2] = 0x4e71;
 	patchrom[0x3a0e0/2] = 0x4e71;
+
+	DRIVER_INIT_CALL( decrypt_toybox_rom );
 
 	memset(galpani3_mcu_com, 0, 4 * sizeof( UINT16) );
 }
