@@ -552,8 +552,9 @@ static TIMER_CALLBACK( upd7759_slave_update )
 
 *************************************************************/
 
-static void upd7759_reset(struct upd7759_chip *chip)
+static SND_RESET( upd7759 )
 {
+	struct upd7759_chip *chip = token;
 	chip->pos                = 0;
 	chip->fifo_in            = 0;
 	chip->drq                = 0;
@@ -620,7 +621,7 @@ static void register_for_save(struct upd7759_chip *chip, int index)
 }
 
 
-static void *upd7759_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( upd7759 )
 {
 	static const upd7759_interface defintrf = { 0 };
 	const upd7759_interface *intf = (config != NULL) ? config : &defintrf;
@@ -654,7 +655,7 @@ static void *upd7759_start(const char *tag, int sndindex, int clock, const void 
 	chip->start = 1;
 
 	/* toggle the reset line to finish the reset */
-	upd7759_reset(chip);
+	SND_RESET_NAME( upd7759 )(chip);
 
 	register_for_save(chip, sndindex);
 
@@ -681,7 +682,7 @@ void upd7759_reset_w(int which, UINT8 data)
 
 	/* on the falling edge, reset everything */
 	if (oldreset && !chip->reset)
-		upd7759_reset(chip);
+		SND_RESET_NAME( upd7759 )(chip);
 }
 
 void upd7759_start_w(int which, UINT8 data)
@@ -770,7 +771,7 @@ READ8_HANDLER(upd7759_0_busy_r)
  * Generic get_info
  **************************************************************************/
 
-static void upd7759_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( upd7759 )
 {
 	switch (state)
 	{
@@ -779,15 +780,15 @@ static void upd7759_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void upd7759_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( upd7759 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = upd7759_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = upd7759_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( upd7759 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( upd7759 );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

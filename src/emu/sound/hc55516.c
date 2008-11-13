@@ -89,28 +89,28 @@ static void *start_common(int sndindex, int clock, const void *config,
 }
 
 
-static void *hc55516_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( hc55516 )
 {
 	return start_common(sndindex, clock, config, 0x07, TRUE);
 }
 
 
-static void *mc3417_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( mc3417 )
 {
 	return start_common(sndindex, clock, config, 0x07, FALSE);
 }
 
 
-static void *mc3418_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( mc3418 )
 {
 	return start_common(sndindex, clock, config, 0x0f, FALSE);
 }
 
 
 
-static void hc55516_reset(void *chip)
+static SND_RESET( hc55516 )
 {
-	((struct hc55516_data *)chip)->last_clock_state = 0;
+	((struct hc55516_data *)token)->last_clock_state = 0;
 }
 
 
@@ -333,7 +333,7 @@ READ8_HANDLER ( hc55516_1_clock_state_r )	{ return hc55516_clock_state_r(1); }
  * Generic get_info
  **************************************************************************/
 
-void hc55516_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( hc55516 )
 {
 	switch (state)
 	{
@@ -341,8 +341,8 @@ void hc55516_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_INT_ALIAS:							info->i = SOUND_HC55516;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_START:							info->start = hc55516_start;			break;
-		case SNDINFO_PTR_RESET:							info->reset = hc55516_reset;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( hc55516 );			break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( hc55516 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "HC-55516";					break;
@@ -354,25 +354,25 @@ void hc55516_get_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void mc3417_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( mc3417 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = mc3417_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( mc3417 );				break;
 		case SNDINFO_PTR_RESET:							/* chip has no reset pin */				break;
 		case SNDINFO_STR_NAME:							info->s = "MC3417";						break;
-		default: 										hc55516_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(hc55516);	break;
 	}
 }
 
 
-void mc3418_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( mc3418 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = mc3418_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( mc3418 );				break;
 		case SNDINFO_PTR_RESET:							/* chip has no reset pin */				break;
 		case SNDINFO_STR_NAME:							info->s = "MC3418";						break;
-		default: 										hc55516_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(hc55516);	break;
 	}
 }

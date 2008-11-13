@@ -37,11 +37,11 @@ static void tms5220_update(void *param, stream_sample_t **inputs, stream_sample_
 
 /**********************************************************************************************
 
-     tms5220_start -- allocate buffers and reset the 5220
+     SND_START( tms5220 ) -- allocate buffers and reset the 5220
 
 ***********************************************************************************************/
 
-static void *tms5220_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( tms5220 )
 {
 	static const tms5220_interface dummy = { 0 };
 	struct tms5220_info *info;
@@ -74,9 +74,9 @@ static void *tms5220_start(const char *tag, int sndindex, int clock, const void 
 
 
 #if (HAS_TMC0285 || HAS_TMS5200)
-static void *tms5200_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( tms5200 )
 {
-	struct tms5220_info *info = tms5220_start(tag, sndindex, clock, config);
+	struct tms5220_info *info = SND_START_CALL( tms5220 );
 	tms5220_set_variant(info->chip, variant_tmc0285);
 	return info;
 }
@@ -86,21 +86,21 @@ static void *tms5200_start(const char *tag, int sndindex, int clock, const void 
 
 /**********************************************************************************************
 
-     tms5220_stop -- free buffers
+     SND_STOP( tms5220 ) -- free buffers
 
 ***********************************************************************************************/
 
-static void tms5220_stop(void *chip)
+static SND_STOP( tms5220 )
 {
-	struct tms5220_info *info = chip;
+	struct tms5220_info *info = token;
 	tms5220_destroy(info->chip);
 }
 
 
 
-static void tms5220_reset(void *chip)
+static SND_RESET( tms5220 )
 {
-	struct tms5220_info *info = chip;
+	struct tms5220_info *info = token;
 	tms5220_reset_chip(info->chip);
 }
 
@@ -238,7 +238,7 @@ void tms5220_set_frequency(int frequency)
  * Generic get_info
  **************************************************************************/
 
-static void tms5220_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( tms5220 )
 {
 	struct tms5220_info *ti = token;
 
@@ -249,7 +249,7 @@ static void tms5220_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void tms5220_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( tms5220 )
 {
 	switch (state)
 	{
@@ -257,10 +257,10 @@ void tms5220_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_INT_ALIAS:							info->i = SOUND_TMS5220;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = tms5220_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = tms5220_start;			break;
-		case SNDINFO_PTR_STOP:							info->stop = tms5220_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = tms5220_reset;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( tms5220 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms5220 );			break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( tms5220 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( tms5220 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "TMS5220";					break;
@@ -272,25 +272,25 @@ void tms5220_get_info(void *token, UINT32 state, sndinfo *info)
 }
 
 #if (HAS_TMC0285)
-void tmc0285_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( tmc0285 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = tms5200_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms5200 );			break;
 		case SNDINFO_STR_NAME:							info->s = "TMC0285";					break;
-		default: 										tms5220_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL( tms5220 );	break;
 	}
 }
 #endif
 
 #if (HAS_TMS5200)
-void tms5200_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( tms5200 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = tms5200_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms5200 );			break;
 		case SNDINFO_STR_NAME:							info->s = "TMS5200";					break;
-		default: 										tms5220_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL( tms5220 );	break;
 	}
 }
 #endif

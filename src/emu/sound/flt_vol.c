@@ -23,7 +23,7 @@ static void filter_volume_update(void *param, stream_sample_t **inputs, stream_s
 }
 
 
-static void *filter_volume_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( filter_volume )
 {
 	struct filter_volume_info *info;
 
@@ -49,7 +49,7 @@ void flt_volume_set_volume(int num, float volume)
  * Generic get_info
  **************************************************************************/
 
-static void filter_volume_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( filter_volume )
 {
 	switch (state)
 	{
@@ -58,15 +58,15 @@ static void filter_volume_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void filter_volume_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( filter_volume )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = filter_volume_set_info;break;
-		case SNDINFO_PTR_START:							info->start = filter_volume_start;		break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( filter_volume );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( filter_volume );		break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

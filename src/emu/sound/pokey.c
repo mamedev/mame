@@ -606,7 +606,7 @@ static void register_for_save(struct POKEYregisters *chip, int index)
 }
 
 
-static void *pokey_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( pokey )
 {
 	struct POKEYregisters *chip;
 	int sample_rate = clock;
@@ -1506,7 +1506,7 @@ void pokey4_kbcode_w(int kbcode, int make)
  * Generic get_info
  **************************************************************************/
 
-static void pokey_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( pokey )
 {
 	switch (state)
 	{
@@ -1515,15 +1515,15 @@ static void pokey_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void pokey_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( pokey )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = pokey_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = pokey_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( pokey );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( pokey );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

@@ -147,9 +147,9 @@ static TIMER_CALLBACK( MSM5205_vclk_callback )
 /*
  *    Reset emulation of an MSM5205-compatible chip
  */
-static void msm5205_reset(void *chip)
+static SND_RESET( msm5205 )
 {
-	struct MSM5205Voice *voice = chip;
+	struct MSM5205Voice *voice = token;
 
 	/* initialize work */
 	voice->data    = 0;
@@ -165,7 +165,7 @@ static void msm5205_reset(void *chip)
  *    Start emulation of an MSM5205-compatible chip
  */
 
-static void *msm5205_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( msm5205 )
 {
 	struct MSM5205Voice *voice;
 
@@ -186,7 +186,7 @@ static void *msm5205_start(const char *tag, int sndindex, int clock, const void 
 	voice->timer = timer_alloc(MSM5205_vclk_callback, voice);
 
 	/* initialize */
-	msm5205_reset(voice);
+	SND_RESET_NAME( msm5205 )(voice);
 
 	/* register for save states */
 	state_save_register_item("msm5205", sndindex, voice->clock);
@@ -297,7 +297,7 @@ void msm5205_set_volume(int num,int volume)
  * Generic get_info
  **************************************************************************/
 
-static void msm5205_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( msm5205 )
 {
 	switch (state)
 	{
@@ -306,15 +306,15 @@ static void msm5205_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void msm5205_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( msm5205 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = msm5205_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = msm5205_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( msm5205 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( msm5205 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

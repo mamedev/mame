@@ -99,7 +99,7 @@ static void DAC_build_voltable(struct dac_info *info)
 }
 
 
-static void *dac_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( dac )
 {
 	struct dac_info *info;
 
@@ -155,7 +155,7 @@ WRITE8_HANDLER( dac_2_signed_data_w )
  * Generic get_info
  **************************************************************************/
 
-static void dac_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( dac )
 {
 	switch (state)
 	{
@@ -164,15 +164,15 @@ static void dac_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void dac_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( dac )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = dac_set_info;			break;
-		case SNDINFO_PTR_START:							info->start = dac_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( dac );			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( dac );				break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

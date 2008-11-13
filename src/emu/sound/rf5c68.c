@@ -121,7 +121,7 @@ static void rf5c68_update(void *param, stream_sample_t **inputs, stream_sample_t
 /*    RF5C68 start                              */
 /************************************************/
 
-static void *rf5c68_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( rf5c68 )
 {
 	/* allocate memory for the chip */
 	struct rf5c68pcm *chip = auto_malloc(sizeof(*chip));
@@ -227,7 +227,7 @@ WRITE8_HANDLER( rf5c68_w )
  * Generic get_info
  **************************************************************************/
 
-static void rf5c68_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( rf5c68 )
 {
 	switch (state)
 	{
@@ -236,15 +236,15 @@ static void rf5c68_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void rf5c68_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( rf5c68 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = rf5c68_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = rf5c68_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( rf5c68 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( rf5c68 );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

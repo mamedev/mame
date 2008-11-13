@@ -208,11 +208,11 @@ static void es8712_state_save_register(struct es8712 *chip, int sndindex)
 
 /**********************************************************************************************
 
-    ES8712_start -- start emulation of an ES8712 chip
+    SND_START( es8712 ) -- start emulation of an ES8712 chip
 
 ***********************************************************************************************/
 
-static void *es8712_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( es8712 )
 {
 	struct es8712 *chip;
 
@@ -244,13 +244,13 @@ static void *es8712_start(const char *tag, int sndindex, int clock, const void *
 
 /*************************************************************************************
 
-     ES8712_reset -- stop emulation of an ES8712-compatible chip
+     SND_RESET( es8712 ) -- stop emulation of an ES8712-compatible chip
 
 **************************************************************************************/
 
-static void es8712_reset(void *chip_src)
+static SND_RESET( es8712 )
 {
-	struct es8712 *chip = chip_src;
+	struct es8712 *chip = token;
 
 	if (chip->playing)
 	{
@@ -441,7 +441,7 @@ WRITE16_HANDLER( es8712_data_2_msb_w )
  * Generic get_info
  **************************************************************************/
 
-static void es8712_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( es8712 )
 {
 	switch (state)
 	{
@@ -450,17 +450,17 @@ static void es8712_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void es8712_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( es8712 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = es8712_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = es8712_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( es8712 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( es8712 );				break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = es8712_reset;				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( es8712 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "ES8712";						break;

@@ -625,7 +625,7 @@ static UINT8 k054539_r(int chip, offs_t offset)
 	return info->regs[offset];
 }
 
-static void *k054539_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( k054539 )
 {
 	static const k054539_interface defintrf = { 0 };
 	int i;
@@ -695,7 +695,7 @@ READ8_HANDLER( k054539_1_r )
  * Generic get_info
  **************************************************************************/
 
-static void k054539_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( k054539 )
 {
 	switch (state)
 	{
@@ -704,15 +704,15 @@ static void k054539_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void k054539_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( k054539 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = k054539_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = k054539_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k054539 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k054539 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

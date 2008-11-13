@@ -217,7 +217,7 @@ static void nile_update(void *param, stream_sample_t **inputs, stream_sample_t *
 	}
 }
 
-static void *nile_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( nile )
 {
 	struct nile_info *info;
 
@@ -237,7 +237,7 @@ static void *nile_start(const char *tag, int sndindex, int clock, const void *co
  * Generic get_info
  **************************************************************************/
 
-static void nile_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( nile )
 {
 	switch (state)
 	{
@@ -246,15 +246,15 @@ static void nile_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void nile_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( nile )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = nile_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = nile_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( nile );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( nile );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

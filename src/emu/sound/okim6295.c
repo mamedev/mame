@@ -312,11 +312,11 @@ static void okim6295_state_save_register(struct okim6295 *info, int sndindex)
 
 /**********************************************************************************************
 
-     OKIM6295_start -- start emulation of an OKIM6295-compatible chip
+     SND_START( okim6295 ) -- start emulation of an OKIM6295-compatible chip
 
 ***********************************************************************************************/
 
-static void *okim6295_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( okim6295 )
 {
 	const okim6295_interface *intf = config;
 	struct okim6295 *info;
@@ -355,13 +355,13 @@ static void *okim6295_start(const char *tag, int sndindex, int clock, const void
 
 /**********************************************************************************************
 
-     OKIM6295_stop -- stop emulation of an OKIM6295-compatible chip
+     SND_RESET( okim6295 ) -- stop emulation of an OKIM6295-compatible chip
 
 ***********************************************************************************************/
 
-static void okim6295_reset(void *chip)
+static SND_RESET( okim6295 )
 {
-	struct okim6295 *info = chip;
+	struct okim6295 *info = token;
 	int i;
 
 	stream_update(info->stream);
@@ -640,7 +640,7 @@ WRITE16_HANDLER( okim6295_data_2_msb_w )
  * Generic get_info
  **************************************************************************/
 
-static void okim6295_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( okim6295 )
 {
 	switch (state)
 	{
@@ -649,17 +649,17 @@ static void okim6295_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void okim6295_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( okim6295 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = okim6295_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = okim6295_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( okim6295 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( okim6295 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = okim6295_reset;			break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( okim6295 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "OKI6295";					break;

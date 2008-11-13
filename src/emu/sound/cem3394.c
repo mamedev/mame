@@ -315,7 +315,7 @@ static void cem3394_update(void *param, stream_sample_t **inputs, stream_sample_
 }
 
 
-static void *cem3394_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( cem3394 )
 {
 	const cem3394_interface *intf = config;
 	sound_chip *chip;
@@ -561,7 +561,7 @@ double cem3394_get_parameter(int chipnum, int input)
  * Generic get_info
  **************************************************************************/
 
-static void cem3394_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( cem3394 )
 {
 	switch (state)
 	{
@@ -570,15 +570,15 @@ static void cem3394_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void cem3394_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( cem3394 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = cem3394_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = cem3394_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( cem3394 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( cem3394 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

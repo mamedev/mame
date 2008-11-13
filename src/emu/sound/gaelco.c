@@ -276,18 +276,18 @@ static void *gaelcosnd_start(sound_type sndtype, const char *tag, int sndindex, 
 	return info;
 }
 
-static void *gaelco_gae1_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( gaelco_gae1 )
 {
 	return gaelcosnd_start(SOUND_GAELCO_GAE1, tag, sndindex, clock, config);
 }
 
-static void *gaelco_cg1v_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( gaelco_cg1v )
 {
 	return gaelcosnd_start(SOUND_GAELCO_CG1V, tag, sndindex, clock, config);
 }
 
 
-static void gaelco_stop(void *chip)
+static SND_STOP( gaelco )
 {
 	if (wavraw)
 		wav_close(wavraw);
@@ -301,7 +301,7 @@ static void gaelco_stop(void *chip)
  * Generic get_info
  **************************************************************************/
 
-static void gaelco_gae1_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( gaelco_gae1 )
 {
 	switch (state)
 	{
@@ -310,16 +310,16 @@ static void gaelco_gae1_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void gaelco_gae1_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( gaelco_gae1 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = gaelco_gae1_set_info;	break;
-		case SNDINFO_PTR_START:							info->start = gaelco_gae1_start;		break;
-		case SNDINFO_PTR_STOP:							info->stop = gaelco_stop;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( gaelco_gae1 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gaelco_gae1 );		break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( gaelco );				break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
@@ -337,7 +337,7 @@ void gaelco_gae1_get_info(void *token, UINT32 state, sndinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void gaelco_cg1v_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( gaelco_cg1v )
 {
 	switch (state)
 	{
@@ -346,16 +346,16 @@ static void gaelco_cg1v_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void gaelco_cg1v_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( gaelco_cg1v )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = gaelco_cg1v_set_info;	break;
-		case SNDINFO_PTR_START:							info->start = gaelco_cg1v_start;		break;
-		case SNDINFO_PTR_STOP:							info->stop = gaelco_stop;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( gaelco_cg1v );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gaelco_cg1v );		break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( gaelco );				break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

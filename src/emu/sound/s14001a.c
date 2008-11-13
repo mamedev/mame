@@ -545,7 +545,7 @@ static void s14001a_pcm_update(void *param, stream_sample_t **inputs, stream_sam
 	}
 }
 
-static void *s14001a_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( s14001a )
 {
 	S14001AChip *chip;
 	int i;
@@ -570,7 +570,7 @@ static void *s14001a_start(const char *tag, int sndindex, int clock, const void 
 	return chip;
 }
 
-static void s14001a_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( s14001a )
 {
 	switch (state)
 	{
@@ -617,13 +617,13 @@ void s14001a_set_volume(int volume)
 	chip->VSU1000_amp = volume;
 }
 
-void s14001a_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( s14001a )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:					info->set_info = s14001a_set_info;	break;
-		case SNDINFO_PTR_START:						info->start = s14001a_start;		break;
+		case SNDINFO_PTR_SET_INFO:					info->set_info = SND_SET_INFO_NAME( s14001a );	break;
+		case SNDINFO_PTR_START:						info->start = SND_START_NAME( s14001a );		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:						info->s = "S14001A";		break;

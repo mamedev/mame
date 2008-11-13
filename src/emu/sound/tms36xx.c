@@ -485,7 +485,7 @@ void tms3617_enable_w(int chip, int enable)
 	tms3617_enable(tms, enable);
 }
 
-static void *tms36xx_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( tms36xx )
 {
 	int j;
 	struct TMS36XX *tms;
@@ -528,7 +528,7 @@ static void *tms36xx_start(const char *tag, int sndindex, int clock, const void 
  * Generic get_info
  **************************************************************************/
 
-static void tms36xx_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( tms36xx )
 {
 	switch (state)
 	{
@@ -537,15 +537,15 @@ static void tms36xx_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void tms36xx_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( tms36xx )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = tms36xx_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = tms36xx_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( tms36xx );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms36xx );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

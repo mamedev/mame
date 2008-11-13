@@ -2387,7 +2387,7 @@ static void state_save_register(struct SN76477 *sn)
  *
  *****************************************************************************/
 
-static void *sn76477_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( sn76477 )
 {
 	struct SN76477 *sn;
 	sn76477_interface *intf;
@@ -2462,7 +2462,7 @@ static void *sn76477_start(const char *tag, int sndindex, int clock, const void 
 }
 
 
-static void sn76477_stop(void *token)
+static SND_STOP( sn76477 )
 {
 	struct SN76477 *sn = (struct SN76477 *)token;
 
@@ -2471,12 +2471,12 @@ static void sn76477_stop(void *token)
 }
 
 
-void sn76477_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( sn76477 )
 {
 	switch (state)
 	{
-	case SNDINFO_PTR_START:			info->start = sn76477_start; break;
-	case SNDINFO_PTR_STOP:			info->stop = sn76477_stop; break;
+	case SNDINFO_PTR_START:			info->start = SND_START_NAME( sn76477 ); break;
+	case SNDINFO_PTR_STOP:			info->stop = SND_STOP_NAME( sn76477 ); break;
 	case SNDINFO_STR_NAME:			info->s = "SN76477"; break;
 	case SNDINFO_STR_CORE_FAMILY:	info->s = "Analog"; break;
 	case SNDINFO_STR_CORE_VERSION:	info->s = "2.1"; break;

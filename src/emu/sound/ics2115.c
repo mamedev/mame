@@ -448,7 +448,7 @@ static UINT16 ics2115_reg_r(struct ics2115 *chip, UINT8 reg)
 }
 
 
-static void *ics2115_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ics2115 )
 {
 	struct ics2115 *chip;
 	int i;
@@ -527,9 +527,9 @@ WRITE8_HANDLER( ics2115_w )
 	//  if (ICS2115LOGERROR) logerror("ICS2115: wi %d, %02x (%04x)\n", offset, data, caller_get_pc());
 }
 
-static void ics2115_reset(void *_chip)
+static SND_RESET( ics2115 )
 {
-	struct ics2115 *chip = _chip;
+	struct ics2115 *chip = token;
 	chip->irq_en = 0;
 	chip->irq_pend = 0;
 	memset(chip->voice, 0, sizeof(chip->voice));
@@ -547,7 +547,7 @@ static void ics2115_reset(void *_chip)
  * Generic get_info
  **************************************************************************/
 
-static void ics2115_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ics2115 )
 {
 	switch (state)
 	{
@@ -556,17 +556,17 @@ static void ics2115_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ics2115_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ics2115 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ics2115_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ics2115_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ics2115 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ics2115 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = ics2115_reset;			break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ics2115 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "ICS2115";					break;

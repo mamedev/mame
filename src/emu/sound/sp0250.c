@@ -190,7 +190,7 @@ static void sp0250_update(void *param, stream_sample_t **inputs, stream_sample_t
 }
 
 
-static void *sp0250_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( sp0250 )
 {
 	const struct sp0250_interface *intf = config;
 	struct sp0250 *sp;
@@ -225,7 +225,7 @@ WRITE8_HANDLER( sp0250_w )
  * Generic get_info
  **************************************************************************/
 
-static void sp0250_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( sp0250 )
 {
 	switch (state)
 	{
@@ -234,15 +234,15 @@ static void sp0250_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void sp0250_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( sp0250 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = sp0250_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = sp0250_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sp0250 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sp0250 );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

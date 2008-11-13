@@ -151,7 +151,7 @@ static void K005289_update(void *param, stream_sample_t **inputs, stream_sample_
 		*buffer++ = info->mixer_lookup[*mix++];
 }
 
-static void *k005289_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( k005289 )
 {
 	k005289_sound_channel *voice;
 	struct k005289_info *info;
@@ -253,7 +253,7 @@ WRITE8_HANDLER( k005289_keylatch_B_w )
  * Generic get_info
  **************************************************************************/
 
-static void k005289_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( k005289 )
 {
 	switch (state)
 	{
@@ -262,15 +262,15 @@ static void k005289_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void k005289_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( k005289 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = k005289_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = k005289_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k005289 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k005289 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

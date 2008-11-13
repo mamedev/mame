@@ -57,7 +57,7 @@ static void wave_sound_update(void *param,stream_sample_t **inputs, stream_sampl
 
 
 
-static void *wave_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( wave )
 {
 	const device_config *image = NULL;
 
@@ -74,7 +74,7 @@ static void *wave_start(const char *tag, int sndindex, int clock, const void *co
  * Generic get_info
  **************************************************************************/
 
-static void wave_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( wave )
 {
 	switch (state)
 	{
@@ -83,15 +83,15 @@ static void wave_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void wave_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( wave )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = wave_set_info;			break;
-		case SNDINFO_PTR_START:							info->start = wave_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( wave );			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( wave );				break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

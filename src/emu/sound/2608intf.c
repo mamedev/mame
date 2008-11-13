@@ -118,7 +118,7 @@ static STATE_POSTLOAD( ym2608_intf_postload )
 }
 
 
-static void *ym2608_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym2608 )
 {
 	static const ym2608_interface generic_2608 =
 	{
@@ -168,14 +168,14 @@ static void *ym2608_start(const char *tag, int sndindex, int clock, const void *
 	return NULL;
 }
 
-static void ym2608_stop(void *token)
+static SND_STOP( ym2608 )
 {
 	struct ym2608_info *info = token;
 	ym2608_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
-static void ym2608_reset(void *token)
+static SND_RESET( ym2608 )
 {
 	struct ym2608_info *info = token;
 	ym2608_reset_chip(info->chip);
@@ -293,7 +293,7 @@ WRITE8_HANDLER( ym2608_data_port_1_b_w ){
  * Generic get_info
  **************************************************************************/
 
-static void ym2608_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym2608 )
 {
 	switch (state)
 	{
@@ -302,17 +302,17 @@ static void ym2608_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym2608_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym2608 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym2608_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym2608_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ym2608_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym2608_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2608 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2608 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym2608 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2608 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM2608";						break;

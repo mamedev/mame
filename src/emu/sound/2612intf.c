@@ -87,7 +87,7 @@ static STATE_POSTLOAD( ym2612_intf_postload )
 }
 
 
-static void *ym2612_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym2612 )
 {
 	static const ym2612_interface dummy = { 0 };
 	struct ym2612_info *info;
@@ -118,13 +118,13 @@ static void *ym2612_start(const char *tag, int sndindex, int clock, const void *
 }
 
 
-static void ym2612_stop(void *token)
+static SND_STOP( ym2612 )
 {
 	struct ym2612_info *info = token;
 	ym2612_shutdown(info->chip);
 }
 
-static void ym2612_reset(void *token)
+static SND_RESET( ym2612 )
 {
 	struct ym2612_info *info = token;
 	ym2612_reset_chip(info->chip);
@@ -347,7 +347,7 @@ WRITE8_HANDLER( ym3438_data_port_1_b_w ){
  * Generic get_info
  **************************************************************************/
 
-static void ym2612_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym2612 )
 {
 	switch (state)
 	{
@@ -356,17 +356,17 @@ static void ym2612_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym2612_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym2612 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym2612_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym2612_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ym2612_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym2612_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym2612 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2612 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym2612 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2612 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM2612";						break;
@@ -383,7 +383,7 @@ void ym2612_get_info(void *token, UINT32 state, sndinfo *info)
 
 #if BUILD_YM3438
 
-static void ym3438_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym3438 )
 {
 	switch (state)
 	{
@@ -392,17 +392,17 @@ static void ym3438_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym3438_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym3438 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym3438_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym2612_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ym2612_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym2612_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym3438 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2612 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym2612 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym2612 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM3438";						break;

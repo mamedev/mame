@@ -494,8 +494,9 @@ static STATE_POSTLOAD( VLM5030_restore_state )
 }
 
 
-static void VLM5030_reset(struct vlm5030_info *chip)
+static SND_RESET( VLM5030 )
 {
+	struct vlm5030_info *chip = token;
 	chip->phase = PH_RESET;
 	chip->address = 0;
 	chip->vcu_addr_h = 0;
@@ -556,7 +557,7 @@ void vlm5030_rst (int pin )
 			chip->pin_RST = 1;
 			if( chip->pin_BSY )
 			{
-				VLM5030_reset(chip);
+				SND_RESET_NAME( VLM5030 )(chip);
 			}
 		}
 	}
@@ -631,7 +632,7 @@ if( chip->interp_step != 1)
 
 /* start VLM5030 with sound rom              */
 /* speech_rom == 0 -> use sampling data mode */
-static void *vlm5030_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( vlm5030 )
 {
 	const vlm5030_interface defintrf = { 0 };
 	int emulation_rate;
@@ -648,7 +649,7 @@ static void *vlm5030_start(const char *tag, int sndindex, int clock, const void 
 	chip->pin_RST = chip->pin_ST = chip->pin_VCU= 0;
 	chip->latch_data = 0;
 
-	VLM5030_reset(chip);
+	SND_RESET_NAME( VLM5030 )(chip);
 	chip->phase = PH_IDLE;
 
 	chip->rom = memory_region(Machine, tag);
@@ -691,7 +692,7 @@ static void *vlm5030_start(const char *tag, int sndindex, int clock, const void 
  * Generic get_info
  **************************************************************************/
 
-static void vlm5030_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( vlm5030 )
 {
 	switch (state)
 	{
@@ -700,15 +701,15 @@ static void vlm5030_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void vlm5030_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( vlm5030 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = vlm5030_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = vlm5030_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( vlm5030 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( vlm5030 );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

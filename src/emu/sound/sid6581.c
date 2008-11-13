@@ -51,7 +51,7 @@ static void *sid_start(const char *tag, int sndindex, int clock, const void *con
 
 
 
-static void sid_reset(void *token)
+static SND_RESET( sid )
 {
 	SID6581 *sid = (SID6581 *) token;
 	sidEmuReset(sid);
@@ -59,14 +59,14 @@ static void sid_reset(void *token)
 
 
 
-static void *sid6581_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( sid6581 )
 {
 	return sid_start(tag, sndindex, clock, config, MOS6581);
 }
 
 
 
-static void *sid8580_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( sid8580 )
 {
 	return sid_start(tag, sndindex, clock, config, MOS8580);
 }
@@ -99,7 +99,7 @@ WRITE8_HANDLER ( sid6581_1_port_w )
  * Generic get_info
  **************************************************************************/
 
-static void sid6581_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( sid6581 )
 {
 	switch (state)
 	{
@@ -108,17 +108,17 @@ static void sid6581_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void sid6581_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( sid6581 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = sid6581_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = sid6581_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sid6581 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sid6581 );			break;
 		case SNDINFO_PTR_STOP:							info->stop = NULL;						break;
-		case SNDINFO_PTR_RESET:							info->reset = sid_reset;				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( sid );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "SID6581";					break;
@@ -130,16 +130,16 @@ void sid6581_get_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void sid8580_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( sid8580 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_START:							info->start = sid8580_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sid8580 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "SID8580";					break;
-		default:										sid6581_get_info(token, state, info);	break;
+		default:										SND_GET_INFO_CALL(sid6581);	break;
 	}
 }
 

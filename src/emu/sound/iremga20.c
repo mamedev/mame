@@ -206,9 +206,9 @@ READ16_HANDLER( irem_ga20_r )
 	return 0;
 }
 
-static void iremga20_reset( void *_chip )
+static SND_RESET( iremga20 )
 {
-	struct IremGA20_chip_def *chip = _chip;
+	struct IremGA20_chip_def *chip = token;
 	int i;
 
 	for( i = 0; i < 4; i++ ) {
@@ -226,7 +226,7 @@ static void iremga20_reset( void *_chip )
 }
 
 
-static void *iremga20_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( iremga20 )
 {
 	struct IremGA20_chip_def *chip;
 	int i;
@@ -238,7 +238,7 @@ static void *iremga20_start(const char *tag, int sndindex, int clock, const void
 	chip->rom = memory_region(Machine, tag);
 	chip->rom_size = memory_region_length(Machine, tag);
 
-	iremga20_reset(chip);
+	SND_RESET_NAME( iremga20 )(chip);
 
 	for ( i = 0; i < 0x40; i++ )
 		chip->regs[i] = 0;
@@ -271,7 +271,7 @@ static void *iremga20_start(const char *tag, int sndindex, int clock, const void
  * Generic get_info
  **************************************************************************/
 
-static void iremga20_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( iremga20 )
 {
 	switch (state)
 	{
@@ -280,17 +280,17 @@ static void iremga20_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void iremga20_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( iremga20 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = iremga20_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = iremga20_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( iremga20 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( iremga20 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = iremga20_reset;			break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( iremga20 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "Irem GA20";					break;

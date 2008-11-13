@@ -127,7 +127,7 @@ static void k051649_update(void *param, stream_sample_t **inputs, stream_sample_
 		*buffer++ = info->mixer_lookup[*mix++];
 }
 
-static void *k051649_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( k051649 )
 {
 	struct k051649_info *info;
 
@@ -149,9 +149,9 @@ static void *k051649_start(const char *tag, int sndindex, int clock, const void 
 	return info;
 }
 
-static void k051649_reset(void *chip)
+static SND_RESET( k051649 )
 {
-	struct k051649_info *info = chip;
+	struct k051649_info *info = token;
 	k051649_sound_channel *voice = info->channel_list;
 	int i;
 
@@ -223,7 +223,7 @@ WRITE8_HANDLER( k051649_keyonoff_w )
  * Generic get_info
  **************************************************************************/
 
-static void k051649_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( k051649 )
 {
 	switch (state)
 	{
@@ -232,17 +232,17 @@ static void k051649_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void k051649_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( k051649 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = k051649_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = k051649_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( k051649 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( k051649 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = k051649_reset;			break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( k051649 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "K051649";					break;

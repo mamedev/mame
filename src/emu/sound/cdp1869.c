@@ -103,7 +103,7 @@ static void cdp1869_update(void *param, stream_sample_t **inputs, stream_sample_
  *
  *************************************/
 
-static void *cdp1869_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( cdp1869 )
 {
 	struct CDP1869 *info;
 
@@ -172,7 +172,7 @@ void cdp1869_set_wnoff(int which, int value)
  * Generic get_info
  **************************************************************************/
 
-static void cdp1869_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( cdp1869 )
 {
 	switch (state)
 	{
@@ -180,15 +180,15 @@ static void cdp1869_set_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
-void cdp1869_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( cdp1869 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = cdp1869_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = cdp1869_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( cdp1869 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( cdp1869 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

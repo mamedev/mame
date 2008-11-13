@@ -36,7 +36,7 @@ static void speaker_sound_update(void *param,stream_sample_t **inputs, stream_sa
 
 
 
-static void *speaker_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( speaker )
 {
 	struct speaker *sp = auto_malloc(sizeof(*sp));
 
@@ -74,7 +74,7 @@ void speaker_level_w(int which, int new_level)
  * Generic get_info
  **************************************************************************/
 
-static void speaker_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( speaker )
 {
 	switch (state)
 	{
@@ -83,15 +83,15 @@ static void speaker_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void speaker_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( speaker )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = speaker_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = speaker_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( speaker );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( speaker );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

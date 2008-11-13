@@ -79,7 +79,7 @@ static void _stream_update_3812(void * param, int interval)
 }
 
 
-static void *ym3812_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym3812 )
 {
 	static const ym3812_interface dummy = { 0 };
 	struct ym3812_info *info;
@@ -108,13 +108,13 @@ static void *ym3812_start(const char *tag, int sndindex, int clock, const void *
 	return info;
 }
 
-static void ym3812_stop(void *token)
+static SND_STOP( ym3812 )
 {
 	struct ym3812_info *info = token;
 	ym3812_shutdown(info->chip);
 }
 
-static void ym3812_reset(void *token)
+static SND_RESET( ym3812 )
 {
 	struct ym3812_info *info = token;
 	ym3812_reset_chip(info->chip);
@@ -159,7 +159,7 @@ READ8_HANDLER( ym3812_read_port_1_r ) {
  * Generic get_info
  **************************************************************************/
 
-static void ym3812_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym3812 )
 {
 	switch (state)
 	{
@@ -168,17 +168,17 @@ static void ym3812_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym3812_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym3812 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym3812_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym3812_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ym3812_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym3812_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym3812 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym3812 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym3812 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym3812 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM3812";						break;
@@ -248,7 +248,7 @@ static void _stream_update_3526(void *param, int interval)
 }
 
 
-static void *ym3526_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym3526 )
 {
 	static const ym3526_interface dummy = { 0 };
 	struct ym3526_info *info;
@@ -276,13 +276,13 @@ static void *ym3526_start(const char *tag, int sndindex, int clock, const void *
 	return info;
 }
 
-static void ym3526_stop(void *token)
+static SND_STOP( ym3526 )
 {
 	struct ym3526_info *info = token;
 	ym3526_shutdown(info->chip);
 }
 
-static void ym3526_reset(void *token)
+static SND_RESET( ym3526 )
 {
 	struct ym3526_info *info = token;
 	ym3526_reset_chip(info->chip);
@@ -327,7 +327,7 @@ READ8_HANDLER( ym3526_read_port_1_r ) {
  * Generic get_info
  **************************************************************************/
 
-static void ym3526_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ym3526 )
 {
 	switch (state)
 	{
@@ -336,17 +336,17 @@ static void ym3526_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ym3526_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym3526 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ym3526_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ym3526_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ym3526_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ym3526_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ym3526 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym3526 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ym3526 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ym3526 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YM3526";						break;
@@ -443,7 +443,7 @@ static void _stream_update_8950(void *param, int interval)
 }
 
 
-static void *y8950_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( y8950 )
 {
 	static const y8950_interface dummy = { 0 };
 	struct y8950_info *info;
@@ -482,13 +482,13 @@ static void *y8950_start(const char *tag, int sndindex, int clock, const void *c
 	return info;
 }
 
-static void y8950_stop(void *token)
+static SND_STOP( y8950 )
 {
 	struct y8950_info *info = token;
 	y8950_shutdown(info->chip);
 }
 
-static void y8950_reset(void *token)
+static SND_RESET( y8950 )
 {
 	struct y8950_info *info = token;
 	y8950_reset_chip(info->chip);
@@ -533,7 +533,7 @@ READ8_HANDLER( y8950_read_port_1_r ) {
  * Generic get_info
  **************************************************************************/
 
-static void y8950_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( y8950 )
 {
 	switch (state)
 	{
@@ -542,17 +542,17 @@ static void y8950_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void y8950_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( y8950 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = y8950_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = y8950_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = y8950_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = y8950_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( y8950 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( y8950 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( y8950 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( y8950 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "Y8950";						break;

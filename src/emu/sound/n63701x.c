@@ -100,7 +100,7 @@ static void namco_63701x_update(void *param, stream_sample_t **inputs, stream_sa
 }
 
 
-static void *namco_63701x_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( namco_63701x )
 {
 	struct namco_63701x *chip;
 
@@ -160,7 +160,7 @@ void namco_63701x_write(int offset, int data)
  * Generic get_info
  **************************************************************************/
 
-static void namco_63701x_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( namco_63701x )
 {
 	switch (state)
 	{
@@ -169,15 +169,15 @@ static void namco_63701x_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void namco_63701x_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( namco_63701x )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = namco_63701x_set_info;	break;
-		case SNDINFO_PTR_START:							info->start = namco_63701x_start;		break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_63701x );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco_63701x );		break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

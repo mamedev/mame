@@ -91,7 +91,7 @@ static void dmadac_update(void *param, stream_sample_t **inputs, stream_sample_t
  *
  *************************************/
 
-static void *dmadac_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( dmadac )
 {
 	struct dmadac_channel_data *info;
 
@@ -235,7 +235,7 @@ void dmadac_set_volume(UINT8 first_channel, UINT8 num_channels, UINT16 volume)
  * Generic get_info
  **************************************************************************/
 
-static void dmadac_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( dmadac )
 {
 	switch (state)
 	{
@@ -244,15 +244,15 @@ static void dmadac_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void dmadac_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( dmadac )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = dmadac_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = dmadac_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( dmadac );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( dmadac );				break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

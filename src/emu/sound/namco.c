@@ -355,7 +355,7 @@ static void namco_update_stereo(void *param, stream_sample_t **inputs, stream_sa
 }
 
 
-static void *namco_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( namco )
 {
 	sound_channel *voice;
 	const namco_interface *intf = config;
@@ -806,7 +806,7 @@ WRITE8_HANDLER( _20pacgal_wavedata_w )
  * Generic get_info
  **************************************************************************/
 
-static void namco_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( namco )
 {
 	switch (state)
 	{
@@ -815,15 +815,15 @@ static void namco_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void namco_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( namco )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = namco_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = namco_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 
@@ -840,7 +840,7 @@ void namco_get_info(void *token, UINT32 state, sndinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void namco_15xx_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( namco_15xx )
 {
 	switch (state)
 	{
@@ -849,15 +849,15 @@ static void namco_15xx_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void namco_15xx_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( namco_15xx )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = namco_15xx_set_info;	break;
-		case SNDINFO_PTR_START:							info->start = namco_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_15xx );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 
@@ -874,7 +874,7 @@ void namco_15xx_get_info(void *token, UINT32 state, sndinfo *info)
  * Generic get_info
  **************************************************************************/
 
-static void namco_cus30_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( namco_cus30 )
 {
 	switch (state)
 	{
@@ -883,15 +883,15 @@ static void namco_cus30_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void namco_cus30_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( namco_cus30 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = namco_cus30_set_info;	break;
-		case SNDINFO_PTR_START:							info->start = namco_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( namco_cus30 );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( namco );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

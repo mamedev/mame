@@ -67,7 +67,7 @@ static void _stream_update(void *param, int interval)
 }
 
 
-static void *ymf262_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ymf262 )
 {
 	static const ymf262_interface dummy = { 0 };
 	struct ymf262_info *info;
@@ -96,14 +96,14 @@ static void *ymf262_start(const char *tag, int sndindex, int clock, const void *
 	return info;
 }
 
-static void ymf262_stop(void *token)
+static SND_STOP( ymf262 )
 {
 	struct ymf262_info *info = token;
 	ymf262_shutdown(info->chip);
 }
 
 /* reset */
-static void ymf262_reset(void *token)
+static SND_RESET( ymf262 )
 {
 	struct ymf262_info *info = token;
 	ymf262_reset_chip(info->chip);
@@ -158,7 +158,7 @@ WRITE8_HANDLER( ymf262_data_b_1_w ) {
  * Generic get_info
  **************************************************************************/
 
-static void ymf262_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ymf262 )
 {
 	switch (state)
 	{
@@ -167,17 +167,17 @@ static void ymf262_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ymf262_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ymf262 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ymf262_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ymf262_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ymf262_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ymf262_reset;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf262 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf262 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ymf262 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ymf262 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YMF262";						break;

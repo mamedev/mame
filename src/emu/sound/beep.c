@@ -81,7 +81,7 @@ static void beep_sound_update(void *param,stream_sample_t **inputs, stream_sampl
  *
  *************************************/
 
-static void *beep_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( beep )
 {
 	struct beep_sound *pBeep;
 
@@ -166,7 +166,7 @@ void beep_set_volume(int num, int volume)
  * Generic get_info
  **************************************************************************/
 
-static void beep_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( beep )
 {
 	switch (state)
 	{
@@ -175,15 +175,15 @@ static void beep_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void beep_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( beep )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = beep_set_info;			break;
-		case SNDINFO_PTR_START:							info->start = beep_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( beep );			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( beep );				break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 

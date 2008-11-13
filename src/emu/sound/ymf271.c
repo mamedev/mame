@@ -1742,7 +1742,7 @@ static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine
 	init_state(chip);
 }
 
-static void *ymf271_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ymf271 )
 {
 	static const ymf271_interface defintrf = { 0 };
 	const ymf271_interface *intf;
@@ -1797,7 +1797,7 @@ WRITE8_HANDLER( ymf271_1_w )
 	ymf271_w(1, offset, data);
 }
 
-static void ymf271_reset(void *token)
+static SND_RESET( ymf271 )
 {
 	int i;
 	YMF271Chip *chip = (YMF271Chip*)token;
@@ -1813,7 +1813,7 @@ static void ymf271_reset(void *token)
  * Generic get_info
  **************************************************************************/
 
-static void ymf271_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ymf271 )
 {
 	switch (state)
 	{
@@ -1822,17 +1822,17 @@ static void ymf271_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ymf271_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ymf271 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ymf271_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ymf271_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf271 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf271 );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = ymf271_reset;				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ymf271 );				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "YMF271";						break;

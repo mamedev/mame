@@ -192,7 +192,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 
 
 
-static void *x1_010_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( x1_010 )
 {
 	int i;
 	const x1_010_interface *intf = config;
@@ -289,7 +289,7 @@ WRITE16_HANDLER( seta_sound_word_w )
  * Generic get_info
  **************************************************************************/
 
-static void x1_010_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( x1_010 )
 {
 	switch (state)
 	{
@@ -298,15 +298,15 @@ static void x1_010_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void x1_010_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( x1_010 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = x1_010_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = x1_010_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( x1_010 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( x1_010 );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

@@ -64,118 +64,118 @@ struct _sndintrf_data
     EXTERNAL PROTOTYPES
 ***************************************************************************/
 
-static void dummy_sound_get_info(void *token, UINT32 state, sndinfo *info);
-void custom_get_info(void *token, UINT32 state, sndinfo *info);
-void samples_get_info(void *token, UINT32 state, sndinfo *info);
-void dac_get_info(void *token, UINT32 state, sndinfo *info);
-void dmadac_get_info(void *token, UINT32 state, sndinfo *info);
-void discrete_get_info(void *token, UINT32 state, sndinfo *info);
-void ay8910_get_info(void *token, UINT32 state, sndinfo *info);
-void ay8912_get_info(void *token, UINT32 state, sndinfo *info);
-void ay8913_get_info(void *token, UINT32 state, sndinfo *info);
-void ay8930_get_info(void *token, UINT32 state, sndinfo *info);
-void ym2149_get_info(void *token, UINT32 state, sndinfo *info);
-void ym3439_get_info(void *token, UINT32 state, sndinfo *info);
-void ymz284_get_info(void *token, UINT32 state, sndinfo *info);
-void ymz294_get_info(void *token, UINT32 state, sndinfo *info);
-void ym2203_get_info(void *token, UINT32 state, sndinfo *info);
-void ym2151_get_info(void *token, UINT32 state, sndinfo *info);
-void ym2608_get_info(void *token, UINT32 state, sndinfo *info);
-void ym2610_get_info(void *token, UINT32 state, sndinfo *info);
-void ym2610b_get_info(void *token, UINT32 state, sndinfo *info);
-void ym2612_get_info(void *token, UINT32 state, sndinfo *info);
-void ym3438_get_info(void *token, UINT32 state, sndinfo *info);
-void ym2413_get_info(void *token, UINT32 state, sndinfo *info);
-void ym3812_get_info(void *token, UINT32 state, sndinfo *info);
-void ym3526_get_info(void *token, UINT32 state, sndinfo *info);
-void ymz280b_get_info(void *token, UINT32 state, sndinfo *info);
-void y8950_get_info(void *token, UINT32 state, sndinfo *info);
-void sn76477_get_info(void *token, UINT32 state, sndinfo *info);
-void sn76489_get_info(void *token, UINT32 state, sndinfo *info);
-void sn76489a_get_info(void *token, UINT32 state, sndinfo *info);
-void sn76494_get_info(void *token, UINT32 state, sndinfo *info);
-void sn76496_get_info(void *token, UINT32 state, sndinfo *info);
-void gamegear_get_info(void *token, UINT32 state, sndinfo *info);
-void smsiii_get_info(void *token, UINT32 state, sndinfo *info);
-void pokey_get_info(void *token, UINT32 state, sndinfo *info);
-void nesapu_get_info(void *token, UINT32 state, sndinfo *info);
-void astrocade_get_info(void *token, UINT32 state, sndinfo *info);
-void namco_get_info(void *token, UINT32 state, sndinfo *info);
-void namco_15xx_get_info(void *token, UINT32 state, sndinfo *info);
-void namco_cus30_get_info(void *token, UINT32 state, sndinfo *info);
-void namco_52xx_get_info(void *token, UINT32 state, sndinfo *info);
-void namco_63701x_get_info(void *token, UINT32 state, sndinfo *info);
-void snkwave_get_info(void *token, UINT32 state, sndinfo *info);
-void tms36xx_get_info(void *token, UINT32 state, sndinfo *info);
-void tms3615_get_info(void *token, UINT32 state, sndinfo *info);
-void tms5100_get_info(void *token, UINT32 state, sndinfo *info);
-void tms5110_get_info(void *token, UINT32 state, sndinfo *info);
-void tms5110a_get_info(void *token, UINT32 state, sndinfo *info);
-void cd2801_get_info(void *token, UINT32 state, sndinfo *info);
-void tmc0281_get_info(void *token, UINT32 state, sndinfo *info);
-void cd2802_get_info(void *token, UINT32 state, sndinfo *info);
-void m58817_get_info(void *token, UINT32 state, sndinfo *info);
-void tmc0285_get_info(void *token, UINT32 state, sndinfo *info);
-void tms5200_get_info(void *token, UINT32 state, sndinfo *info);
-void tms5220_get_info(void *token, UINT32 state, sndinfo *info);
-void vlm5030_get_info(void *token, UINT32 state, sndinfo *info);
-void adpcm_get_info(void *token, UINT32 state, sndinfo *info);
-void okim6295_get_info(void *token, UINT32 state, sndinfo *info);
-void msm5205_get_info(void *token, UINT32 state, sndinfo *info);
-void msm5232_get_info(void *token, UINT32 state, sndinfo *info);
-void upd7759_get_info(void *token, UINT32 state, sndinfo *info);
-void hc55516_get_info(void *token, UINT32 state, sndinfo *info);
-void mc3417_get_info(void *token, UINT32 state, sndinfo *info);
-void mc3418_get_info(void *token, UINT32 state, sndinfo *info);
-void k005289_get_info(void *token, UINT32 state, sndinfo *info);
-void k007232_get_info(void *token, UINT32 state, sndinfo *info);
-void k051649_get_info(void *token, UINT32 state, sndinfo *info);
-void k053260_get_info(void *token, UINT32 state, sndinfo *info);
-void k054539_get_info(void *token, UINT32 state, sndinfo *info);
-void segapcm_get_info(void *token, UINT32 state, sndinfo *info);
-void rf5c68_get_info(void *token, UINT32 state, sndinfo *info);
-void cem3394_get_info(void *token, UINT32 state, sndinfo *info);
-void c140_get_info(void *token, UINT32 state, sndinfo *info);
-void qsound_get_info(void *token, UINT32 state, sndinfo *info);
-void saa1099_get_info(void *token, UINT32 state, sndinfo *info);
-void iremga20_get_info(void *token, UINT32 state, sndinfo *info);
-void es5503_get_info(void *token, UINT32 state, sndinfo *info);
-void es5505_get_info(void *token, UINT32 state, sndinfo *info);
-void es5506_get_info(void *token, UINT32 state, sndinfo *info);
-void bsmt2000_get_info(void *token, UINT32 state, sndinfo *info);
-void ymf262_get_info(void *token, UINT32 state, sndinfo *info);
-void ymf278b_get_info(void *token, UINT32 state, sndinfo *info);
-void gaelco_cg1v_get_info(void *token, UINT32 state, sndinfo *info);
-void gaelco_gae1_get_info(void *token, UINT32 state, sndinfo *info);
-void x1_010_get_info(void *token, UINT32 state, sndinfo *info);
-void multipcm_get_info(void *token, UINT32 state, sndinfo *info);
-void c6280_get_info(void *token, UINT32 state, sndinfo *info);
-void tia_get_info(void *token, UINT32 state, sndinfo *info);
-void sp0250_get_info(void *token, UINT32 state, sndinfo *info);
-void scsp_get_info(void *token, UINT32 state, sndinfo *info);
-void psxspu_get_info(void *token, UINT32 state, sndinfo *info);
-void ymf271_get_info(void *token, UINT32 state, sndinfo *info);
-void cdda_get_info(void *token, UINT32 state, sndinfo *info);
-void ics2115_get_info(void *token, UINT32 state, sndinfo *info);
-void st0016_get_info(void *token, UINT32 state, sndinfo *info);
-void nile_get_info(void *token, UINT32 state, sndinfo *info);
-void c352_get_info(void *token, UINT32 state, sndinfo *info);
-void vrender0_get_info(void *token, UINT32 state, sndinfo *info);
-void votrax_get_info(void *token, UINT32 state, sndinfo *info);
-void es8712_get_info(void *token, UINT32 state, sndinfo *info);
-void rf5c400_get_info(void *token, UINT32 state, sndinfo *info);
-void speaker_get_info(void *token, UINT32 state, sndinfo *info);
-void cdp1869_get_info(void *token, UINT32 state, sndinfo *info);
-void beep_get_info(void *token, UINT32 state, sndinfo *info);
-void wave_get_info(void *token, UINT32 state, sndinfo *info);
-void sid6581_get_info(void *token, UINT32 state, sndinfo *info);
-void sid8580_get_info(void *token, UINT32 state, sndinfo *info);
-void sp0256_get_info(void *token, UINT32 state, sndinfo *info);
-void s14001a_get_info(void *token, UINT32 state, sndinfo *info);
-void aica_get_info(void *token, UINT32 state, sndinfo *info);
+static SND_GET_INFO( dummy_sound );
+SND_GET_INFO( custom );
+SND_GET_INFO( samples );
+SND_GET_INFO( dac );
+SND_GET_INFO( dmadac );
+SND_GET_INFO( discrete );
+SND_GET_INFO( ay8910 );
+SND_GET_INFO( ay8912 );
+SND_GET_INFO( ay8913 );
+SND_GET_INFO( ay8930 );
+SND_GET_INFO( ym2149 );
+SND_GET_INFO( ym3439 );
+SND_GET_INFO( ymz284 );
+SND_GET_INFO( ymz294 );
+SND_GET_INFO( ym2203 );
+SND_GET_INFO( ym2151 );
+SND_GET_INFO( ym2608 );
+SND_GET_INFO( ym2610 );
+SND_GET_INFO( ym2610b );
+SND_GET_INFO( ym2612 );
+SND_GET_INFO( ym3438 );
+SND_GET_INFO( ym2413 );
+SND_GET_INFO( ym3812 );
+SND_GET_INFO( ym3526 );
+SND_GET_INFO( ymz280b );
+SND_GET_INFO( y8950 );
+SND_GET_INFO( sn76477 );
+SND_GET_INFO( sn76489 );
+SND_GET_INFO( sn76489a );
+SND_GET_INFO( sn76494 );
+SND_GET_INFO( sn76496 );
+SND_GET_INFO( gamegear );
+SND_GET_INFO( smsiii );
+SND_GET_INFO( pokey );
+SND_GET_INFO( nesapu );
+SND_GET_INFO( astrocade );
+SND_GET_INFO( namco );
+SND_GET_INFO( namco_15xx );
+SND_GET_INFO( namco_cus30 );
+SND_GET_INFO( namco_52xx );
+SND_GET_INFO( namco_63701x );
+SND_GET_INFO( snkwave );
+SND_GET_INFO( tms36xx );
+SND_GET_INFO( tms3615 );
+SND_GET_INFO( tms5100 );
+SND_GET_INFO( tms5110 );
+SND_GET_INFO( tms5110a );
+SND_GET_INFO( cd2801 );
+SND_GET_INFO( tmc0281 );
+SND_GET_INFO( cd2802 );
+SND_GET_INFO( m58817 );
+SND_GET_INFO( tmc0285 );
+SND_GET_INFO( tms5200 );
+SND_GET_INFO( tms5220 );
+SND_GET_INFO( vlm5030 );
+SND_GET_INFO( adpcm );
+SND_GET_INFO( okim6295 );
+SND_GET_INFO( msm5205 );
+SND_GET_INFO( msm5232 );
+SND_GET_INFO( upd7759 );
+SND_GET_INFO( hc55516 );
+SND_GET_INFO( mc3417 );
+SND_GET_INFO( mc3418 );
+SND_GET_INFO( k005289 );
+SND_GET_INFO( k007232 );
+SND_GET_INFO( k051649 );
+SND_GET_INFO( k053260 );
+SND_GET_INFO( k054539 );
+SND_GET_INFO( segapcm );
+SND_GET_INFO( rf5c68 );
+SND_GET_INFO( cem3394 );
+SND_GET_INFO( c140 );
+SND_GET_INFO( qsound );
+SND_GET_INFO( saa1099 );
+SND_GET_INFO( iremga20 );
+SND_GET_INFO( es5503 );
+SND_GET_INFO( es5505 );
+SND_GET_INFO( es5506 );
+SND_GET_INFO( bsmt2000 );
+SND_GET_INFO( ymf262 );
+SND_GET_INFO( ymf278b );
+SND_GET_INFO( gaelco_cg1v );
+SND_GET_INFO( gaelco_gae1 );
+SND_GET_INFO( x1_010 );
+SND_GET_INFO( multipcm );
+SND_GET_INFO( c6280 );
+SND_GET_INFO( tia );
+SND_GET_INFO( sp0250 );
+SND_GET_INFO( scsp );
+SND_GET_INFO( psxspu );
+SND_GET_INFO( ymf271 );
+SND_GET_INFO( cdda );
+SND_GET_INFO( ics2115 );
+SND_GET_INFO( st0016 );
+SND_GET_INFO( nile );
+SND_GET_INFO( c352 );
+SND_GET_INFO( vrender0 );
+SND_GET_INFO( votrax );
+SND_GET_INFO( es8712 );
+SND_GET_INFO( rf5c400 );
+SND_GET_INFO( speaker );
+SND_GET_INFO( cdp1869 );
+SND_GET_INFO( beep );
+SND_GET_INFO( wave );
+SND_GET_INFO( sid6581 );
+SND_GET_INFO( sid8580 );
+SND_GET_INFO( sp0256 );
+SND_GET_INFO( s14001a );
+SND_GET_INFO( aica );
 
-void filter_volume_get_info(void *token, UINT32 state, sndinfo *info);
-void filter_rc_get_info(void *token, UINT32 state, sndinfo *info);
+SND_GET_INFO( filter_volume );
+SND_GET_INFO( filter_rc );
 
 
 
@@ -191,303 +191,303 @@ static const struct
 	void		(*get_info)(void *token, UINT32 state, sndinfo *info);
 } sndintrf_map[] =
 {
-	{ SOUND_DUMMY, dummy_sound_get_info },
+	{ SOUND_DUMMY, SND_GET_INFO_NAME( dummy_sound ) },
 #if (HAS_CUSTOM)
-	{ SOUND_CUSTOM, custom_get_info },
+	{ SOUND_CUSTOM, SND_GET_INFO_NAME( custom ) },
 #endif
 #if (HAS_SAMPLES)
-	{ SOUND_SAMPLES, samples_get_info },
+	{ SOUND_SAMPLES, SND_GET_INFO_NAME( samples ) },
 #endif
 #if (HAS_DAC)
-	{ SOUND_DAC, dac_get_info },
+	{ SOUND_DAC, SND_GET_INFO_NAME( dac ) },
 #endif
 #if (HAS_DMADAC)
-	{ SOUND_DMADAC, dmadac_get_info },
+	{ SOUND_DMADAC, SND_GET_INFO_NAME( dmadac ) },
 #endif
 #if (HAS_DISCRETE)
-	{ SOUND_DISCRETE, discrete_get_info },
+	{ SOUND_DISCRETE, SND_GET_INFO_NAME( discrete ) },
 #endif
 #if (HAS_AY8910)
-	{ SOUND_AY8910, ay8910_get_info },
-	{ SOUND_AY8912, ay8912_get_info },
-	{ SOUND_AY8913, ay8913_get_info },
-	{ SOUND_AY8930, ay8930_get_info },
-	{ SOUND_YM2149, ym2149_get_info },
-	{ SOUND_YM3439, ym3439_get_info },
-	{ SOUND_YMZ284, ymz284_get_info },
-	{ SOUND_YMZ294, ymz294_get_info },
+	{ SOUND_AY8910, SND_GET_INFO_NAME( ay8910 ) },
+	{ SOUND_AY8912, SND_GET_INFO_NAME( ay8912 ) },
+	{ SOUND_AY8913, SND_GET_INFO_NAME( ay8913 ) },
+	{ SOUND_AY8930, SND_GET_INFO_NAME( ay8930 ) },
+	{ SOUND_YM2149, SND_GET_INFO_NAME( ym2149 ) },
+	{ SOUND_YM3439, SND_GET_INFO_NAME( ym3439 ) },
+	{ SOUND_YMZ284, SND_GET_INFO_NAME( ymz284 ) },
+	{ SOUND_YMZ294, SND_GET_INFO_NAME( ymz294 ) },
 #endif
 #if (HAS_YM2203)
-	{ SOUND_YM2203, ym2203_get_info },
+	{ SOUND_YM2203, SND_GET_INFO_NAME( ym2203 ) },
 #endif
 #if (HAS_YM2151)
-	{ SOUND_YM2151, ym2151_get_info },
+	{ SOUND_YM2151, SND_GET_INFO_NAME( ym2151 ) },
 #endif
 #if (HAS_YM2608)
-	{ SOUND_YM2608, ym2608_get_info },
+	{ SOUND_YM2608, SND_GET_INFO_NAME( ym2608 ) },
 #endif
 #if (HAS_YM2610)
-	{ SOUND_YM2610, ym2610_get_info },
+	{ SOUND_YM2610, SND_GET_INFO_NAME( ym2610 ) },
 #endif
 #if (HAS_YM2610B)
-	{ SOUND_YM2610B, ym2610b_get_info },
+	{ SOUND_YM2610B, SND_GET_INFO_NAME( ym2610b ) },
 #endif
 #if (HAS_YM2612)
-	{ SOUND_YM2612, ym2612_get_info },
+	{ SOUND_YM2612, SND_GET_INFO_NAME( ym2612 ) },
 #endif
 #if (HAS_YM3438)
-	{ SOUND_YM3438, ym3438_get_info },
+	{ SOUND_YM3438, SND_GET_INFO_NAME( ym3438 ) },
 #endif
 #if (HAS_YM2413)
-	{ SOUND_YM2413, ym2413_get_info },
+	{ SOUND_YM2413, SND_GET_INFO_NAME( ym2413 ) },
 #endif
 #if (HAS_YM3812)
-	{ SOUND_YM3812, ym3812_get_info },
+	{ SOUND_YM3812, SND_GET_INFO_NAME( ym3812 ) },
 #endif
 #if (HAS_YM3526)
-	{ SOUND_YM3526, ym3526_get_info },
+	{ SOUND_YM3526, SND_GET_INFO_NAME( ym3526 ) },
 #endif
 #if (HAS_YMZ280B)
-	{ SOUND_YMZ280B, ymz280b_get_info },
+	{ SOUND_YMZ280B, SND_GET_INFO_NAME( ymz280b ) },
 #endif
 #if (HAS_Y8950)
-	{ SOUND_Y8950, y8950_get_info },
+	{ SOUND_Y8950, SND_GET_INFO_NAME( y8950 ) },
 #endif
 #if (HAS_SN76477)
-	{ SOUND_SN76477, sn76477_get_info },
+	{ SOUND_SN76477, SND_GET_INFO_NAME( sn76477 ) },
 #endif
 #if (HAS_SN76496)
-	{ SOUND_SN76489, sn76489_get_info },
-	{ SOUND_SN76489A, sn76489a_get_info },
-	{ SOUND_SN76494, sn76494_get_info },
-	{ SOUND_SN76496, sn76496_get_info },
-	{ SOUND_GAMEGEAR, gamegear_get_info },
-	{ SOUND_SMSIII, smsiii_get_info },
+	{ SOUND_SN76489, SND_GET_INFO_NAME( sn76489 ) },
+	{ SOUND_SN76489A, SND_GET_INFO_NAME( sn76489a ) },
+	{ SOUND_SN76494, SND_GET_INFO_NAME( sn76494 ) },
+	{ SOUND_SN76496, SND_GET_INFO_NAME( sn76496 ) },
+	{ SOUND_GAMEGEAR, SND_GET_INFO_NAME( gamegear ) },
+	{ SOUND_SMSIII, SND_GET_INFO_NAME( smsiii ) },
 #endif
 #if (HAS_POKEY)
-	{ SOUND_POKEY, pokey_get_info },
+	{ SOUND_POKEY, SND_GET_INFO_NAME( pokey ) },
 #endif
 #if (HAS_NES)
-	{ SOUND_NES, nesapu_get_info },
+	{ SOUND_NES, SND_GET_INFO_NAME( nesapu ) },
 #endif
 #if (HAS_ASTROCADE)
-	{ SOUND_ASTROCADE, astrocade_get_info },
+	{ SOUND_ASTROCADE, SND_GET_INFO_NAME( astrocade ) },
 #endif
 #if (HAS_NAMCO)
-	{ SOUND_NAMCO, namco_get_info },
+	{ SOUND_NAMCO, SND_GET_INFO_NAME( namco ) },
 #endif
 #if (HAS_NAMCO_15XX)
-	{ SOUND_NAMCO_15XX, namco_15xx_get_info },
+	{ SOUND_NAMCO_15XX, SND_GET_INFO_NAME( namco_15xx ) },
 #endif
 #if (HAS_NAMCO_CUS30)
-	{ SOUND_NAMCO_CUS30, namco_cus30_get_info },
+	{ SOUND_NAMCO_CUS30, SND_GET_INFO_NAME( namco_cus30 ) },
 #endif
 #if (HAS_NAMCO_52XX)
-	{ SOUND_NAMCO_52XX, namco_52xx_get_info },
+	{ SOUND_NAMCO_52XX, SND_GET_INFO_NAME( namco_52xx ) },
 #endif
 #if (HAS_NAMCO_63701X)
-	{ SOUND_NAMCO_63701X, namco_63701x_get_info },
+	{ SOUND_NAMCO_63701X, SND_GET_INFO_NAME( namco_63701x ) },
 #endif
 #if (HAS_SNKWAVE)
-	{ SOUND_SNKWAVE, snkwave_get_info },
+	{ SOUND_SNKWAVE, SND_GET_INFO_NAME( snkwave ) },
 #endif
 #if (HAS_TMS36XX)
-	{ SOUND_TMS36XX, tms36xx_get_info },
+	{ SOUND_TMS36XX, SND_GET_INFO_NAME( tms36xx ) },
 #endif
 #if (HAS_TMS3615)
-	{ SOUND_TMS3615, tms3615_get_info },
+	{ SOUND_TMS3615, SND_GET_INFO_NAME( tms3615 ) },
 #endif
 #if (HAS_TMS5100)
-	{ SOUND_TMS5100, tms5100_get_info },
+	{ SOUND_TMS5100, SND_GET_INFO_NAME( tms5100 ) },
 #endif
 #if (HAS_TMS5110)
-	{ SOUND_TMS5110, tms5110_get_info },
+	{ SOUND_TMS5110, SND_GET_INFO_NAME( tms5110 ) },
 #endif
 #if (HAS_TMS5110A)
-	{ SOUND_TMS5110A, tms5110a_get_info },
+	{ SOUND_TMS5110A, SND_GET_INFO_NAME( tms5110a ) },
 #endif
 #if (HAS_CD2801)
-	{ SOUND_CD2801, cd2801_get_info },
+	{ SOUND_CD2801, SND_GET_INFO_NAME( cd2801 ) },
 #endif
 #if (HAS_TMC0281)
-	{ SOUND_TMC0281, tmc0281_get_info },
+	{ SOUND_TMC0281, SND_GET_INFO_NAME( tmc0281 ) },
 #endif
 #if (HAS_CD2802)
-	{ SOUND_CD2802, cd2802_get_info },
+	{ SOUND_CD2802, SND_GET_INFO_NAME( cd2802 ) },
 #endif
 #if (HAS_M58817)
-	{ SOUND_M58817, m58817_get_info },
+	{ SOUND_M58817, SND_GET_INFO_NAME( m58817 ) },
 #endif
 #if (HAS_TMC0285)
-	{ SOUND_TMC0285, tmc0285_get_info },
+	{ SOUND_TMC0285, SND_GET_INFO_NAME( tmc0285 ) },
 #endif
 #if (HAS_TMS5200)
-	{ SOUND_TMS5200, tms5200_get_info },
+	{ SOUND_TMS5200, SND_GET_INFO_NAME( tms5200 ) },
 #endif
 #if (HAS_TMS5220)
-	{ SOUND_TMS5220, tms5220_get_info },
+	{ SOUND_TMS5220, SND_GET_INFO_NAME( tms5220 ) },
 #endif
 #if (HAS_VLM5030)
-	{ SOUND_VLM5030, vlm5030_get_info },
+	{ SOUND_VLM5030, SND_GET_INFO_NAME( vlm5030 ) },
 #endif
 #if (HAS_OKIM6295)
-	{ SOUND_OKIM6295, okim6295_get_info },
+	{ SOUND_OKIM6295, SND_GET_INFO_NAME( okim6295 ) },
 #endif
 #if (HAS_MSM5205)
-	{ SOUND_MSM5205, msm5205_get_info },
+	{ SOUND_MSM5205, SND_GET_INFO_NAME( msm5205 ) },
 #endif
 #if (HAS_MSM5232)
-	{ SOUND_MSM5232, msm5232_get_info },
+	{ SOUND_MSM5232, SND_GET_INFO_NAME( msm5232 ) },
 #endif
 #if (HAS_UPD7759)
-	{ SOUND_UPD7759, upd7759_get_info },
+	{ SOUND_UPD7759, SND_GET_INFO_NAME( upd7759 ) },
 #endif
 #if (HAS_HC55516)
-	{ SOUND_HC55516, hc55516_get_info },
-	{ SOUND_MC3417, mc3417_get_info },
-	{ SOUND_MC3418, mc3418_get_info },
+	{ SOUND_HC55516, SND_GET_INFO_NAME( hc55516 ) },
+	{ SOUND_MC3417, SND_GET_INFO_NAME( mc3417 ) },
+	{ SOUND_MC3418, SND_GET_INFO_NAME( mc3418 ) },
 #endif
 #if (HAS_K005289)
-	{ SOUND_K005289, k005289_get_info },
+	{ SOUND_K005289, SND_GET_INFO_NAME( k005289 ) },
 #endif
 #if (HAS_K007232)
-	{ SOUND_K007232, k007232_get_info },
+	{ SOUND_K007232, SND_GET_INFO_NAME( k007232 ) },
 #endif
 #if (HAS_K051649)
-	{ SOUND_K051649, k051649_get_info },
+	{ SOUND_K051649, SND_GET_INFO_NAME( k051649 ) },
 #endif
 #if (HAS_K053260)
-	{ SOUND_K053260, k053260_get_info },
+	{ SOUND_K053260, SND_GET_INFO_NAME( k053260 ) },
 #endif
 #if (HAS_K054539)
-	{ SOUND_K054539, k054539_get_info },
+	{ SOUND_K054539, SND_GET_INFO_NAME( k054539 ) },
 #endif
 #if (HAS_SEGAPCM)
-	{ SOUND_SEGAPCM, segapcm_get_info },
+	{ SOUND_SEGAPCM, SND_GET_INFO_NAME( segapcm ) },
 #endif
 #if (HAS_RF5C68)
-	{ SOUND_RF5C68, rf5c68_get_info },
+	{ SOUND_RF5C68, SND_GET_INFO_NAME( rf5c68 ) },
 #endif
 #if (HAS_CEM3394)
-	{ SOUND_CEM3394, cem3394_get_info },
+	{ SOUND_CEM3394, SND_GET_INFO_NAME( cem3394 ) },
 #endif
 #if (HAS_C140)
-	{ SOUND_C140, c140_get_info },
+	{ SOUND_C140, SND_GET_INFO_NAME( c140 ) },
 #endif
 #if (HAS_QSOUND)
-	{ SOUND_QSOUND, qsound_get_info },
+	{ SOUND_QSOUND, SND_GET_INFO_NAME( qsound ) },
 #endif
 #if (HAS_SAA1099)
-	{ SOUND_SAA1099, saa1099_get_info },
+	{ SOUND_SAA1099, SND_GET_INFO_NAME( saa1099 ) },
 #endif
 #if (HAS_IREMGA20)
-	{ SOUND_IREMGA20, iremga20_get_info },
+	{ SOUND_IREMGA20, SND_GET_INFO_NAME( iremga20 ) },
 #endif
 #if (HAS_ES5503)
-	{ SOUND_ES5503, es5503_get_info },
+	{ SOUND_ES5503, SND_GET_INFO_NAME( es5503 ) },
 #endif
 #if (HAS_ES5505)
-	{ SOUND_ES5505, es5505_get_info },
+	{ SOUND_ES5505, SND_GET_INFO_NAME( es5505 ) },
 #endif
 #if (HAS_ES5506)
-	{ SOUND_ES5506, es5506_get_info },
+	{ SOUND_ES5506, SND_GET_INFO_NAME( es5506 ) },
 #endif
 #if (HAS_BSMT2000)
-	{ SOUND_BSMT2000, bsmt2000_get_info },
+	{ SOUND_BSMT2000, SND_GET_INFO_NAME( bsmt2000 ) },
 #endif
 #if (HAS_YMF262)
-	{ SOUND_YMF262, ymf262_get_info },
+	{ SOUND_YMF262, SND_GET_INFO_NAME( ymf262 ) },
 #endif
 #if (HAS_YMF278B)
-	{ SOUND_YMF278B, ymf278b_get_info },
+	{ SOUND_YMF278B, SND_GET_INFO_NAME( ymf278b ) },
 #endif
 #if (HAS_GAELCO_CG1V)
-	{ SOUND_GAELCO_CG1V, gaelco_cg1v_get_info },
+	{ SOUND_GAELCO_CG1V, SND_GET_INFO_NAME( gaelco_cg1v ) },
 #endif
 #if (HAS_GAELCO_GAE1)
-	{ SOUND_GAELCO_GAE1, gaelco_gae1_get_info },
+	{ SOUND_GAELCO_GAE1, SND_GET_INFO_NAME( gaelco_gae1 ) },
 #endif
 #if (HAS_X1_010)
-	{ SOUND_X1_010, x1_010_get_info },
+	{ SOUND_X1_010, SND_GET_INFO_NAME( x1_010 ) },
 #endif
 #if (HAS_MULTIPCM)
-	{ SOUND_MULTIPCM, multipcm_get_info },
+	{ SOUND_MULTIPCM, SND_GET_INFO_NAME( multipcm ) },
 #endif
 #if (HAS_C6280)
-	{ SOUND_C6280, c6280_get_info },
+	{ SOUND_C6280, SND_GET_INFO_NAME( c6280 ) },
 #endif
 #if (HAS_TIA)
-	{ SOUND_TIA, tia_get_info },
+	{ SOUND_TIA, SND_GET_INFO_NAME( tia ) },
 #endif
 #if (HAS_SP0250)
-	{ SOUND_SP0250, sp0250_get_info },
+	{ SOUND_SP0250, SND_GET_INFO_NAME( sp0250 ) },
 #endif
 #if (HAS_SCSP)
-	{ SOUND_SCSP, scsp_get_info },
+	{ SOUND_SCSP, SND_GET_INFO_NAME( scsp ) },
 #endif
 #if (HAS_PSXSPU)
-	{ SOUND_PSXSPU, psxspu_get_info },
+	{ SOUND_PSXSPU, SND_GET_INFO_NAME( psxspu ) },
 #endif
 #if (HAS_YMF271)
-	{ SOUND_YMF271, ymf271_get_info },
+	{ SOUND_YMF271, SND_GET_INFO_NAME( ymf271 ) },
 #endif
 #if (HAS_CDDA)
-	{ SOUND_CDDA, cdda_get_info },
+	{ SOUND_CDDA, SND_GET_INFO_NAME( cdda ) },
 #endif
 #if (HAS_ICS2115)
-	{ SOUND_ICS2115, ics2115_get_info },
+	{ SOUND_ICS2115, SND_GET_INFO_NAME( ics2115 ) },
 #endif
 #if (HAS_ST0016)
-	{ SOUND_ST0016, st0016_get_info },
+	{ SOUND_ST0016, SND_GET_INFO_NAME( st0016 ) },
 #endif
 #if (HAS_NILE)
-	{ SOUND_NILE, nile_get_info },
+	{ SOUND_NILE, SND_GET_INFO_NAME( nile ) },
 #endif
 #if (HAS_C352)
-	{ SOUND_C352, c352_get_info },
+	{ SOUND_C352, SND_GET_INFO_NAME( c352 ) },
 #endif
 #if (HAS_VRENDER0)
-	{ SOUND_VRENDER0, vrender0_get_info },
+	{ SOUND_VRENDER0, SND_GET_INFO_NAME( vrender0 ) },
 #endif
 #if (HAS_VOTRAX)
-	{ SOUND_VOTRAX, votrax_get_info },
+	{ SOUND_VOTRAX, SND_GET_INFO_NAME( votrax ) },
 #endif
 #if (HAS_ES8712)
-	{ SOUND_ES8712, es8712_get_info },
+	{ SOUND_ES8712, SND_GET_INFO_NAME( es8712 ) },
 #endif
 #if (HAS_RF5C400)
-	{ SOUND_RF5C400, rf5c400_get_info },
+	{ SOUND_RF5C400, SND_GET_INFO_NAME( rf5c400 ) },
 #endif
 #if (HAS_SPEAKER)
-	{ SOUND_SPEAKER, speaker_get_info },
+	{ SOUND_SPEAKER, SND_GET_INFO_NAME( speaker ) },
 #endif
 #if (HAS_CDP1869)
-	{ SOUND_CDP1869, cdp1869_get_info },
+	{ SOUND_CDP1869, SND_GET_INFO_NAME( cdp1869 ) },
 #endif
 #if (HAS_S14001A)
-	{ SOUND_S14001A, s14001a_get_info },
+	{ SOUND_S14001A, SND_GET_INFO_NAME( s14001a ) },
 #endif
 #if (HAS_BEEP)
-	{ SOUND_BEEP, beep_get_info },
+	{ SOUND_BEEP, SND_GET_INFO_NAME( beep ) },
 #endif
 #if (HAS_WAVE)
-	{ SOUND_WAVE, wave_get_info },
+	{ SOUND_WAVE, SND_GET_INFO_NAME( wave ) },
 #endif
 #if (HAS_SID6581)
-	{ SOUND_SID6581, sid6581_get_info },
+	{ SOUND_SID6581, SND_GET_INFO_NAME( sid6581 ) },
 #endif
 #if (HAS_SID8580)
-	{ SOUND_SID8580, sid8580_get_info },
+	{ SOUND_SID8580, SND_GET_INFO_NAME( sid8580 ) },
 #endif
 #if (HAS_SP0256)
-	{ SOUND_SP0256, sp0256_get_info },
+	{ SOUND_SP0256, SND_GET_INFO_NAME( sp0256 ) },
 #endif
 #if (HAS_AICA)
-	{ SOUND_AICA, aica_get_info },
+	{ SOUND_AICA, SND_GET_INFO_NAME( aica ) },
 #endif
 
-	{ SOUND_FILTER_VOLUME, filter_volume_get_info },
-	{ SOUND_FILTER_RC, filter_rc_get_info },
+	{ SOUND_FILTER_VOLUME, SND_GET_INFO_NAME( filter_volume ) },
+	{ SOUND_FILTER_RC, SND_GET_INFO_NAME( filter_rc ) },
 };
 
 
@@ -989,14 +989,14 @@ const char *sndtype_get_info_string(sound_type sndtype, UINT32 state)
     DUMMY INTERFACES
 ***************************************************************************/
 
-static void *dummy_sound_start(const char *tag, int index, int clock, const void *config)
+static SND_START( dummy_sound )
 {
 	logerror("Warning: starting a dummy sound core -- you are missing a hookup in sndintrf.c!\n");
 	return auto_malloc(1);
 }
 
 
-static void dummy_sound_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( dummy_sound )
 {
 	switch (state)
 	{
@@ -1005,15 +1005,15 @@ static void dummy_sound_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-static void dummy_sound_get_info(void *token, UINT32 state, sndinfo *info)
+static SND_GET_INFO( dummy_sound )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = dummy_sound_set_info;	break;
-		case SNDINFO_PTR_START:							info->start = dummy_sound_start;		break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( dummy_sound );	break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( dummy_sound );		break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

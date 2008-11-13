@@ -265,9 +265,9 @@ static void msm5232_gate_update(MSM5232 *chip)
 }
 
 
-static void msm5232_reset(void *_chip)
+static SND_RESET( msm5232 )
 {
-	MSM5232 *chip = _chip;
+	MSM5232 *chip = token;
 	int i;
 
 	for (i=0; i<8; i++)
@@ -315,7 +315,7 @@ static void msm5232_init(MSM5232 *chip, const msm5232_interface *intf, int clock
 		memset(&chip->voi[j],0,sizeof(VOICE));
 		msm5232_init_voice(chip,j);
 	}
-	msm5232_reset( chip );
+	SND_RESET_NAME( msm5232 )( chip );
 }
 
 static void msm5232_shutdown(void *chip)
@@ -774,7 +774,7 @@ static void MSM5232_update_one(void *param, stream_sample_t **inputs, stream_sam
 
 /* MAME Interface */
 
-static void *msm5232_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( msm5232 )
 {
 	const msm5232_interface *intf = config;
 	int rate = clock/CLOCK_RATE_DIVIDER;
@@ -789,9 +789,9 @@ static void *msm5232_start(const char *tag, int sndindex, int clock, const void 
 	return chip;
 }
 
-static void msm5232_stop (void *chip)
+static SND_STOP( msm5232 )
 {
-	msm5232_shutdown(chip);
+	msm5232_shutdown(token);
 }
 
 WRITE8_HANDLER ( msm5232_0_w )
@@ -828,7 +828,7 @@ void msm5232_set_clock(void *_chip, int clock)
  * Generic get_info
  **************************************************************************/
 
-static void msm5232_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( msm5232 )
 {
 	switch (state)
 	{
@@ -837,17 +837,17 @@ static void msm5232_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void msm5232_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( msm5232 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = msm5232_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = msm5232_start;			break;
-		case SNDINFO_PTR_STOP:							info->stop = msm5232_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = msm5232_reset;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( msm5232 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( msm5232 );			break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( msm5232 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( msm5232 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "MSM5232";					break;

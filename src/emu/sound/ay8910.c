@@ -816,7 +816,7 @@ int ay8910_read_ym(void *chip)
  *
  *************************************/
 
-static void *ay8910_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ay8910 )
 {
 	static const ay8910_interface generic_ay8910 =
 	{
@@ -828,7 +828,7 @@ static void *ay8910_start(const char *tag, int sndindex, int clock, const void *
 	return ay8910_start_ym(SOUND_AY8910, sndindex+16, clock, intf);
 }
 
-static void *ym2149_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ym2149 )
 {
 	static const ay8910_interface generic_ay8910 =
 	{
@@ -840,12 +840,17 @@ static void *ym2149_start(const char *tag, int sndindex, int clock, const void *
 	return ay8910_start_ym(SOUND_YM2149, sndindex+16, clock, intf);
 }
 
-static void ay8910_stop(void *chip)
+static SND_STOP( ay8910 )
 {
-	ay8910_stop_ym(chip);
+	ay8910_stop_ym(token);
 }
 
-static void ay8910_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_RESET( ay8910 )
+{
+	ay8910_reset_ym(token);
+}
+
+static SND_SET_INFO( ay8910 )
 {
 	switch (state)
 	{
@@ -853,7 +858,7 @@ static void ay8910_set_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
-void ay8910_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ay8910 )
 {
 	switch (state)
 	{
@@ -861,10 +866,10 @@ void ay8910_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_INT_ALIAS:							info->i = SOUND_AY8910;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ay8910_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = ay8910_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = ay8910_reset_ym;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ay8910 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( ay8910 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( ay8910 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "AY-3-8910A";					break;
@@ -875,73 +880,73 @@ void ay8910_get_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
-void ay8912_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ay8912 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
 		case SNDINFO_STR_NAME:							info->s = "AY-3-8912A";					break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ay8913_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ay8913 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
 		case SNDINFO_STR_NAME:							info->s = "AY-3-8913A";					break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ay8930_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ay8930 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ay8910_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ay8910 );				break;
 		case SNDINFO_STR_NAME:							info->s = "AY8930";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ym2149_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym2149 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ym2149_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
 		case SNDINFO_STR_NAME:							info->s = "YM2149";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ym3439_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ym3439 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ym2149_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
 		case SNDINFO_STR_NAME:							info->s = "YM3439";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ymz284_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ymz284 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ym2149_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
 		case SNDINFO_STR_NAME:							info->s = "YMZ284";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 
-void ymz294_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ymz294 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = ym2149_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ym2149 );				break;
 		case SNDINFO_STR_NAME:							info->s = "YMZ294";						break;
-		default: 										ay8910_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(ay8910);	break;
 	}
 }
 

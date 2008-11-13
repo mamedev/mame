@@ -667,7 +667,7 @@ static void ymf278b_init(YMF278BChip *chip, UINT8 *rom, void (*cb)(running_machi
 	mix = auto_malloc(44100*2*sizeof(*mix));
 }
 
-static void *ymf278b_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ymf278b )
 {
 	static const ymf278b_interface defintrf = { 0 };
 	const ymf278b_interface *intf;
@@ -793,7 +793,7 @@ WRITE8_HANDLER( ymf278b_data_port_1_c_w )
  * Generic get_info
  **************************************************************************/
 
-static void ymf278b_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ymf278b )
 {
 	switch (state)
 	{
@@ -802,15 +802,15 @@ static void ymf278b_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ymf278b_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ymf278b )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ymf278b_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ymf278b_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymf278b );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymf278b );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

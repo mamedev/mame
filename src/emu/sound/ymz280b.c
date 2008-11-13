@@ -623,11 +623,11 @@ static void ymz280b_update(void *param, stream_sample_t **inputs, stream_sample_
 
 /**********************************************************************************************
 
-     YMZ280B_sh_start -- start emulation of the YMZ280B
+     SND_START( ymz280b ) -- start emulation of the YMZ280B
 
 ***********************************************************************************************/
 
-static void *ymz280b_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( ymz280b )
 {
 	static const ymz280b_interface defintrf = { 0 };
 	const ymz280b_interface *intf = (config != NULL) ? config : &defintrf;
@@ -705,12 +705,12 @@ static void *ymz280b_start(const char *tag, int sndindex, int clock, const void 
 
 /**********************************************************************************************
 
-     YMZ280B_sh_stop -- stop emulation of the YMZ280B
+     SND_STOP( YMZ280B_sh ) -- stop emulation of the YMZ280B
 
 ***********************************************************************************************/
 
 #ifdef UNUSED_FUNCTION
-void YMZ280B_sh_stop(void)
+SND_STOP( YMZ280B_sh )
 {
 #if MAKE_WAVS
 {
@@ -1097,7 +1097,7 @@ READ8_HANDLER( ymz280b_data_1_r )
  * Generic get_info
  **************************************************************************/
 
-static void ymz280b_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( ymz280b )
 {
 	switch (state)
 	{
@@ -1106,15 +1106,15 @@ static void ymz280b_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void ymz280b_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( ymz280b )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = ymz280b_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = ymz280b_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( ymz280b );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( ymz280b );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

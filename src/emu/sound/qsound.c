@@ -93,7 +93,7 @@ struct qsound_info
 static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length );
 static void qsound_set_command(struct qsound_info *chip, int data, int value);
 
-static void *qsound_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( qsound )
 {
 	struct qsound_info *chip;
 	int i;
@@ -153,9 +153,9 @@ static void *qsound_start(const char *tag, int sndindex, int clock, const void *
 	return chip;
 }
 
-static void qsound_stop (void *_chip)
+static SND_STOP( qsound )
 {
-	struct qsound_info *chip = _chip;
+	struct qsound_info *chip = token;
 	if (chip->fpRawDataR)
 	{
 		fclose(chip->fpRawDataR);
@@ -370,7 +370,7 @@ static void qsound_update( void *param, stream_sample_t **inputs, stream_sample_
  * Generic get_info
  **************************************************************************/
 
-static void qsound_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( qsound )
 {
 	switch (state)
 	{
@@ -379,16 +379,16 @@ static void qsound_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void qsound_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( qsound )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = qsound_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = qsound_start;				break;
-		case SNDINFO_PTR_STOP:							info->stop = qsound_stop;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( qsound );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( qsound );				break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( qsound );				break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */

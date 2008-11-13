@@ -343,32 +343,32 @@ static void *generic_start(int sndindex, int clock, int feedbackmask, int noiset
 }
 
 
-static void *sn76489_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( sn76489 )
 {
 	return generic_start(sndindex, clock, 0x4000, 0x03, TRUE);
 }
 
-static void *sn76489a_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( sn76489a )
 {
 	return generic_start(sndindex, clock, 0x8000, 0x06, FALSE);
 }
 
-static void *sn76494_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( sn76494 )
 {
 	return generic_start(sndindex, clock, 0x8000, 0x06, FALSE);
 }
 
-static void *sn76496_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( sn76496 )
 {
 	return generic_start(sndindex, clock, 0x8000, 0x06, FALSE);
 }
 
-static void *gamegear_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( gamegear )
 {
 	return generic_start(sndindex, clock, 0x8000, 0x09, FALSE);
 }
 
-static void *smsiii_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( smsiii )
 {
 	return generic_start(sndindex, clock, 0x8000, 0x09, FALSE);
 }
@@ -378,7 +378,7 @@ static void *smsiii_start(const char *tag, int sndindex, int clock, const void *
  * Generic get_info
  **************************************************************************/
 
-static void sn76496_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( sn76496 )
 {
 	switch (state)
 	{
@@ -387,7 +387,7 @@ static void sn76496_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void sn76496_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( sn76496 )
 {
 	switch (state)
 	{
@@ -395,8 +395,8 @@ void sn76496_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_INT_ALIAS:							info->i = SOUND_SN76496;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = sn76496_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = sn76496_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( sn76496 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76496 );			break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 
@@ -409,52 +409,52 @@ void sn76496_get_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
-void sn76489_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( sn76489 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = sn76489_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76489 );			break;
 		case SNDINFO_STR_NAME:							info->s = "SN76489";					break;
-		default: 										sn76496_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(sn76496);	break;
 	}
 }
 
-void sn76489a_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( sn76489a )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = sn76489a_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76489a );			break;
 		case SNDINFO_STR_NAME:							info->s = "SN76489A";					break;
-		default: 										sn76496_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(sn76496);	break;
 	}
 }
 
-void sn76494_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( sn76494 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = sn76494_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( sn76494 );			break;
 		case SNDINFO_STR_NAME:							info->s = "SN76494";					break;
-		default: 										sn76496_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(sn76496);	break;
 	}
 }
 
-void gamegear_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( gamegear )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = gamegear_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( gamegear );			break;
 		case SNDINFO_STR_NAME:							info->s = "Game Gear PSG";				break;
-		default: 										sn76496_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(sn76496);	break;
 	}
 }
 
-void smsiii_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( smsiii )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = smsiii_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( smsiii );				break;
 		case SNDINFO_STR_NAME:							info->s = "SMSIII PSG";					break;
-		default: 										sn76496_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(sn76496);	break;
 	}
 }

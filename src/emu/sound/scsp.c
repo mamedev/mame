@@ -1219,7 +1219,7 @@ static void SCSP_Update(void *param, stream_sample_t **inputs, stream_sample_t *
 	SCSP_DoMasterSamples(SCSP, samples);
 }
 
-static void *scsp_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( scsp )
 {
 	const scsp_interface *intf;
 
@@ -1369,7 +1369,7 @@ READ16_HANDLER( scsp_midi_out_r )
  * Generic get_info
  **************************************************************************/
 
-static void scsp_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( scsp )
 {
 	switch (state)
 	{
@@ -1378,15 +1378,15 @@ static void scsp_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void scsp_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( scsp )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = scsp_set_info;			break;
-		case SNDINFO_PTR_START:							info->start = scsp_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( scsp );			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( scsp );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

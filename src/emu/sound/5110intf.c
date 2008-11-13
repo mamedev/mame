@@ -62,11 +62,11 @@ static void speech_rom_set_addr(int addr)
 
 /******************************************************************************
 
-     tms5110_start -- allocate buffers and reset the 5110
+     SND_START( tms5110 ) -- allocate buffers and reset the 5110
 
 ******************************************************************************/
 
-static void *tms5110_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( tms5110 )
 {
 	static const tms5110_interface dummy = { 0 };
 	struct tms5110_info *info;
@@ -88,7 +88,7 @@ static void *tms5110_start(const char *tag, int sndindex, int clock, const void 
 	{
 	    if (info->intf->M0_callback==NULL)
 	    {
-			logerror("\n file: 5110intf.c, tms5110_start(), line 53:\n  Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
+			logerror("\n file: 5110intf.c, SND_START( tms5110 ):\n  Missing _mandatory_ 'M0_callback' function pointer in the TMS5110 interface\n  This function is used by TMS5110 to call for a single bits\n  needed to generate the speech\n  Aborting startup...\n");
 			return NULL;
 	    }
 	    tms5110_set_M0_callback(info->chip, info->intf->M0_callback );
@@ -107,44 +107,44 @@ static void *tms5110_start(const char *tag, int sndindex, int clock, const void 
     return info;
 }
 
-static void *tms5100_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( tms5100 )
 {
-	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
+	struct tms5110_info *info = SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_5100);
 	return info;
 }
 
-static void *tms5110a_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( tms5110a )
 {
-	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
+	struct tms5110_info *info = SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_5110A);
 	return info;
 }
 
-static void *cd2801_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( cd2801 )
 {
-	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
+	struct tms5110_info *info = SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2801);
 	return info;
 }
 
-static void *tmc0281_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( tmc0281 )
 {
-	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
+	struct tms5110_info *info = SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_TMC0281);
 	return info;
 }
 
-static void *cd2802_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( cd2802 )
 {
-	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
+	struct tms5110_info *info = SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_CD2802);
 	return info;
 }
 
-static void *m58817_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( m58817 )
 {
-	struct tms5110_info *info = tms5110_start(tag, sndindex, clock, config);
+	struct tms5110_info *info = SND_START_CALL( tms5110 );
 	tms5110_set_variant(info->chip, TMS5110_IS_M58817);
 	return info;
 }
@@ -152,20 +152,20 @@ static void *m58817_start(const char *tag, int sndindex, int clock, const void *
 
 /******************************************************************************
 
-     tms5110_stop -- free buffers
+     SND_STOP( tms5110 ) -- free buffers
 
 ******************************************************************************/
 
-static void tms5110_stop(void *chip)
+static SND_STOP( tms5110 )
 {
-	struct tms5110_info *info = chip;
+	struct tms5110_info *info = token;
 	tms5110_destroy(info->chip);
 }
 
 
-static void tms5110_reset(void *chip)
+static SND_RESET( tms5110 )
 {
-	struct tms5110_info *info = chip;
+	struct tms5110_info *info = token;
 	tms5110_reset_chip(info->chip);
 }
 
@@ -287,7 +287,7 @@ void tms5110_set_frequency(int frequency)
  * Generic get_info
  **************************************************************************/
 
-static void tms5110_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( tms5110 )
 {
 	switch (state)
 	{
@@ -295,7 +295,7 @@ static void tms5110_set_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
-void tms5110_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( tms5110 )
 {
 	switch (state)
 	{
@@ -303,10 +303,10 @@ void tms5110_get_info(void *token, UINT32 state, sndinfo *info)
 		case SNDINFO_INT_ALIAS:							info->i = SOUND_TMS5110;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = tms5110_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = tms5110_start;			break;
-		case SNDINFO_PTR_STOP:							info->stop = tms5110_stop;				break;
-		case SNDINFO_PTR_RESET:							info->reset = tms5110_reset;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( tms5110 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms5110 );			break;
+		case SNDINFO_PTR_STOP:							info->stop = SND_STOP_NAME( tms5110 );				break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( tms5110 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "TMS5110";					break;
@@ -317,63 +317,63 @@ void tms5110_get_info(void *token, UINT32 state, sndinfo *info)
 	}
 }
 
-void tms5100_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( tms5100 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = tms5100_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms5100 );			break;
 		case SNDINFO_STR_NAME:							info->s = "TMS5100";					break;
-		default: 										tms5110_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(tms5110);	break;
 	}
 }
 
-void tms5110a_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( tms5110a )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = tms5110a_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tms5110a );			break;
 		case SNDINFO_STR_NAME:							info->s = "TMS5100A";					break;
-		default: 										tms5110_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(tms5110);	break;
 	}
 }
 
-void cd2801_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( cd2801 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = cd2801_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( cd2801 );				break;
 		case SNDINFO_STR_NAME:							info->s = "CD2801";						break;
-		default: 										tms5110_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(tms5110);	break;
 	}
 }
 
-void tmc0281_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( tmc0281 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = tmc0281_start;			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( tmc0281 );			break;
 		case SNDINFO_STR_NAME:							info->s = "TMS5100";					break;
-		default: 										tms5110_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(tms5110);	break;
 	}
 }
 
-void cd2802_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( cd2802 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = cd2802_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( cd2802 );				break;
 		case SNDINFO_STR_NAME:							info->s = "CD2802";						break;
-		default: 										tms5110_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(tms5110);	break;
 	}
 }
 
-void m58817_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( m58817 )
 {
 	switch (state)
 	{
-		case SNDINFO_PTR_START:							info->start = m58817_start;				break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( m58817 );				break;
 		case SNDINFO_STR_NAME:							info->s = "M58817";						break;
-		default: 										tms5110_get_info(token, state, info);	break;
+		default: 										SND_GET_INFO_CALL(tms5110);	break;
 	}
 }
 

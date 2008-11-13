@@ -6,10 +6,9 @@
 
 **************************************************************************
 
-sh_votrax_start  - Start emulation, load samples from Votrax subdirectory
-sh_votrax_stop   - End emulation, free memory used for samples
+SND_START(votrax)- Start emulation, load samples from Votrax subdirectory
 votrax_w         - Write data to votrax port
-votrax_status    - Return busy status (-1 = busy)
+votrax_status_r  - Return busy status (-1 = busy)
 
 If you need to alter the base frequency (i.e. Qbert) then just alter
 the variable VotraxBaseFrequency, this is defaulted to 8000
@@ -101,7 +100,7 @@ static void votrax_update_sound(void *param, stream_sample_t **inputs, stream_sa
 }
 
 
-static void *votrax_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( votrax )
 {
 	struct votrax_info *votrax;
 
@@ -159,7 +158,7 @@ int votrax_status_r(void)
  * Generic get_info
  **************************************************************************/
 
-static void votrax_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( votrax )
 {
 	switch (state)
 	{
@@ -168,15 +167,15 @@ static void votrax_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void votrax_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( votrax )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = votrax_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = votrax_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( votrax );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( votrax );				break;
 		case SNDINFO_PTR_STOP:							/* Nothing */							break;
 		case SNDINFO_PTR_RESET:							/* Nothing */							break;
 

@@ -86,8 +86,8 @@ struct _bsmt2000_chip
 ***************************************************************************/
 
 /* core implementation */
-static void *bsmt2000_start(const char *tag, int sndindex, int clock, const void *config);
-static void bsmt2000_reset(void *_chip);
+static SND_START( bsmt2000 );
+static SND_RESET( bsmt2000 );
 static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
 
 /* read/write access */
@@ -104,10 +104,10 @@ static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8
 ***************************************************************************/
 
 /*-------------------------------------------------
-    bsmt2000_start - initialization callback
+    SND_START( bsmt2000 ) - initialization callback
 -------------------------------------------------*/
 
-static void *bsmt2000_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( bsmt2000 )
 {
 	bsmt2000_chip *chip;
 	int voicenum;
@@ -149,18 +149,18 @@ static void *bsmt2000_start(const char *tag, int sndindex, int clock, const void
 	}
 
 	/* reset the chip -- this also configures the default mode */
-	bsmt2000_reset(chip);
+	SND_RESET_NAME( bsmt2000 )(chip);
 	return chip;
 }
 
 
 /*-------------------------------------------------
-    bsmt2000_reset - chip reset callback
+    SND_RESET( bsmt2000 ) - chip reset callback
 -------------------------------------------------*/
 
-static void bsmt2000_reset(void *_chip)
+static SND_RESET( bsmt2000 )
 {
-	bsmt2000_chip *chip = _chip;
+	bsmt2000_chip *chip = token;
 	int voicenum;
 
 	/* reset all the voice data */
@@ -476,11 +476,11 @@ static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8
 ***************************************************************************/
 
 /*-------------------------------------------------
-    bsmt2000_set_info - callback for setting chip
-    information
+    SND_SET_INFO( bsmt2000 ) - callback for
+    setting chip information
 -------------------------------------------------*/
 
-static void bsmt2000_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( bsmt2000 )
 {
 	switch (state)
 	{
@@ -490,21 +490,21 @@ static void bsmt2000_set_info(void *token, UINT32 state, sndinfo *info)
 
 
 /*-------------------------------------------------
-    bsmt2000_get_info - callback for retrieving
-    chip information
+    SND_GET_INFO( bsmt2000 ) - callback for
+    retrieving chip information
 -------------------------------------------------*/
 
-void bsmt2000_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( bsmt2000 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = bsmt2000_set_info;		break;
-		case SNDINFO_PTR_START:							info->start = bsmt2000_start;			break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( bsmt2000 );		break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( bsmt2000 );			break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
-		case SNDINFO_PTR_RESET:							info->reset = bsmt2000_reset;			break;
+		case SNDINFO_PTR_RESET:							info->reset = SND_RESET_NAME( bsmt2000 );			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case SNDINFO_STR_NAME:							info->s = "BSMT2000";					break;

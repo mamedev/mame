@@ -535,7 +535,7 @@ static void c352_init(struct c352_info *info, int sndindex)
 	}
 }
 
-static void *c352_start(const char *tag, int sndindex, int clock, const void *config)
+static SND_START( c352 )
 {
 	struct c352_info *info;
 
@@ -582,7 +582,7 @@ WRITE16_HANDLER( c352_0_w )
  * Generic get_info
  **************************************************************************/
 
-static void c352_set_info(void *token, UINT32 state, sndinfo *info)
+static SND_SET_INFO( c352 )
 {
 	switch (state)
 	{
@@ -591,15 +591,15 @@ static void c352_set_info(void *token, UINT32 state, sndinfo *info)
 }
 
 
-void c352_get_info(void *token, UINT32 state, sndinfo *info)
+SND_GET_INFO( c352 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case SNDINFO_PTR_SET_INFO:						info->set_info = c352_set_info;			break;
-		case SNDINFO_PTR_START:							info->start = c352_start;				break;
+		case SNDINFO_PTR_SET_INFO:						info->set_info = SND_SET_INFO_NAME( c352 );			break;
+		case SNDINFO_PTR_START:							info->start = SND_START_NAME( c352 );				break;
 		case SNDINFO_PTR_STOP:							/* nothing */							break;
 		case SNDINFO_PTR_RESET:							/* nothing */							break;
 
