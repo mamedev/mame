@@ -214,6 +214,11 @@ static UINT32* jchan_sprite_regs32_2;
 
 static int jchan_irq_sub_enable;
 
+static UINT16 *jchan_spriteram_1;
+static UINT16* jchan_sprregs_1;
+static UINT16 *jchan_spriteram_2;
+static UINT16* jchan_sprregs_2;
+
 /***************************************************************************
 
                             MCU Code Simulation
@@ -350,7 +355,6 @@ static READ16_HANDLER( jchan_mcu_status_r )
 
 ***************************************************************************/
 
-static UINT16 *jchan_spriteram;
 
 
 // interrupt generation is NOT understood
@@ -417,11 +421,43 @@ static UINT16 *mainsub_shared_ram;
 
 static VIDEO_UPDATE(jchan)
 {
+	int x,y;
+	UINT16* src1;
+	UINT16* src2;
+	UINT16* dst;
+	UINT16 pixdata1;
+	UINT16 pixdata2;
+
 	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
 	//skns_draw_sprites(screen->machine,bitmap,cliprect);
-	//fillbitmap(sprite_bitmap, 0x0000, cliprect);
-	skns_draw_sprites(screen->machine, bitmap, cliprect, jchan_sprite_ram32_1, 0x4000, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), jchan_sprite_regs32_1 );
+	fillbitmap(sprite_bitmap_1, 0x0000, cliprect);
+	fillbitmap(sprite_bitmap_2, 0x0000, cliprect);
 
+	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, jchan_sprite_ram32_1, 0x4000, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), jchan_sprite_regs32_1 );
+	skns_draw_sprites(screen->machine, sprite_bitmap_2, cliprect, jchan_sprite_ram32_2, 0x4000, memory_region(screen->machine,"gfx2"), memory_region_length (screen->machine, "gfx2"), jchan_sprite_regs32_2 );
+
+	for (y=0;y<240;y++)
+	{
+		src1 = BITMAP_ADDR16(sprite_bitmap_1, y, 0);
+		src2 = BITMAP_ADDR16(sprite_bitmap_2, y, 0);
+		dst =  BITMAP_ADDR16(bitmap, y, 0);
+
+		for (x=0;x<320;x++)
+		{
+			pixdata1 = src1[x];
+			pixdata2 = src2[x];
+
+			if (pixdata2 & 0x3fff)
+			{
+				dst[x] = (pixdata2 & 0x3fff)|0x4000;
+			}
+
+			if (pixdata1 & 0x3fff)
+			{
+				dst[x] = (pixdata1 & 0x3fff)|0x4000;
+			}
+		}
+	}
 
 	return 0;
 }
@@ -490,21 +526,34 @@ static WRITE16_HANDLER( sub2main_cmd_w )
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */
-static WRITE16_HANDLER( jchan_suprnova_sprite32_w )
+static WRITE16_HANDLER( jchan_suprnova_sprite32_1_w )
 {
-	COMBINE_DATA(&jchan_spriteram[offset]);
+	COMBINE_DATA(&jchan_spriteram_1[offset]);
 	offset>>=1;
-	jchan_sprite_ram32_1[offset]=(jchan_spriteram[offset*2+1]<<16) | (jchan_spriteram[offset*2]);
+	jchan_sprite_ram32_1[offset]=(jchan_spriteram_1[offset*2+1]<<16) | (jchan_spriteram_1[offset*2]);
 }
 
-static UINT16* jchan_sprregs;
-
-static WRITE16_HANDLER( jchan_suprnova_sprite32regs_w )
+static WRITE16_HANDLER( jchan_suprnova_sprite32regs_1_w )
 {
-	COMBINE_DATA(&jchan_sprregs[offset]);
+	COMBINE_DATA(&jchan_sprregs_1[offset]);
 	offset>>=1;
-	jchan_sprite_regs32_1[offset]=(jchan_sprregs[offset*2+1]<<16) | (jchan_sprregs[offset*2]);
+	jchan_sprite_regs32_1[offset]=(jchan_sprregs_1[offset*2+1]<<16) | (jchan_sprregs_1[offset*2]);
 }
+
+static WRITE16_HANDLER( jchan_suprnova_sprite32_2_w )
+{
+	COMBINE_DATA(&jchan_spriteram_2[offset]);
+	offset>>=1;
+	jchan_sprite_ram32_2[offset]=(jchan_spriteram_2[offset*2+1]<<16) | (jchan_spriteram_2[offset*2]);
+}
+
+static WRITE16_HANDLER( jchan_suprnova_sprite32regs_2_w )
+{
+	COMBINE_DATA(&jchan_sprregs_2[offset]);
+	offset>>=1;
+	jchan_sprite_regs32_2[offset]=(jchan_sprregs_2[offset*2+1]<<16) | (jchan_sprregs_2[offset*2]);
+}
+
 
 static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
@@ -520,17 +569,10 @@ static ADDRESS_MAP_START( jchan_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&mainsub_shared_ram) AM_SHARE(1)
 
 	/* 1st sprite layer */
-//  AM_RANGE(0x500000, 0x5005ff) AM_RAM //     grid tested ($924-$97c), cleared ($982-$9a4) until $503fff
-//  AM_RANGE(0x500600, 0x503fff) AM_RAM // [B] grid tested, cleared ($b68-$be6)
-	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(jchan_suprnova_sprite32_w) AM_BASE(&jchan_spriteram)
-	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_w) AM_BASE(&jchan_sprregs)
+	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(jchan_suprnova_sprite32_1_w) AM_BASE(&jchan_spriteram_1)
+	AM_RANGE(0x600000, 0x60003f) AM_RAM_WRITE(jchan_suprnova_sprite32regs_1_w) AM_BASE(&jchan_sprregs_1)
 
-	/* (0x700000, 0x707fff) = palette zone - but there seems to be 'sub-zones' used differently */
-//  AM_RANGE(0x700000, 0x707fff) AM_RAM //     grid tested, cleared ($dbc-$e3a), $2000 bytes (8Kb) copied from $aae40 ($e40-$e56)
-//  AM_RANGE(0x708000, 0x70ffff) AM_RAM // [E] grid tested, cleared ($d1c-$d9a), $8000 bytes (32Kb) copied from $a2e40 ($da0-$db6)
-	AM_RANGE(0x700000, 0x707fff) AM_RAM // palette for tilemaps?
-	AM_RANGE(0x708000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
-//  AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
+	AM_RANGE(0x700000, 0x70ffff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // palette for sprites?
 
 	AM_RANGE(0xf00000, 0xf00003) AM_READWRITE(jchan_ctrl_r, jchan_ctrl_w) AM_BASE(&jchan_ctrl)
 	AM_RANGE(0xf00004, 0xf00005) AM_READ_PORT("SYSTEM")
@@ -554,8 +596,8 @@ static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x60001f) AM_RAM // AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)   // Layers 0 Regs
 
 	/* 2nd sprite layer? - [C] grid tested, cleared ($1e2a), also cleared at startup ($7dc-$80a) */
-	AM_RANGE(0x700000, 0x703fff) AM_RAM // AM_BASE(&jchan_spriteram) AM_WRITE(jchan_suprnova_sprite32_w)
-	AM_RANGE(0x780000, 0x78003f) AM_RAM // AM_BASE(&jchan_sprregs) AM_WRITE(jchan_suprnova_sprite32regs_w)
+	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE(&jchan_spriteram_2) AM_WRITE(jchan_suprnova_sprite32_2_w)
+	AM_RANGE(0x780000, 0x78003f) AM_RAM AM_BASE(&jchan_sprregs_2) AM_WRITE(jchan_suprnova_sprite32regs_2_w)
 
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(ymz280b_register_0_lsb_w) // sound
 	AM_RANGE(0x800002, 0x800003) AM_WRITE(ymz280b_data_0_lsb_w) 	//
