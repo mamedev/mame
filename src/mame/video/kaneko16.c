@@ -1020,7 +1020,19 @@ VIDEO_UPDATE(berlwall)
 
 VIDEO_UPDATE( jchan_view2 )
 {
+	int dx,dy;
+
 	VIDEO_UPDATE_CALL(common);
+
+	/* override the offsets set in common - tuned to char select in jchan2 */
+	dx = 25;dy = 11;
+
+	tilemap_set_scrolldx( kaneko16_tmap_0, -dx,		320 + dx -1        );
+	tilemap_set_scrolldx( kaneko16_tmap_1, -(dx+2),	320 + (dx + 2) - 1 );
+
+	tilemap_set_scrolldy( kaneko16_tmap_0, -dy,		240 + dy -1 );
+	tilemap_set_scrolldy( kaneko16_tmap_1, -dy,		240 + dy -1 );
+
 	return 0;
 }
 

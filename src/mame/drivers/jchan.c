@@ -828,14 +828,13 @@ ROM_START( jchan )
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE ) /* BG GFX */
 	ROM_LOAD( "jc-200.00", 0x000000, 0x100000, CRC(1f30c24e) SHA1(0c413fc67c3ec020e6786e7157d82aa242c8d2ad) )
 
-	ROM_REGION( 0x1000000, "ymz", 0 ) /* Audio 1? */
-	ROM_LOAD( "jc-300-00.84", 0x000000, 0x200000, CRC(13d5b1eb) SHA1(b047594d0f1a71d89b8f072879ccba480f54a483) )
-	ROM_LOAD( "jc-301-00.85", 0x200000, 0x100000, CRC(9c5b3077) SHA1(db9a31e1c65d9f12d0f2fb316ced48a02aae089d) )
+	ROM_REGION( 0x1000000, "ymz", 0 ) /* Audio */
+	ROM_LOAD( "jc-301-00.85", 0x000000, 0x100000, CRC(9c5b3077) SHA1(db9a31e1c65d9f12d0f2fb316ced48a02aae089d) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_LOAD( "jc-300-00.84", 0x200000, 0x200000, CRC(13d5b1eb) SHA1(b047594d0f1a71d89b8f072879ccba480f54a483) )
+	ROM_LOAD( "jcw0x0.u56",   0x400000, 0x040000, CRC(bcf25c2a) SHA1(b57a563ab5c05b05d133eed3d099c4de997f37e4) )
 
-	ROM_REGION( 0x040000, "unknown", 0 ) /* Audio 2? */
-	ROM_LOAD( "jcw0x0.u56", 0x000000, 0x040000, CRC(bcf25c2a) SHA1(b57a563ab5c05b05d133eed3d099c4de997f37e4) )
-
-	ROM_REGION( 0x020000, "mcudata", 0 ) /* MCU Code? */
+	ROM_REGION( 0x020000, "mcudata", 0 ) /* MCU Data */
 	ROM_LOAD16_WORD_SWAP( "jcd0x1.u13", 0x000000, 0x020000, CRC(2a41da9c) SHA1(7b1ba0efc0544e276196b9605df1881fde871708) )
 ROM_END
 
@@ -869,14 +868,13 @@ ROM_START( jchan2 ) /* Some kind of semi-sequel? MASK ROMs dumped and confirmed 
 	ROM_REGION( 0x100000, "gfx3", ROMREGION_DISPOSE ) /* BG GFX */
 	ROM_LOAD( "jc-200.00", 0x000000, 0x100000, CRC(1f30c24e) SHA1(0c413fc67c3ec020e6786e7157d82aa242c8d2ad) )
 
-	ROM_REGION( 0x1000000, "ymz", 0 ) /* Audio 1? */
-	ROM_LOAD( "jc-300-00.84", 0x000000, 0x200000, CRC(13d5b1eb) SHA1(b047594d0f1a71d89b8f072879ccba480f54a483) )
-	ROM_LOAD( "jc-301-00.85", 0x200000, 0x100000, CRC(9c5b3077) SHA1(db9a31e1c65d9f12d0f2fb316ced48a02aae089d) )
+	ROM_REGION( 0x1000000, "ymz", 0 ) /* Audio */
+	ROM_LOAD( "jc-301-00.85", 0x000000, 0x100000, CRC(9c5b3077) SHA1(db9a31e1c65d9f12d0f2fb316ced48a02aae089d) )
+	ROM_RELOAD(0x100000,0x100000)
+	ROM_LOAD( "jc-300-00.84", 0x200000, 0x200000, CRC(13d5b1eb) SHA1(b047594d0f1a71d89b8f072879ccba480f54a483) )
+	ROM_LOAD( "j2m1x1.u56",   0x400000, 0x040000, CRC(baf6e25e) SHA1(6b02f3eb1eafcd43022a9f60f98573d02277adfe) )
 
-	ROM_REGION( 0x040000, "unknown", 0 ) /* Audio 2? */
-	ROM_LOAD( "j2m1x1.u56", 0x000000, 0x040000, CRC(baf6e25e) SHA1(6b02f3eb1eafcd43022a9f60f98573d02277adfe) )
-
-	ROM_REGION( 0x020000, "mcudata", 0 ) /* MCU Code? */
+	ROM_REGION( 0x020000, "mcudata", 0 ) /* MCU data */
 	ROM_LOAD16_WORD_SWAP( "j2d1x1.u13", 0x000000, 0x020000, CRC(b2b7fc90) SHA1(1b90c13bb41a313c4ed791a15d56073a7c29928b) )
 ROM_END
 
@@ -893,6 +891,6 @@ static DRIVER_INIT( jchan )
 
 
 /* game drivers */
-GAME( 1995, jchan,     0,        jchan,    jchan,    jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", GAME_NOT_WORKING )
-GAME( 1995, jchan2,    jchan,    jchan,    jchan2,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire", GAME_NOT_WORKING )
+GAME( 1995, jchan,     0,        jchan,    jchan,    jchan,    ROT0, "Kaneko", "Jackie Chan - The Kung-Fu Master", GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, jchan2,    jchan,    jchan,    jchan2,   jchan,    ROT0, "Kaneko", "Jackie Chan in Fists of Fire", GAME_IMPERFECT_GRAPHICS )
 
