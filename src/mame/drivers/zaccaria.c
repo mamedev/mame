@@ -101,8 +101,8 @@ static WRITE8_HANDLER( ay8910_port0a_w )
 }
 
 
-static void zaccaria_irq0a(running_machine *machine, int state) { cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
-static void zaccaria_irq0b(running_machine *machine, int state) { cpunum_set_input_line(machine, 1,0,state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0a(running_machine *machine, int state) { cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE); }
+static void zaccaria_irq0b(running_machine *machine, int state) { cpu_set_input_line(machine->cpu[1],0,state ? ASSERT_LINE : CLEAR_LINE); }
 
 static int active_8910, port0a, acs;
 
@@ -162,7 +162,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	static int toggle;
 
-	pia_0_cb1_w(machine,0,toggle & 1);
+	pia_0_cb1_w(device->machine,0,toggle & 1);
 	toggle ^= 1;
 }
 
@@ -257,7 +257,7 @@ static MACHINE_RESET( zaccaria )
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 2,0,(data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2],0,(data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound1_command_w )

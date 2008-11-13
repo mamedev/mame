@@ -1739,12 +1739,12 @@ GFXDECODE_END
 #define CISCHEAT_INTERRUPT_NUM	3
 static INTERRUPT_GEN( cischeat_interrupt )
 {
-	if (cpu_getiloops()==0)
-		cpunum_set_input_line(machine, 0, 4, HOLD_LINE); /* Once */
+	if (cpu_getiloops(device)==0)
+		cpu_set_input_line(device, 4, HOLD_LINE); /* Once */
 	else
 	{
-		if (cpu_getiloops()%2)	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
-		else 					cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+		if (cpu_getiloops(device)%2)	cpu_set_input_line(device, 2, HOLD_LINE);
+		else 					cpu_set_input_line(device, 1, HOLD_LINE);
 	}
 }
 
@@ -1894,10 +1894,10 @@ MACHINE_DRIVER_END
 #define INTERRUPT_NUM_SCUDHAMM		30
 static INTERRUPT_GEN( interrupt_scudhamm )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	// update palette, layers etc. Not the sprites.
-		case 14:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	// "real" vblank. It just sets a flag that
+		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);	// update palette, layers etc. Not the sprites.
+		case 14:	cpu_set_input_line(device, 2, HOLD_LINE);	// "real" vblank. It just sets a flag that
 														// the main loop polls before updating the sprites.
 	}
 }
@@ -1947,10 +1947,10 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( interrupt_armchmp2)
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
-		case 14:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		case 0:		cpu_set_input_line(device, 4, HOLD_LINE);
+		case 14:	cpu_set_input_line(device, 2, HOLD_LINE);
 	}
 }
 

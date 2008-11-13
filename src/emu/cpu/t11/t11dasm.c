@@ -19,7 +19,7 @@ static offs_t pcbase;
 
 static unsigned MakeEA (char **ea, int lo, unsigned pc, int width)
 {
-	char *buffer = cpuintrf_temp_str();
+	static char buffer[32];
 	int reg, pm;
 
 	assert (width == 2 || width == 4);

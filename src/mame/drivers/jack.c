@@ -66,14 +66,14 @@ static READ8_HANDLER( timer_r )
 {
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
-	return activecpu_gettotalcycles() / timer_rate;
+	return cpu_get_total_cycles(machine->activecpu) / timer_rate;
 }
 
 
 static WRITE8_HANDLER( jack_sh_command_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 
@@ -894,12 +894,12 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( joinem_interrupts )
 {
-	if(cpu_getiloops() > 0)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	if(cpu_getiloops(device) > 0)
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
 	{
-		if(!(input_port_read(machine, "IN2") & 0x80))
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		if(!(input_port_read(device->machine, "IN2") & 0x80))
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

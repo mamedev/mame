@@ -149,7 +149,7 @@ UINT16* mcatadv_vidregs;
 static WRITE16_HANDLER( mcat_soundlatch_w )
 {
 	soundlatch_w(machine, 0, data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 #if 0 // mcat only.. install read handler?
@@ -460,7 +460,7 @@ GFXDECODE_END
 /* Stolen from Psikyo.c */
 static void sound_irq( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym2610_interface mcatadv_ym2610_interface =
 {

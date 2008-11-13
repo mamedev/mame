@@ -387,9 +387,9 @@ static UINT16 *model3_soundram;
 static void update_irq_state(running_machine *machine)
 {
 	if ((irq_enable & irq_state) || scsi_irq_state)
-		cpunum_set_input_line(machine, 0, PPC_IRQ, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], PPC_IRQ, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, PPC_IRQ, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], PPC_IRQ, CLEAR_LINE);
 }
 
 void model3_set_irq_line(running_machine *machine, UINT8 bit, int state)
@@ -1345,7 +1345,7 @@ static WRITE64_HANDLER(model3_sound_w)
 		scsp_midi_in(machine, 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
 	}
 }
 
@@ -4269,10 +4269,10 @@ static void scsp_irq(running_machine *machine, int irq)
  	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(machine, 1, irq, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], irq, ASSERT_LINE);
 	}
 	else
-		cpunum_set_input_line(machine, 1, -irq, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], -irq, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =
@@ -4302,9 +4302,9 @@ static int model3_vblank = 0;
 static INTERRUPT_GEN(model3_interrupt)
 {
 	if (model3_vblank == 0) {
-		model3_set_irq_line(machine, 0x42, ASSERT_LINE);
+		model3_set_irq_line(device->machine, 0x42, ASSERT_LINE);
 	} else {
-		model3_set_irq_line(machine, 0x0d, ASSERT_LINE);
+		model3_set_irq_line(device->machine, 0x0d, ASSERT_LINE);
 	}
 
 	model3_vblank++;

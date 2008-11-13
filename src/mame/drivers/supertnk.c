@@ -152,13 +152,13 @@ static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 static INTERRUPT_GEN( supertnk_interrupt )
 {
 	/* On a TMS9980, a 6 on the interrupt bus means a level 4 interrupt */
-	cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 6);
+	cpu_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
 }
 
 
 static WRITE8_HANDLER( supertnk_interrupt_ack_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

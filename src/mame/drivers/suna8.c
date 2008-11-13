@@ -1446,7 +1446,7 @@ GFXDECODE_END
 
 static void soundirq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, 0, state);
+	cpu_set_input_line(machine->cpu[1], 0, state);
 }
 
 /* In games with only 2 CPUs, port A&B of the AY8910 are used
@@ -1581,8 +1581,8 @@ static const ym3812_interface brickzn_ym3812_interface =
 
 static INTERRUPT_GEN( brickzn_interrupt )
 {
-	if (cpu_getiloops()) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-	else				 cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	if (cpu_getiloops(device)) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+	else				 cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( brickzn )
@@ -1648,11 +1648,11 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( hardhea2_interrupt )
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
-		if (suna8_nmi_enable)	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		if (suna8_nmi_enable)	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
-	else cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	else cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_RESET( hardhea2 )
@@ -1738,11 +1738,11 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( sparkman_interrupt )
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
-		if (suna8_nmi_enable)	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		if (suna8_nmi_enable)	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
-	else cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	else cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( sparkman )

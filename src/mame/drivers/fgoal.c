@@ -83,10 +83,10 @@ static TIMER_CALLBACK( interrupt_callback )
 	int scanline;
 	int coin = (input_port_read(machine, "IN1") & 2);
 
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 
 	if (!coin && prev_coin)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 
 	prev_coin = coin;
 
@@ -126,7 +126,7 @@ static CUSTOM_INPUT( fgoal_80_r )
 
 static READ8_HANDLER( fgoal_nmi_reset_r )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
@@ -134,7 +134,7 @@ static READ8_HANDLER( fgoal_nmi_reset_r )
 
 static READ8_HANDLER( fgoal_irq_reset_r )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 
 	return 0;
 }

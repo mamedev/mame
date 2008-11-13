@@ -131,7 +131,7 @@ static WRITE8_HANDLER( exzisus_sharedram_ac_w )
 
 static WRITE8_HANDLER( exzisus_cpub_reset_w )
 {
-	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 #if 0
@@ -312,7 +312,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

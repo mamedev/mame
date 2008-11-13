@@ -112,15 +112,15 @@ MACHINE_RESET (cpk)
 
 INTERRUPT_GEN( cpoker_interrupt )
 {
-	if (cpu_getiloops() % 2)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	if (cpu_getiloops(device) % 2)
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN( cska_interrupt )
 {
-	UINT8 * RAM = memory_region(machine, "main");
+	UINT8 * RAM = memory_region(device->machine, "main");
 
 	RAM[ hopperOK ] = 1;	/* simulate hopper working! */
 
@@ -133,10 +133,10 @@ INTERRUPT_GEN( cska_interrupt )
 
 	abilityflag = (oldstate == 5 || (RAM[ intstate1 ] == 1 && RAM[ intstate2 ] == 5)) ? 1 : 0;
 
-	if (cpu_getiloops() % 2)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	if (cpu_getiloops(device) % 2)
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 
 }
 

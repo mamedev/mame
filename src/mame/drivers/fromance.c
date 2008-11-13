@@ -180,7 +180,7 @@ static void fromance_adpcm_int(running_machine *machine, int irq)
 
 	/* generate an NMI if we're out of data */
 	if (!fromance_vclk_left)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

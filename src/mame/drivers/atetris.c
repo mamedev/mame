@@ -80,7 +80,7 @@ static TIMER_CALLBACK( interrupt_gen )
 	int scanline = param;
 
 	/* assert/deassert the interrupt */
-	cpunum_set_input_line(machine, 0, 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* set the next timer */
 	scanline += 32;
@@ -92,7 +92,7 @@ static TIMER_CALLBACK( interrupt_gen )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

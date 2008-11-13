@@ -38,7 +38,7 @@ DIP locations verified for:
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -50,13 +50,13 @@ static UINT8 *lasso_chip_data;
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1, 0, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( pinbo_sound_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )

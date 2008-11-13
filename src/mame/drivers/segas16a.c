@@ -230,7 +230,7 @@ static void system16a_generic_init(running_machine *machine)
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	cpunum_suspend(mame_find_cpu_index(machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
+	cpu_suspend(machine->cpu[mame_find_cpu_index(machine, "mcu")], SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -243,7 +243,7 @@ static TIMER_CALLBACK( suspend_i8751 )
 
 static MACHINE_RESET( system16a )
 {
-	fd1094_machine_init();
+	fd1094_machine_init(machine->cpu[0]);
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
@@ -383,7 +383,7 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
              0= Sound is disabled
              1= sound is enabled
     */
-	cpunum_set_input_line(device->machine, 1, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
 }
@@ -435,9 +435,9 @@ static WRITE8_HANDLER( n7751_control_w )
         D1 = /RESET line on 7751
         D0 = /IRQ line on 7751
     */
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(machine, 2, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -494,7 +494,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 {
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (i8751_vblank_hook != NULL)
-		(*i8751_vblank_hook)(machine);
+		(*i8751_vblank_hook)(device->machine);
 }
 
 
@@ -513,7 +513,7 @@ static void bodyslam_i8751_sim(running_machine *machine)
 	UINT8 min = workram[0x202/2] & 0xff;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* out of time? set the flag */
 	if (tick == 0 && sec == 0 && min == 0)
@@ -553,7 +553,7 @@ static void bodyslam_i8751_sim(running_machine *machine)
 static void quartet_i8751_sim(running_machine *machine)
 {
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* X scroll values */
 	segaic16_textram_0_w(machine, 0xff8/2, workram[0x0d14/2], 0xffff);

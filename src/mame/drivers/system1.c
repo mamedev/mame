@@ -116,9 +116,9 @@ static WRITE8_HANDLER( chplft_videomode_w )
 static WRITE8_HANDLER( system1_soundport_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
-	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
+	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(50));
 }
 
 /* protection values from real hardware, these were verified to be the same on the title

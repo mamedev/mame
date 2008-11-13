@@ -115,7 +115,7 @@ WRITE16_HANDLER( lockon_crtc_w )
 static TIMER_CALLBACK( cursor_callback )
 {
 	if (lockon_main_inten)
-		cpunum_set_input_line_and_vector(machine, MAIN_CPU, 0, HOLD_LINE, 0xff);
+		cpu_set_input_line_and_vector(machine->cpu[MAIN_CPU], 0, HOLD_LINE, 0xff);
 
 	timer_adjust_oneshot(cursor_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
 }
@@ -329,8 +329,8 @@ WRITE16_HANDLER( lockon_ground_ctrl_w )
 
 static TIMER_CALLBACK( bufend_callback )
 {
-	cpunum_set_input_line_and_vector(machine, GROUND_CPU, 0, HOLD_LINE, 0xff);
-	cpunum_set_input_line(machine, OBJECT_CPU, NEC_INPUT_LINE_POLL, ASSERT_LINE);
+	cpu_set_input_line_and_vector(machine->cpu[GROUND_CPU], 0, HOLD_LINE, 0xff);
+	cpu_set_input_line(machine->cpu[OBJECT_CPU], NEC_INPUT_LINE_POLL, ASSERT_LINE);
 }
 
 /* Get data for a each 8x8x3 ground tile */
@@ -658,7 +658,7 @@ WRITE16_HANDLER( lockon_tza112_w )
 
 READ16_HANDLER( lockon_obj_4000_r )
 {
-	cpunum_set_input_line(machine, OBJECT_CPU, NEC_INPUT_LINE_POLL, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[OBJECT_CPU], NEC_INPUT_LINE_POLL, CLEAR_LINE);
 	return 0xffff;
 }
 

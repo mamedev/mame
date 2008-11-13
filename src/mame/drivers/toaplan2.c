@@ -296,8 +296,8 @@ static WRITE16_HANDLER( batsugun_share2_w );
 
 static void toaplan2_reset(void)
 {
-	if ( cpu_gettotalcpu() > 1 )
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+	if (Machine->cpu[1] != NULL)
+		cpu_set_input_line(Machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static MACHINE_RESET( toaplan2 )
@@ -521,7 +521,7 @@ static READ16_HANDLER( toaplan2_inputport_0_word_r )
 
 static TIMER_CALLBACK( toaplan2_raise_irq )
 {
-	cpunum_set_input_line(machine, 0, param, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], param, HOLD_LINE);
 }
 
 static void toaplan2_vblank_irq(running_machine *machine, int irq_line)
@@ -530,9 +530,9 @@ static void toaplan2_vblank_irq(running_machine *machine, int irq_line)
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0xe6, 0), NULL, irq_line, toaplan2_raise_irq);
 }
 
-static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(machine, 1); }
-static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(machine, 2); }
-static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(machine, 4); }
+static INTERRUPT_GEN( toaplan2_vblank_irq1 ) { toaplan2_vblank_irq(device->machine, 1); }
+static INTERRUPT_GEN( toaplan2_vblank_irq2 ) { toaplan2_vblank_irq(device->machine, 2); }
+static INTERRUPT_GEN( toaplan2_vblank_irq4 ) { toaplan2_vblank_irq(device->machine, 4); }
 
 static READ16_HANDLER( video_count_r )
 {
@@ -609,8 +609,8 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 
 		#if USE_V25
 		/* only the ram-based V25 based games access the following bits */
-		//cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+		//cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 		#endif
 
 	}
@@ -1008,7 +1008,7 @@ static WRITE16_HANDLER( bgaregga_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine, offset, data & 0xff);
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -1123,7 +1123,7 @@ static WRITE16_HANDLER( batrider_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine, offset, data & 0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1133,7 +1133,7 @@ static WRITE16_HANDLER( batrider_soundlatch2_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch2_w(machine, offset, data & 0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1149,20 +1149,20 @@ static WRITE16_HANDLER( raizing_clear_sndirq_w )
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	cpunum_set_input_line(machine, 0, raizing_sndirq_line, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], raizing_sndirq_line, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_sndirq_w )
 {
 	// if raizing_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	cpunum_set_input_line(machine, 0, raizing_sndirq_line, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], raizing_sndirq_line, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_clear_nmi_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1288,7 +1288,7 @@ static void bbakraid_irqhandler(running_machine *machine, int state)
 
 static INTERRUPT_GEN( bbakraid_snd_interrupt )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 
@@ -1488,7 +1488,7 @@ ADDRESS_MAP_END
 WRITE16_HANDLER( fixeight_subcpu_ctrl )
 {
 	/* 0x18 used */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 }
 #endif
 
@@ -3319,7 +3319,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,0,linestate);
+	cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =
@@ -3809,7 +3809,7 @@ MACHINE_DRIVER_END
 static MACHINE_RESET(batsugun)
 {
 	#if USE_V25
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	#endif
 }
 

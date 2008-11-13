@@ -282,7 +282,7 @@ static void init_mem_names(int feature_set, const char **mem_names)
 
 static const char *get_data_address( const char **mem_names, UINT8 arg )
 {
-	char *buffer = cpuintrf_temp_str();
+	static char buffer[32];
 
 	if (mem_names[arg] == NULL)
 		sprintf(buffer,"$%02X",arg);
@@ -293,7 +293,7 @@ static const char *get_data_address( const char **mem_names, UINT8 arg )
 
 static const char *get_bit_address( const char **mem_names, UINT8 arg )
 {
-	char *buffer = cpuintrf_temp_str();
+	static char buffer[32];
 
 	if(arg < 0x80)
 	{
@@ -324,14 +324,14 @@ static const char *get_bit_address( const char **mem_names, UINT8 arg )
 
 static const char *get_data_address( UINT8 arg )
 {
-	char *buffer = cpuintrf_temp_str();
+	static char buffer[32];
 	sprintf(buffer,"$%02X",arg);
 	return buffer;
 }
 
 static const char *get_bit_address( UINT8 arg )
 {
-	char *buffer = cpuintrf_temp_str();
+	static char buffer[32];
 	sprintf(buffer,"$%02X",arg);
 	return buffer;
 }

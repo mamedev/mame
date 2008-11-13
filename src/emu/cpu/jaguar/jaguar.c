@@ -8,6 +8,7 @@
 
 #include "debugger.h"
 #include "deprecat.h"
+#include "cpuexec.h"
 #include "jaguar.h"
 
 #define LOG_GPU_IO		0
@@ -506,7 +507,7 @@ static CPU_EXECUTE( jaguargpu )
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar.ctrl[G_CTRL] & 1))
 	{
-		cpunum_set_input_line(Machine, cpunum_get_active(), INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(device->machine->activecpu, INPUT_LINE_HALT, ASSERT_LINE);
 		return cycles;
 	}
 
@@ -552,7 +553,7 @@ static CPU_EXECUTE( jaguardsp )
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar.ctrl[G_CTRL] & 1))
 	{
-		cpunum_set_input_line(Machine, cpunum_get_active(), INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(Machine->activecpu, INPUT_LINE_HALT, ASSERT_LINE);
 		return cycles;
 	}
 
@@ -1366,9 +1367,9 @@ void jaguargpu_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 			jaguar.ctrl[offset] = newval;
 			if ((oldval ^ newval) & 0x01)
 			{
-				cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
-				if (cpunum_get_executing() >= 0)
-					cpu_yield();
+				cpu_set_input_line(Machine->cpu[cpunum], INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
+				if (cpunum_get_active() >= 0)
+					cpu_yield(Machine->activecpu);
 			}
 			if (newval & 0x02)
 			{
@@ -1477,9 +1478,9 @@ void jaguardsp_ctrl_w(int cpunum, offs_t offset, UINT32 data, UINT32 mem_mask)
 			jaguar.ctrl[offset] = newval;
 			if ((oldval ^ newval) & 0x01)
 			{
-				cpunum_set_input_line(Machine, cpunum, INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
-				if (cpunum_get_executing() >= 0)
-					cpu_yield();
+				cpu_set_input_line(Machine->cpu[cpunum], INPUT_LINE_HALT, (newval & 1) ? CLEAR_LINE : ASSERT_LINE);
+				if (cpunum_get_active() >= 0)
+					cpu_yield(Machine->activecpu);
 			}
 			if (newval & 0x02)
 			{

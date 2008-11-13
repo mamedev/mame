@@ -248,7 +248,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 	/* sound CPU reset */
 	if (diff & 0x0080)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(newselect & 0x0080)) atarigen_sound_reset();
 	}
 
@@ -415,7 +415,7 @@ static TIMER_CALLBACK( int3_callback )
 	int scanline = param;
 
 	/* update the state */
-	atarigen_scanline_int_gen(machine, 0);
+	atarigen_scanline_int_gen(machine->cpu[0]);
 
 	/* set a timer to turn it off */
 	timer_adjust_oneshot(int3off_timer, video_screen_get_scan_period(machine->primary_screen), 0);

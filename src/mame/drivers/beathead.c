@@ -144,7 +144,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* on scanline zero, clear any halt condition */
 	if (scanline == 0)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
 
 	/* wrap around at 262 */
 	scanline++;
@@ -204,7 +204,7 @@ static void update_interrupts(running_machine *machine)
 	{
 		irq_line_state = gen_int;
 //      if (irq_line_state != CLEAR_LINE)
-			cpunum_set_input_line(machine, 0, ASAP_IRQ0, irq_line_state);
+			cpu_set_input_line(machine->cpu[0], ASAP_IRQ0, irq_line_state);
 //      else
 //          asap_set_irq_line(ASAP_IRQ0, irq_line_state);
 	}
@@ -299,7 +299,7 @@ static WRITE32_HANDLER( sound_data_w )
 static WRITE32_HANDLER( sound_reset_w )
 {
 	logerror("Sound reset = %d\n", !offset);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -480,7 +480,7 @@ static READ32_HANDLER( speedup_r )
 {
 	int result = *speedup_data;
 	if ((cpu_get_previouspc(machine->activecpu) & 0xfffff) == 0x006f0 && result == cpu_get_reg(machine->activecpu, ASAP_R3))
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	return result;
 }
 
@@ -494,7 +494,7 @@ static READ32_HANDLER( movie_speedup_r )
 	{
 		UINT32 temp = (INT16)result + movie_speedup_data[4] * 262;
 		if (temp - (UINT32)cpu_get_reg(machine->activecpu, ASAP_R15) < (UINT32)cpu_get_reg(machine->activecpu, ASAP_R23))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 	}
 	return result;
 }

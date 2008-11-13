@@ -427,7 +427,7 @@ static INTERRUPT_GEN( pturn_sub_intgen )
 {
 	if(nmi_sub)
 	{
-		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -435,7 +435,7 @@ static INTERRUPT_GEN( pturn_main_intgen )
 {
 	if (nmi_main)
 	{
-		cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 

@@ -26,11 +26,11 @@ WRITE8_HANDLER( bublbobl_bankswitch_w )
 	/* bit 3 n.c. */
 
 	/* bit 4 resets second Z80 */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 5 resets mcu */
 	if (machine->config->cpu[3].type != CPU_DUMMY)	// only if we have a MCU
-		cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, (data & 0x20) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* bit 6 enables display */
 	bublbobl_video_enable = data & 0x40;
@@ -59,7 +59,7 @@ WRITE8_HANDLER( tokio_videoctrl_w )
 
 WRITE8_HANDLER( bublbobl_nmitrigger_w )
 {
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -98,7 +98,7 @@ static int sound_nmi_enable,pending_nmi;
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	if (sound_nmi_enable) cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
+	if (sound_nmi_enable) cpu_set_input_line(machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
 	else pending_nmi = 1;
 }
 
@@ -118,7 +118,7 @@ WRITE8_HANDLER( bublbobl_sh_nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpunum_set_input_line(machine, 2,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
@@ -198,8 +198,8 @@ WRITE8_HANDLER( bublbobl_mcu_port1_w )
 	if ((port1_out & 0x40) && (~data & 0x40))
 	{
 //      logerror("triggering IRQ on main CPU\n");
-		cpunum_set_input_line_vector(0,0,bublbobl_mcu_sharedram[0]);
-		cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+		cpu_set_input_line_vector(machine->cpu[0],0,bublbobl_mcu_sharedram[0]);
+		cpu_set_input_line(machine->cpu[0],0,HOLD_LINE);
 	}
 
 	// bit 7: select read or write shared RAM
@@ -370,10 +370,10 @@ READ8_HANDLER( boblbobl_ic43_b_r )
 INTERRUPT_GEN( bublbobl_m68705_interrupt )
 {
 	/* I don't know how to handle the interrupt line so I just toggle it every time. */
-	if (cpu_getiloops() & 1)
-		cpunum_set_input_line(machine, 3,0,CLEAR_LINE);
+	if (cpu_getiloops(device) & 1)
+		cpu_set_input_line(device,0,CLEAR_LINE);
 	else
-		cpunum_set_input_line(machine, 3,0,ASSERT_LINE);
+		cpu_set_input_line(device,0,ASSERT_LINE);
 }
 
 
@@ -478,8 +478,8 @@ logerror("%04x: 68705 unknown write to address %04x\n",cpu_get_pc(machine->activ
 		/* hack to get random EXTEND letters (who is supposed to do this? 68705? PAL?) */
 		bublbobl_mcu_sharedram[0x7c] = mame_rand(machine)%6;
 
-		cpunum_set_input_line_vector(0,0,bublbobl_mcu_sharedram[0]);
-		cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+		cpu_set_input_line_vector(machine->cpu[0],0,bublbobl_mcu_sharedram[0]);
+		cpu_set_input_line(machine->cpu[0],0,HOLD_LINE);
 	}
 	if ((ddrB & 0x40) && (~data & 0x40) && (portB_out & 0x40))
 	{

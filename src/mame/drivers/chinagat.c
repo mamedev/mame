@@ -142,13 +142,13 @@ static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 
 static WRITE8_HANDLER( chinagat_sub_IRQ_w )
 {
-	cpunum_set_input_line(machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	cpu_set_input_line(machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static WRITE8_HANDLER( chinagat_cpu_sound_cmd_w )
 {
 	soundlatch_w( machine, offset, data );
-	cpunum_set_input_line(machine, 2, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	cpu_set_input_line(machine->cpu[2], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static READ8_HANDLER( saiyugb1_mcu_command_r )
@@ -156,7 +156,7 @@ static READ8_HANDLER( saiyugb1_mcu_command_r )
 #if 0
 	if (saiyugb1_mcu_command == 0x78)
 	{
-		cpunum_suspend(3, SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
+		cpu_suspend(machine->cpu[3], SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
 	}
 #endif
 	return saiyugb1_mcu_command;
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( saiyugb1_mcu_command_w )
 #if 0
 	if (data != 0x78)
 	{
-		cpunum_resume(3, SUSPEND_REASON_HALT);	/* Wake up */
+		cpu_resume(machine->cpu[3], SUSPEND_REASON_HALT);	/* Wake up */
 	}
 #endif
 }
@@ -459,7 +459,7 @@ GFXDECODE_END
 
 static void chinagat_irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -477,8 +477,8 @@ static const msm5205_interface msm5205_config =
 
 static INTERRUPT_GEN( chinagat_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	/* hold the FIRQ line */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);	/* pulse the NMI line */
+	cpu_set_input_line(device, 1, HOLD_LINE);	/* hold the FIRQ line */
+	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);	/* pulse the NMI line */
 }
 
 /* This is only on the second bootleg board */

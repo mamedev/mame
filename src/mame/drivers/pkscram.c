@@ -86,7 +86,7 @@ static WRITE16_HANDLER( pkscramble_output_w )
 
 	if (!(out & 0x2000) && interrupt_line_active)
 	{
-	    cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+	    cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
 		interrupt_line_active = 0;
 	}
 
@@ -210,14 +210,14 @@ static TIMER_CALLBACK( scanline_callback )
 	if (param==interrupt_scanline)
 	{
     	if (out&0x2000)
-    		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
+    		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
 		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, param+1, 0), param+1);
 		interrupt_line_active = 1;
 	}
 	else
 	{
 		if (interrupt_line_active)
-	    	cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+	    	cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
 		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
 		interrupt_line_active = 0;
 	}
@@ -260,7 +260,7 @@ GFXDECODE_END
 static void irqhandler(running_machine *machine, int irq)
 {
 	if(out & 0x10)
-		cpunum_set_input_line(machine, 0,2,irq ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0],2,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

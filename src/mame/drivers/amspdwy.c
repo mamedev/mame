@@ -70,7 +70,7 @@ static READ8_HANDLER( amspdwy_sound_r )
 static WRITE8_HANDLER( amspdwy_sound_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -241,7 +241,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface amspdwy_ym2151_interface =

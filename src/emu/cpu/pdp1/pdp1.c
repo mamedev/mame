@@ -1027,11 +1027,11 @@ CPU_GET_INFO( pdp1 )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &pdp1_ICount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME: 							strcpy(info->s = cpuintrf_temp_str(), "PDP1");	break;
-	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s = cpuintrf_temp_str(), "DEC PDP-1");	break;
-	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s = cpuintrf_temp_str(), "2.0");	break;
-	case CPUINFO_STR_CORE_FILE:						strcpy(info->s = cpuintrf_temp_str(), __FILE__);	break;
-	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s = cpuintrf_temp_str(),
+	case CPUINFO_STR_NAME: 							strcpy(info->s, "PDP1");	break;
+	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "DEC PDP-1");	break;
+	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "2.0");	break;
+	case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);	break;
+	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s,
 															"Brian Silverman (original Java Source)\n"
 															"Vadim Gerasimov (original Java Source)\n"
 															"Chris Salomon (MESS driver)\n"
@@ -1039,7 +1039,7 @@ CPU_GET_INFO( pdp1 )
 													break;
 
     case CPUINFO_STR_FLAGS:
-		sprintf(info->s = cpuintrf_temp_str(), "%c%c%c%c%c%c-%c%c%c%c%c%c",
+		sprintf(info->s, "%c%c%c%c%c%c-%c%c%c%c%c%c",
 				 (FLAGS & 040) ? '1' : '.',
 				 (FLAGS & 020) ? '2' : '.',
 				 (FLAGS & 010) ? '3' : '.',
@@ -1055,42 +1055,42 @@ CPU_GET_INFO( pdp1 )
 		break;
 
 
-	case CPUINFO_STR_REGISTER + PDP1_PC:			sprintf(info->s = cpuintrf_temp_str(), "PC:0%06o", PC); break;
-	case CPUINFO_STR_REGISTER + PDP1_IR:			sprintf(info->s = cpuintrf_temp_str(), "IR:0%02o", IR); break;
-	case CPUINFO_STR_REGISTER + PDP1_MB:			sprintf(info->s = cpuintrf_temp_str(), "MB:0%06o", MB); break;
-	case CPUINFO_STR_REGISTER + PDP1_MA:			sprintf(info->s = cpuintrf_temp_str(), "MA:0%06o", MA); break;
-	case CPUINFO_STR_REGISTER + PDP1_AC:			sprintf(info->s = cpuintrf_temp_str(), "AC:0%06o", AC); break;
-	case CPUINFO_STR_REGISTER + PDP1_IO:			sprintf(info->s = cpuintrf_temp_str(), "IO:0%06o", IO); break;
-	case CPUINFO_STR_REGISTER + PDP1_OV:			sprintf(info->s = cpuintrf_temp_str(), "OV:%X", OV); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF:			sprintf(info->s = cpuintrf_temp_str(), "FLAGS:0%02o", FLAGS); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF1:			sprintf(info->s = cpuintrf_temp_str(), "FLAG1:%X", READFLAG(1)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF2:			sprintf(info->s = cpuintrf_temp_str(), "FLAG2:%X", READFLAG(2)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF3:			sprintf(info->s = cpuintrf_temp_str(), "FLAG3:%X", READFLAG(3)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF4:			sprintf(info->s = cpuintrf_temp_str(), "FLAG4:%X", READFLAG(4)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF5:			sprintf(info->s = cpuintrf_temp_str(), "FLAG5:%X", READFLAG(5)); break;
-	case CPUINFO_STR_REGISTER + PDP1_PF6:			sprintf(info->s = cpuintrf_temp_str(), "FLAG6:%X", READFLAG(6)); break;
-	case CPUINFO_STR_REGISTER + PDP1_TA:			sprintf(info->s = cpuintrf_temp_str(), "TA:0%06o", pdp1.ta); break;
-	case CPUINFO_STR_REGISTER + PDP1_TW:			sprintf(info->s = cpuintrf_temp_str(), "TW:0%06o", pdp1.tw); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS:			sprintf(info->s = cpuintrf_temp_str(), "SS:0%02o", SENSE_SW); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS1:			sprintf(info->s = cpuintrf_temp_str(), "SENSE1:%X", READSENSE(1)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS2:			sprintf(info->s = cpuintrf_temp_str(), "SENSE2:%X", READSENSE(2)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS3:			sprintf(info->s = cpuintrf_temp_str(), "SENSE3:%X", READSENSE(3)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS4:			sprintf(info->s = cpuintrf_temp_str(), "SENSE4:%X", READSENSE(4)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS5:			sprintf(info->s = cpuintrf_temp_str(), "SENSE5:%X", READSENSE(5)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SS6:			sprintf(info->s = cpuintrf_temp_str(), "SENSE6:%X", READSENSE(6)); break;
-	case CPUINFO_STR_REGISTER + PDP1_SNGL_STEP:		sprintf(info->s = cpuintrf_temp_str(), "SNGLSTEP:%X", pdp1.sngl_step); break;
-	case CPUINFO_STR_REGISTER + PDP1_SNGL_INST:		sprintf(info->s = cpuintrf_temp_str(), "SNGLINST:%X", pdp1.sngl_inst); break;
-	case CPUINFO_STR_REGISTER + PDP1_EXTEND_SW:		sprintf(info->s = cpuintrf_temp_str(), "EXS:%X", pdp1.extend_sw); break;
-	case CPUINFO_STR_REGISTER + PDP1_RUN:			sprintf(info->s = cpuintrf_temp_str(), "RUN:%X", pdp1.run); break;
-	case CPUINFO_STR_REGISTER + PDP1_CYC:			sprintf(info->s = cpuintrf_temp_str(), "CYC:%X", pdp1.cycle); break;
-	case CPUINFO_STR_REGISTER + PDP1_DEFER:			sprintf(info->s = cpuintrf_temp_str(), "DF:%X", pdp1.defer); break;
-	case CPUINFO_STR_REGISTER + PDP1_BRK_CTR:		sprintf(info->s = cpuintrf_temp_str(), "BRKCTR:%X", pdp1.brk_ctr); break;
-	case CPUINFO_STR_REGISTER + PDP1_RIM:			sprintf(info->s = cpuintrf_temp_str(), "RIM:%X", pdp1.rim); break;
-	case CPUINFO_STR_REGISTER + PDP1_SBM:			sprintf(info->s = cpuintrf_temp_str(), "SBM:%X", pdp1.sbm); break;
-	case CPUINFO_STR_REGISTER + PDP1_EXD:			sprintf(info->s = cpuintrf_temp_str(), "EXD:%X", EXD); break;
-	case CPUINFO_STR_REGISTER + PDP1_IOC:			sprintf(info->s = cpuintrf_temp_str(), "IOC:%X", pdp1.ioc); break;
-	case CPUINFO_STR_REGISTER + PDP1_IOH:			sprintf(info->s = cpuintrf_temp_str(), "IOH:%X", pdp1.ioh); break;
-	case CPUINFO_STR_REGISTER + PDP1_IOS:			sprintf(info->s = cpuintrf_temp_str(), "IOS:%X", pdp1.ios); break;
+	case CPUINFO_STR_REGISTER + PDP1_PC:			sprintf(info->s, "PC:0%06o", PC); break;
+	case CPUINFO_STR_REGISTER + PDP1_IR:			sprintf(info->s, "IR:0%02o", IR); break;
+	case CPUINFO_STR_REGISTER + PDP1_MB:			sprintf(info->s, "MB:0%06o", MB); break;
+	case CPUINFO_STR_REGISTER + PDP1_MA:			sprintf(info->s, "MA:0%06o", MA); break;
+	case CPUINFO_STR_REGISTER + PDP1_AC:			sprintf(info->s, "AC:0%06o", AC); break;
+	case CPUINFO_STR_REGISTER + PDP1_IO:			sprintf(info->s, "IO:0%06o", IO); break;
+	case CPUINFO_STR_REGISTER + PDP1_OV:			sprintf(info->s, "OV:%X", OV); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF:			sprintf(info->s, "FLAGS:0%02o", FLAGS); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF1:			sprintf(info->s, "FLAG1:%X", READFLAG(1)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF2:			sprintf(info->s, "FLAG2:%X", READFLAG(2)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF3:			sprintf(info->s, "FLAG3:%X", READFLAG(3)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF4:			sprintf(info->s, "FLAG4:%X", READFLAG(4)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF5:			sprintf(info->s, "FLAG5:%X", READFLAG(5)); break;
+	case CPUINFO_STR_REGISTER + PDP1_PF6:			sprintf(info->s, "FLAG6:%X", READFLAG(6)); break;
+	case CPUINFO_STR_REGISTER + PDP1_TA:			sprintf(info->s, "TA:0%06o", pdp1.ta); break;
+	case CPUINFO_STR_REGISTER + PDP1_TW:			sprintf(info->s, "TW:0%06o", pdp1.tw); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS:			sprintf(info->s, "SS:0%02o", SENSE_SW); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS1:			sprintf(info->s, "SENSE1:%X", READSENSE(1)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS2:			sprintf(info->s, "SENSE2:%X", READSENSE(2)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS3:			sprintf(info->s, "SENSE3:%X", READSENSE(3)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS4:			sprintf(info->s, "SENSE4:%X", READSENSE(4)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS5:			sprintf(info->s, "SENSE5:%X", READSENSE(5)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SS6:			sprintf(info->s, "SENSE6:%X", READSENSE(6)); break;
+	case CPUINFO_STR_REGISTER + PDP1_SNGL_STEP:		sprintf(info->s, "SNGLSTEP:%X", pdp1.sngl_step); break;
+	case CPUINFO_STR_REGISTER + PDP1_SNGL_INST:		sprintf(info->s, "SNGLINST:%X", pdp1.sngl_inst); break;
+	case CPUINFO_STR_REGISTER + PDP1_EXTEND_SW:		sprintf(info->s, "EXS:%X", pdp1.extend_sw); break;
+	case CPUINFO_STR_REGISTER + PDP1_RUN:			sprintf(info->s, "RUN:%X", pdp1.run); break;
+	case CPUINFO_STR_REGISTER + PDP1_CYC:			sprintf(info->s, "CYC:%X", pdp1.cycle); break;
+	case CPUINFO_STR_REGISTER + PDP1_DEFER:			sprintf(info->s, "DF:%X", pdp1.defer); break;
+	case CPUINFO_STR_REGISTER + PDP1_BRK_CTR:		sprintf(info->s, "BRKCTR:%X", pdp1.brk_ctr); break;
+	case CPUINFO_STR_REGISTER + PDP1_RIM:			sprintf(info->s, "RIM:%X", pdp1.rim); break;
+	case CPUINFO_STR_REGISTER + PDP1_SBM:			sprintf(info->s, "SBM:%X", pdp1.sbm); break;
+	case CPUINFO_STR_REGISTER + PDP1_EXD:			sprintf(info->s, "EXD:%X", EXD); break;
+	case CPUINFO_STR_REGISTER + PDP1_IOC:			sprintf(info->s, "IOC:%X", pdp1.ioc); break;
+	case CPUINFO_STR_REGISTER + PDP1_IOH:			sprintf(info->s, "IOH:%X", pdp1.ioh); break;
+	case CPUINFO_STR_REGISTER + PDP1_IOS:			sprintf(info->s, "IOS:%X", pdp1.ios); break;
 	}
 }
 

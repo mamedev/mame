@@ -315,7 +315,7 @@ static WRITE8_HANDLER( omegrace_leds_w )
 static WRITE8_HANDLER( omegrace_soundlatch_w )
 {
 	soundlatch_w (machine, offset, data);
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 

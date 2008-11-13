@@ -72,7 +72,7 @@ WRITE8_HANDLER( cchasm_snd_io_w )
     case 0x41:
         sound_flags |= 0x40;
         soundlatch4_w (machine, offset, data);
-        cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+        cpu_set_input_line(machine->cpu[0], 1, HOLD_LINE);
         break;
 
     case 0x61:
@@ -100,7 +100,7 @@ WRITE16_HANDLER( cchasm_io_w )
 			sound_flags |= 0x80;
 			soundlatch2_w (machine, offset, data);
 			z80ctc_trg2_w (ctc, 0, 1);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		case 2:
 			led = data;
@@ -134,7 +134,7 @@ static int output[2];
 
 static void ctc_interrupt (const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 1, 0, state);
+	cpu_set_input_line(device->machine->cpu[1], 0, state);
 }
 
 static WRITE8_DEVICE_HANDLER( ctc_timer_1_w )

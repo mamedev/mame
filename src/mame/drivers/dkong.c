@@ -380,7 +380,7 @@ static const dma8257_interface hb_dma =
 
 static INTERRUPT_GEN( s2650_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x03);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
 /*************************************
@@ -711,13 +711,13 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 

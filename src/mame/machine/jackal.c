@@ -23,7 +23,7 @@ MACHINE_RESET( jackal )
 
 	// HACK: running at the nominal clock rate, music stops working
 	// at the beginning of the game. This fixes it.
-	cpunum_set_clockscale(machine, 1, 1.2f);
+	cpu_set_clockscale(machine->cpu[1], 1.2f);
 
 	memory_set_bankptr(1,&rgn[0x4000]);
  	jackal_rambank = rgn;

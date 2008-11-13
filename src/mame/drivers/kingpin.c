@@ -121,12 +121,12 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( kingpin_video_interrupt )
 {
-	TMS9928A_interrupt(machine);
+	TMS9928A_interrupt(device->machine);
 }
 
 static void vdp_interrupt (running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0,0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],0, HOLD_LINE);
 }
 
 static const TMS9928a_interface tms9928a_interface =

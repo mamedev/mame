@@ -30,18 +30,18 @@ extern VIDEO_UPDATE( tryout );
 
 static WRITE8_HANDLER( tryout_nmi_ack_w )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( tryout_sound_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1, 0, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( tryout_sound_irq_ack_w )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( tryout_bankswitch_w )
@@ -183,8 +183,8 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( tryout_interrupt )
 {
-	if ((input_port_read(machine, "SYSTEM") & 0x1c) != 0x1c)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+	if ((input_port_read(device->machine, "SYSTEM") & 0x1c) != 0x1c)
+		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( tryout )

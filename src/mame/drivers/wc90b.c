@@ -141,7 +141,7 @@ static WRITE8_HANDLER( wc90b_bankswitch1_w )
 static WRITE8_HANDLER( wc90b_sound_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 2,0,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[2],0,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( adpcm_control_w )
@@ -349,7 +349,7 @@ GFXDECODE_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -371,7 +371,7 @@ static void adpcm_int(running_machine *machine, int data)
 
 	toggle ^= 1;
 	if(toggle)
-		cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 
 }
 

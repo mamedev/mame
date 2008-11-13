@@ -78,27 +78,27 @@ static UINT8 *sn_nmi_enable;
 
 static WRITE8_HANDLER( flower_irq_ack )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( sn_irq_enable_w )
 {
 	*sn_irq_enable = data;
 
-	cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( sn_irq )
 {
 	if ((*sn_irq_enable & 1) == 1)
-		cpunum_set_input_line(machine, 2, 0, ASSERT_LINE);
+		cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(machine,0,data);
 	if ((*sn_nmi_enable & 1) == 1)
-		cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( flower_cpu1_2, ADDRESS_SPACE_PROGRAM, 8 )
@@ -238,7 +238,7 @@ static const custom_sound_interface custom_interface =
 
 static INTERRUPT_GEN( flower_cpu0_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( flower )

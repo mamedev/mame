@@ -35,7 +35,7 @@ static MACHINE_START( pooyan )
 static INTERRUPT_GEN( pooyan_interrupt )
 {
 	if (irq_enable)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -43,7 +43,7 @@ static WRITE8_HANDLER( irq_enable_w )
 {
 	irq_enable = data & 1;
 	if (!irq_enable)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

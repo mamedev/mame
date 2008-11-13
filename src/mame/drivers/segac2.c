@@ -1350,7 +1350,7 @@ INPUT_PORTS_END
 void  segac2_irq2_interrupt(running_machine *machine, int state)
 {
 	//printf("sound irq %d\n", state);
-	cpunum_set_input_line(machine, 0, 2, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 static const ym3438_interface ym3438_intf =
 {

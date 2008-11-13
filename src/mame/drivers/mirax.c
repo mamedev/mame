@@ -78,7 +78,7 @@ static VIDEO_UPDATE(mirax)
 	//audio tester
 	if(input_code_pressed_once(KEYCODE_Q))
 	{
-		cpunum_set_input_line(screen->machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(screen->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 	}
 #endif
 	return 0;

@@ -60,11 +60,11 @@ static WRITE8_HANDLER( sprite_shared_w ) {
 }
 
 static WRITE8_HANDLER( video_interrupt_w ) {
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
 }
 
 static WRITE8_HANDLER( sprite_interrupt_w ) {
-	cpunum_set_input_line_and_vector(machine, 2, 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(machine->cpu[2], 0, HOLD_LINE, 0xff );
 }
 
 static WRITE8_HANDLER( scroll_interrupt_w ) {
@@ -74,7 +74,7 @@ static WRITE8_HANDLER( scroll_interrupt_w ) {
 
 static WRITE8_HANDLER( sound_command_w ) {
 	soundlatch_w( machine, 0, data );
-	cpunum_set_input_line_and_vector(machine, 3, 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(machine->cpu[3], 0, HOLD_LINE, 0xff );
 }
 
 
@@ -536,7 +536,7 @@ static const ay8910_interface ay8910_config =
 static INTERRUPT_GEN( kingofb_interrupt ) {
 
 	if ( kingofb_nmi_enable )
-		cpunum_set_input_line(machine, cpunum_get_active(), INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( kingofb )

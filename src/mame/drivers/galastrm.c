@@ -59,12 +59,12 @@ extern INT16  galastrm_tc0610_ctrl_reg[2][8];
 static INTERRUPT_GEN( galastrm_interrupt )
 {
 	frame_counter ^= 1;
-	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( galastrm_interrupt6 )
 {
-	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 6, HOLD_LINE);
 }
 
 

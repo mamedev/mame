@@ -316,14 +316,14 @@ READ32_HANDLER( K001005_r )
 			{
 				if (K001005_fifo_read_ptr < 0x3ff)
 				{
-					//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+					//cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG1, CLEAR_LINE);
 					cpu_push_context(machine->cpu[2]);
 					sharc_set_flag_input(1, CLEAR_LINE);
 					cpu_pop_context();
 				}
 				else
 				{
-					//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
+					//cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
 					cpu_push_context(machine->cpu[2]);
 					sharc_set_flag_input(1, ASSERT_LINE);
 					cpu_pop_context();
@@ -331,7 +331,7 @@ READ32_HANDLER( K001005_r )
 			}
 			else
 			{
-				//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
+				//cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
 				cpu_push_context(machine->cpu[2]);
 				sharc_set_flag_input(1, ASSERT_LINE);
 				cpu_pop_context();
@@ -375,14 +375,14 @@ WRITE32_HANDLER( K001005_w )
 			{
 				if (K001005_fifo_write_ptr < 0x400)
 				{
-					//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
+					//cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
 					cpu_push_context(machine->cpu[2]);
 					sharc_set_flag_input(1, ASSERT_LINE);
 					cpu_pop_context();
 				}
 				else
 				{
-					//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+					//cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG1, CLEAR_LINE);
 					cpu_push_context(machine->cpu[2]);
 					sharc_set_flag_input(1, CLEAR_LINE);
 					cpu_pop_context();
@@ -390,7 +390,7 @@ WRITE32_HANDLER( K001005_w )
 			}
 			else
 			{
-				//cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
+				//cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
 				cpu_push_context(machine->cpu[2]);
 				sharc_set_flag_input(1, ASSERT_LINE);
 				cpu_pop_context();
@@ -407,13 +407,13 @@ WRITE32_HANDLER( K001005_w )
 			if (cpu_get_pc(machine->activecpu) == 0x201ee)
 			{
 				// This is used to make the SHARC timeout
-				cpu_spinuntil_trigger(10000);
+				cpu_spinuntil_trigger(machine->activecpu, 10000);
 			}
 			// !!! HACK to get past the FIFO B test (Winding Heat & Midnight Run) !!!
 			if (cpu_get_pc(machine->activecpu) == 0x201e6)
 			{
 				// This is used to make the SHARC timeout
-				cpu_spinuntil_trigger(10000);
+				cpu_spinuntil_trigger(machine->activecpu, 10000);
 			}
 
 			break;
@@ -1058,7 +1058,7 @@ VIDEO_UPDATE( gticlub )
 	draw_7segment_led(bitmap, 3, 3, gticlub_led_reg0);
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);
 
-	//cpunum_set_input_line(screen->machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
+	//cpu_set_input_line(screen->machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
 	cpu_push_context(screen->machine->cpu[2]);
 	sharc_set_flag_input(1, ASSERT_LINE);
 	cpu_pop_context();

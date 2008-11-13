@@ -84,7 +84,7 @@ static NVRAM_HANDLER( seicross )
 static MACHINE_RESET( friskyt )
 {
 	/* start with the protection mcu halted */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -106,8 +106,8 @@ static WRITE8_HANDLER( friskyt_portB_w )
 	if (((portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	/* other bits unknown */

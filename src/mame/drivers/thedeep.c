@@ -45,7 +45,7 @@ static WRITE8_HANDLER( thedeep_nmi_w )
 static WRITE8_HANDLER( thedeep_sound_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 protection_command, protection_data;
@@ -307,7 +307,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface thedeep_ym2203_intf =
@@ -322,11 +322,11 @@ static const ym2203_interface thedeep_ym2203_intf =
 
 static INTERRUPT_GEN( thedeep_interrupt )
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
 		if (protection_command != 0x59)
 		{
-			int coins = input_port_read(machine, "MCU");
+			int coins = input_port_read(device->machine, "MCU");
 			if		(coins & 1)	protection_data = 1;
 			else if	(coins & 2)	protection_data = 2;
 			else if	(coins & 4)	protection_data = 3;
@@ -336,14 +336,14 @@ static INTERRUPT_GEN( thedeep_interrupt )
 				protection_irq = 1;
 		}
 		if (protection_irq)
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+			cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 	else
 	{
 		if (nmi_enable)
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, CLEAR_LINE);
 		}
 	}
 }

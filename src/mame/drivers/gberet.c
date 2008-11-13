@@ -91,16 +91,16 @@ static UINT8 nmi_enable, irq_enable;
 
 static INTERRUPT_GEN( gberet_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		if (irq_enable)
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+			cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 
-	if (cpu_getiloops() % 2)
+	if (cpu_getiloops(device) % 2)
 	{
 		if (nmi_enable)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

@@ -336,7 +336,7 @@ GFXDECODE_END
 static void irqhandler(running_machine *machine, int irq)
 {
 	logerror("YM3526 firing an IRQ\n");
-//  cpunum_set_input_line(machine, 2,0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(machine->cpu[2],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3526_interface ym3526_config =
@@ -348,7 +348,7 @@ static const ym3526_interface ym3526_config =
 
 static INTERRUPT_GEN( missb2_interrupt )
 {
-	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 /* Machine Driver */

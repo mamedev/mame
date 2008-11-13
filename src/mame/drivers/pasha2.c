@@ -456,7 +456,7 @@ static READ16_HANDLER( pasha2_speedup_r )
 {
 	if(cpu_get_pc(machine->activecpu) == 0x8302)
 	{
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return wram[(0x95744/2)+offset];

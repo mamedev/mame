@@ -113,8 +113,8 @@ static MACHINE_START( m72 )
 
 static TIMER_CALLBACK( synch_callback )
 {
-	//cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(8000000));
-	cpu_boost_interleave(machine, ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(25));
+	//cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(8000000));
+	cpuexec_boost_interleave(machine, ATTOTIME_IN_HZ(MASTER_CLOCK/4/12), ATTOTIME_IN_SEC(25));
 }
 
 static MACHINE_RESET( m72 )
@@ -257,7 +257,7 @@ static INTERRUPT_GEN( m72_mcu_int )
 {
 	//mcu_snd_cmd_latch |= 0x11; /* 0x10 is special as well - FIXME */
 	mcu_snd_cmd_latch = 0x11;// | (mame_rand(machine) & 1); /* 0x10 is special as well - FIXME */
-	cputag_set_input_line(machine, "mcu", 1, ASSERT_LINE);
+	cpu_set_input_line(device, 1, ASSERT_LINE);
 }
 
 static READ8_HANDLER(m72_mcu_sample_r )
@@ -402,9 +402,9 @@ static int find_sample(int num)
 
 static INTERRUPT_GEN(fake_nmi)
 {
-	int sample = m72_sample_r(machine,0);
+	int sample = m72_sample_r(device->machine,0);
 	if (sample)
-		m72_sample_w(machine,0,sample);
+		m72_sample_w(device->machine,0,sample);
 }
 
 

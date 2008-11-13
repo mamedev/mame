@@ -47,7 +47,7 @@ static const int scramble_timer[10] =
 
 READ8_HANDLER( scramble_portB_r )
 {
-	return scramble_timer[(activecpu_gettotalcycles()/512) % 10];
+	return scramble_timer[(cpu_get_total_cycles(machine->activecpu)/512) % 10];
 }
 
 
@@ -76,7 +76,7 @@ static const int frogger_timer[10] =
 
 READ8_HANDLER( frogger_portB_r )
 {
-	return frogger_timer[(activecpu_gettotalcycles()/512) % 10];
+	return frogger_timer[(cpu_get_total_cycles(machine->activecpu)/512) % 10];
 }
 
 
@@ -145,24 +145,24 @@ static void scramble_sh_7474_callback(void)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cpunum_set_input_line(Machine, 1, 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[1], 0, !TTL7474_output_comp_r(2) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static void sfx_sh_7474_callback(void)
 {
 	/* the Q bar is connected to the Z80's INT line.  But since INT is complemented, */
 	/* we need to complement Q bar */
-	cpunum_set_input_line(Machine, 2, 0, !TTL7474_output_comp_r(3) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[2], 0, !TTL7474_output_comp_r(3) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 {
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( hotshock_soundlatch_r )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	return soundlatch_r(machine,0);
 }
 
@@ -211,7 +211,7 @@ static const struct TTL7474_interface sfx_sh_7474_intf =
 
 void scramble_sh_init(void)
 {
-	cpunum_set_irq_callback(1, scramble_sh_irq_callback);
+	cpu_set_irq_callback(Machine->cpu[1], scramble_sh_irq_callback);
 
 	TTL7474_config(2, &scramble_sh_7474_intf);
 
@@ -221,7 +221,7 @@ void scramble_sh_init(void)
 
 void sfx_sh_init(void)
 {
-	cpunum_set_irq_callback(2, sfx_sh_irq_callback);
+	cpu_set_irq_callback(Machine->cpu[2], sfx_sh_irq_callback);
 
 	TTL7474_config(3, &sfx_sh_7474_intf);
 

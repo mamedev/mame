@@ -247,7 +247,7 @@ static READ8_HANDLER( exprraid_protection_r )
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
     soundlatch_w(machine,0,data);
-    cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+    cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static READ8_HANDLER( vblank_r )
@@ -436,7 +436,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,linestate,0xff);
+	cpu_set_input_line_and_vector(machine->cpu[1],0,linestate,0xff);
 }
 
 static const ym3526_interface ym3526_config =
@@ -448,12 +448,12 @@ static INTERRUPT_GEN( exprraid_interrupt )
 {
 	static int coin = 0;
 
-	if ((~input_port_read(machine, "IN2")) & 0xc0 )
+	if ((~input_port_read(device->machine, "IN2")) & 0xc0 )
 	{
 		if ( coin == 0 )
 		{
 			coin = 1;
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else

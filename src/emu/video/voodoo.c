@@ -2038,7 +2038,7 @@ static void check_stalled_cpu(voodoo_state *v, attotime current_time)
 		if (v->pci.stall_callback)
 			(*v->pci.stall_callback)(v->device, FALSE);
 		else
-			cpu_trigger(v->device->machine, v->trigger);
+			cpuexec_trigger(v->device->machine, v->trigger);
 	}
 
 	/* if not, set a timer for the next one */
@@ -2062,7 +2062,7 @@ static void stall_cpu(voodoo_state *v, int state, attotime current_time)
 	if (v->pci.stall_callback)
 		(*v->pci.stall_callback)(v->device, TRUE);
 	else
-		cpu_spinuntil_trigger(v->trigger);
+		cpu_spinuntil_trigger(v->device->machine->activecpu, v->trigger);
 
 	/* set a timer to clear the stall */
 	timer_adjust_oneshot(v->pci.continue_timer, attotime_sub(v->pci.op_end_time, current_time), 0);
@@ -3686,7 +3686,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			/* bit 31 is not used */
 
 			/* eat some cycles since people like polling here */
-			activecpu_eat_cycles(1000);
+			cpu_eat_cycles(v->device->machine->activecpu, 1000);
 			break;
 
 		/* bit 2 of the initEnable register maps this to dacRead */
@@ -3699,7 +3699,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 		case vRetrace:
 
 			/* eat some cycles since people like polling here */
-			activecpu_eat_cycles(10);
+			cpu_eat_cycles(v->device->machine->activecpu, 10);
 			result = video_screen_get_vpos(v->screen);
 			break;
 
@@ -3714,7 +3714,7 @@ static UINT32 register_r(voodoo_state *v, offs_t offset)
 			result = v->fbi.cmdfifo[0].rdptr;
 
 			/* eat some cycles since people like polling here */
-			activecpu_eat_cycles(1000);
+			cpu_eat_cycles(v->device->machine->activecpu, 1000);
 			break;
 
 		case cmdFifoAMin:

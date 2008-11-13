@@ -147,11 +147,11 @@ static void IntReq(running_machine *machine, int num)
 	{
 		IntPend|=(1<<num);
 		program_write_dword_32le(0x01800c0c,IntPend);
-		cpunum_set_input_line(machine, 0,SE3208_INT,ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0],SE3208_INT,ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
 	FlipCntRead=0;
-	cpunum_resume(0,SUSPEND_REASON_SPIN);
+	cpu_resume(machine->cpu[0],SUSPEND_REASON_SPIN);
 #endif
 }
 
@@ -161,7 +161,7 @@ static READ32_HANDLER(FlipCount_r)
 	UINT32 IntPend=program_read_dword_32le(0x01800c0c);
 	FlipCntRead++;
 	if(FlipCntRead>=16 && !IntPend && FlipCount!=0)
-		cpunum_suspend(0,SUSPEND_REASON_SPIN,1);
+		cpu_suspend(machine->cpu[0],SUSPEND_REASON_SPIN,1);
 #endif
 	return ((UINT32) FlipCount)<<16;
 }
@@ -205,7 +205,7 @@ static WRITE32_HANDLER(IntAck_w)
 		IntPend&=~(1<<(data&0x1f));
 		program_write_dword_32le(0x01800c0c,IntPend);
 		if(!IntPend)
-			cpunum_set_input_line(machine, 0,SE3208_INT,CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0],SE3208_INT,CLEAR_LINE);
 	}
 	if(mem_mask&0xff00)
 		IntHigh=(data>>8)&7;
@@ -499,7 +499,7 @@ static MACHINE_START(crystal)
 {
 	int i;
 
-	cpunum_set_irq_callback(0,icallback);
+	cpu_set_irq_callback(machine->cpu[0],icallback);
 	for (i=0; i<4; i++)
 		Timer[i] = timer_alloc(Timercb, (void*)(FPTR)i);
 
@@ -514,7 +514,7 @@ static MACHINE_RESET(crystal)
 	memset(vidregs,0,0x10000);
 	FlipCount=0;
 	IntHigh=0;
-	cpunum_set_irq_callback(0,icallback);
+	cpu_set_irq_callback(machine->cpu[0],icallback);
 	Bank=0;
 	memory_set_bankptr(1,memory_region(machine, "user1")+0);
 	FlashCmd=0xff;
@@ -640,7 +640,7 @@ static VIDEO_EOF(crystal)
 
 static INTERRUPT_GEN(crystal_interrupt)
 {
-	IntReq(machine, 24);		//VRender0 VBlank
+	IntReq(device->machine, 24);		//VRender0 VBlank
 }
 
 static INPUT_PORTS_START(crystal)

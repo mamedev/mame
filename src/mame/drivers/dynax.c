@@ -104,7 +104,7 @@ void sprtmtch_update_irq(running_machine *machine)
 	int irq	=	((dynax_sound_irq)   ? 0x08 : 0) |
 				((dynax_vblank_irq)  ? 0x10 : 0) |
 				((dynax_blitter_irq) ? 0x20 : 0) ;
-	cpunum_set_input_line_and_vector(machine, 0, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( dynax_vblank_ack_w )
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( dynax_blitter_ack_w )
 static INTERRUPT_GEN( sprtmtch_vblank_interrupt )
 {
 	dynax_vblank_irq = 1;
-	sprtmtch_update_irq(machine);
+	sprtmtch_update_irq(device->machine);
 }
 
 static void sprtmtch_sound_callback(running_machine *machine, int state)
@@ -144,7 +144,7 @@ void jantouki_update_irq(running_machine *machine)
 	int irq	=	((dynax_blitter_irq)	? 0x08 : 0) |
 				((dynax_blitter2_irq)	? 0x10 : 0) |
 				((dynax_vblank_irq)		? 0x20 : 0) ;
-	cpunum_set_input_line_and_vector(machine, 0, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static WRITE8_HANDLER( jantouki_vblank_ack_w )
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( jantouki_blitter2_ack_w )
 static INTERRUPT_GEN( jantouki_vblank_interrupt )
 {
 	dynax_vblank_irq = 1;
-	jantouki_update_irq(machine);
+	jantouki_update_irq(device->machine);
 }
 
 
@@ -184,13 +184,13 @@ static void jantouki_sound_update_irq(running_machine *machine)
 	int irq	=	((dynax_sound_irq)			? 0x08 : 0) |
 				((dynax_soundlatch_irq)		? 0x10 : 0) |
 				((dynax_sound_vblank_irq)	? 0x20 : 0) ;
-	cpunum_set_input_line_and_vector(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE, 0xc7 | irq); /* rst $xx */
 }
 
 static INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
 {
 	dynax_sound_vblank_irq = 1;
-	jantouki_sound_update_irq(machine);
+	jantouki_sound_update_irq(device->machine);
 }
 
 static WRITE8_HANDLER( jantouki_sound_vblank_ack_w )
@@ -407,7 +407,7 @@ static void adpcm_int(running_machine *machine, int data)
 	if (toggle)
 	{
 		if (resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 static void adpcm_int_cpu1(running_machine *machine, int data)
@@ -421,7 +421,7 @@ static void adpcm_int_cpu1(running_machine *machine, int data)
 	if (toggle)
 	{
 		if (resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);	// cpu1
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);	// cpu1
 	}
 }
 
@@ -3845,7 +3845,7 @@ static INTERRUPT_GEN( yarunara_clock_interrupt )
 		dynax_sound_irq = 1;
 	}
 
-	sprtmtch_update_irq(machine);
+	sprtmtch_update_irq(device->machine);
 }
 
 static MACHINE_DRIVER_START( yarunara )
@@ -3989,7 +3989,7 @@ MACHINE_DRIVER_END
 void mjelctrn_update_irq(running_machine *machine)
 {
 	dynax_blitter_irq = 1;
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xfa);
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, 0xfa);
 }
 
 static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
@@ -3997,7 +3997,7 @@ static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 	// This is a kludge to avoid losing blitter interrupts
 	// there should be a vblank ack mechanism
 	if (!dynax_blitter_irq)
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xf8);
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
 }
 
 static MACHINE_DRIVER_START( mjelctrn )
@@ -4023,7 +4023,7 @@ MACHINE_DRIVER_END
 void neruton_update_irq(running_machine *machine)
 {
 	dynax_blitter_irq = 1;
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x42);
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, 0x42);
 }
 
 static INTERRUPT_GEN( neruton_vblank_interrupt )
@@ -4032,10 +4032,10 @@ static INTERRUPT_GEN( neruton_vblank_interrupt )
 	// there should be a vblank ack mechanism
 	if (dynax_blitter_irq)	return;
 
-	switch(cpu_getiloops())
+	switch(cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x40);	break;
-		default:	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x46);
+		case 0:		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);	break;
+		default:	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x46);
 	}
 }
 
@@ -4061,7 +4061,7 @@ static INTERRUPT_GEN( majxtal7_vblank_interrupt )
 	// there should be a vblank ack mechanism
 	if (dynax_blitter_irq)	return;
 
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x40);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);
 }
 
 static MACHINE_DRIVER_START( majxtal7 )
@@ -4132,11 +4132,11 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( tenkai_interrupt )
 {
-	switch(cpu_getiloops())
+	switch(cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, HOLD_LINE);	break;
-		case 2:		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, HOLD_LINE);	break;
+		case 0:		cpu_set_input_line(device, INPUT_LINE_IRQ0, HOLD_LINE);	break;
+		case 1:		cpu_set_input_line(device, INPUT_LINE_IRQ1, HOLD_LINE);	break;
+		case 2:		cpu_set_input_line(device, INPUT_LINE_IRQ2, HOLD_LINE);	break;
 	}
 }
 

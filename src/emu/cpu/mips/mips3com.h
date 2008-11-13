@@ -14,6 +14,7 @@
 #include "cpuintrf.h"
 #include "mips3.h"
 #include "cpu/vtlb.h"
+#include "timer.h"
 
 
 /***************************************************************************

@@ -742,13 +742,13 @@ static WRITE8_HANDLER( bosco_latch_w )
 		case 0x00:	/* IRQ1 */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
 			cpu_interrupt_enable(1,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
@@ -756,8 +756,8 @@ static WRITE8_HANDLER( bosco_latch_w )
 			break;
 
 		case 0x03:	/* RESET */
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
@@ -807,7 +807,7 @@ static TIMER_CALLBACK( cpu3_interrupt_callback )
 {
 	int scanline = param;
 
-	nmi_line_pulse(machine, 2);
+	nmi_line_pulse(machine->cpu[2]);
 
 	scanline = scanline + 128;
 	if (scanline >= 272)

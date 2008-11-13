@@ -423,7 +423,7 @@ static READ32_HANDLER( psh_eeprom_r )
 
 static INTERRUPT_GEN(psikyosh_interrupt)
 {
-	cpunum_set_input_line(machine, 0, 4, ASSERT_LINE);
+	cpu_set_input_line(device, 4, ASSERT_LINE);
 }
 
 // VBL handler writes 0x00 on entry, 0xc0 on exit
@@ -432,7 +432,7 @@ static WRITE32_HANDLER( psikyosh_irqctrl_w )
 {
 	if (!(data & 0x00c00000))
 	{
-		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 4, CLEAR_LINE);
 	}
 }
 
@@ -597,9 +597,9 @@ ADDRESS_MAP_END
 static void irqhandler(running_machine *machine, int linestate)
 {
 	if (linestate)
-		cpunum_set_input_line(machine, 0, 12, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 12, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 12, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 12, CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =

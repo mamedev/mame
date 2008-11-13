@@ -427,7 +427,7 @@ VIDEO_UPDATE( profpac )
 
 static TIMER_CALLBACK( interrupt_off )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -440,14 +440,14 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		/* bit 0 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x01) == 0)
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, interrupt_vector & 0xf0);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector & 0xf0);
 			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, interrupt_vector & 0xf0);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector & 0xf0);
 			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
 		}
 
@@ -480,14 +480,14 @@ static TIMER_CALLBACK( scanline_callback )
 		/* bit 2 controls the interrupt mode: mode 0 means assert until acknowledged */
 		if ((interrupt_enable & 0x04) == 0)
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, interrupt_vector);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector);
 			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, interrupt_vector);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector);
 			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
 		}
 	}
@@ -788,7 +788,7 @@ INLINE void increment_dest(UINT8 curwidth)
 }
 
 
-static void execute_blit(void)
+static void execute_blit(running_machine *machine)
 {
 	/*
         pattern_source = counter set U7/U16/U25/U34
@@ -880,7 +880,7 @@ static void execute_blit(void)
 	} while (pattern_height-- != 0);
 
 	/* count cycles we ran the bus */
-	activecpu_adjust_icount(-cycles);
+	cpu_adjust_icount(machine->activecpu, -cycles);
 }
 
 
@@ -915,7 +915,7 @@ WRITE8_HANDLER( astrocade_pattern_board_w )
 
 		case 6:		/* height of blit and initiator */
 			pattern_height = data;
-			execute_blit();
+			execute_blit(machine);
 			break;
 	}
 }

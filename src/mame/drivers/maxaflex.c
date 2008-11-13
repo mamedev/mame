@@ -79,14 +79,14 @@ static WRITE8_HANDLER( mcu_portB_w )
 
 	/* clear coin interrupt */
 	if (data & 0x04)
-		cpunum_set_input_line(machine, 1, M6805_IRQ_LINE, CLEAR_LINE );
+		cpu_set_input_line(machine->cpu[1], M6805_IRQ_LINE, CLEAR_LINE );
 
 	/* AUDMUTE */
 	sound_global_enable((data >> 5) & 1);
 
 	/* RES600 */
 	if (diff & 0x10)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))
@@ -154,7 +154,7 @@ static TIMER_CALLBACK( mcu_timer_proc )
 		if ( (tcr & 0x40) == 0 )
 		{
 			//timer interrupt!
-			cpunum_set_input_line(machine, 1, M68705_INT_TIMER, PULSE_LINE );
+			cpu_set_input_line(machine->cpu[1], M68705_INT_TIMER, PULSE_LINE );
 		}
 	}
 }
@@ -226,7 +226,7 @@ static MACHINE_RESET(supervisor_board)
 static INPUT_CHANGED( coin_inserted )
 {
 	if (!newval)
-		cpunum_set_input_line(field->port->machine, 1, M6805_IRQ_LINE, HOLD_LINE );
+		cpu_set_input_line(field->port->machine->cpu[1], M6805_IRQ_LINE, HOLD_LINE );
 }
 
 int atari_input_disabled(void)

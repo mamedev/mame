@@ -123,11 +123,11 @@ static INTERRUPT_GEN( truco_interrupt )
 	/* coinup */
 	static int trigger = 0;
 
-	if ( input_port_read(machine,  "COIN") & 1 )
+	if ( input_port_read(device->machine,  "COIN") & 1 )
 	{
 		if ( trigger == 0 )
 		{
-			cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, PULSE_LINE );
+			cpu_set_input_line(device, M6809_IRQ_LINE, PULSE_LINE );
 			trigger++;
 		}
 	} else

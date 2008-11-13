@@ -68,7 +68,7 @@ static WRITE8_HANDLER( irqack_w )
 	cpu_interrupt_enable(0, bit);
 
 	if (!bit)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE );
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE );
 }
 
 

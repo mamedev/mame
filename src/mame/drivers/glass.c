@@ -39,7 +39,7 @@ static WRITE16_HANDLER( clr_int_w )
 static INTERRUPT_GEN( glass_interrupt )
 {
 	if (cause_interrupt){
-		cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
+		cpu_set_input_line(device, 6, HOLD_LINE);
 		cause_interrupt = 0;
 	}
 }

@@ -158,7 +158,7 @@ void cia_config(running_machine *machine, int which, const cia6526_interface *in
 	memset(cia, 0, sizeof(*cia));
 	cia->active = TRUE;
 	cia->type = intf->type;
-	cia->clock = (intf->clock != 0) ? intf->clock : cpunum_get_clock(0);
+	cia->clock = (intf->clock != 0) ? intf->clock : cpu_get_clock(machine->cpu[0]);
 	cia->irq_func = intf->irq_func;
 
 	/* setup ports */

@@ -8,6 +8,7 @@
 
 #include "debugger.h"
 #include "deprecat.h"
+#include "cpuexec.h"
 #include "tlcs90.h"
 
 typedef struct
@@ -2655,7 +2656,7 @@ static CPU_INIT( t90 )
 	T90.irq_callback = irqcallback;
 	T90.device = device;
 
-	T90.timer_period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpunum_get_active())), 8);
+	T90.timer_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(device->machine->activecpu)), 8);
 
 	// Reset registers to their initial values
 
@@ -2792,14 +2793,14 @@ CPU_GET_INFO( tmp90840 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
-		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP90840");			break;
-		case CPUINFO_STR_CORE_FAMILY:		strcpy(info->s = cpuintrf_temp_str(), "Toshiba TLCS-90");	break;
-		case CPUINFO_STR_CORE_VERSION:		strcpy(info->s = cpuintrf_temp_str(), "1.0");				break;
-		case CPUINFO_STR_CORE_FILE:			strcpy(info->s = cpuintrf_temp_str(), __FILE__);			break;
-		case CPUINFO_STR_CORE_CREDITS:		strcpy(info->s = cpuintrf_temp_str(), "Luca Elia");			break;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "TMP90840");			break;
+		case CPUINFO_STR_CORE_FAMILY:		strcpy(info->s, "Toshiba TLCS-90");	break;
+		case CPUINFO_STR_CORE_VERSION:		strcpy(info->s, "1.0");				break;
+		case CPUINFO_STR_CORE_FILE:			strcpy(info->s, __FILE__);			break;
+		case CPUINFO_STR_CORE_CREDITS:		strcpy(info->s, "Luca Elia");			break;
 
 		case CPUINFO_STR_FLAGS:
-			sprintf(info->s = cpuintrf_temp_str(), "%c%c%c%c%c%c%c%c",
+			sprintf(info->s, "%c%c%c%c%c%c%c%c",
 				F & 0x80 ? 'S':'.',
 				F & 0x40 ? 'Z':'.',
 				F & 0x20 ? 'I':'.',
@@ -2810,21 +2811,21 @@ CPU_GET_INFO( tmp90840 )
 				F & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + T90_PC:		sprintf(info->s = cpuintrf_temp_str(), "PC:%04X", T90.pc.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_SP:		sprintf(info->s = cpuintrf_temp_str(), "SP:%04X", T90.sp.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_A:		sprintf(info->s = cpuintrf_temp_str(), "~A:%02X", T90.af.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_B:		sprintf(info->s = cpuintrf_temp_str(), "~B:%02X", T90.bc.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_C:		sprintf(info->s = cpuintrf_temp_str(), "~C:%02X", T90.bc.b.l);	break;
-		case CPUINFO_STR_REGISTER + T90_D:		sprintf(info->s = cpuintrf_temp_str(), "~D:%02X", T90.de.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_E:		sprintf(info->s = cpuintrf_temp_str(), "~E:%02X", T90.de.b.l);	break;
-		case CPUINFO_STR_REGISTER + T90_H:		sprintf(info->s = cpuintrf_temp_str(), "~H:%02X", T90.hl.b.h);	break;
-		case CPUINFO_STR_REGISTER + T90_L:		sprintf(info->s = cpuintrf_temp_str(), "~L:%02X", T90.hl.b.l);	break;
-		case CPUINFO_STR_REGISTER + T90_AF:		sprintf(info->s = cpuintrf_temp_str(), "AF:%04X", T90.af.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_BC:		sprintf(info->s = cpuintrf_temp_str(), "BC:%04X", T90.bc.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_DE:		sprintf(info->s = cpuintrf_temp_str(), "DE:%04X", T90.de.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_HL:		sprintf(info->s = cpuintrf_temp_str(), "HL:%04X", T90.hl.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_IX:		sprintf(info->s = cpuintrf_temp_str(), "IX:%04X", T90.ix.w.l);	break;
-		case CPUINFO_STR_REGISTER + T90_IY:		sprintf(info->s = cpuintrf_temp_str(), "IY:%04X", T90.iy.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_PC:		sprintf(info->s, "PC:%04X", T90.pc.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_SP:		sprintf(info->s, "SP:%04X", T90.sp.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_A:		sprintf(info->s, "~A:%02X", T90.af.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_B:		sprintf(info->s, "~B:%02X", T90.bc.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_C:		sprintf(info->s, "~C:%02X", T90.bc.b.l);	break;
+		case CPUINFO_STR_REGISTER + T90_D:		sprintf(info->s, "~D:%02X", T90.de.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_E:		sprintf(info->s, "~E:%02X", T90.de.b.l);	break;
+		case CPUINFO_STR_REGISTER + T90_H:		sprintf(info->s, "~H:%02X", T90.hl.b.h);	break;
+		case CPUINFO_STR_REGISTER + T90_L:		sprintf(info->s, "~L:%02X", T90.hl.b.l);	break;
+		case CPUINFO_STR_REGISTER + T90_AF:		sprintf(info->s, "AF:%04X", T90.af.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_BC:		sprintf(info->s, "BC:%04X", T90.bc.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_DE:		sprintf(info->s, "DE:%04X", T90.de.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_HL:		sprintf(info->s, "HL:%04X", T90.hl.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_IX:		sprintf(info->s, "IX:%04X", T90.ix.w.l);	break;
+		case CPUINFO_STR_REGISTER + T90_IY:		sprintf(info->s, "IY:%04X", T90.iy.w.l);	break;
 	}
 }
 
@@ -2838,7 +2839,7 @@ CPU_GET_INFO( tmp90841 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
-		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP90841");			return;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "TMP90841");			return;
 	}
 
 	CPU_GET_INFO_CALL(tmp90840);
@@ -2854,7 +2855,7 @@ CPU_GET_INFO( tmp91640 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
-		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP91640");			return;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "TMP91640");			return;
 	}
 
 	CPU_GET_INFO_CALL(tmp90840);
@@ -2870,7 +2871,7 @@ CPU_GET_INFO( tmp91641 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 
-		case CPUINFO_STR_NAME:				strcpy(info->s = cpuintrf_temp_str(), "TMP91641");			return;
+		case CPUINFO_STR_NAME:				strcpy(info->s, "TMP91641");			return;
 	}
 
 	CPU_GET_INFO_CALL(tmp90840);

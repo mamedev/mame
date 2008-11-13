@@ -365,7 +365,7 @@ static WRITE8_HANDLER(write_a00x)
 		break;
 
 		case 0x08: //A008
-			cpunum_set_input_line(machine, cpunum_get_active(),0,CLEAR_LINE);
+			cpu_set_input_line(machine->activecpu,0,CLEAR_LINE);
 		break;
 	}
 }
@@ -758,12 +758,12 @@ static VIDEO_UPDATE(witch)
 
 static INTERRUPT_GEN( witch_main_interrupt )
 {
-	cpunum_set_input_line(machine, 0,0,ASSERT_LINE);
+	cpu_set_input_line(device,0,ASSERT_LINE);
 }
 
 static INTERRUPT_GEN( witch_sub_interrupt )
 {
-	cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
+	cpu_set_input_line(device,0,ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( witch )

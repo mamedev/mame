@@ -225,7 +225,7 @@ static READ32_HANDLER( ps4_eeprom_r )
 
 static INTERRUPT_GEN(psikyosh_interrupt)
 {
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static CUSTOM_INPUT( system_port_r )
@@ -478,9 +478,9 @@ ADDRESS_MAP_END
 static void irqhandler(running_machine *machine, int linestate)
 {
 	if (linestate)
-		cpunum_set_input_line(machine, 0, 12, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 12, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 12, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 12, CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =
@@ -1056,7 +1056,7 @@ PC  :00001B46: TST     R2,R2
 PC  :00001B48: BT      $00001B3C
 */
 
-	if (cpu_get_pc(machine->activecpu)==0x00001B3E) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x00001B3E) cpu_spinuntil_int(machine->activecpu);
 	return ps4_ram[0x000020/4];
 }
 
@@ -1072,7 +1072,7 @@ PC  :00001B52: TST     R2,R2
 PC  :00001B54: BT      $00001B48
 */
 
-	if (cpu_get_pc(machine->activecpu)==0x00001B4A) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x00001B4A) cpu_spinuntil_int(machine->activecpu);
 	return ps4_ram[0x000020/4];
 }
 
@@ -1088,7 +1088,7 @@ PC  :000029F6: TST     R3,R3
 PC  :000029F8: BT      $000029EC
 */
 
-	if (cpu_get_pc(machine->activecpu)==0x000029EE) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x000029EE) cpu_spinuntil_int(machine->activecpu);
 	return ps4_ram[0x00001c/4];
 }
 

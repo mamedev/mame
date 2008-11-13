@@ -147,8 +147,8 @@ static UINT16 sound_reset_val;
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -156,7 +156,7 @@ static void scanline_update(const device_config *screen, int scanline)
 {
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_gen(screen->machine, 0);
+		atarigen_6502_irq_gen(screen->machine->cpu[1]);
 	else
 		atarigen_6502_irq_ack_r(screen->machine, 0);
 }
@@ -207,7 +207,7 @@ static WRITE16_HANDLER( sound_reset_w )
 
 		if ((oldword ^ sound_reset_val) & 1)
 		{
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
 			atarigen_sound_reset();
 		}
 	}

@@ -266,7 +266,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( snd_irq )
 {
-	cpunum_set_input_line(machine, 1,UPD7810_INTF2,HOLD_LINE);
+	cpu_set_input_line(device,UPD7810_INTF2,HOLD_LINE);
 }
 
 static const UPD7810_CONFIG sound_cpu_config =

@@ -200,7 +200,7 @@ static READ32_HANDLER( mlc_scanline_r )
 static TIMER_CALLBACK( interrupt_gen )
 {
 //  logerror("hit scanline IRQ %d (%08x)\n", video_screen_get_vpos(machine->primary_screen), info.i);
-	cpunum_set_input_line(machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], mainCpuIsArm ? ARM_IRQ_LINE : 1, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( mlc_irq_w )
@@ -212,7 +212,7 @@ static WRITE32_HANDLER( mlc_irq_w )
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cpunum_set_input_line(machine, 0, mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */
@@ -715,7 +715,7 @@ static READ32_HANDLER( avengrgs_speedup_r )
 	UINT32 a=mlc_ram[0x89a0/4];
 	UINT32 p=cpu_get_pc(machine->activecpu);
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) cpu_spinuntil_int();
+	if ((p==0x3234 || p==0x32dc) && (a&1)) cpu_spinuntil_int(machine->activecpu);
 
 	return a;
 }
@@ -741,7 +741,7 @@ static DRIVER_INIT( mlc )
 	/* The timing in the ARM core isn't as accurate as it should be, so bump up the
         effective clock rate here to compensate otherwise we have slowdowns in
         Skull Fung where there probably shouldn't be. */
-	cpunum_set_clockscale(machine, 0, 2.0f);
+	cpu_set_clockscale(machine->cpu[0], 2.0f);
 	mainCpuIsArm=1;
 	deco156_decrypt(machine);
 	descramble_sound(machine);

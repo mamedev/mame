@@ -271,7 +271,7 @@ static void send_to_adder(running_machine *machine, int data)
 	adder2_sc2data       = data;
 
 	adder2_acia_triggered = 1;
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE );
+	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE );
 
 	LOG_SERIAL(("sadder  %02X  (%c)\n",data, data ));
 }
@@ -511,8 +511,8 @@ static INTERRUPT_GEN( timer_irq )
 		watchdog_cnt++;
 		if ( watchdog_cnt > 2 )	// this is a hack, i don't know what the watchdog timeout is, 3 IRQ's works fine
 		{  // reset board
-			mame_schedule_soft_reset(machine);		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
-			on_scorpion2_reset(machine);
+			mame_schedule_soft_reset(device->machine);		// reset entire machine. CPU 0 should be enough, but that doesn't seem to work !!
+			on_scorpion2_reset(device->machine);
 			return;
 		}
 	}
@@ -522,7 +522,7 @@ static INTERRUPT_GEN( timer_irq )
 		irq_timer_stat = 0x01;
 		irq_status     = 0x02;
 
-		cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, PULSE_LINE );
+		cpu_set_input_line(device, M6809_IRQ_LINE, PULSE_LINE );
 	}
 }
 
@@ -619,7 +619,7 @@ static WRITE8_HANDLER( mmtr_w )
 			}
  		}
  	}
-	if ( data & 0x1F ) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE );
+	if ( data & 0x1F ) cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////

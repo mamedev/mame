@@ -272,7 +272,7 @@ static void parse_control(running_machine *machine)	/* assumes Z80 sandwiched be
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -296,14 +296,14 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 
 static TIMER_CALLBACK( topspeed_interrupt6  )
 {
-	cpunum_set_input_line(machine, 0,6,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
 }
 
 /* 68000 B */
 
 static TIMER_CALLBACK( topspeed_cpub_interrupt6 )
 {
-	cpunum_set_input_line(machine, 2,6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	cpu_set_input_line(machine->cpu[2],6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 
 
@@ -311,14 +311,14 @@ static INTERRUPT_GEN( topspeed_interrupt )
 {
 	/* Unsure how many int6's per frame */
 	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, topspeed_interrupt6);
-	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( topspeed_cpub_interrupt )
 {
 	/* Unsure how many int6's per frame */
 	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, topspeed_cpub_interrupt6);
-	cpunum_set_input_line(machine, 2, 5, HOLD_LINE);
+	cpu_set_input_line(device, 5, HOLD_LINE);
 }
 
 
@@ -655,7 +655,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)	/* assumes Z80 sandwiched between 68Ks */
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

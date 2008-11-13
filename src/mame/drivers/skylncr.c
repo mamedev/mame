@@ -491,7 +491,7 @@ static const ay8910_interface ay8910_config =
 // It runs in IM 0, thus needs an opcode on the data bus
 static INTERRUPT_GEN( skylncr_vblank_interrupt )
 {
-	if (skylncr_nmi_enable) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (skylncr_nmi_enable) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( skylncr )

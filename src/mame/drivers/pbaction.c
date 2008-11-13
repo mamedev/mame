@@ -55,7 +55,7 @@ extern VIDEO_UPDATE( pbaction );
 static WRITE8_HANDLER( pbaction_sh_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0x00);
+	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0x00);
 }
 
 
@@ -250,7 +250,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( pbaction_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x02);	/* the CPU is in Interrupt Mode 2 */
 }
 
 

@@ -67,7 +67,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 {
 	main_to_sound_data = param;
 	main_to_sound_ready = 1;
-	cpu_triggerint(machine, 1);
+	cpu_triggerint(machine->cpu[1]);
 
 	/* use a timer to make long transfers faster */
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, 0);
@@ -129,7 +129,7 @@ static READ8_HANDLER( sound_ready_to_send_r )
 static READ8_HANDLER( sound_data_ready_r )
 {
 	if (cpu_get_pc(machine->activecpu) == 0xd50 && !main_to_sound_ready)
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	return main_to_sound_ready ? 0x00 : 0x80;
 }
 
@@ -148,7 +148,7 @@ static WRITE8_HANDLER( sound_int_state_w )
 		sndti_reset(SOUND_BSMT2000, 0);
 
 	/* also clears interrupts */
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	sound_int_state = data;
 }
 

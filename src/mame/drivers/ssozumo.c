@@ -34,25 +34,25 @@ static INTERRUPT_GEN( ssozumo_interrupt )
 {
 	static int coin;
 
-	if ((input_port_read(machine, "P1") & 0xc0) != 0xc0)
+	if ((input_port_read(device->machine, "P1") & 0xc0) != 0xc0)
 	{
 		if (coin == 0)
 		{
 			coin = 1;
-			nmi_line_pulse(machine, cpunum);
+			nmi_line_pulse(device);
 			return;
 		}
 	}
 	else coin = 0;
 
-	irq0_line_hold(machine, cpunum);
+	irq0_line_hold(device);
 }
 
 
 static WRITE8_HANDLER( ssozumo_sh_command_w )
 {
 	soundlatch_w(machine, offset, data);
-	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], M6502_IRQ_LINE, HOLD_LINE);
 }
 
 

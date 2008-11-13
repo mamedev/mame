@@ -58,10 +58,10 @@ static MACHINE_RESET( srumbler )
 
 static INTERRUPT_GEN( srumbler_interrupt )
 {
-	if (cpu_getiloops()==0)
-		cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+	if (cpu_getiloops(device)==0)
+		cpu_set_input_line(device,0,HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
+		cpu_set_input_line(device,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 

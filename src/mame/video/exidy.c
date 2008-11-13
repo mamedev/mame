@@ -80,29 +80,29 @@ INLINE void latch_condition(running_machine *machine, int collision)
 INTERRUPT_GEN( exidy_vblank_interrupt )
 {
 	/* latch the current condition */
-	latch_condition(machine, 0);
+	latch_condition(device->machine, 0);
 	int_condition &= ~0x80;
 
 	/* set the IRQ line */
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
 INTERRUPT_GEN( teetert_vblank_interrupt )
 {
 	/* standard stuff */
-	if (cpu_getiloops() == 0)
-		exidy_vblank_interrupt(machine, cpunum);
+	if (cpu_getiloops(device) == 0)
+		exidy_vblank_interrupt(device);
 
 	/* plus a pulse on the NMI line */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 READ8_HANDLER( exidy_interrupt_r )
 {
 	/* clear any interrupts */
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 
 	/* return the latched condition */
 	return int_condition;
@@ -286,7 +286,7 @@ static TIMER_CALLBACK( collision_irq_callback )
 	latch_condition(machine, param);
 
 	/* set the IRQ line */
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 }
 
 

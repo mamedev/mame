@@ -480,7 +480,7 @@ static READ32_HANDLER( gstream_speedup_r )
 {
 	if (cpu_get_pc(machine->activecpu)==0xc0001592)
 	{
-		activecpu_eat_cycles(50);
+		cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return gstream_workram[0xd1ee0/4];

@@ -249,7 +249,7 @@ static WRITE8_HANDLER( control2_w )
 
 static INTERRUPT_GEN(lethalen_interrupt)
 {
-	if (K056832_is_IRQ_enabled(0)) cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
+	if (K056832_is_IRQ_enabled(0)) cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( sound_cmd_w )
@@ -259,7 +259,7 @@ static WRITE8_HANDLER( sound_cmd_w )
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -269,7 +269,7 @@ static READ8_HANDLER( sound_status_r )
 
 static void sound_nmi(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( le_bankswitch_w )

@@ -160,11 +160,11 @@ static MACHINE_RESET( megasys1_hachoo )
 #define INTERRUPT_NUM_A		3
 static INTERRUPT_GEN( interrupt_A )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
-		case 2:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);	break;
+		case 1:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
+		case 2:		cpu_set_input_line(device, 1, HOLD_LINE);	break;
 	}
 }
 
@@ -207,11 +207,11 @@ ADDRESS_MAP_END
 #define INTERRUPT_NUM_B		3
 static INTERRUPT_GEN( interrupt_B )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
-		case 1:		cpunum_set_input_line(machine, 0, 1, HOLD_LINE); break;
-		default:	cpunum_set_input_line(machine, 0, 2, HOLD_LINE); break;
+		case 0:		cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 1:		cpu_set_input_line(device, 1, HOLD_LINE); break;
+		default:	cpu_set_input_line(device, 2, HOLD_LINE); break;
 	}
 }
 
@@ -258,7 +258,7 @@ static READ16_HANDLER( ip_select_r )
 static WRITE16_HANDLER( ip_select_w )
 {
 	COMBINE_DATA(&ip_select);
-	cpunum_set_input_line(machine, 0,2,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],2,HOLD_LINE);
 }
 
 
@@ -335,7 +335,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( interrupt_D )
 {
-	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( readmem_D, ADDRESS_SPACE_PROGRAM, 16 )
@@ -431,7 +431,7 @@ ADDRESS_MAP_END
 static void megasys1_sound_irq(running_machine *machine, int irq)
 {
 	if (irq)
-		cpunum_set_input_line(machine, 1, 4, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 4, HOLD_LINE);
 }
 
 static READ16_HANDLER( oki_status_0_r )
@@ -751,7 +751,7 @@ MACHINE_DRIVER_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -3061,7 +3061,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 		}
 	}
 
-	cpunum_set_input_line(machine, 0,4,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
 }
 
 

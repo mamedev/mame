@@ -577,7 +577,7 @@ WRITE8_HANDLER( williams_blitter_w )
 	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
 	/* this is just a guess */
 	estimated_clocks_at_4MHz = 20 + 2 * accesses;
-	activecpu_adjust_icount(-((estimated_clocks_at_4MHz + 3) / 4));
+	cpu_adjust_icount(machine->activecpu, -((estimated_clocks_at_4MHz + 3) / 4));
 
 	/* Log blits */
 	logerror("%04X:Blit @ %3d : %02X%02X -> %02X%02X, %3dx%3d, mask=%02X, flags=%02X, icount=%d, win=%d\n",

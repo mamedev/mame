@@ -3714,10 +3714,7 @@ static READ32_HANDLER( rddsp32_speedup_r )
 		int cycles_to_burn = 17 * 4 * (0x2bc - r1 - 2);
 		if (cycles_to_burn > 20 * 4)
 		{
-			int icount_remaining = activecpu_get_icount();
-			if (cycles_to_burn > icount_remaining)
-				cycles_to_burn = icount_remaining;
-			activecpu_adjust_icount(-cycles_to_burn);
+			cpu_eat_cycles(machine->activecpu, cycles_to_burn);
 			program_write_word(r14 - 0x14, r1 + cycles_to_burn / 17);
 		}
 		msp_speedup_count[0]++;

@@ -47,7 +47,7 @@ extern VIDEO_UPDATE( tagteam );
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1,M6502_IRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],M6502_IRQ_LINE,HOLD_LINE);
 }
 
 
@@ -84,14 +84,14 @@ static INTERRUPT_GEN( tagteam_interrupt )
 	static int coin;
 	int port;
 
-	port = input_port_read(machine, "P1") & 0xc0;
+	port = input_port_read(device->machine, "P1") & 0xc0;
 
 	if (port != 0xc0)    /* Coin */
 	{
 		if (coin == 0)
 		{
 			coin = 1;
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		}
 	}
 	else coin = 0;

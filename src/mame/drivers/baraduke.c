@@ -169,7 +169,7 @@ static WRITE8_HANDLER( baraduke_lamps_w )
 
 static WRITE8_HANDLER( baraduke_irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

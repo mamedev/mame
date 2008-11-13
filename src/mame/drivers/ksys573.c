@@ -1129,7 +1129,7 @@ static UINT64 m_p_n_root_start[ 3 ];
 static UINT64 psxcpu_gettotalcycles( void )
 {
 	/* TODO: should return the start of the current tick. */
-	return cpunum_gettotalcycles(0) * 2;
+	return cpu_get_total_cycles(Machine->cpu[0]) * 2;
 }
 
 static int root_divider( int n_counter )
@@ -1569,9 +1569,9 @@ static void update_mode( running_machine *machine )
 
 static INTERRUPT_GEN( sys573_vblank )
 {
-	update_mode(machine);
+	update_mode(device->machine);
 
-	if( strcmp( machine->gamedrv->name, "ddr2ml" ) == 0 )
+	if( strcmp( device->machine->gamedrv->name, "ddr2ml" ) == 0 )
 	{
 		/* patch out security-plate error */
 
@@ -1583,7 +1583,7 @@ static INTERRUPT_GEN( sys573_vblank )
 		}
 	}
 
-	psx_vblank(machine, cpunum);
+	psx_vblank(device);
 }
 
 /*

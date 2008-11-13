@@ -835,7 +835,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( niyanpai_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+	cpu_set_input_line(device, 1, HOLD_LINE);
 }
 
 static const z80_daisy_chain daisy_chain_sound[] =

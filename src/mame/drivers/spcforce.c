@@ -74,7 +74,7 @@ static READ8_HANDLER( spcforce_t0_r )
 
 static WRITE8_HANDLER( spcforce_soundtrigger_w )
 {
-	cpunum_set_input_line(machine, 1, 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, (~data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -172,7 +172,7 @@ static WRITE8_HANDLER(bg2_w)
 static WRITE8_HANDLER( sound_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( i8257_CH0_w )
@@ -390,13 +390,13 @@ static const ay8910_interface ay8910_config =
 static INTERRUPT_GEN( ddayjlc_interrupt )
 {
 	if(main_nmi_enable)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( ddayjlc_snd_interrupt )
 {
 	if(sound_nmi_enable)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( ddayjlc )

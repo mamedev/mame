@@ -358,10 +358,10 @@ static void megatech_select_game(running_machine *machine, int gameno)
 
 	printf("game 0 selected\n");
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	sndti_reset(SOUND_YM2612, 0);
 
 	sprintf(tempname, "game%d", gameno);
@@ -387,8 +387,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 			printf("SMS cart!!, CPU not running\n");
 			current_game_is_sms = 1;
 			megatech_set_genz80_as_sms_standard_map(machine);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 
 
 		}
@@ -397,8 +397,8 @@ static void megatech_select_game(running_machine *machine, int gameno)
 			printf("Genesis Cart, CPU0 running\n");
 			current_game_is_sms = 0;
 			megatech_set_megadrive_z80_as_megadrive_z80(machine);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
 		}
 		else
 		{
@@ -407,10 +407,10 @@ static void megatech_select_game(running_machine *machine, int gameno)
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
-	//  cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
-	//  cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+	//  cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
+	//  cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* no cart.. */
 		memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);

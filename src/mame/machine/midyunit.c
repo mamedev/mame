@@ -583,7 +583,7 @@ WRITE16_HANDLER( midyunit_sound_w )
 
 			case SOUND_YAWDIM:
 				soundlatch_w(machine, 0, data);
-				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+				cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 				break;
 		}
 }

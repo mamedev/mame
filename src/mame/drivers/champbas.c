@@ -130,13 +130,13 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	cpu_interrupt_enable(0,bit);
 	if (!bit)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( exctsccr_fm_callback )
 {
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
 }
 
 static MACHINE_START( exctsccr )
@@ -178,7 +178,7 @@ static WRITE8_HANDLER( champbas_mcu_halt_w )
 		return;
 
 	data &= 1;
-	cpunum_set_input_line(machine, cpunum, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[cpunum], INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

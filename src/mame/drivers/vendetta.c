@@ -233,24 +233,24 @@ static WRITE8_HANDLER( vendetta_5fe0_w )
 
 static TIMER_CALLBACK( z80_nmi_callback )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE );
 }
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE );
 
 	timer_set( ATTOTIME_IN_USEC( 25 ), NULL, 0, z80_nmi_callback );
 }
 
 static WRITE8_HANDLER( z80_irq_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
 }
 
 static READ8_HANDLER( vendetta_sound_interrupt_r )
 {
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 
@@ -517,7 +517,7 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( vendetta_irq )
 {
 	if (irq_enabled)
-		cpunum_set_input_line(machine, 0, KONAMI_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( vendetta )

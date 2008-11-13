@@ -366,7 +366,7 @@ static WRITE8_HANDLER( sysreg_w )
 			eeprom_write_bit((data & 0x01) ? 1 : 0);
 			eeprom_set_clock_line((data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 			eeprom_set_cs_line((data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 0 = %02X\n", data);
 			break;
 
@@ -382,9 +382,9 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = ADDSCLK (ADC SCLK)
             */
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			adc083x_cs_write(0, (data >> 2) & 1);
 			adc083x_di_write(0, (data >> 1) & 1);
@@ -731,11 +731,11 @@ static const sharc_config sharc_cfg =
 */
 static INTERRUPT_GEN( zr107_vblank )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 static MACHINE_RESET( zr107 )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( zr107 )
@@ -832,13 +832,13 @@ MACHINE_DRIVER_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpunum_set_input_line(machine, 1, param, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], param, CLEAR_LINE);
 }
 
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cpunum_set_input_line(machine, 1, line, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 

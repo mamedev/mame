@@ -149,7 +149,7 @@ INPUT_PORTS_END
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	cpunum_set_input_line(machine, 0, 0, param);
+	cpu_set_input_line(machine->cpu[0], 0, param);
 }
 
 static void via_irq(running_machine *machine, int state)
@@ -195,8 +195,8 @@ static MACHINE_RESET( trvquest )
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	via_2_ca1_w(machine,0,1);
-	via_2_ca1_w(machine,0,0);
+	via_2_ca1_w(device->machine,0,1);
+	via_2_ca1_w(device->machine,0,0);
 }
 
 static MACHINE_DRIVER_START( trvquest )

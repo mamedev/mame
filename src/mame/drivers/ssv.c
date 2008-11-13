@@ -201,7 +201,7 @@ static UINT16 *ssv_mainram;
 /* Update the IRQ state based on all possible causes */
 static void update_irq_state(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, (requested_int & irq_enable)? ASSERT_LINE : CLEAR_LINE);
 }
 
 static IRQ_CALLBACK(ssv_irq_callback)
@@ -253,32 +253,32 @@ static int interrupt_ultrax;
 
 static INTERRUPT_GEN( ssv_interrupt )
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
 		if(interrupt_ultrax)
 		{
 			requested_int |= 1 << 1;	// needed by ultrax to coin up, breaks cairblad
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 		}
 	}
 	else
 	{
 		requested_int |= 1 << 3;	// vblank
-		update_irq_state(machine);
+		update_irq_state(device->machine);
 	}
 }
 
 static INTERRUPT_GEN( gdfs_interrupt )
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
 		requested_int |= 1 << 6;	// reads lightgun (4 times for 4 axis)
-		update_irq_state(machine);
+		update_irq_state(device->machine);
 	}
 	else
 	{
 		requested_int |= 1 << 3;	// vblank
-		update_irq_state(machine);
+		update_irq_state(device->machine);
 	}
 }
 
@@ -337,7 +337,7 @@ static WRITE16_HANDLER( ssv_lockout_inv_w )
 static MACHINE_RESET( ssv )
 {
 	requested_int = 0;
-	cpunum_set_irq_callback(0, ssv_irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], ssv_irq_callback);
 	memory_set_bankptr(1, memory_region(machine, "user1"));
 }
 

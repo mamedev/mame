@@ -278,7 +278,7 @@ TODO:
 #if 0 // doesn't work for some reason
 static WRITE8_HANDLER(soundcpu_reset_w)
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 #endif
 
@@ -671,7 +671,7 @@ GFXDECODE_END
 // handler called by the 2203 emulator when the internal timers cause an IRQ
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

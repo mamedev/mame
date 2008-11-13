@@ -402,7 +402,7 @@ static const ymz280b_interface ymz280b_intf =
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
 {
-	cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( hvysmsh )

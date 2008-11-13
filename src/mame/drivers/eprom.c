@@ -44,9 +44,9 @@ static UINT16 *sync_data;
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -110,9 +110,9 @@ static WRITE16_HANDLER( eprom_latch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 1)
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -138,7 +138,7 @@ static WRITE16_HANDLER( sync_w )
 
 	sync_data[offset] = newword;
 	if ((oldword & 0xff00) != (newword & 0xff00))
-		cpu_yield();
+		cpu_yield(machine->activecpu);
 }
 
 

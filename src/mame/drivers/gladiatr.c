@@ -290,7 +290,7 @@ static WRITE8_HANDLER( gladiator_int_control_w )
 static void gladiator_ym_irq(running_machine *machine, int irq)
 {
 	/* NMI IRQ is not used by gladiator sound program */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /*Sound Functions*/
@@ -309,12 +309,12 @@ static WRITE8_HANDLER( glad_adpcm_w )
 static WRITE8_HANDLER( glad_cpu_sound_command_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static READ8_HANDLER( glad_cpu_sound_command_r )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(machine,0);
 }
 
@@ -328,7 +328,7 @@ static WRITE8_HANDLER( gladiatr_flipscreen_w )
 /* !!!!! patch to IRQ timming for 2nd CPU !!!!! */
 static WRITE8_HANDLER( gladiatr_irq_patch_w )
 {
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 }
 #endif
 

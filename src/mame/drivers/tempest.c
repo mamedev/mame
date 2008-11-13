@@ -303,7 +303,7 @@ static UINT8 tempest_player_select;
 
 static WRITE8_HANDLER( wdclr_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	watchdog_reset(machine);
 }
 
@@ -329,7 +329,7 @@ static CUSTOM_INPUT( tempest_buttons_r )
 static CUSTOM_INPUT( clock_r )
 {
 	/* Emulate the 3kHz source on bit 7 (divide 1.5MHz by 512) */
-	return (cpunum_gettotalcycles(0) & 0x100) ? 1 : 0;
+	return (cpu_get_total_cycles(field->port->machine->cpu[0]) & 0x100) ? 1 : 0;
 }
 
 

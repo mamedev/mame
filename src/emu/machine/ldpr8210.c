@@ -857,7 +857,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 		player->slowtrg = timer_get_time();
 
 	/* bit 6 when low triggers an IRQ on the MCU */
-	cpunum_set_input_line(machine, player->cpunum, MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[player->cpunum], MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* standby LED is set accordingl to bit 4 */
 	output_set_value("pr8210_standby", (data & 0x10) != 0);
@@ -1109,7 +1109,7 @@ static TIMER_CALLBACK( irq_off )
 {
 	laserdisc_state *ld = ptr;
 	ldplayer_data *player = ld->player;
-	cpunum_set_input_line(ld->device->machine, player->simutrek.cpunum, MCS48_INPUT_IRQ, CLEAR_LINE);
+	cpu_set_input_line(ld->device->machine->cpu[player->simutrek.cpunum], MCS48_INPUT_IRQ, CLEAR_LINE);
 	if (LOG_SIMUTREK)
 		printf("%3d:**** Simutrek IRQ clear\n", video_screen_get_vpos(ld->screen));
 }
@@ -1132,7 +1132,7 @@ static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 	{
 		if (LOG_SIMUTREK)
 			printf("%3d:VSYNC IRQ\n", video_screen_get_vpos(ld->screen));
-		cpunum_set_input_line(ld->device->machine, player->simutrek.cpunum, MCS48_INPUT_IRQ, ASSERT_LINE);
+		cpu_set_input_line(ld->device->machine->cpu[player->simutrek.cpunum], MCS48_INPUT_IRQ, ASSERT_LINE);
 		timer_set(video_screen_get_scan_period(ld->screen), ld, 0, irq_off);
 	}
 }

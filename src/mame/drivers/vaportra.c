@@ -29,7 +29,7 @@ static WRITE16_HANDLER( vaportra_sound_w )
 	/* Force synchronisation between CPUs with fake timer */
 	timer_call_after_resynch(NULL, 0, NULL);
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1],0,ASSERT_LINE);
 }
 
 static READ16_HANDLER( vaportra_control_r )
@@ -74,7 +74,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( vaportra_soundlatch_r )
 {
-	cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
 	return soundlatch_r(machine, offset);
 }
 
@@ -229,7 +229,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
+	cpu_set_input_line(machine->cpu[1],1,state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

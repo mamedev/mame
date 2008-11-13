@@ -56,7 +56,7 @@ static READ8_HANDLER( aeroboto_201_r )
 static INTERRUPT_GEN( aeroboto_interrupt )
 {
 	if (!disable_irq)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	else
 		disable_irq--;
 }

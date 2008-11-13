@@ -258,7 +258,7 @@ static WRITE32_HANDLER( v_ctrl_w )
 		if (pending_vb_int && !DISABLE_VB_INT)
 		{
 			pending_vb_int = 0;
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_4, HOLD_LINE);
 		}
 	}
 }
@@ -449,7 +449,7 @@ static INTERRUPT_GEN( vb_interrupt )
 	}
 
 	//logerror("V-Blank interrupt\n");
-	cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
+	cpu_set_input_line(device, MC68000_IRQ_4, HOLD_LINE);
 }
 
 
@@ -458,12 +458,12 @@ static void ide_interrupt(const device_config *device, int state)
 	if (state != CLEAR_LINE)
 	{
 		//logerror("IDE interrupt asserted\n");
-		cpunum_set_input_line(device->machine, 0, MC68000_IRQ_1, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[0], MC68000_IRQ_1, HOLD_LINE);
 	}
 	else
 	{
 		//logerror("IDE interrupt cleared\n");
-		cpunum_set_input_line(device->machine, 0, MC68000_IRQ_1, CLEAR_LINE);
+		cpu_set_input_line(device->machine->cpu[0], MC68000_IRQ_1, CLEAR_LINE);
 	}
 }
 

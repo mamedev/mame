@@ -268,7 +268,7 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(machine, 0, (data & 0xff00) >> 8 );
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1638,11 +1638,11 @@ GFXDECODE_END
 #define KANEKO16_INTERRUPTS_NUM	3
 static INTERRUPT_GEN( kaneko16_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
-		case 0:  cpunum_set_input_line(machine, 0, 5, HOLD_LINE); break;
+		case 2:  cpu_set_input_line(device, 3, HOLD_LINE); break;
+		case 1:  cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break;
 	}
 }
 
@@ -1990,11 +1990,11 @@ MACHINE_DRIVER_END
 #define SHOGWARR_INTERRUPTS_NUM	3
 static INTERRUPT_GEN( shogwarr_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpunum_set_input_line(machine, 0, 2, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
-//      case 0:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
+		case 2:  cpu_set_input_line(device, 2, HOLD_LINE); break;
+		case 1:  cpu_set_input_line(device, 3, HOLD_LINE); break;
+//      case 0:  cpu_set_input_line(device, 4, HOLD_LINE); break;
 	}
 }
 

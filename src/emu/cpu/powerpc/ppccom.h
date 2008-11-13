@@ -13,6 +13,7 @@
 
 #include "cpuintrf.h"
 #include "ppc.h"
+#include "timer.h"
 #include "cpu/vtlb.h"
 
 

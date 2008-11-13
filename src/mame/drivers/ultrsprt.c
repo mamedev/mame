@@ -75,7 +75,7 @@ static CUSTOM_INPUT( analog_ctrl_r )
 
 static WRITE32_HANDLER( int_ack_w )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 static MACHINE_START( ultrsprt )
@@ -228,7 +228,7 @@ static NVRAM_HANDLER(ultrsprt)
 
 static INTERRUPT_GEN( ultrsprt_vblank )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpu_set_input_line(device, INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 
@@ -270,14 +270,14 @@ MACHINE_DRIVER_END
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		/*cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ5, PULSE_LINE)*/;
+		/*cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ5, PULSE_LINE)*/;
 	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ6, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ6, PULSE_LINE);
 }
 
 static DRIVER_INIT( ultrsprt )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
 	K056800_init(sound_irq_callback);
 }

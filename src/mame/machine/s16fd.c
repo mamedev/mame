@@ -141,7 +141,7 @@ static void fd1094_kludge_reset_values(void)
 
 
 /* function, to be called from MACHINE_RESET (every reset) */
-void fd1094_machine_init(void)
+void fd1094_machine_init(const device_config *device)
 {
 	/* punt if no key; this allows us to be called even for non-FD1094 games */
 	if (!fd1094_key)
@@ -150,9 +150,11 @@ void fd1094_machine_init(void)
 	fd1094_setstate_and_decrypt(FD1094_STATE_RESET);
 	fd1094_kludge_reset_values();
 
-	cpu_set_info_fct(Machine->cpu[0], CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)fd1094_cmp_callback);
-	cpu_set_info_fct(Machine->cpu[0], CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)fd1094_rte_callback);
-	cpunum_set_irq_callback(0, fd1094_int_callback);
+	cpu_set_info_fct(device, CPUINFO_PTR_M68K_CMPILD_CALLBACK, (genf *)fd1094_cmp_callback);
+	cpu_set_info_fct(device, CPUINFO_PTR_M68K_RTE_CALLBACK, (genf *)fd1094_rte_callback);
+	cpu_set_irq_callback(device, fd1094_int_callback);
+
+	cpu_reset(device);
 }
 
 static STATE_POSTLOAD( fd1094_postload )
@@ -162,7 +164,7 @@ static STATE_POSTLOAD( fd1094_postload )
 		int selected_state = fd1094_selected_state;
 		int state = fd1094_state;
 
-		fd1094_machine_init();
+		fd1094_machine_init(machine->cpu[0]);
 
 		fd1094_setstate_and_decrypt(selected_state);
 		fd1094_setstate_and_decrypt(state);

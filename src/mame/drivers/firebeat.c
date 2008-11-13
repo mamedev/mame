@@ -589,7 +589,7 @@ static void GCU_w(running_machine *machine, int chip, UINT32 offset, UINT32 data
 			/* IRQ clear/enable; ppd writes bit off then on in response to interrupt */
 			/* it enables bits 0x41, but 0x01 seems to be the one it cares about */
 			if (ACCESSING_BITS_16_31 && (data & 0x0001) == 0)
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			break;
 
 		case 0x30:
@@ -857,12 +857,12 @@ static int atapi_drivesel;
 
 static void atapi_cause_irq(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ4, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ4, ASSERT_LINE);
 }
 
 static void atapi_clear_irq(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ4, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ4, CLEAR_LINE);
 }
 
 static void atapi_exit(running_machine* machine)
@@ -1277,7 +1277,7 @@ static WRITE32_HANDLER( comm_uart_w )
 static void comm_uart_irq_callback(running_machine *machine, int channel, int value)
 {
 	// TODO
-	//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+	//cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, ASSERT_LINE);
 }
 
 /*****************************************************************************/
@@ -1432,20 +1432,20 @@ static void midi_uart_irq_callback(running_machine *machine, int channel, int va
 		if ((extend_board_irq_enable & 0x02) == 0 && value != CLEAR_LINE)
 		{
 			extend_board_irq_active |= 0x02;
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 	else
 	{
 		if ((extend_board_irq_enable & 0x01) == 0 && value != CLEAR_LINE)
 		{
 			extend_board_irq_active |= 0x01;
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
 		}
 		else
-			cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 	}
 }
 
@@ -1996,7 +1996,7 @@ static INTERRUPT_GEN(firebeat_interrupt)
 	// IRQ 2: Main board UART
 	// IRQ 4: ATAPI
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_RESET( firebeat )

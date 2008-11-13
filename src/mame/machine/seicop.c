@@ -872,7 +872,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 		case (0x65c/2):
 		{
 			soundlatch_w(machine,1,data&0xff);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
 		/*video regs (not scrollram,something else)*/
@@ -889,7 +889,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 		/*case (0x740/2):
         {
             soundlatch_w(1,data&0x00ff);
-            cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+            cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
             break;
         }*/
 	}

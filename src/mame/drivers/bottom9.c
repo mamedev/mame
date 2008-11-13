@@ -29,7 +29,7 @@ VIDEO_UPDATE( bottom9 );
 static INTERRUPT_GEN( bottom9_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 
@@ -101,7 +101,7 @@ static WRITE8_HANDLER( bottom9_1f90_w )
 
 static WRITE8_HANDLER( bottom9_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static int nmienable;
@@ -109,7 +109,7 @@ static int nmienable;
 static INTERRUPT_GEN( bottom9_sound_interrupt )
 {
 	if (nmienable)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )

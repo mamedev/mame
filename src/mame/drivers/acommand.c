@@ -550,10 +550,10 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( acommand_irq )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
-		case 1:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);
+		case 1:		cpu_set_input_line(device, 2, HOLD_LINE);
 	}
 }
 

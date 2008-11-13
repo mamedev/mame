@@ -292,7 +292,7 @@ GFXDECODE_END
 
 static void ym2203_irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( ym2203_write_a )
@@ -331,7 +331,7 @@ static void ashnojoe_vclk_cb(running_machine *machine, int data)
 	else
 	{
 		msm5205_data_w(0, adpcm_byte & 0xf);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	msm5205_vclk_toggle ^= 1;

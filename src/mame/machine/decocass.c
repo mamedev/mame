@@ -108,7 +108,7 @@ WRITE8_HANDLER( decocass_sound_command_w )
 	decocass_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
 	decocass_sound_ack &= ~0x40;
-	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 READ8_HANDLER( decocass_sound_data_r )
@@ -136,14 +136,14 @@ READ8_HANDLER( decocass_sound_command_r )
 {
 	UINT8 data = soundlatch_r(machine, 0);
 	LOG(4,("CPU #%d sound command <- $%02x\n", cpunum_get_active(), data));
-	cpunum_set_input_line(machine, 1, M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6502_IRQ_LINE, CLEAR_LINE);
 	decocass_sound_ack &= ~0x80;
 	return data;
 }
 
 static TIMER_CALLBACK( decocass_sound_nmi_pulse )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 WRITE8_HANDLER( decocass_sound_nmi_enable_w )
@@ -176,7 +176,7 @@ WRITE8_HANDLER( decocass_sound_data_ack_reset_w )
 
 WRITE8_HANDLER( decocass_nmi_reset_w )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE );
 }
 
 WRITE8_HANDLER( decocass_quadrature_decoder_reset_w )
@@ -284,14 +284,14 @@ WRITE8_HANDLER( decocass_reset_w )
 	decocass_reset = data;
 
 	/* CPU #1 active hight reset */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, data & 0x01 );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, data & 0x01 );
 
 	/* on reset also remove the sound timer */
 	if (data & 1)
 		timer_adjust_oneshot(decocass_sound_timer, attotime_never, 0);
 
 	/* 8041 active low reset */
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x08) ^ 0x08 );
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x08) ^ 0x08 );
 }
 
 static const char *dirnm(int speed)

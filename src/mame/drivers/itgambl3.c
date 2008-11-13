@@ -161,7 +161,7 @@ GFXDECODE_END
 static MACHINE_RESET( itgambl3 )
 {
 	/* stop the CPU, we have no code for it anyway */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 

@@ -53,7 +53,7 @@ static int cur_dac_address_index = 0;
 
 static TIMER_CALLBACK( dac_irq )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( audio_dac_w)
@@ -130,7 +130,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( trucocl_interrupt )
 {
-	irq0_line_hold(machine, cpunum);
+	irq0_line_hold(device);
 }
 
 static MACHINE_DRIVER_START( trucocl )

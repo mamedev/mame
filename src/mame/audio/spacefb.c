@@ -36,7 +36,7 @@ READ8_HANDLER( spacefb_audio_t1_r )
 
 WRITE8_HANDLER( spacefb_port_1_w )
 {
-	cpunum_set_input_line(machine, 1, 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* enemy killed */
 	if (!(data & 0x01) && (spacefb_sound_latch & 0x01))  sample_start(0,0,0);

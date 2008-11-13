@@ -69,18 +69,18 @@ static int input_ports_hack;
 
 static INTERRUPT_GEN( yamyam_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		if (input_ports_hack)
 		{
-			rambase[0x004] = input_port_read(machine, "IN2");
-			rambase[0x005] = input_port_read(machine, "IN1");
-			rambase[0x006] = input_port_read(machine, "IN0");
+			rambase[0x004] = input_port_read(device->machine, "IN2");
+			rambase[0x005] = input_port_read(device->machine, "IN1");
+			rambase[0x006] = input_port_read(device->machine, "IN0");
 		}
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h vblank */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h vblank */
 	}
-	else if ((cpu_getiloops() & 1) == 1)
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h sound (hand tuned) */
+	else if ((cpu_getiloops(device) & 1) == 1)
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h sound (hand tuned) */
 }
 
 static WRITE8_HANDLER( yamyam_bankswitch_w )

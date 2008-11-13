@@ -56,7 +56,7 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(machine,offset,(data >> 8) & 0xff);
-		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -263,7 +263,7 @@ static void irqhandler(running_machine *machine, int linestate)
 {
 	/* system 16c doesn't have the sound CPU */
 	if (machine->config->cpu[1].type != CPU_DUMMY)
-		cpunum_set_input_line(machine, 1,0,linestate);
+		cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =

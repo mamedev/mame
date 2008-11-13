@@ -102,7 +102,7 @@ static void hangon_generic_init(void)
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	cpunum_suspend(mame_find_cpu_index(machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
+	cpu_suspend(machine->cpu[mame_find_cpu_index(machine, "mcu")], SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -130,10 +130,10 @@ static MACHINE_RESET( hangon )
 static INTERRUPT_GEN( hangon_irq )
 {
 	/* according to the schematics, IRQ2 is generated every 16 scanlines */
-	if (cpu_getiloops() != 0)
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	if (cpu_getiloops(device) != 0)
+		cpu_set_input_line(device, 2, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 #endif
 
@@ -298,7 +298,7 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 	/* D2 : SCONT1 - Tilemap origin bit 1 */
 	/* D1 : SCONT0 - Tilemap origin bit 0 */
 	/* D0 : MUTE (1= audio on, 0= audio off) */
-	cpunum_set_input_line(device->machine, 2, INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
 	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
 	sound_global_enable(data & 0x01);
@@ -311,8 +311,8 @@ static WRITE8_DEVICE_HANDLER( sub_control_adc_w )
 	/* D6 : INTR line on second CPU */
 	/* D5 : RESET line on second CPU */
 	/* D3-D2 : ADC_SELECT */
-	cpunum_set_input_line(device->machine, 1, 4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
-	cpunum_set_input_line(device->machine, 1, INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 4, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, (data & 0x20) ? ASSERT_LINE : CLEAR_LINE);
 	adc_select = (data >> 2) & 3;
 }
 
@@ -338,8 +338,8 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 {
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (i8751_vblank_hook != NULL)
-		(*i8751_vblank_hook)(machine);
-	irq4_line_hold(machine, cpunum);
+		(*i8751_vblank_hook)(device->machine);
+	irq4_line_hold(device);
 }
 
 
@@ -365,7 +365,7 @@ static void sharrier_i8751_sim(running_machine *machine)
 
 static void sound_irq(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 2, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

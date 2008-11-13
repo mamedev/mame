@@ -149,14 +149,14 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin1_inserted )
 {
 	/* left coin insertion causes an NMI */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static INPUT_CHANGED( coin2_inserted )
 {
 	/* right coin insertion causes an IRQ */
 	if (newval)
-		cpunum_set_input_line(field->port->machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], 0, HOLD_LINE);
 }
 
 

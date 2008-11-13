@@ -31,7 +31,7 @@ TODO:
   interleaving is taken into account. A high resolution timer around the
   poll loop is probably the best bet. The driver sets its timer manually
   because strange enough, interleaving doesn't occur immediately when
-  cpu_boost_interleave() is called. Speculations are TIME_NOWs could have
+  cpuexec_boost_interleave() is called. Speculations are TIME_NOWs could have
   been used as the timer durations to force instant triggering.
 
 
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( protection_clock_w )
 
 static WRITE8_HANDLER( combasc_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( combasc_play_w )

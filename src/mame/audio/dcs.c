@@ -410,7 +410,7 @@ static void timer_enable_callback(int enable);
 static TIMER_CALLBACK( internal_timer_callback );
 static TIMER_CALLBACK( dcs_irq );
 static TIMER_CALLBACK( sport0_irq );
-static void recompute_sample_rate(void);
+static void recompute_sample_rate(running_machine *machine);
 static void sound_tx_callback(int port, INT32 data);
 
 static READ16_HANDLER( dcs_polling_r );
@@ -761,7 +761,7 @@ static void dcs_boot(void)
 		/* rev 3/4: HALT the ADSP-2181 until program is downloaded via IDMA */
 		case 3:
 		case 4:
-			cpunum_set_input_line(Machine, dcs.cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(Machine->cpu[dcs.cpunum], INPUT_LINE_HALT, ASSERT_LINE);
 			dsio.start_on_next_write = 0;
 			break;
 	}
@@ -814,9 +814,9 @@ static TIMER_CALLBACK( dcs_reset )
 	memset(dcs.control_regs, 0, sizeof(dcs.control_regs));
 
 	/* clear all interrupts */
-	cpunum_set_input_line(machine, dcs.cpunum, ADSP2105_IRQ0, CLEAR_LINE);
-	cpunum_set_input_line(machine, dcs.cpunum, ADSP2105_IRQ1, CLEAR_LINE);
-	cpunum_set_input_line(machine, dcs.cpunum, ADSP2105_IRQ2, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[dcs.cpunum], ADSP2105_IRQ0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[dcs.cpunum], ADSP2105_IRQ1, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[dcs.cpunum], ADSP2105_IRQ2, CLEAR_LINE);
 
 	/* initialize the comm bits */
 	SET_INPUT_EMPTY();
@@ -1379,7 +1379,7 @@ static WRITE16_HANDLER( denver_w )
 				dmadac_enable(0, dcs.channels, enable);
 				if (dcs.channels < 6)
 					dmadac_enable(dcs.channels, 6 - dcs.channels, FALSE);
-				recompute_sample_rate();
+				recompute_sample_rate(machine);
 			}
 			break;
 
@@ -1436,7 +1436,7 @@ WRITE32_HANDLER( dsio_idma_data_w )
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
 		logerror("Starting DSIO CPU\n");
-		cpunum_set_input_line(machine, dcs.cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[dcs.cpunum], INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -1476,7 +1476,7 @@ int dcs_control_r(void)
 {
 	/* only boost for DCS2 boards */
 	if (!dcs.auto_ack && !transfer.hle_enabled)
-		cpu_boost_interleave(Machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
+		cpuexec_boost_interleave(Machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
 	return dcs.latch_control;
 }
 
@@ -1490,12 +1490,12 @@ void dcs_reset_w(int state)
 
 		/* just run through the init code again */
 		timer_call_after_resynch(NULL, 0, dcs_reset);
-		cpunum_set_input_line(Machine, dcs.cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[dcs.cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	/* going low resets and reactivates the CPU */
 	else
-		cpunum_set_input_line(Machine, dcs.cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[dcs.cpunum], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -1534,10 +1534,10 @@ static void dcs_delayed_data_w(running_machine *machine, int data)
 		logerror("%08X:dcs_data_w(%04X)\n", cpu_get_pc(machine->activecpu), data);
 
 	/* boost the interleave temporarily */
-	cpu_boost_interleave(machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
+	cpuexec_boost_interleave(machine, ATTOTIME_IN_NSEC(500), ATTOTIME_IN_USEC(5));
 
 	/* set the IRQ line on the ADSP */
-	cpunum_set_input_line(machine, dcs.cpunum, ADSP2105_IRQ2, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[dcs.cpunum], ADSP2105_IRQ2, ASSERT_LINE);
 
 	/* indicate we are no longer empty */
 	if (dcs.last_input_empty && dcs.input_empty_cb)
@@ -1574,7 +1574,7 @@ static WRITE16_HANDLER( input_latch_ack_w )
 	if (!dcs.last_input_empty && dcs.input_empty_cb)
 		(*dcs.input_empty_cb)(dcs.last_input_empty = 1);
 	SET_INPUT_EMPTY();
-	cpunum_set_input_line(machine, dcs.cpunum, ADSP2105_IRQ2, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[dcs.cpunum], ADSP2105_IRQ2, CLEAR_LINE);
 }
 
 
@@ -1666,7 +1666,7 @@ static WRITE16_HANDLER( output_control_w )
 
 static READ16_HANDLER( output_control_r )
 {
-	dcs.output_control_cycles = activecpu_gettotalcycles();
+	dcs.output_control_cycles = cpu_get_total_cycles(machine->activecpu);
 	return dcs.output_control;
 }
 
@@ -1684,7 +1684,7 @@ int dcs_data2_r(void)
  *
  *************************************/
 
-static void update_timer_count(void)
+static void update_timer_count(running_machine *machine)
 {
 	UINT64 periods_since_start;
 	UINT64 elapsed_cycles;
@@ -1695,7 +1695,7 @@ static void update_timer_count(void)
 		return;
 
 	/* count cycles */
-	elapsed_cycles = cpunum_gettotalcycles(dcs.cpunum) - dcs.timer_start_cycles;
+	elapsed_cycles = cpu_get_total_cycles(machine->cpu[dcs.cpunum]) - dcs.timer_start_cycles;
 	elapsed_clocks = elapsed_cycles / dcs.timer_scale;
 
 	/* if we haven't counted past the initial count yet, just do that */
@@ -1721,23 +1721,23 @@ static TIMER_CALLBACK( internal_timer_callback )
 	/* we do this to avoid drifting */
 	dcs.timers_fired++;
 	target_cycles = dcs.timer_start_cycles + dcs.timer_scale * (dcs.timer_start_count + 1 + dcs.timers_fired * (dcs.timer_period + 1));
-	target_cycles -= cpunum_gettotalcycles(dcs.cpunum);
+	target_cycles -= cpu_get_total_cycles(machine->cpu[dcs.cpunum]);
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
 		timer_adjust_oneshot(dcs.internal_timer, ATTOTIME_IN_CYCLES(target_cycles, dcs.cpunum), 0);
-	cpunum_set_input_line(machine, dcs.cpunum, ADSP2105_TIMER, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[dcs.cpunum], ADSP2105_TIMER, PULSE_LINE);
 }
 
 
-static void reset_timer(void)
+static void reset_timer(running_machine *machine)
 {
 	/* if not enabled, skip */
 	if (!dcs.timer_enable)
 		return;
 
 	/* compute the time until the first firing */
-	dcs.timer_start_cycles = cpunum_gettotalcycles(dcs.cpunum);
+	dcs.timer_start_cycles = cpu_get_total_cycles(machine->cpu[dcs.cpunum]);
 	dcs.timers_fired = 0;
 
 	/* if this is the first timer, check the IRQ routine for the DRAM refresh stub */
@@ -1771,7 +1771,7 @@ static void timer_enable_callback(int enable)
 	if (enable)
 	{
 //      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / ATTOTIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_period + 1), dcs.cpunum));
-		reset_timer();
+		reset_timer(Machine);
 	}
 	else
 	{
@@ -1822,7 +1822,7 @@ static READ16_HANDLER( adsp_control_r )
 			break;
 
 		case TIMER_COUNT_REG:
-			update_timer_count();
+			update_timer_count(machine);
 			result = dcs.control_regs[offset];
 			break;
 
@@ -1845,7 +1845,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			if (data & 0x0200)
 			{
 				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", cpu_get_pc(machine->activecpu));
-				cpunum_set_input_line(machine, dcs.cpunum, INPUT_LINE_RESET, PULSE_LINE);
+				cpu_set_input_line(machine->cpu[dcs.cpunum], INPUT_LINE_RESET, PULSE_LINE);
 				dcs_boot();
 				dcs.control_regs[SYSCONTROL_REG] = 0;
 			}
@@ -1878,23 +1878,23 @@ static WRITE16_HANDLER( adsp_control_w )
 			data = (data & 0xff) + 1;
 			if (data != dcs.timer_scale)
 			{
-				update_timer_count();
+				update_timer_count(machine);
 				dcs.timer_scale = data;
-				reset_timer();
+				reset_timer(machine);
 			}
 			break;
 
 		case TIMER_COUNT_REG:
 			dcs.timer_start_count = data;
-			reset_timer();
+			reset_timer(machine);
 			break;
 
 		case TIMER_PERIOD_REG:
 			if (data != dcs.timer_period)
 			{
-				update_timer_count();
+				update_timer_count(machine);
 				dcs.timer_period = data;
-				reset_timer();
+				reset_timer(machine);
 			}
 			break;
 
@@ -1939,7 +1939,7 @@ static TIMER_CALLBACK( dcs_irq )
 		reg = dcs.ireg_base;
 
 		/* generate the (internal, thats why the pulse) irq */
-		cpunum_set_input_line(machine, dcs.cpunum, ADSP2105_IRQ1, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[dcs.cpunum], ADSP2105_IRQ1, PULSE_LINE);
 	}
 
 	/* store it */
@@ -1953,17 +1953,17 @@ static TIMER_CALLBACK( sport0_irq )
 	/* note that there is non-interrupt code that reads/modifies/writes the output_control */
 	/* register; if we don't interlock it, we will eventually lose sound (see CarnEvil) */
 	/* so we skip the SPORT interrupt if we read with output_control within the last 5 cycles */
-	if ((cpunum_gettotalcycles(dcs.cpunum) - dcs.output_control_cycles) > 5)
-		cpunum_set_input_line(machine, dcs.cpunum, ADSP2115_SPORT0_RX, PULSE_LINE);
+	if ((cpu_get_total_cycles(machine->cpu[dcs.cpunum]) - dcs.output_control_cycles) > 5)
+		cpu_set_input_line(machine->cpu[dcs.cpunum], ADSP2115_SPORT0_RX, PULSE_LINE);
 }
 
 
-static void recompute_sample_rate(void)
+static void recompute_sample_rate(running_machine *machine)
 {
 	/* calculate how long until we generate an interrupt */
 
 	/* frequency the time per each bit sent */
-	attotime sample_period = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(dcs.cpunum)), 2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
+	attotime sample_period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[dcs.cpunum])), 2 * (dcs.control_regs[S1_SCLKDIV_REG] + 1));
 
 	/* now put it down to samples, so we know what the channel frequency has to be */
 	sample_period = attotime_mul(sample_period, 16 * dcs.channels);
@@ -2016,7 +2016,7 @@ static void sound_tx_callback(int port, INT32 data)
 			dcs.ireg_base = source;
 
 			/* recompute the sample rate and timer */
-			recompute_sample_rate();
+			recompute_sample_rate(Machine);
 			return;
 		}
 		else
@@ -2038,7 +2038,7 @@ static void sound_tx_callback(int port, INT32 data)
 
 static READ16_HANDLER( dcs_polling_r )
 {
-	activecpu_eat_cycles(1000);
+	cpu_eat_cycles(machine->activecpu, 1000);
 	return *dcs_polling_base;
 }
 

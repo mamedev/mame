@@ -53,6 +53,7 @@
 
 #include "deprecat.h"
 #include "debugger.h"
+#include "cpuexec.h"
 #include "m37710cm.h"
 
 #define M37710_DEBUG	(0)	// enables verbose logging for peripherals, etc.
@@ -279,7 +280,7 @@ static TIMER_CALLBACK( m37710_timer_cb )
 
 	m37710i_cpu.m37710_regs[m37710_irq_levels[curirq]] |= 0x04;
 	m37710_set_irq_line(curirq, PULSE_LINE);
-	cpu_triggerint(machine, cpunum);
+	cpu_triggerint(machine->cpu[cpunum]);
 	cpu_pop_context();
 }
 
@@ -338,7 +339,7 @@ static void m37710_recalc_timer(int timer)
 			switch (m37710i_cpu.m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	      	// timer mode
-					time = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpunum_get_active())), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
+					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(Machine->activecpu)), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
 					#if M37710_DEBUG
@@ -373,7 +374,7 @@ static void m37710_recalc_timer(int timer)
 			switch (m37710i_cpu.m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	      	// timer mode
-					time = attotime_mul(ATTOTIME_IN_HZ(cpunum_get_clock(cpunum_get_active())), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
+					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(Machine->activecpu)), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
 					#if M37710_DEBUG

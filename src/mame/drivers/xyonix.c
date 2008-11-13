@@ -34,7 +34,7 @@ VIDEO_UPDATE(xyonix);
 
 static WRITE8_HANDLER( xyonix_irqack_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

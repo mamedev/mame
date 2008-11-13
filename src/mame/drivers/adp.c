@@ -164,7 +164,7 @@ static struct
 
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	cpunum_set_input_line_and_vector(device->machine, 0, 4, HOLD_LINE, vector);
+	cpu_set_input_line_and_vector(device->machine->cpu[0], 4, HOLD_LINE, vector);
 };
 
 static void duart_tx(const device_config *device, int channel, UINT8 data)
@@ -492,7 +492,7 @@ INPUT_PORTS_END
 /*
 static INTERRUPT_GEN( adp_int )
 {
-    cpunum_set_input_line(machine, 0, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
+    cpu_set_input_line(device, 1, HOLD_LINE); // ??? All irqs have the same vector, and the mask used is 0 or 7
 }
 */
 

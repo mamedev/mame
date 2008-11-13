@@ -3898,11 +3898,11 @@ READ32_HANDLER( psx_gpu_r )
 INTERRUPT_GEN( psx_vblank )
 {
 #if defined( MAME_DEBUG )
-	DebugCheckKeys(machine);
+	DebugCheckKeys(device->machine);
 #endif
 
 	m_n_gpustatus ^= ( 1L << 31 );
-	psx_irq_set( machine, 0x0001 );
+	psx_irq_set( device->machine, 0x0001 );
 }
 
 void psx_gpu_reset( running_machine *machine )

@@ -46,7 +46,7 @@ static WRITE8_HANDLER( pcktgal_sound_bank_w )
 static WRITE8_HANDLER( pcktgal_sound_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static int msm5205next;
@@ -60,7 +60,7 @@ static void pcktgal_adpcm_int(running_machine *machine, int data)
 
 	toggle = 1 - toggle;
 	if (toggle)
-		cpunum_set_input_line(machine, 1,M6502_IRQ_LINE,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],M6502_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( pcktgal_adpcm_data_w )

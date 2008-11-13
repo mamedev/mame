@@ -82,14 +82,14 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 
 	if (offset == (0x260 >> 1)) {
 		//soundlatch_w(0,data&0xff);
-		//cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		//cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE16_HANDLER( sshangha_sound_w )
 {
 	soundlatch_w(machine,0,data&0xff);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* Protection/IO chip 146 */
@@ -323,7 +323,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1,0,state);
+	cpu_set_input_line(machine->cpu[1],0,state);
 }
 
 static const ym2203_interface ym2203_config =

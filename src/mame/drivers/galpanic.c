@@ -142,19 +142,19 @@ static VIDEO_EOF( galpanic )
 static INTERRUPT_GEN( galpanic_interrupt )
 {
 	/* IRQ 3 drives the game, IRQ 5 updates the palette */
-	if (cpu_getiloops() != 0)
-		cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	if (cpu_getiloops(device) != 0)
+		cpu_set_input_line(device, 5, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+		cpu_set_input_line(device, 3, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( galhustl_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpunum_set_input_line(machine, 0, 5, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
-		case 0:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
+		case 2:  cpu_set_input_line(device, 5, HOLD_LINE); break;
+		case 1:  cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 0:  cpu_set_input_line(device, 3, HOLD_LINE); break;
 	}
 }
 

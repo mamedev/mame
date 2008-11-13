@@ -40,7 +40,7 @@
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -48,7 +48,7 @@ static void scanline_update(const device_config *screen, int scanline)
 {
 	/* generate 32V signals */
 	if ((scanline & 32) == 0)
-		atarigen_scanline_int_gen(screen->machine, 0);
+		atarigen_scanline_int_gen(screen->machine->cpu[0]);
 }
 
 

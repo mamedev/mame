@@ -156,7 +156,7 @@ static READ32_HANDLER( psac_rom_r )
 
 static INTERRUPT_GEN(polygonet_interrupt)
 {
-	cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
+	cpu_set_input_line(device, MC68000_IRQ_5, HOLD_LINE);
 }
 
 /* sound CPU communications */
@@ -184,7 +184,7 @@ static WRITE32_HANDLER( sound_w )
 
 static WRITE32_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(machine, mame_find_cpu_index(machine, "sound"), 0, HOLD_LINE);
+	cputag_set_input_line(machine, "sound", 0, HOLD_LINE);
 }
 
 /* DSP communications */
@@ -238,16 +238,16 @@ static WRITE32_HANDLER( dsp_w_lines )
 	if ((data >> 24) & 0x01)
 	{
 		logerror("RESET CLEARED\n");
-		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_RESET, CLEAR_LINE);
+		cputag_set_input_line(machine, "dsp", DSP56K_IRQ_RESET, CLEAR_LINE);
 	}
 	else
 	{
 		logerror("RESET ASSERTED\n");
-		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_RESET, ASSERT_LINE);
+		cputag_set_input_line(machine, "dsp", DSP56K_IRQ_RESET, ASSERT_LINE);
 
 		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
-		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODA, ASSERT_LINE);
-		cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODB, CLEAR_LINE);
+		cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODA, ASSERT_LINE);
+		cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
 	}
 
 	/* 0x04000000 is the ??? line */
@@ -535,7 +535,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 static INTERRUPT_GEN(audio_interrupt)
 {
-	cpunum_set_input_line(machine, mame_find_cpu_index(machine, "sound"), INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -586,9 +586,9 @@ static MACHINE_START(polygonet)
 	/* It's presumed the hardware has hard-wired operating mode 1 (MODA = 1, MODB = 0) */
 	/* TODO: This should work, but the MAME core appears to do something funny.
              Not a big deal - it's hacked in dsp_w_lines. */
-	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), INPUT_LINE_RESET, ASSERT_LINE);
-	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODA, ASSERT_LINE);
-	//cpunum_set_input_line(machine, mame_find_cpu_index(machine, "dsp"), DSP56K_IRQ_MODB, CLEAR_LINE);
+	//cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
+	//cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODA, ASSERT_LINE);
+	//cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
 }
 
 static MACHINE_DRIVER_START( plygonet )

@@ -72,7 +72,7 @@ static MACHINE_RESET( nemesis )
 static INTERRUPT_GEN( nemesis_interrupt )
 {
 	if (irq_on)
-		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+		cpu_set_input_line(device, 1, HOLD_LINE);
 }
 
 
@@ -80,7 +80,7 @@ static WRITE16_HANDLER( salamand_soundlatch_word_w )
 {
 	if(ACCESSING_BITS_0_7) {
 		soundlatch_w(machine,offset,data & 0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 	}
 }
 
@@ -88,30 +88,30 @@ static int gx400_irq1_cnt;
 
 static INTERRUPT_GEN( konamigt_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
-		if ( (irq_on) && (gx400_irq1_cnt++ & 1) ) cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+		if ( (irq_on) && (gx400_irq1_cnt++ & 1) ) cpu_set_input_line(device, 1, HOLD_LINE);
 	}
 	else
 	{
-		if (irq2_on) cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		if (irq2_on) cpu_set_input_line(device, 2, HOLD_LINE);
 	}
 }
 
 static INTERRUPT_GEN( gx400_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
-			if (irq2_on) cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+			if (irq2_on) cpu_set_input_line(device, 2, HOLD_LINE);
 			break;
 
 		case 1:
-			if ( (irq1_on) && (gx400_irq1_cnt++ & 1) ) cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+			if ( (irq1_on) && (gx400_irq1_cnt++ & 1) ) cpu_set_input_line(device, 1, HOLD_LINE);
 			break;
 
 		case 2:
-			if (irq4_on) cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+			if (irq4_on) cpu_set_input_line(device, 4, HOLD_LINE);
 			break;
 	}
 }
@@ -158,13 +158,13 @@ static WRITE16_HANDLER( gx400_sharedram_word_w )
 static INTERRUPT_GEN( salamand_interrupt )
 {
 	if (irq_on)
-		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+		cpu_set_input_line(device, 1, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( blkpnthr_interrupt )
 {
 	if (irq_on)
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( nemesis_irq_enable_word_w )
@@ -315,7 +315,7 @@ static READ8_HANDLER( nemesis_portA_r )
    bit 7:     unused by this software version. Bubble Memory version uses this bit.
 */
 
-	int res = (activecpu_gettotalcycles() / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
+	int res = (cpu_get_total_cycles(machine->activecpu) / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
 
 	res |= 0xd0;
 
@@ -2083,7 +2083,7 @@ static const ay8910_interface ay8910_interface_2 =
 static void sound_irq(running_machine *machine, int state)
 {
 /* Interrupts _are_ generated, I wonder where they go.. */
-/*cpunum_set_input_line(machine, 1,0,HOLD_LINE);*/
+/*cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);*/
 }
 
 static const ym2151_interface ym2151_config =

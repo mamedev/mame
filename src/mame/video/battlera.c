@@ -387,20 +387,20 @@ VIDEO_UPDATE( battlera )
 
 INTERRUPT_GEN( battlera_interrupt )
 {
-	current_scanline=255-cpu_getiloops(); /* 8 lines clipped at top */
+	current_scanline=255-cpu_getiloops(device); /* 8 lines clipped at top */
 
 	/* If raster interrupt occurs, refresh screen _up_ to this point */
 	if (rcr_enable && (current_scanline+56)==HuC6270_registers[6]) {
-		video_screen_update_partial(machine->primary_screen, current_scanline);
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE); /* RCR interrupt */
+		video_screen_update_partial(device->machine->primary_screen, current_scanline);
+		cpu_set_input_line(device, 0, HOLD_LINE); /* RCR interrupt */
 	}
 
 	/* Start of vblank */
 	else if (current_scanline==240) {
 		bldwolf_vblank=1;
-		video_screen_update_partial(machine->primary_screen, 240);
+		video_screen_update_partial(device->machine->primary_screen, 240);
 		if (irq_enable)
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE); /* VBL */
+			cpu_set_input_line(device, 0, HOLD_LINE); /* VBL */
 	}
 
 	/* End of vblank */

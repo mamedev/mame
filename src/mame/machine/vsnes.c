@@ -849,7 +849,7 @@ static void mapper4_irq ( int num, int scanline, int vblank, int blanked )
 			if (IRQ_count == 0)
 			{
 				IRQ_count = IRQ_count_latch;
-				cpunum_set_input_line (Machine, 0, 0, HOLD_LINE);
+				cpu_set_input_line (Machine->cpu[0], 0, HOLD_LINE);
 			}
 			IRQ_count --;
 		}
@@ -1186,7 +1186,7 @@ static int ret;
 static WRITE8_HANDLER ( set_bnglngby_irq_w )
 {
 	ret = data;
-	cpunum_set_input_line(machine, 0, 0, ( data & 2 ) ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[0], 0, ( data & 2 ) ? ASSERT_LINE : CLEAR_LINE );
 	/* other values ??? */
 	/* 0, 4, 84 */
 }
@@ -1272,7 +1272,7 @@ static WRITE8_HANDLER( vstennis_vrom_banking )
 	ppu2c0x_set_videorom_bank( cpunum_get_active(), 0, 8, ( data & 4 ) ? 1 : 0, 512 );
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
-	cpunum_set_input_line(machine, other_cpu, 0, ( data & 2 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpu_set_input_line(machine->cpu[other_cpu], 0, ( data & 2 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	/* move along */
 	if ( cpunum_get_active() == 0 )

@@ -228,7 +228,7 @@ void atarigen_scanline_int_set(const device_config *screen, int scanline)
 INTERRUPT_GEN( atarigen_scanline_int_gen )
 {
 	atarigen_scanline_int_state = 1;
-	(*update_int_callback)(machine);
+	(*update_int_callback)(device->machine);
 }
 
 
@@ -258,7 +258,7 @@ WRITE32_HANDLER( atarigen_scanline_int_ack32_w )
 INTERRUPT_GEN( atarigen_sound_int_gen )
 {
 	atarigen_sound_int_state = 1;
-	(*update_int_callback)(machine);
+	(*update_int_callback)(device->machine);
 }
 
 
@@ -288,7 +288,7 @@ WRITE32_HANDLER( atarigen_sound_int_ack32_w )
 INTERRUPT_GEN( atarigen_video_int_gen )
 {
 	atarigen_video_int_state = 1;
-	(*update_int_callback)(machine);
+	(*update_int_callback)(device->machine);
 }
 
 
@@ -320,7 +320,7 @@ static TIMER_CALLBACK( scanline_interrupt_callback )
 	emu_timer *timer = get_scanline_interrupt_timer_for_screen(screen);
 
 	/* generate the interrupt */
-	atarigen_scanline_int_gen(machine, 0);
+	atarigen_scanline_int_gen(machine->cpu[0]);
 
 	/* set a new timer to go off at the same scan line next frame */
 	timer_adjust_oneshot(timer, video_screen_get_frame_period(screen), 0);
@@ -639,7 +639,7 @@ void atarigen_sound_io_reset(int cpu_num)
 INTERRUPT_GEN( atarigen_6502_irq_gen )
 {
 	timed_int = 1;
-	update_6502_irq(machine);
+	update_6502_irq(device->machine);
 }
 
 
@@ -770,7 +770,7 @@ WRITE8_HANDLER( atarigen_6502_sound_w )
 READ8_HANDLER( atarigen_6502_sound_r )
 {
 	atarigen_cpu_to_sound_ready = 0;
-	cpunum_set_input_line(machine, sound_cpu_num, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_NMI, CLEAR_LINE);
 	return atarigen_cpu_to_sound;
 }
 
@@ -785,9 +785,9 @@ READ8_HANDLER( atarigen_6502_sound_r )
 static void update_6502_irq(running_machine *machine)
 {
 	if (timed_int || ym2151_int)
-		cpunum_set_input_line(machine, sound_cpu_num, M6502_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[sound_cpu_num], M6502_IRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, sound_cpu_num, M6502_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[sound_cpu_num], M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -801,8 +801,8 @@ static TIMER_CALLBACK( delayed_sound_reset )
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
 	{
-		cpunum_set_input_line(machine, sound_cpu_num, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line(machine, sound_cpu_num, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* reset the sound write state */
@@ -811,7 +811,7 @@ static TIMER_CALLBACK( delayed_sound_reset )
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
-	cpu_boost_interleave(machine, SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	cpuexec_boost_interleave(machine, SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 
@@ -829,11 +829,11 @@ static TIMER_CALLBACK( delayed_sound_w )
 	/* set up the states and signal an NMI to the sound CPU */
 	atarigen_cpu_to_sound = param;
 	atarigen_cpu_to_sound_ready = 1;
-	cpunum_set_input_line(machine, sound_cpu_num, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
-	cpu_boost_interleave(machine, SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
+	cpuexec_boost_interleave(machine, SOUND_TIMER_RATE, SOUND_TIMER_BOOST);
 }
 
 
@@ -851,7 +851,7 @@ static TIMER_CALLBACK( delayed_6502_sound_w )
 	/* set up the states and signal the sound interrupt to the main CPU */
 	atarigen_sound_to_cpu = param;
 	atarigen_sound_to_cpu_ready = 1;
-	atarigen_sound_int_gen(machine, 0);
+	atarigen_sound_int_gen(machine->cpu[0]);
 }
 
 
@@ -1479,7 +1479,7 @@ void atarigen_halt_until_hblank_0(const device_config *screen)
 	/* halt and set a timer to wake up */
 	fraction = (double)(hblank - hpos) / (double)width;
 	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(screen)) * fraction), NULL, 0, unhalt_cpu);
-	cpunum_set_input_line(screen->machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(screen->machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 
@@ -1567,7 +1567,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 
 static TIMER_CALLBACK( unhalt_cpu )
 {
-	cpunum_set_input_line(machine, param, INPUT_LINE_HALT, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[param], INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 

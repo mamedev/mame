@@ -224,8 +224,8 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( steaser_irq )
 {
-	int num=cpu_getiloops()+3;
-	cpunum_set_input_line(machine, 0, num, HOLD_LINE);
+	int num=cpu_getiloops(device)+3;
+	cpu_set_input_line(device, num, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( steaser )

@@ -81,7 +81,7 @@ static void update_plunger(running_machine *machine)
 			time_released = timer_get_time();
 
 			if (!mask)
-				cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
 			time_pushed = timer_get_time();
@@ -97,7 +97,7 @@ static TIMER_CALLBACK( interrupt_callback )
 
 	update_plunger(machine);
 
-	cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, PULSE_LINE);
 
 	scanline = scanline + 32;
 

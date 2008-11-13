@@ -97,7 +97,7 @@ static void unimpl(tms34010_state *tms, UINT16 op)
 	/* extra check to prevent bad things */
 	if (tms->pc == 0 || opcode_table[cpu_readop16(TOBYTE(tms->pc)) >> 4] == unimpl)
 	{
-		cpunum_set_input_line(tms->device->machine, cpunum_get_active(), INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(tms->device, INPUT_LINE_HALT, ASSERT_LINE);
 		debugger_break(tms->device->machine);
 	}
 }

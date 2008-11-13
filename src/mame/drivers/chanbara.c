@@ -312,7 +312,7 @@ static WRITE8_HANDLER(chanbara_ay_out_1_w)
 
 static void sound_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 0,0,linestate);
+	cpu_set_input_line(machine->cpu[0],0,linestate);
 }
 
 

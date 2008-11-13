@@ -113,7 +113,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( gunpey_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0x200/4);
+	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x200/4);
 }
 
 /***************************************************************************************/

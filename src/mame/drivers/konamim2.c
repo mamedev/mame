@@ -318,7 +318,7 @@ static WRITE64_HANDLER(unk4_w)
 		if (data & 0x800000)
 		{
 			mame_printf_debug("CPU%d: CPU1 IRQ at %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu));
-			cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ0, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
 		unk20004 = (UINT32)(data);
@@ -413,7 +413,7 @@ static WRITE64_HANDLER(reset_w)
 	{
 		if (data & U64(0x100000000))
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 			unk3 = 0;
 		}
 	}
@@ -1127,7 +1127,7 @@ static INTERRUPT_GEN(m2)
         irq_active |= 0x8;
     }*/
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( m2 )

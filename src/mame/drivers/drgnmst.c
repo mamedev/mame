@@ -67,7 +67,7 @@ static WRITE16_HANDLER( drgnmst_snd_command_w )
 {
 	if (ACCESSING_BITS_0_7) {
 		drgnmst_snd_command = (data & 0xff);
-		cpu_yield();
+		cpu_yield(machine->activecpu);
 	}
 }
 

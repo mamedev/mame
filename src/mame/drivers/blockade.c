@@ -65,12 +65,12 @@ static DRIVER_INIT( blockade )
 
 static INTERRUPT_GEN( blockade_interrupt )
 {
-	cpunum_resume(0, SUSPEND_ANY_REASON);
+	cpu_resume(device, SUSPEND_ANY_REASON);
 
-	if ((input_port_read(machine, "IN0") & 0x80) == 0)
+	if ((input_port_read(device->machine, "IN0") & 0x80) == 0)
 	{
 		just_been_reset = 1;
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE);
 	}
 }
 

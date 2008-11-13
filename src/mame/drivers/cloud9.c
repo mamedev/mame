@@ -140,7 +140,7 @@ static TIMER_CALLBACK( clock_irq )
 	/* assert the IRQ if not already asserted */
 	if (!irq_state)
 	{
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 		irq_state = 1;
 	}
 
@@ -211,7 +211,7 @@ static MACHINE_START( cloud9 )
 
 static MACHINE_RESET( cloud9 )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	irq_state = 0;
 }
 
@@ -227,7 +227,7 @@ static WRITE8_HANDLER( irq_ack_w )
 {
 	if (irq_state)
 	{
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 		irq_state = 0;
 	}
 }

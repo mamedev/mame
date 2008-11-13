@@ -67,8 +67,8 @@ void hdsnd_init(running_machine *machine)
 
 static void update_68k_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, hdcpu_sound, 1, mainflag ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, hdcpu_sound, 3, irq68k   ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_sound], 1, mainflag ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_sound], 3, irq68k   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -110,8 +110,8 @@ WRITE16_HANDLER( hd68k_snd_data_w )
 
 WRITE16_HANDLER( hd68k_snd_reset_w )
 {
-	cpunum_set_input_line(machine, hdcpu_sound, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, hdcpu_sound, INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_sound], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_sound], INPUT_LINE_RESET, CLEAR_LINE);
 	mainflag = soundflag = 0;
 	update_68k_interrupts(machine);
 	logerror("%06X:Reset sound\n", cpu_get_previouspc(machine->activecpu));
@@ -214,7 +214,7 @@ WRITE16_HANDLER( hdsnd68k_latches_w )
 		case 4:	/* RES320 */
 			logerror("%06X:RES320=%d\n", cpu_get_previouspc(machine->activecpu), data);
 			if (hdcpu_sounddsp != -1)
-				cpunum_set_input_line(machine, hdcpu_sounddsp, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+				cpu_set_input_line(machine->cpu[hdcpu_sounddsp], INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 7:	/* LED */
@@ -301,17 +301,17 @@ WRITE16_HANDLER( hdsnd68k_320com_w )
 
 READ16_HANDLER( hdsnddsp_get_bio )
 {
-	UINT64 cycles_since_last_bio = activecpu_gettotalcycles() - last_bio_cycles;
+	UINT64 cycles_since_last_bio = cpu_get_total_cycles(machine->activecpu) - last_bio_cycles;
 	INT32 cycles_until_bio = CYCLES_PER_BIO - cycles_since_last_bio;
 
 	/* if we're not at the next BIO yet, advance us there */
 	if (cycles_until_bio > 0)
 	{
-		activecpu_adjust_icount(-cycles_until_bio);
+		cpu_adjust_icount(machine->activecpu, -cycles_until_bio);
 		last_bio_cycles += CYCLES_PER_BIO;
 	}
 	else
-		last_bio_cycles = activecpu_gettotalcycles();
+		last_bio_cycles = cpu_get_total_cycles(machine->activecpu);
 	return ASSERT_LINE;
 }
 

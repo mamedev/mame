@@ -1266,7 +1266,7 @@ static UINT32 ide_controller_read(const device_config *device, offs_t offset, in
 			}
 
 			/* take a bit of time to speed up people who poll hard */
-			activecpu_adjust_icount(-100);
+			cpu_adjust_icount(device->machine->activecpu, -100);
 			break;
 
 		/* log anything else */

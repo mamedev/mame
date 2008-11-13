@@ -257,8 +257,8 @@ static MACHINE_RESET( othunder )
 
 static void update_irq(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 6, ad_irq ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 5, vblank_irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 6, ad_irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 5, vblank_irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( irq_ack_w )
@@ -280,7 +280,7 @@ static WRITE16_HANDLER( irq_ack_w )
 static INTERRUPT_GEN( vblank_interrupt )
 {
 	vblank_irq = 1;
-	update_irq(machine);
+	update_irq(device->machine);
 }
 
 static TIMER_CALLBACK( ad_interrupt )
@@ -675,7 +675,7 @@ GFXDECODE_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

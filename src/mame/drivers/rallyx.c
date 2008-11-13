@@ -212,8 +212,8 @@ VIDEO_UPDATE( locomotn );
 
 static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 {
-	cpunum_set_input_line_vector(0, 0, data);
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line_vector(machine->cpu[0], 0, data);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -242,7 +242,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 		case 0x01:	/* INT ON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* SOUND ON */

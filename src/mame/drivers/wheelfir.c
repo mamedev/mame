@@ -575,7 +575,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 	if (scanline_counter!=(total_scanlines-1))
 	{
 		scanline_counter++;
-		cpunum_set_input_line(machine, 0, 5, HOLD_LINE); // raster IRQ, changes scroll values for road
+		cpu_set_input_line(machine->cpu[0], 5, HOLD_LINE); // raster IRQ, changes scroll values for road
 		timer_adjust_oneshot(scanline_timer, attotime_div(ATTOTIME_IN_HZ(60), total_scanlines), 0);
 
 		if (scanline_counter<256)
@@ -585,7 +585,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 
 		if (scanline_counter==256)
 		{
-			cpunum_set_input_line(machine, 0, 3, HOLD_LINE); // vblank IRQ?
+			cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE); // vblank IRQ?
 			toggle_bit = 0x8000; // must toggle..
 		}
 
@@ -623,7 +623,7 @@ static MACHINE_RESET(wheelfir)
 static INTERRUPT_GEN( wheelfir_irq )
 {
 	// we seem to need this interrupt at least once for every object drawn on the screen, otherwise things flicker + slowdown
-	cpunum_set_input_line(machine, 0, 1, HOLD_LINE); // blitter IRQ?
+	cpu_set_input_line(device, 1, HOLD_LINE); // blitter IRQ?
 }
 
 

@@ -84,7 +84,7 @@ static const UINT8 led_map[16] =
 
 static void dleuro_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
 
@@ -215,7 +215,7 @@ static INTERRUPT_GEN( vblank_callback )
 	/* also update the speaker on the European version */
 	if (sndti_exists(SOUND_BEEP, 0))
 	{
-		const device_config *ctc = devtag_get_device(machine, Z80CTC, "ctc");
+		const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "ctc");
 		beep_set_state(0, 1);
 		beep_set_frequency(0, ATTOSECONDS_TO_HZ(z80ctc_getperiod(ctc, 0).attoseconds));
 	}

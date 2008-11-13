@@ -307,15 +307,15 @@ INLINE int adjust_object_timer(running_machine *machine, int vc)
  *
  *************************************/
 
-void jaguar_gpu_suspend(void)
+void jaguar_gpu_suspend(running_machine *machine)
 {
-	cpunum_suspend(1, SUSPEND_REASON_SPIN, 1);
+	cpu_suspend(machine->cpu[1], SUSPEND_REASON_SPIN, 1);
 }
 
 
-void jaguar_gpu_resume(void)
+void jaguar_gpu_resume(running_machine *machine)
 {
-	cpunum_resume(1, SUSPEND_REASON_SPIN);
+	cpu_resume(machine->cpu[1], SUSPEND_REASON_SPIN);
 }
 
 
@@ -329,9 +329,9 @@ void jaguar_gpu_resume(void)
 static void update_cpu_irq(running_machine *machine)
 {
 	if (cpu_irq_state & gpu_regs[INT1] & 0x1f)
-		cpunum_set_input_line(machine, 0, cojag_is_r3000 ? R3000_IRQ4 : MC68000_IRQ_6, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : MC68000_IRQ_6, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, cojag_is_r3000 ? R3000_IRQ4 : MC68000_IRQ_6, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : MC68000_IRQ_6, CLEAR_LINE);
 }
 
 

@@ -213,7 +213,7 @@ static void multigam3_mmc3_scanline_cb( int num, int scanline, int vblank, int b
 		if ( --multigam3_mmc3_scanline_counter == -1 )
 		{
 			multigam3_mmc3_scanline_counter = multigam3_mmc3_scanline_latch;
-			cpunum_set_input_line(Machine, 0, 0, PULSE_LINE );
+			cpu_set_input_line(Machine->cpu[0], 0, PULSE_LINE );
 		}
 	}
 }
@@ -515,7 +515,7 @@ static PALETTE_INIT( multigam )
 
 static void ppu_irq( int num, int *ppu_regs )
 {
-	cpunum_set_input_line(Machine, num, INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(Machine->cpu[num], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /* our ppu interface                                            */

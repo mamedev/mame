@@ -188,7 +188,7 @@ static INTERRUPT_GEN( vblank )
 {
 	int int_level = video_field == 0 ? 5 : 6;
 
-	cputag_set_input_line(machine, "main_cpu", int_level, HOLD_LINE);
+	cpu_set_input_line(device, int_level, HOLD_LINE);
 
 	/* Update the laserdisc */
 	video_field ^= 1;

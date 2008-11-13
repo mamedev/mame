@@ -24,7 +24,7 @@ static UINT8 *ram;
 
 static INTERRUPT_GEN( parodius_interrupt )
 {
-	if (K052109_is_IRQ_enabled()) cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	if (K052109_is_IRQ_enabled()) cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
@@ -100,7 +100,7 @@ static READ8_HANDLER( parodius_sound_r )
 
 static WRITE8_HANDLER( parodius_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 #if 0
@@ -108,7 +108,7 @@ static int nmi_enabled;
 
 static void sound_nmi_callback( int param )
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, ( nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
+	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, ( nmi_enabled ) ? CLEAR_LINE : ASSERT_LINE );
 
 	nmi_enabled = 0;
 }
@@ -116,13 +116,13 @@ static void sound_nmi_callback( int param )
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 //  sound_nmi_enabled = 1;
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 

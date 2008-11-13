@@ -128,30 +128,30 @@ GFXDECODE_END
 // IRQs 2 & 3 are valid on SH-2
 static INTERRUPT_GEN( system_h1 )
 {
-	if (cpu_getiloops())
-		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	if (cpu_getiloops(device))
+		cpu_set_input_line(device, 4, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+		cpu_set_input_line(device, 3, HOLD_LINE);
 }
 
 // not sure on SH-1
 static INTERRUPT_GEN( system_h1_sub )
 {
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
-//      cpunum_set_input_line(machine, 2, 4, HOLD_LINE);
+//      cpu_set_input_line(device, 4, HOLD_LINE);
 	}
 	else
 	{
-//      cpunum_set_input_line(machine, 2, 3, HOLD_LINE);
+//      cpu_set_input_line(device, 3, HOLD_LINE);
 	}
 }
 
 static MACHINE_RESET ( coolridr )
 {
 
-//  cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+//  cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
 }
 

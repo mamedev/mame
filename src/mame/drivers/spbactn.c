@@ -139,7 +139,7 @@ static WRITE16_HANDLER( soundcommand_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,offset,data & 0xff);
-		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -343,7 +343,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,0,linestate);
+	cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =

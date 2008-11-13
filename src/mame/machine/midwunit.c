@@ -258,7 +258,7 @@ void midxunit_dcs_output_full(int state)
 {
 	/* only signal if not in loopback state */
 	if (uart[1] != 0x66)
-		cpunum_set_input_line(Machine, 0, 1, state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[0], 1, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -436,7 +436,7 @@ static WRITE16_HANDLER( umk3_palette_hack_w )
         without significantly impacting the rest of the system.
     */
 	COMBINE_DATA(&umk3_palette[offset]);
-	activecpu_adjust_icount(-100);
+	cpu_adjust_icount(machine->activecpu, -100);
 /*  printf("in=%04X%04X  out=%04X%04X\n", umk3_palette[3], umk3_palette[2], umk3_palette[1], umk3_palette[0]); */
 }
 

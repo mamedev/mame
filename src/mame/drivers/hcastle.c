@@ -37,7 +37,7 @@ static WRITE8_HANDLER( hcastle_bankswitch_w )
 
 static WRITE8_HANDLER( hcastle_soundirq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( hcastle_coin_w )
@@ -243,7 +243,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int linestate)
 {
-//  cpunum_set_input_line(machine, 1,0,linestate);
+//  cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 
 static void volume_callback(int v)

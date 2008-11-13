@@ -37,7 +37,7 @@ static MACHINE_RESET( flkatck )
 static INTERRUPT_GEN( flkatck_interrupt )
 {
 	if (flkatck_irq_enabled)
-		cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( flkatck_bankswitch_w )
@@ -85,7 +85,7 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 			soundlatch_w(machine, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+			cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
 			watchdog_reset_w(machine, 0, data);

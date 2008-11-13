@@ -106,17 +106,17 @@ INTERRUPT_GEN( pce_interrupt )
 
 			/* Draw VDC #0 sprite layer */
 			if(vdc[0].vdc_data[CR].w & CR_SB) {
-				pce_refresh_sprites(machine, 0, vdc[0].current_segment_line, drawn, line_buffer);
+				pce_refresh_sprites(device->machine, 0, vdc[0].current_segment_line, drawn, line_buffer);
 			}
 		}
 	} else {
 		/* We are in one of the blanking areas */
-		draw_black_line(machine, vce.current_bitmap_line );
+		draw_black_line(device->machine, vce.current_bitmap_line );
 	}
 
 	/* bump current scanline */
 	vce.current_bitmap_line = ( vce.current_bitmap_line + 1 ) % VDC_LPF;
-	vdc_advance_line(machine, 0 );
+	vdc_advance_line(device->machine, 0 );
 }
 
 INTERRUPT_GEN( sgx_interrupt )
@@ -148,7 +148,7 @@ INTERRUPT_GEN( sgx_interrupt )
 
 			/* Draw VDC #0 sprite layer */
 			if(vdc[0].vdc_data[CR].w & CR_SB) {
-				pce_refresh_sprites(machine, 0, vdc[0].current_segment_line, drawn[0], temp_buffer[0]);
+				pce_refresh_sprites(device->machine, 0, vdc[0].current_segment_line, drawn[0], temp_buffer[0]);
 			}
 
 			/* Draw VDC #1 background layer */
@@ -156,7 +156,7 @@ INTERRUPT_GEN( sgx_interrupt )
 
 			/* Draw VDC #1 sprite layer */
 			if ( vdc[1].vdc_data[CR].w & CR_SB ) {
-				pce_refresh_sprites(machine, 1, vdc[1].current_segment_line, drawn[1], temp_buffer[1]);
+				pce_refresh_sprites(device->machine, 1, vdc[1].current_segment_line, drawn[1], temp_buffer[1]);
 			}
 
 			line_buffer = BITMAP_ADDR16( vce.bmp, vce.current_bitmap_line, 86 );
@@ -226,13 +226,13 @@ INTERRUPT_GEN( sgx_interrupt )
 		}
 	} else {
 		/* We are in one of the blanking areas */
-		draw_black_line(machine, vce.current_bitmap_line );
+		draw_black_line(device->machine, vce.current_bitmap_line );
 	}
 
 	/* bump current scanline */
 	vce.current_bitmap_line = ( vce.current_bitmap_line + 1 ) % VDC_LPF;
-	vdc_advance_line(machine, 0 );
-	vdc_advance_line(machine, 1 );
+	vdc_advance_line(device->machine, 0 );
+	vdc_advance_line(device->machine, 1 );
 }
 
 static void vdc_advance_line(running_machine *machine, int which) {
@@ -341,7 +341,7 @@ static void vdc_advance_line(running_machine *machine, int which) {
 	}
 
 	if (ret)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 }
 
 VIDEO_START( pce )
@@ -540,7 +540,7 @@ static UINT8 vdc_r( running_machine *machine, int which, offs_t offset )
 		case 0x00:
 			temp = vdc[which].status;
 			vdc[which].status &= ~(VDC_VD | VDC_RR | VDC_CR | VDC_OR | VDC_DS);
-			cpunum_set_input_line(machine, 0,0,CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0],0,CLEAR_LINE);
 			break;
 
 		case 0x02:
@@ -806,7 +806,7 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 			if(sprites_drawn > 16) {
 				vdc[which].status |= VDC_OR;
 				if(vdc[which].vdc_data[CR].w&CR_OV)
-					cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+					cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 				continue;  /* Should cause an interrupt */
 			}
 
@@ -843,7 +843,7 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 							else if (drawn[pixel_x]==2)
 							{
 								if(vdc[which].vdc_data[CR].w&CR_CC)
-									cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+									cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 								vdc[which].status|=VDC_CR;
 							}
 						}
@@ -884,7 +884,7 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 							/* Check for sprite #0 collision */
 							else if ( drawn[pixel_x] == 2 ) {
 								if(vdc[which].vdc_data[CR].w&CR_CC)
-									cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+									cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 								vdc[which].status|=VDC_CR;
 							}
 						}
@@ -903,7 +903,7 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 				if( sprites_drawn > 16 ) {
 					vdc[which].status |= VDC_OR;
 					if(vdc[which].vdc_data[CR].w&CR_OV)
-						cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+						cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 				} else {
 					conv_obj(which, obj_i + (cgypos << 2) + (hf ? 0 : 2), obj_l, hf, vf, buf);
 					for(x=0;x<16;x++)
@@ -928,7 +928,7 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 								/* Check for sprite #0 collision */
 								else if ( drawn[pixel_x]==2 ) {
 									if(vdc[which].vdc_data[CR].w&CR_CC)
-										cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+										cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 									vdc[which].status|=VDC_CR;
 								}
 							}
@@ -980,7 +980,7 @@ static void vdc_do_dma(running_machine *machine, int which)
 	vdc[which].vdc_data[LENR].w = len;
 	if(dvc)
 	{
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 	}
 
 }

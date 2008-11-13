@@ -122,7 +122,7 @@ static WRITE8_HANDLER( unknown_w )
 
 static TIMER_CALLBACK( main_to_sound_callback )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	main_to_sound_data = param;
 }
 
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( main_to_sound_w )
 
 static READ8_HANDLER( main_to_sound_r )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	return main_to_sound_data;
 }
 
@@ -149,7 +149,7 @@ static READ8_HANDLER( main_to_sound_r )
 
 static TIMER_CALLBACK( sound_to_main_callback )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 	sound_to_main_data = param;
 }
 
@@ -162,7 +162,7 @@ static WRITE8_HANDLER( sound_to_main_w )
 
 static READ8_HANDLER( sound_to_main_r )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 	return sound_to_main_data;
 }
 

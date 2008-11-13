@@ -121,14 +121,14 @@ static offs_t speedup_pc;
 
 static TIMER_CALLBACK( irq5_gen )
 {
-	cpunum_set_input_line(machine, 0, R3000_IRQ5, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], R3000_IRQ5, ASSERT_LINE);
 }
 
 
 static INTERRUPT_GEN( irq4_gen )
 {
-	cpunum_set_input_line(machine, 0, R3000_IRQ4, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, irq5_gen);
+	cpu_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
+	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, irq5_gen);
 }
 
 
@@ -218,7 +218,7 @@ static WRITE32_HANDLER( speedup_w )
 	/* see if the PC matches */
 	if ((cpu_get_previouspc(machine->activecpu) & 0x1fffffff) == speedup_pc)
 	{
-		UINT64 curr_cycles = activecpu_gettotalcycles();
+		UINT64 curr_cycles = cpu_get_total_cycles(machine->activecpu);
 
 		/* if less than 50 cycles from the last time, count it */
 		if (curr_cycles - last_cycles < 50)
@@ -227,7 +227,7 @@ static WRITE32_HANDLER( speedup_w )
 
 			/* more than 2 in a row and we spin */
 			if (loop_count > 2)
-				cpu_spinuntil_int();
+				cpu_spinuntil_int(machine->activecpu);
 		}
 		else
 			loop_count = 0;

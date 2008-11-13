@@ -147,12 +147,12 @@ void asic65_reset(running_machine *machine, int state)
 {
 	/* rom-based means reset and clear states */
 	if (asic65.type == ASIC65_ROMBASED)
-		cpunum_set_input_line(machine, asic65.cpunum, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[asic65.cpunum], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* otherwise, do it manually */
 	else
 	{
-		cpunum_suspend(mame_find_cpu_index(machine, "asic65"), SUSPEND_REASON_DISABLE, 1);
+		cpu_suspend(machine->cpu[mame_find_cpu_index(machine, "asic65")], SUSPEND_REASON_DISABLE, 1);
 
 		/* if reset is being signalled, clear everything */
 		if (state && !asic65.reset_state)
@@ -183,7 +183,7 @@ static TIMER_CALLBACK( m68k_asic65_deferred_w )
 	asic65.tfull = 1;
 	asic65.cmd = param >> 16;
 	asic65.tdata = param;
-	cpunum_set_input_line(machine, asic65.cpunum, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[asic65.cpunum], 0, ASSERT_LINE);
 }
 
 
@@ -196,7 +196,7 @@ WRITE16_HANDLER( asic65_data_w )
 	if (asic65.type == ASIC65_ROMBASED)
 	{
 		timer_call_after_resynch(NULL, data | (offset << 16), m68k_asic65_deferred_w);
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
 		return;
 	}
 
@@ -234,7 +234,7 @@ READ16_HANDLER( asic65_r )
 	if (asic65.type == ASIC65_ROMBASED)
 	{
 		asic65._68full = 0;
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(5));
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(5));
 		return asic65._68data;
 	}
 
@@ -452,7 +452,7 @@ READ16_HANDLER( asic65_io_r )
 		/* bit 14 = 68FULL */
 		/* bit 13 = XFLG */
 		/* bit 12 = controlled by jumper */
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(5));
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(5));
 		return (asic65.tfull << 15) | (asic65._68full << 14) | (asic65.xflg << 13) | 0x0000;
 	}
 	else
@@ -480,7 +480,7 @@ static WRITE16_HANDLER( asic65_68k_w )
 static READ16_HANDLER( asic65_68k_r )
 {
 	asic65.tfull = 0;
-	cpunum_set_input_line(machine, asic65.cpunum, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[asic65.cpunum], 0, CLEAR_LINE);
 	return asic65.tdata;
 }
 
@@ -504,7 +504,7 @@ static READ16_HANDLER( asic65_stat_r )
 static READ16_HANDLER( asci65_get_bio )
 {
 	if (!asic65.tfull)
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	return asic65.tfull ? CLEAR_LINE : ASSERT_LINE;
 }
 

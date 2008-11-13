@@ -145,7 +145,7 @@ static void omegaf_io_protection_reset(void);
 
 static INTERRUPT_GEN( ninjakd2_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( robokid_bankselect_w )
 static WRITE8_HANDLER( ninjakd2_soundreset_w )
 {
 	// bit 4 resets sound CPU
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(data & 0x80);
@@ -899,7 +899,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

@@ -91,23 +91,23 @@ static void update_main_irqs(running_machine *machine)
 	if (timer_irq_state)
 		irq |= 2;
 	else
-		cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 2, CLEAR_LINE);
 
 	if (vblank_irq_state)
 		irq |= 4;
 	else
-		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 4, CLEAR_LINE);
 
 	if (gprider_hack && irq > 4)
 		irq = 4;
 
 	if (!(irq==6))
-		cpunum_set_input_line(machine, 0, 6, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 6, CLEAR_LINE);
 
 	if (irq)
 	{
-		cpunum_set_input_line(machine, 0, irq, ASSERT_LINE);
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+		cpu_set_input_line(machine->cpu[0], irq, ASSERT_LINE);
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 }
 
@@ -126,7 +126,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == 223)
 	{
 		vblank_irq_state = update = 1;
-		cpunum_set_input_line(machine, 1, 4, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], 4, ASSERT_LINE);
 		next_scanline = scanline + 1;
 	}
 
@@ -135,7 +135,7 @@ static TIMER_CALLBACK( scanline_callback )
 	{
 		vblank_irq_state = 0;
 		update = 1;
-		cpunum_set_input_line(machine, 1, 4, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 4, CLEAR_LINE);
 		next_scanline = scanline + 1;
 	}
 
@@ -166,7 +166,7 @@ static void timer_ack_callback(running_machine *machine)
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	soundlatch_w(machine, 0, param);
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -178,13 +178,13 @@ static void sound_data_w(UINT8 data)
 
 static void sound_cpu_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 2, 0, state);
+	cpu_set_input_line(machine->cpu[2], 0, state);
 }
 
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(machine, offset);
 }
 
@@ -198,14 +198,14 @@ static READ8_HANDLER( sound_data_r )
 
 static void xboard_reset(void)
 {
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, PULSE_LINE);
-	cpu_boost_interleave(Machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cpuexec_boost_interleave(Machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
 static MACHINE_RESET( xboard )
 {
-	fd1094_machine_init();
+	fd1094_machine_init(machine->cpu[0]);
 	segaic16_tilemap_reset(0);
 
 	/* hook the RESET line, which resets CPU #1 */
@@ -345,7 +345,7 @@ static WRITE16_HANDLER( iochip_0_w )
             */
 			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(machine,0,0);
 			segaic16_set_display_enable(machine, data & 0x20);
-			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 3:
@@ -455,7 +455,7 @@ static UINT16 *loffire_sync;
 static WRITE16_HANDLER( loffire_sync0_w )
 {
 	COMBINE_DATA(&loffire_sync[offset]);
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 

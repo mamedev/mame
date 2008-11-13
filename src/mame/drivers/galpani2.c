@@ -435,12 +435,12 @@ GFXDECODE_END
 #define GALPANI2_INTERRUPTS_NUM	4
 static INTERRUPT_GEN( galpani2_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 3:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
-		case 2:  cpunum_set_input_line(machine, 0, 4, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(machine, 0, 5, HOLD_LINE); break;	// vblank?
-		case 0:  cpunum_set_input_line(machine, 0, 6, HOLD_LINE); break;	// hblank?
+		case 3:  cpu_set_input_line(device, 3, HOLD_LINE); break;
+		case 2:  cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 1:  cpu_set_input_line(device, 5, HOLD_LINE); break;	// vblank?
+		case 0:  cpu_set_input_line(device, 6, HOLD_LINE); break;	// hblank?
 	}
 }
 
@@ -449,11 +449,11 @@ static INTERRUPT_GEN( galpani2_interrupt )
 #define GALPANI2_INTERRUPTS_NUM2	3
 static INTERRUPT_GEN( galpani2_interrupt2 )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpunum_set_input_line(machine, 1, 3, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(machine, 1, 4, HOLD_LINE); break;
-		case 0:  cpunum_set_input_line(machine, 1, 5, HOLD_LINE); break;
+		case 2:  cpu_set_input_line(device, 3, HOLD_LINE); break;
+		case 1:  cpu_set_input_line(device, 4, HOLD_LINE); break;
+		case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break;
 	}
 }
 

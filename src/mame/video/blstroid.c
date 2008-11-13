@@ -106,7 +106,7 @@ static TIMER_CALLBACK( irq_off )
 static TIMER_CALLBACK( irq_on )
 {
 	/* generate the interrupt */
-	atarigen_scanline_int_gen(machine, 0);
+	atarigen_scanline_int_gen(machine->cpu[0]);
 	atarigen_update_interrupts(machine);
 }
 

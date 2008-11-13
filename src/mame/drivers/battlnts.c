@@ -24,12 +24,12 @@ VIDEO_UPDATE( battlnts );
 static INTERRUPT_GEN( battlnts_interrupt )
 {
 	if (K007342_is_INT_enabled())
-		cpunum_set_input_line(machine, 0, HD6309_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device, HD6309_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlnts_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( battlnts_bankswitch_w )

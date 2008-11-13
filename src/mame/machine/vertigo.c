@@ -78,12 +78,12 @@ static const struct TTL74148_interface irq_encoder =
 static void update_irq(void)
 {
 	if (irq_state < 7)
-		cpunum_set_input_line(Machine, 0, irq_state ^ 7, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[0], irq_state ^ 7, CLEAR_LINE);
 
 	irq_state = TTL74148_output_r(0);
 
 	if (irq_state < 7)
-		cpunum_set_input_line(Machine, 0, irq_state ^ 7, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[0], irq_state ^ 7, ASSERT_LINE);
 }
 
 
@@ -105,7 +105,7 @@ static PIT8253_OUTPUT_CHANGED( v_irq4_w )
 static PIT8253_OUTPUT_CHANGED( v_irq3_w )
 {
 	if (state)
-		cpunum_set_input_line(device->machine, 1, INPUT_LINE_IRQ0, ASSERT_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_IRQ0, ASSERT_LINE);
 
 	update_irq_encoder(INPUT_LINE_IRQ3, state);
 }
@@ -149,7 +149,7 @@ READ16_HANDLER( vertigo_coin_r )
 INTERRUPT_GEN( vertigo_interrupt )
 {
 	/* Coin inputs cause IRQ6 */
-	if ((input_port_read(machine, "COIN") & 0x7) < 0x7)
+	if ((input_port_read(device->machine, "COIN") & 0x7) < 0x7)
 		update_irq_encoder(INPUT_LINE_IRQ6, ASSERT_LINE);
 }
 
@@ -165,9 +165,9 @@ WRITE16_HANDLER( vertigo_wsot_w )
 {
 	/* Reset sound cpu */
 	if ((data & 2) == 0)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -175,13 +175,13 @@ static TIMER_CALLBACK( sound_command_w )
 {
 	exidy440_sound_command = param;
 	exidy440_sound_command_ack = 0;
-	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ1, ASSERT_LINE);
 
 	/* It is important that the sound cpu ACKs the sound command
        quickly. Otherwise the main CPU gives up with sound. Boosting
        the interleave for a while helps. */
 
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 

@@ -18,7 +18,7 @@ void sprint8_set_collision(running_machine *machine, int n)
 {
 	if (collision_reset == 0)
 	{
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 
 		collision_index = n;
 	}
@@ -98,7 +98,7 @@ static WRITE8_HANDLER( sprint8_int_reset_w )
 	collision_reset = !(data & 1);
 
 	if (collision_reset)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

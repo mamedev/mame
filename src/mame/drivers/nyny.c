@@ -115,13 +115,13 @@ static void main_cpu_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1) | pia_get_irq_b(2);
 
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void main_cpu_firq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -137,13 +137,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA0 (COIN1) */
-	pia_1_ca1_w(machine, 0, input_port_read(machine, "IN0") & 0x01);
+	pia_1_ca1_w(device->machine, 0, input_port_read(device->machine, "IN0") & 0x01);
 
 	/* CA2 - copy of PA1 (SERVICE1) */
-	pia_1_ca2_w(machine, 0, input_port_read(machine, "IN0") & 0x02);
+	pia_1_ca2_w(device->machine, 0, input_port_read(device->machine, "IN0") & 0x02);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(machine, 0, input_port_read(machine, "CROSS"));
+	pia_1_cb1_w(device->machine, 0, input_port_read(device->machine, "CROSS"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -430,14 +430,14 @@ static VIDEO_UPDATE( nyny )
 static WRITE8_HANDLER( audio_1_command_w )
 {
 	soundlatch_w(machine, 0, data);
-	cpunum_set_input_line(machine, 1, M6802_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], M6802_IRQ_LINE, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_1_answer_w )
 {
 	soundlatch3_w(machine, 0, data);
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -487,7 +487,7 @@ static const ay8910_interface ay8910_64_interface =
 static WRITE8_HANDLER( audio_2_command_w )
 {
 	soundlatch2_w(machine, 0, (data & 0x60) >> 5);
-	cpunum_set_input_line(machine, 2, M6802_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], M6802_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

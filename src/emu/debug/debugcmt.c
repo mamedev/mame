@@ -103,11 +103,16 @@ static void debug_comment_free(void);
 
 int debug_comment_init(running_machine *machine)
 {
-	if (cpu_gettotalcpu() > 0)
+	int numcpu;
+	
+	for (numcpu = 0; numcpu < ARRAY_LENGTH(machine->cpu); numcpu++)
+		if (machine->cpu[numcpu] == NULL)
+			break;
+	if (numcpu > 0)
 	{
 		/* allocate enough comment groups for the total # of cpu's */
-		debug_comments = (comment_group*) auto_malloc(cpu_gettotalcpu() * sizeof(comment_group));
-		memset(debug_comments, 0, cpu_gettotalcpu() * sizeof(comment_group));
+		debug_comments = (comment_group*) auto_malloc(numcpu * sizeof(comment_group));
+		memset(debug_comments, 0, numcpu * sizeof(comment_group));
 
 		/* automatically load em up */
 		debug_comment_load(machine);
@@ -287,8 +292,9 @@ UINT32 debug_comment_all_change_count(void)
 	int i ;
 	UINT32 retVal = 0;
 
-	for (i = 0; i < cpu_gettotalcpu(); i++)
-		retVal += debug_comments[i].change_count ;
+	for (i = 0; i < ARRAY_LENGTH(Machine->cpu); i++)
+		if (Machine->cpu[i] != NULL)
+			retVal += debug_comments[i].change_count ;
 
 	return retVal;
 }
@@ -404,25 +410,26 @@ int debug_comment_save(running_machine *machine)
 	xml_set_attribute(systemnode, "name", machine->gamedrv->name);
 
 	/* for each cpu */
-	for (i = 0; i < cpu_gettotalcpu(); i++)
-	{
-		xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
-		if (!curnode)
-			goto error;
-		xml_set_attribute_int(curnode, "num", i);
-
-		for (j = 0; j < debug_comments[i].comment_count; j++)
+	for (i = 0; i < ARRAY_LENGTH(machine->cpu); i++)
+		if (machine->cpu[i] != NULL)
 		{
-			xml_data_node *datanode = xml_add_child(curnode, "comment", xml_normalize_string(debug_comments[i].comment_info[j]->text));
-			if (!datanode)
+			xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
+			if (!curnode)
 				goto error;
-			xml_set_attribute_int(datanode, "address", debug_comments[i].comment_info[j]->address);
-			xml_set_attribute_int(datanode, "color", debug_comments[i].comment_info[j]->color);
-			sprintf(crc_buf, "%08X", debug_comments[i].comment_info[j]->crc);
-			xml_set_attribute(datanode, "crc", crc_buf);
-			total_comments++;
+			xml_set_attribute_int(curnode, "num", i);
+
+			for (j = 0; j < debug_comments[i].comment_count; j++)
+			{
+				xml_data_node *datanode = xml_add_child(curnode, "comment", xml_normalize_string(debug_comments[i].comment_info[j]->text));
+				if (!datanode)
+					goto error;
+				xml_set_attribute_int(datanode, "address", debug_comments[i].comment_info[j]->address);
+				xml_set_attribute_int(datanode, "color", debug_comments[i].comment_info[j]->color);
+				sprintf(crc_buf, "%08X", debug_comments[i].comment_info[j]->crc);
+				xml_set_attribute(datanode, "crc", crc_buf);
+				total_comments++;
+			}
 		}
-	}
 
 	/* flush the file */
 	if (total_comments > 0)
@@ -557,13 +564,14 @@ static void debug_comment_free(void)
 {
 	int i, j;
 
-	for (i = 0; i < cpu_gettotalcpu(); i++)
-	{
-		for (j = 0; j < debug_comments[i].comment_count; j++)
+	for (i = 0; i < ARRAY_LENGTH(Machine->cpu); i++)
+		if (Machine->cpu[i] != NULL)
 		{
-			free(debug_comments[i].comment_info[j]);
-		}
+			for (j = 0; j < debug_comments[i].comment_count; j++)
+			{
+				free(debug_comments[i].comment_info[j]);
+			}
 
-		debug_comments[i].comment_count = 0;
-	}
+			debug_comments[i].comment_count = 0;
+		}
 }

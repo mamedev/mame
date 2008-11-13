@@ -11,6 +11,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "profiler.h"
 #include "pool.h"
 
@@ -140,16 +141,13 @@ static void timer_remove(emu_timer *which);
 
 INLINE attotime get_current_time(void)
 {
-	int activecpu;
-
 	/* if we're currently in a callback, use the timer's expiration time as a base */
 	if (callback_timer != NULL)
 		return callback_timer_expire_time;
 
 	/* if we're executing as a particular CPU, use its local time as a base */
-	activecpu = cpunum_get_active();
-	if (activecpu >= 0)
-		return cpunum_get_localtime(activecpu);
+	if (Machine->activecpu != NULL)
+		return cpu_get_local_time(Machine->activecpu);
 
 	/* otherwise, return the current global base time */
 	return global_basetime;
@@ -734,8 +732,8 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 
 	/* if this was inserted as the head, abort the current timeslice and resync */
 	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
-	if (which == timer_head && cpunum_get_executing() >= 0)
-		activecpu_abort_timeslice();
+	if (which == timer_head && Machine->activecpu != NULL)
+		cpu_abort_timeslice(Machine->activecpu);
 }
 
 

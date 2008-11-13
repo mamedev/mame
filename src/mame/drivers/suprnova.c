@@ -452,7 +452,7 @@ static READ32_HANDLER( skns_hit_r )
 
 static TIMER_CALLBACK( interrupt_callback )
 {
-	cpunum_set_input_line(machine, 0,param,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],param,HOLD_LINE);
 }
 
 static MACHINE_RESET(skns)
@@ -468,7 +468,7 @@ static MACHINE_RESET(skns)
 static INTERRUPT_GEN(skns_interrupt)
 {
 	UINT8 interrupt = 5;
-	switch(cpu_getiloops())
+	switch(cpu_getiloops(device))
 	{
 		case 0:
 			interrupt = 5; // VBLANK
@@ -477,7 +477,7 @@ static INTERRUPT_GEN(skns_interrupt)
 			interrupt = 1; // SPC
 			break;
 	}
-	cpunum_set_input_line(machine, 0,interrupt,HOLD_LINE);
+	cpu_set_input_line(device,interrupt,HOLD_LINE);
 }
 
 /**********************************************************************************
@@ -671,28 +671,28 @@ static WRITE32_HANDLER( skns_io_w )
 		if(ACCESSING_BITS_8_15)
 		{ /* Interrupt Clear, do we need these? */
 /*          if(data&0x01)
-                cpunum_set_input_line(machine, 0,1,CLEAR_LINE);
+                cpu_set_input_line(machine->cpu[0],1,CLEAR_LINE);
             if(data&0x02)
-                cpunum_set_input_line(machine, 0,3,CLEAR_LINE);
+                cpu_set_input_line(machine->cpu[0],3,CLEAR_LINE);
             if(data&0x04)
-                cpunum_set_input_line(machine, 0,5,CLEAR_LINE);
+                cpu_set_input_line(machine->cpu[0],5,CLEAR_LINE);
             if(data&0x08)
-                cpunum_set_input_line(machine, 0,7,CLEAR_LINE);
+                cpu_set_input_line(machine->cpu[0],7,CLEAR_LINE);
             if(data&0x10)
-                cpunum_set_input_line(machine, 0,9,CLEAR_LINE);
+                cpu_set_input_line(machine->cpu[0],9,CLEAR_LINE);
             if(data&0x20)
-                cpunum_set_input_line(machine, 0,0xb,CLEAR_LINE);
+                cpu_set_input_line(machine->cpu[0],0xb,CLEAR_LINE);
             if(data&0x40)
-                cpunum_set_input_line(machine, 0,0xd,CLEAR_LINE);
+                cpu_set_input_line(machine->cpu[0],0xd,CLEAR_LINE);
             if(data&0x80)
-                cpunum_set_input_line(machine, 0,0xf,CLEAR_LINE);*/
+                cpu_set_input_line(machine->cpu[0],0xf,CLEAR_LINE);*/
 
 			/* idle skip for vblokbrk/sarukani, i can't find a better place to put it :-( but i think it works ok unless its making the game too fast */
 			if (cpu_get_pc(machine->activecpu)==0x04013B42)
 			{
 				if (!strcmp(machine->gamedrv->name,"vblokbrk") ||
 					!strcmp(machine->gamedrv->name,"sarukani"))
-					cpu_spinuntil_int();
+					cpu_spinuntil_int(machine->activecpu);
 			}
 
 		}
@@ -924,26 +924,26 @@ static READ32_HANDLER( gutsn_speedup_r )
 	if (cpu_get_pc(machine->activecpu)==0x402206e)
 	{
 		if(skns_main_ram[0x00078/4] == skns_main_ram[0x0c780/4])
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 	}
 	return skns_main_ram[0x0c780/4];
 }
 
 static READ32_HANDLER( cyvern_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x402ebd2) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x402ebd2) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x4d3c8/4];
 }
 
 static READ32_HANDLER( puzloopj_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x401dca0) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x401dca0) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x86714/4];
 }
 
 static READ32_HANDLER( puzloopu_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x401dab0) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x401dab0) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x85cec/4];
 }
 
@@ -956,61 +956,61 @@ static READ32_HANDLER( puzzloop_speedup_r )
     0401DA18: BF      $0401DA26
     0401DA26: BRA     $0401DA12
 */
-	if (cpu_get_pc(machine->activecpu)==0x401da14) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x401da14) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x81d38/4];
 }
 
 static READ32_HANDLER( senknow_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x4017dce) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x4017dce) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x0000dc/4];
 }
 
 static READ32_HANDLER( teljan_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x401ba32) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x401ba32) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x002fb4/4];
 }
 
 static READ32_HANDLER( jjparads_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x4015e84) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x4015e84) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x000994/4];
 }
 
 static READ32_HANDLER( jjparad2_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x401620a) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x401620a) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x000984/4];
 }
 
 static READ32_HANDLER( ryouran_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x40182ce) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x40182ce) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x000a14/4];
 }
 
 static READ32_HANDLER( galpans2_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x4049ae2) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x4049ae2) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x0fb6bc/4];
 }
 
 static READ32_HANDLER( panicstr_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x404e68a) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x404e68a) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0x0f19e4/4];
 }
 
 static READ32_HANDLER( sengekis_speedup_r ) // 60006ee  600308e
 {
-	if (cpu_get_pc(machine->activecpu)==0x60006ec) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x60006ec) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0xb74bc/4];
 }
 
 static READ32_HANDLER( sengekij_speedup_r ) // 60006ee  600308e
 {
-	if (cpu_get_pc(machine->activecpu)==0x60006ec) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x60006ec) cpu_spinuntil_int(machine->activecpu);
 	return skns_main_ram[0xb7380/4];
 }
 

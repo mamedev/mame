@@ -56,19 +56,19 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 {
 	static int which;
 	which = !which;
-	if( which ) cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	else if( mnchmobl_nmi_enable ) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if( which ) cpu_set_input_line(device, 0, HOLD_LINE);
+	else if( mnchmobl_nmi_enable ) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
 	soundlatch_w( machine, offset, data );
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static CUSTOM_INPUT( mnchmobl_bonus_r )

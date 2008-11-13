@@ -315,14 +315,14 @@ static INTERRUPT_GEN( ssio_14024_clock )
 
 	/* if the low 5 bits clocked to 0, bit 6 has changed state */
 	if ((ssio_14024_count & 0x3f) == 0)
-		cpunum_set_input_line(machine, ssio_sound_cpu, 0, (ssio_14024_count & 0x40) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(device, 0, (ssio_14024_count & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( ssio_irq_clear )
 {
 	/* a read here asynchronously resets the 14024 count, clearing /SINT */
 	ssio_14024_count = 0;
-	cpunum_set_input_line(machine, ssio_sound_cpu, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[ssio_sound_cpu], 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -398,7 +398,7 @@ void ssio_reset_w(int state)
 	{
 		int i;
 
-		cpunum_set_input_line(Machine, ssio_sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[ssio_sound_cpu], INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* latches also get reset */
 		for (i = 0; i < 4; i++)
@@ -408,7 +408,7 @@ void ssio_reset_w(int state)
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpunum_set_input_line(Machine, ssio_sound_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[ssio_sound_cpu], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 READ8_HANDLER( ssio_input_port_r )
@@ -534,7 +534,7 @@ static void csdeluxe_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
 
-  	cpunum_set_input_line(machine, csdeluxe_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+  	cpu_set_input_line(machine->cpu[csdeluxe_sound_cpu], 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
@@ -544,7 +544,7 @@ static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 static READ16_HANDLER( csdeluxe_pia_r )
@@ -581,7 +581,7 @@ READ8_HANDLER( csdeluxe_status_r )
 
 void csdeluxe_reset_w(int state)
 {
-	cpunum_set_input_line(Machine, csdeluxe_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[csdeluxe_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -657,7 +657,7 @@ static void soundsgood_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1);
 
-  	cpunum_set_input_line(machine, soundsgood_sound_cpu, 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
+  	cpu_set_input_line(machine->cpu[soundsgood_sound_cpu], 4, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
@@ -667,7 +667,7 @@ static TIMER_CALLBACK( soundsgood_delayed_data_w )
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(250));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(250));
 }
 
 
@@ -685,7 +685,7 @@ READ8_HANDLER( soundsgood_status_r )
 void soundsgood_reset_w(int state)
 {
 //if (state) mame_printf_debug("SG Reset\n");
-	cpunum_set_input_line(Machine, soundsgood_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[soundsgood_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -751,7 +751,7 @@ static void turbocs_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0);
 
-	cpunum_set_input_line(machine, turbocs_sound_cpu, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[turbocs_sound_cpu], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
@@ -761,7 +761,7 @@ static TIMER_CALLBACK( turbocs_delayed_data_w )
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -778,7 +778,7 @@ READ8_HANDLER( turbocs_status_r )
 
 void turbocs_reset_w(int state)
 {
-	cpunum_set_input_line(Machine, turbocs_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[turbocs_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -884,7 +884,7 @@ static void squawkntalk_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
-	cpunum_set_input_line(machine, squawkntalk_sound_cpu, M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[squawkntalk_sound_cpu], M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
@@ -902,7 +902,7 @@ WRITE8_HANDLER( squawkntalk_data_w )
 
 void squawkntalk_reset_w(int state)
 {
-	cpunum_set_input_line(Machine, squawkntalk_sound_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[squawkntalk_sound_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

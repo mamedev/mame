@@ -440,7 +440,7 @@ static WRITE32_HANDLER( esc_w )
 		if (konamigx_wrport1_1 & 0x10)
 		{
 			gx_rdport1_3 &= ~8;
-			cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 		}
 	}
 	else
@@ -552,13 +552,13 @@ static WRITE32_HANDLER( control_w )
 		{
 			// enable 68k
 			// clear the halt condition and reset the 68000
-			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 		}
 		else
 		{
 			// disable 68k
-			cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 
 		K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
@@ -590,7 +590,7 @@ static READ32_HANDLER(waitskip_r)
 
 	if (cpu_get_pc(machine->activecpu) == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
 	{
-		cpu_spinuntil_trigger(resume_trigger);
+		cpu_spinuntil_trigger(machine->activecpu, resume_trigger);
 		suspension_active = 1;
 	}
 
@@ -621,14 +621,14 @@ static WRITE32_HANDLER( ccu_w )
 		// vblank interrupt ACK
 		if (ACCESSING_BITS_24_31)
 		{
-			cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
 			gx_syncen |= 0x20;
 		}
 
 		// hblank interrupt ACK
 		if (ACCESSING_BITS_8_15)
 		{
-			cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], 2, CLEAR_LINE);
 			gx_syncen |= 0x40;
 		}
 	}
@@ -646,7 +646,7 @@ static WRITE32_HANDLER( ccu_w )
 static TIMER_CALLBACK( dmaend_callback )
 {
 	// foul-proof (CPU0 could be deactivated while we wait)
-	if (resume_trigger && suspension_active) { suspension_active = 0; cpu_trigger(machine, resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; cpuexec_trigger(machine, resume_trigger); }
 
 	// DMA busy flag must be cleared before triggering IRQ 3
 	gx_rdport1_3 &= ~2;
@@ -658,7 +658,7 @@ static TIMER_CALLBACK( dmaend_callback )
 
 		// lower OBJINT-REQ flag and trigger interrupt
 		gx_rdport1_3 &= ~0x80;
-		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE);
 	}
 }
 
@@ -682,7 +682,7 @@ static void dmastart_callback(int data)
 static INTERRUPT_GEN(konamigx_vbinterrupt)
 {
 	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; cpu_trigger(machine, resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; cpuexec_trigger(device->machine, resume_trigger); }
 
 	// IRQ 1 is the main 60hz vblank interrupt
 	if (gx_syncen & 0x20)
@@ -692,7 +692,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 		if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 		{
 			gx_syncen &= ~1;
-			cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+			cpu_set_input_line(device, 1, HOLD_LINE);
 		}
 	}
 
@@ -702,7 +702,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt)
 static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 {
 	// lift idle suspension
-	if (resume_trigger && suspension_active) { suspension_active = 0; cpu_trigger(machine, resume_trigger); }
+	if (resume_trigger && suspension_active) { suspension_active = 0; cpuexec_trigger(device->machine, resume_trigger); }
 
 	// IRQ 1 is the main 60hz vblank interrupt
 	// the gx_syncen & 0x20 test doesn't work on type 3 or 4 ROM boards, likely because the ROM board
@@ -714,7 +714,7 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 		if ((konamigx_wrport1_1 & 0x81) == 0x81 || (gx_syncen & 1))
 		{
 			gx_syncen &= ~1;
-			cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+			cpu_set_input_line(device, 1, HOLD_LINE);
 		}
 	}
 
@@ -723,9 +723,9 @@ static INTERRUPT_GEN(konamigx_vbinterrupt_type4)
 
 static INTERRUPT_GEN(konamigx_hbinterrupt)
 {
-	if (!cpu_getiloops())
+	if (!cpu_getiloops(device))
 	{
-		konamigx_vbinterrupt_type4(machine, cpunum);
+		konamigx_vbinterrupt_type4(device);
 	}
 	else	// hblank
 	{
@@ -737,7 +737,7 @@ static INTERRUPT_GEN(konamigx_hbinterrupt)
 			if ((konamigx_wrport1_1 & 0x82) == 0x82 || (gx_syncen & 2))
 			{
 				gx_syncen &= ~2;
-				cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+				cpu_set_input_line(device, 2, HOLD_LINE);
 			}
 		}
 	}
@@ -816,7 +816,7 @@ INLINE void write_snd_020(running_machine *machine, int reg, int val)
 
 	if (reg == 7)
 	{
-		cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 1, HOLD_LINE);
 	}
 }
 
@@ -1087,7 +1087,7 @@ static WRITE32_HANDLER( type4_prot_w )
 				if (konamigx_wrport1_1 & 0x10)
 				{
 					gx_rdport1_3 &= ~8;
-					cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+					cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 				}
 
 				// don't accidentally do a phony command
@@ -3259,7 +3259,7 @@ static MACHINE_RESET(konamigx)
 	tms57002_init();
 
 	// sound CPU initially disabled?
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
 	if (!strcmp(machine->gamedrv->name, "tkmmpzdm"))
 	{

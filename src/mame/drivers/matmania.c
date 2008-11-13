@@ -42,7 +42,7 @@ The driver has been updated accordingly.
 static WRITE8_HANDLER( matmania_sh_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1,M6502_IRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],M6502_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( matmania_dac_w )
@@ -54,7 +54,7 @@ static WRITE8_HANDLER( matmania_dac_w )
 static WRITE8_HANDLER( maniach_sh_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
 }
 
 
@@ -364,7 +364,7 @@ MACHINE_DRIVER_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,1,linestate);
+	cpu_set_input_line(machine->cpu[1],1,linestate);
 }
 
 static const ym3526_interface ym3526_config =

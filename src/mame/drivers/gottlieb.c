@@ -664,15 +664,15 @@ static void laserdisc_audio_process(const device_config *device, int samplerate,
 
 static TIMER_CALLBACK( nmi_clear )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( gottlieb_interrupt )
 {
 	/* assert the NMI and set a timer to clear it at the first visible line */
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, nmi_clear);
+	cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
+	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, nmi_clear);
 
 	/* if we have a laserdisc, update it */
 	if (laserdisc != NULL)

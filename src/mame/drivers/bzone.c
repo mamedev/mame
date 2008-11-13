@@ -254,8 +254,8 @@ static MACHINE_START( redbaron )
 
 static INTERRUPT_GEN( bzone_interrupt )
 {
-	if (input_port_read(machine, "IN0") & 0x10)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "IN0") & 0x10)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -268,7 +268,7 @@ static INTERRUPT_GEN( bzone_interrupt )
 
 static CUSTOM_INPUT( clock_r )
 {
-	return (cpunum_gettotalcycles(0) & 0x100) ? 1 : 0;
+	return (cpu_get_total_cycles(field->port->machine->cpu[0]) & 0x100) ? 1 : 0;
 }
 
 

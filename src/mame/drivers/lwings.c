@@ -97,8 +97,8 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 
 static INTERRUPT_GEN( lwings_interrupt )
 {
-	if (interrupt_enable_r(machine, 0))
-		cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xd7); /* RST 10h */
+	if (interrupt_enable_r(device->machine, 0))
+		cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xd7); /* RST 10h */
 }
 
 

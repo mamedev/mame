@@ -299,7 +299,7 @@ static WRITE16_HANDLER( sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0x00,data & 0xff);
-		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -891,7 +891,7 @@ static VIDEO_UPDATE(deroon)
 static void sound_irq(running_machine *machine, int irq)
 {
 	/* IRQ */
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ymf262_interface tecmosys_ymf262_interface =

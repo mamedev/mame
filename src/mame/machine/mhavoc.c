@@ -44,7 +44,7 @@ static TIMER_CALLBACK( cpu_irq_clock )
 		alpha_irq_clock++;
 		if ((alpha_irq_clock & 0x0c) == 0x0c)
 		{
-			cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 			alpha_irq_clock_enable = 0;
 		}
 	}
@@ -53,7 +53,7 @@ static TIMER_CALLBACK( cpu_irq_clock )
 	if (has_gamma_cpu)
 	{
 		gamma_irq_clock++;
-		cpunum_set_input_line(machine, 1, 0, (gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, (gamma_irq_clock & 0x08) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -61,7 +61,7 @@ static TIMER_CALLBACK( cpu_irq_clock )
 WRITE8_HANDLER( mhavoc_alpha_irq_ack_w )
 {
 	/* clear the line and reset the clock */
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	alpha_irq_clock = 0;
 	alpha_irq_clock_enable = 1;
 }
@@ -70,7 +70,7 @@ WRITE8_HANDLER( mhavoc_alpha_irq_ack_w )
 WRITE8_HANDLER( mhavoc_gamma_irq_ack_w )
 {
 	/* clear the line and reset the clock */
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	gamma_irq_clock = 0;
 }
 
@@ -84,7 +84,7 @@ WRITE8_HANDLER( mhavoc_gamma_irq_ack_w )
 
 MACHINE_RESET( mhavoc )
 {
-	has_gamma_cpu = (cpu_gettotalcpu() > 1);
+	has_gamma_cpu = (machine->cpu[1] != NULL);
 
 	memory_configure_bank(1, 0, 1, mhavoc_zram0, 0);
 	memory_configure_bank(1, 1, 1, mhavoc_zram1, 0);
@@ -143,7 +143,7 @@ static TIMER_CALLBACK( delayed_gamma_w )
 	alpha_data = param;
 
 	/* signal with an NMI pulse */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the sound CPU needs to reply in 250microseconds (according to Neil Bradley) */
 	timer_set(ATTOTIME_IN_USEC(250), NULL, 0, 0);
@@ -268,7 +268,7 @@ WRITE8_HANDLER( mhavoc_out_0_w )
 	player_1 = (data >> 5) & 1;
 
 	/* Bit 3 = Gamma reset */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x08))
 	{
 		logerror("\t\t\t\t*** resetting gamma processor. ***\n");

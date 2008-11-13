@@ -257,12 +257,12 @@ static WRITE32_HANDLER( paletteram32_w )
 
 static void voodoo_vblank_0(const device_config *device, int param)
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static void voodoo_vblank_1(const device_config *device, int param)
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_START( hangplt )
@@ -515,10 +515,10 @@ static WRITE8_HANDLER( sysreg_w )
 
 		case 4:
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			adc1038_di_w((data >> 0) & 1);
 			adc1038_clk_w(machine, (data >> 1) & 1);
@@ -546,7 +546,7 @@ READ8_HANDLER( K056230_r )
 
 static TIMER_CALLBACK( network_irq_clear )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, CLEAR_LINE);
 }
 
 WRITE8_HANDLER( K056230_w )
@@ -564,12 +564,12 @@ WRITE8_HANDLER( K056230_w )
 				// Thunder Hurricane breaks otherwise...
 				if (mame_stricmp(machine->gamedrv->name, "thunderh") != 0)
 				{
-					cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, ASSERT_LINE);
+					cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, ASSERT_LINE);
 					timer_set(ATTOTIME_IN_USEC(10), NULL, 0, network_irq_clear);
 				}
 			}
 //          else
-//              cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ2, CLEAR_LINE);
+//              cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
 		case 2:		// Sub ID register
@@ -896,7 +896,7 @@ INPUT_PORTS_END
 */
 static INTERRUPT_GEN( gticlub_vblank )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 
@@ -907,7 +907,7 @@ static const sharc_config sharc_cfg =
 
 static MACHINE_RESET( gticlub )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( gticlub )
@@ -951,8 +951,8 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( hangplt )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( hangplt )
@@ -1153,13 +1153,13 @@ ROM_END
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpunum_set_input_line(machine, 1, param, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], param, CLEAR_LINE);
 }
 
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cpunum_set_input_line(machine, 1, line, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 

@@ -752,13 +752,13 @@ static const ay8910_interface ay8910_config =
 static void meritm_audio_pio_interrupt(const device_config *device, int state)
 {
 	//logerror( "PIO(0) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
 static void meritm_io_pio_interrupt(const device_config *device, int state)
 {
 	//logerror( "PIO(1) interrupt line: %d, V = %d, H = %d\n", state, video_screen_get_vpos(0), video_screen_get_hpos(0) );
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
 

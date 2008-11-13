@@ -411,12 +411,12 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( pntnpuzl_irq )
 {
-	if (input_port_read(machine, "IN0") & 0x02)	/* coin */
-		cpunum_set_input_line(machine, 0, 1, PULSE_LINE);
-	else if (input_port_read(machine, "IN0") & 0x04)	/* service */
-		cpunum_set_input_line(machine, 0, 2, PULSE_LINE);
-	else if (input_port_read(machine, "IN0") & 0x08)	/* coin */
-		cpunum_set_input_line(machine, 0, 4, PULSE_LINE);
+	if (input_port_read(device->machine, "IN0") & 0x02)	/* coin */
+		cpu_set_input_line(device, 1, PULSE_LINE);
+	else if (input_port_read(device->machine, "IN0") & 0x04)	/* service */
+		cpu_set_input_line(device, 2, PULSE_LINE);
+	else if (input_port_read(device->machine, "IN0") & 0x08)	/* coin */
+		cpu_set_input_line(device, 4, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( pntnpuzl )

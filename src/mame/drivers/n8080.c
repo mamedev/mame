@@ -36,10 +36,10 @@ static READ8_HANDLER( n8080_shift_r )
 
 static INTERRUPT_GEN( interrupt )
 {
-	if (video_screen_get_vblank(machine->primary_screen))
-		cpunum_set_input_line_and_vector(machine, 0, 0, PULSE_LINE, 0xcf);  /* RST $08 */
+	if (video_screen_get_vblank(device->machine->primary_screen))
+		cpu_set_input_line_and_vector(device, 0, PULSE_LINE, 0xcf);  /* RST $08 */
 	else
-		cpunum_set_input_line_and_vector(machine, 0, 0, PULSE_LINE, 0xd7);  /* RST $10 */
+		cpu_set_input_line_and_vector(device, 0, PULSE_LINE, 0xd7);  /* RST $10 */
 }
 
 

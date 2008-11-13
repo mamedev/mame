@@ -209,7 +209,7 @@ static WRITE8_HANDLER( video_command_trigger_w )
 
 static TIMER_CALLBACK( via_irq_delayed )
 {
-	cpunum_set_input_line(machine, 0, 0, param);
+	cpu_set_input_line(machine->cpu[0], 0, param);
 }
 
 

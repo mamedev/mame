@@ -168,7 +168,7 @@ static void update_irq_state(running_machine *machine)
 			if (irq & (1 << i))
 				irq_level[metro_irq_levels[i]&7] = 1;
 		for (i = 0; i < 8; i++)
-			cpunum_set_input_line(machine, 0, i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], i, irq_level[i] ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
@@ -177,7 +177,7 @@ static void update_irq_state(running_machine *machine)
             source by peeking a register (metro_irq_cause_r) */
 
 		int state =	(irq ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, irq_line, state);
+		cpu_set_input_line(machine->cpu[0], irq_line, state);
 	}
 }
 
@@ -192,7 +192,7 @@ static IRQ_CALLBACK(metro_irq_callback)
 static MACHINE_RESET( metro )
 {
 	if (irq_line == -1)
-		cpunum_set_irq_callback(0, metro_irq_callback);
+		cpu_set_irq_callback(machine->cpu[0], metro_irq_callback);
 }
 
 
@@ -220,16 +220,16 @@ static WRITE16_HANDLER( metro_irq_cause_w )
 
 static INTERRUPT_GEN( metro_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[0] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		default:
 			requested_int[4] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 	}
 }
@@ -239,7 +239,7 @@ static INTERRUPT_GEN( bangball_interrupt )
 {
 	requested_int[0] = 1;	// set scroll regs if a flag is set
 	requested_int[4] = 1;	// clear that flag
-	update_irq_state(machine);
+	update_irq_state(device->machine);
 }
 
 
@@ -251,19 +251,19 @@ static TIMER_CALLBACK( vblank_end_callback )
 /* lev 2-7 (lev 1 seems sound related) */
 static INTERRUPT_GEN( karatour_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[0] = 1;
 			requested_int[5] = 1;	// write the scroll registers
 			/* the duration is a guess */
 			timer_set(ATTOTIME_IN_USEC(2500), NULL, 0, vblank_end_callback);
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		default:
 			requested_int[4] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 	}
 }
@@ -285,39 +285,39 @@ static WRITE16_HANDLER( mouja_irq_timer_ctrl_w )
 static INTERRUPT_GEN( mouja_interrupt )
 {
 	requested_int[1] = 1;
-	update_irq_state(machine);
+	update_irq_state(device->machine);
 }
 
 
 static INTERRUPT_GEN( gakusai_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 	}
 }
 
 static INTERRUPT_GEN( dokyusei_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 		case 1:	// needed?
 			requested_int[5] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 	}
 }
 
 static void ymf278b_interrupt(running_machine *machine, int active)
 {
-	cpunum_set_input_line(machine, 0, 2, active);
+	cpu_set_input_line(machine->cpu[0], 2, active);
 }
 
 /***************************************************************************
@@ -354,8 +354,8 @@ static WRITE16_HANDLER( metro_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data & 0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_int();
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_spinuntil_int(machine->activecpu);
 		busy_sndcpu = 1;
 	}
 }
@@ -512,7 +512,7 @@ static WRITE8_HANDLER( daitorid_portb_w )
 
 static void metro_sound_irq_handler(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], UPD7810_INTF2, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -1918,7 +1918,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( blzntrnd_sound_w )
 {
 	soundlatch_w(machine, offset, data>>8);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
@@ -1932,7 +1932,7 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 
 static void blzntrnd_irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface blzntrnd_ym2610_interface =
@@ -4587,26 +4587,26 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( puzzlet_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			requested_int[1] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		case 1:
 			requested_int[3] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		case 2:
 			requested_int[5] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		case 3:
 			requested_int[2] = 1;
-			update_irq_state(machine);
+			update_irq_state(device->machine);
 			break;
 
 		default:

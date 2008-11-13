@@ -46,7 +46,7 @@ static READ8_HANDLER( megazone_portA_r )
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
 
-	clock = activecpu_gettotalcycles() * 7159/12288;	/* = (14318/8)/(18432/6) */
+	clock = cpu_get_total_cycles(machine->activecpu) * 7159/12288;	/* = (14318/8)/(18432/6) */
 	timer = (clock / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
@@ -74,13 +74,13 @@ static WRITE8_HANDLER( megazone_portB_w )
 
 static WRITE8_HANDLER( megazone_i8039_irq_w )
 {
-	cpunum_set_input_line(machine, 2, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
 	if ((data & 0x80) == 0)
-		cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE);
 	i8039_status = (data & 0x70) >> 4;
 }
 

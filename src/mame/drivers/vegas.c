@@ -933,12 +933,12 @@ static void update_nile_irqs(running_machine *machine)
 		if (irq[i])
 		{
 			if (LOG_NILE_IRQS) logerror(" 1");
-			cpunum_set_input_line(machine, 0, MIPS3_IRQ0 + i, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ0 + i, ASSERT_LINE);
 		}
 		else
 		{
 			if (LOG_NILE_IRQS) logerror(" 0");
-			cpunum_set_input_line(machine, 0, MIPS3_IRQ0 + i, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], MIPS3_IRQ0 + i, CLEAR_LINE);
 		}
 	}
 	if (LOG_NILE_IRQS) logerror("\n");
@@ -1459,7 +1459,7 @@ static WRITE32_HANDLER( analog_port_w )
 
 static WRITE32_HANDLER( vegas_watchdog_w )
 {
-	activecpu_eat_cycles(100);
+	cpu_eat_cycles(machine->activecpu, 100);
 }
 
 

@@ -62,7 +62,7 @@ WRITE8_HANDLER( arkanoid_Z80_mcu_w )
 {
 	timer_call_after_resynch(NULL, data, test);
 	/* boost the interleave for a few usecs to make sure it is read successfully */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 READ8_HANDLER( arkanoid_68705_portA_r )

@@ -187,14 +187,14 @@ static VIDEO_UPDATE( spaceint )
 
 static TIMER_CALLBACK( kamikaze_int_off )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( kamizake_int_gen )
 {
 	/* interrupts are asserted on every state change of the 128V line */
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 	param ^= 128;
 	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 
@@ -213,7 +213,7 @@ static MACHINE_START( kamikaze )
 static INPUT_CHANGED( spaceint_coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

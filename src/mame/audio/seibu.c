@@ -317,9 +317,9 @@ static void update_irq_lines(running_machine *machine, int param)
 	}
 
 	if ((irq1 & irq2) == 0xff)	/* no IRQs pending */
-		cpunum_set_input_line(machine, sound_cpu,0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[sound_cpu],0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpunum_set_input_line_and_vector(machine, sound_cpu,0,ASSERT_LINE,irq1 & irq2);
+		cpu_set_input_line_and_vector(machine->cpu[sound_cpu],0,ASSERT_LINE,irq1 & irq2);
 }
 
 WRITE8_HANDLER( seibu_irq_clear_w )

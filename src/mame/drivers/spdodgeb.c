@@ -54,7 +54,7 @@ static UINT8 last_dash[2] = {0,0};
 static WRITE8_HANDLER( sound_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( spd_adpcm_w )
@@ -413,7 +413,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine,1,M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],M6809_FIRQ_LINE,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =

@@ -1779,24 +1779,24 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( seta2_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
 			/* VBlank is connected to INT0 (external interrupts pin 0) */
-			tmp68301_external_interrupt_0(machine);
+			tmp68301_external_interrupt_0(device->machine);
 			break;
 	}
 }
 
 static INTERRUPT_GEN( samshoot_interrupt )
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
 		case 0:
-			tmp68301_external_interrupt_0(machine);	// vblank
+			tmp68301_external_interrupt_0(device->machine);	// vblank
 			break;
 		case 1:
-			tmp68301_external_interrupt_2(machine);	// to do: hook up x1-10 interrupts
+			tmp68301_external_interrupt_2(device->machine);	// to do: hook up x1-10 interrupts
 			break;
 	}
 }

@@ -48,7 +48,7 @@ static WRITE8_HANDLER( battlera_sound_w )
 {
 	if (offset==0) {
 		soundlatch_w(machine,0,data);
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -112,7 +112,7 @@ static void battlera_adpcm_int(running_machine *machine, int data)
 
 	toggle = 1 - toggle;
 	if (toggle)
-		cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( battlera_adpcm_data_w )

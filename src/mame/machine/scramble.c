@@ -20,10 +20,8 @@ MACHINE_RESET( scramble )
 {
 	MACHINE_RESET_CALL(galaxold);
 
-	if (cpu_gettotalcpu() > 1)
-	{
+	if (machine->cpu[1] != NULL)
 		scramble_sh_init();
-	}
 
   security_2B_counter = 0;
 }

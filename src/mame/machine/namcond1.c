@@ -48,7 +48,7 @@ MACHINE_RESET( namcond1 )
     namcond1_h8_irq5_enabled = 0;
 
     // halt the MCU
-    cpunum_set_input_line(machine, 1,INPUT_LINE_RESET,ASSERT_LINE);
+    cpu_set_input_line(machine->cpu[1],INPUT_LINE_RESET,ASSERT_LINE);
 }
 
 // instance of the shared ram pointer
@@ -97,7 +97,7 @@ WRITE16_HANDLER( namcond1_cuskey_w )
             // this is a kludge until we emulate the h8
 	    if ((namcond1_h8_irq5_enabled == 0) && (data != 0x0000))
 	    {
-	    	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+	    	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 	    }
             namcond1_h8_irq5_enabled = ( data != 0x0000 );
             break;

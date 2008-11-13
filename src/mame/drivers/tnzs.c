@@ -840,7 +840,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( tnzsb_sound_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line_and_vector(machine, 2,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(machine->cpu[2],0,HOLD_LINE,0xff);
 }
 
 static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1592,7 +1592,7 @@ static const ym2203_interface ym2203_config =
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface kageki_ym2203_interface =

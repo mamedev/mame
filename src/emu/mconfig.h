@@ -15,6 +15,7 @@
 #define __MCONFIG_H__
 
 #include "devintrf.h"
+#include "cpuexec.h"
 #include <stddef.h>
 
 
@@ -170,7 +171,7 @@ union _machine_config_token
 	const gfx_decode_entry *gfxdecode;
 	const addrmap_token *addrmap;
 	device_type devtype;
-	void (*interrupt)(running_machine *machine, int cpunum);
+	void (*interrupt)(const device_config *device);
 	driver_init_func driver_init;
 	nvram_handler_func nvram_handler;
 	memcard_handler_func memcard_handler;

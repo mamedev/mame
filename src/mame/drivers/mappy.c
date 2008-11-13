@@ -704,13 +704,13 @@ static WRITE8_HANDLER( superpac_latch_w )
 		case 0x00:	/* INT ON 2 */
 			cpu_interrupt_enable(1,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
@@ -726,7 +726,7 @@ static WRITE8_HANDLER( superpac_latch_w )
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */
@@ -746,19 +746,19 @@ static WRITE8_HANDLER( phozon_latch_w )
 		case 0x00:
 			cpu_interrupt_enable(1,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x04:
 			cpu_interrupt_enable(2,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE);
 			break;
 
 		case 0x06:
@@ -771,11 +771,11 @@ static WRITE8_HANDLER( phozon_latch_w )
 			break;
 
 		case 0x0a:
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:
-			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0e:
@@ -792,13 +792,13 @@ static WRITE8_HANDLER( mappy_latch_w )
 		case 0x00:	/* INT ON 2 */
 			cpu_interrupt_enable(1,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* FLIP */
@@ -815,7 +815,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */
@@ -855,8 +855,8 @@ static MACHINE_RESET( mappy )
 
 static INTERRUPT_GEN( mappy_interrupt_1 )
 {
-	irq0_line_assert(machine, cpunum);	// this also checks if irq is enabled - IMPORTANT!
-						// so don't replace with cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
+						// so don't replace with cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 
 	namcoio_set_irq_line(0,PULSE_LINE);
 	namcoio_set_irq_line(1,PULSE_LINE);

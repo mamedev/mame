@@ -1597,7 +1597,7 @@ static DRIVER_INIT( turbotag )
 	spyhunt_scroll_offset = 88;
 
 	/* the SSIO Z80 doesn't have any program to execute */
-	cpunum_suspend(1, SUSPEND_REASON_DISABLE, 1);
+	cpu_suspend(machine->cpu[1], SUSPEND_REASON_DISABLE, 1);
 
 	/* kludge for bad ROM read */
 	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0b53, 0x0b53, 0, 0, turbotag_kludge_r);

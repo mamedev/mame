@@ -359,7 +359,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( igs_majhong_interrupt )
 {
-	cpunum_set_input_line(machine, 0, ARM7_FIRQ_LINE, PULSE_LINE);
+	cpu_set_input_line(device, ARM7_FIRQ_LINE, PULSE_LINE);
 }
 
 

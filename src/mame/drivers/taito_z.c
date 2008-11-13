@@ -912,7 +912,7 @@ static void parse_control(running_machine *machine)
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -921,7 +921,7 @@ static void parse_control_noz80(running_machine *machine)
 	/* bit 0 enables cpu B */
 	/* however this fails when recovering from a save state
        if cpu B is disabled !! */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (cpua_ctrl &0x1) ? CLEAR_LINE : ASSERT_LINE);
 
 }
 
@@ -963,7 +963,7 @@ static WRITE16_HANDLER( cpua_noz80_ctrl_w )	/* assumes no Z80 */
 
 static TIMER_CALLBACK( taitoz_interrupt6 )
 {
-	cpunum_set_input_line(machine, 0,6,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
 }
 
 /* 68000 B */
@@ -971,19 +971,19 @@ static TIMER_CALLBACK( taitoz_interrupt6 )
 #if 0
 static TIMER_CALLBACK( taitoz_cpub_interrupt5 )
 {
-	cpunum_set_input_line(machine, 2,5,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	cpu_set_input_line(machine->cpu[2],5,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 #endif
 
 static TIMER_CALLBACK( taitoz_sg_cpub_interrupt5 )
 {
-	cpunum_set_input_line(machine, 1,5,HOLD_LINE);	/* assumes no Z80 */
+	cpu_set_input_line(machine->cpu[1],5,HOLD_LINE);	/* assumes no Z80 */
 }
 
 #if 0
 static TIMER_CALLBACK( taitoz_cpub_interrupt6 )
 {
-	cpunum_set_input_line(machine, 2,6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
+	cpu_set_input_line(machine->cpu[2],6,HOLD_LINE);	/* assumes Z80 sandwiched between the 68Ks */
 }
 #endif
 
@@ -1001,7 +1001,7 @@ static INTERRUPT_GEN( sci_interrupt )
 
 	if (sci_int6)
 		timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, taitoz_interrupt6);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 /* Double Axle seems to keep only 1 sprite frame in sprite ram,
@@ -1017,14 +1017,14 @@ static INTERRUPT_GEN( dblaxle_interrupt )
 	if (dblaxle_int6)
 		timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, taitoz_interrupt6);
 
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( dblaxle_cpub_interrupt )
 {
 	// Unsure how many int6's per frame
 	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL,  0, taitoz_interrupt6);
-	cpunum_set_input_line(machine, 2, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 
@@ -3044,14 +3044,14 @@ Interface B is for games which lack a Z80 (Spacegun, Bshark).
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)	// assumes Z80 sandwiched between 68Ks
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irqhandlerb(running_machine *machine, int irq)
 {
 	// DG: this is probably specific to Z80 and wrong?
-//  cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

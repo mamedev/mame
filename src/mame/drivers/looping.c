@@ -306,41 +306,41 @@ static MACHINE_START( looping )
 
 static INTERRUPT_GEN( looping_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 4);
+	cpu_set_input_line_and_vector(device, 0, ASSERT_LINE, 4);
 }
 
 
 static WRITE8_HANDLER( level2_irq_set )
 {
 	if (!(data & 1))
-		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 4);
+		cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, 4);
 }
 
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
 	if (data == 0)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( looping_souint_clr )
 {
 	if (data == 0)
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 
 static void looping_spcint(running_machine *machine, int state)
 {
-	cpunum_set_input_line_and_vector(machine, 1, 0, state, 6);
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, state, 6);
 }
 
 
 static WRITE8_HANDLER( looping_soundlatch_w )
 {
 	soundlatch_w(machine, offset, data);
-	cpunum_set_input_line_and_vector(machine, 1, 0, ASSERT_LINE, 4);
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, ASSERT_LINE, 4);
 }
 
 

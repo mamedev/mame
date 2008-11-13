@@ -290,7 +290,7 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 			warpwarp_ball_on = data & 1;
 			cpu_interrupt_enable(0,data & 1);
 			if (~data & 1)
-				cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 			break;
 		case 7:
 			flip_screen_set(data & 1);

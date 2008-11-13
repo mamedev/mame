@@ -30,7 +30,7 @@ static UINT8 *ram;
 static INTERRUPT_GEN( aliens_interrupt )
 {
 	if (K051960_is_IRQ_enabled())
-		cpunum_set_input_line(machine, 0, KONAMI_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 }
 
 static READ8_HANDLER( bankedram_r )
@@ -74,7 +74,7 @@ static WRITE8_HANDLER( aliens_coin_counter_w )
 static WRITE8_HANDLER( aliens_sh_irqtrigger_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( aliens_snd_bankswitch_w )

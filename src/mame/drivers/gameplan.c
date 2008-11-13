@@ -128,11 +128,11 @@ static const struct via6522_interface via_1_interface =
 static WRITE8_HANDLER( audio_reset_w )
 {
 	gameplan_state *state = machine->driver_data;
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 	if (data == 0)
 	{
 		device_reset(state->riot);
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
 	}
 }
 
@@ -170,9 +170,9 @@ static const struct via6522_interface via_2_interface =
 
 static void r6532_irq(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 1, 0, state);
+	cpu_set_input_line(device->machine->cpu[1], 0, state);
 	if (state == ASSERT_LINE)
-		cpu_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(10));
+		cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 

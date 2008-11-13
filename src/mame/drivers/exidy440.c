@@ -265,7 +265,7 @@ static INPUT_CHANGED( coin_inserted )
 {
 	/* if we got a coin, set the IRQ on the main CPU */
 	if (newval == 0)
-		cpunum_set_input_line(field->port->machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], 0, ASSERT_LINE);
 }
 
 
@@ -343,7 +343,7 @@ static WRITE8_HANDLER( bankram_w )
 static READ8_HANDLER( exidy440_input_port_3_r )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	return input_port_read(machine, "IN3");
 }
 
@@ -368,7 +368,7 @@ static TIMER_CALLBACK( delayed_sound_command_w )
 	exidy440_sound_command_ack = 0;
 
 	/* cause an FIRQ on the sound CPU */
-	cpunum_set_input_line(machine, 1, 1, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], 1, ASSERT_LINE);
 }
 
 
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( exidy440_input_port_3_w )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

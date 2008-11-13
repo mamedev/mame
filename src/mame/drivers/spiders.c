@@ -235,19 +235,19 @@ static void main_cpu_irq(running_machine *machine, int state)
 						 					pia_get_irq_b(2) |
 						 pia_get_irq_a(3) | pia_get_irq_b(3);
 
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void main_cpu_firq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void audio_cpu_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, M6802_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6802_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -271,13 +271,13 @@ static INTERRUPT_GEN( update_pia_1 )
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia_1_ca1_w(machine, 0, input_port_read(machine, "IN0") & 0x02);
+	pia_1_ca1_w(device->machine, 0, input_port_read(device->machine, "IN0") & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia_1_ca2_w(machine, 0, input_port_read(machine, "IN0") & 0x01);
+	pia_1_ca2_w(device->machine, 0, input_port_read(device->machine, "IN0") & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(machine, 0, input_port_read(machine, "XHATCH"));
+	pia_1_cb1_w(device->machine, 0, input_port_read(device->machine, "XHATCH"));
 
 	/* CB2 - NOT CONNECTED */
 }

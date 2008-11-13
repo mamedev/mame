@@ -394,7 +394,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( jollyjgr_interrupt )
 {
 	if(nmi_enable)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( jollyjgr )

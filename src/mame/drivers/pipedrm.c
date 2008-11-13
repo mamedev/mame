@@ -181,7 +181,7 @@ static TIMER_CALLBACK( delayed_command_w	)
 	/* sound commands. It's possible the NMI isn't really hooked up on the YM2608 */
 	/* sound board. */
 	if (param & 0x100)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -200,7 +200,7 @@ static WRITE8_HANDLER( sound_command_nonmi_w )
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	pending_command = 0;
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -526,7 +526,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

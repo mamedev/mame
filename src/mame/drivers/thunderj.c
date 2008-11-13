@@ -36,9 +36,9 @@ static UINT16 *rom_base[2];
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 4, atarigen_scanline_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 6, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -81,9 +81,9 @@ static WRITE16_HANDLER( latch_w )
 	{
 		/* 0 means hold CPU 2's reset low */
 		if (data & 1)
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bits 2-5 are the alpha bank */
 		if (thunderj_alpha_tile_bank != ((data >> 2) & 7))
@@ -151,7 +151,7 @@ static READ16_HANDLER( thunderj_atarivc_r )
        the beginning of interrupt and once near the end. It stores these values in a
        table starting at $163484. CPU #2 periodically looks at this table to make
        sure that it is getting interrupts at the appropriate times, and that the
-       VBLANK bit is set appropriately. Unfortunately, due to all the cpu_yield()
+       VBLANK bit is set appropriately. Unfortunately, due to all the cpu_yield(machine->activecpu)
        calls we make to synchronize the two CPUs, we occasionally get out of time
        and generate the interrupt outside of the tight tolerances CPU #2 expects.
 

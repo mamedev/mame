@@ -480,8 +480,8 @@ static VIDEO_UPDATE( bballoon )
 static INTERRUPT_GEN( bballoon_interrupt )
 {
 	if(irq_en)
-	cpunum_set_input_line(machine, 0, ARM7_IRQ_LINE, HOLD_LINE);
-	//cpunum_set_input_line(machine, 0, ARM7_FIRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(device, ARM7_IRQ_LINE, HOLD_LINE);
+	//cpu_set_input_line(device, ARM7_FIRQ_LINE, HOLD_LINE);
 
 //	irq_en = 0;
 }

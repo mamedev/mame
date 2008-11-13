@@ -160,9 +160,9 @@ static WRITE8_HANDLER( punchout_speech_vcu_w )
 static WRITE8_HANDLER( punchout_2a03_reset_w )
 {
 	if (data & 1)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static int prot_mode_sel; /* Mode selector */

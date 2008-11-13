@@ -236,7 +236,7 @@ static WRITE32_HANDLER( color_ram_w )
 
 static TIMER_CALLBACK( interrupt5 )
 {
-	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 5, HOLD_LINE);
 }
 
 
@@ -470,7 +470,7 @@ static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
     ........ .x......   Vibration
 */
 
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ32_HANDLER( cbombers_adc_r )
@@ -726,7 +726,7 @@ static MACHINE_RESET( undrfire )
 static INTERRUPT_GEN( undrfire_interrupt )
 {
 	frame_counter^=1;
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( undrfire )

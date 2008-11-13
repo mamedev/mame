@@ -120,17 +120,17 @@ NVRAM_HANDLER( stv )
 
 static READ32_HANDLER( stv_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x60154b2) cpu_spinuntil_int(); // bios menus..
-	cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x60154b2) cpu_spinuntil_int(machine->activecpu); // bios menus..
+	cpu_spinuntil_int(machine->activecpu);
 
 	return stv_workram_h[0x0335d0/4];
 }
 
 static READ32_HANDLER( stv_speedup2_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x6013aee) cpu_spinuntil_int(); // for use in japan
+	if (cpu_get_pc(machine->activecpu)==0x6013aee) cpu_spinuntil_int(machine->activecpu); // for use in japan
 
-	cpu_spinuntil_int();
+	cpu_spinuntil_int(machine->activecpu);
 
 	return stv_workram_h[0x0335bc/4];
 }
@@ -156,7 +156,7 @@ void install_stvbios_speedups(running_machine *machine)
 static READ32_HANDLER( shienryu_slave_speedup_r )
 {
  if (cpu_get_pc(machine->activecpu)==0x0600440e)
-  cpu_spinuntil_time(ATTOTIME_IN_USEC(20)); // is this safe... we can't skip till vbl because its not a vbl wait loop
+  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20)); // is this safe... we can't skip till vbl because its not a vbl wait loop
 
  return stv_workram_h[0x0ae8e4/4];
 }
@@ -164,7 +164,7 @@ static READ32_HANDLER( shienryu_slave_speedup_r )
 
 static READ32_HANDLER( shienryu_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x060041C6) cpu_spinuntil_int(); // after you enable the sound cpu ...
+	if (cpu_get_pc(machine->activecpu)==0x060041C6) cpu_spinuntil_int(machine->activecpu); // after you enable the sound cpu ...
 	return stv_workram_h[0x0ae8e0/4];
 }
 
@@ -189,7 +189,7 @@ DRIVER_INIT(shienryu)
 
 static READ32_HANDLER( prikura_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x6018640) cpu_spinuntil_int(); // after you enable the sound cpu ...
+	if (cpu_get_pc(machine->activecpu)==0x6018640) cpu_spinuntil_int(machine->activecpu); // after you enable the sound cpu ...
 	return stv_workram_h[0x0b9228/4];
 }
 
@@ -197,7 +197,7 @@ static void prikura_slave_speedup( UINT32 data )
 {
 	if ( cpu_get_pc(Machine->activecpu) == 0x06018c6e )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(prikura)
@@ -229,7 +229,7 @@ DRIVER_INIT(prikura)
 
 static READ32_HANDLER( hanagumi_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x06010160) cpu_spinuntil_int(); // title logos
+	if (cpu_get_pc(machine->activecpu)==0x06010160) cpu_spinuntil_int(machine->activecpu); // title logos
 
 	return stv_workram_h[0x94188/4];
 }
@@ -237,7 +237,7 @@ static READ32_HANDLER( hanagumi_speedup_r )
 static READ32_HANDLER( hanagumi_slave_off )
 {
 	/* just turn the slave off, i don't think the game needs it */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
 	return stv_workram_h[0x015438/4];
 }
@@ -291,7 +291,7 @@ CPU0: Aids Screen
 
 static READ32_HANDLER( puyosun_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x6021CF0) cpu_spinuntil_time(ATTOTIME_IN_USEC(400)); // spinuntilint breaks controls again .. urgh
+	if (cpu_get_pc(machine->activecpu)==0x6021CF0) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400)); // spinuntilint breaks controls again .. urgh
 
 
 	return stv_workram_h[0x0ffc10/4];
@@ -301,7 +301,7 @@ static void puyosun_slave_speedup( UINT32 data )
 {
 	if ( cpu_get_pc(Machine->activecpu) == 0x60236fe )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(puyosun)
@@ -333,7 +333,7 @@ CPU0 Data East Logo:
 
 static READ32_HANDLER( mausuke_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x060461A0) cpu_spinuntil_time(ATTOTIME_IN_USEC(20)); // spinuntilint breaks controls again .. urgh
+	if (cpu_get_pc(machine->activecpu)==0x060461A0) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20)); // spinuntilint breaks controls again .. urgh
 
 	return stv_workram_h[0x0ffc10/4];
 }
@@ -354,7 +354,7 @@ DRIVER_INIT(mausuke)
 #if 0
 static READ32_HANDLER( cottonbm_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x06030EE2) cpu_spinuntil_time(ATTOTIME_IN_USEC(20)); // spinuntilint breaks lots of things
+	if (cpu_get_pc(machine->activecpu)==0x06030EE2) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20)); // spinuntilint breaks lots of things
 
 	return stv_workram_h[0x0ffc10/4];
 }
@@ -373,7 +373,7 @@ static void cottonbm_slave_speedup( UINT32 data )
 			{
 				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
-				cpunum_spinuntil_trigger(1, 1000);
+				cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 			}
 		}
 }
@@ -396,7 +396,7 @@ DRIVER_INIT(cottonbm)
 
 static READ32_HANDLER( cotton2_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x06031c7a) cpu_spinuntil_time(ATTOTIME_IN_USEC(20)); // spinuntilint breaks lots of things
+	if (cpu_get_pc(machine->activecpu)==0x06031c7a) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20)); // spinuntilint breaks lots of things
 
 	return stv_workram_h[0x0ffc10/4];
 }
@@ -415,7 +415,7 @@ static void cotton2_slave_speedup( UINT32 data )
 			{
 				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
-				cpunum_spinuntil_trigger(1, 1000);
+				cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 			}
 		}
 }
@@ -439,7 +439,7 @@ static int dnmtdeka_pending_commands;
 
 static READ32_HANDLER( dnmtdeka_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x6027c90) cpu_spinuntil_int();//cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x6027c90) cpu_spinuntil_int(machine->activecpu);//cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x0985a0/4];
 }
 
@@ -451,7 +451,7 @@ static WRITE32_HANDLER(dnmtdeka_cmd_write)
 
 	if ( data != 0 ) dnmtdeka_pending_commands++;
 	//logerror( "CMD: Written by cpu=%d, at = %08X, offset = %08X, data = %08X, commands = %d\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), offset, data, dnmtdeka_pending_commands );
-	cpu_trigger(machine, 1000);
+	cpuexec_trigger(machine, 1000);
 }
 
 static READ32_HANDLER(dnmtdeka_cmd_read)
@@ -462,7 +462,7 @@ static READ32_HANDLER(dnmtdeka_cmd_read)
 		if ( stv_workram_h[0x0e0ad4/4 + offset] == 0 )
 		{
 			if ( dnmtdeka_pending_commands == 0 )
-				cpu_spinuntil_trigger(1000);
+				cpu_spinuntil_trigger(machine->activecpu, 1000);
 		}
 		else
 		{
@@ -503,7 +503,7 @@ static int diehard_pending_commands;
 
 static READ32_HANDLER(diehard_speedup_r)
 {
-	if ( cpu_get_pc(machine->activecpu) == 0x06027c98 ) cpu_spinuntil_int();
+	if ( cpu_get_pc(machine->activecpu) == 0x06027c98 ) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x000986ac/4];
 }
 
@@ -515,7 +515,7 @@ static WRITE32_HANDLER(diehard_cmd_write)
 
 	if ( data != 0 ) diehard_pending_commands++;
 	//logerror( "CMD: Written by cpu=%d, at = %08X, offset = %08X, data = %08X, commands = %d\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), offset, data, diehard_pending_commands );
-	cpu_trigger(machine, 1000);
+	cpuexec_trigger(machine, 1000);
 }
 
 static READ32_HANDLER(diehard_cmd_read)
@@ -526,7 +526,7 @@ static READ32_HANDLER(diehard_cmd_read)
 		if ( stv_workram_h[0xe0bd0/4 + offset] == 0 )
 		{
 			if ( diehard_pending_commands == 0 )
-				cpu_spinuntil_trigger(1000);
+				cpu_spinuntil_trigger(machine->activecpu, 1000);
 		}
 	}
 
@@ -539,7 +539,7 @@ static READ32_HANDLER(diehard_cmd_ack_read)
 	if ( (stv_workram_h[0x000e0dd8/4] & 0xff000000) == 0 &&
 		 diehard_pending_commands == 0 )
 	{
-		cpu_trigger(machine, 1000);
+		cpuexec_trigger(machine, 1000);
 	}
 	return stv_workram_h[0x000e0dd8/4];
 }
@@ -558,7 +558,7 @@ static WRITE32_HANDLER(diehard_cmd_ack_write_cpu0)
 {
 	//logerror( "CMDACK: Write by cpu=%d, at = %08X, offset = %08X, data = %08X, commands = %d\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), offset, data, diehard_pending_commands );
 	COMBINE_DATA(&stv_workram_h[0x000e0dd8/4]);
-	cpu_trigger(machine, 1000);
+	cpuexec_trigger(machine, 1000);
 }
 
 DRIVER_INIT(diehard)
@@ -594,14 +594,14 @@ DRIVER_INIT(diehard)
 
 static READ32_HANDLER( fhboxers_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x060041c2) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x060041c2) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 
 	return stv_workram_h[0x00420c/4];
 }
 
 static READ32_HANDLER( fhboxers_speedup2_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x0600bb0a) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x0600bb0a) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 
 
 	return stv_workram_h[0x090740/4];
@@ -610,7 +610,7 @@ static READ32_HANDLER( fhboxers_speedup2_r )
 static READ32_HANDLER( fhboxers_speedup3_r )
 {
 	if (cpu_get_pc(machine->activecpu)==0x0600b31e )
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 
 	return stv_workram_h[0x90bb4/4];
 }
@@ -653,7 +653,7 @@ static READ32_HANDLER( groovef_speedup_r )
 //  logerror ("groove speedup \n");
 	if (cpu_get_pc(machine->activecpu)==0x060a4970)
 	{
-		cpu_spinuntil_int(); // title logos
+		cpu_spinuntil_int(machine->activecpu); // title logos
 //      logerror ("groove speedup skipping\n");
 
 	}
@@ -664,7 +664,7 @@ static READ32_HANDLER( groovef_speedup_r )
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER( groovef_second_cpu_off_r )
 {
-    if (cpu_get_pc(machine->activecpu)==0x060060c2)     cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+    if (cpu_get_pc(machine->activecpu)==0x060060c2)     cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
     return 0;
 }
 #endif
@@ -673,7 +673,7 @@ static void groovef_slave_speedup( UINT32 data )
 {
 	if ( cpu_get_pc(Machine->activecpu) == 0x060060c2 )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT( groovef )
@@ -739,7 +739,7 @@ static READ32_HANDLER( danchih_hack_r )
 
 static READ32_HANDLER( danchih_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x06028c8e) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x06028c8e) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x0ffc10/4];
 }
 
@@ -747,7 +747,7 @@ static void danchih_slave_speedup( UINT32 data )
 {
 	if ( cpu_get_pc(Machine->activecpu) == 0x0602ae26 )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT( danchih )
@@ -802,7 +802,7 @@ static READ32_HANDLER( astrass_hack_r )
 static READ32_HANDLER( astrass_speedup_r )
 {
 	if(cpu_get_pc(machine->activecpu) == 0x0605b9da )
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 
 	return stv_workram_h[0x8e4d8/4];
 }
@@ -827,13 +827,13 @@ DRIVER_INIT( astrass )
 
 static READ32_HANDLER(thunt_speedup_r)
 {
-	if (cpu_get_pc(machine->activecpu) == 0x0602A024) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu) == 0x0602A024) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x00031424/4];
 }
 
 static READ32_HANDLER(thunt_speedup2_r)
 {
-	if (cpu_get_pc(machine->activecpu) == 0x06013EEA) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu) == 0x06013EEA) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x00075958/4];
 }
 
@@ -841,7 +841,7 @@ static void thunt_slave_speedup(UINT32 data)
 {
 	if (cpu_get_pc(Machine->activecpu) == 0x0602AAF8)
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(thunt)
@@ -889,13 +889,13 @@ DRIVER_INIT(thunt)
 
 static READ32_HANDLER(sandor_speedup_r)
 {
-	if (cpu_get_pc(machine->activecpu) == 0x0602a0f8) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu) == 0x0602a0f8) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x000314f8/4];
 }
 
 static READ32_HANDLER(sandor_speedup2_r)
 {
-	if (cpu_get_pc(machine->activecpu) == 0x06013fbe) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu) == 0x06013fbe) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x00075a2c/4];
 }
 
@@ -904,7 +904,7 @@ static void sandor_slave_speedup(UINT32 data)
 {
 	if (cpu_get_pc(Machine->activecpu) == 0x0602abcc)
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(sandor)
@@ -926,7 +926,7 @@ DRIVER_INIT(sandor)
 
 static READ32_HANDLER(grdforce_speedup_r)
 {
-	if ( cpu_get_pc(machine->activecpu) == 0x06041E32 ) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if ( cpu_get_pc(machine->activecpu) == 0x06041E32 ) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x000ffc10/4];
 }
 
@@ -944,8 +944,8 @@ static void grdforce_slave_speedup( UINT32 data )
 			{
 				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
-				//cpu_spinuntil_time(ATTOTIME_IN_USEC(200));
-				cpunum_spinuntil_trigger(1, 1000);
+				//cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(200));
+				cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 			}
 		}
 }
@@ -979,7 +979,7 @@ static READ32_HANDLER( batmanfr_speedup_r )
 {
 	//logerror( "batmanfr speedup: pc = %08x, mem = %08x\n", cpu_get_pc(machine->activecpu), stv_workram_h[0x0002acf0/4] );
 	if ( cpu_get_pc(machine->activecpu) != 0x060121c0 )
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 
 	return stv_workram_h[0x0002acf0/4];
 }
@@ -988,7 +988,7 @@ static void batmanfr_slave_speedup( UINT32 data )
 {
 	if (cpu_get_pc(Machine->activecpu) == 0x060125bc )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 
@@ -1015,7 +1015,7 @@ static void colmns97_slave_speedup( UINT32 data )
 			if ( (stv_workram_h[0x0ffc48/4] != 0x260ef3fc) )
 			{
 				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
-				cpunum_spinuntil_trigger(1, 1000);
+				cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 			}
 
 }
@@ -1035,7 +1035,7 @@ DRIVER_INIT(colmns97)
 
 static READ32_HANDLER(winterht_speedup_r)
 {
-	if ( cpu_get_pc(machine->activecpu) == 0x06098aea ) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));//cpu_spinuntil_int();
+	if ( cpu_get_pc(machine->activecpu) == 0x06098aea ) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));//cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x000ffc10/4];
 }
 
@@ -1043,7 +1043,7 @@ static void winterht_slave_speedup( UINT32 data )
 {
 	if (cpu_get_pc(Machine->activecpu) == 0x0609ae4e )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(winterht)
@@ -1064,7 +1064,7 @@ DRIVER_INIT(winterht)
 
 static READ32_HANDLER(seabass_speedup_r)
 {
-	if ( cpu_get_pc(machine->activecpu) == 0x0602cbfa ) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if ( cpu_get_pc(machine->activecpu) == 0x0602cbfa ) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x000ffc10/4];
 }
 
@@ -1072,7 +1072,7 @@ static void seabass_slave_speedup( UINT32 data )
 {
 	if (cpu_get_pc(Machine->activecpu) == 0x060321ee )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 
@@ -1096,12 +1096,12 @@ static void vfremix_slave_speedup( UINT32 data )
 {
 	if (cpu_get_pc(Machine->activecpu) == 0x0604C332 )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 static READ32_HANDLER(vfremix_speedup_r)
 {
-	if ( cpu_get_pc(machine->activecpu) == 0x0602c30c ) cpu_spinuntil_int();
+	if ( cpu_get_pc(machine->activecpu) == 0x0602c30c ) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x00074f98/4];
 }
 
@@ -1123,7 +1123,7 @@ DRIVER_INIT(vfremix)
 
 static READ32_HANDLER(sss_speedup_r)
 {
-	if ( cpu_get_pc(machine->activecpu) == 0x06026398 ) cpu_spinuntil_int();
+	if ( cpu_get_pc(machine->activecpu) == 0x06026398 ) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x000ffc10/4];
 }
 
@@ -1131,7 +1131,7 @@ static void sss_slave_speedup( UINT32 data )
 {
 	if (cpu_get_pc(Machine->activecpu) == 0x06028cd6 )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(sss)
@@ -1152,7 +1152,7 @@ DRIVER_INIT(sss)
 
 static READ32_HANDLER(othellos_speedup_r)
 {
-	if ( cpu_get_pc(machine->activecpu) == 0x0602bcbe ) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if ( cpu_get_pc(machine->activecpu) == 0x0602bcbe ) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x000ffc10/4];
 }
 
@@ -1163,7 +1163,7 @@ static void othellos_slave_speedup( UINT32 data )
 			if ( (stv_workram_h[0x0ffc48/4] != 0x260fd25c ) )
 			{
 				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
-				cpunum_spinuntil_trigger(1, 1000);
+				cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 			}
 }
 
@@ -1187,7 +1187,7 @@ static void sasissu_slave_speedup( UINT32 data )
 {
 	if ( cpu_get_pc(Machine->activecpu) == 0x060710be )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(sasissu)
@@ -1204,7 +1204,7 @@ DRIVER_INIT(sasissu)
 
 static READ32_HANDLER(gaxeduel_speedup_r)
 {
-	if ( cpu_get_pc(machine->activecpu) == 0x06012ee4 ) cpu_spinuntil_int();
+	if ( cpu_get_pc(machine->activecpu) == 0x06012ee4 ) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_l[0x000f4068 / 4];
 }
 
@@ -1219,7 +1219,7 @@ DRIVER_INIT(gaxeduel)
 
 static READ32_HANDLER(suikoenb_speedup_r)
 {
-	if ( cpu_get_pc(machine->activecpu) == 0x06013f7a ) cpu_spinuntil_int();
+	if ( cpu_get_pc(machine->activecpu) == 0x06013f7a ) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x000705d0 / 4];
 }
 
@@ -1242,7 +1242,7 @@ DRIVER_INIT(sokyugrt)
 
 static READ32_HANDLER( znpwfv_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x6012ec2) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x6012ec2) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x0ffc10/4];
 }
 
@@ -1259,7 +1259,7 @@ static void znpwfv_slave_speedup( UINT32 data )
 			{
 				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
-				cpunum_spinuntil_trigger(1, 1000);
+				cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 			}
 		}
 }
@@ -1280,7 +1280,7 @@ DRIVER_INIT(znpwfv)
 
 static READ32_HANDLER( twcup98_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x605edde) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x605edde) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x0ffc10/4];
 }
 
@@ -1288,7 +1288,7 @@ static void twcup98_slave_speedup( UINT32 data )
 {
 	if ( cpu_get_pc(Machine->activecpu) == 0x06062bca )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(twcup98)
@@ -1309,7 +1309,7 @@ DRIVER_INIT(twcup98)
 
 static READ32_HANDLER( smleague_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x6063bf4) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x6063bf4) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x0ffc10/4];
 }
 
@@ -1317,7 +1317,7 @@ static void smleague_slave_speedup( UINT32 data )
 {
 	if ( cpu_get_pc(Machine->activecpu) == 0x06062bca )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(smleague)
@@ -1337,7 +1337,7 @@ DRIVER_INIT(smleague)
 
 static READ32_HANDLER( finlarch_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x6064d60) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x6064d60) cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x0ffc10/4];
 }
 
@@ -1355,7 +1355,7 @@ DRIVER_INIT(finlarch)
 
 static READ32_HANDLER( maruchan_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x06012a52) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x06012a52) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x0ffc10/4];
 }
 
@@ -1370,7 +1370,7 @@ static void maruchan_slave_speedup( UINT32 data )
 			{
 				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
-				cpunum_spinuntil_trigger(1, 1000);
+				cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 			}
 
 }
@@ -1394,7 +1394,7 @@ static READ32_HANDLER( pblbeach_speedup_r )
 {
 	if (cpu_get_pc(machine->activecpu)==0x0605eb78)
 		if (stv_workram_h[0x006c398/4] != 0)
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x006c398/4];
 }
 
@@ -1411,7 +1411,7 @@ DRIVER_INIT(pblbeach)
 static READ32_HANDLER( shanhigw_speedup_r )
 {
 	if (cpu_get_pc(machine->activecpu)==0x06020c5c)
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 	return stv_workram_h[0x95cd8/4];
 }
 
@@ -1427,7 +1427,7 @@ DRIVER_INIT(shanhigw)
 
 static READ32_HANDLER( elandore_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x0604eac0) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x0604eac0) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x0ffc10/4];
 }
 
@@ -1440,7 +1440,7 @@ static void elandore_slave_speedup(UINT32 data)
 			{
 				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
-				cpunum_spinuntil_trigger(1, 1000);
+				cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 			}
 }
 
@@ -1461,7 +1461,7 @@ DRIVER_INIT(elandore)
 
 static READ32_HANDLER( rsgun_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x06034d04) cpu_spinuntil_time(ATTOTIME_IN_USEC(20));
+	if (cpu_get_pc(machine->activecpu)==0x06034d04) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(20));
 	return stv_workram_h[0x0ffc10/4];
 }
 
@@ -1473,7 +1473,7 @@ static void rsgun_slave_speedup(UINT32 data)
 			{
 				logerror("cpu1 skip %08x %08x\n",stv_workram_h[0x0ffc44/4],stv_workram_h[0x0ffc48/4]);
 
-				cpunum_spinuntil_trigger(1, 1000);
+				cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 			}
 }
 
@@ -1508,7 +1508,7 @@ DRIVER_INIT(decathlt)
 
 static READ32_HANDLER( nameclv3_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x601eb4c) cpu_spinuntil_time(ATTOTIME_IN_USEC(30));
+	if (cpu_get_pc(machine->activecpu)==0x601eb4c) cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(30));
 	return stv_workram_h[0x0452c0/4];
 }
 
@@ -1516,7 +1516,7 @@ static void nameclv3_slave_speedup( UINT32 data )
 {
 	if ( cpu_get_pc(Machine->activecpu) == 0x0602B80e )
 		if ( (data & 0x00800000) == 0 )
-			cpunum_spinuntil_trigger(1, 1000);
+			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
 
 DRIVER_INIT(nameclv3)

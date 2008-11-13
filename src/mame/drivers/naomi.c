@@ -671,7 +671,7 @@ UINT32 dma_offset;
 
 static INTERRUPT_GEN( naomi_vblank )
 {
-	dc_vblank(machine);
+	dc_vblank(device->machine);
 }
 
 static READ64_HANDLER( naomi_arm_r )
@@ -939,7 +939,7 @@ static READ32_HANDLER( test1 )
 
 static void aica_irq(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )

@@ -59,11 +59,11 @@ static UINT8 sound_msb_latch;
  *
  *************************************/
 
-static void update_irq_state(running_machine *machine)
+static void update_irq_state(const device_config *cpu)
 {
 	int i;
 	for (i = 1; i < 5; i++)
-		cpunum_set_input_line(machine, 0, i, irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(cpu, i, irq_state[i] ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -71,7 +71,7 @@ static IRQ_CALLBACK(irq_callback)
 {
 	/* auto-ack the IRQ */
 	irq_state[irqline] = 0;
-	update_irq_state(machine);
+	update_irq_state(device);
 
 	/* vector is 0x40 + index */
 	return 0x40 + irqline;
@@ -81,14 +81,14 @@ static IRQ_CALLBACK(irq_callback)
 void dcheese_signal_irq(running_machine *machine, int which)
 {
 	irq_state[which] = 1;
-	update_irq_state(machine);
+	update_irq_state(machine->cpu[0]);
 }
 
 
 static INTERRUPT_GEN( dcheese_vblank )
 {
 	logerror("---- VBLANK ----\n");
-	dcheese_signal_irq(machine, 4);
+	dcheese_signal_irq(device->machine, 4);
 }
 
 
@@ -101,7 +101,7 @@ static INTERRUPT_GEN( dcheese_vblank )
 
 static MACHINE_START( dcheese )
 {
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	state_save_register_global_array(irq_state);
 	state_save_register_global(soundlatch_full);
@@ -143,7 +143,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		/* write the latch and set the IRQ */
 		soundlatch_full = 1;
-		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 		soundlatch_w(machine, 0, data & 0xff);
 	}
 }
@@ -160,7 +160,7 @@ static READ8_HANDLER( sound_command_r )
 {
 	/* read the latch and clear the IRQ */
 	soundlatch_full = 0;
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	return soundlatch_r(machine, 0);
 }
 

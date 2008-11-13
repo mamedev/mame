@@ -707,7 +707,7 @@ READ32_HANDLER(K001604_reg_r)
 
 static void voodoo_vblank_0(const device_config *device, int param)
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static VIDEO_START( nwktr )
@@ -813,11 +813,11 @@ static WRITE32_HANDLER( sysreg_w )
 		{
 			if (data & 0x80)	// CG Board 1 IRQ Ack
 			{
-				//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				//cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if (data & 0x40)	// CG Board 0 IRQ Ack
 			{
-				//cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				//cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 		}
 		return;
@@ -1087,7 +1087,7 @@ static const sharc_config sharc_cfg =
 
 static MACHINE_RESET( nwktr )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static const timekeeper_config timekeeper_intf =
@@ -1145,9 +1145,9 @@ MACHINE_DRIVER_END
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	if (irq == 0)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ1, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ1, PULSE_LINE);
 	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ2, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ2, PULSE_LINE);
 }
 
 static DRIVER_INIT(nwktr)

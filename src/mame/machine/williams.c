@@ -293,14 +293,14 @@ static void williams_main_irq(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(1) | pia_get_irq_b(1);
 
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void williams_main_firq(running_machine *machine, int state)
 {
 	/* FIRQ to the main CPU */
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -309,7 +309,7 @@ static void williams_snd_irq(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(2) | pia_get_irq_b(2);
 
 	/* IRQ to the sound CPU */
-	cpunum_set_input_line(machine, 1, M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -325,7 +325,7 @@ static void mysticm_main_irq(running_machine *machine, int state)
 	int combined_state = pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -334,7 +334,7 @@ static void tshoot_main_irq(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
 	/* IRQ to the main CPU */
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

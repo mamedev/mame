@@ -2121,16 +2121,16 @@ CPU_GET_INFO( f8 )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &f8_icount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME: 			strcpy(info->s = cpuintrf_temp_str(), "F8");			break;
-	case CPUINFO_STR_CORE_FAMILY:	strcpy(info->s = cpuintrf_temp_str(), "Fairchild F8");	break;
-	case CPUINFO_STR_CORE_VERSION:	strcpy(info->s = cpuintrf_temp_str(), "1.0");			break;
-	case CPUINFO_STR_CORE_FILE:		strcpy(info->s = cpuintrf_temp_str(), __FILE__);		break;
-	case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s = cpuintrf_temp_str(),
+	case CPUINFO_STR_NAME: 			strcpy(info->s, "F8");			break;
+	case CPUINFO_STR_CORE_FAMILY:	strcpy(info->s, "Fairchild F8");	break;
+	case CPUINFO_STR_CORE_VERSION:	strcpy(info->s, "1.0");			break;
+	case CPUINFO_STR_CORE_FILE:		strcpy(info->s, __FILE__);		break;
+	case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s,
 									"Copyright Juergen Buchmueller, all rights reserved.");
 									break;
 
     case CPUINFO_STR_FLAGS:
-			sprintf(info->s = cpuintrf_temp_str(), "%c%c%c%c%c",
+			sprintf(info->s, "%c%c%c%c%c",
 				f8.w & 0x10 ? 'I':'.',
 				f8.w & 0x08 ? 'O':'.',
 				f8.w & 0x04 ? 'Z':'.',
@@ -2138,77 +2138,77 @@ CPU_GET_INFO( f8 )
 				f8.w & 0x01 ? 'S':'.');
 			break;
 
-	case CPUINFO_STR_REGISTER+F8_PC0:sprintf(info->s = cpuintrf_temp_str(), "PC0:%04X", ((f8.pc0) - 1) & 0xffff); break;
-	case CPUINFO_STR_REGISTER+F8_PC1:sprintf(info->s = cpuintrf_temp_str(), "PC1:%04X", f8.pc1); break;
-	case CPUINFO_STR_REGISTER+F8_DC0:sprintf(info->s = cpuintrf_temp_str(), "DC0:%04X", f8.dc0); break;
-	case CPUINFO_STR_REGISTER+F8_DC1:sprintf(info->s = cpuintrf_temp_str(), "DC1:%04X", f8.dc1); break;
-	case CPUINFO_STR_REGISTER+F8_W:  sprintf(info->s = cpuintrf_temp_str(), "W  :%02X", f8.w); break;
-	case CPUINFO_STR_REGISTER+F8_A:  sprintf(info->s = cpuintrf_temp_str(), "A  :%02X", f8.a); break;
-	case CPUINFO_STR_REGISTER+F8_IS: sprintf(info->s = cpuintrf_temp_str(), "IS :%02X", f8.is); break;
-	case CPUINFO_STR_REGISTER+F8_J:  sprintf(info->s = cpuintrf_temp_str(), "J  :%02X", f8.r[9]); break;
-	case CPUINFO_STR_REGISTER+F8_HU: sprintf(info->s = cpuintrf_temp_str(), "HU :%02X", f8.r[10]); break;
-	case CPUINFO_STR_REGISTER+F8_HL: sprintf(info->s = cpuintrf_temp_str(), "HL :%02X", f8.r[11]); break;
-	case CPUINFO_STR_REGISTER+F8_KU: sprintf(info->s = cpuintrf_temp_str(), "KU :%02X", f8.r[12]); break;
-	case CPUINFO_STR_REGISTER+F8_KL: sprintf(info->s = cpuintrf_temp_str(), "KL :%02X", f8.r[13]); break;
-	case CPUINFO_STR_REGISTER+F8_QU: sprintf(info->s = cpuintrf_temp_str(), "QU :%02X", f8.r[14]); break;
-	case CPUINFO_STR_REGISTER+F8_QL: sprintf(info->s = cpuintrf_temp_str(), "QL :%02X", f8.r[15]); break;
-	case CPUINFO_STR_REGISTER+F8_R0: sprintf(info->s = cpuintrf_temp_str(), "R0 :%02X", f8.r[0]); break;
-	case CPUINFO_STR_REGISTER+F8_R1: sprintf(info->s = cpuintrf_temp_str(), "R1 :%02X", f8.r[1]); break;
-	case CPUINFO_STR_REGISTER+F8_R2: sprintf(info->s = cpuintrf_temp_str(), "R2 :%02X", f8.r[2]); break;
-	case CPUINFO_STR_REGISTER+F8_R3: sprintf(info->s = cpuintrf_temp_str(), "R3 :%02X", f8.r[3]); break;
-	case CPUINFO_STR_REGISTER+F8_R4: sprintf(info->s = cpuintrf_temp_str(), "R4 :%02X", f8.r[4]); break;
-	case CPUINFO_STR_REGISTER+F8_R5: sprintf(info->s = cpuintrf_temp_str(), "R5 :%02X", f8.r[5]); break;
-	case CPUINFO_STR_REGISTER+F8_R6: sprintf(info->s = cpuintrf_temp_str(), "R6 :%02X", f8.r[6]); break;
-	case CPUINFO_STR_REGISTER+F8_R7: sprintf(info->s = cpuintrf_temp_str(), "R7 :%02X", f8.r[7]); break;
-	case CPUINFO_STR_REGISTER+F8_R8: sprintf(info->s = cpuintrf_temp_str(), "R8 :%02X", f8.r[8]); break;
-	case CPUINFO_STR_REGISTER+F8_R16: sprintf(info->s = cpuintrf_temp_str(), "R16 :%02X", f8.r[16]); break;
-	case CPUINFO_STR_REGISTER+F8_R17: sprintf(info->s = cpuintrf_temp_str(), "R17 :%02X", f8.r[17]); break;
-	case CPUINFO_STR_REGISTER+F8_R18: sprintf(info->s = cpuintrf_temp_str(), "R18 :%02X", f8.r[18]); break;
-	case CPUINFO_STR_REGISTER+F8_R19: sprintf(info->s = cpuintrf_temp_str(), "R19 :%02X", f8.r[19]); break;
-	case CPUINFO_STR_REGISTER+F8_R20: sprintf(info->s = cpuintrf_temp_str(), "R20 :%02X", f8.r[20]); break;
-	case CPUINFO_STR_REGISTER+F8_R21: sprintf(info->s = cpuintrf_temp_str(), "R21 :%02X", f8.r[21]); break;
-	case CPUINFO_STR_REGISTER+F8_R22: sprintf(info->s = cpuintrf_temp_str(), "R22 :%02X", f8.r[22]); break;
-	case CPUINFO_STR_REGISTER+F8_R23: sprintf(info->s = cpuintrf_temp_str(), "R23 :%02X", f8.r[23]); break;
-	case CPUINFO_STR_REGISTER+F8_R24: sprintf(info->s = cpuintrf_temp_str(), "R24 :%02X", f8.r[24]); break;
-	case CPUINFO_STR_REGISTER+F8_R25: sprintf(info->s = cpuintrf_temp_str(), "R25 :%02X", f8.r[25]); break;
-	case CPUINFO_STR_REGISTER+F8_R26: sprintf(info->s = cpuintrf_temp_str(), "R26 :%02X", f8.r[26]); break;
-	case CPUINFO_STR_REGISTER+F8_R27: sprintf(info->s = cpuintrf_temp_str(), "R27 :%02X", f8.r[27]); break;
-	case CPUINFO_STR_REGISTER+F8_R28: sprintf(info->s = cpuintrf_temp_str(), "R28 :%02X", f8.r[28]); break;
-	case CPUINFO_STR_REGISTER+F8_R29: sprintf(info->s = cpuintrf_temp_str(), "R29 :%02X", f8.r[29]); break;
-	case CPUINFO_STR_REGISTER+F8_R30: sprintf(info->s = cpuintrf_temp_str(), "R30 :%02X", f8.r[30]); break;
-	case CPUINFO_STR_REGISTER+F8_R31: sprintf(info->s = cpuintrf_temp_str(), "R31 :%02X", f8.r[31]); break;
-	case CPUINFO_STR_REGISTER+F8_R32: sprintf(info->s = cpuintrf_temp_str(), "R32 :%02X", f8.r[32]); break;
-	case CPUINFO_STR_REGISTER+F8_R33: sprintf(info->s = cpuintrf_temp_str(), "R33 :%02X", f8.r[33]); break;
-	case CPUINFO_STR_REGISTER+F8_R34: sprintf(info->s = cpuintrf_temp_str(), "R34 :%02X", f8.r[34]); break;
-	case CPUINFO_STR_REGISTER+F8_R35: sprintf(info->s = cpuintrf_temp_str(), "R35 :%02X", f8.r[35]); break;
-	case CPUINFO_STR_REGISTER+F8_R36: sprintf(info->s = cpuintrf_temp_str(), "R36 :%02X", f8.r[36]); break;
-	case CPUINFO_STR_REGISTER+F8_R37: sprintf(info->s = cpuintrf_temp_str(), "R37 :%02X", f8.r[37]); break;
-	case CPUINFO_STR_REGISTER+F8_R38: sprintf(info->s = cpuintrf_temp_str(), "R38 :%02X", f8.r[38]); break;
-	case CPUINFO_STR_REGISTER+F8_R39: sprintf(info->s = cpuintrf_temp_str(), "R39 :%02X", f8.r[39]); break;
-	case CPUINFO_STR_REGISTER+F8_R40: sprintf(info->s = cpuintrf_temp_str(), "R40 :%02X", f8.r[40]); break;
-	case CPUINFO_STR_REGISTER+F8_R41: sprintf(info->s = cpuintrf_temp_str(), "R41 :%02X", f8.r[41]); break;
-	case CPUINFO_STR_REGISTER+F8_R42: sprintf(info->s = cpuintrf_temp_str(), "R42 :%02X", f8.r[42]); break;
-	case CPUINFO_STR_REGISTER+F8_R43: sprintf(info->s = cpuintrf_temp_str(), "R43 :%02X", f8.r[43]); break;
-	case CPUINFO_STR_REGISTER+F8_R44: sprintf(info->s = cpuintrf_temp_str(), "R44 :%02X", f8.r[44]); break;
-	case CPUINFO_STR_REGISTER+F8_R45: sprintf(info->s = cpuintrf_temp_str(), "R45 :%02X", f8.r[45]); break;
-	case CPUINFO_STR_REGISTER+F8_R46: sprintf(info->s = cpuintrf_temp_str(), "R46 :%02X", f8.r[46]); break;
-	case CPUINFO_STR_REGISTER+F8_R47: sprintf(info->s = cpuintrf_temp_str(), "R47 :%02X", f8.r[47]); break;
-	case CPUINFO_STR_REGISTER+F8_R48: sprintf(info->s = cpuintrf_temp_str(), "R48 :%02X", f8.r[48]); break;
-	case CPUINFO_STR_REGISTER+F8_R49: sprintf(info->s = cpuintrf_temp_str(), "R49 :%02X", f8.r[49]); break;
-	case CPUINFO_STR_REGISTER+F8_R50: sprintf(info->s = cpuintrf_temp_str(), "R50 :%02X", f8.r[50]); break;
-	case CPUINFO_STR_REGISTER+F8_R51: sprintf(info->s = cpuintrf_temp_str(), "R51 :%02X", f8.r[51]); break;
-	case CPUINFO_STR_REGISTER+F8_R52: sprintf(info->s = cpuintrf_temp_str(), "R52 :%02X", f8.r[52]); break;
-	case CPUINFO_STR_REGISTER+F8_R53: sprintf(info->s = cpuintrf_temp_str(), "R53 :%02X", f8.r[53]); break;
-	case CPUINFO_STR_REGISTER+F8_R54: sprintf(info->s = cpuintrf_temp_str(), "R54 :%02X", f8.r[54]); break;
-	case CPUINFO_STR_REGISTER+F8_R55: sprintf(info->s = cpuintrf_temp_str(), "R55 :%02X", f8.r[55]); break;
-	case CPUINFO_STR_REGISTER+F8_R56: sprintf(info->s = cpuintrf_temp_str(), "R56 :%02X", f8.r[56]); break;
-	case CPUINFO_STR_REGISTER+F8_R57: sprintf(info->s = cpuintrf_temp_str(), "R57 :%02X", f8.r[57]); break;
-	case CPUINFO_STR_REGISTER+F8_R58: sprintf(info->s = cpuintrf_temp_str(), "R58 :%02X", f8.r[58]); break;
-	case CPUINFO_STR_REGISTER+F8_R59: sprintf(info->s = cpuintrf_temp_str(), "R59 :%02X", f8.r[59]); break;
-	case CPUINFO_STR_REGISTER+F8_R60: sprintf(info->s = cpuintrf_temp_str(), "R60 :%02X", f8.r[60]); break;
-	case CPUINFO_STR_REGISTER+F8_R61: sprintf(info->s = cpuintrf_temp_str(), "R61 :%02X", f8.r[61]); break;
-	case CPUINFO_STR_REGISTER+F8_R62: sprintf(info->s = cpuintrf_temp_str(), "R62 :%02X", f8.r[62]); break;
-	case CPUINFO_STR_REGISTER+F8_R63: sprintf(info->s = cpuintrf_temp_str(), "R63 :%02X", f8.r[63]); break;
+	case CPUINFO_STR_REGISTER+F8_PC0:sprintf(info->s, "PC0:%04X", ((f8.pc0) - 1) & 0xffff); break;
+	case CPUINFO_STR_REGISTER+F8_PC1:sprintf(info->s, "PC1:%04X", f8.pc1); break;
+	case CPUINFO_STR_REGISTER+F8_DC0:sprintf(info->s, "DC0:%04X", f8.dc0); break;
+	case CPUINFO_STR_REGISTER+F8_DC1:sprintf(info->s, "DC1:%04X", f8.dc1); break;
+	case CPUINFO_STR_REGISTER+F8_W:  sprintf(info->s, "W  :%02X", f8.w); break;
+	case CPUINFO_STR_REGISTER+F8_A:  sprintf(info->s, "A  :%02X", f8.a); break;
+	case CPUINFO_STR_REGISTER+F8_IS: sprintf(info->s, "IS :%02X", f8.is); break;
+	case CPUINFO_STR_REGISTER+F8_J:  sprintf(info->s, "J  :%02X", f8.r[9]); break;
+	case CPUINFO_STR_REGISTER+F8_HU: sprintf(info->s, "HU :%02X", f8.r[10]); break;
+	case CPUINFO_STR_REGISTER+F8_HL: sprintf(info->s, "HL :%02X", f8.r[11]); break;
+	case CPUINFO_STR_REGISTER+F8_KU: sprintf(info->s, "KU :%02X", f8.r[12]); break;
+	case CPUINFO_STR_REGISTER+F8_KL: sprintf(info->s, "KL :%02X", f8.r[13]); break;
+	case CPUINFO_STR_REGISTER+F8_QU: sprintf(info->s, "QU :%02X", f8.r[14]); break;
+	case CPUINFO_STR_REGISTER+F8_QL: sprintf(info->s, "QL :%02X", f8.r[15]); break;
+	case CPUINFO_STR_REGISTER+F8_R0: sprintf(info->s, "R0 :%02X", f8.r[0]); break;
+	case CPUINFO_STR_REGISTER+F8_R1: sprintf(info->s, "R1 :%02X", f8.r[1]); break;
+	case CPUINFO_STR_REGISTER+F8_R2: sprintf(info->s, "R2 :%02X", f8.r[2]); break;
+	case CPUINFO_STR_REGISTER+F8_R3: sprintf(info->s, "R3 :%02X", f8.r[3]); break;
+	case CPUINFO_STR_REGISTER+F8_R4: sprintf(info->s, "R4 :%02X", f8.r[4]); break;
+	case CPUINFO_STR_REGISTER+F8_R5: sprintf(info->s, "R5 :%02X", f8.r[5]); break;
+	case CPUINFO_STR_REGISTER+F8_R6: sprintf(info->s, "R6 :%02X", f8.r[6]); break;
+	case CPUINFO_STR_REGISTER+F8_R7: sprintf(info->s, "R7 :%02X", f8.r[7]); break;
+	case CPUINFO_STR_REGISTER+F8_R8: sprintf(info->s, "R8 :%02X", f8.r[8]); break;
+	case CPUINFO_STR_REGISTER+F8_R16: sprintf(info->s, "R16 :%02X", f8.r[16]); break;
+	case CPUINFO_STR_REGISTER+F8_R17: sprintf(info->s, "R17 :%02X", f8.r[17]); break;
+	case CPUINFO_STR_REGISTER+F8_R18: sprintf(info->s, "R18 :%02X", f8.r[18]); break;
+	case CPUINFO_STR_REGISTER+F8_R19: sprintf(info->s, "R19 :%02X", f8.r[19]); break;
+	case CPUINFO_STR_REGISTER+F8_R20: sprintf(info->s, "R20 :%02X", f8.r[20]); break;
+	case CPUINFO_STR_REGISTER+F8_R21: sprintf(info->s, "R21 :%02X", f8.r[21]); break;
+	case CPUINFO_STR_REGISTER+F8_R22: sprintf(info->s, "R22 :%02X", f8.r[22]); break;
+	case CPUINFO_STR_REGISTER+F8_R23: sprintf(info->s, "R23 :%02X", f8.r[23]); break;
+	case CPUINFO_STR_REGISTER+F8_R24: sprintf(info->s, "R24 :%02X", f8.r[24]); break;
+	case CPUINFO_STR_REGISTER+F8_R25: sprintf(info->s, "R25 :%02X", f8.r[25]); break;
+	case CPUINFO_STR_REGISTER+F8_R26: sprintf(info->s, "R26 :%02X", f8.r[26]); break;
+	case CPUINFO_STR_REGISTER+F8_R27: sprintf(info->s, "R27 :%02X", f8.r[27]); break;
+	case CPUINFO_STR_REGISTER+F8_R28: sprintf(info->s, "R28 :%02X", f8.r[28]); break;
+	case CPUINFO_STR_REGISTER+F8_R29: sprintf(info->s, "R29 :%02X", f8.r[29]); break;
+	case CPUINFO_STR_REGISTER+F8_R30: sprintf(info->s, "R30 :%02X", f8.r[30]); break;
+	case CPUINFO_STR_REGISTER+F8_R31: sprintf(info->s, "R31 :%02X", f8.r[31]); break;
+	case CPUINFO_STR_REGISTER+F8_R32: sprintf(info->s, "R32 :%02X", f8.r[32]); break;
+	case CPUINFO_STR_REGISTER+F8_R33: sprintf(info->s, "R33 :%02X", f8.r[33]); break;
+	case CPUINFO_STR_REGISTER+F8_R34: sprintf(info->s, "R34 :%02X", f8.r[34]); break;
+	case CPUINFO_STR_REGISTER+F8_R35: sprintf(info->s, "R35 :%02X", f8.r[35]); break;
+	case CPUINFO_STR_REGISTER+F8_R36: sprintf(info->s, "R36 :%02X", f8.r[36]); break;
+	case CPUINFO_STR_REGISTER+F8_R37: sprintf(info->s, "R37 :%02X", f8.r[37]); break;
+	case CPUINFO_STR_REGISTER+F8_R38: sprintf(info->s, "R38 :%02X", f8.r[38]); break;
+	case CPUINFO_STR_REGISTER+F8_R39: sprintf(info->s, "R39 :%02X", f8.r[39]); break;
+	case CPUINFO_STR_REGISTER+F8_R40: sprintf(info->s, "R40 :%02X", f8.r[40]); break;
+	case CPUINFO_STR_REGISTER+F8_R41: sprintf(info->s, "R41 :%02X", f8.r[41]); break;
+	case CPUINFO_STR_REGISTER+F8_R42: sprintf(info->s, "R42 :%02X", f8.r[42]); break;
+	case CPUINFO_STR_REGISTER+F8_R43: sprintf(info->s, "R43 :%02X", f8.r[43]); break;
+	case CPUINFO_STR_REGISTER+F8_R44: sprintf(info->s, "R44 :%02X", f8.r[44]); break;
+	case CPUINFO_STR_REGISTER+F8_R45: sprintf(info->s, "R45 :%02X", f8.r[45]); break;
+	case CPUINFO_STR_REGISTER+F8_R46: sprintf(info->s, "R46 :%02X", f8.r[46]); break;
+	case CPUINFO_STR_REGISTER+F8_R47: sprintf(info->s, "R47 :%02X", f8.r[47]); break;
+	case CPUINFO_STR_REGISTER+F8_R48: sprintf(info->s, "R48 :%02X", f8.r[48]); break;
+	case CPUINFO_STR_REGISTER+F8_R49: sprintf(info->s, "R49 :%02X", f8.r[49]); break;
+	case CPUINFO_STR_REGISTER+F8_R50: sprintf(info->s, "R50 :%02X", f8.r[50]); break;
+	case CPUINFO_STR_REGISTER+F8_R51: sprintf(info->s, "R51 :%02X", f8.r[51]); break;
+	case CPUINFO_STR_REGISTER+F8_R52: sprintf(info->s, "R52 :%02X", f8.r[52]); break;
+	case CPUINFO_STR_REGISTER+F8_R53: sprintf(info->s, "R53 :%02X", f8.r[53]); break;
+	case CPUINFO_STR_REGISTER+F8_R54: sprintf(info->s, "R54 :%02X", f8.r[54]); break;
+	case CPUINFO_STR_REGISTER+F8_R55: sprintf(info->s, "R55 :%02X", f8.r[55]); break;
+	case CPUINFO_STR_REGISTER+F8_R56: sprintf(info->s, "R56 :%02X", f8.r[56]); break;
+	case CPUINFO_STR_REGISTER+F8_R57: sprintf(info->s, "R57 :%02X", f8.r[57]); break;
+	case CPUINFO_STR_REGISTER+F8_R58: sprintf(info->s, "R58 :%02X", f8.r[58]); break;
+	case CPUINFO_STR_REGISTER+F8_R59: sprintf(info->s, "R59 :%02X", f8.r[59]); break;
+	case CPUINFO_STR_REGISTER+F8_R60: sprintf(info->s, "R60 :%02X", f8.r[60]); break;
+	case CPUINFO_STR_REGISTER+F8_R61: sprintf(info->s, "R61 :%02X", f8.r[61]); break;
+	case CPUINFO_STR_REGISTER+F8_R62: sprintf(info->s, "R62 :%02X", f8.r[62]); break;
+	case CPUINFO_STR_REGISTER+F8_R63: sprintf(info->s, "R63 :%02X", f8.r[63]); break;
 
 	}
 

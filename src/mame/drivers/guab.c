@@ -55,7 +55,7 @@ enum int_levels
 
 static void ptm_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0, INT_6840PTM, state);
+	cpu_set_input_line(machine->cpu[0], INT_6840PTM, state);
 }
 
 static const ptm6840_interface ptm_intf =
@@ -79,7 +79,7 @@ static const ptm6840_interface ptm_intf =
 
 static void tms_interrupt(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0, INT_TMS34061, state);
+	cpu_set_input_line(machine->cpu[0], INT_TMS34061, state);
 }
 
 static const struct tms34061_interface tms34061intf =
@@ -346,7 +346,7 @@ static TIMER_CALLBACK( fdc_data_callback )
 	}
 
 	fdc.status |= DATA_REQUEST;
-	cpunum_set_input_line(machine, 0, INT_FLOPPYCTRL, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INT_FLOPPYCTRL, ASSERT_LINE);
 }
 
 
@@ -440,7 +440,7 @@ static WRITE16_HANDLER( wd1770_w )
 															fdc.sector));
 
 					/* Trigger a DRQ interrupt on the CPU */
-					cpunum_set_input_line(machine, 0, INT_FLOPPYCTRL, ASSERT_LINE);
+					cpu_set_input_line(machine->cpu[0], INT_FLOPPYCTRL, ASSERT_LINE);
 					fdc.status |= DATA_REQUEST;
 					break;
 				}
@@ -485,7 +485,7 @@ static WRITE16_HANDLER( wd1770_w )
 			fdc.data = data;
 
 			/* Clear the DRQ */
-			cpunum_set_input_line(machine, 0, INT_FLOPPYCTRL, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INT_FLOPPYCTRL, CLEAR_LINE);
 
 			/* Queue an event to write the data if write command was specified */
 			if (fdc.cmd & 0x20)
@@ -522,7 +522,7 @@ static READ16_HANDLER( wd1770_r )
 			retval = fdc.data;
 
 			/* Clear the DRQ */
-			cpunum_set_input_line(machine, 0, INT_FLOPPYCTRL, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INT_FLOPPYCTRL, CLEAR_LINE);
 			fdc.status &= ~DATA_REQUEST;
 			break;
 		}

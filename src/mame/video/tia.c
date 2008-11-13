@@ -506,15 +506,15 @@ static int collision_check(UINT8* p1, UINT8* p2, int x1, int x2)
 }
 
 
-INLINE int current_x(void)
+INLINE int current_x(running_machine *machine)
 {
-	return 3 * ((activecpu_gettotalcycles() - frame_cycles) % 76) - 68;
+	return 3 * ((cpu_get_total_cycles(machine->activecpu) - frame_cycles) % 76) - 68;
 }
 
 
-INLINE int current_y(void)
+INLINE int current_y(running_machine *machine)
 {
-	return (activecpu_gettotalcycles() - frame_cycles) / 76;
+	return (cpu_get_total_cycles(machine->activecpu) - frame_cycles) / 76;
 }
 
 
@@ -853,11 +853,11 @@ static void update_bitmap(int next_x, int next_y)
 
 static WRITE8_HANDLER( WSYNC_w )
 {
-	int cycles = activecpu_gettotalcycles() - frame_cycles;
+	int cycles = cpu_get_total_cycles(machine->activecpu) - frame_cycles;
 
 	if (cycles % 76)
 	{
-		activecpu_adjust_icount(cycles % 76 - 76);
+		cpu_adjust_icount(machine->activecpu, cycles % 76 - 76);
 	}
 }
 
@@ -868,7 +868,7 @@ static WRITE8_HANDLER( VSYNC_w )
 	{
 		if (!(VSYNC & 2))
 		{
-			int curr_y = current_y();
+			int curr_y = current_y(machine);
 
 			if ( curr_y > 5 )
 				update_bitmap(
@@ -882,7 +882,7 @@ static WRITE8_HANDLER( VSYNC_w )
 			prev_y = 0;
 			prev_x = 0;
 
-			frame_cycles += 76 * current_y();
+			frame_cycles += 76 * current_y(machine);
 		}
 	}
 
@@ -894,7 +894,7 @@ static WRITE8_HANDLER( VBLANK_w )
 {
 	if (data & 0x80)
 	{
-		paddle_cycles = activecpu_gettotalcycles();
+		paddle_cycles = cpu_get_total_cycles(machine->activecpu);
 	}
 	if ( ! ( VBLANK & 0x40 ) ) {
 		INPT4 = 0x80;
@@ -906,7 +906,7 @@ static WRITE8_HANDLER( VBLANK_w )
 
 static WRITE8_HANDLER( CTRLPF_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 
 	CTRLPF = data;
 	if ( curr_x < 80 ) {
@@ -916,7 +916,7 @@ static WRITE8_HANDLER( CTRLPF_w )
 
 static WRITE8_HANDLER( HMP0_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 
 	data &= 0xF0;
 
@@ -948,7 +948,7 @@ static WRITE8_HANDLER( HMP0_w )
 
 static WRITE8_HANDLER( HMP1_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 
 	data &= 0xF0;
 
@@ -980,7 +980,7 @@ static WRITE8_HANDLER( HMP1_w )
 
 static WRITE8_HANDLER( HMM0_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 
 	data &= 0xF0;
 
@@ -1011,7 +1011,7 @@ static WRITE8_HANDLER( HMM0_w )
 
 static WRITE8_HANDLER( HMM1_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 
 	data &= 0xF0;
 
@@ -1042,7 +1042,7 @@ static WRITE8_HANDLER( HMM1_w )
 
 static WRITE8_HANDLER( HMBL_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 
 	data &= 0xF0;
 
@@ -1073,8 +1073,8 @@ static WRITE8_HANDLER( HMBL_w )
 
 static WRITE8_HANDLER( HMOVE_w )
 {
-	int curr_x = current_x();
-	int curr_y = current_y();
+	int curr_x = current_x(machine);
+	int curr_y = current_y(machine);
 
 	HMOVE_started = curr_x;
 
@@ -1204,7 +1204,7 @@ static WRITE8_HANDLER( RSYNC_w )
 
 static WRITE8_HANDLER( NUSIZ0_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 
 	/* Check if relevant bits have changed */
 	if ( ( data & 7 ) != ( NUSIZ0 & 7 ) ) {
@@ -1219,7 +1219,7 @@ static WRITE8_HANDLER( NUSIZ0_w )
 						/* This copy has started drawing */
 						if ( p0gfx.size[i] == 1 && nusiz[data & 7][1] > 1 ) {
 							int delay = 1 + ( ( p0gfx.start_pixel[i] + ( curr_x - p0gfx.start_drawing[i] ) ) & 1 );
-							update_bitmap( curr_x + delay, current_y() );
+							update_bitmap( curr_x + delay, current_y(machine) );
 							p0gfx.start_pixel[i] += ( curr_x + delay - p0gfx.start_drawing[i] );
 							if ( p0gfx.start_pixel[i] > 8 )
 								p0gfx.start_pixel[i] = 8;
@@ -1229,7 +1229,7 @@ static WRITE8_HANDLER( NUSIZ0_w )
 							if ( delay ) {
 								delay = p0gfx.size[i] - delay;
 							}
-							update_bitmap( curr_x + delay, current_y() );
+							update_bitmap( curr_x + delay, current_y(machine) );
 							p0gfx.start_pixel[i] += ( curr_x - p0gfx.start_drawing[i] ) / p0gfx.size[i];
 							p0gfx.start_drawing[i] = curr_x + delay;
 						} else {
@@ -1282,7 +1282,7 @@ static WRITE8_HANDLER( NUSIZ0_w )
 
 static WRITE8_HANDLER( NUSIZ1_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 
 	/* Check if relevant bits have changed */
 	if ( ( data & 7 ) != ( NUSIZ1 & 7 ) ) {
@@ -1297,7 +1297,7 @@ static WRITE8_HANDLER( NUSIZ1_w )
 						/* This copy has started drawing */
 						if ( p1gfx.size[i] == 1 && nusiz[data & 7][1] > 1 ) {
 							int delay = 1 + ( ( p0gfx.start_pixel[i] + ( curr_x - p0gfx.start_drawing[i] ) ) & 1 );
-							update_bitmap( curr_x + delay, current_y() );
+							update_bitmap( curr_x + delay, current_y(machine) );
 							p1gfx.start_pixel[i] += ( curr_x + delay - p1gfx.start_drawing[i] );
 							if ( p1gfx.start_pixel[i] > 8 )
 								p1gfx.start_pixel[i] = 8;
@@ -1307,7 +1307,7 @@ static WRITE8_HANDLER( NUSIZ1_w )
 							if ( delay ) {
 								delay = p1gfx.size[i] - delay;
 							}
-							update_bitmap( curr_x + delay, current_y() );
+							update_bitmap( curr_x + delay, current_y(machine) );
 							p1gfx.start_pixel[i] += ( curr_x - p1gfx.start_drawing[i] ) / p1gfx.size[i];
 							p1gfx.start_drawing[i] = curr_x + delay;
 						} else {
@@ -1405,7 +1405,7 @@ static WRITE8_HANDLER( CXCLR_w )
 
 static WRITE8_HANDLER( RESP0_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 	int new_horzP0;
 
 	/* Check if HMOVE is activated during this line */
@@ -1465,7 +1465,7 @@ static WRITE8_HANDLER( RESP0_w )
 
 static WRITE8_HANDLER( RESP1_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 	int new_horzP1;
 
 	/* Check if HMOVE is activated during this line */
@@ -1525,7 +1525,7 @@ static WRITE8_HANDLER( RESP1_w )
 
 static WRITE8_HANDLER( RESM0_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 	int new_horzM0;
 
 	/* Check if HMOVE is activated during this line */
@@ -1547,7 +1547,7 @@ static WRITE8_HANDLER( RESM0_w )
 
 static WRITE8_HANDLER( RESM1_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 	int new_horzM1;
 
 	/* Check if HMOVE is activated during this line */
@@ -1569,7 +1569,7 @@ static WRITE8_HANDLER( RESM1_w )
 
 static WRITE8_HANDLER( RESBL_w )
 {
-	int curr_x = current_x();
+	int curr_x = current_x(machine);
 
 	/* Check if HMOVE is activated during this line */
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
@@ -1647,7 +1647,7 @@ static WRITE8_HANDLER( GRP1_w )
 
 static READ8_HANDLER( INPT_r )
 {
-	UINT64 elapsed = activecpu_gettotalcycles() - paddle_cycles;
+	UINT64 elapsed = cpu_get_total_cycles(machine->activecpu) - paddle_cycles;
 	int input = TIA_INPUT_PORT_ALWAYS_ON;
 	if ( tia_read_input_port )
 	{
@@ -1679,7 +1679,7 @@ READ8_HANDLER( tia_r )
 
 	if (!(offset & 0x8))
 	{
-		update_bitmap(current_x(), current_y());
+		update_bitmap(current_x(machine), current_y(machine));
 	}
 
 	switch (offset & 0xF)
@@ -1776,8 +1776,8 @@ WRITE8_HANDLER( tia_w )
 		 0,	// HMCLR
 		 0,	// CXCLR
 	};
-	int curr_x = current_x();
-	int curr_y = current_y();
+	int curr_x = current_x(machine);
+	int curr_y = current_y(machine);
 
 	offset &= 0x3F;
 

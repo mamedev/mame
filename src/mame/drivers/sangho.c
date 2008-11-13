@@ -205,7 +205,7 @@ static MACHINE_RESET(sexyboom)
 
 static void msx_vdp_interrupt(running_machine *machine, int i)
 {
-	cpunum_set_input_line (machine, 0, 0, (i ? HOLD_LINE : CLEAR_LINE));
+	cpu_set_input_line (machine->cpu[0], 0, (i ? HOLD_LINE : CLEAR_LINE));
 }
 
 static INTERRUPT_GEN( sangho_interrupt )

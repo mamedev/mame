@@ -175,12 +175,12 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( clear_irq_cb )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( assert_irq )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_CYCLES(14288, 0), NULL, 0, clear_irq_cb);
        /* Timing here is an educated GUESS, Z80 /INT must stay high so the irq
           fires no less than TWICE per frame, else game doesn't work right.

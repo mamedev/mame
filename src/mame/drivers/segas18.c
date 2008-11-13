@@ -147,7 +147,7 @@ static const struct segaic16_memory_map_entry *const region_info_list[] =
 static void sound_w(UINT8 data)
 {
 	soundlatch_w(Machine, 0, data & 0xff);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -190,7 +190,7 @@ static void system18_generic_init(running_machine *machine, int _rom_board)
 
 static TIMER_CALLBACK( boost_interleave )
 {
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_MSEC(10));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_MSEC(10));
 }
 
 
@@ -198,7 +198,7 @@ static MACHINE_RESET( system18 )
 {
 	segaic16_memory_mapper_reset(machine);
 	segaic16_tilemap_reset(0);
-	fd1094_machine_init();
+	fd1094_machine_init(machine->cpu[0]);
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
 	if (machine->config->cpu[2].type == CPU_I8751)
@@ -557,7 +557,7 @@ static WRITE8_HANDLER( soundbank_w )
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpunum_set_input_line(machine, 2, 1, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[2], 1, PULSE_LINE);
 }
 
 

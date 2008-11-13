@@ -47,7 +47,6 @@
                 - calls memory_init() [memory.c] to process the game's memory maps
                 - calls cpuexec_init() [cpuexec.c] to initialize the CPUs
                 - calls watchdog_init() [watchdog.c] to initialize the watchdog system
-                - calls cpuint_init() [cpuint.c] to initialize the CPU interrupts
                 - calls the driver's DRIVER_INIT callback
                 - calls device_list_start() [devintrf.c] to start any devices
                 - calls video_init() [video.c] to start the video system
@@ -560,8 +559,8 @@ void mame_schedule_exit(running_machine *machine)
 		mame->exit_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	if (cpunum_get_active() >= 0)
-		activecpu_adjust_icount(-activecpu_get_icount() - 1);
+	if (machine->activecpu != NULL)
+		cpu_eat_cycles(machine->activecpu, 1000000000);
 
 	/* if we're autosaving on exit, schedule a save as well */
 	if (options_get_bool(mame_options(), OPTION_AUTOSAVE) && (machine->gamedrv->flags & GAME_SUPPORTS_SAVE))
@@ -580,8 +579,8 @@ void mame_schedule_hard_reset(running_machine *machine)
 	mame->hard_reset_pending = TRUE;
 
 	/* if we're executing, abort out immediately */
-	if (cpunum_get_active() >= 0)
-		activecpu_adjust_icount(-activecpu_get_icount() - 1);
+	if (machine->activecpu != NULL)
+		cpu_eat_cycles(machine->activecpu, 1000000000);
 }
 
 
@@ -601,7 +600,7 @@ void mame_schedule_soft_reset(running_machine *machine)
 
 	/* if we're executing, abort out immediately */
 	if (cpunum_get_active() >= 0)
-		activecpu_adjust_icount(-activecpu_get_icount() - 1);
+		cpu_eat_cycles(machine->activecpu, 1000000000);
 }
 
 
@@ -618,7 +617,7 @@ void mame_schedule_new_driver(running_machine *machine, const game_driver *drive
 
 	/* if we're executing, abort out immediately */
 	if (cpunum_get_active() >= 0)
-		activecpu_adjust_icount(-activecpu_get_icount() - 1);
+		cpu_eat_cycles(machine->activecpu, 1000000000);
 }
 
 
@@ -1542,7 +1541,6 @@ static void init_machine(running_machine *machine)
 	memory_init(machine);
 	cpuexec_init(machine);
 	watchdog_init(machine);
-	cpuint_init(machine);
 
 #ifdef MESS
 	/* first MESS initialization */
@@ -1621,10 +1619,9 @@ static TIMER_CALLBACK( soft_reset )
 	/* allow save state registrations during the reset */
 	state_save_allow_registration(TRUE);
 
-	/* unfortunately, we can't rely on callbacks to reset the interrupt */
-	/* structures, as these need to happen before we call the reset */
-	/* functions registered by the drivers */
-	cpuint_reset(machine);
+	/* call all registered reset callbacks */
+	for (cb = machine->mame_data->reset_callback_list; cb; cb = cb->next)
+		(*cb->func.reset)(machine);
 
 	/* run the driver's reset callbacks */
 	if (machine->config->machine_reset != NULL)
@@ -1633,10 +1630,6 @@ static TIMER_CALLBACK( soft_reset )
 		(*machine->config->sound_reset)(machine);
 	if (machine->config->video_reset != NULL)
 		(*machine->config->video_reset)(machine);
-
-	/* call all registered reset callbacks */
-	for (cb = machine->mame_data->reset_callback_list; cb; cb = cb->next)
-		(*cb->func.reset)(machine);
 
 	/* disallow save state registrations starting here */
 	state_save_allow_registration(FALSE);
@@ -1737,20 +1730,21 @@ static void handle_save(running_machine *machine)
 		state_save_pop_tag();
 
 		/* loop over CPUs */
-		for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
-		{
-			cpu_push_context(machine->cpu[cpunum]);
+		for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+			if (machine->cpu[cpunum] != NULL)
+			{
+				cpu_push_context(machine->cpu[cpunum]);
 
-			/* make sure banking is set */
-			activecpu_reset_banking();
+				/* make sure banking is set */
+				memory_set_opbase(cpu_get_physical_pc_byte(machine->activecpu));
 
-			/* save the CPU data */
-			state_save_push_tag(cpunum + 1);
-			state_save_save_continue(machine);
-			state_save_pop_tag();
+				/* save the CPU data */
+				state_save_push_tag(cpunum + 1);
+				state_save_save_continue(machine);
+				state_save_pop_tag();
 
-			cpu_pop_context();
-		}
+				cpu_pop_context();
+			}
 
 		/* finish and close */
 		state_save_save_finish(machine);
@@ -1819,23 +1813,24 @@ static void handle_load(running_machine *machine)
 			state_save_pop_tag();
 
 			/* loop over CPUs */
-			for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
-			{
-				cpu_push_context(machine->cpu[cpunum]);
+			for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+				if (machine->cpu[cpunum] != NULL)
+				{
+					cpu_push_context(machine->cpu[cpunum]);
 
-				/* make sure banking is set */
-				activecpu_reset_banking();
+					/* make sure banking is set */
+					memory_set_opbase(cpu_get_physical_pc_byte(machine->activecpu));
 
-				/* load the CPU data */
-				state_save_push_tag(cpunum + 1);
-				state_save_load_continue(machine);
-				state_save_pop_tag();
+					/* load the CPU data */
+					state_save_push_tag(cpunum + 1);
+					state_save_load_continue(machine);
+					state_save_pop_tag();
 
-				/* make sure banking is set */
-				activecpu_reset_banking();
+					/* make sure banking is set */
+					memory_set_opbase(cpu_get_physical_pc_byte(machine->activecpu));
 
-				cpu_pop_context();
-			}
+					cpu_pop_context();
+				}
 
 			/* finish and close */
 			state_save_load_finish();

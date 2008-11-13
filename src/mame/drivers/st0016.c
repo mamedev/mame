@@ -397,11 +397,11 @@ GFXDECODE_END
 
 static INTERRUPT_GEN(st0016_int)
 {
-	if(!cpu_getiloops())
-		cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+	if(!cpu_getiloops(device))
+		cpu_set_input_line(device,0,HOLD_LINE);
 	else
-		if(cpu_get_reg(machine->activecpu, Z80_IFF1)) /* dirty hack ... */
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE );
+		if(cpu_get_reg(device, Z80_IFF1)) /* dirty hack ... */
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE );
 }
 
 extern UINT8 *st0016_charram;

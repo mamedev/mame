@@ -31,13 +31,13 @@ static WRITE8_HANDLER( ctrl_w )
 static INTERRUPT_GEN( scotrsht_interrupt )
 {
 	if (irq_enable)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( scotrsht_soundlatch_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( scotrsht_map, ADDRESS_SPACE_PROGRAM, 8 )

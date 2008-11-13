@@ -588,7 +588,7 @@ static MACHINE_RESET(gamecstl)
 {
 	memory_set_bankptr(1, memory_region(machine, "user1") + 0x30000);
 
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	gamecstl_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
 	gamecstl_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
@@ -605,7 +605,7 @@ static MACHINE_RESET(gamecstl)
  *************************************************************/
 
 static PIC8259_SET_INT_LINE( gamecstl_pic8259_1_set_int_line ) {
-	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -709,7 +709,7 @@ static const struct pci_device_info intel82371ab =
 
 static void set_gate_a20(int a20)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_A20, a20);
+	cpu_set_input_line(Machine->cpu[0], INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(int state)

@@ -104,7 +104,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 static WRITE16_HANDLER( sound_irq_trigger_w )
 {
 	if (ACCESSING_BITS_0_7)
-		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 

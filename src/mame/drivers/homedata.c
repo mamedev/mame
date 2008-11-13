@@ -233,12 +233,12 @@ static int vblank;
 static INTERRUPT_GEN( homedata_irq )
 {
 	vblank = 1;
-	cpunum_set_input_line(machine, 0,M6809_FIRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(device,M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( upd7807_irq )
 {
-	cpunum_set_input_line(machine, 1,UPD7810_INTF1,HOLD_LINE);
+	cpu_set_input_line(device,UPD7810_INTF1,HOLD_LINE);
 }
 
 
@@ -327,7 +327,7 @@ static WRITE8_HANDLER( mrokumei_sound_io_w )
 static WRITE8_HANDLER( mrokumei_sound_cmd_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 }
 
 

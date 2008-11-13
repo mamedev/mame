@@ -137,8 +137,8 @@ static WRITE8_HANDLER( adpcm_w )
 
 static void lrq_callback(int state)
 {
-	//cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-	cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, state);
+	//cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, state);
 }
 
 static ADDRESS_MAP_START( sauro_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -353,7 +353,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sauro_interrupt )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( tecfri )

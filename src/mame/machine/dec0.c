@@ -280,7 +280,7 @@ WRITE8_HANDLER( hippodrm_shared_w )
 
 static READ16_HANDLER( hippodrm_68000_share_r )
 {
-	if (offset==0) cpu_yield(); /* A wee helper */
+	if (offset==0) cpu_yield(machine->activecpu); /* A wee helper */
 	return share[offset]&0xff;
 }
 
@@ -463,7 +463,7 @@ static emu_timer *i8751_timer;
 static TIMER_CALLBACK( i8751_callback )
 {
 	/* Signal main cpu microcontroller task is complete */
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE);
 	i8751_timer=NULL;
 
 	logerror("i8751:  Timer called!!!\n");
@@ -477,7 +477,7 @@ void dec0_i8751_write(running_machine *machine, int data)
 	if (GAME==2) baddudes_i8751_write(machine, data);
 	if (GAME==3) birdtry_i8751_write(machine, data);
 
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE);
 
 	/* Simulate the processing time of the i8751, time value is guessed
     if (i8751_timer)
@@ -526,7 +526,7 @@ static WRITE16_HANDLER( robocop_68000_share_w )
 	robocop_shared_ram[offset]=data&0xff;
 
 	if (offset==0x7ff) /* A control address - not standard ram */
-		cpunum_set_input_line(machine, 2,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[2],0,HOLD_LINE);
 }
 
 /******************************************************************************/

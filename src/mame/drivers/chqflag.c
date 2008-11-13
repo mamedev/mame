@@ -30,15 +30,15 @@ VIDEO_UPDATE( chqflag );
 
 static INTERRUPT_GEN( chqflag_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		if (K051960_is_IRQ_enabled())
-			cpunum_set_input_line(machine, 0, KONAMI_IRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device, KONAMI_IRQ_LINE, HOLD_LINE);
 	}
-	else if (cpu_getiloops() % 2)
+	else if (cpu_getiloops(device) % 2)
 	{
 		if (K051960_is_NMI_enabled())
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -138,7 +138,7 @@ static READ8_HANDLER( analog_read_r )
 
 static WRITE8_HANDLER( chqflag_sh_irqtrigger_w )
 {
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 }
 
 
@@ -309,7 +309,7 @@ INPUT_PORTS_END
 
 static void chqflag_ym2151_irq_w(running_machine *machine, int data)
 {
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 

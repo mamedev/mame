@@ -268,20 +268,20 @@ static VIDEO_UPDATE( kinst )
 
 static TIMER_CALLBACK( irq0_stop )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( irq0_start )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq0_stop);
 }
 
 
 static void ide_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, 1, state);
+	cpu_set_input_line(device->machine->cpu[0], 1, state);
 }
 
 
@@ -350,7 +350,7 @@ static READ32_HANDLER( kinst_control_r )
 		case 4:		/* $a0 */
 			result = input_port_read(machine, portnames[offset]);
 			if (cpu_get_pc(machine->activecpu) == 0x802d428)
-				cpu_spinuntil_int();
+				cpu_spinuntil_int(machine->activecpu);
 			break;
 	}
 

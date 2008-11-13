@@ -344,7 +344,7 @@ static READ32_HANDLER( disp_ctrl_r )
 
 #if SPEEDUP_HACKS
 			// wait for vblank speedup
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 #endif
 			break;
 	}
@@ -959,7 +959,7 @@ static MACHINE_RESET(mediagx)
 {
 	UINT8 *rom = memory_region(machine, "bios");
 
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	memcpy(bios_ram, rom, 0x40000);
 
@@ -980,7 +980,7 @@ static MACHINE_RESET(mediagx)
  *************************************************************/
 
 static PIC8259_SET_INT_LINE( mediagx_pic8259_1_set_int_line ) {
-	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 
@@ -1082,7 +1082,7 @@ MACHINE_DRIVER_END
 
 static void set_gate_a20(int a20)
 {
-	cpunum_set_input_line(Machine, 0, INPUT_LINE_A20, a20);
+	cpu_set_input_line(Machine->cpu[0], INPUT_LINE_A20, a20);
 }
 
 static void keyboard_interrupt(int state)
@@ -1145,7 +1145,7 @@ INLINE UINT32 generic_speedup(running_machine *machine, speedup_entry *entry)
 	if (cpu_get_pc(machine->activecpu) == entry->pc)
 	{
 		entry->hits++;
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 	return main_ram[entry->offset/4];
 }

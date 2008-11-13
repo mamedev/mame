@@ -48,7 +48,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 
     case 2: /* Sound CPU write */
 		soundlatch_w(machine,0,data & 0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
     	return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
@@ -326,7 +326,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
+	cpu_set_input_line(machine->cpu[1],1,state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

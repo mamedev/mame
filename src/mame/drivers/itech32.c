@@ -337,8 +337,8 @@ static UINT32 *tms1_ram, *tms2_ram;
 static UINT32 *tms1_boot;
 static UINT8 tms_spinning[2];
 
-#define START_TMS_SPINNING(n)			do { cpu_spinuntil_trigger(7351 + n); tms_spinning[n] = 1; } while (0)
-#define STOP_TMS_SPINNING(machine, n)  	do { cpu_trigger(machine, 7351 + n); tms_spinning[n] = 0; } while (0)
+#define START_TMS_SPINNING(n)			do { cpu_spinuntil_trigger(machine->activecpu, 7351 + n); tms_spinning[n] = 1; } while (0)
+#define STOP_TMS_SPINNING(machine, n)  	do { cpuexec_trigger(machine, 7351 + n); tms_spinning[n] = 0; } while (0)
 
 
 
@@ -373,13 +373,13 @@ void itech32_update_interrupts(running_machine *machine, int vint, int xint, int
 	if (qint != -1) qint_state = qint;
 
 	if (is_drivedge) {
-		cpunum_set_input_line(machine, 0, 3, vint_state ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 4, xint_state ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 5, qint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, vint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 4, xint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 5, qint_state ? ASSERT_LINE : CLEAR_LINE);
 	} else {
-		cpunum_set_input_line(machine, 0, 1, vint_state ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 2, xint_state ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 3, qint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, vint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 2, xint_state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, qint_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -387,8 +387,8 @@ void itech32_update_interrupts(running_machine *machine, int vint, int xint, int
 static INTERRUPT_GEN( generate_int1 )
 {
 	/* signal the NMI */
-	itech32_update_interrupts(machine, 1, -1, -1);
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
+	itech32_update_interrupts(device->machine, 1, -1, -1);
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(device->machine->primary_screen));
 }
 
 
@@ -424,8 +424,8 @@ static MACHINE_RESET( drivedge )
 {
 	MACHINE_RESET_CALL(itech32);
 
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
 	STOP_TMS_SPINNING(machine, 0);
 	STOP_TMS_SPINNING(machine, 1);
 }
@@ -616,7 +616,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	sound_data = param;
 	sound_int_state = 1;
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -642,7 +642,7 @@ static WRITE32_HANDLER( sound_data32_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
 	sound_int_state = 0;
 	return sound_data;
 }
@@ -713,9 +713,9 @@ static WRITE8_HANDLER( pia_portb_out )
 static void via_irq(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -748,7 +748,7 @@ static const struct via6522_interface drivedge_via_interface =
 
 static WRITE8_HANDLER( firq_clear_w )
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -761,8 +761,8 @@ static WRITE8_HANDLER( firq_clear_w )
 
 static WRITE32_HANDLER( tms_reset_assert_w )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -771,12 +771,12 @@ static WRITE32_HANDLER( tms_reset_clear_w )
 	/* kludge to prevent crash on first boot */
 	if ((tms1_ram[0] & 0xff000000) == 0)
 	{
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(machine, 0);
 	}
 	if ((tms2_ram[0] & 0xff000000) == 0)
 	{
-		cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
 		STOP_TMS_SPINNING(machine, 1);
 	}
 }
@@ -788,7 +788,7 @@ static WRITE32_HANDLER( tms1_68k_ram_w )
 	if (offset == 0) COMBINE_DATA(tms1_boot);
 	if (offset == 0x382 && tms_spinning[0]) STOP_TMS_SPINNING(machine, 0);
 	if (!tms_spinning[0])
-		cpu_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
@@ -797,21 +797,21 @@ static WRITE32_HANDLER( tms2_68k_ram_w )
 	COMBINE_DATA(&tms2_ram[offset]);
 	if (offset == 0x382 && tms_spinning[1]) STOP_TMS_SPINNING(machine, 1);
 	if (!tms_spinning[1])
-		cpu_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
 static WRITE32_HANDLER( tms1_trigger_w )
 {
 	COMBINE_DATA(&tms1_ram[offset]);
-	cpu_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+	cpuexec_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 
 static WRITE32_HANDLER( tms2_trigger_w )
 {
 	COMBINE_DATA(&tms2_ram[offset]);
-	cpu_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
+	cpuexec_boost_interleave(machine, ATTOTIME_IN_HZ(CPU020_CLOCK/256), ATTOTIME_IN_USEC(20));
 }
 
 

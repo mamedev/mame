@@ -566,7 +566,7 @@ static VIDEO_UPDATE ( raiden2 )
 static INTERRUPT_GEN( raiden2_interrupt )
 {
 
-	cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc0/4);	/* VBL */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc0/4);	/* VBL */
 	logerror("VSYNC\n");
 }
 
@@ -2049,7 +2049,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( rdx_v33_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, cpunum_get_active(), 0, HOLD_LINE, 0xc0/4);	/* VBL */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc0/4);	/* VBL */
 	logerror("VSYNC\n");
 }
 

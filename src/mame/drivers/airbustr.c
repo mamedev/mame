@@ -277,7 +277,7 @@ static READ8_HANDLER( devram_r )
 
 static WRITE8_HANDLER( master_nmi_trigger_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void airbustr_bankswitch(running_machine *machine, const char *cpu, int bank, int data)
@@ -334,7 +334,7 @@ static WRITE8_HANDLER( soundcommand_w )
 {
 	soundlatch_w(machine, 0, data);
 	soundlatch_status = 1;	// soundlatch has been written
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
 static WRITE8_HANDLER( soundcommand2_w )
@@ -578,13 +578,13 @@ static const ym2203_interface ym2203_config =
 static INTERRUPT_GEN( master_interrupt )
 {
 	master_addr ^= 0x02;
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, master_addr);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, master_addr);
 }
 
 static INTERRUPT_GEN( slave_interrupt )
 {
 	slave_addr ^= 0x02;
-	cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, slave_addr);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, slave_addr);
 }
 
 /* Machine Initialization */

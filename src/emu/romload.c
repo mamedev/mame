@@ -1178,14 +1178,14 @@ static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflag
 
 		/* set the endianness */
 		startflags &= ~ROMREGION_ENDIANMASK;
-		if (cputype_endianness(cputype) == CPU_IS_LE)
+		if (cputype_get_endianness(cputype) == CPU_IS_LE)
 			startflags |= ROMREGION_LE;
 		else
 			startflags |= ROMREGION_BE;
 
 		/* set the width */
 		startflags &= ~ROMREGION_WIDTHMASK;
-		buswidth = cputype_databus_width(cputype, ADDRESS_SPACE_PROGRAM);
+		buswidth = cputype_get_databus_width(cputype, ADDRESS_SPACE_PROGRAM);
 		if (buswidth <= 8)
 			startflags |= ROMREGION_8BIT;
 		else if (buswidth <= 16)

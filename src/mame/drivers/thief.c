@@ -53,10 +53,10 @@ VIDEO_UPDATE( thief );
 static INTERRUPT_GEN( thief_interrupt )
 {
 	/* SLAM switch causes an NMI if it's pressed */
-	if( (input_port_read(machine, "P2") & 0x10) == 0 )
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if( (input_port_read(device->machine, "P2") & 0x10) == 0 )
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 /**********************************************************/

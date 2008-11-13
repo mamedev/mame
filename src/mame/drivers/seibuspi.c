@@ -809,7 +809,7 @@ static READ32_HANDLER( sound_fifo_status_r )
 
 static READ32_HANDLER( spi_int_r )
 {
-	cpunum_set_input_line(machine, 0, 0,CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[0], 0,CLEAR_LINE );
 	return 0xffffffff;
 }
 
@@ -881,9 +881,9 @@ logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 	if( ACCESSING_BITS_0_7 ) {
 		if( data & 0x1 ) {
 			z80_prg_fifo_pos = 0;
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE );
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE );
 		} else {
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE );
 		}
 	}
 }
@@ -1078,9 +1078,9 @@ static WRITE8_HANDLER( flashrom_write )
 static void irqhandler(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line_and_vector(machine, 1, 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
+		cpu_set_input_line_and_vector(machine->cpu[1], 0, ASSERT_LINE, 0xd7);	// IRQ is RST10
 	else
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static const ymf271_interface ymf271_config =
@@ -1687,7 +1687,7 @@ static NVRAM_HANDLER( sxx2f )
 
 static INTERRUPT_GEN( spi_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE );
+	cpu_set_input_line(device, 0, ASSERT_LINE );
 }
 
 static IRQ_CALLBACK(spi_irq_callback)
@@ -1705,8 +1705,8 @@ static MACHINE_RESET( spi )
 	UINT8 *rombase = memory_region(machine, "user1");
 	UINT8 flash_data = rombase[0x1ffffc];
 
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE );
-	cpunum_set_irq_callback(0, spi_irq_callback);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE );
+	cpu_set_irq_callback(machine->cpu[0], spi_irq_callback);
 
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sound_fifo_r);
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000688, 0x0000068b, 0, 0, z80_prg_fifo_w);
@@ -1783,7 +1783,7 @@ static MACHINE_RESET( sxx2f )
 
 	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000068c, 0x0000068f, 0, 0, eeprom_w);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x00000680, 0x00000683, 0, 0, sb_coin_r);
-	cpunum_set_irq_callback(0, spi_irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], spi_irq_callback);
 
 	sb_coin_latch = 0;
 }
@@ -1818,13 +1818,13 @@ MACHINE_DRIVER_END
 
 static READ32_HANDLER ( senkyu_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x00305bb2) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x00305bb2) cpu_spinuntil_int(machine->activecpu); // idle
 	return spimainram[(0x0018cb4-0x800)/4];
 }
 
 static READ32_HANDLER( senkyua_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)== 0x30582e) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)== 0x30582e) cpu_spinuntil_int(machine->activecpu); // idle
 	return spimainram[(0x0018c9c-0x800)/4];
 }
 
@@ -1833,10 +1833,10 @@ static READ32_HANDLER ( batlball_speedup_r )
 //  printf("cpu_get_pc(machine->activecpu) %06x\n", cpu_get_pc(machine->activecpu));
 
 	/* batlbalu */
-	if (cpu_get_pc(machine->activecpu)==0x00305996) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x00305996) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* batlball */
-	if (cpu_get_pc(machine->activecpu)==0x003058aa) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x003058aa) cpu_spinuntil_int(machine->activecpu); // idle
 
 	return spimainram[(0x0018db4-0x800)/4];
 }
@@ -1844,19 +1844,19 @@ static READ32_HANDLER ( batlball_speedup_r )
 static READ32_HANDLER ( rdft_speedup_r )
 {
 	/* rdft */
-	if (cpu_get_pc(machine->activecpu)==0x0203f0a) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f0a) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* rdftau */
-	if (cpu_get_pc(machine->activecpu)==0x0203f16) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f16) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* rdftj */
-	if (cpu_get_pc(machine->activecpu)==0x0203f22) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f22) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* rdftdi */
-	if (cpu_get_pc(machine->activecpu)==0x0203f46) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f46) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* rdftu */
-	if (cpu_get_pc(machine->activecpu)==0x0203f3a) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203f3a) cpu_spinuntil_int(machine->activecpu); // idle
 
 //  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 
@@ -1866,13 +1866,13 @@ static READ32_HANDLER ( rdft_speedup_r )
 static READ32_HANDLER ( viprp1_speedup_r )
 {
 	/* viprp1 */
-	if (cpu_get_pc(machine->activecpu)==0x0202769) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0202769) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* viprp1s */
-	if (cpu_get_pc(machine->activecpu)==0x02027e9) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x02027e9) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* viprp1ot */
-	if (cpu_get_pc(machine->activecpu)==0x02026bd) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x02026bd) cpu_spinuntil_int(machine->activecpu); // idle
 
 //  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 
@@ -1882,7 +1882,7 @@ static READ32_HANDLER ( viprp1_speedup_r )
 static READ32_HANDLER ( viprp1o_speedup_r )
 {
 	/* viperp1o */
-	if (cpu_get_pc(machine->activecpu)==0x0201f99) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0201f99) cpu_spinuntil_int(machine->activecpu); // idle
 //  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 	return spimainram[(0x001d49c-0x800)/4];
 }
@@ -1892,7 +1892,7 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 READ32_HANDLER ( ejanhs_speedup_r )
 {
 // mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
- if (cpu_get_pc(machine->activecpu)==0x03032c7) cpu_spinuntil_int(); // idle
+ if (cpu_get_pc(machine->activecpu)==0x03032c7) cpu_spinuntil_int(machine->activecpu); // idle
  return spimainram[(0x002d224-0x800)/4];
 }
 #endif
@@ -1901,16 +1901,16 @@ static READ32_HANDLER ( rf2_speedup_r )
 {
 
 	/* rdft22kc */
-	if (cpu_get_pc(machine->activecpu)==0x0203926) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0203926) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* rdft2, rdft2j */
-	if (cpu_get_pc(machine->activecpu)==0x0204372) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0204372) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* rdft2us */
-	if (cpu_get_pc(machine->activecpu)==0x020420e) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x020420e) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* rdft2a */
-	if (cpu_get_pc(machine->activecpu)==0x0204366) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0204366) cpu_spinuntil_int(machine->activecpu); // idle
 
 //  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 
@@ -1920,20 +1920,20 @@ static READ32_HANDLER ( rf2_speedup_r )
 static READ32_HANDLER ( rfjet_speedup_r )
 {
 	/* rfjet, rfjetu, rfjeta */
-	if (cpu_get_pc(machine->activecpu)==0x0206082) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0206082) cpu_spinuntil_int(machine->activecpu); // idle
 
 	/* rfjetus */
 	if (cpu_get_pc(machine->activecpu)==0x0205b39)
 	{
 		UINT32 r;
-		cpu_spinuntil_int(); // idle
+		cpu_spinuntil_int(machine->activecpu); // idle
 		// Hack to enter test mode
 		r = spimainram[(0x002894c-0x800)/4] & (~0x400);
 		return r | (((input_port_read(machine, "SYSTEM") ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
-	if (cpu_get_pc(machine->activecpu)==0x0205f2e) cpu_spinuntil_int(); // idle
+	if (cpu_get_pc(machine->activecpu)==0x0205f2e) cpu_spinuntil_int(machine->activecpu); // idle
 
 //  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
 
@@ -2049,7 +2049,7 @@ static DRIVER_INIT( rdft22kc )
 
 static MACHINE_RESET( seibu386 )
 {
-	cpunum_set_irq_callback(0, spi_irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], spi_irq_callback);
 }
 
 static MACHINE_DRIVER_START( seibu386 )

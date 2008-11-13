@@ -102,7 +102,7 @@ static UINT8 grudge_last_steering[3];
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -115,7 +115,7 @@ static TIMER_CALLBACK( interrupt_timer )
 		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), param + 64);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
@@ -312,7 +312,7 @@ READ8_HANDLER( balsente_random_num_r )
 	UINT32 cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
-	cc = activecpu_gettotalcycles();
+	cc = cpu_get_total_cycles(machine->activecpu);
 
 	/* 12.5 = 8 + 4 + 0.5 */
 	cc = (cc << 3) + (cc << 2) + (cc >> 1);
@@ -447,12 +447,12 @@ static void m6850_update_io(running_machine *machine)
 	/* apply the change */
 	if (new_state && !(m6850_status & 0x80))
 	{
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 		m6850_status |= 0x80;
 	}
 	else if (!new_state && (m6850_status & 0x80))
 	{
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 		m6850_status &= ~0x80;
 	}
 
@@ -465,12 +465,12 @@ static void m6850_update_io(running_machine *machine)
 	/* apply the change */
 	if (new_state && !(m6850_sound_status & 0x80))
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 		m6850_sound_status |= 0x80;
 	}
 	else if (!new_state && (m6850_sound_status & 0x80))
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 		m6850_sound_status &= ~0x80;
 	}
 }
@@ -611,7 +611,7 @@ INTERRUPT_GEN( balsente_update_analog_inputs )
 	/* ports are read once a frame, just at varying intervals. To get around this, we */
 	/* read all the analog inputs at VBLANK time and just return the cached values. */
 	for (i = 0; i < 4; i++)
-		analog_input_data[i] = input_port_read(machine, analog[i]);
+		analog_input_data[i] = input_port_read(device->machine, analog[i]);
 }
 
 
@@ -756,7 +756,7 @@ static void counter_set_out(running_machine *machine, int which, int out)
 {
 	/* OUT on counter 2 is hooked to the /INT line on the Z80 */
 	if (which == 2)
-		cpunum_set_input_line(machine, 1, 0, out ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, out ? ASSERT_LINE : CLEAR_LINE);
 
 	/* OUT on counter 0 is hooked to the GATE line on counter 1 */
 	else if (which == 0)

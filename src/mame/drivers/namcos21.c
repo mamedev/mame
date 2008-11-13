@@ -552,8 +552,8 @@ namcos21_kickstart( running_machine *machine, int internal )
 	mpDspState->slaveOutputSize = 0;
 	mpDspState->masterFinished = 0;
 	mpDspState->slaveActive = 0;
-	cpunum_set_input_line(machine, 4, 0, HOLD_LINE); /* DSP: master */
-	cpunum_set_input_line(machine, 5, INPUT_LINE_RESET, PULSE_LINE); /* DSP: slave */
+	cpu_set_input_line(machine->cpu[4], 0, HOLD_LINE); /* DSP: master */
+	cpu_set_input_line(machine->cpu[5], INPUT_LINE_RESET, PULSE_LINE); /* DSP: slave */
 }
 
 static UINT16
@@ -609,7 +609,7 @@ static WRITE16_HANDLER( dspram16_w )
 					offset == 0x103 &&
 					cpunum_get_active()==0 )
 		{ /* hack; synchronization for solvalou */
-			cpu_yield();
+			cpu_yield(machine->activecpu);
 		}
 	}
 } /* dspram16_w */
@@ -1261,7 +1261,7 @@ static WRITE16_HANDLER( winrun_dsp_complete_w )
 	if( data )
 	{
 		winrun_flushpoly();
-		cpunum_set_input_line(machine, 4, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[4], INPUT_LINE_RESET, PULSE_LINE);
 		namcos21_ClearPolyFrameBuffer();
 	}
 }

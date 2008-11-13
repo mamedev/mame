@@ -146,7 +146,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	if (data==0x26) {
 		i8751_current_command=0;
 		i8751_return=0xff; /* This value is XOR'd and must equal 0 */
-		cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xff);
+		cpu_set_input_line_and_vector(machine->cpu[0],0,HOLD_LINE,0xff);
 		return;
 	}
 
@@ -193,14 +193,14 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	}
 
 	/* Signal main cpu task is complete */
-	cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(machine->cpu[0],0,HOLD_LINE,0xff);
 	i8751_current_command=data;
 }
 
 static WRITE8_HANDLER( firetrap_sound_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
@@ -229,7 +229,7 @@ static void firetrap_adpcm_int (running_machine *machine, int data)
 
 	toggle ^= 1;
 	if (firetrap_irq_enable && toggle)
-		cpunum_set_input_line (machine, 1, M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line (machine->cpu[1], M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_adpcm_data_w )
@@ -544,33 +544,33 @@ static INTERRUPT_GEN( firetrap )
 	static int coin_command_pending=0;
 
 	/* Check for coin IRQ */
-	if (cpu_getiloops())
+	if (cpu_getiloops(device))
 	{
-		if ((input_port_read(machine, "COIN") & 0x7) != 0x7 && !latch)
+		if ((input_port_read(device->machine, "COIN") & 0x7) != 0x7 && !latch)
 		{
-			coin_command_pending = ~input_port_read(machine, "COIN");
+			coin_command_pending = ~input_port_read(device->machine, "COIN");
 			latch=1;
 		}
-		if ((input_port_read(machine, "COIN") & 0x7) == 0x7)
+		if ((input_port_read(device->machine, "COIN") & 0x7) == 0x7)
 			latch=0;
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
             definitely doesn't expect them as it locks out the coin routine */
 		if (coin_command_pending && !i8751_current_command) {
 			i8751_return=coin_command_pending;
-			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xff);
+			cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xff);
 			coin_command_pending=0;
 		}
 	}
 
-	if (firetrap_nmi_enable && !cpu_getiloops())
-		cpunum_set_input_line (machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (firetrap_nmi_enable && !cpu_getiloops(device))
+		cpu_set_input_line (device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( bootleg )
 {
 	if (firetrap_nmi_enable)
-		cpunum_set_input_line (machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line (device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( firetrap )

@@ -1081,7 +1081,7 @@ static void registers_update(debug_view *view)
 	/* cannot update if no active CPU */
 	if (cpunum_get_active() < 0)
 		return;
-	total_cycles = activecpu_gettotalcycles();
+	total_cycles = cpu_get_total_cycles(Machine->activecpu);
 
 	/* if our assumptions changed, revisit them */
 	if (regdata->recompute)
@@ -1119,8 +1119,8 @@ static void registers_update(debug_view *view)
 						break;
 
 					case MAX_REGS + 1:
-						sprintf(dummy, "cycles:%-8d", activecpu_get_icount());
-						reg->currval = activecpu_get_icount();
+						sprintf(dummy, "cycles:%-8d", *cpu_get_icount_ptr(Machine->activecpu));
+						reg->currval = *cpu_get_icount_ptr(Machine->activecpu);
 						break;
 
 					case MAX_REGS + 2:
@@ -1270,8 +1270,9 @@ static int disasm_alloc(debug_view *view)
 	memset(dasmdata, 0, sizeof(*dasmdata));
 
 	/* count the number of comments */
-	for (i = 0; i < cpu_gettotalcpu(); i++)
-		total_comments += debug_comment_get_count(i);
+	for (i = 0; i < ARRAY_LENGTH(Machine->cpu); i++)
+		if (Machine->cpu[i] != NULL)
+			total_comments += debug_comment_get_count(i);
 
 	/* initialize */
 	dasmdata->recompute = TRUE;

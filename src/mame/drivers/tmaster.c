@@ -146,7 +146,7 @@ static WRITE16_HANDLER( tmaster_oki_bank_w )
 
 static void duart_irq_handler(const device_config *device, UINT8 vector)
 {
-	cpunum_set_input_line_and_vector(device->machine, 0, 4, HOLD_LINE, vector);
+	cpu_set_input_line_and_vector(device->machine->cpu[0], 4, HOLD_LINE, vector);
 };
 
 static void duart_tx(const device_config *device, int channel, UINT8 data)
@@ -407,7 +407,7 @@ static WRITE16_HANDLER( tmaster_blitter_w )
 	{
 		case 0x0e:
 			tmaster_draw(machine);
-			cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[0], 2, HOLD_LINE);
 			break;
 	}
 }
@@ -754,11 +754,11 @@ static MACHINE_RESET( tmaster )
 
 static INTERRUPT_GEN( tm3k_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
-		case 1:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
-		default:	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+		case 0:		cpu_set_input_line(device, 2, HOLD_LINE);	break;
+		case 1:		cpu_set_input_line(device, 3, HOLD_LINE);	break;
+		default:	cpu_set_input_line(device, 1, HOLD_LINE);	break;
 	}
 }
 
@@ -816,11 +816,11 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( galgames_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:		cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
+		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);	break;
 					// lev 2 triggered at the end of a blit
-		default:	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
+		default:	cpu_set_input_line(device, 1, HOLD_LINE);	break;
 	}
 }
 

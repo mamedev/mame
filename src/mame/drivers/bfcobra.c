@@ -132,7 +132,7 @@ static void update_irqs(running_machine *machine)
 	if (newstate != irq_state)
 	{
 		irq_state = newstate;
-		cpunum_set_input_line(machine, 0, 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -692,7 +692,7 @@ static void RunBlit(running_machine *machine)
 	} while (blitter.command  & CMD_RUN);
 
 	/* Burn Z80 cycles while blitter is in operation */
-	cpu_spinuntil_time( ATTOTIME_IN_NSEC( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
+	cpu_spinuntil_time(machine->activecpu,  ATTOTIME_IN_NSEC( (1000000000 / Z80_XTAL)*cycles_used * 2 ) );
 }
 
 
@@ -1378,7 +1378,7 @@ static WRITE8_HANDLER( meter_w )
 		if (changed & (1 << i))
 		{
 			Mechmtr_update(i, cycles, data & (1 << i) );
-			cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, PULSE_LINE );
+			cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, PULSE_LINE );
 		}
  	}
 }
@@ -1585,7 +1585,7 @@ static void z80_acia_irq(int state)
 
 static void m6809_data_irq(int state)
 {
-	cpunum_set_input_line(Machine, 1, M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(Machine->cpu[1], M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*
@@ -1701,14 +1701,14 @@ static DRIVER_INIT( bfcobra )
 /* TODO */
 static INTERRUPT_GEN( timer_irq )
 {
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, PULSE_LINE);
+	cpu_set_input_line(device, M6809_IRQ_LINE, PULSE_LINE);
 }
 
 /* TODO */
 static INTERRUPT_GEN( vblank_gen )
 {
 	vblank_irq = 1;
-	update_irqs(machine);
+	update_irqs(device->machine);
 }
 
 static MACHINE_DRIVER_START( bfcobra )

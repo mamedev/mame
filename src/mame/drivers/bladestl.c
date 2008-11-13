@@ -42,12 +42,12 @@ WRITE8_HANDLER( bladestl_vreg_w );
 
 static INTERRUPT_GEN( bladestl_interrupt )
 {
-	if (cpu_getiloops() == 0){
+	if (cpu_getiloops(device) == 0){
 		if (K007342_is_INT_enabled())
-			cpunum_set_input_line(machine, 0, HD6309_FIRQ_LINE, HOLD_LINE);
+			cpu_set_input_line(device, HD6309_FIRQ_LINE, HOLD_LINE);
 	}
-	else if (cpu_getiloops() % 2){
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	else if (cpu_getiloops(device) % 2){
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -90,7 +90,7 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 {
 	soundlatch_w(machine, offset, data);
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 

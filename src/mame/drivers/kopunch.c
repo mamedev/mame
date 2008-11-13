@@ -16,21 +16,21 @@ extern VIDEO_UPDATE( kopunch );
 
 static INTERRUPT_GEN( kopunch_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
-		if (~input_port_read(machine, "SYSTEM") & 0x80)	/* coin 1 */
+		if (~input_port_read(device->machine, "SYSTEM") & 0x80)	/* coin 1 */
 		{
-			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xf7);	/* RST 30h */
+			cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xf7);	/* RST 30h */
 			return;
 		}
-		else if (~input_port_read(machine, "SYSTEM") & 0x08)	/* coin 2 */
+		else if (~input_port_read(device->machine, "SYSTEM") & 0x08)	/* coin 2 */
 		{
-			cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xef);	/* RST 28h */
+			cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xef);	/* RST 28h */
 			return;
 		}
 	}
 
-	cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xff);	/* RST 38h */
+	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xff);	/* RST 38h */
 }
 
 static READ8_HANDLER( kopunch_in_r )

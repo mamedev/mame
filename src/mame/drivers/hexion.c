@@ -273,10 +273,10 @@ GFXDECODE_END
 static INTERRUPT_GEN( hexion_interrupt )
 {
 	/* NMI handles start and coin inputs, origin unknown */
-	if (cpu_getiloops())
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (cpu_getiloops(device))
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( hexion )

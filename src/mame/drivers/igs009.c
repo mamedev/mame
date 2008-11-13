@@ -441,7 +441,7 @@ static MACHINE_RESET( jingbell )
 static INTERRUPT_GEN( jingbell_interrupt )
 {
 	 if (nmi_enable & 0x80)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( jingbell )

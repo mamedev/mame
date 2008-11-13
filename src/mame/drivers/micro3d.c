@@ -113,7 +113,7 @@ static int data_to_i8031(void)
     // Write to sound board
     if(M68681.IMR & 0x1000)
     {
-    	cpunum_set_input_line_and_vector(Machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
+    	cpu_set_input_line_and_vector(Machine->cpu[0],3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
     }
 	return M68681.TBB;
 }
@@ -124,7 +124,7 @@ static void data_from_i8031(int data)
 	M68681.SRB |= 0x0100;                          // Set Receiver B ready.
 	if(M68681.IMR & 0x1000)
 	{
-		cpunum_set_input_line_and_vector(Machine, 0,3, HOLD_LINE, M68681.IVR);    // Generate a receiver interrupt.
+		cpu_set_input_line_and_vector(Machine->cpu[0],3, HOLD_LINE, M68681.IVR);    // Generate a receiver interrupt.
 		mame_printf_debug("INTERRUPT!!!\n");
 	}
 	mame_printf_debug("8031 sent data: %x\n",data);
@@ -404,7 +404,7 @@ static void tms_interrupt(int state)
 
 static INTERRUPT_GEN( micro3d_vblank )
 {
-   m68901_int_gen(machine, GPIP7);
+   m68901_int_gen(device->machine, GPIP7);
 }
 
 
@@ -458,7 +458,7 @@ int bit=1 << (source-8*(int)(source/8));
 
        if(m68901_base[IMASK_REG] & (bit<<8))              // If interrupt is not masked by MFD, trigger a 68k INT
        {
-                cpunum_set_input_line(machine, 0,4, HOLD_LINE);
+                cpu_set_input_line(machine->cpu[0],4, HOLD_LINE);
             //    logerror("M68901 interrupt %d serviced.\n",source);
        }
 }
@@ -518,7 +518,7 @@ switch(offset)
 
       case 0x03:        M68681.TBA = value;                   // Fill transmit buffer
                         M68681.SRA |=0x0400;                  // Data has been sent - TX ready for more.
-                        if(M68681.IMR & 1)   cpunum_set_input_line_and_vector(machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
+                        if(M68681.IMR & 1)   cpu_set_input_line_and_vector(machine->cpu[0],3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
 
 #if HOST_MONITOR_DISPLAY
                         mame_printf_debug("%c",value);                    // Port A - Monitor
@@ -547,13 +547,13 @@ switch(offset)
                         // Write to sound board
                         if(M68681.IMR & 0x1000)
                         {
-                        	cpunum_set_input_line_and_vector(machine, 0,3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
+                        	cpu_set_input_line_and_vector(machine->cpu[0],3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
                         }
-                        cpunum_set_input_line(machine, 2, MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
+                        cpu_set_input_line(machine->cpu[2], MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
                         mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,cpu_get_pc(machine->activecpu));
 #endif
                         M68681.SRB &=~0x0400;                   // Data has been sent - TX ready for more.
-                        cpunum_set_input_line(machine, 2, MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
+                        cpu_set_input_line(machine->cpu[2], MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
                         mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,cpu_get_pc(machine->activecpu));
                         break;
 

@@ -351,10 +351,10 @@ static MACHINE_RESET( psychic5 )
 
 static INTERRUPT_GEN( psychic5_interrupt )
 {
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);		/* RST 10h */
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);		/* RST 10h */
 	else
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);		/* RST 08h */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);		/* RST 08h */
 }
 
 
@@ -667,7 +667,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =

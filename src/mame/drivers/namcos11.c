@@ -574,16 +574,16 @@ static INTERRUPT_GEN( namcos11_vblank )
 	UINT16 n_coin;
 	UINT32 n_input;
 
-	n_input = ( input_port_read(machine,  "PLAYER1" ) << 16 );
+	n_input = ( input_port_read(device->machine,  "PLAYER1" ) << 16 );
 	SHRAM( 0xbd00 ) = n_input | ( ( n_input & ~SHRAM( 0xbd00 ) ) >> 8 ) | ( SHRAM( 0xbd00 ) & 0x0000ffff );
 
-	n_input = input_port_read(machine,  "PLAYER2" ) | ( input_port_read(machine,  "PLAYER3" ) << 16 );
+	n_input = input_port_read(device->machine,  "PLAYER2" ) | ( input_port_read(device->machine,  "PLAYER3" ) << 16 );
 	SHRAM( 0xbd04 ) = n_input | ( ( n_input & ~SHRAM( 0xbd04 ) ) >> 8 );
 
-	n_input = input_port_read(machine,  "PLAYER4" );
+	n_input = input_port_read(device->machine,  "PLAYER4" );
 	SHRAM( 0xbd08 ) = n_input | ( ( n_input & ~SHRAM( 0xbd08 ) ) >> 8 ) | ( SHRAM( 0xbd08 ) & 0xffff0000 );
 
-	n_coin = input_port_read(machine,  "COIN" );
+	n_coin = input_port_read(device->machine,  "COIN" );
 
 	if( ( n_coin & m_n_oldcoin & 0x08 ) != 0 )
 	{
@@ -603,7 +603,7 @@ static INTERRUPT_GEN( namcos11_vblank )
 	}
 	m_n_oldcoin = ~n_coin;
 
-	if( strcmp( machine->gamedrv->name, "pocketrc" ) == 0 )
+	if( strcmp( device->machine->gamedrv->name, "pocketrc" ) == 0 )
  	{
 		if( g_p_n_psxram[ 0x12c74 / 4 ] == 0x1440fff9 )
 		{
@@ -616,7 +616,7 @@ static INTERRUPT_GEN( namcos11_vblank )
 
 		if( ( SHRAM( 0xbe88 ) & 0x0000ffff ) == 2 )
 		{
-			cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE );
+			cpu_set_input_line(device, INPUT_LINE_RESET, PULSE_LINE );
 			memset( namcos11_keycus, 0, namcos11_keycus_size );
 
 			SHRAM( 0xbe88 ) = ( SHRAM( 0xbe88 ) & 0xffff0000 );
@@ -624,11 +624,11 @@ static INTERRUPT_GEN( namcos11_vblank )
 
 		SHRAM( 0xbd30 ) = ( SHRAM( 0xbd30 ) & 0x0000ffff ) | ( 0x0080 << 16 );
 
-		SHRAM( 0xbd08 ) = ( SHRAM( 0xbd08 ) & 0x0000ffff ) | ( ( input_port_read(machine,  "STEERING" ) - 0x8000 ) << 16 );
-		SHRAM( 0xbd0c ) = ( SHRAM( 0xbd0c ) & 0xffff0000 ) | ( input_port_read(machine,  "GAS" ) << 0 );
+		SHRAM( 0xbd08 ) = ( SHRAM( 0xbd08 ) & 0x0000ffff ) | ( ( input_port_read(device->machine,  "STEERING" ) - 0x8000 ) << 16 );
+		SHRAM( 0xbd0c ) = ( SHRAM( 0xbd0c ) & 0xffff0000 ) | ( input_port_read(device->machine,  "GAS" ) << 0 );
 	}
 
-	psx_vblank(machine, cpunum);
+	psx_vblank(device);
 }
 
 static TIMER_CALLBACK( mcu_timer )

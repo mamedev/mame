@@ -969,7 +969,7 @@ static READ32_HANDLER( dynabomb_speedup_r )
 {
 	if(cpu_get_pc(machine->activecpu) == 0xc25b8)
 	{
-		activecpu_eat_cycles(50);
+		cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return mainram[0xe2784/4];
@@ -979,7 +979,7 @@ static READ32_HANDLER( legendoh_speedup_r )
 {
 	if(cpu_get_pc(machine->activecpu) == 0x23e32)
 	{
-		activecpu_eat_cycles(50);
+		cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return mainram[0x32ab0/4];
@@ -989,7 +989,7 @@ static READ32_HANDLER( sb2003_speedup_r )
 {
 	if(cpu_get_pc(machine->activecpu) == 0x26da4)
 	{
-		activecpu_eat_cycles(50);
+		cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return mainram[0x135800/4];
@@ -999,7 +999,7 @@ static READ32_HANDLER( spotty_speedup_r )
 {
 	if(cpu_get_pc(machine->activecpu) == 0x8560)
 	{
-		activecpu_eat_cycles(50);
+		cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return mainram[0x6626c/4];

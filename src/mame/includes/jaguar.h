@@ -29,8 +29,8 @@ extern UINT32 *jaguar_wave_rom;
 
 /*----------- defined in audio/jaguar.c -----------*/
 
-void jaguar_dsp_suspend(void);
-void jaguar_dsp_resume(void);
+void jaguar_dsp_suspend(running_machine *machine);
+void jaguar_dsp_resume(running_machine *machine);
 
 void cojag_sound_init(running_machine *machine);
 void cojag_sound_reset(void);
@@ -48,8 +48,8 @@ WRITE32_HANDLER( jaguar_serial_w );
 
 /*----------- defined in video/jaguar.c -----------*/
 
-void jaguar_gpu_suspend(void);
-void jaguar_gpu_resume(void);
+void jaguar_gpu_suspend(running_machine *machine);
+void jaguar_gpu_resume(running_machine *machine);
 
 void jaguar_gpu_cpu_int(void);
 void jaguar_dsp_cpu_int(void);

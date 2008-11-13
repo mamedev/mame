@@ -81,7 +81,7 @@ static WRITE16_HANDLER(ml_subreset_w)
 {
 	//wrong
 	if(cpu_get_pc(machine->activecpu)==0x822)
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -332,7 +332,7 @@ INPUT_PORTS_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static GFXDECODE_START( mlanding )

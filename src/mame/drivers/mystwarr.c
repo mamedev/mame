@@ -198,36 +198,36 @@ static INTERRUPT_GEN(mystwarr_interrupt)
 {
 	if (!(mw_irq_control & 0x01)) return;
 
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);
+			cpu_set_input_line(device, MC68000_IRQ_2, HOLD_LINE);
 		break;
 
 		case 1:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
+			cpu_set_input_line(device, MC68000_IRQ_4, HOLD_LINE);
 		break;
 
 		case 2:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_6, HOLD_LINE);
+			cpu_set_input_line(device, MC68000_IRQ_6, HOLD_LINE);
 		break;
 	}
 }
 
 static INTERRUPT_GEN(metamrph_interrupt)
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
+			cpu_set_input_line(device, MC68000_IRQ_4, HOLD_LINE);
 		break;
 
 		case 15:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_6, HOLD_LINE);
+			cpu_set_input_line(device, MC68000_IRQ_6, HOLD_LINE);
 		break;
 
 		case 39:
-			if (K053246_is_IRQ_enabled()) cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
+			if (K053246_is_IRQ_enabled()) cpu_set_input_line(device, MC68000_IRQ_5, HOLD_LINE);
 		break;
 	}
 }
@@ -236,21 +236,21 @@ static INTERRUPT_GEN(mchamp_interrupt)
 {
 	if (!(mw_irq_control & 0x02)) return;
 
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
-			if (K053246_is_IRQ_enabled()) cpunum_set_input_line(machine, 0, MC68000_IRQ_6, HOLD_LINE);
+			if (K053246_is_IRQ_enabled()) cpu_set_input_line(device, MC68000_IRQ_6, HOLD_LINE);
 		break;
 
 		case 1:
-			cpunum_set_input_line(machine, 0, MC68000_IRQ_2, HOLD_LINE);
+			cpu_set_input_line(device, MC68000_IRQ_2, HOLD_LINE);
 		break;
 	}
 }
 
 static INTERRUPT_GEN(ddd_interrupt)
 {
-	cpunum_set_input_line(machine, 0, MC68000_IRQ_5, HOLD_LINE);
+	cpu_set_input_line(device, MC68000_IRQ_5, HOLD_LINE);
 }
 
 
@@ -280,7 +280,7 @@ static WRITE16_HANDLER( sound_cmd2_msb_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )

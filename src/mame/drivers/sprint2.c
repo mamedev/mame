@@ -80,7 +80,7 @@ static INTERRUPT_GEN( sprint2 )
 
 		for (i = 0; i < 2; i++)
 		{
-			signed char delta = input_port_read(machine, i ? "DIAL_P2" : "DIAL_P1") - dial[i];
+			signed char delta = input_port_read(device->machine, i ? "DIAL_P2" : "DIAL_P1") - dial[i];
 
 			if (delta < 0)
 			{
@@ -93,7 +93,7 @@ static INTERRUPT_GEN( sprint2 )
 
 			dial[i] += delta;
 
-			switch (input_port_read(machine, i ? "GEAR_P2" : "GEAR_P1") & 15)
+			switch (input_port_read(device->machine, i ? "GEAR_P2" : "GEAR_P1") & 15)
 			{
 			case 1: gear[i] = 1; break;
 			case 2: gear[i] = 2; break;
@@ -103,16 +103,16 @@ static INTERRUPT_GEN( sprint2 )
 		}
 	}
 
-	discrete_sound_w(machine, SPRINT2_MOTORSND1_DATA, sprint2_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
-	discrete_sound_w(machine, SPRINT2_MOTORSND2_DATA, sprint2_video_ram[0x395] & 15);
-	discrete_sound_w(machine, SPRINT2_CRASHSND_DATA, sprint2_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
+	discrete_sound_w(device->machine, SPRINT2_MOTORSND1_DATA, sprint2_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
+	discrete_sound_w(device->machine, SPRINT2_MOTORSND2_DATA, sprint2_video_ram[0x395] & 15);
+	discrete_sound_w(device->machine, SPRINT2_CRASHSND_DATA, sprint2_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
-	watchdog_enable(machine, !service_mode(machine));
+	watchdog_enable(device->machine, !service_mode(device->machine));
 
-	if (!service_mode(machine))
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (!service_mode(device->machine))
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

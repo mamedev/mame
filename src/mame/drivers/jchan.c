@@ -360,16 +360,16 @@ static READ16_HANDLER( jchan_mcu_status_r )
 // interrupt generation is NOT understood
 static INTERRUPT_GEN( jchan_vblank )
 {
-	int i = cpu_getiloops();
+	int i = cpu_getiloops(device);
 	switch (i)
 	{
 
 		case 0:
-			cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+			cpu_set_input_line(device, 1, HOLD_LINE);
 			break;
 
 		case 220:
-			cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+			cpu_set_input_line(device, 2, HOLD_LINE);
 			break;
 
 	}
@@ -380,15 +380,15 @@ static INTERRUPT_GEN( jchan_vblank )
 		{
 
 			case 0:
-				cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
+				cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
 				break;
 
 			case 100:
-				cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
+				cpu_set_input_line(device->machine->cpu[1], 2, HOLD_LINE);
 				break;
 
 			case 220:
-				cpunum_set_input_line(machine, 1, 3, HOLD_LINE);
+				cpu_set_input_line(device->machine->cpu[1], 3, HOLD_LINE);
 				break;
 
 		}
@@ -520,7 +520,7 @@ static WRITE16_HANDLER( main2sub_cmd_w )
 	//printf("main2sub\n");
 
 	COMBINE_DATA(&mainsub_shared_ram[0x03ffe/2]);
-	cpunum_set_input_line(machine, 1, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 4, HOLD_LINE);
 }
 
 // is this called?
@@ -528,7 +528,7 @@ static WRITE16_HANDLER( sub2main_cmd_w )
 {
 	//printf("sub2main\n");
 	COMBINE_DATA(&mainsub_shared_ram[0x0000/2]);
-	cpunum_set_input_line(machine, 0, 3, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE);
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */

@@ -308,7 +308,7 @@ static READ32_HANDLER( arm7_latch_arm_r )
 #ifdef PGMARM7SPEEDHACK
 static TIMER_CALLBACK( arm_irq )
 {
-	cpunum_set_input_line(machine, 2, ARM7_FIRQ_LINE, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[2], ARM7_FIRQ_LINE, PULSE_LINE);
 }
 #endif
 
@@ -319,12 +319,12 @@ static WRITE32_HANDLER( arm7_latch_arm_w )
 	COMBINE_DATA(&arm7_latch);
 
 #ifdef PGMARM7SPEEDHACK
-//  cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
-	if (data!=0xaa) cpu_spinuntil_trigger(1000);
-	cpu_trigger(machine, 1002);
+//  cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	if (data!=0xaa) cpu_spinuntil_trigger(machine->activecpu, 1000);
+	cpuexec_trigger(machine, 1002);
 #else
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
-	cpu_spinuntil_time(ATTOTIME_IN_CYCLES(100, 0));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_CYCLES(100, 0));
 #endif
 }
 
@@ -352,13 +352,13 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 	COMBINE_DATA(&arm7_latch);
 
 #ifdef PGMARM7SPEEDHACK
-	cpu_trigger(machine, 1000);
+	cpuexec_trigger(machine, 1000);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, arm_irq); // i don't know how long..
-	cpu_spinuntil_trigger(1002);
+	cpu_spinuntil_trigger(machine->activecpu, 1002);
 #else
-	cpunum_set_input_line(machine, 2, ARM7_FIRQ_LINE, PULSE_LINE);
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(ATTOTIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
+	cpu_set_input_line(machine->cpu[2], ARM7_FIRQ_LINE, PULSE_LINE);
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
+	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
 #endif
 }
 
@@ -395,8 +395,8 @@ static WRITE16_HANDLER ( z80_reset_w )
 
 	if(data == 0x5050) {
 		sndti_reset(SOUND_ICS2115, 0);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 		if(0) {
 			FILE *out;
 			out = fopen("z80ram.bin", "wb");
@@ -408,7 +408,7 @@ static WRITE16_HANDLER ( z80_reset_w )
 	{
 		/* this might not be 100% correct, but several of the games (ddp2, puzzli2 etc. expect the z80 to be turned
            off during data uploads, they write here before the upload */
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -422,7 +422,7 @@ static WRITE16_HANDLER ( m68k_l1_w )
 	if(ACCESSING_BITS_0_7) {
 		if (PGMLOGERROR) logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(machine->activecpu));
 		soundlatch_w(machine, 0, data);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 	}
 }
 
@@ -434,7 +434,7 @@ static WRITE8_HANDLER( z80_l3_w )
 
 static void sound_irq(running_machine *machine, int level)
 {
-	cpunum_set_input_line(machine, 1, 0, level);
+	cpu_set_input_line(machine->cpu[1], 0, level);
 }
 
 static const ics2115_interface pgm_ics2115_interface = {
@@ -739,14 +739,14 @@ static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 		kovsh_lowlatch = data;
 	}
 
-//  cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
-//  cpu_spinuntil_time(ATTOTIME_IN_CYCLES(100, 0));
+//  cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+//  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_CYCLES(100, 0));
 }
 
 static READ16_HANDLER( kovsh_68k_protlatch_r )
 {
-	//cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(ATTOTIME_IN_CYCLES(600, 0));
+	//cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
+	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_CYCLES(600, 0));
 
 	switch (offset)
 	{
@@ -1133,15 +1133,15 @@ GFXDECODE_END
 /* only dragon world 2 NEEDs irq4, Puzzli 2 explicitly doesn't want it, what
    is the source? maybe the protection device? */
 static INTERRUPT_GEN( drgw_interrupt ) {
-	if( cpu_getiloops() == 0 )
-		cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
+	if( cpu_getiloops(device) == 0 )
+		cpu_set_input_line(device, 6, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_RESET ( pgm )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static MACHINE_DRIVER_START( pgm )

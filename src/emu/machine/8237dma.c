@@ -176,7 +176,7 @@ static void dma8237_update_status(const device_config *device)
 		/* set the halt line */
 		if (dma8237->intf && dma8237->intf->cpunum >= 0)
 		{
-			cpunum_set_input_line(device->machine, dma8237->intf->cpunum, INPUT_LINE_HALT,
+			cpu_set_input_line(device->machine->cpu[dma8237->intf->cpunum], INPUT_LINE_HALT,
 				pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 		}
 

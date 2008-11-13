@@ -88,13 +88,13 @@ static WRITE8_HANDLER( darwin_0803_w )
 static WRITE8_HANDLER( brkthru_soundlatch_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an IRQ */
-	cpunum_set_input_line(field->port->machine, 0, 0, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], 0, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -327,7 +327,7 @@ GFXDECODE_END
 /* handler called by the 3812 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,linestate);
+	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,linestate);
 }
 
 static const ym3526_interface ym3526_config =

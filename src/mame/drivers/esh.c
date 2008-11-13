@@ -129,9 +129,9 @@ static WRITE8_HANDLER(led_writes)
 static WRITE8_HANDLER(nmi_line_w)
 {
 	if (data == 0x00)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 	if (data == 0x01)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 
 	if (data != 0x00 && data != 0x01)
 		logerror("NMI line got a weird value!\n");
@@ -259,13 +259,13 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( irq_stop )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( vblank_callback_esh )
 {
 	// IRQ
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq_stop);
 }
 

@@ -216,10 +216,10 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( deadang_interrupt )
 {
-	if (cpu_getiloops())
-		cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc8/4);	/* VBL */
+	if (cpu_getiloops(device))
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 	else
-		cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc4/4);	/* VBL */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc4/4);	/* VBL */
 }
 
 /* Machine Drivers */

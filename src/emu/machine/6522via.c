@@ -23,6 +23,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "6522via.h"
 
 //#define TRACE_VIA
@@ -165,7 +166,7 @@ void via_config(int which, const struct via6522_interface *intf)
 	via[which].time2 = via[which].time1 = timer_get_time();
 
 	/* Default clock is from CPU1 */
-	via_set_clock (which, cpunum_get_clock(0));
+	via_set_clock (which, cpu_get_clock(Machine->cpu[0]));
 }
 
 /******************* external interrupt check *******************/

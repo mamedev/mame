@@ -249,7 +249,7 @@ static INTERRUPT_GEN( skyfox_interrupt )
 	skyfox_bg_pos += (skyfox_bg_ctrl >> 1) & 0x7;	// maybe..
 
 	/* Check coin 1 & 2 */
-	if ((input_port_read(machine, "COINS") & 3) != 3) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if ((input_port_read(device->machine, "COINS") & 3) != 3) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_DRIVER_START( skyfox )

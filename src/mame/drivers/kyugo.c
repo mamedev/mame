@@ -46,7 +46,7 @@ MACHINE_RESET( kyugo )
 
 WRITE8_HANDLER( kyugo_sub_cpu_control_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

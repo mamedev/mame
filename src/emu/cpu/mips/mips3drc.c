@@ -28,6 +28,7 @@
 #include <stddef.h>
 #include "cpuintrf.h"
 #include "debugger.h"
+#include "cpuexec.h"
 #include "mips3com.h"
 #include "mips3fe.h"
 #include "deprecat.h"
@@ -816,7 +817,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 static void cfunc_get_cycles(void *param)
 {
 	UINT64 *dest = param;
-	*dest = activecpu_gettotalcycles();
+	*dest = cpu_get_total_cycles(Machine->activecpu);
 }
 
 

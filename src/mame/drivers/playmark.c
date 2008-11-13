@@ -144,7 +144,7 @@ static WRITE16_HANDLER( playmark_snd_command_w )
 	if (ACCESSING_BITS_0_7) {
 		playmark_snd_command = (data & 0xff);
 		playmark_snd_flag = 1;
-		cpu_yield();
+		cpu_yield(machine->activecpu);
 	}
 }
 

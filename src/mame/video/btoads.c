@@ -78,7 +78,7 @@ WRITE16_HANDLER( btoads_misc_control_w )
 	COMBINE_DATA(&misc_control);
 
 	/* bit 3 controls sound reset line */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

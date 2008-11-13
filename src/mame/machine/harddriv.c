@@ -173,9 +173,9 @@ MACHINE_RESET( harddriv )
 	atarigen_interrupt_reset(hd68k_update_interrupts);
 
 	/* halt several of the DSPs to start */
-	if (hdcpu_adsp != -1) cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
-	if (hdcpu_dsp32 != -1) cpunum_set_input_line(machine, hdcpu_dsp32, INPUT_LINE_HALT, ASSERT_LINE);
-	if (hdcpu_sounddsp != -1) cpunum_set_input_line(machine, hdcpu_sounddsp, INPUT_LINE_HALT, ASSERT_LINE);
+	if (hdcpu_adsp != -1) cpu_set_input_line(machine->cpu[hdcpu_adsp], INPUT_LINE_HALT, ASSERT_LINE);
+	if (hdcpu_dsp32 != -1) cpu_set_input_line(machine->cpu[hdcpu_dsp32], INPUT_LINE_HALT, ASSERT_LINE);
+	if (hdcpu_sounddsp != -1) cpu_set_input_line(machine->cpu[hdcpu_sounddsp], INPUT_LINE_HALT, ASSERT_LINE);
 
 	/* if we found a 6502, reset the JSA board */
 	if (hdcpu_jsa != -1)
@@ -210,19 +210,19 @@ MACHINE_RESET( harddriv )
 
 static void hd68k_update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, hdcpu_main, 1, msp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, hdcpu_main, 2, adsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, hdcpu_main, 3, gsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, hdcpu_main, 4, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);	/* /LINKIRQ on STUN Runner */
-	cpunum_set_input_line(machine, hdcpu_main, 5, irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, hdcpu_main, 6, duart_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_main], 1, msp_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_main], 2, adsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_main], 3, gsp_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_main], 4, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);	/* /LINKIRQ on STUN Runner */
+	cpu_set_input_line(machine->cpu[hdcpu_main], 5, irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[hdcpu_main], 6, duart_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 INTERRUPT_GEN( hd68k_irq_gen )
 {
 	irq_state = 1;
-	atarigen_update_interrupts(machine);
+	atarigen_update_interrupts(device->machine);
 }
 
 
@@ -514,12 +514,12 @@ WRITE16_HANDLER( hd68k_nwr_w )
 		case 6:	/* /GSPRES */
 			logerror("Write to /GSPRES(%d)\n", data);
 			if (hdcpu_gsp != -1)
-				cpunum_set_input_line(machine, hdcpu_gsp, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+				cpu_set_input_line(machine->cpu[hdcpu_gsp], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 		case 7:	/* /MSPRES */
 			logerror("Write to /MSPRES(%d)\n", data);
 			if (hdcpu_msp != -1)
-				cpunum_set_input_line(machine, hdcpu_msp, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+				cpu_set_input_line(machine->cpu[hdcpu_msp], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -713,7 +713,7 @@ WRITE16_HANDLER( hdgsp_io_w )
 		{
 			last_gsp_shiftreg = new_shiftreg;
 			if (new_shiftreg)
-				cpu_yield();
+				cpu_yield(machine->activecpu);
 		}
 	}
 
@@ -754,7 +754,7 @@ static TIMER_CALLBACK( stmsp_sync_update )
 	offs_t offset = (param >> 16) & 0xfff;
 	UINT16 data = param;
 	stmsp_sync[which][offset] = data;
-	cpu_triggerint(machine, hdcpu_msp);
+	cpu_triggerint(machine->cpu[hdcpu_msp]);
 }
 
 
@@ -854,7 +854,7 @@ WRITE16_HANDLER( hd68k_adsp_data_w )
 	{
 		logerror("%06X:ADSP sync address written (%04X)\n", cpu_get_previouspc(machine->activecpu), data);
 		timer_call_after_resynch(NULL, 0, 0);
-		cpu_triggerint(machine, hdcpu_adsp);
+		cpu_triggerint(machine->cpu[hdcpu_adsp]);
 	}
 	else
 		logerror("%06X:ADSP W@%04X (%04X)\n", cpu_get_previouspc(machine->activecpu), offset, data);
@@ -964,14 +964,14 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 			adsp_br = !val;
 			logerror("ADSP /BR = %d\n", !adsp_br);
 			if (adsp_br || adsp_halt)
-				cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+				cpu_set_input_line(machine->cpu[hdcpu_adsp], INPUT_LINE_HALT, ASSERT_LINE);
 			else
 			{
-				cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_HALT, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[hdcpu_adsp], INPUT_LINE_HALT, CLEAR_LINE);
 				/* a yield in this case is not enough */
 				/* we would need to increase the interleaving otherwise */
 				/* note that this only affects the test mode */
-				cpu_spin();
+				cpu_spin(machine->activecpu);
 			}
 			break;
 
@@ -981,21 +981,21 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 			adsp_halt = !val;
 			logerror("ADSP /HALT = %d\n", !adsp_halt);
 			if (adsp_br || adsp_halt)
-				cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+				cpu_set_input_line(machine->cpu[hdcpu_adsp], INPUT_LINE_HALT, ASSERT_LINE);
 			else
 			{
-				cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_HALT, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[hdcpu_adsp], INPUT_LINE_HALT, CLEAR_LINE);
 				/* a yield in this case is not enough */
 				/* we would need to increase the interleaving otherwise */
 				/* note that this only affects the test mode */
-				cpu_spin();
+				cpu_spin(machine->activecpu);
 			}
 			break;
 
 		case 7:
 			logerror("ADSP reset = %d\n", val);
-			cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
-			cpu_yield();
+			cpu_set_input_line(machine->cpu[hdcpu_adsp], INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			cpu_yield(machine->activecpu);
 			break;
 
 		default:
@@ -1110,9 +1110,9 @@ static void update_ds3_irq(void)
 {
 	/* update the IRQ2 signal to the ADSP2101 */
 	if (!(!ds3_g68flag && ds3_g68irqs) && !(ds3_gflag && ds3_gfirqs))
-		cpunum_set_input_line(Machine, hdcpu_adsp, ADSP2100_IRQ2, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[hdcpu_adsp], ADSP2100_IRQ2, ASSERT_LINE);
 	else
-		cpunum_set_input_line(Machine, hdcpu_adsp, ADSP2100_IRQ2, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[hdcpu_adsp], ADSP2100_IRQ2, CLEAR_LINE);
 }
 
 
@@ -1135,19 +1135,19 @@ WRITE16_HANDLER( hd68k_ds3_control_w )
 			/* the ADSP at the next instruction boundary */
 			adsp_br = !val;
 			if (adsp_br)
-				cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_HALT, ASSERT_LINE);
+				cpu_set_input_line(machine->cpu[hdcpu_adsp], INPUT_LINE_HALT, ASSERT_LINE);
 			else
 			{
-				cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_HALT, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[hdcpu_adsp], INPUT_LINE_HALT, CLEAR_LINE);
 				/* a yield in this case is not enough */
 				/* we would need to increase the interleaving otherwise */
 				/* note that this only affects the test mode */
-				cpu_spin();
+				cpu_spin(machine->activecpu);
 			}
 			break;
 
 		case 3:
-			cpunum_set_input_line(machine, hdcpu_adsp, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[hdcpu_adsp], INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			if (val && !ds3_reset)
 			{
 				ds3_gflag = 0;
@@ -1158,7 +1158,7 @@ WRITE16_HANDLER( hd68k_ds3_control_w )
 				update_ds3_irq();
 			}
 			ds3_reset = val;
-			cpu_yield();
+			cpu_yield(machine->activecpu);
 			logerror("DS III reset = %d\n", val);
 			break;
 
@@ -1231,8 +1231,8 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	/* if we just cleared the IRQ, we are going to do some VERY timing critical reads */
 	/* it is important that all the CPUs be in sync before we continue, so spin a little */
 	/* while to let everyone else catch up */
-	cpu_spinuntil_trigger(DS3_TRIGGER);
-	cpu_triggertime(ATTOTIME_IN_USEC(5), DS3_TRIGGER);
+	cpu_spinuntil_trigger(machine->activecpu, DS3_TRIGGER);
+	cpuexec_triggertime(machine, DS3_TRIGGER, ATTOTIME_IN_USEC(5));
 
 	return ds3_gdata;
 }
@@ -1245,7 +1245,7 @@ WRITE16_HANDLER( hd68k_ds3_gdata_w )
 	COMBINE_DATA(&ds3_g68data);
 	ds3_g68flag = 1;
 	ds3_gcmd = offset & 1;
-	cpu_triggerint(machine, hdcpu_adsp);
+	cpu_triggerint(machine->cpu[hdcpu_adsp]);
 	update_ds3_irq();
 }
 
@@ -1323,7 +1323,7 @@ WRITE16_HANDLER( hdds3_special_w )
 			update_ds3_irq();
 
 			/* once we've written data, trigger the main CPU to wake up again */
-			cpu_trigger(machine, DS3_TRIGGER);
+			cpuexec_trigger(machine, DS3_TRIGGER);
 			break;
 
 		case 1:
@@ -1436,11 +1436,11 @@ WRITE16_HANDLER( hd68k_dsk_control_w )
 	switch (offset & 7)
 	{
 		case 0:	/* DSPRESTN */
-			cpunum_set_input_line(machine, hdcpu_dsp32, INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[hdcpu_dsp32], INPUT_LINE_RESET, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 1:	/* DSPZN */
-			cpunum_set_input_line(machine, hdcpu_dsp32, INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[hdcpu_dsp32], INPUT_LINE_HALT, val ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 2:	/* ZW1 */
@@ -1765,7 +1765,7 @@ READ16_HANDLER( hdgsp_speedup_r )
 		cpunum_get_active() == hdcpu_gsp && cpu_get_pc(machine->activecpu) == hdgsp_speedup_pc)
 	{
 		gsp_speedup_count[0]++;
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return result;
@@ -1778,7 +1778,7 @@ WRITE16_HANDLER( hdgsp_speedup1_w )
 
 	/* if $ffff is written, send an "interrupt" trigger to break us out of the spin loop */
 	if (hdgsp_speedup_addr[0][offset] == 0xffff)
-		cpu_triggerint(machine, hdcpu_gsp);
+		cpu_triggerint(machine->cpu[hdcpu_gsp]);
 }
 
 
@@ -1788,7 +1788,7 @@ WRITE16_HANDLER( hdgsp_speedup2_w )
 
 	/* if $ffff is written, send an "interrupt" trigger to break us out of the spin loop */
 	if (hdgsp_speedup_addr[1][offset] == 0xffff)
-		cpu_triggerint(machine, hdcpu_gsp);
+		cpu_triggerint(machine->cpu[hdcpu_gsp]);
 }
 
 
@@ -1810,7 +1810,7 @@ READ16_HANDLER( rdgsp_speedup1_r )
 		(result & 0xff) < cpu_get_reg(machine->activecpu, TMS34010_A1))
 	{
 		gsp_speedup_count[0]++;
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return result;
@@ -1821,7 +1821,7 @@ WRITE16_HANDLER( rdgsp_speedup1_w )
 {
 	COMBINE_DATA(&hdgsp_speedup_addr[0][offset]);
 	if (cpunum_get_active() != hdcpu_gsp)
-		cpu_triggerint(machine, hdcpu_gsp);
+		cpu_triggerint(machine->cpu[hdcpu_gsp]);
 }
 
 
@@ -1844,7 +1844,7 @@ READ16_HANDLER( hdmsp_speedup_r )
 	if (data == 0 && cpu_get_pc(machine->activecpu) == hdmsp_speedup_pc && cpunum_get_active() == hdcpu_msp)
 	{
 		msp_speedup_count[0]++;
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return data;
@@ -1855,7 +1855,7 @@ WRITE16_HANDLER( hdmsp_speedup_w )
 {
 	COMBINE_DATA(&hdmsp_speedup_addr[offset]);
 	if (offset == 0 && hdmsp_speedup_addr[offset] != 0)
-		cpu_triggerint(machine, hdcpu_msp);
+		cpu_triggerint(machine->cpu[hdcpu_msp]);
 }
 
 
@@ -1876,7 +1876,7 @@ READ16_HANDLER( stmsp_speedup_r )
 		cpu_get_pc(machine->activecpu) == 0x3c0)
 	{
 		msp_speedup_count[0]++;
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 	return stmsp_sync[0][1];
 }
@@ -1901,7 +1901,7 @@ READ16_HANDLER( hdadsp_speedup_r )
 	if (data == 0xffff && cpu_get_pc(machine->activecpu) <= 0x3b && cpunum_get_active() == hdcpu_adsp)
 	{
 		adsp_speedup_count[0]++;
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return data;
@@ -1915,7 +1915,7 @@ READ16_HANDLER( hdds3_speedup_r )
 	if (data != 0 && cpu_get_pc(machine->activecpu) == hdds3_speedup_pc && cpunum_get_active() == hdcpu_adsp)
 	{
 		adsp_speedup_count[2]++;
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return data;

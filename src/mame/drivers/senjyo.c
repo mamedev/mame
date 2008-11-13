@@ -88,7 +88,7 @@ static MACHINE_RESET( senjyo )
 
 static INTERRUPT_GEN( senjyo_interrupt )
 {
-	if (int_delay_kludge == 0) cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	if (int_delay_kludge == 0) cpu_set_input_line(device, 0, HOLD_LINE);
 	else int_delay_kludge--;
 }
 

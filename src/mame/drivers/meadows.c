@@ -207,7 +207,7 @@ static WRITE8_HANDLER( meadows_audio_w )
 
 static INPUT_CHANGED( coin_inserted )
 {
-	cpunum_set_input_line_and_vector(field->port->machine, 0, 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
+	cpu_set_input_line_and_vector(field->port->machine->cpu[0], 0, (newval ? ASSERT_LINE : CLEAR_LINE), 0x82);
 }
 
 
@@ -222,7 +222,7 @@ static INTERRUPT_GEN( meadows_interrupt )
 {
     /* fake something toggling the sense input line of the S2650 */
 	main_sense_state ^= 1;
-	cpunum_set_input_line(machine, 0, 1, main_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device, 1, main_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -236,7 +236,7 @@ static INTERRUPT_GEN( meadows_interrupt )
 static INTERRUPT_GEN( minferno_interrupt )
 {
 	main_sense_state++;
-	cpunum_set_input_line(machine, 0, 1, (main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(device, 1, (main_sense_state & 0x40) ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -318,7 +318,7 @@ static INTERRUPT_GEN( audio_interrupt )
 {
     /* fake something toggling the sense input line of the S2650 */
 	audio_sense_state ^= 1;
-	cpunum_set_input_line(machine, 1, 1, audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device, 1, audio_sense_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

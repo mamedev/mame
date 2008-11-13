@@ -98,9 +98,9 @@ static UINT8 agallet_vblank_irq;
 static void update_irq_state(running_machine *machine)
 {
 	if (vblank_irq || sound_irq || unknown_irq)
-		cpunum_set_input_line(machine, 0, irq_level, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], irq_level, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, irq_level, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], irq_level, CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( cave_vblank_start )
@@ -222,8 +222,8 @@ static WRITE16_HANDLER( sound_cmd_w )
 //  sound_flag1 = 1;
 //  sound_flag2 = 1;
 	soundlatch_word_w(machine,offset,data,mem_mask);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(50));	// Allow the other cpu to reply
 }
 
 /* Sound CPU: read the low 8 bits of the 16 bit sound latch */
@@ -1068,7 +1068,7 @@ static READ16_HANDLER( agallet_irq_cause_r )
 	{
 // Speed hack for agallet
 		if ((cpu_get_pc(machine->activecpu) == 0xcdca) && (irq_cause & 4))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return irq_cause;
@@ -1961,7 +1961,7 @@ static const ymz280b_interface ymz280b_intf =
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =

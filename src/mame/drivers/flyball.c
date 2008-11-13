@@ -28,7 +28,7 @@ static TIMER_CALLBACK( flyball_joystick_callback )
 	int potsense = param;
 
 	if (potsense & ~flyball_potmask)
-		cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, PULSE_LINE);
 
 	flyball_potsense |= potsense;
 }

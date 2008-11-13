@@ -48,37 +48,37 @@ WRITE16_HANDLER( apache3_bank_w )
 	if (tatsumi_control_word&0x7f00)
 	{
 		logerror("Unknown control Word: %04x\n",tatsumi_control_word);
-		cpunum_set_input_line(machine, 3, INPUT_LINE_HALT, CLEAR_LINE); // ?
+		cpu_set_input_line(machine->cpu[3], INPUT_LINE_HALT, CLEAR_LINE); // ?
 	}
 	if ((tatsumi_control_word&0x8)==0 && !(tatsumi_last_control&0x8))
-		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ4, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ4, ASSERT_LINE);
 
 	if (tatsumi_control_word&0x10)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 
 	if (tatsumi_control_word&0x80)
-		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
 
 	tatsumi_last_control=tatsumi_control_word;
 }
 
 WRITE16_HANDLER( apache3_irq_ack_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ4, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ4, CLEAR_LINE);
 
 	if ((data&2) && (tatsumi_last_irq&2)==0)
 	{
-		cpunum_set_input_line(machine, 3, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[3], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	if ((tatsumi_last_irq&2) && (data&2)==0)
 	{
-		cpunum_set_input_line(machine, 3, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line_and_vector(machine, 3, 0, HOLD_LINE, 0xc7 | 0x10);
+		cpu_set_input_line(machine->cpu[3], INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line_and_vector(machine->cpu[3], 0, HOLD_LINE, 0xc7 | 0x10);
 	}
 
 	tatsumi_last_irq=data;
@@ -186,14 +186,14 @@ WRITE16_HANDLER( roundup5_control_w )
 	COMBINE_DATA(&tatsumi_control_word);
 
 	if (tatsumi_control_word&0x10)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 
 	if (tatsumi_control_word&0x4)
-		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
 
 //  if (offset==1 && (tatsumi_control_w&0xfeff)!=(last_bank&0xfeff))
 //      logerror("%08x:  Changed bank to %04x (%d)\n",cpu_get_pc(machine->activecpu),tatsumi_control_w,offset);
@@ -219,7 +219,7 @@ WRITE16_HANDLER( roundup5_control_w )
     */
 
 	if ((tatsumi_control_word&0x8)==0 && !(tatsumi_last_control&0x8))
-		cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ4, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ4, ASSERT_LINE);
 //  if (tatsumi_control_w&0x200)
 //      cpu_set_reset_line(1, CLEAR_LINE);
 //  else
@@ -252,7 +252,7 @@ WRITE16_HANDLER( roundup5_e0000_w )
     */
 
 	COMBINE_DATA(&roundup5_e0000_ram[offset]);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ4, CLEAR_LINE); // guess, probably wrong
 
 //  logerror("d_68k_e0000_w %06x %04x\n",cpu_get_pc(machine->activecpu),data);
 }
@@ -283,12 +283,12 @@ WRITE16_HANDLER(cyclwarr_control_w)
 
 	if ((tatsumi_control_word&4)==4 && (tatsumi_last_control&4)==0) {
 //      logerror("68k 2 halt\n");
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 	if ((tatsumi_control_word&4)==0 && (tatsumi_last_control&4)==4) {
 //      logerror("68k 2 irq go\n");
-		cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 

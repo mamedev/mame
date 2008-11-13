@@ -170,7 +170,7 @@ static READ32_HANDLER( gunbird_input_r )
 static TIMER_CALLBACK( psikyo_soundlatch_callback )
 {
 	psikyo_soundlatch = param;
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	z80_nmi = 1;
 }
 
@@ -376,7 +376,7 @@ ADDRESS_MAP_END
 
 static void sound_irq( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static READ8_HANDLER( psikyo_soundlatch_r )
@@ -386,7 +386,7 @@ static READ8_HANDLER( psikyo_soundlatch_r )
 
 static WRITE8_HANDLER( psikyo_clear_nmi_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	z80_nmi = 0;
 }
 
@@ -1313,9 +1313,9 @@ MACHINE_DRIVER_END
 static void irqhandler(running_machine *machine, int linestate)
 {
 	if (linestate)
-		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static const ymf278b_interface ymf278b_config =

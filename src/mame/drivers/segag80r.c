@@ -160,7 +160,7 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -303,8 +303,8 @@ static WRITE8_HANDLER( coin_count_w )
 static WRITE8_DEVICE_HANDLER( sindbadm_soundport_w )
 {
 	soundlatch_w(device->machine,0,data);
-	cpunum_set_input_line(device->machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-	cpu_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(50));
 }
 
 

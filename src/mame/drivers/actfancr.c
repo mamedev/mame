@@ -69,7 +69,7 @@ static READ8_HANDLER( triothep_control_r )
 static WRITE8_HANDLER( actfancr_sound_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /******************************************************************************/
@@ -278,7 +278,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,0,linestate); /* IRQ */
+	cpu_set_input_line(machine->cpu[1],0,linestate); /* IRQ */
 }
 
 static const ym3812_interface ym3812_config =
@@ -552,7 +552,7 @@ static READ8_HANDLER( cycle_r )
 	if (offset==1) return actfancr_ram[0x27];
 
 	if (pc==0xe29a && ret==0) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 		return 1;
 	}
 
@@ -567,7 +567,7 @@ static READ8_HANDLER( cyclej_r )
 	if (offset==1) return actfancr_ram[0x27];
 
 	if (pc==0xe2b1 && ret==0) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 		return 1;
 	}
 

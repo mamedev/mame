@@ -38,7 +38,7 @@ static WRITE8_HANDLER( mouser_nmi_enable_w )
 static INTERRUPT_GEN( mouser_nmi_interrupt )
 {
 	if ((mouser_nmi_enable & 1) == 1)
-		nmi_line_pulse(machine, cpunum);
+		nmi_line_pulse(device);
 }
 
 /* Sound CPU interrupted on write */
@@ -46,7 +46,7 @@ static INTERRUPT_GEN( mouser_nmi_interrupt )
 static WRITE8_HANDLER( mouser_sound_interrupt_w )
 {
 	mouser_sound_byte = data;
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( mouser_sound_byte_r )

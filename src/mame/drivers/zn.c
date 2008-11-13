@@ -651,13 +651,13 @@ static WRITE8_HANDLER( qsound_bankswitch_w )
 
 static INTERRUPT_GEN( qsound_interrupt )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( zn_qsound_w )
 {
 	soundlatch_w(machine, 0, data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static DRIVER_INIT( coh1000c )
@@ -678,7 +678,7 @@ static DRIVER_INIT( coh1000c )
 		/* disable:
             the QSound CPU for glpracr as it doesn't have any roms &
             the link cpu for glprac2l as the h/w is not emulated yet. */
-		cpunum_suspend( 1, SUSPEND_REASON_DISABLE, 1 );
+		cpu_suspend( machine->cpu[1], SUSPEND_REASON_DISABLE, 1 );
 	}
 }
 
@@ -1224,7 +1224,7 @@ ADDRESS_MAP_END
 /* handler called by the YM2610 emulator when the internal timers cause an IRQ */
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =
@@ -1819,7 +1819,7 @@ static WRITE32_HANDLER( coh1002e_bank_w )
 static WRITE32_HANDLER( coh1002e_latch_w )
 {
 	if (offset)
-		cpunum_set_input_line(machine, 1, 2, HOLD_LINE);	// irq 2 on the 68k
+		cpu_set_input_line(machine->cpu[1], 2, HOLD_LINE);	// irq 2 on the 68k
 	else
 		soundlatch_w(machine, 0, data);
 }
@@ -2252,13 +2252,13 @@ static INTERRUPT_GEN( jdredd_vblank )
 
 	if( jdredd_gun_mux == 0 )
 	{
-		x = input_port_read(machine, "GUN1X");
-		y = input_port_read(machine, "GUN1Y");
+		x = input_port_read(device->machine, "GUN1X");
+		y = input_port_read(device->machine, "GUN1Y");
 	}
 	else
 	{
-		x = input_port_read(machine, "GUN2X");
-		y = input_port_read(machine, "GUN2Y");
+		x = input_port_read(device->machine, "GUN2X");
+		y = input_port_read(device->machine, "GUN2Y");
 	}
 
 	if( x > 0x393 && x < 0xcb2 &&
@@ -2267,7 +2267,7 @@ static INTERRUPT_GEN( jdredd_vblank )
 		psx_lightgun_set( x, y );
 	}
 
-	psx_vblank( machine, cpunum );
+	psx_vblank( device );
 }
 
 static size_t nbajamex_eeprom_size;

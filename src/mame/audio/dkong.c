@@ -1135,9 +1135,9 @@ static WRITE8_HANDLER( dkong_p1_w )
 WRITE8_HANDLER( dkong_audio_irq_w )
 {
 	if (data)
-		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 

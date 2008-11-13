@@ -1150,9 +1150,9 @@ static READ16_HANDLER( vamphalf_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0x82de)
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram[(0x4a6d0/2)+offset];
@@ -1163,9 +1163,9 @@ static READ16_HANDLER( misncrft_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0xecc8)
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram[(0x72eb4/2)+offset];
@@ -1176,9 +1176,9 @@ static READ16_HANDLER( coolmini_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0x75f7a)
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram[(0xd2e80/2)+offset];
@@ -1189,9 +1189,9 @@ static READ16_HANDLER( suplup_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0xaf18a )
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram[(0x11605c/2)+offset];
@@ -1202,9 +1202,9 @@ static READ16_HANDLER( luplup_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0xaefac )
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram[(0x115e84/2)+offset];
@@ -1215,9 +1215,9 @@ static READ16_HANDLER( luplup29_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0xae6c0 )
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram[(0x113f08/2)+offset];
@@ -1228,9 +1228,9 @@ static READ16_HANDLER( puzlbang_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0xae6d2 )
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram[(0x113ecc/2)+offset];
@@ -1241,9 +1241,9 @@ static READ32_HANDLER( wyvernwg_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0x10758 )
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram32[0x00b56fc/4];
@@ -1254,9 +1254,9 @@ static READ32_HANDLER( finalgdr_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0x1c212 )
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram32[0x005e874/4];
@@ -1267,9 +1267,9 @@ static READ16_HANDLER( dquizgo2_speedup_r )
 	if(cpu_get_pc(machine->activecpu) == 0xaa622)
 	{
 		if(irq_active(machine))
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 		else
-			activecpu_eat_cycles(50);
+			cpu_eat_cycles(machine->activecpu, 50);
 	}
 
 	return wram[(0xcde70/2)+offset];

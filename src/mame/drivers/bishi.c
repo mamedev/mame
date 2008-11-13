@@ -125,14 +125,14 @@ static INTERRUPT_GEN(bishi_interrupt)
 {
 	if (cur_control & 0x800)
 	{
-		switch (cpu_getiloops())
+		switch (cpu_getiloops(device))
 		{
 			case 0:
-				cpunum_set_input_line(machine, 0, MC68000_IRQ_3, HOLD_LINE);
+				cpu_set_input_line(device, MC68000_IRQ_3, HOLD_LINE);
 				break;
 
 			case 1:
-				cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
+				cpu_set_input_line(device, MC68000_IRQ_4, HOLD_LINE);
 				break;
 		}
 	}
@@ -302,9 +302,9 @@ static MACHINE_RESET( bishi )
 static void sound_irq_gen(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line(machine, 0, MC68000_IRQ_1, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], MC68000_IRQ_1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, MC68000_IRQ_1, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], MC68000_IRQ_1, CLEAR_LINE);
 }
 
 static const ymz280b_interface ymz280b_intf =

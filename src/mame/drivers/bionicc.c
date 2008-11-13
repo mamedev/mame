@@ -138,10 +138,10 @@ static READ16_HANDLER( hacked_soundcommand_r )
 
 static INTERRUPT_GEN( bionicc_interrupt )
 {
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line(device, 2, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+		cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )

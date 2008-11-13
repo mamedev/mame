@@ -133,7 +133,7 @@ static READ32_HANDLER( midvunit_adc_r )
 {
 	if (!(control_data & 0x40))
 	{
-		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, CLEAR_LINE);
 		return adc_data << adc_shift;
 	}
 	else
@@ -144,7 +144,7 @@ static READ32_HANDLER( midvunit_adc_r )
 
 static TIMER_CALLBACK( adc_ready )
 {
-	cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 3, ASSERT_LINE);
 }
 
 
@@ -290,7 +290,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 
 		/* bit 0x200 selects internal clocking, which is 1/2 the main CPU clock rate */
 		if (data & 0x200)
-			timer_rate = (double)(cpunum_get_clock(0) * 0.5);
+			timer_rate = (double)(cpu_get_clock(machine->cpu[0]) * 0.5);
 		else
 			timer_rate = 10000000.;
 	}
@@ -1517,7 +1517,7 @@ ROM_END
 static UINT32 *generic_speedup;
 static READ32_HANDLER( generic_speedup_r )
 {
-	activecpu_eat_cycles(100);
+	cpu_eat_cycles(machine->activecpu, 100);
 	return generic_speedup[offset];
 }
 

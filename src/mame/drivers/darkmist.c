@@ -237,10 +237,10 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( darkmist_interrupt )
 {
-	if(cpu_getiloops())
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x08);
+	if(cpu_getiloops(device))
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x08);
 	else
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x10);
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x10);
 }
 
 

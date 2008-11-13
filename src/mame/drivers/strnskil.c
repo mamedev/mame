@@ -35,7 +35,7 @@ static READ8_HANDLER( strnskil_d800_r )
 {
 /* bit0: interrupt type?, bit1: CPU2 busack? */
 
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(machine->activecpu) == 0)
 		return 0;
 	return 1;
 }

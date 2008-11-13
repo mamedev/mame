@@ -232,10 +232,10 @@ static VIDEO_UPDATE( panicr)
 
 static INTERRUPT_GEN( panicr_interrupt )
 {
-	if (cpu_getiloops())
-		cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc8/4);
+	if (cpu_getiloops(device))
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);
 	else
-		cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc4/4);
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc4/4);
 }
 
 static INPUT_PORTS_START( panicr )

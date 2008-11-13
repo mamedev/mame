@@ -39,20 +39,20 @@ static TIMER_CALLBACK( nmi_32v )
 {
 	int scanline = param;
 	int nmistate = (scanline & 32) && (orbit_misc_flags & 4);
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( orbit_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, irq_off);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
+	timer_set(video_screen_get_time_until_vblank_end(device->machine->primary_screen), NULL, 0, irq_off);
 }
 
 

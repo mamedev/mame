@@ -350,14 +350,14 @@ static READ16_HANDLER( tumblepb_prot_r )
 static WRITE16_HANDLER( tumblepb_sound_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 }
 #endif
 
 static WRITE16_HANDLER( jumppop_sound_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE );
 }
 
 /******************************************************************************/
@@ -471,8 +471,8 @@ static void tumbleb2_playmusic(running_machine *machine)
 
 static INTERRUPT_GEN( tumbleb2_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);
-	tumbleb2_playmusic(machine);
+	cpu_set_input_line(device, 6, HOLD_LINE);
+	tumbleb2_playmusic(device->machine);
 }
 
 static const int tumbleb_sound_lookup[256] = {
@@ -750,7 +750,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( jumpkids_sound_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 }
 
 
@@ -804,8 +804,8 @@ static WRITE16_HANDLER( semicom_soundcmd_w )
 	{
 		soundlatch_w(machine,0,data & 0xff);
 		// needed for Super Trio which reads the sound with polling
-//      cpu_spinuntil_time(ATTOTIME_IN_USEC(100));
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
+//      cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(100));
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
 
 	}
 }
@@ -840,7 +840,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(jumppop_z80latch_r)
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	return soundlatch_r(machine, 0);
 }
 
@@ -2127,7 +2127,7 @@ MACHINE_DRIVER_END
 
 static void semicom_irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

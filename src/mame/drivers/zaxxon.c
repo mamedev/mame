@@ -360,14 +360,14 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static INTERRUPT_GEN( vblank_int )
 {
 	if (int_enabled)
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 
@@ -375,7 +375,7 @@ static WRITE8_HANDLER( int_enable_w )
 {
 	int_enabled = data & 1;
 	if (!int_enabled)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

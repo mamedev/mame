@@ -31,7 +31,7 @@ void triplhnt_set_collision(running_machine *machine, int code)
 {
 	triplhnt_hit_code = code;
 
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 }
 
 

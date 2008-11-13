@@ -471,7 +471,7 @@ static const ymz280b_interface ymz280b_intf =
 
 static INTERRUPT_GEN( deco32_vbl_interrupt )
 {
-	cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -668,8 +668,8 @@ static READ32_HANDLER( backfire_speedup_r )
 {
 //  mame_printf_debug( "%08x\n",cpu_get_pc(machine->activecpu));
 
-	if (cpu_get_pc(machine->activecpu)==0xce44)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400)); // backfire
-	if (cpu_get_pc(machine->activecpu)==0xcee4)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400)); // backfira
+	if (cpu_get_pc(machine->activecpu)==0xce44)  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400)); // backfire
+	if (cpu_get_pc(machine->activecpu)==0xcee4)  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400)); // backfira
 
 	return backfire_mainram[0x18/4];
 }
@@ -680,7 +680,7 @@ static DRIVER_INIT( backfire )
 	deco56_decrypt_gfx(machine, "gfx1"); /* 141 */
 	deco56_decrypt_gfx(machine, "gfx2"); /* 141 */
 	deco156_decrypt(machine);
-	cpunum_set_clockscale(machine, 0, 4.0f); /* core timings aren't accurate */
+	cpu_set_clockscale(machine->cpu[0], 4.0f); /* core timings aren't accurate */
 	descramble_sound(machine);
 	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0170018, 0x017001b, 0, 0, backfire_speedup_r );
 }

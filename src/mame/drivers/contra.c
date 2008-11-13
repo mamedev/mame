@@ -52,7 +52,7 @@ static WRITE8_HANDLER( contra_bankswitch_w )
 
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
 {
-	cpunum_set_input_line(machine, 1,M6809_IRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( contra_coin_counter_w )

@@ -2432,11 +2432,11 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( chmplst2_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);	break;
+		case 0:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
 		default:
-		case 1:	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);	break;
+		case 1:	cpu_set_input_line(device, 5, HOLD_LINE);	break;
 	}
 }
 
@@ -2466,10 +2466,10 @@ MACHINE_DRIVER_END
 
 static INTERRUPT_GEN( grtwall_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:	cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
-		case 1:	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);	break;
+		case 0:	cpu_set_input_line(device, 3, HOLD_LINE);	break;
+		case 1:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
 	}
 }
 
@@ -2487,13 +2487,13 @@ static INTERRUPT_GEN( lhb_interrupt )
 	if (!lhb_irq_enable)
 		return;
 
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:	cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;
-		case 2:	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);	break;
+		case 0:	cpu_set_input_line(device, 3, HOLD_LINE);	break;
+		case 2:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
 		default:
 				// It reads the inputs. Must be called more than once for test mode on boot to work
-				cpunum_set_input_line(machine, 0, 5, HOLD_LINE);	break;
+				cpu_set_input_line(device, 5, HOLD_LINE);	break;
 	}
 }
 
@@ -2508,7 +2508,7 @@ MACHINE_DRIVER_END
 
 static void sound_irq(running_machine *machine, int state)
 {
-//   cpunum_set_input_line(machine, 0, 3, state);
+//   cpu_set_input_line(machine->cpu[0], 3, state);
 }
 
 static const ics2115_interface vbowl_ics2115_interface = {
@@ -2517,13 +2517,13 @@ static const ics2115_interface vbowl_ics2115_interface = {
 
 static INTERRUPT_GEN( vbowl_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0:	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);	break;
-		case 1:	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);	break;
-		case 2:	cpunum_set_input_line(machine, 0, 6, HOLD_LINE);	break;
+		case 0:	cpu_set_input_line(device, 4, HOLD_LINE);	break;
+		case 1:	cpu_set_input_line(device, 5, HOLD_LINE);	break;
+		case 2:	cpu_set_input_line(device, 6, HOLD_LINE);	break;
 		default:
-		case 3:	cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	break;	// sound
+		case 3:	cpu_set_input_line(device, 3, HOLD_LINE);	break;	// sound
 	}
 }
 

@@ -110,7 +110,7 @@ WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 {
 	if (offset==(0x150/2)) {
 		soundlatch_w(machine,0,data&0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -228,7 +228,7 @@ WRITE16_HANDLER( deco16_60_prot_w ) /* Edward Randy */
 {
 	if (offset==(0x64/2)) {
 		soundlatch_w(machine,0,data&0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 	}
 
 	COMBINE_DATA(&deco16_prot_ram[offset]);
@@ -417,7 +417,7 @@ WRITE16_HANDLER( deco16_66_prot_w ) /* Mutant Fighter */
 {
 	if (offset==(0x64/2)) {
 		soundlatch_w(machine,0,data&0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -603,7 +603,7 @@ WRITE16_HANDLER( deco16_104_cninja_prot_w )
 {
 	if (offset==(0xa8/2)) {
 		soundlatch_w(machine,0,data&0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -665,7 +665,7 @@ WRITE16_HANDLER( deco16_146_funkyjet_prot_w )
 
 	if (offset == (0x10a >> 1)) {
 		soundlatch_w(machine,0,data&0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 }
@@ -784,7 +784,7 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 
 	if (offset==(0xa8/2)) {
 		soundlatch_w(machine,0,data&0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -1213,7 +1213,7 @@ static WRITE16_HANDLER( deco16_146_core_prot_w )
 	const int maskport=0x6c0;
 	if (writeport==sndport) {
 		soundlatch_w(machine,0,data&0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -1741,7 +1741,7 @@ WRITE16_HANDLER( dietgo_104_prot_w )
 {
 	if (offset==(0x380/2)) {
 		soundlatch_w(machine,0,data&0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 	logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n",cpu_get_pc(machine->activecpu),offset<<1,data);

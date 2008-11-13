@@ -66,18 +66,18 @@ static void yboard_generic_init(void)
 
 static void update_main_irqs(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 2, 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 2, 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 2, 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 2, timer_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 4, vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 6, timer_irq_state && vblank_irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	if(timer_irq_state || vblank_irq_state)
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
 }
 
 
@@ -193,14 +193,14 @@ static MACHINE_RESET( yboard )
 
 static void sound_cpu_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 3, 0, state);
+	cpu_set_input_line(machine->cpu[3], 0, state);
 }
 
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	soundlatch_w(machine, 0, param);
-	cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -213,7 +213,7 @@ static WRITE16_HANDLER( sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(machine,offset);
 }
 
@@ -305,9 +305,9 @@ static WRITE16_HANDLER( io_chip_w )
             */
 			segaic16_set_display_enable(machine, data & 0x80);
 			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(machine,0,0);
-			cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-			cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		/* mute */

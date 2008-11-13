@@ -81,11 +81,11 @@ static bitmap_t *sprite_bitmap_1;
 
 static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
 {
-	switch ( cpu_getiloops() )
+	switch ( cpu_getiloops(device) )
 	{
-		case 2:  cpunum_set_input_line(machine, 0, 2, HOLD_LINE); break;
-		case 1:  cpunum_set_input_line(machine, 0, 3, HOLD_LINE); break;
-		case 0:  cpunum_set_input_line(machine, 0, 5, HOLD_LINE); break;
+		case 2:  cpu_set_input_line(device, 2, HOLD_LINE); break;
+		case 1:  cpu_set_input_line(device, 3, HOLD_LINE); break;
+		case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break;
 	}
 }
 

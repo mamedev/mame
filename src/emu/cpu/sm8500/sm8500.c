@@ -502,13 +502,13 @@ CPU_GET_INFO( sm8500 )
 	case CPUINFO_PTR_DISASSEMBLE:			info->disassemble = CPU_DISASSEMBLE_NAME(sm8500); break;
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &sm8500_icount; break;
 
-	case CPUINFO_STR_NAME:					strcpy( info->s = cpuintrf_temp_str(), "sm8500" ); break;
-	case CPUINFO_STR_CORE_FAMILY:				strcpy( info->s = cpuintrf_temp_str(), "Sharp SM8500" ); break;
-	case CPUINFO_STR_CORE_VERSION:				strcpy( info->s = cpuintrf_temp_str(), "0.1" ); break;
-	case CPUINFO_STR_CORE_FILE:				strcpy( info->s = cpuintrf_temp_str(), __FILE__ ); break;
-	case CPUINFO_STR_CORE_CREDITS:				strcpy( info->s = cpuintrf_temp_str(), "Copyright The MESS Team." ); break;
+	case CPUINFO_STR_NAME:					strcpy( info->s, "sm8500" ); break;
+	case CPUINFO_STR_CORE_FAMILY:				strcpy( info->s, "Sharp SM8500" ); break;
+	case CPUINFO_STR_CORE_VERSION:				strcpy( info->s, "0.1" ); break;
+	case CPUINFO_STR_CORE_FILE:				strcpy( info->s, __FILE__ ); break;
+	case CPUINFO_STR_CORE_CREDITS:				strcpy( info->s, "Copyright The MESS Team." ); break;
 	case CPUINFO_STR_FLAGS:
-		sprintf( info->s = cpuintrf_temp_str(), "%c%c%c%c%c%c%c%c",
+		sprintf( info->s, "%c%c%c%c%c%c%c%c",
 			regs.PS1 & FLAG_C ? 'C' : '.',
 			regs.PS1 & FLAG_Z ? 'Z' : '.',
 			regs.PS1 & FLAG_S ? 'S' : '.',
@@ -518,18 +518,18 @@ CPU_GET_INFO( sm8500 )
 			regs.PS1 & FLAG_B ? 'B' : '.',
 			regs.PS1 & FLAG_I ? 'I' : '.' );
 		break;
-	case CPUINFO_STR_REGISTER + SM8500_RR0:			sprintf(info->s = cpuintrf_temp_str(), "RR0:%04X", sm85cpu_mem_readword( 0x00 ) ); break;
-	case CPUINFO_STR_REGISTER + SM8500_RR2:			sprintf(info->s = cpuintrf_temp_str(), "RR2:%04X", sm85cpu_mem_readword( 0x02 ) ); break;
-	case CPUINFO_STR_REGISTER + SM8500_RR4:			sprintf(info->s = cpuintrf_temp_str(), "RR4:%04X", sm85cpu_mem_readword( 0x04 ) ); break;
-	case CPUINFO_STR_REGISTER + SM8500_RR6:			sprintf(info->s = cpuintrf_temp_str(), "RR6:%04X", sm85cpu_mem_readword( 0x06 ) ); break;
-	case CPUINFO_STR_REGISTER + SM8500_RR8:			sprintf(info->s = cpuintrf_temp_str(), "RR8:%04X", sm85cpu_mem_readword( 0x08 ) ); break;
-	case CPUINFO_STR_REGISTER + SM8500_RR10:		sprintf(info->s = cpuintrf_temp_str(), "RR10:%04X", sm85cpu_mem_readword( 0x0A ) ); break;
-	case CPUINFO_STR_REGISTER + SM8500_RR12:		sprintf(info->s = cpuintrf_temp_str(), "RR12:%04X", sm85cpu_mem_readword( 0x0C ) ); break;
-	case CPUINFO_STR_REGISTER + SM8500_RR14:		sprintf(info->s = cpuintrf_temp_str(), "RR14:%04X", sm85cpu_mem_readword( 0x0E ) ); break;
-	case CPUINFO_STR_REGISTER + SM8500_PC:			sprintf(info->s = cpuintrf_temp_str(), "PC:%04X", regs.PC); break;
-	case CPUINFO_STR_REGISTER + SM8500_SP:			sprintf(info->s = cpuintrf_temp_str(), "SP:%04X", regs.SP); break;
-	case CPUINFO_STR_REGISTER + SM8500_PS:			sprintf(info->s = cpuintrf_temp_str(), "PS:%04X", ( regs.PS0 << 8 ) | regs.PS1 ); break;
-	case CPUINFO_STR_REGISTER + SM8500_SYS16:		sprintf(info->s = cpuintrf_temp_str(), "SYS:%04X", regs.SYS ); break;
+	case CPUINFO_STR_REGISTER + SM8500_RR0:			sprintf(info->s, "RR0:%04X", sm85cpu_mem_readword( 0x00 ) ); break;
+	case CPUINFO_STR_REGISTER + SM8500_RR2:			sprintf(info->s, "RR2:%04X", sm85cpu_mem_readword( 0x02 ) ); break;
+	case CPUINFO_STR_REGISTER + SM8500_RR4:			sprintf(info->s, "RR4:%04X", sm85cpu_mem_readword( 0x04 ) ); break;
+	case CPUINFO_STR_REGISTER + SM8500_RR6:			sprintf(info->s, "RR6:%04X", sm85cpu_mem_readword( 0x06 ) ); break;
+	case CPUINFO_STR_REGISTER + SM8500_RR8:			sprintf(info->s, "RR8:%04X", sm85cpu_mem_readword( 0x08 ) ); break;
+	case CPUINFO_STR_REGISTER + SM8500_RR10:		sprintf(info->s, "RR10:%04X", sm85cpu_mem_readword( 0x0A ) ); break;
+	case CPUINFO_STR_REGISTER + SM8500_RR12:		sprintf(info->s, "RR12:%04X", sm85cpu_mem_readword( 0x0C ) ); break;
+	case CPUINFO_STR_REGISTER + SM8500_RR14:		sprintf(info->s, "RR14:%04X", sm85cpu_mem_readword( 0x0E ) ); break;
+	case CPUINFO_STR_REGISTER + SM8500_PC:			sprintf(info->s, "PC:%04X", regs.PC); break;
+	case CPUINFO_STR_REGISTER + SM8500_SP:			sprintf(info->s, "SP:%04X", regs.SP); break;
+	case CPUINFO_STR_REGISTER + SM8500_PS:			sprintf(info->s, "PS:%04X", ( regs.PS0 << 8 ) | regs.PS1 ); break;
+	case CPUINFO_STR_REGISTER + SM8500_SYS16:		sprintf(info->s, "SYS:%04X", regs.SYS ); break;
 	}
 }
 

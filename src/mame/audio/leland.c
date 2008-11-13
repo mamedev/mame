@@ -616,7 +616,7 @@ static IRQ_CALLBACK(int_callback)
 	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time()), i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
-	cpu_set_info_int(machine->activecpu, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
+	cpu_set_info_int(device->machine->activecpu, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
 	i80186.intr.pending = 0;
 
 	/* clear the request and set the in-service bit */
@@ -724,7 +724,7 @@ generate_int:
 	/* generate the appropriate interrupt */
 	i80186.intr.poll_status = 0x8000 | new_vector;
 	if (!i80186.intr.pending)
-		cpunum_set_input_line(Machine, 2, 0, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[2], 0, ASSERT_LINE);
 	i80186.intr.pending = 1;
 	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time()), new_vector);
 }
@@ -1093,7 +1093,7 @@ static READ16_HANDLER( i80186_internal_port_r )
 		case 0x24/2:
 			if (LOG_PORTS) logerror("%05X:read 80186 interrupt poll\n", cpu_get_pc(machine->activecpu));
 			if (i80186.intr.poll_status & 0x8000)
-				int_callback(machine, 0);
+				int_callback(machine->activecpu, 0);
 			return i80186.intr.poll_status;
 
 		case 0x26/2:
@@ -1429,7 +1429,7 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 			/* we need to do this at a time when the 80186 context is swapped in */
 			/* this register is generally set once at startup and never again, so it's a good */
 			/* time to set it up */
-			cpunum_set_irq_callback(cpunum_get_active(), int_callback);
+			cpu_set_irq_callback(machine->activecpu, int_callback);
 			break;
 
 		case 0xc0/2:
@@ -1660,14 +1660,14 @@ WRITE8_HANDLER( leland_80186_control_w )
 	}
 
 	/* /RESET */
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, data & 0x80  ? CLEAR_LINE : ASSERT_LINE);
 
 	/* /NMI */
 /*  If the master CPU doesn't get a response by the time it's ready to send
     the next command, it uses an NMI to force the issue; unfortunately, this
     seems to really screw up the sound system. It turns out it's better to
     just wait for the original interrupt to occur naturally */
-/*  cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
+/*  cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, data & 0x40  ? CLEAR_LINE : ASSERT_LINE);*/
 
 	/* INT0 */
 	if (data & 0x20)

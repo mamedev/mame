@@ -69,7 +69,7 @@ static WRITE16_HANDLER( ddragon3_io16_w )
 
 		case 1: /* soundlatch_w */
 		soundlatch_w(machine,1,reg[1]&0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
@@ -453,7 +453,7 @@ GFXDECODE_END
 
 static void dd3_ymirq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -468,11 +468,11 @@ static const ym2151_interface ym2151_config =
  *************************************/
 
 static INTERRUPT_GEN( ddragon3_cpu_interrupt ) { /* 6:0x177e - 5:0x176a */
-	if( cpu_getiloops() == 0 ){
-		cpunum_set_input_line(machine, 0, 6, HOLD_LINE);  /* VBlank */
+	if( cpu_getiloops(device) == 0 ){
+		cpu_set_input_line(device, 6, HOLD_LINE);  /* VBlank */
 	}
 	else {
-		cpunum_set_input_line(machine, 0, 5, HOLD_LINE); /* Input Ports */
+		cpu_set_input_line(device, 5, HOLD_LINE); /* Input Ports */
 	}
 }
 

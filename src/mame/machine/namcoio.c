@@ -826,11 +826,11 @@ void namcoio_init(int chipnum, int type, const struct namcoio_interface *intf)
 
 static TIMER_CALLBACK( nmi_generate )
 {
-	if (!cpunum_is_suspended(param, SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
+	if (!cpu_is_suspended(machine->cpu[param], SUSPEND_REASON_HALT | SUSPEND_REASON_RESET | SUSPEND_REASON_DISABLE))
 	{
 		LOG(("NMI cpu %d\n",nmi_cpu[param]));
 
-		cpunum_set_input_line(machine, nmi_cpu[param], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[nmi_cpu[param]], INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		LOG(("NMI not generated because cpu %d is suspended\n",nmi_cpu[param]));

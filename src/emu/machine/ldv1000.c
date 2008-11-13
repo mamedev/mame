@@ -277,7 +277,7 @@ static void ldv1000_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fiel
 	timer_set(video_screen_get_time_until_pos(ld->screen, 19*2, 0), ld, 0, vbi_data_fetch);
 
 	/* boost interleave for the first 1ms to improve communications */
-	cpu_boost_interleave(ld->device->machine, attotime_zero, ATTOTIME_IN_MSEC(1));
+	cpuexec_boost_interleave(ld->device->machine, attotime_zero, ATTOTIME_IN_MSEC(1));
 }
 
 
@@ -437,7 +437,7 @@ static TIMER_DEVICE_CALLBACK( multijump_timer )
 static void ctc_interrupt(const device_config *device, int state)
 {
 	laserdisc_state *ld = find_ldv1000(device->machine);
-	cpunum_set_input_line(device->machine, ld->player->cpunum, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[ld->player->cpunum], 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

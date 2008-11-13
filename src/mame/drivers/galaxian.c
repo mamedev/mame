@@ -237,7 +237,7 @@ static INTERRUPT_GEN( interrupt_gen )
 	/* interrupt line is clocked at VBLANK */
 	/* a flip-flop at 6F is held in the preset state based on the NMI ON signal */
 	if (irq_enabled)
-		cpunum_set_input_line(machine, 0, irq_line, ASSERT_LINE);
+		cpu_set_input_line(device, irq_line, ASSERT_LINE);
 }
 
 
@@ -248,7 +248,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	/* if CLEAR is held low, we must make sure the interrupt signal is clear */
 	if (!irq_enabled)
-		cpunum_set_input_line(machine, 0, irq_line, CLEAR_LINE);
+		cpu_set_input_line(machine->activecpu, irq_line, CLEAR_LINE);
 }
 
 
@@ -326,7 +326,7 @@ static WRITE8_DEVICE_HANDLER( konami_sound_control_w )
 	/* the inverse of bit 3 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x08) && !(data & 0x08))
-		cpunum_set_input_line(device->machine, 1, 0, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[1], 0, HOLD_LINE);
 
 	/* bit 4 is sound disable */
 	sound_global_enable(~data & 0x10);
@@ -349,7 +349,7 @@ static READ8_HANDLER( konami_sound_timer_r )
         current counter index, we use the sound cpu clock times 8 mod
         16*16*2*8*5*2.
     */
-	UINT32 cycles = (cpunum_gettotalcycles(1) * 8) % (UINT64)(16*16*2*8*5*2);
+	UINT32 cycles = (cpu_get_total_cycles(machine->cpu[1]) * 8) % (UINT64)(16*16*2*8*5*2);
 	UINT8 hibit = 0;
 
 	/* separate the high bit from the others */
@@ -536,13 +536,13 @@ static const ppi8255_interface scramble_ppi8255_1_intf =
 
 static WRITE8_HANDLER( explorer_sound_control_w )
 {
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( explorer_sound_latch_r )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	return soundlatch_r(machine, 0);
 }
 
@@ -579,7 +579,7 @@ static WRITE8_HANDLER( sfx_sample_control_w )
 	/* the inverse of bit 0 clocks the flip flop to signal an INT */
 	/* it is automatically cleared on the acknowledge */
 	if ((old & 0x01) && !(data & 0x01))
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 
@@ -654,7 +654,7 @@ static READ8_HANDLER( frogger_sound_timer_r )
 
 static WRITE8_HANDLER( froggrmc_sound_control_w )
 {
-	cpunum_set_input_line(machine, 1, 0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -809,7 +809,7 @@ static INPUT_CHANGED( gmgalax_game_changed )
 	galaxian_stars_enable_w(field->port->machine, 0, 0);
 
 	/* reset the CPU */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 
@@ -993,13 +993,13 @@ static READ8_HANDLER( jumpbug_protection_r )
 static WRITE8_HANDLER( checkman_sound_command_w )
 {
 	soundlatch_w(machine, 0, data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
 static TIMER_CALLBACK( checkmaj_irq0_gen )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 

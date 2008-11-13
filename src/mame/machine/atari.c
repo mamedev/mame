@@ -69,7 +69,7 @@ void atari_interrupt_cb(running_machine *machine, int mask)
 			logerror("atari interrupt_cb TIMR1\n");
 	}
 
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
 }
 
 /**************************************************************

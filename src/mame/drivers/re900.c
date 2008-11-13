@@ -234,12 +234,12 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( re900_video_interrupt )
 {
-	TMS9928A_interrupt(machine);
+	TMS9928A_interrupt(device->machine);
 }
 
 static void vdp_interrupt (running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

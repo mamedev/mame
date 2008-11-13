@@ -120,8 +120,8 @@ static UINT8 *bank_source_data;
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 2, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 2, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -131,7 +131,7 @@ static void scanline_update(const device_config *screen, int scanline)
 	if (scanline & 32)
 		atarigen_6502_irq_ack_r(screen->machine, 0);
 	else if (!(input_port_read(screen->machine, "FE4000") & 0x40))
-		atarigen_6502_irq_gen(screen->machine, 0);
+		atarigen_6502_irq_gen(screen->machine->cpu[1]);
 }
 
 
@@ -157,7 +157,7 @@ static MACHINE_RESET( badlands )
 
 static INTERRUPT_GEN( vblank_int )
 {
-	int pedal_state = input_port_read(machine, "PEDALS");
+	int pedal_state = input_port_read(device->machine, "PEDALS");
 	int i;
 
 	/* update the pedals once per frame */
@@ -168,7 +168,7 @@ static INTERRUPT_GEN( vblank_int )
 			pedal_value[i]++;
 	}
 
-	atarigen_video_int_gen(machine, cpunum);
+	atarigen_video_int_gen(device);
 }
 
 
@@ -603,7 +603,7 @@ GFXDECODE_END
 
 static void update_interrupts_bootleg(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -613,7 +613,7 @@ static void scanline_update_bootleg(const device_config *screen, int scanline)
 //  if (scanline & 32)
 //      atarigen_6502_irq_ack_r(screen->machine, 0);
 //  else if (!(input_port_read(machine, "FE4000") & 0x40))
-//      atarigen_6502_irq_gen(screen->machine, 0);
+//      atarigen_6502_irq_gen(screen->machine->cpu[1]);
 }
 
 

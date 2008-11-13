@@ -116,7 +116,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* if this is a rising edge of 16V, assert the CPU interrupt */
 	if (scanline % 32 == 16)
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 
 	/* update the DAC state */
 	dac_data_w(0, (videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
@@ -138,7 +138,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -182,9 +182,9 @@ static READ8_HANDLER( switches_r )
 static void update_nmi_state(running_machine *machine)
 {
 	if ((pot_trigger[0] & ~pot_mask[0]) | (pot_trigger[1] & ~pot_mask[1]))
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

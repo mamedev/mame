@@ -29,6 +29,7 @@
 // SJE: Implemented internal register file
 
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "debugger.h"
 #include "tms7000.h"
 #include "deprecat.h"
@@ -338,14 +339,14 @@ CPU_GET_INFO( tms7000 )
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:	info->internal_map8 = ADDRESS_MAP_NAME(tms7000_mem); break;
 
         /* --- the following bits of info are returned as NULL-terminated strings --- */
-        case CPUINFO_STR_NAME:	strcpy(info->s = cpuintrf_temp_str(), "TMS7000"); break;
-        case CPUINFO_STR_CORE_FAMILY:	strcpy(info->s = cpuintrf_temp_str(), "Texas Instriuments TMS7000"); break;
-        case CPUINFO_STR_CORE_VERSION:	strcpy(info->s = cpuintrf_temp_str(), "1.0"); break;
-        case CPUINFO_STR_CORE_FILE:	strcpy(info->s = cpuintrf_temp_str(), __FILE__); break;
-        case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s = cpuintrf_temp_str(), "Copyright tim lindner"); break;
+        case CPUINFO_STR_NAME:	strcpy(info->s, "TMS7000"); break;
+        case CPUINFO_STR_CORE_FAMILY:	strcpy(info->s, "Texas Instriuments TMS7000"); break;
+        case CPUINFO_STR_CORE_VERSION:	strcpy(info->s, "1.0"); break;
+        case CPUINFO_STR_CORE_FILE:	strcpy(info->s, __FILE__); break;
+        case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s, "Copyright tim lindner"); break;
 
         case CPUINFO_STR_FLAGS:
-                sprintf(info->s = cpuintrf_temp_str(),  "%c%c%c%c%c%c%c%c",
+                sprintf(info->s,  "%c%c%c%c%c%c%c%c",
                         tms7000.sr & 0x80 ? 'C':'c',
                         tms7000.sr & 0x40 ? 'N':'n',
                         tms7000.sr & 0x20 ? 'Z':'z',
@@ -356,13 +357,13 @@ CPU_GET_INFO( tms7000 )
                         tms7000.sr & 0x01 ? '?':'.' );
                 break;
 
-        case CPUINFO_STR_REGISTER + TMS7000_PC:	sprintf(info->s = cpuintrf_temp_str(), "PC:%04X", tms7000.pc.w.l); break;
-        case CPUINFO_STR_REGISTER + TMS7000_SP:	sprintf(info->s = cpuintrf_temp_str(), "S:%02X", tms7000.sp); break;
-        case CPUINFO_STR_REGISTER + TMS7000_ST:	sprintf(info->s = cpuintrf_temp_str(), "ST:%02X", tms7000.sr); break;
-		case CPUINFO_STR_REGISTER + TMS7000_IDLE: sprintf(info->s = cpuintrf_temp_str(), "Idle:%02X", tms7000.idle_state); break;
-		case CPUINFO_STR_REGISTER + TMS7000_T1_CL: sprintf(info->s = cpuintrf_temp_str(), "T1CL:%02X", tms7000.t1_capture_latch); break;
-		case CPUINFO_STR_REGISTER + TMS7000_T1_PS: sprintf(info->s = cpuintrf_temp_str(), "T1PS:%02X", tms7000.t1_prescaler & 0x1f); break;
-		case CPUINFO_STR_REGISTER + TMS7000_T1_DEC: sprintf(info->s = cpuintrf_temp_str(), "T1DEC:%02X", tms7000.t1_decrementer & 0xff); break;
+        case CPUINFO_STR_REGISTER + TMS7000_PC:	sprintf(info->s, "PC:%04X", tms7000.pc.w.l); break;
+        case CPUINFO_STR_REGISTER + TMS7000_SP:	sprintf(info->s, "S:%02X", tms7000.sp); break;
+        case CPUINFO_STR_REGISTER + TMS7000_ST:	sprintf(info->s, "ST:%02X", tms7000.sr); break;
+		case CPUINFO_STR_REGISTER + TMS7000_IDLE: sprintf(info->s, "Idle:%02X", tms7000.idle_state); break;
+		case CPUINFO_STR_REGISTER + TMS7000_T1_CL: sprintf(info->s, "T1CL:%02X", tms7000.t1_capture_latch); break;
+		case CPUINFO_STR_REGISTER + TMS7000_T1_PS: sprintf(info->s, "T1PS:%02X", tms7000.t1_prescaler & 0x1f); break;
+		case CPUINFO_STR_REGISTER + TMS7000_T1_DEC: sprintf(info->s, "T1DEC:%02X", tms7000.t1_decrementer & 0xff); break;
 
     }
 }
@@ -562,14 +563,14 @@ static void tms7000_service_timer1( void )
         if( --tms7000.t1_decrementer < 0 ) /* Decrement timer1 register and check for underflow */
         {
             tms7000.t1_decrementer = tms7000.pf[2]; /* Reload decrementer (8 bit) */
-			cpunum_set_input_line(Machine, cpunum_get_active(), TMS7000_IRQ2_LINE, HOLD_LINE);
-            //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", activecpu_gettotalcycles(), activecpu_gettotalcycles() - tick, tms7000_cycles_per_INT2-(activecpu_gettotalcycles() - tick) );
-			//tick = activecpu_gettotalcycles() );
+			cpu_set_input_line(Machine->activecpu, TMS7000_IRQ2_LINE, HOLD_LINE);
+            //LOG( ("tms7000: trigger int2 (cycles: %d)\t%d\tdelta %d\n", cpu_get_total_cycles(machine->activecpu), cpu_get_total_cycles(machine->activecpu) - tick, tms7000_cycles_per_INT2-(cpu_get_total_cycles(machine->activecpu) - tick) );
+			//tick = cpu_get_total_cycles(machine->activecpu) );
             /* Also, cascade out to timer 2 - timer 2 unimplemented */
         }
     }
-//  LOG( ( "tms7000: service timer1. 0x%2.2x 0x%2.2x (cycles %d)\t%d\t\n", tms7000.t1_prescaler, tms7000.t1_decrementer, activecpu_gettotalcycles(), activecpu_gettotalcycles() - tick2 ) );
-//  tick2 = activecpu_gettotalcycles();
+//  LOG( ( "tms7000: service timer1. 0x%2.2x 0x%2.2x (cycles %d)\t%d\t\n", tms7000.t1_prescaler, tms7000.t1_decrementer, cpu_get_total_cycles(machine->activecpu), cpu_get_total_cycles(machine->activecpu) - tick2 ) );
+//  tick2 = cpu_get_total_cycles(machine->activecpu);
 }
 
 static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */

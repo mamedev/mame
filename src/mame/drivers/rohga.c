@@ -790,7 +790,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
+	cpu_set_input_line(machine->cpu[1],1,state); /* IRQ 2 */
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

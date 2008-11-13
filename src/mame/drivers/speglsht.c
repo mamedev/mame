@@ -303,7 +303,7 @@ static const st0016_interface st0016_config =
 
  static INTERRUPT_GEN( irq4_gen )
 {
-	cpunum_set_input_line(machine, 1, R3000_IRQ4, ASSERT_LINE);
+	cpu_set_input_line(device, R3000_IRQ4, ASSERT_LINE);
 }
 
 static const r3000_cpu_core config =

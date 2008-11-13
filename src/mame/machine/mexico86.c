@@ -22,11 +22,11 @@ bit 0 = ? (unused?)
 */
 WRITE8_HANDLER( mexico86_f008_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 4) ? CLEAR_LINE : ASSERT_LINE);
  	if (machine->config->cpu[2].type != CPU_DUMMY)
 	{
 		// mexico 86, knight boy
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 2) ? CLEAR_LINE : ASSERT_LINE);
 	}
 	else
 	{
@@ -155,10 +155,10 @@ logerror("initialising MCU\n");
 INTERRUPT_GEN( kikikai_interrupt )
 {
 	if (kikikai_mcu_running)
-		mcu_simulate(machine);
+		mcu_simulate(device->machine);
 
-	cpunum_set_input_line_vector(0,0,mexico86_protection_ram[0]);
-	cpunum_set_input_line(machine, 0,0,HOLD_LINE);
+	cpu_set_input_line_vector(device,0,mexico86_protection_ram[0]);
+	cpu_set_input_line(device,0,HOLD_LINE);
 }
 
 
@@ -224,10 +224,10 @@ static void kiki_clogic(int address, int latch)
 INTERRUPT_GEN( mexico86_m68705_interrupt )
 {
 	/* I don't know how to handle the interrupt line so I just toggle it every time. */
-	if (cpu_getiloops() & 1)
-		cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
+	if (cpu_getiloops(device) & 1)
+		cpu_set_input_line(device,0,CLEAR_LINE);
 	else
-		cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
+		cpu_set_input_line(device,0,ASSERT_LINE);
 }
 
 
@@ -314,9 +314,9 @@ WRITE8_HANDLER( mexico86_68705_portB_w )
 	}
 	if ((ddrB & 0x20) && (data & 0x20) && (~portB_out & 0x20))
 	{
-		cpunum_set_input_line_vector(0,0,mexico86_protection_ram[0]);
-		//cpunum_set_input_line(machine, 0,0,PULSE_LINE);
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
+		cpu_set_input_line_vector(machine->cpu[0],0,mexico86_protection_ram[0]);
+		//cpu_set_input_line(machine->cpu[0],0,PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE); //AT: HOLD_LINE works better in Z80 interrupt mode 1.
 	}
 	if ((ddrB & 0x40) && (~data & 0x40) && (portB_out & 0x40))
 	{

@@ -119,7 +119,7 @@ static UINT8 imago_sprites_bank = 0;
 
 static WRITE8_HANDLER( imago_dma_irq_w )
 {
-	cpunum_set_input_line(machine, 0, 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( imago_sprites_bank_w )

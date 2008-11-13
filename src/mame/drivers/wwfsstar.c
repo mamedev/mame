@@ -217,7 +217,7 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 static WRITE16_HANDLER ( wwfsstar_soundwrite )
 {
 	soundlatch_w(machine,1,data & 0xff);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE16_HANDLER( wwfsstar_flipscreen_w )
@@ -228,10 +228,10 @@ static WRITE16_HANDLER( wwfsstar_flipscreen_w )
 static WRITE16_HANDLER( wwfsstar_irqack_w )
 {
 	if(offset == 0)
-		cpunum_set_input_line(machine, 0, 6, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 6, CLEAR_LINE);
 
 	else
-		cpunum_set_input_line(machine, 0, 5, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 5, CLEAR_LINE);
 }
 
 /*
@@ -249,7 +249,7 @@ static WRITE16_HANDLER( wwfsstar_irqack_w )
 
 static INTERRUPT_GEN( wwfsstars_interrupt )
 {
-	int scanline = 271 - cpu_getiloops();
+	int scanline = 271 - cpu_getiloops(device);
 
 	/* Vblank is lowered on scanline 0 (8) */
 	if (scanline == 0)
@@ -264,15 +264,15 @@ static INTERRUPT_GEN( wwfsstars_interrupt )
 	/* Vblank is raised on scanline 240 (248) */
 	else if (scanline==240)
 	{
-		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line(machine, 0, 6, ASSERT_LINE);
+		video_screen_update_partial(device->machine->primary_screen, scanline);
+		cpu_set_input_line(device, 6, ASSERT_LINE);
 	}
 
 	/* An interrupt is generated every 16 scanlines */
 	if (scanline%16 == 0)
 	{
-		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line(machine, 0, 5, ASSERT_LINE);
+		video_screen_update_partial(device->machine->primary_screen, scanline);
+		cpu_set_input_line(device, 5, ASSERT_LINE);
 	}
 }
 
@@ -417,7 +417,7 @@ GFXDECODE_END
 
 static void wwfsstar_ymirq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0 , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[1], 0 , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =

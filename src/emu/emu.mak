@@ -42,7 +42,6 @@ EMUOBJS = \
 	$(EMUOBJ)/clifront.o \
 	$(EMUOBJ)/config.o \
 	$(EMUOBJ)/cpuexec.o \
-	$(EMUOBJ)/cpuint.o \
 	$(EMUOBJ)/cpuintrf.o \
 	$(EMUOBJ)/crsshair.o \
 	$(EMUOBJ)/debugger.o \

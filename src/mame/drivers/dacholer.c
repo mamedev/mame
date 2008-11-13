@@ -70,7 +70,7 @@ static WRITE8_HANDLER( coins_w )
 static WRITE8_HANDLER(snd_w)
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -375,11 +375,11 @@ static INTERRUPT_GEN( sound_irq )
 {
 	if(music_interrupt_enable == 1)
 	{
-		cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0x30);
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x30);
 	}
 }
 
-static INTERRUPT_GEN(adpcm_int)
+static void adpcm_int(running_machine *machine, int cpunum)
 {
 	if(snd_interrupt_enable == 1 || (snd_interrupt_enable ==0 && msm_toggle==1))
 	{
@@ -388,7 +388,7 @@ static INTERRUPT_GEN(adpcm_int)
 		msm_toggle^=1;
 		if (msm_toggle==0)
 		{
-			cpunum_set_input_line_and_vector(machine, 1, 0, HOLD_LINE, 0x38);
+			cpu_set_input_line_and_vector(machine->cpu[cpunum], 0, HOLD_LINE, 0x38);
 		}
 	}
 }

@@ -125,12 +125,12 @@ static WRITE32_HANDLER( f3_control_w )
 
 static WRITE32_HANDLER( f3_sound_reset_0_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_reset_1_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_bankswitch_w )
@@ -352,19 +352,19 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( f3_interrupt3 )
 {
-	cpunum_set_input_line(machine, 0, 3, HOLD_LINE);	// some signal from video hardware?
+	cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE);	// some signal from video hardware?
 }
 
 static INTERRUPT_GEN( f3_interrupt2 )
 {
-	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	// vblank
+	cpu_set_input_line(device, 2, HOLD_LINE);	// vblank
 	timer_set( ATTOTIME_IN_CYCLES(10000,0), NULL, 0, f3_interrupt3);
 }
 
 static MACHINE_RESET( f3 )
 {
 	taito_f3_soundsystem_reset(machine);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 	f3_68681_reset();
 }
@@ -3466,7 +3466,7 @@ static void tile_decode(running_machine *machine)
 static READ32_HANDLER( irq_speedup_r_##GAME )					\
 {																\
 	if (cpu_get_pc(machine->activecpu)==counter && (f3_ram[mem_addr]&mask)!=0)	\
-		cpu_spinuntil_int();									\
+		cpu_spinuntil_int(machine->activecpu);									\
 	return f3_ram[mem_addr];									\
 }
 
@@ -3474,7 +3474,7 @@ static READ32_HANDLER( irq_speedup_r_##GAME )					\
 static READ32_HANDLER( irq_speedup_r_##GAME )					\
 {																\
 	if (cpu_get_pc(machine->activecpu)==counter && (f3_ram[mem_addr]&mask)==0)	\
-		cpu_spinuntil_int();									\
+		cpu_spinuntil_int(machine->activecpu);									\
 	return f3_ram[mem_addr];									\
 }
 
@@ -3486,7 +3486,7 @@ static READ32_HANDLER( irq_speedup_r_##GAME )					\
 	else ptr=(((f3_ram[(cpu_get_sp(machine->activecpu)&0x1ffff)/4])&0x1ffff)<<16) | \
 	(f3_ram[((cpu_get_sp(machine->activecpu)&0x1ffff)/4)+1]>>16); 				\
 	if (cpu_get_pc(machine->activecpu)==counter && ptr==stack)					\
-		cpu_spinuntil_int();									\
+		cpu_spinuntil_int(machine->activecpu);									\
 	return f3_ram[mem_addr];									\
 }
 

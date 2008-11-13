@@ -47,12 +47,12 @@ static READ8_HANDLER( mcu_tnzs_r )
 	if (offset == 0)
 	{
 		data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
-		cpu_yield();
+		cpu_yield(machine->activecpu);
 	}
 	else
 	{
 		data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
-		cpu_yield();
+		cpu_yield(machine->activecpu);
 	}
 
 //  logerror("PC %04x: read %02x from mcu $c00%01x\n", cpu_get_previouspc(machine->activecpu), data, offset);
@@ -660,9 +660,9 @@ INTERRUPT_GEN( arknoid2_interrupt )
 		case MCU_DRTOPPEL:
 		case MCU_PLUMPOP:
 			coin  = 0;
-			coin |= ((input_port_read(machine, "COIN1") & 1) << 0);
-			coin |= ((input_port_read(machine, "COIN2") & 1) << 1);
-			coin |= ((input_port_read(machine, "IN2") & 3) << 2);
+			coin |= ((input_port_read(device->machine, "COIN1") & 1) << 0);
+			coin |= ((input_port_read(device->machine, "COIN2") & 1) << 1);
+			coin |= ((input_port_read(device->machine, "IN2") & 3) << 2);
 			coin ^= 0x0c;
 			mcu_handle_coins(coin);
 			break;
@@ -670,7 +670,7 @@ INTERRUPT_GEN( arknoid2_interrupt )
 			break;
 	}
 
-	cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 MACHINE_RESET( tnzs )
@@ -721,9 +721,9 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 
 	/* bit 4 resets the second CPU */
 	if (data & 0x10)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bits 0-2 select RAM/ROM bank */
 	memory_set_bankptr (1, &RAM[0x10000 + 0x4000 * (data & 0x07)]);
@@ -743,7 +743,7 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 				if (data & 0x04)
 				{
 					if (machine->config->cpu[2].type == CPU_I8742)
-						cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, PULSE_LINE);
+						cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */
 				break;

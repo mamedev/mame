@@ -49,8 +49,8 @@ static UINT32 *	protection_base;
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 5, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, atarigen_video_int_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 5, atarigen_sound_int_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -135,7 +135,7 @@ static WRITE32_HANDLER( latch_w )
 
 	/* lower byte */
 	if (ACCESSING_BITS_16_23)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

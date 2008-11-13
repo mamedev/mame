@@ -175,7 +175,7 @@ static READ8_HANDLER( pang_port5_r )
 	/* bit 3 is checked before updating the palette so it really seems to be vblank. */
 	/* Many games require two interrupts per frame and for these bits to toggle, */
 	/* otherwise music doesn't work. */
-	if (cpu_getiloops() & 1) bit |= 0x01;
+	if (cpu_getiloops(machine->activecpu) & 1) bit |= 0x01;
 	else bit |= 0x08;
 
 		if (pang_port5_kludge)	/* hack... music doesn't work otherwise */
@@ -473,7 +473,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER(mstworld_sound_w)
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 }
 
 extern WRITE8_HANDLER( mstworld_gfxctrl_w );
@@ -1207,7 +1207,7 @@ static void spangbl_adpcm_int(running_machine *machine, int data)
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

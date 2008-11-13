@@ -129,7 +129,7 @@ static WRITE16_HANDLER( bigkarnk_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7){
 		soundlatch_w(machine,0,data & 0xff);
-		cpunum_set_input_line(machine, 1,M6809_FIRQ_LINE,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],M6809_FIRQ_LINE,HOLD_LINE);
 	}
 }
 

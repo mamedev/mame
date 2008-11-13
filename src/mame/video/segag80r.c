@@ -66,7 +66,7 @@ INTERRUPT_GEN( segag80r_vblank_start )
 
 	/* if interrupts are enabled, clock one */
 	if (video_control & 0x04)
-		irq0_line_hold(machine, cpunum);
+		irq0_line_hold(device);
 }
 
 
@@ -77,7 +77,7 @@ INTERRUPT_GEN( sindbadm_vblank_start )
 	/* interrupts appear to always be enabled, but they have a manual */
 	/* acknowledge rather than an automatic ack; they are also not masked */
 	/* by bit 2 of video_control like a standard G80 */
-	irq0_line_assert(machine, cpunum);
+	irq0_line_assert(device);
 }
 
 
@@ -611,7 +611,7 @@ WRITE8_HANDLER( sindbadm_back_port_w )
 	{
 		/* port 0: irq ack */
 		case 0:
-			cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		/* port 1: background control

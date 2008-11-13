@@ -8,6 +8,7 @@
 
 #include "debugger.h"
 #include "deprecat.h"
+#include "cpuexec.h"
 #include "sh2.h"
 #include "sh2comn.h"
 
@@ -59,7 +60,7 @@ INLINE void WL(offs_t A, UINT32 V)
 static void sh2_timer_resync(void)
 {
 	int divider = div_tab[(sh2->m[5] >> 8) & 3];
-	UINT64 cur_time = cpunum_gettotalcycles(sh2->cpu_number);
+	UINT64 cur_time = cpu_get_total_cycles(Machine->cpu[sh2->cpu_number]);
 
 	if(divider)
 		sh2->frc += (cur_time - sh2->frc_base) >> divider;
@@ -96,7 +97,7 @@ static void sh2_timer_activate(void)
 		int divider = div_tab[(sh2->m[5] >> 8) & 3];
 		if(divider) {
 			max_delta <<= divider;
-			sh2->frc_base = cpunum_gettotalcycles(sh2->cpu_number);
+			sh2->frc_base = cpu_get_total_cycles(Machine->cpu[sh2->cpu_number]);
 			timer_adjust_oneshot(sh2->timer, ATTOTIME_IN_CYCLES(max_delta, sh2->cpu_number), sh2->cpu_number);
 		} else {
 			logerror("SH2.%d: Timer event in %d cycles of external clock", sh2->cpu_number, max_delta);

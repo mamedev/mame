@@ -302,7 +302,7 @@ static WRITE16_HANDLER( io_w )
 		case 0:
 			// sound data
 			if (ACCESSING_BITS_0_7)
-				cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
+				cpu_set_input_line(machine->cpu[2], 0, HOLD_LINE);
 			else
 				LOG_UNKNOWN_WRITE
 			break;
@@ -540,19 +540,19 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( master_irq )
 {
-	switch(cpu_getiloops())
+	switch(cpu_getiloops(device))
 	{
-		case 0: cpunum_set_input_line(machine, 0,1,HOLD_LINE); break;
-		case 1: cpunum_set_input_line(machine, 0,3,HOLD_LINE); break;
+		case 0: cpu_set_input_line(device,1,HOLD_LINE); break;
+		case 1: cpu_set_input_line(device,3,HOLD_LINE); break;
 	}
 }
 
 static INTERRUPT_GEN( slave_irq )
 {
-	switch(cpu_getiloops())
+	switch(cpu_getiloops(device))
 	{
-		case 0: cpunum_set_input_line(machine, 0,3,HOLD_LINE); break;
-		case 1: cpunum_set_input_line(machine, 0,1,HOLD_LINE); break;
+		case 0: cpu_set_input_line(device,3,HOLD_LINE); break;
+		case 1: cpu_set_input_line(device,1,HOLD_LINE); break;
 	}
 }
 

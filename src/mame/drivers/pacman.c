@@ -387,24 +387,24 @@ static MACHINE_RESET( mschamp )
 
 static WRITE8_HANDLER( pacman_interrupt_vector_w )
 {
-	cpunum_set_input_line_vector(0, 0, data);
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line_vector(machine->cpu[0], 0, data);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
 static INTERRUPT_GEN( pacman_interrupt )
 {
 	/* always signal a normal VBLANK */
-	if (cpu_getiloops() == 0)
-		irq0_line_hold(machine, cpunum);
+	if (cpu_getiloops(device) == 0)
+		irq0_line_hold(device);
 
 	/* on other "VBLANK" opportunities, check to make sure the cheat is enabled */
 	/* and that the speedup button is pressed */
 	else
 	{
-		UINT8 value = input_port_read_safe(machine, "FAKE", 0);
+		UINT8 value = input_port_read_safe(device->machine, "FAKE", 0);
 		if ((value & 7) == 5 || (value & 6) == 2)
-			irq0_line_hold(machine, cpunum);
+			irq0_line_hold(device);
 	}
 }
 
@@ -469,7 +469,7 @@ static WRITE8_HANDLER( piranha_interrupt_vector_w)
 {
 	if (data==0xfa) data=0x78;
 	if (data==0xfc) data=0xfc;
-	cpunum_set_input_line_vector( 0, 0, data );
+	cpu_set_input_line_vector(machine->cpu[0], 0, data );
 }
 
 
@@ -478,7 +478,7 @@ static WRITE8_HANDLER( nmouse_interrupt_vector_w)
 	if (data==0xbf) data=0x3c;
 	if (data==0xc6) data=0x40;
 	if (data==0xfc) data=0xfc;
-	cpunum_set_input_line_vector( 0, 0, data );
+	cpu_set_input_line_vector(machine->cpu[0], 0, data );
 }
 
 
@@ -680,7 +680,7 @@ static READ8_HANDLER( bigbucks_question_r )
 
 static INTERRUPT_GEN( s2650_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x03);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x03);
 }
 
 static WRITE8_HANDLER( porky_banking_w )

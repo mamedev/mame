@@ -298,7 +298,7 @@ static UINT8 vp931_data_r(laserdisc_state *ld)
 	}
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	cpu_boost_interleave(ld->device->machine, attotime_zero, attotime_mul(video_screen_get_scan_period(ld->screen), 4));
+	cpuexec_boost_interleave(ld->device->machine, attotime_zero, attotime_mul(video_screen_get_scan_period(ld->screen), 4));
 	return player->tocontroller;
 }
 
@@ -350,7 +350,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	/* at the start of each line, signal an interrupt and use a timer to turn it off */
 	if (which == 0)
 	{
-		cpunum_set_input_line(machine, player->cpunum, MCS48_INPUT_IRQ, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[player->cpunum], MCS48_INPUT_IRQ, ASSERT_LINE);
 		timer_set(ATTOTIME_IN_NSEC(5580), ld, 0, irq_off);
 	}
 
@@ -406,7 +406,7 @@ static TIMER_CALLBACK( deferred_data_w )
 static TIMER_CALLBACK( irq_off )
 {
 	laserdisc_state *ld = ptr;
-	cpunum_set_input_line(machine, ld->player->cpunum, MCS48_INPUT_IRQ, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[ld->player->cpunum], MCS48_INPUT_IRQ, CLEAR_LINE);
 }
 
 
@@ -632,7 +632,7 @@ static WRITE8_HANDLER( to_controller_w )
 		(*player->data_ready_cb)(ld->device, TRUE);
 
 	/* also boost interleave for 4 scanlines to ensure proper communications */
-	cpu_boost_interleave(ld->device->machine, attotime_zero, attotime_mul(video_screen_get_scan_period(ld->screen), 4));
+	cpuexec_boost_interleave(ld->device->machine, attotime_zero, attotime_mul(video_screen_get_scan_period(ld->screen), 4));
 }
 
 

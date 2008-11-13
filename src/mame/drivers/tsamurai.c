@@ -73,7 +73,7 @@ static WRITE8_HANDLER( nmi_enable_w ){
 }
 
 static INTERRUPT_GEN( samurai_interrupt ){
-	if (nmi_enabled) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static READ8_HANDLER( unknown_d803_r )
@@ -104,19 +104,19 @@ static READ8_HANDLER( unknown_d938_r )
 static WRITE8_HANDLER( sound_command1_w )
 {
 	sound_command1 = data;
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command2_w )
 {
 	sound_command2 = data;
-	cpunum_set_input_line(machine, 2, 0, HOLD_LINE );
+	cpu_set_input_line(machine->cpu[2], 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_command3_w )
 {
 	sound_command3 = data;
-	cpunum_set_input_line(machine, 3, 0, HOLD_LINE );
+	cpu_set_input_line(machine->cpu[3], 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( flip_screen_w )
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( vsgongf_sound_nmi_enable_w ){
 }
 
 static INTERRUPT_GEN( vsgongf_sound_interrupt ){
-	if (vsgongf_sound_nmi_enabled) cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	if (vsgongf_sound_nmi_enabled) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* what are these, protection of some kind? */
@@ -383,7 +383,7 @@ static READ8_HANDLER( vsgongf_a100_r ){
 
 static WRITE8_HANDLER( vsgongf_sound_command_w ){
 	soundlatch_w( machine, offset, data );
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static ADDRESS_MAP_START( readmem_vsgongf, ADDRESS_SPACE_PROGRAM, 8 )

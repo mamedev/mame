@@ -257,7 +257,7 @@ static WRITE8_HANDLER( gaplus_irq_1_ctrl_w )
 	int bit = !BIT(offset,11);
 	cpu_interrupt_enable(0,bit);
 	if (!bit)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
@@ -265,7 +265,7 @@ static WRITE8_HANDLER( gaplus_irq_3_ctrl_w )
 	int bit = !BIT(offset,13);
 	cpu_interrupt_enable(2,bit);
 	if (!bit)
-		cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gaplus_irq_2_ctrl_w )
@@ -273,14 +273,14 @@ static WRITE8_HANDLER( gaplus_irq_2_ctrl_w )
 	int bit = offset & 1;
 	cpu_interrupt_enable(1,bit);
 	if (!bit)
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gaplus_sreset_w )
 {
 	int bit = !BIT(offset,11);
-    cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-    cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+    cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+    cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 	mappy_sound_enable(bit);
 }
 
@@ -296,13 +296,13 @@ static MACHINE_RESET( gaplus )
 {
 	/* on reset, VINTON is reset, while the other flags don't seem to be affected */
 	cpu_interrupt_enable(1,0);
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( gaplus_interrupt_1 )
 {
-	irq0_line_assert(machine, cpunum);	// this also checks if irq is enabled - IMPORTANT!
-						// so don't replace with cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
+						// so don't replace with cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 
 	namcoio_set_irq_line(0,PULSE_LINE);
 	namcoio_set_irq_line(1,PULSE_LINE);

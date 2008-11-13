@@ -53,7 +53,7 @@ MACHINE_RESET( taitosj )
 	zready = 0;
 	busreq = 0;
  	if (machine->config->cpu[2].type != CPU_DUMMY)
-	cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
 
 	spacecr_prot_value = 0;
 }
@@ -112,7 +112,7 @@ READ8_HANDLER( taitosj_mcu_data_r )
 static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 {
 	zready = 1;
-	cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2],0,ASSERT_LINE);
 	fromz80 = param;
 }
 
@@ -121,13 +121,13 @@ WRITE8_HANDLER( taitosj_mcu_data_w )
 	LOG(("%04x: protection write %02x\n",cpu_get_pc(machine->activecpu),data));
 	timer_call_after_resynch(NULL, data,taitosj_mcu_real_data_w);
 	/* temporarily boost the interleave to sync things up */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 READ8_HANDLER( taitosj_mcu_status_r )
 {
 	/* temporarily boost the interleave to sync things up */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
 
 	/* bit 0 = the 68705 has read data from the Z80 */
 	/* bit 1 = the 68705 has written data for the Z80 */
@@ -198,7 +198,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	{
 		/* 68705 is going to read data from the Z80 */
 		timer_call_after_resynch(NULL, 0,taitosj_mcu_data_real_r);
-		cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
 		portA_in = fromz80;
 		LOG(("%04x: 68705 <- Z80 %02x\n",cpu_get_pc(machine->activecpu),portA_in));
 	}

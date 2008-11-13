@@ -8,6 +8,7 @@
 
 #include "debugger.h"
 #include "deprecat.h"
+#include "cpuexec.h"
 #include "sh4.h"
 #include "sh4regs.h"
 #include "sh4comn.h"
@@ -1010,7 +1011,7 @@ void sh4_set_irln_input(int cpunum, int value)
 	if (sh4.irln == value)
 		return;
 	sh4.irln = value;
-	cpunum_set_input_line(Machine, cpunum, SH4_IRLn, PULSE_LINE);
+	cpu_set_input_line(Machine->cpu[cpunum], SH4_IRLn, PULSE_LINE);
 }
 
 void sh4_set_irq_line(int irqline, int state) // set state of external interrupt line

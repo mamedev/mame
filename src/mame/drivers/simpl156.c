@@ -472,7 +472,7 @@ static NVRAM_HANDLER( simpl156 )
 
 static INTERRUPT_GEN( simpl156_vbl_interrupt )
 {
-	cpunum_set_input_line(machine, 0, ARM_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -1151,7 +1151,7 @@ static const UINT8 gangonta_eeprom[128] = {
 /* Everything seems more stable if we run the CPU speed x4 and use Idle skips.. maybe it has an internal multipler? */
 static READ32_HANDLER( joemacr_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x284)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(machine->activecpu)==0x284)  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0x18/4];
 }
 
@@ -1164,7 +1164,7 @@ static DRIVER_INIT (joemacr)
 
 static READ32_HANDLER( chainrec_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x2d4)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(machine->activecpu)==0x2d4)  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0x18/4];
 }
 
@@ -1177,7 +1177,7 @@ static DRIVER_INIT (chainrec)
 
 static READ32_HANDLER( prtytime_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x4f0)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(machine->activecpu)==0x4f0)  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0xae0/4];
 }
 
@@ -1198,7 +1198,7 @@ static DRIVER_INIT (gangonta)
 
 static READ32_HANDLER( charlien_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0xc8c8)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(machine->activecpu)==0xc8c8)  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0x10/4];
 }
 
@@ -1210,7 +1210,7 @@ static DRIVER_INIT (charlien)
 
 static READ32_HANDLER( osman_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x5974)  cpu_spinuntil_time(ATTOTIME_IN_USEC(400));
+	if (cpu_get_pc(machine->activecpu)==0x5974)  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400));
 	return simpl156_systemram[0x10/4];
 }
 

@@ -408,7 +408,7 @@ static emu_timer *nmi_timer, *adjuster_timer;
 
 static TIMER_CALLBACK( equites_nmi_callback )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -440,17 +440,17 @@ static WRITE8_HANDLER(equites_c0f8_w)
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			cpunum_set_input_line(machine, 1, I8085_RST75_LINE, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[1], I8085_RST75_LINE, PULSE_LINE);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			cpunum_set_input_line(machine, 1, I8085_INTR_LINE, HOLD_LINE);
+			cpu_set_input_line(machine->cpu[1], I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -588,10 +588,10 @@ static void equites_msm5232_gate(int state)
 // Equites Hardware
 static INTERRUPT_GEN( equites_interrupt )
 {
-	if (cpu_getiloops())
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	if (cpu_getiloops(device))
+		cpu_set_input_line(device, 2, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+		cpu_set_input_line(device, 1, HOLD_LINE);
 }
 
 static WRITE8_HANDLER(equites_8155_w)
@@ -694,12 +694,12 @@ static WRITE16_HANDLER(mcu_w)
 
 static WRITE16_HANDLER( mcu_halt_assert_w )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( mcu_halt_clear_w )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 

@@ -79,7 +79,7 @@ INTERRUPT_GEN( ygv608_timed_interrupt )
 	{
 		ygv608.ports.s.p6 |= p6_fv;
 		if (ygv608.regs.s.r14 & r14_iev)
-			irq2_line_hold(machine, cpunum);
+			irq2_line_hold(device);
 	}
 
 	/* once every 60Hz, set the position detection flag (somewhere) */
@@ -87,7 +87,7 @@ INTERRUPT_GEN( ygv608_timed_interrupt )
 	{
 		ygv608.ports.s.p6 |= p6_fp;
 		if (ygv608.regs.s.r14 & r14_iep)
-			irq2_line_hold(machine, cpunum);
+			irq2_line_hold(device);
 	}
 }
 

@@ -658,9 +658,9 @@ static INTERRUPT_GEN( cps2_interrupt )
 	if(cps1_scanline1 == scancount || (cps1_scanline1 < scancount && !cps1_scancalls))
 	{
 		cps1_cps_b_regs[0x10/2] = 0;
-		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+		cpu_set_input_line(device, 4, HOLD_LINE);
 		cps2_set_sprite_priorities();
-		video_screen_update_partial(machine->primary_screen, 16 - 10 + scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		video_screen_update_partial(device->machine->primary_screen, 16 - 10 + scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		cps1_scancalls++;
 //          popmessage("IRQ4 scancounter = %04i",scancount);
 	}
@@ -669,9 +669,9 @@ static INTERRUPT_GEN( cps2_interrupt )
 	if(cps1_scanline2 == scancount || (cps1_scanline2 < scancount && !cps1_scancalls))
 	{
 		cps1_cps_b_regs[0x12/2] = 0;
-		cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+		cpu_set_input_line(device, 4, HOLD_LINE);
 		cps2_set_sprite_priorities();
-		video_screen_update_partial(machine->primary_screen, 16 - 10 + scancount);	/* visarea.min_y - [first visible line?] + scancount */
+		video_screen_update_partial(device->machine->primary_screen, 16 - 10 + scancount);	/* visarea.min_y - [first visible line?] + scancount */
 		cps1_scancalls++;
 //          popmessage("IRQ4 scancounter = %04i",scancount);
 	}
@@ -680,11 +680,11 @@ static INTERRUPT_GEN( cps2_interrupt )
 	{
 		cps1_cps_b_regs[0x10/2] = cps1_scanline1;
 		cps1_cps_b_regs[0x12/2] = cps1_scanline2;
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		cpu_set_input_line(device, 2, HOLD_LINE);
 		if(cps1_scancalls)
 		{
 			cps2_set_sprite_priorities();
-			video_screen_update_partial(machine->primary_screen, 256);
+			video_screen_update_partial(device->machine->primary_screen, 256);
 		}
 		cps2_objram_latch();
 	}
@@ -751,7 +751,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	/* bit 7 - */
 
         /* Z80 Reset */
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 	coin_counter_w(0, data & 0x0001);
 	if( (strncmp(machine->gamedrv->name,"pzloop2",8)==0) ||
@@ -7312,7 +7312,7 @@ static DRIVER_INIT( cps2 )
 	DRIVER_INIT_CALL(cps2crpt);
 	cps2networkpresent = 0;
 
-	cpunum_set_clockscale(machine, 0, 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
+	cpu_set_clockscale(machine->cpu[0], 0.7375f); /* RAM access waitstates etc. aren't emulated - slow the CPU to compensate */
 }
 
 static DRIVER_INIT( ssf2tb )

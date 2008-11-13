@@ -295,27 +295,27 @@ static IRQ_CALLBACK(irq_callback)
 
 static INTERRUPT_GEN( vbl_interrupt )
 {
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(device, irq_callback);
 
 	/* kludge to make plgirls boot */
-	if (cpu_get_reg(machine->cpu[0],Z80_IM) != 2) return;
+	if (cpu_get_reg(device,Z80_IM) != 2) return;
 
 	// What is really generating interrupts 0 and 1 is still to be found
 
-	if (cpu_getiloops() == 1 && (irq_enable & 1))
+	if (cpu_getiloops(device) == 1 && (irq_enable & 1))
 	{
 		last_irq_level = 0;
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
-	else if (cpu_getiloops() == 2 && (irq_enable & 2))
+	else if (cpu_getiloops(device) == 2 && (irq_enable & 2))
 	{
 		last_irq_level = 1;
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
-	else if (cpu_getiloops() == 0 && (irq_enable & 4))
+	else if (cpu_getiloops(device) == 0 && (irq_enable & 4))
 	{
 		last_irq_level = 2;
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
@@ -337,7 +337,7 @@ static WRITE8_HANDLER( irq_enable_w )
 
 	// fix Plotting test mode
 	if ((irq_enable & (1 << last_irq_level)) == 0)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( irq_enable_r )
@@ -1057,7 +1057,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER (evilston_snd_w)
 {
 	shared_ram[0x7fe]=data&0x7f;
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -2055,7 +2055,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( portA_w )

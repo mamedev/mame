@@ -396,7 +396,7 @@ static MACHINE_RESET( system32 )
 	v60_irq_timer[1] = timer_alloc(signal_v60_irq_callback, NULL);
 
 	/* clear IRQ lines */
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -417,13 +417,13 @@ static void update_irq_state(running_machine *machine)
 	for (vector = 0; vector < 5; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, vector);
+			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 5)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -569,9 +569,9 @@ static TIMER_CALLBACK( end_of_vblank_int )
 
 static INTERRUPT_GEN( start_of_vblank_int )
 {
-	signal_v60_irq(machine, MAIN_IRQ_VBSTART);
+	signal_v60_irq(device->machine, MAIN_IRQ_VBSTART);
 	system32_set_vblank(1);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, end_of_vblank_int);
+	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, end_of_vblank_int);
 	if (system32_prot_vblank)
 		(*system32_prot_vblank)();
 }
@@ -690,7 +690,7 @@ static void common_io_chip_w(running_machine *machine, int which, offs_t offset,
 		case 0x1c/2:
 			system32_displayenable[which] = (data & 0x02);
 			if (which == 0)
-				cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+				cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -1035,13 +1035,13 @@ static void update_sound_irq_state(running_machine *machine)
 	for (vector = 0; vector < 3; vector++)
 		if (effirq & (1 << vector))
 		{
-			cpunum_set_input_line_and_vector(machine, 1, 0, ASSERT_LINE, 2 * vector);
+			cpu_set_input_line_and_vector(machine->cpu[1], 0, ASSERT_LINE, 2 * vector);
 			break;
 		}
 
 	/* if we didn't find any, clear the interrupt line */
 	if (vector == 3)
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 

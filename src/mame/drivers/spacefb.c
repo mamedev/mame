@@ -127,7 +127,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	/* compute vector and set the interrupt line */
 	int vpos = video_screen_get_vpos(machine->primary_screen);
 	UINT8 vector = 0xc7 | ((vpos & 0x40) >> 2) | ((~vpos & 0x40) >> 3);
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, vector);
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, vector);
 
 	/* set up for next interrupt */
 	if (vpos == SPACEFB_INT_TRIGGER_COUNT_1)

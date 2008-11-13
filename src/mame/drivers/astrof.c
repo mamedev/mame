@@ -85,7 +85,7 @@ static UINT16 abattle_count;
 
 static READ8_HANDLER( irq_clear_r )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -93,7 +93,7 @@ static READ8_HANDLER( irq_clear_r )
 
 static TIMER_DEVICE_CALLBACK( irq_callback )
 {
-	cpunum_set_input_line(timer->machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(timer->machine->cpu[0], 0, ASSERT_LINE);
 }
 
 
@@ -107,7 +107,7 @@ static TIMER_DEVICE_CALLBACK( irq_callback )
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 	coin_counter_w(0, newval);
 }
 
@@ -115,7 +115,7 @@ static INPUT_CHANGED( coin_inserted )
 static INPUT_CHANGED( service_coin_inserted )
 {
 	/* service coin insertion causes an NMI */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

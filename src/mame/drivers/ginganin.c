@@ -324,7 +324,7 @@ static INTERRUPT_GEN( ginganin_sound_interrupt )
 		if (MC6809_CTR > S_TEMPO)
 		{
 			MC6809_CTR = 0;
-			cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+			cpu_set_input_line(device, 0, HOLD_LINE);
 		}
 		else
 		{

@@ -244,9 +244,9 @@ WRITE8_HANDLER( exidy440_interrupt_clear_w )
 static void exidy440_update_firq(running_machine *machine)
 {
 	if (exidy440_firq_vblank || (firq_enable && exidy440_firq_beam))
-		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
 }
 
 
@@ -254,7 +254,7 @@ INTERRUPT_GEN( exidy440_vblank_interrupt )
 {
 	/* set the FIRQ line on a VBLANK */
 	exidy440_firq_vblank = 1;
-	exidy440_update_firq(machine);
+	exidy440_update_firq(device->machine);
 }
 
 

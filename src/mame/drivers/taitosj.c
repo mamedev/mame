@@ -181,7 +181,7 @@ static WRITE8_HANDLER( taitosj_sndnmi_msk_w )
 static WRITE8_HANDLER( taitosj_soundcommand_w )
 {
 	soundlatch_w(machine,offset,data);
-	if (!sndnmi_disable) cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	if (!sndnmi_disable) cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static UINT8 input_port_4_f0;

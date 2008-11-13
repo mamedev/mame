@@ -427,7 +427,7 @@ doesn't use an interrupt vector */
 
 INTERRUPT_GEN( jrpacman_interrupt )
 {
-	irq0_line_hold();
+	irq0_line_hold(device);
 }
 
 

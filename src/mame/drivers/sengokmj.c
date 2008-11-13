@@ -284,7 +284,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sengokmj_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xcb/4);
+	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xcb/4);
 }
 
 static MACHINE_DRIVER_START( sengokmj )

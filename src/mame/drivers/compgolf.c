@@ -192,7 +192,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 0,0,linestate);
+	cpu_set_input_line(machine->cpu[0],0,linestate);
 }
 
 static const ym2203_interface ym2203_config =

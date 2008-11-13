@@ -38,7 +38,7 @@ static READ16_HANDLER( speedup_r )
 {
 	if ((cpu_get_pc(machine->activecpu) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return su_82;
@@ -187,9 +187,9 @@ ADDRESS_MAP_END
 
 INTERRUPT_GEN( namcoc7x_interrupt )
 {
-	if (cpu_getiloops() == 0)
- 		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ0, HOLD_LINE);
+	if (cpu_getiloops(device) == 0)
+ 		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ2, HOLD_LINE);
+		cpu_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
 }
 

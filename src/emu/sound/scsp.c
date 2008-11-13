@@ -28,6 +28,7 @@
 #include "sndintrf.h"
 #include "streams.h"
 #include "cpuintrf.h"
+#include "cpuexec.h"
 #include "deprecat.h"
 #include "scsp.h"
 #include "scspdsp.h"
@@ -1198,7 +1199,7 @@ static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-	cpunum_set_input_line(machine, 2,dma_transfer_end,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[2],dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1315,7 +1316,7 @@ WRITE16_HANDLER( scsp_0_w )
 		case 0x42a:
 			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
 			{
-				cpunum_set_input_line_and_vector(machine, 0, 9, HOLD_LINE , 0x46);
+				cpu_set_input_line_and_vector(machine->cpu[0], 9, HOLD_LINE , 0x46);
 			    logerror("SCSP: Main CPU interrupt\n");
 			}
 		break;

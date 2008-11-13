@@ -265,12 +265,12 @@ static READ8_HANDLER( dsw1_r )
 
 static WRITE8_HANDLER( int_ack1_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( int_ack2_w )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 

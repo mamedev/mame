@@ -61,7 +61,7 @@ WRITE16_HANDLER( toki_foreground_videoram16_w );
 static WRITE16_HANDLER( tokib_soundcommand16_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( pip16_r )
@@ -81,7 +81,7 @@ static void toki_adpcm_int (running_machine *machine, int data)
 
 	toggle ^= 1;
 	if (toggle)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( toki_adpcm_control_w )

@@ -71,7 +71,7 @@ static WRITE16_HANDLER( dec0_control_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_w(machine,0,data & 0xff);
-				cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+				cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 			}
 			break;
 
@@ -107,7 +107,7 @@ static WRITE16_HANDLER( slyspy_control_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				soundlatch_w(machine,0,data & 0xff);
-				cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+				cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 			}
 			break;
 		case 2:
@@ -121,7 +121,7 @@ static WRITE16_HANDLER( midres_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data & 0xff);
-		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -824,12 +824,12 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,0,linestate); /* IRQ */
+	cpu_set_input_line(machine->cpu[1],0,linestate); /* IRQ */
 }
 
 static void sound_irq2(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,1,linestate); /* IRQ2 */
+	cpu_set_input_line(machine->cpu[1],1,linestate); /* IRQ2 */
 }
 
 static const ym3812_interface ym3812_config =

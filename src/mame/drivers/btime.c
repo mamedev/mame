@@ -351,25 +351,25 @@ ADDRESS_MAP_END
 static INPUT_CHANGED( coin_inserted_irq_hi )
 {
 	if (newval)
-		cpunum_set_input_line(field->port->machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], 0, HOLD_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_irq_lo )
 {
 	if (!newval)
-		cpunum_set_input_line(field->port->machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], 0, HOLD_LINE);
 }
 
 static INPUT_CHANGED( coin_inserted_nmi_lo )
 {
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_command_w )
 {
 	soundlatch_w(machine,offset,data);
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 

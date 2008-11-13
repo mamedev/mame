@@ -1130,23 +1130,23 @@ GFXDECODE_END
 
 static TIMER_CALLBACK( rockn_timer_level4_callback )
 {
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( rockn_timer_sub_level4_callback )
 {
-	cpunum_set_input_line(machine, 1, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 4, HOLD_LINE);
 }
 
 
 static TIMER_CALLBACK( rockn_timer_level1_callback )
 {
-	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, HOLD_LINE);
 }
 
 static TIMER_CALLBACK( rockn_timer_sub_level1_callback )
 {
-	cpunum_set_input_line(machine, 1, 1, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 1, HOLD_LINE);
 }
 
 static void init_rockn_timer(running_machine *machine)

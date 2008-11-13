@@ -1102,14 +1102,14 @@ CPU_GET_INFO( v30mz )
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s = cpuintrf_temp_str(), "NEC V-Series"); break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s = cpuintrf_temp_str(), "1.5"); break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s = cpuintrf_temp_str(), __FILE__); break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s = cpuintrf_temp_str(), "NEC emulator v1.5 by Bryan McPhail"); break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "NEC V-Series"); break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.5"); break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__); break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "NEC emulator v1.5 by Bryan McPhail"); break;
 
 		case CPUINFO_STR_FLAGS:
             flags = CompressFlags();
-            sprintf(info->s = cpuintrf_temp_str(), "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
+            sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
                 flags & 0x8000 ? 'M':'.',
                 flags & 0x4000 ? '?':'.',
                 flags & 0x2000 ? '?':'.',
@@ -1128,22 +1128,22 @@ CPU_GET_INFO( v30mz )
                 flags & 0x0001 ? 'C':'.');
             break;
 
-        case CPUINFO_STR_REGISTER + NEC_PC:				sprintf(info->s = cpuintrf_temp_str(), "PC:%04X", (I.sregs[CS]<<4) + I.ip); break;
-        case CPUINFO_STR_REGISTER + NEC_IP:				sprintf(info->s = cpuintrf_temp_str(), "IP:%04X", I.ip); break;
-        case CPUINFO_STR_REGISTER + NEC_SP:				sprintf(info->s = cpuintrf_temp_str(), "SP:%04X", I.regs.w[SP]); break;
-        case CPUINFO_STR_REGISTER + NEC_FLAGS:			sprintf(info->s = cpuintrf_temp_str(), "F:%04X", CompressFlags()); break;
-        case CPUINFO_STR_REGISTER + NEC_AW:				sprintf(info->s = cpuintrf_temp_str(), "AW:%04X", I.regs.w[AW]); break;
-        case CPUINFO_STR_REGISTER + NEC_CW:				sprintf(info->s = cpuintrf_temp_str(), "CW:%04X", I.regs.w[CW]); break;
-        case CPUINFO_STR_REGISTER + NEC_DW:				sprintf(info->s = cpuintrf_temp_str(), "DW:%04X", I.regs.w[DW]); break;
-        case CPUINFO_STR_REGISTER + NEC_BW:				sprintf(info->s = cpuintrf_temp_str(), "BW:%04X", I.regs.w[BW]); break;
-        case CPUINFO_STR_REGISTER + NEC_BP:				sprintf(info->s = cpuintrf_temp_str(), "BP:%04X", I.regs.w[BP]); break;
-        case CPUINFO_STR_REGISTER + NEC_IX:				sprintf(info->s = cpuintrf_temp_str(), "IX:%04X", I.regs.w[IX]); break;
-        case CPUINFO_STR_REGISTER + NEC_IY:				sprintf(info->s = cpuintrf_temp_str(), "IY:%04X", I.regs.w[IY]); break;
-        case CPUINFO_STR_REGISTER + NEC_ES:				sprintf(info->s = cpuintrf_temp_str(), "ES:%04X", I.sregs[ES]); break;
-        case CPUINFO_STR_REGISTER + NEC_CS:				sprintf(info->s = cpuintrf_temp_str(), "CS:%04X", I.sregs[CS]); break;
-        case CPUINFO_STR_REGISTER + NEC_SS:				sprintf(info->s = cpuintrf_temp_str(), "SS:%04X", I.sregs[SS]); break;
-        case CPUINFO_STR_REGISTER + NEC_DS:				sprintf(info->s = cpuintrf_temp_str(), "DS:%04X", I.sregs[DS]); break;
-        case CPUINFO_STR_REGISTER + NEC_VECTOR:			sprintf(info->s = cpuintrf_temp_str(), "V:%02X", I.int_vector); break;
+        case CPUINFO_STR_REGISTER + NEC_PC:				sprintf(info->s, "PC:%04X", (I.sregs[CS]<<4) + I.ip); break;
+        case CPUINFO_STR_REGISTER + NEC_IP:				sprintf(info->s, "IP:%04X", I.ip); break;
+        case CPUINFO_STR_REGISTER + NEC_SP:				sprintf(info->s, "SP:%04X", I.regs.w[SP]); break;
+        case CPUINFO_STR_REGISTER + NEC_FLAGS:			sprintf(info->s, "F:%04X", CompressFlags()); break;
+        case CPUINFO_STR_REGISTER + NEC_AW:				sprintf(info->s, "AW:%04X", I.regs.w[AW]); break;
+        case CPUINFO_STR_REGISTER + NEC_CW:				sprintf(info->s, "CW:%04X", I.regs.w[CW]); break;
+        case CPUINFO_STR_REGISTER + NEC_DW:				sprintf(info->s, "DW:%04X", I.regs.w[DW]); break;
+        case CPUINFO_STR_REGISTER + NEC_BW:				sprintf(info->s, "BW:%04X", I.regs.w[BW]); break;
+        case CPUINFO_STR_REGISTER + NEC_BP:				sprintf(info->s, "BP:%04X", I.regs.w[BP]); break;
+        case CPUINFO_STR_REGISTER + NEC_IX:				sprintf(info->s, "IX:%04X", I.regs.w[IX]); break;
+        case CPUINFO_STR_REGISTER + NEC_IY:				sprintf(info->s, "IY:%04X", I.regs.w[IY]); break;
+        case CPUINFO_STR_REGISTER + NEC_ES:				sprintf(info->s, "ES:%04X", I.sregs[ES]); break;
+        case CPUINFO_STR_REGISTER + NEC_CS:				sprintf(info->s, "CS:%04X", I.sregs[CS]); break;
+        case CPUINFO_STR_REGISTER + NEC_SS:				sprintf(info->s, "SS:%04X", I.sregs[SS]); break;
+        case CPUINFO_STR_REGISTER + NEC_DS:				sprintf(info->s, "DS:%04X", I.sregs[DS]); break;
+        case CPUINFO_STR_REGISTER + NEC_VECTOR:			sprintf(info->s, "V:%02X", I.int_vector); break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
 	case CPUINFO_PTR_INIT:		info->init = CPU_INIT_NAME(v30mz);
@@ -1152,7 +1152,7 @@ CPU_GET_INFO( v30mz )
 					break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME:		strcpy(info->s = cpuintrf_temp_str(), "V30MZ");
+	case CPUINFO_STR_NAME:		strcpy(info->s, "V30MZ");
 					break;
 	}
 }

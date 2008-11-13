@@ -508,7 +508,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 	/* at its endpoint; otherwise, we never get a result from the Z80 */
 	if ((data & 0x10) || cpu_get_reg(machine->cpu[2], Z80_PC) == 0x13a)
 	{
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* on the rising edge, make the crosshair visible again */
 		if ((data & 0x10) && !(z80_ctrl & 0x10))
@@ -516,7 +516,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 	}
 
 	/* boost the interleave whenever this is written to */
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 
 	/* stash the new value */
 	z80_ctrl = data;

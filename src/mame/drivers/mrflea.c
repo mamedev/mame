@@ -127,7 +127,7 @@ static WRITE8_HANDLER( mrflea_main_w ){
 static WRITE8_HANDLER( mrflea_io_w ){
 	mrflea_status |= 0x08; // pending command to IO CPU
 	mrflea_io = data;
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
 }
 
 static READ8_HANDLER( mrflea_main_r ){
@@ -155,8 +155,8 @@ static READ8_HANDLER( mrflea_io_status_r ){
 }
 
 static INTERRUPT_GEN( mrflea_io_interrupt ){
-	if( cpu_getiloops()==0 || (mrflea_status&0x08) )
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	if( cpu_getiloops(device)==0 || (mrflea_status&0x08) )
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( mrflea_interrupt_type_r ){

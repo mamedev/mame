@@ -262,7 +262,7 @@ static WRITE16_HANDLER( sound_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine, 0, data&0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -641,7 +641,7 @@ GFXDECODE_END
 
 static void sound_irq( running_machine *machine, int irq )
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2608_interface ym2608_config =
@@ -676,10 +676,10 @@ static NVRAM_HANDLER( bbusters )
 
 static INTERRUPT_GEN( bbuster )
 {
-	if (cpu_getiloops()==0)
-		cpunum_set_input_line(machine, 0, 6, HOLD_LINE); /* VBL */
+	if (cpu_getiloops(device)==0)
+		cpu_set_input_line(device, 6, HOLD_LINE); /* VBL */
 	else
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE); /* at least 6 interrupts per frame to read gun controls */
+		cpu_set_input_line(device, 2, HOLD_LINE); /* at least 6 interrupts per frame to read gun controls */
 }
 
 static VIDEO_EOF( bbuster )

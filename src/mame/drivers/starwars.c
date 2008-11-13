@@ -79,7 +79,7 @@ static MACHINE_RESET( starwars )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 

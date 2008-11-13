@@ -330,7 +330,7 @@ INTERRUPT_GEN( cps1_interrupt )
 {
 	/* Strider also has a IRQ4 handler. It is input port related, but the game */
 	/* works without it. It is the *only* CPS1 game to have that. */
-	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
 /********************************************************************
@@ -344,7 +344,7 @@ static UINT8 *qsound_sharedram1,*qsound_sharedram2;
 
 INTERRUPT_GEN( cps1_qsound_interrupt )
 {
-	cpunum_set_input_line(machine, cpunum, 2, HOLD_LINE);
+	cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
 
@@ -2736,7 +2736,7 @@ GFXDECODE_END
 
 static void cps1_irq_handler_mus(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface ym2151_config =
@@ -2892,7 +2892,7 @@ static void m5205_int1(running_machine *machine, int data)
 //  sample_buffer1 >>= 4;
 //  sample_select1 ^= 1;
 //  if (sample_select1 == 0)
-//      cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+//      cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void m5205_int2(running_machine *machine, int data)

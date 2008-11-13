@@ -472,18 +472,18 @@ static WRITE8_HANDLER( tmpz84c011_1_dir_pe_w )	{ pio_dir[9] = data; }
 
 static void ctc0_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 0, 0, state);
+	cpu_set_input_line(device->machine->cpu[0], 0, state);
 }
 
 static void ctc1_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 1, 0, state);
+	cpu_set_input_line(device->machine->cpu[1], 0, state);
 }
 
 /* CTC of main cpu, ch0 trigger is vblank */
 static INTERRUPT_GEN( ctc0_trg1 )
 {
-	const device_config *ctc = devtag_get_device(machine, Z80CTC, "main_ctc");
+	const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "main_ctc");
 	z80ctc_trg1_w(ctc, 0, 1);
 	z80ctc_trg1_w(ctc, 0, 0);
 }

@@ -61,7 +61,7 @@ static WRITE8_HANDLER( shootout_bankswitch_w )
 static WRITE8_HANDLER( sound_cpu_command_w )
 {
 	soundlatch_w( machine, offset, data );
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( shootout_flipscreen_w )
@@ -264,12 +264,12 @@ GFXDECODE_END
 
 static void shootout_snd_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,0,linestate);
+	cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 
 static void shootout_snd2_irq(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 0,0,linestate);
+	cpu_set_input_line(machine->cpu[0],0,linestate);
 }
 
 static const ym2203_interface ym2203_config =
@@ -299,10 +299,10 @@ static INTERRUPT_GEN( shootout_interrupt )
 {
 	static int coin = 0;
 
-	if ( input_port_read(machine, "P2") & 0xc0 ) {
+	if ( input_port_read(device->machine, "P2") & 0xc0 ) {
 		if ( coin == 0 ) {
 			coin = 1;
-			nmi_line_pulse(machine, cpunum);
+			nmi_line_pulse(device);
 		}
 	} else
 		coin = 0;

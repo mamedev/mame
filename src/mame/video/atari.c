@@ -1074,7 +1074,7 @@ static TIMER_CALLBACK( antic_issue_dli )
 	{
 		LOG(("           @cycle #%3d issue DLI\n", cycle(machine)));
 		antic.r.nmist |= DLI_NMI;
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
@@ -1143,13 +1143,13 @@ static TIMER_CALLBACK( antic_line_done )
     {
 		LOG(("           @cycle #%3d release WSYNC\n", cycle(machine)));
         /* release the CPU if it was actually waiting for HSYNC */
-        cpu_trigger(machine, TRIGGER_HSYNC);
+        cpuexec_trigger(machine, TRIGGER_HSYNC);
         /* and turn off the 'wait for hsync' flag */
         antic.w.wsync = 0;
     }
 	LOG(("           @cycle #%3d release CPU\n", cycle(machine)));
     /* release the CPU (held for emulating cycles stolen by ANTIC DMA) */
-	cpu_trigger(machine, TRIGGER_STEAL);
+	cpuexec_trigger(machine, TRIGGER_STEAL);
 
 	/* refresh the display (translate color clocks to pixels) */
     antic_linerefresh(machine);
@@ -1169,7 +1169,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
 	LOG(("           @cycle #%3d steal %d cycles\n", cycle(machine), antic.steal_cycles));
 	after(machine, antic.steal_cycles, antic_line_done, "antic_line_done");
     antic.steal_cycles = 0;
-	cpunum_spinuntil_trigger( 0, TRIGGER_STEAL );
+	cpu_spinuntil_trigger( machine->cpu[0], TRIGGER_STEAL );
 }
 
 
@@ -1532,7 +1532,7 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 			LOG(("           cause VBL NMI\n"));
 			/* set the VBL NMI status bit */
 			antic.r.nmist |= VBL_NMI;
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 		}
     }
 
@@ -1544,20 +1544,20 @@ static void generic_atari_interrupt(running_machine *machine, void (*handle_keyb
 
 INTERRUPT_GEN( a400_interrupt )
 {
-	generic_atari_interrupt(machine, a800_handle_keyboard, 4);
+	generic_atari_interrupt(device->machine, a800_handle_keyboard, 4);
 }
 
 INTERRUPT_GEN( a800_interrupt )
 {
-	generic_atari_interrupt(machine, a800_handle_keyboard, 4);
+	generic_atari_interrupt(device->machine, a800_handle_keyboard, 4);
 }
 
 INTERRUPT_GEN( a800xl_interrupt )
 {
-	generic_atari_interrupt(machine, a800_handle_keyboard, 2);
+	generic_atari_interrupt(device->machine, a800_handle_keyboard, 2);
 }
 
 INTERRUPT_GEN( a5200_interrupt )
 {
-	generic_atari_interrupt(machine, a5200_handle_keypads, 4);
+	generic_atari_interrupt(device->machine, a5200_handle_keypads, 4);
 }

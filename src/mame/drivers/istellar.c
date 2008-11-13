@@ -101,7 +101,7 @@ static WRITE8_HANDLER(z80_0_latch2_write)
 	if (z80_2_nmi_enable)
 	{
 		logerror("Executing an NMI on CPU2\n");
-		cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
 		z80_2_nmi_enable = 0;
 	}
 }
@@ -312,10 +312,10 @@ GFXDECODE_END
 static INTERRUPT_GEN( vblank_callback_istellar )
 {
 	/* Interrupt presumably comes from VBlank */
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 
 	/* Interrupt presumably comes from the LDP's status strobe */
-	cpunum_set_input_line(machine, 2, 0, ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[2], 0, ASSERT_LINE);
 }
 
 

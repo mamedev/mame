@@ -275,7 +275,7 @@ static INTERRUPT_GEN( josvolly_snd_interrupt )
 {
 	if(josvolly_nmi_enable)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		josvolly_nmi_enable = 0;
 	}
 }
@@ -285,7 +285,7 @@ static INTERRUPT_GEN( gsword_snd_interrupt )
 {
 	if(gsword_nmi_enable)
 	{
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -359,7 +359,7 @@ static WRITE8_HANDLER( gsword_adpcm_data_w )
 static WRITE8_HANDLER( adpcm_soundcommand_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( cpu1_map, 0 , 8 )

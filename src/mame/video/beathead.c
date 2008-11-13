@@ -114,7 +114,7 @@ WRITE32_HANDLER( beathead_finescroll_w )
 	if ((oldword & 8) && !(newword & 8) && video_screen_get_vpos(machine->primary_screen) != 261)
 	{
 		logerror("Suspending time! (scanline = %d)\n", video_screen_get_vpos(machine->primary_screen));
-		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 

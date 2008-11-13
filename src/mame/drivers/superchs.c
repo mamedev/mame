@@ -87,8 +87,8 @@ static WRITE32_HANDLER( cpua_ctrl_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
-		if (data&0x8000) cpunum_set_input_line(machine, 0,3,HOLD_LINE); /* Guess */
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
+		if (data&0x8000) cpu_set_input_line(machine->cpu[0],3,HOLD_LINE); /* Guess */
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -220,7 +220,7 @@ static WRITE32_HANDLER( superchs_stick_w )
         different byte in this long word before the RTE.  I assume all but the last
         (top) byte cause an IRQ with the final one being an ACK.  (Total guess but it works). */
 	if (mem_mask!=0xff000000)
-		cpunum_set_input_line(machine, 0,3,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0],3,HOLD_LINE);
 }
 
 /***********************************************************
@@ -485,7 +485,7 @@ ROM_END
 static READ32_HANDLER( main_cycle_r )
 {
 	if (cpu_get_pc(machine->activecpu)==0x702)
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 
 	return superchs_ram[0];
 }
@@ -493,7 +493,7 @@ static READ32_HANDLER( main_cycle_r )
 static READ16_HANDLER( sub_cycle_r )
 {
 	if (cpu_get_pc(machine->activecpu)==0x454)
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 
 	return superchs_ram[2]&0xffff;
 }

@@ -21,7 +21,7 @@
  *
  *****************************************************************************/
 
-#include "cpuintrf.h"
+#include "cpuexec.h"
 #include "debugger.h"
 #include "deprecat.h"
 #include "cp1610.h"
@@ -1551,7 +1551,7 @@ static void cp1610_xori(int d)
 static CPU_RESET( cp1610 )
 {
 	/* This is how we set the reset vector */
-	cpunum_set_input_line(Machine, cpunum_get_active(), CP1610_RESET, PULSE_LINE);
+	cpu_set_input_line(Machine->activecpu, CP1610_RESET, PULSE_LINE);
 }
 
 /***************************************************
@@ -3498,28 +3498,28 @@ CPU_GET_INFO( cp1610 )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cp1610_icount;			break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME: 			strcpy(info->s = cpuintrf_temp_str(), "CP1610");		break;
-	case CPUINFO_STR_CORE_FAMILY:	strcpy(info->s = cpuintrf_temp_str(), "");				break;
-	case CPUINFO_STR_CORE_VERSION:	strcpy(info->s = cpuintrf_temp_str(), "1.0");			break;
-	case CPUINFO_STR_CORE_FILE:		strcpy(info->s = cpuintrf_temp_str(), __FILE__);		break;
-	case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s = cpuintrf_temp_str(),
+	case CPUINFO_STR_NAME: 			strcpy(info->s, "CP1610");		break;
+	case CPUINFO_STR_CORE_FAMILY:	strcpy(info->s, "");				break;
+	case CPUINFO_STR_CORE_VERSION:	strcpy(info->s, "1.0");			break;
+	case CPUINFO_STR_CORE_FILE:		strcpy(info->s, __FILE__);		break;
+	case CPUINFO_STR_CORE_CREDITS:	strcpy(info->s,
 									"Copyright Frank Palazzolo, all rights reserved.");
 									break;
     case CPUINFO_STR_FLAGS:
-			sprintf(info->s = cpuintrf_temp_str(), "%c%c%c%c",
+			sprintf(info->s, "%c%c%c%c",
 				cp1610.flags & 0x80 ? 'S':'.',
 				cp1610.flags & 0x40 ? 'Z':'.',
 				cp1610.flags & 0x10 ? 'V':'.',
 				cp1610.flags & 0x10 ? 'C':'.');
 			break;
-	case CPUINFO_STR_REGISTER+CP1610_R0: sprintf(info->s = cpuintrf_temp_str(), "R0:%04X", cp1610.r[0]); break;
-	case CPUINFO_STR_REGISTER+CP1610_R1: sprintf(info->s = cpuintrf_temp_str(), "R1:%04X", cp1610.r[1]); break;
-	case CPUINFO_STR_REGISTER+CP1610_R2: sprintf(info->s = cpuintrf_temp_str(), "R2:%04X", cp1610.r[2]); break;
-	case CPUINFO_STR_REGISTER+CP1610_R3: sprintf(info->s = cpuintrf_temp_str(), "R3:%04X", cp1610.r[3]); break;
-	case CPUINFO_STR_REGISTER+CP1610_R4: sprintf(info->s = cpuintrf_temp_str(), "R4:%04X", cp1610.r[4]); break;
-	case CPUINFO_STR_REGISTER+CP1610_R5: sprintf(info->s = cpuintrf_temp_str(), "R5:%04X", cp1610.r[5]); break;
-	case CPUINFO_STR_REGISTER+CP1610_R6: sprintf(info->s = cpuintrf_temp_str(), "R6:%04X", cp1610.r[6]); break;
-	case CPUINFO_STR_REGISTER+CP1610_R7: sprintf(info->s = cpuintrf_temp_str(), "R7:%04X", cp1610.r[7]); break;
+	case CPUINFO_STR_REGISTER+CP1610_R0: sprintf(info->s, "R0:%04X", cp1610.r[0]); break;
+	case CPUINFO_STR_REGISTER+CP1610_R1: sprintf(info->s, "R1:%04X", cp1610.r[1]); break;
+	case CPUINFO_STR_REGISTER+CP1610_R2: sprintf(info->s, "R2:%04X", cp1610.r[2]); break;
+	case CPUINFO_STR_REGISTER+CP1610_R3: sprintf(info->s, "R3:%04X", cp1610.r[3]); break;
+	case CPUINFO_STR_REGISTER+CP1610_R4: sprintf(info->s, "R4:%04X", cp1610.r[4]); break;
+	case CPUINFO_STR_REGISTER+CP1610_R5: sprintf(info->s, "R5:%04X", cp1610.r[5]); break;
+	case CPUINFO_STR_REGISTER+CP1610_R6: sprintf(info->s, "R6:%04X", cp1610.r[6]); break;
+	case CPUINFO_STR_REGISTER+CP1610_R7: sprintf(info->s, "R7:%04X", cp1610.r[7]); break;
 	}
 
 	return;

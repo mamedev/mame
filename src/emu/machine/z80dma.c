@@ -257,7 +257,7 @@ static void z80dma_update_status(const device_config *device)
 	if (z80dma->intf && z80dma->intf->cpunum >= 0)
 	{
 		//FIXME: Synchronization is done by BUSREQ!
-		cpunum_set_input_line(device->machine, z80dma->intf->cpunum, INPUT_LINE_HALT,
+		cpu_set_input_line(device->machine->cpu[z80dma->intf->cpunum], INPUT_LINE_HALT,
 			pending_transfer ? ASSERT_LINE : CLEAR_LINE);
 	}
 }

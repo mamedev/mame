@@ -443,7 +443,7 @@ static TIMER_DEVICE_CALLBACK( generate_interrupt )
 
 	/* IRQ is clocked on the rising edge of 16V, equal to the previous 32V */
 	if (scanline & 16)
-		cpunum_set_input_line(timer->machine, 0, 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(timer->machine->cpu[0], 0, ((scanline - 1) & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* do a partial update now to handle sprite multiplexing (Maze Invaders) */
 	video_screen_update_partial(timer->machine->primary_screen, scanline);
@@ -460,7 +460,7 @@ static MACHINE_START( centiped )
 
 static MACHINE_RESET( centiped )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	dsw_select = 0;
 	control_select = 0;
 }
@@ -477,7 +477,7 @@ static MACHINE_RESET( magworm )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

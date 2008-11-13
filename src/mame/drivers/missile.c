@@ -404,7 +404,7 @@ static TIMER_CALLBACK( clock_irq )
 
 	/* assert the IRQ if not already asserted */
 	irq_state = (~curv >> 5) & 1;
-	cpunum_set_input_line(machine, 0, 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, irq_state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* force an update while we're here */
 	video_screen_update_partial(machine->primary_screen, v_to_scanline(curv));
@@ -434,9 +434,9 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 
 	/* starting at scanline 224, the CPU runs at half speed */
 	if (curv == 224)
-		cpunum_set_clock(machine, 0, MASTER_CLOCK/16);
+		cpu_set_clock(machine->cpu[0], MASTER_CLOCK/16);
 	else
-		cpunum_set_clock(machine, 0, MASTER_CLOCK/8);
+		cpu_set_clock(machine->cpu[0], MASTER_CLOCK/8);
 
 	/* scanline for the next run */
 	curv ^= 224;
@@ -498,7 +498,7 @@ static MACHINE_START( missile )
 
 static MACHINE_RESET( missile )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 	irq_state = 0;
 }
 
@@ -547,7 +547,7 @@ INLINE offs_t get_bit3_addr(offs_t pixaddr)
 }
 
 
-static void write_vram(offs_t address, UINT8 data)
+static void write_vram(running_machine *machine, offs_t address, UINT8 data)
 {
 	static const UINT8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	offs_t vramaddr;
@@ -572,12 +572,12 @@ static void write_vram(offs_t address, UINT8 data)
 		videoram[vramaddr] = (videoram[vramaddr] & vrammask) | (vramdata & ~vrammask);
 
 		/* account for the extra clock cycle */
-		activecpu_adjust_icount(-1);
+		cpu_adjust_icount(machine->activecpu, -1);
 	}
 }
 
 
-static UINT8 read_vram(offs_t address)
+static UINT8 read_vram(running_machine *machine, offs_t address)
 {
 	offs_t vramaddr;
 	UINT8 vramdata;
@@ -606,7 +606,7 @@ static UINT8 read_vram(offs_t address)
 			result &= ~0x20;
 
 		/* account for the extra clock cycle */
-		activecpu_adjust_icount(-1);
+		cpu_adjust_icount(machine->activecpu, -1);
 	}
 	return result;
 }
@@ -665,7 +665,7 @@ static WRITE8_HANDLER( missile_w )
 	/* if we're in MADSEL mode, write to video RAM */
 	if (get_madsel(machine))
 	{
-		write_vram(offset, data);
+		write_vram(machine, offset, data);
 		return;
 	}
 
@@ -705,7 +705,7 @@ static WRITE8_HANDLER( missile_w )
 	{
 		if (irq_state)
 		{
-			cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 			irq_state = 0;
 		}
 	}
@@ -722,7 +722,7 @@ static READ8_HANDLER( missile_r )
 
 	/* if we're in MADSEL mode, read from video RAM */
 	if (get_madsel(machine))
-		return read_vram(offset);
+		return read_vram(machine, offset);
 
 	/* otherwise, strip A15 and handle manually */
 	offset &= 0x7fff;

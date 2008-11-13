@@ -17,22 +17,22 @@ UINT8 *asteroid_ram1, *asteroid_ram2;
 INTERRUPT_GEN( asteroid_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
-	if (!(input_port_read(machine, "IN0") & 0x80))
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (!(input_port_read(device->machine, "IN0") & 0x80))
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN( asterock_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
-	if ((input_port_read(machine, "IN0") & 0x80))
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if ((input_port_read(device->machine, "IN0") & 0x80))
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 INTERRUPT_GEN( llander_interrupt )
 {
 	/* Turn off interrupts if self-test is enabled */
-	if (input_port_read(machine, "IN0") & 0x02)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "IN0") & 0x02)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 READ8_HANDLER( asteroid_IN0_r )

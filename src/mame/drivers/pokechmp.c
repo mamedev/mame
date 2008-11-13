@@ -94,7 +94,7 @@ static WRITE8_HANDLER( pokechmp_sound_bank_w )
 static WRITE8_HANDLER( pokechmp_sound_w )
 {
 	soundlatch_w(machine,0,data);
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 

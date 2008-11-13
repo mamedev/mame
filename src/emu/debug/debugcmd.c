@@ -245,13 +245,14 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
 	/* ask all the CPUs if they would like to register functions or symbols */
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
-	{
-		cpu_debug_init_func debug_init;
-		debug_init = (cpu_debug_init_func)cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_DEBUG_INIT);
-		if (debug_init != NULL)
-			(*debug_init)(machine->cpu[cpunum]);
-	}
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			cpu_debug_init_func debug_init;
+			debug_init = (cpu_debug_init_func)cpu_get_info_fct(machine->cpu[cpunum], CPUINFO_PTR_DEBUG_INIT);
+			if (debug_init != NULL)
+				(*debug_init)(machine->cpu[cpunum]);
+		}
 
 	add_exit_callback(machine, debug_command_exit);
 
@@ -271,8 +272,9 @@ static void debug_command_exit(running_machine *machine)
 	int cpunum;
 
 	/* turn off all traces */
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
-		debug_cpu_trace(cpunum, NULL, 0, NULL);
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+			debug_cpu_trace(cpunum, NULL, 0, NULL);
 }
 
 
@@ -766,7 +768,7 @@ static void execute_focus(running_machine *machine, int ref, int params, const c
 	/* validate params */
 	if (!debug_command_parameter_number(param[0], &cpuwhich))
 		return;
-	if (cpuwhich >= cpu_gettotalcpu())
+	if (cpuwhich >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpuwhich] == NULL)
 	{
 		debug_console_printf("Invalid CPU number!\n");
 		return;
@@ -827,7 +829,7 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 		{
 			if (!debug_command_parameter_number(param[paramnum], &cpuwhich[paramnum]))
 				return;
-			if (cpuwhich[paramnum] >= cpu_gettotalcpu())
+			if (cpuwhich[paramnum] >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpuwhich[paramnum]] == NULL)
 			{
 				debug_console_printf("Invalid CPU number! (%d)\n", (int)cpuwhich[paramnum]);
 				return;
@@ -898,7 +900,7 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 		{
 			if (!debug_command_parameter_number(param[paramnum], &cpuwhich[paramnum]))
 				return;
-			if (cpuwhich[paramnum] >= cpu_gettotalcpu())
+			if (cpuwhich[paramnum] >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpuwhich[paramnum]] == NULL)
 			{
 				debug_console_printf("Invalid CPU number! (%d)\n", (int)cpuwhich[paramnum]);
 				return;
@@ -1453,7 +1455,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 		return;
 
 	/* further validation */
-	if (cpunum >= cpu_gettotalcpu())
+	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
 	{
 		debug_console_printf("Invalid CPU number!\n");
 		return;
@@ -1620,7 +1622,7 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 		return;
 
 	/* further validation */
-	if (cpunum >= cpu_gettotalcpu())
+	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
 	{
 		debug_console_printf("Invalid CPU number!\n");
 		return;
@@ -1726,7 +1728,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 		return;
 
 	/* further validation */
-	if (cpunum >= cpu_gettotalcpu())
+	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
 	{
 		debug_console_printf("Invalid CPU number!\n");
 		return;
@@ -1872,7 +1874,7 @@ static void execute_trace_internal(running_machine *machine, int ref, int params
 	/* further validation */
 	if (!mame_stricmp(filename, "off"))
 		filename = NULL;
-	if (cpunum >= cpu_gettotalcpu())
+	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
 	{
 		debug_console_printf("Invalid CPU number!\n");
 		return;
@@ -1957,7 +1959,7 @@ static void execute_history(running_machine *machine, int ref, int params, const
 		return;
 
 	/* further validation */
-	if (cpunum >= cpu_gettotalcpu())
+	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
 	{
 		debug_console_printf("Invalid CPU number!\n");
 		return;
@@ -2137,7 +2139,7 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 	/* validate parameters */
 	if (params > 0 && !debug_command_parameter_number(param[0], &cpunum))
 		return;
-	if (cpunum != 100000 && cpunum >= cpu_gettotalcpu())
+	if (cpunum != 100000 && (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL))
 	{
 		debug_console_printf("Invalid CPU number!\n");
 		return;

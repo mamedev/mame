@@ -289,7 +289,7 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( clock_r )
 {
-	return (cpunum_gettotalcycles(0) & 0x100) ? 1 : 0;
+	return (cpu_get_total_cycles(field->port->machine->cpu[0]) & 0x100) ? 1 : 0;
 }
 
 static INPUT_PORTS_START( asteroid )

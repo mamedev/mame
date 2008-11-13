@@ -292,7 +292,7 @@ static WRITE8_HANDLER( mcu_p3_w )
 
 static READ8_HANDLER( nmi_ack_r )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 	return 0;
 }
 
@@ -346,8 +346,8 @@ static TIMER_CALLBACK( delayed_z80_mcu_w )
 logerror("Z80 sends command %02x\n",param);
 	from_z80 = param;
 	from_mcu_pending = 0;
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
 }
 
 static TIMER_CALLBACK( delayed_mcu_z80_w )
@@ -966,15 +966,15 @@ static const ay8910_interface bootleg_ay8910_interface_2 =
 static INTERRUPT_GEN( sqix_interrupt )
 {
 	/* highly suspicious... */
-	if (cpu_getiloops() <= 3)
-		nmi_line_assert(machine, cpunum);
+	if (cpu_getiloops(device) <= 3)
+		nmi_line_assert(device);
 }
 
 static INTERRUPT_GEN( bootleg_interrupt )
 {
 	/* highly suspicious... */
-	if (cpu_getiloops() <= 3)
-		nmi_line_pulse(machine, cpunum);
+	if (cpu_getiloops(device) <= 3)
+		nmi_line_pulse(device);
 }
 
 

@@ -73,8 +73,8 @@ static TIMER_CALLBACK( taito_en_timer_callback )
 {
 	/* Only cause IRQ if the mask is set to allow it */
 	if (m68681_imr&8) {
-		cpunum_set_input_line_vector(1, 6, vector_reg);
-		cpunum_set_input_line(machine, 1, 6, ASSERT_LINE);
+		cpu_set_input_line_vector(machine->cpu[1], 6, vector_reg);
+		cpu_set_input_line(machine->cpu[1], 6, ASSERT_LINE);
 		imr_status|=0x8;
 	}
 }
@@ -97,7 +97,7 @@ READ16_HANDLER(f3_68681_r)
 
 	/* IRQ ack */
 	if (offset==0xf) {
-		cpunum_set_input_line(machine, 1, 6, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 6, CLEAR_LINE);
 		return 0;
 	}
 
@@ -258,7 +258,7 @@ void taito_f3_soundsystem_reset(running_machine *machine)
 	sound_ram[2]=ROM[0x80002];
 	sound_ram[3]=ROM[0x80003];
 
-	//cpunum_set_input_line(Machine, 1, INPUT_LINE_RESET, ASSERT_LINE);
+	//cpu_set_input_line(Machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 const es5505_interface es5505_taito_f3_config =

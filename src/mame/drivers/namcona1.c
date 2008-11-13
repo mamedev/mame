@@ -721,7 +721,7 @@ static WRITE16_HANDLER( mcu_mailbox_w_68k )
 //  logerror("mailbox_w_68k: %x @ %x\n", data, offset);
 
 	if (offset == 4)
-		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], M37710_LINE_IRQ0, HOLD_LINE);
 
 	COMBINE_DATA(&mcu_mailbox[offset%8]);
 
@@ -846,7 +846,7 @@ static WRITE8_HANDLER( port4_w )
 		logerror("launching 68k, PC=%x\n", cpu_get_pc(machine->activecpu));
 
 		// reset and launch the 68k
-		cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	mcu_port4 = data;
@@ -925,7 +925,7 @@ static MACHINE_START( namcona1 )
 // for games with the MCU emulated, the MCU boots the 68000.  don't allow it before that.
 static MACHINE_RESET( namcona1_mcu )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, ASSERT_LINE);
 
 	mcu_port5 = 1;
 }
@@ -960,10 +960,10 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( namcona1_interrupt )
 {
-	int level = cpu_getiloops(); /* 0,1,2,3,4 */
+	int level = cpu_getiloops(device); /* 0,1,2,3,4 */
 	if( level==0 )
 	{
-		simulate_mcu( machine );
+		simulate_mcu( device->machine );
 	}
 	if( mEnableInterrupts )
 	{
@@ -974,10 +974,10 @@ static INTERRUPT_GEN( namcona1_interrupt )
 				int scanline = namcona1_vreg[0x8a/2]&0xff;
 				if( scanline )
 				{
-					video_screen_update_partial(machine->primary_screen, scanline );
+					video_screen_update_partial(device->machine->primary_screen, scanline );
 				}
 			}
-			cpunum_set_input_line(machine, 0, level+1, HOLD_LINE);
+			cpu_set_input_line(device, level+1, HOLD_LINE);
 		}
 	}
 }
@@ -988,13 +988,13 @@ static INTERRUPT_GEN( namcona1_interrupt )
 
 static INTERRUPT_GEN( mcu_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
- 		cpunum_set_input_line(machine, 1, M37710_LINE_IRQ1, HOLD_LINE);
+ 		cpu_set_input_line(device, M37710_LINE_IRQ1, HOLD_LINE);
 	}
-	else if (cpu_getiloops() == 1)
+	else if (cpu_getiloops(device) == 1)
 	{
-		cpunum_set_input_line(machine, 1, M37710_LINE_ADC, HOLD_LINE);
+		cpu_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 

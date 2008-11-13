@@ -223,7 +223,7 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data & 0xff);
-		cpunum_set_input_line(machine, 1,0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0, HOLD_LINE);
 	}
 }
 
@@ -282,7 +282,7 @@ static WRITE16_HANDLER( macross2_sound_reset_w )
 {
 	/* PCB behaviour verified by Corrado Tomaselli at MAME Italia Forum:
        every time music changes Z80 is resetted */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( macross2_sound_command_w )
@@ -321,7 +321,7 @@ static WRITE16_HANDLER( afega_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,0,data&0xff);
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -3431,7 +3431,7 @@ static const ym2203_interface ym2203_nmk004_interface =
 
 static void ym2203_irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -3446,8 +3446,8 @@ static const ym2203_interface ym2203_config =
 
 static INTERRUPT_GEN( nmk_interrupt )
 {
-	if (cpu_getiloops() == 0) cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
-	else cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	if (cpu_getiloops(device) == 0) cpu_set_input_line(device, 4, HOLD_LINE);
+	else cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
 
@@ -4774,7 +4774,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface afega_ym2151_intf =

@@ -72,14 +72,14 @@ static READ16_HANDLER( tumblep_prot_r )
 static WRITE16_HANDLER( tumblep_sound_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( jumppop_sound_w )
 {
 	soundlatch_w(machine,0,data & 0xff);
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE );
 }
 #endif
 
@@ -287,7 +287,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1,1,state); /* IRQ 2 */
+	cpu_set_input_line(machine->cpu[1],1,state); /* IRQ 2 */
 }
 
 static const ym2151_interface ym2151_config =

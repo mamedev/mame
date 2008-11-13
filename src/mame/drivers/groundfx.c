@@ -107,7 +107,7 @@ static WRITE32_HANDLER( color_ram_w )
 
 static TIMER_CALLBACK( groundfx_interrupt5 )
 {
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE); //from 5... ADC port
+	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE); //from 5... ADC port
 }
 
 
@@ -390,7 +390,7 @@ static MACHINE_RESET( groundfx )
 static INTERRUPT_GEN( groundfx_interrupt )
 {
 	frame_counter^=1;
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( groundfx )
@@ -472,7 +472,7 @@ static READ32_HANDLER( irq_speedup_r_groundfx )
 	(groundfx_ram[((cpu_get_sp(machine->activecpu)&0x1ffff)/4)+1]>>16);
 
 	if (cpu_get_pc(machine->activecpu)==0x1ece && ptr==0x1b9a)
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 
 	return groundfx_ram[0xb574/4];
 }

@@ -72,7 +72,7 @@ static int pitnrun_nmi;
 
 static INTERRUPT_GEN( pitnrun_nmi_source )
 {
-	 if(pitnrun_nmi) cpunum_set_input_line(machine, 0,INPUT_LINE_NMI, PULSE_LINE);
+	 if(pitnrun_nmi) cpu_set_input_line(device,INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )

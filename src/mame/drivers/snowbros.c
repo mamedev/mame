@@ -106,21 +106,21 @@ static int sb3_music;
 
 static INTERRUPT_GEN( snowbros_interrupt )
 {
-	cpunum_set_input_line(machine, 0, cpu_getiloops() + 2, HOLD_LINE);	/* IRQs 4, 3, and 2 */
+	cpu_set_input_line(device, cpu_getiloops(device) + 2, HOLD_LINE);	/* IRQs 4, 3, and 2 */
 }
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	int status = okim6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(device->machine,0);
 
-	cpunum_set_input_line(machine, 0, cpu_getiloops() + 2, HOLD_LINE);	/* IRQs 4, 3, and 2 */
+	cpu_set_input_line(device, cpu_getiloops(device) + 2, HOLD_LINE);	/* IRQs 4, 3, and 2 */
 
 	if (sb3_music_is_playing)
 	{
 		if ((status&0x08)==0x00)
 		{
-			okim6295_data_0_w(machine,0,0x80|sb3_music);
-			okim6295_data_0_w(machine,0,0x00|0x82);
+			okim6295_data_0_w(device->machine,0,0x80|sb3_music);
+			okim6295_data_0_w(device->machine,0,0x00|0x82);
 		}
 
 	}
@@ -128,7 +128,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x08)
 		{
-			okim6295_data_0_w(machine,0,0x40);		/* Stop playing music */
+			okim6295_data_0_w(device->machine,0,0x40);		/* Stop playing music */
 		}
 	}
 
@@ -148,7 +148,7 @@ static WRITE16_HANDLER( snowbros_68000_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,offset,data & 0xff);
-		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -278,7 +278,7 @@ static WRITE16_HANDLER( twinadv_68000_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine,offset,data & 0xff);
-		cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -1496,7 +1496,7 @@ GFXDECODE_END
 /* handler called by the 3812/2151 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* SnowBros Sound */

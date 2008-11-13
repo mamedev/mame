@@ -592,9 +592,9 @@ static void megadrive_vdp_set_register(running_machine *machine, int regnum, UIN
 		if (megadrive_irq4_pending)
 		{
 			if (MEGADRIVE_REG0_IRQ4_ENABLE)
-				cpunum_set_input_line(machine, 0,4,HOLD_LINE);
+				cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
 			else
-				cpunum_set_input_line(machine, 0,4,CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0],4,CLEAR_LINE);
 		}
 
 		/* ??? Fatal Rewind needs this but I'm not sure it's accurate behavior
@@ -609,9 +609,9 @@ static void megadrive_vdp_set_register(running_machine *machine, int regnum, UIN
 		if (megadrive_irq6_pending)
 		{
 			if (MEGADRIVE_REG01_IRQ6_ENABLE )
-				cpunum_set_input_line(machine, 0,6,HOLD_LINE);
+				cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
 			else
-				cpunum_set_input_line(machine, 0,6,CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0],6,CLEAR_LINE);
 		}
 
 		/* ??? */
@@ -719,7 +719,7 @@ static void megadrive_do_insta_68k_to_vram_dma(UINT32 source,int length)
 	if (length==0x00) length = 0xffff;
 
 	/* This is a hack until real DMA timings are implemented */
-	cpu_spinuntil_time(ATTOTIME_IN_NSEC(length*1000/3500));
+	cpu_spinuntil_time(Machine->activecpu, ATTOTIME_IN_NSEC(length*1000/3500));
 
 	for (count = 0;count<(length>>1);count++)
 	{
@@ -2330,13 +2330,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
 
 		}
 	}
@@ -2346,13 +2346,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
 		}
 	}
 	else // word access
@@ -2361,13 +2361,13 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 		{
 			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
 		}
 	}
 }
@@ -2380,13 +2380,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 		}
 	}
@@ -2396,13 +2396,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 
 		}
@@ -2413,13 +2413,13 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 		{
 			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, CLEAR_LINE );
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, CLEAR_LINE );
 		}
 		else
 		{
 			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 		}
 	}
@@ -2734,8 +2734,8 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 
 		if (data & 0x02)
 		{
-			cpunum_set_input_line(machine, _32x_master_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
-			cpunum_set_input_line(machine, _32x_slave_cpu_number, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[_32x_master_cpu_number], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], INPUT_LINE_RESET, CLEAR_LINE);
 		}
 
 		if (data & 0x01)
@@ -2805,12 +2805,12 @@ static WRITE16_HANDLER( _32x_68k_a15102_w )
 
 		if (data&0x1)
 		{
-			if (sh2_master_cmdint_enable) cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (sh2_master_cmdint_enable) cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 		}
 
 		if (data&0x2)
 		{
-			if (sh2_slave_cmdint_enable) cpunum_set_input_line(machine, _32x_slave_cpu_number,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (sh2_slave_cmdint_enable) cpu_set_input_line(machine->cpu[_32x_slave_cpu_number],SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 		}
 	}
 }
@@ -3228,40 +3228,40 @@ static WRITE16_HANDLER( _32x_sh2_common_4002_w )
 // VRES (md reset button interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4014_w ){cpunum_set_input_line(machine,  _32x_master_cpu_number,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4014_w ){cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 4016
 // VINT (vertical interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4016_w ){cpunum_set_input_line(machine,  _32x_master_cpu_number,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4016_w ){cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 4018
 // HINT (horizontal interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4018_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4018_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4018_w ){ cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4018_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401A
 // HINT (control register interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_401a_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_401a_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_401a_w ){ cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_401a_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401C
 // PINT (PWM timer interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_401c_w ){ cpunum_set_input_line(machine, _32x_master_cpu_number,SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_401c_w ) { cpunum_set_input_line(machine, _32x_slave_cpu_number, SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_401c_w ){ cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_401c_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401E
@@ -3923,7 +3923,7 @@ static UINT8 megadrive_io_read_data_port_svp(int portnum)
 
 static READ16_HANDLER( svp_speedup_r )
 {
-	 cpu_spinuntil_time(ATTOTIME_IN_USEC(100));
+	 cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(100));
 	return 0x0425;
 }
 
@@ -5925,8 +5925,8 @@ static TIMER_CALLBACK( scanline_timer_callback )
 			// 32x interrupt!
 			if (_32x_is_connected)
 			{
-				if (sh2_master_vint_enable) cpunum_set_input_line(machine,  _32x_master_cpu_number,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
-				if (sh2_slave_vint_enable) cpunum_set_input_line(machine,  _32x_slave_cpu_number,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+				if (sh2_master_vint_enable) cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+				if (sh2_slave_vint_enable) cpu_set_input_line(machine->cpu[_32x_slave_cpu_number],SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
 			}
 
 		}
@@ -5975,11 +5975,11 @@ static TIMER_CALLBACK( scanline_timer_callback )
 	{
 		if (genesis_scanline_counter==megadrive_z80irq_scanline)
 		{
-			if ((genz80.z80_has_bus==1) && (genz80.z80_is_reset==0)) cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+			if ((genz80.z80_has_bus==1) && (genz80.z80_is_reset==0)) cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 		}
 		if (genesis_scanline_counter==megadrive_z80irq_scanline+1)
 		{
-			cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
 		}
 	}
 
@@ -5997,14 +5997,14 @@ static TIMER_CALLBACK( irq6_on_callback )
 
 	{
 //      megadrive_irq6_pending = 1;
-		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6) cpunum_set_input_line(machine, 0,6,HOLD_LINE);
+		if (MEGADRIVE_REG01_IRQ6_ENABLE || genesis_always_irq6) cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
 	}
 }
 
 static TIMER_CALLBACK( irq4_on_callback )
 {
 	//mame_printf_debug("irq4 active on %d\n",genesis_scanline_counter);
-	cpunum_set_input_line(machine, 0,4,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
 }
 
 /*****************************************************************************************/
@@ -6055,9 +6055,9 @@ MACHINE_RESET( megadriv )
 	if (genesis_has_z80)
 	{
 		genz80.z80_is_reset = 1;
-		cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 		genz80.z80_has_bus = 1;
-		cpunum_set_input_line(machine, genz80.z80_cpunum, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
 		genz80.z80_bank_pos = 0;
 		genz80.z80_bank_addr = 0;
 		genesis_scanline_counter = -1;
@@ -6080,8 +6080,8 @@ MACHINE_RESET( megadriv )
 	if (genesis_other_hacks)
 	{
 	//  set_refresh_rate(megadriv_framerate);
-		cpunum_set_clockscale(machine, 0, 0.9950f); /* Fatal Rewind is very fussy... */
-	//  cpunum_set_clockscale(machine, 0, 0.3800f); /* Fatal Rewind is very fussy... */
+		cpu_set_clockscale(machine->cpu[0], 0.9950f); /* Fatal Rewind is very fussy... */
+	//  cpu_set_clockscale(machine->cpu[0], 0.3800f); /* Fatal Rewind is very fussy... */
 
 		memset(megadrive_ram,0x00,0x10000);
 	}
@@ -6096,18 +6096,18 @@ MACHINE_RESET( megadriv )
 	/* if any of these extra CPUs exist, pause them until we actually turn them on */
 	if (_32x_master_cpu_number != -1)
 	{
-		cpunum_set_input_line(machine, _32x_master_cpu_number, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[_32x_master_cpu_number], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	if (_32x_slave_cpu_number != -1)
 	{
-		cpunum_set_input_line(machine, _32x_slave_cpu_number, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
 	if (_segacd_68k_cpu_number != -1 )
 	{
-		cpunum_set_input_line(machine, _segacd_68k_cpu_number, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(machine, _segacd_68k_cpu_number, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[_segacd_68k_cpu_number], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[_segacd_68k_cpu_number], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 }
@@ -6140,9 +6140,9 @@ VIDEO_EOF(megadriv)
 	megadrive_sprite_collision=0;//? when to reset this ..
 	megadrive_imode = MEGADRIVE_REG0C_INTERLEAVE; // can't change mid-frame..
 	megadrive_imode_odd_frame^=1;
-//  cpunum_set_input_line(machine, 1,0,CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
+//  cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-	if (MD_RESET_BUTTON)  cpunum_set_input_line(machine, 0, INPUT_LINE_RESET, PULSE_LINE);
+	if (MD_RESET_BUTTON)  cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 
 /*
 int megadrive_total_scanlines = 262;
@@ -6483,7 +6483,7 @@ static void megadriv_init_common(running_machine *machine)
 		memory_set_bankptr( 1, genz80.z80_prgram );
 	}
 
-	cpunum_set_irq_callback(0, genesis_int_callback);
+	cpu_set_irq_callback(machine->cpu[0], genesis_int_callback);
 	megadriv_backupram = NULL;
 	megadriv_backupram_length = 0;
 

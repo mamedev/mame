@@ -40,7 +40,7 @@ WRITE8_HANDLER( irem_sound_cmd_w )
 	if ((data & 0x80) == 0)
 		soundlatch_w(machine, 0, data & 0x7f);
 	else
-		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 }
 
 
@@ -147,7 +147,7 @@ static WRITE8_HANDLER( ay8910_1_porta_w )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 
@@ -175,7 +175,7 @@ static WRITE8_HANDLER( m62_adpcm_w )
 
 static void adpcm_int(running_machine *machine, int data)
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
 	if (sndti_exists(SOUND_MSM5205, 1))

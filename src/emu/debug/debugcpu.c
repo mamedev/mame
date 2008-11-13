@@ -1242,7 +1242,7 @@ int debug_cpu_breakpoint_set(running_machine *machine, int cpunum, offs_t addres
 	debug_cpu_info *info = &global.cpuinfo[cpunum];
 	debug_cpu_breakpoint *bp;
 
-	assert_always(cpunum >= 0 && cpunum < cpu_gettotalcpu(), "debug_cpu_breakpoint_set() called with invalid cpunum!");
+	assert_always(cpunum >= 0 && cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL, "debug_cpu_breakpoint_set() called with invalid cpunum!");
 
 	/* allocate breakpoint */
 	bp = malloc_or_die(sizeof(*bp));
@@ -2726,11 +2726,12 @@ void debug_cpu_flush_traces(void)
 {
 	int cpunum;
 
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
-	{
-		if (global.cpuinfo[cpunum].trace.file)
-			fflush(global.cpuinfo[cpunum].trace.file);
-	}
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(Machine->cpu); cpunum++)
+		if (Machine->cpu[cpunum] != NULL)
+		{
+			if (global.cpuinfo[cpunum].trace.file)
+				fflush(global.cpuinfo[cpunum].trace.file);
+		}
 }
 
 
@@ -2768,7 +2769,7 @@ static UINT64 get_wpdata(void *ref)
 
 static UINT64 get_cycles(void *ref)
 {
-	return activecpu_get_icount();
+	return *cpu_get_icount_ptr(Machine->activecpu);
 }
 
 

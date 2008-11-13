@@ -1338,9 +1338,9 @@ static void
 InitDSP( running_machine *machine, int bSuperSystem22 )
 {
 	mbSuperSystem22 = bSuperSystem22;
-	cpunum_set_input_line(machine, 1,INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
-	cpunum_set_input_line(machine, 2,INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
-	cpunum_set_input_line(machine, 3,INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
+	cpu_set_input_line(machine->cpu[2],INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
+	cpu_set_input_line(machine->cpu[3],INPUT_LINE_RESET,ASSERT_LINE); /* MCU */
 } /* InitDSP */
 
 static READ16_HANDLER( pdp_status_r )
@@ -1520,12 +1520,12 @@ static WRITE16_HANDLER( slave_external_ram_w )
 
 static void HaltSlaveDSP( running_machine *machine )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static void EnableSlaveDSP( void )
 {
-//  cpunum_set_input_line(Machine, 2, INPUT_LINE_RESET, CLEAR_LINE);
+//  cpu_set_input_line(Machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static READ16_HANDLER( dsp_HOLD_signal_r )
@@ -1703,14 +1703,14 @@ static INTERRUPT_GEN( dsp_serial_pulse1 )
 	{
 		mSerialDataSlaveToMasterCurrent = mSerialDataSlaveToMasterNext;
 
-		if( cpu_getiloops()==0 )
+		if( cpu_getiloops(device)==0 )
 		{
-			cpunum_set_input_line(machine, 1, TMS32025_INT0, HOLD_LINE);
+			cpu_set_input_line(device->machine->cpu[1], TMS32025_INT0, HOLD_LINE);
 		}
-		cpunum_set_input_line(machine, 1, TMS32025_RINT, HOLD_LINE);
-		cpunum_set_input_line(machine, 1, TMS32025_XINT, HOLD_LINE);
-		cpunum_set_input_line(machine, 2, TMS32025_RINT, HOLD_LINE);
-		cpunum_set_input_line(machine, 2, TMS32025_XINT, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[1], TMS32025_RINT, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[1], TMS32025_XINT, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[2], TMS32025_RINT, HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[2], TMS32025_XINT, HOLD_LINE);
 	}
 }
 
@@ -2098,7 +2098,7 @@ GetDspControlRegister( void )
 */
 static TIMER_CALLBACK( start_subcpu )
 {
-	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE32_HANDLER( namcos22_system_controller_w )
@@ -2135,11 +2135,11 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 		{ /* SUBCPU enable for Super System 22 */
 			if (data)
 			{
-				cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			else
 			{
-				cpunum_set_input_line(machine, 3,INPUT_LINE_RESET,ASSERT_LINE); /* M37710 MCU */
+				cpu_set_input_line(machine->cpu[3],INPUT_LINE_RESET,ASSERT_LINE); /* M37710 MCU */
 			}
 		}
 	}
@@ -2161,19 +2161,19 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 	{
 		if( newReg == 0 )
 		{ /* disable DSPs */
-			cpunum_set_input_line(machine, 1,INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
-			cpunum_set_input_line(machine, 2,INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
+			cpu_set_input_line(machine->cpu[1],INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
+			cpu_set_input_line(machine->cpu[2],INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
 			mbEnableDspIrqs = 0;
 		}
 		else if( newReg==1 )
 		{ /*enable dsp and rendering subsystem */
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 			namcos22_enable_slave_simulation();
 			mbEnableDspIrqs = 1;
 		}
 		else if( newReg==0xff )
 		{ /* used to upload game-specific code to master/slave dsps */
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 			mbEnableDspIrqs = 0;
 		}
 	}
@@ -2193,10 +2193,10 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 */
 static INTERRUPT_GEN( namcos22s_interrupt )
 {
-	if( cpu_getiloops() == 0 )
+	if( cpu_getiloops(device) == 0 )
 	{
 		int vblank_level   = nthbyte(namcos22_system_controller,0x00)&0x7; /* $700004: ack */
-		cpunum_set_input_line(machine, 0, vblank_level, HOLD_LINE);
+		cpu_set_input_line(device, vblank_level, HOLD_LINE);
 		mFrameCount++;
 	}
 	else
@@ -2204,7 +2204,7 @@ static INTERRUPT_GEN( namcos22s_interrupt )
 		//int scanline_level = nthbyte(namcos22_system_controller,0x01)&0x7; /* $700005: ack */
 		//int sci_level      = nthbyte(namcos22_system_controller,0x02)&0x7; /* $700006: ack */
 		//int unk_irq        = nthbyte(namcos22_system_controller,0x03)&0x7; /* $700007: ack */
-		//cpunum_set_input_line(machine, 0, sci_level, HOLD_LINE);
+		//cpu_set_input_line(device, sci_level, HOLD_LINE);
 	}
 }
 
@@ -2600,7 +2600,7 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 				int i;
 				for (i = 0; i < 16; i++)
 				{
-					cpunum_set_input_line(machine, 3, M37710_LINE_TIMERA3TICK, PULSE_LINE);
+					cpu_set_input_line(machine->cpu[3], M37710_LINE_TIMERA3TICK, PULSE_LINE);
 				}
 			}
 
@@ -2755,17 +2755,17 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( mcu_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
- 		cpunum_set_input_line(machine, 3, M37710_LINE_IRQ0, HOLD_LINE);
+ 		cpu_set_input_line(device, M37710_LINE_IRQ0, HOLD_LINE);
 	}
-	else if (cpu_getiloops() == 1)
+	else if (cpu_getiloops(device) == 1)
 	{
-		cpunum_set_input_line(machine, 3, M37710_LINE_IRQ2, HOLD_LINE);
+		cpu_set_input_line(device, M37710_LINE_IRQ2, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 3, M37710_LINE_ADC, HOLD_LINE);
+		cpu_set_input_line(device, M37710_LINE_ADC, HOLD_LINE);
 	}
 }
 
@@ -3091,7 +3091,7 @@ static INTERRUPT_GEN( namcos22_interrupt )
 	switch( namcos22_gametype )
 	{
 	case NAMCOS22_RIDGE_RACER:
-		HandleDrivingIO(machine);
+		HandleDrivingIO(device->machine);
 		irq_level1 = 4;
 		irq_level2 = 5;
 		// 1:0a0b6
@@ -3104,7 +3104,7 @@ static INTERRUPT_GEN( namcos22_interrupt )
 		break;
 
 	case NAMCOS22_RIDGE_RACER2:
-		HandleDrivingIO(machine);
+		HandleDrivingIO(device->machine);
 		irq_level1 = 1;
 		irq_level2 = 5;
 		//1:0d10c  40000005
@@ -3117,11 +3117,11 @@ static INTERRUPT_GEN( namcos22_interrupt )
 		break;
 
 	case NAMCOS22_RAVE_RACER:
-		HandleDrivingIO(machine);
+		HandleDrivingIO(device->machine);
 		break;
 
 	case NAMCOS22_VICTORY_LAP:
-		HandleDrivingIO(machine);
+		HandleDrivingIO(device->machine);
 		// a54 indir to 21c2 (hblank?)
 		// a5a (rte)
 		// a5c (rte)
@@ -3134,7 +3134,7 @@ static INTERRUPT_GEN( namcos22_interrupt )
 		break;
 
 	case NAMCOS22_ACE_DRIVER:
-		HandleDrivingIO(machine);
+		HandleDrivingIO(device->machine);
 		// 9f8 (rte)
 		// 9fa (rte)
 		// 9fc (rte)
@@ -3152,7 +3152,7 @@ static INTERRUPT_GEN( namcos22_interrupt )
 		//move.b  #$35, $40000004.l
 		//
 		//move.b  #$34, $40000004.l
-		HandleCyberCommandoIO(machine);
+		HandleCyberCommandoIO(device->machine);
 		irq_level1 = nthbyte(namcos22_system_controller,0x04)&0x7;
 		irq_level2 = nthbyte(namcos22_system_controller,0x02)&0x7;
 		break;
@@ -3161,18 +3161,18 @@ static INTERRUPT_GEN( namcos22_interrupt )
 		break;
 	}
 
-	switch( cpu_getiloops() )
+	switch( cpu_getiloops(device) )
 	{
 	case 0:
 		if( irq_level1 )
 		{
-			cpunum_set_input_line(machine, 0, irq_level1, HOLD_LINE); /* vblank */
+			cpu_set_input_line(device, irq_level1, HOLD_LINE); /* vblank */
 		}
 		break;
 	case 1:
 		if( irq_level2 )
 		{
-			cpunum_set_input_line(machine, 0, irq_level2, HOLD_LINE); /* SCI */
+			cpu_set_input_line(device, irq_level2, HOLD_LINE); /* SCI */
 		}
 		break;
 	}
@@ -5057,7 +5057,7 @@ static READ16_HANDLER( mcu141_speedup_r )
 {
 	if ((cpu_get_pc(machine->activecpu) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return su_82;
@@ -5073,7 +5073,7 @@ static READ16_HANDLER( mcu130_speedup_r )
 {
 	if ((cpu_get_pc(machine->activecpu) == 0xc12a) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return su_82;
@@ -5084,7 +5084,7 @@ static READ16_HANDLER( mcuc74_speedup_r )
 {
 	if (((cpu_get_pc(machine->activecpu) == 0xc0df) || (cpu_get_pc(machine->activecpu) == 0xc101)) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	}
 
 	return su_82;

@@ -933,8 +933,8 @@ static WRITE8_DEVICE_HANDLER( n7751_command_w )
         D3    = /INT line
     */
 	n7751_command = data & 0x07;
-	cpunum_set_input_line(device->machine, 1, 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
-	cpu_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_set_input_line(device->machine->cpu[1], 0, ((data & 0x08) == 0) ? ASSERT_LINE : CLEAR_LINE);
+	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 

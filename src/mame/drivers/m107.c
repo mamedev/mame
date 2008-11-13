@@ -75,14 +75,14 @@ static TIMER_CALLBACK( m107_scanline_interrupt )
 	if (scanline == m107_raster_irq_position)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M107_IRQ_2);
+		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M107_IRQ_2);
 	}
 
 	/* VBLANK interrupt */
 	else if (scanline == video_screen_get_visible_area(machine->primary_screen)->max_y + 1)
 	{
 		video_screen_update_partial(machine->primary_screen, scanline);
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M107_IRQ_0);
+		cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M107_IRQ_0);
 	}
 
 	/* adjust for next scanline */
@@ -119,14 +119,14 @@ static TIMER_CALLBACK( setvector_callback )
 	}
 
 	if (irqvector & 0x2)		/* YM2151 has precedence */
-		cpunum_set_input_line_vector(1,0,0x18);
+		cpu_set_input_line_vector(machine->cpu[1],0,0x18);
 	else if (irqvector & 0x1)	/* V30 */
-		cpunum_set_input_line_vector(1,0,0x19);
+		cpu_set_input_line_vector(machine->cpu[1],0,0x19);
 
 	if (irqvector == 0)	/* no IRQs pending */
-		cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1],0,ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( m107_soundlatch_w )
@@ -156,7 +156,7 @@ static WRITE16_HANDLER( m107_sound_irq_ack_w )
 static WRITE16_HANDLER( m107_sound_status_w )
 {
 	COMBINE_DATA(&sound_status);
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, M107_IRQ_3);
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M107_IRQ_3);
 }
 
 /*****************************************************************************/

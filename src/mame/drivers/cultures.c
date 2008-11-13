@@ -348,7 +348,7 @@ static PALETTE_INIT( cultures )
 static INTERRUPT_GEN( cultures_interrupt )
 {
 	if (irq_enable)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static MACHINE_RESET( cultures )

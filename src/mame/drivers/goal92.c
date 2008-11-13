@@ -31,7 +31,7 @@ static WRITE16_HANDLER( goal92_sound_command_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(machine, 0, (data >> 8) & 0xff);
-		cpunum_set_input_line(machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
 	}
 }
 
@@ -234,7 +234,7 @@ INPUT_PORTS_END
 /* handler called by the 2203 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_config =
@@ -256,7 +256,7 @@ static void goal92_adpcm_int(running_machine *machine, int data)
 
 	toggle ^= 1;
 	if(toggle)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =

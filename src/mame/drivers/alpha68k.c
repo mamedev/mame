@@ -346,7 +346,7 @@ static WRITE16_HANDLER( paddlema_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine, 0, data);
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -355,7 +355,7 @@ static WRITE16_HANDLER( tnexspce_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_w(machine, 0, data);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 //ZT
@@ -1876,7 +1876,7 @@ static const ym2203_interface ym2203_config =
 
 static void YM3812_irq(running_machine *machine, int param)
 {
-	cpunum_set_input_line(machine, 1, 0, (param) ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, (param) ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const ym3812_interface ym3812_config =
@@ -1886,10 +1886,10 @@ static const ym3812_interface ym3812_config =
 
 static INTERRUPT_GEN( alpha68k_interrupt )
 {
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line(device, 1, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 //ZT
 
@@ -3030,7 +3030,7 @@ static READ16_HANDLER( timesold_cycle_r )
 	int ret=shared_ram[0x4];
 
 	if (cpu_get_pc(machine->activecpu)==0x9ea2 && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3042,7 +3042,7 @@ static READ16_HANDLER( timesol1_cycle_r )
 	int ret=shared_ram[0x4];
 
 	if (cpu_get_pc(machine->activecpu)==0x9e20 && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3054,7 +3054,7 @@ static READ16_HANDLER( btlfield_cycle_r )
 	int ret=shared_ram[0x4];
 
 	if (cpu_get_pc(machine->activecpu)==0x9e1c && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3066,7 +3066,7 @@ static READ16_HANDLER( skysoldr_cycle_r )
 	int ret=shared_ram[0x4];
 
 	if (cpu_get_pc(machine->activecpu)==0x1f4e && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3078,7 +3078,7 @@ static READ16_HANDLER( skyadvnt_cycle_r )
 	int ret=shared_ram[0x4];
 
 	if (cpu_get_pc(machine->activecpu)==0x1f78 && (ret&0xff00)==0) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 		return 0x100 | (ret&0xff);
 	}
 
@@ -3090,7 +3090,7 @@ static READ16_HANDLER( gangwars_cycle_r )
 	int ret=shared_ram[0x103];
 
 	if (cpu_get_pc(machine->activecpu)==0xbbb6) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 		return (ret+2) & 0xff;
 	}
 
@@ -3102,7 +3102,7 @@ static READ16_HANDLER( gangwarb_cycle_r )
 	int ret=shared_ram[0x103];
 
 	if (cpu_get_pc(machine->activecpu)==0xbbca) {
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 		return (ret+2) & 0xff;
 	}
 

@@ -79,7 +79,7 @@ static WRITE8_HANDLER( onetwo_coin_counters_w )
 static WRITE8_HANDLER( onetwo_soundlatch_w )
 {
 	soundlatch_w(machine, 0, data);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void setColor(running_machine *machine, int offset)
@@ -265,7 +265,7 @@ static VIDEO_UPDATE( onetwo )
 
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1,0,linestate);
+	cpu_set_input_line(machine->cpu[1],0,linestate);
 }
 
 static const ym3812_interface ym3812_config =

@@ -141,7 +141,7 @@ static CDP1869_ON_PRD_CHANGED(cidelsa_prd_changed)
 
 	// PRD is inverted
 
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, !prd);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, !prd);
 	state->cdp1869_prd = !prd;
 }
 

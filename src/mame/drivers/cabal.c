@@ -112,12 +112,12 @@ static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 	seibu_main_word_w(machine,4,data,mem_mask);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
-	cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
+	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(50));
 }
 
 static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 
@@ -474,7 +474,7 @@ GFXDECODE_END
 
 static void irqhandler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2151_interface cabalbl_ym2151_interface =

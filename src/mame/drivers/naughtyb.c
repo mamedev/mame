@@ -217,8 +217,8 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( naughtyb_interrupt )
 {
-	if (input_port_read(machine, "FAKE") & 1)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "FAKE") & 1)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INPUT_PORTS_START( naughtyb )

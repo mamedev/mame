@@ -222,10 +222,10 @@ static READ32_HANDLER( ms32_read_inputs3 )
 static WRITE32_HANDLER( ms32_sound_w )
 {
 	soundlatch_w(machine,0, data & 0xff);
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
+	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
 }
 
 static READ32_HANDLER( ms32_sound_r )
@@ -235,7 +235,7 @@ static READ32_HANDLER( ms32_sound_r )
 
 static WRITE32_HANDLER( reset_sub_w )
 {
-	if(data) cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
+	if(data) cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
 }
 
 
@@ -1097,27 +1097,27 @@ static IRQ_CALLBACK(irq_callback)
 	for(i=15; i>=0 && !(irqreq & (1<<i)); i--);
 	irqreq &= ~(1<<i);
 	if(!irqreq)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(device, 0, CLEAR_LINE);
 	return i;
 }
 
 static void irq_init(running_machine *machine)
 {
 	irqreq = 0;
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 }
 
 static void irq_raise(running_machine *machine, int level)
 {
 	irqreq |= (1<<level);
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 }
 
 static INTERRUPT_GEN(ms32_interrupt)
 {
-	if( cpu_getiloops() == 0 ) irq_raise(machine, 10);
-	if( cpu_getiloops() == 1 ) irq_raise(machine, 9);
+	if( cpu_getiloops(device) == 0 ) irq_raise(device->machine, 10);
+	if( cpu_getiloops(device) == 1 ) irq_raise(device->machine, 9);
 	/* hayaosi2 needs at least 12 IRQ 0 per frame to work (see code at FFE02289)
        kirarast needs it too, at least 8 per frame, but waits for a variable amount
        47pi2 needs ?? per frame (otherwise it hangs when you lose)
@@ -1126,7 +1126,7 @@ static INTERRUPT_GEN(ms32_interrupt)
        desertwr
        p47aces
        */
-	if( cpu_getiloops() >= 3 && cpu_getiloops() <= 32 ) irq_raise(machine, 0);
+	if( cpu_getiloops(device) >= 3 && cpu_getiloops(device) <= 32 ) irq_raise(device->machine, 0);
 }
 
 /********** SOUND **********/
@@ -1154,7 +1154,7 @@ static INTERRUPT_GEN(ms32_interrupt)
 
 static READ8_HANDLER( latch_r )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	return soundlatch_r(machine,0)^0xff;
 }
 

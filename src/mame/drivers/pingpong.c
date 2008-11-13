@@ -74,13 +74,13 @@ static WRITE8_HANDLER( coin_w )
 
 static INTERRUPT_GEN( pingpong_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
-		if (intenable & 0x04) cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		if (intenable & 0x04) cpu_set_input_line(device, 0, HOLD_LINE);
 	}
-	else if (cpu_getiloops() % 2)
+	else if (cpu_getiloops(device) % 2)
 	{
-		if (intenable & 0x08) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		if (intenable & 0x08) cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

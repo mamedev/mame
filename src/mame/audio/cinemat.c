@@ -1494,7 +1494,7 @@ static const ay8910_interface demon_ay8910_interface_3 =
 
 static void ctc_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 1, 0, state);
+	cpu_set_input_line(device->machine->cpu[1], 0, state);
 }
 
 

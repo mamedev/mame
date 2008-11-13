@@ -578,9 +578,9 @@ static int sms_vdp_null_irq_callback(int status)
 static int sms_vdp_cpu0_irq_callback(int status)
 {
 	if (status==1)
-		cpunum_set_input_line(Machine, 0,0,HOLD_LINE);
+		cpu_set_input_line(Machine->cpu[0],0,HOLD_LINE);
 	else
-		cpunum_set_input_line(Machine, 0,0,CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[0],0,CLEAR_LINE);
 
 	return 0;
 }
@@ -588,9 +588,9 @@ static int sms_vdp_cpu0_irq_callback(int status)
 static int sms_vdp_cpu1_irq_callback(int status)
 {
 	if (status==1)
-		cpunum_set_input_line(Machine, 1,0,HOLD_LINE);
+		cpu_set_input_line(Machine->cpu[1],0,HOLD_LINE);
 	else
-		cpunum_set_input_line(Machine, 1,0,CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[1],0,CLEAR_LINE);
 
 	return 0;
 }
@@ -599,9 +599,9 @@ static int sms_vdp_cpu1_irq_callback(int status)
 static int sms_vdp_cpu2_irq_callback(int status)
 {
 	if (status==1)
-		cpunum_set_input_line(Machine, 2,0,HOLD_LINE);
+		cpu_set_input_line(Machine->cpu[2],0,HOLD_LINE);
 	else
-		cpunum_set_input_line(Machine, 2,0,CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[2],0,CLEAR_LINE);
 
 	return 0;
 }
@@ -1461,7 +1461,7 @@ static void end_of_frame(running_machine *machine, struct sms_vdp *chip)
 VIDEO_EOF(sms)
 {
 	end_of_frame(machine, vdp1);
-	//if (SMS_PAUSE_BUTTON) cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE); // not on systeme!!!
+	//if (SMS_PAUSE_BUTTON) cpu_set_input_line(machine->cpu[0],INPUT_LINE_NMI,PULSE_LINE); // not on systeme!!!
 }
 #endif
 

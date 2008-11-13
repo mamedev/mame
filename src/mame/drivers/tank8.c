@@ -13,7 +13,7 @@ static int collision_index;
 
 void tank8_set_collision(running_machine *machine, int index)
 {
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 
 	collision_index = index;
 }
@@ -40,7 +40,7 @@ static WRITE8_HANDLER( tank8_int_reset_w )
 {
 	collision_index &= ~0x3f;
 
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( tank8_crash_w )

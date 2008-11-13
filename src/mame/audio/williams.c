@@ -386,15 +386,15 @@ static void init_audio_state(running_machine *machine)
 	williams_sound_int_state = 0;
 	if (sound_cpunum != -1)
 	{
-		cpunum_set_input_line(machine, sound_cpunum, M6809_FIRQ_LINE, CLEAR_LINE);
-		cpunum_set_input_line(machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
-		cpunum_set_input_line(machine, sound_cpunum, INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[sound_cpunum], M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[sound_cpunum], M6809_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[sound_cpunum], INPUT_LINE_NMI, CLEAR_LINE);
 	}
 	if (soundalt_cpunum != -1)
 	{
-		cpunum_set_input_line(machine, soundalt_cpunum, M6809_FIRQ_LINE, CLEAR_LINE);
-		cpunum_set_input_line(machine, soundalt_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
-		cpunum_set_input_line(machine, soundalt_cpunum, INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[soundalt_cpunum], M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[soundalt_cpunum], M6809_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[soundalt_cpunum], INPUT_LINE_NMI, CLEAR_LINE);
 	}
 }
 
@@ -412,13 +412,13 @@ static void cvsd_ym2151_irq(running_machine *machine, int state)
 
 static void cvsd_irqa(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, sound_cpunum, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[sound_cpunum], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void cvsd_irqb(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, sound_cpunum, INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[sound_cpunum], INPUT_LINE_NMI, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -429,7 +429,7 @@ static void cvsd_irqb(running_machine *machine, int state)
 
 static void adpcm_ym2151_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, sound_cpunum, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[sound_cpunum], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -489,11 +489,11 @@ void williams_cvsd_reset_w(int state)
 	{
 		cvsd_bank_select_w(Machine, 0, 0);
 		init_audio_state(Machine);
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[sound_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[sound_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 
@@ -516,7 +516,7 @@ static WRITE8_HANDLER( narc_slave_bank_select_w )
 
 static READ8_HANDLER( narc_command_r )
 {
-	cpunum_set_input_line(machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[sound_cpunum], M6809_IRQ_LINE, CLEAR_LINE);
 	williams_sound_int_state = 0;
 	return soundlatch_r(machine, 0);
 }
@@ -525,13 +525,13 @@ static READ8_HANDLER( narc_command_r )
 static WRITE8_HANDLER( narc_command2_w )
 {
 	soundlatch2_w(machine, 0, data & 0xff);
-	cpunum_set_input_line(machine, soundalt_cpunum, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[soundalt_cpunum], M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( narc_command2_r )
 {
-	cpunum_set_input_line(machine, soundalt_cpunum, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[soundalt_cpunum], M6809_FIRQ_LINE, CLEAR_LINE);
 	return soundlatch2_r(machine, 0);
 }
 
@@ -578,10 +578,10 @@ static WRITE8_HANDLER( narc_slave_sync_w )
 void williams_narc_data_w(int data)
 {
 	soundlatch_w(Machine, 0, data & 0xff);
-	cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(Machine->cpu[sound_cpunum], INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x200))
 	{
-		cpunum_set_input_line(Machine, sound_cpunum, M6809_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[sound_cpunum], M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
 	}
 }
@@ -595,14 +595,14 @@ void williams_narc_reset_w(int state)
 		narc_master_bank_select_w(Machine, 0, 0);
 		narc_slave_bank_select_w(Machine, 0, 0);
 		init_audio_state(Machine);
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
-		cpunum_set_input_line(Machine, soundalt_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[sound_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[soundalt_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
 	{
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
-		cpunum_set_input_line(Machine, soundalt_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[sound_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[soundalt_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
 	}
 }
 
@@ -638,7 +638,7 @@ static TIMER_CALLBACK( clear_irq_state )
 
 static READ8_HANDLER( adpcm_command_r )
 {
-	cpunum_set_input_line(machine, sound_cpunum, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[sound_cpunum], M6809_IRQ_LINE, CLEAR_LINE);
 
 	/* don't clear the external IRQ state for a short while; this allows the
        self-tests to pass */
@@ -664,9 +664,9 @@ void williams_adpcm_data_w(int data)
 	soundlatch_w(Machine, 0, data & 0xff);
 	if (!(data & 0x200))
 	{
-		cpunum_set_input_line(Machine, sound_cpunum, M6809_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[sound_cpunum], M6809_IRQ_LINE, ASSERT_LINE);
 		williams_sound_int_state = 1;
-		cpu_boost_interleave(Machine, attotime_zero, ATTOTIME_IN_USEC(100));
+		cpuexec_boost_interleave(Machine, attotime_zero, ATTOTIME_IN_USEC(100));
 	}
 }
 
@@ -678,11 +678,11 @@ void williams_adpcm_reset_w(int state)
 	{
 		adpcm_bank_select_w(Machine, 0, 0);
 		init_audio_state(Machine);
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[sound_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 	/* going low resets and reactivates the CPU */
 	else
-		cpunum_set_input_line(Machine, sound_cpunum, INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[sound_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 

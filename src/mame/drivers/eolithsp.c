@@ -25,7 +25,7 @@ void eolith_speedup_read(running_machine *machine)
 
 	if (cpu_get_pc(machine->activecpu)==eolith_speedup_address && eolith_vblank==0 && eolith_scanline < eolith_speedup_resume_scanline)
 	{
-		cpu_spinuntil_trigger(1000);
+		cpu_spinuntil_trigger(machine->activecpu, 1000);
 	}
 
 }
@@ -78,7 +78,7 @@ void init_eolith_speedup(running_machine *machine)
 /* todo, use timers instead! */
 INTERRUPT_GEN( eolith_speedup )
 {
-	eolith_scanline = 261 -  cpu_getiloops();
+	eolith_scanline = 261 -  cpu_getiloops(device);
 
 	if (eolith_scanline==0)
 	{
@@ -87,7 +87,7 @@ INTERRUPT_GEN( eolith_speedup )
 
 	if (eolith_scanline==eolith_speedup_resume_scanline)
 	{
-		cpu_trigger(machine, 1000);
+		cpuexec_trigger(device->machine, 1000);
 	}
 
 	if (eolith_scanline==240)

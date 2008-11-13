@@ -495,7 +495,7 @@ static void josvolly_8741_w(running_machine *machine,int num,int offset,int data
 		{
 			if(josvolly_nmi_enable)
 			{
-				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+				cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 				josvolly_nmi_enable = 0;
 			}
 		}

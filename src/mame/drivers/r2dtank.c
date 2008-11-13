@@ -76,7 +76,7 @@ static void main_cpu_irq(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) |
 						 pia_get_irq_a(1) | pia_get_irq_b(1);
 
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE,  combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -100,7 +100,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", safe_cpu_g
 static WRITE8_HANDLER( audio_command_w )
 {
 	soundlatch_w(machine, 0, ~data);
-	cpunum_set_input_line(machine, 1, M6802_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], M6802_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", safe_cpu_get_pc(machine->activecpu), data^0xff);
 }
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( audio_answer_w )
 		data = 0x00;
 
 	soundlatch2_w(machine, 0, data);
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Answer Write: %x\n", safe_cpu_get_pc(machine->activecpu), data);
 }

@@ -190,14 +190,14 @@ WRITE16_HANDLER( bang_clr_gun_int_w )
 
 INTERRUPT_GEN( bang_interrupt )
 {
-	if (cpu_getiloops() == 0){
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	if (cpu_getiloops(device) == 0){
+		cpu_set_input_line(device, 2, HOLD_LINE);
 
 		clr_gun_int = 0;
 	}
-	else if (cpu_getiloops() % 2){
+	else if (cpu_getiloops(device) % 2){
 		if (clr_gun_int){
-			cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+			cpu_set_input_line(device, 4, HOLD_LINE);
 		}
 	}
 }

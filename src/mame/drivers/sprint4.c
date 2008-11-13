@@ -118,7 +118,7 @@ static TIMER_CALLBACK( nmi_callback	)
 	watchdog_enable(machine, input_port_read(machine, "IN0") & 0x40);
 
 	if (input_port_read(machine, "IN0") & 0x40)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, nmi_callback);
 }

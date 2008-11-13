@@ -44,24 +44,24 @@ static void check_interrupt(running_machine *machine)
 {
 	if (!timer_int || !data_rdy_int || !ssi_data_request)
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
 static TIMER_CALLBACK( intrq_tick )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( intrq_w )
 {
 	// T = 1.1 * R30 * C53 = 1.1 * 750K * 0.01uF = 8.25 ms
 
-	cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, HOLD_LINE);
 
 	timer_set(ATTOTIME_IN_USEC(8250), NULL, 0, intrq_tick);
 }
@@ -301,7 +301,7 @@ static WRITE8_HANDLER( control2_w )
 
 	if (!BIT(data, 2) & cart_present)
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, HOLD_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, HOLD_LINE);
 	}
 }
 

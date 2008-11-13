@@ -283,10 +283,10 @@ static VIDEO_UPDATE(meijinsn)
 
 static INTERRUPT_GEN( meijinsn_interrupt )
 {
-	if (cpu_getiloops() == 0)
-		cpunum_set_input_line(machine, 0, 1, HOLD_LINE);
+	if (cpu_getiloops(device) == 0)
+		cpu_set_input_line(device, 1, HOLD_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
 static const ay8910_interface ay8910_config =

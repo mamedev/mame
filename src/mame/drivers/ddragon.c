@@ -153,11 +153,11 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 
 	/* on the rising edge of VBLK (vcount == F8), signal an NMI */
 	if (vcount == 0xf8)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* set 1ms signal on rising edge of vcount & 8 */
 	if (!(vcount_old & 8) && (vcount & 8))
-		cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* adjust for next scanline */
 	if (++scanline >= screen_height)
@@ -221,7 +221,7 @@ static WRITE8_HANDLER( ddragon_bankswitch_w )
 	if (data & 0x10)
 		dd_sub_cpu_busy = 0;
 	else if (dd_sub_cpu_busy == 0)
-		cpunum_set_input_line(machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	memory_set_bank(1, (data & 0xe0) >> 5);
 }
@@ -296,7 +296,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	if (data & 0x10)
 		dd_sub_cpu_busy = 0;
 	else if (dd_sub_cpu_busy == 0)
-		cpunum_set_input_line(machine, 1, sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
 	memory_set_bank(1, newbank);
 	if (newbank == 4 && oldbank != 4)
@@ -318,20 +318,20 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 	switch (offset)
 	{
 		case 0: /* 380b - NMI ack */
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: /* 380c - FIRQ ack */
-			cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 2: /* 380d - IRQ ack */
-			cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
 			break;
 
 		case 3: /* 380e - SND irq */
 			soundlatch_w(machine, 0, data);
-			cpunum_set_input_line(machine, snd_cpu, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			cpu_set_input_line(machine->cpu[snd_cpu], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 			break;
 
 		case 4: /* 380f - ? */
@@ -343,19 +343,19 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 
 static WRITE8_HANDLER( ddragon2_sub_irq_ack_w )
 {
-	cpunum_set_input_line(machine, 1, sprite_irq, CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[1], sprite_irq, CLEAR_LINE );
 }
 
 
 static WRITE8_HANDLER( ddragon2_sub_irq_w )
 {
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, snd_cpu, ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[snd_cpu], ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 
@@ -396,8 +396,8 @@ static WRITE8_HANDLER( ddragon_hd63701_internal_registers_w )
         it's quite obvious from the Double Dragon 2 code, below). */
 		if (data & 3)
 		{
-			cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, ASSERT_LINE);
-			cpunum_set_input_line(machine, 1, sprite_irq, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], sprite_irq, CLEAR_LINE);
 		}
 	}
 }
@@ -573,8 +573,8 @@ ADDRESS_MAP_END
 /* might not be 100% accurate, check bits written */
 static WRITE8_HANDLER( ddragnba_port_w )
 {
-	cpunum_set_input_line(machine, 0,M6809_IRQ_LINE,ASSERT_LINE);
-	cpunum_set_input_line(machine, 1,sprite_irq, CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1],sprite_irq, CLEAR_LINE );
 }
 
 static ADDRESS_MAP_START( ddragnba_sub_portmap, ADDRESS_SPACE_IO, 8 )

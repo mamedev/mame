@@ -207,7 +207,7 @@ static WRITE16_HANDLER( sys16_3d_coinctrl_w )
 
 static INTERRUPT_GEN( sys16_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE); /* Interrupt vector 4, used by VBlank */
+	cpu_set_input_line(device, 4, HOLD_LINE); /* Interrupt vector 4, used by VBlank */
 }
 
 
@@ -255,7 +255,7 @@ static void tturfbl_msm5205_callback(running_machine *machine, int data)
 	sample_buffer <<= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface tturfbl_msm5205_interface =
@@ -392,7 +392,7 @@ static WRITE16_HANDLER( sound_command_w )
 	if( ACCESSING_BITS_0_7 )
 {
 		soundlatch_w( machine,0,data&0xff );
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
 	}
 }
 
@@ -401,7 +401,7 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 	if( ACCESSING_BITS_0_7 )
 {
 		soundlatch_w( machine,0,data&0xff );
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1198,7 +1198,7 @@ static WRITE16_HANDLER( ga_sound_command_w )
 	if( ACCESSING_BITS_8_15 )
 {
 		soundlatch_w( machine,0,data>>8 );
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
 	}
 }
 

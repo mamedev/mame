@@ -174,7 +174,7 @@ static void shdancbl_msm5205_callback(running_machine *machine, int data)
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface shdancbl_msm5205_interface =
@@ -188,7 +188,7 @@ static UINT8* shdancbl_soundbank_ptr = NULL;		/* Pointer to currently selected p
 static WRITE16_HANDLER( sound_command_irq_w ){
 	if( ACCESSING_BITS_0_7 ){
 		soundlatch_w( machine,0,data&0xff );
-		cpunum_set_input_line(machine, 1, 0, HOLD_LINE );
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
 	}
 }
 
@@ -322,7 +322,7 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( sound_command_nmi_w ){
 	if( ACCESSING_BITS_0_7 ){
 		soundlatch_w( machine,0,data&0xff );
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -738,7 +738,7 @@ static MACHINE_RESET( shdancbl )
 }
 
 static READ16_HANDLER( shdancbl_skip_r ){
-	if (cpu_get_pc(machine->activecpu)==0x2f76) {cpu_spinuntil_int(); return 0xffff;}
+	if (cpu_get_pc(machine->activecpu)==0x2f76) {cpu_spinuntil_int(machine->activecpu); return 0xffff;}
 	return sys16_workingram[0];
 }
 
@@ -771,7 +771,7 @@ static DRIVER_INIT( shdancbl )
 /***************************************************************************/
 
 static READ16_HANDLER( mwalkbl_skip_r ){
-	if (cpu_get_pc(machine->activecpu)==0x308a) {cpu_spinuntil_int(); return 0xffff;}
+	if (cpu_get_pc(machine->activecpu)==0x308a) {cpu_spinuntil_int(machine->activecpu); return 0xffff;}
 	return sys16_workingram[0x202c/2];
 }
 

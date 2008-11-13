@@ -184,24 +184,24 @@ static STATE_POSTLOAD( bankselect_postload );
 static void update_interrupts(running_machine *machine)
 {
 	if (atarigen_video_int_state)
-		cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, CLEAR_LINE);
 
 	if (atarigen_scanline_int_state)
-		cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 2, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 2, CLEAR_LINE);
 
 	if (p2portwr_state)
-		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
 
 	if (p2portrd_state)
-		cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -219,7 +219,7 @@ static void scanline_update(const device_config *screen, int scanline)
 		/* generate the 32V interrupt (IRQ 2) */
 		if ((scanline % 64) == 0)
 			if (interrupt_enable & 4)
-				atarigen_scanline_int_gen(screen->machine, 0);
+				atarigen_scanline_int_gen(screen->machine->cpu[0]);
 	}
 }
 
@@ -285,7 +285,7 @@ static INTERRUPT_GEN( vblank_int )
 {
 	/* clock the VBLANK through */
 	if (interrupt_enable & 8)
-		atarigen_video_int_gen(machine, cpunum);
+		atarigen_video_int_gen(device);
 }
 
 
@@ -301,7 +301,7 @@ static WRITE16_HANDLER( int1_ack_w )
 {
 	/* reset sound CPU */
 	if (ACCESSING_BITS_0_7)
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

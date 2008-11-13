@@ -96,7 +96,7 @@ static void gottlieb1_sh_w(const device_config *riot, UINT8 data)
 
 static void snd_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 1, M6502_IRQ_LINE, state);
+	cpu_set_input_line(device->machine->cpu[1], M6502_IRQ_LINE, state);
 }
 
 
@@ -109,7 +109,7 @@ static UINT8 r6532_portb_r(const device_config *device, UINT8 olddata)
 static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
 	/* unsure if this is ever used, but the NMI is connected to the RIOT's PB7 */
-	cpunum_set_input_line(device->machine, 1, INPUT_LINE_NMI, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, (newdata & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -221,7 +221,7 @@ void gottlieb_knocker(void)
 /* callback for the timer */
 static TIMER_CALLBACK( gottlieb_nmi_generate )
 {
-	cpunum_set_input_line(machine, 1,INPUT_LINE_NMI,PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 

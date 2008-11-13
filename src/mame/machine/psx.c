@@ -72,12 +72,12 @@ static void psx_irq_update( running_machine *machine )
 	if( ( m_n_irqdata & m_n_irqmask ) != 0 )
 	{
 		verboselog( 2, "psx irq assert\n" );
-		cpunum_set_input_line(machine, 0, MIPS_IRQ0, ASSERT_LINE );
+		cpu_set_input_line(machine->cpu[0], MIPS_IRQ0, ASSERT_LINE );
 	}
 	else
 	{
 		verboselog( 2, "psx irq clear\n" );
-		cpunum_set_input_line(machine, 0, MIPS_IRQ0, CLEAR_LINE );
+		cpu_set_input_line(machine->cpu[0], MIPS_IRQ0, CLEAR_LINE );
 	}
 }
 
@@ -487,7 +487,7 @@ static UINT64 m_p_n_root_start[ 3 ];
 static UINT64 psxcpu_gettotalcycles( void )
 {
 	/* TODO: should return the start of the current tick. */
-	return cpunum_gettotalcycles(0) * 2;
+	return cpu_get_total_cycles(Machine->cpu[0]) * 2;
 }
 
 static int root_divider( int n_counter )

@@ -470,17 +470,17 @@ static const ay8910_interface ay8910_interface_2 =
 
 static INTERRUPT_GEN( chl_interrupt )
 {
-	int vector = video_screen_get_vblank(machine->primary_screen) ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
+	int vector = video_screen_get_vblank(device->machine->primary_screen) ? 0xdf : 0xcf; /* 4 irqs per frame: 3 times 0xcf, 1 time 0xdf */
 
-//    video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+//    video_screen_update_partial(device->machine->primary_screen, video_screen_get_vpos(device->machine->primary_screen));
 
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, vector);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, vector);
 
 	/* it seems the V8 == Vblank and it is connected to the INT on the 68705 */
 	//so we should cause an INT on the cpu 1 here, as well.
 	//but only once per frame !
 	if (vector == 0xdf) /* only on vblank */
-		cpunum_set_input_line(machine, 1, 0, PULSE_LINE );
+		cpu_set_input_line(device->machine->cpu[1], 0, PULSE_LINE );
 
 }
 

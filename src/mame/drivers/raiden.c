@@ -222,7 +222,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( raiden_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, cpunum, 0, HOLD_LINE, 0xc8/4);	/* VBL */
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc8/4);	/* VBL */
 }
 
 static VIDEO_EOF( raiden )
@@ -454,7 +454,7 @@ static READ16_HANDLER( sub_cpu_spin_r )
 	int ret=raiden_shared_ram[0x4];
 
 	if (pc==0xfcde6 && ret!=0x40)
-		cpu_spin();
+		cpu_spin(machine->activecpu);
 
 	return ret;
 }
@@ -465,7 +465,7 @@ static READ16_HANDLER( sub_cpu_spina_r )
 	int ret=raiden_shared_ram[0x4];
 
 	if (pc==0xfcde8 && ret!=0x40)
-		cpu_spin();
+		cpu_spin(machine->activecpu);
 
 	return ret;
 }

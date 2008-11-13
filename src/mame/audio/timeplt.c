@@ -65,7 +65,7 @@ static READ8_HANDLER( timeplt_portB_r )
 	{
 		0x00, 0x10, 0x20, 0x30, 0x40, 0x90, 0xa0, 0xb0, 0xa0, 0xd0
 	};
-	return timeplt_timer[(activecpu_gettotalcycles() / 512) % 10];
+	return timeplt_timer[(cpu_get_total_cycles(machine->activecpu) / 512) % 10];
 }
 
 
@@ -109,7 +109,7 @@ WRITE8_HANDLER( timeplt_sh_irqtrigger_w )
 	if (timeplt_last_irq_state == 0 && data)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+		cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
 	}
 
 	timeplt_last_irq_state = data;

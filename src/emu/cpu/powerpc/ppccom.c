@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "ppccom.h"
+#include "cpuexec.h"
 #include "mame.h"
 #include "deprecat.h"
 
@@ -122,7 +123,7 @@ INLINE void set_xer(powerpc_state *ppc, UINT32 value)
 
 INLINE UINT64 get_timebase(powerpc_state *ppc)
 {
-	return (cpunum_gettotalcycles(ppc->cpunum) - ppc->tb_zero_cycles) / ppc->tb_divisor;
+	return (cpu_get_total_cycles(Machine->cpu[ppc->cpunum]) - ppc->tb_zero_cycles) / ppc->tb_divisor;
 }
 
 
@@ -132,7 +133,7 @@ INLINE UINT64 get_timebase(powerpc_state *ppc)
 
 INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 {
-	ppc->tb_zero_cycles = activecpu_gettotalcycles() - newtb * ppc->tb_divisor;
+	ppc->tb_zero_cycles = cpu_get_total_cycles(Machine->activecpu) - newtb * ppc->tb_divisor;
 }
 
 
@@ -143,7 +144,7 @@ INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 
 INLINE UINT32 get_decrementer(powerpc_state *ppc)
 {
-	INT64 cycles_until_zero = ppc->dec_zero_cycles - cpunum_gettotalcycles(ppc->cpunum);
+	INT64 cycles_until_zero = ppc->dec_zero_cycles - cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
 	cycles_until_zero = MAX(cycles_until_zero, 0);
 	return cycles_until_zero / ppc->tb_divisor;
 }
@@ -160,13 +161,13 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 
 	if (PRINTF_DECREMENTER)
 	{
-		UINT64 total = cpunum_gettotalcycles(ppc->cpunum);
+		UINT64 total = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
 		mame_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%08X%08X timer=%08X%08X\n",
 				curdec, newdec, ppc->tb_divisor,
 				(UINT32)(total >> 32), (UINT32)total, (UINT32)(cycles_until_done >> 32), (UINT32)cycles_until_done);
 	}
 
-	ppc->dec_zero_cycles = cpunum_gettotalcycles(ppc->cpunum) + cycles_until_done;
+	ppc->dec_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]) + cycles_until_done;
 	timer_adjust_oneshot(ppc->decrementer_int_timer, ATTOTIME_IN_CYCLES(cycles_until_done, ppc->cpunum), 0);
 
 	if ((INT32)curdec >= 0 && (INT32)newdec < 0)
@@ -281,7 +282,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->msr = MSROEA_IP;
 
 		/* reset the decrementer */
-		ppc->dec_zero_cycles = cpunum_gettotalcycles(ppc->cpunum);
+		ppc->dec_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
 		decrementer_int_callback(Machine, ppc, 0);
 	}
 
@@ -302,7 +303,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->spr[SPR603_HID0] = 1;
 
 	/* time base starts here */
-	ppc->tb_zero_cycles = cpunum_gettotalcycles(ppc->cpunum);
+	ppc->tb_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
 
 	/* clear interrupts */
 	ppc->irq_pending = 0;
@@ -1256,7 +1257,7 @@ static TIMER_CALLBACK( decrementer_int_callback )
 
 	/* advance by another full rev */
 	ppc->dec_zero_cycles += (UINT64)ppc->tb_divisor << 32;
-	cycles_until_next = ppc->dec_zero_cycles - cpunum_gettotalcycles(ppc->cpunum);
+	cycles_until_next = ppc->dec_zero_cycles - cpu_get_total_cycles(machine->cpu[ppc->cpunum]);
 	timer_adjust_oneshot(ppc->decrementer_int_timer, ATTOTIME_IN_CYCLES(cycles_until_next, ppc->cpunum), 0);
 }
 

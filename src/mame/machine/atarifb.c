@@ -113,7 +113,7 @@ WRITE8_HANDLER( soccer_out2_w )
 
 WRITE8_HANDLER( atarifb_out3_w )
 {
-	int loop = cpu_getiloops();
+	int loop = cpu_getiloops(machine->cpu[0]);
 
 	switch (loop)
 	{

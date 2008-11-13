@@ -275,24 +275,24 @@ static int sound_status;
 
 READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 	return 0xff;
 }
 
 WRITE8_HANDLER( snk_cpuA_nmi_ack_w )
 {
-	cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 READ8_HANDLER ( snk_cpuB_nmi_trigger_r )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	return 0xff;
 }
 
 WRITE8_HANDLER( snk_cpuB_nmi_ack_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 /*********************************************************************/
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( marvins_soundlatch_w )
 {
 	marvins_sound_busy_flag = 1;
 	soundlatch_w(machine, offset, data);
-	cpunum_set_input_line(machine, 2, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( marvins_soundlatch_r )
@@ -330,7 +330,7 @@ static CUSTOM_INPUT( marvins_sound_busy )
 
 static READ8_HANDLER( marvins_sound_nmi_ack_r )
 {
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -353,7 +353,7 @@ static TIMER_CALLBACK( sgladiat_sndirq_update_callback )
 			break;
 	}
 
-	cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, (sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, (sound_status & 0x8) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -377,7 +377,7 @@ static READ8_HANDLER( sgladiat_sound_nmi_ack_r )
 
 static READ8_HANDLER( sgladiat_sound_irq_ack_r )
 {
-	cpunum_set_input_line(machine, 2, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -438,7 +438,7 @@ static TIMER_CALLBACK( sndirq_update_callback )
 			break;
 	}
 
-	cpunum_set_input_line(machine, 2, 0, (sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], 0, (sound_status & 0xb) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -283,7 +283,7 @@ static WRITE8_HANDLER( cfb_zpu_int_req_set_w )
 {
 	zpu_int_vector &= ~2;	/* clear D1 on INTA (interrupt acknowledge) */
 
-	cpunum_set_input_line(machine, 0, 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
+	cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);	/* main cpu interrupt (comes from CFB (generated at the start of INT routine on CFB) - vblank?) */
 }
 
 static READ8_HANDLER( cfb_zpu_int_req_clr )
@@ -292,7 +292,7 @@ static READ8_HANDLER( cfb_zpu_int_req_clr )
 
 	/* clear the INT line when there are no more interrupt requests */
 	if (zpu_int_vector==0xff)
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -1064,7 +1064,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	soundlatch = param;
 
 	/* cause NMI on sound CPU */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -1088,16 +1088,16 @@ ADDRESS_MAP_END
 /* frequency is 14.318 MHz/16/16/16/16 */
 static INTERRUPT_GEN( sound_interrupt )
 {
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound_int_clear_w )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 static WRITE8_HANDLER( sound_nmi_clear_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( gg_led_ctrl_w )
@@ -1426,7 +1426,7 @@ static MACHINE_RESET( mazerbla )
 {
 	game_id = MAZERBLA;
 	zpu_int_vector = 0xff;
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 }
 
 
@@ -1435,7 +1435,7 @@ static MACHINE_RESET( greatgun )
 	UINT8 *rom = memory_region(machine, "sub2");
 	game_id = GREATGUN;
 	zpu_int_vector = 0xff;
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 
 //patch VCU test

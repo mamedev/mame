@@ -86,7 +86,7 @@ INLINE int vysnc_chain_counter_to_vpos(UINT16 counter)
 
 static TIMER_CALLBACK( interrupt_clear_callback )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -99,7 +99,7 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 	int vpos = video_screen_get_vpos(machine->primary_screen);
 	UINT16 counter = vpos_to_vysnc_chain_counter(vpos);
 	UINT8 vector = 0xc7 | ((counter & 0x80) >> 3) | ((~counter & 0x80) >> 4);
-	cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, vector);
+	cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, vector);
 
 	/* set up for next interrupt */
 	if (counter == INT_TRIGGER_COUNT_1)
@@ -137,7 +137,7 @@ static MACHINE_START( enigma2 )
 static MACHINE_RESET( enigma2 )
 {
 	last_sound_data = 0;
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 
 	engima2_flip_screen = 0;
 
@@ -349,7 +349,7 @@ static WRITE8_HANDLER( sound_data_w )
 	if (!(data & 0x04) && (last_sound_data & 0x04))
 		sound_latch = (sound_latch << 1) | (~data & 0x01);
 
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, (data & 0x02) ? ASSERT_LINE : CLEAR_LINE);
 
 	last_sound_data = data;
 }

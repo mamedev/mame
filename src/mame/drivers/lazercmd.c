@@ -249,7 +249,7 @@ static INTERRUPT_GEN( lazercmd_timer )
 	if( ++timer_count >= 64*128 ) {
 		timer_count = 0;
 		sense_state ^= 1;
-		cpunum_set_input_line(machine, 0, 1, (sense_state) ? ASSERT_LINE : CLEAR_LINE );
+		cpu_set_input_line(device, 1, (sense_state) ? ASSERT_LINE : CLEAR_LINE );
 	}
 }
 

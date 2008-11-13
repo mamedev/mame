@@ -364,8 +364,8 @@ static MACHINE_RESET( cojag )
 	}
 
 	/* clear any spinuntil stuff */
-	jaguar_gpu_resume();
-	jaguar_dsp_resume();
+	jaguar_gpu_resume(machine);
+	jaguar_dsp_resume(machine);
 
 	/* halt the CPUs */
 	jaguargpu_ctrl_w(1, G_CTRL, 0, 0xffffffff);
@@ -414,8 +414,8 @@ static WRITE32_HANDLER( misc_control_w )
 	if (!(data & 0x80))
 	{
 		/* clear any spinuntil stuff */
-		jaguar_gpu_resume();
-		jaguar_dsp_resume();
+		jaguar_gpu_resume(machine);
+		jaguar_dsp_resume(machine);
 
 		/* halt the CPUs */
 		jaguargpu_ctrl_w(1, G_CTRL, 0, 0xffffffff);
@@ -582,7 +582,7 @@ static WRITE32_HANDLER( gpu_jump_w )
 	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(machine->activecpu), *gpu_jump_address);
 
 	/* if the GPU is suspended, release it now */
-	jaguar_gpu_resume();
+	jaguar_gpu_resume(machine);
 
 	/* start the sync timer going, and note that there is a command pending */
 	timer_call_after_resynch(NULL, 0, gpu_sync_timer);
@@ -598,7 +598,7 @@ static READ32_HANDLER( gpu_jump_r )
 	{
 #if ENABLE_SPEEDUP_HACKS
 		/* spin if we're allowed */
-		jaguar_gpu_suspend();
+		jaguar_gpu_suspend(machine);
 #endif
 
 		/* no command is pending */
@@ -637,7 +637,7 @@ static UINT64 main_speedup_max_cycles;
 
 static READ32_HANDLER( cojagr3k_main_speedup_r )
 {
-	UINT64 curcycles = activecpu_gettotalcycles();
+	UINT64 curcycles = cpu_get_total_cycles(machine->activecpu);
 
 	/* if it's been less than main_speedup_max_cycles cycles since the last time */
 	if (curcycles - main_speedup_last_cycles < main_speedup_max_cycles)
@@ -645,7 +645,7 @@ static READ32_HANDLER( cojagr3k_main_speedup_r )
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (main_speedup_hits++ > 5)
 		{
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 			main_speedup_hits = 0;
 		}
 	}
@@ -687,7 +687,7 @@ static UINT32 *main_gpu_wait;
 static READ32_HANDLER( main_gpu_wait_r )
 {
 	if (gpu_command_pending)
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 	return *main_gpu_wait;
 }
 
@@ -712,7 +712,7 @@ static READ32_HANDLER( main_gpu_wait_r )
 
 static WRITE32_HANDLER( area51_main_speedup_w )
 {
-	UINT64 curcycles = activecpu_gettotalcycles();
+	UINT64 curcycles = cpu_get_total_cycles(machine->activecpu);
 
 	/* store the data */
 	COMBINE_DATA(main_speedup);
@@ -723,7 +723,7 @@ static WRITE32_HANDLER( area51_main_speedup_w )
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (main_speedup_hits++ > 5)
 		{
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 			main_speedup_hits = 0;
 		}
 	}
@@ -746,7 +746,7 @@ static WRITE32_HANDLER( area51_main_speedup_w )
 
 static WRITE32_HANDLER( area51mx_main_speedup_w )
 {
-	UINT64 curcycles = activecpu_gettotalcycles();
+	UINT64 curcycles = cpu_get_total_cycles(machine->activecpu);
 
 	/* store the data */
 	COMBINE_DATA(&main_speedup[offset]);
@@ -757,7 +757,7 @@ static WRITE32_HANDLER( area51mx_main_speedup_w )
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (main_speedup_hits++ > 10)
 		{
-			cpu_spinuntil_int();
+			cpu_spinuntil_int(machine->activecpu);
 			main_speedup_hits = 0;
 		}
 	}

@@ -521,24 +521,24 @@ CPU_GET_INFO( tx0_64kw )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tx0_ICount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME: 							strcpy(info->s = cpuintrf_temp_str(), "TX-0");	break;
-	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s = cpuintrf_temp_str(), "TX-0");	break;
-	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s = cpuintrf_temp_str(), "1.0");	break;
-	case CPUINFO_STR_CORE_FILE:						strcpy(info->s = cpuintrf_temp_str(), __FILE__);	break;
-	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s = cpuintrf_temp_str(), "Raphael Nabet");	break;
+	case CPUINFO_STR_NAME: 							strcpy(info->s, "TX-0");	break;
+	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "TX-0");	break;
+	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");	break;
+	case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);	break;
+	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Raphael Nabet");	break;
 
-    case CPUINFO_STR_FLAGS:							strcpy(info->s = cpuintrf_temp_str(), "");	break;
+    case CPUINFO_STR_FLAGS:							strcpy(info->s, "");	break;
 
-	case CPUINFO_STR_REGISTER + TX0_PC:				sprintf(info->s = cpuintrf_temp_str(), "PC:0%06o", PC); break;
-	case CPUINFO_STR_REGISTER + TX0_IR:				sprintf(info->s = cpuintrf_temp_str(), "IR:0%02o", IR); break;
-	case CPUINFO_STR_REGISTER + TX0_MBR:			sprintf(info->s = cpuintrf_temp_str(), "MBR:0%06o", MBR); break;
-	case CPUINFO_STR_REGISTER + TX0_MAR:			sprintf(info->s = cpuintrf_temp_str(), "MAR:0%06o", MAR); break;
-	case CPUINFO_STR_REGISTER + TX0_AC:				sprintf(info->s = cpuintrf_temp_str(), "AC:0%06o", AC); break;
-	case CPUINFO_STR_REGISTER + TX0_LR:				sprintf(info->s = cpuintrf_temp_str(), "LR:0%06o", LR); break;
-	case CPUINFO_STR_REGISTER + TX0_XR:				sprintf(info->s = cpuintrf_temp_str(), "XR:0%05o", XR); break;
-	case CPUINFO_STR_REGISTER + TX0_PF:				sprintf(info->s = cpuintrf_temp_str(), "PF:0%02o", PF); break;							break;
-	case CPUINFO_STR_REGISTER + TX0_TBR:			sprintf(info->s = cpuintrf_temp_str(), "TBR:0%06o", tx0.tbr); break;
-	case CPUINFO_STR_REGISTER + TX0_TAC:			sprintf(info->s = cpuintrf_temp_str(), "TAC:0%06o", tx0.tac); break;
+	case CPUINFO_STR_REGISTER + TX0_PC:				sprintf(info->s, "PC:0%06o", PC); break;
+	case CPUINFO_STR_REGISTER + TX0_IR:				sprintf(info->s, "IR:0%02o", IR); break;
+	case CPUINFO_STR_REGISTER + TX0_MBR:			sprintf(info->s, "MBR:0%06o", MBR); break;
+	case CPUINFO_STR_REGISTER + TX0_MAR:			sprintf(info->s, "MAR:0%06o", MAR); break;
+	case CPUINFO_STR_REGISTER + TX0_AC:				sprintf(info->s, "AC:0%06o", AC); break;
+	case CPUINFO_STR_REGISTER + TX0_LR:				sprintf(info->s, "LR:0%06o", LR); break;
+	case CPUINFO_STR_REGISTER + TX0_XR:				sprintf(info->s, "XR:0%05o", XR); break;
+	case CPUINFO_STR_REGISTER + TX0_PF:				sprintf(info->s, "PF:0%02o", PF); break;							break;
+	case CPUINFO_STR_REGISTER + TX0_TBR:			sprintf(info->s, "TBR:0%06o", tx0.tbr); break;
+	case CPUINFO_STR_REGISTER + TX0_TAC:			sprintf(info->s, "TAC:0%06o", tx0.tac); break;
 	case CPUINFO_STR_REGISTER + TX0_TSS00:
 	case CPUINFO_STR_REGISTER + TX0_TSS01:
 	case CPUINFO_STR_REGISTER + TX0_TSS02:
@@ -554,17 +554,17 @@ CPU_GET_INFO( tx0_64kw )
 	case CPUINFO_STR_REGISTER + TX0_TSS14:
 	case CPUINFO_STR_REGISTER + TX0_TSS15:
 	case CPUINFO_STR_REGISTER + TX0_TSS16:
-	case CPUINFO_STR_REGISTER + TX0_TSS17:			sprintf(info->s = cpuintrf_temp_str(), "TSS%02o:0%06o", state-(CPUINFO_STR_REGISTER + TX0_TSS00), tx0.tss[state-(CPUINFO_STR_REGISTER + TX0_TSS00)]); break;
-	case CPUINFO_STR_REGISTER + TX0_CM_SEL:			sprintf(info->s = cpuintrf_temp_str(), "CMSEL:0%06o", tx0.cm_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_LR_SEL:			sprintf(info->s = cpuintrf_temp_str(), "LRSEL:0%06o", tx0.lr_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_GBL_CM_SEL:		sprintf(info->s = cpuintrf_temp_str(), "GBLCMSEL:%X", tx0.gbl_cm_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_STOP_CYC0:		sprintf(info->s = cpuintrf_temp_str(), "STOPCYC0:%X", tx0.stop_cyc0); break;
-	case CPUINFO_STR_REGISTER + TX0_STOP_CYC1:		sprintf(info->s = cpuintrf_temp_str(), "STOPCYC1:%X", tx0.stop_cyc1); break;
-	case CPUINFO_STR_REGISTER + TX0_RUN:			sprintf(info->s = cpuintrf_temp_str(), "RUN:%X", tx0.run); break;
-	case CPUINFO_STR_REGISTER + TX0_RIM:			sprintf(info->s = cpuintrf_temp_str(), "RIM:%X", tx0.rim); break;
-	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s = cpuintrf_temp_str(), "CYCLE:%X", tx0.cycle); break;
-	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s = cpuintrf_temp_str(), "IOH:%X", tx0.ioh); break;
-	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s = cpuintrf_temp_str(), "IOS:%X", tx0.ios); break;
+	case CPUINFO_STR_REGISTER + TX0_TSS17:			sprintf(info->s, "TSS%02o:0%06o", state-(CPUINFO_STR_REGISTER + TX0_TSS00), tx0.tss[state-(CPUINFO_STR_REGISTER + TX0_TSS00)]); break;
+	case CPUINFO_STR_REGISTER + TX0_CM_SEL:			sprintf(info->s, "CMSEL:0%06o", tx0.cm_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_LR_SEL:			sprintf(info->s, "LRSEL:0%06o", tx0.lr_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_GBL_CM_SEL:		sprintf(info->s, "GBLCMSEL:%X", tx0.gbl_cm_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_STOP_CYC0:		sprintf(info->s, "STOPCYC0:%X", tx0.stop_cyc0); break;
+	case CPUINFO_STR_REGISTER + TX0_STOP_CYC1:		sprintf(info->s, "STOPCYC1:%X", tx0.stop_cyc1); break;
+	case CPUINFO_STR_REGISTER + TX0_RUN:			sprintf(info->s, "RUN:%X", tx0.run); break;
+	case CPUINFO_STR_REGISTER + TX0_RIM:			sprintf(info->s, "RIM:%X", tx0.rim); break;
+	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s, "CYCLE:%X", tx0.cycle); break;
+	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s, "IOH:%X", tx0.ioh); break;
+	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s, "IOS:%X", tx0.ios); break;
 	}
 }
 
@@ -647,24 +647,24 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tx0_ICount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME: 							strcpy(info->s = cpuintrf_temp_str(), "TX-0");	break;
-	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s = cpuintrf_temp_str(), "TX-0");	break;
-	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s = cpuintrf_temp_str(), "1.0");	break;
-	case CPUINFO_STR_CORE_FILE:						strcpy(info->s = cpuintrf_temp_str(), __FILE__);	break;
-	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s = cpuintrf_temp_str(), "Raphael Nabet");	break;
+	case CPUINFO_STR_NAME: 							strcpy(info->s, "TX-0");	break;
+	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "TX-0");	break;
+	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");	break;
+	case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);	break;
+	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Raphael Nabet");	break;
 
-    case CPUINFO_STR_FLAGS:							strcpy(info->s = cpuintrf_temp_str(), "");	break;
+    case CPUINFO_STR_FLAGS:							strcpy(info->s, "");	break;
 
-	case CPUINFO_STR_REGISTER + TX0_PC:				sprintf(info->s = cpuintrf_temp_str(), "PC:0%06o", PC); break;
-	case CPUINFO_STR_REGISTER + TX0_IR:				sprintf(info->s = cpuintrf_temp_str(), "IR:0%02o", IR); break;
-	case CPUINFO_STR_REGISTER + TX0_MBR:			sprintf(info->s = cpuintrf_temp_str(), "MBR:0%06o", MBR); break;
-	case CPUINFO_STR_REGISTER + TX0_MAR:			sprintf(info->s = cpuintrf_temp_str(), "MAR:0%06o", MAR); break;
-	case CPUINFO_STR_REGISTER + TX0_AC:				sprintf(info->s = cpuintrf_temp_str(), "AC:0%06o", AC); break;
-	case CPUINFO_STR_REGISTER + TX0_LR:				sprintf(info->s = cpuintrf_temp_str(), "LR:0%06o", LR); break;
-	case CPUINFO_STR_REGISTER + TX0_XR:				sprintf(info->s = cpuintrf_temp_str(), "XR:0%05o", XR); break;
-	case CPUINFO_STR_REGISTER + TX0_PF:				sprintf(info->s = cpuintrf_temp_str(), "PF:0%02o", PF); break;							break;
-	case CPUINFO_STR_REGISTER + TX0_TBR:			sprintf(info->s = cpuintrf_temp_str(), "TBR:0%06o", tx0.tbr); break;
-	case CPUINFO_STR_REGISTER + TX0_TAC:			sprintf(info->s = cpuintrf_temp_str(), "TAC:0%06o", tx0.tac); break;
+	case CPUINFO_STR_REGISTER + TX0_PC:				sprintf(info->s, "PC:0%06o", PC); break;
+	case CPUINFO_STR_REGISTER + TX0_IR:				sprintf(info->s, "IR:0%02o", IR); break;
+	case CPUINFO_STR_REGISTER + TX0_MBR:			sprintf(info->s, "MBR:0%06o", MBR); break;
+	case CPUINFO_STR_REGISTER + TX0_MAR:			sprintf(info->s, "MAR:0%06o", MAR); break;
+	case CPUINFO_STR_REGISTER + TX0_AC:				sprintf(info->s, "AC:0%06o", AC); break;
+	case CPUINFO_STR_REGISTER + TX0_LR:				sprintf(info->s, "LR:0%06o", LR); break;
+	case CPUINFO_STR_REGISTER + TX0_XR:				sprintf(info->s, "XR:0%05o", XR); break;
+	case CPUINFO_STR_REGISTER + TX0_PF:				sprintf(info->s, "PF:0%02o", PF); break;							break;
+	case CPUINFO_STR_REGISTER + TX0_TBR:			sprintf(info->s, "TBR:0%06o", tx0.tbr); break;
+	case CPUINFO_STR_REGISTER + TX0_TAC:			sprintf(info->s, "TAC:0%06o", tx0.tac); break;
 	case CPUINFO_STR_REGISTER + TX0_TSS00:
 	case CPUINFO_STR_REGISTER + TX0_TSS01:
 	case CPUINFO_STR_REGISTER + TX0_TSS02:
@@ -680,17 +680,17 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_STR_REGISTER + TX0_TSS14:
 	case CPUINFO_STR_REGISTER + TX0_TSS15:
 	case CPUINFO_STR_REGISTER + TX0_TSS16:
-	case CPUINFO_STR_REGISTER + TX0_TSS17:			sprintf(info->s = cpuintrf_temp_str(), "TSS%02o:0%06o", state-(CPUINFO_STR_REGISTER + TX0_TSS00), tx0.tss[state-(CPUINFO_STR_REGISTER + TX0_TSS00)]); break;
-	case CPUINFO_STR_REGISTER + TX0_CM_SEL:			sprintf(info->s = cpuintrf_temp_str(), "CMSEL:0%06o", tx0.cm_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_LR_SEL:			sprintf(info->s = cpuintrf_temp_str(), "LRSEL:0%06o", tx0.lr_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_GBL_CM_SEL:		sprintf(info->s = cpuintrf_temp_str(), "GBLCMSEL:%X", tx0.gbl_cm_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_STOP_CYC0:		sprintf(info->s = cpuintrf_temp_str(), "STOPCYC0:%X", tx0.stop_cyc0); break;
-	case CPUINFO_STR_REGISTER + TX0_STOP_CYC1:		sprintf(info->s = cpuintrf_temp_str(), "STOPCYC1:%X", tx0.stop_cyc1); break;
-	case CPUINFO_STR_REGISTER + TX0_RUN:			sprintf(info->s = cpuintrf_temp_str(), "RUN:%X", tx0.run); break;
-	case CPUINFO_STR_REGISTER + TX0_RIM:			sprintf(info->s = cpuintrf_temp_str(), "RIM:%X", tx0.rim); break;
-	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s = cpuintrf_temp_str(), "CYCLE:%X", tx0.cycle); break;
-	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s = cpuintrf_temp_str(), "IOH:%X", tx0.ioh); break;
-	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s = cpuintrf_temp_str(), "IOS:%X", tx0.ios); break;
+	case CPUINFO_STR_REGISTER + TX0_TSS17:			sprintf(info->s, "TSS%02o:0%06o", state-(CPUINFO_STR_REGISTER + TX0_TSS00), tx0.tss[state-(CPUINFO_STR_REGISTER + TX0_TSS00)]); break;
+	case CPUINFO_STR_REGISTER + TX0_CM_SEL:			sprintf(info->s, "CMSEL:0%06o", tx0.cm_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_LR_SEL:			sprintf(info->s, "LRSEL:0%06o", tx0.lr_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_GBL_CM_SEL:		sprintf(info->s, "GBLCMSEL:%X", tx0.gbl_cm_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_STOP_CYC0:		sprintf(info->s, "STOPCYC0:%X", tx0.stop_cyc0); break;
+	case CPUINFO_STR_REGISTER + TX0_STOP_CYC1:		sprintf(info->s, "STOPCYC1:%X", tx0.stop_cyc1); break;
+	case CPUINFO_STR_REGISTER + TX0_RUN:			sprintf(info->s, "RUN:%X", tx0.run); break;
+	case CPUINFO_STR_REGISTER + TX0_RIM:			sprintf(info->s, "RIM:%X", tx0.rim); break;
+	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s, "CYCLE:%X", tx0.cycle); break;
+	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s, "IOH:%X", tx0.ioh); break;
+	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s, "IOS:%X", tx0.ios); break;
 	}
 }
 

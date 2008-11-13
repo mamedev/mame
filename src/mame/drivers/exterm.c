@@ -198,7 +198,7 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 	{
 		/* Bit 13 = Resets the slave CPU */
 		if ((data & 0x2000) && !(last & 0x2000))
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 
 		/* Bits 14-15 = Coin counters */
 		coin_counter_w(0, data & 0x8000);
@@ -213,8 +213,8 @@ static TIMER_CALLBACK( sound_delayed_w )
 {
 	/* data is latched independently for both sound CPUs */
 	master_sound_latch = slave_sound_latch = param;
-	cpunum_set_input_line(machine, 2, M6502_IRQ_LINE, ASSERT_LINE);
-	cpunum_set_input_line(machine, 3, M6502_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], M6502_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[3], M6502_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -236,7 +236,7 @@ static TIMER_CALLBACK( master_sound_nmi_callback )
 {
 	/* bit 0 of the sound control determines if the NMI is actually delivered */
 	if (sound_control & 0x01)
-		cpunum_set_input_line(machine, 2, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 static READ8_HANDLER( sound_master_latch_r )
 {
 	/* read latch and clear interrupt */
-	cpunum_set_input_line(machine, 2, M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], M6502_IRQ_LINE, CLEAR_LINE);
 	return master_sound_latch;
 }
 
@@ -271,7 +271,7 @@ static READ8_HANDLER( sound_master_latch_r )
 static READ8_HANDLER( sound_slave_latch_r )
 {
 	/* read latch and clear interrupt */
-	cpunum_set_input_line(machine, 3, M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[3], M6502_IRQ_LINE, CLEAR_LINE);
 	return slave_sound_latch;
 }
 
@@ -287,7 +287,7 @@ static WRITE8_HANDLER( sound_slave_dac_w )
 static READ8_HANDLER( sound_nmi_to_slave_r )
 {
 	/* a read from here triggers an NMI pulse to the slave */
-	cpunum_set_input_line(machine, 3, INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
 	return 0xff;
 }
 

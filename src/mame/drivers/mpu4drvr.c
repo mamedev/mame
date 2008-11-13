@@ -230,7 +230,7 @@ static MACHINE_RESET( mpu4_vid )
 {
 	ROC10937_reset(0);
 
-/*  cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE); */
+/*  cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE); */
 	mpu4_stepper_reset();
 
 	lamp_strobe    = 0;
@@ -271,9 +271,9 @@ static MACHINE_RESET( mpu4_vid )
 
 static void update_mpu68_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 1, 1, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 2, m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 1, 3, scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 1, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 2, m6850_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 3, scn2674_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 /* Communications with 6809 board */
@@ -282,7 +282,7 @@ static void update_mpu68_interrupts(running_machine *machine)
 static void m6809_acia_irq(int state)
 {
 	m68k_acia_cts = state;
-	cpunum_set_input_line(Machine, 0, M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	cpu_set_input_line(Machine->cpu[0], M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
 
@@ -1328,7 +1328,7 @@ INPUT_PORTS_END
 static INTERRUPT_GEN(mpu4_vid_irq)
 {
 	LOGSTUFF(("scn2674_irq_mask %02x\n",scn2674_irq_mask));
-	if (cpu_getiloops()==0) /* vbl */
+	if (cpu_getiloops(device)==0) /* vbl */
 	{
 	/*  if (scn2674_display_enabled) ? */
 		{
@@ -1336,7 +1336,7 @@ static INTERRUPT_GEN(mpu4_vid_irq)
 			{
 				LOGSTUFF(("vblank irq\n"));
 				scn2674_irq_state = 1;
-				update_mpu68_interrupts(machine);
+				update_mpu68_interrupts(device->machine);
 
 				scn2674_irq_register |= 0x10;
 			}
@@ -1607,7 +1607,7 @@ static VIDEO_UPDATE(dealem)
 
 static MC6845_ON_VSYNC_CHANGED( dealem_vsync_changed )
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_NMI, vsync);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, vsync);
 }
 
 /*************************************

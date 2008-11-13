@@ -182,7 +182,7 @@ INPUT_PORTS_END
 static INTERRUPT_GEN( bmc_interrupt )
 {
 	static const int bmcints[]={2,3,6};
-	cpunum_set_input_line(machine, 0, bmcints[cpu_getiloops()], HOLD_LINE);
+	cpu_set_input_line(device, bmcints[cpu_getiloops(device)], HOLD_LINE);
 }
 
 static const gfx_layout tilelayout =

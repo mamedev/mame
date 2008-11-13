@@ -241,13 +241,13 @@ static int adpcm_data;
 
 static TIMER_CALLBACK( cadash_interrupt5 )
 {
-	cpunum_set_input_line(machine, 0, 5, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 5, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( cadash_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(500,0), NULL, 0, cadash_interrupt5);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);  /* interrupt vector 4 */
+	cpu_set_input_line(device, 4, HOLD_LINE);  /* interrupt vector 4 */
 }
 
 
@@ -753,7 +753,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

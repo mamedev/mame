@@ -199,9 +199,9 @@ void neogeo_set_display_counter_lsb(running_machine *machine, UINT16 data)
 
 static void update_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, 1, vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 2, display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, 3, irq3_pending ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, vblank_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 2, display_position_interrupt_pending ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 3, irq3_pending ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -287,19 +287,19 @@ static void start_interrupt_timers(running_machine *machine)
 
 static void audio_cpu_irq(running_machine *machine, int assert)
 {
-	cpunum_set_input_line(machine, 1, 0, assert ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, assert ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
 static void audio_cpu_assert_nmi(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_cpu_clear_nmi_w )
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -559,7 +559,7 @@ static WRITE16_HANDLER( audio_command_w )
 		audio_cpu_assert_nmi(machine);
 
 		/* boost the interleave to let the audio CPU read the command */
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
 
 		if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(machine->activecpu), data, mem_mask);
 	}
@@ -740,7 +740,7 @@ static void _set_audio_cpu_rom_source(running_machine *machine)
 	{
 		audio_cpu_rom_source_last = audio_cpu_rom_source;
 
-		cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 
 		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", safe_cpu_get_pc(machine->activecpu), audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}

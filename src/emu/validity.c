@@ -720,7 +720,6 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 	/* loop over all the CPUs */
 	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
 	{
-		extern CPU_GET_INFO( dummy );
 		const cpu_config *cpu = &config->cpu[cpunum];
 		int spacenum, checknum;
 
@@ -750,7 +749,7 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 		error |= validate_tag(driver, "CPU", cpu->tag);
 
 		/* checks to see if this driver is using a dummy CPU */
-		if (cputype_get_interface(cpu->type)->get_info == CPU_GET_INFO_NAME(dummy))
+		if (cpu->type == CPU_DUMMY)
 		{
 			mame_printf_error("%s: %s uses non-present CPU\n", driver->source_file, driver->name);
 			error = TRUE;
@@ -781,8 +780,8 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 		{
 #define SPACE_SHIFT(a)		((addr_shift < 0) ? ((a) << -addr_shift) : ((a) >> addr_shift))
 #define SPACE_SHIFT_END(a)	((addr_shift < 0) ? (((a) << -addr_shift) | ((1 << -addr_shift) - 1)) : ((a) >> addr_shift))
-			int databus_width = cputype_databus_width(cpu->type, spacenum);
-			int addr_shift = cputype_addrbus_shift(cpu->type, spacenum);
+			int databus_width = cputype_get_databus_width(cpu->type, spacenum);
+			int addr_shift = cputype_get_addrbus_shift(cpu->type, spacenum);
 			int alignunit = databus_width/8;
 			address_map_entry *entry;
 			address_map *map;

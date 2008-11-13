@@ -183,7 +183,7 @@ GFXDECODE_END
 static INTERRUPT_GEN( progolf_interrupt )
 {
 	//if (input_port_read(machine, "IN2") & 0xc0)
-		cpunum_set_input_line(machine, 0, /*0*/INPUT_LINE_NMI, /*HOLD_LINE*/PULSE_LINE);
+		cpu_set_input_line(device, /*0*/INPUT_LINE_NMI, /*HOLD_LINE*/PULSE_LINE);
 }
 #endif
 

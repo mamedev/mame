@@ -697,12 +697,12 @@ static const ym2151_interface ym2151_config =
 
 static INTERRUPT_GEN( m90_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x60/4);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x60/4);
 }
 
 static INTERRUPT_GEN( bomblord_interrupt )
 {
-	cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0x50/4);
+	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x50/4);
 }
 
 

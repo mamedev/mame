@@ -322,7 +322,7 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( snd_irq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 	timer_call_after_resynch(NULL, 0, NULL);
 }
 
@@ -352,7 +352,7 @@ static WRITE8_HANDLER( p2_w )
 	p2 = data;
 	if((p2&0xf0)==0x50)
 	{
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	}
 }
 
@@ -629,7 +629,7 @@ static const samples_interface fghtbskt_samples_interface =
 	fghtbskt_sh_start
 };
 
-static void snd_irq(running_machine *machine, int num)
+static INTERRUPT_GEN( snd_irq )
 {
 	sound_irq = 1;
 }

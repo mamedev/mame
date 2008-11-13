@@ -217,7 +217,7 @@ static WRITE16_HANDLER ( shadfrce_sound_brt_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		soundlatch_w(machine,1,data >> 8);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE );
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 	}
 	else
 	{
@@ -238,13 +238,13 @@ static TIMER_CALLBACK( raster_interrupt )
 	shadfrce_scanline = (shadfrce_scanline + 1) % 256;
 
 	// fire another raster irq for the next scanline
-	cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
 	timer_adjust_oneshot(raster_irq_timer, video_screen_get_time_until_pos(machine->primary_screen, shadfrce_scanline, 0), 0);
 }
 
 static WRITE16_HANDLER( shadfrce_irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, offset ^ 3, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], offset ^ 3, CLEAR_LINE);
 }
 
 static WRITE16_HANDLER( shadfrce_irq_w )
@@ -470,7 +470,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1, 0, irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(machine->cpu[1], 0, irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 static const ym2151_interface ym2151_config =
@@ -483,7 +483,7 @@ static const ym2151_interface ym2151_config =
 */
 static INTERRUPT_GEN( shadfrce_interrupt )
 {
-	int scanline = 255 - cpu_getiloops();
+	int scanline = 255 - cpu_getiloops(device);
 
 	/* Vblank is lowered on scanline 0 (8) */
 	if (scanline == 0)
@@ -499,14 +499,14 @@ static INTERRUPT_GEN( shadfrce_interrupt )
 	else if (scanline==248)
 	{
 		if(shadfrce_irqs_enable)
-			cpunum_set_input_line(machine, 0, 3, ASSERT_LINE);
+			cpu_set_input_line(device, 3, ASSERT_LINE);
 	}
 
 	/* An interrupt is generated every 16 scanlines */
 	if (scanline%16 == 0)
 	{
 		if(shadfrce_irqs_enable)
-			cpunum_set_input_line(machine, 0, 2, ASSERT_LINE);
+			cpu_set_input_line(device, 2, ASSERT_LINE);
 	}
 }
 

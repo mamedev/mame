@@ -201,7 +201,7 @@ static WRITE8_HANDLER( adpcm_play_w )
 static WRITE8_HANDLER( sound_w )
 {
 	soundlatch_w(machine, offset, data);
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /********************************************************************************************/
@@ -506,10 +506,10 @@ static INTERRUPT_GEN( renegade_interrupt )
     else coin = 0;
 */
 
-	if (cpu_getiloops())
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (cpu_getiloops(device))
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( renegade_coin_counter_w )
@@ -765,7 +765,7 @@ GFXDECODE_END
 /* handler called by the 3526 emulator when the internal timers cause an IRQ */
 static void irqhandler(running_machine *machine, int linestate)
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, linestate);
+	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, linestate);
 }
 
 static const ym3526_interface ym3526_config =

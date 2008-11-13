@@ -90,7 +90,7 @@ static UINT8 last_wheel_value[4];
 
 static void TTL74148_3S_cb(void)
 {
-	cpunum_set_input_line(Machine, 0, M6502_IRQ_LINE, TTL74148_output_valid_r(TTL74148_3S) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(Machine->cpu[0], M6502_IRQ_LINE, TTL74148_output_valid_r(TTL74148_3S) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -241,7 +241,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 
 
 	/* check the coins here as well - they drive the clock of the flip-flops */
-	port_value = input_port_read(machine, "IN0");
+	port_value = input_port_read(device->machine, "IN0");
 
 	TTL7474_clock_w(TTL7474_2S_1, port_value & 0x01);
 	TTL7474_clock_w(TTL7474_2S_2, port_value & 0x02);
@@ -261,7 +261,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 		int dir_flip_flop      = movement_flip_flop + 1;
 		static const char *const portnames[] = { "DIAL0", "DIAL1", "DIAL2", "DIAL3" };
 
-		port_value = input_port_read(machine, portnames[player]);
+		port_value = input_port_read(device->machine, portnames[player]);
 
 		if (port_value != last_wheel_value[player])
 		{
@@ -282,7 +282,7 @@ INTERRUPT_GEN( carpolo_timer_interrupt )
 
 
 	/* finally read the accelerator pedals */
-	port_value = input_port_read(machine, "PEDALS");
+	port_value = input_port_read(device->machine, "PEDALS");
 
 	for (player = 0; player < 4; player++)
 	{

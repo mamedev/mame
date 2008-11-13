@@ -592,7 +592,7 @@ if (VERBOSE_AUDIO_LOG)
 
 static TIMER_CALLBACK( rabbit_blit_done )
 {
-	cpunum_set_input_line(machine, 0, rabbit_bltirqlevel, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], rabbit_bltirqlevel, HOLD_LINE);
 }
 
 static void rabbit_do_blit(running_machine *machine)
@@ -1031,7 +1031,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 {
 	int intlevel = 0;
 
-	int line = 262 - cpu_getiloops();
+	int line = 262 - cpu_getiloops(device);
 
 	if(line==262)
 	{
@@ -1042,7 +1042,7 @@ static INTERRUPT_GEN( rabbit_interrupts )
 		return;
 	}
 
-	cpunum_set_input_line(machine, 0, intlevel, HOLD_LINE);
+	cpu_set_input_line(device, intlevel, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( rabbit )
@@ -1165,12 +1165,12 @@ static INTERRUPT_GEN( tmmjprd_interrupt )
 {
 	int intlevel = 0;
 
-	if (cpu_getiloops()==0)
+	if (cpu_getiloops(device)==0)
 		intlevel = 5;
 	else
 		intlevel = 3;
 
-	cpunum_set_input_line(machine, 0, intlevel, HOLD_LINE);
+	cpu_set_input_line(device, intlevel, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( tmmjprd )

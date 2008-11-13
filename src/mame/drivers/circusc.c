@@ -89,21 +89,21 @@ static READ8_HANDLER( circusc_sh_timer_r )
      * to D1-D4.
      *
      * The following:
-     * clock = activecpu_gettotalcycles() >> 10;
+     * clock = cpu_get_total_cycles(machine->activecpu) >> 10;
      * return (clock & 0x0f) << 1;
      * Can be shortened to:
      */
 
 	int clock;
 
-	clock = activecpu_gettotalcycles() >> 9;
+	clock = cpu_get_total_cycles(machine->activecpu) >> 9;
 
 	return clock & 0x1e;
 }
 
 static WRITE8_HANDLER( circusc_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( circusc_coin_counter_w )

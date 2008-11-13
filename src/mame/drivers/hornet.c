@@ -603,12 +603,12 @@ static WRITE32_HANDLER(K037122_reg_w)
 
 static void voodoo_vblank_0(const device_config *device, int param)
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
 static void voodoo_vblank_1(const device_config *device, int param)
 {
-	cpunum_set_input_line(device->machine, 0, INPUT_LINE_IRQ1, ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ1, ASSERT_LINE);
 }
 
 static VIDEO_START( hornet )
@@ -742,7 +742,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = ADDI (ADC DI)
                 0x01 = ADDSCLK (ADC SCLK)
             */
-			cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -777,9 +777,9 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = EXRGB
             */
 			if (data & 0x80)
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
-				cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			break;
 	}
@@ -1032,7 +1032,7 @@ static MACHINE_RESET( hornet )
 		memory_set_bank(1, 0);
 	}
 
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 		memory_set_bankptr(5, usr5);
@@ -1104,8 +1104,8 @@ static MACHINE_RESET( hornet_2board )
 		memory_configure_bank(1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
 		memory_set_bank(1, 0);
 	}
-	cpunum_set_input_line(machine, 2, INPUT_LINE_RESET, ASSERT_LINE);
-	cpunum_set_input_line(machine, 3, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
 		memory_set_bankptr(5, usr5);
@@ -1307,13 +1307,13 @@ static void jamma_jvs_cmd_exec(void)
 
 static TIMER_CALLBACK( irq_off )
 {
-	cpunum_set_input_line(machine, 1, param, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], param, CLEAR_LINE);
 }
 
 static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
-	cpunum_set_input_line(machine, 1, line, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
 	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 

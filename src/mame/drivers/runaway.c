@@ -32,7 +32,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	/* assume Centipede-style interrupt timing */
 	int scanline = param;
 
-	cpunum_set_input_line(machine, 0, 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, (scanline & 32) ? ASSERT_LINE : CLEAR_LINE);
 
 	scanline += 32;
 
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( runaway_led_w )
 
 static WRITE8_HANDLER( runaway_irq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

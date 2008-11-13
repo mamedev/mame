@@ -19,7 +19,7 @@ MACHINE_RESET( pitnrun )
 {
 	zaccept = 1;
 	zready = 0;
-	cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( pitnrun_mcu_real_data_r )
@@ -36,14 +36,14 @@ READ8_HANDLER( pitnrun_mcu_data_r )
 static TIMER_CALLBACK( pitnrun_mcu_real_data_w )
 {
 	zready = 1;
-	cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2],0,ASSERT_LINE);
 	fromz80 = param;
 }
 
 WRITE8_HANDLER( pitnrun_mcu_data_w )
 {
 	timer_call_after_resynch(NULL, data,pitnrun_mcu_real_data_w);
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(5));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(5));
 }
 
 READ8_HANDLER( pitnrun_mcu_status_r )
@@ -110,7 +110,7 @@ WRITE8_HANDLER( pitnrun_68705_portB_w )
 	{
 		/* 68705 is going to read data from the Z80 */
 		timer_call_after_resynch(NULL, 0,pitnrun_mcu_data_real_r);
-		cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
 		portA_in = fromz80;
 	}
 	if (~data & 0x04)

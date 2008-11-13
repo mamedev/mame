@@ -22,7 +22,7 @@ static UINT8 *shift_lo;
 static INPUT_CHANGED( coin_inserted )
 {
 	/* coin insertion causes an NMI */
-	cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, newval ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -57,14 +57,14 @@ static WRITE8_HANDLER( madalien_output_w )
 
 static WRITE8_HANDLER( madalien_sound_command_w )
 {
-	cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 	soundlatch_w(machine, offset, data);
 }
 
 
 static READ8_HANDLER(madalien_sound_command_r )
 {
-	cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 	return soundlatch_r(machine, offset);
 }
 

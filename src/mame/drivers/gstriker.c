@@ -201,7 +201,7 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		pending_command = 1;
 		soundlatch_w(machine,offset,data & 0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -268,9 +268,9 @@ GFXDECODE_END
 static void gs_ym2610_irq(running_machine *machine, int irq)
 {
 	if (irq)
-		cpunum_set_input_line(machine, 1, 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, 0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static const ym2610_interface ym2610_config =

@@ -102,7 +102,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static INTERRUPT_GEN( freekick_irqgen )
 {
-	if (nmi_en) cpunum_set_input_line(machine, 0,INPUT_LINE_NMI,PULSE_LINE);
+	if (nmi_en) cpu_set_input_line(device,INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_HANDLER(oigas_5_w)

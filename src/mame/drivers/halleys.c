@@ -1003,7 +1003,7 @@ static WRITE8_HANDLER( blitter_w )
 		if (i==0 || (i==4 && !data))
 		{
 			blitter_busy = 0;
-			if (firq_level) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
+			if (firq_level) cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
 		}
 		else
 		{
@@ -1480,7 +1480,7 @@ static INTERRUPT_GEN( halleys_interrupt )
 	static int latch_delay = 0;
 	UINT8 latch_data;
 
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
 			/*
@@ -1503,8 +1503,8 @@ static INTERRUPT_GEN( halleys_interrupt )
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
 				latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(machine, 0, latch_data);
-				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+				soundlatch_w(device->machine, 0, latch_data);
+				cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 			}
 
 			// clear collision list of this frame unconditionally
@@ -1513,16 +1513,16 @@ static INTERRUPT_GEN( halleys_interrupt )
 
 		// In Halley's Comet, NMI is used exclusively to handle coin input
 		case 1:
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 
 		// FIRQ drives gameplay; we need both types of NMI each frame.
 		case 2:
-			mVectorType = 1; cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+			mVectorType = 1; cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 
 		case 3:
-			mVectorType = 0; cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+			mVectorType = 0; cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 		break;
 	}
 }
@@ -1533,7 +1533,7 @@ static INTERRUPT_GEN( benberob_interrupt )
 	static int latch_delay = 0;
 	UINT8 latch_data;
 
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
 			if (latch_delay) latch_delay--; else
@@ -1543,19 +1543,19 @@ static INTERRUPT_GEN( benberob_interrupt )
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
 				latch_delay = (latch_data) ? 0 : 4;
-				soundlatch_w(machine, 0, latch_data);
-				cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+				soundlatch_w(device->machine, 0, latch_data);
+				cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 			}
 		break;
 
 		case 1:
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 		break;
 
 		case 2:
 		case 3:
 			// FIRQ must not happen when the blitter is being updated or it'll cause serious screen artifacts
-			if (!blitter_busy) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE); else firq_level++;
+			if (!blitter_busy) cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE); else firq_level++;
 		break;
 	}
 }
@@ -1572,7 +1572,7 @@ static WRITE8_HANDLER( firq_ack_w )
 	io_ram[0x9c] = data;
 
 	if (firq_level) firq_level--;
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

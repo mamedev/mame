@@ -654,15 +654,15 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( igs_180_interrupt )
 {
-	if (cpu_getiloops() & 1)
+	if (cpu_getiloops(device) & 1)
 	{
 		 if (nmi_enable)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
 		 if (irq_enable)
-			cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+			cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 

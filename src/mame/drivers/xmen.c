@@ -126,7 +126,7 @@ static WRITE16_HANDLER( sound_cmd_w )
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 }
 
 //int xmen_irqenabled;
@@ -414,8 +414,8 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( xmen_interrupt )
 {
-	if (cpu_getiloops() == 0) irq5_line_hold(machine, cpunum);
-	else irq3_line_hold(machine, cpunum);
+	if (cpu_getiloops(device) == 0) irq5_line_hold(device);
+	else irq3_line_hold(device);
 }
 
 static STATE_POSTLOAD( xmen_postload )
@@ -477,9 +477,9 @@ static MACHINE_RESET(xmen6p)
 
 static INTERRUPT_GEN( xmen6p_interrupt )
 {
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
-		irq5_line_hold(machine, cpunum);
+		irq5_line_hold(device);
 
 
 	}
@@ -487,7 +487,7 @@ static INTERRUPT_GEN( xmen6p_interrupt )
 	{
 //      if (xmen_irqenabled&0x04)
 //      {
-			irq3_line_hold(machine, cpunum);
+			irq3_line_hold(device);
 //          xmen_current_frame = 0x00;
 
 //      }

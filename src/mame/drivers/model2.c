@@ -175,7 +175,7 @@ static UINT32 copro_fifoout_pop(void)
 		i960_stall(Machine->activecpu);
 
 		/* spin the main cpu and let the TGP catch up */
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(100));
+		cpu_spinuntil_time(Machine->activecpu, ATTOTIME_IN_USEC(100));
 
 		return 0;
 	}
@@ -239,7 +239,7 @@ static void copro_fifoout_push(UINT32 data)
 			sharc_set_flag_input(1, ASSERT_LINE);
 			cpu_pop_context();
 
-			//cpunum_set_input_line(Machine, 2, SHARC_INPUT_FLAG1, ASSERT_LINE);
+			//cpu_set_input_line(Machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
 		}
 		else
 		{
@@ -247,7 +247,7 @@ static void copro_fifoout_push(UINT32 data)
 			sharc_set_flag_input(1, CLEAR_LINE);
 			cpu_pop_context();
 
-			//cpunum_set_input_line(Machine, 2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+			//cpu_set_input_line(Machine->cpu[2], SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
 	}
 }
@@ -316,7 +316,7 @@ static TIMER_CALLBACK( model2_timer_cb )
 	model2_intreq |= (1<<bit);
 	if (model2_intena & (1<<bit))
 	{
-		cpunum_set_input_line(machine, 0, I960_IRQ2, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], I960_IRQ2, ASSERT_LINE);
 	}
 
 	model2_timervals[tnum] = 0;
@@ -355,7 +355,7 @@ static MACHINE_RESET(model2o)
 	MACHINE_RESET_CALL(model2_common);
 
 	// hold TGP in halt until we have code
-	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 
 	dsp_type = DSP_TYPE_TGP;
 }
@@ -375,7 +375,7 @@ static MACHINE_RESET(model2)
 	MACHINE_RESET_CALL(model2_scsp);
 
 	// hold TGP in halt until we have code
-	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 
 	dsp_type = DSP_TYPE_TGP;
 }
@@ -385,12 +385,12 @@ static MACHINE_RESET(model2b)
 	MACHINE_RESET_CALL(model2_common);
 	MACHINE_RESET_CALL(model2_scsp);
 
-	cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 
 	// set FIFOIN empty flag on SHARC
-	cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG0, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG0, ASSERT_LINE);
 	// clear FIFOOUT buffer full flag on SHARC
-	cpunum_set_input_line(machine, 2, SHARC_INPUT_FLAG1, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG1, CLEAR_LINE);
 
 	dsp_type = DSP_TYPE_SHARC;
 }
@@ -540,7 +540,7 @@ static WRITE32_HANDLER( copro_ctl1_w )
 			logerror("Boot copro, %d dwords\n", model2_coprocnt);
 			if (dsp_type != DSP_TYPE_TGPX4)
 			{
-				cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
+				cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
 			}
 		}
 	}
@@ -662,8 +662,8 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         else
         {
             logerror("Boot geo, %d dwords\n", model2_geocnt);
-            cpunum_set_input_line(machine, 3, INPUT_LINE_HALT, CLEAR_LINE);
-            //cpu_spinuntil_time(ATTOTIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
+            cpu_set_input_line(machine->cpu[3], INPUT_LINE_HALT, CLEAR_LINE);
+            //cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
@@ -905,7 +905,7 @@ static int snd_68k_ready_r(void)
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(Machine->activecpu, ATTOTIME_IN_USEC(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -916,15 +916,15 @@ static void snd_latch_to_68k_w(running_machine *machine, int data)
 {
 	while (!snd_68k_ready_r())
 	{
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
 	}
 
 	to_68k = data;
 
-	cpunum_set_input_line(machine, 1, 2, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 2, HOLD_LINE);
 
 	// give the 68k time to notice
-	cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
+	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
 }
 
 static READ32_HANDLER( model2_serial_r )
@@ -952,7 +952,7 @@ static WRITE32_HANDLER( model2_serial_w )
 		scsp_midi_in(machine, 0, data&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
 	}
 }
 
@@ -1553,20 +1553,20 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN(model2_interrupt)
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
 			model2_intreq |= (1<<10);
 			if (model2_intena & (1<<10))
 			{
-				cpunum_set_input_line(machine, 0, I960_IRQ3, ASSERT_LINE);
+				cpu_set_input_line(device, I960_IRQ3, ASSERT_LINE);
 			}
 			break;
 		case 1:
 			model2_intreq |= (1<<0);
 			if (model2_intena & (1<<0))
 			{
-				cpunum_set_input_line(machine, 0, I960_IRQ0, ASSERT_LINE);
+				cpu_set_input_line(device, I960_IRQ0, ASSERT_LINE);
 			}
 			break;
 	}
@@ -1574,23 +1574,23 @@ static INTERRUPT_GEN(model2_interrupt)
 
 static INTERRUPT_GEN(model2c_interrupt)
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
 			model2_intreq |= (1<<10);
 			if (model2_intena & (1<<10))
-				cpunum_set_input_line(machine, 0, I960_IRQ3, ASSERT_LINE);
+				cpu_set_input_line(device, I960_IRQ3, ASSERT_LINE);
 			break;
 		case 1:
 			model2_intreq |= (1<<2);
 			if (model2_intena & (1<<2))
-				cpunum_set_input_line(machine, 0, I960_IRQ2, ASSERT_LINE);
+				cpu_set_input_line(device, I960_IRQ2, ASSERT_LINE);
 
 			break;
 		case 2:
 			model2_intreq |= (1<<0);
 			if (model2_intena & (1<<0))
-				cpunum_set_input_line(machine, 0, I960_IRQ0, ASSERT_LINE);
+				cpu_set_input_line(device, I960_IRQ0, ASSERT_LINE);
 			break;
 	}
 }
@@ -1724,10 +1724,10 @@ static void scsp_irq(running_machine *machine, int irq)
 	if (irq > 0)
 	{
 		scsp_last_line = irq;
-		cpunum_set_input_line(machine, 1, irq, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], irq, ASSERT_LINE);
 	}
 	else
-		cpunum_set_input_line(machine, 1, -irq, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], -irq, CLEAR_LINE);
 }
 
 static const scsp_interface scsp_config =

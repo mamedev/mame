@@ -16,11 +16,28 @@
 #undef i386
 
 
-/*************************************
- *
- *  Include headers from all CPUs
- *
- *************************************/
+/***************************************************************************
+    DEBUGGING
+***************************************************************************/
+
+#define VERBOSE 0
+
+#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
+
+
+
+/***************************************************************************
+    CONSTANTS
+***************************************************************************/
+
+#define TEMP_STRING_POOL_ENTRIES		16
+#define MAX_STRING_LENGTH				256
+
+
+
+/***************************************************************************
+    PROTOTYPES FOR ALL CPU ENTRY POINTS
+***************************************************************************/
 
 CPU_GET_INFO( dummy );
 CPU_GET_INFO( z80 );
@@ -245,62 +262,9 @@ CPU_GET_INFO( cxd8661r );
 
 
 
-/*************************************
- *
- *  Debug logging
- *
- *************************************/
-
-#define VERBOSE 0
-
-#define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
-
-
-
-/*************************************
- *
- *  Macros to help verify active CPU
- *
- *************************************/
-
-#define VERIFY_CPU(name) \
-	assert_always(cpu != NULL, #name "() called with invalid cpu!")
-
-#define VERIFY_ACTIVECPU(name) \
-	assert_always(activecpunum >= 0, #name "() called with no active cpu!")
-
-#define VERIFY_CPUTYPE(name) \
-	assert_always(cputype >= 0 && cputype < CPU_COUNT, #name "() called for invalid cpu type!")
-
-
-
-/*************************************
- *
- *  Internal CPU info type
- *
- *************************************/
-
-typedef struct _cpuintrf_data cpuintrf_data;
-struct _cpuintrf_data
-{
-	int index;						/* index of this CPU */
-	int family; 					/* family index of this CPU */
-	cpu_interface intf;		 		/* copy of the interface data */
-	cpu_type cputype; 					/* type index of this CPU */
-	device_config *device;			/* dummy device for now */
-	int *icount;
-	cpu_disassemble_func dasm_override;
-};
-
-
-
-/*************************************
- *
- *  The core list of CPU interfaces
- *
- *************************************/
-
-cpu_interface cpuintrf[CPU_COUNT];
+/***************************************************************************
+    MASTER CPU LIST
+***************************************************************************/
 
 static const struct
 {
@@ -935,98 +899,30 @@ static const struct
 
 
 
-/*************************************
- *
- *  Other variables we own
- *
- *************************************/
+/***************************************************************************
+    GLOBAL VARIABLES
+***************************************************************************/
 
-const device_config *executingcpu;
-int activecpunum;		/* index of active CPU (or -1) */
-int executingcpunum;	/* index of executing CPU (or -1) */
-int totalcpu;		/* total number of CPUs */
-
-static cpuintrf_data cpu[MAX_CPU];
+static cpu_class_header cpu_type_header[CPU_COUNT];
 
 static const device_config *cpu_context_stack[4];
 static int cpu_context_stack_ptr;
 
-#define TEMP_STRING_POOL_ENTRIES 16
-static char temp_string_pool[TEMP_STRING_POOL_ENTRIES][256];
+static char temp_string_pool[TEMP_STRING_POOL_ENTRIES][MAX_STRING_LENGTH];
 static int temp_string_pool_index;
 
 
 
-/*************************************
- *
- *  Set a new CPU context
- *
- *************************************/
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
-INLINE void set_cpu_context(const device_config *oldcpu, const device_config *newcpu)
-{
-	cpuintrf_data *cpudata = NULL;
-	
-	/* if nothing is changing, quick exit */
-	if (newcpu == NULL || oldcpu == newcpu)
-		return;
+/*-------------------------------------------------
+    get_temp_string_buffer - return a pointer to
+    a temporary string buffer
+-------------------------------------------------*/
 
-	/* save the old context if we have one */
-	if (oldcpu != NULL)
-	{
-		cpudata = oldcpu->classtoken;
-		(*cpudata->intf.get_context)(oldcpu->token);
-	}
-
-	/* swap memory spaces */
-	newcpu->machine->activecpu = newcpu;
-
-	cpudata = newcpu->classtoken;
-	activecpunum = cpudata->index;
-	memory_set_context(newcpu->machine, activecpunum);
-	(*cpudata->intf.set_context)(newcpu->token);
-}
-
-
-
-/*************************************
- *
- *  Push/pop to a new CPU context
- *
- *************************************/
-
-void cpu_push_context(const device_config *cpu)
-{
-	const device_config *oldcpu = cpu->machine->activecpu;
-	cpu_context_stack[cpu_context_stack_ptr++] = oldcpu;
-	set_cpu_context(oldcpu, cpu);
-}
-
-
-void cpu_pop_context(void)
-{
-	const device_config *cpu = cpu_context_stack[--cpu_context_stack_ptr];
-	if (cpu != NULL)
-	{
-		const device_config *oldcpu = cpu->machine->activecpu;
-		set_cpu_context(oldcpu, cpu);
-	}
-	else
-	{
-		Machine->activecpu = NULL;
-		activecpunum = -1;
-	}
-}
-
-
-
-/*************************************
- *
- *  Global temp string pool
- *
- *************************************/
-
-char *cpuintrf_temp_str(void)
+INLINE char *get_temp_string_buffer(void)
 {
 	char *string = &temp_string_pool[temp_string_pool_index++ % TEMP_STRING_POOL_ENTRIES][0];
 	string[0] = 0;
@@ -1034,498 +930,452 @@ char *cpuintrf_temp_str(void)
 }
 
 
+/*-------------------------------------------------
+    get_safe_classheader - makes sure that the 
+    passed in device is, in fact, a CPU, and
+    return the class token
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Initialize the global interface
- *
- *************************************/
+INLINE cpu_class_header *get_safe_classheader(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->classtoken != NULL);
+	assert(device->class == DEVICE_CLASS_CPU_CHIP);
+
+	return (cpu_class_header *)device->classtoken;
+}
+
+
+/*-------------------------------------------------
+    set_cpu_context - set the current CPU context
+    swapping out the old one if necessary
+-------------------------------------------------*/
+
+INLINE void set_cpu_context(const device_config *oldcpu, const device_config *newcpu)
+{
+	cpu_class_header *classheader;
+	
+	/* if nothing is changing, quick exit */
+	if (oldcpu == newcpu)
+		return;
+
+	/* swap out the old context if we have one */
+	if (oldcpu != NULL)
+	{
+		classheader = oldcpu->classtoken;
+		(*classheader->get_context)(oldcpu->token);
+	}
+	
+	/* swap in the new context if we have one */
+	if (newcpu != NULL)
+	{
+		/* make this the activecpu */
+		newcpu->machine->activecpu = newcpu;
+
+		/* set the memory context and swap in the new */
+		classheader = newcpu->classtoken;
+		memory_set_context(newcpu->machine, classheader->index);
+		(*classheader->set_context)(newcpu->token);
+	}
+	else
+		Machine->activecpu = NULL;
+}
+
+
+
+/***************************************************************************
+    GLOBAL MANAGEMENT
+***************************************************************************/
+
+/*-------------------------------------------------
+    cpuintrf_init - initialize global structures
+-------------------------------------------------*/
 
 void cpuintrf_init(running_machine *machine)
 {
 	int mapindex;
 
 	/* reset the cpuintrf array */
-	memset(cpuintrf, 0, sizeof(cpuintrf));
+	memset(cpu_type_header, 0, sizeof(cpu_type_header));
 
 	/* build the cpuintrf array */
-	for (mapindex = 0; mapindex < sizeof(cpuintrf_map) / sizeof(cpuintrf_map[0]); mapindex++)
+	for (mapindex = 0; mapindex < ARRAY_LENGTH(cpuintrf_map); mapindex++)
 	{
 		cpu_type cputype = cpuintrf_map[mapindex].cputype;
-		cpu_interface *intf = &cpuintrf[cputype];
+		cpu_class_header *header = &cpu_type_header[cputype];
 		cpuinfo info;
+		int spacenum;
 
 		/* start with the get_info routine */
-		intf->get_info = cpuintrf_map[mapindex].get_info;
+		header->cputype = cputype;
+		header->get_info = cpuintrf_map[mapindex].get_info;
 
 		/* bootstrap the rest of the function pointers */
 		info.setinfo = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_SET_INFO, &info);
-		intf->set_info = info.setinfo;
+		(*header->get_info)(NULL, CPUINFO_PTR_SET_INFO, &info);
+		header->set_info = info.setinfo;
 
 		info.getcontext = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_GET_CONTEXT, &info);
-		intf->get_context = info.getcontext;
+		(*header->get_info)(NULL, CPUINFO_PTR_GET_CONTEXT, &info);
+		header->get_context = info.getcontext;
 
 		info.setcontext = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_SET_CONTEXT, &info);
-		intf->set_context = info.setcontext;
+		(*header->get_info)(NULL, CPUINFO_PTR_SET_CONTEXT, &info);
+		header->set_context = info.setcontext;
 
 		info.init = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_INIT, &info);
-		intf->init = info.init;
+		(*header->get_info)(NULL, CPUINFO_PTR_INIT, &info);
+		header->init = info.init;
 
 		info.reset = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_RESET, &info);
-		intf->reset = info.reset;
+		(*header->get_info)(NULL, CPUINFO_PTR_RESET, &info);
+		header->reset = info.reset;
 
 		info.exit = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_EXIT, &info);
-		intf->exit = info.exit;
+		(*header->get_info)(NULL, CPUINFO_PTR_EXIT, &info);
+		header->exit = info.exit;
 
 		info.execute = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_EXECUTE, &info);
-		intf->execute = info.execute;
+		(*header->get_info)(NULL, CPUINFO_PTR_EXECUTE, &info);
+		header->execute = info.execute;
 
 		info.burn = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_BURN, &info);
-		intf->burn = info.burn;
+		(*header->get_info)(NULL, CPUINFO_PTR_BURN, &info);
+		header->burn = info.burn;
 
 		info.disassemble = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_DISASSEMBLE, &info);
-		intf->disassemble = info.disassemble;
+		(*header->get_info)(NULL, CPUINFO_PTR_DISASSEMBLE, &info);
+		header->disassemble = info.disassemble;
 
 		info.translate = NULL;
-		(*intf->get_info)(NULL, CPUINFO_PTR_TRANSLATE, &info);
-		intf->translate = info.translate;
+		(*header->get_info)(NULL, CPUINFO_PTR_TRANSLATE, &info);
+		header->translate = info.translate;
 
 		/* get other miscellaneous stuff */
-		intf->context_size = cputype_context_size(cputype);
-		intf->address_shift = cputype_addrbus_shift(cputype, ADDRESS_SPACE_PROGRAM);
+		for (spacenum = 0; spacenum < ARRAY_LENGTH(header->address_shift); spacenum++)
+			header->address_shift[spacenum] = cputype_get_addrbus_shift(cputype, spacenum);
+		header->clock_divider = cputype_get_clock_divider(cputype);
+		header->clock_multiplier = cputype_get_clock_multiplier(cputype);
 	}
 
 	/* fill in any empty entries with the dummy CPU */
 	for (mapindex = 0; mapindex < CPU_COUNT; mapindex++)
-		if (cpuintrf[mapindex].get_info == NULL)
-			cpuintrf[mapindex] = cpuintrf[CPU_DUMMY];
-
-	/* zap the CPU data structure */
-	memset(cpu, 0, sizeof(cpu));
-	totalcpu = 0;
+		if (cpu_type_header[mapindex].get_info == NULL)
+			cpu_type_header[mapindex] = cpu_type_header[CPU_DUMMY];
 
 	/* reset the context stack */
-	memset(&cpu_context_stack[0], 0, sizeof(cpu_context_stack));
+	memset((void *)&cpu_context_stack[0], 0, sizeof(cpu_context_stack));
 	cpu_context_stack_ptr = 0;
+}
 
-	/* nothing active, nothing executing */
-	activecpunum = -1;
-	executingcpu = NULL;
-	executingcpunum = -1;
-	totalcpu = 0;
 
-	/* compute information about the CPUs now if we have a machine */
-	if (machine != NULL)
+
+/***************************************************************************
+    LIVE CONTEXT CONTROL
+***************************************************************************/
+
+/*-------------------------------------------------
+    cpu_push_context - remember the current
+    context and push a new one on the stack
+-------------------------------------------------*/
+
+void cpu_push_context(const device_config *device)
+{
+	const device_config *oldcpu = device->machine->activecpu;
+	cpu_context_stack[cpu_context_stack_ptr++] = oldcpu;
+	set_cpu_context(oldcpu, device);
+}
+
+
+/*-------------------------------------------------
+    cpu_pop_context - restore a previously saved
+    context
+-------------------------------------------------*/
+
+void cpu_pop_context(void)
+{
+	const device_config *device = cpu_context_stack[--cpu_context_stack_ptr];
+	set_cpu_context(Machine->activecpu, device);
+}
+
+
+/*-------------------------------------------------
+    cpunum_get_active - return the index of the
+    active CPU (deprecated soon)
+-------------------------------------------------*/
+
+int cpunum_get_active(void)
+{
+	return (Machine->activecpu == NULL) ? -1 : cpu_get_index(Machine->activecpu);
+}
+
+
+
+/***************************************************************************
+    LIVE CPU ACCESSORS
+***************************************************************************/
+
+/*-------------------------------------------------
+    cpu_init - initialize a live CPU
+-------------------------------------------------*/
+
+void cpu_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
+{
+	cpu_class_header *classheader = get_safe_classheader(device);
+	
+	cpu_push_context(device);
+	classheader->index = index;
+	(*classheader->init)(device, index, clock, irqcallback);
+	(*classheader->get_context)(device->token);
+	cpu_pop_context();
+}
+
+
+/*-------------------------------------------------
+    cpu_exit - free a live CPU
+-------------------------------------------------*/
+
+void cpu_exit(const device_config *device)
+{
+	cpu_class_header *classheader = get_safe_classheader(device);
+	
+	if (classheader->exit != NULL)
 	{
-		/* loop over all defined CPUs */
-		for (totalcpu = 0; totalcpu < CPU_COUNT; totalcpu++)
-		{
-			cpu_type cputype = machine->config->cpu[totalcpu].type;
-			char familyname[256];
-			int j;
-
-			/* stop when we hit a dummy */
-			if (cputype == CPU_DUMMY)
-				break;
-
-			/* fill in the type and interface */
-			cpu[totalcpu].index = totalcpu;
-			cpu[totalcpu].intf = cpuintrf[cputype];
-			cpu[totalcpu].cputype = cputype;
-
-			/* determine the family index */
-			strcpy(familyname, cputype_core_file(cputype));
-			for (j = 0; j < CPU_COUNT; j++)
-				if (!strcmp(familyname, cputype_core_file(j)))
-				{
-					cpu[totalcpu].family = j;
-					break;
-				}
-		}
+		set_cpu_context(device->machine->activecpu, device);
+		(*classheader->exit)(device);
+		device->machine->activecpu = NULL;
 	}
 }
 
 
+/*-------------------------------------------------
+    cpu_get_info_* - return information about a 
+    live CPU
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Set the disassembly override proc
- *
- *************************************/
-
-void cpu_set_dasm_override(const device_config *cpu, cpu_disassemble_func dasm_override)
+INT64 cpu_get_info_int(const device_config *device, UINT32 state)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
-	cpudata->dasm_override = dasm_override;
-}
-
-
-
-/*************************************
- *
- *  Initialize a single CPU
- *
- *************************************/
-
-int cpuintrf_init_cpu(int cpunum, cpu_type cputype, int clock, const void *config, cpu_irq_callback irqcallback)
-{
-	cpuintrf_data *cpudata = &cpu[cpunum];
+	cpu_class_header *classheader = get_safe_classheader(device);
 	cpuinfo info;
 
-	/* create a fake device for the CPU */
-	cpudata->device = auto_malloc(sizeof(*cpudata->device) + strlen(Machine->config->cpu[cpunum].tag));
-	memset(cpudata->device, 0, sizeof(*cpudata->device));
-	strcpy(cpudata->device->tag, Machine->config->cpu[cpunum].tag);
-	cpudata->device->type = (device_type)cputype;
-	cpudata->device->class = DEVICE_CLASS_CPU_CHIP;
-	cpudata->device->static_config = config;
-	cpudata->device->started = TRUE;
-	cpudata->device->machine = Machine;
-	cpudata->device->region = memory_region(Machine, cpudata->device->tag);
-	cpudata->device->regionbytes = memory_region_length(Machine, cpudata->device->tag);
-	
-	/* allocate a context token */
-	cpudata->device->token = auto_malloc(cpudata->intf.context_size);
-	memset(cpudata->device->token, 0, cpudata->intf.context_size);
-	
-	/* set up the class token */
-	cpudata->device->classtoken = &cpu[cpunum];
-	
-	/* put a pointer to the device in the machine */
-	Machine->cpu[cpunum] = cpudata->device;
-
-	/* initialize the CPU and stash the context */
-	Machine->activecpu = Machine->cpu[cpunum];
-	activecpunum = cpunum;
-	(*cpudata->intf.init)(cpudata->device, cpunum, clock, irqcallback);
-	(*cpudata->intf.get_context)(cpudata->device->token);
-	Machine->activecpu = NULL;
-	activecpunum = -1;
-
-	/* get the instruction count pointer */
-	info.icount = NULL;
-	(*cpudata->intf.get_info)(cpudata->device, CPUINFO_PTR_INSTRUCTION_COUNTER, &info);
-	cpudata->icount = info.icount;
-	return 0;
-}
-
-
-
-/*************************************
- *
- *  Exit/free a single CPU
- *
- *************************************/
-
-void cpuintrf_exit_cpu(int cpunum)
-{
-	cpuintrf_data *cpudata = &cpu[cpunum];
-	
-	/* if the CPU core defines an exit function, call it now */
-	if (cpudata->intf.exit)
-	{
-		/* switch contexts to the CPU during the exit */
-		cpu_push_context(cpu->device);
-		(*cpudata->intf.exit)(cpu->device);
-		cpu_pop_context();
-	}
-}
-
-
-
-/*************************************
- *
- *  Interfaces to the active CPU
- *
- *************************************/
-
-/*--------------------------
-    Adjust/get icount
---------------------------*/
-
-void activecpu_adjust_icount(int delta)
-{
-	VERIFY_ACTIVECPU(activecpu_adjust_icount);
-	*cpu[activecpunum].icount += delta;
-}
-
-
-int activecpu_get_icount(void)
-{
-	VERIFY_ACTIVECPU(activecpu_get_icount);
-	return *cpu[activecpunum].icount;
-}
-
-
-/*--------------------------
-    Reset banking pointers
---------------------------*/
-
-void activecpu_reset_banking(void)
-{
-	VERIFY_ACTIVECPU(activecpu_reset_banking);
-	memory_set_opbase(cpu_get_physical_pc_byte(Machine->activecpu));
-}
-
-
-/*************************************
- *
- *  Interfaces to a specific CPU
- *
- *************************************/
-
-/*--------------------------
-    Get info accessors
---------------------------*/
-
-INT64 cpu_get_info_int(const device_config *cpu, UINT32 state)
-{
-	cpuintrf_data *cpudata = cpu->classtoken;
-	cpuinfo info;
-
-	VERIFY_CPU(cpu_get_info_int);
-	cpu_push_context(cpu);
+	cpu_push_context(device);
 	info.i = 0;
-	(*cpudata->intf.get_info)(cpu, state, &info);
+	(*classheader->get_info)(device, state, &info);
 	cpu_pop_context();
 	return info.i;
 }
 
-void *cpu_get_info_ptr(const device_config *cpu, UINT32 state)
+void *cpu_get_info_ptr(const device_config *device, UINT32 state)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
+	cpu_class_header *classheader = get_safe_classheader(device);
 	cpuinfo info;
 
-	VERIFY_CPU(cpu_get_info_ptr);
-	cpu_push_context(cpu);
+	cpu_push_context(device);
 	info.p = NULL;
-	(*cpudata->intf.get_info)(cpu, state, &info);
+	(*classheader->get_info)(device, state, &info);
 	cpu_pop_context();
 	return info.p;
 }
 
-genf *cpu_get_info_fct(const device_config *cpu, UINT32 state)
+genf *cpu_get_info_fct(const device_config *device, UINT32 state)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
+	cpu_class_header *classheader = get_safe_classheader(device);
 	cpuinfo info;
 
-	VERIFY_CPU(cpu_get_info_fct);
-	cpu_push_context(cpu);
+	cpu_push_context(device);
 	info.f = NULL;
-	(*cpudata->intf.get_info)(cpu, state, &info);
+	(*classheader->get_info)(device, state, &info);
 	cpu_pop_context();
 	return info.f;
 }
 
-const char *cpu_get_info_string(const device_config *cpu, UINT32 state)
+const char *cpu_get_info_string(const device_config *device, UINT32 state)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
+	cpu_class_header *classheader = get_safe_classheader(device);
 	cpuinfo info;
 
-	VERIFY_CPU(cpu_get_info_string);
-	cpu_push_context(cpu);
-	info.s = cpuintrf_temp_str();
-	(*cpudata->intf.get_info)(cpu, state, &info);
+	cpu_push_context(device);
+	info.s = get_temp_string_buffer();
+	(*classheader->get_info)(device, state, &info);
 	cpu_pop_context();
 	return info.s;
 }
 
 
-/*--------------------------
-    Set info accessors
---------------------------*/
+/*-------------------------------------------------
+    cpu_set_info_* - set information about a 
+    live CPU
+-------------------------------------------------*/
 
-void cpu_set_info_int(const device_config *cpu, UINT32 state, INT64 data)
+void cpu_set_info_int(const device_config *device, UINT32 state, INT64 data)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
+	cpu_class_header *classheader = get_safe_classheader(device);
 	cpuinfo info;
 
-	VERIFY_CPU(cpu_set_info_int);
 	info.i = data;
-	cpu_push_context(cpu);
-	(*cpudata->intf.set_info)(cpu, state, &info);
+	cpu_push_context(device);
+	(*classheader->set_info)(device, state, &info);
 	cpu_pop_context();
 }
 
-void cpu_set_info_ptr(const device_config *cpu, UINT32 state, void *data)
+void cpu_set_info_ptr(const device_config *device, UINT32 state, void *data)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
+	cpu_class_header *classheader = get_safe_classheader(device);
 	cpuinfo info;
 
-	VERIFY_CPU(cpu_set_info_ptr);
 	info.p = data;
-	cpu_push_context(cpu);
-	(*cpudata->intf.set_info)(cpu, state, &info);
+	cpu_push_context(device);
+	(*classheader->set_info)(device, state, &info);
 	cpu_pop_context();
 }
 
-void cpu_set_info_fct(const device_config *cpu, UINT32 state, genf *data)
+void cpu_set_info_fct(const device_config *device, UINT32 state, genf *data)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
+	cpu_class_header *classheader = get_safe_classheader(device);
 	cpuinfo info;
 
-	VERIFY_CPU(cpu_set_info_ptr);
 	info.f = data;
-	cpu_push_context(cpu);
-	(*cpudata->intf.set_info)(cpu, state, &info);
+	cpu_push_context(device);
+	(*classheader->set_info)(device, state, &info);
 	cpu_pop_context();
 }
 
 
-/*--------------------------
-    Execute
---------------------------*/
 
-int cpu_execute(const device_config *cpu, int cycles)
+/*-------------------------------------------------
+    cpu_execute - execute the requested cycles on 
+    a given CPU
+-------------------------------------------------*/
+
+int cpu_execute(const device_config *device, int cycles)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
+	cpu_class_header *classheader = get_safe_classheader(device);
 	int ran;
 
-	VERIFY_CPU(cpu_execute);
-	cpu_push_context(cpu);
-	executingcpu = cpu;
-	executingcpunum = cpudata->index;
-	memory_set_opbase(cpu_get_physical_pc_byte(cpu));
-	ran = (*cpudata->intf.execute)(cpu, cycles);
-	executingcpu = NULL;
-	executingcpunum = -1;
+	cpu_push_context(device);
+	memory_set_opbase(cpu_get_physical_pc_byte(device));
+	ran = (*classheader->execute)(device, cycles);
 	cpu_pop_context();
 	return ran;
 }
 
 
-/*--------------------------
-    Reset and set IRQ ack
---------------------------*/
+/*-------------------------------------------------
+    cpu_reset - signal a reset for a given CPU
+-------------------------------------------------*/
 
-void cpu_reset(const device_config *cpu)
+void cpu_reset(const device_config *device)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
+	cpu_class_header *classheader = get_safe_classheader(device);
 
-	VERIFY_CPU(cpu_reset);
-	cpu_push_context(cpu);
+	cpu_push_context(device);
 	memory_set_opbase(0);
-	(*cpudata->intf.reset)(cpu);
+	(*classheader->reset)(device);
 	cpu_pop_context();
 }
 
 
-/*--------------------------
-    Read a byte
---------------------------*/
+/*-------------------------------------------------
+    cpu_read_byte - read a byte from another CPU's 
+    memory space
+-------------------------------------------------*/
 
-UINT8 cpu_read_byte(const device_config *cpu, offs_t address)
+UINT8 cpu_read_byte(const device_config *device, offs_t address)
 {
-	int result;
+	UINT8 result;
 
-	VERIFY_CPU(cpu_read_byte);
-	cpu_push_context(cpu);
+	cpu_push_context(device);
 	result = program_read_byte(address);
 	cpu_pop_context();
 	return result;
 }
 
 
-/*--------------------------
-    Write a byte
---------------------------*/
+/*-------------------------------------------------
+    cpu_write_byte - write a byte to another CPU's 
+    memory space
+-------------------------------------------------*/
 
-void cpu_write_byte(const device_config *cpu, offs_t address, UINT8 data)
+void cpu_write_byte(const device_config *device, offs_t address, UINT8 data)
 {
-	VERIFY_CPU(cpu_write_byte);
-	
-	cpu_push_context(cpu);
+	cpu_push_context(device);
 	program_write_byte(address, data);
 	cpu_pop_context();
 }
 
 
-/*--------------------------
-    Get/set PC
---------------------------*/
+/*-------------------------------------------------
+    cpu_get_physical_pc_byte - return the PC, 
+    corrected to a byte offset and translated to
+    physical space, on a given CPU
+-------------------------------------------------*/
 
-offs_t cpu_get_physical_pc_byte(const device_config *cpu)
+offs_t cpu_get_physical_pc_byte(const device_config *device)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
 	offs_t pc;
-	int shift;
 
-	VERIFY_CPU(cpu_get_physical_pc_byte);
-	shift = cpudata->intf.address_shift;
-	cpu_push_context(cpu);
-	pc = cpu_get_info_int(cpu, CPUINFO_INT_PC);
-	if (shift < 0)
-		pc <<= -shift;
-	else
-		pc >>= shift;
-	if (cpudata->intf.translate != NULL)
-		(cpudata->intf.translate)(cpu, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, &pc);
+	cpu_push_context(device);
+	pc = cpu_address_to_byte(device, ADDRESS_SPACE_PROGRAM, cpu_get_info_int(device, CPUINFO_INT_PC));
+	pc = cpu_address_physical(device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, pc);
 	cpu_pop_context();
 	return pc;
 }
 
 
-void cpu_set_opbase(const device_config *cpu, unsigned val)
-{
-	VERIFY_CPU(cpu_set_opbase);
+/*-------------------------------------------------
+    cpu_set_opbase - update the banking on a given 
+    CPU
+-------------------------------------------------*/
 
-	cpu_push_context(cpu);
+void cpu_set_opbase(const device_config *device, unsigned val)
+{
+	cpu_push_context(device);
 	memory_set_opbase(val);
 	cpu_pop_context();
 }
 
 
-/*--------------------------
-    Disassembly
---------------------------*/
+/*-------------------------------------------------
+    cpu_dasm - disassemble a line at a given PC 
+    on a given CPU
+-------------------------------------------------*/
 
-offs_t cpu_dasm(const device_config *cpu, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+offs_t cpu_dasm(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
-	cpuintrf_data *cpudata = cpu->classtoken;
-	offs_t result;
+	cpu_class_header *classheader = get_safe_classheader(device);
+	offs_t result = 0;
 	
-	VERIFY_CPU(cpu_dasm);
-	cpu_push_context(cpu);
+	cpu_push_context(device);
 
 	/* check for disassembler override */
-	if (cpudata->dasm_override != NULL)
-	{
-		result = (*cpudata->dasm_override)(buffer, pc, oprom, opram);
-		if (result != 0)
-			return result;
-	}
+	if (classheader->dasm_override != NULL)
+		result = (*classheader->dasm_override)(buffer, pc, oprom, opram);
 
-	if (cpudata->intf.disassemble != NULL)
-		result = (*cpudata->intf.disassemble)(buffer, pc, oprom, opram);
+	/* if we have a disassembler, run it */
+	if (result == 0 && classheader->disassemble != NULL)
+		result = (*classheader->disassemble)(buffer, pc, oprom, opram);
 
-	else
+	/* if we still have nothing, output vanilla bytes */
+	if (result == 0)
 	{
-		/* if no disassembler present, dump vanilla bytes */
-		switch (cpu_get_min_opcode_bytes(cpu))
+		result = cpu_get_min_opcode_bytes(device);
+		switch (result)
 		{
 			case 1:
 			default:
-				sprintf(buffer, "$%02X", (unsigned) *((UINT8 *) oprom));
-				result = 1;
+				sprintf(buffer, "$%02X", *(UINT8 *)oprom);
 				break;
 
 			case 2:
-				sprintf(buffer, "$%04X", (unsigned) *((UINT16 *) oprom));
-				result = 2;
+				sprintf(buffer, "$%04X", *(UINT16 *)oprom);
 				break;
 
 			case 4:
-				sprintf(buffer, "$%08X", (unsigned) *((UINT32 *) oprom));
-				result = 4;
+				sprintf(buffer, "$%08X", *(UINT32 *)oprom);
+				break;
+
+			case 8:
+				sprintf(buffer, "$%08X%08X", (UINT32)(*(UINT64 *)oprom >> 32), (UINT32)(*(UINT64 *)oprom >> 0));
 				break;
 		}
 	}
@@ -1534,10 +1384,9 @@ offs_t cpu_dasm(const device_config *cpu, char *buffer, offs_t pc, const UINT8 *
 	assert((result & DASMFLAG_LENGTHMASK) != 0);
 #ifdef MAME_DEBUG
 {
-	int shift = cpu_get_addrbus_shift(cpu, ADDRESS_SPACE_PROGRAM);
-	int bytes = (shift < 0) ? ((result & DASMFLAG_LENGTHMASK) << -shift) : ((result & DASMFLAG_LENGTHMASK) >> shift);
-	assert(bytes >= cpu_get_min_opcode_bytes(cpu));
-	assert(bytes <= cpu_get_max_opcode_bytes(cpu));
+	int bytes = cpu_address_to_byte(device, ADDRESS_SPACE_PROGRAM, result & DASMFLAG_LENGTHMASK);
+	assert(bytes >= cpu_get_min_opcode_bytes(device));
+	assert(bytes <= cpu_get_max_opcode_bytes(device));
 	(void) bytes; /* appease compiler */
 }
 #endif
@@ -1547,64 +1396,89 @@ offs_t cpu_dasm(const device_config *cpu, char *buffer, offs_t pc, const UINT8 *
 }
 
 
+/*-------------------------------------------------
+    cpu_set_dasm_override - set a dasm override 
+    handler
+-------------------------------------------------*/
 
-/*************************************
- *
- *  Interfaces to a specific CPU type
- *
- *************************************/
+void cpu_set_dasm_override(const device_config *device, cpu_disassemble_func dasm_override)
+{
+	cpu_class_header *classheader = get_safe_classheader(device);
+	classheader->dasm_override = dasm_override;
+}
 
-/*--------------------------
-    Get info accessors
---------------------------*/
+
+
+/***************************************************************************
+    CPU TYPE ACCESSORS
+***************************************************************************/
+
+/*-------------------------------------------------
+    cputype_get_header_template - return a header 
+    template for a given CPU type
+-------------------------------------------------*/
+
+const cpu_class_header *cputype_get_header_template(cpu_type cputype)
+{
+	assert(cputype >= 0 && cputype < CPU_COUNT);
+	return &cpu_type_header[cputype];
+}
+
+
+/*-------------------------------------------------
+    cputype_get_info_* - return information about a 
+    given CPU type
+-------------------------------------------------*/
 
 INT64 cputype_get_info_int(cpu_type cputype, UINT32 state)
 {
+	cpu_class_header *classheader = &cpu_type_header[cputype];
 	cpuinfo info;
 
-	VERIFY_CPUTYPE(cputype_get_info_int);
+	assert(cputype >= 0 && cputype < CPU_COUNT);
 	info.i = 0;
-	(*cpuintrf[cputype].get_info)(NULL, state, &info);
+	(*classheader->get_info)(NULL, state, &info);
 	return info.i;
 }
 
 void *cputype_get_info_ptr(cpu_type cputype, UINT32 state)
 {
+	cpu_class_header *classheader = &cpu_type_header[cputype];
 	cpuinfo info;
 
-	VERIFY_CPUTYPE(cputype_get_info_ptr);
+	assert(cputype >= 0 && cputype < CPU_COUNT);
 	info.p = NULL;
-	(*cpuintrf[cputype].get_info)(NULL, state, &info);
+	(*classheader->get_info)(NULL, state, &info);
 	return info.p;
 }
 
 genf *cputype_get_info_fct(cpu_type cputype, UINT32 state)
 {
+	cpu_class_header *classheader = &cpu_type_header[cputype];
 	cpuinfo info;
 
-	VERIFY_CPUTYPE(cputype_get_info_fct);
+	assert(cputype >= 0 && cputype < CPU_COUNT);
 	info.f = NULL;
-	(*cpuintrf[cputype].get_info)(NULL, state, &info);
+	(*classheader->get_info)(NULL, state, &info);
 	return info.f;
 }
 
 const char *cputype_get_info_string(cpu_type cputype, UINT32 state)
 {
+	cpu_class_header *classheader = &cpu_type_header[cputype];
 	cpuinfo info;
 
-	VERIFY_CPUTYPE(cputype_get_info_string);
-	info.s = cpuintrf_temp_str();
-	(*cpuintrf[cputype].get_info)(NULL, state, &info);
+	assert(cputype >= 0 && cputype < CPU_COUNT);
+	info.s = get_temp_string_buffer();
+	(*classheader->get_info)(NULL, state, &info);
 	return info.s;
 }
 
 
 
-/*************************************
- *
- *  Dummy CPU definition
- *
- *************************************/
+/***************************************************************************
+    DUMMY CPU DEFINITION
+***************************************************************************/
 
 struct dummy_context
 {

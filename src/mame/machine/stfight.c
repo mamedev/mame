@@ -121,13 +121,13 @@ static WRITE8_HANDLER( stfight_bank_w )
 static TIMER_CALLBACK( stfight_interrupt_1 )
 {
     // Do a RST08
-    cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xcf);
+    cpu_set_input_line_and_vector(machine->cpu[0],0,HOLD_LINE,0xcf);
 }
 
 INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
-    cpunum_set_input_line_and_vector(machine, 0,0,HOLD_LINE,0xd7);
+    cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xd7);
     timer_set(ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
 }
 

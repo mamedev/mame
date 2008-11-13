@@ -402,7 +402,7 @@ static WRITE8_DEVICE_HANDLER( buckrog_ppi0c_w )
 	/* bit   7 = /INT on the 2nd CPU */
 	turbo_state *state = device->machine->driver_data;
 	state->buckrog_fchg = data & 0x07;
-	cpunum_set_input_line(device->machine, 1, 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[1], 0, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

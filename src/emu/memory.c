@@ -1668,10 +1668,10 @@ static void memory_init_cpudata(running_machine *machine)
 			/* determine the address and data bits */
 			space->cpunum = cpunum;
 			space->spacenum = spacenum;
-			space->endianness = cputype_endianness(cputype);
-			space->ashift = cputype_addrbus_shift(cputype, spacenum);
-			space->abits = cputype_addrbus_width(cputype, spacenum);
-			space->dbits = cputype_databus_width(cputype, spacenum);
+			space->endianness = cputype_get_endianness(cputype);
+			space->ashift = cputype_get_addrbus_shift(cputype, spacenum);
+			space->abits = cputype_get_addrbus_width(cputype, spacenum);
+			space->dbits = cputype_get_databus_width(cputype, spacenum);
 			space->addrmask = 0xffffffffUL >> (32 - space->abits);
 			space->bytemask = ADDR2BYTE_END(space, space->addrmask);
 			space->accessors = memory_get_accessors(spacenum, space->dbits, space->endianness);

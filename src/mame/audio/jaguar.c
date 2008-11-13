@@ -190,15 +190,15 @@ static TIMER_CALLBACK( serial_callback );
  *
  *************************************/
 
-void jaguar_dsp_suspend(void)
+void jaguar_dsp_suspend(running_machine *machine)
 {
-	cpunum_suspend(2, SUSPEND_REASON_SPIN, 1);
+	cpu_suspend(machine->cpu[2], SUSPEND_REASON_SPIN, 1);
 }
 
 
-void jaguar_dsp_resume(void)
+void jaguar_dsp_resume(running_machine *machine)
 {
-	cpunum_resume(2, SUSPEND_REASON_SPIN);
+	cpu_resume(machine->cpu[2], SUSPEND_REASON_SPIN);
 }
 
 
@@ -213,11 +213,11 @@ static void update_gpu_irq(void)
 {
 	if (gpu_irq_state & dsp_regs[JINTCTRL] & 0x1f)
 	{
-		cpunum_set_input_line(Machine, 1, 1, ASSERT_LINE);
-		jaguar_gpu_resume();
+		cpu_set_input_line(Machine->cpu[1], 1, ASSERT_LINE);
+		jaguar_gpu_resume(Machine);
 	}
 	else
-		cpunum_set_input_line(Machine, 1, 1, CLEAR_LINE);
+		cpu_set_input_line(Machine->cpu[1], 1, CLEAR_LINE);
 }
 
 
@@ -374,7 +374,7 @@ static WRITE32_HANDLER( dsp_flags_w )
 		{
 			UINT32 r30 = cpu_get_reg(machine->activecpu, JAGUAR_R30) & 0xffffff;
 			if (r30 >= 0xf1b124 && r30 <= 0xf1b126)
-				jaguar_dsp_suspend();
+				jaguar_dsp_suspend(machine);
 		}
 	}
 }
@@ -394,8 +394,8 @@ static WRITE32_HANDLER( dsp_flags_w )
 static TIMER_CALLBACK( serial_chunky_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cpunum_set_input_line(machine, 2, 1, ASSERT_LINE);
-	jaguar_dsp_resume();
+	cpu_set_input_line(machine->cpu[2], 1, ASSERT_LINE);
+	jaguar_dsp_resume(machine);
 
 	/* fix flaky code in interrupt handler which thwarts our speedup */
 	if ((jaguar_dsp_ram[0x3e/4] & 0xffff) == 0xbfbc &&
@@ -413,8 +413,8 @@ static TIMER_CALLBACK( serial_chunky_callback )
 static TIMER_CALLBACK( serial_callback )
 {
 	/* assert the A2S IRQ on CPU #2 (DSP) */
-	cpunum_set_input_line(machine, 2, 1, ASSERT_LINE);
-	jaguar_dsp_resume();
+	cpu_set_input_line(machine->cpu[2], 1, ASSERT_LINE);
+	jaguar_dsp_resume(machine);
 }
 
 #endif

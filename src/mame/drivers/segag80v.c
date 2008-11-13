@@ -182,7 +182,7 @@ static INPUT_CHANGED( service_switch )
 {
 	/* pressing the service switch sends an NMI */
 	if (newval)
-		cpunum_set_input_line(field->port->machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -217,7 +217,7 @@ static offs_t decrypt_offset(running_machine *machine, offs_t offset)
 	offs_t pc;
 
 	/* if no active CPU, don't do anything */
-	if (cpunum_get_active() == -1)
+	if (machine->activecpu == NULL)
 		return offset;
 
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */

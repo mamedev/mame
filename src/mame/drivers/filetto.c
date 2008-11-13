@@ -429,7 +429,7 @@ static READ8_DEVICE_HANDLER( port_a_r )
 	}
 	else//keyboard emulation
 	{
-		//cpunum_set_input_line(device->machine, 0,1,PULSE_LINE);
+		//cpu_set_input_line(device->machine->cpu[0],1,PULSE_LINE);
 		return 0x00;//Keyboard is disconnected
 		//return 0xaa;//Keyboard code
 	}
@@ -465,7 +465,7 @@ static WRITE8_DEVICE_HANDLER( wss_2_w )
 
 static WRITE8_DEVICE_HANDLER( sys_reset_w )
 {
-	cpunum_set_input_line(device->machine, 0,INPUT_LINE_RESET,PULSE_LINE);
+	cpu_set_input_line(device->machine->cpu[0],INPUT_LINE_RESET,PULSE_LINE);
 }
 
 
@@ -623,7 +623,7 @@ static const struct dma8237_interface dma8237_1_config =
 ******************/
 
 static PIC8259_SET_INT_LINE( pic8259_1_set_int_line ) {
-	cpunum_set_input_line(device->machine, 0, 0, interrupt ? HOLD_LINE : CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], 0, interrupt ? HOLD_LINE : CLEAR_LINE);
 }
 
 static const struct pic8259_interface pic8259_1_config = {
@@ -816,11 +816,11 @@ static INTERRUPT_GEN( filetto_vblank )
 {
 	/*TODO: Timings are guessed*/
 	/*H-Blank*/
-	if((cpu_getiloops() % 8) == 0){ HBLANK_1; }
+	if((cpu_getiloops(device) % 8) == 0){ HBLANK_1; }
 	else						  { HBLANK_0; }
 
 	/*V-Blank*/
-	if(cpu_getiloops() >= 180) 	  { VBLANK_1; }
+	if(cpu_getiloops(device) >= 180) 	  { VBLANK_1; }
 	else						  { VBLANK_0; }
 }
 
@@ -830,7 +830,7 @@ static MACHINE_RESET( filetto )
 	bank = -1;
 	lastvalue = -1;
 	hv_blank = 0;
-	cpunum_set_irq_callback(0, irq_callback);
+	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 	filetto_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
 	filetto_devices.pic8259_1 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_1" );
 	filetto_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );

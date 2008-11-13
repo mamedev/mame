@@ -173,15 +173,15 @@ static READ16_HANDLER( dassault_sub_control_r )
 static WRITE16_HANDLER( dassault_sound_w )
 {
 	soundlatch_w(machine,0,data&0xff);
-	cpunum_set_input_line(machine, 2,0,HOLD_LINE); /* IRQ1 */
+	cpu_set_input_line(machine->cpu[2],0,HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
 static READ16_HANDLER( dassault_irq_r )
 {
 	switch (offset) {
-		case 0: cpunum_set_input_line(machine, 0, 5, CLEAR_LINE); break;
-		case 1: cpunum_set_input_line(machine, 1, 6, CLEAR_LINE); break;
+		case 0: cpu_set_input_line(machine->cpu[0], 5, CLEAR_LINE); break;
+		case 1: cpu_set_input_line(machine->cpu[1], 6, CLEAR_LINE); break;
 	}
 	return shared_ram[(0xffc/2)+offset]; /* The values probably don't matter */
 }
@@ -189,8 +189,8 @@ static READ16_HANDLER( dassault_irq_r )
 static WRITE16_HANDLER( dassault_irq_w )
 {
 	switch (offset) {
-		case 0: cpunum_set_input_line(machine, 0, 5, ASSERT_LINE); break;
-		case 1: cpunum_set_input_line(machine, 1, 6, ASSERT_LINE); break;
+		case 0: cpu_set_input_line(machine->cpu[0], 5, ASSERT_LINE); break;
+		case 1: cpu_set_input_line(machine->cpu[1], 6, ASSERT_LINE); break;
 	}
 
 	COMBINE_DATA(&shared_ram[(0xffc/2)+offset]); /* The values probably don't matter */
@@ -533,7 +533,7 @@ GFXDECODE_END
 
 static void sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 2,1,state);
+	cpu_set_input_line(machine->cpu[2],1,state);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -812,7 +812,7 @@ static READ16_HANDLER( dassault_main_skip )
 	int ret=dassault_ram[0];
 
 	if (cpu_get_previouspc(machine->activecpu)==0x1170 && ret&0x8000)
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 
 	return ret;
 }
@@ -822,7 +822,7 @@ static READ16_HANDLER( thndzone_main_skip )
 	int ret=dassault_ram[0];
 
 	if (cpu_get_pc(machine->activecpu)==0x114c && ret&0x8000)
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 
 	return ret;
 }

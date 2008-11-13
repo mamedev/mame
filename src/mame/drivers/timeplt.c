@@ -71,7 +71,7 @@ static MACHINE_START( timeplt )
 static INTERRUPT_GEN( timeplt_interrupt )
 {
 	if (nmi_enable)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, ASSERT_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
@@ -79,7 +79,7 @@ static WRITE8_HANDLER( timeplt_nmi_enable_w )
 {
 	nmi_enable = data & 1;
 	if (!nmi_enable)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

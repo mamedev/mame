@@ -290,26 +290,26 @@ WRITE8_HANDLER( zookeep_bankswitch_w )
 
 WRITE8_HANDLER( qix_data_firq_w )
 {
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 WRITE8_HANDLER( qix_data_firq_ack_w )
 {
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 READ8_HANDLER( qix_data_firq_r )
 {
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 	return 0xff;
 }
 
 
 READ8_HANDLER( qix_data_firq_ack_r )
 {
-	cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -323,26 +323,26 @@ READ8_HANDLER( qix_data_firq_ack_r )
 
 WRITE8_HANDLER( qix_video_firq_w )
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 WRITE8_HANDLER( qix_video_firq_ack_w )
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
 READ8_HANDLER( qix_video_firq_r )
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
 	return 0xff;
 }
 
 
 READ8_HANDLER( qix_video_firq_ack_r )
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -379,7 +379,7 @@ static void qix_pia_dint(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(3) | pia_get_irq_b(3);
 
 	/* DINT is connected to the data CPU's IRQ line */
-	cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -388,7 +388,7 @@ static void qix_pia_sint(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(4) | pia_get_irq_b(4);
 
 	/* SINT is connected to the sound CPU's IRQ line */
-	cpunum_set_input_line(machine, 2, M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -425,13 +425,13 @@ static WRITE8_HANDLER( qixmcu_coinctrl_w )
 
 	if (!(data & 0x04))
 	{
-		cpunum_set_input_line(machine, 3, M68705_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[3], M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */
 		/* note: I'm using 50 because 30 is not enough for space dungeon at game over */
-		cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
+		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50));
 	}
 	else
-		cpunum_set_input_line(machine, 3, M68705_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[3], M68705_IRQ_LINE, CLEAR_LINE);
 
 	/* this is a callback called by pia_0_w(), so I don't need to synchronize */
 	/* the CPUs - they have already been synchronized by qix_pia_0_w() */

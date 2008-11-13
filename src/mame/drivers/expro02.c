@@ -428,7 +428,7 @@ ADDRESS_MAP_END
 
 static INTERRUPT_GEN( galsnew_interrupt )
 {
-	cpunum_set_input_line(machine, 0, cpu_getiloops() + 3, HOLD_LINE);	/* IRQs 5, 4, and 3 */
+	cpu_set_input_line(device, cpu_getiloops(device) + 3, HOLD_LINE);	/* IRQs 5, 4, and 3 */
 }
 
 static MACHINE_RESET( galsnew )

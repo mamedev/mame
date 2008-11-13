@@ -722,35 +722,35 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( satansat_interrupt )
 {
-	if (cpu_getiloops() != 0)
+	if (cpu_getiloops(device) != 0)
 	{
-		UINT8 val = input_port_read(machine, "IN2");
+		UINT8 val = input_port_read(device->machine, "IN2");
 
 		coin_counter_w(0, val & 1);
 
 		/* user asks to insert coin: generate a NMI interrupt. */
 		if (val & 0x01)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+		cpu_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
 static INTERRUPT_GEN( rockola_interrupt )
 {
-	if (cpu_getiloops() != 0)
+	if (cpu_getiloops(device) != 0)
 	{
-		UINT8 val = input_port_read(machine, "IN2");
+		UINT8 val = input_port_read(device->machine, "IN2");
 
 		coin_counter_w(0, val & 1);
 		coin_counter_w(1, val & 2);
 
 		/* user asks to insert coin: generate a NMI interrupt. */
 		if (val & 0x03)
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
-		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
+		cpu_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);	/* one IRQ per frame */
 }
 
 

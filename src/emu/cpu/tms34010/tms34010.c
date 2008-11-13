@@ -778,7 +778,7 @@ static TIMER_CALLBACK( internal_interrupt_callback )
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 		if (machine->cpu[cpunum] == tms->device)
 		{
-			cpu_triggerint(machine, cpunum);
+			cpu_triggerint(machine->cpu[cpunum]);
 			break;
 		}
 }
@@ -1508,7 +1508,7 @@ READ16_HANDLER( tms34010_io_register_r )
 			return result;
 
 		case REG_REFCNT:
-			return (activecpu_gettotalcycles() / 16) & 0xfffc;
+			return (cpu_get_total_cycles(machine->activecpu) / 16) & 0xfffc;
 
 		case REG_INTPEND:
 			result = IOREG(tms, offset);
@@ -1554,7 +1554,7 @@ READ16_HANDLER( tms34020_io_register_r )
 		{
 			int refreshrate = (IOREG(tms, REG020_CONFIG) >> 8) & 7;
 			if (refreshrate < 6)
-				return (activecpu_gettotalcycles() / refreshrate) & 0xffff;
+				return (cpu_get_total_cycles(machine->activecpu) / refreshrate) & 0xffff;
 			break;
 		}
 	}
@@ -1633,7 +1633,7 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 
 	/* swap back */
 	cpu_pop_context();
-	activecpu_reset_banking();
+	memory_set_opbase(cpu_get_physical_pc_byte(tms->device));
 }
 
 

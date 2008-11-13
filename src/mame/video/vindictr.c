@@ -191,7 +191,7 @@ void vindictr_scanline_update(const device_config *screen, int scanline)
 				break;
 
 			case 6:		/* /VIRQ */
-				atarigen_scanline_int_gen(screen->machine, 0);
+				atarigen_scanline_int_gen(screen->machine->cpu[0]);
 				break;
 
 			case 7:		/* /PFVS */

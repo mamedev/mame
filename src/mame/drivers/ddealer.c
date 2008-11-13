@@ -578,7 +578,7 @@ static MACHINE_RESET (ddealer)
 
 static INTERRUPT_GEN( ddealer_interrupt )
 {
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static MACHINE_DRIVER_START( ddealer )

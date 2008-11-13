@@ -67,13 +67,13 @@ static WRITE8_HANDLER( ctrl_w )
 static INTERRUPT_GEN( jb_interrupt )
 {
 	if (irq_enable)
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
 static INTERRUPT_GEN( jb_interrupt_nmi )
 {
 	if (nmi_enable)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

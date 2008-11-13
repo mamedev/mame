@@ -34,7 +34,7 @@ INTERRUPT_GEN( twincobr_interrupt )
 {
 	if (twincobr_intenable) {
 		twincobr_intenable = 0;
-		cpunum_set_input_line(machine, 0, MC68000_IRQ_4, HOLD_LINE);
+		cpu_set_input_line(device, MC68000_IRQ_4, HOLD_LINE);
 	}
 }
 
@@ -42,7 +42,7 @@ INTERRUPT_GEN( wardner_interrupt )
 {
 	if (twincobr_intenable) {
 		twincobr_intenable = 0;
-		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
+		cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
@@ -158,7 +158,7 @@ WRITE16_HANDLER( twincobr_dsp_bio_w )
 	if (data == 0) {
 		if (dsp_execute) {
 			LOG(("Turning the main CPU on\n"));
-			cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, CLEAR_LINE);
 			dsp_execute = 0;
 		}
 		twincobr_dsp_BIO = ASSERT_LINE;
@@ -195,14 +195,14 @@ static void twincobr_dsp(running_machine *machine, int enable)
 	twincobr_dsp_on = enable;
 	if (enable) {
 		LOG(("Turning DSP on and main CPU off\n"));
-		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
-		cpunum_set_input_line(machine, 2, 0, ASSERT_LINE); /* TMS32010 INT */
-		cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE); /* TMS32010 INT */
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 	else {
 		LOG(("Turning DSP off\n"));
-		cpunum_set_input_line(machine, 2, 0, CLEAR_LINE); /* TMS32010 INT */
-		cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE); /* TMS32010 INT */
+		cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -281,14 +281,14 @@ static void toaplan0_coin_dsp_w(running_machine *machine, int offset, int data)
 		/****** The following apply to Flying Shark/Wardner only ******/
 		case 0x00:	/* This means assert the INT line to the DSP */
 					LOG(("Turning DSP on and main CPU off\n"));
-					cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, CLEAR_LINE);
-					cpunum_set_input_line(machine, 2, 0, ASSERT_LINE); /* TMS32010 INT */
-					cpunum_set_input_line(machine, 0, INPUT_LINE_HALT, ASSERT_LINE);
+					cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
+					cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE); /* TMS32010 INT */
+					cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 		case 0x01:	/* This means inhibit the INT line to the DSP */
 					LOG(("Turning DSP off\n"));
-					cpunum_set_input_line(machine, 2, 0, CLEAR_LINE); /* TMS32010 INT */
-					cpunum_set_input_line(machine, 2, INPUT_LINE_HALT, ASSERT_LINE);
+					cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE); /* TMS32010 INT */
+					cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 	}
 }

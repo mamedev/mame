@@ -64,13 +64,13 @@ static UINT32 *gunbustr_ram;
 
 static TIMER_CALLBACK( gunbustr_interrupt5 )
 {
-	cpunum_set_input_line(machine, 0,5,HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0],5,HOLD_LINE);
 }
 
 static INTERRUPT_GEN( gunbustr_interrupt )
 {
 	timer_set(ATTOTIME_IN_CYCLES(200000-500,0), NULL, 0, gunbustr_interrupt5);
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
 static WRITE32_HANDLER( gunbustr_palette_w )
@@ -423,7 +423,7 @@ ROM_END
 static READ32_HANDLER( main_cycle_r )
 {
 	if (cpu_get_pc(machine->activecpu)==0x55a && (gunbustr_ram[0x3acc/4]&0xff000000)==0)
-		cpu_spinuntil_int();
+		cpu_spinuntil_int(machine->activecpu);
 
 	return gunbustr_ram[0x3acc/4];
 }

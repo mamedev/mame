@@ -58,14 +58,14 @@ INLINE void get_crosshair_xy(running_machine *machine, int player, int *x, int *
 static TIMER_CALLBACK( trigger_gun_interrupt )
 {
 	/* fire the IRQ at the correct moment */
-	cpunum_set_input_line(machine, 0, param, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[0], param, ASSERT_LINE);
 }
 
 
 static TIMER_CALLBACK( clear_gun_interrupt )
 {
 	/* clear the IRQ on the next scanline? */
-	cpunum_set_input_line(machine, 0, param, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], param, CLEAR_LINE);
 }
 
 

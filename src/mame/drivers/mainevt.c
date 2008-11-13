@@ -39,7 +39,7 @@ VIDEO_START( dv );
 static INTERRUPT_GEN( mainevt_interrupt )
 {
 	if (K052109_is_IRQ_enabled())
-		irq0_line_hold(machine, cpunum);
+		irq0_line_hold(device);
 }
 
 
@@ -53,7 +53,7 @@ static WRITE8_HANDLER( dv_nmienable_w )
 static INTERRUPT_GEN( dv_interrupt )
 {
 	if (nmi_enable)
-		nmi_line_pulse(machine, cpunum);
+		nmi_line_pulse(device);
 }
 
 
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( mainevt_coin_w )
 
 static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
 {
-	cpunum_set_input_line_and_vector(machine, 1,0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )

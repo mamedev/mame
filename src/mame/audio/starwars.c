@@ -63,7 +63,7 @@ static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 oldd
 
 static void snd_interrupt(const device_config *device, int state)
 {
-	cpunum_set_input_line(device->machine, 1, M6809_IRQ_LINE, state);
+	cpu_set_input_line(device->machine->cpu[1], M6809_IRQ_LINE, state);
 }
 
 
@@ -89,7 +89,7 @@ static TIMER_CALLBACK( sound_callback )
 {
 	riot6532_porta_in_set(riot, 0x40, 0x40);
 	main_data = param;
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -132,7 +132,7 @@ static TIMER_CALLBACK( main_callback )
 
 	riot6532_porta_in_set(riot, 0x80, 0x80);
 	sound_data = param;
-	cpu_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 WRITE8_HANDLER( starwars_main_wr_w )
@@ -146,5 +146,5 @@ WRITE8_HANDLER( starwars_soundrst_w )
 	riot6532_porta_in_set(riot, 0x00, 0xc0);
 
 	/* reset sound CPU here  */
-	cpunum_set_input_line(machine, 1, INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }

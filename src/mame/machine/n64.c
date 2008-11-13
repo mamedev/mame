@@ -33,7 +33,7 @@ void signal_rcp_interrupt(running_machine *machine, int interrupt)
 	{
 		mi_interrupt |= interrupt;
 
-		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, ASSERT_LINE);
 	}
 }
 
@@ -43,7 +43,7 @@ void clear_rcp_interrupt(running_machine *machine, int interrupt)
 
 	//if (!mi_interrupt)
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_IRQ0, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 	}
 }
 
@@ -210,9 +210,9 @@ static void sp_set_status(UINT32 status)
 {
 	if (status & 0x1)
 	{
-		//cpu_trigger(Machine, 6789);
+		//cpuexec_trigger(Machine, 6789);
 
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(Machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
         cpu_set_reg(Machine->cpu[1], RSP_SR, cpu_get_reg(Machine->cpu[1], RSP_SR) | RSP_STATUS_HALT);
 		//rsp_sp_status |= SP_STATUS_HALT;
 	}
@@ -309,10 +309,10 @@ WRITE32_HANDLER( n64_sp_reg_w )
                 {
                     //if (first_rsp)
                     //{
-                    //  cpu_spinuntil_trigger(6789);
+                    //  cpu_spinuntil_trigger(machine->activecpu, 6789);
 
                         // printf( "Clearing RSP_STATUS_HALT\n" );
-                        cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, CLEAR_LINE);
+                        cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
                         cpu_set_reg(machine->cpu[1], RSP_SR, cpu_get_reg(machine->cpu[1], RSP_SR) & ~RSP_STATUS_HALT );
                         // RSP_STATUS &= ~RSP_STATUS_HALT;
                     //}
@@ -324,7 +324,7 @@ WRITE32_HANDLER( n64_sp_reg_w )
                 if (data & 0x00000002)      // set halt
                 {
                     // printf( "Setting RSP_STATUS_HALT\n" );
-                    cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+                    cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
                     cpu_set_reg(machine->cpu[1], RSP_SR, cpu_get_reg(machine->cpu[1], RSP_SR) | RSP_STATUS_HALT );
                     // RSP_STATUS |= RSP_STATUS_HALT;
                 }
@@ -1642,7 +1642,7 @@ void n64_machine_reset(running_machine *machine)
 	audio_timer = timer_alloc(audio_timer_callback, NULL);
 	timer_adjust_oneshot(audio_timer, attotime_never, 0);
 
-	cpunum_set_input_line(machine, 1, INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
     // bootcode differs between CIC-chips, so we can use its checksum to detect the CIC-chip
     boot_checksum = 0;

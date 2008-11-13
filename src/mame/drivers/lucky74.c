@@ -808,7 +808,7 @@ static INTERRUPT_GEN( nmi_interrupt )
 {
 	if ((ym2149_portb & 0x10) == 0)	/* ym2149 portB bit 4 trigger the NMI */
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

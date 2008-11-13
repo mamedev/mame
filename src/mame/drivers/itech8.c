@@ -591,16 +591,16 @@ void itech8_update_interrupts(running_machine *machine, int periodic, int tms340
 	if (machine->config->cpu[0].type == CPU_M6809 || machine->config->cpu[0].type == CPU_HD6309)
 	{
 		/* just modify lines that have changed */
-		if (periodic != -1) cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
-		if (tms34061 != -1) cpunum_set_input_line(machine, 0, M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
-		if (blitter != -1) cpunum_set_input_line(machine, 0, M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
+		if (periodic != -1) cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, periodic ? ASSERT_LINE : CLEAR_LINE);
+		if (tms34061 != -1) cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, tms34061 ? ASSERT_LINE : CLEAR_LINE);
+		if (blitter != -1) cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, blitter ? ASSERT_LINE : CLEAR_LINE);
 	}
 
 	/* handle the 68000 case */
 	else
 	{
-		cpunum_set_input_line(machine, 0, 2, blitter_int ? ASSERT_LINE : CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 3, periodic_int ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 2, blitter_int ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, periodic_int ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -621,23 +621,23 @@ static TIMER_CALLBACK( irq_off )
 static INTERRUPT_GEN( generate_nmi )
 {
 	/* signal the NMI */
-	itech8_update_interrupts(machine, 1, -1, -1);
+	itech8_update_interrupts(device->machine, 1, -1, -1);
 	timer_set(ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
 
-	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(machine->primary_screen));
+	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(device->machine->primary_screen));
 }
 
 
 static WRITE8_HANDLER( itech8_nmi_ack_w )
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
 static void generate_sound_irq(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -668,7 +668,10 @@ static MACHINE_RESET( itech8 )
 {
 	/* make sure bank 0 is selected */
 	if (machine->config->cpu[0].type == CPU_M6809 || machine->config->cpu[0].type == CPU_HD6309)
+	{
 		memory_set_bankptr(1, &memory_region(machine, "main")[0x4000]);
+		cpu_reset(machine->cpu[0]);
+	}
 
 	/* reset the PIA (if used) */
 	pia_reset();
@@ -806,7 +809,7 @@ static WRITE8_HANDLER( ym2203_portb_out )
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	sound_data = param;
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
 }
 
 
@@ -829,7 +832,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpunum_set_input_line(machine, 1, M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -844,9 +847,9 @@ static READ8_HANDLER( sound_data_r )
 static void via_irq(running_machine *machine, int state)
 {
 	if (state)
-		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 1, M6809_FIRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 

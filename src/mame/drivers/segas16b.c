@@ -1038,7 +1038,7 @@ static void sound_w(UINT8 data)
 	if (has_sound_cpu)
 	{
 		soundlatch_w(Machine, 0, data & 0xff);
-		cpunum_set_input_line(Machine, 1, 0, HOLD_LINE);
+		cpu_set_input_line(Machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -1075,7 +1075,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	cpunum_suspend(mame_find_cpu_index(machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
+	cpu_suspend(machine->cpu[mame_find_cpu_index(machine, "mcu")], SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -1097,7 +1097,7 @@ static MACHINE_RESET( system16b )
 		segaic16_memory_mapper_config(machine, i8751_initial_config);
 	segaic16_tilemap_reset(0);
 
-	fd1094_machine_init();
+	fd1094_machine_init(machine->cpu[0]);
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
@@ -1111,7 +1111,7 @@ static MACHINE_RESET( system16b )
 
 static TIMER_CALLBACK( atomicp_sound_irq )
 {
-	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 2, HOLD_LINE);
 }
 
 
@@ -1344,7 +1344,7 @@ static READ8_HANDLER( upd7759_status_r )
 static void upd7759_generate_nmi(int state)
 {
 	if (state)
-		cpunum_set_input_line(Machine, 1, INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -1352,7 +1352,7 @@ static void upd7759_generate_nmi(int state)
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpunum_set_input_line(machine, 2, 1, PULSE_LINE);
+	cpu_set_input_line(machine->cpu[2], 1, PULSE_LINE);
 }
 #endif
 
@@ -1367,7 +1367,7 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 {
 	/* if we have a fake 8751 handler, call it on VBLANK */
 	if (i8751_vblank_hook != NULL)
-		(*i8751_vblank_hook)(machine);
+		(*i8751_vblank_hook)(device->machine);
 }
 
 
@@ -1383,7 +1383,7 @@ static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* set tile banks */
 	rom_5704_bank_w(machine, 1, workram[0x3094/2] & 0x00ff, 0x00ff);
@@ -1421,7 +1421,7 @@ static void ddux_i8751_sim(running_machine *machine)
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x0bd0/2];
@@ -1456,7 +1456,7 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* they periodically clear the data at 2cd8,2cda,2cdc,2cde and expect the MCU to fill it in */
 	if (workram[0x2cd8/2] == 0 && workram[0x2cda/2] == 0 && workram[0x2cdc/2] == 0 && workram[0x2cde/2] == 0)
@@ -1486,7 +1486,7 @@ static void tturf_i8751_sim(running_machine *machine)
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x01d0/2];
@@ -1508,7 +1508,7 @@ static void wb3_i8751_sim(running_machine *machine)
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x0008/2];
@@ -1525,7 +1525,7 @@ static void wrestwar_i8751_sim(running_machine *machine)
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
-	cpunum_set_input_line(machine, 0, 4, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* process any new sound data */
 	temp = workram[0x208e/2];

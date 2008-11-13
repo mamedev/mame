@@ -31,12 +31,12 @@ static WRITE8_HANDLER( subirqtrigger_w )
 	/* bit 0 used but unknown */
 
 	if (data & 0x04)
-		cpunum_set_input_line(machine, 1,0,ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[1],0,ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sub_irqack_w )
 {
-	cpunum_set_input_line(machine, 1,0,CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
 }
 
 

@@ -329,7 +329,7 @@ MACHINE_START( mcr68 )
 }
 
 
-static void mcr68_common_init(void)
+static void mcr68_common_init(running_machine *machine)
 {
 	int i;
 
@@ -354,7 +354,7 @@ static void mcr68_common_init(void)
 	}
 
 	/* initialize the clock */
-	m6840_internal_counter_period = ATTOTIME_IN_HZ(cpunum_get_clock(0) / 10);
+	m6840_internal_counter_period = ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[0]) / 10);
 
 	/* reset cocktail flip */
 	mcr_cocktail_flip = 0;
@@ -367,7 +367,7 @@ static void mcr68_common_init(void)
 MACHINE_RESET( mcr68 )
 {
 	/* for the most part all MCR/68k games are the same */
-	mcr68_common_init();
+	mcr68_common_init(machine);
 	v493_callback = mcr68_493_callback;
 
 	/* vectors are 1 and 2 */
@@ -390,7 +390,7 @@ MACHINE_START( zwackery )
 MACHINE_RESET( zwackery )
 {
 	/* for the most part all MCR/68k games are the same */
-	mcr68_common_init();
+	mcr68_common_init(machine);
 	v493_callback = zwackery_493_callback;
 
 	/* append our PIA state onto the existing one and reinit */
@@ -411,7 +411,7 @@ MACHINE_RESET( zwackery )
 
 INTERRUPT_GEN( mcr_interrupt )
 {
-	const device_config *ctc = devtag_get_device(machine, Z80CTC, "ctc");
+	const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "ctc");
 
 	/* CTC line 2 is connected to VBLANK, which is once every 1/2 frame */
 	/* for the 30Hz interlaced display */
@@ -420,7 +420,7 @@ INTERRUPT_GEN( mcr_interrupt )
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		z80ctc_trg3_w(ctc, 0, 1);
 		z80ctc_trg3_w(ctc, 0, 0);
@@ -430,11 +430,11 @@ INTERRUPT_GEN( mcr_interrupt )
 
 INTERRUPT_GEN( mcr_ipu_interrupt )
 {
-	const device_config *ctc = devtag_get_device(machine, Z80CTC, "ipu_ctc");
+	const device_config *ctc = devtag_get_device(device->machine, Z80CTC, "ipu_ctc");
 
 	/* CTC line 3 is connected to 493, which is signalled once every */
 	/* frame at 30Hz */
-	if (cpu_getiloops() == 0)
+	if (cpu_getiloops(device) == 0)
 	{
 		z80ctc_trg3_w(ctc, 0, 1);
 		z80ctc_trg3_w(ctc, 0, 0);
@@ -446,7 +446,7 @@ INTERRUPT_GEN( mcr68_interrupt )
 {
 	/* update the 6840 VBLANK clock */
 	if (!m6840_state[0].timer_active)
-		subtract_from_counter(machine, 0, 1);
+		subtract_from_counter(device->machine, 0, 1);
 
 	logerror("--- VBLANK ---\n");
 
@@ -466,8 +466,8 @@ INTERRUPT_GEN( mcr68_interrupt )
 
 static void update_mcr68_interrupts(running_machine *machine)
 {
-	cpunum_set_input_line(machine, 0, v493_irq_vector, v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
-	cpunum_set_input_line(machine, 0, m6840_irq_vector, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], v493_irq_vector, v493_irq_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0], m6840_irq_vector, m6840_irq_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

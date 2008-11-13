@@ -57,7 +57,7 @@ enum
 };
 
 #define M6502_IRQ_LINE		0
-/* use cpunum_set_input_line(machine, cpu, M6502_SET_OVERFLOW, level)
+/* use cpu_set_input_line(machine->cpu[cpu], M6502_SET_OVERFLOW, level)
    to change level of the so input line
    positiv edge sets overflow flag */
 #define M6502_SET_OVERFLOW	1

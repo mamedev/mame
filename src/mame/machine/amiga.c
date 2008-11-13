@@ -34,7 +34,7 @@
  *************************************/
 
 /* 715909 Hz for NTSC, 709379 for PAL */
-#define O2_CLOCK					(cpunum_get_clock(0) / 10)
+#define O2_CLOCK					(cpu_get_clock(machine->cpu[0]) / 10)
 
 /* How many CPU cycles we delay until we fire a pending interrupt */
 #define AMIGA_IRQ_DELAY_CYCLES		24
@@ -413,31 +413,31 @@ static void update_irqs(running_machine *machine)
 	if (CUSTOM_REG(REG_INTENA) & 0x4000)
 	{
 		/* Serial transmit buffer empty, disk block finished, software interrupts */
-		cpunum_set_input_line(machine, 0, 1, ints & 0x0007 ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, ints & 0x0007 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* I/O ports and timer interrupts */
-		cpunum_set_input_line(machine, 0, 2, ints & 0x0008 ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 2, ints & 0x0008 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Copper, VBLANK, blitter interrupts */
-		cpunum_set_input_line(machine, 0, 3, ints & 0x0070 ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, ints & 0x0070 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Audio interrupts */
-		cpunum_set_input_line(machine, 0, 4, ints & 0x0780 ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 4, ints & 0x0780 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* Serial receive buffer full, disk sync match */
-		cpunum_set_input_line(machine, 0, 5, ints & 0x1800 ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 5, ints & 0x1800 ? ASSERT_LINE : CLEAR_LINE);
 
 		/* External interrupts */
-		cpunum_set_input_line(machine, 0, 6, ints & 0x2000 ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 6, ints & 0x2000 ? ASSERT_LINE : CLEAR_LINE);
 	}
 	else
 	{
-		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 2, CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 3, CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 4, CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 5, CLEAR_LINE);
-		cpunum_set_input_line(machine, 0, 6, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 2, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 3, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 4, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 5, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 6, CLEAR_LINE);
 	}
 }
 
@@ -1032,7 +1032,7 @@ static void blitter_setup(void)
 	if ( CUSTOM_REG(REG_DMACON) & 0x0400 )
 	{
 		/* simulate the 68k not running while the blit is going */
-		activecpu_adjust_icount( -(blittime/2) );
+		cpu_adjust_icount( Machine->activecpu, -(blittime/2) );
 
 		blittime = BLITTER_NASTY_DELAY;
 	}
@@ -1150,7 +1150,7 @@ static void amiga_cia_1_irq(running_machine *machine, int state)
 
 static void custom_reset(void)
 {
-	int clock = cpunum_get_clock(0);
+	int clock = cpu_get_clock(Machine->cpu[0]);
 	UINT16	vidmode = (clock == AMIGA_68000_NTSC_CLOCK || clock == AMIGA_68EC020_NTSC_CLOCK ) ? 0x1000 : 0x0000; /* NTSC or PAL? */
 
 	CUSTOM_REG(REG_DDFSTRT) = 0x18;
@@ -1525,7 +1525,7 @@ void amiga_serial_in_w(UINT16 data)
 attotime amiga_get_serial_char_period(void)
 {
 	UINT32 divisor = (CUSTOM_REG(REG_SERPER) & 0x7fff) + 1;
-	UINT32 baud = cpunum_get_clock(0) / 2 / divisor;
+	UINT32 baud = cpu_get_clock(Machine->cpu[0]) / 2 / divisor;
 	UINT32 numbits = 2 + ((CUSTOM_REG(REG_SERPER) & 0x8000) ? 9 : 8);
 	return attotime_mul(ATTOTIME_IN_HZ(baud), numbits);
 }

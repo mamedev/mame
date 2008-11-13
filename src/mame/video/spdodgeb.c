@@ -93,18 +93,18 @@ static int lastscroll;
 
 INTERRUPT_GEN( spdodgeb_interrupt )
 {
-	int iloop = cpu_getiloops();
+	int iloop = cpu_getiloops(device);
 	int scanline = (32-iloop) * 8;
 
 	if (iloop > 1 && iloop < 32)
 	{
-		cpunum_set_input_line(machine, 0, M6502_IRQ_LINE, HOLD_LINE);
-		video_screen_update_partial(machine->primary_screen, scanline+7);
+		cpu_set_input_line(device, M6502_IRQ_LINE, HOLD_LINE);
+		video_screen_update_partial(device->machine->primary_screen, scanline+7);
 	}
 	else if (!iloop)
 	{
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
-		video_screen_update_partial(machine->primary_screen, 256);
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
+		video_screen_update_partial(device->machine->primary_screen, 256);
 	}
 }
 

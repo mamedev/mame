@@ -827,10 +827,10 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( bssoccer_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
-		case 0: 	cpunum_set_input_line(machine, 0, 1, HOLD_LINE);	break;
-		case 1: 	cpunum_set_input_line(machine, 0, 2, HOLD_LINE);	break;
+		case 0: 	cpu_set_input_line(device, 1, HOLD_LINE);	break;
+		case 1: 	cpu_set_input_line(device, 2, HOLD_LINE);	break;
 	}
 }
 
@@ -997,7 +997,7 @@ MACHINE_DRIVER_END
 
 static void bestbest_ym3526_irqhandler(running_machine *machine, int state)
 {
-	cpunum_set_input_line(machine, 1, INPUT_LINE_IRQ0, state);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ0, state);
 }
 
 static const ym3526_interface bestbest_ym3526_interface =

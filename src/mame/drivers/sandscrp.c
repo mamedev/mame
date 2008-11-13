@@ -103,9 +103,9 @@ static UINT8 vblank_irq;
 static void update_irq_state(running_machine *machine)
 {
 	if (vblank_irq || sprite_irq || unknown_irq)
-		cpunum_set_input_line(machine, 0, 1, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
 	else
-		cpunum_set_input_line(machine, 0, 1, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
 }
 
 
@@ -114,7 +114,7 @@ static void update_irq_state(running_machine *machine)
 static INTERRUPT_GEN( sandscrp_interrupt )
 {
 	vblank_irq = 1;
-	update_irq_state(machine);
+	update_irq_state(device->machine);
 }
 
 
@@ -195,8 +195,8 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 	{
 		latch1_full = 1;
 		soundlatch_w(machine, 0, data & 0xff);
-		cpunum_set_input_line(machine, 1, INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(100));	// Allow the other cpu to reply
+		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(100));	// Allow the other cpu to reply
 	}
 }
 
@@ -413,7 +413,7 @@ GFXDECODE_END
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpunum_set_input_line(machine, 1,0,irq ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const ym2203_interface ym2203_intf_sandscrp =

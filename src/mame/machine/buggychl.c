@@ -10,7 +10,7 @@ MACHINE_RESET( buggychl )
 {
 	mcu_sent = 0;
 	main_sent = 0;
-	cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
 }
 
 
@@ -75,7 +75,7 @@ logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(machine->activecpu),data);
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpunum_set_input_line(machine, 2,0,CLEAR_LINE);
+		if (main_sent) cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
 		main_sent = 0;
 logerror("read command %02x from main cpu\n",portA_in);
 	}
@@ -132,7 +132,7 @@ WRITE8_HANDLER( buggychl_mcu_w )
 logerror("%04x: mcu_w %02x\n",cpu_get_pc(machine->activecpu),data);
 	from_main = data;
 	main_sent = 1;
-	cpunum_set_input_line(machine, 2,0,ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2],0,ASSERT_LINE);
 }
 
 READ8_HANDLER( buggychl_mcu_r )

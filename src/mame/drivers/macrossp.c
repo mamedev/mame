@@ -355,9 +355,9 @@ static WRITE32_HANDLER( macrossp_soundcmd_w )
 		//logerror("%08x write soundcmd %08x (%08x)\n",cpu_get_pc(machine->activecpu),data,mem_mask);
 		soundlatch_word_w(machine,0,data >> 16,0xffff);
 		sndpending = 1;
-		cpunum_set_input_line(machine, 1,2,HOLD_LINE);
+		cpu_set_input_line(machine->cpu[1],2,HOLD_LINE);
 		/* spin for a while to let the sound CPU read the command */
-		cpu_spinuntil_time(ATTOTIME_IN_USEC(50));
+		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(50));
 	}
 }
 
@@ -618,7 +618,7 @@ static void irqhandler(running_machine *machine, int irq)
 
 	/* IRQ lines 1 & 4 on the sound 68000 are definitely triggered by the ES5506,
     but I haven't noticed the ES5506 ever assert the line - maybe only used when developing the game? */
-//  cpunum_set_input_line(machine, 1,1,irq ? ASSERT_LINE : CLEAR_LINE);
+//  cpu_set_input_line(machine->cpu[1],1,irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static const es5506_interface es5506_config =
@@ -778,14 +778,14 @@ PC :0001810A 01810A: cmp.w   $f10140.l, D0
 PC :00018110 018110: beq     18104
 */
 	COMBINE_DATA(&macrossp_mainram[0x10158/4]);
-	if (cpu_get_pc(machine->activecpu)==0x001810A) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x001810A) cpu_spinuntil_int(machine->activecpu);
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE32_HANDLER( quizmoon_speedup_w )
 {
 	COMBINE_DATA(&macrossp_mainram[0x00020/4]);
-	if (cpu_get_pc(machine->activecpu)==0x1cc) cpu_spinuntil_int();
+	if (cpu_get_pc(machine->activecpu)==0x1cc) cpu_spinuntil_int(machine->activecpu);
 }
 #endif
 

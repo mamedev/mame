@@ -429,10 +429,10 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( bishjan_interrupt )
 {
-	switch (cpu_getiloops())
+	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpunum_set_input_line(machine, 0, 0, PULSE_LINE);
+			cpu_set_input_line(device, 0, PULSE_LINE);
 			break;
 		default:
 			h8_3002_InterruptRequest(24);

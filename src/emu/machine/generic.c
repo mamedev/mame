@@ -10,6 +10,7 @@
 *********************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "config.h"
 #include "generic.h"
 
@@ -566,7 +567,7 @@ static void interrupt_reset(running_machine *machine)
 	int cpunum;
 
 	/* on a reset, enable all interrupts */
-	for (cpunum = 0; cpunum < cpu_gettotalcpu(); cpunum++)
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 		interrupt_enable[cpunum] = 1;
 }
 
@@ -583,9 +584,9 @@ static TIMER_CALLBACK( clear_all_lines )
 	int line;
 
 	/* clear NMI and all inputs */
-	cpunum_set_input_line(machine, cpunum, INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[cpunum], INPUT_LINE_NMI, CLEAR_LINE);
 	for (line = 0; line < inputcount; line++)
-		cpunum_set_input_line(machine, cpunum, line, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[cpunum], line, CLEAR_LINE);
 }
 
 
@@ -596,7 +597,7 @@ static TIMER_CALLBACK( clear_all_lines )
 
 void cpu_interrupt_enable(int cpunum, int enabled)
 {
-	assert_always(cpunum >= 0 && cpunum < cpu_gettotalcpu(), "cpu_interrupt_enable() called for invalid cpu num!");
+	assert_always(cpunum >= 0 && cpunum < ARRAY_LENGTH(Machine->cpu) && Machine->cpu[cpunum] != NULL, "cpu_interrupt_enable() called for invalid cpu num!");
 
 	/* set the new state */
 	interrupt_enable[cpunum] = enabled;
@@ -643,10 +644,10 @@ READ8_HANDLER( interrupt_enable_r )
     specified state on the active CPU
 -------------------------------------------------*/
 
-INLINE void irqn_line_set(running_machine *machine, int cpunum, int line, int state)
+INLINE void irqn_line_set(const device_config *device, int line, int state)
 {
-	if (interrupt_enable[cpunum])
-		cpunum_set_input_line(machine, cpunum, line, state);
+	if (interrupt_enable[cpu_get_index(device)])
+		cpu_set_input_line(device, line, state);
 }
 
 
@@ -654,45 +655,45 @@ INLINE void irqn_line_set(running_machine *machine, int cpunum, int line, int st
     NMI callbacks
 -------------------------------------------------*/
 
-INTERRUPT_GEN( nmi_line_pulse )		{ irqn_line_set(machine, cpunum, INPUT_LINE_NMI, PULSE_LINE); }
-INTERRUPT_GEN( nmi_line_assert )	{ irqn_line_set(machine, cpunum, INPUT_LINE_NMI, ASSERT_LINE); }
+INTERRUPT_GEN( nmi_line_pulse )		{ irqn_line_set(device, INPUT_LINE_NMI, PULSE_LINE); }
+INTERRUPT_GEN( nmi_line_assert )	{ irqn_line_set(device, INPUT_LINE_NMI, ASSERT_LINE); }
 
 
 /*-------------------------------------------------
     IRQn callbacks
 -------------------------------------------------*/
 
-INTERRUPT_GEN( irq0_line_hold )		{ irqn_line_set(machine, cpunum, 0, HOLD_LINE); }
-INTERRUPT_GEN( irq0_line_pulse )	{ irqn_line_set(machine, cpunum, 0, PULSE_LINE); }
-INTERRUPT_GEN( irq0_line_assert )	{ irqn_line_set(machine, cpunum, 0, ASSERT_LINE); }
+INTERRUPT_GEN( irq0_line_hold )		{ irqn_line_set(device, 0, HOLD_LINE); }
+INTERRUPT_GEN( irq0_line_pulse )	{ irqn_line_set(device, 0, PULSE_LINE); }
+INTERRUPT_GEN( irq0_line_assert )	{ irqn_line_set(device, 0, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq1_line_hold )		{ irqn_line_set(machine, cpunum, 1, HOLD_LINE); }
-INTERRUPT_GEN( irq1_line_pulse )	{ irqn_line_set(machine, cpunum, 1, PULSE_LINE); }
-INTERRUPT_GEN( irq1_line_assert )	{ irqn_line_set(machine, cpunum, 1, ASSERT_LINE); }
+INTERRUPT_GEN( irq1_line_hold )		{ irqn_line_set(device, 1, HOLD_LINE); }
+INTERRUPT_GEN( irq1_line_pulse )	{ irqn_line_set(device, 1, PULSE_LINE); }
+INTERRUPT_GEN( irq1_line_assert )	{ irqn_line_set(device, 1, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq2_line_hold )		{ irqn_line_set(machine, cpunum, 2, HOLD_LINE); }
-INTERRUPT_GEN( irq2_line_pulse )	{ irqn_line_set(machine, cpunum, 2, PULSE_LINE); }
-INTERRUPT_GEN( irq2_line_assert )	{ irqn_line_set(machine, cpunum, 2, ASSERT_LINE); }
+INTERRUPT_GEN( irq2_line_hold )		{ irqn_line_set(device, 2, HOLD_LINE); }
+INTERRUPT_GEN( irq2_line_pulse )	{ irqn_line_set(device, 2, PULSE_LINE); }
+INTERRUPT_GEN( irq2_line_assert )	{ irqn_line_set(device, 2, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq3_line_hold )		{ irqn_line_set(machine, cpunum, 3, HOLD_LINE); }
-INTERRUPT_GEN( irq3_line_pulse )	{ irqn_line_set(machine, cpunum, 3, PULSE_LINE); }
-INTERRUPT_GEN( irq3_line_assert )	{ irqn_line_set(machine, cpunum, 3, ASSERT_LINE); }
+INTERRUPT_GEN( irq3_line_hold )		{ irqn_line_set(device, 3, HOLD_LINE); }
+INTERRUPT_GEN( irq3_line_pulse )	{ irqn_line_set(device, 3, PULSE_LINE); }
+INTERRUPT_GEN( irq3_line_assert )	{ irqn_line_set(device, 3, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq4_line_hold )		{ irqn_line_set(machine, cpunum, 4, HOLD_LINE); }
-INTERRUPT_GEN( irq4_line_pulse )	{ irqn_line_set(machine, cpunum, 4, PULSE_LINE); }
-INTERRUPT_GEN( irq4_line_assert )	{ irqn_line_set(machine, cpunum, 4, ASSERT_LINE); }
+INTERRUPT_GEN( irq4_line_hold )		{ irqn_line_set(device, 4, HOLD_LINE); }
+INTERRUPT_GEN( irq4_line_pulse )	{ irqn_line_set(device, 4, PULSE_LINE); }
+INTERRUPT_GEN( irq4_line_assert )	{ irqn_line_set(device, 4, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq5_line_hold )		{ irqn_line_set(machine, cpunum, 5, HOLD_LINE); }
-INTERRUPT_GEN( irq5_line_pulse )	{ irqn_line_set(machine, cpunum, 5, PULSE_LINE); }
-INTERRUPT_GEN( irq5_line_assert )	{ irqn_line_set(machine, cpunum, 5, ASSERT_LINE); }
+INTERRUPT_GEN( irq5_line_hold )		{ irqn_line_set(device, 5, HOLD_LINE); }
+INTERRUPT_GEN( irq5_line_pulse )	{ irqn_line_set(device, 5, PULSE_LINE); }
+INTERRUPT_GEN( irq5_line_assert )	{ irqn_line_set(device, 5, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq6_line_hold )		{ irqn_line_set(machine, cpunum, 6, HOLD_LINE); }
-INTERRUPT_GEN( irq6_line_pulse )	{ irqn_line_set(machine, cpunum, 6, PULSE_LINE); }
-INTERRUPT_GEN( irq6_line_assert )	{ irqn_line_set(machine, cpunum, 6, ASSERT_LINE); }
+INTERRUPT_GEN( irq6_line_hold )		{ irqn_line_set(device, 6, HOLD_LINE); }
+INTERRUPT_GEN( irq6_line_pulse )	{ irqn_line_set(device, 6, PULSE_LINE); }
+INTERRUPT_GEN( irq6_line_assert )	{ irqn_line_set(device, 6, ASSERT_LINE); }
 
-INTERRUPT_GEN( irq7_line_hold )		{ irqn_line_set(machine, cpunum, 7, HOLD_LINE); }
-INTERRUPT_GEN( irq7_line_pulse )	{ irqn_line_set(machine, cpunum, 7, PULSE_LINE); }
-INTERRUPT_GEN( irq7_line_assert )	{ irqn_line_set(machine, cpunum, 7, ASSERT_LINE); }
+INTERRUPT_GEN( irq7_line_hold )		{ irqn_line_set(device, 7, HOLD_LINE); }
+INTERRUPT_GEN( irq7_line_pulse )	{ irqn_line_set(device, 7, PULSE_LINE); }
+INTERRUPT_GEN( irq7_line_assert )	{ irqn_line_set(device, 7, ASSERT_LINE); }
 
 
 

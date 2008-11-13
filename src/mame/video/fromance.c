@@ -269,7 +269,7 @@ WRITE8_HANDLER( fromance_scroll_w )
 
 static TIMER_CALLBACK( crtc_interrupt_gen )
 {
-	cpunum_set_input_line(machine, 1, 0, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 	if (param != 0)
 		timer_adjust_periodic(crtc_timer, attotime_div(video_screen_get_frame_period(machine->primary_screen), param), 0, attotime_div(video_screen_get_frame_period(machine->primary_screen), param));
 }

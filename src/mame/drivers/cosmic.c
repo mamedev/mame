@@ -350,20 +350,20 @@ static WRITE8_HANDLER( cosmica_sound_output_w )
 
 static INTERRUPT_GEN( panic_interrupt )
 {
-	if (cpu_getiloops() != 0)
+	if (cpu_getiloops(device) != 0)
 	{
     	/* Coin insert - Trigger Sample */
 
         /* mostly not noticed since sound is */
 		/* only enabled if game in progress! */
 
-    	if ((input_port_read(machine, "SYSTEM") & 0xc0) != 0xc0)
-        	panic_sound_output_w(machine, 17, 1);
+    	if ((input_port_read(device->machine, "SYSTEM") & 0xc0) != 0xc0)
+        	panic_sound_output_w(device->machine, 17, 1);
 
-		cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xcf);	/* RST 08h */
+		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
     }
     else
-        cpunum_set_input_line_and_vector(machine, 0, 0, HOLD_LINE, 0xd7);	/* RST 10h */
+        cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h */
 }
 
 static INTERRUPT_GEN( cosmica_interrupt )
@@ -372,8 +372,8 @@ static INTERRUPT_GEN( cosmica_interrupt )
 
     if (pixel_clock == 0)
     {
-		if (input_port_read(machine, "FAKE") & 1)	/* Left Coin */
-			cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+		if (input_port_read(device->machine, "FAKE") & 1)	/* Left Coin */
+			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
     }
 }
 
@@ -386,27 +386,27 @@ static INTERRUPT_GEN( cosmicg_interrupt )
     It makes sense and works fine, but I cannot be 100% sure this is correct,
     as I have no Cosmic Guerilla console :-) . */
 
-	if ((input_port_read(machine, "IN2") & 1))	/* Coin */
+	if ((input_port_read(device->machine, "IN2") & 1))	/* Coin */
 		/* on tms9980, a 6 on the interrupt bus means level 4 interrupt */
-		cpunum_set_input_line_and_vector(machine, 0, 0, ASSERT_LINE, 6);
+		cpu_set_input_line_and_vector(device, 0, ASSERT_LINE, 6);
 	else
-		cpunum_set_input_line(machine, 0, 0, CLEAR_LINE);
+		cpu_set_input_line(device, 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( magspot_interrupt )
 {
 	/* Coin 1 causes an IRQ, Coin 2 an NMI */
-	if (input_port_read(machine, "COINS") & 0x01)
-  		cpunum_set_input_line(machine, 0, 0, HOLD_LINE);
-	else if (input_port_read(machine, "COINS") & 0x02)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "COINS") & 0x01)
+  		cpu_set_input_line(device, 0, HOLD_LINE);
+	else if (input_port_read(device->machine, "COINS") & 0x02)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static INTERRUPT_GEN( nomnlnd_interrupt )
 {
 	/* Coin causes an NMI */
-	if (input_port_read(machine, "COIN") & 0x01)
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "COIN") & 0x01)
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

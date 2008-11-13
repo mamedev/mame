@@ -44,15 +44,15 @@ extern VIDEO_EOF( redclash );
 */
 static INTERRUPT_GEN( redclash_interrupt )
 {
-	if (input_port_read(machine, "FAKE") & 1)	/* Left Coin */
-		cpunum_set_input_line(machine, 0,0,ASSERT_LINE);
-	else if (input_port_read(machine, "FAKE") & 2)	/* Right Coin */
-		cpunum_set_input_line(machine, 0, INPUT_LINE_NMI, PULSE_LINE);
+	if (input_port_read(device->machine, "FAKE") & 1)	/* Left Coin */
+		cpu_set_input_line(device,0,ASSERT_LINE);
+	else if (input_port_read(device->machine, "FAKE") & 2)	/* Right Coin */
+		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( irqack_w )
 {
-	cpunum_set_input_line(machine, 0,0,CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[0],0,CLEAR_LINE);
 }
 
 
