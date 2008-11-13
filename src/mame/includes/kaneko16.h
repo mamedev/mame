@@ -98,7 +98,9 @@ extern kaneko16_priority_t kaneko16_priority;
 
 /* Machine */
 
+
 VIDEO_START( kaneko16_sprites );
+VIDEO_START( kaneko16_1xVIEW2_tilemaps );
 VIDEO_START( kaneko16_1xVIEW2 );
 VIDEO_START( kaneko16_2xVIEW2 );
 VIDEO_START( berlwall );
@@ -108,6 +110,7 @@ VIDEO_START( sandscrp_1xVIEW2 );
 VIDEO_UPDATE( kaneko16 );
 VIDEO_UPDATE( sandscrp );
 VIDEO_UPDATE( berlwall );
+VIDEO_UPDATE( jchan_view2 );
 
 VIDEO_START( galsnew );
 VIDEO_UPDATE( galsnew );

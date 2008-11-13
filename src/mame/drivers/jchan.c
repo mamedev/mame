@@ -411,6 +411,8 @@ static VIDEO_START(jchan)
 	sprite_bitmap_2 = auto_bitmap_alloc(1024,1024,BITMAP_FORMAT_INDEXED16);
 
 	suprnova_alt_enable_sprites = 1;
+
+	VIDEO_START_CALL( kaneko16_1xVIEW2_tilemaps );
 }
 
 
@@ -429,6 +431,9 @@ static VIDEO_UPDATE(jchan)
 	UINT16 pixdata2;
 
 	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+
+	VIDEO_UPDATE_CALL(jchan_view2);
+
 	//skns_draw_sprites(screen->machine,bitmap,cliprect);
 	fillbitmap(sprite_bitmap_1, 0x0000, cliprect);
 	fillbitmap(sprite_bitmap_2, 0x0000, cliprect);
@@ -436,6 +441,7 @@ static VIDEO_UPDATE(jchan)
 	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, jchan_sprite_ram32_1, 0x4000, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), jchan_sprite_regs32_1 );
 	skns_draw_sprites(screen->machine, sprite_bitmap_2, cliprect, jchan_sprite_ram32_2, 0x4000, memory_region(screen->machine,"gfx2"), memory_region_length (screen->machine, "gfx2"), jchan_sprite_regs32_2 );
 
+	// ignoring priority bits for now..
 	for (y=0;y<240;y++)
 	{
 		src1 = BITMAP_ADDR16(sprite_bitmap_1, y, 0);
@@ -589,11 +595,11 @@ static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x400000, 0x403fff) AM_RAM AM_BASE(&mainsub_shared_ram) AM_SHARE(1)
 
 	/* VIEW2 Tilemap - [D] grid tested, cleared ($1d84), also cleared at startup ($810-$826) */
-	AM_RANGE(0x500000, 0x500fff) AM_RAM // AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1) // Layers 0
-	AM_RANGE(0x501000, 0x501fff) AM_RAM // AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0) //
-	AM_RANGE(0x502000, 0x502fff) AM_RAM // AM_RAM AM_BASE(&kaneko16_vscroll_1)                                  //
-	AM_RANGE(0x503000, 0x503fff) AM_RAM // AM_RAM AM_BASE(&kaneko16_vscroll_0)                                  //
-	AM_RANGE(0x600000, 0x60001f) AM_RAM // AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)   // Layers 0 Regs
+	AM_RANGE(0x500000, 0x500fff) AM_RAM_WRITE(kaneko16_vram_1_w) AM_BASE(&kaneko16_vram_1)	// Layers 0
+	AM_RANGE(0x501000, 0x501fff) AM_RAM_WRITE(kaneko16_vram_0_w) AM_BASE(&kaneko16_vram_0)	//
+	AM_RANGE(0x502000, 0x502fff) AM_RAM AM_BASE(&kaneko16_vscroll_1)									//
+	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
+	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)	// Layers 0 Regs
 
 	/* 2nd sprite layer? - [C] grid tested, cleared ($1e2a), also cleared at startup ($7dc-$80a) */
 	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE(&jchan_spriteram_2) AM_WRITE(jchan_suprnova_sprite32_2_w)
@@ -658,7 +664,8 @@ static const gfx_layout tilelayout =
 static GFXDECODE_START( jchan )
 //  GFXDECODE_ENTRY( "gfx1", 0, char2layout,   0, 512  )
 //  GFXDECODE_ENTRY( "gfx2", 0, char2layout,   0, 512  )
-	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   16384, 16384  )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  )
+	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  ) // video/kaneko16.c is hardcoded to here for now
 GFXDECODE_END
 
 

@@ -128,10 +128,8 @@ VIDEO_START( kaneko16_sprites )
 	spritelist.first_sprite = (struct tempsprite *)auto_malloc(0x400 * sizeof(spritelist.first_sprite[0]));
 }
 
-VIDEO_START( kaneko16_1xVIEW2 )
+VIDEO_START( kaneko16_1xVIEW2_tilemaps )
 {
-	VIDEO_START_CALL(kaneko16_sprites);
-
 	kaneko16_tmap_0 = tilemap_create(	get_tile_info_0, tilemap_scan_rows,
 										 16,16, 0x20,0x20	);
 	kaneko16_tmap_1 = tilemap_create(	get_tile_info_1, tilemap_scan_rows,
@@ -174,6 +172,15 @@ VIDEO_START( kaneko16_1xVIEW2 )
 		tilemap_set_scroll_rows(kaneko16_tmap_0, 0x200);	// Line Scroll
 		tilemap_set_scroll_rows(kaneko16_tmap_1, 0x200);
 	}
+
+}
+
+
+VIDEO_START( kaneko16_1xVIEW2 )
+{
+	VIDEO_START_CALL(kaneko16_sprites);
+
+	VIDEO_START_CALL(kaneko16_1xVIEW2_tilemaps);
 }
 
 VIDEO_START( kaneko16_2xVIEW2 )
@@ -1010,6 +1017,12 @@ VIDEO_UPDATE(berlwall)
 	return 0;
 }
 
+
+VIDEO_UPDATE( jchan_view2 )
+{
+	VIDEO_UPDATE_CALL(common);
+	return 0;
+}
 
 
 VIDEO_UPDATE( kaneko16 )
