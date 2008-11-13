@@ -31,6 +31,36 @@ e800      command for the sound CPU
 Notes:
 - pbactio2 has a ROM for a third Z80, not emulated, function unknown
 
+
+Stephh's notes (based on the game Z80 code and some tests) :
+
+  - There is an ingame bug that prevents you to get a bonus life at 1000000 points
+    when you set the "Bonus Life" Dip Switch to "200k 1000k" :
+      * Bonus life table index starts at 0x63c6 (8 * 2 butes, LSB first) :
+
+          63C6: D6 63   "70k 200k"          -> 04 07 03 02 01 10
+          63C8: DC 63   "70k 200k 1000k"    -> 04 07 03 02 02 01 01 10
+          63CA: E4 63   "100k"              -> 03 01 01 10
+          63CC: E8 63   "100k 300k"         -> 03 01 03 03 01 10
+          63CE: EE 63   "100k 300k 1000k"   -> 03 01 03 03 02 01 01 10
+          63D0: F6 63   "200k"              -> 03 02 01 10
+          63D2: FA 63   "200k 1000k"        -> 03 02 01 10 !!!
+          63D4: FE 63   "None"              -> 01 10
+
+      * Each "pair" determines the digit number, then what shall be its value :
+
+          digit  : 12 345 67
+          number : 99.999.990
+
+        Note that digit 1 is displayed outside the score box.
+      * As each digit value can only be 00 to 09, 10 as a bonus life value
+        means that you can't get anymore bonus life.
+      * Now look at 7th table : first, you notice that it's the same as the
+        6th table; then you find that the first bonus life at 200k and you see
+        the end of table "marker" (01 10) instead of having 02 01.
+      * As addresses and data are the same (after decryption in 'pbactio3'),
+        this bug affects the 3 sets.
+
 ***************************************************************************/
 
 #include "driver.h"
@@ -172,13 +202,13 @@ static INPUT_PORTS_START( pbaction )
 
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x01, "70K 200K 1000K" )
-	PORT_DIPSETTING(    0x00, "70K 200K" )
-	PORT_DIPSETTING(    0x04, "100K 300K 1000K" )
-	PORT_DIPSETTING(    0x03, "100K 300K" )
-	PORT_DIPSETTING(    0x02, "100K" )
-	PORT_DIPSETTING(    0x06, "200K 1000K" )
-	PORT_DIPSETTING(    0x05, "200K" )
+	PORT_DIPSETTING(    0x01, "70k 200k 1000k" )
+	PORT_DIPSETTING(    0x04, "100k 300k 1000k" )
+	PORT_DIPSETTING(    0x00, "70k 200k" )
+	PORT_DIPSETTING(    0x03, "100k 300k" )
+	PORT_DIPSETTING(    0x06, "200k 1000k" )                /* see notes */
+	PORT_DIPSETTING(    0x02, "100k" )
+	PORT_DIPSETTING(    0x05, "200k" )
 	PORT_DIPSETTING(    0x07, DEF_STR( None ) )
 	PORT_DIPNAME( 0x08, 0x00, "Extra" )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )
