@@ -60,16 +60,16 @@ static NVRAM_HANDLER( nbmj9195 )
 	}
 }
 
-static void nbmj9195_soundbank_w(running_machine *machine, int data)
+static WRITE8_HANDLER( nbmj9195_soundbank_w )
 {
-	UINT8 *SNDROM = memory_region(machine, "audio");
+	UINT8 *SNDROM = memory_region(space->machine, "audio");
 
 	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
-static int nbmj9195_sound_r(running_machine *machine, int offset)
+static READ8_HANDLER( nbmj9195_sound_r )
 {
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 static WRITE8_HANDLER( nbmj9195_sound_w )
@@ -77,9 +77,9 @@ static WRITE8_HANDLER( nbmj9195_sound_w )
 	soundlatch_w(space, 0, data);
 }
 
-static void nbmj9195_soundclr_w(running_machine *machine, int offset, int data)
+static WRITE8_HANDLER( nbmj9195_soundclr_w )
 {
-	soundlatch_clear_w(machine, 0, 0);
+	soundlatch_clear_w(space, 0, 0);
 }
 
 static void nbmj9195_outcoin_flag_w(int data)
@@ -150,43 +150,43 @@ static READ8_HANDLER( mscoutm_dipsw_1_r )
 
 static UINT8 pio_dir[5 * 2], pio_latch[5 * 2];
 
-static int tmpz84c011_pio_r(running_machine *machine, int offset)
+static READ8_HANDLER( tmpz84c011_pio_r )
 {
 	int portdata;
 
-	if ((!strcmp(machine->gamedrv->name, "mscoutm")) ||
-		(!strcmp(machine->gamedrv->name, "imekura")) ||
-		(!strcmp(machine->gamedrv->name, "mjegolf")))
+	if ((!strcmp(space->machine->gamedrv->name, "mscoutm")) ||
+		(!strcmp(space->machine->gamedrv->name, "imekura")) ||
+		(!strcmp(space->machine->gamedrv->name, "mjegolf")))
 	{
 
 		switch (offset)
 		{
 			case 0:			/* PA_0 */
 				// COIN IN, ETC...
-				portdata = input_port_read(machine, "SYSTEM");
+				portdata = input_port_read(space->machine, "SYSTEM");
 				break;
 			case 1:			/* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
 				switch (mscoutm_inputport)
 				{
 					case 0x01:
-						portdata = input_port_read(machine, "KEY0");
+						portdata = input_port_read(space->machine, "KEY0");
 						break;
 					case 0x02:
-						portdata = input_port_read(machine, "KEY1");
+						portdata = input_port_read(space->machine, "KEY1");
 						break;
 					case 0x04:
-						portdata = input_port_read(machine, "KEY2");
+						portdata = input_port_read(space->machine, "KEY2");
 						break;
 					case 0x08:
-						portdata = input_port_read(machine, "KEY3");
+						portdata = input_port_read(space->machine, "KEY3");
 						break;
 					case 0x10:
-						portdata = input_port_read(machine, "KEY4");
+						portdata = input_port_read(space->machine, "KEY4");
 						break;
 					default:
-						portdata = (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2")
-									& input_port_read(machine, "KEY3") & input_port_read(machine, "KEY4"));
+						portdata = (input_port_read(space->machine, "KEY0") & input_port_read(space->machine, "KEY1") & input_port_read(space->machine, "KEY2")
+									& input_port_read(space->machine, "KEY3") & input_port_read(space->machine, "KEY4"));
 						break;
 				}
 				break;
@@ -195,23 +195,23 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 				switch (mscoutm_inputport)
 				{
 					case 0x01:
-						portdata = input_port_read(machine, "KEY5");
+						portdata = input_port_read(space->machine, "KEY5");
 						break;
 					case 0x02:
-						portdata = input_port_read(machine, "KEY6");
+						portdata = input_port_read(space->machine, "KEY6");
 						break;
 					case 0x04:
-						portdata = input_port_read(machine, "KEY7");
+						portdata = input_port_read(space->machine, "KEY7");
 						break;
 					case 0x08:
-						portdata = input_port_read(machine, "KEY8");
+						portdata = input_port_read(space->machine, "KEY8");
 						break;
 					case 0x10:
-						portdata = input_port_read(machine, "KEY9");
+						portdata = input_port_read(space->machine, "KEY9");
 						break;
 					default:
-						portdata = (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7")
-									& input_port_read(machine, "KEY8") & input_port_read(machine, "KEY9"));
+						portdata = (input_port_read(space->machine, "KEY5") & input_port_read(space->machine, "KEY6") & input_port_read(space->machine, "KEY7")
+									& input_port_read(space->machine, "KEY8") & input_port_read(space->machine, "KEY9"));
 						break;
 				}
 				break;
@@ -232,14 +232,14 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 				portdata = 0xff;
 				break;
 			case 8:			/* PD_1 */
-				portdata = nbmj9195_sound_r(machine, 0);
+				portdata = nbmj9195_sound_r(space, 0);
 				break;
 			case 9:			/* PE_1 */
 				portdata = 0xff;
 				break;
 
 			default:
-				logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", cpu_get_pc(machine->activecpu), offset);
+				logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", cpu_get_pc(space->machine->activecpu), offset);
 				portdata = 0xff;
 				break;
 		}
@@ -250,29 +250,29 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 		{
 			case 0:			/* PA_0 */
 				// COIN IN, ETC...
-				portdata = ((input_port_read(machine, "SYSTEM") & 0xfe) | nbmj9195_outcoin_flag);
+				portdata = ((input_port_read(space->machine, "SYSTEM") & 0xfe) | nbmj9195_outcoin_flag);
 				break;
 			case 1:			/* PB_0 */
 				// PLAYER1 KEY, DIPSW A/B
 				switch (nbmj9195_inputport)
 				{
 					case 0x01:
-						portdata = input_port_read(machine, "KEY0");
+						portdata = input_port_read(space->machine, "KEY0");
 						break;
 					case 0x02:
-						portdata = input_port_read(machine, "KEY1");
+						portdata = input_port_read(space->machine, "KEY1");
 						break;
 					case 0x04:
-						portdata = input_port_read(machine, "KEY2");
+						portdata = input_port_read(space->machine, "KEY2");
 						break;
 					case 0x08:
-						portdata = input_port_read(machine, "KEY3");
+						portdata = input_port_read(space->machine, "KEY3");
 						break;
 					case 0x10:
-						portdata = ((input_port_read(machine, "KEY4") & 0x7f) | (nbmj9195_dipsw_r(machine) << 7));
+						portdata = ((input_port_read(space->machine, "KEY4") & 0x7f) | (nbmj9195_dipsw_r(space->machine) << 7));
 						break;
 					default:
-						portdata = (input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2") & input_port_read(machine, "KEY3") & (input_port_read(machine, "KEY4") & 0x7f));
+						portdata = (input_port_read(space->machine, "KEY0") & input_port_read(space->machine, "KEY1") & input_port_read(space->machine, "KEY2") & input_port_read(space->machine, "KEY3") & (input_port_read(space->machine, "KEY4") & 0x7f));
 						break;
 				}
 				break;
@@ -281,22 +281,22 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 				switch (nbmj9195_inputport)
 				{
 					case 0x01:
-						portdata = input_port_read(machine, "KEY5");
+						portdata = input_port_read(space->machine, "KEY5");
 						break;
 					case 0x02:
-						portdata = input_port_read(machine, "KEY6");
+						portdata = input_port_read(space->machine, "KEY6");
 						break;
 					case 0x04:
-						portdata = input_port_read(machine, "KEY7");
+						portdata = input_port_read(space->machine, "KEY7");
 						break;
 					case 0x08:
-						portdata = input_port_read(machine, "KEY8");
+						portdata = input_port_read(space->machine, "KEY8");
 						break;
 					case 0x10:
-						portdata = input_port_read(machine, "KEY9") & 0x7f;
+						portdata = input_port_read(space->machine, "KEY9") & 0x7f;
 						break;
 					default:
-						portdata = (input_port_read(machine, "KEY5") & input_port_read(machine, "KEY6") & input_port_read(machine, "KEY7") & input_port_read(machine, "KEY8") & (input_port_read(machine, "KEY9") & 0x7f));
+						portdata = (input_port_read(space->machine, "KEY5") & input_port_read(space->machine, "KEY6") & input_port_read(space->machine, "KEY7") & input_port_read(space->machine, "KEY8") & (input_port_read(space->machine, "KEY9") & 0x7f));
 						break;
 				}
 				break;
@@ -317,14 +317,14 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 				portdata = 0xff;
 				break;
 			case 8:			/* PD_1 */
-				portdata = nbmj9195_sound_r(machine, 0);
+				portdata = nbmj9195_sound_r(space, 0);
 				break;
 			case 9:			/* PE_1 */
 				portdata = 0xff;
 				break;
 
 			default:
-				logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", cpu_get_pc(machine->activecpu), offset);
+				logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", cpu_get_pc(space->machine->activecpu), offset);
 				portdata = 0xff;
 				break;
 		}
@@ -333,11 +333,11 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 	return portdata;
 }
 
-static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
+static WRITE8_HANDLER( tmpz84c011_pio_w )
 {
-	if ((!strcmp(machine->gamedrv->name, "imekura")) ||
-		(!strcmp(machine->gamedrv->name, "mscoutm")) ||
-		(!strcmp(machine->gamedrv->name, "mjegolf")))
+	if ((!strcmp(space->machine->gamedrv->name, "imekura")) ||
+		(!strcmp(space->machine->gamedrv->name, "mscoutm")) ||
+		(!strcmp(space->machine->gamedrv->name, "mjegolf")))
 		{
 
 		switch (offset)
@@ -357,22 +357,22 @@ static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 				break;
 
 			case 5:			/* PA_1 */
-				nbmj9195_soundbank_w(machine, data);
+				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_1_WRITE(machine, 0, data);
+				DAC_1_WRITE(space, 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_0_WRITE(machine, 0, data);
+				DAC_0_WRITE(space, 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
 			case 9:			/* PE_1 */
-				if (!(data & 0x01)) nbmj9195_soundclr_w(machine, 0, 0);
+				if (!(data & 0x01)) nbmj9195_soundclr_w(space, 0, 0);
 				break;
 
 			default:
-				logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", cpu_get_pc(machine->activecpu), offset, data);
+				logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", cpu_get_pc(space->machine->activecpu), offset, data);
 				break;
 		}
 	}
@@ -395,22 +395,22 @@ static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 				break;
 
 			case 5:			/* PA_1 */
-				nbmj9195_soundbank_w(machine, data);
+				nbmj9195_soundbank_w(space, 0, data);
 				break;
 			case 6:			/* PB_1 */
-				DAC_1_WRITE(machine, 0, data);
+				DAC_1_WRITE(space, 0, data);
 				break;
 			case 7:			/* PC_1 */
-				DAC_0_WRITE(machine, 0, data);
+				DAC_0_WRITE(space, 0, data);
 				break;
 			case 8:			/* PD_1 */
 				break;
 			case 9:			/* PE_1 */
-				if (!(data & 0x01)) nbmj9195_soundclr_w(machine, 0, 0);
+				if (!(data & 0x01)) nbmj9195_soundclr_w(space, 0, 0);
 				break;
 
 			default:
-				logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", cpu_get_pc(machine->activecpu), offset, data);
+				logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", cpu_get_pc(space->machine->activecpu), offset, data);
 				break;
 		}
 	}
@@ -512,25 +512,27 @@ static z80ctc_interface ctc_intf_audio =
 
 static MACHINE_RESET( sailorws )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
 	for (i = 0; i < (5 * 2); i++)
 	{
 		pio_dir[i] = pio_latch[i] = 0;
-		tmpz84c011_pio_w(machine, i, 0);
+		tmpz84c011_pio_w(space, i, 0);
 	}
 }
 
 static DRIVER_INIT( nbmj9195 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 *ROM = memory_region(machine, "audio");
 
 	// sound program patch
 	ROM[0x0213] = 0x00;			// DI -> NOP
 
 	// initialize sound rom bank
-	nbmj9195_soundbank_w(machine, 0);
+	nbmj9195_soundbank_w(space, 0, 0);
 }
 
 

@@ -161,7 +161,8 @@ Pin #11(+) | | R               |
 
 static CUSTOM_INPUT( ticket_status )
 {
-	return ticket_dispenser_0_r(field->port->machine, 0) >> 7;
+	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	return ticket_dispenser_0_r(space, 0) >> 7;
 }
 
 

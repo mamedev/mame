@@ -374,11 +374,12 @@ static const struct namcoio_interface intf1 =
 #include "cpu/z8000/z8000.h"
 static MACHINE_RESET( polepos )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0;i < 8;i++)
-		polepos_latch_w(machine,i,0);
+		polepos_latch_w(space,i,0);
 
 	namco_06xx_init(0, 0,
 		NAMCOIO_51XX, &intf0,

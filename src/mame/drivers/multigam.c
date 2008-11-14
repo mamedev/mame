@@ -560,9 +560,10 @@ static MACHINE_RESET( multigam )
 
 static MACHINE_RESET( multigm3 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* reset the ppu */
 	ppu2c0x_reset( machine, 0, 1 );
-	multigm3_switch_prg_rom(machine, 0, 0x01 );
+	multigm3_switch_prg_rom(space, 0, 0x01 );
 };
 
 
@@ -665,7 +666,8 @@ ROM_END
 
 static DRIVER_INIT( multigam )
 {
-	multigam_switch_prg_rom( machine, 0x0, 0x01 );
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	multigam_switch_prg_rom( space, 0x0, 0x01 );
 }
 
 static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble)

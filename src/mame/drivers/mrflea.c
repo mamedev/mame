@@ -227,21 +227,21 @@ static READ8_HANDLER( mrflea_input3_r )
 /*******************************************************/
 
 static WRITE8_HANDLER( mrflea_data0_w ){
-	ay8910_control_port_0_w( space->machine, offset, mrflea_select0 );
-	ay8910_write_port_0_w( space->machine, offset, data );
+	ay8910_control_port_0_w( space, offset, mrflea_select0 );
+	ay8910_write_port_0_w( space, offset, data );
 }
 
 static WRITE8_HANDLER( mrflea_data1_w ){
 }
 
 static WRITE8_HANDLER( mrflea_data2_w ){
-	ay8910_control_port_1_w( space->machine, offset, mrflea_select2 );
-	ay8910_write_port_1_w( space->machine, offset, data );
+	ay8910_control_port_1_w( space, offset, mrflea_select2 );
+	ay8910_write_port_1_w( space, offset, data );
 }
 
 static WRITE8_HANDLER( mrflea_data3_w ){
-	ay8910_control_port_2_w( space->machine, offset, mrflea_select3 );
-	ay8910_write_port_2_w( space->machine, offset, data );
+	ay8910_control_port_2_w( space, offset, mrflea_select3 );
+	ay8910_write_port_2_w( space, offset, data );
 }
 
 static ADDRESS_MAP_START( inout_io_map, ADDRESS_SPACE_IO, 8 )

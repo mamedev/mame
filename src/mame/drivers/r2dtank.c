@@ -226,7 +226,8 @@ static const ay8910_interface ay8910_2_interface =
 
 static WRITE8_DEVICE_HANDLER( ttl74123_output_changed )
 {
-	pia_0_ca1_w(device->machine, 0, data);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_0_ca1_w(space, 0, data);
 	ttl74123_output = data;
 }
 

@@ -64,9 +64,9 @@ static void niyanpai_soundbank_w(running_machine *machine, int data)
 	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
-static int niyanpai_sound_r(running_machine *machine, int offset)
+static READ8_HANDLER( niyanpai_sound_r )
 {
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 static WRITE16_HANDLER( niyanpai_sound_w )
@@ -74,16 +74,16 @@ static WRITE16_HANDLER( niyanpai_sound_w )
 	soundlatch_w(space, 0, ((data >> 8) & 0xff));
 }
 
-static void niyanpai_soundclr_w(running_machine *machine, int offset, int data)
+static WRITE8_HANDLER( niyanpai_soundclr_w )
 {
-	soundlatch_clear_w(machine, 0, 0);
+	soundlatch_clear_w(space, 0, 0);
 }
 
 
 /* TMPZ84C011 PIO emulation */
 static UINT8 pio_dir[5], pio_latch[5];
 
-static int tmpz84c011_pio_r(running_machine *machine, int offset)
+static READ8_HANDLER( tmpz84c011_pio_r )
 {
 	int portdata;
 
@@ -99,14 +99,14 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 			portdata = 0xff;
 			break;
 		case 3:			/* PD_0 */
-			portdata = niyanpai_sound_r(machine, 0);
+			portdata = niyanpai_sound_r(space, 0);
 			break;
 		case 4:			/* PE_0 */
 			portdata = 0xff;
 			break;
 
 		default:
-			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", cpu_get_pc(machine->activecpu), offset);
+			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Read %02X\n", cpu_get_pc(space->machine->activecpu), offset);
 			portdata = 0xff;
 			break;
 	}
@@ -114,27 +114,27 @@ static int tmpz84c011_pio_r(running_machine *machine, int offset)
 	return portdata;
 }
 
-static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
+static WRITE8_HANDLER( tmpz84c011_pio_w)
 {
 	switch (offset)
 	{
 		case 0:			/* PA_0 */
-			niyanpai_soundbank_w(machine, data & 0x03);
+			niyanpai_soundbank_w(space->machine, data & 0x03);
 			break;
 		case 1:			/* PB_0 */
-			DAC_1_WRITE(machine, 0, data);
+			DAC_1_WRITE(space, 0, data);
 			break;
 		case 2:			/* PC_0 */
-			DAC_0_WRITE(machine, 0, data);
+			DAC_0_WRITE(space, 0, data);
 			break;
 		case 3:			/* PD_0 */
 			break;
 		case 4:			/* PE_0 */
-			if (!(data & 0x01)) niyanpai_soundclr_w(machine, 0, 0);
+			if (!(data & 0x01)) niyanpai_soundclr_w(space, 0, 0);
 			break;
 
 		default:
-			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", cpu_get_pc(machine->activecpu), offset, data);
+			logerror("PC %04X: TMPZ84C011_PIO Unknown Port Write %02X, %02X\n", cpu_get_pc(space->machine->activecpu), offset, data);
 			break;
 	}
 }
@@ -183,13 +183,14 @@ static z80ctc_interface ctc_intf =
 
 static MACHINE_RESET( niyanpai )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
 	for (i = 0; i < 5; i++)
 	{
 		pio_dir[i] = pio_latch[i] = 0;
-		tmpz84c011_pio_w(machine, i, 0);
+		tmpz84c011_pio_w(space, i, 0);
 	}
 }
 
@@ -252,12 +253,13 @@ static READ16_HANDLER( musobana_inputport_0_r )
 
 static CUSTOM_INPUT( musobana_outcoin_flag_r )
 {
+	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
 	//  bit 2   motor on
 	//  bit 3   coin lock
 
-	if (tmp68301_parallel_interface_r(field->port->machine, 0x0005, 0x00ff) & 0x0004) musobana_outcoin_flag ^= 1;
+	if (tmp68301_parallel_interface_r(space, 0x0005, 0x00ff) & 0x0004) musobana_outcoin_flag ^= 1;
 	else musobana_outcoin_flag = 1;
 
 	return musobana_outcoin_flag & 0x01;

@@ -680,13 +680,13 @@ INLINE int blt_read(const UINT8 *ROM, const int offs)
 	return ROM[offs];
 }
 
-INLINE void blt_write(running_machine *machine, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
+INLINE void blt_write(const address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask)
 {
 	switch( tmap )
 	{
-		case 1:	metro_vram_0_w(machine,offs,data,mask);	break;
-		case 2:	metro_vram_1_w(machine,offs,data,mask);	break;
-		case 3:	metro_vram_2_w(machine,offs,data,mask);	break;
+		case 1:	metro_vram_0_w(space,offs,data,mask);	break;
+		case 2:	metro_vram_1_w(space,offs,data,mask);	break;
+		case 3:	metro_vram_2_w(space,offs,data,mask);	break;
 	}
 //  logerror("CPU #0 PC %06X : Blitter %X] %04X <- %04X & %04X\n",cpu_get_pc(machine->activecpu),tmap,offs,data,mask);
 }
@@ -759,7 +759,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 						src_offs++;
 
 						dst_offs &= 0xffff;
-						blt_write(space->machine,tmap,dst_offs,b2,mask);
+						blt_write(space,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -775,7 +775,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(space->machine,tmap,dst_offs,b2<<shift,mask);
+						blt_write(space,tmap,dst_offs,b2<<shift,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 						b2++;
 					}
@@ -792,7 +792,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(space->machine,tmap,dst_offs,b2,mask);
+						blt_write(space,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;

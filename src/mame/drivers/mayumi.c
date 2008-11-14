@@ -41,7 +41,8 @@ static WRITE8_HANDLER( bank_sel_w )
 
 static MACHINE_RESET( mayumi )
 {
-	bank_sel_w(machine,0,0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	bank_sel_w(space,0,0);
 }
 
 static WRITE8_HANDLER( input_sel_w )

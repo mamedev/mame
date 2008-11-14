@@ -477,13 +477,13 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 static WRITE32_HANDLER( namconb1_cpureg_w )
 {
 	if(mem_mask & 0xff000000)
-		namconb1_cpureg8_w(space, offset*4, data >> 24);
+		namconb1_cpureg8_w(space->machine, offset*4, data >> 24);
 	if(mem_mask & 0x00ff0000)
-		namconb1_cpureg8_w(space, offset*4+1, data >> 16);
+		namconb1_cpureg8_w(space->machine, offset*4+1, data >> 16);
 	if(mem_mask & 0x0000ff00)
-		namconb1_cpureg8_w(space, offset*4+2, data >> 8);
+		namconb1_cpureg8_w(space->machine, offset*4+2, data >> 8);
 	if(mem_mask & 0x000000ff)
-		namconb1_cpureg8_w(space, offset*4+3, data);
+		namconb1_cpureg8_w(space->machine, offset*4+3, data);
 }
 
 
@@ -544,13 +544,13 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 static WRITE32_HANDLER( namconb2_cpureg_w )
 {
 	if(mem_mask & 0xff000000)
-		namconb2_cpureg8_w(space, offset*4, data >> 24);
+		namconb2_cpureg8_w(space->machine, offset*4, data >> 24);
 	if(mem_mask & 0x00ff0000)
-		namconb2_cpureg8_w(space, offset*4+1, data >> 16);
+		namconb2_cpureg8_w(space->machine, offset*4+1, data >> 16);
 	if(mem_mask & 0x0000ff00)
-		namconb2_cpureg8_w(space, offset*4+2, data >> 8);
+		namconb2_cpureg8_w(space->machine, offset*4+2, data >> 8);
 	if(mem_mask & 0x000000ff)
-		namconb2_cpureg8_w(space, offset*4+3, data);
+		namconb2_cpureg8_w(space->machine, offset*4+3, data);
 }
 
 static READ32_HANDLER(namconb_cpureg_r)

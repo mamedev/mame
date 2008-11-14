@@ -233,8 +233,9 @@
 
 static MACHINE_RESET( omegrace )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* Omega Race expects the vector processor to be ready. */
-	avgdvg_reset_w (machine,0, 0);
+	avgdvg_reset_w(space, 0, 0);
 }
 
 
@@ -314,7 +315,7 @@ static WRITE8_HANDLER( omegrace_leds_w )
 
 static WRITE8_HANDLER( omegrace_soundlatch_w )
 {
-	soundlatch_w (space->machine, offset, data);
+	soundlatch_w (space, offset, data);
 	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 

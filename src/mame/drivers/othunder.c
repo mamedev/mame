@@ -389,7 +389,7 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 			return eeprom_r();
 
 		default:
-			return TC0220IOC_r( space->machine, offset );
+			return TC0220IOC_r( space, offset );
 	}
 }
 
@@ -449,15 +449,15 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static WRITE16_HANDLER( othunder_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (space->machine, 0, data & 0xff);
+		taitosound_port_w (space, 0, data & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (space->machine, 0, data & 0xff);
+		taitosound_comm_w (space, 0, data & 0xff);
 }
 
 static READ16_HANDLER( othunder_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (space->machine, 0) & 0xff));
+		return ((taitosound_comm_r (space, 0) & 0xff));
 	else return 0;
 }
 

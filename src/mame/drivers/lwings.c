@@ -97,7 +97,7 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 
 static INTERRUPT_GEN( lwings_interrupt )
 {
-	if (interrupt_enable_r(device->machine, 0))
+	if (interrupt_enable_r(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0))
 		cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xd7); /* RST 10h */
 }
 
@@ -125,7 +125,7 @@ static WRITE8_HANDLER( avengers_protection_w )
 	else if( pc == 0x0445 )
 	{
 		avengers_soundstate = 0x80;
-		soundlatch_w( space->machine, 0, data );
+		soundlatch_w( space, 0, data );
 	}
 }
 

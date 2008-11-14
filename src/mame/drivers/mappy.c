@@ -826,31 +826,35 @@ static WRITE8_HANDLER( mappy_latch_w )
 	}
 }
 
+
 static MACHINE_RESET( superpac )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0;i < 0x10;i += 2)
-		superpac_latch_w(machine,i,0);
+		superpac_latch_w(space,i,0);
 }
 
 static MACHINE_RESET( phozon )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0;i < 0x10;i += 2)
-		phozon_latch_w(machine,i,0);
+		phozon_latch_w(space,i,0);
 }
 
 static MACHINE_RESET( mappy )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0;i < 0x10;i += 2)
-		mappy_latch_w(machine,i,0);
+		mappy_latch_w(space,i,0);
 }
 
 static INTERRUPT_GEN( mappy_interrupt_1 )

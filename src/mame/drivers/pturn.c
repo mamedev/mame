@@ -441,7 +441,8 @@ static INTERRUPT_GEN( pturn_main_intgen )
 
 static MACHINE_RESET( pturn )
 {
-	soundlatch_clear_w(machine,0,0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	soundlatch_clear_w(space,0,0);
 }
 
 static MACHINE_DRIVER_START( pturn )

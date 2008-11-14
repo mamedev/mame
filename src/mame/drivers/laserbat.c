@@ -688,7 +688,7 @@ static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
 	static int toggle;
 
-	pia_0_cb1_w(device->machine,0,toggle & 1);
+	pia_0_cb1_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM),0,toggle & 1);
 	toggle ^= 1;
 }
 

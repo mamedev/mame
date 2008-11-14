@@ -941,7 +941,7 @@ static WRITE32_HANDLER( model2o_serial_w )
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		snd_latch_to_68k_w(space, data&0xff);
+		snd_latch_to_68k_w(space->machine, data&0xff);
 	}
 }
 
@@ -949,7 +949,7 @@ static WRITE32_HANDLER( model2_serial_w )
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		scsp_midi_in(space->machine, 0, data&0xff, 0);
+		scsp_midi_in(space, 0, data&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));

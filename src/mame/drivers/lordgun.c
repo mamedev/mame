@@ -158,7 +158,7 @@ static READ16_HANDLER( lordgun_gun_1_y_r )		{ return lordgun_gun[1].hw_y; }
 
 static WRITE16_HANDLER( lordgun_soundlatch_w )
 {
-	if (ACCESSING_BITS_0_7)	soundlatch_w (space->machine, 0, (data >> 0) & 0xff);
+	if (ACCESSING_BITS_0_7)	soundlatch_w (space, 0, (data >> 0) & 0xff);
 	if (ACCESSING_BITS_8_15)	soundlatch2_w(space, 0, (data >> 8) & 0xff);
 
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);

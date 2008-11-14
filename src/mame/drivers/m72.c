@@ -402,9 +402,10 @@ static int find_sample(int num)
 
 static INTERRUPT_GEN(fake_nmi)
 {
-	int sample = m72_sample_r(device->machine,0);
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	int sample = m72_sample_r(space,0);
 	if (sample)
-		m72_sample_w(device->machine,0,sample);
+		m72_sample_w(space,0,sample);
 }
 
 

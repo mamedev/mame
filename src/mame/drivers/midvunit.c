@@ -386,7 +386,7 @@ static READ32_HANDLER( offroadc_serial_data_r )
 
 static WRITE32_HANDLER( offroadc_serial_data_w )
 {
-	midway_serial_pic2_w(space, data >> 16);
+	midway_serial_pic2_w(space->machine, data >> 16);
 }
 
 

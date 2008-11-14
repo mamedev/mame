@@ -304,90 +304,90 @@ static WRITE8_HANDLER( spunchout_prot_w ) {
 }
 
 static READ8_HANDLER( spunchout_prot_0_r ) {
-	return spunchout_prot_r( space->machine, 0 );
+	return spunchout_prot_r( space, 0 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_0_w ) {
-	spunchout_prot_w( space->machine, 0, data );
+	spunchout_prot_w( space, 0, data );
 }
 
 static READ8_HANDLER( spunchout_prot_1_r ) {
-	return spunchout_prot_r( space->machine, 1 );
+	return spunchout_prot_r( space, 1 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_1_w ) {
-	spunchout_prot_w( space->machine, 1, data );
+	spunchout_prot_w( space, 1, data );
 }
 
 static READ8_HANDLER( spunchout_prot_2_r ) {
-	return spunchout_prot_r( space->machine, 2 );
+	return spunchout_prot_r( space, 2 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_2_w ) {
-	spunchout_prot_w( space->machine, 2, data );
+	spunchout_prot_w( space, 2, data );
 }
 
 static READ8_HANDLER( spunchout_prot_3_r ) {
-	return spunchout_prot_r( space->machine, 3 );
+	return spunchout_prot_r( space, 3 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_3_w ) {
-	spunchout_prot_w( space->machine, 3, data );
+	spunchout_prot_w( space, 3, data );
 }
 
 static READ8_HANDLER( spunchout_prot_5_r ) {
-	return spunchout_prot_r( space->machine, 5 );
+	return spunchout_prot_r( space, 5 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_5_w ) {
-	spunchout_prot_w( space->machine, 5, data );
+	spunchout_prot_w( space, 5, data );
 }
 
 
 static READ8_HANDLER( spunchout_prot_6_r ) {
-	return spunchout_prot_r( space->machine, 6 );
+	return spunchout_prot_r( space, 6 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_6_w ) {
-	spunchout_prot_w( space->machine, 6, data );
+	spunchout_prot_w( space, 6, data );
 }
 
 static READ8_HANDLER( spunchout_prot_9_r ) {
-	return spunchout_prot_r( space->machine, 9 );
+	return spunchout_prot_r( space, 9 );
 }
 
 static READ8_HANDLER( spunchout_prot_b_r ) {
-	return spunchout_prot_r( space->machine, 11 );
+	return spunchout_prot_r( space, 11 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_b_w ) {
-	spunchout_prot_w( space->machine, 11, data );
+	spunchout_prot_w( space, 11, data );
 }
 
 static READ8_HANDLER( spunchout_prot_c_r ) {
-	return spunchout_prot_r( space->machine, 12 );
+	return spunchout_prot_r( space, 12 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_d_w ) {
-	spunchout_prot_w( space->machine, 13, data );
+	spunchout_prot_w( space, 13, data );
 }
 
 static READ8_HANDLER( spunchout_prot_a_r ) {
-	return spunchout_prot_r( space->machine, 10 );
+	return spunchout_prot_r( space, 10 );
 }
 
 static WRITE8_HANDLER( spunchout_prot_a_w ) {
-	spunchout_prot_w( space->machine, 10, data );
+	spunchout_prot_w( space, 10, data );
 }
 
 #if 0
 static READ8_HANDLER( spunchout_prot_f_r ) {
-	return spunchout_prot_r( space->machine, 15 );
+	return spunchout_prot_r( space, 15 );
 }
 #endif
 
 static WRITE8_HANDLER( spunchout_prot_f_w ) {
-	spunchout_prot_w( space->machine, 15, data );
+	spunchout_prot_w( space, 15, data );
 }
 
 

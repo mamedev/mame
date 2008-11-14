@@ -1207,8 +1207,9 @@ static READ32_HANDLER( tektagt_protection_2_r )
 
 static MACHINE_RESET( namcos12 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	psx_machine_init(machine);
-	bankoffset_w(machine,0,0,0xffffffff);
+	bankoffset_w(space,0,0,0xffffffff);
 
 	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
 		strcmp( machine->gamedrv->name, "tektagta" ) == 0 ||
