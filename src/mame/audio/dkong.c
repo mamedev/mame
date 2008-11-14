@@ -1096,7 +1096,7 @@ static WRITE8_HANDLER( dkong_voice_w )
 	logerror("dkong_speech_w: 0x%02x\n", data);
 }
 
-static READ8_HANDLER( dkong_voice_status_r )
+static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 {
 	/* only provided for documentation purposes
      * not actually used
@@ -1111,7 +1111,7 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 
 	if ( page & 0x40 )
 	{
-		return (latch8_r(device, 0) & 0x0F) | (dkong_voice_status_r(device->machine,0)<<4);
+		return (latch8_r(device, 0) & 0x0F) | (dkong_voice_status_r(device,0)<<4);
 	}
 	else
 	{
