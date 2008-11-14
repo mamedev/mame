@@ -131,7 +131,7 @@ static READ8_HANDLER( aquarium_oki_r )
 static WRITE8_HANDLER( aquarium_oki_w )
 {
 	logerror("Z80-PC:%04x Writing %04x to the OKI M6295\n",cpu_get_previouspc(space->cpu),aquarium_snd_bitswap(data));
-	okim6295_data_0_w( space->machine, 0, (aquarium_snd_bitswap(data)) );
+	okim6295_data_0_w( space, 0, (aquarium_snd_bitswap(data)) );
 }
 
 
@@ -317,7 +317,7 @@ static DRIVER_INIT( aquarium )
 	}
 
 	/* reset the sound bank */
-	aquarium_z80_bank_w(machine, 0, 0);
+	aquarium_z80_bank_w(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0, 0);
 }
 
 

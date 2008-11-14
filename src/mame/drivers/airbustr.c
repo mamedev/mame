@@ -591,12 +591,13 @@ static INTERRUPT_GEN( slave_interrupt )
 
 static MACHINE_RESET( airbustr )
 {
+	address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	soundlatch_status = soundlatch2_status = 0;
 	master_addr = 0xff;
 	slave_addr = 0xfd;
-	master_bankswitch_w(machine, 0, 0x02);
-	slave_bankswitch_w(machine, 0, 0x02);
-	sound_bankswitch_w(machine, 0, 0x02);
+	master_bankswitch_w(space, 0, 0x02);
+	slave_bankswitch_w(space, 0, 0x02);
+	sound_bankswitch_w(space, 0, 0x02);
 }
 
 /* Machine Driver */
