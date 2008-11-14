@@ -399,7 +399,7 @@ static READ32_HANDLER(DMA0_r)
 
 static WRITE32_HANDLER(DMA0_w)
 {
-	DMA_w(space, 0, data, mem_mask);
+	DMA_w(space->machine, 0, data, mem_mask);
 }
 
 static READ32_HANDLER(DMA1_r)
@@ -409,7 +409,7 @@ static READ32_HANDLER(DMA1_r)
 
 static WRITE32_HANDLER(DMA1_w)
 {
-	DMA_w(space, 1, data, mem_mask);
+	DMA_w(space->machine, 1, data, mem_mask);
 }
 
 

@@ -273,8 +273,8 @@ static WRITE16_HANDLER( cave_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		if (offset)	ymz280b_data_0_w     (space->machine, offset, data & 0xff);
-		else		ymz280b_register_0_w (space->machine, offset, data & 0xff);
+		if (offset)	ymz280b_data_0_w     (space, offset, data & 0xff);
+		else		ymz280b_register_0_w (space, offset, data & 0xff);
 	}
 }
 

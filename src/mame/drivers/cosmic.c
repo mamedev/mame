@@ -358,7 +358,7 @@ static INTERRUPT_GEN( panic_interrupt )
 		/* only enabled if game in progress! */
 
     	if ((input_port_read(device->machine, "SYSTEM") & 0xc0) != 0xc0)
-        	panic_sound_output_w(device->machine, 17, 1);
+        	panic_sound_output_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 17, 1);
 
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
     }
