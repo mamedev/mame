@@ -64,7 +64,6 @@ AH
 ******************************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/generic.h"
 #include "machine/pit8253.h"
 #include "machine/8255ppi.h"
@@ -111,12 +110,24 @@ static READ8_HANDLER( vga_hvretrace_r )
     ---- x--- Vertical Retrace
     ---- ---x Horizontal Retrace
     */
-	//v_blank^=8;
-	//h_blank^=1;
-	return (hv_blank);
+	static UINT8 res;
+	static int h,w;
+	res = 0;
+	h = video_screen_get_height(machine->primary_screen);
+	w = video_screen_get_width(machine->primary_screen);
+
+//	popmessage("%d %d",h,w);
+
+	if (video_screen_get_hpos(machine->primary_screen) > h)
+		res|= 1;
+
+	if (video_screen_get_vpos(machine->primary_screen) > w)
+		res|= 8;
+
+	return res;
 }
 
-//was using magenta/cyan/white instead of red/green/brown
+//Note: this should be converted to red/green/brown instead of magenta/cyan/white
 /*Basic Graphic mode */
 static void cga_graphic_bitmap(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,UINT16 size,UINT32 map_offs)
 {
@@ -806,25 +817,6 @@ static PALETTE_INIT(filetto)
 	palette_set_color(machine, 0xff,MAKE_RGB(0xff,0xff,0xff));
 }
 
-#define HBLANK_1 if(!(hv_blank & 1)) hv_blank^= 1;
-#define HBLANK_0 if(hv_blank & 1) hv_blank^= 1;
-
-#define VBLANK_1 if(!(hv_blank & 8)) hv_blank^= 8;
-#define VBLANK_0 if(hv_blank & 8) hv_blank^= 8;
-
-static INTERRUPT_GEN( filetto_vblank )
-{
-	/*TODO: Timings are guessed*/
-	/*H-Blank*/
-	if((cpu_getiloops(device) % 8) == 0){ HBLANK_1; }
-	else						  { HBLANK_0; }
-
-	/*V-Blank*/
-	if(cpu_getiloops(device) >= 180) 	  { VBLANK_1; }
-	else						  { VBLANK_0; }
-}
-
-
 static MACHINE_RESET( filetto )
 {
 	bank = -1;
@@ -842,7 +834,6 @@ static MACHINE_DRIVER_START( filetto )
 	MDRV_CPU_ADD("main", I8088, 8000000)
 	MDRV_CPU_PROGRAM_MAP(filetto_map,0)
 	MDRV_CPU_IO_MAP(filetto_io,0)
-	MDRV_CPU_VBLANK_INT_HACK(filetto_vblank,200)
 
 	MDRV_MACHINE_RESET( filetto )
 
