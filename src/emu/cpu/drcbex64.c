@@ -796,9 +796,10 @@ static void drcbex64_reset(drcbe_state *drcbe)
 		x86log_printf(drcbe->log, "\n\n===========\nCACHE RESET\n===========\n\n");
 
 	/* fetch the accessors now that things are ready to go */
+	/* FIXME: Not sure about this one */
 	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-		if (active_address_space[spacenum]->accessors != NULL)
-			drcbe->accessors[spacenum] = *active_address_space[spacenum]->accessors;
+		if (active_address_space[spacenum] != NULL)
+			drcbe->accessors[spacenum] = active_address_space[spacenum]->accessors;
 
 	/* generate a little bit of glue code to set up the environment */
 	dst = (x86code **)drccache_begin_codegen(drcbe->cache, 500);
