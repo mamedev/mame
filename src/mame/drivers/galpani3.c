@@ -2,21 +2,21 @@
     Gals Panic 3
     (c) Kaneko 1995
 
-    Skeleton driver by Haze
-    WIP Driver by Sebastien Volpe
+	Driver by David Haywood
+
+    Original Skeleton driver by David Haywood
+    Early Progress by Sebastien Volpe
 
 Check done by main code, as part of EEPROM data:
 'Gals Panic 3 v0.96 95/08/29(Tue)'
 
+ Sprites are from Supernova
+ Backgrounds are 3x bitmap layers + some kind of priority / mask layer
+ The bitmaps have blitter devices to decompress RLE rom data into them
 
-TODO:
-- find a working board to dump MCU provided code & data, as code is
-  involved just after initial checks; the game currently goes nowhere.
-- finish emulation, mainly backgounds
-
-What's been done lately:
-- palette, inputs, sound, backgounds 'decoded' (RLE)
 */
+
+
 
 /*
 
@@ -76,6 +76,15 @@ Dumped by Uki
 ***************************************************************************/
 
 static UINT16* galpani3_priority_buffer;
+static UINT16* galpani3_framebuffer1;
+static UINT16* galpani3_framebuffer2;
+static UINT16* galpani3_framebuffer3;
+static UINT16* galpani3_framebuffer1_palette;
+static UINT16* galpani3_framebuffer2_palette;
+static UINT16* galpani3_framebuffer3_palette;
+static UINT16 galpani3_framebuffer3_scrolly;
+static UINT16 galpani3_framebuffer3_scrollx;
+
 
 static UINT16 *galpani3_sprregs, *galpani3_spriteram;
 static UINT32* galpani3_spriteram32, *galpani3_spc_regs;
@@ -87,7 +96,7 @@ static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
 	{
 		case 2:  cpu_set_input_line(device, 2, HOLD_LINE); break;
 		case 1:  cpu_set_input_line(device, 3, HOLD_LINE); break;
-		case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break;
+	//	case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break;
 	}
 }
 
@@ -123,11 +132,14 @@ static VIDEO_UPDATE(galpani3)
 		{
 			for (xx=0;xx<512;xx++)
 			{
-				UINT8 dat = galpani3_priority_buffer[offset];
-				UINT16* dst = BITMAP_ADDR16(bitmap, yy, xx);
+				//UINT8 dat = galpani3_priority_buffer[offset];
+				UINT8 dat = galpani3_framebuffer3[offset];
+
+
+				UINT16* dst = BITMAP_ADDR16(bitmap, (yy-(galpani3_framebuffer3_scrolly+11))&0x1ff, (xx-(galpani3_framebuffer3_scrollx>>0)-67)&0x1ff);
 				offset++;
 
-				if (dat==0x2f) dst[0] = mame_rand(Machine)&0xff;
+				dst[0] = dat+0x4200;// mame_rand(Machine)&0xff;
 
 
 			}
@@ -255,7 +267,7 @@ static void galpani3_mcu_run(running_machine *machine)
 	logerror("(PC=%06X): MCU executed command : %04X %04X\n",cpu_get_pc(machine->activecpu),mcu_command,mcu_offset*2);
 
 	/* the only MCU commands found in program code are:
-         0x04: protection: provide code/data, that's exactly where we are stuck !!!
+         0x04: protection: provide code/data,
          0x03: read DSW
          0x02: load NVRAM settings \ ATMEL AT93C46 chip,
          0x42: save NVRAM settings / 128 bytes serial EEPROM
@@ -344,12 +356,14 @@ static READ16_HANDLER( galpani3_mcu_status_r )
 }
 
 // might be blitter regs? - there are 3, probably GRAP2 chips
+
 READ16_HANDLER( galpani3_regs1_r )
 {
-
-	logerror("cpu #%d (PC=%06X): galpani3_regs1_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(space->cpu), offset, mem_mask);
 	switch (offset)
 	{
+		case 0x2:
+			return 0xffff;
+
 		case 0xb:
 		{
 			static int i = 0;
@@ -358,17 +372,23 @@ READ16_HANDLER( galpani3_regs1_r )
 			else return 0xffff;
 		}
 
+		default:
+			logerror("cpu #%d (PC=%06X): galpani3_regs1_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(space->cpu), offset, mem_mask);
+			break;
+
 	}
 
 	return 0x0000;
-
 }
+
 
 READ16_HANDLER( galpani3_regs2_r )
 {
-	logerror("cpu #%d (PC=%06X): galpani3_regs2_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(space->cpu), offset, mem_mask);
 	switch (offset)
 	{
+		case 0x2:
+			return 0xffff;
+
 		case 0xb:
 		{
 			static int i = 0;
@@ -377,22 +397,9 @@ READ16_HANDLER( galpani3_regs2_r )
 			else return 0xffff;
 		}
 
-	}
-
-	return 0x0000;}
-
-READ16_HANDLER( galpani3_regs3_r )
-{
-	logerror("cpu #%d (PC=%06X): galpani3_regs3_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(space->cpu), offset, mem_mask);
-	switch (offset)
-	{
-		case 0xb:
-		{
-			static int i = 0;
-			i^=1;
-			if (i) return 0xfffe;
-			else return 0xffff;
-		}
+		default:
+			logerror("cpu #%d (PC=%06X): galpani3_regs2_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(space->cpu), offset, mem_mask);
+			break;
 
 	}
 
@@ -400,12 +407,171 @@ READ16_HANDLER( galpani3_regs3_r )
 }
 
 
+READ16_HANDLER( galpani3_regs3_r )
+{
+	switch (offset)
+	{
+		case 0x2:
+			return 0xffff;
+
+		case 0xb:
+		{
+			static int i = 0;
+			i^=1;
+			if (i) return 0xfffe;
+			else return 0xffff;
+		}
+
+		default:
+			logerror("cpu #%d (PC=%06X): galpani3_regs3_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(space->cpu), offset, mem_mask);
+			break;
+
+	}
+
+	return 0x0000;
+}
+
+
+UINT16 galpani3_regs1_address_regs[0x20];
+UINT16 galpani3_regs2_address_regs[0x20];
+UINT16 galpani3_regs3_address_regs[0x20];
+
+WRITE16_HANDLER( galpani3_regs1_address_w )
+{
+	logerror("galpani3_regs1_address_w %04x\n",data);
+	COMBINE_DATA(&galpani3_regs1_address_regs[offset]);
+}
+
+WRITE16_HANDLER( galpani3_regs1_go_w )
+{
+	UINT32 address = galpani3_regs1_address_regs[1]| (galpani3_regs1_address_regs[0]<<16);
+
+	printf("galpani3_regs1_go_w? %08x\n",address );
+
+}
+
+
+WRITE16_HANDLER( galpani3_regs2_address_w )
+{
+	logerror("galpani3_regs2_address_w %04x\n",data);
+	COMBINE_DATA(&galpani3_regs2_address_regs[offset]);
+}
+
+WRITE16_HANDLER( galpani3_regs2_go_w )
+{
+	UINT32 address = galpani3_regs2_address_regs[1]| (galpani3_regs2_address_regs[0]<<16);
+
+	printf("galpani3_regs2_go_w? %08x\n", address );
+
+
+
+}
+
+
+
+WRITE16_HANDLER( galpani3_regs3_address_w )
+{
+	logerror("galpani3_regs3_address_w %04x\n",data);
+	COMBINE_DATA(&galpani3_regs3_address_regs[offset]);
+}
+
+WRITE16_HANDLER( galpani3_regs3_go_w )
+{
+	UINT32 address =  galpani3_regs3_address_regs[1]| (galpani3_regs3_address_regs[0]<<16);
+
+	printf("galpani3_regs3_go_w? %08x\n",address );
+
+	// this is WRONG..
+//	if (address!=0)
+	{
+		UINT8* rledata = memory_region(space->machine,"gfx2");
+		int rlecount =0;
+		UINT32 dstaddress = 0;
+
+		UINT8 thebyte;
+
+		while (dstaddress<0x40000)
+		{
+			if (rlecount==0)
+			{
+				thebyte = rledata[address];
+
+				printf("thebyte is %02x",thebyte);
+
+				if (thebyte & 0x80)
+				{
+					printf("(normal data)\n");
+					galpani3_framebuffer3[dstaddress] = thebyte & 0x7f;
+					dstaddress++;
+					address++;
+					// normal data
+				}
+				else
+				{
+					printf("(rle command)\n");
+						// rledata
+					rlecount = thebyte;
+					address++;
+				}
+			}
+			else
+			{
+				thebyte = rledata[address];
+				galpani3_framebuffer3[dstaddress] = thebyte & 0x7f;
+				dstaddress++;
+				rlecount--;
+
+				if (rlecount==0)
+				{
+					address++;
+				}
+			}
+		}
+
+	}
+}
+
+static void set_color_555_gp3(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
+{
+	palette_set_color_rgb(machine, color, pal5bit(data >> rshift), pal5bit(data >> gshift), pal5bit(data >> bshift));
+}
+
+static WRITE16_HANDLER( galpani3_framebuffer1_palette_w )
+{
+	COMBINE_DATA(&galpani3_framebuffer1_palette[offset]);
+	set_color_555_gp3(space->machine, offset+0x4000, 5, 10, 0, galpani3_framebuffer1_palette[offset]);
+}
+
+
+static WRITE16_HANDLER( galpani3_framebuffer2_palette_w )
+{
+	COMBINE_DATA(&galpani3_framebuffer2_palette[offset]);
+	set_color_555_gp3(space->machine, offset+0x4100, 5, 10, 0, galpani3_framebuffer2_palette[offset]);
+}
+
+static WRITE16_HANDLER( galpani3_framebuffer3_palette_w )
+{
+	COMBINE_DATA(&galpani3_framebuffer3_palette[offset]);
+	set_color_555_gp3(space->machine, offset+0x4200, 5, 10, 0, galpani3_framebuffer3_palette[offset]);
+}
+
+static WRITE16_HANDLER( galpani3_framebuffer3_scrolly_w )
+{
+	galpani3_framebuffer3_scrolly = data;
+//	printf("galpani3_framebuffer3_scrolly %04x\n",data);
+}
+
+static WRITE16_HANDLER( galpani3_framebuffer3_scrollx_w )
+{
+	galpani3_framebuffer3_scrollx = data;
+//	printf("galpani3_framebuffer3_scrollx %04x\n",data);
+}
 
 static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM // area [B] - Work RAM
-	AM_RANGE(0x280000, 0x287fff) AM_RAM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w) AM_BASE(&paletteram16) // area [A] - palette for sprites
+	AM_RANGE(0x280000, 0x287fff) AM_RAM AM_WRITE(paletteram16_xGGGGGRRRRRBBBBB_word_w)   AM_BASE(&paletteram16) // area [A] - palette for sprites
 
 	AM_RANGE(0x300000, 0x303fff) AM_RAM_WRITE(galpani3_suprnova_sprite32_w) AM_BASE(&galpani3_spriteram)
 	AM_RANGE(0x380000, 0x38003f) AM_RAM_WRITE(galpani3_suprnova_sprite32regs_w) AM_BASE(&galpani3_sprregs)
@@ -418,7 +584,6 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x700001) AM_WRITE(galpani3_mcu_com3_w)	// ] then bit #0 of $780000.l is tested: 0 = OK!
 	AM_RANGE(0x780000, 0x780001) AM_READ(galpani3_mcu_status_r)
 
-
 	// GRAP2 1?
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM // ??? see subroutine $39f42 (R?)
 	AM_RANGE(0x800400, 0x800401) AM_WRITE(SMH_NOP) // scroll?
@@ -427,36 +592,39 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800c06, 0x800c07) AM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0x800c10, 0x800c11) AM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0x800c12, 0x800c13) AM_WRITE(SMH_NOP) // ?
-	// 800c18 / 800c1a --- rom data start address?
+	AM_RANGE(0x800c18, 0x800c1b) AM_WRITE(galpani3_regs1_address_w) // ROM address of RLE data, in bytes
+	AM_RANGE(0x800c1e, 0x800c1f) AM_WRITE(galpani3_regs1_go_w) // ?
 	AM_RANGE(0x800c00, 0x800c1f) AM_READ(galpani3_regs1_r)// ? R layer regs ? see subroutine $3a03e
-	AM_RANGE(0x880000, 0x8801ff) AM_RAM // area [G] - R area ? linescroll ?
-	AM_RANGE(0x900000, 0x97ffff) AM_RAM // area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0x880000, 0x8801ff) AM_RAM AM_WRITE(galpani3_framebuffer1_palette_w) AM_BASE(&galpani3_framebuffer1_palette) // palette
+	AM_RANGE(0x900000, 0x97ffff) AM_RAM AM_BASE(&galpani3_framebuffer1)// area [D] - R area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// GRAP2 2?
 	AM_RANGE(0xa00000, 0xa003ff) AM_RAM // ??? see subroutine $39f42 (G?)
 	AM_RANGE(0xa00400, 0xa00401) AM_WRITE(SMH_NOP) // scroll?
 	AM_RANGE(0xa00800, 0xa00bff) AM_RAM // ??? see subroutine $39f42 (G?)
 	AM_RANGE(0xa00c00, 0xa00c01) AM_WRITE(SMH_NOP) // scroll?
-	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE(SMH_NOP) // ?
-	AM_RANGE(0xa00c10, 0xa00c11) AM_WRITE(SMH_NOP) // ?
-	AM_RANGE(0xa00c12, 0xa00c13) AM_WRITE(SMH_NOP) // ?
+//	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE(SMH_NOP) // ?
+//	AM_RANGE(0xa00c10, 0xa00c11) AM_WRITE(SMH_NOP) // ?
+//	AM_RANGE(0xa00c12, 0xa00c13) AM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0xa00c00, 0xa00c1f) AM_READ(galpani3_regs2_r) // ? G layer regs ? see subroutine $3a03e
-	// a00c18 / a00c1a --- rom data start address?
-	AM_RANGE(0xa80000, 0xa801ff) AM_RAM // area [H] - G area ? linescroll ?
-	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0xa00c18, 0xa00c1b) AM_WRITE(galpani3_regs2_address_w) // ROM address of RLE data, in bytes
+	AM_RANGE(0xa00c1e, 0xa00c1f) AM_WRITE(galpani3_regs2_go_w) // ?
+	AM_RANGE(0xa80000, 0xa801ff) AM_RAM AM_WRITE(galpani3_framebuffer2_palette_w) AM_BASE(&galpani3_framebuffer2_palette) // palette
+	AM_RANGE(0xb00000, 0xb7ffff) AM_RAM AM_BASE(&galpani3_framebuffer2) // area [E] - G area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// GRAP2 3?
-	AM_RANGE(0xc00000, 0xc003ff) AM_RAM // ??? see subroutine $39f42 (B?)
-	AM_RANGE(0xc00400, 0xc00401) AM_WRITE(SMH_NOP) // scroll?
-	AM_RANGE(0xc00800, 0xc00bff) AM_RAM // ??? see subroutine $39f42 (B?)
-	AM_RANGE(0xc00c00, 0xc00c01) AM_WRITE(SMH_NOP) // scroll?
-	AM_RANGE(0xc00c06, 0xc00c07) AM_WRITE(SMH_NOP) // ?
-	AM_RANGE(0xc00c10, 0xc00c11) AM_WRITE(SMH_NOP) // ?
-	AM_RANGE(0xc00c12, 0xc00c13) AM_WRITE(SMH_NOP) // ?
-	// c00c18 / c00c1a --- rom data start address?
+	AM_RANGE(0xc00000, 0xc003ff) AM_RAM // row scroll??
+	AM_RANGE(0xc00400, 0xc00401) AM_WRITE(galpani3_framebuffer3_scrollx_w) // scroll?
+	AM_RANGE(0xc00800, 0xc00bff) AM_RAM // column scroll??
+	AM_RANGE(0xc00c00, 0xc00c01) AM_WRITE(galpani3_framebuffer3_scrolly_w) // scroll?
+	AM_RANGE(0xc00c06, 0xc00c07) AM_WRITE(SMH_NOP) // blitter?
+	AM_RANGE(0xc00c10, 0xc00c11) AM_WRITE(SMH_NOP) // blitter?
+	AM_RANGE(0xc00c12, 0xc00c13) AM_WRITE(SMH_NOP) // blitter?
+	AM_RANGE(0xc00c18, 0xc00c1b) AM_WRITE(galpani3_regs3_address_w) // ROM address of RLE data, in bytes
+	AM_RANGE(0xc00c1e, 0xc00c1f) AM_WRITE(galpani3_regs3_go_w) // ?
 	AM_RANGE(0xc00c00, 0xc00c1f) AM_READ(galpani3_regs3_r) // ? B layer regs ? see subroutine $3a03e
-	AM_RANGE(0xc80000, 0xc801ff) AM_RAM // area [I] - B area ? linescroll ?
-	AM_RANGE(0xd00000, 0xd7ffff) AM_RAM // area [F] - B area ? odd bytes only, initialized 00..ff,00..ff,...
+	AM_RANGE(0xc80000, 0xc801ff) AM_RAM AM_WRITE(galpani3_framebuffer3_palette_w) AM_BASE(&galpani3_framebuffer3_palette) // palette
+	AM_RANGE(0xd00000, 0xd7ffff) AM_RAM AM_BASE(&galpani3_framebuffer3) // area [F] - B area ? odd bytes only, initialized 00..ff,00..ff,...
 
 	// ?? priority / alpha buffer?
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_BASE(&galpani3_priority_buffer) // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
@@ -492,10 +660,10 @@ static MACHINE_DRIVER_START( galpani3 )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
-	//MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
+	//MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
 
-	MDRV_PALETTE_LENGTH(0x10000)
+	MDRV_PALETTE_LENGTH(0x4300)
 
 	MDRV_VIDEO_START(galpani3)
 	MDRV_VIDEO_UPDATE(galpani3)
@@ -511,7 +679,7 @@ MACHINE_DRIVER_END
 
 
 ROM_START( galpani3 )
-	ROM_REGION( 0x100000, "main", 0 ) /* 68000 Code */
+	ROM_REGION( 0x180000, "main", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "g3p0j1.71",  0x000000, 0x080000, CRC(52893326) SHA1(78fdbf3436a4ba754d7608fedbbede5c719a4505) )
 	ROM_LOAD16_BYTE( "g3p1j1.102", 0x000001, 0x080000, CRC(05f935b4) SHA1(81e78875585bcdadad1c302614b2708e60563662) )
 
@@ -523,8 +691,8 @@ ROM_START( galpani3 )
 	ROM_LOAD( "gp340100.122", 0x200000, 0x200000, CRC(746fe4a8) SHA1(a5126ae9e83d556277d31b166296a708c311a902) )		// 19950414GROMBCap
 	ROM_LOAD( "gp340200.121", 0x400000, 0x200000, CRC(e9bc15c8) SHA1(2c6a10e768709d1937d9206970553f4101ce9016) )		// 19950414GROMCCap
 	ROM_LOAD( "gp340300.120", 0x600000, 0x200000, CRC(59062eef) SHA1(936977c20d83540c1e0f65d429c7ebea201ef991) )		// 19950414GROMDCap
-	ROM_LOAD16_BYTE( "g3g0j0.101", 0x800000, 0x040000, CRC(fbb1e0dc) SHA1(14f6377afd93054aa5dc38af235ae12b932e847f) )	// 19950523GROMECap
-	ROM_LOAD16_BYTE( "g3g1j0.100", 0x800001, 0x040000, CRC(18edb5f0) SHA1(5e2ed0105b3e6037f6116494d3b186a368824171) )	//
+	ROM_LOAD16_BYTE( "g3g0j0.101", 0xe00000, 0x040000, CRC(fbb1e0dc) SHA1(14f6377afd93054aa5dc38af235ae12b932e847f) )	// 19950523GROMECap
+	ROM_LOAD16_BYTE( "g3g1j0.100", 0xe00001, 0x040000, CRC(18edb5f0) SHA1(5e2ed0105b3e6037f6116494d3b186a368824171) )	//
 
 	ROM_REGION( 0x300000, "ymz", 0 ) /* Samples */
 	ROM_LOAD( "gp310100.40", 0x000000, 0x200000, CRC(6a0b1d12) SHA1(11fed80b96d07fddb27599743991c58c12c048e0) )
