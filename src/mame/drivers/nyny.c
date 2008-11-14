@@ -430,7 +430,7 @@ static VIDEO_UPDATE( nyny )
 static WRITE8_HANDLER( audio_1_command_w )
 {
 	soundlatch_w(machine, 0, data);
-	cpu_set_input_line(machine->cpu[1], M6802_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], M6800_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -487,7 +487,7 @@ static const ay8910_interface ay8910_64_interface =
 static WRITE8_HANDLER( audio_2_command_w )
 {
 	soundlatch2_w(machine, 0, (data & 0x60) >> 5);
-	cpu_set_input_line(machine->cpu[2], M6802_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(machine->cpu[2], M6800_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 

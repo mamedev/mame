@@ -884,7 +884,7 @@ static void squawkntalk_irq(running_machine *machine, int state)
 {
 	int combined_state = pia_get_irq_a(0) | pia_get_irq_b(0) | pia_get_irq_a(1) | pia_get_irq_b(1);
 
-	cpu_set_input_line(machine->cpu[squawkntalk_sound_cpu], M6808_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[squawkntalk_sound_cpu], M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )

@@ -247,7 +247,7 @@ static void main_cpu_firq(running_machine *machine, int state)
 
 static void audio_cpu_irq(running_machine *machine, int state)
 {
-	cpu_set_input_line(machine->cpu[1], M6802_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[1], M6800_IRQ_LINE, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

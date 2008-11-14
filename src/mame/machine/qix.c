@@ -388,7 +388,7 @@ static void qix_pia_sint(running_machine *machine, int state)
 	int combined_state = pia_get_irq_a(4) | pia_get_irq_b(4);
 
 	/* SINT is connected to the sound CPU's IRQ line */
-	cpu_set_input_line(machine->cpu[2], M6802_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(machine->cpu[2], M6800_IRQ_LINE, combined_state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

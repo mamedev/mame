@@ -100,7 +100,7 @@ if (LOG_AUDIO_COMM) logerror("%08X  CPU#1  Audio Command Read: %x\n", safe_cpu_g
 static WRITE8_HANDLER( audio_command_w )
 {
 	soundlatch_w(machine, 0, ~data);
-	cpu_set_input_line(machine->cpu[1], M6802_IRQ_LINE, HOLD_LINE);
+	cpu_set_input_line(machine->cpu[1], M6800_IRQ_LINE, HOLD_LINE);
 
 if (LOG_AUDIO_COMM) logerror("%08X   CPU#0  Audio Command Write: %x\n", safe_cpu_get_pc(machine->activecpu), data^0xff);
 }
