@@ -52,4 +52,6 @@ CPU_GET_INFO( hd6309 );
 #	 define TRUE (!FALSE)
 #endif
 
+CPU_DISASSEMBLE( hd6309 );
+
 #endif /* __HD6309_H__ */

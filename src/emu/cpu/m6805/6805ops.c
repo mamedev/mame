@@ -13,13 +13,17 @@ HNZC
 
 */
 
-static void illegal( void )
+#define OP_HANDLER(_name) INLINE void _name (void /*m68_state_t *m68_state*/) 
+
+#define OP_HANDLER_BIT(_name) INLINE void _name (/*m68_state_t *m68_state,*/ UINT8 bit) 
+
+OP_HANDLER( illegal )
 {
 	logerror("M6805: illegal opcode\n");
 }
 
 /* $00/$02/$04/$06/$08/$0A/$0C/$0E BRSET direct,relative ---- */
-INLINE void brset (UINT8 bit)
+OP_HANDLER_BIT( brset )
 {
 	UINT8 t,r;
 	DIRBYTE(r);
@@ -41,7 +45,7 @@ INLINE void brset (UINT8 bit)
 }
 
 /* $01/$03/$05/$07/$09/$0B/$0D/$0F BRCLR direct,relative ---- */
-INLINE void brclr (UINT8 bit)
+OP_HANDLER_BIT( brclr )
 {
 	UINT8 t,r;
 	DIRBYTE(r);
@@ -63,7 +67,7 @@ INLINE void brclr (UINT8 bit)
 }
 
 /* $10/$12/$14/$16/$18/$1A/$1C/$1E BSET direct ---- */
-INLINE void bset (UINT8 bit)
+OP_HANDLER_BIT( bset )
 {
 	UINT8 t,r;
 	DIRBYTE(t); r=t|bit;
@@ -71,7 +75,7 @@ INLINE void bset (UINT8 bit)
 }
 
 /* $11/$13/$15/$17/$19/$1B/$1D/$1F BCLR direct ---- */
-INLINE void bclr (UINT8 bit)
+OP_HANDLER_BIT( bclr)
 {
 	UINT8 t,r;
 	DIRBYTE(t); r=t&(~bit);
@@ -79,10 +83,11 @@ INLINE void bclr (UINT8 bit)
 }
 
 /* $20 BRA relative ---- */
-INLINE void bra( void )
+OP_HANDLER( bra )
 {
 	UINT8 t;
-	IMMBYTE(t);PC+=SIGNED(t);
+	IMMBYTE(t);
+	PC+=SIGNED(t);
 	if (t==0xfe)
 	{
 		/* speed up busy loops */
@@ -92,86 +97,86 @@ INLINE void bra( void )
 }
 
 /* $21 BRN relative ---- */
-INLINE void brn( void )
+OP_HANDLER( brn )
 {
 	UINT8 t;
 	IMMBYTE(t);
 }
 
 /* $22 BHI relative ---- */
-INLINE void bhi( void )
+OP_HANDLER( bhi )
 {
 	BRANCH( !(CC&(CFLAG|ZFLAG)) );
 }
 
 /* $23 BLS relative ---- */
-INLINE void bls( void )
+OP_HANDLER( bls )
 {
 	BRANCH( CC&(CFLAG|ZFLAG) );
 }
 
 /* $24 BCC relative ---- */
-INLINE void bcc( void )
+OP_HANDLER( bcc )
 {
 	BRANCH( !(CC&CFLAG) );
 }
 
 /* $25 BCS relative ---- */
-INLINE void bcs( void )
+OP_HANDLER( bcs )
 {
 	BRANCH( CC&CFLAG );
 }
 
 /* $26 BNE relative ---- */
-INLINE void bne( void )
+OP_HANDLER( bne )
 {
 	BRANCH( !(CC&ZFLAG) );
 }
 
 /* $27 BEQ relative ---- */
-INLINE void beq( void )
+OP_HANDLER( beq )
 {
 	BRANCH( CC&ZFLAG );
 }
 
 /* $28 BHCC relative ---- */
-INLINE void bhcc( void )
+OP_HANDLER( bhcc )
 {
 	BRANCH( !(CC&HFLAG) );
 }
 
 /* $29 BHCS relative ---- */
-INLINE void bhcs( void )
+OP_HANDLER( bhcs )
 {
 	BRANCH( CC&HFLAG );
 }
 
 /* $2a BPL relative ---- */
-INLINE void bpl( void )
+OP_HANDLER( bpl )
 {
 	BRANCH( !(CC&NFLAG) );
 }
 
 /* $2b BMI relative ---- */
-INLINE void bmi( void )
+OP_HANDLER( bmi )
 {
 	BRANCH( CC&NFLAG );
 }
 
 /* $2c BMC relative ---- */
-INLINE void bmc( void )
+OP_HANDLER( bmc )
 {
 	BRANCH( !(CC&IFLAG) );
 }
 
 /* $2d BMS relative ---- */
-INLINE void bms( void )
+OP_HANDLER( bms )
 {
 	BRANCH( CC&IFLAG );
 }
 
 /* $2e BIL relative ---- */
-INLINE void bil( void )
+OP_HANDLER( bil )
 {
 	if(SUBTYPE==SUBTYPE_HD63705)
 	{
@@ -184,7 +189,7 @@ INLINE void bil( void )
 }
 
 /* $2f BIH relative ---- */
-INLINE void bih( void )
+OP_HANDLER( bih )
 {
 	if(SUBTYPE==SUBTYPE_HD63705)
 	{
@@ -197,12 +202,14 @@ INLINE void bih( void )
 }
 
 /* $30 NEG direct -*** */
-INLINE void neg_di( void )
+OP_HANDLER( neg_di )
 {
 	UINT8 t;
 	UINT16 r;
-	DIRBYTE(t); r=-t;
-	CLR_NZC; SET_FLAGS8(0,t,r);
+	DIRBYTE(t);
+	r=-t;
+	CLR_NZC;
+	SET_FLAGS8(0,t,r);
 	WM(EAD,r);
 }
 
@@ -211,16 +218,19 @@ INLINE void neg_di( void )
 /* $32 ILLEGAL */
 
 /* $33 COM direct -**1 */
-INLINE void com_di( void )
+OP_HANDLER( com_di )
 {
 	UINT8 t;
-	DIRBYTE(t); t = ~t;
-	CLR_NZ; SET_NZ8(t); SEC;
+	DIRBYTE(t); 
+	t = ~t;
+	CLR_NZ; 
+	SET_NZ8(t);
+	SEC;
 	WM(EAD,t);
 }
 
 /* $34 LSR direct -0** */
-INLINE void lsr_di( void )
+OP_HANDLER( lsr_di )
 {
 	UINT8 t;
 	DIRBYTE(t);
@@ -234,7 +244,7 @@ INLINE void lsr_di( void )
 /* $35 ILLEGAL */
 
 /* $36 ROR direct -*** */
-INLINE void ror_di( void )
+OP_HANDLER( ror_di )
 {
 	UINT8 t,r;
 	DIRBYTE(t);
@@ -247,7 +257,7 @@ INLINE void ror_di( void )
 }
 
 /* $37 ASR direct ?*** */
-INLINE void asr_di( void )
+OP_HANDLER( asr_di )
 {
 	UINT8 t;
 	DIRBYTE(t);
@@ -258,7 +268,7 @@ INLINE void asr_di( void )
 }
 
 /* $38 LSL direct ?*** */
-INLINE void lsl_di( void )
+OP_HANDLER( lsl_di )
 {
 	UINT8 t;
 	UINT16 r;
@@ -270,7 +280,7 @@ INLINE void lsl_di( void )
 }
 
 /* $39 ROL direct -*** */
-INLINE void rol_di( void )
+OP_HANDLER( rol_di )
 {
 	UINT16 t,r;
 	DIRBYTE(t);
@@ -282,7 +292,7 @@ INLINE void rol_di( void )
 }
 
 /* $3a DEC direct -**- */
-INLINE void dec_di( void )
+OP_HANDLER( dec_di )
 {
 	UINT8 t;
 	DIRBYTE(t);
@@ -294,7 +304,7 @@ INLINE void dec_di( void )
 /* $3b ILLEGAL */
 
 /* $3c INC direct -**- */
-INLINE void inc_di( void )
+OP_HANDLER( inc_di )
 {
 	UINT8 t;
 	DIRBYTE(t);
@@ -304,7 +314,7 @@ INLINE void inc_di( void )
 }
 
 /* $3d TST direct -**- */
-INLINE void tst_di( void )
+OP_HANDLER( tst_di )
 {
 	UINT8 t;
 	DIRBYTE(t);
@@ -314,7 +324,7 @@ INLINE void tst_di( void )
 /* $3e ILLEGAL */
 
 /* $3f CLR direct -0100 */
-INLINE void clr_di( void )
+OP_HANDLER( clr_di )
 {
 	DIRECT;
 	CLR_NZC; SEZ;
@@ -322,7 +332,7 @@ INLINE void clr_di( void )
 }
 
 /* $40 NEGA inherent ?*** */
-INLINE void nega( void )
+OP_HANDLER( nega )
 {
 	UINT16 r;
 	r = -A;
@@ -335,7 +345,7 @@ INLINE void nega( void )
 /* $42 ILLEGAL */
 
 /* $43 COMA inherent -**1 */
-INLINE void coma( void )
+OP_HANDLER( coma )
 {
 	A = ~A;
 	CLR_NZ;
@@ -344,7 +354,7 @@ INLINE void coma( void )
 }
 
 /* $44 LSRA inherent -0** */
-INLINE void lsra( void )
+OP_HANDLER( lsra )
 {
 	CLR_NZC;
 	CC |= (A & 0x01);
@@ -355,7 +365,7 @@ INLINE void lsra( void )
 /* $45 ILLEGAL */
 
 /* $46 RORA inherent -*** */
-INLINE void rora( void )
+OP_HANDLER( rora )
 {
 	UINT8 r;
 	r = (CC & 0x01) << 7;
@@ -367,7 +377,7 @@ INLINE void rora( void )
 }
 
 /* $47 ASRA inherent ?*** */
-INLINE void asra( void )
+OP_HANDLER( asra )
 {
 	CLR_NZC;
 	CC |= (A & 0x01);
@@ -376,7 +386,7 @@ INLINE void asra( void )
 }
 
 /* $48 LSLA inherent ?*** */
-INLINE void lsla( void )
+OP_HANDLER( lsla )
 {
 	UINT16 r;
 	r = A << 1;
@@ -386,7 +396,7 @@ INLINE void lsla( void )
 }
 
 /* $49 ROLA inherent -*** */
-INLINE void rola( void )
+OP_HANDLER( rola )
 {
 	UINT16 t,r;
 	t = A;
@@ -398,7 +408,7 @@ INLINE void rola( void )
 }
 
 /* $4a DECA inherent -**- */
-INLINE void deca( void )
+OP_HANDLER( deca )
 {
 	--A;
 	CLR_NZ;
@@ -408,7 +418,7 @@ INLINE void deca( void )
 /* $4b ILLEGAL */
 
 /* $4c INCA inherent -**- */
-INLINE void inca( void )
+OP_HANDLER( inca )
 {
 	++A;
 	CLR_NZ;
@@ -416,7 +426,7 @@ INLINE void inca( void )
 }
 
 /* $4d TSTA inherent -**- */
-INLINE void tsta( void )
+OP_HANDLER( tsta )
 {
 	CLR_NZ;
 	SET_NZ8(A);
@@ -425,7 +435,7 @@ INLINE void tsta( void )
 /* $4e ILLEGAL */
 
 /* $4f CLRA inherent -010 */
-INLINE void clra( void )
+OP_HANDLER( clra )
 {
 	A = 0;
 	CLR_NZ;
@@ -433,7 +443,7 @@ INLINE void clra( void )
 }
 
 /* $50 NEGX inherent ?*** */
-INLINE void negx( void )
+OP_HANDLER( negx )
 {
 	UINT16 r;
 	r = -X;
@@ -447,7 +457,7 @@ INLINE void negx( void )
 /* $52 ILLEGAL */
 
 /* $53 COMX inherent -**1 */
-INLINE void comx( void )
+OP_HANDLER( comx )
 {
 	X = ~X;
 	CLR_NZ;
@@ -456,7 +466,7 @@ INLINE void comx( void )
 }
 
 /* $54 LSRX inherent -0** */
-INLINE void lsrx( void )
+OP_HANDLER( lsrx )
 {
 	CLR_NZC;
 	CC |= (X & 0x01);
@@ -467,7 +477,7 @@ INLINE void lsrx( void )
 /* $55 ILLEGAL */
 
 /* $56 RORX inherent -*** */
-INLINE void rorx( void )
+OP_HANDLER( rorx )
 {
 	UINT8 r;
 	r = (CC & 0x01) << 7;
@@ -479,7 +489,7 @@ INLINE void rorx( void )
 }
 
 /* $57 ASRX inherent ?*** */
-INLINE void asrx( void )
+OP_HANDLER( asrx )
 {
 	CLR_NZC;
 	CC |= (X & 0x01);
@@ -488,7 +498,7 @@ INLINE void asrx( void )
 }
 
 /* $58 ASLX inherent ?*** */
-INLINE void aslx( void )
+OP_HANDLER( aslx )
 {
 	UINT16 r;
 	r = X << 1;
@@ -498,7 +508,7 @@ INLINE void aslx( void )
 }
 
 /* $59 ROLX inherent -*** */
-INLINE void rolx( void )
+OP_HANDLER( rolx )
 {
 	UINT16 t,r;
 	t = X;
@@ -510,7 +520,7 @@ INLINE void rolx( void )
 }
 
 /* $5a DECX inherent -**- */
-INLINE void decx( void )
+OP_HANDLER( decx )
 {
 	--X;
 	CLR_NZ;
@@ -520,7 +530,7 @@ INLINE void decx( void )
 /* $5b ILLEGAL */
 
 /* $5c INCX inherent -**- */
-INLINE void incx( void )
+OP_HANDLER( incx )
 {
 	++X;
 	CLR_NZ;
@@ -528,7 +538,7 @@ INLINE void incx( void )
 }
 
 /* $5d TSTX inherent -**- */
-INLINE void tstx( void )
+OP_HANDLER( tstx )
 {
 	CLR_NZ;
 	SET_NZ8(X);
@@ -537,7 +547,7 @@ INLINE void tstx( void )
 /* $5e ILLEGAL */
 
 /* $5f CLRX inherent -010 */
-INLINE void clrx( void )
+OP_HANDLER( clrx )
 {
 	X = 0;
 	CLR_NZC;
@@ -545,7 +555,7 @@ INLINE void clrx( void )
 }
 
 /* $60 NEG indexed, 1 byte offset -*** */
-INLINE void neg_ix1( void )
+OP_HANDLER( neg_ix1 )
 {
 	UINT8 t;
 	UINT16 r;
@@ -559,7 +569,7 @@ INLINE void neg_ix1( void )
 /* $62 ILLEGAL */
 
 /* $63 COM indexed, 1 byte offset -**1 */
-INLINE void com_ix1( void )
+OP_HANDLER( com_ix1 )
 {
 	UINT8 t;
 	IDX1BYTE(t); t = ~t;
@@ -568,7 +578,7 @@ INLINE void com_ix1( void )
 }
 
 /* $64 LSR indexed, 1 byte offset -0** */
-INLINE void lsr_ix1( void )
+OP_HANDLER( lsr_ix1 )
 {
 	UINT8 t;
 	IDX1BYTE(t);
@@ -582,7 +592,7 @@ INLINE void lsr_ix1( void )
 /* $65 ILLEGAL */
 
 /* $66 ROR indexed, 1 byte offset -*** */
-INLINE void ror_ix1( void )
+OP_HANDLER( ror_ix1 )
 {
 	UINT8 t,r;
 	IDX1BYTE(t);
@@ -595,7 +605,7 @@ INLINE void ror_ix1( void )
 }
 
 /* $67 ASR indexed, 1 byte offset ?*** */
-INLINE void asr_ix1( void )
+OP_HANDLER( asr_ix1 )
 {
 	UINT8 t;
 	IDX1BYTE(t);
@@ -606,7 +616,7 @@ INLINE void asr_ix1( void )
 }
 
 /* $68 LSL indexed, 1 byte offset ?*** */
-INLINE void lsl_ix1( void )
+OP_HANDLER( lsl_ix1 )
 {
 	UINT8 t;
 	UINT16 r;
@@ -618,7 +628,7 @@ INLINE void lsl_ix1( void )
 }
 
 /* $69 ROL indexed, 1 byte offset -*** */
-INLINE void rol_ix1( void )
+OP_HANDLER( rol_ix1 )
 {
 	UINT16 t,r;
 	IDX1BYTE(t);
@@ -630,7 +640,7 @@ INLINE void rol_ix1( void )
 }
 
 /* $6a DEC indexed, 1 byte offset -**- */
-INLINE void dec_ix1( void )
+OP_HANDLER( dec_ix1 )
 {
 	UINT8 t;
 	IDX1BYTE(t);
@@ -642,7 +652,7 @@ INLINE void dec_ix1( void )
 /* $6b ILLEGAL */
 
 /* $6c INC indexed, 1 byte offset -**- */
-INLINE void inc_ix1( void )
+OP_HANDLER( inc_ix1 )
 {
 	UINT8 t;
 	IDX1BYTE(t);
@@ -652,7 +662,7 @@ INLINE void inc_ix1( void )
 }
 
 /* $6d TST indexed, 1 byte offset -**- */
-INLINE void tst_ix1( void )
+OP_HANDLER( tst_ix1 )
 {
 	UINT8 t;
 	IDX1BYTE(t);
@@ -662,7 +672,7 @@ INLINE void tst_ix1( void )
 /* $6e ILLEGAL */
 
 /* $6f CLR indexed, 1 byte offset -0100 */
-INLINE void clr_ix1( void )
+OP_HANDLER( clr_ix1 )
 {
 	INDEXED1;
 	CLR_NZC; SEZ;
@@ -670,7 +680,7 @@ INLINE void clr_ix1( void )
 }
 
 /* $70 NEG indexed -*** */
-INLINE void neg_ix( void )
+OP_HANDLER( neg_ix )
 {
 	UINT8 t;
 	UINT16 r;
@@ -684,7 +694,7 @@ INLINE void neg_ix( void )
 /* $72 ILLEGAL */
 
 /* $73 COM indexed -**1 */
-INLINE void com_ix( void )
+OP_HANDLER( com_ix )
 {
 	UINT8 t;
 	IDXBYTE(t); t = ~t;
@@ -693,7 +703,7 @@ INLINE void com_ix( void )
 }
 
 /* $74 LSR indexed -0** */
-INLINE void lsr_ix( void )
+OP_HANDLER( lsr_ix )
 {
 	UINT8 t;
 	IDXBYTE(t);
@@ -707,7 +717,7 @@ INLINE void lsr_ix( void )
 /* $75 ILLEGAL */
 
 /* $76 ROR indexed -*** */
-INLINE void ror_ix( void )
+OP_HANDLER( ror_ix )
 {
 	UINT8 t,r;
 	IDXBYTE(t);
@@ -720,7 +730,7 @@ INLINE void ror_ix( void )
 }
 
 /* $77 ASR indexed ?*** */
-INLINE void asr_ix( void )
+OP_HANDLER( asr_ix )
 {
 	UINT8 t;
 	IDXBYTE(t);
@@ -732,7 +742,7 @@ INLINE void asr_ix( void )
 }
 
 /* $78 LSL indexed ?*** */
-INLINE void lsl_ix( void )
+OP_HANDLER( lsl_ix )
 {
 	UINT8 t;
 	UINT16 r;
@@ -742,7 +752,7 @@ INLINE void lsl_ix( void )
 }
 
 /* $79 ROL indexed -*** */
-INLINE void rol_ix( void )
+OP_HANDLER( rol_ix )
 {
 	UINT16 t,r;
 	IDXBYTE(t);
@@ -754,7 +764,7 @@ INLINE void rol_ix( void )
 }
 
 /* $7a DEC indexed -**- */
-INLINE void dec_ix( void )
+OP_HANDLER( dec_ix )
 {
 	UINT8 t;
 	IDXBYTE(t);
@@ -766,7 +776,7 @@ INLINE void dec_ix( void )
 /* $7b ILLEGAL */
 
 /* $7c INC indexed -**- */
-INLINE void inc_ix( void )
+OP_HANDLER( inc_ix )
 {
 	UINT8 t;
 	IDXBYTE(t);
@@ -776,7 +786,7 @@ INLINE void inc_ix( void )
 }
 
 /* $7d TST indexed -**- */
-INLINE void tst_ix( void )
+OP_HANDLER( tst_ix )
 {
 	UINT8 t;
 	IDXBYTE(t);
@@ -786,7 +796,7 @@ INLINE void tst_ix( void )
 /* $7e ILLEGAL */
 
 /* $7f CLR indexed -0100 */
-INLINE void clr_ix( void )
+OP_HANDLER( clr_ix )
 {
 	INDEXED;
 	CLR_NZC; SEZ;
@@ -794,7 +804,7 @@ INLINE void clr_ix( void )
 }
 
 /* $80 RTI inherent #### */
-INLINE void rti( void )
+OP_HANDLER( rti )
 {
 	PULLBYTE(CC);
 	PULLBYTE(A);
@@ -808,7 +818,7 @@ INLINE void rti( void )
 }
 
 /* $81 RTS inherent ---- */
-INLINE void rts( void )
+OP_HANDLER( rts )
 {
 	PULLWORD(pPC);
 	change_pc(PC);
@@ -817,7 +827,7 @@ INLINE void rts( void )
 /* $82 ILLEGAL */
 
 /* $83 SWI absolute indirect ---- */
-INLINE void swi( void )
+OP_HANDLER( swi )
 {
 	PUSHWORD(m6805.pc);
 	PUSHBYTE(m6805.x);
@@ -867,7 +877,7 @@ INLINE void swi( void )
 /* $96 ILLEGAL */
 
 /* $97 TAX inherent ---- */
-INLINE void tax (void)
+OP_HANDLER( tax )
 {
 	X = A;
 }
@@ -881,26 +891,26 @@ INLINE void tax (void)
 /* $9B SEI */
 
 /* $9C RSP inherent ---- */
-INLINE void rsp (void)
+OP_HANDLER( rsp )
 {
 	S = SP_MASK;
 }
 
 /* $9D NOP inherent ---- */
-INLINE void nop (void)
+OP_HANDLER( nop )
 {
 }
 
 /* $9E ILLEGAL */
 
 /* $9F TXA inherent ---- */
-INLINE void txa (void)
+OP_HANDLER( txa )
 {
 	A = X;
 }
 
 /* $a0 SUBA immediate ?*** */
-INLINE void suba_im( void )
+OP_HANDLER( suba_im )
 {
 	UINT16	  t,r;
 	IMMBYTE(t);
@@ -911,7 +921,7 @@ INLINE void suba_im( void )
 }
 
 /* $a1 CMPA immediate ?*** */
-INLINE void cmpa_im( void )
+OP_HANDLER( cmpa_im )
 {
 	UINT16	  t,r;
 	IMMBYTE(t);
@@ -921,7 +931,7 @@ INLINE void cmpa_im( void )
 }
 
 /* $a2 SBCA immediate ?*** */
-INLINE void sbca_im( void )
+OP_HANDLER( sbca_im )
 {
 	UINT16	  t,r;
 	IMMBYTE(t);
@@ -932,7 +942,7 @@ INLINE void sbca_im( void )
 }
 
 /* $a3 CPX immediate -*** */
-INLINE void cpx_im( void )
+OP_HANDLER( cpx_im )
 {
 	UINT16	  t,r;
 	IMMBYTE(t);
@@ -942,7 +952,7 @@ INLINE void cpx_im( void )
 }
 
 /* $a4 ANDA immediate -**- */
-INLINE void anda_im( void )
+OP_HANDLER( anda_im )
 {
 	UINT8 t;
 	IMMBYTE(t);
@@ -952,7 +962,7 @@ INLINE void anda_im( void )
 }
 
 /* $a5 BITA immediate -**- */
-INLINE void bita_im( void )
+OP_HANDLER( bita_im )
 {
 	UINT8 t,r;
 	IMMBYTE(t);
@@ -962,7 +972,7 @@ INLINE void bita_im( void )
 }
 
 /* $a6 LDA immediate -**- */
-INLINE void lda_im( void )
+OP_HANDLER( lda_im )
 {
 	IMMBYTE(A);
 	CLR_NZ;
@@ -972,7 +982,7 @@ INLINE void lda_im( void )
 /* $a7 ILLEGAL */
 
 /* $a8 EORA immediate -**- */
-INLINE void eora_im( void )
+OP_HANDLER( eora_im )
 {
 	UINT8 t;
 	IMMBYTE(t);
@@ -982,7 +992,7 @@ INLINE void eora_im( void )
 }
 
 /* $a9 ADCA immediate **** */
-INLINE void adca_im( void )
+OP_HANDLER( adca_im )
 {
 	UINT16 t,r;
 	IMMBYTE(t);
@@ -994,7 +1004,7 @@ INLINE void adca_im( void )
 }
 
 /* $aa ORA immediate -**- */
-INLINE void ora_im( void )
+OP_HANDLER( ora_im )
 {
 	UINT8 t;
 	IMMBYTE(t);
@@ -1004,7 +1014,7 @@ INLINE void ora_im( void )
 }
 
 /* $ab ADDA immediate **** */
-INLINE void adda_im( void )
+OP_HANDLER( adda_im )
 {
 	UINT16 t,r;
 	IMMBYTE(t);
@@ -1018,7 +1028,7 @@ INLINE void adda_im( void )
 /* $ac ILLEGAL */
 
 /* $ad BSR ---- */
-INLINE void bsr( void )
+OP_HANDLER( bsr )
 {
 	UINT8 t;
 	IMMBYTE(t);
@@ -1027,7 +1037,7 @@ INLINE void bsr( void )
 }
 
 /* $ae LDX immediate -**- */
-INLINE void ldx_im( void )
+OP_HANDLER( ldx_im )
 {
 	IMMBYTE(X);
 	CLR_NZ;
@@ -1037,7 +1047,7 @@ INLINE void ldx_im( void )
 /* $af ILLEGAL */
 
 /* $b0 SUBA direct ?*** */
-INLINE void suba_di( void )
+OP_HANDLER( suba_di )
 {
 	UINT16	  t,r;
 	DIRBYTE(t);
@@ -1048,7 +1058,7 @@ INLINE void suba_di( void )
 }
 
 /* $b1 CMPA direct ?*** */
-INLINE void cmpa_di( void )
+OP_HANDLER( cmpa_di )
 {
 	UINT16	  t,r;
 	DIRBYTE(t);
@@ -1058,7 +1068,7 @@ INLINE void cmpa_di( void )
 }
 
 /* $b2 SBCA direct ?*** */
-INLINE void sbca_di( void )
+OP_HANDLER( sbca_di )
 {
 	UINT16	  t,r;
 	DIRBYTE(t);
@@ -1069,7 +1079,7 @@ INLINE void sbca_di( void )
 }
 
 /* $b3 CPX direct -*** */
-INLINE void cpx_di( void )
+OP_HANDLER( cpx_di )
 {
 	UINT16	  t,r;
 	DIRBYTE(t);
@@ -1079,7 +1089,7 @@ INLINE void cpx_di( void )
 }
 
 /* $b4 ANDA direct -**- */
-INLINE void anda_di( void )
+OP_HANDLER( anda_di )
 {
 	UINT8 t;
 	DIRBYTE(t);
@@ -1089,7 +1099,7 @@ INLINE void anda_di( void )
 }
 
 /* $b5 BITA direct -**- */
-INLINE void bita_di( void )
+OP_HANDLER( bita_di )
 {
 	UINT8 t,r;
 	DIRBYTE(t);
@@ -1099,7 +1109,7 @@ INLINE void bita_di( void )
 }
 
 /* $b6 LDA direct -**- */
-INLINE void lda_di( void )
+OP_HANDLER( lda_di )
 {
 	DIRBYTE(A);
 	CLR_NZ;
@@ -1107,7 +1117,7 @@ INLINE void lda_di( void )
 }
 
 /* $b7 STA direct -**- */
-INLINE void sta_di( void )
+OP_HANDLER( sta_di )
 {
 	CLR_NZ;
 	SET_NZ8(A);
@@ -1116,7 +1126,7 @@ INLINE void sta_di( void )
 }
 
 /* $b8 EORA direct -**- */
-INLINE void eora_di( void )
+OP_HANDLER( eora_di )
 {
 	UINT8 t;
 	DIRBYTE(t);
@@ -1126,7 +1136,7 @@ INLINE void eora_di( void )
 }
 
 /* $b9 ADCA direct **** */
-INLINE void adca_di( void )
+OP_HANDLER( adca_di )
 {
 	UINT16 t,r;
 	DIRBYTE(t);
@@ -1138,7 +1148,7 @@ INLINE void adca_di( void )
 }
 
 /* $ba ORA direct -**- */
-INLINE void ora_di( void )
+OP_HANDLER( ora_di )
 {
 	UINT8 t;
 	DIRBYTE(t);
@@ -1148,7 +1158,7 @@ INLINE void ora_di( void )
 }
 
 /* $bb ADDA direct **** */
-INLINE void adda_di( void )
+OP_HANDLER( adda_di )
 {
 	UINT16 t,r;
 	DIRBYTE(t);
@@ -1160,7 +1170,7 @@ INLINE void adda_di( void )
 }
 
 /* $bc JMP direct -*** */
-INLINE void jmp_di( void )
+OP_HANDLER( jmp_di )
 {
 	DIRECT;
 	PC = EA;
@@ -1168,7 +1178,7 @@ INLINE void jmp_di( void )
 }
 
 /* $bd JSR direct ---- */
-INLINE void jsr_di( void )
+OP_HANDLER( jsr_di )
 {
 	DIRECT;
 	PUSHWORD(m6805.pc);
@@ -1177,7 +1187,7 @@ INLINE void jsr_di( void )
 }
 
 /* $be LDX direct -**- */
-INLINE void ldx_di( void )
+OP_HANDLER( ldx_di )
 {
 	DIRBYTE(X);
 	CLR_NZ;
@@ -1185,7 +1195,7 @@ INLINE void ldx_di( void )
 }
 
 /* $bf STX direct -**- */
-INLINE void stx_di( void )
+OP_HANDLER( stx_di )
 {
 	CLR_NZ;
 	SET_NZ8(X);
@@ -1194,7 +1204,7 @@ INLINE void stx_di( void )
 }
 
 /* $c0 SUBA extended ?*** */
-INLINE void suba_ex( void )
+OP_HANDLER( suba_ex )
 {
 	UINT16	  t,r;
 	EXTBYTE(t);
@@ -1205,7 +1215,7 @@ INLINE void suba_ex( void )
 }
 
 /* $c1 CMPA extended ?*** */
-INLINE void cmpa_ex( void )
+OP_HANDLER( cmpa_ex )
 {
 	UINT16	  t,r;
 	EXTBYTE(t);
@@ -1215,7 +1225,7 @@ INLINE void cmpa_ex( void )
 }
 
 /* $c2 SBCA extended ?*** */
-INLINE void sbca_ex( void )
+OP_HANDLER( sbca_ex )
 {
 	UINT16	  t,r;
 	EXTBYTE(t);
@@ -1226,7 +1236,7 @@ INLINE void sbca_ex( void )
 }
 
 /* $c3 CPX extended -*** */
-INLINE void cpx_ex( void )
+OP_HANDLER( cpx_ex )
 {
 	UINT16	  t,r;
 	EXTBYTE(t);
@@ -1236,7 +1246,7 @@ INLINE void cpx_ex( void )
 }
 
 /* $c4 ANDA extended -**- */
-INLINE void anda_ex( void )
+OP_HANDLER( anda_ex )
 {
 	UINT8 t;
 	EXTBYTE(t);
@@ -1246,7 +1256,7 @@ INLINE void anda_ex( void )
 }
 
 /* $c5 BITA extended -**- */
-INLINE void bita_ex( void )
+OP_HANDLER( bita_ex )
 {
 	UINT8 t,r;
 	EXTBYTE(t);
@@ -1256,7 +1266,7 @@ INLINE void bita_ex( void )
 }
 
 /* $c6 LDA extended -**- */
-INLINE void lda_ex( void )
+OP_HANDLER( lda_ex )
 {
 	EXTBYTE(A);
 	CLR_NZ;
@@ -1264,7 +1274,7 @@ INLINE void lda_ex( void )
 }
 
 /* $c7 STA extended -**- */
-INLINE void sta_ex( void )
+OP_HANDLER( sta_ex )
 {
 	CLR_NZ;
 	SET_NZ8(A);
@@ -1273,7 +1283,7 @@ INLINE void sta_ex( void )
 }
 
 /* $c8 EORA extended -**- */
-INLINE void eora_ex( void )
+OP_HANDLER( eora_ex )
 {
 	UINT8 t;
 	EXTBYTE(t);
@@ -1283,7 +1293,7 @@ INLINE void eora_ex( void )
 }
 
 /* $c9 ADCA extended **** */
-INLINE void adca_ex( void )
+OP_HANDLER( adca_ex )
 {
 	UINT16 t,r;
 	EXTBYTE(t);
@@ -1295,7 +1305,7 @@ INLINE void adca_ex( void )
 }
 
 /* $ca ORA extended -**- */
-INLINE void ora_ex( void )
+OP_HANDLER( ora_ex )
 {
 	UINT8 t;
 	EXTBYTE(t);
@@ -1305,7 +1315,7 @@ INLINE void ora_ex( void )
 }
 
 /* $cb ADDA extended **** */
-INLINE void adda_ex( void )
+OP_HANDLER( adda_ex )
 {
 	UINT16 t,r;
 	EXTBYTE(t);
@@ -1317,7 +1327,7 @@ INLINE void adda_ex( void )
 }
 
 /* $cc JMP extended -*** */
-INLINE void jmp_ex( void )
+OP_HANDLER( jmp_ex )
 {
 	EXTENDED;
 	PC = EA;
@@ -1325,7 +1335,7 @@ INLINE void jmp_ex( void )
 }
 
 /* $cd JSR extended ---- */
-INLINE void jsr_ex( void )
+OP_HANDLER( jsr_ex )
 {
 	EXTENDED;
 	PUSHWORD(m6805.pc);
@@ -1334,7 +1344,7 @@ INLINE void jsr_ex( void )
 }
 
 /* $ce LDX extended -**- */
-INLINE void ldx_ex( void )
+OP_HANDLER( ldx_ex )
 {
 	EXTBYTE(X);
 	CLR_NZ;
@@ -1342,7 +1352,7 @@ INLINE void ldx_ex( void )
 }
 
 /* $cf STX extended -**- */
-INLINE void stx_ex( void )
+OP_HANDLER( stx_ex )
 {
 	CLR_NZ;
 	SET_NZ8(X);
@@ -1351,7 +1361,7 @@ INLINE void stx_ex( void )
 }
 
 /* $d0 SUBA indexed, 2 byte offset ?*** */
-INLINE void suba_ix2( void )
+OP_HANDLER( suba_ix2 )
 {
 	UINT16	  t,r;
 	IDX2BYTE(t);
@@ -1362,7 +1372,7 @@ INLINE void suba_ix2( void )
 }
 
 /* $d1 CMPA indexed, 2 byte offset ?*** */
-INLINE void cmpa_ix2( void )
+OP_HANDLER( cmpa_ix2 )
 {
 	UINT16	  t,r;
 	IDX2BYTE(t);
@@ -1372,7 +1382,7 @@ INLINE void cmpa_ix2( void )
 }
 
 /* $d2 SBCA indexed, 2 byte offset ?*** */
-INLINE void sbca_ix2( void )
+OP_HANDLER( sbca_ix2 )
 {
 	UINT16	  t,r;
 	IDX2BYTE(t);
@@ -1383,7 +1393,7 @@ INLINE void sbca_ix2( void )
 }
 
 /* $d3 CPX indexed, 2 byte offset -*** */
-INLINE void cpx_ix2( void )
+OP_HANDLER( cpx_ix2 )
 {
 	UINT16	  t,r;
 	IDX2BYTE(t);
@@ -1393,7 +1403,7 @@ INLINE void cpx_ix2( void )
 }
 
 /* $d4 ANDA indexed, 2 byte offset -**- */
-INLINE void anda_ix2( void )
+OP_HANDLER( anda_ix2 )
 {
 	UINT8 t;
 	IDX2BYTE(t);
@@ -1403,7 +1413,7 @@ INLINE void anda_ix2( void )
 }
 
 /* $d5 BITA indexed, 2 byte offset -**- */
-INLINE void bita_ix2( void )
+OP_HANDLER( bita_ix2 )
 {
 	UINT8 t,r;
 	IDX2BYTE(t);
@@ -1413,7 +1423,7 @@ INLINE void bita_ix2( void )
 }
 
 /* $d6 LDA indexed, 2 byte offset -**- */
-INLINE void lda_ix2( void )
+OP_HANDLER( lda_ix2 )
 {
 	IDX2BYTE(A);
 	CLR_NZ;
@@ -1421,7 +1431,7 @@ INLINE void lda_ix2( void )
 }
 
 /* $d7 STA indexed, 2 byte offset -**- */
-INLINE void sta_ix2( void )
+OP_HANDLER( sta_ix2 )
 {
 	CLR_NZ;
 	SET_NZ8(A);
@@ -1430,7 +1440,7 @@ INLINE void sta_ix2( void )
 }
 
 /* $d8 EORA indexed, 2 byte offset -**- */
-INLINE void eora_ix2( void )
+OP_HANDLER( eora_ix2 )
 {
 	UINT8 t;
 	IDX2BYTE(t);
@@ -1440,7 +1450,7 @@ INLINE void eora_ix2( void )
 }
 
 /* $d9 ADCA indexed, 2 byte offset **** */
-INLINE void adca_ix2( void )
+OP_HANDLER( adca_ix2 )
 {
 	UINT16 t,r;
 	IDX2BYTE(t);
@@ -1452,7 +1462,7 @@ INLINE void adca_ix2( void )
 }
 
 /* $da ORA indexed, 2 byte offset -**- */
-INLINE void ora_ix2( void )
+OP_HANDLER( ora_ix2 )
 {
 	UINT8 t;
 	IDX2BYTE(t);
@@ -1462,7 +1472,7 @@ INLINE void ora_ix2( void )
 }
 
 /* $db ADDA indexed, 2 byte offset **** */
-INLINE void adda_ix2( void )
+OP_HANDLER( adda_ix2 )
 {
 	UINT16 t,r;
 	IDX2BYTE(t);
@@ -1474,7 +1484,7 @@ INLINE void adda_ix2( void )
 }
 
 /* $dc JMP indexed, 2 byte offset -*** */
-INLINE void jmp_ix2( void )
+OP_HANDLER( jmp_ix2 )
 {
 	INDEXED2;
 	PC = EA;
@@ -1482,7 +1492,7 @@ INLINE void jmp_ix2( void )
 }
 
 /* $dd JSR indexed, 2 byte offset ---- */
-INLINE void jsr_ix2( void )
+OP_HANDLER( jsr_ix2 )
 {
 	INDEXED2;
 	PUSHWORD(m6805.pc);
@@ -1491,7 +1501,7 @@ INLINE void jsr_ix2( void )
 }
 
 /* $de LDX indexed, 2 byte offset -**- */
-INLINE void ldx_ix2( void )
+OP_HANDLER( ldx_ix2 )
 {
 	IDX2BYTE(X);
 	CLR_NZ;
@@ -1499,7 +1509,7 @@ INLINE void ldx_ix2( void )
 }
 
 /* $df STX indexed, 2 byte offset -**- */
-INLINE void stx_ix2( void )
+OP_HANDLER( stx_ix2 )
 {
 	CLR_NZ;
 	SET_NZ8(X);
@@ -1508,7 +1518,7 @@ INLINE void stx_ix2( void )
 }
 
 /* $e0 SUBA indexed, 1 byte offset ?*** */
-INLINE void suba_ix1( void )
+OP_HANDLER( suba_ix1 )
 {
 	UINT16	  t,r;
 	IDX1BYTE(t);
@@ -1519,7 +1529,7 @@ INLINE void suba_ix1( void )
 }
 
 /* $e1 CMPA indexed, 1 byte offset ?*** */
-INLINE void cmpa_ix1( void )
+OP_HANDLER( cmpa_ix1 )
 {
 	UINT16	  t,r;
 	IDX1BYTE(t);
@@ -1529,7 +1539,7 @@ INLINE void cmpa_ix1( void )
 }
 
 /* $e2 SBCA indexed, 1 byte offset ?*** */
-INLINE void sbca_ix1( void )
+OP_HANDLER( sbca_ix1 )
 {
 	UINT16	  t,r;
 	IDX1BYTE(t);
@@ -1540,7 +1550,7 @@ INLINE void sbca_ix1( void )
 }
 
 /* $e3 CPX indexed, 1 byte offset -*** */
-INLINE void cpx_ix1( void )
+OP_HANDLER( cpx_ix1 )
 {
 	UINT16	  t,r;
 	IDX1BYTE(t);
@@ -1550,7 +1560,7 @@ INLINE void cpx_ix1( void )
 }
 
 /* $e4 ANDA indexed, 1 byte offset -**- */
-INLINE void anda_ix1( void )
+OP_HANDLER( anda_ix1 )
 {
 	UINT8 t;
 	IDX1BYTE(t);
@@ -1560,7 +1570,7 @@ INLINE void anda_ix1( void )
 }
 
 /* $e5 BITA indexed, 1 byte offset -**- */
-INLINE void bita_ix1( void )
+OP_HANDLER( bita_ix1 )
 {
 	UINT8 t,r;
 	IDX1BYTE(t);
@@ -1570,7 +1580,7 @@ INLINE void bita_ix1( void )
 }
 
 /* $e6 LDA indexed, 1 byte offset -**- */
-INLINE void lda_ix1( void )
+OP_HANDLER( lda_ix1 )
 {
 	IDX1BYTE(A);
 	CLR_NZ;
@@ -1578,7 +1588,7 @@ INLINE void lda_ix1( void )
 }
 
 /* $e7 STA indexed, 1 byte offset -**- */
-INLINE void sta_ix1( void )
+OP_HANDLER( sta_ix1 )
 {
 	CLR_NZ;
 	SET_NZ8(A);
@@ -1587,7 +1597,7 @@ INLINE void sta_ix1( void )
 }
 
 /* $e8 EORA indexed, 1 byte offset -**- */
-INLINE void eora_ix1( void )
+OP_HANDLER( eora_ix1 )
 {
 	UINT8 t;
 	IDX1BYTE(t);
@@ -1597,7 +1607,7 @@ INLINE void eora_ix1( void )
 }
 
 /* $e9 ADCA indexed, 1 byte offset **** */
-INLINE void adca_ix1( void )
+OP_HANDLER( adca_ix1 )
 {
 	UINT16 t,r;
 	IDX1BYTE(t);
@@ -1609,7 +1619,7 @@ INLINE void adca_ix1( void )
 }
 
 /* $ea ORA indexed, 1 byte offset -**- */
-INLINE void ora_ix1( void )
+OP_HANDLER( ora_ix1 )
 {
 	UINT8 t;
 	IDX1BYTE(t);
@@ -1619,7 +1629,7 @@ INLINE void ora_ix1( void )
 }
 
 /* $eb ADDA indexed, 1 byte offset **** */
-INLINE void adda_ix1( void )
+OP_HANDLER( adda_ix1 )
 {
 	UINT16 t,r;
 	IDX1BYTE(t);
@@ -1631,7 +1641,7 @@ INLINE void adda_ix1( void )
 }
 
 /* $ec JMP indexed, 1 byte offset -*** */
-INLINE void jmp_ix1( void )
+OP_HANDLER( jmp_ix1 )
 {
 	INDEXED1;
 	PC = EA;
@@ -1639,7 +1649,7 @@ INLINE void jmp_ix1( void )
 }
 
 /* $ed JSR indexed, 1 byte offset ---- */
-INLINE void jsr_ix1( void )
+OP_HANDLER( jsr_ix1 )
 {
 	INDEXED1;
 	PUSHWORD(m6805.pc);
@@ -1648,7 +1658,7 @@ INLINE void jsr_ix1( void )
 }
 
 /* $ee LDX indexed, 1 byte offset -**- */
-INLINE void ldx_ix1( void )
+OP_HANDLER( ldx_ix1 )
 {
 	IDX1BYTE(X);
 	CLR_NZ;
@@ -1656,7 +1666,7 @@ INLINE void ldx_ix1( void )
 }
 
 /* $ef STX indexed, 1 byte offset -**- */
-INLINE void stx_ix1( void )
+OP_HANDLER( stx_ix1 )
 {
 	CLR_NZ;
 	SET_NZ8(X);
@@ -1665,7 +1675,7 @@ INLINE void stx_ix1( void )
 }
 
 /* $f0 SUBA indexed ?*** */
-INLINE void suba_ix( void )
+OP_HANDLER( suba_ix )
 {
 	UINT16	  t,r;
 	IDXBYTE(t);
@@ -1676,7 +1686,7 @@ INLINE void suba_ix( void )
 }
 
 /* $f1 CMPA indexed ?*** */
-INLINE void cmpa_ix( void )
+OP_HANDLER( cmpa_ix )
 {
 	UINT16	  t,r;
 	IDXBYTE(t);
@@ -1686,7 +1696,7 @@ INLINE void cmpa_ix( void )
 }
 
 /* $f2 SBCA indexed ?*** */
-INLINE void sbca_ix( void )
+OP_HANDLER( sbca_ix )
 {
 	UINT16	  t,r;
 	IDXBYTE(t);
@@ -1697,7 +1707,7 @@ INLINE void sbca_ix( void )
 }
 
 /* $f3 CPX indexed -*** */
-INLINE void cpx_ix( void )
+OP_HANDLER( cpx_ix )
 {
 	UINT16	  t,r;
 	IDXBYTE(t);
@@ -1707,7 +1717,7 @@ INLINE void cpx_ix( void )
 }
 
 /* $f4 ANDA indexed -**- */
-INLINE void anda_ix( void )
+OP_HANDLER( anda_ix )
 {
 	UINT8 t;
 	IDXBYTE(t);
@@ -1717,7 +1727,7 @@ INLINE void anda_ix( void )
 }
 
 /* $f5 BITA indexed -**- */
-INLINE void bita_ix( void )
+OP_HANDLER( bita_ix )
 {
 	UINT8 t,r;
 	IDXBYTE(t);
@@ -1727,7 +1737,7 @@ INLINE void bita_ix( void )
 }
 
 /* $f6 LDA indexed -**- */
-INLINE void lda_ix( void )
+OP_HANDLER( lda_ix )
 {
 	IDXBYTE(A);
 	CLR_NZ;
@@ -1735,7 +1745,7 @@ INLINE void lda_ix( void )
 }
 
 /* $f7 STA indexed -**- */
-INLINE void sta_ix( void )
+OP_HANDLER( sta_ix )
 {
 	CLR_NZ;
 	SET_NZ8(A);
@@ -1744,7 +1754,7 @@ INLINE void sta_ix( void )
 }
 
 /* $f8 EORA indexed -**- */
-INLINE void eora_ix( void )
+OP_HANDLER( eora_ix )
 {
 	UINT8 t;
 	IDXBYTE(t);
@@ -1754,7 +1764,7 @@ INLINE void eora_ix( void )
 }
 
 /* $f9 ADCA indexed **** */
-INLINE void adca_ix( void )
+OP_HANDLER( adca_ix )
 {
 	UINT16 t,r;
 	IDXBYTE(t);
@@ -1766,7 +1776,7 @@ INLINE void adca_ix( void )
 }
 
 /* $fa ORA indexed -**- */
-INLINE void ora_ix( void )
+OP_HANDLER( ora_ix )
 {
 	UINT8 t;
 	IDXBYTE(t);
@@ -1776,7 +1786,7 @@ INLINE void ora_ix( void )
 }
 
 /* $fb ADDA indexed **** */
-INLINE void adda_ix( void )
+OP_HANDLER( adda_ix )
 {
 	UINT16 t,r;
 	IDXBYTE(t);
@@ -1788,7 +1798,7 @@ INLINE void adda_ix( void )
 }
 
 /* $fc JMP indexed -*** */
-INLINE void jmp_ix( void )
+OP_HANDLER( jmp_ix )
 {
 	INDEXED;
 	PC = EA;
@@ -1796,7 +1806,7 @@ INLINE void jmp_ix( void )
 }
 
 /* $fd JSR indexed ---- */
-INLINE void jsr_ix( void )
+OP_HANDLER( jsr_ix )
 {
 	INDEXED;
 	PUSHWORD(m6805.pc);
@@ -1805,7 +1815,7 @@ INLINE void jsr_ix( void )
 }
 
 /* $fe LDX indexed -**- */
-INLINE void ldx_ix( void )
+OP_HANDLER( ldx_ix )
 {
 	IDXBYTE(X);
 	CLR_NZ;
@@ -1813,7 +1823,7 @@ INLINE void ldx_ix( void )
 }
 
 /* $ff STX indexed -**- */
-INLINE void stx_ix( void )
+OP_HANDLER( stx_ix )
 {
 	CLR_NZ;
 	SET_NZ8(X);

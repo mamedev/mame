@@ -51,4 +51,6 @@ CPU_GET_INFO( m6809e );
 #    define TRUE (!FALSE)
 #endif
 
+CPU_DISASSEMBLE( m6809 );
+
 #endif /* __M6809_H__ */
