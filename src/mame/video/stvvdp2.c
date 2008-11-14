@@ -112,9 +112,13 @@ static UINT8*  stv_vdp2_vram_dirty_8x8x8;
 static UINT8* stv_vdp2_gfx_decode;
 
 static int stv_vdp2_render_rbg0;
+int stv_hblank,stv_vblank;
+int horz_res,vert_res;
 
 UINT32* stv_vdp2_cram;
 static void stv_vdp2_dynamic_res_change(running_machine *machine);
+UINT8 get_vblank(running_machine *machine);
+UINT8 get_hblank(running_machine *machine);
 static void refresh_palette_data(running_machine *machine);
 static int stv_vdp2_window_process(int x,int y);
 static int stv_vdp2_apply_window_on_layer(rectangle *cliprect);
@@ -5260,6 +5264,31 @@ WRITE32_HANDLER ( stv_vdp2_regs_w )
 	}
 }
 
+UINT8 get_hblank(running_machine *machine)
+{
+	static int cur_h;
+
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	cur_h = video_screen_get_hpos(machine->primary_screen);
+
+	if (cur_h > visarea.max_x)
+		return 1;
+	else
+		return 0;
+}
+
+UINT8 get_vblank(running_machine *machine)
+{
+	static int cur_v;
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	cur_v = video_screen_get_vpos(machine->primary_screen);
+
+	if (cur_v > visarea.max_y)
+		return 1;
+	else
+		return 0;
+}
+
 READ32_HANDLER ( stv_vdp2_regs_r )
 {
 //  if (offset!=1) if(LOG_VDP2) logerror ("VDP2: Read from Registers, Offset %04x\n",offset);
@@ -5267,10 +5296,29 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 	switch(offset)
 	{
 		case 0x4/4:
-		/*Screen Status Register*/
+		{
+			/*Screen Status Register*/
+			//rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+
+			//stv_hblank = 0;
+			//stv_vblank = 0;
+			//h = video_screen_get_height(machine->primary_screen);
+			//w = video_screen_get_width(machine->primary_screen);
+			//cur_h = video_screen_get_hpos(machine->primary_screen);
+			//cur_v = video_screen_get_vpos(machine->primary_screen);
+
+			//popmessage("%d %d",cur_h,cur_v);
+
+			//if (cur_h > visarea.max_x)
+			stv_hblank = get_hblank(machine);
+			//if (cur_v > visarea.max_y)
+			stv_vblank = get_vblank(machine);
+			/*ODD bit*/
+
 								   /*VBLANK              HBLANK            ODD         PAL    */
 			stv_vdp2_regs[offset] = (stv_vblank<<19) | (stv_hblank<<18) | (1 << 17) | (0 << 16);
-		break;
+			break;
+		}
 		case 0x8/4:
 		/*H/V Counter Register*/
 								     /*H-Counter                               V-Counter                                         */
@@ -5348,40 +5396,60 @@ VIDEO_START( stv_vdp2 )
 	debug.roz = 0;
 }
 
+/*TODO: frame_period should be different for every kind of resolution (needs tests on actual boards)*/
+/*    & height / width not yet understood (docs-wise MUST be bigger than normal visible area)*/
+static TIMER_CALLBACK( dyn_res_change )
+{
+	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+	visarea.min_x = 0;
+	visarea.max_x = horz_res-1;
+	visarea.min_y = 0;
+	visarea.max_y = vert_res-1;
+
+	video_screen_configure(machine->primary_screen, horz_res*2, vert_res+2, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
+}
+
 static void stv_vdp2_dynamic_res_change(running_machine *machine)
 {
-	static UINT16 horz,vert;
+	static UINT8 old_vres = 0,old_hres = 0;
 
 	switch( STV_VDP2_VRES & 3 )
 	{
-		case 0: vert = 224; break;
-		case 1: vert = 240; break;
-		case 2: vert = 256; break;
+		case 0: vert_res = 224; break;
+		case 1: vert_res = 240; break;
+		case 2: vert_res = 256; break;
 		case 3:
 			if(LOG_VDP2) logerror("WARNING: V Res setting (3) not allowed!\n");
-			vert = 256;
+			vert_res = 256;
 			break;
 	}
 
 	/*Double-density interlace mode,doubles the vertical res*/
-	if((STV_VDP2_LSMD & 3) == 3) { vert*=2;  }
+	if((STV_VDP2_LSMD & 3) == 3) { vert_res*=2;  }
 
 	switch( STV_VDP2_HRES & 7 )
 	{
-		case 0: horz = 320; break;
-		case 1: horz = 352; break;
-		case 2: horz = 640; break;
-		case 3: horz = 704; break;
+		case 0: horz_res = 320; break;
+		case 1: horz_res = 352; break;
+		case 2: horz_res = 640; break;
+		case 3: horz_res = 704; break;
 		/*Exclusive modes,they sets the Vertical Resolution without considering the
             VRES register.*/
-		case 4: horz = 320; vert = 480; break;
-		case 5: horz = 352; vert = 480; break;
-		case 6: horz = 640; vert = 480; break;
-		case 7: horz = 704; vert = 480; break;
+		case 4: horz_res = 320; vert_res = 480; break;
+		case 5: horz_res = 352; vert_res = 480; break;
+		case 6: horz_res = 640; vert_res = 480; break;
+		case 7: horz_res = 704; vert_res = 480; break;
 	}
-
-	video_screen_set_visarea(machine->primary_screen, 0*8, horz-1,0*8, vert-1);
-	//if(LOG_VDP2) popmessage("%04d %04d",horz-1,vert-1);
+//	horz_res+=1;
+//	vert_res*=2;
+	if(old_vres != vert_res || old_hres != horz_res)
+	{
+		timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, dyn_res_change);
+		old_vres = vert_res;
+		old_hres = horz_res;
+	}
+//	video_screen_set_visarea(machine->primary_screen, 0*8, horz_res-1,0*8, vert_res-1);
+	//if(LOG_VDP2) popmessage("%04d %04d",horz_res-1,vert-1);
 }
 
 /*This is for calculating the rgb brightness*/

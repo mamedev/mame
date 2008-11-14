@@ -192,7 +192,6 @@ static UINT32* ioga;
 static UINT16* scsp_regs;
 static UINT16* sound_ram;
 
-int stv_vblank,stv_hblank;
 int stv_enable_slave_sh2;
 /*SMPC stuff*/
 static UINT8 NMI_reset;
@@ -756,8 +755,6 @@ static INTERRUPT_GEN( stv_interrupt )
 {
 	scanline = 261-cpu_getiloops(device);
 
-	stv_hblank = 0;
-
 	if(scanline == 0)
 	{
 		if(!(stv_scu[40] & 2))/*VBLANK-OUT*/
@@ -765,13 +762,11 @@ static INTERRUPT_GEN( stv_interrupt )
 			if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT at scanline %04x, Vector 0x41 Level 0x0e\n",scanline);
 			cpu_set_input_line_and_vector(device, 0xe, HOLD_LINE , 0x41);
 		}
-		stv_vblank = 0;
 	}
 	else if(scanline <= 223 && scanline >= 1)/*Correct?*/
 	{
 		timer_0++;
 		timer_1++;
-		stv_hblank = 1;
 		/*TODO: check this...*/
 		/*Timer 1 handling*/
 		if((stv_scu[38] & 1))
@@ -816,7 +811,6 @@ static INTERRUPT_GEN( stv_interrupt )
 			if(LOG_IRQ) logerror ("Interrupt: VBlank IN at scanline %04x, Vector 0x40 Level 0x0f\n",scanline);
 			cpu_set_input_line_and_vector(device, 0xf, HOLD_LINE , 0x40);
 		}
-		stv_vblank = 1;
 
 		if(timer_0 == (stv_scu[36] & 0x1ff))
 		{
@@ -2535,8 +2529,8 @@ static MACHINE_START( stv )
 	state_save_register_global_pointer(smpc_ram, 0x80);
 	state_save_register_global_pointer(stv_scu, 0x100/4);
 	state_save_register_global_pointer(scsp_regs, 0x1000/2);
-	state_save_register_global(stv_vblank);
-	state_save_register_global(stv_hblank);
+//	state_save_register_global(stv_vblank);
+//	state_save_register_global(stv_hblank);
 	state_save_register_global(stv_enable_slave_sh2);
 	state_save_register_global(NMI_reset);
 	state_save_register_global(en_68k);
@@ -2608,8 +2602,8 @@ static MACHINE_DRIVER_START( stv )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(192))	// guess, needed to force video update after V-Blank OUT interrupt
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(1024, 1024)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 512) // we need to use a resolution as high as the max size it can change to
+	MDRV_SCREEN_SIZE(704, 512)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 511) // we need to use a resolution as high as the max size it can change to
 
 	MDRV_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
 	MDRV_GFXDECODE(stv)
