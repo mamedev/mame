@@ -40,7 +40,7 @@ static INTERRUPT_GEN( labyrunr_interrupt )
 static WRITE8_HANDLER( labyrunr_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 if (data & 0xe0) popmessage("bankswitch %02x",data);
 

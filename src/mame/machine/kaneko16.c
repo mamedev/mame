@@ -50,7 +50,7 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 	switch (offset)
 	{
 		case 0x00/2: // watchdog
-			return watchdog_reset_r(machine,0);
+			return watchdog_reset_r(space,0);
 
 		case 0x02/2: // unknown (yet!), used by *MANY* games !!!
 			//popmessage("unknown collision reg");
@@ -86,10 +86,10 @@ READ16_HANDLER(galpanib_calc_r) /* Simulation of the CALC1 MCU */
 			return (((UINT32)hit.mult_a * (UINT32)hit.mult_b) & 0xffff);
 
 		case 0x14/2:
-			return (mame_rand(machine) & 0xffff);
+			return (mame_rand(space->machine) & 0xffff);
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	}
 
 	return 0;
@@ -112,7 +112,7 @@ WRITE16_HANDLER(galpanib_calc_w)
 		case 0x12/2: hit.mult_b = data; break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	}
 }
 
@@ -136,7 +136,7 @@ WRITE16_HANDLER(bloodwar_calc_w)
 		case 0x38/2: break;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
+			logerror("CPU #0 PC %06x: warning - write unmapped hit address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	}
 }
 
@@ -217,7 +217,7 @@ READ16_HANDLER(bloodwar_calc_r)
 			return data;
 
 		case 0x14/2:
-			return (mame_rand(machine) & 0xffff);
+			return (mame_rand(space->machine) & 0xffff);
 
 		case 0x20/2: return hit.x1p;
 		case 0x22/2: return hit.x1s;
@@ -230,7 +230,7 @@ READ16_HANDLER(bloodwar_calc_r)
 		case 0x32/2: return hit.y2s;
 
 		default:
-			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
+			logerror("CPU #0 PC %06x: warning - read unmapped calc address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	}
 
 	return 0;
@@ -283,14 +283,14 @@ void calc3_mcu_init(void)
 WRITE16_HANDLER( calc3_mcu_ram_w )
 {
 	COMBINE_DATA(&kaneko16_mcu_ram[offset]);
-	calc3_mcu_run(machine);
+	calc3_mcu_run(space->machine);
 }
 
 #define CALC3_MCU_COM_W(_n_)				\
 WRITE16_HANDLER( calc3_mcu_com##_n_##_w )	\
 {											\
 	calc3_mcu_status |= (1 << _n_);			\
-	calc3_mcu_run(machine);					\
+	calc3_mcu_run(space->machine);					\
 }
 
 CALC3_MCU_COM_W(0)
@@ -665,7 +665,7 @@ WRITE16_HANDLER( toybox_mcu_com##_n_##_w )				\
 	if (toybox_mcu_com[3] != 0xFFFF)	return;			\
 														\
 	memset(toybox_mcu_com, 0, 4 * sizeof( UINT16 ) );	\
-	toybox_mcu_run(machine);							\
+	toybox_mcu_run(space->machine);							\
 }
 
 TOYBOX_MCU_COM_W(0)
@@ -678,7 +678,7 @@ TOYBOX_MCU_COM_W(3)
 */
 READ16_HANDLER( toybox_mcu_status_r )
 {
-	logerror("CPU #%d (PC=%06X) : read MCU status\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu));
+	logerror("CPU #%d (PC=%06X) : read MCU status\n", cpunum_get_active(), cpu_get_previouspc(space->cpu));
 	return 0; // most games test bit 0 for failure
 }
 

@@ -425,7 +425,7 @@ READ32_HANDLER( zeus2_r )
 #endif
 
 	if (logit)
-		logerror("%06X:zeus2_r(%02X)\n", cpu_get_pc(machine->activecpu), offset);
+		logerror("%06X:zeus2_r(%02X)\n", cpu_get_pc(space->cpu), offset);
 
 	switch (offset)
 	{
@@ -438,7 +438,7 @@ READ32_HANDLER( zeus2_r )
 			/* bits $00080000 is tested in a loop until 0 */
 			/* bit  $00000004 is tested for toggling; probably VBLANK */
 			result = 0x00;
-			if (video_screen_get_vblank(machine->primary_screen))
+			if (video_screen_get_vblank(space->machine->primary_screen))
 				result |= 0x04;
 			break;
 
@@ -449,7 +449,7 @@ READ32_HANDLER( zeus2_r )
 
 		case 0x54:
 			/* both upper 16 bits and lower 16 bits seem to be used as vertical counters */
-			result = (video_screen_get_vpos(machine->primary_screen) << 16) | video_screen_get_vpos(machine->primary_screen);
+			result = (video_screen_get_vpos(space->machine->primary_screen) << 16) | video_screen_get_vpos(space->machine->primary_screen);
 			break;
 	}
 
@@ -471,8 +471,8 @@ WRITE32_HANDLER( zeus2_w )
 				 offset != 0x40 && offset != 0x41 && offset != 0x48 && offset != 0x49 && offset != 0x4e &&
 				 offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e);
 	if (logit)
-		logerror("%06X:zeus2_w", cpu_get_pc(machine->activecpu));
-	zeus_register32_w(machine, offset, data, logit);
+		logerror("%06X:zeus2_w", cpu_get_pc(space->cpu));
+	zeus_register32_w(space, offset, data, logit);
 }
 
 

@@ -212,8 +212,8 @@ VIDEO_UPDATE( locomotn );
 
 static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 {
-	cpu_set_input_line_vector(machine->cpu[0], 0, data);
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line_vector(space->machine->cpu[0], 0, data);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -236,13 +236,13 @@ static WRITE8_HANDLER( rallyx_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* BANG */
-			rallyx_bang_w(machine,0,bit);
+			rallyx_bang_w(space,0,bit);
 			break;
 
 		case 0x01:	/* INT ON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* SOUND ON */
@@ -280,7 +280,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 	switch (offset)
 	{
 		case 0x00:	/* SOUNDON */
-			timeplt_sh_irqtrigger_w(machine,0,bit);
+			timeplt_sh_irqtrigger_w(space,0,bit);
 			break;
 
 		case 0x01:	/* INTST */
@@ -307,7 +307,7 @@ static WRITE8_HANDLER( locomotn_latch_w )
 			break;
 
 		case 0x07:	/* STARSON */
-			tactcian_starson_w(machine,offset,bit);
+			tactcian_starson_w(space,offset,bit);
 			break;
 	}
 }

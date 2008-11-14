@@ -76,7 +76,7 @@ static MACHINE_RESET( eprom )
 
 static READ16_HANDLER( special_port1_r )
 {
-	int result = input_port_read(machine, "260010");
+	int result = input_port_read(space->machine, "260010");
 
 	if (atarigen_sound_to_cpu_ready) result ^= 0x0004;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0008;
@@ -90,7 +90,7 @@ static READ16_HANDLER( adc_r )
 {
 	static int last_offset;
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-	int result = input_port_read(machine, adcnames[last_offset & 3]);
+	int result = input_port_read(space->machine, adcnames[last_offset & 3]);
 
 	last_offset = offset;
 	return result;
@@ -110,9 +110,9 @@ static WRITE16_HANDLER( eprom_latch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data & 1)
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
@@ -138,7 +138,7 @@ static WRITE16_HANDLER( sync_w )
 
 	sync_data[offset] = newword;
 	if ((oldword & 0xff00) != (newword & 0xff00))
-		cpu_yield(machine->activecpu);
+		cpu_yield(space->cpu);
 }
 
 

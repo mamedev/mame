@@ -425,11 +425,11 @@ static WRITE16_HANDLER( seta2_sound_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *ROM = memory_region( machine, "x1" );
-		int banks = (memory_region_length( machine, "x1" ) - 0x100000) / 0x20000;
+		UINT8 *ROM = memory_region( space->machine, "x1" );
+		int banks = (memory_region_length( space->machine, "x1" ) - 0x100000) / 0x20000;
 		if (data >= banks)
 		{
-			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(machine->activecpu),data);
+			logerror("CPU #0 PC %06X: invalid sound bank %04X\n",cpu_get_pc(space->cpu),data);
 			data %= banks;
 		}
 		memcpy(ROM + offset * 0x20000, ROM + 0x100000 + data * 0x20000, 0x20000);
@@ -563,11 +563,11 @@ static READ16_HANDLER( mj4simai_p1_r )
 {
 	switch (keyboard_row)
 	{
-		case 0x01: return input_port_read(machine, "KEY0");
-		case 0x02: return input_port_read(machine, "KEY1");
-		case 0x04: return input_port_read(machine, "KEY2");
-		case 0x08: return input_port_read(machine, "KEY3");
-		case 0x10: return input_port_read(machine, "KEY4");
+		case 0x01: return input_port_read(space->machine, "KEY0");
+		case 0x02: return input_port_read(space->machine, "KEY1");
+		case 0x04: return input_port_read(space->machine, "KEY2");
+		case 0x08: return input_port_read(space->machine, "KEY3");
+		case 0x10: return input_port_read(space->machine, "KEY4");
 		default:   logerror("p1_r with keyboard_row = %02x\n",keyboard_row); return 0xffff;
 	}
 }
@@ -680,12 +680,12 @@ ADDRESS_MAP_END
 static READ16_HANDLER( pzlbowl_protection_r )
 {
 	UINT32 address = (program_read_word(0x20ba16) << 16) | program_read_word(0x20ba18);
-	return memory_region(machine, "main")[address - 2];
+	return memory_region(space->machine, "main")[address - 2];
 }
 
 static READ16_HANDLER( pzlbowl_coins_r )
 {
-	return input_port_read(machine, "SYSTEM") | (mame_rand(machine) & 0x80 );
+	return input_port_read(space->machine, "SYSTEM") | (mame_rand(space->machine) & 0x80 );
 }
 
 static WRITE16_HANDLER( pzlbowl_coin_counter_w )
@@ -769,12 +769,12 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( samshoot_lightgun1_r )
 {
-//  popmessage("%02x %02x",input_port_read(machine, "GUN1X"),input_port_read(machine, "GUN1Y"));
-	return (input_port_read(machine, "GUN1Y") << 8) | input_port_read(machine, "GUN1X");
+//  popmessage("%02x %02x",input_port_read(space->machine, "GUN1X"),input_port_read(space->machine, "GUN1Y"));
+	return (input_port_read(space->machine, "GUN1Y") << 8) | input_port_read(space->machine, "GUN1X");
 }
 static READ16_HANDLER( samshoot_lightgun2_r )
 {
-	return (input_port_read(machine, "GUN2Y") << 8) | input_port_read(machine, "GUN2X");
+	return (input_port_read(space->machine, "GUN2Y") << 8) | input_port_read(space->machine, "GUN2X");
 }
 
 static WRITE16_HANDLER( samshoot_coin_w )

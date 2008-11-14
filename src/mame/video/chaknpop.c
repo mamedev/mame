@@ -106,7 +106,7 @@ WRITE8_HANDLER( chaknpop_gfxmode_w )
 		int all_dirty = 0;
 
 		gfxmode = data;
-		set_vram_bank(machine);
+		set_vram_bank(space->machine);
 
 		if (flip_x != (gfxmode & GFX_FLIP_X))
 		{

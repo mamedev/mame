@@ -77,14 +77,14 @@ static MACHINE_RESET( rampart )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return (okim6295_status_0_r(machine, offset) << 8) | 0x00ff;
+	return (okim6295_status_0_r(space, offset) << 8) | 0x00ff;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_BITS_8_15)
-		okim6295_data_0_w(machine, offset, (data >> 8) & 0xff);
+		okim6295_data_0_w(space, offset, (data >> 8) & 0xff);
 }
 
 
@@ -100,9 +100,9 @@ static WRITE16_HANDLER( ym2413_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		if (offset & 1)
-			ym2413_data_port_0_w(machine, 0, (data >> 8) & 0xff);
+			ym2413_data_port_0_w(space, 0, (data >> 8) & 0xff);
 		else
-			ym2413_register_port_0_w(machine, 0, (data >> 8) & 0xff);
+			ym2413_register_port_0_w(space, 0, (data >> 8) & 0xff);
 	}
 }
 
@@ -144,10 +144,10 @@ static WRITE16_HANDLER( latch_w )
 	/* lower byte being modified? */
 	if (ACCESSING_BITS_0_7)
 	{
-		atarigen_set_oki6295_vol(machine, (data & 0x0020) ? 100 : 0);
+		atarigen_set_oki6295_vol(space->machine, (data & 0x0020) ? 100 : 0);
 		if (!(data & 0x0010))
 			sndti_reset(SOUND_OKIM6295, 0);
-		atarigen_set_ym2413_vol(machine, ((data >> 1) & 7) * 100 / 7);
+		atarigen_set_ym2413_vol(space->machine, ((data >> 1) & 7) * 100 / 7);
 		if (!(data & 0x0001))
 			sndti_reset(SOUND_YM2413, 0);
 	}

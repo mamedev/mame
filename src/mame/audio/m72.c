@@ -124,14 +124,14 @@ WRITE16_HANDLER( m72_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,offset,data);
+		soundlatch_w(space,offset,data);
 		timer_call_after_resynch(NULL, Z80_ASSERT,setvector_callback);
 	}
 }
 
 WRITE8_HANDLER( m72_sound_command_byte_w )
 {
-	soundlatch_w(machine,offset,data);
+	soundlatch_w(space,offset,data);
 	timer_call_after_resynch(NULL, Z80_ASSERT,setvector_callback);
 }
 
@@ -197,11 +197,11 @@ WRITE8_HANDLER( poundfor_sample_addr_w )
 
 READ8_HANDLER( m72_sample_r )
 {
-	return memory_region(machine, "samples")[sample_addr];
+	return memory_region(space->machine, "samples")[sample_addr];
 }
 
 WRITE8_HANDLER( m72_sample_w )
 {
 	dac_signed_data_w(0,data);
-	sample_addr = (sample_addr + 1) & (memory_region_length(machine, "samples") - 1);
+	sample_addr = (sample_addr + 1) & (memory_region_length(space->machine, "samples") - 1);
 }

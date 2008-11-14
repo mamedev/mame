@@ -194,7 +194,7 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 		g = (paletteram32[offset] & 0x03e00000) >> (5+16);
 		b = (paletteram32[offset] & 0x001f0000) >> (0+16);
 
-		palette_set_color_rgb(machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 
 	if(ACCESSING_BITS_0_15)
@@ -206,7 +206,7 @@ static WRITE32_HANDLER( paletteram32_xRRRRRGGGGGBBBBB_dword_w )
 		g = (paletteram32[offset] & 0x000003e0) >> (5);
 		b = (paletteram32[offset] & 0x0000001f) >> (0);
 
-		palette_set_color_rgb(machine,offset*2+1,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(space->machine,offset*2+1,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -245,9 +245,9 @@ static WRITE32_HANDLER( fuuki32_vregs_w )
 		COMBINE_DATA(&fuuki32_vregs[offset]);
 		if (offset == 0x1c/4)
 		{
-			const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-			attotime period = video_screen_get_frame_period(machine->primary_screen);
-			timer_adjust_periodic(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, fuuki32_vregs[0x1c/4]>>16, visarea->max_x + 1), 0, period);
+			const rectangle *visarea = video_screen_get_visible_area(space->machine->primary_screen);
+			attotime period = video_screen_get_frame_period(space->machine->primary_screen);
+			timer_adjust_periodic(raster_interrupt_timer, video_screen_get_time_until_pos(space->machine->primary_screen, fuuki32_vregs[0x1c/4]>>16, visarea->max_x + 1), 0, period);
 		}
 	}
 }
@@ -317,7 +317,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER ( fuuki32_sound_bw_w )
 {
-	UINT8 *rom = memory_region(machine, "sound");
+	UINT8 *rom = memory_region(space->machine, "sound");
 
 	memory_set_bankptr(1, rom + 0x10000 + (data * 0x8000));
 }

@@ -45,7 +45,7 @@ WRITE8_HANDLER( bigevglf_68705_portB_w )
 
 	if ((ddrB & 0x02) && (~portB_out & 0x02) && (data & 0x02)) /* positive going transition of the clock */
 	{
-		cpu_set_input_line(machine->cpu[3],0,CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[3],0,CLEAR_LINE);
 		main_sent = 0;
 
 	}
@@ -86,7 +86,7 @@ WRITE8_HANDLER( bigevglf_mcu_w )
 {
 	portA_in = data;
 	main_sent = 1;
-	cpu_set_input_line(machine->cpu[3],0,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[3],0,ASSERT_LINE);
 }
 
 

@@ -152,7 +152,7 @@ static WRITE8_HANDLER( ppmast93_bgram_w )
 
 static WRITE8_HANDLER( ppmast93_port4_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	int bank;
 
 	coin_counter_w(0, data & 0x08);
@@ -194,10 +194,10 @@ static WRITE8_HANDLER(ppmast_sound_w)
 {
 	switch(offset&0xff)
 	{
-		case 0: ym2413_register_port_0_w(machine,0,data); break;
-		case 1: ym2413_data_port_0_w(machine,0,data); break;
-		case 2: dac_0_data_w(machine,0,data);break;
-		default: logerror("%x %x - %x\n",offset,data,cpu_get_previouspc(machine->activecpu));
+		case 0: ym2413_register_port_0_w(space,0,data); break;
+		case 1: ym2413_data_port_0_w(space,0,data); break;
+		case 2: dac_0_data_w(space,0,data);break;
+		default: logerror("%x %x - %x\n",offset,data,cpu_get_previouspc(space->cpu));
 	}
 }
 

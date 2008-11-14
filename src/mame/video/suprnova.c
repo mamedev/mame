@@ -257,7 +257,7 @@ WRITE32_HANDLER ( skns_palette_ram_w )
 		r <<= 3;
 	}
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 

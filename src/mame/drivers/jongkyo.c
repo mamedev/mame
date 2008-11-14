@@ -109,19 +109,19 @@ static READ8_HANDLER( keyboard1_r )
 	{
 
 		case 0xef:
-			return  input_port_read(machine, "0");
+			return  input_port_read(space->machine, "0");
 
 		case 0xf7:
-			return  input_port_read(machine, "1");
+			return  input_port_read(space->machine, "1");
 
 		case 0xfb:
-			return  input_port_read(machine, "2");
+			return  input_port_read(space->machine, "2");
 
 		case 0xfd:
-			return  input_port_read(machine, "3");
+			return  input_port_read(space->machine, "3");
 
 		case 0xfe:
-			return  input_port_read(machine, "4");
+			return  input_port_read(space->machine, "4");
 
 		default:
 			printf("keyboard1_r, select %02x\n",keyboard_select);
@@ -137,19 +137,19 @@ static READ8_HANDLER( keyboard2_r )
 	switch (keyboard_select)
 	{
 		case 0xef:
-			return  input_port_read(machine, "5");
+			return  input_port_read(space->machine, "5");
 
 		case 0xf7:
-			return  input_port_read(machine, "6");
+			return  input_port_read(space->machine, "6");
 
 		case 0xfb:
-			return  input_port_read(machine, "7");
+			return  input_port_read(space->machine, "7");
 
 		case 0xfd:
-			return  input_port_read(machine, "8");
+			return  input_port_read(space->machine, "8");
 
 		case 0xfe:
-			return  input_port_read(machine, "9");
+			return  input_port_read(space->machine, "9");
 
 		default:
 			printf("keyboard2_r, select %02x\n",keyboard_select);

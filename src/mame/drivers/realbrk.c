@@ -53,17 +53,17 @@ static UINT16 *realbrk_dsw_select;
 static READ16_HANDLER( realbrk_dsw_r )
 {
 	UINT16 sel = ~realbrk_dsw_select[0];
-	if (sel & 0x01)	return	(input_port_read(machine, "SW1") & 0x00ff) << 8;		// DSW1 low bits
-	if (sel & 0x02)	return	(input_port_read(machine, "SW2") & 0x00ff) << 8;		// DSW2 low bits
-	if (sel & 0x04)	return	(input_port_read(machine, "SW3") & 0x00ff) << 8;		// DSW3 low bits
-	if (sel & 0x08)	return	(input_port_read(machine, "SW4") & 0x00ff) << 8;		// DSW4 low bits
+	if (sel & 0x01)	return	(input_port_read(space->machine, "SW1") & 0x00ff) << 8;		// DSW1 low bits
+	if (sel & 0x02)	return	(input_port_read(space->machine, "SW2") & 0x00ff) << 8;		// DSW2 low bits
+	if (sel & 0x04)	return	(input_port_read(space->machine, "SW3") & 0x00ff) << 8;		// DSW3 low bits
+	if (sel & 0x08)	return	(input_port_read(space->machine, "SW4") & 0x00ff) << 8;		// DSW4 low bits
 
-	if (sel & 0x10)	return	((input_port_read(machine, "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
-							((input_port_read(machine, "SW2") & 0x0300) << 2) |
-							((input_port_read(machine, "SW3") & 0x0300) << 4) |
-							((input_port_read(machine, "SW4") & 0x0300) << 6) ;
+	if (sel & 0x10)	return	((input_port_read(space->machine, "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
+							((input_port_read(space->machine, "SW2") & 0x0300) << 2) |
+							((input_port_read(space->machine, "SW3") & 0x0300) << 4) |
+							((input_port_read(space->machine, "SW4") & 0x0300) << 6) ;
 
-	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",cpu_get_pc(machine->activecpu),realbrk_dsw_select[0]);
+	logerror("CPU #0 PC %06X: read with unknown dsw_select = %02x\n",cpu_get_pc(space->cpu),realbrk_dsw_select[0]);
 	return 0xffff;
 }
 
@@ -73,14 +73,14 @@ static READ16_HANDLER( pkgnsh_input_r )
 	{
 		case 0x00/2: return 0xffff;
 		case 0x02/2: return 0xffff;
-		case 0x04/2: return input_port_read(machine, "IN0");		/*Service buttons*/
-		case 0x06/2: return input_port_read(machine, "SW1");		/*DIP 2*/
-		case 0x08/2: return input_port_read(machine, "SW2");		/*DIP 1*/
-		case 0x0a/2: return input_port_read(machine, "SW3");		/*DIP 1+2 Hi-Bits*/
-		case 0x0c/2: return input_port_read(machine, "PADDLE1");	/*Handle 1p*/
-		case 0x0e/2: return input_port_read(machine, "P1");			/*Buttons 1p*/
-		case 0x10/2: return input_port_read(machine, "PADDLE2");	/*Handle 2p*/
-		case 0x12/2: return input_port_read(machine, "P2");			/*Buttons 2p*/
+		case 0x04/2: return input_port_read(space->machine, "IN0");		/*Service buttons*/
+		case 0x06/2: return input_port_read(space->machine, "SW1");		/*DIP 2*/
+		case 0x08/2: return input_port_read(space->machine, "SW2");		/*DIP 1*/
+		case 0x0a/2: return input_port_read(space->machine, "SW3");		/*DIP 1+2 Hi-Bits*/
+		case 0x0c/2: return input_port_read(space->machine, "PADDLE1");	/*Handle 1p*/
+		case 0x0e/2: return input_port_read(space->machine, "P1");			/*Buttons 1p*/
+		case 0x10/2: return input_port_read(space->machine, "PADDLE2");	/*Handle 2p*/
+		case 0x12/2: return input_port_read(space->machine, "P2");			/*Buttons 2p*/
 	}
 	return 0xffff;
 }
@@ -92,22 +92,22 @@ static READ16_HANDLER( pkgnshdx_input_r )
 	switch(offset)
 	{
 		case 0x00/2: return 0xffff;
-		case 0x02/2: return input_port_read(machine, "IN0");	/*Service buttons*/
+		case 0x02/2: return input_port_read(space->machine, "IN0");	/*Service buttons*/
 		/*DSW,same handling as realbrk*/
 		case 0x04/2:
-			if (sel & 0x01)	return	(input_port_read(machine, "SW1") & 0x00ff) << 8;		// DSW1 low bits
-			if (sel & 0x02)	return	(input_port_read(machine, "SW2") & 0x00ff) << 8;		// DSW2 low bits
-			if (sel & 0x04)	return	(input_port_read(machine, "SW3") & 0x00ff) << 8;		// DSW3 low bits
-			if (sel & 0x08)	return	(input_port_read(machine, "SW4") & 0x00ff) << 8;		// DSW4 low bits
+			if (sel & 0x01)	return	(input_port_read(space->machine, "SW1") & 0x00ff) << 8;		// DSW1 low bits
+			if (sel & 0x02)	return	(input_port_read(space->machine, "SW2") & 0x00ff) << 8;		// DSW2 low bits
+			if (sel & 0x04)	return	(input_port_read(space->machine, "SW3") & 0x00ff) << 8;		// DSW3 low bits
+			if (sel & 0x08)	return	(input_port_read(space->machine, "SW4") & 0x00ff) << 8;		// DSW4 low bits
 
-			if (sel & 0x10)	return	((input_port_read(machine, "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
-									((input_port_read(machine, "SW2") & 0x0300) << 2) |
-									((input_port_read(machine, "SW3") & 0x0300) << 4) |
-									((input_port_read(machine, "SW4") & 0x0300) << 6) ;
+			if (sel & 0x10)	return	((input_port_read(space->machine, "SW1") & 0x0300) << 0) |	// DSWs high 2 bits
+									((input_port_read(space->machine, "SW2") & 0x0300) << 2) |
+									((input_port_read(space->machine, "SW3") & 0x0300) << 4) |
+									((input_port_read(space->machine, "SW4") & 0x0300) << 6) ;
 
 			return 0xffff;
-		case 0x06/2: return input_port_read(machine, "P2");/*Buttons+Handle 2p*/
-		case 0x08/2: return input_port_read(machine, "P1");/*Buttons+Handle 1p*/
+		case 0x06/2: return input_port_read(space->machine, "P2");/*Buttons+Handle 2p*/
+		case 0x08/2: return input_port_read(space->machine, "P1");/*Buttons+Handle 1p*/
 		case 0x0a/2: return 0xffff;
 		case 0x0c/2: return 0xffff;
 		case 0x0e/2: return 0xffff;
@@ -124,7 +124,7 @@ static READ16_HANDLER( backup_ram_r )
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
             unemulated tmp68301 feature?*/
-	if(cpu_get_previouspc(machine->activecpu) == 0x02c08e)
+	if(cpu_get_previouspc(space->cpu) == 0x02c08e)
 		return 0xffff;
 	else
 		return backup_ram[offset];
@@ -135,7 +135,7 @@ static READ16_HANDLER( backup_ram_dx_r )
 {
 	/*TODO: understand the format & cmds of the backup-ram,maybe it's an
             unemulated tmp68301 feature?*/
-	if(cpu_get_previouspc(machine->activecpu) == 0x02f046)
+	if(cpu_get_previouspc(space->cpu) == 0x02f046)
 		return 0xffff;
 	else
 		return backup_ram[offset];

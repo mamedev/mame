@@ -140,19 +140,19 @@ static READ16_HANDLER( dassault_control_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(machine, "P1_P2");
+			return input_port_read(space->machine, "P1_P2");
 
 		case 2: /* Player 3 & Player 4 joysticks & fire buttons */
-			return input_port_read(machine, "P3_P4");
+			return input_port_read(space->machine, "P3_P4");
 
 		case 4: /* Dip 1 (stored at 0x3f8035) */
-			return input_port_read(machine, "DSW1");
+			return input_port_read(space->machine, "DSW1");
 
 		case 6: /* Dip 2 (stored at 0x3f8034) */
-			return input_port_read(machine, "DSW2");
+			return input_port_read(space->machine, "DSW2");
 
 		case 8: /* VBL, Credits */
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 	}
 
 	return 0xffff;
@@ -167,21 +167,21 @@ static WRITE16_HANDLER( dassault_control_w )
 
 static READ16_HANDLER( dassault_sub_control_r )
 {
-	return input_port_read(machine, "VBLANK1");
+	return input_port_read(space->machine, "VBLANK1");
 }
 
 static WRITE16_HANDLER( dassault_sound_w )
 {
-	soundlatch_w(machine,0,data&0xff);
-	cpu_set_input_line(machine->cpu[2],0,HOLD_LINE); /* IRQ1 */
+	soundlatch_w(space,0,data&0xff);
+	cpu_set_input_line(space->machine->cpu[2],0,HOLD_LINE); /* IRQ1 */
 }
 
 /* The CPU-CPU irq controller is overlaid onto the end of the shared memory */
 static READ16_HANDLER( dassault_irq_r )
 {
 	switch (offset) {
-		case 0: cpu_set_input_line(machine->cpu[0], 5, CLEAR_LINE); break;
-		case 1: cpu_set_input_line(machine->cpu[1], 6, CLEAR_LINE); break;
+		case 0: cpu_set_input_line(space->machine->cpu[0], 5, CLEAR_LINE); break;
+		case 1: cpu_set_input_line(space->machine->cpu[1], 6, CLEAR_LINE); break;
 	}
 	return shared_ram[(0xffc/2)+offset]; /* The values probably don't matter */
 }
@@ -189,8 +189,8 @@ static READ16_HANDLER( dassault_irq_r )
 static WRITE16_HANDLER( dassault_irq_w )
 {
 	switch (offset) {
-		case 0: cpu_set_input_line(machine->cpu[0], 5, ASSERT_LINE); break;
-		case 1: cpu_set_input_line(machine->cpu[1], 6, ASSERT_LINE); break;
+		case 0: cpu_set_input_line(space->machine->cpu[0], 5, ASSERT_LINE); break;
+		case 1: cpu_set_input_line(space->machine->cpu[1], 6, ASSERT_LINE); break;
 	}
 
 	COMBINE_DATA(&shared_ram[(0xffc/2)+offset]); /* The values probably don't matter */
@@ -811,8 +811,8 @@ static READ16_HANDLER( dassault_main_skip )
 {
 	int ret=dassault_ram[0];
 
-	if (cpu_get_previouspc(machine->activecpu)==0x1170 && ret&0x8000)
-		cpu_spinuntil_int(machine->activecpu);
+	if (cpu_get_previouspc(space->cpu)==0x1170 && ret&0x8000)
+		cpu_spinuntil_int(space->cpu);
 
 	return ret;
 }
@@ -821,8 +821,8 @@ static READ16_HANDLER( thndzone_main_skip )
 {
 	int ret=dassault_ram[0];
 
-	if (cpu_get_pc(machine->activecpu)==0x114c && ret&0x8000)
-		cpu_spinuntil_int(machine->activecpu);
+	if (cpu_get_pc(space->cpu)==0x114c && ret&0x8000)
+		cpu_spinuntil_int(space->cpu);
 
 	return ret;
 }

@@ -44,7 +44,7 @@ static READ8_HANDLER( bankedram_r )
 static WRITE8_HANDLER( bankedram_w )
 {
 	if (palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	else
 		ram[offset] = data;
 }
@@ -59,7 +59,7 @@ static WRITE8_HANDLER( gbusters_1f98_w )
 
 	/* other bits unused/unknown */
 	if (data & 0xfe){
-		//logerror("%04x: (1f98) write %02x\n",cpu_get_pc(machine->activecpu), data);
+		//logerror("%04x: (1f98) write %02x\n",cpu_get_pc(space->cpu), data);
 		//popmessage("$1f98 = %02x", data);
 	}
 }
@@ -86,13 +86,13 @@ static WRITE8_HANDLER( gbusters_coin_counter_w )
 		sprintf(baf,"ccnt = %02x", data);
 		popmessage(baf);
 #endif
-		logerror("%04x: (ccount) write %02x\n",cpu_get_pc(machine->activecpu), data);
+		logerror("%04x: (ccount) write %02x\n",cpu_get_pc(space->cpu), data);
 	}
 }
 
 static WRITE8_HANDLER( gbusters_unknown_w )
 {
-	logerror("%04x: write %02x to 0x1f9c\n",cpu_get_pc(machine->activecpu), data);
+	logerror("%04x: write %02x to 0x1f9c\n",cpu_get_pc(space->cpu), data);
 
 {
 char baf[40];
@@ -103,7 +103,7 @@ char baf[40];
 
 static WRITE8_HANDLER( gbusters_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( gbusters_snd_bankswitch_w )

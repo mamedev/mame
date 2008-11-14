@@ -136,13 +136,13 @@ static void update_24bitcol(running_machine *machine, int offset)
 WRITE16_HANDLER( dec0_paletteram_rg_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	update_24bitcol(machine, offset);
+	update_24bitcol(space->machine, offset);
 }
 
 WRITE16_HANDLER( dec0_paletteram_b_w )
 {
 	COMBINE_DATA(&paletteram16_2[offset]);
-	update_24bitcol(machine, offset);
+	update_24bitcol(space->machine, offset);
 }
 
 /******************************************************************************/
@@ -610,8 +610,8 @@ WRITE8_HANDLER( dec0_pf3_control_8bit_w )
 	offset&=0xffe;
 	myword=buffer[offset] + (buffer[offset+1]<<8);
 
-	if (offset<0x10) dec0_pf3_control_0_w(machine,offset/2,myword,0xffff);
-	else dec0_pf3_control_1_w(machine,(offset-0x10)/2,myword,0xffff);
+	if (offset<0x10) dec0_pf3_control_0_w(space,offset/2,myword,0xffff);
+	else dec0_pf3_control_1_w(space,(offset-0x10)/2,myword,0xffff);
 }
 
 WRITE8_HANDLER( dec0_pf3_data_8bit_w )

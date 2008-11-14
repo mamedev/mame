@@ -516,23 +516,23 @@ static WRITE8_HANDLER( narc_slave_bank_select_w )
 
 static READ8_HANDLER( narc_command_r )
 {
-	cpu_set_input_line(machine->cpu[sound_cpunum], M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[sound_cpunum], M6809_IRQ_LINE, CLEAR_LINE);
 	williams_sound_int_state = 0;
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 
 static WRITE8_HANDLER( narc_command2_w )
 {
-	soundlatch2_w(machine, 0, data & 0xff);
-	cpu_set_input_line(machine->cpu[soundalt_cpunum], M6809_FIRQ_LINE, ASSERT_LINE);
+	soundlatch2_w(space, 0, data & 0xff);
+	cpu_set_input_line(space->machine->cpu[soundalt_cpunum], M6809_FIRQ_LINE, ASSERT_LINE);
 }
 
 
 static READ8_HANDLER( narc_command2_r )
 {
-	cpu_set_input_line(machine->cpu[soundalt_cpunum], M6809_FIRQ_LINE, CLEAR_LINE);
-	return soundlatch2_r(machine, 0);
+	cpu_set_input_line(space->machine->cpu[soundalt_cpunum], M6809_FIRQ_LINE, CLEAR_LINE);
+	return soundlatch2_r(space, 0);
 }
 
 
@@ -638,12 +638,12 @@ static TIMER_CALLBACK( clear_irq_state )
 
 static READ8_HANDLER( adpcm_command_r )
 {
-	cpu_set_input_line(machine->cpu[sound_cpunum], M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[sound_cpunum], M6809_IRQ_LINE, CLEAR_LINE);
 
 	/* don't clear the external IRQ state for a short while; this allows the
        self-tests to pass */
 	timer_set(ATTOTIME_IN_USEC(10), NULL, 0, clear_irq_state);
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 

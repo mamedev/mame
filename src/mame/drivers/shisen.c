@@ -20,18 +20,18 @@ extern VIDEO_UPDATE( sichuan2 );
 
 static READ8_HANDLER( sichuan2_dsw1_r )
 {
-	int ret = input_port_read(machine, "DSW1");
+	int ret = input_port_read(space->machine, "DSW1");
 
 	/* Based on the coin mode fill in the upper bits */
-	if (input_port_read(machine, "DSW2") & 0x04)
+	if (input_port_read(space->machine, "DSW2") & 0x04)
 	{
 		/* Mode 1 */
-		ret	|= (input_port_read(machine, "DSW1") << 4);
+		ret	|= (input_port_read(space->machine, "DSW1") << 4);
 	}
 	else
 	{
 		/* Mode 2 */
-		ret	|= (input_port_read(machine, "DSW1") & 0xf0);
+		ret	|= (input_port_read(space->machine, "DSW1") & 0xf0);
 	}
 
 	return ret;

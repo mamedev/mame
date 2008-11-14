@@ -807,7 +807,7 @@ READ16_HANDLER( neogeo_video_register_r )
 
 	/* accessing the LSB only is not mapped */
 	if (mem_mask == 0x00ff)
-		ret = neogeo_unmapped_r(machine, 0, 0xffff) & 0x00ff;
+		ret = neogeo_unmapped_r(space, 0, 0xffff) & 0x00ff;
 	else
 	{
 		switch (offset)
@@ -816,7 +816,7 @@ READ16_HANDLER( neogeo_video_register_r )
 		case 0x00:
 		case 0x01: ret = get_videoram_data(); break;
 		case 0x02: ret = get_videoram_modulo(); break;
-		case 0x03: ret = get_video_control(machine); break;
+		case 0x03: ret = get_video_control(space->machine); break;
 		}
 	}
 
@@ -838,10 +838,10 @@ WRITE16_HANDLER( neogeo_video_register_w )
 		case 0x00: set_videoram_offset(data); break;
 		case 0x01: set_videoram_data(data); break;
 		case 0x02: set_videoram_modulo(data); break;
-		case 0x03: set_video_control(machine, data); break;
-		case 0x04: neogeo_set_display_counter_msb(machine, data); break;
-		case 0x05: neogeo_set_display_counter_lsb(machine, data); break;
-		case 0x06: neogeo_acknowledge_interrupt(machine, data); break;
+		case 0x03: set_video_control(space->machine, data); break;
+		case 0x04: neogeo_set_display_counter_msb(space->machine, data); break;
+		case 0x05: neogeo_set_display_counter_lsb(space->machine, data); break;
+		case 0x06: neogeo_acknowledge_interrupt(space->machine, data); break;
 		case 0x07: break; /* unknown, see get_video_control */
 		}
 	}

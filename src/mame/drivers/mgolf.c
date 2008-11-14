@@ -137,13 +137,13 @@ static READ8_HANDLER( mgolf_wram_r )
 
 static READ8_HANDLER( mgolf_dial_r )
 {
-	UINT8 val = input_port_read(machine, "41");
+	UINT8 val = input_port_read(space->machine, "41");
 
-	if ((input_port_read(machine, "DIAL") + 0x00) & 0x20)
+	if ((input_port_read(space->machine, "DIAL") + 0x00) & 0x20)
 	{
 		val |= 0x01;
 	}
-	if ((input_port_read(machine, "DIAL") + 0x10) & 0x20)
+	if ((input_port_read(space->machine, "DIAL") + 0x10) & 0x20)
 	{
 		val |= 0x02;
 	}
@@ -156,7 +156,7 @@ static READ8_HANDLER( mgolf_misc_r )
 {
 	double plunger = calc_plunger_pos(); /* see Video Pinball */
 
-	UINT8 val = input_port_read(machine, "61");
+	UINT8 val = input_port_read(space->machine, "61");
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{

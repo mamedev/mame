@@ -317,14 +317,14 @@ static WRITE16_HANDLER( srmp6_input_select_w )
 static READ16_HANDLER( srmp6_inputs_r )
 {
 	if (offset == 0)			// DSW
-		return input_port_read(machine, "DSW");
+		return input_port_read(space->machine, "DSW");
 
 	switch(srmp6_input_select)	// inputs
 	{
-		case 1<<0: return input_port_read(machine, "KEY0");
-		case 1<<1: return input_port_read(machine, "KEY1");
-		case 1<<2: return input_port_read(machine, "KEY2");
-		case 1<<3: return input_port_read(machine, "KEY3");
+		case 1<<0: return input_port_read(space->machine, "KEY0");
+		case 1<<1: return input_port_read(space->machine, "KEY1");
+		case 1<<2: return input_port_read(space->machine, "KEY2");
+		case 1<<3: return input_port_read(space->machine, "KEY3");
 	}
 
 	return 0;
@@ -341,7 +341,7 @@ static WRITE16_HANDLER( video_regs_w )
 		case 0x5e/2: // bank switch, used by ROM check
 			LOG(("%x\n",data));
 
-			memory_set_bankptr(1,(UINT16 *)(memory_region(machine, "nile") + (data & 0x0f)*0x200000));
+			memory_set_bankptr(1,(UINT16 *)(memory_region(space->machine, "nile") + (data & 0x0f)*0x200000));
 			break;
 
 		// set by IT4
@@ -350,7 +350,7 @@ static WRITE16_HANDLER( video_regs_w )
 			data = (!data)?0x60:(data == 0x5e)?0x60:data;
 			if(brightness != data) {
 				brightness = data;
-				update_palette(machine);
+				update_palette(space->machine);
 			}
 			break;
 
@@ -365,7 +365,7 @@ static WRITE16_HANDLER( video_regs_w )
 		case 0x56/2: // written 8,9,8,9 successively
 
 		default:
-			logerror("video_regs_w (PC=%06X): %04x = %04x & %04x\n", cpu_get_previouspc(machine->activecpu), offset*2, data, mem_mask);
+			logerror("video_regs_w (PC=%06X): %04x = %04x & %04x\n", cpu_get_previouspc(space->cpu), offset*2, data, mem_mask);
 			break;
 	}
 	COMBINE_DATA(&video_regs[offset]);
@@ -373,7 +373,7 @@ static WRITE16_HANDLER( video_regs_w )
 
 static READ16_HANDLER( video_regs_r )
 {
-	logerror("video_regs_r (PC=%06X): %04x\n", cpu_get_previouspc(machine->activecpu), offset*2);
+	logerror("video_regs_r (PC=%06X): %04x\n", cpu_get_previouspc(space->cpu), offset*2);
 	return video_regs[offset];
 }
 
@@ -424,7 +424,7 @@ static WRITE16_HANDLER(srmp6_dma_w)
 	COMBINE_DATA(&dmaram[offset]);
 	if(offset==13 && dmaram[offset]==0x40)
 	{
-		const UINT8 *rom = memory_region(machine, "nile");
+		const UINT8 *rom = memory_region(space->machine, "nile");
 		UINT32 srctab=2*((((UINT32)dmaram[5])<<16)|dmaram[4]);
 		UINT32 srcdata=2*((((UINT32)dmaram[11])<<16)|dmaram[10]);
 		UINT32 len=4*(((((UINT32)dmaram[7]&3)<<16)|dmaram[6])+1); //??? WRONG!
@@ -505,7 +505,7 @@ static WRITE16_HANDLER(tileram_w)
 	if (offset >= 0xfff00/2 && offset <= 0xfff1a/2 )
 	{
 		offset &=0x1f;
-		srmp6_dma_w(machine,offset,data,mem_mask);
+		srmp6_dma_w(space,offset,data,mem_mask);
 	}
 }
 
@@ -514,7 +514,7 @@ static WRITE16_HANDLER(paletteram_w)
 	INT8 r, g, b;
 	int brg = brightness - 0x60;
 
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset, data, mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 
 	if(brg)
 	{
@@ -539,7 +539,7 @@ static WRITE16_HANDLER(paletteram_w)
 			if(b > 0x1F) b = 0x1F;
 		}
 
-		palette_set_color(machine, offset, MAKE_RGB(r << 3, g << 3, b << 3));
+		palette_set_color(space->machine, offset, MAKE_RGB(r << 3, g << 3, b << 3));
 	}
 }
 

@@ -295,7 +295,7 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 *rom = memory_region(machine, "oki");
+		UINT8 *rom = memory_region(space->machine, "oki");
 		memcpy(&rom[0x30000],&rom[0x40000 + ((data >> 8) & 0x0f) * 0x10000],0x10000);
 	}
 }
@@ -309,7 +309,7 @@ static WRITE16_HANDLER( galsnew_6295_bankswitch_w )
 static WRITE16_HANDLER( galsnew_paletteram_w )
 {
 	data = COMBINE_DATA(&paletteram16[offset]);
-	palette_set_color_rgb(machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
+	palette_set_color_rgb(space->machine,offset,pal5bit(data >> 6),pal5bit(data >> 11),pal5bit(data >> 1));
 }
 
 static UINT16 vram_0_bank_num = 0, vram_1_bank_num = 0;
@@ -323,7 +323,7 @@ static WRITE16_HANDLER(galsnew_vram_0_bank_w)
 		{
 			if(kaneko16_vram_0[i])
 			{
-				kaneko16_vram_0_w(machine, i+1, data << 8, 0xFF00);
+				kaneko16_vram_0_w(space, i+1, data << 8, 0xFF00);
 			}
 		}
 		vram_0_bank_num = data;
@@ -339,7 +339,7 @@ static WRITE16_HANDLER(galsnew_vram_1_bank_w)
 		{
 			if(kaneko16_vram_1[i])
 			{
-				kaneko16_vram_1_w(machine, i+1, data << 8, 0xFF00);
+				kaneko16_vram_1_w(space, i+1, data << 8, 0xFF00);
 			}
 		}
 		vram_1_bank_num = data;

@@ -237,13 +237,13 @@ static void megadriv_z80_bank_w(UINT16 data)
 
 static WRITE16_HANDLER( megadriv_68k_z80_bank_write )
 {
-	//logerror("%06x: 68k writing bit to bank register %01x\n", cpu_get_pc(machine->activecpu),data&0x01);
+	//logerror("%06x: 68k writing bit to bank register %01x\n", cpu_get_pc(space->cpu),data&0x01);
 	megadriv_z80_bank_w(data&0x01);
 }
 
 static WRITE8_HANDLER(megadriv_z80_z80_bank_w)
 {
-	//logerror("%04x: z80 writing bit to bank register %01x\n", cpu_get_pc(machine->activecpu),data&0x01);
+	//logerror("%04x: z80 writing bit to bank register %01x\n", cpu_get_pc(space->cpu),data&0x01);
 	megadriv_z80_bank_w(data&0x01);
 }
 
@@ -984,13 +984,13 @@ WRITE16_HANDLER( megadriv_vdp_w )
 				data = (data&0xff00) | data>>8;
 			//  mame_printf_debug("8-bit write VDP data port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
 			}
-			megadriv_vdp_data_port_w(machine, data);
+			megadriv_vdp_data_port_w(space, data);
 			break;
 
 		case 0x04:
 		case 0x06:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit write VDP control port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
-			megadriv_vdp_ctrl_port_w(machine, data);
+			megadriv_vdp_ctrl_port_w(space, data);
 			break;
 
 		case 0x08:
@@ -1004,8 +1004,8 @@ WRITE16_HANDLER( megadriv_vdp_w )
 		case 0x12:
 		case 0x14:
 		case 0x16:
-			if (ACCESSING_BITS_0_7) sn76496_0_w(machine, 0, data & 0xff);
-			//if (ACCESSING_BITS_8_15) sn76496_0_w(machine, 0, (data >>8) & 0xff);
+			if (ACCESSING_BITS_0_7) sn76496_0_w(space, 0, data & 0xff);
+			//if (ACCESSING_BITS_8_15) sn76496_0_w(space, 0, (data >>8) & 0xff);
 			break;
 
 		default:
@@ -1373,15 +1373,15 @@ READ16_HANDLER( megadriv_vdp_r )
 		case 0x00:
 		case 0x02:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read data port access, offset %04x mem_mask %04x\n",offset,mem_mask);
-			retvalue = megadriv_vdp_data_port_r(machine);
+			retvalue = megadriv_vdp_data_port_r(space);
 			break;
 
 		case 0x04:
 		case 0x06:
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read control port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_vdp_ctrl_port_r();
-		//  retvalue = mame_rand(machine);
-		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",cpu_get_pc(machine->activecpu),genesis_scanline_counter, get_hposition(),retvalue);
+		//  retvalue = mame_rand(space->machine);
+		//  mame_printf_debug("%06x: Read Control Port at scanline %d hpos %d (return %04x)\n",cpu_get_pc(space->cpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
 		case 0x08:
@@ -1390,8 +1390,8 @@ READ16_HANDLER( megadriv_vdp_r )
 		case 0x0e:
 		//  if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read HV counter port access, offset %04x mem_mask %04x\n",offset,mem_mask);
 			retvalue = megadriv_read_hv_counters();
-		//  retvalue = mame_rand(machine);
-		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",cpu_get_pc(machine->activecpu),genesis_scanline_counter, get_hposition(),retvalue);
+		//  retvalue = mame_rand(space->machine);
+		//  mame_printf_debug("%06x: Read HV counters at scanline %d hpos %d (return %04x)\n",cpu_get_pc(space->cpu),genesis_scanline_counter, get_hposition(),retvalue);
 			break;
 
 		case 0x10:
@@ -1413,18 +1413,18 @@ static READ16_HANDLER( megadriv_68k_YM2612_read)
 		switch (offset)
 		{
 			case 0:
-				if (ACCESSING_BITS_8_15)	 return ym2612_status_port_0_a_r(machine, 0) << 8;
-				else 				 return ym2612_status_port_0_a_r(machine, 0);
+				if (ACCESSING_BITS_8_15)	 return ym2612_status_port_0_a_r(space, 0) << 8;
+				else 				 return ym2612_status_port_0_a_r(space, 0);
 				break;
 			case 1:
-				if (ACCESSING_BITS_8_15)	return ym2612_status_port_0_a_r(machine, 0) << 8;
-				else 				return ym2612_status_port_0_a_r(machine, 0);
+				if (ACCESSING_BITS_8_15)	return ym2612_status_port_0_a_r(space, 0) << 8;
+				else 				return ym2612_status_port_0_a_r(space, 0);
 				break;
 		}
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access YM2612 (read) without bus\n", cpu_get_pc(machine->activecpu));
+		logerror("%06x: 68000 attempting to access YM2612 (read) without bus\n", cpu_get_pc(space->cpu));
 		return 0;
 	}
 
@@ -1441,18 +1441,18 @@ static WRITE16_HANDLER( megadriv_68k_YM2612_write)
 		switch (offset)
 		{
 			case 0:
-				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_a_w	(machine, 0,	(data >> 8) & 0xff);
-				else 				ym2612_data_port_0_a_w		(machine, 0,	(data >> 0) & 0xff);
+				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_a_w	(space->machine, 0,	(data >> 8) & 0xff);
+				else 				ym2612_data_port_0_a_w		(space->machine, 0,	(data >> 0) & 0xff);
 				break;
 			case 1:
-				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_b_w	(machine, 0,	(data >> 8) & 0xff);
-				else 				ym2612_data_port_0_b_w		(machine, 0,	(data >> 0) & 0xff);
+				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_b_w	(space->machine, 0,	(data >> 8) & 0xff);
+				else 				ym2612_data_port_0_b_w		(space->machine, 0,	(data >> 0) & 0xff);
 				break;
 		}
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access YM2612 (write) without bus\n", cpu_get_pc(machine->activecpu));
+		logerror("%06x: 68000 attempting to access YM2612 (write) without bus\n", cpu_get_pc(space->cpu));
 	}
 }
 
@@ -1460,10 +1460,10 @@ static READ8_HANDLER( megadriv_z80_YM2612_read )
 {
 	switch (offset)
 	{
-		case 0: return ym2612_status_port_0_a_r(machine,0);
-		case 1: return ym2612_status_port_0_a_r(machine,0);
-		case 2: return ym2612_status_port_0_a_r(machine,0);
-		case 3: return ym2612_status_port_0_a_r(machine,0);
+		case 0: return ym2612_status_port_0_a_r(space,0);
+		case 1: return ym2612_status_port_0_a_r(space,0);
+		case 2: return ym2612_status_port_0_a_r(space,0);
+		case 3: return ym2612_status_port_0_a_r(space,0);
 
 	}
 
@@ -1475,10 +1475,10 @@ static WRITE8_HANDLER( megadriv_z80_YM2612_write )
 	//mame_printf_debug("megadriv_z80_YM2612_write %02x %02x\n",offset,data);
 	switch (offset)
 	{
-		case 0: ym2612_control_port_0_a_w(machine, 0, data); break;
-		case 1: ym2612_data_port_0_a_w(machine, 0, data); break;
-		case 2: ym2612_control_port_0_b_w(machine, 0, data); break;
-		case 3: ym2612_data_port_0_b_w(machine, 0, data); break;
+		case 0: ym2612_control_port_0_a_w(space, 0, data); break;
+		case 1: ym2612_data_port_0_a_w(space, 0, data); break;
+		case 2: ym2612_control_port_0_b_w(space, 0, data); break;
+		case 3: ym2612_data_port_0_b_w(space, 0, data); break;
 	}
 }
 
@@ -2035,11 +2035,11 @@ static READ16_HANDLER( megadriv_68k_io_read )
           D0 : Bit 0 of version number
       */
 
-	//return (mame_rand(machine)&0x0f0f)|0xf0f0;//0x0000;
+	//return (mame_rand(space->machine)&0x0f0f)|0xf0f0;//0x0000;
 	switch (offset)
 	{
 		case 0:
-			logerror("%06x read version register\n", cpu_get_pc(machine->activecpu));
+			logerror("%06x read version register\n", cpu_get_pc(space->cpu));
 			retdata = megadrive_region_export<<7 | // Export
 			          megadrive_region_pal<<6 | // NTSC
 			          0x20 | // No Sega CD
@@ -2245,8 +2245,8 @@ static READ16_HANDLER( megadriv_68k_read_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", cpu_get_pc(machine->activecpu));
-		return mame_rand(machine);
+		logerror("%06x: 68000 attempting to access Z80 (read) address space without bus\n", cpu_get_pc(space->cpu));
+		return mame_rand(space->machine);
 	}
 }
 
@@ -2272,7 +2272,7 @@ static WRITE16_HANDLER( megadriv_68k_write_z80_ram )
 	}
 	else
 	{
-		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", cpu_get_pc(machine->activecpu));
+		logerror("%06x: 68000 attempting to access Z80 (write) address space without bus\n", cpu_get_pc(space->cpu));
 	}
 }
 
@@ -2288,7 +2288,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
        the value is never zero.  Time Killers is the most fussy, and doesn't like the
        read_next_instruction function from system16, so I just return a random value
        in the unused bits */
-	UINT16 nextvalue = mame_rand(machine);//read_next_instruction()&0xff00;
+	UINT16 nextvalue = mame_rand(space->machine);//read_next_instruction()&0xff00;
 
 
 	/* Check if the 68k has the z80 bus */
@@ -2297,13 +2297,13 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
-		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", cpu_get_pc(machine->activecpu),retvalue, mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (byte MSB access) returning %04x mask %04x\n", cpu_get_pc(space->cpu),retvalue, mem_mask);
 		return retvalue;
 
 	}
 	else if (!ACCESSING_BITS_8_15) // is this valid?
 	{
-		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", cpu_get_pc(machine->activecpu),mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (byte LSB access) %04x\n", cpu_get_pc(space->cpu),mem_mask);
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = 0x0001;
 		else retvalue = 0x0000;
 
@@ -2311,11 +2311,11 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
 	}
 	else
 	{
-		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", cpu_get_pc(machine->activecpu),mem_mask);
+		//logerror("%06x: 68000 check z80 Bus (word access) %04x\n", cpu_get_pc(space->cpu),mem_mask);
 		if (genz80.z80_has_bus || genz80.z80_is_reset) retvalue = nextvalue | 0x0100;
 		else retvalue = (nextvalue & 0xfeff);
 
-	//  mame_printf_debug("%06x: 68000 check z80 Bus (word access) %04x %04x\n", cpu_get_pc(machine->activecpu),mem_mask, retvalue);
+	//  mame_printf_debug("%06x: 68000 check z80 Bus (word access) %04x %04x\n", cpu_get_pc(space->cpu),mem_mask, retvalue);
 		return retvalue;
 	}
 }
@@ -2328,15 +2328,15 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
 
 		}
 	}
@@ -2344,30 +2344,30 @@ static WRITE16_HANDLER( megadriv_68k_req_z80_bus )
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
 		}
 	}
 	else // word access
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 request z80 Bus (word access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus=0;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 return z80 Bus (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_has_bus=1;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_HALT, CLEAR_LINE);
 		}
 	}
 }
@@ -2378,15 +2378,15 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte MSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 		}
 	}
@@ -2394,15 +2394,15 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0001)
 		{
-			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, CLEAR_LINE);
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 
 		}
@@ -2411,15 +2411,15 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	{
 		if (data & 0x0100)
 		{
-			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 clear z80 reset (word access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset=0;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, CLEAR_LINE );
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, CLEAR_LINE );
 		}
 		else
 		{
-			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(machine->activecpu),data,mem_mask);
+			//logerror("%06x: 68000 start z80 reset (byte LSB access) %04x %04x\n", cpu_get_pc(space->cpu),data,mem_mask);
 			genz80.z80_is_reset=1;
-			cpu_set_input_line(machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[genz80.z80_cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 			sndti_reset(SOUND_YM2612, 0);
 		}
 	}
@@ -2434,7 +2434,7 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 		UINT32 fulladdress;
 		fulladdress = genz80.z80_bank_addr + offset;
 
-		return memory_region(machine, "main")[fulladdress^1]; // ^1? better..
+		return memory_region(space->machine, "main")[fulladdress^1]; // ^1? better..
 
 
 	}
@@ -2447,7 +2447,7 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 				UINT32 fulladdress;
 				fulladdress = (genz80.z80_bank_addr + offset)&0x3ffff;
 
-				return memory_region(machine, "gamecart")[fulladdress^1]; // ^1? better..
+				return memory_region(space->machine, "gamecart")[fulladdress^1]; // ^1? better..
 
 
 			}
@@ -2458,7 +2458,7 @@ static READ8_HANDLER( z80_read_68k_banked_data )
 
 				fulladdress |= (_32x_68k_a15104_reg&0x3)*0x80000;
 
-				return memory_region(machine, "gamecart")[fulladdress^1]; // ^1? better..
+				return memory_region(space->machine, "gamecart")[fulladdress^1]; // ^1? better..
 
 			}
 		}
@@ -2478,7 +2478,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 		case 0x13:
 		case 0x15:
 		case 0x17:
-			sn76496_0_w(machine, 0, data);
+			sn76496_0_w(space, 0, data);
 			break;
 
 		default:
@@ -2509,7 +2509,7 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 	else if (fulladdress == 0xc00011)
 	{
 		/* quite a few early games write here, most of the later ones don't */
-		sn76496_0_w(machine, 0, data);
+		sn76496_0_w(space, 0, data);
 	}
 	else
 	{
@@ -2522,7 +2522,7 @@ static WRITE8_HANDLER( z80_write_68k_banked_data )
 static READ8_HANDLER( megadriv_z80_vdp_read )
 {
 	mame_printf_debug("megadriv_z80_vdp_read %02x\n",offset);
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static READ8_HANDLER( megadriv_z80_unmapped_read )
@@ -2734,33 +2734,33 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 
 		if (data & 0x02)
 		{
-			cpu_set_input_line(machine->cpu[_32x_master_cpu_number], INPUT_LINE_RESET, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], INPUT_LINE_RESET, CLEAR_LINE);
 		}
 
 		if (data & 0x01)
 		{
 			_32x_adapter_enabled = 1;
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
-			memory_set_bankptr( 11, memory_region(machine, "gamecart") );
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
+			memory_set_bankptr( 11, memory_region(space->machine, "gamecart") );
 
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
-			memory_set_bankptr( 12, memory_region(machine, "gamecart") );
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
+			memory_set_bankptr( 12, memory_region(space->machine, "gamecart") );
 
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
-			memory_set_bankptr( 10, memory_region(machine, "32x_68k_bios") );
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_set_bankptr( 10, memory_region(space->machine, "32x_68k_bios") );
 
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_a15180_r, _32x_68k_a15180_w); // mode control regs
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15182, 0x0a15183, 0, 0, _32x_68k_a15182_r, _32x_68k_a15182_w); // screen shift
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15184, 0x0a15185, 0, 0, _32x_68k_a15184_r, _32x_68k_a15184_w); // autofill length reg
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15186, 0x0a15187, 0, 0, _32x_68k_a15186_r, _32x_68k_a15186_w); // autofill address reg
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15188, 0x0a15189, 0, 0, _32x_68k_a15188_r, _32x_68k_a15188_w); // autofill data reg / start fill
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_a1518a_r, _32x_68k_a1518a_w); // framebuffer control regs
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_a15180_r, _32x_68k_a15180_w); // mode control regs
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15182, 0x0a15183, 0, 0, _32x_68k_a15182_r, _32x_68k_a15182_w); // screen shift
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15184, 0x0a15185, 0, 0, _32x_68k_a15184_r, _32x_68k_a15184_w); // autofill length reg
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15186, 0x0a15187, 0, 0, _32x_68k_a15186_r, _32x_68k_a15186_w); // autofill address reg
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15188, 0x0a15189, 0, 0, _32x_68k_a15188_r, _32x_68k_a15188_w); // autofill data reg / start fill
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_a1518a_r, _32x_68k_a1518a_w); // framebuffer control regs
 
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
 
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0860000, 0x087ffff, 0, 0, _32x_68k_dram_overwrite_r, _32x_68k_dram_overwrite_w); // access to 'display ram' (framebuffer)
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0860000, 0x087ffff, 0, 0, _32x_68k_dram_overwrite_r, _32x_68k_dram_overwrite_w); // access to 'display ram' (framebuffer)
 
 
 
@@ -2770,8 +2770,8 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		{
 			_32x_adapter_enabled = 0;
 
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
-			memory_set_bankptr( 10, memory_region(machine, "gamecart") );
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_set_bankptr( 10, memory_region(space->machine, "gamecart") );
 
 
 		}
@@ -2805,12 +2805,12 @@ static WRITE16_HANDLER( _32x_68k_a15102_w )
 
 		if (data&0x1)
 		{
-			if (sh2_master_cmdint_enable) cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (sh2_master_cmdint_enable) cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 		}
 
 		if (data&0x2)
 		{
-			if (sh2_slave_cmdint_enable) cpu_set_input_line(machine->cpu[_32x_slave_cpu_number],SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (sh2_slave_cmdint_enable) cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number],SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 		}
 	}
 }
@@ -2838,7 +2838,7 @@ static WRITE16_HANDLER( _32x_68k_a15104_w )
 		_32x_68k_a15104_reg = (_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	memory_set_bankptr( 12, memory_region(machine, "gamecart")+((_32x_68k_a15104_reg&0x3)*0x100000) );
+	memory_set_bankptr( 12, memory_region(space->machine, "gamecart")+((_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/
@@ -3228,40 +3228,40 @@ static WRITE16_HANDLER( _32x_sh2_common_4002_w )
 // VRES (md reset button interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4014_w ){cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4014_w ){cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 4016
 // VINT (vertical interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4016_w ){cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4016_w ){cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 4018
 // HINT (horizontal interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4018_w ){ cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4018_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4018_w ){ cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4018_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401A
 // HINT (control register interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_401a_w ){ cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_401a_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_401a_w ){ cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_401a_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401C
 // PINT (PWM timer interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_401c_w ){ cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_401c_w ) { cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_401c_w ){ cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_401c_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401E
@@ -3285,8 +3285,8 @@ static WRITE16_HANDLER( _32x_sh2_slave_401e_w )
 // these just map through to the 68k functions
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_commsram16_r ) { return _32x_68k_commsram_r(machine, offset, mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_commsram16_w ) { _32x_68k_commsram_w(machine, offset, data, mem_mask); }
+static READ16_HANDLER( _32x_sh2_commsram16_r ) { return _32x_68k_commsram_r(space, offset, mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_commsram16_w ) { _32x_68k_commsram_w(space, offset, data, mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 4030
@@ -3319,8 +3319,8 @@ static WRITE16_HANDLER( _32x_sh2_commsram16_w ) { _32x_68k_commsram_w(machine, o
 // maps through to 68k at a15180
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_common_4100_r ) { return _32x_68k_a15180_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4100_w ) { _32x_68k_a15180_w(machine,offset,data,mem_mask); }
+static READ16_HANDLER( _32x_sh2_common_4100_r ) { return _32x_68k_a15180_r(space,offset,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_common_4100_w ) { _32x_68k_a15180_w(space,offset,data,mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 4102
@@ -3328,8 +3328,8 @@ static WRITE16_HANDLER( _32x_sh2_common_4100_w ) { _32x_68k_a15180_w(machine,off
 // maps through to 68k at a15182
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_common_4102_r ) { return _32x_68k_a15182_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4102_w ) { _32x_68k_a15182_w(machine,offset,data,mem_mask); }
+static READ16_HANDLER( _32x_sh2_common_4102_r ) { return _32x_68k_a15182_r(space,offset,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_common_4102_w ) { _32x_68k_a15182_w(space,offset,data,mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 4104
@@ -3337,8 +3337,8 @@ static WRITE16_HANDLER( _32x_sh2_common_4102_w ) { _32x_68k_a15182_w(machine,off
 // maps through to 68k at a15184
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_common_4104_r ) { return _32x_68k_a15184_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4104_w ) { _32x_68k_a15184_w(machine,offset,data,mem_mask); }
+static READ16_HANDLER( _32x_sh2_common_4104_r ) { return _32x_68k_a15184_r(space,offset,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_common_4104_w ) { _32x_68k_a15184_w(space,offset,data,mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 4106
@@ -3346,8 +3346,8 @@ static WRITE16_HANDLER( _32x_sh2_common_4104_w ) { _32x_68k_a15184_w(machine,off
 // maps through to 68k at a15186
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_common_4106_r ) { return _32x_68k_a15186_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4106_w ) { _32x_68k_a15186_w(machine,offset,data,mem_mask); }
+static READ16_HANDLER( _32x_sh2_common_4106_r ) { return _32x_68k_a15186_r(space,offset,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_common_4106_w ) { _32x_68k_a15186_w(space,offset,data,mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 4108
@@ -3355,8 +3355,8 @@ static WRITE16_HANDLER( _32x_sh2_common_4106_w ) { _32x_68k_a15186_w(machine,off
 // maps through to 68k at a15188
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_common_4108_r ) { return _32x_68k_a15188_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4108_w ) { _32x_68k_a15188_w(machine,offset,data,mem_mask); }
+static READ16_HANDLER( _32x_sh2_common_4108_r ) { return _32x_68k_a15188_r(space,offset,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_common_4108_w ) { _32x_68k_a15188_w(space,offset,data,mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 410a
@@ -3364,8 +3364,8 @@ static WRITE16_HANDLER( _32x_sh2_common_4108_w ) { _32x_68k_a15188_w(machine,off
 // maps through to 68k at a1518a
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_common_410a_r ) { return _32x_68k_a1518a_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_410a_w ) { _32x_68k_a1518a_w(machine,offset,data,mem_mask); }
+static READ16_HANDLER( _32x_sh2_common_410a_r ) { return _32x_68k_a1518a_r(space,offset,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_common_410a_w ) { _32x_68k_a1518a_w(space,offset,data,mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 4200 - 43ff
@@ -3373,8 +3373,8 @@ static WRITE16_HANDLER( _32x_sh2_common_410a_w ) { _32x_68k_a1518a_w(machine,off
 // maps through to 68k at a15200 - a153ff
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_paletteram16_r ) { return _32x_68k_palette_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_paletteram16_w ) { _32x_68k_palette_w(machine,offset,data,mem_mask); }
+static READ16_HANDLER( _32x_sh2_paletteram16_r ) { return _32x_68k_palette_r(space,offset,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_paletteram16_w ) { _32x_68k_palette_w(space,offset,data,mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 4000000 - 401ffff
@@ -3382,8 +3382,8 @@ static WRITE16_HANDLER( _32x_sh2_paletteram16_w ) { _32x_68k_palette_w(machine,o
 // maps through to 68k at 840000 - 85ffff
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_framebuffer_dram16_r ) { return _32x_68k_dram_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_framebuffer_dram16_w ) { _32x_68k_dram_w(machine,offset,data,mem_mask); }
+static READ16_HANDLER( _32x_sh2_framebuffer_dram16_r ) { return _32x_68k_dram_r(space,offset,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_framebuffer_dram16_w ) { _32x_68k_dram_w(space,offset,data,mem_mask); }
 
 /**********************************************************************************************/
 // SH2 side 4020000 - 403ffff
@@ -3391,8 +3391,8 @@ static WRITE16_HANDLER( _32x_sh2_framebuffer_dram16_w ) { _32x_68k_dram_w(machin
 // maps through to 68k at 860000 - 87ffff
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_r ) { return _32x_68k_dram_overwrite_r(machine,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_w ) { _32x_68k_dram_overwrite_w(machine,offset,data,mem_mask); }
+static READ16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_r ) { return _32x_68k_dram_overwrite_r(space,offset,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_w ) { _32x_68k_dram_overwrite_w(space,offset,data,mem_mask); }
 
 
 
@@ -3410,12 +3410,12 @@ static READ32_HANDLER( _32x_sh2_##NAMEA##_##NAMEB##_r )                         
 	UINT32 retvalue = 0x00000000;                                                   \
 	if (ACCESSING_BITS_16_31)                                                       \
 	{                                                                               \
-		UINT16 ret = _32x_sh2_##NAMEA##_r(machine,0,(mem_mask>>16)&0xffff);         \
+		UINT16 ret = _32x_sh2_##NAMEA##_r(space,0,(mem_mask>>16)&0xffff);         \
 		retvalue |= ret << 16;                                                      \
 	}                                                                               \
 	if (ACCESSING_BITS_0_15)                                                        \
 	{                                                                               \
-		UINT16 ret = _32x_sh2_##NAMEB##_r(machine,0,(mem_mask>>0)&0xffff);          \
+		UINT16 ret = _32x_sh2_##NAMEB##_r(space,0,(mem_mask>>0)&0xffff);          \
 		retvalue |= ret << 0;                                                       \
 	}                                                                               \
                                                                                     \
@@ -3427,11 +3427,11 @@ static WRITE32_HANDLER( _32x_sh2_##NAMEA##_##NAMEB##_w)                         
 {                                                                                       \
 	if (ACCESSING_BITS_16_31)                                                           \
 	{                                                                                   \
-		_32x_sh2_##NAMEA##_w(machine,0,(data>>16)&0xffff,(mem_mask>>16)&0xffff);        \
+		_32x_sh2_##NAMEA##_w(space,0,(data>>16)&0xffff,(mem_mask>>16)&0xffff);        \
 	}                                                                                   \
 	if (ACCESSING_BITS_0_15)                                                            \
 	{                                                                                   \
-		_32x_sh2_##NAMEB##_w(machine,0,(data>>0)&0xffff,(mem_mask>>0)&0xffff);          \
+		_32x_sh2_##NAMEB##_w(space,0,(data>>0)&0xffff,(mem_mask>>0)&0xffff);          \
 	}                                                                                   \
 }                                                                                       \
 
@@ -3443,12 +3443,12 @@ static READ32_HANDLER( _32x_sh2_##NAMEA##_r )                                   
 	UINT32 retvalue = 0x00000000;                                                   \
 	if (ACCESSING_BITS_16_31)                                                       \
 	{                                                                               \
-		UINT16 ret = _32x_sh2_##NAMEA##16_r(machine,offset*2,(mem_mask>>16)&0xffff);  \
+		UINT16 ret = _32x_sh2_##NAMEA##16_r(space,offset*2,(mem_mask>>16)&0xffff);  \
 		retvalue |= ret << 16;                                                      \
 	}                                                                               \
 	if (ACCESSING_BITS_0_15)                                                        \
 	{                                                                               \
-		UINT16 ret = _32x_sh2_##NAMEA##16_r(machine,offset*2+1,(mem_mask>>0)&0xffff); \
+		UINT16 ret = _32x_sh2_##NAMEA##16_r(space,offset*2+1,(mem_mask>>0)&0xffff); \
 		retvalue |= ret << 0;                                                       \
 	}                                                                               \
                                                                                     \
@@ -3460,11 +3460,11 @@ static WRITE32_HANDLER( _32x_sh2_##NAMEA##_w)                                   
 {                                                                                       \
 	if (ACCESSING_BITS_16_31)                                                           \
 	{                                                                                   \
-		_32x_sh2_##NAMEA##16_w(machine,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff); \
+		_32x_sh2_##NAMEA##16_w(space,offset*2,(data>>16)&0xffff,(mem_mask>>16)&0xffff); \
 	}                                                                                   \
 	if (ACCESSING_BITS_0_15)                                                            \
 	{                                                                                   \
-		_32x_sh2_##NAMEA##16_w(machine,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff); \
+		_32x_sh2_##NAMEA##16_w(space,offset*2+1,(data>>0)&0xffff,(mem_mask>>0)&0xffff); \
 	}                                                                                   \
 }                                                                                       \
 
@@ -3715,7 +3715,7 @@ static UINT32 pm_io(running_machine *machine, int reg, int write, UINT32 d)
 
 static READ16_HANDLER( read_PM0 )
 {
-	UINT32 d = pm_io(machine, 0, 0, 0);
+	UINT32 d = pm_io(space->machine, 0, 0, 0);
 	if (d != (UINT32)-1) return d;
 	d = svp.XST2;
 	svp.XST2 &= ~2; // ?
@@ -3724,14 +3724,14 @@ static READ16_HANDLER( read_PM0 )
 
 static WRITE16_HANDLER( write_PM0 )
 {
-	UINT32 r = pm_io(machine, 0, 1, data);
+	UINT32 r = pm_io(space->machine, 0, 1, data);
 	if (r != (UINT32)-1) return;
 	svp.XST2 = data; // ?
 }
 
 static READ16_HANDLER( read_PM1 )
 {
-	UINT32 r = pm_io(machine, 1, 0, 0);
+	UINT32 r = pm_io(space->machine, 1, 0, 0);
 	if (r != (UINT32)-1) return r;
 	logerror("svp: PM1 acces in non PM mode?\n");
 	return 0;
@@ -3739,14 +3739,14 @@ static READ16_HANDLER( read_PM1 )
 
 static WRITE16_HANDLER( write_PM1 )
 {
-	UINT32 r = pm_io(machine, 1, 1, data);
+	UINT32 r = pm_io(space->machine, 1, 1, data);
 	if (r != (UINT32)-1) return;
 	logerror("svp: PM1 acces in non PM mode?\n");
 }
 
 static READ16_HANDLER( read_PM2 )
 {
-	UINT32 r = pm_io(machine, 2, 0, 0);
+	UINT32 r = pm_io(space->machine, 2, 0, 0);
 	if (r != (UINT32)-1) return r;
 	logerror("svp: PM2 acces in non PM mode?\n");
 	return 0;
@@ -3754,14 +3754,14 @@ static READ16_HANDLER( read_PM2 )
 
 static WRITE16_HANDLER( write_PM2 )
 {
-	UINT32 r = pm_io(machine, 2, 1, data);
+	UINT32 r = pm_io(space->machine, 2, 1, data);
 	if (r != (UINT32)-1) return;
 	logerror("svp: PM2 acces in non PM mode?\n");
 }
 
 static READ16_HANDLER( read_XST )
 {
-	UINT32 d = pm_io(machine, 3, 0, 0);
+	UINT32 d = pm_io(space->machine, 3, 0, 0);
 	if (d != (UINT32)-1) return d;
 
 	return svp.XST;
@@ -3769,7 +3769,7 @@ static READ16_HANDLER( read_XST )
 
 static WRITE16_HANDLER( write_XST )
 {
-	UINT32 r = pm_io(machine, 3, 1, data);
+	UINT32 r = pm_io(space->machine, 3, 1, data);
 	if (r != (UINT32)-1) return;
 
 	svp.XST2 |= 1;
@@ -3778,12 +3778,12 @@ static WRITE16_HANDLER( write_XST )
 
 static READ16_HANDLER( read_PM4 )
 {
-	return pm_io(machine, 4, 0, 0);
+	return pm_io(space->machine, 4, 0, 0);
 }
 
 static WRITE16_HANDLER( write_PM4 )
 {
-	pm_io(machine, 4, 1, data);
+	pm_io(space->machine, 4, 1, data);
 }
 
 static READ16_HANDLER( read_PMC )
@@ -3923,7 +3923,7 @@ static UINT8 megadrive_io_read_data_port_svp(int portnum)
 
 static READ16_HANDLER( svp_speedup_r )
 {
-	 cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(100));
+	 cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));
 	return 0x0425;
 }
 

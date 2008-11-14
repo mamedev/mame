@@ -1605,7 +1605,7 @@ static WRITE16_HANDLER( upload_code_to_slave_dsp_w )
 		logerror( "UPLOAD_READY; cmd = 0x%x\n", data );
 		if( data==0 )
 		{
-			HaltSlaveDSP(machine);
+			HaltSlaveDSP(space->machine);
 		}
 		else if( data==1 )
 		{
@@ -1629,7 +1629,7 @@ static WRITE16_HANDLER( upload_code_to_slave_dsp_w )
 		else
 		{
 			logerror( "%08x: master port#7: 0x%04x\n",
-				cpu_get_previouspc(machine->activecpu), data );
+				cpu_get_previouspc(space->cpu), data );
 		}
 		break;
 
@@ -2119,7 +2119,7 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 				if(offs<4 || offs>=8)
 				{
 					mame_printf_debug( "%08x: sys[0x%02x] := 0x%02x\n",
-						cpu_get_previouspc(machine->activecpu),
+						cpu_get_previouspc(space->cpu),
 						offs,
 						dat>>24 );
 				}
@@ -2135,11 +2135,11 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 		{ /* SUBCPU enable for Super System 22 */
 			if (data)
 			{
-				cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			else
 			{
-				cpu_set_input_line(machine->cpu[3],INPUT_LINE_RESET,ASSERT_LINE); /* M37710 MCU */
+				cpu_set_input_line(space->machine->cpu[3],INPUT_LINE_RESET,ASSERT_LINE); /* M37710 MCU */
 			}
 		}
 	}
@@ -2161,19 +2161,19 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 	{
 		if( newReg == 0 )
 		{ /* disable DSPs */
-			cpu_set_input_line(machine->cpu[1],INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
-			cpu_set_input_line(machine->cpu[2],INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
+			cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_RESET,ASSERT_LINE); /* master DSP */
+			cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_RESET,ASSERT_LINE); /* slave DSP */
 			mbEnableDspIrqs = 0;
 		}
 		else if( newReg==1 )
 		{ /*enable dsp and rendering subsystem */
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 			namcos22_enable_slave_simulation();
 			mbEnableDspIrqs = 1;
 		}
 		else if( newReg==0xff )
 		{ /* used to upload game-specific code to master/slave dsps */
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 			mbEnableDspIrqs = 0;
 		}
 	}
@@ -2264,14 +2264,14 @@ static READ32_HANDLER( namcos22_portbit_r )
 }
 static WRITE32_HANDLER( namcos22_portbit_w )
 {
-	unsigned dat50000008 = AnalogAsDigital(machine);
+	unsigned dat50000008 = AnalogAsDigital(space->machine);
 	unsigned dat5000000a = 0xffff;
 	mSys22PortBits = (dat50000008<<16)|dat5000000a;
 }
 
 static READ32_HANDLER( namcos22_dipswitch_r )
 {
-	return input_port_read(machine, "DSW0")<<16;
+	return input_port_read(space->machine, "DSW0")<<16;
 }
 
 static READ32_HANDLER( namcos22_mcuram_r )
@@ -2341,8 +2341,8 @@ static WRITE32_HANDLER( spotram_w )
 
 static READ32_HANDLER( namcos22_gun_r )
 {
-	int xpos = input_port_read_safe(machine, "LIGHTX", 0) * 640 / 0xff;
-	int ypos = input_port_read_safe(machine, "LIGHTY", 0) * 480 / 0xff;
+	int xpos = input_port_read_safe(space->machine, "LIGHTX", 0) * 640 / 0xff;
+	int ypos = input_port_read_safe(space->machine, "LIGHTY", 0) * 480 / 0xff;
 	switch( offset )
 	{
 	case 0: /* 430000 */
@@ -2386,12 +2386,12 @@ static WRITE32_HANDLER( alpinesa_prot_w )
 	}
 #else
 	int i;
-	unsigned sptr = cpu_get_sp(machine->activecpu);
+	unsigned sptr = cpu_get_sp(space->cpu);
 	mAlpineSurferProtData = 0;
 	for(i=0;i<4;i++)
 	{
 		mAlpineSurferProtData<<=8;
-		mAlpineSurferProtData |= cpu_read_byte(machine->cpu[0], sptr+4+i );
+		mAlpineSurferProtData |= cpu_read_byte(space->machine->cpu[0], sptr+4+i );
 	}
 #endif
 } /* alpinesa_prot_w */
@@ -2506,11 +2506,11 @@ static READ8_HANDLER( mcu_port5_r )
 		{
 			if (mFrameCount & 1)
 			{
-				return input_port_read_safe(machine, "MCUP5A", 0xff) | 0x80;
+				return input_port_read_safe(space->machine, "MCUP5A", 0xff) | 0x80;
 			}
 			else
 			{
-				return input_port_read_safe(machine, "MCUP5A", 0xff) & 0x7f;
+				return input_port_read_safe(space->machine, "MCUP5A", 0xff) & 0x7f;
 			}
 		}
 		else
@@ -2529,11 +2529,11 @@ static READ8_HANDLER( mcu_port5_r )
 	{
 		if (p4 & 8)
 		{
-			return input_port_read_safe(machine, "MCUP5A", 0xff);
+			return input_port_read_safe(space->machine, "MCUP5A", 0xff);
 		}
 		else
 		{
-			return input_port_read_safe(machine, "MCUP5B", 0xff);
+			return input_port_read_safe(space->machine, "MCUP5B", 0xff);
 		}
 	}
 }
@@ -2554,7 +2554,7 @@ static WRITE8_HANDLER( mcu_port5_w )
 	// bit 1 = fan
 	// bit 2 = button light
 
-	if (!strcmp(machine->gamedrv->name, "propcycl"))
+	if (!strcmp(space->machine->gamedrv->name, "propcycl"))
 	{
 		output_set_value("fan0", data & 1);
 		set_led_status(0, data & 2);
@@ -2576,9 +2576,9 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 {
 	static UINT16 ddx, ddy;
 
-	ddx = input_port_read(machine, "STICKX")^0xff;
+	ddx = input_port_read(space->machine, "STICKX")^0xff;
 	if (ddx > 0) ddx -= 1;
-	ddy = input_port_read(machine, "STICKY");
+	ddy = input_port_read(space->machine, "STICKY");
 	if (ddy > 0) ddy -= 1;
 
 	ddx <<= 2;
@@ -2595,12 +2595,12 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 			// and timer A3 is configured by the MCU program to cause an interrupt each time
 			// it's clocked.  by counting the number of interrupts in a frame, we can determine
 			// how fast the user is pedaling.
-			if( input_port_read(machine, "JOY") & 0x10 )
+			if( input_port_read(space->machine, "JOY") & 0x10 )
 			{
 				int i;
 				for (i = 0; i < 16; i++)
 				{
-					cpu_set_input_line(machine->cpu[3], M37710_LINE_TIMERA3TICK, PULSE_LINE);
+					cpu_set_input_line(space->machine->cpu[3], M37710_LINE_TIMERA3TICK, PULSE_LINE);
 				}
 			}
 
@@ -2624,12 +2624,12 @@ static READ8_HANDLER( propcycle_mcu_adc_r )
 // 0 H+L = swing, 1 H+L = edge
 static READ8_HANDLER( alpineracer_mcu_adc_r )
 {
-	UINT16 swing = (0xff - input_port_read(machine, "SWING"))<<2;
-	UINT16 edge = (0xff - input_port_read(machine, "EDGE"))<<2;
+	UINT16 swing = (0xff - input_port_read(space->machine, "SWING"))<<2;
+	UINT16 edge = (0xff - input_port_read(space->machine, "EDGE"))<<2;
 
 	// fake out the centering a bit
-	if (input_port_read(machine, "SWING") == 0x80) swing = 0x200;
-	if (input_port_read(machine, "EDGE") == 0x80) edge = 0x200;
+	if (input_port_read(space->machine, "SWING") == 0x80) swing = 0x200;
+	if (input_port_read(space->machine, "EDGE") == 0x80) edge = 0x200;
 
 	switch (offset)
 	{
@@ -2658,7 +2658,7 @@ static READ8_HANDLER( alpineracer_mcu_adc_r )
 static READ8_HANDLER( cybrcycc_mcu_adc_r )
 {
 	UINT16 gas,brake,steer;
-	ReadAnalogDrivingPorts( machine, &gas, &brake, &steer );
+	ReadAnalogDrivingPorts( space->machine, &gas, &brake, &steer );
 
 	gas <<= 2;
 	brake <<= 2;
@@ -2700,9 +2700,9 @@ static READ8_HANDLER( airco22_mcu_adc_r )
 {
 	UINT16 pedal, x, y;
 
-	pedal = input_port_read(machine, "PEDAL")<<2;
-	x = input_port_read(machine, "STICKX")<<2;
-	y = input_port_read(machine, "STICKY")<<2;
+	pedal = input_port_read(space->machine, "PEDAL")<<2;
+	x = input_port_read(space->machine, "STICKX")<<2;
+	y = input_port_read(space->machine, "STICKY")<<2;
 
 
 	switch (offset)
@@ -5055,9 +5055,9 @@ static UINT16 su_82;
 // for MCU BIOS v1.41
 static READ16_HANDLER( mcu141_speedup_r )
 {
-	if ((cpu_get_pc(machine->activecpu) == 0xc12d) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(space->cpu) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int(machine->activecpu);
+		cpu_spinuntil_int(space->cpu);
 	}
 
 	return su_82;
@@ -5071,9 +5071,9 @@ static WRITE16_HANDLER( mcu_speedup_w )
 // for MCU BIOS v1.30
 static READ16_HANDLER( mcu130_speedup_r )
 {
-	if ((cpu_get_pc(machine->activecpu) == 0xc12a) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(space->cpu) == 0xc12a) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int(machine->activecpu);
+		cpu_spinuntil_int(space->cpu);
 	}
 
 	return su_82;
@@ -5082,9 +5082,9 @@ static READ16_HANDLER( mcu130_speedup_r )
 // for NSTX7702 v1.00 (C74)
 static READ16_HANDLER( mcuc74_speedup_r )
 {
-	if (((cpu_get_pc(machine->activecpu) == 0xc0df) || (cpu_get_pc(machine->activecpu) == 0xc101)) && (!(su_82 & 0xff00)))
+	if (((cpu_get_pc(space->cpu) == 0xc0df) || (cpu_get_pc(space->cpu) == 0xc101)) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int(machine->activecpu);
+		cpu_spinuntil_int(space->cpu);
 	}
 
 	return su_82;

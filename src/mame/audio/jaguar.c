@@ -303,7 +303,7 @@ void cojag_sound_reset(void)
 READ16_HANDLER( jaguar_jerry_regs_r )
 {
 	if (offset != JINTCTRL && offset != JINTCTRL+2)
-		logerror("%08X:jerry read register @ F10%03X\n", cpu_get_previouspc(machine->activecpu), offset * 2);
+		logerror("%08X:jerry read register @ F10%03X\n", cpu_get_previouspc(space->cpu), offset * 2);
 
 	switch (offset)
 	{
@@ -328,7 +328,7 @@ WRITE16_HANDLER( jaguar_jerry_regs_w )
 	}
 
 	if (offset != JINTCTRL && offset != JINTCTRL+2 && offset != ASICTRL)
-		logerror("%08X:jerry write register @ F10%03X = %04X\n", cpu_get_previouspc(machine->activecpu), offset * 2, data);
+		logerror("%08X:jerry write register @ F10%03X = %04X\n", cpu_get_previouspc(space->cpu), offset * 2, data);
 }
 
 
@@ -341,13 +341,13 @@ WRITE16_HANDLER( jaguar_jerry_regs_w )
 
 READ32_HANDLER( jaguar_jerry_regs32_r )
 {
-	return read32be_with_16be_handler(jaguar_jerry_regs_r, machine, offset, mem_mask);
+	return read32be_with_16be_handler(jaguar_jerry_regs_r, space->machine, offset, mem_mask);
 }
 
 
 WRITE32_HANDLER( jaguar_jerry_regs32_w )
 {
-	write32be_with_16be_handler(jaguar_jerry_regs_w, machine, offset, data, mem_mask);
+	write32be_with_16be_handler(jaguar_jerry_regs_w, space->machine, offset, data, mem_mask);
 }
 
 
@@ -370,11 +370,11 @@ static WRITE32_HANDLER( dsp_flags_w )
 	if (cpunum_get_active() == 2 && ACCESSING_BITS_8_15 && (data & 0x400))
 	{
 		/* see if we're going back to the spin loop */
-		if (!(data & 0x04000) && cpu_get_reg(machine->activecpu, JAGUAR_R22) != 0)
+		if (!(data & 0x04000) && cpu_get_reg(space->cpu, JAGUAR_R22) != 0)
 		{
-			UINT32 r30 = cpu_get_reg(machine->activecpu, JAGUAR_R30) & 0xffffff;
+			UINT32 r30 = cpu_get_reg(space->cpu, JAGUAR_R30) & 0xffffff;
 			if (r30 >= 0xf1b124 && r30 <= 0xf1b126)
-				jaguar_dsp_suspend(machine);
+				jaguar_dsp_suspend(space->machine);
 		}
 	}
 }
@@ -429,7 +429,7 @@ static TIMER_CALLBACK( serial_callback )
 
 READ32_HANDLER( jaguar_serial_r )
 {
-	logerror("%08X:jaguar_serial_r(%X)\n", cpu_get_previouspc(machine->activecpu), offset);
+	logerror("%08X:jaguar_serial_r(%X)\n", cpu_get_previouspc(space->cpu), offset);
 	return 0;
 }
 
@@ -465,7 +465,7 @@ WRITE32_HANDLER( jaguar_serial_w )
 			break;
 
 		default:
-			logerror("%08X:jaguar_serial_w(%X,%X)\n", cpu_get_previouspc(machine->activecpu), offset, data);
+			logerror("%08X:jaguar_serial_w(%X,%X)\n", cpu_get_previouspc(space->cpu), offset, data);
 			break;
 	}
 }

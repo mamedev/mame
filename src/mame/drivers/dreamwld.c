@@ -228,8 +228,8 @@ static VIDEO_UPDATE( dreamwld )
 static READ32_HANDLER( dreamwld_protdata_r )
 {
 	static int protindex = 0;
-	UINT8 *protdata    = memory_region( machine, "user1" );
-	size_t  protsize = memory_region_length( machine, "user1" );
+	UINT8 *protdata    = memory_region( space->machine, "user1" );
+	size_t  protsize = memory_region_length( space->machine, "user1" );
 	UINT8 dat = protdata[(protindex++)%protsize];
 	return dat<<24;
 }
@@ -244,22 +244,22 @@ static WRITE32_HANDLER( dreamwld_palette_w )
 	color = offset * 2;
 
 	dat = paletteram32[offset] & 0x7fff;
-	palette_set_color_rgb(machine, color + 1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
+	palette_set_color_rgb(space->machine, color + 1, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 
 	dat = (paletteram32[offset] >> 16) & 0x7fff;
-	palette_set_color_rgb(machine, color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
+	palette_set_color_rgb(space->machine, color, pal5bit(dat >> 10), pal5bit(dat >> 5), pal5bit(dat >> 0));
 }
 
 static READ32_HANDLER( dreamwld_6295_0_r )
 {
-	return okim6295_status_0_r(machine, 0)<<24;
+	return okim6295_status_0_r(space, 0)<<24;
 }
 
 static WRITE32_HANDLER( dreamwld_6295_0_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		okim6295_data_0_w(machine, 0, (data>>24) & 0xff);
+		okim6295_data_0_w(space, 0, (data>>24) & 0xff);
 	}
 	else
 	{
@@ -281,7 +281,7 @@ static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		dreamwld_oki_setbank(machine,0,data&0x3);
+		dreamwld_oki_setbank(space->machine,0,data&0x3);
 	}
 	else
 	{
@@ -291,14 +291,14 @@ static WRITE32_HANDLER( dreamwld_6295_0_bank_w )
 
 static READ32_HANDLER( dreamwld_6295_1_r )
 {
-	return okim6295_status_1_r(machine, 0)<<24;
+	return okim6295_status_1_r(space, 0)<<24;
 }
 
 static WRITE32_HANDLER( dreamwld_6295_1_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		okim6295_data_1_w(machine, 0, (data>>24) & 0xff);
+		okim6295_data_1_w(space, 0, (data>>24) & 0xff);
 	}
 	else
 	{
@@ -310,7 +310,7 @@ static WRITE32_HANDLER( dreamwld_6295_1_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		dreamwld_oki_setbank(machine,1,data&0x3);
+		dreamwld_oki_setbank(space->machine,1,data&0x3);
 	}
 	else
 	{

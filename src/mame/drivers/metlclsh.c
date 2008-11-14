@@ -64,12 +64,12 @@ static WRITE8_HANDLER( sharedram_w )	{ sharedram[offset] = data; }
 
 static WRITE8_HANDLER( metlclsh_cause_irq )
 {
-	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi )
 {
-	cpu_set_input_line(machine->cpu[0],INPUT_LINE_NMI,CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0],INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 static ADDRESS_MAP_START( metlclsh_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -115,17 +115,17 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( metlclsh_cause_nmi2 )
 {
-	cpu_set_input_line(machine->cpu[0],INPUT_LINE_NMI,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[0],INPUT_LINE_NMI,ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_irq2 )
 {
-	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_ack_nmi2 )
 {
-	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( metlclsh_flipscreen_w )

@@ -43,7 +43,7 @@ static WRITE16_HANDLER( ohmygod_ctrl_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = memory_region(machine, "oki");
+		UINT8 *rom = memory_region(space->machine, "oki");
 
 		/* ADPCM bank switch */
 		if (sndbank != ((data >> adpcm_bank_shift) & 0x0f))

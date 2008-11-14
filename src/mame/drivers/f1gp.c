@@ -40,7 +40,7 @@ static WRITE16_HANDLER( sharedram_w )
 
 static READ16_HANDLER( extrarom_r )
 {
-	UINT8 *rom = memory_region(machine, "user1");
+	UINT8 *rom = memory_region(space->machine, "user1");
 
 	offset *= 2;
 
@@ -49,7 +49,7 @@ static READ16_HANDLER( extrarom_r )
 
 static READ16_HANDLER( extrarom2_r )
 {
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT8 *rom = memory_region(space->machine, "user2");
 
 	offset *= 2;
 
@@ -58,7 +58,7 @@ static READ16_HANDLER( extrarom2_r )
 
 static WRITE8_HANDLER( f1gp_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, "audio") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
 
 	memory_set_bankptr(1,rom + (data & 0x01) * 0x8000);
 }
@@ -71,8 +71,8 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		pending_command = 1;
-		soundlatch_w(machine,offset,data & 0xff);
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space,offset,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -212,8 +212,8 @@ static WRITE16_HANDLER( f1gpb_misc_w )
     if(old_bank != new_bank && new_bank < 5)
     {
         // oki banking
-        UINT8 *src = memory_region(machine, "oki") + 0x40000 + 0x10000 * new_bank;
-        UINT8 *dst = memory_region(machine, "oki") + 0x30000;
+        UINT8 *src = memory_region(space->machine, "oki") + 0x40000 + 0x10000 * new_bank;
+        UINT8 *dst = memory_region(space->machine, "oki") + 0x30000;
         memcpy(dst, src, 0x10000);
 
         old_bank = new_bank;

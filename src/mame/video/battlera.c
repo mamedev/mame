@@ -54,7 +54,7 @@ WRITE8_HANDLER( battlera_palette_w )
 	if (offset%2) offset-=1;
 
 	pal_word=paletteram[offset] | (paletteram[offset+1]<<8);
-	palette_set_color_rgb(machine, offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
+	palette_set_color_rgb(space->machine, offset/2, pal3bit(pal_word >> 3), pal3bit(pal_word >> 6), pal3bit(pal_word >> 0));
 }
 
 /******************************************************************************/
@@ -167,7 +167,7 @@ WRITE8_HANDLER( HuC6270_data_w )
 			case 16:
 			case 17:
 			case 18:
-				logerror("%04x: dma 2 %02x\n",cpu_get_pc(machine->activecpu),data);
+				logerror("%04x: dma 2 %02x\n",cpu_get_pc(space->cpu),data);
 				break;
 
 			case 19: /* SATB */
@@ -229,7 +229,7 @@ WRITE8_HANDLER( HuC6270_data_w )
 			case 16:
 			case 17:
 			case 18:
-				logerror("%04x: dma 2 %02x\n",cpu_get_pc(machine->activecpu),data);
+				logerror("%04x: dma 2 %02x\n",cpu_get_pc(space->cpu),data);
 				break;
 
 			case 19: /* SATB - Sprites */
@@ -238,7 +238,7 @@ WRITE8_HANDLER( HuC6270_data_w )
 			}
 			break;
 	}
-	logerror("%04x: unknown write to  VDC_register %02x (%02x) at %02x\n",cpu_get_pc(machine->activecpu),VDC_register,data,offset);
+	logerror("%04x: unknown write to  VDC_register %02x (%02x) at %02x\n",cpu_get_pc(space->cpu),VDC_register,data,offset);
 }
 
 /******************************************************************************/

@@ -565,20 +565,20 @@ static WRITE32_HANDLER( hng64_videoram_w )
 
 static READ32_HANDLER( hng64_random_read )
 {
-	return mame_rand(machine)&0xffffffff;
+	return mame_rand(space->machine)&0xffffffff;
 }
 
 
 static READ32_HANDLER( hng64_com_r )
 {
-	logerror("com read  (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(machine->activecpu), (offset*4)+0xc0000000, mem_mask, hng64_com_ram[offset]);
+	logerror("com read  (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, hng64_com_ram[offset]);
 	return hng64_com_ram[offset] ;
 }
 
 
 static WRITE32_HANDLER( hng64_com_w )
 {
-	logerror("com write (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(machine->activecpu), (offset*4)+0xc0000000, mem_mask, data);
+	logerror("com write (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, data);
 	COMBINE_DATA(&hng64_com_ram[offset]);
 }
 
@@ -588,7 +588,7 @@ static UINT32 hng64_com_shared_b;
 
 static WRITE32_HANDLER( hng64_com_share_w )
 {
-	logerror("commw  (PC=%08x): %08x %08x %08x\n", cpu_get_pc(machine->activecpu), data, (offset*4)+0xc0001000, mem_mask);
+	logerror("commw  (PC=%08x): %08x %08x %08x\n", cpu_get_pc(space->cpu), data, (offset*4)+0xc0001000, mem_mask);
 
 	if (offset==0x0) COMBINE_DATA(&hng64_com_shared_a);
 	if (offset==0x1) COMBINE_DATA(&hng64_com_shared_b);
@@ -596,7 +596,7 @@ static WRITE32_HANDLER( hng64_com_share_w )
 
 static READ32_HANDLER( hng64_com_share_r )
 {
-	logerror("commr  (PC=%08x): %08x %08x\n", cpu_get_pc(machine->activecpu), (offset*4)+0xc0001000, mem_mask);
+	logerror("commr  (PC=%08x): %08x %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0001000, mem_mask);
 
 //  if(offset==0x0) return hng64_com_shared_a;
 //  if(offset==0x1) return hng64_com_shared_b;
@@ -620,25 +620,25 @@ static WRITE32_HANDLER( hng64_pal_w )
 	a = ((paletteram32[offset] & 0xff000000) >>24);
 
 	// a sure ain't alpha.
-	// alpha_set_level(mame_rand(machine)) ;
+	// alpha_set_level(mame_rand(space->machine)) ;
 	// mame_printf_debug("Alpha : %d %d %d %d\n", a, b, g, r) ;
 
 	//if (a != 0)
 	//  popmessage("Alpha is not zero!") ;
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( hng64_port_read )
 {
-	logerror("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(machine->activecpu),offset*4);
+	logerror("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
 
 	if(offset==0x421) return 0x00000002;
  	if(offset==0x441) return hng64_interrupt_level_request;
 
 	if(offset==0x85b) return 0x00000010;
 
-	return mame_rand(machine)&0xffffffff;
+	return mame_rand(space->machine)&0xffffffff;
 }
 
 
@@ -703,25 +703,25 @@ READ32_HANDLER( hng64_cart_r )
 
 static READ32_HANDLER( hng64_sram_r )
 {
-	logerror("HNG64 reading from SRAM 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sram[offset], cpu_get_pc(machine->activecpu));
+	logerror("HNG64 reading from SRAM 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sram[offset], cpu_get_pc(space->cpu));
 	return hng64_sram[offset];
 }
 
 static WRITE32_HANDLER( hng64_sram_w )
 {
-	logerror("HNG64 writing to SRAM 0x%08x == 0x%08x & 0x%08x. (PC=%08x)\n", offset*4, data, mem_mask, cpu_get_pc(machine->activecpu));
+	logerror("HNG64 writing to SRAM 0x%08x == 0x%08x & 0x%08x. (PC=%08x)\n", offset*4, data, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_sram[offset]);
 }
 
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-	logerror("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(machine->activecpu));
+	logerror("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 	COMBINE_DATA (&hng64_dualport[offset]);
 }
 
 static READ32_HANDLER( hng64_dualport_r )
 {
-	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(machine->activecpu));
+	logerror("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	// These hacks create some red marks for the boot-up sequence
 	switch (offset*4)
@@ -729,18 +729,18 @@ static READ32_HANDLER( hng64_dualport_r )
 		//SamSho64
 //      case 0x00:  toggi^=1; if (toggi==1) {return 0x00000400;} else {return 0x00000300;};
 		//RoadsEdge
-//      case 0x00:  return input_port_read(machine, "IPT_TEST");
+//      case 0x00:  return input_port_read(space->machine, "IPT_TEST");
 
 		//Fatfurwa
 		case 0x00:  return 0x00000400;
-		case 0x04:  return input_port_read(machine, "SYSTEM");
-		case 0x08:  return input_port_read(machine, "P1_P2");
+		case 0x04:  return input_port_read(space->machine, "SYSTEM");
+		case 0x08:  return input_port_read(space->machine, "P1_P2");
 
 		// This takes care of the 'machine' error code
 		case 0x600: return no_machine_error_code;
 	}
 
-	return mame_rand(machine)&0xffffffff;
+	return mame_rand(space->machine)&0xffffffff;
 	//return hng64_dualport[offset];
 }
 
@@ -805,7 +805,7 @@ static WRITE32_HANDLER( dl_w )
 //  if (offset == 0x85 && hng64_dl[offset] == 0x1)      // Just before the second half of the writes
 //      hng64_dl[0x86] = 0x2 ;                          // set 0x86 to 2 (so it drops into the loop)
 
-//  mame_printf_debug("dl W (%08x) : %.8x %.8x\n", cpu_get_pc(machine->activecpu), offset, hng64_dl[offset]) ;
+//  mame_printf_debug("dl W (%08x) : %.8x %.8x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 }
 
 static READ32_HANDLER( dl_r )
@@ -813,8 +813,8 @@ static READ32_HANDLER( dl_r )
 	// A read of 0x86 ONLY happens if there are more display lists than what are readily available.
 	// (PC = 8006fe1c)
 
-//  mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(machine->activecpu), offset, hng64_dl[offset]) ;
-//  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(machine->activecpu), offset, hng64_dl[offset]) ;
+//  mame_printf_debug("dl R (%08x) : %x %x\n", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
+//  usrintf_showmessage("dl R (%08x) : %x %x", cpu_get_pc(space->cpu), offset, hng64_dl[offset]) ;
 	return hng64_dl[offset] ;
 }
 

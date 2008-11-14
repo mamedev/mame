@@ -96,12 +96,12 @@ static const int ControllerTable[32] = {
 
 static READ8_HANDLER( gray5bit_controller0_r )
 {
-    return (input_port_read(machine, "8004") & 0xe0) | (~ControllerTable[input_port_read(machine, "8004") & 0x1f] & 0x1f);
+    return (input_port_read(space->machine, "8004") & 0xe0) | (~ControllerTable[input_port_read(space->machine, "8004") & 0x1f] & 0x1f);
 }
 
 static READ8_HANDLER( gray5bit_controller1_r )
 {
-    return (input_port_read(machine, "8005") & 0xe0) | (~ControllerTable[input_port_read(machine, "8005") & 0x1f] & 0x1f);
+    return (input_port_read(space->machine, "8005") & 0xe0) | (~ControllerTable[input_port_read(space->machine, "8005") & 0x1f] & 0x1f);
 }
 
 static WRITE8_HANDLER( sound_w )

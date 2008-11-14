@@ -47,7 +47,7 @@ static UINT8 *finalgdr_backupram;
 static READ16_HANDLER( oki_r )
 {
 	if(offset)
-		return okim6295_status_0_r(machine, 0);
+		return okim6295_status_0_r(space, 0);
 	else
 		return 0;
 }
@@ -55,23 +55,23 @@ static READ16_HANDLER( oki_r )
 static WRITE16_HANDLER( oki_w )
 {
 	if(offset)
-		okim6295_data_0_w(machine, 0, data);
+		okim6295_data_0_w(space, 0, data);
 }
 
 static READ32_HANDLER( oki32_r )
 {
-	return okim6295_status_0_r(machine, 0) << 8;
+	return okim6295_status_0_r(space, 0) << 8;
 }
 
 static WRITE32_HANDLER( oki32_w )
 {
-	okim6295_data_0_w(machine, 0, (data >> 8) & 0xff);
+	okim6295_data_0_w(space, 0, (data >> 8) & 0xff);
 }
 
 static READ16_HANDLER( ym2151_status_r )
 {
 	if(offset)
-		return ym2151_status_port_0_r(machine, 0);
+		return ym2151_status_port_0_r(space, 0);
 	else
 		return 0;
 }
@@ -79,28 +79,28 @@ static READ16_HANDLER( ym2151_status_r )
 static WRITE16_HANDLER( ym2151_data_w )
 {
 	if(offset)
-		ym2151_data_port_0_w(machine, 0, data);
+		ym2151_data_port_0_w(space, 0, data);
 }
 
 static WRITE16_HANDLER( ym2151_register_w )
 {
 	if(offset)
-		ym2151_register_port_0_w(machine, 0, data);
+		ym2151_register_port_0_w(space, 0, data);
 }
 
 static READ32_HANDLER( ym2151_status32_r )
 {
-	return ym2151_status_port_0_r(machine, 0) << 8;
+	return ym2151_status_port_0_r(space, 0) << 8;
 }
 
 static WRITE32_HANDLER( ym2151_data32_w )
 {
-	ym2151_data_port_0_w(machine, 0, (data >> 8) & 0xff);
+	ym2151_data_port_0_w(space, 0, (data >> 8) & 0xff);
 }
 
 static WRITE32_HANDLER( ym2151_register32_w )
 {
-	ym2151_register_port_0_w(machine, 0, (data >> 8) & 0xff);
+	ym2151_register_port_0_w(space, 0, (data >> 8) & 0xff);
 }
 
 static READ16_HANDLER( eeprom_r )
@@ -160,10 +160,10 @@ static WRITE32_HANDLER( paletteram32_w )
 	COMBINE_DATA(&paletteram32[offset]);
 
 	paldata = paletteram32[offset] & 0xffff;
-	palette_set_color_rgb(machine, offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	palette_set_color_rgb(space->machine, offset*2 + 1, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 
 	paldata = (paletteram32[offset] >> 16) & 0xffff;
-	palette_set_color_rgb(machine, offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	palette_set_color_rgb(space->machine, offset*2 + 0, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 static READ32_HANDLER( wyvernwg_prot_r )
@@ -1147,12 +1147,12 @@ static int irq_active(running_machine *machine)
 
 static READ16_HANDLER( vamphalf_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0x82de)
+	if(cpu_get_pc(space->cpu) == 0x82de)
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x4a6d0/2)+offset];
@@ -1160,12 +1160,12 @@ static READ16_HANDLER( vamphalf_speedup_r )
 
 static READ16_HANDLER( misncrft_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0xecc8)
+	if(cpu_get_pc(space->cpu) == 0xecc8)
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x72eb4/2)+offset];
@@ -1173,12 +1173,12 @@ static READ16_HANDLER( misncrft_speedup_r )
 
 static READ16_HANDLER( coolmini_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0x75f7a)
+	if(cpu_get_pc(space->cpu) == 0x75f7a)
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0xd2e80/2)+offset];
@@ -1186,12 +1186,12 @@ static READ16_HANDLER( coolmini_speedup_r )
 
 static READ16_HANDLER( suplup_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0xaf18a )
+	if(cpu_get_pc(space->cpu) == 0xaf18a )
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x11605c/2)+offset];
@@ -1199,12 +1199,12 @@ static READ16_HANDLER( suplup_speedup_r )
 
 static READ16_HANDLER( luplup_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0xaefac )
+	if(cpu_get_pc(space->cpu) == 0xaefac )
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x115e84/2)+offset];
@@ -1212,12 +1212,12 @@ static READ16_HANDLER( luplup_speedup_r )
 
 static READ16_HANDLER( luplup29_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0xae6c0 )
+	if(cpu_get_pc(space->cpu) == 0xae6c0 )
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x113f08/2)+offset];
@@ -1225,12 +1225,12 @@ static READ16_HANDLER( luplup29_speedup_r )
 
 static READ16_HANDLER( puzlbang_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0xae6d2 )
+	if(cpu_get_pc(space->cpu) == 0xae6d2 )
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0x113ecc/2)+offset];
@@ -1238,12 +1238,12 @@ static READ16_HANDLER( puzlbang_speedup_r )
 
 static READ32_HANDLER( wyvernwg_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0x10758 )
+	if(cpu_get_pc(space->cpu) == 0x10758 )
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram32[0x00b56fc/4];
@@ -1251,12 +1251,12 @@ static READ32_HANDLER( wyvernwg_speedup_r )
 
 static READ32_HANDLER( finalgdr_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0x1c212 )
+	if(cpu_get_pc(space->cpu) == 0x1c212 )
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram32[0x005e874/4];
@@ -1264,12 +1264,12 @@ static READ32_HANDLER( finalgdr_speedup_r )
 
 static READ16_HANDLER( dquizgo2_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0xaa622)
+	if(cpu_get_pc(space->cpu) == 0xaa622)
 	{
-		if(irq_active(machine))
-			cpu_spinuntil_int(machine->activecpu);
+		if(irq_active(space->machine))
+			cpu_spinuntil_int(space->cpu);
 		else
-			cpu_eat_cycles(machine->activecpu, 50);
+			cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return wram[(0xcde70/2)+offset];

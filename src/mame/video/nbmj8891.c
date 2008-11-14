@@ -57,7 +57,7 @@ WRITE8_HANDLER( nbmj8891_palette_type1_w )
 	g = ((nbmj8891_palette[offset + 1] & 0xf0) >> 4);
 	b = ((nbmj8891_palette[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_HANDLER( nbmj8891_palette_type2_r )
@@ -79,7 +79,7 @@ WRITE8_HANDLER( nbmj8891_palette_type2_w )
 	g = ((nbmj8891_palette[offset + 0x000] & 0xf0) >> 4);
 	b = ((nbmj8891_palette[offset + 0x100] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine, (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine, (offset & 0x0ff), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 READ8_HANDLER( nbmj8891_palette_type3_r )
@@ -101,7 +101,7 @@ WRITE8_HANDLER( nbmj8891_palette_type3_w )
 	g = ((nbmj8891_palette[offset + 0] & 0xf0) >> 4);
 	b = ((nbmj8891_palette[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 WRITE8_HANDLER( nbmj8891_clutsel_w )
@@ -134,14 +134,14 @@ WRITE8_HANDLER( nbmj8891_blitter_w )
 		case 0x04:	blitter_sizex = data; break;
 		case 0x05:	blitter_sizey = data;
 					/* writing here also starts the blit */
-					nbmj8891_gfxdraw(machine);
+					nbmj8891_gfxdraw(space->machine);
 					break;
 		case 0x06:	blitter_direction_x = (data & 0x01) ? 1 : 0;
 					blitter_direction_y = (data & 0x02) ? 1 : 0;
 					nbmj8891_flipscreen = (data & 0x04) ? 1 : 0;
 					nbmj8891_dispflag = (data & 0x08) ? 0 : 1;
-					if (gfxdraw_mode) nbmj8891_vramflip(machine, 1);
-					nbmj8891_vramflip(machine, 0);
+					if (gfxdraw_mode) nbmj8891_vramflip(space->machine, 1);
+					nbmj8891_vramflip(space->machine, 0);
 					break;
 		case 0x07:	break;
 	}
@@ -162,14 +162,14 @@ WRITE8_HANDLER( nbmj8891_taiwanmb_blitter_w )
 
 WRITE8_HANDLER( nbmj8891_taiwanmb_gfxdraw_w )
 {
-//  nbmj8891_gfxdraw(machine);
+//  nbmj8891_gfxdraw(space->machine);
 }
 
 WRITE8_HANDLER( nbmj8891_taiwanmb_gfxflag_w )
 {
 	nbmj8891_flipscreen = (data & 0x04) ? 1 : 0;
 
-	nbmj8891_vramflip(machine, 0);
+	nbmj8891_vramflip(space->machine, 0);
 }
 
 WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w )
@@ -248,7 +248,7 @@ WRITE8_HANDLER( nbmj8891_taiwanmb_mcu_w )
 			blitter_sizey ^= 0x00;
 		}
 
-		nbmj8891_gfxdraw(machine);
+		nbmj8891_gfxdraw(space->machine);
 	}
 
 //  blitter_direction_x = 0;                // for debug
@@ -273,7 +273,7 @@ WRITE8_HANDLER( nbmj8891_vramsel_w )
 
 WRITE8_HANDLER( nbmj8891_romsel_w )
 {
-	int gfxlen = memory_region_length(machine, "gfx1");
+	int gfxlen = memory_region_length(space->machine, "gfx1");
 	nbmj8891_gfxrom = (data & 0x0f);
 
 	if ((0x20000 * nbmj8891_gfxrom) > (gfxlen - 1))

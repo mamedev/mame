@@ -454,7 +454,7 @@ static WRITE32_HANDLER( rabbit_paletteram_dword_w )
 	r = ((paletteram32[offset] & 0x0000ff00) >>8);
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine,offset^0xff,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset^0xff,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( rabbit_tilemap0_r )
@@ -479,7 +479,7 @@ static READ32_HANDLER( rabbit_tilemap3_r )
 
 static READ32_HANDLER( randomrabbits )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( rabbit_readmem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -502,7 +502,7 @@ ADDRESS_MAP_END
 /* rom bank is used when testing roms, not currently hooked up */
 static WRITE32_HANDLER ( rabbit_rombank_w )
 {
-	UINT8 *dataroms = memory_region(machine, "gfx1");
+	UINT8 *dataroms = memory_region(space->machine, "gfx1");
 	int bank;
 //  mame_printf_debug("rabbit rombank %08x\n",data&0x3ff);
 	bank = data & 0x3ff;
@@ -696,7 +696,7 @@ static WRITE32_HANDLER( rabbit_blitter_w )
 
 	if (offset == 0x0c/4)
 	{
-		rabbit_do_blit(machine);
+		rabbit_do_blit(space->machine);
 	}
 }
 
@@ -774,7 +774,7 @@ static WRITE32_HANDLER( tmmjprd_paletteram_dword_w )
 	r = ((paletteram32[offset] & 0x0000ff00) >>8);
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 
-	palette_set_color(machine,(offset^0xff)+0x2000,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,(offset^0xff)+0x2000,MAKE_RGB(r,g,b));
 }
 
 

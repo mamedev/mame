@@ -38,14 +38,14 @@ static MACHINE_RESET( dealer );
 
 static WRITE8_HANDLER( dealer_decrypt_rom )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 
 	if (offset & 0x04)
 		counter = (counter + 1) & 0x03;
 	else
 		counter = (counter - 1) & 0x03;
 
-//  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(machine->activecpu),counter);
+//  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(space->cpu),counter);
 
 	memory_set_bankptr(1, rom + 0x10000 * counter);
 

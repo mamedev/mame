@@ -159,8 +159,8 @@ static UINT8 last_trackball_val[2] = {0,0};
 static READ8_HANDLER( trackball_r )
 {
 	UINT8 ret;
-	UINT8 port4 = input_port_read(machine, "FAKEX");
-	UINT8 port5 = input_port_read(machine, "FAKEY");
+	UINT8 port4 = input_port_read(space->machine, "FAKEX");
+	UINT8 port5 = input_port_read(space->machine, "FAKEY");
 
 	ret = (((port4 - last_trackball_val[0]) & 0x0f)<<4) | ((port5 - last_trackball_val[1]) & 0x0f);
 
@@ -178,7 +178,7 @@ static WRITE8_HANDLER( champbwl_misc_w )
 	coin_lockout_w(0, ~data & 8);
 	coin_lockout_w(1, ~data & 4);
 
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000 + 0x4000 * ((data & 0x30)>>4));
+	memory_set_bankptr(1, memory_region(space->machine, "main") + 0x10000 + 0x4000 * ((data & 0x30)>>4));
 }
 
 static WRITE8_HANDLER( champbwl_objctrl_w )

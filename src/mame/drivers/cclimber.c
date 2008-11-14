@@ -209,8 +209,8 @@ static UINT8 toprollr_rombank;
 
 static WRITE8_HANDLER( swimmer_sh_soundlatch_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 

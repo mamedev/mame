@@ -145,22 +145,22 @@ READ8_HANDLER( tms57002_data_r )
 
 READ16_HANDLER( tms57002_data_word_r )
 {
-	return(tms57002_data_r(machine,0));
+	return(tms57002_data_r(space,0));
 }
 
 READ16_HANDLER( tms57002_status_word_r )
 {
-	return(tms57002_status_r(machine,0));
+	return(tms57002_status_r(space,0));
 }
 
 WRITE16_HANDLER( tms57002_control_word_w )
 {
-	tms57002_control_w(machine, 0, data);
+	tms57002_control_w(space, 0, data);
 }
 
 WRITE16_HANDLER( tms57002_data_word_w )
 {
-	tms57002_data_w(machine, 0, data);
+	tms57002_data_w(space, 0, data);
 }
 
 
@@ -1956,13 +1956,13 @@ WRITE16_HANDLER( K055550_word_w )
 				else
 					if (dy < 0) i = 0x80;
 				else
-					i = mame_rand(machine) & 0xff; // vector direction indeterminate
+					i = mame_rand(space->machine) & 0xff; // vector direction indeterminate
 
 				prot_data[0x10] = i;
 			break;
 
 			default:
-//              logerror("%06x: unknown K055550 command %02x\n", cpu_get_pc(machine->activecpu), data);
+//              logerror("%06x: unknown K055550 command %02x\n", cpu_get_pc(space->cpu), data);
 			break;
 		}
 	}

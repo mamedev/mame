@@ -61,7 +61,7 @@ static WRITE16_HANDLER( powerins_okibank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(machine, "oki1");
+		UINT8 *RAM = memory_region(space->machine, "oki1");
 		int new_bank = data & 0x7;
 
 		if (new_bank != oki_bank)
@@ -76,7 +76,7 @@ static WRITE16_HANDLER( powerins_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine, 0, data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 	}
 }
 static READ8_HANDLER( powerinb_fake_ym2203_r )

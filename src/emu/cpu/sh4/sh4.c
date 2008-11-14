@@ -114,7 +114,7 @@ UINT32 abs;
 INLINE UINT8 RB(offs_t A)
 {
 	if (A >= 0xfe000000)
-		return sh4_internal_r(Machine, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xff << ((A & 3)*8)) >> ((A & 3)*8);
+		return sh4_internal_r(sh4.internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xff << ((A & 3)*8)) >> ((A & 3)*8);
 
 	if (A >= 0xe0000000)
 		return program_read_byte_64le(A);
@@ -125,7 +125,7 @@ INLINE UINT8 RB(offs_t A)
 INLINE UINT16 RW(offs_t A)
 {
 	if (A >= 0xfe000000)
-		return sh4_internal_r(Machine, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffff << ((A & 2)*8)) >> ((A & 2)*8);
+		return sh4_internal_r(sh4.internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffff << ((A & 2)*8)) >> ((A & 2)*8);
 
 	if (A >= 0xe0000000)
 		return program_read_word_64le(A);
@@ -136,7 +136,7 @@ INLINE UINT16 RW(offs_t A)
 INLINE UINT32 RL(offs_t A)
 {
 	if (A >= 0xfe000000)
-		return sh4_internal_r(Machine, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffffffff);
+		return sh4_internal_r(sh4.internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffffffff);
 
 	if (A >= 0xe0000000)
 		return program_read_dword_64le(A);
@@ -149,7 +149,7 @@ INLINE void WB(offs_t A, UINT8 V)
 
 	if (A >= 0xfe000000)
 	{
-		sh4_internal_w(Machine, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 3)*8), 0xff << ((A & 3)*8));
+		sh4_internal_w(sh4.internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 3)*8), 0xff << ((A & 3)*8));
 		return;
 	}
 
@@ -166,7 +166,7 @@ INLINE void WW(offs_t A, UINT16 V)
 {
 	if (A >= 0xfe000000)
 	{
-		sh4_internal_w(Machine, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 2)*8), 0xffff << ((A & 2)*8));
+		sh4_internal_w(sh4.internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V << ((A & 2)*8), 0xffff << ((A & 2)*8));
 		return;
 	}
 
@@ -183,7 +183,7 @@ INLINE void WL(offs_t A, UINT32 V)
 {
 	if (A >= 0xfe000000)
 	{
-		sh4_internal_w(Machine, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V, 0xffffffff);
+		sh4_internal_w(sh4.internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), V, 0xffffffff);
 		return;
 	}
 
@@ -3401,6 +3401,7 @@ static CPU_INIT( sh4 )
 	sh4.cpu_number = index;
 	sh4.irq_callback = irqcallback;
 	sh4.device = device;
+	sh4.internal = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	sh4_default_exception_priorities();
 	sh4.irln = 15;
 	sh4.test_irq = 0;

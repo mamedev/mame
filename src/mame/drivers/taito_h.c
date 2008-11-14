@@ -190,48 +190,48 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 {
 	/* Bypass TC0220IOC controller for analog input */
 
-	UINT8	port = TC0220IOC_port_r(machine,0);	/* read port number */
+	UINT8	port = TC0220IOC_port_r(space,0);	/* read port number */
 
 	switch( port )
 	{
 		case 0x08:				/* trackball y coords bottom 8 bits for 2nd player */
-			return input_port_read(machine, P2TRACKY_PORT_TAG);
+			return input_port_read(space->machine, P2TRACKY_PORT_TAG);
 
 		case 0x09:				/* trackball y coords top 8 bits for 2nd player */
-			if (input_port_read(machine, P2TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
+			if (input_port_read(space->machine, P2TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
 			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0a:				/* trackball x coords bottom 8 bits for 2nd player */
-			return input_port_read(machine, P2TRACKX_PORT_TAG);
+			return input_port_read(space->machine, P2TRACKX_PORT_TAG);
 
 		case 0x0b:				/* trackball x coords top 8 bits for 2nd player */
-			if (input_port_read(machine, P2TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
+			if (input_port_read(space->machine, P2TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
 			else												/* x+ direction (positive value) */
 				return 0x00;
 
 		case 0x0c:				/* trackball y coords bottom 8 bits for 1st player */
-			return input_port_read(machine, P1TRACKY_PORT_TAG);
+			return input_port_read(space->machine, P1TRACKY_PORT_TAG);
 
 		case 0x0d:				/* trackball y coords top 8 bits for 1st player */
-			if (input_port_read(machine, P1TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
+			if (input_port_read(space->machine, P1TRACKY_PORT_TAG) & 0x80)	/* y- direction (negative value) */
 				return 0xff;
 			else												/* y+ direction (positive value) */
 				return 0x00;
 
 		case 0x0e:				/* trackball x coords bottom 8 bits for 1st player */
-			return input_port_read(machine, P1TRACKX_PORT_TAG);
+			return input_port_read(space->machine, P1TRACKX_PORT_TAG);
 
 		case 0x0f:				/* trackball x coords top 8 bits for 1st player */
-			if (input_port_read(machine, P1TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
+			if (input_port_read(space->machine, P1TRACKX_PORT_TAG) & 0x80)	/* x- direction (negative value) */
 				return 0xff;
 			else												/* x+ direction (positive value) */
 				return 0x00;
 
 		default:
-			return TC0220IOC_portreg_r( machine,offset );
+			return TC0220IOC_portreg_r( space->machine,offset );
 	}
 }
 
@@ -246,7 +246,7 @@ static void reset_sound_region(running_machine *machine)
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 3;
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 

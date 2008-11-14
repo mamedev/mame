@@ -18,7 +18,7 @@
 // to change if a different ROM set ever surfaces.
 static READ8_HANDLER( fastfred_custom_io_r )
 {
-    switch (cpu_get_pc(machine->activecpu))
+    switch (cpu_get_pc(space->cpu))
     {
     case 0x03c0: return 0x9d;
     case 0x03e6: return 0x9f;
@@ -44,14 +44,14 @@ static READ8_HANDLER( fastfred_custom_io_r )
     case 0x7b58: return 0x20;
     }
 
-    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, cpu_get_pc(machine->activecpu));
+    logerror("Uncaught custom I/O read %04X at %04X\n", 0xc800+offset, cpu_get_pc(space->cpu));
     return 0x00;
 }
 
 static READ8_HANDLER( flyboy_custom1_io_r )
 {
 
-	switch (cpu_get_pc(machine->activecpu))
+	switch (cpu_get_pc(space->cpu))
 	{
 	 case 0x049d: return 0xad;	/* compare */
 	 case 0x04b9:			/* compare with 0x9e ??? When ??? */
@@ -72,14 +72,14 @@ static READ8_HANDLER( flyboy_custom1_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, cpu_get_pc(machine->activecpu));
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc085+offset, cpu_get_pc(space->cpu));
 	return 0x00;
 }
 
 static READ8_HANDLER( flyboy_custom2_io_r )
 {
 
-	switch (cpu_get_pc(machine->activecpu))
+	switch (cpu_get_pc(space->cpu))
 	{
 	 case 0x0395: return 0xf7;	/* $C900 compare         */
 	 case 0x03f5:			/* $c8fd                 */
@@ -97,7 +97,7 @@ static READ8_HANDLER( flyboy_custom2_io_r )
 	 return 0x00;
 	}
 
-	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, cpu_get_pc(machine->activecpu));
+	logerror("Uncaught custom I/O read %04X at %04X\n", 0xc8fb+offset, cpu_get_pc(space->cpu));
 	return 0x00;
 }
 
@@ -119,7 +119,7 @@ static UINT8 imago_sprites_bank = 0;
 
 static WRITE8_HANDLER( imago_dma_irq_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, data & 1 ? ASSERT_LINE : CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( imago_sprites_bank_w )
@@ -129,7 +129,7 @@ static WRITE8_HANDLER( imago_sprites_bank_w )
 
 static WRITE8_HANDLER( imago_sprites_dma_w )
 {
-	UINT8 *rom = (UINT8 *)memory_region(machine, "gfx2");
+	UINT8 *rom = (UINT8 *)memory_region(space->machine, "gfx2");
 	UINT8 sprites_data;
 
 	sprites_data = rom[imago_sprites_address + 0x2000*0 + imago_sprites_bank * 0x1000];
@@ -141,7 +141,7 @@ static WRITE8_HANDLER( imago_sprites_dma_w )
 	sprites_data = rom[imago_sprites_address + 0x2000*2 + imago_sprites_bank * 0x1000];
 	imago_sprites[offset + 0x800*2] = sprites_data;
 
-	decodechar(machine->gfx[1], offset/32, imago_sprites);
+	decodechar(space->machine->gfx[1], offset/32, imago_sprites);
 }
 
 static READ8_HANDLER( imago_sprites_offset_r )

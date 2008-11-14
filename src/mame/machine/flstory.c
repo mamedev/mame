@@ -28,13 +28,13 @@ static UINT8 portA_in,portA_out,ddrA;
 
 READ8_HANDLER( flstory_68705_portA_r )
 {
-//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(machine->activecpu),portA_in);
+//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(space->cpu),portA_in);
 	return (portA_out & ddrA) | (portA_in & ~ddrA);
 }
 
 WRITE8_HANDLER( flstory_68705_portA_w )
 {
-//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(space->cpu),data);
 	portA_out = data;
 }
 
@@ -63,12 +63,12 @@ READ8_HANDLER( flstory_68705_portB_r )
 
 WRITE8_HANDLER( flstory_68705_portB_w )
 {
-//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(space->cpu),data);
 
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
+		if (main_sent) cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
 		main_sent = 0;
 logerror("read command %02x from main cpu\n",portA_in);
 	}
@@ -95,13 +95,13 @@ READ8_HANDLER( flstory_68705_portC_r )
 	portC_in = 0;
 	if (main_sent) portC_in |= 0x01;
 	if (!mcu_sent) portC_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(machine->activecpu),portC_in);
+//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(space->cpu),portC_in);
 	return (portC_out & ddrC) | (portC_in & ~ddrC);
 }
 
 WRITE8_HANDLER( flstory_68705_portC_w )
 {
-logerror("%04x: 68705 port C write %02x\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: 68705 port C write %02x\n",cpu_get_pc(space->cpu),data);
 	portC_out = data;
 }
 
@@ -112,15 +112,15 @@ WRITE8_HANDLER( flstory_68705_ddrC_w )
 
 WRITE8_HANDLER( flstory_mcu_w )
 {
-logerror("%04x: mcu_w %02x\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: mcu_w %02x\n",cpu_get_pc(space->cpu),data);
 	from_main = data;
 	main_sent = 1;
-	cpu_set_input_line(machine->cpu[2],0,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2],0,ASSERT_LINE);
 }
 
 READ8_HANDLER( flstory_mcu_r )
 {
-logerror("%04x: mcu_r %02x\n",cpu_get_pc(machine->activecpu),from_mcu);
+logerror("%04x: mcu_r %02x\n",cpu_get_pc(space->cpu),from_mcu);
 	mcu_sent = 0;
 	return from_mcu;
 }
@@ -131,7 +131,7 @@ READ8_HANDLER( flstory_mcu_status_r )
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 1, mcu has sent data to the main cpu */
-//logerror("%04x: mcu_status_r\n",cpu_get_pc(machine->activecpu));
+//logerror("%04x: mcu_status_r\n",cpu_get_pc(space->cpu));
 	if (!main_sent) res |= 0x01;
 	if (mcu_sent) res |= 0x02;
 
@@ -258,7 +258,7 @@ WRITE8_HANDLER( victnine_mcu_w )
 
 READ8_HANDLER( victnine_mcu_r )
 {
-	//logerror("%04x: mcu read (0x%02x)\n", cpu_get_previouspc(machine->activecpu), from_mcu);
+	//logerror("%04x: mcu read (0x%02x)\n", cpu_get_previouspc(space->cpu), from_mcu);
 
 	return from_mcu - VICTNINE_MCU_SEED;
 }

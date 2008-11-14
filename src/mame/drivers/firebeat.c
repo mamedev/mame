@@ -658,7 +658,7 @@ static READ32_HANDLER(gcu0_r)
 
 static WRITE32_HANDLER(gcu0_w)
 {
-	GCU_w(machine, 0, offset, data, mem_mask);
+	GCU_w(space, 0, offset, data, mem_mask);
 }
 
 static READ32_HANDLER(gcu1_r)
@@ -668,7 +668,7 @@ static READ32_HANDLER(gcu1_r)
 
 static WRITE32_HANDLER(gcu1_w)
 {
-	GCU_w(machine, 1, offset, data, mem_mask);
+	GCU_w(space, 1, offset, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -679,15 +679,15 @@ static READ32_HANDLER(input_r)
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (input_port_read(machine, "IN0") & 0xff) << 24;
+		r |= (input_port_read(space->machine, "IN0") & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (input_port_read(machine, "IN1") & 0xff) << 8;
+		r |= (input_port_read(space->machine, "IN1") & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (input_port_read(machine, "IN2") & 0xff);
+		r |= (input_port_read(space->machine, "IN2") & 0xff);
 	}
 
 	return r;
@@ -697,11 +697,11 @@ static READ32_HANDLER( sensor_r )
 {
 	if (offset == 0)
 	{
-		return input_port_read(machine, "SENSOR1") | 0x01000100;
+		return input_port_read(space->machine, "SENSOR1") | 0x01000100;
 	}
 	else
 	{
-		return input_port_read(machine, "SENSOR2") | 0x01000100;
+		return input_port_read(space->machine, "SENSOR2") | 0x01000100;
 	}
 }
 
@@ -1173,12 +1173,12 @@ static READ32_HANDLER( atapi_command_r )
 //  printf("atapi_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = atapi_command_reg_r(machine, offset*2);
+		r = atapi_command_reg_r(space, offset*2);
 		return ATAPI_ENDIAN(r) << 16;
 	}
 	else
 	{
-		r = atapi_command_reg_r(machine, (offset*2) + 1);
+		r = atapi_command_reg_r(space, (offset*2) + 1);
 		return ATAPI_ENDIAN(r) << 0;
 	}
 }
@@ -1189,11 +1189,11 @@ static WRITE32_HANDLER( atapi_command_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		atapi_command_reg_w(machine, offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
+		atapi_command_reg_w(space, offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
 	}
 	else
 	{
-		atapi_command_reg_w(machine, (offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
+		atapi_command_reg_w(space, (offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
 	}
 }
 
@@ -1236,19 +1236,19 @@ static READ32_HANDLER( comm_uart_r )
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= pc16552d_0_r(machine, (offset*4)+0) << 24;
+		r |= pc16552d_0_r(space, (offset*4)+0) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= pc16552d_0_r(machine, (offset*4)+1) << 16;
+		r |= pc16552d_0_r(space, (offset*4)+1) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= pc16552d_0_r(machine, (offset*4)+2) << 8;
+		r |= pc16552d_0_r(space, (offset*4)+2) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= pc16552d_0_r(machine, (offset*4)+3) << 0;
+		r |= pc16552d_0_r(space, (offset*4)+3) << 0;
 	}
 
 	return r;
@@ -1258,19 +1258,19 @@ static WRITE32_HANDLER( comm_uart_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		pc16552d_0_w(machine, (offset*4)+0, (data >> 24) & 0xff);
+		pc16552d_0_w(space, (offset*4)+0, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		pc16552d_0_w(machine, (offset*4)+1, (data >> 16) & 0xff);
+		pc16552d_0_w(space, (offset*4)+1, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		pc16552d_0_w(machine, (offset*4)+2, (data >> 8) & 0xff);
+		pc16552d_0_w(space, (offset*4)+2, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		pc16552d_0_w(machine, (offset*4)+3, (data >> 0) & 0xff);
+		pc16552d_0_w(space, (offset*4)+3, (data >> 0) & 0xff);
 	}
 }
 
@@ -1339,11 +1339,11 @@ static READ32_HANDLER( sound_r )
 
 	if (ACCESSING_BITS_24_31)	/* External RAM read */
 	{
-		r |= ymz280b_data_0_r(machine, offset) << 24;
+		r |= ymz280b_data_0_r(space, offset) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= ymz280b_status_0_r(machine, offset) << 16;
+		r |= ymz280b_status_0_r(space, offset) << 16;
 	}
 
 	return r;
@@ -1354,11 +1354,11 @@ static WRITE32_HANDLER( sound_w )
 //  printf("sound_w: %08X, %08X, %08X\n", offset, data, mem_mask);
 	if (ACCESSING_BITS_24_31)
 	{
-		ymz280b_register_0_w(machine, offset, (data >> 24) & 0xff);
+		ymz280b_register_0_w(space, offset, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		ymz280b_data_0_w(machine, offset, (data >> 16) & 0xff);
+		ymz280b_data_0_w(space, offset, (data >> 16) & 0xff);
 	}
 }
 
@@ -1395,11 +1395,11 @@ static READ32_HANDLER( keyboard_wheel_r )
 {
 	if (offset == 0)		// Keyboard Wheel (P1)
 	{
-		return input_port_read(machine, "WHEEL_P1") << 24;
+		return input_port_read(space->machine, "WHEEL_P1") << 24;
 	}
 	else if (offset == 2)	// Keyboard Wheel (P2)
 	{
-		return input_port_read(machine, "WHEEL_P2") << 24;
+		return input_port_read(space->machine, "WHEEL_P2") << 24;
 	}
 
 	return 0;
@@ -1411,7 +1411,7 @@ static READ32_HANDLER( midi_uart_r )
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= pc16552d_1_r(machine, offset >> 6) << 24;
+		r |= pc16552d_1_r(space, offset >> 6) << 24;
 	}
 
 	return r;
@@ -1421,7 +1421,7 @@ static WRITE32_HANDLER( midi_uart_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		pc16552d_1_w(machine, offset >> 6, (data >> 24) & 0xff);
+		pc16552d_1_w(space, offset >> 6, (data >> 24) & 0xff);
 	}
 }
 
@@ -1577,7 +1577,7 @@ static WRITE32_HANDLER( lamp_output_w )
 
 static WRITE32_HANDLER( lamp_output_kbm_w )
 {
-	lamp_output_w(machine, offset, data, mem_mask);
+	lamp_output_w(space, offset, data, mem_mask);
 
 	if (ACCESSING_BITS_24_31)
 	{
@@ -1596,7 +1596,7 @@ static WRITE32_HANDLER( lamp_output_kbm_w )
 
 static WRITE32_HANDLER( lamp_output_ppp_w )
 {
-	lamp_output_w(machine, offset, data, mem_mask);
+	lamp_output_w(space, offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00000100 Left
@@ -1643,7 +1643,7 @@ static WRITE32_HANDLER( lamp_output2_w )
 
 static WRITE32_HANDLER( lamp_output2_ppp_w )
 {
-	lamp_output2_w(machine, offset, data, mem_mask);
+	lamp_output2_w(space, offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Top LED 0
@@ -1677,7 +1677,7 @@ static WRITE32_HANDLER( lamp_output3_w )
 
 static WRITE32_HANDLER( lamp_output3_ppp_w )
 {
-	lamp_output3_w(machine, offset, data, mem_mask);
+	lamp_output3_w(space, offset, data, mem_mask);
 
 	// ParaParaParadise lamps (active high)
 	// 0x00010000 Lamp 0

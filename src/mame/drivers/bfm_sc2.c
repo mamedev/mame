@@ -619,7 +619,7 @@ static WRITE8_HANDLER( mmtr_w )
 			}
  		}
  	}
-	if ( data & 0x1F ) cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE );
+	if ( data & 0x1F ) cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE );
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -655,11 +655,11 @@ static READ8_HANDLER( mux_input_r )
 		t1 = input_override[offset];	// strobe 0-7 data 0-4
 		t2 = input_override[offset+idx];	// strobe 8-B data 0-4
 
-		t1 = (sc2_Inputs[offset]   & t1) | ( ( input_port_read(machine, port[offset])   & ~t1) & 0x1F);
+		t1 = (sc2_Inputs[offset]   & t1) | ( ( input_port_read(space->machine, port[offset])   & ~t1) & 0x1F);
 		if (idx == 8)
-			t2 = (sc2_Inputs[offset+8] & t2) | ( ( input_port_read(machine, port[offset+8]) & ~t2) << 5);
+			t2 = (sc2_Inputs[offset+8] & t2) | ( ( input_port_read(space->machine, port[offset+8]) & ~t2) << 5);
 		else
-			t2 =  (sc2_Inputs[offset+4] & t2) | ( ( ( input_port_read(machine, port[offset+4]) & ~t2) << 2) & 0x60);
+			t2 =  (sc2_Inputs[offset+4] & t2) | ( ( ( input_port_read(space->machine, port[offset+4]) & ~t2) << 2) & 0x60);
 
 		sc2_Inputs[offset]   = (sc2_Inputs[offset]   & ~0x1F) | t1;
 		sc2_Inputs[offset+idx] = (sc2_Inputs[offset+idx] & ~0x60) | t2;
@@ -894,7 +894,7 @@ static WRITE8_HANDLER( coininhib_w )
 
 static READ8_HANDLER( coin_input_r )
 {
-	return input_port_read(machine, "COINS");
+	return input_port_read(space->machine, "COINS");
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1072,7 +1072,7 @@ static WRITE8_HANDLER( uart2data_w )
 
 static WRITE8_HANDLER( vid_uart_tx_w )
 {
-	send_to_adder(machine, data);
+	send_to_adder(space->machine, data);
 }
 
 ///////////////////////////////////////////////////////////////////////////

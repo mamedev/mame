@@ -52,8 +52,8 @@ static WRITE16_HANDLER( soundcmd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,offset,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space,offset,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -122,8 +122,8 @@ static WRITE16_HANDLER( protection_w )
 			program_write_word(0xffc00c, 0xc0);
 			program_write_word(0xffc00e, 0);
 
-			sf_fg_scroll_w(machine, 0, d1, 0xffff);
-			sf_bg_scroll_w(machine, 0, d2, 0xffff);
+			sf_fg_scroll_w(space, 0, d1, 0xffff);
+			sf_bg_scroll_w(space, 0, d2, 0xffff);
 			break;
 		}
 	case 4:
@@ -143,13 +143,13 @@ static WRITE16_HANDLER( protection_w )
 				}
 				program_write_word(0xffc682, d1);
 				program_write_word(0xffc00e, off);
-				sf_bg_scroll_w(machine, 0, d1, 0xffff);
+				sf_bg_scroll_w(space, 0, d1, 0xffff);
 			}
 			break;
 		}
 	default:
 		{
-			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(machine->activecpu), data&0xffff);
+			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(space->cpu), data&0xffff);
 			logerror("*** Unknown protection %d\n", program_read_byte(0xffc684));
 			break;
 		}
@@ -165,18 +165,18 @@ static const int scale[8] = { 0x00, 0x40, 0xe0, 0xfe, 0xfe, 0xfe, 0xfe, 0xfe };
 
 static READ16_HANDLER( button1_r )
 {
-	return (scale[input_port_read(machine, "IN3")]<<8) | scale[input_port_read(machine, "IN1")];
+	return (scale[input_port_read(space->machine, "IN3")]<<8) | scale[input_port_read(space->machine, "IN1")];
 }
 
 static READ16_HANDLER( button2_r )
 {
-	return (scale[input_port_read(machine, "IN4")]<<8) | scale[input_port_read(machine, "IN2")];
+	return (scale[input_port_read(space->machine, "IN4")]<<8) | scale[input_port_read(space->machine, "IN2")];
 }
 
 
 static WRITE8_HANDLER( sound2_bank_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "audio2")+0x8000*(data+1));
+	memory_set_bankptr(1,memory_region(space->machine, "audio2")+0x8000*(data+1));
 }
 
 

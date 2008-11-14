@@ -97,7 +97,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is service button */
 	/* bits 4-7 are DIP switches */
-	res = input_port_read(machine, "IN1");
+	res = input_port_read(space->machine, "IN1");
 
 	if (init_eeprom_count)
 	{
@@ -201,30 +201,30 @@ static WRITE16_HANDLER( sound_cmd1_w )
 {
 	if((data & 0x00ff0000) == 0) {
 		data &= 0xff;
-		soundlatch_w(machine, 0, data);
+		soundlatch_w(space, 0, data);
 	}
 }
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
 	if((data & 0x00ff0000) == 0) {
-		soundlatch2_w(machine, 0, data & 0xff);
+		soundlatch2_w(space, 0, data & 0xff);
 	}
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch3_r(machine,0);
+	return soundlatch3_r(space,0);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(2, memory_region(machine, "sound") + 0x10000 + (data&0xf)*0x4000);
+	memory_set_bankptr(2, memory_region(space->machine, "sound") + 0x10000 + (data&0xf)*0x4000);
 }
 
 
@@ -239,7 +239,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return K053247_word_r(machine,offset,mem_mask);
+		return K053247_word_r(space,offset,mem_mask);
 	}
 }
 
@@ -251,7 +251,7 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		K053247_word_w(machine,offset,data,mem_mask);
+		K053247_word_w(space,offset,data,mem_mask);
 	}
 }
 
@@ -260,12 +260,12 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 
 static READ16_HANDLER( player1_r ) 	// players 1 and 3
 {
-	return input_port_read(machine, "P1") | (input_port_read(machine, "P3")<<8);
+	return input_port_read(space->machine, "P1") | (input_port_read(space->machine, "P3")<<8);
 }
 
 static READ16_HANDLER( player2_r )	// players 2 and 4
 {
-	return input_port_read(machine, "P2") | (input_port_read(machine, "P4")<<8);
+	return input_port_read(space->machine, "P2") | (input_port_read(space->machine, "P4")<<8);
 }
 
 static WRITE16_HANDLER( moo_prot_w )

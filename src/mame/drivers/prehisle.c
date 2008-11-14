@@ -26,8 +26,8 @@ extern UINT16 *prehisle_bg_videoram16;
 
 static WRITE16_HANDLER( prehisle_sound16_w )
 {
-	soundlatch_w(machine, 0, data & 0xff);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /*******************************************************************************/

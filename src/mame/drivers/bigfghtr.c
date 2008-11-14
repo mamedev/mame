@@ -279,7 +279,7 @@ static VIDEO_EOF( bigfghtr )
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(machine,0,((data & 0x7f) << 1) | 1);
+		soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
 }
 
 static WRITE16_HANDLER( io_w )
@@ -312,12 +312,12 @@ static READ16_HANDLER(sharedram_r)
 				if(read_latch)
 				{
 					read_latch=0;
-					return mame_rand(machine);
+					return mame_rand(space->machine);
 				}
 			break;
 
 			case 0x46/2:
-				return (input_port_read(machine, "P1") & 0xffff)^0xffff;
+				return (input_port_read(space->machine, "P1") & 0xffff)^0xffff;
 
 
 		}
@@ -357,7 +357,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( soundlatch_clear_r )
 {
-	soundlatch_clear_w(machine,0,0);
+	soundlatch_clear_w(space,0,0);
 	return 0;
 }
 

@@ -246,9 +246,9 @@ static WRITE16_HANDLER( system_control_w )
 
 	dsp_HOLD_signal = (data & 4) ? CLEAR_LINE : ASSERT_LINE;
 
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 
-	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n",cpu_get_previouspc(machine->activecpu),data,((data & 4) ? "Clear" : "Assert"),((data & 1) ? "Clear" : "Assert"));
+	logerror("68K:%06x writing %04x to TMS32025.  %s HOLD , %s RESET\n",cpu_get_previouspc(space->cpu),data,((data & 4) ? "Clear" : "Assert"),((data & 1) ? "Clear" : "Assert"));
 }
 
 static READ16_HANDLER( lineram_r )
@@ -276,7 +276,7 @@ static WRITE16_HANDLER( dspram_w )
 static READ16_HANDLER( dsp_HOLD_signal_r )
 {
 	/* HOLD signal is active low */
-	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n",cpu_get_previouspc(machine->activecpu),dsp_HOLD_signal);
+	//  logerror("TMS32025:%04x Reading %01x level from HOLD signal\n",cpu_get_previouspc(space->cpu),dsp_HOLD_signal);
 
 	return dsp_HOLD_signal;
 }
@@ -284,7 +284,7 @@ static READ16_HANDLER( dsp_HOLD_signal_r )
 static WRITE16_HANDLER( dsp_HOLDA_signal_w )
 {
 	if (offset)
-		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n",cpu_get_previouspc(machine->activecpu),data);
+		logerror("TMS32025:%04x Writing %01x level to HOLD-Acknowledge signal\n",cpu_get_previouspc(space->cpu),data);
 }
 
 
@@ -294,7 +294,7 @@ static WRITE16_HANDLER( airsys_paletteram16_w )	/* xxBBBBxRRRRxGGGG */
 	COMBINE_DATA(&paletteram16[offset]);
 
 	a = paletteram16[offset];
-	palette_set_color_rgb(machine,offset,pal4bit(a >> 0),pal4bit(a >> 5),pal4bit(a >> 10));
+	palette_set_color_rgb(space->machine,offset,pal4bit(a >> 0),pal4bit(a >> 5),pal4bit(a >> 10));
 }
 
 
@@ -311,16 +311,16 @@ static READ16_HANDLER( stick_input_r )
 	switch( offset )
 	{
 		case 0x00:	/* "counter 1" lo */
-			return input_port_read(machine, STICK1_PORT_TAG);
+			return input_port_read(space->machine, STICK1_PORT_TAG);
 
 		case 0x01:	/* "counter 2" lo */
-			return input_port_read(machine, STICK2_PORT_TAG);
+			return input_port_read(space->machine, STICK2_PORT_TAG);
 
 		case 0x02:	/* "counter 1" hi */
-			return (input_port_read(machine, STICK1_PORT_TAG) & 0xff00) >> 8;
+			return (input_port_read(space->machine, STICK1_PORT_TAG) & 0xff00) >> 8;
 
 		case 0x03:	/* "counter 2" hi */
-			return (input_port_read(machine, STICK2_PORT_TAG) & 0xff00) >> 8;
+			return (input_port_read(space->machine, STICK2_PORT_TAG) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -331,10 +331,10 @@ static READ16_HANDLER( stick2_input_r )
 	switch( offset )
 	{
 		case 0x00:	/* "counter 3" lo */
-			return input_port_read(machine, STICK3_PORT_TAG);
+			return input_port_read(space->machine, STICK3_PORT_TAG);
 
 		case 0x02:	/* "counter 3" hi */
-			return (input_port_read(machine, STICK3_PORT_TAG) & 0xff00) >> 8;
+			return (input_port_read(space->machine, STICK3_PORT_TAG) & 0xff00) >> 8;
 	}
 
 	return 0;
@@ -351,7 +351,7 @@ static void reset_sound_region(running_machine *machine)
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 3;
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 static STATE_POSTLOAD( taitoair_postload )

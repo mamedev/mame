@@ -283,7 +283,7 @@ static WRITE8_HANDLER( peplus_bgcolor_w )
 		bit2 = 0;
 		b = 0x21 * bit2 + 0x47 * bit1 + 0x97 * bit0;
 
-		palette_set_color(machine, (15 + (i*16)), MAKE_RGB(r, g, b));
+		palette_set_color(space->machine, (15 + (i*16)), MAKE_RGB(r, g, b));
 	}
 }
 
@@ -485,7 +485,7 @@ static READ8_HANDLER( peplus_sf000_r )
 /* Last Color in Every Palette is bgcolor */
 static READ8_HANDLER( peplus_bgcolor_r )
 {
-	return palette_get_color(machine, 15); // Return bgcolor from First Palette
+	return palette_get_color(space->machine, 15); // Return bgcolor from First Palette
 }
 
 static READ8_HANDLER( peplus_dropdoor_r )
@@ -513,7 +513,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 	UINT8 bank_a = 0x50; // Turn Off Low Battery and Hopper Full Statuses
 	UINT8 coin_optics = 0x00;
     UINT8 coin_out = 0x00;
-	UINT64 curr_cycles = cpu_get_total_cycles(machine->activecpu);
+	UINT64 curr_cycles = cpu_get_total_cycles(space->cpu);
 
 	UINT8 sda = 0;
 	if(!sda_dir)
@@ -521,16 +521,16 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 		sda = i2cmem_read(0, I2CMEM_SDA);
 	}
 
-	if ((input_port_read_safe(machine, "SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {
+	if ((input_port_read_safe(space->machine, "SENSOR",0x00) & 0x01) == 0x01 && coin_state == 0) {
 		coin_state = 1; // Start Coin Cycle
-		last_cycles = cpu_get_total_cycles(machine->activecpu);
+		last_cycles = cpu_get_total_cycles(space->cpu);
 	} else {
 		/* Process Next Coin Optic State */
 		if (curr_cycles - last_cycles > 600000/6 && coin_state != 0) {
 			coin_state++;
 			if (coin_state > 5)
 				coin_state = 0;
-			last_cycles = cpu_get_total_cycles(machine->activecpu);
+			last_cycles = cpu_get_total_cycles(space->cpu);
 		}
 	}
 
@@ -557,12 +557,12 @@ static READ8_HANDLER( peplus_input_bank_a_r )
 	}
 
 	if (curr_cycles - last_door > 6000/12) { // Guessing with 6000
-		if ((input_port_read_safe(machine, "DOOR",0xff) & 0x01) == 0x01) {
+		if ((input_port_read_safe(space->machine, "DOOR",0xff) & 0x01) == 0x01) {
 			door_open = (!door_open & 0x01);
 		} else {
 			door_open = 1;
 		}
-		last_door = cpu_get_total_cycles(machine->activecpu);
+		last_door = cpu_get_total_cycles(space->cpu);
 	}
 
 	if (curr_cycles - last_coin_out > 600000/12 && coin_out_state != 0) { // Guessing with 600000
@@ -572,7 +572,7 @@ static READ8_HANDLER( peplus_input_bank_a_r )
             coin_out_state = 3; // Coin-Out On
         }
 
-		last_coin_out = cpu_get_total_cycles(machine->activecpu);
+		last_coin_out = cpu_get_total_cycles(space->cpu);
 	}
 
     switch (coin_out_state)

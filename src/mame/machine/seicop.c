@@ -157,12 +157,12 @@ static UINT8 xy_check;
 
 #define CRT_MODE(_x_,_y_,_flip_) \
 	{ \
-	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen); \
+	rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen); \
 	visarea.min_x = 0; \
 	visarea.max_x = _x_-1; \
 	visarea.min_y = 0; \
 	visarea.max_y = _y_-1; \
-	video_screen_configure(machine->primary_screen, _x_, _y_, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds ); \
+	video_screen_configure(space->machine->primary_screen, _x_, _y_, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds ); \
 	flip_screen_set(_flip_); \
 	} \
 
@@ -756,7 +756,7 @@ READ16_HANDLER( copdxbl_0_r )
 	{
 		default:
 		{
-			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(machine->activecpu), retvalue, offset*2);
+			logerror("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(space->cpu), retvalue, offset*2);
 			return retvalue;
 		}
 
@@ -765,11 +765,11 @@ READ16_HANDLER( copdxbl_0_r )
 		//case (0x5b4/2):
 		//  return cop_mcu_ram[offset];
 
-		case (0x700/2): return input_port_read(machine, "DSW1");
-		case (0x704/2):	return input_port_read(machine, "PLAYERS12");
-		case (0x708/2):	return input_port_read(machine, "PLAYERS34");
-		case (0x70c/2):	return input_port_read(machine, "SYSTEM");
-		case (0x71c/2): return input_port_read(machine, "DSW2");
+		case (0x700/2): return input_port_read(space->machine, "DSW1");
+		case (0x704/2):	return input_port_read(space->machine, "PLAYERS12");
+		case (0x708/2):	return input_port_read(space->machine, "PLAYERS34");
+		case (0x70c/2):	return input_port_read(space->machine, "SYSTEM");
+		case (0x71c/2): return input_port_read(space->machine, "DSW2");
 	}
 }
 
@@ -782,7 +782,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 
 		default:
 		{
-			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(machine->activecpu), data, offset*2);
+			logerror("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
 			break;
 		}
 
@@ -871,8 +871,8 @@ WRITE16_HANDLER( copdxbl_0_w )
 		/*WRONG*/
 		case (0x65c/2):
 		{
-			soundlatch_w(machine,1,data&0xff);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+			soundlatch_w(space,1,data&0xff);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
 		/*video regs (not scrollram,something else)*/
@@ -889,7 +889,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 		/*case (0x740/2):
         {
             soundlatch_w(1,data&0x00ff);
-            cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+            cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
             break;
         }*/
 	}
@@ -990,12 +990,12 @@ WRITE16_HANDLER( raiden2_cop2_w )
 		/* ----- program upload registers ----- */
 
 		case 0x432/2:		/* COP program data */
-			COP_LOG(("%05X:COP Prog Data = %04X\n", cpu_get_pc(machine->activecpu), data));
+			COP_LOG(("%05X:COP Prog Data = %04X\n", cpu_get_pc(space->cpu), data));
 			cop->program[cop_ram_r(cop, 0x434)] = data;
 			break;
 
 		case 0x434/2:		/* COP program address */
-			COP_LOG(("%05X:COP Prog Addr = %04X\n", cpu_get_pc(machine->activecpu), data));
+			COP_LOG(("%05X:COP Prog Addr = %04X\n", cpu_get_pc(space->cpu), data));
 			assert((data & ~0xff) == 0);
 			temp32 = (data & 0xff) / 8;
 			cop->func_value[temp32] = cop_ram_r(cop, 0x438);
@@ -1005,15 +1005,15 @@ WRITE16_HANDLER( raiden2_cop2_w )
 			break;
 
 		case 0x438/2:		/* COP program entry value (0,4,5,6,7,8,9,F) */
-			COP_LOG(("%05X:COP Prog Val  = %04X\n", cpu_get_pc(machine->activecpu), data));
+			COP_LOG(("%05X:COP Prog Val  = %04X\n", cpu_get_pc(space->cpu), data));
 			break;
 
 		case 0x43a/2:		/* COP program entry mask */
-			COP_LOG(("%05X:COP Prog Mask = %04X\n", cpu_get_pc(machine->activecpu), data));
+			COP_LOG(("%05X:COP Prog Mask = %04X\n", cpu_get_pc(space->cpu), data));
 			break;
 
 		case 0x43c/2:		/* COP program trigger value */
-			COP_LOG(("%05X:COP Prog Trig = %04X\n", cpu_get_pc(machine->activecpu), data));
+			COP_LOG(("%05X:COP Prog Trig = %04X\n", cpu_get_pc(space->cpu), data));
 			break;
 
 		/* ----- ???? ----- */
@@ -1023,13 +1023,13 @@ WRITE16_HANDLER( raiden2_cop2_w )
 			{
 				UINT32 addr = cop_ram_r(cop, 0x478) << 6;
 				int count = (cop_ram_r(cop, 0x47a) + 1) << 5;
-				COP_LOG(("%05X:COP RAM clear from %05X to %05X\n", cpu_get_pc(machine->activecpu), addr, addr + count));
+				COP_LOG(("%05X:COP RAM clear from %05X to %05X\n", cpu_get_pc(space->cpu), addr, addr + count));
 				while (count--)
 					program_write_byte(addr++, 0);
 			}
 			else
 			{
-				COP_LOG(("%05X:COP Unknown RAM clear(%04X) = %04X\n", cpu_get_pc(machine->activecpu), cop_ram_r(cop, 0x47e), data));
+				COP_LOG(("%05X:COP Unknown RAM clear(%04X) = %04X\n", cpu_get_pc(space->cpu), cop_ram_r(cop, 0x47e), data));
 			}
 			break;
 
@@ -1040,7 +1040,7 @@ WRITE16_HANDLER( raiden2_cop2_w )
 		case 0x4a4/2:		/* COP register high word */
 		case 0x4a6/2:		/* COP register high word */
 			regnum = (offset) % 4;
-			COP_LOG(("%05X:COP RegHi(%d) = %04X\n", cpu_get_pc(machine->activecpu), regnum, data));
+			COP_LOG(("%05X:COP RegHi(%d) = %04X\n", cpu_get_pc(space->cpu), regnum, data));
 			cop->reg[regnum] = (cop->reg[regnum] & 0x0000ffff) | (data << 16);
 			break;
 
@@ -1049,14 +1049,14 @@ WRITE16_HANDLER( raiden2_cop2_w )
 		case 0x4c4/2:		/* COP register low word */
 		case 0x4c6/2:		/* COP register low word */
 			regnum = (offset) % 4;
-			COP_LOG(("%05X:COP RegLo(%d) = %04X\n", cpu_get_pc(machine->activecpu), regnum, data));
+			COP_LOG(("%05X:COP RegLo(%d) = %04X\n", cpu_get_pc(space->cpu), regnum, data));
 			cop->reg[regnum] = (cop->reg[regnum] & 0xffff0000) | data;
 			break;
 
 		/* ----- program trigger register ----- */
 
 		case 0x500/2:		/* COP trigger */
-			COP_LOG(("%05X:COP Trigger = %04X\n", cpu_get_pc(machine->activecpu), data));
+			COP_LOG(("%05X:COP Trigger = %04X\n", cpu_get_pc(space->cpu), data));
 			for (func = 0; func < ARRAY_LENGTH(cop->func_trigger); func++)
 				if (cop->func_trigger[func] == data)
 				{
@@ -1084,13 +1084,13 @@ WRITE16_HANDLER( raiden2_cop2_w )
 					}
 					break;
 				}
-			logerror("%05X:COP Warning - can't find command - func != ARRAY_LENGTH(cop->func_trigger)\n",  cpu_get_pc(machine->activecpu));
+			logerror("%05X:COP Warning - can't find command - func != ARRAY_LENGTH(cop->func_trigger)\n",  cpu_get_pc(space->cpu));
 			break;
 
 		/* ----- other stuff ----- */
 
 		default:		/* unknown */
-			COP_LOG(("%05X:COP Unknown(%04X) = %04X\n", cpu_get_pc(machine->activecpu), offset*2 + 0x400, data));
+			COP_LOG(("%05X:COP Unknown(%04X) = %04X\n", cpu_get_pc(space->cpu), offset*2 + 0x400, data));
 			break;
 	}
 }
@@ -1099,7 +1099,7 @@ WRITE16_HANDLER( raiden2_cop2_w )
 READ16_HANDLER( raiden2_cop2_r )
 {
 	cop_state *cop = &cop_data;
-	COP_LOG(("%05X:COP Read(%04X) = %04X\n", cpu_get_pc(machine->activecpu), offset*2 + 0x400, cop->ram[offset]));
+	COP_LOG(("%05X:COP Read(%04X) = %04X\n", cpu_get_pc(space->cpu), offset*2 + 0x400, cop->ram[offset]));
 	return cop->ram[offset];
 }
 #endif
@@ -1123,7 +1123,7 @@ static READ16_HANDLER( generic_cop_r )
 	switch (offset)
 	{
 		default:
-			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(machine->activecpu), retvalue, offset*2);
+			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(space->cpu), retvalue, offset*2);
 			return retvalue;
 			break;
 
@@ -1145,7 +1145,7 @@ static WRITE16_HANDLER( generic_cop_w )
 	switch (offset)
 	{
 		default:
-			seibu_cop_log("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(machine->activecpu), data, offset*2);
+			seibu_cop_log("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
 			break;
 
 		/* BCD Protection */
@@ -1154,8 +1154,8 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x024/2): { prot_bcd[2] = protection_bcd_jsr(cop_mcu_ram[offset]); break; }
 
 		/* Command tables for 0x500 / 0x502 commands */
-		case (0x032/2): { copd2_set_tabledata(data, machine); break; }
-		case (0x034/2): { copd2_set_tableoffset(data, machine); break; }
+		case (0x032/2): { copd2_set_tabledata(data, space->machine); break; }
+		case (0x034/2): { copd2_set_tableoffset(data, space->machine); break; }
 		case (0x038/2):	{ cop_438 = data; break; }
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
@@ -1164,14 +1164,14 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x078/2): /* clear address */
 		{
 			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
-			seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(machine->activecpu), data, data<<6);
+			seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
 			break;
 		}
 
 		case (0x07a/2): /* clear length */
 		{
 			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
-			seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(machine->activecpu), data, data<<5);
+			seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<5);
 
 			break;
 		}
@@ -1179,7 +1179,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x07c/2): /* clear value? */
 		{
 			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
-			seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(machine->activecpu), data, data<<6);
+			seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
 			break;
 		}
 
@@ -1187,7 +1187,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x07e/2):
 		{
 			cop_clearfill_lasttrigger = data;
-			seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", cpu_get_pc(machine->activecpu), data);
+			seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", cpu_get_pc(space->cpu), data);
 			if (data>=0x1ff)
 			{
 				seibu_cop_log("invalid!, >0x1ff\n");
@@ -1219,7 +1219,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			int i;
 			int command;
 
-			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", cpu_get_pc(machine->activecpu), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
+			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
 
 			command = -1;
 			/* search the uploaded 'trigger' table for a matching trigger*/
@@ -1258,7 +1258,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		/* hmm, this would be strange the 6xx range should be video regs?? */
 		case (0x2fc/2):
 		{
-			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(machine->activecpu), data);
+			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(space->cpu), data);
 
 			// I think the value it writes here must match the other value for anything to happen.. maybe */
 			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
@@ -1291,7 +1291,7 @@ READ16_HANDLER( heatbrl_mcu_r )
 	switch (offset)
 	{
 		default:
-			return generic_cop_r(machine, offset, mem_mask);
+			return generic_cop_r(space, offset, mem_mask);
 			break;
 
 	    /*********************************************************************
@@ -1310,15 +1310,15 @@ READ16_HANDLER( heatbrl_mcu_r )
         *********************************************************************/
 
 		/* Seibu Sound System */
-		case (0x3c8/2):	return seibu_main_word_r(machine,2,0xffff);
-		case (0x3cc/2):	return seibu_main_word_r(machine,3,0xffff);
-		case (0x3d4/2): return seibu_main_word_r(machine,5,0xffff);
+		case (0x3c8/2):	return seibu_main_word_r(space,2,0xffff);
+		case (0x3cc/2):	return seibu_main_word_r(space,3,0xffff);
+		case (0x3d4/2): return seibu_main_word_r(space,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read(machine, "DSW1");
-		case (0x344/2):	return input_port_read(machine, "PLAYERS12");
-		case (0x348/2): return input_port_read(machine, "PLAYERS34");
-		case (0x34c/2): return input_port_read(machine, "SYSTEM");
+		case (0x340/2): return input_port_read(space->machine, "DSW1");
+		case (0x344/2):	return input_port_read(space->machine, "PLAYERS12");
+		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
+		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
 
 	}
 }
@@ -1330,7 +1330,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 	switch (offset)
 	{
 		default:
-			generic_cop_w(machine, offset, data, mem_mask);
+			generic_cop_w(space, offset, data, mem_mask);
 			break;
 
 		/*********************************************************************
@@ -1370,7 +1370,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 					break;
 				}
 				default:
-					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],cpu_get_previouspc(machine->activecpu));
+					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],cpu_get_previouspc(space->cpu));
 			}
 			break;
 		}
@@ -1394,10 +1394,10 @@ WRITE16_HANDLER( heatbrl_mcu_w )
         700-7ff - Output (Seibu Sound System)
         *********************************************************************/
 
-		case (0x3c0/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x3c4/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x3d0/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x3d8/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x3c0/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x3c4/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x3d0/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x3d8/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1411,7 +1411,7 @@ READ16_HANDLER( cupsoc_mcu_r )
 	switch (offset)
 	{
 		default:
-			return generic_cop_r(machine, offset, mem_mask);
+			return generic_cop_r(space, offset, mem_mask);
 			break;
 
 		//case (0x07e/2):
@@ -1421,18 +1421,18 @@ READ16_HANDLER( cupsoc_mcu_r )
 
 		/* returning 0xffff for some inputs for now, breaks coinage but
            allows cupsoc to boot */
-		case (0x300/2): return input_port_read(machine, "DSW1");
-		case (0x304/2): return input_port_read(machine, "PLAYERS12");
-		case (0x308/2): return input_port_read(machine, "PLAYERS34");
-		case (0x30c/2): return input_port_read(machine, "SYSTEM");
+		case (0x300/2): return input_port_read(space->machine, "DSW1");
+		case (0x304/2): return input_port_read(space->machine, "PLAYERS12");
+		case (0x308/2): return input_port_read(space->machine, "PLAYERS34");
+		case (0x30c/2): return input_port_read(space->machine, "SYSTEM");
 		case (0x314/2): return 0xffff;
-		case (0x31c/2): return input_port_read(machine, "DSW2");
+		case (0x31c/2): return input_port_read(space->machine, "DSW2");
 
 		case (0x340/2): return 0xffff;
 		case (0x344/2): return 0xffff;
-		case (0x348/2):	return 0xffff;//seibu_main_word_r(machine,2,0xffff);
-		case (0x34c/2): return 0xffff;//seibu_main_word_r(machine,3,0xffff);
-		case (0x354/2): return 0xffff;//seibu_main_word_r(machine,5,0xffff);
+		case (0x348/2):	return 0xffff;//seibu_main_word_r(space,2,0xffff);
+		case (0x34c/2): return 0xffff;//seibu_main_word_r(space,3,0xffff);
+		case (0x354/2): return 0xffff;//seibu_main_word_r(space,5,0xffff);
 		case (0x35c/2): return 0xffff;
 	}
 }
@@ -1444,7 +1444,7 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 	switch (offset)
 	{
 		default:
-			generic_cop_w(machine, offset, data, mem_mask);
+			generic_cop_w(space, offset, data, mem_mask);
 			break;
 
 		/*********************************************************************
@@ -1491,10 +1491,10 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 				{
 					//UINT32 dst = cop_register[0];
 					//UINT32 dst = cop_register[1];
-					//program_write_word(dst,  mame_rand(machine)/*program_read_word(src)*/);
-					//program_write_word(dst+2,mame_rand(machine)/*program_read_word(src+2)*/);
-					//program_write_word(dst+4,mame_rand(machine)/*program_read_word(src+4)*/);
-					//program_write_word(dst+6,mame_rand(machine)/*program_read_word(src+6)*/);
+					//program_write_word(dst,  mame_rand(space->machine)/*program_read_word(src)*/);
+					//program_write_word(dst+2,mame_rand(space->machine)/*program_read_word(src+2)*/);
+					//program_write_word(dst+4,mame_rand(space->machine)/*program_read_word(src+4)*/);
+					//program_write_word(dst+6,mame_rand(space->machine)/*program_read_word(src+6)*/);
 					//logerror("%04x\n",cop_register[0]);
 					break;
 				}
@@ -1548,10 +1548,10 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 		case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
 		case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
-		case (0x340/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x344/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x350/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x358/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x340/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x344/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x350/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x358/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1564,19 +1564,19 @@ READ16_HANDLER( godzilla_mcu_r )
 	switch (offset)
 	{
 		default:
-			return generic_cop_r(machine, offset, mem_mask);
+			return generic_cop_r(space, offset, mem_mask);
 			break;
 
 		/* Non-protection reads */
-		case (0x308/2):	return seibu_main_word_r(machine,2,0xffff);
-		case (0x30c/2):	return seibu_main_word_r(machine,3,0xffff);
-		case (0x314/2):	return seibu_main_word_r(machine,5,0xffff);
+		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
+		case (0x30c/2):	return seibu_main_word_r(space,3,0xffff);
+		case (0x314/2):	return seibu_main_word_r(space,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read(machine, "DSW1");
-		case (0x344/2): return input_port_read(machine, "PLAYERS12");
-		case (0x348/2): return input_port_read(machine, "PLAYERS34");
-		case (0x34c/2): return input_port_read(machine, "SYSTEM");
+		case (0x340/2): return input_port_read(space->machine, "DSW1");
+		case (0x344/2): return input_port_read(space->machine, "PLAYERS12");
+		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
+		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
 	}
 }
 
@@ -1587,7 +1587,7 @@ WRITE16_HANDLER( godzilla_mcu_w )
 	switch (offset)
 	{
 		default:
-			generic_cop_w(machine, offset, data, mem_mask);
+			generic_cop_w(space, offset, data, mem_mask);
 			break;
 
 
@@ -1598,10 +1598,10 @@ WRITE16_HANDLER( godzilla_mcu_w )
 		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
 		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1614,21 +1614,21 @@ READ16_HANDLER( denjinmk_mcu_r )
 	switch (offset)
 	{
 		default:
-			return generic_cop_r(machine, offset, mem_mask);
+			return generic_cop_r(space, offset, mem_mask);
 			break;
 
 		/* Non-protection reads */
 
-		case (0x308/2):	return seibu_main_word_r(machine,2,0xffff);
-		case (0x30c/2):	return seibu_main_word_r(machine,3,0xffff);
-		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
+		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
+		case (0x30c/2):	return seibu_main_word_r(space,3,0xffff);
+		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read(machine, "DSW1");
-		case (0x344/2):	return input_port_read(machine, "PLAYERS12");
-		case (0x348/2): return input_port_read(machine, "PLAYERS34");
-		case (0x34c/2): return input_port_read(machine, "SYSTEM");
-		case (0x35c/2): return input_port_read(machine, "DSW2");
+		case (0x340/2): return input_port_read(space->machine, "DSW1");
+		case (0x344/2):	return input_port_read(space->machine, "PLAYERS12");
+		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
+		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
+		case (0x35c/2): return input_port_read(space->machine, "DSW2");
 	}
 }
 
@@ -1639,7 +1639,7 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 	switch (offset)
 	{
 		default:
-			generic_cop_w(machine, offset, data, mem_mask);
+			generic_cop_w(space, offset, data, mem_mask);
 			break;
 
 		//case (0x05a/2): { /* brightness?? */ break; }
@@ -1657,10 +1657,10 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 
 		//case (0x280/2): { /* trigger.. something */ break; }
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
 
 	}
 }
@@ -1674,7 +1674,7 @@ READ16_HANDLER( sdgndmrb_mcu_r )
 	switch (offset)
 	{
 		default:
-			return generic_cop_r(machine, offset, mem_mask);
+			return generic_cop_r(space, offset, mem_mask);
 			break;
 
 		/*hit protection*/
@@ -1691,16 +1691,16 @@ READ16_HANDLER( sdgndmrb_mcu_r )
 			return cop_mcu_ram[offset];
 
 		/* Non-protection reads */
-		case (0x308/2): return seibu_main_word_r(machine,2,0xffff);
-		case (0x30c/2): return seibu_main_word_r(machine,3,0xffff);
-		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
+		case (0x308/2): return seibu_main_word_r(space,2,0xffff);
+		case (0x30c/2): return seibu_main_word_r(space,3,0xffff);
+		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read(machine, "DSW1");
-		case (0x344/2):	return input_port_read(machine, "PLAYERS12");
-		case (0x348/2): return input_port_read(machine, "PLAYERS34");
-		case (0x34c/2): return input_port_read(machine, "SYSTEM");
-		case (0x35c/2): return input_port_read(machine, "DSW2");
+		case (0x340/2): return input_port_read(space->machine, "DSW1");
+		case (0x344/2):	return input_port_read(space->machine, "PLAYERS12");
+		case (0x348/2): return input_port_read(space->machine, "PLAYERS34");
+		case (0x34c/2): return input_port_read(space->machine, "SYSTEM");
+		case (0x35c/2): return input_port_read(space->machine, "DSW2");
 	}
 }
 
@@ -1712,7 +1712,7 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 	switch (offset)
 	{
 		default:
-			generic_cop_w(machine, offset, data, mem_mask);
+			generic_cop_w(space, offset, data, mem_mask);
 			break;
 
 		/*********************************************************************
@@ -1775,7 +1775,7 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 					break;
 				}
 				default:
-					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],cpu_get_previouspc(machine->activecpu));
+					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],cpu_get_previouspc(space->cpu));
 			}
 			break;
 		}
@@ -1864,10 +1864,10 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 		//case (0x280/2): break;
 		//case (0x6fc/2): break;
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1881,14 +1881,14 @@ READ16_HANDLER( legionna_mcu_r )
 	switch (offset)
 	{
 		default:
-			return generic_cop_r(machine, offset, mem_mask);
+			return generic_cop_r(space, offset, mem_mask);
 			break;
 
 		/*********************************************************************
         400-5ff -  Protection reads
         *********************************************************************/
 
-		case (0x070/2):	return (mame_rand(machine) &0xffff); /* read PC $110a, could be some sort of control word:  sometimes a bit is changed then it's poked back in... */
+		case (0x070/2):	return (mame_rand(space->machine) &0xffff); /* read PC $110a, could be some sort of control word:  sometimes a bit is changed then it's poked back in... */
 		case (0x182/2):	return (0); /* read PC $3594 */
 		case (0x184/2):	return (0); /* read PC $3588 */
 		case (0x186/2):	return (0); /* read PC $35a0 */
@@ -1902,15 +1902,15 @@ READ16_HANDLER( legionna_mcu_r )
         *********************************************************************/
 
 		/* Seibu Sound System */
-		case (0x308/2):	return seibu_main_word_r(machine,2,0xffff);
-		case (0x30c/2):	return seibu_main_word_r(machine,3,0xffff);
-		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
+		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
+		case (0x30c/2):	return seibu_main_word_r(space,3,0xffff);
+		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
 
 		/* Inputs */
-		case (0x340/2): return input_port_read(machine, "DSW1");
-		case (0x344/2):	return input_port_read(machine, "PLAYERS12");
-		case (0x348/2):	return input_port_read(machine, "COIN");
-		case (0x34c/2):	return input_port_read(machine, "SYSTEM");
+		case (0x340/2): return input_port_read(space->machine, "DSW1");
+		case (0x344/2):	return input_port_read(space->machine, "PLAYERS12");
+		case (0x348/2):	return input_port_read(space->machine, "COIN");
+		case (0x34c/2):	return input_port_read(space->machine, "SYSTEM");
 
 	}
 }
@@ -1923,7 +1923,7 @@ WRITE16_HANDLER( legionna_mcu_w )
 	switch (offset)
 	{
 		default:
-			generic_cop_w(machine, offset, data, mem_mask);
+			generic_cop_w(space, offset, data, mem_mask);
 			break;
 
 		/* Execute Macro command from table */
@@ -1966,10 +1966,10 @@ WRITE16_HANDLER( legionna_mcu_w )
         700-7ff - Output (Seibu Sound System)
         *********************************************************************/
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
 	}
 }
 
@@ -1983,17 +1983,17 @@ READ16_HANDLER( raiden2_mcu_r )
 	switch (offset)
 	{
 		default:
-			return generic_cop_r(machine, offset, mem_mask);
+			return generic_cop_r(space, offset, mem_mask);
 			break;
 
-		case (0x340/2): return input_port_read(machine, "DSWA") | (input_port_read(machine, "DSWB") << 8);
-		case (0x344/2): return input_port_read(machine, "P1") | (input_port_read(machine, "P2") << 8);
-		case (0x34c/2): return input_port_read(machine, "SYSTEM") | 0xff00;
+		case (0x340/2): return input_port_read(space->machine, "DSWA") | (input_port_read(space->machine, "DSWB") << 8);
+		case (0x344/2): return input_port_read(space->machine, "P1") | (input_port_read(space->machine, "P2") << 8);
+		case (0x34c/2): return input_port_read(space->machine, "SYSTEM") | 0xff00;
 
 		/* Inputs */
-		case (0x308/2):	return seibu_main_word_r(machine,2,0xffff);
-		case (0x30c/2):	return seibu_main_word_r(machine,3,0xffff);
-		case (0x314/2): return seibu_main_word_r(machine,5,0xffff);
+		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
+		case (0x30c/2):	return seibu_main_word_r(space,3,0xffff);
+		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
 
 	}
 }
@@ -2005,31 +2005,31 @@ WRITE16_HANDLER( raiden2_mcu_w )
 	switch (offset)
 	{
 		default:
-			generic_cop_w(machine, offset, data, mem_mask);
+			generic_cop_w(space, offset, data, mem_mask);
 			break;
 
-		case (0x2a0/2): sprcpt_val_1_w(machine,offset,data,mem_mask); break;
-		case (0x2a2/2): sprcpt_val_1_w(machine,offset,data,mem_mask); break;
-		case (0x2a4/2): sprcpt_data_3_w(machine,offset,data,mem_mask); break;
-		case (0x2a6/2): sprcpt_data_3_w(machine,offset,data,mem_mask); break;
-		case (0x2a8/2): sprcpt_data_4_w(machine,offset,data,mem_mask); break;
-		case (0x2aa/2): sprcpt_data_4_w(machine,offset,data,mem_mask); break;
-		case (0x2ac/2): sprcpt_flags_1_w(machine,offset,data,mem_mask); break;
-		case (0x2ae/2): sprcpt_flags_1_w(machine,offset,data,mem_mask); break;
-		case (0x2b0/2): sprcpt_data_1_w(machine,offset,data,mem_mask); break;
-		case (0x2b2/2): sprcpt_data_1_w(machine,offset,data,mem_mask); break;
-		case (0x2b4/2): sprcpt_data_2_w(machine,offset,data,mem_mask); break;
-		case (0x2b6/2): sprcpt_data_2_w(machine,offset,data,mem_mask); break;
-		case (0x2b8/2): sprcpt_val_2_w(machine,offset,data,mem_mask); break;
-		case (0x2ba/2): sprcpt_val_2_w(machine,offset,data,mem_mask); break;
-		case (0x2bc/2): sprcpt_adr_w(machine,offset,data,mem_mask); break;
-		case (0x2be/2): sprcpt_adr_w(machine,offset,data,mem_mask); break;
-		case (0x2ce/2): sprcpt_flags_2_w(machine,offset,data,mem_mask); break;
+		case (0x2a0/2): sprcpt_val_1_w(space,offset,data,mem_mask); break;
+		case (0x2a2/2): sprcpt_val_1_w(space,offset,data,mem_mask); break;
+		case (0x2a4/2): sprcpt_data_3_w(space,offset,data,mem_mask); break;
+		case (0x2a6/2): sprcpt_data_3_w(space,offset,data,mem_mask); break;
+		case (0x2a8/2): sprcpt_data_4_w(space,offset,data,mem_mask); break;
+		case (0x2aa/2): sprcpt_data_4_w(space,offset,data,mem_mask); break;
+		case (0x2ac/2): sprcpt_flags_1_w(space,offset,data,mem_mask); break;
+		case (0x2ae/2): sprcpt_flags_1_w(space,offset,data,mem_mask); break;
+		case (0x2b0/2): sprcpt_data_1_w(space,offset,data,mem_mask); break;
+		case (0x2b2/2): sprcpt_data_1_w(space,offset,data,mem_mask); break;
+		case (0x2b4/2): sprcpt_data_2_w(space,offset,data,mem_mask); break;
+		case (0x2b6/2): sprcpt_data_2_w(space,offset,data,mem_mask); break;
+		case (0x2b8/2): sprcpt_val_2_w(space,offset,data,mem_mask); break;
+		case (0x2ba/2): sprcpt_val_2_w(space,offset,data,mem_mask); break;
+		case (0x2bc/2): sprcpt_adr_w(space,offset,data,mem_mask); break;
+		case (0x2be/2): sprcpt_adr_w(space,offset,data,mem_mask); break;
+		case (0x2ce/2): sprcpt_flags_2_w(space,offset,data,mem_mask); break;
 
-		case (0x300/2):	{ seibu_main_word_w(machine,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(machine,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(machine,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(machine,6,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
+		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
 
 
 	}

@@ -82,7 +82,7 @@ WRITE8_HANDLER( yunsung8_videoram_w )
 		color = RAM[offset & ~1] | (RAM[offset | 1] << 8);
 
 		/* BBBBBGGGGGRRRRRx */
-		palette_set_color_rgb(machine, offset/2 + (bank ? 0x400:0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
+		palette_set_color_rgb(space->machine, offset/2 + (bank ? 0x400:0), pal5bit(color >> 0), pal5bit(color >> 5), pal5bit(color >> 10));
 	}
 	else
 	{

@@ -58,26 +58,26 @@ static READ32_HANDLER( f3_control_r )
 		case 0x0: /* MSW: Test switch, coins, eeprom access, LSW: Player Buttons, Start, Tilt, Service */
 			e = eeprom_read_bit();
 			e = e | (e<<8);
-			return ((e | input_port_read(machine, "EEPROM") | (input_port_read(machine, "EEPROM")<<8))<<16)		/* top byte may be mirror of bottom byte??  see bubblem */
-					| input_port_read(machine, "IN1");
+			return ((e | input_port_read(space->machine, "EEPROM") | (input_port_read(space->machine, "EEPROM")<<8))<<16)		/* top byte may be mirror of bottom byte??  see bubblem */
+					| input_port_read(space->machine, "IN1");
 
 		case 0x1: /* MSW: Coin counters/lockouts are readable, LSW: Joysticks (Player 1 & 2) */
-			return (coin_word[0]<<16) | input_port_read(machine, "IN0") | 0xff00;
+			return (coin_word[0]<<16) | input_port_read(space->machine, "IN0") | 0xff00;
 
 		case 0x2: /* Analog control 1 */
-			return ((input_port_read(machine, "DIAL1") & 0xf)<<12) | ((input_port_read(machine, "DIAL1") & 0xff0)>>4);
+			return ((input_port_read(space->machine, "DIAL1") & 0xf)<<12) | ((input_port_read(space->machine, "DIAL1") & 0xff0)>>4);
 
 		case 0x3: /* Analog control 2 */
-			return ((input_port_read(machine, "DIAL2") & 0xf)<<12) | ((input_port_read(machine, "DIAL2") & 0xff0)>>4);
+			return ((input_port_read(space->machine, "DIAL2") & 0xf)<<12) | ((input_port_read(space->machine, "DIAL2") & 0xff0)>>4);
 
 		case 0x4: /* Player 3 & 4 fire buttons (Player 2 top fire buttons in Kaiser Knuckle) */
-			return input_port_read(machine, "IN2")<<8;
+			return input_port_read(space->machine, "IN2")<<8;
 
 		case 0x5: /* Player 3 & 4 joysticks (Player 1 top fire buttons in Kaiser Knuckle) */
-			return (coin_word[1]<<16) | input_port_read(machine, "IN3");
+			return (coin_word[1]<<16) | input_port_read(space->machine, "IN3");
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(machine->activecpu), offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n", cpu_get_pc(space->cpu), offset);
 	return 0xffffffff;
 }
 
@@ -86,7 +86,7 @@ static WRITE32_HANDLER( f3_control_w )
 	switch (offset)
 	{
 		case 0x00: /* Watchdog */
-			watchdog_reset(machine);
+			watchdog_reset(space->machine);
 			return;
 
 		case 0x01: /* Coin counters & lockouts */
@@ -120,23 +120,23 @@ static WRITE32_HANDLER( f3_control_w )
 			}
 			return;
 	}
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",cpu_get_pc(machine->activecpu),offset,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %08x\n",cpu_get_pc(space->cpu),offset,data);
 }
 
 static WRITE32_HANDLER( f3_sound_reset_0_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_reset_1_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static WRITE32_HANDLER( f3_sound_bankswitch_w )
 {
 	if (f3_game==KIRAMEKI) {
-		UINT16 *rom = (UINT16 *)memory_region(machine, "audio");
+		UINT16 *rom = (UINT16 *)memory_region(space->machine, "audio");
 		UINT32 idx;
 
 		idx = (offset << 1) & 0x1e;
@@ -3465,16 +3465,16 @@ static void tile_decode(running_machine *machine)
 #define F3_IRQ_SPEEDUP_1_R(GAME, counter, mem_addr, mask) 		\
 static READ32_HANDLER( irq_speedup_r_##GAME )					\
 {																\
-	if (cpu_get_pc(machine->activecpu)==counter && (f3_ram[mem_addr]&mask)!=0)	\
-		cpu_spinuntil_int(machine->activecpu);									\
+	if (cpu_get_pc(space->cpu)==counter && (f3_ram[mem_addr]&mask)!=0)	\
+		cpu_spinuntil_int(space->cpu);									\
 	return f3_ram[mem_addr];									\
 }
 
 #define F3_IRQ_SPEEDUP_2_R(GAME, counter, mem_addr, mask) 		\
 static READ32_HANDLER( irq_speedup_r_##GAME )					\
 {																\
-	if (cpu_get_pc(machine->activecpu)==counter && (f3_ram[mem_addr]&mask)==0)	\
-		cpu_spinuntil_int(machine->activecpu);									\
+	if (cpu_get_pc(space->cpu)==counter && (f3_ram[mem_addr]&mask)==0)	\
+		cpu_spinuntil_int(space->cpu);									\
 	return f3_ram[mem_addr];									\
 }
 
@@ -3482,11 +3482,11 @@ static READ32_HANDLER( irq_speedup_r_##GAME )					\
 static READ32_HANDLER( irq_speedup_r_##GAME )					\
 {																\
 	int ptr;													\
-	if ((cpu_get_sp(machine->activecpu)&2)==0) ptr=f3_ram[(cpu_get_sp(machine->activecpu)&0x1ffff)/4];	\
-	else ptr=(((f3_ram[(cpu_get_sp(machine->activecpu)&0x1ffff)/4])&0x1ffff)<<16) | \
-	(f3_ram[((cpu_get_sp(machine->activecpu)&0x1ffff)/4)+1]>>16); 				\
-	if (cpu_get_pc(machine->activecpu)==counter && ptr==stack)					\
-		cpu_spinuntil_int(machine->activecpu);									\
+	if ((cpu_get_sp(space->cpu)&2)==0) ptr=f3_ram[(cpu_get_sp(space->cpu)&0x1ffff)/4];	\
+	else ptr=(((f3_ram[(cpu_get_sp(space->cpu)&0x1ffff)/4])&0x1ffff)<<16) | \
+	(f3_ram[((cpu_get_sp(space->cpu)&0x1ffff)/4)+1]>>16); 				\
+	if (cpu_get_pc(space->cpu)==counter && ptr==stack)					\
+		cpu_spinuntil_int(space->cpu);									\
 	return f3_ram[mem_addr];									\
 }
 
@@ -3651,16 +3651,16 @@ static DRIVER_INIT( bubsymph )
 
 static READ32_HANDLER( bubsympb_oki_r )
 {
-	return okim6295_status_0_r(machine,0);
+	return okim6295_status_0_r(space,0);
 }
 static WRITE32_HANDLER( bubsympb_oki_w )
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) okim6295_data_0_w(machine,0,data&0xff);
-	//if (mem_mask==0x000000ff) okim6295_data_0_w(machine,0,data&0xff);
+	if (ACCESSING_BITS_0_7) okim6295_data_0_w(space,0,data&0xff);
+	//if (mem_mask==0x000000ff) okim6295_data_0_w(space,0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT8 *snd = memory_region(machine, "oki");
+		UINT8 *snd = memory_region(space->machine, "oki");
 		int bank = (data & 0x000f0000) >> 16;
 		// almost certainly wrong
 		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);

@@ -87,7 +87,7 @@ WRITE8_HANDLER( tagteam_mirrorvideoram_w )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	tagteam_videoram_w(machine,offset,data);
+	tagteam_videoram_w(space,offset,data);
 }
 
 WRITE8_HANDLER( tagteam_mirrorcolorram_w )
@@ -99,12 +99,12 @@ WRITE8_HANDLER( tagteam_mirrorcolorram_w )
 	y = offset % 32;
 	offset = 32 * y + x;
 
-	tagteam_colorram_w(machine,offset,data);
+	tagteam_colorram_w(space,offset,data);
 }
 
 WRITE8_HANDLER( tagteam_control_w )
 {
-logerror("%04x: control = %02x\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: control = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 7 is the palette bank */
 	palettebank = (data & 0x80) >> 7;

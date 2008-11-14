@@ -284,7 +284,7 @@ static READ8_HANDLER( spacezap_io_r )
 {
 	coin_counter_w(0, (offset >> 8) & 1);
 	coin_counter_w(1, (offset >> 9) & 1);
-	return input_port_read_safe(machine, "P3HANDLE", 0xff);
+	return input_port_read_safe(space->machine, "P3HANDLE", 0xff);
 }
 
 
@@ -421,15 +421,15 @@ static WRITE8_HANDLER( profpac_banksw_w )
 	profpac_bank = data;
 
 	/* set the main banking */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(machine, "user1") + 0x8000 * bank);
+	memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0xbfff, 0, 0, SMH_BANK1);
+	memory_set_bankptr(1, memory_region(space->machine, "user1") + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
+		memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, profpac_videoram_r);
 
 	/* if we have a 640k EPROM board, map that on top of the 4000-7FFF range if specified */
-	if ((data & 0x80) && memory_region(machine, "user2") != NULL)
+	if ((data & 0x80) && memory_region(space->machine, "user2") != NULL)
 	{
 		/* Note: There is a jumper which could change the base offset to 0xa8 instead */
 		bank = data - 0x80;
@@ -437,11 +437,11 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		/* if the bank is in range, map the appropriate bank */
 		if (bank < 0x28)
 		{
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
-			memory_set_bankptr(2, memory_region(machine, "user2") + 0x4000 * bank);
+			memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
+			memory_set_bankptr(2, memory_region(space->machine, "user2") + 0x4000 * bank);
 		}
 		else
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
+			memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);
 	}
 }
 
@@ -521,8 +521,8 @@ static const ay8910_interface ay8912_interface =
 
 static WRITE8_HANDLER( tenpindx_sound_w )
 {
-	soundlatch_w(machine, offset, data);
-	cputag_set_input_line(machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, offset, data);
+	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

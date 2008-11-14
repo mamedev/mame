@@ -58,7 +58,7 @@ static WRITE8_HANDLER(vroulet_paletteram_w)
 		{
 			a=paletteram[((i*8+j)*2)&0xff ];
 			b=paletteram[((i*8+j)*2+1)&0xff ];
-			palette_set_color_rgb(machine,i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
+			palette_set_color_rgb(space->machine,i*16+j,pal4bit(b),pal4bit(b>>4),pal4bit(a));
 		}
 	}
 }

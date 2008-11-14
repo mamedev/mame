@@ -249,7 +249,7 @@ WRITE8_HANDLER( lasso_video_control_w )
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
-	lasso_flip_screen_w(machine, offset, data);
+	lasso_flip_screen_w(space, offset, data);
 }
 
 WRITE8_HANDLER( wwjgtin_video_control_w )
@@ -263,7 +263,7 @@ WRITE8_HANDLER( wwjgtin_video_control_w )
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	}
 
-	lasso_flip_screen_w(machine, offset, data);
+	lasso_flip_screen_w(space, offset, data);
 }
 
 WRITE8_HANDLER( pinbo_video_control_w )
@@ -271,7 +271,7 @@ WRITE8_HANDLER( pinbo_video_control_w )
 	/* no need to dirty the tilemap -- only the sprites use the global bank */
 	gfxbank = (data & 0x0c) >> 2;
 
-	lasso_flip_screen_w(machine, offset, data);
+	lasso_flip_screen_w(space, offset, data);
 }
 
 

@@ -79,7 +79,7 @@ TODO:
 
 static WRITE8_HANDLER( io_select_w )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = space->machine->driver_data;
 
 	switch (data)
 	{
@@ -96,9 +96,9 @@ static WRITE8_HANDLER( io_select_w )
 static READ8_HANDLER( io_port_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "DSW0", "DSW1" };
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = space->machine->driver_data;
 
-	return input_port_read(machine, portnames[state->current_port]);
+	return input_port_read(space->machine, portnames[state->current_port]);
 }
 
 
@@ -127,26 +127,26 @@ static const struct via6522_interface via_1_interface =
 
 static WRITE8_HANDLER( audio_reset_w )
 {
-	gameplan_state *state = machine->driver_data;
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	gameplan_state *state = space->machine->driver_data;
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 	if (data == 0)
 	{
 		device_reset(state->riot);
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 	}
 }
 
 
 static WRITE8_HANDLER( audio_cmd_w )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = space->machine->driver_data;
 	riot6532_porta_in_set(state->riot, data, 0x7f);
 }
 
 
 static WRITE8_HANDLER( audio_trigger_w )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = space->machine->driver_data;
 	riot6532_porta_in_set(state->riot, data << 7, 0x80);
 }
 

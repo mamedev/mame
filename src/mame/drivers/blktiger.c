@@ -41,8 +41,8 @@ VIDEO_EOF( blktiger );
 /* if a read from this address doesn't return the value it expects. */
 static READ8_HANDLER( blktiger_protection_r )
 {
-	int data = cpu_get_reg(machine->activecpu, Z80_DE) >> 8;
-	logerror("protection read, PC: %04x Result:%02x\n",cpu_get_pc(machine->activecpu),data);
+	int data = cpu_get_reg(space->cpu, Z80_DE) >> 8;
+	logerror("protection read, PC: %04x Result:%02x\n",cpu_get_pc(space->cpu),data);
 	return data;
 }
 
@@ -53,7 +53,7 @@ static WRITE8_HANDLER( blktiger_bankswitch_w )
 
 static WRITE8_HANDLER( blktiger_coinlockout_w )
 {
-	if (input_port_read(machine, "COIN_LOCKOUT") & 0x01)
+	if (input_port_read(space->machine, "COIN_LOCKOUT") & 0x01)
 	{
 		coin_lockout_w(0,~data & 0x01);
 		coin_lockout_w(1,~data & 0x02);

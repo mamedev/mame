@@ -325,7 +325,7 @@ static WRITE8_HANDLER( bankram_w )
 	/* EEROM lives in the upper 8k of bank 15 */
 	if (exidy440_bank == 15 && offset >= 0x2000)
 	{
-		memory_region(machine, "main")[0x10000 + 15 * 0x4000 + offset] = data;
+		memory_region(space->machine, "main")[0x10000 + 15 * 0x4000 + offset] = data;
 		logerror("W EEROM[%04X] = %02X\n", offset - 0x2000, data);
 	}
 
@@ -343,8 +343,8 @@ static WRITE8_HANDLER( bankram_w )
 static READ8_HANDLER( exidy440_input_port_3_r )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-	return input_port_read(machine, "IN3");
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	return input_port_read(space->machine, "IN3");
 }
 
 
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( sound_command_w )
 static WRITE8_HANDLER( exidy440_input_port_3_w )
 {
 	/* I/O1 accesses clear the CIRQ flip/flop */
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -435,7 +435,7 @@ static READ8_HANDLER( claypign_protection_r )
 
 static READ8_HANDLER( topsecex_input_port_5_r )
 {
-	return (input_port_read(machine, "AN1") & 1) ? 0x01 : 0x02;
+	return (input_port_read(space->machine, "AN1") & 1) ? 0x01 : 0x02;
 }
 
 

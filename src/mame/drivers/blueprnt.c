@@ -85,8 +85,8 @@ static READ8_HANDLER( blueprnt_sh_dipsw_r )
 
 static WRITE8_HANDLER( blueprnt_sound_command_w )
 {
-	soundlatch_w(machine, offset, data);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blueprnt_coin_counter_w )

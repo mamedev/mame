@@ -60,8 +60,8 @@ WRITE16_HANDLER( toki_foreground_videoram16_w );
 
 static WRITE16_HANDLER( tokib_soundcommand16_w )
 {
-	soundlatch_w(machine,0,data & 0xff);
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	soundlatch_w(space,0,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( pip16_r )
@@ -87,7 +87,7 @@ static void toki_adpcm_int (running_machine *machine, int data)
 static WRITE8_HANDLER( toki_adpcm_control_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 
 
 	/* the code writes either 2 or 3 in the bottom two bits */

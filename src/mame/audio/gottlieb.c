@@ -56,13 +56,13 @@ static void trigger_sample(running_machine *machine, UINT8 data);
 
 WRITE8_HANDLER( gottlieb_sh_w )
 {
-	const device_config *riot = device_list_find_by_tag(machine->config->devicelist, RIOT6532, "riot");
+	const device_config *riot = device_list_find_by_tag(space->machine->config->devicelist, RIOT6532, "riot");
 
 	/* identify rev1 boards by the presence of a 6532 RIOT device */
 	if (riot != NULL)
 		gottlieb1_sh_w(riot, data);
 	else
-		gottlieb2_sh_w(machine, data);
+		gottlieb2_sh_w(space, data);
 }
 
 
@@ -395,22 +395,22 @@ static void gottlieb2_sh_w(running_machine *machine, UINT8 data)
 
 static READ8_HANDLER( speech_data_r )
 {
-	cputag_set_input_line(machine, "speech", M6502_IRQ_LINE, CLEAR_LINE);
-	return soundlatch_r(machine, offset);
+	cputag_set_input_line(space->machine, "speech", M6502_IRQ_LINE, CLEAR_LINE);
+	return soundlatch_r(space, offset);
 }
 
 
 static READ8_HANDLER( audio_data_r )
 {
-	cputag_set_input_line(machine, "audio", M6502_IRQ_LINE, CLEAR_LINE);
-	return soundlatch2_r(machine, offset);
+	cputag_set_input_line(space->machine, "audio", M6502_IRQ_LINE, CLEAR_LINE);
+	return soundlatch2_r(space, offset);
 }
 
 
 static WRITE8_HANDLER( signal_audio_nmi_w )
 {
-	cputag_set_input_line(machine, "audio", INPUT_LINE_NMI, ASSERT_LINE);
-	cputag_set_input_line(machine, "audio", INPUT_LINE_NMI, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audio", INPUT_LINE_NMI, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audio", INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -499,7 +499,7 @@ static WRITE8_HANDLER( speech_control_w )
 	speech_control = data;
 
 	/* bit 0 enables/disables the NMI line */
-	nmi_state_update(machine);
+	nmi_state_update(space->machine);
 
 	/* bit 1 controls a LED on the sound board */
 
@@ -511,17 +511,17 @@ static WRITE8_HANDLER( speech_control_w )
 		{
 			/* bit 4 goes to the 8913 BC1 pin */
 			if (data & 0x10)
-				ay8910_control_port_0_w(machine, 0, *psg_latch);
+				ay8910_control_port_0_w(space, 0, *psg_latch);
 			else
-				ay8910_write_port_0_w(machine, 0, *psg_latch);
+				ay8910_write_port_0_w(space, 0, *psg_latch);
 		}
 		else
 		{
 			/* bit 4 goes to the 8913 BC1 pin */
 			if (data & 0x10)
-				ay8910_control_port_1_w(machine, 0, *psg_latch);
+				ay8910_control_port_1_w(space, 0, *psg_latch);
 			else
-				ay8910_write_port_1_w(machine, 0, *psg_latch);
+				ay8910_write_port_1_w(space, 0, *psg_latch);
 		}
 	}
 
@@ -529,7 +529,7 @@ static WRITE8_HANDLER( speech_control_w )
 
 	/* bit 6 = speech chip DATA PRESENT pin; high then low to make the chip read data */
 	if ((previous & 0x40) == 0 && (data & 0x40) != 0)
-		sp0250_w(machine, 0, *sp0250_latch);
+		sp0250_w(space, 0, *sp0250_latch);
 
 	/* bit 7 goes to the speech chip RESET pin */
 	if ((previous ^ data) & 0x80)

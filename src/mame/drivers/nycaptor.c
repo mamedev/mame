@@ -161,7 +161,7 @@ int nyc_gametype=0;
 
 static WRITE8_HANDLER( sub_cpu_halt_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, (data )? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, (data )? ASSERT_LINE : CLEAR_LINE);
 }
 
 static UINT8 snd_data;
@@ -195,7 +195,7 @@ static READ8_HANDLER( nycaptor_b_r )
 
 static READ8_HANDLER( nycaptor_by_r )
 {
-	int port=input_port_read(machine, "LIGHTY");
+	int port=input_port_read(space->machine, "LIGHTY");
 	if(nyc_gametype == 1)
 			port = 255 - port;
 		return port - 8;
@@ -203,13 +203,13 @@ static READ8_HANDLER( nycaptor_by_r )
 
 static READ8_HANDLER( nycaptor_bx_r )
 {
-		return (input_port_read(machine, "LIGHTX") + 0x27) | 1;
+		return (input_port_read(space->machine, "LIGHTX") + 0x27) | 1;
 }
 
 
 static WRITE8_HANDLER( sound_cpu_reset_w )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data&1 )? ASSERT_LINE : CLEAR_LINE);
 }
 
 static int vol_ctrl[16];
@@ -239,7 +239,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(machine,0,data);
+	soundlatch_w(space,0,data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 
@@ -253,7 +253,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpu_set_input_line(machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
@@ -287,7 +287,7 @@ static READ8_HANDLER ( nycaptor_generic_control_r )
 static WRITE8_HANDLER( nycaptor_generic_control_w )
 {
 	generic_control_reg = data;
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000 + ((data&0x08)>>3)*0x4000 );
+	memory_set_bankptr(1, memory_region(space->machine, "main") + 0x10000 + ((data&0x08)>>3)*0x4000 );
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -425,14 +425,14 @@ static WRITE8_HANDLER(cyclshtg_mcu_w)
 
 static READ8_HANDLER(cyclshtg_mcu_status_r1)
 {
-  return mame_rand(machine);
+  return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER( cyclshtg_generic_control_w )
 {
 	int bank=(data>>2)&3;
 	generic_control_reg = data;
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000 + bank*0x4000 );
+	memory_set_bankptr(1, memory_region(space->machine, "main") + 0x10000 + bank*0x4000 );
 }
 
 
@@ -503,7 +503,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(unk_r)
 {
-  return mame_rand(machine);
+  return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( bronx_readmem, ADDRESS_SPACE_PROGRAM, 8 )

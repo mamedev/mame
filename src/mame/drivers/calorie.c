@@ -190,8 +190,8 @@ static WRITE8_HANDLER( calorie_flipscreen_w )
 
 static READ8_HANDLER( calorie_soundlatch_r )
 {
-	UINT8 latch = soundlatch_r(machine,0);
-	soundlatch_clear_w(machine,0,0);
+	UINT8 latch = soundlatch_r(space,0);
+	soundlatch_clear_w(space,0,0);
 	return latch;
 }
 

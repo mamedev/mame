@@ -76,34 +76,34 @@ static WRITE8_HANDLER( sound_status_w )
 
 static READ16_HANDLER( control_1_r )
 {
-	return (input_port_read(machine, "P1") + (input_port_read(machine, "P2") << 8));
+	return (input_port_read(space->machine, "P1") + (input_port_read(space->machine, "P2") << 8));
 }
 
 static READ16_HANDLER( control_2_r )
 {
-	return input_port_read(machine, "SYSTEM");
+	return input_port_read(space->machine, "SYSTEM");
 }
 
 static READ16_HANDLER( rotary_1_r )
 {
-	return (( ~(1 << input_port_read(machine, "ROT1")) )<<8)&0xff00;
+	return (( ~(1 << input_port_read(space->machine, "ROT1")) )<<8)&0xff00;
 }
 
 static READ16_HANDLER( rotary_2_r )
 {
-	return (( ~(1 << input_port_read(machine, "ROT2")) )<<8)&0xff00;
+	return (( ~(1 << input_port_read(space->machine, "ROT2")) )<<8)&0xff00;
 }
 
 static READ16_HANDLER( rotary_lsb_r )
 {
-	return ((( ~(1 << input_port_read(machine, "ROT2"))  ) <<4)&0xf000)
-		 + ((( ~(1 << input_port_read(machine, "ROT1"))  )    )&0x0f00);
+	return ((( ~(1 << input_port_read(space->machine, "ROT2"))  ) <<4)&0xf000)
+		 + ((( ~(1 << input_port_read(space->machine, "ROT1"))  )    )&0x0f00);
 }
 
 static READ16_HANDLER( protcontrols_r )
 {
 	static const char *const portnames[] = { "P1", "P2", "SYSTEM" };
-	return input_port_read(machine, portnames[offset]) ^ invert_controls;
+	return input_port_read(space->machine, portnames[offset]) ^ invert_controls;
 }
 
 static WRITE16_HANDLER( protection_w )
@@ -118,8 +118,8 @@ static WRITE16_HANDLER( sound_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(machine, 0, data >> 8);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, 0, data >> 8);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

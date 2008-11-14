@@ -146,18 +146,18 @@ static READ16_HANDLER( bishi_mirror_r )
 
 static READ16_HANDLER( bishi_sound_r )
 {
-	return ymz280b_status_0_r(machine, offset)<<8;
+	return ymz280b_status_0_r(space, offset)<<8;
 }
 
 static WRITE16_HANDLER( bishi_sound_w )
 {
  	if (offset)
 	{
-		ymz280b_data_0_w(machine, offset, data>>8);
+		ymz280b_data_0_w(space, offset, data>>8);
 	}
  	else
 	{
-		ymz280b_register_0_w(machine, offset, data>>8);
+		ymz280b_register_0_w(space, offset, data>>8);
 	}
 }
 
@@ -176,7 +176,7 @@ static READ16_HANDLER( bishi_K056832_rom_r )
 		ouroffs += 4;
 	}
 
-	return K056832_bishi_rom_word_r(machine, ouroffs, mem_mask);
+	return K056832_bishi_rom_word_r(space, ouroffs, mem_mask);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )

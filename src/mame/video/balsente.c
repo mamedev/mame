@@ -81,11 +81,11 @@ WRITE8_HANDLER( balsente_palette_select_w )
 	if (palettebank_vis != (data & 3))
 	{
 		/* update the scanline palette */
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1 + BALSENTE_VBEND);
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) - 1 + BALSENTE_VBEND);
 		palettebank_vis = data & 3;
 	}
 
-	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, video_screen_get_vpos(machine->primary_screen));
+	logerror("balsente_palette_select_w(%d) scanline=%d\n", data & 3, video_screen_get_vpos(space->machine->primary_screen));
 }
 
 
@@ -106,7 +106,7 @@ WRITE8_HANDLER( balsente_paletteram_w )
 	g = paletteram[(offset & ~3) + 1];
 	b = paletteram[(offset & ~3) + 2];
 
-	palette_set_color_rgb(machine, offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine, offset / 4, pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 
@@ -122,11 +122,11 @@ WRITE8_HANDLER( shrike_sprite_select_w )
 	if( sprite_data != sprite_bank[(data & 0x80 >> 7) ^ 1 ])
 	{
 		logerror( "shrike_sprite_select_w( 0x%02x )\n", data );
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1 + BALSENTE_VBEND);
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) - 1 + BALSENTE_VBEND);
 		sprite_data = sprite_bank[(data & 0x80 >> 7) ^ 1];
 	}
 
-	shrike_shared_6809_w( machine, 1, data );
+	shrike_shared_6809_w( space->machine, 1, data );
 }
 
 

@@ -521,7 +521,7 @@ static READ32_HANDLER( trackball_r )
 
 		for( axis = 0; axis < 2; axis++ )
 		{
-			value = input_port_read(machine, axisnames[axis]);
+			value = input_port_read(space->machine, axisnames[axis]);
 			diff = value - trackball_prev[ axis ];
 			trackball_prev[ axis ] = value;
 			trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -595,7 +595,7 @@ static WRITE32_HANDLER( btcflash_w )
 
 static READ32_HANDLER( btc_trackball_r )
 {
-//  mame_printf_debug( "r %08x %08x %08x\n", cpu_get_pc(machine->activecpu), offset, mem_mask );
+//  mame_printf_debug( "r %08x %08x %08x\n", cpu_get_pc(space->cpu), offset, mem_mask );
 
 	if( offset == 1 && mem_mask == 0xffff0000 )
 	{
@@ -606,7 +606,7 @@ static READ32_HANDLER( btc_trackball_r )
 
 		for( axis = 0; axis < 4; axis++ )
 		{
-			value = input_port_read(machine, axisnames[axis]);
+			value = input_port_read(space->machine, axisnames[axis]);
 			diff = value - btc_trackball_prev[ axis ];
 			btc_trackball_prev[ axis ] = value;
 			btc_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
@@ -617,7 +617,7 @@ static READ32_HANDLER( btc_trackball_r )
 
 static WRITE32_HANDLER( btc_trackball_w )
 {
-//  mame_printf_debug( "w %08x %08x %08x %08x\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask );
+//  mame_printf_debug( "w %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), offset, data, mem_mask );
 }
 
 static NVRAM_HANDLER( btchamp )

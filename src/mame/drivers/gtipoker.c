@@ -15,7 +15,7 @@ static VIDEO_UPDATE(gtipoker)
 
 static READ8_HANDLER( gtipoker_unk_r )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( gtipoker_memmap, ADDRESS_SPACE_PROGRAM, 8 )

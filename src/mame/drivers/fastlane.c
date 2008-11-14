@@ -41,7 +41,7 @@ static INTERRUPT_GEN( fastlane_interrupt )
 static WRITE8_HANDLER( k007121_registers_w )
 {
 	if (offset < 8)
-		K007121_ctrl_0_w(machine,offset,data);
+		K007121_ctrl_0_w(space,offset,data);
 	else	/* scroll registers */
 		fastlane_k007121_regs[offset] = data;
 }
@@ -49,7 +49,7 @@ static WRITE8_HANDLER( k007121_registers_w )
 static WRITE8_HANDLER( fastlane_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	/* bits 0 & 1 coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -70,19 +70,19 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 
 static READ8_HANDLER( fastlane_k007232_read_port_0_r )
 {
-	return k007232_read_port_0_r(machine, offset ^ 1);
+	return k007232_read_port_0_r(space, offset ^ 1);
 }
 static WRITE8_HANDLER( fastlane_k007232_write_port_0_w )
 {
-	k007232_write_port_0_w(machine, offset ^ 1, data);
+	k007232_write_port_0_w(space, offset ^ 1, data);
 }
 static READ8_HANDLER( fastlane_k007232_read_port_1_r )
 {
-	return k007232_read_port_1_r(machine, offset ^ 1);
+	return k007232_read_port_1_r(space, offset ^ 1);
 }
 static WRITE8_HANDLER( fastlane_k007232_write_port_1_w )
 {
-	k007232_write_port_1_w(machine, offset ^ 1, data);
+	k007232_write_port_1_w(space, offset ^ 1, data);
 }
 
 

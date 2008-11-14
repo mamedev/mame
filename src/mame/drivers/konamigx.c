@@ -440,7 +440,7 @@ static WRITE32_HANDLER( esc_w )
 		if (konamigx_wrport1_1 & 0x10)
 		{
 			gx_rdport1_3 &= ~8;
-			cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 4, HOLD_LINE);
 		}
 	}
 	else
@@ -524,7 +524,7 @@ static WRITE32_HANDLER( eeprom_w )
         */
 
 		konamigx_wrport1_1 = (data>>16)&0xff;
-//      logerror("write %x to IRQ register (PC=%x)\n", konamigx_wrport1_1, cpu_get_pc(machine->activecpu));
+//      logerror("write %x to IRQ register (PC=%x)\n", konamigx_wrport1_1, cpu_get_pc(space->cpu));
 
 		// gx_syncen is to ensure each IRQ is trigger at least once after being enabled
 		if (konamigx_wrport1_1 & 0x80) gx_syncen |= konamigx_wrport1_1 & 0x1f;
@@ -552,13 +552,13 @@ static WRITE32_HANDLER( control_w )
 		{
 			// enable 68k
 			// clear the halt condition and reset the 68000
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 		}
 		else
 		{
 			// disable 68k
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 		}
 
 		K053246_set_OBJCHA_line((data&0x100000) ? ASSERT_LINE : CLEAR_LINE);
@@ -588,9 +588,9 @@ static READ32_HANDLER(waitskip_r)
 {
 	UINT32 data = gx_workram[waitskip.offs+offset];
 
-	if (cpu_get_pc(machine->activecpu) == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
+	if (cpu_get_pc(space->cpu) == waitskip.pc && (data & mem_mask) == (waitskip.data & mem_mask))
 	{
-		cpu_spinuntil_trigger(machine->activecpu, resume_trigger);
+		cpu_spinuntil_trigger(space->cpu, resume_trigger);
 		suspension_active = 1;
 	}
 
@@ -621,14 +621,14 @@ static WRITE32_HANDLER( ccu_w )
 		// vblank interrupt ACK
 		if (ACCESSING_BITS_24_31)
 		{
-			cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 1, CLEAR_LINE);
 			gx_syncen |= 0x20;
 		}
 
 		// hblank interrupt ACK
 		if (ACCESSING_BITS_8_15)
 		{
-			cpu_set_input_line(machine->cpu[0], 2, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 2, CLEAR_LINE);
 			gx_syncen |= 0x40;
 		}
 	}
@@ -769,7 +769,7 @@ static READ32_HANDLER( sound020_r )
 		rv |= LSW<<8;
 	}
 
-//  mame_printf_debug("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("Read 68k @ %x (PC=%x)\n", reg, cpu_get_pc(space->cpu));
 
 	// we clearly have some problem because some games require these hacks
 	// perhaps 68000/68020 timing is skewed?
@@ -779,31 +779,31 @@ static READ32_HANDLER( sound020_r )
 			if (reg == 0) rv |= 0xff00;
 			break;
 		case 2: // Winning Spike
-			if (cpu_get_pc(machine->activecpu) == 0x2026fe) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x2026fe) rv = 0xc0c0c0c0;
 			break;
 		case 3: // Run'n Gun 2
-			if (cpu_get_pc(machine->activecpu) == 0x24f122) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24f122) rv = 0xc0c0c0c0;
 			break;
 		case 4:	// Rushing Heroes
-			if (cpu_get_pc(machine->activecpu) == 0x20eda6) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x20eda6) rv = 0xc0c0c0c0;
 			break;
 		case 5:	// Vs. Net Soccer ver. UAB
-			if (cpu_get_pc(machine->activecpu) == 0x24c63e) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c63e) rv = 0xc0c0c0c0;
 			break;
 		case 6: // Slam Dunk 2
-			if (cpu_get_pc(machine->activecpu) == 0x24f21c) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24f21c) rv = 0xc0c0c0c0;
 			break;
 		case 7:	// Vs. Net Soccer ver. AAA
-			if (cpu_get_pc(machine->activecpu) == 0x24c722) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c722) rv = 0xc0c0c0c0;
 			break;
 		case 8:	// Vs. Net Soccer ver. EAD
-			if (cpu_get_pc(machine->activecpu) == 0x24c482) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c482) rv = 0xc0c0c0c0;
 			break;
 		case 9:	// Vs. Net Soccer ver. EAB
-			if (cpu_get_pc(machine->activecpu) == 0x24c46c) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c46c) rv = 0xc0c0c0c0;
 			break;
 		case 10: // Vs. Net Soccer ver. JAB
-			if (cpu_get_pc(machine->activecpu) == 0x24c5f0) rv = 0xc0c0c0c0;
+			if (cpu_get_pc(space->cpu) == 0x24c5f0) rv = 0xc0c0c0c0;
 			break;
 	}
 
@@ -828,14 +828,14 @@ static WRITE32_HANDLER( sound020_w )
 	{
 		reg = offset<<1;
 		val = data>>24;
-		write_snd_020(machine, reg, val);
+		write_snd_020(space->machine, reg, val);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
 		reg = (offset<<1)+1;
 		val = (data>>8)&0xff;
-		write_snd_020(machine, reg, val);
+		write_snd_020(space->machine, reg, val);
 	}
 }
 
@@ -873,16 +873,16 @@ static double adc0834_callback( int input )
 
 static READ32_HANDLER( le2_gun_H_r )
 {
-	int p1x = input_port_read(machine, "LIGHT0_X")*290/0xff+20;
-	int p2x = input_port_read(machine, "LIGHT1_X")*290/0xff+20;
+	int p1x = input_port_read(space->machine, "LIGHT0_X")*290/0xff+20;
+	int p2x = input_port_read(space->machine, "LIGHT1_X")*290/0xff+20;
 
 	return (p1x<<16)|p2x;
 }
 
 static READ32_HANDLER( le2_gun_V_r )
 {
-	int p1y = input_port_read(machine, "LIGHT0_Y")*224/0xff;
-	int p2y = input_port_read(machine, "LIGHT1_Y")*224/0xff;
+	int p1y = input_port_read(space->machine, "LIGHT0_Y")*224/0xff;
+	int p2y = input_port_read(space->machine, "LIGHT1_Y")*224/0xff;
 
 	// make "off the bottom" reload too
 	if (p1y >= 0xdf) p1y = 0;
@@ -892,7 +892,7 @@ static READ32_HANDLER( le2_gun_V_r )
 
 static READ32_HANDLER( service_r )
 {
-	int res = input_port_read(machine, "SERVICE");
+	int res = input_port_read(space->machine, "SERVICE");
 
 	if (init_eeprom_count)
 	{
@@ -909,24 +909,24 @@ static READ32_HANDLER( service_r )
 
 static READ32_HANDLER( gx5bppspr_r )
 {
-	return (K055673_rom_word_r(machine, offset*2+1, 0xffff) | K055673_rom_word_r(machine, offset*2, 0xffff)<<16);
+	return (K055673_rom_word_r(space, offset*2+1, 0xffff) | K055673_rom_word_r(space, offset*2, 0xffff)<<16);
 }
 
 static READ32_HANDLER( gx6bppspr_r )
 {
-	return (K055673_GX6bpp_rom_word_r(machine, offset*2+1, 0xffff) | K055673_GX6bpp_rom_word_r(machine, offset*2, 0xffff)<<16);
+	return (K055673_GX6bpp_rom_word_r(space, offset*2+1, 0xffff) | K055673_GX6bpp_rom_word_r(space, offset*2, 0xffff)<<16);
 }
 
 static READ32_HANDLER( type1_roz_r1 )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "gfx3");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "gfx3");
 
 	return ROM[offset];
 }
 
 static READ32_HANDLER( type1_roz_r2 )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "gfx3");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "gfx3");
 
 	ROM += (0x600000/2);
 
@@ -1081,13 +1081,13 @@ static WRITE32_HANDLER( type4_prot_w )
 				}
 				else
 				{
-					logerror("GXT4: unknown protection command %x (PC=%x)\n", last_prot_op, cpu_get_pc(machine->activecpu));
+					logerror("GXT4: unknown protection command %x (PC=%x)\n", last_prot_op, cpu_get_pc(space->cpu));
 				}
 
 				if (konamigx_wrport1_1 & 0x10)
 				{
 					gx_rdport1_3 &= ~8;
-					cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
+					cpu_set_input_line(space->machine->cpu[0], 4, HOLD_LINE);
 				}
 
 				// don't accidentally do a phony command
@@ -1198,9 +1198,9 @@ static READ16_HANDLER( dual539_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_1_r(machine, offset);
+		ret |= k054539_1_r(space, offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_0_r(machine, offset)<<8;
+		ret |= k054539_0_r(space, offset)<<8;
 
 	return ret;
 }
@@ -1208,9 +1208,9 @@ static READ16_HANDLER( dual539_r )
 static WRITE16_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_1_w(machine, offset, data);
+		k054539_1_w(space, offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_0_w(machine, offset, data>>8);
+		k054539_0_w(space, offset, data>>8);
 }
 
 static READ16_HANDLER( sndcomm68k_r )

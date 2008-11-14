@@ -68,8 +68,8 @@ static WRITE16_HANDLER( ddragon3_io16_w )
 		break;
 
 		case 1: /* soundlatch_w */
-		soundlatch_w(machine,1,reg[1]&0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(space,1,reg[1]&0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 		case 2:
@@ -88,7 +88,7 @@ static WRITE16_HANDLER( ddragon3_io16_w )
 		break;
 
 		default:
-		logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset,(unsigned)data, cpu_get_pc(machine->activecpu) );
+		logerror("OUTPUT 1400[%02x] %08x, pc=%06x \n", offset,(unsigned)data, cpu_get_pc(space->cpu) );
 		break;
 	}
 }

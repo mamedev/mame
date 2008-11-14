@@ -132,7 +132,7 @@ static WRITE16_HANDLER( eeprom_control_w )
 		eeprom_set_cs_line(~data & 8);
 		eeprom_write_bit(data & 2);
 		eeprom_set_clock_line(data & 4);
-		ticket_dispenser_w(machine, 0, (data & 1) << 7);
+		ticket_dispenser_w(space, 0, (data & 1) << 7);
 	}
 }
 
@@ -143,8 +143,8 @@ static WRITE16_HANDLER( sound_command_w )
 	{
 		/* write the latch and set the IRQ */
 		soundlatch_full = 1;
-		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
-		soundlatch_w(machine, 0, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
+		soundlatch_w(space, 0, data & 0xff);
 	}
 }
 
@@ -160,8 +160,8 @@ static READ8_HANDLER( sound_command_r )
 {
 	/* read the latch and clear the IRQ */
 	soundlatch_full = 0;
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
-	return soundlatch_r(machine, 0);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	return soundlatch_r(space, 0);
 }
 
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( sound_control_w )
 	if ((diff & 0x40) && (data & 0x40))
 		sndti_reset(SOUND_BSMT2000, 0);
 	if (data != 0x40 && data != 0x60)
-		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(machine->activecpu), data);
+		logerror("%04X:sound_control_w = %02X\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -192,7 +192,7 @@ static WRITE8_HANDLER( bsmt_data_w )
 	if (offset % 2 == 0)
 		sound_msb_latch = data;
 	else
-		bsmt2000_data_0_w(machine, offset/2, (sound_msb_latch << 8) | data, 0xffff);
+		bsmt2000_data_0_w(space, offset/2, (sound_msb_latch << 8) | data, 0xffff);
 }
 
 

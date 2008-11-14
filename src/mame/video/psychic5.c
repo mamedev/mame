@@ -131,11 +131,11 @@ READ8_HANDLER( psychic5_paged_ram_r )
 	{
 		switch (offset)
 		{
-			case 0x00: return input_port_read(machine, "SYSTEM");
-			case 0x01: return input_port_read(machine, "P1");
-			case 0x02: return input_port_read(machine, "P2");
-			case 0x03: return input_port_read(machine, "DSW1");
-			case 0x04: return input_port_read(machine, "DSW2");
+			case 0x00: return input_port_read(space->machine, "SYSTEM");
+			case 0x01: return input_port_read(space->machine, "P1");
+			case 0x02: return input_port_read(space->machine, "P2");
+			case 0x03: return input_port_read(space->machine, "DSW1");
+			case 0x04: return input_port_read(space->machine, "DSW2");
 		}
 	}
 
@@ -168,11 +168,11 @@ WRITE8_HANDLER( psychic5_paged_ram_w )
 			psychic5_bg_status = ps5_io_ram[BG_SCREEN_MODE];
 		}
 		else if (offset >= 0x400 && offset <= 0x5ff)	/* Sprite color */
-			psychic5_change_palette(machine,((offset >> 1) & 0xff)+0x000,offset-0x400);
+			psychic5_change_palette(space->machine,((offset >> 1) & 0xff)+0x000,offset-0x400);
 		else if (offset >= 0x800 && offset <= 0x9ff)	/* BG color */
-			psychic5_change_palette(machine,((offset >> 1) & 0xff)+0x100,offset-0x400);
+			psychic5_change_palette(space->machine,((offset >> 1) & 0xff)+0x100,offset-0x400);
 		else if (offset >= 0xa00 && offset <= 0xbff)	/* Text color */
-			psychic5_change_palette(machine,((offset >> 1) & 0xff)+0x200,offset-0x400);
+			psychic5_change_palette(space->machine,((offset >> 1) & 0xff)+0x200,offset-0x400);
 		else if (offset >= 0x1000)
 			tilemap_mark_tile_dirty(fg_tilemap, (offset-0x1000) >> 1);
 	}
@@ -205,7 +205,7 @@ WRITE8_HANDLER( bombsa_paged_ram_w )
 		else if (offset >= 0x0800 && offset <= 0x0fff)
 			tilemap_mark_tile_dirty(fg_tilemap, (offset & 0x7ff) >> 1);
 		else if (offset >= 0x1000 && offset <= 0x15ff)
-			psychic5_change_palette(machine, (offset >> 1) & 0x3ff, offset-0x1000);
+			psychic5_change_palette(space->machine, (offset >> 1) & 0x3ff, offset-0x1000);
 	}
 }
 

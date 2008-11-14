@@ -116,16 +116,16 @@ static READ8_HANDLER( mariner_protection_2_r )
 
 READ8_HANDLER( triplep_pip_r )
 {
-	logerror("PC %04x: triplep read port 2\n",cpu_get_pc(machine->activecpu));
-	if (cpu_get_pc(machine->activecpu) == 0x015a) return 0xff;
-	else if (cpu_get_pc(machine->activecpu) == 0x0886) return 0x05;
+	logerror("PC %04x: triplep read port 2\n",cpu_get_pc(space->cpu));
+	if (cpu_get_pc(space->cpu) == 0x015a) return 0xff;
+	else if (cpu_get_pc(space->cpu) == 0x0886) return 0x05;
 	else return 0;
 }
 
 READ8_HANDLER( triplep_pap_r )
 {
-	logerror("PC %04x: triplep read port 3\n",cpu_get_pc(machine->activecpu));
-	if (cpu_get_pc(machine->activecpu) == 0x015d) return 0x04;
+	logerror("PC %04x: triplep read port 3\n",cpu_get_pc(space->cpu));
+	if (cpu_get_pc(space->cpu) == 0x015d) return 0x04;
 	else return 0;
 }
 
@@ -146,9 +146,9 @@ static READ8_HANDLER( cavelon_banksw_r )
 	cavelon_banksw();
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		return ppi8255_r((device_config*)devtag_get_device(machine, PPI8255, "ppi8255_0"), offset - 0x0100);
+		return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset - 0x0100);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		return ppi8255_r((device_config*)devtag_get_device(machine, PPI8255, "ppi8255_1"), offset - 0x0200);
+		return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset - 0x0200);
 
 	return 0xff;
 }
@@ -158,9 +158,9 @@ static WRITE8_HANDLER( cavelon_banksw_w )
 	cavelon_banksw();
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset - 0x0100, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset - 0x0100, data);
 	else if ((offset >= 0x0200) && (offset <= 0x0203))
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset - 0x0200, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset - 0x0200, data);
 }
 
 

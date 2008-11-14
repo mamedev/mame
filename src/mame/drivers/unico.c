@@ -37,9 +37,9 @@ Year + Game         PCB             Notes
 
 ***************************************************************************/
 
-static READ16_HANDLER ( YM3812_status_port_0_msb_r )	{	return ym3812_status_port_0_r(machine,0) << 8;	}
-static WRITE16_HANDLER( YM3812_register_port_0_msb_w )	{	if (ACCESSING_BITS_8_15)	ym3812_control_port_0_w(machine,0,data >> 8);	}
-static WRITE16_HANDLER( YM3812_data_port_0_msb_w )		{	if (ACCESSING_BITS_8_15)	ym3812_write_port_0_w(machine,0,data >> 8);		}
+static READ16_HANDLER ( YM3812_status_port_0_msb_r )	{	return ym3812_status_port_0_r(space,0) << 8;	}
+static WRITE16_HANDLER( YM3812_register_port_0_msb_w )	{	if (ACCESSING_BITS_8_15)	ym3812_control_port_0_w(space,0,data >> 8);	}
+static WRITE16_HANDLER( YM3812_data_port_0_msb_w )		{	if (ACCESSING_BITS_8_15)	ym3812_write_port_0_w(space,0,data >> 8);		}
 
 
 /*
@@ -115,7 +115,7 @@ static WRITE16_HANDLER( zeropnt_sound_bank_w )
            contains garbage. Indeed, only banks 0&1 are used */
 
 		int bank = (data >> 8 ) & 1;
-		UINT8 *dst	= memory_region(machine, "oki");
+		UINT8 *dst	= memory_region(space->machine, "oki");
 		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 
@@ -128,42 +128,42 @@ static WRITE16_HANDLER( zeropnt_sound_bank_w )
 /* Light Gun - need to wiggle the input slightly otherwise fire doesn't work */
 static READ16_HANDLER( unico_gunx_0_msb_r )
 {
-	int x=input_port_read(machine, "X0");
+	int x=input_port_read(space->machine, "X0");
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (video_screen_get_frame_number(machine->primary_screen)&1))<<8;
+	return ((x&0xff) ^ (video_screen_get_frame_number(space->machine->primary_screen)&1))<<8;
 }
 
 static READ16_HANDLER( unico_guny_0_msb_r )
 {
-	int y=input_port_read(machine, "Y0");
+	int y=input_port_read(space->machine, "Y0");
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (video_screen_get_frame_number(machine->primary_screen)&1))<<8;
+	return ((y&0xff) ^ (video_screen_get_frame_number(space->machine->primary_screen)&1))<<8;
 }
 
 static READ16_HANDLER( unico_gunx_1_msb_r )
 {
-	int x=input_port_read(machine, "X1");
+	int x=input_port_read(space->machine, "X1");
 
 	x=x*384/256; /* On screen pixel X */
 	if (x<0x160) x=0x30 + (x*0xd0/0x15f);
 	else x=((x-0x160) * 0x20)/0x1f;
 
-	return ((x&0xff) ^ (video_screen_get_frame_number(machine->primary_screen)&1))<<8;
+	return ((x&0xff) ^ (video_screen_get_frame_number(space->machine->primary_screen)&1))<<8;
 }
 
 static READ16_HANDLER( unico_guny_1_msb_r )
 {
-	int y=input_port_read(machine, "Y1");
+	int y=input_port_read(space->machine, "Y1");
 
 	y=0x18+((y*0xe0)/0xff);
 
-	return ((y&0xff) ^ (video_screen_get_frame_number(machine->primary_screen)&1))<<8;
+	return ((y&0xff) ^ (video_screen_get_frame_number(space->machine->primary_screen)&1))<<8;
 }
 
 static ADDRESS_MAP_START( readmem_zeropnt, ADDRESS_SPACE_PROGRAM, 16 )
@@ -214,26 +214,26 @@ ADDRESS_MAP_END
                                 Zero Point 2
 ***************************************************************************/
 
-static READ32_HANDLER( zeropnt2_gunx_0_msb_r )		{ return (unico_gunx_0_msb_r(machine,0,0xffff)-0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(machine,0,0xffff)+0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_gunx_1_msb_r )		{ return (unico_gunx_1_msb_r(machine,0,0xffff)-0x0800) << 16; }
-static READ32_HANDLER( zeropnt2_guny_1_msb_r )		{ return (unico_guny_1_msb_r(machine,0,0xffff)+0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_gunx_0_msb_r )		{ return (unico_gunx_0_msb_r(space,0,0xffff)-0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_guny_0_msb_r )		{ return (unico_guny_0_msb_r(space,0,0xffff)+0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_gunx_1_msb_r )		{ return (unico_gunx_1_msb_r(space,0,0xffff)-0x0800) << 16; }
+static READ32_HANDLER( zeropnt2_guny_1_msb_r )		{ return (unico_guny_1_msb_r(space,0,0xffff)+0x0800) << 16; }
 
-static READ32_HANDLER ( zeropnt2_oki0_r )			{ return okim6295_status_0_r(machine,0) << 16; }
-static READ32_HANDLER ( zeropnt2_oki1_r )			{ return okim6295_status_1_r(machine,0) << 16; }
-static WRITE32_HANDLER( zeropnt2_oki0_w )			{ if (ACCESSING_BITS_16_23)	okim6295_data_0_w(machine,0,(data >> 16) & 0xff); }
-static WRITE32_HANDLER( zeropnt2_oki1_w )			{ if (ACCESSING_BITS_16_23)	okim6295_data_1_w(machine,0,(data >> 16) & 0xff); }
+static READ32_HANDLER ( zeropnt2_oki0_r )			{ return okim6295_status_0_r(space,0) << 16; }
+static READ32_HANDLER ( zeropnt2_oki1_r )			{ return okim6295_status_1_r(space,0) << 16; }
+static WRITE32_HANDLER( zeropnt2_oki0_w )			{ if (ACCESSING_BITS_16_23)	okim6295_data_0_w(space,0,(data >> 16) & 0xff); }
+static WRITE32_HANDLER( zeropnt2_oki1_w )			{ if (ACCESSING_BITS_16_23)	okim6295_data_1_w(space,0,(data >> 16) & 0xff); }
 
-static READ32_HANDLER( zeropnt2_ym2151_status_r )	{ return ym2151_status_port_0_r(machine,0) << 16; }
-static WRITE32_HANDLER( zeropnt2_ym2151_reg_w )		{ if (ACCESSING_BITS_16_23)	ym2151_register_port_0_w(machine,0,(data >> 16) & 0xff); }
-static WRITE32_HANDLER( zeropnt2_ym2151_data_w )	{ if (ACCESSING_BITS_16_23)	ym2151_data_port_0_w(machine,0,(data >> 16) & 0xff); }
+static READ32_HANDLER( zeropnt2_ym2151_status_r )	{ return ym2151_status_port_0_r(space,0) << 16; }
+static WRITE32_HANDLER( zeropnt2_ym2151_reg_w )		{ if (ACCESSING_BITS_16_23)	ym2151_register_port_0_w(space,0,(data >> 16) & 0xff); }
+static WRITE32_HANDLER( zeropnt2_ym2151_data_w )	{ if (ACCESSING_BITS_16_23)	ym2151_data_port_0_w(space,0,(data >> 16) & 0xff); }
 
 static WRITE32_HANDLER( zeropnt2_sound_bank_w )
 {
 	if (ACCESSING_BITS_24_31)
 	{
 		int bank = ((data >> 24) & 3) % 4;
-		UINT8 *dst	= memory_region(machine, "oki1");
+		UINT8 *dst	= memory_region(space->machine, "oki1");
 		UINT8 *src	= dst + 0x80000 + 0x20000 + 0x20000 * bank;
 		memcpy(dst + 0x20000, src, 0x20000);
 	}
@@ -252,7 +252,7 @@ static WRITE32_HANDLER( zeropnt2_leds_w )
 static WRITE32_HANDLER( zeropnt2_eeprom_w )
 {
 	if (data & ~0xfe00000)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(machine->activecpu),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{

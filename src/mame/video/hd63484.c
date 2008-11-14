@@ -1341,8 +1341,8 @@ static int regno;
 
 READ16_HANDLER( HD63484_status_r )
 {
-	if (cpu_get_pc(machine->activecpu) != 0xfced6 && cpu_get_pc(machine->activecpu) != 0xfe1d6) logerror("%05x: HD63484 status read\n",cpu_get_pc(machine->activecpu));
-	return 0xff22|(mame_rand(machine) & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
+	if (cpu_get_pc(space->cpu) != 0xfced6 && cpu_get_pc(space->cpu) != 0xfe1d6) logerror("%05x: HD63484 status read\n",cpu_get_pc(space->cpu));
+	return 0xff22|(mame_rand(space->machine) & 0x0004);	/* write FIFO ready + command end    +  (read FIFO ready or read FIFO not ready) */
 }
 
 WRITE16_HANDLER( HD63484_address_w )
@@ -1356,9 +1356,9 @@ WRITE16_HANDLER( HD63484_data_w )
 {
 	COMBINE_DATA(&HD63484_reg[regno/2]);
 	if (regno & 0x80) regno += 2;	/* autoincrement */
-logerror("PC %05x: HD63484 register %02x write %04x\n",cpu_get_pc(machine->activecpu),regno,HD63484_reg[regno/2]);
+logerror("PC %05x: HD63484 register %02x write %04x\n",cpu_get_pc(space->cpu),regno,HD63484_reg[regno/2]);
 	if (regno == 0)	/* FIFO */
-		HD63484_command_w(machine, HD63484_reg[0]);
+		HD63484_command_w(space, HD63484_reg[0]);
 }
 
 READ16_HANDLER( HD63484_data_r )
@@ -1366,15 +1366,15 @@ READ16_HANDLER( HD63484_data_r )
 	int res;
 
 	if (regno == 0x80)
-		res = video_screen_get_vpos(machine->primary_screen);
+		res = video_screen_get_vpos(space->machine->primary_screen);
 	else if (regno == 0)
 	{
-logerror("%05x: HD63484 read FIFO\n",cpu_get_pc(machine->activecpu));
+logerror("%05x: HD63484 read FIFO\n",cpu_get_pc(space->cpu));
 		res = readfifo;
 	}
 	else
 	{
-logerror("%05x: HD63484 read register %02x\n",cpu_get_pc(machine->activecpu),regno);
+logerror("%05x: HD63484 read register %02x\n",cpu_get_pc(space->cpu),regno);
 		res = 0;
 	}
 

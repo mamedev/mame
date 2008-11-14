@@ -350,14 +350,14 @@ return 0x4;
 	if (input_code_pressed(KEYCODE_8)) return 0x0080 ^ 0xffff;
 
 	// return 0x0004 ^ 0xffff; // 0x0004
-	switch (mame_rand(machine) & 3)
+	switch (mame_rand(space->machine) & 3)
 	{
 		case 0:
 			return 0;
 		case 1:
 			return 0xffff;
 		default:
-			return mame_rand(machine) & 0xffff;
+			return mame_rand(space->machine) & 0xffff;
 	}
 }
 
@@ -381,14 +381,14 @@ static READ16_HANDLER(test1_r)
     if (input_code_pressed(KEYCODE_J)) return 0x4000;
     if (input_code_pressed(KEYCODE_K)) return 0x8000;
 
-    switch (mame_rand(machine) & 3)
+    switch (mame_rand(space->machine) & 3)
     {
         case 0:
             return 0;
         case 1:
             return 0xffff;
         default:
-            return mame_rand(machine) % 0xffff;
+            return mame_rand(space->machine) % 0xffff;
     }
 }
 */
@@ -418,14 +418,14 @@ static READ16_HANDLER(rh1_r)
 
         }
 */
-	switch (mame_rand(machine) & 3)
+	switch (mame_rand(space->machine) & 3)
 	{
 		case 0:
 			return 0;
 		case 1:
 			return 0xffff;
 		default:
-			return mame_rand(machine) % 0xffff;
+			return mame_rand(space->machine) % 0xffff;
 	}
 }
 

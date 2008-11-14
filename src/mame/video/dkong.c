@@ -472,7 +472,7 @@ static TILE_GET_INFO( radarsc1_bg_tile_info )
 
 WRITE8_HANDLER( dkong_videoram_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 
 	if (state->video_ram[offset] != data)
 	{
@@ -483,7 +483,7 @@ WRITE8_HANDLER( dkong_videoram_w )
 
 WRITE8_HANDLER( dkongjr_gfxbank_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 
 	if (state->gfx_bank != (data & 0x01))
 	{
@@ -494,7 +494,7 @@ WRITE8_HANDLER( dkongjr_gfxbank_w )
 
 WRITE8_HANDLER( dkong3_gfxbank_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 
 	if (state->gfx_bank != (~data & 0x01))
 	{
@@ -505,7 +505,7 @@ WRITE8_HANDLER( dkong3_gfxbank_w )
 
 WRITE8_HANDLER( dkong_palettebank_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 	int newbank;
 
 	newbank = state->palette_bank;
@@ -524,14 +524,14 @@ WRITE8_HANDLER( dkong_palettebank_w )
 
 WRITE8_HANDLER( radarscp_grid_enable_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 
 	state->grid_on = data & 0x01;
 }
 
 WRITE8_HANDLER( radarscp_grid_color_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 
 	state->grid_col = (data & 0x07) ^ 0x07;
 	/* popmessage("Gridcol: %d", state->grid_col); */
@@ -539,14 +539,14 @@ WRITE8_HANDLER( radarscp_grid_color_w )
 
 WRITE8_HANDLER( dkong_flipscreen_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 
 	state->flip = ~data & 0x01;
 }
 
 WRITE8_HANDLER( dkong_spritebank_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 
 	state->sprite_bank = data & 0x01;
 }

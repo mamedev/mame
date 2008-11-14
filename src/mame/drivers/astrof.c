@@ -85,7 +85,7 @@ static UINT16 abattle_count;
 
 static READ8_HANDLER( irq_clear_r )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 
 	return 0;
 }
@@ -240,7 +240,7 @@ static WRITE8_HANDLER( tomahawk_videoram_w )
 
 static WRITE8_HANDLER( video_control_1_w )
 {
-	flipscreen = ((data >> 0) & 0x01) & input_port_read(machine, "CAB");
+	flipscreen = ((data >> 0) & 0x01) & input_port_read(space->machine, "CAB");
 
 	/* this ties to the CLR pin of the shift registers */
 	screen_off = (data & 0x02) ? TRUE : FALSE;
@@ -248,7 +248,7 @@ static WRITE8_HANDLER( video_control_1_w )
 	/* D2 - not connected in the schematics, but at one point Astro Fighter sets it to 1 */
 	/* D3-D7 - not connected */
 
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 }
 
 
@@ -269,7 +269,7 @@ static void astrof_set_video_control_2(UINT8 data)
 static WRITE8_HANDLER( astrof_video_control_2_w )
 {
 	astrof_set_video_control_2(data);
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 }
 
 
@@ -287,7 +287,7 @@ static void spfghmk2_set_video_control_2(UINT8 data)
 static WRITE8_HANDLER( spfghmk2_video_control_2_w )
 {
 	spfghmk2_set_video_control_2(data);
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 }
 
 
@@ -304,7 +304,7 @@ static void tomahawk_set_video_control_2(UINT8 data)
 static WRITE8_HANDLER( tomahawk_video_control_2_w )
 {
 	tomahawk_set_video_control_2(data);
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 }
 
 
@@ -386,7 +386,7 @@ static VIDEO_UPDATE( tomahawk )
 static READ8_HANDLER( shoot_r )
 {
 	/* not really sure about this */
-	return mame_rand(machine) & 8;
+	return mame_rand(space->machine) & 8;
 }
 
 

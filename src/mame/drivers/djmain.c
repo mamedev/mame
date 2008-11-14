@@ -112,7 +112,7 @@ static WRITE32_HANDLER( paletteram32_w )
 	g = (data >>  8) & 0xff;
 	b = (data >> 16) & 0xff;
 
-	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -128,7 +128,7 @@ static WRITE32_HANDLER( sndram_bank_w )
 	if (ACCESSING_BITS_16_31)
 	{
 		sndram_bank = (data >> 16) & 0x1f;
-		sndram_set_bank(machine);
+		sndram_set_bank(space->machine);
 	}
 }
 
@@ -174,9 +174,9 @@ static READ16_HANDLER( dual539_16_r )
 	UINT16 ret = 0;
 
 	if (ACCESSING_BITS_0_7)
-		ret |= k054539_1_r(machine, offset);
+		ret |= k054539_1_r(space, offset);
 	if (ACCESSING_BITS_8_15)
-		ret |= k054539_0_r(machine, offset)<<8;
+		ret |= k054539_0_r(space, offset)<<8;
 
 	return ret;
 }
@@ -184,9 +184,9 @@ static READ16_HANDLER( dual539_16_r )
 static WRITE16_HANDLER( dual539_16_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_1_w(machine, offset, data);
+		k054539_1_w(space, offset, data);
 	if (ACCESSING_BITS_8_15)
-		k054539_0_w(machine, offset, data>>8);
+		k054539_0_w(space, offset, data>>8);
 }
 
 static READ32_HANDLER( dual539_r )
@@ -194,9 +194,9 @@ static READ32_HANDLER( dual539_r )
 	UINT32 data = 0;
 
 	if (ACCESSING_BITS_16_31)
-		data |= dual539_16_r(machine, offset * 2, mem_mask >> 16) << 16;
+		data |= dual539_16_r(space, offset * 2, mem_mask >> 16) << 16;
 	if (ACCESSING_BITS_0_15)
-		data |= dual539_16_r(machine, offset * 2 + 1, mem_mask);
+		data |= dual539_16_r(space, offset * 2 + 1, mem_mask);
 
 	return data;
 }
@@ -204,9 +204,9 @@ static READ32_HANDLER( dual539_r )
 static WRITE32_HANDLER( dual539_w )
 {
 	if (ACCESSING_BITS_16_31)
-		dual539_16_w(machine, offset * 2, data >> 16, mem_mask >> 16);
+		dual539_16_w(space, offset * 2, data >> 16, mem_mask >> 16);
 	if (ACCESSING_BITS_0_15)
-		dual539_16_w(machine, offset * 2 + 1, data, mem_mask);
+		dual539_16_w(space, offset * 2 + 1, data, mem_mask);
 }
 
 
@@ -229,7 +229,7 @@ static WRITE32_HANDLER( obj_ctrl_w )
 
 static READ32_HANDLER( obj_rom_r )
 {
-	UINT8 *mem8 = memory_region(machine, "gfx1");
+	UINT8 *mem8 = memory_region(space->machine, "gfx1");
 	int bank = obj_regs[0x28/4] >> 16;
 
 	offset += bank * 0x200;
@@ -258,15 +258,15 @@ static WRITE32_HANDLER( v_ctrl_w )
 		if (pending_vb_int && !DISABLE_VB_INT)
 		{
 			pending_vb_int = 0;
-			cpu_set_input_line(machine->cpu[0], MC68000_IRQ_4, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[0], MC68000_IRQ_4, HOLD_LINE);
 		}
 	}
 }
 
 static READ32_HANDLER( v_rom_r )
 {
-	UINT8 *mem8 = memory_region(machine, "gfx2");
-	int bank = K056832_word_r(machine, 0x34/2, 0xffff);
+	UINT8 *mem8 = memory_region(space->machine, "gfx2");
+	int bank = K056832_word_r(space, 0x34/2, 0xffff);
 
 	offset *= 2;
 
@@ -294,7 +294,7 @@ static READ32_HANDLER( turntable_r )
 		UINT8 pos;
 		int delta;
 
-		pos = input_port_read(machine, ttnames[turntable_select]);
+		pos = input_port_read(space->machine, ttnames[turntable_select]);
 		delta = pos - turntable_last_pos[turntable_select];
 		if (delta < -128)
 			delta += 256;
@@ -417,17 +417,17 @@ static WRITE32_HANDLER( light_ctrl_2_w )
 
 static WRITE32_HANDLER( unknown590000_w )
 {
-	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", cpu_get_previouspc(machine->activecpu), offset, data, mem_mask);
+	//logerror("%08X: unknown 590000 write %08X: %08X & %08X\n", cpu_get_previouspc(space->cpu), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknown802000_w )
 {
-	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", cpu_get_previouspc(machine->activecpu), offset, data, mem_mask);
+	//logerror("%08X: unknown 802000 write %08X: %08X & %08X\n", cpu_get_previouspc(space->cpu), offset, data, mem_mask);
 }
 
 static WRITE32_HANDLER( unknownc02000_w )
 {
-	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", cpu_get_previouspc(machine->activecpu), offset, data, mem_mask);
+	//logerror("%08X: unknown c02000 write %08X: %08X & %08X\n", cpu_get_previouspc(space->cpu), offset, data, mem_mask);
 }
 
 

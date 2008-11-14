@@ -1076,8 +1076,8 @@ Addresses found at @0x510, cpu2
 
 static WRITE8_HANDLER( M58817_command_w )
 {
-	tms5110_ctl_w(machine, 0, data & 0x0f);
-	tms5110_pdc_w(machine, 0, (data>>4) & 0x01);
+	tms5110_ctl_w(space, 0, data & 0x0f);
+	tms5110_pdc_w(space, 0, (data>>4) & 0x01);
 	/* FIXME 0x20 is CS */
 }
 
@@ -1122,7 +1122,7 @@ static READ8_DEVICE_HANDLER( dkong_tune_r )
 
 static WRITE8_HANDLER( dkong_p1_w )
 {
-	discrete_sound_w(machine,DS_DAC,data);
+	discrete_sound_w(space,DS_DAC,data);
 }
 
 
@@ -1135,9 +1135,9 @@ static WRITE8_HANDLER( dkong_p1_w )
 WRITE8_HANDLER( dkong_audio_irq_w )
 {
 	if (data)
-		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 

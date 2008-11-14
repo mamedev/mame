@@ -128,8 +128,8 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( bigkarnk_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7){
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],M6809_FIRQ_LINE,HOLD_LINE);
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],M6809_FIRQ_LINE,HOLD_LINE);
 	}
 }
 
@@ -306,7 +306,7 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "oki");
+	UINT8 *RAM = memory_region(space->machine, "oki");
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);
@@ -556,7 +556,7 @@ static WRITE16_HANDLER( gaelco_vram_encrypted_w )
 {
 //  mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 
-	data = gaelco_decrypt(machine, offset, data, 0x0f, 0x4228);
+	data = gaelco_decrypt(space->machine, offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&gaelco_videoram[offset]);
 
 	tilemap_mark_tile_dirty(gaelco_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 2);
@@ -567,7 +567,7 @@ static WRITE16_HANDLER(gaelco_encrypted_w)
 {
 //  mame_printf_debug("gaelco_encrypted_w!!\n");
 
-	data = gaelco_decrypt(machine, offset, data, 0x0f, 0x4228);
+	data = gaelco_decrypt(space->machine, offset, data, 0x0f, 0x4228);
 	COMBINE_DATA(&gaelco_screen[offset]);
 }
 
@@ -575,7 +575,7 @@ static WRITE16_HANDLER( thoop_vram_encrypted_w )
 {
 //  mame_printf_debug("gaelco_vram_encrypted_w!!\n");
 
-	data = gaelco_decrypt(machine, offset, data, 0x0e, 0x4228);
+	data = gaelco_decrypt(space->machine, offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&gaelco_videoram[offset]);
 
 	tilemap_mark_tile_dirty(gaelco_tilemap[offset >> 11],((offset << 1) & 0x0fff) >> 2);
@@ -585,7 +585,7 @@ static WRITE16_HANDLER(thoop_encrypted_w)
 {
 //  mame_printf_debug("gaelco_encrypted_w!!\n");
 
-	data = gaelco_decrypt(machine, offset, data, 0x0e, 0x4228);
+	data = gaelco_decrypt(space->machine, offset, data, 0x0e, 0x4228);
 	COMBINE_DATA(&gaelco_screen[offset]);
 }
 

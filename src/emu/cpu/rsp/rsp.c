@@ -229,13 +229,14 @@ INLINE void WRITE32(UINT32 address, UINT32 data)
 
 static UINT32 get_cop0_reg(int reg)
 {
+	const address_space *space = cpu_get_address_space(rsp.device, ADDRESS_SPACE_PROGRAM);
 	if (reg >= 0 && reg < 8)
 	{
-		return (configdata->sp_reg_r)(Machine, reg, 0x00000000);
+		return (configdata->sp_reg_r)(space, reg, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return (configdata->dp_reg_r)(Machine, reg - 8, 0x00000000);
+		return (configdata->dp_reg_r)(space, reg - 8, 0x00000000);
 	}
 	else
 	{
@@ -245,13 +246,14 @@ static UINT32 get_cop0_reg(int reg)
 
 static void set_cop0_reg(int reg, UINT32 data)
 {
+	const address_space *space = cpu_get_address_space(rsp.device, ADDRESS_SPACE_PROGRAM);
 	if (reg >= 0 && reg < 8)
 	{
-		(configdata->sp_reg_w)(Machine, reg, data, 0x00000000);
+		(configdata->sp_reg_w)(space, reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(configdata->dp_reg_w)(Machine, reg - 8, data, 0x00000000);
+		(configdata->dp_reg_w)(space, reg - 8, data, 0x00000000);
 	}
 	else
 	{

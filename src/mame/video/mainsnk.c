@@ -62,12 +62,12 @@ WRITE8_HANDLER(mainsnk_c600_w)
 	tilemap_set_palette_offset(tx_tilemap, (data & 0x07) << 4);
 
 	bank = 0;
-	if (machine->gfx[0]->total_elements == 0x400)	// mainsnk
+	if (space->machine->gfx[0]->total_elements == 0x400)	// mainsnk
 		bank = ((data & 0x30) >> 4);
-	else if (machine->gfx[0]->total_elements == 0x800)	// canvas
+	else if (space->machine->gfx[0]->total_elements == 0x800)	// canvas
 		bank = ((data & 0x40) >> 6) | ((data & 0x30) >> 3);
 
-	tilemap_set_pen_data_offset(bg_tilemap, (bank << 8) * machine->gfx[0]->char_modulo);
+	tilemap_set_pen_data_offset(bg_tilemap, (bank << 8) * space->machine->gfx[0]->char_modulo);
 }
 
 WRITE8_HANDLER( mainsnk_fgram_w )

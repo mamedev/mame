@@ -347,7 +347,7 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 	cchip_ram[(current_bank * 0x400) + offset]=data;
 
 //  if (offset!=0x8)
-//      logerror("%08x:  volfied c write %04x %04x\n", cpu_get_pc(machine->activecpu), offset,data);
+//      logerror("%08x:  volfied c write %04x %04x\n", cpu_get_pc(space->cpu), offset,data);
 
 	if (current_bank == 0)
 	{
@@ -438,16 +438,16 @@ READ16_HANDLER( volfied_cchip_ram_r )
 	{
 		switch (offset)
 		{
-		case 0x03: return input_port_read(machine, "F00007");    /* STARTn + SERVICE1 */
-		case 0x04: return input_port_read(machine, "F00009");    /* COINn */
-		case 0x05: return input_port_read(machine, "F0000B");    /* Player controls + TILT */
-		case 0x06: return input_port_read(machine, "F0000D");    /* Player controls (cocktail) */
+		case 0x03: return input_port_read(space->machine, "F00007");    /* STARTn + SERVICE1 */
+		case 0x04: return input_port_read(space->machine, "F00009");    /* COINn */
+		case 0x05: return input_port_read(space->machine, "F0000B");    /* Player controls + TILT */
+		case 0x06: return input_port_read(space->machine, "F0000D");    /* Player controls (cocktail) */
 		case 0x08: return cc_port;
 		}
 	}
 
-//  if (cpu_get_pc(machine->activecpu)!=0x15ca8 && cpu_get_pc(machine->activecpu)!=0x15cd8 && cpu_get_pc(machine->activecpu)!=0x15cde)
-//      logerror("%08x:  volfied c read %04x (bank %04x)\n", cpu_get_pc(machine->activecpu), offset, current_bank);
+//  if (cpu_get_pc(space->cpu)!=0x15ca8 && cpu_get_pc(space->cpu)!=0x15cd8 && cpu_get_pc(space->cpu)!=0x15cde)
+//      logerror("%08x:  volfied c read %04x (bank %04x)\n", cpu_get_pc(space->cpu), offset, current_bank);
 
 	/* Unknown */
 	if (current_bank == 2 && offset == 0x005)

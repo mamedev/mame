@@ -33,6 +33,8 @@ INLINE latch8_t *get_safe_token(const device_config *device) {
 
 static void update(const device_config *device, UINT8 new_val, UINT8 mask)
 {
+	/*  temporary hack until the discrete system is a device */
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	latch8_t *latch8 = get_safe_token(device);
 	UINT8 old_val = latch8->value;
 
@@ -44,7 +46,7 @@ static void update(const device_config *device, UINT8 new_val, UINT8 mask)
 		UINT8 changed = old_val ^ latch8->value;
 		for (i=0; i<8; i++)
 			if (((changed & (1<<i)) != 0) && latch8->intf->node_map[i] != 0)
-				discrete_sound_w(device->machine, latch8->intf->node_map[i] , (latch8->value >> i) & 1);
+				discrete_sound_w(space, latch8->intf->node_map[i] , (latch8->value >> i) & 1);
 	}
 }
 
@@ -82,13 +84,15 @@ READ8_DEVICE_HANDLER( latch8_r )
 	}
 	if (latch8->has_read)
 	{
+		/*  temporary hack until all relevant systems are devices */
+		const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 		int i;
 		for (i=0; i<8; i++)
 		{
 			if (latch8->intf->devread[i].read_handler != NULL)
 			{
 				res &= ~( 1 << i);
-				res |= ((latch8->intf->devread[i].read_handler(device->machine, 0) >> latch8->intf->devread[i].from_bit) & 0x01) << i;
+				res |= ((latch8->intf->devread[i].read_handler(space, 0) >> latch8->intf->devread[i].from_bit) & 0x01) << i;
 			}
 		}
 	}

@@ -99,7 +99,7 @@ static WRITE16_HANDLER( pasha2_misc_w )
 					case 0xb000:
 					case 0xc000:
 					case 0xd000:
-						memory_set_bankptr(1, memory_region(machine, "user2") + 0x400 * (bank - 0x8000)); break;
+						memory_set_bankptr(1, memory_region(space->machine, "user2") + 0x400 * (bank - 0x8000)); break;
 				}
 			}
 		}
@@ -114,10 +114,10 @@ static WRITE16_HANDLER( pasha2_palette_w )
 	offset &= 0xff;
 
 	color = (paletteram16[offset] >> 8) | (paletteram16[offset+0x100] & 0xff00);
-	palette_set_color_rgb(machine,offset*2+0,pal5bit(color),pal5bit(color >> 5),pal5bit(color >> 10));
+	palette_set_color_rgb(space->machine,offset*2+0,pal5bit(color),pal5bit(color >> 5),pal5bit(color >> 10));
 
 	color = (paletteram16[offset] & 0xff) | ((paletteram16[offset+0x100] & 0xff) << 8);
-	palette_set_color_rgb(machine,offset*2+1,pal5bit(color),pal5bit(color >> 5),pal5bit(color >> 10));
+	palette_set_color_rgb(space->machine,offset*2+1,pal5bit(color),pal5bit(color >> 5),pal5bit(color >> 10));
 }
 
 static WRITE16_HANDLER( vbuffer_set_w )
@@ -141,8 +141,8 @@ static WRITE16_HANDLER( bitmap_1_w )
 	switch(mem_mask)
 	{
 		case 0xffff:
-			bitmap_1_w(machine,offset,data,0xff00);
-			bitmap_1_w(machine,offset,data,0x00ff);
+			bitmap_1_w(space,offset,data,0xff00);
+			bitmap_1_w(space,offset,data,0x00ff);
 			return;
 
 		case 0xff00:
@@ -162,7 +162,7 @@ static WRITE16_HANDLER( bitmap_1_w )
 static READ16_HANDLER( oki_0_r )
 {
 	if(offset)
-		return okim6295_status_0_r(machine, 0);
+		return okim6295_status_0_r(space, 0);
 	else
 		return 0;
 }
@@ -170,19 +170,19 @@ static READ16_HANDLER( oki_0_r )
 static WRITE16_HANDLER( oki_0_w )
 {
 	if(offset)
-		okim6295_data_0_w(machine, 0, data);
+		okim6295_data_0_w(space, 0, data);
 }
 
 static WRITE16_HANDLER( oki_1_w )
 {
 	if(offset)
-		okim6295_data_1_w(machine, 0, data);
+		okim6295_data_1_w(space, 0, data);
 }
 
 static READ16_HANDLER( oki_1_r )
 {
 	if(offset)
-		return okim6295_status_1_r(machine, 0);
+		return okim6295_status_1_r(space, 0);
 	else
 		return 0;
 }
@@ -454,9 +454,9 @@ ROM_END
 
 static READ16_HANDLER( pasha2_speedup_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0x8302)
+	if(cpu_get_pc(space->cpu) == 0x8302)
 	{
-		cpu_spinuntil_int(machine->activecpu);
+		cpu_spinuntil_int(space->cpu);
 	}
 
 	return wram[(0x95744/2)+offset];

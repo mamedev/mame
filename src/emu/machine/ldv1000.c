@@ -454,7 +454,7 @@ static WRITE8_HANDLER( decoder_display_port_w )
         Display is 6-bit
         Decoder is 4-bit
     */
-	laserdisc_state *ld = find_ldv1000(machine);
+	laserdisc_state *ld = find_ldv1000(space->machine);
 	ldplayer_data *player = ld->player;
 
 	/* writes to offset 0 select the target for reads/writes of actual data */
@@ -481,7 +481,7 @@ static WRITE8_HANDLER( decoder_display_port_w )
 
 static READ8_HANDLER( decoder_display_port_r )
 {
-	laserdisc_state *ld = find_ldv1000(machine);
+	laserdisc_state *ld = find_ldv1000(space->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0;
 
@@ -506,7 +506,7 @@ static READ8_HANDLER( decoder_display_port_r )
 
 static READ8_HANDLER( controller_r )
 {
-	laserdisc_state *ld = find_ldv1000(machine);
+	laserdisc_state *ld = find_ldv1000(space->machine);
 
 	/* note that this is a cheesy implementation; the real thing relies on exquisite timing */
 	UINT8 result = ld->player->command ^ 0xff;
@@ -521,9 +521,9 @@ static READ8_HANDLER( controller_r )
 
 static WRITE8_HANDLER( controller_w )
 {
-	laserdisc_state *ld = find_ldv1000(machine);
+	laserdisc_state *ld = find_ldv1000(space->machine);
 	if (LOG_STATUS_CHANGES && data != ld->player->status)
-		printf("%04X:CONTROLLER.W=%02X\n", cpu_get_pc(machine->activecpu), data);
+		printf("%04X:CONTROLLER.W=%02X\n", cpu_get_pc(space->cpu), data);
 	ld->player->status = data;
 }
 

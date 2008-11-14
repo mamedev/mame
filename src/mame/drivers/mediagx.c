@@ -339,12 +339,12 @@ static READ32_HANDLER( disp_ctrl_r )
 		case DC_TIMING_CFG:
 			r |= 0x40000000;
 
-			if (video_screen_get_vpos(machine->primary_screen) >= frame_height)
+			if (video_screen_get_vpos(space->machine->primary_screen) >= frame_height)
 				r &= ~0x40000000;
 
 #if SPEEDUP_HACKS
 			// wait for vblank speedup
-			cpu_spinuntil_int(machine->activecpu);
+			cpu_spinuntil_int(space->cpu);
 #endif
 			break;
 	}
@@ -503,20 +503,20 @@ static READ32_HANDLER( parallel_port_r )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		UINT8 nibble = parallel_latched;//(input_port_read_safe(machine, portnames[parallel_pointer / 3], 0) >> (4 * (parallel_pointer % 3))) & 15;
+		UINT8 nibble = parallel_latched;//(input_port_read_safe(space->machine, portnames[parallel_pointer / 3], 0) >> (4 * (parallel_pointer % 3))) & 15;
 		r |= ((~nibble & 0x08) << 12) | ((nibble & 0x07) << 11);
-		logerror("%08X:parallel_port_r()\n", cpu_get_pc(machine->activecpu));
+		logerror("%08X:parallel_port_r()\n", cpu_get_pc(space->cpu));
 /*      if (controls_data == 0x18)
         {
-            r |= input_port_read(machine, "IN0") << 8;
+            r |= input_port_read(space->machine, "IN0") << 8;
         }
         else if (controls_data == 0x60)
         {
-            r |= input_port_read(machine, "IN1") << 8;
+            r |= input_port_read(space->machine, "IN1") << 8;
         }
         else if (controls_data == 0xff ||  controls_data == 0x50)
         {
-            r |= input_port_read(machine, "IN2") << 8;
+            r |= input_port_read(space->machine, "IN2") << 8;
         }
 
         //r |= control_read << 8;*/
@@ -552,9 +552,9 @@ static WRITE32_HANDLER( parallel_port_w )
                 7x..ff = advance pointer
         */
 
-		logerror("%08X:", cpu_get_pc(machine->activecpu));
+		logerror("%08X:", cpu_get_pc(space->cpu));
 
-		parallel_latched = (input_port_read_safe(machine, portnames[parallel_pointer / 3], 0) >> (4 * (parallel_pointer % 3))) & 15;
+		parallel_latched = (input_port_read_safe(space->machine, portnames[parallel_pointer / 3], 0) >> (4 * (parallel_pointer % 3))) & 15;
 //      parallel_pointer++;
 //      logerror("[%02X] Advance pointer to %d\n", data, parallel_pointer);
 		switch (data & 0xfc)
@@ -1150,18 +1150,18 @@ INLINE UINT32 generic_speedup(running_machine *machine, speedup_entry *entry)
 	return main_ram[entry->offset/4];
 }
 
-static READ32_HANDLER( speedup0_r ) { return generic_speedup(machine, &speedup_table[0]); }
-static READ32_HANDLER( speedup1_r ) { return generic_speedup(machine, &speedup_table[1]); }
-static READ32_HANDLER( speedup2_r ) { return generic_speedup(machine, &speedup_table[2]); }
-static READ32_HANDLER( speedup3_r ) { return generic_speedup(machine, &speedup_table[3]); }
-static READ32_HANDLER( speedup4_r ) { return generic_speedup(machine, &speedup_table[4]); }
-static READ32_HANDLER( speedup5_r ) { return generic_speedup(machine, &speedup_table[5]); }
-static READ32_HANDLER( speedup6_r ) { return generic_speedup(machine, &speedup_table[6]); }
-static READ32_HANDLER( speedup7_r ) { return generic_speedup(machine, &speedup_table[7]); }
-static READ32_HANDLER( speedup8_r ) { return generic_speedup(machine, &speedup_table[8]); }
-static READ32_HANDLER( speedup9_r ) { return generic_speedup(machine, &speedup_table[9]); }
-static READ32_HANDLER( speedup10_r ) { return generic_speedup(machine, &speedup_table[10]); }
-static READ32_HANDLER( speedup11_r ) { return generic_speedup(machine, &speedup_table[11]); }
+static READ32_HANDLER( speedup0_r ) { return generic_speedup(space->machine, &speedup_table[0]); }
+static READ32_HANDLER( speedup1_r ) { return generic_speedup(space->machine, &speedup_table[1]); }
+static READ32_HANDLER( speedup2_r ) { return generic_speedup(space->machine, &speedup_table[2]); }
+static READ32_HANDLER( speedup3_r ) { return generic_speedup(space->machine, &speedup_table[3]); }
+static READ32_HANDLER( speedup4_r ) { return generic_speedup(space->machine, &speedup_table[4]); }
+static READ32_HANDLER( speedup5_r ) { return generic_speedup(space->machine, &speedup_table[5]); }
+static READ32_HANDLER( speedup6_r ) { return generic_speedup(space->machine, &speedup_table[6]); }
+static READ32_HANDLER( speedup7_r ) { return generic_speedup(space->machine, &speedup_table[7]); }
+static READ32_HANDLER( speedup8_r ) { return generic_speedup(space->machine, &speedup_table[8]); }
+static READ32_HANDLER( speedup9_r ) { return generic_speedup(space->machine, &speedup_table[9]); }
+static READ32_HANDLER( speedup10_r ) { return generic_speedup(space->machine, &speedup_table[10]); }
+static READ32_HANDLER( speedup11_r ) { return generic_speedup(space->machine, &speedup_table[11]); }
 
 static const read32_machine_func speedup_handlers[] =
 {

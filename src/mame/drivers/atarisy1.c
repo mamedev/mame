@@ -202,15 +202,15 @@ static READ16_HANDLER( joystick_r )
 
 	/* digital joystick type */
 	if (joystick_type == 1)
-		newval = (input_port_read(machine, "IN0") & (0x80 >> offset)) ? 0xf0 : 0x00;
+		newval = (input_port_read(space->machine, "IN0") & (0x80 >> offset)) ? 0xf0 : 0x00;
 
 	/* Hall-effect analog joystick */
 	else if (joystick_type == 2)
-		newval = input_port_read(machine, portnames[offset & 1]);
+		newval = input_port_read(space->machine, portnames[offset & 1]);
 
 	/* Road Blasters gas pedal */
 	else if (joystick_type == 3)
-		newval = input_port_read(machine, "IN1");
+		newval = input_port_read(space->machine, "IN1");
 
 	/* the A4 bit enables/disables joystick IRQs */
 	joystick_int_enable = ((offset >> 3) & 1) ^ 1;
@@ -218,7 +218,7 @@ static READ16_HANDLER( joystick_r )
 	/* clear any existing interrupt and set a timer for a new one */
 	joystick_int = 0;
 	timer_adjust_oneshot(joystick_timer, ATTOTIME_IN_USEC(50), newval);
-	atarigen_update_interrupts(machine);
+	atarigen_update_interrupts(space->machine);
 
 	return joystick_value;
 }
@@ -256,13 +256,13 @@ static READ16_HANDLER( trakball_r )
 
 			if (player == 0)
 			{
-				posx = (INT8)input_port_read(machine, "IN0");
-				posy = (INT8)input_port_read(machine, "IN1");
+				posx = (INT8)input_port_read(space->machine, "IN0");
+				posy = (INT8)input_port_read(space->machine, "IN1");
 			}
 			else
 			{
-				posx = (INT8)input_port_read(machine, "IN2");
-				posy = (INT8)input_port_read(machine, "IN3");
+				posx = (INT8)input_port_read(space->machine, "IN2");
+				posy = (INT8)input_port_read(space->machine, "IN3");
 			}
 
 			cur[player][0] = posx + posy;
@@ -274,7 +274,7 @@ static READ16_HANDLER( trakball_r )
 
 	/* Road Blasters steering wheel */
 	else if (trackball_type == 2)
-		result = input_port_read(machine, "IN0");
+		result = input_port_read(space->machine, "IN0");
 
 	return result;
 }
@@ -289,7 +289,7 @@ static READ16_HANDLER( trakball_r )
 
 static READ16_HANDLER( port4_r )
 {
-	int temp = input_port_read(machine, "F60000");
+	int temp = input_port_read(space->machine, "F60000");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0080;
 	return temp;
 }
@@ -304,11 +304,11 @@ static READ16_HANDLER( port4_r )
 
 static READ8_HANDLER( switch_6502_r )
 {
-	int temp = input_port_read(machine, "1820");
+	int temp = input_port_read(space->machine, "1820");
 
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x08;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x10;
-	if (!(input_port_read(machine, "F60000") & 0x0040)) temp ^= 0x80;
+	if (!(input_port_read(space->machine, "F60000") & 0x0040)) temp ^= 0x80;
 
 	return temp;
 }
@@ -355,11 +355,11 @@ static WRITE8_HANDLER( via_pb_w )
 
 	/* write strobe */
 	if (!(old & 1) && (tms5220_ctl & 1))
-		tms5220_data_w(machine, 0, tms5220_out_data);
+		tms5220_data_w(space, 0, tms5220_out_data);
 
 	/* read strobe */
 	if (!(old & 2) && (tms5220_ctl & 2))
-		tms5220_in_data = tms5220_status_r(machine, 0);
+		tms5220_in_data = tms5220_status_r(space, 0);
 
 	/* bit 4 is connected to an up-counter, clocked by SYCLKB */
 	data = 5 | ((data >> 3) & 2);

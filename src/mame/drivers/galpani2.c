@@ -170,7 +170,7 @@ static void galpani2_mcu_nmi(running_machine *machine)
 static WRITE16_HANDLER( galpani2_mcu_nmi_w )
 {
 	static UINT16 old = 0;
-	if ( (data & 1) && !(old & 1) )	galpani2_mcu_nmi(machine);
+	if ( (data & 1) && !(old & 1) )	galpani2_mcu_nmi(space->machine);
 	old = data;
 }
 
@@ -202,8 +202,8 @@ static WRITE16_HANDLER( galpani2_oki_0_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *ROM = memory_region(machine, "oki1");
-		logerror("CPU #0 PC %06X : OKI 0 bank %08X\n",cpu_get_pc(machine->activecpu),data);
+		UINT8 *ROM = memory_region(space->machine, "oki1");
+		logerror("CPU #0 PC %06X : OKI 0 bank %08X\n",cpu_get_pc(space->cpu),data);
 		memcpy(ROM + 0x30000, ROM + 0x40000 + 0x10000 * (~data & 0xf), 0x10000);
 	}
 }
@@ -213,7 +213,7 @@ static WRITE16_HANDLER( galpani2_oki_1_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(1, 0x40000 * (data & 0xf) );
-		logerror("CPU #0 PC %06X : OKI 1 bank %08X\n",cpu_get_pc(machine->activecpu),data);
+		logerror("CPU #0 PC %06X : OKI 1 bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -266,8 +266,8 @@ static UINT16 *galpani2_rombank;
 
 static READ16_HANDLER( galpani2_bankedrom_r )
 {
-	UINT16 *ROM = (UINT16 *) memory_region( machine, "user1" );
-	size_t    len = memory_region_length( machine, "user1" ) / 2;
+	UINT16 *ROM = (UINT16 *) memory_region( space->machine, "user1" );
+	size_t    len = memory_region_length( space->machine, "user1" ) / 2;
 
 	offset += (0x800000/2) * (*galpani2_rombank & 0x0003);
 

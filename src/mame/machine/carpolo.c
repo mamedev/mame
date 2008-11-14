@@ -446,7 +446,7 @@ static READ8_HANDLER( pia_1_port_a_r )
 		  (TTL7474_output_r(TTL7474_1C_2) ? 0x02 : 0x00) |
 		  (TTL7474_output_r(TTL7474_1D_2) ? 0x04 : 0x00) |
 		  (TTL7474_output_r(TTL7474_1F_2) ? 0x08 : 0x00) |
-		  (input_port_read(machine, "IN2") & 0xf0);
+		  (input_port_read(space->machine, "IN2") & 0xf0);
 
 	return ret;
 }

@@ -192,19 +192,19 @@ static WRITE8_HANDLER( sound_command_w )
 	{
 		// 0x90 triggers a jump to non-existant address(development system?) and must be filtered
 		case 0x00:
-			if (data != 0x90) soundlatch_w(machine, 0, data);
+			if (data != 0x90) soundlatch_w(space, 0, data);
 		break;
 
 		// explosion sound trigger(analog?)
 		case 0x08:
-			discrete_sound_w(machine, STINGER_BOOM_EN1, dsc1);
-			discrete_sound_w(machine, STINGER_BOOM_EN2, dsc1^=1);
+			discrete_sound_w(space, STINGER_BOOM_EN1, dsc1);
+			discrete_sound_w(space, STINGER_BOOM_EN2, dsc1^=1);
 		break;
 
 		// player shot sound trigger(analog?)
 		case 0x0a:
-			discrete_sound_w(machine, STINGER_SHOT_EN1, dsc0);
-			discrete_sound_w(machine, STINGER_SHOT_EN2, dsc0^=1);
+			discrete_sound_w(space, STINGER_SHOT_EN1, dsc0);
+			discrete_sound_w(space, STINGER_SHOT_EN2, dsc0^=1);
 		break;
 	}
 }

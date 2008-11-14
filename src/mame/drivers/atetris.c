@@ -92,7 +92,7 @@ static TIMER_CALLBACK( interrupt_gen )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -149,7 +149,7 @@ static MACHINE_RESET( atetris )
 static READ8_HANDLER( atetris_slapstic_r )
 {
 	int result = slapstic_base[0x2000 + offset];
-	int new_bank = slapstic_tweak(machine, offset) & 1;
+	int new_bank = slapstic_tweak(space->machine, offset) & 1;
 
 	/* update for the new bank */
 	if (new_bank != current_bank)

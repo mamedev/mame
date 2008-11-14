@@ -83,12 +83,12 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 	flip_screen_set(~data & 0x01);
 
 	/* bits 1 and 2 select ROM bank */
-	RAM = memory_region(machine, "main");
+	RAM = memory_region(space->machine, "main");
 	bank = (data & 0x06) >> 1;
 	memory_set_bankptr(1,&RAM[0x10000 + bank*0x4000]);
 
 	/* bit 3 enables NMI */
-	interrupt_enable_w(machine,0,data & 0x08);
+	interrupt_enable_w(space,0,data & 0x08);
 
 	/* bits 6 and 7 are coin counters */
 	coin_counter_w(1,data & 0x40);
@@ -104,7 +104,7 @@ static INTERRUPT_GEN( lwings_interrupt )
 
 static WRITE8_HANDLER( avengers_protection_w )
 {
-	int pc = cpu_get_pc(machine->activecpu);
+	int pc = cpu_get_pc(space->cpu);
 
 	if( pc == 0x2eeb )
 	{
@@ -125,7 +125,7 @@ static WRITE8_HANDLER( avengers_protection_w )
 	else if( pc == 0x0445 )
 	{
 		avengers_soundstate = 0x80;
-		soundlatch_w( machine, 0, data );
+		soundlatch_w( space->machine, 0, data );
 	}
 }
 
@@ -225,7 +225,7 @@ static READ8_HANDLER( avengers_protection_r )
 	int x,y;
 	int dx,dy,dist,dir;
 
-	if( cpu_get_pc(machine->activecpu) == 0x7c7 )
+	if( cpu_get_pc(space->cpu) == 0x7c7 )
 	{
 		/* palette data */
 		return avengers_fetch_paldata();

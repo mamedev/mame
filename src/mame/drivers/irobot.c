@@ -102,13 +102,13 @@ static WRITE8_HANDLER( irobot_nvram_w )
 
 static WRITE8_HANDLER( irobot_clearirq_w )
 {
-    cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE ,CLEAR_LINE);
+    cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE ,CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( irobot_clearfirq_w )
 {
-    cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE ,CLEAR_LINE);
+    cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE ,CLEAR_LINE);
 }
 
 

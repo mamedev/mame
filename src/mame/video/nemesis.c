@@ -95,7 +95,7 @@ WRITE16_HANDLER( nemesis_gfx_flipx_w )
 	else
 	{
 		if (data & 0x100)
-			cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff);
+			cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
 	}
 }
 
@@ -150,7 +150,7 @@ WRITE16_HANDLER( nemesis_palette_word_w )
 	bit5=(data >>  14)&1;
 	b = MULTIPLIER;
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 WRITE16_HANDLER( salamander_palette_word_w )
@@ -159,7 +159,7 @@ WRITE16_HANDLER( salamander_palette_word_w )
 	offset &= ~1;
 
 	data = ((paletteram16[offset] << 8) & 0xff00) | (paletteram16[offset+1] & 0xff);
-	palette_set_color_rgb(machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	palette_set_color_rgb(space->machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 WRITE16_HANDLER( nemesis_videoram1b_word_w )

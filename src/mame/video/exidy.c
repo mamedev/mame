@@ -102,7 +102,7 @@ INTERRUPT_GEN( teetert_vblank_interrupt )
 READ8_HANDLER( exidy_interrupt_r )
 {
 	/* clear any interrupts */
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 
 	/* return the latched condition */
 	return int_condition;

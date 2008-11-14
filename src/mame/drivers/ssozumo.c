@@ -51,8 +51,8 @@ static INTERRUPT_GEN( ssozumo_interrupt )
 
 static WRITE8_HANDLER( ssozumo_sh_command_w )
 {
-	soundlatch_w(machine, offset, data);
-	cpu_set_input_line(machine->cpu[1], M6502_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(space->machine->cpu[1], M6502_IRQ_LINE, HOLD_LINE);
 }
 
 

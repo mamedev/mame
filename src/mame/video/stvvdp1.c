@@ -194,7 +194,7 @@ READ32_HANDLER( stv_vdp1_regs_r )
 
 //  x ^= 0x00020000;
 
-	logerror ("cpu #%d (PC=%08X) VDP1: Read from Registers, Offset %04x\n",cpunum_get_active(), cpu_get_pc(machine->activecpu), offset);
+	logerror ("cpu #%d (PC=%08X) VDP1: Read from Registers, Offset %04x\n",cpunum_get_active(), cpu_get_pc(space->cpu), offset);
 //  if (offset == 0x04) return x;
 
 	return stv_vdp1_regs[offset];
@@ -295,13 +295,13 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 		else
 		{
 			if ( vdp1_sprite_log ) logerror( "VDP1: Access to register TVMR = %1X\n", STV_VDP1_TVMR );
-			if ( STV_VDP1_VBE && get_vblank(machine) )
+			if ( STV_VDP1_VBE && get_vblank(space->machine) )
 			{
 				stv_vdp1_clear_framebuffer_on_next_frame = 1;
 			}
 
 			/* needed by pblbeach, it doesn't clear local coordinates in its sprite list...*/
-			if ( !strcmp(machine->gamedrv->name, "pblbeach") )
+			if ( !strcmp(space->machine->gamedrv->name, "pblbeach") )
 			{
 				stvvdp1_local_x = stvvdp1_local_y = 0;
 			}
@@ -319,7 +319,7 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 				if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
 				{
 					logerror( "Interrupt: Sprite draw end, Vector 0x4d, Level 0x02\n" );
-					cpu_set_input_line_and_vector(machine->cpu[0], 2, HOLD_LINE , 0x4d);
+					cpu_set_input_line_and_vector(space->machine->cpu[0], 2, HOLD_LINE , 0x4d);
 				}
 			}
 		}
@@ -356,7 +356,7 @@ WRITE32_HANDLER ( stv_vdp1_vram_w )
 
 //  if (((offset * 4) > 0xdf) && ((offset * 4) < 0x140))
 //  {
-//      logerror("cpu #%d (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), offset*4, data, mem_mask);
+//      logerror("cpu #%d (PC=%08X): VRAM dword write to %08X = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 //  }
 
 	data = stv_vdp1_vram[offset];

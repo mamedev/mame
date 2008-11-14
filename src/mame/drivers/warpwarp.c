@@ -147,10 +147,10 @@ static READ8_HANDLER( geebee_in_r )
 	static const char *const portnames[] = { "SW0", "SW1", "DSW2", "PLACEHOLDER" };	// "IN1" & "IN2" are read separately when offset==3
 
 	offset &= 3;
-	res = input_port_read_safe(machine, portnames[offset], 0);
+	res = input_port_read_safe(space->machine, portnames[offset], 0);
 	if (offset == 3)
 	{
-		res = input_port_read(machine, (flip_screen_get() & 1) ? "IN2" : "IN1");	// read player 2 input in cocktail mode
+		res = input_port_read(space->machine, (flip_screen_get() & 1) ? "IN2" : "IN1");	// read player 2 input in cocktail mode
 		if (handle_joystick)
 		{
 			/* map digital two-way joystick to two fixed VOLIN values */
@@ -176,7 +176,7 @@ static WRITE8_HANDLER( geebee_out6_w )
 			/* n.c. */
 			break;
 		case 3:
-			geebee_sound_w(machine,0,data);
+			geebee_sound_w(space,0,data);
 			break;
 	}
 }
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( geebee_out7_w )
 			coin_counter_w(0,data & 1);
 			break;
 		case 4:
-			if (strcmp(machine->gamedrv->name, "geebeeb"))
+			if (strcmp(space->machine->gamedrv->name, "geebeeb"))
 				coin_lockout_global_w(~data & 1);
 			break;
 		case 5:
@@ -219,13 +219,13 @@ static WRITE8_HANDLER( geebee_out7_w )
 /* Read Switch Inputs */
 static READ8_HANDLER( warpwarp_sw_r )
 {
-	return (input_port_read(machine, "IN0") >> (offset & 7)) & 1;
+	return (input_port_read(space->machine, "IN0") >> (offset & 7)) & 1;
 }
 
 /* Read Dipswitches */
 static READ8_HANDLER( warpwarp_dsw1_r )
 {
-	return (input_port_read(machine, "DSW1") >> (offset & 7)) & 1;
+	return (input_port_read(space->machine, "DSW1") >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */
@@ -233,7 +233,7 @@ static READ8_HANDLER( warpwarp_vol_r )
 {
 	int res;
 
-	res = input_port_read(machine, (flip_screen_get() & 1) ? "VOLIN2" : "VOLIN1");
+	res = input_port_read(space->machine, (flip_screen_get() & 1) ? "VOLIN2" : "VOLIN1");
 	if (handle_joystick)
 	{
 		if (res & 1) return 0x0f;
@@ -256,10 +256,10 @@ static WRITE8_HANDLER( warpwarp_out0_w )
 			warpwarp_ball_v = data;
 			break;
 		case 2:
-			warpwarp_sound_w(machine,0,data);
+			warpwarp_sound_w(space,0,data);
 			break;
 		case 3:
-			watchdog_reset_w(machine,0,data);
+			watchdog_reset_w(space,0,data);
 			break;
 	}
 }
@@ -290,7 +290,7 @@ static WRITE8_HANDLER( warpwarp_out3_w )
 			warpwarp_ball_on = data & 1;
 			cpu_interrupt_enable(0,data & 1);
 			if (~data & 1)
-				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 		case 7:
 			flip_screen_set(data & 1);

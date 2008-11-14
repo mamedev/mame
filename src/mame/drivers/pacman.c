@@ -387,8 +387,8 @@ static MACHINE_RESET( mschamp )
 
 static WRITE8_HANDLER( pacman_interrupt_vector_w )
 {
-	cpu_set_input_line_vector(machine->cpu[0], 0, data);
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line_vector(space->machine->cpu[0], 0, data);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -469,7 +469,7 @@ static WRITE8_HANDLER( piranha_interrupt_vector_w)
 {
 	if (data==0xfa) data=0x78;
 	if (data==0xfc) data=0xfc;
-	cpu_set_input_line_vector(machine->cpu[0], 0, data );
+	cpu_set_input_line_vector(space->machine->cpu[0], 0, data );
 }
 
 
@@ -478,7 +478,7 @@ static WRITE8_HANDLER( nmouse_interrupt_vector_w)
 	if (data==0xbf) data=0x3c;
 	if (data==0xc6) data=0x40;
 	if (data==0xfc) data=0xfc;
-	cpu_set_input_line_vector(machine->cpu[0], 0, data );
+	cpu_set_input_line_vector(space->machine->cpu[0], 0, data );
 }
 
 
@@ -518,11 +518,11 @@ static WRITE8_HANDLER( alibaba_sound_w )
 	/* since the sound region in Ali Baba is not contiguous, translate the
        offset into the 0-0x1f range */
  	if (offset < 0x10)
-		pacman_sound_w(machine, offset, data);
+		pacman_sound_w(space, offset, data);
 	else if (offset < 0x20)
 		spriteram_2[offset - 0x10] = data;
 	else
-		pacman_sound_w(machine, offset - 0x10, data);
+		pacman_sound_w(space, offset - 0x10, data);
 }
 
 
@@ -530,7 +530,7 @@ static READ8_HANDLER( alibaba_mystery_1_r )
 {
 	/* The return value determines what the mystery item is.  Each bit corresponds
        to a question mark */
-	return mame_rand(machine) & 0x0f;
+	return mame_rand(space->machine) & 0x0f;
 }
 
 
@@ -553,8 +553,8 @@ static READ8_HANDLER( alibaba_mystery_2_r )
 
 static READ8_HANDLER( maketrax_special_port2_r )
 {
-	int data = input_port_read(machine, "DSW1");
-	int pc = cpu_get_previouspc(machine->activecpu);
+	int data = input_port_read(space->machine, "DSW1");
+	int pc = cpu_get_previouspc(space->cpu);
 
 	if ((pc == 0x1973) || (pc == 0x2389)) return data | 0x40;
 
@@ -575,7 +575,7 @@ static READ8_HANDLER( maketrax_special_port2_r )
 
 static READ8_HANDLER( maketrax_special_port3_r )
 {
-	int pc = cpu_get_previouspc(machine->activecpu);
+	int pc = cpu_get_previouspc(space->cpu);
 
 	if (pc == 0x040e) return 0x20;
 
@@ -596,8 +596,8 @@ static READ8_HANDLER( maketrax_special_port3_r )
 
 static READ8_HANDLER( korosuke_special_port2_r )
 {
-	int data = input_port_read(machine, "DSW1");
-	int pc = cpu_get_previouspc(machine->activecpu);
+	int data = input_port_read(space->machine, "DSW1");
+	int pc = cpu_get_previouspc(space->cpu);
 
 	if ((pc == 0x196e) || (pc == 0x2387)) return data | 0x40;
 
@@ -617,7 +617,7 @@ static READ8_HANDLER( korosuke_special_port2_r )
 
 static READ8_HANDLER( korosuke_special_port3_r )
 {
-	int pc = cpu_get_previouspc(machine->activecpu);
+	int pc = cpu_get_previouspc(space->cpu);
 
 	if (pc == 0x0445) return 0x20;
 
@@ -664,7 +664,7 @@ static WRITE8_HANDLER( bigbucks_bank_w )
 static READ8_HANDLER( bigbucks_question_r )
 {
 
-	UINT8 *question = memory_region(machine, "user1");
+	UINT8 *question = memory_region(space->machine, "user1");
 	UINT8 ret;
 
 	ret = question[(bigbucks_bank << 16) | (offset ^ 0xffff)];
@@ -692,7 +692,7 @@ static WRITE8_HANDLER( porky_banking_w )
 
 static READ8_HANDLER( drivfrcp_port1_r )
 {
-	switch (cpu_get_pc(machine->activecpu))
+	switch (cpu_get_pc(space->cpu))
 	{
 		case 0x0030:
 		case 0x0291:
@@ -704,7 +704,7 @@ static READ8_HANDLER( drivfrcp_port1_r )
 
 static READ8_HANDLER( _8bpm_port1_r )
 {
-	switch (cpu_get_pc(machine->activecpu))
+	switch (cpu_get_pc(space->cpu))
 	{
 		case 0x0030:
 		case 0x0466:
@@ -716,7 +716,7 @@ static READ8_HANDLER( _8bpm_port1_r )
 
 static READ8_HANDLER( porky_port1_r )
 {
-	switch (cpu_get_pc(machine->activecpu))
+	switch (cpu_get_pc(space->cpu))
 	{
 		case 0x0034:
 			return 0x01;
@@ -768,7 +768,7 @@ static WRITE8_HANDLER( rocktrv2_question_bank_w )
 
 static READ8_HANDLER( rocktrv2_question_r )
 {
-	UINT8 *question = memory_region(machine, "user1");
+	UINT8 *question = memory_region(space->machine, "user1");
 
 	return question[offset | (rocktrv2_question_bank * 0x8000)];
 }
@@ -5416,7 +5416,7 @@ static READ8_HANDLER( cannonbp_protection_r )
 	switch (offset)
 	{
 		default:
-			logerror("CPU0 %04x: Unhandled protection read, offset %04x\n", cpu_get_pc(machine->activecpu), offset);
+			logerror("CPU0 %04x: Unhandled protection read, offset %04x\n", cpu_get_pc(space->cpu), offset);
 			return 0x00;
 
 		case 0x0000: // unknown
@@ -5439,7 +5439,7 @@ static READ8_HANDLER( cannonbp_protection_r )
 			cannonb_bit_to_read = 7;
 			return 0x00;
 		case 0x0001: // affects the ball hitting the blocks as well as jump address after bonus round
-			if (cpu_get_pc(machine->activecpu) == 0x2b97)
+			if (cpu_get_pc(space->cpu) == 0x2b97)
 				return (BIT(0x46, cannonb_bit_to_read--) << 7);
 			else
 				return 0xff;            /* value taken from the bootlegs */

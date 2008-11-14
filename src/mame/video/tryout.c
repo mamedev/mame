@@ -140,7 +140,7 @@ WRITE8_HANDLER( tryout_vram_w )
 		break;
 	}
 
-	decodechar(machine->gfx[2],(offset-0x400/64)&0x7f,tryout_vram_gfx);
+	decodechar(space->machine->gfx[2],(offset-0x400/64)&0x7f,tryout_vram_gfx);
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 }
 

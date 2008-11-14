@@ -64,7 +64,7 @@ static void alpha_row_update(const device_config *screen, int scanline)
 
 static WRITE16_HANDLER( skullxbo_halt_until_hblank_0_w )
 {
-	atarigen_halt_until_hblank_0(machine->primary_screen);
+	atarigen_halt_until_hblank_0(space->machine->primary_screen);
 }
 
 
@@ -86,9 +86,9 @@ static MACHINE_RESET( skullxbo )
 
 static READ16_HANDLER( special_port1_r )
 {
-	int temp = input_port_read(machine, "FF5802");
+	int temp = input_port_read(space->machine, "FF5802");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(machine->primary_screen)) temp ^= 0x0010;
+	if (atarigen_get_hblank(space->machine->primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 

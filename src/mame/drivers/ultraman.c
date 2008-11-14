@@ -23,88 +23,88 @@ VIDEO_UPDATE( ultraman );
 
 static READ16_HANDLER( ultraman_K051937_r )
 {
-	return K051937_r(machine, offset);
+	return K051937_r(space, offset);
 }
 
 static READ16_HANDLER( ultraman_K051960_r )
 {
-	return K051960_r(machine, offset);
+	return K051960_r(space, offset);
 }
 
 static READ16_HANDLER( ultraman_K051316_0_r )
 {
-	return K051316_0_r(machine, offset);
+	return K051316_0_r(space, offset);
 }
 
 static READ16_HANDLER( ultraman_K051316_1_r )
 {
-	return K051316_1_r(machine, offset);
+	return K051316_1_r(space, offset);
 }
 
 static READ16_HANDLER( ultraman_K051316_2_r )
 {
-	return K051316_2_r(machine, offset);
+	return K051316_2_r(space, offset);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_0_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051316_0_w(machine, offset, data & 0xff);
+		K051316_0_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_1_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051316_1_w(machine, offset, data & 0xff);
+		K051316_1_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_2_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051316_2_w(machine, offset, data & 0xff);
+		K051316_2_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_ctrl_0_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051316_ctrl_0_w(machine, offset, data & 0xff);
+		K051316_ctrl_0_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051316_ctrl_1_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051316_ctrl_1_w(machine, offset, data & 0xff);
+		K051316_ctrl_1_w(space, offset, data & 0xff);
 
 }
 
 static WRITE16_HANDLER( ultraman_K051316_ctrl_2_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051316_ctrl_2_w(machine, offset, data & 0xff);
+		K051316_ctrl_2_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051937_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051937_w(machine, offset, data & 0xff);
+		K051937_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( ultraman_K051960_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051960_w(machine, offset, data & 0xff);
+		K051960_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( sound_cmd_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(machine,0,data & 0xff);
+		soundlatch_w(space,0,data & 0xff);
 }
 
 static WRITE16_HANDLER( sound_irq_trigger_w )
 {
 	if (ACCESSING_BITS_0_7)
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 

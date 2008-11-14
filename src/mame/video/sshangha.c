@@ -26,7 +26,7 @@ WRITE16_HANDLER( sshangha_palette_24bit_w )
 	g = (paletteram16[offset+1] >> 8) & 0xff;
 	r = (paletteram16[offset+1] >> 0) & 0xff;
 
-	palette_set_color(machine,offset/2,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset/2,MAKE_RGB(r,g,b));
 }
 
 static void sshangha_tilemap_draw(bitmap_t *bitmap, const rectangle *cliprect)

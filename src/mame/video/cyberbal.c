@@ -246,7 +246,7 @@ INLINE void set_palette_entry(running_machine *machine, int entry, UINT16 value)
 WRITE16_HANDLER( cyberbal_paletteram_0_w )
 {
 	COMBINE_DATA(&cyberbal_paletteram_0[offset]);
-	set_palette_entry(machine, offset, cyberbal_paletteram_0[offset]);
+	set_palette_entry(space->machine, offset, cyberbal_paletteram_0[offset]);
 }
 
 READ16_HANDLER( cyberbal_paletteram_0_r )
@@ -258,7 +258,7 @@ READ16_HANDLER( cyberbal_paletteram_0_r )
 WRITE16_HANDLER( cyberbal_paletteram_1_w )
 {
 	COMBINE_DATA(&cyberbal_paletteram_1[offset]);
-	set_palette_entry(machine, offset + 0x800, cyberbal_paletteram_1[offset]);
+	set_palette_entry(space->machine, offset + 0x800, cyberbal_paletteram_1[offset]);
 }
 
 READ16_HANDLER( cyberbal_paletteram_1_r )

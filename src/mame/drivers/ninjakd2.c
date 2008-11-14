@@ -191,7 +191,7 @@ static WRITE8_HANDLER( robokid_bankselect_w )
 static WRITE8_HANDLER( ninjakd2_soundreset_w )
 {
 	// bit 4 resets sound CPU
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
 	// bit 7 flips screen
 	flip_screen_set(data & 0x80);
@@ -220,12 +220,12 @@ static void ninjakd2_init_samples(void)
 
 static WRITE8_HANDLER( ninjakd2_pcm_play_w )
 {
-	const UINT8* const rom = memory_region(machine, "samples");
+	const UINT8* const rom = memory_region(space->machine, "samples");
 
 	// only Ninja Kid II uses this
 	if (rom)
 	{
-		const int length = memory_region_length(machine, "samples");
+		const int length = memory_region_length(space->machine, "samples");
 
 		const int start = data << 8;
 
@@ -325,8 +325,8 @@ static READ8_HANDLER( omegaf_io_protection_r )
 		case 1:	// dip switches
 			switch (offset)
 			{
-				case 0: result = input_port_read(machine, "DIPSW1"); break;
-				case 1: result = input_port_read(machine, "DIPSW2"); break;
+				case 0: result = input_port_read(space->machine, "DIPSW1"); break;
+				case 1: result = input_port_read(space->machine, "DIPSW2"); break;
 				case 2: result = 0x02;                         break;
 			}
 			break;
@@ -334,8 +334,8 @@ static READ8_HANDLER( omegaf_io_protection_r )
 		case 2:	// player inputs
 			switch (offset)
 			{
-				case 0: result = input_port_read(machine, "PAD1"); break;
-				case 1: result = input_port_read(machine, "PAD2"); break;
+				case 0: result = input_port_read(space->machine, "PAD1"); break;
+				case 1: result = input_port_read(space->machine, "PAD2"); break;
 				case 2: result = 0x01;                       break;
 			}
 			break;

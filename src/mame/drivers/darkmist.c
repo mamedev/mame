@@ -43,7 +43,7 @@ int darkmist_hw;
 static WRITE8_HANDLER(darkmist_hw_w)
 {
   darkmist_hw=data;
-  memory_set_bankptr(1,&memory_region(machine, "main")[0x010000+((data&0x80)?0x4000:0)]);
+  memory_set_bankptr(1,&memory_region(space->machine, "main")[0x010000+((data&0x80)?0x4000:0)]);
 }
 
 static READ8_HANDLER(t5182shared_r)

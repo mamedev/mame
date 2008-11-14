@@ -271,7 +271,7 @@ WRITE16_HANDLER( timekill_intensity_w )
 		double intensity = (double)(data & 0xff) / (double)0x60;
 		int i;
 		for (i = 0; i < 8192; i++)
-			palette_set_pen_contrast(machine, i, intensity);
+			palette_set_pen_contrast(space->machine, i, intensity);
 	}
 }
 
@@ -349,7 +349,7 @@ WRITE16_HANDLER( timekill_paletteram_w )
 	g = paletteram16[offset & ~1] >> 8;
 	b = paletteram16[offset |  1] >> 8;
 
-	palette_set_color(machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset / 2, MAKE_RGB(r, g, b));
 }
 
 
@@ -366,7 +366,7 @@ WRITE16_HANDLER( bloodstm_paletteram_w )
 	g = paletteram16[offset & ~1] >> 8;
 	b = paletteram16[offset |  1] & 0xff;
 
-	palette_set_color(machine, offset / 2, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset / 2, MAKE_RGB(r, g, b));
 }
 
 
@@ -380,7 +380,7 @@ WRITE32_HANDLER( drivedge_paletteram_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = (paletteram32[offset] >> 16) & 0xff;
 
-	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -394,7 +394,7 @@ WRITE32_HANDLER( itech020_paletteram_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = paletteram32[offset] & 0xff;
 
-	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 }
 
 
@@ -1293,7 +1293,7 @@ WRITE16_HANDLER( itech32_video_w )
 	{
 		case 0x02/2:	/* VIDEO_INTACK */
 			VIDEO_INTSTATE = old & ~data;
-			update_interrupts(machine, 1);
+			update_interrupts(space->machine, 1);
 			break;
 
 		case 0x04/2:	/* VIDEO_TRANSFER */
@@ -1318,11 +1318,11 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x08/2:	/* VIDEO_COMMAND */
-			handle_video_command(machine);
+			handle_video_command(space->machine);
 			break;
 
 		case 0x0a/2:	/* VIDEO_INTENABLE */
-			update_interrupts(machine, 1);
+			update_interrupts(space->machine, 1);
 			break;
 
 		case 0x24/2:	/* VIDEO_LEFTCLIP */
@@ -1346,7 +1346,7 @@ WRITE16_HANDLER( itech32_video_w )
 			break;
 
 		case 0x2c/2:	/* VIDEO_INTSCANLINE */
-			timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, VIDEO_INTSCANLINE, 0), 0);
+			timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(space->machine->primary_screen, VIDEO_INTSCANLINE, 0), 0);
 			break;
 
 		case 0x32/2:	/* VIDEO_VTOTAL */
@@ -1378,7 +1378,7 @@ WRITE16_HANDLER( itech32_video_w )
 
 				logerror("Configure Screen: HTOTAL: %x  HBSTART: %x  HBEND: %x  VTOTAL: %x  VBSTART: %x  VBEND: %x\n",
 					VIDEO_HTOTAL, VIDEO_HBLANK_START, VIDEO_HBLANK_END, VIDEO_VTOTAL, VIDEO_VBLANK_START, VIDEO_VBLANK_END);
-				video_screen_configure(machine->primary_screen, VIDEO_HTOTAL, VIDEO_VTOTAL, &visarea, HZ_TO_ATTOSECONDS(VIDEO_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
+				video_screen_configure(space->machine->primary_screen, VIDEO_HTOTAL, VIDEO_VTOTAL, &visarea, HZ_TO_ATTOSECONDS(VIDEO_CLOCK) * VIDEO_HTOTAL * VIDEO_VTOTAL);
 			}
 			break;
 	}
@@ -1393,7 +1393,7 @@ READ16_HANDLER( itech32_video_r )
 	}
 	else if (offset == 3)
 	{
-		return 0xef;/*video_screen_get_vpos(machine->primary_screen) - 1;*/
+		return 0xef;/*video_screen_get_vpos(space->machine->primary_screen) - 1;*/
 	}
 
 	return itech32_video[offset];
@@ -1409,22 +1409,22 @@ READ16_HANDLER( itech32_video_r )
 
 WRITE16_HANDLER( bloodstm_video_w )
 {
-	itech32_video_w(machine, offset / 2, data, mem_mask);
+	itech32_video_w(space, offset / 2, data, mem_mask);
 }
 
 
 READ16_HANDLER( bloodstm_video_r )
 {
-	return itech32_video_r(machine, offset / 2, mem_mask);
+	return itech32_video_r(space, offset / 2, mem_mask);
 }
 
 
 WRITE32_HANDLER( itech020_video_w )
 {
 	if (ACCESSING_BITS_16_31)
-		itech32_video_w(machine, offset, data >> 16, mem_mask >> 16);
+		itech32_video_w(space, offset, data >> 16, mem_mask >> 16);
 	else
-		itech32_video_w(machine, offset, data, mem_mask);
+		itech32_video_w(space, offset, data, mem_mask);
 }
 
 
@@ -1437,7 +1437,7 @@ WRITE32_HANDLER( drivedge_zbuf_control_w )
 
 READ32_HANDLER( itech020_video_r )
 {
-	int result = itech32_video_r(machine, offset, mem_mask);
+	int result = itech32_video_r(space, offset, mem_mask);
 	return (result << 16) | result;
 }
 

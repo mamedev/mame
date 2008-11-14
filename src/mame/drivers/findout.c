@@ -130,7 +130,7 @@ static MACHINE_RESET( findout )
 
 static READ8_HANDLER( catchall )
 {
-	int pc = cpu_get_pc(machine->activecpu);
+	int pc = cpu_get_pc(space->cpu);
 
 	if (pc != 0x3c74 && pc != 0x0364 && pc != 0x036d)	/* weed out spurious blit reads */
 		logerror("%04x: unmapped memory read from %04x\n",pc,offset);
@@ -140,27 +140,27 @@ static READ8_HANDLER( catchall )
 
 static WRITE8_HANDLER( banksel_main_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x8000);
+	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x8000);
 }
 static WRITE8_HANDLER( banksel_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x10000);
+	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x18000);
+	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x18000);
 }
 static WRITE8_HANDLER( banksel_3_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x20000);
+	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x20000);
 }
 static WRITE8_HANDLER( banksel_4_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x28000);
+	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x28000);
 }
 static WRITE8_HANDLER( banksel_5_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "main") + 0x30000);
+	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x30000);
 }
 
 

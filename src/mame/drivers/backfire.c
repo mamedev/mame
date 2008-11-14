@@ -227,30 +227,30 @@ static VIDEO_UPDATE(backfire)
 static READ32_HANDLER(backfire_eeprom_r)
 {
 	/* some kind of screen indicator?  checked by backfira set before it will boot */
-	int backfire_screen = mame_rand(machine)&1;
-	return ((eeprom_read_bit()<<24) | input_port_read(machine, "IN0")
-			| ((input_port_read(machine, "IN2") & ~0x40) <<16)
-			| ((input_port_read(machine, "IN3") &  0x40) <<16)) ^  (backfire_screen << 26) ;
+	int backfire_screen = mame_rand(space->machine)&1;
+	return ((eeprom_read_bit()<<24) | input_port_read(space->machine, "IN0")
+			| ((input_port_read(space->machine, "IN2") & ~0x40) <<16)
+			| ((input_port_read(space->machine, "IN3") &  0x40) <<16)) ^  (backfire_screen << 26) ;
 }
 
 static READ32_HANDLER(backfire_control2_r)
 {
-//  logerror("%08x:Read eprom %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
-	return (eeprom_read_bit()<<24) | input_port_read(machine, "IN1") | (input_port_read(machine, "IN1")<<16);
+//  logerror("%08x:Read eprom %08x (%08x)\n",cpu_get_pc(space->cpu),offset<<1,mem_mask);
+	return (eeprom_read_bit()<<24) | input_port_read(space->machine, "IN1") | (input_port_read(space->machine, "IN1")<<16);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ32_HANDLER(backfire_control3_r)
 {
-//  logerror("%08x:Read eprom %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
-	return (eeprom_read_bit()<<24) | input_port_read(machine, "IN2") | (input_port_read(machine, "IN2")<<16);
+//  logerror("%08x:Read eprom %08x (%08x)\n",cpu_get_pc(space->cpu),offset<<1,mem_mask);
+	return (eeprom_read_bit()<<24) | input_port_read(space->machine, "IN2") | (input_port_read(space->machine, "IN2")<<16);
 }
 #endif
 
 
 static WRITE32_HANDLER(backfire_eeprom_w)
 {
-	logerror("%08x:write eprom %08x (%08x) %08x\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask,data);
+	logerror("%08x:write eprom %08x (%08x) %08x\n",cpu_get_pc(space->cpu),offset<<1,mem_mask,data);
 	if (ACCESSING_BITS_0_7) {
 		eeprom_set_clock_line((data & 0x2) ? ASSERT_LINE : CLEAR_LINE);
 		eeprom_write_bit(data & 0x1);
@@ -262,21 +262,21 @@ static WRITE32_HANDLER(backfire_eeprom_w)
 static WRITE32_HANDLER(wcvol95_nonbuffered_palette_w)
 {
 	COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color_rgb(machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(space->machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 
 static READ32_HANDLER( deco156_snd_r )
 {
-	return ymz280b_status_0_r(machine, 0);
+	return ymz280b_status_0_r(space, 0);
 }
 
 static WRITE32_HANDLER( deco156_snd_w )
 {
 	if (offset)
-		ymz280b_data_0_w(machine, 0, data);
+		ymz280b_data_0_w(space, 0, data);
 	else
-		ymz280b_register_0_w(machine, 0, data);
+		ymz280b_register_0_w(space, 0, data);
 }
 
 /* map 32-bit writes to 16-bit */
@@ -297,25 +297,25 @@ static READ32_HANDLER( backfire_pf1_data_r ) {	return deco16_pf1_data[offset]^0x
 static READ32_HANDLER( backfire_pf2_data_r ) {	return deco16_pf2_data[offset]^0xffff0000; }
 static READ32_HANDLER( backfire_pf3_data_r ) {	return deco16_pf3_data[offset]^0xffff0000; }
 static READ32_HANDLER( backfire_pf4_data_r ) {	return deco16_pf4_data[offset]^0xffff0000; }
-static WRITE32_HANDLER( backfire_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(machine,offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(machine,offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf3_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf3_data_w(machine,offset,data,mem_mask); }
-static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf4_data_w(machine,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf1_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf1_data_w(space,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf2_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf2_data_w(space,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf3_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf3_data_w(space,offset,data,mem_mask); }
+static WRITE32_HANDLER( backfire_pf4_data_w ) { data &=0x0000ffff; mem_mask &=0x0000ffff; deco16_pf4_data_w(space,offset,data,mem_mask); }
 
 #ifdef UNUSED_FUNCTION
 READ32_HANDLER( backfire_unknown_wheel_r )
 {
-	return input_port_read(machine, "PADDLE0");
+	return input_port_read(space->machine, "PADDLE0");
 }
 
 READ32_HANDLER( backfire_wheel1_r )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 READ32_HANDLER( backfire_wheel2_r )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 #endif
 
@@ -666,10 +666,10 @@ static void descramble_sound( running_machine *machine )
 
 static READ32_HANDLER( backfire_speedup_r )
 {
-//  mame_printf_debug( "%08x\n",cpu_get_pc(machine->activecpu));
+//  mame_printf_debug( "%08x\n",cpu_get_pc(space->cpu));
 
-	if (cpu_get_pc(machine->activecpu)==0xce44)  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400)); // backfire
-	if (cpu_get_pc(machine->activecpu)==0xcee4)  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(400)); // backfira
+	if (cpu_get_pc(space->cpu)==0xce44)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400)); // backfire
+	if (cpu_get_pc(space->cpu)==0xcee4)  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(400)); // backfira
 
 	return backfire_mainram[0x18/4];
 }

@@ -32,7 +32,7 @@ WRITE8_HANDLER( lsasquad_sh_nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
@@ -41,28 +41,28 @@ WRITE8_HANDLER( lsasquad_sound_command_w )
 {
 	lsasquad_sound_pending |= 0x01;
 	sound_cmd = data;
-//logerror("%04x: sound cmd %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: sound cmd %02x\n",cpu_get_pc(space->cpu),data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 
 READ8_HANDLER( lsasquad_sh_sound_command_r )
 {
 	lsasquad_sound_pending &= ~0x01;
-//logerror("%04x: read sound cmd %02x\n",cpu_get_pc(machine->activecpu),sound_cmd);
+//logerror("%04x: read sound cmd %02x\n",cpu_get_pc(space->cpu),sound_cmd);
 	return sound_cmd;
 }
 
 WRITE8_HANDLER( lsasquad_sh_result_w )
 {
 	lsasquad_sound_pending |= 0x02;
-//logerror("%04x: sound res %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: sound res %02x\n",cpu_get_pc(space->cpu),data);
 	sound_result = data;
 }
 
 READ8_HANDLER( lsasquad_sound_result_r )
 {
 	lsasquad_sound_pending &= ~0x02;
-//logerror("%04x: read sound res %02x\n",cpu_get_pc(machine->activecpu),sound_result);
+//logerror("%04x: read sound res %02x\n",cpu_get_pc(space->cpu),sound_result);
 	return sound_result;
 }
 
@@ -78,7 +78,7 @@ READ8_HANDLER( daikaiju_sh_sound_command_r )
 {
 	lsasquad_sound_pending &= ~0x01;
 	lsasquad_sound_pending |= 0x02;
-//logerror("%04x: read sound cmd %02x\n",cpu_get_pc(machine->activecpu),sound_cmd);
+//logerror("%04x: read sound cmd %02x\n",cpu_get_pc(space->cpu),sound_cmd);
 	return sound_cmd;
 }
 
@@ -105,13 +105,13 @@ static UINT8 portA_in,portA_out,ddrA;
 
 READ8_HANDLER( lsasquad_68705_portA_r )
 {
-//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(machine->activecpu),portA_in);
+//logerror("%04x: 68705 port A read %02x\n",cpu_get_pc(space->cpu),portA_in);
 	return (portA_out & ddrA) | (portA_in & ~ddrA);
 }
 
 WRITE8_HANDLER( lsasquad_68705_portA_w )
 {
-//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: 68705 port A write %02x\n",cpu_get_pc(space->cpu),data);
 	portA_out = data;
 }
 
@@ -140,12 +140,12 @@ READ8_HANDLER( lsasquad_68705_portB_r )
 
 WRITE8_HANDLER( lsasquad_68705_portB_w )
 {
-//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: 68705 port B write %02x\n",cpu_get_pc(space->cpu),data);
 
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
+		if (main_sent) cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
 		main_sent = 0;
 //logerror("read command %02x from main cpu\n",portA_in);
 	}
@@ -166,26 +166,26 @@ WRITE8_HANDLER( lsasquad_68705_ddrB_w )
 
 WRITE8_HANDLER( lsasquad_mcu_w )
 {
-//logerror("%04x: mcu_w %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: mcu_w %02x\n",cpu_get_pc(space->cpu),data);
 	from_main = data;
 	main_sent = 1;
-	cpu_set_input_line(machine->cpu[2],0,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2],0,ASSERT_LINE);
 }
 
 READ8_HANDLER( lsasquad_mcu_r )
 {
-//logerror("%04x: mcu_r %02x\n",cpu_get_pc(machine->activecpu),from_mcu);
+//logerror("%04x: mcu_r %02x\n",cpu_get_pc(space->cpu),from_mcu);
 	mcu_sent = 0;
 	return from_mcu;
 }
 
 READ8_HANDLER( lsasquad_mcu_status_r )
 {
-	int res = input_port_read(machine, "MCU?");
+	int res = input_port_read(space->machine, "MCU?");
 
 	/* bit 0 = when 1, mcu is ready to receive data from main cpu */
 	/* bit 1 = when 0, mcu has sent data to the main cpu */
-//logerror("%04x: mcu_status_r\n",cpu_get_pc(machine->activecpu));
+//logerror("%04x: mcu_status_r\n",cpu_get_pc(space->cpu));
 	if (!main_sent) res |= 0x01;
 	if (!mcu_sent) res |= 0x02;
 

@@ -218,13 +218,13 @@ static void set_rgba( running_machine *machine, int start, int index, unsigned c
 static WRITE8_HANDLER( tile_palette_w )
 {
 	tile_palette[ offset ] = data;
-	set_rgba( machine, 0, offset & 0xff, tile_palette );
+	set_rgba( space->machine, 0, offset & 0xff, tile_palette );
 }
 
 static WRITE8_HANDLER( sprite_palette_w )
 {
 	sprite_palette[ offset ] = data;
-	set_rgba( machine, 256, offset & 0xff, sprite_palette );
+	set_rgba( space->machine, 256, offset & 0xff, sprite_palette );
 }
 
 static WRITE8_HANDLER( firefox_objram_bank_w )
@@ -253,19 +253,19 @@ static CUSTOM_INPUT( soundflag_r )
 static READ8_HANDLER( sound_to_main_r )
 {
 	sound_to_main_flag = 0;
-	return soundlatch2_r(machine, 0);
+	return soundlatch2_r(space, 0);
 }
 
 static WRITE8_HANDLER( main_to_sound_w )
 {
 	main_to_sound_flag = 1;
-	soundlatch_w(machine, 0, data);
-	cputag_set_input_line(machine, "audio", INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cputag_set_input_line(space->machine, "audio", INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_reset_w )
 {
-	cputag_set_input_line(machine, "audio", INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audio", INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 	if ((data & 0x80) != 0)
 		sound_to_main_flag = main_to_sound_flag = 0;
 }
@@ -273,13 +273,13 @@ static WRITE8_HANDLER( sound_reset_w )
 static READ8_HANDLER( main_to_sound_r )
 {
 	main_to_sound_flag = 0;
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 static WRITE8_HANDLER( sound_to_main_w )
 {
 	sound_to_main_flag = 1;
-	soundlatch2_w(machine, 0, data);
+	soundlatch2_w(space, 0, data);
 }
 
 
@@ -307,13 +307,15 @@ static UINT8 riot_porta_r(const device_config *device, UINT8 olddata)
 
 static void riot_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[1], ADDRESS_SPACE_PROGRAM);
+	
 	/* handle 5220 read */
 	if ((olddata & 2) != 0 && (newdata & 2) == 0)
-		riot6532_portb_in_set(device, tms5220_status_r(device->machine, 0), 0xff);
+		riot6532_portb_in_set(device, tms5220_status_r(space, 0), 0xff);
 
 	/* handle 5220 write */
 	if ((olddata & 1) != 0 && (newdata & 1) == 0)
-		tms5220_data_w(device->machine, 0, riot6532_portb_out_get(device));
+		tms5220_data_w(space, 0, riot6532_portb_out_get(device));
 }
 
 
@@ -334,10 +336,10 @@ static READ8_HANDLER( adc_r )
 {
 	if( control_num == 0 )
 	{
-		return input_port_read( machine, "PITCH" );
+		return input_port_read( space->machine, "PITCH" );
 	}
 
-	return input_port_read( machine, "YAW" );
+	return input_port_read( space->machine, "YAW" );
 }
 
 static WRITE8_HANDLER( adc_select_w )
@@ -391,17 +393,17 @@ static WRITE8_HANDLER( rom_bank_w )
 
 static WRITE8_HANDLER( main_irq_clear_w )
 {
-    cputag_set_input_line( machine, "main", M6809_IRQ_LINE, CLEAR_LINE );
+    cputag_set_input_line( space->machine, "main", M6809_IRQ_LINE, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( main_firq_clear_w )
 {
-    cputag_set_input_line( machine, "main", M6809_FIRQ_LINE, CLEAR_LINE );
+    cputag_set_input_line( space->machine, "main", M6809_FIRQ_LINE, CLEAR_LINE );
 }
 
 static WRITE8_HANDLER( self_reset_w )
 {
-	cputag_set_input_line( machine, "main", INPUT_LINE_RESET, PULSE_LINE );
+	cputag_set_input_line( space->machine, "main", INPUT_LINE_RESET, PULSE_LINE );
 }
 
 

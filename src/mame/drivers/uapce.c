@@ -41,7 +41,7 @@ static WRITE8_HANDLER( jamma_if_control_latch_w )
 
 	if ( diff & 0x40 )
 	{
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 	}
 
 	// bit 3 - enable 752 Hz (D-3) square wave output
@@ -58,7 +58,7 @@ static READ8_HANDLER( jamma_if_read_dsw )
 {
 	UINT8 dsw_val;
 
-	dsw_val = input_port_read(machine,  "DSW" );
+	dsw_val = input_port_read(space->machine,  "DSW" );
 
 	if ( BIT( offset, 7 ) == 0 )
 	{

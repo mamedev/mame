@@ -120,7 +120,7 @@ WRITE8_HANDLER( vigilant_paletteram_w )
 	g = (paletteram[bank + offset + 0x100] << 3) & 0xFF;
 	b = (paletteram[bank + offset + 0x200] << 3) & 0xFF;
 
-	palette_set_color(machine, (bank >> 2) + offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine, (bank >> 2) + offset,MAKE_RGB(r,g,b));
 }
 
 

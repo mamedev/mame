@@ -255,7 +255,7 @@ WRITE8_HANDLER( seta_sound_w )
 	 	info->smp_offset[channel] = 0;
 	 	info->env_offset[channel] = 0;
 	}
-	LOG_REGISTER_WRITE(("PC: %06X : offset %6X : data %2X\n", cpu_get_pc(machine->activecpu), offset, data ));
+	LOG_REGISTER_WRITE(("PC: %06X : offset %6X : data %2X\n", cpu_get_pc(space->cpu), offset, data ));
 	info->reg[offset] = data;
 }
 
@@ -270,8 +270,8 @@ READ16_HANDLER( seta_sound_word_r )
 	UINT16	ret;
 
 	ret = info->HI_WORD_BUF[offset]<<8;
-	ret += (seta_sound_r( machine, offset )&0xff);
-	LOG_REGISTER_READ(( "Read X1-010 PC:%06X Offset:%04X Data:%04X\n", cpu_get_pc(machine->activecpu), offset, ret ));
+	ret += (seta_sound_r( space, offset )&0xff);
+	LOG_REGISTER_READ(( "Read X1-010 PC:%06X Offset:%04X Data:%04X\n", cpu_get_pc(space->cpu), offset, ret ));
 	return ret;
 }
 
@@ -279,8 +279,8 @@ WRITE16_HANDLER( seta_sound_word_w )
 {
 	struct x1_010_info *info = sndti_token(SOUND_X1_010, 0);
 	info->HI_WORD_BUF[offset] = (data>>8)&0xff;
-	seta_sound_w( machine, offset, data&0xff );
-	LOG_REGISTER_WRITE(( "Write X1-010 PC:%06X Offset:%04X Data:%04X\n", cpu_get_pc(machine->activecpu), offset, data ));
+	seta_sound_w( space, offset, data&0xff );
+	LOG_REGISTER_WRITE(( "Write X1-010 PC:%06X Offset:%04X Data:%04X\n", cpu_get_pc(space->cpu), offset, data ));
 }
 
 

@@ -51,10 +51,10 @@ static UINT16 data_9a0000, data_998000, data_9b0000, data_9a8000, data_990000, d
 
 static WRITE16_HANDLER(blitter_9b8000_w)
 {
-	UINT8 *rom = memory_region(machine, "gfx1");
-	int len=memory_region_length(machine, "gfx1");
-	int w = video_screen_get_width(machine->primary_screen);
-	int h = video_screen_get_height(machine->primary_screen);
+	UINT8 *rom = memory_region(space->machine, "gfx1");
+	int len=memory_region_length(space->machine, "gfx1");
+	int w = video_screen_get_width(space->machine->primary_screen);
+	int h = video_screen_get_height(space->machine->primary_screen);
 	int x,y;
 	UINT16 pix;
 
@@ -66,7 +66,7 @@ static WRITE16_HANDLER(blitter_9b8000_w)
 
 	if(of==0)
 	{
-		fillbitmap(tmpbitmap,get_black_pen(machine),0);
+		fillbitmap(tmpbitmap,get_black_pen(space->machine),0);
 		return;
 	}
 
@@ -78,7 +78,7 @@ static WRITE16_HANDLER(blitter_9b8000_w)
 	dx<<=1;
 
 #if 0
-	printf("[%x] %x blit %x -> %x,%x  (%x*%x ) [%x] %x - %.4x %.4x - %.4x - %.4x\n",data,cpu_get_pc(machine->activecpu),of,x0,y0,dx,dy,data_9b0000,data_9a8000,data_9a0000,data_998000,data_990000,data_988000);
+	printf("[%x] %x blit %x -> %x,%x  (%x*%x ) [%x] %x - %.4x %.4x - %.4x - %.4x\n",data,cpu_get_pc(space->cpu),of,x0,y0,dx,dy,data_9b0000,data_9a8000,data_9a0000,data_998000,data_990000,data_988000);
 #endif
 
 	for(y=0;y<dy;++y)
@@ -134,13 +134,13 @@ static WRITE16_HANDLER(mcu_w)
 
 static WRITE16_HANDLER(unk_w)
 {
-	switch(cpu_get_pc(machine->activecpu))
+	switch(cpu_get_pc(space->cpu))
 	{
 		case 0x1348: mainram[0x00932/2]=0xffff; break; //dirt way to exit loop
 /*      case 0x16ce:
         {
-            int addr=(cpu_get_reg(machine->activecpu, M68K_D2)+0x089c)>>1;
-            mainram[addr&0x7fff]=0xffff;//mame_rand(machine);
+            int addr=(cpu_get_reg(space->cpu, M68K_D2)+0x089c)>>1;
+            mainram[addr&0x7fff]=0xffff;//mame_rand(space->machine);
         }
         break;*/
 	}
@@ -186,7 +186,7 @@ static WRITE16_HANDLER( color_data_w )
 {
 		data>>=8;
 		colorram[clr_offset]=data;
-		palette_set_color_rgb(machine,clr_offset/3,pal6bit(colorram[(clr_offset/3)*3]),pal6bit(colorram[(clr_offset/3)*3+1]),pal6bit(colorram[(clr_offset/3)*3+2]));
+		palette_set_color_rgb(space->machine,clr_offset/3,pal6bit(colorram[(clr_offset/3)*3]),pal6bit(colorram[(clr_offset/3)*3+1]),pal6bit(colorram[(clr_offset/3)*3+2]));
 		clr_offset=(clr_offset+1)%768;
 }
 

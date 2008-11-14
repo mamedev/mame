@@ -80,7 +80,7 @@ static READ8_HANDLER( zaccaria_dsw_r )
 {
 	static const char *const dswnames[] = { "IN0", "DSW0", "DSW1" };
 
-	return input_port_read(machine, dswnames[dsw]);
+	return input_port_read(space->machine, dswnames[dsw]);
 }
 
 
@@ -109,9 +109,9 @@ static int active_8910, port0a, acs;
 static READ8_HANDLER( zaccaria_port0a_r )
 {
 	if (active_8910 == 0)
-		return ay8910_read_port_0_r(machine,0);
+		return ay8910_read_port_0_r(space,0);
 	else
-		return ay8910_read_port_1_r(machine,0);
+		return ay8910_read_port_1_r(space,0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -129,9 +129,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
 		if (last & 0x01)
-			ay8910_control_port_0_w(machine,0,port0a);
+			ay8910_control_port_0_w(space,0,port0a);
 		else
-			ay8910_write_port_0_w(machine,0,port0a);
+			ay8910_write_port_0_w(space,0,port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -144,9 +144,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
 		if (last & 0x04)
-			ay8910_control_port_1_w(machine,0,port0a);
+			ay8910_control_port_1_w(space,0,port0a);
 		else
-			ay8910_write_port_1_w(machine,0,port0a);
+			ay8910_write_port_1_w(space,0,port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{
@@ -172,7 +172,7 @@ static int port1a,port1b;
 
 static READ8_HANDLER( zaccaria_port1a_r )
 {
-	if (~port1b & 1) return tms5220_status_r(machine,0);
+	if (~port1b & 1) return tms5220_status_r(space,0);
 	else return port1a;
 }
 
@@ -188,7 +188,7 @@ static WRITE8_HANDLER( zaccaria_port1b_w )
 	// bit 0 = /RS
 
 	// bit 1 = /WS
-	if (~data & 2) tms5220_data_w(machine,0,port1a);
+	if (~data & 2) tms5220_data_w(space,0,port1a);
 
 	// bit 3 = "ACS" (goes, inverted, to input port 6 bit 3)
 	acs = ~data & 0x08;
@@ -256,14 +256,14 @@ static MACHINE_RESET( zaccaria )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[2],0,(data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[2],0,(data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sound1_command_w )
 {
-	pia_0_ca1_w(machine,0,data & 0x80);
-	soundlatch2_w(machine,0,data);
+	pia_0_ca1_w(space,0,data & 0x80);
+	soundlatch2_w(space,0,data);
 }
 
 static WRITE8_HANDLER( mc1408_data_w )
@@ -285,7 +285,7 @@ static READ8_HANDLER( zaccaria_prot1_r )
 			return 0x40;    /* Jack Rabbit */
 
 		case 6:
-			if (machine->gamedrv == &driver_monymony)
+			if (space->machine->gamedrv == &driver_monymony)
 				return 0x70;    /* Money Money */
 			return 0xa0;    /* Jack Rabbit */
 
@@ -299,7 +299,7 @@ static READ8_HANDLER( zaccaria_prot2_r )
 	switch (offset)
 	{
 		case 0:
-			return input_port_read(machine, "COINS");   /* bits 4 and 5 must be 0 in Jack Rabbit */
+			return input_port_read(space->machine, "COINS");   /* bits 4 and 5 must be 0 in Jack Rabbit */
 
 		case 2:
 			return 0x10;    /* Jack Rabbit */
@@ -323,7 +323,7 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( nmienable_w )
 {
-	interrupt_enable_w(machine,0,data & 1);
+	interrupt_enable_w(space,0,data & 1);
 }
 
 

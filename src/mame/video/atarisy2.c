@@ -158,7 +158,7 @@ WRITE16_HANDLER( atarisy2_xscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 
 	/* update the playfield scrolling - hscroll is clocked on the following scanline */
 	tilemap_set_scrollx(atarigen_playfield_tilemap, 0, newscroll >> 6);
@@ -189,13 +189,13 @@ WRITE16_HANDLER( atarisy2_yscroll_w )
 
 	/* if anything has changed, force a partial update */
 	if (newscroll != oldscroll)
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 
 	/* if bit 4 is zero, the scroll value is clocked in right away */
 	if (!(newscroll & 0x10))
-		tilemap_set_scrolly(atarigen_playfield_tilemap, 0, (newscroll >> 6) - video_screen_get_vpos(machine->primary_screen));
+		tilemap_set_scrolly(atarigen_playfield_tilemap, 0, (newscroll >> 6) - video_screen_get_vpos(space->machine->primary_screen));
 	else
-		timer_adjust_oneshot(yscroll_reset_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), newscroll >> 6);
+		timer_adjust_oneshot(yscroll_reset_timer, video_screen_get_time_until_pos(space->machine->primary_screen, 0, 0), newscroll >> 6);
 
 	/* update the playfield banking */
 	if (playfield_tile_bank[1] != (newscroll & 0x0f) * 0x400)
@@ -240,7 +240,7 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 	red = (color_table[(newword >> 12) & 15] * inten) >> 4;
 	green = (color_table[(newword >> 8) & 15] * inten) >> 4;
 	blue = (color_table[(newword >> 4) & 15] * inten) >> 4;
-	palette_set_color(machine, offset, MAKE_RGB(red, green, blue));
+	palette_set_color(space->machine, offset, MAKE_RGB(red, green, blue));
 }
 
 
@@ -254,20 +254,20 @@ WRITE16_HANDLER( atarisy2_paletteram_w )
 READ16_HANDLER( atarisy2_slapstic_r )
 {
 	int result = atarisy2_slapstic[offset];
-	slapstic_tweak(machine, offset);
+	slapstic_tweak(space->machine, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	videobank = slapstic_tweak(machine, 0x1234) * 0x1000;
+	videobank = slapstic_tweak(space->machine, 0x1234) * 0x1000;
 	return result;
 }
 
 
 WRITE16_HANDLER( atarisy2_slapstic_w )
 {
-	slapstic_tweak(machine, offset);
+	slapstic_tweak(space->machine, offset);
 
 	/* an extra tweak for the next opcode fetch */
-	videobank = slapstic_tweak(machine, 0x1234) * 0x1000;
+	videobank = slapstic_tweak(space->machine, 0x1234) * 0x1000;
 }
 
 
@@ -300,8 +300,8 @@ WRITE16_HANDLER( atarisy2_videoram_w )
 	{
 		/* force an update if the link of object 0 is about to change */
 		if (offs == 0x0c03)
-			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-		atarimo_0_spriteram_w(machine, offs - 0x0c00, data, mem_mask);
+			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+		atarimo_0_spriteram_w(space, offs - 0x0c00, data, mem_mask);
 	}
 
 	/* playfieldram? */

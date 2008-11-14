@@ -59,17 +59,17 @@ static WRITE8_HANDLER( sprite_dma_w )
 
 static READ8_HANDLER( psg_4015_r )
 {
-	return nes_psg_0_r(machine, 0x15);
+	return nes_psg_0_r(space, 0x15);
 }
 
 static WRITE8_HANDLER( psg_4015_w )
 {
-	nes_psg_0_w(machine, 0x15, data);
+	nes_psg_0_w(space, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg_4017_w )
 {
-	nes_psg_0_w(machine, 0x17, data);
+	nes_psg_0_w(space, 0x17, data);
 }
 
 /******************************************************
@@ -100,11 +100,11 @@ static WRITE8_HANDLER( multigam_IN0_w )
 	in_0_shift = 0;
 	in_1_shift = 0;
 
-	in_0 = input_port_read(machine, "P1");
-	in_1 = input_port_read(machine, "P2");
+	in_0 = input_port_read(space->machine, "P1");
+	in_1 = input_port_read(space->machine, "P2");
 
 	multigam_in_dsw_shift = 0;
-	multigam_in_dsw = input_port_read(machine, "DSW");
+	multigam_in_dsw = input_port_read(space->machine, "DSW");
 }
 
 static READ8_HANDLER( multigam_IN1_r )
@@ -131,8 +131,8 @@ static int multigam_game_gfx_bank = 0;
 static WRITE8_HANDLER(multigam_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( machine, "main" );
-	UINT8* src = memory_region( machine, "user1" );
+	UINT8* dst = memory_region( space->machine, "main" );
+	UINT8* src = memory_region( space->machine, "user1" );
 
 	if ( data & 0x80 )
 	{
@@ -231,7 +231,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 			if ( multigam3_mmc3_last_bank != ( data & 0xc0 ) )
 			{
 				int bank;
-				UINT8 *prg = memory_region( machine, "main" );
+				UINT8 *prg = memory_region( space->machine, "main" );
 
 				/* reset the banks */
 				if ( multigam3_mmc3_command & 0x40 )
@@ -284,7 +284,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 
 					case 6: /* program banking */
 					{
-						UINT8 *prg = memory_region( machine, "main" );
+						UINT8 *prg = memory_region( space->machine, "main" );
 						if ( multigam3_mmc3_command & 0x40 )
 						{
 							/* high bank */
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( multigam3_mmc3_rom_switch_w )
 					case 7: /* program banking */
 						{
 							/* mid bank */
-							UINT8 *prg = memory_region( machine, "main" );
+							UINT8 *prg = memory_region( space->machine, "main" );
 							multigam3_mmc3_banks[1] = data & 0x1f;
 							bank = multigam3_mmc3_banks[1] * 0x2000 + 0xa0000;
 
@@ -388,18 +388,18 @@ static WRITE8_HANDLER(multigm3_mapper2_w)
 static WRITE8_HANDLER(multigm3_switch_prg_rom)
 {
 	/* switch PRG rom */
-	UINT8* dst = memory_region( machine, "main" );
-	UINT8* src = memory_region( machine, "user1" );
+	UINT8* dst = memory_region( space->machine, "main" );
+	UINT8* src = memory_region( space->machine, "user1" );
 
 	if ( data == 0xa8 )
 	{
-		multigam_init_smb3(machine);
+		multigam_init_smb3(space->machine);
 		return;
 	}
 	else
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, multigm3_mapper2_w );
-		memory_set_bankptr(1, memory_region(machine, "main") + 0x6000);
+		memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, multigm3_mapper2_w );
+		memory_set_bankptr(1, memory_region(space->machine, "main") + 0x6000);
 	}
 
 	if ( data & 0x80 )

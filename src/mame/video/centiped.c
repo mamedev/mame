@@ -232,7 +232,7 @@ WRITE8_HANDLER( centiped_paletteram_w )
 
 		/* character colors, set directly */
 		if ((offset & 0x08) == 0)
-			palette_set_color(machine, offset & 0x03, color);
+			palette_set_color(space->machine, offset & 0x03, color);
 
 		/* sprite colors - set all the applicable ones */
 		else
@@ -244,13 +244,13 @@ WRITE8_HANDLER( centiped_paletteram_w )
 			for (i = 0; i < 0x100; i += 4)
 			{
 				if (offset == ((i >> 2) & 0x03))
-					palette_set_color(machine, i + 4 + 1, color);
+					palette_set_color(space->machine, i + 4 + 1, color);
 
 				if (offset == ((i >> 4) & 0x03))
-					palette_set_color(machine, i + 4 + 2, color);
+					palette_set_color(space->machine, i + 4 + 2, color);
 
 				if (offset == ((i >> 6) & 0x03))
-					palette_set_color(machine, i + 4 + 3, color);
+					palette_set_color(space->machine, i + 4 + 3, color);
 			}
 		}
 	}
@@ -387,7 +387,7 @@ WRITE8_HANDLER( milliped_paletteram_w )
 {
 	paletteram[offset] = data;
 
-	melliped_mazeinv_set_color(machine, offset, data);
+	melliped_mazeinv_set_color(space->machine, offset, data);
 }
 
 
@@ -396,7 +396,7 @@ WRITE8_HANDLER( mazeinv_paletteram_w )
 	paletteram[offset] = data;
 
 	/* the value passed in is a look-up index into the color PROM */
-	melliped_mazeinv_set_color(machine, offset, ~memory_region(machine, "proms")[~data & 0x0f]);
+	melliped_mazeinv_set_color(space->machine, offset, ~memory_region(space->machine, "proms")[~data & 0x0f]);
 }
 
 

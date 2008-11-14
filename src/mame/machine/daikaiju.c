@@ -175,7 +175,7 @@ WRITE8_HANDLER( daikaiju_mcu_w )
 			case MCU_ID: 				SET_COMMAND(MCU_ID_LENGTH); break;
 			default:
 				daikaiju_command=data;
-				logerror("Unknown MCU command W %x %x \n",data,cpu_get_pc(machine->activecpu));
+				logerror("Unknown MCU command W %x %x \n",data,cpu_get_pc(space->cpu));
 		}
 	}
 	else
@@ -332,15 +332,15 @@ READ8_HANDLER( daikaiju_mcu_r )
 			return n;
 		}
 	}
-	logerror("Unknown MCU R %x %x %x %x\n",cpu_get_pc(machine->activecpu), daikaiju_command, daikaiju_length, daikaiju_prev);
+	logerror("Unknown MCU R %x %x %x %x\n",cpu_get_pc(space->cpu), daikaiju_command, daikaiju_length, daikaiju_prev);
 	return 0xff;
 }
 
 READ8_HANDLER( daikaiju_mcu_status_r )
 {
-	int res = input_port_read(machine, "MCU?");
+	int res = input_port_read(space->machine, "MCU?");
 
-	res^=mame_rand(machine)&3;
+	res^=mame_rand(space->machine)&3;
 	res |=((lsasquad_sound_pending & 0x02)^2)<<3; //inverted flag
 	lsasquad_sound_pending &= ~0x02;
 	return res;

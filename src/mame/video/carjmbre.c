@@ -55,7 +55,7 @@ WRITE8_HANDLER( carjmbre_bgcolor_w )
 	if(oldbg!=carjmbre_bgcolor)
 	{
 		for (i=0;i<64;i+=4)
-			palette_set_color_rgb(machine, i, (carjmbre_bgcolor&0xff)*0x50, (carjmbre_bgcolor&0xff)*0x50, (carjmbre_bgcolor&0xff)!=0?0x50:0);
+			palette_set_color_rgb(space->machine, i, (carjmbre_bgcolor&0xff)*0x50, (carjmbre_bgcolor&0xff)*0x50, (carjmbre_bgcolor&0xff)!=0?0x50:0);
 	}
 }
 

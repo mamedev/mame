@@ -728,7 +728,7 @@ READ8_HANDLER( namcoio_r )
 	// RAM is 4-bit wide; Pac & Pal requires the | 0xf0 otherwise Easter egg doesn't work
 	offset &= 0x3f;
 
-	LOG(("%04x: I/O read %d: mode %d, offset %d = %02x\n", cpu_get_pc(machine->activecpu), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f));
+	LOG(("%04x: I/O read %d: mode %d, offset %d = %02x\n", cpu_get_pc(space->cpu), offset / 16, namcoio_ram[(offset & 0x30) + 8], offset & 0x0f, namcoio_ram[offset]&0x0f));
 
 	return 0xf0 | namcoio_ram[offset];
 }
@@ -738,7 +738,7 @@ WRITE8_HANDLER( namcoio_w )
 	offset &= 0x3f;
 	data &= 0x0f;	// RAM is 4-bit wide
 
-	LOG(("%04x: I/O write %d: offset %d = %02x\n", cpu_get_pc(machine->activecpu), offset / 16, offset & 0x0f, data));
+	LOG(("%04x: I/O write %d: offset %d = %02x\n", cpu_get_pc(space->cpu), offset / 16, offset & 0x0f, data));
 
 	namcoio_ram[offset] = data;
 }
@@ -1033,11 +1033,11 @@ static void namco_06xx_ctrl_w(running_machine *machine, int chip,int data)
 
 
 
-READ8_HANDLER( namco_06xx_0_data_r )		{ return namco_06xx_data_r(machine,0,offset); }
-READ8_HANDLER( namco_06xx_1_data_r )		{ return namco_06xx_data_r(machine,1,offset); }
-WRITE8_HANDLER( namco_06xx_0_data_w )	{ namco_06xx_data_w(machine,0,offset,data); }
-WRITE8_HANDLER( namco_06xx_1_data_w )	{ namco_06xx_data_w(machine,1,offset,data); }
-READ8_HANDLER( namco_06xx_0_ctrl_r )		{ return namco_06xx_ctrl_r(machine,0); }
-READ8_HANDLER( namco_06xx_1_ctrl_r )		{ return namco_06xx_ctrl_r(machine,1); }
-WRITE8_HANDLER( namco_06xx_0_ctrl_w )	{ namco_06xx_ctrl_w(machine, 0,data); }
-WRITE8_HANDLER( namco_06xx_1_ctrl_w )	{ namco_06xx_ctrl_w(machine, 1,data); }
+READ8_HANDLER( namco_06xx_0_data_r )		{ return namco_06xx_data_r(space,0,offset); }
+READ8_HANDLER( namco_06xx_1_data_r )		{ return namco_06xx_data_r(space,1,offset); }
+WRITE8_HANDLER( namco_06xx_0_data_w )	{ namco_06xx_data_w(space,0,offset,data); }
+WRITE8_HANDLER( namco_06xx_1_data_w )	{ namco_06xx_data_w(space,1,offset,data); }
+READ8_HANDLER( namco_06xx_0_ctrl_r )		{ return namco_06xx_ctrl_r(space,0); }
+READ8_HANDLER( namco_06xx_1_ctrl_r )		{ return namco_06xx_ctrl_r(space,1); }
+WRITE8_HANDLER( namco_06xx_0_ctrl_w )	{ namco_06xx_ctrl_w(space, 0,data); }
+WRITE8_HANDLER( namco_06xx_1_ctrl_w )	{ namco_06xx_ctrl_w(space, 1,data); }

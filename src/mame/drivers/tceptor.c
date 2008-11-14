@@ -150,22 +150,22 @@ static UINT8 fix_input1(UINT8 in1, UINT8 in2)
 
 static READ8_HANDLER( dsw0_r )
 {
-	return fix_input0(input_port_read(machine, "DSW1"), input_port_read(machine, "DSW2"));
+	return fix_input0(input_port_read(space->machine, "DSW1"), input_port_read(space->machine, "DSW2"));
 }
 
 static READ8_HANDLER( dsw1_r )
 {
-	return fix_input1(input_port_read(machine, "DSW1"), input_port_read(machine, "DSW2"));
+	return fix_input1(input_port_read(space->machine, "DSW1"), input_port_read(space->machine, "DSW2"));
 }
 
 static READ8_HANDLER( input0_r )
 {
-	return fix_input0(input_port_read(machine, "BUTTONS"), input_port_read(machine, "SERVICE"));
+	return fix_input0(input_port_read(space->machine, "BUTTONS"), input_port_read(space->machine, "SERVICE"));
 }
 
 static READ8_HANDLER( input1_r )
 {
-	return fix_input1(input_port_read(machine, "BUTTONS"), input_port_read(machine, "SERVICE"));
+	return fix_input1(input_port_read(space->machine, "BUTTONS"), input_port_read(space->machine, "SERVICE"));
 }
 
 static READ8_HANDLER( readFF )

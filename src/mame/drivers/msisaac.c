@@ -54,7 +54,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(machine,0,data);
+	soundlatch_w(space,0,data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 
@@ -68,7 +68,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
@@ -144,7 +144,7 @@ MCU simulation TODO:
  			//6-down
  			//7-leftdwn
 
- 			UINT8 val= (input_port_read(machine, "IN1")>>2) & 0x0f;
+ 			UINT8 val= (input_port_read(space->machine, "IN1")>>2) & 0x0f;
  			/* bit0 = left
                bit1 = right
                bit2 = down
@@ -175,7 +175,7 @@ MCU simulation TODO:
  		break;
 
  		default:
- 			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(machine->activecpu), mcu_val );
+ 			logerror("CPU#0 read from MCU pc=%4x, mcu_val=%2x\n", cpu_get_pc(space->cpu), mcu_val );
  		   	return mcu_val;
  		break;
 	}
@@ -197,7 +197,7 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 	buggychl_mcu_w(offset,data);
 #else
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
-	//  popmessage("PC = %04x %02x",cpu_get_pc(machine->activecpu),data);
+	//  popmessage("PC = %04x %02x",cpu_get_pc(space->cpu),data);
 	mcu_val = data;
 #endif
 }

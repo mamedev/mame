@@ -92,9 +92,9 @@ static WRITE8_HANDLER( vastar_hold_cpu2_w )
 {
 	/* I'm not sure that this works exactly like this */
 	if (data & 1)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 static READ8_HANDLER( vastar_sharedram_r )

@@ -252,7 +252,7 @@ static READ8_HANDLER( devram_r )
            that would reset the main cpu. We avoid this and patch
            the rom instead (main cpu has to be reset once at startup) */
 		case 0xfe0:
-			return watchdog_reset_r(machine,0);
+			return watchdog_reset_r(space,0);
 
 		/* Reading a word at eff2 probably yelds the product
            of the words written to eff0 and eff2 */
@@ -268,7 +268,7 @@ static READ8_HANDLER( devram_r )
 		/* Reading eff4, F0 times must yield at most 80-1 consecutive
            equal values */
 		case 0xff4:
-			return mame_rand(machine);
+			return mame_rand(space->machine);
 
 		default:
 			return devram[offset];
@@ -277,7 +277,7 @@ static READ8_HANDLER( devram_r )
 
 static WRITE8_HANDLER( master_nmi_trigger_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void airbustr_bankswitch(running_machine *machine, const char *cpu, int bank, int data)
@@ -294,12 +294,12 @@ static void airbustr_bankswitch(running_machine *machine, const char *cpu, int b
 
 static WRITE8_HANDLER( master_bankswitch_w )
 {
-	airbustr_bankswitch(machine, "master", 1, data);
+	airbustr_bankswitch(space->machine, "master", 1, data);
 }
 
 static WRITE8_HANDLER( slave_bankswitch_w )
 {
-	airbustr_bankswitch(machine, "slave", 2, data);
+	airbustr_bankswitch(space->machine, "slave", 2, data);
 
 	flip_screen_set(data & 0x10);
 
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( slave_bankswitch_w )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	airbustr_bankswitch(machine, "audio", 3, data);
+	airbustr_bankswitch(space->machine, "audio", 3, data);
 }
 
 static READ8_HANDLER( soundcommand_status_r )
@@ -321,25 +321,25 @@ static READ8_HANDLER( soundcommand_status_r )
 static READ8_HANDLER( soundcommand_r )
 {
 	soundlatch_status = 0;	// soundlatch has been read
-	return soundlatch_r(machine,0);
+	return soundlatch_r(space,0);
 }
 
 static READ8_HANDLER( soundcommand2_r )
 {
 	soundlatch2_status = 0;	// soundlatch2 has been read
-	return soundlatch2_r(machine,0);
+	return soundlatch2_r(space,0);
 }
 
 static WRITE8_HANDLER( soundcommand_w )
 {
-	soundlatch_w(machine, 0, data);
+	soundlatch_w(space, 0, data);
 	soundlatch_status = 1;	// soundlatch has been written
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);	// cause a nmi to sub cpu
 }
 
 static WRITE8_HANDLER( soundcommand2_w )
 {
-	soundlatch2_w(machine, 0, data);
+	soundlatch2_w(space, 0, data);
 	soundlatch2_status = 1;	// soundlatch2 has been written
 }
 
@@ -354,7 +354,7 @@ static WRITE8_HANDLER( airbustr_paletteram_w )
 	paletteram[offset] = data;
 	val = (paletteram[offset | 1] << 8) | paletteram[offset & ~1];
 
-	palette_set_color_rgb(machine, offset/2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
+	palette_set_color_rgb(space->machine, offset/2, pal5bit(val >> 5), pal5bit(val >> 10), pal5bit(val >> 0));
 }
 
 static WRITE8_HANDLER( airbustr_coin_counter_w )

@@ -40,7 +40,7 @@ static void setcolor(running_machine *machine,int color,int rgb)
 WRITE16_HANDLER( blockout_paletteram_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	setcolor(machine,offset,paletteram16[offset]);
+	setcolor(space->machine,offset,paletteram16[offset]);
 }
 
 WRITE16_HANDLER( blockout_frontcolor_w )
@@ -48,7 +48,7 @@ WRITE16_HANDLER( blockout_frontcolor_w )
 	static UINT16 color;
 
 	COMBINE_DATA(&color);
-	setcolor(machine,512,color);
+	setcolor(space->machine,512,color);
 }
 
 
@@ -95,7 +95,7 @@ WRITE16_HANDLER( blockout_videoram_w )
 	COMBINE_DATA(&blockout_videoram[offset]);
 
 	if (oldword != blockout_videoram[offset])
-		update_pixels(machine->primary_screen, (offset % 256)*2, (offset / 256) % 256);
+		update_pixels(space->machine->primary_screen, (offset % 256)*2, (offset / 256) % 256);
 }
 
 

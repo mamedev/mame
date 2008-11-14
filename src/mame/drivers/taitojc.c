@@ -407,20 +407,20 @@ static WRITE32_HANDLER( taitojc_palette_w )
 	g = (color >> 16) & 0xff;
 	b = (color >>  0) & 0xff;
 
-	palette_set_color(machine,offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine,offset, MAKE_RGB(r, g, b));
 }
 
 static READ32_HANDLER ( jc_control_r )
 {
 	UINT32 r = 0;
-//  mame_printf_debug("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("jc_control_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
 	switch(offset)
 	{
 		case 0x0:
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= ((input_port_read(machine, "COINS") & 0x2) << 2) << 24;
+				r |= ((input_port_read(space->machine, "COINS") & 0x2) << 2) << 24;
 			}
 			return r;
 		}
@@ -428,7 +428,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(machine, "COINS") << 24;
+				r |= input_port_read(space->machine, "COINS") << 24;
 			}
 			return r;
 		}
@@ -436,7 +436,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(machine, "START") << 24;
+				r |= input_port_read(space->machine, "START") << 24;
 			}
 			return r;
 		}
@@ -444,7 +444,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(machine, "UNUSED") << 24;
+				r |= input_port_read(space->machine, "UNUSED") << 24;
 			}
 			return r;
 		}
@@ -452,7 +452,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				//r |= (mame_rand(machine) & 0xff) << 24;
+				//r |= (mame_rand(space->machine) & 0xff) << 24;
 			}
 			return r;
 		}
@@ -460,7 +460,7 @@ static READ32_HANDLER ( jc_control_r )
 		{
 			if (ACCESSING_BITS_24_31)
 			{
-				r |= input_port_read(machine, "BUTTONS") << 24;
+				r |= input_port_read(space->machine, "BUTTONS") << 24;
 			}
 			return r;
 		}
@@ -748,7 +748,7 @@ static void debug_dsp_command(void)
 static int first_dsp_reset;
 static WRITE32_HANDLER(dsp_shared_w)
 {
-	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(machine->activecpu));
+	//mame_printf_debug("dsp_shared_ram: %08X, %04X at %08X\n", offset, data >> 16, cpu_get_pc(space->cpu));
 	if (ACCESSING_BITS_24_31)
 	{
 		dsp_shared_ram[offset] &= 0x00ff;
@@ -773,13 +773,13 @@ static WRITE32_HANDLER(dsp_shared_w)
 		{
 			if (!first_dsp_reset)
 			{
-				cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, CLEAR_LINE);
 			}
 			first_dsp_reset = 0;
 		}
 		else
 		{
-			cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
 		}
 	}
 }
@@ -869,7 +869,7 @@ static READ8_HANDLER(hc11_analog_r)
 	static const char *const portnames[] = { "ANALOG1", "ANALOG2", "ANALOG3", "ANALOG4",
 										"ANALOG5", "ANALOG6", "ANALOG7", "ANALOG8" };
 
-	return input_port_read_safe(machine, portnames[offset], 0);
+	return input_port_read_safe(space->machine, portnames[offset], 0);
 }
 
 
@@ -897,9 +897,9 @@ static UINT16 dsp_tex_offset = 0;
 
 static READ16_HANDLER( dsp_rom_r )
 {
-	UINT16 *rom = (UINT16*)memory_region(machine, "gfx2");
+	UINT16 *rom = (UINT16*)memory_region(space->machine, "gfx2");
 	UINT16 data = rom[dsp_rom_pos++];
-	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
+	//mame_printf_debug("dsp_rom_r:  %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
 	return data;
 }
 
@@ -943,7 +943,7 @@ static READ16_HANDLER( dsp_texaddr_r )
 static WRITE16_HANDLER( dsp_texaddr_w )
 {
 	dsp_tex_address = data;
-//  mame_printf_debug("texaddr = %08X at %08X\n", data, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("texaddr = %08X at %08X\n", data, cpu_get_pc(space->cpu));
 
 	texture_x = (((data >> 0) & 0x1f) << 1) | ((data >> 12) & 0x1);
 	texture_y = (((data >> 5) & 0x1f) << 1) | ((data >> 13) & 0x1);
@@ -1018,8 +1018,8 @@ static WRITE16_HANDLER(dsp_unk2_w)
 {
 	if (offset == 0)
 	{
-		taitojc_clear_frame(machine);
-		taitojc_render_polygons(machine, polygon_fifo, polygon_fifo_ptr);
+		taitojc_clear_frame(space->machine);
+		taitojc_render_polygons(space->machine, polygon_fifo, polygon_fifo_ptr);
 
 		polygon_fifo_ptr = 0;
 	}

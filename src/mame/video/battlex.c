@@ -35,7 +35,7 @@ PALETTE_INIT( battlex )
 
 WRITE8_HANDLER( battlex_palette_w )
 {
-	palette_set_color_rgb(machine,16*8 + offset,pal1bit(data >> 2),pal1bit(data >> 0),pal1bit(data >> 1));
+	palette_set_color_rgb(space->machine,16*8 + offset,pal1bit(data >> 2),pal1bit(data >> 0),pal1bit(data >> 1));
 }
 
 WRITE8_HANDLER( battlex_scroll_x_lsb_w )

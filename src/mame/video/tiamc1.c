@@ -84,7 +84,7 @@ WRITE8_HANDLER( tiamc1_bg_hshift_w ) {
 
 WRITE8_HANDLER( tiamc1_palette_w )
 {
-	palette_set_color(machine, offset, palette[data]);
+	palette_set_color(space->machine, offset, palette[data]);
 }
 
 PALETTE_INIT( tiamc1 )

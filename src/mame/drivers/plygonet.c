@@ -108,8 +108,8 @@ static READ32_HANDLER( polygonet_eeprom_r )
 	}
 	else
 	{
-		UINT8 lowInputBits = input_port_read(machine, "IN1");
-		UINT8 highInputBits = input_port_read(machine, "IN0");
+		UINT8 lowInputBits = input_port_read(space->machine, "IN1");
+		UINT8 highInputBits = input_port_read(space->machine, "IN0");
 		return ((highInputBits << 24) | (lowInputBits << 16));
 	}
 
@@ -135,7 +135,7 @@ static WRITE32_HANDLER( polygonet_eeprom_w )
 static READ32_HANDLER( ttl_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(machine, "gfx1");
+	ROM = (UINT32 *)memory_region(space->machine, "gfx1");
 
 	return ROM[offset];
 }
@@ -144,7 +144,7 @@ static READ32_HANDLER( ttl_rom_r )
 static READ32_HANDLER( psac_rom_r )
 {
 	UINT32 *ROM;
-	ROM = (UINT32 *)memory_region(machine, "gfx2");
+	ROM = (UINT32 *)memory_region(space->machine, "gfx2");
 
 	return ROM[offset];
 }
@@ -163,7 +163,7 @@ static INTERRUPT_GEN(polygonet_interrupt)
 
 static READ32_HANDLER( sound_r )
 {
-	int latch = soundlatch3_r(machine, 0);
+	int latch = soundlatch3_r(space, 0);
 
 	if (latch == 0xe) latch = 0xf;	/* hack: until 54539 NMI disable found */
 
@@ -174,17 +174,17 @@ static WRITE32_HANDLER( sound_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(machine, 0, (data>>8)&0xff);
+		soundlatch_w(space, 0, (data>>8)&0xff);
 	}
 	else
 	{
-		soundlatch2_w(machine, 0, data&0xff);
+		soundlatch2_w(space, 0, data&0xff);
 	}
 }
 
 static WRITE32_HANDLER( sound_irq_w )
 {
-	cputag_set_input_line(machine, "sound", 0, HOLD_LINE);
+	cputag_set_input_line(space->machine, "sound", 0, HOLD_LINE);
 }
 
 /* DSP communications */
@@ -201,7 +201,7 @@ static READ32_HANDLER( dsp_host_interface_r )
 	if (mem_mask == 0x0000ff00)	{ value <<= 8;  }
 	if (mem_mask == 0xff000000) { value <<= 24; }
 
-	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, cpu_get_pc(machine->activecpu));
+	logerror("Dsp HI Read (host-side) %08x (HI %04x) = %08x (@%x)\n", mem_mask, hi_addr, value, cpu_get_pc(space->cpu));
 
 	return value;
 }
@@ -215,7 +215,7 @@ static WRITE32_HANDLER( shared_ram_write )
 																              0xc000 + (offset<<1),
 																              0xc000 +((offset<<1)+1),
 																		      mem_mask,
-																		      cpu_get_pc(machine->activecpu));
+																		      cpu_get_pc(space->cpu));
 
 	/* write to the current dsp56k word */
 	if (mem_mask | (0xffff0000))
@@ -238,16 +238,16 @@ static WRITE32_HANDLER( dsp_w_lines )
 	if ((data >> 24) & 0x01)
 	{
 		logerror("RESET CLEARED\n");
-		cputag_set_input_line(machine, "dsp", DSP56K_IRQ_RESET, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, CLEAR_LINE);
 	}
 	else
 	{
 		logerror("RESET ASSERTED\n");
-		cputag_set_input_line(machine, "dsp", DSP56K_IRQ_RESET, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_RESET, ASSERT_LINE);
 
 		/* A little hacky - I can't seem to set these lines anywhere else where reset is asserted, so i do it here */
-		cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODA, ASSERT_LINE);
-		cputag_set_input_line(machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_MODA, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "dsp", DSP56K_IRQ_MODB, CLEAR_LINE);
 	}
 
 	/* 0x04000000 is the ??? line */
@@ -472,7 +472,7 @@ WRITE32_HANDLER( plygonet_palette_w )
 	g = (paletteram32[offset] >> 8) & 0xff;
 	b = (paletteram32[offset] >> 0) & 0xff;
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 
@@ -530,7 +530,7 @@ static void reset_sound_region(running_machine *machine)
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	cur_sound_region = (data & 0x1f);
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 static INTERRUPT_GEN(audio_interrupt)

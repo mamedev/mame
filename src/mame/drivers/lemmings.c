@@ -32,10 +32,10 @@ static WRITE16_HANDLER( lemmings_control_w )
 static READ16_HANDLER( lemmings_trackball_r )
 {
 	switch (offset) {
-	case 0: return input_port_read(machine, "AN0"); break;
-	case 1: return input_port_read(machine, "AN1"); break;
-	case 4: return input_port_read(machine, "AN2"); break;
-	case 5: return input_port_read(machine, "AN3"); break;
+	case 0: return input_port_read(space->machine, "AN0"); break;
+	case 1: return input_port_read(space->machine, "AN1"); break;
+	case 4: return input_port_read(space->machine, "AN2"); break;
+	case 5: return input_port_read(space->machine, "AN3"); break;
 	}
 	return 0;
 }
@@ -45,13 +45,13 @@ static READ16_HANDLER( lemmings_prot_r )
 {
  	switch (offset<<1) {
 		case 0x41a:
-			return input_port_read(machine, "BUTTONS");
+			return input_port_read(space->machine, "BUTTONS");
 
 		case 0x320:
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 
 		case 0x4e6:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 	}
 
 	return 0;
@@ -68,18 +68,18 @@ static WRITE16_HANDLER( lemmings_palette_24bit_w )
 	g = (paletteram16[offset+1] >> 8) & 0xff;
 	r = (paletteram16[offset+1] >> 0) & 0xff;
 
-	palette_set_color(machine,offset/2,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset/2,MAKE_RGB(r,g,b));
 }
 
 static WRITE16_HANDLER( lemmings_sound_w )
 {
-	soundlatch_w(machine,0,data&0xff);
-	cpu_set_input_line(machine->cpu[1],1,HOLD_LINE);
+	soundlatch_w(space,0,data&0xff);
+	cpu_set_input_line(space->machine->cpu[1],1,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( lemmings_sound_ack_w )
 {
-	cpu_set_input_line(machine->cpu[1],1,CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1],1,CLEAR_LINE);
 }
 
 /******************************************************************************/

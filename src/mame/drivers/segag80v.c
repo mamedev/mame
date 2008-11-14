@@ -229,9 +229,9 @@ static offs_t decrypt_offset(running_machine *machine, offs_t offset)
 	return (offset & 0xff00) | (*sega_decrypt)(pc, program_read_byte(pc + 1));
 }
 
-static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(machine, offset)] = data; }
-static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(machine, decrypt_offset(machine, offset), data); }
-static WRITE8_HANDLER( vectorram_w ) { vectorram[decrypt_offset(machine, offset)] = data; }
+static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(space->machine, offset)] = data; }
+static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(space, decrypt_offset(space->machine, offset), data); }
+static WRITE8_HANDLER( vectorram_w ) { vectorram[decrypt_offset(space->machine, offset)] = data; }
 
 
 
@@ -257,10 +257,10 @@ static READ8_HANDLER( mangled_ports_r )
 	/* read as two bits from each of 4 ports. For this reason, the input   */
 	/* ports have been organized logically, and are demangled at runtime.  */
 	/* 4 input ports each provide 8 bits of information. */
-	UINT8 d7d6 = input_port_read(machine, "D7D6");
-	UINT8 d5d4 = input_port_read(machine, "D5D4");
-	UINT8 d3d2 = input_port_read(machine, "D3D2");
-	UINT8 d1d0 = input_port_read(machine, "D1D0");
+	UINT8 d7d6 = input_port_read(space->machine, "D7D6");
+	UINT8 d5d4 = input_port_read(space->machine, "D5D4");
+	UINT8 d3d2 = input_port_read(space->machine, "D3D2");
+	UINT8 d1d0 = input_port_read(space->machine, "D1D0");
 	int shift = offset & 3;
 	return demangle(d7d6 >> shift, d5d4 >> shift, d3d2 >> shift, d1d0 >> shift);
 }
@@ -284,7 +284,7 @@ static READ8_HANDLER( spinner_input_r )
 	INT8 delta;
 
 	if (spinner_select & 1)
-		return input_port_read(machine, "FC");
+		return input_port_read(space->machine, "FC");
 
 /*
  * The values returned are always increasing.  That is, regardless of whether
@@ -294,7 +294,7 @@ static READ8_HANDLER( spinner_input_r )
  */
 
 	/* I'm sure this can be further simplified ;-) BW */
-	delta = input_port_read(machine, "SPINNER");
+	delta = input_port_read(space->machine, "SPINNER");
 	if (delta != 0)
 	{
 		spinner_sign = (delta >> 7) & 1;
@@ -329,11 +329,11 @@ static READ8_HANDLER( elim4_input_r )
 		{
 			case 6:
 				/* player 3 & 4 controls */
-				result = input_port_read(machine, "FC");
+				result = input_port_read(space->machine, "FC");
 				break;
 			case 7:
 				/* the 4 coin inputs */
-				result = input_port_read(machine, "COINS");
+				result = input_port_read(space->machine, "COINS");
 				break;
 		}
 	}
@@ -385,7 +385,7 @@ static WRITE8_HANDLER( unknown_w )
 	/* writing an 0x04 here enables interrupts */
 	/* some games write 0x00/0x01 here as well */
 	if (data != 0x00 && data != 0x01 && data != 0x04)
-		mame_printf_debug("%04X:unknown_w = %02X\n", cpu_get_pc(machine->activecpu), data);
+		mame_printf_debug("%04X:unknown_w = %02X\n", cpu_get_pc(space->cpu), data);
 }
 
 

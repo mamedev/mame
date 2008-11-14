@@ -9,7 +9,7 @@ static int charbank;
 
 WRITE8_HANDLER( mexico86_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	if ((data & 7) > 5)
 		popmessage( "Switching to invalid bank!" );

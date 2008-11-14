@@ -52,11 +52,11 @@ static READ8_HANDLER( skyraid_alpha_num_r)
 
 static READ8_HANDLER( skyraid_port_0_r )
 {
-	UINT8 val = input_port_read(machine, "LANGUAGE");
+	UINT8 val = input_port_read(space->machine, "LANGUAGE");
 
-	if (input_port_read(machine, "STICKY") > analog_range)
+	if (input_port_read(space->machine, "STICKY") > analog_range)
 		val |= 0x40;
-	if (input_port_read(machine, "STICKX") > analog_range)
+	if (input_port_read(space->machine, "STICKX") > analog_range)
 		val |= 0x80;
 
 	return val;

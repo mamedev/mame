@@ -109,7 +109,7 @@ MACHINE_RESET( stfight )
 // - in fact I don't even know how/where it's switched in!
 static WRITE8_HANDLER( stfight_bank_w )
 {
-	UINT8   *ROM2 = memory_region(machine, "main") + 0x10000;
+	UINT8   *ROM2 = memory_region(space->machine, "main") + 0x10000;
 
 	memory_set_bankptr( 1, &ROM2[data<<14] );
 }
@@ -138,7 +138,7 @@ INTERRUPT_GEN( stfight_vb_interrupt )
 // Perhaps define dipswitches as active low?
 READ8_HANDLER( stfight_dsw_r )
 {
-    return( ~input_port_read(machine, offset ? "DSW1" : "DSW0") );
+    return( ~input_port_read(space->machine, offset ? "DSW1" : "DSW0") );
 }
 
 READ8_HANDLER( stfight_coin_r )
@@ -160,7 +160,7 @@ READ8_HANDLER( stfight_coin_r )
      *        since it's read by the 30Hz interrupt ISR
      */
 
-    coin_mech_data = input_port_read(machine, "COIN");
+    coin_mech_data = input_port_read(space->machine, "COIN");
 
     for( i=0; i<2; i++ )
     {

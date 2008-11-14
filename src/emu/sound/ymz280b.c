@@ -866,7 +866,11 @@ static void write_to_register(struct YMZ280BChip *chip, int data)
 
 			case 0x87:		/* RAM write */
 				if (chip->ext_ram_write)
-					chip->ext_ram_write(Machine, chip->rom_readback_addr, data);
+				{
+					/* temporary hack until this is converted to a device */
+					const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+					chip->ext_ram_write(space, chip->rom_readback_addr, data);
+				}
 				else
 					logerror("YMZ280B attempted RAM write to %X\n", chip->rom_readback_addr);
 				break;
@@ -1076,7 +1080,7 @@ READ8_HANDLER( ymz280b_data_0_r )
 {
 	UINT8 data;
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 0);
-	data = chip->ext_ram_read(machine, chip->rom_readback_addr - 1);
+	data = chip->ext_ram_read(space, chip->rom_readback_addr - 1);
 	chip->rom_readback_addr++;
 	return data;
 }
@@ -1085,7 +1089,7 @@ READ8_HANDLER( ymz280b_data_1_r )
 {
 	UINT8 data;
 	struct YMZ280BChip *chip = sndti_token(SOUND_YMZ280B, 1);
-	data = chip->ext_ram_read(machine, chip->rom_readback_addr - 1);
+	data = chip->ext_ram_read(space, chip->rom_readback_addr - 1);
 	chip->rom_readback_addr++;
 	return data;
 }

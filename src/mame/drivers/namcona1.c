@@ -409,7 +409,7 @@ static READ16_HANDLER( custom_key_r )
 	old_count = count;
 	do
 	{
-		count = mame_rand(machine);
+		count = mame_rand(space->machine);
 	} while( old_count == count );
 
 	switch( namcona1_gametype )
@@ -481,7 +481,7 @@ static READ16_HANDLER( custom_key_r )
 	default:
 		return 0;
 	}
-	return mame_rand(machine)&0xffff;
+	return mame_rand(space->machine)&0xffff;
 } /* custom_key_r */
 
 static WRITE16_HANDLER( custom_key_w )
@@ -695,7 +695,7 @@ static WRITE16_HANDLER( namcona1_vreg_w )
 	switch( offset )
 	{
 	case 0x18/2:
-		namcona1_blit(machine);
+		namcona1_blit(space->machine);
 		/* see also 0x1e */
 		break;
 
@@ -721,7 +721,7 @@ static WRITE16_HANDLER( mcu_mailbox_w_68k )
 //  logerror("mailbox_w_68k: %x @ %x\n", data, offset);
 
 	if (offset == 4)
-		cpu_set_input_line(machine->cpu[1], M37710_LINE_IRQ0, HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[1], M37710_LINE_IRQ0, HOLD_LINE);
 
 	COMBINE_DATA(&mcu_mailbox[offset%8]);
 
@@ -789,7 +789,7 @@ static READ16_HANDLER( na1mcu_shared_r )
 #if 0
 	if (offset >= 0x70000/2)
 	{
-		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, cpu_get_pc(machine->activecpu));
+		logerror("MD: %04x @ %x PC %x\n", ((data>>8)&0xff) | ((data<<8)&0xff00), offset*2, cpu_get_pc(space->cpu));
 	}
 #endif
 
@@ -806,19 +806,19 @@ static WRITE16_HANDLER( na1mcu_shared_w )
 
 static READ16_HANDLER(snd_r)
 {
-	return c140_r(machine,offset*2+1) | c140_r(machine,offset*2)<<8;
+	return c140_r(space,offset*2+1) | c140_r(space,offset*2)<<8;
 }
 
 static WRITE16_HANDLER(snd_w)
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		c140_w(machine,(offset*2)+1, data);
+		c140_w(space,(offset*2)+1, data);
 	}
 
 	if (ACCESSING_BITS_8_15)
 	{
-		c140_w(machine,(offset*2), data>>8);
+		c140_w(space,(offset*2), data>>8);
 	}
 }
 
@@ -843,10 +843,10 @@ static WRITE8_HANDLER( port4_w )
 {
 	if ((data & 0x08) && !(mcu_port4 & 0x08))
 	{
-		logerror("launching 68k, PC=%x\n", cpu_get_pc(machine->activecpu));
+		logerror("launching 68k, PC=%x\n", cpu_get_pc(space->cpu));
 
 		// reset and launch the 68k
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, CLEAR_LINE);
 	}
 
 	mcu_port4 = data;
@@ -882,19 +882,19 @@ static READ8_HANDLER( port7_r )
 	switch (mcu_port6 & 0xe0)
 	{
 		case 0x40:
-			return input_port_read(machine, "P1");
+			return input_port_read(space->machine, "P1");
 			break;
 
   		case 0x60:
-			return input_port_read(machine, "P2");
+			return input_port_read(space->machine, "P2");
 			break;
 
 		case 0x20:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 			break;
 
 		case 0x00:
-			return input_port_read(machine, "P4");
+			return input_port_read(space->machine, "P4");
 			break;
 	}
 
@@ -943,7 +943,7 @@ static MACHINE_RESET( namcona1_mcu )
 static READ8_HANDLER( portana_r )
 {
 	static const UINT8 bitnum[8] = { 0x40, 0x20, 0x10, 0x01, 0x02, 0x04, 0x08, 0x80 };
-	UINT8 port = input_port_read(machine, "P3");
+	UINT8 port = input_port_read(space->machine, "P3");
 
 	return (port & bitnum[offset>>1]) ? 0xff : 0x00;
 }

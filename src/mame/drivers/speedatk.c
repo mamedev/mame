@@ -101,7 +101,7 @@ static READ8_HANDLER( key_matrix_r )
 		return 0x80;
 	}
 
-	if((input_port_read(machine,"COINS") & 1) || (input_port_read(machine,"COINS") & 2))
+	if((input_port_read(space->machine,"COINS") & 1) || (input_port_read(space->machine,"COINS") & 2))
 	{
 		coin_impulse = coin_settings;
 		coin_impulse--;
@@ -112,7 +112,7 @@ static READ8_HANDLER( key_matrix_r )
 	{
 		case 0x02:
 		{
-			switch(input_port_read(machine, "P1"))
+			switch(input_port_read(space->machine, "P1"))
 			{
 				case 0x002: return 0x02;
 				case 0x001: return 0x01;
@@ -130,7 +130,7 @@ static READ8_HANDLER( key_matrix_r )
 		}
 		case 0x04:
 		{
-			switch(input_port_read(machine, "P2"))
+			switch(input_port_read(space->machine, "P2"))
 			{
 				case 0x002: return 0x02;
 				case 0x001: return 0x01;

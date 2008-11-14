@@ -50,12 +50,12 @@ static READ8_HANDLER( spy_bankedram1_r )
 	{
 		if (pmcbank)
 		{
-			//logerror("%04x read pmcram %04x\n",cpu_get_pc(machine->activecpu),offset);
+			//logerror("%04x read pmcram %04x\n",cpu_get_pc(space->cpu),offset);
 			return pmcram[offset];
 		}
 		else
 		{
-			//logerror("%04x read pmc internal ram %04x\n",cpu_get_pc(machine->activecpu),offset);
+			//logerror("%04x read pmc internal ram %04x\n",cpu_get_pc(space->cpu),offset);
 			return 0;
 		}
 	}
@@ -67,17 +67,17 @@ static WRITE8_HANDLER( spy_bankedram1_w )
 {
 	if (rambank & 1)
 	{
-		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	}
 	else if (rambank & 2)
 	{
 		if (pmcbank)
 		{
-			//logerror("%04x pmcram %04x = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
+			//logerror("%04x pmcram %04x = %02x\n",cpu_get_pc(space->cpu),offset,data);
 			pmcram[offset] = data;
 		}
 		//else
-			//logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
+			//logerror("%04x pmc internal ram %04x = %02x\n",cpu_get_pc(space->cpu),offset,data);
 	}
 	else
 		ram[offset] = data;
@@ -153,7 +153,7 @@ this is the data written to internal ram on startup:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	int offs;
 
 	/* bit 0 = RAM bank? */
@@ -304,7 +304,7 @@ static WRITE8_HANDLER( spy_3f90_w )
 	/* bit 7 = PMC-BK */
 	pmcbank = (data & 0x80) >> 7;
 
-//logerror("%04x: 3f90_w %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: 3f90_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 6 = PMC-START */
 	if ((data & 0x40) && !(old & 0x40))
 	{
@@ -324,7 +324,7 @@ static WRITE8_HANDLER( spy_3f90_w )
 		}
 		spy_collision();
 //ZT
-		cpu_set_input_line(machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
 	}
 
 	old = data;
@@ -333,7 +333,7 @@ static WRITE8_HANDLER( spy_3f90_w )
 
 static WRITE8_HANDLER( spy_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( sound_bank_w )

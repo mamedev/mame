@@ -13,14 +13,14 @@ static int protection_ret = 0;
 
 READ8_HANDLER( mmonkey_protection_r )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	int ret = 0;
 
 	if      (offset == 0x0000)                      ret = protection_status;
 	else if (offset == 0x0e00)                      ret = protection_ret;
 	else if (offset >= 0x0d00 && offset <= 0x0d02)  ret = RAM[BASE+offset];  /* addition result */
-	else logerror("Unknown protection read.  PC=%04X  Offset=%04X\n", cpu_get_pc(machine->activecpu), offset);
+	else logerror("Unknown protection read.  PC=%04X  Offset=%04X\n", cpu_get_pc(space->cpu), offset);
 
 	return ret;
 }
@@ -29,7 +29,7 @@ READ8_HANDLER( mmonkey_protection_r )
 
 WRITE8_HANDLER( mmonkey_protection_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 
 	if (offset == 0)
@@ -78,7 +78,7 @@ WRITE8_HANDLER( mmonkey_protection_w )
 				break;
 
 			default:
-				logerror("Unemulated protection command=%02X.  PC=%04X\n", protection_command, cpu_get_pc(machine->activecpu));
+				logerror("Unemulated protection command=%02X.  PC=%04X\n", protection_command, cpu_get_pc(space->cpu));
 				break;
 			}
 
@@ -89,5 +89,5 @@ WRITE8_HANDLER( mmonkey_protection_w )
 	else if (offset == 0x0e00)                      protection_value = data;
 	else if (offset >= 0x0f00)                      RAM[BASE+offset] = data;   /* decrypt table */
 	else if (offset >= 0x0d00 && offset <= 0x0d05)  RAM[BASE+offset] = data;   /* source table */
-	else logerror("Unknown protection write=%02X.  PC=%04X  Offset=%04X\n", data, cpu_get_pc(machine->activecpu), offset);
+	else logerror("Unknown protection write=%02X.  PC=%04X  Offset=%04X\n", data, cpu_get_pc(space->cpu), offset);
 }

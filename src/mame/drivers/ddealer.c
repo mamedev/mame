@@ -430,8 +430,8 @@ static WRITE16_HANDLER( ddealer_mcu_shared_w )
 static WRITE16_HANDLER( YM2203_w )
 {
 	switch (offset) {
-	case 0: ym2203_control_port_0_w(machine,0,data & 0xff); break;
-	case 1: ym2203_write_port_0_w(machine,0,data & 0xff); break;
+	case 0: ym2203_control_port_0_w(space,0,data & 0xff); break;
+	case 1: ym2203_write_port_0_w(space,0,data & 0xff); break;
 	}
 }
 

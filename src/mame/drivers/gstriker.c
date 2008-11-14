@@ -200,8 +200,8 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		pending_command = 1;
-		soundlatch_w(machine,offset,data & 0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space,offset,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -219,7 +219,7 @@ static WRITE8_HANDLER( gs_sh_pending_command_clear_w )
 
 static WRITE8_HANDLER( gs_sh_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x8000;

@@ -406,7 +406,7 @@ static void meritm_switch_banks( void )
 static WRITE8_HANDLER(meritm_psd_a15_w)
 {
 	meritm_psd_a15 = data;
-	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(machine->activecpu) );
+	//logerror( "Writing PSD_A15 with %02x at PC=%04X\n", data, cpu_get_pc(space->cpu) );
 	meritm_switch_banks();
 };
 
@@ -446,7 +446,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 		return;
 	}
 
-	dst = memory_region(machine, "main") + 0x70000 + 2;
+	dst = memory_region(space->machine, "main") + 0x70000 + 2;
 
 	if (data == 0)
 	{
@@ -475,7 +475,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 			default: logerror( "meritm_crt250_questions_bank_w: unknown data = %02x\n", data ); return;
 		}
 		logerror( "Reading question byte at %06X\n", questions_address | questions_loword_address);
-		*dst = memory_region(machine, "user1")[questions_address | questions_loword_address];
+		*dst = memory_region(space->machine, "user1")[questions_address | questions_loword_address];
 	}
 };
 
@@ -518,7 +518,7 @@ static READ8_HANDLER(meritm_ds1644_r)
 	{
 		//logerror( "Reading RTC, reg = %x\n", offset);
 
-		mame_get_current_datetime(machine, &systime);
+		mame_get_current_datetime(space->machine, &systime);
 		meritm_ram[0x7ff9] = binary_to_BCD(systime.local_time.second);
 		meritm_ram[0x7ffa] = binary_to_BCD(systime.local_time.minute);
 		meritm_ram[0x7ffb] = binary_to_BCD(systime.local_time.hour);
@@ -725,7 +725,7 @@ static const ppi8255_interface crt250_ppi8255_intf =
 
 static READ8_HANDLER(meritm_ay8930_port_a_r)
 {
-	return input_port_read_safe(machine, "DSW", 0);
+	return input_port_read_safe(space->machine, "DSW", 0);
 };
 
 static WRITE8_HANDLER(meritm_ay8930_port_b_w)

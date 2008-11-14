@@ -42,7 +42,7 @@ extern UINT16 *lastduel_vram,*lastduel_scroll2,*lastduel_scroll1;
 static WRITE16_HANDLER( lastduel_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(machine,0,data & 0xff);
+		soundlatch_w(space,0,data & 0xff);
 }
 
 /******************************************************************************/
@@ -124,7 +124,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( mg_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(3,&RAM[bankaddress]);

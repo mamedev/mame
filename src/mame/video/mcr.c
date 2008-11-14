@@ -166,7 +166,7 @@ WRITE8_HANDLER( mcr_91490_paletteram_w )
 {
 	paletteram[offset] = data;
 	offset &= 0x7f;
-	mcr_set_color(machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
+	mcr_set_color(space->machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 }
 
 
@@ -193,9 +193,9 @@ WRITE8_HANDLER( mcr_90010_videoram_w )
 	if ((offset & 0x780) == 0x780)
 	{
 		if (mcr_cpu_board != 91475)
-			mcr_set_color(machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
+			mcr_set_color(space->machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 		else
-			journey_set_color(machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
+			journey_set_color(space->machine, (offset / 2) & 0x3f, data | ((offset & 1) << 8));
 	}
 }
 
@@ -217,7 +217,7 @@ WRITE8_HANDLER( twotiger_videoram_w )
 
 	/* palette RAM is mapped into the upper 0x80 bytes here */
 	if ((effoffs & 0x780) == 0x780)
-		mcr_set_color(machine, ((offset & 0x400) >> 5) | ((offset >> 1) & 0x1f), data | ((offset & 1) << 8));
+		mcr_set_color(space->machine, ((offset & 0x400) >> 5) | ((offset >> 1) & 0x1f), data | ((offset & 1) << 8));
 }
 
 

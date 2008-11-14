@@ -32,10 +32,10 @@ READ8_HANDLER( suprloco_control_r );
 
 static WRITE8_HANDLER( suprloco_soundport_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(50));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

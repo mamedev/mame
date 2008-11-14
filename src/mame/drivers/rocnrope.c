@@ -22,7 +22,7 @@ extern VIDEO_UPDATE( rocnrope );
 /* Roc'n'Rope has the IRQ vectors in RAM. The rom contains $FFFF at this address! */
 static WRITE8_HANDLER( rocnrope_interrupt_vector_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 
 	RAM[0xFFF2+offset] = data;

@@ -98,7 +98,7 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 			/* X register as the intensity */
 			if (data != last_control && data)
 			{
-				int xval = cpu_get_reg(machine->cpu[0], CCPU_X) & 0x0f;
+				int xval = cpu_get_reg(space->machine->cpu[0], CCPU_X) & 0x0f;
 				i = (xval + 1) * 255 / 16;
 				vector_color = MAKE_RGB(i,i,i);
 			}
@@ -109,7 +109,7 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 			/* X register as the intensity */
 			if (data != last_control && data)
 			{
-				int xval = cpu_get_reg(machine->cpu[0], CCPU_X);
+				int xval = cpu_get_reg(space->machine->cpu[0], CCPU_X);
 				xval = (~xval >> 2) & 0x3f;
 				i = (xval + 1) * 255 / 64;
 				vector_color = MAKE_RGB(i,i,i);
@@ -121,7 +121,7 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 			/* as 4-4-4 BGR values */
 			if (data != last_control && data)
 			{
-				int xval = cpu_get_reg(machine->cpu[0], CCPU_X);
+				int xval = cpu_get_reg(space->machine->cpu[0], CCPU_X);
 				r = (~xval >> 0) & 0x0f;
 				r = r * 255 / 15;
 				g = (~xval >> 4) & 0x0f;
@@ -142,15 +142,15 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 				/* on an IV instruction if data == 0 here */
 				if (data != last_control && !data)
 				{
-					lastx = cpu_get_reg(machine->cpu[0], CCPU_X);
-					lasty = cpu_get_reg(machine->cpu[0], CCPU_Y);
+					lastx = cpu_get_reg(space->machine->cpu[0], CCPU_X);
+					lasty = cpu_get_reg(space->machine->cpu[0], CCPU_Y);
 				}
 
 				/* on the rising edge of the data value, latch the Y register */
 				/* as 2-3-3 BGR values */
 				if (data != last_control && data)
 				{
-					int yval = cpu_get_reg(machine->cpu[0], CCPU_Y);
+					int yval = cpu_get_reg(space->machine->cpu[0], CCPU_Y);
 					r = (~yval >> 0) & 0x07;
 					r = r * 255 / 7;
 					g = (~yval >> 3) & 0x07;
@@ -160,8 +160,8 @@ WRITE8_HANDLER(cinemat_vector_control_w)
 					vector_color = MAKE_RGB(r,g,b);
 
 					/* restore the original X,Y values */
-					cpu_set_reg(machine->cpu[0], CCPU_X, lastx);
-					cpu_set_reg(machine->cpu[0], CCPU_Y, lasty);
+					cpu_set_reg(space->machine->cpu[0], CCPU_X, lastx);
+					cpu_set_reg(space->machine->cpu[0], CCPU_Y, lasty);
 				}
 			}
 			break;

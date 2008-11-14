@@ -225,7 +225,7 @@ static WRITE32_HANDLER( color_ram_w )
 		g = (a & 0xff00) >> 8;
 		b = (a & 0xff);
 
-		palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -296,12 +296,12 @@ static READ32_HANDLER( undrfire_input_r )
 	{
 		case 0x00:
 		{
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 		}
 
 		case 0x01:
 		{
-			return input_port_read(machine, "SYSTEM") | (coin_word << 16);
+			return input_port_read(space->machine, "SYSTEM") | (coin_word << 16);
 		}
  	}
 
@@ -316,7 +316,7 @@ static WRITE32_HANDLER( undrfire_input_w )
 		{
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
-				watchdog_reset(machine);
+				watchdog_reset(space->machine);
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -409,8 +409,8 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x00:	/* P1 */
 		{
-			x = input_port_read(machine, "GUNX1") << 6;
-			y = input_port_read(machine, "GUNY1") << 6;
+			x = input_port_read(space->machine, "GUNX1") << 6;
+			y = input_port_read(space->machine, "GUNY1") << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
@@ -418,15 +418,15 @@ static READ32_HANDLER( undrfire_lightgun_r )
 
 		case 0x01:	/* P2 */
 		{
-			x = input_port_read(machine, "GUNX2") << 6;
-			y = input_port_read(machine, "GUNY2") << 6;
+			x = input_port_read(space->machine, "GUNX2") << 6;
+			y = input_port_read(space->machine, "GUNY2") << 6;
 
 			return ((x << 24) &0xff000000) | ((x << 8) &0xff0000)
 				 | ((y << 8) &0xff00) | ((y >> 8) &0xff) ;
 		}
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",cpu_get_pc(machine->activecpu),offset);
+logerror("CPU #0 PC %06x: warning - read unmapped lightgun offset %06x\n",cpu_get_pc(space->cpu),offset);
 
 	return 0x0;
 }
@@ -470,12 +470,12 @@ static WRITE32_HANDLER( cbombers_cpua_ctrl_w )
     ........ .x......   Vibration
 */
 
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x1000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static READ32_HANDLER( cbombers_adc_r )
 {
-	return (input_port_read(machine, "STEER") << 24);
+	return (input_port_read(space->machine, "STEER") << 24);
 }
 
 static WRITE32_HANDLER( cbombers_adc_w )

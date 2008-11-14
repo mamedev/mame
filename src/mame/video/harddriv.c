@@ -272,21 +272,21 @@ WRITE16_HANDLER( hdgsp_control_hi_w )
 
 		case 0x01:
 			data = data & (15 >> hdgsp_multisync);
-			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
+			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) - 1);
 			gfx_finescroll = data;
 			break;
 
 		case 0x02:
-			update_palette_bank(machine, (gfx_palettebank & ~1) | val);
+			update_palette_bank(space->machine, (gfx_palettebank & ~1) | val);
 			break;
 
 		case 0x03:
-			update_palette_bank(machine, (gfx_palettebank & ~2) | (val << 1));
+			update_palette_bank(space->machine, (gfx_palettebank & ~2) | (val << 1));
 			break;
 
 		case 0x04:
-			if (machine->config->total_colors >= 256 * 8)
-				update_palette_bank(machine, (gfx_palettebank & ~4) | (val << 2));
+			if (space->machine->config->total_colors >= 256 * 8)
+				update_palette_bank(space->machine, (gfx_palettebank & ~4) | (val << 2));
 			break;
 
 		case 0x07:
@@ -394,7 +394,7 @@ WRITE16_HANDLER( hdgsp_paletteram_lo_w )
 	offset = gfx_palettebank * 0x100 + (offset & 0xff);
 
 	COMBINE_DATA(&hdgsp_paletteram_lo[offset]);
-	gsp_palette_change(machine, offset);
+	gsp_palette_change(space->machine, offset);
 }
 
 
@@ -422,7 +422,7 @@ WRITE16_HANDLER( hdgsp_paletteram_hi_w )
 	offset = gfx_palettebank * 0x100 + (offset & 0xff);
 
 	COMBINE_DATA(&hdgsp_paletteram_hi[offset]);
-	gsp_palette_change(machine, offset);
+	gsp_palette_change(space->machine, offset);
 }
 
 

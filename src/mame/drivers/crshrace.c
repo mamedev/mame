@@ -137,7 +137,7 @@ Dip locations verified with Service Mode.
 
 static READ16_HANDLER( extrarom1_r )
 {
-	UINT8 *rom = memory_region(machine, "user1");
+	UINT8 *rom = memory_region(space->machine, "user1");
 
 	offset *= 2;
 
@@ -146,7 +146,7 @@ static READ16_HANDLER( extrarom1_r )
 
 static READ16_HANDLER( extrarom2_r )
 {
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT8 *rom = memory_region(space->machine, "user2");
 
 	offset *= 2;
 
@@ -155,7 +155,7 @@ static READ16_HANDLER( extrarom2_r )
 
 static WRITE8_HANDLER( crshrace_sh_bankswitch_w )
 {
-	UINT8 *rom = memory_region(machine, "audio") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
 
 	memory_set_bankptr(1,rom + (data & 0x03) * 0x8000);
 }
@@ -168,8 +168,8 @@ static WRITE16_HANDLER( sound_command_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		pending_command = 1;
-		soundlatch_w(machine,offset,data & 0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space,offset,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 

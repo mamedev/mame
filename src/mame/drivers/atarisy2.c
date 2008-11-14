@@ -293,7 +293,7 @@ static WRITE16_HANDLER( int0_ack_w )
 {
 	/* reset sound IRQ */
 	p2portrd_state = 0;
-	atarigen_update_interrupts(machine);
+	atarigen_update_interrupts(space->machine);
 }
 
 
@@ -301,7 +301,7 @@ static WRITE16_HANDLER( int1_ack_w )
 {
 	/* reset sound CPU */
 	if (ACCESSING_BITS_0_7)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 1) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -353,7 +353,7 @@ static WRITE16_HANDLER( bankselect_w )
 	COMBINE_DATA(&newword);
 	bankselect[offset] = newword;
 
-	base = &memory_region(machine, "main")[bankoffset[(newword >> 10) & 0x3f]];
+	base = &memory_region(space->machine, "main")[bankoffset[(newword >> 10) & 0x3f]];
 	memcpy(offset ? rombank2 : rombank1, base, 0x2000);
 }
 
@@ -374,7 +374,7 @@ static STATE_POSTLOAD( bankselect_postload )
 
 static READ16_HANDLER( switch_r )
 {
-	int result = input_port_read(machine, "1800") | (input_port_read(machine, "1801") << 8);
+	int result = input_port_read(space->machine, "1800") | (input_port_read(space->machine, "1801") << 8);
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x20;
 	if (atarigen_sound_to_cpu_ready) result ^= 0x10;
@@ -385,12 +385,12 @@ static READ16_HANDLER( switch_r )
 
 static READ8_HANDLER( switch_6502_r )
 {
-	int result = input_port_read(machine, "1840");
+	int result = input_port_read(space->machine, "1840");
 
 	if (atarigen_cpu_to_sound_ready) result ^= 0x01;
 	if (atarigen_sound_to_cpu_ready) result ^= 0x02;
 	if (!has_tms5220 || tms5220_ready_r()) result ^= 0x04;
-	if (!(input_port_read(machine, "1801") & 0x80)) result ^= 0x10;
+	if (!(input_port_read(space->machine, "1801") & 0x80)) result ^= 0x10;
 
 	return result;
 }
@@ -426,9 +426,9 @@ static READ16_HANDLER( adc_r )
 	static const char *const adcnames[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
 
 	if (which_adc < pedal_count)
-		return ~input_port_read(machine, adcnames[which_adc]);
+		return ~input_port_read(space->machine, adcnames[which_adc]);
 
-	return input_port_read(machine, adcnames[which_adc]) | 0xff00;
+	return input_port_read(space->machine, adcnames[which_adc]) | 0xff00;
 }
 
 
@@ -447,8 +447,8 @@ static READ8_HANDLER( leta_r )
 				static double last_angle;
 				static int rotations;
 
-				int analogx = input_port_read(machine, "LETA0") - 128;
-				int analogy = input_port_read(machine, "LETA1") - 128;
+				int analogx = input_port_read(space->machine, "LETA0") - 128;
+				int analogy = input_port_read(space->machine, "LETA1") - 128;
 				double angle;
 
 				/* if the joystick is centered, leave the rest of this alone */
@@ -484,7 +484,7 @@ static READ8_HANDLER( leta_r )
 		}
 	}
 
-	return input_port_read(machine, letanames[offset & 3]);
+	return input_port_read(space->machine, letanames[offset & 3]);
 }
 
 
@@ -594,7 +594,7 @@ static WRITE8_HANDLER( mixer_w )
 	if (!(data & 0x02)) rbott += 1.0/47;
 	if (!(data & 0x04)) rbott += 1.0/22;
 	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	atarigen_set_ym2151_vol(machine, gain * 100);
+	atarigen_set_ym2151_vol(space->machine, gain * 100);
 
 	/* bits 3-4 control the volume of the POKEYs, using 47k and 100k resistors */
 	rtop = 1.0/(1.0/100 + 1.0/100);
@@ -602,7 +602,7 @@ static WRITE8_HANDLER( mixer_w )
 	if (!(data & 0x08)) rbott += 1.0/47;
 	if (!(data & 0x10)) rbott += 1.0/22;
 	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	atarigen_set_pokey_vol(machine, gain * 100);
+	atarigen_set_pokey_vol(space->machine, gain * 100);
 
 	/* bits 5-7 control the volume of the TMS5220, using 22k, 47k, and 100k resistors */
 	rtop = 1.0/(1.0/100 + 1.0/100);
@@ -611,7 +611,7 @@ static WRITE8_HANDLER( mixer_w )
 	if (!(data & 0x40)) rbott += 1.0/47;
 	if (!(data & 0x80)) rbott += 1.0/22;
 	gain = (rbott == 0) ? 1.0 : ((1.0/rbott) / (rtop + (1.0/rbott)));
-	atarigen_set_tms5220_vol(machine, gain * 100);
+	atarigen_set_tms5220_vol(space->machine, gain * 100);
 }
 
 
@@ -629,7 +629,7 @@ static WRITE8_HANDLER( sound_reset_w )
 	/* a large number of signals are reset when this happens */
 	atarigen_sound_io_reset(1);
 	sndti_reset(SOUND_YM2151, 0);
-	mixer_w(machine, 0, 0);
+	mixer_w(space, 0, 0);
 	tms5220_data = 0;
 	tms5220_data_strobe = 0;
 }
@@ -639,10 +639,10 @@ static READ16_HANDLER( sound_r )
 {
 	/* clear the p2portwr state on a p1portrd */
 	p2portwr_state = 0;
-	atarigen_update_interrupts(machine);
+	atarigen_update_interrupts(space->machine);
 
 	/* handle it normally otherwise */
-	return atarigen_sound_r(machine,offset,0xffff);
+	return atarigen_sound_r(space,offset,0xffff);
 }
 
 
@@ -650,10 +650,10 @@ static WRITE8_HANDLER( sound_6502_w )
 {
 	/* clock the state through */
 	p2portwr_state = (interrupt_enable & 2) != 0;
-	atarigen_update_interrupts(machine);
+	atarigen_update_interrupts(space->machine);
 
 	/* handle it normally otherwise */
-	atarigen_6502_sound_w(machine, offset, data);
+	atarigen_6502_sound_w(space, offset, data);
 }
 
 
@@ -661,10 +661,10 @@ static READ8_HANDLER( sound_6502_r )
 {
 	/* clock the state through */
 	p2portrd_state = (interrupt_enable & 1) != 0;
-	atarigen_update_interrupts(machine);
+	atarigen_update_interrupts(space->machine);
 
 	/* handle it normally otherwise */
-	return atarigen_6502_sound_r(machine, offset);
+	return atarigen_6502_sound_r(space, offset);
 }
 
 
@@ -684,7 +684,7 @@ static WRITE8_HANDLER( tms5220_w )
 static WRITE8_HANDLER( tms5220_strobe_w )
 {
 	if (!(offset & 1) && tms5220_data_strobe && has_tms5220)
-		tms5220_data_w(machine, 0, tms5220_data);
+		tms5220_data_w(space, 0, tms5220_data);
 	tms5220_data_strobe = offset & 1;
 }
 

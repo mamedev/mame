@@ -60,7 +60,7 @@ static SOUND_RESET( jedi )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpu_set_input_line(machine->cpu[1], M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -73,7 +73,7 @@ static WRITE8_HANDLER( irq_ack_w )
 
 WRITE8_HANDLER( jedi_audio_reset_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -94,7 +94,7 @@ WRITE8_HANDLER( jedi_audio_latch_w )
 
 static READ8_HANDLER( audio_latch_r )
 {
-	jedi_state *state = machine->driver_data;
+	jedi_state *state = space->machine->driver_data;
 
 	*state->audio_comm_stat &= ~0x80;
 	return state->audio_latch;
@@ -117,7 +117,7 @@ CUSTOM_INPUT( jedi_audio_comm_stat_r )
 
 READ8_HANDLER( jedi_audio_ack_latch_r )
 {
-	jedi_state *state = machine->driver_data;
+	jedi_state *state = space->machine->driver_data;
 
 	*state->audio_comm_stat &= ~0x40;
 	return state->audio_ack_latch;
@@ -126,7 +126,7 @@ READ8_HANDLER( jedi_audio_ack_latch_r )
 
 static WRITE8_HANDLER( audio_ack_latch_w )
 {
-	jedi_state *state = machine->driver_data;
+	jedi_state *state = space->machine->driver_data;
 
 	state->audio_ack_latch = data;
 	*state->audio_comm_stat |= 0x40;
@@ -142,11 +142,11 @@ static WRITE8_HANDLER( audio_ack_latch_w )
 
 static WRITE8_HANDLER( speech_strobe_w )
 {
-	jedi_state *state = machine->driver_data;
+	jedi_state *state = space->machine->driver_data;
 	int new_speech_strobe_state = (~offset >> 8) & 1;
 
 	if ((new_speech_strobe_state != state->speech_strobe_state) && new_speech_strobe_state)
-		tms5220_data_w(machine, 0, *state->speech_data);
+		tms5220_data_w(space, 0, *state->speech_data);
 	state->speech_strobe_state = new_speech_strobe_state;
 }
 

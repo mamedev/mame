@@ -75,7 +75,7 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 {
 	/* is this weird banking some form of protection? */
 
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	int addr;
 
 	switch (data)
@@ -102,8 +102,8 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 
 static WRITE8_HANDLER(speedspn_sound_w)
 {
-	soundlatch_w(machine,1,data);
-	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+	soundlatch_w(space,1,data);
+	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( oki_banking_w )

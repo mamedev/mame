@@ -40,11 +40,11 @@ static WRITE16_HANDLER( darkseal_control_w )
 {
 	switch (offset<<1) {
     case 6: /* DMA flag */
-		buffer_spriteram16_w(machine,0,0,0xffff);
+		buffer_spriteram16_w(space,0,0,0xffff);
 		return;
     case 8: /* Sound CPU write */
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
     	return;
   	case 0xa: /* IRQ Ack (VBL) */
 		return;
@@ -56,13 +56,13 @@ static READ16_HANDLER( darkseal_control_r )
 	switch (offset<<1)
 	{
 		case 0:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 
 		case 2:
-			return input_port_read(machine, "P1_P2");
+			return input_port_read(space->machine, "P1_P2");
 
 		case 4:
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 	}
 
 	return ~0;
@@ -104,10 +104,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		ym2151_register_port_0_w(machine,0,data);
+		ym2151_register_port_0_w(space,0,data);
 		break;
 	case 1:
-		ym2151_data_port_0_w(machine,0,data);
+		ym2151_data_port_0_w(space,0,data);
 		break;
 	}
 }
@@ -116,10 +116,10 @@ static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
 	case 0:
-		ym2203_control_port_0_w(machine,0,data);
+		ym2203_control_port_0_w(space,0,data);
 		break;
 	case 1:
-		ym2203_write_port_0_w(machine,0,data);
+		ym2203_write_port_0_w(space,0,data);
 		break;
 	}
 }

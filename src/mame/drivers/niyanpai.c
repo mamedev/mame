@@ -71,7 +71,7 @@ static int niyanpai_sound_r(running_machine *machine, int offset)
 
 static WRITE16_HANDLER( niyanpai_sound_w )
 {
-	soundlatch_w(machine, 0, ((data >> 8) & 0xff));
+	soundlatch_w(space, 0, ((data >> 8) & 0xff));
 }
 
 static void niyanpai_soundclr_w(running_machine *machine, int offset, int data)
@@ -140,17 +140,17 @@ static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 }
 
 /* CPU interface */
-static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(machine,0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
-static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(machine,1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
-static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(machine,2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
-static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(machine,3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
-static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(machine,4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
+static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(space,0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
+static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(space,1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
+static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(space,2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
+static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(space,3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
+static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(space,4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
 
-static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(machine, 0, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(machine, 1, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(machine, 2, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(machine, 3, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(machine, 4, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(space, 0, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(space, 1, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(space, 2, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(space, 3, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(space, 4, data); }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pa_r )	{ return pio_dir[0]; }
 static READ8_HANDLER( tmpz84c011_0_dir_pb_r )	{ return pio_dir[1]; }
@@ -219,15 +219,15 @@ static READ16_HANDLER( niyanpai_dipsw_r )
 {
 	UINT8 dipsw_a, dipsw_b;
 
-	dipsw_a = (((input_port_read(machine, "DSWA") & 0x01) << 7) | ((input_port_read(machine, "DSWA") & 0x02) << 5) |
-			   ((input_port_read(machine, "DSWA") & 0x04) << 3) | ((input_port_read(machine, "DSWA") & 0x08) << 1) |
-			   ((input_port_read(machine, "DSWA") & 0x10) >> 1) | ((input_port_read(machine, "DSWA") & 0x20) >> 3) |
-			   ((input_port_read(machine, "DSWA") & 0x40) >> 5) | ((input_port_read(machine, "DSWA") & 0x80) >> 7));
+	dipsw_a = (((input_port_read(space->machine, "DSWA") & 0x01) << 7) | ((input_port_read(space->machine, "DSWA") & 0x02) << 5) |
+			   ((input_port_read(space->machine, "DSWA") & 0x04) << 3) | ((input_port_read(space->machine, "DSWA") & 0x08) << 1) |
+			   ((input_port_read(space->machine, "DSWA") & 0x10) >> 1) | ((input_port_read(space->machine, "DSWA") & 0x20) >> 3) |
+			   ((input_port_read(space->machine, "DSWA") & 0x40) >> 5) | ((input_port_read(space->machine, "DSWA") & 0x80) >> 7));
 
-	dipsw_b = (((input_port_read(machine, "DSWB") & 0x01) << 7) | ((input_port_read(machine, "DSWB") & 0x02) << 5) |
-			   ((input_port_read(machine, "DSWB") & 0x04) << 3) | ((input_port_read(machine, "DSWB") & 0x08) << 1) |
-			   ((input_port_read(machine, "DSWB") & 0x10) >> 1) | ((input_port_read(machine, "DSWB") & 0x20) >> 3) |
-			   ((input_port_read(machine, "DSWB") & 0x40) >> 5) | ((input_port_read(machine, "DSWB") & 0x80) >> 7));
+	dipsw_b = (((input_port_read(space->machine, "DSWB") & 0x01) << 7) | ((input_port_read(space->machine, "DSWB") & 0x02) << 5) |
+			   ((input_port_read(space->machine, "DSWB") & 0x04) << 3) | ((input_port_read(space->machine, "DSWB") & 0x08) << 1) |
+			   ((input_port_read(space->machine, "DSWB") & 0x10) >> 1) | ((input_port_read(space->machine, "DSWB") & 0x20) >> 3) |
+			   ((input_port_read(space->machine, "DSWB") & 0x40) >> 5) | ((input_port_read(space->machine, "DSWB") & 0x80) >> 7));
 
 	return ((dipsw_a << 8) | dipsw_b);
 }
@@ -238,13 +238,13 @@ static READ16_HANDLER( musobana_inputport_0_r )
 
 	switch ((musobana_inputport ^ 0xff00) >> 8)
 	{
-		case 0x01:	portdata = input_port_read(machine, "KEY0"); break;
-		case 0x02:	portdata = input_port_read(machine, "KEY1"); break;
-		case 0x04:	portdata = input_port_read(machine, "KEY2"); break;
-		case 0x08:	portdata = input_port_read(machine, "KEY3"); break;
-		case 0x10:	portdata = input_port_read(machine, "KEY4"); break;
-		default:	portdata = input_port_read(machine, "KEY0") & input_port_read(machine, "KEY1") & input_port_read(machine, "KEY2")
-								& input_port_read(machine, "KEY3") & input_port_read(machine, "KEY4"); break;
+		case 0x01:	portdata = input_port_read(space->machine, "KEY0"); break;
+		case 0x02:	portdata = input_port_read(space->machine, "KEY1"); break;
+		case 0x04:	portdata = input_port_read(space->machine, "KEY2"); break;
+		case 0x08:	portdata = input_port_read(space->machine, "KEY3"); break;
+		case 0x10:	portdata = input_port_read(space->machine, "KEY4"); break;
+		default:	portdata = input_port_read(space->machine, "KEY0") & input_port_read(space->machine, "KEY1") & input_port_read(space->machine, "KEY2")
+								& input_port_read(space->machine, "KEY3") & input_port_read(space->machine, "KEY4"); break;
 	}
 
 	return (portdata);

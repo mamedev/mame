@@ -23,10 +23,10 @@ extern SH2 *sh2;
 //static const int div_tab[4] = { 3, 5, 7, 0 };
 static const int div_tab[4] = { 3, 5, 3, 0 };
 
-INLINE UINT32 RL(offs_t A)
+INLINE UINT32 RL(SH2 *sh2, offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffffffff);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
 		return program_read_dword_32be(A);
@@ -37,11 +37,11 @@ INLINE UINT32 RL(offs_t A)
   return program_read_dword_32be(A & AM);
 }
 
-INLINE void WL(offs_t A, UINT32 V)
+INLINE void WL(SH2 *sh2, offs_t A, UINT32 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(Machine, (A & 0x1fc)>>2, V, 0xffffffff);
+		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V, 0xffffffff);
 		return;
 	}
 
@@ -301,7 +301,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	//      logerror("sh2_internal_w:  Write %08x (%x), %08x @ %08x\n", 0xfffffe00+offset*4, offset, data, mem_mask);
 
 //    if(offset != 0x20)
-//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, cpu_get_pc(machine->activecpu));
+//        printf("sh2_internal_w:  Write %08x (%x), %08x @ %08x (PC %x)\n", 0xfffffe00+offset*4, offset, data, mem_mask, cpu_get_pc(space->cpu));
 
 	switch( offset )
 	{
@@ -670,7 +670,7 @@ void sh2_exception(const char *message, int irqline)
 	}
 
 	#ifdef USE_SH2DRC
-	sh2->evec = RL( sh2->vbr + vector * 4 );
+	sh2->evec = RL( sh2, sh2->vbr + vector * 4 );
 	sh2->evec &= AM;
 	sh2->irqsr = sh2->sr;
 
@@ -683,9 +683,9 @@ void sh2_exception(const char *message, int irqline)
 //  printf("sh2_exception [%s] irqline %x evec %x save SR %x new SR %x\n", message, irqline, sh2->evec, sh2->irqsr, sh2->sr);
 	#else
 	sh2->r[15] -= 4;
-	WL( sh2->r[15], sh2->sr );		/* push SR onto stack */
+	WL( sh2, sh2->r[15], sh2->sr );		/* push SR onto stack */
 	sh2->r[15] -= 4;
-	WL( sh2->r[15], sh2->pc );		/* push PC onto stack */
+	WL( sh2, sh2->r[15], sh2->pc );		/* push PC onto stack */
 
 	/* set I flags in SR */
 	if (irqline > SH2_INT_15)
@@ -694,7 +694,7 @@ void sh2_exception(const char *message, int irqline)
 		sh2->sr = (sh2->sr & ~I) | (irqline << 4);
 
 	/* fetch PC */
-	sh2->pc = RL( sh2->vbr + vector * 4 );
+	sh2->pc = RL( sh2, sh2->vbr + vector * 4 );
 	change_pc(sh2->pc & AM);
 	#endif
 }
@@ -734,6 +734,7 @@ void sh2_common_init(int alloc, const device_config *device, int index, int cloc
 	sh2->cpu_number = index;
 	sh2->irq_callback = irqcallback;
 	sh2->device = device;
+	sh2->internal = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	state_save_register_item("sh2", index, sh2->pc);
 	state_save_register_item("sh2", index, sh2->r[15]);

@@ -62,13 +62,13 @@ static INTERRUPT_GEN( mnchmobl_interrupt )
 
 static WRITE8_HANDLER( mnchmobl_soundlatch_w )
 {
-	soundlatch_w( machine, offset, data );
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
+	soundlatch_w( space->machine, offset, data );
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( sound_nmi_ack_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static CUSTOM_INPUT( mnchmobl_bonus_r )

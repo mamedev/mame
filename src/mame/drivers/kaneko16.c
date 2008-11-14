@@ -238,7 +238,7 @@ static MACHINE_RESET( shogwarr )
 
 static READ16_HANDLER( kaneko16_rnd_r )
 {
-	return mame_rand(machine) & 0xffff;
+	return mame_rand(space->machine) & 0xffff;
 }
 
 static WRITE16_HANDLER( kaneko16_coin_lockout_w )
@@ -267,8 +267,8 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(machine, 0, (data & 0xff00) >> 8 );
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, 0, (data & 0xff00) >> 8 );
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -277,31 +277,31 @@ static WRITE16_HANDLER( kaneko16_soundlatch_w )
 static READ16_HANDLER( kaneko16_YM2149_0_r )
 {
 	/* Each 2149 register is mapped to a different address */
-	ay8910_control_port_0_w(machine,0,offset);
-	return ay8910_read_port_0_r(machine,0);
+	ay8910_control_port_0_w(space,0,offset);
+	return ay8910_read_port_0_r(space,0);
 }
 static READ16_HANDLER( kaneko16_YM2149_1_r )
 {
 	/* Each 2149 register is mapped to a different address */
-	ay8910_control_port_1_w(machine,0,offset);
-	return ay8910_read_port_1_r(machine,0);
+	ay8910_control_port_1_w(space,0,offset);
+	return ay8910_read_port_1_r(space,0);
 }
 
 static WRITE16_HANDLER( kaneko16_YM2149_0_w )
 {
 	/* Each 2149 register is mapped to a different address */
-	ay8910_control_port_0_w(machine,0,offset);
+	ay8910_control_port_0_w(space,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7)	ay8910_write_port_0_w(machine,0, data       & 0xff);
-	else				ay8910_write_port_0_w(machine,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)	ay8910_write_port_0_w(space,0, data       & 0xff);
+	else				ay8910_write_port_0_w(space,0,(data >> 8) & 0xff);
 }
 static WRITE16_HANDLER( kaneko16_YM2149_1_w )
 {
 	/* Each 2149 register is mapped to a different address */
-	ay8910_control_port_1_w(machine,0,offset);
+	ay8910_control_port_1_w(space,0,offset);
 	/* The registers are mapped to odd addresses, except one! */
-	if (ACCESSING_BITS_0_7)	ay8910_write_port_1_w(machine,0, data       & 0xff);
-	else				ay8910_write_port_1_w(machine,0,(data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)	ay8910_write_port_1_w(space,0, data       & 0xff);
+	else				ay8910_write_port_1_w(space,0,(data >> 8) & 0xff);
 }
 
 
@@ -399,7 +399,7 @@ static WRITE16_HANDLER( bakubrkr_oki_bank_sw )
 {
 	if (ACCESSING_BITS_0_7) {
 		okim6295_set_bank_base(0, 0x40000 * (data & 0x7) );
-		logerror("PC:%06X  Selecting OKI bank %02X\n",cpu_get_pc(machine->activecpu),data&0xff);
+		logerror("PC:%06X  Selecting OKI bank %02X\n",cpu_get_pc(space->cpu),data&0xff);
 	}
 }
 
@@ -470,7 +470,7 @@ static WRITE16_HANDLER( bloodwar_oki_0_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(0, 0x40000 * (data & 0xf) );
-//      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",cpu_get_pc(machine->activecpu),data);
+//      logerror("CPU #0 PC %06X : OKI0  bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -479,7 +479,7 @@ static WRITE16_HANDLER( bloodwar_oki_1_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(1, 0x40000 * data );
-//      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",cpu_get_pc(machine->activecpu),data);
+//      logerror("CPU #0 PC %06X : OKI1  bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -540,7 +540,7 @@ static WRITE16_HANDLER( bonkadv_oki_0_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(0, 0x40000 * (data & 0xF));
-		logerror("CPU #0 PC %06X : OKI0  bank %08X\n",cpu_get_pc(machine->activecpu),data);
+		logerror("CPU #0 PC %06X : OKI0  bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -549,7 +549,7 @@ static WRITE16_HANDLER( bonkadv_oki_1_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(1, 0x40000 * data );
-		logerror("CPU #0 PC %06X : OKI1  bank %08X\n",cpu_get_pc(machine->activecpu),data);
+		logerror("CPU #0 PC %06X : OKI1  bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -599,14 +599,14 @@ ADDRESS_MAP_END
 static READ16_HANDLER( gtmr_wheel_r )
 {
 	// check 'Controls' dip switch
-	switch (input_port_read(machine, "DSW1") & 0x1000)
+	switch (input_port_read(space->machine, "DSW1") & 0x1000)
 	{
 		case 0x0000:	// 'Both Sides' = 270deg Wheel
-			return	(input_port_read(machine, "WHEEL0"));
+			return	(input_port_read(space->machine, "WHEEL0"));
 			break;
 
 		case 0x1000:	// '1P Side' = 360' Wheel
-			return	(input_port_read(machine, "WHEEL1"));
+			return	(input_port_read(space->machine, "WHEEL1"));
 			break;
 		default:
 			return	(0);
@@ -619,7 +619,7 @@ static WRITE16_HANDLER( gtmr_oki_0_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(0, 0x40000 * (data & 0xF) );
-//      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",cpu_get_pc(machine->activecpu),data);
+//      logerror("CPU #0 PC %06X : OKI0 bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -628,7 +628,7 @@ static WRITE16_HANDLER( gtmr_oki_1_bank_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		okim6295_set_bank_base(1, 0x40000 * (data & 0x1) );
-//      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",cpu_get_pc(machine->activecpu),data);
+//      logerror("CPU #0 PC %06X : OKI1 bank %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -636,8 +636,8 @@ static WRITE16_HANDLER( gtmr_oki_0_data_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_data_0_w(machine,0,data);
-//      logerror("CPU #0 PC %06X : OKI0 <- %08X\n",cpu_get_pc(machine->activecpu),data);
+		okim6295_data_0_w(space,0,data);
+//      logerror("CPU #0 PC %06X : OKI0 <- %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -645,8 +645,8 @@ static WRITE16_HANDLER( gtmr_oki_1_data_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		okim6295_data_1_w(machine,0,data);
-//      logerror("CPU #0 PC %06X : OKI1 <- %08X\n",cpu_get_pc(machine->activecpu),data);
+		okim6295_data_1_w(space,0,data);
+//      logerror("CPU #0 PC %06X : OKI1 <- %08X\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -713,19 +713,19 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( gtmr2_wheel_r )
 {
-	switch (input_port_read(machine, "DSW1") & 0x1800)
+	switch (input_port_read(space->machine, "DSW1") & 0x1800)
 	{
 		case 0x0000:	// 270' A. Wheel
-			return	(input_port_read(machine, "WHEEL0"));
+			return	(input_port_read(space->machine, "WHEEL0"));
 			break;
 		case 0x1000:	// 270' D. Wheel
-			return	(input_port_read(machine, "WHEEL1") << 8);
+			return	(input_port_read(space->machine, "WHEEL1") << 8);
 			break;
 		case 0x0800:	// 360' Wheel
-			return	(input_port_read(machine, "WHEEL2") << 8);
+			return	(input_port_read(space->machine, "WHEEL2") << 8);
 			break;
 		default:
-			logerror("gtmr2_wheel_r : read at %06x with joystick\n", cpu_get_pc(machine->activecpu));
+			logerror("gtmr2_wheel_r : read at %06x with joystick\n", cpu_get_pc(space->cpu));
 			return	(~0);
 			break;
 	}
@@ -733,7 +733,7 @@ static READ16_HANDLER( gtmr2_wheel_r )
 
 static READ16_HANDLER( gtmr2_IN1_r )
 {
-	return	(input_port_read(machine, "P2") & (input_port_read(machine, "FAKE") | ~0x7100));
+	return	(input_port_read(space->machine, "P2") & (input_port_read(space->machine, "FAKE") | ~0x7100));
 }
 
 static ADDRESS_MAP_START( gtmr2_readmem, ADDRESS_SPACE_PROGRAM, 16 )

@@ -65,7 +65,6 @@ struct _cpu_class_data
 	cpu_class_header header;				/* header containing public data */
 	
 	/* core interface */
-	device_config *	device;					/* dummy device for now */
 	int *			icount;					/* pointer to the icount */
 
 	/* input states and IRQ callbacks */
@@ -170,6 +169,29 @@ INLINE void suspend_until_trigger(const device_config *device, int trigger, int 
 ***************************************************************************/
 
 /*-------------------------------------------------
+    cpuexec_create_cpu_device - temporary
+    function to allocate a fake CPU device for
+    each CPU
+-------------------------------------------------*/
+
+const device_config *cpuexec_create_cpu_device(const cpu_config *config)
+{
+	device_config *device;
+
+	/* create a fake device for the CPU -- this will be done automatically in the future */
+	device = malloc_or_die(sizeof(*device) + strlen(config->tag));
+	memset(device, 0, sizeof(*device));
+	strcpy(device->tag, config->tag);
+	device->type = (device_type)config->type;
+	device->class = DEVICE_CLASS_CPU_CHIP;
+	device->inline_config = (void *)config;
+	device->static_config = config->reset_param;
+	
+	return device;
+}
+
+
+/*-------------------------------------------------
     cpuexec_init - initialize internal states of
     all CPUs
 -------------------------------------------------*/
@@ -180,96 +202,83 @@ void cpuexec_init(running_machine *machine)
 
 	/* loop over all our CPUs */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->config->cpu); cpunum++)
-	{
-		const cpu_config *config = &machine->config->cpu[cpunum];
-		cpu_type cputype = machine->config->cpu[cpunum].type;
-		cpu_class_data *classdata;
-		int num_regs;
-		int line;
-
-		/* if this is a dummy, stop looking */
-		if (cputype == CPU_DUMMY)
-			break;
-		
-		/* allocate memory for our class state */
-		classdata = auto_malloc(sizeof(*classdata));
-		memset(classdata, 0, sizeof(*classdata));
-		
-		/* fill in the header */
-		classdata->header = *cputype_get_header_template(cputype);
-		
-		/* create a fake device for the CPU -- this will be done automatically in the future */
-		classdata->device = auto_malloc(sizeof(*classdata->device) + strlen(config->tag));
-		memset(classdata->device, 0, sizeof(*classdata->device));
-		strcpy(classdata->device->tag, config->tag);
-		classdata->device->type = (device_type)cputype;
-		classdata->device->class = DEVICE_CLASS_CPU_CHIP;
-		classdata->device->inline_config = (void *)&machine->config->cpu[cpunum];
-		classdata->device->static_config = config->reset_param;
-		classdata->device->started = TRUE;
-		classdata->device->machine = machine;
-		classdata->device->region = memory_region(machine, classdata->device->tag);
-		classdata->device->regionbytes = memory_region_length(machine, classdata->device->tag);
-	
-		/* allocate a context token */
-		classdata->device->token = auto_malloc(cputype_get_context_size(cputype));
-		memset(classdata->device->token, 0, cputype_get_context_size(cputype));
-		
-		/* set up the class token */
-		classdata->device->classtoken = classdata;
-	
-		/* fill in the input states and IRQ callback information */
-		for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
+		if (machine->cpu[cpunum] != NULL)
 		{
-			cpuinput_data *inputline = &classdata->input[line];
-			/* vector and curvector are initialized later */
-			inputline->curstate = CLEAR_LINE;
-			inputline->qindex = 0;
-		}
-		
-		/* fill in the suspend states */
-		classdata->suspend = SUSPEND_REASON_RESET;
-		classdata->inttrigger = cpunum + TRIGGER_INT;
-		
-		/* fill in the clock and timing information */
-		classdata->clock = (UINT64)config->clock * classdata->header.clock_multiplier / classdata->header.clock_divider;
-		classdata->clockscale = 1.0;
-		
-		/* allocate timers if we need them */
-		if (config->vblank_interrupts_per_frame > 1)
-			classdata->partial_frame_timer = timer_alloc(trigger_partial_frame_interrupt, (void *)classdata->device);
-		if (config->timed_interrupt_period != 0)
-			classdata->timedint_timer = timer_alloc(trigger_periodic_interrupt, (void *)classdata->device);
+			device_config *device = (device_config *)machine->cpu[cpunum];
+			const cpu_config *config = device->inline_config;
+			cpu_type cputype = config->type;
+			cpu_class_data *classdata;
+			int num_regs;
+			int line;
 
-		/* initialize this CPU */
-		state_save_push_tag(cpunum + 1);
-		num_regs = state_save_get_reg_count();
-		machine->cpu[cpunum] = classdata->device;
-		cpu_init(classdata->device, cpunum, classdata->clock, standard_irq_callback);
-		num_regs = state_save_get_reg_count() - num_regs;
-		state_save_pop_tag();
+			/* allocate memory for our class state */
+			classdata = auto_malloc(sizeof(*classdata));
+			memset(classdata, 0, sizeof(*classdata));
+			
+			/* fill in the header */
+			classdata->header = *cputype_get_header_template(cputype);
+			
+			/* make the device run */
+			device->started = FALSE;
+			device->machine = machine;
+			device->region = memory_region(machine, device->tag);
+			device->regionbytes = memory_region_length(machine, device->tag);
+			device->token = auto_malloc(cputype_get_context_size(cputype));
+			memset(device->token, 0, cputype_get_context_size(cputype));
+			device->classtoken = classdata;
+			
+			/* fill in the input states and IRQ callback information */
+			for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
+			{
+				cpuinput_data *inputline = &classdata->input[line];
+				/* vector and curvector are initialized later */
+				inputline->curstate = CLEAR_LINE;
+				inputline->qindex = 0;
+			}
+			
+			/* fill in the suspend states */
+			classdata->suspend = SUSPEND_REASON_RESET;
+			classdata->inttrigger = cpunum + TRIGGER_INT;
+			
+			/* fill in the clock and timing information */
+			classdata->clock = (UINT64)config->clock * classdata->header.clock_multiplier / classdata->header.clock_divider;
+			classdata->clockscale = 1.0;
+			
+			/* allocate timers if we need them */
+			if (config->vblank_interrupts_per_frame > 1)
+				classdata->partial_frame_timer = timer_alloc(trigger_partial_frame_interrupt, device);
+			if (config->timed_interrupt_period != 0)
+				classdata->timedint_timer = timer_alloc(trigger_periodic_interrupt, device);
 
-		/* fetch post-initialization data */
-		classdata->icount = cpu_get_icount_ptr(classdata->device);
-		for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
-		{
-			cpuinput_data *inputline = &classdata->input[line];
-			inputline->vector = cpu_get_default_irq_vector(classdata->device);
-			inputline->curvector = inputline->vector;
-		}
-		update_clock_information(classdata->device);
-		
-		/* if no state registered for saving, we can't save */
-		if (num_regs == 0)
-		{
-			logerror("CPU #%d (%s) did not register any state to save!\n", cpunum, cputype_get_name(cputype));
-			if (machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
-				fatalerror("CPU #%d (%s) did not register any state to save!", cpunum, cputype_get_name(cputype));
+			/* initialize this CPU */
+			state_save_push_tag(cpunum + 1);
+			num_regs = state_save_get_reg_count();
+			cpu_init(device, cpunum, classdata->clock, standard_irq_callback);
+			num_regs = state_save_get_reg_count() - num_regs;
+			state_save_pop_tag();
+
+			/* fetch post-initialization data */
+			classdata->icount = cpu_get_icount_ptr(device);
+			for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
+			{
+				cpuinput_data *inputline = &classdata->input[line];
+				inputline->vector = cpu_get_default_irq_vector(device);
+				inputline->curvector = inputline->vector;
+			}
+			update_clock_information(device);
+			
+			/* if no state registered for saving, we can't save */
+			if (num_regs == 0)
+			{
+				logerror("CPU #%d (%s) did not register any state to save!\n", cpunum, cputype_get_name(cputype));
+				if (machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
+					fatalerror("CPU #%d (%s) did not register any state to save!", cpunum, cputype_get_name(cputype));
+			}
+
+			/* register some internal states as well */
+			register_save_states(device);
 		}
 
-		/* register some internal states as well */
-		register_save_states(classdata->device);
-	}
 	add_reset_callback(machine, cpuexec_reset);
 	add_exit_callback(machine, cpuexec_exit);
 }
@@ -624,7 +633,7 @@ UINT64 cpu_get_total_cycles(const device_config *device)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
-	if (device == device->machine->activecpu)
+	if (device == device->machine->activecpu && classdata->icount != NULL)
 		return classdata->totalcycles + cycles_running - *classdata->icount;
 	else
 		return classdata->totalcycles;

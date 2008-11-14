@@ -375,20 +375,20 @@ static READ16_HANDLER(dspcuskey_r)
 	UINT16 result = 0;
 	if( namcos2_gametype == NAMCOS21_SOLVALOU )
 	{
-		switch( cpu_get_pc(machine->activecpu) )
+		switch( cpu_get_pc(space->cpu) )
 		{
 		case 0x805e: result = 0x0000; break;
 		case 0x805f: result = 0xfeba; break;
 		case 0x8067: result = 0xffff; break;
 		case 0x806e: result = 0x0145; break;
 		default:
-			logerror( "unk cuskey_r; pc=0x%x\n", cpu_get_pc(machine->activecpu) );
+			logerror( "unk cuskey_r; pc=0x%x\n", cpu_get_pc(space->cpu) );
 			break;
 		}
 	}
 	else if( namcos2_gametype == NAMCOS21_CYBERSLED )
 	{
-		switch( cpu_get_pc(machine->activecpu) )
+		switch( cpu_get_pc(space->cpu) )
 		{
 		case 0x8061: result = 0xfe95; break;
 		case 0x8069: result = 0xffff; break;
@@ -399,7 +399,7 @@ static READ16_HANDLER(dspcuskey_r)
 	}
 	else if( namcos2_gametype == NAMCOS21_AIRCOMBAT )
 	{
-		switch( cpu_get_pc(machine->activecpu) )
+		switch( cpu_get_pc(space->cpu) )
 		{
 		case 0x8062: result = 0xfeb9; break;
 		case 0x806a: result = 0xffff; break;
@@ -603,13 +603,13 @@ static WRITE16_HANDLER( dspram16_w )
 			offset == 1+(mpDspState->masterSourceAddr&0x7fff) )
 		{
 			logerror( "IDC-CONTINUE\n" );
-			TransferDspData(machine);
+			TransferDspData(space->machine);
 		}
 		else if( namcos2_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
 					cpunum_get_active()==0 )
 		{ /* hack; synchronization for solvalou */
-			cpu_yield(machine->activecpu);
+			cpu_yield(space->cpu);
 		}
 	}
 } /* dspram16_w */
@@ -643,7 +643,7 @@ static int mbPointRomDataAvailable;
 
 static READ16_HANDLER( dsp_port0_r )
 {
-	INT32 data = ReadPointROMData(machine, pointrom_idx++);
+	INT32 data = ReadPointROMData(space->machine, pointrom_idx++);
 	mPointRomMSB = (UINT8)(data>>16);
 	mbPointRomDataAvailable = 1;
 	return (UINT16)data;
@@ -678,7 +678,7 @@ static WRITE16_HANDLER( dsp_port2_w )
 {
 	logerror( "IDC ADDR INIT(0x%04x)\n", data );
 	mpDspState->masterSourceAddr = data;
-	TransferDspData(machine);
+	TransferDspData(space->machine);
 } /* dsp_port2_w */
 
 static READ16_HANDLER( dsp_port3_idc_rcv_enable_r )
@@ -897,7 +897,7 @@ static WRITE16_HANDLER(slave_port0_w)
 
 static READ16_HANDLER(slave_port2_r)
 {
-	return GetInputBytesAdvertisedForSlave(machine);
+	return GetInputBytesAdvertisedForSlave(space->machine);
 } /* slave_port2_r */
 
 static READ16_HANDLER(slave_port3_r)
@@ -914,7 +914,7 @@ static WRITE16_HANDLER(slave_port3_w)
 
 static WRITE16_HANDLER( slave_XF_output_w )
 {
-	logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(machine->activecpu), data );
+	logerror( "0x%x:slaveXF(%d)\n", cpu_get_pc(space->cpu), data );
 } /* slave_XF_output_w */
 
 static READ16_HANDLER( slave_portf_r )
@@ -969,7 +969,7 @@ static WRITE16_HANDLER( pointram_control_w )
 /*
     logerror( "dsp_control_w:%x:%x[%x]:=%04x ",
             cpunum_get_active(),
-            cpu_get_pc(machine->activecpu),
+            cpu_get_pc(space->cpu),
             offset,
             pointram_control );
 
@@ -1152,7 +1152,7 @@ static WRITE16_HANDLER( winrun_dspcomram_w )
 
 static READ16_HANDLER( winrun_cuskey_r )
 {
-	int pc = cpu_get_pc(machine->activecpu);
+	int pc = cpu_get_pc(space->cpu);
 	switch( pc )
 	{
 	case 0x0064: /* winrun91 */
@@ -1252,7 +1252,7 @@ static WRITE16_HANDLER( winrun_dsp_pointrom_addr_w )
 
 static READ16_HANDLER( winrun_dsp_pointrom_data_r )
 {
-	UINT16 *ptrom = (UINT16 *)memory_region(machine, "user2");
+	UINT16 *ptrom = (UINT16 *)memory_region(space->machine, "user2");
 	return ptrom[winrun_pointrom_addr++];
 } /* winrun_dsp_pointrom_data_r */
 
@@ -1261,7 +1261,7 @@ static WRITE16_HANDLER( winrun_dsp_complete_w )
 	if( data )
 	{
 		winrun_flushpoly();
-		cpu_set_input_line(machine->cpu[4], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[4], INPUT_LINE_RESET, PULSE_LINE);
 		namcos21_ClearPolyFrameBuffer();
 	}
 }
@@ -1294,7 +1294,7 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( gpu_data_r )
 {
-	const UINT16 *pSrc = (UINT16 *)memory_region( machine, "user3" );
+	const UINT16 *pSrc = (UINT16 *)memory_region( space->machine, "user3" );
 	return pSrc[offset];
 }
 
@@ -1312,7 +1312,7 @@ static WRITE16_HANDLER( winrun_dspbios_w )
 	COMBINE_DATA( &winrun_dspbios[offset] );
 	if( offset==0xfff )
 	{
-		UINT16 *mem = (UINT16 *)memory_region(machine, "dsp");
+		UINT16 *mem = (UINT16 *)memory_region(space->machine, "dsp");
 		memcpy( mem, winrun_dspbios, 0x2000 );
 		winrun_dsp_alive = 1;
 	}

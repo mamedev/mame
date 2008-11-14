@@ -158,10 +158,10 @@ static READ8_HANDLER( thief_io_r )
 {
 	switch( thief_input_select )
 	{
-		case 0x01: return input_port_read(machine, "DSW1");
-		case 0x02: return input_port_read(machine, "DSW2");
-		case 0x04: return input_port_read(machine, "P1");
-		case 0x08: return input_port_read(machine, "P2");
+		case 0x01: return input_port_read(space->machine, "DSW1");
+		case 0x02: return input_port_read(space->machine, "DSW2");
+		case 0x04: return input_port_read(space->machine, "P1");
+		case 0x08: return input_port_read(space->machine, "P2");
 	}
 	return 0x00;
 }

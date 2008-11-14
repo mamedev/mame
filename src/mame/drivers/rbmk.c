@@ -60,7 +60,7 @@ static UINT16 tilebank=0;
 
 static READ16_HANDLER( gms_read )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 

@@ -716,8 +716,8 @@ static READ8_HANDLER( bosco_dsw_r )
 {
 	int bit0,bit1;
 
-	bit0 = (input_port_read(machine, "DSWB") >> offset) & 1;
-	bit1 = (input_port_read(machine, "DSWA") >> offset) & 1;
+	bit0 = (input_port_read(space->machine, "DSWB") >> offset) & 1;
+	bit1 = (input_port_read(space->machine, "DSWA") >> offset) & 1;
 
 	return bit0 | (bit1 << 1);
 }
@@ -742,13 +742,13 @@ static WRITE8_HANDLER( bosco_latch_w )
 		case 0x00:	/* IRQ1 */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IRQ2 */
 			cpu_interrupt_enable(1,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* NMION */
@@ -756,8 +756,8 @@ static WRITE8_HANDLER( bosco_latch_w )
 			break;
 
 		case 0x03:	/* RESET */
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
@@ -771,14 +771,14 @@ static WRITE8_HANDLER( bosco_latch_w )
 }
 
 
-static READ8_HANDLER( in0_l )	{ return input_port_read(machine, "IN0"); }		// fire and start buttons
-static READ8_HANDLER( in0_h )	{ return input_port_read(machine, "IN0") >> 4; }	// coins
-static READ8_HANDLER( in1_l )	{ return input_port_read(machine, "IN1"); }		// P1 joystick
-static READ8_HANDLER( in1_h )	{ return input_port_read(machine, "IN1") >> 4; }	// P2 joystick
-static READ8_HANDLER( dipA_l )	{ return input_port_read(machine, "DSWA"); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read(machine, "DSWA") >> 4; }	// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read(machine, "DSWB"); }		// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read(machine, "DSWB") >> 4; }	// dips B
+static READ8_HANDLER( in0_l )	{ return input_port_read(space->machine, "IN0"); }		// fire and start buttons
+static READ8_HANDLER( in0_h )	{ return input_port_read(space->machine, "IN0") >> 4; }	// coins
+static READ8_HANDLER( in1_l )	{ return input_port_read(space->machine, "IN1"); }		// P1 joystick
+static READ8_HANDLER( in1_h )	{ return input_port_read(space->machine, "IN1") >> 4; }	// P2 joystick
+static READ8_HANDLER( dipA_l )	{ return input_port_read(space->machine, "DSWA"); }		// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read(space->machine, "DSWA") >> 4; }	// dips A
+static READ8_HANDLER( dipB_l )	{ return input_port_read(space->machine, "DSWB"); }		// dips B
+static READ8_HANDLER( dipB_h )	{ return input_port_read(space->machine, "DSWB") >> 4; }	// dips B
 static WRITE8_HANDLER( out_0 )
 {
 	set_led_status(1,data & 1);

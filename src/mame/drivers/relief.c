@@ -57,13 +57,13 @@ static void update_interrupts(running_machine *machine)
 
 static READ16_HANDLER( relief_atarivc_r )
 {
-	return atarivc_r(machine->primary_screen, offset);
+	return atarivc_r(space->machine->primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( relief_atarivc_w )
 {
-	atarivc_w(machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(space->machine->primary_screen, offset, data, mem_mask);
 }
 
 
@@ -96,9 +96,9 @@ static MACHINE_RESET( relief )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int result = input_port_read(machine, "260010");
+	int result = input_port_read(space->machine, "260010");
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
-	if (!(result & 0x0080) || atarigen_get_hblank(machine->primary_screen)) result ^= 0x0001;
+	if (!(result & 0x0080) || atarigen_get_hblank(space->machine->primary_screen)) result ^= 0x0001;
 	return result;
 }
 
@@ -115,7 +115,7 @@ static WRITE16_HANDLER( audio_control_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		ym2413_volume = (data >> 1) & 15;
-		atarigen_set_ym2413_vol(machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
+		atarigen_set_ym2413_vol(space->machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
 		adpcm_bank_base = (0x040000 * ((data >> 6) & 3)) | (adpcm_bank_base & 0x100000);
 	}
 	if (ACCESSING_BITS_8_15)
@@ -130,8 +130,8 @@ static WRITE16_HANDLER( audio_volume_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		overall_volume = data & 127;
-		atarigen_set_ym2413_vol(machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
-		atarigen_set_oki6295_vol(machine, overall_volume * 100 / 127);
+		atarigen_set_ym2413_vol(space->machine, (ym2413_volume * overall_volume * 100) / (127 * 15));
+		atarigen_set_oki6295_vol(space->machine, overall_volume * 100 / 127);
 	}
 }
 
@@ -145,14 +145,14 @@ static WRITE16_HANDLER( audio_volume_w )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return okim6295_status_0_r(machine, offset) | 0xff00;
+	return okim6295_status_0_r(space, offset) | 0xff00;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_BITS_0_7)
-		okim6295_data_0_w(machine, offset, data & 0xff);
+		okim6295_data_0_w(space, offset, data & 0xff);
 }
 
 
@@ -168,9 +168,9 @@ static WRITE16_HANDLER( ym2413_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		if (offset & 1)
-			ym2413_data_port_0_w(machine, 0, data & 0xff);
+			ym2413_data_port_0_w(space, 0, data & 0xff);
 		else
-			ym2413_register_port_0_w(machine, 0, data & 0xff);
+			ym2413_register_port_0_w(space, 0, data & 0xff);
 	}
 }
 

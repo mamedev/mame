@@ -223,7 +223,7 @@ static void create_tilemaps(void);
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 { \
 	popmessage(_format_,_offset_,_data_);\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(machine->activecpu)); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(space->cpu)); \
 	logerror(_format_,_offset_,_data_);\
 	logerror("\n");\
 }
@@ -232,7 +232,7 @@ static void create_tilemaps(void);
 
 #define SHOW_WRITE_ERROR(_format_,_offset_,_data_)\
 {\
-	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(machine->activecpu)); \
+	logerror("CPU #0 PC %06X : Warning, ",cpu_get_pc(space->cpu)); \
 	logerror(_format_,_offset_,_data_); \
 	logerror("\n");\
 }
@@ -449,13 +449,13 @@ WRITE16_HANDLER( megasys1_vregs_A_w )
 
 		case 0x300/2   :	megasys1_screen_flag = new_data;
 							if (new_data & 0x10)
-								cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+								cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 							else
-								cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+								cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 							break;
 
-		case 0x308/2   :	soundlatch_word_w(machine,0,new_data,0xffff);
-							cpu_set_input_line(machine->cpu[1],4,HOLD_LINE);
+		case 0x308/2   :	soundlatch_word_w(space,0,new_data,0xffff);
+							cpu_set_input_line(space->machine->cpu[1],4,HOLD_LINE);
 							break;
 
 		default		 :	SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);
@@ -471,7 +471,7 @@ READ16_HANDLER( megasys1_vregs_C_r )
 {
 	switch (offset)
 	{
-		case 0x8000/2:	return soundlatch2_word_r(machine,0,0xffff);
+		case 0x8000/2:	return soundlatch2_word_r(space,0,0xffff);
 		default:		return megasys1_vregs[offset];
 	}
 }
@@ -500,14 +500,14 @@ WRITE16_HANDLER( megasys1_vregs_C_w )
 
 		case 0x2308/2   :	megasys1_screen_flag = new_data;
 							if (new_data & 0x10)
-								cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+								cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 							else
-								cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+								cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 							break;
 
 		case 0x8000/2   :	/* Cybattler reads sound latch on irq 2 */
-							soundlatch_word_w(machine,0,new_data,0xffff);
-							cpu_set_input_line(machine->cpu[1],2,HOLD_LINE);
+							soundlatch_word_w(space,0,new_data,0xffff);
+							cpu_set_input_line(space->machine->cpu[1],2,HOLD_LINE);
 							break;
 
 		default:		SHOW_WRITE_ERROR("vreg %04X <- %04X",offset*2,data);

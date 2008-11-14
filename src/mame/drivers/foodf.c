@@ -172,9 +172,9 @@ static WRITE16_HANDLER( digital_w )
 		/* bit 1 = UPDATE */
 
 		if (!(data & 0x04))
-			atarigen_scanline_int_ack_w(machine,0,0,0xffff);
+			atarigen_scanline_int_ack_w(space,0,0,0xffff);
 		if (!(data & 0x08))
-			atarigen_video_int_ack_w(machine,0,0,0xffff);
+			atarigen_video_int_ack_w(space,0,0,0xffff);
 
 		output_set_led_value(0, (data >> 4) & 1);
 		output_set_led_value(1, (data >> 5) & 1);
@@ -196,7 +196,7 @@ static READ16_HANDLER( analog_r )
 {
 	static const char *const portnames[] = { "STICK0_X", "STICK1_X", "STICK0_Y", "STICK1_Y" };
 
-	return input_port_read(machine, portnames[whichport]);
+	return input_port_read(space->machine, portnames[whichport]);
 }
 
 
@@ -213,13 +213,13 @@ static WRITE16_HANDLER( analog_w )
  *
  *************************************/
 
-static READ16_HANDLER( pokey1_word_r ) { return pokey1_r(machine, offset); }
-static READ16_HANDLER( pokey2_word_r ) { return pokey2_r(machine, offset); }
-static READ16_HANDLER( pokey3_word_r ) { return pokey3_r(machine, offset); }
+static READ16_HANDLER( pokey1_word_r ) { return pokey1_r(space, offset); }
+static READ16_HANDLER( pokey2_word_r ) { return pokey2_r(space, offset); }
+static READ16_HANDLER( pokey3_word_r ) { return pokey3_r(space, offset); }
 
-static WRITE16_HANDLER( pokey1_word_w ) { if (ACCESSING_BITS_0_7) pokey1_w(machine, offset, data & 0xff); }
-static WRITE16_HANDLER( pokey2_word_w ) { if (ACCESSING_BITS_0_7) pokey2_w(machine, offset, data & 0xff); }
-static WRITE16_HANDLER( pokey3_word_w ) { if (ACCESSING_BITS_0_7) pokey3_w(machine, offset, data & 0xff); }
+static WRITE16_HANDLER( pokey1_word_w ) { if (ACCESSING_BITS_0_7) pokey1_w(space, offset, data & 0xff); }
+static WRITE16_HANDLER( pokey2_word_w ) { if (ACCESSING_BITS_0_7) pokey2_w(space, offset, data & 0xff); }
+static WRITE16_HANDLER( pokey3_word_w ) { if (ACCESSING_BITS_0_7) pokey3_w(space, offset, data & 0xff); }
 
 
 
@@ -347,7 +347,7 @@ GFXDECODE_END
 
 static READ8_HANDLER( pot_r )
 {
-	return (input_port_read(machine, "DSW") >> offset) << 7;
+	return (input_port_read(space->machine, "DSW") >> offset) << 7;
 }
 
 static const pokey_interface pokey_config =

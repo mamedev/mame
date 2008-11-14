@@ -166,13 +166,13 @@ static WRITE8_HANDLER(bg2_w)
 	bgadr = (bgadr & 0xfb) | ((data & 1)<<2);
 	if(bgadr > 2)
 		bgadr = 0;
-	memory_set_bankptr( 1, memory_region(machine, "user1") + bgadr * 0x4000 );
+	memory_set_bankptr( 1, memory_region(space->machine, "user1") + bgadr * 0x4000 );
 }
 
 static WRITE8_HANDLER( sound_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( i8257_CH0_w )

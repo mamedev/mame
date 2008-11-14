@@ -66,14 +66,14 @@ static READ8_HANDLER( timer_r )
 {
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
-	return cpu_get_total_cycles(machine->activecpu) / timer_rate;
+	return cpu_get_total_cycles(space->cpu) / timer_rate;
 }
 
 
 static WRITE8_HANDLER( jack_sh_command_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 
@@ -121,7 +121,7 @@ static READ8_HANDLER( striv_question_r )
 	// Read the actual byte from question roms
 	else
 	{
-		UINT8 *ROM = memory_region(machine, "user1");
+		UINT8 *ROM = memory_region(space->machine, "user1");
 		int real_address;
 
 		real_address = question_address | (offset & 0x3f0) | remap_address[offset & 0x0f];

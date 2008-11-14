@@ -55,8 +55,8 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(machine,offset,(data >> 8) & 0xff);
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space,offset,(data >> 8) & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -80,13 +80,13 @@ static MACHINE_RESET( deniam )
 static WRITE16_HANDLER( YM3812_control_port_0_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		ym3812_control_port_0_w(machine,0,(data >> 8) & 0xff);
+		ym3812_control_port_0_w(space,0,(data >> 8) & 0xff);
 }
 
 static WRITE16_HANDLER( YM3812_write_port_0_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		ym3812_write_port_0_w(machine,0,(data >> 8) & 0xff);
+		ym3812_write_port_0_w(space,0,(data >> 8) & 0xff);
 }
 
 

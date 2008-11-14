@@ -388,7 +388,7 @@ READ8_HANDLER(kbdc8042_8_r)
 		break;
 
 	case 2:
-		if (kbdc8042.get_out2(machine))
+		if (kbdc8042.get_out2(space->machine))
 			data |= 0x20;
 		else
 			data &= ~0x20;
@@ -584,7 +584,7 @@ WRITE8_HANDLER(kbdc8042_8_w)
              * the bits low set in the command byte.  The only pulse that has
              * an effect currently is bit 0, which pulses the CPU's reset line
              */
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 			at_8042_set_outport(kbdc8042.outport | 0x02, 0);
 			break;
 		}
@@ -597,26 +597,26 @@ WRITE8_HANDLER(kbdc8042_8_w)
 
 READ32_HANDLER( kbdc8042_32le_r )
 {
-	return read32le_with_read8_handler(kbdc8042_8_r, machine, offset, mem_mask);
+	return read32le_with_read8_handler(kbdc8042_8_r, space->machine, offset, mem_mask);
 }
 
 
 
 WRITE32_HANDLER( kbdc8042_32le_w )
 {
-	write32le_with_write8_handler(kbdc8042_8_w, machine, offset, data, mem_mask);
+	write32le_with_write8_handler(kbdc8042_8_w, space->machine, offset, data, mem_mask);
 }
 
 
 
 READ64_HANDLER( kbdc8042_64be_r )
 {
-	return read64be_with_read8_handler(kbdc8042_8_r, machine, offset, mem_mask);
+	return read64be_with_read8_handler(kbdc8042_8_r, space->machine, offset, mem_mask);
 }
 
 
 
 WRITE64_HANDLER( kbdc8042_64be_w )
 {
-	write64be_with_write8_handler(kbdc8042_8_w, machine, offset, data, mem_mask);
+	write64be_with_write8_handler(kbdc8042_8_w, space->machine, offset, data, mem_mask);
 }

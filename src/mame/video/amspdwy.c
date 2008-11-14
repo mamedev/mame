@@ -21,7 +21,7 @@ static tilemap *bg_tilemap;
 WRITE8_HANDLER( amspdwy_paletteram_w )
 {
 	data ^= 0xff;
-	paletteram_BBGGGRRR_w(machine,offset,data);
+	paletteram_BBGGGRRR_w(space,offset,data);
 //  paletteram_RRRGGGBB_w(offset,data);
 }
 

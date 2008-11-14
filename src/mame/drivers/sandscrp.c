@@ -147,7 +147,7 @@ static WRITE16_HANDLER( sandscrp_irq_cause_w )
 		if (data & 0x20)	vblank_irq  = 0;
 	}
 
-	update_irq_state(machine);
+	update_irq_state(space->machine);
 }
 
 
@@ -186,7 +186,7 @@ static WRITE16_HANDLER( sandscrp_latchstatus_word_w )
 static READ16_HANDLER( sandscrp_soundlatch_word_r )
 {
 	latch2_full = 0;
-	return soundlatch2_r(machine,0);
+	return soundlatch2_r(space,0);
 }
 
 static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
@@ -194,9 +194,9 @@ static WRITE16_HANDLER( sandscrp_soundlatch_word_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		latch1_full = 1;
-		soundlatch_w(machine, 0, data & 0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(100));	// Allow the other cpu to reply
+		soundlatch_w(space, 0, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));	// Allow the other cpu to reply
 	}
 }
 
@@ -232,10 +232,10 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sandscrp_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bank = data & 0x07;
 
-	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(machine->activecpu),data);
+	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
@@ -252,13 +252,13 @@ static READ8_HANDLER( sandscrp_latchstatus_r )
 static READ8_HANDLER( sandscrp_soundlatch_r )
 {
 	latch1_full = 0;
-	return soundlatch_r(machine,0);
+	return soundlatch_r(space,0);
 }
 
 static WRITE8_HANDLER( sandscrp_soundlatch_w )
 {
 	latch2_full = 1;
-	soundlatch2_w(machine,0,data);
+	soundlatch2_w(space,0,data);
 }
 
 static ADDRESS_MAP_START( sandscrp_soundmem, ADDRESS_SPACE_PROGRAM, 8 )

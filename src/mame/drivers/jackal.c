@@ -86,7 +86,7 @@ static int irq_enable;
 
 static READ8_HANDLER( topgunbl_rotary_r )
 {
-	return (1 << (input_port_read(machine, offset ? "DIAL1" : "DIAL0") * 8 / 256)) ^ 0xff;
+	return (1 << (input_port_read(space->machine, offset ? "DIAL1" : "DIAL0") * 8 / 256)) ^ 0xff;
 }
 
 static WRITE8_HANDLER( jackal_flipscreen_w )

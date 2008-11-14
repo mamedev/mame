@@ -77,7 +77,7 @@ static WRITE8_HANDLER( draco_sound_bankswitch_w )
 
 static WRITE8_HANDLER( draco_sound_g_w )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = space->machine->driver_data;
 
 	/*
 
@@ -93,36 +93,36 @@ static WRITE8_HANDLER( draco_sound_g_w )
 	switch (data)
 	{
 	case 0x01:
-		ay8910_write_port_0_w(machine, 0, state->draco_ay_latch);
+		ay8910_write_port_0_w(space, 0, state->draco_ay_latch);
 		break;
 
 	case 0x02:
-		state->draco_ay_latch = ay8910_read_port_0_r(machine, 0);
+		state->draco_ay_latch = ay8910_read_port_0_r(space, 0);
 		break;
 
 	case 0x03:
-		ay8910_control_port_0_w(machine, 0, state->draco_ay_latch);
+		ay8910_control_port_0_w(space, 0, state->draco_ay_latch);
 		break;
 	}
 }
 
 static READ8_HANDLER( draco_sound_in_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = space->machine->driver_data;
 
 	return ~(state->draco_sound) & 0x07;
 }
 
 static READ8_HANDLER( draco_sound_ay8910_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = space->machine->driver_data;
 
 	return state->draco_ay_latch;
 }
 
 static WRITE8_HANDLER( draco_sound_ay8910_w )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = space->machine->driver_data;
 
 	state->draco_ay_latch = data;
 }

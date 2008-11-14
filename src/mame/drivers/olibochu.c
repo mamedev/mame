@@ -173,7 +173,7 @@ static WRITE8_HANDLER( sound_command_w )
 	for (c = 15;c >= 0;c--)
 		if (cmd & (1 << c)) break;
 
-	if (c >= 0) soundlatch_w(machine,0,15-c);
+	if (c >= 0) soundlatch_w(space,0,15-c);
 }
 
 

@@ -66,7 +66,7 @@ static WRITE32_HANDLER( soundr3k_w )
 		sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
 		if( offset == 3 )
 		{
-			cpu_set_input_line(machine->cpu[1], 1, HOLD_LINE );
+			cpu_set_input_line(space->machine->cpu[1], 1, HOLD_LINE );
 		}
 	}
 	if( ACCESSING_BITS_0_15 )
@@ -140,7 +140,7 @@ static WRITE32_HANDLER( eeprom_w )
 	eeprom_write_bit( ( data & 0x01 ) ? 1 : 0 );
 	eeprom_set_clock_line( ( data & 0x04 ) ? ASSERT_LINE : CLEAR_LINE );
 	eeprom_set_cs_line( ( data & 0x02 ) ? CLEAR_LINE : ASSERT_LINE );
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ( data & 0x40 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 /* PCM RAM */
@@ -219,11 +219,11 @@ static READ16_HANDLER( dual539_r )
 	data = 0;
 	if( ACCESSING_BITS_0_7 )
 	{
-		data |= k054539_1_r( machine, offset );
+		data |= k054539_1_r( space->machine, offset );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		data |= k054539_0_r( machine, offset ) << 8;
+		data |= k054539_0_r( space->machine, offset ) << 8;
 	}
 	return data;
 }
@@ -232,11 +232,11 @@ static WRITE16_HANDLER( dual539_w )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		k054539_1_w( machine, offset, data );
+		k054539_1_w( space->machine, offset, data );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		k054539_0_w( machine, offset, data >> 8 );
+		k054539_0_w( space->machine, offset, data >> 8 );
 	}
 }
 

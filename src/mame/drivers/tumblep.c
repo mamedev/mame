@@ -71,15 +71,15 @@ static READ16_HANDLER( tumblep_prot_r )
 
 static WRITE16_HANDLER( tumblep_sound_w )
 {
-	soundlatch_w(machine,0,data & 0xff);
-	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+	soundlatch_w(space,0,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE16_HANDLER( jumppop_sound_w )
 {
-	soundlatch_w(machine,0,data & 0xff);
-	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE );
+	soundlatch_w(space,0,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE );
 }
 #endif
 
@@ -90,11 +90,11 @@ static READ16_HANDLER( tumblepop_controls_r )
  	switch (offset<<1)
 	{
 		case 0:
-			return input_port_read(machine, "PLAYERS");
+			return input_port_read(space->machine, "PLAYERS");
 		case 2:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 		case 8:
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 		case 10: /* ? */
 		case 12:
         	return 0;
@@ -131,10 +131,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		ym2151_register_port_0_w(machine,0,data);
+		ym2151_register_port_0_w(space,0,data);
 		break;
 	case 1:
-		ym2151_data_port_0_w(machine,0,data);
+		ym2151_data_port_0_w(space,0,data);
 		break;
 	}
 }

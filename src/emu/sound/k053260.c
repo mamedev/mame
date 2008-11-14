@@ -429,23 +429,23 @@ WRITE8_HANDLER( k053260_1_w )
 WRITE16_HANDLER( k053260_0_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k053260_0_w (machine, offset, data & 0xff);
+		k053260_0_w (space, offset, data & 0xff);
 }
 
 READ16_HANDLER( k053260_0_lsb_r )
 {
-	return k053260_0_r(machine, offset);
+	return k053260_0_r(space, offset);
 }
 
 WRITE16_HANDLER( k053260_1_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k053260_1_w (machine, offset, data & 0xff);
+		k053260_1_w (space, offset, data & 0xff);
 }
 
 READ16_HANDLER( k053260_1_lsb_r )
 {
-	return k053260_1_r(machine, offset);
+	return k053260_1_r(space, offset);
 }
 
 

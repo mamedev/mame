@@ -180,7 +180,7 @@ WRITE8_HANDLER( appoooh_bg_colorram_w )
 WRITE8_HANDLER( appoooh_out_w )
 {
 	/* bit 0 controls NMI */
-	interrupt_enable_w(machine,0,data & 0x01);
+	interrupt_enable_w(space,0,data & 0x01);
 
 	/* bit 1 flip screen */
 	flip_screen_set(data & 0x02);
@@ -195,7 +195,7 @@ WRITE8_HANDLER( appoooh_out_w )
 
 	/* bit 6 ROM bank select */
 	{
-		UINT8 *RAM = memory_region(machine, "main");
+		UINT8 *RAM = memory_region(space->machine, "main");
 
 		memory_set_bankptr(1,&RAM[data&0x40 ? 0x10000 : 0x0a000]);
 	}

@@ -128,8 +128,8 @@ static READ8_HANDLER( sound_ready_to_send_r )
 
 static READ8_HANDLER( sound_data_ready_r )
 {
-	if (cpu_get_pc(machine->activecpu) == 0xd50 && !main_to_sound_ready)
-		cpu_spinuntil_int(machine->activecpu);
+	if (cpu_get_pc(space->cpu) == 0xd50 && !main_to_sound_ready)
+		cpu_spinuntil_int(space->cpu);
 	return main_to_sound_ready ? 0x00 : 0x80;
 }
 
@@ -148,7 +148,7 @@ static WRITE8_HANDLER( sound_int_state_w )
 		sndti_reset(SOUND_BSMT2000, 0);
 
 	/* also clears interrupts */
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 	sound_int_state = data;
 }
 
@@ -170,7 +170,7 @@ static WRITE8_HANDLER( bsmt2000_port_w )
 {
 	UINT16 reg = offset >> 8;
 	UINT16 val = ((offset & 0xff) << 8) | data;
-	bsmt2000_data_0_w(machine, reg, val, 0xffff);
+	bsmt2000_data_0_w(space, reg, val, 0xffff);
 }
 
 

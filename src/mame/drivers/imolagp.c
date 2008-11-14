@@ -113,7 +113,7 @@ static WRITE8_HANDLER( transmit_data_w )
 }
 static READ8_HANDLER( trigger_slave_nmi_r )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 

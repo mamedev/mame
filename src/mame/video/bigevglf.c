@@ -27,7 +27,7 @@ WRITE8_HANDLER(bigevglf_palette_w)
 
 	paletteram[offset] = data;
 	color = paletteram[offset&0x3ff] | (paletteram[0x400+(offset&0x3ff)] << 8);
-	palette_set_color_rgb(machine, offset&0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
+	palette_set_color_rgb(space->machine, offset&0x3ff, pal4bit(color >> 4), pal4bit(color >> 0), pal4bit(color >> 8));
 }
 
 WRITE8_HANDLER( bigevglf_gfxcontrol_w )

@@ -47,7 +47,7 @@ static const int scramble_timer[10] =
 
 READ8_HANDLER( scramble_portB_r )
 {
-	return scramble_timer[(cpu_get_total_cycles(machine->activecpu)/512) % 10];
+	return scramble_timer[(cpu_get_total_cycles(space->cpu)/512) % 10];
 }
 
 
@@ -76,7 +76,7 @@ static const int frogger_timer[10] =
 
 READ8_HANDLER( frogger_portB_r )
 {
-	return frogger_timer[(cpu_get_total_cycles(machine->activecpu)/512) % 10];
+	return frogger_timer[(cpu_get_total_cycles(space->cpu)/512) % 10];
 }
 
 
@@ -157,13 +157,13 @@ static void sfx_sh_7474_callback(void)
 
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
 }
 
 READ8_HANDLER( hotshock_soundlatch_r )
 {
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
-	return soundlatch_r(machine,0);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
+	return soundlatch_r(space,0);
 }
 
 static void filter_w(int chip, int channel, int data)

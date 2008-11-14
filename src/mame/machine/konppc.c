@@ -133,7 +133,7 @@ READ32_HANDLER( cgboard_dsp_comm_r_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-//      mame_printf_debug("dsp_cmd_r: (board %d) %08X, %08X at %08X\n", cgboard_id, offset, mem_mask, cpu_get_pc(machine->activecpu));
+//      mame_printf_debug("dsp_cmd_r: (board %d) %08X, %08X at %08X\n", cgboard_id, offset, mem_mask, cpu_get_pc(space->cpu));
 		return dsp_comm_sharc[cgboard_id][offset] | (dsp_state[cgboard_id] << 16);
 	}
 	else
@@ -145,7 +145,7 @@ READ32_HANDLER( cgboard_dsp_comm_r_ppc )
 WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 {
 	int dsp = (cgboard_id == 0) ? 2 : 3;
-//  mame_printf_debug("dsp_cmd_w: (board %d) %08X, %08X, %08X at %08X\n", cgboard_id, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("dsp_cmd_w: (board %d) %08X, %08X, %08X at %08X\n", cgboard_id, data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
@@ -161,15 +161,15 @@ WRITE32_HANDLER( cgboard_dsp_comm_w_ppc )
 				pci_bridge_enable[cgboard_id] = (data & 0x20000000) ? 1 : 0;
 
 				if (data & 0x10000000)
-					cpu_set_input_line(machine->cpu[dsp], INPUT_LINE_RESET, CLEAR_LINE);
+					cpu_set_input_line(space->machine->cpu[dsp], INPUT_LINE_RESET, CLEAR_LINE);
 				else
-					cpu_set_input_line(machine->cpu[dsp], INPUT_LINE_RESET, ASSERT_LINE);
+					cpu_set_input_line(space->machine->cpu[dsp], INPUT_LINE_RESET, ASSERT_LINE);
 
 				if (data & 0x02000000)
-					cpu_set_input_line(machine->cpu[dsp], INPUT_LINE_IRQ0, ASSERT_LINE);
+					cpu_set_input_line(space->machine->cpu[dsp], INPUT_LINE_IRQ0, ASSERT_LINE);
 
 				if (data & 0x04000000)
-					cpu_set_input_line(machine->cpu[dsp], INPUT_LINE_IRQ1, ASSERT_LINE);
+					cpu_set_input_line(space->machine->cpu[dsp], INPUT_LINE_IRQ1, ASSERT_LINE);
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -198,7 +198,7 @@ WRITE32_HANDLER( cgboard_dsp_shared_w_ppc )
 {
 	if (cgboard_id < MAX_CG_BOARDS)
 	{
-		cpuexec_trigger(machine, 10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
+		cpuexec_trigger(space->machine, 10000);		// Remove the timeout (a part of the GTI Club FIFO test workaround)
 		COMBINE_DATA(dsp_shared_ram[cgboard_id] + (offset + (dsp_shared_ram_bank[cgboard_id] * DSP_BANK_SIZE_WORD)));
 	}
 }
@@ -317,7 +317,7 @@ READ32_HANDLER( cgboard_0_comm_sharc_r )
 
 WRITE32_HANDLER( cgboard_0_comm_sharc_w )
 {
-	dsp_comm_sharc_w(machine, 0, offset, data);
+	dsp_comm_sharc_w(space, 0, offset, data);
 }
 
 READ32_HANDLER( cgboard_0_shared_sharc_r )
@@ -337,7 +337,7 @@ READ32_HANDLER( cgboard_1_comm_sharc_r )
 
 WRITE32_HANDLER( cgboard_1_comm_sharc_w )
 {
-	dsp_comm_sharc_w(machine, 1, offset, data);
+	dsp_comm_sharc_w(space, 1, offset, data);
 }
 
 READ32_HANDLER( cgboard_1_shared_sharc_r )
@@ -523,7 +523,7 @@ WRITE32_HANDLER(K033906_0_w)
 {
 	if (pci_bridge_enable[0])
 	{
-		K033906_w(machine, 0, offset, data);
+		K033906_w(space, 0, offset, data);
 	}
 	else
 	{
@@ -554,7 +554,7 @@ WRITE32_HANDLER(K033906_1_w)
 {
 	if (pci_bridge_enable[1])
 	{
-		K033906_w(machine, 1, offset, data);
+		K033906_w(space, 1, offset, data);
 	}
 	else
 	{

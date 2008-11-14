@@ -273,7 +273,7 @@ READ8_HANDLER (TMS9928A_register_r) {
     tms.StatusReg = 0x1f;
     if (tms.INT) {
         tms.INT = 0;
-        if (tms.INTCallback) tms.INTCallback (machine, tms.INT);
+        if (tms.INTCallback) tms.INTCallback (space->machine, tms.INT);
     }
     tms.latch = 0;
     return b;
@@ -287,13 +287,13 @@ WRITE8_HANDLER (TMS9928A_register_w) {
             /* register write */
 			reg = data & 7;
 			/*if (tms.FirstByte != tms.Regs[reg])*/ /* Removed to fix ColecoVision MESS Driver*/
-	            change_register (machine, reg, tms.FirstByte);
+	            change_register (space->machine, reg, tms.FirstByte);
         } else {
             /* set read/write address */
             tms.Addr = ((UINT16)data << 8 | tms.FirstByte) & (tms.vramsize - 1);
             if ( !(data & 0x40) ) {
 				/* read ahead */
-				TMS9928A_vram_r	(machine,0);
+				TMS9928A_vram_r	(space,0);
             }
         }
         tms.latch = 0;

@@ -451,7 +451,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( hncholms_prot_r )
 {
-	if(cpu_get_pc(machine->activecpu) == 0x2b || cpu_get_pc(machine->activecpu) == 0xa27)
+	if(cpu_get_pc(space->cpu) == 0x2b || cpu_get_pc(space->cpu) == 0xa27)
 		return 1;
 	else
 		return 0;

@@ -147,7 +147,7 @@ WRITE16_HANDLER( bionicc_paletteram_w )
 		b = b * (0x07 + bright) / 0x0e;
 	}
 
-	palette_set_color (machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color (space->machine, offset, MAKE_RGB(r, g, b));
 }
 
 WRITE16_HANDLER( bionicc_scroll_w )

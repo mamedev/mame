@@ -76,16 +76,16 @@ static WRITE8_HANDLER( namco_54xx_O_w )
 {
 	UINT8 out = (data & 0x0f);
 	if (data & 0x10)
-		discrete_sound_w(machine, NAMCO_54XX_1_DATA, out);
+		discrete_sound_w(space, NAMCO_54XX_1_DATA, out);
 	else
-		discrete_sound_w(machine, NAMCO_54XX_0_DATA, out);
+		discrete_sound_w(space, NAMCO_54XX_0_DATA, out);
 }
 
 static WRITE8_HANDLER( namco_54xx_R1_w )
 {
 	UINT8 out = (data & 0x0f);
 
-	discrete_sound_w(machine, NAMCO_54XX_2_DATA, out);
+	discrete_sound_w(space, NAMCO_54XX_2_DATA, out);
 }
 
 

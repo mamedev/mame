@@ -600,7 +600,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 
 static READ8_HANDLER( pr8210_pia_r )
 {
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0xff;
 
@@ -637,7 +637,7 @@ static READ8_HANDLER( pr8210_pia_r )
 			break;
 
 		default:
-			mame_printf_debug("%03X:Unknown PR-8210 PIA read from offset %02X\n", cpu_get_pc(machine->activecpu), offset);
+			mame_printf_debug("%03X:Unknown PR-8210 PIA read from offset %02X\n", cpu_get_pc(space->cpu), offset);
 			break;
 	}
 	return result;
@@ -651,7 +651,7 @@ static READ8_HANDLER( pr8210_pia_r )
 
 static WRITE8_HANDLER( pr8210_pia_w )
 {
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 value;
 
@@ -712,7 +712,7 @@ static WRITE8_HANDLER( pr8210_pia_w )
 
 		/* no other writes known */
 		default:
-			mame_printf_debug("%03X:Unknown PR-8210 PIA write to offset %02X = %02X\n", cpu_get_pc(machine->activecpu), offset, data);
+			mame_printf_debug("%03X:Unknown PR-8210 PIA write to offset %02X = %02X\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
 }
@@ -735,7 +735,7 @@ static READ8_HANDLER( pr8210_bus_r )
        $02 = (in) FG via op-amp (spindle motor stop detector)
        $01 = (in) SLOW TIMER OUT
     */
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	ldplayer_data *player = ld->player;
 	slider_position sliderpos = ldcore_get_slider_position(ld);
 	UINT8 focus_on = !(player->port1 & 0x08);
@@ -783,7 +783,7 @@ static WRITE8_HANDLER( pr8210_port1_w )
        $02 = (out) SCAN A (/SCAN)
        $01 = (out) JUMP TRG (jump back trigger, clock on high->low)
     */
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->port1;
 	int direction;
@@ -845,7 +845,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
        $02 = (out) ???
        $01 = (out) LASER ON
     */
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->port2;
 
@@ -857,7 +857,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 		player->slowtrg = timer_get_time();
 
 	/* bit 6 when low triggers an IRQ on the MCU */
-	cpu_set_input_line(machine->cpu[player->cpunum], MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[player->cpunum], MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* standby LED is set accordingl to bit 4 */
 	output_set_value("pr8210_standby", (data & 0x10) != 0);
@@ -872,7 +872,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 static READ8_HANDLER( pr8210_t0_r )
 {
 	/* returns VSYNC state */
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	return !ld->player->vsync;
 }
 
@@ -1207,7 +1207,7 @@ static TIMER_CALLBACK( simutrek_latched_data_w )
 
 static READ8_HANDLER( simutrek_port2_r )
 {
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	ldplayer_data *player = ld->player;
 
 	/* bit $80 is the pr8210 video squelch */
@@ -1222,7 +1222,7 @@ static READ8_HANDLER( simutrek_port2_r )
 
 static WRITE8_HANDLER( simutrek_port2_w )
 {
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 prev = player->simutrek.port2;
 
@@ -1239,13 +1239,13 @@ static WRITE8_HANDLER( simutrek_port2_w )
 	{
 		int direction = (data & 0x08) ? 1 : -1;
 		if (LOG_SIMUTREK)
-			printf("%3d:JUMP TRG (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), cpu_get_pc(machine->activecpu));
+			printf("%3d:JUMP TRG (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), cpu_get_pc(space->cpu));
 		ldcore_advance_slider(ld, direction);
 	}
 
 	/* bit $04 controls who owns the JUMP TRG command */
 	if (LOG_SIMUTREK && ((data ^ prev) & 0x04))
-		printf("%3d:Simutrek ownership line = %d (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), (data >> 2) & 1, cpu_get_pc(machine->activecpu));
+		printf("%3d:Simutrek ownership line = %d (Simutrek PC=%03X)\n", video_screen_get_vpos(ld->screen), (data >> 2) & 1, cpu_get_pc(space->cpu));
 	player->simutrek.controlnext = (~data >> 2) & 1;
 
 	/* bits $03 control something (status?) */
@@ -1261,7 +1261,7 @@ static WRITE8_HANDLER( simutrek_port2_w )
 
 static READ8_HANDLER( simutrek_data_r )
 {
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	ldplayer_data *player = ld->player;
 
 	/* acknowledge the read and clear the data ready flag */
@@ -1278,6 +1278,6 @@ static READ8_HANDLER( simutrek_data_r )
 static READ8_HANDLER( simutrek_t0_r )
 {
 	/* return 1 if data is waiting from main CPU */
-	laserdisc_state *ld = find_pr8210(machine);
+	laserdisc_state *ld = find_pr8210(space->machine);
 	return ld->player->simutrek.data_ready;
 }

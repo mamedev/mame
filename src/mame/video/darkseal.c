@@ -152,13 +152,13 @@ static void update_24bitcol(running_machine *machine, int offset)
 WRITE16_HANDLER( darkseal_palette_24bit_rg_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	update_24bitcol(machine, offset);
+	update_24bitcol(space->machine, offset);
 }
 
 WRITE16_HANDLER( darkseal_palette_24bit_b_w )
 {
 	COMBINE_DATA(&paletteram16_2[offset]);
-	update_24bitcol(machine, offset);
+	update_24bitcol(space->machine, offset);
 }
 
 /******************************************************************************/
@@ -250,7 +250,7 @@ WRITE16_HANDLER( darkseal_pf3_data_w )
 
 WRITE16_HANDLER( darkseal_pf3b_data_w ) /* Mirror */
 {
-	darkseal_pf3_data_w(machine,offset+0x800,data,mem_mask);
+	darkseal_pf3_data_w(space,offset+0x800,data,mem_mask);
 }
 
 WRITE16_HANDLER( darkseal_control_0_w )

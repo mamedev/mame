@@ -677,7 +677,7 @@ static void HandleCoProcDO(UINT32 insn)
 {
     // This instruction simply instructs the co-processor to do something, no data is returned to ARM7 core
     if (arm7_coproc_do_callback)
-        arm7_coproc_do_callback(Machine, insn, 0, 0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
+        arm7_coproc_do_callback(ARM7.program, insn, 0, 0);    // simply pass entire opcode to callback - since data format is actually dependent on co-proc implementation
     else
         LOG(("%08x: Co-Processor Data Operation executed, but no callback defined!\n", R15));
 }
@@ -693,7 +693,7 @@ static void HandleCoProcRT(UINT32 insn)
     {
         if (arm7_coproc_rt_r_callback)
         {
-            UINT32 res = arm7_coproc_rt_r_callback(Machine, insn, 0);   // RT Read handler must parse opcode & return appropriate result
+            UINT32 res = arm7_coproc_rt_r_callback(ARM7.program, insn, 0);   // RT Read handler must parse opcode & return appropriate result
             SET_REGISTER((insn >> 12) & 0xf, res);
         }
         else
@@ -703,7 +703,7 @@ static void HandleCoProcRT(UINT32 insn)
     else
     {
         if (arm7_coproc_rt_r_callback)
-            arm7_coproc_rt_w_callback(Machine, insn, GET_REGISTER((insn >> 12) & 0xf), 0);
+            arm7_coproc_rt_w_callback(ARM7.program, insn, GET_REGISTER((insn >> 12) & 0xf), 0);
         else
             LOG(("%08x: Co-Processor Register Transfer executed, but no RT Write callback defined!\n", R15));
     }

@@ -261,19 +261,19 @@ static WRITE16_HANDLER( karnov_control_w )
 	/* Mnemonics filled in from the schematics, brackets are my comments */
 	switch (offset<<1) {
 		case 0: /* SECLR (Interrupt ack for Level 6 i8751 interrupt) */
-			cpu_set_input_line(machine->cpu[0],6,CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0],6,CLEAR_LINE);
 
 			if (i8751_needs_ack) {
 				/* If a command and coin insert happen at once, then the i8751 will queue the
                     coin command until the previous command is ACK'd */
 				if (i8751_coin_pending) {
 					i8751_return=i8751_coin_pending;
-					cpu_set_input_line(machine->cpu[0],6,HOLD_LINE);
+					cpu_set_input_line(space->machine->cpu[0],6,HOLD_LINE);
 					i8751_coin_pending=0;
 				} else if (i8751_command_queue) {
 					/* Pending control command - just write it back as SECREQ */
 					i8751_needs_ack=0;
-					karnov_control_w(machine,3,i8751_command_queue,0xffff);
+					karnov_control_w(space,3,i8751_command_queue,0xffff);
 					i8751_command_queue=0;
 				} else {
 					i8751_needs_ack=0;
@@ -282,18 +282,18 @@ static WRITE16_HANDLER( karnov_control_w )
 			return;
 
 		case 2: /* SONREQ (Sound CPU byte) */
-			soundlatch_w(machine,0,data&0xff);
-			cpu_set_input_line (machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+			soundlatch_w(space,0,data&0xff);
+			cpu_set_input_line (space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 			break;
 
 		case 4: /* DM (DMA to buffer spriteram) */
-			buffer_spriteram16_w(machine,0,0,0xffff);
+			buffer_spriteram16_w(space,0,0,0xffff);
 			break;
 
 		case 6: /* SECREQ (Interrupt & Data to i8751) */
-			if (microcontroller_id==KARNOV || microcontroller_id==KARNOVJ) karnov_i8751_w(machine, data);
-			if (microcontroller_id==CHELNOV || microcontroller_id==CHELNOVJ || microcontroller_id==CHELNOVW) chelnov_i8751_w(machine, data);
-			if (microcontroller_id==WNDRPLNT) wndrplnt_i8751_w(machine, data);
+			if (microcontroller_id==KARNOV || microcontroller_id==KARNOVJ) karnov_i8751_w(space, data);
+			if (microcontroller_id==CHELNOV || microcontroller_id==CHELNOVJ || microcontroller_id==CHELNOVW) chelnov_i8751_w(space, data);
+			if (microcontroller_id==WNDRPLNT) wndrplnt_i8751_w(space, data);
 			break;
 
 		case 8: /* HSHIFT (9 bits) - Top bit indicates video flip */
@@ -314,7 +314,7 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 0xe: /* INTCLR (Interrupt ack for Level 7 vbl interrupt) */
-			cpu_set_input_line(machine->cpu[0],7,CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0],7,CLEAR_LINE);
 			break;
 	}
 }
@@ -325,11 +325,11 @@ static READ16_HANDLER( karnov_control_r )
 {
 	switch (offset<<1) {
 		case 0:
-			return input_port_read(machine, "P1_P2");
+			return input_port_read(space->machine, "P1_P2");
 		case 2: /* Start buttons & VBL */
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 		case 4:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 		case 6: /* i8751 return values */
 			return i8751_return;
 	}

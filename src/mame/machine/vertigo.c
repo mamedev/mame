@@ -125,7 +125,7 @@ READ16_HANDLER( vertigo_io_convert )
 	if (offset > 2)
 		adc_result = 0;
 	else
-		adc_result = input_port_read(machine, adcnames[offset]);
+		adc_result = input_port_read(space->machine, adcnames[offset]);
 
 	update_irq_encoder(INPUT_LINE_IRQ2, ASSERT_LINE);
 	return 0;
@@ -142,7 +142,7 @@ READ16_HANDLER( vertigo_io_adc )
 READ16_HANDLER( vertigo_coin_r )
 {
 	update_irq_encoder(INPUT_LINE_IRQ6, CLEAR_LINE);
-	return (input_port_read(machine, "COIN"));
+	return (input_port_read(space->machine, "COIN"));
 }
 
 
@@ -165,9 +165,9 @@ WRITE16_HANDLER( vertigo_wsot_w )
 {
 	/* Reset sound cpu */
 	if ((data & 2) == 0)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 

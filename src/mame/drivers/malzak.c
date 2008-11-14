@@ -86,12 +86,12 @@ WRITE8_HANDLER( malzak_playfield_w );
 
 static READ8_HANDLER( fake_VRLE_r )
 {
-	return (malzak_s2636_0_ram[0xcb] & 0x3f) + (video_screen_get_vblank(machine->primary_screen)*0x40);
+	return (malzak_s2636_0_ram[0xcb] & 0x3f) + (video_screen_get_vblank(space->machine->primary_screen)*0x40);
 }
 
 static READ8_HANDLER( bank_r )
 {
-	UINT8* bank = memory_region(machine, "user2");
+	UINT8* bank = memory_region(space->machine, "user2");
 
 	return bank[offset + (malzak_bank1 * 0x0400)];
 }
@@ -101,7 +101,7 @@ static READ8_HANDLER( s2636_portA_r )
 	// POT switch position, read from port A of the first S2636
 	// Not sure of the correct values to return, but these should
 	// do based on the game code.
-	switch(input_port_read(machine, "POT"))
+	switch(input_port_read(space->machine, "POT"))
 	{
 		case 0:  // Normal play
 			return 0xf0;
@@ -171,7 +171,7 @@ static WRITE8_HANDLER( port40_w )
 //  Bits 1-3 are all set high upon death, until the game continues
 //  Bit 6 is used only in Malzak II, and is set high after checking
 //        the selected version
-//  logerror("S2650 [0x%04x]: port 0x40 write: 0x%02x\n",cpu_get_physical_pc_byte(machine->cpu[0]),data);
+//  logerror("S2650 [0x%04x]: port 0x40 write: 0x%02x\n",cpu_get_physical_pc_byte(space->machine->cpu[0]),data);
 	if(data & 0x40)
 		malzak_bank1 = 1;
 	else

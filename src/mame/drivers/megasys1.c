@@ -246,11 +246,11 @@ static READ16_HANDLER( ip_select_r )
 
 	switch (i)
 	{
-			case 0 :	return input_port_read(machine, "SYSTEM");	break;
-			case 1 :	return input_port_read(machine, "P1");		break;
-			case 2 :	return input_port_read(machine, "P2");		break;
-			case 3 :	return input_port_read(machine, "DSW1");	break;
-			case 4 :	return input_port_read(machine, "DSW2");	break;
+			case 0 :	return input_port_read(space->machine, "SYSTEM");	break;
+			case 1 :	return input_port_read(space->machine, "P1");		break;
+			case 2 :	return input_port_read(space->machine, "P2");		break;
+			case 3 :	return input_port_read(space->machine, "DSW1");	break;
+			case 4 :	return input_port_read(space->machine, "DSW2");	break;
 			default	 :	return 0x0006;
 	}
 }
@@ -258,7 +258,7 @@ static READ16_HANDLER( ip_select_r )
 static WRITE16_HANDLER( ip_select_w )
 {
 	COMBINE_DATA(&ip_select);
-	cpu_set_input_line(machine->cpu[0],2,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0],2,HOLD_LINE);
 }
 
 
@@ -439,7 +439,7 @@ static READ16_HANDLER( oki_status_0_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return okim6295_status_0_lsb_r(machine,offset,mem_mask);
+		return okim6295_status_0_lsb_r(space,offset,mem_mask);
 }
 
 static READ16_HANDLER( oki_status_1_r )
@@ -447,7 +447,7 @@ static READ16_HANDLER( oki_status_1_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return okim6295_status_1_lsb_r(machine,offset,mem_mask);
+		return okim6295_status_1_lsb_r(space,offset,mem_mask);
 }
 
 /***************************************************************************
@@ -3037,8 +3037,8 @@ static READ16_HANDLER( protection_peekaboo_r )
 	switch (protection_val)
 	{
 		case 0x02:	return 0x03;
-		case 0x51:	return input_port_read(machine, "P1");
-		case 0x52:	return input_port_read(machine, "P2");
+		case 0x51:	return input_port_read(space->machine, "P1");
+		case 0x52:	return input_port_read(space->machine, "P2");
 		default:	return protection_val;
 	}
 }
@@ -3051,7 +3051,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 
 	if ((protection_val & 0x90) == 0x90)
 	{
-		UINT8 *RAM = memory_region(machine, "oki1");
+		UINT8 *RAM = memory_region(space->machine, "oki1");
 		int new_bank = (protection_val & 0x7) % 7;
 
 		if (bank != new_bank)
@@ -3061,7 +3061,7 @@ static WRITE16_HANDLER( protection_peekaboo_w )
 		}
 	}
 
-	cpu_set_input_line(machine->cpu[0],4,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0],4,HOLD_LINE);
 }
 
 
@@ -3959,13 +3959,13 @@ static DRIVER_INIT( iganinju )
 
 static WRITE16_HANDLER( okim6295_data_0_both_w )
 {
-	if (ACCESSING_BITS_0_7)	okim6295_data_0_w(machine, 0, (data >> 0) & 0xff );
-	else				okim6295_data_0_w(machine, 0, (data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7)	okim6295_data_0_w(space, 0, (data >> 0) & 0xff );
+	else				okim6295_data_0_w(space, 0, (data >> 8) & 0xff );
 }
 static WRITE16_HANDLER( okim6295_data_1_both_w )
 {
-	if (ACCESSING_BITS_0_7)	okim6295_data_1_w(machine, 0, (data >> 0) & 0xff );
-	else				okim6295_data_1_w(machine, 0, (data >> 8) & 0xff );
+	if (ACCESSING_BITS_0_7)	okim6295_data_1_w(space, 0, (data >> 0) & 0xff );
+	else				okim6295_data_1_w(space, 0, (data >> 8) & 0xff );
 }
 
 static DRIVER_INIT( jitsupro )

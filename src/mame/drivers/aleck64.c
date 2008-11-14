@@ -175,11 +175,11 @@ static READ32_HANDLER( aleck_dips_r )
 {
 	if (offset == 0)
 	{
-		return (input_port_read(machine, "IN0"));	/* mtetrisc has regular inputs here */
+		return (input_port_read(space->machine, "IN0"));	/* mtetrisc has regular inputs here */
 	}
 	else if (offset == 1)
 	{
-		return (input_port_read(machine, "IN1"));
+		return (input_port_read(space->machine, "IN1"));
 	}
 
 	return 0;

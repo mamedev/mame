@@ -103,7 +103,7 @@ static MACHINE_RESET( midvplus )
 
 static READ32_HANDLER( port0_r )
 {
-	UINT16 val = input_port_read(machine, "IN0");
+	UINT16 val = input_port_read(space->machine, "IN0");
 	UINT16 diff = val ^ last_port0;
 
 	/* make sure the shift controls are mutually exclusive */
@@ -133,7 +133,7 @@ static READ32_HANDLER( midvunit_adc_r )
 {
 	if (!(control_data & 0x40))
 	{
-		cpu_set_input_line(machine->cpu[0], 3, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 3, CLEAR_LINE);
 		return adc_data << adc_shift;
 	}
 	else
@@ -157,7 +157,7 @@ static WRITE32_HANDLER( midvunit_adc_w )
 		int which = (data >> adc_shift) - 4;
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
-		adc_data = input_port_read_safe(machine, adcnames[which], 0);
+		adc_data = input_port_read_safe(space->machine, adcnames[which], 0);
 		timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, adc_ready);
 	}
 	else
@@ -207,7 +207,7 @@ static WRITE32_HANDLER( midvunit_control_w )
 
 	/* bit 3 is the watchdog */
 	if ((olddata ^ control_data) & 0x0008)
-		watchdog_reset_w(machine, 0, 0);
+		watchdog_reset_w(space, 0, 0);
 
 	/* bit 1 is the DCS sound reset */
 	dcs_reset_w((~control_data >> 1) & 1);
@@ -228,7 +228,7 @@ static WRITE32_HANDLER( crusnwld_control_w )
 
 	/* bit 9 is the watchdog */
 	if ((olddata ^ control_data) & 0x0200)
-		watchdog_reset_w(machine, 0, 0);
+		watchdog_reset_w(space, 0, 0);
 
 	/* bit 8 is the LED */
 
@@ -260,13 +260,13 @@ static READ32_HANDLER( tms32031_control_r )
 		/* timer is clocked at 100ns */
 		int which = (offset >> 4) & 1;
 		INT32 result = attotime_to_double(attotime_mul(timer_timeelapsed(timer[which]), timer_rate));
-//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(machine->activecpu), offset, result);
+//      logerror("%06X:tms32031_control_r(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, result);
 		return result;
 	}
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(machine->activecpu), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(space->cpu), offset);
 
 	return tms32031_control[offset];
 }
@@ -284,18 +284,18 @@ static WRITE32_HANDLER( tms32031_control_w )
 	else if (offset == 0x20 || offset == 0x30)
 	{
 		int which = (offset >> 4) & 1;
-//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(machine->activecpu), offset, data);
+//  logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
 		if (data & 0x40)
 			timer_adjust_oneshot(timer[which], attotime_never, 0);
 
 		/* bit 0x200 selects internal clocking, which is 1/2 the main CPU clock rate */
 		if (data & 0x200)
-			timer_rate = (double)(cpu_get_clock(machine->cpu[0]) * 0.5);
+			timer_rate = (double)(cpu_get_clock(space->machine->cpu[0]) * 0.5);
 		else
 			timer_rate = 10000000.;
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(machine->activecpu), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -310,7 +310,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 static READ32_HANDLER( crusnwld_serial_status_r )
 {
 	int status = midway_serial_pic_status_r();
-	return (input_port_read(machine, "991030") & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (input_port_read(space->machine, "991030") & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -374,7 +374,7 @@ static WRITE32_HANDLER( bit_reset_w )
 static READ32_HANDLER( offroadc_serial_status_r )
 {
 	int status = midway_serial_pic2_status_r();
-	return (input_port_read(machine, "991030")  & 0x7fff7fff) | (status << 31) | (status << 15);
+	return (input_port_read(space->machine, "991030")  & 0x7fff7fff) | (status << 31) | (status << 15);
 }
 
 
@@ -386,7 +386,7 @@ static READ32_HANDLER( offroadc_serial_data_r )
 
 static WRITE32_HANDLER( offroadc_serial_data_w )
 {
-	midway_serial_pic2_w(machine, data >> 16);
+	midway_serial_pic2_w(space, data >> 16);
 }
 
 
@@ -417,7 +417,7 @@ static READ32_HANDLER( midvplus_misc_r )
 	}
 
 	if (offset != 0 && offset != 3)
-		logerror("%06X:midvplus_misc_r(%d) = %08X\n", cpu_get_pc(machine->activecpu), offset, result);
+		logerror("%06X:midvplus_misc_r(%d) = %08X\n", cpu_get_pc(space->cpu), offset, result);
 	return result;
 }
 
@@ -435,7 +435,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
 			/* bit 0x10 resets watchdog */
 			if ((olddata ^ midvplus_misc[offset]) & 0x0010)
 			{
-				watchdog_reset_w(machine, 0, 0);
+				watchdog_reset_w(space, 0, 0);
 				logit = 0;
 			}
 			break;
@@ -446,7 +446,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
 	}
 
 	if (logit)
-		logerror("%06X:midvplus_misc_w(%d) = %08X\n", cpu_get_pc(machine->activecpu), offset, data);
+		logerror("%06X:midvplus_misc_w(%d) = %08X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -1517,7 +1517,7 @@ ROM_END
 static UINT32 *generic_speedup;
 static READ32_HANDLER( generic_speedup_r )
 {
-	cpu_eat_cycles(machine->activecpu, 100);
+	cpu_eat_cycles(space->cpu, 100);
 	return generic_speedup[offset];
 }
 

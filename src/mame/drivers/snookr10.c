@@ -399,7 +399,7 @@ static READ8_HANDLER( dsw_port_1_r )
     BIT 7 = Complement of DS1, bit 7
    ---------------------------------
 */
-return input_port_read(machine, "SW1");
+return input_port_read(space->machine, "SW1");
 }
 
 

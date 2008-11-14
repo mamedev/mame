@@ -25,19 +25,19 @@ READ8_HANDLER( copsnrob_gun_position_r )
     default:
     case 0x00:
         current_car_image = copsnrob_carimage[0];
-        keys = input_port_read(machine, "FAKE0");
+        keys = input_port_read(space->machine, "FAKE0");
         break;
     case 0x04:
         current_car_image = copsnrob_carimage[1];
-        keys = input_port_read(machine, "FAKE1");
+        keys = input_port_read(space->machine, "FAKE1");
         break;
     case 0x08:
         current_car_image = copsnrob_carimage[2];
-        keys = input_port_read(machine, "FAKE2");
+        keys = input_port_read(space->machine, "FAKE2");
         break;
     case 0x0c:
         current_car_image = copsnrob_carimage[3];
-        keys = input_port_read(machine, "FAKE3");
+        keys = input_port_read(space->machine, "FAKE3");
         break;
     }
 

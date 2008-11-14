@@ -240,13 +240,13 @@ INTERRUPT_GEN( atarigen_scanline_int_gen )
 WRITE16_HANDLER( atarigen_scanline_int_ack_w )
 {
 	atarigen_scanline_int_state = 0;
-	(*update_int_callback)(machine);
+	(*update_int_callback)(space->machine);
 }
 
 WRITE32_HANDLER( atarigen_scanline_int_ack32_w )
 {
 	atarigen_scanline_int_state = 0;
-	(*update_int_callback)(machine);
+	(*update_int_callback)(space->machine);
 }
 
 
@@ -270,13 +270,13 @@ INTERRUPT_GEN( atarigen_sound_int_gen )
 WRITE16_HANDLER( atarigen_sound_int_ack_w )
 {
 	atarigen_sound_int_state = 0;
-	(*update_int_callback)(machine);
+	(*update_int_callback)(space->machine);
 }
 
 WRITE32_HANDLER( atarigen_sound_int_ack32_w )
 {
 	atarigen_sound_int_state = 0;
-	(*update_int_callback)(machine);
+	(*update_int_callback)(space->machine);
 }
 
 
@@ -300,13 +300,13 @@ INTERRUPT_GEN( atarigen_video_int_gen )
 WRITE16_HANDLER( atarigen_video_int_ack_w )
 {
 	atarigen_video_int_state = 0;
-	(*update_int_callback)(machine);
+	(*update_int_callback)(space->machine);
 }
 
 WRITE32_HANDLER( atarigen_video_int_ack32_w )
 {
 	atarigen_video_int_state = 0;
-	(*update_int_callback)(machine);
+	(*update_int_callback)(space->machine);
 }
 
 
@@ -515,12 +515,12 @@ static OPBASE_HANDLER( atarigen_slapstic_setopbase )
 	address &= ~atarigen_slapstic_mirror;
 	if (address >= atarigen_slapstic_base && address < atarigen_slapstic_base + 0x8000)
 	{
-		offs_t pc = cpu_get_previouspc(machine->activecpu);
+		offs_t pc = cpu_get_previouspc(space->cpu);
 		if (pc != atarigen_slapstic_last_pc || address != atarigen_slapstic_last_address)
 		{
 			atarigen_slapstic_last_pc = pc;
 			atarigen_slapstic_last_address = address;
-			atarigen_slapstic_r(machine, (address >> 1) & 0x3fff, 0xffff);
+			atarigen_slapstic_r(space, (address >> 1) & 0x3fff, 0xffff);
 		}
 		return ~0;
 	}
@@ -588,7 +588,7 @@ void atarigen_slapstic_reset(void)
 
 WRITE16_HANDLER( atarigen_slapstic_w )
 {
-	update_bank(slapstic_tweak(machine, offset));
+	update_bank(slapstic_tweak(space->machine, offset));
 }
 
 
@@ -603,7 +603,7 @@ READ16_HANDLER( atarigen_slapstic_r )
 	int result = atarigen_slapstic[offset & 0xfff];
 
 	/* then determine the new one */
-	update_bank(slapstic_tweak(machine, offset));
+	update_bank(slapstic_tweak(space->machine, offset));
 	return result;
 }
 
@@ -651,14 +651,14 @@ INTERRUPT_GEN( atarigen_6502_irq_gen )
 READ8_HANDLER( atarigen_6502_irq_ack_r )
 {
 	timed_int = 0;
-	update_6502_irq(machine);
+	update_6502_irq(space->machine);
 	return 0;
 }
 
 WRITE8_HANDLER( atarigen_6502_irq_ack_w )
 {
 	timed_int = 0;
-	update_6502_irq(machine);
+	update_6502_irq(space->machine);
 }
 
 
@@ -732,21 +732,21 @@ WRITE32_HANDLER( atarigen_sound_upper32_w )
 READ16_HANDLER( atarigen_sound_r )
 {
 	atarigen_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(machine, 0, 0, 0xffff);
+	atarigen_sound_int_ack_w(space, 0, 0, 0xffff);
 	return atarigen_sound_to_cpu | 0xff00;
 }
 
 READ16_HANDLER( atarigen_sound_upper_r )
 {
 	atarigen_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(machine, 0, 0, 0xffff);
+	atarigen_sound_int_ack_w(space, 0, 0, 0xffff);
 	return (atarigen_sound_to_cpu << 8) | 0x00ff;
 }
 
 READ32_HANDLER( atarigen_sound_upper32_r )
 {
 	atarigen_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack32_w(machine, 0, 0, 0xffff);
+	atarigen_sound_int_ack32_w(space, 0, 0, 0xffff);
 	return (atarigen_sound_to_cpu << 24) | 0x00ffffff;
 }
 
@@ -770,7 +770,7 @@ WRITE8_HANDLER( atarigen_6502_sound_w )
 READ8_HANDLER( atarigen_6502_sound_r )
 {
 	atarigen_cpu_to_sound_ready = 0;
-	cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[sound_cpu_num], INPUT_LINE_NMI, CLEAR_LINE);
 	return atarigen_cpu_to_sound;
 }
 
@@ -798,6 +798,8 @@ static void update_6502_irq(running_machine *machine)
 
 static TIMER_CALLBACK( delayed_sound_reset )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[sound_cpu_num], ADDRESS_SPACE_PROGRAM);
+
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
 	{
@@ -807,7 +809,7 @@ static TIMER_CALLBACK( delayed_sound_reset )
 
 	/* reset the sound write state */
 	atarigen_sound_to_cpu_ready = 0;
-	atarigen_sound_int_ack_w(machine, 0, 0, 0xffff);
+	atarigen_sound_int_ack_w(space, 0, 0, 0xffff);
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
@@ -1236,7 +1238,8 @@ static void atarivc_common_w(const device_config *screen, offs_t offset, UINT16 
 
 		/* scanline IRQ ack here */
 		case 0x1e:
-			atarigen_scanline_int_ack_w(screen->machine, 0, 0, 0xffff);
+			/* hack: this should be a device */
+			atarigen_scanline_int_ack_w(cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, 0, 0xffff);
 			break;
 
 		/* log anything else */
@@ -1498,7 +1501,7 @@ WRITE16_HANDLER( atarigen_666_paletteram_w )
 	g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 	b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-	palette_set_color_rgb(machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb(space->machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 
@@ -1522,7 +1525,7 @@ WRITE16_HANDLER( atarigen_expanded_666_paletteram_w )
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-		palette_set_color_rgb(machine, palentry & 0x1ff, pal6bit(r), pal6bit(g), pal6bit(b));
+		palette_set_color_rgb(space->machine, palentry & 0x1ff, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 }
 
@@ -1545,7 +1548,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-		palette_set_color_rgb(machine, offset * 2, pal6bit(r), pal6bit(g), pal6bit(b));
+		palette_set_color_rgb(space->machine, offset * 2, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 
 	if (ACCESSING_BITS_0_15)
@@ -1556,7 +1559,7 @@ WRITE32_HANDLER( atarigen_666_paletteram32_w )
 		g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 1);
 		b = ((newword << 1) & 0x3e) | ((newword >> 15) & 1);
 
-		palette_set_color_rgb(machine, offset * 2 + 1, pal6bit(r), pal6bit(g), pal6bit(b));
+		palette_set_color_rgb(space->machine, offset * 2 + 1, pal6bit(r), pal6bit(g), pal6bit(b));
 	}
 }
 

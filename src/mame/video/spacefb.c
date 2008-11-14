@@ -29,14 +29,14 @@ static double color_weights_rg[3], color_weights_b[2];
 
 WRITE8_HANDLER( spacefb_port_0_w )
 {
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	port_0 = data;
 }
 
 
 WRITE8_HANDLER( spacefb_port_2_w )
 {
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	port_2 = data;
 }
 

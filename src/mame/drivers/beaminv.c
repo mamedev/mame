@@ -168,7 +168,7 @@ static VIDEO_UPDATE( beaminv )
 
 static READ8_HANDLER( v128_r )
 {
-	return (video_screen_get_vpos(machine->primary_screen) >> 7) & 0x01;
+	return (video_screen_get_vpos(space->machine->primary_screen) >> 7) & 0x01;
 }
 
 
@@ -192,7 +192,7 @@ static WRITE8_HANDLER( controller_select_w )
 
 static READ8_HANDLER( controller_r )
 {
-	return input_port_read(machine, (controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
+	return input_port_read(space->machine, (controller_select == 1) ? P1_CONTROL_PORT_TAG : P2_CONTROL_PORT_TAG);
 }
 
 

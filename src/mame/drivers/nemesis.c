@@ -79,8 +79,8 @@ static INTERRUPT_GEN( nemesis_interrupt )
 static WRITE16_HANDLER( salamand_soundlatch_word_w )
 {
 	if(ACCESSING_BITS_0_7) {
-		soundlatch_w(machine,offset,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,offset,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 	}
 }
 
@@ -194,8 +194,8 @@ static READ16_HANDLER( konamigt_input_word_r )
     bit 12-15: accel
 */
 
-	int data=input_port_read(machine, "IN3");
-	int data2=input_port_read(machine, "PADDLE");
+	int data=input_port_read(space->machine, "IN3");
+	int data2=input_port_read(space->machine, "PADDLE");
 
 	int ret=0x0000;
 
@@ -222,10 +222,10 @@ static READ16_HANDLER( selected_ip_r )
 {
 	switch (hcrash_selected_ip & 0xf)
 	{												// From WEC Le Mans Schems:
-		case 0xc:  return input_port_read(machine, "ACCEL");	// Accel - Schems: Accelevr
-		case 0:    return input_port_read(machine, "ACCEL");
-		case 0xd:  return input_port_read(machine, "WHEEL");	// Wheel - Schems: Handlevr
-		case 1:    return input_port_read(machine, "WHEEL");
+		case 0xc:  return input_port_read(space->machine, "ACCEL");	// Accel - Schems: Accelevr
+		case 0:    return input_port_read(space->machine, "ACCEL");
+		case 0xd:  return input_port_read(space->machine, "WHEEL");	// Wheel - Schems: Handlevr
+		case 1:    return input_port_read(space->machine, "WHEEL");
 
 		default: return ~0;
 	}
@@ -234,7 +234,7 @@ static READ16_HANDLER( selected_ip_r )
 static WRITE16_HANDLER( nemesis_soundlatch_word_w )
 {
 	if(ACCESSING_BITS_0_7) {
-		soundlatch_w(machine,offset,data & 0xff);
+		soundlatch_w(space,offset,data & 0xff);
 	}
 }
 
@@ -315,7 +315,7 @@ static READ8_HANDLER( nemesis_portA_r )
    bit 7:     unused by this software version. Bubble Memory version uses this bit.
 */
 
-	int res = (cpu_get_total_cycles(machine->activecpu) / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
+	int res = (cpu_get_total_cycles(space->cpu) / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
 
 	res |= 0xd0;
 

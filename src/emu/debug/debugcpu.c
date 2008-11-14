@@ -1688,7 +1688,7 @@ UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 
 	/* otherwise, call the byte reading function for the translated address */
 	else
-		result = (*active_address_space[spacenum].accessors->read_byte)(address);
+		result = (*active_address_space[spacenum]->accessors.read_byte)(address);
 
 	/* no longer accessing via the debugger */
 	memory_set_debugger_access(global.debugger_access = FALSE);
@@ -1711,7 +1711,7 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is misaligned read, or if there are no word readers, just read two bytes */
-	if ((address & 1) || !active_address_space[spacenum].accessors->read_word)
+	if ((address & 1) || !active_address_space[spacenum]->accessors.read_word)
 	{
 		UINT8 byte0 = debug_read_byte(spacenum, address + 0, apply_translation);
 		UINT8 byte1 = debug_read_byte(spacenum, address + 1, apply_translation);
@@ -1739,7 +1739,7 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			result = (*active_address_space[spacenum].accessors->read_word)(address);
+			result = (*active_address_space[spacenum]->accessors.read_word)(address);
 
 		/* no longer accessing via the debugger */
 		memory_set_debugger_access(global.debugger_access = FALSE);
@@ -1764,7 +1764,7 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is misaligned read, or if there are no dword readers, just read two words */
-	if ((address & 3) || !active_address_space[spacenum].accessors->read_dword)
+	if ((address & 3) || !active_address_space[spacenum]->accessors.read_dword)
 	{
 		UINT16 word0 = debug_read_word(spacenum, address + 0, apply_translation);
 		UINT16 word1 = debug_read_word(spacenum, address + 2, apply_translation);
@@ -1792,7 +1792,7 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			result = (*active_address_space[spacenum].accessors->read_dword)(address);
+			result = (*active_address_space[spacenum]->accessors.read_dword)(address);
 
 		/* no longer accessing via the debugger */
 		memory_set_debugger_access(global.debugger_access = FALSE);
@@ -1817,7 +1817,7 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is misaligned read, or if there are no qword readers, just read two dwords */
-	if ((address & 7) || !active_address_space[spacenum].accessors->read_qword)
+	if ((address & 7) || !active_address_space[spacenum]->accessors.read_qword)
 	{
 		UINT32 dword0 = debug_read_dword(spacenum, address + 0, apply_translation);
 		UINT32 dword1 = debug_read_dword(spacenum, address + 4, apply_translation);
@@ -1845,7 +1845,7 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			result = (*active_address_space[spacenum].accessors->read_qword)(address);
+			result = (*active_address_space[spacenum]->accessors.read_qword)(address);
 
 		/* no longer accessing via the debugger */
 		memory_set_debugger_access(global.debugger_access = FALSE);
@@ -1880,7 +1880,7 @@ void debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_transl
 
 	/* otherwise, call the byte reading function for the translated address */
 	else
-		(*active_address_space[spacenum].accessors->write_byte)(address, data);
+		(*active_address_space[spacenum]->accessors.write_byte)(address, data);
 
 	/* no longer accessing via the debugger */
 	memory_set_debugger_access(global.debugger_access = FALSE);
@@ -1901,7 +1901,7 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is a misaligned write, or if there are no word writers, just read two bytes */
-	if ((address & 1) || !active_address_space[spacenum].accessors->write_word)
+	if ((address & 1) || !active_address_space[spacenum]->accessors.write_word)
 	{
 		if (global.cpuinfo[cpunum_get_active()].endianness == CPU_IS_LE)
 		{
@@ -1931,7 +1931,7 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			(*active_address_space[spacenum].accessors->write_word)(address, data);
+			(*active_address_space[spacenum]->accessors.write_word)(address, data);
 
 		/* no longer accessing via the debugger */
 		memory_set_debugger_access(global.debugger_access = FALSE);
@@ -1953,7 +1953,7 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is a misaligned write, or if there are no dword writers, just read two words */
-	if ((address & 3) || !active_address_space[spacenum].accessors->write_dword)
+	if ((address & 3) || !active_address_space[spacenum]->accessors.write_dword)
 	{
 		if (global.cpuinfo[cpunum_get_active()].endianness == CPU_IS_LE)
 		{
@@ -1983,7 +1983,7 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			(*active_address_space[spacenum].accessors->write_dword)(address, data);
+			(*active_address_space[spacenum]->accessors.write_dword)(address, data);
 
 		/* no longer accessing via the debugger */
 		memory_set_debugger_access(global.debugger_access = FALSE);
@@ -2005,7 +2005,7 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is a misaligned write, or if there are no qword writers, just read two dwords */
-	if ((address & 7) || !active_address_space[spacenum].accessors->write_qword)
+	if ((address & 7) || !active_address_space[spacenum]->accessors.write_qword)
 	{
 		if (global.cpuinfo[cpunum_get_active()].endianness == CPU_IS_LE)
 		{
@@ -2034,7 +2034,7 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			(*active_address_space[spacenum].accessors->write_qword)(address, data);
+			(*active_address_space[spacenum]->accessors.write_qword)(address, data);
 
 		/* no longer accessing via the debugger */
 		memory_set_debugger_access(global.debugger_access = FALSE);

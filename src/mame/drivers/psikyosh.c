@@ -413,7 +413,7 @@ static READ32_HANDLER( psh_eeprom_r )
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		return input_port_read(machine, "JP4");
+		return input_port_read(space->machine, "JP4");
 	}
 
 	logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -432,7 +432,7 @@ static WRITE32_HANDLER( psikyosh_irqctrl_w )
 {
 	if (!(data & 0x00c00000))
 	{
-		cpu_set_input_line(machine->cpu[0], 4, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 4, CLEAR_LINE);
 	}
 }
 
@@ -445,7 +445,7 @@ static WRITE32_HANDLER( paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_w )
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 	r = ((paletteram32[offset] & 0xff000000) >>24);
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static WRITE32_HANDLER( psikyosh_vidregs_w )
@@ -457,7 +457,7 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
-			UINT8 *ROM = memory_region(machine, "gfx1");
+			UINT8 *ROM = memory_region(space->machine, "gfx1");
 			memory_set_bankptr(2,&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
 		}
 	}
@@ -469,7 +469,7 @@ static UINT32 sample_offs = 0;
 
 static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 {
-	UINT8 *ROM = memory_region(machine, "ymf");
+	UINT8 *ROM = memory_region(space->machine, "ymf");
 
 	return ROM[sample_offs++]<<16;
 }
@@ -477,29 +477,29 @@ static READ32_HANDLER( psh_sample_r ) /* Send sample data for test */
 
 static READ32_HANDLER( psh_ymf_fm_r )
 {
-	return ymf278b_status_port_0_r(machine,0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
+	return ymf278b_status_port_0_r(space,0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
 }
 
 static WRITE32_HANDLER( psh_ymf_fm_w )
 {
 	if (ACCESSING_BITS_24_31)	// FM bank 1 address (OPL2/OPL3 compatible)
 	{
-		ymf278b_control_port_0_a_w(machine, 0, data>>24);
+		ymf278b_control_port_0_a_w(space, 0, data>>24);
 	}
 
 	if (ACCESSING_BITS_16_23)	// FM bank 1 data
 	{
-		ymf278b_data_port_0_a_w(machine, 0, data>>16);
+		ymf278b_data_port_0_a_w(space, 0, data>>16);
 	}
 
 	if (ACCESSING_BITS_8_15)	// FM bank 2 address (OPL3/YMF 262 extended)
 	{
-		ymf278b_control_port_0_b_w(machine, 0, data>>8);
+		ymf278b_control_port_0_b_w(space, 0, data>>8);
 	}
 
 	if (ACCESSING_BITS_0_7)	// FM bank 2 data
 	{
-		ymf278b_data_port_0_b_w(machine, 0, data);
+		ymf278b_data_port_0_b_w(space, 0, data);
 	}
 }
 
@@ -507,7 +507,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 {
 	if (ACCESSING_BITS_24_31)	// PCM address (OPL4/YMF 278B extended)
 	{
-		ymf278b_control_port_0_c_w(machine, 0, data>>24);
+		ymf278b_control_port_0_c_w(space, 0, data>>24);
 
 #if ROMTEST
 		if (data>>24 == 0x06)	// Reset Sample reading (They always write this code immediately before reading data)
@@ -519,7 +519,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 
 	if (ACCESSING_BITS_16_23)	// PCM data
 	{
-		ymf278b_data_port_0_c_w(machine, 0, data>>16);
+		ymf278b_data_port_0_c_w(space, 0, data>>16);
 	}
 }
 

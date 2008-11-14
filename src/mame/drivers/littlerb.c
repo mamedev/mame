@@ -174,7 +174,7 @@ static WRITE16_HANDLER( littlerb_vdp_w )
 
 
 		case 2:
-		littlerb_data_write(machine, data);
+		littlerb_data_write(space->machine, data);
 		break;
 
 		case 3:

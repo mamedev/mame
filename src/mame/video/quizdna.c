@@ -72,7 +72,7 @@ VIDEO_START( quizdna )
 
 WRITE8_HANDLER( quizdna_bg_ram_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	quizdna_bg_ram[offset] = data;
 	RAM[0x12000+offset] = data;
 
@@ -83,7 +83,7 @@ WRITE8_HANDLER( quizdna_fg_ram_w )
 {
 	int i;
 	int offs = offset & 0xfff;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	RAM[0x10000+offs] = data;
 	RAM[0x11000+offs] = data; /* mirror */
@@ -137,7 +137,7 @@ WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w )
 	g = ((d0 >> 3) & 0x1e) | ((d1 >> 5) & 1);
 	b = ((d0 << 1) & 0x1e) | ((d1 >> 6) & 1);
 
-	palette_set_color_rgb(machine,offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(space->machine,offs/2,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

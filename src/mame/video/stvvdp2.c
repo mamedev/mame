@@ -5158,7 +5158,7 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00ff0000) >> 16);
 			g = ((stv_vdp2_cram[offset] & 0x0000ff00) >> 8);
 			r = ((stv_vdp2_cram[offset] & 0x000000ff) >> 0);
-			palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+			palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 		}
 		break;
 		/*Mode 0*/
@@ -5169,11 +5169,11 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((stv_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((stv_vdp2_cram[offset] & 0x0000001f) >> 0);
-			palette_set_color_rgb(machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space->machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			b = ((stv_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((stv_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((stv_vdp2_cram[offset] & 0x001f0000) >> 16);
-			palette_set_color_rgb(machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 		/*Mode 1*/
@@ -5184,11 +5184,11 @@ WRITE32_HANDLER ( stv_vdp2_cram_w )
 			b = ((stv_vdp2_cram[offset] & 0x00007c00) >> 10);
 			g = ((stv_vdp2_cram[offset] & 0x000003e0) >> 5);
 			r = ((stv_vdp2_cram[offset] & 0x0000001f) >> 0);
-			palette_set_color_rgb(machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space->machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
 			b = ((stv_vdp2_cram[offset] & 0x7c000000) >> 26);
 			g = ((stv_vdp2_cram[offset] & 0x03e00000) >> 21);
 			r = ((stv_vdp2_cram[offset] & 0x001f0000) >> 16);
-			palette_set_color_rgb(machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+			palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
 		}
 		break;
 	}
@@ -5260,7 +5260,7 @@ WRITE32_HANDLER ( stv_vdp2_regs_w )
 	if(old_crmd != STV_VDP2_CRMD)
 	{
 		old_crmd = STV_VDP2_CRMD;
-		refresh_palette_data(machine);
+		refresh_palette_data(space->machine);
 	}
 }
 
@@ -5310,9 +5310,9 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 			//popmessage("%d %d",cur_h,cur_v);
 
 			//if (cur_h > visarea.max_x)
-			stv_hblank = get_hblank(machine);
+			stv_hblank = get_hblank(space->machine);
 			//if (cur_v > visarea.max_y)
-			stv_vblank = get_vblank(machine);
+			stv_vblank = get_vblank(space->machine);
 			/*ODD bit*/
 
 								   /*VBLANK              HBLANK            ODD         PAL    */
@@ -5322,8 +5322,8 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 		case 0x8/4:
 		/*H/V Counter Register*/
 								     /*H-Counter                               V-Counter                                         */
-			stv_vdp2_regs[offset] = (((video_screen_get_visible_area(machine->primary_screen)->max_x - 1)<<16)&0x3ff0000)|(((video_screen_get_visible_area(machine->primary_screen)->max_y - 1)<<0)& ((STV_VDP2_LSMD == 3) ? 0x7ff : 0x3ff));
-			if(LOG_VDP2) logerror("CPU #%d PC(%08x) = VDP2: H/V counter read : %08x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),stv_vdp2_regs[offset]);
+			stv_vdp2_regs[offset] = (((video_screen_get_visible_area(space->machine->primary_screen)->max_x - 1)<<16)&0x3ff0000)|(((video_screen_get_visible_area(space->machine->primary_screen)->max_y - 1)<<0)& ((STV_VDP2_LSMD == 3) ? 0x7ff : 0x3ff));
+			if(LOG_VDP2) logerror("CPU #%d PC(%08x) = VDP2: H/V counter read : %08x\n",cpunum_get_active(),cpu_get_pc(space->cpu),stv_vdp2_regs[offset]);
 			stv_vdp2_regs[offset] = 0;
 		break;
 	}

@@ -113,7 +113,7 @@ static READ16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r )
 static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w )
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	paletteram16_xxxxBBBBGGGGRRRR_word_w (machine, offset, data, mem_mask);
+	paletteram16_xxxxBBBBGGGGRRRR_word_w (space->machine, offset, data, mem_mask);
 }
 
 /*- Priority Control -*/
@@ -153,8 +153,8 @@ static WRITE8_HANDLER( oki_bankswitch_w )
 
 static WRITE16_HANDLER ( wwfwfest_soundwrite )
 {
-	soundlatch_w(machine,1,data & 0xff);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w(space,1,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 /*******************************************************************************

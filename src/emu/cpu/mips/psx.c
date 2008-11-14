@@ -2875,7 +2875,7 @@ static WRITE32_HANDLER( psx_biu_w )
 
 	if( ( old & ( BIU_RAM | BIU_DS ) ) != ( mipscpu.biu & ( BIU_RAM | BIU_DS ) ) )
 	{
-		mips_update_scratchpad(machine);
+		mips_update_scratchpad(space->machine);
 	}
 }
 

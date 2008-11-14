@@ -280,7 +280,7 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		case 0x22/2:		/* scanline interrupt */
-			update_scanline_irq(machine);
+			update_scanline_irq(space->machine);
 			break;
 
 		case 0x24/2:		/* writes here after writing to 0x28 */
@@ -292,15 +292,15 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 			break;
 
 		case 0x38/2:		/* blit */
-			do_blit(machine);
+			do_blit(space->machine);
 			break;
 
 		case 0x3e/2:		/* clear */
-			do_clear(machine);
+			do_clear(space->machine);
 			break;
 
 		default:
-			logerror("%06X:write to %06X = %04X & %04x\n", cpu_get_pc(machine->activecpu), 0x2a0000 + 2 * offset, data, mem_mask);
+			logerror("%06X:write to %06X = %04X & %04x\n", cpu_get_pc(space->cpu), 0x2a0000 + 2 * offset, data, mem_mask);
 			break;
 	}
 }
@@ -309,7 +309,7 @@ WRITE16_HANDLER( madmax_blitter_vidparam_w )
 WRITE16_HANDLER( madmax_blitter_unknown_w )
 {
 	/* written to just before the blitter command register is written */
-  logerror("%06X:write to %06X = %04X & %04X\n", cpu_get_pc(machine->activecpu), 0x300000 + 2 * offset, data, mem_mask);
+  logerror("%06X:write to %06X = %04X & %04X\n", cpu_get_pc(space->cpu), 0x300000 + 2 * offset, data, mem_mask);
 }
 
 
@@ -317,15 +317,15 @@ READ16_HANDLER( madmax_blitter_vidparam_r )
 {
 	/* analog inputs seem to be hooked up here -- might not actually map to blitter */
 	if (offset == 0x02/2)
-		return input_port_read(machine, "2a0002");
+		return input_port_read(space->machine, "2a0002");
 	if (offset == 0x0e/2)
-		return input_port_read(machine, "2a000e");
+		return input_port_read(space->machine, "2a000e");
 
 	/* early code polls on this bit, wants it to be 0 */
 	if (offset == 0x36/2)
 		return 0xffff ^ (1 << 5);
 
 	/* log everything else */
-	logerror("%06X:read from %06X\n", cpu_get_pc(machine->activecpu), 0x2a0000 + 2 * offset);
+	logerror("%06X:read from %06X\n", cpu_get_pc(space->cpu), 0x2a0000 + 2 * offset);
 	return 0xffff;
 }

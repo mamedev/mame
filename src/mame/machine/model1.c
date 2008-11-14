@@ -2078,7 +2078,7 @@ READ16_HANDLER( model1_tgp_vr_adr_r )
 	if ( ram_adr == 0 && copro_fifoin_num != 0 )
 	{
 		/* spin the main cpu and let the TGP catch up */
-		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(100));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));
 	}
 
 	return ram_adr;
@@ -2104,7 +2104,7 @@ READ16_HANDLER( model1_vr_tgp_ram_r )
 		if ( ram_adr == 0 && r == 0xffff )
 		{
 			/* if the TGP is busy, spin some more */
-			cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(100));
+			cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));
 		}
 
 		if ( ram_adr & 0x8000 )

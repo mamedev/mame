@@ -140,12 +140,12 @@ static WRITE32_HANDLER( gstream_palette_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 
-	palette_set_color_rgb(machine,offset*2,pal5bit(paletteram32[offset] >> (0+16)),
+	palette_set_color_rgb(space->machine,offset*2,pal5bit(paletteram32[offset] >> (0+16)),
 		                             pal5bit(paletteram32[offset] >> (6+16)),
 									 pal5bit(paletteram32[offset] >> (11+16)));
 
 
-	palette_set_color_rgb(machine,offset*2+1,pal5bit(paletteram32[offset] >> (0)),
+	palette_set_color_rgb(space->machine,offset*2+1,pal5bit(paletteram32[offset] >> (0)),
 		                             pal5bit(paletteram32[offset] >> (6)),
 									 pal5bit(paletteram32[offset] >> (11)));
 }
@@ -194,10 +194,10 @@ static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
-static READ32_HANDLER( gstream_oki_0_r ) { return okim6295_status_0_r(machine, 0); }
-static READ32_HANDLER( gstream_oki_1_r ) { return okim6295_status_1_r(machine, 0); }
-static WRITE32_HANDLER( gstream_oki_0_w ) { okim6295_data_0_w(machine, 0, data & 0xff); }
-static WRITE32_HANDLER( gstream_oki_1_w ) { okim6295_data_1_w(machine, 0, data & 0xff); }
+static READ32_HANDLER( gstream_oki_0_r ) { return okim6295_status_0_r(space, 0); }
+static READ32_HANDLER( gstream_oki_1_r ) { return okim6295_status_1_r(space, 0); }
+static WRITE32_HANDLER( gstream_oki_0_w ) { okim6295_data_0_w(space, 0, data & 0xff); }
+static WRITE32_HANDLER( gstream_oki_1_w ) { okim6295_data_1_w(space, 0, data & 0xff); }
 
 static WRITE32_HANDLER( gstream_oki_4030_w )
 {
@@ -478,9 +478,9 @@ ROM_END
 
 static READ32_HANDLER( gstream_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0xc0001592)
+	if (cpu_get_pc(space->cpu)==0xc0001592)
 	{
-		cpu_eat_cycles(machine->activecpu, 50);
+		cpu_eat_cycles(space->cpu, 50);
 	}
 
 	return gstream_workram[0xd1ee0/4];

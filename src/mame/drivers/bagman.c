@@ -154,7 +154,7 @@ static READ8_HANDLER( bagman_ls259_r )
 
 static WRITE8_HANDLER( bagman_ls259_w )
 {
-	bagman_pal16r6_w(machine,offset,data); /*this is just a simulation*/
+	bagman_pal16r6_w(space,offset,data); /*this is just a simulation*/
 
 	if (ls259_buf[offset] != (data&1) )
 	{
@@ -164,11 +164,11 @@ static WRITE8_HANDLER( bagman_ls259_w )
 		{
 			if (ls259_buf[3] == 0)	/* 1->0 transition */
 			{
-				reset_talking(machine);
+				reset_talking(space->machine);
 			}
 			else
 			{
-				start_talking(machine);	/* 0->1 transition */
+				start_talking(space->machine);	/* 0->1 transition */
 			}
 		}
 	}

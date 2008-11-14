@@ -93,13 +93,13 @@ static MACHINE_RESET( artmagic )
 
 static READ16_HANDLER( tms_host_r )
 {
-	return tms34010_host_r(machine->cpu[1], offset);
+	return tms34010_host_r(space->machine->cpu[1], offset);
 }
 
 
 static WRITE16_HANDLER( tms_host_w )
 {
-	tms34010_host_w(machine->cpu[1], offset, data);
+	tms34010_host_w(space->machine->cpu[1], offset, data);
 }
 
 
@@ -116,9 +116,9 @@ static WRITE16_HANDLER( control_w )
 
 	/* OKI banking here */
 	if (offset == 0)
-		okim6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(machine, "oki"));
+		okim6295_set_bank_base(0, (((data >> 4) & 1) * 0x40000) % memory_region_length(space->machine, "oki"));
 
-	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(machine->activecpu), offset, data);
+	logerror("%06X:control_w(%d) = %04X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -138,13 +138,13 @@ static TIMER_CALLBACK( irq_off )
 static READ16_HANDLER( ultennis_hack_r )
 {
 	/* IRQ5 points to: jsr (a5); rte */
-	if (cpu_get_pc(machine->activecpu) == 0x18c2)
+	if (cpu_get_pc(space->cpu) == 0x18c2)
 	{
 		hack_irq = 1;
-		update_irq_state(machine);
+		update_irq_state(space->machine);
 		timer_set(ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
 	}
-	return input_port_read(machine, "300000");
+	return input_port_read(space->machine, "300000");
 }
 
 
@@ -397,7 +397,7 @@ static WRITE16_HANDLER( protection_bit_w )
 		prot_bit_index = 0;
 
 		/* update the protection state */
-		(*protection_handler)(machine);
+		(*protection_handler)(space->machine);
 	}
 }
 

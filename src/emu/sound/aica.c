@@ -718,6 +718,8 @@ static void AICA_UpdateSlotReg(struct _AICA *AICA,int s,int r)
 
 static void AICA_UpdateReg(struct _AICA *AICA, int reg)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(reg&0xff)
 	{
 		case 0x4:
@@ -737,7 +739,7 @@ static void AICA_UpdateReg(struct _AICA *AICA, int reg)
 			break;
 		case 0x8:
 		case 0x9:
-			aica_midi_in(Machine, 0, AICA->udata.data[0x8/2]&0xff, 0);
+			aica_midi_in(space, 0, AICA->udata.data[0x8/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:

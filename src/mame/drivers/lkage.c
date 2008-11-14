@@ -95,7 +95,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( lkage_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
+	soundlatch_w(space,offset,data);
 	timer_call_after_resynch(NULL, data,nmi_callback);
 }
 
@@ -109,7 +109,7 @@ static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 	sound_nmi_enable = 1;
 	if (pending_nmi)
 	{ /* probably wrong but commands may go lost otherwise */
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 		pending_nmi = 0;
 	}
 }
@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( port_fetch_r )
 {
-	return memory_region(machine, "user1")[offset];
+	return memory_region(space->machine, "user1")[offset];
 }
 
 static ADDRESS_MAP_START( readport, ADDRESS_SPACE_IO, 8 )

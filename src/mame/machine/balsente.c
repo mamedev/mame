@@ -312,7 +312,7 @@ READ8_HANDLER( balsente_random_num_r )
 	UINT32 cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
-	cc = cpu_get_total_cycles(machine->activecpu);
+	cc = cpu_get_total_cycles(space->cpu);
 
 	/* 12.5 = 8 + 4 + 0.5 */
 	cc = (cc << 3) + (cc << 2) + (cc >> 1);
@@ -341,7 +341,7 @@ WRITE8_HANDLER( balsente_rombank2_select_w )
 	int bank = data & 7;
 
 	/* top bit controls which half of the ROMs to use (Name that Tune only) */
-	if (memory_region_length(machine, "main") > 0x40000) bank |= (data >> 4) & 8;
+	if (memory_region_length(space->machine, "main") > 0x40000) bank |= (data >> 4) & 8;
 
 	/* when they set the AB bank, it appears as though the CD bank is reset */
 	if (data & 0x20)
@@ -500,7 +500,7 @@ READ8_HANDLER( balsente_m6850_r )
 
 		/* clear the overrun and receive buffer full bits */
 		m6850_status &= ~0x21;
-		m6850_update_io(machine);
+		m6850_update_io(space->machine);
 	}
 
 	return result;
@@ -536,7 +536,7 @@ WRITE8_HANDLER( balsente_m6850_w )
 		m6850_control = data;
 
 		/* re-update since interrupt enables could have been modified */
-		m6850_update_io(machine);
+		m6850_update_io(space->machine);
 	}
 
 	/* output register is at offset 1; set a timer to synchronize the CPUs */
@@ -569,7 +569,7 @@ READ8_HANDLER( balsente_m6850_sound_r )
 
 		/* clear the overrun and receive buffer full bits */
 		m6850_sound_status &= ~0x21;
-		m6850_update_io(machine);
+		m6850_update_io(space->machine);
 	}
 
 	return result;
@@ -590,7 +590,7 @@ WRITE8_HANDLER( balsente_m6850_sound_w )
 	}
 
 	/* re-update since interrupt enables could have been modified */
-	m6850_update_io(machine);
+	m6850_update_io(space->machine);
 }
 
 
@@ -839,7 +839,7 @@ WRITE8_HANDLER( balsente_counter_8253_w )
 
 			/* if the counter is in mode 0, a write here will reset the OUT state */
 			if (counter[which].mode == 0)
-				counter_set_out(machine, which, 0);
+				counter_set_out(space->machine, which, 0);
 
 			/* write the LSB */
 			if (counter[which].writebyte == 0)
@@ -868,7 +868,7 @@ WRITE8_HANDLER( balsente_counter_8253_w )
 
 				/* if the counter is in mode 1, a write here will set the OUT state */
 				if (counter[which].mode == 1)
-					counter_set_out(machine, which, 1);
+					counter_set_out(space->machine, which, 1);
 			}
 			break;
 
@@ -879,14 +879,14 @@ WRITE8_HANDLER( balsente_counter_8253_w )
 
 			/* if the counter was in mode 0, a write here will reset the OUT state */
 			if (((counter[which].mode >> 1) & 7) == 0)
-				counter_set_out(machine, which, 0);
+				counter_set_out(space->machine, which, 0);
 
 			/* set the mode */
 			counter[which].mode = (data >> 1) & 7;
 
 			/* if the counter is in mode 0, a write here will reset the OUT state */
 			if (counter[which].mode == 0)
-				counter_set_out(machine, which, 0);
+				counter_set_out(space->machine, which, 0);
 			break;
 	}
 }
@@ -1011,14 +1011,14 @@ WRITE8_HANDLER( balsente_counter_control_w )
 	}
 
 	/* set the actual gate afterwards, since we need to know the old value above */
-	counter_set_gate(machine, 0, (data >> 1) & 1);
+	counter_set_gate(space->machine, 0, (data >> 1) & 1);
 
 	/* bits D2 and D4 control the clear/reset flags on the flip-flop that feeds counter 0 */
-	if (!(data & 0x04)) set_counter_0_ff(machine, 1);
-	if (!(data & 0x10)) set_counter_0_ff(machine, 0);
+	if (!(data & 0x04)) set_counter_0_ff(space->machine, 1);
+	if (!(data & 0x10)) set_counter_0_ff(space->machine, 0);
 
 	/* bit 5 clears the NMI interrupt; recompute the I/O state now */
-	m6850_update_io(machine);
+	m6850_update_io(space->machine);
 }
 
 
@@ -1077,7 +1077,7 @@ WRITE8_HANDLER( balsente_chip_select_w )
 					"PULSE_WIDTH",
 					"WAVE_SELECT"
 				};
-				logerror("s%04X:   CEM#%d:%s=%f\n", cpu_get_previouspc(machine->activecpu), i, names[dac_register], voltage);
+				logerror("s%04X:   CEM#%d:%s=%f\n", cpu_get_previouspc(space->cpu), i, names[dac_register], voltage);
 			}
 #endif
 		}
@@ -1101,8 +1101,8 @@ WRITE8_HANDLER( balsente_dac_data_w )
 	if ((chip_select & 0x3f) != 0x3f)
 	{
 		UINT8 temp = chip_select;
-		balsente_chip_select_w(machine, 0, 0x3f);
-		balsente_chip_select_w(machine, 0, temp);
+		balsente_chip_select_w(space, 0, 0x3f);
+		balsente_chip_select_w(space, 0, temp);
 	}
 }
 
@@ -1204,7 +1204,7 @@ static void update_grudge_steering(running_machine *machine)
 
 READ8_HANDLER( grudge_steering_r )
 {
-	logerror("%04X:grudge_steering_r(@%d)\n", cpu_get_pc(machine->activecpu), video_screen_get_vpos(machine->primary_screen));
+	logerror("%04X:grudge_steering_r(@%d)\n", cpu_get_pc(space->cpu), video_screen_get_vpos(space->machine->primary_screen));
 	grudge_steering_result |= 0x80;
 	return grudge_steering_result;
 }

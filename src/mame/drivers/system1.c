@@ -54,71 +54,71 @@ static int inport16_step,inport17_step,inport23_step;
 
 static READ8_HANDLER( inport16_r )
 {
-//  logerror("IN  $16 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),inport16_step);
+//  logerror("IN  $16 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),inport16_step);
 	return(inport16_step);
 }
 
 static READ8_HANDLER( inport1c_r )
 {
-//  logerror("IN  $1c : pc = %04x - data = 0x80\n",cpu_get_pc(machine->activecpu));
+//  logerror("IN  $1c : pc = %04x - data = 0x80\n",cpu_get_pc(space->cpu));
 	return(0x80);	// infinite loop (at 0x0fb3) until bit 7 is set
 }
 
 static READ8_HANDLER( inport22_r )
 {
-//  logerror("IN  $22 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),inport17_step);
+//  logerror("IN  $22 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),inport17_step);
 	return(inport17_step);
 }
 
 static READ8_HANDLER( inport23_r )
 {
-//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(machine->activecpu),inport23_step);
+//  logerror("IN  $23 : pc = %04x - step = %02x\n",cpu_get_pc(space->cpu),inport23_step);
 	return(inport23_step);
 }
 
 static WRITE8_HANDLER( outport16_w )
 {
-//  logerror("OUT $16 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),data);
+//  logerror("OUT $16 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
 	inport16_step = data;
 }
 
 static WRITE8_HANDLER( outport17_w )
 {
-//  logerror("OUT $17 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),data);
+//  logerror("OUT $17 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
 	inport17_step = data;
 }
 
 static WRITE8_HANDLER( outport24_w )
 {
-//  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(machine->activecpu),data);
+//  logerror("OUT $24 : pc = %04x - data = %02x\n",cpu_get_pc(space->cpu),data);
 	inport23_step = data;
 }
 
 static WRITE8_HANDLER( hvymetal_videomode_w )
 {
 	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
-	system1_videomode_w(machine, 0, data);
+	system1_videomode_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( brain_videomode_w )
 {
 	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
-	system1_videomode_w(machine, 0, data);
+	system1_videomode_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( chplft_videomode_w )
 {
 	memory_set_bank(1, (data & 0x0c)>>2);
-	system1_videomode_w(machine, 0, data);
+	system1_videomode_w(space, 0, data);
 }
 
 
 static WRITE8_HANDLER( system1_soundport_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	/* spin for a while to let the Z80 read the command (fixes hanging sound in Regulus) */
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(50));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
 }
 
 /* protection values from real hardware, these were verified to be the same on the title
@@ -3988,7 +3988,7 @@ static READ8_HANDLER( dakkochn_port_04_r )
 static WRITE8_HANDLER( dakkochn_port_15_w )
 {
 	dakkochn_control = data; // check if any control multiplex bits are in here!
-	chplft_videomode_w(machine,offset,data);
+	chplft_videomode_w(space,offset,data);
 }
 
 static DRIVER_INIT( dakkochn )

@@ -196,7 +196,7 @@ WRITE16_HANDLER( asic65_data_w )
 	if (asic65.type == ASIC65_ROMBASED)
 	{
 		timer_call_after_resynch(NULL, data | (offset << 16), m68k_asic65_deferred_w);
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
 		return;
 	}
 
@@ -215,7 +215,7 @@ WRITE16_HANDLER( asic65_data_w )
 	else
 	{
 		int command = (data < MAX_COMMANDS) ? command_map[asic65.type][data] : OP_UNKNOWN;
-		if (asic65.log) fprintf(asic65.log, "\n(%06X)%c%04X:", cpu_get_previouspc(machine->activecpu), (command == OP_UNKNOWN) ? '*' : ' ', data);
+		if (asic65.log) fprintf(asic65.log, "\n(%06X)%c%04X:", cpu_get_previouspc(space->cpu), (command == OP_UNKNOWN) ? '*' : ' ', data);
 
 		/* set the command number and reset the parameter/result indices */
 		asic65.command = data;
@@ -234,7 +234,7 @@ READ16_HANDLER( asic65_r )
 	if (asic65.type == ASIC65_ROMBASED)
 	{
 		asic65._68full = 0;
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(5));
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(5));
 		return asic65._68data;
 	}
 
@@ -452,7 +452,7 @@ READ16_HANDLER( asic65_io_r )
 		/* bit 14 = 68FULL */
 		/* bit 13 = XFLG */
 		/* bit 12 = controlled by jumper */
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(5));
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(5));
 		return (asic65.tfull << 15) | (asic65._68full << 14) | (asic65.xflg << 13) | 0x0000;
 	}
 	else
@@ -480,7 +480,7 @@ static WRITE16_HANDLER( asic65_68k_w )
 static READ16_HANDLER( asic65_68k_r )
 {
 	asic65.tfull = 0;
-	cpu_set_input_line(machine->cpu[asic65.cpunum], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[asic65.cpunum], 0, CLEAR_LINE);
 	return asic65.tdata;
 }
 
@@ -504,7 +504,7 @@ static READ16_HANDLER( asic65_stat_r )
 static READ16_HANDLER( asci65_get_bio )
 {
 	if (!asic65.tfull)
-		cpu_spinuntil_int(machine->activecpu);
+		cpu_spinuntil_int(space->cpu);
 	return asic65.tfull ? CLEAR_LINE : ASSERT_LINE;
 }
 

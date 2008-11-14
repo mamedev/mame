@@ -70,23 +70,23 @@ static UINT32 ts;
 /* Main CPU and Z80 synchronisation */
 static WRITE16_HANDLER( z80_busreq_w )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( resume_math_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_TEST, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_TEST, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( halt_math_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_TEST, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_TEST, CLEAR_LINE);
 }
 
 /* Z80 can trigger its own interrupts */
 static WRITE8_HANDLER( z80_intreq_w )
 {
-	cpu_set_input_line(machine->cpu[2], 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE);
 }
 
 /* Periodic Z80 interrupt */
@@ -99,7 +99,7 @@ static READ16_HANDLER( z80_shared_r )
 {
 	UINT16	result = 0xffff;
 
-	cpu_push_context(machine->cpu[2]);
+	cpu_push_context(space->machine->cpu[2]);
 	result = program_read_byte(offset);
 	cpu_pop_context();
 
@@ -108,7 +108,7 @@ static READ16_HANDLER( z80_shared_r )
 
 static WRITE16_HANDLER( z80_shared_w )
 {
-	cpu_push_context(machine->cpu[2]);
+	cpu_push_context(space->machine->cpu[2]);
 	program_write_byte(offset, data & 0xff);
 	cpu_pop_context();
 }
@@ -395,7 +395,7 @@ INPUT_PORTS_END
 
 static READ16_HANDLER( dipswitches_r )
 {
-	return (input_port_read(machine, "DSW") & 0xfffe) | ts;
+	return (input_port_read(space->machine, "DSW") & 0xfffe) | ts;
 }
 
 /*
@@ -422,8 +422,8 @@ static WRITE8_DEVICE_HANDLER( tx1_coin_cnt )
 
 static WRITE8_HANDLER( tx1_ppi_latch_w )
 {
-	tx1_ppi_latch_a = ((input_port_read(machine, "AN_BRAKE") & 0xf) << 4) | (input_port_read(machine, "AN_ACCELERATOR") & 0xf);
-	tx1_ppi_latch_b = input_port_read(machine, "AN_STEERING");
+	tx1_ppi_latch_a = ((input_port_read(space->machine, "AN_BRAKE") & 0xf) << 4) | (input_port_read(space->machine, "AN_ACCELERATOR") & 0xf);
+	tx1_ppi_latch_b = input_port_read(space->machine, "AN_STEERING");
 }
 
 static READ8_DEVICE_HANDLER( tx1_ppi_porta_r )
@@ -440,17 +440,17 @@ static READ8_DEVICE_HANDLER( tx1_ppi_portb_r )
 static READ8_HANDLER( bb_analog_r )
 {
 	if ( offset == 1 )
-		return ((input_port_read(machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine, "AN_STEERING");
+		return ((input_port_read(space->machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(space->machine, "AN_STEERING");
 	else
-		return (input_port_read(machine, "AN_BRAKE") & 0xf) << 4;
+		return (input_port_read(space->machine, "AN_BRAKE") & 0xf) << 4;
 }
 
 static READ8_HANDLER( bbjr_analog_r )
 {
 	if ( offset == 0 )
-		return ((input_port_read(machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(machine, "AN_STEERING");
+		return ((input_port_read(space->machine, "AN_ACCELERATOR") & 0xf) << 4) | input_port_read(space->machine, "AN_STEERING");
 	else
-		return (input_port_read(machine, "AN_BRAKE") & 0xf) << 4;
+		return (input_port_read(space->machine, "AN_BRAKE") & 0xf) << 4;
 }
 
 

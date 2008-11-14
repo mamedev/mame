@@ -1221,7 +1221,7 @@ WRITE16_HANDLER( ygv608_w )
 			if (++p3_state == 3)
 			{
 				p3_state = 0;
-				palette_set_color_rgb(machine,ygv608.regs.s.cc,
+				palette_set_color_rgb(space->machine,ygv608.regs.s.cc,
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][0]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][1]),
 			    	pal6bit(ygv608.colour_palette[ygv608.regs.s.cc][2]) );

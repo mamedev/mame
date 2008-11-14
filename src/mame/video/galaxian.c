@@ -544,7 +544,7 @@ static TILE_GET_INFO( bg_get_tile_info )
 WRITE8_HANDLER( galaxian_videoram_w )
 {
 	/* update any video up to the current scanline */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 
 	/* store the data and mark the corresponding tile dirty */
 	videoram[offset] = data;
@@ -555,7 +555,7 @@ WRITE8_HANDLER( galaxian_videoram_w )
 WRITE8_HANDLER( galaxian_objram_w )
 {
 	/* update any video up to the current scanline */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 
 	/* store the data */
 	spriteram[offset] = data;
@@ -705,12 +705,12 @@ WRITE8_HANDLER( galaxian_flip_screen_x_w )
 {
 	if (flipscreen_x != (data & 0x01))
 	{
-		video_screen_update_now(machine->primary_screen);
+		video_screen_update_now(space->machine->primary_screen);
 
 		/* when the direction changes, we count a different number of clocks */
 		/* per frame, so we need to reset the origin of the stars to the current */
 		/* frame before we flip */
-		stars_update_origin(machine);
+		stars_update_origin(space->machine);
 
 		flipscreen_x = data & 0x01;
 		tilemap_set_flip(bg_tilemap, (flipscreen_x ? TILEMAP_FLIPX : 0) | (flipscreen_y ? TILEMAP_FLIPY : 0));
@@ -721,7 +721,7 @@ WRITE8_HANDLER( galaxian_flip_screen_y_w )
 {
 	if (flipscreen_y != (data & 0x01))
 	{
-		video_screen_update_now(machine->primary_screen);
+		video_screen_update_now(space->machine->primary_screen);
 		flipscreen_y = data & 0x01;
 		tilemap_set_flip(bg_tilemap, (flipscreen_x ? TILEMAP_FLIPX : 0) | (flipscreen_y ? TILEMAP_FLIPY : 0));
 	}
@@ -729,8 +729,8 @@ WRITE8_HANDLER( galaxian_flip_screen_y_w )
 
 WRITE8_HANDLER( galaxian_flip_screen_xy_w )
 {
-	galaxian_flip_screen_x_w(machine, offset, data);
-	galaxian_flip_screen_y_w(machine, offset, data);
+	galaxian_flip_screen_x_w(space, offset, data);
+	galaxian_flip_screen_y_w(space, offset, data);
 }
 
 
@@ -744,14 +744,14 @@ WRITE8_HANDLER( galaxian_flip_screen_xy_w )
 WRITE8_HANDLER( galaxian_stars_enable_w )
 {
 	if ((stars_enabled ^ data) & 0x01)
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	if (!stars_enabled && (data & 0x01))
 	{
 		/* on the rising edge of this, the CLR on the shift registers is released */
 		/* this resets the "origin" of this frame to 0 minus the number of clocks */
 		/* we have counted so far */
-		star_rng_origin = STAR_RNG_PERIOD - (video_screen_get_vpos(machine->primary_screen) * 512 + video_screen_get_hpos(machine->primary_screen));
-		star_rng_origin_frame = video_screen_get_frame_number(machine->primary_screen);
+		star_rng_origin = STAR_RNG_PERIOD - (video_screen_get_vpos(space->machine->primary_screen) * 512 + video_screen_get_hpos(space->machine->primary_screen));
+		star_rng_origin_frame = video_screen_get_frame_number(space->machine->primary_screen);
 	}
 	stars_enabled = data & 0x01;
 }
@@ -759,28 +759,28 @@ WRITE8_HANDLER( galaxian_stars_enable_w )
 
 WRITE8_HANDLER( scramble_background_enable_w )
 {
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	background_enable = data & 0x01;
 }
 
 
 WRITE8_HANDLER( scramble_background_red_w )
 {
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	background_red = data & 0x01;
 }
 
 
 WRITE8_HANDLER( scramble_background_green_w )
 {
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	background_green = data & 0x01;
 }
 
 
 WRITE8_HANDLER( scramble_background_blue_w )
 {
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	background_blue = data & 0x01;
 }
 
@@ -796,7 +796,7 @@ WRITE8_HANDLER( galaxian_gfxbank_w )
 {
 	if (gfxbank[offset] != data)
 	{
-		video_screen_update_now(machine->primary_screen);
+		video_screen_update_now(space->machine->primary_screen);
 		gfxbank[offset] = data;
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}

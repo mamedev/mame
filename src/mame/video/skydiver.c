@@ -130,7 +130,7 @@ WRITE8_HANDLER( skydiver_2000_201F_w )
 {
 	int bit = offset & 0x01;
 
-	watchdog_reset_w(machine,0,0);
+	watchdog_reset_w(space,0,0);
 
 	switch (offset & 0x0e)
 	{
@@ -147,13 +147,13 @@ WRITE8_HANDLER( skydiver_2000_201F_w )
 			output_set_value("lampr", bit);
 			break;
 		case (0x0a):
-			discrete_sound_w(machine, SKYDIVER_OCT1_EN, bit);
+			discrete_sound_w(space, SKYDIVER_OCT1_EN, bit);
 			break;
 		case (0x0c):
-			discrete_sound_w(machine, SKYDIVER_OCT2_EN, bit);
+			discrete_sound_w(space, SKYDIVER_OCT2_EN, bit);
 			break;
 		case (0x0e):
-			discrete_sound_w(machine, SKYDIVER_NOISE_RST, bit);
+			discrete_sound_w(space, SKYDIVER_NOISE_RST, bit);
 			break;
 	}
 }

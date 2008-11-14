@@ -24,8 +24,8 @@ extern VIDEO_UPDATE( solomon );
 
 static WRITE8_HANDLER( solomon_sh_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 /* this is checked on the title screen and when you reach certain scores in the game
@@ -34,17 +34,17 @@ static WRITE8_HANDLER( solomon_sh_command_w )
 
 static READ8_HANDLER( solomon_0xe603_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x161) // all the time .. return 0 to act as before  for coin / startup etc.
+	if (cpu_get_pc(space->cpu)==0x161) // all the time .. return 0 to act as before  for coin / startup etc.
 	{
 		return 0;
 	}
-	else if (cpu_get_pc(machine->activecpu)==0x4cf0) // stop it clearing the screen at certain scores
+	else if (cpu_get_pc(space->cpu)==0x4cf0) // stop it clearing the screen at certain scores
 	{
-		return (cpu_get_reg(machine->activecpu, Z80_BC) & 0x08);
+		return (cpu_get_reg(space->cpu, Z80_BC) & 0x08);
 	}
 	else
 	{
-		mame_printf_debug("unhandled solomon_0xe603_r %04x\n",cpu_get_pc(machine->activecpu));
+		mame_printf_debug("unhandled solomon_0xe603_r %04x\n",cpu_get_pc(space->cpu));
 		return 0;
 	}
 }

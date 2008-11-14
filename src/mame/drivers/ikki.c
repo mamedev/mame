@@ -28,7 +28,7 @@ static READ8_HANDLER( ikki_e000_r )
 {
 /* bit1: interrupt type?, bit0: CPU2 busack? */
 
-	if (cpu_getiloops(machine->activecpu) == 0)
+	if (cpu_getiloops(space->cpu) == 0)
 		return 0;
 	return 2;
 }

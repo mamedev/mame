@@ -78,7 +78,7 @@ static READ8_HANDLER( blockade_input_port_0_r )
 {
     /* coin latch is bit 7 */
 
-    UINT8 temp = (input_port_read(machine, "IN0") & 0x7f);
+    UINT8 temp = (input_port_read(space->machine, "IN0") & 0x7f);
     return (coin_latch<<7) | (temp);
 }
 

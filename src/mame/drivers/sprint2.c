@@ -70,6 +70,7 @@ static int service_mode(running_machine *machine)
 
 static INTERRUPT_GEN( sprint2 )
 {
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	static UINT8 dial[2];
 
 	/* handle steering wheels */
@@ -103,9 +104,9 @@ static INTERRUPT_GEN( sprint2 )
 		}
 	}
 
-	discrete_sound_w(device->machine, SPRINT2_MOTORSND1_DATA, sprint2_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
-	discrete_sound_w(device->machine, SPRINT2_MOTORSND2_DATA, sprint2_video_ram[0x395] & 15);
-	discrete_sound_w(device->machine, SPRINT2_CRASHSND_DATA, sprint2_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
+	discrete_sound_w(space, SPRINT2_MOTORSND1_DATA, sprint2_video_ram[0x394] & 15);	// also DOMINOS_FREQ_DATA
+	discrete_sound_w(space, SPRINT2_MOTORSND2_DATA, sprint2_video_ram[0x395] & 15);
+	discrete_sound_w(space, SPRINT2_CRASHSND_DATA, sprint2_video_ram[0x396] & 15);	// also DOMINOS_AMP_DATA
 
 	/* interrupts and watchdog are disabled during service mode */
 
@@ -124,13 +125,13 @@ static READ8_HANDLER( sprint2_wram_r )
 
 static READ8_HANDLER( sprint2_dip_r )
 {
-	return (input_port_read(machine, "DSW") << (2 * ((offset & 3) ^ 3))) & 0xc0;
+	return (input_port_read(space->machine, "DSW") << (2 * ((offset & 3) ^ 3))) & 0xc0;
 }
 
 
 static READ8_HANDLER( sprint2_input_A_r )
 {
-	UINT8 val = input_port_read(machine, "INA");
+	UINT8 val = input_port_read(space->machine, "INA");
 
 	if (GAME_IS_SPRINT2)
 	{
@@ -148,7 +149,7 @@ static READ8_HANDLER( sprint2_input_A_r )
 
 static READ8_HANDLER( sprint2_input_B_r )
 {
-	UINT8 val = input_port_read(machine, "INB");
+	UINT8 val = input_port_read(space->machine, "INB");
 
 	if (GAME_IS_SPRINT1)
 	{
@@ -168,13 +169,13 @@ static READ8_HANDLER( sprint2_sync_r )
 	if (attract != 0)
 		val |= 0x10;
 
-	if (video_screen_get_vpos(machine->primary_screen) == 261)
+	if (video_screen_get_vpos(space->machine->primary_screen) == 261)
 		val |= 0x20; /* VRESET */
 
-	if (video_screen_get_vpos(machine->primary_screen) >= 224)
+	if (video_screen_get_vpos(space->machine->primary_screen) >= 224)
 		val |= 0x40; /* VBLANK */
 
-	if (video_screen_get_vpos(machine->primary_screen) >= 131)
+	if (video_screen_get_vpos(space->machine->primary_screen) >= 131)
 		val |= 0x80; /* 60 Hz? */
 
 	return val;
@@ -212,25 +213,25 @@ static WRITE8_HANDLER( sprint2_attract_w )
 	attract = offset & 1;
 
 	// also DOMINOS_ATTRACT_EN
-	discrete_sound_w(machine, SPRINT2_ATTRACT_EN, attract);
+	discrete_sound_w(space, SPRINT2_ATTRACT_EN, attract);
 }
 
 
 static WRITE8_HANDLER( sprint2_noise_reset_w )
 {
-	discrete_sound_w(machine, SPRINT2_NOISE_RESET, 0);
+	discrete_sound_w(space, SPRINT2_NOISE_RESET, 0);
 }
 
 
 static WRITE8_HANDLER( sprint2_skid1_w )
 {
 	// also DOMINOS_TUMBLE_EN
-	discrete_sound_w(machine, SPRINT2_SKIDSND1_EN, offset & 1);
+	discrete_sound_w(space, SPRINT2_SKIDSND1_EN, offset & 1);
 }
 
 static WRITE8_HANDLER( sprint2_skid2_w )
 {
-	discrete_sound_w(machine, SPRINT2_SKIDSND2_EN, offset & 1);
+	discrete_sound_w(space, SPRINT2_SKIDSND2_EN, offset & 1);
 }
 
 

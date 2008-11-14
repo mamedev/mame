@@ -212,7 +212,7 @@ static WRITE8_HANDLER( dunhuang_clear_y_w )
 static WRITE8_HANDLER( dunhuang_horiz_clear_w )
 {
 	int i;
-//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", cpu_get_pc(machine->activecpu), dunhuang_clear_y,data);
+//  logerror("%06x: horiz clear, y = %02x, data = %02d\n", cpu_get_pc(space->cpu), dunhuang_clear_y,data);
 	for (i = 0; i < 0x40; i++)
 	{
 		int addr = dunhuang_clear_y * 0x40 + i;
@@ -228,7 +228,7 @@ static WRITE8_HANDLER( dunhuang_horiz_clear_w )
 static WRITE8_HANDLER( dunhuang_vert_clear_w )
 {
 	int i;
-//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", cpu_get_pc(machine->activecpu), dunhuang_pos_x,dunhuang_pos_y,data);
+//  logerror("%06x: vert clear, x = %02x, y = %02x, data = %02x\n", cpu_get_pc(space->cpu), dunhuang_pos_x,dunhuang_pos_y,data);
 	for (i = 0; i < 0x08; i++)
 	{
 		int addr = (dunhuang_pos_x & 0x3f) + (i & 0x07) * 0x40;
@@ -258,11 +258,11 @@ static WRITE8_HANDLER( dunhuang_block_h_w )
 	int i,j, addr;
 	UINT8 *tile_addr;
 
-//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", cpu_get_pc(machine->activecpu), dunhuang_block_dest, (dunhuang_block_addr_hi << 8) + dunhuang_block_addr_lo, dunhuang_block_x,dunhuang_block_y,dunhuang_block_w+1,dunhuang_block_h+1,dunhuang_block_c);
+//  logerror("%06x: block dst %x, src %x, xy %x %x, wh %x %x, clr %x\n", cpu_get_pc(space->cpu), dunhuang_block_dest, (dunhuang_block_addr_hi << 8) + dunhuang_block_addr_lo, dunhuang_block_x,dunhuang_block_y,dunhuang_block_w+1,dunhuang_block_h+1,dunhuang_block_c);
 
 	dunhuang_block_h = data;
 
-	tile_addr = memory_region(machine, "gfx2") + ((dunhuang_block_addr_hi << 8) + dunhuang_block_addr_lo)*4;
+	tile_addr = memory_region(space->machine, "gfx2") + ((dunhuang_block_addr_hi << 8) + dunhuang_block_addr_lo)*4;
 
 	switch (dunhuang_block_dest)
 	{
@@ -297,7 +297,7 @@ static WRITE8_HANDLER( dunhuang_block_h_w )
 			break;
 
 		default:
-			popmessage("%06x: block dst=%x", cpu_get_pc(machine->activecpu), dunhuang_block_dest);
+			popmessage("%06x: block dst=%x", cpu_get_pc(space->cpu), dunhuang_block_dest);
 	}
 }
 
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( dunhuang_paldata_w )
 {
 	dunhuang_paldata[dunhuang_paloffs] = data;
 
-	palette_set_color_rgb( machine, dunhuang_paloffs/3,
+	palette_set_color_rgb( space->machine, dunhuang_paloffs/3,
 		pal6bit(dunhuang_paldata[(dunhuang_paloffs/3)*3+0]),
 		pal6bit(dunhuang_paldata[(dunhuang_paloffs/3)*3+1]),
 		pal6bit(dunhuang_paldata[(dunhuang_paloffs/3)*3+2])
@@ -344,36 +344,36 @@ static UINT8 dunhuang_hopper;
 static WRITE8_HANDLER( dunhuang_input_w )	{	dunhuang_input = data;	}
 static READ8_HANDLER( dunhuang_service_r )
 {
-	return input_port_read(machine, "SERVICE")
-	 | ((dunhuang_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
+	return input_port_read(space->machine, "SERVICE")
+	 | ((dunhuang_hopper && !(video_screen_get_frame_number(space->machine->primary_screen)%10)) ? 0x00 : 0x08)	// bit 3: hopper sensor
 	 | 0x80																// bit 7 low -> tiles block transferrer busy
 	;
 }
 
 static READ8_HANDLER( dunhuang_dsw_r )
 {
-	if (!(dunhuang_input & 0x01))	return input_port_read(machine, "DSW1");
-	if (!(dunhuang_input & 0x02))	return input_port_read(machine, "DSW2");
-	if (!(dunhuang_input & 0x04))	return input_port_read(machine, "DSW3");
-	if (!(dunhuang_input & 0x08))	return input_port_read(machine, "DSW4");
-	if (!(dunhuang_input & 0x10))	return input_port_read(machine, "DSW5");
-	logerror("%06x: warning, unknown dsw bits read, dunhuang_input = %02x\n", cpu_get_pc(machine->activecpu), dunhuang_input);
+	if (!(dunhuang_input & 0x01))	return input_port_read(space->machine, "DSW1");
+	if (!(dunhuang_input & 0x02))	return input_port_read(space->machine, "DSW2");
+	if (!(dunhuang_input & 0x04))	return input_port_read(space->machine, "DSW3");
+	if (!(dunhuang_input & 0x08))	return input_port_read(space->machine, "DSW4");
+	if (!(dunhuang_input & 0x10))	return input_port_read(space->machine, "DSW5");
+	logerror("%06x: warning, unknown dsw bits read, dunhuang_input = %02x\n", cpu_get_pc(space->cpu), dunhuang_input);
 	return 0xff;
 }
 static READ8_HANDLER( dunhuang_input_r )
 {
-	if (!(dunhuang_input & 0x01))	return input_port_read(machine, "IN0");
-	if (!(dunhuang_input & 0x02))	return input_port_read(machine, "IN1");
-	if (!(dunhuang_input & 0x04))	return input_port_read(machine, "IN2");
-	if (!(dunhuang_input & 0x08))	return input_port_read(machine, "IN3");
-	if (!(dunhuang_input & 0x10))	return input_port_read(machine, "IN4");
-	logerror("%06x: warning, unknown input bits read, dunhuang_input = %02x\n", cpu_get_pc(machine->activecpu), dunhuang_input);
+	if (!(dunhuang_input & 0x01))	return input_port_read(space->machine, "IN0");
+	if (!(dunhuang_input & 0x02))	return input_port_read(space->machine, "IN1");
+	if (!(dunhuang_input & 0x04))	return input_port_read(space->machine, "IN2");
+	if (!(dunhuang_input & 0x08))	return input_port_read(space->machine, "IN3");
+	if (!(dunhuang_input & 0x10))	return input_port_read(space->machine, "IN4");
+	logerror("%06x: warning, unknown input bits read, dunhuang_input = %02x\n", cpu_get_pc(space->cpu), dunhuang_input);
 	return 0xff;
 }
 
 static WRITE8_HANDLER( dunhuang_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	memory_set_bankptr( 1, rom + 0x10000 + 0x8000 * ((data >> 2) & 0x7) );
 
 	// ?                data & 0x01

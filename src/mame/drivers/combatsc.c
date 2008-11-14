@@ -173,7 +173,7 @@ static READ8_HANDLER( trackball_r )
 		{
 			UINT8 curr;
 
-			curr = input_port_read_safe(machine, tracknames[i], 0xff);
+			curr = input_port_read_safe(space->machine, tracknames[i], 0xff);
 
 			dir[i] = curr - pos[i];
 			sign[i] = dir[i] & 0x80;
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( protection_clock_w )
 
 static WRITE8_HANDLER( combasc_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( combasc_play_w )
@@ -241,9 +241,9 @@ static emu_timer *combasc_interleave_timer;
 static READ8_HANDLER ( combasc_YM2203_status_port_0_r )
 {
 	static int boost = 1;
-	int status = ym2203_status_port_0_r(machine,0);
+	int status = ym2203_status_port_0_r(space,0);
 
-	if (cpu_get_pc(machine->activecpu) == 0x334)
+	if (cpu_get_pc(space->cpu) == 0x334)
 	{
 		if (boost)
 		{

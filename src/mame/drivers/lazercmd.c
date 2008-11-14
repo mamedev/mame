@@ -286,7 +286,7 @@ static WRITE8_HANDLER( lazercmd_data_port_w )
 static READ8_HANDLER( lazercmd_data_port_r )
 {
 	int data;
-	data = input_port_read(machine, "DSW") & 0x0f;
+	data = input_port_read(space->machine, "DSW") & 0x0f;
 	return data;
 }
 
@@ -381,16 +381,16 @@ static READ8_HANDLER( lazercmd_hardware_r )
 	switch (offset)
 	{
 		case 0: 			   /* player 1 joysticks */
-			data = input_port_read(machine, "IN0");
+			data = input_port_read(space->machine, "IN0");
 			break;
 		case 1: 			   /* player 2 joysticks */
-			data = input_port_read(machine, "IN1");
+			data = input_port_read(space->machine, "IN1");
 			break;
 		case 2: 			   /* player 1 + 2 buttons */
-			data = input_port_read(machine, "IN3");
+			data = input_port_read(space->machine, "IN3");
 			break;
 		case 3: 			   /* coin slot + start buttons */
-			data = input_port_read(machine, "IN2");
+			data = input_port_read(space->machine, "IN2");
 			break;
 		case 4: 			   /* vertical scan counter */
 			data = ((timer_count&0x10)>>1)|((timer_count&0x20)>>3)|((timer_count&0x40)>>5)|((timer_count&0x80)>>7);

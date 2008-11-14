@@ -140,12 +140,12 @@ static WRITE8_HANDLER( cloak_custom_w )
 
 static WRITE8_HANDLER( cloak_irq_reset_0_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cloak_irq_reset_1_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( cloak_nvram_enable_w )

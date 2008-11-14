@@ -132,7 +132,7 @@ static WRITE16_HANDLER( denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w )
 {
 	offset^=1;
 	COMBINE_DATA(&paletteram16[offset]);
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine,offset,data,mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(space,offset,data,mem_mask);
 }
 
 static ADDRESS_MAP_START( denjinmk_map, ADDRESS_SPACE_PROGRAM, 16 )

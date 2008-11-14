@@ -287,7 +287,7 @@ static WRITE8_HANDLER( bzone_coin_counter_w )
 
 static READ8_HANDLER( redbaron_joy_r )
 {
-	return input_port_read(machine, rb_input_select ? "FAKE1" : "FAKE2");
+	return input_port_read(space->machine, rb_input_select ? "FAKE1" : "FAKE2");
 }
 
 
@@ -796,7 +796,7 @@ static WRITE8_HANDLER( analog_select_w )
 	static const char *const analog_port[] = { "AN0", "AN1", "AN2" };
 
 	if (offset <= 2)
-		analog_data = input_port_read(machine, analog_port[offset]);
+		analog_data = input_port_read(space->machine, analog_port[offset]);
 }
 
 

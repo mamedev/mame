@@ -146,21 +146,21 @@ static UINT8 audio_sense_state;
 
 static READ8_HANDLER( hsync_chain_r )
 {
-	UINT8 val = video_screen_get_hpos(machine->primary_screen);
+	UINT8 val = video_screen_get_hpos(space->machine->primary_screen);
 	return BITSWAP8(val,0,1,2,3,4,5,6,7);
 }
 
 
 static READ8_HANDLER( vsync_chain_hi_r )
 {
-	UINT8 val = video_screen_get_vpos(machine->primary_screen);
+	UINT8 val = video_screen_get_vpos(space->machine->primary_screen);
 	return ((val >> 1) & 0x08) | ((val >> 3) & 0x04) | ((val >> 5) & 0x02) | (val >> 7);
 }
 
 
 static READ8_HANDLER( vsync_chain_lo_r )
 {
-	UINT8 val = video_screen_get_vpos(machine->primary_screen);
+	UINT8 val = video_screen_get_vpos(space->machine->primary_screen);
 	return val & 0x0f;
 }
 
@@ -260,7 +260,7 @@ static WRITE8_HANDLER( audio_hardware_w )
 				break;
 			logerror("audio_w ctr1 preset $%x amp %d\n", data & 15, data >> 4);
 			meadows_0c01 = data;
-			meadows_sh_update(machine);
+			meadows_sh_update(space->machine);
 			break;
 
 		case 2: /* counter clk 5 MHz / 32 (/ 2 or / 4) */
@@ -268,7 +268,7 @@ static WRITE8_HANDLER( audio_hardware_w )
                 break;
 			logerror("audio_w ctr2 preset $%02x\n", data);
 			meadows_0c02 = data;
-			meadows_sh_update(machine);
+			meadows_sh_update(space->machine);
             break;
 
 		case 3: /* audio enable */
@@ -276,7 +276,7 @@ static WRITE8_HANDLER( audio_hardware_w )
                 break;
 			logerror("audio_w enable ctr2/2:%d ctr2:%d dac:%d ctr1:%d\n", data&1, (data>>1)&1, (data>>2)&1, (data>>3)&1);
 			meadows_0c03 = data;
-			meadows_sh_update(machine);
+			meadows_sh_update(space->machine);
             break;
 	}
 }

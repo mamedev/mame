@@ -68,17 +68,17 @@ static WRITE8_HANDLER( sprite_dma_w )
 
 static READ8_HANDLER( psg_4015_r )
 {
-	return nes_psg_0_r(machine,0x15);
+	return nes_psg_0_r(space,0x15);
 }
 
 static WRITE8_HANDLER( psg_4015_w )
 {
-	nes_psg_0_w(machine,0x15, data);
+	nes_psg_0_w(space,0x15, data);
 }
 
 static WRITE8_HANDLER( psg_4017_w )
 {
-	nes_psg_0_w(machine,0x17, data);
+	nes_psg_0_w(space,0x17, data);
 }
 
 static UINT32 in_0;
@@ -106,8 +106,8 @@ static WRITE8_HANDLER( cham24_IN0_w )
 	in_0_shift = 0;
 	in_1_shift = 0;
 
-	in_0 = input_port_read(machine, "P1");
-	in_1 = input_port_read(machine, "P2");
+	in_0 = input_port_read(space->machine, "P1");
+	in_1 = input_port_read(space->machine, "P2");
 
 }
 
@@ -124,8 +124,8 @@ static WRITE8_HANDLER( cham24_mapper_w )
 	UINT32 prg_bank_page_size = (offset >> 12) & 0x01;
 	UINT32 gfx_mirroring = (offset >> 13) & 0x01;
 
-	UINT8* dst = memory_region( machine, "main" );
-	UINT8* src = memory_region( machine, "user1" );
+	UINT8* dst = memory_region( space->machine, "main" );
+	UINT8* src = memory_region( space->machine, "user1" );
 
 	// switch PPU VROM bank
 	ppu2c0x_set_videorom_bank( 0, 0, 8, gfx_bank, 512 );

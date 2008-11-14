@@ -78,18 +78,18 @@ static WRITE16_HANDLER( sshangha_protection16_w )
 {
 	COMBINE_DATA(&sshangha_prot_data[offset]);
 
-	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(machine->activecpu),offset<<1,data);
+	logerror("CPU #0 PC %06x: warning - write unmapped control address %06x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
 
 	if (offset == (0x260 >> 1)) {
 		//soundlatch_w(0,data&0xff);
-		//cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		//cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
 static WRITE16_HANDLER( sshangha_sound_w )
 {
-	soundlatch_w(machine,0,data&0xff);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0,data&0xff);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 /* Protection/IO chip 146 */
@@ -98,16 +98,16 @@ static READ16_HANDLER( sshangha_protection16_r )
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 		case 0x76a >> 1:
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 		case 0x0ac >> 1:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 
 		// Protection TODO
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(machine->activecpu),offset<<1);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(space->cpu),offset<<1);
 	return sshangha_prot_data[offset];
 }
 
@@ -116,11 +116,11 @@ static READ16_HANDLER( sshanghb_protection16_r )
 	switch (offset)
 	{
 		case 0x050 >> 1:
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 		case 0x76a >> 1:
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 		case 0x0ac >> 1:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 	}
 	return sshangha_prot_data[offset];
 }

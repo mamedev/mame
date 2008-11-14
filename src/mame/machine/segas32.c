@@ -133,7 +133,7 @@ WRITE16_HANDLER(sonic_level_load_protection)
 		}
 		else
 		{
-			const UINT8 *ROM = memory_region(machine, "main");
+			const UINT8 *ROM = memory_region(space->machine, "main");
 			level =  *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 1);
 			level |= *((ROM + LEVEL_ORDER_ARRAY) + (system32_workram[CLEARED_LEVELS / 2] * 2) - 2) << 8;
 		}
@@ -184,7 +184,7 @@ WRITE16_HANDLER(brival_protection_w)
 	};
 	char ret[32];
 	int curProtType;
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 
 	switch (offset)
 	{
@@ -245,14 +245,14 @@ void darkedge_fd1149_vblank(void)
 WRITE16_HANDLER( darkedge_protection_w )
 {
 	logerror("%06x:darkedge_prot_w(%06X) = %04X & %04X\n",
-		cpu_get_pc(machine->activecpu), 0xa00000 + 2*offset, data, mem_mask);
+		cpu_get_pc(space->cpu), 0xa00000 + 2*offset, data, mem_mask);
 }
 
 
 READ16_HANDLER( darkedge_protection_r )
 {
 	logerror("%06x:darkedge_prot_r(%06X) & %04X\n",
-		cpu_get_pc(machine->activecpu), 0xa00000 + 2*offset, mem_mask);
+		cpu_get_pc(space->cpu), 0xa00000 + 2*offset, mem_mask);
 	return 0xffff;
 }
 
@@ -287,12 +287,12 @@ READ16_HANDLER( dbzvrvs_protection_r )
 // protection ram is 8-bits wide and only occupies every other address
 READ16_HANDLER(arabfgt_protection_r)
 {
-	int PC = cpu_get_pc(machine->activecpu);
+	int PC = cpu_get_pc(space->cpu);
 	int cmpVal;
 
 	if (PC == 0xfe0325 || PC == 0xfe01e5 || PC == 0xfe035e || PC == 0xfe03cc)
 	{
-		cmpVal = cpu_get_reg(machine->activecpu, 1);
+		cmpVal = cpu_get_reg(space->cpu, 1);
 
 		// R0 always contains the value the protection is supposed to return (!)
 		return cmpVal;

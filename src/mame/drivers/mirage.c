@@ -143,11 +143,11 @@ static READ16_HANDLER( mirage_input_r )
 {
 	switch(mux_data & 0x1f)
 	{
-		case 0x01: return input_port_read(machine, "KEY0");
-		case 0x02: return input_port_read(machine, "KEY1");
-		case 0x04: return input_port_read(machine, "KEY2");
-		case 0x08: return input_port_read(machine, "KEY3");
-		case 0x10: return input_port_read(machine, "KEY4");
+		case 0x01: return input_port_read(space->machine, "KEY0");
+		case 0x02: return input_port_read(space->machine, "KEY1");
+		case 0x04: return input_port_read(space->machine, "KEY2");
+		case 0x08: return input_port_read(space->machine, "KEY3");
+		case 0x10: return input_port_read(space->machine, "KEY4");
 	}
 
 	return 0xffff;
@@ -157,7 +157,7 @@ static WRITE16_HANDLER( okim1_rombank_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(machine, "oki2");
+		UINT8 *oki = memory_region(space->machine, "oki2");
 		memcpy(&oki[0], &oki[(data & 3) * 0x40000] + 0x40000, 0x40000);
 	}
 }
@@ -168,7 +168,7 @@ static WRITE16_HANDLER( okim0_rombank_w )
 
 	if(ACCESSING_BITS_0_7)
 	{
-		UINT8 *oki = memory_region(machine, "oki1");
+		UINT8 *oki = memory_region(space->machine, "oki1");
 		memcpy(&oki[0], &oki[(data & 7) * 0x40000] + 0x40000, 0x40000);
 	}
 }

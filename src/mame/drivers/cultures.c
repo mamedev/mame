@@ -99,7 +99,7 @@ static VIDEO_UPDATE( cultures )
 
 static WRITE8_HANDLER( cpu_bankswitch_w )
 {
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x4000 * (data & 0xf));
+	memory_set_bankptr(1, memory_region(space->machine, "main") + 0x4000 * (data & 0xf));
 	video_enable = ~data & 0x20;
 }
 
@@ -116,8 +116,8 @@ static WRITE8_HANDLER( misc_w )
 	if(old_bank != new_bank)
 	{
 		// oki banking
-		UINT8 *src = memory_region(machine, "oki") + 0x40000 + 0x20000 * new_bank;
-		UINT8 *dst = memory_region(machine, "oki") + 0x20000;
+		UINT8 *src = memory_region(space->machine, "oki") + 0x40000 + 0x20000 * new_bank;
+		UINT8 *dst = memory_region(space->machine, "oki") + 0x20000;
 		memcpy(dst, src, 0x20000);
 
 		old_bank = new_bank;

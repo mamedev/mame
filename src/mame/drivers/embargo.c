@@ -58,7 +58,7 @@ static VIDEO_UPDATE( embargo )
 
 static READ8_HANDLER( input_port_bit_r )
 {
-	return (input_port_read(machine, "IN1") << (7 - input_select)) & 0x80;
+	return (input_port_read(space->machine, "IN1") << (7 - input_select)) & 0x80;
 }
 
 
@@ -82,14 +82,14 @@ static READ8_HANDLER( dial_r )
 
 	if (dial_enable_1 && !dial_enable_2)
 	{
-		lo = input_port_read(machine, "DIAL0");
-		hi = input_port_read(machine, "DIAL1");
+		lo = input_port_read(space->machine, "DIAL0");
+		hi = input_port_read(space->machine, "DIAL1");
 	}
 
 	if (dial_enable_2 && !dial_enable_1)
 	{
-		lo = input_port_read(machine, "DIAL2");
-		hi = input_port_read(machine, "DIAL3");
+		lo = input_port_read(space->machine, "DIAL2");
+		hi = input_port_read(space->machine, "DIAL3");
 	}
 
 	lo = 12 * lo / 256;

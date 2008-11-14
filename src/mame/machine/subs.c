@@ -112,7 +112,7 @@ subs_control_r
 ***************************************************************************/
 READ8_HANDLER( subs_control_r )
 {
-	int inport = input_port_read(machine, "IN0");
+	int inport = input_port_read(space->machine, "IN0");
 
 	switch (offset & 0x07)
 	{
@@ -120,10 +120,10 @@ READ8_HANDLER( subs_control_r )
 		case 0x01:		return ((inport & 0x02) << 6);	/* diag hold */
 		case 0x02:		return ((inport & 0x04) << 5);	/* slam */
 		case 0x03:		return ((inport & 0x08) << 4);	/* spare */
-		case 0x04:		return ((subs_steering_1(machine) & 0x40) << 1);	/* steer dir 1 */
-		case 0x05:		return ((subs_steering_1(machine) & 0x80) << 0);	/* steer flag 1 */
-		case 0x06:		return ((subs_steering_2(machine) & 0x40) << 1);	/* steer dir 2 */
-		case 0x07:		return ((subs_steering_2(machine) & 0x80) << 0);	/* steer flag 2 */
+		case 0x04:		return ((subs_steering_1(space->machine) & 0x40) << 1);	/* steer dir 1 */
+		case 0x05:		return ((subs_steering_1(space->machine) & 0x80) << 0);	/* steer flag 1 */
+		case 0x06:		return ((subs_steering_2(space->machine) & 0x40) << 1);	/* steer dir 2 */
+		case 0x07:		return ((subs_steering_2(space->machine) & 0x80) << 0);	/* steer flag 2 */
 	}
 
 	return 0;
@@ -134,7 +134,7 @@ subs_coin_r
 ***************************************************************************/
 READ8_HANDLER( subs_coin_r )
 {
-	int inport = input_port_read(machine, "IN1");
+	int inport = input_port_read(space->machine, "IN1");
 
 	switch (offset & 0x07)
 	{
@@ -156,7 +156,7 @@ subs_options_r
 ***************************************************************************/
 READ8_HANDLER( subs_options_r )
 {
-	int opts = input_port_read(machine, "DSW");
+	int opts = input_port_read(space->machine, "DSW");
 
 	switch (offset & 0x03)
 	{

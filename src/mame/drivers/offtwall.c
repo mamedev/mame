@@ -62,13 +62,13 @@ static MACHINE_RESET( offtwall )
 
 static READ16_HANDLER( offtwall_atarivc_r )
 {
-	return atarivc_r(machine->primary_screen, offset);
+	return atarivc_r(space->machine->primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( offtwall_atarivc_w )
 {
-	atarivc_w(machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(space->machine->primary_screen, offset, data, mem_mask);
 }
 
 
@@ -81,7 +81,7 @@ static WRITE16_HANDLER( offtwall_atarivc_w )
 
 static READ16_HANDLER( special_port3_r )
 {
-	int result = input_port_read(machine, "260010");
+	int result = input_port_read(space->machine, "260010");
 	if (atarigen_cpu_to_sound_ready) result ^= 0x0020;
 	return result;
 }
@@ -93,7 +93,7 @@ static WRITE16_HANDLER( io_latch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 4 resets the sound CPU */
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(data & 0x10)) atarijsa_reset();
 	}
 
@@ -154,11 +154,11 @@ static READ16_HANDLER( bankswitch_r )
 static READ16_HANDLER( bankrom_r )
 {
 	/* this is the banked ROM read */
-	logerror("%06X: %04X\n", cpu_get_previouspc(machine->activecpu), offset);
+	logerror("%06X: %04X\n", cpu_get_previouspc(space->cpu), offset);
 
 	/* if the values are $3e000 or $3e002 are being read by code just below the
         ROM bank area, we need to return the correct value to give the proper checksum */
-	if ((offset == 0x3000 || offset == 0x3001) && cpu_get_previouspc(machine->activecpu) > 0x37000)
+	if ((offset == 0x3000 || offset == 0x3001) && cpu_get_previouspc(space->cpu) > 0x37000)
 	{
 		UINT32 checksum = (program_read_word(0x3fd210) << 16) | program_read_word(0x3fd212);
 		UINT32 us = 0xaaaa5555 - checksum;
@@ -195,7 +195,7 @@ static UINT16 *spritecache_count;
 
 static READ16_HANDLER( spritecache_count_r )
 {
-	int prevpc = cpu_get_previouspc(machine->activecpu);
+	int prevpc = cpu_get_previouspc(space->cpu);
 
 	/* if this read is coming from $99f8 or $9992, it's in the sprite copy loop */
 	if (prevpc == 0x99f8 || prevpc == 0x9992)
@@ -250,7 +250,7 @@ static UINT16 *unknown_verify_base;
 
 static READ16_HANDLER( unknown_verify_r )
 {
-	int prevpc = cpu_get_previouspc(machine->activecpu);
+	int prevpc = cpu_get_previouspc(space->cpu);
 	if (prevpc < 0x5c5e || prevpc > 0xc432)
 		return unknown_verify_base[offset];
 	else

@@ -65,8 +65,8 @@ WRITE8_HANDLER( arkanoid_d008_w )
      leaving the tilt screen (as the MCU is now out of sync with main CPU
      which resets itself).  This bit is the likely candidate as it is flipped
      early in bootup just prior to accessing the MCU for the first time. */
-	if (machine->cpu[1] != NULL) // Bootlegs don't have the MCU but still set this bit
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	if (space->machine->cpu[1] != NULL) // Bootlegs don't have the MCU but still set this bit
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

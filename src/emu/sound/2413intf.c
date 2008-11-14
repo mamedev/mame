@@ -139,16 +139,16 @@ WRITE8_HANDLER( ym2413_data_port_1_w ) { struct ym2413_info *info = sndti_token(
 WRITE8_HANDLER( ym2413_data_port_2_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 2); ym2413_write (info->chip, 1, data); } /* 3rd chip */
 WRITE8_HANDLER( ym2413_data_port_3_w ) { struct ym2413_info *info = sndti_token(SOUND_YM2413, 3); ym2413_write (info->chip, 1, data); } /* 4th chip */
 
-WRITE16_HANDLER( ym2413_register_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_0_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_register_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_register_port_0_w(machine,offset,((data & 0xff00) >> 8)); }
-WRITE16_HANDLER( ym2413_register_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_1_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_register_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_2_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_register_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_3_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_data_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_0_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_data_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_data_port_0_w(machine,offset,((data & 0xff00) >> 8)); }
-WRITE16_HANDLER( ym2413_data_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_1_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_data_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_2_w(machine,offset,data & 0xff); }
-WRITE16_HANDLER( ym2413_data_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_3_w(machine,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_0_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_register_port_0_w(space,offset,((data & 0xff00) >> 8)); }
+WRITE16_HANDLER( ym2413_register_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_1_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_2_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_register_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_register_port_3_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_0_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_0_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_0_msb_w ) { if (ACCESSING_BITS_8_15) ym2413_data_port_0_w(space,offset,((data & 0xff00) >> 8)); }
+WRITE16_HANDLER( ym2413_data_port_1_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_1_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_2_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_2_w(space,offset,data & 0xff); }
+WRITE16_HANDLER( ym2413_data_port_3_lsb_w ) { if (ACCESSING_BITS_0_7) ym2413_data_port_3_w(space,offset,data & 0xff); }
 
 
 /**************************************************************************

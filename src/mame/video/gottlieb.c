@@ -45,7 +45,7 @@ WRITE8_HANDLER( gottlieb_paletteram_w )
 
 	/* alpha is set to 0 if laserdisc video is enabled */
 	a = (transparent0 && offset / 2 == 0) ? 0 : 255;
-	palette_set_color(machine, offset / 2, MAKE_ARGB(a, r, g, b));
+	palette_set_color(space->machine, offset / 2, MAKE_ARGB(a, r, g, b));
 }
 
 
@@ -60,7 +60,7 @@ WRITE8_HANDLER( gottlieb_video_control_w )
 {
 	/* bit 0 controls foreground/background priority */
 	if (background_priority != (data & 0x01))
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 	background_priority = data & 0x01;
 
 	/* bit 1 controls horizonal flip screen */
@@ -84,10 +84,10 @@ WRITE8_HANDLER( gottlieb_video_control_w )
 
 WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 {
-	const device_config *laserdisc = device_list_first(machine->config->devicelist, LASERDISC);
+	const device_config *laserdisc = device_list_first(space->machine->config->devicelist, LASERDISC);
 
 	/* bit 0 works like the other games */
-	gottlieb_video_control_w(machine, offset, data & 0x01);
+	gottlieb_video_control_w(space, offset, data & 0x01);
 
 	/* bit 1 controls the sprite bank. */
 	spritebank = (data & 0x02) >> 1;
@@ -99,7 +99,7 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 
 	/* configure the palette if the laserdisc is enabled */
 	transparent0 = (data >> 3) & 1;
-	gottlieb_paletteram_w(machine, 0, paletteram[0]);
+	gottlieb_paletteram_w(space, 0, paletteram[0]);
 }
 
 
@@ -122,7 +122,7 @@ WRITE8_HANDLER( gottlieb_charram_w )
 	if (gottlieb_charram[offset] != data)
 	{
 		gottlieb_charram[offset] = data;
-		decodechar(machine->gfx[0], offset / 32, gottlieb_charram);
+		decodechar(space->machine->gfx[0], offset / 32, gottlieb_charram);
 		tilemap_mark_all_tiles_dirty(bg_tilemap);
 	}
 }

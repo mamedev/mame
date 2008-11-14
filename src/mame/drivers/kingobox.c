@@ -60,21 +60,21 @@ static WRITE8_HANDLER( sprite_shared_w ) {
 }
 
 static WRITE8_HANDLER( video_interrupt_w ) {
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
 }
 
 static WRITE8_HANDLER( sprite_interrupt_w ) {
-	cpu_set_input_line_and_vector(machine->cpu[2], 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(space->machine->cpu[2], 0, HOLD_LINE, 0xff );
 }
 
 static WRITE8_HANDLER( scroll_interrupt_w ) {
-	sprite_interrupt_w( machine, offset, data );
+	sprite_interrupt_w( space->machine, offset, data );
 	*kingofb_scroll_y = data;
 }
 
 static WRITE8_HANDLER( sound_command_w ) {
-	soundlatch_w( machine, 0, data );
-	cpu_set_input_line_and_vector(machine->cpu[3], 0, HOLD_LINE, 0xff );
+	soundlatch_w( space->machine, 0, data );
+	cpu_set_input_line_and_vector(space->machine->cpu[3], 0, HOLD_LINE, 0xff );
 }
 
 

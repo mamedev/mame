@@ -3707,14 +3707,14 @@ static UINT32 *rddsp32_speedup;
 static offs_t rddsp32_speedup_pc;
 static READ32_HANDLER( rddsp32_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu) == rddsp32_speedup_pc && (*rddsp32_speedup >> 16) == 0)
+	if (cpu_get_pc(space->cpu) == rddsp32_speedup_pc && (*rddsp32_speedup >> 16) == 0)
 	{
-		UINT32 r14 = cpu_get_reg(machine->activecpu, DSP32_R14);
+		UINT32 r14 = cpu_get_reg(space->cpu, DSP32_R14);
 		UINT32 r1 = program_read_word(r14 - 0x14);
 		int cycles_to_burn = 17 * 4 * (0x2bc - r1 - 2);
 		if (cycles_to_burn > 20 * 4)
 		{
-			cpu_eat_cycles(machine->activecpu, cycles_to_burn);
+			cpu_eat_cycles(space->cpu, cycles_to_burn);
 			program_write_word(r14 - 0x14, r1 + cycles_to_burn / 17);
 		}
 		msp_speedup_count[0]++;

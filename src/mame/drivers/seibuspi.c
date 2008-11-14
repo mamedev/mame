@@ -785,7 +785,7 @@ static WRITE8_HANDLER( sb_coin_w )
 
 static READ32_HANDLER( sound_fifo_r )
 {
-	UINT8 r = z80_fifoout_pop(machine);
+	UINT8 r = z80_fifoout_pop(space->machine);
 
 	return r;
 }
@@ -793,7 +793,7 @@ static READ32_HANDLER( sound_fifo_r )
 static WRITE32_HANDLER( sound_fifo_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		z80_fifoin_push(machine, data & 0xff);
+		z80_fifoin_push(space->machine, data & 0xff);
 	}
 }
 
@@ -809,7 +809,7 @@ static READ32_HANDLER( sound_fifo_status_r )
 
 static READ32_HANDLER( spi_int_r )
 {
-	cpu_set_input_line(machine->cpu[0], 0,CLEAR_LINE );
+	cpu_set_input_line(space->machine->cpu[0], 0,CLEAR_LINE );
 	return 0xffffffff;
 }
 
@@ -821,14 +821,14 @@ static READ32_HANDLER( spi_unknown_r )
 static WRITE32_HANDLER( ds2404_reset_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		DS2404_1W_reset_w(machine, offset, data);
+		DS2404_1W_reset_w(space, offset, data);
 	}
 }
 
 static READ32_HANDLER( ds2404_data_r )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		return DS2404_data_r(machine, offset);
+		return DS2404_data_r(space, offset);
 	}
 	return 0;
 }
@@ -836,14 +836,14 @@ static READ32_HANDLER( ds2404_data_r )
 static WRITE32_HANDLER( ds2404_data_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		DS2404_data_w(machine, offset, data);
+		DS2404_data_w(space, offset, data);
 	}
 }
 
 static WRITE32_HANDLER( ds2404_clk_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		DS2404_clk_w(machine, offset, data);
+		DS2404_clk_w(space, offset, data);
 	}
 }
 
@@ -881,9 +881,9 @@ logerror("z80 data = %08x mask = %08x\n",data,mem_mask);
 	if( ACCESSING_BITS_0_7 ) {
 		if( data & 0x1 ) {
 			z80_prg_fifo_pos = 0;
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE );
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE );
 		} else {
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE );
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE );
 		}
 	}
 }
@@ -892,7 +892,7 @@ static READ32_HANDLER( spi_controls1_r )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		return input_port_read(machine, "INPUTS");
+		return input_port_read(space->machine, "INPUTS");
 	}
 	return 0xffffffff;
 }
@@ -901,32 +901,32 @@ static READ32_HANDLER( spi_controls2_r )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		return input_port_read(machine, "SYSTEM");
+		return input_port_read(space->machine, "SYSTEM");
 	}
 	return 0xffffffff;
 }
 
 static READ32_HANDLER( spi_6295_0_r )
 {
-	return okim6295_status_0_r(machine, 0);
+	return okim6295_status_0_r(space, 0);
 }
 
 static READ32_HANDLER( spi_6295_1_r )
 {
-	return okim6295_status_1_r(machine, 0);
+	return okim6295_status_1_r(space, 0);
 }
 
 static WRITE32_HANDLER( spi_6295_0_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		okim6295_data_0_w(machine, 0, data & 0xff);
+		okim6295_data_0_w(space, 0, data & 0xff);
 	}
 }
 
 static WRITE32_HANDLER( spi_6295_1_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		okim6295_data_1_w(machine, 0, data & 0xff);
+		okim6295_data_1_w(space, 0, data & 0xff);
 	}
 }
 
@@ -934,14 +934,14 @@ static WRITE32_HANDLER( spi_6295_1_w )
 
 static READ8_HANDLER( z80_soundfifo_r )
 {
-	UINT8 r = z80_fifoin_pop(machine);
+	UINT8 r = z80_fifoin_pop(space->machine);
 
 	return r;
 }
 
 static WRITE8_HANDLER( z80_soundfifo_w )
 {
-	z80_fifoout_push(machine, data);
+	z80_fifoout_push(space->machine, data);
 }
 
 static READ8_HANDLER( z80_soundfifo_status_r )
@@ -965,18 +965,18 @@ static WRITE8_HANDLER( z80_bank_w )
 
 static READ8_HANDLER( z80_jp1_r )
 {
-	return input_port_read(machine, "JP1");
+	return input_port_read(space->machine, "JP1");
 }
 
 static READ8_HANDLER( z80_coin_r )
 {
-	return input_port_read(machine, "COIN");
+	return input_port_read(space->machine, "COIN");
 }
 
 static READ32_HANDLER( soundrom_r )
 {
-	UINT8 *sound = (UINT8*)memory_region(machine, "user2");
-	UINT16 *sound16 = (UINT16*)memory_region(machine, "user2");
+	UINT8 *sound = (UINT8*)memory_region(space->machine, "user2");
+	UINT16 *sound16 = (UINT16*)memory_region(space->machine, "user2");
 
 	if (mem_mask == 0x000000ff)
 	{
@@ -1818,25 +1818,25 @@ MACHINE_DRIVER_END
 
 static READ32_HANDLER ( senkyu_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x00305bb2) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x00305bb2) cpu_spinuntil_int(space->cpu); // idle
 	return spimainram[(0x0018cb4-0x800)/4];
 }
 
 static READ32_HANDLER( senkyua_speedup_r )
 {
-	if (cpu_get_pc(machine->activecpu)== 0x30582e) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)== 0x30582e) cpu_spinuntil_int(space->cpu); // idle
 	return spimainram[(0x0018c9c-0x800)/4];
 }
 
 static READ32_HANDLER ( batlball_speedup_r )
 {
-//  printf("cpu_get_pc(machine->activecpu) %06x\n", cpu_get_pc(machine->activecpu));
+//  printf("cpu_get_pc(space->cpu) %06x\n", cpu_get_pc(space->cpu));
 
 	/* batlbalu */
-	if (cpu_get_pc(machine->activecpu)==0x00305996) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x00305996) cpu_spinuntil_int(space->cpu); // idle
 
 	/* batlball */
-	if (cpu_get_pc(machine->activecpu)==0x003058aa) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x003058aa) cpu_spinuntil_int(space->cpu); // idle
 
 	return spimainram[(0x0018db4-0x800)/4];
 }
@@ -1844,21 +1844,21 @@ static READ32_HANDLER ( batlball_speedup_r )
 static READ32_HANDLER ( rdft_speedup_r )
 {
 	/* rdft */
-	if (cpu_get_pc(machine->activecpu)==0x0203f0a) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f0a) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdftau */
-	if (cpu_get_pc(machine->activecpu)==0x0203f16) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f16) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdftj */
-	if (cpu_get_pc(machine->activecpu)==0x0203f22) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f22) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdftdi */
-	if (cpu_get_pc(machine->activecpu)==0x0203f46) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f46) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdftu */
-	if (cpu_get_pc(machine->activecpu)==0x0203f3a) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0203f3a) cpu_spinuntil_int(space->cpu); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 
 	return spimainram[(0x00298d0-0x800)/4];
 }
@@ -1866,15 +1866,15 @@ static READ32_HANDLER ( rdft_speedup_r )
 static READ32_HANDLER ( viprp1_speedup_r )
 {
 	/* viprp1 */
-	if (cpu_get_pc(machine->activecpu)==0x0202769) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0202769) cpu_spinuntil_int(space->cpu); // idle
 
 	/* viprp1s */
-	if (cpu_get_pc(machine->activecpu)==0x02027e9) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x02027e9) cpu_spinuntil_int(space->cpu); // idle
 
 	/* viprp1ot */
-	if (cpu_get_pc(machine->activecpu)==0x02026bd) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x02026bd) cpu_spinuntil_int(space->cpu); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 
 	return spimainram[(0x001e2e0-0x800)/4];
 }
@@ -1882,8 +1882,8 @@ static READ32_HANDLER ( viprp1_speedup_r )
 static READ32_HANDLER ( viprp1o_speedup_r )
 {
 	/* viperp1o */
-	if (cpu_get_pc(machine->activecpu)==0x0201f99) cpu_spinuntil_int(machine->activecpu); // idle
-//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
+	if (cpu_get_pc(space->cpu)==0x0201f99) cpu_spinuntil_int(space->cpu); // idle
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 	return spimainram[(0x001d49c-0x800)/4];
 }
 
@@ -1891,8 +1891,8 @@ static READ32_HANDLER ( viprp1o_speedup_r )
 // causes input problems?
 READ32_HANDLER ( ejanhs_speedup_r )
 {
-// mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
- if (cpu_get_pc(machine->activecpu)==0x03032c7) cpu_spinuntil_int(machine->activecpu); // idle
+// mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
+ if (cpu_get_pc(space->cpu)==0x03032c7) cpu_spinuntil_int(space->cpu); // idle
  return spimainram[(0x002d224-0x800)/4];
 }
 #endif
@@ -1901,18 +1901,18 @@ static READ32_HANDLER ( rf2_speedup_r )
 {
 
 	/* rdft22kc */
-	if (cpu_get_pc(machine->activecpu)==0x0203926) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0203926) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdft2, rdft2j */
-	if (cpu_get_pc(machine->activecpu)==0x0204372) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0204372) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdft2us */
-	if (cpu_get_pc(machine->activecpu)==0x020420e) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x020420e) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rdft2a */
-	if (cpu_get_pc(machine->activecpu)==0x0204366) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0204366) cpu_spinuntil_int(space->cpu); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 
 	return spimainram[(0x0282AC-0x800)/4];
 }
@@ -1920,22 +1920,22 @@ static READ32_HANDLER ( rf2_speedup_r )
 static READ32_HANDLER ( rfjet_speedup_r )
 {
 	/* rfjet, rfjetu, rfjeta */
-	if (cpu_get_pc(machine->activecpu)==0x0206082) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0206082) cpu_spinuntil_int(space->cpu); // idle
 
 	/* rfjetus */
-	if (cpu_get_pc(machine->activecpu)==0x0205b39)
+	if (cpu_get_pc(space->cpu)==0x0205b39)
 	{
 		UINT32 r;
-		cpu_spinuntil_int(machine->activecpu); // idle
+		cpu_spinuntil_int(space->cpu); // idle
 		// Hack to enter test mode
 		r = spimainram[(0x002894c-0x800)/4] & (~0x400);
-		return r | (((input_port_read(machine, "SYSTEM") ^ 0xff)<<8) & 0x400);
+		return r | (((input_port_read(space->machine, "SYSTEM") ^ 0xff)<<8) & 0x400);
 	}
 
 	/* rfjetj */
-	if (cpu_get_pc(machine->activecpu)==0x0205f2e) cpu_spinuntil_int(machine->activecpu); // idle
+	if (cpu_get_pc(space->cpu)==0x0205f2e) cpu_spinuntil_int(space->cpu); // idle
 
-//  mame_printf_debug("%08x\n",cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("%08x\n",cpu_get_pc(space->cpu));
 
 
 	return spimainram[(0x002894c-0x800)/4];

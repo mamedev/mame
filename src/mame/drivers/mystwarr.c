@@ -119,7 +119,7 @@ static READ16_HANDLER( mweeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = input_port_read(machine, "IN1");
+		int res = input_port_read(space->machine, "IN1");
 
 		if (init_eeprom_count)
 		{
@@ -139,7 +139,7 @@ static READ16_HANDLER( vseeprom_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		int res = input_port_read(machine, "IN1");
+		int res = input_port_read(space->machine, "IN1");
 
 		if (init_eeprom_count)
 		{
@@ -173,10 +173,10 @@ static READ16_HANDLER( dddeeprom_r )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		return input_port_read(machine, "IN1") << 8;
+		return input_port_read(space->machine, "IN1") << 8;
 	}
 
-	return input_port_read(machine, "P2");
+	return input_port_read(space->machine, "P2");
 }
 
 static WRITE16_HANDLER( mmeeprom_w )
@@ -258,34 +258,34 @@ static INTERRUPT_GEN(ddd_interrupt)
 
 static WRITE16_HANDLER( sound_cmd1_w )
 {
-	soundlatch_w(machine, 0, data&0xff);
+	soundlatch_w(space, 0, data&0xff);
 }
 
 static WRITE16_HANDLER( sound_cmd1_msb_w )
 {
-	soundlatch_w(machine, 0, data>>8);
+	soundlatch_w(space, 0, data>>8);
 }
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
-	soundlatch2_w(machine, 0, data&0xff);
+	soundlatch2_w(space, 0, data&0xff);
 	return;
 }
 
 static WRITE16_HANDLER( sound_cmd2_msb_w )
 {
-	soundlatch2_w(machine, 0, data>>8);
+	soundlatch2_w(space, 0, data>>8);
 	return;
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
 {
-	int latch = soundlatch3_r(machine,0);
+	int latch = soundlatch3_r(space,0);
 
 	if ((latch & 0xf) == 0xe) latch |= 1;
 
@@ -294,7 +294,7 @@ static READ16_HANDLER( sound_status_r )
 
 static READ16_HANDLER( sound_status_msb_r )
 {
-	int latch = soundlatch3_r(machine,0);
+	int latch = soundlatch3_r(space,0);
 
 	if ((latch & 0xf) == 0xe) latch |= 1;
 
@@ -303,7 +303,7 @@ static READ16_HANDLER( sound_status_msb_r )
 
 static WRITE16_HANDLER( irq_ack_w )
 {
-	K056832_b_word_w(machine, offset, data, mem_mask);
+	K056832_b_word_w(space, offset, data, mem_mask);
 
 	if (offset == 3 && ACCESSING_BITS_0_7)
 	{
@@ -316,27 +316,27 @@ static WRITE16_HANDLER( irq_ack_w )
 
 static READ16_HANDLER( player1_r )
 {
-	return input_port_read(machine, "P1") | (input_port_read(machine, "P2")<<8);
+	return input_port_read(space->machine, "P1") | (input_port_read(space->machine, "P2")<<8);
 }
 
 static READ16_HANDLER( player2_r )
 {
-	return input_port_read(machine, "P3") | (input_port_read(machine, "P4")<<8);
+	return input_port_read(space->machine, "P3") | (input_port_read(space->machine, "P4")<<8);
 }
 
 static READ16_HANDLER( mmplayer1_r )
 {
-	return input_port_read(machine, "P1") | (input_port_read(machine, "P3")<<8);
+	return input_port_read(space->machine, "P1") | (input_port_read(space->machine, "P3")<<8);
 }
 
 static READ16_HANDLER( mmplayer2_r )
 {
-	return input_port_read(machine, "P2") | (input_port_read(machine, "P4")<<8);
+	return input_port_read(space->machine, "P2") | (input_port_read(space->machine, "P4")<<8);
 }
 
 static READ16_HANDLER( mmcoins_r )
 {
-	int res = input_port_read(machine, "IN0");
+	int res = input_port_read(space->machine, "IN0");
 
 	if (init_eeprom_count)
 	{
@@ -349,7 +349,7 @@ static READ16_HANDLER( mmcoins_r )
 
 static READ16_HANDLER( dddcoins_r )
 {
-	int res = (input_port_read(machine, "IN0")<<8) | input_port_read(machine, "P1");
+	int res = (input_port_read(space->machine, "IN0")<<8) | input_port_read(space->machine, "P1");
 
 	if (init_eeprom_count)
 	{
@@ -369,7 +369,7 @@ static READ16_HANDLER( K053247_scattered_word_r )
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
-		return K053247_word_r(machine,offset,mem_mask);
+		return K053247_word_r(space,offset,mem_mask);
 	}
 }
 
@@ -377,14 +377,14 @@ static WRITE16_HANDLER( K053247_scattered_word_w )
 {
 	if (offset & 0x0078)
 	{
-//      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, cpu_get_pc(machine->activecpu));
+//      mame_printf_debug("spr write %x to %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
 		COMBINE_DATA(spriteram16+offset);
 	}
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x7f80) >> 4);
 
-		K053247_word_w(machine,offset,data,mem_mask);
+		K053247_word_w(space,offset,data,mem_mask);
 	}
 }
 
@@ -557,7 +557,7 @@ static READ16_HANDLER( K053247_martchmp_word_r )
 	else
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
-		return K053247_word_r(machine,offset,mem_mask);
+		return K053247_word_r(space,offset,mem_mask);
 	}
 }
 
@@ -571,7 +571,7 @@ static WRITE16_HANDLER( K053247_martchmp_word_w )
 	{
 		offset = (offset & 0x0007) | ((offset & 0x1fe0) >> 2);
 
-		K053247_word_w(machine,offset,data,mem_mask);
+		K053247_word_w(space,offset,data,mem_mask);
 	}
 }
 
@@ -778,7 +778,7 @@ static void reset_sound_region(running_machine *machine)
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	cur_sound_region = (data & 0xf);
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 /* sound memory maps

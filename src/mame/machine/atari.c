@@ -80,16 +80,16 @@ void atari_interrupt_cb(running_machine *machine, int mask)
 
 static READ8_HANDLER(atari_pia_pa_r)
 {
-	return atari_input_disabled() ? 0xFF : input_port_read_safe(machine, "djoy_0_1", 0);
+	return atari_input_disabled() ? 0xFF : input_port_read_safe(space->machine, "djoy_0_1", 0);
 }
 
 static READ8_HANDLER(atari_pia_pb_r)
 {
-	return atari_input_disabled() ? 0xFF : input_port_read_safe(machine, "djoy_2_3", 0);
+	return atari_input_disabled() ? 0xFF : input_port_read_safe(space->machine, "djoy_2_3", 0);
 }
 
-static WRITE8_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(machine, data); }
-static WRITE8_HANDLER(a800xl_pia_pb_w) { a800xl_mmu(machine, data); }
+static WRITE8_HANDLER(a600xl_pia_pb_w) { a600xl_mmu(space->machine, data); }
+static WRITE8_HANDLER(a800xl_pia_pb_w) { a800xl_mmu(space->machine, data); }
 
 #ifdef MESS
 extern WRITE8_HANDLER(atari_pia_cb2_w);

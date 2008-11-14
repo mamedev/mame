@@ -51,12 +51,12 @@ WRITE8_HANDLER( mjkjidai_videoram_w )
 
 WRITE8_HANDLER( mjkjidai_ctrl_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 
-//  logerror("%04x: port c0 = %02x\n",cpu_get_pc(machine->activecpu),data);
+//  logerror("%04x: port c0 = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0 = NMI enable */
-	interrupt_enable_w(machine,0,data & 1);
+	interrupt_enable_w(space,0,data & 1);
 
 	/* bit 1 = flip screen */
 	flip_screen_set(data & 0x02);

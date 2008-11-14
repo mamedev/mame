@@ -179,8 +179,8 @@ maybe some priority issues / sprite placement issues..
 static const char *const gunnames[] = { "LIGHT0_X", "LIGHT0_Y", "LIGHT1_X", "LIGHT1_Y" };
 
 /* a = 1, 2 = player # */
-#define GUNX( a ) (( ( input_port_read(machine, gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
-#define GUNY( a ) (( ( input_port_read(machine, gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
+#define GUNX( a ) (( ( input_port_read(space->machine, gunnames[2 * (a - 1)]) * 287 ) / 0xff ) + 16)
+#define GUNY( a ) (( ( input_port_read(space->machine, gunnames[2 * (a - 1) + 1]) * 223 ) / 0xff ) + 10)
 
 VIDEO_START(lethalen);
 VIDEO_UPDATE(lethalen);
@@ -254,12 +254,12 @@ static INTERRUPT_GEN(lethalen_interrupt)
 
 static WRITE8_HANDLER( sound_cmd_w )
 {
-	soundlatch_w(machine, 0, data);
+	soundlatch_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ8_HANDLER( sound_status_r )
@@ -274,7 +274,7 @@ static void sound_nmi(running_machine *machine)
 
 static WRITE8_HANDLER( le_bankswitch_w )
 {
-	UINT8 *prgrom = (UINT8 *)memory_region(machine, "main")+0x10000;
+	UINT8 *prgrom = (UINT8 *)memory_region(space->machine, "main")+0x10000;
 
 	memory_set_bankptr(1, &prgrom[data * 0x2000]);
 }
@@ -298,7 +298,7 @@ static READ8_HANDLER( le_4800_r )
 				case 0x44:
 				case 0x45:
 				case 0x46:
-					return K053244_r(machine,offset-0x40);
+					return K053244_r(space,offset-0x40);
 					break;
 
 				case 0x80:
@@ -333,24 +333,24 @@ static READ8_HANDLER( le_4800_r )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					return K054000_r(machine,offset-0x80);
+					return K054000_r(space,offset-0x80);
 					break;
 
 				case 0xca:
-					return sound_status_r(machine,0);
+					return sound_status_r(space,0);
 					break;
 			}
 		}
 		else if (offset < 0x1800)
-			return K053245_r(machine,(offset - 0x0800) & 0x07ff);
+			return K053245_r(space,(offset - 0x0800) & 0x07ff);
 		else if (offset < 0x2000)
-			return K056832_ram_code_lo_r(machine,offset - 0x1800);
+			return K056832_ram_code_lo_r(space,offset - 0x1800);
 		else if (offset < 0x2800)
-			return K056832_ram_code_hi_r(machine,offset - 0x2000);
+			return K056832_ram_code_hi_r(space,offset - 0x2000);
 		else if (offset < 0x3000)
-			return K056832_ram_attr_lo_r(machine,offset - 0x2800);
+			return K056832_ram_attr_lo_r(space,offset - 0x2800);
 		else // (offset < 0x3800)
-			return K056832_ram_attr_hi_r(machine,offset - 0x3000);
+			return K056832_ram_attr_hi_r(space,offset - 0x3000);
 	}
 
 	return 0;
@@ -360,7 +360,7 @@ static WRITE8_HANDLER( le_4800_w )
 {
 	if (cur_control2 & 0x10)	// RAM enable
 	{
-		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	}
 	else
 	{
@@ -369,11 +369,11 @@ static WRITE8_HANDLER( le_4800_w )
 			switch (offset)
 			{
 				case 0xc6:
-					sound_cmd_w(machine, 0, data);
+					sound_cmd_w(space, 0, data);
 					break;
 
 				case 0xc7:
-					sound_irq_w(machine, 0, data);
+					sound_irq_w(space, 0, data);
 					break;
 
 				case 0x40:
@@ -383,7 +383,7 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x44:
 				case 0x45:
 				case 0x46:
-					K053244_w(machine, offset-0x40, data);
+					K053244_w(space, offset-0x40, data);
 					break;
 
 				case 0x80:
@@ -418,34 +418,34 @@ static WRITE8_HANDLER( le_4800_w )
 				case 0x9d:
 				case 0x9e:
 				case 0x9f:
-					K054000_w(machine, offset-0x80, data);
+					K054000_w(space, offset-0x80, data);
 					break;
 
 				default:
-					logerror("Unknown LE 48xx register write: %x to %x (PC=%x)\n", data, offset, cpu_get_pc(machine->activecpu));
+					logerror("Unknown LE 48xx register write: %x to %x (PC=%x)\n", data, offset, cpu_get_pc(space->cpu));
 					break;
 			}
 		}
 		else if (offset < 0x1800)
 		{
-			K053245_w(machine, (offset - 0x0800) & 0x07ff, data);
+			K053245_w(space, (offset - 0x0800) & 0x07ff, data);
 
 		}
 		else if (offset < 0x2000)
-			K056832_ram_code_lo_w(machine, offset - 0x1800, data);
+			K056832_ram_code_lo_w(space, offset - 0x1800, data);
 		else if (offset < 0x2800)
-			K056832_ram_code_hi_w(machine, offset - 0x2000, data);
+			K056832_ram_code_hi_w(space, offset - 0x2000, data);
 		else if (offset < 0x3000)
-			K056832_ram_attr_lo_w(machine, offset - 0x2800, data);
+			K056832_ram_attr_lo_w(space, offset - 0x2800, data);
 		else // (offset < 0x3800)
-			K056832_ram_attr_hi_w(machine, offset - 0x3000, data);
+			K056832_ram_attr_hi_w(space, offset - 0x3000, data);
 	}
 }
 
 // use one more palette entry for the BG color
 static WRITE8_HANDLER(le_bgcolor_w)
 {
-	paletteram_xBBBBBGGGGGRRRRR_be_w(machine,0x3800+offset, data);
+	paletteram_xBBBBBGGGGGRRRRR_be_w(space,0x3800+offset, data);
 }
 
 static READ8_HANDLER(guns_r)

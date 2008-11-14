@@ -59,7 +59,7 @@ static INTERRUPT_GEN( dv_interrupt )
 
 static WRITE8_HANDLER( mainevt_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress;
 
 	/* bit 0-1 ROM bank select */
@@ -89,7 +89,7 @@ static WRITE8_HANDLER( mainevt_coin_w )
 
 static WRITE8_HANDLER( mainevt_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
@@ -97,19 +97,19 @@ static WRITE8_HANDLER( mainevt_sh_irqcontrol_w )
 	upd7759_reset_w(0, data & 2);
 	upd7759_start_w(0, data & 1);
 
-	interrupt_enable_w(machine,0,data & 4);
+	interrupt_enable_w(space,0,data & 4);
 }
 
 static WRITE8_HANDLER( devstor_sh_irqcontrol_w )
 {
-	interrupt_enable_w(machine,0,data & 4);
+	interrupt_enable_w(space,0,data & 4);
 }
 
 static WRITE8_HANDLER( mainevt_sh_bankswitch_w )
 {
 	int bank_A,bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);
@@ -124,7 +124,7 @@ static WRITE8_HANDLER( dv_sh_bankswitch_w )
 {
 	int bank_A,bank_B;
 
-//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("CPU #1 PC: %04x bank switch = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bits 0-3 select the 007232 banks */
 	bank_A=(data&0x3);

@@ -234,7 +234,7 @@ static NVRAM_HANDLER( darkhors )
 static WRITE32_HANDLER( darkhors_eeprom_w )
 {
 	if (data & ~0xff000000)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %08X\n",cpu_get_pc(machine->activecpu),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %08X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_24_31 )
 	{
@@ -252,19 +252,19 @@ static WRITE32_HANDLER( darkhors_eeprom_w )
 static WRITE32_HANDLER( okim6295_data_0_msb32_w )
 {
 	if (ACCESSING_BITS_24_31)
-		okim6295_data_0_msb_w(machine, offset, data >> 16, mem_mask >> 16);
+		okim6295_data_0_msb_w(space, offset, data >> 16, mem_mask >> 16);
 }
 
 static READ32_HANDLER( okim6295_status_0_msb32_r )
 {
-	return okim6295_status_0_msb_r(machine, offset, mem_mask >> 16) << 16;
+	return okim6295_status_0_msb_r(space, offset, mem_mask >> 16) << 16;
 }
 
 static WRITE32_HANDLER( paletteram32_xBBBBBGGGGGRRRRR_dword_w )
 {
 	paletteram16 = (UINT16 *)paletteram32;
-	if (ACCESSING_BITS_16_31)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2, data >> 16, mem_mask >> 16);
-	if (ACCESSING_BITS_0_15)	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset*2+1, data, mem_mask);
+	if (ACCESSING_BITS_16_31)	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2, data >> 16, mem_mask >> 16);
+	if (ACCESSING_BITS_0_15)	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset*2+1, data, mem_mask);
 }
 
 static UINT32 input_sel;
@@ -297,8 +297,8 @@ static READ32_HANDLER( darkhors_input_sel_r )
 	int bit_p2 = mask_to_bit((input_sel & 0xff000000) >> 24);
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3", "IN4", "IN5", "IN6", "IN7" };
 
-	return	(input_port_read(machine, portnames[bit_p1]) & 0x00ffffff) |
-			(input_port_read(machine, portnames[bit_p2]) & 0xff000000) ;
+	return	(input_port_read(space->machine, portnames[bit_p1]) & 0x00ffffff) |
+			(input_port_read(space->machine, portnames[bit_p2]) & 0xff000000) ;
 }
 
 static WRITE32_HANDLER( darkhors_unk1_w )

@@ -141,7 +141,7 @@ static TIMER_CALLBACK( generate_interrupt )
 
 static WRITE8_HANDLER( main_irq_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -209,13 +209,13 @@ static WRITE8_HANDLER( rom_banksel_w )
 
 static READ8_HANDLER( a2d_data_r )
 {
-	jedi_state *state = machine->driver_data;
+	jedi_state *state = space->machine->driver_data;
 	UINT8 ret = 0;
 
 	switch (state->a2d_select)
 	{
-		case 0: ret = input_port_read(machine, "STICKY"); break;
-		case 2: ret = input_port_read(machine, "STICKX"); break;
+		case 0: ret = input_port_read(space->machine, "STICKY"); break;
+		case 2: ret = input_port_read(space->machine, "STICKX"); break;
 	}
 
 	return ret;
@@ -224,7 +224,7 @@ static READ8_HANDLER( a2d_data_r )
 
 static WRITE8_HANDLER( a2d_select_w )
 {
-	jedi_state *state = machine->driver_data;
+	jedi_state *state = space->machine->driver_data;
 
 	state->a2d_select = offset;
 }
@@ -245,7 +245,7 @@ static WRITE8_HANDLER( jedi_coin_counter_w )
 
 static WRITE8_HANDLER( nvram_data_w )
 {
-	jedi_state *state = machine->driver_data;
+	jedi_state *state = space->machine->driver_data;
 
 	if (state->nvram_enabled)
 		generic_nvram[offset] = data;
@@ -254,7 +254,7 @@ static WRITE8_HANDLER( nvram_data_w )
 
 static WRITE8_HANDLER( nvram_enable_w )
 {
-	jedi_state *state = machine->driver_data;
+	jedi_state *state = space->machine->driver_data;
 
 	state->nvram_enabled = ~offset & 1;
 }

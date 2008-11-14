@@ -138,7 +138,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -155,25 +155,25 @@ static READ8_HANDLER( switches_r )
 
 	/* DIP switches are selected by ADR0+ADR1 if ADR3 == 0 */
 	if ((offset & 0x0b) == 0x00)
-		result &= (input_port_read(machine, "DIPS") << 6) | 0x3f;
+		result &= (input_port_read(space->machine, "DIPS") << 6) | 0x3f;
 	if ((offset & 0x0b) == 0x01)
-		result &= (input_port_read(machine, "DIPS") << 4) | 0x3f;
+		result &= (input_port_read(space->machine, "DIPS") << 4) | 0x3f;
 	if ((offset & 0x0b) == 0x02)
-		result &= (input_port_read(machine, "DIPS") << 0) | 0x3f;
+		result &= (input_port_read(space->machine, "DIPS") << 0) | 0x3f;
 	if ((offset & 0x0b) == 0x03)
-		result &= (input_port_read(machine, "DIPS") << 2) | 0x3f;
+		result &= (input_port_read(space->machine, "DIPS") << 2) | 0x3f;
 
 	/* other switches are selected by ADR0+ADR1+ADR2 if ADR4 == 0 */
 	if ((offset & 0x17) == 0x00)
-		result &= (input_port_read(machine, "SELECT") << 7) | 0x7f;
+		result &= (input_port_read(space->machine, "SELECT") << 7) | 0x7f;
 	if ((offset & 0x17) == 0x04)
 		result &= ((pot_trigger[0] & ~pot_mask[0]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x05)
 		result &= ((pot_trigger[1] & ~pot_mask[1]) << 7) | 0x7f;
 	if ((offset & 0x17) == 0x06)
-		result &= input_port_read(machine, "SERVE");
+		result &= input_port_read(space->machine, "SERVE");
 	if ((offset & 0x17) == 0x07)
-		result &= (input_port_read(machine, "SELECT") << 6) | 0x7f;
+		result &= (input_port_read(space->machine, "SELECT") << 6) | 0x7f;
 
 	return result;
 }
@@ -199,7 +199,7 @@ static WRITE8_HANDLER( pot_mask1_w )
 {
 	pot_mask[0] = ~offset & 1;
 	pot_trigger[0] = 0;
-	update_nmi_state(machine);
+	update_nmi_state(space->machine);
 }
 
 
@@ -207,7 +207,7 @@ static WRITE8_HANDLER( pot_mask2_w )
 {
 	pot_mask[1] = ~offset & 1;
 	pot_trigger[1] = 0;
-	update_nmi_state(machine);
+	update_nmi_state(space->machine);
 }
 
 
@@ -257,9 +257,9 @@ static WRITE8_HANDLER( coincount_w )
 
 static READ8_HANDLER( sync_r )
 {
-	int hpos = video_screen_get_hpos(machine->primary_screen);
-	sync2_value = (hpos >= 128 && hpos <= video_screen_get_visible_area(machine->primary_screen)->max_x);
-	return video_screen_get_vpos(machine->primary_screen);
+	int hpos = video_screen_get_hpos(space->machine->primary_screen);
+	sync2_value = (hpos >= 128 && hpos <= video_screen_get_visible_area(space->machine->primary_screen)->max_x);
+	return video_screen_get_vpos(space->machine->primary_screen);
 }
 
 

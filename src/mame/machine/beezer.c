@@ -58,22 +58,22 @@ static READ8_HANDLER( b_via_0_pb_r )
 static WRITE8_HANDLER( b_via_0_pa_w )
 {
 	if ((data & 0x08) == 0)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 
 	if ((data & 0x04) == 0)
 	{
 		switch (data & 0x03)
 		{
 		case 0:
-			pbus = input_port_read(machine, "IN0");
+			pbus = input_port_read(space->machine, "IN0");
 			break;
 		case 1:
-			pbus = input_port_read(machine, "IN1") | (input_port_read(machine, "IN2") << 4);
+			pbus = input_port_read(space->machine, "IN1") | (input_port_read(space->machine, "IN2") << 4);
 			break;
 		case 2:
-			pbus = input_port_read(machine, "DSWB");
+			pbus = input_port_read(space->machine, "DSWB");
 			break;
 		case 3:
 			pbus = 0xff;
@@ -123,15 +123,15 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 {
 	if ((data & 0x07) == 0)
 	{
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc600, 0xc7ff, 0, 0, watchdog_reset_w);
-		memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xc9ff, 0, 0, beezer_map_w);
-		memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xca00, 0xcbff, 0, 0, beezer_line_r);
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xce00, 0xcfff, 0, 0, via_0_r, via_0_w);
+		memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc600, 0xc7ff, 0, 0, watchdog_reset_w);
+		memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xc9ff, 0, 0, beezer_map_w);
+		memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xca00, 0xcbff, 0, 0, beezer_line_r);
+		memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xce00, 0xcfff, 0, 0, via_0_r, via_0_w);
 	}
 	else
 	{
-		UINT8 *rom = memory_region(machine, "main") + 0x10000;
-		memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		UINT8 *rom = memory_region(space->machine, "main") + 0x10000;
+		memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_BANK1);
 		memory_set_bankptr(1, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}
 }

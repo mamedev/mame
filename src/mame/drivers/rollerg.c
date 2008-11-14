@@ -27,7 +27,7 @@ static int readzoomroms;
 
 static WRITE8_HANDLER( rollerg_0010_w )
 {
-logerror("%04x: write %02x to 0010\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: write %02x to 0010\n",cpu_get_pc(space->cpu),data);
 
 	/* bits 0/1 are coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -44,20 +44,20 @@ logerror("%04x: write %02x to 0010\n",cpu_get_pc(machine->activecpu),data);
 
 static READ8_HANDLER( rollerg_K051316_r )
 {
-	if (readzoomroms) return K051316_rom_0_r(machine, offset);
-	else return K051316_0_r(machine, offset);
+	if (readzoomroms) return K051316_rom_0_r(space, offset);
+	else return K051316_0_r(space, offset);
 }
 
 static READ8_HANDLER( rollerg_sound_r )
 {
 	/* If the sound CPU is running, read the status, otherwise
        just make it pass the test */
-	return k053260_0_r(machine, 2 + offset);
+	return k053260_0_r(space, 2 + offset);
 }
 
 static WRITE8_HANDLER( soundirq_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static TIMER_CALLBACK( nmi_callback )
@@ -67,7 +67,7 @@ static TIMER_CALLBACK( nmi_callback )
 
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 

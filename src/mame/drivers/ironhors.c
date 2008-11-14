@@ -42,16 +42,16 @@ static INTERRUPT_GEN( ironhors_interrupt )
 
 static WRITE8_HANDLER( ironhors_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( ironhors_filter_w )
 {
 	if (sndti_exists(SOUND_DISCRETE, 2))
 	{
-		discrete_sound_w(machine, NODE_11, (data & 0x04) >> 2);
-		discrete_sound_w(machine, NODE_12, (data & 0x02) >> 1);
-		discrete_sound_w(machine, NODE_13, (data & 0x01) >> 0);
+		discrete_sound_w(space, NODE_11, (data & 0x04) >> 2);
+		discrete_sound_w(space, NODE_12, (data & 0x02) >> 1);
+		discrete_sound_w(space, NODE_13, (data & 0x01) >> 0);
 	}
 }
 

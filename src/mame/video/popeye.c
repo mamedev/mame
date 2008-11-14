@@ -230,7 +230,7 @@ WRITE8_HANDLER( skyskipr_bitmap_w )
 	if (data & 0x80)
 		offset |= 0x40;
 
-	popeye_bitmap_w(machine,offset,data);
+	popeye_bitmap_w(space,offset,data);
 }
 
 static TILE_GET_INFO( get_fg_tile_info )

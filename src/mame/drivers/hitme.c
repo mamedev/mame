@@ -148,25 +148,25 @@ static UINT8 read_port_and_t0_and_hblank(running_machine *machine, int port)
 
 static READ8_HANDLER( hitme_port_0_r )
 {
-	return read_port_and_t0_and_hblank(machine, 0);
+	return read_port_and_t0_and_hblank(space->machine, 0);
 }
 
 
 static READ8_HANDLER( hitme_port_1_r )
 {
-	return read_port_and_t0(machine, 1);
+	return read_port_and_t0(space->machine, 1);
 }
 
 
 static READ8_HANDLER( hitme_port_2_r )
 {
-	return read_port_and_t0_and_hblank(machine, 2);
+	return read_port_and_t0_and_hblank(space->machine, 2);
 }
 
 
 static READ8_HANDLER( hitme_port_3_r )
 {
-	return read_port_and_t0(machine, 3);
+	return read_port_and_t0(space->machine, 3);
 }
 
 
@@ -185,20 +185,20 @@ static WRITE8_HANDLER( output_port_0_w )
         In fact, it is very important that our timing calculation timeout AFTER the sound
         system's equivalent computation, or else we will hang notes.
     */
-	UINT8 raw_game_speed = input_port_read(machine, "R3");
+	UINT8 raw_game_speed = input_port_read(space->machine, "R3");
 	double resistance = raw_game_speed * 25000 / 100;
 	attotime duration = attotime_make(0, ATTOSECONDS_PER_SECOND * 0.45 * 6.8e-6 * resistance * (data+1));
 	timeout_time = attotime_add(timer_get_time(), duration);
 
-	discrete_sound_w(machine, HITME_DOWNCOUNT_VAL, data);
-	discrete_sound_w(machine, HITME_OUT0, 1);
+	discrete_sound_w(space, HITME_DOWNCOUNT_VAL, data);
+	discrete_sound_w(space, HITME_OUT0, 1);
 }
 
 
 static WRITE8_HANDLER( output_port_1_w )
 {
-	discrete_sound_w(machine, HITME_ENABLE_VAL, data);
-	discrete_sound_w(machine, HITME_OUT1, 1);
+	discrete_sound_w(space, HITME_ENABLE_VAL, data);
+	discrete_sound_w(space, HITME_OUT1, 1);
 }
 
 

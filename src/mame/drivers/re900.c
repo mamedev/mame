@@ -90,7 +90,7 @@ static UINT8 psg_pa, psg_pb = 0, mux_data = 0, ledant = 0, player = 1, stat_a= 1
 
 static READ8_HANDLER (re_psg_portA_r)
 {
-	if ((input_port_read(machine, "IN0") & 0x01) == 0)
+	if ((input_port_read(space->machine, "IN0") & 0x01) == 0)
 	{
 		output_set_lamp_value(0,1);		// Operator Key ON
 	}
@@ -100,7 +100,7 @@ static READ8_HANDLER (re_psg_portA_r)
 		output_set_lamp_value(0,0);		// Operator Key OFF
 	}
 
-	return input_port_read(machine, "IN0");
+	return input_port_read(space->machine, "IN0");
 }
 
 static READ8_HANDLER (re_psg_portB_r)
@@ -111,7 +111,7 @@ static READ8_HANDLER (re_psg_portB_r)
 
 	output_set_lamp_value(player,1);
 
-	if (input_port_read(machine, "IN_S"))
+	if (input_port_read(space->machine, "IN_S"))
 	{
 		if (!stat_a)
 		{
@@ -142,12 +142,12 @@ static READ8_HANDLER (re_psg_portB_r)
 	/* "INA": Unified port to share the player Keys among all players - Key In & Key Out have their own buttons on keyboard. */
 	switch( mux_data )
 	{
-		case 0x01: retval = (input_port_read(machine, "IN6") | 0x80 ) - (( player == 6 ) ? (input_port_read(machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 6 */
-		case 0x02: retval = (input_port_read(machine, "IN5") | 0x80 ) - (( player == 5 ) ? (input_port_read(machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 5 */
-		case 0x04: retval = (input_port_read(machine, "IN4") | 0x80 ) - (( player == 4 ) ? (input_port_read(machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 4 */
-		case 0x08: retval = (input_port_read(machine, "IN3") | 0x80 ) - (( player == 3 ) ? (input_port_read(machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 3 */
-		case 0x10: retval = (input_port_read(machine, "IN2") | 0x80 ) - (( player == 2 ) ? (input_port_read(machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 2 */
-		case 0x20: retval = (input_port_read(machine, "IN1") | 0x80 ) - (( player == 1 ) ? (input_port_read(machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 1 */
+		case 0x01: retval = (input_port_read(space->machine, "IN6") | 0x80 ) - (( player == 6 ) ? (input_port_read(space->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 6 */
+		case 0x02: retval = (input_port_read(space->machine, "IN5") | 0x80 ) - (( player == 5 ) ? (input_port_read(space->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 5 */
+		case 0x04: retval = (input_port_read(space->machine, "IN4") | 0x80 ) - (( player == 4 ) ? (input_port_read(space->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 4 */
+		case 0x08: retval = (input_port_read(space->machine, "IN3") | 0x80 ) - (( player == 3 ) ? (input_port_read(space->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 3 */
+		case 0x10: retval = (input_port_read(space->machine, "IN2") | 0x80 ) - (( player == 2 ) ? (input_port_read(space->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 2 */
+		case 0x20: retval = (input_port_read(space->machine, "IN1") | 0x80 ) - (( player == 1 ) ? (input_port_read(space->machine, "INA") | 0x80 ) ^ 0xff: 0x00 ); break; /* Player 1 */
 	}
 
 	return retval;
@@ -155,12 +155,12 @@ static READ8_HANDLER (re_psg_portB_r)
 
 static READ8_HANDLER (bs94_portA_r)
 {
-	return input_port_read(machine, "IN0");
+	return input_port_read(space->machine, "IN0");
 }
 
 static READ8_HANDLER (bs94_portB_r)
 {
-	return input_port_read(machine, "IN1");
+	return input_port_read(space->machine, "IN1");
 }
 
 static READ8_HANDLER (rom_r)
@@ -205,7 +205,7 @@ static WRITE8_HANDLER (cpu_port_0_w)
 
 static WRITE8_HANDLER(re900_watchdog_reset_w)
 {
-	//watchdog_reset_w(machine,0,0); /* To do! */
+	//watchdog_reset_w(space,0,0); /* To do! */
 }
 
 

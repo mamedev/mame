@@ -55,7 +55,7 @@ static WRITE16_HANDLER ( crospang_soundlatch_w )
 {
 	if(ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xff);
+		soundlatch_w(space,0,data & 0xff);
 	}
 }
 

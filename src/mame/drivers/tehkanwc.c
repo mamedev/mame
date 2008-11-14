@@ -119,9 +119,9 @@ extern VIDEO_UPDATE( tehkanwc );
 static WRITE8_HANDLER( sub_cpu_halt_w )
 {
 	if (data)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 
@@ -132,40 +132,40 @@ static READ8_HANDLER( tehkanwc_track_0_r )
 {
 	int joy;
 
-	joy = input_port_read(machine, "FAKE") >> (2 * offset);
+	joy = input_port_read(space->machine, "FAKE") >> (2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read(machine, offset ? "P1Y" : "P1X") - track0[offset];
+	return input_port_read(space->machine, offset ? "P1Y" : "P1X") - track0[offset];
 }
 
 static READ8_HANDLER( tehkanwc_track_1_r )
 {
 	int joy;
 
-	joy = input_port_read(machine, "FAKE") >> (4 + 2 * offset);
+	joy = input_port_read(space->machine, "FAKE") >> (4 + 2 * offset);
 	if (joy & 1) return -63;
 	if (joy & 2) return 63;
-	return input_port_read(machine, offset ? "P2Y" : "P2X") - track1[offset];
+	return input_port_read(space->machine, offset ? "P2Y" : "P2X") - track1[offset];
 }
 
 static WRITE8_HANDLER( tehkanwc_track_0_reset_w )
 {
 	/* reset the trackball counters */
-	track0[offset] = input_port_read(machine, offset ? "P1Y" : "P1X") + data;
+	track0[offset] = input_port_read(space->machine, offset ? "P1Y" : "P1X") + data;
 }
 
 static WRITE8_HANDLER( tehkanwc_track_1_reset_w )
 {
 	/* reset the trackball counters */
-	track1[offset] = input_port_read(machine, offset ? "P2Y" : "P2X") + data;
+	track1[offset] = input_port_read(space->machine, offset ? "P2Y" : "P2X") + data;
 }
 
 
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line(machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static TIMER_CALLBACK( reset_callback )
@@ -175,11 +175,11 @@ static TIMER_CALLBACK( reset_callback )
 
 static WRITE8_HANDLER( sound_answer_w )
 {
-	soundlatch2_w(machine,0,data);
+	soundlatch2_w(space,0,data);
 
 	/* in Gridiron, the sound CPU goes in a tight loop after the self test, */
 	/* probably waiting to be reset by a watchdog */
-	if (cpu_get_pc(machine->activecpu) == 0x08bc) timer_set(ATTOTIME_IN_SEC(1), NULL,0,reset_callback);
+	if (cpu_get_pc(space->cpu) == 0x08bc) timer_set(ATTOTIME_IN_SEC(1), NULL,0,reset_callback);
 }
 
 

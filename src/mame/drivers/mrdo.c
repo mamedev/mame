@@ -33,8 +33,8 @@ VIDEO_UPDATE( mrdo );
 /* if a read from this address doesn't return the value it expects. */
 static READ8_HANDLER( mrdo_SECRE_r )
 {
-	UINT8 *RAM = memory_region(machine, "main");
-	return RAM[ cpu_get_reg(machine->activecpu, Z80_HL) ];
+	UINT8 *RAM = memory_region(space->machine, "main");
+	return RAM[ cpu_get_reg(space->cpu, Z80_HL) ];
 }
 
 

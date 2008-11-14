@@ -125,7 +125,7 @@ static WRITE16_HANDLER(colordac_w)
 	if (ACCESSING_BITS_0_7)
 	{
 		colorram[clr_offset] = data;
-		palette_set_color_rgb(machine, clr_offset/3,
+		palette_set_color_rgb(space->machine, clr_offset/3,
 			pal6bit(colorram[(clr_offset/3)*3+0]),
 			pal6bit(colorram[(clr_offset/3)*3+1]),
 			pal6bit(colorram[(clr_offset/3)*3+2])
@@ -205,10 +205,10 @@ static WRITE16_HANDLER( bishjan_sel_w )
 static READ16_HANDLER( bishjan_unk_r )
 {
 	return
-		(mame_rand(machine) & 0x9800)	|	// bit 7 eeprom?
+		(mame_rand(space->machine) & 0x9800)	|	// bit 7 eeprom?
 		(((bishjan_sel==0x12) ? 0x40:0x00) << 8) |
 //      (mame_rand() & 0xff);
-//      (((video_screen_get_frame_number(machine->primary_screen)%60)==0)?0x18:0x00);
+//      (((video_screen_get_frame_number(space->machine->primary_screen)%60)==0)?0x18:0x00);
 		0x18;
 }
 
@@ -225,11 +225,11 @@ static READ16_HANDLER( bishjan_input_r )
 
 	for (i = 0; i < 5; i++)
 		if (bishjan_input & (1 << i))
-			res = input_port_read(machine, port[i]);
+			res = input_port_read(space->machine, port[i]);
 
 	return	(res << 8) |
-			input_port_read(machine, "SYSTEM") |
-			((bishjan_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0x00 : 0x04)	// bit 2: hopper sensor
+			input_port_read(space->machine, "SYSTEM") |
+			((bishjan_hopper && !(video_screen_get_frame_number(space->machine->primary_screen)%10)) ? 0x00 : 0x04)	// bit 2: hopper sensor
 	;
 }
 

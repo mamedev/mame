@@ -44,8 +44,8 @@ static WRITE8_HANDLER( thedeep_nmi_w )
 
 static WRITE8_HANDLER( thedeep_sound_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static UINT8 protection_command, protection_data;
@@ -87,7 +87,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 			int new_rombank = protection_command & 3;
 			if (rombank == new_rombank)	break;
 			rombank = new_rombank;
-			rom = memory_region(machine, "main");
+			rom = memory_region(space->machine, "main");
 			memory_set_bankptr(1, rom + 0x10000 + rombank * 0x4000);
 			/* there's code which falls through from the fixed ROM to bank #1, I have to */
 			/* copy it there otherwise the CPU bank switching support will not catch it. */
@@ -117,7 +117,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 // d166-d174:   hl = (hl + 2*a)
 // d175-d181:   hl *= e (e must be non zero)
 // d182-d19a:   hl /= de
-				protection_data = memory_region(machine, "cpu3")[0x185+protection_index++];
+				protection_data = memory_region(space->machine, "cpu3")[0x185+protection_index++];
 			else
 				protection_data = 0xc9;
 
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( thedeep_protection_w )
 		break;
 
 		default:
-			logerror( "pc %04x: protection_command %02x\n", cpu_get_pc(machine->activecpu),protection_command);
+			logerror( "pc %04x: protection_command %02x\n", cpu_get_pc(space->cpu),protection_command);
 	}
 }
 
@@ -144,7 +144,7 @@ static READ8_HANDLER( thedeep_protection_r )
 static WRITE8_HANDLER( thedeep_e100_w )
 {
 	if (data != 1)
-		logerror("pc %04x: e100 = %02x\n", cpu_get_pc(machine->activecpu),data);
+		logerror("pc %04x: e100 = %02x\n", cpu_get_pc(space->cpu),data);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

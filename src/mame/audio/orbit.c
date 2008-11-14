@@ -15,24 +15,24 @@
 
 WRITE8_HANDLER( orbit_note_w )
 {
-	discrete_sound_w(machine, ORBIT_NOTE_FREQ, (~data) & 0xff);
+	discrete_sound_w(space, ORBIT_NOTE_FREQ, (~data) & 0xff);
 }
 
 WRITE8_HANDLER( orbit_note_amp_w )
 {
-	discrete_sound_w(machine, ORBIT_ANOTE1_AMP, data & 0x0f);
-	discrete_sound_w(machine, ORBIT_ANOTE2_AMP, data >> 4);
+	discrete_sound_w(space, ORBIT_ANOTE1_AMP, data & 0x0f);
+	discrete_sound_w(space, ORBIT_ANOTE2_AMP, data >> 4);
 }
 
 WRITE8_HANDLER( orbit_noise_amp_w )
 {
-	discrete_sound_w(machine, ORBIT_NOISE1_AMP, data & 0x0f);
-	discrete_sound_w(machine, ORBIT_NOISE2_AMP, data >> 4);
+	discrete_sound_w(space, ORBIT_NOISE1_AMP, data & 0x0f);
+	discrete_sound_w(space, ORBIT_NOISE2_AMP, data >> 4);
 }
 
 WRITE8_HANDLER( orbit_noise_rst_w )
 {
-	discrete_sound_w(machine, ORBIT_NOISE_EN, 0);
+	discrete_sound_w(space, ORBIT_NOISE_EN, 0);
 }
 
 

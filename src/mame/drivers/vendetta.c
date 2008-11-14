@@ -148,7 +148,7 @@ static READ8_HANDLER( vendetta_eeprom_r )
 
 	res |= 0x02;	//konami_eeprom_ack() << 5;     /* add the ack */
 
-	res |= input_port_read(machine, "EEPROM") & 0x0d;	/* test switch */
+	res |= input_port_read(space->machine, "EEPROM") & 0x0d;	/* test switch */
 
 	if (init_eeprom_count)
 	{
@@ -181,20 +181,20 @@ static WRITE8_HANDLER( vendetta_eeprom_w )
 
 	irq_enabled = ( data >> 6 ) & 1;
 
-	vendetta_video_banking( machine, data & 1 );
+	vendetta_video_banking( space->machine, data & 1 );
 }
 
 /********************************************/
 
-static READ8_HANDLER( vendetta_K052109_r ) { return K052109_r( machine, offset + 0x2000 ); }
+static READ8_HANDLER( vendetta_K052109_r ) { return K052109_r( space->machine, offset + 0x2000 ); }
 //static WRITE8_HANDLER( vendetta_K052109_w ) { K052109_w( machine, offset + 0x2000, data ); }
 static WRITE8_HANDLER( vendetta_K052109_w ) {
 	// *************************************************************************************
 	// *  Escape Kids uses 052109's mirrored Tilemap ROM bank selector, but only during    *
 	// *  Tilemap MASK-ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
 	// *************************************************************************************
-	if ( ( offset == 0x1d80 ) || ( offset == 0x1e00 ) || ( offset == 0x1f00 ) )		K052109_w( machine, offset, data );
-	K052109_w( machine, offset + 0x2000, data );
+	if ( ( offset == 0x1d80 ) || ( offset == 0x1e00 ) || ( offset == 0x1f00 ) )		K052109_w( space->machine, offset, data );
+	K052109_w( space->machine, offset + 0x2000, data );
 }
 
 static offs_t video_banking_base;
@@ -238,25 +238,25 @@ static TIMER_CALLBACK( z80_nmi_callback )
 
 static WRITE8_HANDLER( z80_arm_nmi_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE );
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE );
 
 	timer_set( ATTOTIME_IN_USEC( 25 ), NULL, 0, z80_nmi_callback );
 }
 
 static WRITE8_HANDLER( z80_irq_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
 }
 
 static READ8_HANDLER( vendetta_sound_interrupt_r )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 
 static READ8_HANDLER( vendetta_sound_r )
 {
-	return k053260_0_r(machine, 2 + offset);
+	return k053260_0_r(space, 2 + offset);
 }
 
 /********************************************/

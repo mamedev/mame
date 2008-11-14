@@ -206,9 +206,9 @@ static READ8_HANDLER( dual_pokey_r )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		return pokey1_r(machine, pokey_reg);
+		return pokey1_r(space, pokey_reg);
 	else
-		return pokey2_r(machine, pokey_reg);
+		return pokey2_r(space, pokey_reg);
 }
 
 
@@ -219,9 +219,9 @@ static WRITE8_HANDLER( dual_pokey_w )
 	int pokey_reg = (offset % 8) | control;
 
 	if (pokey_num == 0)
-		pokey1_w(machine, pokey_reg, data);
+		pokey1_w(space, pokey_reg, data);
 	else
-		pokey2_w(machine, pokey_reg, data);
+		pokey2_w(space, pokey_reg, data);
 }
 
 
@@ -239,7 +239,7 @@ static WRITE8_HANDLER( speech_data_w )
 
 static WRITE8_HANDLER( speech_strobe_w )
 {
-	tms5220_data_w(machine, 0, speech_write_buffer);
+	tms5220_data_w(space, 0, speech_write_buffer);
 }
 
 /*************************************

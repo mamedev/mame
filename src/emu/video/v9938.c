@@ -820,13 +820,13 @@ static void v9938_register_write (int reg, int data)
 READ8_HANDLER( v9938_0_status_r )
 {
 	vdp = &vdps[0];
-	return v9938_status_r(machine);
+	return v9938_status_r(space->machine);
 }
 
 READ8_HANDLER( v9938_1_status_r )
 {
 	vdp = &vdps[1];
-	return v9938_status_r(machine);
+	return v9938_status_r(space->machine);
 }
 
 /***************************************************************************

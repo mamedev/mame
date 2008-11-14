@@ -161,12 +161,12 @@ static MACHINE_RESET( tickee )
 
 static READ8_HANDLER( port1_r )
 {
-	return input_port_read(machine, "IN0") | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
+	return input_port_read(space->machine, "IN0") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
 }
 
 static READ8_HANDLER( port2_r )
 {
-	return input_port_read(machine, "IN2") | (ticket_dispenser_0_r(machine, 0) >> 5) | (ticket_dispenser_1_r(machine, 0) >> 6);
+	return input_port_read(space->machine, "IN2") | (ticket_dispenser_0_r(space, 0) >> 5) | (ticket_dispenser_1_r(space, 0) >> 6);
 }
 
 
@@ -192,12 +192,12 @@ static WRITE16_HANDLER( tickee_control_w )
 
 	if (offset == 3)
 	{
-		ticket_dispenser_0_w(machine, 0, (data & 8) << 4);
-		ticket_dispenser_1_w(machine, 0, (data & 4) << 5);
+		ticket_dispenser_0_w(space, 0, (data & 8) << 4);
+		ticket_dispenser_1_w(space, 0, (data & 4) << 5);
 	}
 
 	if (olddata != tickee_control[offset])
-		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(machine->activecpu), offset, tickee_control[offset], olddata);
+		logerror("%08X:tickee_control_w(%d) = %04X (was %04X)\n", cpu_get_pc(space->cpu), offset, tickee_control[offset], olddata);
 }
 
 

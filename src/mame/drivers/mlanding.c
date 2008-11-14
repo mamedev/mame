@@ -80,14 +80,14 @@ static READ16_HANDLER( io1_r ) //240006
 static WRITE16_HANDLER(ml_subreset_w)
 {
 	//wrong
-	if(cpu_get_pc(machine->activecpu)==0x822)
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);
+	if(cpu_get_pc(space->cpu)==0x822)
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	data=0;
-	memory_set_bankptr( 1, memory_region(machine, "z80") + ((data) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr( 1, memory_region(space->machine, "z80") + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static void ml_msm5205_vck(running_machine *machine, int chip)

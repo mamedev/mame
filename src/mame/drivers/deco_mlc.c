@@ -118,9 +118,9 @@ static int mlc_raster_table[9][256];
 static READ32_HANDLER(test2_r)
 {
 //  if (offset==0)
-//      return input_port_read(machine, "IN0"); //0xffffffff;
-//   logerror("%08x:  Test2_r %d\n",cpu_get_pc(machine->activecpu),offset);
-	return mame_rand(machine); //0xffffffff;
+//      return input_port_read(space->machine, "IN0"); //0xffffffff;
+//   logerror("%08x:  Test2_r %d\n",cpu_get_pc(space->cpu),offset);
+	return mame_rand(space->machine); //0xffffffff;
 }
 
 static READ32_HANDLER(test3_r)
@@ -130,8 +130,8 @@ static READ32_HANDLER(test3_r)
 
 */
 //if (offset==0)
-//  return mame_rand(machine)|(mame_rand(machine)<<16);
-//  logerror("%08x:  Test3_r %d\n",cpu_get_pc(machine->activecpu),offset);
+//  return mame_rand(space->machine)|(mame_rand(space->machine)<<16);
+//  logerror("%08x:  Test3_r %d\n",cpu_get_pc(space->cpu),offset);
 	return 0xffffffff;
 }
 
@@ -149,22 +149,22 @@ static WRITE32_HANDLER( avengrs_eprom_w )
 		//volume control todo
 	}
 	else
-		logerror("%08x:  eprom_w %08x mask %08x\n",cpu_get_pc(machine->activecpu),data,mem_mask);
+		logerror("%08x:  eprom_w %08x mask %08x\n",cpu_get_pc(space->cpu),data,mem_mask);
 }
 
 static WRITE32_HANDLER( avengrs_palette_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	/* x bbbbb ggggg rrrrr */
-	palette_set_color_rgb(machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
+	palette_set_color_rgb(space->machine,offset,pal5bit(paletteram32[offset] >> 0),pal5bit(paletteram32[offset] >> 5),pal5bit(paletteram32[offset] >> 10));
 }
 
 static READ32_HANDLER( avengrs_sound_r )
 {
 	if (ACCESSING_BITS_24_31) {
-		return ymz280b_status_0_r(machine,0)<<24;
+		return ymz280b_status_0_r(space,0)<<24;
 	} else {
-		logerror("%08x:  non-byte read from sound mask %08x\n",cpu_get_pc(machine->activecpu),mem_mask);
+		logerror("%08x:  non-byte read from sound mask %08x\n",cpu_get_pc(space->cpu),mem_mask);
 	}
 
 	return 0;
@@ -174,11 +174,11 @@ static WRITE32_HANDLER( avengrs_sound_w )
 {
 	if (ACCESSING_BITS_24_31) {
 		if (offset)
-			ymz280b_data_0_w(machine,0,data>>24);
+			ymz280b_data_0_w(space,0,data>>24);
 		else
-			ymz280b_register_0_w(machine,0,data>>24);
+			ymz280b_register_0_w(space,0,data>>24);
 	} else {
-		logerror("%08x:  non-byte written to sound %08x mask %08x\n",cpu_get_pc(machine->activecpu),data,mem_mask);
+		logerror("%08x:  non-byte written to sound %08x mask %08x\n",cpu_get_pc(space->cpu),data,mem_mask);
 	}
 }
 
@@ -186,15 +186,15 @@ static READ32_HANDLER( decomlc_vbl_r )
 {
 	static int i=0xffffffff;
 	i ^=0xffffffff;
-//logerror("vbl r %08x\n", cpu_get_pc(machine->activecpu));
+//logerror("vbl r %08x\n", cpu_get_pc(space->cpu));
 	// Todo: Vblank probably in $10
 	return i;
 }
 
 static READ32_HANDLER( mlc_scanline_r )
 {
-//  logerror("read scanline counter (%d)\n", video_screen_get_vpos(machine->primary_screen));
-	return video_screen_get_vpos(machine->primary_screen);
+//  logerror("read scanline counter (%d)\n", video_screen_get_vpos(space->machine->primary_screen));
+	return video_screen_get_vpos(space->machine->primary_screen);
 }
 
 static TIMER_CALLBACK( interrupt_gen )
@@ -206,18 +206,18 @@ static TIMER_CALLBACK( interrupt_gen )
 static WRITE32_HANDLER( mlc_irq_w )
 {
 	static int lastScanline[9]={ 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	int scanline=video_screen_get_vpos(machine->primary_screen);
+	int scanline=video_screen_get_vpos(space->machine->primary_screen);
 	irq_ram[offset]=data&0xffff;
 
 	switch (offset*4)
 	{
 	case 0x10: /* IRQ ack.  Value written doesn't matter */
-		cpu_set_input_line(machine->cpu[0], mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], mainCpuIsArm ? ARM_IRQ_LINE : 1, CLEAR_LINE);
 		return;
 		break;
 	case 0x14: /* Prepare scanline interrupt */
-		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(machine->primary_screen, irq_ram[0x14/4], 0),0);
-		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(machine->primary_screen));
+		timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, irq_ram[0x14/4], 0),0);
+		//logerror("prepare scanline to fire at %d (currently on %d)\n", irq_ram[0x14/4], video_screen_get_vpos(space->machine->primary_screen));
 		return;
 		break;
 	case 0x18:
@@ -273,7 +273,7 @@ static READ32_HANDLER(stadhr96_prot_146_r)
     */
 	offset<<=1;
 
-	logerror("%08x:  Read prot %04x\n", cpu_get_pc(machine->activecpu), offset);
+	logerror("%08x:  Read prot %04x\n", cpu_get_pc(space->cpu), offset);
 
 	if (offset==0x5c4)
 		return 0xaa55 << 16;
@@ -713,9 +713,9 @@ static void descramble_sound( running_machine *machine )
 static READ32_HANDLER( avengrgs_speedup_r )
 {
 	UINT32 a=mlc_ram[0x89a0/4];
-	UINT32 p=cpu_get_pc(machine->activecpu);
+	UINT32 p=cpu_get_pc(space->cpu);
 
-	if ((p==0x3234 || p==0x32dc) && (a&1)) cpu_spinuntil_int(machine->activecpu);
+	if ((p==0x3234 || p==0x32dc) && (a&1)) cpu_spinuntil_int(space->cpu);
 
 	return a;
 }

@@ -709,7 +709,7 @@ static READ8_HANDLER( ramdac_r )
 			if (*count == 0)
 			{
 				rgb_t color;
-				color = palette_get_color(machine, ramdac.addr_r);
+				color = palette_get_color(space->machine, ramdac.addr_r);
 
 				ramdac.color_r[0] = RGB_RED(color);
 				ramdac.color_r[1] = RGB_GREEN(color);
@@ -730,7 +730,7 @@ static READ8_HANDLER( ramdac_r )
 		}
 		default:
 		{
-			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", cpu_get_previouspc(machine->activecpu));
+			mame_printf_debug("Unhandled RAMDAC read (PC:%.4x)\n", cpu_get_previouspc(space->cpu));
 		}
 	}
 
@@ -753,7 +753,7 @@ static WRITE8_HANDLER( ramdac_w )
 			ramdac.color_w[ramdac.count_w] = pal6bit(data);
 			if (++ramdac.count_w == 3)
 			{
-				palette_set_color_rgb(machine, ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
+				palette_set_color_rgb(space->machine, ramdac.addr_w, ramdac.color_w[0], ramdac.color_w[1], ramdac.color_w[2]);
 				ramdac.count_w = 0;
 				ramdac.addr_w++;
 			}
@@ -846,7 +846,7 @@ static READ8_HANDLER( chipset_r )
 			val = 0x1;
 
 			/* TODO */
-			update_irqs(machine);
+			update_irqs(space->machine);
 			break;
 		}
 		case 0x1C:
@@ -863,12 +863,12 @@ static READ8_HANDLER( chipset_r )
 		}
 		case 0x22:
 		{
-			val = 0x40 | input_port_read(machine, "JOYSTICK");
+			val = 0x40 | input_port_read(space->machine, "JOYSTICK");
 			break;
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, cpu_get_previouspc(machine->activecpu));
+			mame_printf_debug("Flare One unknown read: 0x%.2x (PC:0x%.4x)\n", offset, cpu_get_previouspc(space->cpu));
 		}
 	}
 
@@ -884,11 +884,11 @@ static WRITE8_HANDLER( chipset_w )
 		case 0x03:
 		{
 			if (data > 0x3f)
-				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(machine->activecpu), data);
+				popmessage("%x: Unusual bank access (%x)\n", cpu_get_previouspc(space->cpu), data);
 
 			data &= 0x3f;
 			bank[offset] = data;
-			z80_bank(machine, offset, data);
+			z80_bank(space->machine, offset, data);
 			break;
 		}
 
@@ -945,7 +945,7 @@ static WRITE8_HANDLER( chipset_w )
 			blitter.command = data;
 
 			if (data & CMD_RUN)
-				RunBlit(machine);
+				RunBlit(space->machine);
 			else
 				mame_printf_debug("Blitter stopped by IO.\n");
 
@@ -958,7 +958,7 @@ static WRITE8_HANDLER( chipset_w )
 		}
 		default:
 		{
-			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, cpu_get_previouspc(machine->activecpu));
+			mame_printf_debug("Flare One unknown write: 0x%.2x with 0x%.2x (PC:0x%.4x)\n", offset, data, cpu_get_previouspc(space->cpu));
 		}
 	}
 }
@@ -991,9 +991,9 @@ INLINE void z80_bank(running_machine *machine, int num, int data)
 static WRITE8_HANDLER( rombank_w )
 {
 	bank[0] = data;
-	z80_bank(machine, 1, bank[1]);
-	z80_bank(machine, 2, bank[2]);
-	z80_bank(machine, 3, bank[3]);
+	z80_bank(space->machine, 1, bank[1]);
+	z80_bank(space->machine, 2, bank[2]);
+	z80_bank(space->machine, 3, bank[3]);
 }
 
 
@@ -1114,7 +1114,7 @@ static READ8_HANDLER( fddata_r )
 				}
 
 				fdc.offset = (BPT * fdc.track*2) + (fdc.side ? BPT : 0) + (BPS * (fdc.sector-1)) + fdc.byte_pos++;
-				val = *(memory_region(machine, "user2") + fdc.offset);
+				val = *(memory_region(space->machine, "user2") + fdc.offset);
 
 				/* Move on to next sector? */
 				if (fdc.byte_pos == 1024)
@@ -1378,7 +1378,7 @@ static WRITE8_HANDLER( meter_w )
 		if (changed & (1 << i))
 		{
 			Mechmtr_update(i, cycles, data & (1 << i) );
-			cpu_set_input_line(machine->cpu[1], M6809_FIRQ_LINE, PULSE_LINE );
+			cpu_set_input_line(space->machine->cpu[1], M6809_FIRQ_LINE, PULSE_LINE );
 		}
  	}
 }
@@ -1408,7 +1408,7 @@ static WRITE8_HANDLER( latch_w )
 
 				/* Clock is low */
 				if (!(data & 0x08))
-					mux_input = input_port_read(machine, port[input_strobe]);
+					mux_input = input_port_read(space->machine, port[input_strobe]);
 			}
 			break;
 		}

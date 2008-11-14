@@ -83,7 +83,7 @@ INLINE uint g65816i_read_8_direct(uint address)
 INLINE uint g65816i_read_8_vector(uint address)
 {
 	if (READ_VECTOR)
-		return READ_VECTOR(Machine, address);
+		return READ_VECTOR(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), address);
 	else
 		return g65816i_read_8_normal(address);
 }

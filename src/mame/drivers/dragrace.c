@@ -41,7 +41,7 @@ static MACHINE_RESET( dragrace )
 	timer_pulse(video_screen_get_frame_period(machine->primary_screen), NULL, 0, dragrace_frame_callback);
 }
 
-static void dragrace_update_misc_flags(running_machine *machine)
+static void dragrace_update_misc_flags(const address_space *space)
 {
 	/* 0x0900 = set 3SPEED1         0x00000001
      * 0x0901 = set 4SPEED1         0x00000002
@@ -77,21 +77,21 @@ static void dragrace_update_misc_flags(running_machine *machine)
 	set_led_status(0, dragrace_misc_flags & 0x00008000);
 	set_led_status(1, dragrace_misc_flags & 0x80000000);
 
-	discrete_sound_w(machine, DRAGRACE_MOTOR1_DATA,  ~dragrace_misc_flags & 0x0000001f);		// Speed1 data*
-	discrete_sound_w(machine, DRAGRACE_EXPLODE1_EN, (dragrace_misc_flags & 0x00000020) ? 1: 0);	// Explosion1 enable
-	discrete_sound_w(machine, DRAGRACE_SCREECH1_EN, (dragrace_misc_flags & 0x00000040) ? 1: 0);	// Screech1 enable
-	discrete_sound_w(machine, DRAGRACE_KLEXPL1_EN, (dragrace_misc_flags & 0x00000200) ? 1: 0);	// KLEXPL1 enable
-	discrete_sound_w(machine, DRAGRACE_MOTOR1_EN, (dragrace_misc_flags & 0x00000800) ? 1: 0);	// Motor1 enable
+	discrete_sound_w(space, DRAGRACE_MOTOR1_DATA,  ~dragrace_misc_flags & 0x0000001f);		// Speed1 data*
+	discrete_sound_w(space, DRAGRACE_EXPLODE1_EN, (dragrace_misc_flags & 0x00000020) ? 1: 0);	// Explosion1 enable
+	discrete_sound_w(space, DRAGRACE_SCREECH1_EN, (dragrace_misc_flags & 0x00000040) ? 1: 0);	// Screech1 enable
+	discrete_sound_w(space, DRAGRACE_KLEXPL1_EN, (dragrace_misc_flags & 0x00000200) ? 1: 0);	// KLEXPL1 enable
+	discrete_sound_w(space, DRAGRACE_MOTOR1_EN, (dragrace_misc_flags & 0x00000800) ? 1: 0);	// Motor1 enable
 
-	discrete_sound_w(machine, DRAGRACE_MOTOR2_DATA, (~dragrace_misc_flags & 0x001f0000) >> 0x10);	// Speed2 data*
-	discrete_sound_w(machine, DRAGRACE_EXPLODE2_EN, (dragrace_misc_flags & 0x00200000) ? 1: 0);	// Explosion2 enable
-	discrete_sound_w(machine, DRAGRACE_SCREECH2_EN, (dragrace_misc_flags & 0x00400000) ? 1: 0);	// Screech2 enable
-	discrete_sound_w(machine, DRAGRACE_KLEXPL2_EN, (dragrace_misc_flags & 0x02000000) ? 1: 0);	// KLEXPL2 enable
-	discrete_sound_w(machine, DRAGRACE_MOTOR2_EN, (dragrace_misc_flags & 0x08000000) ? 1: 0);	// Motor2 enable
+	discrete_sound_w(space, DRAGRACE_MOTOR2_DATA, (~dragrace_misc_flags & 0x001f0000) >> 0x10);	// Speed2 data*
+	discrete_sound_w(space, DRAGRACE_EXPLODE2_EN, (dragrace_misc_flags & 0x00200000) ? 1: 0);	// Explosion2 enable
+	discrete_sound_w(space, DRAGRACE_SCREECH2_EN, (dragrace_misc_flags & 0x00400000) ? 1: 0);	// Screech2 enable
+	discrete_sound_w(space, DRAGRACE_KLEXPL2_EN, (dragrace_misc_flags & 0x02000000) ? 1: 0);	// KLEXPL2 enable
+	discrete_sound_w(space, DRAGRACE_MOTOR2_EN, (dragrace_misc_flags & 0x08000000) ? 1: 0);	// Motor2 enable
 
-	discrete_sound_w(machine, DRAGRACE_ATTRACT_EN, (dragrace_misc_flags & 0x00001000) ? 1: 0);	// Attract enable
-	discrete_sound_w(machine, DRAGRACE_LOTONE_EN, (dragrace_misc_flags & 0x00002000) ? 1: 0);	// LoTone enable
-	discrete_sound_w(machine, DRAGRACE_HITONE_EN, (dragrace_misc_flags & 0x20000000) ? 1: 0);	// HiTone enable
+	discrete_sound_w(space, DRAGRACE_ATTRACT_EN, (dragrace_misc_flags & 0x00001000) ? 1: 0);	// Attract enable
+	discrete_sound_w(space, DRAGRACE_LOTONE_EN, (dragrace_misc_flags & 0x00002000) ? 1: 0);	// LoTone enable
+	discrete_sound_w(space, DRAGRACE_HITONE_EN, (dragrace_misc_flags & 0x20000000) ? 1: 0);	// HiTone enable
 }
 
 static WRITE8_HANDLER( dragrace_misc_w )
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( dragrace_misc_w )
 	else
 		dragrace_misc_flags &= (~mask);
 	logerror("Set   %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0900+offset, mask, dragrace_misc_flags, data & 0x01);
-	dragrace_update_misc_flags(machine);
+	dragrace_update_misc_flags(space);
 }
 
 static WRITE8_HANDLER( dragrace_misc_clear_w )
@@ -112,12 +112,12 @@ static WRITE8_HANDLER( dragrace_misc_clear_w )
 	UINT32 mask = 0xff << (((offset >> 3) & 0x03) * 8);
 	dragrace_misc_flags &= (~mask);
 	logerror("Clear %#6x, Mask=%#10x, Flag=%#10x, Data=%x\n", 0x0920+offset, mask, dragrace_misc_flags, data & 0x01);
-	dragrace_update_misc_flags(machine);
+	dragrace_update_misc_flags(space);
 }
 
 static READ8_HANDLER( dragrace_input_r )
 {
-	int val = input_port_read(machine, "IN2");
+	int val = input_port_read(space->machine, "IN2");
 	static const char *const portnames[] = { "IN0", "IN1" };
 
 	UINT8 maskA = 1 << (offset % 8);
@@ -127,7 +127,7 @@ static READ8_HANDLER( dragrace_input_r )
 
 	for (i = 0; i < 2; i++)
 	{
-		int in = input_port_read(machine, portnames[i]);
+		int in = input_port_read(space->machine, portnames[i]);
 
 		if (dragrace_gear[i] != 0)
 		{
@@ -154,7 +154,7 @@ static READ8_HANDLER( dragrace_steering_r )
 
 	for (i = 0; i < 2; i++)
 	{
-		int dial = input_port_read(machine, dialnames[i]);
+		int dial = input_port_read(space->machine, dialnames[i]);
 
 		bitA[i] = ((dial + 1) / 2) & 1;
 		bitB[i] = ((dial + 0) / 2) & 1;
@@ -168,7 +168,7 @@ static READ8_HANDLER( dragrace_steering_r )
 
 static READ8_HANDLER( dragrace_scanline_r )
 {
-	return (video_screen_get_vpos(machine->primary_screen) ^ 0xf0) | 0x0f;
+	return (video_screen_get_vpos(space->machine->primary_screen) ^ 0xf0) | 0x0f;
 }
 
 

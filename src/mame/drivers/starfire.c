@@ -67,8 +67,8 @@ static WRITE8_HANDLER( starfire_scratch_w )
 	{
 		switch (offset & 7)
 		{
-			case 0:	starfire_vidctrl_w(machine, 0, data); break;
-			case 1: starfire_vidctrl1_w(machine, 0, data); break;
+			case 0:	starfire_vidctrl_w(space, 0, data); break;
+			case 1: starfire_vidctrl1_w(space, 0, data); break;
 			case 2:
 				/* Sounds */
 				fireone_select = (data & 0x8) ? 0 : 1;
@@ -86,7 +86,7 @@ static READ8_HANDLER( starfire_scratch_r )
 {
 	/* A11 selects input ports */
 	if (offset & 0x800)
-		return (*input_read)(machine, offset);
+		return (*input_read)(space->machine, offset);
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);
@@ -105,11 +105,11 @@ static READ8_HANDLER( starfire_input_r )
 {
 	switch (offset & 15)
 	{
-		case 0:	return input_port_read(machine, "DSW");
-		case 1:	return input_port_read(machine, "SYSTEM");	/* Note: need to loopback sounds lengths on that one */
-		case 5: return input_port_read(machine, "STICKZ");
-		case 6:	return input_port_read(machine, "STICKX");
-		case 7:	return input_port_read(machine, "STICKY");
+		case 0:	return input_port_read(space->machine, "DSW");
+		case 1:	return input_port_read(space->machine, "SYSTEM");	/* Note: need to loopback sounds lengths on that one */
+		case 5: return input_port_read(space->machine, "STICKZ");
+		case 6:	return input_port_read(space->machine, "STICKX");
+		case 7:	return input_port_read(space->machine, "STICKY");
 		default: return 0xff;
 	}
 }
@@ -132,10 +132,10 @@ static READ8_HANDLER( fireone_input_r )
 
 	switch (offset & 15)
 	{
-		case 0:	return input_port_read(machine, "DSW");
-		case 1:	return input_port_read(machine, "SYSTEM");
+		case 0:	return input_port_read(space->machine, "DSW");
+		case 1:	return input_port_read(space->machine, "SYSTEM");
 		case 2:
-			temp = fireone_select ? input_port_read(machine, "P1") : input_port_read(machine, "P2");
+			temp = fireone_select ? input_port_read(space->machine, "P1") : input_port_read(space->machine, "P2");
 			temp = (temp & 0xc0) | fireone_paddle_map[temp & 0x3f];
 			return temp;
 		default: return 0xff;

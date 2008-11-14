@@ -132,8 +132,8 @@ static void sound_data_w(UINT8 data)
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(machine,offset);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(space,offset);
 }
 
 
@@ -346,9 +346,9 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
 static READ16_HANDLER( misc_io_r )
 {
 	if (custom_io_r)
-		return custom_io_r(machine, offset, mem_mask);
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
-	return segaic16_open_bus_r(machine,0,mem_mask);
+		return custom_io_r(space, offset, mem_mask);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	return segaic16_open_bus_r(space,0,mem_mask);
 }
 
 
@@ -356,10 +356,10 @@ static WRITE16_HANDLER( misc_io_w )
 {
 	if (custom_io_w)
 	{
-		custom_io_w(machine, offset, data, mem_mask);
+		custom_io_w(space, offset, data, mem_mask);
 		return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
 }
 
 
@@ -369,26 +369,26 @@ static READ16_HANDLER( outrun_custom_io_r )
 	switch (offset & 0x70/2)
 	{
 		case 0x00/2:
-			return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255"), offset & 3);
+			return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3);
 
 		case 0x10/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return input_port_read(machine, sysports[offset & 3]);
+			return input_port_read(space->machine, sysports[offset & 3]);
 		}
 
 		case 0x30/2:
 		{
 			static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6", "ADC7" };
-			return input_port_read_safe(machine, ports[adc_select], 0x0010);
+			return input_port_read_safe(space->machine, ports[adc_select], 0x0010);
 		}
 
 		case 0x60/2:
-			return watchdog_reset_r(machine,0);
+			return watchdog_reset_r(space,0);
 	}
 
-	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
-	return segaic16_open_bus_r(machine,0,mem_mask);
+	logerror("%06X:outrun_custom_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	return segaic16_open_bus_r(space,0,mem_mask);
 }
 
 
@@ -399,7 +399,7 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 	{
 		case 0x00/2:
 			if (ACCESSING_BITS_0_7)
-				ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255"), offset & 3, data);
+				ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3, data);
 			return;
 
 		case 0x20/2:
@@ -418,14 +418,14 @@ static WRITE16_HANDLER( outrun_custom_io_w )
 			return;
 
 		case 0x60/2:
-			watchdog_reset_w(machine,0,0);
+			watchdog_reset_w(space,0,0);
 			return;
 
 		case 0x70/2:
-			segaic16_sprites_draw_0_w(machine, offset, data, mem_mask);
+			segaic16_sprites_draw_0_w(space, offset, data, mem_mask);
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
 }
 
 
@@ -440,17 +440,17 @@ static READ16_HANDLER( shangon_custom_io_r )
 		case 0x1006/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return input_port_read(machine, sysports[offset & 3]);
+			return input_port_read(space->machine, sysports[offset & 3]);
 		}
 
 		case 0x3020/2:
 		{
 			static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return input_port_read_safe(machine, ports[adc_select], 0x0010);
+			return input_port_read_safe(space->machine, ports[adc_select], 0x0010);
 		}
 	}
-	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
-	return segaic16_open_bus_r(machine,0,mem_mask);
+	logerror("%06X:misc_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	return segaic16_open_bus_r(space,0,mem_mask);
 }
 
 
@@ -465,25 +465,25 @@ static WRITE16_HANDLER( shangon_custom_io_w )
                 D5: Screen display
             */
 			adc_select = (data >> 6) & 3;
-			segaic16_set_display_enable(machine, (data >> 5) & 1);
+			segaic16_set_display_enable(space->machine, (data >> 5) & 1);
 			return;
 
 		case 0x0020/2:
 			/* Output port:
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 1) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 0x3000/2:
-			watchdog_reset_w(machine,0,0);
+			watchdog_reset_w(space,0,0);
 			return;
 
 		case 0x3020/2:
 			/* ADC trigger */
 			return;
 	}
-	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
+	logerror("%06X:misc_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
 }
 
 

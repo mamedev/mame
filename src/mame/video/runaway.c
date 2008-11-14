@@ -33,7 +33,7 @@ WRITE8_HANDLER( runaway_paletteram_w )
 		0x47 * ((~data >> 0) & 1) +
 		0x97 * ((~data >> 1) & 1);
 
-	palette_set_color(machine, offset, MAKE_RGB(R, G, B));
+	palette_set_color(space->machine, offset, MAKE_RGB(R, G, B));
 }
 
 

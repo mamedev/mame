@@ -672,10 +672,10 @@ static READ8_HANDLER( mux_port_r )
 {
 	switch( input_selector )
 	{
-		case 0x10: return input_port_read(machine, "IN0-0");
-		case 0x20: return input_port_read(machine, "IN0-1");
-		case 0x40: return input_port_read(machine, "IN0-2");
-		case 0x80: return input_port_read(machine, "IN0-3");
+		case 0x10: return input_port_read(space->machine, "IN0-0");
+		case 0x20: return input_port_read(space->machine, "IN0-1");
+		case 0x40: return input_port_read(space->machine, "IN0-2");
+		case 0x80: return input_port_read(space->machine, "IN0-3");
 	}
 	return 0xff;
 }
@@ -750,8 +750,8 @@ static WRITE8_HANDLER( sound_w )
 	logerror("Sound Data: %2x\n",data & 0x0f);
 
 	/* discrete sound is connected to PIA1, portA: bits 0-3 */
-	discrete_sound_w(machine,NODE_01, data >> 3 & 0x01);
-	discrete_sound_w(machine,NODE_10, data & 0x07);
+	discrete_sound_w(space,NODE_01, data >> 3 & 0x01);
+	discrete_sound_w(space,NODE_10, data & 0x07);
 }
 
 

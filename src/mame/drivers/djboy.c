@@ -240,7 +240,7 @@ GetLives( running_machine *machine )
 
 static WRITE8_HANDLER( coinplus_w )
 {
-	int dsw = input_port_read(machine, "DSW1");
+	int dsw = input_port_read(space->machine, "DSW1");
 	coin_counter_w( 0, data&1 );
 	coin_counter_w( 1, data&2 );
 	if( data&1 )
@@ -401,14 +401,14 @@ static WRITE8_HANDLER( beast_data_w )
 {
 	prot_busy_count = 1;
 
-	logerror( "0x%04x: prot_w(0x%02x)\n", cpu_get_pc(machine->activecpu), data );
+	logerror( "0x%04x: prot_w(0x%02x)\n", cpu_get_pc(space->cpu), data );
 
-	watchdog_reset_w(machine,0,0);
+	watchdog_reset_w(space,0,0);
 
 	if( prot_mode == ePROT_WAIT_DSW1_WRITEBACK )
 	{
 		logerror( "[DSW1_WRITEBACK]\n" );
-		ProtectionOut( 0, input_port_read(machine, "DSW2") ); /* DSW2 */
+		ProtectionOut( 0, input_port_read(space->machine, "DSW2") ); /* DSW2 */
 		prot_mode = ePROT_WAIT_DSW2_WRITEBACK;
 	}
 	else if( prot_mode == ePROT_WAIT_DSW2_WRITEBACK )
@@ -454,11 +454,11 @@ static WRITE8_HANDLER( beast_data_w )
 			break;
 
 		case 0x01: // pc=7389
-			OutputProtectionState( machine, 0, 0x01 );
+			OutputProtectionState( space->machine, 0, 0x01 );
 			break;
 
 		case 0x02:
-			CommonProt( machine,0,0x02 );
+			CommonProt( space->machine,0,0x02 );
 			break;
 
 		case 0x03: /* prepare for memory write to protection device ram (pc == 0x7987) */ // -> 0x02
@@ -472,48 +472,48 @@ static WRITE8_HANDLER( beast_data_w )
 			ProtectionOut( 1,0 ); // ?
 			ProtectionOut( 2,0 ); // ?
 			ProtectionOut( 3,0 ); // ?
-			CommonProt(    machine, 4,0x04 );
+			CommonProt(    space->machine, 4,0x04 );
 			break;
 
 		case 0x05: /* 0x71f4 */
-			ProtectionOut( 0,input_port_read(machine, "IN1") ); // to $42
+			ProtectionOut( 0,input_port_read(space->machine, "IN1") ); // to $42
 			ProtectionOut( 1,0 ); // ?
-			ProtectionOut( 2,input_port_read(machine, "IN2") ); // to $43
+			ProtectionOut( 2,input_port_read(space->machine, "IN2") ); // to $43
 			ProtectionOut( 3,0 ); // ?
 			ProtectionOut( 4,0 ); // ?
-			CommonProt(    machine, 5,0x05 );
+			CommonProt(    space->machine, 5,0x05 );
 			break;
 
 		case 0x07:
-			CommonProt( machine, 0,0x07 );
+			CommonProt( space->machine, 0,0x07 );
 			break;
 
 		case 0x08: /* pc == 0x727a */
-			ProtectionOut( 0,input_port_read(machine, "IN0") ); /* COIN/START */
-			ProtectionOut( 1,input_port_read(machine, "IN1") ); /* JOY1 */
-			ProtectionOut( 2,input_port_read(machine, "IN2") ); /* JOY2 */
-			ProtectionOut( 3,input_port_read(machine, "DSW1") ); /* DSW1 */
-			ProtectionOut( 4,input_port_read(machine, "DSW2") ); /* DSW2 */
-			CommonProt(    machine, 5, 0x08 );
+			ProtectionOut( 0,input_port_read(space->machine, "IN0") ); /* COIN/START */
+			ProtectionOut( 1,input_port_read(space->machine, "IN1") ); /* JOY1 */
+			ProtectionOut( 2,input_port_read(space->machine, "IN2") ); /* JOY2 */
+			ProtectionOut( 3,input_port_read(space->machine, "DSW1") ); /* DSW1 */
+			ProtectionOut( 4,input_port_read(space->machine, "DSW2") ); /* DSW2 */
+			CommonProt(    space->machine, 5, 0x08 );
 			break;
 
 		case 0x09:
 			ProtectionOut( 0,0 ); // ?
 			ProtectionOut( 1,0 ); // ?
 			ProtectionOut( 2,0 ); // ?
-			CommonProt(    machine, 3, 0x09 );
+			CommonProt(    space->machine, 3, 0x09 );
 			break;
 
 		case 0x0a:
-			CommonProt( machine,0,0x0a );
+			CommonProt( space->machine,0,0x0a );
 			break;
 
 		case 0x0c:
-			CommonProt( machine,1,0x0c );
+			CommonProt( space->machine,1,0x0c );
 			break;
 
 		case 0x0d:
-			CommonProt( machine,2,0x0d );
+			CommonProt( space->machine,2,0x0d );
 			break;
 
 		case 0xfe: /* prepare for memory read from protection device ram (pc == 0x79ee, 0x7a3f) */
@@ -531,7 +531,7 @@ static WRITE8_HANDLER( beast_data_w )
 			break;
 
 		case 0xff: /* read DSW (pc == 0x714d) */
-			ProtectionOut( 0,input_port_read(machine, "DSW1") ); /* DSW1 */
+			ProtectionOut( 0,input_port_read(space->machine, "DSW1") ); /* DSW1 */
 			prot_mode = ePROT_WAIT_DSW1_WRITEBACK;
 			break;
 
@@ -601,7 +601,7 @@ static WRITE8_HANDLER( beast_data_w )
 		default:
 		case 0x97:
 		case 0x9a:
-			logerror( "!!0x%04x: prot_w(0x%02x)\n", cpu_get_pc(machine->activecpu), data );
+			logerror( "!!0x%04x: prot_w(0x%02x)\n", cpu_get_pc(space->cpu), data );
 			break;
 		}
 	}
@@ -624,7 +624,7 @@ static READ8_HANDLER( beast_data_r )
 	{
 		logerror( "prot_r: data expected!\n" );
 	}
-	logerror( "0x%04x: prot_r() == 0x%02x\n", cpu_get_pc(machine->activecpu), data );
+	logerror( "0x%04x: prot_r() == 0x%02x\n", cpu_get_pc(space->cpu), data );
 	return data;
 } /* beast_data_r */
 
@@ -657,12 +657,12 @@ static DRIVER_INIT( djboyj )
 
 static WRITE8_HANDLER( trigger_nmi_on_cpu0 )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
-	unsigned char *RAM = memory_region(machine, "main");
+	unsigned char *RAM = memory_region(space->machine, "main");
 	data ^= bankxor;
 	memory_set_bankptr(4,&RAM[0x10000]); /* unsure if/how this area is banked */
 	if( data < 4 )
@@ -686,7 +686,7 @@ static WRITE8_HANDLER( cpu0_bankswitch_w )
  */
 static WRITE8_HANDLER( cpu1_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "cpu1");
+	UINT8 *RAM = memory_region(space->machine, "cpu1");
 	djboy_set_videoreg( data );
 	switch( data&0xf )
 	{
@@ -715,13 +715,13 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 
 static WRITE8_HANDLER( trigger_nmi_on_sound_cpu2 )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 } /* trigger_nmi_on_sound_cpu2 */
 
 static WRITE8_HANDLER( cpu2_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "cpu2");
+	UINT8 *RAM = memory_region(space->machine, "cpu2");
 
 	if( data<3 )
 	{

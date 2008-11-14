@@ -68,8 +68,8 @@ WRITE8_HANDLER( cop01_vreg_w );
 
 static WRITE8_HANDLER( cop01_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static READ8_HANDLER( cop01_sound_command_r )
@@ -79,10 +79,10 @@ static READ8_HANDLER( cop01_sound_command_r )
 #define TIMER_RATE 12000	/* total guess */
 
 
-	res = (soundlatch_r(machine,offset) & 0x7f) << 1;
+	res = (soundlatch_r(space,offset) & 0x7f) << 1;
 
 	/* bit 0 seems to be a timer */
-	if ((cpu_get_total_cycles(machine->activecpu) / TIMER_RATE) & 1)
+	if ((cpu_get_total_cycles(space->cpu) / TIMER_RATE) & 1)
 	{
 		if (pulse == 0) res |= 1;
 		pulse = 1;

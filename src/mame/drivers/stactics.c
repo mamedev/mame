@@ -64,7 +64,7 @@ static CUSTOM_INPUT( get_motor_not_ready )
 
 static READ8_HANDLER( vert_pos_r )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = space->machine->driver_data;
 
     return 0x70 - state->vert_pos;
 }
@@ -72,7 +72,7 @@ static READ8_HANDLER( vert_pos_r )
 
 static READ8_HANDLER( horiz_pos_r )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = space->machine->driver_data;
 
     return state->horiz_pos + 0x88;
 }

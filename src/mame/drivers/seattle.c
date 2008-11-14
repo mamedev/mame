@@ -650,7 +650,7 @@ static READ32_HANDLER( interrupt_state_r )
 
 static READ32_HANDLER( interrupt_state2_r )
 {
-	UINT32 result = interrupt_state_r(machine, offset, mem_mask);
+	UINT32 result = interrupt_state_r(space, offset, mem_mask);
 	result |= vblank_state << 8;
 	return result;
 }
@@ -663,7 +663,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 
 	/* VBLANK: clear anything pending on the old IRQ */
 	if (vblank_irq_num != 0)
-		cpu_set_input_line(machine->cpu[0], vblank_irq_num, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], vblank_irq_num, CLEAR_LINE);
 
 	/* VBLANK: compute the new IRQ vector */
 	irq = (*interrupt_config >> (2*VBLANK_IRQ_SHIFT)) & 3;
@@ -674,7 +674,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 	{
 		/* Widget: clear anything pending on the old IRQ */
 		if (widget.irq_num != 0)
-			cpu_set_input_line(machine->cpu[0], widget.irq_num, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], widget.irq_num, CLEAR_LINE);
 
 		/* Widget: compute the new IRQ vector */
 		irq = (*interrupt_config >> (2*WIDGET_IRQ_SHIFT)) & 3;
@@ -686,7 +686,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 	{
 		/* Ethernet: clear anything pending on the old IRQ */
 		if (ethernet_irq_num != 0)
-			cpu_set_input_line(machine->cpu[0], ethernet_irq_num, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], ethernet_irq_num, CLEAR_LINE);
 
 		/* Ethernet: compute the new IRQ vector */
 		irq = (*interrupt_config >> (2*ETHERNET_IRQ_SHIFT)) & 3;
@@ -694,8 +694,8 @@ static WRITE32_HANDLER( interrupt_config_w )
 	}
 
 	/* update the states */
-	update_vblank_irq(machine);
-	ethernet_interrupt(machine, ethernet_irq_state);
+	update_vblank_irq(space->machine);
+	ethernet_interrupt(space->machine, ethernet_irq_state);
 }
 
 
@@ -706,9 +706,9 @@ static WRITE32_HANDLER( seattle_interrupt_enable_w )
 	if (old != *interrupt_enable)
 	{
 		if (vblank_latch)
-			update_vblank_irq(machine);
+			update_vblank_irq(space->machine);
 		if (ethernet_irq_state)
-			ethernet_interrupt(machine, ethernet_irq_state);
+			ethernet_interrupt(space->machine, ethernet_irq_state);
 	}
 }
 
@@ -739,7 +739,7 @@ static WRITE32_HANDLER( vblank_clear_w )
 {
 	/* clear the latch and update the IRQ */
 	vblank_latch = 0;
-	update_vblank_irq(machine);
+	update_vblank_irq(space->machine);
 }
 
 
@@ -1099,10 +1099,10 @@ static READ32_HANDLER( galileo_r )
 			}
 
 			/* eat some time for those which poll this register */
-			cpu_eat_cycles(machine->activecpu, 100);
+			cpu_eat_cycles(space->cpu, 100);
 
 			if (LOG_TIMERS)
-				logerror("%08X:hires_timer_r = %08X\n", cpu_get_pc(machine->activecpu), result);
+				logerror("%08X:hires_timer_r = %08X\n", cpu_get_pc(space->cpu), result);
 			break;
 		}
 
@@ -1121,21 +1121,21 @@ static READ32_HANDLER( galileo_r )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				result = pci_bridge_r(machine, reg, type);
+				result = pci_bridge_r(space, reg, type);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				result = pci_3dfx_r(machine, reg, type);
+				result = pci_3dfx_r(space, reg, type);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				result = pci_ide_r(machine, reg, type);
+				result = pci_ide_r(space, reg, type);
 
 			/* anything else, just log */
 			else
 			{
 				result = ~0;
-				logerror("%08X:PCIBus read: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), bus, unit, func, reg, type, result);
+				logerror("%08X:PCIBus read: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(space->cpu), bus, unit, func, reg, type, result);
 			}
 			break;
 		}
@@ -1145,11 +1145,11 @@ static READ32_HANDLER( galileo_r )
 		case GREG_INT_MASK:
 		case GREG_TIMER_CONTROL:
 //          if (LOG_GALILEO)
-//              logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(machine->activecpu), offset*4, result);
+//              logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			break;
 
 		default:
-			logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(machine->activecpu), offset*4, result);
+			logerror("%08X:Galileo read from offset %03X = %08X\n", cpu_get_pc(space->cpu), offset*4, result);
 			break;
 	}
 
@@ -1173,7 +1173,7 @@ static WRITE32_HANDLER( galileo_w )
 			int which = offset % 4;
 
 			if (LOG_DMA)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, data, mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 
 			/* keep the read only activity bit */
 			galileo.reg[offset] &= ~0x4000;
@@ -1181,12 +1181,12 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* fetch next record */
 			if (data & 0x2000)
-				galileo_dma_fetch_next(machine, which);
+				galileo_dma_fetch_next(space->machine, which);
 			galileo.reg[offset] &= ~0x2000;
 
 			/* if enabling, start the DMA */
 			if (!(oldata & 0x1000) && (data & 0x1000))
-				galileo_perform_dma(machine, which);
+				galileo_perform_dma(space->machine, which);
 			break;
 		}
 
@@ -1203,7 +1203,7 @@ static WRITE32_HANDLER( galileo_w )
 			if (!timer->active)
 				timer->count = data;
 			if (LOG_TIMERS)
-				logerror("%08X:timer/counter %d count = %08X [start=%08X]\n", cpu_get_pc(machine->activecpu), offset % 4, data, timer->count);
+				logerror("%08X:timer/counter %d count = %08X [start=%08X]\n", cpu_get_pc(space->cpu), offset % 4, data, timer->count);
 			break;
 		}
 
@@ -1212,7 +1212,7 @@ static WRITE32_HANDLER( galileo_w )
 			int which, mask;
 
 			if (LOG_TIMERS)
-				logerror("%08X:timer/counter control = %08X\n", cpu_get_pc(machine->activecpu), data);
+				logerror("%08X:timer/counter control = %08X\n", cpu_get_pc(space->cpu), data);
 			for (which = 0, mask = 0x01; which < 4; which++, mask <<= 2)
 			{
 				galileo_timer *timer = &galileo.timer[which];
@@ -1246,7 +1246,7 @@ static WRITE32_HANDLER( galileo_w )
 			if (LOG_GALILEO)
 				logerror("%08X:Galileo write to IRQ clear = %08X & %08X\n", offset*4, data, mem_mask);
 			galileo.reg[offset] = oldata & data;
-			update_galileo_irqs(machine);
+			update_galileo_irqs(space->machine);
 			break;
 
 		case GREG_CONFIG_DATA:
@@ -1259,19 +1259,19 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				pci_bridge_w(machine, reg, type, data);
+				pci_bridge_w(space, reg, type, data);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				pci_3dfx_w(machine, reg, type, data);
+				pci_3dfx_w(space, reg, type, data);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				pci_ide_w(machine, reg, type, data);
+				pci_ide_w(space, reg, type, data);
 
 			/* anything else, just log */
 			else
-				logerror("%08X:PCIBus write: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), bus, unit, func, reg, type, data);
+				logerror("%08X:PCIBus write: bus %d unit %d func %d reg %d type %d = %08X\n", cpu_get_pc(space->cpu), bus, unit, func, reg, type, data);
 			break;
 		}
 
@@ -1282,11 +1282,11 @@ static WRITE32_HANDLER( galileo_w )
 		case GREG_CONFIG_ADDRESS:
 		case GREG_INT_MASK:
 			if (LOG_GALILEO)
-				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, data, mem_mask);
+				logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			break;
 
 		default:
-			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, data, mem_mask);
+			logerror("%08X:Galileo write to offset %03X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 			break;
 	}
 }
@@ -1399,8 +1399,8 @@ static WRITE32_HANDLER( analog_port_w )
 	static const char *const portnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
 
 	if (data < 8 || data > 15)
-		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(machine->activecpu), data);
-	pending_analog_read = input_port_read(machine, portnames[data & 7]);
+		logerror("%08X:Unexpected analog port select = %08X\n", cpu_get_pc(space->cpu), data);
+	pending_analog_read = input_port_read(space->machine, portnames[data & 7]);
 }
 
 
@@ -1418,39 +1418,39 @@ static READ32_HANDLER( carnevil_gun_r )
 	switch (offset)
 	{
 		case 0:		/* low 8 bits of X */
-			result = (input_port_read(machine, "LIGHT0_X") << 4) & 0xff;
+			result = (input_port_read(space->machine, "LIGHT0_X") << 4) & 0xff;
 			break;
 
 		case 1:		/* upper 4 bits of X */
-			result = (input_port_read(machine, "LIGHT0_X") >> 4) & 0x0f;
-			result |= (input_port_read(machine, "FAKE") & 0x03) << 4;
+			result = (input_port_read(space->machine, "LIGHT0_X") >> 4) & 0x0f;
+			result |= (input_port_read(space->machine, "FAKE") & 0x03) << 4;
 			result |= 0x40;
 			break;
 
 		case 2:		/* low 8 bits of Y */
-			result = (input_port_read(machine, "LIGHT0_Y") << 2) & 0xff;
+			result = (input_port_read(space->machine, "LIGHT0_Y") << 2) & 0xff;
 			break;
 
 		case 3:		/* upper 4 bits of Y */
-			result = (input_port_read(machine, "LIGHT0_Y") >> 6) & 0x03;
+			result = (input_port_read(space->machine, "LIGHT0_Y") >> 6) & 0x03;
 			break;
 
 		case 4:		/* low 8 bits of X */
-			result = (input_port_read(machine, "LIGHT1_X") << 4) & 0xff;
+			result = (input_port_read(space->machine, "LIGHT1_X") << 4) & 0xff;
 			break;
 
 		case 5:		/* upper 4 bits of X */
-			result = (input_port_read(machine, "LIGHT1_X") >> 4) & 0x0f;
-			result |= (input_port_read(machine, "FAKE") & 0x30);
+			result = (input_port_read(space->machine, "LIGHT1_X") >> 4) & 0x0f;
+			result |= (input_port_read(space->machine, "FAKE") & 0x30);
 			result |= 0x40;
 			break;
 
 		case 6:		/* low 8 bits of Y */
-			result = (input_port_read(machine, "LIGHT1_Y") << 2) & 0xff;
+			result = (input_port_read(space->machine, "LIGHT1_Y") << 2) & 0xff;
 			break;
 
 		case 7:		/* upper 4 bits of Y */
-			result = (input_port_read(machine, "LIGHT1_Y") >> 6) & 0x03;
+			result = (input_port_read(space->machine, "LIGHT1_Y") >> 6) & 0x03;
 			break;
 	}
 	return result;
@@ -1614,7 +1614,7 @@ static READ32_HANDLER( cmos_protect_r )
 
 static WRITE32_HANDLER( seattle_watchdog_w )
 {
-	cpu_eat_cycles(machine->activecpu, 100);
+	cpu_eat_cycles(space->cpu, 100);
 }
 
 
@@ -1622,13 +1622,13 @@ static WRITE32_HANDLER( asic_reset_w )
 {
 	COMBINE_DATA(asic_reset);
 	if (!(*asic_reset & 0x0002))
-		midway_ioasic_reset(machine);
+		midway_ioasic_reset(space->machine);
 }
 
 
 static WRITE32_HANDLER( asic_fifo_w )
 {
-	midway_ioasic_fifo_w(machine, data);
+	midway_ioasic_fifo_w(space, data);
 }
 
 

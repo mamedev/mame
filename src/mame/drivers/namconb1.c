@@ -477,13 +477,13 @@ static void namconb1_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 static WRITE32_HANDLER( namconb1_cpureg_w )
 {
 	if(mem_mask & 0xff000000)
-		namconb1_cpureg8_w(machine, offset*4, data >> 24);
+		namconb1_cpureg8_w(space, offset*4, data >> 24);
 	if(mem_mask & 0x00ff0000)
-		namconb1_cpureg8_w(machine, offset*4+1, data >> 16);
+		namconb1_cpureg8_w(space, offset*4+1, data >> 16);
 	if(mem_mask & 0x0000ff00)
-		namconb1_cpureg8_w(machine, offset*4+2, data >> 8);
+		namconb1_cpureg8_w(space, offset*4+2, data >> 8);
 	if(mem_mask & 0x000000ff)
-		namconb1_cpureg8_w(machine, offset*4+3, data);
+		namconb1_cpureg8_w(space, offset*4+3, data);
 }
 
 
@@ -544,13 +544,13 @@ static void namconb2_cpureg8_w(running_machine *machine, int reg, UINT8 data)
 static WRITE32_HANDLER( namconb2_cpureg_w )
 {
 	if(mem_mask & 0xff000000)
-		namconb2_cpureg8_w(machine, offset*4, data >> 24);
+		namconb2_cpureg8_w(space, offset*4, data >> 24);
 	if(mem_mask & 0x00ff0000)
-		namconb2_cpureg8_w(machine, offset*4+1, data >> 16);
+		namconb2_cpureg8_w(space, offset*4+1, data >> 16);
 	if(mem_mask & 0x0000ff00)
-		namconb2_cpureg8_w(machine, offset*4+2, data >> 8);
+		namconb2_cpureg8_w(space, offset*4+2, data >> 8);
 	if(mem_mask & 0x000000ff)
-		namconb2_cpureg8_w(machine, offset*4+3, data);
+		namconb2_cpureg8_w(space, offset*4+3, data);
 }
 
 static READ32_HANDLER(namconb_cpureg_r)
@@ -662,7 +662,7 @@ static READ32_HANDLER( custom_key_r )
 
 	do
 	{ /* pick a random number, but don't pick the same twice in a row */
-		count = mame_rand(machine);
+		count = mame_rand(space->machine);
 	} while( count==old_count );
 
 	switch( namcos2_gametype )
@@ -730,7 +730,7 @@ static READ32_HANDLER( custom_key_r )
 		break; /* no protection? */
 	}
 
-	logerror( "custom_key_r(%d); pc=%08x\n", offset, cpu_get_pc(machine->activecpu) );
+	logerror( "custom_key_r(%d); pc=%08x\n", offset, cpu_get_pc(space->cpu) );
 	return 0;
 } /* custom_key_r */
 
@@ -801,10 +801,10 @@ static READ32_HANDLER( gunbulet_gun_r )
 
 	switch( offset )
 	{
-	case 0: case 1: result = (UINT8)(0x0f + input_port_read(machine, "LIGHT1_Y") * 224/255); break; /* Y (p2) */
-	case 2: case 3: result = (UINT8)(0x26 + input_port_read(machine, "LIGHT1_X") * 288/314); break; /* X (p2) */
-	case 4: case 5: result = (UINT8)(0x0f + input_port_read(machine, "LIGHT0_Y") * 224/255); break; /* Y (p1) */
-	case 6: case 7: result = (UINT8)(0x26 + input_port_read(machine, "LIGHT0_X") * 288/314); break; /* X (p1) */
+	case 0: case 1: result = (UINT8)(0x0f + input_port_read(space->machine, "LIGHT1_Y") * 224/255); break; /* Y (p2) */
+	case 2: case 3: result = (UINT8)(0x26 + input_port_read(space->machine, "LIGHT1_X") * 288/314); break; /* X (p2) */
+	case 4: case 5: result = (UINT8)(0x0f + input_port_read(space->machine, "LIGHT0_Y") * 224/255); break; /* Y (p1) */
+	case 6: case 7: result = (UINT8)(0x26 + input_port_read(space->machine, "LIGHT0_X") * 288/314); break; /* X (p1) */
 	}
 	return result<<24;
 } /* gunbulet_gun_r */
@@ -812,7 +812,7 @@ static READ32_HANDLER( gunbulet_gun_r )
 static
 READ32_HANDLER( randgen_r )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 } /* randgen_r */
 
 static
@@ -893,7 +893,7 @@ static WRITE16_HANDLER( nbmcu_shared_w )
 	// C74 BIOS has a very short window on the CPU sync signal, so immediately let the '020 at it
 	if ((offset == 0x6000/2) && (data & 0x80))
 	{
-		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_CYCLES(300, 1));	// was 300
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(300, 1));	// was 300
 	}
 }
 
@@ -921,19 +921,19 @@ static READ8_HANDLER( port7_r )
 	switch (nbx_port6 & 0xf0)
 	{
 		case 0x00:
-			return input_port_read_safe(machine, "P4", 0xff);
+			return input_port_read_safe(space->machine, "P4", 0xff);
 			break;
 
 		case 0x20:
-			return input_port_read(machine, "MISC");
+			return input_port_read(space->machine, "MISC");
 			break;
 
 		case 0x40:
-			return input_port_read(machine, "P1");
+			return input_port_read(space->machine, "P1");
 			break;
 
 		case 0x60:
-			return input_port_read(machine, "P2");
+			return input_port_read(space->machine, "P2");
 			break;
 
 		default:
@@ -948,42 +948,42 @@ static READ8_HANDLER( port7_r )
 // register full scale, so it works...
 static READ8_HANDLER(dac7_r)		// bit 7
 {
-	return input_port_read_safe(machine, "P3", 0xff)&0x80;
+	return input_port_read_safe(space->machine, "P3", 0xff)&0x80;
 }
 
 static READ8_HANDLER(dac6_r)		// bit 3
 {
-	return (input_port_read_safe(machine, "P3", 0xff)<<1)&0x80;
+	return (input_port_read_safe(space->machine, "P3", 0xff)<<1)&0x80;
 }
 
 static READ8_HANDLER(dac5_r)		// bit 2
 {
-	return (input_port_read_safe(machine, "P3", 0xff)<<2)&0x80;
+	return (input_port_read_safe(space->machine, "P3", 0xff)<<2)&0x80;
 }
 
 static READ8_HANDLER(dac4_r)		// bit 1
 {
-	return (input_port_read_safe(machine, "P3", 0xff)<<3)&0x80;
+	return (input_port_read_safe(space->machine, "P3", 0xff)<<3)&0x80;
 }
 
 static READ8_HANDLER(dac3_r)		// bit 0
 {
-	return (input_port_read_safe(machine, "P3", 0xff)<<4)&0x80;
+	return (input_port_read_safe(space->machine, "P3", 0xff)<<4)&0x80;
 }
 
 static READ8_HANDLER(dac2_r)		// bit 4
 {
-	return (input_port_read_safe(machine, "P3", 0xff)<<5)&0x80;
+	return (input_port_read_safe(space->machine, "P3", 0xff)<<5)&0x80;
 }
 
 static READ8_HANDLER(dac1_r)		// bit 5
 {
-	return (input_port_read_safe(machine, "P3", 0xff)<<6)&0x80;
+	return (input_port_read_safe(space->machine, "P3", 0xff)<<6)&0x80;
 }
 
 static READ8_HANDLER(dac0_r)		// bit 6
 {
-	return (input_port_read_safe(machine, "P3", 0xff)<<7)&0x80;
+	return (input_port_read_safe(space->machine, "P3", 0xff)<<7)&0x80;
 }
 
 static ADDRESS_MAP_START( namcoc75_io, ADDRESS_SPACE_IO, 8 )

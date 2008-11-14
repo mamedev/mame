@@ -154,7 +154,7 @@ Notes:
 
 static WRITE8_HANDLER( lsasquad_bankswitch_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 
 	/* bits 0-2 select ROM bank */
 	memory_set_bankptr(1,&ROM[0x10000 + 0x2000 * (data & 7)]);

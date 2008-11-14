@@ -646,13 +646,13 @@ static READ16_HANDLER( io_r )
 	static const char *const inputnames[] = { "IN0", "IN1", "IN2" };
 
 	if(offset < 0x8)
-		return input_port_read_safe(machine, analognames[offset], 0x00);
+		return input_port_read_safe(space->machine, analognames[offset], 0x00);
 
 	if(offset < 0x10)
 	{
 		offset -= 0x8;
 		if(offset < 3)
-			return input_port_read(machine, inputnames[offset]);
+			return input_port_read(space->machine, inputnames[offset]);
 		return 0xff;
 	}
 
@@ -670,7 +670,7 @@ static WRITE16_HANDLER( bank_w )
 	if(ACCESSING_BITS_0_7) {
 		switch(data & 0xf) {
 		case 0x1: // 100000-1fffff data roms banking
-			memory_set_bankptr(1, memory_region(machine, "main") + 0x1000000 + 0x100000*((data >> 4) & 0xf));
+			memory_set_bankptr(1, memory_region(space->machine, "main") + 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			logerror("BANK %x\n", 0x1000000 + 0x100000*((data >> 4) & 0xf));
 			break;
 		case 0x2: // 200000-2fffff data roms banking (unused, all known games have only one bank)
@@ -783,7 +783,7 @@ static WRITE16_HANDLER(md1_w)
 	if(0 && offset)
 		return;
 	if(1 && model1_dump)
-		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(machine->activecpu));
+		logerror("TGP: md1_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static WRITE16_HANDLER(md0_w)
@@ -792,15 +792,15 @@ static WRITE16_HANDLER(md0_w)
 	if(0 && offset)
 		return;
 	if(1 && model1_dump)
-		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(machine->activecpu));
+		logerror("TGP: md0_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static WRITE16_HANDLER(p_w)
 {
 	UINT16 old = paletteram16[offset];
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset, data, mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset, data, mem_mask);
 	if(0 && paletteram16[offset] != old)
-		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(machine->activecpu));
+		logerror("XVIDEO: p_w %x, %04x @ %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static UINT16 *mr;
@@ -808,7 +808,7 @@ static WRITE16_HANDLER(mr_w)
 {
 	COMBINE_DATA(mr+offset);
 	if(0 && offset == 0x1138/2)
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, cpu_get_pc(machine->activecpu));
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x500000, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static UINT16 *mr2;
@@ -817,32 +817,32 @@ static WRITE16_HANDLER(mr2_w)
 	COMBINE_DATA(mr2+offset);
 #if 0
 	if(0 && offset == 0x6e8/2) {
-		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, cpu_get_pc(machine->activecpu));
+		logerror("MR.w %x, %04x @ %04x (%x)\n", offset*2+0x400000, data, mem_mask, cpu_get_pc(space->cpu));
 	}
 	if(offset/2 == 0x3680/4)
-		logerror("MW f80[r25], %04x%04x (%x)\n", mr2[0x3680/2+1], mr2[0x3680/2], cpu_get_pc(machine->activecpu));
+		logerror("MW f80[r25], %04x%04x (%x)\n", mr2[0x3680/2+1], mr2[0x3680/2], cpu_get_pc(space->cpu));
 	if(offset/2 == 0x06ca/4)
-		logerror("MW fca[r19], %04x%04x (%x)\n", mr2[0x06ca/2+1], mr2[0x06ca/2], cpu_get_pc(machine->activecpu));
+		logerror("MW fca[r19], %04x%04x (%x)\n", mr2[0x06ca/2+1], mr2[0x06ca/2], cpu_get_pc(space->cpu));
 	if(offset/2 == 0x1eca/4)
-		logerror("MW fca[r22], %04x%04x (%x)\n", mr2[0x1eca/2+1], mr2[0x1eca/2], cpu_get_pc(machine->activecpu));
+		logerror("MW fca[r22], %04x%04x (%x)\n", mr2[0x1eca/2+1], mr2[0x1eca/2], cpu_get_pc(space->cpu));
 #endif
 
 	// wingwar scene position, pc=e1ce -> d735
 	if(offset/2 == 0x1f08/4)
-		logerror("MW  8[r10], %f (%x)\n", *(float *)(mr2+0x1f08/2), cpu_get_pc(machine->activecpu));
+		logerror("MW  8[r10], %f (%x)\n", *(float *)(mr2+0x1f08/2), cpu_get_pc(space->cpu));
 	if(offset/2 == 0x1f0c/4)
-		logerror("MW  c[r10], %f (%x)\n", *(float *)(mr2+0x1f0c/2), cpu_get_pc(machine->activecpu));
+		logerror("MW  c[r10], %f (%x)\n", *(float *)(mr2+0x1f0c/2), cpu_get_pc(space->cpu));
 	if(offset/2 == 0x1f10/4)
-		logerror("MW 10[r10], %f (%x)\n", *(float *)(mr2+0x1f10/2), cpu_get_pc(machine->activecpu));
+		logerror("MW 10[r10], %f (%x)\n", *(float *)(mr2+0x1f10/2), cpu_get_pc(space->cpu));
 }
 
 static READ16_HANDLER( snd_68k_ready_r )
 {
-	int sr = cpu_get_reg(machine->cpu[1], M68K_SR);
+	int sr = cpu_get_reg(space->machine->cpu[1], M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
@@ -856,9 +856,9 @@ static WRITE16_HANDLER( snd_latch_to_68k_w )
 	if (fifo_wptr >= FIFO_SIZE) fifo_wptr = 0;
 
 	// signal the 68000 that there's data waiting
-	cpu_set_input_line(machine->cpu[1], 2, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 2, HOLD_LINE);
 	// give the 68k time to reply
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 }
 
 static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -976,12 +976,12 @@ static READ16_HANDLER( m1_snd_v60_ready_r )
 
 static READ16_HANDLER( m1_snd_mpcm0_r )
 {
-	return multi_pcm_reg_0_r(machine, 0);
+	return multi_pcm_reg_0_r(space, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_w )
 {
-	multi_pcm_reg_0_w(machine, offset, data);
+	multi_pcm_reg_0_w(space, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
@@ -991,12 +991,12 @@ static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
 
 static READ16_HANDLER( m1_snd_mpcm1_r )
 {
-	return multi_pcm_reg_1_r(machine, 0);
+	return multi_pcm_reg_1_r(space, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_w )
 {
-	multi_pcm_reg_1_w(machine, offset, data);
+	multi_pcm_reg_1_w(space, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
@@ -1006,7 +1006,7 @@ static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
 
 static READ16_HANDLER( m1_snd_ym_r )
 {
-	return ym3438_status_port_0_a_r(machine, 0);
+	return ym3438_status_port_0_a_r(space, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_ym_w )
@@ -1014,19 +1014,19 @@ static WRITE16_HANDLER( m1_snd_ym_w )
 	switch (offset)
 	{
 		case 0:
-			ym3438_control_port_0_a_w(machine, 0, data);
+			ym3438_control_port_0_a_w(space, 0, data);
 			break;
 
 		case 1:
-			ym3438_data_port_0_a_w(machine, 0, data);
+			ym3438_data_port_0_a_w(space, 0, data);
 			break;
 
 		case 2:
-			ym3438_control_port_0_b_w(machine, 0, data);
+			ym3438_control_port_0_b_w(space, 0, data);
 			break;
 
 		case 3:
-			ym3438_data_port_0_b_w(machine, 0, data);
+			ym3438_data_port_0_b_w(space, 0, data);
 			break;
 	}
 }

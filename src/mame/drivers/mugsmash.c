@@ -61,8 +61,8 @@ static WRITE16_HANDLER( mugsmash_reg2_w )
 	switch (offset)
 	{
 	case 1:
-		soundlatch_w(machine,1,data&0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+		soundlatch_w(space,1,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 		break;
 
 	default:
@@ -160,16 +160,16 @@ static READ16_HANDLER ( mugsmash_input_ports_r )
 	switch (offset)
 	{
 		case 0 :
-			data = (input_port_read(machine, "P1") & 0xff) | ((input_port_read(machine, "DSW1") & 0xc0) << 6) | ((input_port_read(machine, "IN0") & 0x03) << 8);
+			data = (input_port_read(space->machine, "P1") & 0xff) | ((input_port_read(space->machine, "DSW1") & 0xc0) << 6) | ((input_port_read(space->machine, "IN0") & 0x03) << 8);
 			break;
 		case 1 :
-			data = (input_port_read(machine, "P2") & 0xff) | ((input_port_read(machine, "DSW1") & 0x3f) << 8);
+			data = (input_port_read(space->machine, "P2") & 0xff) | ((input_port_read(space->machine, "DSW1") & 0x3f) << 8);
 			break;
 		case 2 :
-			data = ((input_port_read(machine, "DSW2") & 0x3f) << 8);
+			data = ((input_port_read(space->machine, "DSW2") & 0x3f) << 8);
 			break;
 		case 3 :
-			data = ((input_port_read(machine, "DSW2") & 0xc0) << 2);
+			data = ((input_port_read(space->machine, "DSW2") & 0xc0) << 2);
 			break;
 	}
 

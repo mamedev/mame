@@ -54,14 +54,14 @@ static READ8_HANDLER( bankedram_r )
 static WRITE8_HANDLER( bankedram_w )
 {
 	if (palette_selected)
-		paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+		paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	else
 		ram[offset] = data;
 }
 
 static WRITE8_HANDLER( blockhl_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff);
 }
 
 

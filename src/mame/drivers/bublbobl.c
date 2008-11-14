@@ -278,7 +278,7 @@ TODO:
 #if 0 // doesn't work for some reason
 static WRITE8_HANDLER(soundcpu_reset_w)
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? ASSERT_LINE : CLEAR_LINE);
 }
 #endif
 

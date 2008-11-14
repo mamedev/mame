@@ -174,21 +174,21 @@ static void reset_sound_region(running_machine *machine)
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( warriorb_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (machine, 0, data & 0xff);
+		taitosound_port_w (space->machine, 0, data & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (machine, 0, data & 0xff);
+		taitosound_comm_w (space->machine, 0, data & 0xff);
 }
 
 static READ16_HANDLER( warriorb_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (machine,0) & 0xff));
+		return ((taitosound_comm_r (space->machine,0) & 0xff));
 	else return 0;
 }
 

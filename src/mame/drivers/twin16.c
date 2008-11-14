@@ -110,7 +110,7 @@ static WRITE16_HANDLER( videoram16_w )
 
 static READ16_HANDLER( extra_rom_r )
 {
-	return ((UINT16 *)memory_region(machine, "gfx3"))[offset];
+	return ((UINT16 *)memory_region(space->machine, "gfx3"))[offset];
 }
 
 static READ16_HANDLER( twin16_gfx_rom1_r )
@@ -126,7 +126,7 @@ static READ16_HANDLER( twin16_gfx_rom2_r )
 static WRITE16_HANDLER( sound_command_w )
 {
 	COMBINE_DATA(&twin16_sound_command);
-	soundlatch_w( machine, 0, twin16_sound_command&0xff );
+	soundlatch_w( space->machine, 0, twin16_sound_command&0xff );
 }
 
 static READ16_HANDLER( twin16_sprite_status_r )
@@ -157,13 +157,13 @@ static WRITE16_HANDLER( twin16_CPUA_register_w )
 	if( twin16_CPUA_register!=old )
 	{
 		if( (old&0x08)==0 && (twin16_CPUA_register&0x08) )
-			cpu_set_input_line_and_vector(machine->cpu[CPU_SOUND], 0, HOLD_LINE, 0xff );
+			cpu_set_input_line_and_vector(space->machine->cpu[CPU_SOUND], 0, HOLD_LINE, 0xff );
 
 		if( (old&0x40) && (twin16_CPUA_register&0x40)==0 )
 			twin16_spriteram_process();
 
 		if( (old&0x10)==0 && (twin16_CPUA_register&0x10) )
-			cpu_set_input_line(machine->cpu[CPU_B], MC68000_IRQ_6, HOLD_LINE );
+			cpu_set_input_line(space->machine->cpu[CPU_B], MC68000_IRQ_6, HOLD_LINE );
 
 		coin_counter_w( 0, twin16_CPUA_register&0x01 );
 		coin_counter_w( 1, twin16_CPUA_register&0x02 );
@@ -185,7 +185,7 @@ static WRITE16_HANDLER( twin16_CPUB_register_w )
 	{
 		if( (old&0x01)==0 && (twin16_CPUB_register&0x1) )
 		{
-			cpu_set_input_line(machine->cpu[CPU_A], MC68000_IRQ_6, HOLD_LINE );
+			cpu_set_input_line(space->machine->cpu[CPU_A], MC68000_IRQ_6, HOLD_LINE );
 		}
 	}
 }
@@ -197,7 +197,7 @@ static WRITE16_HANDLER( fround_CPU_register_w )
 	if( twin16_CPUA_register!=old )
 	{
 		if( (old&0x08)==0 && (twin16_CPUA_register&0x08) )
-			cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff ); // trigger IRQ on sound CPU
+			cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff ); // trigger IRQ on sound CPU
 	}
 }
 
@@ -205,13 +205,13 @@ static READ16_HANDLER( twin16_input_r )
 {
 	switch( offset )
 	{
-		case 0x00: return input_port_read(machine, "SYSTEM");
-		case 0x01: return input_port_read(machine, "P1");
-		case 0x02: return input_port_read(machine, "P2");
-		case 0x03: return input_port_read(machine, "P3");
-		case 0x08: return input_port_read(machine, "DSW2");
-		case 0x09: return input_port_read(machine, "DSW1");
-		case 0x0c: return input_port_read(machine, "DSW3");
+		case 0x00: return input_port_read(space->machine, "SYSTEM");
+		case 0x01: return input_port_read(space->machine, "P1");
+		case 0x02: return input_port_read(space->machine, "P2");
+		case 0x03: return input_port_read(space->machine, "P3");
+		case 0x08: return input_port_read(space->machine, "DSW2");
+		case 0x09: return input_port_read(space->machine, "DSW1");
+		case 0x0c: return input_port_read(space->machine, "DSW3");
 	}
 	return 0;
 }

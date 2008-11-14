@@ -139,7 +139,7 @@ static void changecolor_BBBBBRRRRRGGGGGG(running_machine *machine,pen_t color,in
 static WRITE16_HANDLER( paletteram16_BBBBBRRRRRGGGGGG_word_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	changecolor_BBBBBRRRRRGGGGGG(machine,offset,paletteram16[offset]);
+	changecolor_BBBBBRRRRRGGGGGG(space->machine,offset,paletteram16[offset]);
 }
 
 
@@ -518,7 +518,7 @@ switch(offset)
 
       case 0x03:        M68681.TBA = value;                   // Fill transmit buffer
                         M68681.SRA |=0x0400;                  // Data has been sent - TX ready for more.
-                        if(M68681.IMR & 1)   cpu_set_input_line_and_vector(machine->cpu[0],3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
+                        if(M68681.IMR & 1)   cpu_set_input_line_and_vector(space->machine->cpu[0],3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
 
 #if HOST_MONITOR_DISPLAY
                         mame_printf_debug("%c",value);                    // Port A - Monitor
@@ -547,14 +547,14 @@ switch(offset)
                         // Write to sound board
                         if(M68681.IMR & 0x1000)
                         {
-                        	cpu_set_input_line_and_vector(machine->cpu[0],3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
+                        	cpu_set_input_line_and_vector(space->machine->cpu[0],3, HOLD_LINE, M68681.IVR);         // Generate an interrupt, if allowed.
                         }
-                        cpu_set_input_line(machine->cpu[2], MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
-                        mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,cpu_get_pc(machine->activecpu));
+                        cpu_set_input_line(space->machine->cpu[2], MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
+                        mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,cpu_get_pc(space->cpu));
 #endif
                         M68681.SRB &=~0x0400;                   // Data has been sent - TX ready for more.
-                        cpu_set_input_line(machine->cpu[2], MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
-                        mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,cpu_get_pc(machine->activecpu));
+                        cpu_set_input_line(space->machine->cpu[2], MCS51_RX_LINE, ASSERT_LINE);                      // Generate 8031 interrupt
+                        mame_printf_debug("Sound board TX: %4X at PC=%4X\n",value,cpu_get_pc(space->cpu));
                         break;
 
       case 0x0c:        //mame_printf_debug("IVR: %d",value);
@@ -567,7 +567,7 @@ switch(offset)
                         if(value & 0x20)
                         {
 //                              cpunum_set_reset_line(2 CLEAR_LINE);
-                              logerror("8031 running at:%x (val=%x).\n",cpu_get_pc(machine->activecpu),value);
+                              logerror("8031 running at:%x (val=%x).\n",cpu_get_pc(space->cpu),value);
                         }
                         break;
 
@@ -575,7 +575,7 @@ switch(offset)
                         if(value & 0x20)
                         {
 //                              cpunum_set_reset_line(2, ASSERT_LINE);
-                              logerror("8031 reset at:%x (val=%x).\n",cpu_get_pc(machine->activecpu),value);
+                              logerror("8031 reset at:%x (val=%x).\n",cpu_get_pc(space->cpu),value);
                         }
                         break;
 
@@ -718,12 +718,12 @@ static WRITE16_HANDLER( mystery3_w )
 
 static READ16_HANDLER( tms_host_r )
 {
-	return tms34010_host_r(machine->cpu[1], offset);
+	return tms34010_host_r(space->machine->cpu[1], offset);
 }
 
 static WRITE16_HANDLER( tms_host_w )
 {
-	tms34010_host_w(machine->cpu[1], offset, data);
+	tms34010_host_w(space->machine->cpu[1], offset, data);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -807,7 +807,7 @@ static WRITE8_HANDLER(sound_io_w)
         	break;
         case 0x03:
         	upd7759_set_bank_base(0, (data & 0x4) ? 0x20000 : 0);
-        	upd7759_0_reset_w(machine,0,(data & 0x10) ? 0 : 1);
+        	upd7759_0_reset_w(space,0,(data & 0x10) ? 0 : 1);
 	}
 }
 
@@ -815,8 +815,8 @@ static READ8_HANDLER(sound_io_r)
 {
 	switch(offset)
 	{
-	        case 0x01:  return (port_latch[offset] & 0x7f) | input_port_read_safe(machine, "SOUND", 0);		/* Test push switch */
-	        case 0x03:  return (port_latch[offset] & 0xf7) | (upd7759_0_busy_r(machine,0) ? 0x08 : 0);
+	        case 0x01:  return (port_latch[offset] & 0x7f) | input_port_read_safe(space->machine, "SOUND", 0);		/* Test push switch */
+	        case 0x03:  return (port_latch[offset] & 0xf7) | (upd7759_0_busy_r(space,0) ? 0x08 : 0);
 	        default:    return 0;
 	}
 
@@ -824,9 +824,9 @@ static READ8_HANDLER(sound_io_r)
 
 static WRITE8_HANDLER( upd7759_port_start_w)
 {
-	upd7759_0_start_w(machine, offset, 0);
-	upd7759_0_port_w(machine, offset, data);
-	upd7759_0_start_w(machine, offset, 1);
+	upd7759_0_start_w(space, offset, 0);
+	upd7759_0_port_w(space, offset, data);
+	upd7759_0_start_w(space, offset, 1);
 }
 
 static ADDRESS_MAP_START( soundmem_prg, ADDRESS_SPACE_PROGRAM, 8 )

@@ -50,7 +50,7 @@ static WRITE16_HANDLER( bankswitch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(machine, "main");
+		UINT8 *RAM = memory_region(space->machine, "main");
 		memory_set_bankptr(1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
 	}
 }
@@ -132,7 +132,7 @@ static TIMER_CALLBACK( setvector_callback )
 static WRITE16_HANDLER( m107_soundlatch_w )
 {
 	timer_call_after_resynch(NULL, V30_ASSERT,setvector_callback);
-	soundlatch_w(machine, 0, data & 0xff);
+	soundlatch_w(space, 0, data & 0xff);
 //      logerror("soundlatch_w %02x\n",data);
 }
 
@@ -145,7 +145,7 @@ static READ16_HANDLER( m107_sound_status_r )
 
 static READ16_HANDLER( m107_soundlatch_r )
 {
-	return soundlatch_r(machine, offset) | 0xff00;
+	return soundlatch_r(space, offset) | 0xff00;
 }
 
 static WRITE16_HANDLER( m107_sound_irq_ack_w )
@@ -156,7 +156,7 @@ static WRITE16_HANDLER( m107_sound_irq_ack_w )
 static WRITE16_HANDLER( m107_sound_status_w )
 {
 	COMBINE_DATA(&sound_status);
-	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M107_IRQ_3);
+	cpu_set_input_line_and_vector(space->machine->cpu[0], 0, HOLD_LINE, M107_IRQ_3);
 }
 
 /*****************************************************************************/

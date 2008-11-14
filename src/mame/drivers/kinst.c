@@ -335,7 +335,7 @@ static READ32_HANDLER( kinst_control_r )
 	switch (offset)
 	{
 		case 2:		/* $90 -- sound return */
-			result = input_port_read(machine, portnames[offset]);
+			result = input_port_read(space->machine, portnames[offset]);
 			result &= ~0x0002;
 			if (dcs_control_r() & 0x800)
 				result |= 0x0002;
@@ -344,13 +344,13 @@ static READ32_HANDLER( kinst_control_r )
 		case 0:		/* $80 */
 		case 1:		/* $88 */
 		case 3:		/* $98 */
-			result = input_port_read(machine, portnames[offset]);
+			result = input_port_read(space->machine, portnames[offset]);
 			break;
 
 		case 4:		/* $a0 */
-			result = input_port_read(machine, portnames[offset]);
-			if (cpu_get_pc(machine->activecpu) == 0x802d428)
-				cpu_spinuntil_int(machine->activecpu);
+			result = input_port_read(space->machine, portnames[offset]);
+			if (cpu_get_pc(space->cpu) == 0x802d428)
+				cpu_spinuntil_int(space->cpu);
 			break;
 	}
 

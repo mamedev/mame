@@ -715,7 +715,7 @@ READ16_HANDLER( tx1_math_r )
                 TODO make this constant somewhere
                 e.g. math.retval =  math.romptr[ get_tx1_datarom_addr() ];
             */
-			UINT16 *romdata = (UINT16*)memory_region(machine, "user1");
+			UINT16 *romdata = (UINT16*)memory_region(space->machine, "user1");
 			UINT16 addr = get_tx1_datarom_addr();
 			math.retval = romdata[addr];
 		}
@@ -742,7 +742,7 @@ READ16_HANDLER( tx1_math_r )
 			if ( math.mux != TX1_SEL_ILDEN )
 			{
 				INC_PROM_ADDR;
-				tx1_update_state(machine);
+				tx1_update_state(space->machine);
 
 				// MUST RETURN HERE?
 				return math.retval;
@@ -761,12 +761,12 @@ READ16_HANDLER( tx1_math_r )
 	if ( offset & TX1_INSLD )
 	{
 	    math.promaddr = (offset << 2) & 0x1ff;
-		tx1_update_state(machine);
+		tx1_update_state(space->machine);
 	}
 	else if ( offset & TX1_CNTST )
 	{
 	    INC_PROM_ADDR;
-		tx1_update_state(machine);
+		tx1_update_state(space->machine);
 	}
 
 	return math.retval;
@@ -850,18 +850,18 @@ WRITE16_HANDLER( tx1_math_w )
 	if ( offset & TX1_INSLD )
 	{
 	    math.promaddr = (offset << 2) & 0x1ff;
-		tx1_update_state(machine);
+		tx1_update_state(space->machine);
 	}
 	else if ( offset & TX1_CNTST )
 	{
 	    INC_PROM_ADDR;
-		tx1_update_state(machine);
+		tx1_update_state(space->machine);
 	}
 }
 
 READ16_HANDLER( tx1_spcs_rom_r )
 {
-	math.cpulatch = *(UINT16*)((UINT8*)memory_region(machine, "math") + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)memory_region(space->machine, "math") + 0xfc000 + 0x1000 + offset*2);
 
 	if ( math.mux == TX1_SEL_ILDEN )
 	{
@@ -914,7 +914,7 @@ READ16_HANDLER( tx1_spcs_rom_r )
 	if ( math.mux != TX1_SEL_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		tx1_update_state(machine);
+		tx1_update_state(space->machine);
 	}
 
 	return math.cpulatch;
@@ -976,7 +976,7 @@ READ16_HANDLER( tx1_spcs_ram_r )
 	if ( math.mux != TX1_SEL_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		tx1_update_state(machine);
+		tx1_update_state(space->machine);
 	}
 
 	return math.cpulatch;
@@ -1184,7 +1184,7 @@ READ16_HANDLER( buggyboy_math_r )
 	/* /DPROE */
 	else if ( (offset & 0xc00) == 0xc00 )
 	{
-		UINT16 *romdata = (UINT16*)memory_region(machine, "user1");
+		UINT16 *romdata = (UINT16*)memory_region(space->machine, "user1");
 		UINT16 addr = get_bb_datarom_addr();
 
 		math.retval = romdata[addr];
@@ -1199,7 +1199,7 @@ READ16_HANDLER( buggyboy_math_r )
 			if ( math.mux != BB_MUX_ILDEN )
 			{
 				INC_PROM_ADDR;
-				buggyboy_update_state(machine);
+				buggyboy_update_state(space->machine);
 			}
 		}
 	}
@@ -1215,12 +1215,12 @@ READ16_HANDLER( buggyboy_math_r )
 	if ( offset & BB_INSLD )
 	{
 	    math.promaddr = (offset << 2) & 0x1ff;
-		buggyboy_update_state(machine);
+		buggyboy_update_state(space->machine);
 	}
 	else if ( offset & BB_CNTST )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state(machine);
+		buggyboy_update_state(space->machine);
 	}
 
 	return math.retval;
@@ -1289,24 +1289,24 @@ WRITE16_HANDLER( buggyboy_math_w )
 		else
 		{
 			mame_printf_debug("BB_DSEL was not 3 for P->S load!\n");
-			debugger_break(machine);
+			debugger_break(space->machine);
 		}
 	}
 	else
 	{
 		mame_printf_debug("Buggy Boy unknown math state!\n");
-		debugger_break(machine);
+		debugger_break(space->machine);
 	}
 
 	if ( offset & BB_INSLD )
 	{
 	    math.promaddr = (offset << 2) & 0x1ff;
-		buggyboy_update_state(machine);
+		buggyboy_update_state(space->machine);
 	}
 	else if ( offset & BB_CNTST )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state(machine);
+		buggyboy_update_state(space->machine);
 	}
 }
 
@@ -1315,7 +1315,7 @@ WRITE16_HANDLER( buggyboy_math_w )
 */
 READ16_HANDLER( buggyboy_spcs_rom_r )
 {
-	math.cpulatch = *(UINT16*)((UINT8*)memory_region(machine, "math") + 0xfc000 + 0x1000 + offset*2);
+	math.cpulatch = *(UINT16*)((UINT8*)memory_region(space->machine, "math") + 0xfc000 + 0x1000 + offset*2);
 
 	if ( math.mux == BB_MUX_ILDEN )
 	{
@@ -1368,7 +1368,7 @@ READ16_HANDLER( buggyboy_spcs_rom_r )
 	if ( math.mux != BB_MUX_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state(machine);
+		buggyboy_update_state(space->machine);
 	}
 
 	return math.cpulatch;
@@ -1436,7 +1436,7 @@ READ16_HANDLER( buggyboy_spcs_ram_r )
 	if ( math.mux != BB_MUX_ILDEN )
 	{
 	    INC_PROM_ADDR;
-		buggyboy_update_state(machine);
+		buggyboy_update_state(space->machine);
 	}
 
 	return math.cpulatch;

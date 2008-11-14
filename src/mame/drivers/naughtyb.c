@@ -111,14 +111,14 @@ TODO:
 
 static READ8_HANDLER( in0_port_r )
 {
-	int in0 = input_port_read(machine, "IN0");
+	int in0 = input_port_read(space->machine, "IN0");
 
 	if ( naughtyb_cocktail )
 	{
 		// cabinet == cocktail -AND- handling player 2
 
 		in0 = ( in0 & 0x03 ) |				// start buttons
-			  ( input_port_read(machine, "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
+			  ( input_port_read(space->machine, "IN0_COCKTAIL") & 0xFC );	// cocktail inputs
 	}
 
 	return in0;
@@ -128,8 +128,8 @@ static READ8_HANDLER( dsw0_port_r )
 {
 	// vblank replaces the cabinet dip
 
-	return ( ( input_port_read(machine, "DSW0") & 0x7F ) |		// dsw0
-   			 ( input_port_read(machine, "FAKE") & 0x80 ) );		// vblank
+	return ( ( input_port_read(space->machine, "DSW0") & 0x7F ) |		// dsw0
+   			 ( input_port_read(space->machine, "FAKE") & 0x80 ) );		// vblank
 }
 
 /* Pop Flamer
@@ -150,16 +150,16 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 	return values[count];
 
 #if 0
-	if ( cpu_get_pc(machine->activecpu) == (0x26F2 + 0x03) )
+	if ( cpu_get_pc(space->cpu) == (0x26F2 + 0x03) )
 	{
 		popflame_prot_count = 0;
 		return 0x01;
 	} /* Must not carry when rotated left */
 
-	if ( cpu_get_pc(machine->activecpu) == (0x26F9 + 0x03) )
+	if ( cpu_get_pc(space->cpu) == (0x26F9 + 0x03) )
 		return 0x80; /* Must carry when rotated left */
 
-	if ( cpu_get_pc(machine->activecpu) == (0x270F + 0x03) )
+	if ( cpu_get_pc(space->cpu) == (0x270F + 0x03) )
 	{
 		switch( popflame_prot_count++ )
 		{
@@ -169,7 +169,7 @@ static READ8_HANDLER( popflame_protection_r ) /* Not used by bootleg/hack */
 			case 3: return 0x38; /* x011 1xxx, matches 0x07 at $2693, stored in $400D */
 		}
 	}
-	logerror("CPU #0 PC %06x: unmapped protection read\n", cpu_get_pc(machine->activecpu));
+	logerror("CPU #0 PC %06x: unmapped protection read\n", cpu_get_pc(space->cpu));
 	return 0x00;
 #endif
 }
@@ -777,7 +777,7 @@ static int question_offset = 0;
 
 static READ8_HANDLER( trvmstr_questions_r )
 {
-	return memory_region(machine, "user1")[question_offset];
+	return memory_region(space->machine, "user1")[question_offset];
 }
 
 static WRITE8_HANDLER( trvmstr_questions_w )

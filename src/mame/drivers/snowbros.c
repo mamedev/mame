@@ -139,7 +139,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 
 static READ16_HANDLER( snowbros_68000_sound_r )
 {
-	return soundlatch_r(machine,offset);
+	return soundlatch_r(space,offset);
 }
 
 
@@ -147,14 +147,14 @@ static WRITE16_HANDLER( snowbros_68000_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,offset,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space,offset,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
 static WRITE16_HANDLER( semicom_soundcmd_w )
 {
-	if (ACCESSING_BITS_0_7) soundlatch_w(machine,0,data & 0xff);
+	if (ACCESSING_BITS_0_7) soundlatch_w(space,0,data & 0xff);
 }
 
 
@@ -277,8 +277,8 @@ static WRITE16_HANDLER( twinadv_68000_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,offset,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space,offset,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -460,7 +460,7 @@ static WRITE16_HANDLER( sb3_sound_w )
 	if (data == 0x00fe)
 	{
 		sb3_music_is_playing = 0;
-		okim6295_data_0_w(machine,0,0x78);		/* Stop sounds */
+		okim6295_data_0_w(space,0,0x78);		/* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
 	{
@@ -468,22 +468,22 @@ static WRITE16_HANDLER( sb3_sound_w )
 
 		if (data <= 0x21)
 		{
-			sb3_play_sound(machine, data);
+			sb3_play_sound(space->machine, data);
 		}
 
 		if (data>=0x22 && data<=0x31)
 		{
-			sb3_play_music(machine, data);
+			sb3_play_music(space->machine, data);
 		}
 
 		if ((data>=0x30) && (data<=0x51))
 		{
-			sb3_play_sound(machine, data-0x30);
+			sb3_play_sound(space->machine, data-0x30);
 		}
 
 		if (data>=0x52 && data<=0x5f)
 		{
-			sb3_play_music(machine, data-0x30);
+			sb3_play_music(space->machine, data-0x30);
 		}
 
 	}

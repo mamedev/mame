@@ -30,7 +30,7 @@ static INTERRUPT_GEN( mayumi_interrupt )
 
 static WRITE8_HANDLER( bank_sel_w )
 {
-	UINT8 *BANKROM = memory_region(machine, "main");
+	UINT8 *BANKROM = memory_region(space->machine, "main");
 	int bank = ((data & 0x80)) >> 7 | ((data & 0x40) >> 5);
 	memory_set_bankptr(1, &BANKROM[0x10000+bank*0x4000]);
 
@@ -65,7 +65,7 @@ static READ8_HANDLER( key_matrix_r )
 	for (i=0; i<5; i++)
 	{
 		if (p & (1 << i))
-			ret &= input_port_read(machine, keynames[offset][i]);
+			ret &= input_port_read(space->machine, keynames[offset][i]);
 	}
 
 	return ret;

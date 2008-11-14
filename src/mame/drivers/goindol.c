@@ -38,7 +38,7 @@ extern int goindol_char_bank;
 static WRITE8_HANDLER( goindol_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	bankaddress = 0x10000 + ((data & 3) * 0x4000);
 	memory_set_bankptr(1,&RAM[bankaddress]);
@@ -69,7 +69,7 @@ static UINT8 *ram;
 
 static WRITE8_HANDLER( prot_fc44_w )
 {
-logerror("%04x: prot_fc44_w(%02x)\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: prot_fc44_w(%02x)\n",cpu_get_pc(space->cpu),data);
 	ram[0x0419] = 0x5b;
 	ram[0x041a] = 0x3f;
 	ram[0x041b] = 0x6d;
@@ -77,19 +77,19 @@ logerror("%04x: prot_fc44_w(%02x)\n",cpu_get_pc(machine->activecpu),data);
 
 static WRITE8_HANDLER( prot_fd99_w )
 {
-logerror("%04x: prot_fd99_w(%02x)\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: prot_fd99_w(%02x)\n",cpu_get_pc(space->cpu),data);
 	ram[0x0421] = 0x3f;
 }
 
 static WRITE8_HANDLER( prot_fc66_w )
 {
-logerror("%04x: prot_fc66_w(%02x)\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: prot_fc66_w(%02x)\n",cpu_get_pc(space->cpu),data);
 	ram[0x0423] = 0x06;
 }
 
 static WRITE8_HANDLER( prot_fcb0_w )
 {
-logerror("%04x: prot_fcb0_w(%02x)\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: prot_fcb0_w(%02x)\n",cpu_get_pc(space->cpu),data);
 	ram[0x0425] = 0x06;
 }
 

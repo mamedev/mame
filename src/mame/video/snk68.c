@@ -101,10 +101,10 @@ WRITE16_HANDLER( pow_spriteram_w )
 
 	if (spriteram16[offset] != newword)
 	{
-		int vpos = video_screen_get_vpos(machine->primary_screen);
+		int vpos = video_screen_get_vpos(space->machine->primary_screen);
 
 		if (vpos > 0)
-			video_screen_update_partial(machine->primary_screen, vpos - 1);
+			video_screen_update_partial(space->machine->primary_screen, vpos - 1);
 
 		spriteram16[offset] = newword;
 	}
@@ -139,7 +139,7 @@ WRITE16_HANDLER( pow_flipscreen16_w )
 
 		sprite_flip_axis = data & 0x04;	// for streetsm? though might not be present on this board
 
-		tilemap_set_pen_data_offset(fg_tilemap, ((data & 0x70) << 4) * machine->gfx[0]->char_modulo);
+		tilemap_set_pen_data_offset(fg_tilemap, ((data & 0x70) << 4) * space->machine->gfx[0]->char_modulo);
 	}
 }
 
@@ -166,7 +166,7 @@ WRITE16_HANDLER( pow_paletteram16_word_w )
 	g = ((newword >> 3) & 0x1e) | ((newword >> 13) & 0x01) ;
 	b = ((newword << 1) & 0x1e) | ((newword >> 12) & 0x01) ;
 
-	palette_set_color_rgb(machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(space->machine,offset,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 

@@ -155,26 +155,26 @@ static READ16_HANDLER( hangon_io_r )
 	switch (offset & 0x3020/2)
 	{
 		case 0x0000/2: /* PPI @ 4B */
-			return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3);
+			return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3);
 
 		case 0x1000/2: /* Input ports and DIP switches */
 		{
 			static const char *const sysports[] = { "SERVICE", "COINAGE", "DSW", "UNKNOWN" };
-			return input_port_read(machine, sysports[offset & 3]);
+			return input_port_read(space->machine, sysports[offset & 3]);
 		}
 
 		case 0x3000/2: /* PPI @ 4C */
-			return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3);
+			return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3);
 
 		case 0x3020/2: /* ADC0804 data output */
 		{
 			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return input_port_read_safe(machine, adcports[adc_select], 0);
+			return input_port_read_safe(space->machine, adcports[adc_select], 0);
 		}
 	}
 
-	logerror("%06X:hangon_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
-	return segaic16_open_bus_r(machine,0,mem_mask);
+	logerror("%06X:hangon_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	return segaic16_open_bus_r(space,0,mem_mask);
 }
 
 
@@ -190,14 +190,14 @@ static WRITE16_HANDLER( hangon_io_w )
 				return;
 
 			case 0x3000/2: /* PPI @ 4C */
-				ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3, data & 0xff);
+				ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3, data & 0xff);
 				return;
 
 			case 0x3020/2: /* ADC0804 */
 				return;
 		}
 
-	logerror("%06X:hangon_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
+	logerror("%06X:hangon_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
 }
 
 
@@ -206,27 +206,27 @@ static READ16_HANDLER( sharrier_io_r )
 	switch (offset & 0x0030/2)
 	{
 		case 0x0000/2:
-			return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset & 3);
+			return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset & 3);
 
 		case 0x0010/2: /* Input ports and DIP switches */
 		{
 			static const char *const sysports[] = { "SERVICE", "UNKNOWN", "COINAGE", "DSW" };
-			return input_port_read(machine, sysports[offset & 3]);
+			return input_port_read(space->machine, sysports[offset & 3]);
 		}
 
 		case 0x0020/2: /* PPI @ 4C */
 			if (offset == 2) return 0;
-			return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3);
+			return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3);
 
 		case 0x0030/2: /* ADC0804 data output */
 		{
 			static const char *const adcports[] = { "ADC0", "ADC1", "ADC2", "ADC3" };
-			return input_port_read_safe(machine, adcports[adc_select], 0);
+			return input_port_read_safe(space->machine, adcports[adc_select], 0);
 		}
 	}
 
-	logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
-	return segaic16_open_bus_r(machine,0,mem_mask);
+	logerror("%06X:sharrier_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	return segaic16_open_bus_r(space,0,mem_mask);
 }
 
 
@@ -242,14 +242,14 @@ static WRITE16_HANDLER( sharrier_io_w )
 				return;
 
 			case 0x0020/2: /* PPI @ 4C */
-				ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset & 3, data & 0xff);
+				ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset & 3, data & 0xff);
 				return;
 
 			case 0x0030/2: /* ADC0804 */
 				return;
 		}
 
-	logerror("%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
+	logerror("%06X:sharrier_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
 }
 
 
@@ -372,8 +372,8 @@ static void sound_irq(running_machine *machine, int irq)
 static READ8_HANDLER( sound_data_r )
 {
 	/* assert ACK */
-	ppi8255_set_port_c(devtag_get_device(machine, PPI8255, "ppi8255_0"), 0x00);
-	return soundlatch_r(machine, offset);
+	ppi8255_set_port_c(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), 0x00);
+	return soundlatch_r(space, offset);
 }
 
 

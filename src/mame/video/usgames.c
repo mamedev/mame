@@ -62,7 +62,7 @@ WRITE8_HANDLER( usgames_charram_w )
 {
 	usgames_charram[offset] = data;
 
-	decodechar(machine->gfx[0], offset/8, usgames_charram);
+	decodechar(space->machine->gfx[0], offset/8, usgames_charram);
 
 	tilemap_mark_all_tiles_dirty(usgames_tilemap);
 }

@@ -258,9 +258,9 @@ static READ8_HANDLER( spacduel_IN3_r )
 	int res2;
 	int res3;
 
-	res1 = input_port_read(machine, "IN3");
-	res2 = input_port_read(machine, "IN4");
-	res3 = input_port_read_safe(machine, "DSW2", 0);
+	res1 = input_port_read(space->machine, "IN3");
+	res2 = input_port_read(space->machine, "IN4");
+	res3 = input_port_read_safe(space->machine, "DSW2", 0);
 	res = 0x00;
 
 	switch (offset & 0x07)
@@ -340,7 +340,7 @@ static WRITE8_HANDLER( bwidow_misc_w )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

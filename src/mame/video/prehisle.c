@@ -32,11 +32,11 @@ READ16_HANDLER( prehisle_control16_r )
 {
 	switch (offset)
 	{
-	case 0x08: return input_port_read(machine, "P2");						// Player 2
-	case 0x10: return input_port_read(machine, "COIN");						// Coins, Tilt, Service
-	case 0x20: return input_port_read(machine, "P1") ^ invert_controls;		// Player 1
-	case 0x21: return input_port_read(machine, "DSW0");						// DIPs
-	case 0x22: return input_port_read(machine, "DSW1");						// DIPs + VBLANK
+	case 0x08: return input_port_read(space->machine, "P2");						// Player 2
+	case 0x10: return input_port_read(space->machine, "COIN");						// Coins, Tilt, Service
+	case 0x20: return input_port_read(space->machine, "P1") ^ invert_controls;		// Player 1
+	case 0x21: return input_port_read(space->machine, "DSW0");						// DIPs
+	case 0x22: return input_port_read(space->machine, "DSW1");						// DIPs + VBLANK
 	default: return 0;
 	}
 }

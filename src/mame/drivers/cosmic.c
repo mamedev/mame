@@ -127,7 +127,7 @@ static WRITE8_HANDLER( panic_sound_output_w )
 
 static WRITE8_HANDLER( panic_sound_output2_w )
 {
-	panic_sound_output_w(machine, offset+15, data);
+	panic_sound_output_w(space, offset+15, data);
 }
 
 static WRITE8_HANDLER( cosmicg_output_w )
@@ -420,12 +420,12 @@ static READ8_HANDLER( cosmicg_port_0_r )
 {
 	/* The top four address lines from the CRTC are bits 0-3 */
 
-	return (input_port_read(machine, "IN0") & 0xf0) | ((video_screen_get_vpos(machine->primary_screen) & 0xf0) >> 4);
+	return (input_port_read(space->machine, "IN0") & 0xf0) | ((video_screen_get_vpos(space->machine->primary_screen) & 0xf0) >> 4);
 }
 
 static READ8_HANDLER( magspot_coinage_dip_r )
 {
-	return (input_port_read_safe(machine, "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
+	return (input_port_read_safe(space->machine, "DSW", 0) & (1 << (7 - offset))) ? 0 : 1;
 }
 
 
@@ -434,12 +434,12 @@ static READ8_HANDLER( magspot_coinage_dip_r )
 static READ8_HANDLER( nomnlnd_port_0_1_r )
 {
 	int control;
-    int fire = input_port_read(machine, "IN3");
+    int fire = input_port_read(space->machine, "IN3");
 
 	if (offset)
-		control = input_port_read(machine, "IN1");
+		control = input_port_read(space->machine, "IN1");
     else
-		control = input_port_read(machine, "IN0");
+		control = input_port_read(space->machine, "IN0");
 
     /* If firing - stop tank */
 

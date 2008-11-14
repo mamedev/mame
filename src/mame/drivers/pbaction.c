@@ -84,8 +84,8 @@ extern VIDEO_UPDATE( pbaction );
 
 static WRITE8_HANDLER( pbaction_sh_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0x00);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0x00);
 }
 
 
@@ -418,7 +418,7 @@ ROM_END
 static READ8_HANDLER( pbactio3_prot_kludge_r )
 {
 	/* on startup, the game expect this location to NOT act as RAM */
-	if (cpu_get_pc(machine->activecpu) == 0xab80)
+	if (cpu_get_pc(space->cpu) == 0xab80)
 		return 0;
 
 	return work_ram[0];

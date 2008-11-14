@@ -379,7 +379,7 @@ static void process_dma_queue(running_machine *machine)
 WRITE32_HANDLER( midvunit_dma_queue_w )
 {
 	if (LOG_DMA && input_code_pressed(KEYCODE_L))
-		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(machine->activecpu), dma_data_index, data);
+		logerror("%06X:queue(%X) = %08X\n", cpu_get_pc(space->cpu), dma_data_index, data);
 	if (dma_data_index < 16)
 		dma_data[dma_data_index++] = data;
 }
@@ -397,8 +397,8 @@ READ32_HANDLER( midvunit_dma_trigger_r )
 	if (offset)
 	{
 		if (LOG_DMA && input_code_pressed(KEYCODE_L))
-			logerror("%06X:trigger\n", cpu_get_pc(machine->activecpu));
-		process_dma_queue(machine);
+			logerror("%06X:trigger\n", cpu_get_pc(space->cpu));
+		process_dma_queue(space->machine);
 		dma_data_index = 0;
 	}
 	return 0;
@@ -420,7 +420,7 @@ WRITE32_HANDLER( midvunit_page_control_w )
 		video_changed = TRUE;
 		if (LOG_DMA && input_code_pressed(KEYCODE_L))
 			logerror("##########################################################\n");
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) - 1);
 	}
 	page_control = data;
 }
@@ -448,7 +448,7 @@ WRITE32_HANDLER( midvunit_video_control_w )
 
 	/* update the scanline timer */
 	if (offset == 0)
-		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, (data & 0x1ff) + 1, 0), data & 0x1ff);
+		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(space->machine->primary_screen, (data & 0x1ff) + 1, 0), data & 0x1ff);
 
 	/* if something changed, update our parameters */
 	if (old != video_regs[offset] && video_regs[6] != 0 && video_regs[11] != 0)
@@ -460,14 +460,14 @@ WRITE32_HANDLER( midvunit_video_control_w )
 		visarea.max_x = (video_regs[6] + video_regs[2] - video_regs[5]) % video_regs[6];
 		visarea.min_y = 0;
 		visarea.max_y = (video_regs[11] + video_regs[7] - video_regs[10]) % video_regs[11];
-		video_screen_configure(machine->primary_screen, video_regs[6], video_regs[11], &visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * video_regs[6] * video_regs[11]);
+		video_screen_configure(space->machine->primary_screen, video_regs[6], video_regs[11], &visarea, HZ_TO_ATTOSECONDS(MIDVUNIT_VIDEO_CLOCK / 2) * video_regs[6] * video_regs[11]);
 	}
 }
 
 
 READ32_HANDLER( midvunit_scanline_r )
 {
-	return video_screen_get_vpos(machine->primary_screen);
+	return video_screen_get_vpos(space->machine->primary_screen);
 }
 
 
@@ -511,7 +511,7 @@ WRITE32_HANDLER( midvunit_paletteram_w )
 
 	COMBINE_DATA(&paletteram32[offset]);
 	newword = paletteram32[offset];
-	palette_set_color_rgb(machine, offset, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
+	palette_set_color_rgb(space->machine, offset, pal5bit(newword >> 10), pal5bit(newword >> 5), pal5bit(newword >> 0));
 }
 
 

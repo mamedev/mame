@@ -329,7 +329,7 @@ static WRITE16_HANDLER( galpani3_mcu_com##_n_##_w ) \
 	if (galpani3_mcu_com[3] != 0xFFFF)	return; \
 \
 	memset(galpani3_mcu_com, 0, 4 * sizeof( UINT16 ) ); \
-	galpani3_mcu_run(machine); \
+	galpani3_mcu_run(space->machine); \
 }
 
 GALPANI3_MCU_COM_W(0)
@@ -339,7 +339,7 @@ GALPANI3_MCU_COM_W(3)
 
 static READ16_HANDLER( galpani3_mcu_status_r )
 {
-	logerror("cpu #%d (PC=%06X): read mcu status\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu));
+	logerror("cpu #%d (PC=%06X): read mcu status\n", cpunum_get_active(), cpu_get_previouspc(space->cpu));
 	return 0;
 }
 
@@ -347,7 +347,7 @@ static READ16_HANDLER( galpani3_mcu_status_r )
 READ16_HANDLER( galpani3_regs1_r )
 {
 
-	logerror("cpu #%d (PC=%06X): galpani3_regs1_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), offset, mem_mask);
+	logerror("cpu #%d (PC=%06X): galpani3_regs1_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(space->cpu), offset, mem_mask);
 	switch (offset)
 	{
 		case 0xb:
@@ -366,7 +366,7 @@ READ16_HANDLER( galpani3_regs1_r )
 
 READ16_HANDLER( galpani3_regs2_r )
 {
-	logerror("cpu #%d (PC=%06X): galpani3_regs2_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), offset, mem_mask);
+	logerror("cpu #%d (PC=%06X): galpani3_regs2_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(space->cpu), offset, mem_mask);
 	switch (offset)
 	{
 		case 0xb:
@@ -383,7 +383,7 @@ READ16_HANDLER( galpani3_regs2_r )
 
 READ16_HANDLER( galpani3_regs3_r )
 {
-	logerror("cpu #%d (PC=%06X): galpani3_regs3_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu), offset, mem_mask);
+	logerror("cpu #%d (PC=%06X): galpani3_regs3_r %02x %04x\n", cpunum_get_active(), cpu_get_previouspc(space->cpu), offset, mem_mask);
 	switch (offset)
 	{
 		case 0xb:

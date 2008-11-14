@@ -86,12 +86,12 @@ static READ16_HANDLER ( sderby_input_r )
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 		case 0x02 >> 1:
 			return 0xffff;			// to avoid game to reset (needs more work)
 	}
 
-	logerror("sderby_input_r : offset = %x - PC = %06x\n",offset*2,cpu_get_pc(machine->activecpu));
+	logerror("sderby_input_r : offset = %x - PC = %06x\n",offset*2,cpu_get_pc(space->cpu));
 
 	return 0xffff;
 }
@@ -101,11 +101,11 @@ static READ16_HANDLER( roulette_input_r )
 	switch (offset)
 	{
 		case 0x00 >> 1:
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 		case 0x02 >> 1:
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 		case 0x04 >> 1:
-			return input_port_read(machine, "IN2");
+			return input_port_read(space->machine, "IN2");
 	}
 
 	return 0xffff;
@@ -135,7 +135,7 @@ static READ16_HANDLER( roulette_input_r )
 
 static READ16_HANDLER( rprot_r )
 {
-	logerror("rprot_r : offset = %02x\n",cpu_get_pc(machine->activecpu));
+	logerror("rprot_r : offset = %02x\n",cpu_get_pc(space->cpu));
 
 /* This is the only mask I found that allow a normal play.
    Using other values, the game hangs waiting for response,
@@ -144,7 +144,7 @@ static READ16_HANDLER( rprot_r )
    If someone more skilled in 68K code can help to trace it,
    searching for an accurated response, I'll appreciate.
 */
-	return mame_rand(machine) & 0x1f;
+	return mame_rand(space->machine) & 0x1f;
 }
 
 static WRITE16_HANDLER( rprot_w )

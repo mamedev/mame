@@ -643,7 +643,7 @@ VIDEO_UPDATE( calomega );
 
 static READ8_HANDLER( dipsw_1_r )
 {
-	return input_port_read(machine, "SW1");
+	return input_port_read(space->machine, "SW1");
 }
 
 static void tx_rx_clk (int dsw2)
@@ -660,7 +660,7 @@ static void tx_rx_clk (int dsw2)
 
 static READ8_HANDLER( dipsw_3_r )
 {
-	return input_port_read(machine, "SW3");
+	return input_port_read(space->machine, "SW3");
 }
 
 static int s903_mux_data = 0;
@@ -669,10 +669,10 @@ static READ8_HANDLER( s903_mux_port_r )
 {
 	switch( s903_mux_data & 0xf0 )	/* bits 4-7 */
 	{
-		case 0x10: return input_port_read(machine, "IN0-0");
-		case 0x20: return input_port_read(machine, "IN0-1");
-		case 0x40: return input_port_read(machine, "IN0-2");
-		case 0x80: return input_port_read(machine, "IN0-3");
+		case 0x10: return input_port_read(space->machine, "IN0-0");
+		case 0x20: return input_port_read(space->machine, "IN0-1");
+		case 0x40: return input_port_read(space->machine, "IN0-2");
+		case 0x80: return input_port_read(space->machine, "IN0-3");
 	}
 	return 0xff;
 }
@@ -689,10 +689,10 @@ static READ8_HANDLER( s905_mux_port_r )
 {
 	switch( s905_mux_data & 0x0f )	/* bits 0-3 */
 	{
-		case 0x01: return input_port_read(machine, "IN0-0");
-		case 0x02: return input_port_read(machine, "IN0-1");
-		case 0x04: return input_port_read(machine, "IN0-2");
-		case 0x08: return input_port_read(machine, "IN0-3");
+		case 0x01: return input_port_read(space->machine, "IN0-0");
+		case 0x02: return input_port_read(space->machine, "IN0-1");
+		case 0x04: return input_port_read(space->machine, "IN0-2");
+		case 0x08: return input_port_read(space->machine, "IN0-3");
 	}
 	return 0xff;
 }

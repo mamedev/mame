@@ -52,7 +52,7 @@ note: check this, its borrowed from tecmo.c / wc90.c at the moment and could wel
 static WRITE8_HANDLER( tbowlb_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -62,7 +62,7 @@ static WRITE8_HANDLER( tbowlb_bankswitch_w )
 static WRITE8_HANDLER( tbowlc_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = memory_region(space->machine, "sub");
 
 
 	bankaddress = 0x10000 + ((data & 0xf8) << 8);
@@ -87,8 +87,8 @@ static WRITE8_HANDLER( shared_w )
 
 static WRITE8_HANDLER( tbowl_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line(machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -141,7 +141,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER ( tbowl_trigger_nmi )
 {
 	/* trigger NMI on 6206B's Cpu? (guess but seems to work..) */
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( 6206C_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -459,7 +459,7 @@ static TIMER_DEVICE_CALLBACK( track_timer )
 
 static WRITE8_HANDLER( output0_w )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	ldplayer_data *player = ld->player;
 
 	/*
@@ -475,7 +475,7 @@ static WRITE8_HANDLER( output0_w )
 
 	if (LOG_PORTS && (player->out0 ^ data) & 0xff)
 	{
-		printf("%03X:out0:", cpu_get_pc(machine->activecpu));
+		printf("%03X:out0:", cpu_get_pc(space->cpu));
 		if ( (data & 0x80)) printf(" ???");
 		if ( (data & 0x40)) printf(" LED1");
 		if ( (data & 0x20)) printf(" LED2");
@@ -500,7 +500,7 @@ static WRITE8_HANDLER( output0_w )
 
 static WRITE8_HANDLER( output1_w )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	ldplayer_data *player = ld->player;
 	INT32 speed = 0;
 
@@ -517,7 +517,7 @@ static WRITE8_HANDLER( output1_w )
 
 	if (LOG_PORTS && (player->out1 ^ data) & 0x08)
 	{
-		mame_printf_debug("%03X:out1:", cpu_get_pc(machine->activecpu));
+		mame_printf_debug("%03X:out1:", cpu_get_pc(space->cpu));
 		if (!(data & 0x08)) mame_printf_debug(" SMS");
 		mame_printf_debug("\n");
 		player->out1 = data;
@@ -592,7 +592,7 @@ static READ8_HANDLER( keypad_r )
 
 static READ8_HANDLER( datic_r )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	return ld->player->daticval;
 }
 
@@ -604,7 +604,7 @@ static READ8_HANDLER( datic_r )
 
 static READ8_HANDLER( from_controller_r )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	ldplayer_data *player = ld->player;
 
 	/* clear the pending flag and return the data */
@@ -620,7 +620,7 @@ static READ8_HANDLER( from_controller_r )
 
 static WRITE8_HANDLER( to_controller_w )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	ldplayer_data *player = ld->player;
 
 	/* set the pending flag and stash the data */
@@ -642,7 +642,7 @@ static WRITE8_HANDLER( to_controller_w )
 
 static READ8_HANDLER( port1_r )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0x00;
 
@@ -665,7 +665,7 @@ static READ8_HANDLER( port1_r )
 
 static WRITE8_HANDLER( port1_w )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	ldplayer_data *player = ld->player;
 
 	/*
@@ -678,7 +678,7 @@ static WRITE8_HANDLER( port1_w )
 
 	if (LOG_PORTS && (player->port1 ^ data) & 0x1f)
 	{
-		printf("%03X:port1:", cpu_get_pc(machine->activecpu));
+		printf("%03X:port1:", cpu_get_pc(space->cpu));
 		if (!(data & 0x10)) printf(" SPEED");
 		if (!(data & 0x08)) printf(" TIMENABLE");
 		if (!(data & 0x04)) printf(" REV");
@@ -739,7 +739,7 @@ static WRITE8_HANDLER( port1_w )
 
 static READ8_HANDLER( port2_r )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	ldplayer_data *player = ld->player;
 	UINT8 result = 0x00;
 
@@ -778,7 +778,7 @@ static WRITE8_HANDLER( port2_w )
 
 static READ8_HANDLER( t0_r )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	return ld->player->datastrobe;
 }
 
@@ -791,6 +791,6 @@ static READ8_HANDLER( t0_r )
 
 static READ8_HANDLER( t1_r )
 {
-	laserdisc_state *ld = find_vp931(machine);
+	laserdisc_state *ld = find_vp931(space->machine);
 	return ld->player->trackstate;
 }

@@ -401,7 +401,7 @@ static READ32_HANDLER( misc_control_r )
 
 static WRITE32_HANDLER( misc_control_w )
 {
-	logerror("%08X:misc_control_w(%02X)\n", cpu_get_previouspc(machine->activecpu), data);
+	logerror("%08X:misc_control_w(%02X)\n", cpu_get_previouspc(space->cpu), data);
 
 	/*  D7    = board reset (low)
         D6    = audio must & reset (high)
@@ -414,8 +414,8 @@ static WRITE32_HANDLER( misc_control_w )
 	if (!(data & 0x80))
 	{
 		/* clear any spinuntil stuff */
-		jaguar_gpu_resume(machine);
-		jaguar_dsp_resume(machine);
+		jaguar_gpu_resume(space->machine);
+		jaguar_dsp_resume(space->machine);
 
 		/* halt the CPUs */
 		jaguargpu_ctrl_w(1, G_CTRL, 0, 0xffffffff);
@@ -423,7 +423,7 @@ static WRITE32_HANDLER( misc_control_w )
 	}
 
 	/* adjust banking */
-	if (memory_region(machine, "user2"))
+	if (memory_region(space->machine, "user2"))
 	{
 		memory_set_bank(2, (data >> 1) & 7);
 		memory_set_bank(9, (data >> 1) & 7);
@@ -486,10 +486,10 @@ static READ32_HANDLER( jaguar_wave_rom_r )
 
 static WRITE32_HANDLER( latch_w )
 {
-	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(machine->activecpu), data);
+	logerror("%08X:latch_w(%X)\n", cpu_get_previouspc(space->cpu), data);
 
 	/* adjust banking */
-	if (memory_region(machine, "user2"))
+	if (memory_region(space->machine, "user2"))
 	{
 		if (cojag_is_r3000)
 			memory_set_bank(1, data & 1);
@@ -530,7 +530,7 @@ static WRITE32_HANDLER( eeprom_data_w )
 			generic_nvram32[offset] = data & 0xff000000;
 	}
 //  else
-//      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(machine->activecpu));
+//      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(space->cpu));
 	eeprom_enable = 0;
 }
 
@@ -579,10 +579,10 @@ static WRITE32_HANDLER( gpu_jump_w )
 {
 	/* update the data in memory */
 	COMBINE_DATA(gpu_jump_address);
-	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(machine->activecpu), *gpu_jump_address);
+	logerror("%08X:GPU jump address = %08X\n", cpu_get_previouspc(space->cpu), *gpu_jump_address);
 
 	/* if the GPU is suspended, release it now */
-	jaguar_gpu_resume(machine);
+	jaguar_gpu_resume(space->machine);
 
 	/* start the sync timer going, and note that there is a command pending */
 	timer_call_after_resynch(NULL, 0, gpu_sync_timer);
@@ -594,11 +594,11 @@ static READ32_HANDLER( gpu_jump_r )
 {
 	/* if the current GPU command is just pointing back to the spin loop, and */
 	/* we're reading it from the spin loop, we can optimize */
-	if (*gpu_jump_address == gpu_spin_pc && cpu_get_previouspc(machine->activecpu) == gpu_spin_pc)
+	if (*gpu_jump_address == gpu_spin_pc && cpu_get_previouspc(space->cpu) == gpu_spin_pc)
 	{
 #if ENABLE_SPEEDUP_HACKS
 		/* spin if we're allowed */
-		jaguar_gpu_suspend(machine);
+		jaguar_gpu_suspend(space->machine);
 #endif
 
 		/* no command is pending */
@@ -637,7 +637,7 @@ static UINT64 main_speedup_max_cycles;
 
 static READ32_HANDLER( cojagr3k_main_speedup_r )
 {
-	UINT64 curcycles = cpu_get_total_cycles(machine->activecpu);
+	UINT64 curcycles = cpu_get_total_cycles(space->cpu);
 
 	/* if it's been less than main_speedup_max_cycles cycles since the last time */
 	if (curcycles - main_speedup_last_cycles < main_speedup_max_cycles)
@@ -645,7 +645,7 @@ static READ32_HANDLER( cojagr3k_main_speedup_r )
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (main_speedup_hits++ > 5)
 		{
-			cpu_spinuntil_int(machine->activecpu);
+			cpu_spinuntil_int(space->cpu);
 			main_speedup_hits = 0;
 		}
 	}
@@ -687,7 +687,7 @@ static UINT32 *main_gpu_wait;
 static READ32_HANDLER( main_gpu_wait_r )
 {
 	if (gpu_command_pending)
-		cpu_spinuntil_int(machine->activecpu);
+		cpu_spinuntil_int(space->cpu);
 	return *main_gpu_wait;
 }
 
@@ -712,7 +712,7 @@ static READ32_HANDLER( main_gpu_wait_r )
 
 static WRITE32_HANDLER( area51_main_speedup_w )
 {
-	UINT64 curcycles = cpu_get_total_cycles(machine->activecpu);
+	UINT64 curcycles = cpu_get_total_cycles(space->cpu);
 
 	/* store the data */
 	COMBINE_DATA(main_speedup);
@@ -723,7 +723,7 @@ static WRITE32_HANDLER( area51_main_speedup_w )
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (main_speedup_hits++ > 5)
 		{
-			cpu_spinuntil_int(machine->activecpu);
+			cpu_spinuntil_int(space->cpu);
 			main_speedup_hits = 0;
 		}
 	}
@@ -746,7 +746,7 @@ static WRITE32_HANDLER( area51_main_speedup_w )
 
 static WRITE32_HANDLER( area51mx_main_speedup_w )
 {
-	UINT64 curcycles = cpu_get_total_cycles(machine->activecpu);
+	UINT64 curcycles = cpu_get_total_cycles(space->cpu);
 
 	/* store the data */
 	COMBINE_DATA(&main_speedup[offset]);
@@ -757,7 +757,7 @@ static WRITE32_HANDLER( area51mx_main_speedup_w )
 		/* increment the count; if we hit 5, we can spin until an interrupt comes */
 		if (main_speedup_hits++ > 10)
 		{
-			cpu_spinuntil_int(machine->activecpu);
+			cpu_spinuntil_int(space->cpu);
 			main_speedup_hits = 0;
 		}
 	}

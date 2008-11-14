@@ -98,8 +98,8 @@ static WRITE16_HANDLER( inufuku_soundcommand_w )
 		if (data == 0x08) return;
 
 		pending_command = 1;
-		soundlatch_w(machine, 0, data & 0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, 0, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -110,7 +110,7 @@ static WRITE8_HANDLER( pending_command_clear_w )
 
 static WRITE8_HANDLER( inufuku_soundrombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "audio") + 0x10000;
+	UINT8 *ROM = memory_region(space->machine, "audio") + 0x10000;
 
 	memory_set_bankptr(1, ROM + (data & 0x03) * 0x8000);
 }

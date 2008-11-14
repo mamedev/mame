@@ -144,7 +144,7 @@ SH2 *sh2;
 INLINE UINT16 RW(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
 		return program_read_word_32be(A);
@@ -155,7 +155,7 @@ INLINE UINT16 RW(offs_t A)
 INLINE UINT32 RL(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffffffff);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
 		return program_read_dword_32be(A);

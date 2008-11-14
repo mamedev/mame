@@ -55,18 +55,18 @@ static int toggle_bit;
 
 static READ16_HANDLER( wheelfir_rand1 )
 {
-	return input_port_read(machine, "IN0") ^ toggle_bit;	// mame_rand(machine);
+	return input_port_read(space->machine, "IN0") ^ toggle_bit;	// mame_rand(space->machine);
 }
 
 static READ16_HANDLER( wheelfir_rand2 )
 {
-	return input_port_read(machine, "IN1");		// mame_rand(machine);
+	return input_port_read(space->machine, "IN1");		// mame_rand(space->machine);
 }
 
 
 static READ16_HANDLER( wheelfir_rand4 )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static UINT16 *wheelfir_myram;
@@ -151,8 +151,8 @@ static bitmap_t* render_bitmap;
 static WRITE16_HANDLER(wheelfir_blit_w)
 {
 	//wheelfir_blitdata[offset]=data;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = video_screen_get_width(space->machine->primary_screen);
+	int height = video_screen_get_height(space->machine->primary_screen);
 	int vpage=0;
 	COMBINE_DATA(&wheelfir_blitdata[offset]);
 
@@ -182,7 +182,7 @@ static WRITE16_HANDLER(wheelfir_blit_w)
 
 		int x,y;
 		int xsize,ysize;
-		UINT8 *rom = memory_region(machine, "gfx1");
+		UINT8 *rom = memory_region(space->machine, "gfx1");
 		int dir=0;
 
 

@@ -340,7 +340,7 @@ static void channel_update(void *param, stream_sample_t **inputs, stream_sample_
 static READ8_HANDLER( sound_command_r )
 {
 	/* clear the FIRQ that got us here and acknowledge the read to the main CPU */
-	cpu_set_input_line(machine->cpu[1], 1, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 1, CLEAR_LINE);
 	exidy440_sound_command_ack = 1;
 
 	return exidy440_sound_command;
@@ -376,7 +376,7 @@ static WRITE8_HANDLER( sound_volume_w )
 
 static WRITE8_HANDLER( sound_interrupt_clear_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 

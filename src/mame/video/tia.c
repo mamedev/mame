@@ -853,11 +853,11 @@ static void update_bitmap(int next_x, int next_y)
 
 static WRITE8_HANDLER( WSYNC_w )
 {
-	int cycles = cpu_get_total_cycles(machine->activecpu) - frame_cycles;
+	int cycles = cpu_get_total_cycles(space->cpu) - frame_cycles;
 
 	if (cycles % 76)
 	{
-		cpu_adjust_icount(machine->activecpu, cycles % 76 - 76);
+		cpu_adjust_icount(space->cpu, cycles % 76 - 76);
 	}
 }
 
@@ -868,21 +868,21 @@ static WRITE8_HANDLER( VSYNC_w )
 	{
 		if (!(VSYNC & 2))
 		{
-			int curr_y = current_y(machine);
+			int curr_y = current_y(space->machine);
 
 			if ( curr_y > 5 )
 				update_bitmap(
-					video_screen_get_width(machine->primary_screen),
-					video_screen_get_height(machine->primary_screen));
+					video_screen_get_width(space->machine->primary_screen),
+					video_screen_get_height(space->machine->primary_screen));
 
 			if ( tia_vsync_callback ) {
-				tia_vsync_callback( machine, 0, curr_y, 0xFFFF );
+				tia_vsync_callback( space->machine, 0, curr_y, 0xFFFF );
 			}
 
 			prev_y = 0;
 			prev_x = 0;
 
-			frame_cycles += 76 * current_y(machine);
+			frame_cycles += 76 * current_y(space->machine);
 		}
 	}
 
@@ -894,7 +894,7 @@ static WRITE8_HANDLER( VBLANK_w )
 {
 	if (data & 0x80)
 	{
-		paddle_cycles = cpu_get_total_cycles(machine->activecpu);
+		paddle_cycles = cpu_get_total_cycles(space->cpu);
 	}
 	if ( ! ( VBLANK & 0x40 ) ) {
 		INPT4 = 0x80;
@@ -906,7 +906,7 @@ static WRITE8_HANDLER( VBLANK_w )
 
 static WRITE8_HANDLER( CTRLPF_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 
 	CTRLPF = data;
 	if ( curr_x < 80 ) {
@@ -916,7 +916,7 @@ static WRITE8_HANDLER( CTRLPF_w )
 
 static WRITE8_HANDLER( HMP0_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 
 	data &= 0xF0;
 
@@ -948,7 +948,7 @@ static WRITE8_HANDLER( HMP0_w )
 
 static WRITE8_HANDLER( HMP1_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 
 	data &= 0xF0;
 
@@ -980,7 +980,7 @@ static WRITE8_HANDLER( HMP1_w )
 
 static WRITE8_HANDLER( HMM0_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 
 	data &= 0xF0;
 
@@ -1011,7 +1011,7 @@ static WRITE8_HANDLER( HMM0_w )
 
 static WRITE8_HANDLER( HMM1_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 
 	data &= 0xF0;
 
@@ -1042,7 +1042,7 @@ static WRITE8_HANDLER( HMM1_w )
 
 static WRITE8_HANDLER( HMBL_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 
 	data &= 0xF0;
 
@@ -1073,8 +1073,8 @@ static WRITE8_HANDLER( HMBL_w )
 
 static WRITE8_HANDLER( HMOVE_w )
 {
-	int curr_x = current_x(machine);
-	int curr_y = current_y(machine);
+	int curr_x = current_x(space->machine);
+	int curr_y = current_y(space->machine);
 
 	HMOVE_started = curr_x;
 
@@ -1204,7 +1204,7 @@ static WRITE8_HANDLER( RSYNC_w )
 
 static WRITE8_HANDLER( NUSIZ0_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 
 	/* Check if relevant bits have changed */
 	if ( ( data & 7 ) != ( NUSIZ0 & 7 ) ) {
@@ -1219,7 +1219,7 @@ static WRITE8_HANDLER( NUSIZ0_w )
 						/* This copy has started drawing */
 						if ( p0gfx.size[i] == 1 && nusiz[data & 7][1] > 1 ) {
 							int delay = 1 + ( ( p0gfx.start_pixel[i] + ( curr_x - p0gfx.start_drawing[i] ) ) & 1 );
-							update_bitmap( curr_x + delay, current_y(machine) );
+							update_bitmap( curr_x + delay, current_y(space->machine) );
 							p0gfx.start_pixel[i] += ( curr_x + delay - p0gfx.start_drawing[i] );
 							if ( p0gfx.start_pixel[i] > 8 )
 								p0gfx.start_pixel[i] = 8;
@@ -1229,7 +1229,7 @@ static WRITE8_HANDLER( NUSIZ0_w )
 							if ( delay ) {
 								delay = p0gfx.size[i] - delay;
 							}
-							update_bitmap( curr_x + delay, current_y(machine) );
+							update_bitmap( curr_x + delay, current_y(space->machine) );
 							p0gfx.start_pixel[i] += ( curr_x - p0gfx.start_drawing[i] ) / p0gfx.size[i];
 							p0gfx.start_drawing[i] = curr_x + delay;
 						} else {
@@ -1282,7 +1282,7 @@ static WRITE8_HANDLER( NUSIZ0_w )
 
 static WRITE8_HANDLER( NUSIZ1_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 
 	/* Check if relevant bits have changed */
 	if ( ( data & 7 ) != ( NUSIZ1 & 7 ) ) {
@@ -1297,7 +1297,7 @@ static WRITE8_HANDLER( NUSIZ1_w )
 						/* This copy has started drawing */
 						if ( p1gfx.size[i] == 1 && nusiz[data & 7][1] > 1 ) {
 							int delay = 1 + ( ( p0gfx.start_pixel[i] + ( curr_x - p0gfx.start_drawing[i] ) ) & 1 );
-							update_bitmap( curr_x + delay, current_y(machine) );
+							update_bitmap( curr_x + delay, current_y(space->machine) );
 							p1gfx.start_pixel[i] += ( curr_x + delay - p1gfx.start_drawing[i] );
 							if ( p1gfx.start_pixel[i] > 8 )
 								p1gfx.start_pixel[i] = 8;
@@ -1307,7 +1307,7 @@ static WRITE8_HANDLER( NUSIZ1_w )
 							if ( delay ) {
 								delay = p1gfx.size[i] - delay;
 							}
-							update_bitmap( curr_x + delay, current_y(machine) );
+							update_bitmap( curr_x + delay, current_y(space->machine) );
 							p1gfx.start_pixel[i] += ( curr_x - p1gfx.start_drawing[i] ) / p1gfx.size[i];
 							p1gfx.start_drawing[i] = curr_x + delay;
 						} else {
@@ -1360,11 +1360,11 @@ static WRITE8_HANDLER( NUSIZ1_w )
 
 static WRITE8_HANDLER( HMCLR_w )
 {
-	HMP0_w( machine, offset, 0 );
-	HMP1_w( machine, offset, 0 );
-	HMM0_w( machine, offset, 0 );
-	HMM1_w( machine, offset, 0 );
-	HMBL_w( machine, offset, 0 );
+	HMP0_w( space->machine, offset, 0 );
+	HMP1_w( space->machine, offset, 0 );
+	HMM0_w( space->machine, offset, 0 );
+	HMM1_w( space->machine, offset, 0 );
+	HMBL_w( space->machine, offset, 0 );
 }
 
 
@@ -1405,7 +1405,7 @@ static WRITE8_HANDLER( CXCLR_w )
 
 static WRITE8_HANDLER( RESP0_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 	int new_horzP0;
 
 	/* Check if HMOVE is activated during this line */
@@ -1465,7 +1465,7 @@ static WRITE8_HANDLER( RESP0_w )
 
 static WRITE8_HANDLER( RESP1_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 	int new_horzP1;
 
 	/* Check if HMOVE is activated during this line */
@@ -1525,7 +1525,7 @@ static WRITE8_HANDLER( RESP1_w )
 
 static WRITE8_HANDLER( RESM0_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 	int new_horzM0;
 
 	/* Check if HMOVE is activated during this line */
@@ -1547,7 +1547,7 @@ static WRITE8_HANDLER( RESM0_w )
 
 static WRITE8_HANDLER( RESM1_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 	int new_horzM1;
 
 	/* Check if HMOVE is activated during this line */
@@ -1569,7 +1569,7 @@ static WRITE8_HANDLER( RESM1_w )
 
 static WRITE8_HANDLER( RESBL_w )
 {
-	int curr_x = current_x(machine);
+	int curr_x = current_x(space->machine);
 
 	/* Check if HMOVE is activated during this line */
 	if ( HMOVE_started != HMOVE_INACTIVE ) {
@@ -1647,11 +1647,11 @@ static WRITE8_HANDLER( GRP1_w )
 
 static READ8_HANDLER( INPT_r )
 {
-	UINT64 elapsed = cpu_get_total_cycles(machine->activecpu) - paddle_cycles;
+	UINT64 elapsed = cpu_get_total_cycles(space->cpu) - paddle_cycles;
 	int input = TIA_INPUT_PORT_ALWAYS_ON;
 	if ( tia_read_input_port )
 	{
-		input = tia_read_input_port(machine, offset & 3, 0xFFFF);
+		input = tia_read_input_port(space->machine, offset & 3, 0xFFFF);
 	}
 
 	if ( input == TIA_INPUT_PORT_ALWAYS_ON )
@@ -1674,12 +1674,12 @@ READ8_HANDLER( tia_r )
 
 	if ( tia_get_databus )
 	{
-		data = tia_get_databus(machine, offset) & 0x3f;
+		data = tia_get_databus(space->machine, offset) & 0x3f;
 	}
 
 	if (!(offset & 0x8))
 	{
-		update_bitmap(current_x(machine), current_y(machine));
+		update_bitmap(current_x(space->machine), current_y(space->machine));
 	}
 
 	switch (offset & 0xF)
@@ -1701,22 +1701,22 @@ READ8_HANDLER( tia_r )
 	case 0x7:
 		return data | CXPPMM;
 	case 0x8:
-		return data | INPT_r(machine,0);
+		return data | INPT_r(space,0);
 	case 0x9:
-		return data | INPT_r(machine,1);
+		return data | INPT_r(space,1);
 	case 0xA:
-		return data | INPT_r(machine,2);
+		return data | INPT_r(space,2);
 	case 0xB:
-		return data | INPT_r(machine,3);
+		return data | INPT_r(space,3);
 	case 0xC:
 		{
-			int	button = tia_read_input_port ? ( tia_read_input_port(machine,4,0xFFFF) & 0x80 ) : 0x80;
+			int	button = tia_read_input_port ? ( tia_read_input_port(space->machine,4,0xFFFF) & 0x80 ) : 0x80;
 			INPT4 = ( VBLANK & 0x40) ? ( INPT4 & button ) : button;
 		}
 		return data | INPT4;
 	case 0xD:
 		{
-			int button = tia_read_input_port ? ( tia_read_input_port(machine,5,0xFFFF) & 0x80 ) : 0x80;
+			int button = tia_read_input_port ? ( tia_read_input_port(space->machine,5,0xFFFF) & 0x80 ) : 0x80;
 			INPT5 = ( VBLANK & 0x40) ? ( INPT5 & button ) : button;
 		}
 		return data | INPT5;
@@ -1776,8 +1776,8 @@ WRITE8_HANDLER( tia_w )
 		 0,	// HMCLR
 		 0,	// CXCLR
 	};
-	int curr_x = current_x(machine);
-	int curr_y = current_y(machine);
+	int curr_x = current_x(space->machine);
+	int curr_y = current_y(space->machine);
 
 	offset &= 0x3F;
 
@@ -1794,22 +1794,22 @@ WRITE8_HANDLER( tia_w )
 	switch (offset)
 	{
 	case 0x00:
-		VSYNC_w(machine, offset, data);
+		VSYNC_w(space, offset, data);
 		break;
 	case 0x01:
-		VBLANK_w(machine, offset, data);
+		VBLANK_w(space, offset, data);
 		break;
 	case 0x02:
-		WSYNC_w(machine, offset, data);
+		WSYNC_w(space, offset, data);
 		break;
 	case 0x03:
-		RSYNC_w(machine, offset, data);
+		RSYNC_w(space, offset, data);
 		break;
 	case 0x04:
-		NUSIZ0_w(machine, offset, data);
+		NUSIZ0_w(space, offset, data);
 		break;
 	case 0x05:
-		NUSIZ1_w(machine, offset, data);
+		NUSIZ1_w(space, offset, data);
 		break;
 	case 0x06:
 		COLUP0 = data;
@@ -1824,7 +1824,7 @@ WRITE8_HANDLER( tia_w )
 		COLUBK = data;
 		break;
 	case 0x0A:
-		CTRLPF_w(machine, offset, data);
+		CTRLPF_w(space, offset, data);
 		break;
 	case 0x0B:
 		REFP0 = data;
@@ -1842,19 +1842,19 @@ WRITE8_HANDLER( tia_w )
 		PF2 = data;
 		break;
 	case 0x10:
-		RESP0_w(machine, offset, data);
+		RESP0_w(space, offset, data);
 		break;
 	case 0x11:
-		RESP1_w(machine, offset, data);
+		RESP1_w(space, offset, data);
 		break;
 	case 0x12:
-		RESM0_w(machine, offset, data);
+		RESM0_w(space, offset, data);
 		break;
 	case 0x13:
-		RESM1_w(machine, offset, data);
+		RESM1_w(space, offset, data);
 		break;
 	case 0x14:
-		RESBL_w(machine, offset, data);
+		RESBL_w(space, offset, data);
 		break;
 
 	case 0x15: /* AUDC0 */
@@ -1863,14 +1863,14 @@ WRITE8_HANDLER( tia_w )
 	case 0x18: /* AUDF1 */
 	case 0x19: /* AUDV0 */
 	case 0x1A: /* AUDV1 */
-		tia_sound_w(machine, offset, data);
+		tia_sound_w(space, offset, data);
 		break;
 
 	case 0x1B:
-		GRP0_w(machine, offset, data);
+		GRP0_w(space, offset, data);
 		break;
 	case 0x1C:
-		GRP1_w(machine, offset, data);
+		GRP1_w(space, offset, data);
 		break;
 	case 0x1D:
 		ENAM0 = data;
@@ -1882,19 +1882,19 @@ WRITE8_HANDLER( tia_w )
 		ENABL = data;
 		break;
 	case 0x20:
-		HMP0_w(machine, offset, data);
+		HMP0_w(space, offset, data);
 		break;
 	case 0x21:
-		HMP1_w(machine, offset, data);
+		HMP1_w(space, offset, data);
 		break;
 	case 0x22:
-		HMM0_w(machine, offset, data);
+		HMM0_w(space, offset, data);
 		break;
 	case 0x23:
-		HMM1_w(machine, offset, data);
+		HMM1_w(space, offset, data);
 		break;
 	case 0x24:
-		HMBL_w(machine, offset, data);
+		HMBL_w(space, offset, data);
 		break;
 	case 0x25:
 		VDELP0 = data;
@@ -1906,19 +1906,19 @@ WRITE8_HANDLER( tia_w )
 		VDELBL = data;
 		break;
 	case 0x28:
-		RESMP0_w(machine, offset, data);
+		RESMP0_w(space, offset, data);
 		break;
 	case 0x29:
-		RESMP1_w(machine, offset, data);
+		RESMP1_w(space, offset, data);
 		break;
 	case 0x2A:
-		HMOVE_w(machine, offset, data);
+		HMOVE_w(space, offset, data);
 		break;
 	case 0x2B:
-		HMCLR_w(machine, offset, data);
+		HMCLR_w(space, offset, data);
 		break;
 	case 0x2C:
-		CXCLR_w(machine, offset, 0);
+		CXCLR_w(space, offset, 0);
 		break;
 	}
 }

@@ -55,19 +55,19 @@ static READ16_HANDLER( shangha3_prot_r )
 	static int count;
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
-logerror("PC %04x: read 20004e\n",cpu_get_pc(machine->activecpu));
+logerror("PC %04x: read 20004e\n",cpu_get_pc(space->cpu));
 
 	return result[count++ % 9];
 }
 static WRITE16_HANDLER( shangha3_prot_w )
 {
-logerror("PC %04x: write %02x to 20004e\n",cpu_get_pc(machine->activecpu),data);
+logerror("PC %04x: write %02x to 20004e\n",cpu_get_pc(space->cpu),data);
 }
 
 
 static READ16_HANDLER( heberpop_gfxrom_r )
 {
-	UINT8 *ROM = memory_region(machine, "gfx1");
+	UINT8 *ROM = memory_region(space->machine, "gfx1");
 
 	return ROM[2*offset] | (ROM[2*offset+1] << 8);
 }
@@ -118,8 +118,8 @@ static WRITE16_HANDLER( heberpop_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);	/* RST 38h */
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);	/* RST 38h */
 	}
 }
 

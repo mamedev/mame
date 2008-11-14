@@ -67,12 +67,12 @@ static READ16_HANDLER( mahjong_panel_r )
 {
 	switch(sengokumj_mux_data)
 	{
-		case 0x0100: return input_port_read(machine, "KEY0");
-		case 0x0200: return input_port_read(machine, "KEY1");
-		case 0x0400: return input_port_read(machine, "KEY2");
-		case 0x0800: return input_port_read(machine, "KEY3");
-		case 0x1000: return input_port_read(machine, "KEY4");
-		case 0x2000: return input_port_read(machine, "UNUSED");
+		case 0x0100: return input_port_read(space->machine, "KEY0");
+		case 0x0200: return input_port_read(space->machine, "KEY1");
+		case 0x0400: return input_port_read(space->machine, "KEY2");
+		case 0x0800: return input_port_read(space->machine, "KEY3");
+		case 0x1000: return input_port_read(space->machine, "KEY4");
+		case 0x2000: return input_port_read(space->machine, "UNUSED");
 	}
 
 	return 0xffff;

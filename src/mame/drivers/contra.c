@@ -42,7 +42,7 @@ VIDEO_START( contra );
 static WRITE8_HANDLER( contra_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 
 	bankaddress = 0x10000 + (data & 0x0f) * 0x2000;
@@ -52,7 +52,7 @@ static WRITE8_HANDLER( contra_bankswitch_w )
 
 static WRITE8_HANDLER( contra_sh_irqtrigger_w )
 {
-	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( contra_coin_counter_w )
@@ -63,7 +63,7 @@ static WRITE8_HANDLER( contra_coin_counter_w )
 
 static WRITE8_HANDLER( cpu_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
+	soundlatch_w(space,offset,data);
 }
 
 

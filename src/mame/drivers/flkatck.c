@@ -42,7 +42,7 @@ static INTERRUPT_GEN( flkatck_interrupt )
 
 static WRITE8_HANDLER( flkatck_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress = 0;
 
 	/* bits 3-4: coin counters */
@@ -62,13 +62,13 @@ static READ8_HANDLER( flkatck_ls138_r )
 	switch ((offset & 0x1c) >> 2){
 		case 0x00:
 			if (offset & 0x02)
-				data = input_port_read(machine, (offset & 0x01) ? "COIN" : "DSW3");
+				data = input_port_read(space->machine, (offset & 0x01) ? "COIN" : "DSW3");
 			else
-				data = input_port_read(machine, (offset & 0x01) ? "P2" : "P1");
+				data = input_port_read(space->machine, (offset & 0x01) ? "P2" : "P1");
 			break;
 		case 0x01:
 			if (offset & 0x02)
-				data = input_port_read(machine, (offset & 0x01) ? "DSW1" : "DSW2");
+				data = input_port_read(space->machine, (offset & 0x01) ? "DSW1" : "DSW2");
 			break;
 	}
 
@@ -79,16 +79,16 @@ static WRITE8_HANDLER( flkatck_ls138_w )
 {
 	switch ((offset & 0x1c) >> 2){
 		case 0x04:	/* bankswitch */
-			flkatck_bankswitch_w(machine, 0, data);
+			flkatck_bankswitch_w(space, 0, data);
 			break;
 		case 0x05:	/* sound code number */
-			soundlatch_w(machine, 0, data);
+			soundlatch_w(space, 0, data);
 			break;
 		case 0x06:	/* Cause interrupt on audio CPU */
-			cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 			break;
 		case 0x07:	/* watchdog reset */
-			watchdog_reset_w(machine, 0, data);
+			watchdog_reset_w(space, 0, data);
 			break;
 	}
 }

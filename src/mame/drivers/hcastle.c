@@ -28,7 +28,7 @@ WRITE8_HANDLER( hcastle_pf2_control_w );
 
 static WRITE8_HANDLER( hcastle_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x1f) * 0x2000;
@@ -37,7 +37,7 @@ static WRITE8_HANDLER( hcastle_bankswitch_w )
 
 static WRITE8_HANDLER( hcastle_soundirq_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
 }
 
 static WRITE8_HANDLER( hcastle_coin_w )

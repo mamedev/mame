@@ -107,7 +107,7 @@ READ64_HANDLER( pvr_ctrl_r )
 	reg = decode_reg_64(offset, mem_mask, &shift);
 
 	#if DEBUG_PVRCTRL
-	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(machine->activecpu));
+	mame_printf_verbose("PVRCTRL: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f7c00+reg*4, pvrctrl_regs[reg], offset, reg, mem_mask, cpu_get_pc(space->cpu));
 	#endif
 
 	return (UINT64)pvrctrl_regs[reg] << shift;
@@ -148,13 +148,13 @@ READ64_HANDLER( pvr_ta_r )
 	switch (reg)
 	{
 	case SPG_STATUS:
-		pvrta_regs[reg] = (video_screen_get_vblank(machine->primary_screen) << 13) | (video_screen_get_hblank(machine->primary_screen) << 12) | (video_screen_get_vpos(machine->primary_screen) & 0x3ff);
+		pvrta_regs[reg] = (video_screen_get_vblank(space->machine->primary_screen) << 13) | (video_screen_get_hblank(space->machine->primary_screen) << 12) | (video_screen_get_vpos(space->machine->primary_screen) & 0x3ff);
 		break;
 	}
 
 	#if DEBUG_PVRTA_REGS
 	if (reg != 0x43)
-		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, cpu_get_pc(machine->activecpu));
+		mame_printf_verbose("PVRTA: [%08x] read %x @ %x (reg %x), mask %llx (PC=%x)\n", 0x5f8000+reg*4, pvrta_regs[reg], offset, reg, mem_mask, cpu_get_pc(space->cpu));
 	#endif
 	return (UINT64)pvrta_regs[reg] << shift;
 }
@@ -448,7 +448,7 @@ WRITE64_HANDLER( ta_fifo_poly_w )
 				break;
 			}
 			dc_sysctrl_regs[SB_ISTNRM] |= a;
-			dc_update_interrupt_status(machine);
+			dc_update_interrupt_status(space->machine);
 			state_ta.tafifo_listtype= -1; // no list being received
 			state_ta.listtype_used |= (2+8);
 		}

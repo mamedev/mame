@@ -117,7 +117,7 @@ static WRITE8_HANDLER( route16_sharedram_w )
 	if (offset >= 0x0313 && offset <= 0x0319 && data == 0xff)
 	{
 		// Let the other CPU run
-		cpu_yield(machine->activecpu);
+		cpu_yield(space->cpu);
 	}
 }
 
@@ -174,10 +174,10 @@ static READ8_HANDLER( ttmahjng_input_port_matrix_r )
 
 	switch (ttmahjng_port_select)
 	{
-	case 1:  ret = input_port_read(machine, "KEY0"); break;
-	case 2:  ret = input_port_read(machine, "KEY1"); break;
-	case 4:  ret = input_port_read(machine, "KEY2"); break;
-	case 8:  ret = input_port_read(machine, "KEY3"); break;
+	case 1:  ret = input_port_read(space->machine, "KEY0"); break;
+	case 2:  ret = input_port_read(space->machine, "KEY1"); break;
+	case 4:  ret = input_port_read(space->machine, "KEY2"); break;
+	case 8:  ret = input_port_read(space->machine, "KEY3"); break;
 	default: break;
 	}
 
@@ -897,9 +897,9 @@ ROM_END
 
 static READ8_HANDLER( routex_prot_read )
 {
-	if (cpu_get_pc(machine->activecpu) == 0x2f) return 0xfb;
+	if (cpu_get_pc(space->cpu) == 0x2f) return 0xfb;
 
-	logerror ("cpu #%d (PC=%08X): unmapped prot read\n", cpunum_get_active(), cpu_get_pc(machine->activecpu));
+	logerror ("cpu #%d (PC=%08X): unmapped prot read\n", cpunum_get_active(), cpu_get_pc(space->cpu));
 	return 0x00;
 
 }

@@ -1044,6 +1044,8 @@ INLINE void refresh_EG(YM2151Operator * op)
 /* write a register on YM2151 chip number 'n' */
 void ym2151_write_reg(void *_chip, int r, int v)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	YM2151 *chip = _chip;
 	YM2151Operator *op = &chip->oper[ (r&0x07)*4+((r&0x18)>>3) ];
 
@@ -1191,7 +1193,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 		case 0x1b:	/* CT2, CT1, LFO waveform */
 			chip->ct = v >> 6;
 			chip->lfo_wsel = v & 3;
-			if (chip->porthandler) (*chip->porthandler)(Machine, 0 , chip->ct );
+			if (chip->porthandler) (*chip->porthandler)(space, 0 , chip->ct );
 			break;
 
 		default:

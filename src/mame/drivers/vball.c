@@ -107,7 +107,7 @@ VBlank = 58Hz
 */
 static WRITE8_HANDLER( vb_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	memory_set_bankptr( 1,&RAM[ 0x10000 + ( 0x4000 * ( data & 1 ) ) ] );
 
 	if (vball_gfxset != ((data  & 0x20) ^ 0x20)) {
@@ -121,8 +121,8 @@ static WRITE8_HANDLER( vb_bankswitch_w )
 
 
 static WRITE8_HANDLER( cpu_sound_command_w ) {
-	soundlatch_w( machine, offset, data );
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w( space->machine, offset, data );
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 
@@ -139,9 +139,9 @@ static WRITE8_HANDLER( vb_scrollx_hi_w )
 {
 	flip_screen_set(~data&1);
 	vb_scrollx_hi = (data & 0x02) << 7;
-	vb_bgprombank_w(machine, (data >> 2)&0x07);
-	vb_spprombank_w(machine, (data >> 5)&0x07);
-	//logerror("%04x: vb_scrollx_hi = %d\n",cpu_get_previouspc(machine->activecpu), vb_scrollx_hi);
+	vb_bgprombank_w(space, (data >> 2)&0x07);
+	vb_spprombank_w(space, (data >> 5)&0x07);
+	//logerror("%04x: vb_scrollx_hi = %d\n",cpu_get_previouspc(space->cpu), vb_scrollx_hi);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -173,7 +173,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER(vb_scrollx_lo_w)
 {
 	vb_scrollx_lo = data;
-	//logerror("%04x: vb_scrollx_lo =%d\n",cpu_get_previouspc(machine->activecpu), vb_scrollx_lo);
+	//logerror("%04x: vb_scrollx_lo =%d\n",cpu_get_previouspc(space->cpu), vb_scrollx_lo);
 }
 
 //Cheaters note: Scores are stored in ram @ 0x57-0x58 (though the space is used for other things between matches)

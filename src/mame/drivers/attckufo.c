@@ -64,8 +64,8 @@ static READ8_HANDLER(attckufo_io_r)
 {
 	switch(offset)
 	{
-		case 0: return input_port_read(machine, "DSW");
-		case 2: return input_port_read(machine, "INPUT");
+		case 0: return input_port_read(space->machine, "DSW");
+		case 2: return input_port_read(space->machine, "INPUT");
 	}
 	return 0xff;
 }

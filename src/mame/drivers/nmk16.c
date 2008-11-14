@@ -222,8 +222,8 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],0, HOLD_LINE);
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],0, HOLD_LINE);
 	}
 }
 
@@ -231,7 +231,7 @@ static WRITE16_HANDLER ( ssmissin_sound_w )
 
 static WRITE8_HANDLER ( ssmissin_soundbank_w )
 {
-	UINT8 *rom = memory_region(machine, "oki1");
+	UINT8 *rom = memory_region(space->machine, "oki1");
 	int bank;
 
 	bank = data & 0x3;
@@ -246,7 +246,7 @@ static WRITE8_HANDLER ( ssmissin_soundbank_w )
 
 static WRITE16_HANDLER( tharrier_mcu_control_w )
 {
-//  logerror("%04x: mcu_control_w %02x\n",cpu_get_pc(machine->activecpu),data);
+//  logerror("%04x: mcu_control_w %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 static READ16_HANDLER( tharrier_mcu_r )
@@ -263,8 +263,8 @@ static READ16_HANDLER( tharrier_mcu_r )
 
 		int res;
 
-		if (cpu_get_pc(machine->activecpu)==0x8aa) res = (nmk16_mainram[0x9064/2])|0x20; /* Task Force Harrier */
-		else if (cpu_get_pc(machine->activecpu)==0x8ce) res = (nmk16_mainram[0x9064/2])|0x60; /* Task Force Harrier */
+		if (cpu_get_pc(space->cpu)==0x8aa) res = (nmk16_mainram[0x9064/2])|0x20; /* Task Force Harrier */
+		else if (cpu_get_pc(space->cpu)==0x8ce) res = (nmk16_mainram[0x9064/2])|0x60; /* Task Force Harrier */
 		else
 		{
 			res = to_main[prot_count++];
@@ -275,32 +275,32 @@ static READ16_HANDLER( tharrier_mcu_r )
 		return res << 8;
 	}
 	else
-		return ~input_port_read(machine, "IN1");
+		return ~input_port_read(space->machine, "IN1");
 }
 
 static WRITE16_HANDLER( macross2_sound_reset_w )
 {
 	/* PCB behaviour verified by Corrado Tomaselli at MAME Italia Forum:
        every time music changes Z80 is resetted */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, data ? CLEAR_LINE : ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( macross2_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(machine,0,data & 0xff);
+		soundlatch_w(space,0,data & 0xff);
 }
 
 static WRITE8_HANDLER( macross2_sound_bank_w )
 {
-	UINT8 *rom = memory_region(machine, "audio") + 0x10000;
+	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
 
 	memory_set_bankptr(1,rom + (data & 0x07) * 0x4000);
 }
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
 {
-	UINT8 *rom = memory_region(machine, "oki1");
+	UINT8 *rom = memory_region(space->machine, "oki1");
 
 	data &= 3;
 	if (data != 3)
@@ -309,7 +309,7 @@ static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_1_w )
 {
-	UINT8 *rom = memory_region(machine, "oki2");
+	UINT8 *rom = memory_region(space->machine, "oki2");
 
 	data &= 3;
 	if (data != 3)
@@ -320,8 +320,8 @@ static WRITE16_HANDLER( afega_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data&0xff);
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+		soundlatch_w(space,0,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -1000,7 +1000,7 @@ static WRITE8_HANDLER( okibank_w )
 
 static WRITE8_HANDLER( raphero_sound_rombank_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "audio") + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(1,memory_region(space->machine, "audio") + 0x10000 + (data & 0x07) * 0x4000);
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -4633,7 +4633,7 @@ static WRITE16_HANDLER( twinactn_flipscreen_w )
 		flip_screen_set(data & 1);
 
 	if (data & (~1))
-		logerror("%06x: unknown flip screen bit written %04x\n", cpu_get_pc(machine->activecpu), data);
+		logerror("%06x: unknown flip screen bit written %04x\n", cpu_get_pc(space->cpu), data);
 }
 #endif
 
@@ -4679,9 +4679,9 @@ static WRITE8_HANDLER( twinactn_oki_bank_w )
 	okim6295_set_bank_base(0, (data & 3) * 0x40000);
 
 	if (data & (~3))
-		logerror("%04x: invalid oki bank %02x\n", cpu_get_pc(machine->activecpu), data);
+		logerror("%04x: invalid oki bank %02x\n", cpu_get_pc(space->cpu), data);
 
-//  logerror("%04x: oki bank %02x\n", cpu_get_pc(machine->activecpu), data);
+//  logerror("%04x: oki bank %02x\n", cpu_get_pc(space->cpu), data);
 }
 
 static ADDRESS_MAP_START( twinactn_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )

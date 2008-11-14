@@ -60,7 +60,7 @@ WRITE16_HANDLER( bt477_w )
 
 			if (++*addr_cnt == 3)
 			{
-				palette_set_color(machine, bt477.address, MAKE_RGB(color[0], color[1], color[2]));
+				palette_set_color(space->machine, bt477.address, MAKE_RGB(color[0], color[1], color[2]));
 				*addr_cnt = 0;
 
 				/* Address register increments */

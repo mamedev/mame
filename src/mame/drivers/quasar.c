@@ -112,10 +112,10 @@ static READ8_HANDLER( quasar_IO_r )
 {
 	UINT8 ans = 0;
 
-	if (IOpage == 0) ans = input_port_read(machine, "IN0");
-	if (IOpage == 1) ans = input_port_read(machine, "IN1");
-	if (IOpage == 2) ans = input_port_read(machine, "DSW0");
-	if (IOpage == 3) ans = input_port_read(machine, "DSW1");
+	if (IOpage == 0) ans = input_port_read(space->machine, "IN0");
+	if (IOpage == 1) ans = input_port_read(space->machine, "IN1");
+	if (IOpage == 2) ans = input_port_read(space->machine, "DSW0");
+	if (IOpage == 3) ans = input_port_read(space->machine, "DSW1");
 
 	return ans;
 }
@@ -135,22 +135,22 @@ static WRITE8_HANDLER( quasar_sh_command_w )
 	// lower nibble = command to I8035
 	// not necessarily like this, but it seems to work better than direct mapping
 	// (although schematics has it as direct - but then the schematics are wrong elsewhere to!)
-	soundlatch_w(machine, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
+	soundlatch_w(space, 0, (data & 8) + ((data >> 1) & 3) + ((data << 2) & 4));
 }
 
 static READ8_HANDLER( quasar_sh_command_r )
 {
-	return soundlatch_r(machine, 0) + (input_port_read(machine, "DSW2") & 0x30);
+	return soundlatch_r(space, 0) + (input_port_read(space->machine, "DSW2") & 0x30);
 }
 
 static READ8_HANDLER( audio_t1_r )
 {
-	return (soundlatch_r(machine, 0) == 0);
+	return (soundlatch_r(space, 0) == 0);
 }
 
 static WRITE8_HANDLER( audio_dac_w )
 {
-	dac_0_signed_data_w(machine, 0, data);
+	dac_0_signed_data_w(space, 0, data);
 }
 
 // memory map taken from the manual

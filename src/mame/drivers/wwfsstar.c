@@ -216,8 +216,8 @@ static WRITE16_HANDLER ( wwfsstar_scrollwrite )
 
 static WRITE16_HANDLER ( wwfsstar_soundwrite )
 {
-	soundlatch_w(machine,1,data & 0xff);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w(space,1,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE16_HANDLER( wwfsstar_flipscreen_w )
@@ -228,10 +228,10 @@ static WRITE16_HANDLER( wwfsstar_flipscreen_w )
 static WRITE16_HANDLER( wwfsstar_irqack_w )
 {
 	if(offset == 0)
-		cpu_set_input_line(machine->cpu[0], 6, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 6, CLEAR_LINE);
 
 	else
-		cpu_set_input_line(machine->cpu[0], 5, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 5, CLEAR_LINE);
 }
 
 /*

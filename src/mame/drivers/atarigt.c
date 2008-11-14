@@ -95,7 +95,7 @@ static void cage_irq_callback(running_machine *machine, int reason)
 
 static READ32_HANDLER( special_port2_r )
 {
-	int temp = input_port_read(machine, "SERVICE");
+	int temp = input_port_read(space->machine, "SERVICE");
 	temp ^= 0x0001;		/* /A2DRDY always high for now */
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
 	return (temp << 16) | temp;
@@ -104,7 +104,7 @@ static READ32_HANDLER( special_port2_r )
 
 static READ32_HANDLER( special_port3_r )
 {
-	int temp = input_port_read(machine, "COIN");
+	int temp = input_port_read(space->machine, "COIN");
 	if (atarigen_video_int_state) temp ^= 0x0001;
 	if (atarigen_scanline_int_state) temp ^= 0x0002;
 	return (temp << 16) | temp;
@@ -151,7 +151,7 @@ static READ32_HANDLER( analog_port0_r )
 	compute_fake_pots(pots);
 	return (pots[0] << 24) | (pots[3] << 8);
 #else
-	return (input_port_read(machine, "AN1") << 24) | (input_port_read(machine, "AN2") << 8);
+	return (input_port_read(space->machine, "AN1") << 24) | (input_port_read(space->machine, "AN2") << 8);
 #endif
 }
 
@@ -163,7 +163,7 @@ static READ32_HANDLER( analog_port1_r )
 	compute_fake_pots(pots);
 	return (pots[2] << 24) | (pots[1] << 8);
 #else
-	return (input_port_read(machine, "AN3") << 24) | (input_port_read(machine, "AN4") << 8);
+	return (input_port_read(space->machine, "AN3") << 24) | (input_port_read(space->machine, "AN4") << 8);
 #endif
 }
 
@@ -192,7 +192,7 @@ static WRITE32_HANDLER( latch_w )
 	if (ACCESSING_BITS_24_31)
 	{
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(machine, 0, (data >> 27) & 7);
+		atarirle_control_w(space, 0, (data >> 27) & 7);
 	}
 
 	if (ACCESSING_BITS_16_23)
@@ -240,7 +240,7 @@ static READ32_HANDLER( sound_data_r )
 static WRITE32_HANDLER( sound_data_w )
 {
 	if (ACCESSING_BITS_0_15)
-		cage_control_w(machine, data);
+		cage_control_w(space, data);
 	if (ACCESSING_BITS_16_31)
 		main_to_cage_w(data >> 16);
 }
@@ -548,13 +548,13 @@ static READ32_HANDLER( colorram_protection_r )
 	if (ACCESSING_BITS_16_31)
 	{
 		result = atarigt_colorram_r(address);
-		(*protection_r)(machine, address, &result);
+		(*protection_r)(space->machine, address, &result);
 		result32 |= result << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		result = atarigt_colorram_r(address + 2);
-		(*protection_r)(machine, address + 2, &result);
+		(*protection_r)(space->machine, address + 2, &result);
 		result32 |= result;
 	}
 
@@ -570,13 +570,13 @@ static WRITE32_HANDLER( colorram_protection_w )
 	{
 		if (!ignore_writes)
 			atarigt_colorram_w(address, data >> 16, mem_mask >> 16);
-		(*protection_w)(machine, address, data >> 16);
+		(*protection_w)(space->machine, address, data >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		if (!ignore_writes)
 			atarigt_colorram_w(address + 2, data, mem_mask);
-		(*protection_w)(machine, address + 2, data);
+		(*protection_w)(space->machine, address + 2, data);
 	}
 }
 
@@ -1045,21 +1045,21 @@ ROM_END
 
 static WRITE32_HANDLER( tmek_pf_w )
 {
-	offs_t pc = cpu_get_pc(machine->activecpu);
+	offs_t pc = cpu_get_pc(space->cpu);
 
 	/* protected version */
 	if (pc == 0x2EB3C || pc == 0x2EB48)
 	{
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(machine->activecpu), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(machine->activecpu, M68K_A4) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(space->cpu), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(space->cpu, M68K_A4) - 2);
 		/* skip these writes to make more stuff visible */
 		return;
 	}
 
 	/* unprotected version */
 	if (pc == 0x25834 || pc == 0x25860)
-		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(machine->activecpu), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(machine->activecpu, M68K_A3) - 2);
+		logerror("%06X:PFW@%06X = %08X & %08X (src=%06X)\n", cpu_get_pc(space->cpu), 0xd72000 + offset*4, data, mem_mask, (UINT32)cpu_get_reg(space->cpu, M68K_A3) - 2);
 
-	atarigen_playfield32_w(machine, offset, data, mem_mask);
+	atarigen_playfield32_w(space, offset, data, mem_mask);
 }
 
 static DRIVER_INIT( tmek )

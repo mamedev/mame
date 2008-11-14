@@ -72,7 +72,7 @@ static MACHINE_RESET( atarigx2 )
 
 static READ32_HANDLER( special_port2_r )
 {
-	int temp = input_port_read(machine, "SERVICE");
+	int temp = input_port_read(space->machine, "SERVICE");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0020;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
@@ -82,7 +82,7 @@ static READ32_HANDLER( special_port2_r )
 
 static READ32_HANDLER( special_port3_r )
 {
-	int temp = input_port_read(machine, "SPECIAL");
+	int temp = input_port_read(space->machine, "SPECIAL");
 	return (temp << 16) | temp;
 }
 
@@ -102,9 +102,9 @@ static READ32_HANDLER( a2d_data_r )
 	switch (offset)
 	{
 		case 0:
-			return (input_port_read(machine, "A2D0") << 24) | (input_port_read(machine, "A2D1") << 8);
+			return (input_port_read(space->machine, "A2D0") << 24) | (input_port_read(space->machine, "A2D1") << 8);
 		case 1:
-			return (input_port_read(machine, "A2D2") << 24) | (input_port_read(machine, "A2D3") << 8);
+			return (input_port_read(space->machine, "A2D2") << 24) | (input_port_read(space->machine, "A2D3") << 8);
 	}
 
 	return 0;
@@ -130,12 +130,12 @@ static WRITE32_HANDLER( latch_w )
 	if (ACCESSING_BITS_24_31)
 	{
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(machine,0, (data >> 27) & 7);
+		atarirle_control_w(space,0, (data >> 27) & 7);
 	}
 
 	/* lower byte */
 	if (ACCESSING_BITS_16_23)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x100000) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -160,9 +160,9 @@ static UINT16 last_write_offset;
 static WRITE32_HANDLER( atarigx2_protection_w )
 {
 	{
-		int pc = cpu_get_previouspc(machine->activecpu);
+		int pc = cpu_get_previouspc(space->cpu);
 //      if (pc == 0x11cbe || pc == 0x11c30)
-//          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, cpu_get_reg(machine->activecpu, M68K_A2));
+//          logerror("%06X:Protection W@%04X = %04X  (result to %06X)\n", pc, offset, data, cpu_get_reg(space->cpu, M68K_A2));
 //      else
 		if (ACCESSING_BITS_16_31)
 			logerror("%06X:Protection W@%04X = %04X\n", pc, offset * 4, data >> 16);
@@ -1137,17 +1137,17 @@ static READ32_HANDLER( atarigx2_protection_r )
 		if (lookup_table[i][0] == 0xffffffff)
 		{
 			if (last_write_offset*2 >= 0x700 && last_write_offset*2 < 0x720)
-				result = mame_rand(machine) << 16;
+				result = mame_rand(space->machine) << 16;
 			else
 				result = 0xffff << 16;
-			logerror("%06X:Unhandled protection R@%04X = %04X\n", cpu_get_previouspc(machine->activecpu), offset, result);
+			logerror("%06X:Unhandled protection R@%04X = %04X\n", cpu_get_previouspc(space->cpu), offset, result);
 		}
 	}
 
 	if (ACCESSING_BITS_16_31)
-		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(machine->activecpu), offset * 4, result >> 16);
+		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(space->cpu), offset * 4, result >> 16);
 	else
-		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(machine->activecpu), offset * 4 + 2, result);
+		logerror("%06X:Protection R@%04X = %04X\n", cpu_get_previouspc(space->cpu), offset * 4 + 2, result);
 	return result;
 }
 

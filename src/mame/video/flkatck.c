@@ -112,7 +112,7 @@ WRITE8_HANDLER( flkatck_k007121_regs_w )
 			break;
 	}
 
-	K007121_ctrl_0_w(machine,offset,data);
+	K007121_ctrl_0_w(space,offset,data);
 }
 
 

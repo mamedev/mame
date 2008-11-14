@@ -70,8 +70,8 @@ ADDRESS_MAP_END
 /* Wrong ! */
 static WRITE8_HANDLER(pzlestar_bank_w)
 {
-	memory_set_bankptr(2,&memory_region(machine, "user1")[0x20000+ ( ((0x8000*data)^0x10000))  ]);
-	memory_set_bankptr(3,&memory_region(machine, "user1")[  0x18000  ]);
+	memory_set_bankptr(2,&memory_region(space->machine, "user1")[0x20000+ ( ((0x8000*data)^0x10000))  ]);
+	memory_set_bankptr(3,&memory_region(space->machine, "user1")[  0x18000  ]);
 }
 
 /* Puzzle Star Ports */

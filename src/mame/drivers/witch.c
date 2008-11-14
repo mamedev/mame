@@ -318,10 +318,10 @@ static READ8_HANDLER(read_a00x)
 	switch(offset)
 	{
 		case 0x02: return reg_a002;
-		case 0x04: return input_port_read(machine, "A004");
-		case 0x05: return input_port_read(machine, "A005");
-		case 0x0c: return input_port_read(machine, "SERVICE");	// stats / reset
-		case 0x0e: return input_port_read(machine, "A00E");		// coin/reset
+		case 0x04: return input_port_read(space->machine, "A004");
+		case 0x05: return input_port_read(space->machine, "A005");
+		case 0x0c: return input_port_read(space->machine, "SERVICE");	// stats / reset
+		case 0x0e: return input_port_read(space->machine, "A00E");		// coin/reset
 	}
 
 	if(offset == 0x00) //muxed with A002?
@@ -329,11 +329,11 @@ static READ8_HANDLER(read_a00x)
 		switch(reg_a002 & 0x3f)
 		{
 		case 0x3b:
-			return input_port_read(machine, "UNK");	//bet10 / pay out
+			return input_port_read(space->machine, "UNK");	//bet10 / pay out
 		case 0x3e:
-			return input_port_read(machine, "INPUTS");	//TODO : trace f564
+			return input_port_read(space->machine, "INPUTS");	//TODO : trace f564
 		case 0x3d:
-			return input_port_read(machine, "A005");
+			return input_port_read(space->machine, "A005");
 		default:
 			logerror("A000 read with mux=0x%02x\n", reg_a002 & 0x3f);
 		}
@@ -353,7 +353,7 @@ static WRITE8_HANDLER(write_a00x)
 
 			if(newbank != bank)
 			{
-				UINT8 *ROM = memory_region(machine, "main");
+				UINT8 *ROM = memory_region(space->machine, "main");
 				bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
 				memory_set_bankptr(1,ROM);
@@ -365,7 +365,7 @@ static WRITE8_HANDLER(write_a00x)
 		break;
 
 		case 0x08: //A008
-			cpu_set_input_line(machine->activecpu,0,CLEAR_LINE);
+			cpu_set_input_line(space->cpu,0,CLEAR_LINE);
 		break;
 	}
 }
@@ -382,7 +382,7 @@ static READ8_HANDLER(prot_read_700x)
     Otherwise later in game some I/O (controls) reads are skipped.
 */
 
-  switch(cpu_get_pc(machine->activecpu))
+  switch(cpu_get_pc(space->cpu))
   {
   	case 0x23f:
   	case 0x246:
@@ -392,7 +392,7 @@ static READ8_HANDLER(prot_read_700x)
   	case 0x25e:
 		return offset;//enough to pass...
    }
-  return memory_region(machine, "sub")[0x7000+offset];
+  return memory_region(space->machine, "sub")[0x7000+offset];
 }
 
 /*
@@ -410,8 +410,8 @@ static WRITE8_HANDLER(yscroll_w)
 	scrolly=data;
 }
 
-static READ8_HANDLER(portA_r) {	return input_port_read(machine, "YM_PortA"); }
-static READ8_HANDLER(portB_r) {	return input_port_read(machine, "YM_PortB");}
+static READ8_HANDLER(portA_r) {	return input_port_read(space->machine, "YM_PortA"); }
+static READ8_HANDLER(portB_r) {	return input_port_read(space->machine, "YM_PortB");}
 
 static const ym2203_interface ym2203_interface_0 =
 {

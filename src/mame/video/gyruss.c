@@ -101,7 +101,7 @@ PALETTE_INIT( gyruss )
 
 WRITE8_HANDLER( gyruss_spriteram_w )
 {
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	gyruss_spriteram[offset] = data;
 }
 
@@ -130,7 +130,7 @@ VIDEO_START( gyruss )
 READ8_HANDLER( gyruss_scanline_r )
 {
 	/* reads 1V - 128V */
-	return video_screen_get_vpos(machine->primary_screen);
+	return video_screen_get_vpos(space->machine->primary_screen);
 }
 
 

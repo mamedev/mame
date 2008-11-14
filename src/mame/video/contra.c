@@ -236,7 +236,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_0_w )
 	if (offset == 7)
 		tilemap_set_flip(fg_tilemap,(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	K007121_ctrl_0_w(machine,offset,data);
+	K007121_ctrl_0_w(space,offset,data);
 }
 
 WRITE8_HANDLER( contra_K007121_ctrl_1_w )
@@ -256,7 +256,7 @@ WRITE8_HANDLER( contra_K007121_ctrl_1_w )
 	if (offset == 7)
 		tilemap_set_flip(bg_tilemap,(data & 0x08) ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 
-	K007121_ctrl_1_w(machine,offset,data);
+	K007121_ctrl_1_w(space,offset,data);
 }
 
 

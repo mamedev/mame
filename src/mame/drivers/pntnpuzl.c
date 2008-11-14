@@ -161,7 +161,7 @@ static UINT16 pntnpuzl_eeprom;
 static READ16_HANDLER( pntnpuzl_eeprom_r )
 {
 	/* bit 11 is EEPROM data */
-	return (pntnpuzl_eeprom & 0xf4ff) | (eeprom_read_bit()<<11) | (input_port_read(machine, "IN1") & 0x0300);
+	return (pntnpuzl_eeprom & 0xf4ff) | (eeprom_read_bit()<<11) | (input_port_read(space->machine, "IN1") & 0x0300);
 }
 
 static WRITE16_HANDLER( pntnpuzl_eeprom_w )
@@ -262,7 +262,7 @@ static WRITE16_HANDLER( pntnpuzl_palette_w )
 		rgb[sub++] = data & 0xff;
 		if (sub == 3)
 		{
-			palette_set_color_rgb(machine,indx++,pal6bit(rgb[0]),pal6bit(rgb[1]),pal6bit(rgb[2]));
+			palette_set_color_rgb(space->machine,indx++,pal6bit(rgb[0]),pal6bit(rgb[1]),pal6bit(rgb[2]));
 			sub = 0;
 			if (indx == 256) indx = 0;
 		}
@@ -274,25 +274,25 @@ static WRITE16_HANDLER( pntnpuzl_palette_w )
 #ifdef UNUSED_FUNCTION
 READ16_HANDLER ( pntnpuzl_random_r )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 #endif
 
 static READ16_HANDLER( pntnpuzl_vid_r )
 {
-//  logerror("read_videoram: pc = %06x : offset %04x reg %04x\n",cpu_get_pc(machine->activecpu),offset*2, pntnpuzl_bank[0]);
+//  logerror("read_videoram: pc = %06x : offset %04x reg %04x\n",cpu_get_pc(space->cpu),offset*2, pntnpuzl_bank[0]);
 	return pntnpuzl_3a0000ram[offset+ (pntnpuzl_bank[0]&0x0001)*0x8000 ];
 }
 
 static WRITE16_HANDLER( pntnpuzl_vid_w )
 {
-//  logerror("write_to_videoram: pc = %06x : offset %04x data %04x reg %04x\n",cpu_get_pc(machine->activecpu),offset*2, data, pntnpuzl_bank[0]);
+//  logerror("write_to_videoram: pc = %06x : offset %04x data %04x reg %04x\n",cpu_get_pc(space->cpu),offset*2, data, pntnpuzl_bank[0]);
 	COMBINE_DATA(&pntnpuzl_3a0000ram[offset+ (pntnpuzl_bank[0]&0x0001)*0x8000 ]);
 }
 
 static READ16_HANDLER( pntnpuzl_vblank_r )
 {
-	return (input_port_read(machine, "IN0") & 1) << 11;
+	return (input_port_read(space->machine, "IN0") & 1) << 11;
 }
 
 
@@ -336,7 +336,7 @@ static WRITE16_HANDLER( pntnpuzl_200000_w )
 
 static WRITE16_HANDLER( pntnpuzl_280018_w )
 {
-// logerror("%04x: 280018: %04x\n",cpu_get_pc(machine->activecpu),data);
+// logerror("%04x: 280018: %04x\n",cpu_get_pc(space->cpu),data);
 	serial >>= 1;
 	if (data & 0x2000)
 		serial |= 0x400;
@@ -350,11 +350,11 @@ static READ16_HANDLER( pntnpuzl_280014_r )
 	if (serial_out == 0x11)
 	{
 		static int touchscr[5];
-		if (input_port_read(machine, "IN0") & 0x10)
+		if (input_port_read(space->machine, "IN0") & 0x10)
 		{
 			touchscr[0] = 0x1b;
-			touchscr[2] = BITSWAP8(input_port_read(machine, "TOUCHX"),0,1,2,3,4,5,6,7);
-			touchscr[4] = BITSWAP8(input_port_read(machine, "TOUCHY"),0,1,2,3,4,5,6,7);
+			touchscr[2] = BITSWAP8(input_port_read(space->machine, "TOUCHX"),0,1,2,3,4,5,6,7);
+			touchscr[4] = BITSWAP8(input_port_read(space->machine, "TOUCHY"),0,1,2,3,4,5,6,7);
 		}
 		else
 			touchscr[0] = 0;

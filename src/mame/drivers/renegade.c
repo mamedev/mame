@@ -200,8 +200,8 @@ static WRITE8_HANDLER( adpcm_play_w )
 
 static WRITE8_HANDLER( sound_w )
 {
-	soundlatch_w(machine, offset, data);
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
 }
 
 /********************************************************************************************/
@@ -486,7 +486,7 @@ static WRITE8_HANDLER( bankswitch_w )
 	if ((data & 1) != bank)
 	{
 		bank = data & 1;
-		setbank(machine);
+		setbank(space->machine);
 	}
 }
 

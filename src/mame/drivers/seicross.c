@@ -91,12 +91,12 @@ static MACHINE_RESET( friskyt )
 
 static READ8_HANDLER( friskyt_portB_r )
 {
-	return (portb & 0x9f) | (input_port_read_safe(machine, "DEBUG", 0) & 0x60);
+	return (portb & 0x9f) | (input_port_read_safe(space->machine, "DEBUG", 0) & 0x60);
 }
 
 static WRITE8_HANDLER( friskyt_portB_w )
 {
-//logerror("PC %04x: 8910 port B = %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("PC %04x: 8910 port B = %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 is IRQ enable */
 	cpu_interrupt_enable(0,data & 1);
 
@@ -106,8 +106,8 @@ static WRITE8_HANDLER( friskyt_portB_w )
 	if (((portb & 4) == 0) && (data & 4))
 	{
 		/* reset and start the protection mcu */
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 	}
 
 	/* other bits unknown */

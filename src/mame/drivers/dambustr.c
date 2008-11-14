@@ -25,7 +25,7 @@ static WRITE8_HANDLER( dambustr_noise_enable_w )
 {
 	if (data != noise_data) {
 		noise_data = data;
-		galaxian_noise_enable_w(machine, offset, data);
+		galaxian_noise_enable_w(space, offset, data);
 	}
 }
 

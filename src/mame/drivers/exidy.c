@@ -172,7 +172,7 @@ static CUSTOM_INPUT( teetert_input_r )
 
 static WRITE8_HANDLER( fax_bank_select_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	memory_set_bankptr(1, &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
 	if ((data & 0x1f) > 0x17)

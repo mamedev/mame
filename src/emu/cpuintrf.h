@@ -628,6 +628,7 @@ struct _cpu_class_header
 {
 	int						index;					/* index of this CPU */
 	cpu_type				cputype; 				/* type index of this CPU */
+	address_space *			space[ADDRESS_SPACES];	/* address spaces */
 
 	/* table of core functions */
 	cpu_get_info_func		get_info;
@@ -676,6 +677,9 @@ void cpu_pop_context(void);
 
 /* return the index of the active CPU (deprecated soon) */
 int cpunum_get_active(void);
+
+/* find a CPU in the machine by searching */
+int cpu_get_index_slow(const device_config *cpu);
 
 
 
@@ -761,7 +765,19 @@ INLINE offs_t safe_cpu_get_pc(const device_config *cpu)
 INLINE int cpu_get_index(const device_config *cpu)
 {
 	cpu_class_header *classheader = cpu->classtoken;
-	return classheader->index;
+	return (classheader != NULL) ? classheader->index : cpu_get_index_slow(cpu);
+}
+
+
+/*-------------------------------------------------
+    cpu_get_address_space - return a pointer to
+    the given CPU's address space
+-------------------------------------------------*/
+
+INLINE address_space *cpu_get_address_space(const device_config *cpu, int spacenum)
+{
+	cpu_class_header *classheader = cpu->classtoken;
+	return classheader->space[spacenum];
 }
 
 
@@ -834,7 +850,5 @@ INLINE offs_t cpu_address_physical(const device_config *cpu, int space, int inte
 		(*classheader->translate)(cpu, space, intention, &address);
 	return address;
 }
-
-
 
 #endif	/* __CPUINTRF_H__ */

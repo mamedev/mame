@@ -269,9 +269,9 @@ static READ16_HANDLER ( dlbewing_prot_r )
 	if ((offset*2)==0x748) return 0;//dblwings_408_data; // dblwings_408_data // 3rd player 1st level?
 	if ((offset*2)==0x786) return 0;
 
-	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(machine->activecpu), offset*2, mem_mask);
+	mame_printf_debug("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask);
 
-	return 0;//mame_rand(machine);
+	return 0;//mame_rand(space->machine);
 }
 
 static WRITE16_HANDLER( dblewing_prot_w )
@@ -282,7 +282,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 	if ((offset*2)==0x104) { dblwings_104_data = data; return; } // p1 inputs select screen  OK
 	if ((offset*2)==0x200) { dblwings_200_data = data; return; }
 	if ((offset*2)==0x28c) { dblwings_28c_data = data; return; }
-	if ((offset*2)==0x380) { soundlatch_w(machine,0,data&0xff);	/*cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);*/ return; } // sound write
+	if ((offset*2)==0x380) { soundlatch_w(space,0,data&0xff);	/*cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);*/ return; } // sound write
 	if ((offset*2)==0x38e) { dblwings_38e_data = data; return; }
 	if ((offset*2)==0x406) { dblwings_406_data = data; return; } // p2 inputs select screen  OK
 	if ((offset*2)==0x408) { dblwings_408_data = data; return; } // 3rd player 1st level?
@@ -295,7 +295,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 	if ((offset*2)==0x78a) { dblwings_78a_data = data; return; }
 	if ((offset*2)==0x788) { dblwings_788_data = data; return; }
 
-	mame_printf_debug("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(machine->activecpu), offset*2, mem_mask,data);
+	mame_printf_debug("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
 }
 
 static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )

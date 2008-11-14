@@ -53,8 +53,8 @@ static UINT8 last_dash[2] = {0,0};
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( spd_adpcm_w )
@@ -231,7 +231,7 @@ static void mcu63705_update_inputs(running_machine *machine)
 
 static READ8_HANDLER( mcu63701_r )
 {
-//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",cpu_get_pc(machine->activecpu),offset);
+//  logerror("CPU #0 PC %04x: read from port %02x of 63701 data address 3801\n",cpu_get_pc(space->cpu),offset);
 
 	if (mcu63701_command == 0) return 0x6a;
 	else switch (offset)
@@ -241,21 +241,21 @@ static READ8_HANDLER( mcu63701_r )
 		case 1: return inputs[1];
 		case 2: return inputs[2];
 		case 3: return inputs[3];
-		case 4: return input_port_read(machine, "IN1");
+		case 4: return input_port_read(space->machine, "IN1");
 	}
 }
 
 static WRITE8_HANDLER( mcu63701_w )
 {
-//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",cpu_get_pc(machine->activecpu),data);
+//  logerror("CPU #0 PC %04x: write %02x to 63701 control address 3800\n",cpu_get_pc(space->cpu),data);
 	mcu63701_command = data;
-	mcu63705_update_inputs(machine);
+	mcu63705_update_inputs(space->machine);
 }
 
 
 static READ8_HANDLER( port_0_r )
 {
-	int port = input_port_read(machine, "IN0");
+	int port = input_port_read(space->machine, "IN0");
 
 	toggle^=0x02;	/* mcu63701_busy flag */
 

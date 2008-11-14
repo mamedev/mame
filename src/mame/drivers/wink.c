@@ -45,17 +45,17 @@ static WRITE8_HANDLER( wink_coin_counter_w )
 
 static READ8_HANDLER( analog_port_r )
 {
-	return input_port_read(machine, /* player_mux ? "DIAL2" : */ "DIAL1");
+	return input_port_read(space->machine, /* player_mux ? "DIAL2" : */ "DIAL1");
 }
 
 static READ8_HANDLER( player_inputs_r )
 {
-	return input_port_read(machine, /* player_mux ? "INPUTS2" : */ "INPUTS1");
+	return input_port_read(space->machine, /* player_mux ? "INPUTS2" : */ "INPUTS1");
 }
 
 static WRITE8_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 	//sync with sound cpu (but it still loses some soundlatches...)
 	//timer_call_after_resynch(NULL, 0, NULL);
 }

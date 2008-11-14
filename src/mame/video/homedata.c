@@ -583,7 +583,7 @@ WRITE8_HANDLER( pteacher_videoram_w )
 WRITE8_HANDLER( reikaids_gfx_bank_w )
 {
 
-//logerror( "%04x: [setbank %02x]\n",cpu_get_pc(machine->activecpu),data);
+//logerror( "%04x: [setbank %02x]\n",cpu_get_pc(space->cpu),data);
 
 	if (reikaids_gfx_bank[reikaids_which] != data)
 	{
@@ -596,7 +596,7 @@ WRITE8_HANDLER( reikaids_gfx_bank_w )
 
 WRITE8_HANDLER( pteacher_gfx_bank_w )
 {
-//  logerror( "%04x: gfxbank:=%02x\n", cpu_get_pc(machine->activecpu), data );
+//  logerror( "%04x: gfxbank:=%02x\n", cpu_get_pc(space->cpu), data );
 	if (pteacher_gfx_bank != data)
 	{
 		pteacher_gfx_bank = data;
@@ -606,7 +606,7 @@ WRITE8_HANDLER( pteacher_gfx_bank_w )
 
 WRITE8_HANDLER( homedata_blitter_param_w )
 {
-//logerror("%04x: blitter_param_w %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: blitter_param_w %02x\n",cpu_get_pc(space->cpu),data);
 	blitter_param[blitter_param_count] = data;
 	blitter_param_count++;
 	blitter_param_count&=3;
@@ -650,7 +650,7 @@ WRITE8_HANDLER( pteacher_blitter_bank_w )
 
 WRITE8_HANDLER( mrokumei_blitter_start_w )
 {
-	if (data & 0x80) mrokumei_handleblit(machine, ((blitter_bank & 0x04) >> 2) * 0x10000);
+	if (data & 0x80) mrokumei_handleblit(space->machine, ((blitter_bank & 0x04) >> 2) * 0x10000);
 
 	/* bit 0 = bank switch; used by hourouki to access the
        optional service mode ROM (not available in current dump) */
@@ -658,12 +658,12 @@ WRITE8_HANDLER( mrokumei_blitter_start_w )
 
 WRITE8_HANDLER( reikaids_blitter_start_w )
 {
-	reikaids_handleblit(machine, (blitter_bank & 3) * 0x10000);
+	reikaids_handleblit(space->machine, (blitter_bank & 3) * 0x10000);
 }
 
 WRITE8_HANDLER( pteacher_blitter_start_w )
 {
-	pteacher_handleblit(machine, (blitter_bank >> 5) * 0x10000 & (memory_region_length(machine, "user1") - 1));
+	pteacher_handleblit(space->machine, (blitter_bank >> 5) * 0x10000 & (memory_region_length(space->machine, "user1") - 1));
 }
 
 

@@ -74,14 +74,14 @@ static MACHINE_RESET( ojankohs )
 
 static WRITE8_HANDLER( ojankohs_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 
 	memory_set_bankptr(1, &ROM[0x10000 + (0x4000 * (data & 0x3f))]);
 }
 
 static WRITE8_HANDLER( ojankoy_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 
 	memory_set_bankptr(1, &ROM[0x10000 + (0x4000 * (data & 0x1f))]);
 
@@ -125,14 +125,14 @@ static void ojankohs_adpcm_int(running_machine *machine, int irq)
 
 static WRITE8_HANDLER( ojankoc_ctrl_w )
 {
-	UINT8 *BANKROM = memory_region(machine, "user1");
+	UINT8 *BANKROM = memory_region(space->machine, "user1");
 	UINT32 bank_address = (data & 0x0f) * 0x8000;
 
 	memory_set_bankptr(1, &BANKROM[bank_address]);
 
 	ojankohs_adpcm_reset = ((data & 0x10) >> 4);
 	msm5205_reset_w(0, (!(data & 0x10) >> 4));
-	ojankoc_flipscreen(machine, data);
+	ojankoc_flipscreen(space->machine, data);
 }
 
 static WRITE8_HANDLER( ojankohs_portselect_w )
@@ -145,21 +145,21 @@ static READ8_HANDLER( ojankohs_keymatrix_r )
 	int ret;
 
 	switch (ojankohs_portselect) {
-		case 0x01:	ret = input_port_read(machine, "KEY0");	break;
-		case 0x02:	ret = input_port_read(machine, "KEY1"); break;
-		case 0x04:	ret = input_port_read(machine, "KEY2"); break;
-		case 0x08:	ret = input_port_read(machine, "KEY3"); break;
-		case 0x10:	ret = input_port_read(machine, "KEY4"); break;
+		case 0x01:	ret = input_port_read(space->machine, "KEY0");	break;
+		case 0x02:	ret = input_port_read(space->machine, "KEY1"); break;
+		case 0x04:	ret = input_port_read(space->machine, "KEY2"); break;
+		case 0x08:	ret = input_port_read(space->machine, "KEY3"); break;
+		case 0x10:	ret = input_port_read(space->machine, "KEY4"); break;
 		case 0x20:	ret = 0xff; break;
 		case 0x3f:	ret = 0xff;
-					ret &= input_port_read(machine, "KEY0");
-					ret &= input_port_read(machine, "KEY1");
-					ret &= input_port_read(machine, "KEY2");
-					ret &= input_port_read(machine, "KEY3");
-					ret &= input_port_read(machine, "KEY4");
+					ret &= input_port_read(space->machine, "KEY0");
+					ret &= input_port_read(space->machine, "KEY1");
+					ret &= input_port_read(space->machine, "KEY2");
+					ret &= input_port_read(space->machine, "KEY3");
+					ret &= input_port_read(space->machine, "KEY4");
 					break;
 		default:	ret = 0xff;
-					logerror("PC:%04X unknown %02X\n", cpu_get_pc(machine->activecpu), ojankohs_portselect);
+					logerror("PC:%04X unknown %02X\n", cpu_get_pc(space->cpu), ojankohs_portselect);
 					break;
 	}
 
@@ -178,48 +178,48 @@ static READ8_HANDLER( ojankoc_keymatrix_r )
 
 	for (i = 0; i < 5; i++) {
 		if (~ojankohs_portselect & (1 << i))
-			ret |= input_port_read(machine, keynames[offset][i]);
+			ret |= input_port_read(space->machine, keynames[offset][i]);
 	}
 
-	return (ret & 0x3f) | (input_port_read(machine, offset ? "IN1" : "IN0") & 0xc0);
+	return (ret & 0x3f) | (input_port_read(space->machine, offset ? "IN1" : "IN0") & 0xc0);
 }
 
 static READ8_HANDLER( ojankohs_ay8910_0_r )
 {
 	// DIPSW 1
-	return (((input_port_read(machine, "DSW1") & 0x01) << 7) | ((input_port_read(machine, "DSW1") & 0x02) << 5) |
-	        ((input_port_read(machine, "DSW1") & 0x04) << 3) | ((input_port_read(machine, "DSW1") & 0x08) << 1) |
-	        ((input_port_read(machine, "DSW1") & 0x10) >> 1) | ((input_port_read(machine, "DSW1") & 0x20) >> 3) |
-	        ((input_port_read(machine, "DSW1") & 0x40) >> 5) | ((input_port_read(machine, "DSW1") & 0x80) >> 7));
+	return (((input_port_read(space->machine, "DSW1") & 0x01) << 7) | ((input_port_read(space->machine, "DSW1") & 0x02) << 5) |
+	        ((input_port_read(space->machine, "DSW1") & 0x04) << 3) | ((input_port_read(space->machine, "DSW1") & 0x08) << 1) |
+	        ((input_port_read(space->machine, "DSW1") & 0x10) >> 1) | ((input_port_read(space->machine, "DSW1") & 0x20) >> 3) |
+	        ((input_port_read(space->machine, "DSW1") & 0x40) >> 5) | ((input_port_read(space->machine, "DSW1") & 0x80) >> 7));
 }
 
 static READ8_HANDLER( ojankohs_ay8910_1_r )
 {
 	// DIPSW 1
-	return (((input_port_read(machine, "DSW2") & 0x01) << 7) | ((input_port_read(machine, "DSW2") & 0x02) << 5) |
-	        ((input_port_read(machine, "DSW2") & 0x04) << 3) | ((input_port_read(machine, "DSW2") & 0x08) << 1) |
-	        ((input_port_read(machine, "DSW2") & 0x10) >> 1) | ((input_port_read(machine, "DSW2") & 0x20) >> 3) |
-	        ((input_port_read(machine, "DSW2") & 0x40) >> 5) | ((input_port_read(machine, "DSW2") & 0x80) >> 7));
+	return (((input_port_read(space->machine, "DSW2") & 0x01) << 7) | ((input_port_read(space->machine, "DSW2") & 0x02) << 5) |
+	        ((input_port_read(space->machine, "DSW2") & 0x04) << 3) | ((input_port_read(space->machine, "DSW2") & 0x08) << 1) |
+	        ((input_port_read(space->machine, "DSW2") & 0x10) >> 1) | ((input_port_read(space->machine, "DSW2") & 0x20) >> 3) |
+	        ((input_port_read(space->machine, "DSW2") & 0x40) >> 5) | ((input_port_read(space->machine, "DSW2") & 0x80) >> 7));
 }
 
 static READ8_HANDLER( ojankoy_ay8910_0_r )
 {
-	return input_port_read(machine, "DSW1");				// DIPSW 1
+	return input_port_read(space->machine, "DSW1");				// DIPSW 1
 }
 
 static READ8_HANDLER( ojankoy_ay8910_1_r )
 {
-	return input_port_read(machine, "DSW2");				// DIPSW 2
+	return input_port_read(space->machine, "DSW2");				// DIPSW 2
 }
 
 static READ8_HANDLER( ccasino_dipsw3_r )
 {
-	return (input_port_read(machine, "DSW3") ^ 0xff);		// DIPSW 3
+	return (input_port_read(space->machine, "DSW3") ^ 0xff);		// DIPSW 3
 }
 
 static READ8_HANDLER( ccasino_dipsw4_r )
 {
-	return (input_port_read(machine, "DSW4") ^ 0xff);		// DIPSW 4
+	return (input_port_read(space->machine, "DSW4") ^ 0xff);		// DIPSW 4
 }
 
 static WRITE8_HANDLER( ojankoy_coinctr_w )

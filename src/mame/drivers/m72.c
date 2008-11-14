@@ -203,7 +203,7 @@ static WRITE16_HANDLER( m72_main_mcu_sound_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_snd_cmd_latch = data;
-		cputag_set_input_line(machine, "mcu", 1, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "mcu", 1, ASSERT_LINE);
 	}
 }
 
@@ -220,10 +220,10 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 	if (offset == 0x0fff/2 && ACCESSING_BITS_8_15)
 	{
 		protection_ram[offset] = val;
-		cputag_set_input_line(machine, "mcu", 0, ASSERT_LINE);
+		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		//timer_set(ATTOTIME_IN_CYCLES(2, mame_find_cpu_index(machine, "mcu")), NULL, 0, mcu_irq0_clear);
-		//timer_set(ATTOTIME_IN_CYCLES(0, mame_find_cpu_index(machine, "mcu")), NULL, 0, mcu_irq0_raise);
+		//timer_set(ATTOTIME_IN_CYCLES(2, mame_find_cpu_index(space->machine, "mcu")), NULL, 0, mcu_irq0_clear);
+		//timer_set(ATTOTIME_IN_CYCLES(0, mame_find_cpu_index(space->machine, "mcu")), NULL, 0, mcu_irq0_raise);
 	}
 	else
 		timer_call_after_resynch( protection_ram, (offset<<16) | val, delayed_ram16_w);
@@ -244,7 +244,7 @@ static READ8_HANDLER(m72_mcu_data_r )
 
 	if (offset == 0x0fff || offset == 0x0ffe)
 	{
-		cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
+		cputag_set_input_line(space->machine, "mcu", 0, CLEAR_LINE);
 	}
 
 	if (offset&1) ret = (protection_ram[offset/2] & 0xff00)>>8;
@@ -263,13 +263,13 @@ static INTERRUPT_GEN( m72_mcu_int )
 static READ8_HANDLER(m72_mcu_sample_r )
 {
 	UINT8 sample;
-	sample = memory_region(machine, "samples")[mcu_sample_addr++];
+	sample = memory_region(space->machine, "samples")[mcu_sample_addr++];
 	return sample;
 }
 
 static WRITE8_HANDLER(m72_mcu_ack_w )
 {
-	cputag_set_input_line(machine, "mcu", 1, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "mcu", 1, CLEAR_LINE);
 	mcu_snd_cmd_latch = 0;
 }
 
@@ -289,7 +289,7 @@ static WRITE8_HANDLER(m72_mcu_port_w )
 	if (offset == 1)
 	{
 		mcu_sample_latch = data;
-		cputag_set_input_line(machine, "sound", INPUT_LINE_NMI, PULSE_LINE);
+		cputag_set_input_line(space->machine, "sound", INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 		logerror("port: %02x %02x\n", offset, data);
@@ -811,7 +811,7 @@ static READ16_HANDLER( poundfor_trackball_r )
 
 		for (i = 0;i < 4;i++)
 		{
-			curr = input_port_read(machine, axisnames[i]);
+			curr = input_port_read(space->machine, axisnames[i]);
 			diff[i] = (curr - prev[i]);
 			prev[i] = curr;
 		}
@@ -823,7 +823,7 @@ static READ16_HANDLER( poundfor_trackball_r )
 		case 0:
 			return (diff[0] & 0xff) | ((diff[2] & 0xff) << 8);
 		case 1:
-			return ((diff[0] >> 8) & 0x1f) | (diff[2] & 0x1f00) | (input_port_read(machine, "IN0") & 0xe0e0);
+			return ((diff[0] >> 8) & 0x1f) | (diff[2] & 0x1f00) | (input_port_read(space->machine, "IN0") & 0xe0e0);
 		case 2:
 			return (diff[1] & 0xff) | ((diff[3] & 0xff) << 8);
 		case 3:

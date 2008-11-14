@@ -41,7 +41,7 @@ static UINT8* dderby_vid;
 
 static READ8_HANDLER( dderby_random_reader )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )

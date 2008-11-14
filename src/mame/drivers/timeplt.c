@@ -79,7 +79,7 @@ static WRITE8_HANDLER( timeplt_nmi_enable_w )
 {
 	nmi_enable = data & 1;
 	if (!nmi_enable)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

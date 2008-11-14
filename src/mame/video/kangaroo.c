@@ -83,7 +83,7 @@ WRITE8_HANDLER( kangaroo_video_control_w )
 	switch (offset)
 	{
 		case 5:	/* blitter start */
-			blitter_execute(machine);
+			blitter_execute(space->machine);
 			break;
 
 		case 8:	/* bank select */

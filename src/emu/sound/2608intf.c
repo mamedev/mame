@@ -186,14 +186,14 @@ static SND_RESET( ym2608 )
 /************************************************/
 READ8_HANDLER( ym2608_status_port_0_a_r )
 {
-//logerror("PC %04x: 2608 S0A=%02X\n",cpu_get_pc(machine->activecpu),ym2608_read(sndti_token(SOUND_YM2608, 0),0));
+//logerror("PC %04x: 2608 S0A=%02X\n",cpu_get_pc(space->cpu),ym2608_read(sndti_token(SOUND_YM2608, 0),0));
 	struct ym2608_info *info = sndti_token(SOUND_YM2608, 0);
 	return ym2608_read(info->chip,0);
 }
 
 READ8_HANDLER( ym2608_status_port_0_b_r )
 {
-//logerror("PC %04x: 2608 S0B=%02X\n",cpu_get_pc(machine->activecpu),ym2608_read(sndti_token(SOUND_YM2608, 0),2));
+//logerror("PC %04x: 2608 S0B=%02X\n",cpu_get_pc(space->cpu),ym2608_read(sndti_token(SOUND_YM2608, 0),2));
 	struct ym2608_info *info = sndti_token(SOUND_YM2608, 0);
 	return ym2608_read(info->chip,2);
 }

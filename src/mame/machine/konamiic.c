@@ -99,19 +99,19 @@ WRITE32_HANDLER(K056800_host_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		K056800_host_reg_w(machine, (offset*4)+0, (data >> 24) & 0xff);
+		K056800_host_reg_w(space, (offset*4)+0, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		K056800_host_reg_w(machine, (offset*4)+1, (data >> 16) & 0xff);
+		K056800_host_reg_w(space, (offset*4)+1, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		K056800_host_reg_w(machine, (offset*4)+2, (data >> 8) & 0xff);
+		K056800_host_reg_w(space, (offset*4)+2, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		K056800_host_reg_w(machine, (offset*4)+3, (data >> 0) & 0xff);
+		K056800_host_reg_w(space, (offset*4)+3, (data >> 0) & 0xff);
 	}
 }
 

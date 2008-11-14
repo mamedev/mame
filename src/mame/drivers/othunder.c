@@ -274,7 +274,7 @@ static WRITE16_HANDLER( irq_ack_w )
 			break;
 	}
 
-	update_irq(machine);
+	update_irq(space->machine);
 }
 
 static INTERRUPT_GEN( vblank_interrupt )
@@ -371,7 +371,7 @@ if (data & 4)
 				break;
 
 			default:
-				TC0220IOC_w(machine,offset,data & 0xff);
+				TC0220IOC_w(space,offset,data & 0xff);
 		}
 	}
 }
@@ -389,7 +389,7 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 			return eeprom_r();
 
 		default:
-			return TC0220IOC_r( machine, offset );
+			return TC0220IOC_r( space->machine, offset );
 	}
 }
 
@@ -402,7 +402,7 @@ static READ16_HANDLER( othunder_TC0220IOC_r )
 static READ16_HANDLER( othunder_lightgun_r )
 {
 	static const char *const portname[4] = { P1X_PORT_TAG, P1Y_PORT_TAG, P2X_PORT_TAG, P2Y_PORT_TAG };
-	return input_port_read(machine, portname[offset]);
+	return input_port_read(space->machine, portname[offset]);
 }
 
 static WRITE16_HANDLER( othunder_lightgun_w )
@@ -443,21 +443,21 @@ static MACHINE_START( othunder )
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( othunder_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (machine, 0, data & 0xff);
+		taitosound_port_w (space->machine, 0, data & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (machine, 0, data & 0xff);
+		taitosound_comm_w (space->machine, 0, data & 0xff);
 }
 
 static READ16_HANDLER( othunder_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (machine, 0) & 0xff));
+		return ((taitosound_comm_r (space->machine, 0) & 0xff));
 	else return 0;
 }
 

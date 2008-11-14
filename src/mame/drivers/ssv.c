@@ -223,7 +223,7 @@ static WRITE16_HANDLER( ssv_irq_ack_w )
 	int level = ((offset * 2) & 0x70) >> 4;
 	requested_int &= ~(1 << level);
 
-	update_irq_state(machine);
+	update_irq_state(space->machine);
 }
 
 /*
@@ -400,7 +400,7 @@ static WRITE16_HANDLER( dsp_w )
 			break;
 		default:
 			dsp_ram[0x21] = 0;
-			logerror("SSV DSP: unknown function %x (%x)\n", dsp_ram[0x20], cpu_get_pc(machine->activecpu));
+			logerror("SSV DSP: unknown function %x (%x)\n", dsp_ram[0x20], cpu_get_pc(space->cpu));
 			break;
 		}
 	}
@@ -461,7 +461,7 @@ static UINT16 *ssv_input_sel;
 
 static READ16_HANDLER( drifto94_rand_r )
 {
-	return mame_rand(machine) & 0xffff;
+	return mame_rand(space->machine) & 0xffff;
 }
 
 static ADDRESS_MAP_START( drifto94_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -493,7 +493,7 @@ static READ16_HANDLER( gdfs_eeprom_r )
 {
 	static const char *const gunnames[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2" };
 
-	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(machine, gunnames[gdfs_lightgun_select])) | (eeprom_read_bit() << 8);
+	return (((gdfs_lightgun_select & 1) ? 0 : 0xff) ^ input_port_read(space->machine, gunnames[gdfs_lightgun_select])) | (eeprom_read_bit() << 8);
 }
 
 static WRITE16_HANDLER( gdfs_eeprom_w )
@@ -501,7 +501,7 @@ static WRITE16_HANDLER( gdfs_eeprom_w )
 	static UINT16 data_old;
 
 	if (data & ~0x7b00)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(machine->activecpu),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_8_15 )
 	{
@@ -548,7 +548,7 @@ static READ16_HANDLER( gdfs_blitram_r )
 			return 0;
 	}
 
-	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",cpu_get_pc(machine->activecpu),offset*2);
+	logerror("CPU #0 PC: %06X - Blit reg read: %02X\n",cpu_get_pc(space->cpu),offset*2);
 	return 0;
 }
 
@@ -561,7 +561,7 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 		case 0x8a/2:
 		{
 			if (data & ~0x43)
-				logerror("CPU #0 PC: %06X - Unknown gdfs_gfxram_bank bit written %04X\n",cpu_get_pc(machine->activecpu),data);
+				logerror("CPU #0 PC: %06X - Unknown gdfs_gfxram_bank bit written %04X\n",cpu_get_pc(space->cpu),data);
 
 			if (ACCESSING_BITS_0_7)
 				gdfs_gfxram_bank = data & 3;
@@ -581,8 +581,8 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 			UINT32 dst	=	(gdfs_blitram[0xc4/2] + (gdfs_blitram[0xc6/2] << 16)) << 4;
 			UINT32 len	=	(gdfs_blitram[0xc8/2]) << 4;
 
-			UINT8 *rom	=	memory_region(machine, "gfx2");
-			size_t size	=	memory_region_length(machine, "gfx2");
+			UINT8 *rom	=	memory_region(space->machine, "gfx2");
+			size_t size	=	memory_region_length(space->machine, "gfx2");
 
 			if ( (src+len <= size) && (dst+len <= 4 * 0x100000) )
 			{
@@ -597,13 +597,13 @@ static WRITE16_HANDLER( gdfs_blitram_w )
 			}
 			else
 			{
-				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",cpu_get_pc(machine->activecpu),src,dst,len);
+				logerror("CPU #0 PC: %06X - Blit out of range: src %x, dst %x, len %x\n",cpu_get_pc(space->cpu),src,dst,len);
 			}
 		}
 		break;
 
 		default:
-			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",cpu_get_pc(machine->activecpu),offset*2,data);
+			logerror("CPU #0 PC: %06X - Blit reg written: %02X <- %04X\n",cpu_get_pc(space->cpu),offset*2,data);
 	}
 }
 
@@ -646,11 +646,11 @@ ADDRESS_MAP_END
 static READ16_HANDLER( hypreact_input_r )
 {
 	UINT16 input_sel = *ssv_input_sel;
-	if (input_sel & 0x0001)	return input_port_read(machine, "KEY0");
-	if (input_sel & 0x0002)	return input_port_read(machine, "KEY1");
-	if (input_sel & 0x0004)	return input_port_read(machine, "KEY2");
-	if (input_sel & 0x0008)	return input_port_read(machine, "KEY3");
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(machine->activecpu),input_sel);
+	if (input_sel & 0x0001)	return input_port_read(space->machine, "KEY0");
+	if (input_sel & 0x0002)	return input_port_read(space->machine, "KEY1");
+	if (input_sel & 0x0004)	return input_port_read(space->machine, "KEY2");
+	if (input_sel & 0x0008)	return input_port_read(space->machine, "KEY3");
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(space->cpu),input_sel);
 	return 0xffff;
 }
 
@@ -794,11 +794,11 @@ ADDRESS_MAP_END
 static READ16_HANDLER( srmp4_input_r )
 {
 	UINT16 input_sel = *ssv_input_sel;
-	if (input_sel & 0x0002)	return input_port_read(machine, "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(machine, "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(machine, "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(machine, "KEY3");
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(machine->activecpu),input_sel);
+	if (input_sel & 0x0002)	return input_port_read(space->machine, "KEY0");
+	if (input_sel & 0x0004)	return input_port_read(space->machine, "KEY1");
+	if (input_sel & 0x0008)	return input_port_read(space->machine, "KEY2");
+	if (input_sel & 0x0010)	return input_port_read(space->machine, "KEY3");
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(space->cpu),input_sel);
 	return 0xffff;
 }
 
@@ -843,11 +843,11 @@ static WRITE16_HANDLER( srmp7_sound_bank_w )
 static READ16_HANDLER( srmp7_input_r )
 {
 	UINT16 input_sel = *ssv_input_sel;
-	if (input_sel & 0x0002)	return input_port_read(machine, "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(machine, "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(machine, "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(machine, "KEY3");
-	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(machine->activecpu),input_sel);
+	if (input_sel & 0x0002)	return input_port_read(space->machine, "KEY0");
+	if (input_sel & 0x0004)	return input_port_read(space->machine, "KEY1");
+	if (input_sel & 0x0008)	return input_port_read(space->machine, "KEY2");
+	if (input_sel & 0x0010)	return input_port_read(space->machine, "KEY3");
+	logerror("CPU #0 PC %06X: unknown input read: %04X\n",cpu_get_pc(space->cpu),input_sel);
 	return 0xffff;
 }
 
@@ -900,7 +900,7 @@ static UINT16 serial;
 
 static READ16_HANDLER( sxyreact_ballswitch_r )
 {
-	return input_port_read_safe(machine, "SERVICE", 0);
+	return input_port_read_safe(space->machine, "SERVICE", 0);
 }
 
 static READ16_HANDLER( sxyreact_dial_r )
@@ -915,7 +915,7 @@ static WRITE16_HANDLER( sxyreact_dial_w )
 		static int old;
 
 		if (data & 0x20)
-			serial = input_port_read_safe(machine, "PADDLE", 0) & 0xff;
+			serial = input_port_read_safe(space->machine, "PADDLE", 0) & 0xff;
 
 		if ( (old & 0x40) && !(data & 0x40) )	// $40 -> $00
 			serial <<= 1;						// shift 1 bit
@@ -1052,8 +1052,8 @@ static UINT8 trackball_select, gfxrom_select;
 
 static READ16_HANDLER( eaglshot_gfxrom_r )
 {
-	UINT8 *rom	=	memory_region(machine, "gfx1");
-	size_t size	=	memory_region_length(machine, "gfx1");
+	UINT8 *rom	=	memory_region(space->machine, "gfx1");
+	size_t size	=	memory_region_length(space->machine, "gfx1");
 
 	offset = offset * 2 + gfxrom_select * 0x200000;
 
@@ -1073,11 +1073,11 @@ static READ16_HANDLER( eaglshot_trackball_r )
 {
 	switch(trackball_select)
 	{
-		case 0x60:	return (input_port_read(machine, "TRACKX") >> 8) & 0xff;
-		case 0x40:	return (input_port_read(machine, "TRACKX") >> 0) & 0xff;
+		case 0x60:	return (input_port_read(space->machine, "TRACKX") >> 8) & 0xff;
+		case 0x40:	return (input_port_read(space->machine, "TRACKX") >> 0) & 0xff;
 
-		case 0x70:	return (input_port_read(machine, "TRACKY") >> 8) & 0xff;
-		case 0x50:	return (input_port_read(machine, "TRACKY") >> 0) & 0xff;
+		case 0x70:	return (input_port_read(space->machine, "TRACKY") >> 8) & 0xff;
+		case 0x50:	return (input_port_read(space->machine, "TRACKY") >> 0) & 0xff;
 	}
 	return 0;
 }

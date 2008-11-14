@@ -78,7 +78,7 @@ static void appoooh_adpcm_int(running_machine *machine, int num)
 /* adpcm address write */
 static WRITE8_HANDLER( appoooh_adpcm_w )
 {
-	UINT8 *RAM = memory_region(machine, "adpcm");
+	UINT8 *RAM = memory_region(space->machine, "adpcm");
 	adpcmptr  = &RAM[data*256];
 	msm5205_reset_w(0,0);
 	appoooh_adpcm_data=-1;

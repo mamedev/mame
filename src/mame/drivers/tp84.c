@@ -95,7 +95,7 @@ static READ8_HANDLER( tp84_sh_timer_r )
 	/* divided by 2048 to get this timer */
 	/* (divide by (2048/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	return (cpu_get_total_cycles(machine->activecpu) / (2048/2)) & 0x0f;
+	return (cpu_get_total_cycles(space->cpu) / (2048/2)) & 0x0f;
 }
 
 
@@ -128,7 +128,7 @@ static WRITE8_HANDLER( tp84_filter_w )
 
 static WRITE8_HANDLER( tp84_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[2],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[2],0,HOLD_LINE,0xff);
 }
 
 

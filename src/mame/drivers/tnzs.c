@@ -685,8 +685,8 @@ static READ8_HANDLER( kageki_csport_r )
 {
 	int	dsw, dsw1, dsw2;
 
-	dsw1 = input_port_read(machine, "DSWA");
-	dsw2 = input_port_read(machine, "DSWB");
+	dsw1 = input_port_read(space->machine, "DSWA");
+	dsw2 = input_port_read(space->machine, "DSWB");
 
 	switch (kageki_csport_sel)
 	{
@@ -738,7 +738,7 @@ static WRITE8_HANDLER( kabukiz_sound_bank_w )
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
 	{
-		UINT8 *ROM = memory_region(machine, "audio");
+		UINT8 *ROM = memory_region(space->machine, "audio");
 		memory_set_bankptr(3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
 	}
 }
@@ -747,7 +747,7 @@ static WRITE8_HANDLER( kabukiz_sample_w )
 {
 	// to avoid the write when the sound chip is initialized
 	if(data != 0xff)
-		dac_0_data_w(machine, 0, data);
+		dac_0_data_w(space, 0, data);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -839,8 +839,8 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( tnzsb_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line_and_vector(machine->cpu[2],0,HOLD_LINE,0xff);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line_and_vector(space->machine->cpu[2],0,HOLD_LINE,0xff);
 }
 
 static ADDRESS_MAP_START( tnzsb_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -916,7 +916,7 @@ static WRITE8_HANDLER( jpopnics_palette_w )
 	b = (paldata >> 8) & 0x000f;
 	// the other bits seem to be used, and the colours are wrong..
 
-	palette_set_color_rgb(machine,offset,r<<4, g<<4, b<<4);
+	palette_set_color_rgb(space->machine,offset,r<<4, g<<4, b<<4);
 }
 
 static ADDRESS_MAP_START( jpopnics_main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -934,7 +934,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = memory_region(space->machine, "sub");
 
 	/* bits 0-1 select ROM bank */
 	memory_set_bankptr (2, &RAM[0x10000 + 0x2000 * (data & 3)]);

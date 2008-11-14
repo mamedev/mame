@@ -117,13 +117,13 @@ static MACHINE_RESET( exterm )
 
 static WRITE16_HANDLER( exterm_host_data_w )
 {
-	tms34010_host_w(machine->cpu[1], offset / TOWORD(0x00100000), data);
+	tms34010_host_w(space->machine->cpu[1], offset / TOWORD(0x00100000), data);
 }
 
 
 static READ16_HANDLER( exterm_host_data_r )
 {
-	return tms34010_host_r(machine->cpu[1], offset / TOWORD(0x00100000));
+	return tms34010_host_r(space->machine->cpu[1], offset / TOWORD(0x00100000));
 }
 
 
@@ -163,13 +163,13 @@ static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT1
 
 static READ16_HANDLER( exterm_input_port_0_r )
 {
-	return exterm_trackball_port_r(machine, 0, mem_mask);
+	return exterm_trackball_port_r(space, 0, mem_mask);
 }
 
 
 static READ16_HANDLER( exterm_input_port_1_r )
 {
-	return exterm_trackball_port_r(machine, 1, mem_mask);
+	return exterm_trackball_port_r(space, 1, mem_mask);
 }
 
 
@@ -198,7 +198,7 @@ static WRITE16_HANDLER( exterm_output_port_0_w )
 	{
 		/* Bit 13 = Resets the slave CPU */
 		if ((data & 0x2000) && !(last & 0x2000))
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 
 		/* Bits 14-15 = Coin counters */
 		coin_counter_w(0, data & 0x8000);
@@ -244,9 +244,9 @@ static WRITE8_HANDLER( ym2151_data_latch_w )
 {
 	/* bit 7 of the sound control selects which port */
 	if (sound_control & 0x80)
-		ym2151_data_port_0_w(machine, offset, data);
+		ym2151_data_port_0_w(space, offset, data);
 	else
-		ym2151_register_port_0_w(machine, offset, data);
+		ym2151_register_port_0_w(space, offset, data);
 }
 
 
@@ -263,7 +263,7 @@ static WRITE8_HANDLER( sound_nmi_rate_w )
 static READ8_HANDLER( sound_master_latch_r )
 {
 	/* read latch and clear interrupt */
-	cpu_set_input_line(machine->cpu[2], M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], M6502_IRQ_LINE, CLEAR_LINE);
 	return master_sound_latch;
 }
 
@@ -271,7 +271,7 @@ static READ8_HANDLER( sound_master_latch_r )
 static READ8_HANDLER( sound_slave_latch_r )
 {
 	/* read latch and clear interrupt */
-	cpu_set_input_line(machine->cpu[3], M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[3], M6502_IRQ_LINE, CLEAR_LINE);
 	return slave_sound_latch;
 }
 
@@ -287,7 +287,7 @@ static WRITE8_HANDLER( sound_slave_dac_w )
 static READ8_HANDLER( sound_nmi_to_slave_r )
 {
 	/* a read from here triggers an NMI pulse to the slave */
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
 	return 0xff;
 }
 

@@ -262,7 +262,7 @@ WRITE8_HANDLER( pacland_scroll1_w )
 WRITE8_HANDLER( pacland_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	bankaddress = 0x10000 + ((data & 0x07) << 13);
 	memory_set_bankptr(1,&RAM[bankaddress]);
@@ -272,7 +272,7 @@ WRITE8_HANDLER( pacland_bankswitch_w )
 	if (palette_bank != ((data & 0x18) >> 3))
 	{
 		palette_bank = (data & 0x18) >> 3;
-		switch_palette(machine);
+		switch_palette(space->machine);
 	}
 }
 

@@ -59,7 +59,7 @@ extern VIDEO_UPDATE( pokechmp );
 
 static WRITE8_HANDLER( pokechmp_bank_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	if (data == 0x00)
 	{
@@ -93,8 +93,8 @@ static WRITE8_HANDLER( pokechmp_sound_bank_w )
 
 static WRITE8_HANDLER( pokechmp_sound_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 
@@ -107,7 +107,7 @@ INLINE void pokechmp_set_color(running_machine *machine, pen_t color, int rshift
 static WRITE8_HANDLER( pokechmp_paletteram_w )
 {
 	paletteram[offset] = data;
-	pokechmp_set_color(machine, offset &0x3ff, 0, 5, 10, (paletteram[offset&0x3ff]<<8) | ( paletteram[ (offset&0x3ff)+0x400 ] )  );
+	pokechmp_set_color(space->machine, offset &0x3ff, 0, 5, 10, (paletteram[offset&0x3ff]<<8) | ( paletteram[ (offset&0x3ff)+0x400 ] )  );
 }
 
 

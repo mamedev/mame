@@ -335,7 +335,7 @@ static WRITE16_HANDLER( jchan_mcu_com##_n_##_w ) \
 	if (jchan_mcu_com[3] != 0xFFFF)	return; \
 \
 	memset(jchan_mcu_com, 0, 4 * sizeof( UINT16 ) ); \
-	jchan_mcu_run(machine); \
+	jchan_mcu_run(space->machine); \
 }
 
 JCHAN_MCU_COM_W(0)
@@ -345,7 +345,7 @@ JCHAN_MCU_COM_W(3)
 
 static READ16_HANDLER( jchan_mcu_status_r )
 {
-	logerror("cpu #%d (PC=%06X): read mcu status\n", cpunum_get_active(), cpu_get_previouspc(machine->activecpu));
+	logerror("cpu #%d (PC=%06X): read mcu status\n", cpunum_get_active(), cpu_get_previouspc(space->cpu));
 	return 0;
 }
 
@@ -500,10 +500,10 @@ static READ16_HANDLER ( jchan_ctrl_r )
 {
 	switch(offset)
 	{
-		case 0/2: return input_port_read(machine, "P1");
-		case 2/2: return input_port_read(machine, "P2");
-		case 4/2: return input_port_read(machine, "SYSTEM");
-		case 6/2: return input_port_read(machine, "EXTRA");
+		case 0/2: return input_port_read(space->machine, "P1");
+		case 2/2: return input_port_read(space->machine, "P2");
+		case 4/2: return input_port_read(space->machine, "SYSTEM");
+		case 6/2: return input_port_read(space->machine, "EXTRA");
 		default: logerror("jchan_ctrl_r unknown!"); break;
 	}
 	return jchan_ctrl[offset];
@@ -523,7 +523,7 @@ static WRITE16_HANDLER( main2sub_cmd_w )
 	//printf("main2sub\n");
 
 	COMBINE_DATA(&mainsub_shared_ram[0x03ffe/2]);
-	cpu_set_input_line(machine->cpu[1], 4, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 4, HOLD_LINE);
 }
 
 // is this called?
@@ -531,7 +531,7 @@ static WRITE16_HANDLER( sub2main_cmd_w )
 {
 	//printf("sub2main\n");
 	COMBINE_DATA(&mainsub_shared_ram[0x0000/2]);
-	cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 3, HOLD_LINE);
 }
 
 /* ram convert for suprnova (requires 32-bit stuff) */

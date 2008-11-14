@@ -249,7 +249,7 @@ static WRITE32_HANDLER(FIFO_w)
 
 	if(!(data>>28))
 	{
-		palette_set_color_rgb(machine, PS7500_FIFO[1]&0xff, data&0xff,(data>>8)&0xff,(data>>16)&0xff);
+		palette_set_color_rgb(space->machine, PS7500_FIFO[1]&0xff, data&0xff,(data>>8)&0xff,(data>>16)&0xff);
 		PS7500_FIFO[1]++; //autoinc
 	}
 }
@@ -314,18 +314,18 @@ static READ32_HANDLER(PS7500_IO_r)
 	switch(offset)
 	{
 		case MSECR:
-			return mame_rand(machine);
+			return mame_rand(space->machine);
 		break;
 
 		case IOLINES: //TODO: eeprom  24c01
 #if 0
-		mame_printf_debug("IOLINESR %i @%x\n", offset, cpu_get_pc(machine->activecpu));
+		mame_printf_debug("IOLINESR %i @%x\n", offset, cpu_get_pc(space->cpu));
 #endif
 
 		if(flashType == 1)
 			return 0;
 		else
-			return mame_rand(machine);
+			return mame_rand(space->machine);
 
 		case IRQSTA:
 			return (PS7500_IO[offset] & (~2)) | 0x80;
@@ -334,7 +334,7 @@ static READ32_HANDLER(PS7500_IO_r)
 			return (PS7500_IO[IRQSTA] & PS7500_IO[IRQMSKA]) | 0x80;
 
 		case IOCR: //TODO: nINT1, OD[n] p.81
-			return (input_port_read(machine, "PS7500") & 0x80) | 0x34 | 3;
+			return (input_port_read(space->machine, "PS7500") & 0x80) | 0x34 | 3;
 
 		case VIDCR:
 			return (PS7500_IO[offset] | 0x50) & 0xfffffff0;
@@ -351,9 +351,9 @@ static READ32_HANDLER(PS7500_IO_r)
 			return PS7500_IO[offset];
 
 		//default:
-			//mame_printf_debug("ior %i @%x\n",offset,cpu_get_pc(machine->activecpu));
+			//mame_printf_debug("ior %i @%x\n",offset,cpu_get_pc(space->cpu));
 	}
-	return mame_rand(machine);//PS7500_IO[offset];
+	return mame_rand(space->machine);//PS7500_IO[offset];
 }
 
 static WRITE32_HANDLER(PS7500_IO_w)
@@ -369,13 +369,13 @@ static WRITE32_HANDLER(PS7500_IO_w)
 				if(data&0xc0)
 					adrLatch=0;
 
-			if(cpu_get_pc(machine->activecpu) == 0xbac0 && flashType == 1)
+			if(cpu_get_pc(space->cpu) == 0xbac0 && flashType == 1)
 			{
 				flashN=data&1;
 			}
 
 #if 0
-				logerror("IOLINESW %i = %x  @%x\n",offset,data,cpu_get_pc(machine->activecpu));
+				logerror("IOLINESW %i = %x  @%x\n",offset,data,cpu_get_pc(space->cpu));
 #endif
 			break;
 
@@ -422,7 +422,7 @@ static WRITE32_HANDLER(PS7500_IO_w)
 
 static READ32_HANDLER(io_r)
 {
-	UINT16 *FLASH = (UINT16 *)memory_region(machine, "user2"); //16 bit - WORD access
+	UINT16 *FLASH = (UINT16 *)memory_region(space->machine, "user2"); //16 bit - WORD access
 
 	int adr=flashAdr*0x200+(flashOffset);
 
@@ -453,7 +453,7 @@ static WRITE32_HANDLER(io_w)
 	COMBINE_DATA(&temp);
 
 #if 0
-	logerror("[io_w] = %x @%x [latch=%x]\n",data,cpu_get_pc(machine->activecpu),adrLatch);
+	logerror("[io_w] = %x @%x [latch=%x]\n",data,cpu_get_pc(space->cpu),adrLatch);
 #endif
 
 	if(adrLatch==1)
@@ -475,17 +475,17 @@ static WRITE32_HANDLER(debug_w)
 
 static READ32_HANDLER(ff4_r)
 {
-	return mame_rand(machine)&0x20;
+	return mame_rand(space->machine)&0x20;
 }
 
 static READ32_HANDLER(SIMPLEIO_r)
 {
-	return mame_rand(machine)&1;
+	return mame_rand(space->machine)&1;
 }
 
 static READ32_HANDLER(randomized_r)
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( ssfindo_map, ADDRESS_SPACE_PROGRAM, 32 )

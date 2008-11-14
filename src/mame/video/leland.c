@@ -120,9 +120,9 @@ static VIDEO_START( ataxx )
 
 WRITE8_HANDLER( leland_scroll_w )
 {
-	int scanline = video_screen_get_vpos(machine->primary_screen);
+	int scanline = video_screen_get_vpos(space->machine->primary_screen);
 	if (scanline > 0)
-		video_screen_update_partial(machine->primary_screen, scanline - 1);
+		video_screen_update_partial(space->machine->primary_screen, scanline - 1);
 
 	/* adjust the proper scroll value */
 	switch (offset)
@@ -152,7 +152,7 @@ WRITE8_HANDLER( leland_scroll_w )
 
 WRITE8_HANDLER( leland_gfx_port_w )
 {
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 	gfxbank = data;
 }
 
@@ -334,7 +334,7 @@ WRITE8_HANDLER( leland_mvram_port_w )
 
 READ8_HANDLER( leland_mvram_port_r )
 {
-	return leland_vram_port_r(machine, offset, 0);
+	return leland_vram_port_r(space, offset, 0);
 }
 
 
@@ -353,13 +353,13 @@ WRITE8_HANDLER( leland_slave_video_addr_w )
 
 WRITE8_HANDLER( leland_svram_port_w )
 {
-	leland_vram_port_w(machine, offset, data, 1);
+	leland_vram_port_w(space, offset, data, 1);
 }
 
 
 READ8_HANDLER( leland_svram_port_r )
 {
-	return leland_vram_port_r(machine, offset, 1);
+	return leland_vram_port_r(space, offset, 1);
 }
 
 
@@ -380,7 +380,7 @@ WRITE8_HANDLER( ataxx_mvram_port_w )
 WRITE8_HANDLER( ataxx_svram_port_w )
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	leland_vram_port_w(machine, offset, data, 1);
+	leland_vram_port_w(space, offset, data, 1);
 }
 
 
@@ -394,14 +394,14 @@ WRITE8_HANDLER( ataxx_svram_port_w )
 READ8_HANDLER( ataxx_mvram_port_r )
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	return leland_vram_port_r(machine, offset, 0);
+	return leland_vram_port_r(space, offset, 0);
 }
 
 
 READ8_HANDLER( ataxx_svram_port_r )
 {
 	offset = ((offset >> 1) & 0x07) | ((offset << 3) & 0x08) | (offset & 0x10);
-	return leland_vram_port_r(machine, offset, 1);
+	return leland_vram_port_r(space, offset, 1);
 }
 
 

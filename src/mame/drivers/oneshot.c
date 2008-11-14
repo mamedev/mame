@@ -46,7 +46,7 @@ int gun_x_shift;
 
 static READ16_HANDLER( oneshot_in0_word_r )
 {
-	int data = input_port_read(machine, "DSW1");
+	int data = input_port_read(space->machine, "DSW1");
 
 	switch (data & 0x0c)
 	{

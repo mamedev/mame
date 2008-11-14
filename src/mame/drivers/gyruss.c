@@ -96,18 +96,18 @@ static const int gyruss_timer[10] =
 
 static READ8_HANDLER( gyruss_portA_r )
 {
-	return gyruss_timer[(cpu_get_total_cycles(machine->activecpu)/1024) % 10];
+	return gyruss_timer[(cpu_get_total_cycles(space->cpu)/1024) % 10];
 }
 
 
 static WRITE8_HANDLER( gyruss_dac_w )
 {
-	discrete_sound_w(machine, NODE(16), data);
+	discrete_sound_w(space, NODE(16), data);
 }
 
 static WRITE8_HANDLER( gyruss_irq_clear_w )
 {
-	cputag_set_input_line(machine, "audio2", 0, CLEAR_LINE);
+	cputag_set_input_line(space->machine, "audio2", 0, CLEAR_LINE);
 }
 
 static void filter_w(running_machine *machine, int chip, int data)
@@ -126,24 +126,24 @@ static void filter_w(running_machine *machine, int chip, int data)
 
 static WRITE8_HANDLER( gyruss_filter0_w )
 {
-	filter_w(machine, 0,data);
+	filter_w(space, 0,data);
 }
 
 static WRITE8_HANDLER( gyruss_filter1_w )
 {
-	filter_w(machine, 1,data);
+	filter_w(space, 1,data);
 }
 
 
 static WRITE8_HANDLER( gyruss_sh_irqtrigger_w )
 {
 	/* writing to this register triggers IRQ on the sound CPU */
-	cputag_set_input_line_and_vector(machine, "audio", 0, HOLD_LINE, 0xff);
+	cputag_set_input_line_and_vector(space->machine, "audio", 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( gyruss_i8039_irq_w )
 {
-	cputag_set_input_line(machine, "audio2", 0, ASSERT_LINE);
+	cputag_set_input_line(space->machine, "audio2", 0, ASSERT_LINE);
 }
 
 

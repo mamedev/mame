@@ -386,8 +386,8 @@ WRITE16_HANDLER( bonzeadv_cchip_bank_w )
 
 WRITE16_HANDLER( bonzeadv_cchip_ram_w )
 {
-//  if (cpu_get_pc(machine->activecpu)!=0xa028)
-//  logerror("%08x:  write %04x %04x cchip\n", cpu_get_pc(machine->activecpu), offset, data);
+//  if (cpu_get_pc(space->cpu)!=0xa028)
+//  logerror("%08x:  write %04x %04x cchip\n", cpu_get_pc(space->cpu), offset, data);
 
 	if (current_bank == 0)
 	{
@@ -440,16 +440,16 @@ READ16_HANDLER( bonzeadv_cchip_ctrl_r )
 
 READ16_HANDLER( bonzeadv_cchip_ram_r )
 {
-//  logerror("%08x:  read %04x cchip\n", cpu_get_pc(machine->activecpu), offset);
+//  logerror("%08x:  read %04x cchip\n", cpu_get_pc(space->cpu), offset);
 
 	if (current_bank == 0)
 	{
 		switch (offset)
 		{
-		case 0x03: return input_port_read(machine, "800007");    /* STARTn + SERVICE1 */
-		case 0x04: return input_port_read(machine, "800009");    /* COINn */
-		case 0x05: return input_port_read(machine, "80000B");    /* Player controls + TILT */
-		case 0x06: return input_port_read(machine, "80000D");    /* Player controls (cocktail) */
+		case 0x03: return input_port_read(space->machine, "800007");    /* STARTn + SERVICE1 */
+		case 0x04: return input_port_read(space->machine, "800009");    /* COINn */
+		case 0x05: return input_port_read(space->machine, "80000B");    /* Player controls + TILT */
+		case 0x06: return input_port_read(space->machine, "80000D");    /* Player controls (cocktail) */
 		case 0x08: return cc_port;
 		}
 

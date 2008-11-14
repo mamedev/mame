@@ -20,7 +20,7 @@ static int bitmap_offset=0;
 
 static READ8_HANDLER( tetriunk_random_r )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER(crt_index_w)

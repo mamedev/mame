@@ -57,7 +57,7 @@ static READ8_HANDLER( trackball_r )
 	int curr,delta;
 	static const char *const port[] = { "TRACKBALL_P1_1", "TRACKBALL_P1_2", "TRACKBALL_P2_1", "TRACKBALL_P1_2" };
 
-	curr = input_port_read(machine, port[offset]);
+	curr = input_port_read(space->machine, port[offset]);
 	delta = (curr - last[offset]) & 0xff;
 	last[offset] = curr;
 	return (delta & 0x80) | (curr >> 1);
@@ -65,7 +65,7 @@ static READ8_HANDLER( trackball_r )
 
 static WRITE8_HANDLER( bladestl_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress;
 
 	/* bits 0 & 1 = coin counters */
@@ -89,8 +89,8 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 
 static WRITE8_HANDLER( bladestl_sh_irqtrigger_w )
 {
-	soundlatch_w(machine, offset, data);
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
 	//logerror("(sound) write %02x\n", data);
 }
 

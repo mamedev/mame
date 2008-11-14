@@ -278,7 +278,7 @@ WRITE16_HANDLER( seta_vregs_w )
         ---- ---- ---- ---0     Coin #0 Counter     */
 			if (ACCESSING_BITS_0_7)
 			{
-				seta_coin_lockout_w (machine, data & 0x0f);
+				seta_coin_lockout_w (space->machine, data & 0x0f);
 				if (sndti_exists(SOUND_X1_010, 0))
 					seta_sound_enable_w (data & 0x20);
 				coin_counter_w(0,data & 0x01);
@@ -304,8 +304,8 @@ WRITE16_HANDLER( seta_vregs_w )
 
 				if (new_bank != seta_samples_bank)
 				{
-					UINT8 *rom = memory_region(machine, "x1");
-					int samples_len = memory_region_length(machine, "x1");
+					UINT8 *rom = memory_region(space->machine, "x1");
+					int samples_len = memory_region_length(space->machine, "x1");
 					int addr;
 
 					seta_samples_bank = new_bank;
@@ -318,7 +318,7 @@ WRITE16_HANDLER( seta_vregs_w )
 						if ( (samples_len > 0x100000) && ((addr+0x40000) <= samples_len) )
 							memcpy(&rom[0xc0000],&rom[addr],0x40000);
 						else
-							logerror("PC %06X - Invalid samples bank %02X !\n", cpu_get_pc(machine->activecpu), new_bank);
+							logerror("PC %06X - Invalid samples bank %02X !\n", cpu_get_pc(space->cpu), new_bank);
 					}
 					else if (samples_len == 0x480000)	/* zombraid */
 					{

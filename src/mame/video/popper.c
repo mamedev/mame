@@ -89,7 +89,7 @@ WRITE8_HANDLER( popper_flipscreen_w )
 	popper_flipscreen = data;
 	tilemap_set_flip( ALL_TILEMAPS,popper_flipscreen?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
-	tilemap_clip = *video_screen_get_visible_area(machine->primary_screen);
+	tilemap_clip = *video_screen_get_visible_area(space->machine->primary_screen);
 
 	if (popper_flipscreen)
 		tilemap_clip.min_x=tilemap_clip.max_x-15;

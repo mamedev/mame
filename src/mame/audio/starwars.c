@@ -146,5 +146,5 @@ WRITE8_HANDLER( starwars_soundrst_w )
 	riot6532_porta_in_set(riot, 0x00, 0xc0);
 
 	/* reset sound CPU here  */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }

@@ -235,7 +235,7 @@ WRITE8_HANDLER( carnival_audio_2_w )
 
 	if ( bitsGoneHigh & OUT_PORT_2_MUSIC_RESET )
 		/* reset output is no longer asserted active low */
-		cpu_set_input_line(machine->cpu[CPU_MUSIC_ID], INPUT_LINE_RESET, PULSE_LINE );
+		cpu_set_input_line(space->machine->cpu[CPU_MUSIC_ID], INPUT_LINE_RESET, PULSE_LINE );
 }
 
 
@@ -273,11 +273,11 @@ static WRITE8_HANDLER( carnival_music_port_2_w )
 			break;
 
 		case PSG_BC_WRITE:
-			ay8910_write_port_0_w( machine, 0, psgData );
+			ay8910_write_port_0_w( space->machine, 0, psgData );
 			break;
 
 		case PSG_BC_LATCH_ADDRESS:
-			ay8910_control_port_0_w( machine, 0, psgData );
+			ay8910_control_port_0_w( space->machine, 0, psgData );
 			break;
 		}
 	}

@@ -36,9 +36,9 @@ static UINT32 *namcoc7x_hostram;
 
 static READ16_HANDLER( speedup_r )
 {
-	if ((cpu_get_pc(machine->activecpu) == 0xc12d) && (!(su_82 & 0xff00)))
+	if ((cpu_get_pc(space->cpu) == 0xc12d) && (!(su_82 & 0xff00)))
 	{
-		cpu_spinuntil_int(machine->activecpu);
+		cpu_spinuntil_int(space->cpu);
 	}
 
 	return su_82;
@@ -61,14 +61,14 @@ READ16_HANDLER(namcoc7x_soundram16_r)
 
 WRITE32_HANDLER(namcoc7x_soundram32_w)
 {
-	namcoc7x_soundram16_w(machine, offset*2, data >> 16, mem_mask >> 16);
-	namcoc7x_soundram16_w(machine, offset*2+1, data, mem_mask);
+	namcoc7x_soundram16_w(space, offset*2, data >> 16, mem_mask >> 16);
+	namcoc7x_soundram16_w(space, offset*2+1, data, mem_mask);
 }
 
 READ32_HANDLER(namcoc7x_soundram32_r)
 {
-	return (namcoc7x_soundram16_r(machine, offset*2, mem_mask >> 16) << 16) |
-		namcoc7x_soundram16_r(machine, offset*2+1, mem_mask);
+	return (namcoc7x_soundram16_r(space, offset*2, mem_mask >> 16) << 16) |
+		namcoc7x_soundram16_r(space, offset*2+1, mem_mask);
 }
 
 void namcoc7x_sound_write16(UINT16 command, UINT32 offset)

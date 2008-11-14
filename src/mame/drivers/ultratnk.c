@@ -75,21 +75,21 @@ static READ8_HANDLER( ultratnk_wram_r )
 
 static READ8_HANDLER( ultratnk_analog_r )
 {
-	return (input_port_read(machine, "ANALOG") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine, "ANALOG") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( ultratnk_coin_r )
 {
-	return (input_port_read(machine, "COIN") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine, "COIN") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( ultratnk_collision_r )
 {
-	return (input_port_read(machine, "COLLISION") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine, "COLLISION") << (~offset & 7)) & 0x80;
 }
 
 
 static READ8_HANDLER( ultratnk_options_r )
 {
-	return (input_port_read(machine, "DIP") >> (2 * (offset & 3))) & 3;
+	return (input_port_read(space->machine, "DIP") >> (2 * (offset & 3))) & 3;
 }
 
 
@@ -129,19 +129,19 @@ static WRITE8_HANDLER( ultratnk_lockout_w )
 
 static WRITE8_HANDLER( ultratnk_fire_1_w )
 {
-	discrete_sound_w(machine, ULTRATNK_FIRE_EN_1, offset & 1);
+	discrete_sound_w(space, ULTRATNK_FIRE_EN_1, offset & 1);
 }
 static WRITE8_HANDLER( ultratnk_fire_2_w )
 {
-	discrete_sound_w(machine, ULTRATNK_FIRE_EN_2, offset & 1);
+	discrete_sound_w(space, ULTRATNK_FIRE_EN_2, offset & 1);
 }
 static WRITE8_HANDLER( ultratnk_attract_w )
 {
-	discrete_sound_w(machine, ULTRATNK_ATTRACT_EN, data & 1);
+	discrete_sound_w(space, ULTRATNK_ATTRACT_EN, data & 1);
 }
 static WRITE8_HANDLER( ultratnk_explosion_w )
 {
-	discrete_sound_w(machine, ULTRATNK_EXPLOSION_DATA, data & 15);
+	discrete_sound_w(space, ULTRATNK_EXPLOSION_DATA, data & 15);
 }
 
 

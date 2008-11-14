@@ -232,7 +232,7 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 
@@ -685,7 +685,7 @@ WRITE32_HANDLER(K001604_reg_w)
 
 	if (offset != 0x08 && offset != 0x09 && offset != 0x0a /*&& offset != 0x17 && offset != 0x18*/)
 	{
-		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, cpu_get_pc(machine->activecpu));
+		//printf("K001604_reg_w (%d), %02X, %08X, %08X at %08X\n", chip, offset, data, mem_mask, cpu_get_pc(space->cpu));
 	}
 }
 
@@ -695,8 +695,8 @@ READ32_HANDLER(K001604_reg_r)
 
 	switch (offset)
 	{
-		case 0x54/4:	return mame_rand(machine) << 16; break;
-		case 0x5c/4:	return mame_rand(machine) << 16 | mame_rand(machine); break;
+		case 0x54/4:	return mame_rand(space->machine) << 16; break;
+		case 0x5c/4:	return mame_rand(space->machine) << 16 | mame_rand(space->machine); break;
 	}
 
 	return K001604_reg[chip][offset];
@@ -756,15 +756,15 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= input_port_read(machine, "IN0") << 24;
+			r |= input_port_read(space->machine, "IN0") << 24;
 		}
 		if (ACCESSING_BITS_16_23)
 		{
-			r |= input_port_read(machine, "IN1") << 16;
+			r |= input_port_read(space->machine, "IN1") << 16;
 		}
 		if (ACCESSING_BITS_8_15)
 		{
-			r |= input_port_read(machine, "IN2") << 8;
+			r |= input_port_read(space->machine, "IN2") << 8;
 		}
 		if (ACCESSING_BITS_0_7)
 		{
@@ -775,7 +775,7 @@ static READ32_HANDLER( sysreg_r )
 	{
 		if (ACCESSING_BITS_24_31)
 		{
-			r |= input_port_read(machine, "DSW") << 24;
+			r |= input_port_read(space->machine, "DSW") << 24;
 		}
 	}
 	return r;
@@ -813,11 +813,11 @@ static WRITE32_HANDLER( sysreg_w )
 		{
 			if (data & 0x80)	// CG Board 1 IRQ Ack
 			{
-				//cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+				//cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 			}
 			if (data & 0x40)	// CG Board 0 IRQ Ack
 			{
-				//cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+				//cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			}
 		}
 		return;
@@ -853,7 +853,7 @@ static READ32_HANDLER( lanc1_r )
 
 		default:
 		{
-			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
+			//printf("lanc1_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
 			return 0xffffffff;
 		}
 	}
@@ -861,7 +861,7 @@ static READ32_HANDLER( lanc1_r )
 
 static WRITE32_HANDLER( lanc1_w )
 {
-	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+	//printf("lanc1_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static READ32_HANDLER( lanc2_r )
@@ -889,7 +889,7 @@ static READ32_HANDLER( lanc2_r )
 		}
 	}
 
-	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
+	//printf("lanc2_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
 
 	return r;
 }
@@ -913,7 +913,7 @@ static WRITE32_HANDLER( lanc2_w )
 
 			fpga_uploaded = 1;
 
-			//printf("lanc2_fpga_w: %02X at %08X\n", value, cpu_get_pc(machine->activecpu));
+			//printf("lanc2_fpga_w: %02X at %08X\n", value, cpu_get_pc(space->cpu));
 		}
 		else if (ACCESSING_BITS_0_7)
 		{
@@ -922,12 +922,12 @@ static WRITE32_HANDLER( lanc2_w )
 		}
 		else
 		{
-			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+			//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 		}
 	}
 	if (offset == 4)
 	{
-		if (mame_stricmp(machine->gamedrv->name, "thrilld") == 0)
+		if (mame_stricmp(space->machine->gamedrv->name, "thrilld") == 0)
 		{
 			work_ram[(0x3ffed0/4) + 0] = 0x472a3731;
 			work_ram[(0x3ffed0/4) + 1] = 0x33202020;
@@ -941,7 +941,7 @@ static WRITE32_HANDLER( lanc2_w )
 		}
 	}
 
-	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+	//printf("lanc2_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 }
 
 /*****************************************************************************/

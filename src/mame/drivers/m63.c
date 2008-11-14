@@ -322,7 +322,7 @@ static WRITE8_HANDLER( coin_w )
 
 static WRITE8_HANDLER( snd_irq_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
 	timer_call_after_resynch(NULL, 0, NULL);
 }
 
@@ -331,13 +331,13 @@ static WRITE8_HANDLER( snddata_w )
 	int num_ays = (sndti_exists(SOUND_AY8910, 1)) ? 2 : 1;
 
 	if ((p2 & 0xf0) == 0xe0)
-		ay8910_control_port_0_w(machine,0,offset);
+		ay8910_control_port_0_w(space,0,offset);
 	else if ((p2 & 0xf0) == 0xa0)
-		ay8910_write_port_0_w(machine,0,offset);
+		ay8910_write_port_0_w(space,0,offset);
 	else if (num_ays == 2 && (p1 & 0xe0) == 0x60)
-		ay8910_control_port_1_w(machine,0,offset);
+		ay8910_control_port_1_w(space,0,offset);
 	else if (num_ays == 2 && (p1 & 0xe0) == 0x40)
-		 ay8910_write_port_1_w(machine,0,offset);
+		 ay8910_write_port_1_w(space,0,offset);
 	else if ((p2 & 0xf0) == 0x70 )
 		sound_status=offset;
 }
@@ -352,7 +352,7 @@ static WRITE8_HANDLER( p2_w )
 	p2 = data;
 	if((p2&0xf0)==0x50)
 	{
-		cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 	}
 }
 
@@ -375,8 +375,8 @@ static READ8_HANDLER( snddata_r )
 {
 	switch(p2&0xf0)
 	{
-		case 0x60:	return soundlatch_r(machine,0); ;
-		case 0x70:	return memory_region(machine, "user1")[((p1&0x1f)<<8)|offset];
+		case 0x60:	return soundlatch_r(space,0); ;
+		case 0x70:	return memory_region(space->machine, "user1")[((p1&0x1f)<<8)|offset];
 	}
 	return 0xff;
 }

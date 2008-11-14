@@ -418,7 +418,7 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 	cchip_ram[(current_bank * 0x400) + offset]=data&0xff;
 
 //  if (offset!=0x64 && offset!=0x65 && offset!=0x66 && offset!=0x67 && offset!=0x68 && offset!=0x69)
-//      logerror("%08x:  opwolf c write %04x %04x\n", cpu_get_pc(machine->activecpu), offset,data);
+//      logerror("%08x:  opwolf c write %04x %04x\n", cpu_get_pc(space->cpu), offset,data);
 
 	if (current_bank == 0)
 	{
@@ -427,7 +427,7 @@ WRITE16_HANDLER( opwolf_cchip_data_w )
 		if (offset == 0x14)
 		{
 #if OPWOLF_READ_COINAGE_FROM_ROM
-			UINT16* rom=(UINT16*)memory_region(machine, "main");
+			UINT16* rom=(UINT16*)memory_region(space->machine, "main");
 			UINT32 coin_table[2]={0,0};
 			UINT8 coin_offset[2];
 			int slot;
@@ -518,8 +518,8 @@ READ16_HANDLER( opwolf_cchip_status_r )
 
 READ16_HANDLER( opwolf_cchip_data_r )
 {
-//  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && cpu_get_pc(machine->activecpu)!=0xc18 && cpu_get_pc(machine->activecpu)!=0xc2e && cpu_get_pc(machine->activecpu)!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
-//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", cpu_get_pc(machine->activecpu), offset, current_bank);
+//  if (offset!=0x7f && offset!=0x1c && offset!=0x1d && offset!=0x1e && offset!=0x1f && offset!=0x20 && cpu_get_pc(space->cpu)!=0xc18 && cpu_get_pc(space->cpu)!=0xc2e && cpu_get_pc(space->cpu)!=0xc9e && offset!=0x50 && offset!=0x51 && offset!=0x52 && offset!=0x53 && offset!=0x5 && offset!=0x13 && offset!=0x79 && offset!=0x12 && offset!=0x34)
+//      logerror("%08x:  opwolf c read %04x (bank %04x)\n", cpu_get_pc(space->cpu), offset, current_bank);
 
 	return cchip_ram[(current_bank * 0x400) + offset];
 }

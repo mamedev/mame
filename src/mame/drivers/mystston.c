@@ -44,7 +44,7 @@ void mystston_on_scanline_interrupt(running_machine *machine)
 
 static WRITE8_HANDLER( irq_clear_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -71,16 +71,16 @@ static INPUT_CHANGED( coin_inserted )
 
 static WRITE8_HANDLER( mystston_ay8910_select_w )
 {
-	mystston_state *state = machine->driver_data;
+	mystston_state *state = space->machine->driver_data;
 
 	/* bit 5 goes to 8910 #0 BDIR pin */
 	if (((*state->ay8910_select & 0x20) == 0x20) && ((data & 0x20) == 0x00))
 	{
 		/* bit 4 goes to the 8910 #0 BC1 pin */
 		if (*state->ay8910_select & 0x10)
-			ay8910_control_port_0_w(machine, 0, *state->ay8910_data);
+			ay8910_control_port_0_w(space, 0, *state->ay8910_data);
 		else
-			ay8910_write_port_0_w(machine, 0, *state->ay8910_data);
+			ay8910_write_port_0_w(space, 0, *state->ay8910_data);
 	}
 
 	/* bit 7 goes to 8910 #1 BDIR pin */
@@ -88,9 +88,9 @@ static WRITE8_HANDLER( mystston_ay8910_select_w )
 	{
 		/* bit 6 goes to the 8910 #1 BC1 pin */
 		if (*state->ay8910_select & 0x40)
-			ay8910_control_port_1_w(machine, 0, *state->ay8910_data);
+			ay8910_control_port_1_w(space, 0, *state->ay8910_data);
 		else
-			ay8910_write_port_1_w(machine, 0, *state->ay8910_data);
+			ay8910_write_port_1_w(space, 0, *state->ay8910_data);
 	}
 
 	*state->ay8910_select = data;

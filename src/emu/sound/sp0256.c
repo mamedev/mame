@@ -1301,7 +1301,7 @@ WRITE16_HANDLER( spb640_w )
 
 	if( offset == 0 )
 	{
-		sp0256_ALD_w( machine, 0, data & 0xff );
+		sp0256_ALD_w( space, 0, data & 0xff );
 		return;
 	}
 

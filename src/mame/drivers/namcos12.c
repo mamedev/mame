@@ -984,8 +984,8 @@ static UINT32 m_n_bankoffset;
 static WRITE32_HANDLER( bankoffset_w )
 {
 	// Golgo 13 has different banking (maybe the keycus controls it?)
-	if( strcmp( machine->gamedrv->name, "golgo13" ) == 0 ||
-		strcmp( machine->gamedrv->name, "g13knd" ) == 0 )
+	if( strcmp( space->machine->gamedrv->name, "golgo13" ) == 0 ||
+		strcmp( space->machine->gamedrv->name, "g13knd" ) == 0 )
 	{
 		if( ( data & 8 ) != 0 )
 		{
@@ -1146,16 +1146,16 @@ static READ32_HANDLER( system11gun_r )
 	switch( offset )
 	{
 	case 0:
-		data = input_port_read(machine, "LIGHT0_X");
+		data = input_port_read(space->machine, "LIGHT0_X");
 		break;
 	case 1:
-		data = ( input_port_read(machine, "LIGHT0_Y") ) | ( ( input_port_read(machine, "LIGHT0_Y") + 1 ) << 16 );
+		data = ( input_port_read(space->machine, "LIGHT0_Y") ) | ( ( input_port_read(space->machine, "LIGHT0_Y") + 1 ) << 16 );
 		break;
 	case 2:
-		data = input_port_read(machine, "LIGHT1_X");
+		data = input_port_read(space->machine, "LIGHT1_X");
 		break;
 	case 3:
-		data = ( input_port_read(machine, "LIGHT1_Y") ) | ( ( input_port_read(machine, "LIGHT1_Y") + 1 ) << 16 );
+		data = ( input_port_read(space->machine, "LIGHT1_Y") ) | ( ( input_port_read(space->machine, "LIGHT1_Y") + 1 ) << 16 );
 		break;
 	}
 	verboselog( 2, "system11gun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
@@ -1172,7 +1172,7 @@ static UINT8 kcram[ 12 ];
 
 static WRITE32_HANDLER( kcoff_w )
 {
-	memory_set_bankptr( 2, memory_region( machine, "user1" ) + 0x20280 );
+	memory_set_bankptr( 2, memory_region( space->machine, "user1" ) + 0x20280 );
 }
 
 static WRITE32_HANDLER( kcon_w )
@@ -1298,7 +1298,7 @@ static READ8_HANDLER( s12_mcu_rtc_r )
 	mame_system_time systime;
 	static const int weekday[7] = { 7, 1, 2, 3, 4, 5, 6 };
 
-	mame_get_current_datetime(machine, &systime);
+	mame_get_current_datetime(space->machine, &systime);
 
 	switch (s12_rtcstate)
 	{
@@ -1383,7 +1383,7 @@ static WRITE8_HANDLER( s12_mcu_settings_w )
 
 static READ8_HANDLER( s12_mcu_gun_h_r )
 {
-	const input_port_config *port = input_port_by_tag(machine->portconfig, "LIGHT0_X");
+	const input_port_config *port = input_port_by_tag(space->machine->portconfig, "LIGHT0_X");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;
@@ -1402,7 +1402,7 @@ static READ8_HANDLER( s12_mcu_gun_h_r )
 
 static READ8_HANDLER( s12_mcu_gun_v_r )
 {
-	const input_port_config *port = input_port_by_tag(machine->portconfig, "LIGHT0_Y");
+	const input_port_config *port = input_port_by_tag(space->machine->portconfig, "LIGHT0_Y");
 	if( port != NULL )
 	{
 		int rv = input_port_read_direct( port ) << 6;

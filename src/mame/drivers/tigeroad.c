@@ -151,14 +151,14 @@ static void f1dream_protection_w(running_machine *machine)
 
 static WRITE16_HANDLER( f1dream_control_w )
 {
-	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(machine->activecpu), ram16[0x3fe0/2]);
-	f1dream_protection_w(machine);
+	logerror("protection write, PC: %04x  FFE1 Value:%01x\n",cpu_get_pc(space->cpu), ram16[0x3fe0/2]);
+	f1dream_protection_w(space);
 }
 
 static WRITE16_HANDLER( tigeroad_soundcmd_w )
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(machine,offset,data >> 8);
+		soundlatch_w(space,offset,data >> 8);
 }
 
 static WRITE8_HANDLER( msm5205_w )

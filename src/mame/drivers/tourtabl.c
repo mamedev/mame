@@ -31,7 +31,7 @@ static READ16_HANDLER( tourtabl_read_input_port )
 {
 	static const char *const tianames[] = { "PADDLE4", "PADDLE3", "PADDLE2", "PADDLE1", "TIA_IN4", "TIA_IN5" };
 
-	return input_port_read(machine, tianames[offset]);
+	return input_port_read(space->machine, tianames[offset]);
 }
 
 static READ8_HANDLER( tourtabl_get_databus_contents )

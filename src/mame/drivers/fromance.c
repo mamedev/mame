@@ -135,7 +135,7 @@ static WRITE8_HANDLER( fromance_busycheck_sub_w )
 
 static WRITE8_HANDLER( fromance_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "sub");
+	UINT8 *ROM = memory_region(space->machine, "sub");
 
 	memory_set_bankptr(1, &ROM[0x010000 + (0x4000 * data)]);
 }
@@ -202,15 +202,15 @@ static READ8_HANDLER( fromance_keymatrix_r )
 	int ret = 0xff;
 
 	if (fromance_portselect & 0x01)
-		ret &= input_port_read(machine, "KEY1");
+		ret &= input_port_read(space->machine, "KEY1");
 	if (fromance_portselect & 0x02)
-		ret &= input_port_read(machine, "KEY2");
+		ret &= input_port_read(space->machine, "KEY2");
 	if (fromance_portselect & 0x04)
-		ret &= input_port_read(machine, "KEY3");
+		ret &= input_port_read(space->machine, "KEY3");
 	if (fromance_portselect & 0x08)
-		ret &= input_port_read(machine, "KEY4");
+		ret &= input_port_read(space->machine, "KEY4");
 	if (fromance_portselect & 0x10)
-		ret &= input_port_read(machine, "KEY5");
+		ret &= input_port_read(space->machine, "KEY5");
 
 	return ret;
 }

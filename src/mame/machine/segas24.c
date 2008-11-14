@@ -48,9 +48,9 @@ void system24temp_sys16_io_set_callbacks(UINT8 (*io_r)(running_machine *machine,
 
 READ16_HANDLER ( system24temp_sys16_io_r )
 {
-	//  logerror("IO read %02x (%d:%x)\n", offset, cpunum_get_active(), cpu_get_pc(machine->activecpu));
+	//  logerror("IO read %02x (%d:%x)\n", offset, cpunum_get_active(), cpu_get_pc(space->cpu));
 	if(offset < 8)
-		return system24temp_sys16_io_io_r ? system24temp_sys16_io_io_r(machine,offset) : 0xff;
+		return system24temp_sys16_io_io_r ? system24temp_sys16_io_io_r(space,offset) : 0xff;
 	else if (offset < 0x20) {
 		switch(offset) {
 		case 0x8:
@@ -66,16 +66,16 @@ READ16_HANDLER ( system24temp_sys16_io_r )
 		case 0xf:
 			return system24temp_sys16_io_dir;
 		default:
-			logerror("IO control read %02x (%d:%x)\n", offset, cpunum_get_active(), cpu_get_pc(machine->activecpu));
+			logerror("IO control read %02x (%d:%x)\n", offset, cpunum_get_active(), cpu_get_pc(space->cpu));
 			return 0xff;
 		}
 	} else
-		return system24temp_sys16_io_iod_r ? system24temp_sys16_io_iod_r(machine, offset & 0x1f, mem_mask) : 0xff;
+		return system24temp_sys16_io_iod_r ? system24temp_sys16_io_iod_r(space, offset & 0x1f, mem_mask) : 0xff;
 }
 
 READ32_HANDLER(system24temp_sys16_io_dword_r)
 {
-	return system24temp_sys16_io_r(machine, 2*offset, mem_mask)|(system24temp_sys16_io_r(machine,2*offset+1, mem_mask>>16)<<16);
+	return system24temp_sys16_io_r(space, 2*offset, mem_mask)|(system24temp_sys16_io_r(space,2*offset+1, mem_mask>>16)<<16);
 }
 
 
@@ -84,11 +84,11 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 	if(ACCESSING_BITS_0_7) {
 		if(offset < 8) {
 			if(!(system24temp_sys16_io_dir & (1 << offset))) {
-				logerror("IO port write on input-only port (%d, [%02x], %02x, %d:%x)\n", offset, system24temp_sys16_io_dir, data & 0xff, cpunum_get_active(), cpu_get_pc(machine->activecpu));
+				logerror("IO port write on input-only port (%d, [%02x], %02x, %d:%x)\n", offset, system24temp_sys16_io_dir, data & 0xff, cpunum_get_active(), cpu_get_pc(space->cpu));
 				return;
 			}
 			if(system24temp_sys16_io_io_w)
-				system24temp_sys16_io_io_w(machine, offset, data);
+				system24temp_sys16_io_io_w(space, offset, data);
 		} else if (offset < 0x20) {
 			switch(offset) {
 			case 0xe:
@@ -100,10 +100,10 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 				system24temp_sys16_io_dir = data;
 				break;
 			default:
-				logerror("IO control write %02x, %02x (%d:%x)\n", offset, data & 0xff, cpunum_get_active(), cpu_get_pc(machine->activecpu));
+				logerror("IO control write %02x, %02x (%d:%x)\n", offset, data & 0xff, cpunum_get_active(), cpu_get_pc(space->cpu));
 			}
 		}
 	}
 	if(offset >= 0x20 && system24temp_sys16_io_iod_w)
-		system24temp_sys16_io_iod_w(machine, offset & 0x1f, data, mem_mask);
+		system24temp_sys16_io_iod_w(space, offset & 0x1f, data, mem_mask);
 }

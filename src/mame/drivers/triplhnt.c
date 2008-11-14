@@ -37,6 +37,7 @@ void triplhnt_set_collision(running_machine *machine, int code)
 
 static void triplhnt_update_misc(running_machine *machine, int offset)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 is_witch_hunt;
 	UINT8 bit = offset >> 1;
 
@@ -71,9 +72,9 @@ static void triplhnt_update_misc(running_machine *machine, int offset)
 	coin_lockout_w(0, !(triplhnt_misc_flags & 0x08));
 	coin_lockout_w(1, !(triplhnt_misc_flags & 0x08));
 
-	discrete_sound_w(machine, TRIPLHNT_SCREECH_EN, triplhnt_misc_flags & 0x04);	// screech
-	discrete_sound_w(machine, TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise
-	discrete_sound_w(machine, TRIPLHNT_BEAR_EN, triplhnt_misc_flags & 0x80);	// bear
+	discrete_sound_w(space, TRIPLHNT_SCREECH_EN, triplhnt_misc_flags & 0x04);	// screech
+	discrete_sound_w(space, TRIPLHNT_LAMP_EN, triplhnt_misc_flags & 0x02);	// Lamp is used to reset noise
+	discrete_sound_w(space, TRIPLHNT_BEAR_EN, triplhnt_misc_flags & 0x80);	// bear
 
 	is_witch_hunt = input_port_read(machine, "0C09") == 0x40;
 	bit = ~triplhnt_misc_flags & 0x40;
@@ -92,7 +93,7 @@ static void triplhnt_update_misc(running_machine *machine, int offset)
 
 static WRITE8_HANDLER( triplhnt_misc_w )
 {
-	triplhnt_update_misc(machine, offset);
+	triplhnt_update_misc(space->machine, offset);
 }
 
 
@@ -106,22 +107,22 @@ static READ8_HANDLER( triplhnt_cmos_r )
 
 static READ8_HANDLER( triplhnt_input_port_4_r )
 {
-	watchdog_reset_w(machine, 0, 0);
-	return input_port_read(machine, "0C0B");
+	watchdog_reset_w(space, 0, 0);
+	return input_port_read(space->machine, "0C0B");
 }
 
 
 static READ8_HANDLER( triplhnt_misc_r )
 {
-	triplhnt_update_misc(machine, offset);
-	return input_port_read(machine, "VBLANK") | triplhnt_hit_code;
+	triplhnt_update_misc(space->machine, offset);
+	return input_port_read(space->machine, "VBLANK") | triplhnt_hit_code;
 }
 
 
 static READ8_HANDLER( triplhnt_da_latch_r )
 {
-	int cross_x = input_port_read(machine, "STICKX");
-	int cross_y = input_port_read(machine, "STICKY");
+	int cross_x = input_port_read(space->machine, "STICKX");
+	int cross_y = input_port_read(space->machine, "STICKY");
 
 	triplhnt_da_latch = offset;
 

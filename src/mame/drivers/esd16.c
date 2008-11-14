@@ -81,9 +81,9 @@ static WRITE16_HANDLER( esd16_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],0,ASSERT_LINE);		// Generate an IRQ
-		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(50));	// Allow the other CPU to reply
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,ASSERT_LINE);		// Generate an IRQ
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));	// Allow the other CPU to reply
 	}
 }
 
@@ -145,7 +145,7 @@ static READ16_HANDLER( esd_eeprom_r )
 		return ((eeprom_read_bit() & 0x01) << 15);
 	}
 
-//  logerror("(0x%06x) unk EEPROM read: %04x\n", cpu_get_pc(machine->activecpu), mem_mask);
+//  logerror("(0x%06x) unk EEPROM read: %04x\n", cpu_get_pc(space->cpu), mem_mask);
 	return 0;
 }
 
@@ -163,7 +163,7 @@ static WRITE16_HANDLER( esd_eeprom_w )
 		eeprom_set_cs_line((data & 0x0100) ? CLEAR_LINE : ASSERT_LINE );
 	}
 
-//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(machine->activecpu), data, mem_mask);
+//  logerror("(0x%06x) Unk EEPROM write: %04x %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
 }
 
 static ADDRESS_MAP_START( hedpanic_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -278,9 +278,9 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( esd16_sound_rombank_w )
 {
 	int bank = data & 0xf;
-	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(machine->activecpu),data);
+	if (data != bank)	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank >= 3)	bank += 1;
-	memory_set_bankptr(1, memory_region(machine, "audio") + 0x4000 * bank);
+	memory_set_bankptr(1, memory_region(space->machine, "audio") + 0x4000 * bank);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -298,8 +298,8 @@ ADDRESS_MAP_END
 static READ8_HANDLER( esd16_sound_command_r )
 {
 	/* Clear IRQ only after reading the command, or some get lost */
-	cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
-	return soundlatch_r(machine,0);
+	cpu_set_input_line(space->machine->cpu[1],0,CLEAR_LINE);
+	return soundlatch_r(space,0);
 }
 
 static ADDRESS_MAP_START( multchmp_sound_io_map, ADDRESS_SPACE_IO, 8 )

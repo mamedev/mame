@@ -188,7 +188,7 @@ WRITE8_HANDLER( fromance_paletteram_w )
 
 	/* compute R,G,B */
 	palword = (local_paletteram[offset | 1] << 8) | local_paletteram[offset & ~1];
-	palette_set_color_rgb(machine, offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
+	palette_set_color_rgb(space->machine, offset / 2, pal5bit(palword >> 10), pal5bit(palword >> 5), pal5bit(palword >> 0));
 }
 
 
@@ -283,7 +283,7 @@ WRITE8_HANDLER( fromance_crtc_data_w )
 	{
 		/* only register we know about.... */
 		case 0x0b:
-			timer_adjust_oneshot(crtc_timer, video_screen_get_time_until_vblank_start(machine->primary_screen), (data > 0x80) ? 2 : 1);
+			timer_adjust_oneshot(crtc_timer, video_screen_get_time_until_vblank_start(space->machine->primary_screen), (data > 0x80) ? 2 : 1);
 			break;
 
 		default:

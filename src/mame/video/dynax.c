@@ -123,7 +123,7 @@ WRITE8_HANDLER( dynax_blit2_dest_w )
 }
 WRITE8_HANDLER( tenkai_blit_dest_w )
 {
-	dynax_blit_dest_w(machine, 0, BITSWAP8(data, 7,6,5,4, 0,1,2,3));
+	dynax_blit_dest_w(space, 0, BITSWAP8(data, 7,6,5,4, 0,1,2,3));
 }
 
 /* Background Color */
@@ -245,7 +245,7 @@ WRITE8_HANDLER( dynax_flipscreen_w )
 {
 	flipscreen = data & 1;
 	if (data & ~1)
-		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", cpu_get_pc(machine->activecpu), data);
+		logerror("CPU#0 PC %06X: Warning, flip screen <- %02X\n", cpu_get_pc(space->cpu), data);
 	LOG(("F=%02X ",data));
 }
 
@@ -657,13 +657,13 @@ WRITE8_HANDLER( dynax_blitter_rev2_w )
 {
 	switch (offset)
 	{
-		case 0: dynax_blitter_start(machine,data); break;
+		case 0: dynax_blitter_start(space->machine,data); break;
 		case 1:	blit_x		=	data; break;
 		case 2: blit_y		=	data; break;
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
 		case 4: blit_src	=	(blit_src & 0xff00ff) | (data << 8); break;
 		case 5: blit_src	=	(blit_src & 0x00ffff) | (data <<16); break;
-		case 6: dynax_blit_scroll_w(machine,0,data); break;
+		case 6: dynax_blit_scroll_w(space,0,data); break;
 	}
 }
 
@@ -672,13 +672,13 @@ WRITE8_HANDLER( tenkai_blitter_rev2_w )
 {
 	switch (offset)
 	{
-		case 0: dynax_blitter_start(machine,data); break;
+		case 0: dynax_blitter_start(space->machine,data); break;
 		case 1:	blit_x		=	data; break;
 		case 2: blit_y		=	data; break;
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
 		case 4: blit_src	=	(blit_src & 0xff00ff) | (data << 8); break;
 		case 5: blit_src	=	(blit_src & 0x00ffff) | (data <<16); break;
-		case 6: tenkai_blit_scroll_w(machine,0,data); break;
+		case 6: tenkai_blit_scroll_w(space,0,data); break;
 	}
 }
 
@@ -687,13 +687,13 @@ WRITE8_HANDLER( jantouki_blitter_rev2_w )
 {
 	switch (offset)
 	{
-		case 0: jantouki_blitter_start(machine,data); break;
+		case 0: jantouki_blitter_start(space->machine,data); break;
 		case 1:	blit_x		=	data; break;
 		case 2: blit_y		=	data; break;
 		case 3:	blit_src	=	(blit_src & 0xffff00) | (data << 0); break;
 		case 4: blit_src	=	(blit_src & 0xff00ff) | (data << 8); break;
 		case 5: blit_src	=	(blit_src & 0x00ffff) | (data <<16); break;
-		case 6: dynax_blit_scroll_w(machine,0,data); break;
+		case 6: dynax_blit_scroll_w(space,0,data); break;
 	}
 }
 
@@ -701,13 +701,13 @@ WRITE8_HANDLER( jantouki_blitter2_rev2_w )
 {
 	switch (offset)
 	{
-		case 0: jantouki_blitter2_start(machine,data); break;
+		case 0: jantouki_blitter2_start(space->machine,data); break;
 		case 1:	blit2_x		=	data; break;
 		case 2: blit2_y		=	data; break;
 		case 3:	blit2_src	=	(blit2_src & 0xffff00) | (data << 0); break;
 		case 4: blit2_src	=	(blit2_src & 0xff00ff) | (data << 8); break;
 		case 5: blit2_src	=	(blit2_src & 0x00ffff) | (data <<16); break;
-		case 6: dynax_blit2_scroll_w(machine,0,data); break;
+		case 6: dynax_blit2_scroll_w(space,0,data); break;
 	}
 }
 

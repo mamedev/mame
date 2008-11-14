@@ -34,8 +34,8 @@ WRITE8_HANDLER( NMK112_okibank_w )
 	int banknum	=	offset & 3;
 	int paged	=	(page_mask & (1 << chip));
 
-	UINT8 *rom	=	memory_region(machine, region[chip]);
-	int size			=	memory_region_length(machine, region[chip]) - 0x40000;
+	UINT8 *rom	=	memory_region(space->machine, region[chip]);
+	int size			=	memory_region_length(space->machine, region[chip]) - 0x40000;
 	int bankaddr		=	(data * BANKSIZE) % size;
 
 	if (current_bank[offset] == data) return;
@@ -59,6 +59,6 @@ WRITE16_HANDLER( NMK112_okibank_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		NMK112_okibank_w(machine, offset, data & 0xff);
+		NMK112_okibank_w(space, offset, data & 0xff);
 	}
 }

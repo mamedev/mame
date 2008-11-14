@@ -125,7 +125,7 @@ static void set_palette(running_machine *machine, mystston_state *state)
 
 WRITE8_HANDLER( mystston_video_control_w )
 {
-	mystston_state *state = machine->driver_data;
+	mystston_state *state = space->machine->driver_data;
 
 	*state->video_control = data;
 

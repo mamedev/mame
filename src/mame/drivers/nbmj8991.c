@@ -49,20 +49,20 @@ Notes:
 
 static WRITE8_HANDLER( nbmj8991_soundbank_w )
 {
-	if (!(data & 0x80)) soundlatch_clear_w(machine, 0, 0);
+	if (!(data & 0x80)) soundlatch_clear_w(space, 0, 0);
 	memory_set_bank(1, data & 0x03);
 }
 
 static WRITE8_HANDLER( nbmj8991_sound_w )
 {
-	soundlatch_w(machine, 0, data);
+	soundlatch_w(space, 0, data);
 }
 
 static READ8_HANDLER( nbmj8991_sound_r )
 {
 	int data;
 
-	data = soundlatch_r(machine,0);
+	data = soundlatch_r(space,0);
 	return data;
 }
 

@@ -103,13 +103,13 @@ VIDEO_UPDATE( trckydoc );
 static WRITE8_HANDLER( sauro_sound_command_w )
 {
 	data |= 0x80;
-	soundlatch_w(machine, offset, data);
+	soundlatch_w(space, offset, data);
 }
 
 static READ8_HANDLER( sauro_sound_command_r )
 {
-	int ret	= soundlatch_r(machine, offset);
-	soundlatch_clear_w(machine, offset, 0);
+	int ret	= soundlatch_r(space, offset);
+	soundlatch_clear_w(space, offset, 0);
 	return ret;
 }
 
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( flip_screen_w )
 
 static WRITE8_HANDLER( adpcm_w )
 {
-	sp0256_ALD_w(machine, 0, data);
+	sp0256_ALD_w(space, 0, data);
 }
 
 static void lrq_callback(int state)

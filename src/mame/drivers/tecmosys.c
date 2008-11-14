@@ -288,7 +288,7 @@ static READ16_HANDLER( sound_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return soundlatch2_r( machine,  0 );
+		return soundlatch2_r( space->machine,  0 );
 	}
 
 	return 0;
@@ -298,8 +298,8 @@ static WRITE16_HANDLER( sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0x00,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space,0x00,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
@@ -330,12 +330,12 @@ static WRITE16_HANDLER( unk880000_w )
 			break;
 
 		case 0x22/2:
-			watchdog_reset( machine );
-			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(machine->activecpu) );
+			watchdog_reset( space->machine );
+			//logerror( "watchdog_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(space->cpu) );
 			break;
 
 		default:
-			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(machine->activecpu) );
+			logerror( "unk880000_w( %06x, %04x ) @ %06x\n", (offset * 2)+0x880000, data, cpu_get_pc(space->cpu) );
 			break;
 	}
 }
@@ -344,14 +344,14 @@ static READ16_HANDLER( unk880000_r )
 {
 	//UINT16 ret = tecmosys_880000regs[offset];
 
-	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(machine->activecpu), tecmosys_880000regs[offset] );
+	logerror( "unk880000_r( %06x ) @ %06x = %04x\n", (offset * 2 ) +0x880000, cpu_get_pc(space->cpu), tecmosys_880000regs[offset] );
 
 	/* this code allows scroll regs to be updated, but tkdensho at least resets perodically */
 
 	switch( offset )
 	{
 		case 0:
-			if ( video_screen_get_vpos(machine->primary_screen) >= 240) return 0;
+			if ( video_screen_get_vpos(space->machine->primary_screen) >= 240) return 0;
 			else return 1;
 
 		default:
@@ -407,7 +407,7 @@ INLINE void set_color_555(running_machine *machine, pen_t color, int rshift, int
 static WRITE16_HANDLER( tilemap_paletteram16_xGGGGGRRRRRBBBBB_word_w )
 {
 	COMBINE_DATA(&tilemap_paletteram16[offset]);
-	set_color_555(machine, offset+0x4000, 5, 10, 0, tilemap_paletteram16[offset]);
+	set_color_555(space->machine, offset+0x4000, 5, 10, 0, tilemap_paletteram16[offset]);
 }
 
 static WRITE16_HANDLER( bg0_tilemap_lineram_w )
@@ -539,14 +539,14 @@ GFXDECODE_END
 
 static WRITE8_HANDLER( deroon_bankswitch_w )
 {
-	memory_set_bankptr( 1, memory_region(machine, "audio") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
+	memory_set_bankptr( 1, memory_region(space->machine, "audio") + ((data-2) & 0x0f) * 0x4000 + 0x10000 );
 }
 
 static WRITE8_HANDLER( tecmosys_oki_bank_w )
 {
 	UINT8 upperbank = (data & 0x30) >> 4;
 	UINT8 lowerbank = (data & 0x03) >> 0;
-	UINT8* region = memory_region(machine, "oki");
+	UINT8* region = memory_region(space->machine, "oki");
 
 	memcpy( region+0x00000, region+0x80000 + lowerbank * 0x20000, 0x20000  );
 	memcpy( region+0x20000, region+0x80000 + upperbank * 0x20000, 0x20000  );

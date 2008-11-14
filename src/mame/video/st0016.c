@@ -103,8 +103,8 @@ WRITE8_HANDLER (st0016_palette_ram_w)
 	st0016_paletteram[ST0016_PAL_BANK_SIZE*st0016_pal_bank+offset]=data;
 	val=st0016_paletteram[color*2]+(st0016_paletteram[color*2+1]<<8);
 	if(!color)
-		palette_set_color_rgb(machine,UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
-	palette_set_color_rgb(machine,color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
+		palette_set_color_rgb(space->machine,UNUSED_PEN,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10)); /* same as color 0 - bg ? */
+	palette_set_color_rgb(space->machine,color,pal5bit(val >> 0),pal5bit(val >> 5),pal5bit(val >> 10));
 }
 
 READ8_HANDLER(st0016_character_ram_r)
@@ -142,7 +142,7 @@ READ8_HANDLER(st0016_vregs_r)
 	{
 		case 0:
 		case 1:
-			return mame_rand(machine);
+			return mame_rand(space->machine);
 	}
 
 	return st0016_vregs[offset];
@@ -189,14 +189,14 @@ WRITE8_HANDLER(st0016_vregs_w)
 		UINT32 srcadr=(st0016_vregs[0xa0]|(st0016_vregs[0xa1]<<8)|(st0016_vregs[0xa2]<<16))<<1;
 		UINT32 dstadr=(st0016_vregs[0xa3]|(st0016_vregs[0xa4]<<8)|(st0016_vregs[0xa5]<<16))<<1;
 		UINT32 length=((st0016_vregs[0xa6]|(st0016_vregs[0xa7]<<8)|((st0016_vregs[0xa8]&0x1f)<<16))+1)<<1;
-		UINT32 srclen = (memory_region_length(machine, "main")-0x10000);
-		UINT8 *mem = memory_region(machine, "main");
+		UINT32 srclen = (memory_region_length(space->machine, "main")-0x10000);
+		UINT8 *mem = memory_region(space->machine, "main");
 		while(length>0)
 		{
 			if( srcadr < srclen && (dstadr < ST0016_MAX_CHAR_BANK*ST0016_CHAR_BANK_SIZE))
 			{
 				st0016_char_bank=dstadr>>5;
-				st0016_character_ram_w(machine,dstadr&0x1f,mem[0x10000+srcadr]);
+				st0016_character_ram_w(space,dstadr&0x1f,mem[0x10000+srcadr]);
 				srcadr++;
 				dstadr++;
 				length--;
@@ -205,7 +205,7 @@ WRITE8_HANDLER(st0016_vregs_w)
 			{
 				/* samples ? sound dma ? */
 				// speaglsht:  unknown DMA copy : src - 2B6740, dst - 4400, len - 1E400
-				logerror("unknown DMA copy : src - %X, dst - %X, len - %X, PC - %X\n",srcadr,dstadr,length,cpu_get_previouspc(machine->activecpu));
+				logerror("unknown DMA copy : src - %X, dst - %X, len - %X, PC - %X\n",srcadr,dstadr,length,cpu_get_previouspc(space->cpu));
 				break;
 			}
 		}

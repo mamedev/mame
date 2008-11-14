@@ -37,9 +37,9 @@ static READ8_HANDLER( kopunch_in_r )
 {
 	/* port 31 + low 3 bits of port 32 contain the punch strength */
 	if (offset == 0)
-		return mame_rand(machine);
+		return mame_rand(space->machine);
 	else
-		return (mame_rand(machine) & 0x07) | input_port_read(machine, "SYSTEM");
+		return (mame_rand(space->machine) & 0x07) | input_port_read(space->machine, "SYSTEM");
 }
 
 static WRITE8_HANDLER( kopunch_lamp_w )

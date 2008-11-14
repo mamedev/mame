@@ -700,10 +700,10 @@ static READ32_HANDLER ( stv_SMPC_r32 )
 	/* registers are all byte accesses, convert here */
 	offset = offset << 2; // multiply offset by 4
 
-	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = stv_SMPC_r8(machine, offset+byte) << 24; }
-	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = stv_SMPC_r8(machine, offset+byte) << 16; }
-	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = stv_SMPC_r8(machine, offset+byte) << 8;  }
-	if (ACCESSING_BITS_0_7)		{ byte = 3; readdata = stv_SMPC_r8(machine, offset+byte) << 0;  }
+	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = stv_SMPC_r8(space->machine, offset+byte) << 24; }
+	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = stv_SMPC_r8(space->machine, offset+byte) << 16; }
+	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = stv_SMPC_r8(space->machine, offset+byte) << 8;  }
+	if (ACCESSING_BITS_0_7)		{ byte = 3; readdata = stv_SMPC_r8(space->machine, offset+byte) << 0;  }
 
 	return readdata;
 }
@@ -725,7 +725,7 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 
 	offset += byte;
 
-	stv_SMPC_w8(machine, offset,writedata);
+	stv_SMPC_w8(space->machine, offset,writedata);
 }
 
 
@@ -865,7 +865,7 @@ static int port_i;
 
 static READ32_HANDLER ( stv_io_r32 )
 {
-//  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, mem_mask);
+//  if(LOG_IOGA) logerror("(PC=%08X): I/O r %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, mem_mask);
 //  popmessage("SEL: %02x MUX: %02x %02x %02x %02x %02x",port_sel,mux_data,ioga[1],ioga[2],ioga[3],ioga[5]);
 
 	switch(offset)
@@ -873,36 +873,36 @@ static READ32_HANDLER ( stv_io_r32 )
 		case 0:
 		switch(port_sel)
 		{
-			case 0x77: return 0xff000000|(input_port_read(machine, "P1") << 16) |0x0000ff00|(input_port_read(machine, "P2"));
+			case 0x77: return 0xff000000|(input_port_read(space->machine, "P1") << 16) |0x0000ff00|(input_port_read(space->machine, "P2"));
 			case 0x67:
 			{
 				switch(mux_data)
 				{
 					/*Mahjong panel interface,bit wise(ACTIVE LOW)*/
-					case 0xfe:	return 0xff000000 | (input_port_read_safe(machine, "KEY0", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY5", 0));
-					case 0xfd:  return 0xff000000 | (input_port_read_safe(machine, "KEY1", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY6", 0));
-					case 0xfb:	return 0xff000000 | (input_port_read_safe(machine, "KEY2", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY7", 0));
-					case 0xf7:	return 0xff000000 | (input_port_read_safe(machine, "KEY3", 0) << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY8", 0));
-					case 0xef:  return 0xff000000 | (input_port_read_safe(machine, "KEY4", 0) << 16) | 0x0000ff00 | (input_port_read_safe(machine, "KEY9", 0));
+					case 0xfe:	return 0xff000000 | (input_port_read_safe(space->machine, "KEY0", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(space->machine, "KEY5", 0));
+					case 0xfd:  return 0xff000000 | (input_port_read_safe(space->machine, "KEY1", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(space->machine, "KEY6", 0));
+					case 0xfb:	return 0xff000000 | (input_port_read_safe(space->machine, "KEY2", 0)  << 16) | 0x0000ff00 | (input_port_read_safe(space->machine, "KEY7", 0));
+					case 0xf7:	return 0xff000000 | (input_port_read_safe(space->machine, "KEY3", 0) << 16) | 0x0000ff00 | (input_port_read_safe(space->machine, "KEY8", 0));
+					case 0xef:  return 0xff000000 | (input_port_read_safe(space->machine, "KEY4", 0) << 16) | 0x0000ff00 | (input_port_read_safe(space->machine, "KEY9", 0));
 					/*Joystick panel*/
 					default:
 					//popmessage("%02x MUX DATA",mux_data);
-				    return (input_port_read(machine, "P1") << 16) | (input_port_read(machine, "P2"));
+				    return (input_port_read(space->machine, "P1") << 16) | (input_port_read(space->machine, "P2"));
 				}
 			}
 			case 0x47:
 			{
-				if ( strcmp(machine->gamedrv->name,"critcrsh") == 0 )
+				if ( strcmp(space->machine->gamedrv->name,"critcrsh") == 0 )
 				{
 					int data1 = 0, data2 = 0;
 
 					/* Critter Crusher */
-					data1 = input_port_read(machine, "LIGHTX");
+					data1 = input_port_read(space->machine, "LIGHTX");
 					data1 = BITSWAP8(data1, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-					data1 |= (input_port_read(machine, "P1") & 1) ? 0x0 : 0x4;
-					data2 = input_port_read(machine, "LIGHTY");
+					data1 |= (input_port_read(space->machine, "P1") & 1) ? 0x0 : 0x4;
+					data2 = input_port_read(space->machine, "LIGHTY");
 					data2 = BITSWAP8(data2, 2, 3, 0, 1, 6, 7, 5, 4) & 0xf3;
-					data2 |= (input_port_read(machine, "P1") & 1) ? 0x0 : 0x4;
+					data2 |= (input_port_read(space->machine, "P1") & 1) ? 0x0 : 0x4;
 
 					return 0xff000000 | data1 << 16 | 0x0000ff00 | data2;
 				}
@@ -910,18 +910,18 @@ static READ32_HANDLER ( stv_io_r32 )
 			//default:
 			default:
 			//popmessage("%02x PORT SEL",port_sel);
-			return (input_port_read(machine, "P1") << 16) | (input_port_read(machine, "P2"));
+			return (input_port_read(space->machine, "P1") << 16) | (input_port_read(space->machine, "P2"));
 		}
 		case 1:
-		if ( strcmp(machine->gamedrv->name,"critcrsh") == 0 )
-			return ((input_port_read(machine, "SYSTEM") << 16) & ((input_port_read(machine, "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
+		if ( strcmp(space->machine->gamedrv->name,"critcrsh") == 0 )
+			return ((input_port_read(space->machine, "SYSTEM") << 16) & ((input_port_read(space->machine, "P1") & 1) ? 0xffef0000 : 0xffff0000)) | (ioga[1]);
 		else
-			return (input_port_read(machine, "SYSTEM") << 16) | (ioga[1]);
+			return (input_port_read(space->machine, "SYSTEM") << 16) | (ioga[1]);
 
 		case 2:
 		switch(port_sel)
 		{
-			case 0x77:	return (input_port_read(machine, "UNUSED") << 16) | (input_port_read(machine, "EXTRA"));
+			case 0x77:	return (input_port_read(space->machine, "UNUSED") << 16) | (input_port_read(space->machine, "EXTRA"));
 			case 0x67:	return 0xffffffff;/**/
 			case 0x20:  return 0xffff0000 | (ioga[2] & 0xffff);
 			case 0x10:  return ((ioga[2] & 0xffff) << 16) | 0xffff;
@@ -944,8 +944,8 @@ static READ32_HANDLER ( stv_io_r32 )
 		{
 			case 0x77:
 			{
-				//popmessage("(PC=%06x) offs 5 %04x %02x",cpu_get_pc(machine->activecpu),port_sel,((ioga[5] & 0xff0000) >> 16));
-				logerror("(PC=%06x) offs 5 %04x %02x\n",cpu_get_pc(machine->activecpu),port_sel,((ioga[5] & 0xff0000) >> 16));
+				//popmessage("(PC=%06x) offs 5 %04x %02x",cpu_get_pc(space->cpu),port_sel,((ioga[5] & 0xff0000) >> 16));
+				logerror("(PC=%06x) offs 5 %04x %02x\n",cpu_get_pc(space->cpu),port_sel,((ioga[5] & 0xff0000) >> 16));
 
 				//stv_workram_h[0x8e830/4] = ((ioga[5] & 0xff0000) >> 16) ^ 0x3;
 				//stv_workram_h[0x8e834/4] = ((ioga[5] & 0xff0000) >> 16) ^ 0x3;
@@ -960,8 +960,8 @@ static READ32_HANDLER ( stv_io_r32 )
 			case 0x60:  return ioga[5];
 			case 0x77:
 			{
-				//popmessage("(PC=%06x) offs 6 %04x %02x",cpu_get_pc(machine->activecpu),port_sel,((ioga[5] & 0xff0000) >> 16));
-				logerror("(PC=%06x) offs 6 %04x %02x\n",cpu_get_pc(machine->activecpu),port_sel,((ioga[5] & 0xff0000) >> 16));
+				//popmessage("(PC=%06x) offs 6 %04x %02x",cpu_get_pc(space->cpu),port_sel,((ioga[5] & 0xff0000) >> 16));
+				logerror("(PC=%06x) offs 6 %04x %02x\n",cpu_get_pc(space->cpu),port_sel,((ioga[5] & 0xff0000) >> 16));
 				return 0;//sound board status,non-zero = processing
 			}
 			default:
@@ -970,7 +970,7 @@ static READ32_HANDLER ( stv_io_r32 )
 		}
 		break;
 		case 7:
-		if(LOG_IOGA) logerror("(PC %d=%06x) Warning: READ from PORT_AD\n",cpunum_get_active(), cpu_get_pc(machine->activecpu));
+		if(LOG_IOGA) logerror("(PC %d=%06x) Warning: READ from PORT_AD\n",cpunum_get_active(), cpu_get_pc(space->cpu));
 		popmessage("Read from PORT_AD");
 		port_i++;
 		return port_ad[port_i & 7];
@@ -981,7 +981,7 @@ static READ32_HANDLER ( stv_io_r32 )
 
 static WRITE32_HANDLER ( stv_io_w32 )
 {
-//  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(machine->activecpu), offset*4, data, mem_mask);
+//  if(LOG_IOGA) logerror("(PC=%08X): I/O w %08X = %08X & %08X\n", cpu_get_pc(space->cpu), offset*4, data, mem_mask);
 
 	switch(offset)
 	{
@@ -1154,7 +1154,7 @@ static READ32_HANDLER( stv_scu_r32 )
 	//}
 	if (offset == 31)
 	{
-		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(machine->activecpu));
+		if(LOG_SCU) logerror("(PC=%08x) DMA status reg read\n",cpu_get_pc(space->cpu));
 		return stv_scu[offset];
 	}
 	else if ( offset == 35 )
@@ -1164,18 +1164,18 @@ static READ32_HANDLER( stv_scu_r32 )
     }
     else if( offset == 41)
     {
-		logerror("(PC=%08x) IRQ status reg read\n",cpu_get_pc(machine->activecpu));
+		logerror("(PC=%08x) IRQ status reg read\n",cpu_get_pc(space->cpu));
 		/*TODO:for now we're activating everything here,but we need to return the proper active irqs*/
 		return 0xffffffff;
 	}
 	else if( offset == 50 )
 	{
-		logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(machine->activecpu));
+		logerror("(PC=%08x) SCU version reg read\n",cpu_get_pc(space->cpu));
 		return 0x00000000;/*SCU Version 0*/
 	}
     else
     {
-    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(machine->activecpu),offset,stv_scu[offset]);
+    	if(LOG_SCU) logerror("(PC=%08x) SCU reg read at %d = %08x\n",cpu_get_pc(space->cpu),offset,stv_scu[offset]);
     	return stv_scu[offset];
    	}
 }
@@ -1222,22 +1222,22 @@ static WRITE32_HANDLER( stv_scu_w32 )
 */
 		if(stv_scu[4] & 1 && ((stv_scu[5] & 7) == 7) && stv_scu[4] & 0x100)
 		{
-			if(DIRECT_MODE(0)) { dma_direct_lv0(machine); }
-			else			   { dma_indirect_lv0(machine); }
+			if(DIRECT_MODE(0)) { dma_direct_lv0(space->machine); }
+			else			   { dma_indirect_lv0(space->machine); }
 
 			stv_scu[4]^=1;//disable starting bit.
 
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpu_set_input_line_and_vector(machine->cpu[0], 9, HOLD_LINE , 0x46);
+				//cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 				#if 0
 				if((scu_dst_0 & 0x7ffffff) != 0x05a00000)
 				{
 					if(!(stv_scu[40] & 0x1000))
 					{
-						cpu_set_input_line_and_vector(machine->cpu[0], 3, HOLD_LINE, 0x4c);
+						cpu_set_input_line_and_vector(space->machine->cpu[0], 3, HOLD_LINE, 0x4c);
 						logerror("SCU: Illegal DMA interrupt\n");
 					}
 				}
@@ -1283,15 +1283,15 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 12:
 		if(stv_scu[12] & 1 && ((stv_scu[13] & 7) == 7) && stv_scu[12] & 0x100)
 		{
-			if(DIRECT_MODE(1)) { dma_direct_lv1(machine); }
-			else			   { dma_indirect_lv1(machine); }
+			if(DIRECT_MODE(1)) { dma_direct_lv1(space->machine); }
+			else			   { dma_indirect_lv1(space->machine); }
 
 			stv_scu[12]^=1;
 
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpu_set_input_line_and_vector(machine->cpu[0], 9, HOLD_LINE , 0x46);
+				//cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1333,15 +1333,15 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 20:
 		if(stv_scu[20] & 1 && ((stv_scu[21] & 7) == 7) && stv_scu[20] & 0x100)
 		{
-			if(DIRECT_MODE(2)) { dma_direct_lv2(machine); }
-			else			   { dma_indirect_lv2(machine); }
+			if(DIRECT_MODE(2)) { dma_direct_lv2(space->machine); }
+			else			   { dma_indirect_lv2(space->machine); }
 
 			stv_scu[20]^=1;
 
 			/*Sound IRQ*/
 			if(/*(!(stv_scu[40] & 0x40)) &&*/ scsp_to_main_irq == 1)
 			{
-				//cpu_set_input_line_and_vector(machine->cpu[0], 9, HOLD_LINE , 0x46);
+				//cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
 				logerror("SCSP: Main CPU interrupt\n");
 			}
 		}
@@ -1363,7 +1363,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		/*DSP section*/
 		/*Use functions so it is easier to work out*/
 		case 32:
-		dsp_prg_ctrl(machine, data);
+		dsp_prg_ctrl(space->machine, data);
 		if(LOG_SCU) logerror("SCU DSP: Program Control Port Access %08x\n",data);
 		break;
 		case 33:
@@ -1392,7 +1392,7 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		   stv_scu[40] != 0xffffffff)
 		{
 			if(LOG_SCU) logerror("cpu #%d (PC=%08X) IRQ mask reg set %08x = %d%d%d%d|%d%d%d%d|%d%d%d%d|%d%d%d%d\n",
-			cpunum_get_active(), cpu_get_pc(machine->activecpu),
+			cpunum_get_active(), cpu_get_pc(space->cpu),
 			stv_scu[offset],
 			stv_scu[offset] & 0x8000 ? 1 : 0, /*A-Bus irq*/
 			stv_scu[offset] & 0x4000 ? 1 : 0, /*<reserved>*/
@@ -1971,31 +1971,31 @@ static READ32_HANDLER( stv_sh2_soundram_r )
 static READ32_HANDLER( stv_scsp_regs_r32 )
 {
 	offset <<= 1;
-	return (scsp_0_r(machine, offset+1, 0xffff) | (scsp_0_r(machine, offset, 0xffff)<<16));
+	return (scsp_0_r(space, offset+1, 0xffff) | (scsp_0_r(space, offset, 0xffff)<<16));
 }
 
 static WRITE32_HANDLER( stv_scsp_regs_w32 )
 {
 	offset <<= 1;
-	scsp_0_w(machine, offset, data>>16, mem_mask >> 16);
-	scsp_0_w(machine, offset+1, data, mem_mask);
+	scsp_0_w(space, offset, data>>16, mem_mask >> 16);
+	scsp_0_w(space, offset+1, data, mem_mask);
 }
 
 /* communication,SLAVE CPU acquires data from the MASTER CPU and triggers an irq.  *
  * Enter into Radiant Silver Gun specific menu for a test...                       */
 static WRITE32_HANDLER( minit_w )
 {
-	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpunum_get_active(), cpu_get_pc(machine->activecpu),data);
-	cpuexec_boost_interleave(machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
-	cpuexec_trigger(machine, 1000);
-	cpu_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
+	logerror("cpu #%d (PC=%08X) MINIT write = %08x\n",cpunum_get_active(), cpu_get_pc(space->cpu),data);
+	cpuexec_boost_interleave(space->machine, minit_boost_timeslice, ATTOTIME_IN_USEC(minit_boost));
+	cpuexec_trigger(space->machine, 1000);
+	cpu_set_info_int(space->machine->cpu[1], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
 static WRITE32_HANDLER( sinit_w )
 {
-	logerror("cpu #%d (PC=%08X) SINIT write = %08x\n",cpunum_get_active(), cpu_get_pc(machine->activecpu),data);
-	cpuexec_boost_interleave(machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
-	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
+	logerror("cpu #%d (PC=%08X) SINIT write = %08x\n",cpunum_get_active(), cpu_get_pc(space->cpu),data);
+	cpuexec_boost_interleave(space->machine, sinit_boost_timeslice, ATTOTIME_IN_USEC(sinit_boost));
+	cpu_set_info_int(space->machine->cpu[0], CPUINFO_INT_SH2_FRT_INPUT, PULSE_LINE);
 }
 
 
@@ -2313,7 +2313,7 @@ static WRITE32_HANDLER ( w60ffc44_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc44/4]);
 
-	logerror("cpu #%d (PC=%08X): 60ffc44_write write = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), data, mem_mask);
+	logerror("cpu #%d (PC=%08X): 60ffc44_write write = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(space->cpu), data, mem_mask);
 	//sinit_w(offset,data,mem_mask);
 }
 
@@ -2321,7 +2321,7 @@ static WRITE32_HANDLER ( w60ffc48_write )
 {
 	COMBINE_DATA(&stv_workram_h[0xffc48/4]);
 
-	logerror("cpu #%d (PC=%08X): 60ffc48_write write = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), data, mem_mask);
+	logerror("cpu #%d (PC=%08X): 60ffc48_write write = %08X & %08X\n", cpunum_get_active(), cpu_get_pc(space->cpu), data, mem_mask);
 	//minit_w(offset,data,mem_mask);
 }
 

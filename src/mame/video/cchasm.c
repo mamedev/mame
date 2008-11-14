@@ -114,7 +114,7 @@ WRITE16_HANDLER( cchasm_refresh_control_w )
 			cchasm_refresh();
 			break;
 		case 0xf7:
-			cpu_set_input_line (machine->cpu[0], 2, CLEAR_LINE);
+			cpu_set_input_line (space->machine->cpu[0], 2, CLEAR_LINE);
 			break;
 		}
 	}

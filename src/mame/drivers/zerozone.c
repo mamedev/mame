@@ -41,16 +41,16 @@ static READ16_HANDLER( zerozone_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 		case 0x01:
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 		case 0x04:
-			return input_port_read(machine, "DSWB");
+			return input_port_read(space->machine, "DSWB");
 		case 0x05:
-			return input_port_read(machine, "DSWA");
+			return input_port_read(space->machine, "DSWA");
 	}
 
-logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",cpu_get_pc(machine->activecpu),0x800000+offset);
+logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n",cpu_get_pc(space->cpu),0x800000+offset);
 
 	return 0x00;
 }
@@ -60,8 +60,8 @@ static WRITE16_HANDLER( zerozone_sound_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(machine,offset,data >> 8);
-		cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+		soundlatch_w(space,offset,data >> 8);
+		cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 	}
 }
 

@@ -201,8 +201,8 @@ static WRITE16_HANDLER( nvram_data_w )
 
 static WRITE16_HANDLER( nvram_thrash_data_w )
 {
-	nvram_data_w(machine, offset, data, mem_mask);
-	nvram_thrash_w(machine, offset, data, mem_mask);
+	nvram_data_w(space, offset, data, mem_mask);
+	nvram_thrash_w(space, offset, data, mem_mask);
 }
 
 
@@ -215,12 +215,12 @@ static WRITE16_HANDLER( nvram_thrash_data_w )
 
 static WRITE16_HANDLER( amerdart_misc_w )
 {
-	logerror("%08x:IOP_reset_w %04x\n",cpu_get_pc(machine->activecpu),data);
+	logerror("%08x:IOP_reset_w %04x\n",cpu_get_pc(space->cpu),data);
 
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
 
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* bits 10-15 are counted down over time */
 	if (data & 0x0400) amerdart_iop_echo = 1;
@@ -277,7 +277,7 @@ static TIMER_CALLBACK( amerdart_iop_response )
 
 static WRITE16_HANDLER( amerdart_iop_w )
 {
-	logerror("%08x:IOP write %04x\n", cpu_get_pc(machine->activecpu), data);
+	logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
 	COMBINE_DATA(&iop_cmd);
 	timer_set(ATTOTIME_IN_USEC(100), NULL, 0, amerdart_iop_response);
 }
@@ -292,12 +292,12 @@ static WRITE16_HANDLER( amerdart_iop_w )
 
 static WRITE16_HANDLER( coolpool_misc_w )
 {
-	logerror("%08x:IOP_reset_w %04x\n",cpu_get_pc(machine->activecpu),data);
+	logerror("%08x:IOP_reset_w %04x\n",cpu_get_pc(space->cpu),data);
 
 	coin_counter_w(0, ~data & 0x0001);
 	coin_counter_w(1, ~data & 0x0002);
 
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0400) ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -322,15 +322,15 @@ static TIMER_CALLBACK( deferred_iop_w )
 
 static WRITE16_HANDLER( coolpool_iop_w )
 {
-	logerror("%08x:IOP write %04x\n", cpu_get_pc(machine->activecpu), data);
+	logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
 	timer_call_after_resynch(NULL, data, deferred_iop_w);
 }
 
 
 static READ16_HANDLER( coolpool_iop_r )
 {
-	logerror("%08x:IOP read %04x\n",cpu_get_pc(machine->activecpu),iop_answer);
-	cpu_set_input_line(machine->cpu[0], 1, CLEAR_LINE);
+	logerror("%08x:IOP read %04x\n",cpu_get_pc(space->cpu),iop_answer);
+	cpu_set_input_line(space->machine->cpu[0], 1, CLEAR_LINE);
 
 	return iop_answer;
 }
@@ -347,16 +347,16 @@ static READ16_HANDLER( coolpool_iop_r )
 static READ16_HANDLER( dsp_cmd_r )
 {
 	cmd_pending = 0;
-	logerror("%08x:IOP cmd_r %04x\n",cpu_get_pc(machine->activecpu),iop_cmd);
+	logerror("%08x:IOP cmd_r %04x\n",cpu_get_pc(space->cpu),iop_cmd);
 	return iop_cmd;
 }
 
 
 static WRITE16_HANDLER( dsp_answer_w )
 {
-	logerror("%08x:IOP answer %04x\n",cpu_get_pc(machine->activecpu),data);
+	logerror("%08x:IOP answer %04x\n",cpu_get_pc(space->cpu),data);
 	iop_answer = data;
-	cpu_set_input_line(machine->cpu[0], 1, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 1, ASSERT_LINE);
 }
 
 
@@ -381,8 +381,8 @@ static READ16_HANDLER( dsp_hold_line_r )
 
 static READ16_HANDLER( dsp_rom_r )
 {
-	UINT8 *rom = memory_region(machine, "user2");
-	return rom[iop_romaddr & (memory_region_length(machine, "user2") - 1)];
+	UINT8 *rom = memory_region(space->machine, "user2");
+	return rom[iop_romaddr & (memory_region_length(space->machine, "user2") - 1)];
 }
 
 
@@ -419,9 +419,9 @@ static READ16_HANDLER( coolpool_input_r )
 	static UINT8 oldx, oldy;
 	static UINT16 lastresult;
 
-	int result = (input_port_read(machine, "IN1") & 0x00ff) | (lastresult & 0xff00);
-	UINT8 newx = input_port_read(machine, "XAXIS");
-	UINT8 newy = input_port_read(machine, "YAXIS");
+	int result = (input_port_read(space->machine, "IN1") & 0x00ff) | (lastresult & 0xff00);
+	UINT8 newx = input_port_read(space->machine, "XAXIS");
+	UINT8 newy = input_port_read(space->machine, "YAXIS");
 	int dx = (INT8)(newx - oldx);
 	int dy = (INT8)(newy - oldy);
 
@@ -471,7 +471,7 @@ static READ16_HANDLER( coolpool_input_r )
 		}
 	}
 
-//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", cpu_get_pc(machine->activecpu),
+//  logerror("%08X:read port 7 (X=%02X Y=%02X oldX=%02X oldY=%02X res=%04X)\n", cpu_get_pc(space->cpu),
 //      newx, newy, oldx, oldy, result);
 	lastresult = result;
 	return result;

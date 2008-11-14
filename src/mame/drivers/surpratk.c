@@ -39,7 +39,7 @@ static READ8_HANDLER( bankedram_r )
 			return paletteram[offset];
 	}
 	else if (videobank & 0x01)
-		return K053245_r(machine,offset);
+		return K053245_r(space,offset);
 	else
 		return ram[offset];
 }
@@ -49,19 +49,19 @@ static WRITE8_HANDLER( bankedram_w )
 	if (videobank & 0x02)
 	{
 		if (videobank & 0x04)
-			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset + 0x0800,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset + 0x0800,data);
 		else
-			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	}
 	else if (videobank & 0x01)
-		K053245_w(machine,offset,data);
+		K053245_w(space,offset,data);
 	else
 		ram[offset] = data;
 }
 
 static WRITE8_HANDLER( surpratk_videobank_w )
 {
-logerror("%04x: videobank = %02x\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: videobank = %02x\n",cpu_get_pc(space->cpu),data);
 	/* bit 0 = select 053245 at 0000-07ff */
 	/* bit 1 = select palette at 0000-07ff */
 	/* bit 2 = select palette bank 0 or 1 */
@@ -70,7 +70,7 @@ logerror("%04x: videobank = %02x\n",cpu_get_pc(machine->activecpu),data);
 
 static WRITE8_HANDLER( surpratk_5fc0_w )
 {
-	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(machine->activecpu),data);
+	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0/1 = coin counters */
 	coin_counter_w(0,data & 0x01);

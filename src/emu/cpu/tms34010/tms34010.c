@@ -675,7 +675,7 @@ static CPU_RESET( tms34010 )
 	/* the first time we are run */
 	tms->reset_deferred = tms->config->halt_on_reset;
 	if (tms->config->halt_on_reset)
-		tms34010_io_register_w(device->machine, REG_HSTCTLH, 0x8000, 0xffff);
+		tms34010_io_register_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), REG_HSTCTLH, 0x8000, 0xffff);
 }
 
 
@@ -1178,7 +1178,7 @@ static const char *const ioreg_name[] =
 
 WRITE16_HANDLER( tms34010_io_register_w )
 {
-	tms34010_state *tms = machine->activecpu->token;
+	tms34010_state *tms = space->cpu->token;
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1207,7 +1207,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			break;
 
 		case REG_PMASK:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(machine->activecpu));
+			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(space->cpu));
 			break;
 
 		case REG_DPYCTL:
@@ -1292,7 +1292,7 @@ WRITE16_HANDLER( tms34010_io_register_w )
 	}
 
 //	if (LOG_CONTROL_REGS)
-//		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(machine->activecpu), ioreg_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
+//		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
 }
 
 
@@ -1321,7 +1321,7 @@ static const char *const ioreg020_name[] =
 
 WRITE16_HANDLER( tms34020_io_register_w )
 {
-	tms34010_state *tms = machine->activecpu->token;
+	tms34010_state *tms = space->cpu->token;
 	int oldreg, newreg;
 
 	/* Set register */
@@ -1329,7 +1329,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	IOREG(tms, offset) = data;
 
 //	if (LOG_CONTROL_REGS)
-//		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(machine->activecpu), ioreg020_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
+//		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(space->cpu), ioreg020_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
 
 	switch (offset)
 	{
@@ -1358,7 +1358,7 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 		case REG020_PMASKL:
 		case REG020_PMASKH:
-			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(machine->activecpu));
+			if (data) logerror("Plane masking not supported. PC=%08X\n", cpu_get_pc(space->cpu));
 			break;
 
 		case REG020_DPYCTL:
@@ -1484,11 +1484,11 @@ WRITE16_HANDLER( tms34020_io_register_w )
 
 READ16_HANDLER( tms34010_io_register_r )
 {
-	tms34010_state *tms = machine->activecpu->token;
+	tms34010_state *tms = space->cpu->token;
 	int result, total;
 
 //	if (LOG_CONTROL_REGS)
-//		logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(machine->activecpu), ioreg_name[offset]);
+//		logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1507,7 +1507,7 @@ READ16_HANDLER( tms34010_io_register_r )
 			return result;
 
 		case REG_REFCNT:
-			return (cpu_get_total_cycles(machine->activecpu) / 16) & 0xfffc;
+			return (cpu_get_total_cycles(space->cpu) / 16) & 0xfffc;
 
 		case REG_INTPEND:
 			result = IOREG(tms, offset);
@@ -1527,11 +1527,11 @@ READ16_HANDLER( tms34010_io_register_r )
 
 READ16_HANDLER( tms34020_io_register_r )
 {
-	tms34010_state *tms = machine->activecpu->token;
+	tms34010_state *tms = space->cpu->token;
 	int result, total;
 
 //	if (LOG_CONTROL_REGS)
-//		logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(machine->activecpu), ioreg_name[offset]);
+//		logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1553,7 +1553,7 @@ READ16_HANDLER( tms34020_io_register_r )
 		{
 			int refreshrate = (IOREG(tms, REG020_CONFIG) >> 8) & 7;
 			if (refreshrate < 6)
-				return (cpu_get_total_cycles(machine->activecpu) / refreshrate) & 0xffff;
+				return (cpu_get_total_cycles(space->cpu) / refreshrate) & 0xffff;
 			break;
 		}
 	}
@@ -1582,6 +1582,7 @@ static STATE_POSTLOAD( tms34010_state_postload )
 
 void tms34010_host_w(const device_config *cpu, int reg, int data)
 {
+	const address_space *space;
 	tms34010_state *tms = cpu->token;
 	unsigned int addr;
 
@@ -1619,8 +1620,9 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 		/* control register */
 		case TMS34010_HOST_CONTROL:
 			tms->external_host_access = TRUE;
-			tms34010_io_register_w(tms->device->machine, REG_HSTCTLH, data & 0xff00, 0xffff);
-			tms34010_io_register_w(tms->device->machine, REG_HSTCTLL, data & 0x00ff, 0xffff);
+			space = cpu_get_address_space(tms->device, ADDRESS_SPACE_PROGRAM);
+			tms34010_io_register_w(space, REG_HSTCTLH, data & 0xff00, 0xffff);
+			tms34010_io_register_w(space, REG_HSTCTLL, data & 0x00ff, 0xffff);
 			tms->external_host_access = FALSE;
 			break;
 

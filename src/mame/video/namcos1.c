@@ -196,7 +196,7 @@ WRITE8_HANDLER( namcos1_paletteram_w )
 		r = namcos1_paletteram[offset];
 		g = namcos1_paletteram[offset + 0x0800];
 		b = namcos1_paletteram[offset + 0x1000];
-		palette_set_color(machine,color,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine,color,MAKE_RGB(r,g,b));
 	}
 	else
 	{

@@ -443,7 +443,7 @@ WRITE8_HANDLER( hal21_flipscreen_w )
 	flip_screen_set(data & 0x80);
 
 	tilemap_set_palette_offset(bg_tilemap, ((data & 0xf) ^ 8) << 4);
-	tilemap_set_pen_data_offset(bg_tilemap, ((data & 0x20) << 3) * machine->gfx[1]->char_modulo);
+	tilemap_set_pen_data_offset(bg_tilemap, ((data & 0x20) << 3) * space->machine->gfx[1]->char_modulo);
 
 	// other bits unknown
 }
@@ -507,7 +507,7 @@ WRITE8_HANDLER( tnk3_videoattrs_w )
 
 	flip_screen_set(data & 0x80);
 
-	tilemap_set_pen_data_offset(tx_tilemap, ((data & 0x40) << 2) * machine->gfx[0]->char_modulo);
+	tilemap_set_pen_data_offset(tx_tilemap, ((data & 0x40) << 2) * space->machine->gfx[0]->char_modulo);
 
 	bg_scrolly =   (bg_scrolly   & 0xff) | ((data & 0x10) << 4);
 	sp16_scrolly = (sp16_scrolly & 0xff) | ((data & 0x08) << 5);
@@ -518,7 +518,7 @@ WRITE8_HANDLER( tnk3_videoattrs_w )
 WRITE8_HANDLER( aso_bg_bank_w )
 {
 	tilemap_set_palette_offset(bg_tilemap, ((data & 0xf) ^ 8) << 4);
-	tilemap_set_pen_data_offset(bg_tilemap, ((data & 0x30) << 4) * machine->gfx[1]->char_modulo);
+	tilemap_set_pen_data_offset(bg_tilemap, ((data & 0x30) << 4) * space->machine->gfx[1]->char_modulo);
 }
 
 WRITE8_HANDLER( ikari_bg_scroll_msb_w )
@@ -549,13 +549,13 @@ if (data != 0x20 &&	// normal
 	popmessage("attrs %02x contact MAMEDEV", data);
 
 	tilemap_set_palette_offset(tx_tilemap, (data & 0x01) << 4);
-	tilemap_set_pen_data_offset(tx_tilemap, ((data & 0x10) << 4) * machine->gfx[0]->char_modulo);
+	tilemap_set_pen_data_offset(tx_tilemap, ((data & 0x10) << 4) * space->machine->gfx[0]->char_modulo);
 }
 
 WRITE8_HANDLER( gwar_tx_bank_w )
 {
 	tilemap_set_palette_offset(tx_tilemap, (data & 0xf) << 4);
-	tilemap_set_pen_data_offset(tx_tilemap, ((data & 0x30) << 4) * machine->gfx[0]->char_modulo);
+	tilemap_set_pen_data_offset(tx_tilemap, ((data & 0x30) << 4) * space->machine->gfx[0]->char_modulo);
 }
 
 WRITE8_HANDLER( gwar_videoattrs_w )
@@ -597,10 +597,10 @@ WRITE8_HANDLER( tdfever_spriteram_w )
 	/*  partial updates avoid flickers in the fsoccer radar. */
 	if (offset < 0x80 && spriteram[offset] != data)
 	{
-		int vpos = video_screen_get_vpos(machine->primary_screen);
+		int vpos = video_screen_get_vpos(space->machine->primary_screen);
 
 		if (vpos > 0)
-			video_screen_update_partial(machine->primary_screen, vpos - 1);
+			video_screen_update_partial(space->machine->primary_screen, vpos - 1);
 	}
 
 	spriteram[offset] = data;

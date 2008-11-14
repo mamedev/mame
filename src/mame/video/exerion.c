@@ -211,9 +211,9 @@ WRITE8_HANDLER( exerion_videoreg_w )
 
 WRITE8_HANDLER( exerion_video_latch_w )
 {
-	int scanline = video_screen_get_vpos(machine->primary_screen);
+	int scanline = video_screen_get_vpos(space->machine->primary_screen);
 	if (scanline > 0)
-		video_screen_update_partial(machine->primary_screen, scanline - 1);
+		video_screen_update_partial(space->machine->primary_screen, scanline - 1);
 	background_latches[offset] = data;
 }
 
@@ -223,13 +223,13 @@ READ8_HANDLER( exerion_video_timing_r )
 	/* bit 0 is the SNMI signal, which is the negated value of H6, if H7=1 & H8=1 & VBLANK=0, otherwise 1 */
 	/* bit 1 is VBLANK */
 
-	UINT16 hcounter = video_screen_get_hpos(machine->primary_screen) + EXERION_HCOUNT_START;
+	UINT16 hcounter = video_screen_get_hpos(space->machine->primary_screen) + EXERION_HCOUNT_START;
 	UINT8 snmi = 1;
 
-	if (((hcounter & 0x180) == 0x180) && !video_screen_get_vblank(machine->primary_screen))
+	if (((hcounter & 0x180) == 0x180) && !video_screen_get_vblank(space->machine->primary_screen))
 		snmi = !((hcounter >> 6) & 0x01);
 
-	return (video_screen_get_vblank(machine->primary_screen) << 1) | snmi;
+	return (video_screen_get_vblank(space->machine->primary_screen) << 1) | snmi;
 }
 
 

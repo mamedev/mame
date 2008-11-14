@@ -298,14 +298,14 @@ WRITE16_HANDLER( midtunit_paletteram_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	newword = paletteram16[offset];
-	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 
 WRITE16_HANDLER( midxunit_paletteram_w )
 {
 	if (!(offset & 1))
-		midtunit_paletteram_w(machine, offset / 2, data, mem_mask);
+		midtunit_paletteram_w(space, offset / 2, data, mem_mask);
 }
 
 
@@ -684,7 +684,7 @@ WRITE16_HANDLER( midtunit_dma_w )
 
 	/* high bit triggers action */
 	command = dma_register[DMA_COMMAND];
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 	if (!(command & 0x8000))
 		return;
 

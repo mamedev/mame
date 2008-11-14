@@ -751,11 +751,11 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 	/* bit 7 - */
 
         /* Z80 Reset */
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0008) ? CLEAR_LINE : ASSERT_LINE);
 
 	coin_counter_w(0, data & 0x0001);
-	if( (strncmp(machine->gamedrv->name,"pzloop2",8)==0) ||
- 	    (strncmp(machine->gamedrv->name,"pzloop2j",8)==0) )
+	if( (strncmp(space->machine->gamedrv->name,"pzloop2",8)==0) ||
+ 	    (strncmp(space->machine->gamedrv->name,"pzloop2j",8)==0) )
 	{
 		// Puzz Loop 2 uses coin counter 2 input to switch between stick and paddle controls
 		readpaddle = data & 0x0002;
@@ -765,7 +765,7 @@ static WRITE16_HANDLER( cps2_eeprom_port_w )
 		coin_counter_w(1, data & 0x0002);
 	}
 
-	if(strncmp(machine->gamedrv->name,"mmatrix",7)==0)		// Mars Matrix seems to require the coin lockout bit to be reversed
+	if(strncmp(space->machine->gamedrv->name,"mmatrix",7)==0)		// Mars Matrix seems to require the coin lockout bit to be reversed
 	{
 		coin_lockout_w(0,data & 0x0010);
 		coin_lockout_w(1,data & 0x0020);
@@ -844,9 +844,9 @@ static READ16_HANDLER( kludge_r )
 static READ16_HANDLER( joy_or_paddle_r )
 {
 	if (readpaddle != 0)
-		return (input_port_read(machine, "IN0"));
+		return (input_port_read(space->machine, "IN0"));
 	else
-		return (input_port_read(machine, "PADDLE1") & 0xff) | (input_port_read(machine, "PADDLE2") << 8);
+		return (input_port_read(space->machine, "PADDLE1") & 0xff) | (input_port_read(space->machine, "PADDLE2") << 8);
 }
 
 

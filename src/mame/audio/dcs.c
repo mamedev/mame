@@ -1224,7 +1224,7 @@ static WRITE16_HANDLER( sdrc_w )
 		case 0:
 			sdrc.reg[0] = data;
 			if (diff & 0x1833)
-				sdrc_remap_memory(machine);
+				sdrc_remap_memory(space->machine);
 			if (diff & 0x0380)
 				sdrc_update_bank_pointers();
 			break;
@@ -1234,7 +1234,7 @@ static WRITE16_HANDLER( sdrc_w )
 			sdrc.reg[1] = data;
 //          dmadac_enable(0, dcs.channels, SDRC_MUTE);
 			if (diff & 0x0003)
-				sdrc_remap_memory(machine);
+				sdrc_remap_memory(space->machine);
 			break;
 
 		/* offset 2 controls paging */
@@ -1320,7 +1320,7 @@ static WRITE16_HANDLER( dsio_w )
 			dmadac_enable(0, dcs.channels, DSIO_MUTE);
 
 			/* bit 0 resets the FIFO */
-			midway_ioasic_fifo_reset_w(machine, DSIO_EMPTY_FIFO ^ 1);
+			midway_ioasic_fifo_reset_w(space, DSIO_EMPTY_FIFO ^ 1);
 			break;
 
 		/* offset 2 controls RAM pages */
@@ -1379,7 +1379,7 @@ static WRITE16_HANDLER( denver_w )
 				dmadac_enable(0, dcs.channels, enable);
 				if (dcs.channels < 6)
 					dmadac_enable(dcs.channels, 6 - dcs.channels, FALSE);
-				recompute_sample_rate(machine);
+				recompute_sample_rate(space->machine);
 			}
 			break;
 
@@ -1391,7 +1391,7 @@ static WRITE16_HANDLER( denver_w )
 
 		/* offset 3 controls FIFO reset */
 		case 3:
-			midway_ioasic_fifo_reset_w(machine, 1);
+			midway_ioasic_fifo_reset_w(space, 1);
 			break;
 	}
 }
@@ -1407,9 +1407,9 @@ static WRITE16_HANDLER( denver_w )
 WRITE32_HANDLER( dsio_idma_addr_w )
 {
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_addr = %04X\n", cpu_get_pc(machine->activecpu), data);
-	cpu_push_context(machine->cpu[dcs.cpunum]);
-	adsp2181_idma_addr_w(machine->cpu[dcs.cpunum], data);
+		logerror("%08X:IDMA_addr = %04X\n", cpu_get_pc(space->cpu), data);
+	cpu_push_context(space->machine->cpu[dcs.cpunum]);
+	adsp2181_idma_addr_w(space->machine->cpu[dcs.cpunum], data);
 	if (data == 0)
 		dsio.start_on_next_write = 2;
 	cpu_pop_context();
@@ -1418,25 +1418,25 @@ WRITE32_HANDLER( dsio_idma_addr_w )
 
 WRITE32_HANDLER( dsio_idma_data_w )
 {
-	UINT32 pc = cpu_get_pc(machine->activecpu);
-	cpu_push_context(machine->cpu[dcs.cpunum]);
+	UINT32 pc = cpu_get_pc(space->cpu);
+	cpu_push_context(space->machine->cpu[dcs.cpunum]);
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS)
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(machine->cpu[dcs.cpunum]), data & 0xffff);
-		adsp2181_idma_data_w(machine->cpu[dcs.cpunum], data & 0xffff);
+			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(space->machine->cpu[dcs.cpunum]), data & 0xffff);
+		adsp2181_idma_data_w(space->machine->cpu[dcs.cpunum], data & 0xffff);
 	}
 	if (ACCESSING_BITS_16_31)
 	{
 		if (LOG_DCS_TRANSFERS)
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(machine->cpu[dcs.cpunum]), data >> 16);
-		adsp2181_idma_data_w(machine->cpu[dcs.cpunum], data >> 16);
+			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(space->machine->cpu[dcs.cpunum]), data >> 16);
+		adsp2181_idma_data_w(space->machine->cpu[dcs.cpunum], data >> 16);
 	}
 	cpu_pop_context();
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
 		logerror("Starting DSIO CPU\n");
-		cpu_set_input_line(machine->cpu[dcs.cpunum], INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[dcs.cpunum], INPUT_LINE_HALT, CLEAR_LINE);
 	}
 }
 
@@ -1444,11 +1444,11 @@ WRITE32_HANDLER( dsio_idma_data_w )
 READ32_HANDLER( dsio_idma_data_r )
 {
 	UINT32 result;
-	cpu_push_context(machine->cpu[dcs.cpunum]);
-	result = adsp2181_idma_data_r(machine->cpu[dcs.cpunum]);
+	cpu_push_context(space->machine->cpu[dcs.cpunum]);
+	result = adsp2181_idma_data_r(space->machine->cpu[dcs.cpunum]);
 	cpu_pop_context();
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(machine->activecpu), adsp2181_idma_addr_r(machine->cpu[dcs.cpunum]), result);
+		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(space->cpu), adsp2181_idma_addr_r(space->machine->cpu[dcs.cpunum]), result);
 	return result;
 }
 
@@ -1574,16 +1574,16 @@ static WRITE16_HANDLER( input_latch_ack_w )
 	if (!dcs.last_input_empty && dcs.input_empty_cb)
 		(*dcs.input_empty_cb)(dcs.last_input_empty = 1);
 	SET_INPUT_EMPTY();
-	cpu_set_input_line(machine->cpu[dcs.cpunum], ADSP2105_IRQ2, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[dcs.cpunum], ADSP2105_IRQ2, CLEAR_LINE);
 }
 
 
 static READ16_HANDLER( input_latch_r )
 {
 	if (dcs.auto_ack)
-		input_latch_ack_w(machine,0,0,0xffff);
+		input_latch_ack_w(space,0,0,0xffff);
 	if (LOG_DCS_IO)
-		logerror("%08X:input_latch_r(%04X)\n", cpu_get_pc(machine->activecpu), dcs.input_data);
+		logerror("%08X:input_latch_r(%04X)\n", cpu_get_pc(space->cpu), dcs.input_data);
 	return dcs.input_data;
 }
 
@@ -1605,7 +1605,7 @@ static TIMER_CALLBACK( latch_delayed_w )
 static WRITE16_HANDLER( output_latch_w )
 {
 	if (LOG_DCS_IO)
-		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", cpu_get_pc(machine->activecpu), data, IS_OUTPUT_EMPTY());
+		logerror("%08X:output_latch_w(%04X) (empty=%d)\n", cpu_get_pc(space->cpu), data, IS_OUTPUT_EMPTY());
 	timer_call_after_resynch(NULL, data, latch_delayed_w);
 }
 
@@ -1659,14 +1659,14 @@ static TIMER_CALLBACK( output_control_delayed_w )
 static WRITE16_HANDLER( output_control_w )
 {
 	if (LOG_DCS_IO)
-		logerror("%04X:output_control = %04X\n", cpu_get_pc(machine->activecpu), data);
+		logerror("%04X:output_control = %04X\n", cpu_get_pc(space->cpu), data);
 	timer_call_after_resynch(NULL, data, output_control_delayed_w);
 }
 
 
 static READ16_HANDLER( output_control_r )
 {
-	dcs.output_control_cycles = cpu_get_total_cycles(machine->activecpu);
+	dcs.output_control_cycles = cpu_get_total_cycles(space->cpu);
 	return dcs.output_control;
 }
 
@@ -1818,11 +1818,11 @@ static READ16_HANDLER( adsp_control_r )
 			break;
 
 		case IDMA_CONTROL_REG:
-			result = adsp2181_idma_addr_r(machine->cpu[dcs.cpunum]);
+			result = adsp2181_idma_addr_r(space->machine->cpu[dcs.cpunum]);
 			break;
 
 		case TIMER_COUNT_REG:
-			update_timer_count(machine);
+			update_timer_count(space->machine);
 			result = dcs.control_regs[offset];
 			break;
 
@@ -1844,8 +1844,8 @@ static WRITE16_HANDLER( adsp_control_w )
 			/* bit 9 forces a reset */
 			if (data & 0x0200)
 			{
-				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", cpu_get_pc(machine->activecpu));
-				cpu_set_input_line(machine->cpu[dcs.cpunum], INPUT_LINE_RESET, PULSE_LINE);
+				logerror("%04X:Rebooting DCS due to SYSCONTROL write\n", cpu_get_pc(space->cpu));
+				cpu_set_input_line(space->machine->cpu[dcs.cpunum], INPUT_LINE_RESET, PULSE_LINE);
 				dcs_boot();
 				dcs.control_regs[SYSCONTROL_REG] = 0;
 			}
@@ -1878,28 +1878,28 @@ static WRITE16_HANDLER( adsp_control_w )
 			data = (data & 0xff) + 1;
 			if (data != dcs.timer_scale)
 			{
-				update_timer_count(machine);
+				update_timer_count(space->machine);
 				dcs.timer_scale = data;
-				reset_timer(machine);
+				reset_timer(space->machine);
 			}
 			break;
 
 		case TIMER_COUNT_REG:
 			dcs.timer_start_count = data;
-			reset_timer(machine);
+			reset_timer(space->machine);
 			break;
 
 		case TIMER_PERIOD_REG:
 			if (data != dcs.timer_period)
 			{
-				update_timer_count(machine);
+				update_timer_count(space->machine);
 				dcs.timer_period = data;
-				reset_timer(machine);
+				reset_timer(space->machine);
 			}
 			break;
 
 		case IDMA_CONTROL_REG:
-			adsp2181_idma_addr_w(machine->cpu[dcs.cpunum], data);
+			adsp2181_idma_addr_w(space->machine->cpu[dcs.cpunum], data);
 			break;
 	}
 }
@@ -2038,7 +2038,7 @@ static void sound_tx_callback(int port, INT32 data)
 
 static READ16_HANDLER( dcs_polling_r )
 {
-	cpu_eat_cycles(machine->activecpu, 1000);
+	cpu_eat_cycles(space->cpu, 1000);
 	return *dcs_polling_base;
 }
 

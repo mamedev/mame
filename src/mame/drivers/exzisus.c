@@ -69,7 +69,7 @@ VIDEO_UPDATE( exzisus );
 
 static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	static int exzisus_cpua_bank = 0;
 
 	if ( (data & 0x0f) != exzisus_cpua_bank )
@@ -86,7 +86,7 @@ static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 
 static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "cpub");
+	UINT8 *RAM = memory_region(space->machine, "cpub");
 	static int exzisus_cpub_bank = 0;
 
 	if ( (data & 0x0f) != exzisus_cpub_bank )
@@ -131,7 +131,7 @@ static WRITE8_HANDLER( exzisus_sharedram_ac_w )
 
 static WRITE8_HANDLER( exzisus_cpub_reset_w )
 {
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 #if 0

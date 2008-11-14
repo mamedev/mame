@@ -36,7 +36,7 @@ VIDEO_UPDATE( kikcubic );
 static WRITE8_HANDLER( vigilant_bank_select_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
 	memory_set_bankptr(1,&RAM[bankaddress]);

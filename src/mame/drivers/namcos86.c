@@ -202,18 +202,18 @@ WRITE8_HANDLER( rthunder_spriteram_w );
 
 static WRITE8_HANDLER( bankswitch1_w )
 {
-	UINT8 *base = memory_region(machine, "cpu1") + 0x10000;
+	UINT8 *base = memory_region(space->machine, "cpu1") + 0x10000;
 
 	/* if the ROM expansion module is available, don't do anything. This avoids conflict */
 	/* with bankswitch1_ext_w() in wndrmomo */
-	if (memory_region(machine, "user1")) return;
+	if (memory_region(space->machine, "user1")) return;
 
 	memory_set_bankptr(1,base + ((data & 0x03) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch1_ext_w )
 {
-	UINT8 *base = memory_region(machine, "user1");
+	UINT8 *base = memory_region(space->machine, "user1");
 
 	if (base == 0) return;
 
@@ -222,7 +222,7 @@ static WRITE8_HANDLER( bankswitch1_ext_w )
 
 static WRITE8_HANDLER( bankswitch2_w )
 {
-	UINT8 *base = memory_region(machine, "cpu2") + 0x10000;
+	UINT8 *base = memory_region(space->machine, "cpu2") + 0x10000;
 
 	memory_set_bankptr(2,base + ((data & 0x03) * 0x2000));
 }
@@ -232,15 +232,15 @@ static READ8_HANDLER( dsw0_r )
 {
 	int rhi, rlo;
 
-	rhi  = ( input_port_read(machine, "DSWA") & 0x01 ) << 4;
-	rhi |= ( input_port_read(machine, "DSWA") & 0x04 ) << 3;
-	rhi |= ( input_port_read(machine, "DSWA") & 0x10 ) << 2;
-	rhi |= ( input_port_read(machine, "DSWA") & 0x40 ) << 1;
+	rhi  = ( input_port_read(space->machine, "DSWA") & 0x01 ) << 4;
+	rhi |= ( input_port_read(space->machine, "DSWA") & 0x04 ) << 3;
+	rhi |= ( input_port_read(space->machine, "DSWA") & 0x10 ) << 2;
+	rhi |= ( input_port_read(space->machine, "DSWA") & 0x40 ) << 1;
 
-	rlo  = ( input_port_read(machine, "DSWB") & 0x01 );
-	rlo |= ( input_port_read(machine, "DSWB") & 0x04 ) >> 1;
-	rlo |= ( input_port_read(machine, "DSWB") & 0x10 ) >> 2;
-	rlo |= ( input_port_read(machine, "DSWB") & 0x40 ) >> 3;
+	rlo  = ( input_port_read(space->machine, "DSWB") & 0x01 );
+	rlo |= ( input_port_read(space->machine, "DSWB") & 0x04 ) >> 1;
+	rlo |= ( input_port_read(space->machine, "DSWB") & 0x10 ) >> 2;
+	rlo |= ( input_port_read(space->machine, "DSWB") & 0x40 ) >> 3;
 
 	return rhi | rlo;
 }
@@ -249,15 +249,15 @@ static READ8_HANDLER( dsw1_r )
 {
 	int rhi, rlo;
 
-	rhi  = ( input_port_read(machine, "DSWA") & 0x02 ) << 3;
-	rhi |= ( input_port_read(machine, "DSWA") & 0x08 ) << 2;
-	rhi |= ( input_port_read(machine, "DSWA") & 0x20 ) << 1;
-	rhi |= ( input_port_read(machine, "DSWA") & 0x80 );
+	rhi  = ( input_port_read(space->machine, "DSWA") & 0x02 ) << 3;
+	rhi |= ( input_port_read(space->machine, "DSWA") & 0x08 ) << 2;
+	rhi |= ( input_port_read(space->machine, "DSWA") & 0x20 ) << 1;
+	rhi |= ( input_port_read(space->machine, "DSWA") & 0x80 );
 
-	rlo  = ( input_port_read(machine, "DSWB") & 0x02 ) >> 1;
-	rlo |= ( input_port_read(machine, "DSWB") & 0x08 ) >> 2;
-	rlo |= ( input_port_read(machine, "DSWB") & 0x20 ) >> 3;
-	rlo |= ( input_port_read(machine, "DSWB") & 0x80 ) >> 4;
+	rlo  = ( input_port_read(space->machine, "DSWB") & 0x02 ) >> 1;
+	rlo |= ( input_port_read(space->machine, "DSWB") & 0x08 ) >> 2;
+	rlo |= ( input_port_read(space->machine, "DSWB") & 0x20 ) >> 3;
+	rlo |= ( input_port_read(space->machine, "DSWB") & 0x80 ) >> 4;
 
 	return rhi | rlo;
 }
@@ -265,12 +265,12 @@ static READ8_HANDLER( dsw1_r )
 
 static WRITE8_HANDLER( int_ack1_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( int_ack2_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 
@@ -282,7 +282,7 @@ static WRITE8_HANDLER( watchdog1_w )
 	if (wdog == 3)
 	{
 		wdog = 0;
-		watchdog_reset_w(machine,0,0);
+		watchdog_reset_w(space,0,0);
 	}
 }
 
@@ -292,7 +292,7 @@ static WRITE8_HANDLER( watchdog2_w )
 	if (wdog == 3)
 	{
 		wdog = 0;
-		watchdog_reset_w(machine,0,0);
+		watchdog_reset_w(space,0,0);
 	}
 }
 
@@ -314,7 +314,7 @@ static WRITE8_HANDLER( namcos86_led_w )
 static WRITE8_HANDLER( cus115_w )
 {
 	/* make sure the expansion board is present */
-	if (!memory_region(machine, "user1"))
+	if (!memory_region(space->machine, "user1"))
 	{
 		popmessage("expansion board not present");
 		return;
@@ -330,7 +330,7 @@ static WRITE8_HANDLER( cus115_w )
 			break;
 
 		case 4:
-			bankswitch1_ext_w(machine,0,data);
+			bankswitch1_ext_w(space,0,data);
 			break;
 
 		case 5:	// not used?

@@ -83,12 +83,12 @@ static INTERRUPT_GEN( iqblock_interrupt )
 
 static WRITE8_HANDLER( iqblock_irqack_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static READ8_HANDLER( extrarom_r )
 {
-	return memory_region(machine, "user1")[offset];
+	return memory_region(space->machine, "user1")[offset];
 }
 
 

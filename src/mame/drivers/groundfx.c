@@ -96,7 +96,7 @@ static WRITE32_HANDLER( color_ram_w )
 		g = (a &0xff00) >> 8;
 		b = (a &0xff);
 
-		palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 	}
 }
 
@@ -174,7 +174,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 		{
 			if (ACCESSING_BITS_24_31)	/* $500000 is watchdog */
 			{
-				watchdog_reset(machine);
+				watchdog_reset(space->machine);
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -204,7 +204,7 @@ static WRITE32_HANDLER( groundfx_input_w )
 
 static READ32_HANDLER( groundfx_adc_r )
 {
-	return (input_port_read(machine, "AN0") << 8) | input_port_read(machine, "AN1");
+	return (input_port_read(space->machine, "AN0") << 8) | input_port_read(space->machine, "AN1");
 }
 
 static WRITE32_HANDLER( groundfx_adc_w )
@@ -467,12 +467,12 @@ ROM_END
 static READ32_HANDLER( irq_speedup_r_groundfx )
 {
 	int ptr;
-	if ((cpu_get_sp(machine->activecpu)&2)==0) ptr=groundfx_ram[(cpu_get_sp(machine->activecpu)&0x1ffff)/4];
-	else ptr=(((groundfx_ram[(cpu_get_sp(machine->activecpu)&0x1ffff)/4])&0x1ffff)<<16) |
-	(groundfx_ram[((cpu_get_sp(machine->activecpu)&0x1ffff)/4)+1]>>16);
+	if ((cpu_get_sp(space->cpu)&2)==0) ptr=groundfx_ram[(cpu_get_sp(space->cpu)&0x1ffff)/4];
+	else ptr=(((groundfx_ram[(cpu_get_sp(space->cpu)&0x1ffff)/4])&0x1ffff)<<16) |
+	(groundfx_ram[((cpu_get_sp(space->cpu)&0x1ffff)/4)+1]>>16);
 
-	if (cpu_get_pc(machine->activecpu)==0x1ece && ptr==0x1b9a)
-		cpu_spinuntil_int(machine->activecpu);
+	if (cpu_get_pc(space->cpu)==0x1ece && ptr==0x1b9a)
+		cpu_spinuntil_int(space->cpu);
 
 	return groundfx_ram[0xb574/4];
 }

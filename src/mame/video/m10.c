@@ -64,13 +64,13 @@ WRITE8_HANDLER( m10_colorram_w )
 
 WRITE8_HANDLER( m15_chargen_w )
 {
-	m10_state *state = machine->driver_data;
+	m10_state *state = space->machine->driver_data;
 
 	if (state->chargen[offset] != data)
 	{
 		state->chargen[offset] = data;
 		/* not very effective ... dirty would be better */
-		decodechar(machine->gfx[0],offset >> 3,state->chargen);
+		decodechar(space->machine->gfx[0],offset >> 3,state->chargen);
 	}
 }
 

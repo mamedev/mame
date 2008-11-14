@@ -433,7 +433,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0x9:
 				logerror("Read multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memory_region(space->machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -441,7 +441,7 @@ static WRITE16_HANDLER( fdc_w )
 				break;
 			case 0xb:
 				logerror("Write multiple [%02x] %d..%d side %d track %d\n", data, fdc_sector, fdc_sector+fdc_data-1, data & 8 ? 1 : 0, fdc_phys_track);
-				fdc_pt = memory_region(machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
+				fdc_pt = memory_region(space->machine, "floppy") + track_size*(2*fdc_phys_track+(data & 8 ? 1 : 0));
 				fdc_span = track_size;
 				fdc_status = 3;
 				fdc_drq = 1;
@@ -628,7 +628,7 @@ static WRITE16_HANDLER( hotrod3_ctrl_w )
 	if(ACCESSING_BITS_0_7)
 	{
 		data &= 3;
-		hotrod_ctrl_cur = input_port_read_safe(machine, portnames[data], 0);
+		hotrod_ctrl_cur = input_port_read_safe(space->machine, portnames[data], 0);
 	}
 }
 
@@ -640,21 +640,21 @@ static READ16_HANDLER( hotrod3_ctrl_r )
 		{
 			// Steering dials
 			case 0:
-				return input_port_read_safe(machine, "DIAL1", 0) & 0xff;
+				return input_port_read_safe(space->machine, "DIAL1", 0) & 0xff;
 			case 1:
-				return input_port_read_safe(machine, "DIAL1", 0) >> 8;
+				return input_port_read_safe(space->machine, "DIAL1", 0) >> 8;
 			case 2:
-				return input_port_read_safe(machine, "DIAL2", 0) & 0xff;
+				return input_port_read_safe(space->machine, "DIAL2", 0) & 0xff;
 			case 3:
-				return input_port_read_safe(machine, "DIAL2", 0) >> 8;
+				return input_port_read_safe(space->machine, "DIAL2", 0) >> 8;
 			case 4:
-				return input_port_read_safe(machine, "DIAL3", 0) & 0xff;
+				return input_port_read_safe(space->machine, "DIAL3", 0) & 0xff;
 			case 5:
-				return input_port_read_safe(machine, "DIAL3", 0) >> 8;
+				return input_port_read_safe(space->machine, "DIAL3", 0) >> 8;
 			case 6:
-				return input_port_read_safe(machine, "DIAL4", 0) & 0xff;
+				return input_port_read_safe(space->machine, "DIAL4", 0) & 0xff;
 			case 7:
-				return input_port_read_safe(machine, "DIAL4", 0) >> 8;
+				return input_port_read_safe(space->machine, "DIAL4", 0) >> 8;
 
 			case 8:
 			{
@@ -670,13 +670,13 @@ static READ16_HANDLER( hotrod3_ctrl_r )
 
 static READ16_HANDLER( iod_r )
 {
-	logerror("IO daughterboard read %02x (%x)\n", offset, cpu_get_pc(machine->activecpu));
+	logerror("IO daughterboard read %02x (%x)\n", offset, cpu_get_pc(space->cpu));
 	return 0xffff;
 }
 
 static WRITE16_HANDLER( iod_w )
 {
-	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(machine->activecpu));
+	logerror("IO daughterboard write %02x, %04x & %04x (%x)\n", offset, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 
@@ -733,7 +733,7 @@ static WRITE16_HANDLER( curbank_w )
 {
 	if(ACCESSING_BITS_0_7) {
 		curbank = data & 0xff;
-		reset_bank(machine);
+		reset_bank(space->machine);
 	}
 }
 
@@ -742,19 +742,19 @@ static WRITE16_HANDLER( curbank_w )
 
 static READ16_HANDLER( ym_status_r )
 {
-	return ym2151_status_port_0_r(machine, 0);
+	return ym2151_status_port_0_r(space, 0);
 }
 
 static WRITE16_HANDLER( ym_register_w )
 {
 	if(ACCESSING_BITS_0_7)
-		ym2151_register_port_0_w(machine, 0, data);
+		ym2151_register_port_0_w(space, 0, data);
 }
 
 static WRITE16_HANDLER( ym_data_w )
 {
 	if(ACCESSING_BITS_0_7)
-		ym2151_data_port_0_w(machine, 0, data);
+		ym2151_data_port_0_w(space, 0, data);
 }
 
 
@@ -782,7 +782,7 @@ static WRITE16_HANDLER( mlatch_w )
 		int i;
 		UINT8 mxor = 0;
 		if(!mlatch_table) {
-			logerror("Protection: magic latch accessed but no table loaded (%d:%x)\n", cpunum_get_active(), cpu_get_pc(machine->activecpu));
+			logerror("Protection: magic latch accessed but no table loaded (%d:%x)\n", cpunum_get_active(), cpu_get_pc(space->cpu));
 			return;
 		}
 
@@ -793,9 +793,9 @@ static WRITE16_HANDLER( mlatch_w )
 				if(mlatch & (1<<i))
 					mxor |= 1 << mlatch_table[i];
 			mlatch = data ^ mxor;
-			logerror("Magic latching %02x ^ %02x as %02x (%d:%x)\n", data & 0xff, mxor, mlatch, cpunum_get_active(), cpu_get_pc(machine->activecpu));
+			logerror("Magic latching %02x ^ %02x as %02x (%d:%x)\n", data & 0xff, mxor, mlatch, cpunum_get_active(), cpu_get_pc(space->cpu));
 		} else {
-			logerror("Magic latch reset (%d:%x)\n", cpunum_get_active(), cpu_get_pc(machine->activecpu));
+			logerror("Magic latch reset (%d:%x)\n", cpunum_get_active(), cpu_get_pc(space->cpu));
 			mlatch = 0x00;
 		}
 	}
@@ -879,18 +879,18 @@ static WRITE16_HANDLER(irq_w)
 	case 2:
 		irq_allow0 = data;
 		irq_timer_pend0 = 0;
-		cpu_set_input_line(machine->cpu[0], IRQ_TIMER+1, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], IRQ_VBLANK+1, irq_vblank && (irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], IRQ_SPRITE+1, irq_sprite && (irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], IRQ_TIMER+1, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], IRQ_YM2151+1, irq_yms && (irq_allow0 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], IRQ_VBLANK+1, irq_vblank && (irq_allow0 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], IRQ_SPRITE+1, irq_sprite && (irq_allow0 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	case 3:
 		irq_allow1 = data;
 		irq_timer_pend1 = 0;
-		cpu_set_input_line(machine->cpu[1], IRQ_TIMER+1, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[1], IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[1], IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[1], IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], IRQ_TIMER+1, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], IRQ_YM2151+1, irq_yms && (irq_allow1 & (1 << IRQ_YM2151)) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], IRQ_VBLANK+1, irq_vblank && (irq_allow1 & (1 << IRQ_VBLANK)) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], IRQ_SPRITE+1, irq_sprite && (irq_allow1 & (1 << IRQ_SPRITE)) ? ASSERT_LINE : CLEAR_LINE);
 		break;
 	}
 }
@@ -899,7 +899,7 @@ static READ16_HANDLER(irq_r)
 {
 	switch(offset) {
 	case 0: {
-		int pc = cpu_get_pc(machine->activecpu);
+		int pc = cpu_get_pc(space->cpu);
 		static int turns;
 		if(pc == 0x84a4 || pc == 0x84a6)
 			return 0;
@@ -919,11 +919,11 @@ static READ16_HANDLER(irq_r)
 	}
 	case 2:
 		irq_timer_pend0 = 0;
-		cpu_set_input_line(machine->cpu[0], IRQ_TIMER+1, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	case 3:
 		irq_timer_pend1 = 0;
-		cpu_set_input_line(machine->cpu[1], IRQ_TIMER+1, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], IRQ_TIMER+1, CLEAR_LINE);
 		break;
 	}
 	return 0xffff;

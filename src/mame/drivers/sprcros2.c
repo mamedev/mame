@@ -85,7 +85,7 @@ static WRITE8_HANDLER( sprcros2_sharedram_w )
 
 static WRITE8_HANDLER( sprcros2_m_port7_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	//76543210
 	//x------- unused
@@ -106,7 +106,7 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 
 static WRITE8_HANDLER( sprcros2_s_port3_w )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 
 	//76543210
 	//xxxx---- unused

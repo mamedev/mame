@@ -230,9 +230,9 @@ static READ8_HANDLER( kamikaze_ppi_r )
 
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset);
+		result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset);
 	if (!(offset & 8))
-		result &= ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset);
+		result &= ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset);
 	return result;
 }
 
@@ -241,9 +241,9 @@ static WRITE8_HANDLER( kamikaze_ppi_w )
 {
 	/* the address lines are used for /CS; yes, they can overlap! */
 	if (!(offset & 4))
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_0"), offset, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset, data);
 	if (!(offset & 8))
-		ppi8255_w(devtag_get_device(machine, PPI8255, "ppi8255_1"), offset, data);
+		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_1"), offset, data);
 }
 
 
@@ -312,7 +312,7 @@ static WRITE8_HANDLER( spaceint_sound2_w )
 
 	if (bits_gone_hi & 0x04) sample_start(3, SND_INVADERHIT, 0);
 
-	screen_flip = (input_port_read(machine, "CABINET") & data & 0x80) ? 0xff : 0x00;
+	screen_flip = (input_port_read(space->machine, "CABINET") & data & 0x80) ? 0xff : 0x00;
 }
 
 

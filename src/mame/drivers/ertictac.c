@@ -41,7 +41,7 @@ static WRITE32_HANDLER(video_fifo_w)
 
 static READ32_HANDLER(IOCR_r)
 {
-	return (input_port_read(machine, "dummy") & 0x80) | 0x34;
+	return (input_port_read(space->machine, "dummy") & 0x80) | 0x34;
 }
 
 static WRITE32_HANDLER(IOCR_w)
@@ -79,7 +79,7 @@ static WRITE32_HANDLER(IRQMSKA_w)
 
 static READ32_HANDLER(IRQRQB_r)
 {
-	return mame_rand(machine)&IRQMSKB; /* hack  0x20 - controls,  0x02 - ?sound? */
+	return mame_rand(space->machine)&IRQMSKB; /* hack  0x20 - controls,  0x02 - ?sound? */
 }
 
 static READ32_HANDLER(IRQMSKB_r)

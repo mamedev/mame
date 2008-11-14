@@ -440,17 +440,17 @@ static WRITE8_HANDLER(equites_c0f8_w)
 	switch (offset)
 	{
 		case 0:	// c0f8: NMI ack (written by NMI handler)
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 			break;
 
 		case 1: // c0f9: RST75 trigger (written by NMI handler)
 			// Note: solder pad CP3 on the pcb would allow to disable this
-			cpu_set_input_line(machine->cpu[1], I8085_RST75_LINE, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[1], I8085_RST75_LINE, PULSE_LINE);
 			break;
 
 		case 2: // c0fa: INTR trigger (written by NMI handler)
 			// verified on PCB:
-			cpu_set_input_line(machine->cpu[1], I8085_INTR_LINE, HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[1], I8085_INTR_LINE, HOLD_LINE);
 			break;
 
 		case 3: // c0fb: n.c.
@@ -476,7 +476,7 @@ static WRITE8_HANDLER(equites_c0f8_w)
 
 		case 7:	// c0ff: sound command latch clear
 			// Note: solder pad CP1 on the pcb would allow to disable this
-			soundlatch_clear_w(machine,0,0);
+			soundlatch_clear_w(space,0,0);
 			break;
 	}
 }
@@ -619,7 +619,7 @@ static WRITE8_HANDLER(equites_8155_w)
 
 			break;
 		case 2: //logerror( "8155 I/O Port B write %x\n", data );
-			equites_8155_portb_w(machine,0,data);
+			equites_8155_portb_w(space,0,data);
 			break;
 		case 3: //logerror( "8155 I/O Port C (or control) write %x\n", data );
 			eq8155_port_c = data;
@@ -646,7 +646,7 @@ static WRITE8_HANDLER(equites_8155_w)
 #if HVOLTAGE_DEBUG
 static READ16_HANDLER(hvoltage_debug_r)
 {
-	return(input_port_read(machine, "FAKE"));
+	return(input_port_read(space->machine, "FAKE"));
 }
 #endif
 
@@ -694,12 +694,12 @@ static WRITE16_HANDLER(mcu_w)
 
 static WRITE16_HANDLER( mcu_halt_assert_w )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 }
 
 static WRITE16_HANDLER( mcu_halt_clear_w )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 

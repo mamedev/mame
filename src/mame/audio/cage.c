@@ -381,7 +381,7 @@ static READ32_HANDLER( tms32031_io_r )
 	}
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s read -> %08X\n", cpu_get_pc(machine->activecpu), register_names[offset & 0x7f], result);
+		logerror("CAGE:%06X:%s read -> %08X\n", cpu_get_pc(space->cpu), register_names[offset & 0x7f], result);
 	return result;
 }
 
@@ -391,7 +391,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 	COMBINE_DATA(&tms32031_io_regs[offset]);
 
 	if (LOG_32031_IOPORTS)
-		logerror("CAGE:%06X:%s write = %08X\n", cpu_get_pc(machine->activecpu), register_names[offset & 0x7f], tms32031_io_regs[offset]);
+		logerror("CAGE:%06X:%s write = %08X\n", cpu_get_pc(space->cpu), register_names[offset & 0x7f], tms32031_io_regs[offset]);
 
 	switch (offset)
 	{
@@ -474,10 +474,10 @@ static void update_control_lines(running_machine *machine)
 static READ32_HANDLER( cage_from_main_r )
 {
 	if (LOG_COMM)
-		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(machine->activecpu), cage_from_main);
+		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(space->cpu), cage_from_main);
 	cpu_to_cage_ready = 0;
-	update_control_lines(machine);
-	cpu_set_input_line(machine->cpu[cage_cpu], TMS32031_IRQ0, CLEAR_LINE);
+	update_control_lines(space->machine);
+	cpu_set_input_line(space->machine->cpu[cage_cpu], TMS32031_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
 
@@ -485,17 +485,17 @@ static READ32_HANDLER( cage_from_main_r )
 static WRITE32_HANDLER( cage_from_main_ack_w )
 {
 	if (LOG_COMM)
-		logerror("%06X:CAGE ack command = %04X\n", cpu_get_pc(machine->activecpu), cage_from_main);
+		logerror("%06X:CAGE ack command = %04X\n", cpu_get_pc(space->cpu), cage_from_main);
 }
 
 
 static WRITE32_HANDLER( cage_to_main_w )
 {
 	if (LOG_COMM)
-		logerror("%06X:Data from CAGE = %04X\n", cpu_get_pc(machine->activecpu), data);
-	soundlatch_word_w(machine, 0, data, mem_mask);
+		logerror("%06X:Data from CAGE = %04X\n", cpu_get_pc(space->cpu), data);
+	soundlatch_word_w(space, 0, data, mem_mask);
 	cage_to_cpu_ready = 1;
-	update_control_lines(machine);
+	update_control_lines(space->machine);
 }
 
 
@@ -590,7 +590,7 @@ void cage_control_w(running_machine *machine, UINT16 data)
 
 static WRITE32_HANDLER( speedup_w )
 {
-	cpu_eat_cycles(machine->activecpu, 100);
+	cpu_eat_cycles(space->cpu, 100);
 	COMBINE_DATA(&speedup_ram[offset]);
 }
 

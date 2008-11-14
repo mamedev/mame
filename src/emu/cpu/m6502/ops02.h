@@ -64,8 +64,8 @@
 
 #define PPC m6502->ppc.d
 
-#define RDMEM_ID(a)		m6502->rdmem_id(Machine,a)
-#define WRMEM_ID(a,d)	m6502->wrmem_id(Machine,a,d)
+#define RDMEM_ID(a)		m6502->rdmem_id(m6502->space,a)
+#define WRMEM_ID(a,d)	m6502->wrmem_id(m6502->space,a,d)
 
 #define CHANGE_PC change_pc(PCD)
 

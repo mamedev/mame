@@ -22,23 +22,23 @@ READ8_HANDLER( cchasm_snd_io_r )
     switch (offset & 0x61 )
     {
     case 0x00:
-        coin = (input_port_read(machine, "IN3") >> 4) & 0x7;
+        coin = (input_port_read(space->machine, "IN3") >> 4) & 0x7;
         if (coin != 0x7) coin |= 0x8;
         return sound_flags | coin;
 
     case 0x01:
-        return ay8910_read_port_0_r (machine, offset);
+        return ay8910_read_port_0_r (space->machine, offset);
 
     case 0x21:
-        return ay8910_read_port_1_r (machine, offset);
+        return ay8910_read_port_1_r (space->machine, offset);
 
     case 0x40:
-        return soundlatch_r (machine, offset);
+        return soundlatch_r (space->machine, offset);
 
     case 0x41:
         sound_flags &= ~0x80;
         z80ctc_trg2_w(ctc, 0, 0);
-        return soundlatch2_r (machine, offset);
+        return soundlatch2_r (space->machine, offset);
     default:
         logerror("Read from unmapped internal IO device at 0x%x\n", offset + 0x6000);
         return 0;
@@ -50,29 +50,29 @@ WRITE8_HANDLER( cchasm_snd_io_w )
     switch (offset & 0x61 )
     {
     case 0x00:
-        ay8910_control_port_0_w (machine, offset, data);
+        ay8910_control_port_0_w (space->machine, offset, data);
         break;
 
     case 0x01:
-        ay8910_write_port_0_w (machine, offset, data);
+        ay8910_write_port_0_w (space->machine, offset, data);
         break;
 
     case 0x20:
-        ay8910_control_port_1_w (machine, offset, data);
+        ay8910_control_port_1_w (space->machine, offset, data);
         break;
 
     case 0x21:
-        ay8910_write_port_1_w (machine, offset, data);
+        ay8910_write_port_1_w (space->machine, offset, data);
         break;
 
     case 0x40:
-        soundlatch3_w (machine, offset, data);
+        soundlatch3_w (space->machine, offset, data);
         break;
 
     case 0x41:
         sound_flags |= 0x40;
-        soundlatch4_w (machine, offset, data);
-        cpu_set_input_line(machine->cpu[0], 1, HOLD_LINE);
+        soundlatch4_w (space->machine, offset, data);
+        cpu_set_input_line(space->machine->cpu[0], 1, HOLD_LINE);
         break;
 
     case 0x61:
@@ -94,13 +94,13 @@ WRITE16_HANDLER( cchasm_io_w )
 		switch (offset & 0xf)
 		{
 		case 0:
-			soundlatch_w (machine, offset, data);
+			soundlatch_w (space->machine, offset, data);
 			break;
 		case 1:
 			sound_flags |= 0x80;
-			soundlatch2_w (machine, offset, data);
+			soundlatch2_w (space->machine, offset, data);
 			z80ctc_trg2_w (ctc, 0, 1);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 			break;
 		case 2:
 			led = data;
@@ -114,16 +114,16 @@ READ16_HANDLER( cchasm_io_r )
 	switch (offset & 0xf)
 	{
 	case 0x0:
-		return soundlatch3_r (machine, offset) << 8;
+		return soundlatch3_r (space->machine, offset) << 8;
 	case 0x1:
 		sound_flags &= ~0x40;
-		return soundlatch4_r (machine,offset) << 8;
+		return soundlatch4_r (space->machine,offset) << 8;
 	case 0x2:
-		return (sound_flags| (input_port_read(machine, "IN3") & 0x07) | 0x08) << 8;
+		return (sound_flags| (input_port_read(space->machine, "IN3") & 0x07) | 0x08) << 8;
 	case 0x5:
-		return input_port_read(machine, "IN2") << 8;
+		return input_port_read(space->machine, "IN2") << 8;
 	case 0x8:
-		return input_port_read(machine, "IN1") << 8;
+		return input_port_read(space->machine, "IN1") << 8;
 	default:
 		return 0xff << 8;
 	}

@@ -38,7 +38,7 @@ DISCRETE_SOUND_END
 
 WRITE8_HANDLER( blockade_sound_freq_w )
 {
-	discrete_sound_w(machine,BLOCKADE_NOTE_DATA, data);
+	discrete_sound_w(space,BLOCKADE_NOTE_DATA, data);
     return;
 }
 

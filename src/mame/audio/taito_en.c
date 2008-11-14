@@ -36,7 +36,7 @@ WRITE16_HANDLER(f3_68000_share_w)
 
 WRITE16_HANDLER( f3_es5505_bank_w )
 {
-	UINT32 max_banks_this_game=(memory_region_length(machine, "ensoniq.0")/0x200000)-1;
+	UINT32 max_banks_this_game=(memory_region_length(space->machine, "ensoniq.0")/0x200000)-1;
 
 #if 0
 {
@@ -97,7 +97,7 @@ READ16_HANDLER(f3_68681_r)
 
 	/* IRQ ack */
 	if (offset==0xf) {
-		cpu_set_input_line(machine->cpu[1], 6, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 6, CLEAR_LINE);
 		return 0;
 	}
 
@@ -166,7 +166,7 @@ WRITE16_HANDLER(f3_68681_w)
 
 READ16_HANDLER(es5510_dsp_r)
 {
-//  logerror("%06x: DSP read offset %04x (data is %04x)\n",cpu_get_pc(machine->activecpu),offset,es5510_dsp_ram[offset]);
+//  logerror("%06x: DSP read offset %04x (data is %04x)\n",cpu_get_pc(space->cpu),offset,es5510_dsp_ram[offset]);
 //  if (es_tmp) return es5510_dsp_ram[offset];
 /*
     switch (offset) {
@@ -178,7 +178,7 @@ READ16_HANDLER(es5510_dsp_r)
 */
 //  offset<<=1;
 
-//if (offset<7 && es5510_dsp_ram[0]!=0xff) return mame_rand(machine)%0xffff;
+//if (offset<7 && es5510_dsp_ram[0]!=0xff) return mame_rand(space->machine)%0xffff;
 
 	if (offset==0x12) return 0;
 
@@ -190,10 +190,10 @@ READ16_HANDLER(es5510_dsp_r)
 
 WRITE16_HANDLER(es5510_dsp_w)
 {
-	UINT8 *snd_mem = (UINT8 *)memory_region(machine, "ensoniq.0");
+	UINT8 *snd_mem = (UINT8 *)memory_region(space->machine, "ensoniq.0");
 
 //  if (offset>4 && offset!=0x80  && offset!=0xa0  && offset!=0xc0  && offset!=0xe0)
-//      logerror("%06x: DSP write offset %04x %04x\n",cpu_get_pc(machine->activecpu),offset,data);
+//      logerror("%06x: DSP write offset %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
 
 	COMBINE_DATA(&es5510_dsp_ram[offset]);
 

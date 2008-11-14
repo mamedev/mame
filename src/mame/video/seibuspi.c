@@ -207,8 +207,8 @@ WRITE32_HANDLER( palette_dma_start_w )
 			UINT32 color = spimainram[(video_dma_address / 4) + i - 0x200];
 			if (palette_ram[i] != color) {
 				palette_ram[i] = color;
-				palette_set_color_rgb( machine, (i * 2), pal5bit(palette_ram[i] >> 0), pal5bit(palette_ram[i] >> 5), pal5bit(palette_ram[i] >> 10) );
-				palette_set_color_rgb( machine, (i * 2) + 1, pal5bit(palette_ram[i] >> 16), pal5bit(palette_ram[i] >> 21), pal5bit(palette_ram[i] >> 26) );
+				palette_set_color_rgb( space->machine, (i * 2), pal5bit(palette_ram[i] >> 0), pal5bit(palette_ram[i] >> 5), pal5bit(palette_ram[i] >> 10) );
+				palette_set_color_rgb( space->machine, (i * 2) + 1, pal5bit(palette_ram[i] >> 16), pal5bit(palette_ram[i] >> 21), pal5bit(palette_ram[i] >> 26) );
 			}
 		}
 	}

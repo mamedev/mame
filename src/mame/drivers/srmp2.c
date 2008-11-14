@@ -198,7 +198,7 @@ static WRITE16_HANDLER( srmp2_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	UINT8 *ROM = memory_region(machine, "adpcm");
+	UINT8 *ROM = memory_region(space->machine, "adpcm");
 
 	srmp2_adpcm_sptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	srmp2_adpcm_eptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -221,7 +221,7 @@ static WRITE8_HANDLER( srmp3_adpcm_code_w )
       table and plays the ADPCM for itself.
 */
 
-	UINT8 *ROM = memory_region(machine, "adpcm");
+	UINT8 *ROM = memory_region(space->machine, "adpcm");
 
 	srmp2_adpcm_sptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 0)] << 8);
 	srmp2_adpcm_eptr = (ROM[((srmp2_adpcm_bank * 0x10000) + (data << 2) + 1)] << 8);
@@ -305,7 +305,7 @@ static READ16_HANDLER( srmp2_input_1_r )
 
 			for (t = 0 ; t < 8 ; t ++)
 			{
-				if (!(input_port_read(machine, keynames[j]) & ( 1 << t )))
+				if (!(input_port_read(space->machine, keynames[j]) & ( 1 << t )))
 				{
 					return (i + t);
 				}
@@ -314,7 +314,7 @@ static READ16_HANDLER( srmp2_input_1_r )
 	}
 	else								/* Analizer and memory reset keys */
 	{
-		return input_port_read(machine, "SERVICE");
+		return input_port_read(space->machine, "SERVICE");
 	}
 
 	return 0xffff;
@@ -366,7 +366,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
     xxx- ---- : ADPCM ROM bank
 */
 
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	int addr;
 
 	srmp2_adpcm_bank = ((data & 0xe0) >> 5);
@@ -472,7 +472,7 @@ static WRITE8_HANDLER( srmp3_input_1_w )
     ---- -x-- : Player 2 side flag ?
 */
 
-	logerror("PC:%04X DATA:%02X  srmp3_input_1_w\n", cpu_get_pc(machine->activecpu), data);
+	logerror("PC:%04X DATA:%02X  srmp3_input_1_w\n", cpu_get_pc(space->cpu), data);
 
 	srmp2_port_select = 0;
 
@@ -496,7 +496,7 @@ static WRITE8_HANDLER( srmp3_input_2_w )
 
 	/* Key matrix reading related ? */
 
-	logerror("PC:%04X DATA:%02X  srmp3_input_2_w\n", cpu_get_pc(machine->activecpu), data);
+	logerror("PC:%04X DATA:%02X  srmp3_input_2_w\n", cpu_get_pc(space->cpu), data);
 
 	srmp2_port_select = 1;
 
@@ -514,12 +514,12 @@ static READ8_HANDLER( srmp3_input_r )
 	int keydata = 0xff;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3" };
 
-	logerror("PC:%04X          srmp3_input_r\n", cpu_get_pc(machine->activecpu));
+	logerror("PC:%04X          srmp3_input_r\n", cpu_get_pc(space->cpu));
 
 	// PC:0x8903    ROM:0xC903
 	// PC:0x7805    ROM:0x7805
 
-	if ((cpu_get_pc(machine->activecpu) == 0x8903) || (cpu_get_pc(machine->activecpu) == 0x7805))	/* Panel keys */
+	if ((cpu_get_pc(space->cpu) == 0x8903) || (cpu_get_pc(space->cpu) == 0x7805))	/* Panel keys */
 	{
 		int i, j, t;
 
@@ -529,7 +529,7 @@ static READ8_HANDLER( srmp3_input_r )
 
 			for (t = 0 ; t < 8 ; t ++)
 			{
-				if (!(input_port_read(machine, keynames[j]) & ( 1 << t )))
+				if (!(input_port_read(space->machine, keynames[j]) & ( 1 << t )))
 				{
 					keydata = (i + t);
 				}
@@ -540,9 +540,9 @@ static READ8_HANDLER( srmp3_input_r )
 	// PC:0x8926    ROM:0xC926
 	// PC:0x7822    ROM:0x7822
 
-	if ((cpu_get_pc(machine->activecpu) == 0x8926) || (cpu_get_pc(machine->activecpu) == 0x7822))	/* Analizer and memory reset keys */
+	if ((cpu_get_pc(space->cpu) == 0x8926) || (cpu_get_pc(space->cpu) == 0x7822))	/* Analizer and memory reset keys */
 	{
-		keydata = input_port_read(machine, "SERVICE");
+		keydata = input_port_read(space->machine, "SERVICE");
 	}
 
 	return keydata;

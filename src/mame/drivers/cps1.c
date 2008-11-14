@@ -242,14 +242,14 @@ Stephh's log (2006.09.20) :
 READ16_HANDLER( cps1_dsw_r )
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
-	int in = input_port_read(machine, dswname[offset]);
+	int in = input_port_read(space->machine, dswname[offset]);
 	return (in << 8) | 0xff;
 }
 
 static READ16_HANDLER( cps1_hack_dsw_r )
 {
 	static const char *const dswname[] = { "IN0", "DSWA", "DSWB", "DSWC" };
-	int in = input_port_read(machine, dswname[offset]);
+	int in = input_port_read(space->machine, dswname[offset]);
 	return (in << 8) | in;
 }
 
@@ -257,28 +257,28 @@ static int dial[2];
 
 static READ16_HANDLER( forgottn_dial_0_r )
 {
-	return ((input_port_read(machine, "DIAL0") - dial[0]) >> (8*offset)) & 0xff;
+	return ((input_port_read(space->machine, "DIAL0") - dial[0]) >> (8*offset)) & 0xff;
 }
 
 static READ16_HANDLER( forgottn_dial_1_r )
 {
-	return ((input_port_read(machine, "DIAL1") - dial[1]) >> (8*offset)) & 0xff;
+	return ((input_port_read(space->machine, "DIAL1") - dial[1]) >> (8*offset)) & 0xff;
 }
 
 static WRITE16_HANDLER( forgottn_dial_0_reset_w )
 {
-	dial[0] = input_port_read(machine, "DIAL0");
+	dial[0] = input_port_read(space->machine, "DIAL0");
 }
 
 static WRITE16_HANDLER( forgottn_dial_1_reset_w )
 {
-	dial[1] = input_port_read(machine, "DIAL1");
+	dial[1] = input_port_read(space->machine, "DIAL1");
 }
 
 
 static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 	int bankaddr;
 
 	bankaddr = ((data & 1) * 0x4000);
@@ -293,13 +293,13 @@ static WRITE8_HANDLER( cps1_oki_pin7_w )
 static WRITE16_HANDLER( cps1_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(machine,0,data & 0xff);
+		soundlatch_w(space,0,data & 0xff);
 }
 
 static WRITE16_HANDLER( cps1_soundlatch2_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch2_w(machine,0,data & 0xff);
+		soundlatch2_w(space,0,data & 0xff);
 }
 
 WRITE16_HANDLER( cps1_coinctrl_w )
@@ -350,12 +350,12 @@ INTERRUPT_GEN( cps1_qsound_interrupt )
 
 static READ16_HANDLER( qsound_rom_r )
 {
-	UINT8 *rom = memory_region(machine, "user1");
+	UINT8 *rom = memory_region(space->machine, "user1");
 
 	if (rom) return rom[offset] | 0xff00;
 	else
 	{
-		popmessage("%06x: read sound ROM byte %04x",cpu_get_pc(machine->activecpu),offset);
+		popmessage("%06x: read sound ROM byte %04x",cpu_get_pc(space->cpu),offset);
 		return 0;
 	}
 }
@@ -388,9 +388,9 @@ static WRITE8_HANDLER( qsound_banksw_w )
     Z80 bank register for music note data. It's odd that it isn't encrypted
     though.
     */
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 	int bankaddress=0x10000+((data&0x0f)*0x4000);
-	if (bankaddress >= memory_region_length(machine, "audio"))
+	if (bankaddress >= memory_region_length(space->machine, "audio"))
 	{
 		logerror("WARNING: Q sound bank overflow (%02x)\n", data);
 		bankaddress=0x10000;

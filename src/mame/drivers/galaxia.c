@@ -100,7 +100,7 @@ static VIDEO_UPDATE( galaxia )
 
 static WRITE8_HANDLER(galaxia_video_w)
 {
-	if (cpu_get_reg(machine->activecpu, S2650_FO))
+	if (cpu_get_reg(space->cpu, S2650_FO))
 	{
 		galaxia_video[offset]=data;
 	}

@@ -115,16 +115,16 @@ static INTERRUPT_GEN( redalert_vblank_interrupt )
 
 static READ8_HANDLER( redalert_interrupt_clear_r )
 {
-	cpu_set_input_line(machine->cpu[0], M6502_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], M6502_IRQ_LINE, CLEAR_LINE);
 
 	/* the result never seems to be actually used */
-	return video_screen_get_vpos(machine->primary_screen);
+	return video_screen_get_vpos(space->machine->primary_screen);
 }
 
 
 static WRITE8_HANDLER( redalert_interrupt_clear_w )
 {
-	redalert_interrupt_clear_r(machine, 0);
+	redalert_interrupt_clear_r(space, 0);
 }
 
 

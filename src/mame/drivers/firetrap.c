@@ -90,7 +90,7 @@ static WRITE8_HANDLER( firetrap_nmi_disable_w )
 static WRITE8_HANDLER( firetrap_bankselect_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
 	memory_set_bankptr(1,&RAM[bankaddress]);
@@ -101,7 +101,7 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
-	if ((input_port_read(machine, "IN2") & 0x70) != 0x70) return 0xff;
+	if ((input_port_read(space->machine, "IN2") & 0x70) != 0x70) return 0xff;
 	return 0;
 }
 
@@ -114,7 +114,7 @@ static MACHINE_RESET( firetrap )
 
 static READ8_HANDLER( firetrap_8751_r )
 {
-	//logerror("PC:%04x read from 8751\n",cpu_get_pc(machine->activecpu));
+	//logerror("PC:%04x read from 8751\n",cpu_get_pc(space->cpu));
 	return i8751_return;
 }
 
@@ -146,7 +146,7 @@ static WRITE8_HANDLER( firetrap_8751_w )
 	if (data==0x26) {
 		i8751_current_command=0;
 		i8751_return=0xff; /* This value is XOR'd and must equal 0 */
-		cpu_set_input_line_and_vector(machine->cpu[0],0,HOLD_LINE,0xff);
+		cpu_set_input_line_and_vector(space->machine->cpu[0],0,HOLD_LINE,0xff);
 		return;
 	}
 
@@ -189,18 +189,18 @@ static WRITE8_HANDLER( firetrap_8751_w )
 		i8751_return=3;
 	else {
 		i8751_return=0xff;
-		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(machine->activecpu),data);
+		logerror("%04x: Unknown i8751 command %02x!\n",cpu_get_pc(space->cpu),data);
 	}
 
 	/* Signal main cpu task is complete */
-	cpu_set_input_line_and_vector(machine->cpu[0],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[0],0,HOLD_LINE,0xff);
 	i8751_current_command=data;
 }
 
 static WRITE8_HANDLER( firetrap_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_sound_2400_w )
@@ -212,7 +212,7 @@ static WRITE8_HANDLER( firetrap_sound_2400_w )
 static WRITE8_HANDLER( firetrap_sound_bankselect_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
 	memory_set_bankptr(2,&RAM[bankaddress]);

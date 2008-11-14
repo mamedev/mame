@@ -166,7 +166,7 @@ static WRITE8_HANDLER( vsnes_coin_counter_w )
 	coin = data;
 	if( data & 0xfe ) //"bnglngby" and "cluclu"
 	{
-		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(machine->activecpu), data);
+		logerror("vsnes_coin_counter_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(space->cpu), data);
 	}
 }
 
@@ -182,7 +182,7 @@ static WRITE8_HANDLER( vsnes_coin_counter_1_w )
 	if( data & 0xfe ) //vsbball service mode
 	{
 		//do something?
-		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(machine->activecpu), data);
+		logerror("vsnes_coin_counter_1_w: pc = 0x%04x - data = 0x%02x\n", cpu_get_pc(space->cpu), data);
 	}
 
 }
@@ -190,32 +190,32 @@ static WRITE8_HANDLER( vsnes_coin_counter_1_w )
 
 static READ8_HANDLER( psg_4015_r )
 {
-	return nes_psg_0_r(machine, 0x15);
+	return nes_psg_0_r(space, 0x15);
 }
 
 static WRITE8_HANDLER( psg_4015_w )
 {
-	nes_psg_0_w(machine, 0x15, data);
+	nes_psg_0_w(space, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg_4017_w )
 {
-	nes_psg_0_w(machine, 0x17, data);
+	nes_psg_0_w(space, 0x17, data);
 }
 
 static READ8_HANDLER( psg1_4015_r )
 {
-	return nes_psg_1_r(machine, 0x15);
+	return nes_psg_1_r(space, 0x15);
 }
 
 static WRITE8_HANDLER( psg1_4015_w )
 {
-	nes_psg_1_w(machine, 0x15, data);
+	nes_psg_1_w(space, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg1_4017_w )
 {
-	nes_psg_1_w(machine, 0x17, data);
+	nes_psg_1_w(space, 0x17, data);
 }
 
 static ADDRESS_MAP_START( vsnes_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )

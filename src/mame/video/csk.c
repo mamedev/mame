@@ -41,14 +41,14 @@ WRITE8_HANDLER( cpk_palette2_w )
 	cpk_palette2[offset] = data;
 
 	newword = cpk_palette[offset] + 256 * cpk_palette2[offset];
-	palette_set_color_rgb(machine,offset,pal5bit(newword >> 0),pal5bit(newword >> 5),pal5bit(newword >> 10));
+	palette_set_color_rgb(space->machine,offset,pal5bit(newword >> 0),pal5bit(newword >> 5),pal5bit(newword >> 10));
 }
 
 /* Video handling */
 
 READ8_HANDLER( cpk_expansion_r )
 {
-	UINT8 * RAM = memory_region(machine, "gfx3");
+	UINT8 * RAM = memory_region(space->machine, "gfx3");
 	return RAM[offset];
 }
 

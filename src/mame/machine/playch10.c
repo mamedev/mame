@@ -104,18 +104,18 @@ WRITE8_HANDLER( pc10_DOGDI_w )
 
 WRITE8_HANDLER( pc10_GAMERES_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_GAMESTOP_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ( data & 1 ) ? CLEAR_LINE : ASSERT_LINE );
 }
 
 WRITE8_HANDLER( pc10_PPURES_w )
 {
 	if ( data & 1 )
-		ppu2c0x_reset( machine, 0, /* video_screen_get_scan_period(machine->primary_screen) * */ 1 );
+		ppu2c0x_reset( space->machine, 0, /* video_screen_get_scan_period(space->machine->primary_screen) * */ 1 );
 }
 
 READ8_HANDLER( pc10_detectclr_r )
@@ -144,10 +144,10 @@ READ8_HANDLER( pc10_prot_r )
 	/* we only support a single cart connected at slot 0 */
 	if ( cart_sel == 0 )
 	{
-		RP5H01_0_enable_w( machine, 0, 0 );
+		RP5H01_0_enable_w( space->machine, 0, 0 );
 		data |= ( ( ~RP5H01_counter_r( 0 ) ) << 4 ) & 0x10;	/* D4 */
 		data |= ( ( RP5H01_data_r( 0 ) ) << 3 ) & 0x08;		/* D3 */
-		RP5H01_0_enable_w( machine, 0, 1 );
+		RP5H01_0_enable_w( space->machine, 0, 1 );
 	}
 	return data;
 }
@@ -157,18 +157,18 @@ WRITE8_HANDLER( pc10_prot_w )
 	/* we only support a single cart connected at slot 0 */
 	if ( cart_sel == 0 )
 	{
-		RP5H01_0_enable_w( machine, 0, 0 );
-		RP5H01_0_test_w( machine, 0, data & 0x10 );		/* D4 */
-		RP5H01_0_clock_w( machine, 0, data & 0x08 );		/* D3 */
-		RP5H01_0_reset_w( machine, 0, ~data & 0x01 );	/* D0 */
-		RP5H01_0_enable_w( machine, 0, 1 );
+		RP5H01_0_enable_w( space->machine, 0, 0 );
+		RP5H01_0_test_w( space->machine, 0, data & 0x10 );		/* D4 */
+		RP5H01_0_clock_w( space->machine, 0, data & 0x08 );		/* D3 */
+		RP5H01_0_reset_w( space->machine, 0, ~data & 0x01 );	/* D0 */
+		RP5H01_0_enable_w( space->machine, 0, 1 );
 
 		/* this thing gets dense at some point                      */
 		/* it wants to jump and execute an opcode at $ffff, wich    */
 		/* is the actual protection memory area                     */
 		/* setting the whole 0x2000 region every time is a waste    */
 		/* so we just set $ffff with the current value              */
-		memory_region( machine, "main" )[0xffff] = pc10_prot_r(machine,0);
+		memory_region( space->machine, "main" )[0xffff] = pc10_prot_r(space,0);
 	}
 }
 
@@ -185,8 +185,8 @@ WRITE8_HANDLER( pc10_in0_w )
 		return;
 
 	/* load up the latches */
-	input_latch[0] = input_port_read(machine, "P1");
-	input_latch[1] = input_port_read(machine, "P2");
+	input_latch[0] = input_port_read(space->machine, "P1");
+	input_latch[1] = input_port_read(space->machine, "P2");
 
 	/* apply any masking from the BIOS */
 	if ( cntrl_mask )
@@ -220,9 +220,9 @@ READ8_HANDLER( pc10_in1_r )
 	/* do the gun thing */
 	if ( pc10_gun_controller )
 	{
-		int trigger = input_port_read(machine, "P1");
-		int x = input_port_read(machine, "GUNX");
-		int y = input_port_read(machine, "GUNY");
+		int trigger = input_port_read(space->machine, "P1");
+		int x = input_port_read(space->machine, "GUNX");
+		int y = input_port_read(space->machine, "GUNY");
 		UINT32 pix, color_base;
 
 		/* no sprite hit (yet) */
@@ -399,7 +399,7 @@ static WRITE8_HANDLER( mmc1_rom_switch_w )
 			case 3:	/* program banking */
 				{
 					int bank = ( mmc1_shiftreg & mmc1_rom_mask ) * 0x4000;
-					UINT8 *prg = memory_region( machine, "cart" );
+					UINT8 *prg = memory_region( space->machine, "cart" );
 
 					if ( !size16k )
 					{
@@ -454,7 +454,7 @@ DRIVER_INIT( pcaboard )
 static WRITE8_HANDLER( bboard_rom_switch_w )
 {
 	int bankoffset = 0x10000 + ( ( data & 7 ) * 0x4000 );
-	UINT8 *prg = memory_region( machine, "cart" );
+	UINT8 *prg = memory_region( space->machine, "cart" );
 
 	memcpy( &prg[0x08000], &prg[bankoffset], 0x4000 );
 }
@@ -565,7 +565,7 @@ static WRITE8_HANDLER( eboard_rom_switch_w )
 		case 0x2000: /* code bank switching */
 			{
 				int bankoffset = 0x10000 + ( data & 0x0f ) * 0x2000;
-				UINT8 *prg = memory_region( machine, "cart" );
+				UINT8 *prg = memory_region( space->machine, "cart" );
 				memcpy( &prg[0x08000], &prg[bankoffset], 0x2000 );
 			}
 		break;
@@ -691,7 +691,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 			if ( gboard_last_bank != ( data & 0xc0 ) )
 			{
 				int bank;
-				UINT8 *prg = memory_region( machine, "cart" );
+				UINT8 *prg = memory_region( space->machine, "cart" );
 
 				/* reset the banks */
 				if ( gboard_command & 0x40 )
@@ -744,7 +744,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 
 					case 6: /* program banking */
 					{
-						UINT8 *prg = memory_region( machine, "cart" );
+						UINT8 *prg = memory_region( space->machine, "cart" );
 						if ( gboard_command & 0x40 )
 						{
 							/* high bank */
@@ -769,7 +769,7 @@ static WRITE8_HANDLER( gboard_rom_switch_w )
 					case 7: /* program banking */
 						{
 							/* mid bank */
-							UINT8 *prg = memory_region( machine, "cart" );
+							UINT8 *prg = memory_region( space->machine, "cart" );
 							gboard_banks[1] = data & 0x1f;
 							bank = gboard_banks[1] * 0x2000 + 0x10000;
 
@@ -854,7 +854,7 @@ DRIVER_INIT( pcgboard_type2 )
 static WRITE8_HANDLER( iboard_rom_switch_w )
 {
 	int bank = data & 7;
-	UINT8 *prg = memory_region( machine, "cart" );
+	UINT8 *prg = memory_region( space->machine, "cart" );
 
 	if ( data & 0x10 )
 		ppu2c0x_set_mirroring( 0, PPU_MIRROR_HIGH );
@@ -925,7 +925,7 @@ static WRITE8_HANDLER( hboard_rom_switch_w )
 				}
 			}
 	};
-	gboard_rom_switch_w(machine,offset,data);
+	gboard_rom_switch_w(space,offset,data);
 };
 
 

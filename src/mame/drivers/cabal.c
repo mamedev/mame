@@ -91,7 +91,7 @@ static WRITE16_HANDLER( track_reset_w )
 	static const char *const track_names[] = { "IN0", "IN1", "IN2", "IN3" };
 
 	for (i = 0; i < 4; i++)
-		last[i] = input_port_read(machine, track_names[i]);
+		last[i] = input_port_read(space->machine, track_names[i]);
 }
 
 static READ16_HANDLER( track_r )
@@ -99,25 +99,25 @@ static READ16_HANDLER( track_r )
 	switch (offset)
 	{
 		default:
-		case 0:	return (( input_port_read(machine, "IN0") - last[0]) & 0x00ff)		 | (((input_port_read(machine, "IN2") - last[2]) & 0x00ff) << 8);	/* X lo */
-		case 1:	return (((input_port_read(machine, "IN0") - last[0]) & 0xff00) >> 8) | (( input_port_read(machine, "IN2") - last[2]) & 0xff00);			/* X hi */
-		case 2:	return (( input_port_read(machine, "IN1") - last[1]) & 0x00ff)		 | (((input_port_read(machine, "IN3") - last[3]) & 0x00ff) << 8);	/* Y lo */
-		case 3:	return (((input_port_read(machine, "IN1") - last[1]) & 0xff00) >> 8) | (( input_port_read(machine, "IN3") - last[3]) & 0xff00);			/* Y hi */
+		case 0:	return (( input_port_read(space->machine, "IN0") - last[0]) & 0x00ff)		 | (((input_port_read(space->machine, "IN2") - last[2]) & 0x00ff) << 8);	/* X lo */
+		case 1:	return (((input_port_read(space->machine, "IN0") - last[0]) & 0xff00) >> 8) | (( input_port_read(space->machine, "IN2") - last[2]) & 0xff00);			/* X hi */
+		case 2:	return (( input_port_read(space->machine, "IN1") - last[1]) & 0x00ff)		 | (((input_port_read(space->machine, "IN3") - last[3]) & 0x00ff) << 8);	/* Y lo */
+		case 3:	return (((input_port_read(space->machine, "IN1") - last[1]) & 0xff00) >> 8) | (( input_port_read(space->machine, "IN3") - last[3]) & 0xff00);			/* Y hi */
 	}
 }
 
 
 static WRITE16_HANDLER( cabal_sound_irq_trigger_word_w )
 {
-	seibu_main_word_w(machine,4,data,mem_mask);
+	seibu_main_word_w(space,4,data,mem_mask);
 
 	/* spin for a while to let the Z80 read the command, otherwise coins "stick" */
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(50));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));
 }
 
 static WRITE16_HANDLER( cabalbl_sound_irq_trigger_word_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 

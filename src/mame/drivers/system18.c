@@ -187,8 +187,8 @@ static UINT8* shdancbl_soundbank_ptr = NULL;		/* Pointer to currently selected p
 
 static WRITE16_HANDLER( sound_command_irq_w ){
 	if( ACCESSING_BITS_0_7 ){
-		soundlatch_w( machine,0,data&0xff );
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
+		soundlatch_w( space->machine,0,data&0xff );
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
 	}
 }
 
@@ -200,7 +200,7 @@ static READ8_HANDLER( shdancbl_soundbank_r )
 
 static WRITE8_HANDLER( shdancbl_bankctrl_w )
 {
-	UINT8 *mem = memory_region(machine, "sound");
+	UINT8 *mem = memory_region(space->machine, "sound");
 
 	switch(data)
 	{
@@ -218,7 +218,7 @@ static WRITE8_HANDLER( shdancbl_bankctrl_w )
 			break;
 		default:
 			shdancbl_soundbank_ptr = NULL;
-			logerror("Invalid bank setting %02X (%04X)\n", data, cpu_get_pc(machine->activecpu));
+			logerror("Invalid bank setting %02X (%04X)\n", data, cpu_get_pc(space->cpu));
 			break;
 	}
 }
@@ -293,7 +293,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( sys18_soundbank_w )
 {
-	UINT8 *mem = memory_region(machine, "sound");
+	UINT8 *mem = memory_region(space->machine, "sound");
 	int rom = (data >> 6) & 3;
 	int bank = (data & 0x3f);
 	int mask = sys18_sound_info[rom*2+0];
@@ -321,8 +321,8 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( sound_command_nmi_w ){
 	if( ACCESSING_BITS_0_7 ){
-		soundlatch_w( machine,0,data&0xff );
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w( space->machine,0,data&0xff );
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -473,14 +473,14 @@ static READ16_HANDLER( sys18_io_r )
 						if(io_reg[0x0F] & 0x01)
 							return io_reg[0x00];
 						else
-							return input_port_read(machine, "P1");
+							return input_port_read(space->machine, "P1");
 						break;
 
 					case 0x01: /* Port B - 2P controls */
 						if(io_reg[0x0F] & 0x02)
 							return io_reg[0x01];
 						else
-							return input_port_read(machine, "P2");
+							return input_port_read(space->machine, "P2");
 						break;
 
 					case 0x02: /* Port C - Bidirectional I/O port */
@@ -501,21 +501,21 @@ static READ16_HANDLER( sys18_io_r )
 						if(io_reg[0x0F] & 0x10)
 							return io_reg[0x04];
 						else
-							return input_port_read(machine, "SERVICE");
+							return input_port_read(space->machine, "SERVICE");
 						break;
 
 					case 0x05: /* Port F - DIP switch #1 */
 						if(io_reg[0x0F] & 0x20)
 							return io_reg[0x05];
 						else
-							return input_port_read(machine, "DSW1");
+							return input_port_read(space->machine, "DSW1");
 						break;
 
 					case 0x06: /* Port G - DIP switch #2 */
 						if(io_reg[0x0F] & 0x40)
 							return io_reg[0x06];
 						else
-							return input_port_read(machine, "P3");
+							return input_port_read(space->machine, "P3");
 						break;
 
 					case 0x07: /* Port H - Tile banking control */
@@ -545,11 +545,11 @@ static READ16_HANDLER( sys18_io_r )
 				return -1;
 
 			case 0x2000/2: /* Unused */
-				logerror("read video control latch %06X (%06X)\n", offset, cpu_get_pc(machine->activecpu));
+				logerror("read video control latch %06X (%06X)\n", offset, cpu_get_pc(space->cpu));
 				return -1;
 
 			case 0x3000/2: /* Expansion connector */
-				logerror("read expansion area %06X (%06X)\n", offset, cpu_get_pc(machine->activecpu));
+				logerror("read expansion area %06X (%06X)\n", offset, cpu_get_pc(space->cpu));
 				return -1;
 		}
 	}
@@ -617,11 +617,11 @@ static WRITE16_HANDLER( sys18_io_w )
 				break;
 
 			case 0x2000/2: /* Video control latch */
-				logerror("write video control latch %06X = %04X (%06X)\n", offset, data, cpu_get_pc(machine->activecpu));
+				logerror("write video control latch %06X = %04X (%06X)\n", offset, data, cpu_get_pc(space->cpu));
 				break;
 
 			case 0x3000/2: /* Expansion connector */
-//              logerror("write expansion area %06X = %04X (%06X)\n", offset, data, cpu_get_pc(machine->activecpu));
+//              logerror("write expansion area %06X = %04X (%06X)\n", offset, data, cpu_get_pc(space->cpu));
 				break;
 		}
 	}
@@ -738,7 +738,7 @@ static MACHINE_RESET( shdancbl )
 }
 
 static READ16_HANDLER( shdancbl_skip_r ){
-	if (cpu_get_pc(machine->activecpu)==0x2f76) {cpu_spinuntil_int(machine->activecpu); return 0xffff;}
+	if (cpu_get_pc(space->cpu)==0x2f76) {cpu_spinuntil_int(space->cpu); return 0xffff;}
 	return sys16_workingram[0];
 }
 
@@ -771,7 +771,7 @@ static DRIVER_INIT( shdancbl )
 /***************************************************************************/
 
 static READ16_HANDLER( mwalkbl_skip_r ){
-	if (cpu_get_pc(machine->activecpu)==0x308a) {cpu_spinuntil_int(machine->activecpu); return 0xffff;}
+	if (cpu_get_pc(space->cpu)==0x308a) {cpu_spinuntil_int(space->cpu); return 0xffff;}
 	return sys16_workingram[0x202c/2];
 }
 

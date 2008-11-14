@@ -36,7 +36,7 @@ static PALETTE_INIT( sspeedr )
 
 static WRITE8_HANDLER( sspeedr_int_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

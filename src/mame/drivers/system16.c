@@ -275,7 +275,7 @@ static READ8_HANDLER( tturfbl_soundbank_r )
 
 static WRITE8_HANDLER( tturfbl_soundbank_w )
 {
-	UINT8 *mem = memory_region(machine, "sound");
+	UINT8 *mem = memory_region(space->machine, "sound");
 
 	switch(data)
 	{
@@ -299,7 +299,7 @@ static WRITE8_HANDLER( tturfbl_soundbank_w )
 			break;
 		default:
 			tturfbl_soundbank_ptr = NULL;
-			logerror("Invalid bank setting %02X (%04X)\n", data, cpu_get_pc(machine->activecpu));
+			logerror("Invalid bank setting %02X (%04X)\n", data, cpu_get_pc(space->cpu));
 			break;
 	}
 }
@@ -370,11 +370,11 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( upd7759_bank_w ) //*
 {
-	int offs, size = memory_region_length(machine, "sound") - 0x10000;
+	int offs, size = memory_region_length(space->machine, "sound") - 0x10000;
 
 	upd7759_reset_w(0, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	memory_set_bankptr(1, memory_region(machine, "sound") + offs);
+	memory_set_bankptr(1, memory_region(space->machine, "sound") + offs);
 }
 
 
@@ -391,8 +391,8 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if( ACCESSING_BITS_0_7 )
 {
-		soundlatch_w( machine,0,data&0xff );
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
+		soundlatch_w( space->machine,0,data&0xff );
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
 	}
 }
 
@@ -400,8 +400,8 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 {
 	if( ACCESSING_BITS_0_7 )
 {
-		soundlatch_w( machine,0,data&0xff );
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w( space->machine,0,data&0xff );
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -1168,11 +1168,11 @@ MACHINE_DRIVER_END
 /***************************************************************************/
 
 static READ16_HANDLER( ga_io_players_r ) {
-	return (input_port_read(machine, "P1") << 8) | input_port_read(machine, "P2");
+	return (input_port_read(space->machine, "P1") << 8) | input_port_read(space->machine, "P2");
 }
 static READ16_HANDLER( ga_io_service_r )
 {
-	return (input_port_read(machine,"SERVICE") << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
+	return (input_port_read(space->machine,"SERVICE") << 8) | (sys16_workingram[0x2c96/2] & 0x00ff);
 }
 
 static ADDRESS_MAP_START( goldnaxe_readmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1197,8 +1197,8 @@ static WRITE16_HANDLER( ga_sound_command_w )
 	COMBINE_DATA( &sys16_workingram[(0xecfc-0xc000)/2] );
 	if( ACCESSING_BITS_8_15 )
 {
-		soundlatch_w( machine,0,data>>8 );
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
+		soundlatch_w( space->machine,0,data>>8 );
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
 	}
 }
 
@@ -1346,36 +1346,36 @@ static int passht4b_io3_val;
 
 static READ16_HANDLER( passht4b_service_r )
 {
-	UINT16 val=input_port_read(machine, "SERVICE");
-	if(!(input_port_read(machine, "P1") & 0x40)) val&=0xef;
-	if(!(input_port_read(machine, "P2") & 0x40)) val&=0xdf;
-	if(!(input_port_read(machine, "P3") & 0x40)) val&=0xbf;
-	if(!(input_port_read(machine, "P4") & 0x40)) val&=0x7f;
+	UINT16 val=input_port_read(space->machine, "SERVICE");
+	if(!(input_port_read(space->machine, "P1") & 0x40)) val&=0xef;
+	if(!(input_port_read(space->machine, "P2") & 0x40)) val&=0xdf;
+	if(!(input_port_read(space->machine, "P3") & 0x40)) val&=0xbf;
+	if(!(input_port_read(space->machine, "P4") & 0x40)) val&=0x7f;
 
-	passht4b_io3_val=(input_port_read(machine, "P1") << 4) | (input_port_read(machine, "P3") & 0xf);
-	passht4b_io2_val=(input_port_read(machine, "P2") << 4) | (input_port_read(machine, "P4") & 0xf);
+	passht4b_io3_val=(input_port_read(space->machine, "P1") << 4) | (input_port_read(space->machine, "P3") & 0xf);
+	passht4b_io2_val=(input_port_read(space->machine, "P2") << 4) | (input_port_read(space->machine, "P4") & 0xf);
 
 	passht4b_io1_val=0xff;
 
 	// player 1 buttons
-	if(!(input_port_read(machine, "P1") & 0x10)) passht4b_io1_val &=0xfe;
-	if(!(input_port_read(machine, "P1") & 0x20)) passht4b_io1_val &=0xfd;
-	if(!(input_port_read(machine, "P1") & 0x80)) passht4b_io1_val &=0xfc;
+	if(!(input_port_read(space->machine, "P1") & 0x10)) passht4b_io1_val &=0xfe;
+	if(!(input_port_read(space->machine, "P1") & 0x20)) passht4b_io1_val &=0xfd;
+	if(!(input_port_read(space->machine, "P1") & 0x80)) passht4b_io1_val &=0xfc;
 
 	// player 2 buttons
-	if(!(input_port_read(machine, "P2") & 0x10)) passht4b_io1_val &=0xfb;
-	if(!(input_port_read(machine, "P2") & 0x20)) passht4b_io1_val &=0xf7;
-	if(!(input_port_read(machine, "P2") & 0x80)) passht4b_io1_val &=0xf3;
+	if(!(input_port_read(space->machine, "P2") & 0x10)) passht4b_io1_val &=0xfb;
+	if(!(input_port_read(space->machine, "P2") & 0x20)) passht4b_io1_val &=0xf7;
+	if(!(input_port_read(space->machine, "P2") & 0x80)) passht4b_io1_val &=0xf3;
 
 	// player 3 buttons
-	if(!(input_port_read(machine, "P3") & 0x10)) passht4b_io1_val &=0xef;
-	if(!(input_port_read(machine, "P3") & 0x20)) passht4b_io1_val &=0xdf;
-	if(!(input_port_read(machine, "P3") & 0x80)) passht4b_io1_val &=0xcf;
+	if(!(input_port_read(space->machine, "P3") & 0x10)) passht4b_io1_val &=0xef;
+	if(!(input_port_read(space->machine, "P3") & 0x20)) passht4b_io1_val &=0xdf;
+	if(!(input_port_read(space->machine, "P3") & 0x80)) passht4b_io1_val &=0xcf;
 
 	// player 4 buttons
-	if(!(input_port_read(machine, "P4") & 0x10)) passht4b_io1_val &=0xbf;
-	if(!(input_port_read(machine, "P4") & 0x20)) passht4b_io1_val &=0x7f;
-	if(!(input_port_read(machine, "P4") & 0x80)) passht4b_io1_val &=0x3f;
+	if(!(input_port_read(space->machine, "P4") & 0x10)) passht4b_io1_val &=0xbf;
+	if(!(input_port_read(space->machine, "P4") & 0x20)) passht4b_io1_val &=0x7f;
+	if(!(input_port_read(space->machine, "P4") & 0x80)) passht4b_io1_val &=0x3f;
 
 	return val;
 }
@@ -1728,13 +1728,13 @@ ADDRESS_MAP_END
 static READ16_HANDLER(beautyb_unk1_r)
 {
 
-	return mame_rand(machine);;
+	return mame_rand(space->machine);;
 }
 
 
 static READ16_HANDLER(beautyb_unk2_r)
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( beautyb_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1839,17 +1839,17 @@ MACHINE_DRIVER_END
 
 static READ16_HANDLER( tt_io_player1_r )
 {
-	return input_port_read(machine, "P1") << 8;
+	return input_port_read(space->machine, "P1") << 8;
 }
 
 static READ16_HANDLER( tt_io_player2_r )
 {
-	return input_port_read(machine, "P2") << 8;
+	return input_port_read(space->machine, "P2") << 8;
 }
 
 static READ16_HANDLER( tt_io_service_r )
 {
-	return input_port_read(machine, "SERVICE") << 8;
+	return input_port_read(space->machine, "SERVICE") << 8;
 }
 
 /*

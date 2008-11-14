@@ -113,7 +113,7 @@ static unsigned video_ram_address(void)
 
 static READ8_HANDLER( fgoal_analog_r )
 {
-	return input_port_read(machine, fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
+	return input_port_read(space->machine, fgoal_player ? "PADDLE1" : "PADDLE0"); /* PCB can be jumpered to use a single dial */
 }
 
 
@@ -126,7 +126,7 @@ static CUSTOM_INPUT( fgoal_80_r )
 
 static READ8_HANDLER( fgoal_nmi_reset_r )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 
 	return 0;
 }
@@ -134,7 +134,7 @@ static READ8_HANDLER( fgoal_nmi_reset_r )
 
 static READ8_HANDLER( fgoal_irq_reset_r )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 
 	return 0;
 }

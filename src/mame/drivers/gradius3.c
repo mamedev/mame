@@ -36,40 +36,40 @@ VIDEO_UPDATE( gradius3 );
 
 static READ16_HANDLER( K052109_halfword_r )
 {
-	return K052109_r(machine,offset);
+	return K052109_r(space,offset);
 }
 
 static WRITE16_HANDLER( K052109_halfword_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K052109_w(machine,offset,data & 0xff);
+		K052109_w(space,offset,data & 0xff);
 
 	/* is this a bug in the game or something else? */
 	if (!ACCESSING_BITS_0_7)
-		K052109_w(machine,offset,(data >> 8) & 0xff);
-//      logerror("%06x half %04x = %04x\n",cpu_get_pc(machine->activecpu),offset,data);
+		K052109_w(space,offset,(data >> 8) & 0xff);
+//      logerror("%06x half %04x = %04x\n",cpu_get_pc(space->cpu),offset,data);
 }
 
 static READ16_HANDLER( K051937_halfword_r )
 {
-	return K051937_r(machine,offset);
+	return K051937_r(space,offset);
 }
 
 static WRITE16_HANDLER( K051937_halfword_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051937_w(machine,offset,data & 0xff);
+		K051937_w(space,offset,data & 0xff);
 }
 
 static READ16_HANDLER( K051960_halfword_r )
 {
-	return K051960_r(machine,offset);
+	return K051960_r(space,offset);
 }
 
 static WRITE16_HANDLER( K051960_halfword_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051960_w(machine,offset,data & 0xff);
+		K051960_w(space,offset,data & 0xff);
 }
 
 
@@ -99,13 +99,13 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 		gradius3_priority = data & 0x04;
 
 		/* bit 3 enables cpu B */
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 5 enables irq */
 		irqAen = data & 0x20;
 
 		/* other bits unknown */
-//logerror("%06x: write %04x to c0000\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%06x: write %04x to c0000\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -139,22 +139,22 @@ static WRITE16_HANDLER( cpuB_irqtrigger_w )
 {
 	if (irqBmask & 4)
 	{
-logerror("%04x trigger cpu B irq 4 %02x\n",cpu_get_pc(machine->activecpu),data);
-		cpu_set_input_line(machine->cpu[1],4,HOLD_LINE);
+logerror("%04x trigger cpu B irq 4 %02x\n",cpu_get_pc(space->cpu),data);
+		cpu_set_input_line(space->machine->cpu[1],4,HOLD_LINE);
 	}
 	else
-logerror("%04x MISSED cpu B irq 4 %02x\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x MISSED cpu B irq 4 %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(machine,0,(data >> 8) & 0xff);
+		soundlatch_w(space,0,(data >> 8) & 0xff);
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[2],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[2],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( sound_bank_w )

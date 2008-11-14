@@ -591,9 +591,9 @@ WRITE16_HANDLER( segaic16_paletteram_w )
 	b = ((newval >> 14) & 0x01) | ((newval >> 7) & 0x1e);
 
 	/* normal colors */
-	palette_set_color_rgb(machine, offset + 0 * palette.entries, palette.normal[r],  palette.normal[g],  palette.normal[b]);
-	palette_set_color_rgb(machine, offset + 1 * palette.entries, palette.shadow[r],  palette.shadow[g],  palette.shadow[b]);
-	palette_set_color_rgb(machine, offset + 2 * palette.entries, palette.hilight[r], palette.hilight[g], palette.hilight[b]);
+	palette_set_color_rgb(space->machine, offset + 0 * palette.entries, palette.normal[r],  palette.normal[g],  palette.normal[b]);
+	palette_set_color_rgb(space->machine, offset + 1 * palette.entries, palette.shadow[r],  palette.shadow[g],  palette.shadow[b]);
+	palette_set_color_rgb(space->machine, offset + 2 * palette.entries, palette.hilight[r], palette.hilight[g], palette.hilight[b]);
 }
 
 
@@ -1439,7 +1439,7 @@ WRITE16_HANDLER( segaic16_textram_0_w )
 {
 	/* certain ranges need immediate updates */
 	if (offset >= 0xe80/2)
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 
 	COMBINE_DATA(&segaic16_textram_0[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap[0].textmap, offset);

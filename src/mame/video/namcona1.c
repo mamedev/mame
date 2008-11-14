@@ -178,7 +178,7 @@ WRITE16_HANDLER( namcona1_paletteram_w )
 	COMBINE_DATA( &paletteram16[offset] );
 	if( namcona1_vreg[0x8e/2] )
 	{ /* graphics enabled; update palette immediately */
-		UpdatePalette(machine, offset );
+		UpdatePalette(space->machine, offset );
 	}
 	else
 	{

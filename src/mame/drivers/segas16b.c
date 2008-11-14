@@ -1137,14 +1137,14 @@ static READ16_HANDLER( standard_io_r )
 		case 0x1000/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
-			return input_port_read(machine, sysports[offset & 3]);
+			return input_port_read(space->machine, sysports[offset & 3]);
 		}
 
 		case 0x2000/2:
-			return input_port_read(machine, (offset & 1) ? "DSW1" : "DSW2");
+			return input_port_read(space->machine, (offset & 1) ? "DSW1" : "DSW2");
 	}
-	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
-	return segaic16_open_bus_r(machine,0,mem_mask);
+	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
+	return segaic16_open_bus_r(space,0,mem_mask);
 }
 
 
@@ -1167,32 +1167,32 @@ static WRITE16_HANDLER( standard_io_w )
 			segaic16_tilemap_set_flip(0, data & 0x40);
 			segaic16_sprites_set_flip(0, data & 0x40);
 			if (!disable_screen_blanking)
-				segaic16_set_display_enable(machine, data & 0x20);
+				segaic16_set_display_enable(space->machine, data & 0x20);
 			set_led_status(1, data & 0x08);
 			set_led_status(0, data & 0x04);
 			coin_counter_w(1, data & 0x02);
 			coin_counter_w(0, data & 0x01);
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
+	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
 }
 
 
 static READ16_HANDLER( misc_io_r )
 {
 	if (custom_io_r)
-		return (*custom_io_r)(machine, offset, mem_mask);
+		return (*custom_io_r)(space->machine, offset, mem_mask);
 	else
-		return standard_io_r(machine, offset, mem_mask);
+		return standard_io_r(space, offset, mem_mask);
 }
 
 
 static WRITE16_HANDLER( misc_io_w )
 {
 	if (custom_io_w)
-		(*custom_io_w)(machine, offset, data, mem_mask);
+		(*custom_io_w)(space->machine, offset, data, mem_mask);
 	else
-		standard_io_w(machine, offset, data, mem_mask);
+		standard_io_w(space, offset, data, mem_mask);
 }
 
 
@@ -1217,13 +1217,13 @@ static READ16_HANDLER( rom_5797_bank_math_r )
 	{
 		case 0x0000/2:
 			/* multiply registers */
-			return segaic16_multiply_0_r(machine, offset & 3, mem_mask);
+			return segaic16_multiply_0_r(space, offset & 3, mem_mask);
 
 		case 0x1000/2:
 			/* compare registers */
-			return segaic16_compare_timer_0_r(machine, offset & 7, mem_mask);
+			return segaic16_compare_timer_0_r(space, offset & 7, mem_mask);
 	}
-	return segaic16_open_bus_r(machine,0,mem_mask);
+	return segaic16_open_bus_r(space,0,mem_mask);
 }
 
 
@@ -1234,12 +1234,12 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 	{
 		case 0x0000/2:
 			/* multiply registers */
-			segaic16_multiply_0_w(machine, offset & 3, data, mem_mask);
+			segaic16_multiply_0_w(space, offset & 3, data, mem_mask);
 			break;
 
 		case 0x1000/2:
 			/* compare registers */
-			segaic16_compare_timer_0_w(machine, offset & 7, data, mem_mask);
+			segaic16_compare_timer_0_w(space, offset & 7, data, mem_mask);
 			break;
 
 		case 0x2000/2:
@@ -1253,14 +1253,14 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 static READ16_HANDLER( unknown_rgn2_r )
 {
 	logerror("Region 2: read from %04X\n", offset * 2);
-	return segaic16_compare_timer_1_r(machine, offset & 7, mem_mask);
+	return segaic16_compare_timer_1_r(space, offset & 7, mem_mask);
 }
 
 
 static WRITE16_HANDLER( unknown_rgn2_w )
 {
 	logerror("Region 2: write to %04X = %04X & %04X\n", offset * 2, data, mem_mask);
-	segaic16_compare_timer_1_w(machine, offset & 7, data, mem_mask);
+	segaic16_compare_timer_1_w(space, offset & 7, data, mem_mask);
 }
 
 
@@ -1273,7 +1273,7 @@ static WRITE16_HANDLER( unknown_rgn2_w )
 
 static WRITE8_HANDLER( upd7759_control_w )
 {
-	int size = memory_region_length(machine, "sound") - 0x10000;
+	int size = memory_region_length(space->machine, "sound") - 0x10000;
 	if (size > 0)
 	{
 		int bankoffs = 0;
@@ -1330,7 +1330,7 @@ static WRITE8_HANDLER( upd7759_control_w )
 				bankoffs += (data & 0x07) * 0x04000;
 				break;
 		}
-		memory_set_bankptr(1, memory_region(machine, "sound") + 0x10000 + (bankoffs % size));
+		memory_set_bankptr(1, memory_region(space->machine, "sound") + 0x10000 + (bankoffs % size));
 	}
 }
 
@@ -1352,7 +1352,7 @@ static void upd7759_generate_nmi(int state)
 static WRITE8_HANDLER( mcu_data_w )
 {
 	mcu_data = data;
-	cpu_set_input_line(machine->cpu[2], 1, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[2], 1, PULSE_LINE);
 }
 #endif
 
@@ -1552,8 +1552,8 @@ static WRITE16_HANDLER( atomicp_sound_w )
 	if (ACCESSING_BITS_8_15)
 		switch (offset & 1)
 		{
-			case 0:	ym2413_register_port_0_w(machine, 0, data >> 8);	break;
-			case 1:	ym2413_data_port_0_w(machine, 0, data >> 8);		break;
+			case 0:	ym2413_register_port_0_w(space, 0, data >> 8);	break;
+			case 1:	ym2413_data_port_0_w(space, 0, data >> 8);		break;
 		}
 }
 
@@ -1572,18 +1572,18 @@ static READ16_HANDLER( dunkshot_custom_io_r )
 		case 0x3000/2:
 			switch ((offset/2) & 7)
 			{
-				case 0:	return (input_port_read(machine, "ANALOGX1") << 4) >> (8 * (offset & 1));
-				case 1:	return (input_port_read(machine, "ANALOGY1") << 4) >> (8 * (offset & 1));
-				case 2:	return (input_port_read(machine, "ANALOGX2") << 4) >> (8 * (offset & 1));
-				case 3:	return (input_port_read(machine, "ANALOGY2") << 4) >> (8 * (offset & 1));
-				case 4:	return (input_port_read(machine, "ANALOGX3") << 4) >> (8 * (offset & 1));
-				case 5:	return (input_port_read(machine, "ANALOGY3") << 4) >> (8 * (offset & 1));
-				case 6:	return (input_port_read(machine, "ANALOGX4") << 4) >> (8 * (offset & 1));
-				case 7:	return (input_port_read(machine, "ANALOGY4") << 4) >> (8 * (offset & 1));
+				case 0:	return (input_port_read(space->machine, "ANALOGX1") << 4) >> (8 * (offset & 1));
+				case 1:	return (input_port_read(space->machine, "ANALOGY1") << 4) >> (8 * (offset & 1));
+				case 2:	return (input_port_read(space->machine, "ANALOGX2") << 4) >> (8 * (offset & 1));
+				case 3:	return (input_port_read(space->machine, "ANALOGY2") << 4) >> (8 * (offset & 1));
+				case 4:	return (input_port_read(space->machine, "ANALOGX3") << 4) >> (8 * (offset & 1));
+				case 5:	return (input_port_read(space->machine, "ANALOGY3") << 4) >> (8 * (offset & 1));
+				case 6:	return (input_port_read(space->machine, "ANALOGX4") << 4) >> (8 * (offset & 1));
+				case 7:	return (input_port_read(space->machine, "ANALOGY4") << 4) >> (8 * (offset & 1));
 			}
 			break;
 	}
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 
@@ -1610,7 +1610,7 @@ static READ16_HANDLER( hwchamp_custom_io_r )
 			}
 			break;
 	}
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 
@@ -1623,7 +1623,7 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 			switch (offset & 0x30/2)
 			{
 				case 0x20/2:
-					hwc_input_value = input_port_read_safe(machine, portname[offset & 3], 0xff);
+					hwc_input_value = input_port_read_safe(space->machine, portname[offset & 3], 0xff);
 					break;
 
 				case 0x30/2:
@@ -1637,7 +1637,7 @@ static WRITE16_HANDLER( hwchamp_custom_io_w )
 			}
 			break;
 	}
-	standard_io_w(machine, offset, data, mem_mask);
+	standard_io_w(space, offset, data, mem_mask);
 }
 
 
@@ -1655,14 +1655,14 @@ static READ16_HANDLER( passshtj_custom_io_r )
 		case 0x3000/2:
 			switch (offset & 3)
 			{
-				case 0:	return input_port_read(machine, "P1");
-				case 1:	return input_port_read(machine, "P2");
-				case 2:	return input_port_read(machine, "P3");
-				case 3:	return input_port_read(machine, "P4");
+				case 0:	return input_port_read(space->machine, "P1");
+				case 1:	return input_port_read(space->machine, "P2");
+				case 2:	return input_port_read(space->machine, "P3");
+				case 3:	return input_port_read(space->machine, "P4");
 			}
 			break;
 	}
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 
@@ -1680,14 +1680,14 @@ static READ16_HANDLER( sdi_custom_io_r )
 		case 0x3000/2:
 			switch ((offset/2) & 3)
 			{
-				case 0:	return input_port_read(machine, "ANALOGX1");
-				case 1:	return input_port_read(machine, "ANALOGY1");
-				case 2:	return input_port_read(machine, "ANALOGX2");
-				case 3:	return input_port_read(machine, "ANALOGY2");
+				case 0:	return input_port_read(space->machine, "ANALOGX1");
+				case 1:	return input_port_read(space->machine, "ANALOGY1");
+				case 2:	return input_port_read(space->machine, "ANALOGX2");
+				case 3:	return input_port_read(space->machine, "ANALOGY2");
 			}
 			break;
 	}
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 
@@ -1707,16 +1707,16 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (input_port_read_safe(machine, portname[mj_input_num], 0xff) != 0xff)
+					if (input_port_read_safe(space->machine, portname[mj_input_num], 0xff) != 0xff)
 						return 0xff & ~(1 << mj_input_num);
 					return 0xff;
 
 				case 2:
-					return input_port_read_safe(machine, portname[mj_input_num], 0xff);
+					return input_port_read_safe(space->machine, portname[mj_input_num], 0xff);
 			}
 			break;
 	}
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 
@@ -1730,7 +1730,7 @@ static WRITE16_HANDLER( sjryuko_custom_io_w )
 				mj_input_num = (mj_input_num + 1) % 6;
 			break;
 	}
-	standard_io_w(machine, offset, data, mem_mask);
+	standard_io_w(space, offset, data, mem_mask);
 }
 
 

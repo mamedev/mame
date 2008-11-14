@@ -78,7 +78,7 @@ static READ8_HANDLER( ports_r )
 
 	res = 0;
 	for (i = 0; i < 8; i++)
-		res |= ((input_port_read(machine, portnames[i]) >> offset) & 1) << i;
+		res |= ((input_port_read(space->machine, portnames[i]) >> offset) & 1) << i;
 
 	return res;
 }
@@ -86,9 +86,9 @@ static READ8_HANDLER( ports_r )
 static WRITE8_HANDLER( subcpu_reset_w )
 {
 	if (data & 1)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 

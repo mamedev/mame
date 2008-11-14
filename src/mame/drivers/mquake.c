@@ -89,7 +89,7 @@ static void mquake_cia_0_portb_w(UINT8 data)
 
 static READ16_HANDLER( es5503_word_lsb_r )
 {
-	return (ACCESSING_BITS_0_7) ? (es5503_reg_0_r(machine, offset) | 0xff00) : 0xffff;
+	return (ACCESSING_BITS_0_7) ? (es5503_reg_0_r(space, offset) | 0xff00) : 0xffff;
 }
 
 static WRITE16_HANDLER( es5503_word_lsb_w )
@@ -105,12 +105,12 @@ static WRITE16_HANDLER( es5503_word_lsb_w )
 				// if not writing a "halt", set the bank
 				if (!(data & 1))
 				{
-					es5503_set_base_0(memory_region(machine, "ensoniq") + ((data>>4)*0x10000));
+					es5503_set_base_0(memory_region(space->machine, "ensoniq") + ((data>>4)*0x10000));
 				}
 			}
 		}
 
-		es5503_reg_0_w(machine, offset, data);
+		es5503_reg_0_w(space, offset, data);
 	}
 }
 
@@ -118,21 +118,21 @@ static WRITE16_HANDLER( es5503_word_lsb_w )
 static WRITE16_HANDLER( output_w )
 {
 	if (ACCESSING_BITS_0_7)
-		logerror("%06x:output_w(%x) = %02x\n", cpu_get_pc(machine->activecpu), offset, data);
+		logerror("%06x:output_w(%x) = %02x\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
 static READ16_HANDLER( coin_chip_r )
 {
 	if (offset == 1)
-		return input_port_read(machine, "COINCHIP");
-	logerror("%06x:coin_chip_r(%02x) & %04x\n", cpu_get_pc(machine->activecpu), offset, mem_mask);
+		return input_port_read(space->machine, "COINCHIP");
+	logerror("%06x:coin_chip_r(%02x) & %04x\n", cpu_get_pc(space->cpu), offset, mem_mask);
 	return 0xffff;
 }
 
 static WRITE16_HANDLER( coin_chip_w )
 {
-	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
+	logerror("%06x:coin_chip_w(%02x) = %04x & %04x\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 }
 
 // inputs at 282000, 282002 (full word)

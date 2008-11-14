@@ -193,7 +193,7 @@ static WRITE16_HANDLER( sound_command_w )
 static READ8_HANDLER( sound_command_r )
 {
 	sound_busy = 0;
-	cpu_set_input_line(machine->cpu[1], 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, (ym2151_irq | sound_busy) ? ASSERT_LINE : CLEAR_LINE);
 	return sound_data;
 }
 
@@ -215,7 +215,7 @@ static WRITE8_HANDLER( upd_control_w )
 {
 	if ((data & 1) != upd_rom_bank)
 	{
-		UINT8 *snd = memory_region(machine, "upd");
+		UINT8 *snd = memory_region(space->machine, "upd");
 		upd_rom_bank = data & 1;
 		memcpy(snd, snd + 0x20000 * (upd_rom_bank + 1), 0x20000);
 	}

@@ -127,7 +127,7 @@ static WRITE8_HANDLER( mrflea_main_w ){
 static WRITE8_HANDLER( mrflea_io_w ){
 	mrflea_status |= 0x08; // pending command to IO CPU
 	mrflea_io = data;
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE );
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
 }
 
 static READ8_HANDLER( mrflea_main_r ){
@@ -202,8 +202,8 @@ static WRITE8_HANDLER( mrflea_select3_w ){
 
 static READ8_HANDLER( mrflea_input0_r )
 {
-	if( mrflea_select0 == 0x0f ) return input_port_read(machine, "IN0");
-	if( mrflea_select0 == 0x0e ) return input_port_read(machine, "IN1");
+	if( mrflea_select0 == 0x0f ) return input_port_read(space->machine, "IN0");
+	if( mrflea_select0 == 0x0e ) return input_port_read(space->machine, "IN1");
 	return 0x00;
 }
 
@@ -214,8 +214,8 @@ static READ8_HANDLER( mrflea_input1_r )
 
 static READ8_HANDLER( mrflea_input2_r )
 {
-	if( mrflea_select2 == 0x0f ) return input_port_read(machine, "DSW1");
-	if( mrflea_select2 == 0x0e ) return input_port_read(machine, "DSW2");
+	if( mrflea_select2 == 0x0f ) return input_port_read(space->machine, "DSW1");
+	if( mrflea_select2 == 0x0e ) return input_port_read(space->machine, "DSW2");
 	return 0x00;
 }
 
@@ -227,21 +227,21 @@ static READ8_HANDLER( mrflea_input3_r )
 /*******************************************************/
 
 static WRITE8_HANDLER( mrflea_data0_w ){
-	ay8910_control_port_0_w( machine, offset, mrflea_select0 );
-	ay8910_write_port_0_w( machine, offset, data );
+	ay8910_control_port_0_w( space->machine, offset, mrflea_select0 );
+	ay8910_write_port_0_w( space->machine, offset, data );
 }
 
 static WRITE8_HANDLER( mrflea_data1_w ){
 }
 
 static WRITE8_HANDLER( mrflea_data2_w ){
-	ay8910_control_port_1_w( machine, offset, mrflea_select2 );
-	ay8910_write_port_1_w( machine, offset, data );
+	ay8910_control_port_1_w( space->machine, offset, mrflea_select2 );
+	ay8910_write_port_1_w( space->machine, offset, data );
 }
 
 static WRITE8_HANDLER( mrflea_data3_w ){
-	ay8910_control_port_2_w( machine, offset, mrflea_select3 );
-	ay8910_write_port_2_w( machine, offset, data );
+	ay8910_control_port_2_w( space->machine, offset, mrflea_select3 );
+	ay8910_write_port_2_w( space->machine, offset, data );
 }
 
 static ADDRESS_MAP_START( inout_io_map, ADDRESS_SPACE_IO, 8 )

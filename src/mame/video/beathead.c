@@ -111,10 +111,10 @@ WRITE32_HANDLER( beathead_finescroll_w )
 	UINT32 newword = COMBINE_DATA(&finescroll);
 
 	/* if VBLANK is going off on a scanline other than the last, suspend time */
-	if ((oldword & 8) && !(newword & 8) && video_screen_get_vpos(machine->primary_screen) != 261)
+	if ((oldword & 8) && !(newword & 8) && video_screen_get_vpos(space->machine->primary_screen) != 261)
 	{
-		logerror("Suspending time! (scanline = %d)\n", video_screen_get_vpos(machine->primary_screen));
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+		logerror("Suspending time! (scanline = %d)\n", video_screen_get_vpos(space->machine->primary_screen));
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
@@ -132,7 +132,7 @@ WRITE32_HANDLER( beathead_palette_w )
 	int r = ((newword >> 9) & 0x3e) | ((newword >> 15) & 0x01);
 	int g = ((newword >> 4) & 0x3e) | ((newword >> 15) & 0x01);
 	int b = ((newword << 1) & 0x3e) | ((newword >> 15) & 0x01);
-	palette_set_color_rgb(machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
+	palette_set_color_rgb(space->machine, offset, pal6bit(r), pal6bit(g), pal6bit(b));
 }
 
 
@@ -147,7 +147,7 @@ READ32_HANDLER( beathead_hsync_ram_r )
 {
 	/* offset 0 is probably write-only */
 	if (offset == 0)
-		logerror("%08X:Unexpected HSYNC RAM read at offset 0\n", cpu_get_previouspc(machine->activecpu));
+		logerror("%08X:Unexpected HSYNC RAM read at offset 0\n", cpu_get_previouspc(space->cpu));
 
 	/* offset 1 reads the data */
 	else

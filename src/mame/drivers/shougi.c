@@ -214,19 +214,19 @@ static WRITE8_HANDLER ( cpu_shared_ctrl_main_w )
 
 static WRITE8_HANDLER( shougi_watchdog_reset_w )
 {
-	watchdog_reset_w(machine,0,data);
+	watchdog_reset_w(space,0,data);
 }
 
 static WRITE8_HANDLER( shougi_mcu_halt_off_w )
 {
 	/* logerror("mcu HALT OFF"); */
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( shougi_mcu_halt_on_w )
 {
 	/* logerror("mcu HALT ON"); */
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT,ASSERT_LINE);
 }
 
 
@@ -237,8 +237,8 @@ static WRITE8_HANDLER( nmi_disable_and_clear_line_w )
 	nmi_enabled = 0; /* disable NMIs */
 
 	/* NMI lines are tied together on both CPUs and connected to the LS74 /Q output */
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )

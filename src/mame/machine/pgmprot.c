@@ -116,7 +116,7 @@ static const int Pstar_80[0x1a3]={
 READ16_HANDLER (PSTARS_protram_r)
 {
 	if (offset == 4)		//region
-		return input_port_read(machine, "Region");
+		return input_port_read(space->machine, "Region");
 	else if (offset >= 0x10)  //timer
 	{
 	  logerror("PSTARS ACCESS COUNTER %6X\n",pstar_ram[offset-0x10]);
@@ -296,7 +296,7 @@ WRITE16_HANDLER (PSTARS_w16)
 	   			break;
 				default:
 					 PSTARS_VAL=0x890000;
-				   logerror("PSTARS PC(%06x) UNKNOWN %4X %4X\n",cpu_get_pc(machine->activecpu),PSTARSINT[1],PSTARSINT[0]);
+				   logerror("PSTARS PC(%06x) UNKNOWN %4X %4X\n",cpu_get_pc(space->cpu),PSTARSINT[1],PSTARSINT[0]);
 
 		}
 
@@ -353,9 +353,9 @@ READ16_HANDLER( pgm_asic3_r )
 	/* region is supplied by the protection device */
 
 	switch(asic3_reg) {
-	case 0x00: res = (asic3_latch[0] & 0xf7) | ((input_port_read(machine, "Region") << 3) & 0x08); break;
+	case 0x00: res = (asic3_latch[0] & 0xf7) | ((input_port_read(space->machine, "Region") << 3) & 0x08); break;
 	case 0x01: res = asic3_latch[1]; break;
-	case 0x02: res = (asic3_latch[2] & 0x7f) | ((input_port_read(machine, "Region") << 6) & 0x80); break;
+	case 0x02: res = (asic3_latch[2] & 0x7f) | ((input_port_read(space->machine, "Region") << 6) & 0x80); break;
 	case 0x03:
 		res = (bt(asic3_hold, 15) << 0)
 			| (bt(asic3_hold, 12) << 1)
@@ -413,7 +413,7 @@ WRITE16_HANDLER( pgm_asic3_w )
 		} else if(asic3_reg >= 0x80 && asic3_reg <= 0x87) {
 			asic3_y = asic3_reg & 7;
 			asic3_z = data;
-			asic3_compute_hold(machine);
+			asic3_compute_hold(space->machine);
 		}
 	}
 }
@@ -461,7 +461,7 @@ READ16_HANDLER (sango_protram_r)
 	// 4 = hong kong
 	// 5 = world
 
-	if (offset == 4)	return input_port_read(machine, "Region");
+	if (offset == 4)	return input_port_read(space->machine, "Region");
 
 	// otherwise it doesn't seem to use the ram for anything important, we return 0 to avoid test mode corruption
 	// kovplus reads from offset 000e a lot ... why?
@@ -525,21 +525,21 @@ READ16_HANDLER (ASIC28_r16)
 {
 	UINT32 val=(ASIC28REGS[1]<<16)|(ASIC28REGS[0]);
 
-//logerror("Asic28 Read PC = %06x Command = %02x ??\n",cpu_get_pc(machine->activecpu), ASIC28REGS[1]);
+//logerror("Asic28 Read PC = %06x Command = %02x ??\n",cpu_get_pc(space->cpu), ASIC28REGS[1]);
 
 	switch(ASIC28REGS[1]&0xff)
 	{
 
 		case 0x20: // PhotoY2k spritenum conversion 4/4
 			if(!ASIC28RCNT)
-				logerror("ASIC28: PhotoY2K spr4 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[2], cpu_get_pc(machine->activecpu));
+				logerror("ASIC28: PhotoY2K spr4 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[2], cpu_get_pc(space->cpu));
 			val = photoy2k_soff >> 16;
 			break;
 
 		case 0x21: // PhotoY2k spritenum conversion 3/4
 			if(!ASIC28RCNT) {
 				photoy2k_trf[2] = val & 0xffff;
-				logerror("ASIC28: PhotoY2K spr3 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[1], cpu_get_pc(machine->activecpu));
+				logerror("ASIC28: PhotoY2K spr3 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[1], cpu_get_pc(space->cpu));
 				if(photoy2k_trf[0] < 0x3c00)
 					photoy2k_soff = pgmy2ks[photoy2k_trf[0]];
 				else
@@ -552,7 +552,7 @@ READ16_HANDLER (ASIC28_r16)
 		case 0x22: // PhotoY2k spritenum conversion 2/4
 			if(!ASIC28RCNT) {
 				photoy2k_trf[1] = val & 0xffff;
-				logerror("ASIC28: PhotoY2K spr2 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[0], cpu_get_pc(machine->activecpu));
+				logerror("ASIC28: PhotoY2K spr2 %04x %06x (%06x)\n", val & 0xffff, photoy2k_trf[0], cpu_get_pc(space->cpu));
 			}
 			val = photoy2k_trf[0] | 0x880000;
 			break;
@@ -560,7 +560,7 @@ READ16_HANDLER (ASIC28_r16)
 		case 0x23: // PhotoY2k spritenum conversion 1/4
 			if(!ASIC28RCNT) {
 				photoy2k_trf[0] = val & 0xffff;
-				logerror("ASIC28: PhotoY2K spr1 %04x (%06x)\n", val & 0xffff, cpu_get_pc(machine->activecpu));
+				logerror("ASIC28: PhotoY2K spr1 %04x (%06x)\n", val & 0xffff, cpu_get_pc(space->cpu));
 			}
 			val = 0x880000;
 			break;
@@ -570,7 +570,7 @@ READ16_HANDLER (ASIC28_r16)
 				photoy2k_seqpos++;
 			val = photoy2k_spritenum();
 			if(!ASIC28RCNT)
-				logerror("ASIC28: PhotoY2K seq_next  %05x -> %06x (%06x)\n", photoy2k_seqpos, val, cpu_get_pc(machine->activecpu));
+				logerror("ASIC28: PhotoY2K seq_next  %05x -> %06x (%06x)\n", photoy2k_seqpos, val, cpu_get_pc(space->cpu));
 			break;
 
 		case 0x32: // PhotoY2k start of sequence
@@ -578,7 +578,7 @@ READ16_HANDLER (ASIC28_r16)
 				photoy2k_seqpos = (val & 0xffff) << 4;
 			val = photoy2k_spritenum();
 			if(!ASIC28RCNT)
-				logerror("ASIC28: PhotoY2K seq_start %05x -> %06x (%06x)\n", photoy2k_seqpos, val, cpu_get_pc(machine->activecpu));
+				logerror("ASIC28: PhotoY2K seq_start %05x -> %06x (%06x)\n", photoy2k_seqpos, val, cpu_get_pc(space->cpu));
 			break;
 
 		case 0x99:

@@ -85,13 +85,13 @@ static READ8_HANDLER( switch_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "P1", "P2", "DSW", "UNUSED0", "UNUSED1" };
 
-	return input_port_read(machine, portnames[port_select]);
+	return input_port_read(space->machine, portnames[port_select]);
 }
 
 
 static READ8_HANDLER( analog_input_r )
 {
-	return ((input_port_read(machine, "STICK0") >> 4) | (input_port_read(machine, "STICK1") & 0xf0)) ^ 0x88;
+	return ((input_port_read(space->machine, "STICK0") >> 4) | (input_port_read(space->machine, "STICK1") & 0xf0)) ^ 0x88;
 }
 
 
@@ -109,7 +109,7 @@ static WRITE8_HANDLER( switch_input_select_w )
 
 static WRITE8_HANDLER( unknown_w )
 {
-	logerror("%04X:unknown_w = %02X\n", cpu_get_pc(machine->activecpu), data);
+	logerror("%04X:unknown_w = %02X\n", cpu_get_pc(space->cpu), data);
 }
 
 
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( main_to_sound_w )
 
 static READ8_HANDLER( main_to_sound_r )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	return main_to_sound_data;
 }
 
@@ -162,7 +162,7 @@ static WRITE8_HANDLER( sound_to_main_w )
 
 static READ8_HANDLER( sound_to_main_r )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 	return sound_to_main_data;
 }
 

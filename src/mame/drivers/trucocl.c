@@ -45,7 +45,7 @@ VIDEO_UPDATE( trucocl );
 
 static WRITE8_HANDLER( irq_enable_w)
 {
-	interrupt_enable_w( machine, 0, (~data) & 1 );
+	interrupt_enable_w( space->machine, 0, (~data) & 1 );
 }
 
 static int cur_dac_address = -1;
@@ -58,7 +58,7 @@ static TIMER_CALLBACK( dac_irq )
 
 static WRITE8_HANDLER( audio_dac_w)
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	int	dac_address = ( data & 0xf0 ) << 8;
 	int	sel = ( ( (~data) >> 1 ) & 2 ) | ( data & 1 );
 

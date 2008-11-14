@@ -143,7 +143,7 @@ WRITE8_HANDLER( dogfgt_bitmapram_w )
 		return;
 	}
 
-	internal_bitmapram_w(machine,offset + BITMAPRAM_SIZE/3 * bm_plane,data);
+	internal_bitmapram_w(space,offset + BITMAPRAM_SIZE/3 * bm_plane,data);
 }
 
 WRITE8_HANDLER( dogfgt_bgvideoram_w )
@@ -175,7 +175,7 @@ WRITE8_HANDLER( dogfgt_1800_w )
 	flip_screen_set(data & 0x80);
 
 	/* other bits unused? */
-	logerror("PC %04x: 1800 = %02x\n",cpu_get_pc(machine->activecpu),data);
+	logerror("PC %04x: 1800 = %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 

@@ -450,22 +450,22 @@ ROM_END
 /* Spin the sub-cpu if it is waiting on the master cpu */
 static READ16_HANDLER( sub_cpu_spin_r )
 {
-	int pc=cpu_get_pc(machine->activecpu);
+	int pc=cpu_get_pc(space->cpu);
 	int ret=raiden_shared_ram[0x4];
 
 	if (pc==0xfcde6 && ret!=0x40)
-		cpu_spin(machine->activecpu);
+		cpu_spin(space->cpu);
 
 	return ret;
 }
 
 static READ16_HANDLER( sub_cpu_spina_r )
 {
-	int pc=cpu_get_pc(machine->activecpu);
+	int pc=cpu_get_pc(space->cpu);
 	int ret=raiden_shared_ram[0x4];
 
 	if (pc==0xfcde8 && ret!=0x40)
-		cpu_spin(machine->activecpu);
+		cpu_spin(space->cpu);
 
 	return ret;
 }

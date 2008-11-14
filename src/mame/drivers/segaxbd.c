@@ -184,8 +184,8 @@ static void sound_cpu_irq(running_machine *machine, int state)
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(machine, offset);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(space, offset);
 }
 
 
@@ -233,7 +233,7 @@ static READ16_HANDLER( adc_r )
 	int which = (iochip_regs[0][2] >> 2) & 7;
 
 	/* on the write, latch the selected input port and stash the value */
-	int value = input_port_read_safe(machine, ports[which], 0x0010);
+	int value = input_port_read_safe(space->machine, ports[which], 0x0010);
 
 	/* reverse some port values */
 	if (adc_reverse[which])
@@ -293,11 +293,11 @@ static READ16_HANDLER( iochip_0_r )
                 D6: /INTR of ADC0804
                 D5-D0: CN C pin 24-19 (switch state 0= open, 1= closed)
             */
-			return iochip_r(0, 0, input_port_read(machine, "IO0PORTA"));
+			return iochip_r(0, 0, input_port_read(space->machine, "IO0PORTA"));
 
 		case 1:
 			/* I/O port: CN C pins 17,15,13,11,9,7,5,3 */
-			return iochip_r(0, 1, input_port_read(machine, "IO0PORTB"));
+			return iochip_r(0, 1, input_port_read(space->machine, "IO0PORTB"));
 
 		case 2:
 			/* Output port */
@@ -343,9 +343,9 @@ static WRITE16_HANDLER( iochip_0_w )
                 D1: (CONT) - affects sprite hardware
                 D0: Sound section reset (1= normal operation, 0= reset)
             */
-			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(machine,0,0);
-			segaic16_set_display_enable(machine, data & 0x20);
-			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+			if (((oldval ^ data) & 0x40) && !(data & 0x40)) watchdog_reset_w(space,0,0);
+			segaic16_set_display_enable(space->machine, data & 0x20);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 			return;
 
 		case 3:
@@ -368,19 +368,19 @@ static READ16_HANDLER( iochip_1_r )
 	{
 		case 0:
 			/* Input port: switches, CN D pin A1-8 (switch state 1= open, 0= closed) */
-			return iochip_r(1, 0, input_port_read(machine, "IO1PORTA"));
+			return iochip_r(1, 0, input_port_read(space->machine, "IO1PORTA"));
 
 		case 1:
 			/* Input port: switches, CN D pin A9-16 (switch state 1= open, 0= closed) */
-			return iochip_r(1, 1, input_port_read(machine, "IO1PORTB"));
+			return iochip_r(1, 1, input_port_read(space->machine, "IO1PORTB"));
 
 		case 2:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(1, 2, input_port_read(machine, "IO1PORTC"));
+			return iochip_r(1, 2, input_port_read(space->machine, "IO1PORTC"));
 
 		case 3:
 			/* Input port: DIP switches (1= off, 0= on) */
-			return iochip_r(1, 3, input_port_read(machine, "IO1PORTD"));
+			return iochip_r(1, 3, input_port_read(space->machine, "IO1PORTD"));
 
 		case 4:
 			/* Unused */
@@ -455,7 +455,7 @@ static UINT16 *loffire_sync;
 static WRITE16_HANDLER( loffire_sync0_w )
 {
 	COMBINE_DATA(&loffire_sync[offset]);
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 
@@ -468,14 +468,14 @@ static WRITE16_HANDLER( loffire_sync0_w )
 
 static READ16_HANDLER( smgp_excs_r )
 {
-	logerror("%06X:smgp_excs_r(%04X)\n", cpu_get_pc(machine->activecpu), offset*2);
+	logerror("%06X:smgp_excs_r(%04X)\n", cpu_get_pc(space->cpu), offset*2);
 	return 0xffff;
 }
 
 
 static WRITE16_HANDLER( smgp_excs_w )
 {
-	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset*2, data, mem_mask);
+	logerror("%06X:smgp_excs_w(%04X) = %04X & %04X\n", cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 }
 
 

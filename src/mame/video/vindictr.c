@@ -131,7 +131,7 @@ WRITE16_HANDLER( vindictr_paletteram_w )
 		int g = ((data >> 4) & 15) * i;
 		int b = ((data >> 0) & 15) * i;
 
-		palette_set_color(machine,offset + c*2048,MAKE_RGB(r,g,b));
+		palette_set_color(space->machine,offset + c*2048,MAKE_RGB(r,g,b));
 	}
 }
 

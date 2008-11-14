@@ -71,9 +71,9 @@ static WRITE16_HANDLER( fuuki16_vregs_w )
 	UINT16 new_data	=	COMBINE_DATA(&fuuki16_vregs[offset]);
 	if ((offset == 0x1c/2) && old_data != new_data)
 	{
-		const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
-		attotime period = video_screen_get_frame_period(machine->primary_screen);
-		timer_adjust_periodic(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, new_data, visarea->max_x + 1), 0, period);
+		const rectangle *visarea = video_screen_get_visible_area(space->machine->primary_screen);
+		attotime period = video_screen_get_frame_period(space->machine->primary_screen);
+		timer_adjust_periodic(raster_interrupt_timer, video_screen_get_time_until_pos(space->machine->primary_screen, new_data, visarea->max_x + 1), 0, period);
 	}
 }
 
@@ -81,10 +81,10 @@ static WRITE16_HANDLER( fuuki16_sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
-//      cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(50));   // Allow the other CPU to reply
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(50)); // Fixes glitching in rasters
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+//      cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(50));   // Allow the other CPU to reply
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50)); // Fixes glitching in rasters
 	}
 }
 
@@ -130,9 +130,9 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( fuuki16_sound_rombank_w )
 {
 	if (data <= 2)
-		memory_set_bankptr(1, memory_region(machine, "audio") + 0x8000 * data + 0x10000);
+		memory_set_bankptr(1, memory_region(space->machine, "audio") + 0x8000 * data + 0x10000);
 	else
-	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(machine->activecpu),data);
+	 	logerror("CPU #1 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static WRITE8_HANDLER( fuuki16_oki_banking_w )

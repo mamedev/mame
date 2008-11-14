@@ -224,7 +224,7 @@ static UINT8 mt_cart_select_reg;
 
 static READ8_HANDLER( megatech_instr_r )
 {
-	UINT8* instr = memory_region(machine, "mtbios")+0x8000;
+	UINT8* instr = memory_region(space->machine, "mtbios")+0x8000;
 
 	return instr[offset/2];
 //  else
@@ -272,18 +272,18 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 	{
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
-			memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
+			memory_install_readwrite8_handler(space->machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
 
 			//printf("bank ram??\n");
 			break;
 		case 1:
-			memcpy(sms_rom+0x0000, memory_region(machine, "main")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x0000, memory_region(space->machine, "main")+bank*0x4000, 0x4000);
 			break;
 		case 2:
-			memcpy(sms_rom+0x4000, memory_region(machine, "main")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x4000, memory_region(space->machine, "main")+bank*0x4000, 0x4000);
 			break;
 		case 3:
-			memcpy(sms_rom+0x8000, memory_region(machine, "main")+bank*0x4000, 0x4000);
+			memcpy(sms_rom+0x8000, memory_region(space->machine, "main")+bank*0x4000, 0x4000);
 			break;
 
 	}
@@ -432,27 +432,27 @@ static WRITE8_HANDLER( megatech_cart_select_w )
 	mt_cart_select_reg = data;
 
 
-	megatech_select_game(machine, mt_cart_select_reg);
+	megatech_select_game(space->machine, mt_cart_select_reg);
 
 /*
     if (mt_cart_select_reg==2)
     {
         printf("game 2 selected\n");
-        memcpy(memory_region(machine, "mtbios")+0x8000, memory_region(machine, "inst0"), 0x8000);
+        memcpy(memory_region(space->machine, "mtbios")+0x8000, memory_region(space->machine, "inst0"), 0x8000);
     }
 //  else if (mt_cart_select_reg==0)
 //  {
 //      printf("game 0 selected\n");
-//      memcpy(memory_region(machine, "mtbios")+0x8000, memory_region(machine, "inst2"), 0x8000);
+//      memcpy(memory_region(space->machine, "mtbios")+0x8000, memory_region(space->machine, "inst2"), 0x8000);
 //  }
     else if (mt_cart_select_reg==6)
     {
         printf("game 6 selected\n");
-        memcpy(memory_region(machine, "mtbios")+0x8000, memory_region(machine, "user6"), 0x8000);
+        memcpy(memory_region(space->machine, "mtbios")+0x8000, memory_region(space->machine, "user6"), 0x8000);
     }
     else
     {
-        memset(memory_region(machine, "mtbios")+0x8000, 0x00, 0x8000);
+        memset(memory_region(space->machine, "mtbios")+0x8000, 0x00, 0x8000);
     }
 */
 

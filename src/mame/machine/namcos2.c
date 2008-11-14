@@ -172,7 +172,7 @@ READ16_HANDLER( namcos2_68k_eeprom_r ){
 /* 68000 Shared memory area - Data ROM area                  */
 /*************************************************************/
 READ16_HANDLER( namcos2_68k_data_rom_r ){
-	UINT16 *ROM = (UINT16 *)memory_region(machine, "user1");
+	UINT16 *ROM = (UINT16 *)memory_region(space->machine, "user1");
 	return ROM[offset];
 }
 
@@ -362,8 +362,8 @@ READ16_HANDLER( namcos2_68k_key_r )
 		{
 	//  case 3: return 0x142;
 		case 4: return 0x142;
-	//  case 3: popmessage("blah %08x",cpu_get_pc(machine->activecpu));
-		default: return mame_rand(machine);
+	//  case 3: popmessage("blah %08x",cpu_get_pc(space->cpu));
+		default: return mame_rand(space->machine);
 		}
 		break;
 
@@ -420,7 +420,7 @@ READ16_HANDLER( namcos2_68k_key_r )
 
 
 
-	return mame_rand(machine)&0xffff;
+	return mame_rand(space->machine)&0xffff;
 }
 
 WRITE16_HANDLER( namcos2_68k_key_w )
@@ -630,32 +630,32 @@ ReadWriteC148( running_machine *machine, int cpu, offs_t offset, UINT16 data, in
 
 WRITE16_HANDLER( namcos2_68k_master_C148_w )
 {
-	(void)ReadWriteC148( machine, CPU_MASTER, offset, data, 1 );
+	(void)ReadWriteC148( space->machine, CPU_MASTER, offset, data, 1 );
 }
 
 READ16_HANDLER( namcos2_68k_master_C148_r )
 {
-	return ReadWriteC148(  machine, CPU_MASTER, offset, 0, 0 );
+	return ReadWriteC148(  space->machine, CPU_MASTER, offset, 0, 0 );
 }
 
 WRITE16_HANDLER( namcos2_68k_slave_C148_w )
 {
-	(void)ReadWriteC148(  machine, CPU_SLAVE, offset, data, 1 );
+	(void)ReadWriteC148(  space->machine, CPU_SLAVE, offset, data, 1 );
 }
 
 READ16_HANDLER( namcos2_68k_slave_C148_r )
 {
-	return ReadWriteC148(  machine, CPU_SLAVE, offset, 0, 0 );
+	return ReadWriteC148(  space->machine, CPU_SLAVE, offset, 0, 0 );
 }
 
 WRITE16_HANDLER( namcos2_68k_gpu_C148_w )
 {
-	(void)ReadWriteC148(  machine, CPU_GPU, offset, data, 1 );
+	(void)ReadWriteC148(  space->machine, CPU_GPU, offset, data, 1 );
 }
 
 READ16_HANDLER( namcos2_68k_gpu_C148_r )
 {
-	return ReadWriteC148(  machine, CPU_GPU, offset, 0, 0 );
+	return ReadWriteC148(  space->machine, CPU_GPU, offset, 0, 0 );
 }
 
 static TIMER_CALLBACK( namcos2_68k_master_posirq )
@@ -721,8 +721,8 @@ INTERRUPT_GEN( namcos2_68k_gpu_vblank )
 
 WRITE8_HANDLER( namcos2_sound_bankselect_w )
 {
-	UINT8 *RAM=memory_region(machine, "audio");
-	UINT32 max = (memory_region_length(machine, "audio") - 0x10000) / 0x4000;
+	UINT8 *RAM=memory_region(space->machine, "audio");
+	UINT32 max = (memory_region_length(space->machine, "audio") - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max;	/* 991104.CAB */
 	memory_set_bankptr( CPU3_ROM1, &RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }
@@ -747,28 +747,28 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 		switch((data>>2) & 0x07)
 		{
 		case 0:
-			namcos2_mcu_analog_data=input_port_read(machine, "AN0");
+			namcos2_mcu_analog_data=input_port_read(space->machine, "AN0");
 			break;
 		case 1:
-			namcos2_mcu_analog_data=input_port_read(machine, "AN1");
+			namcos2_mcu_analog_data=input_port_read(space->machine, "AN1");
 			break;
 		case 2:
-			namcos2_mcu_analog_data=input_port_read(machine, "AN2");
+			namcos2_mcu_analog_data=input_port_read(space->machine, "AN2");
 			break;
 		case 3:
-			namcos2_mcu_analog_data=input_port_read(machine, "AN3");
+			namcos2_mcu_analog_data=input_port_read(space->machine, "AN3");
 			break;
 		case 4:
-			namcos2_mcu_analog_data=input_port_read(machine, "AN4");
+			namcos2_mcu_analog_data=input_port_read(space->machine, "AN4");
 			break;
 		case 5:
-			namcos2_mcu_analog_data=input_port_read(machine, "AN5");
+			namcos2_mcu_analog_data=input_port_read(space->machine, "AN5");
 			break;
 		case 6:
-			namcos2_mcu_analog_data=input_port_read(machine, "AN6");
+			namcos2_mcu_analog_data=input_port_read(space->machine, "AN6");
 			break;
 		case 7:
-			namcos2_mcu_analog_data=input_port_read(machine, "AN7");
+			namcos2_mcu_analog_data=input_port_read(space->machine, "AN7");
 			break;
 		}
 #if 0
@@ -783,7 +783,7 @@ WRITE8_HANDLER( namcos2_mcu_analog_ctrl_w )
 		/* If the interrupt enable bit is set trigger an A/D IRQ */
 		if(data & 0x20)
 		{
-			cpu_set_input_line(machine->cpu[CPU_MCU], HD63705_INT_ADCONV , PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[CPU_MCU], HD63705_INT_ADCONV , PULSE_LINE);
 		}
 	}
 }
@@ -824,14 +824,14 @@ READ8_HANDLER( namcos2_mcu_port_d_r )
 	int data = 0;
 
 	/* Read/convert the bits one at a time */
-	if(input_port_read(machine, "AN0") > threshold) data |= 0x01;
-	if(input_port_read(machine, "AN1") > threshold) data |= 0x02;
-	if(input_port_read(machine, "AN2") > threshold) data |= 0x04;
-	if(input_port_read(machine, "AN3") > threshold) data |= 0x08;
-	if(input_port_read(machine, "AN4") > threshold) data |= 0x10;
-	if(input_port_read(machine, "AN5") > threshold) data |= 0x20;
-	if(input_port_read(machine, "AN6") > threshold) data |= 0x40;
-	if(input_port_read(machine, "AN7") > threshold) data |= 0x80;
+	if(input_port_read(space->machine, "AN0") > threshold) data |= 0x01;
+	if(input_port_read(space->machine, "AN1") > threshold) data |= 0x02;
+	if(input_port_read(space->machine, "AN2") > threshold) data |= 0x04;
+	if(input_port_read(space->machine, "AN3") > threshold) data |= 0x08;
+	if(input_port_read(space->machine, "AN4") > threshold) data |= 0x10;
+	if(input_port_read(space->machine, "AN5") > threshold) data |= 0x20;
+	if(input_port_read(space->machine, "AN6") > threshold) data |= 0x40;
+	if(input_port_read(space->machine, "AN7") > threshold) data |= 0x80;
 
 	/* Return the result */
 	return data;
@@ -839,18 +839,18 @@ READ8_HANDLER( namcos2_mcu_port_d_r )
 
 READ8_HANDLER( namcos2_input_port_0_r )
 {
-	int data = input_port_read(machine, "MCUB");
+	int data = input_port_read(space->machine, "MCUB");
 	return data;
 }
 
 READ8_HANDLER( namcos2_input_port_10_r )
 {
-	int data = input_port_read(machine, "MCUH");
+	int data = input_port_read(space->machine, "MCUH");
 	return data;
 }
 
 READ8_HANDLER( namcos2_input_port_12_r )
 {
-	int data = input_port_read(machine, "MCUDI0");
+	int data = input_port_read(space->machine, "MCUDI0");
 	return data;
 }

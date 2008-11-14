@@ -212,20 +212,20 @@ static CUSTOM_INPUT( mahjong_ctrl_r )
 static READ32_HANDLER( ms32_read_inputs3 )
 {
 	int a,b,c,d;
-	a = input_port_read(machine, "AN2?"); // unused?
-	b = input_port_read(machine, "AN2?"); // unused?
-	c = input_port_read(machine, "AN1");
-	d = (input_port_read(machine, "AN0") - 0xb0) & 0xff;
+	a = input_port_read(space->machine, "AN2?"); // unused?
+	b = input_port_read(space->machine, "AN2?"); // unused?
+	c = input_port_read(space->machine, "AN1");
+	d = (input_port_read(space->machine, "AN0") - 0xb0) & 0xff;
 	return a << 24 | b << 16 | c << 8 | d << 0;
 }
 
 static WRITE32_HANDLER( ms32_sound_w )
 {
-	soundlatch_w(machine,0, data & 0xff);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+	soundlatch_w(space,0, data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 
 	// give the Z80 time to respond
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 }
 
 static READ32_HANDLER( ms32_sound_r )
@@ -235,7 +235,7 @@ static READ32_HANDLER( ms32_sound_r )
 
 static WRITE32_HANDLER( reset_sub_w )
 {
-	if(data) cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
+	if(data) cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE); // 0 too ?
 }
 
 
@@ -1154,8 +1154,8 @@ static INTERRUPT_GEN(ms32_interrupt)
 
 static READ8_HANDLER( latch_r )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(machine,0)^0xff;
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(space,0)^0xff;
 }
 
 static WRITE8_HANDLER( ms32_snd_bank_w )
@@ -1167,7 +1167,7 @@ static WRITE8_HANDLER( ms32_snd_bank_w )
 static WRITE8_HANDLER( to_main_w )
 {
 		to_main=data;
-		irq_raise(machine, 1);
+		irq_raise(space->machine, 1);
 }
 
 static ADDRESS_MAP_START( ms32_snd_readmem, ADDRESS_SPACE_PROGRAM, 8 )

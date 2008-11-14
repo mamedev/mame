@@ -272,7 +272,7 @@ WRITE16_HANDLER( m72_palette1_w )
 
 	COMBINE_DATA(&paletteram16[offset]);
 	offset &= 0x0ff;
-	changecolor(machine,
+	changecolor(space->machine,
 			offset,
 			paletteram16[offset + 0x000],
 			paletteram16[offset + 0x200],
@@ -286,7 +286,7 @@ WRITE16_HANDLER( m72_palette2_w )
 
 	COMBINE_DATA(&paletteram16_2[offset]);
 	offset &= 0x0ff;
-	changecolor(machine,
+	changecolor(space->machine,
 			offset + 256,
 			paletteram16_2[offset + 0x000],
 			paletteram16_2[offset + 0x200],
@@ -348,16 +348,16 @@ WRITE16_HANDLER( m72_port02_w )
 		coin_counter_w(1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read(machine, "DSW") >> 8) & 1));
+		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
 		video_off = data & 0x08;
 
 		/* bit 4 resets sound CPU (active low) */
 		if (data & 0x10)
-			cputag_set_input_line(machine, "sound", INPUT_LINE_RESET, CLEAR_LINE);
+			cputag_set_input_line(space->machine, "sound", INPUT_LINE_RESET, CLEAR_LINE);
 		else
-			cputag_set_input_line(machine, "sound", INPUT_LINE_RESET, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "sound", INPUT_LINE_RESET, ASSERT_LINE);
 
 		/* bit 5 = "bank"? */
 	}
@@ -374,7 +374,7 @@ WRITE16_HANDLER( rtype2_port02_w )
 		coin_counter_w(1,data & 0x02);
 
 		/* bit 2 is flip screen (handled both by software and hardware) */
-		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read(machine, "DSW") >> 8) & 1));
+		flip_screen_set(((data & 0x04) >> 2) ^ ((~input_port_read(space->machine, "DSW") >> 8) & 1));
 
 		/* bit 3 is display disable */
 		video_off = data & 0x08;

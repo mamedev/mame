@@ -158,7 +158,7 @@ WRITE32_HANDLER( policetr_video_w )
 {
 	/* we assume 4-byte accesses */
 	if (mem_mask)
-		logerror("%08X: policetr_video_w access with mask %08X\n", cpu_get_previouspc(machine->activecpu), mem_mask);
+		logerror("%08X: policetr_video_w access with mask %08X\n", cpu_get_previouspc(space->cpu), mem_mask);
 
 	/* 4 offsets */
 	switch (offset)
@@ -208,7 +208,7 @@ WRITE32_HANDLER( policetr_video_w )
 
 				/* log anything else */
 				default:
-					logerror("%08X: policetr_video_w(2) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
+					logerror("%08X: policetr_video_w(2) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
 					break;
 			}
 			break;
@@ -222,7 +222,7 @@ WRITE32_HANDLER( policetr_video_w )
 				/* latch 0x00 is unknown; 0, 1, and 2 get written into the upper 12 bits before rendering */
 				case 0x00:
 					if (data != (0 << 20) && data != (1 << 20) && data != (2 << 20))
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
 					break;
 
 				/* latch 0x10 specifies destination bitmap X and Y offsets */
@@ -234,28 +234,28 @@ WRITE32_HANDLER( policetr_video_w )
 				/* latch 0x20 is unknown; either 0xef or 0x100 is written every IRQ4 */
 				case 0x20:
 					if (data != (0x100 << 12) && data != (0xef << 12))
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
 					break;
 
 				/* latch 0x40 is unknown; a 0 is written every IRQ4 */
 				case 0x40:
 					if (data != 0)
-						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
+						logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
 					break;
 
 				/* latch 0x50 clears IRQ4 */
 				case 0x50:
-					cpu_set_input_line(machine->cpu[0], R3000_IRQ4, CLEAR_LINE);
+					cpu_set_input_line(space->machine->cpu[0], R3000_IRQ4, CLEAR_LINE);
 					break;
 
 				/* latch 0x60 clears IRQ5 */
 				case 0x60:
-					cpu_set_input_line(machine->cpu[0], R3000_IRQ5, CLEAR_LINE);
+					cpu_set_input_line(space->machine->cpu[0], R3000_IRQ5, CLEAR_LINE);
 					break;
 
 				/* log anything else */
 				default:
-					logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(machine->activecpu), data, mem_mask, video_latch);
+					logerror("%08X: policetr_video_w(3) = %08X & %08X with latch %02X\n", cpu_get_previouspc(space->cpu), data, mem_mask, video_latch);
 					break;
 			}
 			break;
@@ -274,33 +274,33 @@ WRITE32_HANDLER( policetr_video_w )
 READ32_HANDLER( policetr_video_r )
 {
 	int inputval;
-	int width = video_screen_get_width(machine->primary_screen);
-	int height = video_screen_get_height(machine->primary_screen);
+	int width = video_screen_get_width(space->machine->primary_screen);
+	int height = video_screen_get_height(space->machine->primary_screen);
 
 	/* the value read is based on the latch */
 	switch (video_latch)
 	{
 		/* latch 0x00 is player 1's gun X coordinate */
 		case 0x00:
-			inputval = ((input_port_read(machine, "GUNX1") & 0xff) * width) >> 8;
+			inputval = ((input_port_read(space->machine, "GUNX1") & 0xff) * width) >> 8;
 			inputval += 0x50;
 			return (inputval << 20) | 0x20000000;
 
 		/* latch 0x01 is player 1's gun Y coordinate */
 		case 0x01:
-			inputval = ((input_port_read(machine, "GUNY1") & 0xff) * height) >> 8;
+			inputval = ((input_port_read(space->machine, "GUNY1") & 0xff) * height) >> 8;
 			inputval += 0x17;
 			return (inputval << 20);
 
 		/* latch 0x02 is player 2's gun X coordinate */
 		case 0x02:
-			inputval = ((input_port_read(machine, "GUNX2") & 0xff) * width) >> 8;
+			inputval = ((input_port_read(space->machine, "GUNX2") & 0xff) * width) >> 8;
 			inputval += 0x50;
 			return (inputval << 20) | 0x20000000;
 
 		/* latch 0x03 is player 2's gun Y coordinate */
 		case 0x03:
-			inputval = ((input_port_read(machine, "GUNY2") & 0xff) * height) >> 8;
+			inputval = ((input_port_read(space->machine, "GUNY2") & 0xff) * height) >> 8;
 			inputval += 0x17;
 			return (inputval << 20);
 
@@ -315,7 +315,7 @@ READ32_HANDLER( policetr_video_r )
 	}
 
 	/* log anything else */
-	logerror("%08X: policetr_video_r with latch %02X\n", cpu_get_previouspc(machine->activecpu), video_latch);
+	logerror("%08X: policetr_video_r with latch %02X\n", cpu_get_previouspc(space->cpu), video_latch);
 	return 0;
 }
 
@@ -345,7 +345,7 @@ WRITE32_HANDLER( policetr_palette_data_w )
 		palette_data[palette_index] = (data >> 16) & 0xff;
 		if (++palette_index == 3)
 		{
-			palette_set_color(machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
+			palette_set_color(space->machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
 			palette_index = 0;
 		}
 	}

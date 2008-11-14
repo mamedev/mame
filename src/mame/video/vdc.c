@@ -557,10 +557,10 @@ static UINT8 vdc_r( running_machine *machine, int which, offs_t offset )
 	return (temp);
 }
 
-WRITE8_HANDLER( vdc_0_w ) {	vdc_w( machine, 0, offset, data ); }
-WRITE8_HANDLER( vdc_1_w ) {	vdc_w( machine, 1, offset, data ); }
-READ8_HANDLER( vdc_0_r ) {	return vdc_r( machine, 0, offset ); }
-READ8_HANDLER( vdc_1_r ) {	return vdc_r( machine, 1, offset ); }
+WRITE8_HANDLER( vdc_0_w ) {	vdc_w( space->machine, 0, offset, data ); }
+WRITE8_HANDLER( vdc_1_w ) {	vdc_w( space->machine, 1, offset, data ); }
+READ8_HANDLER( vdc_0_r ) {	return vdc_r( space->machine, 0, offset ); }
+READ8_HANDLER( vdc_1_r ) {	return vdc_r( space->machine, 1, offset ); }
 
 PALETTE_INIT( vce ) {
 	int i;
@@ -1078,13 +1078,13 @@ static void vpc_init( running_machine *machine ) {
 
 WRITE8_HANDLER( sgx_vdc_w ) {
 	if ( vpc.vdc_select ) {
-		vdc_1_w( machine, offset, data );
+		vdc_1_w( space->machine, offset, data );
 	} else {
-		vdc_0_w( machine, offset, data );
+		vdc_0_w( space->machine, offset, data );
 	}
 }
 
 READ8_HANDLER( sgx_vdc_r ) {
-	return ( vpc.vdc_select ) ? vdc_1_r( machine, offset ) : vdc_0_r( machine, offset );
+	return ( vpc.vdc_select ) ? vdc_1_r( space->machine, offset ) : vdc_0_r( space->machine, offset );
 }
 

@@ -81,7 +81,7 @@ static WRITE8_HANDLER( rom_bank_w )
 	int new_bank = (data&0xff)>>0;
 
 	if(bank!=new_bank) {
-		UINT8 *ROM = memory_region(machine, "main");
+		UINT8 *ROM = memory_region(space->machine, "main");
 		UINT32 bankaddress;
 
 		bank = new_bank;

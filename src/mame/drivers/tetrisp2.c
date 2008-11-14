@@ -105,15 +105,15 @@ static WRITE16_HANDLER( rocknms_sub_systemregs_w )
 
 static READ16_HANDLER( tetrisp2_sound_r )
 {
-	return ymz280b_status_0_r(machine,offset);
+	return ymz280b_status_0_r(space,offset);
 }
 
 static WRITE16_HANDLER( tetrisp2_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		if (offset)	ymz280b_data_0_w     (machine, offset, data & 0xff);
-		else		ymz280b_register_0_w (machine, offset, data & 0xff);
+		if (offset)	ymz280b_data_0_w     (space->machine, offset, data & 0xff);
+		else		ymz280b_register_0_w (space->machine, offset, data & 0xff);
 	}
 }
 
@@ -124,7 +124,7 @@ static READ16_HANDLER( rockn_adpcmbank_r )
 
 static WRITE16_HANDLER( rockn_adpcmbank_w )
 {
-	UINT8 *SNDROM = memory_region(machine, "ymz");
+	UINT8 *SNDROM = memory_region(space->machine, "ymz");
 	int bank;
 
 	rockn_adpcmbank = data;
@@ -141,7 +141,7 @@ static WRITE16_HANDLER( rockn_adpcmbank_w )
 
 static WRITE16_HANDLER( rockn2_adpcmbank_w )
 {
-	UINT8 *SNDROM = memory_region(machine, "ymz");
+	UINT8 *SNDROM = memory_region(space->machine, "ymz");
 	int bank;
 
 	char banktable[9][3]=
@@ -189,23 +189,23 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *rom = memory_region(machine, "okisource");
+		UINT8 *rom = memory_region(space->machine, "okisource");
 
 		if (data & 0x04)
 		{
 			bank_lo = data & 0x03;
 
-			memcpy(memory_region(machine, "oki"), rom + (bank_lo * 0x80000), 0x20000);
+			memcpy(memory_region(space->machine, "oki"), rom + (bank_lo * 0x80000), 0x20000);
 
-//          logerror("PC:%06X sound bank_lo = %02X\n",cpu_get_pc(machine->activecpu),bank_lo);
+//          logerror("PC:%06X sound bank_lo = %02X\n",cpu_get_pc(space->cpu),bank_lo);
 		}
 		else
 		{
 			bank_hi = data & 0x03;
 
-			memcpy(memory_region(machine, "oki") + 0x20000, rom + (bank_lo * 0x80000) + (bank_hi * 0x20000), 0x20000);
+			memcpy(memory_region(space->machine, "oki") + 0x20000, rom + (bank_lo * 0x80000) + (bank_hi * 0x20000), 0x20000);
 
-//          logerror("PC:%06X sound bank_hi = %02X\n",cpu_get_pc(machine->activecpu),bank_hi);
+//          logerror("PC:%06X sound bank_hi = %02X\n",cpu_get_pc(space->cpu),bank_hi);
 		}
 	}
 }
@@ -220,9 +220,9 @@ static WRITE16_HANDLER( nndmseal_sound_bank_w )
 
 static READ16_HANDLER( tetrisp2_ip_1_word_r )
 {
-	return	( input_port_read(machine, "SYSTEM") &  0xfcff ) |
-			(           mame_rand(machine) & ~0xfcff ) |
-			(      1 << (8 + (mame_rand(machine)&1)) );
+	return	( input_port_read(space->machine, "SYSTEM") &  0xfcff ) |
+			(           mame_rand(space->machine) & ~0xfcff ) |
+			(      1 << (8 + (mame_rand(space->machine)&1)) );
 }
 
 

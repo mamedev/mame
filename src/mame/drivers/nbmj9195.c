@@ -74,7 +74,7 @@ static int nbmj9195_sound_r(running_machine *machine, int offset)
 
 static WRITE8_HANDLER( nbmj9195_sound_w )
 {
-	soundlatch_w(machine, 0, data);
+	soundlatch_w(space, 0, data);
 }
 
 static void nbmj9195_soundclr_w(running_machine *machine, int offset, int data)
@@ -130,19 +130,19 @@ static void mscoutm_inputportsel_w(int data)
 static READ8_HANDLER( mscoutm_dipsw_0_r )
 {
 	// DIPSW A
-	return (((input_port_read(machine, "DSWA") & 0x01) << 7) | ((input_port_read(machine, "DSWA") & 0x02) << 5) |
-	        ((input_port_read(machine, "DSWA") & 0x04) << 3) | ((input_port_read(machine, "DSWA") & 0x08) << 1) |
-	        ((input_port_read(machine, "DSWA") & 0x10) >> 1) | ((input_port_read(machine, "DSWA") & 0x20) >> 3) |
-	        ((input_port_read(machine, "DSWA") & 0x40) >> 5) | ((input_port_read(machine, "DSWA") & 0x80) >> 7));
+	return (((input_port_read(space->machine, "DSWA") & 0x01) << 7) | ((input_port_read(space->machine, "DSWA") & 0x02) << 5) |
+	        ((input_port_read(space->machine, "DSWA") & 0x04) << 3) | ((input_port_read(space->machine, "DSWA") & 0x08) << 1) |
+	        ((input_port_read(space->machine, "DSWA") & 0x10) >> 1) | ((input_port_read(space->machine, "DSWA") & 0x20) >> 3) |
+	        ((input_port_read(space->machine, "DSWA") & 0x40) >> 5) | ((input_port_read(space->machine, "DSWA") & 0x80) >> 7));
 }
 
 static READ8_HANDLER( mscoutm_dipsw_1_r )
 {
 	// DIPSW B
-	return (((input_port_read(machine, "DSWB") & 0x01) << 7) | ((input_port_read(machine, "DSWB") & 0x02) << 5) |
-	        ((input_port_read(machine, "DSWB") & 0x04) << 3) | ((input_port_read(machine, "DSWB") & 0x08) << 1) |
-	        ((input_port_read(machine, "DSWB") & 0x10) >> 1) | ((input_port_read(machine, "DSWB") & 0x20) >> 3) |
-	        ((input_port_read(machine, "DSWB") & 0x40) >> 5) | ((input_port_read(machine, "DSWB") & 0x80) >> 7));
+	return (((input_port_read(space->machine, "DSWB") & 0x01) << 7) | ((input_port_read(space->machine, "DSWB") & 0x02) << 5) |
+	        ((input_port_read(space->machine, "DSWB") & 0x04) << 3) | ((input_port_read(space->machine, "DSWB") & 0x08) << 1) |
+	        ((input_port_read(space->machine, "DSWB") & 0x10) >> 1) | ((input_port_read(space->machine, "DSWB") & 0x20) >> 3) |
+	        ((input_port_read(space->machine, "DSWB") & 0x40) >> 5) | ((input_port_read(space->machine, "DSWB") & 0x80) >> 7));
 }
 
 
@@ -420,17 +420,17 @@ static void tmpz84c011_pio_w(running_machine *machine, int offset, int data)
 /* CPU interface */
 
 /* device 0 */
-static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(machine,0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
-static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(machine,1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
-static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(machine,2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
-static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(machine,3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
-static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(machine,4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
+static READ8_HANDLER( tmpz84c011_0_pa_r )	{ return (tmpz84c011_pio_r(space,0) & ~pio_dir[0]) | (pio_latch[0] & pio_dir[0]); }
+static READ8_HANDLER( tmpz84c011_0_pb_r )	{ return (tmpz84c011_pio_r(space,1) & ~pio_dir[1]) | (pio_latch[1] & pio_dir[1]); }
+static READ8_HANDLER( tmpz84c011_0_pc_r )	{ return (tmpz84c011_pio_r(space,2) & ~pio_dir[2]) | (pio_latch[2] & pio_dir[2]); }
+static READ8_HANDLER( tmpz84c011_0_pd_r )	{ return (tmpz84c011_pio_r(space,3) & ~pio_dir[3]) | (pio_latch[3] & pio_dir[3]); }
+static READ8_HANDLER( tmpz84c011_0_pe_r )	{ return (tmpz84c011_pio_r(space,4) & ~pio_dir[4]) | (pio_latch[4] & pio_dir[4]); }
 
-static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(machine, 0, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(machine, 1, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(machine, 2, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(machine, 3, data); }
-static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(machine, 4, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pa_w )	{ pio_latch[0] = data; tmpz84c011_pio_w(space, 0, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pb_w )	{ pio_latch[1] = data; tmpz84c011_pio_w(space, 1, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pc_w )	{ pio_latch[2] = data; tmpz84c011_pio_w(space, 2, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pd_w )	{ pio_latch[3] = data; tmpz84c011_pio_w(space, 3, data); }
+static WRITE8_HANDLER( tmpz84c011_0_pe_w )	{ pio_latch[4] = data; tmpz84c011_pio_w(space, 4, data); }
 
 static READ8_HANDLER( tmpz84c011_0_dir_pa_r )	{ return pio_dir[0]; }
 static READ8_HANDLER( tmpz84c011_0_dir_pb_r )	{ return pio_dir[1]; }
@@ -445,17 +445,17 @@ static WRITE8_HANDLER( tmpz84c011_0_dir_pd_w )	{ pio_dir[3] = data; }
 static WRITE8_HANDLER( tmpz84c011_0_dir_pe_w )	{ pio_dir[4] = data; }
 
 /* device 1 */
-static READ8_HANDLER( tmpz84c011_1_pa_r )	{ return (tmpz84c011_pio_r(machine,5) & ~pio_dir[5]) | (pio_latch[5] & pio_dir[5]); }
-static READ8_HANDLER( tmpz84c011_1_pb_r )	{ return (tmpz84c011_pio_r(machine,6) & ~pio_dir[6]) | (pio_latch[6] & pio_dir[6]); }
-static READ8_HANDLER( tmpz84c011_1_pc_r )	{ return (tmpz84c011_pio_r(machine,7) & ~pio_dir[7]) | (pio_latch[7] & pio_dir[7]); }
-static READ8_HANDLER( tmpz84c011_1_pd_r )	{ return (tmpz84c011_pio_r(machine,8) & ~pio_dir[8]) | (pio_latch[8] & pio_dir[8]); }
-static READ8_HANDLER( tmpz84c011_1_pe_r )	{ return (tmpz84c011_pio_r(machine,9) & ~pio_dir[9]) | (pio_latch[9] & pio_dir[9]); }
+static READ8_HANDLER( tmpz84c011_1_pa_r )	{ return (tmpz84c011_pio_r(space,5) & ~pio_dir[5]) | (pio_latch[5] & pio_dir[5]); }
+static READ8_HANDLER( tmpz84c011_1_pb_r )	{ return (tmpz84c011_pio_r(space,6) & ~pio_dir[6]) | (pio_latch[6] & pio_dir[6]); }
+static READ8_HANDLER( tmpz84c011_1_pc_r )	{ return (tmpz84c011_pio_r(space,7) & ~pio_dir[7]) | (pio_latch[7] & pio_dir[7]); }
+static READ8_HANDLER( tmpz84c011_1_pd_r )	{ return (tmpz84c011_pio_r(space,8) & ~pio_dir[8]) | (pio_latch[8] & pio_dir[8]); }
+static READ8_HANDLER( tmpz84c011_1_pe_r )	{ return (tmpz84c011_pio_r(space,9) & ~pio_dir[9]) | (pio_latch[9] & pio_dir[9]); }
 
-static WRITE8_HANDLER( tmpz84c011_1_pa_w )	{ pio_latch[5] = data; tmpz84c011_pio_w(machine, 5, data); }
-static WRITE8_HANDLER( tmpz84c011_1_pb_w )	{ pio_latch[6] = data; tmpz84c011_pio_w(machine, 6, data); }
-static WRITE8_HANDLER( tmpz84c011_1_pc_w )	{ pio_latch[7] = data; tmpz84c011_pio_w(machine, 7, data); }
-static WRITE8_HANDLER( tmpz84c011_1_pd_w )	{ pio_latch[8] = data; tmpz84c011_pio_w(machine, 8, data); }
-static WRITE8_HANDLER( tmpz84c011_1_pe_w )	{ pio_latch[9] = data; tmpz84c011_pio_w(machine, 9, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pa_w )	{ pio_latch[5] = data; tmpz84c011_pio_w(space, 5, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pb_w )	{ pio_latch[6] = data; tmpz84c011_pio_w(space, 6, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pc_w )	{ pio_latch[7] = data; tmpz84c011_pio_w(space, 7, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pd_w )	{ pio_latch[8] = data; tmpz84c011_pio_w(space, 8, data); }
+static WRITE8_HANDLER( tmpz84c011_1_pe_w )	{ pio_latch[9] = data; tmpz84c011_pio_w(space, 9, data); }
 
 static READ8_HANDLER( tmpz84c011_1_dir_pa_r )	{ return pio_dir[5]; }
 static READ8_HANDLER( tmpz84c011_1_dir_pb_r )	{ return pio_dir[6]; }

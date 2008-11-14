@@ -40,15 +40,15 @@ static WRITE16_HANDLER( twocrude_control_w )
 {
 	switch (offset<<1) {
 	case 0: /* DMA flag */
-		buffer_spriteram16_w(machine,0,0,0xffff);
+		buffer_spriteram16_w(space,0,0,0xffff);
 		return;
 
 	case 6: /* IRQ ack */
 		return;
 
     case 2: /* Sound CPU write */
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
     	return;
 
 	case 4: /* Protection, maybe this is a PAL on the board?
@@ -83,7 +83,7 @@ static WRITE16_HANDLER( twocrude_control_w )
 
 		break;
 	}
-	logerror("Warning %04x- %02x written to control %02x\n",cpu_get_pc(machine->activecpu),data,offset);
+	logerror("Warning %04x- %02x written to control %02x\n",cpu_get_pc(space->cpu),data,offset);
 }
 
 static READ16_HANDLER( twocrude_control_r )
@@ -91,17 +91,17 @@ static READ16_HANDLER( twocrude_control_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(machine, "P1_P2");
+			return input_port_read(space->machine, "P1_P2");
 
 		case 2: /* Dip Switches */
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 
 		case 4: /* Protection */
-			logerror("%04x : protection control read at 30c000 %d\n",cpu_get_pc(machine->activecpu),offset);
+			logerror("%04x : protection control read at 30c000 %d\n",cpu_get_pc(space->cpu),offset);
 			return prot;
 
 		case 6: /* Credits, VBL in byte 7 */
-			return input_port_read(machine, "COINS");
+			return input_port_read(space->machine, "COINS");
 	}
 
 	return ~0;
@@ -160,10 +160,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		ym2151_register_port_0_w(machine,0,data);
+		ym2151_register_port_0_w(space,0,data);
 		break;
 	case 1:
-		ym2151_data_port_0_w(machine,0,data);
+		ym2151_data_port_0_w(space,0,data);
 		break;
 	}
 }
@@ -172,10 +172,10 @@ static WRITE8_HANDLER( YM2203_w )
 {
 	switch (offset) {
 	case 0:
-		ym2203_control_port_0_w(machine,0,data);
+		ym2203_control_port_0_w(space,0,data);
 		break;
 	case 1:
-		ym2203_write_port_0_w(machine,0,data);
+		ym2203_write_port_0_w(space,0,data);
 		break;
 	}
 }

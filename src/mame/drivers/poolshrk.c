@@ -64,7 +64,7 @@ static WRITE8_HANDLER( poolshrk_watchdog_w )
 {
 	if ((offset & 3) == 3)
 	{
-		watchdog_reset_w(machine, 0, 0);
+		watchdog_reset_w(space, 0, 0);
 	}
 }
 
@@ -72,17 +72,17 @@ static WRITE8_HANDLER( poolshrk_watchdog_w )
 static READ8_HANDLER( poolshrk_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
-	UINT8 val = input_port_read(machine, portnames[offset & 3]);
+	UINT8 val = input_port_read(space->machine, portnames[offset & 3]);
 
-	int x = input_port_read(machine, (offset & 1) ? "AN1" : "AN0");
-	int y = input_port_read(machine, (offset & 1) ? "AN3" : "AN2");
+	int x = input_port_read(space->machine, (offset & 1) ? "AN1" : "AN0");
+	int y = input_port_read(space->machine, (offset & 1) ? "AN3" : "AN2");
 
 	if (x >= poolshrk_da_latch) val |= 8;
 	if (y >= poolshrk_da_latch) val |= 4;
 
 	if ((offset & 3) == 3)
 	{
-		watchdog_reset_r(machine, 0);
+		watchdog_reset_r(space, 0);
 	}
 
 	return val;
@@ -91,7 +91,7 @@ static READ8_HANDLER( poolshrk_input_r )
 
 static READ8_HANDLER( poolshrk_irq_reset_r )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 
 	return 0;
 }

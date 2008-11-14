@@ -49,7 +49,7 @@ static READ16_HANDLER( fatfury2_protection_16_r )
 			return ((res & 0xf0) >> 4) | ((res & 0x0f) << 4);
 
 		default:
-logerror("unknown protection read at pc %06x, offset %08x\n",cpu_get_pc(machine->activecpu),offset<<1);
+logerror("unknown protection read at pc %06x, offset %08x\n",cpu_get_pc(space->cpu),offset<<1);
 			return 0;
 	}
 }
@@ -94,7 +94,7 @@ static WRITE16_HANDLER( fatfury2_protection_16_w )
 			break;
 
 		default:
-			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n",cpu_get_pc(machine->activecpu),offset,data);
+			logerror("unknown protection write at pc %06x, offset %08x, data %02x\n",cpu_get_pc(space->cpu),offset,data);
 			break;
 	}
 }
@@ -120,22 +120,22 @@ void fatfury2_install_protection(running_machine *machine)
 static WRITE16_HANDLER ( kof98_prot_w )
 {
 	/* info from razoola */
-	UINT16* mem16 = (UINT16*)memory_region(machine, "main");
+	UINT16* mem16 = (UINT16*)memory_region(space->machine, "main");
 
 	switch (data)
 	{
 		case 0x0090:
-		logerror ("%06x kof98 - protection 0x0090 old %04x %04x\n",cpu_get_pc(machine->activecpu), mem16[0x100/2], mem16[0x102/2]);
+		logerror ("%06x kof98 - protection 0x0090 old %04x %04x\n",cpu_get_pc(space->cpu), mem16[0x100/2], mem16[0x102/2]);
 		mem16[0x100/2] = 0x00c2; mem16[0x102/2] = 0x00fd;
 		break;
 
 		case 0x00f0:
-		logerror ("%06x kof98 - protection 0x00f0 old %04x %04x\n",cpu_get_pc(machine->activecpu), mem16[0x100/2], mem16[0x102/2]);
+		logerror ("%06x kof98 - protection 0x00f0 old %04x %04x\n",cpu_get_pc(space->cpu), mem16[0x100/2], mem16[0x102/2]);
 		mem16[0x100/2] = 0x4e45; mem16[0x102/2] = 0x4f2d;
 		break;
 
 		default: // 00aa is written, but not needed?
-		logerror ("%06x kof98 - unknown protection write %04x\n",cpu_get_pc(machine->activecpu), data);
+		logerror ("%06x kof98 - unknown protection write %04x\n",cpu_get_pc(space->cpu), data);
 		break;
 	}
 }
@@ -216,7 +216,7 @@ static WRITE16_HANDLER( kof99_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
 }
 
 
@@ -253,7 +253,7 @@ static WRITE16_HANDLER( garou_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
 }
 
 
@@ -292,7 +292,7 @@ static WRITE16_HANDLER( garouo_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
 }
 
 
@@ -328,7 +328,7 @@ static WRITE16_HANDLER( mslug3_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
 }
 
 
@@ -360,7 +360,7 @@ static WRITE16_HANDLER( kof2000_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
 }
 
 
@@ -515,7 +515,7 @@ static WRITE16_HANDLER( pvc_prot_w )
 	COMBINE_DATA( &pvc_cartridge_ram[ offset ] );
 	if (offset == 0xff0)pvc_prot1();
 	else if(offset >= 0xff4 && offset <= 0xff5)pvc_prot2();
-	else if(offset >= 0xff8)pvc_write_bankswitch(machine);
+	else if(offset >= 0xff8)pvc_write_bankswitch(space->machine);
 }
 
 

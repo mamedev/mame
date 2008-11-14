@@ -13,7 +13,7 @@ ROM_END
 static READ16_HANDLER( ssf2ghw_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
-	return input_port_read(machine, dswname[offset]);
+	return input_port_read(space->machine, dswname[offset]);
 }
 
 static DRIVER_INIT( ssf2ghw )

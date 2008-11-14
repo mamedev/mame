@@ -107,8 +107,8 @@ static WRITE8_HANDLER( analog_reset_w )
 
 	analog_port_val = 0xff;
 
-	timer_adjust_oneshot(analog_timer_1, compute_duration(input_port_read(machine, "AN1")), 0x02);
-	timer_adjust_oneshot(analog_timer_2, compute_duration(input_port_read(machine, "AN2")), 0x01);
+	timer_adjust_oneshot(analog_timer_1, compute_duration(input_port_read(space->machine, "AN1")), 0x02);
+	timer_adjust_oneshot(analog_timer_2, compute_duration(input_port_read(space->machine, "AN2")), 0x01);
 }
 
 

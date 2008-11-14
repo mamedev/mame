@@ -36,8 +36,8 @@ static INTERRUPT_GEN( scotrsht_interrupt )
 
 static WRITE8_HANDLER( scotrsht_soundlatch_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( scotrsht_map, ADDRESS_SPACE_PROGRAM, 8 )

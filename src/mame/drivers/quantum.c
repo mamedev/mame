@@ -60,19 +60,19 @@
 
 static READ16_HANDLER( trackball_r )
 {
-	return (input_port_read(machine, "TRACKY") << 4) | input_port_read(machine, "TRACKX");
+	return (input_port_read(space->machine, "TRACKY") << 4) | input_port_read(space->machine, "TRACKX");
 }
 
 
 static READ8_HANDLER( input_1_r )
 {
-	return (input_port_read(machine, "DSW0") << (7 - (offset - POT0_C))) & 0x80;
+	return (input_port_read(space->machine, "DSW0") << (7 - (offset - POT0_C))) & 0x80;
 }
 
 
 static READ8_HANDLER( input_2_r )
 {
-	return (input_port_read(machine, "DSW1") << (7 - (offset - POT0_C))) & 0x80;
+	return (input_port_read(space->machine, "DSW1") << (7 - (offset - POT0_C))) & 0x80;
 }
 
 
@@ -114,18 +114,18 @@ static WRITE16_HANDLER( led_w )
 static WRITE16_HANDLER( pokey_word_w )
 {
 	if (offset & 0x10) /* A5 selects chip */
-		pokey2_w(machine, offset & 0x0f, data);
+		pokey2_w(space, offset & 0x0f, data);
 	else
-		pokey1_w(machine, offset & 0x0f, data);
+		pokey1_w(space, offset & 0x0f, data);
 }
 
 
 static READ16_HANDLER( pokey_word_r )
 {
 	if (offset & 0x10)
-		return pokey2_r(machine, offset & 0x0f);
+		return pokey2_r(space, offset & 0x0f);
 	else
-		return pokey1_r(machine, offset & 0x0f);
+		return pokey1_r(space, offset & 0x0f);
 }
 
 

@@ -324,7 +324,7 @@ static void update_irq_lines(running_machine *machine, int param)
 
 WRITE8_HANDLER( seibu_irq_clear_w )
 {
-	update_irq_lines(machine, VECTOR_INIT);
+	update_irq_lines(space->machine, VECTOR_INIT);
 }
 
 WRITE8_HANDLER( seibu_rst10_ack_w )
@@ -334,7 +334,7 @@ WRITE8_HANDLER( seibu_rst10_ack_w )
 
 WRITE8_HANDLER( seibu_rst18_ack_w )
 {
-	update_irq_lines(machine, RST18_CLEAR);
+	update_irq_lines(space->machine, RST18_CLEAR);
 }
 
 void seibu_ym3812_irqhandler(running_machine *machine, int linestate)
@@ -405,7 +405,7 @@ static WRITE8_HANDLER( seibu_pending_w )
 
 READ16_HANDLER( seibu_main_word_r )
 {
-	//logerror("%06x: seibu_main_word_r(%x)\n",cpu_get_pc(machine->activecpu),offset);
+	//logerror("%06x: seibu_main_word_r(%x)\n",cpu_get_pc(space->cpu),offset);
 	switch (offset)
 	{
 		case 2:
@@ -414,14 +414,14 @@ READ16_HANDLER( seibu_main_word_r )
 		case 5:
 			return main2sub_pending ? 1 : 0;
 		default:
-			//logerror("%06x: seibu_main_word_r(%x)\n",cpu_get_pc(machine->activecpu),offset);
+			//logerror("%06x: seibu_main_word_r(%x)\n",cpu_get_pc(space->cpu),offset);
 			return 0xffff;
 	}
 }
 
 WRITE16_HANDLER( seibu_main_word_w )
 {
-	//logerror("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(machine->activecpu),offset,data);
+	//logerror("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(space->cpu),offset,data);
 	if (ACCESSING_BITS_0_7)
 	{
 		switch (offset)
@@ -431,7 +431,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub[offset] = data;
 				break;
 			case 4:
-				update_irq_lines(machine, RST18_ASSERT);
+				update_irq_lines(space->machine, RST18_ASSERT);
 				break;
 			case 6:
 				/* just a guess */
@@ -439,7 +439,7 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub_pending = 1;
 				break;
 			default:
-				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(machine->activecpu),offset,data);
+				//logerror("%06x: seibu_main_word_w(%x,%02x)\n",cpu_get_pc(space->cpu),offset,data);
 				break;
 		}
 	}
@@ -447,12 +447,12 @@ WRITE16_HANDLER( seibu_main_word_w )
 
 READ8_HANDLER( seibu_main_v30_r )
 {
-	return seibu_main_word_r(machine,offset/2,0xffff) >> (8 * (offset & 1));
+	return seibu_main_word_r(space,offset/2,0xffff) >> (8 * (offset & 1));
 }
 
 WRITE8_HANDLER( seibu_main_v30_w )
 {
-	seibu_main_word_w(machine,offset/2,data << (8 * (offset & 1)),0x00ff << (8 * (offset & 1)));
+	seibu_main_word_w(space,offset/2,data << (8 * (offset & 1)),0x00ff << (8 * (offset & 1)));
 }
 
 WRITE16_HANDLER( seibu_main_mustb_w )
@@ -462,7 +462,7 @@ WRITE16_HANDLER( seibu_main_mustb_w )
 
 //  logerror("seibu_main_mustb_w: %x -> %x %x\n", data, main2sub[0], main2sub[1]);
 
-	update_irq_lines(machine, RST18_ASSERT);
+	update_irq_lines(space->machine, RST18_ASSERT);
 }
 
 /***************************************************************************/

@@ -140,7 +140,7 @@ WRITE32_HANDLER( ms32_brightness_w )
 			brt_b = 0x100 - ((brt[1] & 0x00ff) >> 0);
 
 			for (i = 0;i < 0x3000;i++)	// colors 0x3000-0x3fff are not used
-				update_color(machine, i);
+				update_color(space->machine, i);
 		}
 	}
 
@@ -151,7 +151,7 @@ WRITE32_HANDLER( ms32_palram_w )
 {
 	COMBINE_DATA(&ms32_palram[offset]);
 
-	update_color(machine, offset/2);
+	update_color(space->machine, offset/2);
 }
 
 

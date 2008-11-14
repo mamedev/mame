@@ -312,13 +312,13 @@ static void update_color(running_machine *machine, int color, int screen)
 static WRITE32_HANDLER( ms32_pal0_ram_w )
 {
 	COMBINE_DATA(&ms32_pal_ram[0][offset]);
-	update_color(machine, offset/2, 0);
+	update_color(space->machine, offset/2, 0);
 }
 
 static WRITE32_HANDLER( ms32_pal1_ram_w )
 {
 	COMBINE_DATA(&ms32_pal_ram[1][offset]);
-	update_color(machine, offset/2, 1);
+	update_color(space->machine, offset/2, 1);
 }
 
 static int ms32_reverse_sprite_order = 0;
@@ -1203,28 +1203,28 @@ static READ32_HANDLER( bnstars1_r )
 			return 0xffffffff;
 
 		case 0x0000:
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 
 		case 0x0080:
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 
 		case 0x2000:
-			return input_port_read(machine, "IN2");
+			return input_port_read(space->machine, "IN2");
 
 		case 0x2080:
-			return input_port_read(machine, "IN3");
+			return input_port_read(space->machine, "IN3");
 
 	}
 }
 
 static READ32_HANDLER( bnstars2_r )
 {
-	return input_port_read(machine, "IN4");
+	return input_port_read(space->machine, "IN4");
 }
 
 static READ32_HANDLER( bnstars3_r )
 {
-	return input_port_read(machine, "IN5");
+	return input_port_read(space->machine, "IN5");
 }
 
 static WRITE32_HANDLER( bnstars1_mahjong_select_w )

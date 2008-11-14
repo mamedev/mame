@@ -169,7 +169,7 @@ static WRITE8_HANDLER( jingbell_nmi_and_coins_w )
 {
 	if ((nmi_enable ^ data) & (~0xdd))
 	{
-		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(machine->activecpu),data);
+		logerror("PC %06X: nmi_and_coins = %02x\n",cpu_get_pc(space->cpu),data);
 //      popmessage("%02x",data);
 	}
 
@@ -226,7 +226,7 @@ static WRITE8_HANDLER( jingbell_magic_w )
 
 		default:
 //          popmessage("magic %x <- %04x",igs_magic[0],data);
-			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(machine->activecpu), igs_magic[0], data);
+			logerror("%06x: warning, writing to igs_magic %02x = %02x\n", cpu_get_pc(space->cpu), igs_magic[0], data);
 	}
 }
 
@@ -235,16 +235,16 @@ static READ8_HANDLER( jingbell_magic_r )
 	switch(igs_magic[0])
 	{
 		case 0x00:
-			if ( !(igs_magic[1] & 0x01) )	return input_port_read(machine, "DSW1");
-			if ( !(igs_magic[1] & 0x02) )	return input_port_read(machine, "DSW2");
-			if ( !(igs_magic[1] & 0x04) )	return input_port_read(machine, "DSW3");
-			if ( !(igs_magic[1] & 0x08) )	return input_port_read(machine, "DSW4");
-			if ( !(igs_magic[1] & 0x10) )	return input_port_read(machine, "DSW5");
-			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", cpu_get_pc(machine->activecpu), igs_magic[1]);
+			if ( !(igs_magic[1] & 0x01) )	return input_port_read(space->machine, "DSW1");
+			if ( !(igs_magic[1] & 0x02) )	return input_port_read(space->machine, "DSW2");
+			if ( !(igs_magic[1] & 0x04) )	return input_port_read(space->machine, "DSW3");
+			if ( !(igs_magic[1] & 0x08) )	return input_port_read(space->machine, "DSW4");
+			if ( !(igs_magic[1] & 0x10) )	return input_port_read(space->machine, "DSW5");
+			logerror("%06x: warning, reading dsw with igs_magic[1] = %02x\n", cpu_get_pc(space->cpu), igs_magic[1]);
 			break;
 
 		default:
-			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(machine->activecpu), igs_magic[0]);
+			logerror("%06x: warning, reading with igs_magic = %02x\n", cpu_get_pc(space->cpu), igs_magic[0]);
 	}
 
 	return 0;

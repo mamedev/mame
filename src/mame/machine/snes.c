@@ -339,7 +339,7 @@ READ8_HANDLER( snes_r_io )
 				return snes_ram[offset];
 			}
 		case SLHV:		/* Software latch for H/V counter */
-			snes_latch_counters(machine);
+			snes_latch_counters(space->machine);
 			return 0x0;		/* Return value is meaningless */
 		case ROAMDATA:	/* Read data from OAM (DR) */
 			{
@@ -515,7 +515,7 @@ READ8_HANDLER( snes_r_io )
 			return value;
 		case HVBJOY:		/* H/V blank and joypad controller enable */
 			// electronics test says hcounter 272 is start of hblank, which is beampos 363
-//          if (video_screen_get_hpos(machine->primary_screen) >= 363) snes_ram[offset] |= 0x40;
+//          if (video_screen_get_hpos(space->machine->primary_screen) >= 363) snes_ram[offset] |= 0x40;
 //              else snes_ram[offset] &= ~0x40;
 			return snes_ram[offset];
 		case RDIO:			/* Programmable I/O port - echos back what's written to WRIO */
@@ -563,15 +563,15 @@ READ8_HANDLER( snes_r_io )
 #ifndef MESS
 		case 0x4100:		/* NSS Dip-Switches */
 #ifdef MAME_DEBUG
-			return input_port_read_safe(machine, "DEBUG1", 0);
+			return input_port_read_safe(space->machine, "DEBUG1", 0);
 #else
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 #endif	/* MAME_DEBUG */
 //      case 0x4101: //PC: a104 - a10e - a12a   //only nss_actr
 //      case 0x420c: //PC: 9c7d - 8fab          //only nss_ssoc
 
 		default:
-			mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(machine->activecpu));
+			mame_printf_debug("snes_r: offset = %x pc = %x\n",offset,cpu_get_pc(space->cpu));
 #endif	/* MESS */
 
 	}
@@ -593,7 +593,7 @@ WRITE8_HANDLER( snes_w_io )
 	{
 //          printf("816: %02x to APU @ %d\n", data, offset&3);
 	     	spc_port_in[offset & 0x3] = data;
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
 		return;
 	}
 
@@ -697,7 +697,7 @@ WRITE8_HANDLER( snes_w_io )
 		case BGMODE:	/* BG mode and character size settings */
 			snes_ppu.mode = data & 0x7;
 			{
-				rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
+				rectangle visarea = *video_screen_get_visible_area(space->machine->primary_screen);
 
 				visarea.min_x = visarea.min_y = 0;
 				visarea.max_y = snes_ppu.beam.last_visible_line - 1;
@@ -715,9 +715,9 @@ WRITE8_HANDLER( snes_w_io )
 				}
 
 				if ((snes_ram[STAT78] & 0x10) == SNES_NTSC)
-					video_screen_configure(machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_NTSC, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+					video_screen_configure(space->machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_NTSC, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
 				else
-					video_screen_configure(machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds);
+					video_screen_configure(space->machine->primary_screen, SNES_HTOTAL*snes_htmult, SNES_VTOTAL_PAL, &visarea, video_screen_get_frame_period(space->machine->primary_screen).attoseconds);
 			}
 
 			snes_ppu.layer[0].tile_size = (data >> 4) & 0x1;
@@ -996,7 +996,7 @@ WRITE8_HANDLER( snes_w_io )
 			if (!(snes_ram[WRIO] & 0x80) && (data & 0x80))
 			{
 				// external latch
-				snes_latch_counters(machine);
+				snes_latch_counters(space->machine);
 			}
 		case WRMPYA:	/* Multiplier A */
 			break;
@@ -1043,7 +1043,7 @@ WRITE8_HANDLER( snes_w_io )
 		case MEMSEL:	/* Access cycle designation in memory (2) area */
 			/* FIXME: Need to adjust the speed only during access of banks 0x80+
              * Currently we are just increasing it no matter what */
-//          cpu_set_clockscale(machine->cpu[0], (data & 0x1) ? 1.335820896 : 1.0 );
+//          cpu_set_clockscale(space->machine->cpu[0], (data & 0x1) ? 1.335820896 : 1.0 );
 #ifdef SNES_DBG_REG_W
 			if( (data & 0x1) != (snes_ram[MEMSEL] & 0x1) )
 				mame_printf_debug( "CPU speed: %f Mhz\n", (data & 0x1) ? 3.58 : 2.68 );
@@ -1178,11 +1178,11 @@ READ8_HANDLER( snes_r_bank1 )
 	if (address < 0x2000)											/* Mirror of Low RAM */
 		value = program_read_byte(0x7e0000 + address);
 	else if (address < 0x6000)										/* I/O */
-		value = snes_r_io(machine, address);
+		value = snes_r_io(space->machine, address);
 	else if (address < 0x8000)
 	{
 		if (has_addon_chip == HAS_OBC1)
-			value = obc1_read(machine, offset);
+			value = obc1_read(space->machine, offset);
 		else if ((has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 			value = (address < 0x7000) ? DSP2_read() : 0x00;
 		else if ((snes_cart.mode == SNES_MODE_21) && (has_addon_chip == HAS_DSP1) && (offset < 0x100000))
@@ -1209,11 +1209,11 @@ READ8_HANDLER( snes_r_bank2 )
 	if (address < 0x2000)											/* Mirror of Low RAM */
 		value = program_read_byte(0x7e0000 + address);
 	else if (address < 0x6000)										/* I/O */
-		value = snes_r_io(machine, address);
+		value = snes_r_io(space->machine, address);
 	else if (address < 0x8000)										/* SRAM for mode_21, Reserved othewise */
 	{
 		if (has_addon_chip == HAS_OBC1)
-			value = obc1_read (machine, offset);
+			value = obc1_read (space->machine, offset);
 		else if (has_addon_chip == HAS_DSP2)
 			value = (address < 0x7000) ? DSP2_read() : 0x00;
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
@@ -1361,11 +1361,11 @@ WRITE8_HANDLER( snes_w_bank1 )
 	if (address < 0x2000)							/* Mirror of Low RAM */
 		program_write_byte(0x7e0000 + address, data);
 	else if (address < 0x6000)						/* I/O */
-		snes_w_io(machine, address, data);
+		snes_w_io(space->machine, address, data);
 	else if (address < 0x8000)
 	{
 		if (has_addon_chip == HAS_OBC1)
-			obc1_write(machine, offset, data);
+			obc1_write(space->machine, offset, data);
 		else if ((has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 			DSP2_write(data);
 		else if ((snes_cart.mode == SNES_MODE_21) && (has_addon_chip == HAS_DSP1) && (offset < 0x100000))
@@ -1389,11 +1389,11 @@ WRITE8_HANDLER( snes_w_bank2 )
 	if (address < 0x2000)							/* Mirror of Low RAM */
 		program_write_byte(0x7e0000 + address, data);
 	else if (address < 0x6000)						/* I/O */
-		snes_w_io(machine, address, data);
+		snes_w_io(space->machine, address, data);
 	else if (address < 0x8000)						/* SRAM for mode_21, Reserved othewise */
 	{
 		if (has_addon_chip == HAS_OBC1)
-			obc1_write(machine, offset, data);
+			obc1_write(space->machine, offset, data);
 		else if (has_addon_chip == HAS_DSP2)
 			DSP2_write(data);
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
@@ -1462,18 +1462,18 @@ WRITE8_HANDLER( snes_w_bank6 )
 		if (snes_cart.mode != SNES_MODE_25)
 		{
 			if (offset < 0x300000)
-				snes_w_bank1(machine, offset, data);
+				snes_w_bank1(space->machine, offset, data);
 			else
-				snes_w_bank2(machine, offset - 0x300000, data);
+				snes_w_bank2(space->machine, offset - 0x300000, data);
 		}
 		else	/* Mode 25 has SRAM not mirrored from lower banks */
 		{
 			if (address < 0x6000)
 			{
 				if (offset < 0x300000)
-					snes_w_bank1(machine, offset, data);
+					snes_w_bank1(space->machine, offset, data);
 				else
-					snes_w_bank2(machine, offset - 0x300000, data);
+					snes_w_bank2(space->machine, offset - 0x300000, data);
 			}
 			else if ((offset >= 0x300000) && (snes_cart.sram > 0))
 			{
@@ -1506,9 +1506,9 @@ WRITE8_HANDLER( snes_w_bank7 )
 			if (offset >= 0x3e0000)
 				logerror("Attempt to write to banks 0xfe - 0xff address: %X\n", offset);
 			else if (offset >= 0x300000)
-				snes_w_bank5(machine, offset - 0x300000, data);
+				snes_w_bank5(space->machine, offset - 0x300000, data);
 			else if (offset >= 0x200000)
-				snes_w_bank4(machine, offset - 0x200000, data);
+				snes_w_bank4(space->machine, offset - 0x200000, data);
 		}
 		else
 			logerror("Attempt to write to ROM address: %X\n", offset + 0xc00000);

@@ -274,15 +274,15 @@ static TIMER_CALLBACK( m92_scanline_interrupt )
 
 static READ16_HANDLER( m92_eeprom_r )
 {
-	UINT8 *RAM = memory_region(machine, "user1");
-//  logerror("%05x: EEPROM RE %04x\n",cpu_get_pc(machine->activecpu),offset);
+	UINT8 *RAM = memory_region(space->machine, "user1");
+//  logerror("%05x: EEPROM RE %04x\n",cpu_get_pc(space->cpu),offset);
 	return RAM[offset] | 0xff00;
 }
 
 static WRITE16_HANDLER( m92_eeprom_w )
 {
-	UINT8 *RAM = memory_region(machine, "user1");
-//  logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(machine->activecpu),offset);
+	UINT8 *RAM = memory_region(space->machine, "user1");
+//  logerror("%05x: EEPROM WR %04x\n",cpu_get_pc(space->cpu),offset);
 	if (ACCESSING_BITS_0_7)
 		RAM[offset] = data;
 }
@@ -304,7 +304,7 @@ static WRITE16_HANDLER( m92_bankswitch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		bankaddress = 0x100000 + ((data & 0x7) * 0x10000);
-		set_m92_bank(machine);
+		set_m92_bank(space->machine);
 	}
 }
 
@@ -342,18 +342,18 @@ static TIMER_CALLBACK( setvector_callback )
 static WRITE16_HANDLER( m92_soundlatch_w )
 {
 	timer_call_after_resynch(NULL, V30_ASSERT, setvector_callback);
-	soundlatch_w(machine, 0, data & 0xff);
+	soundlatch_w(space, 0, data & 0xff);
 }
 
 static READ16_HANDLER( m92_sound_status_r )
 {
-//logerror("%06x: read sound status\n",cpu_get_pc(machine->activecpu));
+//logerror("%06x: read sound status\n",cpu_get_pc(space->cpu));
 	return sound_status;
 }
 
 static READ16_HANDLER( m92_soundlatch_r )
 {
-	return soundlatch_r(machine, offset) | 0xff00;
+	return soundlatch_r(space, offset) | 0xff00;
 }
 
 static WRITE16_HANDLER( m92_sound_irq_ack_w )
@@ -364,7 +364,7 @@ static WRITE16_HANDLER( m92_sound_irq_ack_w )
 static WRITE16_HANDLER( m92_sound_status_w )
 {
 	COMBINE_DATA(&sound_status);
-	cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, M92_IRQ_3);
+	cpu_set_input_line_and_vector(space->machine->cpu[0], 0, HOLD_LINE, M92_IRQ_3);
 }
 
 /*****************************************************************************/

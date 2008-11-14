@@ -386,6 +386,8 @@ INLINE UINT16 mix_3D(ay8910_context *psg)
 
 static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	//if (r >= 11 && r <= 13 ) printf("%d %x %02x\n", PSG->index, r, v);
 	psg->regs[r] = v;
@@ -412,7 +414,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 			{
 				/* write out 0xff if port set to input */
 				if (psg->intf->portAwrite)
-					(*psg->intf->portAwrite)(Machine, 0, (psg->regs[AY_ENABLE] & 0x40) ? psg->regs[AY_PORTA] : 0xff);
+					(*psg->intf->portAwrite)(space, 0, (psg->regs[AY_ENABLE] & 0x40) ? psg->regs[AY_PORTA] : 0xff);
 			}
 
 			if ((psg->last_enable == -1) ||
@@ -420,7 +422,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 			{
 				/* write out 0xff if port set to input */
 				if (psg->intf->portBwrite)
-					(*psg->intf->portBwrite)(Machine, 0, (psg->regs[AY_ENABLE] & 0x80) ? psg->regs[AY_PORTB] : 0xff);
+					(*psg->intf->portBwrite)(space, 0, (psg->regs[AY_ENABLE] & 0x80) ? psg->regs[AY_PORTB] : 0xff);
 			}
 
 			psg->last_enable = psg->regs[AY_ENABLE];
@@ -446,7 +448,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 			if (psg->regs[AY_ENABLE] & 0x40)
 			{
 				if (psg->intf->portAwrite)
-					(*psg->intf->portAwrite)(Machine, 0, psg->regs[AY_PORTA]);
+					(*psg->intf->portAwrite)(space, 0, psg->regs[AY_PORTA]);
 				else
 					logerror("warning - write %02x to 8910 #%d Port A\n",psg->regs[AY_PORTA],psg->index);
 			}
@@ -459,7 +461,7 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 			if (psg->regs[AY_ENABLE] & 0x80)
 			{
 				if (psg->intf->portBwrite)
-					(*psg->intf->portBwrite)(Machine, 0, psg->regs[AY_PORTB]);
+					(*psg->intf->portBwrite)(space, 0, psg->regs[AY_PORTB]);
 				else
 					logerror("warning - write %02x to 8910 #%d Port B\n",psg->regs[AY_PORTB],psg->index);
 			}
@@ -779,6 +781,8 @@ void ay8910_write_ym(void *chip, int addr, int data)
 
 int ay8910_read_ym(void *chip)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	ay8910_context *psg = chip;
 	int r = psg->register_latch;
 
@@ -794,7 +798,7 @@ int ay8910_read_ym(void *chip)
            data. Some games, like kidniki, need this to work.
          */
 		if (psg->intf->portAread)
-			psg->regs[AY_PORTA] = (*psg->intf->portAread)(Machine, 0);
+			psg->regs[AY_PORTA] = (*psg->intf->portAread)(space, 0);
 		else
 			logerror("PC %04x: warning - read 8910 #%d Port A\n",cpu_get_pc(Machine->activecpu),psg->index);
 		break;
@@ -802,7 +806,7 @@ int ay8910_read_ym(void *chip)
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
 			logerror("warning: read from 8910 #%d Port B set as output\n",psg->index);
 		if (psg->intf->portBread)
-			psg->regs[AY_PORTB] = (*psg->intf->portBread)(Machine, 0);
+			psg->regs[AY_PORTB] = (*psg->intf->portBread)(space, 0);
 		else
 			logerror("PC %04x: warning - read 8910 #%d Port B\n",cpu_get_pc(Machine->activecpu),psg->index);
 		break;

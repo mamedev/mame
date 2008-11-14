@@ -115,12 +115,12 @@ static WRITE16_HANDLER( dbzcontrol_w )
 
 static WRITE16_HANDLER( dbz_sound_command_w )
 {
-	soundlatch_w(machine, 0, data>>8);
+	soundlatch_w(space, 0, data>>8);
 }
 
 static WRITE16_HANDLER( dbz_sound_cause_nmi )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void dbz_sound_irq(running_machine *machine, int irq)

@@ -77,7 +77,7 @@ static WRITE32_HANDLER( galastrm_palette_w )
 	if (ACCESSING_BITS_16_31)
 		tc0110pcr_addr = data >> 16;
 	if ((ACCESSING_BITS_0_15) && (tc0110pcr_addr < 4096))
-		palette_set_color_rgb(machine, tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+		palette_set_color_rgb(space->machine, tc0110pcr_addr, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static WRITE32_HANDLER( galastrm_tc0610_0_w )
@@ -127,7 +127,7 @@ popmessage(t);
 		{
 			if (ACCESSING_BITS_24_31)	/* $400000 is watchdog */
 			{
-				watchdog_reset(machine);
+				watchdog_reset(space->machine);
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -150,7 +150,7 @@ popmessage(t);
 				coin_counter_w(1, data & 0x04000000);
 				coin_word = (data >> 16) &0xffff;
 			}
-//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(machine->activecpu),offset);
+//logerror("CPU #0 PC %06x: write input %06x\n",cpu_get_pc(space->cpu),offset);
 		}
 	}
 }
@@ -160,9 +160,9 @@ static READ32_HANDLER( galastrm_adstick_ctrl_r )
 	if (offset == 0x00)
 	{
 		if (ACCESSING_BITS_24_31)
-			return input_port_read(machine, "STICKX") << 24;
+			return input_port_read(space->machine, "STICKX") << 24;
 		if (ACCESSING_BITS_16_23)
-			return input_port_read(machine, "STICKY") << 16;
+			return input_port_read(space->machine, "STICKY") << 16;
 	}
 	return 0;
 }

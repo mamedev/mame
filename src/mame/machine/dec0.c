@@ -19,20 +19,20 @@ READ16_HANDLER( dec0_controls_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 & 2 joystick & buttons */
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 
 		case 2: /* Credits, start buttons */
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 
 		case 4: /* Byte 4: Dipswitch bank 2, Byte 5: Dipswitch Bank 1 */
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 
 		case 8: /* Intel 8751 mc, Bad Dudes & Heavy Barrel only */
-			//logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(machine->activecpu), 0x30c000+offset);
+			//logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(space->cpu), 0x30c000+offset);
 			return i8751_return;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(machine->activecpu), 0x30c000+offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped memory address %06x\n", cpu_get_pc(space->cpu), 0x30c000+offset);
 	return ~0;
 }
 
@@ -43,10 +43,10 @@ READ16_HANDLER( dec0_rotary_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 rotary */
-			return ~(1 << (input_port_read(machine, "AN0") * 12 / 256));
+			return ~(1 << (input_port_read(space->machine, "AN0") * 12 / 256));
 
 		case 8: /* Player 2 rotary */
-			return ~(1 << (input_port_read(machine, "AN1") * 12 / 256));
+			return ~(1 << (input_port_read(space->machine, "AN1") * 12 / 256));
 
 		default:
 			logerror("Unknown rotary read at 300000 %02x\n", offset);
@@ -62,25 +62,25 @@ READ16_HANDLER( midres_controls_r )
 	switch (offset<<1)
 	{
 		case 0: /* Player 1 Joystick + start, Player 2 Joystick + start */
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 
 		case 2: /* Dipswitches */
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 
 		case 4: /* Player 1 rotary */
-			return ~(1 << (input_port_read(machine, "AN0") * 12 / 256));
+			return ~(1 << (input_port_read(space->machine, "AN0") * 12 / 256));
 
 		case 6: /* Player 2 rotary */
-			return ~(1 << (input_port_read(machine, "AN1") * 12 / 256));
+			return ~(1 << (input_port_read(space->machine, "AN1") * 12 / 256));
 
 		case 8: /* Credits, start buttons */
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 
 		case 12:
 			return 0;	/* ?? watchdog ?? */
 	}
 
-	logerror("PC %06x unknown control read at %02x\n", cpu_get_pc(machine->activecpu), 0x180000+offset);
+	logerror("PC %06x unknown control read at %02x\n", cpu_get_pc(space->cpu), 0x180000+offset);
 	return ~0;
 }
 
@@ -91,13 +91,13 @@ READ16_HANDLER( slyspy_controls_r )
 	switch (offset<<1)
 	{
 		case 0: /* Dip Switches */
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 
 		case 2: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 
 		case 4: /* Credits */
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 	}
 
 	logerror("Unknown control read at 30c000 %d\n", offset);
@@ -114,7 +114,7 @@ READ16_HANDLER( slyspy_protection_r )
 		case 6:		return 0x2;
 	}
 
-	logerror("%04x, Unknown protection read at 30c000 %d\n", cpu_get_pc(machine->activecpu), offset);
+	logerror("%04x, Unknown protection read at 30c000 %d\n", cpu_get_pc(space->cpu), offset);
 	return 0;
 }
 
@@ -167,72 +167,72 @@ WRITE16_HANDLER( slyspy_240000_w )
 {
 	switch (slyspy_state) {
 		case 0x3:
-			dec0_pf1_data_w(machine,offset,data,mem_mask);
+			dec0_pf1_data_w(space,offset,data,mem_mask);
 			return;
 		case 0x2:
-			dec0_pf2_data_w(machine,offset,data,mem_mask);
+			dec0_pf2_data_w(space,offset,data,mem_mask);
 			return;
 		case 0x0:
-			if (offset<0x8) dec0_pf2_control_0_w(machine,offset,data,mem_mask);
-			else if (offset<0x10) dec0_pf2_control_1_w(machine,offset-0x8,data,mem_mask);
+			if (offset<0x8) dec0_pf2_control_0_w(space,offset,data,mem_mask);
+			else if (offset<0x10) dec0_pf2_control_1_w(space,offset-0x8,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 240000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
+	logerror("Wrote to 240000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_242000_w )
 {
 	switch (slyspy_state) {
 		case 0x2: /* Trap A */
-			dec0_pf1_data_w(machine,offset,data,mem_mask);
+			dec0_pf1_data_w(space,offset,data,mem_mask);
 			return;
 		case 0x0: /* Trap C */
 			if (offset<0x40) COMBINE_DATA(&dec0_pf2_colscroll[offset]);
 			else if (offset<0x300) COMBINE_DATA(&dec0_pf2_rowscroll[offset-0x200]);
 			return;
 	}
-	logerror("Wrote to 242000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
+	logerror("Wrote to 242000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_246000_w )
 {
 	switch (slyspy_state) {
 		case 0x0:
-			dec0_pf2_data_w(machine,offset,data,mem_mask);
+			dec0_pf2_data_w(space,offset,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 246000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
+	logerror("Wrote to 246000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_248000_w )
 {
 	switch (slyspy_state) {
 		case 0x1:
-			dec0_pf1_data_w(machine,offset,data,mem_mask);
+			dec0_pf1_data_w(space,offset,data,mem_mask);
 			return;
 		case 0x3:
-			dec0_pf2_data_w(machine,offset,data,mem_mask);
+			dec0_pf2_data_w(space,offset,data,mem_mask);
 			return;
 		case 0x0:
-			if (offset<0x8) dec0_pf1_control_0_w(machine,offset,data,mem_mask);
-			else if (offset<0x10) dec0_pf1_control_1_w(machine,offset-0x8,data,mem_mask);
+			if (offset<0x8) dec0_pf1_control_0_w(space,offset,data,mem_mask);
+			else if (offset<0x10) dec0_pf1_control_1_w(space,offset-0x8,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 248000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
+	logerror("Wrote to 248000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_24c000_w )
 {
 	switch (slyspy_state) {
 		case 0x1: /* Trap 9 */
-			dec0_pf2_data_w(machine,offset,data,mem_mask);
+			dec0_pf2_data_w(space,offset,data,mem_mask);
 			return;
 		case 0x0: /* Trap C */
 			if (offset<0x40) COMBINE_DATA(&dec0_pf1_colscroll[offset]);
 			else if (offset<0x300) COMBINE_DATA(&dec0_pf1_rowscroll[offset-0x200]);
 			return;
 	}
-	logerror("Wrote to 24c000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
+	logerror("Wrote to 24c000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
 }
 
 WRITE16_HANDLER( slyspy_24e000_w )
@@ -240,10 +240,10 @@ WRITE16_HANDLER( slyspy_24e000_w )
 	switch (slyspy_state) {
 		case 0x2:
 		case 0x0:
-			dec0_pf1_data_w(machine,offset,data,mem_mask);
+			dec0_pf1_data_w(space,offset,data,mem_mask);
 			return;
 	}
-	logerror("Wrote to 24e000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(machine->activecpu),data,slyspy_state);
+	logerror("Wrote to 24e000 %02x at %04x %04x (Trap %02x)\n",offset,cpu_get_pc(space->cpu),data,slyspy_state);
 }
 
 /******************************************************************************/
@@ -280,7 +280,7 @@ WRITE8_HANDLER( hippodrm_shared_w )
 
 static READ16_HANDLER( hippodrm_68000_share_r )
 {
-	if (offset==0) cpu_yield(machine->activecpu); /* A wee helper */
+	if (offset==0) cpu_yield(space->cpu); /* A wee helper */
 	return share[offset]&0xff;
 }
 
@@ -514,19 +514,19 @@ static WRITE16_HANDLER( sprite_mirror_w )
 
 static READ16_HANDLER( robocop_68000_share_r )
 {
-//logerror("%08x: Share read %04x\n",cpu_get_pc(machine->activecpu),offset);
+//logerror("%08x: Share read %04x\n",cpu_get_pc(space->cpu),offset);
 
 	return robocop_shared_ram[offset];
 }
 
 static WRITE16_HANDLER( robocop_68000_share_w )
 {
-//  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(machine->activecpu),offset,data);
+//  logerror("%08x: Share write %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
 
 	robocop_shared_ram[offset]=data&0xff;
 
 	if (offset==0x7ff) /* A control address - not standard ram */
-		cpu_set_input_line(machine->cpu[2],0,HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[2],0,HOLD_LINE);
 }
 
 /******************************************************************************/

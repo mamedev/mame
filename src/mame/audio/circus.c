@@ -175,7 +175,7 @@ DISCRETE_SOUND_END
 WRITE8_HANDLER( circus_clown_z_w )
 {
 	clown_z = (data & 0x0f);
-	*(memory_region(machine, "main")+0x8000)=data; logerror("Z:%02x\n",data); //DEBUG
+	*(memory_region(space->machine, "main")+0x8000)=data; logerror("Z:%02x\n",data); //DEBUG
 	/* Bits 4-6 enable/disable trigger different events */
 
 	switch (circus_game)
@@ -185,11 +185,11 @@ WRITE8_HANDLER( circus_clown_z_w )
 			switch ((data & 0x70) >> 4)
 			{
 				case 0 : /* All Off */
-					discrete_sound_w(machine, CIRCUS_MUSIC_BIT, 0);
+					discrete_sound_w(space, CIRCUS_MUSIC_BIT, 0);
 					break;
 
 				case 1 : /* Music */
-					discrete_sound_w(machine, CIRCUS_MUSIC_BIT, 1);
+					discrete_sound_w(space, CIRCUS_MUSIC_BIT, 1);
 					break;
 
 				case 2 : /* Circus = Pop; Rip Cord = Splash */
@@ -218,7 +218,7 @@ WRITE8_HANDLER( circus_clown_z_w )
 			break;
 
 		case 2:	/* robotbwl */
-			discrete_sound_w(machine, ROBOTBWL_MUSIC_BIT, data & 0x08);	/* Footsteps */
+			discrete_sound_w(space, ROBOTBWL_MUSIC_BIT, data & 0x08);	/* Footsteps */
 
 			if (data & 0x40)	/* Hit */
 				sample_start (0, 0, 0);
@@ -243,11 +243,11 @@ WRITE8_HANDLER( circus_clown_z_w )
 			switch ((data & 0x70) >> 4)
 			{
 				case 0 : /* All Off */
-					discrete_sound_w(machine, CRASH_MUSIC_BIT, 0);
+					discrete_sound_w(space, CRASH_MUSIC_BIT, 0);
 					break;
 
 				case 1 : /* Music */
-					discrete_sound_w(machine, CRASH_MUSIC_BIT, 1);
+					discrete_sound_w(space, CRASH_MUSIC_BIT, 1);
 					break;
 
 				case 2 : /* Crash */
@@ -255,14 +255,14 @@ WRITE8_HANDLER( circus_clown_z_w )
 					break;
 
 				case 3 : /* Normal Video and Beep */
-					discrete_sound_w(machine, CRASH_BEEPER_EN, 0);
+					discrete_sound_w(space, CRASH_BEEPER_EN, 0);
 					break;
 
 				case 4 : /* Skid */
 					break;
 
 				case 5 : /* Invert Video and Beep */
-					discrete_sound_w(machine, CRASH_BEEPER_EN, 0);
+					discrete_sound_w(space, CRASH_BEEPER_EN, 0);
 					break;
 
 				case 6 : /* Hi Motor */

@@ -479,8 +479,8 @@ DISCRETE_SOUND_END
 
 WRITE8_HANDLER( phoenix_sound_control_a_w )
 {
-	discrete_sound_w(machine, PHOENIX_EFFECT_2_DATA, data & 0x0f);
-	discrete_sound_w(machine, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
+	discrete_sound_w(space, PHOENIX_EFFECT_2_DATA, data & 0x0f);
+	discrete_sound_w(space, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
 #if 0
 	/* future handling of noise sounds */
 	discrete_sound_w(PHOENIX_EFFECT_3_EN  , data & 0x40);
@@ -512,9 +512,9 @@ SOUND_START( phoenix)
 
 WRITE8_HANDLER( phoenix_sound_control_b_w )
 {
-	discrete_sound_w(machine, PHOENIX_EFFECT_1_DATA, data & 0x0f);
-	discrete_sound_w(machine, PHOENIX_EFFECT_1_FILT, data & 0x20);
-	discrete_sound_w(machine, PHOENIX_EFFECT_1_FREQ, data & 0x10);
+	discrete_sound_w(space, PHOENIX_EFFECT_1_DATA, data & 0x0f);
+	discrete_sound_w(space, PHOENIX_EFFECT_1_FILT, data & 0x20);
+	discrete_sound_w(space, PHOENIX_EFFECT_1_FREQ, data & 0x10);
 
 	/* update the tune that the MM6221AA is playing */
 	mm6221aa_tune_w(0, data >> 6);

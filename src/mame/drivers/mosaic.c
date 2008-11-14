@@ -51,7 +51,7 @@ static READ8_HANDLER( protection_r )
 {
 	int res = (prot_val >> 8) & 0xff;
 
-	logerror("%06x: protection_r %02x\n",cpu_get_pc(machine->activecpu),res);
+	logerror("%06x: protection_r %02x\n",cpu_get_pc(space->cpu),res);
 
 	prot_val <<= 8;
 
@@ -60,7 +60,7 @@ static READ8_HANDLER( protection_r )
 
 static WRITE8_HANDLER( gfire2_protection_w )
 {
-	logerror("%06x: protection_w %02x\n",cpu_get_pc(machine->activecpu),data);
+	logerror("%06x: protection_w %02x\n",cpu_get_pc(space->cpu),data);
 
 	switch(data)
 	{

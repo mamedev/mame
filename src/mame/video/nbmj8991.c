@@ -51,7 +51,7 @@ WRITE8_HANDLER( nbmj8991_palette_type1_w )
 	g = ((paletteram[offset + 1] & 0xf0) >> 4);
 	b = ((paletteram[offset + 1] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 WRITE8_HANDLER( nbmj8991_palette_type2_w )
@@ -68,7 +68,7 @@ WRITE8_HANDLER( nbmj8991_palette_type2_w )
 	g = (((paletteram[offset + 0] & 0x03) << 3) | ((paletteram[offset + 1] & 0xe0) >> 5));
 	b = ((paletteram[offset + 1] & 0x1f) >> 0);
 
-	palette_set_color_rgb(machine, (offset / 2), pal5bit(r), pal5bit(g), pal5bit(b));
+	palette_set_color_rgb(space->machine, (offset / 2), pal5bit(r), pal5bit(g), pal5bit(b));
 }
 
 WRITE8_HANDLER( nbmj8991_palette_type3_w )
@@ -85,7 +85,7 @@ WRITE8_HANDLER( nbmj8991_palette_type3_w )
 	g = ((paletteram[offset + 0] & 0xf0) >> 4);
 	b = ((paletteram[offset + 0] & 0x0f) >> 0);
 
-	palette_set_color_rgb(machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
+	palette_set_color_rgb(space->machine, (offset >> 1), pal4bit(r), pal4bit(g), pal4bit(b));
 }
 
 /******************************************************************************
@@ -94,7 +94,7 @@ WRITE8_HANDLER( nbmj8991_palette_type3_w )
 ******************************************************************************/
 WRITE8_HANDLER( nbmj8991_blitter_w )
 {
-	int gfxlen = memory_region_length(machine, "gfx1");
+	int gfxlen = memory_region_length(space->machine, "gfx1");
 
 	switch (offset)
 	{
@@ -105,13 +105,13 @@ WRITE8_HANDLER( nbmj8991_blitter_w )
 		case 0x04:	blitter_sizex = data; break;
 		case 0x05:	blitter_sizey = data;
 					/* writing here also starts the blit */
-					nbmj8991_gfxdraw(machine);
+					nbmj8991_gfxdraw(space->machine);
 					break;
 		case 0x06:	blitter_direction_x = (data & 0x01) ? 1 : 0;
 					blitter_direction_y = (data & 0x02) ? 1 : 0;
 					nbmj8991_flipscreen = (data & 0x04) ? 0 : 1;
 					nbmj8991_dispflag = (data & 0x10) ? 0 : 1;
-					nbmj8991_vramflip(machine);
+					nbmj8991_vramflip(space->machine);
 					break;
 		case 0x07:	break;
 		case 0x10:	blitter_destx = (blitter_destx & 0xff00) | data; break;

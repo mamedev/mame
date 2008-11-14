@@ -185,43 +185,43 @@ static WRITE8_DEVICE_HANDLER( nmi_w )
 
 static WRITE8_HANDLER( banksel_1_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x10000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x14000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x14000);
 }
 static WRITE8_HANDLER( banksel_3_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x18000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x18000);
 }
 static WRITE8_HANDLER( banksel_4_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x1c000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x1c000);
 }
 static WRITE8_HANDLER( banksel_5_1_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x20000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x20000);
 }
 static WRITE8_HANDLER( banksel_1_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x12000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x12000);
 }
 static WRITE8_HANDLER( banksel_2_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x16000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x16000);
 }
 static WRITE8_HANDLER( banksel_3_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x1a000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x1a000);
 }
 static WRITE8_HANDLER( banksel_4_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x1e000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x1e000);
 }
 static WRITE8_HANDLER( banksel_5_2_w )
 {
-	memory_set_bankptr(1,memory_region(machine, "cpu") + 0x22000);
+	memory_set_bankptr(1,memory_region(space->machine, "cpu") + 0x22000);
 }
 
 static ADDRESS_MAP_START( getrivia_map, ADDRESS_SPACE_PROGRAM, 8 )

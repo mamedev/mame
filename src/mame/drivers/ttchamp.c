@@ -92,7 +92,7 @@ static WRITE16_HANDLER( paloff_w )
 static WRITE16_HANDLER( pcup_prgbank_w )
 {
     int bank;
-    UINT8 *ROM1 = memory_region(machine, "user1");
+    UINT8 *ROM1 = memory_region(space->machine, "user1");
 
     if (ACCESSING_BITS_0_7)
     {
@@ -104,18 +104,18 @@ static WRITE16_HANDLER( pcup_prgbank_w )
 
 static WRITE16_HANDLER( paldat_w )
 {
-    palette_set_color_rgb(machine,paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
+    palette_set_color_rgb(space->machine,paloff & 0x7fff,pal5bit(data>>0),pal5bit(data>>5),pal5bit(data>>10));
 }
 
 static READ16_HANDLER( peno_rand )
 {
-    return 0xffff;// mame_rand(machine);
+    return 0xffff;// mame_rand(space->machine);
 }
 
 #ifdef UNUSED_FUNCTION
 static READ16_HANDLER( peno_rand2 )
 {
-    return mame_rand(machine);
+    return mame_rand(space->machine);
 }
 #endif
 

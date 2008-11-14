@@ -68,7 +68,7 @@ static WRITE8_HANDLER( irqack_w )
 	cpu_interrupt_enable(0, bit);
 
 	if (!bit)
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE );
+		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE );
 }
 
 
@@ -165,13 +165,13 @@ static WRITE8_HANDLER( _20pacgal_coin_counter_w )
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	_20pacgal_state *state = machine->driver_data;
+	_20pacgal_state *state = space->machine->driver_data;
 
 	state->game_selected = data & 1;
 
 	if (state->game_selected == 0)
 	{
-		UINT8 *rom = memory_region(machine, "main");
+		UINT8 *rom = memory_region(space->machine, "main");
 		memcpy(rom+0x48000, rom+0x8000, 0x2000);
 	}
 }
@@ -179,14 +179,14 @@ static WRITE8_HANDLER( rom_bank_select_w )
 
 static WRITE8_HANDLER( rom_48000_w )
 {
-	_20pacgal_state *state = machine->driver_data;
+	_20pacgal_state *state = space->machine->driver_data;
 
 	if (state->game_selected)
 	{
 		if (offset < 0x0800)
 			state->video_ram[offset & 0x07ff] = data;
 
-		memory_region(machine, "main")[0x48000 + offset] = data;
+		memory_region(space->machine, "main")[0x48000 + offset] = data;
 	}
 }
 

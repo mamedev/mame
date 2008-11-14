@@ -225,8 +225,8 @@ static WRITE8_HANDLER( zvideoram_w )
 		break;
 
 	default:
-		logerror("mode =%02x pc=%04x\n",*io9401,cpu_get_pc(machine->activecpu) );
-		popmessage("mode =%02x pc=%04x\n",*io9401,cpu_get_pc(machine->activecpu) );
+		logerror("mode =%02x pc=%04x\n",*io9401,cpu_get_pc(space->cpu) );
+		popmessage("mode =%02x pc=%04x\n",*io9401,cpu_get_pc(space->cpu) );
 		return;
 		break;
 	}
@@ -249,14 +249,14 @@ int rgbcolor;
 		{
 			/* palette 1 */
 			int col_ind = offset & 0x1f;
-			palette_set_color_rgb(machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
+			palette_set_color_rgb(space->machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
 		}
 		else
 		if ((offset>=0x300) && (offset<0x320)) /* 0xa300- 0xa31f */
 		{
 			/* palette 2 */
 			int col_ind = offset & 0x1f;
-			palette_set_color_rgb(machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
+			palette_set_color_rgb(space->machine, 0x10 + 0x00 + col_ind, pal3bit(rgbcolor >> 0), pal3bit(rgbcolor >> 6), pal3bit(rgbcolor >> 3));
 		}
 		else
 			logerror("palette? read from unkram offset = %04x\n",offset);

@@ -274,7 +274,7 @@ static UINT16 *ac_devram;
 
 static READ16_HANDLER(ac_devices_r)
 {
-  	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(machine->activecpu),offset*2);
+  	logerror("(PC=%06x) read at %04x\n",cpu_get_pc(space->cpu),offset*2);
 
 	switch(offset)
 	{
@@ -291,13 +291,13 @@ static READ16_HANDLER(ac_devices_r)
                 ---- ---- ---- --x- (Activate Test)
                 ---- ---- ---- ---x (Advance Thru Tests)
             */
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 		case 0x0014/2:
 		case 0x0016/2:
-			return okim6295_status_0_r(machine,0);
+			return okim6295_status_0_r(space,0);
 		case 0x0018/2:
 		case 0x001a/2:
-			return okim6295_status_1_r(machine,0);
+			return okim6295_status_1_r(space,0);
 		case 0x0040/2:
 			/*
                 "Upper switch / Under Switch"
@@ -364,7 +364,7 @@ static READ16_HANDLER(ac_devices_r)
                 xxxx xxxx ---- ---- DIPSW4
                 ---- ---- xxxx xxxx DIPSW3
             */
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 	}
 	return ac_devram[offset];
 }
@@ -384,12 +384,12 @@ static WRITE16_HANDLER(ac_devices_w)
 		case 0x14/2:
 		case 0x16/2:
 			if(ACCESSING_BITS_0_7)
-				okim6295_data_0_w(machine,0,data);
+				okim6295_data_0_w(space,0,data);
 			break;
 		case 0x18/2:
 		case 0x1a/2:
 			if(ACCESSING_BITS_0_7)
-				okim6295_data_1_w(machine,0,data);
+				okim6295_data_1_w(space,0,data);
 			break;
 		case 0x1c/2:
 			/*IRQ mask?*/

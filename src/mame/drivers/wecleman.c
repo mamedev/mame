@@ -368,15 +368,15 @@ static WRITE16_HANDLER( irqctrl_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",cpu_get_pc(machine->activecpu), data&0xFF, old_data&0xFF);
+		// logerror("CPU #0 - PC = %06X - $140005 <- %02X (old value: %02X)\n",cpu_get_pc(space->cpu), data&0xFF, old_data&0xFF);
 
 		// Bit 0 : SUBINT
 		if ( (wecleman_irqctrl & 1) && (!(data & 1)) )	// 1->0 transition
-			cpu_set_input_line(machine->cpu[1],4,HOLD_LINE);
+			cpu_set_input_line(space->machine->cpu[1],4,HOLD_LINE);
 
 		// Bit 1 : NSUBRST
-		if (data & 2)   cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE  );
-		else                    cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE );
+		if (data & 2)   cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE  );
+		else                    cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE );
 
 		// Bit 2 : SOUND-ON
 		// Bit 3 : SOUNDRST
@@ -408,9 +408,9 @@ static READ16_HANDLER( selected_ip_r )
 {
 	switch ( (wecleman_selected_ip >> 5) & 3 )
 	{																	// From WEC Le Mans Schems:
-		case 0:  return input_port_read(machine, "ACCEL");		// Accel - Schems: Accelevr
+		case 0:  return input_port_read(space->machine, "ACCEL");		// Accel - Schems: Accelevr
 		case 1:  return ~0;												// ????? - Schems: Not Used
-		case 2:  return input_port_read(machine, "STEER");		// Wheel - Schems: Handlevr
+		case 2:  return input_port_read(space->machine, "STEER");		// Wheel - Schems: Handlevr
 		case 3:  return ~0;												// Table - Schems: Turnvr
 
 		default: return ~0;
@@ -563,32 +563,32 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( hotchase_K051316_0_r )
 {
-	return K051316_0_r(machine, offset) & 0xff;
+	return K051316_0_r(space, offset) & 0xff;
 }
 
 static READ16_HANDLER( hotchase_K051316_1_r )
 {
-	return K051316_1_r(machine, offset) & 0xff;
+	return K051316_1_r(space, offset) & 0xff;
 }
 
 static WRITE16_HANDLER( hotchase_K051316_0_w )
 {
-	if (ACCESSING_BITS_0_7)      K051316_0_w(machine, offset, data & 0xff);
+	if (ACCESSING_BITS_0_7)      K051316_0_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_K051316_1_w )
 {
-	if (ACCESSING_BITS_0_7)      K051316_1_w(machine, offset, data & 0xff);
+	if (ACCESSING_BITS_0_7)      K051316_1_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_K051316_ctrl_0_w )
 {
-	if (ACCESSING_BITS_0_7)      K051316_ctrl_0_w(machine, offset, data & 0xff);
+	if (ACCESSING_BITS_0_7)      K051316_ctrl_0_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_K051316_ctrl_1_w )
 {
-	if (ACCESSING_BITS_0_7)      K051316_ctrl_1_w(machine, offset, data & 0xff);
+	if (ACCESSING_BITS_0_7)      K051316_ctrl_1_w(space, offset, data & 0xff);
 }
 
 static WRITE16_HANDLER( hotchase_soundlatch_w );
@@ -651,8 +651,8 @@ WRITE16_HANDLER( wecleman_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xFF);
-		cpu_set_input_line(machine->cpu[2],0, HOLD_LINE);
+		soundlatch_w(space,0,data & 0xFF);
+		cpu_set_input_line(space->machine->cpu[2],0, HOLD_LINE);
 	}
 }
 
@@ -712,8 +712,8 @@ static WRITE16_HANDLER( hotchase_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xFF);
-		cpu_set_input_line(machine->cpu[2],M6809_IRQ_LINE, HOLD_LINE);
+		soundlatch_w(space,0,data & 0xFF);
+		cpu_set_input_line(space->machine->cpu[2],M6809_IRQ_LINE, HOLD_LINE);
 	}
 }
 
@@ -769,11 +769,11 @@ static WRITE8_HANDLER( hotchase_sound_control_w )
 #define HOTCHASE_k007232_RW(_chip_) \
 static READ8_HANDLER( hotchase_k007232_##_chip_##_r ) \
 { \
-	return k007232_read_port_##_chip_##_r(machine, offset ^ 1); \
+	return k007232_read_port_##_chip_##_r(space, offset ^ 1); \
 } \
 static WRITE8_HANDLER( hotchase_k007232_##_chip_##_w ) \
 { \
-	k007232_write_port_##_chip_##_w(machine, offset ^ 1, data); \
+	k007232_write_port_##_chip_##_w(space, offset ^ 1, data); \
 } \
 
 /* 3 x K007232 */

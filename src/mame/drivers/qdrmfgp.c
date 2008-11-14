@@ -126,8 +126,8 @@ static WRITE16_HANDLER( gp2_control_w )
 
 static READ16_HANDLER( v_rom_r )
 {
-	UINT8 *mem8 = memory_region(machine, "gfx1");
-	int bank = K056832_word_r(machine, 0x34/2, 0xffff);
+	UINT8 *mem8 = memory_region(space->machine, "gfx1");
+	int bank = K056832_word_r(space, 0x34/2, 0xffff);
 
 	offset += bank * 0x800 * 4;
 
@@ -141,33 +141,33 @@ static READ16_HANDLER( v_rom_r )
 static READ16_HANDLER( gp2_vram_r )
 {
 	if (offset < 0x1000/2)
-		return K056832_ram_word_r(machine, offset*2+1, mem_mask);
+		return K056832_ram_word_r(space, offset*2+1, mem_mask);
 	else
-		return K056832_ram_word_r(machine, (offset-0x1000/2)*2, mem_mask);
+		return K056832_ram_word_r(space, (offset-0x1000/2)*2, mem_mask);
 }
 
 static READ16_HANDLER( gp2_vram_mirror_r )
 {
 	if (offset < 0x1000/2)
-		return K056832_ram_word_r(machine, offset*2, mem_mask);
+		return K056832_ram_word_r(space, offset*2, mem_mask);
 	else
-		return K056832_ram_word_r(machine, (offset-0x1000/2)*2+1, mem_mask);
+		return K056832_ram_word_r(space, (offset-0x1000/2)*2+1, mem_mask);
 }
 
 static WRITE16_HANDLER( gp2_vram_w )
 {
 	if (offset < 0x1000/2)
-		K056832_ram_word_w(machine, offset*2+1, data, mem_mask);
+		K056832_ram_word_w(space, offset*2+1, data, mem_mask);
 	else
-		K056832_ram_word_w(machine, (offset-0x1000/2)*2, data, mem_mask);
+		K056832_ram_word_w(space, (offset-0x1000/2)*2, data, mem_mask);
 }
 
 static WRITE16_HANDLER( gp2_vram_mirror_w )
 {
 	if (offset < 0x1000/2)
-		K056832_ram_word_w(machine, offset*2, data, mem_mask);
+		K056832_ram_word_w(space, offset*2, data, mem_mask);
 	else
-		K056832_ram_word_w(machine, (offset-0x1000/2)*2+1, data, mem_mask);
+		K056832_ram_word_w(space, (offset-0x1000/2)*2+1, data, mem_mask);
 }
 
 
@@ -194,7 +194,7 @@ static WRITE16_HANDLER( sndram_w )
 static READ16_HANDLER( k054539_word_r )
 {
 	if (ACCESSING_BITS_0_7)
-		return k054539_0_r(machine, offset);
+		return k054539_0_r(space, offset);
 
 	return 0;
 }
@@ -202,7 +202,7 @@ static READ16_HANDLER( k054539_word_r )
 static WRITE16_HANDLER( k054539_word_w )
 {
 	if (ACCESSING_BITS_0_7)
-		k054539_0_w(machine, offset, data);
+		k054539_0_w(space, offset, data);
 }
 
 /*************/

@@ -74,7 +74,7 @@ static MACHINE_START(merit)
 
 static READ8_HANDLER( questions_r )
 {
-	UINT8 *questions = memory_region(machine, "user1");
+	UINT8 *questions = memory_region(space->machine, "user1");
 	int address;
 
 	switch(question_address >> 16)
@@ -156,7 +156,7 @@ static WRITE8_HANDLER( palette_w )
 {
 	int co;
 
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 	data &= 0x0f;
 
 	co = ((ram_attr[offset] & 0x7F) << 3) | (offset & 0x07);

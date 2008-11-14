@@ -154,7 +154,7 @@ static WRITE8_HANDLER( pipedrm_bankswitch_w )
 	memory_set_bank(1, data & 0x7);
 
 	/* map to the fromance gfx register */
-	fromance_gfxreg_w(machine, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
+	fromance_gfxreg_w(space, offset, ((data >> 6) & 0x01) | 	/* flipscreen */
 							  ((~data >> 2) & 0x02));	/* videoram select */
 }
 
@@ -200,7 +200,7 @@ static WRITE8_HANDLER( sound_command_nonmi_w )
 static WRITE8_HANDLER( pending_command_clear_w )
 {
 	pending_command = 0;
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 

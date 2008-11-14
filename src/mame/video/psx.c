@@ -3694,7 +3694,7 @@ WRITE32_HANDLER( psx_gpu_w )
 			m_n_twy = 0;
 			m_n_twh = 255;
 			m_n_tww = 255;
-			updatevisiblearea(machine, NULL);
+			updatevisiblearea(space->machine, NULL);
 			break;
 		case 0x01:
 			verboselog( 1, "not handled: reset command buffer\n" );
@@ -3748,7 +3748,7 @@ WRITE32_HANDLER( psx_gpu_w )
 			{
 				m_b_reverseflag = ( data >> 7 ) & 1;
 			}
-			updatevisiblearea(machine, NULL);
+			updatevisiblearea(space->machine, NULL);
 			break;
 		case 0x09:
 			verboselog( 1, "not handled: GPU Control 0x09: %08x\n", data );

@@ -198,7 +198,7 @@ static MACHINE_RESET( metro )
 
 static WRITE16_HANDLER( metro_irq_cause_w )
 {
-//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n",cpu_get_pc(machine->activecpu),data);
+//if (data & ~0x15) logerror("CPU #0 PC %06X : unknown bits of irqcause written: %04X\n",cpu_get_pc(space->cpu),data);
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -214,7 +214,7 @@ static WRITE16_HANDLER( metro_irq_cause_w )
 		if (data & 0x80)	requested_int[7] = 0;
 	}
 
-	update_irq_state(machine);
+	update_irq_state(space->machine);
 }
 
 
@@ -353,9 +353,9 @@ static WRITE16_HANDLER( metro_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
-		cpu_spinuntil_int(machine->activecpu);
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_spinuntil_int(space->cpu);
 		busy_sndcpu = 1;
 	}
 }
@@ -381,7 +381,7 @@ static WRITE16_HANDLER( metro_soundstatus_w )
 static WRITE8_HANDLER( metro_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(machine, "audio");
+	UINT8 *ROM = memory_region(space->machine, "audio");
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
@@ -392,7 +392,7 @@ static WRITE8_HANDLER( metro_sound_rombank_w )
 static WRITE8_HANDLER( daitorid_sound_rombank_w )
 {
 	int bankaddress;
-	UINT8 *ROM = memory_region(machine, "audio");
+	UINT8 *ROM = memory_region(space->machine, "audio");
 
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
@@ -437,9 +437,9 @@ static WRITE8_HANDLER( metro_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				ym2413_data_port_0_w(machine,0,porta);
+				ym2413_data_port_0_w(space,0,porta);
 			else
-				ym2413_register_port_0_w(machine,0,porta);
+				ym2413_register_port_0_w(space,0,porta);
 		}
 		portb = data;
 		return;
@@ -449,7 +449,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			okim6295_data_0_w(machine,0,porta);
+			okim6295_data_0_w(space,0,porta);
 	}
 	portb = data;
 }
@@ -481,15 +481,15 @@ static WRITE8_HANDLER( daitorid_portb_w )
 		{
 			/* write */
 			if (BIT(data,1))
-				ym2151_data_port_0_w(machine,0,porta);
+				ym2151_data_port_0_w(space,0,porta);
 			else
-				ym2151_register_port_0_w(machine,0,porta);
+				ym2151_register_port_0_w(space,0,porta);
 		}
 		if (!BIT(data,3))
 		{
 			/* read */
 			if (BIT(data,1))
-				porta = ym2151_status_port_0_r(machine,0);
+				porta = ym2151_status_port_0_r(space,0);
 		}
 		portb = data;
 		return;
@@ -499,13 +499,13 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	{
 		/* write */
 		if (!BIT(data,4))
-			okim6295_data_0_w(machine,0,porta);
+			okim6295_data_0_w(space,0,porta);
 	}
 	if (BIT(portb,3) && !BIT(data,3))	/* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data,4))
-			porta = okim6295_status_0_r(machine,0);
+			porta = okim6295_status_0_r(space,0);
 	}
 	portb = data;
 }
@@ -523,7 +523,7 @@ static const ym2151_interface ym2151_config =
 
 static READ16_HANDLER( ymf278b_r )
 {
-	return ymf278b_status_port_0_r(machine, 0);
+	return ymf278b_status_port_0_r(space, 0);
 }
 
 static WRITE16_HANDLER( ymf278b_w )
@@ -532,22 +532,22 @@ static WRITE16_HANDLER( ymf278b_w )
 		switch(offset)
 		{
 			case 0:
-				ymf278b_control_port_0_a_w(machine, 0, data);
+				ymf278b_control_port_0_a_w(space, 0, data);
 				break;
 			case 1:
-				ymf278b_data_port_0_a_w(machine, 0, data);
+				ymf278b_data_port_0_a_w(space, 0, data);
 				break;
 			case 2:
-				ymf278b_control_port_0_b_w(machine, 0, data);
+				ymf278b_control_port_0_b_w(space, 0, data);
 				break;
 			case 3:
-				ymf278b_data_port_0_b_w(machine, 0, data);
+				ymf278b_data_port_0_b_w(space, 0, data);
 				break;
 			case 4:
-				ymf278b_control_port_0_c_w(machine, 0, data);
+				ymf278b_control_port_0_c_w(space, 0, data);
 				break;
 			case 5:
-				ymf278b_data_port_0_c_w(machine, 0, data);
+				ymf278b_data_port_0_c_w(space, 0, data);
 				break;
 		}
 }
@@ -576,14 +576,14 @@ static WRITE16_HANDLER( metro_coin_lockout_1word_w )
 //      coin_lockout_w(0, data & 1);
 //      coin_lockout_w(1, data & 2);
 	}
-	if (data & ~3)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(machine->activecpu),data);
+	if (data & ~3)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(space->cpu),data);
 }
 
 
 static WRITE16_HANDLER( metro_coin_lockout_4words_w )
 {
 //  coin_lockout_w( (offset >> 1) & 1, offset & 1 );
-	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(machine->activecpu),data);
+	if (data & ~1)	logerror("CPU #0 PC %06X : unknown bits of coin lockout written: %04X\n",cpu_get_pc(space->cpu),data);
 }
 
 
@@ -609,8 +609,8 @@ static UINT16 *metro_rombank;
 
 static READ16_HANDLER( metro_bankedrom_r )
 {
-	UINT8 *ROM = memory_region( machine, "gfx1" );
-	size_t  len  = memory_region_length( machine, "gfx1" );
+	UINT8 *ROM = memory_region( space->machine, "gfx1" );
+	size_t  len  = memory_region_length( space->machine, "gfx1" );
 
 	offset = offset * 2 + 0x10000 * (*metro_rombank);
 
@@ -698,8 +698,8 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 	if (offset == 0xC/2)
 	{
-		UINT8 *src	=	memory_region(machine, "gfx1");
-		size_t  src_len	=	memory_region_length(machine, "gfx1");
+		UINT8 *src	=	memory_region(space->machine, "gfx1");
+		size_t  src_len	=	memory_region_length(space->machine, "gfx1");
 
 		UINT32 tmap		=	(metro_blitter_regs[ 0x00 / 2 ] << 16 ) +
 							 metro_blitter_regs[ 0x02 / 2 ];
@@ -711,7 +711,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 		int shift			=	(dst_offs & 0x80) ? 0 : 8;
 		UINT16 mask		=	(dst_offs & 0x80) ? 0x00ff : 0xff00;
 
-//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",cpu_get_pc(machine->activecpu),tmap,src_offs,dst_offs);
+//      logerror("CPU #0 PC %06X : Blitter regs %08X, %08X, %08X\n",cpu_get_pc(space->cpu),tmap,src_offs,dst_offs);
 
 		dst_offs >>= 7+1;
 		switch( tmap )
@@ -721,7 +721,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 			case 3:
 				break;
 			default:
-				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",cpu_get_pc(machine->activecpu),tmap);
+				logerror("CPU #0 PC %06X : Blitter unknown destination: %08X\n",cpu_get_pc(space->cpu),tmap);
 				return;
 		}
 
@@ -731,7 +731,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 			src_offs %= src_len;
 			b1 = blt_read(src,src_offs);
-//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",cpu_get_pc(machine->activecpu),b1,src_offs);
+//          logerror("CPU #0 PC %06X : Blitter opcode %02X at %06X\n",cpu_get_pc(space->cpu),b1,src_offs);
 			src_offs++;
 
 			count = ((~b1) & 0x3f) + 1;
@@ -759,7 +759,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 						src_offs++;
 
 						dst_offs &= 0xffff;
-						blt_write(machine,tmap,dst_offs,b2,mask);
+						blt_write(space->machine,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -775,7 +775,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(machine,tmap,dst_offs,b2<<shift,mask);
+						blt_write(space->machine,tmap,dst_offs,b2<<shift,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 						b2++;
 					}
@@ -792,7 +792,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 					while (count--)
 					{
 						dst_offs &= 0xffff;
-						blt_write(machine,tmap,dst_offs,b2,mask);
+						blt_write(space->machine,tmap,dst_offs,b2,mask);
 						dst_offs = ((dst_offs+1) & (0x100-1)) | (dst_offs & (~(0x100-1)));
 					}
 					break;
@@ -815,7 +815,7 @@ static WRITE16_HANDLER( metro_blitter_w )
 
 
 				default:
-					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",cpu_get_pc(machine->activecpu),b1,src_offs-1);
+					logerror("CPU #0 PC %06X : Blitter unknown opcode %02X at %06X\n",cpu_get_pc(space->cpu),b1,src_offs-1);
 					return;
 			}
 
@@ -897,9 +897,9 @@ ADDRESS_MAP_END
 /* Really weird way of mapping 3 DSWs */
 static READ16_HANDLER( balcube_dsw_r )
 {
-	UINT16 dsw1 = input_port_read(machine, "DSW0") >> 0;
-	UINT16 dsw2 = input_port_read(machine, "DSW0") >> 8;
-	UINT16 dsw3 = input_port_read(machine, "IN2");
+	UINT16 dsw1 = input_port_read(space->machine, "DSW0") >> 0;
+	UINT16 dsw2 = input_port_read(space->machine, "DSW0") >> 8;
+	UINT16 dsw3 = input_port_read(space->machine, "IN2");
 
 	switch (offset*2)
 	{
@@ -921,7 +921,7 @@ static READ16_HANDLER( balcube_dsw_r )
 		case 0x17FFE:	return (dsw2 & 0x40) ? 0x40 : 0;
 		case 0x0FFFE:	return (dsw2 & 0x80) ? 0x40 : 0;
 	}
-	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n",cpu_get_pc(machine->activecpu),offset);
+	logerror("CPU #0 PC %06X : unknown dsw address read: %04X\n",cpu_get_pc(space->cpu),offset);
 	return 0xffff;
 }
 
@@ -1173,7 +1173,7 @@ static READ16_HANDLER( karatour_vram_##_n_##_r ) \
 } \
 static WRITE16_HANDLER( karatour_vram_##_n_##_w ) \
 { \
-	metro_vram_##_n_##_w(machine,KARATOUR_OFFS(offset),data,mem_mask); \
+	metro_vram_##_n_##_w(space,KARATOUR_OFFS(offset),data,mem_mask); \
 }
 
 KARATOUR_VRAM( 0 )
@@ -1404,11 +1404,11 @@ static READ16_HANDLER( gakusai_input_r )
 {
 	UINT16 input_sel = (*gakusai_input_sel) ^ 0x3e;
 	// Bit 0 ??
-	if (input_sel & 0x0002)	return input_port_read(machine, "KEY0");
-	if (input_sel & 0x0004)	return input_port_read(machine, "KEY1");
-	if (input_sel & 0x0008)	return input_port_read(machine, "KEY2");
-	if (input_sel & 0x0010)	return input_port_read(machine, "KEY3");
-	if (input_sel & 0x0020)	return input_port_read(machine, "KEY4");
+	if (input_sel & 0x0002)	return input_port_read(space->machine, "KEY0");
+	if (input_sel & 0x0004)	return input_port_read(space->machine, "KEY1");
+	if (input_sel & 0x0008)	return input_port_read(space->machine, "KEY2");
+	if (input_sel & 0x0010)	return input_port_read(space->machine, "KEY3");
+	if (input_sel & 0x0020)	return input_port_read(space->machine, "KEY4");
 	return 0xffff;
 }
 
@@ -1917,13 +1917,13 @@ ADDRESS_MAP_END
 
 static WRITE16_HANDLER( blzntrnd_sound_w )
 {
-	soundlatch_w(machine, offset, data>>8);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, offset, data>>8);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "audio");
+	UINT8 *RAM = memory_region(space->machine, "audio");
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;

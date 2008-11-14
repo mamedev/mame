@@ -143,14 +143,14 @@ static UINT8 *mermaid_ay8910_enable;
 
 static WRITE8_HANDLER( mermaid_ay8910_write_port_w )
 {
-	if (mermaid_ay8910_enable[0]) ay8910_write_port_0_w(machine, offset, data);
-	if (mermaid_ay8910_enable[1]) ay8910_write_port_1_w(machine, offset, data);
+	if (mermaid_ay8910_enable[0]) ay8910_write_port_0_w(space, offset, data);
+	if (mermaid_ay8910_enable[1]) ay8910_write_port_1_w(space, offset, data);
 }
 
 static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 {
-	if (mermaid_ay8910_enable[0]) ay8910_control_port_0_w(machine, offset, data);
-	if (mermaid_ay8910_enable[1]) ay8910_control_port_1_w(machine, offset, data);
+	if (mermaid_ay8910_enable[0]) ay8910_control_port_0_w(space, offset, data);
+	if (mermaid_ay8910_enable[1]) ay8910_control_port_1_w(space, offset, data);
 }
 
 

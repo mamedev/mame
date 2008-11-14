@@ -31,12 +31,12 @@ static WRITE8_HANDLER( subirqtrigger_w )
 	/* bit 0 used but unknown */
 
 	if (data & 0x04)
-		cpu_set_input_line(machine->cpu[1],0,ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1],0,ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( sub_irqack_w )
 {
-	cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1],0,CLEAR_LINE);
 }
 
 
@@ -57,18 +57,18 @@ static WRITE8_HANDLER( dogfgt_soundcontrol_w )
 	{
 		/* bit 4 goes to the 8910 #0 BC1 pin */
 		if (last & 0x10)
-			ay8910_control_port_0_w(machine,0,soundlatch);
+			ay8910_control_port_0_w(space,0,soundlatch);
 		else
-			ay8910_write_port_0_w(machine,0,soundlatch);
+			ay8910_write_port_0_w(space,0,soundlatch);
 	}
 	/* bit 7 goes to 8910 #1 BDIR pin  */
 	if ((last & 0x80) == 0x80 && (data & 0x80) == 0x00)
 	{
 		/* bit 6 goes to the 8910 #1 BC1 pin */
 		if (last & 0x40)
-			ay8910_control_port_1_w(machine,0,soundlatch);
+			ay8910_control_port_1_w(space,0,soundlatch);
 		else
-			ay8910_write_port_1_w(machine,0,soundlatch);
+			ay8910_write_port_1_w(space,0,soundlatch);
 	}
 
 	last = data;

@@ -383,7 +383,7 @@ TO DO :
 /* Send sound data to the sound cpu and cause an nmi */
 static READ8_HANDLER( drivfrcg_port0_r )
 {
-	switch (cpu_get_pc(machine->activecpu))
+	switch (cpu_get_pc(space->cpu))
 	{
 		case 0x002e:
 		case 0x0297:
@@ -546,9 +546,9 @@ ADDRESS_MAP_END
 
 
 static READ8_HANDLER( scramb2_protection_r ) { return 0x25; }
-static READ8_HANDLER( scramb2_port0_r ) { return (input_port_read(machine, "IN0") >> offset) & 0x1; }
-static READ8_HANDLER( scramb2_port1_r ) { return (input_port_read(machine, "IN1") >> offset) & 0x1; }
-static READ8_HANDLER( scramb2_port2_r ) { return (input_port_read(machine, "IN2") >> offset) & 0x1; }
+static READ8_HANDLER( scramb2_port0_r ) { return (input_port_read(space->machine, "IN0") >> offset) & 0x1; }
+static READ8_HANDLER( scramb2_port1_r ) { return (input_port_read(space->machine, "IN1") >> offset) & 0x1; }
+static READ8_HANDLER( scramb2_port2_r ) { return (input_port_read(space->machine, "IN2") >> offset) & 0x1; }
 
 static ADDRESS_MAP_START( scramb2_readmem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_READ(SMH_ROM)
@@ -954,7 +954,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( hexpoola_data_port_r )
 {
-	switch (cpu_get_pc(machine->activecpu))
+	switch (cpu_get_pc(space->cpu))
 	{
 		case 0x0022:
 			return 0;

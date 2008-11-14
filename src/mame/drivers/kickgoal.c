@@ -165,7 +165,7 @@ WRITE16_HANDLER( kickgoal_snd_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		logerror("PC:%06x Writing %04x to Sound CPU\n",cpu_get_previouspc(machine->activecpu),data);
+		logerror("PC:%06x Writing %04x to Sound CPU\n",cpu_get_previouspc(space->cpu),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
 				okim6295_data_0_w(0,0x40);	/* Stop playing the melody */
@@ -216,7 +216,7 @@ WRITE16_HANDLER( kickgoal_snd_w )
 
 static WRITE16_HANDLER( actionhw_snd_w )
 {
-	logerror("PC:%06x Writing %04x to Sound CPU - mask %04x\n",cpu_get_previouspc(machine->activecpu),data,mem_mask);
+	logerror("PC:%06x Writing %04x to Sound CPU - mask %04x\n",cpu_get_previouspc(space->cpu),data,mem_mask);
 
 	if (!ACCESSING_BITS_0_7) data >>= 8;
 
@@ -226,7 +226,7 @@ static WRITE16_HANDLER( actionhw_snd_w )
 		case 0xfd:	okim6295_set_bank_base(0, (2 * 0x40000)); break;
 		case 0xfe:	okim6295_set_bank_base(0, (1 * 0x40000)); break;
 		case 0xff:	okim6295_set_bank_base(0, (3 * 0x40000)); break;
-		case 0x78:	okim6295_data_0_w(machine,0,data);
+		case 0x78:	okim6295_data_0_w(space,0,data);
 					snd_sam[0]=00; snd_sam[1]=00; snd_sam[2]=00; snd_sam[3]=00;
 					break;
 		default:	if (snd_new) /* Play new sample */
@@ -234,44 +234,44 @@ static WRITE16_HANDLER( actionhw_snd_w )
 						if ((data & 0x80) && (snd_sam[3] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((okim6295_status_0_r(machine,0) & 0x08) != 0x08)
+							if ((okim6295_status_0_r(space,0) & 0x08) != 0x08)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								okim6295_data_0_w(machine,0,snd_new);
-								okim6295_data_0_w(machine,0,data);
+								okim6295_data_0_w(space,0,snd_new);
+								okim6295_data_0_w(space,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x40) && (snd_sam[2] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((okim6295_status_0_r(machine,0) & 0x04) != 0x04)
+							if ((okim6295_status_0_r(space,0) & 0x04) != 0x04)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								okim6295_data_0_w(machine,0,snd_new);
-								okim6295_data_0_w(machine,0,data);
+								okim6295_data_0_w(space,0,snd_new);
+								okim6295_data_0_w(space,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x20) && (snd_sam[1] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((okim6295_status_0_r(machine,0) & 0x02) != 0x02)
+							if ((okim6295_status_0_r(space,0) & 0x02) != 0x02)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								okim6295_data_0_w(machine,0,snd_new);
-								okim6295_data_0_w(machine,0,data);
+								okim6295_data_0_w(space,0,snd_new);
+								okim6295_data_0_w(space,0,data);
 							}
 							snd_new = 00;
 						}
 						if ((data & 0x10) && (snd_sam[0] != snd_new))
 						{
 							logerror("About to play sample %02x at vol %02x\n",snd_new,data);
-							if ((okim6295_status_0_r(machine,0) & 0x01) != 0x01)
+							if ((okim6295_status_0_r(space,0) & 0x01) != 0x01)
 							{
 							logerror("Playing sample %02x at vol %02x\n",snd_new,data);
-								okim6295_data_0_w(machine,0,snd_new);
-								okim6295_data_0_w(machine,0,data);
+								okim6295_data_0_w(space,0,snd_new);
+								okim6295_data_0_w(space,0,data);
 							}
 							snd_new = 00;
 						}
@@ -286,7 +286,7 @@ static WRITE16_HANDLER( actionhw_snd_w )
 					else /* Turn a channel off */
 					{
 						logerror("Turning channel %02x off\n",data);
-						okim6295_data_0_w(machine,0,data);
+						okim6295_data_0_w(space,0,data);
 						if (data & 0x40) snd_sam[3] = 00;
 						if (data & 0x20) snd_sam[2] = 00;
 						if (data & 0x10) snd_sam[1] = 00;

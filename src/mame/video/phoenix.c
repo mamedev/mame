@@ -229,7 +229,7 @@ VIDEO_START( phoenix )
 
 WRITE8_HANDLER( phoenix_videoram_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 
 	videoram_pg[videoram_pg_index][offset] = data;
 
@@ -254,7 +254,7 @@ WRITE8_HANDLER( phoenix_videoreg_w )
 		videoram_pg_index = data & 1;
 		memory_set_bank(1, videoram_pg_index);
 
-		cocktail_mode = videoram_pg_index && (input_port_read(machine, "CAB") & 0x01);
+		cocktail_mode = videoram_pg_index && (input_port_read(space->machine, "CAB") & 0x01);
 
 		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -277,7 +277,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 		videoram_pg_index = data & 1;
 		memory_set_bank(1, videoram_pg_index);
 
-		cocktail_mode = videoram_pg_index && (input_port_read(machine, "CAB") & 0x01);
+		cocktail_mode = videoram_pg_index && (input_port_read(space->machine, "CAB") & 0x01);
 
 		tilemap_set_flip(ALL_TILEMAPS, cocktail_mode ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
@@ -300,7 +300,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 	pleiads_protection_question = data & 0xfc;
 
 	/* send two bits to sound control C (not sure if they are there) */
-	pleiads_sound_control_c_w(machine, offset, data);
+	pleiads_sound_control_c_w(space, offset, data);
 }
 
 
@@ -370,7 +370,7 @@ CUSTOM_INPUT( pleiads_protection_r )
 #define REMAP_JS(js) ((ret & 0xf) | ( (js & 0xf)  << 4))
 READ8_HANDLER( survival_input_port_0_r )
 {
-	UINT8 ret = ~input_port_read(machine, "IN0");
+	UINT8 ret = ~input_port_read(space->machine, "IN0");
 
 	if( survival_input_readc++ == 2 )
 	{

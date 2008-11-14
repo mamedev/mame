@@ -229,7 +229,7 @@ static WRITE8_HANDLER( ddenlovr_bgcolor2_w )
 static WRITE16_HANDLER( ddenlovr16_bgcolor_w )
 {
 	if (ACCESSING_BITS_0_7)
-		ddenlovr_bgcolor_w(machine,offset,data);
+		ddenlovr_bgcolor_w(space,offset,data);
 }
 
 
@@ -246,7 +246,7 @@ static WRITE8_HANDLER( ddenlovr_priority2_w )
 static WRITE16_HANDLER( ddenlovr16_priority_w )
 {
 	if (ACCESSING_BITS_0_7)
-		ddenlovr_priority_w(machine,offset,data);
+		ddenlovr_priority_w(space,offset,data);
 }
 
 
@@ -264,7 +264,7 @@ static WRITE8_HANDLER( ddenlovr_layer_enable2_w )
 static WRITE16_HANDLER( ddenlovr16_layer_enable_w )
 {
 	if (ACCESSING_BITS_0_7)
-		ddenlovr_layer_enable_w(machine,offset,data);
+		ddenlovr_layer_enable_w(space,offset,data);
 }
 
 
@@ -602,7 +602,7 @@ INLINE void log_blit(running_machine *machine, int data)
 #endif
 }
 
-static void blitter_w(running_machine *machine, int blitter, offs_t offset,UINT8 data,int irq_vector)
+static void blitter_w(const address_space *space, int blitter, offs_t offset,UINT8 data,int irq_vector)
 {
 	static int ddenlovr_blit_reg[2];
 	int hi_bits;
@@ -703,7 +703,7 @@ profiler_mark(PROFILER_VIDEO);
 
 		case 0x24:
 
-			log_blit(machine, data);
+			log_blit(space->machine, data);
 
 			switch (data)
 			{
@@ -712,7 +712,7 @@ profiler_mark(PROFILER_VIDEO);
 				case 0x14:	blit_fill_xy(ddenlovr_blit_x, ddenlovr_blit_y);
 							break;
 
-				case 0x10:	ddenlovr_blit_address = blit_draw(machine,ddenlovr_blit_address,ddenlovr_blit_x);
+				case 0x10:	ddenlovr_blit_address = blit_draw(space->machine,ddenlovr_blit_address,ddenlovr_blit_x);
 							break;
 
 				case 0x13:	blit_horiz_line();
@@ -734,26 +734,26 @@ profiler_mark(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x",data);
-					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(machine->activecpu), data);
+					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(space->cpu), data);
 				#endif
 			}
 
 			if (irq_vector)
 				/* quizchq */
-				cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, irq_vector);
+				cpu_set_input_line_and_vector(space->cpu, 0, HOLD_LINE, irq_vector);
 			else
 			{
 				/* ddenlovr */
 				if (ddenlovr_blitter_irq_enable)
 				{
 					ddenlovr_blitter_irq_flag = 1;
-					cpu_set_input_line(machine->cpu[0],1,HOLD_LINE);
+					cpu_set_input_line(space->cpu,1,HOLD_LINE);
 				}
 			}
 			break;
 
 		default:
-			logerror("%06x: Blitter %d reg %02x = %02x\n", cpu_get_pc(machine->activecpu), blitter, ddenlovr_blit_reg[blitter], data);
+			logerror("%06x: Blitter %d reg %02x = %02x\n", cpu_get_pc(space->cpu), blitter, ddenlovr_blit_reg[blitter], data);
 			break;
 		}
 	}
@@ -1057,11 +1057,11 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		case 0xe4:
-			ddenlovr_priority_w(machine,0,data);
+			ddenlovr_priority_w(space,0,data);
 			break;
 
 		case 0xe6:
-			ddenlovr_layer_enable_w(machine,0,data);
+			ddenlovr_layer_enable_w(space,0,data);
 			break;
 
 		case 0xe8:
@@ -1070,7 +1070,7 @@ profiler_mark(PROFILER_VIDEO);
 
 		case 0x90:
 
-			log_blit(machine, data);
+			log_blit(space->machine, data);
 
 			switch (data)
 			{
@@ -1079,7 +1079,7 @@ profiler_mark(PROFILER_VIDEO);
 				case 0x14:	blit_fill_xy(ddenlovr_blit_x, ddenlovr_blit_y);
 							break;
 
-				case 0x10:	ddenlovr_blit_address = blit_draw(machine,ddenlovr_blit_address,ddenlovr_blit_x);
+				case 0x10:	ddenlovr_blit_address = blit_draw(space->machine,ddenlovr_blit_address,ddenlovr_blit_x);
 							break;
 
 				case 0x13:	blit_horiz_line();
@@ -1101,7 +1101,7 @@ profiler_mark(PROFILER_VIDEO);
 							;
 				#ifdef MAME_DEBUG
 					popmessage("unknown blitter command %02x",data);
-					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(machine->activecpu), data);
+					logerror("%06x: unknown blitter command %02x\n", cpu_get_pc(space->cpu), data);
 				#endif
 			}
 
@@ -1110,7 +1110,7 @@ profiler_mark(PROFILER_VIDEO);
 			break;
 
 		default:
-			logerror("%06x: Blitter 0 reg %02x = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_blit_reg, data);
+			logerror("%06x: Blitter 0 reg %02x = %02x\n", cpu_get_pc(space->cpu), ddenlovr_blit_reg, data);
 			break;
 	}
 
@@ -1120,13 +1120,13 @@ profiler_mark(PROFILER_END);
 
 static WRITE8_HANDLER( rongrong_blitter_w )
 {
-	blitter_w(machine, 0,offset,data,0xf8);
+	blitter_w(space, 0,offset,data,0xf8);
 }
 
 static WRITE16_HANDLER( ddenlovr_blitter_w )
 {
 	if (ACCESSING_BITS_0_7)
-		blitter_w(machine, 0,offset,data & 0xff,0);
+		blitter_w(space, 0,offset,data & 0xff,0);
 }
 
 
@@ -1149,13 +1149,13 @@ static WRITE16_HANDLER( ddenlovr_blitter_irq_ack_w )
 
 static READ8_HANDLER( rongrong_gfxrom_r )
 {
-	UINT8 *rom	=	memory_region( machine, "gfx1" );
-	size_t size	=	memory_region_length( machine, "gfx1" );
+	UINT8 *rom	=	memory_region( space->machine, "gfx1" );
+	size_t size	=	memory_region_length( space->machine, "gfx1" );
 	int address	=	ddenlovr_blit_address;
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(machine->activecpu), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(space->cpu), address);
 		address %= size;
 	}
 
@@ -1166,7 +1166,7 @@ static READ8_HANDLER( rongrong_gfxrom_r )
 
 static READ16_HANDLER( ddenlovr_gfxrom_r )
 {
-	return rongrong_gfxrom_r(machine, offset);
+	return rongrong_gfxrom_r(space, offset);
 }
 
 
@@ -1343,13 +1343,13 @@ static WRITE8_HANDLER( rongrong_palette_w )
 	/* what were they smoking??? */
 	b = ((d1 & 0xe0) >> 5) | (d2 & 0xc0) >> 3;
 
-	palette_set_color_rgb(machine,indx,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(space->machine,indx,pal5bit(r),pal5bit(g),pal5bit(b));
 }
 
 static WRITE16_HANDLER( ddenlovr_palette_w )
 {
 	if (ACCESSING_BITS_0_7)
-		rongrong_palette_w(machine,offset,data & 0xff);
+		rongrong_palette_w(space,offset,data & 0xff);
 }
 
 
@@ -1456,7 +1456,7 @@ static READ8_HANDLER( unk_r )
 
 static READ16_HANDLER( unk16_r )
 {
-	return unk_r(machine,offset);
+	return unk_r(space,offset);
 }
 
 
@@ -1486,13 +1486,13 @@ static WRITE16_HANDLER( ddenlovr_select2_16_w )
 
 static READ8_HANDLER( rongrong_input2_r )
 {
-//  logerror("%04x: input2_r offset %d select %x\n",cpu_get_pc(machine->activecpu),offset,ddenlovr_select2 );
+//  logerror("%04x: input2_r offset %d select %x\n",cpu_get_pc(space->cpu),offset,ddenlovr_select2 );
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch( ddenlovr_select2 )
 	{
-		case 0x00:	return input_port_read(machine, "P1");
-		case 0x01:	return input_port_read(machine, "P2");
-		case 0x02:	return input_port_read(machine, "SYSTEM");
+		case 0x00:	return input_port_read(space->machine, "P1");
+		case 0x01:	return input_port_read(space->machine, "P2");
+		case 0x02:	return input_port_read(space->machine, "SYSTEM");
 	}
 	return 0xff;
 }
@@ -1500,23 +1500,23 @@ static READ8_HANDLER( rongrong_input2_r )
 
 static READ8_HANDLER( quiz365_input_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
-	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
-	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW3");
-	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(machine);
-	if (!(ddenlovr_select & 0x10))	return 0xff;//mame_rand(machine);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(space->machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(space->machine, "DSW2");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(space->machine, "DSW3");
+	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(space->machine);
+	if (!(ddenlovr_select & 0x10))	return 0xff;//mame_rand(space->machine);
 	return 0xff;
 }
 
 static READ16_HANDLER( quiz365_input2_r )
 {
-//  logerror("%04x: input2_r offset %d select %x\n",cpu_get_pc(machine->activecpu),offset,ddenlovr_select2 );
+//  logerror("%04x: input2_r offset %d select %x\n",cpu_get_pc(space->cpu),offset,ddenlovr_select2 );
 	/* 0 and 1 are read from offset 1, 2 from offset 0... */
 	switch( ddenlovr_select2 )
 	{
-		case 0x10:	return input_port_read(machine, "P1");
-		case 0x11:	return input_port_read(machine, "P2");
-		case 0x12:	return input_port_read(machine, "SYSTEM");
+		case 0x10:	return input_port_read(space->machine, "P1");
+		case 0x11:	return input_port_read(space->machine, "P2");
+		case 0x12:	return input_port_read(space->machine, "SYSTEM");
 	}
 	return 0xff;
 }
@@ -1527,7 +1527,7 @@ static WRITE8_HANDLER( rongrong_blitter_busy_w )
 {
 	rongrong_blitter_busy_select = data;
 	if (data != 0x18)
-		logerror("%04x: rongrong_blitter_busy_w data = %02x\n",cpu_get_pc(machine->activecpu),data);
+		logerror("%04x: rongrong_blitter_busy_w data = %02x\n",cpu_get_pc(space->cpu),data);
 }
 static READ8_HANDLER( rongrong_blitter_busy_r )
 {
@@ -1536,7 +1536,7 @@ static READ8_HANDLER( rongrong_blitter_busy_r )
 		case 0x18:	return 0;	// bit 5 = blitter busy
 
 		default:
-			logerror("%04x: rongrong_blitter_busy_r with select = %02x\n",cpu_get_pc(machine->activecpu),rongrong_blitter_busy_select);
+			logerror("%04x: rongrong_blitter_busy_r with select = %02x\n",cpu_get_pc(space->cpu),rongrong_blitter_busy_select);
 	}
 	return 0xff;
 }
@@ -1619,9 +1619,9 @@ static UINT16 *ddenlvrj_dsw_sel;
 static READ16_HANDLER( ddenlvrj_dsw_r )
 {
 	UINT16 dsw = 0;
-	if ((~*ddenlvrj_dsw_sel) & 0x01)	dsw |= input_port_read(machine, "DSW1");
-	if ((~*ddenlvrj_dsw_sel) & 0x02)	dsw |= input_port_read(machine, "DSW2");
-	if ((~*ddenlvrj_dsw_sel) & 0x04)	dsw |= input_port_read(machine, "DSW3");
+	if ((~*ddenlvrj_dsw_sel) & 0x01)	dsw |= input_port_read(space->machine, "DSW1");
+	if ((~*ddenlvrj_dsw_sel) & 0x02)	dsw |= input_port_read(space->machine, "DSW2");
+	if ((~*ddenlvrj_dsw_sel) & 0x04)	dsw |= input_port_read(space->machine, "DSW3");
 	return dsw;
 }
 
@@ -1727,9 +1727,9 @@ static CUSTOM_INPUT( nettoqc_special_r )
 
 static READ16_HANDLER( nettoqc_input_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
-	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
-	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW3");
+	if (!(ddenlovr_select & 0x01))	return input_port_read(space->machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(space->machine, "DSW2");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(space->machine, "DSW3");
 	return 0xffff;
 }
 
@@ -1814,19 +1814,19 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( rongrong_input_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
-	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
-	if (!(ddenlovr_select & 0x04))	return 0xff;//mame_rand(machine);
-	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(machine);
-	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW3");
+	if (!(ddenlovr_select & 0x01))	return input_port_read(space->machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(space->machine, "DSW2");
+	if (!(ddenlovr_select & 0x04))	return 0xff;//mame_rand(space->machine);
+	if (!(ddenlovr_select & 0x08))	return 0xff;//mame_rand(space->machine);
+	if (!(ddenlovr_select & 0x10))	return input_port_read(space->machine, "DSW3");
 	return 0xff;
 }
 
 static WRITE8_HANDLER( rongrong_select_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 
-//logerror("%04x: rongrong_select_w %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: rongrong_select_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bits 0-4 = **both** ROM bank **AND** input select */
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x1f)]);
 	ddenlovr_select = data;
@@ -1942,24 +1942,24 @@ static READ8_HANDLER( magic_r )
 
 static WRITE8_HANDLER( mmpanic_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	/* Bit 4? */
 }
 
 static WRITE8_HANDLER( mmpanic_soundlatch_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( mmpanic_blitter_w )
 {
-	blitter_w(machine, 0,offset,data,0xdf);	// RST 18
+	blitter_w(space, 0,offset,data,0xdf);	// RST 18
 }
 static WRITE8_HANDLER( mmpanic_blitter2_w )
 {
-	blitter_w(machine, 1,offset,data,0xdf);	// RST 18
+	blitter_w(space, 1,offset,data,0xdf);	// RST 18
 }
 
 /* A led for each of the 9 buttons */
@@ -2120,12 +2120,12 @@ static READ8_HANDLER( funkyfig_busy_r )
 
 static WRITE8_HANDLER( funkyfig_blitter_w )
 {
-	blitter_w_funkyfig(machine, 0,offset,data,0xe0);
+	blitter_w_funkyfig(space->machine, 0,offset,data,0xe0);
 }
 
 static WRITE8_HANDLER( funkyfig_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 
 	ddenlovr_select = data;
 
@@ -2136,10 +2136,10 @@ static WRITE8_HANDLER( funkyfig_rombank_w )
 
 static READ8_HANDLER( funkyfig_dsw_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
-	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
-	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW3");
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(space->machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(space->machine, "DSW2");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(space->machine, "DSW3");
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(space->cpu), ddenlovr_select);
 	return 0xff;
 }
 
@@ -2149,10 +2149,10 @@ static READ8_HANDLER( funkyfig_coin_r )
 {
 	switch( ddenlovr_select2 )
 	{
-		case 0x22:	return input_port_read(machine, "IN2");
+		case 0x22:	return input_port_read(space->machine, "IN2");
 		case 0x23:	return funkyfig_lockout;
 	}
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(space->cpu), ddenlovr_select2);
 	return 0xff;
 }
 
@@ -2160,10 +2160,10 @@ static READ8_HANDLER( funkyfig_key_r )
 {
 	switch( ddenlovr_select2 )
 	{
-		case 0x20:	return input_port_read(machine, "IN0");
-		case 0x21:	return input_port_read(machine, "IN1");
+		case 0x20:	return input_port_read(space->machine, "IN0");
+		case 0x21:	return input_port_read(space->machine, "IN1");
 	}
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(space->cpu), ddenlovr_select2);
 	return 0xff;
 }
 
@@ -2176,13 +2176,13 @@ static WRITE8_HANDLER( funkyfig_lockout_w )
 			coin_counter_w(0,  data  & 0x01);
 			coin_lockout_w(0,(~data) & 0x02);
 			if (data & ~0x03)
-				logerror("%06x: warning, unknown bits written, lockout = %02x\n", cpu_get_pc(machine->activecpu), data);
+				logerror("%06x: warning, unknown bits written, lockout = %02x\n", cpu_get_pc(space->cpu), data);
 			break;
 
 //      case 0xef:  16 bytes on startup
 
 		default:
-			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", cpu_get_pc(space->cpu), ddenlovr_select2, data);
 	}
 }
 
@@ -2238,7 +2238,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hanakanz_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
 
@@ -2271,23 +2271,23 @@ static READ8_HANDLER( hanakanz_keyb_r )
 {
 	UINT8 val = 0xff;
 
-	if      (!(keyb & 0x01))	val = input_port_read(machine, offset ? "KEY5" : "KEY0");
-	else if (!(keyb & 0x02))	val = input_port_read(machine, offset ? "KEY6" : "KEY1");
-	else if (!(keyb & 0x04))	val = input_port_read(machine, offset ? "KEY7" : "KEY2");
-	else if (!(keyb & 0x08))	val = input_port_read(machine, offset ? "KEY8" : "KEY3");
-	else if (!(keyb & 0x10))	val = input_port_read(machine, offset ? "KEY9" : "KEY4");
+	if      (!(keyb & 0x01))	val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
+	else if (!(keyb & 0x02))	val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
+	else if (!(keyb & 0x04))	val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
+	else if (!(keyb & 0x08))	val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
+	else if (!(keyb & 0x10))	val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
 
-	val |= input_port_read(machine, offset ? "HOPPER" : "BET");
+	val |= input_port_read(space->machine, offset ? "HOPPER" : "BET");
 	return val;
 }
 
 static READ8_HANDLER( hanakanz_dsw_r )
 {
-	if (!(dsw & 0x01))	return input_port_read(machine, "DSW1");
-	if (!(dsw & 0x02))	return input_port_read(machine, "DSW2");
-	if (!(dsw & 0x04))	return input_port_read(machine, "DSW3");
-	if (!(dsw & 0x08))	return input_port_read(machine, "DSW4");
-	if (!(dsw & 0x10))	return input_port_read(machine, "DSW5");
+	if (!(dsw & 0x01))	return input_port_read(space->machine, "DSW1");
+	if (!(dsw & 0x02))	return input_port_read(space->machine, "DSW2");
+	if (!(dsw & 0x04))	return input_port_read(space->machine, "DSW3");
+	if (!(dsw & 0x08))	return input_port_read(space->machine, "DSW4");
+	if (!(dsw & 0x10))	return input_port_read(space->machine, "DSW5");
 	return 0xff;
 }
 
@@ -2298,15 +2298,15 @@ static READ8_HANDLER( hanakanz_busy_r )
 
 static READ8_HANDLER( hanakanz_gfxrom_r )
 {
-	UINT8 *rom	=	memory_region( machine, "gfx1" );
-	size_t size		=	memory_region_length( machine, "gfx1" );
+	UINT8 *rom	=	memory_region( space->machine, "gfx1" );
+	size_t size		=	memory_region_length( space->machine, "gfx1" );
 	int address		=	(ddenlovr_blit_address & 0xffffff) * 2;
 
 	static UINT8 romdata[2];
 
 	if (address >= size)
 	{
-		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(machine->activecpu), address);
+		logerror("CPU#0 PC %06X: Error, Blitter address %06X out of range\n", cpu_get_pc(space->cpu), address);
 		address %= size;
 	}
 
@@ -2336,7 +2336,7 @@ static WRITE8_HANDLER( hanakanz_coincounter_w )
 	coin_counter_w(0, data & 1);
 
 	if (data & 0xf0)
-		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(machine->activecpu), data);
+		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(space->cpu), data);
 
 #ifdef MAME_DEBUG
 //      popmessage("93 = %02x",data);
@@ -2359,7 +2359,7 @@ static WRITE8_HANDLER( hanakanz_palette_w )
 		int g = ddenlovr_blit_reg & 0x1f;
 		int r = data & 0x1f;
 		int b = ((data & 0xe0) >> 5) | ((ddenlovr_blit_reg & 0x60) >> 2);
-		palette_set_color_rgb(machine,(palette_index++)&0x1ff,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(space->machine,(palette_index++)&0x1ff,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -2370,7 +2370,7 @@ static WRITE8_HANDLER( hanakanz_oki_bank_w )
 
 static READ8_HANDLER( hanakanz_rand_r )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( hanakanz_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -2476,21 +2476,21 @@ static READ8_HANDLER( mjchuuka_keyb_r )
 {
 	UINT8 val = 0xff;
 
-	if      (!(keyb & 0x01))	val = input_port_read(machine, offset ? "KEY5" : "KEY0");
-	else if (!(keyb & 0x02))	val = input_port_read(machine, offset ? "KEY6" : "KEY1");
-	else if (!(keyb & 0x04))	val = input_port_read(machine, offset ? "KEY7" : "KEY2");
-	else if (!(keyb & 0x08))	val = input_port_read(machine, offset ? "KEY8" : "KEY3");
-	else if (!(keyb & 0x10))	val = input_port_read(machine, offset ? "KEY9" : "KEY4");
+	if      (!(keyb & 0x01))	val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
+	else if (!(keyb & 0x02))	val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
+	else if (!(keyb & 0x04))	val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
+	else if (!(keyb & 0x08))	val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
+	else if (!(keyb & 0x10))	val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
 
-	val |= input_port_read(machine, offset ? "HOPPER" : "BET");
+	val |= input_port_read(space->machine, offset ? "HOPPER" : "BET");
 	if (offset)	val |= 0x80;	// blitter busy
 	return val;
 }
 
 static WRITE8_HANDLER( mjchuuka_blitter_w )
 {
-	hanakanz_blitter_reg_w(machine,0,offset >> 8);
-	hanakanz_blitter_data_w(machine,0,data);
+	hanakanz_blitter_reg_w(space,0,offset >> 8);
+	hanakanz_blitter_data_w(space,0,data);
 }
 
 static UINT8 mjchuuka_romdata[2];
@@ -2513,7 +2513,7 @@ static void mjchuuka_get_romdata(running_machine *machine)
 
 static READ8_HANDLER( mjchuuka_gfxrom_0_r )
 {
-	mjchuuka_get_romdata(machine);
+	mjchuuka_get_romdata(space->machine);
 	ddenlovr_blit_address++;
 	return mjchuuka_romdata[0];
 }
@@ -2539,7 +2539,7 @@ static WRITE8_HANDLER( mjchuuka_palette_w )
 		int r = (rgb >> 0) & 0x1f;
 		int g = (rgb >> 8) & 0x1f;
 		int b = ((rgb >> 5) & 0x07) | ((rgb & 0x6000) >> 10);
-		palette_set_color_rgb(machine,(palette_index++)&0x1ff,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(space->machine,(palette_index++)&0x1ff,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -2554,7 +2554,7 @@ static WRITE8_HANDLER( mjchuuka_coincounter_w )
 	coin_lockout_w(0,(~data) & 0x08);
 
 	if (data & 0x74)
-		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(machine->activecpu), data);
+		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(space->cpu), data);
 
 #ifdef MAME_DEBUG
 //    popmessage("40 = %02x",data);
@@ -2622,9 +2622,9 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjmyster_rambank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	memory_set_bankptr(2, &rom[0x90000 + 0x1000 * (data & 0x07)]);
-//  logerror("%04x: rambank = %02x\n", cpu_get_pc(machine->activecpu), data);
+//  logerror("%04x: rambank = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
 static WRITE8_HANDLER( mjmyster_select2_w )
@@ -2638,13 +2638,13 @@ static READ8_HANDLER( mjmyster_coins_r )
 {
 	switch( ddenlovr_select2 )
 	{
-		case 0x00:	return input_port_read(machine, "SYSTEM");
+		case 0x00:	return input_port_read(space->machine, "SYSTEM");
 		case 0x01:	return 0xff;
 		case 0x02:	return 0xff;	// bit 7 = 0 -> blitter busy, + hopper switch
 		case 0x03:	return 0xff;
 	}
 
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(space->cpu), ddenlovr_select2);
 
 	return 0xff;
 }
@@ -2653,12 +2653,12 @@ static READ8_HANDLER( mjmyster_keyb_r )
 {
 	UINT8 ret = 0xff;
 
-	if		(keyb & 0x01)	ret = input_port_read(machine, "KEY0");
-	else if	(keyb & 0x02)	ret = input_port_read(machine, "KEY1");
-	else if	(keyb & 0x04)	ret = input_port_read(machine, "KEY2");
-	else if	(keyb & 0x08)	ret = input_port_read(machine, "KEY3");
-	else if	(keyb & 0x10)	ret = input_port_read(machine, "KEY4");
-	else	logerror("%06x: warning, unknown bits read, keyb = %02x\n", cpu_get_pc(machine->activecpu), keyb);
+	if		(keyb & 0x01)	ret = input_port_read(space->machine, "KEY0");
+	else if	(keyb & 0x02)	ret = input_port_read(space->machine, "KEY1");
+	else if	(keyb & 0x04)	ret = input_port_read(space->machine, "KEY2");
+	else if	(keyb & 0x08)	ret = input_port_read(space->machine, "KEY3");
+	else if	(keyb & 0x10)	ret = input_port_read(space->machine, "KEY4");
+	else	logerror("%06x: warning, unknown bits read, keyb = %02x\n", cpu_get_pc(space->cpu), keyb);
 
 	keyb <<= 1;
 
@@ -2667,12 +2667,12 @@ static READ8_HANDLER( mjmyster_keyb_r )
 
 static READ8_HANDLER( mjmyster_dsw_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW4");
-	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW3");
-	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW2");
-	if (!(ddenlovr_select & 0x08))	return input_port_read(machine, "DSW1");
-	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW5");
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(space->machine, "DSW4");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(space->machine, "DSW3");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(space->machine, "DSW2");
+	if (!(ddenlovr_select & 0x08))	return input_port_read(space->machine, "DSW1");
+	if (!(ddenlovr_select & 0x10))	return input_port_read(space->machine, "DSW5");
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(space->cpu), ddenlovr_select);
 	return 0xff;
 }
 
@@ -2690,13 +2690,13 @@ static WRITE8_HANDLER( mjmyster_coincounter_w )
 			break;
 
 		default:
-			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2, data);
+			logerror("%06x: warning, unknown bits written, ddenlovr_select2 = %02x, data = %02x\n", cpu_get_pc(space->cpu), ddenlovr_select2, data);
 	}
 }
 
 static WRITE8_HANDLER( mjmyster_blitter_w )
 {
-	blitter_w(machine, 0,offset,data,0xfc);
+	blitter_w(space, 0,offset,data,0xfc);
 }
 
 static ADDRESS_MAP_START( mjmyster_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -2739,7 +2739,7 @@ ADDRESS_MAP_END
 static UINT8 hginga_rombank;
 static WRITE8_HANDLER( hginga_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	hginga_rombank = data;
 }
@@ -2747,9 +2747,9 @@ static WRITE8_HANDLER( hginga_rombank_w )
 // similar to rongrong
 static READ8_HANDLER( hginga_protection_r )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	if (hginga_rombank & 0x10)
-		return hanakanz_rand_r(machine,0);
+		return hanakanz_rand_r(space,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xf601 - 0x8000];
 }
 
@@ -2770,12 +2770,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( hginga_dsw_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW4");
-	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW3");
-	if (!(ddenlovr_select & 0x04))	return input_port_read(machine, "DSW2");
-	if (!(ddenlovr_select & 0x08))	return input_port_read(machine, "DSW1");
-	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW5");
-	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select);
+	if (!(ddenlovr_select & 0x01))	return input_port_read(space->machine, "DSW4");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(space->machine, "DSW3");
+	if (!(ddenlovr_select & 0x04))	return input_port_read(space->machine, "DSW2");
+	if (!(ddenlovr_select & 0x08))	return input_port_read(space->machine, "DSW1");
+	if (!(ddenlovr_select & 0x10))	return input_port_read(space->machine, "DSW5");
+	logerror("%06x: warning, unknown bits read, ddenlovr_select = %02x\n", cpu_get_pc(space->cpu), ddenlovr_select);
 	return 0xff;
 }
 
@@ -2791,12 +2791,12 @@ static READ8_HANDLER( hginga_coins_r )
 {
 	switch( hginga_select )
 	{
-		case 0x20:	return input_port_read(machine, "SYSTEM");
-		case 0x21:	return input_port_read(machine, "BET");
+		case 0x20:	return input_port_read(space->machine, "SYSTEM");
+		case 0x21:	return input_port_read(space->machine, "BET");
 		case 0x22:	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x23:	return hginga_coins;
 	}
-	logerror("%04x: coins_r with select = %02x\n", cpu_get_pc(machine->activecpu), hginga_select);
+	logerror("%04x: coins_r with select = %02x\n", cpu_get_pc(space->cpu), hginga_select);
 	return 0xff;
 }
 
@@ -2824,7 +2824,7 @@ static WRITE8_HANDLER( hginga_coins_w )
 			hginga_coins = data;
 			break;
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", cpu_get_pc(machine->activecpu), hginga_select, data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n", cpu_get_pc(space->cpu), hginga_select, data);
 	}
 }
 
@@ -2840,13 +2840,13 @@ static READ8_HANDLER( hginga_input_r )
 
 		// player 1
 		case 0xa1:
-			return input_port_read(machine, keynames0[hginga_ip++]);
+			return input_port_read(space->machine, keynames0[hginga_ip++]);
 
 		// player 2
 		case 0xa2:
-			return input_port_read(machine, keynames1[hginga_ip++]);
+			return input_port_read(space->machine, keynames1[hginga_ip++]);
 	}
-	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(machine->activecpu), hginga_select);
+	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(space->cpu), hginga_select);
 	return 0xff;
 }
 
@@ -2877,7 +2877,7 @@ static WRITE8_HANDLER( hginga_blitter_w )
 				break;
 		}
 	}
-	blitter_w(machine, 0,offset,data,0xfc);
+	blitter_w(space, 0,offset,data,0xfc);
 }
 
 static ADDRESS_MAP_START( hginga_readport, ADDRESS_SPACE_IO, 8 )	ADDRESS_MAP_GLOBAL_MASK(0xff)
@@ -2918,15 +2918,15 @@ ADDRESS_MAP_END
 
 static UINT8 hgokou_hopper;
 
-static UINT8 hgokou_player_r(running_machine *machine, int player)
+static UINT8 hgokou_player_r(const address_space *space, int player)
 {
-	UINT8 hopper_bit = ((hgokou_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0 : (1<<6));
+	UINT8 hopper_bit = ((hgokou_hopper && !(video_screen_get_frame_number(space->machine->primary_screen)%10)) ? 0 : (1<<6));
 
-	if (!(ddenlovr_select2 & 0x01))	return input_port_read(machine, player ? "KEY5" : "KEY0") | hopper_bit;
-	if (!(ddenlovr_select2 & 0x02))	return input_port_read(machine, player ? "KEY6" : "KEY1") | hopper_bit;
-	if (!(ddenlovr_select2 & 0x04))	return input_port_read(machine, player ? "KEY7" : "KEY2") | hopper_bit;
-	if (!(ddenlovr_select2 & 0x08))	return input_port_read(machine, player ? "KEY8" : "KEY3") | hopper_bit;
-	if (!(ddenlovr_select2 & 0x10))	return input_port_read(machine, player ? "KEY9" : "KEY4") | hopper_bit;
+	if (!(ddenlovr_select2 & 0x01))	return input_port_read(space->machine, player ? "KEY5" : "KEY0") | hopper_bit;
+	if (!(ddenlovr_select2 & 0x02))	return input_port_read(space->machine, player ? "KEY6" : "KEY1") | hopper_bit;
+	if (!(ddenlovr_select2 & 0x04))	return input_port_read(space->machine, player ? "KEY7" : "KEY2") | hopper_bit;
+	if (!(ddenlovr_select2 & 0x08))	return input_port_read(space->machine, player ? "KEY8" : "KEY3") | hopper_bit;
+	if (!(ddenlovr_select2 & 0x10))	return input_port_read(space->machine, player ? "KEY9" : "KEY4") | hopper_bit;
 
 	return 0x7f;	// bit 7 = blitter busy, bit 6 = hopper
 }
@@ -2935,12 +2935,12 @@ static READ8_HANDLER( hgokou_input_r )
 {
 	switch (hginga_select)
 	{
-		case 0x20:	return input_port_read(machine, "SYSTEM");
-		case 0x21:	return hgokou_player_r(machine, 1);
-		case 0x22:	return hgokou_player_r(machine, 0);
+		case 0x20:	return input_port_read(space->machine, "SYSTEM");
+		case 0x21:	return hgokou_player_r(space, 1);
+		case 0x22:	return hgokou_player_r(space, 0);
 		case 0x23:	return hginga_coins;
 	}
-	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", cpu_get_pc(machine->activecpu), hginga_select);
+	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", cpu_get_pc(space->cpu), hginga_select);
 	return 0xff;
 }
 
@@ -2965,16 +2965,16 @@ static WRITE8_HANDLER( hgokou_input_w )
 		case 0x2f:	break;	// ? written with 2f
 
 		default:
-			logerror("%04x: input_w with select = %02x, data = %02x\n",cpu_get_pc(machine->activecpu),hginga_select,data);
+			logerror("%04x: input_w with select = %02x, data = %02x\n",cpu_get_pc(space->cpu),hginga_select,data);
 	}
 }
 
 // similar to rongrong
 static READ8_HANDLER( hgokou_protection_r )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	if (hginga_rombank == 0)
-		return hanakanz_rand_r(machine,0);
+		return hanakanz_rand_r(space,0);
 	return rom[0x10000 + 0x8000 * (hginga_rombank & 0x7) + 0xe601 - 0x8000];
 }
 
@@ -3031,7 +3031,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( hparadis_select_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 
 	ddenlovr_select = data;
 	hginga_ip = 0;
@@ -3048,24 +3048,24 @@ static READ8_HANDLER( hparadis_input_r )
 
 	switch (hginga_select)
 	{
-		case 0x00:	return input_port_read(machine, "P1");
-		case 0x01:	return input_port_read(machine, "P2");
-		case 0x02:	return input_port_read(machine, "SYSTEM");
+		case 0x00:	return input_port_read(space->machine, "P1");
+		case 0x01:	return input_port_read(space->machine, "P2");
+		case 0x02:	return input_port_read(space->machine, "SYSTEM");
 		case 0x0d:	return 0x00;
-		case 0x80:	return input_port_read(machine, keynames0[hginga_ip++]);	// P1 (Keys)
-		case 0x81:	return input_port_read(machine, keynames1[hginga_ip++]);	// P2 (Keys)
+		case 0x80:	return input_port_read(space->machine, keynames0[hginga_ip++]);	// P1 (Keys)
+		case 0x81:	return input_port_read(space->machine, keynames1[hginga_ip++]);	// P2 (Keys)
 	}
-	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", cpu_get_pc(machine->activecpu), hginga_select);
+	logerror("%06x: warning, unknown bits read, hginga_select = %02x\n", cpu_get_pc(space->cpu), hginga_select);
 	return 0xff;
 }
 
 static READ8_HANDLER( hparadis_dsw_r )
 {
-	if (!(ddenlovr_select & 0x01))	return input_port_read(machine, "DSW1");
-	if (!(ddenlovr_select & 0x02))	return input_port_read(machine, "DSW2");
+	if (!(ddenlovr_select & 0x01))	return input_port_read(space->machine, "DSW1");
+	if (!(ddenlovr_select & 0x02))	return input_port_read(space->machine, "DSW2");
 	if (!(ddenlovr_select & 0x04))	return 0xff;
 	if (!(ddenlovr_select & 0x08))	return 0xff;
-	if (!(ddenlovr_select & 0x10))	return input_port_read(machine, "DSW3");
+	if (!(ddenlovr_select & 0x10))	return input_port_read(space->machine, "DSW3");
 	return 0xff;
 }
 
@@ -3076,7 +3076,7 @@ static WRITE8_HANDLER( hparadis_coin_w )
 		case 0x0c:	coin_counter_w(0, data & 1);	break;
 		case 0x0d:	break;
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n",cpu_get_pc(machine->activecpu),hginga_select,data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n",cpu_get_pc(space->cpu),hginga_select,data);
 	}
 }
 
@@ -3129,13 +3129,13 @@ static READ8_HANDLER( mjmywrld_coins_r )
 {
 	switch( ddenlovr_select2 )
 	{
-		case 0x80:	return input_port_read(machine, "SYSTEM");
+		case 0x80:	return input_port_read(space->machine, "SYSTEM");
 		case 0x81:	return 0x00;
 		case 0x82:	return 0xff;	// bit 7 = 0 -> blitter busy, + hopper switch
 		case 0x83:	return 0x00;
 	}
 
-	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(machine->activecpu), ddenlovr_select2);
+	logerror("%06x: warning, unknown bits read, ddenlovr_select2 = %02x\n", cpu_get_pc(space->cpu), ddenlovr_select2);
 
 	return 0xff;
 }
@@ -3205,8 +3205,8 @@ static UINT16 *akamaru_dsw_sel;
 static READ16_HANDLER( akamaru_dsw_r )
 {
 	UINT16 dsw = 0;
-	if (akamaru_dsw_sel[1] == 0xff)	dsw |= input_port_read(machine, "DSW1");
-	if (akamaru_dsw_sel[0] == 0xff)	dsw |= input_port_read(machine, "DSW2");
+	if (akamaru_dsw_sel[1] == 0xff)	dsw |= input_port_read(space->machine, "DSW1");
+	if (akamaru_dsw_sel[0] == 0xff)	dsw |= input_port_read(space->machine, "DSW2");
 	return dsw;
 }
 
@@ -3272,7 +3272,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( mjflove_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0xf)]);
 }
 
@@ -3291,11 +3291,11 @@ static READ8_HANDLER( mjflove_keyb_r )
 {
 	UINT8 val = 0xff;
 
-	if      (!(keyb & 0x01))	val = input_port_read(machine, offset ? "KEY5" : "KEY0");
-	else if (!(keyb & 0x02))	val = input_port_read(machine, offset ? "KEY6" : "KEY1");
-	else if (!(keyb & 0x04))	val = input_port_read(machine, offset ? "KEY7" : "KEY2");
-	else if (!(keyb & 0x08))	val = input_port_read(machine, offset ? "KEY8" : "KEY3");
-	else if (!(keyb & 0x10))	val = input_port_read(machine, offset ? "KEY9" : "KEY4");
+	if      (!(keyb & 0x01))	val = input_port_read(space->machine, offset ? "KEY5" : "KEY0");
+	else if (!(keyb & 0x02))	val = input_port_read(space->machine, offset ? "KEY6" : "KEY1");
+	else if (!(keyb & 0x04))	val = input_port_read(space->machine, offset ? "KEY7" : "KEY2");
+	else if (!(keyb & 0x08))	val = input_port_read(space->machine, offset ? "KEY8" : "KEY3");
+	else if (!(keyb & 0x10))	val = input_port_read(space->machine, offset ? "KEY9" : "KEY4");
 
 	return val;
 }
@@ -3312,7 +3312,7 @@ static CUSTOM_INPUT( mjflove_blitter_r )
 
 static WRITE8_HANDLER( mjflove_blitter_w )
 {
-	blitter_w(machine, 0,offset,data,0);
+	blitter_w(space, 0,offset,data,0);
 }
 
 static WRITE8_HANDLER( mjflove_coincounter_w )
@@ -3322,7 +3322,7 @@ static WRITE8_HANDLER( mjflove_coincounter_w )
 
 	if (data & 0xfe)
 	{
-		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(machine->activecpu), data);
+		logerror("%04x: warning, coin counter = %02x\n", cpu_get_pc(space->cpu), data);
 //      popmessage("COIN = %02x",data);
 	}
 }

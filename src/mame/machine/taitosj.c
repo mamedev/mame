@@ -84,18 +84,18 @@ WRITE8_HANDLER( taitosj_bankswitch_w )
 ***************************************************************************/
 READ8_HANDLER( taitosj_fake_data_r )
 {
-	LOG(("%04x: protection read\n",cpu_get_pc(machine->activecpu)));
+	LOG(("%04x: protection read\n",cpu_get_pc(space->cpu)));
 	return 0;
 }
 
 WRITE8_HANDLER( taitosj_fake_data_w )
 {
-	LOG(("%04x: protection write %02x\n",cpu_get_pc(machine->activecpu),data));
+	LOG(("%04x: protection write %02x\n",cpu_get_pc(space->cpu),data));
 }
 
 READ8_HANDLER( taitosj_fake_status_r )
 {
-	LOG(("%04x: protection status read\n",cpu_get_pc(machine->activecpu)));
+	LOG(("%04x: protection status read\n",cpu_get_pc(space->cpu)));
 	return 0xff;
 }
 
@@ -103,7 +103,7 @@ READ8_HANDLER( taitosj_fake_status_r )
 /* timer callback : */
 READ8_HANDLER( taitosj_mcu_data_r )
 {
-	LOG(("%04x: protection read %02x\n",cpu_get_pc(machine->activecpu),toz80));
+	LOG(("%04x: protection read %02x\n",cpu_get_pc(space->cpu),toz80));
 	zaccept = 1;
 	return toz80;
 }
@@ -118,16 +118,16 @@ static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 
 WRITE8_HANDLER( taitosj_mcu_data_w )
 {
-	LOG(("%04x: protection write %02x\n",cpu_get_pc(machine->activecpu),data));
+	LOG(("%04x: protection write %02x\n",cpu_get_pc(space->cpu),data));
 	timer_call_after_resynch(NULL, data,taitosj_mcu_real_data_w);
 	/* temporarily boost the interleave to sync things up */
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
 
 READ8_HANDLER( taitosj_mcu_status_r )
 {
 	/* temporarily boost the interleave to sync things up */
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(10));
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 
 	/* bit 0 = the 68705 has read data from the Z80 */
 	/* bit 1 = the 68705 has written data for the Z80 */
@@ -136,13 +136,13 @@ READ8_HANDLER( taitosj_mcu_status_r )
 
 READ8_HANDLER( taitosj_68705_portA_r )
 {
-	LOG(("%04x: 68705 port A read %02x\n",cpu_get_pc(machine->activecpu),portA_in));
+	LOG(("%04x: 68705 port A read %02x\n",cpu_get_pc(space->cpu),portA_in));
 	return portA_in;
 }
 
 WRITE8_HANDLER( taitosj_68705_portA_w )
 {
-	LOG(("%04x: 68705 port A write %02x\n",cpu_get_pc(machine->activecpu),data));
+	LOG(("%04x: 68705 port A write %02x\n",cpu_get_pc(space->cpu),data));
 	portA_out = data;
 }
 
@@ -188,19 +188,19 @@ static TIMER_CALLBACK( taitosj_mcu_status_real_w )
 
 WRITE8_HANDLER( taitosj_68705_portB_w )
 {
-	LOG(("%04x: 68705 port B write %02x\n",cpu_get_pc(machine->activecpu),data));
+	LOG(("%04x: 68705 port B write %02x\n",cpu_get_pc(space->cpu),data));
 
 	if (~data & 0x01)
 	{
-		LOG(("%04x: 68705  68INTRQ **NOT SUPPORTED**!\n",cpu_get_pc(machine->activecpu)));
+		LOG(("%04x: 68705  68INTRQ **NOT SUPPORTED**!\n",cpu_get_pc(space->cpu)));
 	}
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
 		timer_call_after_resynch(NULL, 0,taitosj_mcu_data_real_r);
-		cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
 		portA_in = fromz80;
-		LOG(("%04x: 68705 <- Z80 %02x\n",cpu_get_pc(machine->activecpu),portA_in));
+		LOG(("%04x: 68705 <- Z80 %02x\n",cpu_get_pc(space->cpu),portA_in));
 	}
 	if (~data & 0x08)
 		busreq = 1;
@@ -208,16 +208,16 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 		busreq = 0;
 	if (~data & 0x04)
 	{
-		LOG(("%04x: 68705 -> Z80 %02x\n",cpu_get_pc(machine->activecpu),portA_out));
+		LOG(("%04x: 68705 -> Z80 %02x\n",cpu_get_pc(space->cpu),portA_out));
 
 		/* 68705 is writing data for the Z80 */
 		timer_call_after_resynch(NULL, portA_out,taitosj_mcu_status_real_w);
 	}
 	if (~data & 0x10)
 	{
-		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(machine->activecpu),portA_out,address));
+		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu),portA_out,address));
 
-		cpu_push_context(machine->cpu[0]);
+		cpu_push_context(space->machine->cpu[0]);
 		program_write_byte(address, portA_out);
 		cpu_pop_context();
 
@@ -226,19 +226,19 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	}
 	if (~data & 0x20)
 	{
-		cpu_push_context(machine->cpu[0]);
+		cpu_push_context(space->machine->cpu[0]);
 		portA_in = program_read_byte(address);
 		cpu_pop_context();
-		LOG(("%04x: 68705 read %02x from address %04x\n",cpu_get_pc(machine->activecpu),portA_in,address));
+		LOG(("%04x: 68705 read %02x from address %04x\n",cpu_get_pc(space->cpu),portA_in,address));
 	}
 	if (~data & 0x40)
 	{
-		LOG(("%04x: 68705 address low %02x\n",cpu_get_pc(machine->activecpu),portA_out));
+		LOG(("%04x: 68705 address low %02x\n",cpu_get_pc(space->cpu),portA_out));
 		address = (address & 0xff00) | portA_out;
 	}
 	if (~data & 0x80)
 	{
-		LOG(("%04x: 68705 address high %02x\n",cpu_get_pc(machine->activecpu),portA_out));
+		LOG(("%04x: 68705 address high %02x\n",cpu_get_pc(space->cpu),portA_out));
 		address = (address & 0x00ff) | (portA_out << 8);
 	}
 }
@@ -258,7 +258,7 @@ READ8_HANDLER( taitosj_68705_portC_r )
 	int res;
 
 	res = (zready << 0) | (zaccept << 1) | ((busreq^1) << 2);
-	LOG(("%04x: 68705 port C read %02x\n",cpu_get_pc(machine->activecpu),res));
+	LOG(("%04x: 68705 port C read %02x\n",cpu_get_pc(space->cpu),res));
 	return res;
 }
 
@@ -267,7 +267,7 @@ READ8_HANDLER( taitosj_68705_portC_r )
 
 READ8_HANDLER( spacecr_prot_r )
 {
-	int pc = cpu_get_pc(machine->activecpu);
+	int pc = cpu_get_pc(space->cpu);
 
 	if( pc != 0x368A && pc != 0x36A6 )
 		logerror("Read protection from an unknown location: %04X\n",pc);
@@ -306,11 +306,11 @@ WRITE8_HANDLER( alpine_protection_w )
 
 WRITE8_HANDLER( alpinea_bankswitch_w )
 {
-    taitosj_bankswitch_w(machine, offset, data);
+    taitosj_bankswitch_w(space, offset, data);
 	protection_value = data >> 2;
 }
 
 READ8_HANDLER( alpine_port_2_r )
 {
-	return input_port_read(machine, "IN2") | protection_value;
+	return input_port_read(space->machine, "IN2") | protection_value;
 }

@@ -175,15 +175,15 @@ static VIDEO_UPDATE( bmcbowl )
 
 static READ16_HANDLER( bmc_random_read )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static READ16_HANDLER( bmc_protection_r )
 {
-	switch(cpu_get_previouspc(machine->activecpu))
+	switch(cpu_get_previouspc(space->cpu))
 	{
 		case 0xca68:
-			switch(cpu_get_reg(machine->activecpu, M68K_D2))
+			switch(cpu_get_reg(space->cpu, M68K_D2))
 			{
 				case 0: 		 return 0x37<<8;
 				case 0x1013: return 0;
@@ -191,8 +191,8 @@ static READ16_HANDLER( bmc_protection_r )
 			}
 			break;
 	}
-	logerror("Protection read @ %X\n",cpu_get_previouspc(machine->activecpu));
-	return mame_rand(machine);
+	logerror("Protection read @ %X\n",cpu_get_previouspc(space->cpu));
+	return mame_rand(space->machine);
 }
 
 static WRITE16_HANDLER( bmc_RAMDAC_offset_w )
@@ -203,7 +203,7 @@ static WRITE16_HANDLER( bmc_RAMDAC_offset_w )
 static WRITE16_HANDLER( bmc_RAMDAC_color_w )
 {
 		colorram[clr_offset]=data;
-		palette_set_color_rgb(machine,clr_offset/3,pal6bit(colorram[(clr_offset/3)*3]),pal6bit(colorram[(clr_offset/3)*3+1]),pal6bit(colorram[(clr_offset/3)*3+2]));
+		palette_set_color_rgb(space->machine,clr_offset/3,pal6bit(colorram[(clr_offset/3)*3]),pal6bit(colorram[(clr_offset/3)*3+1]),pal6bit(colorram[(clr_offset/3)*3+2]));
 		clr_offset=(clr_offset+1)%768;
 }
 
@@ -215,17 +215,17 @@ static WRITE16_HANDLER( scroll_w )
 
 static READ16_HANDLER(via_r)
 {
-	return via_0_r(machine,offset);
+	return via_0_r(space,offset);
 }
 
 static WRITE16_HANDLER(via_w)
 {
-	via_0_w(machine,offset,data);
+	via_0_w(space,offset,data);
 }
 
 static READ8_HANDLER(via_b_in)
 {
-	return input_port_read(machine, "IN3");
+	return input_port_read(space->machine, "IN3");
 }
 
 
@@ -446,10 +446,10 @@ static READ8_HANDLER(dips1_r)
 {
 	switch(bmc_input)
 	{
-			case 0x00:	return  input_port_read(machine, "IN1");
-			case 0x40:	return  input_port_read(machine, "IN2");
+			case 0x00:	return  input_port_read(space->machine, "IN1");
+			case 0x40:	return  input_port_read(space->machine, "IN2");
 	}
-	logerror("unknown input - %X (PC=%X)\n",bmc_input,cpu_get_previouspc(machine->activecpu));
+	logerror("unknown input - %X (PC=%X)\n",bmc_input,cpu_get_previouspc(space->cpu));
 	return 0xff;
 }
 

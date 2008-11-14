@@ -85,25 +85,25 @@ static UINT16 bionicc_inp[3];
 
 static WRITE16_HANDLER( hacked_controls_w )
 {
-logerror("%06x: hacked_controls_w %04x %02x\n",cpu_get_pc(machine->activecpu),offset,data);
+logerror("%06x: hacked_controls_w %04x %02x\n",cpu_get_pc(space->cpu),offset,data);
 	COMBINE_DATA(&bionicc_inp[offset]);
 }
 
 static READ16_HANDLER( hacked_controls_r )
 {
-logerror("%06x: hacked_controls_r %04x %04x\n",cpu_get_pc(machine->activecpu),offset,bionicc_inp[offset]);
+logerror("%06x: hacked_controls_r %04x %04x\n",cpu_get_pc(space->cpu),offset,bionicc_inp[offset]);
 	return bionicc_inp[offset];
 }
 
 static WRITE16_HANDLER( bionicc_mpu_trigger_w )
 {
-	data = input_port_read(machine, "SYSTEM") >> 12;
+	data = input_port_read(space->machine, "SYSTEM") >> 12;
 	bionicc_inp[0] = data ^ 0x0f;
 
-	data = input_port_read(machine, "P2");
+	data = input_port_read(space->machine, "P2");
 	bionicc_inp[1] = data ^ 0xff;
 
-	data = input_port_read(machine, "P1");
+	data = input_port_read(space->machine, "P1");
 	bionicc_inp[2] = data ^ 0xff;
 }
 
@@ -113,7 +113,7 @@ static UINT16 soundcommand;
 static WRITE16_HANDLER( hacked_soundcommand_w )
 {
 	COMBINE_DATA(&soundcommand);
-	soundlatch_w(machine,0,soundcommand & 0xff);
+	soundlatch_w(space,0,soundcommand & 0xff);
 }
 
 static READ16_HANDLER( hacked_soundcommand_r )

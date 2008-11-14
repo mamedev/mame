@@ -161,7 +161,7 @@ static READ32_HANDLER(FlipCount_r)
 	UINT32 IntPend=program_read_dword_32le(0x01800c0c);
 	FlipCntRead++;
 	if(FlipCntRead>=16 && !IntPend && FlipCount!=0)
-		cpu_suspend(machine->cpu[0],SUSPEND_REASON_SPIN,1);
+		cpu_suspend(space->machine->cpu[0],SUSPEND_REASON_SPIN,1);
 #endif
 	return ((UINT32) FlipCount)<<16;
 }
@@ -181,18 +181,18 @@ static WRITE32_HANDLER(FlipCount_w)
 static READ32_HANDLER(Input_r)
 {
 	if(offset == 0)
-		return input_port_read(machine, "P1_P2");
+		return input_port_read(space->machine, "P1_P2");
 	else if(offset == 1)
-		return input_port_read(machine, "P3_P4");
+		return input_port_read(space->machine, "P3_P4");
 	else if(offset == 2)
 	{
-		UINT8 Port4 = input_port_read(machine, "SYSTEM");
+		UINT8 Port4 = input_port_read(space->machine, "SYSTEM");
 		if(!(Port4 & 0x10) && ((OldPort4^Port4) & 0x10))	//coin buttons trigger IRQs
-			IntReq(machine, 12);
+			IntReq(space->machine, 12);
 		if(!(Port4 & 0x20) && ((OldPort4^Port4) & 0x20))
-			IntReq(machine, 19);
+			IntReq(space->machine, 19);
 		OldPort4 = Port4;
-		return /*dips*/input_port_read(machine, "DSW")|(Port4<<16);
+		return /*dips*/input_port_read(space->machine, "DSW")|(Port4<<16);
 	}
 	return 0;
 }
@@ -205,7 +205,7 @@ static WRITE32_HANDLER(IntAck_w)
 		IntPend&=~(1<<(data&0x1f));
 		program_write_dword_32le(0x01800c0c,IntPend);
 		if(!IntPend)
-			cpu_set_input_line(machine->cpu[0],SE3208_INT,CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0],SE3208_INT,CLEAR_LINE);
 	}
 	if(mem_mask&0xff00)
 		IntHigh=(data>>8)&7;
@@ -230,9 +230,9 @@ static WRITE32_HANDLER(Banksw_w)
 {
 	Bank=(data>>1)&7;
 	if(Bank<=2)
-		memory_set_bankptr(1,memory_region(machine, "user1")+Bank*0x1000000);
+		memory_set_bankptr(1,memory_region(space->machine, "user1")+Bank*0x1000000);
 	else
-		memory_set_bankptr(1,memory_region(machine, "user2"));
+		memory_set_bankptr(1,memory_region(space->machine, "user2"));
 }
 
 static TIMER_CALLBACK( Timercb )
@@ -307,7 +307,7 @@ static READ32_HANDLER(FlashCmd_r)
 	{
 		if(Bank<=2)
 		{
-			UINT32 *ptr=(UINT32*)(memory_region(machine, "user1")+Bank*0x1000000);
+			UINT32 *ptr=(UINT32*)(memory_region(space->machine, "user1")+Bank*0x1000000);
 			return ptr[0];
 		}
 		else
@@ -341,7 +341,7 @@ static WRITE32_HANDLER(PIO_w)
 
 	DS1302_RST(RST?1:0);
 	DS1302_DAT(DAT?1:0);
-	DS1302_CLK(machine, CLK?1:0);
+	DS1302_CLK(space->machine, CLK?1:0);
 
 	if(DS1302_RD())
 		program_write_dword_32le(0x01802008,program_read_dword_32le(0x01802008)|0x10000000);
@@ -399,7 +399,7 @@ static READ32_HANDLER(DMA0_r)
 
 static WRITE32_HANDLER(DMA0_w)
 {
-	DMA_w(machine, 0, data, mem_mask);
+	DMA_w(space, 0, data, mem_mask);
 }
 
 static READ32_HANDLER(DMA1_r)
@@ -409,7 +409,7 @@ static READ32_HANDLER(DMA1_r)
 
 static WRITE32_HANDLER(DMA1_w)
 {
-	DMA_w(machine, 1, data, mem_mask);
+	DMA_w(space, 1, data, mem_mask);
 }
 
 

@@ -130,15 +130,15 @@ static int ctrl;
 static READ8_HANDLER( tugboat_input_r )
 {
 	if (~ctrl & 0x80)
-		return input_port_read(machine, "IN0");
+		return input_port_read(space->machine, "IN0");
 	else if (~ctrl & 0x40)
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	else if (~ctrl & 0x20)
-		return input_port_read(machine, "IN2");
+		return input_port_read(space->machine, "IN2");
 	else if (~ctrl & 0x10)
-		return input_port_read(machine, "IN3");
+		return input_port_read(space->machine, "IN3");
 	else
-		return input_port_read(machine, "IN4");
+		return input_port_read(space->machine, "IN4");
 }
 
 static READ8_HANDLER( tugboat_ctrl_r )

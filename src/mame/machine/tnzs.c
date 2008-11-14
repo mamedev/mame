@@ -46,28 +46,28 @@ static READ8_HANDLER( mcu_tnzs_r )
 
 	if (offset == 0)
 	{
-		data = cpu_get_reg(machine->cpu[2], I8X41_DATA);
-		cpu_yield(machine->activecpu);
+		data = cpu_get_reg(space->machine->cpu[2], I8X41_DATA);
+		cpu_yield(space->cpu);
 	}
 	else
 	{
-		data = cpu_get_reg(machine->cpu[2], I8X41_STAT);
-		cpu_yield(machine->activecpu);
+		data = cpu_get_reg(space->machine->cpu[2], I8X41_STAT);
+		cpu_yield(space->cpu);
 	}
 
-//  logerror("PC %04x: read %02x from mcu $c00%01x\n", cpu_get_previouspc(machine->activecpu), data, offset);
+//  logerror("PC %04x: read %02x from mcu $c00%01x\n", cpu_get_previouspc(space->cpu), data, offset);
 
 	return data;
 }
 
 static WRITE8_HANDLER( mcu_tnzs_w )
 {
-//  logerror("PC %04x: write %02x to mcu $c00%01x\n", cpu_get_previouspc(machine->activecpu), data, offset);
+//  logerror("PC %04x: write %02x to mcu $c00%01x\n", cpu_get_previouspc(space->cpu), data, offset);
 
 	if (offset == 0)
-		cpu_set_reg(machine->cpu[2], I8X41_DATA, data);
+		cpu_set_reg(space->machine->cpu[2], I8X41_DATA, data);
 	else
-		cpu_set_reg(machine->cpu[2], I8X41_CMND, data);
+		cpu_set_reg(space->machine->cpu[2], I8X41_CMND, data);
 }
 
 
@@ -77,29 +77,29 @@ READ8_HANDLER( tnzs_port1_r )
 
 	switch (tnzs_input_select & 0x0f)
 	{
-		case 0x0a:	data = input_port_read(machine, "IN2"); break;
-		case 0x0c:	data = input_port_read(machine, "IN0"); break;
-		case 0x0d:	data = input_port_read(machine, "IN1"); break;
+		case 0x0a:	data = input_port_read(space->machine, "IN2"); break;
+		case 0x0c:	data = input_port_read(space->machine, "IN0"); break;
+		case 0x0d:	data = input_port_read(space->machine, "IN1"); break;
 		default:	data = 0xff; break;
 	}
 
-//  logerror("I8742:%04x  Read %02x from port 1\n", cpu_get_previouspc(machine->activecpu), data);
+//  logerror("I8742:%04x  Read %02x from port 1\n", cpu_get_previouspc(space->cpu), data);
 
 	return data;
 }
 
 READ8_HANDLER( tnzs_port2_r )
 {
-	int data = input_port_read(machine, "IN2");
+	int data = input_port_read(space->machine, "IN2");
 
-//  logerror("I8742:%04x  Read %02x from port 2\n", cpu_get_previouspc(machine->activecpu), data);
+//  logerror("I8742:%04x  Read %02x from port 2\n", cpu_get_previouspc(space->cpu), data);
 
 	return data;
 }
 
 WRITE8_HANDLER( tnzs_port2_w )
 {
-//  logerror("I8742:%04x  Write %02x to port 2\n", cpu_get_previouspc(machine->activecpu), data);
+//  logerror("I8742:%04x  Write %02x to port 2\n", cpu_get_previouspc(space->cpu), data);
 
 	coin_lockout_w( 0, (data & 0x40) );
 	coin_lockout_w( 1, (data & 0x80) );
@@ -115,9 +115,9 @@ READ8_HANDLER( arknoid2_sh_f000_r )
 {
 	int val;
 
-//  logerror("PC %04x: read input %04x\n", cpu_get_pc(machine->activecpu), 0xf000 + offset);
+//  logerror("PC %04x: read input %04x\n", cpu_get_pc(space->cpu), 0xf000 + offset);
 
-	val = input_port_read_safe(machine, (offset/2) ? "AN2" : "AN1", 0);
+	val = input_port_read_safe(space->machine, (offset/2) ? "AN2" : "AN1", 0);
 	if (offset & 1)
 	{
 		return ((val >> 8) & 0xff);
@@ -219,7 +219,7 @@ static READ8_HANDLER( mcu_arknoid2_r )
 {
 	static const char mcu_startup[] = "\x55\xaa\x5a";
 
-//  logerror("PC %04x: read mcu %04x\n", cpu_get_pc(machine->activecpu), 0xc000 + offset);
+//  logerror("PC %04x: read mcu %04x\n", cpu_get_pc(space->cpu), 0xc000 + offset);
 
 	if (offset == 0)
 	{
@@ -247,7 +247,7 @@ static READ8_HANDLER( mcu_arknoid2_r )
 					}
 					else return mcu_credits;
 				}
-				else return input_port_read(machine, "IN0");	/* buttons */
+				else return input_port_read(space->machine, "IN0");	/* buttons */
 
 			default:
 				logerror("error, unknown mcu command\n");
@@ -281,7 +281,7 @@ static WRITE8_HANDLER( mcu_arknoid2_w )
 {
 	if (offset == 0)
 	{
-//      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(machine->activecpu), data, 0xc000 + offset);
+//      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(space->cpu), data, 0xc000 + offset);
 		if (mcu_command == 0x41)
 		{
 			mcu_credits = (mcu_credits + data) & 0xff;
@@ -298,7 +298,7 @@ static WRITE8_HANDLER( mcu_arknoid2_w )
         0x80: release coin lockout (issued only in test mode)
         during initialization, a sequence of 4 bytes sets coin/credit settings
         */
-//      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(machine->activecpu), data, 0xc000 + offset);
+//      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(space->cpu), data, 0xc000 + offset);
 
 		if (mcu_initializing)
 		{
@@ -324,7 +324,7 @@ static READ8_HANDLER( mcu_extrmatn_r )
 {
 	static const char mcu_startup[] = "\x5a\xa5\x55";
 
-//  logerror("PC %04x: read mcu %04x\n", cpu_get_pc(machine->activecpu), 0xc000 + offset);
+//  logerror("PC %04x: read mcu %04x\n", cpu_get_pc(space->cpu), 0xc000 + offset);
 
 	if (offset == 0)
 	{
@@ -338,16 +338,16 @@ static READ8_HANDLER( mcu_extrmatn_r )
 		switch (mcu_command)
 		{
 			case 0x01:
-				return input_port_read(machine, "IN0") ^ 0xff;	/* player 1 joystick + buttons */
+				return input_port_read(space->machine, "IN0") ^ 0xff;	/* player 1 joystick + buttons */
 
 			case 0x02:
-				return input_port_read(machine, "IN1") ^ 0xff;	/* player 2 joystick + buttons */
+				return input_port_read(space->machine, "IN1") ^ 0xff;	/* player 2 joystick + buttons */
 
 			case 0x1a:
-				return (input_port_read(machine, "COIN1") | (input_port_read(machine, "COIN2") << 1));
+				return (input_port_read(space->machine, "COIN1") | (input_port_read(space->machine, "COIN2") << 1));
 
 			case 0x21:
-				return input_port_read(machine, "IN2") & 0x0f;
+				return input_port_read(space->machine, "IN2") & 0x0f;
 
 			case 0x41:
 				return mcu_credits;
@@ -375,7 +375,7 @@ static READ8_HANDLER( mcu_extrmatn_r )
 					else return mcu_credits;
 				}
 				/* buttons */
-				else return ((input_port_read(machine, "IN0") & 0xf0) | (input_port_read(machine, "IN1") >> 4)) ^ 0xff;
+				else return ((input_port_read(space->machine, "IN0") & 0xf0) | (input_port_read(space->machine, "IN1") >> 4)) ^ 0xff;
 
 			default:
 				logerror("error, unknown mcu command\n");
@@ -409,7 +409,7 @@ static WRITE8_HANDLER( mcu_extrmatn_w )
 {
 	if (offset == 0)
 	{
-//      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(machine->activecpu), data, 0xc000 + offset);
+//      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(space->cpu), data, 0xc000 + offset);
 		if (mcu_command == 0x41)
 		{
 			mcu_credits = (mcu_credits + data) & 0xff;
@@ -431,7 +431,7 @@ static WRITE8_HANDLER( mcu_extrmatn_w )
         during initialization, a sequence of 4 bytes sets coin/credit settings
         */
 
-//      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(machine->activecpu), data, 0xc000 + offset);
+//      logerror("PC %04x: write %02x to mcu %04x\n", cpu_get_pc(space->cpu), data, 0xc000 + offset);
 
 		if (mcu_initializing)
 		{
@@ -612,15 +612,15 @@ READ8_HANDLER( tnzs_mcu_r )
 	{
 		case MCU_TNZS:
 		case MCU_CHUKATAI:
-			return mcu_tnzs_r(machine,offset);
+			return mcu_tnzs_r(space,offset);
 			break;
 		case MCU_ARKANOID:
-			return mcu_arknoid2_r(machine,offset);
+			return mcu_arknoid2_r(space,offset);
 			break;
 		case MCU_EXTRMATN:
 		case MCU_DRTOPPEL:
 		case MCU_PLUMPOP:
-			return mcu_extrmatn_r(machine,offset);
+			return mcu_extrmatn_r(space,offset);
 			break;
 		default:
 			return 0xff;
@@ -634,15 +634,15 @@ WRITE8_HANDLER( tnzs_mcu_w )
 	{
 		case MCU_TNZS:
 		case MCU_CHUKATAI:
-			mcu_tnzs_w(machine,offset,data);
+			mcu_tnzs_w(space,offset,data);
 			break;
 		case MCU_ARKANOID:
-			mcu_arknoid2_w(machine,offset,data);
+			mcu_arknoid2_w(space,offset,data);
 			break;
 		case MCU_EXTRMATN:
 		case MCU_DRTOPPEL:
 		case MCU_PLUMPOP:
-			mcu_extrmatn_w(machine,offset,data);
+			mcu_extrmatn_w(space,offset,data);
 			break;
 		default:
 			break;
@@ -715,15 +715,15 @@ WRITE8_HANDLER( tnzs_sharedram_w )
 
 WRITE8_HANDLER( tnzs_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
-//  logerror("PC %04x: writing %02x to bankswitch\n", cpu_get_pc(machine->activecpu),data);
+//  logerror("PC %04x: writing %02x to bankswitch\n", cpu_get_pc(space->cpu),data);
 
 	/* bit 4 resets the second CPU */
 	if (data & 0x10)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bits 0-2 select RAM/ROM bank */
 	memory_set_bankptr (1, &RAM[0x10000 + 0x4000 * (data & 0x07)]);
@@ -731,9 +731,9 @@ WRITE8_HANDLER( tnzs_bankswitch_w )
 
 WRITE8_HANDLER( tnzs_bankswitch1_w )
 {
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = memory_region(space->machine, "sub");
 
-//  logerror("PC %04x: writing %02x to bankswitch 1\n", cpu_get_pc(machine->activecpu),data);
+//  logerror("PC %04x: writing %02x to bankswitch 1\n", cpu_get_pc(space->cpu),data);
 
 	switch (mcu_type)
 	{
@@ -742,8 +742,8 @@ WRITE8_HANDLER( tnzs_bankswitch1_w )
 				/* bit 2 resets the mcu */
 				if (data & 0x04)
 				{
-					if (machine->config->cpu[2].type == CPU_I8742)
-						cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);
+					if (space->machine->config->cpu[2].type == CPU_I8742)
+						cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);
 				}
 				/* Coin count and lockout is handled by the i8742 */
 				break;

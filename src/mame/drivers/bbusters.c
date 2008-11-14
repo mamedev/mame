@@ -250,8 +250,8 @@ static WRITE16_HANDLER( sound_cpu_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine, 0, data&0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space, 0, data&0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
 
@@ -267,12 +267,12 @@ static READ16_HANDLER( control_3_r )
 {
 	static const char *const port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
 
-	return input_port_read(machine, port[gun_select]);
+	return input_port_read(space->machine, port[gun_select]);
 }
 
 static WRITE16_HANDLER( gun_select_w )
 {
-	logerror("%08x: gun r\n",cpu_get_pc(machine->activecpu));
+	logerror("%08x: gun r\n",cpu_get_pc(space->cpu));
 
 	gun_select = data & 0xff;
 }
@@ -293,8 +293,8 @@ static READ16_HANDLER( mechatt_gun_r )
 {
 	int x, y;
 
-	x = input_port_read(machine, offset ? "GUNX2" : "GUNX1");
-	y = input_port_read(machine, offset ? "GUNY2" : "GUNY1");
+	x = input_port_read(space->machine, offset ? "GUNX2" : "GUNX1");
+	y = input_port_read(space->machine, offset ? "GUNY2" : "GUNY1");
 
 	/* Todo - does the hardware really clamp like this? */
 	x += 0x18;

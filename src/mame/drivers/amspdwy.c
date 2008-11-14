@@ -48,7 +48,7 @@ static READ8_HANDLER( amspdwy_wheel_##_n_##_r ) \
 	static UINT8 wheel_old, ret; \
 	static const char *const portnames[] = { "WHEEL1", "WHEEL2", "AN1", "AN2" };\
 	UINT8 wheel; \
-	wheel = input_port_read(machine, portnames[2 + _n_]); \
+	wheel = input_port_read(space->machine, portnames[2 + _n_]); \
 	if (wheel != wheel_old) \
 	{ \
 		wheel = (wheel & 0x7fff) - (wheel & 0x8000); \
@@ -56,7 +56,7 @@ static READ8_HANDLER( amspdwy_wheel_##_n_##_r ) \
 		else					ret = ((-wheel) & 0xf) | 0x10; \
 		wheel_old = wheel; \
 	} \
-	return ret | input_port_read(machine, portnames[_n_]); \
+	return ret | input_port_read(space->machine, portnames[_n_]); \
 }
 AMSPDWY_WHEEL_R( 0 )
 AMSPDWY_WHEEL_R( 1 )
@@ -64,13 +64,13 @@ AMSPDWY_WHEEL_R( 1 )
 
 static READ8_HANDLER( amspdwy_sound_r )
 {
-	return (ym2151_status_port_0_r(machine,0) & ~ 0x30) | input_port_read(machine, "IN0");
+	return (ym2151_status_port_0_r(space,0) & ~ 0x30) | input_port_read(space->machine, "IN0");
 }
 
 static WRITE8_HANDLER( amspdwy_sound_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( amspdwy_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -93,7 +93,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( amspdwy_port_r )
 {
-	UINT8 *Tracks = memory_region(machine, "main")+0x10000;
+	UINT8 *Tracks = memory_region(space->machine, "main")+0x10000;
 	return Tracks[offset];
 }
 

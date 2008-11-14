@@ -322,7 +322,7 @@ static READ8_HANDLER( ssio_irq_clear )
 {
 	/* a read here asynchronously resets the 14024 count, clearing /SINT */
 	ssio_14024_count = 0;
-	cpu_set_input_line(machine->cpu[ssio_sound_cpu], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[ssio_sound_cpu], 0, CLEAR_LINE);
 	return 0xff;
 }
 
@@ -414,10 +414,10 @@ void ssio_reset_w(int state)
 READ8_HANDLER( ssio_input_port_r )
 {
 	static const char *const port[] = { "SSIO.IP0", "SSIO.IP1", "SSIO.IP2", "SSIO.IP3", "SSIO.IP4" };
-	UINT8 result = input_port_read_safe(machine, port[offset], 0xff);
+	UINT8 result = input_port_read_safe(space->machine, port[offset], 0xff);
 	if (ssio_custom_input[offset])
 		result = (result & ~ssio_custom_input_mask[offset]) |
-		         ((*ssio_custom_input[offset])(machine, offset) & ssio_custom_input_mask[offset]);
+		         ((*ssio_custom_input[offset])(space->machine, offset) & ssio_custom_input_mask[offset]);
 	return result;
 }
 
@@ -425,9 +425,9 @@ WRITE8_HANDLER( ssio_output_port_w )
 {
 	int which = offset >> 2;
 	if (which == 0)
-		mcr_control_port_w(machine, offset, data);
+		mcr_control_port_w(space, offset, data);
 	if (ssio_custom_output[which])
-		(*ssio_custom_output[which])(machine, offset, data & ssio_custom_output_mask[which]);
+		(*ssio_custom_output[which])(space->machine, offset, data & ssio_custom_output_mask[which]);
 }
 
 void ssio_set_custom_input(int which, int mask, read8_machine_func handler)
@@ -554,17 +554,17 @@ static READ16_HANDLER( csdeluxe_pia_r )
 	/* using the MOVEP instruction outputs the same value on the high and */
 	/* low bytes. */
 	if (ACCESSING_BITS_8_15)
-		return pia_0_alt_r(machine, offset) << 8;
+		return pia_0_alt_r(space, offset) << 8;
 	else
-		return pia_0_alt_r(machine, offset);
+		return pia_0_alt_r(space, offset);
 }
 
 static WRITE16_HANDLER( csdeluxe_pia_w )
 {
 	if (ACCESSING_BITS_8_15)
-		pia_0_alt_w(machine, offset, data >> 8);
+		pia_0_alt_w(space, offset, data >> 8);
 	else
-		pia_0_alt_w(machine, offset, data);
+		pia_0_alt_w(space, offset, data);
 }
 
 
@@ -859,21 +859,21 @@ static WRITE8_HANDLER( squawkntalk_portb2_w )
 	/* write strobe -- pass the current command to the TMS5200 */
 	if (((data ^ squawkntalk_tms_strobes) & 0x02) && !(data & 0x02))
 	{
-		tms5220_data_w(machine, offset, squawkntalk_tms_command);
+		tms5220_data_w(space, offset, squawkntalk_tms_command);
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_1_ca2_w(machine, 0, 1);
-		pia_1_ca2_w(machine, 0, 0);
+		pia_1_ca2_w(space, 0, 1);
+		pia_1_ca2_w(space, 0, 0);
 	}
 
 	/* read strobe -- read the current status from the TMS5200 */
 	else if (((data ^ squawkntalk_tms_strobes) & 0x01) && !(data & 0x01))
 	{
-		pia_1_porta_w(machine, 0, tms5220_status_r(machine, offset));
+		pia_1_porta_w(space, 0, tms5220_status_r(space, offset));
 
 		/* DoT expects the ready line to transition on a command/write here, so we oblige */
-		pia_1_ca2_w(machine, 0, 1);
-		pia_1_ca2_w(machine, 0, 0);
+		pia_1_ca2_w(space, 0, 1);
+		pia_1_ca2_w(space, 0, 0);
 	}
 
 	/* remember the state */

@@ -31,7 +31,7 @@ static UINT8 *exerion_ram;
 static READ8_HANDLER( exerion_port01_r )
 {
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return exerion_cocktail_flip ? input_port_read(machine, "IN1") : input_port_read(machine, "IN0");
+	return exerion_cocktail_flip ? input_port_read(space->machine, "IN1") : input_port_read(space->machine, "IN0");
 }
 
 
@@ -64,7 +64,7 @@ static READ8_HANDLER( exerion_porta_r )
 static WRITE8_HANDLER( exerion_portb_w )
 {
 	/* pull the expected value from the ROM */
-	porta = memory_region(machine, "main")[0x5f76];
+	porta = memory_region(space->machine, "main")[0x5f76];
 	portb = data;
 
 	logerror("Port B = %02X\n", data);
@@ -73,8 +73,8 @@ static WRITE8_HANDLER( exerion_portb_w )
 
 static READ8_HANDLER( exerion_protection_r )
 {
-	if (cpu_get_pc(machine->activecpu) == 0x4143)
-		return memory_region(machine, "main")[0x33c0 + (exerion_ram[0xd] << 2) + offset];
+	if (cpu_get_pc(space->cpu) == 0x4143)
+		return memory_region(space->machine, "main")[0x33c0 + (exerion_ram[0xd] << 2) + offset];
 	else
 		return exerion_ram[0x8 + offset];
 }

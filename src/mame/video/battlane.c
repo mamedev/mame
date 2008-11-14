@@ -50,7 +50,7 @@ WRITE8_HANDLER( battlane_palette_w )
 	bit2 = (~data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
 
-	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 }
 
 WRITE8_HANDLER( battlane_scrollx_w )

@@ -786,7 +786,7 @@ static TIMER_CALLBACK( pokey_pot_trigger )
 
 #define AD_TIME  ((p->SKCTL & SK_PADDLE) ? p->ad_time_fast : p->ad_time_slow)
 
-static void pokey_potgo(struct POKEYregisters *p)
+static void pokey_potgo(const address_space *space, struct POKEYregisters *p)
 {
     int pot;
 
@@ -799,7 +799,7 @@ static void pokey_potgo(struct POKEYregisters *p)
 		p->POTx[pot] = 0xff;
 		if( p->pot_r[pot] )
 		{
-			int r = (*p->pot_r[pot])(Machine, pot);
+			int r = (*p->pot_r[pot])(space, pot);
 
 			LOG(("POKEY #%d pot_r(%d) returned $%02x\n", p->index, pot, r));
 			if( r != -1 )
@@ -817,6 +817,8 @@ static void pokey_potgo(struct POKEYregisters *p)
 
 static int pokey_register_r(int chip, int offs)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
     int data = 0, pot;
 	UINT32 adjust = 0;
@@ -868,7 +870,7 @@ static int pokey_register_r(int chip, int offs)
 		}
 		else if( p->allpot_r )
 		{
-			data = (*p->allpot_r)(Machine, offs);
+			data = (*p->allpot_r)(space, offs);
 			LOG(("POKEY #%d ALLPOT callback $%02x\n", chip, data));
 		}
 		else
@@ -921,7 +923,7 @@ static int pokey_register_r(int chip, int offs)
 
 	case SERIN_C:
 		if( p->serin_r )
-			p->SERIN = (*p->serin_r)(Machine, offs);
+			p->SERIN = (*p->serin_r)(space, offs);
 		data = p->SERIN;
 		LOG(("POKEY #%d SERIN  $%02x\n", chip, data));
 		break;
@@ -978,6 +980,8 @@ READ8_HANDLER( quad_pokey_r )
 
 static void pokey_register_w(int chip, int offs, int data)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, chip);
 	int ch_mask = 0, new_val;
 
@@ -1162,13 +1166,13 @@ static void pokey_register_w(int chip, int offs, int data)
 
     case POTGO_C:
 		LOG(("POKEY #%d POTGO  $%02x\n", chip, data));
-		pokey_potgo(p);
+		pokey_potgo(space, p);
         break;
 
     case SEROUT_C:
 		LOG(("POKEY #%d SEROUT $%02x\n", chip, data));
 		if (p->serout_w)
-			(*p->serout_w)(Machine, offs, data);
+			(*p->serout_w)(space, offs, data);
 		p->SKSTAT |= SK_SEROUT;
         /*
          * These are arbitrary values, tested with some custom boot

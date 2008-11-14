@@ -109,8 +109,8 @@ void decoprot_reset(void)
 WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 {
 	if (offset==(0x150/2)) {
-		soundlatch_w(machine,0,data&0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -119,7 +119,7 @@ WRITE16_HANDLER( deco16_104_prot_w ) /* Wizard Fire */
 		&& offset!=(0x370>>1) && offset!=(0x3c0>>1) && offset!=(0x430>>1) && offset!=(0x460>>1)
 		&& offset!=(0x5a0>>1) && offset!=(0x5b0>>1) && offset!=(0x6e0>>1) && offset!=(0x7d0>>1)
 		)
-		logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n",cpu_get_pc(machine->activecpu),offset<<1,data);
+		logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
 
 	COMBINE_DATA(&deco16_prot_ram[offset]);
 }
@@ -128,16 +128,16 @@ READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 {
 	switch (offset<<1) {
 		case 0x110: /* Player input */
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 
 		case 0x36c: /* Coins */
 		case 0x334: /* Probably also, c6, 2c0, 2e0, 4b2, 46a, 4da, rohga is 44c */
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 		case 0x0dc:
-			return input_port_read(machine, "IN1")<<4;
+			return input_port_read(space->machine, "IN1")<<4;
 
 		case 0x494: /* Dips */
-			return input_port_read(machine, "DSW1_2");
+			return input_port_read(space->machine, "DSW1_2");
 
 		case 0x244:
 			return deco16_prot_ram[0];
@@ -218,7 +218,7 @@ READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 			return ((deco16_prot_ram[0x460/2]&0x0007)<<13) | ((deco16_prot_ram[0x460/2]&0x0008)<<9);
 	}
 
-	logerror("Deco Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+	logerror("Deco Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 	return 0;
 }
 
@@ -227,8 +227,8 @@ READ16_HANDLER( deco16_104_prot_r ) /* Wizard Fire */
 WRITE16_HANDLER( deco16_60_prot_w ) /* Edward Randy */
 {
 	if (offset==(0x64/2)) {
-		soundlatch_w(machine,0,data&0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 	}
 
 	COMBINE_DATA(&deco16_prot_ram[offset]);
@@ -245,7 +245,7 @@ if (offset!=0x32 && offset!=0x36/2 && offset!=0x9e/2 && offset!=0x76/2
 	&& offset!=0x40/2 && offset!=0x54/2 && offset!=0x56/2 && offset!=0x58/2 && offset!=0x6a/2 && offset!=0x2c/2
 	&& offset!=0 && offset!=0x34 && offset!=0x8a && offset!=0x8e && offset!=0x92 && offset!=0x96
 	)
-logerror("Protection PC %06x: warning - write %04x to %04x\n",cpu_get_pc(machine->activecpu),data,offset<<1);
+logerror("Protection PC %06x: warning - write %04x to %04x\n",cpu_get_pc(space->cpu),data,offset<<1);
 
 }
 
@@ -360,9 +360,9 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 
 		/* Player 1 & 2 controls, read in IRQ then written *back* to protection device */
 		case 0x50: /* written to 9e byte */
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 		case 0x6f8: /* written to 76 byte */
-			return (input_port_read(machine, "IN0")>>8)|(input_port_read(machine, "IN0")<<8); /* byte swap IN0 */
+			return (input_port_read(space->machine, "IN0")>>8)|(input_port_read(space->machine, "IN0")<<8); /* byte swap IN0 */
 
 		case 0x5c: /* After coin insert, high 0x8000 bit set starts game */
 			return deco16_prot_ram[0x3b];
@@ -372,9 +372,9 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 			return ((deco16_prot_ram[0x9e/2]&0xff00)>>8) | ((deco16_prot_ram[0x9e/2]&0x00ff)<<8);
 
 		case 0xac: /* Dip switches */
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 		case 0xc2:
-			return input_port_read(machine, "DSW") ^ deco16_prot_ram[0x2c/2];
+			return input_port_read(space->machine, "DSW") ^ deco16_prot_ram[0x2c/2];
 
 		case 0x5d4: /* The state of the dips last frame */
 			return deco16_prot_ram[0x34/2];
@@ -386,7 +386,7 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 			return (((deco16_prot_ram[0]&0xfff0)>>0) | ((deco16_prot_ram[0]&0x000c)>>2) | ((deco16_prot_ram[0]&0x0003)<<2)) & (~deco16_prot_ram[0x36/2]);
 
 		case 0x76a: /* Coins */
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 
 		case 0x284: /* Bit shifting with inverted mask register */
 			return (((deco16_prot_ram[0x40/2]&0xfff0)>>0) | ((deco16_prot_ram[0x40/2]&0x0007)<<1) | ((deco16_prot_ram[0x40/2]&0x0008)>>3)) & (~deco16_prot_ram[0x36/2]);
@@ -400,12 +400,12 @@ READ16_HANDLER( deco16_60_prot_r ) /* Edward Randy */
 			return (((deco16_prot_ram[0x6a/2]&0x00f0)<<4) | ((deco16_prot_ram[0x6a/2]&0x0f00)<<4) | ((deco16_prot_ram[0x6a/2]&0x0007)<<5) | ((deco16_prot_ram[0x6a/2]&0x0008)<<1)) & (~deco16_prot_ram[0x36/2]);
 
 		case 0x7d6: /* XOR IN0 */
-			return input_port_read(machine, "IN0") ^ deco16_prot_ram[0x2c/2];
+			return input_port_read(space->machine, "IN0") ^ deco16_prot_ram[0x2c/2];
 		case 0x4b4:
 			return ((deco16_prot_ram[0x32/2]&0x00f0)<<8) | ((deco16_prot_ram[0x32/2]&0x000e)<<7) | ((deco16_prot_ram[0x32/2]&0x0001)<<11);
 	}
 
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(machine->activecpu),offset*2);
+	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(space->cpu),offset*2);
 	return 0;
 }
 
@@ -416,8 +416,8 @@ static int mutantf_port_0e_hack=0, mutantf_port_6a_hack=0,mutantf_port_e8_hack=0
 WRITE16_HANDLER( deco16_66_prot_w ) /* Mutant Fighter */
 {
 	if (offset==(0x64/2)) {
-		soundlatch_w(machine,0,data&0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -449,7 +449,7 @@ WRITE16_HANDLER( deco16_66_prot_w ) /* Mutant Fighter */
 		&& offset!=0xb6 && offset!=0xfa && offset!=0xe4 && offset!=0x3a && offset!=0x1e
 		&& offset!=0x38 && offset!=0x92 && offset!=0xa2 && offset!=0x308 && offset!=0x40e
 	)
-	logerror("Protection PC %06x: warning - write %04x to %04x\n",cpu_get_pc(machine->activecpu),data,offset);
+	logerror("Protection PC %06x: warning - write %04x to %04x\n",cpu_get_pc(space->cpu),data,offset);
 }
 
 READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
@@ -461,15 +461,15 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 
  	switch (offset*2) {
 		case 0xac: /* Dip switches */
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 		case 0xc2: /* Dip switches */
-			return input_port_read(machine, "DSW") ^ deco16_prot_ram[0x2c/2];
+			return input_port_read(space->machine, "DSW") ^ deco16_prot_ram[0x2c/2];
 		case 0x46: /* Coins */
-			return input_port_read(machine, "IN1") ^ deco16_prot_ram[0x2c/2];
+			return input_port_read(space->machine, "IN1") ^ deco16_prot_ram[0x2c/2];
 		case 0x50: /* Player 1 & 2 input ports */
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 		case 0x63c: /* Player 1 & 2 input ports */
-			return input_port_read(machine, "IN0") ^ deco16_prot_ram[0x2c/2];
+			return input_port_read(space->machine, "IN0") ^ deco16_prot_ram[0x2c/2];
 
 		case 0x5f4:
 			return deco16_prot_ram[0x18/2];
@@ -547,7 +547,7 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 			{
 				int ret=mutantf_port_0e_hack;
 				mutantf_port_0e_hack=0x800;
-				//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+				//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 				return ret;
 			}
 
@@ -555,7 +555,7 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 			{
 				int ret=mutantf_port_6a_hack;
 				mutantf_port_6a_hack=0x2866;
-				//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+				//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 				return ret;
 			}
 
@@ -563,20 +563,20 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 			{
 				int ret=mutantf_port_e8_hack;
 				mutantf_port_e8_hack=0x2401;
-				//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+				//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 				return ret;
 			}
 
 		case 0xaa: /* ??? */
-			//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+			//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 			return 0xc080;
 
 		case 0x42: /* Strange, but consistent */
-			//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+			//logerror("Protection PC %06x: warning - read unknown memory address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 			return deco16_prot_ram[0x2c/2]^0x5302;
 
 		case 0x48: /* Correct for test data, but I wonder if the 0x1800 is from an address, not a constant */
-			//logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+			//logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 			return (0x1800) & (~deco16_prot_ram[0x36/2]);
 
 		case 0x52:
@@ -593,7 +593,7 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 	popmessage("Deco66:  Read unmapped port %04x\n",offset*2);
 #endif
 
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 	return 0;
 }
 
@@ -602,8 +602,8 @@ READ16_HANDLER( deco16_66_prot_r ) /* Mutant Fighter */
 WRITE16_HANDLER( deco16_104_cninja_prot_w )
 {
 	if (offset==(0xa8/2)) {
-		soundlatch_w(machine,0,data&0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -644,16 +644,16 @@ READ16_HANDLER( deco16_104_cninja_prot_r )
 			return deco16_prot_ram[15];
 
 		case 0x36: /* Dip switches */
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 
 		case 0x1c8: /* Coins */
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 
 		case 0x22c: /* Player 1 & 2 input ports */
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 	}
 
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(machine->activecpu),offset);
+	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n",cpu_get_pc(space->cpu),offset);
 	return 0;
 }
 
@@ -664,8 +664,8 @@ WRITE16_HANDLER( deco16_146_funkyjet_prot_w )
 	COMBINE_DATA(&deco16_prot_ram[offset]);
 
 	if (offset == (0x10a >> 1)) {
-		soundlatch_w(machine,0,data&0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 }
@@ -740,15 +740,15 @@ READ16_HANDLER( deco16_146_funkyjet_prot_r )
 			return ((deco16_prot_ram[0x78e>>1]>>4)&0xff00) | (deco16_prot_ram[0x78e>>1]&0x000f) | ((deco16_prot_ram[0x78e>>1]<<8)&0xf000);
 
 		case 0x00c >> 1: /* Player 1 & Player 2 joysticks & fire buttons */
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 		case 0x778 >> 1: /* Credits */
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 		case 0x382 >> 1: /* DIPS */
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 	}
 
-	if (cpu_get_pc(machine->activecpu)!=0xc0ea)
-		logerror("CPU #0 PC %06x: warning - read unmapped control address %06x (ctrl %04x)\n", cpu_get_pc(machine->activecpu), offset<<1, input_port_read(machine, "P1"));
+	if (cpu_get_pc(space->cpu)!=0xc0ea)
+		logerror("CPU #0 PC %06x: warning - read unmapped control address %06x (ctrl %04x)\n", cpu_get_pc(space->cpu), offset<<1, input_port_read(space->machine, "P1"));
 
 	return 0;
 }
@@ -783,8 +783,8 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 		COMBINE_DATA(&deco16_prot_ram[offset]);
 
 	if (offset==(0xa8/2)) {
-		soundlatch_w(machine,0,data&0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -796,11 +796,11 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 
 	offset=offset*2;
 
-	//logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n",cpu_get_pc(machine->activecpu),offset,data);
+	//logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
 	if (offset==0xee || offset==0x42 || offset==0xa8)
 		return;
 
-//  logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n",cpu_get_pc(machine->activecpu),offset,data);
+//  logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
 
 #if 1
 // 66 7c 7e 28 58 4a 9e
@@ -817,7 +817,7 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 		return;
 
 //  if (offset==0x3c)
-//      logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n",cpu_get_pc(machine->activecpu),offset,data);
+//      logerror("CONTROL PC %06x: warning - write protection memory address %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
 // Actually read:
 //  22 24 26 2c 2e 30 32 3c 40 44 46 48 60 62 66 6a 6e 76 7e 80 82 84 86 88 8a 8c 90 94 96 98 9a 9c a0 c0 c4 c6 c8 cc ce d6 dc de
 
@@ -845,7 +845,7 @@ WRITE16_HANDLER( deco16_104_rohga_prot_w )
 		return;
 #endif
 
-	logerror("CONTROL PC %06x: warning - write unmapped protection memory address %04x %04x\n",cpu_get_pc(machine->activecpu),offset,data);
+	logerror("CONTROL PC %06x: warning - write unmapped protection memory address %04x %04x\n",cpu_get_pc(space->cpu),offset,data);
 }
 
 READ16_HANDLER( deco16_104_rohga_prot_r )
@@ -853,17 +853,17 @@ READ16_HANDLER( deco16_104_rohga_prot_r )
 	const UINT16* prot_ram=decoprot_buffer_ram_selected ? decoprot_buffer_ram : deco16_prot_ram;
 
 //  if (offset!=0x88/2 && offset!=0x44c/2 && offset!=0x36c/2 && offset!=0x292/2)
-//      logerror("Protection PC %06x: warning - read prot address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+//      logerror("Protection PC %06x: warning - read prot address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 
 	switch (offset) {
 		case 0x88/2: /* Player 1 & 2 input ports */
-			return input_port_read(machine, "IN0");
+			return input_port_read(space->machine, "IN0");
 		case 0x36c/2:
-			return input_port_read(machine, "IN1");
+			return input_port_read(space->machine, "IN1");
 		case 0x44c/2:
-			return ((input_port_read(machine, "IN1") & 0x7)<<13)|((input_port_read(machine, "IN1") & 0x8)<<9);
+			return ((input_port_read(space->machine, "IN1") & 0x7)<<13)|((input_port_read(space->machine, "IN1") & 0x8)<<9);
 		case 0x292/2: /* Dips */
-			return input_port_read(machine, "DSW1_2");
+			return input_port_read(space->machine, "DSW1_2");
 
 		case 0x44/2:
 			return ((((DECO_PORT(0x2c)&0x000f)<<12)) ^ deco16_xor) & (~deco16_mask);
@@ -1198,7 +1198,7 @@ READ16_HANDLER( deco16_104_rohga_prot_r )
 			return DECO_PORT(0x58);
 	}
 
-	logerror("Protection PC %06x: warning - read unmapped protection address %04x\n",cpu_get_pc(machine->activecpu),offset<<1);
+	logerror("Protection PC %06x: warning - read unmapped protection address %04x\n",cpu_get_pc(space->cpu),offset<<1);
 
 	return 0;
 }
@@ -1212,8 +1212,8 @@ static WRITE16_HANDLER( deco16_146_core_prot_w )
 	const int xorport=0x340;
 	const int maskport=0x6c0;
 	if (writeport==sndport) {
-		soundlatch_w(machine,0,data&0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
 
@@ -1228,7 +1228,7 @@ static WRITE16_HANDLER( deco16_146_core_prot_w )
 		COMBINE_DATA(&decoprot_buffer_ram[offset>>1]);
 
 //  if (offset!=0x5e0 && offset!=0x340 && offset!=0 && offset!=0x3d0 && offset!=0x280)
-//      logerror("%08x:  Write protection port %04x, data %04x (%08x)\n", cpu_get_pc(machine->activecpu), offset, data, mem_mask);
+//      logerror("%08x:  Write protection port %04x, data %04x (%08x)\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 }
 
 static READ16_HANDLER( deco16_146_core_prot_r )
@@ -1240,11 +1240,11 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 	switch (offset)
 	{
 	case 0x582: /* Player 1 & Player 2 */
-		return input_port_read(machine, "IN0");
+		return input_port_read(space->machine, "IN0");
 	case 0x04c: /* Coins/VBL */
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	case 0x672: /* Dip switches */
-		return input_port_read(machine, "DSW1_2");
+		return input_port_read(space->machine, "DSW1_2");
 
 	case 0x13a:
 		return ((DECO_PORT(0x190)&0x00f0)<<8) | ((DECO_PORT(0x190)&0x0003)<<10) | ((DECO_PORT(0x190)&0x000c)<<6);
@@ -1302,8 +1302,8 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 
 	/*********************************************************************************/
 
-//  case 0x582: return input_port_read(machine, "IN0"); /* IN0 */
-//  case 0x672: return input_port_read(machine, "IN1"); /* IN1 */
+//  case 0x582: return input_port_read(space->machine, "IN0"); /* IN0 */
+//  case 0x672: return input_port_read(space->machine, "IN1"); /* IN1 */
 //  case 0x04c: return eeprom_read_bit();
 
 	case 0x468:
@@ -1626,7 +1626,7 @@ static READ16_HANDLER( deco16_146_core_prot_r )
 		return val & (~deco16_mask);
 	}
 
-	//logerror("Protection PC %06x: warning - read fully unmapped protection address %04x\n", cpu_get_pc(machine->activecpu), offset);
+	//logerror("Protection PC %06x: warning - read fully unmapped protection address %04x\n", cpu_get_pc(space->cpu), offset);
 
 	return 0;
 }
@@ -1640,7 +1640,7 @@ WRITE32_HANDLER( deco16_146_fghthist_prot_w )
 	decoprot_last_write=addr;
 	decoprot_last_write_val=data>>16;
 
-	deco16_146_core_prot_w(machine, addr, data>>16, mem_mask>>16);
+	deco16_146_core_prot_w(space, addr, data>>16, mem_mask>>16);
 }
 
 READ32_HANDLER( deco16_146_fghthist_prot_r )
@@ -1651,8 +1651,8 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 	/* Special case inputs, because this is the only game with an eprom */
 	switch (addr)
 	{
-	case 0x582: return (input_port_read(machine, "IN0")<<16) | 0xffff; /* IN0 */
-	case 0x672: return (input_port_read(machine, "IN1")<<16) | 0xffff; /* IN1 */
+	case 0x582: return (input_port_read(space->machine, "IN0")<<16) | 0xffff; /* IN0 */
+	case 0x672: return (input_port_read(space->machine, "IN1")<<16) | 0xffff; /* IN1 */
 	case 0x04c: return (eeprom_read_bit()<<16) | 0xffff;
 	}
 
@@ -1665,7 +1665,7 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 	}
 	decoprot_last_write=-1;
 
-	val=deco16_146_core_prot_r(machine, addr, mem_mask>>16);
+	val=deco16_146_core_prot_r(space, addr, mem_mask>>16);
 
 	if (addr!=0x7b6 && addr!=0x1c && addr!=0x1e0 && addr!=0x1d4
 		&& addr!=0x2c4 && addr!=0x7a4 && addr!=0x30 // confirmed
@@ -1678,7 +1678,7 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 		&& addr!=0x1ae && addr!=0x1d6 && addr!=0x4f8 && addr!=0x614 // cnofirmed
 		&& addr!=0x5ae && addr!=0x50a && addr!=0x476 && addr!=0x328 && addr!=0x3e && addr!=0x558 // dbl check these later
 		&& addr!=0x444 && addr!=0x46a // confirmed
-		&& cpu_get_pc(machine->activecpu)!=0x16448 // hmm
+		&& cpu_get_pc(space->cpu)!=0x16448 // hmm
  		&& addr!=0x67a
 		&& addr!=0x6c2 && addr!=0xac && addr!=0x416 && addr!=0x2c2 // confirmed
 		&& addr!=0x3d8
@@ -1701,10 +1701,10 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 		&& addr!=0x440 && addr!=0x460
 		)
 	{
-		logerror("Protection PC %06x: warning - read unmapped protection address %04x (ret %04x)\n", cpu_get_pc(machine->activecpu), addr, val);
+		logerror("Protection PC %06x: warning - read unmapped protection address %04x (ret %04x)\n", cpu_get_pc(space->cpu), addr, val);
 		popmessage("Read protection port %04x", addr);
 	}
-	//  logerror("Protection PC %06x: warning - read unmapped protection address %04x (ret %04x)\n", cpu_get_pc(machine->activecpu), addr, val);
+	//  logerror("Protection PC %06x: warning - read unmapped protection address %04x (ret %04x)\n", cpu_get_pc(space->cpu), addr, val);
 
 	return (val<<16)|0xffff;
 }
@@ -1712,13 +1712,13 @@ READ32_HANDLER( deco16_146_fghthist_prot_r )
 WRITE16_HANDLER( deco16_146_nitroball_prot_w )
 {
 	UINT16 addr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-	deco16_146_core_prot_w(machine, addr, data, mem_mask);
+	deco16_146_core_prot_w(space, addr, data, mem_mask);
 }
 
 READ16_HANDLER( deco16_146_nitroball_prot_r )
 {
 	UINT16 addr=BITSWAP16(offset<<1, 0, 0, 0, 0, 0, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0);
-	return deco16_146_core_prot_r(machine, addr, mem_mask);
+	return deco16_146_core_prot_r(space, addr, mem_mask);
 }
 
 /**********************************************************************************/
@@ -1727,12 +1727,12 @@ READ16_HANDLER( dietgo_104_prot_r )
 {
 	switch (offset * 2)
 	{
-	case 0x298: return input_port_read(machine, "IN0");
-	case 0x342: return input_port_read(machine, "IN1");
-	case 0x506: return input_port_read(machine, "DSW");
+	case 0x298: return input_port_read(space->machine, "IN0");
+	case 0x342: return input_port_read(space->machine, "IN1");
+	case 0x506: return input_port_read(space->machine, "DSW");
 	}
 
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(machine->activecpu), offset<<1);
+	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(space->cpu), offset<<1);
 
 	return 0;
 }
@@ -1740,11 +1740,11 @@ READ16_HANDLER( dietgo_104_prot_r )
 WRITE16_HANDLER( dietgo_104_prot_w )
 {
 	if (offset==(0x380/2)) {
-		soundlatch_w(machine,0,data&0xff);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data&0xff);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 		return;
 	}
-	logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n",cpu_get_pc(machine->activecpu),offset<<1,data);
+	logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
 }
 
 /**********************************************************************************/
@@ -1754,15 +1754,15 @@ READ16_HANDLER( deco16_104_pktgaldx_prot_r )
 	const UINT16* prot_ram=deco16_prot_ram;
 	switch (offset * 2)
 	{
-	case 0x5b2: return input_port_read(machine, "SYSTEM");
-	case 0x44c: return input_port_read(machine, "DSW");
-	case 0x042: return input_port_read(machine, "INPUTS");
+	case 0x5b2: return input_port_read(space->machine, "SYSTEM");
+	case 0x44c: return input_port_read(space->machine, "DSW");
+	case 0x042: return input_port_read(space->machine, "INPUTS");
 
 	case 0x510: return DECO_PORT(0);
 	case 0x51a: return DECO_PORT(2);
 	}
 
-	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(machine->activecpu), offset<<1);
+	logerror("Protection PC %06x: warning - read unmapped memory address %04x\n", cpu_get_pc(space->cpu), offset<<1);
 
 	return 0;
 }
@@ -1770,7 +1770,7 @@ READ16_HANDLER( deco16_104_pktgaldx_prot_r )
 WRITE16_HANDLER( deco16_104_pktgaldx_prot_w )
 {
 	COMBINE_DATA(&deco16_prot_ram[offset]);
-//  logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n",cpu_get_pc(machine->activecpu),offset<<1,data);
+//  logerror("Protection PC %06x: warning - write unmapped memory address %04x %04x\n",cpu_get_pc(space->cpu),offset<<1,data);
 }
 
 /**********************************************************************************/

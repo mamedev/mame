@@ -78,7 +78,7 @@ WRITE16_HANDLER( btoads_misc_control_w )
 	COMBINE_DATA(&misc_control);
 
 	/* bit 3 controls sound reset line */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (misc_control & 8) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -87,9 +87,9 @@ WRITE16_HANDLER( btoads_display_control_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		/* allow multiple changes during display */
-		int scanline = video_screen_get_vpos(machine->primary_screen);
+		int scanline = video_screen_get_vpos(space->machine->primary_screen);
 		if (scanline > 0)
-			video_screen_update_partial(machine->primary_screen, scanline - 1);
+			video_screen_update_partial(space->machine->primary_screen, scanline - 1);
 
 		/* bit 15 controls which page is rendered and which page is displayed */
 		if (data & 0x8000)
@@ -119,7 +119,7 @@ WRITE16_HANDLER( btoads_display_control_w )
 WRITE16_HANDLER( btoads_scroll0_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)
@@ -132,7 +132,7 @@ WRITE16_HANDLER( btoads_scroll0_w )
 WRITE16_HANDLER( btoads_scroll1_w )
 {
 	/* allow multiple changes during display */
-	video_screen_update_now(machine->primary_screen);
+	video_screen_update_now(space->machine->primary_screen);
 
 	/* upper bits are Y scroll, lower bits are X scroll */
 	if (ACCESSING_BITS_8_15)
@@ -151,13 +151,13 @@ WRITE16_HANDLER( btoads_scroll1_w )
 
 WRITE16_HANDLER( btoads_paletteram_w )
 {
-	tlc34076_lsb_w(machine, offset/2, data, mem_mask);
+	tlc34076_lsb_w(space, offset/2, data, mem_mask);
 }
 
 
 READ16_HANDLER( btoads_paletteram_r )
 {
-	return tlc34076_lsb_r(machine, offset/2, mem_mask);
+	return tlc34076_lsb_r(space, offset/2, mem_mask);
 }
 
 

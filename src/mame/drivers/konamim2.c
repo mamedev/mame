@@ -294,7 +294,7 @@ static UINT32 unk20004 = 0;
 static READ64_HANDLER(unk4_r)
 {
 	UINT64 r = 0;
-//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(machine->activecpu));
+//  logerror("unk4_r: %08X, %08X%08X at %08X\n", offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(space->cpu));
 
 	if (ACCESSING_BITS_32_63)
 	{
@@ -311,14 +311,14 @@ static READ64_HANDLER(unk4_r)
 static WRITE64_HANDLER(unk4_w)
 {
 //  logerror("unk4_w: %08X%08X, %08X, %08X%08X at %08X\n", (UINT32)(data >> 32), (UINT32)(data),
-//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(machine->activecpu));
+//      offset, (UINT32)(mem_mask>>32), (UINT32)(mem_mask), cpu_get_pc(space->cpu));
 
 	if (ACCESSING_BITS_0_31)
 	{
 		if (data & 0x800000)
 		{
-			mame_printf_debug("CPU%d: CPU1 IRQ at %08X\n", cpunum_get_active(), cpu_get_pc(machine->activecpu));
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_IRQ0, ASSERT_LINE);
+			mame_printf_debug("CPU%d: CPU1 IRQ at %08X\n", cpunum_get_active(), cpu_get_pc(space->cpu));
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
 		unk20004 = (UINT32)(data);
@@ -413,7 +413,7 @@ static WRITE64_HANDLER(reset_w)
 	{
 		if (data & U64(0x100000000))
 		{
-			cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+			cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 			unk3 = 0;
 		}
 	}
@@ -870,7 +870,7 @@ static READ64_HANDLER(cde_r)
 
 		default:
 		{
-	//      mame_printf_debug("cde_r: %08X at %08X\n", reg*4, cpu_get_pc(machine->activecpu));
+	//      mame_printf_debug("cde_r: %08X at %08X\n", reg*4, cpu_get_pc(space->cpu));
 			break;
 		}
 	}
@@ -904,7 +904,7 @@ static WRITE64_HANDLER(cde_w)
 	{
 		case 0x028/4:		// Command write
 		{
-			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(machine->activecpu));
+			//printf("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(space->cpu));
 
 			if (d == 0x0180)
 			{
@@ -1032,7 +1032,7 @@ static WRITE64_HANDLER(cde_w)
 
 		default:
 		{
-	//      mame_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(machine->activecpu));
+	//      mame_printf_debug("cde_w: %08X, %08X at %08X\n", d, reg*4, cpu_get_pc(space->cpu));
 			break;
 		}
 	}

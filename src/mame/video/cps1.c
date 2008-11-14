@@ -1527,7 +1527,7 @@ WRITE16_HANDLER( cps1_cps_a_w )
     fixes glitches in the ghouls intro, but it might happen at next vblank.
     */
 	if (offset == CPS1_PALETTE_BASE)
-		cps1_build_palette(machine, cps1_base(CPS1_PALETTE_BASE,cps1_palette_align));
+		cps1_build_palette(space->machine, cps1_base(CPS1_PALETTE_BASE,cps1_palette_align));
 
 	// pzloop2 write to register 24 on startup. This is probably just a bug.
 	if (offset == 0x24/2 && cps_version == 2)
@@ -1557,10 +1557,10 @@ READ16_HANDLER( cps1_cps_b_r )
 				cps1_cps_b_regs[cps1_game_config->mult_factor2/2]) >> 16;
 
 	if (offset == cps1_game_config->in2_addr/2)	/* Extra input ports (on C-board) */
-		return input_port_read(machine, "IN2");
+		return input_port_read(space->machine, "IN2");
 
 	if (offset == cps1_game_config->in3_addr/2)	/* Player 4 controls (on C-board) ("Captain Commando") */
-		return input_port_read(machine, "IN3");
+		return input_port_read(space->machine, "IN3");
 
 	if (cps_version == 2)
 	{

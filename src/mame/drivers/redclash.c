@@ -52,7 +52,7 @@ static INTERRUPT_GEN( redclash_interrupt )
 
 static WRITE8_HANDLER( irqack_w )
 {
-	cpu_set_input_line(machine->cpu[0],0,CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0],0,CLEAR_LINE);
 }
 
 

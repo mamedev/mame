@@ -89,7 +89,7 @@ static READ8_HANDLER(sharedram_r)
 {
 	static INT32 oldinput=0;
 	INT32 coincnt;
-	INT32 input = input_port_read(machine, "COIN");
+	INT32 input = input_port_read(space->machine, "COIN");
 
 	if(input&3)
 	{
@@ -114,7 +114,7 @@ static WRITE8_HANDLER(sharedram_w)
 static READ8_HANDLER(ffight2b_coin_r)
 {
 	static INT32 oldinput=0;
-	INT32 input = input_port_read(machine, "COIN");
+	INT32 input = input_port_read(space->machine, "COIN");
 
 	if( ((input&1)==1)&&((oldinput&1)==0))
 	{
@@ -148,19 +148,19 @@ static READ8_HANDLER(sb2b_6a6xxx_r)
 		case 0xfb7:	return 0x47;
 	}
 
-	logerror("Unknown protection read read %x @ %x\n",offset, cpu_get_pc(machine->activecpu));
+	logerror("Unknown protection read read %x @ %x\n",offset, cpu_get_pc(space->cpu));
 
 	return 0;
 }
 
 static READ8_HANDLER(sb2b_770071_r)
 {
- 	return input_port_read(machine, "DSW");
+ 	return input_port_read(space->machine, "DSW");
 }
 
 static READ8_HANDLER(sb2b_770079_r)
 {
- 	return input_port_read(machine, "COIN");
+ 	return input_port_read(space->machine, "COIN");
 }
 
 static READ8_HANDLER(sb2b_7xxx_r)
@@ -182,12 +182,12 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( spc_ram_100_r )
 {
-	return spc_ram_r(machine, offset + 0x100);
+	return spc_ram_r(space, offset + 0x100);
 }
 
 static WRITE8_HANDLER( spc_ram_100_w )
 {
-	spc_ram_w(machine, offset + 0x100, data);
+	spc_ram_w(space, offset + 0x100, data);
 }
 
 static ADDRESS_MAP_START( spc_mem, ADDRESS_SPACE_PROGRAM, 8 )

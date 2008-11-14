@@ -243,6 +243,8 @@ static TIMER_CALLBACK( via_shift_callback );
 
 static void via_shift(running_machine *machine, int which)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct via6522 *v = via + which;
 
 	if (SO_O2_CONTROL(v->acr))
@@ -251,14 +253,14 @@ static void via_shift(running_machine *machine, int which)
 		v->sr =  (v->sr << 1) | v->out_cb2;
 
 		if (v->intf->out_cb2_func)
-			v->intf->out_cb2_func(machine, 0, v->out_cb2);
+			v->intf->out_cb2_func(space, 0, v->out_cb2);
 
 		v->in_cb1=1;
 		if (v->intf->out_cb1_func)
 		{
 			/* this should be one cycle wide */
-			v->intf->out_cb1_func(machine, 0, 0);
-			v->intf->out_cb1_func(machine, 0, 1);
+			v->intf->out_cb1_func(space, 0, 0);
+			v->intf->out_cb1_func(space, 0, 1);
 		}
 
 		v->shift_counter = (v->shift_counter + 1) % 8;
@@ -277,7 +279,7 @@ static void via_shift(running_machine *machine, int which)
 		v->sr =  (v->sr << 1) | v->out_cb2;
 
 		if (v->intf->out_cb2_func)
-			v->intf->out_cb2_func(machine, 0, v->out_cb2);
+			v->intf->out_cb2_func(space, 0, v->out_cb2);
 
 		v->shift_counter = (v->shift_counter + 1) % 8;
 
@@ -290,7 +292,7 @@ static void via_shift(running_machine *machine, int which)
 	if (SI_EXT_CONTROL(v->acr))
 	{
 		if (v->intf->in_cb2_func)
-			v->in_cb2 = v->intf->in_cb2_func(machine, 0);
+			v->in_cb2 = v->intf->in_cb2_func(space, 0);
 
 		v->sr =  (v->sr << 1) | (v->in_cb2 & 1);
 
@@ -315,6 +317,8 @@ static TIMER_CALLBACK( via_shift_callback )
 
 static TIMER_CALLBACK( via_t1_timeout )
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int which = param;
 	struct via6522 *v = via + which;
 
@@ -337,7 +341,7 @@ static TIMER_CALLBACK( via_t1_timeout )
 		UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
 		if (v->intf->out_b_func)
-			v->intf->out_b_func(machine, 0, write_data);
+			v->intf->out_b_func(space, 0, write_data);
 		else
 			logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
 	}
@@ -391,6 +395,8 @@ void via_reset(void)
 
 int via_read(running_machine *machine, int which, int offset)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct via6522 *v = via + which;
 	int val = 0;
 
@@ -403,7 +409,7 @@ int via_read(running_machine *machine, int which, int offset)
 		if (PB_LATCH_ENABLE(v->acr) == 0)
 		{
 			if (v->intf->in_b_func)
-				v->in_b = v->intf->in_b_func(machine, 0);
+				v->in_b = v->intf->in_b_func(space, 0);
 			else
 				logerror("6522VIA chip %d: Port B is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
 		}
@@ -422,7 +428,7 @@ int via_read(running_machine *machine, int which, int offset)
 		if (PA_LATCH_ENABLE(v->acr) == 0)
 		{
 			if (v->intf->in_a_func)
-				v->in_a = v->intf->in_a_func(machine, 0);
+				v->in_a = v->intf->in_a_func(space, 0);
 			else
 				logerror("6522VIA chip %d: Port A is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
 		}
@@ -443,7 +449,7 @@ int via_read(running_machine *machine, int which, int offset)
 
 				/* call the CA2 output function */
 				if (v->intf->out_ca2_func)
-					v->intf->out_ca2_func(machine, 0, 0);
+					v->intf->out_ca2_func(space, 0, 0);
 				else
 					logerror("6522VIA chip %d: Port CA2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 0);
 			}
@@ -456,7 +462,7 @@ int via_read(running_machine *machine, int which, int offset)
 		if (PA_LATCH_ENABLE(v->acr) == 0)
 		{
 			if (v->intf->in_a_func)
-				v->in_a = v->intf->in_a_func(machine, 0);
+				v->in_a = v->intf->in_a_func(space, 0);
 			else
 				logerror("6522VIA chip %d: Port A is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
 		}
@@ -549,6 +555,8 @@ int via_read(running_machine *machine, int which, int offset)
 
 void via_write(running_machine *machine, int which, int offset, int data)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct via6522 *v = via + which;
 
 	offset &=0x0f;
@@ -566,7 +574,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
 			if (v->intf->out_b_func)
-				v->intf->out_b_func(machine, 0, write_data);
+				v->intf->out_b_func(space, 0, write_data);
 			else
 				logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
 		}
@@ -584,7 +592,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 
 				/* call the CB2 output function */
 				if (v->intf->out_cb2_func)
-					v->intf->out_cb2_func(machine, 0, 0);
+					v->intf->out_cb2_func(space, 0, 0);
 				else
 					logerror("6522VIA chip %d: Port CB2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 0);
 			}
@@ -599,7 +607,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			UINT8 write_data = (v->out_a & v->ddr_a) | (v->ddr_a ^ 0xff);
 
 			if (v->intf->out_a_func)
-				v->intf->out_a_func(machine, 0, write_data);
+				v->intf->out_a_func(space, 0, write_data);
 			else
 				logerror("6522VIA chip %d: Port A is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
 		}
@@ -613,8 +621,8 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			/* call the CA2 output function */
 			if (v->intf->out_ca2_func)
 			{
-				v->intf->out_ca2_func(machine, 0, 0);
-				v->intf->out_ca2_func(machine, 0, 1);
+				v->intf->out_ca2_func(space, 0, 0);
+				v->intf->out_ca2_func(space, 0, 1);
 			}
 			else
 				logerror("6522VIA chip %d: Port CA2 is being pulsed but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
@@ -631,7 +639,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 
 				/* call the CA2 output function */
 				if (v->intf->out_ca2_func)
-					v->intf->out_ca2_func(machine, 0, 0);
+					v->intf->out_ca2_func(space, 0, 0);
 				else
 					logerror("6522VIA chip %d: Port CA2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 0);
 			}
@@ -647,7 +655,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 			UINT8 write_data = (v->out_a & v->ddr_a) | (v->ddr_a ^ 0xff);
 
 			if (v->intf->out_a_func)
-				v->intf->out_a_func(machine, 0, write_data);
+				v->intf->out_a_func(space, 0, write_data);
 			else
 				logerror("6522VIA chip %d: Port A is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
 		}
@@ -665,7 +673,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
 				if (v->intf->out_b_func)
-					v->intf->out_b_func(machine, 0, write_data);
+					v->intf->out_b_func(space, 0, write_data);
 				else
 					logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
 			}
@@ -683,7 +691,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				UINT8 write_data = (v->out_a & v->ddr_a) | (v->ddr_a ^ 0xff);
 
 				if (v->intf->out_a_func)
-					v->intf->out_a_func(machine, 0, write_data);
+					v->intf->out_a_func(space, 0, write_data);
 				else
 					logerror("6522VIA chip %d: Port A is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
 			}
@@ -715,7 +723,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 				UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
 				if (v->intf->out_b_func)
-					v->intf->out_b_func(machine, 0, write_data);
+					v->intf->out_b_func(space, 0, write_data);
 				else
 					logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
 			}
@@ -765,7 +773,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 		{
 			v->out_ca2 = CA2_OUTPUT_LEVEL(data);
 			if (v->intf->out_ca2_func)
-				v->intf->out_ca2_func(machine, 0, v->out_ca2);
+				v->intf->out_ca2_func(space, 0, v->out_ca2);
 			else
 				logerror("6522VIA chip %d: Port CA2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), v->out_ca2);
 		}
@@ -774,7 +782,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 		{
 			v->out_cb2 = CB2_OUTPUT_LEVEL(data);
 			if (v->intf->out_cb2_func)
-				v->intf->out_cb2_func(machine, 0, v->out_cb2);
+				v->intf->out_cb2_func(space, 0, v->out_cb2);
 			else
 				logerror("6522VIA chip %d: Port CB2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), v->out_cb2);
 		}
@@ -796,7 +804,7 @@ logerror("6522VIA chip %d: PCR = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 					UINT8 write_data = (v->out_b & v->ddr_b) | (v->ddr_b ^ 0xff);
 
 					if (v->intf->out_b_func)
-						v->intf->out_b_func(machine, 0, write_data);
+						v->intf->out_b_func(space, 0, write_data);
 					else
 						logerror("6522VIA chip %d: Port B is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), write_data);
 				}
@@ -861,6 +869,8 @@ void via_set_input_a(int which, int data)
 
 void via_set_input_ca1(running_machine *machine, int which, int data)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct via6522 *v = via + which;
 
 	/* limit the data to 0 or 1 */
@@ -877,7 +887,7 @@ logerror("6522VIA chip %d: CA1 = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 			if (PA_LATCH_ENABLE(v->acr))
 			{
 				if (v->intf->in_a_func)
-					v->in_a = v->intf->in_a_func(machine, 0);
+					v->in_a = v->intf->in_a_func(space, 0);
 				else
 					logerror("6522VIA chip %d: Port A is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
 			}
@@ -895,7 +905,7 @@ logerror("6522VIA chip %d: CA1 = %02X.  PC: %08X\n", which, data, safe_cpu_get_p
 
 					/* call the CA2 output function */
 					if (v->intf->out_ca2_func)
-						v->intf->out_ca2_func(machine, 0, 1);
+						v->intf->out_ca2_func(space, 0, 1);
 					else
 						logerror("6522VIA chip %d: Port CA2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 1);
 				}
@@ -951,6 +961,8 @@ void via_set_input_b(int which, int data)
 
 void via_set_input_cb1(running_machine *machine, int which, int data)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct via6522 *v = via + which;
 
 	/* limit the data to 0 or 1 */
@@ -964,7 +976,7 @@ void via_set_input_cb1(running_machine *machine, int which, int data)
 			if (PB_LATCH_ENABLE(v->acr))
 			{
 				if (v->intf->in_b_func)
-					v->in_b = v->intf->in_b_func(machine, 0);
+					v->in_b = v->intf->in_b_func(space, 0);
 				else
 					logerror("6522VIA chip %d: Port B is being read but has no handler.  PC: %08X\n", which, safe_cpu_get_pc(machine->activecpu));
 			}
@@ -984,7 +996,7 @@ void via_set_input_cb1(running_machine *machine, int which, int data)
 
 					/* call the CB2 output function */
 					if (v->intf->out_cb2_func)
-						v->intf->out_cb2_func(machine, 0, 1);
+						v->intf->out_cb2_func(space, 0, 1);
 					else
 						logerror("6522VIA chip %d: Port CB2 is being written to but has no handler.  PC: %08X - %02X\n", which, safe_cpu_get_pc(machine->activecpu), 1);
 				}
@@ -1023,23 +1035,23 @@ void via_set_input_cb2(running_machine *machine, int which, int data)
 
 /******************* Standard 8-bit CPU interfaces, D0-D7 *******************/
 
-READ8_HANDLER( via_0_r) { return via_read(machine, 0, offset); }
-READ8_HANDLER( via_1_r) { return via_read(machine, 1, offset); }
-READ8_HANDLER( via_2_r) { return via_read(machine, 2, offset); }
-READ8_HANDLER( via_3_r) { return via_read(machine, 3, offset); }
-READ8_HANDLER( via_4_r) { return via_read(machine, 4, offset); }
-READ8_HANDLER( via_5_r) { return via_read(machine, 5, offset); }
-READ8_HANDLER( via_6_r) { return via_read(machine, 6, offset); }
-READ8_HANDLER( via_7_r) { return via_read(machine, 7, offset); }
+READ8_HANDLER( via_0_r) { return via_read(space->machine, 0, offset); }
+READ8_HANDLER( via_1_r) { return via_read(space->machine, 1, offset); }
+READ8_HANDLER( via_2_r) { return via_read(space->machine, 2, offset); }
+READ8_HANDLER( via_3_r) { return via_read(space->machine, 3, offset); }
+READ8_HANDLER( via_4_r) { return via_read(space->machine, 4, offset); }
+READ8_HANDLER( via_5_r) { return via_read(space->machine, 5, offset); }
+READ8_HANDLER( via_6_r) { return via_read(space->machine, 6, offset); }
+READ8_HANDLER( via_7_r) { return via_read(space->machine, 7, offset); }
 
-WRITE8_HANDLER( via_0_w) { via_write(machine, 0, offset, data); }
-WRITE8_HANDLER( via_1_w) { via_write(machine, 1, offset, data); }
-WRITE8_HANDLER( via_2_w) { via_write(machine, 2, offset, data); }
-WRITE8_HANDLER( via_3_w) { via_write(machine, 3, offset, data); }
-WRITE8_HANDLER( via_4_w) { via_write(machine, 4, offset, data); }
-WRITE8_HANDLER( via_5_w) { via_write(machine, 5, offset, data); }
-WRITE8_HANDLER( via_6_w) { via_write(machine, 6, offset, data); }
-WRITE8_HANDLER( via_7_w) { via_write(machine, 7, offset, data); }
+WRITE8_HANDLER( via_0_w) { via_write(space->machine, 0, offset, data); }
+WRITE8_HANDLER( via_1_w) { via_write(space->machine, 1, offset, data); }
+WRITE8_HANDLER( via_2_w) { via_write(space->machine, 2, offset, data); }
+WRITE8_HANDLER( via_3_w) { via_write(space->machine, 3, offset, data); }
+WRITE8_HANDLER( via_4_w) { via_write(space->machine, 4, offset, data); }
+WRITE8_HANDLER( via_5_w) { via_write(space->machine, 5, offset, data); }
+WRITE8_HANDLER( via_6_w) { via_write(space->machine, 6, offset, data); }
+WRITE8_HANDLER( via_7_w) { via_write(space->machine, 7, offset, data); }
 
 /******************* 8-bit A/B port interfaces *******************/
 
@@ -1081,39 +1093,39 @@ READ8_HANDLER( via_7_portb_r) { return via[7].in_b; }
 
 /******************* 1-bit CA1/CA2/CB1/CB2 port interfaces *******************/
 
-WRITE8_HANDLER( via_0_ca1_w) { via_set_input_ca1(machine, 0, data); }
-WRITE8_HANDLER( via_1_ca1_w) { via_set_input_ca1(machine, 1, data); }
-WRITE8_HANDLER( via_2_ca1_w) { via_set_input_ca1(machine, 2, data); }
-WRITE8_HANDLER( via_3_ca1_w) { via_set_input_ca1(machine, 3, data); }
-WRITE8_HANDLER( via_4_ca1_w) { via_set_input_ca1(machine, 4, data); }
-WRITE8_HANDLER( via_5_ca1_w) { via_set_input_ca1(machine, 5, data); }
-WRITE8_HANDLER( via_6_ca1_w) { via_set_input_ca1(machine, 6, data); }
-WRITE8_HANDLER( via_7_ca1_w) { via_set_input_ca1(machine, 7, data); }
-WRITE8_HANDLER( via_0_ca2_w) { via_set_input_ca2(machine, 0, data); }
-WRITE8_HANDLER( via_1_ca2_w) { via_set_input_ca2(machine, 1, data); }
-WRITE8_HANDLER( via_2_ca2_w) { via_set_input_ca2(machine, 2, data); }
-WRITE8_HANDLER( via_3_ca2_w) { via_set_input_ca2(machine, 3, data); }
-WRITE8_HANDLER( via_4_ca2_w) { via_set_input_ca2(machine, 4, data); }
-WRITE8_HANDLER( via_5_ca2_w) { via_set_input_ca2(machine, 5, data); }
-WRITE8_HANDLER( via_6_ca2_w) { via_set_input_ca2(machine, 6, data); }
-WRITE8_HANDLER( via_7_ca2_w) { via_set_input_ca2(machine, 7, data); }
+WRITE8_HANDLER( via_0_ca1_w) { via_set_input_ca1(space->machine, 0, data); }
+WRITE8_HANDLER( via_1_ca1_w) { via_set_input_ca1(space->machine, 1, data); }
+WRITE8_HANDLER( via_2_ca1_w) { via_set_input_ca1(space->machine, 2, data); }
+WRITE8_HANDLER( via_3_ca1_w) { via_set_input_ca1(space->machine, 3, data); }
+WRITE8_HANDLER( via_4_ca1_w) { via_set_input_ca1(space->machine, 4, data); }
+WRITE8_HANDLER( via_5_ca1_w) { via_set_input_ca1(space->machine, 5, data); }
+WRITE8_HANDLER( via_6_ca1_w) { via_set_input_ca1(space->machine, 6, data); }
+WRITE8_HANDLER( via_7_ca1_w) { via_set_input_ca1(space->machine, 7, data); }
+WRITE8_HANDLER( via_0_ca2_w) { via_set_input_ca2(space->machine, 0, data); }
+WRITE8_HANDLER( via_1_ca2_w) { via_set_input_ca2(space->machine, 1, data); }
+WRITE8_HANDLER( via_2_ca2_w) { via_set_input_ca2(space->machine, 2, data); }
+WRITE8_HANDLER( via_3_ca2_w) { via_set_input_ca2(space->machine, 3, data); }
+WRITE8_HANDLER( via_4_ca2_w) { via_set_input_ca2(space->machine, 4, data); }
+WRITE8_HANDLER( via_5_ca2_w) { via_set_input_ca2(space->machine, 5, data); }
+WRITE8_HANDLER( via_6_ca2_w) { via_set_input_ca2(space->machine, 6, data); }
+WRITE8_HANDLER( via_7_ca2_w) { via_set_input_ca2(space->machine, 7, data); }
 
-WRITE8_HANDLER( via_0_cb1_w) { via_set_input_cb1(machine, 0, data); }
-WRITE8_HANDLER( via_1_cb1_w) { via_set_input_cb1(machine, 1, data); }
-WRITE8_HANDLER( via_2_cb1_w) { via_set_input_cb1(machine, 2, data); }
-WRITE8_HANDLER( via_3_cb1_w) { via_set_input_cb1(machine, 3, data); }
-WRITE8_HANDLER( via_4_cb1_w) { via_set_input_cb1(machine, 4, data); }
-WRITE8_HANDLER( via_5_cb1_w) { via_set_input_cb1(machine, 5, data); }
-WRITE8_HANDLER( via_6_cb1_w) { via_set_input_cb1(machine, 6, data); }
-WRITE8_HANDLER( via_7_cb1_w) { via_set_input_cb1(machine, 7, data); }
-WRITE8_HANDLER( via_0_cb2_w) { via_set_input_cb2(machine, 0, data); }
-WRITE8_HANDLER( via_1_cb2_w) { via_set_input_cb2(machine, 1, data); }
-WRITE8_HANDLER( via_2_cb2_w) { via_set_input_cb2(machine, 2, data); }
-WRITE8_HANDLER( via_3_cb2_w) { via_set_input_cb2(machine, 3, data); }
-WRITE8_HANDLER( via_4_cb2_w) { via_set_input_cb2(machine, 4, data); }
-WRITE8_HANDLER( via_5_cb2_w) { via_set_input_cb2(machine, 5, data); }
-WRITE8_HANDLER( via_6_cb2_w) { via_set_input_cb2(machine, 6, data); }
-WRITE8_HANDLER( via_7_cb2_w) { via_set_input_cb2(machine, 7, data); }
+WRITE8_HANDLER( via_0_cb1_w) { via_set_input_cb1(space->machine, 0, data); }
+WRITE8_HANDLER( via_1_cb1_w) { via_set_input_cb1(space->machine, 1, data); }
+WRITE8_HANDLER( via_2_cb1_w) { via_set_input_cb1(space->machine, 2, data); }
+WRITE8_HANDLER( via_3_cb1_w) { via_set_input_cb1(space->machine, 3, data); }
+WRITE8_HANDLER( via_4_cb1_w) { via_set_input_cb1(space->machine, 4, data); }
+WRITE8_HANDLER( via_5_cb1_w) { via_set_input_cb1(space->machine, 5, data); }
+WRITE8_HANDLER( via_6_cb1_w) { via_set_input_cb1(space->machine, 6, data); }
+WRITE8_HANDLER( via_7_cb1_w) { via_set_input_cb1(space->machine, 7, data); }
+WRITE8_HANDLER( via_0_cb2_w) { via_set_input_cb2(space->machine, 0, data); }
+WRITE8_HANDLER( via_1_cb2_w) { via_set_input_cb2(space->machine, 1, data); }
+WRITE8_HANDLER( via_2_cb2_w) { via_set_input_cb2(space->machine, 2, data); }
+WRITE8_HANDLER( via_3_cb2_w) { via_set_input_cb2(space->machine, 3, data); }
+WRITE8_HANDLER( via_4_cb2_w) { via_set_input_cb2(space->machine, 4, data); }
+WRITE8_HANDLER( via_5_cb2_w) { via_set_input_cb2(space->machine, 5, data); }
+WRITE8_HANDLER( via_6_cb2_w) { via_set_input_cb2(space->machine, 6, data); }
+WRITE8_HANDLER( via_7_cb2_w) { via_set_input_cb2(space->machine, 7, data); }
 
 READ8_HANDLER( via_0_ca1_r) { return via[0].in_ca1; }
 READ8_HANDLER( via_1_ca1_r) { return via[1].in_ca1; }

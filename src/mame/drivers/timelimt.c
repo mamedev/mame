@@ -49,7 +49,7 @@ static WRITE8_HANDLER( nmi_enable_w )
 static WRITE8_HANDLER( sound_reset_w )
 {
 	if ( data & 1 )
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE );
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE );
 }
 
 /***************************************************************************/

@@ -2039,12 +2039,12 @@ static WRITE8_HANDLER( m6803_internal_registers_w );
 
 READ8_HANDLER( hd63701_internal_registers_r )
 {
-	return m6803_internal_registers_r(machine, offset);
+	return m6803_internal_registers_r(space, offset);
 }
 
 WRITE8_HANDLER( hd63701_internal_registers_w )
 {
-	m6803_internal_registers_w(machine, offset,data);
+	m6803_internal_registers_w(space, offset,data);
 }
 #endif
 
@@ -2430,7 +2430,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x0e:
 			return (m68_state->input_capture >> 8) & 0xff;
 		case 0x0f:
-			logerror("CPU #%d PC %04x: warning - read from unsupported register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset);
+			logerror("CPU #%d PC %04x: warning - read from unsupported register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),offset);
 			return 0;
 		case 0x10:
 			return m68_state->rmcr;
@@ -2447,7 +2447,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x13:
 			return m68_state->tdr;
 		case 0x14:
-			logerror("CPU #%d PC %04x: read RAM control register\n",cpunum_get_active(),cpu_get_pc(machine->activecpu));
+			logerror("CPU #%d PC %04x: read RAM control register\n",cpunum_get_active(),cpu_get_pc(space->cpu));
 			return m68_state->ram_ctrl;
 		case 0x15:
 		case 0x16:
@@ -2461,7 +2461,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x1e:
 		case 0x1f:
 		default:
-			logerror("CPU #%d PC %04x: warning - read from reserved internal register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),offset);
+			logerror("CPU #%d PC %04x: warning - read from reserved internal register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),offset);
 			return 0;
 	}
 }
@@ -2494,7 +2494,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 						| (io_read_byte_8be(M6803_PORT2) & (m68_state->port2_ddr ^ 0xff)));
 
 				if (m68_state->port2_ddr & 2)
-					logerror("CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpunum_get_active(),cpu_get_pc(machine->activecpu));
+					logerror("CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpunum_get_active(),cpu_get_pc(space->cpu));
 			}
 			break;
 		case 0x02:
@@ -2593,10 +2593,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x0d:
 		case 0x0e:
 		case 0x12:
-			logerror("CPU #%d PC %04x: warning - write %02x to read only internal register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
+			logerror("CPU #%d PC %04x: warning - write %02x to read only internal register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
 			break;
 		case 0x0f:
-			logerror("CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
+			logerror("CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
 			break;
 		case 0x10:
 			m68_state->rmcr = data & 0x0f;
@@ -2636,7 +2636,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			m68_state->tdr = data;
 			break;
 		case 0x14:
-			logerror("CPU #%d PC %04x: write %02x to RAM control register\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data);
+			logerror("CPU #%d PC %04x: write %02x to RAM control register\n",cpunum_get_active(),cpu_get_pc(space->cpu),data);
 			m68_state->ram_ctrl = data;
 			break;
 		case 0x15:
@@ -2651,7 +2651,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x1e:
 		case 0x1f:
 		default:
-			logerror("CPU #%d PC %04x: warning - write %02x to reserved internal register %02x\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,offset);
+			logerror("CPU #%d PC %04x: warning - write %02x to reserved internal register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
 			break;
 	}
 }

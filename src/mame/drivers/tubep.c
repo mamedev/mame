@@ -145,10 +145,10 @@ static WRITE8_HANDLER( tubep_LS259_w )
 				//screen_flip_w(offset,data&1); /* bit 0 = screen flip, active high */
 				break;
 		case 6:
-				tubep_background_romselect_w(machine,offset,data);	/* bit0 = 0->select roms: B1,B3,B5; bit0 = 1->select roms: B2,B4,B6 */
+				tubep_background_romselect_w(space,offset,data);	/* bit0 = 0->select roms: B1,B3,B5; bit0 = 1->select roms: B2,B4,B6 */
 				break;
 		case 7:
-				tubep_colorproms_A4_line_w(machine,offset,data);	/* bit0 = line A4 (color proms address) state */
+				tubep_colorproms_A4_line_w(space,offset,data);	/* bit0 = line A4 (color proms address) state */
 				break;
 		default:
 				break;
@@ -167,7 +167,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( main_cpu_irq_line_clear_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 	logerror("CPU#0 VBLANK int clear at scanline=%3i\n", curr_scanline);
 	return;
 }
@@ -203,7 +203,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( second_cpu_irq_line_clear_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 	logerror("CPU#1 VBLANK int clear at scanline=%3i\n", curr_scanline);
 	return;
 }
@@ -238,7 +238,7 @@ static READ8_HANDLER( tubep_soundlatch_r )
 
 static READ8_HANDLER( tubep_sound_irq_ack )
 {
-	cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
 	return 0;
 }
 
@@ -408,7 +408,7 @@ static WRITE8_HANDLER( rjammer_LS259_w )
 static WRITE8_HANDLER( rjammer_soundlatch_w )
 {
 	sound_latch = data;
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
@@ -593,7 +593,7 @@ static WRITE8_HANDLER( rjammer_voice_input_w )
             I do it here because this port (0x80) is first one accessed
             in the interrupt routine.
     */
-	cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE );
+	cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE );
 	return;
 }
 

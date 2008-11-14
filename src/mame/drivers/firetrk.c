@@ -93,7 +93,7 @@ static WRITE8_HANDLER( firetrk_output_w )
 	set_led_status(3, !(data & 0x08));
 
 	/* BIT4 => ATTRACT     */
-	discrete_sound_w(machine, FIRETRUCK_ATTRACT_EN, data & 0x10);
+	discrete_sound_w(space, FIRETRUCK_ATTRACT_EN, data & 0x10);
 	coin_lockout_w(0, !(data & 0x10));
 	coin_lockout_w(1, !(data & 0x10));
 
@@ -103,7 +103,7 @@ static WRITE8_HANDLER( firetrk_output_w )
 	/* BIT6 => UNUSED      */
 
 	/* BIT7 => BELL OUT    */
-	discrete_sound_w(machine, FIRETRUCK_BELL_EN, data & 0x80);
+	discrete_sound_w(space, FIRETRUCK_BELL_EN, data & 0x80);
 }
 
 
@@ -113,7 +113,7 @@ static WRITE8_HANDLER( superbug_output_w )
 	set_led_status(0, offset & 0x01);
 
 	/* BIT1 => ATTRACT    */
-	discrete_sound_w(machine, SUPERBUG_ATTRACT_EN, offset & 0x02);
+	discrete_sound_w(space, SUPERBUG_ATTRACT_EN, offset & 0x02);
 	coin_lockout_w(0, !(offset & 0x02));
 	coin_lockout_w(1, !(offset & 0x02));
 
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( montecar_output_1_w )
 	set_led_status(1, !(data & 0x02));
 
 	/* BIT2 => ATTRACT       */
-	discrete_sound_w(machine, MONTECAR_ATTRACT_INV, data & 0x04);
+	discrete_sound_w(space, MONTECAR_ATTRACT_INV, data & 0x04);
 
 	/* BIT3 => UNUSED        */
 	/* BIT4 => UNUSED        */
@@ -154,8 +154,8 @@ static WRITE8_HANDLER( montecar_output_2_w )
 {
 	firetrk_flash = data & 0x80;
 
-	discrete_sound_w(machine, MONTECAR_BEEPER_EN, data & 0x10);
-	discrete_sound_w(machine, MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
+	discrete_sound_w(space, MONTECAR_BEEPER_EN, data & 0x10);
+	discrete_sound_w(space, MONTECAR_DRONE_LOUD_DATA, data & 0x0f);
 }
 
 
@@ -169,8 +169,8 @@ static MACHINE_RESET( firetrk )
 
 static READ8_HANDLER( firetrk_dip_r )
 {
-	UINT8 val0 = input_port_read(machine, "DIP_0");
-	UINT8 val1 = input_port_read(machine, "DIP_1");
+	UINT8 val0 = input_port_read(space->machine, "DIP_0");
+	UINT8 val1 = input_port_read(space->machine, "DIP_1");
 
 	if (val1 & (1 << (2 * offset + 0))) val0 |= 1;
 	if (val1 & (1 << (2 * offset + 1))) val0 |= 2;
@@ -181,8 +181,8 @@ static READ8_HANDLER( firetrk_dip_r )
 
 static READ8_HANDLER( montecar_dip_r )
 {
-	UINT8 val0 = input_port_read(machine, "DIP_0");
-	UINT8 val1 = input_port_read(machine, "DIP_1");
+	UINT8 val0 = input_port_read(space->machine, "DIP_0");
+	UINT8 val1 = input_port_read(space->machine, "DIP_1");
 
 	if (val1 & (1 << (3 - offset))) val0 |= 1;
 	if (val1 & (1 << (7 - offset))) val0 |= 2;
@@ -244,7 +244,7 @@ static READ8_HANDLER( firetrk_input_r )
 	/* update steering wheels */
 	for (i = 0; i < 2; i++)
 	{
-		UINT32 new_dial = input_port_read_safe(machine, (i ? "STEER_2" : "STEER_1"), 0);
+		UINT32 new_dial = input_port_read_safe(space->machine, (i ? "STEER_2" : "STEER_1"), 0);
 		INT32 delta = new_dial - dial[i];
 
 		if (delta != 0)
@@ -256,15 +256,15 @@ static READ8_HANDLER( firetrk_input_r )
 		}
 	}
 
-	return ((input_port_read_safe(machine, "BIT_0", 0) & (1 << offset)) ? 0x01 : 0) |
-		   ((input_port_read_safe(machine, "BIT_6", 0) & (1 << offset)) ? 0x40 : 0) |
-		   ((input_port_read_safe(machine, "BIT_7", 0) & (1 << offset)) ? 0x80 : 0);
+	return ((input_port_read_safe(space->machine, "BIT_0", 0) & (1 << offset)) ? 0x01 : 0) |
+		   ((input_port_read_safe(space->machine, "BIT_6", 0) & (1 << offset)) ? 0x40 : 0) |
+		   ((input_port_read_safe(space->machine, "BIT_7", 0) & (1 << offset)) ? 0x80 : 0);
 }
 
 
 static READ8_HANDLER( montecar_input_r )
 {
-	UINT8 ret = firetrk_input_r(machine, offset);
+	UINT8 ret = firetrk_input_r(space, offset);
 
 	if (firetrk_crash[0])
 		ret |= 0x02;

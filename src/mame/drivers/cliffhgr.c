@@ -111,7 +111,7 @@ static READ8_HANDLER( cliff_port_r )
 
 	if ( port_bank < 7 )
 	{
-		return input_port_read(machine,  banknames[port_bank]);
+		return input_port_read(space->machine,  banknames[port_bank]);
 	}
 
 	/* output is pulled up for non-mapped ports */
@@ -136,7 +136,7 @@ static WRITE8_HANDLER( cliff_coin_counter_w )
 static READ8_HANDLER( cliff_irq_ack_r )
 {
 	/* deassert IRQ on the CPU */
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 
 	return 0x00;
 }
@@ -149,18 +149,18 @@ static WRITE8_HANDLER( cliff_sound_overlay_w )
 	/* configure pen 0 and 1 as transparent in the renderer and use it as the compositing color */
 	if (overlay)
 	{
-		palette_set_color(machine, 0, palette_get_color(machine, 0) & MAKE_ARGB(0,255,255,255));
-		palette_set_color(machine, 1, palette_get_color(machine, 1) & MAKE_ARGB(0,255,255,255));
+		palette_set_color(space->machine, 0, palette_get_color(space->machine, 0) & MAKE_ARGB(0,255,255,255));
+		palette_set_color(space->machine, 1, palette_get_color(space->machine, 1) & MAKE_ARGB(0,255,255,255));
 	}
 	else
 	{
-		palette_set_color(machine, 0, palette_get_color(machine, 0) | MAKE_ARGB(255,0,0,0));
-		palette_set_color(machine, 1, palette_get_color(machine, 1) | MAKE_ARGB(255,0,0,0));
+		palette_set_color(space->machine, 0, palette_get_color(space->machine, 0) | MAKE_ARGB(255,0,0,0));
+		palette_set_color(space->machine, 1, palette_get_color(space->machine, 1) | MAKE_ARGB(255,0,0,0));
 	}
 
 	/* audio */
-	discrete_sound_w(machine, CLIFF_ENABLE_SND_1, sound&1);
-	discrete_sound_w(machine, CLIFF_ENABLE_SND_2, (sound>>1)&1);
+	discrete_sound_w(space, CLIFF_ENABLE_SND_1, sound&1);
+	discrete_sound_w(space, CLIFF_ENABLE_SND_2, (sound>>1)&1);
 }
 
 static WRITE8_HANDLER( cliff_ldwire_w )

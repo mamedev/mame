@@ -98,7 +98,7 @@ static READ16_HANDLER ( varia_crom_read )
 {
 	/* game reads the cgrom, result is 7772, verified to be correct on the real board */
 
-	UINT8 *cgrom = memory_region(machine, "gfx1");
+	UINT8 *cgrom = memory_region(space->machine, "gfx1");
 	UINT16 retdat;
 	offset = offset << 1;
 	offset |= (vmetal_videoregs[0x0ab/2]&0x7f) << 16;
@@ -143,14 +143,14 @@ static WRITE16_HANDLER( vmetal_mid2tileram_w )
 }
 
 
-static READ16_HANDLER ( varia_dips_bit8_r ) { return ((input_port_read(machine, "DSW2") & 0x80) << 0) | ((input_port_read(machine, "DSW1") & 0x80) >> 1); }
-static READ16_HANDLER ( varia_dips_bit7_r ) { return ((input_port_read(machine, "DSW2") & 0x40) << 1) | ((input_port_read(machine, "DSW1") & 0x40) >> 0); }
-static READ16_HANDLER ( varia_dips_bit6_r ) { return ((input_port_read(machine, "DSW2") & 0x20) << 2) | ((input_port_read(machine, "DSW1") & 0x20) << 1); }
-static READ16_HANDLER ( varia_dips_bit5_r ) { return ((input_port_read(machine, "DSW2") & 0x10) << 3) | ((input_port_read(machine, "DSW1") & 0x10) << 2); }
-static READ16_HANDLER ( varia_dips_bit4_r ) { return ((input_port_read(machine, "DSW2") & 0x08) << 4) | ((input_port_read(machine, "DSW1") & 0x08) << 3); }
-static READ16_HANDLER ( varia_dips_bit3_r ) { return ((input_port_read(machine, "DSW2") & 0x04) << 5) | ((input_port_read(machine, "DSW1") & 0x04) << 4); }
-static READ16_HANDLER ( varia_dips_bit2_r ) { return ((input_port_read(machine, "DSW2") & 0x02) << 6) | ((input_port_read(machine, "DSW1") & 0x02) << 5); }
-static READ16_HANDLER ( varia_dips_bit1_r ) { return ((input_port_read(machine, "DSW2") & 0x01) << 7) | ((input_port_read(machine, "DSW1") & 0x01) << 6); }
+static READ16_HANDLER ( varia_dips_bit8_r ) { return ((input_port_read(space->machine, "DSW2") & 0x80) << 0) | ((input_port_read(space->machine, "DSW1") & 0x80) >> 1); }
+static READ16_HANDLER ( varia_dips_bit7_r ) { return ((input_port_read(space->machine, "DSW2") & 0x40) << 1) | ((input_port_read(space->machine, "DSW1") & 0x40) >> 0); }
+static READ16_HANDLER ( varia_dips_bit6_r ) { return ((input_port_read(space->machine, "DSW2") & 0x20) << 2) | ((input_port_read(space->machine, "DSW1") & 0x20) << 1); }
+static READ16_HANDLER ( varia_dips_bit5_r ) { return ((input_port_read(space->machine, "DSW2") & 0x10) << 3) | ((input_port_read(space->machine, "DSW1") & 0x10) << 2); }
+static READ16_HANDLER ( varia_dips_bit4_r ) { return ((input_port_read(space->machine, "DSW2") & 0x08) << 4) | ((input_port_read(space->machine, "DSW1") & 0x08) << 3); }
+static READ16_HANDLER ( varia_dips_bit3_r ) { return ((input_port_read(space->machine, "DSW2") & 0x04) << 5) | ((input_port_read(space->machine, "DSW1") & 0x04) << 4); }
+static READ16_HANDLER ( varia_dips_bit2_r ) { return ((input_port_read(space->machine, "DSW2") & 0x02) << 6) | ((input_port_read(space->machine, "DSW1") & 0x02) << 5); }
+static READ16_HANDLER ( varia_dips_bit1_r ) { return ((input_port_read(space->machine, "DSW2") & 0x01) << 7) | ((input_port_read(space->machine, "DSW1") & 0x01) << 6); }
 
 static WRITE16_HANDLER( vmetal_control_w )
 {
@@ -172,7 +172,7 @@ static WRITE16_HANDLER( vmetal_control_w )
 		es8712_set_bank_base(0, 0x000000);
 
 	if (data & 0xa0)
-		logerror("PC:%06x - Writing unknown bits %04x to $200000\n",cpu_get_previouspc(machine->activecpu),data);
+		logerror("PC:%06x - Writing unknown bits %04x to $200000\n",cpu_get_previouspc(space->cpu),data);
 }
 
 static WRITE16_HANDLER( vmetal_es8712_w )
@@ -207,8 +207,8 @@ static WRITE16_HANDLER( vmetal_es8712_w )
     16   002a 000e 0083 00ee 000f 0069 0069   0e832a-0f69ee
     */
 
-	es8712_data_0_lsb_w(machine, offset, data, mem_mask);
-	logerror("PC:%06x - Writing %04x to ES8712 offset %02x\n",cpu_get_previouspc(machine->activecpu),data,offset);
+	es8712_data_0_lsb_w(space, offset, data, mem_mask);
+	logerror("PC:%06x - Writing %04x to ES8712 offset %02x\n",cpu_get_previouspc(space->cpu),data,offset);
 }
 
 

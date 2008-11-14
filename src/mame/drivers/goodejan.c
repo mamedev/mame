@@ -79,11 +79,11 @@ static READ16_HANDLER( mahjong_panel_r )
 
 	switch(goodejan_mux_data)
 	{
-		case 1:    ret = input_port_read(machine, "KEY0"); break;
-		case 2:    ret = input_port_read(machine, "KEY1"); break;
-		case 4:    ret = input_port_read(machine, "KEY2"); break;
-		case 8:    ret = input_port_read(machine, "KEY3"); break;
-		case 0x10: ret = input_port_read(machine, "KEY4"); break;
+		case 1:    ret = input_port_read(space->machine, "KEY0"); break;
+		case 2:    ret = input_port_read(space->machine, "KEY1"); break;
+		case 4:    ret = input_port_read(space->machine, "KEY2"); break;
+		case 8:    ret = input_port_read(space->machine, "KEY3"); break;
+		case 0x10: ret = input_port_read(space->machine, "KEY4"); break;
 	}
 
 	return ret;

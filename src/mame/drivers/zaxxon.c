@@ -375,7 +375,7 @@ static WRITE8_HANDLER( int_enable_w )
 {
 	int_enabled = data & 1;
 	if (!int_enabled)
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

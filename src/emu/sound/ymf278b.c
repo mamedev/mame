@@ -722,7 +722,7 @@ WRITE8_HANDLER( ymf278b_control_port_0_a_w )
 
 WRITE8_HANDLER( ymf278b_data_port_0_a_w )
 {
-	ymf278b_data_port_A_w(machine, 0, data);
+	ymf278b_data_port_A_w(space->machine, 0, data);
 }
 
 WRITE8_HANDLER( ymf278b_control_port_0_b_w )
@@ -763,7 +763,7 @@ WRITE8_HANDLER( ymf278b_control_port_1_a_w )
 
 WRITE8_HANDLER( ymf278b_data_port_1_a_w )
 {
-	ymf278b_data_port_A_w(machine, 1, data);
+	ymf278b_data_port_A_w(space->machine, 1, data);
 }
 
 WRITE8_HANDLER( ymf278b_control_port_1_b_w )

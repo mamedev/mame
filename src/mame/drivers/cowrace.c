@@ -49,7 +49,7 @@ static VIDEO_UPDATE( cowrace )
 static WRITE8_HANDLER( cowrace_soundlatch_w )
 {
 	soundlatch_w(0, data);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 #endif
 

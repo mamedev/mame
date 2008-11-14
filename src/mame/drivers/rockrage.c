@@ -71,7 +71,7 @@ static INTERRUPT_GEN( rockrage_interrupt )
 static WRITE8_HANDLER( rockrage_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	/* bits 4-6 = bank number */
 	bankaddress = 0x10000 + ((data & 0x70) >> 4) * 0x2000;
@@ -86,8 +86,8 @@ static WRITE8_HANDLER( rockrage_bankswitch_w )
 
 static WRITE8_HANDLER( rockrage_sh_irqtrigger_w )
 {
-	soundlatch_w(machine, offset, data);
-	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static READ8_HANDLER( rockrage_VLM5030_busy_r ) {

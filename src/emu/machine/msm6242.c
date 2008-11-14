@@ -198,12 +198,12 @@ DEVICE_GET_INFO( msm6242 )
 #if 0
 READ16_HANDLER( msm6242_lsb_r )
 {
-	return msm6242_r(machine, offset);
+	return msm6242_r(space, offset);
 }
 
 WRITE16_HANDLER( msm6242_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		msm6242_w(machine, offset, data);
+		msm6242_w(space, offset, data);
 }
 #endif

@@ -40,31 +40,31 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,offset,data & 0xff);
-		cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+		soundlatch_w(space,offset,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 	}
 }
 
 static READ16_HANDLER( tail2nos_K051316_0_r )
 {
-	return K051316_0_r(machine,offset);
+	return K051316_0_r(space,offset);
 }
 
 static WRITE16_HANDLER( tail2nos_K051316_0_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051316_0_w(machine,offset,data & 0xff);
+		K051316_0_w(space,offset,data & 0xff);
 }
 
 static WRITE16_HANDLER( tail2nos_K051316_ctrl_0_w )
 {
 	if (ACCESSING_BITS_0_7)
-		K051316_ctrl_0_w(machine,offset,data & 0xff);
+		K051316_ctrl_0_w(space,offset,data & 0xff);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(3,memory_region(machine, "audio") + 0x10000 + (data & 0x01) * 0x8000);
+	memory_set_bankptr(3,memory_region(space->machine, "audio") + 0x10000 + (data & 0x01) * 0x8000);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )

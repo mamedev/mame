@@ -53,11 +53,11 @@ static READ8_HANDLER( runaway_input_r )
 {
 	UINT8 val = 0;
 
-	if (input_port_read(machine, "3000D7") & (1 << offset))
+	if (input_port_read(space->machine, "3000D7") & (1 << offset))
 	{
 		val |= 0x80;
 	}
-	if (input_port_read(machine, "3000D6") & (1 << offset))
+	if (input_port_read(space->machine, "3000D6") & (1 << offset))
 	{
 		val |= 0x40;
 	}
@@ -68,7 +68,7 @@ static READ8_HANDLER( runaway_input_r )
 
 static READ8_HANDLER( runaway_pot_r )
 {
-	return (input_port_read(machine, "7000") << (7 - offset)) & 0x80;
+	return (input_port_read(space->machine, "7000") << (7 - offset)) & 0x80;
 }
 
 
@@ -80,7 +80,7 @@ static WRITE8_HANDLER( runaway_led_w )
 
 static WRITE8_HANDLER( runaway_irq_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

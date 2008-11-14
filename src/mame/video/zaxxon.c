@@ -281,7 +281,7 @@ WRITE8_HANDLER( congo_sprite_custom_w )
 		int count = congo_custom[2];
 
 		/* count cycles (just a guess) */
-		cpu_adjust_icount(machine->activecpu, -count * 5);
+		cpu_adjust_icount(space->cpu, -count * 5);
 
 		/* this is just a guess; the chip is hardwired to the spriteram */
 		while (count-- >= 0)

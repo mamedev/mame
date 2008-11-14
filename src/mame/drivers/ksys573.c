@@ -301,11 +301,11 @@ static READ32_HANDLER( jamma_r )
 	switch (offset)
 	{
 	case 0:
-		data = input_port_read(machine, "IN0");
+		data = input_port_read(space->machine, "IN0");
 		break;
 	case 1:
 	{
-		data = input_port_read(machine, "IN1");
+		data = input_port_read(space->machine, "IN1");
 		data |= 0x000000c0;
 
 		if( has_ds2401[ security_cart_number ] )
@@ -341,10 +341,10 @@ static READ32_HANDLER( jamma_r )
 		break;
 	}
 	case 2:
-		data = input_port_read(machine, "IN2");
+		data = input_port_read(space->machine, "IN2");
 		break;
 	case 3:
-		data = input_port_read(machine, "IN3");
+		data = input_port_read(space->machine, "IN3");
 		break;
 	}
 
@@ -568,7 +568,7 @@ static READ32_HANDLER( atapi_r )
 			atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 			atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-			psx_irq_set(machine, 0x400);
+			psx_irq_set(space->machine, 0x400);
 		}
 
 		if( atapi_data_ptr < atapi_data_len )
@@ -585,7 +585,7 @@ static READ32_HANDLER( atapi_r )
 				{
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
-					psx_irq_set(machine, 0x400);
+					psx_irq_set(space->machine, 0x400);
 				}
 			}
 		}
@@ -635,7 +635,7 @@ static READ32_HANDLER( atapi_r )
 			break;
 		}
 
-//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(machine->activecpu));
+//      mame_printf_debug("ATAPI: read reg %d = %x (PC=%x)\n", reg, data, cpu_get_pc(space->cpu));
 
 		data <<= shift;
 	}
@@ -667,7 +667,7 @@ static WRITE32_HANDLER( atapi_w )
 				SCSIWriteData( inserted_cdrom, atapi_data, atapi_cdata_wait );
 
 				// assert IRQ
-				psx_irq_set(machine, 0x400);
+				psx_irq_set(space->machine, 0x400);
 
 				// not sure here, but clear DRQ at least?
 				atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
@@ -740,7 +740,7 @@ static WRITE32_HANDLER( atapi_w )
 				}
 
 				// assert IRQ
-				psx_irq_set(machine, 0x400);
+				psx_irq_set(space->machine, 0x400);
 			}
 			else
 			{
@@ -791,11 +791,11 @@ static WRITE32_HANDLER( atapi_w )
 		}
 
 		atapi_regs[reg] = data;
-//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+//      mame_printf_debug("ATAPI: reg %d = %x (offset %x mask %x PC=%x)\n", reg, data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 		if (reg == ATAPI_REG_CMDSTATUS)
 		{
-//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(machine->activecpu));
+//          mame_printf_debug("ATAPI command %x issued! (PC=%x)\n", data, cpu_get_pc(space->cpu));
 
 			switch (data)
 			{
@@ -857,7 +857,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_COUNTLOW] = 0;
 					atapi_regs[ATAPI_REG_COUNTHIGH] = 2;
 
-					psx_irq_set(machine, 0x400);
+					psx_irq_set(space->machine, 0x400);
 					break;
 
 				case 0xef:	// SET FEATURES
@@ -866,7 +866,7 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_data_ptr = 0;
 					atapi_data_len = 0;
 
-					psx_irq_set(machine, 0x400);
+					psx_irq_set(space->machine, 0x400);
 					break;
 
 				default:
@@ -1048,7 +1048,7 @@ static READ32_HANDLER( flash_r )
 
 	if( flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(machine->activecpu), offset, mem_mask, control );
+		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, control );
 		data = 0xffffffff;
 	}
 	else
@@ -1084,7 +1084,7 @@ static WRITE32_HANDLER( flash_w )
 
 	if( flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(machine->activecpu), offset, mem_mask, data, control );
+		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, data, control );
 	}
 	else
 	{
@@ -1603,8 +1603,8 @@ static READ32_HANDLER( ge765pwbba_r )
 	switch( offset )
 	{
 	case 0x26:
-		uPD4701_y_add( 0, input_port_read_safe(machine,  "uPD4701_y", 0 ) );
-		uPD4701_switches_set( 0, input_port_read_safe(machine,  "uPD4701_switches", 0 ) );
+		uPD4701_y_add( 0, input_port_read_safe(space->machine,  "uPD4701_y", 0 ) );
+		uPD4701_switches_set( 0, input_port_read_safe(space->machine,  "uPD4701_switches", 0 ) );
 
 		uPD4701_cs_w( 0, 0 );
 		uPD4701_xy_w( 0, 1 );
@@ -2142,7 +2142,7 @@ static READ32_HANDLER( gx894pwbba_r )
 	}
 
 	verboselog( 2, "gx894pwbba_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
-//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(machine->activecpu), offset, mem_mask, data );
+//  printf( "%08x: gx894pwbba_r( %08x, %08x ) %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, data );
 	return data;
 }
 

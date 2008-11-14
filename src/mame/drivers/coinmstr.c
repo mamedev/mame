@@ -60,7 +60,7 @@ static WRITE8_HANDLER( quizmstr_attr2_w )
 static READ8_HANDLER( question_r )
 {
 	int address;
-	UINT8 *questions = memory_region(machine, "user1");
+	UINT8 *questions = memory_region(space->machine, "user1");
 
 	switch(question_adr[2])
 	{

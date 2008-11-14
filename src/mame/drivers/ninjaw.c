@@ -222,9 +222,9 @@ static WRITE16_HANDLER( cpua_ctrl_w )
 		data = data >> 8;	/* for Wgp */
 	cpua_ctrl = data;
 
-	parse_control(machine);
+	parse_control(space->machine);
 
-	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(machine->activecpu),data);
+	logerror("CPU #0 PC %06x: write %04x to cpu control\n",cpu_get_pc(space->cpu),data);
 }
 
 
@@ -242,15 +242,15 @@ static void reset_sound_region(running_machine *machine)
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	banknum = (data - 1) & 7;
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 static WRITE16_HANDLER( ninjaw_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (machine, 0, data & 0xff);
+		taitosound_port_w (space->machine, 0, data & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (machine, 0, data & 0xff);
+		taitosound_comm_w (space->machine, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 	if (data & 0xff00)
@@ -261,7 +261,7 @@ static WRITE16_HANDLER( ninjaw_sound_w )
 static READ16_HANDLER( ninjaw_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (machine,0) & 0xff));
+		return ((taitosound_comm_r (space->machine,0) & 0xff));
 	else return 0;
 }
 

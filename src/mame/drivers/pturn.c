@@ -201,7 +201,7 @@ static WRITE8_HANDLER( nmi_sub_enable_w )
 
 static WRITE8_HANDLER(sound_w)
 {
-	soundlatch_w(machine,0,data);
+	soundlatch_w(space,0,data);
 }
 
 

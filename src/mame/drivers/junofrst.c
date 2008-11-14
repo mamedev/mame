@@ -105,7 +105,7 @@ static READ8_HANDLER( junofrst_portA_r )
 	/* divided by 1024 to get this timer */
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
-	timer = (cpu_get_total_cycles(machine->activecpu) / (1024/2)) & 0x0f;
+	timer = (cpu_get_total_cycles(space->cpu) / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
 
@@ -140,7 +140,7 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 	if (last == 0 && data == 1)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
-		cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+		cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 	}
 
 	last = data;
@@ -149,22 +149,22 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
-	cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2], 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
 	if ((data & 0x80) == 0)
-		cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
 	i8039_status = (data & 0x70) >> 4;
 }
 
 
 static WRITE8_HANDLER( flip_screen_w )
 {
-	tutankhm_flip_screen_x_w(machine, 0, data);
-	tutankhm_flip_screen_y_w(machine, 0, data);
+	tutankhm_flip_screen_x_w(space, 0, data);
+	tutankhm_flip_screen_y_w(space, 0, data);
 }
 
 

@@ -481,11 +481,11 @@ static READ16_HANDLER ( OLD_megaplay_genesis_io_r )
 		case 1: /* port A data (joypad 1) */
 
 			if (genesis_io_ram[offset] & 0x40)
-				return_value = input_port_read(machine, "P1_1") & (genesis_io_ram[4]^0xff);
+				return_value = input_port_read(space->machine, "P1_1") & (genesis_io_ram[4]^0xff);
 			else
 			{
-				return_value = input_port_read(machine, "P1_2") & (genesis_io_ram[4]^0xff);
-				return_value |= input_port_read(machine, "P1_1") & 0x03;
+				return_value = input_port_read(space->machine, "P1_2") & (genesis_io_ram[4]^0xff);
+				return_value |= input_port_read(space->machine, "P1_1") & 0x03;
 			}
 			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
 //          logerror ("reading joypad 1 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
@@ -494,11 +494,11 @@ static READ16_HANDLER ( OLD_megaplay_genesis_io_r )
 		case 2: /* port B data (joypad 2) */
 
 			if (genesis_io_ram[offset] & 0x40)
-				return_value = input_port_read(machine, "P2_1") & (genesis_io_ram[5]^0xff);
+				return_value = input_port_read(space->machine, "P2_1") & (genesis_io_ram[5]^0xff);
 			else
 			{
-				return_value = input_port_read(machine, "P2_2") & (genesis_io_ram[5]^0xff);
-				return_value |= input_port_read(machine, "P2_1") & 0x03;
+				return_value = input_port_read(space->machine, "P2_2") & (genesis_io_ram[5]^0xff);
+				return_value |= input_port_read(space->machine, "P2_1") & 0x03;
 			}
 			return_value = (genesis_io_ram[offset] & 0x80) | return_value;
 //          logerror ("reading joypad 2 , type %02x %02x\n",genesis_io_ram[offset] & 0xb0, return_value &0x7f);
@@ -517,7 +517,7 @@ static READ16_HANDLER ( OLD_megaplay_genesis_io_r )
 
 static WRITE16_HANDLER ( OLD_megaplay_genesis_io_w )
 {
-//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,cpu_get_previouspc(machine->activecpu));
+//  logerror ("write io offset :%02x data %04x PC: 0x%06x\n",offset,data,cpu_get_previouspc(space->cpu));
 
 	switch (offset)
 	{
@@ -561,11 +561,11 @@ static WRITE16_HANDLER ( OLD_megaplay_genesis_io_w )
 
 static READ8_HANDLER( bank_r )
 {
-	UINT8* bank = memory_region(machine, "mpbios");
-	UINT8* game = memory_region(machine, "main");
+	UINT8* bank = memory_region(space->machine, "mpbios");
+	UINT8* game = memory_region(space->machine, "main");
 
 	if(game_banksel == 0x142) // Genesis I/O
-		return OLD_megaplay_genesis_io_r(machine, (offset & 0x1f) / 2, 0xffff);
+		return OLD_megaplay_genesis_io_r(space, (offset & 0x1f) / 2, 0xffff);
 
 	if(bios_mode & MP_ROM)
 	{
@@ -598,7 +598,7 @@ static READ8_HANDLER( bank_r )
 static WRITE8_HANDLER ( bank_w )
 {
 	if(game_banksel == 0x142) // Genesis I/O
-		OLD_megaplay_genesis_io_w(machine, (offset & 0x1f) / 2, data, 0xffff);
+		OLD_megaplay_genesis_io_w(space, (offset & 0x1f) / 2, data, 0xffff);
 
 	if(offset <= 0x1fff && (bios_width & 0x08))
 		ic37_ram[(0x2000 * (bios_bank & 0x03)) + offset] = data;
@@ -632,7 +632,7 @@ static READ8_HANDLER( megaplay_bios_6404_r )
 static WRITE8_HANDLER( megaplay_bios_6404_w )
 {
 	if(((bios_6404 & 0x0c) == 0x00) && ((data & 0x0c) == 0x0c))
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 	bios_6404 = data;
 
 //  logerror("BIOS: 0x6404 write: 0x%02x\n",data);
@@ -681,7 +681,7 @@ static WRITE8_HANDLER( megaplay_game_w )
 		bios_mode = MP_GAME;
 		readpos = 1;
 //      popmessage("Game bank selected: 0x%03x",game_banksel);
-		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n",cpu_get_previouspc(machine->activecpu),game_banksel);
+		logerror("BIOS [0x%04x]: 68K address space bank selected: 0x%03x\n",cpu_get_previouspc(space->cpu),game_banksel);
 	}
 }
 
@@ -744,7 +744,7 @@ static WRITE8_HANDLER (megaplay_bios_port_be_bf_w)
 	switch (offset)
 	{
 		case 0: /* port 0xbe, VDP 1 DATA Write */
-			segae_vdp_data_w(machine, 0, data); break;
+			segae_vdp_data_w(space, 0, data); break;
 		case 1: /* port 0xbf, VDP 1 CTRL Write */
 			segae_vdp_ctrl_w(0, data); break;
 	}

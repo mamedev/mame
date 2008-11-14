@@ -11,7 +11,7 @@ UINT8 *homerun_videoram;
 
 WRITE8_HANDLER(homerun_banking_w)
 {
-	if(video_screen_get_vpos(machine->primary_screen)>half_screen)
+	if(video_screen_get_vpos(space->machine->primary_screen)>half_screen)
 		homerun_gc_down=data&3;
 	else
 		homerun_gc_up=data&3;
@@ -20,9 +20,9 @@ WRITE8_HANDLER(homerun_banking_w)
 
 	data>>=5;
 	if(!data)
-		memory_set_bankptr(1, memory_region(machine, "main") );
+		memory_set_bankptr(1, memory_region(space->machine, "main") );
 	else
-		memory_set_bankptr(1, memory_region(machine, "main") + 0x10000 + (((data-1)&0x7)*0x4000 ));
+		memory_set_bankptr(1, memory_region(space->machine, "main") + 0x10000 + (((data-1)&0x7)*0x4000 ));
 }
 
 WRITE8_HANDLER( homerun_videoram_w )
@@ -47,7 +47,7 @@ WRITE8_HANDLER(homerun_color_w)
 	bit1 = (data >> 6) & 0x01;
 	bit2 = (data >> 7) & 0x01;
 	b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static TILE_GET_INFO( get_homerun_tile_info )

@@ -297,7 +297,7 @@ static void register_savestate(void)
 WRITE8_HANDLER( m62_flipscreen_w )
 {
 	/* screen flip is handled both by software and hardware */
-	data ^= ~input_port_read(machine, "DSW2") & 1;
+	data ^= ~input_port_read(space->machine, "DSW2") & 1;
 
 	flipscreen = data & 0x01;
 	if (flipscreen)
@@ -837,8 +837,8 @@ VIDEO_UPDATE( spelunkr )
 
 WRITE8_HANDLER( spelunk2_gfxport_w )
 {
-	m62_hscroll_high_w(machine,0,(data&2)>>1);
-	m62_vscroll_high_w(machine,0,(data&1));
+	m62_hscroll_high_w(space,0,(data&2)>>1);
+	m62_vscroll_high_w(space,0,(data&1));
 	if (spelunkr_palbank != ((data & 0x0c) >> 2))
 	{
 		spelunkr_palbank = (data & 0x0c) >> 2;

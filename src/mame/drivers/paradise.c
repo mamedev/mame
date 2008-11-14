@@ -43,20 +43,20 @@ paradise: I'm not sure it's working correctly:
 static WRITE8_HANDLER( paradise_rombank_w )
 {
 	int bank = data;
-	int bank_n = memory_region_length(machine, "main")/0x4000 - 1;
+	int bank_n = memory_region_length(space->machine, "main")/0x4000 - 1;
 	if (bank >= bank_n)
 	{
-		logerror("PC %04X - invalid rom bank %x\n",cpu_get_pc(machine->activecpu),bank);
+		logerror("PC %04X - invalid rom bank %x\n",cpu_get_pc(space->cpu),bank);
 		bank %= bank_n;
 	}
 
 	if (bank >= 3)	bank+=1;
-	memory_set_bankptr(1, memory_region(machine, "main") + bank * 0x4000);
+	memory_set_bankptr(1, memory_region(space->machine, "main") + bank * 0x4000);
 }
 
 static WRITE8_HANDLER( paradise_okibank_w )
 {
-	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown oki bank bits %02X\n",cpu_get_pc(machine->activecpu),data);
+	if (data & ~0x02)	logerror("CPU #0 - PC %04X: unknown oki bank bits %02X\n",cpu_get_pc(space->cpu),data);
 
 	if (sndti_exists(SOUND_OKIM6295, 1))
 		okim6295_set_bank_base(1, (data & 0x02) ? 0x40000 : 0);

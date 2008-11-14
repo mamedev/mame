@@ -144,12 +144,12 @@ static WRITE16_HANDLER( bit_controls_w )
 	{
 		if (bitvals[offset] != (data & 1))
 		{
-			logerror("%08x:bit_controls_w(%x,%d)\n", cpu_get_pc(machine->activecpu), offset, data & 1);
+			logerror("%08x:bit_controls_w(%x,%d)\n", cpu_get_pc(space->cpu), offset, data & 1);
 
 			switch (offset)
 			{
 				case 7:
-					ticket_dispenser_w(machine, 0, data << 7);
+					ticket_dispenser_w(space, 0, data << 7);
 					break;
 
 				case 8:
@@ -208,23 +208,23 @@ static WRITE16_HANDLER( bit_controls_w )
 
 static READ16_HANDLER( port0_r )
 {
-	int result = input_port_read(machine, "DSW");
-	result ^= ticket_dispenser_r(machine,0) >> 3;
+	int result = input_port_read(space->machine, "DSW");
+	result ^= ticket_dispenser_r(space,0) >> 3;
 	return result;
 }
 
 
 static READ16_HANDLER( analogx_r )
 {
-	return (input_port_read(machine, "ANALOGX") << 8) | 0x00ff;
+	return (input_port_read(space->machine, "ANALOGX") << 8) | 0x00ff;
 }
 
 
 static READ16_HANDLER( analogy_watchdog_r )
 {
 	/* doubles as a watchdog address */
-	watchdog_reset_w(machine,0,0);
-	return (input_port_read(machine, "ANALOGY") << 8) | 0x00ff;
+	watchdog_reset_w(space,0,0);
+	return (input_port_read(space->machine, "ANALOGY") << 8) | 0x00ff;
 }
 
 

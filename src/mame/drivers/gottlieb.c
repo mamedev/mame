@@ -315,8 +315,8 @@ static CUSTOM_INPUT( analog_delta_r )
 static WRITE8_HANDLER( gottlieb_analog_reset_w )
 {
 	/* reset the trackball counters */
-	track[0] = input_port_read_safe(machine, "TRACKX", 0);
-	track[1] = input_port_read_safe(machine, "TRACKY", 0);
+	track[0] = input_port_read_safe(space->machine, "TRACKX", 0);
+	track[1] = input_port_read_safe(space->machine, "TRACKY", 0);
 }
 
 
@@ -338,9 +338,9 @@ static WRITE8_HANDLER( general_output_w )
 {
 	/* bits 0-3 control video features, and are different for laserdisc games */
 	if (laserdisc == NULL)
-		gottlieb_video_control_w(machine, offset, data);
+		gottlieb_video_control_w(space, offset, data);
 	else
-		gottlieb_laserdisc_video_control_w(machine, offset, data);
+		gottlieb_laserdisc_video_control_w(space, offset, data);
 
 	/* bit 4 controls the coin meter */
 	coin_counter_w(0, data & 0x10);
@@ -356,7 +356,7 @@ static WRITE8_HANDLER( general_output_w )
 
 static WRITE8_HANDLER( reactor_output_w )
 {
-	general_output_w(machine, offset, data & ~0xe0);
+	general_output_w(space, offset, data & ~0xe0);
 	set_led_status(0, data & 0x20);
 	set_led_status(1, data & 0x40);
 	set_led_status(2, data & 0x80);
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( reactor_output_w )
 
 static WRITE8_HANDLER( stooges_output_w )
 {
-	general_output_w(machine, offset, data & ~0x60);
+	general_output_w(space, offset, data & ~0x60);
 	joystick_select = (data >> 5) & 0x03;
 }
 

@@ -35,46 +35,46 @@ VIDEO_UPDATE( overdriv );
 
 static READ16_HANDLER( K051316_0_msb_r )
 {
-	return K051316_0_r(machine,offset) << 8;
+	return K051316_0_r(space,offset) << 8;
 }
 
 static READ16_HANDLER( K051316_1_msb_r )
 {
-	return K051316_1_r(machine,offset) << 8;
+	return K051316_1_r(space,offset) << 8;
 }
 
 static READ16_HANDLER( K051316_rom_0_msb_r )
 {
-	return K051316_rom_0_r(machine,offset) << 8;
+	return K051316_rom_0_r(space,offset) << 8;
 }
 
 static READ16_HANDLER( K051316_rom_1_msb_r )
 {
-	return K051316_rom_1_r(machine,offset) << 8;
+	return K051316_rom_1_r(space,offset) << 8;
 }
 
 static WRITE16_HANDLER( K051316_0_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		K051316_0_w(machine,offset,data >> 8);
+		K051316_0_w(space,offset,data >> 8);
 }
 
 static WRITE16_HANDLER( K051316_1_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		K051316_1_w(machine,offset,data >> 8);
+		K051316_1_w(space,offset,data >> 8);
 }
 
 static WRITE16_HANDLER( K051316_ctrl_0_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		K051316_ctrl_0_w(machine,offset,data >> 8);
+		K051316_ctrl_0_w(space,offset,data >> 8);
 }
 
 static WRITE16_HANDLER( K051316_ctrl_1_msb_w )
 {
 	if (ACCESSING_BITS_8_15)
-		K051316_ctrl_1_w(machine,offset,data >> 8);
+		K051316_ctrl_1_w(space,offset,data >> 8);
 }
 
 
@@ -125,7 +125,7 @@ static NVRAM_HANDLER( overdriv )
 
 static WRITE16_HANDLER( eeprom_w )
 {
-//logerror("%06x: write %04x to eeprom_w\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%06x: write %04x to eeprom_w\n",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 is data */
@@ -164,7 +164,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 0 probably enables the second 68000 */
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
 
 		/* bit 1 is clear during service mode - function unknown */
 
@@ -172,7 +172,7 @@ static WRITE16_HANDLER( cpuA_ctrl_w )
 		coin_counter_w(0,data & 0x10);
 		coin_counter_w(1,data & 0x20);
 
-//logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%06x: write %04x to cpuA_ctrl_w\n",cpu_get_pc(space->cpu),data);
 	}
 }
 
@@ -216,27 +216,27 @@ static WRITE16_HANDLER( sharedram_w )
 
 static READ16_HANDLER( overdriv_sound_0_r )
 {
-	return k053260_0_r(machine,2 + offset);
+	return k053260_0_r(space,2 + offset);
 }
 
 static READ16_HANDLER( overdriv_sound_1_r )
 {
-	return k053260_1_r(machine,2 + offset);
+	return k053260_1_r(space,2 + offset);
 }
 
 static WRITE16_HANDLER( overdriv_soundirq_w )
 {
-	cpu_set_input_line(machine->cpu[2],M6809_IRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[2],M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq5_w )
 {
-	cpu_set_input_line(machine->cpu[1],5,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1],5,HOLD_LINE);
 }
 
 static WRITE16_HANDLER( overdriv_cpuB_irq6_w )
 {
-	cpu_set_input_line(machine->cpu[1],6,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1],6,HOLD_LINE);
 }
 
 

@@ -166,7 +166,7 @@ WRITE8_HANDLER( brickzn_banked_paletteram_w )
 			(((rgb & (1<<0x6))?1:0)<<2) |
 			(((rgb & (1<<0x7))?1:0)<<3);
 
-	palette_set_color_rgb(machine,offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
+	palette_set_color_rgb(space->machine,offset/2,pal4bit(r),pal4bit(g),pal4bit(b));
 }
 
 

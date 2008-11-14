@@ -702,7 +702,7 @@ static READ16_HANDLER(any_r)
 	c_r[offset]++;
 
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		return handle_io_r(machine, offset);
+		return handle_io_r(space, offset);
 
 	return mainram[offset];
 }
@@ -711,22 +711,22 @@ static WRITE16_HANDLER(any_w)
 {
 	int show = 0;
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		handle_io_w(machine, offset, data, mem_mask);
+		handle_io_w(space, offset, data, mem_mask);
 
 	c_w[offset]++;
-	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, cpu_get_pc(machine->activecpu));
+	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, cpu_get_pc(space->cpu));
 	if(mainram[offset] != data && offset >= 0x400 && offset < 0x800) {
 		if(0 &&
 		   offset != 0x4c0/2 && offset != 0x500/2 &&
 		   offset != 0x444/2 && offset != 0x6de/2 && offset != 0x47e/2 &&
 		   offset != 0x4a0/2 && offset != 0x620/2 && offset != 0x6c6/2 &&
 		   offset != 0x628/2 && offset != 0x62a/2)
-			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(machine->activecpu));
+			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
 	}
 
 	if(0 && c_w[offset]>1000 && !c_r[offset]) {
 		if(offset != 0x4c0/2 && (offset<0x500/2 || offset > 0x503/2))
-			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, c_w[offset], c_r[offset], cpu_get_pc(machine->activecpu));
+			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, c_w[offset], c_r[offset], cpu_get_pc(space->cpu));
 	}
 
 	//  if(offset == 0x471 || (offset >= 0xb146 && offset < 0xb156))
@@ -737,10 +737,10 @@ static WRITE16_HANDLER(any_w)
 	//  show = offset == 0x704 || offset == 0x710 || offset == 0x71c;
 
 	if(show)
-		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(machine->activecpu));
+		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
 
 	//  if(offset == 0x700)
-	//      cpu_setbank(2, memory_region(machine, "user1")+0x20000*data);
+	//      cpu_setbank(2, memory_region(space->machine, "user1")+0x20000*data);
 
 	COMBINE_DATA(&mainram[offset]);
 }
@@ -749,7 +749,7 @@ static WRITE16_HANDLER(w1x)
 {
 	COMBINE_DATA(&w1ram[offset]);
 	if(0 && offset < 0x800/2)
-		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask, cpu_get_pc(machine->activecpu));
+		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1882,7 +1882,7 @@ static WRITE16_HANDLER( rdx_v33_eeprom_w )
 
 static READ16_HANDLER( rdx_v33_eeprom_r )
 {
-	return input_port_read(machine, "SYSTEM");
+	return input_port_read(space->machine, "SYSTEM");
 }
 
 
@@ -1916,16 +1916,16 @@ static WRITE16_HANDLER( mcu_prog_offs_w )
 
 static READ16_HANDLER( r2_playerin_r )
 {
-	return input_port_read(machine, "INPUT");
+	return input_port_read(space->machine, "INPUT");
 }
 static READ16_HANDLER( rdx_v33_oki_r )
 {
-	return okim6295_status_0_r(machine,0);
+	return okim6295_status_0_r(space,0);
 }
 
 static WRITE16_HANDLER( rdx_v33_oki_w )
 {
-	if (ACCESSING_BITS_0_7) okim6295_data_0_w(machine, 0, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) okim6295_data_0_w(space, 0, data & 0x00ff);
 	if (ACCESSING_BITS_8_15) logerror("rdx_v33_oki_w MSB %04x\n",data);
 }
 

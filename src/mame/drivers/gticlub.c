@@ -252,7 +252,7 @@ static WRITE32_HANDLER( paletteram32_w )
 {
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
-	palette_set_color_rgb(machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
+	palette_set_color_rgb(space->machine, offset, pal5bit(data >> 10), pal5bit(data >> 5), pal5bit(data >> 0));
 }
 
 static void voodoo_vblank_0(const device_config *device, int param)
@@ -470,10 +470,10 @@ static READ8_HANDLER( sysreg_r )
 		case 0:
 		case 1:
 		case 3:
-			return input_port_read(machine, portnames[offset]);
+			return input_port_read(space->machine, portnames[offset]);
 
 		case 2:
-			return adc1038_sars_r(machine) << 7;
+			return adc1038_sars_r(space) << 7;
 
 		case 4:
 		{
@@ -515,13 +515,13 @@ static WRITE8_HANDLER( sysreg_w )
 
 		case 4:
 			if (data & 0x80)	/* CG Board 1 IRQ Ack */
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 
 			if (data & 0x40)	/* CG Board 0 IRQ Ack */
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			adc1038_di_w((data >> 0) & 1);
-			adc1038_clk_w(machine, (data >> 1) & 1);
+			adc1038_clk_w(space, (data >> 1) & 1);
 
 			set_cgboard_id((data >> 4) & 0x3);
 			break;
@@ -539,7 +539,7 @@ READ8_HANDLER( K056230_r )
 		}
 	}
 
-//  mame_printf_debug("K056230_r: %d at %08X\n", offset, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("K056230_r: %d at %08X\n", offset, cpu_get_pc(space->cpu));
 
 	return 0;
 }
@@ -562,14 +562,14 @@ WRITE8_HANDLER( K056230_w )
 			if (data & 0x20)
 			{
 				// Thunder Hurricane breaks otherwise...
-				if (mame_stricmp(machine->gamedrv->name, "thunderh") != 0)
+				if (mame_stricmp(space->machine->gamedrv->name, "thunderh") != 0)
 				{
-					cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, ASSERT_LINE);
+					cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ2, ASSERT_LINE);
 					timer_set(ATTOTIME_IN_USEC(10), NULL, 0, network_irq_clear);
 				}
 			}
 //          else
-//              cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ2, CLEAR_LINE);
+//              cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ2, CLEAR_LINE);
 			break;
 		}
 		case 2:		// Sub ID register
@@ -577,19 +577,19 @@ WRITE8_HANDLER( K056230_w )
 			break;
 		}
 	}
-//  mame_printf_debug("K056230_w: %d, %02X at %08X\n", offset, data, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("K056230_w: %d, %02X at %08X\n", offset, data, cpu_get_pc(space->cpu));
 }
 
 UINT32 *lanc_ram;
 READ32_HANDLER( lanc_ram_r )
 {
-//  mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
 	return lanc_ram[offset & 0x7ff];
 }
 
 WRITE32_HANDLER( lanc_ram_w )
 {
-//  mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+//  mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 	COMBINE_DATA(lanc_ram + (offset & 0x7ff));
 }
 

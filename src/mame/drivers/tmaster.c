@@ -182,7 +182,7 @@ static READ16_HANDLER(rtc_r)
 {
 	mame_system_time systime;
 
-	mame_get_current_datetime(machine, &systime);
+	mame_get_current_datetime(space->machine, &systime);
 	rtc_ram[0x1] = binary_to_BCD(systime.local_time.second);
 	rtc_ram[0x2] = binary_to_BCD(systime.local_time.minute);
 	rtc_ram[0x3] = binary_to_BCD(systime.local_time.hour);
@@ -308,7 +308,7 @@ static WRITE16_HANDLER( tmaster_color_w )
 	COMBINE_DATA( &tmaster_color );
 #if 0
 	if (tmaster_color & ~7)
-		logerror("%06x: color %04x\n", cpu_get_pc(machine->activecpu), tmaster_color);
+		logerror("%06x: color %04x\n", cpu_get_pc(space->cpu), tmaster_color);
 #endif
 }
 
@@ -406,8 +406,8 @@ static WRITE16_HANDLER( tmaster_blitter_w )
 	switch (offset*2)
 	{
 		case 0x0e:
-			tmaster_draw(machine);
-			cpu_set_input_line(machine->cpu[0], 2, HOLD_LINE);
+			tmaster_draw(space->machine);
+			cpu_set_input_line(space->machine->cpu[0], 2, HOLD_LINE);
 			break;
 	}
 }
@@ -429,7 +429,7 @@ static READ16_HANDLER( tmaster_blitter_r )
 
 static READ16_HANDLER( tmaster_coins_r )
 {
-	return input_port_read(machine, "COIN")|(mame_rand(machine)&0x0800);
+	return input_port_read(space->machine, "COIN")|(mame_rand(space->machine)&0x0800);
 }
 
 static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -486,7 +486,7 @@ static READ16_HANDLER( galgames_eeprom_r )
 static WRITE16_HANDLER( galgames_eeprom_w )
 {
 	if (data & ~0x0003)
-		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(machine->activecpu),data);
+		logerror("CPU #0 PC: %06X - Unknown EEPROM bit written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -529,7 +529,7 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 		palette_data[palette_index] = data & 0xff;
 		if (++palette_index == 3)
 		{
-			palette_set_color(machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
+			palette_set_color(space->machine, palette_offset, MAKE_RGB(palette_data[0], palette_data[1], palette_data[2]));
 			palette_index = 0;
 			palette_offset++;
 		}
@@ -539,12 +539,12 @@ static WRITE16_HANDLER( galgames_palette_data_w )
 // Sound
 static READ16_HANDLER( galgames_okiram_r )
 {
-	return memory_region(machine, "oki")[offset] | 0xff00;
+	return memory_region(space->machine, "oki")[offset] | 0xff00;
 }
 static WRITE16_HANDLER( galgames_okiram_w )
 {
 	if (ACCESSING_BITS_0_7)
-		memory_region(machine, "oki")[offset] = data & 0xff;
+		memory_region(space->machine, "oki")[offset] = data & 0xff;
 }
 
 
@@ -575,12 +575,12 @@ static WRITE16_HANDLER( galgames_cart_clock_w )
 		{
 			memory_set_bank(1, 1);	// ram
 			memory_set_bank(3, 0);	// rom
-			logerror("%06x: romram bank = %04x\n", cpu_get_pc(machine->activecpu), data);
+			logerror("%06x: romram bank = %04x\n", cpu_get_pc(space->cpu), data);
 		}
 		else
 		{
 			memory_set_bank(1, 0);	// rom
-			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(machine->activecpu), data);
+			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(space->cpu), data);
 		}
 	}
 }

@@ -377,7 +377,7 @@ static READ8_HANDLER( intercept_v256_r )
 	UINT8 counter;
 	UINT8 v256;
 
-	vpos_to_vysnc_chain_counter(video_screen_get_vpos(machine->primary_screen), &counter, &v256);
+	vpos_to_vysnc_chain_counter(video_screen_get_vpos(space->machine->primary_screen), &counter, &v256);
 
 	return (!intercept << 7) | v256;
 }
@@ -515,12 +515,12 @@ static WRITE8_HANDLER( berzerk_audio_w )
 
 	/* offset 6 writes to the sfxcontrol latch */
 	case 6:
-		exidy_sfxctrl_w(machine, data >> 6, data);
+		exidy_sfxctrl_w(space, data >> 6, data);
 		break;
 
 	/* everything else writes to the 6840 */
 	default:
-		exidy_sh6840_w(machine, offset, data);
+		exidy_sh6840_w(space, offset, data);
 		break;
 
 	}

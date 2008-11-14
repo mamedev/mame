@@ -323,7 +323,7 @@ WRITE16_HANDLER( tmnt_paletteram_word_w )
 	offset &= ~1;
 
 	data = (paletteram16[offset] << 8) | paletteram16[offset+1];
-	palette_set_color_rgb(machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
+	palette_set_color_rgb(space->machine,offset / 2,pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
 
@@ -340,12 +340,12 @@ WRITE16_HANDLER( tmnt_0a0000_w )
 
 		/* bit 3 high then low triggers irq on sound CPU */
 		if (last == 0x08 && (data & 0x08) == 0)
-			cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+			cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 
 		last = data & 0x08;
 
 		/* bit 5 = irq enable */
-		interrupt_enable_w(machine,0,data & 0x20);
+		interrupt_enable_w(space,0,data & 0x20);
 
 		/* bit 7 = enable char ROM reading through the video RAM */
 		K052109_set_RMRD_line((data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
@@ -366,7 +366,7 @@ WRITE16_HANDLER( punkshot_0a0020_w )
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (last == 0x04 && (data & 0x04) == 0)
-			cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+			cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 
 		last = data & 0x04;
 
@@ -388,7 +388,7 @@ WRITE16_HANDLER( lgtnfght_0a0018_w )
 
 		/* bit 2 = trigger irq on sound CPU */
 		if (last == 0x00 && (data & 0x04) == 0x04)
-			cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+			cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 
 		last = data & 0x04;
 
@@ -423,15 +423,15 @@ WRITE16_HANDLER( blswhstl_700300_w )
 READ16_HANDLER( glfgreat_rom_r )
 {
 	if (glfgreat_roz_rom_mode)
-		return memory_region(machine, "gfx3")[glfgreat_roz_char_bank * 0x80000 + offset];
+		return memory_region(space->machine, "gfx3")[glfgreat_roz_char_bank * 0x80000 + offset];
 	else if (offset < 0x40000)
 	{
-		UINT8 *usr = memory_region(machine, "user1");
+		UINT8 *usr = memory_region(space->machine, "user1");
 		return usr[offset + 0x80000 + glfgreat_roz_rom_bank * 0x40000] +
 				256 * usr[offset + glfgreat_roz_rom_bank * 0x40000];
 	}
 	else
-		return memory_region(machine, "user1")[((offset & 0x3ffff) >> 2) + 0x100000 + glfgreat_roz_rom_bank * 0x10000];
+		return memory_region(space->machine, "user1")[((offset & 0x3ffff) >> 2) + 0x100000 + glfgreat_roz_rom_bank * 0x10000];
 }
 
 WRITE16_HANDLER( glfgreat_122000_w )
@@ -527,10 +527,10 @@ WRITE16_HANDLER( prmrsocr_122000_w )
 READ16_HANDLER( prmrsocr_rom_r )
 {
 	if(glfgreat_roz_char_bank)
-		return memory_region(machine, "gfx3")[offset];
+		return memory_region(space->machine, "gfx3")[offset];
 	else
 	{
-		UINT8 *usr = memory_region(machine, "user1");
+		UINT8 *usr = memory_region(space->machine, "user1");
 		return 256 * usr[offset] + usr[offset + 0x020000];
 	}
 }

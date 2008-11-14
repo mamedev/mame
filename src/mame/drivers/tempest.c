@@ -303,8 +303,8 @@ static UINT8 tempest_player_select;
 
 static WRITE8_HANDLER( wdclr_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-	watchdog_reset(machine);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+	watchdog_reset(space->machine);
 }
 
 /*************************************
@@ -335,13 +335,13 @@ static CUSTOM_INPUT( clock_r )
 
 static READ8_HANDLER( input_port_1_bit_r )
 {
-	return (input_port_read(machine, "IN1/DSW0") & (1 << offset)) ? 0 : 228;
+	return (input_port_read(space->machine, "IN1/DSW0") & (1 << offset)) ? 0 : 228;
 }
 
 
 static READ8_HANDLER( input_port_2_bit_r )
 {
-	return (input_port_read(machine, "IN2") & (1 << offset)) ? 0 : 228;
+	return (input_port_read(space->machine, "IN2") & (1 << offset)) ? 0 : 228;
 }
 
 

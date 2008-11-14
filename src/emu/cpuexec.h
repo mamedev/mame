@@ -83,6 +83,9 @@ struct _cpu_config
 
 /* ----- core CPU execution ----- */
 
+/* temporary function to allocate a fake CPU device for each CPU */
+const device_config *cpuexec_create_cpu_device(const cpu_config *config);
+
 /* prepare CPUs for execution */
 void cpuexec_init(running_machine *machine);
 

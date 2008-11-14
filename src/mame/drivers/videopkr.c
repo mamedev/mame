@@ -471,9 +471,9 @@ static READ8_HANDLER( videopkr_io_r )
 	{
 		case 0xef:	/* inputs are multiplexed through a diode matrix */
 		{
-			hf = ((input_port_read(machine, "IN1") & 0x10 ) >> 4) & 1; 			/* Hopper full detection */
-			co = 0x10 * ((input_port_read(machine, "IN1") & 0x20 ) >> 5);		/* Coin Out detection */
-			kbdin = ((input_port_read(machine, "IN1") & 0xaf ) << 8) + input_port_read(machine, "IN0");
+			hf = ((input_port_read(space->machine, "IN1") & 0x10 ) >> 4) & 1; 			/* Hopper full detection */
+			co = 0x10 * ((input_port_read(space->machine, "IN1") & 0x20 ) >> 5);		/* Coin Out detection */
+			kbdin = ((input_port_read(space->machine, "IN1") & 0xaf ) << 8) + input_port_read(space->machine, "IN0");
 
 			switch (kbdin)
 			{
@@ -674,7 +674,7 @@ static READ8_HANDLER( videopkr_t0_latch )
 
 static WRITE8_HANDLER(p4_w)
 {
-	cputag_set_input_line(machine, "main", 0, CLEAR_LINE);	/* clear interrupt FF */
+	cputag_set_input_line(space->machine, "main", 0, CLEAR_LINE);	/* clear interrupt FF */
 }
 
 /*************************
@@ -815,7 +815,7 @@ static READ8_HANDLER(baby_sound_p2_r)
 static WRITE8_HANDLER(baby_sound_p2_w)
 {
 	sbp2 = data;
-	dac_0_data_w(machine, 0, data);
+	dac_0_data_w(space, 0, data);
 }
 
 static READ8_HANDLER(baby_sound_p3_r)
@@ -846,11 +846,11 @@ static WRITE8_HANDLER(baby_sound_p3_w)
 		case 0x00:	break;
 		case 0x01:	break;
 		case 0x02:	break;
-		case 0x03:	ay8910_write_port_0_w(machine, 1, sbp0); break;
+		case 0x03:	ay8910_write_port_0_w(space, 1, sbp0); break;
 		case 0x04:	break;
-		case 0x05:	sbp0 = ay8910_read_port_0_r(machine, sbp0); break;
+		case 0x05:	sbp0 = ay8910_read_port_0_r(space, sbp0); break;
 		case 0x06:	break;
-		case 0x07:	ay8910_control_port_0_w(machine, 0, sbp0); break;
+		case 0x07:	ay8910_control_port_0_w(space, 0, sbp0); break;
 	}
 }
 

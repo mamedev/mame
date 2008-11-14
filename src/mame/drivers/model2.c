@@ -278,7 +278,7 @@ static NVRAM_HANDLER( model2 )
 /* Timers - these count down at 25 MHz and pull IRQ2 when they hit 0 */
 static READ32_HANDLER( timers_r )
 {
-	i960_noburst(machine->activecpu);
+	i960_noburst(space->cpu);
 
 	// if timer is running, calculate current value
 	if (model2_timerrun[offset])
@@ -297,7 +297,7 @@ static WRITE32_HANDLER( timers_w )
 {
 	attotime period;
 
-	i960_noburst(machine->activecpu);
+	i960_noburst(space->cpu);
 	COMBINE_DATA(&model2_timervals[offset]);
 
 	model2_timerorig[offset] = model2_timervals[offset];
@@ -412,9 +412,9 @@ static WRITE32_HANDLER(pal32_w)
 {
 	COMBINE_DATA(paletteram32+offset);
 	if(ACCESSING_BITS_0_15)
-		chcolor(machine, offset*2, paletteram32[offset]);
+		chcolor(space->machine, offset*2, paletteram32[offset]);
 	if(ACCESSING_BITS_16_31)
-		chcolor(machine, offset*2+1, paletteram32[offset]>>16);
+		chcolor(space->machine, offset*2+1, paletteram32[offset]>>16);
 }
 
 static WRITE32_HANDLER(ctrl0_w)
@@ -429,7 +429,7 @@ static WRITE32_HANDLER(ctrl0_w)
 
 static READ32_HANDLER(ctrl0_r)
 {
-	UINT32 ret = input_port_read(machine, "IN0");
+	UINT32 ret = input_port_read(space->machine, "IN0");
 	ret <<= 16;
 	if(model2_ctrlmode==0)
 	{
@@ -443,25 +443,25 @@ static READ32_HANDLER(ctrl0_r)
 }
 static READ32_HANDLER(ctrl1_r)
 {
-	return input_port_read(machine, "IN1") | input_port_read(machine, "IN2")<<16;
+	return input_port_read(space->machine, "IN1") | input_port_read(space->machine, "IN2")<<16;
 }
 
 static READ32_HANDLER(ctrl10_r)
 {
-	return input_port_read(machine, "IN0") | input_port_read(machine, "IN1")<<16;
+	return input_port_read(space->machine, "IN0") | input_port_read(space->machine, "IN1")<<16;
 }
 
 static READ32_HANDLER(ctrl14_r)
 {
-	return input_port_read(machine, "IN2");
+	return input_port_read(space->machine, "IN2");
 }
 
 static READ32_HANDLER(analog_r)
 {
 	if (offset)
-		return input_port_read_safe(machine, "BRAKE", 0);
+		return input_port_read_safe(space->machine, "BRAKE", 0);
 
-	return input_port_read_safe(machine, "STEER", 0) | input_port_read_safe(machine, "ACCEL", 0)<<16;
+	return input_port_read_safe(space->machine, "STEER", 0) | input_port_read_safe(space->machine, "ACCEL", 0)<<16;
 }
 
 static READ32_HANDLER(analog_2b_r)
@@ -470,7 +470,7 @@ static READ32_HANDLER(analog_2b_r)
 	if(analog_channel<4)
 	{
 		static const char *const ports[] = { "ANA0", "ANA1", "ANA2", "ANA3" };
-		iptval=input_port_read_safe(machine, ports[analog_channel], 0);
+		iptval=input_port_read_safe(space->machine, ports[analog_channel], 0);
 		++analog_channel;
 	}
 	return (iptval<<16)|0x0000001a;
@@ -497,7 +497,7 @@ static READ32_HANDLER(fifoctl_r)
 
 static READ32_HANDLER(videoctl_r)
 {
-	return (video_screen_get_frame_number(machine->primary_screen) & 1)<<2;
+	return (video_screen_get_frame_number(space->machine->primary_screen) & 1)<<2;
 }
 
 
@@ -540,7 +540,7 @@ static WRITE32_HANDLER( copro_ctl1_w )
 			logerror("Boot copro, %d dwords\n", model2_coprocnt);
 			if (dsp_type != DSP_TYPE_TGPX4)
 			{
-				cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
 			}
 		}
 	}
@@ -570,7 +570,7 @@ static WRITE32_HANDLER(copro_fifo_w)
 	{
 		if (dsp_type == DSP_TYPE_SHARC)
 		{
-			cpu_push_context(machine->cpu[2]);
+			cpu_push_context(space->machine->cpu[2]);
 			sharc_external_dma_write(model2_coprocnt, data & 0xffff);
 			cpu_pop_context();
 		}
@@ -583,7 +583,7 @@ static WRITE32_HANDLER(copro_fifo_w)
 	}
 	else
 	{
-		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 		copro_fifoin_push(data);
 	}
 }
@@ -592,12 +592,12 @@ static int iop_write_num = 0;
 static UINT32 iop_data = 0;
 static WRITE32_HANDLER(copro_sharc_iop_w)
 {
-	if ((strcmp(machine->gamedrv->name, "schamp" ) == 0) ||
-		(strcmp(machine->gamedrv->name, "fvipers" ) == 0) ||
-		(strcmp(machine->gamedrv->name, "vstriker" ) == 0) ||
-		(strcmp(machine->gamedrv->name, "gunblade" ) == 0))
+	if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0) ||
+		(strcmp(space->machine->gamedrv->name, "fvipers" ) == 0) ||
+		(strcmp(space->machine->gamedrv->name, "vstriker" ) == 0) ||
+		(strcmp(space->machine->gamedrv->name, "gunblade" ) == 0))
 	{
-		cpu_push_context(machine->cpu[2]);
+		cpu_push_context(space->machine->cpu[2]);
 		sharc_external_iop_write(offset, data);
 		cpu_pop_context();
 	}
@@ -610,7 +610,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 		else
 		{
 			iop_data |= (data & 0xffff) << 16;
-			cpu_push_context(machine->cpu[2]);
+			cpu_push_context(space->machine->cpu[2]);
 			sharc_external_iop_write(offset, iop_data);
 			cpu_pop_context();
 		}
@@ -662,8 +662,8 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
         else
         {
             logerror("Boot geo, %d dwords\n", model2_geocnt);
-            cpu_set_input_line(machine->cpu[3], INPUT_LINE_HALT, CLEAR_LINE);
-            //cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
+            cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_HALT, CLEAR_LINE);
+            //cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(1000));       // Give the SHARC enough time to boot itself
         }
     }
 
@@ -672,7 +672,7 @@ static WRITE32_HANDLER( geo_sharc_ctl1_w )
 
 static READ32_HANDLER(geo_sharc_fifo_r)
 {
-    if ((strcmp(machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(machine->gamedrv->name, "srallyc" ) == 0))
+    if ((strcmp(space->machine->gamedrv->name, "manxtt" ) == 0) || (strcmp(space->machine->gamedrv->name, "srallyc" ) == 0))
     {
         return 8;
     }
@@ -687,7 +687,7 @@ static WRITE32_HANDLER(geo_sharc_fifo_w)
 {
     if (model2_geoctl & 0x80000000)
     {
-        cpu_push_context(machine->cpu[3]);
+        cpu_push_context(space->machine->cpu[3]);
         sharc_external_dma_write(model2_geocnt, data & 0xffff);
         cpu_pop_context();
 
@@ -695,7 +695,7 @@ static WRITE32_HANDLER(geo_sharc_fifo_w)
     }
     else
     {
-        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+        //mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
     }
 }
 
@@ -703,9 +703,9 @@ static int geo_iop_write_num = 0;
 static UINT32 geo_iop_data = 0;
 static WRITE32_HANDLER(geo_sharc_iop_w)
 {
-    if ((strcmp(machine->gamedrv->name, "schamp" ) == 0))
+    if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0))
     {
-        cpu_push_context(machine->cpu[3]);
+        cpu_push_context(space->machine->cpu[3]);
         sharc_external_iop_write(offset, data);
         cpu_pop_context();
     }
@@ -718,7 +718,7 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
         else
         {
             geo_iop_data |= (data & 0xffff) << 16;
-            cpu_push_context(machine->cpu[3]);
+            cpu_push_context(space->machine->cpu[3]);
             sharc_external_iop_write(offset, geo_iop_data);
             cpu_pop_context();
         }
@@ -767,7 +767,7 @@ static READ32_HANDLER( geo_r )
 	}
 
 //  fatalerror("geo_r: %08X, %08X\n", address, mem_mask);
-	mame_printf_debug("geo_r: PC:%08x - %08X\n", safe_cpu_get_pc(machine->activecpu), address);
+	mame_printf_debug("geo_r: PC:%08x - %08X\n", safe_cpu_get_pc(space->cpu), address);
 
 	return 0;
 }
@@ -874,7 +874,7 @@ static READ32_HANDLER(desert_unk_r)
 
 static READ32_HANDLER(model2_irq_r)
 {
-	i960_noburst(machine->activecpu);
+	i960_noburst(space->cpu);
 
 	if (offset)
 	{
@@ -886,7 +886,7 @@ static READ32_HANDLER(model2_irq_r)
 
 static WRITE32_HANDLER(model2_irq_w)
 {
-	i960_noburst(machine->activecpu);
+	i960_noburst(space->cpu);
 
 	if (offset)
 	{
@@ -941,7 +941,7 @@ static WRITE32_HANDLER( model2o_serial_w )
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		snd_latch_to_68k_w(machine, data&0xff);
+		snd_latch_to_68k_w(space, data&0xff);
 	}
 }
 
@@ -949,10 +949,10 @@ static WRITE32_HANDLER( model2_serial_w )
 {
 	if (ACCESSING_BITS_0_7 && (offset == 0))
 	{
-		scsp_midi_in(machine, 0, data&0xff, 0);
+		scsp_midi_in(space->machine, 0, data&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 	}
 }
 
@@ -1005,7 +1005,7 @@ static READ32_HANDLER( model2_prot_r )
 		else
 			return 0xfff0;
 	}
-	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, cpu_get_pc(machine->activecpu));
+	else logerror("Unhandled Protection READ @ %x mask %x (PC=%x)\n", offset, mem_mask, cpu_get_pc(space->cpu));
 
 	return retval;
 }
@@ -1075,7 +1075,7 @@ static WRITE32_HANDLER( model2_prot_w )
 			strcpy((char *)protram, "  TECMO LTD.  DEAD OR ALIVE  1996.10.22  VER. 1.00");
 		}
 	}
-	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(machine->activecpu));
+	else logerror("Unhandled Protection WRITE %x @ %x mask %x (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
 
 }
 
@@ -1085,7 +1085,7 @@ static int model2_maxxstate = 0;
 
 static READ32_HANDLER( maxx_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "main");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "main");
 
 	if (offset <= 0x1f/4)
 	{
@@ -1609,12 +1609,12 @@ static READ16_HANDLER( m1_snd_v60_ready_r )
 
 static READ16_HANDLER( m1_snd_mpcm0_r )
 {
-	return multi_pcm_reg_0_r(machine, 0);
+	return multi_pcm_reg_0_r(space, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_w )
 {
-	multi_pcm_reg_0_w(machine, offset, data);
+	multi_pcm_reg_0_w(space, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
@@ -1624,12 +1624,12 @@ static WRITE16_HANDLER( m1_snd_mpcm0_bnk_w )
 
 static READ16_HANDLER( m1_snd_mpcm1_r )
 {
-	return multi_pcm_reg_1_r(machine, 0);
+	return multi_pcm_reg_1_r(space, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_w )
 {
-	multi_pcm_reg_1_w(machine, offset, data);
+	multi_pcm_reg_1_w(space, offset, data);
 }
 
 static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
@@ -1639,7 +1639,7 @@ static WRITE16_HANDLER( m1_snd_mpcm1_bnk_w )
 
 static READ16_HANDLER( m1_snd_ym_r )
 {
-	return ym3438_status_port_0_a_r(machine, 0);
+	return ym3438_status_port_0_a_r(space, 0);
 }
 
 static WRITE16_HANDLER( m1_snd_ym_w )
@@ -1647,19 +1647,19 @@ static WRITE16_HANDLER( m1_snd_ym_w )
 	switch (offset)
 	{
 		case 0:
-			ym3438_control_port_0_a_w(machine, 0, data);
+			ym3438_control_port_0_a_w(space, 0, data);
 			break;
 
 		case 1:
-			ym3438_data_port_0_a_w(machine, 0, data);
+			ym3438_data_port_0_a_w(space, 0, data);
 			break;
 
 		case 2:
-			ym3438_control_port_0_b_w(machine, 0, data);
+			ym3438_control_port_0_b_w(space, 0, data);
 			break;
 
 		case 3:
-			ym3438_data_port_0_b_w(machine, 0, data);
+			ym3438_data_port_0_b_w(space, 0, data);
 			break;
 	}
 }
@@ -1691,9 +1691,9 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( model2snd_ctrl )
 {
 	// handle sample banking
-	if (memory_region_length(machine, "scsp") > 0x800000)
+	if (memory_region_length(space->machine, "scsp") > 0x800000)
 	{
-		UINT8 *snd = memory_region(machine, "scsp");
+		UINT8 *snd = memory_region(space->machine, "scsp");
 		if (data & 0x20)
 		{
 	  		memory_set_bankptr(4, snd + 0x200000);
@@ -1744,7 +1744,7 @@ static const scsp_interface scsp_config =
 static READ32_HANDLER(copro_sharc_input_fifo_r)
 {
 	UINT32 result;
-	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(machine->activecpu));
+	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(space->cpu));
 
 	copro_fifoin_pop(&result);
 	return result;
@@ -1763,7 +1763,7 @@ static READ32_HANDLER(copro_sharc_buffer_r)
 
 static WRITE32_HANDLER(copro_sharc_buffer_w)
 {
-	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(machine->activecpu), data, *(float*)&data);
+	//mame_printf_debug("sharc_buffer_w: %08X at %08X, %08X, %f\n", offset, cpu_get_pc(space->cpu), data, *(float*)&data);
 	model2_bufferram[offset & 0x7fff] = data;
 }
 

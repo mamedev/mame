@@ -249,7 +249,7 @@ static READ16_HANDLER( polepos2_ic25_r )
 		last_result = (INT8)last_signed * (UINT8)last_unsigned;
 	}
 
-//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(machine->activecpu), offset, result);
+//  logerror("%04X: read IC25 @ %04X = %02X\n", cpu_get_pc(space->cpu), offset, result);
 
 	return result | (result << 8);
 }
@@ -263,14 +263,14 @@ static int auto_start_mask;
 
 static READ8_HANDLER( polepos_adc_r )
 {
-	return input_port_read(machine, adc_input ? "ACCEL" : "BRAKE");
+	return input_port_read(space->machine, adc_input ? "ACCEL" : "BRAKE");
 }
 
 static READ8_HANDLER( polepos_ready_r )
 {
 	int ret = 0xff;
 
-	if (video_screen_get_vpos(machine->primary_screen) >= 128)
+	if (video_screen_get_vpos(space->machine->primary_screen) >= 128)
 		ret ^= 0x02;
 
 	ret ^= 0x08; /* ADC End Flag */
@@ -288,7 +288,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 		case 0x00:	/* IRQON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x01:	/* IOSEL */
@@ -299,8 +299,8 @@ static WRITE8_HANDLER( polepos_latch_w )
 			polepos_sound_enable(bit);
 			if (!bit)
 			{
-				polepos_engine_sound_lsb_w(machine,0,0);
-				polepos_engine_sound_msb_w(machine,0,0);
+				polepos_engine_sound_lsb_w(space,0,0);
+				polepos_engine_sound_msb_w(space,0,0);
 			}
 			break;
 
@@ -309,11 +309,11 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x04:	/* RESB */
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x05:	/* RESA */
-			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x06:	/* SB0 */
@@ -321,7 +321,7 @@ static WRITE8_HANDLER( polepos_latch_w )
 			break;
 
 		case 0x07:	/* CHACL */
-			polepos_chacl_w(machine,offset,data);
+			polepos_chacl_w(space,offset,data);
 			break;
 	}
 }
@@ -334,18 +334,18 @@ static WRITE16_HANDLER( polepos_z8002_nvi_enable_w )
 
 	cpu_interrupt_enable(which,data);
 	if (!data)
-		cpu_set_input_line(machine->cpu[which], 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[which], 0, CLEAR_LINE);
 }
 
 
-static READ8_HANDLER( in0_l )	{ return input_port_read(machine, "IN0") & auto_start_mask; }	// fire and start buttons
-static READ8_HANDLER( in0_h )	{ return input_port_read(machine, "IN0") >> 4; }				// coins
-static READ8_HANDLER( dipA_l )	{ return input_port_read(machine, "DSWA"); }					// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read(machine, "DSWA") >> 4; }				// dips A
-static READ8_HANDLER( dipB_l )	{ return input_port_read(machine, "DSWB"); }					// dips B
-static READ8_HANDLER( dipB_h )	{ return input_port_read(machine, "DSWB") >> 4; }				// dips B
-static READ8_HANDLER( in1_l )	{ return input_port_read(machine, "STEER"); }					// wheel
-static READ8_HANDLER( in1_h )	{ return input_port_read(machine, "STEER") >> 4; }				// wheel
+static READ8_HANDLER( in0_l )	{ return input_port_read(space->machine, "IN0") & auto_start_mask; }	// fire and start buttons
+static READ8_HANDLER( in0_h )	{ return input_port_read(space->machine, "IN0") >> 4; }				// coins
+static READ8_HANDLER( dipA_l )	{ return input_port_read(space->machine, "DSWA"); }					// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read(space->machine, "DSWA") >> 4; }				// dips A
+static READ8_HANDLER( dipB_l )	{ return input_port_read(space->machine, "DSWB"); }					// dips B
+static READ8_HANDLER( dipB_h )	{ return input_port_read(space->machine, "DSWB") >> 4; }				// dips B
+static READ8_HANDLER( in1_l )	{ return input_port_read(space->machine, "STEER"); }					// wheel
+static READ8_HANDLER( in1_h )	{ return input_port_read(space->machine, "STEER") >> 4; }				// wheel
 static WRITE8_HANDLER( out_0 )
 {
 // no start lamps in pole position

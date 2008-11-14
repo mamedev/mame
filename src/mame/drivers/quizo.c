@@ -108,11 +108,11 @@ static WRITE8_HANDLER(port60_w)
 {
 	if(data>9)
 	{
-		logerror("ROMBANK %x @ %x\n", data, cpu_get_pc(machine->activecpu));
+		logerror("ROMBANK %x @ %x\n", data, cpu_get_pc(space->cpu));
 		data=0;
 	}
 	port60=data;
-	memory_set_bankptr( 1, &memory_region(machine, "user1")[rombankLookup[data]*0x4000] );
+	memory_set_bankptr( 1, &memory_region(space->machine, "user1")[rombankLookup[data]*0x4000] );
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )

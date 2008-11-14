@@ -175,7 +175,7 @@ static READ8_HANDLER( analog_port_r )
 	static const char *const portnames[] = { "TRACK0_Y", "TRACK0_X", "TRACK1_Y", "TRACK1_X" };
 
 	/* first read the new trackball value and compute the signed delta */
-	newval = input_port_read(machine, portnames[offset + 2 * gridlee_cocktail_flip]);
+	newval = input_port_read(space->machine, portnames[offset + 2 * gridlee_cocktail_flip]);
 	delta = (int)newval - (int)last_analog_input[offset];
 
 	/* handle the case where we wrap around from 0x00 to 0xff, or vice versa */
@@ -254,7 +254,7 @@ static READ8_HANDLER( random_num_r )
 	UINT32 cc;
 
 	/* CPU runs at 1.25MHz, noise source at 100kHz --> multiply by 12.5 */
-	cc = cpu_get_total_cycles(machine->activecpu);
+	cc = cpu_get_total_cycles(space->cpu);
 
 	/* 12.5 = 8 + 4 + 0.5 */
 	cc = (cc << 3) + (cc << 2) + (cc >> 1);

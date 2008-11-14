@@ -65,12 +65,14 @@ static TIMER_CALLBACK( interrupt_callback )
 
 static MACHINE_RESET( videopin )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, interrupt_callback);
 
 	/* both output latches are cleared on reset */
 
-	videopin_out1_w(machine, 0, 0);
-	videopin_out2_w(machine, 0, 0);
+	videopin_out1_w(space, 0, 0);
+	videopin_out2_w(space, 0, 0);
 }
 
 
@@ -93,7 +95,7 @@ static READ8_HANDLER( videopin_misc_r )
 	// signals received. This results in the MPU displaying the
 	// ball being shot onto the playfield at a certain speed.
 
-	UINT8 val = input_port_read(machine, "IN1");
+	UINT8 val = input_port_read(space->machine, "IN1");
 
 	if (plunger >= 0.000 && plunger <= 0.001)
 	{
@@ -110,7 +112,7 @@ static READ8_HANDLER( videopin_misc_r )
 
 static WRITE8_HANDLER( videopin_led_w )
 {
-	int i = (video_screen_get_vpos(machine->primary_screen) >> 5) & 7;
+	int i = (video_screen_get_vpos(space->machine->primary_screen) >> 5) & 7;
 	static const char *const matrix[8][4] =
 	{
 		{ "LED26", "LED18", "LED11", "LED13" },
@@ -131,7 +133,7 @@ static WRITE8_HANDLER( videopin_led_w )
 	if (i == 7)
 		set_led_status(0, data & 8);   /* start button */
 
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -149,12 +151,12 @@ static WRITE8_HANDLER( videopin_out1_w )
 	mask = ~data & 0x10;
 
 	if (mask)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 
 	coin_lockout_global_w(~data & 0x08);
 
 	/* Convert octave data to divide value and write to sound */
-	discrete_sound_w(machine, VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
+	discrete_sound_w(space, VIDEOPIN_OCTAVE_DATA, (0x01 << (~data & 0x07)) & 0xfe);
 }
 
 
@@ -171,17 +173,17 @@ static WRITE8_HANDLER( videopin_out2_w )
 
 	coin_counter_w(0, data & 0x10);
 
-	discrete_sound_w(machine, VIDEOPIN_BELL_EN, data & 0x40);	// Bell
-	discrete_sound_w(machine, VIDEOPIN_BONG_EN, data & 0x20);	// Bong
-	discrete_sound_w(machine, VIDEOPIN_ATTRACT_EN, data & 0x80);	// Attract
-	discrete_sound_w(machine, VIDEOPIN_VOL_DATA, data & 0x07);		// Vol0,1,2
+	discrete_sound_w(space, VIDEOPIN_BELL_EN, data & 0x40);	// Bell
+	discrete_sound_w(space, VIDEOPIN_BONG_EN, data & 0x20);	// Bong
+	discrete_sound_w(space, VIDEOPIN_ATTRACT_EN, data & 0x80);	// Attract
+	discrete_sound_w(space, VIDEOPIN_VOL_DATA, data & 0x07);		// Vol0,1,2
 }
 
 
 static WRITE8_HANDLER( videopin_note_dvsr_w )
 {
 	/* note data */
-	discrete_sound_w(machine, VIDEOPIN_NOTE_DATA, ~data &0xff);
+	discrete_sound_w(space, VIDEOPIN_NOTE_DATA, ~data &0xff);
 }
 
 

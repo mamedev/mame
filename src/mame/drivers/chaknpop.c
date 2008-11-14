@@ -18,17 +18,17 @@
 
 static WRITE8_HANDLER ( unknown_port_1_w )
 {
-	//logerror("%04x: write to unknow port 1: 0x%02x\n", cpu_get_pc(machine->activecpu), data);
+	//logerror("%04x: write to unknow port 1: 0x%02x\n", cpu_get_pc(space->cpu), data);
 }
 
 static WRITE8_HANDLER ( unknown_port_2_w )
 {
-	//logerror("%04x: write to unknow port 2: 0x%02x\n", cpu_get_pc(machine->activecpu), data);
+	//logerror("%04x: write to unknow port 2: 0x%02x\n", cpu_get_pc(space->cpu), data);
 }
 
 static WRITE8_HANDLER ( coinlock_w )
 {
-	logerror("%04x: coin lock %sable\n", cpu_get_pc(machine->activecpu), data ? "dis" : "en");
+	logerror("%04x: coin lock %sable\n", cpu_get_pc(space->cpu), data ? "dis" : "en");
 }
 
 

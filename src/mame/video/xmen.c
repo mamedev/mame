@@ -162,6 +162,7 @@ VIDEO_UPDATE( xmen6p )
 /* my lefts and rights are mixed up in several places.. */
 VIDEO_EOF( xmen6p )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int layer[3];
 	bitmap_t * renderbitmap;
 	rectangle cliprect;
@@ -196,7 +197,7 @@ VIDEO_EOF( xmen6p )
 		for (offset=0;offset<(0xc000/2);offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(machine,offset,xmen6p_tilemapright[offset]&0x00ff);
+			K052109_w(space,offset,xmen6p_tilemapright[offset]&0x00ff);
 		}
 
 
@@ -215,7 +216,7 @@ VIDEO_EOF( xmen6p )
 		for (offset=0;offset<(0xc000/2);offset++)
 		{
 //          K052109_lsb_w
-			K052109_w(machine,offset,xmen6p_tilemapleft[offset]&0x00ff);
+			K052109_w(space,offset,xmen6p_tilemapleft[offset]&0x00ff);
 		}
 
 

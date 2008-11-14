@@ -340,15 +340,15 @@ WRITE8_HANDLER( combasc_vreg_w )
 
 static WRITE8_HANDLER( combascb_sh_irqtrigger_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static READ8_HANDLER( combascb_io_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "DSW1", "DSW2" };
 
-	return input_port_read(machine, portnames[offset]);
+	return input_port_read(space->machine, portnames[offset]);
 }
 
 static WRITE8_HANDLER( combascb_priority_w )
@@ -358,7 +358,7 @@ static WRITE8_HANDLER( combascb_priority_w )
 
 WRITE8_HANDLER( combasc_bankselect_w )
 {
-	UINT8 *page = memory_region(machine, "main") + 0x10000;
+	UINT8 *page = memory_region(space->machine, "main") + 0x10000;
 
 	if (data & 0x40)
 	{
@@ -401,7 +401,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 	data = data & 0x1f;
 	if( data != combasc_bank_select )
 	{
-		UINT8 *page = memory_region(machine, "main") + 0x10000;
+		UINT8 *page = memory_region(space->machine, "main") + 0x10000;
 		combasc_bank_select = data;
 
 		if (data & 0x10)
@@ -416,14 +416,14 @@ WRITE8_HANDLER( combascb_bankselect_w )
 		if (data == 0x1f)
 		{
 			memory_set_bankptr(1,page + 0x20000 + 0x4000 * (data & 1));
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4400, 0x4403, 0, 0, combascb_io_r);/* IO RAM & Video Registers */
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4400, 0x4400, 0, 0, combascb_priority_w);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4800, 0, 0, combascb_sh_irqtrigger_w);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4c00, 0x4c00, 0, 0, combasc_vreg_w);
+			memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4400, 0x4403, 0, 0, combascb_io_r);/* IO RAM & Video Registers */
+			memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4400, 0x4400, 0, 0, combascb_priority_w);
+			memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4800, 0, 0, combascb_sh_irqtrigger_w);
+			memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4c00, 0x4c00, 0, 0, combasc_vreg_w);
 		}
 		else
 		{
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);	/* banked ROM */
+			memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_UNMAP);	/* banked ROM */
 		}
 	}
 }

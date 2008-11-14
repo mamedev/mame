@@ -2481,7 +2481,7 @@ WRITE32_HANDLER(namcos22_port800000_w)
 {
    /* 00000011011111110000100011111111001001111110111110110001 */
    UINT16 word = data>>16;
-   logerror( "%x: C304/C399: 0x%04x\n", cpu_get_previouspc(machine->activecpu), word );
+   logerror( "%x: C304/C399: 0x%04x\n", cpu_get_previouspc(space->cpu), word );
    if( word == 0x4038 )
    {
       mbSpotlightEnable = 1;

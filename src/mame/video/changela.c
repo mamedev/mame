@@ -776,7 +776,7 @@ WRITE8_HANDLER( changela_colors_w )
 	g = color_table[(c >> 3) & 0x07];
 	b = color_table[(c >> 6) & 0x07];
 
-	palette_set_color_rgb(machine,color_index,r,g,b);
+	palette_set_color_rgb(space->machine,color_index,r,g,b);
 }
 
 
@@ -789,11 +789,11 @@ WRITE8_HANDLER( changela_mem_device_select_w )
 	/*
     (data & 0x07) possible settings:
     0 - not connected (no device)
-    1 - ADR1 is 2114 RAM at U59 (state machine) (accessible range: 0x0000-0x003f)
+    1 - ADR1 is 2114 RAM at U59 (state space->machine) (accessible range: 0x0000-0x003f)
     2 - ADR2 is 2128 RAM at U109 (River RAM)    (accessible range: 0x0000-0x07ff)
     3 - ADR3 is 2128 RAM at U114 (Tree RAM)    (accessible range: 0x0000-0x07ff)
     4 - ADR4 is 2732 ROM at U7    (Tree ROM)    (accessible range: 0x0000-0x07ff)
-    5 - SLOPE is ROM at U44 (state machine)     (accessible range: 0x0000-0x07ff)
+    5 - SLOPE is ROM at U44 (state space->machine)     (accessible range: 0x0000-0x07ff)
     */
 }
 

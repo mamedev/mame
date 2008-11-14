@@ -111,7 +111,7 @@ READ16_HANDLER( segaic16_open_bus_r )
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = program_read_word_16be(cpu_get_pc(machine->activecpu));
+	result = program_read_word_16be(cpu_get_pc(space->cpu));
 	recurse = 0;
 	return result;
 }
@@ -401,20 +401,20 @@ READ8_HANDLER( segaic16_memory_mapper_r )
 
 WRITE8_HANDLER( segaic16_memory_mapper_w )
 {
-	memory_mapper_w(machine, &memory_mapper, offset, data);
+	memory_mapper_w(space, &memory_mapper, offset, data);
 }
 
 
 READ16_HANDLER( segaic16_memory_mapper_lsb_r )
 {
-	return memory_mapper_r(&memory_mapper, offset, segaic16_open_bus_r(machine,0,0xffff));
+	return memory_mapper_r(&memory_mapper, offset, segaic16_open_bus_r(space,0,0xffff));
 }
 
 
 WRITE16_HANDLER( segaic16_memory_mapper_lsb_w )
 {
 	if (ACCESSING_BITS_0_7)
-		memory_mapper_w(machine, &memory_mapper, offset, data & 0xff);
+		memory_mapper_w(space, &memory_mapper, offset, data & 0xff);
 }
 
 
@@ -570,9 +570,9 @@ static void divide_w(running_machine *machine, int which, offs_t offset, UINT16 
 READ16_HANDLER( segaic16_divide_0_r )  { return divide_r(0, offset, mem_mask); }
 READ16_HANDLER( segaic16_divide_1_r )  { return divide_r(1, offset, mem_mask); }
 READ16_HANDLER( segaic16_divide_2_r )  { return divide_r(2, offset, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_0_w ) { divide_w(machine, 0, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_1_w ) { divide_w(machine, 1, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(machine, 2, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_divide_0_w ) { divide_w(space, 0, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_divide_1_w ) { divide_w(space, 1, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_divide_2_w ) { divide_w(space, 2, offset, data, mem_mask); }
 
 
 
@@ -693,7 +693,7 @@ static void compare_timer_w(running_machine *machine, int which, offs_t offset, 
 }
 
 
-READ16_HANDLER( segaic16_compare_timer_0_r )  { return compare_timer_r(machine, 0, offset, mem_mask); }
-READ16_HANDLER( segaic16_compare_timer_1_r )  { return compare_timer_r(machine, 1, offset, mem_mask); }
-WRITE16_HANDLER( segaic16_compare_timer_0_w ) { compare_timer_w(machine, 0, offset, data, mem_mask); }
-WRITE16_HANDLER( segaic16_compare_timer_1_w ) { compare_timer_w(machine, 1, offset, data, mem_mask); }
+READ16_HANDLER( segaic16_compare_timer_0_r )  { return compare_timer_r(space, 0, offset, mem_mask); }
+READ16_HANDLER( segaic16_compare_timer_1_r )  { return compare_timer_r(space, 1, offset, mem_mask); }
+WRITE16_HANDLER( segaic16_compare_timer_0_w ) { compare_timer_w(space, 0, offset, data, mem_mask); }
+WRITE16_HANDLER( segaic16_compare_timer_1_w ) { compare_timer_w(space, 1, offset, data, mem_mask); }

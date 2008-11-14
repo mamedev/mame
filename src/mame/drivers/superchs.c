@@ -87,8 +87,8 @@ static WRITE32_HANDLER( cpua_ctrl_w )
 
 	if (ACCESSING_BITS_8_15)
 	{
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
-		if (data&0x8000) cpu_set_input_line(machine->cpu[0],3,HOLD_LINE); /* Guess */
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data &0x200) ? CLEAR_LINE : ASSERT_LINE);
+		if (data&0x8000) cpu_set_input_line(space->machine->cpu[0],3,HOLD_LINE); /* Guess */
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -107,7 +107,7 @@ static WRITE32_HANDLER( superchs_palette_w )
 	g = (a &0xff00) >> 8;
 	b = (a &0xff);
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( superchs_input_r )
@@ -115,7 +115,7 @@ static READ32_HANDLER( superchs_input_r )
 	switch (offset)
 	{
 		case 0x00:
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 
 		case 0x01:
 			return coin_word<<16;
@@ -143,7 +143,7 @@ static WRITE32_HANDLER( superchs_input_w )
 		{
 			if (ACCESSING_BITS_24_31)	/* $300000 is watchdog */
 			{
-				watchdog_reset(machine);
+				watchdog_reset(space->machine);
 			}
 
 			if (ACCESSING_BITS_0_7)
@@ -175,12 +175,12 @@ static WRITE32_HANDLER( superchs_input_w )
 
 static READ32_HANDLER( superchs_stick_r )
 {
-	int fake = input_port_read(machine, "FAKE");
+	int fake = input_port_read(space->machine, "FAKE");
 	int accel;
 
 	if (!(fake &0x10))	/* Analogue steer (the real control method) */
 	{
-		steer = input_port_read(machine, "WHEEL");
+		steer = input_port_read(space->machine, "WHEEL");
 	}
 	else	/* Digital steer, with smoothing - speed depends on how often stick_r is called */
 	{
@@ -205,13 +205,13 @@ static READ32_HANDLER( superchs_stick_r )
 	}
 
 	/* Accelerator is an analogue input but the game treats it as digital (on/off) */
-	if (input_port_read(machine,  "FAKE") & 0x1)	/* pressing B1 */
+	if (input_port_read(space->machine,  "FAKE") & 0x1)	/* pressing B1 */
 		accel = 0x0;
 	else
 		accel = 0xff;
 
 	/* Todo: Verify brake - and figure out other input */
-	return (steer << 24) | (accel << 16) | (input_port_read(machine, "SOUND") << 8) | input_port_read(machine, "UNKNOWN");
+	return (steer << 24) | (accel << 16) | (input_port_read(space->machine, "SOUND") << 8) | input_port_read(space->machine, "UNKNOWN");
 }
 
 static WRITE32_HANDLER( superchs_stick_w )
@@ -220,7 +220,7 @@ static WRITE32_HANDLER( superchs_stick_w )
         different byte in this long word before the RTE.  I assume all but the last
         (top) byte cause an IRQ with the final one being an ACK.  (Total guess but it works). */
 	if (mem_mask!=0xff000000)
-		cpu_set_input_line(machine->cpu[0],3,HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[0],3,HOLD_LINE);
 }
 
 /***********************************************************
@@ -484,16 +484,16 @@ ROM_END
 
 static READ32_HANDLER( main_cycle_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x702)
-		cpu_spinuntil_int(machine->activecpu);
+	if (cpu_get_pc(space->cpu)==0x702)
+		cpu_spinuntil_int(space->cpu);
 
 	return superchs_ram[0];
 }
 
 static READ16_HANDLER( sub_cycle_r )
 {
-	if (cpu_get_pc(machine->activecpu)==0x454)
-		cpu_spinuntil_int(machine->activecpu);
+	if (cpu_get_pc(space->cpu)==0x454)
+		cpu_spinuntil_int(space->cpu);
 
 	return superchs_ram[2]&0xffff;
 }

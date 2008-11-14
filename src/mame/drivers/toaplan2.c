@@ -515,7 +515,7 @@ static DRIVER_INIT( bbakradu )
 
 static READ16_HANDLER( toaplan2_inputport_0_word_r )
 {
-	return ((video_screen_get_vpos(machine->primary_screen) + 15) % 262) >= 245;
+	return ((video_screen_get_vpos(space->machine->primary_screen) + 15) % 262) >= 245;
 }
 
 
@@ -542,8 +542,8 @@ static READ16_HANDLER( video_count_r )
 	/* +---------+---------+--------+---------------------------+ */
 	/*************** Control Signals are active low ***************/
 
-	int hpos = video_screen_get_hpos(machine->primary_screen);
-	int vpos = video_screen_get_vpos(machine->primary_screen);
+	int hpos = video_screen_get_hpos(space->machine->primary_screen);
+	int vpos = video_screen_get_vpos(space->machine->primary_screen);
 	video_status = 0xff00;						/* Set signals inactive */
 
 	vpos = (vpos + 15) % 262;
@@ -559,7 +559,7 @@ static READ16_HANDLER( video_count_r )
 	else
 		video_status |= 0xff;
 
-//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,video_screen_get_vblank(machine->primary_screen));
+//  logerror("VC: vpos=%04x hpos=%04x VBL=%04x\n",vpos,hpos,video_screen_get_vblank(space->machine->primary_screen));
 
 	return video_status;
 }
@@ -591,7 +591,7 @@ static WRITE16_HANDLER( toaplan2_coin_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_coin_w(machine, offset, data & 0xff);
+		toaplan2_coin_w(space, offset, data & 0xff);
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
 	{
@@ -605,12 +605,12 @@ static WRITE16_HANDLER( toaplan2_v25_coin_word_w )
 
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_coin_w(machine, offset, data & 0x0f);
+		toaplan2_coin_w(space, offset, data & 0x0f);
 
 		#if USE_V25
 		/* only the ram-based V25 based games access the following bits */
-		//cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+		//cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x0020) ? CLEAR_LINE : ASSERT_LINE );
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 		#endif
 
 	}
@@ -625,7 +625,7 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_coin_w(machine, offset, data & 0xff);
+		toaplan2_coin_w(space, offset, data & 0xff);
 		okim6295_set_bank_base(0, (((data & 0x10) >> 4) * 0x40000));
 	}
 	if (ACCESSING_BITS_8_15 && (data & 0xff00) )
@@ -661,7 +661,7 @@ static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 		else										/* Teki Paki */
 		{
 			mcu_data = data & 0xff;
-			logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n",cpu_get_previouspc(machine->activecpu),mcu_data);
+			logerror("PC:%08x Writing command (%04x) to secondary CPU shared port\n",cpu_get_previouspc(space->cpu),mcu_data);
 		}
 	}
 }
@@ -698,7 +698,7 @@ static READ16_HANDLER( ghox_p1_h_analog_r )
 {
 	INT8 value, new_value;
 
-	new_value = input_port_read(machine, "PAD1");
+	new_value = input_port_read(space->machine, "PAD1");
 	if (new_value == old_p1_paddle_h) return 0;
 	value = new_value - old_p1_paddle_h;
 	old_p1_paddle_h = new_value;
@@ -709,7 +709,7 @@ static READ16_HANDLER( ghox_p2_h_analog_r )
 {
 	INT8 value, new_value;
 
-	new_value = input_port_read(machine, "PAD2");
+	new_value = input_port_read(space->machine, "PAD2");
 	if (new_value == old_p2_paddle_h) return 0;
 	value = new_value - old_p2_paddle_h;
 	old_p2_paddle_h = new_value;
@@ -734,7 +734,7 @@ static WRITE16_HANDLER( ghox_mcu_w )
 		}
 		else
 		{
-			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n",cpu_get_previouspc(machine->activecpu),mcu_data);
+			logerror("PC:%08x Writing %08x to HD647180 cpu shared ram status port\n",cpu_get_previouspc(space->cpu),mcu_data);
 		}
 		toaplan2_shared_ram16[0x56 / 2] = 0x004e;	/* Return a RTS instruction */
 		toaplan2_shared_ram16[0x58 / 2] = 0x0075;
@@ -811,7 +811,7 @@ static WRITE16_HANDLER( shared_ram_w )
 			case 0xcf8:
 			case 0xff8: toaplan2_shared_ram16[offset + 1] = data; /* Dogyuun */
 						toaplan2_shared_ram16[offset + 2] = data; /* FixEight */
-						logerror("PC:%08x Writing (%04x) to shared RAM at %04x\n",cpu_get_previouspc(machine->activecpu),data,(offset*2));
+						logerror("PC:%08x Writing (%04x) to shared RAM at %04x\n",cpu_get_previouspc(space->cpu),data,(offset*2));
 						if (data == 0x81) data = 0x0001;
 						break;
 			default:	break;
@@ -834,7 +834,7 @@ static READ16_HANDLER( toaplan2_snd_cpu_r )
 		mcu_data = 0xffff;
 	}
 
-	logerror("PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",cpu_get_previouspc(machine->activecpu),response);
+	logerror("PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),response);
 	return response;
 }
 
@@ -843,9 +843,9 @@ static WRITE16_HANDLER( dogyuun_snd_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_data = data;
-		dogyuun_okisnd_w(machine, data);
+		dogyuun_okisnd_w(space, data);
 	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(machine->activecpu),mcu_data);
+	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),mcu_data);
 }
 
 static READ16_HANDLER( kbash_snd_cpu_r )
@@ -862,9 +862,9 @@ static WRITE16_HANDLER( kbash_snd_cpu_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		kbash_okisnd_w(machine, data);
+		kbash_okisnd_w(space, data);
 	}
-	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",cpu_get_previouspc(machine->activecpu),data);
+	logerror("PC:%06x Writing Sound command (%04x) to the NEC V25+ secondary CPU\n",cpu_get_previouspc(space->cpu),data);
 }
 
 static READ16_HANDLER( fixeight_sec_cpu_r )
@@ -888,7 +888,7 @@ static READ16_HANDLER( fixeight_sec_cpu_r )
 	{
 		response = mcu_data;	/* Return the shared RAM data during POST */
 	}
-	logerror("PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",cpu_get_previouspc(machine->activecpu),response);
+	logerror("PC:%06x reading status %08x from the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),response);
 	return response;
 }
 
@@ -899,7 +899,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 		if (mcu_data & 0xff00)
 		{
 			mcu_data = (mcu_data & 0xff00) | (data & 0xff);
-			fixeight_okisnd_w(machine, data);
+			fixeight_okisnd_w(space, data);
 		}
 		else if (mcu_data == 0xff00)
 		{
@@ -913,11 +913,11 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* game keeping service mode. It writes/reads the settings to/from */
 			/* these shared RAM locations. The secondary CPU reads/writes them */
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2);
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2);
 			memory_set_bankptr(2, fixeight_sec_cpu_mem);
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f004, 0x28f005, 0, 0, input_port_read_handler16(machine->portconfig, "DSWA"), SMH_NOP);	/* Dip Switch A - Wrong !!! */
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f006, 0x28f007, 0, 0, input_port_read_handler16(machine->portconfig, "DSWB"), SMH_NOP);	/* Dip Switch B - Wrong !!! */
-			memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f008, 0x28f009, 0, 0, input_port_read_handler16(machine->portconfig, "JMPR"), SMH_NOP);	/* Territory Jumper block - Wrong !!! */
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f004, 0x28f005, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWA"), SMH_NOP);	/* Dip Switch A - Wrong !!! */
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f006, 0x28f007, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWB"), SMH_NOP);	/* Dip Switch B - Wrong !!! */
+			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f008, 0x28f009, 0, 0, input_port_read_handler16(space->machine->portconfig, "JMPR"), SMH_NOP);	/* Territory Jumper block - Wrong !!! */
 
 			mcu_data = data;
 		}
@@ -926,7 +926,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			mcu_data = data;
 		}
 	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(machine->activecpu),mcu_data);
+	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),mcu_data);
 }
 
 static WRITE16_HANDLER( vfive_snd_cpu_w )
@@ -935,7 +935,7 @@ static WRITE16_HANDLER( vfive_snd_cpu_w )
 	{
 		mcu_data = data;
 	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(machine->activecpu),mcu_data);
+	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port\n",cpu_get_previouspc(space->cpu),mcu_data);
 }
 
 static WRITE16_HANDLER( batsugun_snd_cpu_w )
@@ -943,9 +943,9 @@ static WRITE16_HANDLER( batsugun_snd_cpu_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		mcu_data = data;
-		batsugun_okisnd_w(machine, data);
+		batsugun_okisnd_w(space, data);
 	}
-	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port %02x\n",cpu_get_previouspc(machine->activecpu),mcu_data,(offset*2));
+	logerror("PC:%06x Writing command (%04x) to the NEC V25+ secondary CPU port %02x\n",cpu_get_previouspc(space->cpu),mcu_data,(offset*2));
 }
 
 static READ16_HANDLER( V25_sharedram_r )
@@ -976,7 +976,7 @@ static WRITE16_HANDLER( fixeighb_oki_bankswitch_w )
 		data &= 7;
 		if (data <= 4)
 		{
-			UINT8 *fixeighb_oki = memory_region(machine, "oki");
+			UINT8 *fixeighb_oki = memory_region(space->machine, "oki");
 			memcpy(&fixeighb_oki[0x30000], &fixeighb_oki[(data * 0x10000) + 0x40000], 0x10000);
 		}
 	}
@@ -1007,8 +1007,8 @@ static WRITE16_HANDLER( bgaregga_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine, offset, data & 0xff);
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -1049,26 +1049,26 @@ static WRITE8_HANDLER( bgaregga_bankswitch_w )
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_0 )
 {
-	NMK112_okibank_w(machine, 0,  data		& 0x0f);	// chip 0 bank 0
-	NMK112_okibank_w(machine, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
+	NMK112_okibank_w(space, 0,  data		& 0x0f);	// chip 0 bank 0
+	NMK112_okibank_w(space, 1, (data >> 4)	& 0x0f);	// chip 0 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_1 )
 {
-	NMK112_okibank_w(machine, 2,  data		& 0x0f);	// chip 0 bank 2
-	NMK112_okibank_w(machine, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
+	NMK112_okibank_w(space, 2,  data		& 0x0f);	// chip 0 bank 2
+	NMK112_okibank_w(space, 3, (data >> 4)	& 0x0f);	// chip 0 bank 3
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_2 )
 {
-	NMK112_okibank_w(machine, 4,  data		& 0x0f);	// chip 1 bank 0
-	NMK112_okibank_w(machine, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
+	NMK112_okibank_w(space, 4,  data		& 0x0f);	// chip 1 bank 0
+	NMK112_okibank_w(space, 5, (data >> 4)	& 0x0f);	// chip 1 bank 1
 }
 
 static WRITE8_HANDLER( raizing_okim6295_bankselect_3 )
 {
-	NMK112_okibank_w(machine, 6,  data		& 0x0f);	// chip 1 bank 2
-	NMK112_okibank_w(machine, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
+	NMK112_okibank_w(space, 6,  data		& 0x0f);	// chip 1 bank 2
+	NMK112_okibank_w(space, 7, (data >> 4)	& 0x0f);	// chip 1 bank 3
 }
 
 
@@ -1108,7 +1108,7 @@ static WRITE16_HANDLER( batrider_z80_busreq_w )
 
 static READ16_HANDLER( raizing_z80rom_r )
 {
-	UINT8 *Z80_ROM_test = (UINT8 *)memory_region(machine, "audio");
+	UINT8 *Z80_ROM_test = (UINT8 *)memory_region(space->machine, "audio");
 
 	if (offset < 0x8000)
 		return Z80_ROM_test[offset] & 0xff;
@@ -1122,8 +1122,8 @@ static WRITE16_HANDLER( batrider_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine, offset, data & 0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+		soundlatch_w(space, offset, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1132,8 +1132,8 @@ static WRITE16_HANDLER( batrider_soundlatch2_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch2_w(machine, offset, data & 0xff);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
+		soundlatch2_w(space, offset, data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, ASSERT_LINE);
 	}
 }
 
@@ -1149,20 +1149,20 @@ static WRITE16_HANDLER( raizing_clear_sndirq_w )
 {
 	// not sure whether this is correct
 	// the 68K writes here during the sound IRQ handler, and nowhere else...
-	cpu_set_input_line(machine->cpu[0], raizing_sndirq_line, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], raizing_sndirq_line, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_sndirq_w )
 {
 	// if raizing_clear_sndirq_w() is correct, should this be ASSERT_LINE?
-	cpu_set_input_line(machine->cpu[0], raizing_sndirq_line, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0], raizing_sndirq_line, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( raizing_clear_nmi_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
@@ -1262,7 +1262,7 @@ static READ16_HANDLER( bbakraid_nvram_r )
 static WRITE16_HANDLER( bbakraid_nvram_w )
 {
 	if (data & ~0x001f)
-		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(machine->activecpu),data);
+		logerror("CPU #0 PC:%06X - Unknown EEPROM data being written %04X\n",cpu_get_pc(space->cpu),data);
 
 	if ( ACCESSING_BITS_0_7 )
 	{
@@ -1488,7 +1488,7 @@ ADDRESS_MAP_END
 WRITE16_HANDLER( fixeight_subcpu_ctrl )
 {
 	/* 0x18 used */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT,  (data & 0x0010) ? CLEAR_LINE : ASSERT_LINE);
 }
 #endif
 

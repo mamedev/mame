@@ -32,18 +32,18 @@ remove all the code writing the $a0000 area.)
 
 WRITE16_HANDLER( toki_control_w )
 {
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) - 1);
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) - 1);
 	COMBINE_DATA(&toki_scrollram16[offset]);
 }
 
 VIDEO_EOF( toki )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	buffer_spriteram16_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0,0xffff);
 }
 
 VIDEO_EOF( tokib )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	buffer_spriteram16_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0,0xffff);
 }
 
 static TILE_GET_INFO( get_text_tile_info )

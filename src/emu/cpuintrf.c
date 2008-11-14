@@ -1110,6 +1110,22 @@ int cpunum_get_active(void)
 }
 
 
+/*-------------------------------------------------
+    cpu_get_index_slow - find a CPU in the machine
+    by searching
+-------------------------------------------------*/
+
+int cpu_get_index_slow(const device_config *cpu)
+{
+	int cpunum;
+	
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(Machine->cpu); cpunum++)
+		if (Machine->cpu[cpunum] == cpu)
+			return cpunum;
+	return -1;
+}
+
+
 
 /***************************************************************************
     LIVE CPU ACCESSORS
@@ -1123,8 +1139,11 @@ void cpu_init(const device_config *device, int index, int clock, cpu_irq_callbac
 {
 	cpu_class_header *classheader = get_safe_classheader(device);
 	
-	cpu_push_context(device);
 	classheader->index = index;
+	cpu_push_context(device);
+	classheader->space[ADDRESS_SPACE_PROGRAM] = active_address_space[ADDRESS_SPACE_PROGRAM];
+	classheader->space[ADDRESS_SPACE_DATA] = active_address_space[ADDRESS_SPACE_DATA];
+	classheader->space[ADDRESS_SPACE_IO] = active_address_space[ADDRESS_SPACE_IO];
 	(*classheader->init)(device, index, clock, irqcallback);
 	(*classheader->get_context)(device->token);
 	cpu_pop_context();

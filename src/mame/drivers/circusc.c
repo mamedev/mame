@@ -89,21 +89,21 @@ static READ8_HANDLER( circusc_sh_timer_r )
      * to D1-D4.
      *
      * The following:
-     * clock = cpu_get_total_cycles(machine->activecpu) >> 10;
+     * clock = cpu_get_total_cycles(space->cpu) >> 10;
      * return (clock & 0x0f) << 1;
      * Can be shortened to:
      */
 
 	int clock;
 
-	clock = cpu_get_total_cycles(machine->activecpu) >> 9;
+	clock = cpu_get_total_cycles(space->cpu) >> 9;
 
 	return clock & 0x1e;
 }
 
 static WRITE8_HANDLER( circusc_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 static WRITE8_HANDLER( circusc_coin_counter_w )
@@ -124,24 +124,24 @@ static WRITE8_HANDLER(circusc_sound_w)
 
 		/* CS3 */
 		case 1:
-			sn76496_0_w(machine, 0, sn_latch);
+			sn76496_0_w(space, 0, sn_latch);
 			break;
 
 		/* CS4 */
 		case 2:
-			sn76496_1_w(machine, 0, sn_latch);
+			sn76496_1_w(space, 0, sn_latch);
 			break;
 
 		/* CS5 */
 		case 3:
-			discrete_sound_w(machine, NODE_03, data);
+			discrete_sound_w(space, NODE_03, data);
 			break;
 
 		/* CS6 */
 		case 4:
-			discrete_sound_w(machine, NODE_05, (offset & 0x20) >> 5);
-			discrete_sound_w(machine, NODE_06, (offset & 0x18) >> 3);
-			discrete_sound_w(machine, NODE_07, (offset & 0x40) >> 6);
+			discrete_sound_w(space, NODE_05, (offset & 0x20) >> 5);
+			discrete_sound_w(space, NODE_06, (offset & 0x18) >> 3);
+			discrete_sound_w(space, NODE_07, (offset & 0x40) >> 6);
 			break;
 	}
 }

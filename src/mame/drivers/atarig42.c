@@ -74,7 +74,7 @@ static MACHINE_RESET( atarig42 )
 
 static READ16_HANDLER( special_port2_r )
 {
-	int temp = input_port_read(machine, "IN2");
+	int temp = input_port_read(space->machine, "IN2");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0020;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x0010;
 	temp ^= 0x0008;		/* A2D.EOC always high for now */
@@ -86,7 +86,7 @@ static WRITE16_HANDLER( a2d_select_w )
 {
 	static const char *const portnames[] = { "A2D0", "A2D1" };
 
-	analog_data = input_port_read(machine, portnames[offset != 0]);
+	analog_data = input_port_read(space->machine, portnames[offset != 0]);
 }
 
 
@@ -102,17 +102,17 @@ static WRITE16_HANDLER( io_latch_w )
 	if (ACCESSING_BITS_8_15)
 	{
 		/* bit 14 controls the ASIC65 reset line */
-		asic65_reset(machine, (~data >> 14) & 1);
+		asic65_reset(space->machine, (~data >> 14) & 1);
 
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(machine, 0, (data >> 11) & 7);
+		atarirle_control_w(space, 0, (data >> 11) & 7);
 	}
 
 	/* lower byte */
 	if (ACCESSING_BITS_0_7)
 	{
 		/* bit 4 resets the sound CPU */
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(data & 0x10)) atarijsa_reset();
 
 		/* bit 5 is /XRESET, probably related to the ASIC */

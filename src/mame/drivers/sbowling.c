@@ -153,7 +153,7 @@ static WRITE8_HANDLER (system_w)
 	{
 		int offs;
 		for (offs = 0;offs < videoram_size; offs++)
-			sbw_videoram_w(machine, offs, videoram[offs]);
+			sbw_videoram_w(space, offs, videoram[offs]);
 	}
 	sbw_system = data;
 }
@@ -177,9 +177,9 @@ static WRITE8_HANDLER(graph_control_w)
 static READ8_HANDLER (controls_r)
 {
 	if(sbw_system & 2)
-		return input_port_read(machine, "TRACKY");
+		return input_port_read(space->machine, "TRACKY");
 	else
-		return input_port_read(machine, "TRACKX");
+		return input_port_read(space->machine, "TRACKX");
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

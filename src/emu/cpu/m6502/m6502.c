@@ -75,6 +75,7 @@ struct _m6502_Regs
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *space;
 	int		int_occured;
 	int		icount;
 
@@ -140,6 +141,7 @@ static void m6502_common_init(const device_config *device, int index, int clock,
 
 	m6502->irq_callback = irqcallback;
 	m6502->device = device;
+	m6502->space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	m6502->subtype = subtype;
 	m6502->insn = insn;
 	m6502->rdmem_id = default_rdmem_id;

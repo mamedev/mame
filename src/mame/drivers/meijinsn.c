@@ -69,7 +69,7 @@ static unsigned deposits1=0, deposits2=0, credits=0;
 static WRITE16_HANDLER( sound_w )
 {
 	if(ACCESSING_BITS_0_7)
-		soundlatch_w(machine, 0, data&0xff);
+		soundlatch_w(space, 0, data&0xff);
 }
 
 static READ16_HANDLER( alpha_mcu_r )
@@ -84,7 +84,7 @@ static READ16_HANDLER( alpha_mcu_r )
 	switch (offset)
 	{
 		case 0: /* Dipswitch 2 */
-			shared_ram[0] = (source&0xff00)|input_port_read(machine, "DSW");
+			shared_ram[0] = (source&0xff00)|input_port_read(space->machine, "DSW");
 			return 0;
 
 		case 0x22: /* Coin value */
@@ -95,15 +95,15 @@ static READ16_HANDLER( alpha_mcu_r )
 
 			credits=0;
 
-			if ((input_port_read(machine, "COINS")&0x3)==3) latch=0;
+			if ((input_port_read(space->machine, "COINS")&0x3)==3) latch=0;
 
-			if ((input_port_read(machine, "COINS")&0x1)==0 && !latch)
+			if ((input_port_read(space->machine, "COINS")&0x1)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(0x22);	// coinA
 				shared_ram[0x22] = (source&0xff00)|0x0;
 				latch=1;
 
-				coinvalue = (~input_port_read(machine, "DSW")>>3) & 1;
+				coinvalue = (~input_port_read(space->machine, "DSW")>>3) & 1;
 
 				deposits1++;
 				if (deposits1 == coinage1[coinvalue][0])
@@ -114,13 +114,13 @@ static READ16_HANDLER( alpha_mcu_r )
 				else
 					credits = 0;
 			}
-			else if ((input_port_read(machine, "COINS")&0x2)==0 && !latch)
+			else if ((input_port_read(space->machine, "COINS")&0x2)==0 && !latch)
 			{
 				shared_ram[0x29] = (source&0xff00)|(0x22);	// coinA
 				shared_ram[0x22] = (source&0xff00)|0x0;
 				latch=1;
 
-				coinvalue = (~input_port_read(machine, "DSW")>>3) & 1;
+				coinvalue = (~input_port_read(space->machine, "DSW")>>3) & 1;
 
 				deposits2++;
 				if (deposits2 == coinage2[coinvalue][0])

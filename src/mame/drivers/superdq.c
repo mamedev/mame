@@ -133,7 +133,7 @@ static WRITE8_HANDLER( superdq_io_w )
 	static const UINT8 black_color_entries[] = {7,15,16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31};
 
 	if ( data & 0x40 ) /* bit 6 = irqack */
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 
 	coin_counter_w( 0, data & 0x08 );
 	coin_counter_w( 1, data & 0x04 );
@@ -144,9 +144,9 @@ static WRITE8_HANDLER( superdq_io_w )
 	{
 		int index = black_color_entries[i];
 		if (data & 0x80)
-			palette_set_color(machine, index, palette_get_color(machine, index) & MAKE_ARGB(0,255,255,255));
+			palette_set_color(space->machine, index, palette_get_color(space->machine, index) & MAKE_ARGB(0,255,255,255));
 		else
-			palette_set_color(machine, index, palette_get_color(machine, index) | MAKE_ARGB(255,0,0,0));
+			palette_set_color(space->machine, index, palette_get_color(space->machine, index) | MAKE_ARGB(255,0,0,0));
 	}
 
 	/*

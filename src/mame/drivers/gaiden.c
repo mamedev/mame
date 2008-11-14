@@ -162,17 +162,17 @@ WRITE16_HANDLER( gaiden_flip_w );
 
 static WRITE16_HANDLER( gaiden_sound_command_w )
 {
-	if (ACCESSING_BITS_0_7) soundlatch_w(machine,0,data & 0xff);	/* Ninja Gaiden */
-	if (ACCESSING_BITS_8_15) soundlatch_w(machine,0,data >> 8);	/* Tecmo Knight */
-	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	if (ACCESSING_BITS_0_7) soundlatch_w(space,0,data & 0xff);	/* Ninja Gaiden */
+	if (ACCESSING_BITS_8_15) soundlatch_w(space,0,data >> 8);	/* Tecmo Knight */
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static WRITE16_HANDLER( drgnbowl_sound_command_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		soundlatch_w(machine,0,data >> 8);
-		cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+		soundlatch_w(space,0,data >> 8);
+		cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 	}
 }
 
@@ -198,7 +198,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(machine->activecpu),data);
+//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(space->cpu),data);
 
 		switch (data & 0xf0)
 		{
@@ -236,7 +236,7 @@ static WRITE16_HANDLER( wildfang_protection_w )
 
 static READ16_HANDLER( wildfang_protection_r )
 {
-//  logerror("PC %06x: read prot %02x\n",cpu_get_pc(machine->activecpu),prot);
+//  logerror("PC %06x: read prot %02x\n",cpu_get_pc(space->cpu),prot);
 	return prot;
 }
 
@@ -326,7 +326,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 
 		data >>= 8;
 
-//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(machine->activecpu),data);
+//      logerror("PC %06x: prot = %02x\n",cpu_get_pc(space->cpu),data);
 
 		switch (data & 0xf0)
 		{
@@ -372,7 +372,7 @@ static WRITE16_HANDLER( raiga_protection_w )
 
 static READ16_HANDLER( raiga_protection_r )
 {
-//  logerror("PC %06x: read prot %02x\n",cpu_get_pc(machine->activecpu),prot);
+//  logerror("PC %06x: read prot %02x\n",cpu_get_pc(space->cpu),prot);
 	return prot;
 }
 

@@ -29,7 +29,7 @@ extern VIDEO_UPDATE( pcktgal );
 
 static WRITE8_HANDLER( pcktgal_bank_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	if (data & 1) { memory_set_bankptr(1,&RAM[0x4000]); }
 	else { memory_set_bankptr(1,&RAM[0x10000]); }
@@ -45,8 +45,8 @@ static WRITE8_HANDLER( pcktgal_sound_bank_w )
 
 static WRITE8_HANDLER( pcktgal_sound_w )
 {
-	soundlatch_w(machine,0,data);
-	cpu_set_input_line(machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
+	soundlatch_w(space,0,data);
+	cpu_set_input_line(space->machine->cpu[1],INPUT_LINE_NMI,PULSE_LINE);
 }
 
 static int msm5205next;

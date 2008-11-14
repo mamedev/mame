@@ -26,20 +26,20 @@ static WRITE32_HANDLER( vega_vram_w )
 	switch(mem_mask)
 	{
 		case 0xffffffff:
-			vega_vram_w(machine,offset,data,0xff000000);
-			vega_vram_w(machine,offset,data,0x00ff0000);
-			vega_vram_w(machine,offset,data,0x0000ff00);
-			vega_vram_w(machine,offset,data,0x000000ff);
+			vega_vram_w(space,offset,data,0xff000000);
+			vega_vram_w(space,offset,data,0x00ff0000);
+			vega_vram_w(space,offset,data,0x0000ff00);
+			vega_vram_w(space,offset,data,0x000000ff);
 			return;
 
 		case 0xffff0000:
-			vega_vram_w(machine,offset,data,0xff000000);
-			vega_vram_w(machine,offset,data,0x00ff0000);
+			vega_vram_w(space,offset,data,0xff000000);
+			vega_vram_w(space,offset,data,0x00ff0000);
 			return;
 
 		case 0x0000ffff:
-			vega_vram_w(machine,offset,data,0x0000ff00);
-			vega_vram_w(machine,offset,data,0x000000ff);
+			vega_vram_w(space,offset,data,0x0000ff00);
+			vega_vram_w(space,offset,data,0x000000ff);
 			return;
 
 		default:
@@ -63,7 +63,7 @@ static WRITE32_HANDLER( vega_palette_w )
 	COMBINE_DATA(&paletteram32[offset]);
 
 	paldata = paletteram32[offset] & 0x7fff;
-	palette_set_color_rgb(machine, offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
+	palette_set_color_rgb(space->machine, offset, pal5bit(paldata >> 10), pal5bit(paldata >> 5), pal5bit(paldata >> 0));
 }
 
 static WRITE32_HANDLER( vega_misc_w )
@@ -76,8 +76,8 @@ static WRITE32_HANDLER( vega_misc_w )
 
 static READ32_HANDLER( vegaeo_custom_read )
 {
-	eolith_speedup_read(machine);
-	return input_port_read(machine, "SYSTEM");
+	eolith_speedup_read(space->machine);
+	return input_port_read(space->machine, "SYSTEM");
 }
 
 static ADDRESS_MAP_START( vega_map, ADDRESS_SPACE_PROGRAM, 32 )

@@ -245,12 +245,12 @@ READ64_HANDLER( dc_sysctrl_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x41) && (reg != 0x42) && (reg != 0x23) && (reg > 2))	// filter out IRQ status reads
 	{
-		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %llx (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, cpu_get_pc(machine->activecpu));
+		mame_printf_verbose("SYSCTRL: [%08x] read %x @ %x (reg %x: %s), mask %llx (PC=%x)\n", 0x5f6800+reg*4, dc_sysctrl_regs[reg], offset, reg, sysctrl_names[reg], mem_mask, cpu_get_pc(space->cpu));
 	}
 	#endif
 
@@ -265,7 +265,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 	UINT32 address;
 	struct sh4_ddt_dma ddtdata;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = dc_sysctrl_regs[reg];
 	dc_sysctrl_regs[reg] = dat; // 5f6800+off*4=dat
@@ -279,7 +279,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			ddtdata.direction=0;
 			ddtdata.channel=2;
 			ddtdata.mode=25; //011001
-			cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+			cpu_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 			#if DEBUG_SYSCTRL
 			if ((address >= 0x11000000) && (address <= 0x11FFFFFF))
 				if (dc_sysctrl_regs[SB_LMMODE0])
@@ -321,7 +321,7 @@ WRITE64_HANDLER( dc_sysctrl_w )
 			#endif
 			break;
 	}
-	dc_update_interrupt_status(machine);
+	dc_update_interrupt_status(space->machine);
 
 	#if DEBUG_SYSCTRL
 	if ((reg != 0x40) && (reg != 0x42) && (reg > 2))	// filter out IRQ acks and ch2 dma
@@ -336,7 +336,7 @@ READ64_HANDLER( dc_maple_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 
 	#if DEBUG_MAPLE_REGS
 	mame_printf_verbose("MAPLE:  Unmapped read %08x\n", 0x5f6c00+reg*4);
@@ -358,7 +358,7 @@ WRITE64_HANDLER( dc_maple_w )
 	int a;
 	int off,len;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = maple_regs[reg];
 
@@ -386,7 +386,7 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.direction=0;	// 0 source to buffer, 1 buffer to source
 					ddtdata.channel= -1;	// not used
 					ddtdata.mode= -1;		// copy from/to buffer
-					cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
+					cpu_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
 
 					maple_regs[reg] = 0;
 					endflag=buff[0] & 0x80000000;
@@ -418,7 +418,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+								cpu_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 								chk=0;
 								for (a=1;a < length;a++)
 								{
@@ -446,7 +446,7 @@ WRITE64_HANDLER( dc_maple_w )
 								ddtdata.direction=0;
 								ddtdata.channel= -1;
 								ddtdata.mode=-1;
-								cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+								cpu_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 
 								subcommand = buff[0] & 0xff;
 								#if DEBUG_MAPLE
@@ -497,7 +497,7 @@ WRITE64_HANDLER( dc_maple_w )
 									maple0x86data2[3] = maple0x86data2[3] | 0x0c;
 									maple0x86data2[6] = maple0x86data2[6] & 0xcf;
 
-									a = input_port_read(machine, "IN0"); // put keys here
+									a = input_port_read(space->machine, "IN0"); // put keys here
 									maple0x86data2[6] = maple0x86data2[6] | (a << 4);
 									pos = 0x11;
 									tocopy = 17;
@@ -576,10 +576,10 @@ WRITE64_HANDLER( dc_maple_w )
 												// first function
 												maple0x86data2[pos+ 9]=1; // report
 												maple0x86data2[pos+10]=0; // bits TEST TILT1 TILT2 TILT3 ? ? ? ?
-												maple0x86data2[pos+11]=input_port_read(machine, "IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
-												maple0x86data2[pos+12]=input_port_read(machine, "IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
-												maple0x86data2[pos+13]=input_port_read(machine, "IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
-												maple0x86data2[pos+14]=input_port_read(machine, "IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
+												maple0x86data2[pos+11]=input_port_read(space->machine, "IN1"); // bits 1Pstart 1Pservice 1Pup 1Pdown 1Pleft 1Pright 1Ppush1 1Ppush2
+												maple0x86data2[pos+12]=input_port_read(space->machine, "IN2"); // bits 1Ppush3 1Ppush4 1Ppush5 1Ppush6 1Ppush7 1Ppush8 ...
+												maple0x86data2[pos+13]=input_port_read(space->machine, "IN3"); // bits 2Pstart 2Pservice 2Pup 2Pdown 2Pleft 2Pright 2Ppush1 2Ppush2
+												maple0x86data2[pos+14]=input_port_read(space->machine, "IN4"); // bits 2Ppush3 2Ppush4 2Ppush5 2Ppush6 2Ppush7 2Ppush8 ...
 												// second function
 												maple0x86data2[pos+15]=1; // report
 												maple0x86data2[pos+16]=(dc_coin_counts[0] >> 8) & 0xff; // 1CONDITION, 1SLOT COIN(bit13-8)
@@ -656,7 +656,7 @@ WRITE64_HANDLER( dc_maple_w )
 					ddtdata.destination=destination;
 					ddtdata.buffer=buff;
 					ddtdata.direction=1;
-					cpu_set_info_ptr(machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
+					cpu_set_info_ptr(space->machine->cpu[0],CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA,&ddtdata);
 
 					if (endflag)
 					{
@@ -733,7 +733,7 @@ READ64_HANDLER( dc_g1_ctrl_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	mame_printf_verbose("G1CTRL:  Unmapped read %08x\n", 0x5f7400+reg*4);
 	return (UINT64)g1bus_regs[reg] << shift;
 }
@@ -744,9 +744,9 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 	UINT64 shift;
 	UINT32 old,dat;
 	struct sh4_ddt_dma ddtdata;
-	UINT8 *ROM = (UINT8 *)memory_region(machine, "user1");
+	UINT8 *ROM = (UINT8 *)memory_region(space->machine, "user1");
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = g1bus_regs[reg];
 
@@ -770,7 +770,7 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 			ddtdata.channel= -1;	// not used
 			ddtdata.mode= -1;		// copy from/to buffer
 			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dma_offset, g1bus_regs[SB_GDSTAR]);
-			cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
+			cpu_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
 			g1bus_regs[SB_GDST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;
 		}
@@ -783,7 +783,7 @@ READ64_HANDLER( dc_g2_ctrl_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	mame_printf_verbose("G2CTRL:  Unmapped read %08x\n", 0x5f7800+reg*4);
 	return 0;
 }
@@ -794,7 +794,7 @@ WRITE64_HANDLER( dc_g2_ctrl_w )
 	UINT64 shift;
 	UINT32 dat;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	switch (reg)
 	{
@@ -813,7 +813,7 @@ READ64_HANDLER( dc_modem_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 
 	// from ElSemi: this makes Atomiswave do it's "verbose boot" with a Sammy logo and diagnostics instead of just running the cart.
 	// our PVR emulation is apparently not good enough for that to work yet though.
@@ -832,7 +832,7 @@ WRITE64_HANDLER( dc_modem_w )
 	UINT64 shift;
 	UINT32 dat;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	mame_printf_verbose("MODEM: [%08x=%x] write %llx to %x, mask %llx\n", 0x600000+reg*4, dat, data, offset, mem_mask);
 }
@@ -842,7 +842,7 @@ READ64_HANDLER( dc_rtc_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg3216_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg3216_64(space->machine, offset, mem_mask, &shift);
 	mame_printf_verbose("RTC:  Unmapped read %08x\n", 0x710000+reg*4);
 	return (UINT64)dc_rtcregister[reg] << shift;
 }
@@ -853,7 +853,7 @@ WRITE64_HANDLER( dc_rtc_w )
 	UINT64 shift;
 	UINT32 old,dat;
 
-	reg = decode_reg3216_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg3216_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 	old = dc_rtcregister[reg];
 	dc_rtcregister[reg] = dat & 0xFFFF; // 5f6c00+off*4=dat
@@ -920,11 +920,11 @@ READ64_HANDLER( dc_aica_reg_r )
 	int reg;
 	UINT64 shift;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 
 //  mame_printf_verbose("AICA REG: [%08x] read %llx, mask %llx\n", 0x700000+reg*4, (UINT64)offset, mem_mask);
 
-	return (UINT64) aica_0_r(machine, offset*2, 0xffff)<<shift;
+	return (UINT64) aica_0_r(space, offset*2, 0xffff)<<shift;
 }
 
 WRITE64_HANDLER( dc_aica_reg_w )
@@ -933,7 +933,7 @@ WRITE64_HANDLER( dc_aica_reg_w )
 	UINT64 shift;
 	UINT32 dat;
 
-	reg = decode_reg32_64(machine, offset, mem_mask, &shift);
+	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
 
 	if (reg == (0x2c00/4))
@@ -941,27 +941,27 @@ WRITE64_HANDLER( dc_aica_reg_w )
 		if (dat & 1)
 		{
 			/* halt the ARM7 */
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 		}
 		else
 		{
 			/* it's alive ! */
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 		}
         }
 
-	aica_0_w(machine, offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
+	aica_0_w(space, offset*2, dat, shift ? ((mem_mask>>32)&0xffff) : (mem_mask & 0xffff));
 
 //  mame_printf_verbose("AICA REG: [%08x=%x] write %llx to %x, mask %llx\n", 0x700000+reg*4, dat, data, offset, mem_mask);
 }
 
 READ32_HANDLER( dc_arm_aica_r )
 {
-	return aica_0_r(machine, offset*2, 0xffff) & 0xffff;
+	return aica_0_r(space, offset*2, 0xffff) & 0xffff;
 }
 
 WRITE32_HANDLER( dc_arm_aica_w )
 {
-	aica_0_w(machine, offset*2, data, mem_mask&0xffff);
+	aica_0_w(space, offset*2, data, mem_mask&0xffff);
 }
 

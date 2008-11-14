@@ -126,13 +126,13 @@ INLINE void bg_changecolor_RRRRGGGGBBBBxxxx(running_machine *machine,pen_t color
 static WRITE8_HANDLER( bg_paletteram_RRRRGGGGBBBBxxxx_be_w )
 {
 	bg_paletteram[offset] = data;
-	bg_changecolor_RRRRGGGGBBBBxxxx(machine, offset / 2,bg_paletteram[offset | 1] | (bg_paletteram[offset & ~1] << 8));
+	bg_changecolor_RRRRGGGGBBBBxxxx(space->machine, offset / 2,bg_paletteram[offset | 1] | (bg_paletteram[offset & ~1] << 8));
 }
 
 static WRITE8_HANDLER( missb2_bg_bank_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "slave");
+	UINT8 *RAM = memory_region(space->machine, "slave");
 
 	// I don't know how this is really connected,bit 1 is always high afaik...
 	bankaddress = ((data & 2) ? 0x1000 : 0x0000) | ((data & 1) ? 0x4000 : 0x0000) | (0x8000);

@@ -52,7 +52,7 @@ WRITE8_HANDLER( sidearms_c804_w )
 	/* bit 4 resets the sound CPU */
 	if (data & 0x10)
 	{
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* bit 5 enables starfield */

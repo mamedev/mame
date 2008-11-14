@@ -72,7 +72,7 @@ static READ16_HANDLER(unk_r)
 	// 40,41,44 = ?
 	// 4a = flags?
 		if(offset==0xc9/2 )//|| offset==0x40 || offset==0x41 || offset==0x44)
-			return mame_rand(machine);
+			return mame_rand(space->machine);
 	return unkram[offset];
 }
 
@@ -86,7 +86,7 @@ static WRITE16_HANDLER(main_w)
 static READ16_HANDLER(main_r)
 {
 	if(offset>0x502d/2 && offset<0x56c0/2)
-		logerror("R %x @%x\n",offset*2,cpu_get_pc(machine->activecpu));
+		logerror("R %x @%x\n",offset*2,cpu_get_pc(space->cpu));
 	return mainram[offset];
 }
 

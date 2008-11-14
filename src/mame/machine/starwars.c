@@ -144,11 +144,11 @@ READ8_HANDLER( starwars_adc_r )
 {
 	/* pitch */
 	if (control_num == kPitch)
-		return input_port_read(machine, "STICKY");
+		return input_port_read(space->machine, "STICKY");
 
 	/* yaw */
 	else if (control_num == kYaw)
-		return input_port_read(machine, "STICKX");
+		return input_port_read(space->machine, "STICKX");
 
 	/* default to unused thrust */
 	else
@@ -400,7 +400,7 @@ READ8_HANDLER( starwars_prng_r )
      */
 
 	/* Use MAME's PRNG for now */
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 

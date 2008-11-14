@@ -335,11 +335,11 @@ READ16_HANDLER( genesis_vdp_r )
 	{
 		case 0x00:	/* Read Data */
 		case 0x01:
-			return vdp_data_r(machine);
+			return vdp_data_r(space);
 
 		case 0x02:	/* Status Register */
 		case 0x03:
-			return vdp_control_r(machine);
+			return vdp_control_r(space);
 
 		case 0x04:	/* HV counter */
 		case 0x05:
@@ -377,7 +377,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 				 else
 				 	data |= data << 8;
 			}
-			vdp_data_w(machine, data);
+			vdp_data_w(space, data);
 			break;
 
 		case 0x02:	/* Control Write */
@@ -390,7 +390,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 				 else
 				 	data |= data << 8;
 			}
-			vdp_control_w(machine, data);
+			vdp_control_w(space, data);
 			break;
 
 		case 0x08:	/* SN76489 Write */
@@ -398,7 +398,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 		case 0x0a:
 		case 0x0b:
 			if (ACCESSING_BITS_0_7 && sndti_exists(SOUND_SN76496, 0))
-				sn76496_0_w(machine, 0, data & 0xff);
+				sn76496_0_w(space, 0, data & 0xff);
 			break;
 	}
 }

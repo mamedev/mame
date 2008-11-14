@@ -709,28 +709,28 @@ static READ64_HANDLER(scsi_r)
 	int reg = offset*8;
 	UINT64 r = 0;
 	if (ACCESSING_BITS_56_63) {
-		r |= (UINT64)lsi53c810_reg_r(machine, reg+0) << 56;
+		r |= (UINT64)lsi53c810_reg_r(space, reg+0) << 56;
 	}
 	if (ACCESSING_BITS_48_55) {
-		r |= (UINT64)lsi53c810_reg_r(machine, reg+1) << 48;
+		r |= (UINT64)lsi53c810_reg_r(space, reg+1) << 48;
 	}
 	if (ACCESSING_BITS_40_47) {
-		r |= (UINT64)lsi53c810_reg_r(machine, reg+2) << 40;
+		r |= (UINT64)lsi53c810_reg_r(space, reg+2) << 40;
 	}
 	if (ACCESSING_BITS_32_39) {
-		r |= (UINT64)lsi53c810_reg_r(machine, reg+3) << 32;
+		r |= (UINT64)lsi53c810_reg_r(space, reg+3) << 32;
 	}
 	if (ACCESSING_BITS_24_31) {
-		r |= (UINT64)lsi53c810_reg_r(machine, reg+4) << 24;
+		r |= (UINT64)lsi53c810_reg_r(space, reg+4) << 24;
 	}
 	if (ACCESSING_BITS_16_23) {
-		r |= (UINT64)lsi53c810_reg_r(machine, reg+5) << 16;
+		r |= (UINT64)lsi53c810_reg_r(space, reg+5) << 16;
 	}
 	if (ACCESSING_BITS_8_15) {
-		r |= (UINT64)lsi53c810_reg_r(machine, reg+6) << 8;
+		r |= (UINT64)lsi53c810_reg_r(space, reg+6) << 8;
 	}
 	if (ACCESSING_BITS_0_7) {
-		r |= (UINT64)lsi53c810_reg_r(machine, reg+7) << 0;
+		r |= (UINT64)lsi53c810_reg_r(space, reg+7) << 0;
 	}
 
 	return r;
@@ -740,28 +740,28 @@ static WRITE64_HANDLER(scsi_w)
 {
 	int reg = offset*8;
 	if (ACCESSING_BITS_56_63) {
-		lsi53c810_reg_w(machine, reg+0, data >> 56);
+		lsi53c810_reg_w(space, reg+0, data >> 56);
 	}
 	if (ACCESSING_BITS_48_55) {
-		lsi53c810_reg_w(machine, reg+1, data >> 48);
+		lsi53c810_reg_w(space, reg+1, data >> 48);
 	}
 	if (ACCESSING_BITS_40_47) {
-		lsi53c810_reg_w(machine, reg+2, data >> 40);
+		lsi53c810_reg_w(space, reg+2, data >> 40);
 	}
 	if (ACCESSING_BITS_32_39) {
-		lsi53c810_reg_w(machine, reg+3, data >> 32);
+		lsi53c810_reg_w(space, reg+3, data >> 32);
 	}
 	if (ACCESSING_BITS_24_31) {
-		lsi53c810_reg_w(machine, reg+4, data >> 24);
+		lsi53c810_reg_w(space, reg+4, data >> 24);
 	}
 	if (ACCESSING_BITS_16_23) {
-		lsi53c810_reg_w(machine, reg+5, data >> 16);
+		lsi53c810_reg_w(space, reg+5, data >> 16);
 	}
 	if (ACCESSING_BITS_8_15) {
-		lsi53c810_reg_w(machine, reg+6, data >> 8);
+		lsi53c810_reg_w(space, reg+6, data >> 8);
 	}
 	if (ACCESSING_BITS_0_7) {
-		lsi53c810_reg_w(machine, reg+7, data >> 0);
+		lsi53c810_reg_w(space, reg+7, data >> 0);
 	}
 }
 
@@ -831,14 +831,14 @@ static WRITE64_HANDLER( real3d_dma_w )
 					real3d_dma_callback(dma_source, dma_dest, length, 1);
 				}
 				dma_irq |= 0x01;
-				scsi_irq_callback(machine, 1);
+				scsi_irq_callback(space->machine, 1);
 				return;
 			}
 			else if(ACCESSING_BITS_16_23)
 			{
 				if(data & 0x10000) {
 					dma_irq &= ~0x1;
-					scsi_irq_callback(machine, 0);
+					scsi_irq_callback(space->machine, 0);
 				}
 				return;
 			}
@@ -1065,11 +1065,11 @@ static READ64_HANDLER( model3_ctrl_r )
 			{
 				if(model3_controls_bank & 0x1)
 				{
-					return (input_port_read(machine, "IN1")) << 24;
+					return (input_port_read(space->machine, "IN1")) << 24;
 				}
 				else
 				{
-					return (input_port_read(machine, "IN0")) << 24;
+					return (input_port_read(space->machine, "IN0")) << 24;
 				}
 			}
 			break;
@@ -1077,11 +1077,11 @@ static READ64_HANDLER( model3_ctrl_r )
 		case 1:
 			if (ACCESSING_BITS_56_63)
 			{
-				return (UINT64)input_port_read(machine, "IN2") << 56;
+				return (UINT64)input_port_read(space->machine, "IN2") << 56;
 			}
 			else if (ACCESSING_BITS_24_31)
 			{
-				return input_port_read(machine, "IN3") << 24;
+				return input_port_read(space->machine, "IN3") << 24;
 			}
 			break;
 
@@ -1116,7 +1116,7 @@ static READ64_HANDLER( model3_ctrl_r )
 			if (ACCESSING_BITS_24_31)		/* ADC Data read */
 			{
 				static const char *const adcnames[] = { "AN0", "AN1", "AN2", "AN3", "AN4", "AN5", "AN6", "AN7" };
-				UINT8 adc_data = input_port_read_safe(machine, adcnames[adc_channel], 0);
+				UINT8 adc_data = input_port_read_safe(space->machine, adcnames[adc_channel], 0);
 				adc_channel++;
 				adc_channel &= 0x7;
 				return (UINT64)adc_data << 24;
@@ -1168,39 +1168,39 @@ static WRITE64_HANDLER( model3_ctrl_w )
 						switch(lightgun_reg_sel)		/* read lightrun register */
 						{
 							case 0:		/* player 1 gun X-position, lower 8-bits */
-								model3_serial_fifo2 = input_port_read(machine, "LIGHT0_Y") & 0xff;
+								model3_serial_fifo2 = input_port_read(space->machine, "LIGHT0_Y") & 0xff;
 								break;
 							case 1:		/* player 1 gun X-position, upper 2-bits */
-								model3_serial_fifo2 = (input_port_read(machine, "LIGHT0_Y") >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read(space->machine, "LIGHT0_Y") >> 8) & 0x3;
 								break;
 							case 2:		/* player 1 gun Y-position, lower 8-bits */
-								model3_serial_fifo2 = input_port_read(machine, "LIGHT0_X") & 0xff;
+								model3_serial_fifo2 = input_port_read(space->machine, "LIGHT0_X") & 0xff;
 								break;
 							case 3:		/* player 1 gun Y-position, upper 2-bits */
-								model3_serial_fifo2 = (input_port_read(machine, "LIGHT0_X") >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read(space->machine, "LIGHT0_X") >> 8) & 0x3;
 								break;
 							case 4:		/* player 2 gun X-position, lower 8-bits */
-								model3_serial_fifo2 = input_port_read(machine, "LIGHT1_Y") & 0xff;
+								model3_serial_fifo2 = input_port_read(space->machine, "LIGHT1_Y") & 0xff;
 								break;
 							case 5:		/* player 2 gun X-position, upper 2-bits */
-								model3_serial_fifo2 = (input_port_read(machine, "LIGHT1_Y") >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read(space->machine, "LIGHT1_Y") >> 8) & 0x3;
 								break;
 							case 6:		/* player 2 gun Y-position, lower 8-bits */
-								model3_serial_fifo2 = input_port_read(machine, "LIGHT1_X") & 0xff;
+								model3_serial_fifo2 = input_port_read(space->machine, "LIGHT1_X") & 0xff;
 								break;
 							case 7:		/* player 2 gun Y-position, upper 2-bits */
-								model3_serial_fifo2 = (input_port_read(machine, "LIGHT1_X") >> 8) & 0x3;
+								model3_serial_fifo2 = (input_port_read(space->machine, "LIGHT1_X") >> 8) & 0x3;
 								break;
 							case 8:		/* gun offscreen (bit set = gun offscreen, bit clear = gun on screen) */
 								model3_serial_fifo2 = 0;	/* bit 0 = player 1, bit 1 = player 2 */
-								if(input_port_read(machine, "OFFSCREEN") & 0x1) {
+								if(input_port_read(space->machine, "OFFSCREEN") & 0x1) {
 									model3_serial_fifo2 |= 0x01;
 								}
 								break;
 						}
 						break;
 					default:
-						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), cpu_get_pc(machine->activecpu));
+						//mame_printf_debug("Lightgun: Unknown command %02X at %08X\n", (UINT32)(data >> 24), cpu_get_pc(space->cpu));
 						break;
 				}
 			}
@@ -1276,7 +1276,7 @@ static WRITE64_HANDLER( model3_sys_w )
 
 				data >>= 56;
 				data = (~data) & 0xf;
-				memory_set_bankptr( 1, memory_region( machine, "user1" ) + 0x800000 + (data * 0x800000)); /* banked CROM */
+				memory_set_bankptr( 1, memory_region( space->machine, "user1" ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -1296,10 +1296,10 @@ static READ64_HANDLER( model3_rtc_r )
 {
 	UINT64 r = 0;
 	if(ACCESSING_BITS_56_63) {
-		r |= (UINT64)rtc72421_r(machine, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
+		r |= (UINT64)rtc72421_r(space, (offset*2)+0, (UINT32)(mem_mask >> 32)) << 32;
 	}
 	if(ACCESSING_BITS_24_31) {
-		r |= (UINT64)rtc72421_r(machine, (offset*2)+1, (UINT32)(mem_mask));
+		r |= (UINT64)rtc72421_r(space, (offset*2)+1, (UINT32)(mem_mask));
 	}
 	return r;
 }
@@ -1307,10 +1307,10 @@ static READ64_HANDLER( model3_rtc_r )
 static WRITE64_HANDLER( model3_rtc_w )
 {
 	if(ACCESSING_BITS_56_63) {
-		rtc72421_w(machine, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
+		rtc72421_w(space, (offset*2)+0, (UINT32)(data >> 32), (UINT32)(mem_mask >> 32));
 	}
 	if(ACCESSING_BITS_24_31) {
-		rtc72421_w(machine, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
+		rtc72421_w(space, (offset*2)+1, (UINT32)(data), (UINT32)(mem_mask));
 	}
 }
 
@@ -1322,7 +1322,7 @@ static READ64_HANDLER(real3d_status_r)
 	{
 		/* pretty sure this is VBLANK */
 		real3d_status &= ~U64(0x0000000200000000);
-		if (video_screen_get_vblank(machine->primary_screen))
+		if (video_screen_get_vblank(space->machine->primary_screen))
 			real3d_status |= U64(0x0000000200000000);
 		return real3d_status;
 	}
@@ -1337,15 +1337,15 @@ static READ64_HANDLER(model3_sound_r)
 
 static WRITE64_HANDLER(model3_sound_w)
 {
-	model3_set_irq_line(machine, 0x40, CLEAR_LINE);
+	model3_set_irq_line(space->machine, 0x40, CLEAR_LINE);
 
 	// serial configuration writes
 	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
 	{
-		scsp_midi_in(machine, 0, (data>>56)&0xff, 0);
+		scsp_midi_in(space->machine, 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
-		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 	}
 }
 
@@ -1354,14 +1354,14 @@ static WRITE64_HANDLER(model3_sound_w)
 static UINT64 network_ram[0x10000];
 static READ64_HANDLER(network_r)
 {
-	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(machine->activecpu));
+	mame_printf_debug("network_r: %02X at %08X\n", offset, cpu_get_pc(space->cpu));
 	return network_ram[offset];
 }
 
 static WRITE64_HANDLER(network_w)
 {
 	COMBINE_DATA(network_ram + offset);
-	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(machine->activecpu));
+	mame_printf_debug("network_w: %02X, %08X%08X at %08X\n", offset, (UINT32)(data >> 32), (UINT32)(data), cpu_get_pc(space->cpu));
 }
 
 static int prot_data_ptr = 0;
@@ -1437,13 +1437,13 @@ static READ64_HANDLER(model3_security_r)
 		case 0x00/8:	return 0;		/* status */
 		case 0x1c/8:					/* security board data read */
 		{
-			if (mame_stricmp(machine->gamedrv->name, "vs299") == 0 ||
-				mame_stricmp(machine->gamedrv->name, "vs2v991") == 0)
+			if (mame_stricmp(space->machine->gamedrv->name, "vs299") == 0 ||
+				mame_stricmp(space->machine->gamedrv->name, "vs2v991") == 0)
 			{
 				return (UINT64)vs299_prot_data[prot_data_ptr++] << 48;
 			}
-			else if (mame_stricmp(machine->gamedrv->name, "swtrilgy") == 0 ||
-					 mame_stricmp(machine->gamedrv->name, "swtrilga") == 0)
+			else if (mame_stricmp(space->machine->gamedrv->name, "swtrilgy") == 0 ||
+					 mame_stricmp(space->machine->gamedrv->name, "swtrilga") == 0)
 			{
 				UINT64 data = (UINT64)swt_prot_data[prot_data_ptr++] << 16;
 				if (prot_data_ptr > 0x38)
@@ -1452,7 +1452,7 @@ static READ64_HANDLER(model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(machine->gamedrv->name, "fvipers2") == 0)
+			else if (mame_stricmp(space->machine->gamedrv->name, "fvipers2") == 0)
 			{
 				UINT64 data = (UINT64)fvipers2_prot_data[prot_data_ptr++] << 16;
 				if (prot_data_ptr >= 0x41)
@@ -1461,8 +1461,8 @@ static READ64_HANDLER(model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(machine->gamedrv->name, "spikeout") == 0 ||
-					 mame_stricmp(machine->gamedrv->name, "spikeofe") == 0)
+			else if (mame_stricmp(space->machine->gamedrv->name, "spikeout") == 0 ||
+					 mame_stricmp(space->machine->gamedrv->name, "spikeofe") == 0)
 			{
 				UINT64 data = (UINT64)spikeout_prot_data[prot_data_ptr++] << 16;
 				if (prot_data_ptr >= 0x55)
@@ -1471,8 +1471,8 @@ static READ64_HANDLER(model3_security_r)
 				}
 				return data;
 			}
-			else if (mame_stricmp(machine->gamedrv->name, "eca") == 0 ||
-					 mame_stricmp(machine->gamedrv->name, "ecax") == 0)
+			else if (mame_stricmp(space->machine->gamedrv->name, "eca") == 0 ||
+					 mame_stricmp(space->machine->gamedrv->name, "ecax") == 0)
 			{
 				UINT64 data = (UINT64)eca_prot_data[prot_data_ptr++] << 16;
 				if (prot_data_ptr >= 0x31)
@@ -1496,7 +1496,7 @@ static WRITE64_HANDLER(daytona2_rombank_w)
 	{
 		data >>= 56;
 		data = (~data) & 0xf;
-		memory_set_bankptr( 1, memory_region( machine, "user1" ) + 0x800000 + (data * 0x800000)); /* banked CROM */
+		memory_set_bankptr( 1, memory_region( space->machine, "user1" ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
 
@@ -4234,9 +4234,9 @@ ROM_END
 static WRITE16_HANDLER( model3snd_ctrl )
 {
 	// handle sample banking
-	if (memory_region_length(machine, "scsp2") > 0x800000)
+	if (memory_region_length(space->machine, "scsp2") > 0x800000)
 	{
-		UINT8 *snd = memory_region(machine, "scsp2");
+		UINT8 *snd = memory_region(space->machine, "scsp2");
 		if (data & 0x20)
 		{
 	  		memory_set_bankptr(4, snd + 0x200000);

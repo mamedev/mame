@@ -139,15 +139,15 @@ static const UINT32 vector_prot[] = { 0x0603B1B2,0x234 };
 
 static READ32_HANDLER( a_bus_ctrl_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
 
 	if(a_bus[0] & 0x00010000)//protection calculation is activated
 	{
 		if(offset == 3)
 		{
-			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(machine->activecpu),a_bus[3]);
+			logerror("A-Bus control protection read at %06x with data = %08x\n",cpu_get_pc(space->cpu),a_bus[3]);
 			#ifdef MAME_DEBUG
-			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(machine->activecpu),a_bus[3]);
+			popmessage("Prot read at %06x with data = %08x",cpu_get_pc(space->cpu),a_bus[3]);
 			#endif
 			switch(a_bus[3])
 			{
@@ -272,7 +272,7 @@ static READ32_HANDLER( a_bus_ctrl_r )
 static WRITE32_HANDLER ( a_bus_ctrl_w )
 {
 	COMBINE_DATA(&a_bus[offset]);
-	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(machine->activecpu),offset,data);
+	logerror("A-Bus control protection write at %06x: [%02x] <- %08x\n",cpu_get_pc(space->cpu),offset,data);
 	if(offset == 3)
 	{
 		//printf("MAIN : %08x  DATA : %08x\n",a_bus[3],a_bus[2]);
@@ -337,11 +337,11 @@ static READ32_HANDLER(astrass_prot_r)
 	if ( offset == 3 && ctrl_index != -1 )
 	{
 		UINT32 data = 0;
-		UINT32 *prot_data = (UINT32 *)memory_region(machine, "user2");
+		UINT32 *prot_data = (UINT32 *)memory_region(space->machine, "user2");
 
 		data = prot_data[ctrl_index++];
 
-		if ( ctrl_index >= memory_region_length(machine, "user2")/4 )
+		if ( ctrl_index >= memory_region_length(space->machine, "user2")/4 )
 		{
 			ctrl_index = -1;
 		}
@@ -378,7 +378,7 @@ static UINT16 decathlt_prottable2[128];
 
 static READ32_HANDLER( decathlt_prot_r )
 {
-	UINT32 *ROM = (UINT32 *)memory_region(machine, "user1");
+	UINT32 *ROM = (UINT32 *)memory_region(space->machine, "user1");
 
 	if (offset==2)
 	{
@@ -391,7 +391,7 @@ static READ32_HANDLER( decathlt_prot_r )
 	}
 	else
 	{
-		mame_printf_info("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n",cpu_get_pc(machine->activecpu), offset, mem_mask, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
+		mame_printf_info("%06x Decathlete prot R offset %04x mask %08x regs %08x, %08x, %08x, %08x\n",cpu_get_pc(space->cpu), offset, mem_mask, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
 	}
 
 	return decathlt_protregs[offset];
@@ -408,7 +408,7 @@ static WRITE32_HANDLER( decathlt_prot_w )
 
 		if (decathlt_part==0) mame_printf_info("last count was %06x\n",decathlt_lastcount);
 		decathlt_lastcount = 0;
-		mame_printf_info("%06x Decathlete prot W offset %04x data %08x, regs %08x, %08x, %08x, %08x\n",cpu_get_pc(machine->activecpu), offset, data, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
+		mame_printf_info("%06x Decathlete prot W offset %04x data %08x, regs %08x, %08x, %08x, %08x\n",cpu_get_pc(space->cpu), offset, data, decathlt_protregs[0], decathlt_protregs[1], decathlt_protregs[2], decathlt_protregs[3]);
 	}
 
 	if (offset==1) // uploads 2 tables...

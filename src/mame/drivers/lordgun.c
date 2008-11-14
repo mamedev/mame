@@ -158,10 +158,10 @@ static READ16_HANDLER( lordgun_gun_1_y_r )		{ return lordgun_gun[1].hw_y; }
 
 static WRITE16_HANDLER( lordgun_soundlatch_w )
 {
-	if (ACCESSING_BITS_0_7)	soundlatch_w (machine, 0, (data >> 0) & 0xff);
-	if (ACCESSING_BITS_8_15)	soundlatch2_w(machine, 0, (data >> 8) & 0xff);
+	if (ACCESSING_BITS_0_7)	soundlatch_w (space->machine, 0, (data >> 0) & 0xff);
+	if (ACCESSING_BITS_8_15)	soundlatch2_w(space, 0, (data >> 8) & 0xff);
 
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( lordgun_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -236,7 +236,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( lordgun_okibank_w )
 {
 	okim6295_set_bank_base(0, (data & 2) ? 0x40000 : 0);
-	if (data & ~3)	logerror("%04x: unknown okibank bits %02x\n", cpu_get_pc(machine->activecpu), data);
+	if (data & ~3)	logerror("%04x: unknown okibank bits %02x\n", cpu_get_pc(space->cpu), data);
 //  popmessage("OKI %x", data);
 }
 

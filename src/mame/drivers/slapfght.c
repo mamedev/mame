@@ -513,7 +513,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(tigerh_status_r)
 {
-	return (slapfight_port_00_r(machine,0)&0xf9)| ((tigerh_mcu_status_r(machine,0)));
+	return (slapfight_port_00_r(space,0)&0xf9)| ((tigerh_mcu_status_r(space,0)));
 }
 
 static ADDRESS_MAP_START( tigerh_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1798,10 +1798,10 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6D38: 20 F8         jr   nz,$6D32
         6D3A: 10 E0         djnz $6D1C
     */
-	if (cpu_get_pc(machine->activecpu) == 0x6d1e) return 0;
-	if (cpu_get_pc(machine->activecpu) == 0x6d24) return 6;
-	if (cpu_get_pc(machine->activecpu) == 0x6d2c) return 2;
-	if (cpu_get_pc(machine->activecpu) == 0x6d34) return 4;
+	if (cpu_get_pc(space->cpu) == 0x6d1e) return 0;
+	if (cpu_get_pc(space->cpu) == 0x6d24) return 6;
+	if (cpu_get_pc(space->cpu) == 0x6d2c) return 2;
+	if (cpu_get_pc(space->cpu) == 0x6d34) return 4;
 
 	/* The bootleg hangs in the "test mode" before diplaying (wrong) lives settings :
         6AD4: DB 00         in   a,($00)
@@ -1822,11 +1822,11 @@ static READ8_HANDLER( gtstarb1_port_0_read )
         6AF7: 20 FA         jr   nz,$6AF3
        This seems to be what used to be the MCU status.
     */
-	if (cpu_get_pc(machine->activecpu) == 0x6ad6) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(machine->activecpu) == 0x6ae4) return 2; /* bit 1 must be ON */
-	if (cpu_get_pc(machine->activecpu) == 0x6af5) return 0; /* bit 2 must be OFF */
+	if (cpu_get_pc(space->cpu) == 0x6ad6) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(space->cpu) == 0x6ae4) return 2; /* bit 1 must be ON */
+	if (cpu_get_pc(space->cpu) == 0x6af5) return 0; /* bit 2 must be OFF */
 
-	logerror("Port Read PC=%04x\n",cpu_get_pc(machine->activecpu));
+	logerror("Port Read PC=%04x\n",cpu_get_pc(space->cpu));
 
 	return 0;
 }
@@ -1836,7 +1836,7 @@ static READ8_HANDLER( gtstarb1_dpram_r )
 	/* requires this or it gets stuck with 'rom test' on screen */
 	/* it is possible the program roms are slighly corrupt like the gfx roms, or
        that the bootleg simply shouldn't execute the code due to the modified roms */
-	if (cpu_get_pc(machine->activecpu)==0x6d54) return 0xff;
+	if (cpu_get_pc(space->cpu)==0x6d54) return 0xff;
 	return slapfight_dpram[offset];
 }
 
@@ -1881,8 +1881,8 @@ static READ8_HANDLER( slapfigh_mcu_r )
 	/* pass initial checks */
 	static const int protvalues[] = { 0xc7, 0x55, -1 };
 
-	if ((cpu_get_pc(machine->activecpu)==0x1369) || // slapfigh
-		(cpu_get_pc(machine->activecpu)==0x136d)) // slapfiga
+	if ((cpu_get_pc(space->cpu)==0x1369) || // slapfigh
+		(cpu_get_pc(space->cpu)==0x136d)) // slapfiga
 	{
 		int retdat = protvalues[slapfigh_prot_pos];
 		if (retdat == -1)
@@ -1894,7 +1894,7 @@ static READ8_HANDLER( slapfigh_mcu_r )
 		slapfigh_prot_pos++;
 		return retdat;
 	}
-	logerror("MCU Read PC=%04x\n",cpu_get_pc(machine->activecpu));
+	logerror("MCU Read PC=%04x\n",cpu_get_pc(space->cpu));
 	return 0;
 }
 

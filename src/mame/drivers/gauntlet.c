@@ -154,11 +154,13 @@ static void update_interrupts(running_machine *machine)
 
 static void scanline_update(const device_config *screen, int scanline)
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[1], ADDRESS_SPACE_PROGRAM);
+
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
 		atarigen_6502_irq_gen(screen->machine->cpu[1]);
 	else
-		atarigen_6502_irq_ack_r(screen->machine, 0);
+		atarigen_6502_irq_ack_r(space, 0);
 }
 
 
@@ -184,7 +186,7 @@ static MACHINE_RESET( gauntlet )
 
 static READ16_HANDLER( port4_r )
 {
-	int temp = input_port_read(machine, "803008");
+	int temp = input_port_read(space->machine, "803008");
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0020;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x0010;
 	return temp;
@@ -207,7 +209,7 @@ static WRITE16_HANDLER( sound_reset_w )
 
 		if ((oldword ^ sound_reset_val) & 1)
 		{
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
 			atarigen_sound_reset();
 		}
 	}
@@ -228,7 +230,7 @@ static READ8_HANDLER( switch_6502_r )
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x80;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x40;
 	if (tms5220_ready_r()) temp ^= 0x20;
-	if (!(input_port_read(machine, "803008") & 0x0008)) temp ^= 0x10;
+	if (!(input_port_read(space->machine, "803008") & 0x0008)) temp ^= 0x10;
 
 	return temp;
 }
@@ -263,7 +265,7 @@ static WRITE8_HANDLER( sound_ctl_w )
 
 		case 1:	/* speech write, bit D7, active low */
 			if (((data ^ last_speech_write) & 0x80) && (data & 0x80))
-				tms5220_data_w(machine, 0, speech_val);
+				tms5220_data_w(space, 0, speech_val);
 			last_speech_write = data;
 			break;
 
@@ -289,9 +291,9 @@ static WRITE8_HANDLER( sound_ctl_w )
 
 static WRITE8_HANDLER( mixer_w )
 {
-	atarigen_set_ym2151_vol(machine, (data & 7) * 100 / 7);
-	atarigen_set_pokey_vol(machine, ((data >> 3) & 3) * 100 / 3);
-	atarigen_set_tms5220_vol(machine, ((data >> 5) & 7) * 100 / 7);
+	atarigen_set_ym2151_vol(space->machine, (data & 7) * 100 / 7);
+	atarigen_set_pokey_vol(space->machine, ((data >> 3) & 3) * 100 / 3);
+	atarigen_set_tms5220_vol(space->machine, ((data >> 5) & 7) * 100 / 7);
 }
 
 

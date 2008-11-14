@@ -603,18 +603,18 @@ WRITE8_HANDLER( superpac_flipscreen_w );
 ***************************************************************************/
 
 static int mux;
-static READ8_HANDLER( in0_l )	{ return input_port_read(machine, "IN0"); }		// P1 joystick
-static READ8_HANDLER( in0_h )	{ return input_port_read(machine, "IN0") >> 4; }	// P2 joystick
-static READ8_HANDLER( in1_l )	{ return input_port_read(machine, "IN1"); }		// fire and start buttons
-static READ8_HANDLER( in1_h )	{ return input_port_read(machine, "IN1") >> 4; }	// coins
-static READ8_HANDLER( in2 )		{ return input_port_read(machine, "DSW0"); }		// test, cocktail, optional buttons
-static READ8_HANDLER( dipA_l )	{ return input_port_read(machine, "DSW1"); }		// dips A
-static READ8_HANDLER( dipA_h )	{ return input_port_read(machine, "DSW1") >> 4; }	// dips A
-static READ8_HANDLER( dipB_mux )	{ return input_port_read(machine, "DSW2") >> (4*mux); }	// dips B
+static READ8_HANDLER( in0_l )	{ return input_port_read(space->machine, "IN0"); }		// P1 joystick
+static READ8_HANDLER( in0_h )	{ return input_port_read(space->machine, "IN0") >> 4; }	// P2 joystick
+static READ8_HANDLER( in1_l )	{ return input_port_read(space->machine, "IN1"); }		// fire and start buttons
+static READ8_HANDLER( in1_h )	{ return input_port_read(space->machine, "IN1") >> 4; }	// coins
+static READ8_HANDLER( in2 )		{ return input_port_read(space->machine, "DSW0"); }		// test, cocktail, optional buttons
+static READ8_HANDLER( dipA_l )	{ return input_port_read(space->machine, "DSW1"); }		// dips A
+static READ8_HANDLER( dipA_h )	{ return input_port_read(space->machine, "DSW1") >> 4; }	// dips A
+static READ8_HANDLER( dipB_mux )	{ return input_port_read(space->machine, "DSW2") >> (4*mux); }	// dips B
 static READ8_HANDLER( dipB_muxi )	// dips B
 {
 	// bits are interleaved in Phozon
-	return BITSWAP8(input_port_read(machine, "DSW2"),6,4,2,0,7,5,3,1) >> (4*mux);
+	return BITSWAP8(input_port_read(space->machine, "DSW2"),6,4,2,0,7,5,3,1) >> (4*mux);
 }
 static WRITE8_HANDLER( out_mux )	{ mux = data & 1; }
 static WRITE8_HANDLER( out_lamps )
@@ -690,7 +690,7 @@ static DRIVER_INIT( 58_56 )
 static WRITE8_HANDLER( mappy_snd_sharedram_w )
 {
 	if (offset < 0x40)
-		namco_15xx_w(machine,offset,data);
+		namco_15xx_w(space,offset,data);
 	else
 		namco_soundregs[offset] = data;
 }
@@ -704,13 +704,13 @@ static WRITE8_HANDLER( superpac_latch_w )
 		case 0x00:	/* INT ON 2 */
 			cpu_interrupt_enable(1,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* n.c. */
@@ -726,7 +726,7 @@ static WRITE8_HANDLER( superpac_latch_w )
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */
@@ -746,19 +746,19 @@ static WRITE8_HANDLER( phozon_latch_w )
 		case 0x00:
 			cpu_interrupt_enable(1,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x04:
 			cpu_interrupt_enable(2,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
 			break;
 
 		case 0x06:
@@ -771,11 +771,11 @@ static WRITE8_HANDLER( phozon_latch_w )
 			break;
 
 		case 0x0a:
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:
-			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0e:
@@ -792,13 +792,13 @@ static WRITE8_HANDLER( mappy_latch_w )
 		case 0x00:	/* INT ON 2 */
 			cpu_interrupt_enable(1,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 			break;
 
 		case 0x02:	/* INT ON */
 			cpu_interrupt_enable(0,bit);
 			if (!bit)
-				cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			break;
 
 		case 0x04:	/* FLIP */
@@ -815,7 +815,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 			break;
 
 		case 0x0a:	/* SUB RESET */
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, bit ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 0x0c:	/* n.c. */

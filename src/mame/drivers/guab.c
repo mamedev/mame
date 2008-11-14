@@ -175,7 +175,7 @@ static WRITE16_HANDLER( ef9369_w )
 			col = pal.clut[entry] & 0xfff;
 
 			/* Update the MAME palette */
-			palette_set_color_rgb(machine, entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
+			palette_set_color_rgb(space->machine, entry, pal4bit(col >> 0), pal4bit(col >> 4), pal4bit(col >> 8));
 		}
 
 			/* Address register auto-increment */
@@ -440,7 +440,7 @@ static WRITE16_HANDLER( wd1770_w )
 															fdc.sector));
 
 					/* Trigger a DRQ interrupt on the CPU */
-					cpu_set_input_line(machine->cpu[0], INT_FLOPPYCTRL, ASSERT_LINE);
+					cpu_set_input_line(space->machine->cpu[0], INT_FLOPPYCTRL, ASSERT_LINE);
 					fdc.status |= DATA_REQUEST;
 					break;
 				}
@@ -485,7 +485,7 @@ static WRITE16_HANDLER( wd1770_w )
 			fdc.data = data;
 
 			/* Clear the DRQ */
-			cpu_set_input_line(machine->cpu[0], INT_FLOPPYCTRL, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], INT_FLOPPYCTRL, CLEAR_LINE);
 
 			/* Queue an event to write the data if write command was specified */
 			if (fdc.cmd & 0x20)
@@ -522,7 +522,7 @@ static READ16_HANDLER( wd1770_r )
 			retval = fdc.data;
 
 			/* Clear the DRQ */
-			cpu_set_input_line(machine->cpu[0], INT_FLOPPYCTRL, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], INT_FLOPPYCTRL, CLEAR_LINE);
 			fdc.status &= ~DATA_REQUEST;
 			break;
 		}
@@ -548,7 +548,7 @@ static READ16_HANDLER( io_r )
 		case 0x01:
 		case 0x02:
 		{
-			return input_port_read(machine, portnames[offset]);
+			return input_port_read(space->machine, portnames[offset]);
 		}
 		case 0x30:
 		{

@@ -23,13 +23,13 @@
 
 WRITE8_HANDLER( avalnche_noise_amplitude_w )
 {
-	discrete_sound_w(machine, AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
+	discrete_sound_w(space, AVALNCHE_SOUNDLVL_DATA, data & 0x3f);
 }
 
 
 WRITE8_HANDLER( avalnche_attract_enable_w )
 {
-	discrete_sound_w(machine, AVALNCHE_ATTRACT_EN, data & 0x01);
+	discrete_sound_w(space, AVALNCHE_ATTRACT_EN, data & 0x01);
 }
 
 
@@ -40,16 +40,16 @@ WRITE8_HANDLER( avalnche_audio_w )
 	switch (offset & 0x07)
 	{
 	case 0x00:		/* AUD0 */
-		discrete_sound_w(machine, AVALNCHE_AUD0_EN, bit);
+		discrete_sound_w(space, AVALNCHE_AUD0_EN, bit);
 		break;
 
 	case 0x01:		/* AUD1 */
-		discrete_sound_w(machine, AVALNCHE_AUD1_EN, bit);
+		discrete_sound_w(space, AVALNCHE_AUD1_EN, bit);
 		break;
 
 	case 0x02:		/* AUD2 */
 	default:
-		discrete_sound_w(machine, AVALNCHE_AUD2_EN, bit);
+		discrete_sound_w(space, AVALNCHE_AUD2_EN, bit);
 		break;
 	}
 }

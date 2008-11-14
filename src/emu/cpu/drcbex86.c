@@ -4121,25 +4121,25 @@ static x86code *op_read(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
 	{
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->read_byte);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.read_byte);
 																						// call   read_byte
 		emit_movzx_r32_r8(&dst, dstreg, REG_AL);										// movzx  dstreg,al
 	}
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
 	{
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->read_word);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.read_word);
 																						// call   read_word
 		emit_movzx_r32_r16(&dst, dstreg, REG_AX);										// movzx  dstreg,ax
 	}
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
 	{
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->read_dword);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.read_dword);
 																						// call   read_dword
 		emit_mov_r32_r32(&dst, dstreg, REG_EAX);										// mov    dstreg,eax
 	}
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
 	{
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->read_qword);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.read_qword);
 																						// call   read_qword
 		emit_mov_r32_r32(&dst, dstreg, REG_EAX);										// mov    dstreg,eax
 	}
@@ -4200,19 +4200,19 @@ static x86code *op_readm(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
 	{
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->read_word_masked);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.read_word_masked);
 																						// call   read_word_masked
 		emit_movzx_r32_r16(&dst, dstreg, REG_AX);										// movzx  dstreg,ax
 	}
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
 	{
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->read_dword_masked);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.read_dword_masked);
 																						// call   read_dword_masked
 		emit_mov_r32_r32(&dst, dstreg, REG_EAX);										// mov    dstreg,eax
 	}
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
 	{
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->read_qword_masked);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.read_qword_masked);
 																						// call   read_qword_masked
 		emit_mov_r32_r32(&dst, dstreg, REG_EAX);										// mov    dstreg,eax
 	}
@@ -4268,16 +4268,16 @@ static x86code *op_write(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 4), &srcp);							// mov    [esp+4],srcp
 	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_byte);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.write_byte);
 																						// call   write_byte
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_word);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.write_word);
 																						// call   write_word
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_dword);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.write_dword);
 																						// call   write_dword
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_qword);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.write_qword);
 																						// call   write_qword
 	return dst;
 }
@@ -4312,13 +4312,13 @@ static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	}
 	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_word_masked);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.write_word_masked);
 																						// call   write_word_masked
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_DWORD)
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_dword_masked);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.write_dword_masked);
 																						// call   write_dword_masked
 	else if ((spacesizep.value & 3) == DRCUML_SIZE_QWORD)
-		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16].accessors->write_qword_masked);
+		emit_call(&dst, (x86code *)active_address_space[spacesizep.value / 16]->accessors.write_qword_masked);
 																						// call   write_qword_masked
 	return dst;
 }
@@ -6180,9 +6180,9 @@ static x86code *op_fread(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	/* set up a call to the read dword/qword handler */
 	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if (inst->size == 4)
-		emit_call(&dst, (x86code *)active_address_space[spacep.value].accessors->read_dword);// call   read_dword
+		emit_call(&dst, (x86code *)active_address_space[spacep.value]->accessors.read_dword);// call   read_dword
 	else if (inst->size == 8)
-		emit_call(&dst, (x86code *)active_address_space[spacep.value].accessors->read_qword);// call   read_qword
+		emit_call(&dst, (x86code *)active_address_space[spacep.value]->accessors.read_qword);// call   read_qword
 
 	/* store result */
 	if (inst->size == 4)
@@ -6217,9 +6217,9 @@ static x86code *op_fwrite(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 4), &srcp);							// mov    [esp+4],srcp
 	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 0), &addrp);								// mov    [esp],addrp
 	if (inst->size == 4)
-		emit_call(&dst, (x86code *)active_address_space[spacep.value].accessors->write_dword);// call   write_dword
+		emit_call(&dst, (x86code *)active_address_space[spacep.value]->accessors.write_dword);// call   write_dword
 	else if (inst->size == 8)
-		emit_call(&dst, (x86code *)active_address_space[spacep.value].accessors->write_qword);// call   write_qword
+		emit_call(&dst, (x86code *)active_address_space[spacep.value]->accessors.write_qword);// call   write_qword
 
 	return dst;
 }

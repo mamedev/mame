@@ -93,7 +93,7 @@ WRITE16_HANDLER( m92_spritecontrol_w )
 	/* Sprite buffer - the data written doesn't matter (confirmed by several games) */
 	if (offset==4)
 	{
-			buffer_spriteram16_w(machine,0,0,0xffff);
+			buffer_spriteram16_w(space,0,0,0xffff);
 		m92_sprite_buffer_busy = 0;
 
 		/* Pixel clock is 26.6666 MHz, we have 0x800 bytes, or 0x400 words
@@ -101,7 +101,7 @@ WRITE16_HANDLER( m92_spritecontrol_w )
            word can be copied per clock.*/
 		timer_set(attotime_mul(ATTOTIME_IN_HZ(26666000), 0x400), NULL, 0, spritebuffer_callback);
 	}
-//  logerror("%04x: m92_spritecontrol_w %08x %08x\n",cpu_get_pc(machine->activecpu),offset,data);
+//  logerror("%04x: m92_spritecontrol_w %08x %08x\n",cpu_get_pc(space->cpu),offset,data);
 }
 
 WRITE16_HANDLER( m92_videocontrol_w )
@@ -124,7 +124,7 @@ WRITE16_HANDLER( m92_videocontrol_w )
 		/* Access to upper palette bank */
 		m92_palette_bank = (data >> 1) & 1;
 	}
-//  logerror("%04x: m92_videocontrol_w %d = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
+//  logerror("%04x: m92_videocontrol_w %d = %02x\n",cpu_get_pc(space->cpu),offset,data);
 }
 
 READ16_HANDLER( m92_paletteram_r )
@@ -134,7 +134,7 @@ READ16_HANDLER( m92_paletteram_r )
 
 WRITE16_HANDLER( m92_paletteram_w )
 {
-	paletteram16_xBBBBBGGGGGRRRRR_word_w(machine, offset + 0x400 * m92_palette_bank, data, mem_mask);
+	paletteram16_xBBBBBGGGGGRRRRR_word_w(space, offset + 0x400 * m92_palette_bank, data, mem_mask);
 }
 
 /*****************************************************************************/

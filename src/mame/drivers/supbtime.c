@@ -36,24 +36,24 @@ static READ16_HANDLER( supbtime_controls_r )
  	switch (offset<<1)
 	{
 		case 0:
-			return input_port_read(machine, "INPUTS");
+			return input_port_read(space->machine, "INPUTS");
 		case 2:
-			return input_port_read(machine, "DSW");
+			return input_port_read(space->machine, "DSW");
 		case 8:
-			return input_port_read(machine, "COIN");
+			return input_port_read(space->machine, "COIN");
 		case 10: /* ?  Not used for anything */
 		case 12:
 			return 0;
 	}
 
-	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(machine->activecpu),offset);
+	logerror("CPU #0 PC %06x: warning - read unmapped control address %06x\n",cpu_get_pc(space->cpu),offset);
 	return ~0;
 }
 
 static WRITE16_HANDLER( sound_w )
 {
-	soundlatch_w(machine,0,data & 0xff);
-	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+	soundlatch_w(space,0,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 }
 
 /******************************************************************************/
@@ -120,10 +120,10 @@ static WRITE8_HANDLER( YM2151_w )
 {
 	switch (offset) {
 	case 0:
-		ym2151_register_port_0_w(machine,0,data);
+		ym2151_register_port_0_w(space,0,data);
 		break;
 	case 1:
-		ym2151_data_port_0_w(machine,0,data);
+		ym2151_data_port_0_w(space,0,data);
 		break;
 	}
 }

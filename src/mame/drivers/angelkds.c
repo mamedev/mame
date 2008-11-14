@@ -161,7 +161,7 @@ VIDEO_UPDATE( angelkds );
 static WRITE8_HANDLER ( angelkds_cpu_bank_write )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "user1");
+	UINT8 *RAM = memory_region(space->machine, "user1");
 
 	bankaddress = data & 0x0f;
 	memory_set_bankptr(1,&RAM[bankaddress*0x4000]);
@@ -184,9 +184,9 @@ static READ8_HANDLER( angelkds_input_r )
 	static const char *const portnames[] = { "I81", "I82" };
 	static const char *const fakenames[] = { "FAKE1", "FAKE2" };
 
-	fake = input_port_read(machine, fakenames[offset]);
+	fake = input_port_read(space->machine, fakenames[offset]);
 
-	return ((fake & 0x01) ? fake  : input_port_read(machine, portnames[offset]));
+	return ((fake & 0x01) ? fake  : input_port_read(space->machine, portnames[offset]));
 }
 
 #else
@@ -195,7 +195,7 @@ static READ8_HANDLER( angelkds_input_r )
 {
 	static const char *const portnames[] = { "I81", "I82" };
 
-	return input_port_read(machine, portnames[offset]);
+	return input_port_read(space->machine, portnames[offset]);
 }
 
 #endif

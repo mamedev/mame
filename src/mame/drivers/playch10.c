@@ -362,17 +362,17 @@ static WRITE8_HANDLER( time_w )
 
 static READ8_HANDLER( psg_4015_r )
 {
-	return nes_psg_0_r(machine, 0x15);
+	return nes_psg_0_r(space, 0x15);
 }
 
 static WRITE8_HANDLER( psg_4015_w )
 {
-	nes_psg_0_w(machine, 0x15, data);
+	nes_psg_0_w(space, 0x15, data);
 }
 
 static WRITE8_HANDLER( psg_4017_w )
 {
-	nes_psg_0_w(machine, 0x17, data);
+	nes_psg_0_w(space, 0x17, data);
 }
 
 /******************************************************************************/

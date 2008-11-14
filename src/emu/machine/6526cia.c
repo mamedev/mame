@@ -784,8 +784,8 @@ UINT8 cia_get_output_a(int which)	{ return cia_array[which].port[0].out; }
 UINT8 cia_get_output_b(int which)	{ return cia_array[which].port[1].out; }
 int cia_get_irq(int which)			{ return cia_array[which].irq; }
 
-READ8_HANDLER( cia_0_r )	{ return cia_read(machine, 0, offset); }
-READ8_HANDLER( cia_1_r )	{ return cia_read(machine, 1, offset); }
+READ8_HANDLER( cia_0_r )	{ return cia_read(space->machine, 0, offset); }
+READ8_HANDLER( cia_1_r )	{ return cia_read(space->machine, 1, offset); }
 
-WRITE8_HANDLER( cia_0_w )	{ cia_write(machine, 0, offset, data); }
-WRITE8_HANDLER( cia_1_w )	{ cia_write(machine, 1, offset, data); }
+WRITE8_HANDLER( cia_0_w )	{ cia_write(space->machine, 0, offset, data); }
+WRITE8_HANDLER( cia_1_w )	{ cia_write(space->machine, 1, offset, data); }

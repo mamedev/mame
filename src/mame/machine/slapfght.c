@@ -73,38 +73,38 @@ READ8_HANDLER( slapfight_dpram_r )
 /* Reset and hold sound CPU */
 WRITE8_HANDLER( slapfight_port_00_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	getstar_sh_intenabled = 0;
 }
 
 /* Release reset on sound CPU */
 WRITE8_HANDLER( slapfight_port_01_w )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 /* Disable and clear hardware interrupt */
 WRITE8_HANDLER( slapfight_port_06_w )
 {
-	interrupt_enable_w(machine,0,0);
+	interrupt_enable_w(space,0,0);
 }
 
 /* Enable hardware interrupt */
 WRITE8_HANDLER( slapfight_port_07_w )
 {
-	interrupt_enable_w(machine,0,1);
+	interrupt_enable_w(space,0,1);
 }
 
 WRITE8_HANDLER( slapfight_port_08_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	memory_set_bankptr(1,&RAM[0x10000]);
 }
 
 WRITE8_HANDLER( slapfight_port_09_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	memory_set_bankptr(1,&RAM[0x14000]);
 }
@@ -193,13 +193,13 @@ READ8_HANDLER( getstar_e803_r )
 					getstar_val = 0x76;
 					break;
 				default:
-					logerror("%04x: getstar_e803_r - cmd = %02x\n",cpu_get_pc(machine->activecpu),getstar_cmd);
+					logerror("%04x: getstar_e803_r - cmd = %02x\n",cpu_get_pc(space->cpu),getstar_cmd);
 					break;
 			}
 			break;
 		case GTSTARB1:
 			/* value isn't computed by the bootleg but we want to please the "test mode" */
-			if (cpu_get_pc(machine->activecpu) == 0x6b04) return (lives_lookup_table[gs_a]);
+			if (cpu_get_pc(space->cpu) == 0x6b04) return (lives_lookup_table[gs_a]);
 			break;
 		case GTSTARB2:
 			/*
@@ -212,14 +212,14 @@ READ8_HANDLER( getstar_e803_r )
             0576: BE            cp   (hl)
             0577: C2 6E 05      jp   nz,$056E
             */
-			if (cpu_get_pc(machine->activecpu) == 0x056e) return (getstar_val);
-			if (cpu_get_pc(machine->activecpu) == 0x0570) return (getstar_val+1);
-			if (cpu_get_pc(machine->activecpu) == 0x0577) return ((getstar_val+0x05) ^ 0x56);
+			if (cpu_get_pc(space->cpu) == 0x056e) return (getstar_val);
+			if (cpu_get_pc(space->cpu) == 0x0570) return (getstar_val+1);
+			if (cpu_get_pc(space->cpu) == 0x0577) return ((getstar_val+0x05) ^ 0x56);
 			/* value isn't computed by the bootleg but we want to please the "test mode" */
-			if (cpu_get_pc(machine->activecpu) == 0x6b04) return (lgsb2_lookup_table[gs_a]);
+			if (cpu_get_pc(space->cpu) == 0x6b04) return (lgsb2_lookup_table[gs_a]);
 			break;
 		default:
-			logerror("%04x: getstar_e803_r - cmd = %02x - unknown set !\n",cpu_get_pc(machine->activecpu),getstar_cmd);
+			logerror("%04x: getstar_e803_r - cmd = %02x - unknown set !\n",cpu_get_pc(space->cpu),getstar_cmd);
 			break;
 	}
 	return getstar_val;
@@ -231,183 +231,183 @@ WRITE8_HANDLER( getstar_e803_w )
 	{
 		case GETSTAR:
 			/* unknown effect - not read back */
-			if (cpu_get_pc(machine->activecpu) == 0x00bf)
+			if (cpu_get_pc(space->cpu) == 0x00bf)
 			{
 				getstar_cmd = 0x00;
 				GS_RESET_REGS
 			}
 			/* players inputs */
-			if (cpu_get_pc(machine->activecpu) == 0x0560)
+			if (cpu_get_pc(space->cpu) == 0x0560)
 			{
 				getstar_cmd = 0x25;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x056d)
+			if (cpu_get_pc(space->cpu) == 0x056d)
 			{
 				getstar_cmd = 0x25;
 				GS_SAVE_REGS
 			}
 			/* lose life */
-			if (cpu_get_pc(machine->activecpu) == 0x0a0a)
+			if (cpu_get_pc(space->cpu) == 0x0a0a)
 			{
 				getstar_cmd = 0x21;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0a17)
+			if (cpu_get_pc(space->cpu) == 0x0a17)
 			{
 				getstar_cmd = 0x21;
 				GS_SAVE_REGS
 			}
 			/* unknown effect */
-			if (cpu_get_pc(machine->activecpu) == 0x0a51)
+			if (cpu_get_pc(space->cpu) == 0x0a51)
 			{
 				getstar_cmd = 0x29;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0a6e)
+			if (cpu_get_pc(space->cpu) == 0x0a6e)
 			{
 				getstar_cmd = 0x29;
 				GS_SAVE_REGS
 			}
 			/* continue play */
-			if (cpu_get_pc(machine->activecpu) == 0x0ae3)
+			if (cpu_get_pc(space->cpu) == 0x0ae3)
 			{
 				getstar_cmd = 0x20;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0af0)
+			if (cpu_get_pc(space->cpu) == 0x0af0)
 			{
 				getstar_cmd = 0x20;
 				GS_SAVE_REGS
 			}
 			/* unknown effect - not read back */
-			if (cpu_get_pc(machine->activecpu) == 0x0b62)
+			if (cpu_get_pc(space->cpu) == 0x0b62)
 			{
 				getstar_cmd = 0x00;     /* 0x1f */
 				GS_RESET_REGS
 			}
 			/* change player (if 2 players game) */
-			if (cpu_get_pc(machine->activecpu) == 0x0bab)
+			if (cpu_get_pc(space->cpu) == 0x0bab)
 			{
 				getstar_cmd = 0x2a;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0bb8)
+			if (cpu_get_pc(space->cpu) == 0x0bb8)
 			{
 				getstar_cmd = 0x2a;
 				GS_SAVE_REGS
 			}
 			/* game phase */
-			if (cpu_get_pc(machine->activecpu) == 0x0d37)
+			if (cpu_get_pc(space->cpu) == 0x0d37)
 			{
 				getstar_cmd = 0x24;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0d44)
+			if (cpu_get_pc(space->cpu) == 0x0d44)
 			{
 				getstar_cmd = 0x24;
 				GS_SAVE_REGS
 			}
 			/* starting lives */
-			if (cpu_get_pc(machine->activecpu) == 0x0d79)
+			if (cpu_get_pc(space->cpu) == 0x0d79)
 			{
 				getstar_cmd = 0x23;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0d8a)
+			if (cpu_get_pc(space->cpu) == 0x0d8a)
 			{
 				getstar_cmd = 0x23;
 				GS_SAVE_REGS
 			}
 			/* starting difficulty */
-			if (cpu_get_pc(machine->activecpu) == 0x0dc1)
+			if (cpu_get_pc(space->cpu) == 0x0dc1)
 			{
 				getstar_cmd = 0x22;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0dd0)
+			if (cpu_get_pc(space->cpu) == 0x0dd0)
 			{
 				getstar_cmd = 0x22;
 				GS_SAVE_REGS
 			}
 			/* starting lives (again) */
-			if (cpu_get_pc(machine->activecpu) == 0x1011)
+			if (cpu_get_pc(space->cpu) == 0x1011)
 			{
 				getstar_cmd = 0x23;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x101e)
+			if (cpu_get_pc(space->cpu) == 0x101e)
 			{
 				getstar_cmd = 0x23;
 				GS_SAVE_REGS
 			}
 			/* hardware test */
-			if (cpu_get_pc(machine->activecpu) == 0x107a)
+			if (cpu_get_pc(space->cpu) == 0x107a)
 			{
 				getstar_cmd = 0x73;
 				GS_RESET_REGS
 			}
 			/* game phase (again) */
-			if (cpu_get_pc(machine->activecpu) == 0x10c6)
+			if (cpu_get_pc(space->cpu) == 0x10c6)
 			{
 				getstar_cmd = 0x24;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x10d3)
+			if (cpu_get_pc(space->cpu) == 0x10d3)
 			{
 				getstar_cmd = 0x24;
 				GS_SAVE_REGS
 			}
 			/* background */
-			if (cpu_get_pc(machine->activecpu) == 0x1910)
+			if (cpu_get_pc(space->cpu) == 0x1910)
 			{
 				getstar_cmd = 0x26;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x191d)
+			if (cpu_get_pc(space->cpu) == 0x191d)
 			{
 				getstar_cmd = 0x26;
 				GS_SAVE_REGS
 			}
 			/* foreground */
-			if (cpu_get_pc(machine->activecpu) == 0x19d5)
+			if (cpu_get_pc(space->cpu) == 0x19d5)
 			{
 				getstar_cmd = 0x37;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x19e4)
+			if (cpu_get_pc(space->cpu) == 0x19e4)
 			{
 				getstar_cmd = 0x37;
 				GS_SAVE_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x19f1)
+			if (cpu_get_pc(space->cpu) == 0x19f1)
 			{
 				getstar_cmd = 0x37;
 				/* do NOT update the registers because there are 2 writes before 2 reads ! */
 			}
 			/* laser position */
-			if (cpu_get_pc(machine->activecpu) == 0x26af)
+			if (cpu_get_pc(space->cpu) == 0x26af)
 			{
 				getstar_cmd = 0x38;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x26be)
+			if (cpu_get_pc(space->cpu) == 0x26be)
 			{
 				getstar_cmd = 0x38;
 				GS_SAVE_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x26cb)
+			if (cpu_get_pc(space->cpu) == 0x26cb)
 			{
 				getstar_cmd = 0x38;
 				/* do NOT update the registers because there are 2 writes before 2 reads ! */
 			}
 			/* starting lives (for "test mode") */
-			if (cpu_get_pc(machine->activecpu) == 0x6a27)
+			if (cpu_get_pc(space->cpu) == 0x6a27)
 			{
 				getstar_cmd = 0x23;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x6a38)
+			if (cpu_get_pc(space->cpu) == 0x6a38)
 			{
 				getstar_cmd = 0x23;
 				GS_SAVE_REGS
@@ -415,183 +415,183 @@ WRITE8_HANDLER( getstar_e803_w )
 			break;
 		case GETSTARJ:
 			/* unknown effect - not read back */
-			if (cpu_get_pc(machine->activecpu) == 0x00bf)
+			if (cpu_get_pc(space->cpu) == 0x00bf)
 			{
 				getstar_cmd = 0x00;
 				GS_RESET_REGS
 			}
 			/* players inputs */
-			if (cpu_get_pc(machine->activecpu) == 0x0560)
+			if (cpu_get_pc(space->cpu) == 0x0560)
 			{
 				getstar_cmd = 0x25;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x056d)
+			if (cpu_get_pc(space->cpu) == 0x056d)
 			{
 				getstar_cmd = 0x25;
 				GS_SAVE_REGS
 			}
 			/* lose life */
-			if (cpu_get_pc(machine->activecpu) == 0x0ad5)
+			if (cpu_get_pc(space->cpu) == 0x0ad5)
 			{
 				getstar_cmd = 0x21;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0ae2)
+			if (cpu_get_pc(space->cpu) == 0x0ae2)
 			{
 				getstar_cmd = 0x21;
 				GS_SAVE_REGS
 			}
 			/* unknown effect */
-			if (cpu_get_pc(machine->activecpu) == 0x0b1c)
+			if (cpu_get_pc(space->cpu) == 0x0b1c)
 			{
 				getstar_cmd = 0x29;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0b29)
+			if (cpu_get_pc(space->cpu) == 0x0b29)
 			{
 				getstar_cmd = 0x29;
 				GS_SAVE_REGS
 			}
 			/* continue play */
-			if (cpu_get_pc(machine->activecpu) == 0x0bae)
+			if (cpu_get_pc(space->cpu) == 0x0bae)
 			{
 				getstar_cmd = 0x20;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0bbb)
+			if (cpu_get_pc(space->cpu) == 0x0bbb)
 			{
 				getstar_cmd = 0x20;
 				GS_SAVE_REGS
 			}
 			/* unknown effect - not read back */
-			if (cpu_get_pc(machine->activecpu) == 0x0c2d)
+			if (cpu_get_pc(space->cpu) == 0x0c2d)
 			{
 				getstar_cmd = 0x00;     /* 0x1f */
 				GS_RESET_REGS
 			}
 			/* change player (if 2 players game) */
-			if (cpu_get_pc(machine->activecpu) == 0x0c76)
+			if (cpu_get_pc(space->cpu) == 0x0c76)
 			{
 				getstar_cmd = 0x2a;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0c83)
+			if (cpu_get_pc(space->cpu) == 0x0c83)
 			{
 				getstar_cmd = 0x2a;
 				GS_SAVE_REGS
 			}
 			/* game phase */
-			if (cpu_get_pc(machine->activecpu) == 0x0e02)
+			if (cpu_get_pc(space->cpu) == 0x0e02)
 			{
 				getstar_cmd = 0x24;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0e0f)
+			if (cpu_get_pc(space->cpu) == 0x0e0f)
 			{
 				getstar_cmd = 0x24;
 				GS_SAVE_REGS
 			}
 			/* starting lives */
-			if (cpu_get_pc(machine->activecpu) == 0x0e44)
+			if (cpu_get_pc(space->cpu) == 0x0e44)
 			{
 				getstar_cmd = 0x23;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0e55)
+			if (cpu_get_pc(space->cpu) == 0x0e55)
 			{
 				getstar_cmd = 0x23;
 				GS_SAVE_REGS
 			}
 			/* starting difficulty */
-			if (cpu_get_pc(machine->activecpu) == 0x0e8c)
+			if (cpu_get_pc(space->cpu) == 0x0e8c)
 			{
 				getstar_cmd = 0x22;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x0e9b)
+			if (cpu_get_pc(space->cpu) == 0x0e9b)
 			{
 				getstar_cmd = 0x22;
 				GS_SAVE_REGS
 			}
 			/* starting lives (again) */
-			if (cpu_get_pc(machine->activecpu) == 0x10d6)
+			if (cpu_get_pc(space->cpu) == 0x10d6)
 			{
 				getstar_cmd = 0x23;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x10e3)
+			if (cpu_get_pc(space->cpu) == 0x10e3)
 			{
 				getstar_cmd = 0x23;
 				GS_SAVE_REGS
 			}
 			/* hardware test */
-			if (cpu_get_pc(machine->activecpu) == 0x113f)
+			if (cpu_get_pc(space->cpu) == 0x113f)
 			{
 				getstar_cmd = 0x73;
 				GS_RESET_REGS
 			}
 			/* game phase (again) */
-			if (cpu_get_pc(machine->activecpu) == 0x118b)
+			if (cpu_get_pc(space->cpu) == 0x118b)
 			{
 				getstar_cmd = 0x24;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x1198)
+			if (cpu_get_pc(space->cpu) == 0x1198)
 			{
 				getstar_cmd = 0x24;
 				GS_SAVE_REGS
 			}
 			/* background */
-			if (cpu_get_pc(machine->activecpu) == 0x19f8)
+			if (cpu_get_pc(space->cpu) == 0x19f8)
 			{
 				getstar_cmd = 0x26;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x1a05)
+			if (cpu_get_pc(space->cpu) == 0x1a05)
 			{
 				getstar_cmd = 0x26;
 				GS_SAVE_REGS
 			}
 			/* foreground */
-			if (cpu_get_pc(machine->activecpu) == 0x1abd)
+			if (cpu_get_pc(space->cpu) == 0x1abd)
 			{
 				getstar_cmd = 0x37;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x1acc)
+			if (cpu_get_pc(space->cpu) == 0x1acc)
 			{
 				getstar_cmd = 0x37;
 				GS_SAVE_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x1ad9)
+			if (cpu_get_pc(space->cpu) == 0x1ad9)
 			{
 				getstar_cmd = 0x37;
 				/* do NOT update the registers because there are 2 writes before 2 reads ! */
 			}
 			/* laser position */
-			if (cpu_get_pc(machine->activecpu) == 0x2792)
+			if (cpu_get_pc(space->cpu) == 0x2792)
 			{
 				getstar_cmd = 0x38;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x27a1)
+			if (cpu_get_pc(space->cpu) == 0x27a1)
 			{
 				getstar_cmd = 0x38;
 				GS_SAVE_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x27ae)
+			if (cpu_get_pc(space->cpu) == 0x27ae)
 			{
 				getstar_cmd = 0x38;
 				/* do NOT update the registers because there are 2 writes before 2 reads ! */
 			}
 			/* starting lives (for "test mode") */
-			if (cpu_get_pc(machine->activecpu) == 0x6ae2)
+			if (cpu_get_pc(space->cpu) == 0x6ae2)
 			{
 				getstar_cmd = 0x23;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x6af3)
+			if (cpu_get_pc(space->cpu) == 0x6af3)
 			{
 				getstar_cmd = 0x23;
 				GS_SAVE_REGS
@@ -623,12 +623,12 @@ WRITE8_HANDLER( getstar_e803_w )
                 6B01: 3A 03 E8      ld   a,($E803)
                We save the regs though to hack it in 'getstar_e803_r' read handler.
             */
-			if (cpu_get_pc(machine->activecpu) == 0x6ae2)
+			if (cpu_get_pc(space->cpu) == 0x6ae2)
 			{
 				getstar_cmd = 0x00;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x6af3)
+			if (cpu_get_pc(space->cpu) == 0x6af3)
 			{
 				getstar_cmd = 0x00;
 				GS_SAVE_REGS
@@ -662,19 +662,19 @@ WRITE8_HANDLER( getstar_e803_w )
                 6B01: 3A 03 E8      ld   a,($E803)
                We save the regs though to hack it in 'getstar_e803_r' read handler.
             */
-			if (cpu_get_pc(machine->activecpu) == 0x6ae2)
+			if (cpu_get_pc(space->cpu) == 0x6ae2)
 			{
 				getstar_cmd = 0x00;
 				GS_RESET_REGS
 			}
-			if (cpu_get_pc(machine->activecpu) == 0x6af3)
+			if (cpu_get_pc(space->cpu) == 0x6af3)
 			{
 				getstar_cmd = 0x00;
 				GS_SAVE_REGS
 			}
 			break;
 		default:
-			logerror("%04x: getstar_e803_w - data = %02x - unknown set !\n",cpu_get_pc(machine->activecpu),data);
+			logerror("%04x: getstar_e803_w - data = %02x - unknown set !\n",cpu_get_pc(space->cpu),data);
 			break;
 	}
 }
@@ -683,7 +683,7 @@ WRITE8_HANDLER( getstar_e803_w )
 WRITE8_HANDLER( getstar_sh_intenable_w )
 {
 	getstar_sh_intenabled = 1;
-	logerror("cpu #1 PC=%d: %d written to a0e0\n",cpu_get_pc(machine->activecpu),data);
+	logerror("cpu #1 PC=%d: %d written to a0e0\n",cpu_get_pc(space->cpu),data);
 }
 
 
@@ -739,7 +739,7 @@ WRITE8_HANDLER( tigerh_68705_portB_w )
 	if ((ddrB & 0x02) && (~data & 0x02) && (portB_out & 0x02))
 	{
 		portA_in = from_main;
-		if (main_sent) cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
+		if (main_sent) cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
 		main_sent = 0;
 	}
 	if ((ddrB & 0x04) && (data & 0x04) && (~portB_out & 0x04))
@@ -780,7 +780,7 @@ WRITE8_HANDLER( tigerh_mcu_w )
 	from_main = data;
 	main_sent = 1;
 	mcu_sent=0;
-	cpu_set_input_line(machine->cpu[2],0,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2],0,ASSERT_LINE);
 }
 
 READ8_HANDLER( tigerh_mcu_r )
@@ -807,7 +807,7 @@ READ8_HANDLER( tigerhb_e803_r )
 			tigerhb_val = 0x83;
 			break;
 		default:
-			logerror("%04x: tigerhb_e803_r - cmd = %02x\n",cpu_get_pc(machine->activecpu),getstar_cmd);
+			logerror("%04x: tigerhb_e803_r - cmd = %02x\n",cpu_get_pc(space->cpu),getstar_cmd);
 			break;
 	}
 	return tigerhb_val;
@@ -822,7 +822,7 @@ WRITE8_HANDLER( tigerhb_e803_w )
 			tigerhb_cmd = 0x73;
 			break;
 		default:
-			logerror("%04x: tigerhb_e803_w - data = %02x\n",cpu_get_pc(machine->activecpu),data);
+			logerror("%04x: tigerhb_e803_w - data = %02x\n",cpu_get_pc(space->cpu),data);
 			tigerhb_cmd = 0x00;
 			break;
 	}

@@ -478,7 +478,7 @@ static void update_outputs(i8279_state *chip, UINT16 which)
 
 static READ8_HANDLER( turbo_8279_r )
 {
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = space->machine->driver_data;
 	i8279_state *chip = &state->i8279;
 	UINT8 result = 0xff;
 	UINT8 addr;
@@ -490,7 +490,7 @@ static READ8_HANDLER( turbo_8279_r )
 		{
 			/* read sensor RAM */
 			case 0x40:
-				result = ~input_port_read(machine, "DSW1");  /* DSW 1 - inverted! */
+				result = ~input_port_read(space->machine, "DSW1");  /* DSW 1 - inverted! */
 				break;
 
 			/* read display RAM */
@@ -519,7 +519,7 @@ static READ8_HANDLER( turbo_8279_r )
 
 static WRITE8_HANDLER( turbo_8279_w )
 {
-	turbo_state *state = machine->driver_data;
+	turbo_state *state = space->machine->driver_data;
 	i8279_state *chip = &state->i8279;
 	UINT8 addr;
 
@@ -623,16 +623,16 @@ static WRITE8_HANDLER( turbo_8279_w )
 
 static READ8_HANDLER( turbo_collision_r )
 {
-	turbo_state *state = machine->driver_data;
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
-	return input_port_read(machine, "DSW3") | (state->turbo_collision & 15);
+	turbo_state *state = space->machine->driver_data;
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
+	return input_port_read(space->machine, "DSW3") | (state->turbo_collision & 15);
 }
 
 
 static WRITE8_HANDLER( turbo_collision_clear_w )
 {
-	turbo_state *state = machine->driver_data;
-	video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+	turbo_state *state = space->machine->driver_data;
+	video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 	state->turbo_collision = 0;
 }
 
@@ -646,8 +646,8 @@ static READ8_DEVICE_HANDLER( turbo_analog_r )
 
 static WRITE8_HANDLER( turbo_analog_reset_w )
 {
-	turbo_state *state = machine->driver_data;
-	state->turbo_last_analog = input_port_read(machine, "DIAL");
+	turbo_state *state = space->machine->driver_data;
+	state->turbo_last_analog = input_port_read(space->machine, "DIAL");
 }
 
 
@@ -678,16 +678,16 @@ static WRITE8_HANDLER( turbo_coin_and_lamp_w )
 static READ8_HANDLER( buckrog_cpu2_command_r )
 {
 	/* assert ACK */
-	turbo_state *state = machine->driver_data;
-	ppi8255_set_port_c(devtag_get_device(machine, PPI8255, "ppi8255_0"), 0x00);
+	turbo_state *state = space->machine->driver_data;
+	ppi8255_set_port_c(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), 0x00);
 	return state->buckrog_command;
 }
 
 
 static READ8_HANDLER( buckrog_port_2_r )
 {
-	int inp1 = input_port_read(machine, "DSW1");
-	int inp2 = input_port_read(machine, "DSW2");
+	int inp1 = input_port_read(space->machine, "DSW1");
+	int inp2 = input_port_read(space->machine, "DSW2");
 
 	return  (((inp2 >> 6) & 1) << 7) |
 			(((inp2 >> 4) & 1) << 6) |
@@ -702,8 +702,8 @@ static READ8_HANDLER( buckrog_port_2_r )
 
 static READ8_HANDLER( buckrog_port_3_r )
 {
-	int inp1 = input_port_read(machine, "DSW1");
-	int inp2 = input_port_read(machine, "DSW2");
+	int inp1 = input_port_read(space->machine, "DSW1");
+	int inp2 = input_port_read(space->machine, "DSW2");
 
 	return  (((inp2 >> 7) & 1) << 7) |
 			(((inp2 >> 5) & 1) << 6) |

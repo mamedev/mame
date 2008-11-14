@@ -49,10 +49,10 @@ static MACHINE_RESET( clshroad )
 
 static READ8_HANDLER( clshroad_input_r )
 {
-	return	((~input_port_read(machine, "P1") & (1 << offset)) ? 1 : 0) |
-			((~input_port_read(machine, "P2") & (1 << offset)) ? 2 : 0) |
-			((~input_port_read(machine, "DSW1") & (1 << offset)) ? 4 : 0) |
-			((~input_port_read(machine, "DSW2") & (1 << offset)) ? 8 : 0) ;
+	return	((~input_port_read(space->machine, "P1") & (1 << offset)) ? 1 : 0) |
+			((~input_port_read(space->machine, "P2") & (1 << offset)) ? 2 : 0) |
+			((~input_port_read(space->machine, "DSW1") & (1 << offset)) ? 4 : 0) |
+			((~input_port_read(space->machine, "DSW2") & (1 << offset)) ? 8 : 0) ;
 }
 
 

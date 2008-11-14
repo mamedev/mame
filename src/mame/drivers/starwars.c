@@ -56,13 +56,15 @@ static MACHINE_RESET( starwars )
 	/* ESB-specific */
 	if (starwars_is_esb)
 	{
+		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 		/* reset the slapstic */
 		slapstic_reset();
 		slapstic_current_bank = slapstic_bank();
 		memcpy(slapstic_base, &slapstic_source[slapstic_current_bank * 0x2000], 0x2000);
 
 		/* reset all the banks */
-		starwars_out_w(machine, 4, 0);
+		starwars_out_w(space, 4, 0);
 	}
 
 	/* reset the matrix processor */
@@ -79,7 +81,7 @@ static MACHINE_RESET( starwars )
 
 static WRITE8_HANDLER( irq_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -106,14 +108,14 @@ static void esb_slapstic_tweak(running_machine *machine, offs_t offset)
 static READ8_HANDLER( esb_slapstic_r )
 {
 	int result = slapstic_base[offset];
-	esb_slapstic_tweak(machine, offset);
+	esb_slapstic_tweak(space->machine, offset);
 	return result;
 }
 
 
 static WRITE8_HANDLER( esb_slapstic_w )
 {
-	esb_slapstic_tweak(machine, offset);
+	esb_slapstic_tweak(space->machine, offset);
 }
 
 
@@ -129,7 +131,7 @@ static OPBASE_HANDLER( esb_setopbase )
 	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
 	{
-		offs_t pc = cpu_get_pc(machine->activecpu);
+		offs_t pc = cpu_get_pc(space->cpu);
 
 		/* filter out duplicates; we get these because the handler gets called for
            multiple reasons:
@@ -140,7 +142,7 @@ static OPBASE_HANDLER( esb_setopbase )
 		{
 			slapstic_last_pc = pc;
 			slapstic_last_address = address;
-			esb_slapstic_tweak(machine, address & 0x1fff);
+			esb_slapstic_tweak(space->machine, address & 0x1fff);
 		}
 		return ~0;
 	}

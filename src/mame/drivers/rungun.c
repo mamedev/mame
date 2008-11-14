@@ -93,21 +93,21 @@ static READ16_HANDLER( rng_sysregs_r )
 	switch (offset)
 	{
 		case 0x00/2:
-			if (input_port_read(machine, "DSW") & 0x20)
-				return(input_port_read(machine, "P1") | input_port_read(machine, "P3")<<8);
+			if (input_port_read(space->machine, "DSW") & 0x20)
+				return(input_port_read(space->machine, "P1") | input_port_read(space->machine, "P3")<<8);
 			else
 			{
-				data = input_port_read(machine, "P1") & input_port_read(machine, "P3");
+				data = input_port_read(space->machine, "P1") & input_port_read(space->machine, "P3");
 				return(data<<8 | data);
 			}
 		break;
 
 		case 0x02/2:
-			if (input_port_read(machine, "DSW") & 0x20)
-				return(input_port_read(machine, "P2") | input_port_read(machine, "P4")<<8);
+			if (input_port_read(space->machine, "DSW") & 0x20)
+				return(input_port_read(space->machine, "P2") | input_port_read(space->machine, "P4")<<8);
 			else
 			{
-				data = input_port_read(machine, "P2") & input_port_read(machine, "P4");
+				data = input_port_read(space->machine, "P2") & input_port_read(space->machine, "P4");
 				return(data<<8 | data);
 			}
 		break;
@@ -118,13 +118,13 @@ static READ16_HANDLER( rng_sysregs_r )
                 bit8 : freeze
                 bit9 : joysticks layout(auto detect???)
             */
-			return input_port_read(machine, "SYSTEM");
+			return input_port_read(space->machine, "SYSTEM");
 		break;
 
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
-				data = input_port_read(machine, "DSW");
+				data = input_port_read(space->machine, "DSW");
 
 				if (init_eeprom_count)
 				{
@@ -162,7 +162,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
 			}
 
 			if (!(data & 0x40))
-				cpu_set_input_line(machine->cpu[0], MC68000_IRQ_5, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], MC68000_IRQ_5, CLEAR_LINE);
 		break;
 
 		case 0x0c/2:
@@ -180,19 +180,19 @@ static WRITE16_HANDLER( rng_sysregs_w )
 static WRITE16_HANDLER( sound_cmd1_w )
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch_w(machine, 0, data>>8);
+		soundlatch_w(space, 0, data>>8);
 }
 
 static WRITE16_HANDLER( sound_cmd2_w )
 {
 	if (ACCESSING_BITS_8_15)
-		soundlatch2_w(machine, 0, data>>8);
+		soundlatch2_w(space, 0, data>>8);
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
 	if (ACCESSING_BITS_8_15)
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_msb_r )
@@ -262,10 +262,10 @@ static WRITE8_HANDLER( z80ctrl_w )
 {
 	rng_z80_control = data;
 
-	memory_set_bankptr(2, memory_region(machine, "sound") + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(2, memory_region(space->machine, "sound") + 0x10000 + (data & 0x07) * 0x4000);
 
 	if (data & 0x10)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN(audio_interrupt)

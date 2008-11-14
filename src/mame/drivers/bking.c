@@ -68,8 +68,8 @@ static WRITE8_HANDLER( bking_soundlatch_w )
 	for (i = 0;i < 8;i++)
 		if (data & (1 << i)) code |= 0x80 >> i;
 
-	soundlatch_w(machine,offset,code);
-	if (sndnmi_enable) cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space,offset,code);
+	if (sndnmi_enable) cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( bking3_addr_l_w )
@@ -84,7 +84,7 @@ static WRITE8_HANDLER( bking3_addr_h_w )
 
 static READ8_HANDLER( bking3_extrarom_r )
 {
-	UINT8 *rom = memory_region(machine, "user2");
+	UINT8 *rom = memory_region(space->machine, "user2");
 	return rom[bking3_addr_h * 256 + bking3_addr_l];
 }
 
@@ -198,7 +198,7 @@ static WRITE8_HANDLER( bking3_68705_portB_w )
 	if (~data & 0x02)
 	{
 		portA_in = from_main;
-		if (main_sent) cpu_set_input_line(machine->cpu[2],0,CLEAR_LINE);
+		if (main_sent) cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
 		main_sent = 0;
 	}
 
@@ -225,7 +225,7 @@ static READ8_HANDLER( bking3_68705_portC_r )
 	int portC_in = 0;
 	if (main_sent) portC_in |= 0x01;
 	if (!mcu_sent) portC_in |= 0x02;
-//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(machine->activecpu),portC_in);
+//logerror("%04x: 68705 port C read %02x\n",cpu_get_pc(space->cpu),portC_in);
 	return portC_in;
 }
 #endif

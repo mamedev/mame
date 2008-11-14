@@ -94,7 +94,7 @@ static WRITE16_HANDLER( oki_banking )
 	{
 		int addr = 0x40000 * ((data & 3) - 1);
 
-		if(addr < memory_region_length(machine, "oki"))
+		if(addr < memory_region_length(space->machine, "oki"))
 			okim6295_set_bank_base(0, addr);
 	}
 }

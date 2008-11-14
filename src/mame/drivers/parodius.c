@@ -45,9 +45,9 @@ static WRITE8_HANDLER( bankedram_w )
 	if (videobank & 0x01)
 	{
 		if (videobank & 0x04)
-			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset + 0x0800,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset + 0x0800,data);
 		else
-			paletteram_xBBBBBGGGGGRRRRR_be_w(machine,offset,data);
+			paletteram_xBBBBBGGGGGRRRRR_be_w(space,offset,data);
 	}
 	else
 		ram[offset] = data;
@@ -56,22 +56,22 @@ static WRITE8_HANDLER( bankedram_w )
 static READ8_HANDLER( parodius_052109_053245_r )
 {
 	if (videobank & 0x02)
-		return K053245_r(machine,offset);
+		return K053245_r(space,offset);
 	else
-		return K052109_r(machine,offset);
+		return K052109_r(space,offset);
 }
 
 static WRITE8_HANDLER( parodius_052109_053245_w )
 {
 	if (videobank & 0x02)
-		K053245_w(machine,offset,data);
+		K053245_w(space,offset,data);
 	else
-		K052109_w(machine,offset,data);
+		K052109_w(space,offset,data);
 }
 
 static WRITE8_HANDLER( parodius_videobank_w )
 {
-	if (videobank & 0xf8) logerror("%04x: videobank = %02x\n",cpu_get_pc(machine->activecpu),data);
+	if (videobank & 0xf8) logerror("%04x: videobank = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0 = select palette or work RAM at 0000-07ff */
 	/* bit 1 = select 052109 or 053245 at 2000-27ff */
@@ -81,7 +81,7 @@ static WRITE8_HANDLER( parodius_videobank_w )
 
 static WRITE8_HANDLER( parodius_3fc0_w )
 {
-	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(machine->activecpu),data);
+	if ((data & 0xf4) != 0x10) logerror("%04x: 3fc0 = %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bit 0/1 = coin counters */
 	coin_counter_w(0,data & 0x01);
@@ -95,12 +95,12 @@ static WRITE8_HANDLER( parodius_3fc0_w )
 
 static READ8_HANDLER( parodius_sound_r )
 {
-	return k053260_0_r(machine,2 + offset);
+	return k053260_0_r(space,2 + offset);
 }
 
 static WRITE8_HANDLER( parodius_sh_irqtrigger_w )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+	cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
 }
 
 #if 0
@@ -122,7 +122,7 @@ static TIMER_CALLBACK( nmi_callback )
 static WRITE8_HANDLER( sound_arm_nmi_w )
 {
 //  sound_nmi_enabled = 1;
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE);
 	timer_set(ATTOTIME_IN_USEC(50), NULL,0,nmi_callback);	/* kludge until the K053260 is emulated correctly */
 }
 

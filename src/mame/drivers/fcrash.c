@@ -46,14 +46,14 @@ static WRITE16_HANDLER( fcrash_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
 static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "sound");
+	UINT8 *RAM = memory_region(space->machine, "sound");
 	int bankaddr;
 
 	sndti_set_output_gain(SOUND_MSM5205, 0, 0, (data & 0x08) ? 0.0 : 1.0);

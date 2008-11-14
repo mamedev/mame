@@ -20,10 +20,10 @@ WRITE8_HANDLER( atarifb_out1_w )
 {
 	CTRLD = data;
 
-	discrete_sound_w(machine, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(machine, ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(machine, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(machine, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(space, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(space, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(space, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 }
 
 
@@ -31,10 +31,10 @@ WRITE8_HANDLER( atarifb4_out1_w )
 {
 	CTRLD = data;
 
-	discrete_sound_w(machine, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(machine, ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(machine, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(machine, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(space, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(space, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(space, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 
 	coin_counter_w (1, data & 0x80);
 }
@@ -44,22 +44,22 @@ WRITE8_HANDLER( abaseb_out1_w )
 {
 	CTRLD = data;
 
-	discrete_sound_w(machine, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(machine, ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(machine, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(machine, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(space, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(space, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(space, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 
 	if (data & 0x80)
 	{
 		/* Invert video */
-		palette_set_color(machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
-		palette_set_color(machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+		palette_set_color(space->machine,1,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+		palette_set_color(space->machine,0,MAKE_RGB(0xff,0xff,0xff)); /* white  */
 	}
 	else
 	{
 		/* Regular video */
-		palette_set_color(machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black  */
-		palette_set_color(machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white  */
+		palette_set_color(space->machine,0,MAKE_RGB(0x00,0x00,0x00)); /* black  */
+		palette_set_color(space->machine,1,MAKE_RGB(0xff,0xff,0xff)); /* white  */
 	}
 }
 
@@ -76,10 +76,10 @@ WRITE8_HANDLER( soccer_out1_w )
 	/* bit 5-6 = trackball CTRL bits */
 	/* bit 7 = Rule LED */
 
-	discrete_sound_w(machine, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
-	discrete_sound_w(machine, ATARIFB_HIT_EN,  data & 0x02);			// Hit
-	discrete_sound_w(machine, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
-	discrete_sound_w(machine, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
+	discrete_sound_w(space, ATARIFB_WHISTLE_EN,  data & 0x01);		// Whistle
+	discrete_sound_w(space, ATARIFB_HIT_EN,  data & 0x02);			// Hit
+	discrete_sound_w(space, ATARIFB_ATTRACT_EN, data & 0x10);		// Attract
+	discrete_sound_w(space, ATARIFB_NOISE_EN,  data & 0x04);		// Noise Enable / Kicker
 
 //  set_led_status(0,data & 0x10);  // !!!!!!!!!! Is this correct????
 	set_led_status(1,data & 0x80);
@@ -88,7 +88,7 @@ WRITE8_HANDLER( soccer_out1_w )
 
 WRITE8_HANDLER( atarifb_out2_w )
 {
-	discrete_sound_w(machine, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
+	discrete_sound_w(space, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
 	coin_counter_w (0, data & 0x10);
 }
@@ -96,7 +96,7 @@ WRITE8_HANDLER( atarifb_out2_w )
 
 WRITE8_HANDLER( soccer_out2_w )
 {
-	discrete_sound_w(machine, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
+	discrete_sound_w(space, ATARIFB_CROWD_DATA, data & 0x0f);	// Crowd
 
 	coin_counter_w (0, data & 0x10);
 	coin_counter_w (1, data & 0x20);
@@ -113,7 +113,7 @@ WRITE8_HANDLER( soccer_out2_w )
 
 WRITE8_HANDLER( atarifb_out3_w )
 {
-	int loop = cpu_getiloops(machine->cpu[0]);
+	int loop = cpu_getiloops(space->machine->cpu[0]);
 
 	switch (loop)
 	{
@@ -152,7 +152,7 @@ READ8_HANDLER( atarifb_in0_r )
 			  (sign_x_2 >> 6) |
 			  (sign_y_1 >> 5) |
 			  (sign_x_1 >> 4) |
-			  input_port_read(machine, "IN0");
+			  input_port_read(space->machine, "IN0");
 		return val;
 	}
 	else
@@ -161,14 +161,14 @@ READ8_HANDLER( atarifb_in0_r )
 		int new_x,new_y;
 
 		/* Read player 1 trackball */
-		new_x = input_port_read(machine, "IN3");
+		new_x = input_port_read(space->machine, "IN3");
 		if (new_x != counter_x)
 		{
 			sign_x_1 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = input_port_read(machine, "IN2");
+		new_y = input_port_read(space->machine, "IN2");
 		if (new_y != counter_y)
 		{
 			sign_y_1 = (new_y - counter_y) & 0x80;
@@ -184,7 +184,7 @@ READ8_HANDLER( atarifb_in2_r )
 {
 	if ((CTRLD & 0x20) == 0x00)
 	{
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	}
 	else
 	{
@@ -192,14 +192,14 @@ READ8_HANDLER( atarifb_in2_r )
 		int new_x,new_y;
 
 		/* Read player 2 trackball */
-		new_x = input_port_read(machine, "IN5");
+		new_x = input_port_read(space->machine, "IN5");
 		if (new_x != counter_x)
 		{
 			sign_x_2 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = input_port_read(machine, "IN4");
+		new_y = input_port_read(space->machine, "IN4");
 		if (new_y != counter_y)
 		{
 			sign_y_2 = (new_y - counter_y) & 0x80;
@@ -234,14 +234,14 @@ READ8_HANDLER( atarifb4_in0_r )
 		int new_x,new_y;
 
 		/* Read player 1 trackball */
-		new_x = input_port_read(machine, "IN3");
+		new_x = input_port_read(space->machine, "IN3");
 		if (new_x != counter_x)
 		{
 			sign_x_1 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = input_port_read(machine, "IN2");
+		new_y = input_port_read(space->machine, "IN2");
 		if (new_y != counter_y)
 		{
 			sign_y_1 = (new_y - counter_y) & 0x80;
@@ -257,14 +257,14 @@ READ8_HANDLER( atarifb4_in0_r )
 		int new_x,new_y;
 
 		/* Read player 2 trackball */
-		new_x = input_port_read(machine, "IN5");
+		new_x = input_port_read(space->machine, "IN5");
 		if (new_x != counter_x)
 		{
 			sign_x_2 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = input_port_read(machine, "IN4");
+		new_y = input_port_read(space->machine, "IN4");
 		if (new_y != counter_y)
 		{
 			sign_y_2 = (new_y - counter_y) & 0x80;
@@ -282,7 +282,7 @@ READ8_HANDLER( atarifb4_in2_r )
 {
 	if ((CTRLD & 0x40) == 0x00)
 	{
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	}
 	else if ((CTRLD & 0x60) == 0x60)
 	/* LD1 and LD2 both high, return Team 2 right player (player 3) */
@@ -291,14 +291,14 @@ READ8_HANDLER( atarifb4_in2_r )
 		int new_x,new_y;
 
 		/* Read player 3 trackball */
-		new_x = input_port_read(machine, "IN7");
+		new_x = input_port_read(space->machine, "IN7");
 		if (new_x != counter_x)
 		{
 			sign_x_3 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = input_port_read(machine, "IN6");
+		new_y = input_port_read(space->machine, "IN6");
 		if (new_y != counter_y)
 		{
 			sign_y_3 = (new_y - counter_y) & 0x80;
@@ -314,14 +314,14 @@ READ8_HANDLER( atarifb4_in2_r )
 		int new_x,new_y;
 
 		/* Read player 4 trackball */
-		new_x = input_port_read(machine, "IN9");
+		new_x = input_port_read(space->machine, "IN9");
 		if (new_x != counter_x)
 		{
 			sign_x_4 = (new_x - counter_x) & 0x80;
 			counter_x = new_x;
 		}
 
-		new_y = input_port_read(machine, "IN8");
+		new_y = input_port_read(space->machine, "IN8");
 		if (new_y != counter_y)
 		{
 			sign_y_4 = (new_y - counter_y) & 0x80;

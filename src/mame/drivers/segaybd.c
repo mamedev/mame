@@ -213,8 +213,8 @@ static WRITE16_HANDLER( sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, CLEAR_LINE);
-	return soundlatch_r(machine,offset);
+	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_NMI, CLEAR_LINE);
+	return soundlatch_r(space,offset);
 }
 
 
@@ -246,7 +246,7 @@ static READ16_HANDLER( io_chip_r )
 				return misc_io_data[offset];
 
 			/* otherwise, return an input port */
-			return input_port_read(machine, portnames[offset]);
+			return input_port_read(space->machine, portnames[offset]);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -303,11 +303,11 @@ static WRITE16_HANDLER( io_chip_w )
                 D2 = YRES
                 D1-D0 = ADC0-1
             */
-			segaic16_set_display_enable(machine, data & 0x80);
-			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(machine,0,0);
-			cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
-			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
+			segaic16_set_display_enable(space->machine, data & 0x80);
+			if (((old ^ data) & 0x20) && !(data & 0x20)) watchdog_reset_w(space,0,0);
+			cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? ASSERT_LINE : CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x04) ? ASSERT_LINE : CLEAR_LINE);
 			break;
 
 		/* mute */
@@ -347,7 +347,7 @@ static WRITE16_HANDLER( analog_w )
 {
 	static const char *const ports[] = { "ADC0", "ADC1", "ADC2", "ADC3", "ADC4", "ADC5", "ADC6" };
 	int selected = ((offset & 3) == 3) ? (3 + (misc_io_data[0x08/2] & 3)) : (offset & 3);
-	int value = input_port_read_safe(machine, ports[selected], 0xff);
+	int value = input_port_read_safe(space->machine, ports[selected], 0xff);
 	analog_data[offset & 3] = value;
 }
 

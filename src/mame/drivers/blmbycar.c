@@ -56,7 +56,7 @@ static WRITE16_HANDLER( blmbycar_okibank_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		UINT8 *RAM = memory_region(machine, "oki");
+		UINT8 *RAM = memory_region(space->machine, "oki");
 		memcpy(&RAM[0x30000],&RAM[0x40000 + 0x10000*(data & 0xf)],0x10000);
 	}
 }
@@ -76,7 +76,7 @@ static UINT8 pot_wheel = 0;
 static WRITE16_HANDLER( blmbycar_pot_wheel_reset_w )
 {
 	if (ACCESSING_BITS_0_7)
-		pot_wheel = ~input_port_read(machine, "WHEEL") & 0xff;
+		pot_wheel = ~input_port_read(space->machine, "WHEEL") & 0xff;
 }
 
 static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
@@ -93,7 +93,7 @@ static WRITE16_HANDLER( blmbycar_pot_wheel_shift_w )
 static READ16_HANDLER( blmbycar_pot_wheel_r )
 {
 	return	((pot_wheel & 0x80) ? 0x04 : 0) |
-			(mame_rand(machine) & 0x08);
+			(mame_rand(space->machine) & 0x08);
 }
 
 
@@ -101,7 +101,7 @@ static READ16_HANDLER( blmbycar_pot_wheel_r )
 
 static READ16_HANDLER( blmbycar_opt_wheel_r )
 {
-	return	(~input_port_read(machine, "WHEEL") & 0xff) << 8;
+	return	(~input_port_read(space->machine, "WHEEL") & 0xff) << 8;
 }
 
 

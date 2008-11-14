@@ -122,12 +122,12 @@ static WRITE16_HANDLER( paletteram16_xRGB_w )
 	g = ((paldat & 0x0000ff00) >>8);
 	b = ((paldat & 0x00ff0000) >>16);
 
-	palette_set_color(machine,pen,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,pen,MAKE_RGB(r,g,b));
 }
 
 static READ16_HANDLER( pckgaldx_protection_r )
 {
-	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(machine->activecpu));
+	logerror("pckgaldx_protection_r address %06x\n",cpu_get_pc(space->cpu));
 	return -1;
 }
 

@@ -1386,6 +1386,7 @@ static int parse_ini_file(core_options *options, const char *name)
 static running_machine *create_machine(const game_driver *driver)
 {
 	running_machine *machine;
+	int cpunum;
 
 	/* allocate memory for the machine */
 	machine = malloc(sizeof(*machine));
@@ -1403,6 +1404,11 @@ static running_machine *create_machine(const game_driver *driver)
 	machine->gamedrv = driver;
 	machine->basename = mame_strdup(driver->name);
 	machine->config = machine_config_alloc(driver->machine_config);
+
+	/* temporary: create fake CPU devices */
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->config->cpu[cpunum].type != CPU_DUMMY)
+			machine->cpu[cpunum] = cpuexec_create_cpu_device(&machine->config->cpu[cpunum]);
 
 	/* allocate the driver data */
 	if (machine->config->driver_data_size != 0)
@@ -1469,7 +1475,15 @@ static void prepare_machine(running_machine *machine)
 
 static void destroy_machine(running_machine *machine)
 {
+	int cpunum;
+	
 	assert(machine == Machine);
+
+	/* temporary: free the fake CPU devices */
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+			free((void *)machine->cpu[cpunum]);
+			
 	if (machine->driver_data != NULL)
 		free(machine->driver_data);
 	if (machine->config != NULL)

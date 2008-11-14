@@ -64,7 +64,7 @@ WRITE16_HANDLER( unico_palette_w )
 	COMBINE_DATA(&paletteram16[offset]);
 	data1 = paletteram16[offset & ~1];
 	data2 = paletteram16[offset |  1];
-	palette_set_color_rgb( machine,offset/2,
+	palette_set_color_rgb( space->machine,offset/2,
 		 (data1 >> 8) & 0xFC,
 		 (data1 >> 0) & 0xFC,
 		 (data2 >> 8) & 0xFC	);
@@ -73,7 +73,7 @@ WRITE16_HANDLER( unico_palette_w )
 WRITE32_HANDLER( unico_palette32_w )
 {
 	UINT32 rgb0 = COMBINE_DATA(&paletteram32[offset]);
-	palette_set_color_rgb( machine,offset,
+	palette_set_color_rgb( space->machine,offset,
 		 (rgb0 >> 24) & 0xFC,
 		 (rgb0 >> 16) & 0xFC,
 		 (rgb0 >>  8) & 0xFC	);

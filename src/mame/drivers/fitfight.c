@@ -227,35 +227,35 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER(snd_porta_r)
 {
-	//mame_printf_debug("PA R @%x\n",cpu_get_pc(machine->activecpu));
-	return mame_rand(machine);
+	//mame_printf_debug("PA R @%x\n",cpu_get_pc(space->cpu));
+	return mame_rand(space->machine);
 }
 
 static READ8_HANDLER(snd_portb_r)
 {
-	//mame_printf_debug("PB R @%x\n",cpu_get_pc(machine->activecpu));
-	return mame_rand(machine);
+	//mame_printf_debug("PB R @%x\n",cpu_get_pc(space->cpu));
+	return mame_rand(space->machine);
 }
 
 static READ8_HANDLER(snd_portc_r)
 {
-	//mame_printf_debug("PC R @%x\n",cpu_get_pc(machine->activecpu));
-	return mame_rand(machine);
+	//mame_printf_debug("PC R @%x\n",cpu_get_pc(space->cpu));
+	return mame_rand(space->machine);
 }
 
 static WRITE8_HANDLER(snd_porta_w)
 {
-	//mame_printf_debug("PA W %x @%x\n",data,cpu_get_pc(machine->activecpu));
+	//mame_printf_debug("PA W %x @%x\n",data,cpu_get_pc(space->cpu));
 }
 
 static WRITE8_HANDLER(snd_portb_w)
 {
-	//mame_printf_debug("PB W %x @%x\n",data,cpu_get_pc(machine->activecpu));
+	//mame_printf_debug("PB W %x @%x\n",data,cpu_get_pc(space->cpu));
 }
 
 static WRITE8_HANDLER(snd_portc_w)
 {
-	//mame_printf_debug("PC W %x @%x\n",data,cpu_get_pc(machine->activecpu));
+	//mame_printf_debug("PC W %x @%x\n",data,cpu_get_pc(space->cpu));
 }
 
 static ADDRESS_MAP_START( snd_io, ADDRESS_SPACE_IO, 8 )

@@ -348,7 +348,7 @@ READ8_HANDLER(es5503_reg_0_r)
 
 						if (chip->irq_callback)
 						{
-							chip->irq_callback(machine, 0);
+							chip->irq_callback(space->machine, 0);
 						}
 						break;
 					}
@@ -361,7 +361,7 @@ READ8_HANDLER(es5503_reg_0_r)
 					{
 						if (chip->irq_callback)
 						{
-							chip->irq_callback(machine, 1);
+							chip->irq_callback(space->machine, 1);
 						}
 						break;
 					}
@@ -377,7 +377,7 @@ READ8_HANDLER(es5503_reg_0_r)
 			case 0xe2:	// A/D converter
 				if (chip->adc_read)
 				{
-					return chip->adc_read(machine, 0);
+					return chip->adc_read(space, 0);
 				}
 				break;
 		}

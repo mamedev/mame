@@ -69,11 +69,11 @@ READ32_HANDLER( am53cf96_r )
 
 	if (reg == REG_FIFO)
 	{
-//      mame_printf_debug("53cf96: read FIFO PC=%x\n", cpu_get_pc(machine->activecpu));
+//      mame_printf_debug("53cf96: read FIFO PC=%x\n", cpu_get_pc(space->cpu));
 		return 0;
 	}
 
-//  logerror("53cf96: read reg %d = %x (PC=%x)\n", reg, rv>>shift, cpu_get_pc(machine->activecpu));
+//  logerror("53cf96: read reg %d = %x (PC=%x)\n", reg, rv>>shift, cpu_get_pc(space->cpu));
 
 	if (reg == REG_IRQSTATE)
 	{
@@ -106,7 +106,7 @@ WRITE32_HANDLER( am53cf96_w )
 	}
 	val &= 0xff;
 
-//  logerror("53cf96: w %x to reg %d (ofs %02x data %08x mask %08x PC=%x)\n", val, reg, offset, data, mem_mask, cpu_get_pc(machine->activecpu));
+//  logerror("53cf96: w %x to reg %d (ofs %02x data %08x mask %08x PC=%x)\n", val, reg, offset, data, mem_mask, cpu_get_pc(space->cpu));
 
 	// if writing to the target ID, cache it off for later
 	if (reg == REG_STATUS)
@@ -144,7 +144,7 @@ WRITE32_HANDLER( am53cf96_w )
 			case 2: // reset device
 				scsi_regs[REG_IRQSTATE] = 8;	// indicate success
 
-				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, cpu_get_pc(machine->activecpu));
+				logerror("53cf96: reset  target ID = %d (PC = %x)\n", last_id, cpu_get_pc(space->cpu));
 				if (devices[last_id])
 				{
 					SCSIReset( devices[last_id] );
@@ -172,7 +172,7 @@ WRITE32_HANDLER( am53cf96_w )
 					scsi_regs[REG_INTSTATE] = 4;
 				}
 
-				logerror("53cf96: command %x exec.  target ID = %d (PC = %x)\n", fifo[1], last_id, cpu_get_pc(machine->activecpu));
+				logerror("53cf96: command %x exec.  target ID = %d (PC = %x)\n", fifo[1], last_id, cpu_get_pc(space->cpu));
 				if (devices[last_id])
 				{
 					int length;

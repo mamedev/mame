@@ -505,7 +505,7 @@ static READ8_HANDLER( exidy_sh8253_r )
 
 static READ8_HANDLER( exidy_sh6840_r )
 {
-	logerror("%04X:exidy_sh6840_r - unexpected read", cpu_get_pc(machine->activecpu));
+	logerror("%04X:exidy_sh6840_r - unexpected read", cpu_get_pc(space->cpu));
 	return 0;
 }
 
@@ -788,7 +788,7 @@ READ8_HANDLER( victory_sound_response_r )
 {
 	UINT8 ret = pia_get_output_b(1);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", cpu_get_previouspc(machine->activecpu), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound response read = %02X\n", cpu_get_previouspc(space->cpu), ret);
 
 	pia_set_input_cb1(1, 0);
 
@@ -800,7 +800,7 @@ READ8_HANDLER( victory_sound_status_r )
 {
 	UINT8 ret = (pia_get_input_ca1(1) << 7) | (pia_get_input_cb1(1) << 6);
 
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", cpu_get_previouspc(machine->activecpu), ret);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound status read = %02X\n", cpu_get_previouspc(space->cpu), ret);
 
 	return ret;
 }
@@ -814,7 +814,7 @@ static TIMER_CALLBACK( delayed_command_w )
 
 WRITE8_HANDLER( victory_sound_command_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", cpu_get_previouspc(machine->activecpu), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound command = %02X\n", cpu_get_previouspc(space->cpu), data);
 
 	timer_call_after_resynch(NULL, data, delayed_command_w);
 }
@@ -822,7 +822,7 @@ WRITE8_HANDLER( victory_sound_command_w )
 
 static WRITE8_HANDLER( victory_sound_irq_clear_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound IRQ clear = %02X\n", cpu_get_previouspc(machine->activecpu), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound IRQ clear = %02X\n", cpu_get_previouspc(space->cpu), data);
 
 	if (!data) pia_set_input_ca1(1, 1);
 }
@@ -830,7 +830,7 @@ static WRITE8_HANDLER( victory_sound_irq_clear_w )
 
 static WRITE8_HANDLER( victory_main_ack_w )
 {
-	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound Main ACK W = %02X\n", cpu_get_previouspc(machine->activecpu), data);
+	if (VICTORY_LOG_SOUND) logerror("%04X:!!!! Sound Main ACK W = %02X\n", cpu_get_previouspc(space->cpu), data);
 
 	if (victory_sound_response_ack_clk && !data)
 		pia_set_input_cb1(1, 1);

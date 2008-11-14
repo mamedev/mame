@@ -1375,8 +1375,10 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 
 static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_read ) {
-		return chip->ext_mem_read(Machine,address);
+		return chip->ext_mem_read(space,address);
 	} else {
 		if( address < 0x800000)
 			return chip->rom[address];
@@ -1386,8 +1388,10 @@ static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 
 static void ymf271_write_ext_memory(YMF271Chip *chip, UINT32 address, UINT8 data)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if( chip->ext_mem_write ) {
-		chip->ext_mem_write(Machine, address, data);
+		chip->ext_mem_write(space, address, data);
 	}
 }
 

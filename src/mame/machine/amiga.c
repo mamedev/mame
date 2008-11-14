@@ -306,7 +306,9 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 
 static void amiga_m68k_reset(void)
 {
-	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(Machine->activecpu));
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(space->cpu));
 
 	/* Initialize the various chips */
 	cia_reset();
@@ -320,33 +322,22 @@ static void amiga_m68k_reset(void)
 	}
 	else
 	{
-		amiga_cia_w(Machine, 0x1001/2, 1, 0xffff);
+		amiga_cia_w(space, 0x1001/2, 1, 0xffff);
 	}
 
-	if (cpu_get_pc(Machine->activecpu) < 0x80000)
+	if (cpu_get_pc(space->cpu) < 0x80000)
 		memory_set_opbase(0);
 }
 
 
 MACHINE_RESET( amiga )
 {
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* set m68k reset  function */
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)amiga_m68k_reset);
 
-	/* Initialize the various chips */
-	cia_reset();
-	custom_reset();
-	autoconfig_reset();
-
-	/* set the overlay bit */
-	if ( IS_AGA(amiga_intf) )
-	{
-		program_write_byte( 0xbfa001, 1 );
-	}
-	else
-	{
-		amiga_cia_w(machine, 0x1001/2, 1, 0xffff);
-	}
+	amiga_m68k_reset();
 
 	/* call the system-specific callback */
 	if (amiga_intf->reset_callback)
@@ -372,7 +363,7 @@ static TIMER_CALLBACK( scanline_callback )
 	if (scanline == 0)
 	{
 		/* signal VBLANK IRQ */
-		amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
+		amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
 
 		/* clock the first CIA TOD */
 		cia_clock_tod(machine, 0);
@@ -978,7 +969,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
 	CUSTOM_REG(REG_DMACON) &= ~0x4000;
 
 	/* signal an interrupt */
-	amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
+	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_BLIT, 0xffff);
 
 	/* reset the blitter timer */
 	timer_reset( amiga_blitter_timer, attotime_never);
@@ -1076,10 +1067,10 @@ READ16_HANDLER( amiga_cia_r )
 	}
 
 	/* handle the reads */
-	data = cia_read(machine, which, offset >> 7);
+	data = cia_read(space->machine, which, offset >> 7);
 
 	if (LOG_CIA)
-		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", safe_cpu_get_pc(machine->activecpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
+		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", safe_cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
 
 	return data << shift;
 }
@@ -1097,7 +1088,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	int which;
 
 	if (LOG_CIA)
-		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", safe_cpu_get_pc(machine->activecpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
+		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", safe_cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
 
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
@@ -1118,7 +1109,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	}
 
 	/* handle the writes */
-	cia_write(machine, which, offset >> 7, (UINT8) data);
+	cia_write(space->machine, which, offset >> 7, (UINT8) data);
 }
 
 
@@ -1131,13 +1122,13 @@ WRITE16_HANDLER( amiga_cia_w )
 
 static void amiga_cia_0_irq(running_machine *machine, int state)
 {
-	amiga_custom_w(machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
+	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
 static void amiga_cia_1_irq(running_machine *machine, int state)
 {
-	amiga_custom_w(machine, REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
+	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
 
 
@@ -1200,11 +1191,11 @@ READ16_HANDLER( amiga_custom_r )
 
 		case REG_VPOSR:
 			CUSTOM_REG(REG_VPOSR) &= 0xff00;
-			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(machine->primary_screen) >> 16;
+			CUSTOM_REG(REG_VPOSR) |= amiga_gethvpos(space->machine->primary_screen) >> 16;
 			return CUSTOM_REG(REG_VPOSR);
 
 		case REG_VHPOSR:
-			return amiga_gethvpos(machine->primary_screen) & 0xffff;
+			return amiga_gethvpos(space->machine->primary_screen) & 0xffff;
 
 		case REG_SERDATR:
 			CUSTOM_REG(REG_SERDATR) &= ~0x4000;
@@ -1214,24 +1205,24 @@ READ16_HANDLER( amiga_custom_r )
 		case REG_JOY0DAT:
 			if (amiga_intf->joy0dat_r != NULL)
 				return (*amiga_intf->joy0dat_r)();
-			return input_port_read_safe(machine, "JOY0DAT", 0xffff);
+			return input_port_read_safe(space->machine, "JOY0DAT", 0xffff);
 
 		case REG_JOY1DAT:
 			if (amiga_intf->joy1dat_r != NULL)
 				return (*amiga_intf->joy1dat_r)();
-			return input_port_read_safe(machine, "JOY1DAT", 0xffff);
+			return input_port_read_safe(space->machine, "JOY1DAT", 0xffff);
 
 		case REG_ADKCONR:
 			return CUSTOM_REG(REG_ADKCON);
 
 		case REG_POTGOR:
-			return input_port_read_safe(machine, "POTGO", 0x5500);
+			return input_port_read_safe(space->machine, "POTGO", 0x5500);
 
 		case REG_POT0DAT:
-			return input_port_read_safe(machine, "POT0DAT", 0x0000);
+			return input_port_read_safe(space->machine, "POT0DAT", 0x0000);
 
 		case REG_POT1DAT:
-			return input_port_read_safe(machine, "POT1DAT", 0x0000);
+			return input_port_read_safe(space->machine, "POT1DAT", 0x0000);
 
 		case REG_DSKBYTR:
 			if (amiga_intf->dskbytr_r != NULL)
@@ -1263,7 +1254,7 @@ READ16_HANDLER( amiga_custom_r )
 	}
 
 	if (LOG_CUSTOM)
-		logerror("%06X:read from custom %s\n", safe_cpu_get_pc(machine->activecpu), amiga_custom_names[offset & 0xff]);
+		logerror("%06X:read from custom %s\n", safe_cpu_get_pc(space->cpu), amiga_custom_names[offset & 0xff]);
 
 	return 0xffff;
 }
@@ -1282,7 +1273,7 @@ static TIMER_CALLBACK( finish_serial_write )
 	CUSTOM_REG(REG_SERDATR) |= 0x3000;
 
 	/* signal an interrupt */
-	amiga_custom_w(machine, REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
+	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_TBE, 0xffff);
 }
 
 
@@ -1292,7 +1283,7 @@ WRITE16_HANDLER( amiga_custom_w )
 	offset &= 0xff;
 
 	if (LOG_CUSTOM)
-		logerror("%06X:write to custom %s = %04X\n", safe_cpu_get_pc(machine->activecpu), amiga_custom_names[offset & 0xff], data);
+		logerror("%06X:write to custom %s = %04X\n", safe_cpu_get_pc(space->cpu), amiga_custom_names[offset & 0xff], data);
 
 	switch (offset)
 	{
@@ -1424,7 +1415,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
 				timer_adjust_oneshot( amiga_irq_timer, ATTOTIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0);
 			else /* if we're disabling irq's, process right away */
-				update_irqs(machine);
+				update_irqs(space->machine);
 			break;
 
 		case REG_INTREQ:
@@ -1441,7 +1432,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
 				timer_adjust_oneshot( amiga_irq_timer, ATTOTIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0);
 			else /* if we're clearing irq's, process right away */
-				update_irqs(machine);
+				update_irqs(space->machine);
 			break;
 
 		case REG_ADKCON:
@@ -1518,7 +1509,7 @@ void amiga_serial_in_w(UINT16 data)
 	}
 
 	/* signal an interrupt */
-	amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_RBF, 0xffff);
+	amiga_custom_w(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_RBF, 0xffff);
 }
 
 

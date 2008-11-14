@@ -189,9 +189,9 @@ static WRITE16_HANDLER( spriteram16_mirror_w )
 
 static READ16_HANDLER( xexex_waitskip_r )
 {
-	if (cpu_get_pc(machine->activecpu) == 0x1158)
+	if (cpu_get_pc(space->cpu) == 0x1158)
 	{
-		cpu_spinuntil_trigger(machine->activecpu, resume_trigger);
+		cpu_spinuntil_trigger(space->cpu, resume_trigger);
 		suspension_active = 1;
 	}
 
@@ -206,7 +206,7 @@ static READ16_HANDLER( control1_r )
 	/* bit 0 is EEPROM data */
 	/* bit 1 is EEPROM ready */
 	/* bit 3 is service button */
-	res = input_port_read(machine, "EEPROM");
+	res = input_port_read(space->machine, "EEPROM");
 
 	if (init_eeprom_count)
 	{
@@ -255,9 +255,9 @@ static WRITE16_HANDLER( sound_cmd1_w )
 	{
 		// anyone knows why 0x1a keeps lurking the sound queue in the world version???
 		if (xexex_strip0x1a)
-			if (soundlatch2_r(machine, 0)==1 && data==0x1a) return;
+			if (soundlatch2_r(space, 0)==1 && data==0x1a) return;
 
-		soundlatch_w(machine, 0, data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 	}
 }
 
@@ -265,18 +265,18 @@ static WRITE16_HANDLER( sound_cmd2_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch2_w(machine, 0, data & 0xff);
+		soundlatch2_w(space, 0, data & 0xff);
 	}
 }
 
 static WRITE16_HANDLER( sound_irq_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE);
 }
 
 static READ16_HANDLER( sound_status_r )
 {
-	return soundlatch3_r(machine, 0);
+	return soundlatch3_r(space, 0);
 }
 
 static void reset_sound_region(running_machine *machine)
@@ -287,7 +287,7 @@ static void reset_sound_region(running_machine *machine)
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	cur_sound_region = data & 7;
-	reset_sound_region(machine);
+	reset_sound_region(space->machine);
 }
 
 static void ym_set_mixing(double left, double right)

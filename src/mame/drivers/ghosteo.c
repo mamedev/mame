@@ -77,7 +77,7 @@ static struct lcd_config
 
 static READ32_HANDLER( r1 )
 {
-//  int pc = cpu_get_pc(machine->activecpu);
+//  int pc = cpu_get_pc(space->cpu);
 //  if(pc != 0x9a0 && pc != 0x7b4) printf("r1 @ %X\n",pc);
 
 	return 1;
@@ -85,7 +85,7 @@ static READ32_HANDLER( r1 )
 
 static READ32_HANDLER( r2 )
 {
-//  int pc = cpu_get_pc(machine->activecpu);
+//  int pc = cpu_get_pc(space->cpu);
 //  if(pc != 0xd64 && pc != 0xd3c )printf("r2 @ %X\n",pc);
 
 	return 2;
@@ -137,9 +137,9 @@ static READ32_HANDLER( flash_reg_r )
 
 static READ32_HANDLER( flash_r )
 {
-	UINT8 *flash = (UINT8 *)memory_region(machine, "user1");
+	UINT8 *flash = (UINT8 *)memory_region(space->machine, "user1");
 	UINT8 value = flash[flash_addr];
-	flash_addr = (flash_addr + 1) % memory_region_length(machine, "user1");
+	flash_addr = (flash_addr + 1) % memory_region_length(space->machine, "user1");
 	return value;
 }
 
@@ -211,7 +211,7 @@ static READ32_HANDLER( lcd_control_r )
 	{
 		case 0x00/4:
 		{
-			int line_val = video_screen_get_vpos(machine->primary_screen) & 0x3ff;
+			int line_val = video_screen_get_vpos(space->machine->primary_screen) & 0x3ff;
 			return (lcd_control[offset] & ~(0x3ff << 18)) | ((lcd.line_val - line_val) << 18);
 		}
 
@@ -240,7 +240,7 @@ static WRITE32_HANDLER( lcd_control_w )
 	{
 		case 0x00/4:
 		{
-			int line_val = video_screen_get_vpos(machine->primary_screen) & 0x3ff;
+			int line_val = video_screen_get_vpos(space->machine->primary_screen) & 0x3ff;
 			int bpp_mode = (lcd_control[offset] & 0x1e) >> 1;
 			int screen_type = (lcd_control[offset] & 0x60) >> 5;
 

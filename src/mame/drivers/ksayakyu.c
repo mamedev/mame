@@ -85,13 +85,13 @@ static WRITE8_HANDLER( bank_select_w )
         xxxxxxx  - unused ?
 
     */
-	memory_set_bankptr( 1, memory_region(machine, "main") + ((data&1) * 0x4000) + 0x10000 );
+	memory_set_bankptr( 1, memory_region(space->machine, "main") + ((data&1) * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( latch_w )
 {
 	sound_status&=~0x80;
-	soundlatch_w(machine,0,data|0x80);
+	soundlatch_w(space,0,data|0x80);
 }
 
 static READ8_HANDLER (sound_status_r)

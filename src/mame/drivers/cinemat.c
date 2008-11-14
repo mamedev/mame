@@ -87,14 +87,14 @@ MACHINE_RESET( cinemat )
 
 static READ8_HANDLER( inputs_r )
 {
-	return (input_port_read(machine, "INPUTS") >> offset) & 1;
+	return (input_port_read(space->machine, "INPUTS") >> offset) & 1;
 }
 
 
 static READ8_HANDLER( switches_r )
 {
 	static const UINT8 switch_shuffle[8] = { 2,5,4,3,0,1,6,7 };
-	return (input_port_read(machine, "SWITCHES") >> switch_shuffle[offset]) & 1;
+	return (input_port_read(space->machine, "SWITCHES") >> switch_shuffle[offset]) & 1;
 }
 
 
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( coin_reset_w )
 static WRITE8_HANDLER( mux_select_w )
 {
 	mux_select = data;
-	cinemat_sound_control_w(machine, 0x07, data);
+	cinemat_sound_control_w(space, 0x07, data);
 }
 
 
@@ -174,7 +174,7 @@ static READ8_HANDLER( speedfrk_wheel_r )
 	int delta_wheel;
 
     /* the shift register is cleared once per 'frame' */
-    delta_wheel = (INT8)input_port_read(machine, "WHEEL") / 8;
+    delta_wheel = (INT8)input_port_read(space->machine, "WHEEL") / 8;
     if (delta_wheel > 3)
         delta_wheel = 3;
     else if (delta_wheel < -3)
@@ -187,14 +187,14 @@ static READ8_HANDLER( speedfrk_wheel_r )
 static READ8_HANDLER( speedfrk_gear_r )
 {
 	static int gear = 0x0e;
-    int gearval = input_port_read(machine, "GEAR");
+    int gearval = input_port_read(space->machine, "GEAR");
 
 	/* check the fake gear input port and determine the bit settings for the gear */
 	if ((gearval & 0x0f) != 0x0f)
         gear = gearval & 0x0f;
 
 	/* add the start key into the mix -- note that it overlaps 4th gear */
-	if (!(input_port_read(machine, "INPUTS") & 0x80))
+	if (!(input_port_read(space->machine, "INPUTS") & 0x80))
         gear &= ~0x08;
 
 	return (gear >> offset) & 1;
@@ -240,9 +240,9 @@ static READ8_HANDLER( sundance_inputs_r )
 {
 	/* handle special keys first */
 	if (sundance_port_map[offset].portname)
-		return (input_port_read(machine, sundance_port_map[offset].portname) & sundance_port_map[offset].bitmask) ? 0 : 1;
+		return (input_port_read(space->machine, sundance_port_map[offset].portname) & sundance_port_map[offset].bitmask) ? 0 : 1;
 	else
-		return (input_port_read(machine, "INPUTS") >> offset) & 1;
+		return (input_port_read(space->machine, "INPUTS") >> offset) & 1;
 }
 
 
@@ -255,7 +255,7 @@ static READ8_HANDLER( sundance_inputs_r )
 
 static READ8_HANDLER( boxingb_dial_r )
 {
-	int value = input_port_read(machine, "DIAL");
+	int value = input_port_read(space->machine, "DIAL");
 	if (!mux_select) offset += 4;
 	return (value >> offset) & 1;
 }
@@ -270,8 +270,8 @@ static READ8_HANDLER( boxingb_dial_r )
 
 static READ8_HANDLER( qb3_frame_r )
 {
-	attotime next_update = video_screen_get_time_until_update(machine->primary_screen);
-	attotime frame_period = video_screen_get_frame_period(machine->primary_screen);
+	attotime next_update = video_screen_get_time_until_update(space->machine->primary_screen);
+	attotime frame_period = video_screen_get_frame_period(space->machine->primary_screen);
 	int percent = next_update.attoseconds / (frame_period.attoseconds / 100);
 
 	/* note this is just an approximation... */
@@ -281,7 +281,7 @@ static READ8_HANDLER( qb3_frame_r )
 
 static WRITE8_HANDLER( qb3_ram_bank_w )
 {
-	memory_set_bank(1, cpu_get_reg(machine->cpu[0], CCPU_P) & 3);
+	memory_set_bank(1, cpu_get_reg(space->machine->cpu[0], CCPU_P) & 3);
 }
 
 

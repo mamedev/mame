@@ -181,11 +181,11 @@ WRITE16_HANDLER( ginganin_vregs16_w )
 		tilemap_set_flip(ALL_TILEMAPS,flipscreen ? (TILEMAP_FLIPY | TILEMAP_FLIPX) : 0);
 		break;
 	case 7:
-		soundlatch_w(machine,0,data);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		soundlatch_w(space,0,data);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 		break;
 	default:
-		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n",cpu_get_pc(machine->activecpu),offset,data);
+		logerror("CPU #0 PC %06X : Warning, videoreg %04X <- %04X\n",cpu_get_pc(space->cpu),offset,data);
 	}
 }
 

@@ -106,18 +106,18 @@ static READ8_HANDLER( keyboard_r )
 	int res = 0x3f,i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4", "KEY5", "KEY6", "KEY7", "KEY8", "KEY9", "KEY10", "KEY11" };
 
-//  logerror("%04x: keyboard_r\n", cpu_get_pc(machine->activecpu));
+//  logerror("%04x: keyboard_r\n", cpu_get_pc(space->cpu));
 
 	for (i = 0; i < 12; i++)
 	{
 		if (~keyb & (1 << i))
 		{
-			res = input_port_read(machine, keynames[i]) & 0x3f;
+			res = input_port_read(space->machine, keynames[i]) & 0x3f;
 			break;
 		}
 	}
 
-	res |= (input_port_read(machine, "IN3") & 0xc0);
+	res |= (input_port_read(space->machine, "IN3") & 0xc0);
 
 	if (nvram_init_count)
 	{
@@ -130,7 +130,7 @@ static READ8_HANDLER( keyboard_r )
 
 static WRITE8_HANDLER( keyboard_select_w )
 {
-//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(machine->activecpu),offset,data);
+//  logerror("%04x: keyboard_select %d = %02x\n",cpu_get_pc(space->cpu),offset,data);
 
 	switch (offset)
 	{

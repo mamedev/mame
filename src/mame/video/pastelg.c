@@ -84,23 +84,23 @@ WRITE8_HANDLER( pastelg_blitter_w )
 		case 4: blitter_sizex = data; break;
 		case 5: blitter_sizey = data;
 				/* writing here also starts the blit */
-				pastelg_gfxdraw(machine);
+				pastelg_gfxdraw(space->machine);
 				break;
 		case 6:	blitter_direction_x = (data & 0x01) ? 1 : 0;
 				blitter_direction_y = (data & 0x02) ? 1 : 0;
 				pastelg_flipscreen = (data & 0x04) ? 0 : 1;
 				pastelg_dispflag = (data & 0x08) ? 0 : 1;
-				pastelg_vramflip(machine);
+				pastelg_vramflip(space->machine);
 				break;
 	}
 }
 
 WRITE8_HANDLER( pastelg_romsel_w )
 {
-	int gfxlen = memory_region_length(machine, "gfx1");
+	int gfxlen = memory_region_length(space->machine, "gfx1");
 	pastelg_gfxrom = ((data & 0xc0) >> 6);
 	pastelg_palbank = ((data & 0x10) >> 4);
-	nb1413m3_sndrombank1_w(machine, 0, data);
+	nb1413m3_sndrombank1_w(space, 0, data);
 
 	if ((pastelg_gfxrom << 16) > (gfxlen - 1))
 	{

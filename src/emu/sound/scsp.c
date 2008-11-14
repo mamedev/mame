@@ -697,6 +697,8 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 
 static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:
@@ -716,7 +718,7 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 			break;
 		case 0x6:
 		case 0x7:
-			scsp_midi_in(Machine, 0, SCSP->udata.data[0x6/2]&0xff, 0);
+			scsp_midi_in(space, 0, SCSP->udata.data[0x6/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:
@@ -1308,7 +1310,7 @@ WRITE16_HANDLER( scsp_0_w )
 		SCSP->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(machine, SCSP);
+			dma_scsp(space->machine, SCSP);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;
@@ -1316,7 +1318,7 @@ WRITE16_HANDLER( scsp_0_w )
 		case 0x42a:
 			if(stv_scu && !(stv_scu[40] & 0x40) /*&& scsp_regs[0x42c/2] & 0x20*/)/*Main CPU allow sound irq*/
 			{
-				cpu_set_input_line_and_vector(machine->cpu[0], 9, HOLD_LINE , 0x46);
+				cpu_set_input_line_and_vector(space->machine->cpu[0], 9, HOLD_LINE , 0x46);
 			    logerror("SCSP: Main CPU interrupt\n");
 			}
 		break;

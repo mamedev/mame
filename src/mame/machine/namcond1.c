@@ -73,7 +73,7 @@ READ16_HANDLER( namcond1_cuskey_r )
 
         default :
             logerror( "offset $%X accessed from $%X\n",
-                      offset<<1, cpu_get_pc(machine->activecpu) );
+                      offset<<1, cpu_get_pc(space->cpu) );
             return( 0 );
     }
 }
@@ -97,7 +97,7 @@ WRITE16_HANDLER( namcond1_cuskey_w )
             // this is a kludge until we emulate the h8
 	    if ((namcond1_h8_irq5_enabled == 0) && (data != 0x0000))
 	    {
-	    	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+	    	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 	    }
             namcond1_h8_irq5_enabled = ( data != 0x0000 );
             break;

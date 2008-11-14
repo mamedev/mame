@@ -43,8 +43,8 @@ static WRITE32_HANDLER( palette_w )
 	COMBINE_DATA(&paletteram32[offset]);
 	data = paletteram32[offset];
 
-	palette_set_color(machine, (offset*2)+0, MAKE_RGB(pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16)));
-	palette_set_color(machine, (offset*2)+1, MAKE_RGB(pal5bit(data >> 10), pal5bit(data >>  5), pal5bit(data >>  0)));
+	palette_set_color(space->machine, (offset*2)+0, MAKE_RGB(pal5bit(data >> 26), pal5bit(data >> 21), pal5bit(data >> 16)));
+	palette_set_color(space->machine, (offset*2)+1, MAKE_RGB(pal5bit(data >> 10), pal5bit(data >>  5), pal5bit(data >>  0)));
 }
 
 static READ32_HANDLER( eeprom_r )
@@ -52,7 +52,7 @@ static READ32_HANDLER( eeprom_r )
 	UINT32 r = 0;
 
 	if (ACCESSING_BITS_24_31)
-		r |= input_port_read(machine, "SERVICE");
+		r |= input_port_read(space->machine, "SERVICE");
 
 	return r;
 }
@@ -75,7 +75,7 @@ static CUSTOM_INPUT( analog_ctrl_r )
 
 static WRITE32_HANDLER( int_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 }
 
 static MACHINE_START( ultrsprt )
@@ -122,10 +122,10 @@ static READ16_HANDLER( sound_r )
 	int reg = offset * 2;
 
 	if (ACCESSING_BITS_8_15)
-		r |= k054539_0_r(machine, reg+0) << 8;
+		r |= k054539_0_r(space, reg+0) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		r |= k054539_0_r(machine, reg+1) << 0;
+		r |= k054539_0_r(space, reg+1) << 0;
 
 	return r;
 }
@@ -135,10 +135,10 @@ static WRITE16_HANDLER( sound_w )
 	int reg = offset * 2;
 
 	if (ACCESSING_BITS_8_15)
-		k054539_0_w(machine, reg+0, (data >> 8) & 0xff);
+		k054539_0_w(space, reg+0, (data >> 8) & 0xff);
 
 	if (ACCESSING_BITS_0_7)
-		k054539_0_w(machine, reg+1, (data >> 0) & 0xff);
+		k054539_0_w(space, reg+1, (data >> 0) & 0xff);
 }
 
 static READ16_HANDLER( K056800_68k_r )
@@ -146,10 +146,10 @@ static READ16_HANDLER( K056800_68k_r )
 	UINT16 r = 0;
 
 	if (ACCESSING_BITS_8_15)
-		r |= K056800_sound_r(machine, (offset*2)+0, 0xffff) << 8;
+		r |= K056800_sound_r(space, (offset*2)+0, 0xffff) << 8;
 
 	if (ACCESSING_BITS_0_7)
-		r |= K056800_sound_r(machine, (offset*2)+1, 0xffff) << 0;
+		r |= K056800_sound_r(space, (offset*2)+1, 0xffff) << 0;
 
 	return r;
 }
@@ -157,10 +157,10 @@ static READ16_HANDLER( K056800_68k_r )
 static WRITE16_HANDLER( K056800_68k_w )
 {
 	if (ACCESSING_BITS_8_15)
-		K056800_sound_w(machine, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
+		K056800_sound_w(space, (offset*2)+0, (data >> 8) & 0xff, 0x00ff);
 
 	if (ACCESSING_BITS_0_7)
-		K056800_sound_w(machine, (offset*2)+1, (data >> 0) & 0xff, 0x00ff);
+		K056800_sound_w(space, (offset*2)+1, (data >> 0) & 0xff, 0x00ff);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 16 )

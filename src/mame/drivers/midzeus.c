@@ -129,7 +129,7 @@ static WRITE32_HANDLER( cmos_w )
 	if (bitlatch[2] && !cmos_protected)
 		COMBINE_DATA(&generic_nvram32[offset]);
 	else
-		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(machine->activecpu), bitlatch[2], cmos_protected);
+		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(space->cpu), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
 }
 
@@ -181,7 +181,7 @@ static WRITE32_HANDLER( zpram_w )
 	if (bitlatch[2])
 		COMBINE_DATA(&zpram[offset]);
 	else
-		logerror("%06X:zpram_w with bitlatch[2] = %d\n", cpu_get_pc(machine->activecpu), bitlatch[2]);
+		logerror("%06X:zpram_w with bitlatch[2] = %d\n", cpu_get_pc(space->cpu), bitlatch[2]);
 }
 
 
@@ -240,7 +240,7 @@ static READ32_HANDLER( bitlatches_r )
 
 		/* unknown purpose */
 		default:
-			logerror("%06X:bitlatches_r(%X)\n", cpu_get_pc(machine->activecpu), offset);
+			logerror("%06X:bitlatches_r(%X)\n", cpu_get_pc(space->cpu), offset);
 			break;
 	}
 	return ~0;
@@ -257,19 +257,19 @@ static WRITE32_HANDLER( bitlatches_w )
 		/* unknown purpose */
 		default:
 			if (oldval ^ data)
-				logerror("%06X:bitlatches_w(%X) = %X\n", cpu_get_pc(machine->activecpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 
 		/* unknown purpose; crusnexo toggles this between 0 and 1 every 20 frames; thegrid writes 1 */
 		case 0:
 			if (data != 0 && data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(machine->activecpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 
 		/* unknown purpose; mk4/invasn write 1 here at initialization; crusnexo/thegrid write 3 */
 		case 1:
 			if (data != 1 && data != 3)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(machine->activecpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 
 		/* CMOS/ZPRAM extra enable latch; only low bit is used */
@@ -279,7 +279,7 @@ static WRITE32_HANDLER( bitlatches_w )
 		/* unknown purpose; invasn writes 2 here at startup */
 		case 4:
 			if (data != 2)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(machine->activecpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 
 		/* ROM bank selection on Zeus 2 */
@@ -290,19 +290,19 @@ static WRITE32_HANDLER( bitlatches_w )
 		/* unknown purpose; crusnexo/thegrid write 1 at startup */
 		case 7:
 			if (data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(machine->activecpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 
 		/* unknown purpose; crusnexo writes 4 at startup; thegrid writes 6 */
 		case 8:
 			if (data != 4 && data != 6)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(machine->activecpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 
 		/* unknown purpose; thegrid writes 1 at startup */
 		case 9:
 			if (data != 1)
-				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(machine->activecpu), offset, data);
+				logerror("%06X:bitlatches_w(%X) = %X (unexpected)\n", cpu_get_pc(space->cpu), offset, data);
 			break;
 	}
 }
@@ -368,7 +368,7 @@ static WRITE32_HANDLER( crusnexo_leds_w )
 
 static READ32_HANDLER( linkram_r )
 {
-	logerror("%06X:unknown_8a000_r(%02X)\n", cpu_get_pc(machine->activecpu), offset);
+	logerror("%06X:unknown_8a000_r(%02X)\n", cpu_get_pc(space->cpu), offset);
 	if (offset == 0)
 		return 0x30313042;
 	else if (offset == 0x3c)
@@ -378,7 +378,7 @@ static READ32_HANDLER( linkram_r )
 
 static WRITE32_HANDLER( linkram_w )
 {
-	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", cpu_get_pc(machine->activecpu),  offset, data);
+	logerror("%06X:unknown_8a000_w(%02X) = %08X\n", cpu_get_pc(space->cpu),  offset, data);
 	COMBINE_DATA(&linkram[offset]);
 }
 
@@ -403,7 +403,7 @@ static READ32_HANDLER( tms32031_control_r )
 
 	/* log anything else except the memory control register */
 	if (offset != 0x64)
-		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(machine->activecpu), offset);
+		logerror("%06X:tms32031_control_r(%02X)\n", cpu_get_pc(space->cpu), offset);
 
 	return tms32031_control[offset];
 }
@@ -425,7 +425,7 @@ static WRITE32_HANDLER( tms32031_control_w )
 			timer_adjust_oneshot(timer[which], attotime_never, 0);
 	}
 	else
-		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(machine->activecpu), offset, data);
+		logerror("%06X:tms32031_control_w(%02X) = %08X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -476,8 +476,8 @@ static READ32_HANDLER( analog_r )
 {
 	static const char * const tags[] = { "ANALOG0", "ANALOG1", "ANALOG2", "ANALOG3" };
 	if (offset < 8 || offset > 11)
-		logerror("%06X:analog_r(%X)\n", cpu_get_pc(machine->activecpu), offset);
-	return input_port_read(machine, tags[offset & 3]);
+		logerror("%06X:analog_r(%X)\n", cpu_get_pc(space->cpu), offset);
+	return input_port_read(space->machine, tags[offset & 3]);
 }
 
 
@@ -530,22 +530,22 @@ static WRITE32_HANDLER( invasn_gun_w )
 	/* bits 0-1 enable IRQs (?) */
 	/* bits 2-3 reset IRQ states */
 	gun_irq_state &= ~((gun_control >> 2) & 3);
-	update_gun_irq(machine);
+	update_gun_irq(space->machine);
 
 	for (player = 0; player < 2; player++)
 	{
 		UINT8 pmask = 0x04 << player;
 		if (((old_control ^ gun_control) & pmask) != 0 && (gun_control & pmask) == 0)
 		{
-			const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
+			const rectangle *visarea = video_screen_get_visible_area(space->machine->primary_screen);
 			static const char *const names[2][2] =
 			{
 				{ "GUNX1", "GUNY1" },
 				{ "GUNX2", "GUNY2" }
 			};
-			gun_x[player] = input_port_read(machine, names[player][0]) * (visarea->max_x + 1 - visarea->min_x) / 255 + visarea->min_x + BEAM_XOFFS;
-			gun_y[player] = input_port_read(machine, names[player][1]) * (visarea->max_y + 1 - visarea->min_y) / 255 + visarea->min_y;
-			timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(machine->primary_screen, MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
+			gun_x[player] = input_port_read(space->machine, names[player][0]) * (visarea->max_x + 1 - visarea->min_x) / 255 + visarea->min_x + BEAM_XOFFS;
+			gun_y[player] = input_port_read(space->machine, names[player][1]) * (visarea->max_y + 1 - visarea->min_y) / 255 + visarea->min_y;
+			timer_adjust_oneshot(gun_timer[player], video_screen_get_time_until_pos(space->machine->primary_screen, MAX(0, gun_y[player] - BEAM_DY), MAX(0, gun_x[player] - BEAM_DX)), player);
 		}
 	}
 }
@@ -553,8 +553,8 @@ static WRITE32_HANDLER( invasn_gun_w )
 
 static READ32_HANDLER( invasn_gun_r )
 {
-	int beamx = video_screen_get_hpos(machine->primary_screen);
-	int beamy = video_screen_get_vpos(machine->primary_screen);
+	int beamx = video_screen_get_hpos(space->machine->primary_screen);
+	int beamy = video_screen_get_vpos(space->machine->primary_screen);
 	UINT32 result = 0xffff;
 	int player;
 

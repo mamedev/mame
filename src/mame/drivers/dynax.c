@@ -110,13 +110,13 @@ void sprtmtch_update_irq(running_machine *machine)
 static WRITE8_HANDLER( dynax_vblank_ack_w )
 {
 	dynax_vblank_irq = 0;
-	sprtmtch_update_irq(machine);
+	sprtmtch_update_irq(space->machine);
 }
 
 static WRITE8_HANDLER( dynax_blitter_ack_w )
 {
 	dynax_blitter_irq = 0;
-	sprtmtch_update_irq(machine);
+	sprtmtch_update_irq(space->machine);
 }
 
 static INTERRUPT_GEN( sprtmtch_vblank_interrupt )
@@ -150,19 +150,19 @@ void jantouki_update_irq(running_machine *machine)
 static WRITE8_HANDLER( jantouki_vblank_ack_w )
 {
 	dynax_vblank_irq = 0;
-	jantouki_update_irq(machine);
+	jantouki_update_irq(space->machine);
 }
 
 static WRITE8_HANDLER( jantouki_blitter_ack_w )
 {
 	dynax_blitter_irq = data;
-	jantouki_update_irq(machine);
+	jantouki_update_irq(space->machine);
 }
 
 static WRITE8_HANDLER( jantouki_blitter2_ack_w )
 {
 	dynax_blitter2_irq = data;
-	jantouki_update_irq(machine);
+	jantouki_update_irq(space->machine);
 }
 
 static INTERRUPT_GEN( jantouki_vblank_interrupt )
@@ -196,7 +196,7 @@ static INTERRUPT_GEN( jantouki_sound_vblank_interrupt )
 static WRITE8_HANDLER( jantouki_sound_vblank_ack_w )
 {
 	dynax_sound_vblank_irq = 0;
-	jantouki_sound_update_irq(machine);
+	jantouki_sound_update_irq(space->machine);
 }
 
 static void jantouki_sound_callback(running_machine *machine, int state)
@@ -237,11 +237,11 @@ static READ8_HANDLER( hanamai_keyboard_0_r )
 	int res = 0x3f;
 
 	/* the game reads all rows at once (keyb = 0) to check if a key is pressed */
-	if (~keyb & 0x01) res &= input_port_read(machine, "KEY0");
-	if (~keyb & 0x02) res &= input_port_read(machine, "KEY1");
-	if (~keyb & 0x04) res &= input_port_read(machine, "KEY2");
-	if (~keyb & 0x08) res &= input_port_read(machine, "KEY3");
-	if (~keyb & 0x10) res &= input_port_read(machine, "KEY4");
+	if (~keyb & 0x01) res &= input_port_read(space->machine, "KEY0");
+	if (~keyb & 0x02) res &= input_port_read(space->machine, "KEY1");
+	if (~keyb & 0x04) res &= input_port_read(space->machine, "KEY2");
+	if (~keyb & 0x08) res &= input_port_read(space->machine, "KEY3");
+	if (~keyb & 0x10) res &= input_port_read(space->machine, "KEY4");
 
 	return res;
 }
@@ -251,11 +251,11 @@ static READ8_HANDLER( hanamai_keyboard_1_r )
 	int res = 0x3f;
 
 	/* the game reads all rows at once (keyb = 0) to check if a key is pressed */
-	if (~keyb & 0x01) res &= input_port_read(machine, "KEY5");
-	if (~keyb & 0x02) res &= input_port_read(machine, "KEY6");
-	if (~keyb & 0x04) res &= input_port_read(machine, "KEY7");
-	if (~keyb & 0x08) res &= input_port_read(machine, "KEY8");
-	if (~keyb & 0x10) res &= input_port_read(machine, "KEY9");
+	if (~keyb & 0x01) res &= input_port_read(space->machine, "KEY5");
+	if (~keyb & 0x02) res &= input_port_read(space->machine, "KEY6");
+	if (~keyb & 0x04) res &= input_port_read(space->machine, "KEY7");
+	if (~keyb & 0x08) res &= input_port_read(space->machine, "KEY8");
+	if (~keyb & 0x10) res &= input_port_read(space->machine, "KEY9");
 
 	return res;
 }
@@ -268,13 +268,13 @@ static WRITE8_HANDLER( hanamai_keyboard_w )
 
 static WRITE8_HANDLER( dynax_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	memory_set_bankptr(1,&ROM[0x08000+0x8000*(data & 0x0f)]);
 }
 
 static WRITE8_HANDLER( jantouki_sound_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "sound");
+	UINT8 *ROM = memory_region(space->machine, "sound");
 	memory_set_bankptr(2,&ROM[0x08000+0x8000*data]);
 }
 
@@ -283,8 +283,8 @@ static int hnoridur_bank;
 
 static WRITE8_HANDLER( hnoridur_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main") + 0x10000 + 0x8000*data;
-//logerror("%04x: rom bank = %02x\n",cpu_get_pc(machine->activecpu),data);
+	UINT8 *ROM = memory_region(space->machine, "main") + 0x10000 + 0x8000*data;
+//logerror("%04x: rom bank = %02x\n",cpu_get_pc(space->cpu),data);
 	memory_set_bankptr(1,ROM);
 	hnoridur_bank = data;
 }
@@ -295,7 +295,7 @@ static int palbank;
 static WRITE8_HANDLER( hnoridur_palbank_w )
 {
 	palbank = data & 0x0f;
-	dynax_blit_palbank_w(machine,0,data);
+	dynax_blit_palbank_w(space,0,data);
 }
 
 static WRITE8_HANDLER( hnoridur_palette_w )
@@ -315,7 +315,7 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 		// hnoridur: R/W RAM
 		case 0x18:
 		{
-			UINT8 *RAM = memory_region(machine, "main") + 0x10000 + hnoridur_bank * 0x8000;
+			UINT8 *RAM = memory_region(space->machine, "main") + 0x10000 + hnoridur_bank * 0x8000;
 			RAM[offset] = data;
 			return;
 		}
@@ -331,7 +331,7 @@ static WRITE8_HANDLER( hnoridur_palette_w )
 		int r = BITSWAP8((x >>  0) & 0x1f, 7,6,5, 0,1,2,3,4 );
 		int g = BITSWAP8((x >>  5) & 0x1f, 7,6,5, 0,1,2,3,4 );
 		int b = BITSWAP8((x >> 10) & 0x1f, 7,6,5, 0,1,2,3,4 );
-		palette_set_color_rgb(machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(space->machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -346,7 +346,7 @@ static WRITE8_HANDLER( yarunara_palette_w )
 
 		case 0x1c:	// RTC
 		{
-			const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+			const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "rtc");
 			msm6242_w(rtc, offset, data);
 		}
 		return;
@@ -362,7 +362,7 @@ static WRITE8_HANDLER( yarunara_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0)>>3) | ((br & 0xe0)>>5);
-		palette_set_color_rgb(machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(space->machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -389,7 +389,7 @@ static WRITE8_HANDLER( nanajign_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0)>>3) | ((br & 0xe0)>>5);
-		palette_set_color_rgb(machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(space->machine,256*palbank + offset,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -446,11 +446,11 @@ static MACHINE_RESET( adpcm )
 
 static WRITE8_HANDLER( yarunara_layer_half_w )
 {
-	hanamai_layer_half_w(machine,0,data >> 1);
+	hanamai_layer_half_w(space,0,data >> 1);
 }
 static WRITE8_HANDLER( yarunara_layer_half2_w )
 {
-	hnoridur_layer_half2_w(machine,0,data >> 1);
+	hnoridur_layer_half2_w(space,0,data >> 1);
 }
 
 static ADDRESS_MAP_START( sprtmtch_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -620,7 +620,7 @@ static READ8_HANDLER( yarunara_input_r )
 			switch( yarunara_select )
 			{
 				case 0x00:
-					return input_port_read(machine, "IN0");	// coins
+					return input_port_read(space->machine, "IN0");	// coins
 
 				case 0x02:
 					return 0xff;	// bit 7 must be 1. Bit 2?
@@ -637,12 +637,12 @@ static READ8_HANDLER( yarunara_input_r )
 				// player 2
 				case 0x01:	//quiztvqq
 				case 0x81:
-					return input_port_read(machine, keynames1[yarunara_ip++]);
+					return input_port_read(space->machine, keynames1[yarunara_ip++]);
 
 				// player 1
 				case 0x02:	//quiztvqq
 				case 0x82:
-					return input_port_read(machine, keynames0[yarunara_ip++]);
+					return input_port_read(space->machine, keynames0[yarunara_ip++]);
 
 				default:
 					return 0xff;
@@ -654,7 +654,7 @@ static READ8_HANDLER( yarunara_input_r )
 
 static WRITE8_HANDLER( yarunara_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, "main") + 0x10000 + 0x8000 * data;
+	UINT8 *rom = memory_region(space->machine, "main") + 0x10000 + 0x8000 * data;
 	memory_set_bankptr(1, rom);
 
 	hnoridur_bank = data;
@@ -662,20 +662,20 @@ static WRITE8_HANDLER( yarunara_rombank_w )
 
 static WRITE8_HANDLER( yarunara_flipscreen_w )
 {
-	dynax_flipscreen_w(machine,0,(data&2)?1:0);
+	dynax_flipscreen_w(space,0,(data&2)?1:0);
 }
 
 static WRITE8_HANDLER( yarunara_blit_romregion_w )
 {
 	switch(data)
 	{
-		case 0x00:	dynax_blit_romregion_w(machine,0,0);	return;
-		case 0x01:	dynax_blit_romregion_w(machine,0,1);	return;
-		case 0x80:	dynax_blit_romregion_w(machine,0,2);	return;
-		case 0x81:	dynax_blit_romregion_w(machine,0,3);	return;
-		case 0x82:	dynax_blit_romregion_w(machine,0,4);	return;	// mjcomv1
+		case 0x00:	dynax_blit_romregion_w(space,0,0);	return;
+		case 0x01:	dynax_blit_romregion_w(space,0,1);	return;
+		case 0x80:	dynax_blit_romregion_w(space,0,2);	return;
+		case 0x81:	dynax_blit_romregion_w(space,0,3);	return;
+		case 0x82:	dynax_blit_romregion_w(space,0,4);	return;	// mjcomv1
 	}
-	logerror("%04x: unmapped romregion=%02X\n",cpu_get_pc(machine->activecpu),data);
+	logerror("%04x: unmapped romregion=%02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static ADDRESS_MAP_START( yarunara_io_map, ADDRESS_SPACE_IO, 8 )
@@ -866,7 +866,7 @@ static WRITE8_HANDLER( jantouki_soundlatch_w )
 	dynax_soundlatch_full = 1;
 	dynax_soundlatch_irq = 1;
 	latch = data;
-	jantouki_sound_update_irq(machine);
+	jantouki_sound_update_irq(space->machine);
 }
 
 static READ8_HANDLER( jantouki_blitter_busy_r )
@@ -876,7 +876,7 @@ static READ8_HANDLER( jantouki_blitter_busy_r )
 
 static WRITE8_HANDLER( jantouki_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	memory_set_bankptr(1,&ROM[0x8000 + 0x8000*(data&0x0f)]);
 	set_led_status(0,data & 0x10);	// maybe
 }
@@ -922,7 +922,7 @@ static WRITE8_HANDLER( jantouki_soundlatch_ack_w )
 {
 	dynax_soundlatch_ack = data;
 	dynax_soundlatch_irq = 0;
-	jantouki_sound_update_irq(machine);
+	jantouki_sound_update_irq(space->machine);
 }
 
 static READ8_HANDLER( jantouki_soundlatch_r )
@@ -960,7 +960,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mjelctrn_keyboard_1_r )
 {
-	return (hanamai_keyboard_1_r(machine, 0) & 0x3f) | (input_port_read(machine, "FAKE") ? 0x40 : 0);
+	return (hanamai_keyboard_1_r(space, 0) & 0x3f) | (input_port_read(space->machine, "FAKE") ? 0x40 : 0);
 }
 
 static READ8_HANDLER( mjelctrn_dsw_r )
@@ -968,7 +968,7 @@ static READ8_HANDLER( mjelctrn_dsw_r )
 	int dsw = (keyb & 0xc0) >> 6;
 	static const char *const dswnames[] = { "DSW2", "DSW1", "DSW3", "DSW4" };
 
-	return input_port_read(machine, dswnames[dsw]);
+	return input_port_read(space->machine, dswnames[dsw]);
 }
 
 static WRITE8_HANDLER( mjelctrn_blitter_ack_w )
@@ -1034,12 +1034,12 @@ static WRITE8_HANDLER( htengoku_dsw_w )
 static READ8_HANDLER( htengoku_dsw_r )
 {
 
-	if (!(htengoku_dsw & 0x01))	return input_port_read(machine, "DSW0");
-	if (!(htengoku_dsw & 0x02))	return input_port_read(machine, "DSW1");
-	if (!(htengoku_dsw & 0x04))	return input_port_read(machine, "DSW2");
-	if (!(htengoku_dsw & 0x08))	return input_port_read(machine, "DSW3");
-	if (!(htengoku_dsw & 0x10))	return input_port_read(machine, "DSW4");
-	logerror("%06x: warning, unknown bits read, htengoku_dsw = %02x\n", cpu_get_pc(machine->activecpu), htengoku_dsw);
+	if (!(htengoku_dsw & 0x01))	return input_port_read(space->machine, "DSW0");
+	if (!(htengoku_dsw & 0x02))	return input_port_read(space->machine, "DSW1");
+	if (!(htengoku_dsw & 0x04))	return input_port_read(space->machine, "DSW2");
+	if (!(htengoku_dsw & 0x08))	return input_port_read(space->machine, "DSW3");
+	if (!(htengoku_dsw & 0x10))	return input_port_read(space->machine, "DSW4");
+	logerror("%06x: warning, unknown bits read, htengoku_dsw = %02x\n", cpu_get_pc(space->cpu), htengoku_dsw);
 
 	return 0xff;
 }
@@ -1063,7 +1063,7 @@ static WRITE8_HANDLER( htengoku_coin_w )
 
 		case 0xff:	break;	// CRT controller?
 		default:
-			logerror("%04x: coins_w with select = %02x, data = %02x\n", cpu_get_pc(machine->activecpu), htengoku_select,data);
+			logerror("%04x: coins_w with select = %02x, data = %02x\n", cpu_get_pc(space->cpu), htengoku_select,data);
 	}
 }
 
@@ -1074,11 +1074,11 @@ static READ8_HANDLER( htengoku_input_r )
 
 	switch( htengoku_select )
 	{
-		case 0x81:	return input_port_read(machine, keynames1[htengoku_ip++]);
-		case 0x82:	return input_port_read(machine, keynames0[htengoku_ip++]);
+		case 0x81:	return input_port_read(space->machine, keynames1[htengoku_ip++]);
+		case 0x82:	return input_port_read(space->machine, keynames0[htengoku_ip++]);
 		case 0x0d:	return 0xff;	// unused
 	}
-	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(machine->activecpu), htengoku_select);
+	logerror("%04x: input_r with select = %02x\n", cpu_get_pc(space->cpu), htengoku_select);
 	return 0xff;
 }
 
@@ -1086,18 +1086,18 @@ static READ8_HANDLER( htengoku_coin_r )
 {
 	switch( htengoku_select )
 	{
-		case 0x00:	return input_port_read(machine, "IN0");
+		case 0x00:	return input_port_read(space->machine, "IN0");
 		case 0x01:	return 0xff;	//?
-		case 0x02:	return 0xbf | ((htengoku_hopper && !(video_screen_get_frame_number(machine->primary_screen)%10)) ? 0 : (1<<6));;	// bit 7 = blitter busy, bit 6 = hopper
+		case 0x02:	return 0xbf | ((htengoku_hopper && !(video_screen_get_frame_number(space->machine->primary_screen)%10)) ? 0 : (1<<6));;	// bit 7 = blitter busy, bit 6 = hopper
 		case 0x03:	return htengoku_coins;
 	}
-	logerror("%04x: coin_r with select = %02x\n", cpu_get_pc(machine->activecpu), htengoku_select);
+	logerror("%04x: coin_r with select = %02x\n", cpu_get_pc(space->cpu), htengoku_select);
 	return 0xff;
 }
 
 static WRITE8_HANDLER( htengoku_rombank_w )
 {
-	UINT8 *rom = memory_region(machine, "main") + 0x10000 + 0x8000 * (data & 0x7);
+	UINT8 *rom = memory_region(space->machine, "main") + 0x10000 + 0x8000 * (data & 0x7);
 	memory_set_bankptr(1, rom);
 
 	hnoridur_bank = data;
@@ -1107,11 +1107,11 @@ static WRITE8_HANDLER( htengoku_blit_romregion_w )
 {
 	switch(data)
 	{
-		case 0x80:	dynax_blit_romregion_w(machine,0,0);	return;
-		case 0x81:	dynax_blit_romregion_w(machine,0,1);	return;
-		case 0x00:	dynax_blit_romregion_w(machine,0,2);	return;
+		case 0x80:	dynax_blit_romregion_w(space,0,0);	return;
+		case 0x81:	dynax_blit_romregion_w(space,0,1);	return;
+		case 0x00:	dynax_blit_romregion_w(space,0,2);	return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n",cpu_get_pc(machine->activecpu),data);
+	logerror("%04x: unmapped romregion=%02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static READ8_HANDLER( unk_r )
@@ -1194,7 +1194,7 @@ static WRITE8_HANDLER( tenkai_ip_w )
 				break;
 			return;
 	}
-	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", cpu_get_pc(machine->activecpu), tenkai_ipsel,data);
+	logerror("%04x: unmapped ip_sel=%02x written with %02x\n", cpu_get_pc(space->cpu), tenkai_ipsel,data);
 }
 
 static READ8_HANDLER( tenkai_ip_r )
@@ -1209,10 +1209,10 @@ static READ8_HANDLER( tenkai_ip_r )
 			switch( tenkai_ipsel )
 			{
 				case 0x00:
-					return input_port_read(machine, "IN0");	// coins
+					return input_port_read(space->machine, "IN0");	// coins
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(machine->activecpu), tenkai_ipsel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(space->cpu), tenkai_ipsel, offset);
 					return 0xff;
 			}
 		}
@@ -1227,17 +1227,17 @@ static READ8_HANDLER( tenkai_ip_r )
 				// player 2
 				case 0x81:
 					if (tenkai_ip >= 5)
-						logerror("%04x: unmapped tenkai_ip=%02x read\n", cpu_get_pc(machine->activecpu), tenkai_ip);
-					return 0xff;//input_port_read(machine, keynames1[tenkai_ip++]);
+						logerror("%04x: unmapped tenkai_ip=%02x read\n", cpu_get_pc(space->cpu), tenkai_ip);
+					return 0xff;//input_port_read(space->machine, keynames1[tenkai_ip++]);
 
 				// player 1
 				case 0x82:
 					if (tenkai_ip >= 5)
-						logerror("%04x: unmapped tenkai_ip=%02x read\n", cpu_get_pc(machine->activecpu), tenkai_ip);
-					return input_port_read(machine, keynames0[tenkai_ip++]);
+						logerror("%04x: unmapped tenkai_ip=%02x read\n", cpu_get_pc(space->cpu), tenkai_ip);
+					return input_port_read(space->machine, keynames0[tenkai_ip++]);
 
 				default:
-					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(machine->activecpu), tenkai_ipsel, offset);
+					logerror("%04x: unmapped ip_sel=%02x read from offs %x\n", cpu_get_pc(space->cpu), tenkai_ipsel, offset);
 					return 0xff;
 			}
 		}
@@ -1252,12 +1252,12 @@ static WRITE8_HANDLER( tenkai_dswsel_w )
 }
 static READ8_HANDLER( tenkai_dsw_r )
 {
-	if (~tenkai_dswsel & 0x01) return input_port_read(machine, "DSW0");
-	if (~tenkai_dswsel & 0x02) return input_port_read(machine, "DSW1");
-	if (~tenkai_dswsel & 0x04) return input_port_read(machine, "DSW2");
-	if (~tenkai_dswsel & 0x08) return input_port_read(machine, "DSW3");
-	if (~tenkai_dswsel & 0x10) return input_port_read(machine, "DSW4");
-	logerror("%04x: unmapped dsw %02x read\n",cpu_get_pc(machine->activecpu),tenkai_dswsel);
+	if (~tenkai_dswsel & 0x01) return input_port_read(space->machine, "DSW0");
+	if (~tenkai_dswsel & 0x02) return input_port_read(space->machine, "DSW1");
+	if (~tenkai_dswsel & 0x04) return input_port_read(space->machine, "DSW2");
+	if (~tenkai_dswsel & 0x08) return input_port_read(space->machine, "DSW3");
+	if (~tenkai_dswsel & 0x10) return input_port_read(space->machine, "DSW4");
+	logerror("%04x: unmapped dsw %02x read\n",cpu_get_pc(space->cpu),tenkai_dswsel);
 	return 0xff;
 }
 
@@ -1276,7 +1276,7 @@ static WRITE8_HANDLER( tenkai_palette_w )
 		int r = br & 0x1f;
 		int g = bg & 0x1f;
 		int b = ((bg & 0xc0)>>3) | ((br & 0xe0)>>5);
-		palette_set_color_rgb(machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
+		palette_set_color_rgb(space->machine, 256*palbank + ((offset&0xf)|((offset&0x1e0)>>1)) ,pal5bit(r),pal5bit(g),pal5bit(b));
 	}
 }
 
@@ -1293,12 +1293,12 @@ static READ8_HANDLER( tenkai_p3_r )
 static WRITE8_HANDLER( tenkai_p3_w )
 {
 	rombank = ((data & 0x04) << 1) | (rombank & 0x07);
-	tenkai_update_rombank(machine);
+	tenkai_update_rombank(space->machine);
 }
 static WRITE8_HANDLER( tenkai_p4_w )
 {
 	rombank = (rombank & 0x08) | ((data & 0x0e) >> 1);
-	tenkai_update_rombank(machine);
+	tenkai_update_rombank(space->machine);
 }
 // Added by Whistler - START
 static READ8_HANDLER( tenkai_p5_r )
@@ -1325,7 +1325,7 @@ static WRITE8_HANDLER( tenkai_p7_w )
 static WRITE8_HANDLER( tenkai_p8_w )
 {
 	rombank = ((data & 0x08) <<	 1) | (rombank & 0x0f);
-	tenkai_update_rombank(machine);
+	tenkai_update_rombank(space->machine);
 }
 static READ8_HANDLER( tenkai_p8_r )
 {
@@ -1340,15 +1340,15 @@ static READ8_HANDLER( tenkai_8000_r )
 	}
 	else if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+		const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "rtc");
 		return msm6242_r(rtc, offset);
 	}
 	else if (rombank == 0x12)
 	{
-		return tenkai_palette_r(machine,offset);
+		return tenkai_palette_r(space,offset);
 	}
 
-	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",cpu_get_pc(machine->activecpu),offset,rombank);
+	logerror("%04x: unmapped offset %04X read with rombank=%02X\n",cpu_get_pc(space->cpu),offset,rombank);
 	return 0x00;
 }
 
@@ -1356,17 +1356,17 @@ static WRITE8_HANDLER( tenkai_8000_w )
 {
 	if ( (rombank == 0x10) && (offset < 0x10) )
 	{
-		const device_config *rtc = device_list_find_by_tag(machine->config->devicelist, MSM6242, "rtc");
+		const device_config *rtc = device_list_find_by_tag(space->machine->config->devicelist, MSM6242, "rtc");
 		msm6242_w(rtc, offset, data);
 		return;
 	}
 	else if (rombank == 0x12)
 	{
-		tenkai_palette_w(machine,offset,data);
+		tenkai_palette_w(space,offset,data);
 		return;
 	}
 
-	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n",cpu_get_pc(machine->activecpu),offset,data,rombank);
+	logerror("%04x: unmapped offset %04X=%02X written with rombank=%02X\n",cpu_get_pc(space->cpu),offset,data,rombank);
 }
 
 static int tenkai_6c, tenkai_70;
@@ -1389,11 +1389,11 @@ static WRITE8_HANDLER( tenkai_blit_romregion_w )
 {
 	switch(data)
 	{
-		case 0x00:	dynax_blit_romregion_w(machine,0,0);	return;
-		case 0x83:	dynax_blit_romregion_w(machine,0,1);	return;
-		case 0x80:	dynax_blit_romregion_w(machine,0,2);	return;
+		case 0x00:	dynax_blit_romregion_w(space,0,0);	return;
+		case 0x83:	dynax_blit_romregion_w(space,0,1);	return;
+		case 0x80:	dynax_blit_romregion_w(space,0,2);	return;
 	}
-	logerror("%04x: unmapped romregion=%02X\n",cpu_get_pc(machine->activecpu),data);
+	logerror("%04x: unmapped romregion=%02X\n",cpu_get_pc(space->cpu),data);
 }
 
 static ADDRESS_MAP_START( tenkai_map, ADDRESS_SPACE_PROGRAM, 8 )

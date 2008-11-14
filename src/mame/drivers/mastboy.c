@@ -517,7 +517,7 @@ static READ8_HANDLER(banked_ram_r)
 
 		if (bank>0x3) // ROM access
 		{
-			UINT8 *src    = memory_region( machine, "gfx1" );
+			UINT8 *src    = memory_region( space->machine, "gfx1" );
 			bank &=0x3;
 			return src[offset+(bank*0x4000)];
 		}
@@ -533,7 +533,7 @@ static READ8_HANDLER(banked_ram_r)
 		UINT8 *src;
 		int bank;
 		bank = mastboy_bank & 0x7f;
-		src = memory_region       ( machine, "user1" ) + bank * 0x4000;
+		src = memory_region       ( space->machine, "user1" ) + bank * 0x4000;
 		return src[offset];
 	}
 }
@@ -562,7 +562,7 @@ static WRITE8_HANDLER( banked_ram_w )
 			mastboy_vram[offs] = data^0xff;
 
 			/* Decode the new tile */
-			decodechar(machine->gfx[0], offs/32, mastboy_vram);
+			decodechar(space->machine->gfx[0], offs/32, mastboy_vram);
 		}
 	}
 	else
@@ -655,7 +655,7 @@ static const msm5205_interface msm5205_config =
 static WRITE8_HANDLER( mastboy_irq0_ack_w )
 {
 	mastboy_irq0_ack = data;
-	if ((data&1)==1) cpu_set_input_line(machine->cpu[0],0, CLEAR_LINE);
+	if ((data&1)==1) cpu_set_input_line(space->machine->cpu[0],0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( mastboy_interrupt )

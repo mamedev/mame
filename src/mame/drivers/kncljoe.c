@@ -46,9 +46,9 @@ static UINT8 port1, port2;
 static WRITE8_HANDLER( sound_cmd_w )
 {
 	if ((data & 0x80) == 0)
-		soundlatch_w(machine, 0, data & 0x7f);
+		soundlatch_w(space, 0, data & 0x7f);
 	else
-		cpu_set_input_line(machine->cpu[1], 0, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
 }
 
 
@@ -86,12 +86,12 @@ static WRITE8_HANDLER( m6803_port2_w )
 		if (port2 & 0x04)
 		{
 			if (port2 & 0x08)
-				ay8910_control_port_0_w(machine, 0, port1);
+				ay8910_control_port_0_w(space, 0, port1);
 		}
 		else
 		{
 			if (port2 & 0x08)
-				ay8910_write_port_0_w(machine, 0, port1);
+				ay8910_write_port_0_w(space, 0, port1);
 		}
 	}
 	port2 = data;
@@ -100,7 +100,7 @@ static WRITE8_HANDLER( m6803_port2_w )
 static READ8_HANDLER( m6803_port1_r )
 {
 	if (port2 & 0x08)
-		return ay8910_read_port_0_r(machine, 0);
+		return ay8910_read_port_0_r(space, 0);
 	return 0xff;
 }
 
@@ -111,7 +111,7 @@ static READ8_HANDLER( m6803_port2_r )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER(unused_w)

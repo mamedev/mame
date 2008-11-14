@@ -211,7 +211,7 @@ static WRITE16_HANDLER( kodure_io_w )
 		int i;
 		for (i = 0; i < 0x1000; i++)
 		{
-			armedf_text_videoram_w(machine,i, ' ', 0xffff);
+			armedf_text_videoram_w(space,i, ' ', 0xffff);
 		}
 	}
 }
@@ -219,7 +219,7 @@ static WRITE16_HANDLER( kodure_io_w )
 static WRITE16_HANDLER( sound_command_w )
 {
 	if (ACCESSING_BITS_0_7)
-		soundlatch_w(machine,0,((data & 0x7f) << 1) | 1);
+		soundlatch_w(space,0,((data & 0x7f) << 1) | 1);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -421,7 +421,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( soundlatch_clear_r )
 {
-	soundlatch_clear_w(machine,0,0);
+	soundlatch_clear_w(space,0,0);
 	return 0;
 }
 

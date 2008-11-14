@@ -117,13 +117,13 @@ WRITE8_HANDLER( bwing_scrollreg_w )
 			}
 
 			#if BW_DEBUG
-				logerror("(%1d)%04x: w=%02x a=%04x f=%d\n",cpunum_get_active(),cpu_get_pc(machine->activecpu),data,0x1b00+offset,video_screen_get_frame_number(machine->primary_screen));
+				logerror("(%1d)%04x: w=%02x a=%04x f=%d\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,0x1b00+offset,video_screen_get_frame_number(space->machine->primary_screen));
 			#endif
 		break;
 	}
 
 	#if BW_DEBUG
-		(memory_region(machine, REGION_CPU1))[0x1b10 + offset] = data;
+		(memory_region(space->machine, REGION_CPU1))[0x1b10 + offset] = data;
 	#endif
 }
 
@@ -143,7 +143,7 @@ WRITE8_HANDLER( bwing_paletteram_w )
 	g = ((g<<5) + (g<<2) + (g>>1));
 	b = ((b<<5) + (b<<2) + (b>>1));
 
-	if ((i = input_port_read(machine, "EXTRA")) < 4)
+	if ((i = input_port_read(space->machine, "EXTRA")) < 4)
 	{
 		r = (float)r * rgb[i][0];
 		g = (float)g * rgb[i][1];
@@ -153,7 +153,7 @@ WRITE8_HANDLER( bwing_paletteram_w )
 		if (b > 0xff) b = 0xff;
 	}
 
-	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
 
 	#if BW_DEBUG
 		paletteram[offset+0x40] = palatch;

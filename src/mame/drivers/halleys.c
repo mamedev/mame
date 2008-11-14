@@ -968,7 +968,7 @@ static WRITE8_HANDLER( bgtile_w )
 
 static READ8_HANDLER( blitter_status_r )
 {
-	if (game_id==GAME_HALLEYS && cpu_get_pc(machine->activecpu)==0x8017) return(0x55); // HACK: trick SRAM test on startup
+	if (game_id==GAME_HALLEYS && cpu_get_pc(space->cpu)==0x8017) return(0x55); // HACK: trick SRAM test on startup
 
 	return(0);
 }
@@ -1003,7 +1003,7 @@ static WRITE8_HANDLER( blitter_w )
 		if (i==0 || (i==4 && !data))
 		{
 			blitter_busy = 0;
-			if (firq_level) cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
+			if (firq_level) cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE); // make up delayed FIRQ's
 		}
 		else
 		{
@@ -1038,7 +1038,7 @@ static READ8_HANDLER( collision_id_r )
     UPDATE: re-implemented pixel collision to accompany the hack method.
 */
 
-	if (game_id==GAME_HALLEYS && cpu_get_pc(machine->activecpu)==halleys_collision_detection) // HACK: collision detection bypass
+	if (game_id==GAME_HALLEYS && cpu_get_pc(space->cpu)==halleys_collision_detection) // HACK: collision detection bypass
 	{
 		if (collision_count) { collision_count--; return(collision_list[collision_count]); }
 
@@ -1164,13 +1164,13 @@ static WRITE8_HANDLER( halleys_paletteram_IIRRGGBB_w )
 	g = d    & 0x0c; g |= i;  g = g<<4 | g;
 	b = d<<2 & 0x0c; b |= i;  b = b<<4 | b;
 
-	palette_set_color(machine, offset, MAKE_RGB(r, g, b));
-	palette_set_color(machine, offset+SP_2BACK, MAKE_RGB(r, g, b));
-	palette_set_color(machine, offset+SP_ALPHA, MAKE_RGB(r, g, b));
-	palette_set_color(machine, offset+SP_COLLD, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset+SP_2BACK, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset+SP_ALPHA, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offset+SP_COLLD, MAKE_RGB(r, g, b));
 
-	halleys_decode_rgb(machine, &r, &g, &b, offset, 0);
-	palette_set_color(machine, offset+0x20, MAKE_RGB(r, g, b));
+	halleys_decode_rgb(space->machine, &r, &g, &b, offset, 0);
+	palette_set_color(space->machine, offset+0x20, MAKE_RGB(r, g, b));
 }
 
 
@@ -1572,7 +1572,7 @@ static WRITE8_HANDLER( firq_ack_w )
 	io_ram[0x9c] = data;
 
 	if (firq_level) firq_level--;
-	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], M6809_FIRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -1600,8 +1600,8 @@ static READ8_HANDLER( coin_lockout_r )
 	//   0x8599 : 'benberob'
 	//   0x83e2 : 'halleys', 'halleysc', 'halleycj'
 	//   0x83df : 'halley87'
-	int inp = input_port_read(machine, "IN0");
-	int result = ((input_port_read(machine, "DSW4")) & 0x20) >> 5;
+	int inp = input_port_read(space->machine, "IN0");
+	int result = ((input_port_read(space->machine, "DSW4")) & 0x20) >> 5;
 
 	if (inp & 0x80) result |= 0x02;
 	if (inp & 0x40) result |= 0x04;
@@ -1614,7 +1614,7 @@ static READ8_HANDLER( io_mirror_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	return input_port_read(machine, portnames[offset]);
+	return input_port_read(space->machine, portnames[offset]);
 }
 
 

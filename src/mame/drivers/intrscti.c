@@ -15,7 +15,7 @@ I've not had a chance to wire up the board yet, but it might be possible to writ
 
 static READ8_HANDLER( unk_r )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static UINT8 *intrscti_ram;

@@ -353,7 +353,7 @@ Van Van
 WRITE8_HANDLER( vanvan_bgcolor_w )
 {
 	int c = 0xaa * (data & 1);
-	palette_set_color(machine,0,MAKE_RGB(c,c,c));
+	palette_set_color(space->machine,0,MAKE_RGB(c,c,c));
 }
 
 

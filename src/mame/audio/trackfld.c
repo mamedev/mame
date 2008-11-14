@@ -22,7 +22,7 @@ static int SN76496_latch;
 
 READ8_HANDLER( trackfld_sh_timer_r )
 {
-    UINT32 clock = cpu_get_total_cycles(machine->activecpu) / TIMER_RATE;
+    UINT32 clock = cpu_get_total_cycles(space->cpu) / TIMER_RATE;
 
     return clock & 0xF;
 }
@@ -55,7 +55,7 @@ WRITE8_HANDLER( trackfld_sound_w )
 
 READ8_HANDLER( hyperspt_sh_timer_r )
 {
-    UINT32 clock = cpu_get_total_cycles(machine->activecpu) / TIMER_RATE;
+    UINT32 clock = cpu_get_total_cycles(space->cpu) / TIMER_RATE;
 
     return (clock & 0x3) | (vlm5030_bsy()? 0x04 : 0);
 }
@@ -89,7 +89,7 @@ WRITE8_HANDLER( konami_sh_irqtrigger_w )
     if (last == 0 && data)
     {
         /* setting bit 0 low then high triggers IRQ on the sound CPU */
-        cpu_set_input_line_and_vector(machine->cpu[1],0,HOLD_LINE,0xff);
+        cpu_set_input_line_and_vector(space->machine->cpu[1],0,HOLD_LINE,0xff);
     }
 
     last = data;
@@ -104,7 +104,7 @@ WRITE8_HANDLER( konami_SN76496_latch_w )
 
 WRITE8_HANDLER( konami_SN76496_0_w )
 {
-    sn76496_0_w(machine, offset, SN76496_latch);
+    sn76496_0_w(space, offset, SN76496_latch);
 }
 
 
@@ -119,7 +119,7 @@ READ8_HANDLER( hyprolyb_speech_r )
 WRITE8_HANDLER( hyprolyb_ADPCM_data_w )
 {
     int cmd,start,end;
-    UINT8 *RAM = memory_region(machine, "adpcm");
+    UINT8 *RAM = memory_region(space->machine, "adpcm");
 
 
     /* simulate the operation of the 6802 */

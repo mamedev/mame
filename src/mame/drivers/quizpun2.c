@@ -174,25 +174,25 @@ static READ8_HANDLER( quizpun2_protection_r )
 					break;
 
 				default:
-					log_protection(machine, "unknown address");
+					log_protection(space->machine, "unknown address");
 					ret = 0x2e59 >> ((prot.addr & 1) ? 0 : 8);	// return the address of: XOR A, RET
 			}
 			break;
 
 		case STATE_EEPROM_R:		// EEPROM read
 		{
-			UINT8 *eeprom = memory_region(machine, "eeprom");
+			UINT8 *eeprom = memory_region(space->machine, "eeprom");
 			ret = eeprom[prot.addr];
 			break;
 		}
 
 		default:
-			log_protection(machine, "unknown read");
+			log_protection(space->machine, "unknown read");
 			ret = 0x00;
 	}
 
 #if VERBOSE_PROTECTION_LOG
-	log_protection(machine, "info READ");
+	log_protection(space->machine, "info READ");
 #endif
 
 	prot.addr++;
@@ -206,7 +206,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 	{
 		case STATE_EEPROM_W:
 		{
-			UINT8 *eeprom = memory_region(machine, "eeprom");
+			UINT8 *eeprom = memory_region(space->machine, "eeprom");
 			eeprom[prot.addr] = data;
 			prot.addr++;
 			if ((prot.addr % 8) == 0)
@@ -235,7 +235,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 						prot.addr = 0;
 					}
 					else
-						log_protection(machine, "unknown command");
+						log_protection(space->machine, "unknown command");
 				}
 				else if (prot.cmd >= 0x00 && prot.cmd <= 0x0f )
 				{
@@ -250,7 +250,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 				else
 				{
 					prot.state = STATE_IDLE;
-					log_protection(machine, "unknown command");
+					log_protection(space->machine, "unknown command");
 				}
 			}
 			else
@@ -262,7 +262,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 	}
 
 #if VERBOSE_PROTECTION_LOG
-	log_protection(machine, "info WRITE");
+	log_protection(space->machine, "info WRITE");
 #endif
 }
 
@@ -273,19 +273,19 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 
 static WRITE8_HANDLER( quizpun2_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	memory_set_bankptr( 1, &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 
 static WRITE8_HANDLER( quizpun2_irq_ack )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( quizpun2_soundlatch_w )
 {
-	soundlatch_w(machine, 0, data);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( quizpun2_map, ADDRESS_SPACE_PROGRAM, 8 )

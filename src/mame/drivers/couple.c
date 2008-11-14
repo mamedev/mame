@@ -89,7 +89,7 @@ static WRITE8_HANDLER( couple_vram_hi_w )
 #ifdef UNUSED_FUNCTION
 static READ8_HANDLER( dummy_inputs_r )
 {
-	logerror("Read %02x @ %06x\n",offset,cpu_get_pc(machine->activecpu));
+	logerror("Read %02x @ %06x\n",offset,cpu_get_pc(space->cpu));
 	return 0xff;
 }
 #endif

@@ -137,7 +137,7 @@ WRITE8_HANDLER( pbillian_0410_w )
 
 	memory_set_bank(1, (data & 0x08) >> 3);
 
-	interrupt_enable_w(machine,0,data & 0x10);
+	interrupt_enable_w(space,0,data & 0x10);
 	flip_screen_set(data & 0x20);
 }
 
@@ -154,7 +154,7 @@ WRITE8_HANDLER( superqix_0410_w )
 	show_bitmap = (data & 0x04) >> 2;
 
 	/* bit 3 enables NMI */
-	interrupt_enable_w(machine,offset,data & 0x08);
+	interrupt_enable_w(space,offset,data & 0x08);
 
 	/* bits 4-5 control ROM bank */
 	memory_set_bank(1, (data & 0x30) >> 4);

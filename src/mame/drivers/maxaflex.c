@@ -46,7 +46,7 @@ static emu_timer *mcu_timer;
 
 static READ8_HANDLER( mcu_portA_r )
 {
-	portA_in = input_port_read(machine, "dsw") | (input_port_read(machine, "coin") << 4) | (input_port_read(machine, "console") << 5);
+	portA_in = input_port_read(space->machine, "dsw") | (input_port_read(space->machine, "coin") << 4) | (input_port_read(space->machine, "console") << 5);
 	return (portA_in & ~ddrA) | (portA_out & ddrA);
 }
 
@@ -79,14 +79,14 @@ static WRITE8_HANDLER( mcu_portB_w )
 
 	/* clear coin interrupt */
 	if (data & 0x04)
-		cpu_set_input_line(machine->cpu[1], M6805_IRQ_LINE, CLEAR_LINE );
+		cpu_set_input_line(space->machine->cpu[1], M6805_IRQ_LINE, CLEAR_LINE );
 
 	/* AUDMUTE */
 	sound_global_enable((data >> 5) & 1);
 
 	/* RES600 */
 	if (diff & 0x10)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, (data & 0x10) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* latch for lamps */
 	if ((diff & 0x40) && !(data & 0x40))

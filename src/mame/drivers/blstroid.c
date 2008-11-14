@@ -40,7 +40,7 @@ static void update_interrupts(running_machine *machine)
 
 static WRITE16_HANDLER( blstroid_halt_until_hblank_0_w )
 {
-	atarigen_halt_until_hblank_0(machine->primary_screen);
+	atarigen_halt_until_hblank_0(space->machine->primary_screen);
 }
 
 
@@ -63,10 +63,10 @@ static MACHINE_RESET( blstroid )
 static READ16_HANDLER( inputs_r )
 {
 	static const char *const iptnames[] = { "IN0", "IN1" };
-	int temp = input_port_read(machine, iptnames[offset & 1]);
+	int temp = input_port_read(space->machine, iptnames[offset & 1]);
 
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x0040;
-	if (atarigen_get_hblank(machine->primary_screen)) temp ^= 0x0010;
+	if (atarigen_get_hblank(space->machine->primary_screen)) temp ^= 0x0010;
 	return temp;
 }
 

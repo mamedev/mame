@@ -79,6 +79,7 @@ struct _m6509_Regs {
 	UINT8	so_state;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *space;
 
 	int 	icount;
 
@@ -144,6 +145,7 @@ static CPU_INIT( m6509 )
 	m6509->wrmem_id = default_wdmem_id;
 	m6509->irq_callback = irqcallback;
 	m6509->device = device;
+	m6509->space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m6509 )

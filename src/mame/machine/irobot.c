@@ -24,9 +24,9 @@
 #define IR_TIMING 				1		/* try to emulate MB and VG running time */
 #define DISASSEMBLE_MB_ROM		0		/* generate a disassembly of the mathbox ROMs */
 
-#define IR_CPU_STATE \
+#define IR_CPU_STATE(m) \
 	logerror(\
-			"pc: %4x, scanline: %d\n", cpu_get_previouspc(machine->activecpu), video_screen_get_vpos(machine->primary_screen))
+			"pc: %4x, scanline: %d\n", cpu_get_previouspc((m)->activecpu), video_screen_get_vpos((m)->primary_screen))
 
 
 UINT8 irobot_vg_clear;
@@ -93,13 +93,13 @@ static TIMER_CALLBACK( irvg_done_callback )
 WRITE8_HANDLER( irobot_statwr_w )
 {
 	logerror("write %2x ", data);
-	IR_CPU_STATE;
+	IR_CPU_STATE(space->machine);
 
 	irobot_combase = comRAM[data >> 7];
 	irobot_combase_mb = comRAM[(data >> 7) ^ 1];
 	irobot_bufsel = data & 0x02;
 	if (((data & 0x01) == 0x01) && (irobot_vg_clear == 0))
-		irobot_poly_clear(machine);
+		irobot_poly_clear(space->machine);
 
 	irobot_vg_clear = data & 0x01;
 
@@ -111,19 +111,19 @@ WRITE8_HANDLER( irobot_statwr_w )
 			logerror("vg start ");
 		else
 			logerror("vg start [busy!] ");
-		IR_CPU_STATE;
+		IR_CPU_STATE(space->machine);
 		timer_adjust_oneshot(irvg_timer, ATTOTIME_IN_MSEC(10), 0);
 #endif
 		irvg_running=1;
 	}
 	if ((data & 0x10) && !(irobot_statwr & 0x10))
-		irmb_run(machine);
+		irmb_run(space->machine);
 	irobot_statwr = data;
 }
 
 WRITE8_HANDLER( irobot_out0_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	irobot_out0 = data;
 	switch (data & 0x60)
@@ -145,7 +145,7 @@ WRITE8_HANDLER( irobot_out0_w )
 
 WRITE8_HANDLER( irobot_rom_banksel_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	switch ((data & 0x0E) >> 1)
 	{
@@ -208,8 +208,8 @@ MACHINE_RESET( irobot )
 	/* set an initial timer to go off on scanline 0 */
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
 
-	irobot_rom_banksel_w(machine,0,0);
-	irobot_out0_w(machine,0,0);
+	irobot_rom_banksel_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
+	irobot_out0_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
 	irobot_combase = comRAM[0];
 	irobot_combase_mb = comRAM[1];
 	irobot_outx = 0;
@@ -225,9 +225,9 @@ READ8_HANDLER( irobot_control_r )
 {
 
 	if (irobot_control_num == 0)
-		return input_port_read(machine, "AN0");
+		return input_port_read(space->machine, "AN0");
 	else if (irobot_control_num == 1)
-		return input_port_read(machine, "AN1");
+		return input_port_read(space->machine, "AN1");
 	return 0;
 
 }
@@ -239,7 +239,7 @@ READ8_HANDLER( irobot_status_r )
 	int d=0;
 
 	logerror("status read. ");
-	IR_CPU_STATE;
+	IR_CPU_STATE(space->machine);
 
 	if (!irmb_running) d |= 0x20;
 	if (irvg_running) d |= 0x40;
@@ -852,12 +852,12 @@ default:	case 0x3f:	IXOR(irmb_din(curop), 0);							break;
 	{
 		timer_adjust_oneshot(irmb_timer, attotime_mul(ATTOTIME_IN_HZ(12000000), icount), 0);
 		logerror("mb start ");
-		IR_CPU_STATE;
+		IR_CPU_STATE(machine);
 	}
 	else
 	{
 		logerror("mb start [busy!] ");
-		IR_CPU_STATE;
+		IR_CPU_STATE(machine);
 		timer_adjust_oneshot(irmb_timer, attotime_mul(ATTOTIME_IN_NSEC(200), icount), 0);
 	}
 #else

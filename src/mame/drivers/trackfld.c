@@ -79,7 +79,7 @@ static WRITE8_HANDLER( questions_bank_w )
 {
 	if( data != 0xff )
 	{
-		UINT8 *questions = memory_region(machine, "user1");
+		UINT8 *questions = memory_region(space->machine, "user1");
 		int bankaddr = 0;
 
 		switch( ~data & 0xff )

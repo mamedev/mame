@@ -126,7 +126,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_0_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(1, &memory_region(machine, "main")[bank_address]);
+	memory_set_bankptr(1, &memory_region(space->machine, "main")[bank_address]);
 }
 
 
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(1, &memory_region(machine, "main")[bank_address]);
+	memory_set_bankptr(1, &memory_region(space->machine, "main")[bank_address]);
 }
 
 
@@ -158,7 +158,7 @@ static INTERRUPT_GEN( supertnk_interrupt )
 
 static WRITE8_HANDLER( supertnk_interrupt_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

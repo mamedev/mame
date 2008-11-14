@@ -371,7 +371,7 @@ static READ8_HANDLER( psychic5_bankselect_r )
 
 static WRITE8_HANDLER( psychic5_bankselect_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress;
 
 	if (psychic5_bank_latch != data)
@@ -384,7 +384,7 @@ static WRITE8_HANDLER( psychic5_bankselect_w )
 
 static WRITE8_HANDLER( bombsa_bankselect_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bankaddress;
 
 	if (psychic5_bank_latch != data)

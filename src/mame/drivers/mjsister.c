@@ -68,7 +68,7 @@ static MACHINE_RESET( mjsister )
 
 static WRITE8_HANDLER( mjsister_banksel1_w )
 {
-	UINT8 *BANKROM = memory_region(machine, "main");
+	UINT8 *BANKROM = memory_region(space->machine, "main");
 	int tmp = mjsister_colorbank;
 
 	switch (data)
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 		case 0xf: mjsister_vrambank = 1 ; break;
 
 		default:
-			logerror("%04x p30_w:%02x\n",cpu_get_pc(machine->activecpu),data);
+			logerror("%04x p30_w:%02x\n",cpu_get_pc(space->cpu),data);
 	}
 
 	if (tmp != mjsister_colorbank)
@@ -104,7 +104,7 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 
 static WRITE8_HANDLER( mjsister_banksel2_w )
 {
-	UINT8 *BANKROM = memory_region(machine, "main");
+	UINT8 *BANKROM = memory_region(space->machine, "main");
 
 	switch (data)
 	{
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( mjsister_banksel2_w )
 		case 0xd: rombank1 = 1; break;
 
 		default:
-			logerror("%04x p31_w:%02x\n",cpu_get_pc(machine->activecpu),data);
+			logerror("%04x p31_w:%02x\n",cpu_get_pc(space->cpu),data);
 	}
 
 	memory_set_bankptr(1,&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);
@@ -142,7 +142,7 @@ static READ8_HANDLER( mjsister_keys_r )
 	for (i=0; i<6; i++)
 	{
 		if (p & (1 << i))
-			ret |= input_port_read(machine, keynames[i]);
+			ret |= input_port_read(space->machine, keynames[i]);
 	}
 
 	return ret;

@@ -72,7 +72,7 @@ static UINT8 coin_counter[2];
 
 static WRITE16_HANDLER( arcadia_multibios_change_game )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x97ffff, 0, 0, (data == 0) ? SMH_BANK2 : SMH_NOP);
+	memory_install_read16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x97ffff, 0, 0, (data == 0) ? SMH_BANK2 : SMH_NOP);
 }
 
 

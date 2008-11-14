@@ -533,14 +533,14 @@ static WRITE32_HANDLER(K037122_sram_w)
 		}
 		else if (offset >= 0x18000/4)
 		{
-			update_palette_color(machine, chip, 0x18000, offset - (0x18000/4));
+			update_palette_color(space->machine, chip, 0x18000, offset - (0x18000/4));
 		}
 	}
 	else
 	{
 		if (offset < 0x8000/4)
 		{
-			update_palette_color(machine, chip, 0, offset);
+			update_palette_color(space->machine, chip, 0, offset);
 		}
 		else if (offset >= 0x8000/4 && offset < 0x18000/4)
 		{
@@ -675,7 +675,7 @@ static READ8_HANDLER( sysreg_r )
 		case 0:	/* I/O port 0 */
 		case 1:	/* I/O port 1 */
 		case 2:	/* I/O port 2 */
-			r = input_port_read(machine, portnames[offset]);
+			r = input_port_read(space->machine, portnames[offset]);
 			break;
 
 		case 3:	/* I/O port 3 */
@@ -692,7 +692,7 @@ static READ8_HANDLER( sysreg_r )
 			break;
 
 		case 4:	/* I/O port 4 - DIP switches */
-			r = input_port_read(machine, "DSW");
+			r = input_port_read(space->machine, "DSW");
 			break;
 	}
 	return r;
@@ -742,7 +742,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x02 = ADDI (ADC DI)
                 0x01 = ADDSCLK (ADC SCLK)
             */
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 			mame_printf_debug("System register 1 = %02X\n", data);
 			break;
 
@@ -765,7 +765,7 @@ static WRITE8_HANDLER( sysreg_w )
                 0x80 = WDTCLK
             */
 			if (data & 0x80)
-				watchdog_reset(machine);
+				watchdog_reset(space->machine);
 			break;
 
 		case 7:	/* CG Control Register */
@@ -777,9 +777,9 @@ static WRITE8_HANDLER( sysreg_w )
                 0x01 = EXRGB
             */
 			if (data & 0x80)
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ1, CLEAR_LINE);
 			if (data & 0x40)
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 			set_cgboard_id((data >> 4) & 3);
 			break;
 	}
@@ -795,7 +795,7 @@ static WRITE32_HANDLER( comm1_w )
 static WRITE32_HANDLER( comm_rombank_w )
 {
 	int bank = data >> 24;
-	UINT8 *usr3 = memory_region(machine, "user3");
+	UINT8 *usr3 = memory_region(space->machine, "user3");
 	if (usr3 != NULL)
 		memory_set_bank(1, bank & 0x7f);
 }

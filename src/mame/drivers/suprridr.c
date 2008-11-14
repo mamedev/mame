@@ -135,7 +135,7 @@ static READ8_HANDLER( sound_data_r )
 
 static WRITE8_HANDLER( sound_irq_ack_w )
 {
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 }
 
 

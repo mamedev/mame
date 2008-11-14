@@ -941,7 +941,7 @@ READ8_HANDLER( md_sms_vdp_data_r )
 
 WRITE8_HANDLER( md_sms_vdp_data_w )
 {
-	vdp_data_w(machine, data, md_sms_vdp);
+	vdp_data_w(space, data, md_sms_vdp);
 }
 
 READ8_HANDLER( md_sms_vdp_ctrl_r )
@@ -969,7 +969,7 @@ READ8_HANDLER( sms_vdp_data_r )
 
 WRITE8_HANDLER( sms_vdp_data_w )
 {
-	vdp_data_w(machine, data, vdp1);
+	vdp_data_w(space, data, vdp1);
 }
 
 READ8_HANDLER( sms_vdp_ctrl_r )
@@ -984,7 +984,7 @@ WRITE8_HANDLER( sms_vdp_ctrl_w )
 
 WRITE8_HANDLER( sms_sn76496_w )
 {
-	sn76496_0_w(machine, 0, data & 0xff);
+	sn76496_0_w(space, 0, data & 0xff);
 }
 
 static void draw_tile_line(int drawxpos, int tileline, UINT16 tiledata, UINT8* linebuf, struct sms_vdp* chip)
@@ -2087,7 +2087,7 @@ static READ8_HANDLER( sms_vdp_2_data_r )
 
 static WRITE8_HANDLER( sms_vdp_2_data_w )
 {
-	vdp_data_w(machine, data, vdp2);
+	vdp_data_w(space, data, vdp2);
 }
 
 static READ8_HANDLER( sms_vdp_2_ctrl_r )
@@ -2152,14 +2152,14 @@ static WRITE8_HANDLER( systeme_bank_w )
 		vdp2->vram = vdp2_vram_bank0;
 	}
 
-	//memcpy(sms_rom+0x8000, memory_region(machine, "user1")+0x10000+rombank*0x4000, 0x4000);
+	//memcpy(sms_rom+0x8000, memory_region(space->machine, "user1")+0x10000+rombank*0x4000, 0x4000);
 	memory_set_bank(1, rombank);
 
 }
 
 static WRITE8_HANDLER( sms_sn76496_2_w )
 {
-	sn76496_1_w(machine, 0, data & 0xff);
+	sn76496_1_w(space, 0, data & 0xff);
 }
 
 static void init_ports_systeme(running_machine *machine)
@@ -2279,10 +2279,10 @@ static READ8_HANDLER (segae_hangonjr_port_f8_r)
 	temp = 0;
 
 	if (port_fa_last == 0x08)  /* 0000 1000 */ /* Angle */
-		temp = input_port_read(machine, "IN2");
+		temp = input_port_read(space->machine, "IN2");
 
 	if (port_fa_last == 0x09)  /* 0000 1001 */ /* Accel */
-		temp = input_port_read(machine, "IN3");
+		temp = input_port_read(space->machine, "IN3");
 
 	return temp;
 }
@@ -2318,13 +2318,13 @@ static WRITE8_HANDLER (segae_ridleofp_port_fa_w)
 
 	if (data & 1)
 	{
-		int curr = input_port_read(machine, "IN2");
+		int curr = input_port_read(space->machine, "IN2");
 		diff1 = ((curr - last1) & 0x0fff) | (curr & 0xf000);
 		last1 = curr;
 	}
 	if (data & 2)
 	{
-		int curr = input_port_read(machine, "IN3") & 0x0fff;
+		int curr = input_port_read(space->machine, "IN3") & 0x0fff;
 		diff2 = ((curr - last2) & 0x0fff) | (curr & 0xf000);
 		last2 = curr;
 	}

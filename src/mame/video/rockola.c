@@ -20,8 +20,8 @@ static tilemap *fg_tilemap;
 
 static rgb_t palette[64];
 
-#define TOTAL_COLORS(gfxn) (machine->gfx[gfxn]->total_colors * machine->gfx[gfxn]->color_granularity)
-#define COLOR(gfxn,offs) (machine->config->gfxdecodeinfo[gfxn].color_codes_start + offs)
+#define TOTAL_COLORS(m,gfxn) ((m)->gfx[gfxn]->total_colors * (m)->gfx[gfxn]->color_granularity)
+#define COLOR(m,gfxn,offs) ((m)->config->gfxdecodeinfo[gfxn].color_codes_start + offs)
 
 
 
@@ -71,15 +71,15 @@ PALETTE_INIT( rockola )
 
 	backcolor = 0;	/* background color can be changed by the game */
 
-	for (i = 0; i < TOTAL_COLORS(0); i++)
-		palette_set_color(machine, COLOR(0, i), palette[i]);
+	for (i = 0; i < TOTAL_COLORS(machine,0); i++)
+		palette_set_color(machine, COLOR(machine, 0, i), palette[i]);
 
-	for (i = 0; i < TOTAL_COLORS(1); i++)
+	for (i = 0; i < TOTAL_COLORS(machine,1); i++)
 	{
 		if (i % 4 == 0)
-			palette_set_color(machine, COLOR(1, i), palette[4 * backcolor + 0x20]);
+			palette_set_color(machine, COLOR(machine, 1, i), palette[4 * backcolor + 0x20]);
 		else
-			palette_set_color(machine, COLOR(1, i), palette[i + 0x20]);
+			palette_set_color(machine, COLOR(machine, 1, i), palette[i + 0x20]);
 	}
 }
 
@@ -125,7 +125,7 @@ WRITE8_HANDLER( rockola_flipscreen_w )
 		backcolor = data & 7;
 
 		for (i = 0;i < 32;i += 4)
-			palette_set_color(machine, COLOR(1, i), palette[4 * backcolor + 0x20]);
+			palette_set_color(space->machine, COLOR(space->machine, 1, i), palette[4 * backcolor + 0x20]);
 	}
 
 	/* bit 3 selects char bank */
@@ -232,15 +232,15 @@ PALETTE_INIT( satansat )
 
 	backcolor = 0;	/* background color can be changed by the game */
 
-	for (i = 0; i < TOTAL_COLORS(0); i++)
-		palette_set_color(machine, COLOR(0, i), palette[4 * (i % 4) + (i / 4)]);
+	for (i = 0; i < TOTAL_COLORS(machine,0); i++)
+		palette_set_color(machine, COLOR(machine, 0, i), palette[4 * (i % 4) + (i / 4)]);
 
-	for (i = 0; i < TOTAL_COLORS(1); i++)
+	for (i = 0; i < TOTAL_COLORS(machine,1); i++)
 	{
 		if (i % 4 == 0)
-			palette_set_color(machine, COLOR(1, i), palette[backcolor + 0x10]);
+			palette_set_color(machine, COLOR(machine, 1, i), palette[backcolor + 0x10]);
 		else
-			palette_set_color(machine, COLOR(1, i), palette[4 * (i % 4) + (i / 4) + 0x10]);
+			palette_set_color(machine, COLOR(machine, 1, i), palette[4 * (i % 4) + (i / 4) + 0x10]);
 	}
 }
 
@@ -258,7 +258,7 @@ WRITE8_HANDLER( satansat_b002_w )
 	/* it controls only IRQs, not NMIs. Here I am affecting both, which */
 	/* is wrong. */
 
-	interrupt_enable_w(machine,0,data & 0x02);
+	interrupt_enable_w(space,0,data & 0x02);
 
 	/* other bits unused */
 }
@@ -274,7 +274,7 @@ WRITE8_HANDLER( satansat_backcolor_w )
 		backcolor = data & 0x03;
 
 		for (i = 0; i < 16; i += 4)
-			palette_set_color(machine, COLOR(1, i), palette[backcolor + 0x10]);
+			palette_set_color(space->machine, COLOR(space->machine, 1, i), palette[backcolor + 0x10]);
 	}
 }
 

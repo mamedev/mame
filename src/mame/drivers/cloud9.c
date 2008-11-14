@@ -227,7 +227,7 @@ static WRITE8_HANDLER( irq_ack_w )
 {
 	if (irq_state)
 	{
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 		irq_state = 0;
 	}
 }
@@ -247,7 +247,7 @@ static WRITE8_HANDLER( cloud9_coin_counter_w )
 
 static READ8_HANDLER( leta_r )
 {
-	return input_port_read(machine, offset ? "TRACKX" : "TRACKY");
+	return input_port_read(space->machine, offset ? "TRACKX" : "TRACKY");
 }
 
 

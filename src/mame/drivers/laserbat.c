@@ -91,7 +91,7 @@ static READ8_HANDLER( laserbat_input_r )
 {
 	static const char *const portnames[] = { "IN0", "IN1", "IN2", "IN3" };
 
-	return input_port_read(machine, portnames[laserbat_input_mux]);
+	return input_port_read(space->machine, portnames[laserbat_input_mux]);
 }
 
 static WRITE8_HANDLER( laserbat_cnteff_w )
@@ -602,9 +602,9 @@ static int active_8910,port0a;
 static READ8_HANDLER( zaccaria_port0a_r )
 {
 	if (active_8910 == 0)
-		return ay8910_read_port_0_r(machine,0);
+		return ay8910_read_port_0_r(space,0);
 	else
-		return ay8910_read_port_1_r(machine,0);
+		return ay8910_read_port_1_r(space,0);
 }
 
 static WRITE8_HANDLER( zaccaria_port0a_w )
@@ -622,9 +622,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 0 goes to the 8910 #0 BC1 pin */
 		if (last & 0x01)
-			ay8910_control_port_0_w(machine,0,port0a);
+			ay8910_control_port_0_w(space,0,port0a);
 		else
-			ay8910_write_port_0_w(machine,0,port0a);
+			ay8910_write_port_0_w(space,0,port0a);
 	}
 	else if ((last & 0x02) == 0x00 && (data & 0x02) == 0x02)
 	{
@@ -637,9 +637,9 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 	{
 		/* bit 2 goes to the 8910 #1 BC1 pin */
 		if (last & 0x04)
-			ay8910_control_port_1_w(machine,0,port0a);
+			ay8910_control_port_1_w(space,0,port0a);
 		else
-			ay8910_write_port_1_w(machine,0,port0a);
+			ay8910_write_port_1_w(space,0,port0a);
 	}
 	else if ((last & 0x08) == 0x00 && (data & 0x08) == 0x08)
 	{

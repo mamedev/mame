@@ -87,9 +87,9 @@ static MACHINE_RESET( boxer )
 
 static READ8_HANDLER( boxer_input_r )
 {
-	UINT8 val = input_port_read(machine, "IN0");
+	UINT8 val = input_port_read(space->machine, "IN0");
 
-	if (input_port_read(machine, "IN3") < video_screen_get_vpos(machine->primary_screen))
+	if (input_port_read(space->machine, "IN3") < video_screen_get_vpos(space->machine->primary_screen))
 		val |= 0x02;
 
 	return (val << ((offset & 7) ^ 7)) & 0x80;
@@ -107,15 +107,15 @@ static READ8_HANDLER( boxer_misc_r )
 		break;
 
 	case 1:
-		val = video_screen_get_vpos(machine->primary_screen);
+		val = video_screen_get_vpos(space->machine->primary_screen);
 		break;
 
 	case 2:
-		val = input_port_read(machine, "IN1");
+		val = input_port_read(space->machine, "IN1");
 		break;
 
 	case 3:
-		val = input_port_read(machine, "IN2");
+		val = input_port_read(space->machine, "IN2");
 		break;
 	}
 
@@ -146,13 +146,13 @@ static WRITE8_HANDLER( boxer_pot_w )
 
 	pot_latch = data & 0x3f;
 
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 }
 
 
 static WRITE8_HANDLER( boxer_irq_reset_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 

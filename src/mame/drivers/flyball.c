@@ -79,12 +79,12 @@ static MACHINE_RESET( flyball )
 
 static READ8_HANDLER( flyball_input_r )
 {
-	return input_port_read(machine, "IN0") & input_port_read(machine, "IN1");
+	return input_port_read(space->machine, "IN0") & input_port_read(space->machine, "IN1");
 }
 
 static READ8_HANDLER( flyball_scanline_r )
 {
-	return video_screen_get_vpos(machine->primary_screen) & 0x3f;
+	return video_screen_get_vpos(space->machine->primary_screen) & 0x3f;
 }
 
 static READ8_HANDLER( flyball_potsense_r )

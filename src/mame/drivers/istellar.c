@@ -101,7 +101,7 @@ static WRITE8_HANDLER(z80_0_latch2_write)
 	if (z80_2_nmi_enable)
 	{
 		logerror("Executing an NMI on CPU2\n");
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);		/* Maybe this is a ASSERT_LINE, CLEAR_LINE combo? */
 		z80_2_nmi_enable = 0;
 	}
 }

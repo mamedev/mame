@@ -80,7 +80,7 @@ static WRITE16_HANDLER( quizf1_bankswitch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		bankaddress = 0x10000 * (data & 0x0f);
-		set_m90_bank(machine);
+		set_m90_bank(space->machine);
 	}
 }
 

@@ -148,21 +148,21 @@ static READ8_HANDLER( sprint4_wram_r )
 
 static READ8_HANDLER( sprint4_analog_r )
 {
-	return (input_port_read(machine, "ANALOG") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine, "ANALOG") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( sprint4_coin_r )
 {
-	return (input_port_read(machine, "COIN") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine, "COIN") << (~offset & 7)) & 0x80;
 }
 static READ8_HANDLER( sprint4_collision_r )
 {
-	return (input_port_read(machine, "COLLISION") << (~offset & 7)) & 0x80;
+	return (input_port_read(space->machine, "COLLISION") << (~offset & 7)) & 0x80;
 }
 
 
 static READ8_HANDLER( sprint4_options_r )
 {
-	return (input_port_read(machine, "DIP") >> (2 * (offset & 3))) & 3;
+	return (input_port_read(space->machine, "DIP") >> (2 * (offset & 3))) & 3;
 }
 
 
@@ -200,25 +200,25 @@ static WRITE8_HANDLER( sprint4_lockout_w )
 
 static WRITE8_HANDLER( sprint4_screech_1_w )
 {
-	discrete_sound_w(machine, SPRINT4_SCREECH_EN_1, offset & 1);
+	discrete_sound_w(space, SPRINT4_SCREECH_EN_1, offset & 1);
 }
 
 
 static WRITE8_HANDLER( sprint4_screech_2_w )
 {
-	discrete_sound_w(machine, SPRINT4_SCREECH_EN_2, offset & 1);
+	discrete_sound_w(space, SPRINT4_SCREECH_EN_2, offset & 1);
 }
 
 
 static WRITE8_HANDLER( sprint4_screech_3_w )
 {
-	discrete_sound_w(machine, SPRINT4_SCREECH_EN_3, offset & 1);
+	discrete_sound_w(space, SPRINT4_SCREECH_EN_3, offset & 1);
 }
 
 
 static WRITE8_HANDLER( sprint4_screech_4_w )
 {
-	discrete_sound_w(machine, SPRINT4_SCREECH_EN_4, offset & 1);
+	discrete_sound_w(space, SPRINT4_SCREECH_EN_4, offset & 1);
 }
 
 
@@ -226,13 +226,13 @@ static WRITE8_HANDLER( sprint4_screech_4_w )
 
 static WRITE8_HANDLER( sprint4_bang_w )
 {
-	discrete_sound_w(machine, SPRINT4_BANG_DATA, data & 0x0f);
+	discrete_sound_w(space, SPRINT4_BANG_DATA, data & 0x0f);
 }
 
 
 static WRITE8_HANDLER( sprint4_attract_w )
 {
-	discrete_sound_w(machine, SPRINT4_ATTRACT_EN, data & 1);
+	discrete_sound_w(space, SPRINT4_ATTRACT_EN, data & 1);
 }
 
 

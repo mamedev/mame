@@ -47,13 +47,13 @@ static void update_24bitcol(running_machine *machine, int offset)
 WRITE16_HANDLER( twocrude_palette_24bit_rg_w )
 {
 	COMBINE_DATA(&paletteram16[offset]);
-	update_24bitcol(machine, offset);
+	update_24bitcol(space->machine, offset);
 }
 
 WRITE16_HANDLER( twocrude_palette_24bit_b_w )
 {
 	COMBINE_DATA(&paletteram16_2[offset]);
-	update_24bitcol(machine, offset);
+	update_24bitcol(space->machine, offset);
 }
 
 /******************************************************************************/

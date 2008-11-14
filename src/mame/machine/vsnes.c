@@ -120,8 +120,8 @@ WRITE8_HANDLER( vsnes_in0_w )
 	if ( data & 1 )
 	{
 		/* load up the latches */
-		input_latch[0] = input_port_read(machine, "IN0");
-		input_latch[1] = input_port_read(machine, "IN1");
+		input_latch[0] = input_port_read(space->machine, "IN0");
+		input_latch[1] = input_port_read(space->machine, "IN1");
 	}
 }
 
@@ -132,8 +132,8 @@ static READ8_HANDLER( gun_in0_r )
 	/* shift */
 	input_latch[0] >>= 1;
 
-	ret |= input_port_read(machine, "COINS"); 				/* merge coins, etc */
-	ret |= ( input_port_read(machine, "DSW0") & 3 ) << 3; /* merge 2 dipswitches */
+	ret |= input_port_read(space->machine, "COINS"); 				/* merge coins, etc */
+	ret |= ( input_port_read(space->machine, "DSW0") & 3 ) << 3; /* merge 2 dipswitches */
 
 /* The gun games expect a 1 returned on every 5th read after sound_fix is reset*/
 /* Info Supplied by Ben Parnell <xodnizel@home.com> of FCE Ultra fame */
@@ -158,8 +158,8 @@ READ8_HANDLER( vsnes_in0_r )
 	/* shift */
 	input_latch[0] >>= 1;
 
-	ret |= input_port_read(machine, "COINS"); 				/* merge coins, etc */
-	ret |= ( input_port_read(machine, "DSW0") & 3 ) << 3;	/* merge 2 dipswitches */
+	ret |= input_port_read(space->machine, "COINS"); 				/* merge coins, etc */
+	ret |= ( input_port_read(space->machine, "DSW0") & 3 ) << 3;	/* merge 2 dipswitches */
 
 	return ret;
 
@@ -170,7 +170,7 @@ READ8_HANDLER( vsnes_in1_r )
 {
 	int ret = ( input_latch[1] ) & 1;
 
-	ret |= input_port_read(machine, "DSW0") & ~3;			/* merge the rest of the dipswitches */
+	ret |= input_port_read(space->machine, "DSW0") & ~3;			/* merge the rest of the dipswitches */
 
 	/* shift */
 	input_latch[1] >>= 1;
@@ -184,8 +184,8 @@ WRITE8_HANDLER( vsnes_in0_1_w )
 	if ( data & 1 )
 	{
 		/* load up the latches */
-		input_latch[2] = input_port_read(machine, "IN2");
-		input_latch[3] = input_port_read(machine, "IN3");
+		input_latch[2] = input_port_read(space->machine, "IN2");
+		input_latch[3] = input_port_read(space->machine, "IN3");
 	}
 }
 
@@ -196,8 +196,8 @@ READ8_HANDLER( vsnes_in0_1_r )
 	/* shift */
 	input_latch[2] >>= 1;
 
-	ret |= input_port_read(machine, "COINS2"); 				/* merge coins, etc */
-	ret |= ( input_port_read(machine, "DSW1") & 3 ) << 3;	/* merge 2 dipswitches */
+	ret |= input_port_read(space->machine, "COINS2"); 				/* merge coins, etc */
+	ret |= ( input_port_read(space->machine, "DSW1") & 3 ) << 3;	/* merge 2 dipswitches */
 	return ret;
 }
 
@@ -205,7 +205,7 @@ READ8_HANDLER( vsnes_in1_1_r )
 {
 	int ret = ( input_latch[3] ) & 1;
 
-	ret |= input_port_read(machine, "DSW1") & ~3;			/* merge the rest of the dipswitches */
+	ret |= input_port_read(space->machine, "DSW1") & ~3;			/* merge the rest of the dipswitches */
 
 	/* shift */
 	input_latch[3] >>= 1;
@@ -285,7 +285,7 @@ static WRITE8_HANDLER( vsnormal_vrom_banking )
 	/* bit 1 ( data & 2 ) enables writes to extra ram, we ignore it */
 
 	/* move along */
-	vsnes_in0_w( machine, offset, data );
+	vsnes_in0_w( space->machine, offset, data );
 }
 
 /* Most games switch VROM Banks in controller 0 write */
@@ -302,11 +302,11 @@ static WRITE8_HANDLER( ppuRC2C05_protection )
 	/* and no remapped color */
 	if ( offset == 0 )
 	{
-		ppu2c0x_0_w( machine, 1, data );
+		ppu2c0x_0_w( space->machine, 1, data );
 		return;
 	}
 
-	ppu2c0x_0_w( machine, 0, data );
+	ppu2c0x_0_w( space->machine, 0, data );
 }
 
 /**********************************************************************************/
@@ -350,13 +350,13 @@ static WRITE8_HANDLER( gun_in0_w )
 	{
 
 		/* load up the latches */
-		input_latch[0] = input_port_read(machine, "IN0");
+		input_latch[0] = input_port_read(space->machine, "IN0");
 
 		/* do the gun thing */
 		if ( vsnes_gun_controller )
 		{
-			int x = input_port_read(machine, "GUNX");
-			int y = input_port_read(machine, "GUNY");
+			int x = input_port_read(space->machine, "GUNX");
+			int y = input_port_read(space->machine, "GUNY");
 			UINT32 pix, color_base;
 
 			/* get the pixel at the gun position */
@@ -373,7 +373,7 @@ static WRITE8_HANDLER( gun_in0_w )
 			}
 		}
 
-		input_latch[1] = input_port_read(machine, "IN1");
+		input_latch[1] = input_port_read(space->machine, "IN1");
 	}
 
     if ( ( zapstore & 1 ) && ( !( data & 1 ) ) )
@@ -413,7 +413,7 @@ static WRITE8_HANDLER( goonies_rom_banking )
 		case 2: /* code bank 1 */
 		case 4: /* code bank 2 */
 		{
-			UINT8 *prg = memory_region( machine, "main" );
+			UINT8 *prg = memory_region( space->machine, "main" );
 			memcpy( &prg[0x08000 + reg*0x1000], &prg[bankoffset], 0x2000 );
 		}
 		break;
@@ -499,7 +499,7 @@ DRIVER_INIT( hogalley )
 static READ8_HANDLER( vsgshoe_security_r )
 {
 	/* low part must be 0x1c */
-	return ppu2c0x_0_r( machine, 2 ) | 0x1c;
+	return ppu2c0x_0_r( space->machine, 2 ) | 0x1c;
 }
 
 static WRITE8_HANDLER( vsgshoe_gun_in0_w )
@@ -508,13 +508,13 @@ static WRITE8_HANDLER( vsgshoe_gun_in0_w )
 	int addr;
 	if((data & 0x04) != old_bank)
 	{
-		UINT8 *prg = memory_region( machine, "main" );
+		UINT8 *prg = memory_region( space->machine, "main" );
 		old_bank = data & 0x04;
 		addr = old_bank ? 0x12000: 0x10000;
 		memcpy (&prg[0x08000], &prg[addr], 0x2000);
 	}
 
-	gun_in0_w(machine, offset, data);
+	gun_in0_w(space, offset, data);
 }
 
 DRIVER_INIT( vsgshoe )
@@ -626,7 +626,7 @@ static WRITE8_HANDLER( drmario_rom_banking )
 			case 3:	/* program banking */
 				{
 					int bank = ( drmario_shiftreg & 0x03 ) * 0x4000;
-					UINT8 *prg = memory_region( machine, "main" );
+					UINT8 *prg = memory_region( space->machine, "main" );
 
 					if ( !size16k )
 					{
@@ -749,7 +749,7 @@ DRIVER_INIT( vsslalom )
 static WRITE8_HANDLER( castlevania_rom_banking )
 {
 	int rombank = 0x10000 + ( data & 7 ) * 0x4000;
-	UINT8 *prg = memory_region( machine, "main" );
+	UINT8 *prg = memory_region( space->machine, "main" );
 
 	memcpy( &prg[0x08000], &prg[rombank], 0x4000 );
 }
@@ -779,7 +779,7 @@ DRIVER_INIT( cstlevna )
 static READ8_HANDLER( topgun_security_r )
 {
 	/* low part must be 0x1b */
-	return ppu2c0x_0_r( machine, 2 ) | 0x1b;
+	return ppu2c0x_0_r( space->machine, 2 ) | 0x1b;
 }
 
 DRIVER_INIT( topgun )
@@ -1152,7 +1152,7 @@ static WRITE8_HANDLER( mapper68_rom_banking ){
 
 		case 0x7000:
 		{
-			UINT8 *prg = memory_region( machine, "main" );
+			UINT8 *prg = memory_region( space->machine, "main" );
 			memcpy( &prg[0x08000], &prg[0x10000 +data*0x4000], 0x4000 );
 		}
 		break;
@@ -1186,7 +1186,7 @@ static int ret;
 static WRITE8_HANDLER ( set_bnglngby_irq_w )
 {
 	ret = data;
-	cpu_set_input_line(machine->cpu[0], 0, ( data & 2 ) ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(space->machine->cpu[0], 0, ( data & 2 ) ? ASSERT_LINE : CLEAR_LINE );
 	/* other values ??? */
 	/* 0, 4, 84 */
 }
@@ -1221,7 +1221,7 @@ DRIVER_INIT( bnglngby )
 static READ8_HANDLER( jajamaru_security_r )
 {
 	/* low part must be 0x40 */
-	return ppu2c0x_0_r( machine, 2 ) | 0x40;
+	return ppu2c0x_0_r( space->machine, 2 ) | 0x40;
 }
 
 DRIVER_INIT( jajamaru )
@@ -1248,7 +1248,7 @@ DRIVER_INIT( jajamaru )
 static READ8_HANDLER( mightybj_security_r )
 {
 	/* low part must be 0x3d */
-	return ppu2c0x_0_r( machine, 2 ) | 0x3d;
+	return ppu2c0x_0_r( space->machine, 2 ) | 0x3d;
 }
 
 DRIVER_INIT( mightybj )
@@ -1272,13 +1272,13 @@ static WRITE8_HANDLER( vstennis_vrom_banking )
 	ppu2c0x_set_videorom_bank( cpunum_get_active(), 0, 8, ( data & 4 ) ? 1 : 0, 512 );
 
 	/* bit 1 ( data & 2 ) triggers irq on the other cpu */
-	cpu_set_input_line(machine->cpu[other_cpu], 0, ( data & 2 ) ? CLEAR_LINE : ASSERT_LINE );
+	cpu_set_input_line(space->machine->cpu[other_cpu], 0, ( data & 2 ) ? CLEAR_LINE : ASSERT_LINE );
 
 	/* move along */
 	if ( cpunum_get_active() == 0 )
-		vsnes_in0_w( machine, offset, data );
+		vsnes_in0_w( space->machine, offset, data );
 	else
-		vsnes_in0_1_w( machine, offset, data );
+		vsnes_in0_1_w( space->machine, offset, data );
 }
 
 DRIVER_INIT( vstennis )

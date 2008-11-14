@@ -75,7 +75,7 @@ VIDEO_START( aeroboto )
 
 READ8_HANDLER( aeroboto_in0_r )
 {
-	return input_port_read(machine, flip_screen_get() ? "P2" : "P1");
+	return input_port_read(space->machine, flip_screen_get() ? "P2" : "P1");
 }
 
 WRITE8_HANDLER( aeroboto_3000_w )

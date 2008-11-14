@@ -14,7 +14,7 @@ WRITE8_HANDLER( sichuan2_bankswitch_w )
 {
 	int bankaddress;
 	int bank;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	if (data & 0xc0) logerror("bank switch %02x\n",data);
 
@@ -40,7 +40,7 @@ WRITE8_HANDLER( sichuan2_paletteram_w )
 
 	offset &= 0xff;
 
-	palette_set_color_rgb(machine, offset, pal5bit(paletteram[offset + 0x000]), pal5bit(paletteram[offset + 0x100]), pal5bit(paletteram[offset + 0x200]));
+	palette_set_color_rgb(space->machine, offset, pal5bit(paletteram[offset + 0x000]), pal5bit(paletteram[offset + 0x100]), pal5bit(paletteram[offset + 0x200]));
 }
 
 static TILE_GET_INFO( get_bg_tile_info )

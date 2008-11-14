@@ -98,7 +98,7 @@ WRITE8_HANDLER( ssozumo_paletteram_w )
 	bit3 = (val >> 3) & 0x01;
 	b = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	palette_set_color(machine, offs2 + 64, MAKE_RGB(r, g, b));
+	palette_set_color(space->machine, offs2 + 64, MAKE_RGB(r, g, b));
 }
 
 WRITE8_HANDLER( ssozumo_scroll_w )

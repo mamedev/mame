@@ -30,26 +30,26 @@ static WRITE8_HANDLER( starshp1_audio_w )
 	{
 	case 0:
 		starshp1_attract = data;
-		discrete_sound_w(machine, STARSHP1_ATTRACT, data);
+		discrete_sound_w(space, STARSHP1_ATTRACT, data);
 		break;
 	case 1:
 		starshp1_phasor = data;
-		discrete_sound_w(machine, STARSHP1_PHASOR_ON, data);
+		discrete_sound_w(space, STARSHP1_PHASOR_ON, data);
 		break;
 	case 2:
-		discrete_sound_w(machine, STARSHP1_KICKER, data);
+		discrete_sound_w(space, STARSHP1_KICKER, data);
 		break;
 	case 3:
-		discrete_sound_w(machine, STARSHP1_SL1, data);
+		discrete_sound_w(space, STARSHP1_SL1, data);
 		break;
 	case 4:
-		discrete_sound_w(machine, STARSHP1_SL2, data);
+		discrete_sound_w(space, STARSHP1_SL2, data);
 		break;
 	case 5:
-		discrete_sound_w(machine, STARSHP1_MOLVL, data);
+		discrete_sound_w(space, STARSHP1_MOLVL, data);
 		break;
 	case 6:
-		discrete_sound_w(machine, STARSHP1_NOISE_FREQ, data);
+		discrete_sound_w(space, STARSHP1_NOISE_FREQ, data);
 		break;
 	}
 
@@ -108,13 +108,13 @@ static WRITE8_HANDLER( starshp1_analog_out_w )
 		starshp1_ship_size = data;
 		break;
 	case 2:
-		discrete_sound_w(machine, STARSHP1_NOISE_AMPLITUDE, data);
+		discrete_sound_w(space, STARSHP1_NOISE_AMPLITUDE, data);
 		break;
 	case 3:
-		discrete_sound_w(machine, STARSHP1_TONE_PITCH, data);
+		discrete_sound_w(space, STARSHP1_TONE_PITCH, data);
 		break;
 	case 4:
-		discrete_sound_w(machine, STARSHP1_MOTOR_SPEED, data);
+		discrete_sound_w(space, STARSHP1_MOTOR_SPEED, data);
 		break;
 	case 5:
 		starshp1_circle_hpos = data;

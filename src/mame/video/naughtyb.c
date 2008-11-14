@@ -119,10 +119,10 @@ VIDEO_START( naughtyb )
 WRITE8_HANDLER( naughtyb_videoreg_w )
 {
 	// bits 4+5 control the sound circuit
-	pleiads_sound_control_c_w(machine,offset,data);
+	pleiads_sound_control_c_w(space,offset,data);
 
 	naughtyb_cocktail =
-		( ( input_port_read(machine, "DSW0") & 0x80 ) &&	// cabinet == cocktail
+		( ( input_port_read(space->machine, "DSW0") & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
 	palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
 	bankreg = (data >> 2) & 0x01;			// banksel is just bit 2
@@ -131,10 +131,10 @@ WRITE8_HANDLER( naughtyb_videoreg_w )
 WRITE8_HANDLER( popflame_videoreg_w )
 {
 	// bits 4+5 control the sound circuit
-	pleiads_sound_control_c_w(machine,offset,data);
+	pleiads_sound_control_c_w(space,offset,data);
 
 	naughtyb_cocktail =
-		( ( input_port_read(machine, "DSW0") & 0x80 ) &&	// cabinet == cocktail
+		( ( input_port_read(space->machine, "DSW0") & 0x80 ) &&	// cabinet == cocktail
 		  ( data & 0x01 ) );				// handling player 2
 	palreg  = (data >> 1) & 0x03;			// pallette sel is bit 1 & 2
 	bankreg = (data >> 3) & 0x01;			// banksel is just bit 3

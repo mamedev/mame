@@ -631,7 +631,7 @@ static INTERRUPT_GEN( generate_nmi )
 static WRITE8_HANDLER( itech8_nmi_ack_w )
 {
 /* doesn't seem to hold for every game (e.g., hstennis) */
-/*  cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);*/
+/*  cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);*/
 }
 
 
@@ -731,17 +731,17 @@ static WRITE8_HANDLER( blitter_w )
 {
 	/* bit 0x20 on address 7 controls CPU banking */
 	if (offset / 2 == 7)
-		memory_set_bankptr(1, &memory_region(machine, "main")[0x4000 + 0xc000 * ((data >> 5) & 1)]);
+		memory_set_bankptr(1, &memory_region(space->machine, "main")[0x4000 + 0xc000 * ((data >> 5) & 1)]);
 
 	/* the rest is handled by the video hardware */
-	itech8_blitter_w(machine, offset, data);
+	itech8_blitter_w(space, offset, data);
 }
 
 
 static WRITE8_HANDLER( rimrockn_bank_w )
 {
 	/* banking is controlled here instead of by the blitter output */
-	memory_set_bankptr(1, &memory_region(machine, "main")[0x4000 + 0xc000 * (data & 3)]);
+	memory_set_bankptr(1, &memory_region(space->machine, "main")[0x4000 + 0xc000 * (data & 3)]);
 }
 
 
@@ -780,7 +780,7 @@ static WRITE8_HANDLER( pia_portb_out )
 	/* bit 5 controls the coin counter */
 	/* bit 6 controls the diagnostic sound LED */
 	pia_portb_data = data;
-	ticket_dispenser_w(machine, 0, (data & 0x10) << 3);
+	ticket_dispenser_w(space, 0, (data & 0x10) << 3);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -794,7 +794,7 @@ static WRITE8_HANDLER( ym2203_portb_out )
 	/* bit 6 controls the diagnostic sound LED */
 	/* bit 7 controls the ticket dispenser */
 	pia_portb_data = data;
-	ticket_dispenser_w(machine, 0, data & 0x80);
+	ticket_dispenser_w(space, 0, data & 0x80);
 	coin_counter_w(0, (data & 0x20) >> 5);
 }
 
@@ -832,7 +832,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 
 static READ8_HANDLER( sound_data_r )
 {
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
 	return sound_data;
 }
 
@@ -870,14 +870,14 @@ static WRITE16_HANDLER( grom_bank16_w )
 static WRITE16_HANDLER( display_page16_w )
 {
 	if (ACCESSING_BITS_8_15)
-		itech8_page_w(machine, 0, ~data >> 8);
+		itech8_page_w(space, 0, ~data >> 8);
 }
 
 
 static WRITE16_HANDLER( palette16_w )
 {
 	if (ACCESSING_BITS_8_15)
-		itech8_palette_w(machine, offset / 8, data >> 8);
+		itech8_palette_w(space, offset / 8, data >> 8);
 }
 
 

@@ -532,51 +532,51 @@ READ8_HANDLER( astrocade_data_chip_register_r )
 			break;
 
 		case 0x10:	/* player 1 handle */
-			result = input_port_read_safe(machine, "P1HANDLE", 0xff);
+			result = input_port_read_safe(space->machine, "P1HANDLE", 0xff);
 			break;
 
 		case 0x11:	/* player 2 handle */
-			result = input_port_read_safe(machine, "P2HANDLE", 0xff);
+			result = input_port_read_safe(space->machine, "P2HANDLE", 0xff);
 			break;
 
 		case 0x12:	/* player 3 handle */
-			result = input_port_read_safe(machine, "P3HANDLE", 0xff);
+			result = input_port_read_safe(space->machine, "P3HANDLE", 0xff);
 			break;
 
 		case 0x13:	/* player 4 handle */
-			result = input_port_read_safe(machine, "P4HANDLE", 0xff);
+			result = input_port_read_safe(space->machine, "P4HANDLE", 0xff);
 			break;
 
 		case 0x14:	/* keypad column 0 */
-			result = input_port_read_safe(machine, "KEYPAD0", 0xff);
+			result = input_port_read_safe(space->machine, "KEYPAD0", 0xff);
 			break;
 
 		case 0x15:	/* keypad column 1 */
-			result = input_port_read_safe(machine, "KEYPAD1", 0xff);
+			result = input_port_read_safe(space->machine, "KEYPAD1", 0xff);
 			break;
 
 		case 0x16:	/* keypad column 2 */
-			result = input_port_read_safe(machine, "KEYPAD2", 0xff);
+			result = input_port_read_safe(space->machine, "KEYPAD2", 0xff);
 			break;
 
 		case 0x17:	/* keypad column 3 */
-			result = input_port_read_safe(machine, "KEYPAD3", 0xff);
+			result = input_port_read_safe(space->machine, "KEYPAD3", 0xff);
 			break;
 
 		case 0x1c:	/* player 1 knob */
-			result = input_port_read_safe(machine, "P1_KNOB", 0xff);
+			result = input_port_read_safe(space->machine, "P1_KNOB", 0xff);
 			break;
 
 		case 0x1d:	/* player 2 knob */
-			result = input_port_read_safe(machine, "P2_KNOB", 0xff);
+			result = input_port_read_safe(space->machine, "P2_KNOB", 0xff);
 			break;
 
 		case 0x1e:	/* player 3 knob */
-			result = input_port_read_safe(machine, "P3_KNOB", 0xff);
+			result = input_port_read_safe(space->machine, "P3_KNOB", 0xff);
 			break;
 
 		case 0x1f:	/* player 4 knob */
-			result = input_port_read_safe(machine, "P4_KNOB", 0xff);
+			result = input_port_read_safe(space->machine, "P4_KNOB", 0xff);
 			break;
 	}
 
@@ -646,7 +646,7 @@ WRITE8_HANDLER( astrocade_data_chip_register_w )
 		case 0x17:	/* noise volume register */
 		case 0x18:	/* sound block transfer */
 			if (astrocade_video_config & AC_SOUND_PRESENT)
-				astrocade_sound1_w(machine, offset, data);
+				astrocade_sound1_w(space, offset, data);
 			break;
 
 		case 0x19:	/* expand register */
@@ -915,7 +915,7 @@ WRITE8_HANDLER( astrocade_pattern_board_w )
 
 		case 6:		/* height of blit and initiator */
 			pattern_height = data;
-			execute_blit(machine);
+			execute_blit(space->machine);
 			break;
 	}
 }

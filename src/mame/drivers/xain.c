@@ -175,13 +175,13 @@ static WRITE8_HANDLER( xain_sharedram_w )
 	/* so let's resync every time they are changed to avoid deadlocks */
 	if ((offset == 0x003d || offset == 0x003e)
 			&& xain_sharedram[offset] != data)
-		cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(20));
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
 	xain_sharedram[offset] = data;
 }
 
 static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 	xain_pri=data&0x7;
 
@@ -191,7 +191,7 @@ static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 
 static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "sub");
+	UINT8 *RAM = memory_region(space->machine, "sub");
 
 	if (data & 0x01) {memory_set_bankptr(2,&RAM[0x10000]);}
 	else {memory_set_bankptr(2,&RAM[0x4000]);}
@@ -199,8 +199,8 @@ static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 
 static WRITE8_HANDLER( xain_sound_command_w )
 {
-	soundlatch_w(machine,offset,data);
-	cpu_set_input_line(machine->cpu[2],M6809_IRQ_LINE,HOLD_LINE);
+	soundlatch_w(space,offset,data);
+	cpu_set_input_line(space->machine->cpu[2],M6809_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( xain_main_irq_w )
@@ -208,28 +208,28 @@ static WRITE8_HANDLER( xain_main_irq_w )
 	switch (offset)
 	{
 	case 0: /* 0x3a09 - NMI clear */
-		cpu_set_input_line(machine->cpu[0],INPUT_LINE_NMI,CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0],INPUT_LINE_NMI,CLEAR_LINE);
 		break;
 	case 1: /* 0x3a0a - FIRQ clear */
-		cpu_set_input_line(machine->cpu[0],M6809_FIRQ_LINE,CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,CLEAR_LINE);
 		break;
 	case 2: /* 0x3a0b - IRQ clear */
-		cpu_set_input_line(machine->cpu[0],M6809_IRQ_LINE,CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,CLEAR_LINE);
 		break;
 	case 3: /* 0x3a0c - IRQB assert */
-		cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,ASSERT_LINE);
 		break;
 	}
 }
 
 static WRITE8_HANDLER( xain_irqA_assert_w )
 {
-	cpu_set_input_line(machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[0],M6809_IRQ_LINE,ASSERT_LINE);
 }
 
 static WRITE8_HANDLER( xain_irqB_clear_w )
 {
-	cpu_set_input_line(machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1],M6809_IRQ_LINE,CLEAR_LINE);
 }
 
 static READ8_HANDLER( xain_68705_r )

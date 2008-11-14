@@ -282,40 +282,40 @@ static WRITE8_HANDLER( cntsteer_background_w )
 static WRITE8_HANDLER( gekitsui_int_w )
 {
 //  if (errorlog) fprintf(errorlog,"%04x: CPU 2 causes NMI\n",cpu_get_pc());
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 }
 static WRITE8_HANDLER( gekitsui_int2_w ) // not used..
 {
 //  if (errorlog) fprintf(errorlog,"%04x: CPU 1 causes IRQ\n",cpu_get_pc());
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
 static WRITE8_HANDLER( gekitsui_sub_irq_ack )
 {
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, CLEAR_LINE);
 }
 
 #if 0
 static WRITE8_HANDLER( cntsteer_int_w )
 {
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
 }
 #endif
 
 static WRITE8_HANDLER( cntsteer_sound_w )
 {
- 	soundlatch_w(machine,0,data);
+ 	soundlatch_w(space,0,data);
 }
 
 static WRITE8_HANDLER( zerotrgt_ctrl_w )
 {
-	logerror("CTRL: %04x: %04x: %04x\n",cpu_get_pc(machine->activecpu),offset,data);
-//  if (offset==0) cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	logerror("CTRL: %04x: %04x: %04x\n",cpu_get_pc(space->cpu),offset,data);
+//  if (offset==0) cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 	// Wrong - bits 0 & 1 used on this
-	if (offset==1) cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
-//  if (offset==2) cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+	if (offset==1) cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, ASSERT_LINE);
+//  if (offset==2) cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 }
 
 #if 0

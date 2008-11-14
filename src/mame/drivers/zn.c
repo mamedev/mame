@@ -271,19 +271,19 @@ static WRITE32_HANDLER( znsecsel_w )
 	if( ( m_n_znsecsel & 0x80 ) == 0 )
 	{
 		psx_sio_install_handler( 0, sio_pad_handler );
-		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( space->machine, 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else if( ( m_n_znsecsel & 0x08 ) == 0 )
 	{
 		znsec_start( 1 );
 		psx_sio_install_handler( 0, sio_znsec1_handler );
-		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( space->machine, 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else if( ( m_n_znsecsel & 0x04 ) == 0 )
 	{
 		znsec_start( 0 );
 		psx_sio_install_handler( 0, sio_znsec0_handler );
-		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( space->machine, 0, PSX_SIO_IN_DSR, 0 );
 	}
 	else
 	{
@@ -291,7 +291,7 @@ static WRITE32_HANDLER( znsecsel_w )
 		m_b_lastclock = 1;
 
 		psx_sio_install_handler( 0, sio_dip_handler );
-		psx_sio_input( machine, 0, PSX_SIO_IN_DSR, 0 );
+		psx_sio_input( space->machine, 0, PSX_SIO_IN_DSR, 0 );
 
 		timer_adjust_oneshot( dip_timer, ATTOTIME_IN_CYCLES( 100, 0 ), 1 );
 	}
@@ -330,7 +330,7 @@ static READ32_HANDLER( boardconfig_r )
     111----- rev=5
     */
 
-	if( video_screen_get_height(machine->primary_screen) == 1024 )
+	if( video_screen_get_height(space->machine->primary_screen) == 1024 )
 	{
 		return 64|32|8;
 	}
@@ -641,12 +641,12 @@ static READ32_HANDLER( capcom_kickharness_r )
 
 static WRITE32_HANDLER( bank_coh1000c_w )
 {
-	memory_set_bankptr( 2, memory_region( machine, "user2" ) + 0x400000 + ( data * 0x400000 ) );
+	memory_set_bankptr( 2, memory_region( space->machine, "user2" ) + 0x400000 + ( data * 0x400000 ) );
 }
 
 static WRITE8_HANDLER( qsound_bankswitch_w )
 {
-	memory_set_bankptr( 10, memory_region( machine, "audio" ) + 0x10000 + ( ( data & 0x0f ) * 0x4000 ) );
+	memory_set_bankptr( 10, memory_region( space->machine, "audio" ) + 0x10000 + ( ( data & 0x0f ) * 0x4000 ) );
 }
 
 static INTERRUPT_GEN( qsound_interrupt )
@@ -656,8 +656,8 @@ static INTERRUPT_GEN( qsound_interrupt )
 
 static WRITE32_HANDLER( zn_qsound_w )
 {
-	soundlatch_w(machine, 0, data);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static DRIVER_INIT( coh1000c )
@@ -878,7 +878,7 @@ Notes:
 
 static WRITE32_HANDLER( bank_coh3002c_w )
 {
-	memory_set_bankptr( 2, memory_region( machine, "user2" ) + 0x400000 + ( data * 0x400000 ) );
+	memory_set_bankptr( 2, memory_region( space->machine, "user2" ) + 0x400000 + ( data * 0x400000 ) );
 }
 
 static DRIVER_INIT( coh3002c )
@@ -1144,28 +1144,28 @@ static WRITE32_HANDLER( bank_coh1000t_w )
 {
 	mb3773_set_ck( ( data & 0x20 ) >> 5 );
 	verboselog( 1, "bank_coh1000t_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	memory_set_bankptr( 1, memory_region( machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
+	memory_set_bankptr( 1, memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
 }
 
 static WRITE8_HANDLER( fx1a_sound_bankswitch_w )
 {
-	memory_set_bankptr( 10, memory_region( machine, "audio" ) + 0x10000 + ( ( ( data - 1 ) & 0x07 ) * 0x4000 ) );
+	memory_set_bankptr( 10, memory_region( space->machine, "audio" ) + 0x10000 + ( ( ( data - 1 ) & 0x07 ) * 0x4000 ) );
 }
 
 static READ32_HANDLER( taitofx1a_ymsound_r )
 {
-	return taitosound_comm_r(machine, 0)<<16;
+	return taitosound_comm_r(space, 0)<<16;
 }
 
 static WRITE32_HANDLER( taitofx1a_ymsound_w )
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		taitosound_port_w(machine, 0, data&0xff);
+		taitosound_port_w(space, 0, data&0xff);
 	}
 	else
 	{
-		taitosound_comm_w(machine, 0, (data>>16)&0xff);
+		taitosound_comm_w(space, 0, (data>>16)&0xff);
 	}
 }
 
@@ -1811,17 +1811,17 @@ Notes:
 
 static WRITE32_HANDLER( coh1002e_bank_w )
 {
-	znsecsel_w( machine, offset, data, mem_mask );
+	znsecsel_w( space->machine, offset, data, mem_mask );
 
-	memory_set_bankptr( 1, memory_region( machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
+	memory_set_bankptr( 1, memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
 }
 
 static WRITE32_HANDLER( coh1002e_latch_w )
 {
 	if (offset)
-		cpu_set_input_line(machine->cpu[1], 2, HOLD_LINE);	// irq 2 on the 68k
+		cpu_set_input_line(space->machine->cpu[1], 2, HOLD_LINE);	// irq 2 on the 68k
 	else
-		soundlatch_w(machine, 0, data);
+		soundlatch_w(space, 0, data);
 }
 
 static DRIVER_INIT( coh1002e )
@@ -1841,17 +1841,17 @@ static MACHINE_RESET( coh1002e )
 
 static READ16_HANDLER( psarc_ymf_r )
 {
-	return ymf271_0_r(machine,0);
+	return ymf271_0_r(space,0);
 }
 
 static WRITE16_HANDLER( psarc_ymf_w )
 {
-	ymf271_0_w(machine, offset, data);
+	ymf271_0_w(space, offset, data);
 }
 
 static READ16_HANDLER( psarc_latch_r )
 {
-	return soundlatch_r(machine,0);
+	return soundlatch_r(space,0);
 }
 
 static ADDRESS_MAP_START( psarc_snd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -1916,7 +1916,7 @@ MTR-BAM* - DIP42 32MBit maskROMs
 
 static WRITE32_HANDLER( bam2_sec_w )
 {
-	znsecsel_w( machine, offset, data, mem_mask );
+	znsecsel_w( space->machine, offset, data, mem_mask );
 }
 
 /*
@@ -1942,12 +1942,12 @@ static WRITE32_HANDLER( bam2_mcu_w )
 	{
 		if (ACCESSING_BITS_0_15)
 		{
-			memory_set_bankptr( 2, memory_region( machine, "user2" ) + ( ( data & 0xf ) * 0x400000 ) );
+			memory_set_bankptr( 2, memory_region( space->machine, "user2" ) + ( ( data & 0xf ) * 0x400000 ) );
 		}
 		else if (ACCESSING_BITS_16_31)
 		{
 			bam2_mcu_command = data>>16;
-			logerror("MCU command: %04x (PC %08x)\n", bam2_mcu_command, cpu_get_pc(machine->activecpu));
+			logerror("MCU command: %04x (PC %08x)\n", bam2_mcu_command, cpu_get_pc(space->cpu));
 		}
 	}
 }
@@ -1957,11 +1957,11 @@ static READ32_HANDLER( bam2_mcu_r )
 	switch (offset)
 	{
 		case 0:
-			logerror("MCU port 0 read @ PC %08x mask %08x\n", cpu_get_pc(machine->activecpu), mem_mask);
+			logerror("MCU port 0 read @ PC %08x mask %08x\n", cpu_get_pc(space->cpu), mem_mask);
 			break;
 
 		case 1:
-			logerror("MCU status read @ PC %08x mask %08x\n", cpu_get_pc(machine->activecpu), mem_mask);
+			logerror("MCU status read @ PC %08x mask %08x\n", cpu_get_pc(space->cpu), mem_mask);
 
 			switch (bam2_mcu_command)
 			{
@@ -2286,7 +2286,7 @@ static WRITE32_HANDLER( acpsx_10_w )
 static WRITE32_HANDLER( nbajamex_80_w )
 {
 	verboselog( 0, "nbajamex_80_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	psx_irq_set(machine, 0x400);
+	psx_irq_set(space->machine, 0x400);
 }
 
 static READ32_HANDLER( nbajamex_08_r )
@@ -2479,7 +2479,7 @@ Notes:
 
 static WRITE32_HANDLER( coh1001l_bnk_w )
 {
-	memory_set_bankptr( 1, memory_region( machine, "user2" ) + ( ( ( data >> 16 ) & 3 ) * 0x800000 ) );
+	memory_set_bankptr( 1, memory_region( space->machine, "user2" ) + ( ( ( data >> 16 ) & 3 ) * 0x800000 ) );
 }
 
 static DRIVER_INIT( coh1001l )
@@ -2522,7 +2522,7 @@ Key:    Mother    KN01
 
 static WRITE32_HANDLER( coh1002v_bnk_w )
 {
-	memory_set_bankptr( 2, memory_region( machine, "user3" ) + ( data * 0x100000 ) );
+	memory_set_bankptr( 2, memory_region( space->machine, "user3" ) + ( data * 0x100000 ) );
 }
 
 static DRIVER_INIT( coh1002v )
@@ -2707,7 +2707,7 @@ Notes:
 static WRITE32_HANDLER( coh1002m_bank_w )
 {
 	verboselog( 1, "coh1002m_bank_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
-	memory_set_bankptr( 1, memory_region( machine, "user2" ) + ((data>>16) * 0x800000));
+	memory_set_bankptr( 1, memory_region( space->machine, "user2" ) + ((data>>16) * 0x800000));
 }
 
 static int cbaj_to_z80 = 0, cbaj_to_r3k = 0;
@@ -2719,7 +2719,7 @@ static READ32_HANDLER( cbaj_z80_r )
 
 	cbaj_to_r3k &= ~2;
 
-	return soundlatch2_r(machine,0) | ready<<24;
+	return soundlatch2_r(space,0) | ready<<24;
 }
 
 static WRITE32_HANDLER( cbaj_z80_w )
@@ -2752,7 +2752,7 @@ static READ8_HANDLER( cbaj_z80_latch_r )
 static WRITE8_HANDLER( cbaj_z80_latch_w )
 {
 	cbaj_to_r3k |= 2;
-	soundlatch2_w(machine, 0, data);
+	soundlatch2_w(space, 0, data);
 }
 
 static READ8_HANDLER( cbaj_z80_ready_r )

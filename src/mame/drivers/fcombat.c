@@ -145,7 +145,7 @@ static READ8_HANDLER( fcombat_protection_r )
 static READ8_HANDLER( fcombat_port01_r )
 {
 	/* the cocktail flip bit muxes between ports 0 and 1 */
-	return fcombat_cocktail_flip ? input_port_read(machine, "IN1") : input_port_read(machine, "IN0");
+	return fcombat_cocktail_flip ? input_port_read(space->machine, "IN1") : input_port_read(space->machine, "IN0");
 }
 
 
@@ -186,7 +186,7 @@ static READ8_HANDLER(e300_r)
 	int wx=(tx+fcombat_sh)/16;
 	int wy=(ty*2+fcombat_sv)/16;
 
-	return memory_region(machine, "user2")[wx*32*16+wy];
+	return memory_region(space->machine, "user2")[wx*32*16+wy];
 }
 
 static WRITE8_HANDLER(ee00_w)

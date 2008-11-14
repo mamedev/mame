@@ -215,7 +215,7 @@ static READ32_HANDLER( ps4_eeprom_r )
 {
 	if (ACCESSING_BITS_16_31)
 	{
-		return input_port_read(machine, "JP4");
+		return input_port_read(space->machine, "JP4");
 	}
 
 //  logerror("Unk EEPROM read mask %x\n", mem_mask);
@@ -256,8 +256,8 @@ static WRITE32_HANDLER( ps4_paletteram32_RRRRRRRRGGGGGGGGBBBBBBBBxxxxxxxx_dword_
 	g = ((paletteram32[offset] & 0x00ff0000) >>16);
 	r = ((paletteram32[offset] & 0xff000000) >>24);
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
-	palette_set_color(machine,offset+0x800,MAKE_RGB(r,g,b)); // For screen 2
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset+0x800,MAKE_RGB(r,g,b)); // For screen 2
 }
 
 static WRITE32_HANDLER( ps4_bgpen_1_dword_w )
@@ -269,7 +269,7 @@ static WRITE32_HANDLER( ps4_bgpen_1_dword_w )
 	g = ((bgpen_1[0] & 0x00ff0000) >>16);
 	r = ((bgpen_1[0] & 0xff000000) >>24);
 
-	palette_set_color(machine,0x1000,MAKE_RGB(r,g,b)); // Clear colour for screen 1
+	palette_set_color(space->machine,0x1000,MAKE_RGB(r,g,b)); // Clear colour for screen 1
 }
 
 static WRITE32_HANDLER( ps4_bgpen_2_dword_w )
@@ -281,7 +281,7 @@ static WRITE32_HANDLER( ps4_bgpen_2_dword_w )
 	g = ((bgpen_2[0] & 0x00ff0000) >>16);
 	r = ((bgpen_2[0] & 0xff000000) >>24);
 
-	palette_set_color(machine,0x1001,MAKE_RGB(r,g,b)); // Clear colour for screen 2
+	palette_set_color(space->machine,0x1001,MAKE_RGB(r,g,b)); // Clear colour for screen 2
 }
 
 static WRITE32_HANDLER( ps4_screen1_brt_w )
@@ -299,7 +299,7 @@ static WRITE32_HANDLER( ps4_screen1_brt_w )
 			int i;
 
 			for (i = 0; i < 0x800; i++)
-				palette_set_pen_contrast(machine,i,brt1);
+				palette_set_pen_contrast(space->machine,i,brt1);
 
 			oldbrt1 = brt1;
 		}
@@ -326,7 +326,7 @@ static WRITE32_HANDLER( ps4_screen2_brt_w )
 			int i;
 
 			for (i = 0x800; i < 0x1000; i++)
-				palette_set_pen_contrast(machine,i,brt2);
+				palette_set_pen_contrast(space->machine,i,brt2);
 
 			oldbrt2 = brt2;
 		}
@@ -346,7 +346,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 	{
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
-			UINT8 *ROM = memory_region(machine, "gfx1");
+			UINT8 *ROM = memory_region(space->machine, "gfx1");
 			memory_set_bankptr(2,&ROM[0x2000 * (psikyo4_vidregs[offset]&0x1fff)]); /* Bank comes from vidregs */
 		}
 	}
@@ -358,36 +358,36 @@ static UINT32 sample_offs = 0;
 
 static READ32_HANDLER( ps4_sample_r ) /* Send sample data for test */
 {
-	UINT8 *ROM = memory_region(machine, "ymf");
+	UINT8 *ROM = memory_region(space->machine, "ymf");
 	return ROM[sample_offs++]<<16;
 }
 #endif
 
 static READ32_HANDLER( psh_ymf_fm_r )
 {
-	return ymf278b_status_port_0_r(machine, 0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
+	return ymf278b_status_port_0_r(space, 0)<<24; /* Also, bit 0 being high indicates not ready to send sample data for test */
 }
 
 static WRITE32_HANDLER( psh_ymf_fm_w )
 {
 	if (ACCESSING_BITS_24_31)	// FM bank 1 address (OPL2/OPL3 compatible)
 	{
-		ymf278b_control_port_0_a_w(machine, 0, data>>24);
+		ymf278b_control_port_0_a_w(space, 0, data>>24);
 	}
 
 	if (ACCESSING_BITS_16_23)	// FM bank 1 data
 	{
-		ymf278b_data_port_0_a_w(machine, 0, data>>16);
+		ymf278b_data_port_0_a_w(space, 0, data>>16);
 	}
 
 	if (ACCESSING_BITS_8_15)	// FM bank 2 address (OPL3/YMF 262 extended)
 	{
-		ymf278b_control_port_0_b_w(machine, 0, data>>8);
+		ymf278b_control_port_0_b_w(space, 0, data>>8);
 	}
 
 	if (ACCESSING_BITS_0_7)	// FM bank 2 data
 	{
-		ymf278b_data_port_0_b_w(machine, 0, data);
+		ymf278b_data_port_0_b_w(space, 0, data);
 	}
 }
 
@@ -395,7 +395,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 {
 	if (ACCESSING_BITS_24_31)	// PCM address (OPL4/YMF 278B extended)
 	{
-		ymf278b_control_port_0_c_w(machine, 0, data>>24);
+		ymf278b_control_port_0_c_w(space, 0, data>>24);
 
 #if ROMTEST
 		if (data>>24 == 0x06)	// Reset Sample reading (They always write this code immediately before reading data)
@@ -407,7 +407,7 @@ static WRITE32_HANDLER( psh_ymf_pcm_w )
 
 	if (ACCESSING_BITS_16_23)	// PCM data
 	{
-		ymf278b_data_port_0_c_w(machine, 0, data>>16);
+		ymf278b_data_port_0_c_w(space, 0, data>>16);
 	}
 }
 
@@ -433,10 +433,10 @@ static WRITE32_HANDLER( hotgmck_pcm_bank_w )
 	new_bank1 = PCM_BANK_NO(1);
 
 	if (old_bank0 != new_bank0)
-		set_hotgmck_pcm_bank(machine, 0);
+		set_hotgmck_pcm_bank(space->machine, 0);
 
 	if (old_bank1 != new_bank1)
-		set_hotgmck_pcm_bank(machine, 1);
+		set_hotgmck_pcm_bank(space->machine, 1);
 }
 
 static ADDRESS_MAP_START( ps4_readmem, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1056,7 +1056,7 @@ PC  :00001B46: TST     R2,R2
 PC  :00001B48: BT      $00001B3C
 */
 
-	if (cpu_get_pc(machine->activecpu)==0x00001B3E) cpu_spinuntil_int(machine->activecpu);
+	if (cpu_get_pc(space->cpu)==0x00001B3E) cpu_spinuntil_int(space->cpu);
 	return ps4_ram[0x000020/4];
 }
 
@@ -1072,7 +1072,7 @@ PC  :00001B52: TST     R2,R2
 PC  :00001B54: BT      $00001B48
 */
 
-	if (cpu_get_pc(machine->activecpu)==0x00001B4A) cpu_spinuntil_int(machine->activecpu);
+	if (cpu_get_pc(space->cpu)==0x00001B4A) cpu_spinuntil_int(space->cpu);
 	return ps4_ram[0x000020/4];
 }
 
@@ -1088,7 +1088,7 @@ PC  :000029F6: TST     R3,R3
 PC  :000029F8: BT      $000029EC
 */
 
-	if (cpu_get_pc(machine->activecpu)==0x000029EE) cpu_spinuntil_int(machine->activecpu);
+	if (cpu_get_pc(space->cpu)==0x000029EE) cpu_spinuntil_int(space->cpu);
 	return ps4_ram[0x00001c/4];
 }
 

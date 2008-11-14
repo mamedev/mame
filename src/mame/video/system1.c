@@ -104,7 +104,7 @@ WRITE8_HANDLER( system1_paletteram_w )
 		b = pal2bit(data >> 6);
 	}
 
-	palette_set_color(machine,offset,MAKE_RGB(r,g,b));
+	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static STATE_POSTLOAD( system1_postload )

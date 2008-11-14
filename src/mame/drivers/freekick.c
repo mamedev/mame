@@ -82,7 +82,7 @@ static WRITE8_HANDLER( spinner_select_w )
 
 static READ8_HANDLER( spinner_r )
 {
-	return input_port_read(machine, spinner ? "IN3" : "IN2");
+	return input_port_read(space->machine, spinner ? "IN3" : "IN2");
 }
 
 static MACHINE_RESET( pbillrd )

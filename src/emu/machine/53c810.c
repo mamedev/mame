@@ -446,7 +446,7 @@ static void dma_exec(void)
 
 READ8_HANDLER( lsi53c810_reg_r )
 {
-	logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, cpu_get_pc(machine->activecpu));
+	logerror("53c810: read reg %d:0x%x (PC=%x)\n", offset, offset, cpu_get_pc(space->cpu));
 	switch(offset)
 	{
 		case 0x00:		/* SCNTL0 */
@@ -481,7 +481,7 @@ READ8_HANDLER( lsi53c810_reg_r )
 			// clear the interrupt on service
 			if(intf->irq_callback != NULL)
 			{
-				intf->irq_callback(machine, 0);
+				intf->irq_callback(space->machine, 0);
 			}
 
 			return lsi810.istat;
@@ -527,7 +527,7 @@ READ8_HANDLER( lsi53c810_reg_r )
 
 WRITE8_HANDLER( lsi53c810_reg_w )
 {
-	logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, cpu_get_pc(machine->activecpu));
+	logerror("53c810: %02x to reg %d:0x%x (PC=%x)\n", data, offset, offset, cpu_get_pc(space->cpu));
 	switch(offset)
 	{
 		case 0x00:		/* SCNTL0 */
@@ -621,7 +621,7 @@ WRITE8_HANDLER( lsi53c810_reg_w )
 				lsi810.istat |= 0x3;	/* DMA interrupt pending */
 				lsi810.dstat |= 0x8;	/* SSI (Single Step Interrupt) */
 				if(intf->irq_callback != NULL) {
-					intf->irq_callback(machine, 1);
+					intf->irq_callback(space->machine, 1);
 				}
 			}
 			else if(lsi810.dcntl & 0x04 && !lsi810.halted)	/* manual start DMA */

@@ -64,22 +64,22 @@ static WRITE8_HANDLER( onetwo_fgram_w )
 
 static WRITE8_HANDLER( onetwo_cpubank_w )
 {
-	UINT8 *RAM = memory_region(machine, "main") + 0x10000;
+	UINT8 *RAM = memory_region(space->machine, "main") + 0x10000;
 
 	memory_set_bankptr(1,&RAM[data * 0x4000]);
 }
 
 static WRITE8_HANDLER( onetwo_coin_counters_w )
 {
-	watchdog_reset(machine);
+	watchdog_reset(space->machine);
 	coin_counter_w(0, data & 0x02);
 	coin_counter_w(1, data & 0x04);
 }
 
 static WRITE8_HANDLER( onetwo_soundlatch_w )
 {
-	soundlatch_w(machine, 0, data);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	soundlatch_w(space, 0, data);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static void setColor(running_machine *machine, int offset)
@@ -94,13 +94,13 @@ static void setColor(running_machine *machine, int offset)
 static WRITE8_HANDLER(palette1_w)
 {
 	paletteram[offset]=data;
-	setColor(machine, offset);
+	setColor(space->machine, offset);
 }
 
 static WRITE8_HANDLER(palette2_w)
 {
 	paletteram_2[offset]=data;
-	setColor(machine, offset);
+	setColor(space->machine, offset);
 }
 
 /* Main CPU */

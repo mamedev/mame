@@ -91,7 +91,7 @@ static PALETTE_INIT( stactics )
 
 WRITE8_HANDLER( stactics_scroll_ram_w )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = space->machine->driver_data;
 
 	if (data & 0x01)
 	{
@@ -129,7 +129,7 @@ CUSTOM_INPUT( stactics_get_frame_count_d3 )
 
 WRITE8_HANDLER( stactics_speed_latch_w )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = space->machine->driver_data;
 
 	/* This writes to a shift register which is clocked by   */
 	/* a 555 oscillator.  This value determines the speed of */
@@ -156,7 +156,7 @@ WRITE8_HANDLER( stactics_speed_latch_w )
 
 WRITE8_HANDLER( stactics_shot_trigger_w )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = space->machine->driver_data;
 
 	state->shot_standby = 0;
 }
@@ -164,7 +164,7 @@ WRITE8_HANDLER( stactics_shot_trigger_w )
 
 WRITE8_HANDLER( stactics_shot_flag_clear_w )
 {
-	stactics_state *state = machine->driver_data;
+	stactics_state *state = space->machine->driver_data;
 
 	state->shot_arrive = 0;
 }

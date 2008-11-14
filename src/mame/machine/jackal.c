@@ -52,7 +52,7 @@ READ8_HANDLER( jackal_spriteram_r )
 
 WRITE8_HANDLER( jackal_rambank_w )
 {
-	UINT8 *rgn = memory_region(machine, "master");
+	UINT8 *rgn = memory_region(space->machine, "master");
 
 	if (data & 0x04) popmessage("jackal_rambank_w %02x",data);
 	coin_counter_w(0,data & 0x01);

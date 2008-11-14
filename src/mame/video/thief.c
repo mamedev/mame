@@ -67,7 +67,7 @@ WRITE8_HANDLER( thief_color_map_w ){
 	int r = intensity[(data & 0x03) >> 0];
     int g = intensity[(data & 0x0C) >> 2];
     int b = intensity[(data & 0x30) >> 4];
-	palette_set_color( machine,offset,MAKE_RGB(r,g,b) );
+	palette_set_color( space->machine,offset,MAKE_RGB(r,g,b) );
 }
 
 /***************************************************************************/
@@ -161,7 +161,7 @@ static UINT16 fetch_image_addr( void ){
 
 WRITE8_HANDLER( thief_blit_w ){
 	int i, offs, xoffset, dy;
-	UINT8 *gfx_rom = memory_region( machine, "gfx1" );
+	UINT8 *gfx_rom = memory_region( space->machine, "gfx1" );
 	UINT8 x = thief_coprocessor.param[SCREEN_XPOS];
 	UINT8 y = thief_coprocessor.param[SCREEN_YPOS];
 	UINT8 width = thief_coprocessor.param[BLIT_WIDTH];
@@ -195,22 +195,22 @@ WRITE8_HANDLER( thief_blit_w ){
 				if( addr<0x2000*3 ) data = gfx_rom[addr];
 			}
 			offs = (y*32+x/8+i)&0x1fff;
-			old_data = thief_videoram_r( machine,offs );
+			old_data = thief_videoram_r( space->machine,offs );
 			if( xor_blit ){
-				thief_videoram_w( machine,offs, old_data^(data>>xoffset) );
+				thief_videoram_w( space->machine,offs, old_data^(data>>xoffset) );
 			}
 			else {
-				thief_videoram_w( machine,offs,
+				thief_videoram_w( space->machine,offs,
 					(old_data&(0xff00>>xoffset)) | (data>>xoffset)
 				);
 			}
 			offs = (offs+1)&0x1fff;
-			old_data = thief_videoram_r( machine,offs );
+			old_data = thief_videoram_r( space->machine,offs );
 			if( xor_blit ){
-				thief_videoram_w( machine,offs, old_data^((data<<(8-xoffset))&0xff) );
+				thief_videoram_w( space->machine,offs, old_data^((data<<(8-xoffset))&0xff) );
 			}
 			else {
-				thief_videoram_w( machine,offs,
+				thief_videoram_w( space->machine,offs,
 					(old_data&(0xff>>xoffset)) | ((data<<(8-xoffset))&0xff)
 				);
 			}
@@ -238,7 +238,7 @@ READ8_HANDLER( thief_coprocessor_r ){
 				return thief_coprocessor.image_ram[addr];
 			}
 			else {
-				UINT8 *gfx_rom = memory_region( machine, "gfx1" );
+				UINT8 *gfx_rom = memory_region( space->machine, "gfx1" );
 				addr -= 0x2000;
 				if( addr<0x6000 ) return gfx_rom[addr];
 			}

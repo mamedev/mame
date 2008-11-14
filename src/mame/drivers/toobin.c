@@ -75,7 +75,7 @@ static WRITE16_HANDLER( interrupt_scan_w )
 	if (oldword != newword)
 	{
 		interrupt_scan[offset] = newword;
-		atarigen_scanline_int_set(machine->primary_screen, newword & 0x1ff);
+		atarigen_scanline_int_set(space->machine->primary_screen, newword & 0x1ff);
 	}
 }
 
@@ -89,8 +89,8 @@ static WRITE16_HANDLER( interrupt_scan_w )
 
 static READ16_HANDLER( special_port1_r )
 {
-	int result = input_port_read(machine, "FF9000");
-	if (atarigen_get_hblank(machine->primary_screen)) result ^= 0x8000;
+	int result = input_port_read(space->machine, "FF9000");
+	if (atarigen_get_hblank(space->machine->primary_screen)) result ^= 0x8000;
 	if (atarigen_cpu_to_sound_ready) result ^= 0x2000;
 	return result;
 }

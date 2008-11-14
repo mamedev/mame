@@ -410,14 +410,14 @@ WRITE32_HANDLER( gaelco3d_render_w )
 	{
 		if (polydata_count >= 18 && (polydata_count % 2) == 1 && IS_POLYEND(polydata_buffer[polydata_count - 2]))
 		{
-			render_poly(machine->primary_screen, &polydata_buffer[0]);
+			render_poly(space->machine->primary_screen, &polydata_buffer[0]);
 			polydata_count = 0;
 		}
 		video_changed = TRUE;
 	}
 
 #if DISPLAY_STATS
-	lastscan = video_screen_get_vpos(machine->primary_screen);
+	lastscan = video_screen_get_vpos(space->machine->primary_screen);
 #endif
 }
 

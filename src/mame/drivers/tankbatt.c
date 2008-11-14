@@ -80,7 +80,7 @@ static READ8_HANDLER( tankbatt_in0_r )
 {
 	int val;
 
-	val = input_port_read(machine, "P1");
+	val = input_port_read(space->machine, "P1");
 	return ((val << (7 - offset)) & 0x80);
 }
 
@@ -88,7 +88,7 @@ static READ8_HANDLER( tankbatt_in1_r )
 {
 	int val;
 
-	val = input_port_read(machine, "P2");
+	val = input_port_read(space->machine, "P2");
 	return ((val << (7 - offset)) & 0x80);
 }
 
@@ -96,7 +96,7 @@ static READ8_HANDLER( tankbatt_dsw_r )
 {
 	int val;
 
-	val = input_port_read(machine, "DSW");
+	val = input_port_read(space->machine, "DSW");
 	return ((val << (7 - offset)) & 0x80);
 }
 
@@ -106,8 +106,8 @@ static WRITE8_HANDLER( tankbatt_interrupt_enable_w )
 	tankbatt_sound_enable = !data;
 	if (data != 0)
 	{
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 	}
 	/* hack - turn off the engine noise if the normal game nmi's are disabled */
 	if (data) sample_stop (2);
@@ -119,8 +119,8 @@ static WRITE8_HANDLER( tankbatt_demo_interrupt_enable_w )
 	tankbatt_nmi_enable = data;
 	if (data != 0)
 	{
-		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, CLEAR_LINE);
 	}
 //  interrupt_enable_w (offset, data);
 }

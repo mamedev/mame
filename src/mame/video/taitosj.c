@@ -233,7 +233,7 @@ READ8_HANDLER( taitosj_gfxrom_r )
 	offs_t offs = taitosj_gfxpointer[0] | (taitosj_gfxpointer[1] << 8);
 
 	if (offs < 0x8000)
-		ret = memory_region(machine, "gfx1")[offs];
+		ret = memory_region(space->machine, "gfx1")[offs];
 	else
 		ret = 0;
 
@@ -268,7 +268,7 @@ WRITE8_HANDLER( taitosj_characterram_w )
 
 WRITE8_HANDLER( junglhbr_characterram_w )
 {
-	taitosj_characterram_w(machine, offset, data ^ 0xfc);
+	taitosj_characterram_w(space, offset, data ^ 0xfc);
 }
 
 

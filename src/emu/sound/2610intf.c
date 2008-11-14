@@ -260,28 +260,28 @@ static SND_RESET( ym2610 )
 /************************************************/
 READ8_HANDLER( ym2610_status_port_0_a_r )
 {
-//logerror("PC %04x: 2610 S0A=%02X\n",cpu_get_pc(machine->activecpu),ym2610_read(sndti_token(chip_type,0,0));
+//logerror("PC %04x: 2610 S0A=%02X\n",cpu_get_pc(space->cpu),ym2610_read(sndti_token(chip_type,0,0));
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	return ym2610_read(info->chip,0);
 }
 
 READ16_HANDLER( ym2610_status_port_0_a_lsb_r )
 {
-//logerror("PC %04x: 2610 S0A=%02X\n",cpu_get_pc(machine->activecpu),ym2610_read(sndti_token(chip_type,0,0));
+//logerror("PC %04x: 2610 S0A=%02X\n",cpu_get_pc(space->cpu),ym2610_read(sndti_token(chip_type,0,0));
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	return ym2610_read(info->chip,0);
 }
 
 READ8_HANDLER( ym2610_status_port_0_b_r )
 {
-//logerror("PC %04x: 2610 S0B=%02X\n",cpu_get_pc(machine->activecpu),ym2610_read(sndti_token(chip_type,0,2));
+//logerror("PC %04x: 2610 S0B=%02X\n",cpu_get_pc(space->cpu),ym2610_read(sndti_token(chip_type,0,2));
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	return ym2610_read(info->chip,2);
 }
 
 READ16_HANDLER( ym2610_status_port_0_b_lsb_r )
 {
-//logerror("PC %04x: 2610 S0B=%02X\n",cpu_get_pc(machine->activecpu),ym2610_read(sndti_token(chip_type,0,2));
+//logerror("PC %04x: 2610 S0B=%02X\n",cpu_get_pc(space->cpu),ym2610_read(sndti_token(chip_type,0,2));
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	return ym2610_read(info->chip,2);
 }
@@ -341,14 +341,14 @@ READ16_HANDLER( ym2610_read_port_1_lsb_r ){
 /************************************************/
 WRITE8_HANDLER( ym2610_control_port_0_a_w )
 {
-//logerror("PC %04x: 2610 Reg A %02X",cpu_get_pc(machine->activecpu),data);
+//logerror("PC %04x: 2610 Reg A %02X",cpu_get_pc(space->cpu),data);
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	ym2610_write(info->chip,0,data);
 }
 
 WRITE16_HANDLER( ym2610_control_port_0_a_lsb_w )
 {
-//logerror("PC %04x: 2610 Reg A %02X",cpu_get_pc(machine->activecpu),data);
+//logerror("PC %04x: 2610 Reg A %02X",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,0);
@@ -358,14 +358,14 @@ WRITE16_HANDLER( ym2610_control_port_0_a_lsb_w )
 
 WRITE8_HANDLER( ym2610_control_port_0_b_w )
 {
-//logerror("PC %04x: 2610 Reg B %02X",cpu_get_pc(machine->activecpu),data);
+//logerror("PC %04x: 2610 Reg B %02X",cpu_get_pc(space->cpu),data);
 	struct ym2610_info *info = sndti_token(chip_type,0);
 	ym2610_write(info->chip,2,data);
 }
 
 WRITE16_HANDLER( ym2610_control_port_0_b_lsb_w )
 {
-//logerror("PC %04x: 2610 Reg B %02X",cpu_get_pc(machine->activecpu),data);
+//logerror("PC %04x: 2610 Reg B %02X",cpu_get_pc(space->cpu),data);
 	if (ACCESSING_BITS_0_7)
 	{
 		struct ym2610_info *info = sndti_token(chip_type,0);

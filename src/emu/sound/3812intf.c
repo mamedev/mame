@@ -402,32 +402,40 @@ static void TimerHandler_8950(void *param,int c,attotime period)
 
 static unsigned char Y8950PortHandler_r(void *param)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct y8950_info *info = param;
 	if (info->intf->portread)
-		return info->intf->portread(Machine,info->index);
+		return info->intf->portread(space,info->index);
 	return 0;
 }
 
 static void Y8950PortHandler_w(void *param,unsigned char data)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct y8950_info *info = param;
 	if (info->intf->portwrite)
-		info->intf->portwrite(Machine,info->index,data);
+		info->intf->portwrite(space,info->index,data);
 }
 
 static unsigned char Y8950KeyboardHandler_r(void *param)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct y8950_info *info = param;
 	if (info->intf->keyboardread)
-		return info->intf->keyboardread(Machine,info->index);
+		return info->intf->keyboardread(space,info->index);
 	return 0;
 }
 
 static void Y8950KeyboardHandler_w(void *param,unsigned char data)
 {
+	/* temporary hack until this is converted to a device */
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	struct y8950_info *info = param;
 	if (info->intf->keyboardwrite)
-		info->intf->keyboardwrite(Machine,info->index,data);
+		info->intf->keyboardwrite(space,info->index,data);
 }
 
 static void y8950_stream_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length)

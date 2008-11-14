@@ -324,45 +324,45 @@ static void I8741_command_w(running_machine *machine, int num, int data)
 /* Write port handler */
 WRITE8_HANDLER( TAITO8741_0_w )
 {
-	if(offset&1) I8741_command_w(machine,0,data);
-	else         I8741_data_w(machine,0,data);
+	if(offset&1) I8741_command_w(space,0,data);
+	else         I8741_data_w(space,0,data);
 }
 WRITE8_HANDLER( TAITO8741_1_w )
 {
-	if(offset&1) I8741_command_w(machine,1,data);
-	else         I8741_data_w(machine,1,data);
+	if(offset&1) I8741_command_w(space,1,data);
+	else         I8741_data_w(space,1,data);
 }
 WRITE8_HANDLER( TAITO8741_2_w )
 {
-	if(offset&1) I8741_command_w(machine,2,data);
-	else         I8741_data_w(machine,2,data);
+	if(offset&1) I8741_command_w(space,2,data);
+	else         I8741_data_w(space,2,data);
 }
 WRITE8_HANDLER( TAITO8741_3_w )
 {
-	if(offset&1) I8741_command_w(machine,3,data);
-	else         I8741_data_w(machine,3,data);
+	if(offset&1) I8741_command_w(space,3,data);
+	else         I8741_data_w(space,3,data);
 }
 
 /* Read port handler */
 READ8_HANDLER( TAITO8741_0_r )
 {
-	if(offset&1) return I8741_status_r(machine,0);
-	return I8741_data_r(machine,0);
+	if(offset&1) return I8741_status_r(space,0);
+	return I8741_data_r(space,0);
 }
 READ8_HANDLER( TAITO8741_1_r )
 {
-	if(offset&1) return I8741_status_r(machine,1);
-	return I8741_data_r(machine,1);
+	if(offset&1) return I8741_status_r(space,1);
+	return I8741_data_r(space,1);
 }
 READ8_HANDLER( TAITO8741_2_r )
 {
-	if(offset&1) return I8741_status_r(machine,2);
-	return I8741_data_r(machine,2);
+	if(offset&1) return I8741_status_r(space,2);
+	return I8741_data_r(space,2);
 }
 READ8_HANDLER( TAITO8741_3_r )
 {
-	if(offset&1) return I8741_status_r(machine,3);
-	return I8741_data_r(machine,3);
+	if(offset&1) return I8741_status_r(space,3);
+	return I8741_data_r(space,3);
 }
 /****************************************************************************
 
@@ -527,7 +527,7 @@ static INT8 josvolly_8741_r(running_machine *machine,int num,int offset)
 	return ret;
 }
 
-WRITE8_HANDLER( josvolly_8741_0_w ){ josvolly_8741_w(machine,0,offset,data); }
-READ8_HANDLER( josvolly_8741_0_r ) { return josvolly_8741_r(machine,0,offset); }
-WRITE8_HANDLER( josvolly_8741_1_w ) { josvolly_8741_w(machine,1,offset,data); }
-READ8_HANDLER( josvolly_8741_1_r ) { return josvolly_8741_r(machine,1,offset); }
+WRITE8_HANDLER( josvolly_8741_0_w ){ josvolly_8741_w(space,0,offset,data); }
+READ8_HANDLER( josvolly_8741_0_r ) { return josvolly_8741_r(space,0,offset); }
+WRITE8_HANDLER( josvolly_8741_1_w ) { josvolly_8741_w(space,1,offset,data); }
+READ8_HANDLER( josvolly_8741_1_r ) { return josvolly_8741_r(space,1,offset); }

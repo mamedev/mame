@@ -118,7 +118,7 @@ static WRITE8_HANDLER( control_w ) {
 
 static WRITE8_HANDLER( sound_reset_w ) {
 	if ( !( data & 1 ) )
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( sound_control_w ) {
@@ -127,8 +127,8 @@ static WRITE8_HANDLER( sound_control_w ) {
 }
 
 static WRITE8_HANDLER( sound_command_w ) {
-	soundlatch_w( machine, 0, data );
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
+	soundlatch_w( space->machine, 0, data );
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
 }
 
 static int msm_data = 0;
@@ -192,7 +192,7 @@ static ADDRESS_MAP_START( kc_sound_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static READ8_HANDLER( sound_reset_r ) {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 	return 0;
 }
 

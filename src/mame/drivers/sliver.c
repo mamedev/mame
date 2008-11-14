@@ -295,7 +295,7 @@ static WRITE16_HANDLER( fifo_clear_w )
 
 static WRITE16_HANDLER( fifo_flush_w )
 {
-		blit_gfx(machine);
+		blit_gfx(space->machine);
 }
 
 
@@ -351,7 +351,7 @@ static WRITE16_HANDLER( jpeg2_w )
 				jpeg_addr=gfxlookup[idx][0];
 				jpeg_w=gfxlookup[idx][2];
 				jpeg_h=gfxlookup[idx][3];
-				render_jpeg(machine);
+				render_jpeg(space->machine);
 		}
 		else
 			{
@@ -379,7 +379,7 @@ static WRITE16_HANDLER(io_data_w)
 		{
 			jpeg_x=tmpx;
 			jpeg_y=tmpy;
-			render_jpeg(machine);
+			render_jpeg(space->machine);
 		}
 	}
 	else
@@ -390,8 +390,8 @@ static WRITE16_HANDLER(io_data_w)
 
 static WRITE16_HANDLER(sound_w)
 {
-		soundlatch_w(machine,0,data & 0xff);
-		cpu_set_input_line(machine->cpu[1], MCS51_INT0_LINE, HOLD_LINE);
+		soundlatch_w(space,0,data & 0xff);
+		cpu_set_input_line(space->machine->cpu[1], MCS51_INT0_LINE, HOLD_LINE);
 }
 
 static ADDRESS_MAP_START( sliver_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -426,7 +426,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(oki_setbank)
 {
-	UINT8 *sound = memory_region(machine, "oki");
+	UINT8 *sound = memory_region(space->machine, "oki");
 	int bank=(data^0xff)&3; //xor or not ?
 	memcpy(sound+0x20000, sound+0x100000+0x20000*bank, 0x20000);
 }

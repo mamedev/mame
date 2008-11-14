@@ -229,9 +229,9 @@ static READ8_HANDLER( ldp_read )
 static READ8_HANDLER( pedal_in )
 {
 	if (brake_gas)
-		return 	input_port_read(machine, "INACCEL");
+		return 	input_port_read(space->machine, "INACCEL");
 
-	return 	input_port_read(machine, "INBRAKE");
+	return 	input_port_read(space->machine, "INBRAKE");
 
 }
 
@@ -272,7 +272,7 @@ static WRITE8_HANDLER( palette_write )
 
 	/* logerror("PAL WRITE index : %x  rgb : %d %d %d (real %x) at %x\n", pal_index, r,g,b, data, offset); */
 
-	palette_set_color(machine, pal_index, MAKE_ARGB(a, r, g, b));
+	palette_set_color(space->machine, pal_index, MAKE_ARGB(a, r, g, b));
 }
 
 /* PROGRAM MAP */

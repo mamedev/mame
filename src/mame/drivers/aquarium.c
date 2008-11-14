@@ -80,7 +80,7 @@ static MACHINE_RESET( aquarium )
 static READ16_HANDLER( aquarium_coins_r )
 {
 	int data;
-	data = (input_port_read(machine, "SYSTEM") & 0x7fff);
+	data = (input_port_read(space->machine, "SYSTEM") & 0x7fff);
 	data |= aquarium_snd_ack;
 	aquarium_snd_ack = 0;
 	return data;
@@ -95,14 +95,14 @@ static WRITE16_HANDLER( aquarium_sound_w )
 {
 //  popmessage("sound write %04x",data);
 
-	soundlatch_w(machine,1,data&0xff);
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+	soundlatch_w(space,1,data&0xff);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 
 static WRITE8_HANDLER( aquarium_z80_bank_w )
 {
 	int soundbank = ((data & 0x7) + 1) * 0x8000;
-	UINT8 *Z80 = (UINT8 *)memory_region(machine, "audio");
+	UINT8 *Z80 = (UINT8 *)memory_region(space->machine, "audio");
 
 	memory_set_bankptr(1, &Z80[soundbank + 0x10000]);
 }
@@ -125,13 +125,13 @@ static UINT8 aquarium_snd_bitswap(UINT8 scrambled_data)
 
 static READ8_HANDLER( aquarium_oki_r )
 {
-	return (aquarium_snd_bitswap(okim6295_status_0_r(machine,0)) );
+	return (aquarium_snd_bitswap(okim6295_status_0_r(space,0)) );
 }
 
 static WRITE8_HANDLER( aquarium_oki_w )
 {
-	logerror("Z80-PC:%04x Writing %04x to the OKI M6295\n",cpu_get_previouspc(machine->activecpu),aquarium_snd_bitswap(data));
-	okim6295_data_0_w( machine, 0, (aquarium_snd_bitswap(data)) );
+	logerror("Z80-PC:%04x Writing %04x to the OKI M6295\n",cpu_get_previouspc(space->cpu),aquarium_snd_bitswap(data));
+	okim6295_data_0_w( space->machine, 0, (aquarium_snd_bitswap(data)) );
 }
 
 

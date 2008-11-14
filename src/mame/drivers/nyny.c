@@ -179,7 +179,7 @@ static WRITE8_HANDLER( pia_2_port_b_w )
 	star_enable = data & 0x10;
 
 	/* bits 5-7 go to the music board connector */
-	audio_2_command_w(machine, 0, data & 0xe0);
+	audio_2_command_w(space, 0, data & 0xe0);
 }
 
 
@@ -429,15 +429,15 @@ static VIDEO_UPDATE( nyny )
 
 static WRITE8_HANDLER( audio_1_command_w )
 {
-	soundlatch_w(machine, 0, data);
-	cpu_set_input_line(machine->cpu[1], M6800_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(space, 0, data);
+	cpu_set_input_line(space->machine->cpu[1], M6800_IRQ_LINE, HOLD_LINE);
 }
 
 
 static WRITE8_HANDLER( audio_1_answer_w )
 {
-	soundlatch3_w(machine, 0, data);
-	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch3_w(space, 0, data);
+	cpu_set_input_line(space->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
 }
 
 
@@ -445,7 +445,7 @@ static WRITE8_HANDLER( nyny_ay8910_37_port_a_w )
 {
 	/* not sure what this does */
 
-	/*logerror("%x PORT A write %x at  Y=%x X=%x\n", safe_cpu_get_pc(machine->activecpu), data, video_screen_get_vpos(machine->primary_screen), video_screen_get_hpos(machine->primary_screen));*/
+	/*logerror("%x PORT A write %x at  Y=%x X=%x\n", safe_cpu_get_pc(space->cpu), data, video_screen_get_vpos(space->machine->primary_screen), video_screen_get_hpos(space->machine->primary_screen));*/
 }
 
 
@@ -486,8 +486,8 @@ static const ay8910_interface ay8910_64_interface =
 
 static WRITE8_HANDLER( audio_2_command_w )
 {
-	soundlatch2_w(machine, 0, (data & 0x60) >> 5);
-	cpu_set_input_line(machine->cpu[2], M6800_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
+	soundlatch2_w(space, 0, (data & 0x60) >> 5);
+	cpu_set_input_line(space->machine->cpu[2], M6800_IRQ_LINE, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -503,8 +503,8 @@ static READ8_HANDLER( nyny_pia_1_2_r )
 	UINT8 ret = 0;
 
 	/* the address bits are directly connected to the chip selects */
-	if (offset & 0x04)  ret = pia_1_r(machine, offset & 0x03);
-	if (offset & 0x08)  ret = pia_2_alt_r(machine, offset & 0x03);
+	if (offset & 0x04)  ret = pia_1_r(space, offset & 0x03);
+	if (offset & 0x08)  ret = pia_2_alt_r(space, offset & 0x03);
 
 	return ret;
 }
@@ -513,8 +513,8 @@ static READ8_HANDLER( nyny_pia_1_2_r )
 static WRITE8_HANDLER( nyny_pia_1_2_w )
 {
 	/* the address bits are directly connected to the chip selects */
-	if (offset & 0x04)  pia_1_w(machine, offset & 0x03, data);
-	if (offset & 0x08)  pia_2_alt_w(machine, offset & 0x03, data);
+	if (offset & 0x04)  pia_1_w(space, offset & 0x03, data);
+	if (offset & 0x08)  pia_2_alt_w(space, offset & 0x03, data);
 }
 
 

@@ -165,7 +165,7 @@ static READ8_HANDLER( rcasino_port_11_r )
        pulse = 0;
        else pulse = 0x04;
    }
-   return input_port_read(machine, "IN1") + pulse;
+   return input_port_read(space->machine, "IN1") + pulse;
 }
 
 static ADDRESS_MAP_START( rcasino_map, ADDRESS_SPACE_PROGRAM, 8 )

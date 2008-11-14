@@ -225,26 +225,26 @@ static WRITE8_HANDLER( input_port_select_w )
 
 static READ8_HANDLER( royalmah_player_1_port_r )
 {
-	int ret = (input_port_read(machine, "KEY0") & 0xc0) | 0x3f;
+	int ret = (input_port_read(space->machine, "KEY0") & 0xc0) | 0x3f;
 
-	if ((input_port_select & 0x01) == 0)  ret &= input_port_read(machine, "KEY0");
-	if ((input_port_select & 0x02) == 0)  ret &= input_port_read(machine, "KEY1");
-	if ((input_port_select & 0x04) == 0)  ret &= input_port_read(machine, "KEY2");
-	if ((input_port_select & 0x08) == 0)  ret &= input_port_read(machine, "KEY3");
-	if ((input_port_select & 0x10) == 0)  ret &= input_port_read(machine, "KEY4");
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_read(space->machine, "KEY0");
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_read(space->machine, "KEY1");
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_read(space->machine, "KEY2");
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_read(space->machine, "KEY3");
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_read(space->machine, "KEY4");
 
 	return ret;
 }
 
 static READ8_HANDLER( royalmah_player_2_port_r )
 {
-	int ret = (input_port_read(machine, "KEY5") & 0xc0) | 0x3f;
+	int ret = (input_port_read(space->machine, "KEY5") & 0xc0) | 0x3f;
 
-	if ((input_port_select & 0x01) == 0)  ret &= input_port_read(machine, "KEY5");
-	if ((input_port_select & 0x02) == 0)  ret &= input_port_read(machine, "KEY6");
-	if ((input_port_select & 0x04) == 0)  ret &= input_port_read(machine, "KEY7");
-	if ((input_port_select & 0x08) == 0)  ret &= input_port_read(machine, "KEY8");
-	if ((input_port_select & 0x10) == 0)  ret &= input_port_read(machine, "KEY9");
+	if ((input_port_select & 0x01) == 0)  ret &= input_port_read(space->machine, "KEY5");
+	if ((input_port_select & 0x02) == 0)  ret &= input_port_read(space->machine, "KEY6");
+	if ((input_port_select & 0x04) == 0)  ret &= input_port_read(space->machine, "KEY7");
+	if ((input_port_select & 0x08) == 0)  ret &= input_port_read(space->machine, "KEY8");
+	if ((input_port_select & 0x10) == 0)  ret &= input_port_read(space->machine, "KEY9");
 
 	return ret;
 }
@@ -255,9 +255,9 @@ static READ8_HANDLER ( majs101b_dsw_r )
 {
 	switch (dsw_select)
 	{
-		case 0x00: return input_port_read(machine, "DSW3");	/* DSW3 */
-		case 0x20: return input_port_read(machine, "DSW4");	/* DSW4 */
-		case 0x40: return input_port_read(machine, "DSW2");	/* DSW2 */
+		case 0x00: return input_port_read(space->machine, "DSW3");	/* DSW3 */
+		case 0x20: return input_port_read(space->machine, "DSW4");	/* DSW4 */
+		case 0x40: return input_port_read(space->machine, "DSW2");	/* DSW2 */
 	}
 	return 0;
 }
@@ -275,9 +275,9 @@ static READ8_HANDLER ( suzume_dsw_r )
 	{
 		switch (suzume_bank)
 		{
-			case 0x08: return input_port_read(machine, "DSW4");	/* DSW4 */
-			case 0x10: return input_port_read(machine, "DSW3");	/* DSW3 */
-			case 0x18: return input_port_read(machine, "DSW2");	/* DSW2 */
+			case 0x08: return input_port_read(space->machine, "DSW4");	/* DSW4 */
+			case 0x10: return input_port_read(space->machine, "DSW3");	/* DSW3 */
+			case 0x18: return input_port_read(space->machine, "DSW2");	/* DSW2 */
 		}
 		return 0;
 	}
@@ -285,12 +285,12 @@ static READ8_HANDLER ( suzume_dsw_r )
 
 static WRITE8_HANDLER ( suzume_bank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	int address;
 
 	suzume_bank = data;
 
-logerror("%04x: bank %02x\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 
 	/* bits 6, 4 and 3 used for something input related? */
 
@@ -301,7 +301,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(machine->activecpu),data);
 
 static WRITE8_HANDLER ( mjapinky_bank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	rombank = data;
 	memory_set_bankptr(1,ROM + 0x10000 + 0x8000 * data);
 }
@@ -316,16 +316,16 @@ static WRITE8_HANDLER( mjapinky_palbank_w )
 
 static READ8_HANDLER( mjapinky_dsw_r )
 {
-	if (rombank == 0x0e)	return input_port_read(machine, "DSW3");
-	else					return *(memory_region(machine, "main") + 0x10000 + 0x8000 * rombank);
+	if (rombank == 0x0e)	return input_port_read(space->machine, "DSW3");
+	else					return *(memory_region(space->machine, "main") + 0x10000 + 0x8000 * rombank);
 }
 
 static WRITE8_HANDLER ( tontonb_bank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	int address;
 
-logerror("%04x: bank %02x\n",cpu_get_pc(machine->activecpu),data);
+logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 
 	if (data == 0) return;	// tontonb fix?
 
@@ -340,10 +340,10 @@ logerror("%04x: bank %02x\n",cpu_get_pc(machine->activecpu),data);
 /* bits 5 and 6 seem to affect which Dip Switch to read in 'majs101b' */
 static WRITE8_HANDLER ( dynax_bank_w )
 {
-	UINT8 *rom = memory_region(machine, "main");
+	UINT8 *rom = memory_region(space->machine, "main");
 	int address;
 
-//logerror("%04x: bank %02x\n",cpu_get_pc(machine->activecpu),data);
+//logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 
 	dsw_select = data & 0x60;
 
@@ -506,17 +506,17 @@ static READ8_HANDLER( janptr96_dswsel_r )
 
 static READ8_HANDLER( janptr96_dsw_r )
 {
-	if (~dsw_select & 0x01) return input_port_read(machine, "DSW4");
-	if (~dsw_select & 0x02) return input_port_read(machine, "DSW3");
-	if (~dsw_select & 0x04) return input_port_read(machine, "DSW2");
-	if (~dsw_select & 0x08) return input_port_read(machine, "DSW1");
-	if (~dsw_select & 0x10) return input_port_read(machine, "DSWTOP");
+	if (~dsw_select & 0x01) return input_port_read(space->machine, "DSW4");
+	if (~dsw_select & 0x02) return input_port_read(space->machine, "DSW3");
+	if (~dsw_select & 0x04) return input_port_read(space->machine, "DSW2");
+	if (~dsw_select & 0x08) return input_port_read(space->machine, "DSW1");
+	if (~dsw_select & 0x10) return input_port_read(space->machine, "DSWTOP");
 	return 0xff;
 }
 
 static WRITE8_HANDLER( janptr96_rombank_w )
 {
-	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *ROM = memory_region(space->machine, "main");
 	memory_set_bankptr(1,ROM + 0x10000 + 0x8000 * data);
 }
 
@@ -570,19 +570,19 @@ static WRITE8_HANDLER( mjifb_coin_counter_w )
 static READ8_HANDLER( mjifb_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(machine, "main") + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(memory_region(space->machine, "main") + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
 	switch(offset)
 	{
-		case 0x8000:	return input_port_read(machine, "DSW4");		// dsw 4
-		case 0x8200:	return input_port_read(machine, "DSW3");		// dsw 3
-		case 0x9001:	return ay8910_read_port_0_r(machine, 0);	// inputs
-		case 0x9011:	return input_port_read(machine, "SYSTEM");
+		case 0x8000:	return input_port_read(space->machine, "DSW4");		// dsw 4
+		case 0x8200:	return input_port_read(space->machine, "DSW3");		// dsw 3
+		case 0x9001:	return ay8910_read_port_0_r(space, 0);	// inputs
+		case 0x9011:	return input_port_read(space->machine, "SYSTEM");
 	}
 
-	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(machine->activecpu), offset);
+	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(space->cpu), offset);
 	return 0xff;
 }
 
@@ -599,18 +599,18 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 	switch(offset)
 	{
 		case 0x8e00:	palette_base = data & 0x1f;	return;
-		case 0x9002:	ay8910_write_port_0_w(machine,0,data);			return;
-		case 0x9003:	ay8910_control_port_0_w(machine,0,data);		return;
+		case 0x9002:	ay8910_write_port_0_w(space,0,data);			return;
+		case 0x9003:	ay8910_control_port_0_w(space,0,data);		return;
 		case 0x9010:
-			mjifb_coin_counter_w(machine,0,data);
+			mjifb_coin_counter_w(space,0,data);
 			return;
-		case 0x9011:	input_port_select_w(machine,0,data);	return;
+		case 0x9011:	input_port_select_w(space,0,data);	return;
 		case 0x9013:
 //          if (data)   popmessage("%02x",data);
 			return;
 	}
 
-	logerror("%04X: unmapped input write at %04X = %02X\n", cpu_get_pc(machine->activecpu), offset,data);
+	logerror("%04X: unmapped input write at %04X = %02X\n", cpu_get_pc(space->cpu), offset,data);
 }
 
 static WRITE8_HANDLER( mjifb_videoram_w )
@@ -628,19 +628,19 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( mjifb_p3_r )
 {
-	return input_port_read(machine, "PORT3_5") >> 6;
+	return input_port_read(space->machine, "PORT3_5") >> 6;
 }
 static READ8_HANDLER( mjifb_p5_r )
 {
-	return input_port_read(machine, "PORT3_5");
+	return input_port_read(space->machine, "PORT3_5");
 }
 static READ8_HANDLER( mjifb_p6_r )
 {
-	return input_port_read(machine, "PORT6_7");
+	return input_port_read(space->machine, "PORT6_7");
 }
 static READ8_HANDLER( mjifb_p7_r )
 {
-	return input_port_read(machine, "PORT6_7") >> 4;
+	return input_port_read(space->machine, "PORT6_7") >> 4;
 }
 static READ8_HANDLER( mjifb_p8_r )
 {
@@ -677,19 +677,19 @@ ADDRESS_MAP_END
 static READ8_HANDLER( mjdejavu_rom_io_r )
 {
 	if (mjifb_rom_enable)
-		return ((UINT8*)(memory_region(machine, "main") + 0x10000 + rombank * 0x4000))[offset];
+		return ((UINT8*)(memory_region(space->machine, "main") + 0x10000 + rombank * 0x4000))[offset];
 
 	offset += 0x8000;
 
 	switch(offset)
 	{
-		case 0x8000:	return input_port_read(machine, "DSW2");		// dsw 2
-		case 0x8001:	return input_port_read(machine, "DSW1");		// dsw 1
-		case 0x9001:	return ay8910_read_port_0_r(machine, 0);	// inputs
-		case 0x9011:	return input_port_read(machine, "SYSTEM");
+		case 0x8000:	return input_port_read(space->machine, "DSW2");		// dsw 2
+		case 0x8001:	return input_port_read(space->machine, "DSW1");		// dsw 1
+		case 0x9001:	return ay8910_read_port_0_r(space, 0);	// inputs
+		case 0x9011:	return input_port_read(space->machine, "SYSTEM");
 	}
 
-	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(machine->activecpu), offset);
+	logerror("%04X: unmapped input read at %04X\n", cpu_get_pc(space->cpu), offset);
 	return 0xff;
 }
 
@@ -705,16 +705,16 @@ static WRITE8_HANDLER( mjdejavu_rom_io_w )
 	switch(offset)
 	{
 		case 0x8802:	palette_base = data & 0x1f;					return;
-		case 0x9002:	ay8910_write_port_0_w(machine,0,data);		return;
-		case 0x9003:	ay8910_control_port_0_w(machine,0,data);	return;
-		case 0x9010:	mjifb_coin_counter_w(machine,0,data);		return;
-		case 0x9011:	input_port_select_w(machine,0,data);		return;
+		case 0x9002:	ay8910_write_port_0_w(space,0,data);		return;
+		case 0x9003:	ay8910_control_port_0_w(space,0,data);	return;
+		case 0x9010:	mjifb_coin_counter_w(space,0,data);		return;
+		case 0x9011:	input_port_select_w(space,0,data);		return;
 		case 0x9013:
 //          if (data)   popmessage("%02x",data);
 			return;
 	}
 
-	logerror("%04X: unmapped input write at %04X = %02X\n", cpu_get_pc(machine->activecpu), offset,data);
+	logerror("%04X: unmapped input write at %04X = %02X\n", cpu_get_pc(space->cpu), offset,data);
 }
 
 static ADDRESS_MAP_START( mjdejavu_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -741,12 +741,12 @@ static void mjtensin_update_rombank(running_machine *machine)
 static WRITE8_HANDLER( mjtensin_p4_w )
 {
 	rombank = (rombank & 0xf0) | (data & 0x0f);
-	mjtensin_update_rombank(machine);
+	mjtensin_update_rombank(space->machine);
 }
 static WRITE8_HANDLER( mjtensin_6ff3_w )
 {
 	rombank = (data << 4) | (rombank & 0x0f);
-	mjtensin_update_rombank(machine);
+	mjtensin_update_rombank(space->machine);
 }
 
 static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -783,12 +783,12 @@ static void cafetime_update_rombank(running_machine *machine)
 static WRITE8_HANDLER( cafetime_p4_w )
 {
 	rombank = (rombank & 0xf0) | (data & 0x0f);
-	cafetime_update_rombank(machine);
+	cafetime_update_rombank(space->machine);
 }
 static WRITE8_HANDLER( cafetime_p3_w )
 {
 	rombank = (rombank & 0x0f) | ((data & 0x0c) << 2);
-	cafetime_update_rombank(machine);
+	cafetime_update_rombank(space->machine);
 }
 
 static WRITE8_HANDLER( cafetime_dsw_w )
@@ -799,13 +799,13 @@ static READ8_HANDLER( cafetime_dsw_r )
 {
 	switch( dsw_select )
 	{
-		case 0x00: return input_port_read(machine, "DSW1");
-		case 0x01: return input_port_read(machine, "DSW2");
-		case 0x02: return input_port_read(machine, "DSW3");
-		case 0x03: return input_port_read(machine, "DSW4");
-		case 0x04: return input_port_read(machine, "DSWTOP");
+		case 0x00: return input_port_read(space->machine, "DSW1");
+		case 0x01: return input_port_read(space->machine, "DSW2");
+		case 0x02: return input_port_read(space->machine, "DSW3");
+		case 0x03: return input_port_read(space->machine, "DSW4");
+		case 0x04: return input_port_read(space->machine, "DSWTOP");
 	}
-	logerror("%04X: unmapped dsw read %02X\n", cpu_get_pc(machine->activecpu), dsw_select);
+	logerror("%04X: unmapped dsw read %02X\n", cpu_get_pc(space->cpu), dsw_select);
 	return 0xff;
 }
 

@@ -149,7 +149,7 @@ static MACHINE_RESET( capbowl )
 static WRITE8_HANDLER( capbowl_rom_select_w )
 {
 	int bankaddress = ((data & 0x0c) << 13) + ((data & 0x01) << 14);
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000 + bankaddress);
+	memory_set_bankptr(1, memory_region(space->machine, "main") + 0x10000 + bankaddress);
 }
 
 
@@ -162,23 +162,23 @@ static WRITE8_HANDLER( capbowl_rom_select_w )
 
 static READ8_HANDLER( track_0_r )
 {
-	return (input_port_read(machine, "IN0") & 0xf0) | ((input_port_read(machine, "TRACKY") - last_trackball_val[0]) & 0x0f);
+	return (input_port_read(space->machine, "IN0") & 0xf0) | ((input_port_read(space->machine, "TRACKY") - last_trackball_val[0]) & 0x0f);
 }
 
 
 static READ8_HANDLER( track_1_r )
 {
-	return (input_port_read(machine, "IN1") & 0xf0) | ((input_port_read(machine, "TRACKX") - last_trackball_val[1]) & 0x0f);
+	return (input_port_read(space->machine, "IN1") & 0xf0) | ((input_port_read(space->machine, "TRACKX") - last_trackball_val[1]) & 0x0f);
 }
 
 
 static WRITE8_HANDLER( track_reset_w )
 {
 	/* reset the trackball counters */
-	last_trackball_val[0] = input_port_read(machine, "TRACKY");
-	last_trackball_val[1] = input_port_read(machine, "TRACKX");
+	last_trackball_val[0] = input_port_read(space->machine, "TRACKY");
+	last_trackball_val[1] = input_port_read(space->machine, "TRACKX");
 
-	watchdog_reset_w(machine, offset, data);
+	watchdog_reset_w(space, offset, data);
 }
 
 
@@ -191,8 +191,8 @@ static WRITE8_HANDLER( track_reset_w )
 
 static WRITE8_HANDLER( capbowl_sndcmd_w )
 {
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
-	soundlatch_w(machine, offset, data);
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE);
+	soundlatch_w(space, offset, data);
 }
 
 

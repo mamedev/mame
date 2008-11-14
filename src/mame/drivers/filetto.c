@@ -113,15 +113,15 @@ static READ8_HANDLER( vga_hvretrace_r )
 	static UINT8 res;
 	static int h,w;
 	res = 0;
-	h = video_screen_get_height(machine->primary_screen);
-	w = video_screen_get_width(machine->primary_screen);
+	h = video_screen_get_height(space->machine->primary_screen);
+	w = video_screen_get_width(space->machine->primary_screen);
 
 //	popmessage("%d %d",h,w);
 
-	if (video_screen_get_hpos(machine->primary_screen) > h)
+	if (video_screen_get_hpos(space->machine->primary_screen) > h)
 		res|= 1;
 
-	if (video_screen_get_vpos(machine->primary_screen) > w)
+	if (video_screen_get_vpos(space->machine->primary_screen) > w)
 		res|= 8;
 
 	return res;
@@ -290,7 +290,7 @@ static VIDEO_UPDATE( filetto )
 
 static READ8_HANDLER( vga_regs_r )
 {
-	logerror("(PC=%05x) Warning: VGA reg port read\n",cpu_get_pc(machine->activecpu));
+	logerror("(PC=%05x) Warning: VGA reg port read\n",cpu_get_pc(space->cpu));
 	return 0xff;
 }
 
@@ -310,7 +310,7 @@ static WRITE8_HANDLER( vga_regs_w )
 			//logerror("write %02x to video register [%02x]",data,video_index);
 		}
 		else
-			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",cpu_get_pc(machine->activecpu),video_index,data);
+			logerror("(PC=%05x) Warning: Undefined VGA reg port write (I=%02x D=%02x)\n",cpu_get_pc(space->cpu),video_index,data);
 	}
 }
 
@@ -334,9 +334,9 @@ static UINT8 disk_data[2];
 
 static READ8_HANDLER( disk_iobank_r )
 {
-	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(machine->activecpu));
-	//if(offset == 0) return input_port_read(machine, "DSW");
-	if(offset == 1) return input_port_read(machine, "IN1");
+	//printf("Read Prototyping card [%02x] @ PC=%05x\n",offset,cpu_get_pc(space->cpu));
+	//if(offset == 0) return input_port_read(space->machine, "DSW");
+	if(offset == 1) return input_port_read(space->machine, "IN1");
 
 	return disk_data[offset];
 }
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( disk_iobank_w )
 	if (newbank != bank)
 	{
 		bank = newbank;
-		memory_set_bankptr( 1,memory_region(machine, "user1") + 0x10000 * bank );
+		memory_set_bankptr( 1,memory_region(space->machine, "user1") + 0x10000 * bank );
 	}
 
 	lastvalue = data;
@@ -511,7 +511,7 @@ static UINT8 status;
 static READ8_HANDLER( fdc765_status_r )
 {
 	static UINT8 tmp,clr_status;
-//	popmessage("Read FDC status @ PC=%05x",cpu_get_pc(machine->activecpu));
+//	popmessage("Read FDC status @ PC=%05x",cpu_get_pc(space->cpu));
 	tmp = status | 0x80;
 	clr_status++;
 	if(clr_status == 0x10)

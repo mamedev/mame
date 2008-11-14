@@ -138,7 +138,7 @@ READ32_HANDLER(pci_32le_r)
 	if (LOG_PCI)
 	{
 		logerror("pci_32le_r(): CPU #%d pc=0x%08X offset=%d result=0x%08X\n",
-			cpunum_get_active(), (unsigned) cpu_get_reg(machine->activecpu, REG_PC), offset, result);
+			cpunum_get_active(), (unsigned) cpu_get_reg(space->cpu, REG_PC), offset, result);
 	}
 	return result;
 }
@@ -155,7 +155,7 @@ WRITE32_HANDLER(pci_32le_w)
 	if (LOG_PCI)
 	{
 		logerror("pci_32le_w(): CPU #%d pc=0x%08X offset=%d data=0x%08X\n",
-			cpunum_get_active(), (unsigned) cpu_get_reg(machine->activecpu, REG_PC), offset, data);
+			cpunum_get_active(), (unsigned) cpu_get_reg(space->cpu, REG_PC), offset, data);
 	}
 
 	switch(offset)
@@ -193,5 +193,5 @@ WRITE32_HANDLER(pci_32le_w)
 
 
 
-READ64_HANDLER(pci_64be_r) { return read64be_with_32le_handler(pci_32le_r, machine, offset, mem_mask); }
-WRITE64_HANDLER(pci_64be_w) { write64be_with_32le_handler(pci_32le_w, machine, offset, data, mem_mask); }
+READ64_HANDLER(pci_64be_r) { return read64be_with_32le_handler(pci_32le_r, space->machine, offset, mem_mask); }
+WRITE64_HANDLER(pci_64be_w) { write64be_with_32le_handler(pci_32le_w, space->machine, offset, data, mem_mask); }

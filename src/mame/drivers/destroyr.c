@@ -81,13 +81,13 @@ static WRITE8_HANDLER( destroyr_cursor_load_w )
 {
 	destroyr_cursor = data;
 
-	watchdog_reset_w(machine, offset, data);
+	watchdog_reset_w(space, offset, data);
 }
 
 
 static WRITE8_HANDLER( destroyr_interrupt_ack_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -122,7 +122,7 @@ static WRITE8_HANDLER( destroyr_output_w )
 		/* bit 0 => low explosion */
 		break;
 	case 8:
-		destroyr_misc_w(machine, offset, data);
+		destroyr_misc_w(space, offset, data);
 		break;
 	default:
 		logerror("unmapped output port %d\n", offset);
@@ -137,7 +137,7 @@ static READ8_HANDLER( destroyr_input_r )
 
 	if (offset == 0)
 	{
-		UINT8 ret = input_port_read(machine, "IN0");
+		UINT8 ret = input_port_read(space->machine, "IN0");
 
 		if (destroyr_potsense[0] && destroyr_potmask[0])
 			ret |= 4;
@@ -149,7 +149,7 @@ static READ8_HANDLER( destroyr_input_r )
 
 	if (offset == 1)
 	{
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	}
 
 	logerror("unmapped input port %d\n", offset);
@@ -160,7 +160,7 @@ static READ8_HANDLER( destroyr_input_r )
 
 static READ8_HANDLER( destroyr_scanline_r )
 {
-	return video_screen_get_vpos(machine->primary_screen);
+	return video_screen_get_vpos(space->machine->primary_screen);
 }
 
 

@@ -34,7 +34,7 @@ VIDEO_UPDATE(xyonix);
 
 static WRITE8_HANDLER( xyonix_irqack_w )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 
@@ -82,7 +82,7 @@ static void handle_coins(running_machine *machine, int coin)
 
 static READ8_HANDLER ( xyonix_io_r )
 {
-	int regPC = cpu_get_pc(machine->activecpu);
+	int regPC = cpu_get_pc(space->cpu);
 
 	if (regPC == 0x27ba)
 		return 0x88;
@@ -98,23 +98,23 @@ static READ8_HANDLER ( xyonix_io_r )
 		switch (e0_data)
 		{
 			case 0x81 :
-				return input_port_read(machine, "P1") & 0x7f;
+				return input_port_read(space->machine, "P1") & 0x7f;
 				break;
 			case 0x82 :
-				return input_port_read(machine, "P2") & 0x7f;
+				return input_port_read(space->machine, "P2") & 0x7f;
 				break;
 			case 0x91:
 				/* check coin inputs */
-				coin = ((input_port_read(machine, "P1") & 0x80) >> 7) | ((input_port_read(machine, "P2") & 0x80) >> 6);
+				coin = ((input_port_read(space->machine, "P1") & 0x80) >> 7) | ((input_port_read(space->machine, "P2") & 0x80) >> 6);
 				if (coin ^ prev_coin && coin != 3)
 				{
-					if (credits < 9) handle_coins(machine, coin);
+					if (credits < 9) handle_coins(space->machine, coin);
 				}
 				prev_coin = coin;
 				return credits;
 				break;
 			case 0x92:
-				return ((input_port_read(machine, "P1") & 0x80) >> 7) | ((input_port_read(machine, "P2") & 0x80) >> 6);
+				return ((input_port_read(space->machine, "P1") & 0x80) >> 7) | ((input_port_read(space->machine, "P2") & 0x80) >> 6);
 				break;
 			case 0xe0:	/* reset? */
 				coins = 0;
@@ -126,10 +126,10 @@ static READ8_HANDLER ( xyonix_io_r )
 				return 0xff;
 				break;
 			case 0xfe:	/* Dip Switches 1 to 4 */
-				return input_port_read(machine, "DSW") & 0x0f;
+				return input_port_read(space->machine, "DSW") & 0x0f;
 				break;
 			case 0xff:	/* Dip Switches 5 to 8 */
-				return input_port_read(machine, "DSW") >> 4;
+				return input_port_read(space->machine, "DSW") >> 4;
 				break;
 		}
 	}
@@ -142,7 +142,7 @@ static READ8_HANDLER ( xyonix_io_r )
 
 static WRITE8_HANDLER ( xyonix_io_w )
 {
-//  logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(machine->activecpu));
+//  logerror ("xyonix_port_e0_w %02x - PC = %04x\n", data, cpu_get_pc(space->cpu));
 	e0_data = data;
 }
 

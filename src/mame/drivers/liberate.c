@@ -44,7 +44,7 @@ WRITE8_HANDLER( liberate_videoram_w );
 
 static READ8_HANDLER( deco16_bank_r )
 {
-	const UINT8 *ROM = memory_region(machine, "user1");
+	const UINT8 *ROM = memory_region(space->machine, "user1");
 
 	/* The tilemap bank can be swapped into main memory */
 	if (deco16_bank)
@@ -53,10 +53,10 @@ static READ8_HANDLER( deco16_bank_r )
 	/* Else the handler falls through to read the usual address */
 	if (offset<0x800) return videoram[offset];
 	if (offset<0x1000) return spriteram[offset-0x800];
-	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(machine->activecpu),offset); return 0; }
+	if (offset<0x2200) { logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset); return 0; }
 	if (offset<0x2800) return scratchram[offset-0x2200];
 
-	logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(machine->activecpu),offset);
+	logerror("%04x: Unmapped bank read %04x\n",cpu_get_pc(space->cpu),offset);
 	return 0;
 }
 
@@ -67,16 +67,16 @@ static WRITE8_HANDLER( deco16_bank_w )
 
 static READ8_HANDLER( deco16_io_r )
 {
-	const UINT8 *ROM = memory_region(machine, "main");
+	const UINT8 *ROM = memory_region(space->machine, "main");
 
 	if (deco16_bank) {
-		if (offset==0) return input_port_read(machine, "IN1"); /* Player 1 controls */
-		if (offset==1) return input_port_read(machine, "IN2"); /* Player 2 controls */
-		if (offset==2) return input_port_read(machine, "IN3"); /* Vblank, coins */
-		if (offset==3) return input_port_read(machine, "DSW1"); /* Dip 1 */
-		if (offset==4) return input_port_read(machine, "DSW2"); /* Dip 2 */
+		if (offset==0) return input_port_read(space->machine, "IN1"); /* Player 1 controls */
+		if (offset==1) return input_port_read(space->machine, "IN2"); /* Player 2 controls */
+		if (offset==2) return input_port_read(space->machine, "IN3"); /* Vblank, coins */
+		if (offset==3) return input_port_read(space->machine, "DSW1"); /* Dip 1 */
+		if (offset==4) return input_port_read(space->machine, "DSW2"); /* Dip 2 */
 
-		logerror("%04x:  Read input %d\n",cpu_get_pc(machine->activecpu),offset);
+		logerror("%04x:  Read input %d\n",cpu_get_pc(space->cpu),offset);
 		return 0xff;
 	}
 	return ROM[0x8000+offset];

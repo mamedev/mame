@@ -579,12 +579,12 @@ static WRITE8_DEVICE_HANDLER( p8257_drq_w )
 static READ8_HANDLER( dkong_in2_r )
 {
 	/* mcu status (sound feedback) is inverted bit4 from port B (8039) */
-	const device_config *devvp2 = devtag_get_device(machine, LATCH8, "virtual_p2");
+	const device_config *devvp2 = devtag_get_device(space->machine, LATCH8, "virtual_p2");
 	UINT8 mcustatus = latch8_bit4_q_r(devvp2, 0);
 
 	UINT8 r;
 
-	r = (input_port_read(machine, "IN2") & 0xBF) | (mcustatus << 6);
+	r = (input_port_read(space->machine, "IN2") & 0xBF) | (mcustatus << 6);
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
@@ -597,7 +597,7 @@ static READ8_HANDLER( dkongjr_in2_r )
 
 	UINT8 r;
 
-	r = (input_port_read(machine, "IN2") & 0xBF) | 0x40;
+	r = (input_port_read(space->machine, "IN2") & 0xBF) | 0x40;
 	coin_counter_w(offset, r >> 7);
 	if (r & 0x10)
 		r = (r & ~0x10) | 0x80; /* service ==> coin */
@@ -618,7 +618,7 @@ static WRITE8_HANDLER( s2650_mirror_w )
 
 static READ8_HANDLER( epos_decrypt_rom )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 
 	if (offset & 0x01)
 	{
@@ -648,9 +648,9 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 static WRITE8_HANDLER( s2650_data_w )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(machine->activecpu), data);
+	logerror("write : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), data);
 #endif
 
 	state->hunchloopback = data;
@@ -658,12 +658,12 @@ static WRITE8_HANDLER( s2650_data_w )
 
 static READ8_HANDLER( s2650_port0_r )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("port 0 : pc = %04x, loopback = %02x\n",cpu_get_pc(machine->activecpu), state->hunchloopback);
+	logerror("port 0 : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), state->hunchloopback);
 #endif
 
-	switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(machine->activecpu)))
+	switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(space->cpu)))
 	{
 		case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x00e9):  return 0xff;
 		case COMBINE_TYPE_PC(DK2650_HUNCHBKD, 0x0114):  return 0xfb; //fb
@@ -679,18 +679,18 @@ static READ8_HANDLER( s2650_port0_r )
 		case DK2650_SHOOTGAL:  return 0x00;
 		case DK2650_SPCLFORC:  return 0x00;
 	}
-	fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(machine->activecpu));
+	fatalerror("Unhandled read from port 0 : pc = %4x\n",cpu_get_pc(space->cpu));
 }
 
 
 static READ8_HANDLER( s2650_port1_r )
 {
-	dkong_state *state = machine->driver_data;
+	dkong_state *state = space->machine->driver_data;
 #if DEBUG_PROTECTION
-	logerror("port 1 : pc = %04x, loopback = %02x\n",cpu_get_pc(machine->activecpu), state->hunchloopback);
+	logerror("port 1 : pc = %04x, loopback = %02x\n",cpu_get_pc(space->cpu), state->hunchloopback);
 #endif
 
-	switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(machine->activecpu)))
+	switch (COMBINE_TYPE_PC(state->protect_type, cpu_get_pc(space->cpu)))
 	{
 		case COMBINE_TYPE_PC(DK2650_EIGHTACT, 0x0021):  return 0x00;
 		case COMBINE_TYPE_PC(DK2650_HERBIEDK, 0x002b):  return 0x00;
@@ -703,7 +703,7 @@ static READ8_HANDLER( s2650_port1_r )
 		case DK2650_EIGHTACT:  return 1;
 		case DK2650_HERBIEDK:  return 1;
 	}
-	fatalerror("Unhandled read from port 1 : pc = %4x\n",cpu_get_pc(machine->activecpu));
+	fatalerror("Unhandled read from port 1 : pc = %4x\n",cpu_get_pc(space->cpu));
 }
 
 
@@ -711,42 +711,42 @@ static WRITE8_HANDLER( dkong3_2a03_reset_w )
 {
 	if (data & 1)
 	{
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
 	}
 	else
 	{
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 	}
 }
 
 static READ8_HANDLER( strtheat_inputport_0_r )
 {
-	if(input_port_read(machine, "DSW0") & 0x40)
+	if(input_port_read(space->machine, "DSW0") & 0x40)
 	{
 		/* Joystick inputs */
-		return input_port_read(machine, "IN0");
+		return input_port_read(space->machine, "IN0");
 	}
 	else
 	{
 		/* Steering Wheel inputs */
-		return (input_port_read(machine, "IN0") & ~3) | (input_port_read(machine, "IN4") & 3);
+		return (input_port_read(space->machine, "IN0") & ~3) | (input_port_read(space->machine, "IN4") & 3);
 	}
 }
 
 
 static READ8_HANDLER( strtheat_inputport_1_r )
 {
-	if(input_port_read(machine, "DSW0") & 0x40)
+	if(input_port_read(space->machine, "DSW0") & 0x40)
 	{
 		/* Joystick inputs */
-		return input_port_read(machine, "IN1");
+		return input_port_read(space->machine, "IN1");
 	}
 	else
 	{
 		/* Steering Wheel inputs */
-		return (input_port_read(machine, "IN1") & ~3) | (input_port_read(machine, "IN5") & 3);
+		return (input_port_read(space->machine, "IN1") & ~3) | (input_port_read(space->machine, "IN5") & 3);
 	}
 }
 

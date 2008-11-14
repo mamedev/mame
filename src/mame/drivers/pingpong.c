@@ -53,7 +53,7 @@ static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 	{
 		int bank = data & 7;
 		int bankaddr = question_addr_high | ((data - 0x60) * 0x100);
-		UINT8 *questions = memory_region(machine, "user1") + bankaddr;
+		UINT8 *questions = memory_region(space->machine, "user1") + bankaddr;
 		memory_set_bankptr(bank + 1,questions);
 
 	}

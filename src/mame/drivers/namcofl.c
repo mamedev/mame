@@ -198,11 +198,11 @@ static WRITE32_HANDLER( namcofl_sysreg_w )
 		if (data == 0)	// RAM at 00000000, ROM at 10000000
 		{
 			memory_set_bankptr( 1, namcofl_workram );
-			memory_set_bankptr( 2, memory_region(machine, "main") );
+			memory_set_bankptr( 2, memory_region(space->machine, "main") );
 		}
 		else		// ROM at 00000000, RAM at 10000000
 		{
-			memory_set_bankptr( 1, memory_region(machine, "main") );
+			memory_set_bankptr( 1, memory_region(space->machine, "main") );
 			memory_set_bankptr( 2, namcofl_workram );
 		}
 	}
@@ -217,7 +217,7 @@ static WRITE32_HANDLER( namcofl_paletteram_w )
 		UINT16 v = paletteram32[offset] >> 16;
 		UINT16 triggerscanline=(((v>>8)&0xff)|((v&0xff)<<8))-(32+1);
 
-		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, triggerscanline, 0), 0);
+		timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(space->machine->primary_screen, triggerscanline, 0), 0);
 	}
 }
 

@@ -261,7 +261,7 @@ static READ32_HANDLER( deco32_irq_controller_r )
 
 	switch (offset) {
 	case 2: /* Raster IRQ ACK - value read is not used */
-		cpu_set_input_line(machine->cpu[0], ARM_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[0], ARM_IRQ_LINE, CLEAR_LINE);
 		return 0;
 
 	case 3: /* Irq controller
@@ -278,15 +278,15 @@ static READ32_HANDLER( deco32_irq_controller_r )
 
         /* ZV03082007 - video_screen_get_vblank() doesn't work for Captain America, as it expects
            that this bit is NOT set in rows 0-7. */
-        vblank = video_screen_get_vpos(machine->primary_screen) > video_screen_get_visible_area(machine->primary_screen)->max_y;
+        vblank = video_screen_get_vpos(space->machine->primary_screen) > video_screen_get_visible_area(space->machine->primary_screen)->max_y;
 		if (vblank)
 			return 0xffffff80 | 0x1 | 0x10; /* Assume VBL takes priority over possible raster/lightgun irq */
 
-		return 0xffffff80 | vblank | (cpu_getiloops(machine->activecpu) ? 0x40 : 0x20);
+		return 0xffffff80 | vblank | (cpu_getiloops(space->cpu) ? 0x40 : 0x20);
 //      return 0xffffff80 | vblank | (0x40); //test for lock load guns
 	}
 
-	logerror("%08x: Unmapped IRQ read %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset,mem_mask);
+	logerror("%08x: Unmapped IRQ read %08x (%08x)\n",cpu_get_pc(space->cpu),offset,mem_mask);
 	return 0xffffffff;
 }
 
@@ -296,14 +296,14 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 
 	switch (offset) {
 	case 0: /* IRQ enable - probably an irq mask, but only values used are 0xc8 and 0xca */
-//      logerror("%08x:  IRQ write %d %08x\n",cpu_get_pc(machine->activecpu),offset,data);
+//      logerror("%08x:  IRQ write %d %08x\n",cpu_get_pc(space->cpu),offset,data);
 		raster_enable=(data&0xff)==0xc8; /* 0xca seems to be off */
 		break;
 
 	case 1: /* Raster IRQ scanline position, only valid for values between 1 & 239 (0 and 240-256 do NOT generate IRQ's) */
 		scanline=(data&0xff);
 		if (raster_enable && scanline>0 && scanline<240)
-			timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(machine->primary_screen, scanline-1, 320),0);
+			timer_adjust_oneshot(raster_irq_timer,video_screen_get_time_until_pos(space->machine->primary_screen, scanline-1, 320),0);
 		else
 			timer_adjust_oneshot(raster_irq_timer,attotime_never,0);
 		break;
@@ -314,8 +314,8 @@ static WRITE32_HANDLER( deco32_irq_controller_w )
 
 static WRITE32_HANDLER( deco32_sound_w )
 {
-	soundlatch_w(machine,0,data & 0xff);
-	cpu_set_input_line(machine->cpu[1],0,HOLD_LINE);
+	soundlatch_w(space,0,data & 0xff);
+	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 }
 
 static READ32_HANDLER( deco32_71_r )
@@ -329,26 +329,26 @@ static READ32_HANDLER( captaven_prot_r )
 {
 	/* Protection/IO chip 75, same as Lemmings & Robocop 2 */
 	switch (offset<<2) {
-	case 0x0a0: return input_port_read(machine, "IN0"); /* Player 1 & 2 controls */
-	case 0x158: return input_port_read(machine, "IN1"); /* Player 3 & 4 controls */
-	case 0xed4: return input_port_read(machine, "IN2"); /* Misc */
+	case 0x0a0: return input_port_read(space->machine, "IN0"); /* Player 1 & 2 controls */
+	case 0x158: return input_port_read(space->machine, "IN1"); /* Player 3 & 4 controls */
+	case 0xed4: return input_port_read(space->machine, "IN2"); /* Misc */
 	}
 
-	logerror("%08x: Unmapped protection read %04x\n",cpu_get_pc(machine->activecpu),offset<<2);
+	logerror("%08x: Unmapped protection read %04x\n",cpu_get_pc(space->cpu),offset<<2);
 	return 0xffffffff;
 }
 
 static READ32_HANDLER( captaven_soundcpu_r )
 {
 	/* Top byte - top bit low == sound cpu busy, bottom word is dips */
-	return 0xffff0000 | input_port_read(machine, "DSW");
+	return 0xffff0000 | input_port_read(space->machine, "DSW");
 }
 
 static READ32_HANDLER( fghthist_control_r )
 {
 	switch (offset) {
-	case 0: return 0xffff0000 | input_port_read(machine, "IN0");
-	case 1: return 0xffff0000 | input_port_read(machine, "IN1"); //check top bits??
+	case 0: return 0xffff0000 | input_port_read(space->machine, "IN0");
+	case 1: return 0xffff0000 | input_port_read(space->machine, "IN1"); //check top bits??
 	case 2: return 0xfffffffe | eeprom_read_bit();
 	}
 
@@ -372,22 +372,22 @@ static WRITE32_HANDLER( fghthist_eeprom_w )
 
 static READ32_HANDLER( dragngun_service_r )
 {
-//  logerror("%08x:Read service\n",cpu_get_pc(machine->activecpu));
-	return input_port_read(machine, "IN2");
+//  logerror("%08x:Read service\n",cpu_get_pc(space->cpu));
+	return input_port_read(space->machine, "IN2");
 }
 
 static READ32_HANDLER( lockload_gun_mirror_r )
 {
-//logerror("%08x:Read gun %d\n",cpu_get_pc(machine->activecpu),offset);
-//return ((mame_rand(machine)%0xffff)<<16) | mame_rand(machine)%0xffff;
+//logerror("%08x:Read gun %d\n",cpu_get_pc(space->cpu),offset);
+//return ((mame_rand(space->machine)%0xffff)<<16) | mame_rand(space->machine)%0xffff;
 	if (offset) /* Mirror of player 1 and player 2 fire buttons */
-		return input_port_read(machine, "IN4") | ((mame_rand(machine)%0xff)<<16);
-	return input_port_read(machine, "IN3") | input_port_read(machine, "LIGHT0_X") | (input_port_read(machine, "LIGHT0_X")<<16) | (input_port_read(machine, "LIGHT0_X")<<24); //((mame_rand(machine)%0xff)<<16);
+		return input_port_read(space->machine, "IN4") | ((mame_rand(space->machine)%0xff)<<16);
+	return input_port_read(space->machine, "IN3") | input_port_read(space->machine, "LIGHT0_X") | (input_port_read(space->machine, "LIGHT0_X")<<16) | (input_port_read(space->machine, "LIGHT0_X")<<24); //((mame_rand(space->machine)%0xff)<<16);
 }
 
 static READ32_HANDLER( dragngun_prot_r )
 {
-//  logerror("%08x:Read prot %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
+//  logerror("%08x:Read prot %08x (%08x)\n",cpu_get_pc(space->cpu),offset<<1,mem_mask);
 
 	static int strobe=0;
 	if (!strobe) strobe=8;
@@ -396,9 +396,9 @@ static READ32_HANDLER( dragngun_prot_r )
 //definitely vblank in locked load
 
 	switch (offset<<1) {
-	case 0x140/2: return 0xffff0000 | input_port_read(machine, "IN0"); /* IN0 */
-	case 0xadc/2: return 0xffff0000 | input_port_read(machine, "IN1") | strobe; /* IN1 */
-	case 0x6a0/2: return 0xffff0000 | input_port_read(machine, "DSW"); /* IN2 (Dip switch) */
+	case 0x140/2: return 0xffff0000 | input_port_read(space->machine, "IN0"); /* IN0 */
+	case 0xadc/2: return 0xffff0000 | input_port_read(space->machine, "IN1") | strobe; /* IN1 */
+	case 0x6a0/2: return 0xffff0000 | input_port_read(space->machine, "DSW"); /* IN2 (Dip switch) */
 	}
 	return 0xffffffff;
 }
@@ -409,10 +409,10 @@ static READ32_HANDLER( dragngun_lightgun_r )
 {
 	/* Ports 0-3 are read, but seem unused */
 	switch (dragngun_lightgun_port) {
-	case 4: return input_port_read(machine, "LIGHT0_X"); break;
-	case 5: return input_port_read(machine, "LIGHT1_X"); break;
-	case 6: return input_port_read(machine, "LIGHT0_Y"); break;
-	case 7: return input_port_read(machine, "LIGHT1_Y"); break;
+	case 4: return input_port_read(space->machine, "LIGHT0_X"); break;
+	case 5: return input_port_read(space->machine, "LIGHT1_X"); break;
+	case 6: return input_port_read(space->machine, "LIGHT0_Y"); break;
+	case 7: return input_port_read(space->machine, "LIGHT1_Y"); break;
 	}
 
 //  logerror("Illegal lightgun port %d read \n",dragngun_lightgun_port);
@@ -438,17 +438,17 @@ static WRITE32_HANDLER( dragngun_eeprom_w )
 		eeprom_set_cs_line((data & 0x4) ? CLEAR_LINE : ASSERT_LINE);
 		return;
 	}
-	logerror("%08x:Write control 1 %08x %08x\n",cpu_get_pc(machine->activecpu),offset,data);
+	logerror("%08x:Write control 1 %08x %08x\n",cpu_get_pc(space->cpu),offset,data);
 }
 
 static READ32_HANDLER(dragngun_oki_2_r)
 {
-	return okim6295_status_2_r(machine, 0);
+	return okim6295_status_2_r(space, 0);
 }
 
 static WRITE32_HANDLER(dragngun_oki_2_w)
 {
-	okim6295_data_2_w(machine, 0, data&0xff);
+	okim6295_data_2_w(space, 0, data&0xff);
 }
 
 /**********************************************************************************/
@@ -458,12 +458,12 @@ static int tattass_eprom_bit;
 static READ32_HANDLER( tattass_prot_r )
 {
 	switch (offset<<1) {
-	case 0x280: return input_port_read(machine, "IN0") << 16;
-	case 0x4c4: return input_port_read(machine, "IN1") << 16;
+	case 0x280: return input_port_read(space->machine, "IN0") << 16;
+	case 0x4c4: return input_port_read(space->machine, "IN1") << 16;
 	case 0x35a: return tattass_eprom_bit << 16;
 	}
 
-	logerror("%08x:Read prot %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
+	logerror("%08x:Read prot %08x (%08x)\n",cpu_get_pc(space->cpu),offset<<1,mem_mask);
 
 	return 0xffffffff;
 }
@@ -475,7 +475,7 @@ static WRITE32_HANDLER( tattass_prot_w )
 		/* 'Swap bits 0 and 3 to correct for design error from BSMT schematic' */
 		int soundcommand = (data>>16)&0xff;
 		soundcommand = BITSWAP8(soundcommand,7,6,5,4,0,2,1,3);
-		soundlatch_w(machine,0,soundcommand);
+		soundlatch_w(space,0,soundcommand);
 	}
 }
 
@@ -601,13 +601,13 @@ static WRITE32_HANDLER( tattass_control_w )
 	}
 
 	/* Playfield control - Only written in full word memory accesses */
-	deco32_pri_w(machine,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
+	deco32_pri_w(space,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 
 	/* Sound board reset control */
 	if (data&0x80)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 	else
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* bit 0x4 fade cancel? */
 	/* bit 0x8 ?? */
@@ -621,12 +621,12 @@ static READ32_HANDLER( nslasher_prot_r )
 {
 
 	switch (offset<<1) {
-	case 0x280: return input_port_read(machine, "IN0") << 16| 0xffff; /* IN0 */
-	case 0x4c4: return input_port_read(machine, "IN1") << 16| 0xffff; /* IN1 */
+	case 0x280: return input_port_read(space->machine, "IN0") << 16| 0xffff; /* IN0 */
+	case 0x4c4: return input_port_read(space->machine, "IN1") << 16| 0xffff; /* IN1 */
 	case 0x35a: return (eeprom_read_bit()<< 16) | 0xffff; // Debug switch in low word??
 	}
 
-	//logerror("%08x: Read unmapped prot %08x (%08x)\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask);
+	//logerror("%08x: Read unmapped prot %08x (%08x)\n",cpu_get_pc(space->cpu),offset<<1,mem_mask);
 
 	return 0xffffffff;
 }
@@ -639,22 +639,22 @@ static WRITE32_HANDLER( nslasher_eeprom_w )
 		eeprom_write_bit(data & 0x10);
 		eeprom_set_cs_line((data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
-		deco32_pri_w(machine,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
+		deco32_pri_w(space,0,data&0x3,0xffffffff); /* Bit 0 - layer priority toggle, Bit 1 - BG2/3 Joint mode (8bpp) */
 	}
 }
 
 
 static WRITE32_HANDLER( nslasher_prot_w )
 {
-	//logerror("%08x:write prot %08x (%08x) %08x\n",cpu_get_pc(machine->activecpu),offset<<1,mem_mask,data);
+	//logerror("%08x:write prot %08x (%08x) %08x\n",cpu_get_pc(space->cpu),offset<<1,mem_mask,data);
 
 	/* Only sound port of chip is used - no protection */
 	if (offset==0x700/4) {
 
 		/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
-		soundlatch_w(machine,0,(data>>16)&0xff);
+		soundlatch_w(space,0,(data>>16)&0xff);
 		nslasher_sound_irq |= 0x02;
-		cpu_set_input_line(machine->cpu[1], 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
 	}
 }
 
@@ -1131,8 +1131,8 @@ static WRITE8_HANDLER(deco32_bsmt0_w)
 
 static WRITE8_HANDLER(deco32_bsmt1_w)
 {
-	bsmt2000_data_0_w(machine, offset^ 0xff, ((bsmt_latch<<8)|data), 0xffff);
-	cpu_set_input_line(machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE); /* BSMT is ready */
+	bsmt2000_data_0_w(space, offset^ 0xff, ((bsmt_latch<<8)|data), 0xffff);
+	cpu_set_input_line(space->machine->cpu[1], M6809_IRQ_LINE, HOLD_LINE); /* BSMT is ready */
 }
 
 static READ8_HANDLER(deco32_bsmt_status_r)
@@ -1178,8 +1178,8 @@ static READ8_HANDLER(latch_r)
 {
 	/* bit 1 of nslasher_sound_irq specifies IRQ command writes */
 	nslasher_sound_irq &= ~0x02;
-	cpu_set_input_line(machine->cpu[1], 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
-	return soundlatch_r(machine,0);
+	cpu_set_input_line(space->machine->cpu[1], 0, (nslasher_sound_irq != 0) ? ASSERT_LINE : CLEAR_LINE);
+	return soundlatch_r(space,0);
 }
 
 static ADDRESS_MAP_START( nslasher_sound, ADDRESS_SPACE_PROGRAM, 8 )

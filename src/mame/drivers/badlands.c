@@ -217,7 +217,7 @@ static READ8_HANDLER( audio_io_r )
 			break;
 
 		case 0x002:		/* /RDP */
-			result = atarigen_6502_sound_r(machine, offset);
+			result = atarigen_6502_sound_r(space, offset);
 			break;
 
 		case 0x004:		/* /RDIO */
@@ -231,15 +231,15 @@ static READ8_HANDLER( audio_io_r )
                 0x02 = coin 2
                 0x01 = coin 1
             */
-			result = input_port_read(machine, "AUDIO");
-			if (!(input_port_read(machine, "FE4000") & 0x0080)) result ^= 0x90;
+			result = input_port_read(space->machine, "AUDIO");
+			if (!(input_port_read(space->machine, "FE4000") & 0x0080)) result ^= 0x90;
 			if (atarigen_cpu_to_sound_ready) result ^= 0x40;
 			if (atarigen_sound_to_cpu_ready) result ^= 0x20;
 			result ^= 0x10;
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(machine, 0);
+			atarigen_6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* /VOICE */
@@ -265,7 +265,7 @@ static WRITE8_HANDLER( audio_io_w )
 			break;
 
 		case 0x006:		/* /IRQACK */
-			atarigen_6502_irq_ack_r(machine, 0);
+			atarigen_6502_irq_ack_r(space, 0);
 			break;
 
 		case 0x200:		/* n/c */
@@ -273,7 +273,7 @@ static WRITE8_HANDLER( audio_io_w )
 			break;
 
 		case 0x202:		/* /WRP */
-			atarigen_6502_sound_w(machine, offset, data);
+			atarigen_6502_sound_w(space, offset, data);
 			break;
 
 		case 0x204:		/* WRIO */

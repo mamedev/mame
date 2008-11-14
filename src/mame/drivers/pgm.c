@@ -300,7 +300,7 @@ static READ16_HANDLER ( z80_ram_r )
 
 static READ32_HANDLER( arm7_latch_arm_r )
 {
-	if (PGMARM7LOGERROR) logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", arm7_latch, mem_mask, cpu_get_pc(machine->activecpu) );
+	if (PGMARM7LOGERROR) logerror("ARM7: Latch read: %08x (%08x) (%06x)\n", arm7_latch, mem_mask, cpu_get_pc(space->cpu) );
 	return arm7_latch;
 }
 
@@ -315,88 +315,88 @@ static TIMER_CALLBACK( arm_irq )
 //static emu_timer *   arm_comms_timer;
 static WRITE32_HANDLER( arm7_latch_arm_w )
 {
-	if (PGMARM7LOGERROR) logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(machine->activecpu) );
+	if (PGMARM7LOGERROR) logerror("ARM7: Latch write: %08x (%08x) (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu) );
 	COMBINE_DATA(&arm7_latch);
 
 #ifdef PGMARM7SPEEDHACK
-//  cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
-	if (data!=0xaa) cpu_spinuntil_trigger(machine->activecpu, 1000);
-	cpuexec_trigger(machine, 1002);
+//  cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	if (data!=0xaa) cpu_spinuntil_trigger(space->cpu, 1000);
+	cpuexec_trigger(space->machine, 1002);
 #else
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_CYCLES(100, 0));
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(100, 0));
 #endif
 }
 
 static READ32_HANDLER( arm7_shareram_r )
 {
-	if (PGMARM7LOGERROR) logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, arm7_shareram[offset], mem_mask, cpu_get_pc(machine->activecpu) );
+	if (PGMARM7LOGERROR) logerror("ARM7: ARM7 Shared RAM Read: %04x = %08x (%08x) (%06x)\n", offset << 2, arm7_shareram[offset], mem_mask, cpu_get_pc(space->cpu) );
 	return arm7_shareram[offset];
 }
 
 static WRITE32_HANDLER( arm7_shareram_w )
 {
-	if (PGMARM7LOGERROR) logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, cpu_get_pc(machine->activecpu) );
+	if (PGMARM7LOGERROR) logerror("ARM7: ARM7 Shared RAM Write: %04x = %08x (%08x) (%06x)\n", offset << 2, data, mem_mask, cpu_get_pc(space->cpu) );
 	COMBINE_DATA(&arm7_shareram[offset]);
 }
 
 static READ16_HANDLER( arm7_latch_68k_r )
 {
-	if (PGMARM7LOGERROR) logerror("M68K: Latch read: %04x (%04x) (%06x)\n", arm7_latch & 0x0000ffff, mem_mask, cpu_get_pc(machine->activecpu) );
+	if (PGMARM7LOGERROR) logerror("M68K: Latch read: %04x (%04x) (%06x)\n", arm7_latch & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu) );
 	return arm7_latch;
 }
 
 static WRITE16_HANDLER( arm7_latch_68k_w )
 {
-	if (PGMARM7LOGERROR) logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(machine->activecpu) );
+	if (PGMARM7LOGERROR) logerror("M68K: Latch write: %04x (%04x) (%06x)\n", data & 0x0000ffff, mem_mask, cpu_get_pc(space->cpu) );
 	COMBINE_DATA(&arm7_latch);
 
 #ifdef PGMARM7SPEEDHACK
-	cpuexec_trigger(machine, 1000);
+	cpuexec_trigger(space->machine, 1000);
 	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, arm_irq); // i don't know how long..
-	cpu_spinuntil_trigger(machine->activecpu, 1002);
+	cpu_spinuntil_trigger(space->cpu, 1002);
 #else
-	cpu_set_input_line(machine->cpu[2], ARM7_FIRQ_LINE, PULSE_LINE);
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
+	cpu_set_input_line(space->machine->cpu[2], ARM7_FIRQ_LINE, PULSE_LINE);
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
 #endif
 }
 
 static READ16_HANDLER( arm7_ram_r )
 {
 	UINT16 *share16 = (UINT16 *)arm7_shareram;
-	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(machine->activecpu) );
+	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Read: %04x = %04x (%08x) (%06x)\n", BYTE_XOR_LE(offset), share16[BYTE_XOR_LE(offset)], mem_mask, cpu_get_pc(space->cpu) );
 	return share16[BYTE_XOR_LE(offset)];
 }
 
 static WRITE16_HANDLER( arm7_ram_w )
 {
 	UINT16 *share16 = (UINT16 *)arm7_shareram;
-	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(machine->activecpu) );
+	if (PGMARM7LOGERROR) logerror("M68K: ARM7 Shared RAM Write: %04x = %04x (%04x) (%06x)\n", BYTE_XOR_LE(offset), data, mem_mask, cpu_get_pc(space->cpu) );
 
 	COMBINE_DATA(&share16[BYTE_XOR_LE(offset)]);
 }
 
 static WRITE16_HANDLER ( z80_ram_w )
 {
-	int pc = cpu_get_pc(machine->activecpu);
+	int pc = cpu_get_pc(space->cpu);
 	if(ACCESSING_BITS_8_15)
 		z80_mainram[offset*2] = data >> 8;
 	if(ACCESSING_BITS_0_7)
 		z80_mainram[offset*2+1] = data;
 
 	if(pc != 0xf12 && pc != 0xde2 && pc != 0x100c50 && pc != 0x100b20)
-		if (PGMLOGERROR) logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset*2, data, mem_mask, cpu_get_pc(machine->activecpu));
+		if (PGMLOGERROR) logerror("Z80: write %04x, %04x @ %04x (%06x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static WRITE16_HANDLER ( z80_reset_w )
 {
-	if (PGMLOGERROR) logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(machine->activecpu));
+	if (PGMLOGERROR) logerror("Z80: reset %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
 
 	if(data == 0x5050) {
 		sndti_reset(SOUND_ICS2115, 0);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 		if(0) {
 			FILE *out;
 			out = fopen("z80ram.bin", "wb");
@@ -408,28 +408,28 @@ static WRITE16_HANDLER ( z80_reset_w )
 	{
 		/* this might not be 100% correct, but several of the games (ddp2, puzzli2 etc. expect the z80 to be turned
            off during data uploads, they write here before the upload */
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	}
 }
 
 static WRITE16_HANDLER ( z80_ctrl_w )
 {
-	if (PGMLOGERROR) logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(machine->activecpu));
+	if (PGMLOGERROR) logerror("Z80: ctrl %04x @ %04x (%06x)\n", data, mem_mask, cpu_get_pc(space->cpu));
 }
 
 static WRITE16_HANDLER ( m68k_l1_w )
 {
 	if(ACCESSING_BITS_0_7) {
-		if (PGMLOGERROR) logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(machine->activecpu));
-		soundlatch_w(machine, 0, data);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+		if (PGMLOGERROR) logerror("SL 1 m68.w %02x (%06x) IRQ\n", data & 0xff, cpu_get_pc(space->cpu));
+		soundlatch_w(space, 0, data);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 	}
 }
 
 static WRITE8_HANDLER( z80_l3_w )
 {
-	if (PGMLOGERROR) logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(machine->activecpu));
-	soundlatch3_w(machine, 0, data);
+	if (PGMLOGERROR) logerror("SL 3 z80.w %02x (%04x)\n", data, cpu_get_pc(space->cpu));
+	soundlatch3_w(space, 0, data);
 }
 
 static void sound_irq(running_machine *machine, int level)
@@ -462,11 +462,11 @@ static WRITE16_HANDLER( pgm_calendar_w )
 {
 	static mame_system_time systime;
 
-	mame_get_base_datetime(machine, &systime);
+	mame_get_base_datetime(space->machine, &systime);
 
 	// initialize the time, otherwise it crashes
 	if( !systime.time )
-		mame_get_base_datetime(machine, &systime);
+		mame_get_base_datetime(space->machine, &systime);
 
 	CalCom <<= 1;
 	CalCom |= data & 1;
@@ -515,7 +515,7 @@ static WRITE16_HANDLER( pgm_calendar_w )
 				break;
 
 			case 0xf:  //Load Date
-				mame_get_base_datetime(machine, &systime);
+				mame_get_base_datetime(space->machine, &systime);
 				break;
 		}
 	}
@@ -739,14 +739,14 @@ static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 		kovsh_lowlatch = data;
 	}
 
-//  cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
-//  cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_CYCLES(100, 0));
+//  cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
+//  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(100, 0));
 }
 
 static READ16_HANDLER( kovsh_68k_protlatch_r )
 {
-	//cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_CYCLES(600, 0));
+	//cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(600, 0));
 
 	switch (offset)
 	{
@@ -1473,7 +1473,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 		kb_cmd=data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X",cpu_get_pc(machine->activecpu),kb_cmd,data);
+		logerror("%06X: ASIC25 W CMD %X  VAL %X",cpu_get_pc(space->cpu),kb_cmd,data);
 		if(kb_cmd==0)
 			reg=data;
 		else if(kb_cmd==2)
@@ -1548,7 +1548,7 @@ static WRITE16_HANDLER( killbld_prot_w )
 						/* for now, cheat -- the scramble isn't understood, it might
                            be state based */
 						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(machine, "user2");
+						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
 						for (x=0;x<size;x++)
 						{
 							UINT16 dat;
@@ -1561,8 +1561,8 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 5 seems to be a straight copy */
 						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(machine, "user2");
-						UINT16 *PROTROM = (UINT16*)memory_region(machine, "user1");
+						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
+						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
 						for (x=0;x<size;x++)
 						{
 							UINT16 dat;
@@ -1578,8 +1578,8 @@ static WRITE16_HANDLER( killbld_prot_w )
 					{
 						/* mode 6 seems to swap bytes and nibbles */
 						int x;
-						UINT16 *RAMDUMP = (UINT16*)memory_region(machine, "user2");
-						UINT16 *PROTROM = (UINT16*)memory_region(machine, "user1");
+						UINT16 *RAMDUMP = (UINT16*)memory_region(space->machine, "user2");
+						UINT16 *PROTROM = (UINT16*)memory_region(space->machine, "user1");
 						for (x=0;x<size;x++)
 						{
 							UINT16 dat;
@@ -1641,12 +1641,12 @@ static READ16_HANDLER( killbld_prot_r )
 		else if(kb_cmd==5)
 		{
 			UINT32 protvalue;
-			protvalue = 0x89911400|input_port_read(machine, "Region");
+			protvalue = 0x89911400|input_port_read(space->machine, "Region");
 			res=(protvalue>>(8*(ptr-1)))&0xff;
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X",cpu_get_pc(machine->activecpu),kb_cmd,res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X",cpu_get_pc(space->cpu),kb_cmd,res);
 	return res;
 }
 
@@ -1719,7 +1719,7 @@ static READ16_HANDLER(ddp2_protram_r)
 {
 	if (PGMLOGERROR) logerror("prot_r %04x, %04x\n", offset,ddp2_protram[offset]);
 
-	if (offset == 0x02/2) return input_port_read(machine, "Region");
+	if (offset == 0x02/2) return input_port_read(space->machine, "Region");
 
 	if (offset == 0x1f00/2) return 0;
 
@@ -1828,12 +1828,12 @@ static READ16_HANDLER( olds_r16 )
 			res = olds_cmd3;
 		else if(kb_cmd == 5)
 		{
-			UINT32 protvalue = 0x900000 | input_port_read(machine, "Region"); // region from protection device.
+			UINT32 protvalue = 0x900000 | input_port_read(space->machine, "Region"); // region from protection device.
 			res = (protvalue>>(8 * (ptr-1))) & 0xff; // includes region 1 = taiwan , 2 = china, 3 = japan (title = orlegend special), 4 = korea, 5 = hongkong, 6 = world
 
 		}
 	}
-	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",cpu_get_pc(machine->activecpu),kb_cmd,res);
+	logerror("%06X: ASIC25 R CMD %X  VAL %X\n",cpu_get_pc(space->cpu),kb_cmd,res);
 	return res;
 }
 
@@ -1846,7 +1846,7 @@ static WRITE16_HANDLER( olds_w16 )
 		kb_cmd=data;
 	else //offset==2
 	{
-		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(machine->activecpu),kb_cmd,data);
+		logerror("%06X: ASIC25 W CMD %X  VAL %X\n",cpu_get_pc(space->cpu),kb_cmd,data);
 		if(kb_cmd==0)
 			reg=data;
 		else if(kb_cmd==2)	//a bitswap=

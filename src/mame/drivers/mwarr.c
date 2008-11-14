@@ -123,7 +123,7 @@ static WRITE16_HANDLER( mwarr_brightness_w )
 	brightness = (double)(data & 0xff);
 	for (i=0;i<0x800;i++)
 	{
-		palette_set_pen_contrast(machine, i, brightness/255);
+		palette_set_pen_contrast(space->machine, i, brightness/255);
 	}
 }
 

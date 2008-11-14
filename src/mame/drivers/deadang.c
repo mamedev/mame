@@ -55,11 +55,11 @@ extern VIDEO_UPDATE( deadang );
 
 static READ16_HANDLER( ghunter_trackball_low_r )
 {
-	return (input_port_read(machine, "TRACKX") & 0xff) | ((input_port_read(machine, "TRACKY") & 0xff) << 8);
+	return (input_port_read(space->machine, "TRACKX") & 0xff) | ((input_port_read(space->machine, "TRACKY") & 0xff) << 8);
 }
 static READ16_HANDLER( ghunter_trackball_high_r )
 {
-	return ((input_port_read(machine, "TRACKX") & 0x0f00) >> 4) | (input_port_read(machine, "TRACKY") & 0x0f00);
+	return ((input_port_read(space->machine, "TRACKX") & 0x0f00) >> 4) | (input_port_read(space->machine, "TRACKY") & 0x0f00);
 }
 
 /* Memory Maps */

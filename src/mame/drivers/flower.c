@@ -78,14 +78,14 @@ static UINT8 *sn_nmi_enable;
 
 static WRITE8_HANDLER( flower_irq_ack )
 {
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 }
 
 static WRITE8_HANDLER( sn_irq_enable_w )
 {
 	*sn_irq_enable = data;
 
-	cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE);
 }
 
 static INTERRUPT_GEN( sn_irq )
@@ -96,9 +96,9 @@ static INTERRUPT_GEN( sn_irq )
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	soundlatch_w(machine,0,data);
+	soundlatch_w(space,0,data);
 	if ((*sn_nmi_enable & 1) == 1)
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static ADDRESS_MAP_START( flower_cpu1_2, ADDRESS_SPACE_PROGRAM, 8 )

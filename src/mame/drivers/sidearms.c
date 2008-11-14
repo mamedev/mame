@@ -59,7 +59,7 @@ int sidearms_gameid;
 static WRITE8_HANDLER( sidearms_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 
 
 	/* bits 0 and 1 select the ROM bank */
@@ -78,7 +78,7 @@ static READ8_HANDLER( turtship_ports_r )
 
 	res = 0;
 	for (i = 0;i < 8;i++)
-		res |= ((input_port_read_safe(machine, portnames[i], 0) >> offset) & 1) << i;
+		res |= ((input_port_read_safe(space->machine, portnames[i], 0) >> offset) & 1) << i;
 
 	return res;
 }
@@ -166,7 +166,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( whizz_bankswitch_w )
 {
 	int bankaddress;
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	int bank = 0;
 
 	switch (data & 0xC0)

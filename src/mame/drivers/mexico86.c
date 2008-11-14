@@ -54,7 +54,7 @@ PS4  J8635      PS4  J8541       PS4  J8648
 //AT
 static READ8_HANDLER( kiki_2203_r )
 {
-	return(ym2203_status_port_0_r(machine,0) & 0x7f);
+	return(ym2203_status_port_0_r(space,0) & 0x7f);
 }
 //ZT
 

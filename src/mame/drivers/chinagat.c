@@ -130,25 +130,25 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "main");
+	UINT8 *RAM = memory_region(space->machine, "main");
 	memory_set_bankptr( 1,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
 }
 
 static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
-	UINT8 *RAM = memory_region( machine, "sub" );
+	UINT8 *RAM = memory_region( space->machine, "sub" );
 	memory_set_bankptr( 4,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
 }
 
 static WRITE8_HANDLER( chinagat_sub_IRQ_w )
 {
-	cpu_set_input_line(machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	cpu_set_input_line(space->machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static WRITE8_HANDLER( chinagat_cpu_sound_cmd_w )
 {
-	soundlatch_w( machine, offset, data );
-	cpu_set_input_line(machine->cpu[2], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
+	soundlatch_w( space->machine, offset, data );
+	cpu_set_input_line(space->machine->cpu[2], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE );
 }
 
 static READ8_HANDLER( saiyugb1_mcu_command_r )
@@ -156,7 +156,7 @@ static READ8_HANDLER( saiyugb1_mcu_command_r )
 #if 0
 	if (saiyugb1_mcu_command == 0x78)
 	{
-		cpu_suspend(machine->cpu[3], SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
+		cpu_suspend(space->machine->cpu[3], SUSPEND_REASON_HALT, 1);	/* Suspend (speed up) */
 	}
 #endif
 	return saiyugb1_mcu_command;
@@ -168,7 +168,7 @@ static WRITE8_HANDLER( saiyugb1_mcu_command_w )
 #if 0
 	if (data != 0x78)
 	{
-		cpu_resume(machine->cpu[3], SUSPEND_REASON_HALT);	/* Wake up */
+		cpu_resume(space->machine->cpu[3], SUSPEND_REASON_HALT);	/* Wake up */
 	}
 #endif
 }
@@ -183,7 +183,7 @@ static WRITE8_HANDLER( saiyugb1_adpcm_control_w )
 {
 	/* i8748 Port 2 write */
 
-	UINT8 *saiyugb1_adpcm_rom = memory_region(machine, "adpcm");
+	UINT8 *saiyugb1_adpcm_rom = memory_region(space->machine, "adpcm");
 
 	if (data & 0x80)	/* Reset m5205 and disable ADPCM ROM outputs */
 	{

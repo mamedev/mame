@@ -53,7 +53,7 @@ READ8_HANDLER( simpsons_eeprom_r )
 
 	res |= 0x20;//konami_eeprom_ack() << 5; /* add the ack */
 
-	res |= input_port_read(machine, "TEST") & 1; /* test switch */
+	res |= input_port_read(space->machine, "TEST") & 1; /* test switch */
 
 	if (init_eeprom_count)
 	{
@@ -72,7 +72,7 @@ WRITE8_HANDLER( simpsons_eeprom_w )
 	eeprom_set_cs_line((data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	eeprom_set_clock_line((data & 0x10) ? ASSERT_LINE : CLEAR_LINE);
 
-	simpsons_video_banking( machine, data & 3 );
+	simpsons_video_banking( space->machine, data & 3 );
 
 	simpsons_firq_enabled = data & 0x04;
 }
@@ -98,13 +98,13 @@ WRITE8_HANDLER( simpsons_coin_counter_w )
 
 READ8_HANDLER( simpsons_sound_interrupt_r )
 {
-	cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0xff );
+	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
 	return 0x00;
 }
 
 READ8_HANDLER( simpsons_sound_r )
 {
-	return k053260_0_r(machine, 2 + offset);
+	return k053260_0_r(space, 2 + offset);
 }
 
 

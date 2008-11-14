@@ -95,22 +95,22 @@ WRITE8_HANDLER( dooyong_fg2scroll8_w )
 
 WRITE16_HANDLER( dooyong_bgscroll16_w )
 {
-	if (ACCESSING_BITS_0_7) dooyong_bgscroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) dooyong_bgscroll8_w(space, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_bg2scroll16_w )
 {
-	if (ACCESSING_BITS_0_7) dooyong_bg2scroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) dooyong_bg2scroll8_w(space, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_fgscroll16_w )
 {
-	if (ACCESSING_BITS_0_7) dooyong_fgscroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) dooyong_fgscroll8_w(space, offset, data & 0x00ff);
 }
 
 WRITE16_HANDLER( dooyong_fg2scroll16_w )
 {
-	if (ACCESSING_BITS_0_7) dooyong_fg2scroll8_w(machine, offset, data & 0x00ff);
+	if (ACCESSING_BITS_0_7) dooyong_fg2scroll8_w(space, offset, data & 0x00ff);
 }
 
 
@@ -173,7 +173,7 @@ WRITE8_HANDLER( primella_ctrl_w )
 
 	/* bit 5 used but unknown */
 
-//  logerror("%04x: bankswitch = %02x\n",cpu_get_pc(machine->activecpu),data&0xe0);
+//  logerror("%04x: bankswitch = %02x\n",cpu_get_pc(space->cpu),data&0xe0);
 }
 
 WRITE8_HANDLER( flytiger_ctrl_w )

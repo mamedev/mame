@@ -357,7 +357,7 @@ static void akiko_set_cd_status( UINT32 status )
 	if ( akiko.cdrom_status[0] & akiko.cdrom_status[1] )
 	{
 		if (LOG_AKIKO_CD) logerror( "Akiko CD IRQ\n" );
-		amiga_custom_w(Machine, REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
+		amiga_custom_w(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_PORTS, 0xffff);
 	}
 }
 
@@ -751,7 +751,7 @@ READ32_HANDLER(amiga_akiko32_r)
 
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), cpu_get_pc(machine->activecpu) );
+		logerror( "Reading AKIKO reg %0x [%s] at PC=%06x\n", offset, get_akiko_reg_name(offset), cpu_get_pc(space->cpu) );
 	}
 
 	switch( offset )
@@ -811,7 +811,7 @@ WRITE32_HANDLER(amiga_akiko32_w)
 {
 	if ( LOG_AKIKO && offset < (0x30/4) )
 	{
-		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, cpu_get_pc(machine->activecpu) );
+		logerror( "Writing AKIKO reg %0x [%s] with %08x at PC=%06x\n", offset, get_akiko_reg_name(offset), data, cpu_get_pc(space->cpu) );
 	}
 
 	switch( offset )

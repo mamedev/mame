@@ -65,6 +65,8 @@ static INTERRUPT_GEN( orbit_interrupt )
 
 static void update_misc_flags(running_machine *machine, UINT8 val)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	orbit_misc_flags = val;
 
 	/* BIT0 => UNUSED       */
@@ -76,7 +78,7 @@ static void update_misc_flags(running_machine *machine, UINT8 val)
 	/* BIT6 => HYPER LED    */
 	/* BIT7 => WARNING SND  */
 
-	discrete_sound_w(machine, ORBIT_WARNING_EN, orbit_misc_flags & 0x80);
+	discrete_sound_w(space, ORBIT_WARNING_EN, orbit_misc_flags & 0x80);
 
 	set_led_status(0, orbit_misc_flags & 0x08);
 	set_led_status(1, orbit_misc_flags & 0x40);
@@ -91,9 +93,9 @@ static WRITE8_HANDLER( orbit_misc_w )
 	UINT8 bit = offset >> 1;
 
 	if (offset & 1)
-		update_misc_flags(machine, orbit_misc_flags | (1 << bit));
+		update_misc_flags(space->machine, orbit_misc_flags | (1 << bit));
 	else
-		update_misc_flags(machine, orbit_misc_flags & ~(1 << bit));
+		update_misc_flags(space->machine, orbit_misc_flags & ~(1 << bit));
 }
 
 

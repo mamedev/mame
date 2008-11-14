@@ -270,18 +270,18 @@ static READ16_HANDLER( standard_io_r )
 	switch (offset & (0x3000/2))
 	{
 		case 0x0000/2:
-			return ppi8255_r(devtag_get_device(machine, PPI8255, "ppi8255"), offset & 3);
+			return ppi8255_r(devtag_get_device(space->machine, PPI8255, "ppi8255"), offset & 3);
 
 		case 0x1000/2:
 		{
 			static const char *const sysports[] = { "SERVICE", "P1", "UNUSED", "P2" };
-			return input_port_read(machine, sysports[offset & 3]);
+			return input_port_read(space->machine, sysports[offset & 3]);
 		}
 
 		case 0x2000/2:
-			return input_port_read(machine, (offset & 1) ? "DSW2" : "DSW1");
+			return input_port_read(space->machine, (offset & 1) ? "DSW2" : "DSW1");
 	}
-	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(machine->activecpu), offset * 2);
+	logerror("%06X:standard_io_r - unknown read access to address %04X\n", cpu_get_pc(space->cpu), offset * 2);
 	return 0xffff;
 }
 
@@ -298,25 +298,25 @@ static WRITE16_HANDLER( standard_io_w )
 				timer_call_after_resynch(NULL, ((offset & 3) << 8) | (data & 0xff), delayed_ppi8255_w);
 			return;
 	}
-	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(machine->activecpu), offset * 2, data, mem_mask);
+	logerror("%06X:standard_io_w - unknown write access to address %04X = %04X & %04X\n", cpu_get_pc(space->cpu), offset * 2, data, mem_mask);
 }
 
 
 static READ16_HANDLER( misc_io_r )
 {
 	if (custom_io_r)
-		return (*custom_io_r)(machine, offset, mem_mask);
+		return (*custom_io_r)(space->machine, offset, mem_mask);
 	else
-		return standard_io_r(machine, offset, mem_mask);
+		return standard_io_r(space, offset, mem_mask);
 }
 
 
 static WRITE16_HANDLER( misc_io_w )
 {
 	if (custom_io_w)
-		(*custom_io_w)(machine, offset, data, mem_mask);
+		(*custom_io_w)(space->machine, offset, data, mem_mask);
 	else
-		standard_io_w(machine, offset, data, mem_mask);
+		standard_io_w(space, offset, data, mem_mask);
 }
 
 
@@ -399,8 +399,8 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 static READ8_HANDLER( sound_data_r )
 {
 	/* assert ACK */
-	ppi8255_set_port_c(devtag_get_device(machine, PPI8255, "ppi8255"), 0x00);
-	return soundlatch_r(machine, offset);
+	ppi8255_set_port_c(devtag_get_device(space->machine, PPI8255, "ppi8255"), 0x00);
+	return soundlatch_r(space, offset);
 }
 
 
@@ -416,7 +416,7 @@ static WRITE8_HANDLER( n7751_command_w )
         D1    = /CS for ROM 0
         D0    = A14 line to ROMs
     */
-	int numroms = memory_region_length(machine, "n7751data") / 0x8000;
+	int numroms = memory_region_length(space->machine, "n7751data") / 0x8000;
 	n7751_rom_address &= 0x3fff;
 	n7751_rom_address |= (data & 0x01) << 14;
 	if (!(data & 0x02) && numroms >= 1) n7751_rom_address |= 0x00000;
@@ -435,9 +435,9 @@ static WRITE8_HANDLER( n7751_control_w )
         D1 = /RESET line on 7751
         D0 = /IRQ line on 7751
     */
-	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(machine->cpu[2], 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
-	cpuexec_boost_interleave(machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, (data & 0x01) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[2], 0, (data & 0x02) ? CLEAR_LINE : ASSERT_LINE);
+	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
@@ -456,7 +456,7 @@ static WRITE8_HANDLER( n7751_rom_offset_w )
 static READ8_HANDLER( n7751_rom_r )
 {
 	/* read from BUS */
-	return memory_region(machine, "n7751data")[n7751_rom_address];
+	return memory_region(space->machine, "n7751data")[n7751_rom_address];
 }
 
 
@@ -583,25 +583,25 @@ static READ16_HANDLER( aceattaa_custom_io_r )
 				{
 					switch (video_control & 0xf)
 					{
-						case 0x00: return input_port_read(machine, "P1");
-						case 0x04: return input_port_read(machine, "ANALOGX1");
-						case 0x08: return input_port_read(machine, "ANALOGY1");
-						case 0x0c: return input_port_read(machine, "UNUSED");
+						case 0x00: return input_port_read(space->machine, "P1");
+						case 0x04: return input_port_read(space->machine, "ANALOGX1");
+						case 0x08: return input_port_read(space->machine, "ANALOGY1");
+						case 0x0c: return input_port_read(space->machine, "UNUSED");
 					}
 					break;
 				}
 
 				case 0x02:
-					return input_port_read(machine, "DIAL1") | (input_port_read(machine, "DIAL2") << 4);
+					return input_port_read(space->machine, "DIAL1") | (input_port_read(space->machine, "DIAL2") << 4);
 
 				case 0x03:
 				{
 					switch (video_control & 0xf)
 					{
-						case 0x00: return input_port_read(machine, "P2");
-						case 0x04: return input_port_read(machine, "ANALOGX2");
-						case 0x08: return input_port_read(machine, "ANALOGY2");
-						case 0x0c: return input_port_read(machine, "POW2");
+						case 0x00: return input_port_read(space->machine, "P2");
+						case 0x04: return input_port_read(space->machine, "ANALOGX2");
+						case 0x08: return input_port_read(space->machine, "ANALOGY2");
+						case 0x0c: return input_port_read(space->machine, "POW2");
 					}
 					break;
 				}
@@ -609,7 +609,7 @@ static READ16_HANDLER( aceattaa_custom_io_r )
 			break;
 	}
 
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 
@@ -631,9 +631,9 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* upper bit of the trackball controls */
 				case 0:
 				{
-					UINT8 buttons = input_port_read(machine, "SERVICE");
-					UINT8 analog1 = input_port_read(machine, (video_control & 4) ? "ANALOGY1" : "ANALOGX1");
-					UINT8 analog2 = input_port_read(machine, (video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+					UINT8 buttons = input_port_read(space->machine, "SERVICE");
+					UINT8 analog1 = input_port_read(space->machine, (video_control & 4) ? "ANALOGY1" : "ANALOGX1");
+					UINT8 analog2 = input_port_read(space->machine, (video_control & 4) ? "ANALOGY2" : "ANALOGX2");
 					buttons |= (analog1 & 0x80) >> 1;
 					buttons |= (analog2 & 0x80);
 					return buttons;
@@ -643,8 +643,8 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* player 1 select switch mapped to bit 7 */
 				case 1:
 				{
-					UINT8 buttons = input_port_read(machine, "BUTTONS1");
-					UINT8 analog = input_port_read(machine, (video_control & 4) ? "ANALOGY1" : "ANALOGX1");
+					UINT8 buttons = input_port_read(space->machine, "BUTTONS1");
+					UINT8 analog = input_port_read(space->machine, (video_control & 4) ? "ANALOGY1" : "ANALOGX1");
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 
@@ -652,13 +652,13 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				case 2:
 				{
 					if (video_control & 4)
-						return (input_port_read(machine, "ANALOGZ1") >> 4) | (input_port_read(machine, "ANALOGZ2") & 0xf0);
+						return (input_port_read(space->machine, "ANALOGZ1") >> 4) | (input_port_read(space->machine, "ANALOGZ2") & 0xf0);
 					else
 					{
 						static UINT8 last_buttons1 = 0;
 						static UINT8 last_buttons2 = 0;
-						UINT8 buttons1 = input_port_read(machine, "BUTTONS1");
-						UINT8 buttons2 = input_port_read(machine, "BUTTONS2");
+						UINT8 buttons1 = input_port_read(space->machine, "BUTTONS1");
+						UINT8 buttons2 = input_port_read(space->machine, "BUTTONS2");
 
 						if (!(buttons1 & 0x01))
 							last_buttons1 = 0;
@@ -686,14 +686,14 @@ static READ16_HANDLER( mjleague_custom_io_r )
 				/* player 2 select switch mapped to bit 7 */
 				case 3:
 				{
-					UINT8 buttons = input_port_read(machine, "BUTTONS2");
-					UINT8 analog = input_port_read(machine, (video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+					UINT8 buttons = input_port_read(space->machine, "BUTTONS2");
+					UINT8 analog = input_port_read(space->machine, (video_control & 4) ? "ANALOGY2" : "ANALOGX2");
 					return (buttons & 0x80) | (analog & 0x7f);
 				}
 			}
 			break;
 	}
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 /*************************************
@@ -717,17 +717,17 @@ static READ16_HANDLER( pshot16a_custom_io_r )
 				case 1:
 					switch ((read_port++)&3)
 					{
-						case 0: return input_port_read(machine, "P1");
-						case 1: return input_port_read(machine, "P2");
-						case 2: return input_port_read(machine, "P3");
-						case 3: return input_port_read(machine, "P4");
+						case 0: return input_port_read(space->machine, "P1");
+						case 1: return input_port_read(space->machine, "P2");
+						case 2: return input_port_read(space->machine, "P3");
+						case 3: return input_port_read(space->machine, "P4");
 					}
 
 					break;
 			}
 			break;
 	}
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 /*************************************
@@ -743,12 +743,12 @@ static READ16_HANDLER( sdi_custom_io_r )
 		case 0x1000/2:
 			switch (offset & 3)
 			{
-				case 1:	return input_port_read(machine, (video_control & 4) ? "ANALOGY1" : "ANALOGX1");
-				case 3:	return input_port_read(machine, (video_control & 4) ? "ANALOGY2" : "ANALOGX2");
+				case 1:	return input_port_read(space->machine, (video_control & 4) ? "ANALOGY1" : "ANALOGX1");
+				case 3:	return input_port_read(space->machine, (video_control & 4) ? "ANALOGY2" : "ANALOGX2");
 			}
 			break;
 	}
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 
@@ -768,16 +768,16 @@ static READ16_HANDLER( sjryuko_custom_io_r )
 			switch (offset & 3)
 			{
 				case 1:
-					if (input_port_read_safe(machine, portname[mj_input_num], 0xff) != 0xff)
+					if (input_port_read_safe(space->machine, portname[mj_input_num], 0xff) != 0xff)
 						return 0xff & ~(1 << mj_input_num);
 					return 0xff;
 
 				case 2:
-					return input_port_read_safe(machine, portname[mj_input_num], 0xff);
+					return input_port_read_safe(space->machine, portname[mj_input_num], 0xff);
 			}
 			break;
 	}
-	return standard_io_r(machine, offset, mem_mask);
+	return standard_io_r(space, offset, mem_mask);
 }
 
 

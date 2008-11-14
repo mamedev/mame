@@ -57,7 +57,7 @@ static READ8_HANDLER( keyboard_0_r )
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
 	for (i = 0;i < 5;i++)
-		if (~keyb & (1 << i)) res &= input_port_read(machine, keynames[i]);
+		if (~keyb & (1 << i)) res &= input_port_read(space->machine, keynames[i]);
 
 	return res;
 }

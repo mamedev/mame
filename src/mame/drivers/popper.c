@@ -136,21 +136,21 @@ static READ8_HANDLER( popper_input_ports_r )
 	switch (offset)
 	{
 		//           player inputs        dsw1                           dsw2
-		case 0: data=input_port_read(machine, "IN0") | ((input_port_read(machine, "DSW1") & 0x02)<<5) | ((input_port_read(machine, "DSW2") & 0x01)<<4); break;
-		case 1: data=input_port_read(machine, "IN1") | ((input_port_read(machine, "DSW1") & 0x01)<<6) | ((input_port_read(machine, "DSW2") & 0x02)<<3); break;
-		case 2: data=input_port_read(machine, "IN2") | ((input_port_read(machine, "DSW1") & 0x08)<<3) | ((input_port_read(machine, "DSW2") & 0x04)<<2); break;
-		case 3: data=input_port_read(machine, "IN3") | ((input_port_read(machine, "DSW1") & 0x04)<<4) | ((input_port_read(machine, "DSW2") & 0x08)<<1); break;
-		case 4: data=                   ((input_port_read(machine, "DSW1") & 0x20)<<2) | ((input_port_read(machine, "DSW2") & 0x10)<<1); break;
-		case 5: data=                   ((input_port_read(machine, "DSW1") & 0x10)<<3) | ((input_port_read(machine, "DSW2") & 0x20)<<0); break;
-		case 6: data=                   ((input_port_read(machine, "DSW1") & 0x80)<<0) | ((input_port_read(machine, "DSW2") & 0x40)>>1); break;
-		case 7: data=                   ((input_port_read(machine, "DSW1") & 0x40)<<1) | ((input_port_read(machine, "DSW2") & 0x80)>>2); break;
+		case 0: data=input_port_read(space->machine, "IN0") | ((input_port_read(space->machine, "DSW1") & 0x02)<<5) | ((input_port_read(space->machine, "DSW2") & 0x01)<<4); break;
+		case 1: data=input_port_read(space->machine, "IN1") | ((input_port_read(space->machine, "DSW1") & 0x01)<<6) | ((input_port_read(space->machine, "DSW2") & 0x02)<<3); break;
+		case 2: data=input_port_read(space->machine, "IN2") | ((input_port_read(space->machine, "DSW1") & 0x08)<<3) | ((input_port_read(space->machine, "DSW2") & 0x04)<<2); break;
+		case 3: data=input_port_read(space->machine, "IN3") | ((input_port_read(space->machine, "DSW1") & 0x04)<<4) | ((input_port_read(space->machine, "DSW2") & 0x08)<<1); break;
+		case 4: data=                   ((input_port_read(space->machine, "DSW1") & 0x20)<<2) | ((input_port_read(space->machine, "DSW2") & 0x10)<<1); break;
+		case 5: data=                   ((input_port_read(space->machine, "DSW1") & 0x10)<<3) | ((input_port_read(space->machine, "DSW2") & 0x20)<<0); break;
+		case 6: data=                   ((input_port_read(space->machine, "DSW1") & 0x80)<<0) | ((input_port_read(space->machine, "DSW2") & 0x40)>>1); break;
+		case 7: data=                   ((input_port_read(space->machine, "DSW1") & 0x40)<<1) | ((input_port_read(space->machine, "DSW2") & 0x80)>>2); break;
 	}
 	return data;
 }
 
 static READ8_HANDLER( popper_soundcpu_nmi_r )
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	return 0;
 }
 

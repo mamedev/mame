@@ -47,13 +47,13 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 	switch( mux )
 	{
 	case 1: /* start buttons */
-		buttons = input_port_read(machine, "START");
+		buttons = input_port_read(space->machine, "START");
 		break;
 	case 2: /* player 1 buttons */
-		buttons = input_port_read(machine, "P1");
+		buttons = input_port_read(space->machine, "P1");
 		break;
 	case 4: /* player 2 buttons */
-		buttons = input_port_read(machine, "P2");
+		buttons = input_port_read(space->machine, "P2");
 		break;
 	}
 
@@ -69,7 +69,7 @@ static READ8_HANDLER( hanaawas_input_port_0_r )
 		}
 	}
 
-	return (input_port_read(machine, "IN0") & 0xf0) | ordinal;
+	return (input_port_read(space->machine, "IN0") & 0xf0) | ordinal;
 }
 
 static WRITE8_HANDLER( hanaawas_inputs_mux_w )

@@ -74,8 +74,8 @@ static UINT8 protection_data[5];
 
 READ8_HANDLER( zwackery_port_2_r )
 {
-	int result = input_port_read(machine, "IN2");
-	int wheel = input_port_read(machine, "IN5");
+	int result = input_port_read(space->machine, "IN2");
+	int wheel = input_port_read(space->machine, "IN5");
 
 	return result | ((wheel >> 2) & 0x3e);
 }
@@ -91,8 +91,8 @@ static READ16_HANDLER( zwackery_6840_r )
 	/* It expects D1 to end up between 0 and 5; in order to */
 	/* make this happen, we must assume that reads from the */
 	/* 6840 take 14 additional cycles                       */
-	cpu_adjust_icount(machine->activecpu, -14);
-	return mcr68_6840_upper_r(machine,offset,0xffff);
+	cpu_adjust_icount(space->cpu, -14);
+	return mcr68_6840_upper_r(space,offset,0xffff);
 }
 
 
@@ -107,7 +107,7 @@ static WRITE16_HANDLER( xenophobe_control_w )
 {
 	COMBINE_DATA(&control_word);
 /*  soundsgood_reset_w(~control_word & 0x0020);*/
-	soundsgood_data_w(machine, offset, ((control_word & 0x000f) << 1) | ((control_word & 0x0010) >> 4));
+	soundsgood_data_w(space, offset, ((control_word & 0x000f) << 1) | ((control_word & 0x0010) >> 4));
 }
 
 
@@ -122,7 +122,7 @@ static WRITE16_HANDLER( blasted_control_w )
 {
 	COMBINE_DATA(&control_word);
 /*  soundsgood_reset_w(~control_word & 0x0020);*/
-	soundsgood_data_w(machine, offset, (control_word >> 8) & 0x1f);
+	soundsgood_data_w(space, offset, (control_word >> 8) & 0x1f);
 }
 
 
@@ -136,18 +136,18 @@ static WRITE16_HANDLER( blasted_control_w )
 static READ16_HANDLER( spyhunt2_port_0_r )
 {
 	static const char *const portnames[] = { "AN1", "AN2", "AN3", "AN4" };
-	int result = input_port_read(machine, "IN0");
+	int result = input_port_read(space->machine, "IN0");
 	int which = (control_word >> 3) & 3;
-	int analog = input_port_read(machine, portnames[which]);
+	int analog = input_port_read(space->machine, portnames[which]);
 
-	return result | ((soundsgood_status_r(machine, 0) & 1) << 5) | (analog << 8);
+	return result | ((soundsgood_status_r(space, 0) & 1) << 5) | (analog << 8);
 }
 
 
 static READ16_HANDLER( spyhunt2_port_1_r )
 {
-	int result = input_port_read(machine, "IN1");
-	return result | ((turbocs_status_r(machine, 0) & 1) << 7);
+	int result = input_port_read(space->machine, "IN1");
+	return result | ((turbocs_status_r(space, 0) & 1) << 7);
 }
 
 
@@ -156,10 +156,10 @@ static WRITE16_HANDLER( spyhunt2_control_w )
 	COMBINE_DATA(&control_word);
 
 /*  turbocs_reset_w(~control_word & 0x0080);*/
-	turbocs_data_w(machine, offset, (control_word >> 8) & 0x001f);
+	turbocs_data_w(space, offset, (control_word >> 8) & 0x001f);
 
 	soundsgood_reset_w(~control_word & 0x2000);
-	soundsgood_data_w(machine, offset, (control_word >> 8) & 0x001f);
+	soundsgood_data_w(space, offset, (control_word >> 8) & 0x001f);
 }
 
 
@@ -199,10 +199,10 @@ static const UINT8 translate49[7] = { 0x7, 0x3, 0x1, 0x0, 0xc, 0xe, 0xf };
 
 static READ16_HANDLER( archrivl_port_1_r )
 {
-	return (translate49[input_port_read(machine, "49WAYY2") >> 4] << 12) |
-			(translate49[input_port_read(machine, "49WAYX2") >> 4] << 8) |
-			(translate49[input_port_read(machine, "49WAYY1") >> 4] << 4) |
-			(translate49[input_port_read(machine, "49WAYX1") >> 4] << 0);
+	return (translate49[input_port_read(space->machine, "49WAYY2") >> 4] << 12) |
+			(translate49[input_port_read(space->machine, "49WAYX2") >> 4] << 8) |
+			(translate49[input_port_read(space->machine, "49WAYY1") >> 4] << 4) |
+			(translate49[input_port_read(space->machine, "49WAYX1") >> 4] << 0);
 }
 
 
@@ -233,7 +233,7 @@ static WRITE16_HANDLER( pigskin_protection_w )
 		protection_data[3] = protection_data[4];
 		protection_data[4] = data & 0xff;
 
-		logerror("%06X:protection_w=%02X\n", cpu_get_previouspc(machine->activecpu), data & 0xff);
+		logerror("%06X:protection_w=%02X\n", cpu_get_previouspc(space->cpu), data & 0xff);
 	}
 }
 
@@ -261,18 +261,18 @@ static READ16_HANDLER( pigskin_protection_r )
 static READ16_HANDLER( pigskin_port_1_r )
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
-	return input_port_read(machine, "IN1") |
-			(translate49[input_port_read(machine, "49WAYX1") >> 4] << 12) |
-			(translate49[input_port_read(machine, "49WAYY1") >> 4] << 8);
+	return input_port_read(space->machine, "IN1") |
+			(translate49[input_port_read(space->machine, "49WAYX1") >> 4] << 12) |
+			(translate49[input_port_read(space->machine, "49WAYY1") >> 4] << 8);
 }
 
 
 static READ16_HANDLER( pigskin_port_2_r )
 {
 	/* see archrivl_port_1_r for 49-way joystick description */
-	return input_port_read(machine, "DSW") |
-			(translate49[input_port_read(machine, "49WAYX2") >> 4] << 12) |
-			(translate49[input_port_read(machine, "49WAYY2") >> 4] << 8);
+	return input_port_read(space->machine, "DSW") |
+			(translate49[input_port_read(space->machine, "49WAYX2") >> 4] << 12) |
+			(translate49[input_port_read(space->machine, "49WAYY2") >> 4] << 8);
 }
 
 
@@ -285,9 +285,9 @@ static READ16_HANDLER( pigskin_port_2_r )
 
 static READ16_HANDLER( trisport_port_1_r )
 {
-	int xaxis = (INT8)input_port_read(machine, "AN1");
-	int yaxis = (INT8)input_port_read(machine, "AN2");
-	int result = input_port_read(machine, "IN1");
+	int xaxis = (INT8)input_port_read(space->machine, "AN1");
+	int yaxis = (INT8)input_port_read(space->machine, "AN2");
+	int result = input_port_read(space->machine, "IN1");
 
 	result |= (xaxis & 0x3c) << 6;
 	result |= (yaxis & 0x3c) << 10;

@@ -714,16 +714,16 @@ static READ32_HANDLER( lightgun_r )
 	switch( offset )
 	{
 	case 0:
-		data = input_port_read(machine,  "GUN1X" );
+		data = input_port_read(space->machine,  "GUN1X" );
 		break;
 	case 1:
-		data = ( input_port_read(machine,  "GUN1Y" ) ) | ( ( input_port_read(machine,  "GUN1Y" ) + 1 ) << 16 );
+		data = ( input_port_read(space->machine,  "GUN1Y" ) ) | ( ( input_port_read(space->machine,  "GUN1Y" ) + 1 ) << 16 );
 		break;
 	case 2:
-		data = input_port_read(machine,  "GUN2X" );
+		data = input_port_read(space->machine,  "GUN2X" );
 		break;
 	case 3:
-		data = ( input_port_read(machine,  "GUN2Y" ) ) | ( ( input_port_read(machine,  "GUN2Y" ) + 1 ) << 16 );
+		data = ( input_port_read(space->machine,  "GUN2Y" ) ) | ( ( input_port_read(space->machine,  "GUN2Y" ) + 1 ) << 16 );
 		break;
 	}
 	verboselog( 2, "lightgun_r( %08x, %08x ) %08x\n", offset, mem_mask, data );

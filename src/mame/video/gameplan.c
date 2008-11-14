@@ -118,7 +118,7 @@ static VIDEO_UPDATE( leprechn )
 
 static WRITE8_HANDLER( video_data_w )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = space->machine->driver_data;
 
 	state->video_data = data;
 }
@@ -126,7 +126,7 @@ static WRITE8_HANDLER( video_data_w )
 
 static WRITE8_HANDLER( gameplan_video_command_w )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = space->machine->driver_data;
 
 	state->video_command = data & 0x07;
 }
@@ -134,7 +134,7 @@ static WRITE8_HANDLER( gameplan_video_command_w )
 
 static WRITE8_HANDLER( leprechn_video_command_w )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = space->machine->driver_data;
 
 	state->video_command = (data >> 3) & 0x07;
 }
@@ -149,7 +149,7 @@ static TIMER_CALLBACK( clear_screen_done_callback )
 
 static WRITE8_HANDLER( video_command_trigger_w )
 {
-	gameplan_state *state = machine->driver_data;
+	gameplan_state *state = space->machine->driver_data;
 
 	if (data == 0)
 	{
@@ -192,7 +192,7 @@ static WRITE8_HANDLER( video_command_trigger_w )
 		/* clear screen */
 		case 3:
 			/* indicate that the we are busy */
-			via_0_ca1_w(machine, 0, 1);
+			via_0_ca1_w(space, 0, 1);
 
 			memset(state->videoram, state->video_data & 0x0f, state->videoram_size);
 

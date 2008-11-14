@@ -61,7 +61,7 @@ static TIMER_CALLBACK( cpu_irq_clock )
 WRITE8_HANDLER( mhavoc_alpha_irq_ack_w )
 {
 	/* clear the line and reset the clock */
-	cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 	alpha_irq_clock = 0;
 	alpha_irq_clock_enable = 1;
 }
@@ -70,7 +70,7 @@ WRITE8_HANDLER( mhavoc_alpha_irq_ack_w )
 WRITE8_HANDLER( mhavoc_gamma_irq_ack_w )
 {
 	/* clear the line and reset the clock */
-	cpu_set_input_line(machine->cpu[1], 0, CLEAR_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 0, CLEAR_LINE);
 	gamma_irq_clock = 0;
 }
 
@@ -268,7 +268,7 @@ WRITE8_HANDLER( mhavoc_out_0_w )
 	player_1 = (data >> 5) & 1;
 
 	/* Bit 3 = Gamma reset */
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x08))
 	{
 		logerror("\t\t\t\t*** resetting gamma processor. ***\n");

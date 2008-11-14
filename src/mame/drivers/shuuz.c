@@ -45,13 +45,13 @@ static void update_interrupts(running_machine *machine)
 
 static READ16_HANDLER( shuuz_atarivc_r )
 {
-	return atarivc_r(machine->primary_screen, offset);
+	return atarivc_r(space->machine->primary_screen, offset);
 }
 
 
 static WRITE16_HANDLER( shuuz_atarivc_w )
 {
-	atarivc_w(machine->primary_screen, offset, data, mem_mask);
+	atarivc_w(space->machine->primary_screen, offset, data, mem_mask);
 }
 
 
@@ -91,8 +91,8 @@ static READ16_HANDLER( leta_r )
 	/* when reading the even ports, do a real analog port update */
 	if (which == 0)
 	{
-		int dx = (INT8)input_port_read(machine, "TRACKX");
-		int dy = (INT8)input_port_read(machine, "TRACKY");
+		int dx = (INT8)input_port_read(space->machine, "TRACKX");
+		int dy = (INT8)input_port_read(space->machine, "TRACKY");
 
 		cur[0] = dx + dy;
 		cur[1] = dx - dy;
@@ -112,14 +112,14 @@ static READ16_HANDLER( leta_r )
 
 static READ16_HANDLER( adpcm_r )
 {
-	return okim6295_status_0_r(machine, offset) | 0xff00;
+	return okim6295_status_0_r(space, offset) | 0xff00;
 }
 
 
 static WRITE16_HANDLER( adpcm_w )
 {
 	if (ACCESSING_BITS_0_7)
-		okim6295_data_0_w(machine, offset, data & 0xff);
+		okim6295_data_0_w(space, offset, data & 0xff);
 }
 
 
@@ -132,9 +132,9 @@ static WRITE16_HANDLER( adpcm_w )
 
 static READ16_HANDLER( special_port0_r )
 {
-	int result = input_port_read(machine, "SYSTEM");
+	int result = input_port_read(space->machine, "SYSTEM");
 
-	if ((result & 0x0800) && atarigen_get_hblank(machine->primary_screen))
+	if ((result & 0x0800) && atarigen_get_hblank(space->machine->primary_screen))
 		result &= ~0x0800;
 
 	return result;

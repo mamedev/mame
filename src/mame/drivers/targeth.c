@@ -56,7 +56,7 @@ static INTERRUPT_GEN(targeth_interrupt )
 
 static WRITE16_HANDLER( OKIM6295_bankswitch_w )
 {
-	UINT8 *RAM = memory_region(machine, "oki");
+	UINT8 *RAM = memory_region(space->machine, "oki");
 
 	if (ACCESSING_BITS_0_7){
 		memcpy(&RAM[0x30000], &RAM[0x40000 + (data & 0x0f)*0x10000], 0x10000);

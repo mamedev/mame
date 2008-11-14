@@ -239,7 +239,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 {
 	UINT16 oldselect = *atarisy1_bankselect;
 	UINT16 newselect = oldselect, diff;
-	int scanline = video_screen_get_vpos(machine->primary_screen);
+	int scanline = video_screen_get_vpos(space->machine->primary_screen);
 
 	/* update memory */
 	COMBINE_DATA(&newselect);
@@ -248,17 +248,17 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 	/* sound CPU reset */
 	if (diff & 0x0080)
 	{
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
 		if (!(newselect & 0x0080)) atarigen_sound_reset();
 	}
 
 	/* if MO or playfield banks change, force a partial update */
 	if (diff & 0x003c)
-		video_screen_update_partial(machine->primary_screen, scanline);
+		video_screen_update_partial(space->machine->primary_screen, scanline);
 
 	/* motion object bank select */
 	atarimo_set_bank(0, (newselect >> 3) & 7);
-	update_timers(machine, scanline);
+	update_timers(space->machine, scanline);
 
 	/* playfield bank select */
 	if (diff & 0x0004)
@@ -287,7 +287,7 @@ WRITE16_HANDLER( atarisy1_priority_w )
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newpens);
 	if (oldpens != newpens)
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 	playfield_priority_pens = newpens;
 }
 
@@ -307,7 +307,7 @@ WRITE16_HANDLER( atarisy1_xscroll_w )
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newscroll);
 	if (oldscroll != newscroll)
-		video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen));
+		video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen));
 
 	/* set the new scroll value */
 	tilemap_set_scrollx(atarigen_playfield_tilemap, 0, newscroll);
@@ -334,23 +334,23 @@ WRITE16_HANDLER( atarisy1_yscroll_w )
 {
 	UINT16 oldscroll = *atarigen_yscroll;
 	UINT16 newscroll = oldscroll;
-	int scanline = video_screen_get_vpos(machine->primary_screen);
+	int scanline = video_screen_get_vpos(space->machine->primary_screen);
 	int adjusted_scroll;
 
 	/* force a partial update in case this changes mid-screen */
 	COMBINE_DATA(&newscroll);
-	video_screen_update_partial(machine->primary_screen, scanline);
+	video_screen_update_partial(space->machine->primary_screen, scanline);
 
 	/* because this latches a new value into the scroll base,
        we need to adjust for the scanline */
 	adjusted_scroll = newscroll;
-	if (scanline <= video_screen_get_visible_area(machine->primary_screen)->max_y)
+	if (scanline <= video_screen_get_visible_area(space->machine->primary_screen)->max_y)
 		adjusted_scroll -= (scanline + 1);
 	tilemap_set_scrolly(atarigen_playfield_tilemap, 0, adjusted_scroll);
 
 	/* but since we've adjusted it, we must reset it to the normal value
        once we hit scanline 0 again */
-	timer_adjust_oneshot(yscroll_reset_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), newscroll);
+	timer_adjust_oneshot(yscroll_reset_timer, video_screen_get_time_until_pos(space->machine->primary_screen, 0, 0), newscroll);
 
 	/* update the data */
 	*atarigen_yscroll = newscroll;
@@ -379,8 +379,8 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 		    ((offset & 0xc0) == 0x40 && (newword == 0xffff || oldword == 0xffff)))
 		{
 			/* if the timer is in the active bank, update the display list */
-			atarimo_0_spriteram_w(machine, offset, data, 0xffff);
-			update_timers(machine, video_screen_get_vpos(machine->primary_screen));
+			atarimo_0_spriteram_w(space, offset, data, 0xffff);
+			update_timers(space->machine, video_screen_get_vpos(space->machine->primary_screen));
 		}
 
 		/* if we're about to modify data in the active sprite bank, make sure the video is up-to-date */
@@ -388,11 +388,11 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 		/* renders the next scanline's sprites to the line buffers, but Road Runner still glitches */
 		/* without the extra +1 */
 		else
-			video_screen_update_partial(machine->primary_screen, video_screen_get_vpos(machine->primary_screen) + 2);
+			video_screen_update_partial(space->machine->primary_screen, video_screen_get_vpos(space->machine->primary_screen) + 2);
 	}
 
 	/* let the MO handler do the basic work */
-	atarimo_0_spriteram_w(machine, offset, data, 0xffff);
+	atarimo_0_spriteram_w(space, offset, data, 0xffff);
 }
 
 

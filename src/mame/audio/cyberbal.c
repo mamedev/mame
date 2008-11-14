@@ -40,8 +40,8 @@ void cyberbal_sound_reset(running_machine *machine)
 
 READ8_HANDLER( cyberbal_special_port3_r )
 {
-	int temp = input_port_read(machine, "JSAII");
-	if (!(input_port_read(machine, "IN0") & 0x8000)) temp ^= 0x80;
+	int temp = input_port_read(space->machine, "JSAII");
+	if (!(input_port_read(space->machine, "IN0") & 0x8000)) temp ^= 0x80;
 	if (atarigen_cpu_to_sound_ready) temp ^= 0x40;
 	if (atarigen_sound_to_cpu_ready) temp ^= 0x20;
 	return temp;
@@ -62,7 +62,7 @@ WRITE8_HANDLER( cyberbal_sound_bank_select_w )
 	memory_set_bankptr(8, &bank_base[0x1000 * ((data >> 6) & 3)]);
 	coin_counter_w(1, (data >> 5) & 1);
 	coin_counter_w(0, (data >> 4) & 1);
-	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(space->machine->cpu[3], INPUT_LINE_RESET, (data & 0x08) ? CLEAR_LINE : ASSERT_LINE);
 	if (!(data & 0x01)) sndti_reset(SOUND_YM2151, 0);
 
 }
@@ -83,7 +83,7 @@ WRITE8_HANDLER( cyberbal_sound_68k_6502_w )
 	if (!io_68k_int)
 	{
 		io_68k_int = 1;
-		update_sound_68k_interrupts(machine);
+		update_sound_68k_interrupts(space->machine);
 	}
 }
 
@@ -117,7 +117,7 @@ WRITE16_HANDLER( cyberbal_io_68k_irq_ack_w )
 	if (io_68k_int)
 	{
 		io_68k_int = 0;
-		update_sound_68k_interrupts(machine);
+		update_sound_68k_interrupts(space->machine);
 	}
 }
 
@@ -151,6 +151,6 @@ WRITE16_HANDLER( cyberbal_sound_68k_dac_w )
 	if (fast_68k_int)
 	{
 		fast_68k_int = 0;
-		update_sound_68k_interrupts(machine);
+		update_sound_68k_interrupts(space->machine);
 	}
 }

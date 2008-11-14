@@ -120,20 +120,20 @@ static WRITE8_HANDLER( yumefuda_cram_w )
 /*Custom RAM (Protection)*/
 static READ8_HANDLER( custom_ram_r )
 {
-//  logerror("Custom RAM read at %02x PC = %x\n",offset+0xaf80,cpu_get_pc(machine->activecpu));
+//  logerror("Custom RAM read at %02x PC = %x\n",offset+0xaf80,cpu_get_pc(space->cpu));
 	return cus_ram[offset];// ^ 0x55;
 }
 
 static WRITE8_HANDLER( custom_ram_w )
 {
-//  logerror("Custom RAM write at %02x : %02x PC = %x\n",offset+0xaf80,data,cpu_get_pc(machine->activecpu));
+//  logerror("Custom RAM write at %02x : %02x PC = %x\n",offset+0xaf80,data,cpu_get_pc(space->cpu));
 	if(prot_lock)	{ cus_ram[offset] = data; }
 }
 
 /*this might be used as NVRAM commands btw*/
 static WRITE8_HANDLER( prot_lock_w )
 {
-//  logerror("PC %04x Prot lock value written %02x\n",cpu_get_pc(machine->activecpu),data);
+//  logerror("PC %04x Prot lock value written %02x\n",cpu_get_pc(space->cpu),data);
 	prot_lock = data;
 }
 
@@ -146,7 +146,7 @@ static WRITE8_HANDLER( eeprom_w )
 
 static WRITE8_HANDLER( port_c0_w )
 {
-//  logerror("PC %04x (Port $c0) value written %02x\n",cpu_get_pc(machine->activecpu),data);
+//  logerror("PC %04x (Port $c0) value written %02x\n",cpu_get_pc(space->cpu),data);
 }
 
 
@@ -159,13 +159,13 @@ static READ8_HANDLER( mux_r )
 {
 	switch(mux_data)
 	{
-		case 0x00: return input_port_read(machine, "IN0");
-		case 0x01: return input_port_read(machine, "IN1");
-		case 0x02: return input_port_read(machine, "IN2");
-		case 0x04: return input_port_read(machine, "IN3");
-		case 0x08: return input_port_read(machine, "IN4");
-		case 0x10: return input_port_read(machine, "IN5");
-		case 0x20: return input_port_read(machine, "IN6");
+		case 0x00: return input_port_read(space->machine, "IN0");
+		case 0x01: return input_port_read(space->machine, "IN1");
+		case 0x02: return input_port_read(space->machine, "IN2");
+		case 0x04: return input_port_read(space->machine, "IN3");
+		case 0x08: return input_port_read(space->machine, "IN4");
+		case 0x10: return input_port_read(space->machine, "IN5");
+		case 0x20: return input_port_read(space->machine, "IN6");
 	}
 
 	//popmessage("%02x",mux_data);
@@ -181,7 +181,7 @@ static WRITE8_HANDLER( mux_w )
 	//0x14000 bonus game
 	//0x16000 ?
 	if(bank!=new_bank) {
-		UINT8 *ROM = memory_region(machine, "main");
+		UINT8 *ROM = memory_region(space->machine, "main");
 		UINT32 bankaddress;
 
 		bank = new_bank;
@@ -211,12 +211,12 @@ static WRITE8_HANDLER( yumefuda_videoregs_w )
 
 static READ8_HANDLER( in7_r )
 {
-	return input_port_read(machine, "DSW1");
+	return input_port_read(space->machine, "DSW1");
 }
 
 static READ8_HANDLER( in8_r )
 {
-	return input_port_read(machine, "DSW2");
+	return input_port_read(space->machine, "DSW2");
 }
 
 static const ay8910_interface ay8910_config =

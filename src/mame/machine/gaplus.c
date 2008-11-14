@@ -35,7 +35,7 @@ READ8_HANDLER( gaplus_customio_3_r )
 	switch (offset)
 	{
 		case 0:
-			return input_port_read(machine, "IN2");		/* cabinet & test mode */
+			return input_port_read(space->machine, "IN2");		/* cabinet & test mode */
 			break;
 		case 1:
 			return (mode == 2) ? gaplus_customio_3[offset] : 0x0f;

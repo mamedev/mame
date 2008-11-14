@@ -482,8 +482,8 @@ WRITE8_HANDLER( williams2_bank_select_w )
 	{
 		/* page 0 is video ram */
 		case 0:
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
+			memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
 			memory_set_bank(1, 0);
 			memory_set_bankptr(4, &williams_videoram[0x8000]);
 			break;
@@ -491,15 +491,15 @@ WRITE8_HANDLER( williams2_bank_select_w )
 		/* pages 1 and 2 are ROM */
 		case 1:
 		case 2:
-			memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
+			memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
 			memory_set_bank(1, 1 + ((vram_bank & 6) >> 1));
 			memory_set_bankptr(4, &williams_videoram[0x8000]);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4, williams2_paletteram_w);
+			memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4, williams2_paletteram_w);
 			memory_set_bank(1, 1 + ((vram_bank & 4) >> 1));
 			memory_set_bankptr(4, paletteram);
 			break;
@@ -593,16 +593,16 @@ CUSTOM_INPUT( williams_mux_r )
 READ8_HANDLER( williams_49way_port_0_r )
 {
 	static const UINT8 translate49[7] = { 0x0, 0x4, 0x6, 0x7, 0xb, 0x9, 0x8 };
-	return (translate49[input_port_read(machine, "49WAYX") >> 4] << 4) | translate49[input_port_read(machine, "49WAYY") >> 4];
+	return (translate49[input_port_read(space->machine, "49WAYX") >> 4] << 4) | translate49[input_port_read(space->machine, "49WAYY") >> 4];
 }
 
 
 READ8_HANDLER( williams_input_port_49way_0_5_r )
 {
 	if (port_select)
-		return williams_49way_port_0_r(machine,0);
+		return williams_49way_port_0_r(space,0);
 	else
-		return input_port_read(machine, "IN3");
+		return input_port_read(space->machine, "IN3");
 }
 
 
@@ -638,7 +638,7 @@ WRITE8_HANDLER( williams_watchdog_reset_w )
 {
 	/* yes, the data bits are checked for this specific value */
 	if (data == 0x39)
-		watchdog_reset_w(machine,0,0);
+		watchdog_reset_w(space,0,0);
 }
 
 
@@ -646,7 +646,7 @@ WRITE8_HANDLER( williams2_watchdog_reset_w )
 {
 	/* yes, the data bits are checked for this specific value */
 	if ((data & 0x3f) == 0x14)
-		watchdog_reset_w(machine,0,0);
+		watchdog_reset_w(space,0,0);
 }
 
 
@@ -731,7 +731,7 @@ WRITE8_HANDLER( defender_bank_select_w )
 	{
 		/* page 0 is I/O space */
 		case 0:
-			defender_install_io_space(machine);
+			defender_install_io_space(space->machine);
 			break;
 
 		/* pages 1-9 map to ROM banks */
@@ -744,13 +744,13 @@ WRITE8_HANDLER( defender_bank_select_w )
 		case 7:
 		case 8:
 		case 9:
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+			memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
 			memory_set_bank(1, vram_bank - 1);
 			break;
 
 		/* pages A-F are not connected */
 		default:
-			memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_NOP, SMH_NOP);
+			memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_NOP, SMH_NOP);
 			break;
 	}
 }
@@ -768,7 +768,7 @@ READ8_HANDLER( mayday_protection_r )
 	/* Mayday does some kind of protection check that is not currently understood  */
 	/* However, the results of that protection check are stored at $a190 and $a191 */
 	/* These are compared against $a193 and $a194, respectively. Thus, to prevent  */
-	/* the protection from resetting the machine, we just return $a193 for $a190,  */
+	/* the protection from resetting the space->machine, we just return $a193 for $a190,  */
 	/* and $a194 for $a191. */
 	return mayday_protection[offset + 3];
 }
@@ -784,7 +784,7 @@ READ8_HANDLER( mayday_protection_r )
 WRITE8_HANDLER( sinistar_vram_select_w )
 {
 	/* low two bits are standard */
-	williams_vram_select_w(machine, offset, data);
+	williams_vram_select_w(space, offset, data);
 
 	/* window enable from bit 2 (clips to 0x7400) */
 	williams_blitter_window_enable = data & 0x04;
@@ -851,7 +851,7 @@ WRITE8_HANDLER( blaster_bank_select_w )
 static READ8_HANDLER( lottofun_input_port_0_r )
 {
 	/* merge in the ticket dispenser status */
-	return input_port_read(machine, "IN0") | ticket_dispenser_r(machine,offset);
+	return input_port_read(space->machine, "IN0") | ticket_dispenser_r(space,offset);
 }
 
 
@@ -865,7 +865,7 @@ static READ8_HANDLER( lottofun_input_port_0_r )
 static READ8_HANDLER( tshoot_input_port_0_3_r )
 {
 	/* merge in the gun inputs with the standard data */
-	int data = input_port_read(machine, "IN0");
+	int data = input_port_read(space->machine, "IN0");
 	int gun = (data & 0x3f) ^ ((data & 0x3f) >> 1);
 	return (data & 0xc0) | gun;
 
@@ -876,7 +876,7 @@ static READ8_HANDLER( tshoot_input_port_0_3_r )
 static WRITE8_HANDLER( tshoot_maxvol_w )
 {
 	/* something to do with the sound volume */
-	logerror("tshoot maxvol = %d (pc:%x)\n", data, cpu_get_pc(machine->activecpu));
+	logerror("tshoot maxvol = %d (pc:%x)\n", data, cpu_get_pc(space->cpu));
 }
 
 
@@ -937,7 +937,7 @@ static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 static WRITE8_HANDLER( joust2_pia_3_cb1_w )
 {
 	joust2_current_sound_data = (joust2_current_sound_data & ~0x100) | ((data << 8) & 0x100);
-	pia_3_cb1_w(machine, offset, data);
+	pia_3_cb1_w(space, offset, data);
 }
 
 

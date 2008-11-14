@@ -119,14 +119,14 @@ READ8_HANDLER( mgakuen_objram_r )
 
 WRITE8_HANDLER( pang_videoram_w )
 {
-	if (video_bank) mgakuen_objram_w(machine,offset,data);
-	else mgakuen_videoram_w(machine,offset,data);
+	if (video_bank) mgakuen_objram_w(space,offset,data);
+	else mgakuen_videoram_w(space,offset,data);
 }
 
 READ8_HANDLER( pang_videoram_r )
 {
-	if (video_bank) return mgakuen_objram_r(machine,offset);
-	else return mgakuen_videoram_r(machine,offset);
+	if (video_bank) return mgakuen_objram_r(space,offset);
+	else return mgakuen_videoram_r(space,offset);
 }
 
 /***************************************************************************
@@ -152,7 +152,7 @@ static int paletteram_bank;
 
 WRITE8_HANDLER( pang_gfxctrl_w )
 {
-logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(machine->activecpu),data);
+logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
 {
 #if 0
 	char baf[40];
@@ -189,7 +189,7 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(machine->activecpu),data);
 
 WRITE8_HANDLER( mstworld_gfxctrl_w )
 {
-logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(machine->activecpu),data);
+logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(space->cpu),data);
 {
 	char baf[40];
 	sprintf(baf,"%02x",data);
@@ -225,8 +225,8 @@ logerror("PC %04x: pang_gfxctrl_w %02x\n",cpu_get_pc(machine->activecpu),data);
 
 WRITE8_HANDLER( pang_paletteram_w )
 {
-	if (paletteram_bank) paletteram_xxxxRRRRGGGGBBBB_le_w(machine,offset + 0x800,data);
-	else paletteram_xxxxRRRRGGGGBBBB_le_w(machine,offset,data);
+	if (paletteram_bank) paletteram_xxxxRRRRGGGGBBBB_le_w(space,offset + 0x800,data);
+	else paletteram_xxxxRRRRGGGGBBBB_le_w(space,offset,data);
 }
 
 READ8_HANDLER( pang_paletteram_r )
@@ -237,7 +237,7 @@ READ8_HANDLER( pang_paletteram_r )
 
 WRITE8_HANDLER( mgakuen_paletteram_w )
 {
-	paletteram_xxxxRRRRGGGGBBBB_le_w(machine,offset,data);
+	paletteram_xxxxRRRRGGGGBBBB_le_w(space,offset,data);
 }
 
 READ8_HANDLER( mgakuen_paletteram_r )

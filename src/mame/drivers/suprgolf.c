@@ -40,18 +40,18 @@ static READ8_HANDLER( rom_bank_select_r )
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	UINT8 *region_base = memory_region(machine, "user1");
+	UINT8 *region_base = memory_region(space->machine, "user1");
 
 	suprgolf_rom_bank = data;
 
-	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(machine->activecpu));
+	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 	memory_set_bankptr(2, region_base + (data&0x3f ) * 0x4000);
 }
 
 static WRITE8_HANDLER( rom2_bank_select_w )
 {
-	UINT8 *region_base = memory_region(machine, "user2");
-	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(machine->activecpu));
+	UINT8 *region_base = memory_region(space->machine, "user2");
+	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
 	memory_set_bankptr(1, region_base + (data&0x3f ) * 0x4000);
 }
 
@@ -92,7 +92,7 @@ ADDRESS_MAP_END
 
 static READ8_HANDLER( suprgolf_random )
 {
-	return mame_rand(machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )

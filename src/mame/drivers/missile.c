@@ -460,7 +460,7 @@ static OPBASE_HANDLER( missile_opbase_handler )
 	/* ROM? */
 	else if (address >= 0x5000)
 	{
-		opbase->rom = opbase->ram = memory_region(machine, "main") - offset;
+		opbase->rom = opbase->ram = memory_region(space->machine, "main") - offset;
 		return ~0;
 	}
 
@@ -663,9 +663,9 @@ static VIDEO_UPDATE( missile )
 static WRITE8_HANDLER( missile_w )
 {
 	/* if we're in MADSEL mode, write to video RAM */
-	if (get_madsel(machine))
+	if (get_madsel(space->machine))
 	{
-		write_vram(machine, offset, data);
+		write_vram(space->machine, offset, data);
 		return;
 	}
 
@@ -678,7 +678,7 @@ static WRITE8_HANDLER( missile_w )
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		pokey1_w(machine, offset & 0x0f, data);
+		pokey1_w(space, offset & 0x0f, data);
 
 	/* OUT0 */
 	else if (offset < 0x4900)
@@ -694,25 +694,25 @@ static WRITE8_HANDLER( missile_w )
 
 	/* color RAM */
 	else if (offset >= 0x4b00 && offset < 0x4c00)
-		palette_set_color_rgb(machine, offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
+		palette_set_color_rgb(space->machine, offset & 7, pal1bit(~data >> 3), pal1bit(~data >> 2), pal1bit(~data >> 1));
 
 	/* watchdog */
 	else if (offset >= 0x4c00 && offset < 0x4d00)
-		watchdog_reset(machine);
+		watchdog_reset(space->machine);
 
 	/* interrupt ack */
 	else if (offset >= 0x4d00 && offset < 0x4e00)
 	{
 		if (irq_state)
 		{
-			cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[0], 0, CLEAR_LINE);
 			irq_state = 0;
 		}
 	}
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown write to %04X = %02X\n", cpu_get_pc(machine->activecpu), offset, data);
+		logerror("%04X:Unknown write to %04X = %02X\n", cpu_get_pc(space->cpu), offset, data);
 }
 
 
@@ -721,8 +721,8 @@ static READ8_HANDLER( missile_r )
 	UINT8 result = 0xff;
 
 	/* if we're in MADSEL mode, read from video RAM */
-	if (get_madsel(machine))
-		return read_vram(machine, offset);
+	if (get_madsel(space->machine))
+		return read_vram(space->machine, offset);
 
 	/* otherwise, strip A15 and handle manually */
 	offset &= 0x7fff;
@@ -733,11 +733,11 @@ static READ8_HANDLER( missile_r )
 
 	/* ROM */
 	else if (offset >= 0x5000)
-		result = memory_region(machine, "main")[offset];
+		result = memory_region(space->machine, "main")[offset];
 
 	/* POKEY */
 	else if (offset < 0x4800)
-		result = pokey1_r(machine, offset & 0x0f);
+		result = pokey1_r(space, offset & 0x0f);
 
 	/* IN0 */
 	else if (offset < 0x4900)
@@ -745,25 +745,25 @@ static READ8_HANDLER( missile_r )
 		if (ctrld)	/* trackball */
 		{
 			if (!flipscreen)
-		  	    result = ((input_port_read(machine, "TRACK0_Y") << 4) & 0xf0) | (input_port_read(machine, "TRACK0_X") & 0x0f);
+		  	    result = ((input_port_read(space->machine, "TRACK0_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK0_X") & 0x0f);
 			else
-		  	    result = ((input_port_read(machine, "TRACK1_Y") << 4) & 0xf0) | (input_port_read(machine, "TRACK1_X") & 0x0f);
+		  	    result = ((input_port_read(space->machine, "TRACK1_Y") << 4) & 0xf0) | (input_port_read(space->machine, "TRACK1_X") & 0x0f);
 		}
 		else	/* buttons */
-			result = input_port_read(machine, "IN0");
+			result = input_port_read(space->machine, "IN0");
 	}
 
 	/* IN1 */
 	else if (offset < 0x4a00)
-		result = input_port_read(machine, "IN1");
+		result = input_port_read(space->machine, "IN1");
 
 	/* IN2 */
 	else if (offset < 0x4b00)
-		result = input_port_read(machine, "R10");
+		result = input_port_read(space->machine, "R10");
 
 	/* anything else */
 	else
-		logerror("%04X:Unknown read from %04X\n", cpu_get_pc(machine->activecpu), offset);
+		logerror("%04X:Unknown read from %04X\n", cpu_get_pc(space->cpu), offset);
 	return result;
 }
 

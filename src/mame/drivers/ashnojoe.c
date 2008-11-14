@@ -110,7 +110,7 @@ static WRITE16_HANDLER( ashnojoe_soundlatch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		soundlatch_status = 1;
-		soundlatch_w(machine, 0, data & 0xff);
+		soundlatch_w(space, 0, data & 0xff);
 	}
 }
 
@@ -145,7 +145,7 @@ static WRITE8_HANDLER( adpcm_w )
 static READ8_HANDLER( sound_latch_r )
 {
 	soundlatch_status = 0;
-	return soundlatch_r(machine, 0);
+	return soundlatch_r(space, 0);
 }
 
 static READ8_HANDLER( sound_latch_status_r )
@@ -306,7 +306,7 @@ static WRITE8_HANDLER( ym2203_write_a )
 
 static WRITE8_HANDLER( ym2203_write_b )
 {
-	memory_set_bankptr(4, memory_region(machine, "adpcm") + ((data & 0xf) * 0x8000));
+	memory_set_bankptr(4, memory_region(space->machine, "adpcm") + ((data & 0xf) * 0x8000));
 }
 
 static const ym2203_interface ym2203_config =
