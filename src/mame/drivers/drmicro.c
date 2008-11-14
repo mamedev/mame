@@ -68,7 +68,7 @@ static void pcm_w(running_machine *machine, int irq)
 static WRITE8_HANDLER( pcm_set_w )
 {
 	pcm_adr = ((data & 0x3f) << 9);
-	pcm_w(space, 0);
+	pcm_w(space->machine, 0);
 }
 
 /****************************************************************************/

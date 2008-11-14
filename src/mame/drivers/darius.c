@@ -214,12 +214,12 @@ static WRITE16_HANDLER( darius_ioc_w )
 	{
 		case 0x00:	/* sound interface write */
 
-			taitosound_port_w (space->machine, 0, data & 0xff);
+			taitosound_port_w (space, 0, data & 0xff);
 			return;
 
 		case 0x01:	/* sound interface write */
 
-			taitosound_comm_w (space->machine, 0, data & 0xff);
+			taitosound_comm_w (space, 0, data & 0xff);
 			return;
 
 		case 0x28:	/* unknown, written by both cpus - always 0? */
