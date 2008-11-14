@@ -1996,6 +1996,7 @@ const game_driver * const drivers[] =
 	DRIVER( twinqix )	/* ??? (c) 1995 Taito America Corporation (US) */
 	DRIVER( quizhuhu )	/* E08 (c) 1995 Taito Corporation (Japan) */
 	DRIVER( pbobble2 )	/* E10 (c) 1995 Taito Corporation Japan (World) */
+	DRIVER( pbobbl2o )	/* E10 (c) 1995 Taito Corporation Japan (World) */
 	DRIVER( pbobbl2j )	/* E10 (c) 1995 Taito Corporation (Japan) */
 	DRIVER( pbobbl2u )	/* E10 (c) 1995 Taito America Corporation (US) */
 	DRIVER( pbobbl2x )	/* E10 (c) 1995 Taito Corporation (Japan) */
