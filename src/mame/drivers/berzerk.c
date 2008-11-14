@@ -536,8 +536,9 @@ static READ8_HANDLER( berzerk_audio_r )
 
 static SOUND_RESET(berzerk)
 {
+	address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 	/* clears the flip-flop controlling the volume and freq on the speech chip */
-	berzerk_audio_w(machine, 4, 0x40);
+	berzerk_audio_w(space, 4, 0x40);
 }
 
 

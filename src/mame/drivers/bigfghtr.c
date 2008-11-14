@@ -272,7 +272,8 @@ static VIDEO_UPDATE( bigfghtr )
 
 static VIDEO_EOF( bigfghtr )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram16_w(space,0,0,0xffff);
 }
 
 

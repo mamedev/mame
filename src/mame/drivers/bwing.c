@@ -72,7 +72,7 @@ static INTERRUPT_GEN ( bwp1_interrupt )
 				ffcount--;
 				latch_data = sound_fifo[fftail];
 				fftail = (fftail + 1) & (MAX_SOUNDS - 1);
-				soundlatch_w(device->machine, 0, latch_data);
+				soundlatch_w(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0, latch_data);
 				cpu_set_input_line(device->machine->cpu[2], DECO16_IRQ_LINE, HOLD_LINE); // SNDREQ
 			}
 		break;
