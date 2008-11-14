@@ -117,6 +117,7 @@ static WRITE8_HANDLER( aerofgt_sh_bankswitch_w )
 static MACHINE_RESET( aerofgt )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	aerofgt_sh_bankswitch_w(space,0,0);	/* needed by spinlbrk */
 }
 

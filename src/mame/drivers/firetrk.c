@@ -40,7 +40,9 @@ static INPUT_CHANGED( service_mode_switch_changed )
 
 static INPUT_CHANGED( firetrk_horn_changed )
 {
-	discrete_sound_w(field->port->machine, FIRETRUCK_HORN_EN, newval);
+	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	discrete_sound_w(space, FIRETRUCK_HORN_EN, newval);
 }
 
 

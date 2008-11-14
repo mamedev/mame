@@ -391,9 +391,10 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 
 static MACHINE_RESET( reikaids_upd7807 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_which=homedata_priority;
-	reikaids_upd7807_portc_w(machine,0,0xff);
+	reikaids_upd7807_portc_w(space,0,0xff);
 }
 
 static READ8_HANDLER( reikaids_io_r )
@@ -537,8 +538,9 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 static MACHINE_RESET( pteacher_upd7807 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
-	pteacher_upd7807_portc_w(machine,0,0xff);
+	pteacher_upd7807_portc_w(space,0,0xff);
 }
 
 

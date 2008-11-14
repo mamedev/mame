@@ -126,7 +126,9 @@ ADDRESS_MAP_END
 
 static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 {
-	return (victnine_mcu_status_r(field->port->machine,0) & 3);
+	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	return (victnine_mcu_status_r(space,0) & 3);
 }
 
 static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )

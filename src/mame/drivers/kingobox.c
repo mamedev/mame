@@ -68,12 +68,12 @@ static WRITE8_HANDLER( sprite_interrupt_w ) {
 }
 
 static WRITE8_HANDLER( scroll_interrupt_w ) {
-	sprite_interrupt_w( space->machine, offset, data );
+	sprite_interrupt_w( space, offset, data );
 	*kingofb_scroll_y = data;
 }
 
 static WRITE8_HANDLER( sound_command_w ) {
-	soundlatch_w( space->machine, 0, data );
+	soundlatch_w( space, 0, data );
 	cpu_set_input_line_and_vector(space->machine->cpu[3], 0, HOLD_LINE, 0xff );
 }
 

@@ -110,7 +110,7 @@ static WRITE8_HANDLER( gyruss_irq_clear_w )
 	cputag_set_input_line(space->machine, "audio2", 0, CLEAR_LINE);
 }
 
-static void filter_w(running_machine *machine, int chip, int data)
+static void filter_w(const address_space *space, int chip, int data)
 {
 	int i;
 
@@ -119,7 +119,7 @@ static void filter_w(running_machine *machine, int chip, int data)
 	{
 		/* low bit: 47000pF = 0.047uF */
 		/* high bit: 220000pF = 0.22uF */
-		discrete_sound_w(machine, NODE(3 * chip + i + 21), data & 3);
+		discrete_sound_w(space, NODE(3 * chip + i + 21), data & 3);
 		data >>= 2;
 	}
 }

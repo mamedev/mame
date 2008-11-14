@@ -127,7 +127,7 @@ static WRITE8_HANDLER( sound_control_w ) {
 }
 
 static WRITE8_HANDLER( sound_command_w ) {
-	soundlatch_w( space->machine, 0, data );
+	soundlatch_w( space, 0, data );
 	cpu_set_input_line_and_vector(space->machine->cpu[1], 0, HOLD_LINE, 0xff );
 }
 

@@ -373,12 +373,12 @@ WRITE16_HANDLER ( genesis_68k_to_z80_w )
 		switch (offset & 3)
 		{
 		case 0:
-			if (ACCESSING_BITS_8_15)	ym3438_control_port_0_a_w	(space->machine, 0,	(data >> 8) & 0xff);
-			else 				ym3438_data_port_0_a_w		(space->machine, 0,	(data >> 0) & 0xff);
+			if (ACCESSING_BITS_8_15)	ym3438_control_port_0_a_w	(space, 0,	(data >> 8) & 0xff);
+			else 				ym3438_data_port_0_a_w		(space, 0,	(data >> 0) & 0xff);
 			break;
 		case 2:
-			if (ACCESSING_BITS_8_15)	ym3438_control_port_0_b_w	(space->machine, 0,	(data >> 8) & 0xff);
-			else 				ym3438_data_port_0_b_w		(space->machine, 0,	(data >> 0) & 0xff);
+			if (ACCESSING_BITS_8_15)	ym3438_control_port_0_b_w	(space, 0,	(data >> 8) & 0xff);
+			else 				ym3438_data_port_0_b_w		(space, 0,	(data >> 0) & 0xff);
 			break;
 		}
 	}
@@ -576,13 +576,13 @@ WRITE8_HANDLER ( genesis_z80_w )
 	{
 		switch (offset & 3)
 		{
-		case 0: ym3438_control_port_0_a_w	(space->machine, 0,	data);
+		case 0: ym3438_control_port_0_a_w	(space, 0,	data);
 			break;
-		case 1: ym3438_data_port_0_a_w		(space->machine, 0, data);
+		case 1: ym3438_data_port_0_a_w		(space, 0, data);
 			break;
-		case 2: ym3438_control_port_0_b_w	(space->machine, 0,	data);
+		case 2: ym3438_control_port_0_b_w	(space, 0,	data);
 			break;
-		case 3: ym3438_data_port_0_b_w		(space->machine, 0,	data);
+		case 3: ym3438_data_port_0_b_w		(space, 0,	data);
 			break;
 		}
 	}

@@ -473,7 +473,7 @@ static READ8_HANDLER( sysreg_r )
 			return input_port_read(space->machine, portnames[offset]);
 
 		case 2:
-			return adc1038_sars_r(space) << 7;
+			return adc1038_sars_r(space->machine) << 7;
 
 		case 4:
 		{
@@ -521,7 +521,7 @@ static WRITE8_HANDLER( sysreg_w )
 				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ0, CLEAR_LINE);
 
 			adc1038_di_w((data >> 0) & 1);
-			adc1038_clk_w(space, (data >> 1) & 1);
+			adc1038_clk_w(space->machine, (data >> 1) & 1);
 
 			set_cgboard_id((data >> 4) & 0x3);
 			break;

@@ -219,11 +219,11 @@ static READ16_HANDLER( dual539_r )
 	data = 0;
 	if( ACCESSING_BITS_0_7 )
 	{
-		data |= k054539_1_r( space->machine, offset );
+		data |= k054539_1_r( space, offset );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		data |= k054539_0_r( space->machine, offset ) << 8;
+		data |= k054539_0_r( space, offset ) << 8;
 	}
 	return data;
 }
@@ -232,11 +232,11 @@ static WRITE16_HANDLER( dual539_w )
 {
 	if( ACCESSING_BITS_0_7 )
 	{
-		k054539_1_w( space->machine, offset, data );
+		k054539_1_w( space, offset, data );
 	}
 	if( ACCESSING_BITS_8_15 )
 	{
-		k054539_0_w( space->machine, offset, data >> 8 );
+		k054539_0_w( space, offset, data >> 8 );
 	}
 }
 

@@ -291,9 +291,9 @@ static WRITE16_HANDLER( karnov_control_w )
 			break;
 
 		case 6: /* SECREQ (Interrupt & Data to i8751) */
-			if (microcontroller_id==KARNOV || microcontroller_id==KARNOVJ) karnov_i8751_w(space, data);
-			if (microcontroller_id==CHELNOV || microcontroller_id==CHELNOVJ || microcontroller_id==CHELNOVW) chelnov_i8751_w(space, data);
-			if (microcontroller_id==WNDRPLNT) wndrplnt_i8751_w(space, data);
+			if (microcontroller_id==KARNOV || microcontroller_id==KARNOVJ) karnov_i8751_w(space->machine, data);
+			if (microcontroller_id==CHELNOV || microcontroller_id==CHELNOVJ || microcontroller_id==CHELNOVW) chelnov_i8751_w(space->machine, data);
+			if (microcontroller_id==WNDRPLNT) wndrplnt_i8751_w(space->machine, data);
 			break;
 
 		case 8: /* HSHIFT (9 bits) - Top bit indicates video flip */

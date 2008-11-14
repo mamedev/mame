@@ -134,12 +134,12 @@ static READ16_HANDLER( exterm_host_data_r )
  *
  *************************************/
 
-static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT16 mem_mask)
+static UINT16 exterm_trackball_port_r(const address_space *space, int which, UINT16 mem_mask)
 {
 	UINT16 port;
 
 	/* Read the fake input port */
-	UINT8 trackball_pos = input_port_read(machine, which ? "DIAL1" : "DIAL0");
+	UINT8 trackball_pos = input_port_read(space->machine, which ? "DIAL1" : "DIAL0");
 
 	/* Calculate the change from the last position. */
 	UINT8 trackball_diff = trackball_old[which] - trackball_pos;
@@ -155,7 +155,7 @@ static UINT16 exterm_trackball_port_r(running_machine *machine, int which, UINT1
 	aimpos[which] = (aimpos[which] + trackball_diff) & 0x3f;
 
 	/* Combine it with the standard input bits */
-	port = which ? input_port_read(machine, "P2") : input_port_read(machine, "P1");
+	port = which ? input_port_read(space->machine, "P2") : input_port_read(space->machine, "P1");
 
 	return (port & 0xc0ff) | (aimpos[which] << 8);
 }

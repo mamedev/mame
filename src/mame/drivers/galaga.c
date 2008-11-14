@@ -824,14 +824,20 @@ static MACHINE_START( galaga )
 	cpu3_interrupt_timer = timer_alloc(cpu3_interrupt_callback, NULL);
 }
 
-
-static MACHINE_RESET( bosco )
+static void bosco_latch_reset(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
 	for (i = 0;i < 8;i++)
-		bosco_latch_w(machine,i,0);
+		bosco_latch_w(space,i,0);
+}
+
+static MACHINE_RESET( bosco )
+{
+	/* Reset all latches */
+	bosco_latch_reset(machine);
 
 	namco_06xx_init(0, 0,
 		NAMCOIO_51XX, &intf0,
@@ -850,11 +856,8 @@ static MACHINE_RESET( bosco )
 
 static MACHINE_RESET( galaga )
 {
-	int i;
-
 	/* Reset all latches */
-	for (i = 0;i < 8;i++)
-		bosco_latch_w(machine,i,0);
+	bosco_latch_reset(machine);
 
 	namco_06xx_init(0, 0,
 		NAMCOIO_51XX, &intf0,
@@ -867,11 +870,8 @@ static MACHINE_RESET( galaga )
 
 static MACHINE_RESET( xevious )
 {
-	int i;
-
 	/* Reset all latches */
-	for (i = 0;i < 8;i++)
-		bosco_latch_w(machine,i,0);
+	bosco_latch_reset(machine);
 
 	namco_06xx_init(0, 0,
 		NAMCOIO_51XX, &intf0,
@@ -884,11 +884,8 @@ static MACHINE_RESET( xevious )
 
 static MACHINE_RESET( battles )
 {
-	int i;
-
 	/* Reset all latches */
-	for (i = 0;i < 8;i++)
-		bosco_latch_w(machine,i,0);
+	bosco_latch_reset(machine);
 
 	battles_customio_init();
 
@@ -897,11 +894,8 @@ static MACHINE_RESET( battles )
 
 static MACHINE_RESET( digdug )
 {
-	int i;
-
 	/* Reset all latches */
-	for (i = 0;i < 8;i++)
-		bosco_latch_w(machine,i,0);
+	bosco_latch_reset(machine);
 
 	namco_06xx_init(0, 0,
 		NAMCOIO_51XX, &intf0,
