@@ -145,7 +145,7 @@ static void f1dream_protection_w(const address_space *space)
 	else if ((prevpc == 0x27f8) || (prevpc == 0x511a) || (prevpc == 0x5142) || (prevpc == 0x516a))
 	{
 		/* The main CPU stuffs the byte for the soundlatch into 0xfffffd.*/
-		soundlatch_w(space->machine,2,ram16[0x3ffc/2]);
+		soundlatch_w(space,2,ram16[0x3ffc/2]);
 	}
 }
 

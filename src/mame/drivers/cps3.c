@@ -1638,12 +1638,12 @@ static void cps3_flashmain_w(running_machine *machine, int base, UINT32 offset, 
 
 static WRITE32_HANDLER( cps3_flash1_w )
 {
-	cps3_flashmain_w(space,0,offset,data,mem_mask);
+	cps3_flashmain_w(space->machine,0,offset,data,mem_mask);
 }
 
 static WRITE32_HANDLER( cps3_flash2_w )
 {
-	cps3_flashmain_w(space,4,offset,data,mem_mask);
+	cps3_flashmain_w(space->machine,4,offset,data,mem_mask);
 }
 
 static WRITE32_HANDLER( cram_gfxflash_bank_w )

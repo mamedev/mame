@@ -287,8 +287,10 @@ VIDEO_UPDATE( madgear )
 
 VIDEO_EOF( lastduel )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* Spriteram is always 1 frame ahead, suggesting buffering.  I can't find
         a register to control this so I assume it happens automatically
         every frame at the end of vblank */
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	buffer_spriteram16_w(space,0,0,0xffff);
 }

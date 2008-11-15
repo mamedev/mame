@@ -244,5 +244,7 @@ VIDEO_UPDATE( blktiger )
 
 VIDEO_EOF( blktiger )
 {
-	buffer_spriteram_w(machine,0,0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	buffer_spriteram_w(space, 0, 0);
 }
