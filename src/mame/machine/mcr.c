@@ -603,7 +603,9 @@ static TIMER_CALLBACK( zwackery_493_off_callback )
 
 static TIMER_CALLBACK( zwackery_493_callback )
 {
-	pia_2_ca1_w(machine, 0, 1);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_2_ca1_w(space, 0, 1);
 	timer_set(video_screen_get_scan_period(machine->primary_screen), NULL, 0, zwackery_493_off_callback);
 }
 

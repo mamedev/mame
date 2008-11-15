@@ -417,7 +417,7 @@ READ8_HANDLER( ssio_input_port_r )
 	UINT8 result = input_port_read_safe(space->machine, port[offset], 0xff);
 	if (ssio_custom_input[offset])
 		result = (result & ~ssio_custom_input_mask[offset]) |
-		         ((*ssio_custom_input[offset])(space->machine, offset) & ssio_custom_input_mask[offset]);
+		         ((*ssio_custom_input[offset])(space, offset) & ssio_custom_input_mask[offset]);
 	return result;
 }
 
@@ -427,7 +427,7 @@ WRITE8_HANDLER( ssio_output_port_w )
 	if (which == 0)
 		mcr_control_port_w(space, offset, data);
 	if (ssio_custom_output[which])
-		(*ssio_custom_output[which])(space->machine, offset, data & ssio_custom_output_mask[which]);
+		(*ssio_custom_output[which])(space, offset, data & ssio_custom_output_mask[which]);
 }
 
 void ssio_set_custom_input(int which, int mask, read8_machine_func handler)
@@ -539,8 +539,10 @@ static void csdeluxe_irq(running_machine *machine, int state)
 
 static TIMER_CALLBACK( csdeluxe_delayed_data_w )
 {
-	pia_0_portb_w(machine, 0, param & 0x0f);
-	pia_0_ca1_w(machine, 0, ~param & 0x10);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_0_portb_w(space, 0, param & 0x0f);
+	pia_0_ca1_w(space, 0, ~param & 0x10);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -662,8 +664,10 @@ static void soundsgood_irq(running_machine *machine, int state)
 
 static TIMER_CALLBACK( soundsgood_delayed_data_w )
 {
-	pia_1_portb_w(machine, 0, (param >> 1) & 0x0f);
-	pia_1_ca1_w(machine, 0, ~param & 0x01);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_1_portb_w(space, 0, (param >> 1) & 0x0f);
+	pia_1_ca1_w(space, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -756,8 +760,10 @@ static void turbocs_irq(running_machine *machine, int state)
 
 static TIMER_CALLBACK( turbocs_delayed_data_w )
 {
-	pia_0_portb_w(machine, 0, (param >> 1) & 0x0f);
-	pia_0_ca1_w(machine, 0, ~param & 0x01);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_0_portb_w(space, 0, (param >> 1) & 0x0f);
+	pia_0_ca1_w(space, 0, ~param & 0x01);
 
 	/* oftentimes games will write one nibble at a time; the sync on this is very */
 	/* important, so we boost the interleave briefly while this happens */
@@ -889,8 +895,10 @@ static void squawkntalk_irq(running_machine *machine, int state)
 
 static TIMER_CALLBACK( squawkntalk_delayed_data_w )
 {
-	pia_0_porta_w(machine, 0, ~param & 0x0f);
-	pia_0_cb1_w(machine, 0, ~param & 0x10);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	pia_0_porta_w(space, 0, ~param & 0x0f);
+	pia_0_cb1_w(space, 0, ~param & 0x10);
 }
 
 

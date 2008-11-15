@@ -335,14 +335,16 @@ static int porta, portb, busy_sndcpu;
 
 static int metro_io_callback(int ioline, int state)
 {
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	UINT8 data = 0;
 
     switch ( ioline )
 	{
 		case UPD7810_RXD:	/* read the RxD line */
-			data = soundlatch_r(Machine,0);
+			data = soundlatch_r(space,0);
 			state = data & 1;
-			soundlatch_w(Machine, 0, data >> 1);
+			soundlatch_w(space, 0, data >> 1);
 			break;
 		default:
 			logerror("upd7810 ioline %d not handled\n", ioline);
@@ -4685,12 +4687,14 @@ static void metro_common(void)
 
 static DRIVER_INIT( metro )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	metro_common();
 
 	porta = 0x00;
 	portb = 0x00;
 	busy_sndcpu = 0;
-	metro_sound_rombank_w(machine, 0, 0x00);
+	metro_sound_rombank_w(space, 0, 0x00);
 }
 
 static DRIVER_INIT( karatour )
@@ -4708,12 +4712,14 @@ for (i = 0;i < (0x20000*3)/2;i++)
 
 static DRIVER_INIT( daitorid )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	metro_common();
 
 	porta = 0x00;
 	portb = 0x00;
 	busy_sndcpu = 0;
-	daitorid_sound_rombank_w(machine, 0, 0x00);
+	daitorid_sound_rombank_w(space, 0, 0x00);
 }
 
 
