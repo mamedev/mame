@@ -322,13 +322,13 @@ static int skns_rle_decode ( running_machine *machine, int romoffset, int size, 
 	while(size>0) {
 		UINT8 code = src[(romoffset++)%srcsize];
 		size -= (code & 0x7f) + 1;
-		if(code & 0x80) {
+		if(code & 0x80) { /* (code & 0x7f) normal values will follow */
 			code &= 0x7f;
 			do {
 				dst[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = src[(romoffset++)%srcsize];
 				code--;
 			} while(code != 0xff);
-		} else {
+		} else {  /* repeat next value (code & 0x7f) times */
 			UINT8 val = src[(romoffset++)%srcsize];
 			do {
 				dst[(decodeoffset++)%SUPRNOVA_DECODE_BUFFER_SIZE] = val;

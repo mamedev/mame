@@ -446,6 +446,56 @@ UINT16 galpani3_regs1_address_regs[0x20];
 UINT16 galpani3_regs2_address_regs[0x20];
 UINT16 galpani3_regs3_address_regs[0x20];
 
+void gp3_do_rle(UINT32 address, UINT16*framebuffer, UINT8* rledata)
+{
+	int rle_count = 0;
+	int normal_count = 0;
+	UINT32 dstaddress = 0;
+
+	UINT8 thebyte;
+
+	while (dstaddress<0x40000)
+	{
+		if (rle_count==0 && normal_count==0) // we need a new code byte
+		{
+			thebyte = rledata[address];
+
+			if ((thebyte & 0x80)) // stream of normal bytes follows
+			{
+				normal_count = (thebyte & 0x7f)+1;
+				address++;
+			}
+			else // rle block
+			{
+				rle_count = (thebyte & 0x7f)+1;
+				address++;
+			}
+		}
+		else if (rle_count)
+		{
+			thebyte = rledata[address];
+			framebuffer[dstaddress] = thebyte;
+			dstaddress++;
+			rle_count--;
+
+			if (rle_count==0)
+			{
+				address++;
+			}
+		}
+		else if (normal_count)
+		{
+			thebyte = rledata[address];
+			framebuffer[dstaddress] = thebyte;
+			dstaddress++;
+			normal_count--;
+			address++;
+
+		}
+	}
+
+}
+
 WRITE16_HANDLER( galpani3_regs1_address_w )
 {
 	logerror("galpani3_regs1_address_w %04x\n",data);
@@ -455,9 +505,10 @@ WRITE16_HANDLER( galpani3_regs1_address_w )
 WRITE16_HANDLER( galpani3_regs1_go_w )
 {
 	UINT32 address = galpani3_regs1_address_regs[1]| (galpani3_regs1_address_regs[0]<<16);
+	UINT8* rledata = memory_region(space->machine,"gfx2");
 
 	printf("galpani3_regs1_go_w? %08x\n",address );
-
+	gp3_do_rle(address, galpani3_framebuffer1, rledata);
 }
 
 
@@ -470,11 +521,10 @@ WRITE16_HANDLER( galpani3_regs2_address_w )
 WRITE16_HANDLER( galpani3_regs2_go_w )
 {
 	UINT32 address = galpani3_regs2_address_regs[1]| (galpani3_regs2_address_regs[0]<<16);
+	UINT8* rledata = memory_region(space->machine,"gfx2");
 
 	printf("galpani3_regs2_go_w? %08x\n", address );
-
-
-
+	gp3_do_rle(address, galpani3_framebuffer2, rledata);
 }
 
 
@@ -488,57 +538,10 @@ WRITE16_HANDLER( galpani3_regs3_address_w )
 WRITE16_HANDLER( galpani3_regs3_go_w )
 {
 	UINT32 address =  galpani3_regs3_address_regs[1]| (galpani3_regs3_address_regs[0]<<16);
+	UINT8* rledata = memory_region(space->machine,"gfx2");
 
 	printf("galpani3_regs3_go_w? %08x\n",address );
-
-	// this is WRONG..
-	//if (address==0)
-	{
-		UINT8* rledata = memory_region(space->machine,"gfx2");
-		int rlecount =0;
-		UINT32 dstaddress = 0;
-
-		UINT8 thebyte;
-
-		while (dstaddress<0x40000)
-		{
-			if (rlecount==0)
-			{
-				thebyte = rledata[address];
-
-				printf("thebyte is %02x",thebyte);
-
-				if (thebyte & 0x80)
-				{
-					printf("(normal data)\n");
-					galpani3_framebuffer3[dstaddress] = thebyte & 0x7f;
-					dstaddress++;
-					address++;
-					// normal data
-				}
-				else
-				{
-					printf("(rle command)\n");
-						// rledata
-					rlecount = thebyte;
-					address++;
-				}
-			}
-			else
-			{
-				thebyte = rledata[address];
-				galpani3_framebuffer3[dstaddress] = thebyte & 0x7f;
-				dstaddress++;
-				rlecount--;
-
-				if (rlecount==0)
-				{
-					address++;
-				}
-			}
-		}
-
-	}
+	gp3_do_rle(address, galpani3_framebuffer3, rledata);
 }
 
 static void set_color_555_gp3(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
