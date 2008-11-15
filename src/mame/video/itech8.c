@@ -308,7 +308,7 @@ INLINE void consume_rle(int count)
  *
  *************************************/
 
-static void perform_blit(running_machine *machine)
+static void perform_blit(const address_space *space)
 {
 	offs_t addr = tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8);
 	UINT8 shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;
@@ -317,7 +317,7 @@ static void perform_blit(running_machine *machine)
 	int xdir = (BLITTER_FLAGS & BLITFLAG_XFLIP) ? -1 : 1;
 	int xflip = (BLITTER_FLAGS & BLITFLAG_XFLIP);
 	int rle = (BLITTER_FLAGS & BLITFLAG_RLE);
-	int color = tms34061_latch_r(machine, 0);
+	int color = tms34061_latch_r(space, 0);
 	int width = BLITTER_WIDTH;
 	int height = BLITTER_HEIGHT;
 	UINT8 transmaskhi, transmasklo;
@@ -328,7 +328,7 @@ static void perform_blit(running_machine *machine)
 	/* debugging */
 	if (FULL_LOGGING)
 		logerror("Blit: scan=%d  src=%06x @ (%05x) for %dx%d ... flags=%02x\n",
-				video_screen_get_vpos(machine->primary_screen),
+				video_screen_get_vpos(space->machine->primary_screen),
 				(*itech8_grom_bank << 16) | (BLITTER_ADDRHI << 8) | BLITTER_ADDRLO,
 				tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8),
 				BLITTER_WIDTH, BLITTER_HEIGHT, BLITTER_FLAGS);
@@ -519,7 +519,7 @@ WRITE8_HANDLER( itech8_blitter_w )
 		}
 
 		/* perform the blit */
-		perform_blit(space->machine);
+		perform_blit(space);
 		blit_in_progress = 1;
 
 		/* set a timer to go off when we're done */

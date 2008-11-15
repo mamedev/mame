@@ -1183,6 +1183,8 @@ static TIMER_CALLBACK( antic_steal_cycles )
  *****************************************************************************/
 static TIMER_CALLBACK( antic_scanline_render )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(machine), (antic.cmd & 0x0f), antic.modelines));
 
@@ -1198,16 +1200,16 @@ static TIMER_CALLBACK( antic_scanline_render )
             if( antic.w.dmactl & DMA_MISSILE )
             {
                 antic.steal_cycles += 1;
-                atari_gtia_w(machine, 0x11, RDPMGFXD(machine->cpu[0], 3*256));
+                atari_gtia_w(space, 0x11, RDPMGFXD(machine->cpu[0], 3*256));
             }
             /* transport player data to GTIA ? */
             if( antic.w.dmactl & DMA_PLAYER )
             {
                 antic.steal_cycles += 4;
-                atari_gtia_w(machine, 0x0d, RDPMGFXD(machine->cpu[0], 4*256));
-                atari_gtia_w(machine, 0x0e, RDPMGFXD(machine->cpu[0], 5*256));
-                atari_gtia_w(machine, 0x0f, RDPMGFXD(machine->cpu[0], 6*256));
-                atari_gtia_w(machine, 0x10, RDPMGFXD(machine->cpu[0], 7*256));
+                atari_gtia_w(space, 0x0d, RDPMGFXD(machine->cpu[0], 4*256));
+                atari_gtia_w(space, 0x0e, RDPMGFXD(machine->cpu[0], 5*256));
+                atari_gtia_w(space, 0x0f, RDPMGFXD(machine->cpu[0], 6*256));
+                atari_gtia_w(space, 0x10, RDPMGFXD(machine->cpu[0], 7*256));
             }
         }
         else
@@ -1217,17 +1219,17 @@ static TIMER_CALLBACK( antic_scanline_render )
             {
 				if( (antic.scanline & 1) == 0 ) 	 /* even line ? */
 					antic.steal_cycles += 1;
-                atari_gtia_w(machine, 0x11, RDPMGFXS(machine->cpu[0], 3*128));
+                atari_gtia_w(space, 0x11, RDPMGFXS(machine->cpu[0], 3*128));
             }
             /* transport player data to GTIA ? */
             if( antic.w.dmactl & DMA_PLAYER )
             {
 				if( (antic.scanline & 1) == 0 ) 	 /* even line ? */
 					antic.steal_cycles += 4;
-                atari_gtia_w(machine, 0x0d, RDPMGFXS(machine->cpu[0], 4*128));
-                atari_gtia_w(machine, 0x0e, RDPMGFXS(machine->cpu[0], 5*128));
-                atari_gtia_w(machine, 0x0f, RDPMGFXS(machine->cpu[0], 6*128));
-                atari_gtia_w(machine, 0x10, RDPMGFXS(machine->cpu[0], 7*128));
+                atari_gtia_w(space, 0x0d, RDPMGFXS(machine->cpu[0], 4*128));
+                atari_gtia_w(space, 0x0e, RDPMGFXS(machine->cpu[0], 5*128));
+                atari_gtia_w(space, 0x0f, RDPMGFXS(machine->cpu[0], 6*128));
+                atari_gtia_w(space, 0x10, RDPMGFXS(machine->cpu[0], 7*128));
             }
         }
     }

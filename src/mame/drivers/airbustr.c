@@ -591,7 +591,7 @@ static INTERRUPT_GEN( slave_interrupt )
 
 static MACHINE_RESET( airbustr )
 {
-	address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	soundlatch_status = soundlatch2_status = 0;
 	master_addr = 0xff;
 	slave_addr = 0xfd;

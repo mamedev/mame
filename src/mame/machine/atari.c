@@ -692,7 +692,8 @@ static void a800_setbank(running_machine *machine, int n)
 
 static void pokey_reset(running_machine *machine)
 {
-	pokey1_w(machine,15,0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pokey1_w(space,15,0);
 }
 
 

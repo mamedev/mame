@@ -155,9 +155,11 @@ static int is_ntsc(running_machine *machine)
 static void gtia_reset(running_machine *machine)
 {
 	int i;
-    /* reset the GTIA read/write/helper registers */
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	/* reset the GTIA read/write/helper registers */
 	for (i = 0; i < 32; i++)
-		atari_gtia_w(machine,i,0);
+		atari_gtia_w(space,i,0);
     memset(&gtia.r, 0, sizeof(gtia.r));
 	if (is_ntsc(machine))
 		gtia.r.pal = 0xff;

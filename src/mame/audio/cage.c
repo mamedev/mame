@@ -457,7 +457,7 @@ static void update_control_lines(running_machine *machine)
 		if ((cage_control & 2) && cage_to_cpu_ready)
 			reason |= CAGE_IRQ_REASON_DATA_READY;
 
-		(*cage_irqhandler)(Machine, reason);
+		(*cage_irqhandler)(machine, reason);
 	}
 
 	/* set the IOF input lines */
@@ -513,9 +513,9 @@ static READ32_HANDLER( cage_io_status_r )
 UINT16 main_from_cage_r(const address_space *space)
 {
 	if (LOG_COMM)
-		logerror("%06X:main read data = %04X\n", cpu_get_pc(Machine->activecpu), soundlatch_word_r(space, 0, 0));
+		logerror("%06X:main read data = %04X\n", cpu_get_pc(space->machine->activecpu), soundlatch_word_r(space, 0, 0));
 	cage_to_cpu_ready = 0;
-	update_control_lines(Machine);
+	update_control_lines(space->machine);
 	return soundlatch_word_r(space, 0, 0xffff);
 }
 
@@ -557,7 +557,7 @@ void cage_control_w(running_machine *machine, UINT16 data)
 	/* CPU is reset if both control lines are 0 */
 	if (!(cage_control & 3))
 	{
-		cpu_set_input_line(Machine->cpu[cage_cpu], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[cage_cpu], INPUT_LINE_RESET, ASSERT_LINE);
 
 		dma_enabled = 0;
 		dma_timer_enabled = 0;
@@ -574,7 +574,7 @@ void cage_control_w(running_machine *machine, UINT16 data)
 		cage_to_cpu_ready = 0;
 	}
 	else
-		cpu_set_input_line(Machine->cpu[cage_cpu], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[cage_cpu], INPUT_LINE_RESET, CLEAR_LINE);
 
 	/* update the control state */
 	update_control_lines(machine);
