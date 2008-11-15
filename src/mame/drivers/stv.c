@@ -115,8 +115,10 @@ ToDo / Notes:
 (per-game issues)
 -groovef: hangs soon after loaded,caused by two memory addresses in the Work RAM-H range.
  Kludged for now to work.
+-smleague / finlarch: it randomly hangs / crashes,it works if you use a ridiculous MDRV_INTERLEAVE number,might need strict
+ SH-2 synching.
 -various: find idle skip if possible.
--suikoenb/shanhigw + others: why do we get 2 credits on startup? Cause should be by a communication with the M68k
+-suikoenb/shanhigw + others: why do we get 2 credits on startup? Cause might be by a communication with the M68k
 -colmns97/puyosun/mausuke/cotton2/cottonbm: interrupt issues? we can't check the SCU mask
  on SMPC or controls fail
 -mausuke/bakubaku/grdforce: need to sort out transparency on the colour mapped sprites
@@ -3670,8 +3672,6 @@ GAME( 1999, sanjeon,   sasissu, stv, stv,  		sanjeon,   	ROT0,   "Sega / Deniam"
 GAME( 1997, seabass,   stvbios, stv, stv,  		seabass,   	ROT0,   "A wave inc. (Able license)",	"Sea Bass Fishing (JUET 971110 V0.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, shanhigw,  stvbios, stv, stv,  		shanhigw,  	ROT0,   "Sunsoft / Activision", 	  	"Shanghai - The Great Wall / Shanghai Triple Threat (JUE 950623 V1.005)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, shienryu,  stvbios, stv, stv,  		shienryu,  	ROT270, "Warashi",  				  	"Shienryu (JUET 961226 V1.000)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1995, smleague,  stvbios, stv, stv,  		smleague,  	ROT0,   "Sega", 	     			  	"Super Major League (U 960108 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1995, finlarch,  smleague,stv, stv,  		finlarch,  	ROT0,   "Sega", 	     			  	"Final Arch (J 950714 V1.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, sss,       stvbios, stv, stv,  		sss,       	ROT0,   "Capcom / Cave / Victor",	  	"Steep Slope Sliders (JUET 981110 V1.000)", GAME_IMPERFECT_SOUND )
 GAME( 1995, sandor,    stvbios, stv, stv,  		sandor,    	ROT0,   "Sega", 	     			  	"Puzzle & Action: Sando-R (J 951114 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, thunt,     sandor,  stv, stv,  		thunt,     	ROT0,   "Sega",	                  		"Puzzle & Action: Treasure Hunt (JUET 970901 V2.00E)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
@@ -3687,14 +3687,15 @@ GAME( 1997, nclubv3,   stvbios, stv, stv,  		nameclv3,  	ROT0,   "Sega", 	     	
 GAME( 1997, vmahjong,  stvbios, stv, stvmp,		stv,       	ROT0,   "Micronet",                 	"Virtual Mahjong (J 961214 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1998, twcup98,   stvbios, stv, stv,  		twcup98,   	ROT0,   "Tecmo",                    	"Tecmo World Cup '98 (JUET 980410 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING ) // player movement
 GAME( 1998, stress,    stvbios, stv, stv,  		stv,       	ROT0,   "Sega", 	     			  	"Stress Busters (J 981020 V1.000)", GAME_NOT_WORKING ) // needs printer
+GAME( 1995, smleague,  stvbios, stv, stv,  		smleague,  	ROT0,   "Sega", 	     			  	"Super Major League (U 960108 V1.000)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1995, finlarch,  smleague,stv, stv,  		finlarch,  	ROT0,   "Sega", 	     			  	"Final Arch (J 950714 V1.001)", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, elandore,  stvbios, stv, stv,  		elandore,  	ROT0,   "Sai-Mate",   			  		"Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 
 /* Doing Something.. but not enough yet */
-GAME( 1998, elandore,  stvbios, stv, stv,  		elandore,  	ROT0,   "Sai-Mate",   			  		"Touryuu Densetsu Elan-Doree / Elan Doree - Legend of Dragoon (JUET 980922 V1.006)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1995, vfremix,   stvbios, stv, stv,  		vfremix,   	ROT0,   "Sega", 	     			  	"Virtua Fighter Remix (JUETBKAL 950428 V1.000)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1997, findlove,  stvbios, stv, stv,  		stv,  		ROT0,   "Daiki / FCF",    	      		"Find Love (J 971212 V1.000)", GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1996, decathlt,  stvbios, stv, stv,  		decathlt,  	ROT0,   "Sega", 	     			  	"Decathlete (JUET 960709 V1.001)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1996, decathlo,  decathlt,stv, stv,  		decathlt, 	ROT0,  	"Sega", 	     			  	"Decathlete (JUET 960424 V1.000)", GAME_NO_SOUND | GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-
 
 /* not working,black screen */
 GAME( 1999, ffreveng,  stvbios, stv, stv,  		ffreveng,  	ROT0,   "Capcom",     				  	"Final Fight Revenge (JUET 990714 V1.000)", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )

@@ -1307,6 +1307,7 @@ DRIVER_INIT(twcup98)
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(5);
 }
 
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER( smleague_speedup_r )
 {
 	if (cpu_get_pc(space->cpu)==0x6063bf4) cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(20));
@@ -1319,6 +1320,7 @@ static void smleague_slave_speedup( UINT32 data )
 		if ( (data & 0x00800000) == 0 )
 			cpu_spinuntil_trigger(Machine->cpu[1], 1000);
 }
+#endif
 
 DRIVER_INIT(smleague)
 {
@@ -1327,27 +1329,28 @@ DRIVER_INIT(smleague)
 	cpu_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpu_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6062bca);
 
-	cpu_set_info_fct(machine->cpu[1], CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)smleague_slave_speedup );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, smleague_speedup_r );
+//	cpu_set_info_fct(machine->cpu[1], CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK, (genf*)smleague_slave_speedup );
+//	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, smleague_speedup_r );
 
 	DRIVER_INIT_CALL(stv);
 
 	minit_boost_timeslice = sinit_boost_timeslice = ATTOTIME_IN_USEC(50);
 }
 
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER( finlarch_speedup_r )
 {
 	if (cpu_get_pc(space->cpu)==0x6064d60) cpu_spinuntil_int(space->cpu);
 	return stv_workram_h[0x0ffc10/4];
 }
-
+#endif
 
 DRIVER_INIT(finlarch)
 {
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT);
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x6064d60);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, finlarch_speedup_r );
+//	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffc10, 0x60ffc13, 0, 0, finlarch_speedup_r ); //breaks test mode
 
 	DRIVER_INIT_CALL(stv);
 
