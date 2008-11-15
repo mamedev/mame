@@ -165,12 +165,14 @@ static void timer_ack_callback(running_machine *machine)
 
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
-	soundlatch_w(machine, 0, param);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	soundlatch_w(space, 0, param);
 	cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, ASSERT_LINE);
 }
 
 
-static void sound_data_w(UINT8 data)
+static void sound_data_w(running_machine *machine, UINT8 data)
 {
 	timer_call_after_resynch(NULL, data, delayed_sound_data_w);
 }

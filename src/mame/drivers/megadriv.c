@@ -984,13 +984,13 @@ WRITE16_HANDLER( megadriv_vdp_w )
 				data = (data&0xff00) | data>>8;
 			//  mame_printf_debug("8-bit write VDP data port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
 			}
-			megadriv_vdp_data_port_w(space, data);
+			megadriv_vdp_data_port_w(space->machine, data);
 			break;
 
 		case 0x04:
 		case 0x06:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit write VDP control port access, offset %04x data %04x mem_mask %04x\n",offset,data,mem_mask);
-			megadriv_vdp_ctrl_port_w(space, data);
+			megadriv_vdp_ctrl_port_w(space->machine, data);
 			break;
 
 		case 0x08:
@@ -1373,7 +1373,7 @@ READ16_HANDLER( megadriv_vdp_r )
 		case 0x00:
 		case 0x02:
 			if ((!ACCESSING_BITS_8_15) || (!ACCESSING_BITS_0_7)) mame_printf_debug("8-bit VDP read data port access, offset %04x mem_mask %04x\n",offset,mem_mask);
-			retvalue = megadriv_vdp_data_port_r(space);
+			retvalue = megadriv_vdp_data_port_r(space->machine);
 			break;
 
 		case 0x04:
@@ -1441,12 +1441,12 @@ static WRITE16_HANDLER( megadriv_68k_YM2612_write)
 		switch (offset)
 		{
 			case 0:
-				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_a_w	(space->machine, 0,	(data >> 8) & 0xff);
-				else 				ym2612_data_port_0_a_w		(space->machine, 0,	(data >> 0) & 0xff);
+				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_a_w	(space, 0,	(data >> 8) & 0xff);
+				else 				ym2612_data_port_0_a_w		(space, 0,	(data >> 0) & 0xff);
 				break;
 			case 1:
-				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_b_w	(space->machine, 0,	(data >> 8) & 0xff);
-				else 				ym2612_data_port_0_b_w		(space->machine, 0,	(data >> 0) & 0xff);
+				if (ACCESSING_BITS_8_15)	ym2612_control_port_0_b_w	(space, 0,	(data >> 8) & 0xff);
+				else 				ym2612_data_port_0_b_w		(space, 0,	(data >> 0) & 0xff);
 				break;
 		}
 	}

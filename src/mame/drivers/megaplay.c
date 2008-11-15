@@ -744,7 +744,7 @@ static WRITE8_HANDLER (megaplay_bios_port_be_bf_w)
 	switch (offset)
 	{
 		case 0: /* port 0xbe, VDP 1 DATA Write */
-			segae_vdp_data_w(space, 0, data); break;
+			segae_vdp_data_w(space->machine, 0, data); break;
 		case 1: /* port 0xbf, VDP 1 CTRL Write */
 			segae_vdp_ctrl_w(0, data); break;
 	}

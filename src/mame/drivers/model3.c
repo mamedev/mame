@@ -1342,7 +1342,7 @@ static WRITE64_HANDLER(model3_sound_w)
 	// serial configuration writes
 	if ((mem_mask == U64(0xff00000000000000)) && (offset == 0))
 	{
-		scsp_midi_in(space->machine, 0, (data>>56)&0xff, 0);
+		scsp_midi_in(space, 0, (data>>56)&0xff, 0);
 
 		// give the 68k time to notice
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));

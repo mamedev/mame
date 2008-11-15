@@ -50,7 +50,7 @@ READ16_HANDLER ( system24temp_sys16_io_r )
 {
 	//  logerror("IO read %02x (%d:%x)\n", offset, cpunum_get_active(), cpu_get_pc(space->cpu));
 	if(offset < 8)
-		return system24temp_sys16_io_io_r ? system24temp_sys16_io_io_r(space,offset) : 0xff;
+		return system24temp_sys16_io_io_r ? system24temp_sys16_io_io_r(space->machine,offset) : 0xff;
 	else if (offset < 0x20) {
 		switch(offset) {
 		case 0x8:
@@ -88,7 +88,7 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 				return;
 			}
 			if(system24temp_sys16_io_io_w)
-				system24temp_sys16_io_io_w(space, offset, data);
+				system24temp_sys16_io_io_w(space->machine, offset, data);
 		} else if (offset < 0x20) {
 			switch(offset) {
 			case 0xe:

@@ -591,6 +591,8 @@ static UINT8 mahmajn_io_r(running_machine *machine, int port)
 
 static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	switch(port)
 	{
 	case 3:
@@ -598,7 +600,7 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 			cur_input_line = (cur_input_line + 1) & 7;
 		break;
 	case 7: // DAC
-		dac_0_signed_data_w(machine, 0, data);
+		dac_0_signed_data_w(space, 0, data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
@@ -607,12 +609,14 @@ static void mahmajn_io_w(running_machine *machine, int port, UINT8 data)
 
 static void hotrod_io_w(running_machine *machine, int port, UINT8 data)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	switch(port)
 	{
 	case 3: // Lamps
 		break;
 	case 7: // DAC
-		dac_0_signed_data_w(machine,0, data);
+		dac_0_signed_data_w(space,0, data);
 		break;
 	default:
 		fprintf(stderr, "Port %d : %02x\n", port, data & 0xff);
