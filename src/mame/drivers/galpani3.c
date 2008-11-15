@@ -84,6 +84,10 @@ static UINT16* galpani3_framebuffer2_palette;
 static UINT16* galpani3_framebuffer3_palette;
 static UINT16 galpani3_framebuffer3_scrolly;
 static UINT16 galpani3_framebuffer3_scrollx;
+static UINT16 galpani3_framebuffer2_scrolly;
+static UINT16 galpani3_framebuffer2_scrollx;
+static UINT16 galpani3_framebuffer1_scrolly;
+static UINT16 galpani3_framebuffer1_scrollx;
 
 
 static UINT16 *galpani3_sprregs, *galpani3_spriteram;
@@ -96,7 +100,7 @@ static INTERRUPT_GEN( galpani3_vblank ) // 2, 3, 5 ?
 	{
 		case 2:  cpu_set_input_line(device, 2, HOLD_LINE); break;
 		case 1:  cpu_set_input_line(device, 3, HOLD_LINE); break;
-	//	case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break;
+		case 0:  cpu_set_input_line(device, 5, HOLD_LINE); break; // sound?
 	}
 }
 
@@ -126,27 +130,33 @@ static VIDEO_UPDATE(galpani3)
 	fillbitmap(bitmap, 0x0000, cliprect);
 
 	{
-		int yy,xx;
-		int offset = 0;
-		for (yy=0;yy<512;yy++)
+		int drawy, drawx;
+		for (drawy=0;drawy<512;drawy++)
 		{
-			for (xx=0;xx<512;xx++)
+			int srcline1 = (drawy+galpani3_framebuffer1_scrolly+11)&0x1ff;
+			int srcline2 = (drawy+galpani3_framebuffer2_scrolly+11)&0x1ff;
+			int srcline3 = (drawy+galpani3_framebuffer3_scrolly+11)&0x1ff;
+
+			for (drawx=0;drawx<512;drawx++)
 			{
-				//UINT8 dat = galpani3_priority_buffer[offset];
-				UINT8 dat = galpani3_framebuffer3[offset];
+				int srcoffs1 = (drawx+galpani3_framebuffer1_scrollx+67)&0x1ff;
+				int srcoffs2 = (drawx+galpani3_framebuffer2_scrollx+67)&0x1ff;
+				int srcoffs3 = (drawx+galpani3_framebuffer3_scrollx+67)&0x1ff;
 
+				UINT8 dat1 = galpani3_framebuffer1[(srcline1*0x200)+srcoffs1];
+				UINT8 dat2 = galpani3_framebuffer2[(srcline2*0x200)+srcoffs2];
+				UINT8 dat3 = galpani3_framebuffer3[(srcline3*0x200)+srcoffs3];
 
-				UINT16* dst = BITMAP_ADDR16(bitmap, (yy-(galpani3_framebuffer3_scrolly+11))&0x1ff, (xx-(galpani3_framebuffer3_scrollx>>0)-67)&0x1ff);
-				offset++;
+				UINT16* dst = BITMAP_ADDR16(bitmap, drawy, drawx);
 
-				dst[0] = dat+0x4200;// mame_rand(Machine)&0xff;
-
+				if (dat3) dst[0] = dat3+0x4200;
+				else if (dat2) dst[0] = dat2+0x4100;
+				else if (dat1) dst[0] = dat2+0x4000;
 
 			}
 		}
 	}
 
-	//skns_draw_sprites(screen->machine,bitmap,cliprect);
 	fillbitmap(sprite_bitmap_1, 0x0000, cliprect);
 
 	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, galpani3_spriteram32, spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), galpani3_spc_regs );
@@ -482,7 +492,7 @@ WRITE16_HANDLER( galpani3_regs3_go_w )
 	printf("galpani3_regs3_go_w? %08x\n",address );
 
 	// this is WRONG..
-//	if (address!=0)
+	//if (address==0)
 	{
 		UINT8* rledata = memory_region(space->machine,"gfx2");
 		int rlecount =0;
@@ -558,13 +568,31 @@ static WRITE16_HANDLER( galpani3_framebuffer3_palette_w )
 static WRITE16_HANDLER( galpani3_framebuffer3_scrolly_w )
 {
 	galpani3_framebuffer3_scrolly = data;
-//	printf("galpani3_framebuffer3_scrolly %04x\n",data);
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer3_scrollx_w )
 {
 	galpani3_framebuffer3_scrollx = data;
-//	printf("galpani3_framebuffer3_scrollx %04x\n",data);
+}
+
+static WRITE16_HANDLER( galpani3_framebuffer2_scrolly_w )
+{
+	galpani3_framebuffer2_scrolly = data;
+}
+
+static WRITE16_HANDLER( galpani3_framebuffer2_scrollx_w )
+{
+	galpani3_framebuffer2_scrollx = data;
+}
+
+static WRITE16_HANDLER( galpani3_framebuffer1_scrolly_w )
+{
+	galpani3_framebuffer1_scrolly = data;
+}
+
+static WRITE16_HANDLER( galpani3_framebuffer1_scrollx_w )
+{
+	galpani3_framebuffer1_scrollx = data;
 }
 
 static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -586,9 +614,9 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	// GRAP2 1?
 	AM_RANGE(0x800000, 0x8003ff) AM_RAM // ??? see subroutine $39f42 (R?)
-	AM_RANGE(0x800400, 0x800401) AM_WRITE(SMH_NOP) // scroll?
+	AM_RANGE(0x800400, 0x800401) AM_WRITE(galpani3_framebuffer1_scrollx_w) // scroll?
 	AM_RANGE(0x800800, 0x800bff) AM_RAM // ??? see subroutine $39f42 (R?)
-	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(SMH_NOP) // scroll?
+	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(galpani3_framebuffer1_scrolly_w) // scroll?
 	AM_RANGE(0x800c06, 0x800c07) AM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0x800c10, 0x800c11) AM_WRITE(SMH_NOP) // ?
 	AM_RANGE(0x800c12, 0x800c13) AM_WRITE(SMH_NOP) // ?
@@ -600,9 +628,9 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	// GRAP2 2?
 	AM_RANGE(0xa00000, 0xa003ff) AM_RAM // ??? see subroutine $39f42 (G?)
-	AM_RANGE(0xa00400, 0xa00401) AM_WRITE(SMH_NOP) // scroll?
+	AM_RANGE(0xa00400, 0xa00401) AM_WRITE(galpani3_framebuffer2_scrollx_w)
 	AM_RANGE(0xa00800, 0xa00bff) AM_RAM // ??? see subroutine $39f42 (G?)
-	AM_RANGE(0xa00c00, 0xa00c01) AM_WRITE(SMH_NOP) // scroll?
+	AM_RANGE(0xa00c00, 0xa00c01) AM_WRITE(galpani3_framebuffer2_scrolly_w)
 //	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE(SMH_NOP) // ?
 //	AM_RANGE(0xa00c10, 0xa00c11) AM_WRITE(SMH_NOP) // ?
 //	AM_RANGE(0xa00c12, 0xa00c13) AM_WRITE(SMH_NOP) // ?
