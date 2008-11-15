@@ -301,6 +301,8 @@ static UINT8 speech_cnt;
 
 static TIMER_CALLBACK( ad2083_step )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* only 16 bytes needed ... The original dump is bad. This
      * is what is needed to get speech to work. The prom data has
      * been updated and marked as BAD_DUMP. The information below
@@ -327,8 +329,8 @@ static TIMER_CALLBACK( ad2083_step )
 	if (ctrl & 0x40)
 		speech_rom_address = 0;
 
-	tms5110_ctl_w(machine, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
-	tms5110_pdc_w(machine, 0, ctrl & 0x02 ? 0 : 1);
+	tms5110_ctl_w(space, 0, ctrl & 0x04 ? TMS5110_CMD_SPEAK : TMS5110_CMD_RESET);
+	tms5110_pdc_w(space, 0, ctrl & 0x02 ? 0 : 1);
 
 	if (!(ctrl & 0x80))
 		timer_set(ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);

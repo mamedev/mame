@@ -3154,7 +3154,7 @@ static UINT8 K053244_chip_r (running_machine *machine, int chip, int offset)
 
 READ8_HANDLER( K053244_r )
 {
-	return K053244_chip_r(space,0,offset);
+	return K053244_chip_r(space->machine,0,offset);
 }
 
 static void K053244_chip_w(int chip, int offset, int data)
@@ -4812,17 +4812,17 @@ static int K051316_rom_r(running_machine *machine, int chip, int offset)
 
 READ8_HANDLER( K051316_rom_0_r )
 {
-	return K051316_rom_r(space,0,offset);
+	return K051316_rom_r(space->machine,0,offset);
 }
 
 READ8_HANDLER( K051316_rom_1_r )
 {
-	return K051316_rom_r(space,1,offset);
+	return K051316_rom_r(space->machine,1,offset);
 }
 
 READ8_HANDLER( K051316_rom_2_r )
 {
-	return K051316_rom_r(space,2,offset);
+	return K051316_rom_r(space->machine,2,offset);
 }
 
 

@@ -140,7 +140,7 @@ static void K001006_w(int chip, int offset, UINT32 data, UINT32 mem_mask)
 
 READ32_HANDLER(K001006_0_r)
 {
-	return K001006_r(space, 0, offset, mem_mask);
+	return K001006_r(space->machine, 0, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K001006_0_w)
@@ -150,7 +150,7 @@ WRITE32_HANDLER(K001006_0_w)
 
 READ32_HANDLER(K001006_1_r)
 {
-	return K001006_r(space, 1, offset, mem_mask);
+	return K001006_r(space->machine, 1, offset, mem_mask);
 }
 
 WRITE32_HANDLER(K001006_1_w)

@@ -456,11 +456,13 @@ VIDEO_UPDATE( twin16 )
 
 VIDEO_EOF( twin16 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	if( twin16_spriteram_process_enable() && need_process_spriteram )
 		twin16_spriteram_process();
 
 	need_process_spriteram = 1;
 
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	buffer_spriteram16_w(space,0,0,0xffff);
 }
 

@@ -870,7 +870,7 @@ static void tmnt2_put_word(const address_space *space, UINT32 addr, UINT16 data)
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			K053245_word_w(space->machine, offs, data, 0xffff);
+			K053245_word_w(space, offs, data, 0xffff);
 		}
 	}
 	else if (addr >= 0x104000/2 && addr <= 0x107fff/2) sunset_104000[addr-0x104000/2] = data;

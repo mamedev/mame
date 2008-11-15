@@ -119,9 +119,11 @@ WRITE16_HANDLER( gradius3_gfxram_w )
 
 VIDEO_UPDATE( gradius3 )
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* TODO: this kludge enforces the char banks. For some reason, they don't work otherwise. */
-	K052109_w(screen->machine,0x1d80,0x10);
-	K052109_w(screen->machine,0x1f00,0x32);
+	K052109_w(space,0x1d80,0x10);
+	K052109_w(space,0x1f00,0x32);
 
 	if (dirtygfx)
 	{
