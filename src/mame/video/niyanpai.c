@@ -354,13 +354,13 @@ static void niyanpai_gfxdraw(running_machine *machine, int vram)
 
 
 ******************************************************************************/
-WRITE16_HANDLER( niyanpai_blitter_0_w )	{ niyanpai_blitter_w(space, 0, offset, data); }
-WRITE16_HANDLER( niyanpai_blitter_1_w )	{ niyanpai_blitter_w(space, 1, offset, data); }
-WRITE16_HANDLER( niyanpai_blitter_2_w )	{ niyanpai_blitter_w(space, 2, offset, data); }
+WRITE16_HANDLER( niyanpai_blitter_0_w )	{ niyanpai_blitter_w(space->machine, 0, offset, data); }
+WRITE16_HANDLER( niyanpai_blitter_1_w )	{ niyanpai_blitter_w(space->machine, 1, offset, data); }
+WRITE16_HANDLER( niyanpai_blitter_2_w )	{ niyanpai_blitter_w(space->machine, 2, offset, data); }
 
-READ16_HANDLER( niyanpai_blitter_0_r )	{ return niyanpai_blitter_r(space, 0, offset); }
-READ16_HANDLER( niyanpai_blitter_1_r )	{ return niyanpai_blitter_r(space, 1, offset); }
-READ16_HANDLER( niyanpai_blitter_2_r )	{ return niyanpai_blitter_r(space, 2, offset); }
+READ16_HANDLER( niyanpai_blitter_0_r )	{ return niyanpai_blitter_r(space->machine, 0, offset); }
+READ16_HANDLER( niyanpai_blitter_1_r )	{ return niyanpai_blitter_r(space->machine, 1, offset); }
+READ16_HANDLER( niyanpai_blitter_2_r )	{ return niyanpai_blitter_r(space->machine, 2, offset); }
 
 WRITE16_HANDLER( niyanpai_clut_0_w )	{ niyanpai_clut_w(0, offset, data); }
 WRITE16_HANDLER( niyanpai_clut_1_w )	{ niyanpai_clut_w(1, offset, data); }

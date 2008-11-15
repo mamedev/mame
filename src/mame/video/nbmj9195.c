@@ -394,11 +394,11 @@ static void nbmj9195_gfxdraw(running_machine *machine, int vram)
 
 
 ******************************************************************************/
-WRITE8_HANDLER( nbmj9195_blitter_0_w )	{ nbmj9195_blitter_w(space, 0, offset, data); }
-WRITE8_HANDLER( nbmj9195_blitter_1_w )	{ nbmj9195_blitter_w(space, 1, offset, data); }
+WRITE8_HANDLER( nbmj9195_blitter_0_w )	{ nbmj9195_blitter_w(space->machine, 0, offset, data); }
+WRITE8_HANDLER( nbmj9195_blitter_1_w )	{ nbmj9195_blitter_w(space->machine, 1, offset, data); }
 
-READ8_HANDLER( nbmj9195_blitter_0_r )	{ return nbmj9195_blitter_r(space, 0, offset); }
-READ8_HANDLER( nbmj9195_blitter_1_r )	{ return nbmj9195_blitter_r(space, 1, offset); }
+READ8_HANDLER( nbmj9195_blitter_0_r )	{ return nbmj9195_blitter_r(space->machine, 0, offset); }
+READ8_HANDLER( nbmj9195_blitter_1_r )	{ return nbmj9195_blitter_r(space->machine, 1, offset); }
 
 WRITE8_HANDLER( nbmj9195_clut_0_w )		{ nbmj9195_clut_w(0, offset, data); }
 WRITE8_HANDLER( nbmj9195_clut_1_w )		{ nbmj9195_clut_w(1, offset, data); }

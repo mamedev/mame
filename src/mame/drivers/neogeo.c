@@ -434,7 +434,8 @@ static void calendar_clock(void)
 
 static CUSTOM_INPUT( get_calendar_status )
 {
-	return (pd4990a_databit_r(field->port->machine, 0) << 1) | pd4990a_testbit_r(field->port->machine, 0);
+	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	return (pd4990a_databit_r(space, 0) << 1) | pd4990a_testbit_r(space, 0);
 }
 
 
@@ -1003,10 +1004,11 @@ static MACHINE_START( neogeo )
 static MACHINE_RESET( neogeo )
 {
 	offs_t offs;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)
-		system_control_w(machine, offs, 0, 0x00ff);
+		system_control_w(space, offs, 0, 0x00ff);
 
 	neogeo_reset_rng();
 

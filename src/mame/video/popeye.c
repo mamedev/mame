@@ -267,11 +267,12 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 {
 	int offs;
 	static int lastflip = 0;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	if (lastflip != flip_screen_get())
 	{
 		for (offs = 0;offs < popeye_bitmapram_size;offs++)
-			popeye_bitmap_w(machine,offs,popeye_bitmapram[offs]);
+			popeye_bitmap_w(space,offs,popeye_bitmapram[offs]);
 
 		lastflip = flip_screen_get();
 	}
