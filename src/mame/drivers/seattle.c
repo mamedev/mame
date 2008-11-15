@@ -468,7 +468,7 @@ static UINT32 cmos_write_enabled;
  *
  *************************************/
 
-static void vblank_assert(running_machine *machine, int state);
+static void vblank_assert(const device_config *device, int state);
 static void update_vblank_irq(running_machine *machine);
 static void galileo_reset(void);
 static TIMER_CALLBACK( galileo_timer_callback );
@@ -567,12 +567,12 @@ static MACHINE_RESET( seattle )
 	cpu_stalled_on_voodoo = FALSE;
 
 	/* reset either the DCS2 board or the CAGE board */
-	if (mame_find_cpu_index(machine, "dcs2") != -1)
+	if (cputag_get_cpu(machine, "dcs2") != NULL)
 	{
 		dcs_reset_w(1);
 		dcs_reset_w(0);
 	}
-	else if (mame_find_cpu_index(machine, "cage") != -1)
+	else if (cputag_get_cpu(machine, "cage") != NULL)
 	{
 		cage_control_w(machine, 0);
 		cage_control_w(machine, 3);
@@ -743,7 +743,7 @@ static WRITE32_HANDLER( vblank_clear_w )
 }
 
 
-static void vblank_assert(running_machine *machine, int state)
+static void vblank_assert(const device_config *device, int state)
 {
 	/* cache the raw state */
 	vblank_state = state;
@@ -752,7 +752,7 @@ static void vblank_assert(running_machine *machine, int state)
 	if ((state && !(*interrupt_enable & 0x100)) || (!state && (*interrupt_enable & 0x100)))
 	{
 		vblank_latch = 1;
-		update_vblank_irq(machine);
+		update_vblank_irq(device->machine);
 	}
 }
 
@@ -1531,7 +1531,7 @@ static READ32_DEVICE_HANDLER( widget_r )
 			break;
 
 		case WREG_ANALOG:
-			result = analog_port_r(device->machine, 0, mem_mask);
+			result = analog_port_r(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:
@@ -1562,7 +1562,7 @@ static WRITE32_DEVICE_HANDLER( widget_w )
 			break;
 
 		case WREG_ANALOG:
-			analog_port_w(device->machine, 0, data, mem_mask);
+			analog_port_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, data, mem_mask);
 			break;
 
 		case WREG_ETHER_DATA:

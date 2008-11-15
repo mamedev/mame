@@ -256,10 +256,11 @@ const pia6821_interface joust2_pia_1_intf =
 
 static TIMER_CALLBACK( williams_va11_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	pia_1_cb1_w(machine, 0, scanline & 0x20);
+	pia_1_cb1_w(space, 0, scanline & 0x20);
 
 	/* set a timer for the next update */
 	scanline += 0x20;
@@ -270,15 +271,19 @@ static TIMER_CALLBACK( williams_va11_callback )
 
 static TIMER_CALLBACK( williams_count240_off_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	pia_1_ca1_w(machine, 0, 0);
+	pia_1_ca1_w(space, 0, 0);
 }
 
 
 static TIMER_CALLBACK( williams_count240_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* the COUNT240 signal comes into CA1, and is set to the logical AND of VA10-VA13 */
-	pia_1_ca1_w(machine, 0, 1);
+	pia_1_ca1_w(space, 0, 1);
 
 	/* set a timer to turn it off once the scanline counter resets */
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, williams_count240_off_callback);
@@ -384,11 +389,12 @@ MACHINE_RESET( williams )
 
 static TIMER_CALLBACK( williams2_va11_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int scanline = param;
 
 	/* the IRQ signal comes into CB1, and is set to VA11 */
-	pia_0_cb1_w(machine, 0, scanline & 0x20);
-	pia_1_ca1_w(machine, 0, scanline & 0x20);
+	pia_0_cb1_w(space, 0, scanline & 0x20);
+	pia_1_ca1_w(space, 0, scanline & 0x20);
 
 	/* set a timer for the next update */
 	scanline += 0x20;
@@ -399,15 +405,19 @@ static TIMER_CALLBACK( williams2_va11_callback )
 
 static TIMER_CALLBACK( williams2_endscreen_off_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* the /ENDSCREEN signal comes into CA1 */
-	pia_0_ca1_w(machine, 0, 1);
+	pia_0_ca1_w(space, 0, 1);
 }
 
 
 static TIMER_CALLBACK( williams2_endscreen_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* the /ENDSCREEN signal comes into CA1 */
-	pia_0_ca1_w(machine, 0, 0);
+	pia_0_ca1_w(space, 0, 0);
 
 	/* set a timer to turn it off once the scanline counter resets */
 	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 8, 0), NULL, 0, williams2_endscreen_off_callback);
@@ -426,12 +436,15 @@ static TIMER_CALLBACK( williams2_endscreen_callback )
 
 static STATE_POSTLOAD( williams2_postload )
 {
-	williams2_bank_select_w(machine, 0, vram_bank);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	williams2_bank_select_w(space, 0, vram_bank);
 }
 
 
 MACHINE_RESET( williams2 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* reset the PIAs */
 	pia_reset();
 
@@ -440,7 +453,7 @@ MACHINE_RESET( williams2 )
 	memory_configure_bank(1, 1, 4, memory_region(machine, "main") + 0x10000, 0x10000);
 
 	/* make sure our banking is reset */
-	williams2_bank_select_w(machine, 0, 0);
+	williams2_bank_select_w(space, 0, 0);
 
 	/* set a timer to go off every 16 scanlines, to toggle the VA11 line and update the screen */
 	scanline_timer = timer_alloc(williams2_va11_callback, NULL);
@@ -516,30 +529,32 @@ WRITE8_HANDLER( williams2_bank_select_w )
 
 static TIMER_CALLBACK( williams_deferred_snd_cmd_w )
 {
-	pia_2_portb_w(machine, 0, param);
-	pia_2_cb1_w(machine, 0, (param == 0xff) ? 0 : 1);
+	const address_space *space = ptr;
+	pia_2_portb_w(space, 0, param);
+	pia_2_cb1_w(space, 0, (param == 0xff) ? 0 : 1);
 }
 
 WRITE8_HANDLER( williams_snd_cmd_w )
 {
 	/* the high two bits are set externally, and should be 1 */
-	timer_call_after_resynch(NULL, data | 0xc0, williams_deferred_snd_cmd_w);
+	timer_call_after_resynch((void *)space, data | 0xc0, williams_deferred_snd_cmd_w);
 }
 
 WRITE8_HANDLER( playball_snd_cmd_w )
 {
-	timer_call_after_resynch(NULL, data, williams_deferred_snd_cmd_w);
+	timer_call_after_resynch((void *)space, data, williams_deferred_snd_cmd_w);
 }
 
 
 static TIMER_CALLBACK( williams2_deferred_snd_cmd_w )
 {
-	pia_2_porta_w(machine, 0, param);
+	const address_space *space = ptr;
+	pia_2_porta_w(space, 0, param);
 }
 
 static WRITE8_HANDLER( williams2_snd_cmd_w )
 {
-	timer_call_after_resynch(NULL, data, williams2_deferred_snd_cmd_w);
+	timer_call_after_resynch((void *)space, data, williams2_deferred_snd_cmd_w);
 }
 
 
@@ -700,17 +715,20 @@ WRITE8_HANDLER( williams2_7segment_w )
 
 static STATE_POSTLOAD( defender_postload )
 {
-	defender_bank_select_w(machine, 0, vram_bank);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	defender_bank_select_w(space, 0, vram_bank);
 }
 
 
 MACHINE_RESET( defender )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
 	memory_configure_bank(1, 0, 9, &memory_region(machine, "main")[0x10000], 0x1000);
-	defender_bank_select_w(machine, 0, 0);
+	defender_bank_select_w(space, 0, 0);
 
 	state_save_register_postload(machine, defender_postload, NULL);
 }
@@ -930,7 +948,8 @@ MACHINE_RESET( joust2 )
 
 static TIMER_CALLBACK( joust2_deferred_snd_cmd_w )
 {
-	pia_2_porta_w(machine, 0, param & 0xff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_2_porta_w(space, 0, param & 0xff);
 }
 
 

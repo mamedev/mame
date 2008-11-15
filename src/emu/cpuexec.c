@@ -46,8 +46,8 @@ enum
 ***************************************************************************/
 
 /* internal information about the state of inputs */
-typedef struct _cpuinput_data cpuinput_data;
-struct _cpuinput_data
+typedef struct _cpu_input_data cpu_input_data;
+struct _cpu_input_data
 {
 	INT32			vector;				/* most recently written vector */
 	INT32			curvector;			/* most recently processed vector */
@@ -69,7 +69,7 @@ struct _cpu_class_data
 
 	/* input states and IRQ callbacks */
 	cpu_irq_callback driver_irq;			/* driver-specific IRQ callback */
-	cpuinput_data	input[MAX_INPUT_LINES]; /* data about inputs */
+	cpu_input_data	input[MAX_INPUT_LINES]; /* data about inputs */
 
 	/* suspend states */
 	UINT8			suspend;				/* suspend reason mask (0 = not suspended) */
@@ -230,7 +230,7 @@ void cpuexec_init(running_machine *machine)
 			/* fill in the input states and IRQ callback information */
 			for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
 			{
-				cpuinput_data *inputline = &classdata->input[line];
+				cpu_input_data *inputline = &classdata->input[line];
 				/* vector and curvector are initialized later */
 				inputline->curstate = CLEAR_LINE;
 				inputline->qindex = 0;
@@ -261,7 +261,7 @@ void cpuexec_init(running_machine *machine)
 			classdata->icount = cpu_get_icount_ptr(device);
 			for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
 			{
-				cpuinput_data *inputline = &classdata->input[line];
+				cpu_input_data *inputline = &classdata->input[line];
 				inputline->vector = cpu_get_default_irq_vector(device);
 				inputline->curvector = inputline->vector;
 			}
@@ -320,7 +320,7 @@ static void cpuexec_reset(running_machine *machine)
 			/* reset the interrupt vectors and queues */
 			for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
 			{
-				cpuinput_data *inputline = &classdata->input[line];
+				cpu_input_data *inputline = &classdata->input[line];
 				inputline->vector = cpu_get_default_irq_vector(device);
 				inputline->qindex = 0;
 			}
@@ -930,7 +930,7 @@ void cpu_set_input_line_and_vector(const device_config *device, int line, int st
 
 	if (line >= 0 && line < MAX_INPUT_LINES)
 	{
-		cpuinput_data *inputline = &classdata->input[line];
+		cpu_input_data *inputline = &classdata->input[line];
 		INT32 input_event = (state & 0xff) | (vector << 8);
 		int event_index = inputline->qindex++;
 
@@ -1244,7 +1244,7 @@ static TIMER_CALLBACK( empty_event_queue )
 {
 	const device_config *device = ptr;
 	cpu_class_data *classdata = device->classtoken;
-	cpuinput_data *inputline = &classdata->input[param];
+	cpu_input_data *inputline = &classdata->input[param];
 	int curevent;
 
 	/* swap to the CPU's context */
@@ -1341,7 +1341,7 @@ static TIMER_CALLBACK( empty_event_queue )
 static IRQ_CALLBACK( standard_irq_callback )
 {
 	cpu_class_data *classdata = device->classtoken;
-	cpuinput_data *inputline = &classdata->input[irqline];
+	cpu_input_data *inputline = &classdata->input[irqline];
 	int vector = inputline->curvector;
 
 	LOG(("standard_irq_callback('%s', %d) $%04x\n", device->tag, irqline, vector));
@@ -1392,7 +1392,7 @@ static void register_save_states(const device_config *device)
 
 	for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
 	{
-		cpuinput_data *inputline = &classdata->input[line];
+		cpu_input_data *inputline = &classdata->input[line];
 		int index = classdata->header.index * ARRAY_LENGTH(classdata->input) + line;
 		state_save_register_item("cpu", index, inputline->vector);
 		state_save_register_item("cpu", index, inputline->curvector);

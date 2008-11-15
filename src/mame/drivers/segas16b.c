@@ -946,7 +946,7 @@ static WRITE16_HANDLER( atomicp_sound_w );
  *
  *************************************/
 
-static const struct segaic16_memory_map_entry rom_171_5358_info_small[] =
+static const segaic16_memory_map_entry rom_171_5358_info_small[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
 	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
@@ -960,7 +960,7 @@ static const struct segaic16_memory_map_entry rom_171_5358_info_small[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry rom_171_5358_info[] =
+static const segaic16_memory_map_entry rom_171_5358_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
 	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
@@ -974,7 +974,7 @@ static const struct segaic16_memory_map_entry rom_171_5358_info[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry rom_171_5704_info[] =
+static const segaic16_memory_map_entry rom_171_5704_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
 	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
@@ -988,7 +988,7 @@ static const struct segaic16_memory_map_entry rom_171_5704_info[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry rom_atomicp_info[] =
+static const segaic16_memory_map_entry rom_atomicp_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
 	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
@@ -1002,7 +1002,7 @@ static const struct segaic16_memory_map_entry rom_atomicp_info[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry rom_171_5797_info[] =
+static const segaic16_memory_map_entry rom_171_5797_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
 	{ 0x39/2, 0x00000, 0x01000, 0xfff000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
@@ -1016,7 +1016,7 @@ static const struct segaic16_memory_map_entry rom_171_5797_info[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry *const region_info_list[] =
+static const segaic16_memory_map_entry *const region_info_list[] =
 {
 	&rom_171_5358_info_small[0],
 	&rom_171_5358_info[0],
@@ -1033,12 +1033,13 @@ static const struct segaic16_memory_map_entry *const region_info_list[] =
  *
  *************************************/
 
-static void sound_w(UINT8 data)
+static void sound_w(running_machine *machine, UINT8 data)
 {
 	if (has_sound_cpu)
 	{
-		soundlatch_w(Machine, 0, data & 0xff);
-		cpu_set_input_line(Machine->cpu[1], 0, HOLD_LINE);
+		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		soundlatch_w(space, 0, data & 0xff);
+		cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
 	}
 }
 
@@ -1056,7 +1057,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	workram              = auto_malloc(0x04000);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(machine, "main", region_info_list[rom_board], sound_w, NULL);
+	segaic16_memory_mapper_init(cputag_get_cpu(machine, "main"), region_info_list[rom_board], sound_w, NULL);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, segaic16_memory_mapper_set_decrypted);
@@ -1075,7 +1076,7 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	cpu_suspend(machine->cpu[mame_find_cpu_index(machine, "mcu")], SUSPEND_REASON_DISABLE, 1);
+	cpu_suspend(cputag_get_cpu(machine, "mcu"), SUSPEND_REASON_DISABLE, 1);
 }
 
 
@@ -1380,19 +1381,20 @@ static INTERRUPT_GEN( i8751_main_cpu_vblank )
 
 static void altbeast_common_i8751_sim(running_machine *machine, offs_t soundoffs, offs_t inputoffs)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
 	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* set tile banks */
-	rom_5704_bank_w(machine, 1, workram[0x3094/2] & 0x00ff, 0x00ff);
+	rom_5704_bank_w(space, 1, workram[0x3094/2] & 0x00ff, 0x00ff);
 
 	/* process any new sound data */
 	temp = workram[soundoffs];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(machine, 0x03, temp >> 8);
+		segaic16_memory_mapper_w(space, 0x03, temp >> 8);
 		workram[soundoffs] = temp & 0x00ff;
 	}
 
@@ -1418,6 +1420,7 @@ static void altbeast_i8751_sim(running_machine *machine)
 
 static void ddux_i8751_sim(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1427,7 +1430,7 @@ static void ddux_i8751_sim(running_machine *machine)
 	temp = workram[0x0bd0/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(machine, 0x03, temp >> 8);
+		segaic16_memory_mapper_w(space, 0x03, temp >> 8);
 		workram[0x0bd0/2] = temp & 0x00ff;
 	}
 }
@@ -1453,6 +1456,7 @@ static void goldnaxe_i8751_init(running_machine *machine)
 
 static void goldnaxe_i8751_sim(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1471,7 +1475,7 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 	temp = workram[0x2cfc/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(machine, 0x03, temp >> 8);
+		segaic16_memory_mapper_w(space, 0x03, temp >> 8);
 		workram[0x2cfc/2] = temp & 0x00ff;
 	}
 
@@ -1483,6 +1487,7 @@ static void goldnaxe_i8751_sim(running_machine *machine)
 
 static void tturf_i8751_sim(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1492,7 +1497,7 @@ static void tturf_i8751_sim(running_machine *machine)
 	temp = workram[0x01d0/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(machine, 0x03, temp);
+		segaic16_memory_mapper_w(space, 0x03, temp);
 		workram[0x01d0/2] = temp & 0x00ff;
 	}
 
@@ -1505,6 +1510,7 @@ static void tturf_i8751_sim(running_machine *machine)
 
 static void wb3_i8751_sim(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1514,7 +1520,7 @@ static void wb3_i8751_sim(running_machine *machine)
 	temp = workram[0x0008/2];
 	if ((temp & 0x00ff) != 0x0000)
 	{
-		segaic16_memory_mapper_w(machine, 0x03, temp >> 8);
+		segaic16_memory_mapper_w(space, 0x03, temp >> 8);
 		workram[0x0008/2] = temp & 0xff00;
 	}
 }
@@ -1522,6 +1528,7 @@ static void wb3_i8751_sim(running_machine *machine)
 
 static void wrestwar_i8751_sim(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 temp;
 
 	/* signal a VBLANK to the main CPU */
@@ -1531,7 +1538,7 @@ static void wrestwar_i8751_sim(running_machine *machine)
 	temp = workram[0x208e/2];
 	if ((temp & 0xff00) != 0x0000)
 	{
-		segaic16_memory_mapper_w(machine, 0x03, temp);
+		segaic16_memory_mapper_w(space, 0x03, temp);
 		workram[0x208e/2] = temp & 0x00ff;
 	}
 

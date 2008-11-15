@@ -1138,15 +1138,19 @@ int cpu_get_index_slow(const device_config *cpu)
 void cpu_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
 	cpu_class_header *classheader = get_safe_classheader(device);
+
+	memory_set_context(device->machine, index);
+	device->machine->activecpu = device;
 	
 	classheader->index = index;
-	cpu_push_context(device);
 	classheader->space[ADDRESS_SPACE_PROGRAM] = active_address_space[ADDRESS_SPACE_PROGRAM];
 	classheader->space[ADDRESS_SPACE_DATA] = active_address_space[ADDRESS_SPACE_DATA];
 	classheader->space[ADDRESS_SPACE_IO] = active_address_space[ADDRESS_SPACE_IO];
+
 	(*classheader->init)(device, index, clock, irqcallback);
 	(*classheader->get_context)(device->token);
-	cpu_pop_context();
+	
+	device->machine->activecpu = NULL;
 }
 
 

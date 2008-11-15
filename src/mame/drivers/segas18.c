@@ -87,7 +87,7 @@ static WRITE16_HANDLER( rom_5987_bank_w );
  *
  *************************************/
 
-static const struct segaic16_memory_map_entry rom_171_shad_info[] =
+static const segaic16_memory_map_entry rom_171_shad_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
 	{ 0x39/2, 0x00000, 0x02000, 0xffe000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
@@ -101,7 +101,7 @@ static const struct segaic16_memory_map_entry rom_171_shad_info[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry rom_171_5874_info[] =
+static const segaic16_memory_map_entry rom_171_5874_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
 	{ 0x39/2, 0x00000, 0x02000, 0xffe000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
@@ -115,7 +115,7 @@ static const struct segaic16_memory_map_entry rom_171_5874_info[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry rom_171_5987_info[] =
+static const segaic16_memory_map_entry rom_171_5987_info[] =
 {
 	{ 0x3d/2, 0x00000, 0x04000, 0xffc000,      ~0, misc_io_r,             misc_io_w,             NULL,                  "I/O space" },
 	{ 0x39/2, 0x00000, 0x02000, 0xffe000,      ~0, SMH_BANK10,          segaic16_paletteram_w, &paletteram16,         "color RAM" },
@@ -129,7 +129,7 @@ static const struct segaic16_memory_map_entry rom_171_5987_info[] =
 	{ 0 }
 };
 
-static const struct segaic16_memory_map_entry *const region_info_list[] =
+static const segaic16_memory_map_entry *const region_info_list[] =
 {
 	&rom_171_shad_info[0],
 	&rom_171_5874_info[0],
@@ -144,14 +144,15 @@ static const struct segaic16_memory_map_entry *const region_info_list[] =
  *
  *************************************/
 
-static void sound_w(UINT8 data)
+static void sound_w(running_machine *machine, UINT8 data)
 {
-	soundlatch_w(Machine, 0, data & 0xff);
-	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	soundlatch_w(space, 0, data & 0xff);
+	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 
-static UINT8 sound_r(void)
+static UINT8 sound_r(running_machine *machine)
 {
 	return mcu_data;
 }
@@ -170,7 +171,7 @@ static void system18_generic_init(running_machine *machine, int _rom_board)
 	workram              = auto_malloc(0x04000);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(machine, "main", region_info_list[rom_board], sound_w, sound_r);
+	segaic16_memory_mapper_init(cputag_get_cpu(machine, "main"), region_info_list[rom_board], sound_w, sound_r);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, segaic16_memory_mapper_set_decrypted);

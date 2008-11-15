@@ -93,7 +93,7 @@ static const ppi8255_interface single_ppi_intf =
  *
  *************************************/
 
-static const struct segaic16_memory_map_entry outrun_info[] =
+static const segaic16_memory_map_entry outrun_info[] =
 {
 	{ 0x35/2, 0x90000, 0x10000, 0xf00000,      ~0, segaic16_road_control_0_r, segaic16_road_control_0_w, NULL,                  "road control" },
 	{ 0x35/2, 0x80000, 0x01000, 0xf0f000,      ~0, SMH_BANK10,              SMH_BANK10,              &segaic16_roadram_0,   "road RAM" },
@@ -125,7 +125,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 }
 
 
-static void sound_data_w(UINT8 data)
+static void sound_data_w(running_machine *machine, UINT8 data)
 {
 	timer_call_after_resynch(NULL, data, delayed_sound_data_w);
 }
@@ -149,7 +149,7 @@ static void outrun_generic_init(running_machine *machine)
 	workram              = auto_malloc(0x08000);
 
 	/* init the memory mapper */
-	segaic16_memory_mapper_init(machine, "main", outrun_info, sound_data_w, NULL);
+	segaic16_memory_mapper_init(cputag_get_cpu(machine, "main"), outrun_info, sound_data_w, NULL);
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, segaic16_memory_mapper_set_decrypted);

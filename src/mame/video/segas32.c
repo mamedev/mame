@@ -438,7 +438,7 @@ INLINE UINT16 common_paletteram_r(int which, offs_t offset)
 }
 
 
-static void common_paletteram_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_paletteram_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT16 value;
 	int convert;
@@ -456,7 +456,7 @@ static void common_paletteram_w(running_machine *machine, int which, offs_t offs
 	COMBINE_DATA(&value);
 	if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
 	system32_paletteram[which][offset] = value;
-	update_color(machine, 0x4000*which + offset, value);
+	update_color(space->machine, 0x4000*which + offset, value);
 
 	/* if blending is enabled, writes go to both halves of palette RAM */
 	if (mixer_control[which][0x4e/2] & 0x0880)
@@ -469,7 +469,7 @@ static void common_paletteram_w(running_machine *machine, int which, offs_t offs
 		COMBINE_DATA(&value);
 		if (convert) value = xBGRBBBBGGGGRRRR_to_xBBBBBGGGGGRRRRR(value);
 		system32_paletteram[which][offset] = value;
-		update_color(machine, 0x4000*which + offset, value);
+		update_color(space->machine, 0x4000*which + offset, value);
 	}
 }
 

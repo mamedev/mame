@@ -1283,12 +1283,12 @@ static void update_sio_irqs(running_machine *machine)
 }
 
 
-static void vblank_assert(running_machine *machine, int state)
+static void vblank_assert(const device_config *device, int state)
 {
 	if (!vblank_state && state)
 	{
 		sio_irq_state |= 0x20;
-		update_sio_irqs(machine);
+		update_sio_irqs(device->machine);
 	}
 	vblank_state = state;
 
