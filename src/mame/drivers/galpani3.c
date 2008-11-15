@@ -151,7 +151,7 @@ static VIDEO_UPDATE(galpani3)
 
 				if (dat3) dst[0] = dat3+0x4200;
 				else if (dat2) dst[0] = dat2+0x4100;
-				else if (dat1) dst[0] = dat2+0x4000;
+				else if (dat1) dst[0] = dat1+0x4000;
 
 			}
 		}
