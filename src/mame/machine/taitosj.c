@@ -44,9 +44,10 @@ MACHINE_START( taitosj )
 
 MACHINE_RESET( taitosj )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* set the default ROM bank (many games only have one bank and */
 	/* never write to the bank selector register) */
-	taitosj_bankswitch_w(machine, 0, 0);
+	taitosj_bankswitch_w(space, 0, 0);
 
 
 	zaccept = 1;

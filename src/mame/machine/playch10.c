@@ -29,6 +29,7 @@ static int MMC2_bank[4], MMC2_bank_latch[2];
  *************************************/
 MACHINE_RESET( pc10 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* initialize latches and flip-flops */
 	pc10_nmi_enable = pc10_dog_di = pc10_dispmask = pc10_sdcs = pc10_int_detect = 0;
 
@@ -45,8 +46,8 @@ MACHINE_RESET( pc10 )
 
 	/* reset the security chip */
 	RP5H01_enable_w( 0, 0 );
-	RP5H01_0_reset_w( machine, 0, 0 );
-	RP5H01_0_reset_w( machine, 0, 1 );
+	RP5H01_0_reset_w( space, 0, 0 );
+	RP5H01_0_reset_w( space, 0, 1 );
 	RP5H01_enable_w( 0, 1 );
 
 	/* reset the ppu */
@@ -144,10 +145,10 @@ READ8_HANDLER( pc10_prot_r )
 	/* we only support a single cart connected at slot 0 */
 	if ( cart_sel == 0 )
 	{
-		RP5H01_0_enable_w( space->machine, 0, 0 );
+		RP5H01_0_enable_w( space, 0, 0 );
 		data |= ( ( ~RP5H01_counter_r( 0 ) ) << 4 ) & 0x10;	/* D4 */
 		data |= ( ( RP5H01_data_r( 0 ) ) << 3 ) & 0x08;		/* D3 */
-		RP5H01_0_enable_w( space->machine, 0, 1 );
+		RP5H01_0_enable_w( space, 0, 1 );
 	}
 	return data;
 }
@@ -157,11 +158,11 @@ WRITE8_HANDLER( pc10_prot_w )
 	/* we only support a single cart connected at slot 0 */
 	if ( cart_sel == 0 )
 	{
-		RP5H01_0_enable_w( space->machine, 0, 0 );
-		RP5H01_0_test_w( space->machine, 0, data & 0x10 );		/* D4 */
-		RP5H01_0_clock_w( space->machine, 0, data & 0x08 );		/* D3 */
-		RP5H01_0_reset_w( space->machine, 0, ~data & 0x01 );	/* D0 */
-		RP5H01_0_enable_w( space->machine, 0, 1 );
+		RP5H01_0_enable_w( space, 0, 0 );
+		RP5H01_0_test_w( space, 0, data & 0x10 );		/* D4 */
+		RP5H01_0_clock_w( space, 0, data & 0x08 );		/* D3 */
+		RP5H01_0_reset_w( space, 0, ~data & 0x01 );	/* D0 */
+		RP5H01_0_enable_w( space, 0, 1 );
 
 		/* this thing gets dense at some point                      */
 		/* it wants to jump and execute an opcode at $ffff, wich    */

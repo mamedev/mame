@@ -241,13 +241,13 @@ WRITE16_HANDLER( twincobr_control_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan0_control_w(space, offset, data & 0xff);
+		toaplan0_control_w(space->machine, offset, data & 0xff);
 	}
 }
 
 WRITE8_HANDLER( wardner_control_w )
 {
-	toaplan0_control_w(space, offset, data);
+	toaplan0_control_w(space->machine, offset, data);
 }
 
 
@@ -265,10 +265,10 @@ WRITE16_HANDLER( twincobr_sharedram_w )
 }
 
 
-static void toaplan0_coin_dsp_w(running_machine *machine, int offset, int data)
+static void toaplan0_coin_dsp_w(const address_space *space, int offset, int data)
 {
 	if (data > 1)
-		LOG(("CPU0:%08x  Writing %08x to %08x.\n",cpu_get_pc(machine->activecpu),data,toaplan_port_type[toaplan_main_cpu] - offset));
+		LOG(("CPU0:%08x  Writing %08x to %08x.\n",cpu_get_pc(space->machine->activecpu),data,toaplan_port_type[toaplan_main_cpu] - offset));
 	switch (data) {
 		case 0x08: coin_counter_w(0,0); break;
 		case 0x09: coin_counter_w(0,1); break;
@@ -281,14 +281,14 @@ static void toaplan0_coin_dsp_w(running_machine *machine, int offset, int data)
 		/****** The following apply to Flying Shark/Wardner only ******/
 		case 0x00:	/* This means assert the INT line to the DSP */
 					LOG(("Turning DSP on and main CPU off\n"));
-					cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
-					cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE); /* TMS32010 INT */
-					cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+					cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, CLEAR_LINE);
+					cpu_set_input_line(space->machine->cpu[2], 0, ASSERT_LINE); /* TMS32010 INT */
+					cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 		case 0x01:	/* This means inhibit the INT line to the DSP */
 					LOG(("Turning DSP off\n"));
-					cpu_set_input_line(machine->cpu[2], 0, CLEAR_LINE); /* TMS32010 INT */
-					cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
+					cpu_set_input_line(space->machine->cpu[2], 0, CLEAR_LINE); /* TMS32010 INT */
+					cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);
 					break;
 	}
 }

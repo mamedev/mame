@@ -1001,14 +1001,14 @@ WRITE32_HANDLER( midway_ioasic_w )
 			{
 				if ((oldreg ^ newreg) & 1)
 				{
-					cage_control_w(space, 0);
+					cage_control_w(space->machine, 0);
 					if (!(~newreg & 1))
-						cage_control_w(space, 3);
+						cage_control_w(space->machine, 3);
 				}
 			}
 
 			/* FIFO reset? */
-			midway_ioasic_fifo_reset_w(space, ~newreg & 4);
+			midway_ioasic_fifo_reset_w(space->machine, ~newreg & 4);
 			break;
 
 		case IOASIC_SOUNDOUT:
@@ -1025,11 +1025,11 @@ WRITE32_HANDLER( midway_ioasic_w )
 
 		case IOASIC_PICOUT:
 			if (ioasic.shuffle_type == MIDWAY_IOASIC_VAPORTRX)
-				midway_serial_pic2_w(space, newreg ^ 0x0a);
+				midway_serial_pic2_w(space->machine, newreg ^ 0x0a);
 			else if (ioasic.shuffle_type == MIDWAY_IOASIC_SFRUSHRK)
-				midway_serial_pic2_w(space, newreg ^ 0x05);
+				midway_serial_pic2_w(space->machine, newreg ^ 0x05);
 			else
-				midway_serial_pic2_w(space, newreg);
+				midway_serial_pic2_w(space->machine, newreg);
 			break;
 
 		case IOASIC_INTCTL:

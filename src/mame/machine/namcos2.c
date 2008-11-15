@@ -105,6 +105,7 @@ MACHINE_START( namcos2 )
 
 MACHINE_RESET( namcos2 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int loop;
 	mFinalLapProtCount = 0;
 	namcos2_mcu_analog_ctrl=0;
@@ -113,7 +114,7 @@ MACHINE_RESET( namcos2 )
 	sendval = 0;
 
 	/* Initialise the bank select in the sound CPU */
-	namcos2_sound_bankselect_w(machine,0,0); /* Page in bank 0 */
+	namcos2_sound_bankselect_w(space,0,0); /* Page in bank 0 */
 
 	cpu_set_input_line(machine->cpu[CPU_SOUND], INPUT_LINE_RESET, ASSERT_LINE );
 

@@ -373,11 +373,12 @@ MACHINE_START( leland )
 
 MACHINE_RESET( leland )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	timer_adjust_oneshot(master_int_timer, video_screen_get_time_until_pos(machine->primary_screen, 8, 0), 8);
 
 	/* reset globals */
 	leland_gfx_control = 0x00;
-	leland_sound_port_w(machine, 0, 0xff);
+	leland_sound_port_w(space, 0, 0xff);
 	wcol_enable = 0;
 
 	dangerz_x = 512;
@@ -1100,7 +1101,7 @@ READ8_HANDLER( leland_master_analog_key_r )
 			break;
 
 		case 0x02:	/* FF = keycard serial data read */
-			result = keycard_r(space);
+			result = keycard_r(space->machine);
 
 			/* bit 7 indicates the analog input is busy for some games */
 			result &= ~0x80;
@@ -1132,7 +1133,7 @@ WRITE8_HANDLER( leland_master_analog_key_w )
 			break;
 
 		case 0x02:	/* FF = keycard data write */
-			keycard_w(space, data);
+			keycard_w(space->machine, data);
 			break;
 	}
 }

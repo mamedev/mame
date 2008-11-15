@@ -147,6 +147,7 @@ static TIMER_CALLBACK( interrupt_timer )
 
 MACHINE_RESET( balsente )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int numbanks, i;
 
 	/* create the polynomial tables */
@@ -176,8 +177,8 @@ MACHINE_RESET( balsente )
 	grudge_steering_result = 0;
 
 	/* reset the 6850 chips */
-	balsente_m6850_w(machine, 0, 3);
-	balsente_m6850_sound_w(machine, 0, 3);
+	balsente_m6850_w(space, 0, 3);
+	balsente_m6850_sound_w(space, 0, 3);
 
 	/* reset the noise generator */
 	memset(noise_position, 0, sizeof(noise_position));

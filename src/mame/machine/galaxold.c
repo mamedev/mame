@@ -386,6 +386,7 @@ Pin layout is such that links can replace the PAL if encryption is not used.
 
 DRIVER_INIT( 4in1 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	offs_t i, len = memory_region_length(machine, "main");
 	UINT8 *RAM = memory_region(machine, "main");
 
@@ -396,7 +397,7 @@ DRIVER_INIT( 4in1 )
 	/* games are banked at 0x0000 - 0x3fff */
 	memory_configure_bank(1, 0, 4, &RAM[0x10000], 0x4000);
 
-	_4in1_bank_w(machine, 0, 0); /* set the initial CPU bank */
+	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
 
 	state_save_register_global(_4in1_bank);
 }

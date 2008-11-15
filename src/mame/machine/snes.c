@@ -1178,11 +1178,11 @@ READ8_HANDLER( snes_r_bank1 )
 	if (address < 0x2000)											/* Mirror of Low RAM */
 		value = program_read_byte(0x7e0000 + address);
 	else if (address < 0x6000)										/* I/O */
-		value = snes_r_io(space->machine, address);
+		value = snes_r_io(space, address);
 	else if (address < 0x8000)
 	{
 		if (has_addon_chip == HAS_OBC1)
-			value = obc1_read(space->machine, offset);
+			value = obc1_read(space, offset);
 		else if ((has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 			value = (address < 0x7000) ? DSP2_read() : 0x00;
 		else if ((snes_cart.mode == SNES_MODE_21) && (has_addon_chip == HAS_DSP1) && (offset < 0x100000))
@@ -1209,11 +1209,11 @@ READ8_HANDLER( snes_r_bank2 )
 	if (address < 0x2000)											/* Mirror of Low RAM */
 		value = program_read_byte(0x7e0000 + address);
 	else if (address < 0x6000)										/* I/O */
-		value = snes_r_io(space->machine, address);
+		value = snes_r_io(space, address);
 	else if (address < 0x8000)										/* SRAM for mode_21, Reserved othewise */
 	{
 		if (has_addon_chip == HAS_OBC1)
-			value = obc1_read (space->machine, offset);
+			value = obc1_read (space, offset);
 		else if (has_addon_chip == HAS_DSP2)
 			value = (address < 0x7000) ? DSP2_read() : 0x00;
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
@@ -1361,11 +1361,11 @@ WRITE8_HANDLER( snes_w_bank1 )
 	if (address < 0x2000)							/* Mirror of Low RAM */
 		program_write_byte(0x7e0000 + address, data);
 	else if (address < 0x6000)						/* I/O */
-		snes_w_io(space->machine, address, data);
+		snes_w_io(space, address, data);
 	else if (address < 0x8000)
 	{
 		if (has_addon_chip == HAS_OBC1)
-			obc1_write(space->machine, offset, data);
+			obc1_write(space, offset, data);
 		else if ((has_addon_chip == HAS_DSP2) && (offset >= 0x200000))
 			DSP2_write(data);
 		else if ((snes_cart.mode == SNES_MODE_21) && (has_addon_chip == HAS_DSP1) && (offset < 0x100000))
@@ -1389,11 +1389,11 @@ WRITE8_HANDLER( snes_w_bank2 )
 	if (address < 0x2000)							/* Mirror of Low RAM */
 		program_write_byte(0x7e0000 + address, data);
 	else if (address < 0x6000)						/* I/O */
-		snes_w_io(space->machine, address, data);
+		snes_w_io(space, address, data);
 	else if (address < 0x8000)						/* SRAM for mode_21, Reserved othewise */
 	{
 		if (has_addon_chip == HAS_OBC1)
-			obc1_write(space->machine, offset, data);
+			obc1_write(space, offset, data);
 		else if (has_addon_chip == HAS_DSP2)
 			DSP2_write(data);
 		else if ((snes_cart.mode == SNES_MODE_21) && (snes_cart.sram > 0))
@@ -1462,18 +1462,18 @@ WRITE8_HANDLER( snes_w_bank6 )
 		if (snes_cart.mode != SNES_MODE_25)
 		{
 			if (offset < 0x300000)
-				snes_w_bank1(space->machine, offset, data);
+				snes_w_bank1(space, offset, data);
 			else
-				snes_w_bank2(space->machine, offset - 0x300000, data);
+				snes_w_bank2(space, offset - 0x300000, data);
 		}
 		else	/* Mode 25 has SRAM not mirrored from lower banks */
 		{
 			if (address < 0x6000)
 			{
 				if (offset < 0x300000)
-					snes_w_bank1(space->machine, offset, data);
+					snes_w_bank1(space, offset, data);
 				else
-					snes_w_bank2(space->machine, offset - 0x300000, data);
+					snes_w_bank2(space, offset - 0x300000, data);
 			}
 			else if ((offset >= 0x300000) && (snes_cart.sram > 0))
 			{
@@ -1506,9 +1506,9 @@ WRITE8_HANDLER( snes_w_bank7 )
 			if (offset >= 0x3e0000)
 				logerror("Attempt to write to banks 0xfe - 0xff address: %X\n", offset);
 			else if (offset >= 0x300000)
-				snes_w_bank5(space->machine, offset - 0x300000, data);
+				snes_w_bank5(space, offset - 0x300000, data);
 			else if (offset >= 0x200000)
-				snes_w_bank4(space->machine, offset - 0x200000, data);
+				snes_w_bank4(space, offset - 0x200000, data);
 		}
 		else
 			logerror("Attempt to write to ROM address: %X\n", offset + 0xc00000);
@@ -1676,6 +1676,7 @@ MACHINE_RESET( snes )
 /* for mame we use an init, maybe we will need more for the different games */
 DRIVER_INIT( snes )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
@@ -1730,7 +1731,7 @@ DRIVER_INIT( snes )
 	}
 
 	/* Find the amount of sram */
-	snes_cart.sram = snes_r_bank1(machine, 0x00ffd8);
+	snes_cart.sram = snes_r_bank1(space, 0x00ffd8);
 	if (snes_cart.sram > 0)
 	{
 		snes_cart.sram = ((1 << (snes_cart.sram + 3)) / 8);
@@ -1741,6 +1742,7 @@ DRIVER_INIT( snes )
 
 DRIVER_INIT( snes_hirom )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
@@ -1788,7 +1790,7 @@ DRIVER_INIT( snes_hirom )
 	}
 
 	/* Find the amount of sram */
-	snes_cart.sram = snes_r_bank1(machine, 0x00ffd8);
+	snes_cart.sram = snes_r_bank1(space, 0x00ffd8);
 	if (snes_cart.sram > 0)
 	{
 		snes_cart.sram = ((1 << (snes_cart.sram + 3)) / 8);

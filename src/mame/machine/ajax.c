@@ -200,8 +200,9 @@ WRITE8_HANDLER( ajax_bankswitch_2_w )
 
 MACHINE_RESET( ajax )
 {
-	ajax_bankswitch_w(machine, 0, 0);
-	ajax_bankswitch_2_w(machine, 0, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	ajax_bankswitch_w(space, 0, 0);
+	ajax_bankswitch_2_w(space, 0, 0);
 }
 
 INTERRUPT_GEN( ajax_interrupt )

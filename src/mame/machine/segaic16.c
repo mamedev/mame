@@ -195,7 +195,7 @@ void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decry
 }
 
 
-static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
+static void memory_mapper_w(const address_space *space, struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
 {
 	UINT8 oldval;
 
@@ -215,9 +215,9 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			/*   03 - maybe controls halt and reset lines together? */
 			if ((oldval ^ chip->regs[offset]) & 3)
 			{
-				cputag_set_input_line(machine, chip->cpu, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
+				cputag_set_input_line(space->machine, chip->cpu, INPUT_LINE_RESET, (chip->regs[offset] & 3) == 3 ? ASSERT_LINE : CLEAR_LINE);
 				if ((chip->regs[offset] & 3) == 3)
-					fd1094_machine_init(machine->cpu[0]);
+					fd1094_machine_init(space->machine->cpu[0]);
 			}
 			break;
 
@@ -229,7 +229,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 		case 0x04:
 			/* controls IRQ lines to 68000, negative logic -- write $B to signal IRQ4 */
 			if ((chip->regs[offset] & 7) != 7)
-				cputag_set_input_line(machine, chip->cpu, (~chip->regs[offset] & 7), HOLD_LINE);
+				cputag_set_input_line(space->machine, chip->cpu, (~chip->regs[offset] & 7), HOLD_LINE);
 			break;
 
 		case 0x05:
@@ -239,7 +239,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			if (data == 0x01)
 			{
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
-				cpu_push_context(machine->cpu[mame_find_cpu_index(machine, chip->cpu)]);
+				cpu_push_context(space->machine->cpu[mame_find_cpu_index(space->machine, chip->cpu)]);
 				program_write_word_16be(addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
 				cpu_pop_context();
 			}
@@ -247,7 +247,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 			{
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
-				cpu_push_context(machine->cpu[mame_find_cpu_index(machine, chip->cpu)]);
+				cpu_push_context(space->machine->cpu[mame_find_cpu_index(space->machine, chip->cpu)]);
 				result = program_read_word_16be(addr);
 				cpu_pop_context();
 				chip->regs[0x00] = result >> 8;
@@ -272,7 +272,7 @@ static void memory_mapper_w(running_machine *machine, struct memory_mapper_chip 
 		case 0x1c:	case 0x1d:
 		case 0x1e:	case 0x1f:
 			if (oldval != data)
-				update_memory_mapping(machine, chip);
+				update_memory_mapping(space->machine, chip);
 			break;
 
 		default:
@@ -545,12 +545,12 @@ static UINT16 divide_r(int which, offs_t offset, UINT16 mem_mask)
 }
 
 
-static void divide_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void divide_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	int a4 = offset & 8;
 	int a3 = offset & 4;
 
-	if (LOG_DIVIDE) logerror("%06X:divide%d_w(%X) = %04X\n", cpu_get_pc(machine->activecpu), which, offset, data);
+	if (LOG_DIVIDE) logerror("%06X:divide%d_w(%X) = %04X\n", cpu_get_pc(space->machine->activecpu), which, offset, data);
 
 	/* only 4 effective write registers */
 	offset &= 3;
@@ -645,10 +645,10 @@ static void timer_interrupt_ack(running_machine *machine, int which)
 }
 
 
-static UINT16 compare_timer_r(running_machine *machine, int which, offs_t offset, UINT16 mem_mask)
+static UINT16 compare_timer_r(const address_space *space, int which, offs_t offset, UINT16 mem_mask)
 {
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%06X:compare%d_r(%X) = %04X\n", cpu_get_pc(machine->activecpu), which, offset, compare_timer[which].regs[offset]);
+	if (LOG_COMPARE) logerror("%06X:compare%d_r(%X) = %04X\n", cpu_get_pc(space->machine->activecpu), which, offset, compare_timer[which].regs[offset]);
 	switch (offset)
 	{
 		case 0x0:	return compare_timer[which].regs[0];
@@ -660,16 +660,16 @@ static UINT16 compare_timer_r(running_machine *machine, int which, offs_t offset
 		case 0x6:	return compare_timer[which].regs[2];
 		case 0x7:	return compare_timer[which].regs[7];
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(machine, which); break;
+		case 0xd:	timer_interrupt_ack(space->machine, which); break;
 	}
 	return 0xffff;
 }
 
 
-static void compare_timer_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void compare_timer_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	offset &= 0xf;
-	if (LOG_COMPARE) logerror("%06X:compare%d_w(%X) = %04X\n", cpu_get_pc(machine->activecpu), which, offset, data);
+	if (LOG_COMPARE) logerror("%06X:compare%d_w(%X) = %04X\n", cpu_get_pc(space->machine->activecpu), which, offset, data);
 	switch (offset)
 	{
 		case 0x0:	COMBINE_DATA(&compare_timer[which].regs[0]); update_compare(which, 0); break;
@@ -680,7 +680,7 @@ static void compare_timer_w(running_machine *machine, int which, offs_t offset, 
 		case 0x8:
 		case 0xc:	COMBINE_DATA(&compare_timer[which].regs[8]); break;
 		case 0x9:
-		case 0xd:	timer_interrupt_ack(machine, which); break;
+		case 0xd:	timer_interrupt_ack(space->machine, which); break;
 		case 0xa:
 		case 0xe:	COMBINE_DATA(&compare_timer[which].regs[10]); break;
 		case 0xb:

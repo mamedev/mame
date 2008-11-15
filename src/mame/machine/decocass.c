@@ -1522,7 +1522,7 @@ READ8_HANDLER( decocass_e5xx_r )
 	else
 	{
 		if (decocass_dongle_r)
-			data = (*decocass_dongle_r)(space->machine, offset);
+			data = (*decocass_dongle_r)(space, offset);
 		else
 			data = 0xff;
 	}
@@ -1533,7 +1533,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 {
 	if (decocass_dongle_w)
 	{
-		(*decocass_dongle_w)(space->machine, offset, data);
+		(*decocass_dongle_w)(space, offset, data);
 		return;
 	}
 

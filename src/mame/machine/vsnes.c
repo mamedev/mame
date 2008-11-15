@@ -285,7 +285,7 @@ static WRITE8_HANDLER( vsnormal_vrom_banking )
 	/* bit 1 ( data & 2 ) enables writes to extra ram, we ignore it */
 
 	/* move along */
-	vsnes_in0_w( space->machine, offset, data );
+	vsnes_in0_w( space, offset, data );
 }
 
 /* Most games switch VROM Banks in controller 0 write */
@@ -302,11 +302,11 @@ static WRITE8_HANDLER( ppuRC2C05_protection )
 	/* and no remapped color */
 	if ( offset == 0 )
 	{
-		ppu2c0x_0_w( space->machine, 1, data );
+		ppu2c0x_0_w( space, 1, data );
 		return;
 	}
 
-	ppu2c0x_0_w( space->machine, 0, data );
+	ppu2c0x_0_w( space, 0, data );
 }
 
 /**********************************************************************************/
@@ -499,7 +499,7 @@ DRIVER_INIT( hogalley )
 static READ8_HANDLER( vsgshoe_security_r )
 {
 	/* low part must be 0x1c */
-	return ppu2c0x_0_r( space->machine, 2 ) | 0x1c;
+	return ppu2c0x_0_r( space, 2 ) | 0x1c;
 }
 
 static WRITE8_HANDLER( vsgshoe_gun_in0_w )
@@ -779,7 +779,7 @@ DRIVER_INIT( cstlevna )
 static READ8_HANDLER( topgun_security_r )
 {
 	/* low part must be 0x1b */
-	return ppu2c0x_0_r( space->machine, 2 ) | 0x1b;
+	return ppu2c0x_0_r( space, 2 ) | 0x1b;
 }
 
 DRIVER_INIT( topgun )
@@ -1221,7 +1221,7 @@ DRIVER_INIT( bnglngby )
 static READ8_HANDLER( jajamaru_security_r )
 {
 	/* low part must be 0x40 */
-	return ppu2c0x_0_r( space->machine, 2 ) | 0x40;
+	return ppu2c0x_0_r( space, 2 ) | 0x40;
 }
 
 DRIVER_INIT( jajamaru )
@@ -1248,7 +1248,7 @@ DRIVER_INIT( jajamaru )
 static READ8_HANDLER( mightybj_security_r )
 {
 	/* low part must be 0x3d */
-	return ppu2c0x_0_r( space->machine, 2 ) | 0x3d;
+	return ppu2c0x_0_r( space, 2 ) | 0x3d;
 }
 
 DRIVER_INIT( mightybj )
@@ -1276,9 +1276,9 @@ static WRITE8_HANDLER( vstennis_vrom_banking )
 
 	/* move along */
 	if ( cpunum_get_active() == 0 )
-		vsnes_in0_w( space->machine, offset, data );
+		vsnes_in0_w( space, offset, data );
 	else
-		vsnes_in0_1_w( space->machine, offset, data );
+		vsnes_in0_1_w( space, offset, data );
 }
 
 DRIVER_INIT( vstennis )

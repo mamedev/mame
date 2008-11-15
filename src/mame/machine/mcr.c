@@ -596,7 +596,8 @@ static void zwackery_pia_irq(running_machine *machine, int state)
 
 static TIMER_CALLBACK( zwackery_493_off_callback )
 {
-	pia_2_ca1_w(machine, 0, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_2_ca1_w(space, 0, 0);
 }
 
 
@@ -885,26 +886,26 @@ static READ16_HANDLER( mcr68_6840_r_common )
 WRITE16_HANDLER( mcr68_6840_upper_w )
 {
 	if (ACCESSING_BITS_8_15)
-		mcr68_6840_w_common(space->machine, offset, (data >> 8) & 0xff);
+		mcr68_6840_w_common(space, offset, (data >> 8) & 0xff);
 }
 
 
 WRITE16_HANDLER( mcr68_6840_lower_w )
 {
 	if (ACCESSING_BITS_0_7)
-		mcr68_6840_w_common(space->machine, offset, data & 0xff);
+		mcr68_6840_w_common(space, offset, data & 0xff);
 }
 
 
 READ16_HANDLER( mcr68_6840_upper_r )
 {
-	return (mcr68_6840_r_common(space->machine,offset,0) << 8) | 0x00ff;
+	return (mcr68_6840_r_common(space,offset,0) << 8) | 0x00ff;
 }
 
 
 READ16_HANDLER( mcr68_6840_lower_r )
 {
-	return mcr68_6840_r_common(space->machine,offset,0) | 0xff00;
+	return mcr68_6840_r_common(space,offset,0) | 0xff00;
 }
 
 

@@ -92,6 +92,7 @@ DRIVER_INIT( stfight )
 
 MACHINE_RESET( stfight )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	adpcm_data_offs = adpcm_data_end = 0;
 	toggle = 0;
 	fm_data = 0;
@@ -102,7 +103,7 @@ MACHINE_RESET( stfight )
 	stfight_coin_mech_query = 0;
 
     // initialise rom bank
-    stfight_bank_w( machine, 0, 0 );
+    stfight_bank_w( space, 0, 0 );
 }
 
 // It's entirely possible that this bank is never switched out

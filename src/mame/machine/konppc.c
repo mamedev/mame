@@ -212,7 +212,7 @@ static UINT32 dsp_comm_sharc_r(int board, int offset)
 	return dsp_comm_ppc[board][offset];
 }
 
-static void dsp_comm_sharc_w(running_machine *machine, int board, int offset, UINT32 data)
+static void dsp_comm_sharc_w(const address_space *space, int board, int offset, UINT32 data)
 {
 	if (offset >= 2)
 	{
@@ -225,14 +225,14 @@ static void dsp_comm_sharc_w(running_machine *machine, int board, int offset, UI
 		case CGBOARD_TYPE_GTICLUB:
 		{
 			//cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG0, ASSERT_LINE);
-			cpu_push_context(machine->cpu[2]);
+			cpu_push_context(space->machine->cpu[2]);
 			sharc_set_flag_input(0, ASSERT_LINE);
 			cpu_pop_context();
 
 			if (offset == 1)
 			{
 				if (data & 0x03)
-					cpu_set_input_line(machine->cpu[2], INPUT_LINE_IRQ2, ASSERT_LINE);
+					cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_IRQ2, ASSERT_LINE);
 			}
 			break;
 		}
@@ -246,7 +246,7 @@ static void dsp_comm_sharc_w(running_machine *machine, int board, int offset, UI
 
 				if (data & 0x01 || data & 0x10)
 				{
-					cpu_push_context(machine->cpu[board == 0 ? 2 : 3]);
+					cpu_push_context(space->machine->cpu[board == 0 ? 2 : 3]);
 					sharc_set_flag_input(1, ASSERT_LINE);
 					cpu_pop_context();
 				}
@@ -523,7 +523,7 @@ WRITE32_HANDLER(K033906_0_w)
 {
 	if (pci_bridge_enable[0])
 	{
-		K033906_w(space, 0, offset, data);
+		K033906_w(space->machine, 0, offset, data);
 	}
 	else
 	{
@@ -554,7 +554,7 @@ WRITE32_HANDLER(K033906_1_w)
 {
 	if (pci_bridge_enable[1])
 	{
-		K033906_w(space, 1, offset, data);
+		K033906_w(space->machine, 1, offset, data);
 	}
 	else
 	{

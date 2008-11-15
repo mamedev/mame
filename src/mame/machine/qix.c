@@ -262,7 +262,8 @@ MACHINE_START( slither )
 
 MC6845_ON_VSYNC_CHANGED( qix_vsync_changed )
 {
-	pia_3_cb1_w(device->machine, 0, vsync);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_3_cb1_w(space, 0, vsync);
 }
 
 
@@ -356,7 +357,8 @@ READ8_HANDLER( qix_video_firq_ack_r )
 
 static TIMER_CALLBACK( deferred_pia_4_porta_w )
 {
-	pia_4_porta_w(machine, 0, param);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_4_porta_w(space, 0, param);
 }
 
 
@@ -524,7 +526,8 @@ WRITE8_HANDLER( qix_68705_portC_w )
 
 static TIMER_CALLBACK( pia_0_w_callback )
 {
-	pia_0_w(machine, param >> 8, param & 0xff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_0_w(space, param >> 8, param & 0xff);
 }
 
 

@@ -20,13 +20,13 @@ static UINT8 K056800_host_reg_r(int reg)
 	return value;
 }
 
-static void K056800_host_reg_w(running_machine *machine, int reg, UINT8 data)
+static void K056800_host_reg_w(const address_space *space, int reg, UINT8 data)
 {
 	K056800_sound_reg[reg] = data;
 
 	if (reg == 7)
 	{
-		K056800_sound_irq_callback(machine, 1);
+		K056800_sound_irq_callback(space->machine, 1);
 	}
 }
 
