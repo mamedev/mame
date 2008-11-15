@@ -145,6 +145,8 @@ void asic65_config(running_machine *machine, int asictype)
 
 void asic65_reset(running_machine *machine, int state)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* rom-based means reset and clear states */
 	if (asic65.type == ASIC65_ROMBASED)
 		cpu_set_input_line(machine->cpu[asic65.cpunum], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
@@ -162,7 +164,7 @@ void asic65_reset(running_machine *machine, int state)
 		else if (!state && asic65.reset_state)
 		{
 			if (asic65.command != -1)
-				asic65_data_w(machine, 1, asic65.command, 0xffff);
+				asic65_data_w(space, 1, asic65.command, 0xffff);
 		}
 
 		/* update the state */

@@ -709,13 +709,13 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 
 READ32_HANDLER( jaguar_tom_regs32_r )
 {
-	return read32be_with_16be_handler(jaguar_tom_regs_r, space->machine, offset, mem_mask);
+	return read32be_with_16be_handler(jaguar_tom_regs_r, space, offset, mem_mask);
 }
 
 
 WRITE32_HANDLER( jaguar_tom_regs32_w )
 {
-	write32be_with_16be_handler(jaguar_tom_regs_w, space->machine, offset, data, mem_mask);
+	write32be_with_16be_handler(jaguar_tom_regs_w, space, offset, data, mem_mask);
 }
 
 

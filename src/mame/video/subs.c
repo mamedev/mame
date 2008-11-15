@@ -43,6 +43,7 @@ VIDEO_UPDATE( subs )
 
 	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
 	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
@@ -148,7 +149,7 @@ VIDEO_UPDATE( subs )
 	}
 
 	/* Update sound */
-	discrete_sound_w(screen->machine, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data
-	discrete_sound_w(screen->machine, SUBS_CRASH_DATA, spriteram[5] >> 4);		// Crash/explode data
+	discrete_sound_w(space, SUBS_LAUNCH_DATA, spriteram[5] & 0x0f);	// Launch data
+	discrete_sound_w(space, SUBS_CRASH_DATA, spriteram[5] >> 4);		// Crash/explode data
 	return 0;
 }

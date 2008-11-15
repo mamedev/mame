@@ -876,7 +876,7 @@ static WRITE8_HANDLER( VSYNC_w )
 					video_screen_get_height(space->machine->primary_screen));
 
 			if ( tia_vsync_callback ) {
-				tia_vsync_callback( space->machine, 0, curr_y, 0xFFFF );
+				tia_vsync_callback( space, 0, curr_y, 0xFFFF );
 			}
 
 			prev_y = 0;
@@ -1360,11 +1360,11 @@ static WRITE8_HANDLER( NUSIZ1_w )
 
 static WRITE8_HANDLER( HMCLR_w )
 {
-	HMP0_w( space->machine, offset, 0 );
-	HMP1_w( space->machine, offset, 0 );
-	HMM0_w( space->machine, offset, 0 );
-	HMM1_w( space->machine, offset, 0 );
-	HMBL_w( space->machine, offset, 0 );
+	HMP0_w( space, offset, 0 );
+	HMP1_w( space, offset, 0 );
+	HMM0_w( space, offset, 0 );
+	HMM1_w( space, offset, 0 );
+	HMBL_w( space, offset, 0 );
 }
 
 
@@ -1651,7 +1651,7 @@ static READ8_HANDLER( INPT_r )
 	int input = TIA_INPUT_PORT_ALWAYS_ON;
 	if ( tia_read_input_port )
 	{
-		input = tia_read_input_port(space->machine, offset & 3, 0xFFFF);
+		input = tia_read_input_port(space, offset & 3, 0xFFFF);
 	}
 
 	if ( input == TIA_INPUT_PORT_ALWAYS_ON )
@@ -1674,7 +1674,7 @@ READ8_HANDLER( tia_r )
 
 	if ( tia_get_databus )
 	{
-		data = tia_get_databus(space->machine, offset) & 0x3f;
+		data = tia_get_databus(space, offset) & 0x3f;
 	}
 
 	if (!(offset & 0x8))
@@ -1710,13 +1710,13 @@ READ8_HANDLER( tia_r )
 		return data | INPT_r(space,3);
 	case 0xC:
 		{
-			int	button = tia_read_input_port ? ( tia_read_input_port(space->machine,4,0xFFFF) & 0x80 ) : 0x80;
+			int	button = tia_read_input_port ? ( tia_read_input_port(space,4,0xFFFF) & 0x80 ) : 0x80;
 			INPT4 = ( VBLANK & 0x40) ? ( INPT4 & button ) : button;
 		}
 		return data | INPT4;
 	case 0xD:
 		{
-			int button = tia_read_input_port ? ( tia_read_input_port(space->machine,5,0xFFFF) & 0x80 ) : 0x80;
+			int button = tia_read_input_port ? ( tia_read_input_port(space,5,0xFFFF) & 0x80 ) : 0x80;
 			INPT5 = ( VBLANK & 0x40) ? ( INPT5 & button ) : button;
 		}
 		return data | INPT5;

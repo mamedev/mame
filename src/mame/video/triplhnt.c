@@ -130,13 +130,15 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 
 VIDEO_UPDATE( triplhnt )
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	draw_sprites(screen->machine, bitmap, cliprect);
 
-	discrete_sound_w(screen->machine, TRIPLHNT_BEAR_ROAR_DATA, triplhnt_playfield_ram[0xfa] & 15);
-	discrete_sound_w(screen->machine, TRIPLHNT_SHOT_DATA, triplhnt_playfield_ram[0xfc] & 15);
+	discrete_sound_w(space, TRIPLHNT_BEAR_ROAR_DATA, triplhnt_playfield_ram[0xfa] & 15);
+	discrete_sound_w(space, TRIPLHNT_SHOT_DATA, triplhnt_playfield_ram[0xfc] & 15);
 	return 0;
 }

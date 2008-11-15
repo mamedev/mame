@@ -96,6 +96,7 @@ VIDEO_EOF( ultratnk )
 {
 	int i;
 	UINT16 BG = colortable_entry_get_value(machine->colortable, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* check for sprite-playfield collisions */
 
@@ -140,8 +141,8 @@ VIDEO_EOF( ultratnk )
 
 	/* update sound status */
 
-	discrete_sound_w(machine, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
-	discrete_sound_w(machine, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
+	discrete_sound_w(space, ULTRATNK_MOTOR_DATA_1, videoram[0x391] & 15);
+	discrete_sound_w(space, ULTRATNK_MOTOR_DATA_2, videoram[0x393] & 15);
 }
 
 

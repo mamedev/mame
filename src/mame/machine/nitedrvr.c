@@ -251,8 +251,10 @@ static TIMER_CALLBACK( nitedrvr_crash_toggle_callback )
 {
 	if (nitedrvr_crash_en && nitedrvr_crash_data_en)
 	{
+		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 		nitedrvr_crash_data--;
-		discrete_sound_w(machine, NITEDRVR_BANG_DATA, nitedrvr_crash_data);	// Crash Volume
+		discrete_sound_w(space, NITEDRVR_BANG_DATA, nitedrvr_crash_data);	// Crash Volume
 		if (!nitedrvr_crash_data) nitedrvr_crash_data_en = 0;	// Done counting?
 		if (nitedrvr_crash_data & 0x01)
 		{
