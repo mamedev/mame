@@ -311,36 +311,41 @@ static const gfx_layout gfxlayout =
 };
 
 static GFXDECODE_START( culture )
-	GFXDECODE_ENTRY("gfx1", 0, gfxlayout, 0, 1 )
-	GFXDECODE_ENTRY("gfx2", 0, gfxlayout, 0, 1 )
-	GFXDECODE_ENTRY("gfx3", 0, gfxlayout, 0, 1 )
+	GFXDECODE_ENTRY("gfx1", 0, gfxlayout, 0x000, 1 )
+	GFXDECODE_ENTRY("gfx2", 0, gfxlayout, 0x100, 1 )
+	GFXDECODE_ENTRY("gfx3", 0, gfxlayout, 0x200, 1 )
 GFXDECODE_END
+
 
 //WRONG!
 static PALETTE_INIT( cultures )
 {
-	int c,x;
+	int c,x,plane;
 
-	for (c = 0; c < 256; c++)
+	/*every plane appears to use his dedicated color table*/
+	for(plane = 0;plane < 0x300;plane+=0x100)
 	{
- 		int r,g,b,i;
+		for (c = 0; c < 256; c++)
+		{
+ 			int r,g,b,i;
 
- 		i = c & 0x03;
- 		r = ((c & 0x04) >> 0) | ((c & 0x10) >> 1) | i;
- 		g = ((c & 0x20) >> 3) | ((c & 0x40) >> 3) | i;
- 		b = ((c & 0x08) >> 1) | ((c & 0x80) >> 4) | i;
+ 			i = c & 0x03;
+ 			r = ((c & 0x04) >> 0) | ((c & 0x10) >> 1) | i;
+ 			g = ((c & 0x20) >> 3) | ((c & 0x40) >> 3) | i;
+ 			b = ((c & 0x08) >> 1) | ((c & 0x80) >> 4) | i;
 
-		/*
-        r = ((c & 0x0c) >> 0)  | i;
-        g = ((c & 0x30) >> 2) | i;
-        b = ((c & 0xc0) >> 4) | i;
-*/
+			/*
+    	    r = ((c & 0x0c) >> 0) | i;
+    	    g = ((c & 0x30) >> 2) | i;
+    	    b = ((c & 0xc0) >> 4) | i;
+			*/
 
-		x = ((c >> 4) & 0x0f);
+			x = ((c >> 4) & 0x0f);
 
-		x = ((x & 4) << 1) | ((x & 8) >> 1) | (x & 1);
+			x = ((x & 4) << 1) | ((x & 8) >> 1) | (x & 1);
 
- 		palette_set_color_rgb(machine, x | (((c << 4) & 0xf0) ^ 0), pal4bit(r), pal4bit(g), pal4bit(b));
+	 		palette_set_color_rgb(machine, plane+(x | (((c << 4) & 0xf0) ^ 0)), pal4bit(r), pal4bit(g), pal4bit(b));
+		}
 	}
 }
 
@@ -376,7 +381,7 @@ static MACHINE_DRIVER_START( cultures )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 
 	MDRV_GFXDECODE(culture)
-	MDRV_PALETTE_LENGTH(256)
+	MDRV_PALETTE_LENGTH(0x300)
 
 	MDRV_PALETTE_INIT(cultures)
 
