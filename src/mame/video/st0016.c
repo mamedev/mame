@@ -426,7 +426,9 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static STATE_POSTLOAD( st0016_postload )
 {
-	st0016_rom_bank_w(machine,0,st0016_rom_bank);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	st0016_rom_bank_w(space,0,st0016_rom_bank);
 	memset(chardirty, 1, ST0016_MAX_CHAR_BANK);
 }
 

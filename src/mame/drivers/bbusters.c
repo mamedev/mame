@@ -656,7 +656,7 @@ static INTERRUPT_GEN( bbuster )
 
 static VIDEO_EOF( bbuster )
 {
-	address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram16_w(space,0,0,0xffff);
 	buffer_spriteram16_2_w(space,0,0,0xffff);
@@ -664,7 +664,7 @@ static VIDEO_EOF( bbuster )
 
 static VIDEO_EOF( mechatt )
 {
-	address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 
