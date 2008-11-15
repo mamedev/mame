@@ -431,7 +431,7 @@ WRITE8_HANDLER( combascb_bankselect_w )
 MACHINE_RESET( combasc )
 {
 	UINT8 *MEM = memory_region(machine, "main") + 0x38000;
-
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	combasc_io_ram  = MEM + 0x0000;
 	combasc_page[0] = MEM + 0x4000;
@@ -442,7 +442,7 @@ MACHINE_RESET( combasc )
 	memset( combasc_page[1], 0x00, 0x2000 );
 
 	combasc_bank_select = -1;
-	combasc_bankselect_w( machine,0,0 );
+	combasc_bankselect_w(space, 0, 0);
 }
 
 WRITE8_HANDLER( combasc_pf_control_w )

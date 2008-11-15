@@ -142,8 +142,10 @@ static WRITE8_HANDLER( leprechn_video_command_w )
 
 static TIMER_CALLBACK( clear_screen_done_callback )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* indicate that the we are done clearing the screen */
-	via_0_ca1_w(machine, 0, 0);
+	via_0_ca1_w(space, 0, 0);
 }
 
 
@@ -262,9 +264,10 @@ static const struct via6522_interface trvquest_via_0_interface =
 static TIMER_CALLBACK( via_0_ca1_timer_callback )
 {
 	gameplan_state *state = machine->driver_data;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* !VBLANK is connected to CA1 */
-	via_0_ca1_w(machine, 0, (UINT8)param);
+	via_0_ca1_w(space, 0, (UINT8)param);
 
 	if (param)
 		timer_adjust_oneshot(state->via_0_ca1_timer, video_screen_get_time_until_pos(machine->primary_screen, VBSTART, 0), 0);

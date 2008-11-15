@@ -178,7 +178,9 @@ static void r6532_irq(const device_config *device, int state)
 
 static void r6532_soundlatch_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
-	soundlatch_w(device->machine, 0, newdata);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	soundlatch_w(space, 0, newdata);
 }
 
 

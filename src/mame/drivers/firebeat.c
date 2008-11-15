@@ -658,7 +658,7 @@ static READ32_HANDLER(gcu0_r)
 
 static WRITE32_HANDLER(gcu0_w)
 {
-	GCU_w(space, 0, offset, data, mem_mask);
+	GCU_w(space->machine, 0, offset, data, mem_mask);
 }
 
 static READ32_HANDLER(gcu1_r)
@@ -668,7 +668,7 @@ static READ32_HANDLER(gcu1_r)
 
 static WRITE32_HANDLER(gcu1_w)
 {
-	GCU_w(space, 1, offset, data, mem_mask);
+	GCU_w(space->machine, 1, offset, data, mem_mask);
 }
 
 /*****************************************************************************/
@@ -1173,12 +1173,12 @@ static READ32_HANDLER( atapi_command_r )
 //  printf("atapi_command_r: %08X, %08X\n", offset, mem_mask);
 	if (ACCESSING_BITS_16_31)
 	{
-		r = atapi_command_reg_r(space, offset*2);
+		r = atapi_command_reg_r(space->machine, offset*2);
 		return ATAPI_ENDIAN(r) << 16;
 	}
 	else
 	{
-		r = atapi_command_reg_r(space, (offset*2) + 1);
+		r = atapi_command_reg_r(space->machine, (offset*2) + 1);
 		return ATAPI_ENDIAN(r) << 0;
 	}
 }
@@ -1189,11 +1189,11 @@ static WRITE32_HANDLER( atapi_command_w )
 
 	if (ACCESSING_BITS_16_31)
 	{
-		atapi_command_reg_w(space, offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
+		atapi_command_reg_w(space->machine, offset*2, ATAPI_ENDIAN((data >> 16) & 0xffff));
 	}
 	else
 	{
-		atapi_command_reg_w(space, (offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
+		atapi_command_reg_w(space->machine, (offset*2) + 1, ATAPI_ENDIAN((data >> 0) & 0xffff));
 	}
 }
 
