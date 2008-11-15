@@ -916,7 +916,7 @@ READ32_HANDLER( midway_ioasic_r )
 					dcs_ack_w();
 			}
 			else if (ioasic.has_cage)
-				result = main_from_cage_r();
+				result = main_from_cage_r(space);
 			else
 			{
 				static UINT16 val = 0;

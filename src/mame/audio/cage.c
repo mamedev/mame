@@ -510,13 +510,13 @@ static READ32_HANDLER( cage_io_status_r )
 }
 
 
-UINT16 main_from_cage_r(void)
+UINT16 main_from_cage_r(const address_space *space)
 {
 	if (LOG_COMM)
-		logerror("%06X:main read data = %04X\n", cpu_get_pc(Machine->activecpu), soundlatch_word_r(Machine, 0, 0));
+		logerror("%06X:main read data = %04X\n", cpu_get_pc(Machine->activecpu), soundlatch_word_r(space, 0, 0));
 	cage_to_cpu_ready = 0;
 	update_control_lines(Machine);
-	return soundlatch_word_r(Machine, 0, 0xffff);
+	return soundlatch_word_r(space, 0, 0xffff);
 }
 
 

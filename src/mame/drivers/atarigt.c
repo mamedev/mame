@@ -234,7 +234,7 @@ static READ32_HANDLER( sound_data_r )
 	if (ACCESSING_BITS_0_15)
 		result |= cage_control_r();
 	if (ACCESSING_BITS_16_31)
-		result |= main_from_cage_r() << 16;
+		result |= main_from_cage_r(space) << 16;
 	return result;
 }
 
