@@ -774,7 +774,7 @@ INLINE int cpu_get_index(const device_config *cpu)
     the given CPU's address space
 -------------------------------------------------*/
 
-INLINE address_space *cpu_get_address_space(const device_config *cpu, int spacenum)
+INLINE const address_space *cpu_get_address_space(const device_config *cpu, int spacenum)
 {
 	cpu_class_header *classheader = cpu->classtoken;
 	return classheader->space[spacenum];

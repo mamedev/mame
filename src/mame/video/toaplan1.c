@@ -318,12 +318,14 @@ static void toaplan1_set_scrolls(void)
 
 static STATE_POSTLOAD( rallybik_flipscreen )
 {
-	rallybik_bcu_flipscreen_w(machine, 0, bcu_flipscreen, 0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	rallybik_bcu_flipscreen_w(space, 0, bcu_flipscreen, 0xffff);
 }
 
 static STATE_POSTLOAD( toaplan1_flipscreen )
 {
-	toaplan1_bcu_flipscreen_w(machine, 0, bcu_flipscreen, 0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	toaplan1_bcu_flipscreen_w(space, 0, bcu_flipscreen, 0xffff);
 }
 
 
@@ -599,7 +601,7 @@ WRITE16_HANDLER( toaplan1_bcu_control_w )
 	if (toaplan1_unk_reset_port && toaplan1_reset)
 	{
 		toaplan1_reset = 0;
-		toaplan1_reset_sound(space->machine,0,0,0);
+		toaplan1_reset_sound(space,0,0,0);
 	}
 }
 
@@ -1229,18 +1231,21 @@ VIDEO_UPDATE( demonwld )
 
 VIDEO_EOF( rallybik )
 {
-	buffer_spriteram16_w(machine, 0, 0, 0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }
 
 VIDEO_EOF( toaplan1 )
 {
-	buffer_spriteram16_w(machine, 0, 0, 0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram16_w(space, 0, 0, 0xffff);
 	memcpy(toaplan1_buffered_spritesizeram16, toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 }
 
 VIDEO_EOF( samesame )
 {
-	buffer_spriteram16_w(machine, 0, 0, 0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram16_w(space, 0, 0, 0xffff);
 	memcpy(toaplan1_buffered_spritesizeram16, toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
 	cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, HOLD_LINE);	/* Frame done */
 }
