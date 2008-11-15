@@ -227,6 +227,8 @@ VIDEO_UPDATE( dogfgt )
 
 	if (lastflip != flip_screen_get() || lastpixcolor != pixcolor)
 	{
+		const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 		lastflip = flip_screen_get();
 		lastpixcolor = pixcolor;
 

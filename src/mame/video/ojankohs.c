@@ -208,7 +208,7 @@ static TILE_GET_INFO( ojankoy_get_tile_info )
 
 ******************************************************************************/
 
-void ojankoc_flipscreen(running_machine *machine, int data)
+void ojankoc_flipscreen(const address_space *space, int data)
 {
 	static int ojankoc_flipscreen_old = 0;
 	int x, y;
@@ -222,13 +222,13 @@ void ojankoc_flipscreen(running_machine *machine, int data)
 		for (x = 0; x < 0x100; x++) {
 			color1 = ojankohs_videoram[0x0000 + ((y * 256) + x)];
 			color2 = ojankohs_videoram[0x3fff - ((y * 256) + x)];
-			ojankoc_videoram_w(machine, 0x0000 + ((y * 256) + x), color2);
-			ojankoc_videoram_w(machine, 0x3fff - ((y * 256) + x), color1);
+			ojankoc_videoram_w(space, 0x0000 + ((y * 256) + x), color2);
+			ojankoc_videoram_w(space, 0x3fff - ((y * 256) + x), color1);
 
 			color1 = ojankohs_videoram[0x4000 + ((y * 256) + x)];
 			color2 = ojankohs_videoram[0x7fff - ((y * 256) + x)];
-			ojankoc_videoram_w(machine, 0x4000 + ((y * 256) + x), color2);
-			ojankoc_videoram_w(machine, 0x7fff - ((y * 256) + x), color1);
+			ojankoc_videoram_w(space, 0x4000 + ((y * 256) + x), color2);
+			ojankoc_videoram_w(space, 0x7fff - ((y * 256) + x), color1);
 		}
 	}
 
@@ -321,9 +321,11 @@ VIDEO_UPDATE( ojankoc )
 
 	if (ojankoc_screen_refresh)
 	{
+		const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++) {
-			ojankoc_videoram_w(screen->machine, offs, ojankohs_videoram[offs]);
+			ojankoc_videoram_w(space, offs, ojankohs_videoram[offs]);
 		}
 		ojankoc_screen_refresh = 0;
 	}

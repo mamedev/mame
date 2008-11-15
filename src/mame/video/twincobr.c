@@ -514,8 +514,10 @@ VIDEO_UPDATE( toaplan0 )
 
 VIDEO_EOF( toaplan0 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* Spriteram is always 1 frame ahead, suggesting spriteram buffering.
         There are no CPU output registers that control this so we
         assume it happens automatically every frame, at the end of vblank */
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	buffer_spriteram16_w(space,0,0,0xffff);
 }

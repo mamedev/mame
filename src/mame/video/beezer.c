@@ -7,8 +7,10 @@ static int scanline=0;
 
 INTERRUPT_GEN( beezer_interrupt )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	scanline = (scanline + 1) % 0x80;
-	via_0_ca2_w (device->machine, 0, scanline & 0x10);
+	via_0_ca2_w (space, 0, scanline & 0x10);
 	if ((scanline & 0x78) == 0x78)
 		cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 	else

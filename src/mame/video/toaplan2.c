@@ -1083,12 +1083,12 @@ static void toaplan2_scroll_reg_data_w(running_machine *machine, offs_t offset, 
 
 WRITE16_HANDLER( toaplan2_0_scroll_reg_data_w )
 {
-	toaplan2_scroll_reg_data_w(space, offset, data, mem_mask, 0);
+	toaplan2_scroll_reg_data_w(space->machine, offset, data, mem_mask, 0);
 }
 
 WRITE16_HANDLER( toaplan2_1_scroll_reg_data_w )
 {
-	toaplan2_scroll_reg_data_w(space, offset, data, mem_mask, 1);
+	toaplan2_scroll_reg_data_w(space->machine, offset, data, mem_mask, 1);
 }
 
 
@@ -1113,7 +1113,7 @@ WRITE16_HANDLER( pipibibi_scroll_w )
 		}
 
 		toaplan2_scroll_reg[0] = offset;
-		toaplan2_scroll_reg_data_w(space, offset, data, mem_mask, 0);
+		toaplan2_scroll_reg_data_w(space->machine, offset, data, mem_mask, 0);
 	}
 }
 

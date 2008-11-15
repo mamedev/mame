@@ -5023,46 +5023,46 @@ WRITE8_HANDLER( TC0220IOC_portreg_w )
 
 READ16_HANDLER( TC0220IOC_halfword_port_r )
 {
-	return TC0220IOC_port_r( space->machine, offset );
+	return TC0220IOC_port_r( space, offset );
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_port_w )
 {
 	if (ACCESSING_BITS_0_7)
-		TC0220IOC_port_w( space->machine, offset, data & 0xff );
+		TC0220IOC_port_w( space, offset, data & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_portreg_r )
 {
-	return TC0220IOC_portreg_r( space->machine, offset );
+	return TC0220IOC_portreg_r( space, offset );
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_portreg_w )
 {
 	if (ACCESSING_BITS_0_7)
-		TC0220IOC_portreg_w( space->machine, offset, data & 0xff );
+		TC0220IOC_portreg_w( space, offset, data & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_byteswap_port_r )
 {
-	return TC0220IOC_port_r( space->machine, offset ) << 8;
+	return TC0220IOC_port_r( space, offset ) << 8;
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_port_w )
 {
 	if (ACCESSING_BITS_8_15)
-		TC0220IOC_port_w( space->machine, offset, (data>>8) & 0xff );
+		TC0220IOC_port_w( space, offset, (data>>8) & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_byteswap_portreg_r )
 {
-	return TC0220IOC_portreg_r( space->machine, offset )<<8;
+	return TC0220IOC_portreg_r( space, offset )<<8;
 }
 
 WRITE16_HANDLER( TC0220IOC_halfword_byteswap_portreg_w )
 {
 	if (ACCESSING_BITS_8_15)
-		TC0220IOC_portreg_w( space->machine, offset, (data>>8) & 0xff );
+		TC0220IOC_portreg_w( space, offset, (data>>8) & 0xff );
 }
 
 READ16_HANDLER( TC0220IOC_halfword_r )

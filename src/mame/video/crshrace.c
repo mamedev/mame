@@ -216,6 +216,7 @@ popmessage("gfxctrl = %02x",gfxctrl);
 VIDEO_EOF( crshrace )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	buffer_spriteram16_w(space,0,0,0xffff);
 	buffer_spriteram16_2_w(space,0,0,0xffff);
 }

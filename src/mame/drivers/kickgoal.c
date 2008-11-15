@@ -305,7 +305,8 @@ static int m6295_bank;
 static UINT16 m6295_key_delay;
 static INTERRUPT_GEN( kickgoal_interrupt )
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	if ((okim6295_status_0_r(space,0) & 0x08) == 0)
 	{
 		switch(kickgoal_melody_loop)

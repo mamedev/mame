@@ -30,15 +30,15 @@
 
 
 
-void crbaloon_audio_set_music_freq(running_machine *machine, UINT8 freq)
+void crbaloon_audio_set_music_freq(const address_space *space, UINT8 freq)
 {
-	discrete_sound_w(machine, CRBALOON_MUSIC_DATA, freq);
+	discrete_sound_w(space, CRBALOON_MUSIC_DATA, freq);
 }
 
 
-void crbaloon_audio_set_music_enable(running_machine *machine, int enabled)
+void crbaloon_audio_set_music_enable(const address_space *space, int enabled)
 {
-	discrete_sound_w(machine, CRBALOON_MUSIC_EN, enabled);
+	discrete_sound_w(space, CRBALOON_MUSIC_EN, enabled);
 }
 
 
@@ -64,9 +64,9 @@ void crbaloon_audio_set_appear_enable(int enabled)
 }
 
 
-void crbaloon_audio_set_laugh_enable(running_machine *machine, int enabled)
+void crbaloon_audio_set_laugh_enable(const address_space *space, int enabled)
 {
-	discrete_sound_w(machine, CRBALOON_LAUGH_EN, enabled);
+	discrete_sound_w(space, CRBALOON_LAUGH_EN, enabled);
 }
 
 

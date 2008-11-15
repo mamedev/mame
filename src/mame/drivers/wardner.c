@@ -173,8 +173,10 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 
 STATE_POSTLOAD( wardner_restore_bank )
 {
-	wardner_ramrom_bank_sw(machine,0,1);	/* Dummy value to ensure restoration */
-	wardner_ramrom_bank_sw(machine,0,wardner_membank);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	wardner_ramrom_bank_sw(space,0,1);	/* Dummy value to ensure restoration */
+	wardner_ramrom_bank_sw(space,0,wardner_membank);
 }
 
 

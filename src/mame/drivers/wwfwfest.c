@@ -113,7 +113,7 @@ static READ16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_r )
 static WRITE16_HANDLER( wwfwfest_paletteram16_xxxxBBBBGGGGRRRR_word_w )
 {
 	offset = (offset & 0x000f) | (offset & 0x7fc0) >> 2;
-	paletteram16_xxxxBBBBGGGGRRRR_word_w (space->machine, offset, data, mem_mask);
+	paletteram16_xxxxBBBBGGGGRRRR_word_w (space, offset, data, mem_mask);
 }
 
 /*- Priority Control -*/
@@ -356,7 +356,9 @@ static const ym2151_interface ym2151_config =
 
 static VIDEO_EOF( wwfwfest )
 {
-	buffer_spriteram16_w(machine,0,0,0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	buffer_spriteram16_w(space,0,0,0xffff);
 }
 
 /*******************************************************************************
