@@ -105,7 +105,7 @@ static WRITE16_HANDLER( io_latch_w )
 		asic65_reset(space->machine, (~data >> 14) & 1);
 
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(space, 0, (data >> 11) & 7);
+		atarirle_control_w(space->machine, 0, (data >> 11) & 7);
 	}
 
 	/* lower byte */

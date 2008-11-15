@@ -332,7 +332,7 @@ static void amiga_m68k_reset(void)
 
 MACHINE_RESET( amiga )
 {
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+//	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* set m68k reset  function */
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)amiga_m68k_reset);

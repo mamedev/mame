@@ -130,7 +130,7 @@ static WRITE32_HANDLER( latch_w )
 	if (ACCESSING_BITS_24_31)
 	{
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(space,0, (data >> 27) & 7);
+		atarirle_control_w(space->machine,0, (data >> 27) & 7);
 	}
 
 	/* lower byte */
