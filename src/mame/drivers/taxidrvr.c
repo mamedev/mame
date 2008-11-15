@@ -11,15 +11,15 @@ Taxi Driver  (c) 1984 Graphic Techno
 
 
 
-static WRITE8_DEVICE_HANDLER( p2a_w ) { taxidrvr_spritectrl_w(device->machine,0,data); }
-static WRITE8_DEVICE_HANDLER( p2b_w ) { taxidrvr_spritectrl_w(device->machine,1,data); }
-static WRITE8_DEVICE_HANDLER( p2c_w ) { taxidrvr_spritectrl_w(device->machine,2,data); }
-static WRITE8_DEVICE_HANDLER( p3a_w ) { taxidrvr_spritectrl_w(device->machine,3,data); }
-static WRITE8_DEVICE_HANDLER( p3b_w ) { taxidrvr_spritectrl_w(device->machine,4,data); }
-static WRITE8_DEVICE_HANDLER( p3c_w ) { taxidrvr_spritectrl_w(device->machine,5,data); }
-static WRITE8_DEVICE_HANDLER( p4a_w ) { taxidrvr_spritectrl_w(device->machine,6,data); }
-static WRITE8_DEVICE_HANDLER( p4b_w ) { taxidrvr_spritectrl_w(device->machine,7,data); }
-static WRITE8_DEVICE_HANDLER( p4c_w ) { taxidrvr_spritectrl_w(device->machine,8,data); }
+static WRITE8_DEVICE_HANDLER( p2a_w ) { taxidrvr_spritectrl_w(device,0,data); }
+static WRITE8_DEVICE_HANDLER( p2b_w ) { taxidrvr_spritectrl_w(device,1,data); }
+static WRITE8_DEVICE_HANDLER( p2c_w ) { taxidrvr_spritectrl_w(device,2,data); }
+static WRITE8_DEVICE_HANDLER( p3a_w ) { taxidrvr_spritectrl_w(device,3,data); }
+static WRITE8_DEVICE_HANDLER( p3b_w ) { taxidrvr_spritectrl_w(device,4,data); }
+static WRITE8_DEVICE_HANDLER( p3c_w ) { taxidrvr_spritectrl_w(device,5,data); }
+static WRITE8_DEVICE_HANDLER( p4a_w ) { taxidrvr_spritectrl_w(device,6,data); }
+static WRITE8_DEVICE_HANDLER( p4b_w ) { taxidrvr_spritectrl_w(device,7,data); }
+static WRITE8_DEVICE_HANDLER( p4c_w ) { taxidrvr_spritectrl_w(device,8,data); }
 
 
 

@@ -126,6 +126,8 @@ static DRIVER_INIT( tiamc1 )
 
 static MACHINE_RESET( tiamc1 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	memset(video_ram, 0, 0x3040);
 
         tiamc1_charram = video_ram + 0x0800;     /* Ram is banked */
@@ -136,7 +138,7 @@ static MACHINE_RESET( tiamc1 )
 	tiamc1_spriteram_n = video_ram + 0x3020;
 	tiamc1_spriteram_a = video_ram + 0x3030;
 
-	tiamc1_bankswitch_w(machine, 0, 0);
+	tiamc1_bankswitch_w(space, 0, 0);
 
 	state_save_register_global_pointer(video_ram, 0x3040);
 }

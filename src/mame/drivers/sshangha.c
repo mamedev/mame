@@ -135,13 +135,14 @@ static READ16_HANDLER( deco_71_r )
 
 static MACHINE_RESET( sshangha )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* Such thing is needed as there is no code to turn the screen
        to normal orientation when the game is reset.
        I'm using the value that forces the screen to be in normal
          orientation when entering the "test mode"
          (check the game code from 0x0006b8 to 0x0006f0).
        I can't tell however if this is accurate or not. */
-	sshangha_control_0_w(machine, 0, 0x10, 0x00ff);
+	sshangha_control_0_w(space, 0, 0x10, 0x00ff);
 }
 
 /******************************************************************************/

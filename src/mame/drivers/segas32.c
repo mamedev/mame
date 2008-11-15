@@ -445,7 +445,7 @@ static TIMER_CALLBACK( signal_v60_irq_callback )
 }
 
 
-static void int_control_w(running_machine *machine, int offset, UINT8 data)
+static void int_control_w(const address_space *space, int offset, UINT8 data)
 {
 	int duration;
 
@@ -466,12 +466,12 @@ static void int_control_w(running_machine *machine, int offset, UINT8 data)
 
 		case 6:			/* mask */
 			v60_irq_control[offset] = data;
-			update_irq_state(machine);
+			update_irq_state(space->machine);
 			break;
 
 		case 7:			/* acknowledge */
 			v60_irq_control[offset] &= data;
-			update_irq_state(machine);
+			update_irq_state(space->machine);
 			break;
 
 		case 8:
@@ -500,7 +500,7 @@ static void int_control_w(running_machine *machine, int offset, UINT8 data)
 		case 13:
 		case 14:
 		case 15:		/* signal IRQ to sound CPU */
-			signal_sound_irq(machine, SOUND_IRQ_V60);
+			signal_sound_irq(space->machine, SOUND_IRQ_V60);
 			break;
 	}
 }
@@ -584,7 +584,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
  *
  *************************************/
 
-static UINT16 common_io_chip_r(running_machine *machine, int which, offs_t offset, UINT16 mem_mask)
+static UINT16 common_io_chip_r(const address_space *space, int which, offs_t offset, UINT16 mem_mask)
 {
 	static const char *const portnames[2][8] =
 			{
@@ -609,7 +609,7 @@ static UINT16 common_io_chip_r(running_machine *machine, int which, offs_t offse
 				return misc_io_data[which][offset];
 
 			/* otherwise, return an input port */
-			return input_port_read_safe(machine, portnames[which][offset], 0xffff);
+			return input_port_read_safe(space->machine, portnames[which][offset], 0xffff);
 
 		/* 'SEGA' protection */
 		case 0x10/2:
@@ -635,7 +635,7 @@ static UINT16 common_io_chip_r(running_machine *machine, int which, offs_t offse
 }
 
 
-static void common_io_chip_w(running_machine *machine, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_io_chip_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT8 old;
 
@@ -690,7 +690,7 @@ static void common_io_chip_w(running_machine *machine, int which, offs_t offset,
 		case 0x1c/2:
 			system32_displayenable[which] = (data & 0x02);
 			if (which == 0)
-				cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
+				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (data & 0x04) ? CLEAR_LINE : ASSERT_LINE);
 			break;
 	}
 }
@@ -750,7 +750,7 @@ static WRITE32_HANDLER( io_chip_1_w )
 static READ16_HANDLER( io_expansion_r )
 {
 	if (custom_io_r[0])
-		return (*custom_io_r[0])(space->machine, offset, mem_mask);
+		return (*custom_io_r[0])(space, offset, mem_mask);
 	else
 		logerror("%06X:io_expansion_r(%X)\n", cpu_get_pc(space->cpu), offset);
 	return 0xffff;
@@ -764,7 +764,7 @@ static WRITE16_HANDLER( io_expansion_w )
 		return;
 
 	if (custom_io_w[0])
-		(*custom_io_w[0])(space->machine, offset, data, mem_mask);
+		(*custom_io_w[0])(space, offset, data, mem_mask);
 	else
 		logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 }
@@ -773,8 +773,8 @@ static WRITE16_HANDLER( io_expansion_w )
 static READ32_HANDLER( io_expansion_0_r )
 {
 	if (custom_io_r[0])
-		return (*custom_io_r[0])(space->machine, offset*2+0, mem_mask) |
-			  ((*custom_io_r[0])(space->machine, offset*2+1, mem_mask >> 16) << 16);
+		return (*custom_io_r[0])(space, offset*2+0, mem_mask) |
+			  ((*custom_io_r[0])(space, offset*2+1, mem_mask >> 16) << 16);
 	else
 		logerror("%06X:io_expansion_r(%X)\n", cpu_get_pc(space->cpu), offset);
 	return 0xffffffff;
@@ -787,14 +787,14 @@ static WRITE32_HANDLER( io_expansion_0_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		if (custom_io_w[0])
-			(*custom_io_w[0])(space->machine, offset*2+0, data, mem_mask);
+			(*custom_io_w[0])(space, offset*2+0, data, mem_mask);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
 		if (custom_io_w[0])
-			(*custom_io_w[0])(space->machine, offset*2+1, data >> 16, mem_mask >> 16);
+			(*custom_io_w[0])(space, offset*2+1, data >> 16, mem_mask >> 16);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 	}
@@ -804,8 +804,8 @@ static WRITE32_HANDLER( io_expansion_0_w )
 static READ32_HANDLER( io_expansion_1_r )
 {
 	if (custom_io_r[1])
-		return (*custom_io_r[1])(space->machine, offset*2+0, mem_mask) |
-			  ((*custom_io_r[1])(space->machine, offset*2+1, mem_mask >> 16) << 16);
+		return (*custom_io_r[1])(space, offset*2+0, mem_mask) |
+			  ((*custom_io_r[1])(space, offset*2+1, mem_mask >> 16) << 16);
 	else
 		logerror("%06X:io_expansion_r(%X)\n", cpu_get_pc(space->cpu), offset);
 	return 0xffffffff;
@@ -818,14 +818,14 @@ static WRITE32_HANDLER( io_expansion_1_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		if (custom_io_w[1])
-			(*custom_io_w[1])(space->machine, offset*2+0, data, mem_mask);
+			(*custom_io_w[1])(space, offset*2+0, data, mem_mask);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
 		if (custom_io_w[1])
-			(*custom_io_w[1])(space->machine, offset*2+1, data >> 16, mem_mask >> 16);
+			(*custom_io_w[1])(space, offset*2+1, data >> 16, mem_mask >> 16);
 		else
 			logerror("%06X:io_expansion_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data & 0xff);
 	}

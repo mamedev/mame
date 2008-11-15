@@ -111,7 +111,8 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	int status = okim6295_status_0_r(device->machine,0);
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	int status = okim6295_status_0_r(space,0);
 
 	cpu_set_input_line(device, cpu_getiloops(device) + 2, HOLD_LINE);	/* IRQs 4, 3, and 2 */
 
@@ -119,8 +120,8 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x00)
 		{
-			okim6295_data_0_w(device->machine,0,0x80|sb3_music);
-			okim6295_data_0_w(device->machine,0,0x00|0x82);
+			okim6295_data_0_w(space,0,0x80|sb3_music);
+			okim6295_data_0_w(space,0,0x00|0x82);
 		}
 
 	}
@@ -128,7 +129,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x08)
 		{
-			okim6295_data_0_w(device->machine,0,0x40);		/* Stop playing music */
+			okim6295_data_0_w(space,0,0x40);		/* Stop playing music */
 		}
 	}
 
@@ -432,24 +433,24 @@ static void sb3_play_music(running_machine *machine, int data)
 	}
 }
 
-static void sb3_play_sound (running_machine *machine, int data)
+static void sb3_play_sound (const address_space *space, int data)
 {
-	int status = okim6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(space,0);
 
 	if ((status&0x01)==0x00)
 	{
-		okim6295_data_0_w(machine,0,0x80|data);
-		okim6295_data_0_w(machine,0,0x00|0x12);
+		okim6295_data_0_w(space,0,0x80|data);
+		okim6295_data_0_w(space,0,0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		okim6295_data_0_w(machine,0,0x80|data);
-		okim6295_data_0_w(machine,0,0x00|0x22);
+		okim6295_data_0_w(space,0,0x80|data);
+		okim6295_data_0_w(space,0,0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		okim6295_data_0_w(machine,0,0x80|data);
-		okim6295_data_0_w(machine,0,0x00|0x42);
+		okim6295_data_0_w(space,0,0x80|data);
+		okim6295_data_0_w(space,0,0x00|0x42);
 	}
 
 
@@ -468,7 +469,7 @@ static WRITE16_HANDLER( sb3_sound_w )
 
 		if (data <= 0x21)
 		{
-			sb3_play_sound(space->machine, data);
+			sb3_play_sound(space, data);
 		}
 
 		if (data>=0x22 && data<=0x31)
@@ -478,7 +479,7 @@ static WRITE16_HANDLER( sb3_sound_w )
 
 		if ((data>=0x30) && (data<=0x51))
 		{
-			sb3_play_sound(space->machine, data-0x30);
+			sb3_play_sound(space, data-0x30);
 		}
 
 		if (data>=0x52 && data<=0x5f)

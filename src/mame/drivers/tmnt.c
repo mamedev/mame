@@ -860,7 +860,7 @@ INLINE UINT32 tmnt2_get_word(UINT32 addr)
 	return(0);
 }
 
-static void tmnt2_put_word(running_machine *machine, UINT32 addr, UINT16 data)
+static void tmnt2_put_word(const address_space *space, UINT32 addr, UINT16 data)
 {
 	UINT32 offs;
 	if (addr >= 0x180000/2 && addr <= 0x183fff/2)
@@ -870,7 +870,7 @@ static void tmnt2_put_word(running_machine *machine, UINT32 addr, UINT16 data)
 		if (!(offs & 0x0031))
 		{
 			offs = ((offs & 0x000e) >> 1) | ((offs & 0x1fc0) >> 3);
-			K053245_word_w(machine, offs, data, 0xffff);
+			K053245_word_w(space->machine, offs, data, 0xffff);
 		}
 	}
 	else if (addr >= 0x104000/2 && addr <= 0x107fff/2) sunset_104000[addr-0x104000/2] = data;
@@ -985,11 +985,11 @@ static WRITE16_HANDLER( tmnt2_1c0800_w )
 	xoffs += xmod;
 	yoffs += ymod;
 
-	tmnt2_put_word(space->machine, dst_addr +  0, attr1);
-	tmnt2_put_word(space->machine, dst_addr +  2, code);
-	tmnt2_put_word(space->machine, dst_addr +  4, (UINT32)yoffs);
-	tmnt2_put_word(space->machine, dst_addr +  6, (UINT32)xoffs);
-	tmnt2_put_word(space->machine, dst_addr + 12, attr2 | color);
+	tmnt2_put_word(space, dst_addr +  0, attr1);
+	tmnt2_put_word(space, dst_addr +  2, code);
+	tmnt2_put_word(space, dst_addr +  4, (UINT32)yoffs);
+	tmnt2_put_word(space, dst_addr +  6, (UINT32)xoffs);
+	tmnt2_put_word(space, dst_addr + 12, attr2 | color);
 }
 #else // for reference; do not remove
 static WRITE16_HANDLER( tmnt2_1c0800_w )
@@ -2356,9 +2356,10 @@ MACHINE_DRIVER_END
 
 static MACHINE_RESET( tmnt )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* the UPD7759 control flip-flops are cleared: /ST is 1, /RESET is 0 */
-	upd7759_0_start_w(machine, 0, 0);
-	upd7759_0_reset_w(machine, 0, 1);
+	upd7759_0_start_w(space, 0, 0);
+	upd7759_0_reset_w(space, 0, 1);
 }
 
 static MACHINE_DRIVER_START( tmnt )

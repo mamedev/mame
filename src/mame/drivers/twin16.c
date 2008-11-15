@@ -126,7 +126,7 @@ static READ16_HANDLER( twin16_gfx_rom2_r )
 static WRITE16_HANDLER( sound_command_w )
 {
 	COMBINE_DATA(&twin16_sound_command);
-	soundlatch_w( space->machine, 0, twin16_sound_command&0xff );
+	soundlatch_w( space, 0, twin16_sound_command&0xff );
 }
 
 static READ16_HANDLER( twin16_sprite_status_r )

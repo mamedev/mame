@@ -55,11 +55,12 @@ VIDEO_UPDATE( yunsung8 );
 
 static MACHINE_RESET( yunsung8 )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 *RAM = memory_region(machine, "main") + 0x24000;
 
 	yunsung8_videoram_0 = RAM + 0x0000;	// Ram is banked
 	yunsung8_videoram_1 = RAM + 0x2000;
-	yunsung8_videobank_w(machine,0,0);
+	yunsung8_videobank_w(space,0,0);
 }
 
 

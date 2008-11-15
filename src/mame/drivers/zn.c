@@ -1811,7 +1811,7 @@ Notes:
 
 static WRITE32_HANDLER( coh1002e_bank_w )
 {
-	znsecsel_w( space->machine, offset, data, mem_mask );
+	znsecsel_w( space, offset, data, mem_mask );
 
 	memory_set_bankptr( 1, memory_region( space->machine, "user2" ) + ( ( data & 3 ) * 0x800000 ) );
 }
@@ -1916,7 +1916,7 @@ MTR-BAM* - DIP42 32MBit maskROMs
 
 static WRITE32_HANDLER( bam2_sec_w )
 {
-	znsecsel_w( space->machine, offset, data, mem_mask );
+	znsecsel_w( space, offset, data, mem_mask );
 }
 
 /*

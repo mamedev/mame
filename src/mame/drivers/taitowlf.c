@@ -418,13 +418,13 @@ static const struct dma8237_interface dma8237_2_config =
 
 static READ32_HANDLER(at_page32_r)
 {
-	return read32le_with_read8_handler(at_page8_r, space->machine, offset, mem_mask);
+	return read32le_with_read8_handler(at_page8_r, space, offset, mem_mask);
 }
 
 
 static WRITE32_HANDLER(at_page32_w)
 {
-	write32le_with_write8_handler(at_page8_w, space->machine, offset, data, mem_mask);
+	write32le_with_write8_handler(at_page8_w, space, offset, data, mem_mask);
 }
 
 

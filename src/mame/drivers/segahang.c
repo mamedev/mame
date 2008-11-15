@@ -262,7 +262,8 @@ static WRITE16_HANDLER( sharrier_io_w )
 
 static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
-	soundlatch_w(device->machine, offset, data);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	soundlatch_w(space, offset, data);
 }
 
 

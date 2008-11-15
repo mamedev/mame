@@ -288,7 +288,7 @@ static READ16_HANDLER( sound_r )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		return soundlatch2_r( space->machine,  0 );
+		return soundlatch2_r( space,  0 );
 	}
 
 	return 0;

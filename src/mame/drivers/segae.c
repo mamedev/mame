@@ -761,7 +761,7 @@ static UINT8 vdp_data_r(struct sms_vdp *chip)
 	return retdata;
 }
 
-static void vdp_data_w(running_machine *machine, UINT8 data, struct sms_vdp* chip)
+static void vdp_data_w(const address_space *space, UINT8 data, struct sms_vdp* chip)
 {
 	/* data writes clear the pending flag */
 	chip->cmd_pend = 0;
@@ -797,7 +797,7 @@ static void vdp_data_w(running_machine *machine, UINT8 data, struct sms_vdp* chi
 					r = (palword & 0x000f)>>0;
 					g = (palword & 0x00f0)>>4;
 					b = (palword & 0x0f00)>>8;
-					palette_set_color_rgb(machine,(chip->addr_reg&0x3e)/2, pal4bit(r), pal4bit(g), pal4bit(b));
+					palette_set_color_rgb(space->machine,(chip->addr_reg&0x3e)/2, pal4bit(r), pal4bit(g), pal4bit(b));
 					chip->cram_mamecolours[(chip->addr_reg&0x3e)/2]=(b<<1)|(g<<6)|(r<<11);
 				}
 			}
@@ -812,7 +812,7 @@ static void vdp_data_w(running_machine *machine, UINT8 data, struct sms_vdp* chi
 				r = (data & 0x03)>>0;
 				g = (data & 0x0c)>>2;
 				b = (data & 0x30)>>4;
-				palette_set_color_rgb(machine,chip->addr_reg&0x1f, pal2bit(r), pal2bit(g), pal2bit(b));
+				palette_set_color_rgb(space->machine,chip->addr_reg&0x1f, pal2bit(r), pal2bit(g), pal2bit(b));
 				chip->cram_mamecolours[chip->addr_reg&0x1f]=(b<<3)|(g<<8)|(r<<13);
 			}
 

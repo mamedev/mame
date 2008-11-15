@@ -1465,7 +1465,7 @@ static WRITE32_HANDLER( vegas_watchdog_w )
 
 static WRITE32_HANDLER( asic_fifo_w )
 {
-	midway_ioasic_fifo_w(space, data);
+	midway_ioasic_fifo_w(space->machine, data);
 }
 
 
@@ -1515,7 +1515,7 @@ static WRITE32_DEVICE_HANDLER( ethernet_w )
 
 static WRITE32_HANDLER( dcs3_fifo_full_w )
 {
-	midway_ioasic_fifo_full_w(space, data);
+	midway_ioasic_fifo_full_w(space->machine, data);
 }
 
 

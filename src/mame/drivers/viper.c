@@ -141,11 +141,11 @@ static WRITE32_HANDLER( epic_w )
 
 static READ64_HANDLER(epic_64be_r)
 {
-	return read64be_with_32le_handler(epic_r, space->machine, offset, mem_mask);
+	return read64be_with_32le_handler(epic_r, space, offset, mem_mask);
 }
 static WRITE64_HANDLER(epic_64be_w)
 {
-	write64be_with_32le_handler(epic_w, space->machine, offset, data, mem_mask);
+	write64be_with_32le_handler(epic_w, space, offset, data, mem_mask);
 }
 
 

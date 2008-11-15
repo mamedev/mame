@@ -231,7 +231,7 @@ static READ16_HANDLER( syvalion_input_bypass_r )
 				return 0x00;
 
 		default:
-			return TC0220IOC_portreg_r( space->machine,offset );
+			return TC0220IOC_portreg_r( space,offset );
 	}
 }
 

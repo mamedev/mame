@@ -305,7 +305,7 @@ static WRITE16_HANDLER( standard_io_w )
 static READ16_HANDLER( misc_io_r )
 {
 	if (custom_io_r)
-		return (*custom_io_r)(space->machine, offset, mem_mask);
+		return (*custom_io_r)(space, offset, mem_mask);
 	else
 		return standard_io_r(space, offset, mem_mask);
 }
@@ -314,7 +314,7 @@ static READ16_HANDLER( misc_io_r )
 static WRITE16_HANDLER( misc_io_w )
 {
 	if (custom_io_w)
-		(*custom_io_w)(space->machine, offset, data, mem_mask);
+		(*custom_io_w)(space, offset, data, mem_mask);
 	else
 		standard_io_w(space, offset, data, mem_mask);
 }
@@ -363,7 +363,8 @@ static WRITE8_DEVICE_HANDLER( video_control_w )
 
 static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
-	soundlatch_w(device->machine, offset, data);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	soundlatch_w(space, offset, data);
 }
 
 
@@ -552,16 +553,17 @@ static void bodyslam_i8751_sim(running_machine *machine)
 
 static void quartet_i8751_sim(running_machine *machine)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* signal a VBLANK to the main CPU */
 	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE);
 
 	/* X scroll values */
-	segaic16_textram_0_w(machine, 0xff8/2, workram[0x0d14/2], 0xffff);
-	segaic16_textram_0_w(machine, 0xffa/2, workram[0x0d18/2], 0xffff);
+	segaic16_textram_0_w(space, 0xff8/2, workram[0x0d14/2], 0xffff);
+	segaic16_textram_0_w(space, 0xffa/2, workram[0x0d18/2], 0xffff);
 
 	/* page values */
-	segaic16_textram_0_w(machine, 0xe9e/2, workram[0x0d1c/2], 0xffff);
-	segaic16_textram_0_w(machine, 0xe9c/2, workram[0x0d1e/2], 0xffff);
+	segaic16_textram_0_w(space, 0xe9e/2, workram[0x0d1c/2], 0xffff);
+	segaic16_textram_0_w(space, 0xe9c/2, workram[0x0d1e/2], 0xffff);
 }
 
 

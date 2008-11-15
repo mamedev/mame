@@ -1657,7 +1657,8 @@ static INTERRUPT_GEN( hardhea2_interrupt )
 
 static MACHINE_RESET( hardhea2 )
 {
-	hardhea2_rambank_0_w(machine,0,0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	hardhea2_rambank_0_w(space,0,0);
 }
 
 static MACHINE_DRIVER_START( hardhea2 )

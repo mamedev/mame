@@ -302,7 +302,8 @@ static WRITE8_HANDLER( coin_count_w )
 
 static WRITE8_DEVICE_HANDLER( sindbadm_soundport_w )
 {
-	soundlatch_w(device->machine,0,data);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	soundlatch_w(space,0,data);
 	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(50));
 }

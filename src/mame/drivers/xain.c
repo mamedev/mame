@@ -450,9 +450,10 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( xsleena )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	/* initialize the bank pointers */
-	xainCPUA_bankswitch_w(machine,0,0);
-	xainCPUB_bankswitch_w(machine,0,0);
+	xainCPUA_bankswitch_w(space,0,0);
+	xainCPUB_bankswitch_w(space,0,0);
 }
 
 

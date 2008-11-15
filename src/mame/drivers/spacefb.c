@@ -173,10 +173,11 @@ static MACHINE_START( spacefb )
 
 static MACHINE_RESET( spacefb )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 	/* the 3 output ports are cleared on reset */
-	spacefb_port_0_w(machine, 0, 0);
-	spacefb_port_1_w(machine, 0, 0);
-	spacefb_port_2_w(machine, 0, 0);
+	spacefb_port_0_w(space, 0, 0);
+	spacefb_port_1_w(space, 0, 0);
+	spacefb_port_2_w(space, 0, 0);
 
 	start_interrupt_timer(machine);
 }

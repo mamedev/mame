@@ -53,7 +53,7 @@ static WRITE16_HANDLER( suna16_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		soundlatch_w( space->machine, 0, data & 0xff );
+		soundlatch_w( space, 0, data & 0xff );
 	}
 	if (data & ~0xff)	logerror("CPU#0 PC %06X - Sound latch unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
 }
@@ -434,7 +434,8 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(uballoon)
 {
-	uballoon_pcm_1_bankswitch_w(machine, 0, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	uballoon_pcm_1_bankswitch_w(space, 0, 0);
 }
 
 

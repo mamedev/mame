@@ -160,9 +160,10 @@ static WRITE8_HANDLER( zaccaria_port0b_w )
 
 static INTERRUPT_GEN( zaccaria_cb1_toggle )
 {
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	static int toggle;
 
-	pia_0_cb1_w(device->machine,0,toggle & 1);
+	pia_0_cb1_w(space,0, toggle & 1);
 	toggle ^= 1;
 }
 
@@ -211,7 +212,8 @@ return counter;
 
 static void tms5220_irq_handler(running_machine *machine, int state)
 {
-	pia_1_cb1_w(machine,0,state ? 0 : 1);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_1_cb1_w(space,0,state ? 0 : 1);
 }
 
 

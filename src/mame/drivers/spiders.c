@@ -268,16 +268,17 @@ static const pia6821_interface pia_1_intf =
 
 static INTERRUPT_GEN( update_pia_1 )
 {
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	/* update the different PIA pins from the input ports */
 
 	/* CA1 - copy of PA1 (COIN1) */
-	pia_1_ca1_w(device->machine, 0, input_port_read(device->machine, "IN0") & 0x02);
+	pia_1_ca1_w(space, 0, input_port_read(device->machine, "IN0") & 0x02);
 
 	/* CA2 - copy of PA0 (SERVICE1) */
-	pia_1_ca2_w(device->machine, 0, input_port_read(device->machine, "IN0") & 0x01);
+	pia_1_ca2_w(space, 0, input_port_read(device->machine, "IN0") & 0x01);
 
 	/* CB1 - (crosshatch) */
-	pia_1_cb1_w(device->machine, 0, input_port_read(device->machine, "XHATCH"));
+	pia_1_cb1_w(space, 0, input_port_read(device->machine, "XHATCH"));
 
 	/* CB2 - NOT CONNECTED */
 }
@@ -343,7 +344,8 @@ static const pia6821_interface pia_4_intf =
 
 static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 {
-	pia_2_ca1_w(device->machine, 0, data);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	pia_2_ca1_w(space, 0, data);
 }
 
 

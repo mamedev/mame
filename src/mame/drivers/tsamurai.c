@@ -382,7 +382,7 @@ static READ8_HANDLER( vsgongf_a100_r ){
 }
 
 static WRITE8_HANDLER( vsgongf_sound_command_w ){
-	soundlatch_w( space->machine, offset, data );
+	soundlatch_w( space, offset, data );
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 }
 

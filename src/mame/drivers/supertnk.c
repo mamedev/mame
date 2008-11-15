@@ -273,11 +273,12 @@ static VIDEO_UPDATE( supertnk )
 
 static MACHINE_RESET( supertnk )
 {
-	supertnk_bankswitch_0_w(machine, 0, 0);
-	supertnk_bankswitch_1_w(machine, 0, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	supertnk_bankswitch_0_w(space, 0, 0);
+	supertnk_bankswitch_1_w(space, 0, 0);
 
-	supertnk_bitplane_select_0_w(machine, 0, 0);
-	supertnk_bitplane_select_1_w(machine, 0, 0);
+	supertnk_bitplane_select_0_w(space, 0, 0);
+	supertnk_bitplane_select_1_w(space, 0, 0);
 }
 
 

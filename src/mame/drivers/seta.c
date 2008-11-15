@@ -1774,7 +1774,7 @@ static WRITE16_HANDLER( usclssic_lockout_w )
 		if (old_tiles_offset != seta_tiles_offset)	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 		old_tiles_offset = seta_tiles_offset;
 
-		seta_coin_lockout_w(space, data);
+		seta_coin_lockout_w(space->machine, data);
 	}
 }
 
@@ -2602,7 +2602,7 @@ static WRITE16_HANDLER( kiwame_nvram_w )
 
 static READ16_HANDLER( kiwame_input_r )
 {
-	int row_select = kiwame_nvram_r( space->machine,0x10a/2,0x00ff ) & 0x1f;
+	int row_select = kiwame_nvram_r( space, 0x10a/2,0x00ff ) & 0x1f;
 	int i;
 	static const char *const keynames[] = { "KEY0", "KEY1", "KEY2", "KEY3", "KEY4" };
 
@@ -2824,7 +2824,7 @@ static WRITE8_HANDLER( sub_bankswitch_w )
 static WRITE8_HANDLER( sub_bankswitch_lockout_w )
 {
 	sub_bankswitch_w(space,offset,data);
-	seta_coin_lockout_w(space, data);
+	seta_coin_lockout_w(space->machine, data);
 }
 
 
@@ -2937,7 +2937,8 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(calibr50)
 {
-	sub_bankswitch_w(machine, 0, 0);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	sub_bankswitch_w(space, 0, 0);
 }
 
 static WRITE8_HANDLER( calibr50_soundlatch2_w )

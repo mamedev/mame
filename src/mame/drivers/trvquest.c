@@ -195,8 +195,9 @@ static MACHINE_RESET( trvquest )
 
 static INTERRUPT_GEN( trvquest_interrupt )
 {
-	via_2_ca1_w(device->machine,0,1);
-	via_2_ca1_w(device->machine,0,0);
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	via_2_ca1_w(space,0,1);
+	via_2_ca1_w(space,0,0);
 }
 
 static MACHINE_DRIVER_START( trvquest )

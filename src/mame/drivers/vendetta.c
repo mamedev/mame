@@ -186,15 +186,20 @@ static WRITE8_HANDLER( vendetta_eeprom_w )
 
 /********************************************/
 
-static READ8_HANDLER( vendetta_K052109_r ) { return K052109_r( space->machine, offset + 0x2000 ); }
+static READ8_HANDLER( vendetta_K052109_r ) 
+{ 
+	return K052109_r( space, offset + 0x2000 ); 
+}
 //static WRITE8_HANDLER( vendetta_K052109_w ) { K052109_w( machine, offset + 0x2000, data ); }
-static WRITE8_HANDLER( vendetta_K052109_w ) {
+static WRITE8_HANDLER( vendetta_K052109_w ) 
+{
 	// *************************************************************************************
 	// *  Escape Kids uses 052109's mirrored Tilemap ROM bank selector, but only during    *
 	// *  Tilemap MASK-ROM Test       (0x1d80<->0x3d80, 0x1e00<->0x3e00, 0x1f00<->0x3f00)  *
 	// *************************************************************************************
-	if ( ( offset == 0x1d80 ) || ( offset == 0x1e00 ) || ( offset == 0x1f00 ) )		K052109_w( space->machine, offset, data );
-	K052109_w( space->machine, offset + 0x2000, data );
+	if ( ( offset == 0x1d80 ) || ( offset == 0x1e00 ) || ( offset == 0x1f00 ) )
+		K052109_w( space, offset, data );
+	K052109_w( space, offset + 0x2000, data );
 }
 
 static offs_t video_banking_base;

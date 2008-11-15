@@ -1428,9 +1428,9 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 static WRITE16_HANDLER( taitoz_sound_w )
 {
 	if (offset == 0)
-		taitosound_port_w (space->machine, 0, data & 0xff);
+		taitosound_port_w (space, 0, data & 0xff);
 	else if (offset == 1)
-		taitosound_comm_w (space->machine, 0, data & 0xff);
+		taitosound_comm_w (space, 0, data & 0xff);
 
 #ifdef MAME_DEBUG
 //  if (data & 0xff00)
@@ -1446,7 +1446,7 @@ static WRITE16_HANDLER( taitoz_sound_w )
 static READ16_HANDLER( taitoz_sound_r )
 {
 	if (offset == 1)
-		return ((taitosound_comm_r (space->machine,0) & 0xff));
+		return ((taitosound_comm_r (space,0) & 0xff));
 	else return 0;
 }
 
@@ -1494,7 +1494,7 @@ static WRITE8_HANDLER( taitoz_pancontrol )
 static WRITE16_HANDLER( spacegun_pancontrol )
 {
 	if (ACCESSING_BITS_0_7)
-		taitoz_pancontrol(space->machine, offset, data & 0xff);
+		taitoz_pancontrol(space, offset, data & 0xff);
 }
 
 

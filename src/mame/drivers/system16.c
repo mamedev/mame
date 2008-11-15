@@ -391,7 +391,7 @@ static WRITE16_HANDLER( sound_command_w )
 {
 	if( ACCESSING_BITS_0_7 )
 {
-		soundlatch_w( space->machine,0,data&0xff );
+		soundlatch_w( space,0,data&0xff );
 		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
 	}
 }
@@ -400,7 +400,7 @@ static WRITE16_HANDLER( sound_command_nmi_w )
 {
 	if( ACCESSING_BITS_0_7 )
 {
-		soundlatch_w( space->machine,0,data&0xff );
+		soundlatch_w( space,0,data&0xff );
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
@@ -1197,7 +1197,7 @@ static WRITE16_HANDLER( ga_sound_command_w )
 	COMBINE_DATA( &sys16_workingram[(0xecfc-0xc000)/2] );
 	if( ACCESSING_BITS_8_15 )
 {
-		soundlatch_w( space->machine,0,data>>8 );
+		soundlatch_w( space,0,data>>8 );
 		cpu_set_input_line(space->machine->cpu[1], 0, HOLD_LINE );
 	}
 }

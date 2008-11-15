@@ -45,7 +45,7 @@ VIDEO_UPDATE( trucocl );
 
 static WRITE8_HANDLER( irq_enable_w)
 {
-	interrupt_enable_w( space->machine, 0, (~data) & 1 );
+	interrupt_enable_w( space, 0, (~data) & 1 );
 }
 
 static int cur_dac_address = -1;

@@ -1121,15 +1121,15 @@ static READ32_HANDLER( galileo_r )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				result = pci_bridge_r(space, reg, type);
+				result = pci_bridge_r(space->machine, reg, type);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				result = pci_3dfx_r(space, reg, type);
+				result = pci_3dfx_r(space->machine, reg, type);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				result = pci_ide_r(space, reg, type);
+				result = pci_ide_r(space->machine, reg, type);
 
 			/* anything else, just log */
 			else
@@ -1259,15 +1259,15 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				pci_bridge_w(space, reg, type, data);
+				pci_bridge_w(space->machine, reg, type, data);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				pci_3dfx_w(space, reg, type, data);
+				pci_3dfx_w(space->machine, reg, type, data);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				pci_ide_w(space, reg, type, data);
+				pci_ide_w(space->machine, reg, type, data);
 
 			/* anything else, just log */
 			else
@@ -1628,7 +1628,7 @@ static WRITE32_HANDLER( asic_reset_w )
 
 static WRITE32_HANDLER( asic_fifo_w )
 {
-	midway_ioasic_fifo_w(space, data);
+	midway_ioasic_fifo_w(space->machine, data);
 }
 
 

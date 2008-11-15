@@ -86,7 +86,7 @@ static READ8_HANDLER( starfire_scratch_r )
 {
 	/* A11 selects input ports */
 	if (offset & 0x800)
-		return (*input_read)(space->machine, offset);
+		return (*input_read)(space, offset);
 
 	/* convert to a videoram offset */
 	offset = (offset & 0x31f) | ((offset & 0xe0) << 5);

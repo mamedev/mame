@@ -933,7 +933,12 @@ static const ppi8255_interface zaxxon_ppi_intf =
 };
 
 
-static READ8_DEVICE_HANDLER( sound_latch_r ) { return soundlatch_r(device->machine, offset); }
+static READ8_DEVICE_HANDLER( sound_latch_r ) 
+{
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	return soundlatch_r(space, offset); 
+}
+
 
 static const ppi8255_interface congo_ppi_intf =
 {
