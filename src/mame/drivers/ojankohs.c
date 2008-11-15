@@ -54,7 +54,7 @@ VIDEO_UPDATE( ojankoc );
 VIDEO_START( ojankoc );
 WRITE8_HANDLER( ojankoc_palette_w );
 WRITE8_HANDLER( ojankoc_videoram_w );
-void ojankoc_flipscreen(running_machine *machine, int data);
+void ojankoc_flipscreen(const address_space *space, int data);
 
 
 static int ojankohs_portselect;
@@ -132,7 +132,7 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 
 	ojankohs_adpcm_reset = ((data & 0x10) >> 4);
 	msm5205_reset_w(0, (!(data & 0x10) >> 4));
-	ojankoc_flipscreen(space->machine, data);
+	ojankoc_flipscreen(space, data);
 }
 
 static WRITE8_HANDLER( ojankohs_portselect_w )
