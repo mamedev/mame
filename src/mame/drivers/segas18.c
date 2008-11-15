@@ -61,8 +61,8 @@ static UINT8 rom_board;
 static UINT8 misc_io_data[0x10];
 static UINT8 mcu_data;
 
-static read16_machine_func custom_io_r;
-static write16_machine_func custom_io_w;
+static read16_space_func custom_io_r;
+static write16_space_func custom_io_w;
 
 static UINT8 wwally_last_x[3], wwally_last_y[3];
 static UINT8 lghost_value, lghost_select;

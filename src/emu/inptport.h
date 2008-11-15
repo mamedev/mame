@@ -680,7 +680,7 @@ struct _inp_header
 /* macros for referencing input ports in place of read handlers */
 #define HANDLER_PORT(name, type)		((type)("\0\0\0\0" name))
 #define DEVICE8_PORT(name)				HANDLER_PORT(name, read8_device_func)
-#define MACHINE8_PORT(name)				HANDLER_PORT(name, read8_machine_func)
+#define MACHINE8_PORT(name)				HANDLER_PORT(name, read8_space_func)
 #define IS_HANDLER_PORT(ptr)			(((const char *)(ptr))[0] == 0 && ((const char *)(ptr))[1] == 0 && ((const char *)(ptr))[2] == 0 && ((const char *)(ptr))[3] == 0)
 #define CALL_DEVICE8_READ(ptr,d,offs)	(IS_HANDLER_PORT(ptr) ? input_port_read((d)->machine, ((const char *)(ptr)) + 4) : (*ptr)(d, offs))
 #define CALL_MACHINE8_READ(ptr,m,offs)	(IS_HANDLER_PORT(ptr) ? input_port_read((m), ((const char *)(ptr)) + 4) : (*ptr)(m, offs))
@@ -1038,10 +1038,10 @@ int input_condition_true(running_machine *machine, const input_condition *condit
 const char *input_port_string_from_token(const input_port_token token);
 
 /* return a memory handler corresponding to a given input port tag */
-read8_machine_func input_port_read_handler8(const input_port_config *portlist, const char *tag);
-read16_machine_func input_port_read_handler16(const input_port_config *portlist, const char *tag);
-read32_machine_func input_port_read_handler32(const input_port_config *portlist, const char *tag);
-read64_machine_func input_port_read_handler64(const input_port_config *portlist, const char *tag);
+read8_space_func input_port_read_handler8(const input_port_config *portlist, const char *tag);
+read16_space_func input_port_read_handler16(const input_port_config *portlist, const char *tag);
+read32_space_func input_port_read_handler32(const input_port_config *portlist, const char *tag);
+read64_space_func input_port_read_handler64(const input_port_config *portlist, const char *tag);
 
 
 #endif	/* __INPTPORT_H__ */

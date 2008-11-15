@@ -92,8 +92,8 @@ struct YMZ280BChip
 	void (*irq_callback)(running_machine *, int);		/* IRQ callback */
 	struct YMZ280BVoice	voice[8];	/* the 8 voices */
 	UINT32 rom_readback_addr;		/* where the CPU can read the ROM */
-	read8_machine_func ext_ram_read;		/* external RAM read handler */
-	write8_machine_func ext_ram_write;	/* external RAM write handler */
+	read8_space_func ext_ram_read;		/* external RAM read handler */
+	write8_space_func ext_ram_write;	/* external RAM write handler */
 
 #if MAKE_WAVS
 	void *		wavresample;			/* resampled waveform */

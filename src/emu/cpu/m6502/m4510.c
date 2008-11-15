@@ -146,8 +146,8 @@ struct _m4510_Regs {
 	const device_config *device;
 	int 	icount;
 
-	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
+	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_space_func wrmem_id;				/* writemem callback for indexed instructions */
 
 	UINT8    ddr;
 	UINT8    port;
@@ -444,8 +444,8 @@ static CPU_SET_INFO( m4510 )
 		case CPUINFO_INT_REGISTER + M4510_MEM7:			m4510->mem[7] = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m4510->rdmem_id = (read8_machine_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m4510->wrmem_id = (write8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m4510->rdmem_id = (read8_space_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m4510->wrmem_id = (write8_space_func) info->f; break;
 		case CPUINFO_PTR_M6510_PORTREAD:				m4510->port_read = (UINT8 (*)(void)) info->f; break;
 		case CPUINFO_PTR_M6510_PORTWRITE:				m4510->port_write = (void (*)(UINT8)) info->f; break;
 	}

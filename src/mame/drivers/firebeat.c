@@ -2261,7 +2261,7 @@ static void security_w(UINT8 data)
 
 /*****************************************************************************/
 
-static void init_lights(running_machine *machine, write32_machine_func out1, write32_machine_func out2, write32_machine_func out3)
+static void init_lights(running_machine *machine, write32_space_func out1, write32_space_func out2, write32_space_func out3)
 {
 	if(!out1) out1 = lamp_output_w;
 	if(!out2) out1 = lamp_output2_w;

@@ -75,8 +75,8 @@ struct 	_m65ce02_Regs {
 	UINT8	irq_state;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
-	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
+	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_space_func wrmem_id;				/* writemem callback for indexed instructions */
 };
 
 static void *token;
@@ -261,8 +261,8 @@ static CPU_SET_INFO( m65ce02 )
 		case CPUINFO_INT_REGISTER + M65CE02_ZP: m65ce02.zp.b.l = info->i; break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m65ce02.rdmem_id = (read8_machine_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m65ce02.wrmem_id = (write8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m65ce02.rdmem_id = (read8_space_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m65ce02.wrmem_id = (write8_space_func) info->f; break;
 	}
 }
 

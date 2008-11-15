@@ -50,7 +50,7 @@ starfira has one less rom in total than starfire but everything passes as
 
 
 static UINT8 fireone_select;
-static read8_machine_func input_read;
+static read8_space_func input_read;
 
 
 

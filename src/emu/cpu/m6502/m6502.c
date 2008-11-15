@@ -79,8 +79,8 @@ struct _m6502_Regs
 	int		int_occured;
 	int		icount;
 
-	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_machine_func wrmem_id;				/* writemem callback for indexed instructions */
+	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_space_func wrmem_id;				/* writemem callback for indexed instructions */
 
 #if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
 	UINT8    ddr;
@@ -715,8 +715,8 @@ static CPU_SET_INFO( m6502 )
 		case CPUINFO_INT_REGISTER + M6502_ZP:			m6502->zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6502->rdmem_id = (read8_machine_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6502->wrmem_id = (write8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6502->rdmem_id = (read8_space_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6502->wrmem_id = (write8_space_func) info->f; break;
 	}
 }
 

@@ -129,8 +129,8 @@ static const pia6821_interface a800xl_pia_interface =
 
 void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 {
-	read8_machine_func rbank2;
-	write8_machine_func wbank2;
+	read8_space_func rbank2;
+	write8_space_func wbank2;
 
 	/* check if self-test ROM changed */
 	if ( new_mmu & 0x80 )
@@ -152,8 +152,8 @@ void a600xl_mmu(running_machine *machine, UINT8 new_mmu)
 
 void a800xl_mmu(running_machine *machine, UINT8 new_mmu)
 {
-	read8_machine_func rbank1, rbank2, rbank3, rbank4;
-	write8_machine_func wbank1, wbank2, wbank3, wbank4;
+	read8_space_func rbank1, rbank2, rbank3, rbank4;
+	write8_space_func wbank1, wbank2, wbank3, wbank4;
 	UINT8 *base1, *base2, *base3, *base4;
 
 	/* check if memory C000-FFFF changed */

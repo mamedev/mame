@@ -83,8 +83,8 @@ struct _m6509_Regs {
 
 	int 	icount;
 
-	read8_machine_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_machine_func wrmem_id;				/* readmem callback for indexed instructions */
+	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
+	write8_space_func wrmem_id;				/* readmem callback for indexed instructions */
 };
 
 static void *token;
@@ -339,8 +339,8 @@ static CPU_SET_INFO( m6509 )
 		case CPUINFO_INT_REGISTER + M6509_ZP:			m6509->zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6509->rdmem_id = (read8_machine_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6509->wrmem_id = (write8_machine_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6509->rdmem_id = (read8_space_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6509->wrmem_id = (write8_space_func) info->f; break;
 	}
 }
 

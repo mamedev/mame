@@ -66,10 +66,10 @@ struct _ay8910_interface
 {
 	int					flags;			/* Flags */
 	int					res_load[3]; 	/* Load on channel in ohms */
-	read8_machine_func	portAread;
-	read8_machine_func	portBread;
-	write8_machine_func	portAwrite;
-	write8_machine_func	portBwrite;
+	read8_space_func	portAread;
+	read8_space_func	portBread;
+	write8_space_func	portAwrite;
+	write8_space_func	portBwrite;
 };
 
 

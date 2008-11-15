@@ -29,7 +29,7 @@ struct _latch8_devread
 	device_type				type;
 	const char				*tag;
 	read8_device_func		devread_handler;
-	read8_machine_func		read_handler;
+	read8_space_func		read_handler;
 };
 
 typedef struct _latch8_config latch8_config;

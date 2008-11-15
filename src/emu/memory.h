@@ -114,15 +114,15 @@ struct _opbase_data
 typedef offs_t	(*opbase_handler_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t address, ATTR_UNUSED opbase_data *opbase);
 
 
-/* machine read/write handlers */
-typedef UINT8	(*read8_machine_func)  (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset);
-typedef void	(*write8_machine_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
-typedef UINT16	(*read16_machine_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
-typedef void	(*write16_machine_func)(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
-typedef UINT32	(*read32_machine_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
-typedef void	(*write32_machine_func)(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
-typedef UINT64	(*read64_machine_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
-typedef void	(*write64_machine_func)(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+/* space read/write handlers */
+typedef UINT8	(*read8_space_func)  (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset);
+typedef void	(*write8_space_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
+typedef UINT16	(*read16_space_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
+typedef void	(*write16_space_func)(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
+typedef UINT32	(*read32_space_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
+typedef void	(*write32_space_func)(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
+typedef UINT64	(*read64_space_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
+typedef void	(*write64_space_func)(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
 
 
 /* device read/write handlers */
@@ -165,10 +165,10 @@ typedef union _read_handler read_handler;
 union _read_handler
 {
 	genf *					generic;			/* generic function pointer */
-	read8_machine_func		mhandler8;			/* 8-bit machine read handler */
-	read16_machine_func		mhandler16;			/* 16-bit machine read handler */
-	read32_machine_func		mhandler32;			/* 32-bit machine read handler */
-	read64_machine_func		mhandler64;			/* 64-bit machine read handler */
+	read8_space_func		shandler8;			/* 8-bit space read handler */
+	read16_space_func		shandler16;			/* 16-bit space read handler */
+	read32_space_func		shandler32;			/* 32-bit space read handler */
+	read64_space_func		shandler64;			/* 64-bit space read handler */
 	read8_device_func		dhandler8;			/* 8-bit device read handler */
 	read16_device_func		dhandler16;			/* 16-bit device read handler */
 	read32_device_func		dhandler32;			/* 32-bit device read handler */
@@ -181,10 +181,10 @@ typedef union _write_handler write_handler;
 union _write_handler
 {
 	genf *					generic;			/* generic function pointer */
-	write8_machine_func		mhandler8;			/* 8-bit machine write handler */
-	write16_machine_func	mhandler16;			/* 16-bit machine write handler */
-	write32_machine_func	mhandler32;			/* 32-bit machine write handler */
-	write64_machine_func	mhandler64;			/* 64-bit machine write handler */
+	write8_space_func		shandler8;			/* 8-bit space write handler */
+	write16_space_func		shandler16;			/* 16-bit space write handler */
+	write32_space_func		shandler32;			/* 32-bit space write handler */
+	write64_space_func		shandler64;			/* 64-bit space write handler */
 	write8_device_func		dhandler8;			/* 8-bit device write handler */
 	write16_device_func		dhandler16;			/* 16-bit device write handler */
 	write32_device_func		dhandler32;			/* 32-bit device write handler */
@@ -310,8 +310,8 @@ union _addrmap8_token
 {
 	TOKEN_COMMON_FIELDS
 	const addrmap_token *	tokenptr;
-	read8_machine_func		mread;				/* pointer to native machine read handler */
-	write8_machine_func		mwrite;				/* pointer to native machine write handler */
+	read8_space_func		sread;				/* pointer to native space read handler */
+	write8_space_func		swrite;				/* pointer to native space write handler */
 	read8_device_func		dread;				/* pointer to native device read handler */
 	write8_device_func		dwrite;				/* pointer to native device write handler */
 	read_handler			read;				/* generic read handlers */
@@ -328,12 +328,12 @@ union _addrmap16_token
 {
 	TOKEN_COMMON_FIELDS
 	const addrmap_token *	tokenptr;
-	read16_machine_func		mread;				/* pointer to native read handler */
-	write16_machine_func 	mwrite;				/* pointer to native write handler */
+	read16_space_func		sread;				/* pointer to native read handler */
+	write16_space_func 		swrite;				/* pointer to native write handler */
 	read16_device_func		dread;				/* pointer to native device read handler */
 	write16_device_func		dwrite;				/* pointer to native device write handler */
-	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
-	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read8_space_func		sread8;				/* pointer to 8-bit space read handler */
+	write8_space_func		swrite8;			/* pointer to 8-bit space write handler */
 	read8_device_func		dread8;				/* pointer to 8-bit device read handler */
 	write8_device_func		dwrite8;			/* pointer to 8-bit device write handler */
 	read_handler			read;				/* generic read handlers */
@@ -350,16 +350,16 @@ union _addrmap32_token
 {
 	TOKEN_COMMON_FIELDS
 	const addrmap_token *	tokenptr;
-	read32_machine_func		mread;				/* pointer to native read handler */
-	write32_machine_func 	mwrite;				/* pointer to native write handler */
+	read32_space_func		sread;				/* pointer to native read handler */
+	write32_space_func 		swrite;				/* pointer to native write handler */
 	read32_device_func		dread;				/* pointer to native device read handler */
 	write32_device_func		dwrite;				/* pointer to native device write handler */
-	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
-	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read8_space_func		sread8;				/* pointer to 8-bit space read handler */
+	write8_space_func		swrite8;			/* pointer to 8-bit space write handler */
 	read8_device_func		dread8;				/* pointer to 8-bit device read handler */
 	write8_device_func		dwrite8;			/* pointer to 8-bit device write handler */
-	read16_machine_func		mread16;			/* pointer to 16-bit machine read handler */
-	write16_machine_func	mwrite16;			/* pointer to 16-bit machine write handler */
+	read16_space_func		sread16;			/* pointer to 16-bit space read handler */
+	write16_space_func		swrite16;			/* pointer to 16-bit space write handler */
 	read16_device_func		dread16;			/* pointer to 16-bit device read handler */
 	write16_device_func		dwrite16;			/* pointer to 16-bit device write handler */
 	read_handler			read;				/* generic read handlers */
@@ -376,20 +376,20 @@ union _addrmap64_token
 {
 	TOKEN_COMMON_FIELDS
 	const addrmap_token *	tokenptr;
-	read64_machine_func		mread;				/* pointer to native read handler */
-	write64_machine_func 	mwrite;				/* pointer to native write handler */
+	read64_space_func		sread;				/* pointer to native read handler */
+	write64_space_func 		swrite;				/* pointer to native write handler */
 	read64_device_func		dread;				/* pointer to native device read handler */
 	write64_device_func		dwrite;				/* pointer to native device write handler */
-	read8_machine_func		mread8;				/* pointer to 8-bit machine read handler */
-	write8_machine_func		mwrite8;			/* pointer to 8-bit machine write handler */
+	read8_space_func		sread8;				/* pointer to 8-bit space read handler */
+	write8_space_func		swrite8;			/* pointer to 8-bit space write handler */
 	read8_device_func		dread8;				/* pointer to 8-bit device read handler */
 	write8_device_func		dwrite8;			/* pointer to 8-bit device write handler */
-	read16_machine_func		mread16;			/* pointer to 16-bit machine read handler */
-	write16_machine_func	mwrite16;			/* pointer to 16-bit machine write handler */
+	read16_space_func		sread16;			/* pointer to 16-bit space read handler */
+	write16_space_func		swrite16;			/* pointer to 16-bit space write handler */
 	read16_device_func		dread16;			/* pointer to 16-bit device read handler */
 	write16_device_func		dwrite16;			/* pointer to 16-bit device write handler */
-	read32_machine_func		mread32;			/* pointer to 32-bit machine read handler */
-	write32_machine_func	mwrite32;			/* pointer to 32-bit machine write handler */
+	read32_space_func		sread32;			/* pointer to 32-bit space read handler */
+	write32_space_func		swrite32;			/* pointer to 32-bit space write handler */
 	read32_device_func		dread32;			/* pointer to 32-bit device read handler */
 	write32_device_func		dwrite32;			/* pointer to 32-bit device write handler */
 	read_handler			read;				/* generic read handlers */
@@ -409,7 +409,7 @@ union _addrmap64_token
 #define OPBASE_HANDLER(name)			offs_t name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t address, opbase_data *opbase)
 
 
-/* machine read/write handler function macros */
+/* space read/write handler function macros */
 #define READ8_HANDLER(name) 			UINT8  name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset)
 #define WRITE8_HANDLER(name) 			void   name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
 #define READ16_HANDLER(name)			UINT16 name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
@@ -696,42 +696,42 @@ union _addrmap64_token
 
 #define AM_READ(_handler) \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 0, 8, 0, 8), \
-	TOKEN_PTR(mread, _handler), \
+	TOKEN_PTR(sread, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_READ8(_handler, _unitmask) \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 8, 8, UNITMASK8(_unitmask), 8), \
-	TOKEN_PTR(mread8, _handler), \
+	TOKEN_PTR(sread8, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_READ16(_handler, _unitmask) \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 16, 8, UNITMASK16(_unitmask), 8), \
-	TOKEN_PTR(mread16, _handler), \
+	TOKEN_PTR(sread16, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_READ32(_handler, _unitmask) \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_READ, 8, 32, 8, UNITMASK32(_unitmask), 8), \
-	TOKEN_PTR(mread32, _handler), \
+	TOKEN_PTR(sread32, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_WRITE(_handler) \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 0, 8, 0, 8), \
-	TOKEN_PTR(mwrite, _handler), \
+	TOKEN_PTR(swrite, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_WRITE8(_handler, _unitmask) \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 8, 8, UNITMASK8(_unitmask), 8), \
-	TOKEN_PTR(mwrite8, _handler), \
+	TOKEN_PTR(swrite8, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_WRITE16(_handler, _unitmask) \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 16, 8, UNITMASK16(_unitmask), 8), \
-	TOKEN_PTR(mwrite16, _handler), \
+	TOKEN_PTR(swrite16, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_WRITE32(_handler, _unitmask) \
 	TOKEN_UINT32_PACK3(ADDRMAP_TOKEN_WRITE, 8, 32, 8, UNITMASK32(_unitmask), 8), \
-	TOKEN_PTR(mwrite32, _handler), \
+	TOKEN_PTR(swrite32, _handler), \
 	TOKEN_STRING(#_handler),
 
 #define AM_DEVREAD(_type, _tag, _handler) \
@@ -917,10 +917,10 @@ int			memory_get_log_unmap(int spacenum);
 
 /* dynamic address space mapping */
 void *		_memory_install_handler  (running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);
-UINT8 *		_memory_install_handler8 (running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name);
-UINT16 *	_memory_install_handler16(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name);
-UINT32 *	_memory_install_handler32(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name);
-UINT64 *	_memory_install_handler64(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT8 *		_memory_install_handler8 (running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, write8_space_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT16 *	_memory_install_handler16(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, write16_space_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT32 *	_memory_install_handler32(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, write32_space_func whandler, const char *rhandler_name, const char *whandler_name);
+UINT64 *	_memory_install_handler64(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, write64_space_func whandler, const char *rhandler_name, const char *whandler_name);
 
 /* dynamic device address space mapping */
 void *		_memory_install_device_handler  (const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name);

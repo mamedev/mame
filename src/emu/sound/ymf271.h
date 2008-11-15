@@ -6,8 +6,8 @@
 typedef struct _ymf271_interface ymf271_interface;
 struct _ymf271_interface
 {
-	read8_machine_func ext_read;		/* external memory read */
-	write8_machine_func ext_write;	/* external memory write */
+	read8_space_func ext_read;		/* external memory read */
+	write8_space_func ext_write;	/* external memory write */
 	void (*irq_callback)(running_machine *machine, int state);	/* irq callback */
 };
 

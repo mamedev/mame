@@ -17,10 +17,10 @@ struct _y8950_interface
 {
 	void (*handler)(running_machine *machine, int linestate);
 
-	read8_machine_func keyboardread;
-	write8_machine_func keyboardwrite;
-	read8_machine_func portread;
-	write8_machine_func portwrite;
+	read8_space_func keyboardread;
+	write8_space_func keyboardwrite;
+	read8_space_func portread;
+	write8_space_func portwrite;
 };
 
 

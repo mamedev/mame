@@ -122,9 +122,9 @@ static const int nusiz[8][3] =
 	{ 1, 4, 0 }
 };
 
-static read16_machine_func	tia_read_input_port;
-static read8_machine_func	tia_get_databus;
-static write16_machine_func	tia_vsync_callback;
+static read16_space_func	tia_read_input_port;
+static read8_space_func	tia_get_databus;
+static write16_space_func	tia_vsync_callback;
 
 static void extend_palette(running_machine *machine) {
 	int	i,j;

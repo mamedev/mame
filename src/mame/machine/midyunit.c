@@ -466,7 +466,7 @@ DRIVER_INIT( mkyawdim )
 
 /********************** Terminator 2 **********************/
 
-static void term2_init_common(running_machine *machine, write16_machine_func hack_w)
+static void term2_init_common(running_machine *machine, write16_space_func hack_w)
 {
 	/* protection */
 	static const struct protection_data term2_protection_data =

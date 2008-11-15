@@ -911,8 +911,8 @@ static int atomicp_sound_rate;
 
 static UINT8 has_sound_cpu;
 
-static read16_machine_func custom_io_r;
-static write16_machine_func custom_io_w;
+static read16_space_func custom_io_r;
+static write16_space_func custom_io_w;
 
 static UINT8 disable_screen_blanking;
 static UINT8 mj_input_num;

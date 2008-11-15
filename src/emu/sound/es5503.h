@@ -7,7 +7,7 @@ typedef struct _es5503_interface es5503_interface;
 struct _es5503_interface
 {
 	void (*irq_callback)(running_machine *machine, int state);
-	read8_machine_func adc_read;
+	read8_space_func adc_read;
 	UINT8 *wave_memory;
 };
 

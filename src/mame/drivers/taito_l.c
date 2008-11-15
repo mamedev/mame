@@ -114,10 +114,10 @@ static UINT8 *palette_ram;
 static UINT8 *empty_ram;
 static UINT8 *shared_ram;
 
-static read8_machine_func porte0_r;
-static read8_machine_func porte1_r;
-static read8_machine_func portf0_r;
-static read8_machine_func portf1_r;
+static read8_space_func porte0_r;
+static read8_space_func porte1_r;
+static read8_space_func portf0_r;
+static read8_space_func portf1_r;
 
 static int adpcm_pos;
 static int adpcm_data;

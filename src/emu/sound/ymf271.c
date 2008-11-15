@@ -108,8 +108,8 @@ typedef struct
 	UINT8 ext_read;
 
 	const UINT8 *rom;
-	read8_machine_func ext_mem_read;
-	write8_machine_func ext_mem_write;
+	read8_space_func ext_mem_read;
+	write8_space_func ext_mem_write;
 	void (*irq_callback)(running_machine *, int);
 
 	int index;
@@ -1731,7 +1731,7 @@ static void init_state(YMF271Chip *chip)
 	state_save_register_item("ymf271", chip->index, chip->ext_read);
 }
 
-static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_machine_func ext_read, write8_machine_func ext_write)
+static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_space_func ext_read, write8_space_func ext_write)
 {
 	chip->timA = timer_alloc(ymf271_timer_a_tick, chip);
 	chip->timB = timer_alloc(ymf271_timer_b_tick, chip);

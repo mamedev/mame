@@ -7,9 +7,9 @@
 #define TIA_MAX_SCREEN_HEIGHT			342
 
 struct tia_interface {
-	read16_machine_func	read_input_port;
-	read8_machine_func	databus_contents;
-	write16_machine_func	vsync_callback;
+	read16_space_func	read_input_port;
+	read8_space_func	databus_contents;
+	write16_space_func	vsync_callback;
 };
 
 PALETTE_INIT( tia_NTSC );

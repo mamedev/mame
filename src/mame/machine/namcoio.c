@@ -145,8 +145,8 @@ TODO:
 struct namcoio
 {
 	INT32 type;
-	read8_machine_func in[4];
-	write8_machine_func out[2];
+	read8_space_func in[4];
+	write8_space_func out[2];
 	INT32 reset;
 	INT32 lastcoins,lastbuttons;
 	INT32 credits;

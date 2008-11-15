@@ -20,8 +20,8 @@ static UINT8 *s1ram;
 /* Bank handler definitions */
 typedef struct
 {
-	read8_machine_func bank_handler_r;
-	write8_machine_func bank_handler_w;
+	read8_space_func bank_handler_r;
+	write8_space_func bank_handler_w;
 	int           bank_offset;
 	UINT8 *bank_pointer;
 } bankhandler;
@@ -64,7 +64,7 @@ static WRITE8_HANDLER( bank14_w ) { (*namcos1_active_bank[13].bank_handler_w)(sp
 static WRITE8_HANDLER( bank15_w ) { (*namcos1_active_bank[14].bank_handler_w)(space, offset + namcos1_active_bank[14].bank_offset, data); }
 static WRITE8_HANDLER( bank16_w ) { (*namcos1_active_bank[15].bank_handler_w)(space, offset + namcos1_active_bank[15].bank_offset, data); }
 
-static const read8_machine_func ram_bank_handler_r[16] =
+static const read8_space_func ram_bank_handler_r[16] =
 {
 	SMH_BANK1 ,SMH_BANK2 ,SMH_BANK3 ,SMH_BANK4 ,
 	SMH_BANK5 ,SMH_BANK6 ,SMH_BANK7 ,SMH_BANK8 ,
@@ -72,7 +72,7 @@ static const read8_machine_func ram_bank_handler_r[16] =
 	SMH_BANK13,SMH_BANK14,SMH_BANK15,SMH_BANK16
 };
 
-static const write8_machine_func ram_bank_handler_w[16] =
+static const write8_space_func ram_bank_handler_w[16] =
 {
 	SMH_BANK1 ,SMH_BANK2 ,SMH_BANK3 ,SMH_BANK4 ,
 	SMH_BANK5 ,SMH_BANK6 ,SMH_BANK7 ,SMH_BANK8 ,
@@ -80,7 +80,7 @@ static const write8_machine_func ram_bank_handler_w[16] =
 	SMH_BANK13,SMH_BANK14,SMH_BANK15,SMH_BANK16
 };
 
-static const read8_machine_func io_bank_handler_r[16] =
+static const read8_space_func io_bank_handler_r[16] =
 {
 	bank1_r, bank2_r, bank3_r, bank4_r,
 	bank5_r, bank6_r, bank7_r, bank8_r,
@@ -88,7 +88,7 @@ static const read8_machine_func io_bank_handler_r[16] =
 	bank13_r, bank14_r, bank15_r, bank16_r
 };
 
-static const write8_machine_func io_bank_handler_w[16] =
+static const write8_space_func io_bank_handler_w[16] =
 {
 	bank1_w, bank2_w, bank3_w, bank4_w,
 	bank5_w, bank6_w, bank7_w, bank8_w,
@@ -770,7 +770,7 @@ WRITE8_HANDLER( namcos1_subcpu_bank_w )
 *                                                                              *
 *******************************************************************************/
 
-static void namcos1_install_bank(int start,int end,read8_machine_func hr,write8_machine_func hw,
+static void namcos1_install_bank(int start,int end,read8_space_func hr,write8_space_func hw,
 			  int offset,UINT8 *pointer)
 {
 	int i;
@@ -787,7 +787,7 @@ static void namcos1_install_bank(int start,int end,read8_machine_func hr,write8_
 
 
 
-static void namcos1_build_banks(running_machine *machine,read8_machine_func key_r,write8_machine_func key_w)
+static void namcos1_build_banks(running_machine *machine,read8_space_func key_r,write8_space_func key_w)
 {
 	int i;
 
@@ -959,8 +959,8 @@ WRITE8_HANDLER( namcos1_mcu_patch_w )
 struct namcos1_specific
 {
 	/* keychip */
-	read8_machine_func key_r;
-	write8_machine_func key_w;
+	read8_space_func key_r;
+	write8_space_func key_w;
 	int key_id;
 	int key_reg1;
 	int key_reg2;

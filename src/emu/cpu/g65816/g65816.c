@@ -392,7 +392,7 @@ static CPU_SET_INFO( g65816 )
 		case CPUINFO_INT_REGISTER + G65816_IRQ_STATE:	g65816_set_reg(G65816_IRQ_STATE, info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_G65816_READVECTOR_CALLBACK:	READ_VECTOR = (read8_machine_func) info->f;	break;
+		case CPUINFO_PTR_G65816_READVECTOR_CALLBACK:	READ_VECTOR = (read8_space_func) info->f;	break;
 	}
 }
 

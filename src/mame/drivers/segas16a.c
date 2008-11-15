@@ -163,8 +163,8 @@ static UINT16 *workram;
 static UINT8 video_control;
 static UINT8 mj_input_num;
 
-static read16_machine_func custom_io_r;
-static write16_machine_func custom_io_w;
+static read16_space_func custom_io_r;
+static write16_space_func custom_io_w;
 static void (*lamp_changed_w)(UINT8 changed, UINT8 newval);
 static void (*i8751_vblank_hook)(running_machine *machine);
 

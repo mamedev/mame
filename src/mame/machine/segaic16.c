@@ -174,7 +174,7 @@ void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decry
 		offs_t region_size = region_size_map[chip->regs[rgn->regbase] & 3];
 		offs_t region_base = (chip->regs[rgn->regbase + 1] << 16) & ~region_size;
 		offs_t region_start = region_base + (rgn->regoffs & region_size);
-		read16_machine_func read = rgn->read;
+		read16_space_func read = rgn->read;
 		int banknum = 0;
 
 		/* skip non-ROM regions */
@@ -339,8 +339,8 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 		offs_t region_mirror = rgn->mirror & region_size;
 		offs_t region_start = region_base + (rgn->regoffs & region_size);
 		offs_t region_end = region_start + ((rgn->length - 1 < region_size) ? rgn->length - 1 : region_size);
-		write16_machine_func write = rgn->write;
-		read16_machine_func read = rgn->read;
+		write16_space_func write = rgn->write;
+		read16_space_func read = rgn->read;
 		int banknum = 0;
 
 		/* check for mapping to banks */

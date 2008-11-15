@@ -688,7 +688,7 @@ struct _m68ki_cpu_core
 
 extern const UINT8    m68ki_shift_8_table[];
 extern const UINT16   m68ki_shift_16_table[];
-extern const UINT32     m68ki_shift_32_table[];
+extern const UINT32   m68ki_shift_32_table[];
 extern const UINT8    m68ki_exception_cycle_table[][256];
 extern const UINT8    m68ki_ea_idx_cycle_table[];
 

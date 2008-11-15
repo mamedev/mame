@@ -28,8 +28,8 @@ static UINT8 latch1;
 static UINT8 tape_crc16_lsb[256];
 static UINT8 tape_crc16_msb[256];
 
-static read8_machine_func decocass_dongle_r;
-static write8_machine_func decocass_dongle_w;
+static read8_space_func decocass_dongle_r;
+static write8_space_func decocass_dongle_w;
 
 static UINT8 decocass_reset;
 static UINT8 i8041_p1;

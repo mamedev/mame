@@ -36,18 +36,18 @@
 
 struct via6522_interface
 {
-	read8_machine_func in_a_func;
-	read8_machine_func in_b_func;
-	read8_machine_func in_ca1_func;
-	read8_machine_func in_cb1_func;
-	read8_machine_func in_ca2_func;
-	read8_machine_func in_cb2_func;
-	write8_machine_func out_a_func;
-	write8_machine_func out_b_func;
-	write8_machine_func out_ca1_func;
-	write8_machine_func out_cb1_func;
-	write8_machine_func out_ca2_func;
-	write8_machine_func out_cb2_func;
+	read8_space_func in_a_func;
+	read8_space_func in_b_func;
+	read8_space_func in_ca1_func;
+	read8_space_func in_cb1_func;
+	read8_space_func in_ca2_func;
+	read8_space_func in_cb2_func;
+	write8_space_func out_a_func;
+	write8_space_func out_b_func;
+	write8_space_func out_ca1_func;
+	write8_space_func out_cb1_func;
+	write8_space_func out_ca2_func;
+	write8_space_func out_cb2_func;
 	void (*irq_func)(running_machine *machine, int state);
 };
 

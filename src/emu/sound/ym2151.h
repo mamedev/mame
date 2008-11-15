@@ -81,7 +81,7 @@ int ym2151_read_status(void *chip);
 void ym2151_set_irq_handler(void *chip, void (*handler)(running_machine *machine, int irq));
 
 /* set port write handler on YM2151 chip number 'n'*/
-void ym2151_set_port_write_handler(void *chip, write8_machine_func handler);
+void ym2151_set_port_write_handler(void *chip, write8_space_func handler);
 
 /* refresh chip when load state */
 STATE_POSTLOAD( ym2151_postload );

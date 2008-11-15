@@ -483,8 +483,8 @@ static struct dynamic_address
 {
 	offs_t			start;
 	offs_t			end;
-	read32_machine_func	mread;
-	write32_machine_func mwrite;
+	read32_space_func	mread;
+	write32_space_func mwrite;
 	read32_device_func	dread;
 	write32_device_func dwrite;
 	const device_config *device;
@@ -1529,7 +1529,7 @@ static WRITE32_HANDLER( dcs3_fifo_full_w )
 #define add_dynamic_address(s,e,r,w)			_add_dynamic_address(s,e,r,w,#r,#w)
 #define add_dynamic_device_address(d,s,e,r,w)	_add_dynamic_device_address(d,s,e,r,w,#r,#w)
 
-INLINE void _add_dynamic_address(offs_t start, offs_t end, read32_machine_func read, write32_machine_func write, const char *rdname, const char *wrname)
+INLINE void _add_dynamic_address(offs_t start, offs_t end, read32_space_func read, write32_space_func write, const char *rdname, const char *wrname)
 {
 	dynamic[dynamic_count].start = start;
 	dynamic[dynamic_count].end = end;

@@ -1163,7 +1163,7 @@ static READ32_HANDLER( speedup9_r ) { return generic_speedup(space->machine, &sp
 static READ32_HANDLER( speedup10_r ) { return generic_speedup(space->machine, &speedup_table[10]); }
 static READ32_HANDLER( speedup11_r ) { return generic_speedup(space->machine, &speedup_table[11]); }
 
-static const read32_machine_func speedup_handlers[] =
+static const read32_space_func speedup_handlers[] =
 {
 	speedup0_r,		speedup1_r,		speedup2_r,		speedup3_r,
 	speedup4_r,		speedup5_r,		speedup6_r,		speedup7_r,

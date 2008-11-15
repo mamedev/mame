@@ -6,10 +6,10 @@
 typedef struct _rsp_config rsp_config;
 struct _rsp_config
 {
-	read32_machine_func dp_reg_r;
-	write32_machine_func dp_reg_w;
-	read32_machine_func sp_reg_r;
-	write32_machine_func sp_reg_w;
+	read32_space_func dp_reg_r;
+	write32_space_func dp_reg_w;
+	read32_space_func sp_reg_r;
+	write32_space_func sp_reg_w;
 	void (*sp_set_status)(UINT32 status);
 };
 

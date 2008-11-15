@@ -46,7 +46,7 @@ typedef struct TAITO8741_status{
 	UINT8 pending4a;
 	int serial_out;
 	int coins;
-	read8_machine_func portHandler;
+	read8_space_func portHandler;
 }I8741;
 
 static const struct TAITO8741interface *intf;
@@ -388,7 +388,7 @@ typedef struct josvolly_8741_struct {
 
 	UINT8 rst;
 
-	read8_machine_func initReadPort;
+	read8_space_func initReadPort;
 }JV8741;
 
 static JV8741 i8741[4];

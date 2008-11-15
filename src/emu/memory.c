@@ -435,7 +435,7 @@ INLINE UINT8 read_byte_generic(const address_space *space, offs_t address)
 	if (entry < STATIC_RAM)
 		result = bank_ptr[entry][offset];
 	else
-		result = (*handler->handler.read.mhandler8)(handler->object, offset);
+		result = (*handler->handler.read.shandler8)(handler->object, offset);
 
 	profiler_mark(PROFILER_END);
 	return result;
@@ -465,7 +465,7 @@ INLINE void write_byte_generic(const address_space *space, offs_t address, UINT8
 	if (entry < STATIC_RAM)
 		bank_ptr[entry][offset] = data;
 	else
-		(*handler->handler.write.mhandler8)(handler->object, offset, data);
+		(*handler->handler.write.shandler8)(handler->object, offset, data);
 
 	profiler_mark(PROFILER_END);
 }
@@ -495,7 +495,7 @@ INLINE UINT16 read_word_generic(const address_space *space, offs_t address, UINT
 	if (entry < STATIC_RAM)
 		result = *(UINT16 *)&bank_ptr[entry][offset & ~1];
 	else
-		result = (*handler->handler.read.mhandler16)(handler->object, offset >> 1, mem_mask);
+		result = (*handler->handler.read.shandler16)(handler->object, offset >> 1, mem_mask);
 
 	profiler_mark(PROFILER_END);
 	return result;
@@ -528,7 +528,7 @@ INLINE void write_word_generic(const address_space *space, offs_t address, UINT1
 		*dest = (*dest & ~mem_mask) | (data & mem_mask);
 	}
 	else
-		(*handler->handler.write.mhandler16)(handler->object, offset >> 1, data, mem_mask);
+		(*handler->handler.write.shandler16)(handler->object, offset >> 1, data, mem_mask);
 
 	profiler_mark(PROFILER_END);
 }
@@ -558,7 +558,7 @@ INLINE UINT32 read_dword_generic(const address_space *space, offs_t address, UIN
 	if (entry < STATIC_RAM)
 		result = *(UINT32 *)&bank_ptr[entry][offset & ~3];
 	else
-		result = (*handler->handler.read.mhandler32)(handler->object, offset >> 2, mem_mask);
+		result = (*handler->handler.read.shandler32)(handler->object, offset >> 2, mem_mask);
 
 	profiler_mark(PROFILER_END);
 	return result;
@@ -591,7 +591,7 @@ INLINE void write_dword_generic(const address_space *space, offs_t address, UINT
 		*dest = (*dest & ~mem_mask) | (data & mem_mask);
 	}
 	else
-		(*handler->handler.write.mhandler32)(handler->object, offset >> 2, data, mem_mask);
+		(*handler->handler.write.shandler32)(handler->object, offset >> 2, data, mem_mask);
 
 	profiler_mark(PROFILER_END);
 }
@@ -621,7 +621,7 @@ INLINE UINT64 read_qword_generic(const address_space *space, offs_t address, UIN
 	if (entry < STATIC_RAM)
 		result = *(UINT64 *)&bank_ptr[entry][offset & ~7];
 	else
-		result = (*handler->handler.read.mhandler64)(handler->object, offset >> 3, mem_mask);
+		result = (*handler->handler.read.shandler64)(handler->object, offset >> 3, mem_mask);
 
 	profiler_mark(PROFILER_END);
 	return result;
@@ -654,7 +654,7 @@ INLINE void write_qword_generic(const address_space *space, offs_t address, UINT
 		*dest = (*dest & ~mem_mask) | (data & mem_mask);
 	}
 	else
-		(*handler->handler.write.mhandler64)(handler->object, offset >> 3, data, mem_mask);
+		(*handler->handler.write.shandler64)(handler->object, offset >> 3, data, mem_mask);
 
 	profiler_mark(PROFILER_END);
 }
@@ -1471,7 +1471,7 @@ void *_memory_install_handler(running_machine *machine, int cpunum, int spacenum
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT8 *_memory_install_handler8(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_machine_func rhandler, write8_machine_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT8 *_memory_install_handler8(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, write8_space_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	address_space *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
@@ -1482,7 +1482,7 @@ UINT8 *_memory_install_handler8(running_machine *machine, int cpunum, int spacen
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT16 *_memory_install_handler16(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_machine_func rhandler, write16_machine_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT16 *_memory_install_handler16(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, write16_space_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	address_space *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
@@ -1493,7 +1493,7 @@ UINT16 *_memory_install_handler16(running_machine *machine, int cpunum, int spac
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT32 *_memory_install_handler32(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_machine_func rhandler, write32_machine_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT32 *_memory_install_handler32(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, write32_space_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	address_space *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
@@ -1504,7 +1504,7 @@ UINT32 *_memory_install_handler32(running_machine *machine, int cpunum, int spac
 	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
 }
 
-UINT64 *_memory_install_handler64(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_machine_func rhandler, write64_machine_func whandler, const char *rhandler_name, const char *whandler_name)
+UINT64 *_memory_install_handler64(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, write64_space_func whandler, const char *rhandler_name, const char *whandler_name)
 {
 	address_space *space = &cpudata[cpunum].space[spacenum];
 	if (rhandler != NULL)
@@ -1821,10 +1821,10 @@ static void memory_init_populate(running_machine *machine)
 						{
 							switch (space->dbits)
 							{
-								case 8:		rhandler.mhandler8  = input_port_read_handler8(machine->portconfig, entry->read_porttag);	break;
-								case 16:	rhandler.mhandler16 = input_port_read_handler16(machine->portconfig, entry->read_porttag);	break;
-								case 32:	rhandler.mhandler32 = input_port_read_handler32(machine->portconfig, entry->read_porttag);	break;
-								case 64:	rhandler.mhandler64 = input_port_read_handler64(machine->portconfig, entry->read_porttag);	break;
+								case 8:		rhandler.shandler8  = input_port_read_handler8(machine->portconfig, entry->read_porttag);	break;
+								case 16:	rhandler.shandler16 = input_port_read_handler16(machine->portconfig, entry->read_porttag);	break;
+								case 32:	rhandler.shandler32 = input_port_read_handler32(machine->portconfig, entry->read_porttag);	break;
+								case 64:	rhandler.shandler64 = input_port_read_handler64(machine->portconfig, entry->read_porttag);	break;
 							}
 							if (rhandler.generic == NULL)
 								fatalerror("Non-existent port referenced: '%s'\n", entry->read_porttag);
@@ -3250,7 +3250,7 @@ static READ16_HANDLER( stub_read8_from_16 )
 	{
 		int shift = *subshift++;
 		if ((UINT8)(mem_mask >> shift) != 0)
-			result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset) << shift;
+			result |= (*handler->subhandler.read.shandler8)(handler->subobject, offset) << shift;
 		offset++;
 	}
 	return result;
@@ -3274,7 +3274,7 @@ static READ32_HANDLER( stub_read8_from_32 )
 	{
 		int shift = *subshift++;
 		if ((UINT8)(mem_mask >> shift) != 0)
-			result |= (*handler->subhandler.read.mhandler8)(handler->subobject, offset) << shift;
+			result |= (*handler->subhandler.read.shandler8)(handler->subobject, offset) << shift;
 		offset++;
 	}
 	return result;
@@ -3298,7 +3298,7 @@ static READ64_HANDLER( stub_read8_from_64 )
 	{
 		int shift = *subshift++;
 		if ((UINT8)(mem_mask >> shift) != 0)
-			result |= (UINT64)(*handler->subhandler.read.mhandler8)(handler->subobject, offset) << shift;
+			result |= (UINT64)(*handler->subhandler.read.shandler8)(handler->subobject, offset) << shift;
 		offset++;
 	}
 	return result;
@@ -3322,7 +3322,7 @@ static READ32_HANDLER( stub_read16_from_32 )
 	{
 		int shift = *subshift++;
 		if ((UINT16)(mem_mask >> shift) != 0)
-			result |= (*handler->subhandler.read.mhandler16)(handler->subobject, offset, mem_mask >> shift) << shift;
+			result |= (*handler->subhandler.read.shandler16)(handler->subobject, offset, mem_mask >> shift) << shift;
 		offset++;
 	}
 	return result;
@@ -3346,7 +3346,7 @@ static READ64_HANDLER( stub_read16_from_64 )
 	{
 		int shift = *subshift++;
 		if ((UINT16)(mem_mask >> shift) != 0)
-			result |= (UINT64)(*handler->subhandler.read.mhandler16)(handler->subobject, offset, mem_mask >> shift) << shift;
+			result |= (UINT64)(*handler->subhandler.read.shandler16)(handler->subobject, offset, mem_mask >> shift) << shift;
 		offset++;
 	}
 	return result;
@@ -3370,7 +3370,7 @@ static READ64_HANDLER( stub_read32_from_64 )
 	{
 		int shift = *subshift++;
 		if ((UINT32)(mem_mask >> shift) != 0)
-			result |= (UINT64)(*handler->subhandler.read.mhandler32)(handler->subobject, offset, mem_mask >> shift) << shift;
+			result |= (UINT64)(*handler->subhandler.read.shandler32)(handler->subobject, offset, mem_mask >> shift) << shift;
 		offset++;
 	}
 	return result;
@@ -3398,7 +3398,7 @@ static WRITE16_HANDLER( stub_write8_from_16 )
 	{
 		int shift = *subshift++;
 		if ((UINT8)(mem_mask >> shift) != 0)
-			(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> shift);
+			(*handler->subhandler.write.shandler8)(handler->subobject, offset, data >> shift);
 		offset++;
 	}
 }
@@ -3420,7 +3420,7 @@ static WRITE32_HANDLER( stub_write8_from_32 )
 	{
 		int shift = *subshift++;
 		if ((UINT8)(mem_mask >> shift) != 0)
-			(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> shift);
+			(*handler->subhandler.write.shandler8)(handler->subobject, offset, data >> shift);
 		offset++;
 	}
 }
@@ -3442,7 +3442,7 @@ static WRITE64_HANDLER( stub_write8_from_64 )
 	{
 		int shift = *subshift++;
 		if ((UINT8)(mem_mask >> shift) != 0)
-			(*handler->subhandler.write.mhandler8)(handler->subobject, offset, data >> shift);
+			(*handler->subhandler.write.shandler8)(handler->subobject, offset, data >> shift);
 		offset++;
 	}
 }
@@ -3464,7 +3464,7 @@ static WRITE32_HANDLER( stub_write16_from_32 )
 	{
 		int shift = *subshift++;
 		if ((UINT16)(mem_mask >> shift) != 0)
-			(*handler->subhandler.write.mhandler16)(handler->subobject, offset, data >> shift, mem_mask >> shift);
+			(*handler->subhandler.write.shandler16)(handler->subobject, offset, data >> shift, mem_mask >> shift);
 		offset++;
 	}
 }
@@ -3486,7 +3486,7 @@ static WRITE64_HANDLER( stub_write16_from_64 )
 	{
 		int shift = *subshift++;
 		if ((UINT16)(mem_mask >> shift) != 0)
-			(*handler->subhandler.write.mhandler16)(handler->subobject, offset, data >> shift, mem_mask >> shift);
+			(*handler->subhandler.write.shandler16)(handler->subobject, offset, data >> shift, mem_mask >> shift);
 		offset++;
 	}
 }
@@ -3508,7 +3508,7 @@ static WRITE64_HANDLER( stub_write32_from_64 )
 	{
 		int shift = *subshift++;
 		if ((UINT32)(mem_mask >> shift) != 0)
-			(*handler->subhandler.write.mhandler32)(handler->subobject, offset, data >> shift, mem_mask >> shift);
+			(*handler->subhandler.write.shandler32)(handler->subobject, offset, data >> shift, mem_mask >> shift);
 		offset++;
 	}
 }
@@ -3535,27 +3535,27 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 		if (spacedbits == 16)
 		{
 			if (handlerdbits == 8)
-				result.read.mhandler16 = stub_read8_from_16;
+				result.read.shandler16 = stub_read8_from_16;
 		}
 
 		/* 32-bit read stubs */
 		else if (spacedbits == 32)
 		{
 			if (handlerdbits == 8)
-				result.read.mhandler32 = stub_read8_from_32;
+				result.read.shandler32 = stub_read8_from_32;
 			else if (handlerdbits == 16)
-				result.read.mhandler32 = stub_read16_from_32;
+				result.read.shandler32 = stub_read16_from_32;
 		}
 
 		/* 64-bit read stubs */
 		else if (spacedbits == 64)
 		{
 			if (handlerdbits == 8)
-				result.read.mhandler64 = stub_read8_from_64;
+				result.read.shandler64 = stub_read8_from_64;
 			else if (handlerdbits == 16)
-				result.read.mhandler64 = stub_read16_from_64;
+				result.read.shandler64 = stub_read16_from_64;
 			else if (handlerdbits == 32)
-				result.read.mhandler64 = stub_read32_from_64;
+				result.read.shandler64 = stub_read32_from_64;
 		}
 	}
 
@@ -3566,27 +3566,27 @@ static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits
 		if (spacedbits == 16)
 		{
 			if (handlerdbits == 8)
-				result.write.mhandler16 = stub_write8_from_16;
+				result.write.shandler16 = stub_write8_from_16;
 		}
 
 		/* 32-bit write stubs */
 		else if (spacedbits == 32)
 		{
 			if (handlerdbits == 8)
-				result.write.mhandler32 = stub_write8_from_32;
+				result.write.shandler32 = stub_write8_from_32;
 			else if (handlerdbits == 16)
-				result.write.mhandler32 = stub_write16_from_32;
+				result.write.shandler32 = stub_write16_from_32;
 		}
 
 		/* 64-bit write stubs */
 		else if (spacedbits == 64)
 		{
 			if (handlerdbits == 8)
-				result.write.mhandler64 = stub_write8_from_64;
+				result.write.shandler64 = stub_write8_from_64;
 			else if (handlerdbits == 16)
-				result.write.mhandler64 = stub_write16_from_64;
+				result.write.shandler64 = stub_write16_from_64;
 			else if (handlerdbits == 32)
-				result.write.mhandler64 = stub_write32_from_64;
+				result.write.shandler64 = stub_write32_from_64;
 		}
 	}
 

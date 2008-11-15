@@ -70,7 +70,7 @@ typedef struct
 
 	void (*irq_callback)(running_machine *machine, int);	// IRQ callback
 
-	read8_machine_func adc_read;		// callback for the 5503's built-in analog to digital converter
+	read8_space_func adc_read;		// callback for the 5503's built-in analog to digital converter
 
 	INT8  oscsenabled;		// # of oscillators enabled
 

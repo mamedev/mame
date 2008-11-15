@@ -358,8 +358,8 @@ static UINT16 sound_bank;
 
 /* I/O chips and custom I/O */
 static UINT8 misc_io_data[2][0x10];
-static read16_machine_func custom_io_r[2];
-static write16_machine_func custom_io_w[2];
+static read16_space_func custom_io_r[2];
+static write16_space_func custom_io_w[2];
 static UINT8 analog_bank;
 static UINT8 analog_value[4];
 static UINT8 sonic_last[6];
@@ -3738,7 +3738,7 @@ ROM_END
  *
  *************************************/
 
-static void segas32_common_init(read16_machine_func custom_r, write16_machine_func custom_w, const UINT8 *default_eeprom)
+static void segas32_common_init(read16_space_func custom_r, write16_space_func custom_w, const UINT8 *default_eeprom)
 {
 	/* reset the custom handlers and other pointers */
 	custom_io_r[0] = custom_r;

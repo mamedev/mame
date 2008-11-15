@@ -44,8 +44,8 @@ static UINT8 adc_select;
 static UINT8 irq2_state;
 static UINT8 vblank_irq_state;
 
-static read16_machine_func custom_io_r;
-static write16_machine_func custom_io_w;
+static read16_space_func custom_io_r;
+static write16_space_func custom_io_w;
 
 static const UINT8 *custom_map;
 

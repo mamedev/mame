@@ -63,8 +63,8 @@ static UINT8 ssio_duty_cycle[2][3];
 static UINT8 ssio_ayvolume_lookup[16];
 static UINT8 ssio_custom_input_mask[5];
 static UINT8 ssio_custom_output_mask[2];
-static read8_machine_func ssio_custom_input[5];
-static write8_machine_func ssio_custom_output[2];
+static read8_space_func ssio_custom_input[5];
+static write8_space_func ssio_custom_output[2];
 
 /* Chip Squeak Deluxe-specific globals */
 static UINT8 csdeluxe_sound_cpu;
@@ -430,13 +430,13 @@ WRITE8_HANDLER( ssio_output_port_w )
 		(*ssio_custom_output[which])(space, offset, data & ssio_custom_output_mask[which]);
 }
 
-void ssio_set_custom_input(int which, int mask, read8_machine_func handler)
+void ssio_set_custom_input(int which, int mask, read8_space_func handler)
 {
 	ssio_custom_input[which] = handler;
 	ssio_custom_input_mask[which] = mask;
 }
 
-void ssio_set_custom_output(int which, int mask, write8_machine_func handler)
+void ssio_set_custom_output(int which, int mask, write8_space_func handler)
 {
 	ssio_custom_output[which/4] = handler;
 	ssio_custom_output_mask[which/4] = mask;
