@@ -2476,6 +2476,7 @@ V-V                           TP-027
 	DRIVER( sf2cej )	/* 13/05/1992 (c) 1992 (Japan) */
 	DRIVER( sf2rb )		/* hack */
 	DRIVER( sf2rb2 )	/* hack */
+	DRIVER( sf2rb3 )	/* hack */
 	DRIVER( sf2red )	/* hack */
 	DRIVER( sf2v004 )	/* hack */
 	DRIVER( sf2accp2 )	/* hack */
