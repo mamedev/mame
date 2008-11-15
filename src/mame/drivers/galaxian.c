@@ -400,7 +400,9 @@ static WRITE8_DEVICE_HANDLER( konami_portc_1_w )
 
 static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
-	soundlatch_w(device->machine, offset, data);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	soundlatch_w(space, offset, data);
 }
 
 
@@ -585,7 +587,9 @@ static WRITE8_HANDLER( sfx_sample_control_w )
 
 static READ8_DEVICE_HANDLER( sound_data2_r )
 {
-	return soundlatch2_r(device->machine, offset);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	return soundlatch2_r(space, offset);
 }
 
 
@@ -798,15 +802,17 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
 
 static INPUT_CHANGED( gmgalax_game_changed )
 {
+	const address_space *space = cpu_get_address_space(field->port->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* new value is the selected game */
 	gmgalax_selected_game = newval;
 
 	/* select the bank and graphics bank based on it */
 	memory_set_bank(1, gmgalax_selected_game);
-	galaxian_gfxbank_w(field->port->machine, 0, gmgalax_selected_game);
+	galaxian_gfxbank_w(space, 0, gmgalax_selected_game);
 
 	/* reset the starts */
-	galaxian_stars_enable_w(field->port->machine, 0, 0);
+	galaxian_stars_enable_w(space, 0, 0);
 
 	/* reset the CPU */
 	cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
@@ -2456,6 +2462,8 @@ static DRIVER_INIT( devilfsg )
 
 static DRIVER_INIT( zigzag )
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	/* video extensions */
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
 
@@ -2467,7 +2475,7 @@ static DRIVER_INIT( zigzag )
 
 	/* handler for doing the swaps */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7002, 0x7002, 0, 0x07f8, zigzag_bankswap_w);
-	zigzag_bankswap_w(machine, 0, 0);
+	zigzag_bankswap_w(space, 0, 0);
 
 	/* coin lockout disabled */
 	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0x7f8, SMH_UNMAP);

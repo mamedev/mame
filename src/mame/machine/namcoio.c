@@ -283,6 +283,8 @@ static const int joy_map[16] =
 
 static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	LOG(("%04x: custom 51XX read\n",cpu_get_pc(machine->activecpu)));
 
 	if (io[chip].mode == 0)	/* switch mode */
@@ -290,8 +292,8 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 		switch ((io[chip].in_count++) % 3)
 		{
 			default:
-			case 0: return READ_PORT(machine,0) | (READ_PORT(machine,1) << 4);
-			case 1: return READ_PORT(machine,2) | (READ_PORT(machine,3) << 4);
+			case 0: return READ_PORT(space,0) | (READ_PORT(space,1) << 4);
+			case 1: return READ_PORT(space,2) | (READ_PORT(space,3) << 4);
 			case 2: return 0;	// nothing?
 		}
 	}
@@ -304,7 +306,7 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 				{
 					int in,toggle;
 
-					in = ~(READ_PORT(machine,0) | (READ_PORT(machine,1) << 4));
+					in = ~(READ_PORT(space,0) | (READ_PORT(space,1) << 4));
 					toggle = in ^ io[chip].lastcoins;
 					io[chip].lastcoins = in;
 
@@ -312,17 +314,17 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 					{
 						if (io[chip].credits >= 99)
 						{
-							WRITE_PORT(machine,1,1);	// coin lockout
+							WRITE_PORT(space,1,1);	// coin lockout
 						}
 						else
 						{
-							WRITE_PORT(machine,1,0);	// coin lockout
+							WRITE_PORT(space,1,0);	// coin lockout
 							/* check if the user inserted a coin */
 							if (toggle & in & 0x10)
 							{
 								io[chip].coins[0]++;
-								WRITE_PORT(machine,0,0x04);	// coin counter
-								WRITE_PORT(machine,0,0x0c);
+								WRITE_PORT(space,0,0x04);	// coin counter
+								WRITE_PORT(space,0,0x0c);
 								if (io[chip].coins[0] >= io[chip].coins_per_cred[0])
 								{
 									io[chip].credits += io[chip].creds_per_coin[0];
@@ -332,8 +334,8 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 							if (toggle & in & 0x20)
 							{
 								io[chip].coins[1]++;
-								WRITE_PORT(machine,0,0x08);	// coin counter
-								WRITE_PORT(machine,0,0x0c);
+								WRITE_PORT(space,0,0x08);	// coin counter
+								WRITE_PORT(space,0,0x0c);
 								if (io[chip].coins[1] >= io[chip].coins_per_cred[1])
 								{
 									io[chip].credits += io[chip].creds_per_coin[1];
@@ -353,11 +355,11 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 						int on = (video_screen_get_frame_number(machine->primary_screen) & 0x10) >> 4;
 
 						if (io[chip].credits >= 2)
-							WRITE_PORT(machine,0,0x0c | 3*on);	// lamps
+							WRITE_PORT(space,0,0x0c | 3*on);	// lamps
 						else if (io[chip].credits >= 1)
-							WRITE_PORT(machine,0,0x0c | 2*on);	// lamps
+							WRITE_PORT(space,0,0x0c | 2*on);	// lamps
 						else
-							WRITE_PORT(machine,0,0x0c);	// lamps off
+							WRITE_PORT(space,0,0x0c);	// lamps off
 
 						/* check for 1 player start button */
 						if (toggle & in & 0x04)
@@ -366,7 +368,7 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 							{
 								io[chip].credits--;
 								io[chip].mode = 2;
-								WRITE_PORT(machine,0,0x0c);	// lamps off
+								WRITE_PORT(space,0,0x0c);	// lamps off
 							}
 						}
 						/* check for 2 players start button */
@@ -376,7 +378,7 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 							{
 								io[chip].credits -= 2;
 								io[chip].mode = 2;
-								WRITE_PORT(machine,0,0x0c);	// lamps off
+								WRITE_PORT(space, 0,0x0c);	// lamps off
 							}
 						}
 					}
@@ -389,10 +391,10 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 
 			case 1:
 				{
-					int joy = READ_PORT(machine,2) & 0x0f;
+					int joy = READ_PORT(space,2) & 0x0f;
 					int in,toggle;
 
-					in = ~READ_PORT(machine,0);
+					in = ~READ_PORT(space,0);
 					toggle = in ^ io[chip].lastbuttons;
 					io[chip].lastbuttons = (io[chip].lastbuttons & 2) | (in & 1);
 
@@ -408,10 +410,10 @@ static UINT8 namcoio_51XX_read(running_machine *machine, int chip)
 
 			case 2:
 				{
-					int joy = READ_PORT(machine,3) & 0x0f;
+					int joy = READ_PORT(space,3) & 0x0f;
 					int in,toggle;
 
-					in = ~READ_PORT(machine,0);
+					in = ~READ_PORT(space,0);
 					toggle = in ^ io[chip].lastbuttons;
 					io[chip].lastbuttons = (io[chip].lastbuttons & 1) | (in & 2);
 
@@ -444,10 +446,11 @@ static void handle_coins(running_machine *machine,int chip,int swap)
 	int credit_add = 0;
 	int credit_sub = 0;
 	int button;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-	val = ~READ_PORT(machine,0);	// pins 38-41
+	val = ~READ_PORT(space,0);	// pins 38-41
 	toggled = val ^ io[chip].lastcoins;
 	io[chip].lastcoins = val;
 
@@ -479,7 +482,7 @@ static void handle_coins(running_machine *machine,int chip,int swap)
 		credit_add = 1;
 	}
 
-	val = ~READ_PORT(machine,3);	// pins 30-33
+	val = ~READ_PORT(space,3);	// pins 30-33
 	toggled = val ^ io[chip].lastbuttons;
 	io[chip].lastbuttons = val;
 
@@ -503,10 +506,10 @@ static void handle_coins(running_machine *machine,int chip,int swap)
 	IORAM_WRITE(1 ^ swap, io[chip].credits % 10);	// BCD credits
 	IORAM_WRITE(2 ^ swap, credit_add);	// credit increment (coin inputs)
 	IORAM_WRITE(3 ^ swap, credit_sub);	// credit decrement (start buttons)
-	IORAM_WRITE(4, ~READ_PORT(machine,1));	// pins 22-25
+	IORAM_WRITE(4, ~READ_PORT(space,1));	// pins 22-25
 	button = ((val & 0x05) << 1) | (val & toggled & 0x05);
 	IORAM_WRITE(5, button);	// pins 30 & 32 normal and impulse
-	IORAM_WRITE(6, ~READ_PORT(machine,2));	// pins 26-29
+	IORAM_WRITE(6, ~READ_PORT(space,2));	// pins 26-29
 	button = (val & 0x0a) | ((val & toggled & 0x0a) >> 1);
 	IORAM_WRITE(7, button);	// pins 31 & 33 normal and impulse
 }
@@ -515,6 +518,8 @@ static void handle_coins(running_machine *machine,int chip,int swap)
 
 static void namco_customio_56XX_run(running_machine *machine, int chip)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	LOG(("execute 56XX %d mode %d\n",chip,IORAM_READ(8)));
 
 	switch (IORAM_READ(8))
@@ -523,15 +528,15 @@ static void namco_customio_56XX_run(running_machine *machine, int chip)
 			break;
 
 		case 1:	// read switch inputs
-			IORAM_WRITE(0, ~READ_PORT(machine,0));	// pins 38-41
-			IORAM_WRITE(1, ~READ_PORT(machine,1));	// pins 22-25
-			IORAM_WRITE(2, ~READ_PORT(machine,2));	// pins 26-29
-			IORAM_WRITE(3, ~READ_PORT(machine,3));	// pins 30-33
+			IORAM_WRITE(0, ~READ_PORT(space,0));	// pins 38-41
+			IORAM_WRITE(1, ~READ_PORT(space,1));	// pins 22-25
+			IORAM_WRITE(2, ~READ_PORT(space,2));	// pins 26-29
+			IORAM_WRITE(3, ~READ_PORT(space,3));	// pins 30-33
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-			WRITE_PORT(machine,0,IORAM_READ(9));	// output to pins 13-16 (motos, pacnpal, gaplus)
-			WRITE_PORT(machine,1,IORAM_READ(10));	// output to pins 17-20 (gaplus)
+			WRITE_PORT(space,0,IORAM_READ(9));	// output to pins 13-16 (motos, pacnpal, gaplus)
+			WRITE_PORT(space,1,IORAM_READ(10));	// output to pins 17-20 (gaplus)
 			break;
 
 		case 2:	// initialize coinage settings
@@ -574,16 +579,16 @@ static void namco_customio_56XX_run(running_machine *machine, int chip)
 			break;
 
 		case 9:	// read dip switches and inputs
-			WRITE_PORT(machine,0,0);	// set pin 13 = 0
-			IORAM_WRITE(0, ~READ_PORT(machine,0));	// pins 38-41, pin 13 = 0
-			IORAM_WRITE(2, ~READ_PORT(machine,1));	// pins 22-25, pin 13 = 0
-			IORAM_WRITE(4, ~READ_PORT(machine,2));	// pins 26-29, pin 13 = 0
-			IORAM_WRITE(6, ~READ_PORT(machine,3));	// pins 30-33, pin 13 = 0
-			WRITE_PORT(machine,0,1);	// set pin 13 = 1
-			IORAM_WRITE(1, ~READ_PORT(machine,0));	// pins 38-41, pin 13 = 1
-			IORAM_WRITE(3, ~READ_PORT(machine,1));	// pins 22-25, pin 13 = 1
-			IORAM_WRITE(5, ~READ_PORT(machine,2));	// pins 26-29, pin 13 = 1
-			IORAM_WRITE(7, ~READ_PORT(machine,3));	// pins 30-33, pin 13 = 1
+			WRITE_PORT(space,0,0);	// set pin 13 = 0
+			IORAM_WRITE(0, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 0
+			IORAM_WRITE(2, ~READ_PORT(space,1));	// pins 22-25, pin 13 = 0
+			IORAM_WRITE(4, ~READ_PORT(space,2));	// pins 26-29, pin 13 = 0
+			IORAM_WRITE(6, ~READ_PORT(space,3));	// pins 30-33, pin 13 = 0
+			WRITE_PORT(space,0,1);	// set pin 13 = 1
+			IORAM_WRITE(1, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 1
+			IORAM_WRITE(3, ~READ_PORT(space,1));	// pins 22-25, pin 13 = 1
+			IORAM_WRITE(5, ~READ_PORT(space,2));	// pins 26-29, pin 13 = 1
+			IORAM_WRITE(7, ~READ_PORT(space,3));	// pins 30-33, pin 13 = 1
 			break;
 
 		default:
@@ -595,6 +600,8 @@ static void namco_customio_56XX_run(running_machine *machine, int chip)
 
 static void namco_customio_59XX_run(running_machine *machine, int chip)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	LOG(("execute 59XX %d mode %d\n",chip,IORAM_READ(8)));
 
 	switch (IORAM_READ(8))
@@ -603,10 +610,10 @@ static void namco_customio_59XX_run(running_machine *machine, int chip)
 			break;
 
 		case 3:	// pacnpal chip #1: read dip switches and inputs
-			IORAM_WRITE(4, ~READ_PORT(machine,0));	// pins 38-41, pin 13 = 0 ?
-			IORAM_WRITE(5, ~READ_PORT(machine,2));	// pins 26-29 ?
-			IORAM_WRITE(6, ~READ_PORT(machine,1));	// pins 22-25 ?
-			IORAM_WRITE(7, ~READ_PORT(machine,3));	// pins 30-33
+			IORAM_WRITE(4, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 0 ?
+			IORAM_WRITE(5, ~READ_PORT(space,2));	// pins 26-29 ?
+			IORAM_WRITE(6, ~READ_PORT(space,1));	// pins 22-25 ?
+			IORAM_WRITE(7, ~READ_PORT(space,3));	// pins 30-33
 			break;
 
 		default:
@@ -618,6 +625,8 @@ static void namco_customio_59XX_run(running_machine *machine, int chip)
 
 static void namco_customio_58XX_run(running_machine *machine, int chip)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	LOG(("execute 58XX %d mode %d\n",chip,IORAM_READ(8)));
 
 	switch (IORAM_READ(8))
@@ -626,15 +635,15 @@ static void namco_customio_58XX_run(running_machine *machine, int chip)
 			break;
 
 		case 1:	// read switch inputs
-			IORAM_WRITE(4, ~READ_PORT(machine,0));	// pins 38-41
-			IORAM_WRITE(5, ~READ_PORT(machine,1));	// pins 22-25
-			IORAM_WRITE(6, ~READ_PORT(machine,2));	// pins 26-29
-			IORAM_WRITE(7, ~READ_PORT(machine,3));	// pins 30-33
+			IORAM_WRITE(4, ~READ_PORT(space,0));	// pins 38-41
+			IORAM_WRITE(5, ~READ_PORT(space,1));	// pins 22-25
+			IORAM_WRITE(6, ~READ_PORT(space,2));	// pins 26-29
+			IORAM_WRITE(7, ~READ_PORT(space,3));	// pins 30-33
 
 //popmessage("%x %x %x %x %x %x %x %x",IORAM_READ(8),IORAM_READ(9),IORAM_READ(10),IORAM_READ(11),IORAM_READ(12),IORAM_READ(13),IORAM_READ(14),IORAM_READ(15));
 
-			WRITE_PORT(machine,0,IORAM_READ(9));	// output to pins 13-16 (toypop)
-			WRITE_PORT(machine,1,IORAM_READ(10));	// output to pins 17-20 (toypop)
+			WRITE_PORT(space,0,IORAM_READ(9));	// output to pins 13-16 (toypop)
+			WRITE_PORT(space,1,IORAM_READ(10));	// output to pins 17-20 (toypop)
 			break;
 
 		case 2:	// initialize coinage settings
@@ -652,16 +661,16 @@ static void namco_customio_58XX_run(running_machine *machine, int chip)
 			break;
 
 		case 4:	// read dip switches and inputs
-			WRITE_PORT(machine,0,0);	// set pin 13 = 0
-			IORAM_WRITE(0, ~READ_PORT(machine,0));	// pins 38-41, pin 13 = 0
-			IORAM_WRITE(2, ~READ_PORT(machine,1));	// pins 22-25, pin 13 = 0
-			IORAM_WRITE(4, ~READ_PORT(machine,2));	// pins 26-29, pin 13 = 0
-			IORAM_WRITE(6, ~READ_PORT(machine,3));	// pins 30-33, pin 13 = 0
-			WRITE_PORT(machine,0,1);	// set pin 13 = 1
-			IORAM_WRITE(1, ~READ_PORT(machine,0));	// pins 38-41, pin 13 = 1
-			IORAM_WRITE(3, ~READ_PORT(machine,1));	// pins 22-25, pin 13 = 1
-			IORAM_WRITE(5, ~READ_PORT(machine,2));	// pins 26-29, pin 13 = 1
-			IORAM_WRITE(7, ~READ_PORT(machine,3));	// pins 30-33, pin 13 = 1
+			WRITE_PORT(space,0,0);	// set pin 13 = 0
+			IORAM_WRITE(0, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 0
+			IORAM_WRITE(2, ~READ_PORT(space,1));	// pins 22-25, pin 13 = 0
+			IORAM_WRITE(4, ~READ_PORT(space,2));	// pins 26-29, pin 13 = 0
+			IORAM_WRITE(6, ~READ_PORT(space,3));	// pins 30-33, pin 13 = 0
+			WRITE_PORT(space,0,1);	// set pin 13 = 1
+			IORAM_WRITE(1, ~READ_PORT(space,0));	// pins 38-41, pin 13 = 1
+			IORAM_WRITE(3, ~READ_PORT(space,1));	// pins 22-25, pin 13 = 1
+			IORAM_WRITE(5, ~READ_PORT(space,2));	// pins 26-29, pin 13 = 1
+			IORAM_WRITE(7, ~READ_PORT(space,3));	// pins 30-33, pin 13 = 1
 			break;
 
 		case 5:	// bootup check
@@ -868,25 +877,29 @@ void namco_06xx_init(int chipnum, int cpu,
 
 static UINT8 namcoio_53XX_digdug_read(running_machine *machine, int chip)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	LOG(("%04x: custom 53XX read\n",cpu_get_pc(machine->activecpu)));
 
 	switch ((io[chip].in_count++) % 2)
 	{
 		default:
-		case 0: return READ_PORT(machine,0) | (READ_PORT(machine,1) << 4);
-		case 1: return READ_PORT(machine,2) | (READ_PORT(machine,3) << 4);
+		case 0: return READ_PORT(space,0) | (READ_PORT(space,1) << 4);
+		case 1: return READ_PORT(space,2) | (READ_PORT(space,3) << 4);
 	}
 }
 
 
 static UINT8 namcoio_53XX_polepos_read(running_machine *machine,int chip)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	LOG(("%04x: custom 53XX read\n",cpu_get_pc(machine->activecpu)));
 
 	switch ((io[chip].in_count++) % 8)
 	{
-		case 0: return READ_PORT(machine,0) | (READ_PORT(machine,1) << 4);	// steering
-		case 4: return READ_PORT(machine,2) | (READ_PORT(machine,3) << 4);	// dip switches
+		case 0: return READ_PORT(space,0) | (READ_PORT(space,1) << 4);	// steering
+		case 4: return READ_PORT(space,2) | (READ_PORT(space,3) << 4);	// dip switches
 		default: return 0xff;	// polepos2 hangs if 0 is returned
 	}
 }
@@ -1033,11 +1046,11 @@ static void namco_06xx_ctrl_w(running_machine *machine, int chip,int data)
 
 
 
-READ8_HANDLER( namco_06xx_0_data_r )		{ return namco_06xx_data_r(space,0,offset); }
-READ8_HANDLER( namco_06xx_1_data_r )		{ return namco_06xx_data_r(space,1,offset); }
-WRITE8_HANDLER( namco_06xx_0_data_w )	{ namco_06xx_data_w(space,0,offset,data); }
-WRITE8_HANDLER( namco_06xx_1_data_w )	{ namco_06xx_data_w(space,1,offset,data); }
-READ8_HANDLER( namco_06xx_0_ctrl_r )		{ return namco_06xx_ctrl_r(space,0); }
-READ8_HANDLER( namco_06xx_1_ctrl_r )		{ return namco_06xx_ctrl_r(space,1); }
-WRITE8_HANDLER( namco_06xx_0_ctrl_w )	{ namco_06xx_ctrl_w(space, 0,data); }
-WRITE8_HANDLER( namco_06xx_1_ctrl_w )	{ namco_06xx_ctrl_w(space, 1,data); }
+READ8_HANDLER( namco_06xx_0_data_r )		{ return namco_06xx_data_r(space->machine,0,offset); }
+READ8_HANDLER( namco_06xx_1_data_r )		{ return namco_06xx_data_r(space->machine,1,offset); }
+WRITE8_HANDLER( namco_06xx_0_data_w )	{ namco_06xx_data_w(space->machine,0,offset,data); }
+WRITE8_HANDLER( namco_06xx_1_data_w )	{ namco_06xx_data_w(space->machine,1,offset,data); }
+READ8_HANDLER( namco_06xx_0_ctrl_r )		{ return namco_06xx_ctrl_r(space->machine,0); }
+READ8_HANDLER( namco_06xx_1_ctrl_r )		{ return namco_06xx_ctrl_r(space->machine,1); }
+WRITE8_HANDLER( namco_06xx_0_ctrl_w )	{ namco_06xx_ctrl_w(space->machine, 0,data); }
+WRITE8_HANDLER( namco_06xx_1_ctrl_w )	{ namco_06xx_ctrl_w(space->machine, 1,data); }

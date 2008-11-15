@@ -3907,7 +3907,9 @@ INTERRUPT_GEN( psx_vblank )
 
 void psx_gpu_reset( running_machine *machine )
 {
-	psx_gpu_w( machine, 1, 0, 0xffffffff );
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	psx_gpu_w(space, 1, 0, 0xffffffff );
 }
 
 void psx_lightgun_set( int n_x, int n_y )

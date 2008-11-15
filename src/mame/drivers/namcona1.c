@@ -498,6 +498,7 @@ static READ16_HANDLER( namcona1_vreg_r )
 static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 {
 	UINT16 data;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	if( source>=0x400000 && source<0xc00000 )
 	{
@@ -518,15 +519,15 @@ static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source 
 	}
 	if( dest>=0xf00000 && dest<0xf02000 )
 	{
-		namcona1_paletteram_w( machine, (dest-0xf00000)/2, data, 0xffff );
+		namcona1_paletteram_w(space, (dest-0xf00000)/2, data, 0xffff );
 	}
 	else if( dest>=0xf40000 && dest<0xf80000 )
 	{
-		namcona1_gfxram_w( machine, (dest-0xf40000)/2, data, 0xffff );
+		namcona1_gfxram_w(space, (dest-0xf40000)/2, data, 0xffff );
 	}
 	else if( dest>=0xff0000 && dest<0xffc000 )
-	{
-		namcona1_videoram_w( machine, (dest-0xff0000)/2, data, 0xffff );
+	{				 
+		namcona1_videoram_w(space, (dest-0xff0000)/2, data, 0xffff );
 	}
 	else if( dest>=0xfff000 && dest<0x1000000 )
 	{
