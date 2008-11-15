@@ -443,11 +443,11 @@ WRITE32_HANDLER( zeus_w )
 
 	/* 32-bit mode */
 	if (zeusbase[0x80] & 0x00020000)
-		zeus_register32_w(space, offset, data, logit);
+		zeus_register32_w(space->machine, offset, data, logit);
 
 	/* 16-bit mode */
 	else
-		zeus_register16_w(space, offset, data, logit);
+		zeus_register16_w(space->machine, offset, data, logit);
 }
 
 

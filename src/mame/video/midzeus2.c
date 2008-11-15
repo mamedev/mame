@@ -472,7 +472,7 @@ WRITE32_HANDLER( zeus2_w )
 				 offset != 0x50 && offset != 0x51 && offset != 0x57 && offset != 0x58 && offset != 0x59 && offset != 0x5a && offset != 0x5e);
 	if (logit)
 		logerror("%06X:zeus2_w", cpu_get_pc(space->cpu));
-	zeus_register32_w(space, offset, data, logit);
+	zeus_register32_w(space->machine, offset, data, logit);
 }
 
 
