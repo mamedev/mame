@@ -2604,7 +2604,7 @@ static MACHINE_DRIVER_START( stv )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(192))	// guess, needed to force video update after V-Blank OUT interrupt
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_SIZE(704, 512)
+	MDRV_SCREEN_SIZE(704*2, 512*2)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 703, 0*8, 511) // we need to use a resolution as high as the max size it can change to
 
 	MDRV_PALETTE_LENGTH(2048+(2048*2))//standard palette + extra memory for rgb brightness.
