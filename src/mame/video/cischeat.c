@@ -1341,11 +1341,15 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 
 	if (msk != 0) megasys1_active_layers &= msk;
 #if 1
-	popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
-						scudhamm_motor_command,
-						scudhamm_motor_pos_r(screen->machine,0,0xffff),
-						scudhamm_motor_status_r(screen->machine,0,0xffff),
-						scudhamm_analog_r(screen->machine,0,0xffff) );
+	{
+		const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
+							scudhamm_motor_command,
+							scudhamm_motor_pos_r(space,0,0xffff),
+							scudhamm_motor_status_r(space,0,0xffff),
+							scudhamm_analog_r(space,0,0xffff) );
+	}
 #endif
 
 }
