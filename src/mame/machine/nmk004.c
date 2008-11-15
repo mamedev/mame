@@ -996,23 +996,23 @@ static void update_music(const address_space *space)
 
 
 
-void NMK004_irq(const address_space *space, int irq)
+void NMK004_irq(running_machine *machine, int irq)
 {
-	int status;
-
-	if (!irq) return;
-
-	status = ym2203_status_port_0_r(space,0);
-
-	if (status & 1)	// timer A expired
+	if (irq)
 	{
-		oki_update_state(space);
-		get_command(space);
-		update_music(space);
+		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+		int status = ym2203_status_port_0_r(space,0);
 
-		// restart timer
-		ym2203_control_port_0_w(space, 0, 0x27);
-		ym2203_write_port_0_w(space, 0, 0x15);
+		if (status & 1)	// timer A expired
+		{
+			oki_update_state(space);
+			get_command(space);
+			update_music(space);
+
+			// restart timer
+			ym2203_control_port_0_w(space, 0, 0x27);
+			ym2203_write_port_0_w(space, 0, 0x15);
+		}
 	}
 }
 
