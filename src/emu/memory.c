@@ -1316,6 +1316,10 @@ void memory_configure_bank(int banknum, int startentry, int numentries, void *ba
 	/* fill in the requested bank entries */
 	for (entrynum = startentry; entrynum < startentry + numentries; entrynum++)
 		bankdata[banknum].entry[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
+	
+	/* if we have no bankptr yet, set it to the first entry */
+	if (bank_ptr[banknum] == NULL)
+		bank_ptr[banknum] = bankdata[banknum].entry[0];
 }
 
 
