@@ -305,7 +305,8 @@ static int m6295_bank;
 static UINT16 m6295_key_delay;
 static INTERRUPT_GEN( kickgoal_interrupt )
 {
-	if ((okim6295_status_0_r(device->machine,0) & 0x08) == 0)
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	if ((okim6295_status_0_r(space,0) & 0x08) == 0)
 	{
 		switch(kickgoal_melody_loop)
 		{
@@ -334,8 +335,8 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		if (kickgoal_melody_loop)
 		{
 //          logerror("Changing to sample %02x\n",kickgoal_melody_loop);
-			okim6295_data_0_w(device->machine,0,((0x80 | kickgoal_melody_loop) & 0xff));
-			okim6295_data_0_w(device->machine,0,0x81);
+			okim6295_data_0_w(space,0,((0x80 | kickgoal_melody_loop) & 0xff));
+			okim6295_data_0_w(space,0,0x81);
 		}
 	}
 	if ( input_code_pressed_once(KEYCODE_PGUP) )
@@ -412,9 +413,9 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 	{
 		if (m6295_key_delay >= (0x80 * oki_time_base))
 		{
-			okim6295_data_0_w(device->machine,0,0x78);
-			okim6295_data_0_w(device->machine,0,(0x80 | m6295_comm));
-			okim6295_data_0_w(device->machine,0,0x11);
+			okim6295_data_0_w(space,0,0x78);
+			okim6295_data_0_w(space,0,(0x80 | m6295_comm));
+			okim6295_data_0_w(space,0,0x11);
 
 			popmessage("Playing sound %02x on Bank %02x",m6295_comm,m6295_bank);
 

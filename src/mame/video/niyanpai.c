@@ -86,10 +86,10 @@ WRITE16_HANDLER( niyanpai_palette_w )
 
 
 ******************************************************************************/
-static int niyanpai_blitter_r(running_machine *machine, int vram, int offset)
+static int niyanpai_blitter_r(const address_space *space, int vram, int offset)
 {
 	int ret;
-	UINT8 *GFXROM = memory_region(machine, "gfx1");
+	UINT8 *GFXROM = memory_region(space->machine, "gfx1");
 
 	switch (offset)
 	{
@@ -101,7 +101,7 @@ static int niyanpai_blitter_r(running_machine *machine, int vram, int offset)
 	return ret;
 }
 
-static void niyanpai_blitter_w(running_machine *machine, int vram, int offset, int data)
+static void niyanpai_blitter_w(const address_space *space, int vram, int offset, int data)
 {
 	switch (offset)
 	{
@@ -113,7 +113,7 @@ static void niyanpai_blitter_w(running_machine *machine, int vram, int offset, i
 				//  if (data & 0x20) popmessage("Unknown GFX Flag!! (0x20)");
 					niyanpai_flipscreen[vram] = (data & 0x40) ? 0 : 1;
 					niyanpai_dispflag[vram] = (data & 0x80) ? 1 : 0;
-					niyanpai_vramflip(machine, vram);
+					niyanpai_vramflip(space->machine, vram);
 					break;
 		case 0x01:	niyanpai_scrollx[vram] = (niyanpai_scrollx[vram] & 0x0100) | data; break;
 		case 0x02:	niyanpai_scrollx[vram] = (niyanpai_scrollx[vram] & 0x00ff) | ((data << 8) & 0x0100); break;
@@ -128,7 +128,7 @@ static void niyanpai_blitter_w(running_machine *machine, int vram, int offset, i
 		case 0x0b:	blitter_destx[vram] = (blitter_destx[vram]  & 0x00ff) | (data << 8); break;
 		case 0x0c:	blitter_desty[vram] = (blitter_desty[vram]  & 0xff00) | data; break;
 		case 0x0d:	blitter_desty[vram] = (blitter_desty[vram]  & 0x00ff) | (data << 8);
-					niyanpai_gfxdraw(machine, vram);
+					niyanpai_gfxdraw(space->machine, vram);
 					break;
 		default:	break;
 	}

@@ -220,6 +220,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( groundfx )
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 layer[5];
 	UINT8 pivlayer[3];
 	UINT16 priority;
@@ -261,12 +262,12 @@ VIDEO_UPDATE( groundfx )
         it's contents the usual way.
 
     */
-	if (TC0100SCN_long_r(screen->machine,0x4090/4,0xffffffff) || TC0480SCP_long_r(screen->machine,0x20/4,0xffffffff)==0x240866) { /* Anything in text layer - really stupid hack */
+	if (TC0100SCN_long_r(space,0x4090/4,0xffffffff) || TC0480SCP_long_r(space,0x20/4,0xffffffff)==0x240866) { /* Anything in text layer - really stupid hack */
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[1],0,2);
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[2],0,4);
 		TC0480SCP_tilemap_draw(bitmap,cliprect,layer[3],0,8);
 //      TC0100SCN_tilemap_draw(machine,bitmap,cliprect,0,pivlayer[2],0,0);
-		if (TC0480SCP_long_r(screen->machine,0x20/4,0xffffffff)!=0x240866) /* Stupid hack for start of race */
+		if (TC0480SCP_long_r(space,0x20/4,0xffffffff)!=0x240866) /* Stupid hack for start of race */
 			TC0480SCP_tilemap_draw(bitmap,&hack_cliprect,layer[0],0,0);
 		draw_sprites(screen->machine,bitmap,cliprect,1,44,-574);
 	} else {

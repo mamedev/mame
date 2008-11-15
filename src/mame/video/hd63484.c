@@ -1358,7 +1358,7 @@ WRITE16_HANDLER( HD63484_data_w )
 	if (regno & 0x80) regno += 2;	/* autoincrement */
 logerror("PC %05x: HD63484 register %02x write %04x\n",cpu_get_pc(space->cpu),regno,HD63484_reg[regno/2]);
 	if (regno == 0)	/* FIFO */
-		HD63484_command_w(space, HD63484_reg[0]);
+		HD63484_command_w(space->machine, HD63484_reg[0]);
 }
 
 READ16_HANDLER( HD63484_data_r )

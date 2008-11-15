@@ -48,7 +48,7 @@ static tilemap *bg_tilemap[2][4];
 
 ***************************************************************************/
 
-static void mrokumei_handleblit( running_machine *machine, int rom_base )
+static void mrokumei_handleblit( const address_space *space, int rom_base )
 {
 	int i;
 	int DestParam;
@@ -56,7 +56,7 @@ static void mrokumei_handleblit( running_machine *machine, int rom_base )
 	int DestAddr;
 	int BaseAddr;
 	int opcode,data,NumTiles;
-	UINT8 *pBlitData = memory_region(machine, "user1") + rom_base;
+	UINT8 *pBlitData = memory_region(space->machine, "user1") + rom_base;
 
 	DestParam =
 		blitter_param[(blitter_param_count-4)&3]*256+
@@ -116,7 +116,7 @@ static void mrokumei_handleblit( running_machine *machine, int rom_base )
 			} /* i!=0 */
 
 			if (data)	/* 00 is a nop */
-				mrokumei_videoram_w( machine, BaseAddr + DestAddr, data );
+				mrokumei_videoram_w( space, BaseAddr + DestAddr, data );
 
 			if (homedata_vreg[1] & 0x80)	/* flip screen */
 			{
@@ -132,17 +132,17 @@ static void mrokumei_handleblit( running_machine *machine, int rom_base )
 	} /* for(;;) */
 
 finish:
-	cpu_set_input_line(machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
 }
 
-static void reikaids_handleblit( running_machine *machine, int rom_base )
+static void reikaids_handleblit( const address_space *space, int rom_base )
 {
 	int i;
 	UINT16 DestParam;
 	int flipx;
 	int SourceAddr, BaseAddr;
 	int DestAddr;
-	UINT8 *pBlitData = memory_region(machine, "user1") + rom_base;
+	UINT8 *pBlitData = memory_region(space->machine, "user1") + rom_base;
 
 	int opcode,data,NumTiles;
 
@@ -220,7 +220,7 @@ static void reikaids_handleblit( running_machine *machine, int rom_base )
 						addr ^= 0x007c;
 					}
 
-					reikaids_videoram_w( machine, addr, dat );
+					reikaids_videoram_w( space, addr, dat );
 				}
 			}
 
@@ -232,17 +232,17 @@ static void reikaids_handleblit( running_machine *machine, int rom_base )
 	}
 
 finish:
-	cpu_set_input_line(machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
 }
 
-static void pteacher_handleblit( running_machine *machine, int rom_base )
+static void pteacher_handleblit( const address_space *space, int rom_base )
 {
 	int i;
 	int DestParam;
 	int SourceAddr;
 	int DestAddr, BaseAddr;
 	int opcode,data,NumTiles;
-	UINT8 *pBlitData = memory_region(machine, "user1") + rom_base;
+	UINT8 *pBlitData = memory_region(space->machine, "user1") + rom_base;
 
 	DestParam =
 		blitter_param[(blitter_param_count-4)&3]*256+
@@ -308,7 +308,7 @@ static void pteacher_handleblit( running_machine *machine, int rom_base )
 				if ((addr & 0x2080) == 0)
 				{
 					addr = ((addr & 0xc000) >> 2) | ((addr & 0x1f00) >> 1) | (addr & 0x7f);
-					pteacher_videoram_w( machine, addr, data );
+					pteacher_videoram_w( space, addr, data );
 				}
 			}
 
@@ -320,7 +320,7 @@ static void pteacher_handleblit( running_machine *machine, int rom_base )
 	} /* for(;;) */
 
 finish:
-	cpu_set_input_line(machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[0],M6809_FIRQ_LINE,HOLD_LINE);
 }
 
 
@@ -650,7 +650,7 @@ WRITE8_HANDLER( pteacher_blitter_bank_w )
 
 WRITE8_HANDLER( mrokumei_blitter_start_w )
 {
-	if (data & 0x80) mrokumei_handleblit(space->machine, ((blitter_bank & 0x04) >> 2) * 0x10000);
+	if (data & 0x80) mrokumei_handleblit(space, ((blitter_bank & 0x04) >> 2) * 0x10000);
 
 	/* bit 0 = bank switch; used by hourouki to access the
        optional service mode ROM (not available in current dump) */
@@ -658,12 +658,12 @@ WRITE8_HANDLER( mrokumei_blitter_start_w )
 
 WRITE8_HANDLER( reikaids_blitter_start_w )
 {
-	reikaids_handleblit(space->machine, (blitter_bank & 3) * 0x10000);
+	reikaids_handleblit(space, (blitter_bank & 3) * 0x10000);
 }
 
 WRITE8_HANDLER( pteacher_blitter_start_w )
 {
-	pteacher_handleblit(space->machine, (blitter_bank >> 5) * 0x10000 & (memory_region_length(space->machine, "user1") - 1));
+	pteacher_handleblit(space, (blitter_bank >> 5) * 0x10000 & (memory_region_length(space->machine, "user1") - 1));
 }
 
 

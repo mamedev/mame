@@ -220,6 +220,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( dogfgt )
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	static int lastflip,lastpixcolor;
 	int offs;
 
@@ -230,7 +231,7 @@ VIDEO_UPDATE( dogfgt )
 		lastpixcolor = pixcolor;
 
 		for (offs = 0;offs < BITMAPRAM_SIZE;offs++)
-			internal_bitmapram_w(screen->machine,offs,bitmapram[offs]);
+			internal_bitmapram_w(space,offs,bitmapram[offs]);
 	}
 
 
