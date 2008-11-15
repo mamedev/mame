@@ -88,6 +88,8 @@ static UINT16 galpani3_framebuffer2_scrolly;
 static UINT16 galpani3_framebuffer2_scrollx;
 static UINT16 galpani3_framebuffer1_scrolly;
 static UINT16 galpani3_framebuffer1_scrollx;
+static UINT16 galpani3_priority_buffer_scrollx;
+static UINT16 galpani3_priority_buffer_scrolly;
 
 
 static UINT16 *galpani3_sprregs, *galpani3_spriteram;
@@ -137,15 +139,21 @@ static VIDEO_UPDATE(galpani3)
 			int srcline2 = (drawy+galpani3_framebuffer2_scrolly+11)&0x1ff;
 			int srcline3 = (drawy+galpani3_framebuffer3_scrolly+11)&0x1ff;
 
+			int priline  = (drawy+galpani3_priority_buffer_scrolly+11)&0x1ff;
+
 			for (drawx=0;drawx<512;drawx++)
 			{
 				int srcoffs1 = (drawx+galpani3_framebuffer1_scrollx+67)&0x1ff;
 				int srcoffs2 = (drawx+galpani3_framebuffer2_scrollx+67)&0x1ff;
 				int srcoffs3 = (drawx+galpani3_framebuffer3_scrollx+67)&0x1ff;
 
+				int prioffs  = (drawx+galpani3_priority_buffer_scrollx+67)&0x1ff;
+
 				UINT8 dat1 = galpani3_framebuffer1[(srcline1*0x200)+srcoffs1];
 				UINT8 dat2 = galpani3_framebuffer2[(srcline2*0x200)+srcoffs2];
 				UINT8 dat3 = galpani3_framebuffer3[(srcline3*0x200)+srcoffs3];
+
+				UINT8 pridat = galpani3_priority_buffer[(priline*0x200)+prioffs];
 
 				UINT16* dst = BITMAP_ADDR16(bitmap, drawy, drawx);
 
@@ -153,6 +161,34 @@ static VIDEO_UPDATE(galpani3)
 				else if (dat2) dst[0] = dat2+0x4100;
 				else if (dat1) dst[0] = dat1+0x4000;
 
+				if (pridat==0x0f) // relates to the area you've drawn over
+				{
+					//dst[0] = mame_rand(screen->machine)&0x3fff;
+				}
+				else if (pridat==0x2f) // area outside of the girl
+				{
+					//dst[0] = mame_rand(screen->machine)&0x3fff;
+				}
+				else if (pridat==0xcf) // the girl
+				{
+					//dst[0] = mame_rand(screen->machine)&0x3fff;
+				}
+				else if (pridat==0x00) // the initial line / box that gets drawn
+				{
+					//dst[0] = mame_rand(screen->machine)&0x3fff;
+				}
+				else if (pridat==0x30) // during the 'gals boxes' on the intro
+				{
+					//dst[0] = mame_rand(screen->machine)&0x3fff;
+				}
+				else if (pridat==0x0c) // 'nice' at end of level
+				{
+					//dst[0] = mame_rand(screen->machine)&0x3fff;
+				}
+				else
+				{
+					//printf("%02x, ",pridat);
+				}
 			}
 		}
 	}
@@ -598,6 +634,18 @@ static WRITE16_HANDLER( galpani3_framebuffer1_scrollx_w )
 	galpani3_framebuffer1_scrollx = data;
 }
 
+static WRITE16_HANDLER( galpani3_priority_buffer_scrollx_w )
+{
+	galpani3_priority_buffer_scrollx = data;
+}
+
+static WRITE16_HANDLER( galpani3_priority_buffer_scrolly_w )
+{
+	galpani3_priority_buffer_scrolly = data;
+}
+
+
+
 static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x17ffff) AM_ROM
 
@@ -659,8 +707,8 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	// ?? priority / alpha buffer?
 	AM_RANGE(0xe00000, 0xe7ffff) AM_RAM AM_BASE(&galpani3_priority_buffer) // area [J] - A area ? odd bytes only, initialized 00..ff,00..ff,..., then cleared
-	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(SMH_NOP) // scroll?
-	AM_RANGE(0xe80002, 0xe80003) AM_WRITE(SMH_NOP) // scroll?
+	AM_RANGE(0xe80000, 0xe80001) AM_WRITE(galpani3_priority_buffer_scrollx_w) // scroll?
+	AM_RANGE(0xe80002, 0xe80003) AM_WRITE(galpani3_priority_buffer_scrolly_w) // scroll?
 
 
 	AM_RANGE(0xf00000, 0xf00001) AM_NOP // ? written once (2nd opcode, $1.b)
