@@ -2057,7 +2057,7 @@ static WRITE16_HANDLER( peripheral_w )
 			break;
 
 		case 5:	/* Ataxx/WSF/Indy Heat only */
-			ataxx_dac_control(space->machine, offset, data, mem_mask);
+			ataxx_dac_control(space, offset, data, mem_mask);
 			break;
 
 		default:

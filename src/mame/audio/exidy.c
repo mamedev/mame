@@ -405,17 +405,18 @@ static void r6532_porta_w(const device_config *device, UINT8 newdata, UINT8 oldd
 
 static void r6532_portb_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (has_tms5220)
 	{
 		if ((olddata & 0x01) && !(newdata & 0x01))
 		{
-			riot6532_porta_in_set(riot, tms5220_status_r(device->machine, 0), 0xff);
-			logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(device->machine->activecpu), tms5220_status_r(device->machine, 0));
+			riot6532_porta_in_set(riot, tms5220_status_r(space, 0), 0xff);
+			logerror("(%f)%04X:TMS5220 status read = %02X\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(device->machine->activecpu), tms5220_status_r(space, 0));
 		}
 		if ((olddata & 0x02) && !(newdata & 0x02))
 		{
 			logerror("(%f)%04X:TMS5220 data write = %02X\n", attotime_to_double(timer_get_time()), cpu_get_previouspc(device->machine->activecpu), riot6532_porta_out_get(riot));
-			tms5220_data_w(device->machine, 0, riot6532_porta_out_get(riot));
+			tms5220_data_w(space, 0, riot6532_porta_out_get(riot));
 		}
 	}
 }

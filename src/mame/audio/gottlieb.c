@@ -43,7 +43,7 @@ static int random_offset;
 
 
 static void gottlieb1_sh_w(const device_config *riot, UINT8 data);
-static void gottlieb2_sh_w(running_machine *machine, UINT8 data);
+static void gottlieb2_sh_w(const address_space *space, UINT8 data);
 static void trigger_sample(running_machine *machine, UINT8 data);
 
 
@@ -373,20 +373,20 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void gottlieb2_sh_w(running_machine *machine, UINT8 data)
+static void gottlieb2_sh_w(const address_space *space, UINT8 data)
 {
 	/* when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested */
 	if (data != 0xff)
 	{
 		/* each CPU has its own latch */
-		soundlatch_w(machine, 0, data);
-		soundlatch2_w(machine, 0, data);
+		soundlatch_w(space, 0, data);
+		soundlatch2_w(space, 0, data);
 
 		/* if the previous data was 0xff, clock an IRQ on each */
 		if (last_command == 0xff)
 		{
-			cputag_set_input_line(machine, "audio", M6502_IRQ_LINE, ASSERT_LINE);
-			cputag_set_input_line(machine, "speech", M6502_IRQ_LINE, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "audio", M6502_IRQ_LINE, ASSERT_LINE);
+			cputag_set_input_line(space->machine, "speech", M6502_IRQ_LINE, ASSERT_LINE);
 		}
 	}
 	last_command = data;

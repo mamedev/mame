@@ -1320,7 +1320,7 @@ static WRITE16_HANDLER( dsio_w )
 			dmadac_enable(0, dcs.channels, DSIO_MUTE);
 
 			/* bit 0 resets the FIFO */
-			midway_ioasic_fifo_reset_w(space, DSIO_EMPTY_FIFO ^ 1);
+			midway_ioasic_fifo_reset_w(space->machine, DSIO_EMPTY_FIFO ^ 1);
 			break;
 
 		/* offset 2 controls RAM pages */
@@ -1391,7 +1391,7 @@ static WRITE16_HANDLER( denver_w )
 
 		/* offset 3 controls FIFO reset */
 		case 3:
-			midway_ioasic_fifo_reset_w(space, 1);
+			midway_ioasic_fifo_reset_w(space->machine, 1);
 			break;
 	}
 }
