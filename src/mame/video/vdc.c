@@ -1068,9 +1068,11 @@ READ8_HANDLER( vpc_r ) {
 	return data;
 }
 
-static void vpc_init( running_machine *machine ) {
-	vpc_w( machine, 0, 0x11 );
-	vpc_w( machine, 1, 0x11 );
+static void vpc_init( running_machine *machine )
+{
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	vpc_w( space, 0, 0x11 );
+	vpc_w( space, 1, 0x11 );
 	vpc.window1.w = 0;
 	vpc.window2.w = 0;
 	vpc.vdc_select = 0;
@@ -1078,13 +1080,13 @@ static void vpc_init( running_machine *machine ) {
 
 WRITE8_HANDLER( sgx_vdc_w ) {
 	if ( vpc.vdc_select ) {
-		vdc_1_w( space->machine, offset, data );
+		vdc_1_w( space, offset, data );
 	} else {
-		vdc_0_w( space->machine, offset, data );
+		vdc_0_w( space, offset, data );
 	}
 }
 
 READ8_HANDLER( sgx_vdc_r ) {
-	return ( vpc.vdc_select ) ? vdc_1_r( space->machine, offset ) : vdc_0_r( space->machine, offset );
+	return ( vpc.vdc_select ) ? vdc_1_r( space, offset ) : vdc_0_r( space, offset );
 }
 

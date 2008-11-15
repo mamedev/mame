@@ -1145,7 +1145,9 @@ VIDEO_UPDATE( psikyosh ) /* Note the z-buffer on each sprite to get correct prio
 
 VIDEO_EOF( psikyosh )
 {
-	buffer_spriteram32_w(machine,0,0,0xffffffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	buffer_spriteram32_w(space,0,0,0xffffffff);
 }
 
 /*popmessage   ("Regs %08x %08x %08x\n     %08x %08x %08x",

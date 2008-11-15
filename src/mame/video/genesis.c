@@ -335,11 +335,11 @@ READ16_HANDLER( genesis_vdp_r )
 	{
 		case 0x00:	/* Read Data */
 		case 0x01:
-			return vdp_data_r(space);
+			return vdp_data_r(space->machine);
 
 		case 0x02:	/* Status Register */
 		case 0x03:
-			return vdp_control_r(space);
+			return vdp_control_r(space->machine);
 
 		case 0x04:	/* HV counter */
 		case 0x05:
@@ -377,7 +377,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 				 else
 				 	data |= data << 8;
 			}
-			vdp_data_w(space, data);
+			vdp_data_w(space->machine, data);
 			break;
 
 		case 0x02:	/* Control Write */
@@ -390,7 +390,7 @@ WRITE16_HANDLER( genesis_vdp_w )
 				 else
 				 	data |= data << 8;
 			}
-			vdp_control_w(space, data);
+			vdp_control_w(space->machine, data);
 			break;
 
 		case 0x08:	/* SN76489 Write */

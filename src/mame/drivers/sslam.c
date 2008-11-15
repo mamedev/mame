@@ -241,8 +241,9 @@ VIDEO_UPDATE(powerbls);
 static TIMER_CALLBACK( music_playback )
 {
 	int pattern = 0;
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-	if ((okim6295_status_0_r(machine,0) & 0x08) == 0)
+	if ((okim6295_status_0_r(space,0) & 0x08) == 0)
 	{
 		if (sslam_bar != 0) {
 			sslam_bar += 1;
@@ -263,8 +264,8 @@ static TIMER_CALLBACK( music_playback )
 		}
 		if (pattern) {
 			logerror("Changing bar in music track to pattern %02x\n",pattern);
-			okim6295_data_0_w(machine,0,(0x80 | pattern));
-			okim6295_data_0_w(machine,0,0x81);
+			okim6295_data_0_w(space,0,(0x80 | pattern));
+			okim6295_data_0_w(space,0,0x81);
 		}
 	}
 //  {
@@ -274,9 +275,9 @@ static TIMER_CALLBACK( music_playback )
 }
 
 
-static void sslam_play(running_machine *machine, int track, int data)
+static void sslam_play(const address_space *space, int track, int data)
 {
-	int status = okim6295_status_0_r(machine,0);
+	int status = okim6295_status_0_r(space,0);
 
 	if (data < 0x80) {
 		if (track) {
@@ -284,24 +285,24 @@ static void sslam_play(running_machine *machine, int track, int data)
 				sslam_track  = data;
 				sslam_bar = 1;
 				if (status & 0x08)
-					okim6295_data_0_w(machine,0,0x40);
-				okim6295_data_0_w(machine,0,(0x80 | data));
-				okim6295_data_0_w(machine,0,0x81);
+					okim6295_data_0_w(space,0,0x40);
+				okim6295_data_0_w(space,0,(0x80 | data));
+				okim6295_data_0_w(space,0,0x81);
 				timer_adjust_periodic(music_timer, ATTOTIME_IN_MSEC(4), 0, ATTOTIME_IN_HZ(250));	/* 250Hz for smooth sequencing */
 			}
 		}
 		else {
 			if ((status & 0x01) == 0) {
-				okim6295_data_0_w(machine,0,(0x80 | data));
-				okim6295_data_0_w(machine,0,0x11);
+				okim6295_data_0_w(space,0,(0x80 | data));
+				okim6295_data_0_w(space,0,0x11);
 			}
 			else if ((status & 0x02) == 0) {
-				okim6295_data_0_w(machine,0,(0x80 | data));
-				okim6295_data_0_w(machine,0,0x21);
+				okim6295_data_0_w(space,0,(0x80 | data));
+				okim6295_data_0_w(space,0,0x21);
 			}
 			else if ((status & 0x04) == 0) {
-				okim6295_data_0_w(machine,0,(0x80 | data));
-				okim6295_data_0_w(machine,0,0x41);
+				okim6295_data_0_w(space,0,(0x80 | data));
+				okim6295_data_0_w(space,0,0x41);
 			}
 		}
 	}
@@ -313,7 +314,7 @@ static void sslam_play(running_machine *machine, int track, int data)
 			sslam_bar = 0;
 		}
 		data &= 0x7f;
-		okim6295_data_0_w(machine,0,data);
+		okim6295_data_0_w(space,0,data);
 	}
 }
 
@@ -326,7 +327,7 @@ static WRITE16_HANDLER( sslam_snd_w )
 			if (data == 0xfe) {
 				/* This should reset the sound MCU and stop audio playback, but here, it */
 				/* chops the first coin insert. So let's only stop any playing melodies. */
-				sslam_play(space->machine, 1, (0x80 | 0x40));		/* Stop playing the melody */
+				sslam_play(space, 1, (0x80 | 0x40));		/* Stop playing the melody */
 			}
 			else {
 				logerror("Unknown command (%02x) sent to the Sound controller\n",data);
@@ -348,7 +349,7 @@ static WRITE16_HANDLER( sslam_snd_w )
 //              if (sslam_snd_bank != 1)
 //                  okim6295_set_bank_base(0, (1 * 0x40000));
 //              sslam_snd_bank = 1;
-				sslam_play(space->machine, 0, sslam_sound);
+				sslam_play(space, 0, sslam_sound);
 			}
 			else if (sslam_sound >= 0x69) {
 				if (sslam_snd_bank != 2)
@@ -361,14 +362,14 @@ static WRITE16_HANDLER( sslam_snd_w )
 					case 0x6c:	sslam_melody = 7; break;
 					default:	sslam_melody = 0; sslam_bar = 0; break;	/* Invalid */
 				}
-				sslam_play(space->machine, sslam_melody, sslam_sound);
+				sslam_play(space, sslam_melody, sslam_sound);
 			}
 			else if (sslam_sound >= 0x65) {
 				if (sslam_snd_bank != 1)
 					okim6295_set_bank_base(0, (1 * 0x40000));
 				sslam_snd_bank = 1;
 				sslam_melody = 4;
-				sslam_play(space->machine, sslam_melody, sslam_sound);
+				sslam_play(space, sslam_melody, sslam_sound);
 			}
 			else if (sslam_sound >= 0x60) {
 				if (sslam_snd_bank != 0)
@@ -381,10 +382,10 @@ static WRITE16_HANDLER( sslam_snd_w )
 					case 0x64:	sslam_melody = 3; break;
 					default:	sslam_melody = 0; sslam_bar = 0; break;	/* Invalid */
 				}
-				sslam_play(space->machine, sslam_melody, sslam_sound);
+				sslam_play(space, sslam_melody, sslam_sound);
 			}
 			else {
-				sslam_play(space->machine, 0, sslam_sound);
+				sslam_play(space, 0, sslam_sound);
 			}
 		}
 	}
