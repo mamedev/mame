@@ -79,10 +79,12 @@ static MACHINE_RESET( atarigt )
 
 static void cage_irq_callback(running_machine *machine, int reason)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
 	if (reason)
 		atarigen_sound_int_gen(machine->cpu[0]);
 	else
-		atarigen_sound_int_ack_w(machine,0,0,0xffff);
+		atarigen_sound_int_ack_w(space,0,0,0xffff);
 }
 
 
@@ -192,7 +194,7 @@ static WRITE32_HANDLER( latch_w )
 	if (ACCESSING_BITS_24_31)
 	{
 		/* bits 13-11 are the MO control bits */
-		atarirle_control_w(space, 0, (data >> 27) & 7);
+		atarirle_control_w(space->machine, 0, (data >> 27) & 7);
 	}
 
 	if (ACCESSING_BITS_16_23)
@@ -240,7 +242,7 @@ static READ32_HANDLER( sound_data_r )
 static WRITE32_HANDLER( sound_data_w )
 {
 	if (ACCESSING_BITS_0_15)
-		cage_control_w(space, data);
+		cage_control_w(space->machine, data);
 	if (ACCESSING_BITS_16_31)
 		main_to_cage_w(data >> 16);
 }

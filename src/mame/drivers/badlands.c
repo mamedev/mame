@@ -127,9 +127,11 @@ static void update_interrupts(running_machine *machine)
 
 static void scanline_update(const device_config *screen, int scanline)
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[1], ADDRESS_SPACE_PROGRAM);
+
 	/* sound IRQ is on 32V */
 	if (scanline & 32)
-		atarigen_6502_irq_ack_r(screen->machine, 0);
+		atarigen_6502_irq_ack_r(space, 0);
 	else if (!(input_port_read(screen->machine, "FE4000") & 0x40))
 		atarigen_6502_irq_gen(screen->machine->cpu[1]);
 }

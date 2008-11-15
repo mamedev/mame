@@ -360,8 +360,10 @@ static WRITE16_HANDLER( bankselect_w )
 
 static STATE_POSTLOAD( bankselect_postload )
 {
-	bankselect_w(machine, 0, bankselect[0], 0xffff);
-	bankselect_w(machine, 1, bankselect[1], 0xffff);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+
+	bankselect_w(space, 0, bankselect[0], 0xffff);
+	bankselect_w(space, 1, bankselect[1], 0xffff);
 }
 
 
