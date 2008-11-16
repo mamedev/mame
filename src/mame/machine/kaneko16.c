@@ -289,6 +289,7 @@ WRITE16_HANDLER( calc3_mcu_ram_w )
 #define CALC3_MCU_COM_W(_n_)				\
 WRITE16_HANDLER( calc3_mcu_com##_n_##_w )	\
 {											\
+	logerror("calc3w %d %04x %04x\n",_n_, data,mem_mask); \
 	calc3_mcu_status |= (1 << _n_);			\
 	calc3_mcu_run(space->machine);					\
 }
@@ -329,13 +330,93 @@ static void calc3_mcu_run(running_machine *machine)
 
 		case 0x00ff:
 		{
+				static UINT16 shogwarr_snip_[] = {
+		 	0x48E7,0xFFFE,				// movem.l D0-D7/A0-A6, -(A7)
+
+			0x3039,0x00A8,0x0000,		// move.w  $a80000.l, D0
+			0x4279,0x0020,0xFFFE,		// clr.w   $20fffe.l
+
+			0x41F9,0x0020,0x0000,		// lea     $200000.l, A0
+			0x7000,						// moveq   #$0, D0
+
+			0x43E8,0x01C6,				// lea     ($1c6,A0), A1
+			0x7E02,						// moveq   #$2, D7
+			0xD059,						// add.w   (A1)+, D0
+			0x51CF,0xFFFC,				// dbra    D7, 207ffe
+
+			0x43E9,0x0002,				// lea     ($2,A1), A1
+			0x7E04,						// moveq   #$4, D7
+			0xD059,						// add.w   (A1)+, D0
+			0x51CF,0xFFFC,				// dbra    D7, 20800a
+
+			0x4640,						// not.w   D0
+			0x5340,						// subq.w  #1, D0
+			0x0068,0x0030,0x0216,		// ori.w   #$30, ($216,A0)
+
+			0xB07A,0x009A,				// cmp.w   ($9a,PC), D0; ($2080b6)
+			0x670A,						// beq     20802a
+
+			0x0268,0x000F,0x0216,		// andi.w  #$f, ($216,A0)
+			0x4268,0x0218,				// clr.w   ($218,A0)
+
+			0x5468,0x0216,				// addq.w  #2, ($216,A0)
+			0x42A8,0x030C,				// clr.l   ($30c,A0)
+			0x117C,0x0020,0x030C,		// move.b  #$20, ($30c,A0)
+
+			0x3E3C,0x0001,				// move.w  #$1, D7
+
+			0x0C68,0x0008,0x0218,		// cmpi.w  #$8, ($218,A0)
+			0x6C00,0x0068,				// bge     2080ac
+
+			0x117C,0x0080,0x0310,		// move.b  #$80, ($310,A0)
+			0x117C,0x0008,0x0311,		// move.b  #$8, ($311,A0)
+			0x317C,0x7800,0x0312,		// move.w  #$7800, ($312,A0)
+			0x5247,						// addq.w  #1, D7
+			0x0C68,0x0040,0x0216,		// cmpi.w  #$40, ($216,A0)
+			0x6D08,						// blt     20806a
+
+			0x5468,0x0218,				// addq.w  #2, ($218,A0)
+			0x6000,0x0044,				// bra     2080ac
+
+			0x117C,0x0041,0x0314,		// move.b  #$41, ($314,A0)
+
+			0x0C39,0x0001,0x0010,0x2E12,// cmpi.b  #$1, $102e12.l
+			0x6606,						// bne     208080
+
+			0x117C,0x0040,0x0314,		// move.b  #$40, ($314,A0)
+
+			0x117C,0x000C,0x0315,		// move.b  #$c, ($315,A0)
+			0x317C,0x7000,0x0316,		// move.w  #$7000, ($316,A0)
+			0x5247,						// addq.w  #1, D7
+
+			0x0839,0x0001,0x0010,0x2E15,// btst    #$1, $102e15.l ; service mode
+			0x6714,						// beq     2080ac
+
+			0x117C,0x0058,0x0318,		// move.b  #$58, ($318,A0)
+			0x117C,0x0006,0x0319,		// move.b  #$6, ($319,A0)
+			0x317C,0x6800,0x031A,		// move.w  #$6800, ($31a,A0)
+			0x5247,						// addq.w  #1, D7
+
+			0x3147,0x030A,				// move.w  D7, ($30a,A0)
+			0x4CDF,0x7FFF,				// movem.l (A7)+, D0-D7/A0-A6
+			0x4E73,						// rte
+			0xC747,
+			};
+
+
 			int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
 			int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
 			int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
-			//int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
+			int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
 			int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
-			//int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
-			//int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+			int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
+			int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+			UINT32 writeaddress = (param6 << 16) | param7;
+			int i;
+			logerror("params %04x %04x %04x %04x %04x %04x %04x\n",
+			param1,param2,param3,param4,param5,param6,param7);
+
+
 
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset] = 0x0000;
@@ -350,90 +431,30 @@ static void calc3_mcu_run(running_machine *machine)
 			kaneko16_mcu_ram[param5 / 2] = 0x8ee4;				// MCU Rom Checksum!
 			// param 6&7 = address.l
 
-/*
+			writeaddress&=0xffff;
 
-First code snippet provided by the MCU:
 
-207FE0: 48E7 FFFE                movem.l D0-D7/A0-A6, -(A7)
+			for(i=0;i<sizeof(shogwarr_snip_) / 2;i++)
+			{
+				kaneko16_mcu_ram[(writeaddress/2)+i] = shogwarr_snip_[i];
+			}
 
-207FE4: 3039 00A8 0000           move.w  $a80000.l, D0
-207FEA: 4279 0020 FFFE           clr.w   $20fffe.l
-
-207FF0: 41F9 0020 0000           lea     $200000.l, A0
-207FF6: 7000                     moveq   #$0, D0
-
-207FF8: 43E8 01C6                lea     ($1c6,A0), A1
-207FFC: 7E02                     moveq   #$2, D7
-207FFE: D059                     add.w   (A1)+, D0
-208000: 51CF FFFC                dbra    D7, 207ffe
-
-208004: 43E9 0002                lea     ($2,A1), A1
-208008: 7E04                     moveq   #$4, D7
-20800A: D059                     add.w   (A1)+, D0
-20800C: 51CF FFFC                dbra    D7, 20800a
-
-208010: 4640                     not.w   D0
-208012: 5340                     subq.w  #1, D0
-208014: 0068 0030 0216           ori.w   #$30, ($216,A0)
-
-20801A: B07A 009A                cmp.w   ($9a,PC), D0; ($2080b6)
-20801E: 670A                     beq     20802a
-
-208020: 0268 000F 0216           andi.w  #$f, ($216,A0)
-208026: 4268 0218                clr.w   ($218,A0)
-
-20802A: 5468 0216                addq.w  #2, ($216,A0)
-20802E: 42A8 030C                clr.l   ($30c,A0)
-208032: 117C 0020 030C           move.b  #$20, ($30c,A0)
-
-208038: 3E3C 0001                move.w  #$1, D7
-
-20803C: 0C68 0008 0218           cmpi.w  #$8, ($218,A0)
-208042: 6C00 0068                bge     2080ac
-
-208046: 117C 0080 0310           move.b  #$80, ($310,A0)
-20804C: 117C 0008 0311           move.b  #$8, ($311,A0)
-208052: 317C 7800 0312           move.w  #$7800, ($312,A0)
-208058: 5247                     addq.w  #1, D7
-20805A: 0C68 0040 0216           cmpi.w  #$40, ($216,A0)
-208060: 6D08                     blt     20806a
-
-208062: 5468 0218                addq.w  #2, ($218,A0)
-208066: 6000 0044                bra     2080ac
-
-20806A: 117C 0041 0314           move.b  #$41, ($314,A0)
-
-208070: 0C39 0001 0010 2E12      cmpi.b  #$1, $102e12.l
-208078: 6606                     bne     208080
-
-20807A: 117C 0040 0314           move.b  #$40, ($314,A0)
-
-208080: 117C 000C 0315           move.b  #$c, ($315,A0)
-208086: 317C 7000 0316           move.w  #$7000, ($316,A0)
-20808C: 5247                     addq.w  #1, D7
-
-20808E: 0839 0001 0010 2E15      btst    #$1, $102e15.l ; service mode
-208096: 6714                     beq     2080ac
-
-208098: 117C 0058 0318           move.b  #$58, ($318,A0)
-20809E: 117C 0006 0319           move.b  #$6, ($319,A0)
-2080A4: 317C 6800 031A           move.w  #$6800, ($31a,A0)
-2080AA: 5247                     addq.w  #1, D7
-
-2080AC: 3147 030A                move.w  D7, ($30a,A0)
-2080B0: 4CDF 7FFF                movem.l (A7)+, D0-D7/A0-A6
-2080B4: 4E73                     rte
-
-2080B6: C747
-*/
 		}
 		break;
 
 
 		case 0x0001:
 		{
-			//int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
+			int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
 			int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
+			int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
+			int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
+			int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
+			int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
+			int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+
+			logerror("params %04x %04x %04x %04x %04x %04x %04x\n",
+			param1,param2,param3,param4,param5,param6,param7);
 
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset] = 0x0000;
@@ -453,13 +474,17 @@ First code snippet provided by the MCU:
 
 		case 0x0002:
 		{
-			//int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
-			//int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
-			//int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
-			//int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
-			//int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
-			//int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
-			//int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+			int param1 = kaneko16_mcu_ram[calc3_mcu_command_offset + 1];
+			int param2 = kaneko16_mcu_ram[calc3_mcu_command_offset + 2];
+			int param3 = kaneko16_mcu_ram[calc3_mcu_command_offset + 3];
+			int param4 = kaneko16_mcu_ram[calc3_mcu_command_offset + 4];
+			int param5 = kaneko16_mcu_ram[calc3_mcu_command_offset + 5];
+			int param6 = kaneko16_mcu_ram[calc3_mcu_command_offset + 6];
+			int param7 = kaneko16_mcu_ram[calc3_mcu_command_offset + 7];
+
+			logerror("params %04x %04x %04x %04x %04x %04x %04x\n",
+			param1,param2,param3,param4,param5,param6,param7);
+
 
 			// clear old command (handshake to main cpu)
 			kaneko16_mcu_ram[calc3_mcu_command_offset] = 0x0000;
