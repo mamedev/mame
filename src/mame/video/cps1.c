@@ -20,9 +20,9 @@ Known A-board revisions:
 
 NAME                                        Year  B-board #      B-board PALs      C-board #         CPS-B #           C-board PALs
 ------------------------------------------- ----  --------  ---------------------  ---------  -----------------------  -------------
-Forgotten Worlds / Lost Worlds              1988  88618B-2  LWCHR            LWIO  None       CPS-B-01  DL-0411-10001  None
-  (alt B-board revision)                          88621B-2  LW621            LWIO  ?
-Ghouls 'n Ghosts (World / US)               1988  88620-B-2 DM620            LWIO  None       CPS-B-01  DL-0411-10001  None
+Forgotten Worlds / Lost Worlds              1988  88618B-2  LWCHR            LWIO  None       CPS-B-01  DL-0411-10001  N/A
+  (alt B-board revision)                          88621B-2  LW621            LWIO  None       CPS-B-01  DL-0411-10001  N/A
+Ghouls 'n Ghosts (World / US)               1988  88620-B-2 DM620            LWIO  None       CPS-B-01  DL-0411-10001  N/A
   (alt B-board revision - Japan)                  88622B-2  DM22A            LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
   (alt B-board revision - Japan)                  91634B-2  DAM63B    BPRG1  IOB1  92631C-6   CPS-B-21  DL-0921-10014  C632  IOC1
 Strider                                     1989  89624B-2  ST24M1           LWIO  88622-C-1  CPS-B-01  DL-0411-10001  None
