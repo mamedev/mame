@@ -58,7 +58,7 @@ void deco102_decrypt_cpu(running_machine *machine, const char *region, int addre
 		memcpy(buf,rom,size);
 
 		memory_set_decrypted_region(0, 0, size - 1, opcodes);
-		m68k_set_encrypted_opcode_range(0,0,size);
+		m68k_set_encrypted_opcode_range(machine->cpu[0],0,size);
 
 		for (i = 0;i < size/2;i++)
 		{

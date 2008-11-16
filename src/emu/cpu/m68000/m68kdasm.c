@@ -192,9 +192,6 @@ static void (*g_instruction_table[0x10000])(void);
 /* Flag if disassembler initialized */
 static int  g_initialized = 0;
 
-/* Address mask to simulate address lines */
-static unsigned int g_address_mask = 0xffffffff;
-
 static char g_dasm_str[100]; /* string to hold disassembly */
 static char g_helper_str[100]; /* string to hold helpful info */
 static UINT32 g_cpu_pc;        /* program counter */
@@ -245,10 +242,7 @@ static const char *const g_cpcc[64] =
 static UINT32 dasm_read_imm_8(UINT32 advance)
 {
 	UINT32 result;
-//  if (g_rawop)
-		result = g_rawop[g_cpu_pc + 1 - g_rawbasepc];
-//  else
-//      result = m68k_read_disassembler_16(g_cpu_pc & g_address_mask) & 0xff;
+	result = g_rawop[g_cpu_pc + 1 - g_rawbasepc];
 	g_cpu_pc += advance;
 	return result;
 }
@@ -256,11 +250,8 @@ static UINT32 dasm_read_imm_8(UINT32 advance)
 static UINT32 dasm_read_imm_16(UINT32 advance)
 {
 	UINT32 result;
-//  if (g_rawop)
-		result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 8) |
-		          g_rawop[g_cpu_pc + 1 - g_rawbasepc];
-//  else
-//      result = m68k_read_disassembler_16(g_cpu_pc & g_address_mask) & 0xff;
+	result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 8) |
+	          g_rawop[g_cpu_pc + 1 - g_rawbasepc];
 	g_cpu_pc += advance;
 	return result;
 }
@@ -268,13 +259,10 @@ static UINT32 dasm_read_imm_16(UINT32 advance)
 static UINT32 dasm_read_imm_32(UINT32 advance)
 {
 	UINT32 result;
-//  if (g_rawop)
-		result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 24) |
-		         (g_rawop[g_cpu_pc + 1 - g_rawbasepc] << 16) |
-		         (g_rawop[g_cpu_pc + 2 - g_rawbasepc] << 8) |
-		          g_rawop[g_cpu_pc + 3 - g_rawbasepc];
-//  else
-//      result = m68k_read_disassembler_32(g_cpu_pc & g_address_mask) & 0xff;
+	result = (g_rawop[g_cpu_pc + 0 - g_rawbasepc] << 24) |
+	         (g_rawop[g_cpu_pc + 1 - g_rawbasepc] << 16) |
+	         (g_rawop[g_cpu_pc + 2 - g_rawbasepc] << 8) |
+	          g_rawop[g_cpu_pc + 3 - g_rawbasepc];
 	g_cpu_pc += advance;
 	return result;
 }
@@ -3471,31 +3459,24 @@ unsigned int m68k_disassemble(char* str_buff, unsigned int pc, unsigned int cpu_
 	{
 		case M68K_CPU_TYPE_68000:
 			g_cpu_type = TYPE_68000;
-			g_address_mask = 0x00ffffff;
 			break;
 		case M68K_CPU_TYPE_68008:
 			g_cpu_type = TYPE_68008;
-			g_address_mask = 0x003fffff;
 			break;
 		case M68K_CPU_TYPE_68010:
 			g_cpu_type = TYPE_68010;
-			g_address_mask = 0x00ffffff;
 			break;
 		case M68K_CPU_TYPE_68EC020:
 			g_cpu_type = TYPE_68020;
-			g_address_mask = 0x00ffffff;
 			break;
 		case M68K_CPU_TYPE_68020:
 			g_cpu_type = TYPE_68020;
-			g_address_mask = 0xffffffff;
 			break;
 		case M68K_CPU_TYPE_68030:
 			g_cpu_type = TYPE_68030;
-			g_address_mask = 0xffffffff;
 			break;
 		case M68K_CPU_TYPE_68040:
 			g_cpu_type = TYPE_68040;
-			g_address_mask = 0xffffffff;
 			break;
 		default:
 			return 0;

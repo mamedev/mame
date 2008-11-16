@@ -3284,8 +3284,8 @@ M68KMAKE_OP(callm, 32, ., .)
 		REG_PC += 2;
 (void)ea;	/* just to avoid an 'unused variable' warning */
 		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PC - 2), m68k->ir,
-					 m68k_disassemble_quick(ADDRESS_68K(m68k, REG_PC - 2))));
+					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
+					 m68k_disassemble_quick(REG_PC - 2)));
 		return;
 	}
 	m68ki_exception_illegal(m68k);
@@ -4362,8 +4362,8 @@ M68KMAKE_OP(cpbcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PC - 2), m68k->ir,
-					 m68k_disassemble_quick(ADDRESS_68K(m68k, REG_PC - 2))));
+					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
+					 m68k_disassemble_quick(REG_PC - 2)));
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4375,8 +4375,8 @@ M68KMAKE_OP(cpdbcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PC - 2), m68k->ir,
-					 m68k_disassemble_quick(ADDRESS_68K(m68k, REG_PC - 2))));
+					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
+					 m68k_disassemble_quick(REG_PC - 2)));
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4388,8 +4388,8 @@ M68KMAKE_OP(cpgen, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PC - 2), m68k->ir,
-					 m68k_disassemble_quick(ADDRESS_68K(m68k, REG_PC - 2))));
+					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
+					 m68k_disassemble_quick(REG_PC - 2)));
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4401,8 +4401,8 @@ M68KMAKE_OP(cpscc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PC - 2), m68k->ir,
-					 m68k_disassemble_quick(ADDRESS_68K(m68k, REG_PC - 2))));
+					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
+					 m68k_disassemble_quick(REG_PC - 2)));
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4414,8 +4414,8 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PC - 2), m68k->ir,
-					 m68k_disassemble_quick(ADDRESS_68K(m68k, REG_PC - 2))));
+					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
+					 m68k_disassemble_quick(REG_PC - 2)));
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -9326,8 +9326,8 @@ M68KMAKE_OP(rtm, 32, ., .)
 	{
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
 		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], ADDRESS_68K(m68k, REG_PC - 2), m68k->ir,
-					 m68k_disassemble_quick(ADDRESS_68K(m68k, REG_PC - 2))));
+					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
+					 m68k_disassemble_quick(REG_PC - 2)));
 		return;
 	}
 	m68ki_exception_illegal(m68k);

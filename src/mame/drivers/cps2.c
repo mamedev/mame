@@ -810,28 +810,6 @@ static READ16_HANDLER( cps2_qsound_volume_r )
 
 /*************************************
  *
- *  ???
- *
- *************************************/
-
-static UINT8  cps2_read8(offs_t address)
-{
-	return m68k_read_pcrelative_8(NULL, address);
-}
-
-static UINT16 cps2_read16(offs_t address)
-{
-	return m68k_read_pcrelative_16(NULL, address);
-}
-
-static UINT32 cps2_read32(offs_t address)
-{
-	return m68k_read_pcrelative_32(NULL, address);
-}
-
-
-/*************************************
- *
  *  Read handlers
  *
  *************************************/
@@ -1236,19 +1214,6 @@ GFXDECODE_END
 
 /*************************************
  *
- *  M68K encryption interface
- *
- *************************************/
-
-static const m68k_encryption_interface cps2_encryption =
-{
-	cps2_read8, cps2_read16, cps2_read32,
-	cps2_read16, cps2_read32
-};
-
-
-/*************************************
- *
  *  Machine driver
  *
  *************************************/
@@ -1257,7 +1222,6 @@ static MACHINE_DRIVER_START( cps2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, XTAL_16MHz)
-	MDRV_CPU_CONFIG(cps2_encryption)
 	MDRV_CPU_PROGRAM_MAP(cps2_readmem,cps2_writemem)
 	MDRV_CPU_VBLANK_INT_HACK(cps2_interrupt,259)	// 262  /* ??? interrupts per frame */
 

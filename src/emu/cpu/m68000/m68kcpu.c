@@ -469,23 +469,11 @@ static int default_tas_instr_callback(void)
 	return 1; // allow writeback
 }
 
-/* Called when the program counter changed by a large value */
-static unsigned int default_pc_changed_callback_data;
-static void default_pc_changed_callback(unsigned int new_pc)
-{
-	default_pc_changed_callback_data = new_pc;
-}
-
 /* Called every time there's bus activity (read/write to/from memory */
 static unsigned int default_set_fc_callback_data;
 static void default_set_fc_callback(unsigned int new_fc)
 {
 	default_set_fc_callback_data = new_fc;
-}
-
-/* Called every instruction cycle prior to execution */
-static void default_instr_hook_callback(unsigned int pc)
-{
 }
 
 
@@ -636,19 +624,9 @@ void m68k_set_tas_instr_callback(m68ki_cpu_core *m68k, int  (*callback)(void))
 	m68k->tas_instr_callback = callback ? callback : default_tas_instr_callback;
 }
 
-void m68k_set_pc_changed_callback(m68ki_cpu_core *m68k, void  (*callback)(unsigned int new_pc))
-{
-	m68k->pc_changed_callback = callback ? callback : default_pc_changed_callback;
-}
-
 void m68k_set_fc_callback(m68ki_cpu_core *m68k, void  (*callback)(unsigned int new_fc))
 {
 	m68k->set_fc_callback = callback ? callback : default_set_fc_callback;
-}
-
-void m68k_set_instr_hook_callback(m68ki_cpu_core *m68k, void  (*callback)(unsigned int pc))
-{
-	m68k->instr_hook_callback = callback ? callback : default_instr_hook_callback;
 }
 
 #include <stdio.h>
@@ -659,7 +637,6 @@ void m68k_set_cpu_type(m68ki_cpu_core *m68k, unsigned int cpu_type)
 	{
 		case M68K_CPU_TYPE_68000:
 			m68k->cpu_type         = CPU_TYPE_000;
-			m68k->address_mask = 0x00ffffff;
 			m68k->sr_mask      = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 			m68k->cyc_instruction  = m68ki_cycles[0];
 			m68k->cyc_exception    = m68ki_exception_cycle_table[0];
@@ -675,7 +652,6 @@ void m68k_set_cpu_type(m68ki_cpu_core *m68k, unsigned int cpu_type)
 			return;
 		case M68K_CPU_TYPE_68008:
 			m68k->cpu_type         = CPU_TYPE_008;
-			m68k->address_mask = 0x003fffff;
 			m68k->sr_mask      = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 			m68k->cyc_instruction  = m68ki_cycles[0];
 			m68k->cyc_exception    = m68ki_exception_cycle_table[0];
@@ -691,7 +667,6 @@ void m68k_set_cpu_type(m68ki_cpu_core *m68k, unsigned int cpu_type)
 			return;
 		case M68K_CPU_TYPE_68010:
 			m68k->cpu_type         = CPU_TYPE_010;
-			m68k->address_mask = 0x00ffffff;
 			m68k->sr_mask      = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 			m68k->cyc_instruction  = m68ki_cycles[1];
 			m68k->cyc_exception    = m68ki_exception_cycle_table[1];
@@ -707,7 +682,6 @@ void m68k_set_cpu_type(m68ki_cpu_core *m68k, unsigned int cpu_type)
 			return;
 		case M68K_CPU_TYPE_68EC020:
 			m68k->cpu_type         = CPU_TYPE_EC020;
-			m68k->address_mask = 0x00ffffff;
 			m68k->sr_mask      = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 			m68k->cyc_instruction  = m68ki_cycles[2];
 			m68k->cyc_exception    = m68ki_exception_cycle_table[2];
@@ -723,7 +697,6 @@ void m68k_set_cpu_type(m68ki_cpu_core *m68k, unsigned int cpu_type)
 			return;
 		case M68K_CPU_TYPE_68020:
 			m68k->cpu_type         = CPU_TYPE_020;
-			m68k->address_mask = 0xffffffff;
 			m68k->sr_mask      = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 			m68k->cyc_instruction  = m68ki_cycles[2];
 			m68k->cyc_exception    = m68ki_exception_cycle_table[2];
@@ -739,7 +712,6 @@ void m68k_set_cpu_type(m68ki_cpu_core *m68k, unsigned int cpu_type)
 			return;
 		case M68K_CPU_TYPE_68040:		// TODO: these values are not correct
 			m68k->cpu_type         = CPU_TYPE_040;
-			m68k->address_mask = 0xffffffff;
 			m68k->sr_mask      = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 			m68k->cyc_instruction  = m68ki_cycles[2];
 			m68k->cyc_exception    = m68ki_exception_cycle_table[2];
@@ -887,9 +859,7 @@ void m68k_init(m68ki_cpu_core *m68k)
 	m68k_set_cmpild_instr_callback(m68k, NULL);
 	m68k_set_rte_instr_callback(m68k, NULL);
 	m68k_set_tas_instr_callback(m68k, NULL);
-	m68k_set_pc_changed_callback(m68k, NULL);
 	m68k_set_fc_callback(m68k, NULL);
-	m68k_set_instr_hook_callback(m68k, NULL);
 }
 
 /* Pulse the RESET line on the CPU */

@@ -78,7 +78,7 @@ static void fd1094_setstate_and_decrypt(int state)
 			/* copy cached state */
 			fd1094_userregion=fd1094_cacheregion[i];
 			set_decrypted_region();
-			m68k_set_encrypted_opcode_range(0,0,fd1094_cpuregionsize);
+			m68k_set_encrypted_opcode_range(Machine->cpu[0],0,fd1094_cpuregionsize);
 
 			return;
 		}
@@ -97,7 +97,7 @@ static void fd1094_setstate_and_decrypt(int state)
 	/* copy newly decrypted data to user region */
 	fd1094_userregion=fd1094_cacheregion[fd1094_current_cacheposition];
 	set_decrypted_region();
-	m68k_set_encrypted_opcode_range(0,0,fd1094_cpuregionsize);
+	m68k_set_encrypted_opcode_range(Machine->cpu[0],0,fd1094_cpuregionsize);
 
 	fd1094_current_cacheposition++;
 

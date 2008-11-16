@@ -5,22 +5,18 @@
 
 /* global access */
 
-m68k_memory_interface m68k_memory_intf;
-offs_t m68k_encrypted_opcode_start[MAX_CPU];
-offs_t m68k_encrypted_opcode_end[MAX_CPU];
-
-
-void m68k_set_encrypted_opcode_range(int cpunum, offs_t start, offs_t end)
+void m68k_set_encrypted_opcode_range(const device_config *device, offs_t start, offs_t end)
 {
-	m68k_encrypted_opcode_start[cpunum] = start;
-	m68k_encrypted_opcode_end[cpunum] = end;
+	m68ki_cpu_core *m68k = device->token;
+	m68k->encrypted_start = start;
+	m68k->encrypted_end = end;
 }
 
 /****************************************************************************
  * 8-bit data memory interface
  ****************************************************************************/
 
-static UINT16 m68008_read_immediate_16(offs_t address)
+static UINT16 m68008_read_immediate_16(const address_space *space, offs_t address)
 {
 	offs_t addr = address;
 	return (cpu_readop(addr) << 8) | (cpu_readop(addr + 1));
@@ -31,34 +27,40 @@ static const m68k_memory_interface interface_d8 =
 {
 	0,
 	m68008_read_immediate_16,
-	program_read_byte_8be,
-	program_read_word_8be,
-	program_read_dword_8be,
-	program_write_byte_8be,
-	program_write_word_8be,
-	program_write_dword_8be
+	memory_read_byte_8be,
+	memory_read_word_8be,
+	memory_read_dword_8be,
+	memory_write_byte_8be,
+	memory_write_word_8be,
+	memory_write_dword_8be
 };
 
 /****************************************************************************
  * 16-bit data memory interface
  ****************************************************************************/
 
-static UINT16 read_immediate_16(offs_t address)
+static UINT16 read_immediate_16(const address_space *space, offs_t address)
 {
-	return cpu_readop16((address) ^ m68k_memory_intf.opcode_xor);
+	m68ki_cpu_core *m68k = space->cpu->token;
+	return cpu_readop16((address) ^ m68k->memory.opcode_xor);
+}
+
+static UINT16 simple_read_immediate_16(const address_space *space, offs_t address)
+{
+	return cpu_readop16(address);
 }
 
 /* interface for 24-bit address bus, 16-bit data bus (68000, 68010) */
 static const m68k_memory_interface interface_d16 =
 {
 	0,
-	cpu_readop16,
-	program_read_byte_16be,
-	program_read_word_16be,
-	program_read_dword_16be,
-	program_write_byte_16be,
-	program_write_word_16be,
-	program_write_dword_16be
+	simple_read_immediate_16,
+	memory_read_byte_16be,
+	memory_read_word_16be,
+	memory_read_dword_16be,
+	memory_write_byte_16be,
+	memory_write_word_16be,
+	memory_write_dword_16be
 };
 
 /****************************************************************************
@@ -66,62 +68,62 @@ static const m68k_memory_interface interface_d16 =
  ****************************************************************************/
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT16 readword_d32(offs_t address)
+static UINT16 readword_d32(const address_space *space, offs_t address)
 {
 	UINT16 result;
 
 	if (!(address & 1))
-		return program_read_word_32be(address);
-	result = program_read_byte_32be(address) << 8;
-	return result | program_read_byte_32be(address + 1);
+		return memory_read_word_32be(space, address);
+	result = memory_read_byte_32be(space, address) << 8;
+	return result | memory_read_byte_32be(space, address + 1);
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writeword_d32(offs_t address, UINT16 data)
+static void writeword_d32(const address_space *space, offs_t address, UINT16 data)
 {
 	if (!(address & 1))
 	{
-		program_write_word_32be(address, data);
+		memory_write_word_32be(space, address, data);
 		return;
 	}
-	program_write_byte_32be(address, data >> 8);
-	program_write_byte_32be(address + 1, data);
+	memory_write_byte_32be(space, address, data >> 8);
+	memory_write_byte_32be(space, address + 1, data);
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT32 readlong_d32(offs_t address)
+static UINT32 readlong_d32(const address_space *space, offs_t address)
 {
 	UINT32 result;
 
 	if (!(address & 3))
-		return program_read_dword_32be(address);
+		return memory_read_dword_32be(space, address);
 	else if (!(address & 1))
 	{
-		result = program_read_word_32be(address) << 16;
-		return result | program_read_word_32be(address + 2);
+		result = memory_read_word_32be(space, address) << 16;
+		return result | memory_read_word_32be(space, address + 2);
 	}
-	result = program_read_byte_32be(address) << 24;
-	result |= program_read_word_32be(address + 1) << 8;
-	return result | program_read_byte_32be(address + 3);
+	result = memory_read_byte_32be(space, address) << 24;
+	result |= memory_read_word_32be(space, address + 1) << 8;
+	return result | memory_read_byte_32be(space, address + 3);
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writelong_d32(offs_t address, UINT32 data)
+static void writelong_d32(const address_space *space, offs_t address, UINT32 data)
 {
 	if (!(address & 3))
 	{
-		program_write_dword_32be(address, data);
+		memory_write_dword_32be(space, address, data);
 		return;
 	}
 	else if (!(address & 1))
 	{
-		program_write_word_32be(address, data >> 16);
-		program_write_word_32be(address + 2, data);
+		memory_write_word_32be(space, address, data >> 16);
+		memory_write_word_32be(space, address + 2, data);
 		return;
 	}
-	program_write_byte_32be(address, data >> 24);
-	program_write_word_32be(address + 1, data >> 8);
-	program_write_byte_32be(address + 3, data);
+	memory_write_byte_32be(space, address, data >> 24);
+	memory_write_word_32be(space, address + 1, data >> 8);
+	memory_write_byte_32be(space, address + 3, data);
 }
 
 /* interface for 32-bit data bus (68EC020, 68020) */
@@ -129,10 +131,10 @@ static const m68k_memory_interface interface_d32 =
 {
 	WORD_XOR_BE(0),
 	read_immediate_16,
-	program_read_byte_32be,
+	memory_read_byte_32be,
 	readword_d32,
 	readlong_d32,
-	program_write_byte_32be,
+	memory_write_byte_32be,
 	writeword_d32,
 	writelong_d32
 };
@@ -154,9 +156,11 @@ static void set_irq_line(m68ki_cpu_core *m68k, int irqline, int state)
 static CPU_INIT( m68000 )
 {
 	m68ki_cpu_core *m68k = device->token;
+	m68k->device = device;
+	m68k->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68k->memory = interface_d16;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68000);
-	m68k_memory_intf = interface_d16;
 	m68k_state_register(m68k, "m68000", index);
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
@@ -182,8 +186,6 @@ static CPU_GET_CONTEXT( m68000 )
 
 static CPU_SET_CONTEXT( m68000 )
 {
-	if (m68k_memory_intf.read8 != program_read_byte_16be)
-		m68k_memory_intf = interface_d16;
 }
 
 static CPU_DISASSEMBLE( m68000 )
@@ -199,9 +201,11 @@ static CPU_DISASSEMBLE( m68000 )
 static CPU_INIT( m68008 )
 {
 	m68ki_cpu_core *m68k = device->token;
+	m68k->device = device;
+	m68k->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68k->memory = interface_d8;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68008);
-	m68k_memory_intf = interface_d8;
 	m68k_state_register(m68k, "m68008", index);
 	m68k_set_int_ack_callback(m68k, (void *)device, irqcallback);
 }
@@ -227,8 +231,6 @@ static CPU_GET_CONTEXT( m68008 )
 
 static CPU_SET_CONTEXT( m68008 )
 {
-	if (m68k_memory_intf.read8 != program_read_byte_8be)
-		m68k_memory_intf = interface_d8;
 }
 
 static CPU_DISASSEMBLE( m68008 )
@@ -246,9 +248,11 @@ static CPU_DISASSEMBLE( m68008 )
 static CPU_INIT( m68010 )
 {
 	m68ki_cpu_core *m68k = device->token;
+	m68k->device = device;
+	m68k->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68k->memory = interface_d16;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68010);
-	m68k_memory_intf = interface_d16;
 	m68k_state_register(m68k, "m68010", index);
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
@@ -267,9 +271,11 @@ static CPU_DISASSEMBLE( m68010 )
 static CPU_INIT( m68020 )
 {
 	m68ki_cpu_core *m68k = device->token;
+	m68k->device = device;
+	m68k->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68k->memory = interface_d32;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68020);
-	m68k_memory_intf = interface_d32;
 	m68k_state_register(m68k, "m68020", index);
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
@@ -295,8 +301,6 @@ static CPU_GET_CONTEXT( m68020 )
 
 static CPU_SET_CONTEXT( m68020 )
 {
-	if (m68k_memory_intf.read8 != program_read_byte_32be)
-		m68k_memory_intf = interface_d32;
 }
 
 static CPU_DISASSEMBLE( m68020 )
@@ -313,9 +317,11 @@ static CPU_DISASSEMBLE( m68020 )
 static CPU_INIT( m68ec020 )
 {
 	m68ki_cpu_core *m68k = device->token;
+	m68k->device = device;
+	m68k->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68k->memory = interface_d32;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68EC020);
-	m68k_memory_intf = interface_d32;
 	m68k_state_register(m68k, "m68ec020", index);
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
@@ -335,9 +341,11 @@ static CPU_DISASSEMBLE( m68ec020 )
 static CPU_INIT( m68040 )
 {
 	m68ki_cpu_core *m68k = device->token;
+	m68k->device = device;
+	m68k->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68k->memory = interface_d32;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68040);
-	m68k_memory_intf = interface_d32;
 	m68k_state_register(m68k, "m68040", index);
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
@@ -363,8 +371,6 @@ static CPU_GET_CONTEXT( m68040 )
 
 static CPU_SET_CONTEXT( m68040 )
 {
-	if (m68k_memory_intf.read8 != program_read_byte_32be)
-		m68k_memory_intf = interface_d32;
 }
 
 static CPU_DISASSEMBLE( m68040 )

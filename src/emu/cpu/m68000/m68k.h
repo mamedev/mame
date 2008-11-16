@@ -91,63 +91,6 @@ typedef enum _m68k_register_t m68k_register_t;
 
 
 /* ======================================================================== */
-/* ====================== FUNCTIONS CALLED BY THE CPU ===================== */
-/* ======================================================================== */
-
-/* You will have to implement these functions */
-
-/* read/write functions called by the CPU to access memory.
- * while values used are 32 bits, only the appropriate number
- * of bits are relevant (i.e. in write_memory_8, only the lower 8 bits
- * of value should be written to memory).
- *
- * NOTE: I have separated the immediate and PC-relative memory fetches
- *       from the other memory fetches because some systems require
- *       differentiation between PROGRAM and DATA fetches (usually
- *       for security setups such as encryption).
- *       This separation can either be achieved by setting
- *       M68K_SEPARATE_READS in m68kconf.h and defining
- *       the read functions, or by setting M68K_EMULATE_FC and
- *       making a function code callback function.
- *       Using the callback offers better emulation coverage
- *       because you can also monitor whether the CPU is in SYSTEM or
- *       USER mode, but it is also slower.
- */
-
-/* Read from anywhere */
-unsigned int  m68k_read_memory_8(m68ki_cpu_core *m68k, unsigned int address);
-unsigned int  m68k_read_memory_16(m68ki_cpu_core *m68k, unsigned int address);
-unsigned int  m68k_read_memory_32(m68ki_cpu_core *m68k, unsigned int address);
-
-/* Read data immediately following the PC */
-unsigned int  m68k_read_immediate_16(m68ki_cpu_core *m68k, unsigned int address);
-unsigned int  m68k_read_immediate_32(m68ki_cpu_core *m68k, unsigned int address);
-
-/* Read data relative to the PC */
-unsigned int  m68k_read_pcrelative_8(m68ki_cpu_core *m68k, unsigned int address);
-unsigned int  m68k_read_pcrelative_16(m68ki_cpu_core *m68k, unsigned int address);
-unsigned int  m68k_read_pcrelative_32(m68ki_cpu_core *m68k, unsigned int address);
-
-/* Memory access for the disassembler */
-unsigned int m68k_read_disassembler_8  (unsigned int address);
-unsigned int m68k_read_disassembler_16 (unsigned int address);
-unsigned int m68k_read_disassembler_32 (unsigned int address);
-
-/* Write to anywhere */
-void m68k_write_memory_8(m68ki_cpu_core *m68k, unsigned int address, unsigned int value);
-void m68k_write_memory_16(m68ki_cpu_core *m68k, unsigned int address, unsigned int value);
-void m68k_write_memory_32(m68ki_cpu_core *m68k, unsigned int address, unsigned int value);
-
-/* Special call to simulate undocumented 68k behavior when move.l with a
- * predecrement destination mode is executed.
- * To simulate real 68k behavior, first write the high word to
- * [address+2], and then write the low word to [address].
- */
-void m68k_write_memory_32_pd(m68ki_cpu_core *m68k, unsigned int address, unsigned int value);
-
-
-
-/* ======================================================================== */
 /* ============================== CALLBACKS =============================== */
 /* ======================================================================== */
 

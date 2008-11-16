@@ -58,23 +58,13 @@ typedef struct _m68k_memory_interface m68k_memory_interface;
 struct _m68k_memory_interface
 {
 	offs_t	opcode_xor;						// Address Calculation
-	UINT16	(*readimm16)(offs_t);			// Immediate read 16 bit
-	UINT8	(*read8)(offs_t);				// Normal read 8 bit
-	UINT16	(*read16)(offs_t);				// Normal read 16 bit
-	UINT32	(*read32)(offs_t);				// Normal read 32 bit
-	void	(*write8)(offs_t, UINT8);		// Write 8 bit
-	void	(*write16)(offs_t, UINT16);		// Write 16 bit
-	void	(*write32)(offs_t, UINT32);		// Write 32 bit
-	void	(*changepc)(offs_t);			// Change PC
-
-    // For Encrypted Stuff
-
-	UINT8	(*read8pc)(offs_t);				// PC Relative read 8 bit
-	UINT16	(*read16pc)(offs_t);			// PC Relative read 16 bit
-	UINT32	(*read32pc)(offs_t);			// PC Relative read 32 bit
-
-	UINT16	(*read16d)(offs_t);				// Direct read 16 bit
-	UINT32	(*read32d)(offs_t);				// Direct read 32 bit
+	UINT16	(*readimm16)(const address_space *, offs_t);			// Immediate read 16 bit
+	UINT8	(*read8)(const address_space *, offs_t);				// Normal read 8 bit
+	UINT16	(*read16)(const address_space *, offs_t);				// Normal read 16 bit
+	UINT32	(*read32)(const address_space *, offs_t);				// Normal read 32 bit
+	void	(*write8)(const address_space *, offs_t, UINT8);		// Write 8 bit
+	void	(*write16)(const address_space *, offs_t, UINT16);		// Write 16 bit
+	void	(*write32)(const address_space *, offs_t, UINT32);		// Write 32 bit
 };
 
 
