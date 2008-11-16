@@ -5,7 +5,7 @@
 
 #include "cpuintrf.h"
 
-offs_t hc11_disasm(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+offs_t hc11_disasm(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
 CPU_GET_INFO( mc68hc11 );
 
