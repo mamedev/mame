@@ -374,6 +374,8 @@ CPU_DISASSEMBLE( m6809 )
 	do
 	{
 		opcode = oprom[p++];
+// FIXME if (m68_state->config->encrypt_only_first_byte) we should to this
+//		opcode = page == 0 ? oprom[p++] :  opram[p++];
 		for (i = 0; i < m6809_numops[page]; i++)
 			if (m6809_pgpointers[page][i].opcode == opcode)
 				break;

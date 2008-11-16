@@ -98,6 +98,7 @@ struct _m68_state_t
 	int 	extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const m6809_config *config;
 	UINT8	int_state;	/* SYNC and CWAI flags */
 	UINT8	nmi_state;
 };
@@ -279,57 +280,57 @@ static void UpdateState(m68_state_t *m68_state)
 
 static void CHECK_IRQ_LINES(m68_state_t *m68_state)
 {
-	if( m68_state->irq_state[M6809_IRQ_LINE] != CLEAR_LINE ||				
-		m68_state->irq_state[M6809_FIRQ_LINE] != CLEAR_LINE )				
-		m68_state->int_state &= ~M6809_SYNC; /* clear SYNC flag */			
-	if( m68_state->irq_state[M6809_FIRQ_LINE]!=CLEAR_LINE && !(CC & CC_IF) ) 
-	{																	
-		/* fast IRQ */													
-		/* HJB 990225: state already saved by CWAI? */					
-		if( m68_state->int_state & M6809_CWAI )								
-		{																
-			m68_state->int_state &= ~M6809_CWAI;  /* clear CWAI */			
-			m68_state->extra_cycles += 7;		 /* subtract +7 cycles */	
-        }                                                               
-		else															
-		{																
-			CC &= ~CC_E;				/* save 'short' state */        
-			PUSHWORD(pPC);												
-			PUSHBYTE(CC);												
-			m68_state->extra_cycles += 10;	/* subtract +10 cycles */		
-		}																
-		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */		
-		PCD=RM16(0xfff6);												
-		CHANGE_PC;														
-		(void)(*m68_state->irq_callback)(m68_state->device, M6809_FIRQ_LINE);		
-	}																	
-	else																
-	if( m68_state->irq_state[M6809_IRQ_LINE]!=CLEAR_LINE && !(CC & CC_II) )	
-	{																	
-		/* standard IRQ */												
-		/* HJB 990225: state already saved by CWAI? */					
-		if( m68_state->int_state & M6809_CWAI )								
-		{																
-			m68_state->int_state &= ~M6809_CWAI;  /* clear CWAI flag */		
-			m68_state->extra_cycles += 7;		 /* subtract +7 cycles */	
-		}																
-		else															
-		{																
-			CC |= CC_E; 				/* save entire state */ 		
-			PUSHWORD(pPC);												
-			PUSHWORD(pU);												
-			PUSHWORD(pY);												
-			PUSHWORD(pX);												
-			PUSHBYTE(DP);												
-			PUSHBYTE(B);												
-			PUSHBYTE(A);												
-			PUSHBYTE(CC);												
-			m68_state->extra_cycles += 19;	 /* subtract +19 cycles */		
-		}																
-		CC |= CC_II;					/* inhibit IRQ */				
-		PCD=RM16(0xfff8);												
-		CHANGE_PC;														
-		(void)(*m68_state->irq_callback)(m68_state->device, M6809_IRQ_LINE);		
+	if( m68_state->irq_state[M6809_IRQ_LINE] != CLEAR_LINE ||
+		m68_state->irq_state[M6809_FIRQ_LINE] != CLEAR_LINE )
+		m68_state->int_state &= ~M6809_SYNC; /* clear SYNC flag */
+	if( m68_state->irq_state[M6809_FIRQ_LINE]!=CLEAR_LINE && !(CC & CC_IF) )
+	{
+		/* fast IRQ */
+		/* HJB 990225: state already saved by CWAI? */
+		if( m68_state->int_state & M6809_CWAI )
+		{
+			m68_state->int_state &= ~M6809_CWAI;  /* clear CWAI */
+			m68_state->extra_cycles += 7;		 /* subtract +7 cycles */
+        }
+		else
+		{
+			CC &= ~CC_E;				/* save 'short' state */
+			PUSHWORD(pPC);
+			PUSHBYTE(CC);
+			m68_state->extra_cycles += 10;	/* subtract +10 cycles */
+		}
+		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
+		PCD=RM16(0xfff6);
+		CHANGE_PC;
+		(void)(*m68_state->irq_callback)(m68_state->device, M6809_FIRQ_LINE);
+	}
+	else
+	if( m68_state->irq_state[M6809_IRQ_LINE]!=CLEAR_LINE && !(CC & CC_II) )
+	{
+		/* standard IRQ */
+		/* HJB 990225: state already saved by CWAI? */
+		if( m68_state->int_state & M6809_CWAI )
+		{
+			m68_state->int_state &= ~M6809_CWAI;  /* clear CWAI flag */
+			m68_state->extra_cycles += 7;		 /* subtract +7 cycles */
+		}
+		else
+		{
+			CC |= CC_E; 				/* save entire state */
+			PUSHWORD(pPC);
+			PUSHWORD(pU);
+			PUSHWORD(pY);
+			PUSHWORD(pX);
+			PUSHBYTE(DP);
+			PUSHBYTE(B);
+			PUSHBYTE(A);
+			PUSHBYTE(CC);
+			m68_state->extra_cycles += 19;	 /* subtract +19 cycles */
+		}
+		CC |= CC_II;					/* inhibit IRQ */
+		PCD=RM16(0xfff8);
+		CHANGE_PC;
+		(void)(*m68_state->irq_callback)(m68_state->device, M6809_IRQ_LINE);
 	}
 }
 
@@ -362,8 +363,16 @@ static CPU_SET_CONTEXT( m6809 )
 /****************************************************************************/
 static CPU_INIT( m6809 )
 {
+	/* default configuration */
+	static const m6809_config default_config =
+	{
+		0
+	};
+
+	const m6809_config *configdata = device->static_config ? device->static_config : &default_config;
 	m68_state_t *m68_state = device->token;
-	
+
+	m68_state->config = configdata;
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
 
@@ -388,7 +397,7 @@ static CPU_INIT( m6809 )
 static CPU_RESET( m6809 )
 {
 	m68_state_t *m68_state = device->token;
-	
+
 	m68_state->int_state = 0;
 	m68_state->nmi_state = CLEAR_LINE;
 	m68_state->irq_state[0] = CLEAR_LINE;
@@ -467,7 +476,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 static CPU_EXECUTE( m6809 )	/* NS 970908 */
 {
 	m68_state_t *m68_state = device->token;
-	
+
     m68_icount = cycles - m68_state->extra_cycles;
 	m68_state->extra_cycles = 0;
 
@@ -1050,7 +1059,7 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 static CPU_SET_INFO( m6809 )
 {
 	m68_state_t *m68_state = device->token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1081,7 +1090,7 @@ static CPU_SET_INFO( m6809 )
 CPU_GET_INFO( m6809 )
 {
 	m68_state_t *m68_state = (device != NULL) ? device->token : NULL;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

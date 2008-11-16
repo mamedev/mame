@@ -12,7 +12,7 @@ HNZVC
 
 */
 
-#define OP_HANDLER(_name) INLINE void _name (m68_state_t *m68_state) 
+#define OP_HANDLER(_name) INLINE void _name (m68_state_t *m68_state)
 
 #ifdef NEW
 static void illegal )
@@ -2913,7 +2913,7 @@ OP_HANDLER( sts_ex )
 /* $10xx opcodes */
 OP_HANDLER( pref10 )
 {
-	UINT8 ireg2 = ROP(PCD);
+	UINT8 ireg2 = m68_state->config->encrypt_only_first_byte ? ROP_ARG(PCD) : ROP(PCD);
 	PC++;
 	switch( ireg2 )
 	{
@@ -2974,7 +2974,7 @@ OP_HANDLER( pref10 )
 /* $11xx opcodes */
 OP_HANDLER( pref11 )
 {
-	UINT8 ireg2 = ROP(PCD);
+	UINT8 ireg2 = m68_state->config->encrypt_only_first_byte ? ROP_ARG(PCD) : ROP(PCD);
 	PC++;
 	switch( ireg2 )
 	{
