@@ -183,7 +183,7 @@ OP_HANDLER( sync )
 	/* if M6809_SYNC has not been cleared by CHECK_IRQ_LINES(m68_state),
      * stop execution until the interrupt lines change. */
 	if( m68_state->int_state & M6809_SYNC )
-		if (m68_icount > 0) m68_icount = 0;
+		if (m68_state->icount > 0) m68_state->icount = 0;
 }
 
 /* $14 ILLEGAL */
@@ -193,19 +193,19 @@ OP_HANDLER( sync )
 /* $16 LBRA relative ----- */
 OP_HANDLER( lbra )
 {
-	IMMWORD(ea);
+	IMMWORD(EAP);
 	PC += EA;
 	CHANGE_PC;
 
 	if ( EA == 0xfffd )  /* EHC 980508 speed up busy loop */
-		if ( m68_icount > 0)
-			m68_icount = 0;
+		if ( m68_state->icount > 0)
+			m68_state->icount = 0;
 }
 
 /* $17 LBSR relative ----- */
 OP_HANDLER( lbsr )
 {
-	IMMWORD(ea);
+	IMMWORD(EAP);
 	PUSHWORD(pPC);
 	PC += EA;
 	CHANGE_PC;
@@ -377,7 +377,7 @@ OP_HANDLER( bra )
 	CHANGE_PC;
 	/* JB 970823 - speed up busy loops */
 	if( t == 0xfe )
-		if( m68_icount > 0 ) m68_icount = 0;
+		if( m68_state->icount > 0 ) m68_state->icount = 0;
 }
 
 /* $21 BRN relative ----- */
@@ -390,7 +390,7 @@ OP_HANDLER( brn )
 /* $1021 LBRN relative ----- */
 OP_HANDLER( lbrn )
 {
-	IMMWORD(ea);
+	IMMWORD(EAP);
 }
 
 /* $22 BHI relative ----- */
@@ -599,14 +599,14 @@ OP_HANDLER( pshs )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	if( t&0x80 ) { PUSHWORD(pPC); m68_icount -= 2; }
-	if( t&0x40 ) { PUSHWORD(pU);  m68_icount -= 2; }
-	if( t&0x20 ) { PUSHWORD(pY);  m68_icount -= 2; }
-	if( t&0x10 ) { PUSHWORD(pX);  m68_icount -= 2; }
-	if( t&0x08 ) { PUSHBYTE(DP);  m68_icount -= 1; }
-	if( t&0x04 ) { PUSHBYTE(B);   m68_icount -= 1; }
-	if( t&0x02 ) { PUSHBYTE(A);   m68_icount -= 1; }
-	if( t&0x01 ) { PUSHBYTE(CC);  m68_icount -= 1; }
+	if( t&0x80 ) { PUSHWORD(pPC); m68_state->icount -= 2; }
+	if( t&0x40 ) { PUSHWORD(pU);  m68_state->icount -= 2; }
+	if( t&0x20 ) { PUSHWORD(pY);  m68_state->icount -= 2; }
+	if( t&0x10 ) { PUSHWORD(pX);  m68_state->icount -= 2; }
+	if( t&0x08 ) { PUSHBYTE(DP);  m68_state->icount -= 1; }
+	if( t&0x04 ) { PUSHBYTE(B);   m68_state->icount -= 1; }
+	if( t&0x02 ) { PUSHBYTE(A);   m68_state->icount -= 1; }
+	if( t&0x01 ) { PUSHBYTE(CC);  m68_state->icount -= 1; }
 }
 
 /* 35 PULS inherent ----- */
@@ -614,14 +614,14 @@ OP_HANDLER( puls )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	if( t&0x01 ) { PULLBYTE(CC); m68_icount -= 1; }
-	if( t&0x02 ) { PULLBYTE(A);  m68_icount -= 1; }
-	if( t&0x04 ) { PULLBYTE(B);  m68_icount -= 1; }
-	if( t&0x08 ) { PULLBYTE(DP); m68_icount -= 1; }
-	if( t&0x10 ) { PULLWORD(XD); m68_icount -= 2; }
-	if( t&0x20 ) { PULLWORD(YD); m68_icount -= 2; }
-	if( t&0x40 ) { PULLWORD(UD); m68_icount -= 2; }
-	if( t&0x80 ) { PULLWORD(PCD); CHANGE_PC; m68_icount -= 2; }
+	if( t&0x01 ) { PULLBYTE(CC); m68_state->icount -= 1; }
+	if( t&0x02 ) { PULLBYTE(A);  m68_state->icount -= 1; }
+	if( t&0x04 ) { PULLBYTE(B);  m68_state->icount -= 1; }
+	if( t&0x08 ) { PULLBYTE(DP); m68_state->icount -= 1; }
+	if( t&0x10 ) { PULLWORD(XD); m68_state->icount -= 2; }
+	if( t&0x20 ) { PULLWORD(YD); m68_state->icount -= 2; }
+	if( t&0x40 ) { PULLWORD(UD); m68_state->icount -= 2; }
+	if( t&0x80 ) { PULLWORD(PCD); CHANGE_PC; m68_state->icount -= 2; }
 
 	/* HJB 990225: moved check after all PULLs */
 	if( t&0x01 ) { CHECK_IRQ_LINES(m68_state); }
@@ -632,14 +632,14 @@ OP_HANDLER( pshu )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	if( t&0x80 ) { PSHUWORD(pPC); m68_icount -= 2; }
-	if( t&0x40 ) { PSHUWORD(pS);  m68_icount -= 2; }
-	if( t&0x20 ) { PSHUWORD(pY);  m68_icount -= 2; }
-	if( t&0x10 ) { PSHUWORD(pX);  m68_icount -= 2; }
-	if( t&0x08 ) { PSHUBYTE(DP);  m68_icount -= 1; }
-	if( t&0x04 ) { PSHUBYTE(B);   m68_icount -= 1; }
-	if( t&0x02 ) { PSHUBYTE(A);   m68_icount -= 1; }
-	if( t&0x01 ) { PSHUBYTE(CC);  m68_icount -= 1; }
+	if( t&0x80 ) { PSHUWORD(pPC); m68_state->icount -= 2; }
+	if( t&0x40 ) { PSHUWORD(pS);  m68_state->icount -= 2; }
+	if( t&0x20 ) { PSHUWORD(pY);  m68_state->icount -= 2; }
+	if( t&0x10 ) { PSHUWORD(pX);  m68_state->icount -= 2; }
+	if( t&0x08 ) { PSHUBYTE(DP);  m68_state->icount -= 1; }
+	if( t&0x04 ) { PSHUBYTE(B);   m68_state->icount -= 1; }
+	if( t&0x02 ) { PSHUBYTE(A);   m68_state->icount -= 1; }
+	if( t&0x01 ) { PSHUBYTE(CC);  m68_state->icount -= 1; }
 }
 
 /* 37 PULU inherent ----- */
@@ -647,14 +647,14 @@ OP_HANDLER( pulu )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	if( t&0x01 ) { PULUBYTE(CC); m68_icount -= 1; }
-	if( t&0x02 ) { PULUBYTE(A);  m68_icount -= 1; }
-	if( t&0x04 ) { PULUBYTE(B);  m68_icount -= 1; }
-	if( t&0x08 ) { PULUBYTE(DP); m68_icount -= 1; }
-	if( t&0x10 ) { PULUWORD(XD); m68_icount -= 2; }
-	if( t&0x20 ) { PULUWORD(YD); m68_icount -= 2; }
-	if( t&0x40 ) { PULUWORD(SD); m68_icount -= 2; }
-	if( t&0x80 ) { PULUWORD(PCD); CHANGE_PC; m68_icount -= 2; }
+	if( t&0x01 ) { PULUBYTE(CC); m68_state->icount -= 1; }
+	if( t&0x02 ) { PULUBYTE(A);  m68_state->icount -= 1; }
+	if( t&0x04 ) { PULUBYTE(B);  m68_state->icount -= 1; }
+	if( t&0x08 ) { PULUBYTE(DP); m68_state->icount -= 1; }
+	if( t&0x10 ) { PULUWORD(XD); m68_state->icount -= 2; }
+	if( t&0x20 ) { PULUWORD(YD); m68_state->icount -= 2; }
+	if( t&0x40 ) { PULUWORD(SD); m68_state->icount -= 2; }
+	if( t&0x80 ) { PULUWORD(PCD); CHANGE_PC; m68_state->icount -= 2; }
 
 	/* HJB 990225: moved check after all PULLs */
 	if( t&0x01 ) { CHECK_IRQ_LINES(m68_state); }
@@ -683,7 +683,7 @@ OP_HANDLER( rti )
 	t = CC & CC_E;		/* HJB 990225: entire state saved? */
 	if(t)
 	{
- 		m68_icount -= 9;
+ 		m68_state->icount -= 9;
 		PULLBYTE(A);
 		PULLBYTE(B);
 		PULLBYTE(DP);
@@ -719,8 +719,8 @@ OP_HANDLER( cwai )
 	m68_state->int_state |= M6809_CWAI;	 /* HJB 990228 */
 	CHECK_IRQ_LINES(m68_state);    /* HJB 990116 */
 	if( m68_state->int_state & M6809_CWAI )
-		if( m68_icount > 0 )
-			m68_icount = 0;
+		if( m68_state->icount > 0 )
+			m68_state->icount = 0;
 }
 
 /* $3D MUL inherent --*-@ */
@@ -2917,55 +2917,55 @@ OP_HANDLER( pref10 )
 	PC++;
 	switch( ireg2 )
 	{
-		case 0x21: lbrn(m68_state);		m68_icount-=5;	break;
-		case 0x22: lbhi(m68_state);		m68_icount-=5;	break;
-		case 0x23: lbls(m68_state);		m68_icount-=5;	break;
-		case 0x24: lbcc(m68_state);		m68_icount-=5;	break;
-		case 0x25: lbcs(m68_state);		m68_icount-=5;	break;
-		case 0x26: lbne(m68_state);		m68_icount-=5;	break;
-		case 0x27: lbeq(m68_state);		m68_icount-=5;	break;
-		case 0x28: lbvc(m68_state);		m68_icount-=5;	break;
-		case 0x29: lbvs(m68_state);		m68_icount-=5;	break;
-		case 0x2a: lbpl(m68_state);		m68_icount-=5;	break;
-		case 0x2b: lbmi(m68_state);		m68_icount-=5;	break;
-		case 0x2c: lbge(m68_state);		m68_icount-=5;	break;
-		case 0x2d: lblt(m68_state);		m68_icount-=5;	break;
-		case 0x2e: lbgt(m68_state);		m68_icount-=5;	break;
-		case 0x2f: lble(m68_state);		m68_icount-=5;	break;
+		case 0x21: lbrn(m68_state);		m68_state->icount-=5;	break;
+		case 0x22: lbhi(m68_state);		m68_state->icount-=5;	break;
+		case 0x23: lbls(m68_state);		m68_state->icount-=5;	break;
+		case 0x24: lbcc(m68_state);		m68_state->icount-=5;	break;
+		case 0x25: lbcs(m68_state);		m68_state->icount-=5;	break;
+		case 0x26: lbne(m68_state);		m68_state->icount-=5;	break;
+		case 0x27: lbeq(m68_state);		m68_state->icount-=5;	break;
+		case 0x28: lbvc(m68_state);		m68_state->icount-=5;	break;
+		case 0x29: lbvs(m68_state);		m68_state->icount-=5;	break;
+		case 0x2a: lbpl(m68_state);		m68_state->icount-=5;	break;
+		case 0x2b: lbmi(m68_state);		m68_state->icount-=5;	break;
+		case 0x2c: lbge(m68_state);		m68_state->icount-=5;	break;
+		case 0x2d: lblt(m68_state);		m68_state->icount-=5;	break;
+		case 0x2e: lbgt(m68_state);		m68_state->icount-=5;	break;
+		case 0x2f: lble(m68_state);		m68_state->icount-=5;	break;
 
-		case 0x3f: swi2(m68_state);		m68_icount-=20;	break;
+		case 0x3f: swi2(m68_state);		m68_state->icount-=20;	break;
 
-		case 0x83: cmpd_im(m68_state);	m68_icount-=5;	break;
-		case 0x8c: cmpy_im(m68_state);	m68_icount-=5;	break;
-		case 0x8e: ldy_im(m68_state);	m68_icount-=4;	break;
-		case 0x8f: sty_im(m68_state);	m68_icount-=4;	break;
+		case 0x83: cmpd_im(m68_state);	m68_state->icount-=5;	break;
+		case 0x8c: cmpy_im(m68_state);	m68_state->icount-=5;	break;
+		case 0x8e: ldy_im(m68_state);	m68_state->icount-=4;	break;
+		case 0x8f: sty_im(m68_state);	m68_state->icount-=4;	break;
 
-		case 0x93: cmpd_di(m68_state);	m68_icount-=7;	break;
-		case 0x9c: cmpy_di(m68_state);	m68_icount-=7;	break;
-		case 0x9e: ldy_di(m68_state);	m68_icount-=6;	break;
-		case 0x9f: sty_di(m68_state);	m68_icount-=6;	break;
+		case 0x93: cmpd_di(m68_state);	m68_state->icount-=7;	break;
+		case 0x9c: cmpy_di(m68_state);	m68_state->icount-=7;	break;
+		case 0x9e: ldy_di(m68_state);	m68_state->icount-=6;	break;
+		case 0x9f: sty_di(m68_state);	m68_state->icount-=6;	break;
 
-		case 0xa3: cmpd_ix(m68_state);	m68_icount-=7;	break;
-		case 0xac: cmpy_ix(m68_state);	m68_icount-=7;	break;
-		case 0xae: ldy_ix(m68_state);	m68_icount-=6;	break;
-		case 0xaf: sty_ix(m68_state);	m68_icount-=6;	break;
+		case 0xa3: cmpd_ix(m68_state);	m68_state->icount-=7;	break;
+		case 0xac: cmpy_ix(m68_state);	m68_state->icount-=7;	break;
+		case 0xae: ldy_ix(m68_state);	m68_state->icount-=6;	break;
+		case 0xaf: sty_ix(m68_state);	m68_state->icount-=6;	break;
 
-		case 0xb3: cmpd_ex(m68_state);	m68_icount-=8;	break;
-		case 0xbc: cmpy_ex(m68_state);	m68_icount-=8;	break;
-		case 0xbe: ldy_ex(m68_state);	m68_icount-=7;	break;
-		case 0xbf: sty_ex(m68_state);	m68_icount-=7;	break;
+		case 0xb3: cmpd_ex(m68_state);	m68_state->icount-=8;	break;
+		case 0xbc: cmpy_ex(m68_state);	m68_state->icount-=8;	break;
+		case 0xbe: ldy_ex(m68_state);	m68_state->icount-=7;	break;
+		case 0xbf: sty_ex(m68_state);	m68_state->icount-=7;	break;
 
-		case 0xce: lds_im(m68_state);	m68_icount-=4;	break;
-		case 0xcf: sts_im(m68_state);	m68_icount-=4;	break;
+		case 0xce: lds_im(m68_state);	m68_state->icount-=4;	break;
+		case 0xcf: sts_im(m68_state);	m68_state->icount-=4;	break;
 
-		case 0xde: lds_di(m68_state);	m68_icount-=6;	break;
-		case 0xdf: sts_di(m68_state);	m68_icount-=6;	break;
+		case 0xde: lds_di(m68_state);	m68_state->icount-=6;	break;
+		case 0xdf: sts_di(m68_state);	m68_state->icount-=6;	break;
 
-		case 0xee: lds_ix(m68_state);	m68_icount-=6;	break;
-		case 0xef: sts_ix(m68_state);	m68_icount-=6;	break;
+		case 0xee: lds_ix(m68_state);	m68_state->icount-=6;	break;
+		case 0xef: sts_ix(m68_state);	m68_state->icount-=6;	break;
 
-		case 0xfe: lds_ex(m68_state);	m68_icount-=7;	break;
-		case 0xff: sts_ex(m68_state);	m68_icount-=7;	break;
+		case 0xfe: lds_ex(m68_state);	m68_state->icount-=7;	break;
+		case 0xff: sts_ex(m68_state);	m68_state->icount-=7;	break;
 
 		default:   illegal(m68_state);						break;
 	}
@@ -2978,19 +2978,19 @@ OP_HANDLER( pref11 )
 	PC++;
 	switch( ireg2 )
 	{
-		case 0x3f: swi3(m68_state);		m68_icount-=20;	break;
+		case 0x3f: swi3(m68_state);		m68_state->icount-=20;	break;
 
-		case 0x83: cmpu_im(m68_state);	m68_icount-=5;	break;
-		case 0x8c: cmps_im(m68_state);	m68_icount-=5;	break;
+		case 0x83: cmpu_im(m68_state);	m68_state->icount-=5;	break;
+		case 0x8c: cmps_im(m68_state);	m68_state->icount-=5;	break;
 
-		case 0x93: cmpu_di(m68_state);	m68_icount-=7;	break;
-		case 0x9c: cmps_di(m68_state);	m68_icount-=7;	break;
+		case 0x93: cmpu_di(m68_state);	m68_state->icount-=7;	break;
+		case 0x9c: cmps_di(m68_state);	m68_state->icount-=7;	break;
 
-		case 0xa3: cmpu_ix(m68_state);	m68_icount-=7;	break;
-		case 0xac: cmps_ix(m68_state);	m68_icount-=7;	break;
+		case 0xa3: cmpu_ix(m68_state);	m68_state->icount-=7;	break;
+		case 0xac: cmps_ix(m68_state);	m68_state->icount-=7;	break;
 
-		case 0xb3: cmpu_ex(m68_state);	m68_icount-=8;	break;
-		case 0xbc: cmps_ex(m68_state);	m68_icount-=8;	break;
+		case 0xb3: cmpu_ex(m68_state);	m68_state->icount-=8;	break;
+		case 0xbc: cmps_ex(m68_state);	m68_state->icount-=8;	break;
 
 		default:   illegal(m68_state);						break;
 	}
