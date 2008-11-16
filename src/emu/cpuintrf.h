@@ -486,8 +486,8 @@ typedef enum _cpu_type cpu_type;
 #define CPU_DEBUG_INIT_CALL(name)	CPU_DEBUG_INIT_NAME(name)(device)
 
 #define CPU_DISASSEMBLE_NAME(name)	cpu_disassemble_##name
-#define CPU_DISASSEMBLE(name)		offs_t CPU_DISASSEMBLE_NAME(name)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
-#define CPU_DISASSEMBLE_CALL(name)	CPU_DISASSEMBLE_NAME(name)(buffer, pc, oprom, opram)
+#define CPU_DISASSEMBLE(name)		offs_t CPU_DISASSEMBLE_NAME(name)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+#define CPU_DISASSEMBLE_CALL(name)	CPU_DISASSEMBLE_NAME(name)(device, buffer, pc, oprom, opram)
 
 #define CPU_VALIDITY_CHECK_NAME(name)	cpu_validity_check_##name
 #define CPU_VALIDITY_CHECK(name)		int CPU_VALIDITY_CHECK_NAME(name)(const game_driver *driver, const void *config)
@@ -584,9 +584,9 @@ typedef int	(*cpu_read_func)(const device_config *device, int space, UINT32 offs
 typedef int	(*cpu_write_func)(const device_config *device, int space, UINT32 offset, int size, UINT64 value);
 typedef int	(*cpu_readop_func)(const device_config *device, UINT32 offset, int size, UINT64 *value);
 typedef void (*cpu_debug_init_func)(const device_config *device);
+typedef offs_t (*cpu_disassemble_func)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 
 typedef int (*cpu_validity_check_func)(const game_driver *driver, const void *config);
-typedef offs_t (*cpu_disassemble_func)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 typedef void (*cpu_get_context_func)(void *buffer);
 typedef void (*cpu_set_context_func)(void *buffer);
 

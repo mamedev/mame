@@ -1372,11 +1372,11 @@ offs_t cpu_dasm(const device_config *device, char *buffer, offs_t pc, const UINT
 
 	/* check for disassembler override */
 	if (classheader->dasm_override != NULL)
-		result = (*classheader->dasm_override)(buffer, pc, oprom, opram);
+		result = (*classheader->dasm_override)(device, buffer, pc, oprom, opram);
 
 	/* if we have a disassembler, run it */
 	if (result == 0 && classheader->disassemble != NULL)
-		result = (*classheader->disassemble)(buffer, pc, oprom, opram);
+		result = (*classheader->disassemble)(device, buffer, pc, oprom, opram);
 
 	/* if we still have nothing, output vanilla bytes */
 	if (result == 0)
