@@ -971,6 +971,52 @@ static ADDRESS_MAP_START( balcube_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x679700, 0x679713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
 ADDRESS_MAP_END
 
+/***************************************************************************
+                                    Daitoride (alt hardware)
+***************************************************************************/
+
+
+static ADDRESS_MAP_START( daitoa_readmem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM				)	// ROM
+	AM_RANGE(0xf00000, 0xf0ffff) AM_READ(SMH_RAM				)	// RAM
+	AM_RANGE(0x400000, 0x400001) AM_READ(ymf278b_r				)	// Sound
+	AM_RANGE(0x300000, 0x31ffff) AM_READ(balcube_dsw_r			)	// DSW x 3
+	AM_RANGE(0x100000, 0x11ffff) AM_READ(SMH_RAM				)	// Layer 0
+	AM_RANGE(0x120000, 0x13ffff) AM_READ(SMH_RAM				)	// Layer 1
+	AM_RANGE(0x140000, 0x15ffff) AM_READ(SMH_RAM				)	// Layer 2
+	AM_RANGE(0x160000, 0x16ffff) AM_READ(metro_bankedrom_r		)	// Banked ROM
+	AM_RANGE(0x170000, 0x173fff) AM_READ(SMH_RAM				)	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_READ(SMH_RAM				)	// Sprites
+	AM_RANGE(0x178000, 0x1787ff) AM_READ(SMH_RAM				)	// Tiles Set
+	AM_RANGE(0x1788a2, 0x1788a3) AM_READ(metro_irq_cause_r		)	// IRQ Cause
+	AM_RANGE(0x200000, 0x200001) AM_READ_PORT("IN0")				// Inputs
+	AM_RANGE(0x200002, 0x200003) AM_READ_PORT("IN1")				//
+	AM_RANGE(0x200006, 0x200007) AM_READ(SMH_NOP				)	//
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( daitoa_writemem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_WRITE(SMH_ROM						)	// ROM
+	AM_RANGE(0xf00000, 0xf0ffff) AM_WRITE(SMH_RAM						)	// RAM
+	AM_RANGE(0x400000, 0x40000b) AM_WRITE(ymf278b_w						)	// Sound
+	AM_RANGE(0x200002, 0x200009) AM_WRITE(metro_coin_lockout_4words_w	)	// Coin Lockout
+	AM_RANGE(0x170000, 0x173fff) AM_WRITE(paletteram16_GGGGGRRRRRBBBBBx_word_w  ) AM_BASE(&paletteram16	)	// Palette
+	AM_RANGE(0x174000, 0x174fff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16) AM_SIZE(&spriteram_size				)	// Sprites
+	AM_RANGE(0x100000, 0x11ffff) AM_WRITE(metro_vram_0_w) AM_BASE(&metro_vram_0	)	// Layer 0
+	AM_RANGE(0x120000, 0x13ffff) AM_WRITE(metro_vram_1_w) AM_BASE(&metro_vram_1	)	// Layer 1
+	AM_RANGE(0x140000, 0x15ffff) AM_WRITE(metro_vram_2_w) AM_BASE(&metro_vram_2	)	// Layer 2
+	AM_RANGE(0x178000, 0x1787ff) AM_WRITE(SMH_RAM) AM_BASE(&metro_tiletable) AM_SIZE(&metro_tiletable_size		)	// Tiles Set
+	AM_RANGE(0x178840, 0x17884d) AM_WRITE(metro_blitter_w) AM_BASE(&metro_blitter_regs		)	// Tiles Blitter
+	AM_RANGE(0x178860, 0x17886b) AM_WRITE(metro_window_w) AM_BASE(&metro_window				)	// Tilemap Window
+	AM_RANGE(0x178870, 0x17887b) AM_WRITE(SMH_RAM) AM_BASE(&metro_scroll		)	// Scroll
+	AM_RANGE(0x178880, 0x178881) AM_WRITE(SMH_NOP						)	// ? increasing
+	AM_RANGE(0x178890, 0x178891) AM_WRITE(SMH_NOP						)	// ? increasing
+	AM_RANGE(0x1788a2, 0x1788a3) AM_WRITE(metro_irq_cause_w				)	// IRQ Acknowledge
+	AM_RANGE(0x1788a4, 0x1788a5) AM_WRITE(SMH_RAM) AM_BASE(&metro_irq_enable	)	// IRQ Enable
+	AM_RANGE(0x1788aa, 0x1788ab) AM_WRITE(SMH_RAM) AM_BASE(&metro_rombank		)	// Rom Bank
+	AM_RANGE(0x1788ac, 0x1788ad) AM_WRITE(SMH_RAM) AM_BASE(&metro_screenctrl	)	// Screen Control
+	AM_RANGE(0x179700, 0x179713) AM_WRITE(SMH_RAM) AM_BASE(&metro_videoregs	)	// Video Registers
+ADDRESS_MAP_END
+
 
 /***************************************************************************
                                 Bang Bang Ball
@@ -3784,6 +3830,38 @@ static MACHINE_DRIVER_START( balcube )
 MACHINE_DRIVER_END
 
 
+static MACHINE_DRIVER_START( daitoa )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", M68000, 16000000)
+	MDRV_CPU_PROGRAM_MAP(daitoa_readmem,daitoa_writemem)
+	MDRV_CPU_VBLANK_INT_HACK(metro_interrupt,10)	/* ? */
+
+	MDRV_MACHINE_RESET(metro)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(320, 224)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+
+	MDRV_GFXDECODE(14220)
+	MDRV_PALETTE_LENGTH(8192)
+
+	MDRV_VIDEO_START(metro_14220)
+	MDRV_VIDEO_UPDATE(metro)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
+	MDRV_SOUND_CONFIG(ymf278b_config)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+MACHINE_DRIVER_END
+
 static MACHINE_DRIVER_START( bangball )
 
 	/* basic machine hardware */
@@ -4828,6 +4906,28 @@ ROM_START( balcube )
 	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) )	    // Yamaha YRW801 2MB ROM with samples for the OPL4.
 	ROM_LOAD( "7",        0x200000, 0x080000, CRC(f769287d) SHA1(dd0f781b4a1a1fd6bf0a50048b4996f3cf41e155) )	    // PCM 16 Bit (Signed)
 ROM_END
+
+/***************************************************************************
+Daitoride (YMF278B version)
+***************************************************************************/
+
+
+ROM_START( daitoa )
+	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "dt_ja-6.6", 0x000000, 0x040000, CRC(c753954e) SHA1(f895c776ec6e2da063d3fbf9630f4812ba7bc455) )
+	ROM_LOAD16_BYTE( "dt_ja-5.5", 0x000001, 0x040000, CRC(c4340290) SHA1(6748572a8733d88a1dd03604628e3d0e90171cf0) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )	/* Gfx + Data (Addressable by CPU & Blitter) */
+	ROMX_LOAD( "dt_ja-2.2", 0x000000, 0x080000, CRC(6a262249) SHA1(93b58825a454403d568e7d9a3b4d998322d0baef) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dt_ja-4.4", 0x000002, 0x080000, CRC(cdcef57a) SHA1(4b386f5ebde1ab6866bbbe528e43b813eba99237) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dt_ja-1.1", 0x000004, 0x080000, CRC(a6ccb1d2) SHA1(87570b8d82af0529c054b3038b3d3e9aa550ce6a) , ROM_GROUPWORD | ROM_SKIP(6))
+	ROMX_LOAD( "dt_ja-3.3", 0x000006, 0x080000, CRC(32353e04) SHA1(16ac82de9e6e43eabef3adab2d3a006bb50100fb) , ROM_GROUPWORD | ROM_SKIP(6))
+
+	ROM_REGION( 0x280000, "ymf", 0 )
+	ROM_LOAD( "yrw801-m", 0x000000, 0x200000, CRC(2a9d8d43) SHA1(32760893ce06dbe3930627755ba065cc3d8ec6ca) )	    // Yamaha YRW801 2MB ROM with samples for the OPL4.
+	ROM_LOAD( "dt_ja-7.7",        0x200000, 0x080000, CRC(7a2d3222) SHA1(1a16bf483a5a086ad48029dd23dd16ad47c3740e) )	    // PCM 16 Bit (Signed)
+ROM_END
+
 
 
 /***************************************************************************
@@ -6114,6 +6214,7 @@ GAME( 1994, torid2gg, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",  
 GAME( 1994, toride2j, toride2g, toride2g, toride2g, metro,    ROT0,   "Metro",                                  "Toride II (Japan)",                 GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, gunmast,  0,        pururun,  gunmast,  daitorid, ROT0,   "Metro",                                  "Gun Master",                        0 )
 GAME( 1995, daitorid, 0,        daitorid, daitorid, daitorid, ROT0,   "Metro",                                  "Daitoride",                         GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, daitoa,   daitorid, daitoa,   daitorid, balcube,  ROT0,   "Metro",                                  "Daitoride (YMF278B version)",                          0 )
 GAME( 1995, dokyusei, 0,        dokyusei, dokyusei, gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei",                0 )
 GAME( 1995, dokyusp,  0,        dokyusp,  gakusai,  gakusai,  ROT0,   "Make Software / Elf / Media Trading",    "Mahjong Doukyuusei Special",        0 )
 GAME( 1995, pururun,  0,        pururun,  pururun,  daitorid, ROT0,   "Metro / Banpresto",                      "Pururun",                           0 )

@@ -7165,6 +7165,7 @@ Other Sun games
 	DRIVER( toride2j )	/* (c) 1994 */
 	DRIVER( gunmast )	/* (c) 1994 */
 	DRIVER( daitorid )	/* (c) 1995 */
+	DRIVER( daitoa )	/* (c) 1995 */
 	DRIVER( dokyusei )	/* (c) 1995 Make Software / Elf / Media Trading */
 	DRIVER( dokyusp )	/* (c) 1995 Make Software / Elf / Media Trading */
 	DRIVER( puzzli )	/* (c) 1995 Metro / Banpresto */
