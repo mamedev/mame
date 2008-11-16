@@ -9,6 +9,7 @@
 #include "driver.h"
 #include "video/mc6845.h"
 #include "qix.h"
+#include "cpu/m6809/m6809.h"
 
 
 
@@ -440,9 +441,16 @@ static const mc6845_interface mc6845_intf =
 };
 
 
+static const m6809_config encryption_config =
+{
+	TRUE,		/* encrypt only the first byte in 10 xx and 11 xx opcodes */
+};
+
+
 MACHINE_DRIVER_START( qix_video )
 	MDRV_CPU_ADD("video", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(qix_video_map,0)
+	MDRV_CPU_CONFIG(encryption_config)	// for kram3
 
 	MDRV_VIDEO_START(qix)
 	MDRV_VIDEO_UPDATE(qix)
