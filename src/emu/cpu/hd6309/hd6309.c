@@ -138,6 +138,7 @@ struct _m68_state_t
 	int 	extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	int		icount;
 	UINT8	int_state;	/* SYNC and CWAI flags */
 	UINT8	nmi_state;
 
@@ -214,9 +215,6 @@ static PAIR ea; 		/* effective address */
 #define M6809_CWAI 	8	/* set when CWAI is waiting for an interrupt */
 #define M6809_SYNC 	16	/* set when SYNC is waiting for an interrupt */
 #define M6809_LDS		32	/* set when LDS occured at least once */
-
-/* public globals */
-static int m68_icount;
 
 /* these are re-defined in m68_state->h TO RAM, ROM or functions in cpuintrf.c */
 #define RM(mAddr)		HD6309_RDMEM(mAddr)
@@ -344,7 +342,7 @@ static UINT8 const *index_cycle;
 	if( f ) 							\
 	{									\
 		if( !(MD & MD_EM) )				\
-			m68_icount -= 1;			\
+			m68_state->icount -= 1;			\
 		PC += t.w.l;					\
 		CHANGE_PC;						\
 	}									\
@@ -641,13 +639,13 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 {
 	m68_state_t *m68_state = device->token;
 	
-	m68_icount = cycles - m68_state->extra_cycles;
+	m68_state->icount = cycles - m68_state->extra_cycles;
 	m68_state->extra_cycles = 0;
 
 	if (m68_state->int_state & (M6809_CWAI | M6809_SYNC))
 	{
 		debugger_instruction_hook(device->machine, PCD);
-		m68_icount = 0;
+		m68_state->icount = 0;
 	}
 	else
 	{
@@ -923,15 +921,15 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 			(*hd6309_main[m68_state->ireg])(m68_state);
 #endif    /* BIG_SWITCH */
 
-			m68_icount -= cycle_counts_page0[m68_state->ireg];
+			m68_state->icount -= cycle_counts_page0[m68_state->ireg];
 
-		} while( m68_icount > 0 );
+		} while( m68_state->icount > 0 );
 
-		m68_icount -= m68_state->extra_cycles;
+		m68_state->icount -= m68_state->extra_cycles;
 		m68_state->extra_cycles = 0;
 	}
 
-	return cycles - m68_icount;	 /* NS 970908 */
+	return cycles - m68_state->icount;	 /* NS 970908 */
 }
 
 INLINE void fetch_effective_address( m68_state_t *m68_state )
@@ -1214,7 +1212,7 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xff: IIError(m68_state);												break;
 	}
 
-	m68_icount -= index_cycle[postbyte];
+	m68_state->icount -= index_cycle[postbyte];
 }
 
 
@@ -1317,7 +1315,7 @@ CPU_GET_INFO( hd6309 )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(hd6309);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(hd6309);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68_icount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m68_state->icount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "HD6309");				break;

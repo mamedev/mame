@@ -29,7 +29,7 @@ OP_HANDLER( illegal )
 	{
 		PUSHBYTE(F);
 		PUSHBYTE(E);
-		m68_icount -= 2;
+		m68_state->icount -= 2;
 	}
 
 	PUSHBYTE(B);
@@ -252,7 +252,7 @@ OP_HANDLER( sync )
 	/* if M6809_SYNC has not been cleared by CHECK_IRQ_LINES(m68_state),
      * stop execution until the interrupt lines change. */
 	if( m68_state->int_state & M6809_SYNC )
-		if (m68_icount > 0) m68_icount = 0;
+		if (m68_state->icount > 0) m68_state->icount = 0;
 }
 
 /* $14 sexw inherent */
@@ -277,8 +277,8 @@ OP_HANDLER( lbra )
 	CHANGE_PC;
 
 	if ( EA == 0xfffd )  /* EHC 980508 speed up busy loop */
-		if ( m68_icount > 0)
-			m68_icount = 0;
+		if ( m68_state->icount > 0)
+			m68_state->icount = 0;
 }
 
 /* $17 LBSR relative ----- */
@@ -485,7 +485,7 @@ OP_HANDLER( bra )
 	CHANGE_PC;
 	/* JB 970823 - speed up busy loops */
 	if( t == 0xfe )
-		if( m68_icount > 0 ) m68_icount = 0;
+		if( m68_state->icount > 0 ) m68_state->icount = 0;
 }
 
 /* $21 BRN relative ----- */
@@ -1001,7 +1001,7 @@ OP_HANDLER( tfmpp )
 		W--;
 	}
 	else
-		m68_icount -= 6;   /* Needs six aditional cycles to get the 6+3n */
+		m68_state->icount -= 6;   /* Needs six aditional cycles to get the 6+3n */
 }
 
 /* $1139 TFM R0-,R1- */
@@ -1036,7 +1036,7 @@ OP_HANDLER( tfmmm )
 		W--;
 	}
 	else
-		m68_icount -= 6;   /* Needs six aditional cycles to get the 6+3n */
+		m68_state->icount -= 6;   /* Needs six aditional cycles to get the 6+3n */
 }
 
 /* $113A TFM R0+,R1 */
@@ -1071,7 +1071,7 @@ OP_HANDLER( tfmpc )
 		W--;
 	}
 	else
-		m68_icount -= 6;   /* Needs six aditional cycles to get the 6+3n */
+		m68_state->icount -= 6;   /* Needs six aditional cycles to get the 6+3n */
 }
 
 /* $113B TFM R0,R1+ */
@@ -1106,7 +1106,7 @@ OP_HANDLER( tfmcp )
 		W--;
 	}
 	else
-		m68_icount -= 6;   /* Needs six aditional cycles to get the 6+3n */
+		m68_state->icount -= 6;   /* Needs six aditional cycles to get the 6+3n */
 }
 
 /* $30 LEAX indexed --*-- */
@@ -1147,14 +1147,14 @@ OP_HANDLER( pshs )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	if( t&0x80 ) { PUSHWORD(pPC); m68_icount -= 2; }
-	if( t&0x40 ) { PUSHWORD(pU);  m68_icount -= 2; }
-	if( t&0x20 ) { PUSHWORD(pY);  m68_icount -= 2; }
-	if( t&0x10 ) { PUSHWORD(pX);  m68_icount -= 2; }
-	if( t&0x08 ) { PUSHBYTE(DP);  m68_icount -= 1; }
-	if( t&0x04 ) { PUSHBYTE(B);   m68_icount -= 1; }
-	if( t&0x02 ) { PUSHBYTE(A);   m68_icount -= 1; }
-	if( t&0x01 ) { PUSHBYTE(CC);  m68_icount -= 1; }
+	if( t&0x80 ) { PUSHWORD(pPC); m68_state->icount -= 2; }
+	if( t&0x40 ) { PUSHWORD(pU);  m68_state->icount -= 2; }
+	if( t&0x20 ) { PUSHWORD(pY);  m68_state->icount -= 2; }
+	if( t&0x10 ) { PUSHWORD(pX);  m68_state->icount -= 2; }
+	if( t&0x08 ) { PUSHBYTE(DP);  m68_state->icount -= 1; }
+	if( t&0x04 ) { PUSHBYTE(B);   m68_state->icount -= 1; }
+	if( t&0x02 ) { PUSHBYTE(A);   m68_state->icount -= 1; }
+	if( t&0x01 ) { PUSHBYTE(CC);  m68_state->icount -= 1; }
 }
 
 /* $1038 PSHSW inherent ----- */
@@ -1174,14 +1174,14 @@ OP_HANDLER( puls )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	if( t&0x01 ) { PULLBYTE(CC); m68_icount -= 1; }
-	if( t&0x02 ) { PULLBYTE(A);  m68_icount -= 1; }
-	if( t&0x04 ) { PULLBYTE(B);  m68_icount -= 1; }
-	if( t&0x08 ) { PULLBYTE(DP); m68_icount -= 1; }
-	if( t&0x10 ) { PULLWORD(XD); m68_icount -= 2; }
-	if( t&0x20 ) { PULLWORD(YD); m68_icount -= 2; }
-	if( t&0x40 ) { PULLWORD(UD); m68_icount -= 2; }
-	if( t&0x80 ) { PULLWORD(PCD); CHANGE_PC; m68_icount -= 2; }
+	if( t&0x01 ) { PULLBYTE(CC); m68_state->icount -= 1; }
+	if( t&0x02 ) { PULLBYTE(A);  m68_state->icount -= 1; }
+	if( t&0x04 ) { PULLBYTE(B);  m68_state->icount -= 1; }
+	if( t&0x08 ) { PULLBYTE(DP); m68_state->icount -= 1; }
+	if( t&0x10 ) { PULLWORD(XD); m68_state->icount -= 2; }
+	if( t&0x20 ) { PULLWORD(YD); m68_state->icount -= 2; }
+	if( t&0x40 ) { PULLWORD(UD); m68_state->icount -= 2; }
+	if( t&0x80 ) { PULLWORD(PCD); CHANGE_PC; m68_state->icount -= 2; }
 
 	/* HJB 990225: moved check after all PULLs */
 	if( t&0x01 ) { CHECK_IRQ_LINES(m68_state); }
@@ -1204,14 +1204,14 @@ OP_HANDLER( pshu )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	if( t&0x80 ) { PSHUWORD(pPC); m68_icount -= 2; }
-	if( t&0x40 ) { PSHUWORD(pS);  m68_icount -= 2; }
-	if( t&0x20 ) { PSHUWORD(pY);  m68_icount -= 2; }
-	if( t&0x10 ) { PSHUWORD(pX);  m68_icount -= 2; }
-	if( t&0x08 ) { PSHUBYTE(DP);  m68_icount -= 1; }
-	if( t&0x04 ) { PSHUBYTE(B);   m68_icount -= 1; }
-	if( t&0x02 ) { PSHUBYTE(A);   m68_icount -= 1; }
-	if( t&0x01 ) { PSHUBYTE(CC);  m68_icount -= 1; }
+	if( t&0x80 ) { PSHUWORD(pPC); m68_state->icount -= 2; }
+	if( t&0x40 ) { PSHUWORD(pS);  m68_state->icount -= 2; }
+	if( t&0x20 ) { PSHUWORD(pY);  m68_state->icount -= 2; }
+	if( t&0x10 ) { PSHUWORD(pX);  m68_state->icount -= 2; }
+	if( t&0x08 ) { PSHUBYTE(DP);  m68_state->icount -= 1; }
+	if( t&0x04 ) { PSHUBYTE(B);   m68_state->icount -= 1; }
+	if( t&0x02 ) { PSHUBYTE(A);   m68_state->icount -= 1; }
+	if( t&0x01 ) { PSHUBYTE(CC);  m68_state->icount -= 1; }
 }
 
 /* 37 PULU inherent ----- */
@@ -1219,14 +1219,14 @@ OP_HANDLER( pulu )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	if( t&0x01 ) { PULUBYTE(CC); m68_icount -= 1; }
-	if( t&0x02 ) { PULUBYTE(A);  m68_icount -= 1; }
-	if( t&0x04 ) { PULUBYTE(B);  m68_icount -= 1; }
-	if( t&0x08 ) { PULUBYTE(DP); m68_icount -= 1; }
-	if( t&0x10 ) { PULUWORD(XD); m68_icount -= 2; }
-	if( t&0x20 ) { PULUWORD(YD); m68_icount -= 2; }
-	if( t&0x40 ) { PULUWORD(SD); m68_icount -= 2; }
-	if( t&0x80 ) { PULUWORD(PCD); CHANGE_PC; m68_icount -= 2; }
+	if( t&0x01 ) { PULUBYTE(CC); m68_state->icount -= 1; }
+	if( t&0x02 ) { PULUBYTE(A);  m68_state->icount -= 1; }
+	if( t&0x04 ) { PULUBYTE(B);  m68_state->icount -= 1; }
+	if( t&0x08 ) { PULUBYTE(DP); m68_state->icount -= 1; }
+	if( t&0x10 ) { PULUWORD(XD); m68_state->icount -= 2; }
+	if( t&0x20 ) { PULUWORD(YD); m68_state->icount -= 2; }
+	if( t&0x40 ) { PULUWORD(SD); m68_state->icount -= 2; }
+	if( t&0x80 ) { PULUWORD(PCD); CHANGE_PC; m68_state->icount -= 2; }
 
 	/* HJB 990225: moved check after all PULLs */
 	if( t&0x01 ) { CHECK_IRQ_LINES(m68_state); }
@@ -1255,14 +1255,14 @@ OP_HANDLER( rti )
 	t = CC & CC_E;		/* HJB 990225: entire state saved? */
 	if(t)
 	{
-		m68_icount -= 9;
+		m68_state->icount -= 9;
 		PULLBYTE(A);
 		PULLBYTE(B);
 		if ( MD & MD_EM )
 		{
 			PULLBYTE(E);
 			PULLBYTE(F);
-			m68_icount -= 2;
+			m68_state->icount -= 2;
 		}
 		PULLBYTE(DP);
 		PULLWORD(XD);
@@ -1302,8 +1302,8 @@ OP_HANDLER( cwai )
 	m68_state->int_state |= M6809_CWAI;	 /* HJB 990228 */
 	CHECK_IRQ_LINES(m68_state);	  /* HJB 990116 */
 	if( m68_state->int_state & M6809_CWAI )
-		if( m68_icount > 0 )
-			m68_icount = 0;
+		if( m68_state->icount > 0 )
+			m68_state->icount = 0;
 }
 
 /* $3D MUL inherent --*-@ */
@@ -2638,7 +2638,7 @@ OP_HANDLER( divd_im )
 	}
 	else
 	{
-		m68_icount -= 8;
+		m68_state->icount -= 8;
 		DZError(m68_state);
 	}
 }
@@ -2968,7 +2968,7 @@ OP_HANDLER( divd_di )
 	}
 	else
 	{
-		m68_icount -= 8;
+		m68_state->icount -= 8;
 		DZError(m68_state);
 	}
 }
@@ -3364,7 +3364,7 @@ OP_HANDLER( divd_ix )
 	}
 	else
 	{
-		m68_icount -= 8;
+		m68_state->icount -= 8;
 		DZError(m68_state);
 	}
 }
@@ -3749,7 +3749,7 @@ OP_HANDLER( divd_ex )
 	}
 	else
 	{
-		m68_icount -= 8;
+		m68_state->icount -= 8;
 		DZError(m68_state);
 	}
 }
@@ -5480,7 +5480,7 @@ OP_HANDLER( pref10 )
 
 #endif /* BIG_SWITCH */
 
-	m68_icount -= cycle_counts_page01[ireg2];
+	m68_state->icount -= cycle_counts_page01[ireg2];
 }
 
 /* $11xx opcodes */
@@ -5593,6 +5593,6 @@ OP_HANDLER( pref11 )
 	(*hd6309_page11[ireg2])(m68_state);
 
 #endif /* BIG_SWITCH */
-	m68_icount -= cycle_counts_page11[ireg2];
+	m68_state->icount -= cycle_counts_page11[ireg2];
 }
 
