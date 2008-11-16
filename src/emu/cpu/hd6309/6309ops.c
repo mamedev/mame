@@ -272,7 +272,7 @@ OP_HANDLER( sexw )
 /* $16 LBRA relative ----- */
 OP_HANDLER( lbra )
 {
-	IMMWORD(ea);
+	IMMWORD(EAP);
 	PC += EA;
 	CHANGE_PC;
 
@@ -284,7 +284,7 @@ OP_HANDLER( lbra )
 /* $17 LBSR relative ----- */
 OP_HANDLER( lbsr )
 {
-	IMMWORD(ea);
+	IMMWORD(EAP);
 	PUSHWORD(pPC);
 	PC += EA;
 	CHANGE_PC;
@@ -498,7 +498,7 @@ OP_HANDLER( brn )
 /* $1021 LBRN relative ----- */
 OP_HANDLER( lbrn )
 {
-	IMMWORD(ea);
+	IMMWORD(EAP);
 }
 
 /* $22 BHI relative ----- */
