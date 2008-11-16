@@ -655,19 +655,17 @@ Notes:
 #include "driver.h"
 #include "video/generic.h"
 #include "machine/eeprom.h"
-#include "machine/x76f100.h"
+#include "naomibd.h"
 #include "cpu/sh4/sh4.h"
 #include "cpu/arm7/arm7core.h"
 #include "sound/aica.h"
 #include "dc.h"
 
 #define CPU_CLOCK (200000000)
+static UINT32 *dc_sound_ram;
+
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
-
-static UINT32 *dc_sound_ram;
-static UINT32 rom_offset, rom_offset_flags, dma_count;
-UINT32 dma_offset;
 
 static INTERRUPT_GEN( naomi_vblank )
 {
@@ -696,180 +694,11 @@ static WRITE64_HANDLER( naomi_unknown1_w )
 }
 
 /*
-    Naomi ROM board info from ElSemi:
-
-    NAOMI_ROM_OFFSETH = 0x5f7000,
-    NAOMI_ROM_OFFSETL = 0x5f7004,
-    NAOMI_ROM_DATA = 0x5f7008,
-    NAOMI_DMA_OFFSETH = 0x5f700C,
-    NAOMI_DMA_OFFSETL = 0x5f7010,
-    NAOMI_DMA_COUNT = 0x5f7014,
-    NAOMI_COMM_OFFSET = 0x5F7050,
-    NAOMI_COMM_DATA = 0x5F7054,
-    NAOMI_BOARDID_WRITE = 0x5F7078,
-    NAOMI_BOARDID_READ = 0x5F707C,
-    each port is 16 bit wide, to access the rom in PIO mode, just set an offset in ROM_OFFSETH/L and read from ROM_DATA, each access reads 2 bytes and increases the offset by 2.
-
-    the BOARDID regs access the password protected eeprom in the game board. the main board eeprom is read through port 0x1F800030
-
-    To access the board using DMA, use the DMA_OFFSETL/H. DMA_COUNT is in units of 0x20 bytes. Then trigger a GDROM DMA request.
-
-    Dimm board registers (add more information if you find it):
-
-    Name:                   Naomi   Dimm Bd.
-    NAOMI_DIMM_COMMAND    = 5f703c  14000014 (16 bit):
-        if bits all 1 no dimm board present and other registers not used
-        bit 15: during an interrupt is 1 if the dimm board has a command to be executed
-        bit 14-9: 6 bit command number (naomi bios understands 0 1 3 4 5 6 8 9 a)
-        bit 7-0: higher 8 bits of 24 bit offset parameter
-    NAOMI_DIMM_OFFSETL    = 5f7040  14000018 (16 bit):
-        bit 15-0: lower 16 bits of 24 bit offset parameter
-    NAOMI_DIMM_PARAMETERL = 5f7044  1400001c (16 bit)
-    NAOMI_DIMM_PARAMETERH = 5f7048  14000020 (16 bit)
-    NAOMI_DIMM_STATUS     = 5f704c  14000024 (16 bit):
-        bit 0: when 0 signal interrupt from naomi to dimm board
-        bit 8: when 0 signal interrupt from dimm board to naomi
+* Non-volatile memories
 */
-
-// NOTE: all accesses are 16 or 32 bits wide but only 16 bits are valid
-
-static READ64_HANDLER( naomi_rom_board_r )
-{
-	UINT8 *ROM = (UINT8 *)memory_region(space->machine, "user1");
-
-	// ROM_DATA
-	if ((offset == 1) && ACCESSING_BITS_0_15)
-	{
-		UINT64 ret;
-
-		ret = (UINT64)(ROM[rom_offset] | (ROM[rom_offset+1]<<8));
-
-		rom_offset += 2;
-
-		return ret;
-	}
-	else if ((offset == 7) && ACCESSING_BITS_32_47)
-	{
-		// 5f703c
-		mame_printf_verbose("ROM: read 5f703c\n");
-		return (UINT64)0xffff << 32;
-	}
-	else if ((offset == 8) && ACCESSING_BITS_0_15)
-	{
-		// 5f7040
-		mame_printf_verbose("ROM: read 5f7040\n");
-		return 0;
-	}
-	else if ((offset == 8) && ACCESSING_BITS_32_47)
-	{
-		// 5f7044
-		mame_printf_verbose("ROM: read 5f7044\n");
-		return 0;
-	}
-	else if ((offset == 9) && ACCESSING_BITS_0_15)
-	{
-		// 5f7048
-		mame_printf_verbose("ROM: read 5f7048\n");
-		return 0;
-	}
-	else if ((offset == 9) && ACCESSING_BITS_32_47)
-	{
-		// 5f704c
-		mame_printf_verbose("ROM: read 5f704c\n");
-		return (UINT64)1 << 32;
-	}
-	else if ((offset == 15) && ACCESSING_BITS_32_47) // boardid read
-	{
-		UINT64 ret;
-
-		ret = x76f100_sda_read( 0 ) << 15;
-
-		return ret << 32;
-	}
-	else
-	{
-		mame_printf_verbose("ROM: read mask %llx @ %x (PC=%x)\n", mem_mask, offset, cpu_get_pc(space->cpu));
-	}
-
-	return U64(0xffffffffffffffff);
-}
-
-static WRITE64_HANDLER( naomi_rom_board_w )
-{
-	if ((offset == 1) && (ACCESSING_BITS_32_47 || ACCESSING_BITS_32_63))
-	{
-		// DMA_OFFSETH
-		dma_offset &= 0xffff;
-		dma_offset |= (data >> 16) & 0x1fff0000;
-	}
-	else if ((offset == 2) && ACCESSING_BITS_0_15)
-	{
-		// DMA_OFFSETL
-		dma_offset &= 0xffff0000;
-		dma_offset |= (data & 0xffff);
-	}
-	else if ((offset == 0) && ACCESSING_BITS_0_15)
-	{
-		// ROM_OFFSETH
-		rom_offset &= 0xffff;
-		rom_offset |= (data & 0x1fff)<<16;
-		rom_offset_flags = data >> 13;
-	}
-	else if ((offset == 0) && ACCESSING_BITS_32_47)
-	{
-		// ROM_OFFSETL
-		rom_offset &= 0xffff0000;
-		rom_offset |= ((data >> 32) & 0xffff);
-	}
-	else if ((offset == 1) && ACCESSING_BITS_0_15)
-	{
-		// ROM_DATA
-		// Doa2 writes here (16 bit decryption key ?)
-		mame_printf_verbose("ROM: write %llx to 5f7008 (PC=%x)\n", data, cpu_get_pc(space->cpu));
-	}
-	else if ((offset == 15) && ACCESSING_BITS_0_15)
-	{
-		// NAOMI_BOARDID_WRITE
-		x76f100_cs_write(0, (data >> 2) & 1 );
-		x76f100_rst_write(0, (data >> 3) & 1 );
-		x76f100_scl_write(0, (data >> 1) & 1 );
-		x76f100_sda_write(0, (data >> 0) & 1 );
-	}
-	else if ((offset == 2) && ACCESSING_BITS_32_63)
-	{
-		// NAOMI_DMA_COUNT
-		dma_count = data >> 32;
-	}
-	else if ((offset == 7) && ACCESSING_BITS_32_47)
-	{
-		mame_printf_verbose("ROM: write 5f703c\n");
-	}
-	else if ((offset == 8) && ACCESSING_BITS_0_15)
-	{
-		mame_printf_verbose("ROM: write 5f7040\n");
-	}
-	else if ((offset == 8) && ACCESSING_BITS_32_47)
-	{
-		mame_printf_verbose("ROM: write 5f7044\n");
-	}
-	else if ((offset == 9) && ACCESSING_BITS_0_15)
-	{
-		mame_printf_verbose("ROM: write 5f7048\n");
-	}
-	else if ((offset == 9) && ACCESSING_BITS_32_47)
-	{
-		mame_printf_verbose("ROM: write 5f704c\n");
-	}
-	else
-	{
-		mame_printf_verbose("ROM: write %llx to %x, mask %llx (PC=%x)\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
-	}
-}
 
 static NVRAM_HANDLER( naomi_eeproms )
 {
-	static UINT8 eeprom_romboard[20+48] = {0x19,0x00,0xaa,0x55,0,0,0,0,0,0,0,0,0x69,0x79,0x68,0x6b,0x74,0x6d,0x68,0x6d};
-
 	if (read_or_write)
 		/*eeprom_save(file)*/;
 	else
@@ -879,8 +708,6 @@ static NVRAM_HANDLER( naomi_eeproms )
             eeprom_load(file);
         else*/
 		eeprom_set_data((UINT8 *)"\011\241                              0000000000000000", 48);  // 2*checksum 30*unknown 16*serial
-		x76f100_init( 0, eeprom_romboard );
-		memcpy(eeprom_romboard+20,"\241\011                              0000000000000000",48);
 	}
 }
 
@@ -903,12 +730,15 @@ static WRITE64_HANDLER( eeprom_93c46a_w )
 	eeprom_set_clock_line((data & 0x4) ? ASSERT_LINE : CLEAR_LINE);
 }
 
-static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
+/*
+ * Common address map for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
+ */
+
+static ADDRESS_MAP_START( naomi_base_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_ROM                                             // BIOS
 	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
 	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
-	AM_RANGE(0x005f7000, 0x005f70ff) AM_READWRITE( naomi_rom_board_r, naomi_rom_board_w )
 	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE( dc_g1_ctrl_r, dc_g1_ctrl_w )
 	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
 	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
@@ -928,25 +758,68 @@ static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
 	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("main", 0)
 ADDRESS_MAP_END
 
+/*
+ * Naomi 1 address map
+ */
+
+static ADDRESS_MAP_START( naomi_map, ADDRESS_SPACE_PROGRAM, 64 )
+	AM_RANGE(0x00000000, 0x001fffff) AM_ROM                                             // BIOS
+	AM_RANGE(0x00200000, 0x00207fff) AM_RAM                                             // bios uses it (battery backed ram ?)
+	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
+	AM_RANGE(0x005f6c00, 0x005f6cff) AM_READWRITE( dc_maple_r, dc_maple_w )
+	AM_RANGE(0x005f7400, 0x005f74ff) AM_READWRITE( dc_g1_ctrl_r, dc_g1_ctrl_w )
+	AM_RANGE(0x005f7800, 0x005f78ff) AM_READWRITE( dc_g2_ctrl_r, dc_g2_ctrl_w )
+	AM_RANGE(0x005f7c00, 0x005f7cff) AM_READWRITE( pvr_ctrl_r, pvr_ctrl_w )
+	AM_RANGE(0x005f8000, 0x005f9fff) AM_READWRITE( pvr_ta_r, pvr_ta_w )
+	AM_RANGE(0x00600000, 0x006007ff) AM_READWRITE( dc_modem_r, dc_modem_w )
+	AM_RANGE(0x00700000, 0x00707fff) AM_READWRITE( dc_aica_reg_r, dc_aica_reg_w )
+	AM_RANGE(0x00710000, 0x0071000f) AM_READWRITE( dc_rtc_r, dc_rtc_w )
+	AM_RANGE(0x00800000, 0x00ffffff) AM_READWRITE( naomi_arm_r, naomi_arm_w )           // sound RAM (8 MB)
+	AM_RANGE(0x0103ff00, 0x0103ffff) AM_READWRITE( naomi_unknown1_r, naomi_unknown1_w ) // bios uses it, actual start and end addresses not known
+	AM_RANGE(0x04000000, 0x04ffffff) AM_RAM	AM_SHARE(2) AM_BASE( &dc_texture_ram )      // texture memory 64 bit access
+	AM_RANGE(0x05000000, 0x05ffffff) AM_RAM AM_SHARE(2)                                 // mirror of texture RAM 32 bit access
+	AM_RANGE(0x0c000000, 0x0dffffff) AM_RAM
+	AM_RANGE(0x10000000, 0x107fffff) AM_WRITE( ta_fifo_poly_w )
+	AM_RANGE(0x10800000, 0x10ffffff) AM_WRITE( ta_fifo_yuv_w )
+	AM_RANGE(0x11000000, 0x11ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
+	AM_RANGE(0x13000000, 0x13ffffff) AM_RAM AM_SHARE(2)                                 // another mirror of texture memory
+	AM_RANGE(0xa0000000, 0xa01fffff) AM_ROM AM_REGION("main", 0)
+
+	AM_RANGE(0x005f7000, 0x005f70ff) AM_DEVREADWRITE(NAOMI_BOARD, "rom_board", naomibd_r, naomibd_w)
+ADDRESS_MAP_END
+
+
 static ADDRESS_MAP_START( naomi_port, ADDRESS_SPACE_IO, 64 )
 	AM_RANGE(0x00, 0x0f) AM_READWRITE(eeprom_93c46a_r, eeprom_93c46a_w)
 ADDRESS_MAP_END
 
-static READ32_HANDLER( test1 )
-{
-	return -1;
-}
 
+/*
+ * Aica
+ */
 static void aica_irq(running_machine *machine, int irq)
 {
 	cpu_set_input_line(machine->cpu[1], ARM7_FIRQ_LINE, irq ? ASSERT_LINE : CLEAR_LINE);
 }
 
+
+static const aica_interface aica_config =
+{
+	0,
+	aica_irq
+};
+
+
+
 static ADDRESS_MAP_START( dc_audio_map, ADDRESS_SPACE_PROGRAM, 32 )
+	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM	AM_BASE( &dc_sound_ram )                /* shared with SH-4 */
 	AM_RANGE(0x00800000, 0x00807fff) AM_READWRITE(dc_arm_aica_r, dc_arm_aica_w)
-	AM_RANGE(0x00808000, 0x008080ff) AM_READ( test1 )                               // for bug (?) in sound bios
 ADDRESS_MAP_END
+
+/*
+* Input ports
+*/
 
 static INPUT_PORTS_START( naomi )
 	PORT_START("IN0")
@@ -978,19 +851,17 @@ static INPUT_PORTS_START( naomi )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(dc_coin_slots_callback, &dc_coin_counts[1])
 INPUT_PORTS_END
 
-static const aica_interface aica_config =
-{
-	0,
-	aica_irq
-};
-
 static MACHINE_RESET( naomi )
 {
 	MACHINE_RESET_CALL(dc);
 	aica_set_ram_base(0, dc_sound_ram, 8*1024*1024);
 }
 
-static MACHINE_DRIVER_START( naomi )
+/*
+ * Common for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
+ */
+
+static MACHINE_DRIVER_START( naomi_base )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", SH4, CPU_CLOCK) // SH4!!!
 	MDRV_CPU_CONFIG(sh4cpu_config)
@@ -1024,6 +895,24 @@ static MACHINE_DRIVER_START( naomi )
 	MDRV_SOUND_CONFIG(aica_config)
 	MDRV_SOUND_ROUTE(0, "left", 2.0)
 	MDRV_SOUND_ROUTE(0, "right", 2.0)
+MACHINE_DRIVER_END
+
+/*
+ * Naomi 1
+ */
+
+static MACHINE_DRIVER_START( naomi )
+	MDRV_IMPORT_FROM(naomi_base)
+	MDRV_NAOMI_ROM_BOARD_ADD("rom_board", "user1")
+MACHINE_DRIVER_END
+
+/*
+ * Naomi 1 GD-Rom
+ */
+
+static MACHINE_DRIVER_START( naomigd )
+	MDRV_IMPORT_FROM(naomi_base)
+	MDRV_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
 MACHINE_DRIVER_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
@@ -2809,13 +2698,6 @@ void naomi_write_keyfile(void)
 
 extern void naomi_game_decrypt(UINT64 key, UINT8* region, int length);
 
-
-
-
-
-
-
-
 /* All games have the regional titles at the start of the IC22 rom in the following order
 
   JAPAN
@@ -2872,31 +2754,10 @@ GAME( 2001, hod2bios, 0,        naomi,    naomi,    0, ROT0, "Sega",            
 
 
 
-static DRIVER_INIT( ngdkey )
-{
-	UINT8* picdata = memory_region(machine,"picreturn");
-	UINT64 key;
-
-	key =(((UINT64)picdata[0x31] << 56) |
-		  ((UINT64)picdata[0x32] << 48) |
-		  ((UINT64)picdata[0x33] << 40) |
-		  ((UINT64)picdata[0x34] << 32) |
-		  ((UINT64)picdata[0x35] << 24) |
-		  ((UINT64)picdata[0x36] << 16) |
-		  ((UINT64)picdata[0x37] << 8)  |
-		  ((UINT64)picdata[0x29] << 0));
-
-	printf("key is %08x%08x\n", (UINT32)((key & 0xffffffff00000000ULL)>>32), (UINT32)(key & 0x00000000ffffffffULL));
-
-	naomi_game_decrypt( key, memory_region(machine,"user1"), memory_region_length(machine,"user1"));
-}
-
-
 ROM_START( gundmgd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xa000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD_OPTIONAL("gdmgd_sl.bin", 0x0000000,  0xa000000, CRC(d07ee020) SHA1(751033d48e021908958757125cf3b96a89d0e765) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0001", 0, SHA1(f525111e2762e5895fd0016a9bd41210c1125499) MD5(dcba598e76646a5a6b6e6da70552a7c5) )
@@ -2911,8 +2772,7 @@ ROM_END
 ROM_START( sfz3ugd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xac00000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD_OPTIONAL("zero3rom.bin", 0x0000000, 0xac00000, CRC(4eabda58) SHA1(e70db0e93c821838c77510fd47c91f0c4cfb09c9) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0002", 0, SHA1(6e7cb0df5feea41ae0b5eb72a92adcd8966595dc) MD5(6340b2527673a8cf387dcda52ecae0ca) )
@@ -2926,8 +2786,7 @@ ROM_END
 ROM_START( cvsgd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x7800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD_OPTIONAL("snkgd_sl.bin", 0x0000000, 0x7800000, CRC(83ec3894) SHA1(d07271d964bf6421ea9f13e10ecec57c6e995b2e) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0004", 0,  SHA1(8f8651527463aa01d40c280c0d9b03b7a0650a32) MD5(2d17eaf881c06bd95847e54878bc2ba9) )
@@ -2942,8 +2801,7 @@ ROM_END
 ROM_START( gundmxgd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xc800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD_OPTIONAL("gdmgd_sl.bin", 0x0000000, 0xc800000, CRC(322e503c) SHA1(10a0e3e079d9724e6bc2d4916a4f64384d00d202) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0006", 0, SHA1(b95bc07e61e57a62e276ba7fef0ae9a5c19667d9) MD5(90b1980605e7f53b38292ae32d547c8b) )
@@ -2958,8 +2816,7 @@ ROM_END
 ROM_START( cvs2gd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x9800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("snkgd_sl.bin", 0x0000000, 0x9800000,  CRC(f153421d) SHA1(0c2b935ae3cfb6c85410a209fec4eab497066d84) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0007a", 0, SHA1(e8f199f2743a63765bcbcd533bbe5eed82f959a8) MD5(1f434e6f610987987d1d130e454f5c74) )
@@ -2973,8 +2830,7 @@ ROM_END
 ROM_START( ikaruga )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x9800000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("ikaruga.bin", 0x0000000, 0x2000000, CRC(e0369676) SHA1(87f1d01ed81a612b44ed2e1bc48098c3ba92c238) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0010", 0, SHA1(3b853be7208f523100690e12a661173d023af9c1) MD5(83f1877b979b0e5fd77ebfa1ddd9fd56) )
@@ -2989,8 +2845,7 @@ ROM_END
 ROM_START( ggxx )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("ggx2.bin", 0x0000000, 0xf000000, CRC(666676ee) SHA1(24302e6f10e0d4d41f432cabf9d2743c0aa8fa7c) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0011", 0, SHA1(c08a19acb5641d2fd14b54cc149459c345dae013) MD5(25ab6d42bf07dd26e7033cf201322d9c) )
@@ -3005,8 +2860,7 @@ ROM_END
 ROM_START( chocomk )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x3f1f000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("typ.bin", 0x0000000, 0x3f1f000,  CRC(d3976ae9) SHA1(764675d0b612b856dab95caa3000b31206439db4) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0014a", 0, SHA1(ee71e76f136b1a25855233a614d5c60a6a3e587d) MD5(1e5a028b0ae5cf3c5602cdc657fa2bc4) )
@@ -3021,8 +2875,7 @@ ROM_END
 ROM_START( quizqgd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("game.bin", 0x0000000, 0x9000000,  CRC(0075dd46) SHA1(8f0cb3f8bce492c8d2bdec607a4b95d36ddea404) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0017", 0, SHA1(b6f3fbc81d9aea18551134b93ba3b612254bbc43) MD5(af4be08bf65cbddf2177ccf838c0df20) )
@@ -3036,8 +2889,7 @@ ROM_END
 ROM_START( ggxxrl )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("ggx2.bin", 0x0000000,  0xf000000,  CRC(96ee0174) SHA1(3063682aa31b983fc8dcc2a86bf57dc50da5d904) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0019a", 0, SHA1(50ec9bba5a7ba71f8543763cb139bab46dc487a5) MD5(b09c865e3e06e6e4467acf45b04e9caa) )
@@ -3051,8 +2903,7 @@ ROM_END
 ROM_START( shikgam2 )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x704e000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("game.bin", 0x0000000, 0x704e000,  CRC(f658311f) SHA1(d4b780d5954dd41bfe6ceff5fb358d94bc836126) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0021", 0, SHA1(ca6a9f78b2f6b18be3fb926ebcd20c2e90923882) MD5(ba448900dd5cbc9f1f75f285f5d72231) )
@@ -3067,8 +2918,7 @@ ROM_END
 ROM_START( meltybld )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xdc2c000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("mel.bin", 0x0000000,  0xdc2c000, CRC(2af7db27) SHA1(2569b6f84be411928764fb513503dfe116f957f5) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0028c", 0, SHA1(bbe95fd6bb39a33e979a0d9d8a63c0f2df1e9e96) MD5(b3318abacfea682605aaa24c756f225d) )
@@ -3084,8 +2934,7 @@ ROM_END
 ROM_START( senko )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xfe40000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("ronde.bin", 0x0000000,  0xfe40000, CRC(49bff4cb) SHA1(bd67522ed781cdd70b4c652cbb1befddb395a4b7) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0030a", 0,  SHA1(bb9727f69f7e5452e09b151c1198d006a81aeb0e) MD5(12885cd794d8a5a839699aef4769b2dd) )
@@ -3101,8 +2950,7 @@ ROM_END
 ROM_START( ss2005 )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x5504800, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("sh2sl.bin", 0x0000000,   0x5504800, CRC(5c1d2394) SHA1(197cb74c00adb2acafa927045a2fa7b5730605c7) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gdl-0031a", 0, SHA1(09a47ce506b9696d7bdf4d7c95aa3182cc0d9efa) MD5(1a83930f2083397868172745d3ab2926) )
@@ -3119,8 +2967,7 @@ ROM_END
 ROM_START( sprtjam )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("rom.enc", 0x0000000,   0xb000000, CRC(1f6daa8d) SHA1(41c40da36c0448d0a8695fef2fd304b9caaf7562) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0003", 0, SHA1(bfabb0da1d4f0422e0b62d8a7bb67dbcdb0d5954) MD5(3a8d3cbc4067f9b5f50be9b9abdc689b) )
@@ -3135,8 +2982,7 @@ ROM_END
 ROM_START( slashout )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("slash.bin", 0x0000000,   0x9000000, CRC(e1f9320f) SHA1(09f1a69aee6e401acbe2099e10193d3fb575eeeb) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0004", 0, SHA1(ec1758f5ae359bcb3c66c7ce9ebcb7443c4fd967) MD5(f5228f26e661ab0cb67414f51fe1a5bc) )
@@ -3151,8 +2997,7 @@ ROM_END
 ROM_START( spkrbtl )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("spkb.bin", 0x0000000,   0xb000000, CRC(ca11d20e) SHA1(e2e2710a8c69eeb970e131be80e0ec19e91d90c6) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0005", 0, SHA1(ca6e7ed2e161acad8600898e1b83aded9bb31d3b) MD5(a8a05ce6ab7d9ea67e015cd4853a5b80) )
@@ -3167,8 +3012,7 @@ ROM_END
 ROM_START( dygolf )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x6000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("game.enc", 0x0000000,   0x6000000, CRC(ab02d769) SHA1(3d96d43522357950a3928717464ecf854dd6e385) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0009", 0, SHA1(d58a42586c65dcb44282bf930631ea8b663c6aa7) MD5(e553e1811f28b67fd57fa8e34d978d87) )
@@ -3182,8 +3026,7 @@ ROM_END
 ROM_START( wsbbgd )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0xa000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("wsb_sl.bin", 0x0000000,   0xa000000, CRC(e61f37f1) SHA1(ba7b97eec6df672b520c57422287f699438267c5) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0010", 0,  SHA1(8ce36c9710a8d55e8c19d7f218500b7074b66dec) MD5(bfb8c5ead5ac9e2a82bca9114390a99f) )
@@ -3198,8 +3041,7 @@ ROM_END
 ROM_START( vathlete )
 	NAOMIGD_BIOS
 
-	ROM_REGION( 0x7000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("va.bin", 0x0000000,   0x7000000, CRC(82992bf8) SHA1(1c36e1d8e5bf392b760c934b358963b92fc716cf) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0019", 0, SHA1(2167bbdde987c16949c5814ab7cff6eefd9f9326) MD5(67499591f2c61cda14fa581db9294315) )
@@ -3214,28 +3056,28 @@ ROM_END
 GAME( 2001, naomigd,   0,        naomi,    naomi,    0,       ROT0, "Sega",            "Naomi GD-ROM Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 // GDL-xxxx (licensed games?)
-GAME( 200?, gundmgd,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, sfz3ugd,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",        "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, cvsgd,     naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",        "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, gundmxgd,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, cvs2gd,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Capcom",        "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2001, ikaruga,   naomigd,  naomi,    naomi,    ngdkey,   ROT270, "Treasure",      "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, ggxx,      naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, chocomk,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, quizqgd,   naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, ggxxrl,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, shikgam2,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2004, meltybld,  naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "Ecole",         "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, senko,     naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Senko No Ronde (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 2005, ss2005,    naomigd,  naomi,    naomi,    ngdkey,   ROT0,   "unknown",       "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, gundmgd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Mobile Suit Gundam: Federation VS Zeon (GDL-0001)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, sfz3ugd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",        "Street Fighter Zero 3 Upper (GDL-0002)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, cvsgd,     naomigd,  naomigd,  naomi,    0,   ROT0,   "Capcom",        "Capcom vs SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, gundmxgd,  naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, cvs2gd,    naomigd,  naomigd,  naomi,    0,	  ROT0,   "Capcom",        "Capcom vs SNK 2 Millionaire Fighting 2001 (GDL-0007A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2001, ikaruga,   naomigd,  naomigd,  naomi,    0,   ROT270, "Treasure",      "Ikaruga (GDL-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, ggxx,      naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Guilty Gear XX (GDL-0011)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, chocomk,   naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Musapey's Choco Marker (GDL-0014A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, quizqgd,   naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Quiz Keitai Q mode (GDL-0017)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, ggxxrl,    naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Guilty Gear XX #Reload (GDL-0019A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, shikgam2,  naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Shikigami No Shiro II / The Castle of Shikigami II (GDL-0021)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2004, meltybld,  naomigd,  naomigd,  naomi,    0,   ROT0,   "Ecole",         "Melty Blood Act Cadenza (GDL-0028C)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, senko,     naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Senko No Ronde (GDL-0030A)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 2005, ss2005,    naomigd,  naomigd,  naomi,    0,   ROT0,   "unknown",       "Super Shanghai 2005 (GDL-0031A)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 // GDS-xxxx (first party games?)
-GAME( 200?, sprtjam,   naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, slashout,  naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, spkrbtl,   naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, dygolf,    naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, wsbbgd,    naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "World Series Baseball (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, vathlete,  naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, sprtjam,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Sports Jam (GDS-0003)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, slashout,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Slashout (GDS-0004)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, spkrbtl,   naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Spikers Battle (GDS-0005)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, dygolf,    naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Golf / Dynamic Golf (GDS-0009)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, wsbbgd,    naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "World Series Baseball (GDS-0010)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, vathlete,  naomigd,  naomigd,  naomi,    0,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 /* Naomi 2 & Naomi 2 GD-ROM */
 
@@ -3243,8 +3085,7 @@ GAME( 200?, vathlete,  naomigd,  naomi,    naomi,    ngdkey,  ROT0, "Sega",     
 ROM_START( vstrik3 )
 	NAOMI2_BIOS
 
-	ROM_REGION( 0xb000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("vs3.bin", 0x0000000,   0xb000000, CRC(79d44ff4) SHA1(af0b892531c60999f0ef5db7525de50836764c77) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0006", 0, SHA1(293b84c7f4547060f57598b796b6fc49513cc839) MD5(060d9fef55d8f0fc1986ecc991478942) )
@@ -3258,8 +3099,7 @@ ROM_END
 ROM_START( vf4 )
 	NAOMI2_BIOS
 
-	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("vf4.bin", 0x0000000,   0xf000000, CRC(a81e3277) SHA1(fb162f34720d6ba49297ecb5e2869b2afffc307b) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0012", 0, SHA1(d68436ee72ea5db40e184b7ff38903a9cadb6df7) MD5(5a18300646a68f2994ed8c81abe9bdd8) )
@@ -3279,8 +3119,7 @@ ROM_END
 ROM_START( initd )
 	NAOMI2_BIOS
 
-	ROM_REGION( 0xc2ed000, "user1", ROMREGION_ERASE) // this is the 'rom' file from the GDROM DISC, once the GDROM is emulated this won't be loaded
-	ROM_LOAD("inid.bin", 0x0000000,    0xc2ed000, CRC(524ca451) SHA1(cc8dd06e4fe50e70f277043bd1b817e41c5db8cf) )
+	ROM_REGION( 0x10000000, "user1", ROMREGION_ERASE) // allocate max size in init instead?
 
 	DISK_REGION( "gdrom" )
 	DISK_IMAGE_READONLY( "gds-0020b", 0, SHA1(5f386183e856722fee4a6ddb0146350b73349181) MD5(b085005215e2766e0fc1e3bd16b2fd95) )
@@ -3293,9 +3132,9 @@ ROM_END
 
 GAME( 2001, naomi2,   0,        naomi,    naomi,    0, ROT0, "Sega",            "Naomi 2 Bios", GAME_NO_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 // GDS-xxxx (first party games?)
-GAME( 200?, vstrik3, naomi2,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, vf4,     naomi2,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Virtua Fighter 4 (GDS-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
-GAME( 200?, initd,   naomi2,  naomi,    naomi,    ngdkey,  ROT0, "Sega",          "Initial D (GDS-0020b)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, vstrik3, naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Striker 3 (GDS-0006)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, vf4,     naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Virtua Fighter 4 (GDS-0012)", GAME_NO_SOUND|GAME_NOT_WORKING )
+GAME( 200?, initd,   naomi2,  naomigd,    naomi,    0,  ROT0, "Sega",          "Initial D (GDS-0020b)", GAME_NO_SOUND|GAME_NOT_WORKING )
 
 
 /* Atomiswave */

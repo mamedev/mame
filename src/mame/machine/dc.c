@@ -9,6 +9,7 @@
 #include "dc.h"
 #include "cpu/sh4/sh4.h"
 #include "sound/aica.h"
+#include "naomibd.h"
 
 #define DEBUG_REGISTERS	(1)
 
@@ -123,7 +124,6 @@ UINT32 dc_coin_counts[2];
 static UINT32 maple_regs[0x100/4];
 static UINT32 dc_rtcregister[4];
 static UINT32 g1bus_regs[0x100/4];
-extern UINT32 dma_offset;
 static UINT8 maple0x86data1[0x80];
 static UINT8 maple0x86data2[0x400];
 static emu_timer *dc_rtc_timer;
@@ -744,7 +744,8 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 	UINT64 shift;
 	UINT32 old,dat;
 	struct sh4_ddt_dma ddtdata;
-	UINT8 *ROM = (UINT8 *)memory_region(space->machine, "user1");
+ 	UINT8 *ROM;
+ 	UINT32 dmaoffset;
 
 	reg = decode_reg32_64(space->machine, offset, mem_mask, &shift);
 	dat = (UINT32)(data >> shift);
@@ -762,14 +763,16 @@ WRITE64_HANDLER( dc_g1_ctrl_w )
 				mame_printf_verbose("G1CTRL: unsupported transfer\n");
 				return;
 			}
+ 			ROM = (UINT8 *)devtag_get_info_ptr(space->machine, NAOMI_BOARD, "rom_board", DEVINFO_PTR_MEMORY);
+ 			dmaoffset = (UINT32)devtag_get_info_int(space->machine, NAOMI_BOARD, "rom_board", DEVINFO_INT_DMAOFFSET);
 			ddtdata.destination=g1bus_regs[SB_GDSTAR];		// destination address
 			ddtdata.length=g1bus_regs[SB_GDLEN] >> 5;		// words to transfer
 			ddtdata.size=32;			// bytes per word
-			ddtdata.buffer=ROM+dma_offset;	// buffer address
+ 			ddtdata.buffer=ROM+dmaoffset;	// buffer address
 			ddtdata.direction=1;	// 0 source to buffer, 1 buffer to destination
 			ddtdata.channel= -1;	// not used
 			ddtdata.mode= -1;		// copy from/to buffer
-			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dma_offset, g1bus_regs[SB_GDSTAR]);
+ 			mame_printf_verbose("G1CTRL: transfer %x from ROM %08x to sdram %08x\n", g1bus_regs[SB_GDLEN], dmaoffset, g1bus_regs[SB_GDSTAR]);
 			cpu_set_info_ptr(space->machine->cpu[0], CPUINFO_PTR_SH4_EXTERNAL_DDT_DMA, &ddtdata);
 			g1bus_regs[SB_GDST]=0;
 			dc_sysctrl_regs[SB_ISTNRM] |= IST_DMA_GDROM;

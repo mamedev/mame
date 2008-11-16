@@ -164,7 +164,9 @@ WRITE64_HANDLER( pvr_ta_w )
 	int reg;
 	UINT64 shift;
 	UINT32 old,dat;
-	//UINT32 sizera,offsetra,v;
+	#if DEBUG_PVRTA
+	UINT32 sizera,offsetra,v;
+	#endif
 	int a;
 
 	reg = decode_reg_64(offset, mem_mask, &shift);
