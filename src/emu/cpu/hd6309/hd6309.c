@@ -478,13 +478,7 @@ static void CHECK_IRQ_LINES( m68_state_t *m68_state )
 		CHANGE_PC;
 		(void)(*m68_state->irq_callback)(m68_state->device, HD6309_IRQ_LINE);
 	}
-
 }
-
-/****************************************************************************
- * includes the actual opcode implementations
- ****************************************************************************/
-#include "6309ops.c"
 
 
 
@@ -634,6 +628,11 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 		CHECK_IRQ_LINES(m68_state);
 	}
 }
+
+/****************************************************************************
+ * includes the actual opcode implementations
+ ****************************************************************************/
+#include "6309ops.c"
 
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( hd6309 )	/* NS 970908 */

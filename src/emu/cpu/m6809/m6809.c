@@ -348,11 +348,11 @@ static CPU_GET_CONTEXT( m6809 )
 static CPU_SET_CONTEXT( m6809 )
 {
 	m68_state_t *m68_state = src;
+
 	CHANGE_PC;
 
-    CHECK_IRQ_LINES(m68_state);
-    UpdateState(m68_state);
-
+	CHECK_IRQ_LINES(m68_state);
+	UpdateState(m68_state);
 }
 
 
@@ -464,7 +464,9 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 	}
 }
 
-/* includes the static function prototypes and the master opcode table */
+/****************************************************************************
+ * includes the actual opcode implementations
+ ****************************************************************************/
 #include "6809tbl.c"
 
 /* includes the actual opcode implementations */

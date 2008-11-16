@@ -223,9 +223,8 @@ OP_HANDLER( jmp_di )
 /* $0F CLR direct -0100 */
 OP_HANDLER( clr_di )
 {
-	UINT32 dummy;
 	DIRECT;
-	dummy = RM(EAD);
+	(void)RM(EAD);
 	WM(EAD,0);
 	CLR_NZVC;
 	SEZ;
@@ -327,16 +326,18 @@ OP_HANDLER( andcc )
 	CHECK_IRQ_LINES(m68_state);	/* HJB 990116 */
 }
 
-/* $1D SEX inherent -**0- */
+/* $1D SEX inherent -**-- */
 OP_HANDLER( sex )
 {
 	UINT16 t;
 	t = SIGNED(B);
 	D = t;
+	//  CLR_NZV;    Tim Lindner 20020905: verified that V flag is not affected
 	CLR_NZ;
 	SET_NZ16(t);
 }
 
+/* $1E EXG inherent ----- */
 OP_HANDLER( exg )
 {
 	UINT16 t1,t2;
@@ -2185,9 +2186,8 @@ OP_HANDLER( jmp_ix )
 /* $6F CLR indexed -0100 */
 OP_HANDLER( clr_ix )
 {
-	UINT32 dummy;
 	fetch_effective_address(m68_state);
-	dummy = RM(EAD);
+	(void)RM(EAD);
 	WM(EAD,0);
 	CLR_NZVC; SEZ;
 }
@@ -2340,9 +2340,8 @@ OP_HANDLER( jmp_ex )
 /* $7F CLR extended -0100 */
 OP_HANDLER( clr_ex )
 {
-	UINT32 dummy;
 	EXTENDED;
-	dummy = RM(EAD);
+	(void)RM(EAD);
 	WM(EAD,0);
 	CLR_NZVC; SEZ;
 }
@@ -3134,19 +3133,6 @@ OP_HANDLER( subw_ix )
 	W = r;
 }
 
-/* $10a3 CMPD indexed -**** */
-OP_HANDLER( cmpd_ix )
-{
-	UINT32 r,d;
-	PAIR b;
-	fetch_effective_address(m68_state);
-	b.d=RM16(EAD);
-	d = D;
-	r = d - b.d;
-	CLR_NZVC;
-	SET_FLAGS16(d,b.d,r);
-}
-
 /* $10a1 CMPW indexed -**** */
 OP_HANDLER( cmpw_ix )
 {
@@ -3155,6 +3141,19 @@ OP_HANDLER( cmpw_ix )
 	fetch_effective_address(m68_state);
 	b.d=RM16(EAD);
 	d = W;
+	r = d - b.d;
+	CLR_NZVC;
+	SET_FLAGS16(d,b.d,r);
+}
+
+/* $10a3 CMPD indexed -**** */
+OP_HANDLER( cmpd_ix )
+{
+	UINT32 r,d;
+	PAIR b;
+	fetch_effective_address(m68_state);
+	b.d=RM16(EAD);
+	d = D;
 	r = d - b.d;
 	CLR_NZVC;
 	SET_FLAGS16(d,b.d,r);
@@ -3507,7 +3506,7 @@ OP_HANDLER( sbca_ex )
 OP_HANDLER( subd_ex )
 {
 	UINT32 r,d;
-	PAIR b = {{0,}};
+	PAIR b;
 	EXTWORD(b);
 	d = D;
 	r = d - b.d;
@@ -3533,7 +3532,7 @@ OP_HANDLER( subw_ex )
 OP_HANDLER( cmpd_ex )
 {
 	UINT32 r,d;
-	PAIR b = {{0,}};
+	PAIR b;
 	EXTWORD(b);
 	d = D;
 	r = d - b.d;
@@ -3557,7 +3556,7 @@ OP_HANDLER( cmpw_ex )
 OP_HANDLER( cmpu_ex )
 {
 	UINT32 r,d;
-	PAIR b = {{0,}};
+	PAIR b;
 	EXTWORD(b);
 	d = U;
 	r = d - b.d;
@@ -3649,7 +3648,7 @@ OP_HANDLER( adda_ex )
 OP_HANDLER( cmpx_ex )
 {
 	UINT32 r,d;
-	PAIR b = {{0,}};
+	PAIR b;
 	EXTWORD(b);
 	d = X;
 	r = d - b.d;
@@ -3661,7 +3660,7 @@ OP_HANDLER( cmpx_ex )
 OP_HANDLER( cmpy_ex )
 {
 	UINT32 r,d;
-	PAIR b = {{0,}};
+	PAIR b;
 	EXTWORD(b);
 	d = Y;
 	r = d - b.d;
@@ -3673,7 +3672,7 @@ OP_HANDLER( cmpy_ex )
 OP_HANDLER( cmps_ex )
 {
 	UINT32 r,d;
-	PAIR b = {{0,}};
+	PAIR b;
 	EXTWORD(b);
 	d = S;
 	r = d - b.d;
@@ -5050,7 +5049,7 @@ OP_HANDLER( sbcd_ex )
 OP_HANDLER( addd_ex )
 {
 	UINT32 r,d;
-	PAIR b = {{0,}};
+	PAIR b;
 	EXTWORD(b);
 	d = D;
 	r = d + b.d;
