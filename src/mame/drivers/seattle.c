@@ -605,7 +605,7 @@ static void ide_interrupt(const device_config *device, int state)
  *
  *************************************/
 
-static void ethernet_interrupt(running_machine *machine, int state)
+static void ethernet_interrupt_machine(running_machine *machine, int state)
 {
 	ethernet_irq_state = state;
 	if (board_config == FLAGSTAFF_CONFIG)
@@ -616,6 +616,11 @@ static void ethernet_interrupt(running_machine *machine, int state)
 	}
 	else if (board_config == SEATTLE_WIDGET_CONFIG)
 		update_widget_irq(machine);
+}
+
+static void ethernet_interrupt(const device_config *device, int state)
+{
+	ethernet_interrupt_machine(device->machine, state);
 }
 
 
@@ -695,7 +700,7 @@ static WRITE32_HANDLER( interrupt_config_w )
 
 	/* update the states */
 	update_vblank_irq(space->machine);
-	ethernet_interrupt(space->machine, ethernet_irq_state);
+	ethernet_interrupt_machine(space->machine, ethernet_irq_state);
 }
 
 
@@ -708,7 +713,7 @@ static WRITE32_HANDLER( seattle_interrupt_enable_w )
 		if (vblank_latch)
 			update_vblank_irq(space->machine);
 		if (ethernet_irq_state)
-			ethernet_interrupt(space->machine, ethernet_irq_state);
+			ethernet_interrupt_machine(space->machine, ethernet_irq_state);
 	}
 }
 
