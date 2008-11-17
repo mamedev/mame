@@ -127,14 +127,14 @@ static const char *const status_text[] =
 static const char *const status_color[] =
 {
 	"",
-	"bgcolor=\"#00A000\"",
-	"bgcolor=\"#E0E000\"",
-	"bgcolor=\"#8000C0\"",
-	"bgcolor=\"#C00000\"",
-	"bgcolor=\"#C00000\"",
-	"bgcolor=\"#C06000\"",
-	"bgcolor=\"#C00000\"",
-	"bgcolor=\"#C00000\"",
+	"background:#00A000",
+	"background:#E0E000",
+	"background:#8000C0",
+	"background:#C00000",
+	"background:#C00000",
+	"background:#C06000",
+	"background:#C00000",
+	"background:#C00000",
 };
 
 
@@ -151,40 +151,21 @@ static int CLIB_DECL compare_file(const void *file0ptr, const void *file1ptr);
 static summary_file *sort_file_list(void);
 
 /* HTML helpers */
-static FILE *create_file_and_output_header(const char *filename, const char *title, const char *subtitle);
-static void output_footer_and_close_file(FILE *file);
+static core_file *create_file_and_output_header(const astring *filename, const astring *template, const astring *title);
+static void output_footer_and_close_file(core_file *file, const astring *template, const astring *title);
 
 /* report generators */
-static void output_report(const char *dirname, summary_file *filelist);
+static void output_report(const astring *dirname, const astring *tempheader, const astring *tempfooter, summary_file *filelist);
 static int compare_screenshots(summary_file *curfile);
-static int generate_png_diff(const summary_file *curfile, const char *destdir, const char *destname);
-static void create_linked_file(const char *dirname, const summary_file *curfile, const summary_file *prevfile, const summary_file *nextfile, const char *pngfile);
-static void append_driver_list_table(const char *header, const char *dirname, FILE *indexfile, const summary_file *listhead);
+static int generate_png_diff(const summary_file *curfile, const astring *destdir, const char *destname);
+static void create_linked_file(const astring *dirname, const summary_file *curfile, const summary_file *prevfile, const summary_file *nextfile, const char *pngfile, const astring *tempheader, const astring *tempfooter);
+static void append_driver_list_table(const char *header, const astring *dirname, core_file *indexfile, const summary_file *listhead, const astring *tempheader, const astring *tempfooter);
 
 
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    alloc_filename - combine directory name
-    and remainder into full path, living in
-    allocated memory
--------------------------------------------------*/
-
-INLINE const char *alloc_filename(const char *dirname, const char *remainder)
-{
-	int count = strlen(dirname) + 1 + strlen(remainder) + 1;
-	char *result;
-
-	result = malloc(count);
-	if (result == NULL)
-		return NULL;
-	sprintf(result, "%s" PATH_SEPARATOR "%s", dirname, remainder);
-	return result;
-}
-
 
 /*-------------------------------------------------
     trim_string - trim leading/trailing spaces
@@ -240,29 +221,65 @@ INLINE int get_unique_index(const summary_file *curfile, int index)
 
 int main(int argc, char *argv[])
 {
-	const char *dirname;
+	astring *dirname = NULL, *tempfilename = NULL, *tempheader = NULL, *tempfooter = NULL;
+	core_file *tempfile;
 	int listnum;
     int result;
 
     /* first argument is the directory */
-    if (argc < 3)
+    if (argc < 4)
     {
-    	fprintf(stderr, "Usage:\nsummcomp <outputdir> <summary1> [<summary2> [<summary3> ...]]\n");
+    	fprintf(stderr, "Usage:\nregrep <template> <outputdir> <summary1> [<summary2> [<summary3> ...]]\n");
     	return 1;
     }
-    dirname = argv[1];
-    list_count = argc - 2;
+    tempfilename = astring_dupc(argv[1]);
+    dirname = astring_dupc(argv[2]);
+    list_count = argc - 3;
+
+	/* read the template file into an astring */
+	if (core_fopen(astring_c(tempfilename), OPEN_FLAG_READ, &tempfile) == FILERR_NONE)
+	{
+		UINT64 filesize = core_fsize(tempfile);
+		void *buffer = malloc(filesize);
+		if (buffer != NULL)
+		{
+			core_fread(tempfile, buffer, filesize);
+			tempheader = astring_dupch(buffer, filesize);
+			free(buffer);
+		}
+		core_fclose(tempfile);
+	}
+
+	/* verify the template */
+	if (tempheader == NULL)
+	{
+		fprintf(stderr, "Unable to read template file\n");
+		return 1;
+	}
+	result = astring_findc(tempheader, 0, "<!--CONTENT-->");
+	if (result == -1)
+	{
+		fprintf(stderr, "Template is missing a <!--CONTENT--> marker\n");
+		return 1;
+	}
+	tempfooter = astring_substr(astring_dup(tempheader), result + 14, -1);
+	tempheader = astring_substr(tempheader, 0, result);
 
     /* loop over arguments and read the files */
     for (listnum = 0; listnum < list_count; listnum++)
     {
-        result = read_summary_log(argv[listnum + 2], listnum);
+        result = read_summary_log(argv[listnum + 3], listnum);
         if (result != 0)
             return result;
     }
 
     /* output the summary */
-    output_report(dirname, sort_file_list());
+    output_report(dirname, tempheader, tempfooter, sort_file_list());
+
+	astring_free(dirname);
+	astring_free(tempfilename);
+	astring_free(tempheader);
+	astring_free(tempfooter);
     return 0;
 }
 
@@ -573,47 +590,22 @@ static summary_file *sort_file_list(void)
     HTML file with a standard header
 -------------------------------------------------*/
 
-static FILE *create_file_and_output_header(const char *filename, const char *title, const char *subtitle)
+static core_file *create_file_and_output_header(const astring *filename, const astring *template, const astring *title)
 {
-	FILE *file;
+	astring *modified;
+	core_file *file;
 
 	/* create the indexfile */
-	file = fopen(filename, "w");
-	if (file == NULL)
+	if (core_fopen(astring_c(filename), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS | OPEN_FLAG_NO_BOM, &file) != FILERR_NONE)
 		return NULL;
 
 	/* print a header */
-	fprintf(file,
-		"<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n"
-		"\n"
-		"<html xmlns=\"http://www.w3.org/1999/xhtml\">\n"
-		"<head>\n"
-		"\t<meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" />\n"
-		"\t<title>%s</title>\n"
-		"\t<link rel=\"stylesheet\" href=\"http://mamedev.org/styles-site.css\" type=\"text/css\" />\n"
-		"</head>\n"
-		"\n"
-		"<body>\n"
-		"\t<div id=\"outer\">\n"
-		"\n"
-		"\t<div id=\"banner\">\n"
-		"\t<h1>%s</h1>\n"
-		"\t<h2>%s</h2>\n"
-		"\t</div>\n"
-		"\n"
-		"\t<div id=\"left\">\n"
-		"\t<div class=\"sidebar\">\n"
-		"\t<!--#include virtual=\"/links.txt\" -->\n"
-		"\t</div>\n"
-		"\t</div>\n"
-		"\n"
-		"\t<div id=\"center\">\n"
-		"\t<div class=\"content\">\n"
-		"\n",
-		title, title, (subtitle == NULL) ? "&nbsp;" : subtitle
-	);
+	modified = astring_dup(template);
+	astring_replacec(modified, 0, "<!--TITLE-->", astring_c(title));
+	core_fwrite(file, astring_c(modified), astring_len(modified));
 
 	/* return the file */
+	astring_free(modified);
 	return file;
 }
 
@@ -623,18 +615,15 @@ static FILE *create_file_and_output_header(const char *filename, const char *tit
     standard footer to an HTML file and close it
 -------------------------------------------------*/
 
-static void output_footer_and_close_file(FILE *file)
+static void output_footer_and_close_file(core_file *file, const astring *template, const astring *title)
 {
-	fprintf(file,
-		"\n"
-		"\t</div>\n"
-		"\t</div>\n"
-		"\t</div>\n"
-		"</body>"
-		"\n"
-		"</html>\n"
-	);
-	fclose(file);
+	astring *modified;
+
+	modified = astring_dup(template);
+	astring_replacec(modified, 0, "<!--TITLE-->", astring_c(title));
+	core_fwrite(file, astring_c(modified), astring_len(modified));
+	astring_free(modified);
+	core_fclose(file);
 }
 
 
@@ -648,13 +637,14 @@ static void output_footer_and_close_file(FILE *file)
     report HTML files
 -------------------------------------------------*/
 
-static void output_report(const char *dirname, summary_file *filelist)
+static void output_report(const astring *dirname, const astring *tempheader, const astring *tempfooter, summary_file *filelist)
 {
 	summary_file *buckethead[BUCKET_COUNT], **buckettailptr[BUCKET_COUNT];
 	summary_file *curfile;
-	const char *indexname;
+	astring *title = astring_dupc("MAME Regressions");
+	astring *tempname = astring_alloc();
 	int listnum, bucknum;
-	FILE *indexfile;
+	core_file *indexfile;
 	int count = 0, total;
 
 	/* initialize the lists */
@@ -731,12 +721,13 @@ static void output_report(const char *dirname, summary_file *filelist)
 		*buckettailptr[bucknum] = NULL;
 
 	/* output header */
-	indexname = alloc_filename(dirname, "index.html");
-	indexfile = create_file_and_output_header(indexname, "MAME&trade; Regressions", NULL);
-	free((void *)indexname);
+	astring_printf(tempname, "%s" PATH_SEPARATOR "%s", astring_c(dirname), "index.html");
+	indexfile = create_file_and_output_header(tempname, tempheader, title);
 	if (indexfile == NULL)
 	{
-		fprintf(stderr, "Error creating file '%s'\n", indexname);
+		fprintf(stderr, "Error creating file '%s'\n", astring_c(tempname));
+		astring_free(tempname);
+		astring_free(title);
 		return;
 	}
 
@@ -748,12 +739,14 @@ static void output_report(const char *dirname, summary_file *filelist)
 		if (buckethead[curbucket] != NULL)
 		{
 			fprintf(stderr, "Outputting bucket: %s\n", bucket_name[curbucket]);
-			append_driver_list_table(bucket_name[curbucket], dirname, indexfile, buckethead[curbucket]);
+			append_driver_list_table(bucket_name[curbucket], dirname, indexfile, buckethead[curbucket], tempheader, tempfooter);
 		}
 	}
 
 	/* output footer */
-	output_footer_and_close_file(indexfile);
+	output_footer_and_close_file(indexfile, tempfooter, title);
+	astring_free(tempname);
+	astring_free(title);
 }
 
 
@@ -775,29 +768,24 @@ static int compare_screenshots(summary_file *curfile)
 		bitmaps[listnum] = NULL;
 		if (curfile->status[listnum] == STATUS_SUCCESS)
 		{
+			astring *fullname = astring_alloc();
 			file_error filerr;
-			const char *fullname;
-			char imgname[100];
 			core_file *file;
 
 			/* get the filename for the image */
-			sprintf(imgname, "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
-			fullname = alloc_filename(lists[listnum].dir, imgname);
+			astring_printf(fullname, "%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", lists[listnum].dir, curfile->name);
 
 			/* open the file */
-			filerr = core_fopen(fullname, OPEN_FLAG_READ, &file);
-			free((void *)fullname);
+			filerr = core_fopen(astring_c(fullname), OPEN_FLAG_READ, &file);
 
 			/* if that failed, look in the old location */
 			if (filerr != FILERR_NONE)
 			{
 				/* get the filename for the image */
-				sprintf(imgname, "snap" PATH_SEPARATOR "_%s.png", curfile->name);
-				fullname = alloc_filename(lists[listnum].dir, imgname);
+				astring_printf(fullname, "%s" PATH_SEPARATOR "snap" PATH_SEPARATOR "_%s.png", lists[listnum].dir, curfile->name);
 
 				/* open the file */
-				filerr = core_fopen(fullname, OPEN_FLAG_READ, &file);
-				free((void *)fullname);
+				filerr = core_fopen(astring_c(fullname), OPEN_FLAG_READ, &file);
 			}
 
 			/* if that worked, load the file */
@@ -806,6 +794,7 @@ static int compare_screenshots(summary_file *curfile)
 				png_read_bitmap(file, &bitmaps[listnum]);
 				core_fclose(file);
 			}
+			astring_free(fullname);
 		}
 	}
 
@@ -887,33 +876,34 @@ static int compare_screenshots(summary_file *curfile)
     side with a third set of differences
 -------------------------------------------------*/
 
-static int generate_png_diff(const summary_file *curfile, const char *destdir, const char *destname)
+static int generate_png_diff(const summary_file *curfile, const astring *destdir, const char *destname)
 {
-	const char *dstfilename = alloc_filename(destdir, destname);
 	bitmap_t *bitmaps[MAX_COMPARES] = { NULL };
+	astring *srcimgname = astring_alloc();
+	astring *dstfilename = astring_alloc();
+	astring *tempname = astring_alloc();
 	bitmap_t *finalbitmap = NULL;
 	int width, height, maxwidth;
 	int bitmapcount = 0;
 	int listnum, bmnum;
 	core_file *file = NULL;
-	char srcimgname[50];
 	file_error filerr;
 	png_error pngerr;
 	int error = -1;
 	int starty;
 
 	/* generate the common source filename */
-	sprintf(srcimgname, "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
+	astring_printf(dstfilename, "%s" PATH_SEPARATOR "%s", astring_c(destdir), destname);
+	astring_printf(srcimgname, "snap" PATH_SEPARATOR "%s" PATH_SEPARATOR "final.png", curfile->name);
 
 	/* open and load all unique bitmaps */
 	for (listnum = 0; listnum < list_count; listnum++)
 		if (curfile->matchbitmap[listnum] == listnum)
 		{
-			const char *filename = alloc_filename(lists[listnum].dir, srcimgname);
+			astring_printf(tempname, "%s" PATH_SEPARATOR "%s", lists[listnum].dir, astring_c(srcimgname));
 
 			/* open the source image */
-			filerr = core_fopen(filename, OPEN_FLAG_READ, &file);
-			free((void *)filename);
+			filerr = core_fopen(astring_c(tempname), OPEN_FLAG_READ, &file);
 			if (filerr != FILERR_NONE)
 				goto error;
 
@@ -987,7 +977,7 @@ static int generate_png_diff(const summary_file *curfile, const char *destdir, c
 	}
 
 	/* write the final PNG */
-	filerr = core_fopen(dstfilename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
+	filerr = core_fopen(astring_c(dstfilename), OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 	if (filerr != FILERR_NONE)
 		goto error;
 	pngerr = png_write_bitmap(file, NULL, finalbitmap, 0, NULL);
@@ -999,15 +989,16 @@ static int generate_png_diff(const summary_file *curfile, const char *destdir, c
 	error = 0;
 
 error:
-	if (dstfilename != NULL)
-		free((void *)dstfilename);
 	if (finalbitmap != NULL)
 		bitmap_free(finalbitmap);
 	for (bmnum = 0; bmnum < bitmapcount; bmnum++)
 		if (bitmaps[bmnum] != NULL)
 			bitmap_free(bitmaps[bmnum]);
 	if (error)
-		osd_rmfile(dstfilename);
+		osd_rmfile(astring_c(dstfilename));
+	astring_free(dstfilename);
+	astring_free(srcimgname);
+	astring_free(tempname);
 	return error;
 }
 
@@ -1017,42 +1008,44 @@ error:
     file between differing versions
 -------------------------------------------------*/
 
-static void create_linked_file(const char *dirname, const summary_file *curfile, const summary_file *prevfile, const summary_file *nextfile, const char *pngfile)
+static void create_linked_file(const astring *dirname, const summary_file *curfile, const summary_file *prevfile, const summary_file *nextfile, const char *pngfile, const astring *tempheader, const astring *tempfooter)
 {
-	const char *linkname;
-	char filename[100];
-	char title[100];
-	FILE *linkfile;
+	astring *linkname = astring_alloc();
+	astring *filename = astring_alloc();
+	astring *title = astring_alloc();
+	core_file *linkfile;
 	int listnum;
 
 	/* create the filename */
-	sprintf(filename, "%s.html", curfile->name);
+	astring_printf(filename, "%s.html", curfile->name);
 
 	/* output header */
-	sprintf(title, "%s Regressions", curfile->name);
-	linkname = alloc_filename(dirname, filename);
-	linkfile = create_file_and_output_header(linkname, title, NULL);
-	free((void *)linkname);
+	astring_printf(title, "%s Regressions", curfile->name);
+	astring_printf(linkname, "%s" PATH_SEPARATOR "%s", astring_c(dirname), astring_c(filename));
+	linkfile = create_file_and_output_header(linkname, tempheader, title);
 	if (linkfile == NULL)
 	{
-		fprintf(stderr, "Error creating file '%s'\n", filename);
+		fprintf(stderr, "Error creating file '%s'\n", astring_c(filename));
+		astring_free(title);
+		astring_free(filename);
+		astring_free(linkname);
 		return;
 	}
 
 	/* link to the previous/next entries */
-	fprintf(linkfile, "\t<p>\n");
-	fprintf(linkfile, "\t<table width=\"100%%\">\n");
-	fprintf(linkfile, "\t\t<td align=\"left\" width=\"40%%\" style=\"border:none\">");
+	core_fprintf(linkfile, "\t<p>\n");
+	core_fprintf(linkfile, "\t<table width=\"100%%\">\n");
+	core_fprintf(linkfile, "\t\t<td align=\"left\" width=\"40%%\" style=\"border:none\">");
 	if (prevfile != NULL)
-		fprintf(linkfile, "<a href=\"%s.html\"><< %s (%s)</a>", prevfile->name, prevfile->name, prevfile->source);
-	fprintf(linkfile, "</td>\n");
-	fprintf(linkfile, "\t\t<td align=\"center\" width=\"20%%\" style=\"border:none\"><a href=\"index.html\">Home</a></td>\n");
-	fprintf(linkfile, "\t\t<td align=\"right\" width=\"40%%\" style=\"border:none\">");
+		core_fprintf(linkfile, "<a href=\"%s.html\"><< %s (%s)</a>", prevfile->name, prevfile->name, prevfile->source);
+	core_fprintf(linkfile, "</td>\n");
+	core_fprintf(linkfile, "\t\t<td align=\"center\" width=\"20%%\" style=\"border:none\"><a href=\"index.html\">Home</a></td>\n");
+	core_fprintf(linkfile, "\t\t<td align=\"right\" width=\"40%%\" style=\"border:none\">");
 	if (nextfile != NULL)
-		fprintf(linkfile, "<a href=\"%s.html\">%s (%s) >></a>", nextfile->name, nextfile->name, nextfile->source);
-	fprintf(linkfile, "</td>\n");
-	fprintf(linkfile, "\t</table>\n");
-	fprintf(linkfile, "\t</p>\n");
+		core_fprintf(linkfile, "<a href=\"%s.html\">%s (%s) >></a>", nextfile->name, nextfile->name, nextfile->source);
+	core_fprintf(linkfile, "</td>\n");
+	core_fprintf(linkfile, "\t</table>\n");
+	core_fprintf(linkfile, "\t</p>\n");
 
 	/* output data for each one */
 	for (listnum = 0; listnum < list_count; listnum++)
@@ -1060,34 +1053,37 @@ static void create_linked_file(const char *dirname, const summary_file *curfile,
 		int imageindex = -1;
 
 		/* generate the HTML */
-		fprintf(linkfile, "\n\t<h2>%s</h2>\n", lists[listnum].version);
-		fprintf(linkfile, "\t<p>\n");
-		fprintf(linkfile, "\t<b>Status:</b> %s\n", status_text[curfile->status[listnum]]);
+		core_fprintf(linkfile, "\n\t<h2>%s</h2>\n", lists[listnum].version);
+		core_fprintf(linkfile, "\t<p>\n");
+		core_fprintf(linkfile, "\t<b>Status:</b> %s\n", status_text[curfile->status[listnum]]);
 		if (pngfile != NULL)
 			imageindex = get_unique_index(curfile, listnum);
 		if (imageindex != -1)
-			fprintf(linkfile, " [%d]", imageindex);
-		fprintf(linkfile, "\t</p>\n");
+			core_fprintf(linkfile, " [%d]", imageindex);
+		core_fprintf(linkfile, "\t</p>\n");
 		if (curfile->text[listnum] != NULL)
 		{
-			fprintf(linkfile, "\t<p>\n");
-			fprintf(linkfile, "\t<b>Errors:</b>\n");
-			fprintf(linkfile, "\t<pre>%s</pre>\n", curfile->text[listnum]);
-			fprintf(linkfile, "\t</p>\n");
+			core_fprintf(linkfile, "\t<p>\n");
+			core_fprintf(linkfile, "\t<b>Errors:</b>\n");
+			core_fprintf(linkfile, "\t<pre>%s</pre>\n", curfile->text[listnum]);
+			core_fprintf(linkfile, "\t</p>\n");
 		}
 	}
 
 	/* output link to the image */
 	if (pngfile != NULL)
 	{
-		fprintf(linkfile, "\n\t<h2>Screenshot Comparisons</h2>\n");
-		fprintf(linkfile, "\t<p>\n");
-		fprintf(linkfile, "\t<img src=\"%s\" />\n", pngfile);
-		fprintf(linkfile, "\t</p>\n");
+		core_fprintf(linkfile, "\n\t<h2>Screenshot Comparisons</h2>\n");
+		core_fprintf(linkfile, "\t<p>\n");
+		core_fprintf(linkfile, "\t<img src=\"%s\" />\n", pngfile);
+		core_fprintf(linkfile, "\t</p>\n");
 	}
 
 	/* output footer */
-	output_footer_and_close_file(linkfile);
+	output_footer_and_close_file(linkfile, tempfooter, title);
+	astring_free(title);
+	astring_free(filename);
+	astring_free(linkname);
 }
 
 
@@ -1096,29 +1092,28 @@ static void create_linked_file(const char *dirname, const summary_file *curfile,
     of drivers from a list to an HTML file
 -------------------------------------------------*/
 
-static void append_driver_list_table(const char *header, const char *dirname, FILE *indexfile, const summary_file *listhead)
+static void append_driver_list_table(const char *header, const astring *dirname, core_file *indexfile, const summary_file *listhead, const astring *tempheader, const astring *tempfooter)
 {
 	const summary_file *curfile, *prevfile;
 	int width = 100 / (2 + list_count);
 	int listnum;
 
 	/* output a header */
-	fprintf(indexfile, "\t<h2>%s</h2>\n", header);
-	fprintf(indexfile, "\t<div style=\"padding-left:20px;\">\n");
+	core_fprintf(indexfile, "\t<h2>%s</h2>\n", header);
 
 	/* start the table */
-	fprintf(indexfile, "\t<p><table width=\"90%%\">\n");
-	fprintf(indexfile, "\t\t<tr>\n\t\t\t<th width=\"%d%%\">Source</th><th width=\"%d%%\">Driver</th>", width, width);
+	core_fprintf(indexfile, "\t<p><table width=\"90%%\">\n");
+	core_fprintf(indexfile, "\t\t<tr>\n\t\t\t<th width=\"%d%%\">Source</th><th width=\"%d%%\">Driver</th>", width, width);
 	for (listnum = 0; listnum < list_count; listnum++)
-		fprintf(indexfile, "<th width=\"%d%%\">%s</th>", width, lists[listnum].version);
-	fprintf(indexfile, "\n\t\t</tr>\n");
+		core_fprintf(indexfile, "<th width=\"%d%%\">%s</th>", width, lists[listnum].version);
+	core_fprintf(indexfile, "\n\t\t</tr>\n");
 
 	/* if nothing, print a default message */
 	if (listhead == NULL)
 	{
-		fprintf(indexfile, "\t\t<tr>\n\t\t\t");
-		fprintf(indexfile, "<td colspan=\"%d\" align=\"center\">(No regressions detected)</td>", list_count + 2);
-		fprintf(indexfile, "\n\t\t</tr>\n");
+		core_fprintf(indexfile, "\t\t<tr>\n\t\t\t");
+		core_fprintf(indexfile, "<td colspan=\"%d\" align=\"center\">(No regressions detected)</td>", list_count + 2);
+		core_fprintf(indexfile, "\n\t\t</tr>\n");
 	}
 
 	/* iterate over files */
@@ -1151,13 +1146,13 @@ static void append_driver_list_table(const char *header, const char *dirname, FI
 		}
 
 		/* create a linked file */
-		create_linked_file(dirname, curfile, prevfile, curfile->next, (pngdiffname[0] == 0) ? NULL : pngdiffname);
+		create_linked_file(dirname, curfile, prevfile, curfile->next, (pngdiffname[0] == 0) ? NULL : pngdiffname, tempheader, tempfooter);
 
 		/* create a row */
-		fprintf(indexfile, "\t\t<tr>\n\t\t\t");
+		core_fprintf(indexfile, "\t\t<tr>\n\t\t\t");
 		if (rowspan > 0)
-			fprintf(indexfile, "<td rowspan=\"%d\">%s</td>", rowspan, curfile->source);
-		fprintf(indexfile, "<td><a href=\"%s.html\">%s</a></td>", curfile->name, curfile->name);
+			core_fprintf(indexfile, "<td rowspan=\"%d\">%s</td>", rowspan, curfile->source);
+		core_fprintf(indexfile, "<td><a href=\"%s.html\">%s</a></td>", curfile->name, curfile->name);
 		for (listnum = 0; listnum < list_count; listnum++)
 		{
 			int unique_index = -1;
@@ -1165,17 +1160,16 @@ static void append_driver_list_table(const char *header, const char *dirname, FI
 			if (pngdiffname[0] != 0)
 				unique_index = get_unique_index(curfile, listnum);
 			if (unique_index != -1)
-				fprintf(indexfile, "<td %s>%s [<a href=\"%s\" target=\"blank\">%d</a>]</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]], pngdiffname, unique_index);
+				core_fprintf(indexfile, "<td><span style=\"%s\">&nbsp;&nbsp;&nbsp;</span> %s [<a href=\"%s\" target=\"blank\">%d</a>]</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]], pngdiffname, unique_index);
 			else
-				fprintf(indexfile, "<td %s>%s</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]]);
+				core_fprintf(indexfile, "<td><span style=\"%s\">&nbsp;&nbsp;&nbsp;</span> %s</td>", status_color[curfile->status[listnum]], status_text[curfile->status[listnum]]);
 		}
-		fprintf(indexfile, "\n\t\t</tr>\n");
+		core_fprintf(indexfile, "\n\t\t</tr>\n");
 
 		/* also print the name and source file */
 		printf("%s %s\n", curfile->name, curfile->source);
 	}
 
 	/* end of table */
-	fprintf(indexfile, "</table></p>\n");
-	fprintf(indexfile, "</div>\n");
+	core_fprintf(indexfile, "</table></p>\n");
 }
