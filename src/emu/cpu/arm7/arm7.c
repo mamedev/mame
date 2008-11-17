@@ -85,7 +85,7 @@ static int ARM7_ICOUNT;
 static CPU_INIT( arm7 )
 {
     // must call core
-    arm7_core_init("arm7", index);
+    arm7_core_init("arm7", device);
 
     ARM7.irq_callback = irqcallback;
     ARM7.device = device;

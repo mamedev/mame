@@ -823,10 +823,10 @@ void rainbow_cchip_init(int version)
 	{
 		CRAM[i] = auto_malloc(0x400);
 
-		state_save_register_item_pointer("cchip", i, CRAM[i], 0x400);
+		state_save_register_item_pointer("cchip", NULL, i, CRAM[i], 0x400);
 	}
 
-	state_save_register_item("cchip", 0, current_bank);
+	state_save_register_item("cchip", NULL, 0, current_bank);
 
 	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, cchip_timer);
 }

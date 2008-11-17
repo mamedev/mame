@@ -45,6 +45,6 @@ READ8_HANDLER( mb14241_0_shift_result_r ) { return mb14241_shift_result_r(0); }
 
 void mb14241_init(int num)
 {
-	state_save_register_item("mb14241", num, chips[num].shift_data);
-	state_save_register_item("mb14241", num, chips[num].shift_count);
+	state_save_register_item("mb14241", NULL, num, chips[num].shift_data);
+	state_save_register_item("mb14241", NULL, num, chips[num].shift_count);
 }

@@ -453,16 +453,16 @@ void YM_DELTAT_postload(YM_DELTAT *DELTAT,UINT8 *regs)
 		DELTAT->now_data = *(DELTAT->memory + (DELTAT->now_addr>>1) );
 
 }
-void YM_DELTAT_savestate(const char *statename,int num,YM_DELTAT *DELTAT)
+void YM_DELTAT_savestate(const char *statename,const char *tag,YM_DELTAT *DELTAT)
 {
 #ifdef __STATE_H__
-	state_save_register_item(statename, num, DELTAT->portstate);
-	state_save_register_item(statename, num, DELTAT->now_addr);
-	state_save_register_item(statename, num, DELTAT->now_step);
-	state_save_register_item(statename, num, DELTAT->acc);
-	state_save_register_item(statename, num, DELTAT->prev_acc);
-	state_save_register_item(statename, num, DELTAT->adpcmd);
-	state_save_register_item(statename, num, DELTAT->adpcml);
+	state_save_register_item(statename, tag, 0, DELTAT->portstate);
+	state_save_register_item(statename, tag, 0, DELTAT->now_addr);
+	state_save_register_item(statename, tag, 0, DELTAT->now_step);
+	state_save_register_item(statename, tag, 0, DELTAT->acc);
+	state_save_register_item(statename, tag, 0, DELTAT->prev_acc);
+	state_save_register_item(statename, tag, 0, DELTAT->adpcmd);
+	state_save_register_item(statename, tag, 0, DELTAT->adpcml);
 #endif
 }
 

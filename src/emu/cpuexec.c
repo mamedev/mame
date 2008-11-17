@@ -1376,27 +1376,26 @@ static void register_save_states(const device_config *device)
 	cpu_class_data *classdata = device->classtoken;
 	int line;
 	
-	state_save_register_item("cpu", classdata->header.index, classdata->suspend);
-	state_save_register_item("cpu", classdata->header.index, classdata->nextsuspend);
-	state_save_register_item("cpu", classdata->header.index, classdata->eatcycles);
-	state_save_register_item("cpu", classdata->header.index, classdata->nexteatcycles);
-	state_save_register_item("cpu", classdata->header.index, classdata->trigger);
+	state_save_register_item("cpu", device->tag, 0, classdata->suspend);
+	state_save_register_item("cpu", device->tag, 0, classdata->nextsuspend);
+	state_save_register_item("cpu", device->tag, 0, classdata->eatcycles);
+	state_save_register_item("cpu", device->tag, 0, classdata->nexteatcycles);
+	state_save_register_item("cpu", device->tag, 0, classdata->trigger);
 
-	state_save_register_item("cpu", classdata->header.index, classdata->iloops);
+	state_save_register_item("cpu", device->tag, 0, classdata->iloops);
 
-	state_save_register_item("cpu", classdata->header.index, classdata->totalcycles);
-	state_save_register_item("cpu", classdata->header.index, classdata->localtime.seconds);
-	state_save_register_item("cpu", classdata->header.index, classdata->localtime.attoseconds);
-	state_save_register_item("cpu", classdata->header.index, classdata->clock);
-	state_save_register_item("cpu", classdata->header.index, classdata->clockscale);
+	state_save_register_item("cpu", device->tag, 0, classdata->totalcycles);
+	state_save_register_item("cpu", device->tag, 0, classdata->localtime.seconds);
+	state_save_register_item("cpu", device->tag, 0, classdata->localtime.attoseconds);
+	state_save_register_item("cpu", device->tag, 0, classdata->clock);
+	state_save_register_item("cpu", device->tag, 0, classdata->clockscale);
 
 	for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
 	{
 		cpu_input_data *inputline = &classdata->input[line];
-		int index = classdata->header.index * ARRAY_LENGTH(classdata->input) + line;
-		state_save_register_item("cpu", index, inputline->vector);
-		state_save_register_item("cpu", index, inputline->curvector);
-		state_save_register_item("cpu", index, inputline->curstate);
+		state_save_register_item("cpu", device->tag, line, inputline->vector);
+		state_save_register_item("cpu", device->tag, line, inputline->curvector);
+		state_save_register_item("cpu", device->tag, line, inputline->curstate);
 	}
 }
 

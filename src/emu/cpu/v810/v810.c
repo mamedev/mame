@@ -953,10 +953,10 @@ static CPU_INIT( v810 )
 	v810.irq_cb = irqcallback;
 	v810.device = device;
 
-	state_save_register_item_array("v810", index, v810.reg);
-	state_save_register_item("v810", index, v810.irq_line);
-	state_save_register_item("v810", index, v810.nmi_line);
-	state_save_register_item("v810", index, v810.PPC);
+	state_save_register_item_array("v810", device->tag, 0, v810.reg);
+	state_save_register_item("v810", device->tag, 0, v810.irq_line);
+	state_save_register_item("v810", device->tag, 0, v810.nmi_line);
+	state_save_register_item("v810", device->tag, 0, v810.PPC);
 
 }
 

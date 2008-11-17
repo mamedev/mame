@@ -98,8 +98,8 @@ VIDEO_START( gaelco3d )
 	state_save_register_global(polygons);
 	state_save_register_global(lastscan);
 
-	state_save_register_bitmap("video", 0, "screenbits", screenbits);
-	state_save_register_bitmap("video", 0, "zbuffer", zbuffer);
+	state_save_register_bitmap("video", NULL, 0, "screenbits", screenbits);
+	state_save_register_bitmap("video", NULL, 0, "zbuffer", zbuffer);
 }
 
 

@@ -91,7 +91,7 @@ static SND_START( ym3812 )
 	info->intf = config ? config : &dummy;
 
 	/* stream system initialize */
-	info->chip = ym3812_init(sndindex,clock,rate);
+	info->chip = ym3812_init(tag,clock,rate);
 	if (!info->chip)
 		return NULL;
 
@@ -260,7 +260,7 @@ static SND_START( ym3526 )
 	info->intf = config ? config : &dummy;
 
 	/* stream system initialize */
-	info->chip = ym3526_init(sndindex,clock,rate);
+	info->chip = ym3526_init(tag,clock,rate);
 	if (!info->chip)
 		return NULL;
 
@@ -464,7 +464,7 @@ static SND_START( y8950 )
 	info->index = sndindex;
 
 	/* stream system initialize */
-	info->chip = y8950_init(sndindex,clock,rate);
+	info->chip = y8950_init(tag,clock,rate);
 	if (!info->chip)
 		return NULL;
 

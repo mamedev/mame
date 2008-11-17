@@ -107,7 +107,7 @@ static SND_START( ym2612 )
 	info->stream = stream_create(0,2,rate,info,ym2612_stream_update);
 
 	/**** initialize YM2612 ****/
-	info->chip = ym2612_init(info,sndindex,clock,rate,timer_handler,IRQHandler);
+	info->chip = ym2612_init(info,tag,clock,rate,timer_handler,IRQHandler);
 
 	state_save_register_postload(Machine, ym2612_intf_postload, info);
 

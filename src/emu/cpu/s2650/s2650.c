@@ -771,18 +771,18 @@ static CPU_INIT( s2650 )
 	S.irq_callback = irqcallback;
 	S.device = device;
 
-	state_save_register_item("s2650", index, S.ppc);
-	state_save_register_item("s2650", index, S.page);
-	state_save_register_item("s2650", index, S.iar);
-	state_save_register_item("s2650", index, S.ea);
-	state_save_register_item("s2650", index, S.psl);
-	state_save_register_item("s2650", index, S.psu);
-	state_save_register_item("s2650", index, S.r);
-	state_save_register_item_array("s2650", index, S.reg);
-	state_save_register_item("s2650", index, S.halt);
-	state_save_register_item("s2650", index, S.ir);
-	state_save_register_item_array("s2650", index, S.ras);
-	state_save_register_item("s2650", index, S.irq_state);
+	state_save_register_item("s2650", device->tag, 0, S.ppc);
+	state_save_register_item("s2650", device->tag, 0, S.page);
+	state_save_register_item("s2650", device->tag, 0, S.iar);
+	state_save_register_item("s2650", device->tag, 0, S.ea);
+	state_save_register_item("s2650", device->tag, 0, S.psl);
+	state_save_register_item("s2650", device->tag, 0, S.psu);
+	state_save_register_item("s2650", device->tag, 0, S.r);
+	state_save_register_item_array("s2650", device->tag, 0, S.reg);
+	state_save_register_item("s2650", device->tag, 0, S.halt);
+	state_save_register_item("s2650", device->tag, 0, S.ir);
+	state_save_register_item_array("s2650", device->tag, 0, S.ras);
+	state_save_register_item("s2650", device->tag, 0, S.irq_state);
 }
 
 static CPU_RESET( s2650 )

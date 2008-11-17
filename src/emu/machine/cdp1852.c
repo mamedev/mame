@@ -120,12 +120,10 @@ WRITE8_DEVICE_HANDLER( cdp1852_data_w )
 static DEVICE_START( cdp1852 )
 {
 	cdp1852_t *cdp1852 = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	cdp1852->intf = device->static_config;
 
@@ -149,13 +147,11 @@ static DEVICE_START( cdp1852 )
 	}
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "CDP1852", device->tag);
-
-	state_save_register_item(unique_tag, 0, cdp1852->new_data);
-	state_save_register_item(unique_tag, 0, cdp1852->data);
-	state_save_register_item(unique_tag, 0, cdp1852->next_data);
-	state_save_register_item(unique_tag, 0, cdp1852->sr);
-	state_save_register_item(unique_tag, 0, cdp1852->next_sr);
+	state_save_register_item("cdp1852", device->tag, 0, cdp1852->new_data);
+	state_save_register_item("cdp1852", device->tag, 0, cdp1852->data);
+	state_save_register_item("cdp1852", device->tag, 0, cdp1852->next_data);
+	state_save_register_item("cdp1852", device->tag, 0, cdp1852->sr);
+	state_save_register_item("cdp1852", device->tag, 0, cdp1852->next_sr);
 
 	return DEVICE_START_OK;
 }

@@ -429,20 +429,20 @@ static void Interrupt(void)
 	}
 }
 
-static void state_register(const char *type, int index)
+static void state_register(const char *type, const device_config *device)
 {
-	state_save_register_item(type, index, A);
-	state_save_register_item(type, index, PC);
-	state_save_register_item(type, index, S);
-	state_save_register_item(type, index, X);
-	state_save_register_item(type, index, CC);
-	state_save_register_item(type, index, m6805.pending_interrupts);
-	state_save_register_item_array(type, index, m6805.irq_state);
+	state_save_register_item(type, device->tag, 0, A);
+	state_save_register_item(type, device->tag, 0, PC);
+	state_save_register_item(type, device->tag, 0, S);
+	state_save_register_item(type, device->tag, 0, X);
+	state_save_register_item(type, device->tag, 0, CC);
+	state_save_register_item(type, device->tag, 0, m6805.pending_interrupts);
+	state_save_register_item_array(type, device->tag, 0, m6805.irq_state);
 }
 
 static CPU_INIT( m6805 )
 {
-	state_register("m6805", index);
+	state_register("m6805", device);
 	m6805.irq_callback = irqcallback;
 	m6805.device = device;
 }
@@ -808,7 +808,7 @@ static CPU_EXECUTE( m6805 )
 #if (HAS_M68705)
 static CPU_INIT( m68705 )
 {
-	state_register("m68705", index);
+	state_register("m68705", device);
 	m6805.irq_callback = irqcallback;
 	m6805.device = device;
 }
@@ -836,7 +836,7 @@ static void m68705_set_irq_line(int irqline, int state)
 #if (HAS_HD63705)
 static CPU_INIT( hd63705 )
 {
-	state_register("hd63705", index);
+	state_register("hd63705", device);
 	m6805.irq_callback = irqcallback;
 	m6805.device = device;
 }

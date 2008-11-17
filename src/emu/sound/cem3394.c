@@ -338,18 +338,18 @@ static SND_START( cem3394 )
 	chip->mixer_buffer = auto_malloc(chip->sample_rate * sizeof(INT16));
 	chip->external_buffer = auto_malloc(chip->sample_rate * sizeof(INT16));
 
-	state_save_register_item_array("cem3394", sndindex, chip->values);
-	state_save_register_item("cem3394", sndindex, chip->wave_select);
-	state_save_register_item("cem3394", sndindex, chip->volume);
-	state_save_register_item("cem3394", sndindex, chip->mixer_internal);
-	state_save_register_item("cem3394", sndindex, chip->mixer_external);
-	state_save_register_item("cem3394", sndindex, chip->position);
-	state_save_register_item("cem3394", sndindex, chip->step);
-	state_save_register_item("cem3394", sndindex, chip->filter_position);
-	state_save_register_item("cem3394", sndindex, chip->filter_step);
-	state_save_register_item("cem3394", sndindex, chip->modulation_depth);
-	state_save_register_item("cem3394", sndindex, chip->last_ext);
-	state_save_register_item("cem3394", sndindex, chip->pulse_width);
+	state_save_register_item_array("cem3394", tag, 0, chip->values);
+	state_save_register_item("cem3394", tag, 0, chip->wave_select);
+	state_save_register_item("cem3394", tag, 0, chip->volume);
+	state_save_register_item("cem3394", tag, 0, chip->mixer_internal);
+	state_save_register_item("cem3394", tag, 0, chip->mixer_external);
+	state_save_register_item("cem3394", tag, 0, chip->position);
+	state_save_register_item("cem3394", tag, 0, chip->step);
+	state_save_register_item("cem3394", tag, 0, chip->filter_position);
+	state_save_register_item("cem3394", tag, 0, chip->filter_step);
+	state_save_register_item("cem3394", tag, 0, chip->modulation_depth);
+	state_save_register_item("cem3394", tag, 0, chip->last_ext);
+	state_save_register_item("cem3394", tag, 0, chip->pulse_width);
 
 	return chip;
 }

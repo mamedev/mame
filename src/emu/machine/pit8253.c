@@ -1046,15 +1046,12 @@ void pit8253_set_clock_signal(const device_config *device, int timerno, int stat
 
 static device_start_err common_start( const device_config *device, int device_type ) {
 	pit8253_t	*pit8253 = get_safe_token(device);
-	char		unique_tag[30];
 	int			timerno;
 
 	pit8253->config = device->static_config;
 	pit8253->device_type = device_type;
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], device->tag);
-
 	for (timerno = 0; timerno < MAX_TIMER; timerno++)
 	{
 		struct pit8253_timer *timer = get_timer(pit8253,timerno);
@@ -1066,26 +1063,26 @@ static device_start_err common_start( const device_config *device, int device_ty
 		timer_adjust_oneshot(timer->updatetimer, attotime_never, timerno);
 
 		/* set up state save values */
-		state_save_register_item(unique_tag, timerno, timer->clockin);
-		state_save_register_item(unique_tag, timerno, timer->control);
-		state_save_register_item(unique_tag, timerno, timer->status);
-		state_save_register_item(unique_tag, timerno, timer->lowcount);
-		state_save_register_item(unique_tag, timerno, timer->latch);
-		state_save_register_item(unique_tag, timerno, timer->count);
-		state_save_register_item(unique_tag, timerno, timer->value);
-		state_save_register_item(unique_tag, timerno, timer->wmsb);
-		state_save_register_item(unique_tag, timerno, timer->rmsb);
-		state_save_register_item(unique_tag, timerno, timer->output);
-		state_save_register_item(unique_tag, timerno, timer->gate);
-		state_save_register_item(unique_tag, timerno, timer->latched_count);
-		state_save_register_item(unique_tag, timerno, timer->latched_status);
-		state_save_register_item(unique_tag, timerno, timer->null_count);
-		state_save_register_item(unique_tag, timerno, timer->phase);
-		state_save_register_item(unique_tag, timerno, timer->cycles_to_output);
-		state_save_register_item(unique_tag, timerno, timer->last_updated.seconds);
-		state_save_register_item(unique_tag, timerno, timer->last_updated.attoseconds);
-		state_save_register_item(unique_tag, timerno, timer->programmed);
-		state_save_register_item(unique_tag, timerno, timer->clock);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->clockin);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->control);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->status);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->lowcount);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->latch);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->count);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->value);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->wmsb);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->rmsb);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->output);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->gate);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->latched_count);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->latched_status);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->null_count);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->phase);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->cycles_to_output);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->last_updated.seconds);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->last_updated.attoseconds);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->programmed);
+		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->clock);
 	}
 
 	return DEVICE_START_OK;

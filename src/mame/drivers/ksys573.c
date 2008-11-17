@@ -1506,10 +1506,10 @@ static DRIVER_INIT( konami573 )
 	security_cart_init( machine, 0, "user2", "user9" );
 	security_cart_init( machine, 1, "user8", "user10" );
 
-	state_save_register_item_array( "KSYS573", 0, m_p_n_root_count );
-	state_save_register_item_array( "KSYS573", 0, m_p_n_root_mode );
-	state_save_register_item_array( "KSYS573", 0, m_p_n_root_target );
-	state_save_register_item_array( "KSYS573", 0, m_p_n_root_start );
+	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_count );
+	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_mode );
+	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_target );
+	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_start );
 
 	adc083x_init( 0, ADC0834, analogue_inputs_callback );
 	flash_init(machine);

@@ -197,14 +197,14 @@ MACHINE_RESET( balsente )
 	/* register for saving */
 	for (i = 0; i < 3; i++)
 	{
-		state_save_register_item("8253counter", i, counter[i].timer_active);
-		state_save_register_item("8253counter", i, counter[i].initial);
-		state_save_register_item("8253counter", i, counter[i].count);
-		state_save_register_item("8253counter", i, counter[i].gate);
-		state_save_register_item("8253counter", i, counter[i].out);
-		state_save_register_item("8253counter", i, counter[i].mode);
-		state_save_register_item("8253counter", i, counter[i].readbyte);
-		state_save_register_item("8253counter", i, counter[i].writebyte);
+		state_save_register_item("8253counter", NULL, i, counter[i].timer_active);
+		state_save_register_item("8253counter", NULL, i, counter[i].initial);
+		state_save_register_item("8253counter", NULL, i, counter[i].count);
+		state_save_register_item("8253counter", NULL, i, counter[i].gate);
+		state_save_register_item("8253counter", NULL, i, counter[i].out);
+		state_save_register_item("8253counter", NULL, i, counter[i].mode);
+		state_save_register_item("8253counter", NULL, i, counter[i].readbyte);
+		state_save_register_item("8253counter", NULL, i, counter[i].writebyte);
 	}
 
 	state_save_register_global(counter_control);

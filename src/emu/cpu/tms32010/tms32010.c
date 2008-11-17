@@ -711,21 +711,21 @@ static const opcode_fn opcode_7F_other[32]=
  ****************************************************************************/
 static CPU_INIT( tms32010 )
 {
-	state_save_register_item("tms32010", index, R.PC);
-	state_save_register_item("tms32010", index, R.PREVPC);
-	state_save_register_item("tms32010", index, R.STR);
-	state_save_register_item("tms32010", index, R.ACC.d);
-	state_save_register_item("tms32010", index, R.ALU.d);
-	state_save_register_item("tms32010", index, R.Preg.d);
-	state_save_register_item("tms32010", index, R.Treg);
-	state_save_register_item("tms32010", index, R.AR[0]);
-	state_save_register_item("tms32010", index, R.AR[1]);
-	state_save_register_item("tms32010", index, R.STACK[0]);
-	state_save_register_item("tms32010", index, R.STACK[1]);
-	state_save_register_item("tms32010", index, R.STACK[2]);
-	state_save_register_item("tms32010", index, R.STACK[3]);
-	state_save_register_item("tms32010", index, R.INTF);
-	state_save_register_item("tms32010", index, R.opcode.d);
+	state_save_register_item("tms32010", device->tag, 0, R.PC);
+	state_save_register_item("tms32010", device->tag, 0, R.PREVPC);
+	state_save_register_item("tms32010", device->tag, 0, R.STR);
+	state_save_register_item("tms32010", device->tag, 0, R.ACC.d);
+	state_save_register_item("tms32010", device->tag, 0, R.ALU.d);
+	state_save_register_item("tms32010", device->tag, 0, R.Preg.d);
+	state_save_register_item("tms32010", device->tag, 0, R.Treg);
+	state_save_register_item("tms32010", device->tag, 0, R.AR[0]);
+	state_save_register_item("tms32010", device->tag, 0, R.AR[1]);
+	state_save_register_item("tms32010", device->tag, 0, R.STACK[0]);
+	state_save_register_item("tms32010", device->tag, 0, R.STACK[1]);
+	state_save_register_item("tms32010", device->tag, 0, R.STACK[2]);
+	state_save_register_item("tms32010", device->tag, 0, R.STACK[3]);
+	state_save_register_item("tms32010", device->tag, 0, R.INTF);
+	state_save_register_item("tms32010", device->tag, 0, R.opcode.d);
 }
 
 /****************************************************************************

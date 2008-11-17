@@ -396,15 +396,15 @@ static SND_START( namco )
 	chip->sound_enable = 1;
 
 	/* register with the save state system */
-	state_save_register_item("namco", sndindex, chip->num_voices);
-	state_save_register_item("namco", sndindex, chip->sound_enable);
-	state_save_register_item_pointer("namco", sndindex, chip->waveform[0],
+	state_save_register_item("namco", tag, 0, chip->num_voices);
+	state_save_register_item("namco", tag, 0, chip->sound_enable);
+	state_save_register_item_pointer("namco", tag, 0, chip->waveform[0],
 										 MAX_VOLUME * 32 * 8 * (1+chip->wave_size));
 
 	/* reset all the voices */
 	for (voice = chip->channel_list; voice < chip->last_channel; voice++)
 	{
-		int state_index = sndindex * MAX_VOICES + (voice - chip->channel_list);
+		int voicenum = voice - chip->channel_list;
 
 		voice->frequency = 0;
 		voice->volume[0] = voice->volume[1] = 0;
@@ -417,15 +417,15 @@ static SND_START( namco )
 		voice->noise_hold = 0;
 
 		/* register with the save state system */
-		state_save_register_item("namco", state_index, voice->frequency);
-		state_save_register_item("namco", state_index, voice->counter);
-		state_save_register_item_array("namco", state_index, voice->volume);
-		state_save_register_item("namco", state_index, voice->noise_sw);
-		state_save_register_item("namco", state_index, voice->noise_state);
-		state_save_register_item("namco", state_index, voice->noise_seed);
-		state_save_register_item("namco", state_index, voice->noise_hold);
-		state_save_register_item("namco", state_index, voice->noise_counter);
-		state_save_register_item("namco", state_index, voice->waveform_select);
+		state_save_register_item("namco", tag, voicenum, voice->frequency);
+		state_save_register_item("namco", tag, voicenum, voice->counter);
+		state_save_register_item_array("namco", tag, voicenum, voice->volume);
+		state_save_register_item("namco", tag, voicenum, voice->noise_sw);
+		state_save_register_item("namco", tag, voicenum, voice->noise_state);
+		state_save_register_item("namco", tag, voicenum, voice->noise_seed);
+		state_save_register_item("namco", tag, voicenum, voice->noise_hold);
+		state_save_register_item("namco", tag, voicenum, voice->noise_counter);
+		state_save_register_item("namco", tag, voicenum, voice->waveform_select);
 	}
 
 	return chip;

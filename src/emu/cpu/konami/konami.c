@@ -393,18 +393,18 @@ static CPU_INIT( konami )
 	konami.irq_callback = irqcallback;
 	konami.device = device;
 
-	state_save_register_item("KONAMI", index, PC);
-	state_save_register_item("KONAMI", index, U);
-	state_save_register_item("KONAMI", index, S);
-	state_save_register_item("KONAMI", index, X);
-	state_save_register_item("KONAMI", index, Y);
-	state_save_register_item("KONAMI", index, D);
-	state_save_register_item("KONAMI", index, DP);
-	state_save_register_item("KONAMI", index, CC);
-	state_save_register_item("KONAMI", index, konami.int_state);
-	state_save_register_item("KONAMI", index, konami.nmi_state);
-	state_save_register_item("KONAMI", index, konami.irq_state[0]);
-	state_save_register_item("KONAMI", index, konami.irq_state[1]);
+	state_save_register_item("KONAMI", device->tag, 0, PC);
+	state_save_register_item("KONAMI", device->tag, 0, U);
+	state_save_register_item("KONAMI", device->tag, 0, S);
+	state_save_register_item("KONAMI", device->tag, 0, X);
+	state_save_register_item("KONAMI", device->tag, 0, Y);
+	state_save_register_item("KONAMI", device->tag, 0, D);
+	state_save_register_item("KONAMI", device->tag, 0, DP);
+	state_save_register_item("KONAMI", device->tag, 0, CC);
+	state_save_register_item("KONAMI", device->tag, 0, konami.int_state);
+	state_save_register_item("KONAMI", device->tag, 0, konami.nmi_state);
+	state_save_register_item("KONAMI", device->tag, 0, konami.irq_state[0]);
+	state_save_register_item("KONAMI", device->tag, 0, konami.irq_state[1]);
 }
 
 static CPU_RESET( konami )

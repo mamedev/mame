@@ -664,27 +664,27 @@ static const s_opcode opcode_8301[256]=
  ****************************************************************************/
 static CPU_INIT( ALPHA8201 )
 {
-	state_save_register_item_array("ALPHA8201", index, R.RAM);
-	state_save_register_item("ALPHA8201", index, R.PREVPC);
-	state_save_register_item("ALPHA8201", index, PC);
-	state_save_register_item("ALPHA8201", index, regPTR);
-	state_save_register_item("ALPHA8201", index, ZF);
-	state_save_register_item("ALPHA8201", index, CF);
-	state_save_register_item("ALPHA8201", index, R.mb);
+	state_save_register_item_array("ALPHA8201", device->tag, 0, R.RAM);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.PREVPC);
+	state_save_register_item("ALPHA8201", device->tag, 0, PC);
+	state_save_register_item("ALPHA8201", device->tag, 0, regPTR);
+	state_save_register_item("ALPHA8201", device->tag, 0, ZF);
+	state_save_register_item("ALPHA8201", device->tag, 0, CF);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.mb);
 #if HANDLE_HALT_LINE
-	state_save_register_item("ALPHA8201", index, R.halt);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.halt);
 #endif
-	state_save_register_item("ALPHA8201", index, IX0);
-	state_save_register_item("ALPHA8201", index, IX1);
-	state_save_register_item("ALPHA8201", index, IX2);
-	state_save_register_item("ALPHA8201", index, LP0);
-	state_save_register_item("ALPHA8201", index, LP1);
-	state_save_register_item("ALPHA8201", index, LP2);
-	state_save_register_item("ALPHA8201", index, R.A);
-	state_save_register_item("ALPHA8201", index, R.B);
-	state_save_register_item("ALPHA8201", index, R.retptr);
-	state_save_register_item("ALPHA8201", index, R.savec);
-	state_save_register_item("ALPHA8201", index, R.savez);
+	state_save_register_item("ALPHA8201", device->tag, 0, IX0);
+	state_save_register_item("ALPHA8201", device->tag, 0, IX1);
+	state_save_register_item("ALPHA8201", device->tag, 0, IX2);
+	state_save_register_item("ALPHA8201", device->tag, 0, LP0);
+	state_save_register_item("ALPHA8201", device->tag, 0, LP1);
+	state_save_register_item("ALPHA8201", device->tag, 0, LP2);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.A);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.B);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.retptr);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.savec);
+	state_save_register_item("ALPHA8201", device->tag, 0, R.savez);
 }
 /****************************************************************************
  * Reset registers to their initial values

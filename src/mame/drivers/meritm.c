@@ -213,11 +213,11 @@ static void ds1204_init(const UINT8* key, const UINT8* nvram)
 	if (nvram)
 		memcpy(ds1204.nvram, nvram, sizeof(ds1204.nvram));
 
-	state_save_register_item("ds1204", 0, ds1204.state);
-	state_save_register_item("ds1204", 0, ds1204.read_ptr);
-	state_save_register_item("ds1204", 0, ds1204.last_clk);
-	state_save_register_item("ds1204", 0, ds1204.out_bit);
-	state_save_register_item_array("ds1204", 0, ds1204.command);
+	state_save_register_item("ds1204", NULL, 0, ds1204.state);
+	state_save_register_item("ds1204", NULL, 0, ds1204.read_ptr);
+	state_save_register_item("ds1204", NULL, 0, ds1204.last_clk);
+	state_save_register_item("ds1204", NULL, 0, ds1204.out_bit);
+	state_save_register_item_array("ds1204", NULL, 0, ds1204.command);
 };
 
 /*************************************

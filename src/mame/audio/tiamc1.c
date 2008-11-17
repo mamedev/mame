@@ -295,15 +295,15 @@ void *tiamc1_sh_start(int clock, const custom_sound_interface *config)
 		struct timer8253struct *t = (i ? &timer1 : &timer0);
 
 		for (j = 0; j < 3; j++) {
-			state_save_register_item("channel", i * 3 + j, t->channel[j].count);
-			state_save_register_item("channel", i * 3 + j, t->channel[j].cnval);
-			state_save_register_item("channel", i * 3 + j, t->channel[j].bcdMode);
-			state_save_register_item("channel", i * 3 + j, t->channel[j].cntMode);
-			state_save_register_item("channel", i * 3 + j, t->channel[j].valMode);
-			state_save_register_item("channel", i * 3 + j, t->channel[j].gate);
-			state_save_register_item("channel", i * 3 + j, t->channel[j].output);
-			state_save_register_item("channel", i * 3 + j, t->channel[j].loadCnt);
-			state_save_register_item("channel", i * 3 + j, t->channel[j].enable);
+			state_save_register_item("channel", NULL, i * 3 + j, t->channel[j].count);
+			state_save_register_item("channel", NULL, i * 3 + j, t->channel[j].cnval);
+			state_save_register_item("channel", NULL, i * 3 + j, t->channel[j].bcdMode);
+			state_save_register_item("channel", NULL, i * 3 + j, t->channel[j].cntMode);
+			state_save_register_item("channel", NULL, i * 3 + j, t->channel[j].valMode);
+			state_save_register_item("channel", NULL, i * 3 + j, t->channel[j].gate);
+			state_save_register_item("channel", NULL, i * 3 + j, t->channel[j].output);
+			state_save_register_item("channel", NULL, i * 3 + j, t->channel[j].loadCnt);
+			state_save_register_item("channel", NULL, i * 3 + j, t->channel[j].enable);
 		}
 	}
 

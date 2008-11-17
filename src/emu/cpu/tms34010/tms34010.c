@@ -633,17 +633,17 @@ static CPU_INIT( tms34010 )
 	/* allocate the shiftreg */
 	tms->shiftreg = auto_malloc(SHIFTREG_SIZE);
 
-	state_save_register_item("tms34010", index, tms->pc);
-	state_save_register_item("tms34010", index, tms->st);
-	state_save_register_item("tms34010", index, tms->reset_deferred);
-	state_save_register_item_pointer("tms34010", index, tms->shiftreg, SHIFTREG_SIZE / 2);
-	state_save_register_item_array("tms34010", index, tms->IOregs);
-	state_save_register_item("tms34010", index, tms->convsp);
-	state_save_register_item("tms34010", index, tms->convdp);
-	state_save_register_item("tms34010", index, tms->convmp);
-	state_save_register_item("tms34010", index, tms->pixelshift);
-	state_save_register_item("tms34010", index, tms->gfxcycles);
-	state_save_register_item_pointer("tms34010", index, (&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
+	state_save_register_item("tms34010", device->tag, 0, tms->pc);
+	state_save_register_item("tms34010", device->tag, 0, tms->st);
+	state_save_register_item("tms34010", device->tag, 0, tms->reset_deferred);
+	state_save_register_item_pointer("tms34010", device->tag, 0, tms->shiftreg, SHIFTREG_SIZE / 2);
+	state_save_register_item_array("tms34010", device->tag, 0, tms->IOregs);
+	state_save_register_item("tms34010", device->tag, 0, tms->convsp);
+	state_save_register_item("tms34010", device->tag, 0, tms->convdp);
+	state_save_register_item("tms34010", device->tag, 0, tms->convmp);
+	state_save_register_item("tms34010", device->tag, 0, tms->pixelshift);
+	state_save_register_item("tms34010", device->tag, 0, tms->gfxcycles);
+	state_save_register_item_pointer("tms34010", device->tag, 0, (&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
 	state_save_register_postload(device->machine, tms34010_state_postload, tms);
 }
 

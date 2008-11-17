@@ -297,21 +297,21 @@ static CPU_INIT( t11 )
 	t11.irq_callback = irqcallback;
 	t11.device = device;
 
-	state_save_register_item("t11", index, t11.ppc.w.l);
-	state_save_register_item("t11", index, t11.reg[0].w.l);
-	state_save_register_item("t11", index, t11.reg[1].w.l);
-	state_save_register_item("t11", index, t11.reg[2].w.l);
-	state_save_register_item("t11", index, t11.reg[3].w.l);
-	state_save_register_item("t11", index, t11.reg[4].w.l);
-	state_save_register_item("t11", index, t11.reg[5].w.l);
-	state_save_register_item("t11", index, t11.reg[6].w.l);
-	state_save_register_item("t11", index, t11.reg[7].w.l);
-	state_save_register_item("t11", index, t11.psw.w.l);
-	state_save_register_item("t11", index, t11.op);
-	state_save_register_item("t11", index, t11.initial_pc);
-	state_save_register_item("t11", index, t11.wait_state);
-	state_save_register_item("t11", index, t11.irq_state);
-	state_save_register_item("t11", index, t11.interrupt_cycles);
+	state_save_register_item("t11", device->tag, 0, t11.ppc.w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[0].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[1].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[2].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[3].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[4].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[5].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[6].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.reg[7].w.l);
+	state_save_register_item("t11", device->tag, 0, t11.psw.w.l);
+	state_save_register_item("t11", device->tag, 0, t11.op);
+	state_save_register_item("t11", device->tag, 0, t11.initial_pc);
+	state_save_register_item("t11", device->tag, 0, t11.wait_state);
+	state_save_register_item("t11", device->tag, 0, t11.irq_state);
+	state_save_register_item("t11", device->tag, 0, t11.interrupt_cycles);
 }
 
 

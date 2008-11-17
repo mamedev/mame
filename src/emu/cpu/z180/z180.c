@@ -1905,31 +1905,31 @@ static CPU_INIT( z180 )
 	Z180.irq_callback = irqcallback;
 	Z180.device = device;
 
-	state_save_register_item("z180", index, Z180.AF.w.l);
-	state_save_register_item("z180", index, Z180.BC.w.l);
-	state_save_register_item("z180", index, Z180.DE.w.l);
-	state_save_register_item("z180", index, Z180.HL.w.l);
-	state_save_register_item("z180", index, Z180.IX.w.l);
-	state_save_register_item("z180", index, Z180.IY.w.l);
-	state_save_register_item("z180", index, Z180.PC.w.l);
-	state_save_register_item("z180", index, Z180.SP.w.l);
-	state_save_register_item("z180", index, Z180.AF2.w.l);
-	state_save_register_item("z180", index, Z180.BC2.w.l);
-	state_save_register_item("z180", index, Z180.DE2.w.l);
-	state_save_register_item("z180", index, Z180.HL2.w.l);
-	state_save_register_item("z180", index, Z180.R);
-	state_save_register_item("z180", index, Z180.R2);
-	state_save_register_item("z180", index, Z180.IFF1);
-	state_save_register_item("z180", index, Z180.IFF2);
-	state_save_register_item("z180", index, Z180.HALT);
-	state_save_register_item("z180", index, Z180.IM);
-	state_save_register_item("z180", index, Z180.I);
-	state_save_register_item("z180", index, Z180.nmi_state);
-	state_save_register_item("z180", index, Z180.nmi_pending);
-	state_save_register_item("z180", index, Z180.irq_state[0]);
-	state_save_register_item("z180", index, Z180.irq_state[1]);
-	state_save_register_item("z180", index, Z180.irq_state[2]);
-	state_save_register_item("z180", index, Z180.after_EI);
+	state_save_register_item("z180", device->tag, 0, Z180.AF.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.BC.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.DE.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.HL.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.IX.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.IY.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.PC.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.SP.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.AF2.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.BC2.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.DE2.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.HL2.w.l);
+	state_save_register_item("z180", device->tag, 0, Z180.R);
+	state_save_register_item("z180", device->tag, 0, Z180.R2);
+	state_save_register_item("z180", device->tag, 0, Z180.IFF1);
+	state_save_register_item("z180", device->tag, 0, Z180.IFF2);
+	state_save_register_item("z180", device->tag, 0, Z180.HALT);
+	state_save_register_item("z180", device->tag, 0, Z180.IM);
+	state_save_register_item("z180", device->tag, 0, Z180.I);
+	state_save_register_item("z180", device->tag, 0, Z180.nmi_state);
+	state_save_register_item("z180", device->tag, 0, Z180.nmi_pending);
+	state_save_register_item("z180", device->tag, 0, Z180.irq_state[0]);
+	state_save_register_item("z180", device->tag, 0, Z180.irq_state[1]);
+	state_save_register_item("z180", device->tag, 0, Z180.irq_state[2]);
+	state_save_register_item("z180", device->tag, 0, Z180.after_EI);
 }
 
 /****************************************************************************

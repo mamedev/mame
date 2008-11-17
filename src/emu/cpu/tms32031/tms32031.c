@@ -429,20 +429,20 @@ static CPU_INIT( tms32031 )
 		tms32031.iack_w = configdata->iack_w;
 	}
 
-	state_save_register_item("tms32031", index, tms32031.pc);
+	state_save_register_item("tms32031", device->tag, 0, tms32031.pc);
 	for (i=0;i<36;i++)
 	{
 		sprintf(namebuf,"tms32031.r[%d]",i);
-		state_save_register_generic("tms32031", index, namebuf, tms32031.r[i].i8, UINT8, 8);
+		state_save_register_generic("tms32031", device->tag, 0, namebuf, tms32031.r[i].i8, UINT8, 8);
 	}
-	state_save_register_item("tms32031", index, tms32031.bkmask);
-	state_save_register_item("tms32031", index, tms32031.op);
-	state_save_register_item("tms32031", index, tms32031.irq_state);
-	state_save_register_item("tms32031", index, tms32031.delayed);
-	state_save_register_item("tms32031", index, tms32031.irq_pending);
-	state_save_register_item("tms32031", index, tms32031.mcu_mode);
-	state_save_register_item("tms32031", index, tms32031.is_idling);
-	state_save_register_item("tms32031", index, tms32031.interrupt_cycles);
+	state_save_register_item("tms32031", device->tag, 0, tms32031.bkmask);
+	state_save_register_item("tms32031", device->tag, 0, tms32031.op);
+	state_save_register_item("tms32031", device->tag, 0, tms32031.irq_state);
+	state_save_register_item("tms32031", device->tag, 0, tms32031.delayed);
+	state_save_register_item("tms32031", device->tag, 0, tms32031.irq_pending);
+	state_save_register_item("tms32031", device->tag, 0, tms32031.mcu_mode);
+	state_save_register_item("tms32031", device->tag, 0, tms32031.is_idling);
+	state_save_register_item("tms32031", device->tag, 0, tms32031.interrupt_cycles);
 
 }
 

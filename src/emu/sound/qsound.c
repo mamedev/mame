@@ -136,18 +136,18 @@ static SND_START( qsound )
 	/* state save */
 	for (i=0; i<QSOUND_CHANNELS; i++)
 	{
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].bank);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].address);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].pitch);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].loop);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].end);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].vol);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].pan);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].key);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].lvol);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].rvol);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].lastdt);
-		state_save_register_item("QSound", sndindex*QSOUND_CHANNELS+i, chip->channel[i].offset);
+		state_save_register_item("QSound", tag, i, chip->channel[i].bank);
+		state_save_register_item("QSound", tag, i, chip->channel[i].address);
+		state_save_register_item("QSound", tag, i, chip->channel[i].pitch);
+		state_save_register_item("QSound", tag, i, chip->channel[i].loop);
+		state_save_register_item("QSound", tag, i, chip->channel[i].end);
+		state_save_register_item("QSound", tag, i, chip->channel[i].vol);
+		state_save_register_item("QSound", tag, i, chip->channel[i].pan);
+		state_save_register_item("QSound", tag, i, chip->channel[i].key);
+		state_save_register_item("QSound", tag, i, chip->channel[i].lvol);
+		state_save_register_item("QSound", tag, i, chip->channel[i].rvol);
+		state_save_register_item("QSound", tag, i, chip->channel[i].lastdt);
+		state_save_register_item("QSound", tag, i, chip->channel[i].offset);
 	}
 
 	return chip;

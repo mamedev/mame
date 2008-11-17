@@ -142,7 +142,7 @@ static SND_START( ym2610 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610, sndindex, clock, &generic_ay8910);
+	info->psg = ay8910_start_ym(SOUND_YM2610, tag, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -165,7 +165,7 @@ static SND_START( ym2610 )
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,sndindex,clock,rate,
+	info->chip = ym2610_init(info,tag,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 
@@ -208,7 +208,7 @@ static SND_START( ym2610b )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610B, sndindex, clock, &generic_ay8910);
+	info->psg = ay8910_start_ym(SOUND_YM2610B, tag, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -231,7 +231,7 @@ static SND_START( ym2610b )
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,sndindex,clock,rate,
+	info->chip = ym2610_init(info,tag,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 	if (info->chip)

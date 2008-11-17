@@ -402,25 +402,25 @@ void ptm6840_config(running_machine *machine, int which, const ptm6840_interface
 		timer_enable(ptm[which].timer[i], FALSE);
 	}
 
-	state_save_register_item("6840ptm", which, currptr->lsb_buffer);
-	state_save_register_item("6840ptm", which, currptr->msb_buffer);
-	state_save_register_item("6840ptm", which, currptr->status_read_since_int);
-	state_save_register_item("6840ptm", which, currptr->status_reg);
-	state_save_register_item("6840ptm", which, currptr->t3_divisor);
-	state_save_register_item("6840ptm", which, currptr->t3_scaler);
-	state_save_register_item("6840ptm", which, currptr->internal_clock);
-	state_save_register_item("6840ptm", which, currptr->IRQ);
+	state_save_register_item("6840ptm", NULL, which, currptr->lsb_buffer);
+	state_save_register_item("6840ptm", NULL, which, currptr->msb_buffer);
+	state_save_register_item("6840ptm", NULL, which, currptr->status_read_since_int);
+	state_save_register_item("6840ptm", NULL, which, currptr->status_reg);
+	state_save_register_item("6840ptm", NULL, which, currptr->t3_divisor);
+	state_save_register_item("6840ptm", NULL, which, currptr->t3_scaler);
+	state_save_register_item("6840ptm", NULL, which, currptr->internal_clock);
+	state_save_register_item("6840ptm", NULL, which, currptr->IRQ);
 
-	state_save_register_item_array("6840ptm", which, currptr->control_reg);
-	state_save_register_item_array("6840ptm", which, currptr->output);
-	state_save_register_item_array("6840ptm", which, currptr->gate);
-	state_save_register_item_array("6840ptm", which, currptr->clock);
-	state_save_register_item_array("6840ptm", which, currptr->mode);
-	state_save_register_item_array("6840ptm", which, currptr->fired);
-	state_save_register_item_array("6840ptm", which, currptr->enabled);
-	state_save_register_item_array("6840ptm", which, currptr->external_clock);
-	state_save_register_item_array("6840ptm", which, currptr->counter);
-	state_save_register_item_array("6840ptm", which, currptr->latch);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->control_reg);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->output);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->gate);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->clock);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->mode);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->fired);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->enabled);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->external_clock);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->counter);
+	state_save_register_item_array("6840ptm", NULL, which, currptr->latch);
 
 	ptm6840_reset(which);
 }

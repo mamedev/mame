@@ -491,7 +491,6 @@ static SND_START( multipcm )
 {
 	struct _MultiPCM *ptChip;
 	int i;
-	char mname[20];
 
 	ptChip=(struct _MultiPCM *)auto_malloc(sizeof(struct _MultiPCM));
 
@@ -601,44 +600,39 @@ static SND_START( multipcm )
 		ptChip->Samples[i].AM=ptSample[11];
 	}
 
-	sprintf(mname, "MultiPCM %d", sndindex);
-	state_save_register_item(mname, sndindex, ptChip->CurSlot);
-	state_save_register_item(mname, sndindex, ptChip->Address);
-	state_save_register_item(mname, sndindex, ptChip->BankL);
-	state_save_register_item(mname, sndindex, ptChip->BankR);
+	state_save_register_item("multipcm", tag, 0, ptChip->CurSlot);
+	state_save_register_item("multipcm", tag, 0, ptChip->Address);
+	state_save_register_item("multipcm", tag, 0, ptChip->BankL);
+	state_save_register_item("multipcm", tag, 0, ptChip->BankR);
 
 	for(i=0;i<28;++i)
 	{
-		char mname2[20];
-
 		ptChip->Slots[i].Num=i;
 		ptChip->Slots[i].Playing=0;
 
-		sprintf(mname2, "MultiPCM %d v %d", sndindex, i);
-
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].Num);
-		state_save_register_item_array(mname2, sndindex, ptChip->Slots[i].Regs);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].Playing);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].Base);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].offset);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].step);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].Pan);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].TL);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].DstTL);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].TLStep);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].Prev);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].EG.volume);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].EG.state);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].EG.step);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].EG.AR);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].EG.D1R);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].EG.D2R);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].EG.RR);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].EG.DL);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].PLFO.phase);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].PLFO.phase_step);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].ALFO.phase);
-		state_save_register_item(mname2, sndindex, ptChip->Slots[i].ALFO.phase_step);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Num);
+		state_save_register_item_array("multipcm", tag, i, ptChip->Slots[i].Regs);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Playing);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Base);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].offset);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].step);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Pan);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].TL);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].DstTL);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].TLStep);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Prev);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.volume);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.state);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.step);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.AR);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.D1R);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.D2R);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.RR);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.DL);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].PLFO.phase);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].PLFO.phase_step);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].ALFO.phase);
+		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].ALFO.phase_step);
 	}
 
 	LFO_Init();

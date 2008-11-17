@@ -226,7 +226,7 @@ unsigned int m68k_get_context(void* dst);
 void m68k_set_context(void* dst);
 
 /* Register the CPU state information */
-void m68k_state_register(m68ki_cpu_core *m68k, const char *type, int index);
+void m68k_state_register(m68ki_cpu_core *m68k, const char *type);
 
 
 /* Peek at the internals of a CPU context.  This can either be a context

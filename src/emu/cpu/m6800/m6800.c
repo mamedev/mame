@@ -838,49 +838,49 @@ static TIMER_CALLBACK(m6800_rx_tick)
 /****************************************************************************
  * Reset registers to their initial values
  ****************************************************************************/
-static void state_register(m68_state_t *m68_state, const char *type, int index)
+static void state_register(m68_state_t *m68_state, const char *type)
 {
-	state_save_register_item(type, index, m68_state->ppc.w.l);
-	state_save_register_item(type, index, m68_state->pc.w.l);
-	state_save_register_item(type, index, m68_state->s.w.l);
-	state_save_register_item(type, index, m68_state->x.w.l);
-	state_save_register_item(type, index, m68_state->d.w.l);
-	state_save_register_item(type, index, m68_state->cc);
-	state_save_register_item(type, index, m68_state->wai_state);
-	state_save_register_item(type, index, m68_state->nmi_state);
-	state_save_register_item_array(type, index, m68_state->irq_state);
-	state_save_register_item(type, index, m68_state->ic_eddge);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->ppc.w.l);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->pc.w.l);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->s.w.l);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->x.w.l);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->d.w.l);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->cc);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->wai_state);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->nmi_state);
+	state_save_register_item_array(type, m68_state->device->tag, 0, m68_state->irq_state);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->ic_eddge);
 
-	state_save_register_item(type, index, m68_state->port1_ddr);
-	state_save_register_item(type, index, m68_state->port2_ddr);
-	state_save_register_item(type, index, m68_state->port3_ddr);
-	state_save_register_item(type, index, m68_state->port4_ddr);
-	state_save_register_item(type, index, m68_state->port1_data);
-	state_save_register_item(type, index, m68_state->port2_data);
-	state_save_register_item(type, index, m68_state->port3_data);
-	state_save_register_item(type, index, m68_state->port4_data);
-	state_save_register_item(type, index, m68_state->tcsr);
-	state_save_register_item(type, index, m68_state->pending_tcsr);
-	state_save_register_item(type, index, m68_state->irq2);
-	state_save_register_item(type, index, m68_state->ram_ctrl);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->port1_ddr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->port2_ddr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->port3_ddr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->port4_ddr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->port1_data);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->port2_data);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->port3_data);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->port4_data);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->tcsr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->pending_tcsr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->irq2);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->ram_ctrl);
 
-	state_save_register_item(type, index, m68_state->counter.d);
-	state_save_register_item(type, index, m68_state->output_compare.d);
-	state_save_register_item(type, index, m68_state->input_capture);
-	state_save_register_item(type, index, m68_state->timer_over.d);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->counter.d);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->output_compare.d);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->input_capture);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->timer_over.d);
 
-	state_save_register_item(type, index, m68_state->clock);
-	state_save_register_item(type, index, m68_state->trcsr);
-	state_save_register_item(type, index, m68_state->rmcr);
-	state_save_register_item(type, index, m68_state->rdr);
-	state_save_register_item(type, index, m68_state->tdr);
-	state_save_register_item(type, index, m68_state->rsr);
-	state_save_register_item(type, index, m68_state->tsr);
-	state_save_register_item(type, index, m68_state->rxbits);
-	state_save_register_item(type, index, m68_state->txbits);
-	state_save_register_item(type, index, m68_state->txstate);
-	state_save_register_item(type, index, m68_state->trcsr_read);
-	state_save_register_item(type, index, m68_state->tx);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->clock);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->trcsr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->rmcr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->rdr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->tdr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->rsr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->tsr);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->rxbits);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->txbits);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->txstate);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->trcsr_read);
+	state_save_register_item(type, m68_state->device->tag, 0, m68_state->tx);
 }
 
 static CPU_INIT( m6800 )
@@ -891,7 +891,7 @@ static CPU_INIT( m6800 )
 	m68_state->cycles = cycles_6800;
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
-	state_register(m68_state, "m6800", index);
+	state_register(m68_state, "m6800");
 }
 
 static CPU_RESET( m6800 )
@@ -1321,7 +1321,7 @@ static CPU_INIT( m6801 )
 	m68_state->m6800_rx_timer = timer_alloc(m6800_rx_tick, m68_state);
 	m68_state->m6800_tx_timer = timer_alloc(m6800_tx_tick, m68_state);
 
-	state_register(m68_state, "m6801", index);
+	state_register(m68_state, "m6801");
 }
 #endif
 
@@ -1337,7 +1337,7 @@ static CPU_INIT( m6802 )
 	m68_state->cycles = cycles_6800;
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
-	state_register(m68_state, "m6802", index);
+	state_register(m68_state, "m6802");
 }
 #endif
 
@@ -1358,7 +1358,7 @@ static CPU_INIT( m6803 )
 	m68_state->m6800_rx_timer = timer_alloc(m6800_rx_tick, m68_state);
 	m68_state->m6800_tx_timer = timer_alloc(m6800_tx_tick, m68_state);
 
-	state_register(m68_state, "m6803", index);
+	state_register(m68_state, "m6803");
 }
 #endif
 
@@ -1692,7 +1692,7 @@ static CPU_INIT( m6808 )
 	m68_state->cycles = cycles_6800;
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
-	state_register(m68_state, "m6808", index);
+	state_register(m68_state, "m6808");
 }
 #endif
 
@@ -1714,7 +1714,7 @@ static CPU_INIT( hd63701 )
 	m68_state->m6800_rx_timer = timer_alloc(m6800_rx_tick, m68_state);
 	m68_state->m6800_tx_timer = timer_alloc(m6800_tx_tick, m68_state);
 
-	state_register(m68_state, "hd63701", index);
+	state_register(m68_state, "hd63701");
 }
 
 /****************************************************************************
@@ -2059,7 +2059,7 @@ static CPU_INIT( nsc8105 )
 	//  m68_state->subtype = SUBTYPE_NSC8105;
 	m68_state->insn = nsc8105_insn;
 	m68_state->cycles = cycles_nsc8105;
-	state_register(m68_state, "nsc8105", index);
+	state_register(m68_state, "nsc8105");
 }
 
 /****************************************************************************

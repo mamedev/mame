@@ -90,30 +90,30 @@ static struct i80x86_timing timing;
 
 
 /***************************************************************************/
-static void i8086_state_register(int index)
+static void i8086_state_register(const device_config *device)
 {
 	static const char type[] = "I8086";
-	state_save_register_item_array(type, index, I.regs.w);
-	state_save_register_item(type, index, I.pc);
-	state_save_register_item(type, index, I.prevpc);
-	state_save_register_item_array(type, index, I.base);
-	state_save_register_item_array(type, index, I.sregs);
-	state_save_register_item(type, index, I.flags);
-	state_save_register_item(type, index, I.AuxVal);
-	state_save_register_item(type, index, I.OverVal);
-	state_save_register_item(type, index, I.SignVal);
-	state_save_register_item(type, index, I.ZeroVal);
-	state_save_register_item(type, index, I.CarryVal);
-	state_save_register_item(type, index, I.DirVal);
-	state_save_register_item(type, index, I.ParityVal);
-	state_save_register_item(type, index, I.TF);
-	state_save_register_item(type, index, I.IF);
-	state_save_register_item(type, index, I.MF);
-	state_save_register_item(type, index, I.int_vector);
-	state_save_register_item(type, index, I.nmi_state);
-	state_save_register_item(type, index, I.irq_state);
-	state_save_register_item(type, index, I.extra_cycles);
-	state_save_register_item(type, index, I.test_state);	/* PJB 03/05 */
+	state_save_register_item_array(type, device->tag, 0, I.regs.w);
+	state_save_register_item(type, device->tag, 0, I.pc);
+	state_save_register_item(type, device->tag, 0, I.prevpc);
+	state_save_register_item_array(type, device->tag, 0, I.base);
+	state_save_register_item_array(type, device->tag, 0, I.sregs);
+	state_save_register_item(type, device->tag, 0, I.flags);
+	state_save_register_item(type, device->tag, 0, I.AuxVal);
+	state_save_register_item(type, device->tag, 0, I.OverVal);
+	state_save_register_item(type, device->tag, 0, I.SignVal);
+	state_save_register_item(type, device->tag, 0, I.ZeroVal);
+	state_save_register_item(type, device->tag, 0, I.CarryVal);
+	state_save_register_item(type, device->tag, 0, I.DirVal);
+	state_save_register_item(type, device->tag, 0, I.ParityVal);
+	state_save_register_item(type, device->tag, 0, I.TF);
+	state_save_register_item(type, device->tag, 0, I.IF);
+	state_save_register_item(type, device->tag, 0, I.MF);
+	state_save_register_item(type, device->tag, 0, I.int_vector);
+	state_save_register_item(type, device->tag, 0, I.nmi_state);
+	state_save_register_item(type, device->tag, 0, I.irq_state);
+	state_save_register_item(type, device->tag, 0, I.extra_cycles);
+	state_save_register_item(type, device->tag, 0, I.test_state);	/* PJB 03/05 */
 }
 
 static CPU_INIT( i8086 )
@@ -144,7 +144,7 @@ static CPU_INIT( i8086 )
 	I.irq_callback = irqcallback;
 	I.device = device;
 
-	i8086_state_register(index);
+	i8086_state_register(device);
 	configure_memory_16bit();
 }
 

@@ -53,7 +53,7 @@ static SND_START( ym2151 )
 	/* stream setup */
 	info->stream = stream_create(0,2,rate,info,ym2151_update);
 
-	info->chip = ym2151_init(sndindex,clock,rate);
+	info->chip = ym2151_init(tag,clock,rate);
 
 	state_save_register_postload(Machine, ym2151intf_postload, info);
 

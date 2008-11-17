@@ -124,7 +124,7 @@ static SND_START( ym2203 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2203, sndindex, clock, &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(SOUND_YM2203, tag, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -135,7 +135,7 @@ static SND_START( ym2203 )
 	info->stream = stream_create(0,1,rate,info,ym2203_stream_update);
 
 	/* Initialize FM emurator */
-	info->chip = ym2203_init(info,sndindex,clock,rate,timer_handler,IRQHandler,&psgintf);
+	info->chip = ym2203_init(info,tag,clock,rate,timer_handler,IRQHandler,&psgintf);
 
 	state_save_register_postload(Machine, ym2203_intf_postload, info);
 

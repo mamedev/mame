@@ -941,28 +941,28 @@ static void m68k_post_load(running_machine *machine, void *param)
 	m68ki_jump(m68k, REG_PC);
 }
 
-void m68k_state_register(m68ki_cpu_core *m68k, const char *type, int index)
+void m68k_state_register(m68ki_cpu_core *m68k, const char *type)
 {
 	/* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
-	state_save_register_item_array(type, index, REG_D);
-	state_save_register_item(type, index, REG_PPC);
-	state_save_register_item(type, index, REG_PC);
-	state_save_register_item(type, index, REG_USP);
-	state_save_register_item(type, index, REG_ISP);
-	state_save_register_item(type, index, REG_MSP);
-	state_save_register_item(type, index, m68k->vbr);
-	state_save_register_item(type, index, m68k->sfc);
-	state_save_register_item(type, index, m68k->dfc);
-	state_save_register_item(type, index, m68k->cacr);
-	state_save_register_item(type, index, m68k->caar);
-	state_save_register_item(type, index, m68k_substate.sr);
-	state_save_register_item(type, index, m68k->int_level);
-	state_save_register_item(type, index, m68k_substate.stopped);
-	state_save_register_item(type, index, m68k_substate.halted);
-	state_save_register_item(type, index, m68k->pref_addr);
-	state_save_register_item(type, index, m68k->pref_data);
-	state_save_register_presave(Machine, m68k_prepare_substate, m68k);
-	state_save_register_postload(Machine, m68k_post_load, m68k);
+	state_save_register_item_array(type, m68k->device->tag, 0, REG_D);
+	state_save_register_item(type, m68k->device->tag, 0, REG_PPC);
+	state_save_register_item(type, m68k->device->tag, 0, REG_PC);
+	state_save_register_item(type, m68k->device->tag, 0, REG_USP);
+	state_save_register_item(type, m68k->device->tag, 0, REG_ISP);
+	state_save_register_item(type, m68k->device->tag, 0, REG_MSP);
+	state_save_register_item(type, m68k->device->tag, 0, m68k->vbr);
+	state_save_register_item(type, m68k->device->tag, 0, m68k->sfc);
+	state_save_register_item(type, m68k->device->tag, 0, m68k->dfc);
+	state_save_register_item(type, m68k->device->tag, 0, m68k->cacr);
+	state_save_register_item(type, m68k->device->tag, 0, m68k->caar);
+	state_save_register_item(type, m68k->device->tag, 0, m68k_substate.sr);
+	state_save_register_item(type, m68k->device->tag, 0, m68k->int_level);
+	state_save_register_item(type, m68k->device->tag, 0, m68k_substate.stopped);
+	state_save_register_item(type, m68k->device->tag, 0, m68k_substate.halted);
+	state_save_register_item(type, m68k->device->tag, 0, m68k->pref_addr);
+	state_save_register_item(type, m68k->device->tag, 0, m68k->pref_data);
+	state_save_register_presave(m68k->device->machine, m68k_prepare_substate, m68k);
+	state_save_register_postload(m68k->device->machine, m68k_post_load, m68k);
 }
 
 /* ======================================================================== */

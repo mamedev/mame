@@ -457,9 +457,9 @@ static int K037122_vh_start(running_machine *machine, int chip)
 
 	machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;
 
-	state_save_register_item_pointer("K037122", chip, K037122_reg[chip], 0x400/sizeof(K037122_reg[chip][0]));
-	state_save_register_item_pointer("K037122", chip, K037122_char_ram[chip], 0x200000/sizeof(K037122_char_ram[chip][0]));
-	state_save_register_item_pointer("K037122", chip, K037122_tile_ram[chip], 0x20000/sizeof(K037122_tile_ram[chip][0]));
+	state_save_register_item_pointer("K037122", NULL, chip, K037122_reg[chip], 0x400/sizeof(K037122_reg[chip][0]));
+	state_save_register_item_pointer("K037122", NULL, chip, K037122_char_ram[chip], 0x200000/sizeof(K037122_char_ram[chip][0]));
+	state_save_register_item_pointer("K037122", NULL, chip, K037122_tile_ram[chip], 0x20000/sizeof(K037122_tile_ram[chip][0]));
 	state_save_register_postload(machine, K037122_postload, (void *)(FPTR)chip);
 
 	return 0;

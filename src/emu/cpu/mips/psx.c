@@ -1559,26 +1559,26 @@ static STATE_POSTLOAD( mips_postload )
 	mips_update_scratchpad(machine);
 }
 
-static void mips_state_register( const char *type, int index )
+static void mips_state_register( const char *type, const device_config *device )
 {
-	state_save_register_item( type, index, mipscpu.op );
-	state_save_register_item( type, index, mipscpu.pc );
-	state_save_register_item( type, index, mipscpu.delayv );
-	state_save_register_item( type, index, mipscpu.delayr );
-	state_save_register_item( type, index, mipscpu.hi );
-	state_save_register_item( type, index, mipscpu.lo );
-	state_save_register_item( type, index, mipscpu.biu );
-	state_save_register_item_array( type, index, mipscpu.r );
-	state_save_register_item_array( type, index, mipscpu.cp0r );
-	state_save_register_item_array( type, index, mipscpu.cp2cr );
-	state_save_register_item_array( type, index, mipscpu.cp2dr );
-	state_save_register_item_array( type, index, mipscpu.icacheTag );
-	state_save_register_item_array( type, index, mipscpu.icache );
-	state_save_register_item_array( type, index, mipscpu.dcache );
-	state_save_register_item( type, index, mipscpu.multiplier_operation );
-	state_save_register_item( type, index, mipscpu.multiplier_operand1 );
-	state_save_register_item( type, index, mipscpu.multiplier_operand2 );
-	state_save_register_postload( Machine, mips_postload, NULL );
+	state_save_register_item( type, device->tag, 0, mipscpu.op );
+	state_save_register_item( type, device->tag, 0, mipscpu.pc );
+	state_save_register_item( type, device->tag, 0, mipscpu.delayv );
+	state_save_register_item( type, device->tag, 0, mipscpu.delayr );
+	state_save_register_item( type, device->tag, 0, mipscpu.hi );
+	state_save_register_item( type, device->tag, 0, mipscpu.lo );
+	state_save_register_item( type, device->tag, 0, mipscpu.biu );
+	state_save_register_item_array( type, device->tag, 0, mipscpu.r );
+	state_save_register_item_array( type, device->tag, 0, mipscpu.cp0r );
+	state_save_register_item_array( type, device->tag, 0, mipscpu.cp2cr );
+	state_save_register_item_array( type, device->tag, 0, mipscpu.cp2dr );
+	state_save_register_item_array( type, device->tag, 0, mipscpu.icacheTag );
+	state_save_register_item_array( type, device->tag, 0, mipscpu.icache );
+	state_save_register_item_array( type, device->tag, 0, mipscpu.dcache );
+	state_save_register_item( type, device->tag, 0, mipscpu.multiplier_operation );
+	state_save_register_item( type, device->tag, 0, mipscpu.multiplier_operand1 );
+	state_save_register_item( type, device->tag, 0, mipscpu.multiplier_operand2 );
+	state_save_register_postload( device->machine, mips_postload, NULL );
 }
 
 static CPU_INIT( mips )
@@ -1586,7 +1586,7 @@ static CPU_INIT( mips )
 	mipscpu.irq_callback = irqcallback;
 	mipscpu.device = device;
 
-	mips_state_register( "psxcpu", index );
+	mips_state_register( "psxcpu", device );
 }
 
 static CPU_RESET( mips )

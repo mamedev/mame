@@ -160,7 +160,7 @@ struct _ay_ym_param
 typedef struct _ay8910_context ay8910_context;
 struct _ay8910_context
 {
-	int index;
+	const char *tag;
 	int streams;
 	int ready;
 	sound_stream *channel;
@@ -450,11 +450,11 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 				if (psg->intf->portAwrite)
 					(*psg->intf->portAwrite)(space, 0, psg->regs[AY_PORTA]);
 				else
-					logerror("warning - write %02x to 8910 #%d Port A\n",psg->regs[AY_PORTA],psg->index);
+					logerror("warning - write %02x to 8910 '%s' Port A\n",psg->regs[AY_PORTA],psg->tag);
 			}
 			else
 			{
-				logerror("warning: write to 8910 #%d Port A set as input - ignored\n",psg->index);
+				logerror("warning: write to 8910 '%s' Port A set as input - ignored\n",psg->tag);
 			}
 			break;
 		case AY_PORTB:
@@ -463,11 +463,11 @@ static void ay8910_write_reg(ay8910_context *psg, int r, int v)
 				if (psg->intf->portBwrite)
 					(*psg->intf->portBwrite)(space, 0, psg->regs[AY_PORTB]);
 				else
-					logerror("warning - write %02x to 8910 #%d Port B\n",psg->regs[AY_PORTB],psg->index);
+					logerror("warning - write %02x to 8910 '%s' Port B\n",psg->regs[AY_PORTB],psg->tag);
 			}
 			else
 			{
-				logerror("warning: write to 8910 #%d Port B set as input - ignored\n",psg->index);
+				logerror("warning: write to 8910 '%s' Port B set as input - ignored\n",psg->tag);
 			}
 			break;
 	}
@@ -628,27 +628,27 @@ static void build_mixer_table(ay8910_context *psg)
 	build_3D_table(psg->intf->res_load[0], psg->par, psg->par_env, normalize, 3, psg->zero_is_off, psg->vol3d_table);
 }
 
-static void ay8910_statesave(ay8910_context *psg, int sndindex)
+static void ay8910_statesave(ay8910_context *psg, const char *tag)
 {
-	state_save_register_item("AY8910", sndindex, psg->register_latch);
-	state_save_register_item_array("AY8910", sndindex, psg->regs);
-	state_save_register_item("AY8910", sndindex, psg->last_enable);
+	state_save_register_item("AY8910", tag, 0, psg->register_latch);
+	state_save_register_item_array("AY8910", tag, 0, psg->regs);
+	state_save_register_item("AY8910", tag, 0, psg->last_enable);
 
-	state_save_register_item_array("AY8910", sndindex, psg->count);
-	state_save_register_item("AY8910", sndindex, psg->count_noise);
-	state_save_register_item("AY8910", sndindex, psg->count_env);
+	state_save_register_item_array("AY8910", tag, 0, psg->count);
+	state_save_register_item("AY8910", tag, 0, psg->count_noise);
+	state_save_register_item("AY8910", tag, 0, psg->count_env);
 
-	state_save_register_item("AY8910", sndindex, psg->env_volume);
+	state_save_register_item("AY8910", tag, 0, psg->env_volume);
 
-	state_save_register_item_array("AY8910", sndindex, psg->output);
-	state_save_register_item("AY8910", sndindex, psg->output_noise);
+	state_save_register_item_array("AY8910", tag, 0, psg->output);
+	state_save_register_item("AY8910", tag, 0, psg->output_noise);
 
-	state_save_register_item("AY8910", sndindex, psg->env_step);
-	state_save_register_item("AY8910", sndindex, psg->hold);
-	state_save_register_item("AY8910", sndindex, psg->alternate);
-	state_save_register_item("AY8910", sndindex, psg->attack);
-	state_save_register_item("AY8910", sndindex, psg->holding);
-	state_save_register_item("AY8910", sndindex, psg->rng);
+	state_save_register_item("AY8910", tag, 0, psg->env_step);
+	state_save_register_item("AY8910", tag, 0, psg->hold);
+	state_save_register_item("AY8910", tag, 0, psg->alternate);
+	state_save_register_item("AY8910", tag, 0, psg->attack);
+	state_save_register_item("AY8910", tag, 0, psg->holding);
+	state_save_register_item("AY8910", tag, 0, psg->rng);
 }
 
 /*************************************
@@ -659,13 +659,13 @@ static void ay8910_statesave(ay8910_context *psg, int sndindex)
  *
  *************************************/
 
-void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const ay8910_interface *intf)
+void *ay8910_start_ym(sound_type chip_type, const char *tag, int clock, const ay8910_interface *intf)
 {
 	ay8910_context *info;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
-	info->index = sndindex;
+	info->tag = tag;
 	info->intf = intf;
 	if ((info->intf->flags & AY8910_SINGLE_OUTPUT) != 0)
 	{
@@ -709,7 +709,7 @@ void *ay8910_start_ym(sound_type chip_type, int sndindex, int clock, const ay891
 	info->channel = stream_create(0,info->streams,clock / 8 ,info,ay8910_update);
 
 	ay8910_set_clock_ym(info,clock);
-	ay8910_statesave(info, sndindex);
+	ay8910_statesave(info, tag);
 
 	return info;
 }
@@ -792,7 +792,7 @@ int ay8910_read_ym(void *chip)
 	{
 	case AY_PORTA:
 		if ((psg->regs[AY_ENABLE] & 0x40) != 0)
-			logerror("warning: read from 8910 #%d Port A set as output\n",psg->index);
+			logerror("warning: read from 8910 '%s' Port A set as output\n",psg->tag);
 		/*
            even if the port is set as output, we still need to return the external
            data. Some games, like kidniki, need this to work.
@@ -800,15 +800,15 @@ int ay8910_read_ym(void *chip)
 		if (psg->intf->portAread)
 			psg->regs[AY_PORTA] = (*psg->intf->portAread)(space, 0);
 		else
-			logerror("PC %04x: warning - read 8910 #%d Port A\n",cpu_get_pc(Machine->activecpu),psg->index);
+			logerror("PC %04x: warning - read 8910 '%s' Port A\n",cpu_get_pc(Machine->activecpu),psg->tag);
 		break;
 	case AY_PORTB:
 		if ((psg->regs[AY_ENABLE] & 0x80) != 0)
-			logerror("warning: read from 8910 #%d Port B set as output\n",psg->index);
+			logerror("warning: read from 8910 '%s' Port B set as output\n",psg->tag);
 		if (psg->intf->portBread)
 			psg->regs[AY_PORTB] = (*psg->intf->portBread)(space, 0);
 		else
-			logerror("PC %04x: warning - read 8910 #%d Port B\n",cpu_get_pc(Machine->activecpu),psg->index);
+			logerror("PC %04x: warning - read 8910 '%s' Port B\n",cpu_get_pc(Machine->activecpu),psg->tag);
 		break;
 	}
 	return psg->regs[r];
@@ -829,7 +829,7 @@ static SND_START( ay8910 )
 		NULL, NULL, NULL, NULL
 	};
 	const ay8910_interface *intf = (config ? config : &generic_ay8910);
-	return ay8910_start_ym(SOUND_AY8910, sndindex+16, clock, intf);
+	return ay8910_start_ym(SOUND_AY8910, tag, clock, intf);
 }
 
 static SND_START( ym2149 )
@@ -841,7 +841,7 @@ static SND_START( ym2149 )
 		NULL, NULL, NULL, NULL
 	};
 	const ay8910_interface *intf = (config ? config : &generic_ay8910);
-	return ay8910_start_ym(SOUND_YM2149, sndindex+16, clock, intf);
+	return ay8910_start_ym(SOUND_YM2149, tag, clock, intf);
 }
 
 static SND_STOP( ay8910 )

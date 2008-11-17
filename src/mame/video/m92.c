@@ -275,8 +275,8 @@ VIDEO_START( m92 )
 		tilemap_set_transmask(layer->tmap, 2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 		tilemap_set_transmask(layer->wide_tmap, 2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 
-		state_save_register_item("layer", laynum, layer->vram_base);
-		state_save_register_item_array("layer", laynum, layer->control);
+		state_save_register_item("layer", NULL, laynum, layer->vram_base);
+		state_save_register_item_array("layer", NULL, laynum, layer->control);
 	}
 
 	paletteram16 = auto_malloc(0x1000);

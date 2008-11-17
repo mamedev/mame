@@ -74,24 +74,24 @@ static CPU_INIT( cdp1802 )
 	cdp1802.dmain = CLEAR_LINE;
 	cdp1802.dmaout = CLEAR_LINE;
 
-	state_save_register_item("cdp1802", index, cdp1802.p);
-	state_save_register_item("cdp1802", index, cdp1802.x);
-	state_save_register_item("cdp1802", index, cdp1802.d);
-	state_save_register_item("cdp1802", index, cdp1802.b);
-	state_save_register_item("cdp1802", index, cdp1802.t);
-	state_save_register_item_array("cdp1802", index, cdp1802.r);
-	state_save_register_item("cdp1802", index, cdp1802.df);
-	state_save_register_item("cdp1802", index, cdp1802.ie);
-	state_save_register_item("cdp1802", index, cdp1802.q);
-	state_save_register_item("cdp1802", index, cdp1802.n);
-	state_save_register_item("cdp1802", index, cdp1802.i);
-	state_save_register_item("cdp1802", index, cdp1802.state);
-	state_save_register_item("cdp1802", index, cdp1802.prevmode);
-	state_save_register_item("cdp1802", index, cdp1802.mode);
-	state_save_register_item("cdp1802", index, cdp1802.irq);
-	state_save_register_item("cdp1802", index, cdp1802.dmain);
-	state_save_register_item("cdp1802", index, cdp1802.dmaout);
-	state_save_register_item("cdp1802", index, cdp1802.ef);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.p);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.x);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.d);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.b);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.t);
+	state_save_register_item_array("cdp1802", device->tag, 0, cdp1802.r);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.df);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.ie);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.q);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.n);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.i);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.state);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.prevmode);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.mode);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.irq);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.dmain);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.dmaout);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802.ef);
 }
 
 INLINE void cdp1802_add(int left, int right)

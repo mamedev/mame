@@ -663,25 +663,25 @@ static SND_START( vlm5030 )
 
 	/* don't restore "UINT8 *chip->rom" when use vlm5030_set_rom() */
 
-	state_save_register_item(VLM_NAME,sndindex,chip->address);
-	state_save_register_item(VLM_NAME,sndindex,chip->pin_BSY);
-	state_save_register_item(VLM_NAME,sndindex,chip->pin_ST);
-	state_save_register_item(VLM_NAME,sndindex,chip->pin_VCU);
-	state_save_register_item(VLM_NAME,sndindex,chip->pin_RST);
-	state_save_register_item(VLM_NAME,sndindex,chip->latch_data);
-	state_save_register_item(VLM_NAME,sndindex,chip->vcu_addr_h);
-	state_save_register_item(VLM_NAME,sndindex,chip->parameter);
-	state_save_register_item(VLM_NAME,sndindex,chip->phase);
-	state_save_register_item(VLM_NAME,sndindex,chip->interp_count);
-	state_save_register_item(VLM_NAME,sndindex,chip->sample_count);
-	state_save_register_item(VLM_NAME,sndindex,chip->pitch_count);
-	state_save_register_item(VLM_NAME,sndindex,chip->old_energy);
-	state_save_register_item(VLM_NAME,sndindex,chip->old_pitch);
-	state_save_register_item_array(VLM_NAME,sndindex,chip->old_k);
-	state_save_register_item(VLM_NAME,sndindex,chip->target_energy);
-	state_save_register_item(VLM_NAME,sndindex,chip->target_pitch);
-	state_save_register_item_array(VLM_NAME,sndindex,chip->target_k);
-	state_save_register_item_array(VLM_NAME,sndindex,chip->x);
+	state_save_register_item(VLM_NAME,tag,0,chip->address);
+	state_save_register_item(VLM_NAME,tag,0,chip->pin_BSY);
+	state_save_register_item(VLM_NAME,tag,0,chip->pin_ST);
+	state_save_register_item(VLM_NAME,tag,0,chip->pin_VCU);
+	state_save_register_item(VLM_NAME,tag,0,chip->pin_RST);
+	state_save_register_item(VLM_NAME,tag,0,chip->latch_data);
+	state_save_register_item(VLM_NAME,tag,0,chip->vcu_addr_h);
+	state_save_register_item(VLM_NAME,tag,0,chip->parameter);
+	state_save_register_item(VLM_NAME,tag,0,chip->phase);
+	state_save_register_item(VLM_NAME,tag,0,chip->interp_count);
+	state_save_register_item(VLM_NAME,tag,0,chip->sample_count);
+	state_save_register_item(VLM_NAME,tag,0,chip->pitch_count);
+	state_save_register_item(VLM_NAME,tag,0,chip->old_energy);
+	state_save_register_item(VLM_NAME,tag,0,chip->old_pitch);
+	state_save_register_item_array(VLM_NAME,tag,0,chip->old_k);
+	state_save_register_item(VLM_NAME,tag,0,chip->target_energy);
+	state_save_register_item(VLM_NAME,tag,0,chip->target_pitch);
+	state_save_register_item_array(VLM_NAME,tag,0,chip->target_k);
+	state_save_register_item_array(VLM_NAME,tag,0,chip->x);
 	state_save_register_postload(Machine, vlm5030_restore_state, chip);
 
 	return chip;

@@ -742,12 +742,10 @@ void mc6845_update(const device_config *device, bitmap_t *bitmap, const rectangl
 static device_start_err common_start(const device_config *device, int device_type)
 {
 	mc6845_t *mc6845 = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	mc6845->intf = device->static_config;
 	mc6845->device_type = device_type;
@@ -785,32 +783,30 @@ static device_start_err common_start(const device_config *device, int device_typ
 	mc6845->light_pen_latch_timer = timer_alloc(light_pen_latch_timer_cb, (void *)device);
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, device_tags[device_type], device->tag);
-
 	state_save_register_postload(device->machine, mc6845_state_save_postload, mc6845);
 
-	state_save_register_item(unique_tag, 0, mc6845->clock);
-	state_save_register_item(unique_tag, 0, mc6845->hpixels_per_column);
-	state_save_register_item(unique_tag, 0, mc6845->register_address_latch);
-	state_save_register_item(unique_tag, 0, mc6845->horiz_char_total);
-	state_save_register_item(unique_tag, 0, mc6845->horiz_disp);
-	state_save_register_item(unique_tag, 0, mc6845->horiz_sync_pos);
-	state_save_register_item(unique_tag, 0, mc6845->sync_width);
-	state_save_register_item(unique_tag, 0, mc6845->vert_char_total);
-	state_save_register_item(unique_tag, 0, mc6845->vert_total_adj);
-	state_save_register_item(unique_tag, 0, mc6845->vert_disp);
-	state_save_register_item(unique_tag, 0, mc6845->vert_sync_pos);
-	state_save_register_item(unique_tag, 0, mc6845->mode_control);
-	state_save_register_item(unique_tag, 0, mc6845->max_ras_addr);
-	state_save_register_item(unique_tag, 0, mc6845->cursor_start_ras);
-	state_save_register_item(unique_tag, 0, mc6845->cursor_end_ras);
-	state_save_register_item(unique_tag, 0, mc6845->disp_start_addr);
-	state_save_register_item(unique_tag, 0, mc6845->cursor_addr);
-	state_save_register_item(unique_tag, 0, mc6845->light_pen_addr);
-	state_save_register_item(unique_tag, 0, mc6845->light_pen_latched);
-	state_save_register_item(unique_tag, 0, mc6845->cursor_state);
-	state_save_register_item(unique_tag, 0, mc6845->cursor_blink_count);
-	state_save_register_item(unique_tag, 0, mc6845->update_addr);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->clock);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->hpixels_per_column);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->register_address_latch);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->horiz_char_total);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->horiz_disp);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->horiz_sync_pos);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->sync_width);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->vert_char_total);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->vert_total_adj);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->vert_disp);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->vert_sync_pos);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->mode_control);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->max_ras_addr);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_start_ras);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_end_ras);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->disp_start_addr);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_addr);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->light_pen_addr);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->light_pen_latched);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_state);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->cursor_blink_count);
+	state_save_register_item(device_tags[device_type], device->tag, 0, mc6845->update_addr);
 
 	return DEVICE_START_OK;
 }

@@ -374,18 +374,18 @@ static CPU_INIT( m6809 )
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
 
-	state_save_register_item("m6809", index, PC);
-	state_save_register_item("m6809", index, PPC);
-	state_save_register_item("m6809", index, D);
-	state_save_register_item("m6809", index, DP);
-	state_save_register_item("m6809", index, U);
-	state_save_register_item("m6809", index, S);
-	state_save_register_item("m6809", index, X);
-	state_save_register_item("m6809", index, Y);
-	state_save_register_item("m6809", index, CC);
-	state_save_register_item_array("m6809", index, m68_state->irq_state);
-	state_save_register_item("m6809", index, m68_state->int_state);
-	state_save_register_item("m6809", index, m68_state->nmi_state);
+	state_save_register_item("m6809", device->tag, 0, PC);
+	state_save_register_item("m6809", device->tag, 0, PPC);
+	state_save_register_item("m6809", device->tag, 0, D);
+	state_save_register_item("m6809", device->tag, 0, DP);
+	state_save_register_item("m6809", device->tag, 0, U);
+	state_save_register_item("m6809", device->tag, 0, S);
+	state_save_register_item("m6809", device->tag, 0, X);
+	state_save_register_item("m6809", device->tag, 0, Y);
+	state_save_register_item("m6809", device->tag, 0, CC);
+	state_save_register_item_array("m6809", device->tag, 0, m68_state->irq_state);
+	state_save_register_item("m6809", device->tag, 0, m68_state->int_state);
+	state_save_register_item("m6809", device->tag, 0, m68_state->nmi_state);
 
 }
 

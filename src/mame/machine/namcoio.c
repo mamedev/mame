@@ -797,18 +797,18 @@ void namcoio_set_irq_line(int chipnum, int state)
 static void namcoio_state_save(int chipnum)
 {
 
-	state_save_register_item_pointer("namcoio", chipnum, ((UINT8 *) (&namcoio_ram[chipnum * 16])), 16);
-	state_save_register_item("namcoio", chipnum, io[chipnum].reset);
-	state_save_register_item("namcoio", chipnum, io[chipnum].lastcoins);
-	state_save_register_item("namcoio", chipnum, io[chipnum].lastbuttons);
-	state_save_register_item("namcoio", chipnum, io[chipnum].credits);
-	state_save_register_item_array("namcoio", chipnum, io[chipnum].coins);
-	state_save_register_item_array("namcoio", chipnum, io[chipnum].coins_per_cred);
-	state_save_register_item_array("namcoio", chipnum, io[chipnum].creds_per_coin);
-	state_save_register_item("namcoio", chipnum, io[chipnum].in_count);
-	state_save_register_item("namcoio", chipnum, io[chipnum].mode);
-	state_save_register_item("namcoio", chipnum, io[chipnum].coincred_mode);
-	state_save_register_item("namcoio", chipnum, io[chipnum].remap_joy);
+	state_save_register_item_pointer("namcoio", NULL, chipnum, ((UINT8 *) (&namcoio_ram[chipnum * 16])), 16);
+	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].reset);
+	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].lastcoins);
+	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].lastbuttons);
+	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].credits);
+	state_save_register_item_array("namcoio", NULL, chipnum, io[chipnum].coins);
+	state_save_register_item_array("namcoio", NULL, chipnum, io[chipnum].coins_per_cred);
+	state_save_register_item_array("namcoio", NULL, chipnum, io[chipnum].creds_per_coin);
+	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].in_count);
+	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].mode);
+	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].coincred_mode);
+	state_save_register_item("namcoio", NULL, chipnum, io[chipnum].remap_joy);
 }
 
 void namcoio_init(int chipnum, int type, const struct namcoio_interface *intf)
@@ -850,8 +850,8 @@ static UINT8 customio_command[MAX_06XX];
 static void namco_06xx_state_save(int chipnum)
 {
 
-		//state_save_register_item("namcoio06xx", chipnum, nmi_cpu[chipnum]);
-		state_save_register_item("namcoio06xx", chipnum, customio_command[chipnum]);
+		//state_save_register_item("namcoio06xx", NULL, chipnum, nmi_cpu[chipnum]);
+		state_save_register_item("namcoio06xx", NULL, chipnum, customio_command[chipnum]);
 }
 
 

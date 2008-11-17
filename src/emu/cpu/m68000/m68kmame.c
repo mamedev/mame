@@ -161,7 +161,7 @@ static CPU_INIT( m68000 )
 	m68k->memory = interface_d16;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68000);
-	m68k_state_register(m68k, "m68000", index);
+	m68k_state_register(m68k, "m68000");
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
 
@@ -206,7 +206,7 @@ static CPU_INIT( m68008 )
 	m68k->memory = interface_d8;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68008);
-	m68k_state_register(m68k, "m68008", index);
+	m68k_state_register(m68k, "m68008");
 	m68k_set_int_ack_callback(m68k, (void *)device, irqcallback);
 }
 
@@ -253,7 +253,7 @@ static CPU_INIT( m68010 )
 	m68k->memory = interface_d16;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68010);
-	m68k_state_register(m68k, "m68010", index);
+	m68k_state_register(m68k, "m68010");
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
 
@@ -276,7 +276,7 @@ static CPU_INIT( m68020 )
 	m68k->memory = interface_d32;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68020);
-	m68k_state_register(m68k, "m68020", index);
+	m68k_state_register(m68k, "m68020");
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
 
@@ -322,7 +322,7 @@ static CPU_INIT( m68ec020 )
 	m68k->memory = interface_d32;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68EC020);
-	m68k_state_register(m68k, "m68ec020", index);
+	m68k_state_register(m68k, "m68ec020");
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
 
@@ -346,7 +346,7 @@ static CPU_INIT( m68040 )
 	m68k->memory = interface_d32;
 	m68k_init(m68k);
 	m68k_set_cpu_type(m68k, M68K_CPU_TYPE_68040);
-	m68k_state_register(m68k, "m68040", index);
+	m68k_state_register(m68k, "m68040");
 	m68k_set_int_ack_callback(m68k, (void *)device, (int (*)(void *param, int int_level)) irqcallback);
 }
 

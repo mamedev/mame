@@ -928,24 +928,24 @@ static void nec_init(const device_config *device, int index, int clock, cpu_irq_
 {
 	static const char *const names[]={"V20","V30","V33","V30MZ"};
 
-	state_save_register_item_array(names[type], index, I.regs.w);
-	state_save_register_item_array(names[type], index, I.sregs);
+	state_save_register_item_array(names[type], device->tag, 0, I.regs.w);
+	state_save_register_item_array(names[type], device->tag, 0, I.sregs);
 
-	state_save_register_item(names[type], index, I.ip);
-	state_save_register_item(names[type], index, I.TF);
-	state_save_register_item(names[type], index, I.IF);
-	state_save_register_item(names[type], index, I.DF);
-	state_save_register_item(names[type], index, I.MF);
-	state_save_register_item(names[type], index, I.SignVal);
-	state_save_register_item(names[type], index, I.int_vector);
-	state_save_register_item(names[type], index, I.pending_irq);
-	state_save_register_item(names[type], index, I.nmi_state);
-	state_save_register_item(names[type], index, I.irq_state);
-	state_save_register_item(names[type], index, I.AuxVal);
-	state_save_register_item(names[type], index, I.OverVal);
-	state_save_register_item(names[type], index, I.ZeroVal);
-	state_save_register_item(names[type], index, I.CarryVal);
-	state_save_register_item(names[type], index, I.ParityVal);
+	state_save_register_item(names[type], device->tag, 0, I.ip);
+	state_save_register_item(names[type], device->tag, 0, I.TF);
+	state_save_register_item(names[type], device->tag, 0, I.IF);
+	state_save_register_item(names[type], device->tag, 0, I.DF);
+	state_save_register_item(names[type], device->tag, 0, I.MF);
+	state_save_register_item(names[type], device->tag, 0, I.SignVal);
+	state_save_register_item(names[type], device->tag, 0, I.int_vector);
+	state_save_register_item(names[type], device->tag, 0, I.pending_irq);
+	state_save_register_item(names[type], device->tag, 0, I.nmi_state);
+	state_save_register_item(names[type], device->tag, 0, I.irq_state);
+	state_save_register_item(names[type], device->tag, 0, I.AuxVal);
+	state_save_register_item(names[type], device->tag, 0, I.OverVal);
+	state_save_register_item(names[type], device->tag, 0, I.ZeroVal);
+	state_save_register_item(names[type], device->tag, 0, I.CarryVal);
+	state_save_register_item(names[type], device->tag, 0, I.ParityVal);
 
 	I.irq_callback = irqcallback;
 	I.device = device;

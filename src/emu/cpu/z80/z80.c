@@ -3518,31 +3518,31 @@ static CPU_INIT( z80 )
 		if( (i & 0x0f) == 0x0f ) SZHV_dec[i] |= HF;
 	}
 
-	state_save_register_item("z80", index, z80->prvpc.w.l);
-	state_save_register_item("z80", index, z80->pc.w.l);
-	state_save_register_item("z80", index, z80->sp.w.l);
-	state_save_register_item("z80", index, z80->af.w.l);
-	state_save_register_item("z80", index, z80->bc.w.l);
-	state_save_register_item("z80", index, z80->de.w.l);
-	state_save_register_item("z80", index, z80->hl.w.l);
-	state_save_register_item("z80", index, z80->ix.w.l);
-	state_save_register_item("z80", index, z80->iy.w.l);
-	state_save_register_item("z80", index, z80->memptr.w.l);
-	state_save_register_item("z80", index, z80->af2.w.l);
-	state_save_register_item("z80", index, z80->bc2.w.l);
-	state_save_register_item("z80", index, z80->de2.w.l);
-	state_save_register_item("z80", index, z80->hl2.w.l);
-	state_save_register_item("z80", index, z80->r);
-	state_save_register_item("z80", index, z80->r2);
-	state_save_register_item("z80", index, z80->iff1);
-	state_save_register_item("z80", index, z80->iff2);
-	state_save_register_item("z80", index, z80->halt);
-	state_save_register_item("z80", index, z80->im);
-	state_save_register_item("z80", index, z80->i);
-	state_save_register_item("z80", index, z80->nmi_state);
-	state_save_register_item("z80", index, z80->nmi_pending);
-	state_save_register_item("z80", index, z80->irq_state);
-	state_save_register_item("z80", index, z80->after_ei);
+	state_save_register_item("z80", device->tag, 0, z80->prvpc.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->pc.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->sp.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->af.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->bc.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->de.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->hl.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->ix.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->iy.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->memptr.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->af2.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->bc2.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->de2.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->hl2.w.l);
+	state_save_register_item("z80", device->tag, 0, z80->r);
+	state_save_register_item("z80", device->tag, 0, z80->r2);
+	state_save_register_item("z80", device->tag, 0, z80->iff1);
+	state_save_register_item("z80", device->tag, 0, z80->iff2);
+	state_save_register_item("z80", device->tag, 0, z80->halt);
+	state_save_register_item("z80", device->tag, 0, z80->im);
+	state_save_register_item("z80", device->tag, 0, z80->i);
+	state_save_register_item("z80", device->tag, 0, z80->nmi_state);
+	state_save_register_item("z80", device->tag, 0, z80->nmi_pending);
+	state_save_register_item("z80", device->tag, 0, z80->irq_state);
+	state_save_register_item("z80", device->tag, 0, z80->after_ei);
 
 	/* Reset registers to their initial values */
 	memset(z80, 0, sizeof(*z80));

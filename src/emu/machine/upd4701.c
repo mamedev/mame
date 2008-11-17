@@ -58,20 +58,20 @@ void uPD4701_init( int chip )
 	c->latchswitches = 0;
 	c->cf = 1;
 
-	state_save_register_item( "uPD4701", chip, c->cs );
-	state_save_register_item( "uPD4701", chip, c->xy );
-	state_save_register_item( "uPD4701", chip, c->ul );
-	state_save_register_item( "uPD4701", chip, c->resetx );
-	state_save_register_item( "uPD4701", chip, c->resety );
-	state_save_register_item( "uPD4701", chip, c->latchx );
-	state_save_register_item( "uPD4701", chip, c->latchy );
-	state_save_register_item( "uPD4701", chip, c->startx );
-	state_save_register_item( "uPD4701", chip, c->starty );
-	state_save_register_item( "uPD4701", chip, c->x );
-	state_save_register_item( "uPD4701", chip, c->y );
-	state_save_register_item( "uPD4701", chip, c->switches );
-	state_save_register_item( "uPD4701", chip, c->latchswitches );
-	state_save_register_item( "uPD4701", chip, c->cf );
+	state_save_register_item( "uPD4701", NULL, chip, c->cs );
+	state_save_register_item( "uPD4701", NULL, chip, c->xy );
+	state_save_register_item( "uPD4701", NULL, chip, c->ul );
+	state_save_register_item( "uPD4701", NULL, chip, c->resetx );
+	state_save_register_item( "uPD4701", NULL, chip, c->resety );
+	state_save_register_item( "uPD4701", NULL, chip, c->latchx );
+	state_save_register_item( "uPD4701", NULL, chip, c->latchy );
+	state_save_register_item( "uPD4701", NULL, chip, c->startx );
+	state_save_register_item( "uPD4701", NULL, chip, c->starty );
+	state_save_register_item( "uPD4701", NULL, chip, c->x );
+	state_save_register_item( "uPD4701", NULL, chip, c->y );
+	state_save_register_item( "uPD4701", NULL, chip, c->switches );
+	state_save_register_item( "uPD4701", NULL, chip, c->latchswitches );
+	state_save_register_item( "uPD4701", NULL, chip, c->cf );
 }
 
 void uPD4701_ul_w( int chip, int ul )

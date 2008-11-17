@@ -2626,7 +2626,7 @@ static CPU_INIT( t90 )
 {
 	int i, p;
 
-//  state_save_register_item("z80", index, Z80.prvpc.w.l);
+//  state_save_register_item("z80", device->tag, 0, Z80.prvpc.w.l);
 
 	for (i = 0; i < 256; i++)
 	{

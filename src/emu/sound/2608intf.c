@@ -141,7 +141,7 @@ static SND_START( ym2608 )
 
 	info->intf = intf;
 	/* FIXME: Force to use simgle output */
-	info->psg = ay8910_start_ym(SOUND_YM2608, sndindex, clock, &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(SOUND_YM2608, tag, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -155,7 +155,7 @@ static SND_START( ym2608 )
 	pcmsizea = memory_region_length(Machine, tag);
 
 	/* initialize YM2608 */
-	info->chip = ym2608_init(info,sndindex,clock,rate,
+	info->chip = ym2608_init(info,tag,clock,rate,
 		           pcmbufa,pcmsizea,
 		           timer_handler,IRQHandler,&psgintf);
 

@@ -280,32 +280,25 @@ static void okim6295_update(void *param, stream_sample_t **inputs, stream_sample
 
 ***********************************************************************************************/
 
-static void adpcm_state_save_register(struct ADPCMVoice *voice, int i)
+static void adpcm_state_save_register(struct ADPCMVoice *voice, const char *tag, int index)
 {
-	char buf[20];
-
-	sprintf(buf,"ADPCM");
-
-	state_save_register_item(buf, i, voice->playing);
-	state_save_register_item(buf, i, voice->sample);
-	state_save_register_item(buf, i, voice->count);
-	state_save_register_item(buf, i, voice->adpcm.signal);
-	state_save_register_item(buf, i, voice->adpcm.step);
-	state_save_register_item(buf, i, voice->volume);
-	state_save_register_item(buf, i, voice->base_offset);
+	state_save_register_item("okim6295", tag, index, voice->playing);
+	state_save_register_item("okim6295", tag, index, voice->sample);
+	state_save_register_item("okim6295", tag, index, voice->count);
+	state_save_register_item("okim6295", tag, index, voice->adpcm.signal);
+	state_save_register_item("okim6295", tag, index, voice->adpcm.step);
+	state_save_register_item("okim6295", tag, index, voice->volume);
+	state_save_register_item("okim6295", tag, index, voice->base_offset);
 }
 
-static void okim6295_state_save_register(struct okim6295 *info, int sndindex)
+static void okim6295_state_save_register(struct okim6295 *info, const char *tag)
 {
 	int j;
-	char buf[20];
 
-	sprintf(buf,"OKIM6295");
-
-	state_save_register_item(buf, sndindex, info->command);
-	state_save_register_item(buf, sndindex, info->bank_offset);
+	state_save_register_item("okim6295", tag, 0, info->command);
+	state_save_register_item("okim6295", tag, 0, info->bank_offset);
 	for (j = 0; j < OKIM6295_VOICES; j++)
-		adpcm_state_save_register(&info->voice[j], sndindex * 4 + j);
+		adpcm_state_save_register(&info->voice[j], tag, j);
 }
 
 
@@ -345,7 +338,7 @@ static SND_START( okim6295 )
 		reset_adpcm(&info->voice[voice].adpcm);
 	}
 
-	okim6295_state_save_register(info, sndindex);
+	okim6295_state_save_register(info, tag);
 
 	/* success */
 	return info;

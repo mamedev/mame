@@ -66,7 +66,7 @@ discrete_info *discrete_current_context = NULL;
  *
  *************************************/
 
-static void init_nodes(discrete_info *info, discrete_sound_block *block_list);
+static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const char *tag);
 static void find_input_nodes(discrete_info *info, discrete_sound_block *block_list);
 static void setup_output_nodes(discrete_info *info);
 static void setup_disc_logs(discrete_info *info);
@@ -308,7 +308,7 @@ static SND_START( discrete )
 	memset(info->indexed_node, 0, DISCRETE_MAX_NODES * sizeof(info->indexed_node[0]));
 
 	/* initialize the node data */
-	init_nodes(info, intf);
+	init_nodes(info, intf, tag);
 
 	/* now go back and find pointers to all input nodes */
 	find_input_nodes(info, intf);
@@ -411,9 +411,6 @@ static SND_RESET( discrete )
 		/* otherwise, just step it */
 		else if (node->module.step)
 			(*node->module.step)(node);
-
-		/* and register save state */
-		state_save_register_item_array("discrete", nodenum | (info->sndindex << 16 ), node->output);
 	}
 
 	discrete_current_context = NULL;
@@ -521,7 +518,7 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
  *
  *************************************/
 
-static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
+static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const char *tag)
 {
 	int nodenum;
 
@@ -629,6 +626,8 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list)
 			info->discrete_input_streams++;
 		}
 
+		/* and register save state */
+		state_save_register_item_array("discrete", tag, nodenum, node->output);
 	}
 
 	/* if no outputs, give an error */

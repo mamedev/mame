@@ -1185,7 +1185,6 @@ void video_screen_register_vblank_callback(const device_config *screen, vblank_s
 static DEVICE_START( video_screen )
 {
 	const device_config *screen = device;
-	char unique_tag[40];
 	screen_state *state = get_safe_token(screen);
 	render_container_user_settings settings;
 	render_container *container;
@@ -1248,26 +1247,22 @@ static DEVICE_START( video_screen )
 	if (screen->machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
 		timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
 
-	/* register for save states */
-	assert(strlen(screen->tag) < 30);
-	state_save_combine_module_and_tag(unique_tag, "video_screen", screen->tag);
-
-	state_save_register_item(unique_tag, 0, state->width);
-	state_save_register_item(unique_tag, 0, state->height);
-	state_save_register_item(unique_tag, 0, state->visarea.min_x);
-	state_save_register_item(unique_tag, 0, state->visarea.min_y);
-	state_save_register_item(unique_tag, 0, state->visarea.max_x);
-	state_save_register_item(unique_tag, 0, state->visarea.max_y);
-	state_save_register_item(unique_tag, 0, state->last_partial_scan);
-	state_save_register_item(unique_tag, 0, state->frame_period);
-	state_save_register_item(unique_tag, 0, state->scantime);
-	state_save_register_item(unique_tag, 0, state->pixeltime);
-	state_save_register_item(unique_tag, 0, state->vblank_period);
-	state_save_register_item(unique_tag, 0, state->vblank_start_time.seconds);
-	state_save_register_item(unique_tag, 0, state->vblank_start_time.attoseconds);
-	state_save_register_item(unique_tag, 0, state->vblank_end_time.seconds);
-	state_save_register_item(unique_tag, 0, state->vblank_end_time.attoseconds);
-	state_save_register_item(unique_tag, 0, state->frame_number);
+	state_save_register_item("video_screen", screen->tag, 0, state->width);
+	state_save_register_item("video_screen", screen->tag, 0, state->height);
+	state_save_register_item("video_screen", screen->tag, 0, state->visarea.min_x);
+	state_save_register_item("video_screen", screen->tag, 0, state->visarea.min_y);
+	state_save_register_item("video_screen", screen->tag, 0, state->visarea.max_x);
+	state_save_register_item("video_screen", screen->tag, 0, state->visarea.max_y);
+	state_save_register_item("video_screen", screen->tag, 0, state->last_partial_scan);
+	state_save_register_item("video_screen", screen->tag, 0, state->frame_period);
+	state_save_register_item("video_screen", screen->tag, 0, state->scantime);
+	state_save_register_item("video_screen", screen->tag, 0, state->pixeltime);
+	state_save_register_item("video_screen", screen->tag, 0, state->vblank_period);
+	state_save_register_item("video_screen", screen->tag, 0, state->vblank_start_time.seconds);
+	state_save_register_item("video_screen", screen->tag, 0, state->vblank_start_time.attoseconds);
+	state_save_register_item("video_screen", screen->tag, 0, state->vblank_end_time.seconds);
+	state_save_register_item("video_screen", screen->tag, 0, state->vblank_end_time.attoseconds);
+	state_save_register_item("video_screen", screen->tag, 0, state->frame_number);
 	state_save_register_postload(device->machine, video_screen_postload, (void *)device);
 
 	return DEVICE_START_OK;

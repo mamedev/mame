@@ -278,7 +278,7 @@ static void SN76496_set_gain(struct SN76496 *R,int gain)
 
 
 
-static int SN76496_init(struct SN76496 *R,int sndindex,int clock)
+static int SN76496_init(struct SN76496 *R,int clock)
 {
 	int sample_rate = clock/16;
 	int i;
@@ -314,14 +314,14 @@ static int SN76496_init(struct SN76496 *R,int sndindex,int clock)
 }
 
 
-static void *generic_start(int sndindex, int clock, int feedbackmask, int noisetaps, int noiseinvert)
+static void *generic_start(const char *tag, int clock, int feedbackmask, int noisetaps, int noiseinvert)
 {
 	struct SN76496 *chip;
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	if (SN76496_init(chip,sndindex,clock) != 0)
+	if (SN76496_init(chip,clock) != 0)
 		return NULL;
 	SN76496_set_gain(chip, 0);
 
@@ -329,14 +329,14 @@ static void *generic_start(int sndindex, int clock, int feedbackmask, int noiset
 	chip->WhitenoiseTaps = noisetaps;
 	chip->WhitenoiseInvert = noiseinvert;
 
-	state_save_register_item_array("sn76496", sndindex, chip->Register);
-	state_save_register_item("sn76496", sndindex, chip->LastRegister);
-	state_save_register_item_array("sn76496", sndindex, chip->Volume);
-	state_save_register_item("sn76496", sndindex, chip->RNG);
-	state_save_register_item("sn76496", sndindex, chip->NoiseMode);
-	state_save_register_item_array("sn76496", sndindex, chip->Period);
-	state_save_register_item_array("sn76496", sndindex, chip->Count);
-	state_save_register_item_array("sn76496", sndindex, chip->Output);
+	state_save_register_item_array("sn76496", tag, 0, chip->Register);
+	state_save_register_item("sn76496", tag, 0, chip->LastRegister);
+	state_save_register_item_array("sn76496", tag, 0, chip->Volume);
+	state_save_register_item("sn76496", tag, 0, chip->RNG);
+	state_save_register_item("sn76496", tag, 0, chip->NoiseMode);
+	state_save_register_item_array("sn76496", tag, 0, chip->Period);
+	state_save_register_item_array("sn76496", tag, 0, chip->Count);
+	state_save_register_item_array("sn76496", tag, 0, chip->Output);
 
 	return chip;
 
@@ -345,32 +345,32 @@ static void *generic_start(int sndindex, int clock, int feedbackmask, int noiset
 
 static SND_START( sn76489 )
 {
-	return generic_start(sndindex, clock, 0x4000, 0x03, TRUE);
+	return generic_start(tag, clock, 0x4000, 0x03, TRUE);
 }
 
 static SND_START( sn76489a )
 {
-	return generic_start(sndindex, clock, 0x8000, 0x06, FALSE);
+	return generic_start(tag, clock, 0x8000, 0x06, FALSE);
 }
 
 static SND_START( sn76494 )
 {
-	return generic_start(sndindex, clock, 0x8000, 0x06, FALSE);
+	return generic_start(tag, clock, 0x8000, 0x06, FALSE);
 }
 
 static SND_START( sn76496 )
 {
-	return generic_start(sndindex, clock, 0x8000, 0x06, FALSE);
+	return generic_start(tag, clock, 0x8000, 0x06, FALSE);
 }
 
 static SND_START( gamegear )
 {
-	return generic_start(sndindex, clock, 0x8000, 0x09, FALSE);
+	return generic_start(tag, clock, 0x8000, 0x09, FALSE);
 }
 
 static SND_START( smsiii )
 {
-	return generic_start(sndindex, clock, 0x8000, 0x09, FALSE);
+	return generic_start(tag, clock, 0x8000, 0x09, FALSE);
 }
 
 

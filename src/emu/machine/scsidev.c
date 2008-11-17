@@ -101,13 +101,10 @@ static int scsidev_get_command( SCSIInstance *scsiInstance, void **command )
 static void scsidev_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
 	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
-	char tag[256];
 
-	state_save_combine_module_and_tag(tag, "scsidev", diskregion);
-
-	state_save_register_item_array( tag, 0, our_this->command );
-	state_save_register_item( tag, 0, our_this->commandLength );
-	state_save_register_item( tag, 0, our_this->phase );
+	state_save_register_item_array( "scsidev", diskregion, 0, our_this->command );
+	state_save_register_item( "scsidev", diskregion, 0, our_this->commandLength );
+	state_save_register_item( "scsidev", diskregion, 0, our_this->phase );
 }
 
 static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptrparm )

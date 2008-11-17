@@ -308,14 +308,14 @@ static void base_init(const char *type, const device_config *device, int index, 
 	v60.irq_line = CLEAR_LINE;
 	v60.nmi_line = CLEAR_LINE;
 
-	state_save_register_item_array(type, index, v60.reg);
-	state_save_register_item(type, index, v60.irq_line);
-	state_save_register_item(type, index, v60.nmi_line);
-	state_save_register_item(type, index, v60.PPC);
-	state_save_register_item(type, index, _CY);
-	state_save_register_item(type, index, _OV);
-	state_save_register_item(type, index, _S);
-	state_save_register_item(type, index, _Z);
+	state_save_register_item_array(type, device->tag, 0, v60.reg);
+	state_save_register_item(type, device->tag, 0, v60.irq_line);
+	state_save_register_item(type, device->tag, 0, v60.nmi_line);
+	state_save_register_item(type, device->tag, 0, v60.PPC);
+	state_save_register_item(type, device->tag, 0, _CY);
+	state_save_register_item(type, device->tag, 0, _OV);
+	state_save_register_item(type, device->tag, 0, _S);
+	state_save_register_item(type, device->tag, 0, _Z);
 }
 
 static CPU_INIT( v60 )

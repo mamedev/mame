@@ -512,7 +512,6 @@ static DEVICE_START( smc91c9x )
 {
 	const smc91c9x_config *config = device->inline_config;
 	smc91c9x_state *smc = get_safe_token(device);
-	char unique_tag[50];
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -525,20 +524,16 @@ static DEVICE_START( smc91c9x )
 	smc->device = device;
 	smc->irq_handler = config->interrupt;
 
-	/* create the name for save states */
-	assert(strlen(device->tag) < 30);
-	state_save_combine_module_and_tag(unique_tag, "smc91c9x", device->tag);
-
 	/* register ide states */
-	state_save_register_item_array(unique_tag, 0, smc->reg);
-	state_save_register_item_array(unique_tag, 0, smc->regmask);
-	state_save_register_item(unique_tag, 0, smc->irq_state);
-	state_save_register_item(unique_tag, 0, smc->alloc_count);
-	state_save_register_item(unique_tag, 0, smc->fifo_count);
-	state_save_register_item_array(unique_tag, 0, smc->rx);
-	state_save_register_item_array(unique_tag, 0, smc->tx);
-	state_save_register_item(unique_tag, 0, smc->sent);
-	state_save_register_item(unique_tag, 0, smc->recd);
+	state_save_register_item_array("smc91c9x", device->tag, 0, smc->reg);
+	state_save_register_item_array("smc91c9x", device->tag, 0, smc->regmask);
+	state_save_register_item("smc91c9x", device->tag, 0, smc->irq_state);
+	state_save_register_item("smc91c9x", device->tag, 0, smc->alloc_count);
+	state_save_register_item("smc91c9x", device->tag, 0, smc->fifo_count);
+	state_save_register_item_array("smc91c9x", device->tag, 0, smc->rx);
+	state_save_register_item_array("smc91c9x", device->tag, 0, smc->tx);
+	state_save_register_item("smc91c9x", device->tag, 0, smc->sent);
+	state_save_register_item("smc91c9x", device->tag, 0, smc->recd);
 
 	return DEVICE_START_OK;
 }

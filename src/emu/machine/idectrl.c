@@ -1670,7 +1670,6 @@ static DEVICE_START( ide_controller )
 	ide_state *ide = get_safe_token(device);
 	const hard_disk_info *hdinfo;
 	const ide_config *config;
-	char unique_tag[50];
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -1707,55 +1706,51 @@ static DEVICE_START( ide_controller )
 	ide->last_status_timer = timer_alloc(NULL, NULL);
 	ide->reset_timer = timer_alloc(reset_callback, (void *)device);
 
-	/* create the name for save states */
-	assert(strlen(device->tag) < 30);
-	state_save_combine_module_and_tag(unique_tag, "ide_controller", device->tag);
-
 	/* register ide states */
-	state_save_register_item(unique_tag, 0, ide->adapter_control);
-	state_save_register_item(unique_tag, 0, ide->status);
-	state_save_register_item(unique_tag, 0, ide->error);
-	state_save_register_item(unique_tag, 0, ide->command);
-	state_save_register_item(unique_tag, 0, ide->interrupt_pending);
-	state_save_register_item(unique_tag, 0, ide->precomp_offset);
+	state_save_register_item("ide_controller", device->tag, 0, ide->adapter_control);
+	state_save_register_item("ide_controller", device->tag, 0, ide->status);
+	state_save_register_item("ide_controller", device->tag, 0, ide->error);
+	state_save_register_item("ide_controller", device->tag, 0, ide->command);
+	state_save_register_item("ide_controller", device->tag, 0, ide->interrupt_pending);
+	state_save_register_item("ide_controller", device->tag, 0, ide->precomp_offset);
 
-	state_save_register_item_array(unique_tag, 0, ide->buffer);
-	state_save_register_item_array(unique_tag, 0, ide->features);
-	state_save_register_item(unique_tag, 0, ide->buffer_offset);
-	state_save_register_item(unique_tag, 0, ide->sector_count);
+	state_save_register_item_array("ide_controller", device->tag, 0, ide->buffer);
+	state_save_register_item_array("ide_controller", device->tag, 0, ide->features);
+	state_save_register_item("ide_controller", device->tag, 0, ide->buffer_offset);
+	state_save_register_item("ide_controller", device->tag, 0, ide->sector_count);
 
-	state_save_register_item(unique_tag, 0, ide->block_count);
-	state_save_register_item(unique_tag, 0, ide->sectors_until_int);
+	state_save_register_item("ide_controller", device->tag, 0, ide->block_count);
+	state_save_register_item("ide_controller", device->tag, 0, ide->sectors_until_int);
 
-	state_save_register_item(unique_tag, 0, ide->dma_active);
-	state_save_register_item(unique_tag, 0, ide->dma_cpu);
-	state_save_register_item(unique_tag, 0, ide->dma_address_xor);
-	state_save_register_item(unique_tag, 0, ide->dma_last_buffer);
-	state_save_register_item(unique_tag, 0, ide->dma_address);
-	state_save_register_item(unique_tag, 0, ide->dma_descriptor);
-	state_save_register_item(unique_tag, 0, ide->dma_bytes_left);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_active);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_cpu);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_address_xor);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_last_buffer);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_address);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_descriptor);
+	state_save_register_item("ide_controller", device->tag, 0, ide->dma_bytes_left);
 
-	state_save_register_item(unique_tag, 0, ide->bus_master_command);
-	state_save_register_item(unique_tag, 0, ide->bus_master_status);
-	state_save_register_item(unique_tag, 0, ide->bus_master_descriptor);
+	state_save_register_item("ide_controller", device->tag, 0, ide->bus_master_command);
+	state_save_register_item("ide_controller", device->tag, 0, ide->bus_master_status);
+	state_save_register_item("ide_controller", device->tag, 0, ide->bus_master_descriptor);
 
-	state_save_register_item(unique_tag, 0, ide->cur_cylinder);
-	state_save_register_item(unique_tag, 0, ide->cur_sector);
-	state_save_register_item(unique_tag, 0, ide->cur_head);
-	state_save_register_item(unique_tag, 0, ide->cur_head_reg);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_cylinder);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_sector);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_head);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_head_reg);
 
-	state_save_register_item(unique_tag, 0, ide->cur_lba);
+	state_save_register_item("ide_controller", device->tag, 0, ide->cur_lba);
 
-	state_save_register_item(unique_tag, 0, ide->num_cylinders);
-	state_save_register_item(unique_tag, 0, ide->num_sectors);
-	state_save_register_item(unique_tag, 0, ide->num_heads);
+	state_save_register_item("ide_controller", device->tag, 0, ide->num_cylinders);
+	state_save_register_item("ide_controller", device->tag, 0, ide->num_sectors);
+	state_save_register_item("ide_controller", device->tag, 0, ide->num_heads);
 
-	state_save_register_item(unique_tag, 0, ide->config_unknown);
-	state_save_register_item_array(unique_tag, 0, ide->config_register);
-	state_save_register_item(unique_tag, 0, ide->config_register_num);
+	state_save_register_item("ide_controller", device->tag, 0, ide->config_unknown);
+	state_save_register_item_array("ide_controller", device->tag, 0, ide->config_register);
+	state_save_register_item("ide_controller", device->tag, 0, ide->config_register_num);
 
-	state_save_register_item(unique_tag, 0, ide->master_password_enable);
-	state_save_register_item(unique_tag, 0, ide->user_password_enable);
+	state_save_register_item("ide_controller", device->tag, 0, ide->master_password_enable);
+	state_save_register_item("ide_controller", device->tag, 0, ide->user_password_enable);
 
 	return DEVICE_START_OK;
 }

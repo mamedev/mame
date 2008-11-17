@@ -3062,12 +3062,12 @@ void K053245_vh_start(running_machine *machine,int chip, const char *gfx_memory_
 	memset(K053245_ram[chip],0,K053245_ramsize[chip]);
 	memset(K053245_buffer[chip],0,K053245_ramsize[chip]);
 
-	state_save_register_item_pointer("K053245", chip, K053245_ram[chip], K053245_ramsize[chip] / 2);
-	state_save_register_item_pointer("K053245", chip, K053245_buffer[chip], K053245_ramsize[chip] / 2);
-	state_save_register_item("K053245", chip, K053244_rombank[chip]);
-	state_save_register_item("K053245", chip, K053245_dx[chip]);
-	state_save_register_item("K053245", chip, K053245_dy[chip]);
-	state_save_register_item_array("K053245", chip, K053244_regs[chip]);
+	state_save_register_item_pointer("K053245", NULL, chip, K053245_ram[chip], K053245_ramsize[chip] / 2);
+	state_save_register_item_pointer("K053245", NULL, chip, K053245_buffer[chip], K053245_ramsize[chip] / 2);
+	state_save_register_item("K053245", NULL, chip, K053244_rombank[chip]);
+	state_save_register_item("K053245", NULL, chip, K053245_dx[chip]);
+	state_save_register_item("K053245", NULL, chip, K053245_dy[chip]);
+	state_save_register_item_array("K053245", NULL, chip, K053244_regs[chip]);
 }
 
 void K053245_set_SpriteOffset(int chip,int offsx, int offsy)
@@ -4717,11 +4717,11 @@ static void K051316_vh_start(running_machine *machine,int chip, const char *gfx_
 	K051316_wraparound[chip] = 0;	/* default = no wraparound */
 	K051316_offset[chip][0] = K051316_offset[chip][1] = 0;
 
-	state_save_register_item_pointer("K051316", chip, K051316_ram[chip], 0x800);
-	state_save_register_item_array("K051316", chip, K051316_ctrlram[chip]);
-	state_save_register_item("K051316", chip, K051316_wraparound[chip]);
-	state_save_register_item("K051316", chip, K051316_offset[chip][0]);
-	state_save_register_item("K051316", chip, K051316_offset[chip][1]);
+	state_save_register_item_pointer("K051316", NULL, chip, K051316_ram[chip], 0x800);
+	state_save_register_item_array("K051316", NULL, chip, K051316_ctrlram[chip]);
+	state_save_register_item("K051316", NULL, chip, K051316_wraparound[chip]);
+	state_save_register_item("K051316", NULL, chip, K051316_offset[chip][0]);
+	state_save_register_item("K051316", NULL, chip, K051316_offset[chip][1]);
 }
 
 void K051316_vh_start_0(running_machine *machine,const char *gfx_memory_region,int bpp,
@@ -7549,8 +7549,8 @@ void K053250_vh_start(int chips, const char **region)
 		K053250_info.chip[chip].offsy = K053250_info.chip[chip].offsx = 0;
 		K053250_info.chip[chip].frame = -1;
 
-		state_save_register_item_pointer("K053250", chip, K053250_info.chip[chip].ram,  0x800);
-		state_save_register_item_array("K053250", chip, K053250_info.chip[chip].regs);
+		state_save_register_item_pointer("K053250", NULL, chip, K053250_info.chip[chip].ram,  0x800);
+		state_save_register_item_array("K053250", NULL, chip, K053250_info.chip[chip].regs);
 	}
 }
 

@@ -708,25 +708,25 @@ static void mcs48_init(const device_config *device, int index, int clock, cpu_ir
 	mcs48->device = device;
 	mcs48->int_rom_size = romsize;
 
-	state_save_register_item("mcs48", index, mcs48->prevpc.w.l);
-	state_save_register_item("mcs48", index, PC);
-	state_save_register_item("mcs48", index, A);
-	state_save_register_item("mcs48", index, PSW);
-	state_save_register_item("mcs48", index, mcs48->p1);
-	state_save_register_item("mcs48", index, mcs48->p2);
-	state_save_register_item("mcs48", index, mcs48->f1);
-	state_save_register_item("mcs48", index, mcs48->ea);
-	state_save_register_item("mcs48", index, mcs48->timer);
-	state_save_register_item("mcs48", index, mcs48->prescaler);
-	state_save_register_item("mcs48", index, mcs48->t1_history);
-	state_save_register_item("mcs48", index, mcs48->irq_state);
-	state_save_register_item("mcs48", index, mcs48->irq_in_progress);
-	state_save_register_item("mcs48", index, mcs48->timer_overflow);
-	state_save_register_item("mcs48", index, mcs48->timer_flag);
-	state_save_register_item("mcs48", index, mcs48->tirq_enabled);
-	state_save_register_item("mcs48", index, mcs48->xirq_enabled);
-	state_save_register_item("mcs48", index, mcs48->timecount_enabled);
-	state_save_register_item("mcs48", index, mcs48->a11);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->prevpc.w.l);
+	state_save_register_item("mcs48", device->tag, 0, PC);
+	state_save_register_item("mcs48", device->tag, 0, A);
+	state_save_register_item("mcs48", device->tag, 0, PSW);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->p1);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->p2);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->f1);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->ea);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->timer);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->prescaler);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->t1_history);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->irq_state);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->irq_in_progress);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->timer_overflow);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->timer_flag);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->tirq_enabled);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->xirq_enabled);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->timecount_enabled);
+	state_save_register_item("mcs48", device->tag, 0, mcs48->a11);
 }
 
 

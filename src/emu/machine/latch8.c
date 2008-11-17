@@ -186,12 +186,9 @@ WRITE8_DEVICE_HANDLER( latch8_bit7_w ) { latch8_bitx_w(device, 0, offset, data);
 static DEVICE_START( latch8 )
 {
 	latch8_t *latch8 = get_safe_token(device);
-	char unique_tag[30];
 	int i;
 
 	/* validate arguments */
-	assert(strlen(device->tag) < 20);
-
 	latch8->intf = device->inline_config;
 
 	latch8->value = 0x0;
@@ -224,9 +221,7 @@ static DEVICE_START( latch8 )
 			latch8->has_read = 1;
 		}
 
-	state_save_combine_module_and_tag(unique_tag, "latch8", device->tag);
-
-	state_save_register_item(unique_tag, 0, latch8->value);
+	state_save_register_item("latch8", device->tag, 0, latch8->value);
 
 	return DEVICE_START_OK;
 }

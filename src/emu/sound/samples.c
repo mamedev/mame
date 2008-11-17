@@ -558,13 +558,13 @@ static SND_START( samples )
 		info->channel[i].paused = 0;
 
 		/* register with the save state system */
-        state_save_register_item("samples", sndindex * MAX_CHANNELS + i, info->channel[i].source_length);
-        state_save_register_item("samples", sndindex * MAX_CHANNELS + i, info->channel[i].source_num);
-        state_save_register_item("samples", sndindex * MAX_CHANNELS + i, info->channel[i].pos);
-        state_save_register_item("samples", sndindex * MAX_CHANNELS + i, info->channel[i].frac);
-        state_save_register_item("samples", sndindex * MAX_CHANNELS + i, info->channel[i].step);
-        state_save_register_item("samples", sndindex * MAX_CHANNELS + i, info->channel[i].loop);
-        state_save_register_item("samples", sndindex * MAX_CHANNELS + i, info->channel[i].paused);
+        state_save_register_item("samples", tag, i, info->channel[i].source_length);
+        state_save_register_item("samples", tag, i, info->channel[i].source_num);
+        state_save_register_item("samples", tag, i, info->channel[i].pos);
+        state_save_register_item("samples", tag, i, info->channel[i].frac);
+        state_save_register_item("samples", tag, i, info->channel[i].step);
+        state_save_register_item("samples", tag, i, info->channel[i].loop);
+        state_save_register_item("samples", tag, i, info->channel[i].paused);
 	}
 	state_save_register_postload(Machine, samples_postload, info);
 

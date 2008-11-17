@@ -372,8 +372,8 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	stream->param = param;
 
 	/* create a unique tag for saving */
-	sprintf(statetag, "stream.%d", stream->index);
-	state_save_register_item(statetag, 0, stream->sample_rate);
+	sprintf(statetag, "%d", stream->index);
+	state_save_register_item("stream", statetag, 0, stream->sample_rate);
 	state_save_register_postload(Machine, stream_postload, stream);
 
 	/* allocate space for the inputs */
@@ -390,7 +390,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	{
 		stream->input[inputnum].owner = stream;
 		stream->input[inputnum].gain = 0x100;
-		state_save_register_item(statetag, inputnum, stream->input[inputnum].gain);
+		state_save_register_item("stream", statetag, inputnum, stream->input[inputnum].gain);
 	}
 
 	/* allocate space for the outputs */
@@ -407,7 +407,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	{
 		stream->output[outputnum].owner = stream;
 		stream->output[outputnum].gain = 0x100;
-		state_save_register_item(statetag, outputnum, stream->output[outputnum].gain);
+		state_save_register_item("stream", statetag, outputnum, stream->output[outputnum].gain);
 	}
 
 	/* hook us into the master stream list */

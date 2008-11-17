@@ -66,9 +66,9 @@ void K056800_init(void (* irq_callback)(running_machine *, int))
 	K056800_sound_cpu_timer = timer_alloc(K056800_sound_cpu_timer_tick, NULL);
 	timer_adjust_periodic(K056800_sound_cpu_timer, timer_period, 0, timer_period);
 
-	state_save_register_item_array("K056800", 0, K056800_host_reg);
-	state_save_register_item_array("K056800", 0, K056800_sound_reg);
-	state_save_register_item("K056800", 0, K056800_sound_cpu_irq1_enable);
+	state_save_register_item_array("K056800", NULL, 0, K056800_host_reg);
+	state_save_register_item_array("K056800", NULL, 0, K056800_sound_reg);
+	state_save_register_item("K056800", NULL, 0, K056800_sound_cpu_irq1_enable);
 }
 
 READ32_HANDLER(K056800_host_r)

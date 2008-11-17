@@ -515,10 +515,10 @@ static CPU_INIT( arm )
 	arm.irq_callback = irqcallback;
 	arm.device = device;
 
-	state_save_register_item_array("arm", index, arm.sArmRegister);
-	state_save_register_item_array("arm", index, arm.coproRegister);
-	state_save_register_item("arm", index, arm.pendingIrq);
-	state_save_register_item("arm", index, arm.pendingFiq);
+	state_save_register_item_array("arm", device->tag, 0, arm.sArmRegister);
+	state_save_register_item_array("arm", device->tag, 0, arm.coproRegister);
+	state_save_register_item("arm", device->tag, 0, arm.pendingIrq);
+	state_save_register_item("arm", device->tag, 0, arm.pendingFiq);
 }
 
 /***************************************************************************/

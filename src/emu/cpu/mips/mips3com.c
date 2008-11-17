@@ -100,17 +100,17 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const 
 	mips3com_reset(mips);
 
 	/* register for save states */
-	state_save_register_item("mips3", index, mips->pc);
-	state_save_register_item_array("mips3", index, mips->r);
-	state_save_register_item_2d_array("mips3", index, mips->cpr);
-	state_save_register_item_2d_array("mips3", index, mips->ccr);
-	state_save_register_item("mips3", index, mips->llbit);
-	state_save_register_item("mips3", index, mips->count_zero_time);
+	state_save_register_item("mips3", device->tag, 0, mips->pc);
+	state_save_register_item_array("mips3", device->tag, 0, mips->r);
+	state_save_register_item_2d_array("mips3", device->tag, 0, mips->cpr);
+	state_save_register_item_2d_array("mips3", device->tag, 0, mips->ccr);
+	state_save_register_item("mips3", device->tag, 0, mips->llbit);
+	state_save_register_item("mips3", device->tag, 0, mips->count_zero_time);
 	for (tlbindex = 0; tlbindex < ARRAY_LENGTH(mips->tlb); tlbindex++)
 	{
-		state_save_register_item("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].page_mask);
-		state_save_register_item("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_hi);
-		state_save_register_item_array("mips3", index * ARRAY_LENGTH(mips->tlb) + tlbindex, mips->tlb[tlbindex].entry_lo);
+		state_save_register_item("mips3", device->tag, tlbindex, mips->tlb[tlbindex].page_mask);
+		state_save_register_item("mips3", device->tag, tlbindex, mips->tlb[tlbindex].entry_hi);
+		state_save_register_item_array("mips3", device->tag, tlbindex, mips->tlb[tlbindex].entry_lo);
 	}
 }
 

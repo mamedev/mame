@@ -361,19 +361,19 @@ void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 	mo->partial_scanline = -1;
 
 	/* register for save states */
-	state_save_register_item_pointer("atarirle", map, mo->spriteram[0].data, ARRAY_LENGTH(mo->spriteram[0].data) * mo->spriteramsize);
-	state_save_register_item_bitmap("atarirle", map, mo->vram[0][0]);
-	state_save_register_item_bitmap("atarirle", map, mo->vram[0][1]);
+	state_save_register_item_pointer("atarirle", NULL, map, mo->spriteram[0].data, ARRAY_LENGTH(mo->spriteram[0].data) * mo->spriteramsize);
+	state_save_register_item_bitmap("atarirle", NULL, map, mo->vram[0][0]);
+	state_save_register_item_bitmap("atarirle", NULL, map, mo->vram[0][1]);
 	if (mo->vrammask.mask != 0)
 	{
-		state_save_register_item_bitmap("atarirle", map, mo->vram[1][0]);
-		state_save_register_item_bitmap("atarirle", map, mo->vram[1][1]);
+		state_save_register_item_bitmap("atarirle", NULL, map, mo->vram[1][0]);
+		state_save_register_item_bitmap("atarirle", NULL, map, mo->vram[1][1]);
 	}
-	state_save_register_item("atarirle", map, mo->partial_scanline);
-	state_save_register_item("atarirle", map, mo->control_bits);
-	state_save_register_item("atarirle", map, mo->command);
-	state_save_register_item("atarirle", map, mo->is32bit);
-	state_save_register_item_array("atarirle", map, mo->checksums);
+	state_save_register_item("atarirle", NULL, map, mo->partial_scanline);
+	state_save_register_item("atarirle", NULL, map, mo->control_bits);
+	state_save_register_item("atarirle", NULL, map, mo->command);
+	state_save_register_item("atarirle", NULL, map, mo->is32bit);
+	state_save_register_item_array("atarirle", NULL, map, mo->checksums);
 }
 
 

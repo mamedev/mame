@@ -183,25 +183,21 @@ static void es8712_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 ***********************************************************************************************/
 
-static void es8712_state_save_register(struct es8712 *chip, int sndindex)
+static void es8712_state_save_register(struct es8712 *chip, const char *tag)
 {
-	char buf[20];
+	state_save_register_item("es8712", tag, 0, chip->bank_offset);
 
-	sprintf(buf,"ES8712");
+	state_save_register_item("es8712", tag, 0, chip->playing);
+	state_save_register_item("es8712", tag, 0, chip->sample);
+	state_save_register_item("es8712", tag, 0, chip->count);
+	state_save_register_item("es8712", tag, 0, chip->signal);
+	state_save_register_item("es8712", tag, 0, chip->step);
 
-	state_save_register_item(buf, sndindex, chip->bank_offset);
+	state_save_register_item("es8712", tag, 0, chip->base_offset);
 
-	state_save_register_item(buf, sndindex, chip->playing);
-	state_save_register_item(buf, sndindex, chip->sample);
-	state_save_register_item(buf, sndindex, chip->count);
-	state_save_register_item(buf, sndindex, chip->signal);
-	state_save_register_item(buf, sndindex, chip->step);
-
-	state_save_register_item(buf, sndindex, chip->base_offset);
-
-	state_save_register_item(buf, sndindex, chip->start);
-	state_save_register_item(buf, sndindex, chip->end);
-	state_save_register_item(buf, sndindex, chip->repeat);
+	state_save_register_item("es8712", tag, 0, chip->start);
+	state_save_register_item("es8712", tag, 0, chip->end);
+	state_save_register_item("es8712", tag, 0, chip->repeat);
 }
 
 
@@ -234,7 +230,7 @@ static SND_START( es8712 )
 	/* initialize the rest of the structure */
 	chip->signal = -2;
 
-	es8712_state_save_register(chip, sndindex);
+	es8712_state_save_register(chip, tag);
 
 	/* success */
 	return chip;

@@ -116,16 +116,16 @@ MACHINE_RESET( mhavoc )
 	/* set a timer going for the CPU interrupt generators */
 	timer_pulse(ATTOTIME_IN_HZ(MHAVOC_CLOCK_5K), NULL, 0, cpu_irq_clock);
 
-	state_save_register_item("misc", 0, alpha_data);
-	state_save_register_item("misc", 0, alpha_rcvd);
-	state_save_register_item("misc", 0, alpha_xmtd);
-	state_save_register_item("misc", 0, gamma_data);
-	state_save_register_item("misc", 0, gamma_rcvd);
-	state_save_register_item("misc", 0, gamma_xmtd);
-	state_save_register_item("misc", 0, player_1);
-	state_save_register_item("misc", 0, alpha_irq_clock);
-	state_save_register_item("misc", 0, alpha_irq_clock_enable);
-	state_save_register_item("misc", 0, gamma_irq_clock);
+	state_save_register_item("misc", NULL, 0, alpha_data);
+	state_save_register_item("misc", NULL, 0, alpha_rcvd);
+	state_save_register_item("misc", NULL, 0, alpha_xmtd);
+	state_save_register_item("misc", NULL, 0, gamma_data);
+	state_save_register_item("misc", NULL, 0, gamma_rcvd);
+	state_save_register_item("misc", NULL, 0, gamma_xmtd);
+	state_save_register_item("misc", NULL, 0, player_1);
+	state_save_register_item("misc", NULL, 0, alpha_irq_clock);
+	state_save_register_item("misc", NULL, 0, alpha_irq_clock_enable);
+	state_save_register_item("misc", NULL, 0, gamma_irq_clock);
 }
 
 

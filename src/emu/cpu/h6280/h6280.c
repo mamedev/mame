@@ -159,32 +159,32 @@ static void set_irq_line(int irqline, int state);
 /*****************************************************************************/
 static CPU_INIT( h6280 )
 {
-	state_save_register_item("h6280", index, h6280.ppc.w.l);
-	state_save_register_item("h6280", index, h6280.pc.w.l);
-	state_save_register_item("h6280", index, h6280.sp.w.l);
-	state_save_register_item("h6280", index, h6280.zp.w.l);
-	state_save_register_item("h6280", index, h6280.ea.w.l);
-	state_save_register_item("h6280", index, h6280.a);
-	state_save_register_item("h6280", index, h6280.x);
-	state_save_register_item("h6280", index, h6280.y);
-	state_save_register_item("h6280", index, h6280.p);
-	state_save_register_item_array("h6280", index, h6280.mmr);
-	state_save_register_item("h6280", index, h6280.irq_mask);
-	state_save_register_item("h6280", index, h6280.timer_status);
-	state_save_register_item("h6280", index, h6280.timer_ack);
-	state_save_register_item("h6280", index, h6280.clocks_per_cycle);
-	state_save_register_item("h6280", index, h6280.timer_value);
-	state_save_register_item("h6280", index, h6280.timer_load);
-	state_save_register_item("h6280", index, h6280.nmi_state);
-	state_save_register_item("h6280", index, h6280.irq_state[0]);
-	state_save_register_item("h6280", index, h6280.irq_state[1]);
-	state_save_register_item("h6280", index, h6280.irq_state[2]);
-	state_save_register_item("h6280", index, h6280.irq_pending);
+	state_save_register_item("h6280", device->tag, 0, h6280.ppc.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.pc.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.sp.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.zp.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.ea.w.l);
+	state_save_register_item("h6280", device->tag, 0, h6280.a);
+	state_save_register_item("h6280", device->tag, 0, h6280.x);
+	state_save_register_item("h6280", device->tag, 0, h6280.y);
+	state_save_register_item("h6280", device->tag, 0, h6280.p);
+	state_save_register_item_array("h6280", device->tag, 0, h6280.mmr);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_mask);
+	state_save_register_item("h6280", device->tag, 0, h6280.timer_status);
+	state_save_register_item("h6280", device->tag, 0, h6280.timer_ack);
+	state_save_register_item("h6280", device->tag, 0, h6280.clocks_per_cycle);
+	state_save_register_item("h6280", device->tag, 0, h6280.timer_value);
+	state_save_register_item("h6280", device->tag, 0, h6280.timer_load);
+	state_save_register_item("h6280", device->tag, 0, h6280.nmi_state);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_state[0]);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_state[1]);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_state[2]);
+	state_save_register_item("h6280", device->tag, 0, h6280.irq_pending);
 
 	#if LAZY_FLAGS
-	state_save_register_item("h6280", index, h6280.NZ);
+	state_save_register_item("h6280", device->tag, 0, h6280.NZ);
 	#endif
-	state_save_register_item("h6280", index, h6280.io_buffer);
+	state_save_register_item("h6280", device->tag, 0, h6280.io_buffer);
 
 	h6280.irq_callback = irqcallback;
 	h6280.device = device;

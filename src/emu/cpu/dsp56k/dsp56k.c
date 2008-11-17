@@ -395,7 +395,7 @@ static CPU_INIT( dsp56k )
 	core.reset_state = FALSE;
 
 	/* Save the core's state */
-	// state_save_register_item("dsp56k", index, modA_state);
+	// state_save_register_item("dsp56k", device->tag, 0, modA_state);
 	// ...
 
 	//core.config = device->static_config;

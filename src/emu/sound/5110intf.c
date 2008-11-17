@@ -76,7 +76,7 @@ static SND_START( tms5110 )
 	info->intf = config ? config : &dummy;
 	info->tag = tag;
 
-	info->chip = tms5110_create(sndindex, TMS5110_IS_5110A);
+	info->chip = tms5110_create(tag, TMS5110_IS_5110A);
 	if (!info->chip)
 		return NULL;
 	sndintrf_register_token(info);

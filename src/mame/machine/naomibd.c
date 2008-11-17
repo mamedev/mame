@@ -144,19 +144,14 @@ static STATE_POSTLOAD( naomibd_postload )
 static void init_save_state(const device_config *device)
 {
 	naomibd_state *v = get_safe_token(device);
-	char unique_tag[50];
 
 	state_save_register_postload(device->machine, naomibd_postload, v);
 
-	/* create the name for save states */
-	assert(strlen(device->tag) < 30);
-	state_save_combine_module_and_tag(unique_tag, "naomibd", device->tag);
-
 	/* register states */
-	state_save_register_item(unique_tag, 0, v->rom_offset);
-	state_save_register_item(unique_tag, 0, v->rom_offset_flags);
-	state_save_register_item(unique_tag, 0, v->dma_count);
-	state_save_register_item(unique_tag, 0, v->dma_offset);
+	state_save_register_item("naomibd", device->tag, 0, v->rom_offset);
+	state_save_register_item("naomibd", device->tag, 0, v->rom_offset_flags);
+	state_save_register_item("naomibd", device->tag, 0, v->dma_count);
+	state_save_register_item("naomibd", device->tag, 0, v->dma_offset);
 }
 
 

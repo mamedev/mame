@@ -535,8 +535,8 @@ static MACHINE_START( seattle )
 	state_save_register_global_array(galileo.pci_ide_regs);
 	for (index = 0; index < ARRAY_LENGTH(galileo.timer); index++)
 	{
-		state_save_register_item("galileo", index, galileo.timer[index].count);
-		state_save_register_item("galileo", index, galileo.timer[index].active);
+		state_save_register_item("galileo", NULL, index, galileo.timer[index].count);
+		state_save_register_item("galileo", NULL, index, galileo.timer[index].active);
 	}
 	state_save_register_global(widget.ethernet_addr);
 	state_save_register_global(widget.irq_num);

@@ -1363,21 +1363,21 @@ static CPU_INIT( i8085 )
 	I.irq_callback = irqcallback;
 	I.device = device;
 
-	state_save_register_item("i8085", index, I.AF.w.l);
-	state_save_register_item("i8085", index, I.BC.w.l);
-	state_save_register_item("i8085", index, I.DE.w.l);
-	state_save_register_item("i8085", index, I.HL.w.l);
-	state_save_register_item("i8085", index, I.SP.w.l);
-	state_save_register_item("i8085", index, I.PC.w.l);
-	state_save_register_item("i8085", index, I.HALT);
-	state_save_register_item("i8085", index, I.IM);
-	state_save_register_item("i8085", index, I.IREQ);
-	state_save_register_item("i8085", index, I.ISRV);
-	state_save_register_item("i8085", index, I.INTR);
-	state_save_register_item("i8085", index, I.IRQ2);
-	state_save_register_item("i8085", index, I.IRQ1);
-	state_save_register_item("i8085", index, I.STATUS);
-	state_save_register_item_array("i8085", index, I.irq_state);
+	state_save_register_item("i8085", device->tag, 0, I.AF.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.BC.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.DE.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.HL.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.SP.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.PC.w.l);
+	state_save_register_item("i8085", device->tag, 0, I.HALT);
+	state_save_register_item("i8085", device->tag, 0, I.IM);
+	state_save_register_item("i8085", device->tag, 0, I.IREQ);
+	state_save_register_item("i8085", device->tag, 0, I.ISRV);
+	state_save_register_item("i8085", device->tag, 0, I.INTR);
+	state_save_register_item("i8085", device->tag, 0, I.IRQ2);
+	state_save_register_item("i8085", device->tag, 0, I.IRQ1);
+	state_save_register_item("i8085", device->tag, 0, I.STATUS);
+	state_save_register_item_array("i8085", device->tag, 0, I.irq_state);
 }
 
 /****************************************************************************
@@ -1600,21 +1600,21 @@ static CPU_INIT( i8080 )
 	I.irq_callback = irqcallback;
 	I.device = device;
 
-	state_save_register_item("i8080", index, I.AF.w.l);
-	state_save_register_item("i8080", index, I.BC.w.l);
-	state_save_register_item("i8080", index, I.DE.w.l);
-	state_save_register_item("i8080", index, I.HL.w.l);
-	state_save_register_item("i8080", index, I.SP.w.l);
-	state_save_register_item("i8080", index, I.PC.w.l);
-	state_save_register_item("i8080", index, I.HALT);
-	state_save_register_item("i8085", index, I.IM);
-	state_save_register_item("i8080", index, I.IREQ);
-	state_save_register_item("i8080", index, I.ISRV);
-	state_save_register_item("i8080", index, I.INTR);
-	state_save_register_item("i8080", index, I.IRQ2);
-	state_save_register_item("i8080", index, I.IRQ1);
-	state_save_register_item("i8080", index, I.STATUS);
-	state_save_register_item_array("i8080", index, I.irq_state);
+	state_save_register_item("i8080", device->tag, 0, I.AF.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.BC.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.DE.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.HL.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.SP.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.PC.w.l);
+	state_save_register_item("i8080", device->tag, 0, I.HALT);
+	state_save_register_item("i8085", device->tag, 0, I.IM);
+	state_save_register_item("i8080", device->tag, 0, I.IREQ);
+	state_save_register_item("i8080", device->tag, 0, I.ISRV);
+	state_save_register_item("i8080", device->tag, 0, I.INTR);
+	state_save_register_item("i8080", device->tag, 0, I.IRQ2);
+	state_save_register_item("i8080", device->tag, 0, I.IRQ1);
+	state_save_register_item("i8080", device->tag, 0, I.STATUS);
+	state_save_register_item_array("i8080", device->tag, 0, I.irq_state);
 }
 
 static void i8080_set_irq_line(int irqline, int state)

@@ -57,7 +57,7 @@ static SND_START( ym2413 )
 	memset(info, 0, sizeof(*info));
 
 	/* emulator create */
-	info->chip = ym2413_init(clock, rate, sndindex);
+	info->chip = ym2413_init(clock, rate, tag);
 	if (!info->chip)
 		return NULL;
 

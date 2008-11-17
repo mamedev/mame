@@ -245,20 +245,18 @@ static SND_START( iremga20 )
 
 	chip->stream = stream_create( 0, 2, clock/4, chip, IremGA20_update );
 
-	state_save_register_item_array("irem_ga20", sndindex, chip->regs);
+	state_save_register_item_array("irem_ga20", tag, sndindex, chip->regs);
 	for (i = 0; i < 4; i++)
 	{
-		char buf[20];
-		sprintf(buf, "irem_ga20.ch%d", i);
-		state_save_register_item(buf, sndindex, chip->channel[i].rate);
-		state_save_register_item(buf, sndindex, chip->channel[i].size);
-		state_save_register_item(buf, sndindex, chip->channel[i].start);
-		state_save_register_item(buf, sndindex, chip->channel[i].pos);
-		state_save_register_item(buf, sndindex, chip->channel[i].end);
-		state_save_register_item(buf, sndindex, chip->channel[i].volume);
-		state_save_register_item(buf, sndindex, chip->channel[i].pan);
-		state_save_register_item(buf, sndindex, chip->channel[i].effect);
-		state_save_register_item(buf, sndindex, chip->channel[i].play);
+		state_save_register_item("irem_ga20", tag, i, chip->channel[i].rate);
+		state_save_register_item("irem_ga20", tag, i, chip->channel[i].size);
+		state_save_register_item("irem_ga20", tag, i, chip->channel[i].start);
+		state_save_register_item("irem_ga20", tag, i, chip->channel[i].pos);
+		state_save_register_item("irem_ga20", tag, i, chip->channel[i].end);
+		state_save_register_item("irem_ga20", tag, i, chip->channel[i].volume);
+		state_save_register_item("irem_ga20", tag, i, chip->channel[i].pan);
+		state_save_register_item("irem_ga20", tag, i, chip->channel[i].effect);
+		state_save_register_item("irem_ga20", tag, i, chip->channel[i].play);
 	}
 
 	return chip;

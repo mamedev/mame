@@ -423,13 +423,13 @@ static STATE_POSTLOAD( jaguar_postload )
 	check_irqs();
 }
 
-static void jaguar_state_register(int index, const char *type)
+static void jaguar_state_register(const device_config *device, const char *type)
 {
-	state_save_register_item_array(type, index, jaguar.r);
-	state_save_register_item_array(type, index, jaguar.a);
-	state_save_register_item_array(type, index, jaguar.ctrl);
-	state_save_register_item(type, index, jaguar.ppc);
-	state_save_register_postload(Machine, jaguar_postload, NULL);
+	state_save_register_item_array(type, device->tag, 0, jaguar.r);
+	state_save_register_item_array(type, device->tag, 0, jaguar.a);
+	state_save_register_item_array(type, device->tag, 0, jaguar.ctrl);
+	state_save_register_item(type, device->tag, 0, jaguar.ppc);
+	state_save_register_postload(device->machine, jaguar_postload, NULL);
 }
 
 static CPU_INIT( jaguargpu )
@@ -438,7 +438,7 @@ static CPU_INIT( jaguargpu )
 
 	memset(&jaguar, 0, sizeof(jaguar));
 
-	jaguar_state_register(index, "jaguargpu");
+	jaguar_state_register(device, "jaguargpu");
 
 	jaguar.irq_callback = irqcallback;
 	jaguar.device = device;
@@ -452,7 +452,7 @@ static CPU_INIT( jaguardsp )
 
 	memset(&jaguar, 0, sizeof(jaguar));
 
-	jaguar_state_register(index, "jaguardsp");
+	jaguar_state_register(device, "jaguardsp");
 
 	jaguar.irq_callback = irqcallback;
 	jaguar.device = device;

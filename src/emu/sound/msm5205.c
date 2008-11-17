@@ -189,14 +189,14 @@ static SND_START( msm5205 )
 	SND_RESET_NAME( msm5205 )(voice);
 
 	/* register for save states */
-	state_save_register_item("msm5205", sndindex, voice->clock);
-	state_save_register_item("msm5205", sndindex, voice->data);
-	state_save_register_item("msm5205", sndindex, voice->vclk);
-	state_save_register_item("msm5205", sndindex, voice->reset);
-	state_save_register_item("msm5205", sndindex, voice->prescaler);
-	state_save_register_item("msm5205", sndindex, voice->bitwidth);
-	state_save_register_item("msm5205", sndindex, voice->signal);
-	state_save_register_item("msm5205", sndindex, voice->step);
+	state_save_register_item("msm5205", tag, 0, voice->clock);
+	state_save_register_item("msm5205", tag, 0, voice->data);
+	state_save_register_item("msm5205", tag, 0, voice->vclk);
+	state_save_register_item("msm5205", tag, 0, voice->reset);
+	state_save_register_item("msm5205", tag, 0, voice->prescaler);
+	state_save_register_item("msm5205", tag, 0, voice->bitwidth);
+	state_save_register_item("msm5205", tag, 0, voice->signal);
+	state_save_register_item("msm5205", tag, 0, voice->step);
 
 	/* success */
 	return voice;

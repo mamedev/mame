@@ -815,8 +815,8 @@ void PC080SN_vh_start(running_machine *machine,int chips,int gfxnum,int x_offset
 		PC080SN_bgscroll_ram[i][1] = PC080SN_ram[i] + 0xc000 /2;
 		memset(PC080SN_ram[i],0,PC080SN_RAM_SIZE);
 
-		state_save_register_item_pointer("PC080SN", i, PC080SN_ram[i], PC080SN_RAM_SIZE/2);
-		state_save_register_item_array("PC080SN", i, PC080SN_ctrl[i]);
+		state_save_register_item_pointer("PC080SN", NULL, i, PC080SN_ram[i], PC080SN_RAM_SIZE/2);
+		state_save_register_item_array("PC080SN", NULL, i, PC080SN_ctrl[i]);
 		state_save_register_postload(machine, PC080SN_restore_scroll, (void *)(FPTR)i);
 
 		/* use the given gfx set for bg tiles */
@@ -2328,9 +2328,9 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 		memset(TC0100SCN_ram[i],0,TC0100SCN_RAM_SIZE);
 
 		{
-			state_save_register_item_pointer("TC0100SCN", i, TC0100SCN_ram[i], TC0100SCN_RAM_SIZE/2);
-			state_save_register_item_array("TC0100SCN", i, TC0100SCN_ctrl[i]);
-			state_save_register_item("TC0100SCN", i, TC0100SCN_dblwidth[i]);
+			state_save_register_item_pointer("TC0100SCN", NULL, i, TC0100SCN_ram[i], TC0100SCN_RAM_SIZE/2);
+			state_save_register_item_array("TC0100SCN", NULL, i, TC0100SCN_ctrl[i]);
+			state_save_register_item("TC0100SCN", NULL, i, TC0100SCN_dblwidth[i]);
 		}
 
 		state_save_register_postload(machine, TC0100SCN_postload, (void *)(FPTR)i);

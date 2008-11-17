@@ -419,34 +419,30 @@ WRITE8_DEVICE_HANDLER( z80dma_rdy_w)
 static DEVICE_START( z80dma )
 {
 	z80dma_t *z80dma = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
 	z80dma->intf = device->static_config;
 
 	z80dma->timer = timer_alloc(z80dma_timerproc, (void *) device);
 
-	state_save_combine_module_and_tag(unique_tag, "z80dma", device->tag);
+	state_save_register_item_array("z80dma", device->tag, 0, z80dma->regs);
+	state_save_register_item_array("z80dma", device->tag, 0, z80dma->regs_follow);
 
-	state_save_register_item_array(unique_tag, 0, z80dma->regs);
-	state_save_register_item_array(unique_tag, 0, z80dma->regs_follow);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->num_follow);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->cur_follow);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->status);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->dma_enabled);
 
-	state_save_register_item(unique_tag, 0, z80dma->num_follow);
-	state_save_register_item(unique_tag, 0, z80dma->cur_follow);
-	state_save_register_item(unique_tag, 0, z80dma->status);
-	state_save_register_item(unique_tag, 0, z80dma->dma_enabled);
-
-	state_save_register_item(unique_tag, 0, z80dma->addressA);
-	state_save_register_item(unique_tag, 0, z80dma->addressB);
-	state_save_register_item(unique_tag, 0, z80dma->count);
-	state_save_register_item(unique_tag, 0, z80dma->rdy);
-	state_save_register_item(unique_tag, 0, z80dma->is_read);
-	state_save_register_item(unique_tag, 0, z80dma->cur_cycle);
-	state_save_register_item(unique_tag, 0, z80dma->latch);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->addressA);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->addressB);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->count);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->rdy);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->is_read);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->cur_cycle);
+	state_save_register_item("z80dma", device->tag, 0, z80dma->latch);
 
 	return DEVICE_START_OK;
 }

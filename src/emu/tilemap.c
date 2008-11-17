@@ -345,18 +345,18 @@ tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func ma
 	tilemap_tailptr = &tmap->next;
 
 	/* save relevant state */
-	state_save_register_item("tilemap", tilemap_instance, tmap->enable);
-	state_save_register_item("tilemap", tilemap_instance, tmap->attributes);
-	state_save_register_item("tilemap", tilemap_instance, tmap->palette_offset);
-	state_save_register_item("tilemap", tilemap_instance, tmap->pen_data_offset);
-	state_save_register_item("tilemap", tilemap_instance, tmap->scrollrows);
-	state_save_register_item("tilemap", tilemap_instance, tmap->scrollcols);
-	state_save_register_item_pointer("tilemap", tilemap_instance, tmap->rowscroll, rows * tileheight);
-	state_save_register_item_pointer("tilemap", tilemap_instance, tmap->colscroll, cols * tilewidth);
-	state_save_register_item("tilemap", tilemap_instance, tmap->dx);
-	state_save_register_item("tilemap", tilemap_instance, tmap->dx_flipped);
-	state_save_register_item("tilemap", tilemap_instance, tmap->dy);
-	state_save_register_item("tilemap", tilemap_instance, tmap->dy_flipped);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->enable);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->attributes);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->palette_offset);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->pen_data_offset);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->scrollrows);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->scrollcols);
+	state_save_register_item_pointer("tilemap", NULL, tilemap_instance, tmap->rowscroll, rows * tileheight);
+	state_save_register_item_pointer("tilemap", NULL, tilemap_instance, tmap->colscroll, cols * tilewidth);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->dx);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->dx_flipped);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->dy);
+	state_save_register_item("tilemap", NULL, tilemap_instance, tmap->dy_flipped);
 	tilemap_instance++;
 
 	/* reset everything after a load */

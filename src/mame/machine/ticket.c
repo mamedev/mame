@@ -56,8 +56,8 @@ void ticket_dispenser_init(int msec, int motoronhigh, int statusactivehigh)
 		dispenser[i].power 	= 0x00;
 		dispenser[i].timer 	= timer_alloc(ticket_dispenser_toggle, &dispenser[i]);
 
-		state_save_register_item("ticket", i, dispenser[i].status);
-		state_save_register_item("ticket", i, dispenser[i].power);
+		state_save_register_item("ticket", NULL, i, dispenser[i].status);
+		state_save_register_item("ticket", NULL, i, dispenser[i].power);
 	}
 }
 

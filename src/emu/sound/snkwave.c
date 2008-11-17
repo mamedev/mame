@@ -123,10 +123,10 @@ static SND_START( snkwave )
 	chip->waveform_position = 0;
 
 	/* register with the save state system */
-	state_save_register_item("snkwave", sndindex, chip->frequency);
-	state_save_register_item("snkwave", sndindex, chip->counter);
-	state_save_register_item("snkwave", sndindex, chip->waveform_position);
-	state_save_register_item_pointer("snkwave", sndindex, chip->waveform, WAVEFORM_LENGTH);
+	state_save_register_item("snkwave", tag, 0, chip->frequency);
+	state_save_register_item("snkwave", tag, 0, chip->counter);
+	state_save_register_item("snkwave", tag, 0, chip->waveform_position);
+	state_save_register_item_pointer("snkwave", tag, 0, chip->waveform, WAVEFORM_LENGTH);
 
 	return chip;
 }

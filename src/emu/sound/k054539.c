@@ -464,9 +464,9 @@ static void k054539_init_chip(const char *tag, struct k054539_info *info, int cl
 
 	info->stream = stream_create(0, 2, clock, info, k054539_update);
 
-	state_save_register_item_array("K054539", sndindex, info->regs);
-	state_save_register_item_pointer("K054539", sndindex, info->ram,  0x4000);
-	state_save_register_item("K054539", sndindex, info->cur_ptr);
+	state_save_register_item_array("K054539", tag, 0, info->regs);
+	state_save_register_item_pointer("K054539", tag, 0, info->ram,  0x4000);
+	state_save_register_item("K054539", tag, 0, info->cur_ptr);
 }
 
 static void k054539_w(int chip, offs_t offset, UINT8 data) //*

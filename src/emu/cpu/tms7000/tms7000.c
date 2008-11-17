@@ -187,8 +187,6 @@ static CPU_SET_CONTEXT( tms7000 )
 
 static CPU_INIT( tms7000 )
 {
-	int cpu = cpunum_get_active();
-
 	tms7000.irq_callback = irqcallback;
 	tms7000.device = device;
 
@@ -196,23 +194,23 @@ static CPU_INIT( tms7000 )
 	memset(tms7000.rf, 0, 0x80);
 
 	/* Save register state */
-	state_save_register_item("tms7000", cpu, pPC);
-	state_save_register_item("tms7000", cpu, pSP);
-	state_save_register_item("tms7000", cpu, pSR);
+	state_save_register_item("tms7000", device->tag, 0, pPC);
+	state_save_register_item("tms7000", device->tag, 0, pSP);
+	state_save_register_item("tms7000", device->tag, 0, pSR);
 
 	/* Save Interrupt state */
-	state_save_register_item_array("tms7000", cpu, tms7000.irq_state);
+	state_save_register_item_array("tms7000", device->tag, 0, tms7000.irq_state);
 
 	/* Save register and perpherial file state */
-	state_save_register_item_array("tms7000", cpu, tms7000.rf);
-	state_save_register_item_array("tms7000", cpu, tms7000.pf);
+	state_save_register_item_array("tms7000", device->tag, 0, tms7000.rf);
+	state_save_register_item_array("tms7000", device->tag, 0, tms7000.pf);
 
 	/* Save timer state */
-	state_save_register_item("tms7000", cpu, tms7000.t1_prescaler);
-	state_save_register_item("tms7000", cpu, tms7000.t1_capture_latch);
-	state_save_register_item("tms7000", cpu, tms7000.t1_decrementer);
+	state_save_register_item("tms7000", device->tag, 0, tms7000.t1_prescaler);
+	state_save_register_item("tms7000", device->tag, 0, tms7000.t1_capture_latch);
+	state_save_register_item("tms7000", device->tag, 0, tms7000.t1_decrementer);
 
-	state_save_register_item("tms7000", cpu, tms7000.idle_state);
+	state_save_register_item("tms7000", device->tag, 0, tms7000.idle_state);
 }
 
 static CPU_RESET( tms7000 )

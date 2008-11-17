@@ -1872,48 +1872,43 @@ static STATE_POSTLOAD( OPL_postload )
 }
 
 
-static void OPLsave_state_channel(const char *name, int num, OPL_CH *CH)
+static void OPLsave_state_channel(const char *name, const char *tag, OPL_CH *CH)
 {
 	int slot, ch;
-	char state_name[20];
-	static const char slot_array[2] = { 1, 2 };
 
 	for( ch=0 ; ch < 9 ; ch++, CH++ )
 	{
 		/* channel */
-		sprintf(state_name, "%s.CH%d", name,ch);
-		state_save_register_item(state_name, num, CH->block_fnum);
-		state_save_register_item(state_name, num, CH->kcode);
+		state_save_register_item(name, tag, ch, CH->block_fnum);
+		state_save_register_item(name, tag, ch, CH->kcode);
 		/* slots */
 		for( slot=0 ; slot < 2 ; slot++ )
 		{
 			OPL_SLOT *SLOT = &CH->SLOT[slot];
 
-			sprintf(state_name, "%s.CH%d.SLOT%d", name, ch, slot_array[slot]);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->ar);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->dr);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->rr);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->KSR);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->ksl);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->mul);
 
-			state_save_register_item(state_name, num, SLOT->ar);
-			state_save_register_item(state_name, num, SLOT->dr);
-			state_save_register_item(state_name, num, SLOT->rr);
-			state_save_register_item(state_name, num, SLOT->KSR);
-			state_save_register_item(state_name, num, SLOT->ksl);
-			state_save_register_item(state_name, num, SLOT->mul);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->Cnt);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->FB);
+			state_save_register_item_array(name, tag, ch * 2 + slot, SLOT->op1_out);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->CON);
 
-			state_save_register_item(state_name, num, SLOT->Cnt);
-			state_save_register_item(state_name, num, SLOT->FB);
-			state_save_register_item_array(state_name, num, SLOT->op1_out);
-			state_save_register_item(state_name, num, SLOT->CON);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->eg_type);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->state);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->TL);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->volume);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->sl);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->key);
 
-			state_save_register_item(state_name, num, SLOT->eg_type);
-			state_save_register_item(state_name, num, SLOT->state);
-			state_save_register_item(state_name, num, SLOT->TL);
-			state_save_register_item(state_name, num, SLOT->volume);
-			state_save_register_item(state_name, num, SLOT->sl);
-			state_save_register_item(state_name, num, SLOT->key);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->AMmask);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->vib);
 
-			state_save_register_item(state_name, num, SLOT->AMmask);
-			state_save_register_item(state_name, num, SLOT->vib);
-
-			state_save_register_item(state_name, num, SLOT->wavetable);
+			state_save_register_item(name, tag, ch * 2 + slot, SLOT->wavetable);
 		}
 	}
 }
@@ -1921,48 +1916,48 @@ static void OPLsave_state_channel(const char *name, int num, OPL_CH *CH)
 
 /* Register savestate for a virtual YM3812/YM3526Y8950 */
 
-static void OPL_save_state(FM_OPL *OPL, const char *statename, int index)
+static void OPL_save_state(FM_OPL *OPL, const char *statename, const char *tag)
 {
-	OPLsave_state_channel(statename, index, OPL->P_CH);
+	OPLsave_state_channel(statename, tag, OPL->P_CH);
 
-	state_save_register_item(statename, index, OPL->eg_cnt);
-	state_save_register_item(statename, index, OPL->eg_timer);
+	state_save_register_item(statename, tag, 0, OPL->eg_cnt);
+	state_save_register_item(statename, tag, 0, OPL->eg_timer);
 
-	state_save_register_item(statename, index, OPL->rhythm);
+	state_save_register_item(statename, tag, 0, OPL->rhythm);
 
-	state_save_register_item(statename, index, OPL->lfo_am_depth);
-	state_save_register_item(statename, index, OPL->lfo_pm_depth_range);
-	state_save_register_item(statename, index, OPL->lfo_am_cnt);
-	state_save_register_item(statename, index, OPL->lfo_pm_cnt);
+	state_save_register_item(statename, tag, 0, OPL->lfo_am_depth);
+	state_save_register_item(statename, tag, 0, OPL->lfo_pm_depth_range);
+	state_save_register_item(statename, tag, 0, OPL->lfo_am_cnt);
+	state_save_register_item(statename, tag, 0, OPL->lfo_pm_cnt);
 
-	state_save_register_item(statename, index, OPL->noise_rng);
-	state_save_register_item(statename, index, OPL->noise_p);
+	state_save_register_item(statename, tag, 0, OPL->noise_rng);
+	state_save_register_item(statename, tag, 0, OPL->noise_p);
 
 	if( OPL->type & OPL_TYPE_WAVESEL )
 	{
-		state_save_register_item(statename, index, OPL->wavesel);
+		state_save_register_item(statename, tag, 0, OPL->wavesel);
 	}
 
-	state_save_register_item_array(statename, index, OPL->T);
-	state_save_register_item_array(statename, index, OPL->st);
+	state_save_register_item_array(statename, tag, 0, OPL->T);
+	state_save_register_item_array(statename, tag, 0, OPL->st);
 
 #if BUILD_Y8950
 	if ( (OPL->type & OPL_TYPE_ADPCM) && (OPL->deltat) )
 	{
-		YM_DELTAT_savestate(statename, index, OPL->deltat);
+		YM_DELTAT_savestate(statename, tag, OPL->deltat);
 	}
 
 	if ( OPL->type & OPL_TYPE_IO )
 	{
-		state_save_register_item(statename, index, OPL->portDirection);
-		state_save_register_item(statename, index, OPL->portLatch);
+		state_save_register_item(statename, tag, 0, OPL->portDirection);
+		state_save_register_item(statename, tag, 0, OPL->portLatch);
 	}
 #endif
 
-	state_save_register_item(statename, index, OPL->address);
-	state_save_register_item(statename, index, OPL->status);
-	state_save_register_item(statename, index, OPL->statusmask);
-	state_save_register_item(statename, index, OPL->mode);
+	state_save_register_item(statename, tag, 0, OPL->address);
+	state_save_register_item(statename, tag, 0, OPL->status);
+	state_save_register_item(statename, tag, 0, OPL->statusmask);
+	state_save_register_item(statename, tag, 0, OPL->mode);
 
 	state_save_register_postload(Machine, OPL_postload, OPL);
 }
@@ -2164,13 +2159,13 @@ static int OPLTimerOver(FM_OPL *OPL,int c)
 
 #if (BUILD_YM3812)
 
-void * ym3812_init(int sndindex, UINT32 clock, UINT32 rate)
+void * ym3812_init(const char *tag, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
 	FM_OPL *YM3812 = OPLCreate(OPL_TYPE_YM3812,clock,rate);
 	if (YM3812)
 	{
-		OPL_save_state(YM3812, "YM3812", sndindex);
+		OPL_save_state(YM3812, "YM3812", tag);
 		ym3812_reset_chip(YM3812);
 	}
 	return YM3812;
@@ -2300,13 +2295,13 @@ void ym3812_update_one(void *chip, OPLSAMPLE *buffer, int length)
 
 #if (BUILD_YM3526)
 
-void *ym3526_init(int sndindex, UINT32 clock, UINT32 rate)
+void *ym3526_init(const char *tag, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
 	FM_OPL *YM3526 = OPLCreate(OPL_TYPE_YM3526,clock,rate);
 	if (YM3526)
 	{
-		OPL_save_state(YM3526, "YM3526", sndindex);
+		OPL_save_state(YM3526, "YM3526", tag);
 		ym3526_reset_chip(YM3526);
 	}
 	return YM3526;
@@ -2447,7 +2442,7 @@ static void Y8950_deltat_status_reset(void *chip, UINT8 changebits)
 	OPL_STATUS_RESET(Y8950, changebits);
 }
 
-void *y8950_init(int sndindex, UINT32 clock, UINT32 rate)
+void *y8950_init(const char *tag, UINT32 clock, UINT32 rate)
 {
 	/* emulator create */
 	FM_OPL *Y8950 = OPLCreate(OPL_TYPE_Y8950,clock,rate);
@@ -2462,7 +2457,7 @@ void *y8950_init(int sndindex, UINT32 clock, UINT32 rate)
 		/*Y8950->deltat->write_time = 10.0 / clock;*/		/* a single byte write takes 10 cycles of main clock */
 		/*Y8950->deltat->read_time  = 8.0 / clock;*/		/* a single byte read takes 8 cycles of main clock */
 		/* reset */
-		OPL_save_state(Y8950, "Y8950", sndindex);
+		OPL_save_state(Y8950, "Y8950", tag);
 		y8950_reset_chip(Y8950);
 	}
 

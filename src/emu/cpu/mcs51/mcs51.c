@@ -2067,18 +2067,18 @@ static CPU_INIT( mcs51 )
 	mcs51_state->sfr_write = mcs51_sfr_write;
 
 	/* Save states */
-	state_save_register_item("mcs51", index, mcs51_state->ppc);
-	state_save_register_item("mcs51", index, mcs51_state->pc);
-	state_save_register_item("mcs51", index, mcs51_state->rwm );
-	state_save_register_item("mcs51", index, mcs51_state->cur_irq_prio );
-	state_save_register_item("mcs51", index, mcs51_state->last_line_state );
-	state_save_register_item("mcs51", index, mcs51_state->t0_cnt );
-	state_save_register_item("mcs51", index, mcs51_state->t1_cnt );
-	state_save_register_item("mcs51", index, mcs51_state->t2_cnt );
-	state_save_register_item("mcs51", index, mcs51_state->t2ex_cnt );
-	state_save_register_item("mcs51", index, mcs51_state->recalc_parity );
-	state_save_register_item_array("mcs51", index, mcs51_state->irq_prio );
-	state_save_register_item("mcs51", index, mcs51_state->irq_active );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ppc);
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->pc);
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->rwm );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->cur_irq_prio );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->last_line_state );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->t0_cnt );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->t1_cnt );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->t2_cnt );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->t2ex_cnt );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->recalc_parity );
+	state_save_register_item_array("mcs51", device->tag, 0, mcs51_state->irq_prio );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->irq_active );
 }
 
 static CPU_INIT( i80c51 )
@@ -2376,9 +2376,9 @@ static CPU_INIT( ds5002fp )
 	mcs51_state->sfr_read = ds5002fp_sfr_read;
 	mcs51_state->sfr_write = ds5002fp_sfr_write;
 
-	state_save_register_item("mcs51", index, mcs51_state->ds5002fp.previous_ta );
-	state_save_register_item("mcs51", index, mcs51_state->ds5002fp.ta_window );
-	state_save_register_item("mcs51", index, mcs51_state->ds5002fp.range );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ds5002fp.previous_ta );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ds5002fp.ta_window );
+	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ds5002fp.range );
 
 }
 

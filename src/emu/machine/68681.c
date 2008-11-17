@@ -537,54 +537,50 @@ void duart68681_rx_data( const device_config* device, int ch, UINT8 data )
 static DEVICE_START(duart68681)
 {
 	duart68681_state *duart68681 = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
 	assert(device != NULL);
 	assert(device->tag != NULL);
-	assert(strlen(device->tag) < 20);
 
-	state_save_combine_module_and_tag(unique_tag, "DUART 68681", device->tag);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->ACR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->IMR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->ISR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->IVR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->OPCR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->CTR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->IP_last_state);
 
-	state_save_register_item(unique_tag, 0, duart68681->ACR);
-	state_save_register_item(unique_tag, 0, duart68681->IMR);
-	state_save_register_item(unique_tag, 0, duart68681->ISR);
-	state_save_register_item(unique_tag, 0, duart68681->IVR);
-	state_save_register_item(unique_tag, 0, duart68681->OPCR);
-	state_save_register_item(unique_tag, 0, duart68681->CTR);
-	state_save_register_item(unique_tag, 0, duart68681->IP_last_state);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].CR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].CSR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].MR1);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].MR2);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].MR_ptr);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].SR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].baud_rate);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].rx_enabled);
+	state_save_register_item_array("DUART68681", device->tag, 0, duart68681->channel[0].rx_fifo);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].rx_fifo_read_ptr);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].rx_fifo_write_ptr);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].rx_fifo_num);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].tx_enabled);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].tx_data);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[0].tx_ready);
 
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].CR);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].CSR);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].MR1);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].MR2);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].MR_ptr);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].SR);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].baud_rate);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].rx_enabled);
-	state_save_register_item_array(unique_tag, 0, duart68681->channel[0].rx_fifo);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].rx_fifo_read_ptr);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].rx_fifo_write_ptr);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].rx_fifo_num);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].tx_enabled);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].tx_data);
-	state_save_register_item(unique_tag, 0, duart68681->channel[0].tx_ready);
-
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].CR);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].CSR);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].MR1);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].MR2);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].MR_ptr);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].SR);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].baud_rate);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].rx_enabled);
-	state_save_register_item_array(unique_tag, 0, duart68681->channel[1].rx_fifo);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].rx_fifo_read_ptr);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].rx_fifo_write_ptr);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].rx_fifo_num);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].tx_enabled);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].tx_data);
-	state_save_register_item(unique_tag, 0, duart68681->channel[1].tx_ready);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].CR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].CSR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].MR1);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].MR2);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].MR_ptr);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].SR);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].baud_rate);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].rx_enabled);
+	state_save_register_item_array("DUART68681", device->tag, 0, duart68681->channel[1].rx_fifo);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].rx_fifo_read_ptr);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].rx_fifo_write_ptr);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].rx_fifo_num);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].tx_enabled);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].tx_data);
+	state_save_register_item("DUART68681", device->tag, 0, duart68681->channel[1].tx_ready);
 
 	return DEVICE_START_OK;
 }

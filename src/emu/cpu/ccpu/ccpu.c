@@ -141,25 +141,25 @@ static CPU_INIT( ccpu )
 	ccpu.external_input = configdata->external_input ? configdata->external_input : read_jmi;
 	ccpu.vector_callback = configdata->vector_callback;
 
-	state_save_register_item("ccpu", clock, ccpu.PC);
-	state_save_register_item("ccpu", clock, ccpu.A);
-	state_save_register_item("ccpu", clock, ccpu.B);
-	state_save_register_item("ccpu", clock, ccpu.I);
-	state_save_register_item("ccpu", clock, ccpu.J);
-	state_save_register_item("ccpu", clock, ccpu.P);
-	state_save_register_item("ccpu", clock, ccpu.X);
-	state_save_register_item("ccpu", clock, ccpu.Y);
-	state_save_register_item("ccpu", clock, ccpu.T);
-	state_save_register_item("ccpu", clock, ccpu.a0flag);
-	state_save_register_item("ccpu", clock, ccpu.ncflag);
-	state_save_register_item("ccpu", clock, ccpu.cmpacc);
-	state_save_register_item("ccpu", clock, ccpu.cmpval);
-	state_save_register_item("ccpu", clock, ccpu.miflag);
-	state_save_register_item("ccpu", clock, ccpu.nextmiflag);
-	state_save_register_item("ccpu", clock, ccpu.nextnextmiflag);
-	state_save_register_item("ccpu", clock, ccpu.drflag);
-	state_save_register_item("ccpu", clock, ccpu.waiting);
-	state_save_register_item("ccpu", clock, ccpu.watchdog);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.PC);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.A);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.B);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.I);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.J);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.P);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.X);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.Y);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.T);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.a0flag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.ncflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.cmpacc);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.cmpval);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.miflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.nextmiflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.nextnextmiflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.drflag);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.waiting);
+	state_save_register_item("ccpu", device->tag, 0, ccpu.watchdog);
 }
 
 

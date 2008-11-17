@@ -2075,16 +2075,16 @@ static CPU_INIT( i960 )
 	i960_state->irq_cb = irqcallback;
 	i960_state->device = device;
 
-	state_save_register_item("i960", index, i960_state->PIP);
-	state_save_register_item("i960", index, i960_state->SAT);
-	state_save_register_item("i960", index, i960_state->PRCB);
-	state_save_register_item("i960", index, i960_state->PC);
-	state_save_register_item("i960", index, i960_state->AC);
-	state_save_register_item("i960", index, i960_state->ICR);
-	state_save_register_item_array("i960", index, i960_state->r);
- 	state_save_register_item_array("i960", index, i960_state->fp);
-	state_save_register_item_2d_array("i960", index, i960_state->rcache);
-	state_save_register_item_array("i960", index, i960_state->rcache_frame_addr);
+	state_save_register_item("i960", device->tag, 0, i960_state->PIP);
+	state_save_register_item("i960", device->tag, 0, i960_state->SAT);
+	state_save_register_item("i960", device->tag, 0, i960_state->PRCB);
+	state_save_register_item("i960", device->tag, 0, i960_state->PC);
+	state_save_register_item("i960", device->tag, 0, i960_state->AC);
+	state_save_register_item("i960", device->tag, 0, i960_state->ICR);
+	state_save_register_item_array("i960", device->tag, 0, i960_state->r);
+ 	state_save_register_item_array("i960", device->tag, 0, i960_state->fp);
+	state_save_register_item_2d_array("i960", device->tag, 0, i960_state->rcache);
+	state_save_register_item_array("i960", device->tag, 0, i960_state->rcache_frame_addr);
 }
 
 static CPU_DISASSEMBLE( i960  )

@@ -255,25 +255,25 @@ static CPU_INIT( cop410 )
 
 	/* register for state saving */
 
-	state_save_register_item("cop410", index, PC);
-	state_save_register_item("cop410", index, R.PREVPC);
-	state_save_register_item("cop410", index, A);
-	state_save_register_item("cop410", index, B);
-	state_save_register_item("cop410", index, C);
-	state_save_register_item("cop410", index, EN);
-	state_save_register_item("cop410", index, G);
-	state_save_register_item("cop410", index, Q);
-	state_save_register_item("cop410", index, SA);
-	state_save_register_item("cop410", index, SB);
-	state_save_register_item("cop410", index, SIO);
-	state_save_register_item("cop410", index, SKL);
-	state_save_register_item("cop410", index, skip);
-	state_save_register_item("cop410", index, skipLBI);
-	state_save_register_item("cop410", index, R.G_mask);
-	state_save_register_item("cop410", index, R.D_mask);
-	state_save_register_item("cop410", index, R.si);
-	state_save_register_item("cop410", index, R.microbus_int);
-	state_save_register_item("cop410", index, R.halt);
+	state_save_register_item("cop410", device->tag, 0, PC);
+	state_save_register_item("cop410", device->tag, 0, R.PREVPC);
+	state_save_register_item("cop410", device->tag, 0, A);
+	state_save_register_item("cop410", device->tag, 0, B);
+	state_save_register_item("cop410", device->tag, 0, C);
+	state_save_register_item("cop410", device->tag, 0, EN);
+	state_save_register_item("cop410", device->tag, 0, G);
+	state_save_register_item("cop410", device->tag, 0, Q);
+	state_save_register_item("cop410", device->tag, 0, SA);
+	state_save_register_item("cop410", device->tag, 0, SB);
+	state_save_register_item("cop410", device->tag, 0, SIO);
+	state_save_register_item("cop410", device->tag, 0, SKL);
+	state_save_register_item("cop410", device->tag, 0, skip);
+	state_save_register_item("cop410", device->tag, 0, skipLBI);
+	state_save_register_item("cop410", device->tag, 0, R.G_mask);
+	state_save_register_item("cop410", device->tag, 0, R.D_mask);
+	state_save_register_item("cop410", device->tag, 0, R.si);
+	state_save_register_item("cop410", device->tag, 0, R.microbus_int);
+	state_save_register_item("cop410", device->tag, 0, R.halt);
 }
 
 static CPU_INIT( cop411 )

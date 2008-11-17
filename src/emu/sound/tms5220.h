@@ -3,7 +3,7 @@
 #ifndef __TMS5220_H__
 #define __TMS5220_H__
 
-void *tms5220_create(int index);
+void *tms5220_create(const char *tag);
 void tms5220_destroy(void *chip);
 
 void tms5220_reset_chip(void *chip);

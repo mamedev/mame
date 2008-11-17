@@ -120,7 +120,6 @@ static DEVICE_START(at28c16)
 {
 	at28c16_state *c = get_safe_token(device);
 	const at28c16_config *config;
-	char unique_tag[50];
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -148,14 +147,11 @@ static DEVICE_START(at28c16)
 	}
 
 	/* create the name for save states */
-	assert( strlen( device->tag ) < 30 );
-	state_save_combine_module_and_tag( unique_tag, "at28c16", device->tag );
-
-	state_save_register_item_pointer( unique_tag, 0, c->data, SIZE_DATA );
-	state_save_register_item_pointer( unique_tag, 0, c->id, SIZE_ID );
-	state_save_register_item( unique_tag, 0, c->a9_12v );
-	state_save_register_item( unique_tag, 0, c->oe_12v );
-	state_save_register_item( unique_tag, 0, c->last_write );
+	state_save_register_item_pointer( "at28c16", device->tag, 0, c->data, SIZE_DATA );
+	state_save_register_item_pointer( "at28c16", device->tag, 0, c->id, SIZE_ID );
+	state_save_register_item( "at28c16", device->tag, 0, c->a9_12v );
+	state_save_register_item( "at28c16", device->tag, 0, c->oe_12v );
+	state_save_register_item( "at28c16", device->tag, 0, c->last_write );
 
 	return DEVICE_START_OK;
 }

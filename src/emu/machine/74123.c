@@ -189,11 +189,8 @@ WRITE8_DEVICE_HANDLER( ttl74123_reset_w )
 static DEVICE_START( ttl74123 )
 {
 	ttl74123_t *chip = get_safe_token(device);
-	char unique_tag[30];
 
 	/* validate arguments */
-	assert(strlen(device->tag) < 20);
-
 	chip->intf = device->static_config;
 
 	assert_always(chip->intf, "No interface specified");
@@ -208,12 +205,9 @@ static DEVICE_START( ttl74123 )
 	chip->clear = chip->intf->clear;
 
 	/* register for state saving */
-
-	state_save_combine_module_and_tag(unique_tag, "ttl74123", device->tag);
-
-	state_save_register_item(unique_tag, 0, chip->a);
-	state_save_register_item(unique_tag, 0, chip->b);
-	state_save_register_item(unique_tag, 0, chip->clear);
+	state_save_register_item("ttl74123", device->tag, 0, chip->a);
+	state_save_register_item("ttl74123", device->tag, 0, chip->b);
+	state_save_register_item("ttl74123", device->tag, 0, chip->clear);
 
 	return DEVICE_START_OK;
 }

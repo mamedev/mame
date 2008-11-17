@@ -1568,15 +1568,15 @@ static void set_irq_line(int irqline, int state)
 
 static void hyperstone_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
-	state_save_register_item_array("E132XS", index, hyperstone.global_regs);
-	state_save_register_item_array("E132XS", index, hyperstone.local_regs);
-	state_save_register_item("E132XS", index, hyperstone.ppc);
-	state_save_register_item("E132XS", index, hyperstone.trap_entry);
-	state_save_register_item("E132XS", index, hyperstone.delay.delay_pc);
-	state_save_register_item("E132XS", index, hyperstone.instruction_length);
-	state_save_register_item("E132XS", index, hyperstone.intblock);
-	state_save_register_item("E132XS", index, hyperstone.delay.delay_cmd);
-	state_save_register_item("E132XS", index, hyperstone.tr_clocks_per_tick);
+	state_save_register_item_array("E132XS", device->tag, 0, hyperstone.global_regs);
+	state_save_register_item_array("E132XS", device->tag, 0, hyperstone.local_regs);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.ppc);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.trap_entry);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.delay.delay_pc);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.instruction_length);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.intblock);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.delay.delay_cmd);
+	state_save_register_item("E132XS", device->tag, 0, hyperstone.tr_clocks_per_tick);
 
 	hyperstone.irq_callback = irqcallback;
 	hyperstone.device = device;

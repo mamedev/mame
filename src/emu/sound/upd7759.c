@@ -588,35 +588,35 @@ static STATE_POSTLOAD( upd7759_postload )
 }
 
 
-static void register_for_save(struct upd7759_chip *chip, int index)
+static void register_for_save(struct upd7759_chip *chip, const char *tag)
 {
-	state_save_register_item("upd7759", index, chip->pos);
-	state_save_register_item("upd7759", index, chip->step);
+	state_save_register_item("upd7759", tag, 0, chip->pos);
+	state_save_register_item("upd7759", tag, 0, chip->step);
 
-	state_save_register_item("upd7759", index, chip->fifo_in);
-	state_save_register_item("upd7759", index, chip->reset);
-	state_save_register_item("upd7759", index, chip->start);
-	state_save_register_item("upd7759", index, chip->drq);
+	state_save_register_item("upd7759", tag, 0, chip->fifo_in);
+	state_save_register_item("upd7759", tag, 0, chip->reset);
+	state_save_register_item("upd7759", tag, 0, chip->start);
+	state_save_register_item("upd7759", tag, 0, chip->drq);
 
-	state_save_register_item("upd7759", index, chip->state);
-	state_save_register_item("upd7759", index, chip->clocks_left);
-	state_save_register_item("upd7759", index, chip->nibbles_left);
-	state_save_register_item("upd7759", index, chip->repeat_count);
-	state_save_register_item("upd7759", index, chip->post_drq_state);
-	state_save_register_item("upd7759", index, chip->post_drq_clocks);
-	state_save_register_item("upd7759", index, chip->req_sample);
-	state_save_register_item("upd7759", index, chip->last_sample);
-	state_save_register_item("upd7759", index, chip->block_header);
-	state_save_register_item("upd7759", index, chip->sample_rate);
-	state_save_register_item("upd7759", index, chip->first_valid_header);
-	state_save_register_item("upd7759", index, chip->offset);
-	state_save_register_item("upd7759", index, chip->repeat_offset);
+	state_save_register_item("upd7759", tag, 0, chip->state);
+	state_save_register_item("upd7759", tag, 0, chip->clocks_left);
+	state_save_register_item("upd7759", tag, 0, chip->nibbles_left);
+	state_save_register_item("upd7759", tag, 0, chip->repeat_count);
+	state_save_register_item("upd7759", tag, 0, chip->post_drq_state);
+	state_save_register_item("upd7759", tag, 0, chip->post_drq_clocks);
+	state_save_register_item("upd7759", tag, 0, chip->req_sample);
+	state_save_register_item("upd7759", tag, 0, chip->last_sample);
+	state_save_register_item("upd7759", tag, 0, chip->block_header);
+	state_save_register_item("upd7759", tag, 0, chip->sample_rate);
+	state_save_register_item("upd7759", tag, 0, chip->first_valid_header);
+	state_save_register_item("upd7759", tag, 0, chip->offset);
+	state_save_register_item("upd7759", tag, 0, chip->repeat_offset);
 
-	state_save_register_item("upd7759", index, chip->adpcm_state);
-	state_save_register_item("upd7759", index, chip->adpcm_data);
-	state_save_register_item("upd7759", index, chip->sample);
+	state_save_register_item("upd7759", tag, 0, chip->adpcm_state);
+	state_save_register_item("upd7759", tag, 0, chip->adpcm_data);
+	state_save_register_item("upd7759", tag, 0, chip->sample);
 
-	state_save_register_item("upd7759", index, chip->romoffset);
+	state_save_register_item("upd7759", tag, 0, chip->romoffset);
 	state_save_register_postload(Machine, upd7759_postload, chip);
 }
 
@@ -657,7 +657,7 @@ static SND_START( upd7759 )
 	/* toggle the reset line to finish the reset */
 	SND_RESET_NAME( upd7759 )(chip);
 
-	register_for_save(chip, sndindex);
+	register_for_save(chip, tag);
 
 	return chip;
 }

@@ -27,7 +27,7 @@
 #define TMS5110_IS_CD2802	TMS5110_IS_5110
 #define TMS5110_IS_M58817	TMS5110_IS_5110
 
-void *tms5110_create(int index, int variant);
+void *tms5110_create(const char *tag, int variant);
 void tms5110_destroy(void *chip);
 
 void tms5110_set_variant(void *chip, int variant);

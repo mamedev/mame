@@ -80,7 +80,6 @@ static DEVICE_START(x2212)
 {
 	x2212_state *c = get_safe_token(device);
 	const x2212_config *config;
-	char unique_tag[50];
 
 	/* validate some basic stuff */
 	assert(device != NULL);
@@ -100,14 +99,10 @@ static DEVICE_START(x2212)
 		c->default_data = memory_region( device->machine, config->data );
 	}
 
-	/* create the name for save states */
-	assert( strlen( device->tag ) < 30 );
-	state_save_combine_module_and_tag( unique_tag, "x2212", device->tag );
-
-	state_save_register_item_pointer( unique_tag, 0, c->sram, SIZE_DATA );
-	state_save_register_item_pointer( unique_tag, 0, c->e2prom, SIZE_DATA );
-	state_save_register_item( unique_tag, 0, c->store );
-	state_save_register_item( unique_tag, 0, c->array_recall );
+	state_save_register_item_pointer( "x2212", device->tag, 0, c->sram, SIZE_DATA );
+	state_save_register_item_pointer( "x2212", device->tag, 0, c->e2prom, SIZE_DATA );
+	state_save_register_item( "x2212", device->tag, 0, c->store );
+	state_save_register_item( "x2212", device->tag, 0, c->array_recall );
 
 	return DEVICE_START_OK;
 }

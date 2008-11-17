@@ -54,7 +54,7 @@ typedef stream_sample_t SAMP;
 ** 'clock' is the chip clock in Hz
 ** 'rate' is sampling rate
 */
-void *ym2151_init(int index, int clock, int rate);
+void *ym2151_init(const char *tag, int clock, int rate);
 
 /* shutdown the YM2151 emulators*/
 void ym2151_shutdown(void *chip);

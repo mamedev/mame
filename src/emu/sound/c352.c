@@ -482,7 +482,7 @@ static void c352_write_reg16(struct c352_info *info, unsigned long address, unsi
 	}
 }
 
-static void c352_init(struct c352_info *info, int sndindex)
+static void c352_init(struct c352_info *info, const char *tag)
 {
 	int i;
 	double x_max = 32752.0;
@@ -515,23 +515,23 @@ static void c352_init(struct c352_info *info, int sndindex)
 
 		sprintf(cname, "C352 v %02d", i);
 
-		state_save_register_item(cname, sndindex, info->c352_ch[i].vol_l);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].vol_r);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].vol_l2);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].vol_r2);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].bank);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].noise);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].noisebuf);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].noisecnt);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].pitch);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].start_addr);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].end_addr);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].repeat_addr);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].flag);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].start);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].repeat);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].current_addr);
-		state_save_register_item(cname, sndindex, info->c352_ch[i].pos);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].vol_l);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].vol_r);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].vol_l2);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].vol_r2);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].bank);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].noise);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].noisebuf);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].noisecnt);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].pitch);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].start_addr);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].end_addr);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].repeat_addr);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].flag);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].start);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].repeat);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].current_addr);
+		state_save_register_item(cname, tag, 0, info->c352_ch[i].pos);
 	}
 }
 
@@ -549,7 +549,7 @@ static SND_START( c352 )
 
 	info->stream = stream_create(0, 4, info->sample_rate_base, info, c352_update);
 
-	c352_init(info, sndindex);
+	c352_init(info, tag);
 
 	return info;
 }

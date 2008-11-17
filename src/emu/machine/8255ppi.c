@@ -506,7 +506,6 @@ UINT8 ppi8255_get_port_c( const device_config *device ) {
 
 static DEVICE_START( ppi8255 ) {
 	ppi8255_t	*ppi8255 = get_safe_token(device);
-	char		unique_tag[30];
 
 	ppi8255->intf = device->static_config;
 
@@ -519,24 +518,22 @@ static DEVICE_START( ppi8255 ) {
 	ppi8255->port_write[2] = ppi8255->intf->port_c_write;
 
 	/* register for state saving */
-	state_save_combine_module_and_tag(unique_tag, "ppi8255", device->tag);
-
-	state_save_register_item(unique_tag, 0, ppi8255->group_a_mode);
-	state_save_register_item(unique_tag, 0, ppi8255->group_b_mode);
-	state_save_register_item(unique_tag, 0, ppi8255->port_a_dir);
-	state_save_register_item(unique_tag, 0, ppi8255->port_b_dir);
-	state_save_register_item(unique_tag, 0, ppi8255->port_ch_dir);
-	state_save_register_item(unique_tag, 0, ppi8255->port_cl_dir);
-	state_save_register_item(unique_tag, 0, ppi8255->obf_a);
-	state_save_register_item(unique_tag, 0, ppi8255->obf_b);
-	state_save_register_item(unique_tag, 0, ppi8255->ibf_a);
-	state_save_register_item(unique_tag, 0, ppi8255->ibf_b);
-	state_save_register_item(unique_tag, 0, ppi8255->inte_a);
-	state_save_register_item(unique_tag, 0, ppi8255->inte_b);
-	state_save_register_item_array(unique_tag, 0, ppi8255->in_mask);
-	state_save_register_item_array(unique_tag, 0, ppi8255->out_mask);
-	state_save_register_item_array(unique_tag, 0, ppi8255->read);
-	state_save_register_item_array(unique_tag, 0, ppi8255->latch);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->group_a_mode);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->group_b_mode);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->port_a_dir);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->port_b_dir);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->port_ch_dir);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->port_cl_dir);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->obf_a);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->obf_b);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->ibf_a);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->ibf_b);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->inte_a);
+	state_save_register_item("ppi8255", device->tag, 0, ppi8255->inte_b);
+	state_save_register_item_array("ppi8255", device->tag, 0, ppi8255->in_mask);
+	state_save_register_item_array("ppi8255", device->tag, 0, ppi8255->out_mask);
+	state_save_register_item_array("ppi8255", device->tag, 0, ppi8255->read);
+	state_save_register_item_array("ppi8255", device->tag, 0, ppi8255->latch);
 
 	return DEVICE_START_OK;
 }

@@ -52,7 +52,7 @@ static void hc55516_update(void *param, stream_sample_t **inputs, stream_sample_
 
 
 
-static void *start_common(int sndindex, int clock, const void *config,
+static void *start_common(const char *tag, int clock, const void *config,
 						  UINT8 _shiftreg_mask, int _active_clock_hi)
 {
 	struct hc55516_data *chip;
@@ -74,15 +74,15 @@ static void *start_common(int sndindex, int clock, const void *config,
 	/* create the stream */
 	chip->channel = stream_create(0, 1, SAMPLE_RATE, chip, hc55516_update);
 
-	state_save_register_item("hc55516", sndindex, chip->last_clock_state);
-	state_save_register_item("hc55516", sndindex, chip->digit);
-	state_save_register_item("hc55516", sndindex, chip->new_digit);
-	state_save_register_item("hc55516", sndindex, chip->shiftreg);
-	state_save_register_item("hc55516", sndindex, chip->curr_sample);
-	state_save_register_item("hc55516", sndindex, chip->next_sample);
-	state_save_register_item("hc55516", sndindex, chip->update_count);
-	state_save_register_item("hc55516", sndindex, chip->filter);
-	state_save_register_item("hc55516", sndindex, chip->integrator);
+	state_save_register_item("hc55516", tag, 0, chip->last_clock_state);
+	state_save_register_item("hc55516", tag, 0, chip->digit);
+	state_save_register_item("hc55516", tag, 0, chip->new_digit);
+	state_save_register_item("hc55516", tag, 0, chip->shiftreg);
+	state_save_register_item("hc55516", tag, 0, chip->curr_sample);
+	state_save_register_item("hc55516", tag, 0, chip->next_sample);
+	state_save_register_item("hc55516", tag, 0, chip->update_count);
+	state_save_register_item("hc55516", tag, 0, chip->filter);
+	state_save_register_item("hc55516", tag, 0, chip->integrator);
 
 	/* success */
 	return chip;
@@ -91,19 +91,19 @@ static void *start_common(int sndindex, int clock, const void *config,
 
 static SND_START( hc55516 )
 {
-	return start_common(sndindex, clock, config, 0x07, TRUE);
+	return start_common(tag, clock, config, 0x07, TRUE);
 }
 
 
 static SND_START( mc3417 )
 {
-	return start_common(sndindex, clock, config, 0x07, FALSE);
+	return start_common(tag, clock, config, 0x07, FALSE);
 }
 
 
 static SND_START( mc3418 )
 {
-	return start_common(sndindex, clock, config, 0x0f, FALSE);
+	return start_common(tag, clock, config, 0x0f, FALSE);
 }
 
 

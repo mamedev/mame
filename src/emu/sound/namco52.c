@@ -159,12 +159,12 @@ static SND_START( namco_52xx )
 
 	SND_RESET_NAME( namco_52xx )(chip);
 
-	state_save_register_item("namco52xx", sndindex, chip->n52_pb_cycle);
-	state_save_register_item("namco52xx", sndindex, chip->n52_step);
-	state_save_register_item("namco52xx", sndindex, chip->n52_start);
-	state_save_register_item("namco52xx", sndindex, chip->n52_end);
-	state_save_register_item("namco52xx", sndindex, chip->n52_length);
-	state_save_register_item("namco52xx", sndindex, chip->n52_pos);
+	state_save_register_item("namco52xx", tag, 0, chip->n52_pb_cycle);
+	state_save_register_item("namco52xx", tag, 0, chip->n52_step);
+	state_save_register_item("namco52xx", tag, 0, chip->n52_start);
+	state_save_register_item("namco52xx", tag, 0, chip->n52_end);
+	state_save_register_item("namco52xx", tag, 0, chip->n52_length);
+	state_save_register_item("namco52xx", tag, 0, chip->n52_pos);
 
 	return chip;
 }

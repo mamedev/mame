@@ -1971,7 +1971,7 @@ static void bank_assign_static(int banknum, int cpunum, int spacenum, read_or_wr
 	{
 		/* if we're allowed to, wire up state saving for the entry */
 		if (state_save_registration_allowed())
-			state_save_register_item("memory", banknum, bank->curentry);
+			state_save_register_item("memory", NULL, banknum, bank->curentry);
 
 		/* fill in information about the bank */
 		bank->used = TRUE;
@@ -2632,8 +2632,8 @@ static void register_for_save(int cpunum, int spacenum, offs_t bytestart, void *
 	int bytes_per_element = cpudata[cpunum].space[spacenum].dbits/8;
 	char name[256];
 
-	sprintf(name, "%d.%08x-%08x", spacenum, bytestart, (int)(bytestart + numbytes - 1));
-	state_save_register_memory("memory", cpunum, name, base, bytes_per_element, (UINT32)numbytes / bytes_per_element);
+	sprintf(name, "%08x-%08x", bytestart, (int)(bytestart + numbytes - 1));
+	state_save_register_memory("memory", address_space_names[spacenum], cpunum, name, base, bytes_per_element, (UINT32)numbytes / bytes_per_element);
 }
 
 

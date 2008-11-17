@@ -508,15 +508,15 @@ static int storeDec(UINT32 pat, UINT32 rbv)
  ***************************************************************************/
 
 // CPU INIT
-static void arm7_core_init(const char *cpuname, int index)
+static void arm7_core_init(const char *cpuname, const device_config *device)
 {
-    state_save_register_item_array(cpuname, index, ARM7.sArmRegister);
-    state_save_register_item(cpuname, index, ARM7.pendingIrq);
-    state_save_register_item(cpuname, index, ARM7.pendingFiq);
-    state_save_register_item(cpuname, index, ARM7.pendingAbtD);
-    state_save_register_item(cpuname, index, ARM7.pendingAbtP);
-    state_save_register_item(cpuname, index, ARM7.pendingUnd);
-    state_save_register_item(cpuname, index, ARM7.pendingSwi);
+    state_save_register_item_array(cpuname, device->tag, 0, ARM7.sArmRegister);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingIrq);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingFiq);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingAbtD);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingAbtP);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingUnd);
+    state_save_register_item(cpuname, device->tag, 0, ARM7.pendingSwi);
 }
 
 // CPU RESET

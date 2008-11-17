@@ -226,26 +226,26 @@ static SND_RESET( astrocade )
  *
  *************************************/
 
-static void astrocade_state_save_register(struct astrocade_info *chip, int sndindex)
+static void astrocade_state_save_register(struct astrocade_info *chip, const char *tag)
 {
-	state_save_register_item_array("globals", sndindex, chip->reg);
+	state_save_register_item_array("globals", tag, 0, chip->reg);
 
-	state_save_register_item_array("astrocade", sndindex, chip->reg);
+	state_save_register_item_array("astrocade", tag, 0, chip->reg);
 
-	state_save_register_item("astrocade", sndindex, chip->master_count);
-	state_save_register_item("astrocade", sndindex, chip->vibrato_clock);
+	state_save_register_item("astrocade", tag, 0, chip->master_count);
+	state_save_register_item("astrocade", tag, 0, chip->vibrato_clock);
 
-	state_save_register_item("astrocade", sndindex, chip->noise_clock);
-	state_save_register_item("astrocade", sndindex, chip->noise_state);
+	state_save_register_item("astrocade", tag, 0, chip->noise_clock);
+	state_save_register_item("astrocade", tag, 0, chip->noise_state);
 
-	state_save_register_item("astrocade", sndindex, chip->a_count);
-	state_save_register_item("astrocade", sndindex, chip->a_state);
+	state_save_register_item("astrocade", tag, 0, chip->a_count);
+	state_save_register_item("astrocade", tag, 0, chip->a_state);
 
-	state_save_register_item("astrocade", sndindex, chip->b_count);
-	state_save_register_item("astrocade", sndindex, chip->b_state);
+	state_save_register_item("astrocade", tag, 0, chip->b_count);
+	state_save_register_item("astrocade", tag, 0, chip->b_state);
 
-	state_save_register_item("astrocade", sndindex, chip->c_count);
-	state_save_register_item("astrocade", sndindex, chip->c_state);
+	state_save_register_item("astrocade", tag, 0, chip->c_count);
+	state_save_register_item("astrocade", tag, 0, chip->c_state);
 }
 
 
@@ -274,7 +274,7 @@ static SND_START( astrocade )
 
 	/* reset state */
 	SND_RESET_NAME( astrocade )(chip);
-	astrocade_state_save_register(chip, sndindex);
+	astrocade_state_save_register(chip, tag);
 
 	return chip;
 }
