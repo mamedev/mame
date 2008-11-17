@@ -1247,5 +1247,5 @@ VIDEO_EOF( samesame )
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 	memcpy(toaplan1_buffered_spritesizeram16, toaplan1_spritesizeram16, TOAPLAN1_SPRITESIZERAM_SIZE);
-	cpu_set_input_line(machine->cpu[0], MC68000_IRQ_2, HOLD_LINE);	/* Frame done */
+	cpu_set_input_line(machine->cpu[0], M68K_IRQ_2, HOLD_LINE);	/* Frame done */
 }

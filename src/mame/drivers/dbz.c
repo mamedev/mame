@@ -77,12 +77,12 @@ static INTERRUPT_GEN( dbz_interrupt )
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line(device, MC68000_IRQ_2, HOLD_LINE);
+			cpu_set_input_line(device, M68K_IRQ_2, HOLD_LINE);
 			break;
 
 		case 1:
 			if (K053246_is_IRQ_enabled())
-				cpu_set_input_line(device, MC68000_IRQ_4, HOLD_LINE);
+				cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 			break;
 	}
 }

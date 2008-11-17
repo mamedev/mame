@@ -241,9 +241,9 @@ static TIMER_CALLBACK( scanline_callback )
  *
  *************************************/
 
-static void outrun_reset(void)
+static void outrun_reset(const device_config *device)
 {
-	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 

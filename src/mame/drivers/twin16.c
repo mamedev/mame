@@ -163,7 +163,7 @@ static WRITE16_HANDLER( twin16_CPUA_register_w )
 			twin16_spriteram_process();
 
 		if( (old&0x10)==0 && (twin16_CPUA_register&0x10) )
-			cpu_set_input_line(space->machine->cpu[CPU_B], MC68000_IRQ_6, HOLD_LINE );
+			cpu_set_input_line(space->machine->cpu[CPU_B], M68K_IRQ_6, HOLD_LINE );
 
 		coin_counter_w( 0, twin16_CPUA_register&0x01 );
 		coin_counter_w( 1, twin16_CPUA_register&0x02 );
@@ -185,7 +185,7 @@ static WRITE16_HANDLER( twin16_CPUB_register_w )
 	{
 		if( (old&0x01)==0 && (twin16_CPUB_register&0x1) )
 		{
-			cpu_set_input_line(space->machine->cpu[CPU_A], MC68000_IRQ_6, HOLD_LINE );
+			cpu_set_input_line(space->machine->cpu[CPU_A], M68K_IRQ_6, HOLD_LINE );
 		}
 	}
 }

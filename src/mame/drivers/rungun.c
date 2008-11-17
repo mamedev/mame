@@ -162,7 +162,7 @@ static WRITE16_HANDLER( rng_sysregs_w )
 			}
 
 			if (!(data & 0x40))
-				cpu_set_input_line(space->machine->cpu[0], MC68000_IRQ_5, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[0], M68K_IRQ_5, CLEAR_LINE);
 		break;
 
 		case 0x0c/2:
@@ -206,7 +206,7 @@ static READ16_HANDLER( sound_status_msb_r )
 static INTERRUPT_GEN(rng_interrupt)
 {
 	if (rng_sysreg[0x0c/2] & 0x09)
-		cpu_set_input_line(device, MC68000_IRQ_5, ASSERT_LINE);
+		cpu_set_input_line(device, M68K_IRQ_5, ASSERT_LINE);
 }
 
 static ADDRESS_MAP_START( rngreadmem, ADDRESS_SPACE_PROGRAM, 16 )

@@ -492,22 +492,12 @@ static const struct
 #if (HAS_KONAMI)
 	{ CPU_KONAMI, CPU_GET_INFO_NAME(konami) },
 #endif
-#if (HAS_M68000)
+#if (HAS_M680X0)
 	{ CPU_M68000, CPU_GET_INFO_NAME(m68000) },
-#endif
-#if (HAS_M68008)
 	{ CPU_M68008, CPU_GET_INFO_NAME(m68008) },
-#endif
-#if (HAS_M68010)
 	{ CPU_M68010, CPU_GET_INFO_NAME(m68010) },
-#endif
-#if (HAS_M68EC020)
 	{ CPU_M68EC020, CPU_GET_INFO_NAME(m68ec020) },
-#endif
-#if (HAS_M68020)
 	{ CPU_M68020, CPU_GET_INFO_NAME(m68020) },
-#endif
-#if (HAS_M68040)
 	{ CPU_M68040, CPU_GET_INFO_NAME(m68040) },
 #endif
 #if (HAS_T11)

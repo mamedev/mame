@@ -259,6 +259,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 M68KMAKE_OPCODE_HANDLER_HEADER
 
 #include "m68kcpu.h"
+#include "mame.h"
 extern void m68040_fpu_op0(m68ki_cpu_core *m68k);
 extern void m68040_fpu_op1(m68ki_cpu_core *m68k);
 
@@ -3119,7 +3120,8 @@ M68KMAKE_OP(bkpt, 0, ., .)
 {
 	if(CPU_TYPE_IS_010_PLUS(m68k->cpu_type))
 	{
-		(*m68k->bkpt_ack_callback)(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type) ? m68k->ir & 7 : 0);
+		if (m68k->bkpt_ack_callback != NULL)
+			(*m68k->bkpt_ack_callback)(m68k->device, CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type) ? m68k->ir & 7 : 0);
 	}
 	m68ki_exception_illegal(m68k);
 }
@@ -3283,9 +3285,8 @@ M68KMAKE_OP(callm, 32, ., .)
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
 		REG_PC += 2;
 (void)ea;	/* just to avoid an 'unused variable' warning */
-		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
-					 m68k_disassemble_quick(REG_PC - 2)));
+		logerror("%s at %08x: called unimplemented instruction %04x (callm)\n",
+					 m68k->device->tag, REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_illegal(m68k);
@@ -4221,7 +4222,8 @@ M68KMAKE_OP(cmpi, 32, ., d)
 	UINT32 dst = DY;
 	UINT32 res = dst - src;
 
-	(*m68k->cmpild_instr_callback)(src, m68k->ir & 7);		   /* auto-disable (see m68kcpu.h) */
+	if (m68k->cmpild_instr_callback != NULL)
+		(*m68k->cmpild_instr_callback)(m68k->device, src, m68k->ir & 7);
 
 	m68k->n_flag = NFLAG_32(res);
 	m68k->not_z_flag = MASK_OUT_ABOVE_32(res);
@@ -4361,9 +4363,8 @@ M68KMAKE_OP(cpbcc, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
-		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
-					 m68k_disassemble_quick(REG_PC - 2)));
+		logerror( "%s at %08x: called unimplemented instruction %04x (cpbcc)\n",
+					 m68k->device->tag, REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4374,9 +4375,8 @@ M68KMAKE_OP(cpdbcc, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
-		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
-					 m68k_disassemble_quick(REG_PC - 2)));
+		logerror("%s at %08x: called unimplemented instruction %04x (cpdbcc)\n",
+					 m68k->device->tag, REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4387,9 +4387,8 @@ M68KMAKE_OP(cpgen, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
-		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
-					 m68k_disassemble_quick(REG_PC - 2)));
+		logerror("%s at %08x: called unimplemented instruction %04x (cpgen)\n",
+					 m68k->device->tag, REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4400,9 +4399,8 @@ M68KMAKE_OP(cpscc, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
-		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
-					 m68k_disassemble_quick(REG_PC - 2)));
+		logerror("%s at %08x: called unimplemented instruction %04x (cpscc)\n",
+					 m68k->device->tag, REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4413,9 +4411,8 @@ M68KMAKE_OP(cptrapcc, 32, ., .)
 {
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
-		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
-					 m68k_disassemble_quick(REG_PC - 2)));
+		logerror("%s at %08x: called unimplemented instruction %04x (cptrapcc)\n",
+					 m68k->device->tag, REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_1111(m68k);
@@ -4603,8 +4600,6 @@ M68KMAKE_OP(divu, 16, ., .)
 
 M68KMAKE_OP(divl, 32, ., d)
 {
-#if M68K_USE_64_BIT
-
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		UINT32 word2 = OPER_I_16(m68k);
@@ -4670,152 +4665,11 @@ M68KMAKE_OP(divl, 32, ., d)
 		return;
 	}
 	m68ki_exception_illegal(m68k);
-
-#else
-
-	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
-	{
-		UINT32 word2 = OPER_I_16(m68k);
-		UINT32 divisor = DY;
-		UINT32 dividend_hi = REG_D[word2 & 7];
-		UINT32 dividend_lo = REG_D[(word2 >> 12) & 7];
-		UINT32 quotient = 0;
-		UINT32 remainder = 0;
-		UINT32 dividend_neg = 0;
-		UINT32 divisor_neg = 0;
-		INT32 i;
-		UINT32 overflow;
-
-		if(divisor != 0)
-		{
-			/* quad / long : long quotient, long remainder */
-			if(BIT_A(word2))
-			{
-				if(BIT_B(word2))	   /* signed */
-				{
-					/* special case in signed divide */
-					if(dividend_hi == 0 && dividend_lo == 0x80000000 && divisor == 0xffffffff)
-					{
-						REG_D[word2 & 7] = 0;
-						REG_D[(word2 >> 12) & 7] = 0x80000000;
-
-						m68k->n_flag = NFLAG_SET;
-						m68k->not_z_flag = ZFLAG_CLEAR;
-						m68k->v_flag = VFLAG_CLEAR;
-						m68k->c_flag = CFLAG_CLEAR;
-						return;
-					}
-					if(GET_MSB_32(dividend_hi))
-					{
-						dividend_neg = 1;
-						dividend_hi = (UINT32)MASK_OUT_ABOVE_32((-(INT32)dividend_hi) - (dividend_lo != 0));
-						dividend_lo = (UINT32)MASK_OUT_ABOVE_32(-(INT32)dividend_lo);
-					}
-					if(GET_MSB_32(divisor))
-					{
-						divisor_neg = 1;
-						divisor = (UINT32)MASK_OUT_ABOVE_32(-(INT32)divisor);
-
-					}
-				}
-
-				/* if the upper long is greater than the divisor, we're overflowing. */
-				if(dividend_hi >= divisor)
-				{
-					m68k->v_flag = VFLAG_SET;
-					return;
-				}
-
-				for(i = 31; i >= 0; i--)
-				{
-					quotient <<= 1;
-					remainder = (remainder << 1) + ((dividend_hi >> i) & 1);
-					if(remainder >= divisor)
-					{
-						remainder -= divisor;
-						quotient++;
-					}
-				}
-				for(i = 31; i >= 0; i--)
-				{
-					quotient <<= 1;
-					overflow = GET_MSB_32(remainder);
-					remainder = (remainder << 1) + ((dividend_lo >> i) & 1);
-					if(remainder >= divisor || overflow)
-					{
-						remainder -= divisor;
-						quotient++;
-					}
-				}
-
-				if(BIT_B(word2))	   /* signed */
-				{
-					if(quotient > 0x7fffffff)
-					{
-						m68k->v_flag = VFLAG_SET;
-						return;
-					}
-					if(dividend_neg)
-					{
-						remainder = (UINT32)MASK_OUT_ABOVE_32(-(INT32)remainder);
-						quotient = (UINT32)MASK_OUT_ABOVE_32(-(INT32)quotient);
-					}
-					if(divisor_neg)
-						quotient = (UINT32)MASK_OUT_ABOVE_32(-(INT32)quotient);
-				}
-
-				REG_D[word2 & 7] = remainder;
-				REG_D[(word2 >> 12) & 7] = quotient;
-
-				m68k->n_flag = NFLAG_32(quotient);
-				m68k->not_z_flag = quotient;
-				m68k->v_flag = VFLAG_CLEAR;
-				m68k->c_flag = CFLAG_CLEAR;
-				return;
-			}
-
-			/* long / long: long quotient, maybe long remainder */
-			if(BIT_B(word2))	   /* signed */
-			{
-				/* Special case in divide */
-				if(dividend_lo == 0x80000000 && divisor == 0xffffffff)
-				{
-					m68k->n_flag = NFLAG_SET;
-					m68k->not_z_flag = ZFLAG_CLEAR;
-					m68k->v_flag = VFLAG_CLEAR;
-					m68k->c_flag = CFLAG_CLEAR;
-					REG_D[(word2 >> 12) & 7] = 0x80000000;
-					REG_D[word2 & 7] = 0;
-					return;
-				}
-				REG_D[word2 & 7] = MAKE_INT_32(dividend_lo) % MAKE_INT_32(divisor);
-				quotient = REG_D[(word2 >> 12) & 7] = MAKE_INT_32(dividend_lo) / MAKE_INT_32(divisor);
-			}
-			else
-			{
-				REG_D[word2 & 7] = MASK_OUT_ABOVE_32(dividend_lo) % MASK_OUT_ABOVE_32(divisor);
-				quotient = REG_D[(word2 >> 12) & 7] = MASK_OUT_ABOVE_32(dividend_lo) / MASK_OUT_ABOVE_32(divisor);
-			}
-
-			m68k->n_flag = NFLAG_32(quotient);
-			m68k->not_z_flag = quotient;
-			m68k->v_flag = VFLAG_CLEAR;
-			m68k->c_flag = CFLAG_CLEAR;
-			return;
-		}
-		m68ki_exception_trap(m68k, EXCEPTION_ZERO_DIVIDE);
-		return;
-	}
-	m68ki_exception_illegal(m68k);
-
-#endif
 }
 
 
 M68KMAKE_OP(divl, 32, ., .)
 {
-#if M68K_USE_64_BIT
-
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		UINT32 word2 = OPER_I_16(m68k);
@@ -4881,145 +4735,6 @@ M68KMAKE_OP(divl, 32, ., .)
 		return;
 	}
 	m68ki_exception_illegal(m68k);
-
-#else
-
-	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
-	{
-		UINT32 word2 = OPER_I_16(m68k);
-		UINT32 divisor = M68KMAKE_GET_OPER_AY_32;
-		UINT32 dividend_hi = REG_D[word2 & 7];
-		UINT32 dividend_lo = REG_D[(word2 >> 12) & 7];
-		UINT32 quotient = 0;
-		UINT32 remainder = 0;
-		UINT32 dividend_neg = 0;
-		UINT32 divisor_neg = 0;
-		INT32 i;
-		UINT32 overflow;
-
-		if(divisor != 0)
-		{
-			/* quad / long : long quotient, long remainder */
-			if(BIT_A(word2))
-			{
-				if(BIT_B(word2))	   /* signed */
-				{
-					/* special case in signed divide */
-					if(dividend_hi == 0 && dividend_lo == 0x80000000 && divisor == 0xffffffff)
-					{
-						REG_D[word2 & 7] = 0;
-						REG_D[(word2 >> 12) & 7] = 0x80000000;
-
-						m68k->n_flag = NFLAG_SET;
-						m68k->not_z_flag = ZFLAG_CLEAR;
-						m68k->v_flag = VFLAG_CLEAR;
-						m68k->c_flag = CFLAG_CLEAR;
-						return;
-					}
-					if(GET_MSB_32(dividend_hi))
-					{
-						dividend_neg = 1;
-						dividend_hi = (UINT32)MASK_OUT_ABOVE_32((-(INT32)dividend_hi) - (dividend_lo != 0));
-						dividend_lo = (UINT32)MASK_OUT_ABOVE_32(-(INT32)dividend_lo);
-					}
-					if(GET_MSB_32(divisor))
-					{
-						divisor_neg = 1;
-						divisor = (UINT32)MASK_OUT_ABOVE_32(-(INT32)divisor);
-
-					}
-				}
-
-				/* if the upper long is greater than the divisor, we're overflowing. */
-				if(dividend_hi >= divisor)
-				{
-					m68k->v_flag = VFLAG_SET;
-					return;
-				}
-
-				for(i = 31; i >= 0; i--)
-				{
-					quotient <<= 1;
-					remainder = (remainder << 1) + ((dividend_hi >> i) & 1);
-					if(remainder >= divisor)
-					{
-						remainder -= divisor;
-						quotient++;
-					}
-				}
-				for(i = 31; i >= 0; i--)
-				{
-					quotient <<= 1;
-					overflow = GET_MSB_32(remainder);
-					remainder = (remainder << 1) + ((dividend_lo >> i) & 1);
-					if(remainder >= divisor || overflow)
-					{
-						remainder -= divisor;
-						quotient++;
-					}
-				}
-
-				if(BIT_B(word2))	   /* signed */
-				{
-					if(quotient > 0x7fffffff)
-					{
-						m68k->v_flag = VFLAG_SET;
-						return;
-					}
-					if(dividend_neg)
-					{
-						remainder = (UINT32)MASK_OUT_ABOVE_32(-(INT32)remainder);
-						quotient = (UINT32)MASK_OUT_ABOVE_32(-(INT32)quotient);
-					}
-					if(divisor_neg)
-						quotient = (UINT32)MASK_OUT_ABOVE_32(-(INT32)quotient);
-				}
-
-				REG_D[word2 & 7] = remainder;
-				REG_D[(word2 >> 12) & 7] = quotient;
-
-				m68k->n_flag = NFLAG_32(quotient);
-				m68k->not_z_flag = quotient;
-				m68k->v_flag = VFLAG_CLEAR;
-				m68k->c_flag = CFLAG_CLEAR;
-				return;
-			}
-
-			/* long / long: long quotient, maybe long remainder */
-			if(BIT_B(word2))	   /* signed */
-			{
-				/* Special case in divide */
-				if(dividend_lo == 0x80000000 && divisor == 0xffffffff)
-				{
-					m68k->n_flag = NFLAG_SET;
-					m68k->not_z_flag = ZFLAG_CLEAR;
-					m68k->v_flag = VFLAG_CLEAR;
-					m68k->c_flag = CFLAG_CLEAR;
-					REG_D[(word2 >> 12) & 7] = 0x80000000;
-					REG_D[word2 & 7] = 0;
-					return;
-				}
-				REG_D[word2 & 7] = MAKE_INT_32(dividend_lo) % MAKE_INT_32(divisor);
-				quotient = REG_D[(word2 >> 12) & 7] = MAKE_INT_32(dividend_lo) / MAKE_INT_32(divisor);
-			}
-			else
-			{
-				REG_D[word2 & 7] = MASK_OUT_ABOVE_32(dividend_lo) % MASK_OUT_ABOVE_32(divisor);
-				quotient = REG_D[(word2 >> 12) & 7] = MASK_OUT_ABOVE_32(dividend_lo) / MASK_OUT_ABOVE_32(divisor);
-			}
-
-			m68k->n_flag = NFLAG_32(quotient);
-			m68k->not_z_flag = quotient;
-			m68k->v_flag = VFLAG_CLEAR;
-			m68k->c_flag = CFLAG_CLEAR;
-			return;
-		}
-		m68ki_exception_trap(m68k, EXCEPTION_ZERO_DIVIDE);
-		return;
-	}
-	m68ki_exception_illegal(m68k);
-
-#endif
 }
 
 
@@ -7541,8 +7256,6 @@ M68KMAKE_OP(mulu, 16, ., .)
 
 M68KMAKE_OP(mull, 32, ., d)
 {
-#if M68K_USE_64_BIT
-
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		UINT32 word2 = OPER_I_16(m68k);
@@ -7588,85 +7301,11 @@ M68KMAKE_OP(mull, 32, ., d)
 		return;
 	}
 	m68ki_exception_illegal(m68k);
-
-#else
-
-	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
-	{
-		UINT32 word2 = OPER_I_16(m68k);
-		UINT32 src = DY;
-		UINT32 dst = REG_D[(word2 >> 12) & 7];
-		UINT32 neg = GET_MSB_32(src ^ dst);
-		UINT32 src1;
-		UINT32 src2;
-		UINT32 dst1;
-		UINT32 dst2;
-		UINT32 r1;
-		UINT32 r2;
-		UINT32 r3;
-		UINT32 r4;
-		UINT32 lo;
-		UINT32 hi;
-
-		m68k->c_flag = CFLAG_CLEAR;
-
-		if(BIT_B(word2))			   /* signed */
-		{
-			if(GET_MSB_32(src))
-				src = (UINT32)MASK_OUT_ABOVE_32(-(INT32)src);
-			if(GET_MSB_32(dst))
-				dst = (UINT32)MASK_OUT_ABOVE_32(-(INT32)dst);
-		}
-
-		src1 = MASK_OUT_ABOVE_16(src);
-		src2 = src>>16;
-		dst1 = MASK_OUT_ABOVE_16(dst);
-		dst2 = dst>>16;
-
-
-		r1 = src1 * dst1;
-		r2 = src1 * dst2;
-		r3 = src2 * dst1;
-		r4 = src2 * dst2;
-
-		lo = r1 + (MASK_OUT_ABOVE_16(r2)<<16) + (MASK_OUT_ABOVE_16(r3)<<16);
-		hi = r4 + (r2>>16) + (r3>>16) + (((r1>>16) + MASK_OUT_ABOVE_16(r2) + MASK_OUT_ABOVE_16(r3)) >> 16);
-
-		if(BIT_B(word2) && neg)
-		{
-			hi = (UINT32)MASK_OUT_ABOVE_32((-(INT32)hi) - (lo != 0));
-			lo = (UINT32)MASK_OUT_ABOVE_32(-(INT32)lo);
-		}
-
-		if(BIT_A(word2))
-		{
-			REG_D[word2 & 7] = hi;
-			REG_D[(word2 >> 12) & 7] = lo;
-			m68k->n_flag = NFLAG_32(hi);
-			m68k->not_z_flag = hi | lo;
-			m68k->v_flag = VFLAG_CLEAR;
-			return;
-		}
-
-		REG_D[(word2 >> 12) & 7] = lo;
-		m68k->n_flag = NFLAG_32(lo);
-		m68k->not_z_flag = lo;
-		if(BIT_B(word2))
-			m68k->v_flag = (!((GET_MSB_32(lo) && hi == 0xffffffff) || (!GET_MSB_32(lo) && !hi)))<<7;
-		else
-			m68k->v_flag = (hi != 0) << 7;
-		return;
-	}
-	m68ki_exception_illegal(m68k);
-
-#endif
 }
 
 
 M68KMAKE_OP(mull, 32, ., .)
 {
-#if M68K_USE_64_BIT
-
 	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
 	{
 		UINT32 word2 = OPER_I_16(m68k);
@@ -7712,78 +7351,6 @@ M68KMAKE_OP(mull, 32, ., .)
 		return;
 	}
 	m68ki_exception_illegal(m68k);
-
-#else
-
-	if(CPU_TYPE_IS_EC020_PLUS(m68k->cpu_type))
-	{
-		UINT32 word2 = OPER_I_16(m68k);
-		UINT32 src = M68KMAKE_GET_OPER_AY_32;
-		UINT32 dst = REG_D[(word2 >> 12) & 7];
-		UINT32 neg = GET_MSB_32(src ^ dst);
-		UINT32 src1;
-		UINT32 src2;
-		UINT32 dst1;
-		UINT32 dst2;
-		UINT32 r1;
-		UINT32 r2;
-		UINT32 r3;
-		UINT32 r4;
-		UINT32 lo;
-		UINT32 hi;
-
-		m68k->c_flag = CFLAG_CLEAR;
-
-		if(BIT_B(word2))			   /* signed */
-		{
-			if(GET_MSB_32(src))
-				src = (UINT32)MASK_OUT_ABOVE_32(-(INT32)src);
-			if(GET_MSB_32(dst))
-				dst = (UINT32)MASK_OUT_ABOVE_32(-(INT32)dst);
-		}
-
-		src1 = MASK_OUT_ABOVE_16(src);
-		src2 = src>>16;
-		dst1 = MASK_OUT_ABOVE_16(dst);
-		dst2 = dst>>16;
-
-
-		r1 = src1 * dst1;
-		r2 = src1 * dst2;
-		r3 = src2 * dst1;
-		r4 = src2 * dst2;
-
-		lo = r1 + (MASK_OUT_ABOVE_16(r2)<<16) + (MASK_OUT_ABOVE_16(r3)<<16);
-		hi = r4 + (r2>>16) + (r3>>16) + (((r1>>16) + MASK_OUT_ABOVE_16(r2) + MASK_OUT_ABOVE_16(r3)) >> 16);
-
-		if(BIT_B(word2) && neg)
-		{
-			hi = (UINT32)MASK_OUT_ABOVE_32((-(INT32)hi) - (lo != 0));
-			lo = (UINT32)MASK_OUT_ABOVE_32(-(INT32)lo);
-		}
-
-		if(BIT_A(word2))
-		{
-			REG_D[word2 & 7] = hi;
-			REG_D[(word2 >> 12) & 7] = lo;
-			m68k->n_flag = NFLAG_32(hi);
-			m68k->not_z_flag = hi | lo;
-			m68k->v_flag = VFLAG_CLEAR;
-			return;
-		}
-
-		REG_D[(word2 >> 12) & 7] = lo;
-		m68k->n_flag = NFLAG_32(lo);
-		m68k->not_z_flag = lo;
-		if(BIT_B(word2))
-			m68k->v_flag = (!((GET_MSB_32(lo) && hi == 0xffffffff) || (!GET_MSB_32(lo) && !hi)))<<7;
-		else
-			m68k->v_flag = (hi != 0) << 7;
-		return;
-	}
-	m68ki_exception_illegal(m68k);
-
-#endif
 }
 
 
@@ -8437,7 +8004,8 @@ M68KMAKE_OP(reset, 0, ., .)
 {
 	if(m68k->s_flag)
 	{
-		(*m68k->reset_instr_callback)();
+		if (m68k->reset_instr_callback != NULL)
+			(*m68k->reset_instr_callback)(m68k->device);
 		USE_CYCLES(m68k, m68k->cyc_reset);
 		return;
 	}
@@ -8814,8 +8382,6 @@ M68KMAKE_OP(roxr, 16, s, .)
 
 M68KMAKE_OP(roxr, 32, s, .)
 {
-#if M68K_USE_64_BIT
-
 	UINT32*  r_dst = &DY;
 	UINT32   shift = (((m68k->ir >> 9) - 1) & 7) + 1;
 	UINT64 src   = *r_dst;
@@ -8834,26 +8400,6 @@ M68KMAKE_OP(roxr, 32, s, .)
 	m68k->n_flag = NFLAG_32(res);
 	m68k->not_z_flag = res;
 	m68k->v_flag = VFLAG_CLEAR;
-
-#else
-
-	UINT32* r_dst = &DY;
-	UINT32 shift = (((m68k->ir >> 9) - 1) & 7) + 1;
-	UINT32 src = *r_dst;
-	UINT32 res = MASK_OUT_ABOVE_32((ROR_33(src, shift) & ~(1 << (32 - shift))) | (XFLAG_AS_1(m68k) << (32 - shift)));
-	UINT32 new_x_flag = src & (1 << (shift - 1));
-
-	if(shift != 0)
-		USE_CYCLES(m68k, shift<<m68k->cyc_shift);
-
-	*r_dst = res;
-
-	m68k->c_flag = m68k->x_flag = (new_x_flag != 0)<<8;
-	m68k->n_flag = NFLAG_32(res);
-	m68k->not_z_flag = res;
-	m68k->v_flag = VFLAG_CLEAR;
-
-#endif
 }
 
 
@@ -8919,8 +8465,6 @@ M68KMAKE_OP(roxr, 16, r, .)
 
 M68KMAKE_OP(roxr, 32, r, .)
 {
-#if M68K_USE_64_BIT
-
 	UINT32*  r_dst = &DY;
 	UINT32   orig_shift = DX & 0x3f;
 
@@ -8948,32 +8492,6 @@ M68KMAKE_OP(roxr, 32, r, .)
 	m68k->n_flag = NFLAG_32(*r_dst);
 	m68k->not_z_flag = *r_dst;
 	m68k->v_flag = VFLAG_CLEAR;
-
-#else
-
-	UINT32* r_dst = &DY;
-	UINT32 orig_shift = DX & 0x3f;
-	UINT32 shift = orig_shift % 33;
-	UINT32 src = *r_dst;
-	UINT32 res = MASK_OUT_ABOVE_32((ROR_33(src, shift) & ~(1 << (32 - shift))) | (XFLAG_AS_1(m68k) << (32 - shift)));
-	UINT32 new_x_flag = src & (1 << (shift - 1));
-
-	if(orig_shift != 0)
-		USE_CYCLES(m68k, orig_shift<<m68k->cyc_shift);
-
-	if(shift != 0)
-	{
-		*r_dst = res;
-		m68k->x_flag = (new_x_flag != 0)<<8;
-	}
-	else
-		res = src;
-	m68k->c_flag = m68k->x_flag;
-	m68k->n_flag = NFLAG_32(res);
-	m68k->not_z_flag = res;
-	m68k->v_flag = VFLAG_CLEAR;
-
-#endif
 }
 
 
@@ -9038,8 +8556,6 @@ M68KMAKE_OP(roxl, 16, s, .)
 
 M68KMAKE_OP(roxl, 32, s, .)
 {
-#if M68K_USE_64_BIT
-
 	UINT32*  r_dst = &DY;
 	UINT32   shift = (((m68k->ir >> 9) - 1) & 7) + 1;
 	UINT64 src   = *r_dst;
@@ -9058,26 +8574,6 @@ M68KMAKE_OP(roxl, 32, s, .)
 	m68k->n_flag = NFLAG_32(res);
 	m68k->not_z_flag = res;
 	m68k->v_flag = VFLAG_CLEAR;
-
-#else
-
-	UINT32* r_dst = &DY;
-	UINT32 shift = (((m68k->ir >> 9) - 1) & 7) + 1;
-	UINT32 src = *r_dst;
-	UINT32 res = MASK_OUT_ABOVE_32((ROL_33(src, shift) & ~(1 << (shift - 1))) | (XFLAG_AS_1(m68k) << (shift - 1)));
-	UINT32 new_x_flag = src & (1 << (32 - shift));
-
-	if(shift != 0)
-		USE_CYCLES(m68k, shift<<m68k->cyc_shift);
-
-	*r_dst = res;
-
-	m68k->c_flag = m68k->x_flag = (new_x_flag != 0)<<8;
-	m68k->n_flag = NFLAG_32(res);
-	m68k->not_z_flag = res;
-	m68k->v_flag = VFLAG_CLEAR;
-
-#endif
 }
 
 
@@ -9144,8 +8640,6 @@ M68KMAKE_OP(roxl, 16, r, .)
 
 M68KMAKE_OP(roxl, 32, r, .)
 {
-#if M68K_USE_64_BIT
-
 	UINT32*  r_dst = &DY;
 	UINT32   orig_shift = DX & 0x3f;
 
@@ -9173,32 +8667,6 @@ M68KMAKE_OP(roxl, 32, r, .)
 	m68k->n_flag = NFLAG_32(*r_dst);
 	m68k->not_z_flag = *r_dst;
 	m68k->v_flag = VFLAG_CLEAR;
-
-#else
-
-	UINT32* r_dst = &DY;
-	UINT32 orig_shift = DX & 0x3f;
-	UINT32 shift = orig_shift % 33;
-	UINT32 src = *r_dst;
-	UINT32 res = MASK_OUT_ABOVE_32((ROL_33(src, shift) & ~(1 << (shift - 1))) | (XFLAG_AS_1(m68k) << (shift - 1)));
-	UINT32 new_x_flag = src & (1 << (32 - shift));
-
-	if(orig_shift != 0)
-		USE_CYCLES(m68k, orig_shift<<m68k->cyc_shift);
-
-	if(shift != 0)
-	{
-		*r_dst = res;
-		m68k->x_flag = (new_x_flag != 0)<<8;
-	}
-	else
-		res = src;
-	m68k->c_flag = m68k->x_flag;
-	m68k->n_flag = NFLAG_32(res);
-	m68k->not_z_flag = res;
-	m68k->v_flag = VFLAG_CLEAR;
-
-#endif
 }
 
 
@@ -9242,7 +8710,8 @@ M68KMAKE_OP(rte, 32, ., .)
 		UINT32 new_pc;
 		UINT32 format_word;
 
-		(*m68k->rte_instr_callback)();
+		if (m68k->rte_instr_callback != NULL)
+			(*m68k->rte_instr_callback)(m68k->device);
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
 
 		if(CPU_TYPE_IS_000(m68k->cpu_type))
@@ -9325,9 +8794,8 @@ M68KMAKE_OP(rtm, 32, ., .)
 	if(CPU_TYPE_IS_020_VARIANT(m68k->cpu_type))
 	{
 		m68ki_trace_t0();			   /* auto-disable (see m68kcpu.h) */
-		M68K_DO_LOG((M68K_LOG_FILEHANDLE "%s at %08x: called unimplemented instruction %04x (%s)\n",
-					 m68ki_cpu_get_names[m68k->cpu_type], REG_PC - 2, m68k->ir,
-					 m68k_disassemble_quick(REG_PC - 2)));
+		logerror("%s at %08x: called unimplemented instruction %04x (rtm)\n",
+					 m68k->device->tag, REG_PC - 2, m68k->ir);
 		return;
 	}
 	m68ki_exception_illegal(m68k);
@@ -10192,7 +9660,7 @@ M68KMAKE_OP(tas, 8, ., .)
 {
 	UINT32 ea = M68KMAKE_GET_EA_AY_8;
 	UINT32 dst = m68ki_read_8(m68k, ea);
-	UINT32 allow_writeback;
+	UINT32 allow_writeback = TRUE;
 
 	m68k->not_z_flag = dst;
 	m68k->n_flag = NFLAG_8(dst);
@@ -10203,9 +9671,11 @@ M68KMAKE_OP(tas, 8, ., .)
        disabled in order to function properly.  Some Amiga software may also rely
        on this, but only when accessing specific addresses so additional functionality
        will be needed. */
-	allow_writeback = (*m68k->tas_instr_callback)();
+	if (m68k->tas_instr_callback != NULL)
+		allow_writeback = (*m68k->tas_instr_callback)(m68k->device);
 
-	if (allow_writeback==1) m68ki_write_8(m68k, ea, dst | 0x80);
+	if (allow_writeback)
+		m68ki_write_8(m68k, ea, dst | 0x80);
 }
 
 

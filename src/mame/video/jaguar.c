@@ -329,9 +329,9 @@ void jaguar_gpu_resume(running_machine *machine)
 static void update_cpu_irq(running_machine *machine)
 {
 	if (cpu_irq_state & gpu_regs[INT1] & 0x1f)
-		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : MC68000_IRQ_6, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : MC68000_IRQ_6, CLEAR_LINE);
+		cpu_set_input_line(machine->cpu[0], cojag_is_r3000 ? R3000_IRQ4 : M68K_IRQ_6, CLEAR_LINE);
 }
 
 

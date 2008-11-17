@@ -30,7 +30,7 @@
 #include <string.h>
 
 #define m68ki_cpu_core void
-#include "m68k.h"
+#include "m68000.h"
 
 #ifndef DECL_SPEC
 #define DECL_SPEC

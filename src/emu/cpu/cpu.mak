@@ -1097,16 +1097,11 @@ $(CPUOBJ)/mc68hc11/mc68hc11.o:	$(CPUSRC)/mc68hc11/mc68hc11.c \
 # Motorola 68000 series
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_M68000=$(if $(filter M68000,$(CPUS)),1,0)
-CPUDEFS += -DHAS_M68008=$(if $(filter M68008,$(CPUS)),1,0)
-CPUDEFS += -DHAS_M68010=$(if $(filter M68010,$(CPUS)),1,0)
-CPUDEFS += -DHAS_M68EC020=$(if $(filter M68EC020,$(CPUS)),1,0)
-CPUDEFS += -DHAS_M68020=$(if $(filter M68020,$(CPUS)),1,0)
-CPUDEFS += -DHAS_M68040=$(if $(filter M68040,$(CPUS)),1,0)
+CPUDEFS += -DHAS_M680X0=$(if $(filter M680X0,$(CPUS)),1,0)
 
-ifneq ($(filter M68000 M68008 M68010 M68EC020 M68020 M68040,$(CPUS)),)
+ifneq ($(filter M680X0,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/m68000
-CPUOBJS += $(CPUOBJ)/m68000/m68kcpu.o $(CPUOBJ)/m68000/m68kmame.o $(CPUOBJ)/m68000/m68kops.o
+CPUOBJS += $(CPUOBJ)/m68000/m68kcpu.o $(CPUOBJ)/m68000/m68kops.o
 DBGOBJS += $(CPUOBJ)/m68000/m68kdasm.o
 M68KMAKE = $(BUILDOUT)/m68kmake$(BUILD_EXE)
 endif
@@ -1138,9 +1133,6 @@ endif
 
 # rule to ensure we build the header before building the core CPU file
 $(CPUOBJ)/m68000/m68kcpu.o: 	$(CPUOBJ)/m68000/m68kops.c \
-								$(CPUSRC)/m68000/m68kcpu.h
-
-$(CPUOBJ)/m68000/m68kmame.o:	$(CPUSRC)/m68000/m68kmame.c \
 								$(CPUSRC)/m68000/m68kcpu.h
 
 

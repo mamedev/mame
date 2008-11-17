@@ -304,9 +304,9 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 }
 
 
-static void amiga_m68k_reset(void)
+static void amiga_m68k_reset(const device_config *device)
 {
-	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(space->cpu));
 
@@ -337,7 +337,7 @@ MACHINE_RESET( amiga )
 	/* set m68k reset  function */
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)amiga_m68k_reset);
 
-	amiga_m68k_reset();
+	amiga_m68k_reset(machine->cpu[0]);
 
 	/* call the system-specific callback */
 	if (amiga_intf->reset_callback)

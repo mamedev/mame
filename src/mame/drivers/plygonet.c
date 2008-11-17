@@ -156,7 +156,7 @@ static READ32_HANDLER( psac_rom_r )
 
 static INTERRUPT_GEN(polygonet_interrupt)
 {
-	cpu_set_input_line(device, MC68000_IRQ_5, HOLD_LINE);
+	cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 }
 
 /* sound CPU communications */

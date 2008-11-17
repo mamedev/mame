@@ -294,10 +294,10 @@ static WRITE16_HANDLER( batsugun_share2_w );
   Initialisation handlers
 ***************************************************************************/
 
-static void toaplan2_reset(void)
+static void toaplan2_reset(const device_config *device)
 {
-	if (Machine->cpu[1] != NULL)
-		cpu_set_input_line(Machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	if (device->machine->cpu[1] != NULL)
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 }
 
 static MACHINE_RESET( toaplan2 )

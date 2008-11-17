@@ -1,4 +1,4 @@
-#include "cpuintrf.h"
+#include <math.h>
 
 #define FPCC_N			0x08000000
 #define FPCC_Z			0x04000000

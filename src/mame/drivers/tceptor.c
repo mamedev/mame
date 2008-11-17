@@ -81,7 +81,7 @@ static WRITE8_HANDLER( m6809_irq_disable_w )
 static INTERRUPT_GEN( m68k_vb_interrupt )
 {
 	if (m68k_irq_enable)
-		cpu_set_input_line(device, MC68000_IRQ_1, HOLD_LINE);
+		cpu_set_input_line(device, M68K_IRQ_1, HOLD_LINE);
 }
 
 static WRITE16_HANDLER( m68k_irq_enable_w )

@@ -17,6 +17,19 @@
 #define M68K_IRQ_6    6
 #define M68K_IRQ_7    7
 
+/* CPU types for use in m68k_set_cpu_type() */
+enum
+{
+	M68K_CPU_TYPE_INVALID,
+	M68K_CPU_TYPE_68000,
+	M68K_CPU_TYPE_68008,
+	M68K_CPU_TYPE_68010,
+	M68K_CPU_TYPE_68EC020,
+	M68K_CPU_TYPE_68020,
+	M68K_CPU_TYPE_68030,	/* Supported by disassembler ONLY */
+	M68K_CPU_TYPE_68040		/* Supported by disassembler ONLY */
+};
+
 
 /* Special interrupt acknowledge values.
  * Use these as special returns from the interrupt acknowledge callback
@@ -52,135 +65,22 @@ enum
 	CPUINFO_PTR_M68K_TAS_CALLBACK
 };
 
-/* Redirect memory calls */
+typedef void (*m68k_bkpt_ack_func)(const device_config *device, UINT32 data);
+typedef void (*m68k_reset_func)(const device_config *device);
+typedef void (*m68k_cmpild_func)(const device_config *device, UINT32 data, UINT8 reg);
+typedef void (*m68k_rte_func)(const device_config *device);
+typedef int (*m68k_tas_func)(const device_config *device);
 
-typedef struct _m68k_memory_interface m68k_memory_interface;
-struct _m68k_memory_interface
-{
-	offs_t	opcode_xor;						// Address Calculation
-	UINT16	(*readimm16)(const address_space *, offs_t);			// Immediate read 16 bit
-	UINT8	(*read8)(const address_space *, offs_t);				// Normal read 8 bit
-	UINT16	(*read16)(const address_space *, offs_t);				// Normal read 16 bit
-	UINT32	(*read32)(const address_space *, offs_t);				// Normal read 32 bit
-	void	(*write8)(const address_space *, offs_t, UINT8);		// Write 8 bit
-	void	(*write16)(const address_space *, offs_t, UINT16);		// Write 16 bit
-	void	(*write32)(const address_space *, offs_t, UINT32);		// Write 32 bit
-};
-
-
-typedef struct _m68k_encryption_interface m68k_encryption_interface;
-struct _m68k_encryption_interface
-{
-	UINT8	(*read8pc)(offs_t);				// PC Relative read 8 bit
-	UINT16	(*read16pc)(offs_t);			// PC Relative read 16 bit
-	UINT32	(*read32pc)(offs_t);			// PC Relative read 32 bit
-
-	UINT16	(*read16d)(offs_t);				// Direct read 16 bit
-	UINT32	(*read32d)(offs_t);				// Direct read 32 bit
-};
-
-/* The MAME API for MC68000 */
-
-#define MC68000_IRQ_1    1
-#define MC68000_IRQ_2    2
-#define MC68000_IRQ_3    3
-#define MC68000_IRQ_4    4
-#define MC68000_IRQ_5    5
-#define MC68000_IRQ_6    6
-#define MC68000_IRQ_7    7
-
-#define MC68000_INT_ACK_AUTOVECTOR    -1
-#define MC68000_INT_ACK_SPURIOUS      -2
 
 CPU_GET_INFO( m68000 );
-extern void m68000_memory_interface_set(int Entry,void * memory_routine);
-
-/****************************************************************************
- * M68008 section
- ****************************************************************************/
-#if HAS_M68008
-#define MC68008_IRQ_1					MC68000_IRQ_1
-#define MC68008_IRQ_2					MC68000_IRQ_2
-#define MC68008_IRQ_3					MC68000_IRQ_3
-#define MC68008_IRQ_4					MC68000_IRQ_4
-#define MC68008_IRQ_5					MC68000_IRQ_5
-#define MC68008_IRQ_6					MC68000_IRQ_6
-#define MC68008_IRQ_7					MC68000_IRQ_7
-#define MC68008_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
-#define MC68008_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
-
 CPU_GET_INFO( m68008 );
-#endif
-
-/****************************************************************************
- * M68010 section
- ****************************************************************************/
-#if HAS_M68010
-#define MC68010_IRQ_1					MC68000_IRQ_1
-#define MC68010_IRQ_2					MC68000_IRQ_2
-#define MC68010_IRQ_3					MC68000_IRQ_3
-#define MC68010_IRQ_4					MC68000_IRQ_4
-#define MC68010_IRQ_5					MC68000_IRQ_5
-#define MC68010_IRQ_6					MC68000_IRQ_6
-#define MC68010_IRQ_7					MC68000_IRQ_7
-#define MC68010_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
-#define MC68010_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
-
 CPU_GET_INFO( m68010 );
-#endif
-
-/****************************************************************************
- * M68EC020 section
- ****************************************************************************/
-#if HAS_M68EC020
-#define MC68EC020_IRQ_1					MC68000_IRQ_1
-#define MC68EC020_IRQ_2					MC68000_IRQ_2
-#define MC68EC020_IRQ_3					MC68000_IRQ_3
-#define MC68EC020_IRQ_4					MC68000_IRQ_4
-#define MC68EC020_IRQ_5					MC68000_IRQ_5
-#define MC68EC020_IRQ_6					MC68000_IRQ_6
-#define MC68EC020_IRQ_7					MC68000_IRQ_7
-#define MC68EC020_INT_ACK_AUTOVECTOR	MC68000_INT_ACK_AUTOVECTOR
-#define MC68EC020_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
-
 CPU_GET_INFO( m68ec020 );
-#endif
-
-/****************************************************************************
- * M68020 section
- ****************************************************************************/
-#if HAS_M68020
-#define MC68020_IRQ_1					MC68000_IRQ_1
-#define MC68020_IRQ_2					MC68000_IRQ_2
-#define MC68020_IRQ_3					MC68000_IRQ_3
-#define MC68020_IRQ_4					MC68000_IRQ_4
-#define MC68020_IRQ_5					MC68000_IRQ_5
-#define MC68020_IRQ_6					MC68000_IRQ_6
-#define MC68020_IRQ_7					MC68000_IRQ_7
-#define MC68020_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
-#define MC68020_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
-
 CPU_GET_INFO( m68020 );
-#endif
-
-/****************************************************************************
- * M68040 section
- ****************************************************************************/
-#if HAS_M68040
-#define MC68040_IRQ_1					MC68000_IRQ_1
-#define MC68040_IRQ_2					MC68000_IRQ_2
-#define MC68040_IRQ_3					MC68000_IRQ_3
-#define MC68040_IRQ_4					MC68000_IRQ_4
-#define MC68040_IRQ_5					MC68000_IRQ_5
-#define MC68040_IRQ_6					MC68000_IRQ_6
-#define MC68040_IRQ_7					MC68000_IRQ_7
-#define MC68040_INT_ACK_AUTOVECTOR		MC68000_INT_ACK_AUTOVECTOR
-#define MC68040_INT_ACK_SPURIOUS		MC68000_INT_ACK_SPURIOUS
-
 CPU_GET_INFO( m68040 );
-#endif
 
-// C Core header
-#include "m68kmame.h"
+void m68k_set_encrypted_opcode_range(const device_config *device, offs_t start, offs_t end);
+
+unsigned int m68k_disassemble_raw(char* str_buff, unsigned int pc, const unsigned char* opdata, const unsigned char* argdata, unsigned int cpu_type);
 
 #endif /* __M68000_H__ */

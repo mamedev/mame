@@ -141,9 +141,9 @@ static VIDEO_START( ddealer )
 	back_tilemap = tilemap_create(get_back_tile_info,tilemap_scan_cols,8,8,64,32);
 }
 
-static void ddealer_draw_video_layer( UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t* bitmap, const rectangle *cliprect, int flipy)
+static void ddealer_draw_video_layer( running_machine *machine, UINT16* vreg_base, UINT16* top, UINT16* bottom, bitmap_t* bitmap, const rectangle *cliprect, int flipy)
 {
-	const gfx_element *gfx = Machine->gfx[1];
+	const gfx_element *gfx = machine->gfx[1];
 
 	{
 		INT16 sx, sy;
@@ -244,24 +244,24 @@ static VIDEO_UPDATE( ddealer )
 	{
 		if (ddealer_vregs[0xcc/2] & 0x80)
 		{
-			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
-			ddealer_draw_video_layer(&ddealer_vregs[0xcc/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0xcc/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
 		}
 	}
 	else
 	{
 		if (ddealer_vregs[0xcc/2] & 0x80)
 		{
-			ddealer_draw_video_layer(&ddealer_vregs[0xcc/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
-			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0xcc/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0x1e0/2], right_fg_vram_top, right_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
 		}
 		else
 		{
-			ddealer_draw_video_layer(&ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
+			ddealer_draw_video_layer(screen->machine, &ddealer_vregs[0x1e0/2], left_fg_vram_top, left_fg_vram_bottom, bitmap, cliprect, ddealer_flipscreen);
 		}
 
 	}

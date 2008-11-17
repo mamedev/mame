@@ -111,7 +111,7 @@ the decryption keys.
 *******************************************************************************/
 
 #include "driver.h"
-#include "cpu/m68000/m68kmame.h"
+#include "cpu/m68000/m68000.h"
 #include "ui.h"
 #include "includes/cps1.h"
 

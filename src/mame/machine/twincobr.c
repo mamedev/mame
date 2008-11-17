@@ -34,7 +34,7 @@ INTERRUPT_GEN( twincobr_interrupt )
 {
 	if (twincobr_intenable) {
 		twincobr_intenable = 0;
-		cpu_set_input_line(device, MC68000_IRQ_4, HOLD_LINE);
+		cpu_set_input_line(device, M68K_IRQ_4, HOLD_LINE);
 	}
 }
 

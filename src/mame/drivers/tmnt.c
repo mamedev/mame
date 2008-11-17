@@ -168,12 +168,12 @@ static INTERRUPT_GEN(cuebrick_interrupt)
 	switch (cpu_getiloops(device))
 	{
 		case 0:
-			cpu_set_input_line(device, MC68000_IRQ_5, HOLD_LINE);
+			cpu_set_input_line(device, M68K_IRQ_5, HOLD_LINE);
 			break;
 
 		default:
 			if (cuebrick_snd_irqlatch)
-				cpu_set_input_line(device, MC68000_IRQ_6, HOLD_LINE);
+				cpu_set_input_line(device, M68K_IRQ_6, HOLD_LINE);
 			break;
 	}
 }

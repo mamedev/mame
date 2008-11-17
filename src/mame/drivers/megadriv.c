@@ -6421,7 +6421,7 @@ static IRQ_CALLBACK(genesis_int_callback)
 	return (0x60+irqline*4)/4; // vector address
 }
 
-static int megadriv_tas_callback(void)
+static int megadriv_tas_callback(const device_config *device)
 {
 	return 0; // writeback not allowed
 }

@@ -198,10 +198,10 @@ static READ8_HANDLER( sound_data_r )
  *
  *************************************/
 
-static void xboard_reset(void)
+static void xboard_reset(const device_config *device)
 {
-	cpu_set_input_line(Machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
-	cpuexec_boost_interleave(Machine, attotime_zero, ATTOTIME_IN_USEC(100));
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 
 
