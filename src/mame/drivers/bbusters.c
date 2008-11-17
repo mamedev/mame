@@ -182,6 +182,18 @@ If you calibrate the guns correctly the game runs as expected:
 2) Using P2 controls fire at the indicated spots.
 3) Using P3 controls fire at the indicated spots.
 
+---
+
+Beast Busters notes (from Brian Hargrove)
+
+1. Stage 2 for example, has background sprites and enemies that float on the
+foreground and not behind the moving elevator layer.
+
+2. Oddly enough, the emulation completely misses the huge zombie that jumps
+out during the attract demo right before the text story text comes in.
+When you hear the the high pitch "zing" sound, there should be a zombie nearly
+the entire size of the screen.
+
 
 ***************************************************************************/
 
@@ -267,26 +279,28 @@ static READ16_HANDLER( control_3_r )
 {
 	static const char *const port[] = { "GUNX1", "GUNY1", "GUNX2", "GUNY2", "GUNX3", "GUNY3" };
 
-	return input_port_read(space->machine, port[gun_select]);
+	UINT16 retdata =  input_port_read(space->machine, port[gun_select]);
+
+	retdata >>=1; // by lowering the precision of the gun reading hardware the game seems to work better
+
+	return retdata;
 }
 
 static WRITE16_HANDLER( gun_select_w )
 {
 	logerror("%08x: gun r\n",cpu_get_pc(space->cpu));
 
+	cpu_set_input_line(space->cpu, 2, HOLD_LINE);
+
+
 	gun_select = data & 0xff;
 }
 
 static READ16_HANDLER( kludge_r )
 {
-//  this is a hack...
-//	bbuster_ram[0xa692/2] = input_port_read(machine, "GUNX1")<<1;
-//	bbuster_ram[0xa694/2] = input_port_read(machine, "GUNY1")<<1;
-//	bbuster_ram[0xa696/2] = input_port_read(machine, "GUNX2")<<1;
-//	bbuster_ram[0xa698/2] = input_port_read(machine, "GUNY2")<<1;
-//	bbuster_ram[0xa69a/2] = input_port_read(machine, "GUNX3")<<1;
-//	bbuster_ram[0xa69c/2] = input_port_read(machine, "GUNY3")<<1;
-	return 0;
+	// might latch the gun value?
+	return 0x0000;
+
 }
 
 static READ16_HANDLER( mechatt_gun_r )
@@ -633,6 +647,27 @@ static const ym2610_interface ym2610_config =
 
 /******************************************************************************/
 
+// default eeprom with reasonable calibration for MAME
+unsigned char bbusters_default_eeprom[128] = {
+	                                    /*y*/                   /*y*/
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00, 0x00, 0x00, 0xEE, 0x00,
+	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,
+	                                    /*y*/                   /*y*/
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00,	0x00, 0x00, 0xEE, 0x00,
+	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,
+	                                    /*y*/                   /*y*/
+	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x74, 0x00,	0x00, 0x00, 0xEE, 0x00,
+	0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x7E, 0x00, 0x00, 0x00, 0xFE, 0x00,
+
+
+	0x42, 0x00, 0x45, 0x00, 0x41, 0x00, 0x53, 0x00,	0x54, 0x00, 0x20, 0x00,
+	0x42, 0x00, 0x55, 0x00, 0x53, 0x00, 0x54, 0x00, 0x45, 0x00, 0x52, 0x00,
+	0x53, 0x00, 0x20, 0x00, 0x54, 0x00, 0x4D, 0x00, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+	0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF
+};
+
+
 static NVRAM_HANDLER( bbusters )
 {
 	if( read_or_write ) {
@@ -642,16 +677,8 @@ static NVRAM_HANDLER( bbusters )
 		if (file)
 			mame_fread (file, eprom_data, 0x80);
 		else
-			memset (eprom_data, 0xff, 0x80);
+			memcpy(eprom_data, bbusters_default_eeprom, 0x80);
 	}
-}
-
-static INTERRUPT_GEN( bbuster )
-{
-	if (cpu_getiloops(device)==0)
-		cpu_set_input_line(device, 6, HOLD_LINE); /* VBL */
-	else
-		cpu_set_input_line(device, 2, HOLD_LINE); /* at least 6 interrupts per frame to read gun controls */
 }
 
 static VIDEO_EOF( bbuster )
@@ -673,7 +700,7 @@ static MACHINE_DRIVER_START( bbusters )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bbuster_map,0)
-	MDRV_CPU_VBLANK_INT_HACK(bbuster,4)
+	MDRV_CPU_VBLANK_INT("main", irq6_line_hold)
 
 	MDRV_CPU_ADD("audio", Z80,4000000) /* Accurate */
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
@@ -833,7 +860,7 @@ ROM_START( bbusteru )
 	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 
 	ROM_REGION( 0x80000, "ym.deltat", 0 )
-	ROM_LOAD( "bb-pcmb.l3",  0x000000, 0x80000, CRC(c8d5dd53) SHA1(0f7e94532cc14852ca12c1b792e5479667af899e) )
+	ROM_LOAD( "bb-pcma.l5",  0x000000, 0x80000, CRC(44cd5bfe) SHA1(26a612191a0aa614c090203485aba17c99c763ee) )
 ROM_END
 
 
@@ -914,8 +941,8 @@ ROM_END
 /******************************************************************************/
 
 // as soon as you calibrate the guns in test mode the game refuses to boot
-GAME( 1989, bbusters, 0,        bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (World)", GAME_NOT_WORKING )
-GAME( 1989, bbusteru, bbusters, bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_NOT_WORKING )
+GAME( 1989, bbusters, 0,        bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (World)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1989, bbusteru, bbusters, bbusters, bbusters, 0, ROT0,  "SNK", "Beast Busters (US, Version 2)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1989, mechatt,  0,        mechatt,  mechatt,  0, ROT0,  "SNK", "Mechanized Attack (World)", 0 )
 GAME( 1989, mechattu, mechatt,  mechatt,  mechatt,  0, ROT0,  "SNK", "Mechanized Attack (US)", 0 )
