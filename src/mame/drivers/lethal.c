@@ -592,7 +592,10 @@ static MACHINE_RESET( lethalen )
 
 	memory_set_bankptr(1, &prgrom[0x10000]);
 	memory_set_bankptr(2, &prgrom[0x48000]);
+	/* force reset again to read proper reset vector */
+	cpu_reset(machine->cpu[0]);
 }
+
 static const gfx_layout lethal_6bpp =
 {
 	16,16,
