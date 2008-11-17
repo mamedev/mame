@@ -147,7 +147,7 @@ struct _m68_state_t
 
 };
 
-static void *token; /* for READ8/WRITE8 handlers */
+//static void *token; /* for READ8/WRITE8 handlers */
 
 #if 0
 static void hd63701_trap_pc(m68_state_t *m68_state);
@@ -655,9 +655,9 @@ static int m6800_rx(m68_state_t *m68_state)
 
 static TIMER_CALLBACK(m6800_tx_tick)
 {
-    int cpunum = param;
     m68_state_t *m68_state = ptr;
 
+    cpu_push_context(m68_state->device);
 	if (m68_state->trcsr & M6800_TRCSR_TE)
 	{
 		// force Port 2 bit 4 as output
@@ -706,9 +706,7 @@ static TIMER_CALLBACK(m6800_tx_tick)
 				// send stop bit '1'
 				m68_state->tx = 1;
 
-			    cpu_push_context(machine->cpu[cpunum]);
 				CHECK_IRQ_LINES(m68_state);
-				cpu_pop_context();
 
 				m68_state->txbits = M6800_SERIAL_START;
 				break;
@@ -728,13 +726,14 @@ static TIMER_CALLBACK(m6800_tx_tick)
 	}
 
 	m6800_tx(m68_state, m68_state->tx);
+	cpu_pop_context();
 }
 
 static TIMER_CALLBACK(m6800_rx_tick)
 {
-    int cpunum = param;
     m68_state_t *m68_state =ptr;
     
+    cpu_push_context(m68_state->device);
 	if (m68_state->trcsr & M6800_TRCSR_RE)
 	{
 		if (m68_state->trcsr & M6800_TRCSR_WU)
@@ -768,6 +767,7 @@ static TIMER_CALLBACK(m6800_rx_tick)
 					// start bit found
 					m68_state->rxbits++;
 				}
+				cpu_pop_context();
 				break;
 
 			case M6800_SERIAL_STOP:
@@ -779,9 +779,7 @@ static TIMER_CALLBACK(m6800_rx_tick)
 
 						m68_state->trcsr |= M6800_TRCSR_ORFE;
 
-					    cpu_push_context(machine->cpu[cpunum]);
 						CHECK_IRQ_LINES(m68_state);
-						cpu_pop_context();
 					}
 					else
 					{
@@ -793,9 +791,7 @@ static TIMER_CALLBACK(m6800_rx_tick)
 							// set RDRF flag
 							m68_state->trcsr |= M6800_TRCSR_RDRF;
 
-							cpu_push_context(machine->cpu[cpunum]);
 							CHECK_IRQ_LINES(m68_state);
-							cpu_pop_context();
 						}
 					}
 				}
@@ -812,9 +808,7 @@ static TIMER_CALLBACK(m6800_rx_tick)
 					m68_state->trcsr |= M6800_TRCSR_ORFE;
 					m68_state->trcsr &= ~M6800_TRCSR_RDRF;
 
-					cpu_push_context(machine->cpu[cpunum]);
 					CHECK_IRQ_LINES(m68_state);
-					cpu_pop_context();
 				}
 
 				m68_state->rxbits = M6800_SERIAL_START;
@@ -832,6 +826,7 @@ static TIMER_CALLBACK(m6800_rx_tick)
 			}
 		}
 	}
+	cpu_pop_context();
 }
 #endif
 
@@ -951,7 +946,6 @@ static CPU_SET_CONTEXT( m6800 )
 {
 	m68_state_t *m68_state = src;
 	
-	token = src;
 	CHANGE_PC(m68_state);
 	CHECK_IRQ_LINES(m68_state); /* HJB 990417 */
 }
@@ -2371,7 +2365,8 @@ static CPU_EXECUTE( nsc8105 )
 
 static READ8_HANDLER( m6803_internal_registers_r )
 {
-	m68_state_t *m68_state = token;
+	m68_state_t *m68_state = space->cpu->token;
+
 	switch (offset)
 	{
 		case 0x00:
@@ -2468,7 +2463,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 
 static WRITE8_HANDLER( m6803_internal_registers_w )
 {
-	m68_state_t *m68_state = token;
+	m68_state_t *m68_state = space->cpu->token;
 
 	switch (offset)
 	{
@@ -2614,8 +2609,8 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 				{
 					int divisor = M6800_RMCR_SS[m68_state->rmcr & M6800_RMCR_SS_MASK];
 
-					timer_adjust_periodic(m68_state->m6800_rx_timer, attotime_zero, cpunum_get_active(), ATTOTIME_IN_HZ(m68_state->clock / divisor));
-					timer_adjust_periodic(m68_state->m6800_tx_timer, attotime_zero, cpunum_get_active(), ATTOTIME_IN_HZ(m68_state->clock / divisor));
+					timer_adjust_periodic(m68_state->m6800_rx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m68_state->clock / divisor));
+					timer_adjust_periodic(m68_state->m6800_tx_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m68_state->clock / divisor));
 				}
 				break;
 			}
