@@ -20,7 +20,8 @@ enum
 	CDP1802_STATE_3_INT
 };
 
-typedef struct
+typedef struct _cdp1802_state cdp1802_state;
+struct _cdp1802_state
 {
 	const cdp1802_interface *intf;
 
@@ -33,82 +34,79 @@ typedef struct
 	int irq, dmain, dmaout;
 	int ef;
 
-} CDP1802_Regs;
+	int icount;
+};
 
 #define M	program_read_byte
 #define MW	program_write_byte
 
-#define P	cdp1802.p
-#define X	cdp1802.x
-#define D	cdp1802.d
-#define B   cdp1802.b
-#define T	cdp1802.t
-#define R   cdp1802.r
-#define DF	cdp1802.df
-#define IE	cdp1802.ie
-#define Q	cdp1802.q
-#define N	cdp1802.n
-#define I	cdp1802.i
-
-static int cdp1802_ICount;
-
-static CDP1802_Regs cdp1802;
+#define P	cdp1802->p
+#define X	cdp1802->x
+#define D	cdp1802->d
+#define B   cdp1802->b
+#define T	cdp1802->t
+#define R   cdp1802->r
+#define DF	cdp1802->df
+#define IE	cdp1802->ie
+#define Q	cdp1802->q
+#define N	cdp1802->n
+#define I	cdp1802->i
 
 static CPU_GET_CONTEXT( cdp1802 )
 {
-	*(CDP1802_Regs *)dst = cdp1802;
 }
 
 static CPU_SET_CONTEXT( cdp1802 )
 {
-	cdp1802 = *(CDP1802_Regs *)src;
 }
 
 static CPU_INIT( cdp1802 )
 {
-	cdp1802.intf = (cdp1802_interface *) device->static_config;
+	cdp1802_state *cdp1802 = device->token;
 
-	cdp1802.mode = CDP1802_MODE_RESET;
-	cdp1802.prevmode = cdp1802.mode;
-	cdp1802.irq = CLEAR_LINE;
-	cdp1802.dmain = CLEAR_LINE;
-	cdp1802.dmaout = CLEAR_LINE;
+	cdp1802->intf = (cdp1802_interface *) device->static_config;
 
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.p);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.x);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.d);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.b);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.t);
-	state_save_register_item_array("cdp1802", device->tag, 0, cdp1802.r);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.df);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.ie);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.q);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.n);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.i);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.state);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.prevmode);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.mode);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.irq);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.dmain);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.dmaout);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802.ef);
+	cdp1802->mode = CDP1802_MODE_RESET;
+	cdp1802->prevmode = cdp1802->mode;
+	cdp1802->irq = CLEAR_LINE;
+	cdp1802->dmain = CLEAR_LINE;
+	cdp1802->dmaout = CLEAR_LINE;
+
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->p);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->x);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->d);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->b);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->t);
+	state_save_register_item_array("cdp1802", device->tag, 0, cdp1802->r);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->df);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->ie);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->q);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->n);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->i);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->state);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->prevmode);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->mode);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->irq);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->dmain);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->dmaout);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->ef);
 }
 
-INLINE void cdp1802_add(int left, int right)
+INLINE void cdp1802_add(cdp1802_state *cdp1802, int left, int right)
 {
 	int result = left + right;
 	D = result & 0xff;
 	DF = (result & 0x100) >> 8;
 }
 
-INLINE void cdp1802_add_carry(int left, int right)
+INLINE void cdp1802_add_carry(cdp1802_state *cdp1802, int left, int right)
 {
 	int result = left + right + DF;
 	D = result & 0xff;
 	DF = (result & 0x100) >> 8;
 }
 
-INLINE void cdp1802_sub(int left, int right)
+INLINE void cdp1802_sub(cdp1802_state *cdp1802, int left, int right)
 {
 	int result = left + (~right & 0xff) + 1;
 
@@ -116,7 +114,7 @@ INLINE void cdp1802_sub(int left, int right)
 	DF = (result & 0x100) >> 8;
 }
 
-INLINE void cdp1802_sub_carry(int left, int right)
+INLINE void cdp1802_sub_carry(cdp1802_state *cdp1802, int left, int right)
 {
 	int result = left + (~right & 0xff) + DF;
 
@@ -124,7 +122,7 @@ INLINE void cdp1802_sub_carry(int left, int right)
 	DF = (result & 0x100) >> 8;
 }
 
-INLINE void cdp1802_short_branch(int taken)
+INLINE void cdp1802_short_branch(cdp1802_state *cdp1802, int taken)
 {
 	if (taken)
 	{
@@ -136,7 +134,7 @@ INLINE void cdp1802_short_branch(int taken)
 	}
 }
 
-INLINE void cdp1802_long_branch(int taken)
+INLINE void cdp1802_long_branch(cdp1802_state *cdp1802, int taken)
 {
 	if (taken)
 	{
@@ -161,7 +159,7 @@ INLINE void cdp1802_long_branch(int taken)
 	}
 }
 
-INLINE void cdp1802_long_skip(int taken)
+INLINE void cdp1802_long_skip(cdp1802_state *cdp1802, int taken)
 {
 	if (taken)
 	{
@@ -175,25 +173,29 @@ INLINE void cdp1802_long_skip(int taken)
 	}
 }
 
-static void cdp1802_sample_ef(running_machine *machine)
+static void cdp1802_sample_ef(const device_config *device)
 {
-	if (cdp1802.intf->ef_r)
+	cdp1802_state *cdp1802 = device->token;
+
+	if (cdp1802->intf->ef_r)
 	{
-		cdp1802.ef = cdp1802.intf->ef_r(machine) & 0x0f;
+		cdp1802->ef = cdp1802->intf->ef_r(device) & 0x0f;
 	}
 	else
 	{
-		cdp1802.ef = 0x0f;
+		cdp1802->ef = 0x0f;
 	}
 }
 
-static void cdp1802_output_state_code(running_machine *machine)
+static void cdp1802_output_state_code(const device_config *device)
 {
-	if (cdp1802.intf->sc_w)
-	{
-		cdp1802_state state_code = CDP1802_STATE_CODE_S0_FETCH;
+	cdp1802_state *cdp1802 = device->token;
 
-		switch (cdp1802.state)
+	if (cdp1802->intf->sc_w)
+	{
+		cdp1802_state_code state_code = CDP1802_STATE_CODE_S0_FETCH;
+
+		switch (cdp1802->state)
 		{
 		case CDP1802_STATE_0_FETCH:
 			state_code = CDP1802_STATE_CODE_S0_FETCH;
@@ -213,15 +215,17 @@ static void cdp1802_output_state_code(running_machine *machine)
 			break;
 		}
 
-		cdp1802.intf->sc_w(machine, state_code);
+		cdp1802->intf->sc_w(device, state_code);
 	}
 }
 
-static void cdp1802_run(running_machine *machine)
+static void cdp1802_run(const device_config *device)
 {
-	cdp1802_output_state_code(machine);
+	cdp1802_state *cdp1802 = device->token;
 
-	switch (cdp1802.state)
+	cdp1802_output_state_code(device);
+
+	switch (cdp1802->state)
 	{
 	case CDP1802_STATE_1_RESET:
 
@@ -230,9 +234,9 @@ static void cdp1802_run(running_machine *machine)
 		Q = 0;
 		IE = 1;
 
-		cdp1802_ICount -= CDP1802_CYCLES_RESET;
+		cdp1802->icount -= CDP1802_CYCLES_RESET;
 
-		debugger_instruction_hook(machine, cdp1802.r[cdp1802.p]);
+		debugger_instruction_hook(device->machine, cdp1802->r[cdp1802->p]);
 
 		break;
 
@@ -242,22 +246,22 @@ static void cdp1802_run(running_machine *machine)
 		P = 0;
 		R[0] = 0;
 
-		cdp1802_ICount -= CDP1802_CYCLES_INIT;
+		cdp1802->icount -= CDP1802_CYCLES_INIT;
 
-		if (cdp1802.dmain)
+		if (cdp1802->dmain)
 		{
-			cdp1802.state = CDP1802_STATE_2_DMA_IN;
+			cdp1802->state = CDP1802_STATE_2_DMA_IN;
 		}
-		else if (cdp1802.dmaout)
+		else if (cdp1802->dmaout)
 		{
-			cdp1802.state = CDP1802_STATE_2_DMA_OUT;
+			cdp1802->state = CDP1802_STATE_2_DMA_OUT;
 		}
 		else
 		{
-			cdp1802.state = CDP1802_STATE_0_FETCH;
+			cdp1802->state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(machine, cdp1802.r[cdp1802.p]);
+		debugger_instruction_hook(device->machine, cdp1802->r[cdp1802->p]);
 
 		break;
 
@@ -269,15 +273,15 @@ static void cdp1802_run(running_machine *machine)
 		N = opcode & 0x0f;
 		R[P] = R[P] + 1;
 
-		cdp1802_ICount -= CDP1802_CYCLES_FETCH;
+		cdp1802->icount -= CDP1802_CYCLES_FETCH;
 
-		cdp1802.state = CDP1802_STATE_1_EXECUTE;
+		cdp1802->state = CDP1802_STATE_1_EXECUTE;
 		}
 		break;
 
 	case CDP1802_STATE_1_EXECUTE:
 
-		cdp1802_sample_ef(machine);
+		cdp1802_sample_ef(device);
 
 		switch (I)
 		{
@@ -300,67 +304,67 @@ static void cdp1802_run(running_machine *machine)
 			switch (N)
 			{
 			case 0:
-				cdp1802_short_branch(1);
+				cdp1802_short_branch(cdp1802, 1);
 				break;
 
 			case 1:
-				cdp1802_short_branch(Q == 1);
+				cdp1802_short_branch(cdp1802, Q == 1);
 				break;
 
 			case 2:
-				cdp1802_short_branch(D == 0);
+				cdp1802_short_branch(cdp1802, D == 0);
 				break;
 
 			case 3:
-				cdp1802_short_branch(DF == 1);
+				cdp1802_short_branch(cdp1802, DF == 1);
 				break;
 
 			case 4:
-				cdp1802_short_branch((cdp1802.ef & EF1) ? 0 : 1);
+				cdp1802_short_branch(cdp1802, (cdp1802->ef & EF1) ? 0 : 1);
 				break;
 
 			case 5:
-				cdp1802_short_branch((cdp1802.ef & EF2) ? 0 : 1);
+				cdp1802_short_branch(cdp1802, (cdp1802->ef & EF2) ? 0 : 1);
 				break;
 
 			case 6:
-				cdp1802_short_branch((cdp1802.ef & EF3) ? 0 : 1);
+				cdp1802_short_branch(cdp1802, (cdp1802->ef & EF3) ? 0 : 1);
 				break;
 
 			case 7:
-				cdp1802_short_branch((cdp1802.ef & EF4) ? 0 : 1);
+				cdp1802_short_branch(cdp1802, (cdp1802->ef & EF4) ? 0 : 1);
 				break;
 
 			case 8:
-				cdp1802_short_branch(0);
+				cdp1802_short_branch(cdp1802, 0);
 				break;
 
 			case 9:
-				cdp1802_short_branch(Q == 0);
+				cdp1802_short_branch(cdp1802, Q == 0);
 				break;
 
 			case 0xa:
-				cdp1802_short_branch(D != 0);
+				cdp1802_short_branch(cdp1802, D != 0);
 				break;
 
 			case 0xb:
-				cdp1802_short_branch(DF == 0);
+				cdp1802_short_branch(cdp1802, DF == 0);
 				break;
 
 			case 0xc:
-				cdp1802_short_branch((cdp1802.ef & EF1) ? 1 : 0);
+				cdp1802_short_branch(cdp1802, (cdp1802->ef & EF1) ? 1 : 0);
 				break;
 
 			case 0xd:
-				cdp1802_short_branch((cdp1802.ef & EF2) ? 1 : 0);
+				cdp1802_short_branch(cdp1802, (cdp1802->ef & EF2) ? 1 : 0);
 				break;
 
 			case 0xe:
-				cdp1802_short_branch((cdp1802.ef & EF3) ? 1 : 0);
+				cdp1802_short_branch(cdp1802, (cdp1802->ef & EF3) ? 1 : 0);
 				break;
 
 			case 0xf:
-				cdp1802_short_branch((cdp1802.ef & EF4) ? 1 : 0);
+				cdp1802_short_branch(cdp1802, (cdp1802->ef & EF4) ? 1 : 0);
 				break;
 			}
 			break;
@@ -461,11 +465,11 @@ static void cdp1802_run(running_machine *machine)
 				break;
 
 			case 4:
-				cdp1802_add_carry(M(R[X]), D);
+				cdp1802_add_carry(cdp1802, M(R[X]), D);
 				break;
 
 			case 5:
-				cdp1802_sub_carry(M(R[X]), D);
+				cdp1802_sub_carry(cdp1802, M(R[X]), D);
 				break;
 
 			case 6:
@@ -478,7 +482,7 @@ static void cdp1802_run(running_machine *machine)
 				break;
 
 			case 7:
-				cdp1802_sub_carry(D, M(R[X]));
+				cdp1802_sub_carry(cdp1802, D, M(R[X]));
 				break;
 
 			case 8:
@@ -498,28 +502,28 @@ static void cdp1802_run(running_machine *machine)
 			case 0xa:
 				Q = 0;
 
-				if (cdp1802.intf->q_w)
+				if (cdp1802->intf->q_w)
 				{
-					cdp1802.intf->q_w(machine, Q);
+					cdp1802->intf->q_w(device, Q);
 				}
 				break;
 
 			case 0xb:
 				Q = 1;
 
-				if (cdp1802.intf->q_w)
+				if (cdp1802->intf->q_w)
 				{
-					cdp1802.intf->q_w(machine, Q);
+					cdp1802->intf->q_w(device, Q);
 				}
 				break;
 
 			case 0xc:
-				cdp1802_add_carry(M(R[P]), D);
+				cdp1802_add_carry(cdp1802, M(R[P]), D);
 				R[P] = R[P] + 1;
 				break;
 
 			case 0xd:
-				cdp1802_sub_carry(M(R[P]), D);
+				cdp1802_sub_carry(cdp1802, M(R[P]), D);
 				R[P] = R[P] + 1;
 				break;
 
@@ -533,7 +537,7 @@ static void cdp1802_run(running_machine *machine)
 				break;
 
 			case 0xf:
-				cdp1802_sub_carry(D, M(R[P]));
+				cdp1802_sub_carry(cdp1802, D, M(R[P]));
 				R[P] = R[P] + 1;
 				break;
 			}
@@ -556,24 +560,24 @@ static void cdp1802_run(running_machine *machine)
 			break;
 
 		case 0xc:
-			cdp1802_output_state_code(machine);
+			cdp1802_output_state_code(device);
 
 			switch (N)
 			{
 			case 0:
-				cdp1802_long_branch(1);
+				cdp1802_long_branch(cdp1802, 1);
 				break;
 
 			case 1:
-				cdp1802_long_branch(Q == 1);
+				cdp1802_long_branch(cdp1802, Q == 1);
 				break;
 
 			case 2:
-				cdp1802_long_branch(D == 0);
+				cdp1802_long_branch(cdp1802, D == 0);
 				break;
 
 			case 3:
-				cdp1802_long_branch(DF == 1);
+				cdp1802_long_branch(cdp1802, DF == 1);
 				break;
 
 			case 4:
@@ -581,51 +585,51 @@ static void cdp1802_run(running_machine *machine)
 				break;
 
 			case 5:
-				cdp1802_long_skip(Q == 0);
+				cdp1802_long_skip(cdp1802, Q == 0);
 				break;
 
 			case 6:
-				cdp1802_long_skip(D != 0);
+				cdp1802_long_skip(cdp1802, D != 0);
 				break;
 
 			case 7:
-				cdp1802_long_skip(DF == 0);
+				cdp1802_long_skip(cdp1802, DF == 0);
 				break;
 
 			case 8:
-				cdp1802_long_skip(1);
+				cdp1802_long_skip(cdp1802, 1);
 				break;
 
 			case 9:
-				cdp1802_long_branch(Q == 0);
+				cdp1802_long_branch(cdp1802, Q == 0);
 				break;
 
 			case 0xa:
-				cdp1802_long_branch(D != 0);
+				cdp1802_long_branch(cdp1802, D != 0);
 				break;
 
 			case 0xb:
-				cdp1802_long_branch(DF == 0);
+				cdp1802_long_branch(cdp1802, DF == 0);
 				break;
 
 			case 0xc:
-				cdp1802_long_skip(IE == 1);
+				cdp1802_long_skip(cdp1802, IE == 1);
 				break;
 
 			case 0xd:
-				cdp1802_long_skip(Q == 1);
+				cdp1802_long_skip(cdp1802, Q == 1);
 				break;
 
 			case 0xe:
-				cdp1802_long_skip(D == 0);
+				cdp1802_long_skip(cdp1802, D == 0);
 				break;
 
 			case 0xf:
-				cdp1802_long_skip(DF == 1);
+				cdp1802_long_skip(cdp1802, DF == 1);
 				break;
 			}
 
-			cdp1802_ICount -= CDP1802_CYCLES_EXECUTE;
+			cdp1802->icount -= CDP1802_CYCLES_EXECUTE;
 			break;
 
 		case 0xd:
@@ -656,11 +660,11 @@ static void cdp1802_run(running_machine *machine)
 				break;
 
 			case 4:
-				cdp1802_add(M(R[X]), D);
+				cdp1802_add(cdp1802, M(R[X]), D);
 				break;
 
 			case 5:
-				cdp1802_sub(M(R[X]), D);
+				cdp1802_sub(cdp1802, M(R[X]), D);
 				break;
 
 			case 6:
@@ -669,7 +673,7 @@ static void cdp1802_run(running_machine *machine)
 				break;
 
 			case 7:
-				cdp1802_sub(D, M(R[X]));
+				cdp1802_sub(cdp1802, D, M(R[X]));
 				break;
 
 			case 8:
@@ -693,12 +697,12 @@ static void cdp1802_run(running_machine *machine)
 				break;
 
 			case 0xc:
-				cdp1802_add(M(R[P]), D);
+				cdp1802_add(cdp1802, M(R[P]), D);
 				R[P] = R[P] + 1;
 				break;
 
 			case 0xd:
-				cdp1802_sub(M(R[P]), D);
+				cdp1802_sub(cdp1802, M(R[P]), D);
 				R[P] = R[P] + 1;
 				break;
 
@@ -708,95 +712,95 @@ static void cdp1802_run(running_machine *machine)
 				break;
 
 			case 0xf:
-				cdp1802_sub(D, M(R[P]));
+				cdp1802_sub(cdp1802, D, M(R[P]));
 				R[P] = R[P] + 1;
 				break;
 			}
 			break;
 		}
 
-		cdp1802_ICount -= CDP1802_CYCLES_EXECUTE;
+		cdp1802->icount -= CDP1802_CYCLES_EXECUTE;
 
-		if (cdp1802.dmain)
+		if (cdp1802->dmain)
 		{
-			cdp1802.state = CDP1802_STATE_2_DMA_IN;
+			cdp1802->state = CDP1802_STATE_2_DMA_IN;
 		}
-		else if (cdp1802.dmaout)
+		else if (cdp1802->dmaout)
 		{
-			cdp1802.state = CDP1802_STATE_2_DMA_OUT;
+			cdp1802->state = CDP1802_STATE_2_DMA_OUT;
 		}
-		else if (IE && cdp1802.irq)
+		else if (IE && cdp1802->irq)
 		{
-			cdp1802.state = CDP1802_STATE_3_INT;
+			cdp1802->state = CDP1802_STATE_3_INT;
 		}
 		else if ((I > 0) || (N > 0)) // not idling
 		{
-			cdp1802.state = CDP1802_STATE_0_FETCH;
+			cdp1802->state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(machine, cdp1802.r[cdp1802.p]);
+		debugger_instruction_hook(device->machine, cdp1802->r[cdp1802->p]);
 
 		break;
 
     case CDP1802_STATE_2_DMA_IN:
 
-		if (cdp1802.intf->dma_r)
+		if (cdp1802->intf->dma_r)
 		{
-			MW(R[0], cdp1802.intf->dma_r(machine, R[0]));
+			MW(R[0], cdp1802->intf->dma_r(device, R[0]));
 		}
 
 		R[0] = R[0] + 1;
 
-        cdp1802_ICount -= CDP1802_CYCLES_DMA;
+        cdp1802->icount -= CDP1802_CYCLES_DMA;
 
-        if (cdp1802.dmain)
+        if (cdp1802->dmain)
         {
-            cdp1802.state = CDP1802_STATE_2_DMA_IN;
+            cdp1802->state = CDP1802_STATE_2_DMA_IN;
         }
-        else if (cdp1802.dmaout)
+        else if (cdp1802->dmaout)
         {
-            cdp1802.state = CDP1802_STATE_2_DMA_OUT;
+            cdp1802->state = CDP1802_STATE_2_DMA_OUT;
         }
-        else if (IE && cdp1802.irq)
+        else if (IE && cdp1802->irq)
         {
-            cdp1802.state = CDP1802_STATE_3_INT;
+            cdp1802->state = CDP1802_STATE_3_INT;
         }
-        else if (cdp1802.mode == CDP1802_MODE_LOAD)
+        else if (cdp1802->mode == CDP1802_MODE_LOAD)
         {
-            cdp1802.state = CDP1802_STATE_1_EXECUTE;
+            cdp1802->state = CDP1802_STATE_1_EXECUTE;
         }
         else
         {
-            cdp1802.state = CDP1802_STATE_0_FETCH;
+            cdp1802->state = CDP1802_STATE_0_FETCH;
         }
         break;
 
     case CDP1802_STATE_2_DMA_OUT:
 
-		if (cdp1802.intf->dma_w)
+		if (cdp1802->intf->dma_w)
 		{
-	        cdp1802.intf->dma_w(machine, R[0], M(R[0]));
+	        cdp1802->intf->dma_w(device, R[0], M(R[0]));
 		}
 
 		R[0] = R[0] + 1;
 
-        cdp1802_ICount -= CDP1802_CYCLES_DMA;
+        cdp1802->icount -= CDP1802_CYCLES_DMA;
 
-        if (cdp1802.dmain)
+        if (cdp1802->dmain)
         {
-            cdp1802.state = CDP1802_STATE_2_DMA_IN;
+            cdp1802->state = CDP1802_STATE_2_DMA_IN;
         }
-        else if (cdp1802.dmaout)
+        else if (cdp1802->dmaout)
         {
-            cdp1802.state = CDP1802_STATE_2_DMA_OUT;
+            cdp1802->state = CDP1802_STATE_2_DMA_OUT;
         }
-        else if (IE && cdp1802.irq)
+        else if (IE && cdp1802->irq)
         {
-            cdp1802.state = CDP1802_STATE_3_INT;
+            cdp1802->state = CDP1802_STATE_3_INT;
         }
         else
         {
-            cdp1802.state = CDP1802_STATE_0_FETCH;
+            cdp1802->state = CDP1802_STATE_0_FETCH;
         }
         break;
 
@@ -807,22 +811,22 @@ static void cdp1802_run(running_machine *machine)
 		P = 1;
 		IE = 0;
 
-		cdp1802_ICount -= CDP1802_CYCLES_INTERRUPT;
+		cdp1802->icount -= CDP1802_CYCLES_INTERRUPT;
 
-		if (cdp1802.dmain)
+		if (cdp1802->dmain)
 		{
-			cdp1802.state = CDP1802_STATE_2_DMA_IN;
+			cdp1802->state = CDP1802_STATE_2_DMA_IN;
 		}
-		else if (cdp1802.dmaout)
+		else if (cdp1802->dmaout)
 		{
-			cdp1802.state = CDP1802_STATE_2_DMA_OUT;
+			cdp1802->state = CDP1802_STATE_2_DMA_OUT;
 		}
 		else
 		{
-			cdp1802.state = CDP1802_STATE_0_FETCH;
+			cdp1802->state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(machine, cdp1802.r[cdp1802.p]);
+		debugger_instruction_hook(device->machine, cdp1802->r[cdp1802->p]);
 
 		break;
 	}
@@ -830,81 +834,70 @@ static void cdp1802_run(running_machine *machine)
 
 static CPU_EXECUTE( cdp1802 )
 {
-	cdp1802_ICount = cycles;
+	cdp1802_state *cdp1802 = device->token;
 
-	cdp1802.prevmode = cdp1802.mode;
-	cdp1802.mode = cdp1802.intf->mode_r(device->machine);
+	cdp1802->icount = cycles;
+
+	cdp1802->prevmode = cdp1802->mode;
+	cdp1802->mode = cdp1802->intf->mode_r(device);
 
 	do
 	{
-		switch (cdp1802.mode)
+		switch (cdp1802->mode)
 		{
 		case CDP1802_MODE_LOAD:
 			I = 0;
 			N = 0;
-			cdp1802.state = CDP1802_STATE_1_EXECUTE;
-			cdp1802_run(device->machine);
+			cdp1802->state = CDP1802_STATE_1_EXECUTE;
+			cdp1802_run(device);
 			break;
 
 		case CDP1802_MODE_RESET:
-			cdp1802.state = CDP1802_STATE_1_RESET;
-			cdp1802_run(device->machine);
+			cdp1802->state = CDP1802_STATE_1_RESET;
+			cdp1802_run(device);
 			break;
 
 		case CDP1802_MODE_PAUSE:
-			cdp1802_ICount -= 1;
+			cdp1802->icount -= 1;
 			break;
 
 		case CDP1802_MODE_RUN:
-			switch (cdp1802.prevmode)
+			switch (cdp1802->prevmode)
 			{
 			case CDP1802_MODE_LOAD:
 				// RUN mode cannot be initiated from LOAD mode
-				cdp1802.mode = CDP1802_MODE_LOAD;
+				cdp1802->mode = CDP1802_MODE_LOAD;
 				break;
 
 			case CDP1802_MODE_RESET:
-				cdp1802.prevmode = CDP1802_MODE_RUN;
-				cdp1802.state = CDP1802_STATE_1_INIT;
-				cdp1802_run(device->machine);
+				cdp1802->prevmode = CDP1802_MODE_RUN;
+				cdp1802->state = CDP1802_STATE_1_INIT;
+				cdp1802_run(device);
 				break;
 
 			case CDP1802_MODE_PAUSE:
-				cdp1802.prevmode = CDP1802_MODE_RUN;
-				cdp1802.state = CDP1802_STATE_0_FETCH;
-				cdp1802_run(device->machine);
+				cdp1802->prevmode = CDP1802_MODE_RUN;
+				cdp1802->state = CDP1802_STATE_0_FETCH;
+				cdp1802_run(device);
 				break;
 
 			case CDP1802_MODE_RUN:
-				cdp1802_run(device->machine);
+				cdp1802_run(device);
 				break;
 			}
 			break;
 		}
 	}
-	while (cdp1802_ICount > 0);
+	while (cdp1802->icount > 0);
 
-	return cycles - cdp1802_ICount;
-}
-
-static void cdp1802_set_interrupt_line(int state)
-{
-	cdp1802.irq = state;
-}
-
-static void cdp1802_set_dmain_line(int state)
-{
-	cdp1802.dmain = state;
-}
-
-static void cdp1802_set_dmaout_line(int state)
-{
-	cdp1802.dmaout = state;
+	return cycles - cdp1802->icount;
 }
 
 static CPU_RESET( cdp1802 )
 {
-	cdp1802.mode = CDP1802_MODE_RESET;
+	cdp1802_state *cdp1802 = device->token;
+
+	cdp1802->mode = CDP1802_MODE_RESET;
 }
 
 /**************************************************************************
@@ -913,40 +906,42 @@ static CPU_RESET( cdp1802 )
 
 static CPU_SET_INFO( cdp1802 )
 {
+	cdp1802_state *cdp1802 = device->token;
+
 	switch (state)
 	{
-		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		cdp1802_set_interrupt_line(info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAIN:	cdp1802_set_dmain_line(info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAOUT:	cdp1802_set_dmaout_line(info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		cdp1802->irq = info->i;		break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAIN:	cdp1802->dmain = info->i;	break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAOUT:	cdp1802->dmaout = info->i;	break;
 
-		case CPUINFO_INT_REGISTER + CDP1802_P:			cdp1802.p = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_X:			cdp1802.x = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_T:			cdp1802.t = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_D:			cdp1802.d = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_B:			cdp1802.b = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R0:			cdp1802.r[0] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R1:			cdp1802.r[1] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R2:			cdp1802.r[2] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R3:			cdp1802.r[3] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R4:			cdp1802.r[4] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R5:			cdp1802.r[5] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R6:			cdp1802.r[6] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R7:			cdp1802.r[7] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R8:			cdp1802.r[8] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_R9:			cdp1802.r[9] = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_Ra:			cdp1802.r[0xa] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rb:			cdp1802.r[0xb] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rc:			cdp1802.r[0xc] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rd:			cdp1802.r[0xd] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Re:			cdp1802.r[0xe] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rf:			cdp1802.r[0xf] = info->i;	break;
-		case CPUINFO_INT_REGISTER + CDP1802_DF:			cdp1802.df = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_IE:			cdp1802.ie = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_Q:			cdp1802.q = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_N:			cdp1802.n = info->i;		break;
-		case CPUINFO_INT_REGISTER + CDP1802_I:			cdp1802.i = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_P:			cdp1802->p = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_X:			cdp1802->x = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_T:			cdp1802->t = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_D:			cdp1802->d = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_B:			cdp1802->b = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_R0:			cdp1802->r[0] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_R1:			cdp1802->r[1] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_R2:			cdp1802->r[2] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_R3:			cdp1802->r[3] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_R4:			cdp1802->r[4] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_R5:			cdp1802->r[5] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_R6:			cdp1802->r[6] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_R7:			cdp1802->r[7] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_R8:			cdp1802->r[8] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_R9:			cdp1802->r[9] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_Ra:			cdp1802->r[0xa] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_Rb:			cdp1802->r[0xb] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_Rc:			cdp1802->r[0xc] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_Rd:			cdp1802->r[0xd] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_Re:			cdp1802->r[0xe] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_Rf:			cdp1802->r[0xf] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_DF:			cdp1802->df = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_IE:			cdp1802->ie = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_Q:			cdp1802->q = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_N:			cdp1802->n = info->i;		break;
+		case CPUINFO_INT_REGISTER + CDP1802_I:			cdp1802->i = info->i;		break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CDP1802_PC: 		cdp1802.r[cdp1802.p] = info->i;	break;
+		case CPUINFO_INT_REGISTER + CDP1802_PC: 		cdp1802->r[cdp1802->p] = info->i;	break;
 	}
 }
 
@@ -955,10 +950,12 @@ static CPU_SET_INFO( cdp1802 )
  ****************************************************************************/
 CPU_GET_INFO( cdp1802 )
 {
+	cdp1802_state *cdp1802 = (device != NULL) ? device->token : NULL;
+
 	switch(state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cdp1802);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cdp1802_state);		break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
@@ -979,91 +976,91 @@ CPU_GET_INFO( cdp1802 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 3;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		info->i = cdp1802.irq;		break;
-		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAIN:	info->i = cdp1802.dmain;	break;
-		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAOUT:	info->i = cdp1802.dmaout;	break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_INT:		info->i = cdp1802->irq;		break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAIN:	info->i = cdp1802->dmain;	break;
+		case CPUINFO_INT_INPUT_STATE + CDP1802_INPUT_LINE_DMAOUT:	info->i = cdp1802->dmaout;	break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 
 		case CPUINFO_INT_SP:							info->i = 0;							break;
-		case CPUINFO_INT_REGISTER + CDP1802_P:			info->i = cdp1802.p;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_X:			info->i = cdp1802.x;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_T:			info->i = cdp1802.t;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_D:			info->i = cdp1802.d;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_B:			info->i = cdp1802.b;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R0:			info->i = cdp1802.r[0];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R1:			info->i = cdp1802.r[1];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R2:			info->i = cdp1802.r[2];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R3:			info->i = cdp1802.r[3];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R4:			info->i = cdp1802.r[4];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R5:			info->i = cdp1802.r[5];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R6:			info->i = cdp1802.r[6];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R7:			info->i = cdp1802.r[7];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R8:			info->i = cdp1802.r[8];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_R9:			info->i = cdp1802.r[9];					break;
-		case CPUINFO_INT_REGISTER + CDP1802_Ra:			info->i = cdp1802.r[0xa];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rb:			info->i = cdp1802.r[0xb];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rc:			info->i = cdp1802.r[0xc];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rd:			info->i = cdp1802.r[0xd];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Re:			info->i = cdp1802.r[0xe];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_Rf:			info->i = cdp1802.r[0xf];				break;
-		case CPUINFO_INT_REGISTER + CDP1802_DF:			info->i = cdp1802.df;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_IE:			info->i = cdp1802.ie;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_Q:			info->i = cdp1802.q;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_N:			info->i = cdp1802.n;					break;
-		case CPUINFO_INT_REGISTER + CDP1802_I:			info->i = cdp1802.i;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_P:			info->i = cdp1802->p;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_X:			info->i = cdp1802->x;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_T:			info->i = cdp1802->t;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_D:			info->i = cdp1802->d;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_B:			info->i = cdp1802->b;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_R0:			info->i = cdp1802->r[0];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_R1:			info->i = cdp1802->r[1];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_R2:			info->i = cdp1802->r[2];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_R3:			info->i = cdp1802->r[3];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_R4:			info->i = cdp1802->r[4];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_R5:			info->i = cdp1802->r[5];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_R6:			info->i = cdp1802->r[6];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_R7:			info->i = cdp1802->r[7];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_R8:			info->i = cdp1802->r[8];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_R9:			info->i = cdp1802->r[9];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_Ra:			info->i = cdp1802->r[0xa];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_Rb:			info->i = cdp1802->r[0xb];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_Rc:			info->i = cdp1802->r[0xc];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_Rd:			info->i = cdp1802->r[0xd];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_Re:			info->i = cdp1802->r[0xe];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_Rf:			info->i = cdp1802->r[0xf];				break;
+		case CPUINFO_INT_REGISTER + CDP1802_DF:			info->i = cdp1802->df;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_IE:			info->i = cdp1802->ie;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_Q:			info->i = cdp1802->q;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_N:			info->i = cdp1802->n;					break;
+		case CPUINFO_INT_REGISTER + CDP1802_I:			info->i = cdp1802->i;					break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CDP1802_PC:			info->i = cdp1802.r[cdp1802.p];			break;
+		case CPUINFO_INT_REGISTER + CDP1802_PC:			info->i = cdp1802->r[cdp1802->p];			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cdp1802);		break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cdp1802);			break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(cdp1802);	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(cdp1802);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(cdp1802);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cdp1802);			break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cdp1802);		break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cdp1802);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cdp1802_ICount;			break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(cdp1802);				break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cdp1802);			break;
+		case CPUINFO_PTR_BURN:							info->burn = NULL;									break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cdp1802);	break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cdp1802->icount;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "CDP1802");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "CDP1800");				break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "RCA COSMAC");			break;
 		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
 		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
 
-		case CPUINFO_STR_REGISTER + CDP1802_PC:	sprintf(info->s, "PC:%.4x", cdp1802.r[cdp1802.p]);	break;
-		case CPUINFO_STR_REGISTER + CDP1802_R0:	sprintf(info->s, "R0:%.4x", cdp1802.r[0]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R1:	sprintf(info->s, "R1:%.4x", cdp1802.r[1]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R2:	sprintf(info->s, "R2:%.4x", cdp1802.r[2]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R3:	sprintf(info->s, "R3:%.4x", cdp1802.r[3]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R4:	sprintf(info->s, "R4:%.4x", cdp1802.r[4]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R5:	sprintf(info->s, "R5:%.4x", cdp1802.r[5]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R6:	sprintf(info->s, "R6:%.4x", cdp1802.r[6]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R7:	sprintf(info->s, "R7:%.4x", cdp1802.r[7]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R8:	sprintf(info->s, "R8:%.4x", cdp1802.r[8]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_R9:	sprintf(info->s, "R9:%.4x", cdp1802.r[9]); 		break;
-		case CPUINFO_STR_REGISTER + CDP1802_Ra:	sprintf(info->s, "Ra:%.4x", cdp1802.r[0xa]); 	break;
-		case CPUINFO_STR_REGISTER + CDP1802_Rb:	sprintf(info->s, "Rb:%.4x", cdp1802.r[0xb]); 	break;
-		case CPUINFO_STR_REGISTER + CDP1802_Rc:	sprintf(info->s, "Rc:%.4x", cdp1802.r[0xc]); 	break;
-		case CPUINFO_STR_REGISTER + CDP1802_Rd:	sprintf(info->s, "Rd:%.4x", cdp1802.r[0xd]); 	break;
-		case CPUINFO_STR_REGISTER + CDP1802_Re:	sprintf(info->s, "Re:%.4x", cdp1802.r[0xe]); 	break;
-		case CPUINFO_STR_REGISTER + CDP1802_Rf:	sprintf(info->s, "Rf:%.4x", cdp1802.r[0xf]); 	break;
-		case CPUINFO_STR_REGISTER + CDP1802_P:	sprintf(info->s, "P:%x",    cdp1802.p);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_X:	sprintf(info->s, "X:%x",    cdp1802.x);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_D:	sprintf(info->s, "D:%.2x",  cdp1802.d);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_B:	sprintf(info->s, "B:%.2x",  cdp1802.b);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_T:	sprintf(info->s, "T:%.2x",  cdp1802.t);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_DF:	sprintf(info->s, "DF:%x",   cdp1802.df);		break;
-		case CPUINFO_STR_REGISTER + CDP1802_IE:	sprintf(info->s, "IE:%x",   cdp1802.ie);		break;
-		case CPUINFO_STR_REGISTER + CDP1802_Q:	sprintf(info->s, "Q:%x",    cdp1802.q);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_N:	sprintf(info->s, "N:%x",    cdp1802.n);			break;
-		case CPUINFO_STR_REGISTER + CDP1802_I:	sprintf(info->s, "I:%x",    cdp1802.i);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_PC:	sprintf(info->s, "PC:%.4x", cdp1802->r[cdp1802->p]);break;
+		case CPUINFO_STR_REGISTER + CDP1802_R0:	sprintf(info->s, "R0:%.4x", cdp1802->r[0]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_R1:	sprintf(info->s, "R1:%.4x", cdp1802->r[1]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_R2:	sprintf(info->s, "R2:%.4x", cdp1802->r[2]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_R3:	sprintf(info->s, "R3:%.4x", cdp1802->r[3]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_R4:	sprintf(info->s, "R4:%.4x", cdp1802->r[4]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_R5:	sprintf(info->s, "R5:%.4x", cdp1802->r[5]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_R6:	sprintf(info->s, "R6:%.4x", cdp1802->r[6]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_R7:	sprintf(info->s, "R7:%.4x", cdp1802->r[7]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_R8:	sprintf(info->s, "R8:%.4x", cdp1802->r[8]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_R9:	sprintf(info->s, "R9:%.4x", cdp1802->r[9]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_Ra:	sprintf(info->s, "Ra:%.4x", cdp1802->r[0xa]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_Rb:	sprintf(info->s, "Rb:%.4x", cdp1802->r[0xb]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_Rc:	sprintf(info->s, "Rc:%.4x", cdp1802->r[0xc]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_Rd:	sprintf(info->s, "Rd:%.4x", cdp1802->r[0xd]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_Re:	sprintf(info->s, "Re:%.4x", cdp1802->r[0xe]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_Rf:	sprintf(info->s, "Rf:%.4x", cdp1802->r[0xf]); 		break;
+		case CPUINFO_STR_REGISTER + CDP1802_P:	sprintf(info->s, "P:%x",    cdp1802->p);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_X:	sprintf(info->s, "X:%x",    cdp1802->x);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_D:	sprintf(info->s, "D:%.2x",  cdp1802->d);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_B:	sprintf(info->s, "B:%.2x",  cdp1802->b);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_T:	sprintf(info->s, "T:%.2x",  cdp1802->t);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_DF:	sprintf(info->s, "DF:%x",   cdp1802->df);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_IE:	sprintf(info->s, "IE:%x",   cdp1802->ie);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_Q:	sprintf(info->s, "Q:%x",    cdp1802->q);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_N:	sprintf(info->s, "N:%x",    cdp1802->n);			break;
+		case CPUINFO_STR_REGISTER + CDP1802_I:	sprintf(info->s, "I:%x",    cdp1802->i);			break;
 		case CPUINFO_STR_FLAGS: sprintf(info->s,
 									"%s%s%s",
-									 cdp1802.df ? "DF" : "..",
-									 cdp1802.ie ? "IE" : "..",
-									 cdp1802.q ? "Q" : "."); break;
+									 cdp1802->df ? "DF" : "..",
+									 cdp1802->ie ? "IE" : "..",
+									 cdp1802->q ? "Q" : "."); break;
 	}
 }

@@ -20,21 +20,21 @@ enum
 	EF4 = 0x08
 };
 
+typedef enum _cdp1802_control_mode cdp1802_control_mode;
 enum _cdp1802_control_mode {
 	CDP1802_MODE_LOAD,
 	CDP1802_MODE_RESET,
 	CDP1802_MODE_PAUSE,
 	CDP1802_MODE_RUN
 };
-typedef enum _cdp1802_control_mode cdp1802_control_mode;
 
-enum _cdp1802_state {
+typedef enum _cdp1802_state_code cdp1802_state_code;
+enum _cdp1802_state_code {
 	CDP1802_STATE_CODE_S0_FETCH,
 	CDP1802_STATE_CODE_S1_EXECUTE,
 	CDP1802_STATE_CODE_S2_DMA,
 	CDP1802_STATE_CODE_S3_INTERRUPT
 };
-typedef enum _cdp1802_state cdp1802_state;
 
 // CDP1802 Registers
 
@@ -47,8 +47,8 @@ enum
 	CDP1802_B,		// Auxiliary Holding Register
 	CDP1802_T,		// Holds old X, P after Interrupt (X is high nibble)
 
-	CDP1802_R0,		// 1 of 16 Scratchpad Registers
-	CDP1802_R1,
+	CDP1802_R0,		// Scratchpad Register 0
+	CDP1802_R1,		
 	CDP1802_R2,
 	CDP1802_R3,
 	CDP1802_R4,
@@ -73,23 +73,23 @@ enum
 
 CPU_GET_INFO( cdp1802 );
 
-typedef cdp1802_control_mode (*cdp1802_mode_read_func)(running_machine *machine);
-#define CDP1802_MODE_READ(name) cdp1802_control_mode name(running_machine *machine)
+typedef cdp1802_control_mode (*cdp1802_mode_read_func)(const device_config *device);
+#define CDP1802_MODE_READ(name) cdp1802_control_mode name(const device_config *device)
 
-typedef UINT8 (*cdp1802_ef_read_func)(running_machine *machine);
-#define CDP1802_EF_READ(name) UINT8 name(running_machine *machine)
+typedef UINT8 (*cdp1802_ef_read_func)(const device_config *device);
+#define CDP1802_EF_READ(name) UINT8 name(const device_config *device)
 
-typedef void (*cdp1802_sc_write_func)(running_machine *machine, cdp1802_state state);
-#define CDP1802_SC_WRITE(name) void name(running_machine *machine, cdp1802_state state)
+typedef void (*cdp1802_sc_write_func)(const device_config *device, cdp1802_state_code state);
+#define CDP1802_SC_WRITE(name) void name(const device_config *device, cdp1802_state_code state)
 
-typedef void (*cdp1802_q_write_func)(running_machine *machine, int level);
-#define CDP1802_Q_WRITE(name) void name(running_machine *machine, int level)
+typedef void (*cdp1802_q_write_func)(const device_config *device, int level);
+#define CDP1802_Q_WRITE(name) void name(const device_config *device, int level)
 
-typedef UINT8 (*cdp1802_dma_read_func)(running_machine *machine, UINT16 ma);
-#define CDP1802_DMA_READ(name) UINT8 name(running_machine *machine, UINT16 ma)
+typedef UINT8 (*cdp1802_dma_read_func)(const device_config *device, UINT16 ma);
+#define CDP1802_DMA_READ(name) UINT8 name(const device_config *device, UINT16 ma)
 
-typedef void (*cdp1802_dma_write_func)(running_machine *machine, UINT16 ma, UINT8 data);
-#define CDP1802_DMA_WRITE(name) void name(running_machine *machine, UINT16 ma, UINT8 data)
+typedef void (*cdp1802_dma_write_func)(const device_config *device, UINT16 ma, UINT8 data);
+#define CDP1802_DMA_WRITE(name) void name(const device_config *device, UINT16 ma, UINT8 data)
 
 /* interface */
 typedef struct _cdp1802_interface cdp1802_interface;

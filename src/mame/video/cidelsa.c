@@ -141,7 +141,7 @@ static CDP1869_ON_PRD_CHANGED(cidelsa_prd_changed)
 
 	// PRD is inverted
 
-	cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_IRQ0, !prd);
+	cputag_set_input_line(device->machine, "main", INPUT_LINE_IRQ0, !prd); 
 	state->cdp1869_prd = !prd;
 }
 
@@ -154,7 +154,7 @@ static CDP1869_ON_PRD_CHANGED(draco_prd_changed)
 
 /* CDP1869 Interface */
 
-static const cdp1869_interface destryer_cdp1869_intf =
+static CDP1869_INTERFACE( destryer_cdp1869_intf )
 {
 	SCREEN_TAG,
 	DESTRYER_CHR2,
@@ -168,7 +168,7 @@ static const cdp1869_interface destryer_cdp1869_intf =
 	cidelsa_prd_changed,
 };
 
-static const cdp1869_interface altair_cdp1869_intf =
+static CDP1869_INTERFACE( altair_cdp1869_intf )
 {
 	SCREEN_TAG,
 	ALTAIR_CHR2,
@@ -202,13 +202,17 @@ static VIDEO_START(cidelsa)
 {
 	cidelsa_state *state = machine->driver_data;
 
-	// allocate memory
+	/* allocate memory */
 
 	state->pageram = auto_malloc(CIDELSA_PAGERAM_SIZE);
 	state->pcbram = auto_malloc(CIDELSA_CHARRAM_SIZE);
 	state->charram = auto_malloc(CIDELSA_CHARRAM_SIZE);
 
-	// register for save state
+	/* find devices */
+
+	state->cdp1869 = devtag_get_device(machine, CDP1869_VIDEO, CDP1869_TAG);
+
+	/* register for state saving */
 
 	state_save_register_global(state->cdp1869_prd);
 	state_save_register_global(state->cdp1869_pcb);
@@ -221,13 +225,17 @@ static VIDEO_START(draco)
 {
 	cidelsa_state *state = machine->driver_data;
 
-	// allocate memory
+	/* allocate memory */
 
 	state->pageram = auto_malloc(DRACO_PAGERAM_SIZE);
 	state->pcbram = auto_malloc(CIDELSA_CHARRAM_SIZE);
 	state->charram = auto_malloc(CIDELSA_CHARRAM_SIZE);
 
-	// register for save state
+	/* find devices */
+
+	state->cdp1869 = devtag_get_device(machine, CDP1869_VIDEO, CDP1869_TAG);
+
+	/* register for state saving */
 
 	state_save_register_global(state->cdp1869_prd);
 	state_save_register_global(state->cdp1869_pcb);
@@ -240,9 +248,9 @@ static VIDEO_START(draco)
 
 static VIDEO_UPDATE( cidelsa )
 {
-	const device_config *cdp1869 = device_list_find_by_tag(screen->machine->config->devicelist, CDP1869_VIDEO, CDP1869_TAG);
+	cidelsa_state *state = screen->machine->driver_data;
 
-	cdp1869_update(cdp1869, bitmap, cliprect);
+	cdp1869_update(state->cdp1869, bitmap, cliprect);
 
 	return 0;
 }

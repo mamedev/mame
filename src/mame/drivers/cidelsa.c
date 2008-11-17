@@ -21,7 +21,7 @@
 
 static CDP1802_MODE_READ( cidelsa_mode_r )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data;
 
 	return state->cdp1802_mode;
 }
@@ -35,12 +35,12 @@ static CDP1802_EF_READ( cidelsa_ef_r )
         EF4     Coin 1
     */
 
-	return input_port_read(machine, "EF");
+	return input_port_read(device->machine, "EF");
 }
 
 static CDP1802_Q_WRITE( cidelsa_q_w )
 {
-	cidelsa_state *state = machine->driver_data;
+	cidelsa_state *state = device->machine->driver_data;
 
 	state->cdp1802_q = level;
 }
@@ -226,8 +226,6 @@ static CDP1852_DATA_WRITE( altair_out1_w )
 
 static CDP1852_DATA_WRITE( draco_out1_w )
 {
-	cidelsa_state *state = device->machine->driver_data;
-
 	/*
       bit   description
 
@@ -240,6 +238,8 @@ static CDP1852_DATA_WRITE( draco_out1_w )
         6   SONIDO B -> COP402 IN1
         7   SONIDO C -> COP402 IN2
     */
+
+	cidelsa_state *state = device->machine->driver_data;
 
     state->draco_sound = (data & 0xe0) >> 5;
 }
@@ -548,12 +548,12 @@ static MACHINE_START( cidelsa )
 {
 	cidelsa_state *state = machine->driver_data;
 
-	// reset the CPU
+	/* reset the CPU */
 
 	state->cdp1802_mode = CDP1802_MODE_RESET;
 	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 
-	// register save states
+	/* register for state saving */
 
 	state_save_register_global(state->cdp1802_mode);
 }
@@ -564,12 +564,12 @@ static MACHINE_START( draco )
 
 	MACHINE_START_CALL( cidelsa );
 
-	// COP402 memory banking
+	/* setup COP402 memory banking */
 
 	memory_configure_bank(1, 0, 2, memory_region(machine, "audio"), 0x400);
 	memory_set_bank(1, 0);
 
-	// register save states
+	/* register for state saving */
 
 	state_save_register_global(state->draco_sound);
 	state_save_register_global(state->draco_ay_latch);
@@ -579,7 +579,7 @@ static MACHINE_START( draco )
 
 static MACHINE_RESET( cidelsa )
 {
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+	cputag_set_input_line(machine, "main", INPUT_LINE_RESET, PULSE_LINE); 
 }
 
 /* Machine Drivers */
