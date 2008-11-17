@@ -36,7 +36,7 @@ static const char copyright_notice[] =
 #include "m68kcpu.h"
 #include "m68kops.h"
 #include "m68kfpu.c"
-#include "debugger.c"
+#include "debugger.h"
 
 extern void m68040_fpu_op0(m68ki_cpu_core *m68k);
 extern void m68040_fpu_op1(m68ki_cpu_core *m68k);
@@ -452,7 +452,7 @@ static void m68k_postload(running_machine *machine, void *param)
 /* Execute some instructions until we use up cycles clock cycles */
 static CPU_EXECUTE( m68k )
 {
-	m68ki_cpu_core *m68k = device->token; 
+	m68ki_cpu_core *m68k = device->token;
 
 	/* Set our pool of clock cycles available */
 	SET_CYCLES(m68k, cycles);
@@ -540,7 +540,7 @@ static CPU_INIT( m68k )
 static CPU_RESET( m68k )
 {
 	m68ki_cpu_core *m68k = device->token;
-	
+
 	/* Clear all stop levels and eat up all remaining cycles */
 	m68k->stopped = 0;
 	SET_CYCLES(m68k, 0);
@@ -739,12 +739,12 @@ static CPU_SET_INFO( m68k )
 		case CPUINFO_INT_REGISTER + M68K_ISP: 		if(m68k->s_flag && !m68k->m_flag)
 														REG_SP = info->i;
 													else
-														REG_ISP = info->i;	
+														REG_ISP = info->i;
 													break;
 		case CPUINFO_INT_REGISTER + M68K_USP: 		if(m68k->s_flag)
 														REG_USP = info->i;
 													else
-														REG_SP = info->i;		
+														REG_SP = info->i;
 													break;
 		case CPUINFO_INT_REGISTER + M68K_SR:  		m68ki_set_sr(m68k, info->i);					break;
 		case CPUINFO_INT_REGISTER + M68K_D0:  		REG_D[0] = info->i;								break;
@@ -954,7 +954,7 @@ CPU_GET_INFO( m68000 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:						strcpy(info->s, "68000");						break;
-		
+
 		default: 									CPU_GET_INFO_CALL(m68k);						break;
 	}
 }
@@ -1006,7 +1006,7 @@ CPU_GET_INFO( m68008 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:						strcpy(info->s, "68008");						break;
-		
+
 		default: 									CPU_GET_INFO_CALL(m68k);						break;
 	}
 }
@@ -1085,7 +1085,7 @@ CPU_GET_INFO( m68010 )
 static CPU_INIT( m68020 )
 {
 	m68ki_cpu_core *m68k = device->token;
-	
+
 	CPU_INIT_CALL(m68k);
 
 	m68k->cpu_type         = CPU_TYPE_020;
@@ -1115,7 +1115,7 @@ static CPU_SET_INFO( m68020 )
 		case CPUINFO_INT_REGISTER + M68K_MSP:		if(m68k->s_flag && m68k->m_flag)
 														REG_SP = info->i;
 													else
-														REG_MSP = info->i;	
+														REG_MSP = info->i;
 													break;
 		case CPUINFO_INT_REGISTER + M68K_CACR:		m68k->cacr = info->i;							break;
 		case CPUINFO_INT_REGISTER + M68K_CAAR:		m68k->caar = info->i;							break;
@@ -1286,7 +1286,7 @@ static CPU_SET_INFO( m68040 )
 		case CPUINFO_INT_REGISTER + M68K_MSP:		if(m68k->s_flag && m68k->m_flag)
 														REG_SP = info->i;
 													else
-														REG_MSP = info->i;	
+														REG_MSP = info->i;
 													break;
 		case CPUINFO_INT_REGISTER + M68K_CACR:		m68k->cacr = info->i;							break;
 		case CPUINFO_INT_REGISTER + M68K_CAAR:		m68k->caar = info->i;							break;
