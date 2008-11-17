@@ -96,6 +96,13 @@ static UINT16 galpani3_framebuffer3_enable;
 static UINT16*galpani3_framebuffer1_bgcol;
 static UINT16*galpani3_framebuffer2_bgcol;
 static UINT16*galpani3_framebuffer3_bgcol;
+static UINT16*galpani3_framebuffer3_bright1;
+static UINT16*galpani3_framebuffer3_bright2;
+static UINT16*galpani3_framebuffer2_bright1;
+static UINT16*galpani3_framebuffer2_bright2;
+static UINT16*galpani3_framebuffer1_bright1;
+static UINT16*galpani3_framebuffer1_bright2;
+
 
 
 static UINT16 *galpani3_sprregs, *galpani3_spriteram;
@@ -128,12 +135,52 @@ static VIDEO_START(galpani3)
 
 }
 
+
+static int gp3_is_alpha_pen(int pen)
+{
+	UINT16 dat;
+
+	if (pen<0x4000)
+	{
+		dat = paletteram16[pen];
+	}
+	else if (pen<0x4100)
+	{
+		dat = galpani3_framebuffer1_palette[pen&0xff];
+	}
+	else if (pen<0x4200)
+	{
+		dat = galpani3_framebuffer2_palette[pen&0xff];
+	}
+	else if (pen<0x4300)
+	{
+		dat = galpani3_framebuffer3_palette[pen&0xff];
+	}
+	else if (pen<0x4301)
+	{
+		dat = galpani3_framebuffer1_bgcol[0];
+	}
+	else if (pen<0x4302)
+	{
+		dat = galpani3_framebuffer2_bgcol[0];
+	}
+	else if (pen<0x4303)
+	{
+		dat = galpani3_framebuffer3_bgcol[0];
+	}
+
+	if (dat&0x8000) return 1;
+	else return 0;
+
+}
+
 static VIDEO_UPDATE(galpani3)
 {
 	int x,y;
 	UINT16* src1;
-	UINT16* dst;
+	UINT32* dst;
 	UINT16 pixdata1;
+	const pen_t *paldata = screen->machine->pens;
 
 	fillbitmap(bitmap, 0x0000, cliprect);
 
@@ -161,26 +208,101 @@ static VIDEO_UPDATE(galpani3)
 
 				UINT8 pridat = galpani3_priority_buffer[(priline*0x200)+prioffs];
 
-				UINT16* dst = BITMAP_ADDR16(bitmap, drawy, drawx);
+				UINT32* dst = BITMAP_ADDR32(bitmap, drawy, drawx);
 
-				if (dat3 && galpani3_framebuffer3_enable) dst[0] = dat3+0x4200;
-				else if (dat2 && galpani3_framebuffer2_enable) dst[0] = dat2+0x4100;
-				else if (dat1 && galpani3_framebuffer1_enable) dst[0] = dat1+0x4000;
+
 
 				// this is all wrong
 				if (pridat==0x0f) // relates to the area you've drawn over
 				{
-					if (dat2 && galpani3_framebuffer2_enable) dst[0] = dat2+0x4100;
-					else if (dat1 && galpani3_framebuffer1_enable) dst[0] = dat1+0x4000;
+					if (dat1 && galpani3_framebuffer1_enable)
+					{
+						dst[0] = paldata[dat1+0x4000];
+					}
+
+					if (dat2 && galpani3_framebuffer2_enable)
+					{
+						dst[0] = paldata[dat2+0x4100];
+					}
+
 				}
+				else if (pridat==0xcf) // the girl
+				{
+					dst[0] = paldata[0x4300];
+				}
+				else
+				{
+					/* this isn't right, but the registers have something to do with
+					   alpha / mixing, and bit 0x8000 of the palette is DEFINITELY alpha
+					   enable -- see fading in intro */
+					if (dat1 && galpani3_framebuffer1_enable)
+					{
+						UINT16 pen = dat1+0x4000;
+						UINT32 pal = paldata[pen];
+
+						if (gp3_is_alpha_pen(pen))
+						{
+							int r,g,b;
+							r = (pal & 0x00ff0000)>>16;
+							g = (pal & 0x0000ff00)>>8;
+							b = (pal & 0x000000ff)>>0;
+
+							r = (r * galpani3_framebuffer1_bright2[0]) / 0xff;
+							g = (g * galpani3_framebuffer1_bright2[0]) / 0xff;
+							b = (b * galpani3_framebuffer1_bright2[0]) / 0xff;
+
+							pal = (r & 0x000000ff)<<16;
+							pal |=(g & 0x000000ff)<<8;
+							pal |=(b & 0x000000ff)<<0;
+
+							dst[0] = pal;
+						}
+						else
+						{
+							dst[0] = pal;
+						}
+					}
+
+					if (dat2 && galpani3_framebuffer2_enable)
+					{
+						UINT16 pen = dat2+0x4100;
+						UINT32 pal = paldata[pen];
+
+						if (gp3_is_alpha_pen(pen))
+						{
+							int r,g,b;
+							r = (pal & 0x00ff0000)>>16;
+							g = (pal & 0x0000ff00)>>8;
+							b = (pal & 0x000000ff)>>0;
+
+							r = (r * galpani3_framebuffer2_bright2[0]) / 0xff;
+							g = (g * galpani3_framebuffer2_bright2[0]) / 0xff;
+							b = (b * galpani3_framebuffer2_bright2[0]) / 0xff;
+
+							pal = (r & 0x000000ff)<<16;
+							pal |=(g & 0x000000ff)<<8;
+							pal |=(b & 0x000000ff)<<0;
+
+							dst[0] |= pal;
+						}
+						else
+						{
+							dst[0] = pal;
+						}
+					}
+
+					if (dat3 && galpani3_framebuffer3_enable)
+					{
+						dst[0] = paldata[dat3+0x4200];
+					}
+				}
+
+				/*
 				else if (pridat==0x2f) // area outside of the girl
 				{
 					//dst[0] = mame_rand(screen->machine)&0x3fff;
 				}
-				else if (pridat==0xcf) // the girl
-				{
-					dst[0] = 0x4300;
-				}
+
 				else if (pridat==0x00) // the initial line / box that gets drawn
 				{
 					//dst[0] = mame_rand(screen->machine)&0x3fff;
@@ -197,6 +319,7 @@ static VIDEO_UPDATE(galpani3)
 				{
 					//printf("%02x, ",pridat);
 				}
+				*/
 			}
 		}
 	}
@@ -209,7 +332,7 @@ static VIDEO_UPDATE(galpani3)
 	for (y=0;y<240;y++)
 	{
 		src1 = BITMAP_ADDR16(sprite_bitmap_1, y, 0);
-		dst =  BITMAP_ADDR16(bitmap, y, 0);
+		dst =  BITMAP_ADDR32(bitmap, y, 0);
 
 		for (x=0;x<320;x++)
 		{
@@ -217,7 +340,7 @@ static VIDEO_UPDATE(galpani3)
 
 			if (pixdata1 & 0x3fff)
 			{
-				dst[x] = (pixdata1 & 0x3fff);
+				dst[x] = paldata[(pixdata1 & 0x3fff)];
 			}
 		}
 	}
@@ -416,7 +539,7 @@ READ16_HANDLER( galpani3_regs1_r )
 	switch (offset)
 	{
 		case 0x2:
-			return 0xffff;
+			return galpani3_framebuffer1_enable;
 
 		case 0xb:
 		{
@@ -441,7 +564,7 @@ READ16_HANDLER( galpani3_regs2_r )
 	switch (offset)
 	{
 		case 0x2:
-			return 0xffff;
+			return galpani3_framebuffer2_enable;
 
 		case 0xb:
 		{
@@ -466,7 +589,7 @@ READ16_HANDLER( galpani3_regs3_r )
 	switch (offset)
 	{
 		case 0x2:
-			return 0xffff;
+			return galpani3_framebuffer3_enable;
 
 		case 0xb:
 		{
@@ -655,17 +778,17 @@ static WRITE16_HANDLER( galpani3_priority_buffer_scrolly_w )
 /* I'm not convinced these are enables */
 static WRITE16_HANDLER( galpani3_framebuffer1_enable_w )
 {
-	galpani3_framebuffer1_enable = data & 1;
+	galpani3_framebuffer1_enable = data;
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer2_enable_w )
 {
-	galpani3_framebuffer2_enable = data & 1;
+	galpani3_framebuffer2_enable = data;
 }
 
 static WRITE16_HANDLER( galpani3_framebuffer3_enable_w )
 {
-	galpani3_framebuffer3_enable = data & 1;
+	galpani3_framebuffer3_enable = data;
 }
 
 /* definitely looks like a cycling bg colour used for the girls */
@@ -714,8 +837,8 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800c00, 0x800c01) AM_WRITE(galpani3_framebuffer1_scrolly_w) // scroll?
 	AM_RANGE(0x800c02, 0x800c03) AM_WRITE(galpani3_framebuffer1_enable_w) // enable?
 	AM_RANGE(0x800c06, 0x800c07) AM_WRITE(galpani3_framebuffer1_bgcol_w) AM_BASE(&galpani3_framebuffer1_bgcol) // bg colour? cycles ingame, for girls?
-	AM_RANGE(0x800c10, 0x800c11) AM_WRITE(SMH_NOP) // brightness / blend amount?
-	AM_RANGE(0x800c12, 0x800c13) AM_WRITE(SMH_NOP) // similar.
+	AM_RANGE(0x800c10, 0x800c11) AM_RAM AM_BASE(&galpani3_framebuffer1_bright1) // brightness / blend amount?
+	AM_RANGE(0x800c12, 0x800c13) AM_RAM AM_BASE(&galpani3_framebuffer1_bright2) // similar.
 	AM_RANGE(0x800c18, 0x800c1b) AM_WRITE(galpani3_regs1_address_w) // ROM address of RLE data, in bytes
 	AM_RANGE(0x800c1e, 0x800c1f) AM_WRITE(galpani3_regs1_go_w) // ?
 	AM_RANGE(0x800c00, 0x800c1f) AM_READ(galpani3_regs1_r)// ? R layer regs ? see subroutine $3a03e
@@ -729,8 +852,8 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00c00, 0xa00c01) AM_WRITE(galpani3_framebuffer2_scrolly_w)
 	AM_RANGE(0xa00c02, 0xa00c03) AM_WRITE(galpani3_framebuffer2_enable_w) // enable?
 	AM_RANGE(0xa00c06, 0xa00c07) AM_WRITE(galpani3_framebuffer2_bgcol_w) AM_BASE(&galpani3_framebuffer2_bgcol) // bg colour? same values as previous layer
-	AM_RANGE(0xa00c10, 0xa00c11) AM_WRITE(SMH_NOP) // similar..
-	AM_RANGE(0xa00c12, 0xa00c13) AM_WRITE(SMH_NOP) // brightness / blend amount?
+	AM_RANGE(0xa00c10, 0xa00c11) AM_RAM AM_BASE(&galpani3_framebuffer2_bright1) // similar..
+	AM_RANGE(0xa00c12, 0xa00c13) AM_RAM AM_BASE(&galpani3_framebuffer2_bright2) // brightness / blend amount?
 	AM_RANGE(0xa00c00, 0xa00c1f) AM_READ(galpani3_regs2_r) // ? G layer regs ? see subroutine $3a03e
 	AM_RANGE(0xa00c18, 0xa00c1b) AM_WRITE(galpani3_regs2_address_w) // ROM address of RLE data, in bytes
 	AM_RANGE(0xa00c1e, 0xa00c1f) AM_WRITE(galpani3_regs2_go_w) // ?
@@ -744,8 +867,8 @@ static ADDRESS_MAP_START( galpani3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00c00, 0xc00c01) AM_WRITE(galpani3_framebuffer3_scrolly_w) // scroll?
 	AM_RANGE(0xc00c02, 0xc00c03) AM_WRITE(galpani3_framebuffer3_enable_w) // enable?
 	AM_RANGE(0xc00c06, 0xc00c07) AM_WRITE(galpani3_framebuffer3_bgcol_w) AM_BASE(&galpani3_framebuffer3_bgcol) // bg colour? not used?
-	AM_RANGE(0xc00c10, 0xc00c11) AM_WRITE(SMH_NOP) // brightness / blend amount?
-	AM_RANGE(0xc00c12, 0xc00c13) AM_WRITE(SMH_NOP) // similar..
+	AM_RANGE(0xc00c10, 0xc00c11) AM_RAM AM_BASE(&galpani3_framebuffer3_bright1) // brightness / blend amount?
+	AM_RANGE(0xc00c12, 0xc00c13) AM_RAM AM_BASE(&galpani3_framebuffer3_bright2) // similar..
 	AM_RANGE(0xc00c18, 0xc00c1b) AM_WRITE(galpani3_regs3_address_w) // ROM address of RLE data, in bytes
 	AM_RANGE(0xc00c1e, 0xc00c1f) AM_WRITE(galpani3_regs3_go_w) // ?
 	AM_RANGE(0xc00c00, 0xc00c1f) AM_READ(galpani3_regs3_r) // ? B layer regs ? see subroutine $3a03e
@@ -784,7 +907,7 @@ static MACHINE_DRIVER_START( galpani3 )
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 	//MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
