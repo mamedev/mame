@@ -86,6 +86,7 @@ ToDo / Notes:
 -To enter into an Advanced Test Mode,keep pressed the Test Button (F2) on the start-up.
 
 (Main issues)
+-IRQs: some games have some issues with timing accurate IRQs,check/fix all of them.
 -Clean-ups and split the various chips(SCU,SMPC)into their respective files.
 -CD block:complete it.
 -The Cart-Dev mode hangs even with the -dev bios,I would like to see what it does on the real HW.
@@ -153,7 +154,6 @@ ToDo / Notes:
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/eeprom.h"
 #include "cpu/sh2/sh2.h"
 #include "machine/stvcd.h"
@@ -219,6 +219,23 @@ static INT32  scu_size_0,		/* Transfer DMA size lv 0*/
 			  scu_size_1,		/* lv 1*/
 			  scu_size_2;		/* lv 2*/
 
+struct
+{
+	UINT8 vblank_out;
+	UINT8 vblank_in;
+	UINT8 hblank_in;
+	UINT8 timer_0;
+	UINT8 timer_1;
+	UINT8 dsp_end;
+	UINT8 sound_req;
+	UINT8 smpc;
+	UINT8 pad;
+	UINT8 dma_end[3];
+	UINT8 dma_ill;
+	UINT8 vdp1_end;
+	UINT8 abus;
+}stv_irq;
+
 static void dma_direct_lv0(running_machine *machine);	/*DMA level 0 direct transfer function*/
 static void dma_direct_lv1(running_machine *machine);   /*DMA level 1 direct transfer function*/
 static void dma_direct_lv2(running_machine *machine);   /*DMA level 2 direct transfer function*/
@@ -230,12 +247,12 @@ static void dma_indirect_lv2(running_machine *machine); /*DMA level 2 indirect t
 int minit_boost,sinit_boost;
 attotime minit_boost_timeslice, sinit_boost_timeslice;
 
-static int scanline;
+//static int scanline;
 
 
 /*A-Bus IRQ checks,where they could be located these?*/
-#define ABUSIRQ(_irq_,_vector_,_mask_) \
-	if(!(stv_scu[40] & _mask_)) { cpu_set_input_line_and_vector(machine->cpu[0], _irq_, HOLD_LINE , _vector_); }
+#define ABUSIRQ(_irq_,_vector_) \
+	{ cpu_set_input_line_and_vector(device->machine->cpu[0], _irq_, HOLD_LINE , _vector_); }
 #if 0
 if(stv_scu[42] & 1)//IRQ ACK
 {
@@ -530,17 +547,17 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 			SMPC_CONTROL_MODE_PORT_2;
 	}
 
+	/*TODO: probably this is wrong...*/
 	if(offset == 0x7f)
 	{
 		//enable PAD irq & VDP2 external latch for port 1/2
 		EXLE1 = smpc_ram[0x7f] & 1 ? 1 : 0;
 		EXLE2 = smpc_ram[0x7f] & 2 ? 1 : 0;
 		if(EXLE1 || EXLE2)
-			if(!(stv_scu[40] & 0x0100)) /*Pad irq*/
-			{
-				if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
-				cpu_set_input_line_and_vector(machine->cpu[0], 8, HOLD_LINE , 0x48);
-			}
+		{
+			//if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
+			cpu_set_input_line_and_vector(machine->cpu[0], 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
+		}
 	}
 
 	if (offset == 0x1f)
@@ -643,10 +660,10 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				smpc_ram[0x5d]=0xff;
 
 			//  /*This is for RTC,cartridge code and similar stuff...*/
-			//  if(!(stv_scu[40] & 0x0080)) /*System Manager(SMPC) irq*/ /* we can't check this .. breaks controls .. probably issues elsewhere? */
+				/*System Manager(SMPC) irq*/
 				{
-					if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
-					cpu_set_input_line_and_vector(machine->cpu[0], 8, HOLD_LINE , 0x47);
+					//if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
+					cpu_set_input_line_and_vector(machine->cpu[0], 8, (stv_irq.smpc) ? HOLD_LINE : CLEAR_LINE, 0x47);
 				}
 			break;
 			/* RTC write*/
@@ -728,103 +745,6 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 	offset += byte;
 
 	stv_SMPC_w8(space->machine, offset,writedata);
-}
-
-
-/*
-(Preliminary) explaination about this:
-VBLANK-OUT is used at the start of the vblank period.It also sets the timer zero
-variable to 0.
-If the Timer Compare register is zero too,the Timer 0 irq is triggered.
-
-HBLANK-IN is used at the end of each scanline except when in VBLANK-IN/OUT periods.
-
-The timer 0 is also incremented by one at each HBLANK and checked with the value
-of the Timer Compare register;if equal,the timer 0 irq is triggered here too.
-Notice that the timer 0 compare register can be more than the VBLANK maximum range,in
-this case the timer 0 irq is simply never triggered.This is a known Sega Saturn/ST-V "bug".
-
-VBLANK-IN is used at the end of the vblank period.
-
-SCU register[36] is the timer zero compare register.
-SCU register[40] is for IRQ masking.
-*/
-
-/* to do, update bios idle skips so they work better with this arrangement.. */
-
-
-static INTERRUPT_GEN( stv_interrupt )
-{
-	scanline = 261-cpu_getiloops(device);
-
-	if(scanline == 0)
-	{
-		if(!(stv_scu[40] & 2))/*VBLANK-OUT*/
-		{
-			if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT at scanline %04x, Vector 0x41 Level 0x0e\n",scanline);
-			cpu_set_input_line_and_vector(device, 0xe, HOLD_LINE , 0x41);
-		}
-	}
-	else if(scanline <= 223 && scanline >= 1)/*Correct?*/
-	{
-		timer_0++;
-		timer_1++;
-		/*TODO: check this...*/
-		/*Timer 1 handling*/
-		if((stv_scu[38] & 1))
-		{
-			if((!(stv_scu[40] & 0x10)) && (!(stv_scu[38] & 0x80)))
-			{
-				if(LOG_IRQ) logerror ("Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
-				cpu_set_input_line_and_vector(device, 0xb, HOLD_LINE, 0x44 );
-			}
-			else if((!(stv_scu[40] & 0x10)) && (stv_scu[38] & 0x80))
-			{
-				if(timer_1 == (stv_scu[36] & 0x1ff))
-				{
-					if(LOG_IRQ) logerror ("Interrupt: Timer 1 at scanline %04x, Vector 0x44 Level 0x0b\n",scanline);
-					cpu_set_input_line_and_vector(device, 0xb, HOLD_LINE, 0x44 );
-				}
-			}
-		}
-		if(timer_0 == (stv_scu[36] & 0x1ff))
-		{
-			if(!(stv_scu[40] & 8))/*Timer 0*/
-			{
-				if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
-				cpu_set_input_line_and_vector(device, 0xc, HOLD_LINE, 0x43 );
-			}
-		}
-
-		/*TODO:use this *at the end* of the draw line.*/
-		if(!(stv_scu[40] & 4))/*HBLANK-IN*/
-		{
-			if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);
-			cpu_set_input_line_and_vector(device, 0xd, HOLD_LINE , 0x42);
-		}
-	}
-	else if(scanline == 224)
-	{
-		timer_0 = 0;
-		timer_1 = 0;
-
-		if(!(stv_scu[40] & 1))/*VBLANK-IN*/
-		{
-			if(LOG_IRQ) logerror ("Interrupt: VBlank IN at scanline %04x, Vector 0x40 Level 0x0f\n",scanline);
-			cpu_set_input_line_and_vector(device, 0xf, HOLD_LINE , 0x40);
-		}
-
-		if(timer_0 == (stv_scu[36] & 0x1ff))
-		{
-			if(!(stv_scu[40] & 8))/*Timer 0*/
-			{
-				if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);
-				cpu_set_input_line_and_vector(device, 0xc, HOLD_LINE, 0x43 );
-			}
-		}
-		if(!(stv_scu[40] & 0x2000)) /*Sprite draw end irq*/
-			cpu_set_input_line_and_vector(device, 2, HOLD_LINE , 0x4d);
-	}
 }
 
 /*
@@ -1164,11 +1084,27 @@ static READ32_HANDLER( stv_scu_r32 )
         if(LOG_SCU) logerror( "DSP mem read at %08X\n", stv_scu[34]);
         return dsp_ram_addr_r();
     }
-    else if( offset == 41)
+    else if( offset == 41) /*IRQ reg status read*/
     {
-		logerror("(PC=%08x) IRQ status reg read\n",cpu_get_pc(space->cpu));
-		/*TODO:for now we're activating everything here,but we need to return the proper active irqs*/
-		return 0xffffffff;
+		if(LOG_SCU) logerror("(PC=%08x) IRQ status reg read %08x\n",cpu_get_pc(space->cpu),mem_mask);
+
+		stv_scu[41] = (stv_irq.vblank_in & 1)<<0;
+		stv_scu[41]|= (stv_irq.vblank_out & 1)<<1;
+		stv_scu[41]|= (stv_irq.hblank_in & 1)<<2;
+		stv_scu[41]|= (stv_irq.timer_0 & 1)<<3;
+		stv_scu[41]|= (stv_irq.timer_1 & 1)<<4;
+		stv_scu[41]|= (stv_irq.dsp_end & 1)<<5;
+		stv_scu[41]|= (stv_irq.sound_req & 1)<<6;
+		stv_scu[41]|= (stv_irq.smpc & 1)<<7;
+		stv_scu[41]|= (stv_irq.pad & 1)<<8;
+		stv_scu[41]|= (stv_irq.dma_end[0] & 1)<<9;
+		stv_scu[41]|= (stv_irq.dma_end[1] & 1)<<10;
+		stv_scu[41]|= (stv_irq.dma_end[2] & 1)<<11;
+		stv_scu[41]|= (stv_irq.dma_ill & 1)<<12;
+		stv_scu[41]|= (stv_irq.vdp1_end & 1)<<13;
+		stv_scu[41]|= (stv_irq.abus & 1)<<15;
+
+		return stv_scu[41] ^ 0xffffffff;
 	}
 	else if( offset == 50 )
 	{
@@ -1386,7 +1322,22 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		case 40:
 		/*An interrupt is masked when his specific bit is 1.*/
 		/*Are bit 16-bit 31 for External A-Bus irq mask like the status register?*/
-		/*What is 0x00000080 setting?Is it valid?*/
+
+		stv_irq.vblank_in =  (((stv_scu[40] & 0x0001)>>0) ^ 1);
+		stv_irq.vblank_out = (((stv_scu[40] & 0x0002)>>1) ^ 1);
+		stv_irq.hblank_in =  (((stv_scu[40] & 0x0004)>>2) ^ 1);
+		stv_irq.timer_0 = 	 (((stv_scu[40] & 0x0008)>>3) ^ 1);
+		stv_irq.timer_1 =    (((stv_scu[40] & 0x0010)>>4) ^ 1);
+		stv_irq.dsp_end =    (((stv_scu[40] & 0x0020)>>5) ^ 1);
+		stv_irq.sound_req =  (((stv_scu[40] & 0x0040)>>6) ^ 1);
+		stv_irq.smpc =       (((stv_scu[40] & 0x0080)>>7)); //NOTE: SCU bug
+		stv_irq.pad =        (((stv_scu[40] & 0x0100)>>8) ^ 1);
+		stv_irq.dma_end[0] = (((stv_scu[40] & 0x0200)>>9) ^ 1);
+		stv_irq.dma_end[1] = (((stv_scu[40] & 0x0400)>>10) ^ 1);
+		stv_irq.dma_end[2] = (((stv_scu[40] & 0x0800)>>11) ^ 1);
+		stv_irq.dma_ill =    (((stv_scu[40] & 0x1000)>>12) ^ 1);
+		stv_irq.vdp1_end =   (((stv_scu[40] & 0x2000)>>13) ^ 1);
+		stv_irq.abus =       (((stv_scu[40] & 0x8000)>>15) ^ 1);
 
 		/*Take out the common settings to keep logging quiet.*/
 		if(stv_scu[40] != 0xfffffffe &&
@@ -1414,14 +1365,56 @@ static WRITE32_HANDLER( stv_scu_w32 )
 			stv_scu[offset] & 0x0001 ? 1 : 0);/*VBlank-IN*/
 		}
 		break;
+		/*Interrupt Control reg Set*/
 		case 41:
 		/*This is r/w by introdon...*/
-		if(LOG_SCU) logerror("IRQ status reg set:%08x\n",stv_scu[41]);
+		if(LOG_SCU) logerror("IRQ status reg set:%08x %08x\n",stv_scu[41],mem_mask);
+
+		stv_irq.vblank_in =  ((stv_scu[41] & 0x0001)>>0);
+		stv_irq.vblank_out = ((stv_scu[41] & 0x0002)>>1);
+		stv_irq.hblank_in =  ((stv_scu[41] & 0x0004)>>2);
+		stv_irq.timer_0 =    ((stv_scu[41] & 0x0008)>>3);
+		stv_irq.timer_1 =    ((stv_scu[41] & 0x0010)>>4);
+		stv_irq.dsp_end =    ((stv_scu[41] & 0x0020)>>5);
+		stv_irq.sound_req =  ((stv_scu[41] & 0x0040)>>6);
+		stv_irq.smpc =       ((stv_scu[41] & 0x0080)>>7);
+		stv_irq.pad =        ((stv_scu[41] & 0x0100)>>8);
+		stv_irq.dma_end[0] = ((stv_scu[41] & 0x0200)>>9);
+		stv_irq.dma_end[1] = ((stv_scu[41] & 0x0400)>>10);
+		stv_irq.dma_end[2] = ((stv_scu[41] & 0x0800)>>11);
+		stv_irq.dma_ill =    ((stv_scu[41] & 0x1000)>>12);
+		stv_irq.vdp1_end =   ((stv_scu[41] & 0x2000)>>13);
+		stv_irq.abus =       ((stv_scu[41] & 0x8000)>>15);
+
 		break;
 		case 42: if(LOG_SCU) logerror("A-Bus IRQ ACK %08x\n",stv_scu[42]); break;
 		case 49: if(LOG_SCU) logerror("SCU SDRAM set: %02x\n",stv_scu[49]); break;
 		default: if(LOG_SCU) logerror("Warning: unused SCU reg set %d = %08x\n",offset,data);
 	}
+}
+
+/*Lv 0 DMA end irq*/
+static TIMER_CALLBACK( dma_lv0_ended )
+{
+	cpu_set_input_line_and_vector(machine->cpu[0], 5, (stv_irq.dma_end[0]) ? HOLD_LINE : CLEAR_LINE, 0x4b);
+
+	D0MV_0;
+}
+
+/*Lv 1 DMA end irq*/
+static TIMER_CALLBACK( dma_lv1_ended )
+{
+	cpu_set_input_line_and_vector(machine->cpu[0], 6, (stv_irq.dma_end[1]) ? HOLD_LINE : CLEAR_LINE, 0x4a);
+
+	D1MV_0;
+}
+
+/*Lv 2 DMA end irq*/
+static TIMER_CALLBACK( dma_lv2_ended )
+{
+	cpu_set_input_line_and_vector(machine->cpu[0], 6, (stv_irq.dma_end[2]) ? HOLD_LINE : CLEAR_LINE, 0x49);
+
+	D2MV_0;
 }
 
 static void dma_direct_lv0(running_machine *machine)
@@ -1521,8 +1514,9 @@ static void dma_direct_lv0(running_machine *machine)
 	if(!(DWUP(0))) scu_dst_0 = tmp_dst;
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
-	if(!(stv_scu[40] & 0x800))/*Lv 0 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 5, HOLD_LINE , 0x4b);
+
+	/*TODO: timing of this*/
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1530,8 +1524,6 @@ static void dma_direct_lv0(running_machine *machine)
 		scu_src_add_0 = (scu_add_tmp & 0x00ff) >> 0;
 		scu_add_tmp^=0x80000000;
 	}
-
-	D0MV_0;
 }
 
 static void dma_direct_lv1(running_machine *machine)
@@ -1624,8 +1616,8 @@ static void dma_direct_lv1(running_machine *machine)
 	if(!(DWUP(1))) scu_dst_1 = tmp_dst;
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
-	if(!(stv_scu[40] & 0x400))/*Lv 1 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 6, HOLD_LINE , 0x4a);
+
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1633,8 +1625,6 @@ static void dma_direct_lv1(running_machine *machine)
 		scu_src_add_1 = (scu_add_tmp & 0x00ff) >> 0;
 		scu_add_tmp^=0x80000000;
 	}
-
-	D1MV_0;
 }
 
 static void dma_direct_lv2(running_machine *machine)
@@ -1727,8 +1717,8 @@ static void dma_direct_lv2(running_machine *machine)
 	if(!(DWUP(2))) scu_dst_2 = tmp_dst;
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
-	if(!(stv_scu[40] & 0x200))/*Lv 2 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 6, HOLD_LINE , 0x49);
+
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1736,8 +1726,6 @@ static void dma_direct_lv2(running_machine *machine)
 		scu_src_add_2 = (scu_add_tmp & 0x00ff) >> 0;
 		scu_add_tmp^=0x80000000;
 	}
-
-	D2MV_0;
 }
 
 static void dma_indirect_lv0(running_machine *machine)
@@ -1805,10 +1793,7 @@ static void dma_indirect_lv0(running_machine *machine)
 
 	}while(job_done == 0);
 
-	if(!(stv_scu[40] & 0x800))/*Lv 0 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 5, HOLD_LINE , 0x4b);
-
-	D0MV_0;
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 }
 
 static void dma_indirect_lv1(running_machine *machine)
@@ -1877,10 +1862,7 @@ static void dma_indirect_lv1(running_machine *machine)
 
 	}while(job_done == 0);
 
-	if(!(stv_scu[40] & 0x400))/*Lv 1 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 6, HOLD_LINE , 0x4a);
-
-	D1MV_0;
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 }
 
 static void dma_indirect_lv2(running_machine *machine)
@@ -1948,10 +1930,7 @@ static void dma_indirect_lv2(running_machine *machine)
 
 	}while(job_done == 0);
 
-	if(!(stv_scu[40] & 0x200))/*Lv 2 DMA end irq*/
-		cpu_set_input_line_and_vector(machine->cpu[0], 6, HOLD_LINE , 0x49);
-
-	D2MV_0;
+	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 }
 
 
@@ -2025,10 +2004,6 @@ static ADDRESS_MAP_START( stv_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	//AM_RANGE(0x05a80000, 0x05afffff) AM_READ(stv_sh2_random_r)
 	AM_RANGE(0x05b00000, 0x05b00fff) AM_READWRITE(stv_scsp_regs_r32, stv_scsp_regs_w32)
 	/* VDP1 */
-	/*0x05c00000-0x05c7ffff VRAM*/
-	/*0x05c80000-0x05c9ffff Frame Buffer 0*/
-	/*0x05ca0000-0x05cbffff Frame Buffer 1*/
-	/*0x05d00000-0x05d7ffff VDP1 Regs */
 	AM_RANGE(0x05c00000, 0x05c7ffff) AM_READWRITE(stv_vdp1_vram_r, stv_vdp1_vram_w)
 	AM_RANGE(0x05c80000, 0x05cbffff) AM_READWRITE(stv_vdp1_framebuffer0_r, stv_vdp1_framebuffer0_w)
 	AM_RANGE(0x05d00000, 0x05d0001f) AM_READWRITE(stv_vdp1_regs_r, stv_vdp1_regs_w)
@@ -2538,7 +2513,7 @@ static MACHINE_START( stv )
 	state_save_register_global(en_68k);
 	state_save_register_global(timer_0);
 	state_save_register_global(timer_1);
-	state_save_register_global(scanline);
+//	state_save_register_global(scanline);
 	state_save_register_global(IOSEL1);
 	state_save_register_global(IOSEL2);
 	state_save_register_global(EXLE1);
@@ -2552,6 +2527,145 @@ static MACHINE_START( stv )
 	stv_register_protection_savestates(); // machine/stvprot.c
 
 	add_exit_callback(machine, stvcd_exit);
+}
+
+/*
+(Preliminary) explaination about this:
+VBLANK-OUT is used at the start of the vblank period.It also sets the timer zero
+variable to 0.
+If the Timer Compare register is zero too,the Timer 0 irq is triggered.
+
+HBLANK-IN is used at the end of each scanline except when in VBLANK-IN/OUT periods.
+
+The timer 0 is also incremented by one at each HBLANK and checked with the value
+of the Timer Compare register;if equal,the timer 0 irq is triggered here too.
+Notice that the timer 0 compare register can be more than the VBLANK maximum range,in
+this case the timer 0 irq is simply never triggered.This is a known Sega Saturn/ST-V "bug".
+
+VBLANK-IN is used at the end of the vblank period.
+
+SCU register[36] is the timer zero compare register.
+SCU register[40] is for IRQ masking.
+*/
+
+/* to do, update bios idle skips so they work better with this arrangement.. */
+
+static emu_timer *vblank_in_timer,*scan_timer,*t1_timer;
+static int h_sync,v_sync;
+static int cur_scan;
+
+#define VBLANK_OUT_IRQ	\
+timer_0 = 0; \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT Vector 0x41 Level 0x0e\n");*/ \
+	cpu_set_input_line_and_vector(device->machine->cpu[0], 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
+} \
+
+#define VBLANK_IN_IRQ \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: VBlank IN Vector 0x40 Level 0x0f\n");*/ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
+} \
+
+#define HBLANK_IN_IRQ \
+timer_1 = stv_scu[37] & 0x1ff; \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: HBlank-In at scanline %04x, Vector 0x42 Level 0x0d\n",scanline);*/ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xd, (stv_irq.hblank_in) ? HOLD_LINE : CLEAR_LINE, 0x42); \
+} \
+
+#define TIMER_0_IRQ \
+if(timer_0 == (stv_scu[36] & 0x3ff)) \
+{ \
+	/*if(LOG_IRQ) logerror ("Interrupt: Timer 0 at scanline %04x, Vector 0x43 Level 0x0c\n",scanline);*/ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xc, (stv_irq.timer_0) ? HOLD_LINE : CLEAR_LINE, 0x43 ); \
+} \
+
+#define TIMER_1_IRQ	\
+if((stv_scu[38] & 1)) \
+{ \
+	if(!(stv_scu[38] & 0x80)) \
+	{ \
+		/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
+		cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+	} \
+	else \
+	{ \
+		if((timer_0) == (stv_scu[36] & 0x3ff)) \
+		{ \
+			/*if(LOG_IRQ) logerror ("Interrupt: Timer 1 at point %04x, Vector 0x44 Level 0x0b\n",point);*/ \
+			cpu_set_input_line_and_vector(machine->cpu[0], 0xb, (stv_irq.timer_1) ? HOLD_LINE : CLEAR_LINE, 0x44 ); \
+		} \
+	} \
+} \
+
+#define VDP1_IRQ \
+{ \
+	cpu_set_input_line_and_vector(machine->cpu[0], 2, (stv_irq.vdp1_end) ? HOLD_LINE : CLEAR_LINE, 0x4d); \
+} \
+
+static TIMER_CALLBACK( hblank_in_irq )
+{
+	int scanline = param;
+
+//	h = video_screen_get_height(machine->primary_screen);
+//	w = video_screen_get_width(machine->primary_screen);
+
+	TIMER_0_IRQ;
+	HBLANK_IN_IRQ;
+
+	if((scanline+1) < v_sync)
+	{
+		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, h_sync), scanline+1);
+		/*set the first Timer-1 event*/
+		cur_scan = scanline+1;
+		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, 0), 0);
+	}
+
+	timer_0++;
+}
+
+static TIMER_CALLBACK( timer1_irq )
+{
+	int cur_point = param;
+
+	TIMER_1_IRQ;
+
+	if((cur_point+1) < h_sync)
+	{
+		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, cur_scan, cur_point+1), cur_point+1);
+	}
+
+	if(timer_1 > 0) timer_1--;
+}
+
+static TIMER_CALLBACK( vdp1_irq )
+{
+	VDP1_IRQ;
+}
+
+static TIMER_CALLBACK( vblank_in_irq )
+{
+	VBLANK_IN_IRQ;
+}
+
+/*V-Blank-OUT event*/
+static INTERRUPT_GEN( stv_interrupt )
+{
+//	scanline = 0;
+	h_sync = video_screen_get_height(device->machine->primary_screen)/2;//horz
+	v_sync = video_screen_get_width(device->machine->primary_screen)-2;//vert
+
+	VBLANK_OUT_IRQ;
+
+	/*Next V-Blank-IN event*/
+	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), 0);
+	/*Set the first Hblank-IN event*/
+	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 0, h_sync), 0);
+
+	/*TODO: timing of this one (related to the VDP1 speed)*/
+	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
+	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen,0,0), NULL, 0, vdp1_irq);
 }
 
 static MACHINE_RESET( stv )
@@ -2575,6 +2689,13 @@ static MACHINE_RESET( stv )
 	cpu_set_clock(machine->cpu[2], MASTER_CLOCK_320/5);
 
 	stvcd_reset(machine);
+
+	/* set the first scanline 0 timer to go off */
+	scan_timer = timer_alloc(hblank_in_irq, NULL);
+	t1_timer = timer_alloc(timer1_irq,NULL);
+	vblank_in_timer = timer_alloc(vblank_in_irq,NULL);
+	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 224, 352), 0);
 }
 
 
@@ -2583,7 +2704,7 @@ static MACHINE_DRIVER_START( stv )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
 	MDRV_CPU_PROGRAM_MAP(stv_mem, 0)
-	MDRV_CPU_VBLANK_INT_HACK(stv_interrupt,264)/*264 lines,224 display lines*/
+	MDRV_CPU_VBLANK_INT("main",stv_interrupt)
 	MDRV_CPU_CONFIG(sh2_conf_master)
 
 	MDRV_CPU_ADD("slave", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -2598,7 +2719,7 @@ static MACHINE_DRIVER_START( stv )
 	MDRV_NVRAM_HANDLER(stv) /* Actually 93c45 */
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
