@@ -271,6 +271,7 @@ static MACHINE_RESET( gladiator )
 	{
 		UINT8 *rom = memory_region(machine, "audio") + 0x10000;
 		memory_set_bankptr(2,rom);
+		cpu_reset(machine->cpu[2]);
 	}
 }
 
@@ -1014,6 +1015,10 @@ static DRIVER_INIT( gladiatr )
 	swap_block(rom + 0x22000, rom + 0x28000, 0x2000);
 	swap_block(rom + 0x26000, rom + 0x2c000, 0x2000);
 	swap_block(rom + 0x24000, rom + 0x28000, 0x4000);
+	
+	/* make sure bank is valid in cpu-reset */
+	rom = memory_region(machine, "audio") + 0x10000;
+	memory_set_bankptr(2,rom);
 }
 
 
