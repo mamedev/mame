@@ -529,10 +529,8 @@ static IRQ_CALLBACK(irq_callback)
 	return r;
 }
 
-static MACHINE_RESET(taitowlf)
+static MACHINE_START(taitowlf)
 {
-	memory_set_bankptr(1, memory_region(machine, "user1") + 0x30000);
-
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	taitowlf_devices.pit8254 = device_list_find_by_tag( machine->config->devicelist, PIT8254, "pit8254" );
@@ -540,6 +538,11 @@ static MACHINE_RESET(taitowlf)
 	taitowlf_devices.pic8259_2 = device_list_find_by_tag( machine->config->devicelist, PIC8259, "pic8259_2" );
 	taitowlf_devices.dma8237_1 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_1" );
 	taitowlf_devices.dma8237_2 = device_list_find_by_tag( machine->config->devicelist, DMA8237, "dma8237_2" );
+}
+
+static MACHINE_RESET(taitowlf)
+{
+	memory_set_bankptr(1, memory_region(machine, "user1") + 0x30000);
 }
 
 
@@ -603,6 +606,7 @@ static MACHINE_DRIVER_START(taitowlf)
 	MDRV_CPU_PROGRAM_MAP(taitowlf_map, 0)
 	MDRV_CPU_IO_MAP(taitowlf_io, 0)
 
+	MDRV_MACHINE_START(taitowlf)
 	MDRV_MACHINE_RESET(taitowlf)
 
 	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
