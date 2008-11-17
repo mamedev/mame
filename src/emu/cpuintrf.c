@@ -1266,7 +1266,6 @@ int cpu_execute(const device_config *device, int cycles)
 	int ran;
 
 	cpu_push_context(device);
-	memory_set_opbase(cpu_get_physical_pc_byte(device));
 	ran = (*classheader->execute)(device, cycles);
 	cpu_pop_context();
 	return ran;
@@ -1282,7 +1281,7 @@ void cpu_reset(const device_config *device)
 	cpu_class_header *classheader = get_safe_classheader(device);
 
 	cpu_push_context(device);
-	memory_set_opbase(0);
+	memory_set_direct_region(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0);
 	(*classheader->reset)(device);
 	cpu_pop_context();
 }
@@ -1332,19 +1331,6 @@ offs_t cpu_get_physical_pc_byte(const device_config *device)
 	pc = cpu_address_physical(device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, pc);
 	cpu_pop_context();
 	return pc;
-}
-
-
-/*-------------------------------------------------
-    cpu_set_opbase - update the banking on a given 
-    CPU
--------------------------------------------------*/
-
-void cpu_set_opbase(const device_config *device, unsigned val)
-{
-	cpu_push_context(device);
-	memory_set_opbase(val);
-	cpu_pop_context();
 }
 
 

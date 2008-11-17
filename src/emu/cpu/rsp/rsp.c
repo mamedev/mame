@@ -150,7 +150,7 @@ typedef struct
 static RSP_REGS rsp;
 static int rsp_icount;
 
-#define ROPCODE(pc)		cpu_readop32(pc)
+#define ROPCODE(pc)		program_decrypted_read_dword(pc)
 
 INLINE UINT8 READ8(UINT32 address)
 {

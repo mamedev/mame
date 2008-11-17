@@ -215,32 +215,32 @@ INLINE UINT32 ROPCODE(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
 	tms->pc += 2 << 3;
-	return cpu_readop16(pc);
+	return program_decrypted_read_word(pc);
 }
 
 INLINE INT16 PARAM_WORD(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
 	tms->pc += 2 << 3;
-	return cpu_readop_arg16(pc);
+	return program_raw_read_word(pc);
 }
 
 INLINE INT32 PARAM_LONG(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
 	tms->pc += 4 << 3;
-	return (UINT16)cpu_readop_arg16(pc) | (cpu_readop_arg16(pc + 2) << 16);
+	return (UINT16)program_raw_read_word(pc) | (program_raw_read_word(pc + 2) << 16);
 }
 
 INLINE INT16 PARAM_WORD_NO_INC(tms34010_state *tms)
 {
-	return cpu_readop_arg16(TOBYTE(tms->pc));
+	return program_raw_read_word(TOBYTE(tms->pc));
 }
 
 INLINE INT32 PARAM_LONG_NO_INC(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
-	return (UINT16)cpu_readop_arg16(pc) | (cpu_readop_arg16(pc + 2) << 16);
+	return (UINT16)program_raw_read_word(pc) | (program_raw_read_word(pc + 2) << 16);
 }
 
 /* read memory byte */
@@ -1634,7 +1634,6 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 
 	/* swap back */
 	cpu_pop_context();
-	memory_set_opbase(cpu_get_physical_pc_byte(tms->device));
 }
 
 

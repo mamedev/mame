@@ -187,7 +187,7 @@ static void check_irqs(	mcs48_state *mcs48);
 
 INLINE UINT8 opcode_fetch(offs_t address)
 {
-	return cpu_readop(address);
+	return program_decrypted_read_byte(address);
 }
 
 
@@ -198,7 +198,7 @@ INLINE UINT8 opcode_fetch(offs_t address)
 
 INLINE UINT8 argument_fetch(offs_t address)
 {
-	return cpu_readop_arg(address);
+	return program_raw_read_byte(address);
 }
 
 

@@ -69,7 +69,7 @@ static int g_cycles;
 
 #define PPC    ssp1601.ppc.w.h
 
-#define FETCH() cpu_readop16(rPC++ << 1)
+#define FETCH() program_decrypted_read_word(rPC++ << 1)
 #define PROGRAM_WORD(a) program_read_word((a) << 1)
 #define GET_PPC_OFFS() PPC
 #define CHANGEPC() change_pc(rPC << 1)

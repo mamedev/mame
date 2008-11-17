@@ -329,7 +329,7 @@ static CPU_EXECUTE( arm )
 
 		/* load instruction */
 		pc = R15;
-		insn = cpu_readop32( pc & ADDRESS_MASK );
+		insn = program_decrypted_read_dword( pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{

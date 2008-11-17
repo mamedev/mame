@@ -55,7 +55,7 @@ static int ccpu_icount;
     MACROS
 ***************************************************************************/
 
-#define READOP(a) 			(cpu_readop(a))
+#define READOP(a) 			(program_decrypted_read_byte(a))
 
 #define RDMEM(a)			(data_read_word_16be((a) * 2) & 0xfff)
 #define WRMEM(a,v)			(data_write_word_16be((a) * 2, (v)))

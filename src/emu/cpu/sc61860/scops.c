@@ -28,18 +28,18 @@
 
 INLINE UINT8 READ_OP(void)
 {
-	return cpu_readop(sc61860.pc++);
+	return program_decrypted_read_byte(sc61860.pc++);
 }
 
 INLINE UINT8 READ_OP_ARG(void)
 {
-	return cpu_readop_arg(sc61860.pc++);
+	return program_raw_read_byte(sc61860.pc++);
 }
 
 INLINE UINT16 READ_OP_ARG_WORD(void)
 {
-	UINT16 t=cpu_readop(sc61860.pc++)<<8;
-	t|=cpu_readop(sc61860.pc++);
+	UINT16 t=program_decrypted_read_byte(sc61860.pc++)<<8;
+	t|=program_decrypted_read_byte(sc61860.pc++);
 	return t;
 }
 

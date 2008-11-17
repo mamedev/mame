@@ -444,7 +444,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 }
 
 
-static OPBASE_HANDLER( missile_opbase_handler )
+static DIRECT_UPDATE_HANDLER( missile_direct_handler )
 {
 	/* offset accounts for lack of A15 decoding */
 	int offset = address & 0x8000;
@@ -453,14 +453,14 @@ static OPBASE_HANDLER( missile_opbase_handler )
 	/* RAM? */
 	if (address < 0x4000)
 	{
-		opbase->rom = opbase->ram = videoram - offset;
+		direct->raw = direct->decrypted = videoram - offset;
 		return ~0;
 	}
 
 	/* ROM? */
 	else if (address >= 0x5000)
 	{
-		opbase->rom = opbase->ram = memory_region(space->machine, "main") - offset;
+		direct->raw = direct->decrypted = memory_region(space->machine, "main") - offset;
 		return ~0;
 	}
 
@@ -476,7 +476,7 @@ static MACHINE_START( missile )
 	flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
-	memory_set_opbase_handler(0, missile_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), missile_direct_handler);
 
 	/* create a timer to speed/slow the CPU */
 	cpu_timer = timer_alloc(adjust_cpu_speed, NULL);
@@ -521,7 +521,7 @@ INLINE int get_madsel(running_machine *machine)
 	/* MADSEL signal disables standard address decoding and routes
         writes to video RAM; it is enabled if the IRQ signal is clear
         and the low 5 bits of the fetched opcode are 0x01 */
-	if (!irq_state && (cpu_readop(pc) & 0x1f) == 0x01)
+	if (!irq_state && (program_decrypted_read_byte(pc) & 0x1f) == 0x01)
 	{
 		/* the MADSEL signal goes high 5 cycles after the opcode is identified;
             this effectively skips the indirect memory read. Since this is difficult

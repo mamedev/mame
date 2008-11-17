@@ -621,7 +621,7 @@ INLINE UINT8 ROP(z80_state *z80)
 {
 	unsigned pc = PCD;
 	PC++;
-	return cpu_readop(pc);
+	return program_decrypted_read_byte(pc);
 }
 
 /****************************************************************
@@ -634,14 +634,14 @@ INLINE UINT8 ARG(z80_state *z80)
 {
 	unsigned pc = PCD;
 	PC++;
-	return cpu_readop_arg(pc);
+	return program_raw_read_byte(pc);
 }
 
 INLINE UINT32 ARG16(z80_state *z80)
 {
 	unsigned pc = PCD;
 	PC += 2;
-	return cpu_readop_arg(pc) | (cpu_readop_arg((pc+1)&0xffff) << 8);
+	return program_raw_read_byte(pc) | (program_raw_read_byte((pc+1)&0xffff) << 8);
 }
 
 /***************************************************************
@@ -678,7 +678,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 	}															\
 	else														\
 	{															\
-		UINT8 op = cpu_readop(PCD);								\
+		UINT8 op = program_decrypted_read_byte(PCD);								\
 		if( PCD == oldpc-1 )									\
 		{														\
 			/* NOP - JP $-1 or EI - JP $-1 */					\
@@ -741,7 +741,7 @@ INLINE UINT32 ARG16(z80_state *z80)
 	}															\
 	else														\
 	{															\
-		UINT8 op = cpu_readop(PCD);								\
+		UINT8 op = program_decrypted_read_byte(PCD);								\
 		if( PCD == oldpc-1 )									\
 		{														\
 			/* NOP - JR $-1 or EI - JR $-1 */					\
@@ -2170,7 +2170,7 @@ OP(xycb,ff) { A = SET(7, RM(EA) ); WM( EA,A );						} /* SET  7,A=(XY+o)  */
 
 OP(illegal,1) {
 	logerror("Z80 #%d ill. opcode $%02x $%02x\n",
-			cpunum_get_active(), cpu_readop((PCD-1)&0xffff), cpu_readop(PCD));
+			cpunum_get_active(), program_decrypted_read_byte((PCD-1)&0xffff), program_decrypted_read_byte(PCD));
 }
 
 /**********************************************************
@@ -2758,7 +2758,7 @@ OP(fd,ff) { illegal_1(z80); op_ff(z80);								} /* DB   FD          */
 OP(illegal,2)
 {
 	logerror("Z80 #%d ill. opcode $ed $%02x\n",
-			cpunum_get_active(), cpu_readop((PCD-1)&0xffff));
+			cpunum_get_active(), program_decrypted_read_byte((PCD-1)&0xffff));
 }
 
 /**********************************************************

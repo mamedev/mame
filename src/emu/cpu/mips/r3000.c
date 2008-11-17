@@ -238,7 +238,7 @@ static const memory_accessors le_cache =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		cpu_readop32(pc)
+#define ROPCODE(pc)		program_decrypted_read_dword(pc)
 
 
 

@@ -59,14 +59,14 @@ extern CPU_GET_INFO( alpha8301 );
  *   opcodes. In case of system with memory mapped I/O, this function can be
  *   used to greatly speed up emulation
  */
-#define ALPHA8201_RDOP(A) ((unsigned)cpu_readop(A))
+#define ALPHA8201_RDOP(A) ((unsigned)program_decrypted_read_byte(A))
 
 /*
  *   ALPHA8201_RDOP_ARG() is identical to ALPHA8201_RDOP() except it is used for reading
  *   opcode arguments. This difference can be used to support systems that
  *   use different encoding mechanisms for opcodes and opcode arguments
  */
-#define ALPHA8201_RDOP_ARG(A) ((unsigned)cpu_readop_arg(A))
+#define ALPHA8201_RDOP_ARG(A) ((unsigned)program_raw_read_byte(A))
 
 CPU_DISASSEMBLE( ALPHA8201 );
 

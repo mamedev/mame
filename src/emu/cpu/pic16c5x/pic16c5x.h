@@ -89,7 +89,7 @@ void pic16c5x_config(int data);
  *  can be used to greatly speed up emulation
  */
 
-#define PIC16C5x_RDOP(A) (cpu_readop16((A)<<1))
+#define PIC16C5x_RDOP(A) (program_decrypted_read_word((A)<<1))
 
 
 /****************************************************************************
@@ -98,7 +98,7 @@ void pic16c5x_config(int data);
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define PIC16C5x_RDOP_ARG(A) (cpu_readop_arg16((A)<<1))
+#define PIC16C5x_RDOP_ARG(A) (program_raw_read_word((A)<<1))
 
 
 

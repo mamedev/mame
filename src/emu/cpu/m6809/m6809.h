@@ -37,14 +37,14 @@ CPU_GET_INFO( m6809e );
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M6809_RDOP(Addr) ((unsigned)cpu_readop(Addr))
+#define M6809_RDOP(Addr) ((unsigned)program_decrypted_read_byte(Addr))
 
 /****************************************************************************/
 /* Z80_RDOP_ARG() is identical to Z80_RDOP() except it is used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M6809_RDOP_ARG(Addr) ((unsigned)cpu_readop_arg(Addr))
+#define M6809_RDOP_ARG(Addr) ((unsigned)program_raw_read_byte(Addr))
 
 #ifndef FALSE
 #    define FALSE 0

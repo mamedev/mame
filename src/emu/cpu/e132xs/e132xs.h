@@ -106,7 +106,7 @@ extern int hyp_type_16bit;
 #define IO_WRITE_W(addr, data) ((*hyp_cpu_write_io_word)(((addr) >> 11) & 0x7ffc, data))
 
 
-#define READ_OP(addr)	       (cpu_readop16(hyp_type_16bit ? addr: WORD_XOR_BE(addr)))
+#define READ_OP(addr)	       (program_decrypted_read_word(hyp_type_16bit ? addr: WORD_XOR_BE(addr)))
 
 
 /* Registers Number */

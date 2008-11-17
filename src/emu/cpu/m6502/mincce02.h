@@ -58,14 +58,14 @@
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
-#define RDOP()	cpu_readop(PCW++); m65ce02->icount -= 1
+#define RDOP()	program_decrypted_read_byte(PCW++); m65ce02->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
-#define RDOPARG()	cpu_readop_arg(PCW++); m65ce02->icount -= 1
+#define RDOPARG()	program_raw_read_byte(PCW++); m65ce02->icount -= 1
 
-#define PEEK_OP()	cpu_readop(PCW)
+#define PEEK_OP()	program_decrypted_read_byte(PCW)
 
 #define RDMEM(addr)			program_read_byte_8le(addr); m65ce02->icount -= 1
 #define WRMEM(addr,data)	program_write_byte_8le(addr,data); m65ce02->icount -= 1

@@ -32,7 +32,7 @@ static const char *const condition[16] =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		cpu_readop32(pc)
+#define ROPCODE(pc)		program_decrypted_read_dword(pc)
 
 
 /***************************************************************************

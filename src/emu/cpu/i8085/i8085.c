@@ -162,20 +162,20 @@ static UINT8 RIM_IEN = 0; //AT: IEN status latch used by the RIM instruction
 static UINT8 ROP(void)
 {
 	I.STATUS = 0xa2; // instruction fetch
-	return cpu_readop(I.PC.w.l++);
+	return program_decrypted_read_byte(I.PC.w.l++);
 }
 
 static UINT8 ARG(void)
 {
-	return cpu_readop_arg(I.PC.w.l++);
+	return program_raw_read_byte(I.PC.w.l++);
 }
 
 static UINT16 ARG16(void)
 {
 	UINT16 w;
-	w  = cpu_readop_arg(I.PC.d);
+	w  = program_raw_read_byte(I.PC.d);
 	I.PC.w.l++;
-	w += cpu_readop_arg(I.PC.d) << 8;
+	w += program_raw_read_byte(I.PC.d) << 8;
 	I.PC.w.l++;
 	return w;
 }

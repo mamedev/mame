@@ -11,7 +11,7 @@
 
 #define INSTRUCTION(mnemonic) INLINE void (mnemonic)(UINT8 opcode)
 
-#define ROM(addr)			cpu_readop(addr)
+#define ROM(addr)			program_decrypted_read_byte(addr)
 #define RAM_W(addr, value)	(data_write_byte_8le(addr, value))
 #define RAM_R(addr)			(data_read_byte_8le(addr))
 

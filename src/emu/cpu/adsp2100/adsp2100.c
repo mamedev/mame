@@ -319,7 +319,7 @@ INLINE void WWORD_PGM(UINT32 addr, UINT32 data)
 	program_write_dword_32le(addr << 2, data & 0xffffff);
 }
 
-#define ROPCODE(a) cpu_readop32((a)->pc << 2)
+#define ROPCODE(a) program_decrypted_read_dword((a)->pc << 2)
 
 #define CHANGEPC(a) change_pc((a)->pc << 2)
 

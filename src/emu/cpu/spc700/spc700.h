@@ -137,8 +137,8 @@ extern CPU_GET_INFO( spc700 );
 
 #define spc700_read_8_direct(A)     spc700_read_8(A)
 #define spc700_write_8_direct(A, V) spc700_write_8(A, V)
-//#define spc700_read_instruction(A)    cpu_readop(A)
-//#define spc700_read_8_immediate(A)    cpu_readop_arg(A)
+//#define spc700_read_instruction(A)    program_decrypted_read_byte(A)
+//#define spc700_read_8_immediate(A)    program_raw_read_byte(A)
 #define spc700_read_instruction(A)    program_read_byte_8le(A)
 #define spc700_read_8_immediate(A)    program_read_byte_8le(A)
 #define spc700_jumping(A)             change_pc(A)

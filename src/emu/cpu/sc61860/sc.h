@@ -31,4 +31,4 @@ enum
 //  SC61860_IRQ_STATE
 };
 
-#define PEEK_OP(pc) cpu_readop(pc)
+#define PEEK_OP(pc) program_decrypted_read_byte(pc)

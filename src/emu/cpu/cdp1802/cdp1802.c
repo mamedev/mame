@@ -128,7 +128,7 @@ INLINE void cdp1802_short_branch(int taken)
 {
 	if (taken)
 	{
-		R[P] = (R[P] & 0xff00) | cpu_readop(R[P]);
+		R[P] = (R[P] & 0xff00) | program_decrypted_read_byte(R[P]);
 	}
 	else
 	{
@@ -142,12 +142,12 @@ INLINE void cdp1802_long_branch(int taken)
 	{
 		// S1#1
 
-		B = cpu_readop(R[P]);
+		B = program_decrypted_read_byte(R[P]);
 		R[P] = R[P] + 1;
 
 		// S1#2
 
-		R[P] = (B << 8) | cpu_readop(R[P]);
+		R[P] = (B << 8) | program_decrypted_read_byte(R[P]);
 	}
 	else
 	{
@@ -263,7 +263,7 @@ static void cdp1802_run(running_machine *machine)
 
 	case CDP1802_STATE_0_FETCH:
 		{
-		UINT8 opcode = cpu_readop(R[P]);
+		UINT8 opcode = program_decrypted_read_byte(R[P]);
 
 		I = opcode >> 4;
 		N = opcode & 0x0f;

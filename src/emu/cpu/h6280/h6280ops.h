@@ -182,13 +182,13 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
  *  RDOP    read an opcode
  ***************************************************************/
 #define RDOP()													\
-	cpu_readop(TRANSLATED(PCW))
+	program_decrypted_read_byte(TRANSLATED(PCW))
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #define RDOPARG()												\
-	cpu_readop_arg(TRANSLATED(PCW))
+	program_raw_read_byte(TRANSLATED(PCW))
 
 /***************************************************************
  *  BRA  branch relative

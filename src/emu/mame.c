@@ -1749,9 +1749,6 @@ static void handle_save(running_machine *machine)
 			{
 				cpu_push_context(machine->cpu[cpunum]);
 
-				/* make sure banking is set */
-				memory_set_opbase(cpu_get_physical_pc_byte(machine->activecpu));
-
 				/* save the CPU data */
 				state_save_push_tag(cpunum + 1);
 				state_save_save_continue(machine);
@@ -1832,16 +1829,10 @@ static void handle_load(running_machine *machine)
 				{
 					cpu_push_context(machine->cpu[cpunum]);
 
-					/* make sure banking is set */
-					memory_set_opbase(cpu_get_physical_pc_byte(machine->activecpu));
-
 					/* load the CPU data */
 					state_save_push_tag(cpunum + 1);
 					state_save_load_continue(machine);
 					state_save_pop_tag();
-
-					/* make sure banking is set */
-					memory_set_opbase(cpu_get_physical_pc_byte(machine->activecpu));
 
 					cpu_pop_context();
 				}

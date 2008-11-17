@@ -28,7 +28,7 @@
 /*****************************************************************************
     Changes
     20051129 Mariusz Wojcieszek
-    - introduced cpu_readop16() for opcode fetching
+    - introduced program_decrypted_read_word() for opcode fetching
 
     20050813 Mariusz Wojcieszek
     - fixed 64 bit / 32 bit division in division unit
@@ -2205,12 +2205,12 @@ static CPU_EXECUTE( sh2 )
 
 		if (sh2->delay)
 		{
-			opcode = cpu_readop16(WORD_XOR_BE((UINT32)(sh2->delay & AM)));
+			opcode = program_decrypted_read_word(WORD_XOR_BE((UINT32)(sh2->delay & AM)));
 			change_pc(sh2->pc & AM);
 			sh2->pc -= 2;
 		}
 		else
-			opcode = cpu_readop16(WORD_XOR_BE((UINT32)(sh2->pc & AM)));
+			opcode = program_decrypted_read_word(WORD_XOR_BE((UINT32)(sh2->pc & AM)));
 
 		debugger_instruction_hook(device->machine, sh2->pc);
 

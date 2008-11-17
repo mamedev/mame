@@ -77,7 +77,7 @@ static int	t11_ICount;
 
 INLINE int ROPCODE(void)
 {
-	int val = cpu_readop16(PC);
+	int val = program_decrypted_read_word(PC);
 	PC += 2;
 	return val;
 }

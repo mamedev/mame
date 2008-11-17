@@ -201,14 +201,14 @@ static UINT32 timer_next;
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M_RDOP(Addr) ((unsigned)cpu_readop(Addr))
+#define M_RDOP(Addr) ((unsigned)program_decrypted_read_byte(Addr))
 
 /****************************************************************************/
 /* M6800_RDOP_ARG() is identical to M6800_RDOP() but it's used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M_RDOP_ARG(Addr) ((unsigned)cpu_readop_arg(Addr))
+#define M_RDOP_ARG(Addr) ((unsigned)program_raw_read_byte(Addr))
 
 /* macros to access memory */
 #define IMMBYTE(b)	b = M_RDOP_ARG(PCD); PC++

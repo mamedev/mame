@@ -285,16 +285,16 @@ static READ16_HANDLER( dsp56k_bootload_r )
 	return 0x7fff;
 }
 
-static OPBASE_HANDLER( plygonet_dsp56k_opbase_handler )
+static DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
 {
 	if (address >= 0x7000 && address <= 0x7fff)
 	{
-		opbase->rom = opbase->ram = (void*)(dsp56k_p_mirror - 0x7000);
+		direct->raw = direct->decrypted = (void*)(dsp56k_p_mirror - 0x7000);
 		return ~0;
 	}
 	else if (address >= 0x8000 && address <= 0x87ff)
 	{
-		opbase->rom = opbase->ram = (void*)(dsp56k_p_8000 - 0x8000);
+		direct->raw = direct->decrypted = (void*)(dsp56k_p_8000 - 0x8000);
 		return ~0;
 	}
 
@@ -682,7 +682,7 @@ static DRIVER_INIT(polygonet)
 	memset(dsp56k_bank04_ram,    0, 2 * 8 * dsp56k_bank04_size		  * sizeof(UINT16));
 
 	/* The dsp56k occasionally executes out of mapped memory */
-	memory_set_opbase_handler(1, plygonet_dsp56k_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), plygonet_dsp56k_direct_handler);
 }
 
 ROM_START( plygonet )

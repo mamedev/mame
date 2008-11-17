@@ -1292,7 +1292,7 @@ INLINE void mips_set_cp0r( int reg, UINT32 value )
 		( mipscpu.cp0r[ CP0_SR ] & SR_IEC ) != 0 &&
 		( mipscpu.cp0r[ CP0_SR ] & mipscpu.cp0r[ CP0_CAUSE ] & CAUSE_IP ) != 0 )
 	{
-		mipscpu.op = cpu_readop32( mipscpu.pc );
+		mipscpu.op = program_decrypted_read_dword( mipscpu.pc );
 		mips_execute_unstoppable_instructions( 1 );
 		mips_exception( EXC_INT );
 	}
@@ -1327,12 +1327,12 @@ static void mips_fetch_next_op( void )
 		UINT32 safepc = mipscpu.delayv & ~mipscpu.bad_word_address_mask;
 
 		change_pc( safepc );
-		mipscpu.op = cpu_readop32( safepc );
+		mipscpu.op = program_decrypted_read_dword( safepc );
 		change_pc( mipscpu.pc );
 	}
 	else
 	{
-		mipscpu.op = cpu_readop32( mipscpu.pc + 4 );
+		mipscpu.op = program_decrypted_read_dword( mipscpu.pc + 4 );
 	}
 }
 
@@ -1798,7 +1798,7 @@ static CPU_EXECUTE( mips )
 		if (LOG_BIOSCALL) log_bioscall();
 		debugger_instruction_hook(device->machine,  mipscpu.pc );
 
-		mipscpu.op = cpu_readop32( mipscpu.pc );
+		mipscpu.op = program_decrypted_read_dword( mipscpu.pc );
 		switch( INS_OP( mipscpu.op ) )
 		{
 		case OP_SPECIAL:

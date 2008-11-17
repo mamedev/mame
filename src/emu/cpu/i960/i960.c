@@ -128,22 +128,22 @@ INLINE UINT32 get_ea(i960_state_t *i960_state, UINT32 opcode)
 			return i960_state->r[abase] + (i960_state->r[index] << scale);
 
 		case 0xc:
-			ret = cpu_readop32(i960_state->IP);
+			ret = program_decrypted_read_dword(i960_state->IP);
 			i960_state->IP += 4;
 			return ret;
 
 		case 0xd:
-			ret = cpu_readop32(i960_state->IP) + i960_state->r[abase];
+			ret = program_decrypted_read_dword(i960_state->IP) + i960_state->r[abase];
 			i960_state->IP += 4;
 			return ret;
 
 		case 0xe:
-			ret = cpu_readop32(i960_state->IP) + (i960_state->r[index] << scale);
+			ret = program_decrypted_read_dword(i960_state->IP) + (i960_state->r[index] << scale);
 			i960_state->IP += 4;
 			return ret;
 
 		case 0xf:
-			ret = cpu_readop32(i960_state->IP) + i960_state->r[abase] + (i960_state->r[index] << scale);
+			ret = program_decrypted_read_dword(i960_state->IP) + i960_state->r[abase] + (i960_state->r[index] << scale);
 			i960_state->IP += 4;
 			return ret;
 
@@ -1962,7 +1962,7 @@ static CPU_EXECUTE( i960 )
 
 		i960_state->bursting = 0;
 
-		opcode = cpu_readop32(i960_state->IP);
+		opcode = program_decrypted_read_dword(i960_state->IP);
 		i960_state->IP += 4;
 
 		execute_op(i960_state, opcode);

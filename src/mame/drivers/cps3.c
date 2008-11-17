@@ -603,7 +603,7 @@ INLINE void cps3_drawgfxzoom(running_machine *machine, bitmap_t *dest_bmp,const 
 
 
 
-static OPBASE_HANDLER( cps3_opbase_handler );
+static DIRECT_UPDATE_HANDLER( cps3_direct_handler );
 
 /* Encryption */
 
@@ -754,7 +754,7 @@ static DRIVER_INIT( cps3 )
 
 
 	cps3_0xc0000000_ram_decrypted = auto_malloc(0x400);
-	memory_set_opbase_handler(0, cps3_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), cps3_direct_handler);
 
 	// flash roms
 
@@ -1340,38 +1340,38 @@ static WRITE32_HANDLER( cps3_0xc0000000_ram_w )
 
 
 
-static OPBASE_HANDLER( cps3_opbase_handler )
+static DIRECT_UPDATE_HANDLER( cps3_direct_handler )
 {
 //  if(DEBUG_PRINTF) printf("address %04x\n",address);
 
 	/* BIOS ROM */
 	if (address < 0x80000)
 	{
-		opbase->rom = opbase->ram = memory_region(space->machine, "user1");
+		direct->raw = direct->decrypted = memory_region(space->machine, "user1");
 		return ~0;
 	}
 	/* RAM */
 	else if (address >= 0x06000000 && address <= 0x06ffffff)
 	{
-		opbase->rom = (UINT8*)decrypted_gamerom-0x06000000;
-		opbase->ram = (UINT8*)decrypted_gamerom-0x06000000;
+		direct->decrypted = (UINT8*)decrypted_gamerom-0x06000000;
+		direct->raw = (UINT8*)decrypted_gamerom-0x06000000;
 
-		if (cps3_altEncryption) opbase->ram = (UINT8*) memory_region(space->machine, "user4")-0x06000000;
+		if (cps3_altEncryption) direct->raw = (UINT8*) memory_region(space->machine, "user4")-0x06000000;
 
 
 		return ~0;
 	}
 	else if (address >= 0xc0000000 && address <= 0xc00003ff)
 	{
-		//opbase->rom = (void*)cps3_0xc0000000_ram_decrypted;
-		opbase->rom = (UINT8*)cps3_0xc0000000_ram_decrypted-0xc0000000;
-		opbase->ram = (UINT8*)cps3_0xc0000000_ram-0xc0000000;
+		//direct->decrypted = (void*)cps3_0xc0000000_ram_decrypted;
+		direct->decrypted = (UINT8*)cps3_0xc0000000_ram_decrypted-0xc0000000;
+		direct->raw = (UINT8*)cps3_0xc0000000_ram-0xc0000000;
 		return ~0;
 	}
 
 	/* anything else falls through to NOPs */
-	opbase->rom = (UINT8*)cps3_nops-address;
-	opbase->ram = (UINT8*)cps3_nops-address;
+	direct->decrypted = (UINT8*)cps3_nops-address;
+	direct->raw = (UINT8*)cps3_nops-address;
 	return ~0;
 }
 

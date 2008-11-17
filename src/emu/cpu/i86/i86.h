@@ -99,10 +99,10 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,SIH,SIL,DIH,DIL } BREGS;
 #define WriteWord(ea,val)		write_word((ea) & AMASK, val);
 
 #define FETCH_XOR(a)			((a) ^ I.mem.fetch_xor)
-#define FETCH					(cpu_readop_arg(FETCH_XOR(I.pc++)))
-#define FETCHOP					(cpu_readop(FETCH_XOR(I.pc++)))
-#define PEEKOP(addr)			(cpu_readop(FETCH_XOR(addr)))
-#define FETCHWORD(var) 			{ var = cpu_readop_arg(FETCH_XOR(I.pc)); var += (cpu_readop_arg(FETCH_XOR(I.pc + 1)) << 8); I.pc += 2; }
+#define FETCH					(program_raw_read_byte(FETCH_XOR(I.pc++)))
+#define FETCHOP					(program_decrypted_read_byte(FETCH_XOR(I.pc++)))
+#define PEEKOP(addr)			(program_decrypted_read_byte(FETCH_XOR(addr)))
+#define FETCHWORD(var) 			{ var = program_raw_read_byte(FETCH_XOR(I.pc)); var += (program_raw_read_byte(FETCH_XOR(I.pc + 1)) << 8); I.pc += 2; }
 #define CHANGE_PC(addr)			change_pc(addr)
 #define PUSH(val)				{ I.regs.w[SP] -= 2; WriteWord(((I.base[SS] + I.regs.w[SP]) & AMASK), val); }
 #define POP(var)				{ var = ReadWord(((I.base[SS] + I.regs.w[SP]) & AMASK)); I.regs.w[SP] += 2; }

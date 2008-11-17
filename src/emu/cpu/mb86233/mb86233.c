@@ -87,7 +87,7 @@ static int mb86233_icount;
 #define ALU(a)				mb86233_alu(a)
 #define GETREPCNT()			mb86233.repcnt
 
-#define ROPCODE(a)			cpu_readop32(a<<2)
+#define ROPCODE(a)			program_decrypted_read_dword(a<<2)
 #define RDMEM(a)			program_read_dword_32le((a<<2))
 #define WRMEM(a,v)			program_write_dword_32le((a<<2),v)
 

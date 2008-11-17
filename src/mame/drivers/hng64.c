@@ -1070,9 +1070,9 @@ index=00000004  pagesize=01000000  vaddr=00000000C9000000  paddr=000000006900000
 #define KL5C_MMU_A(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[((xxx-1)*2)+1] << 2) | ((hng64_com_mmu_mem[(xxx-1)*2] & 0xc0) >> 6) )
 #define KL5C_MMU_B(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[(xxx-1)*2] & 0x3f) )
 
-static OPBASE_HANDLER( KL5C80_opbase_handler )
+static DIRECT_UPDATE_HANDLER( KL5C80_direct_handler )
 {
-	opbase->rom = opbase->ram = hng64_com_op_base;
+	direct->raw = direct->decrypted = hng64_com_op_base;
 	return ~0;
 }
 
@@ -1477,7 +1477,7 @@ static MACHINE_RESET(hyperneo)
 		hng64_com_virtual_mem[i] = rom[i] ;
 
 	KL5C80_virtual_mem_sync();
-	memory_set_opbase_handler(2, KL5C80_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), KL5C80_direct_handler);
 
 	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
 //  cpu_set_input_line(machine->cpu[2], INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...

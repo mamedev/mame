@@ -307,8 +307,8 @@ struct _mcs51_state_t
 #define change_pc(x)
 
 /* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)			cpu_readop(pc)
-#define ROP_ARG(pc)		cpu_readop_arg(pc)
+#define ROP(pc)			program_decrypted_read_byte(pc)
+#define ROP_ARG(pc)		program_raw_read_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
 #define CODEMEM_R(a)	(UINT8)program_read_byte_8le(a)
@@ -1941,7 +1941,7 @@ static CPU_EXECUTE( mcs51 )
 		/* Read next opcode */
 		PPC = PC;
 		debugger_instruction_hook(device->machine, PC);
-		op = cpu_readop(PC++);
+		op = program_decrypted_read_byte(PC++);
 
 		/* process opcode and count cycles */
 		mcs51_state->inst_cycles = mcs51_cycles[op];

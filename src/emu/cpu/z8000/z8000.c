@@ -187,7 +187,7 @@ static UINT64   *const pRQ[16] = {
 
 INLINE UINT16 RDOP(void)
 {
-	UINT16 res = cpu_readop16(PC);
+	UINT16 res = program_decrypted_read_word(PC);
     PC += 2;
     return res;
 }

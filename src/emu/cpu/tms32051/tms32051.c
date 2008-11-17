@@ -154,7 +154,7 @@ static int tms_icount;
 
 #define CYCLES(x)		(tms_icount -= x)
 
-#define ROPCODE()		cpu_readop16((tms.pc++) << 1)
+#define ROPCODE()		program_decrypted_read_word((tms.pc++) << 1)
 
 INLINE void CHANGE_PC(UINT16 new_pc)
 {

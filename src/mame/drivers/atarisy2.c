@@ -231,12 +231,12 @@ static void scanline_update(const device_config *screen, int scanline)
  *
  *************************************/
 
-static OPBASE_HANDLER( atarisy2_opbase_handler )
+static DIRECT_UPDATE_HANDLER( atarisy2_direct_handler )
 {
 	/* make sure slapstic area looks like ROM */
 	if (address >= 0x8000 && address < 0x8200)
 	{
-		opbase->rom = opbase->ram = (UINT8 *)atarisy2_slapstic - 0x8000;
+		direct->raw = direct->decrypted = (UINT8 *)atarisy2_slapstic - 0x8000;
 		return ~0;
 	}
 	return address;
@@ -263,7 +263,7 @@ static MACHINE_RESET( atarisy2 )
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_sound_io_reset(1);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 64);
-	memory_set_opbase_handler(0, atarisy2_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), atarisy2_direct_handler);
 
 	tms5220_data_strobe = 1;
 

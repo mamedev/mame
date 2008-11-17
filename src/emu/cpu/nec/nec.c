@@ -237,7 +237,7 @@ static void do_prefetch(int previous_ICount)
 INLINE UINT8 fetch(void)
 {
 	prefetch();
-	return cpu_readop_arg(FETCH_XOR((I.sregs[PS]<<4)+I.ip++));
+	return program_raw_read_byte(FETCH_XOR((I.sregs[PS]<<4)+I.ip++));
 }
 
 INLINE UINT16 fetchword(void)
@@ -260,7 +260,7 @@ static UINT8 fetchop(void)
 	UINT8 ret;
 
 	prefetch();
-	ret = cpu_readop( FETCH_XOR( ( I.sregs[PS]<<4)+I.ip++));
+	ret = program_decrypted_read_byte( FETCH_XOR( ( I.sregs[PS]<<4)+I.ip++));
 
 	if (I.MF == 1)
 		if (I.config->v25v35_decryptiontable)

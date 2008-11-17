@@ -126,7 +126,7 @@ static WRITE8_HANDLER( esb_slapstic_w )
  *
  *************************************/
 
-static OPBASE_HANDLER( esb_setopbase )
+static DIRECT_UPDATE_HANDLER( esb_setdirect )
 {
 	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
@@ -521,7 +521,7 @@ static DRIVER_INIT( esb )
 	slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
-	memory_set_opbase_handler(0, esb_setopbase);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), esb_setdirect);
 
 	/* install read/write handlers for it */
 	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);

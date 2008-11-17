@@ -431,7 +431,7 @@ CPU_DISASSEMBLE( tms7000 )
 						break;
 					case TRAP:
 						vector = 0xffff - ((0xff - opcode) * 2);
-						c = (UINT16)((cpu_readop( vector-1 ) << 8) + cpu_readop( vector ));
+						c = (UINT16)((program_decrypted_read_byte( vector-1 ) << 8) + program_decrypted_read_byte( vector ));
 						break;
 				}
 			}

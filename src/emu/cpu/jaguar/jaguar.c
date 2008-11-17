@@ -246,7 +246,7 @@ static void (*const dsp_op_table[64])(void) =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		(cpu_readop16(WORD_XOR_BE((UINT32)(pc))))
+#define ROPCODE(pc)		(program_decrypted_read_word(WORD_XOR_BE((UINT32)(pc))))
 
 
 

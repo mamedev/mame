@@ -1901,13 +1901,13 @@ static void dasm_chunk(char *tag, UINT8 *base, UINT16 pc, UINT32 length, FILE *o
 		count = DasmZ80(buffer, pc);
 		for (i = 0; i < 4; i++)
 			if (i < count)
-				fprintf(output, "%c", (cpu_readop(pc + i) >= 32 && cpu_readop(pc + i) < 127) ? cpu_readop(pc + i) : ' ');
+				fprintf(output, "%c", (program_decrypted_read_byte(pc + i) >= 32 && program_decrypted_read_byte(pc + i) < 127) ? program_decrypted_read_byte(pc + i) : ' ');
 			else
 				fprintf(output, " ");
 		fprintf(output, " %04X: ", pc);
 		for (i = 0; i < 4; i++)
 			if (i < count)
-				fprintf(output, "%02X ", cpu_readop(pc++));
+				fprintf(output, "%02X ", program_decrypted_read_byte(pc++));
 			else
 				fprintf(output, "   ");
 		fprintf(output, "%s\n", buffer);

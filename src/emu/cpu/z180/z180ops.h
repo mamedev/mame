@@ -111,7 +111,7 @@ INLINE UINT8 ROP(void)
 {
 	offs_t addr = _PCD;
 	_PC++;
-	return cpu_readop(MMU_REMAP_ADDR(addr));
+	return program_decrypted_read_byte(MMU_REMAP_ADDR(addr));
 }
 
 /****************************************************************
@@ -124,14 +124,14 @@ INLINE UINT8 ARG(void)
 {
 	offs_t addr = _PCD;
 	_PC++;
-	return cpu_readop_arg(MMU_REMAP_ADDR(addr));
+	return program_raw_read_byte(MMU_REMAP_ADDR(addr));
 }
 
 INLINE UINT32 ARG16(void)
 {
 	offs_t addr = _PCD;
 	_PC += 2;
-	return cpu_readop_arg(MMU_REMAP_ADDR(addr)) | (cpu_readop_arg(MMU_REMAP_ADDR(addr+1)) << 8);
+	return program_raw_read_byte(MMU_REMAP_ADDR(addr)) | (program_raw_read_byte(MMU_REMAP_ADDR(addr+1)) << 8);
 }
 
 /****************************************************************************
@@ -200,7 +200,7 @@ void z180_setOPbase(int pc)
 	}															\
 	else														\
 	{															\
-		UINT8 op = cpu_readop(_PCD);							\
+		UINT8 op = program_decrypted_read_byte(_PCD);							\
 		if( _PCD == oldpc-1 )									\
 		{														\
 			/* NOP - JR $-1 or EI - JR $-1 */					\

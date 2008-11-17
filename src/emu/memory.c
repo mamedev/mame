@@ -54,7 +54,7 @@
     - Automatically mirror program space into data space if no data space
     - Get rid of opcode/data separation by using address spaces?
     - Add support for internal addressing (maybe just accessors - see TMS3202x)
-    - Evaluate min/max opcode ranges and do we include a check in cpu_readop?
+    - Evaluate min/max opcode ranges and do we include a check in program_decrypted_read_byte?
 
 ****************************************************************************
 
@@ -251,9 +251,6 @@ struct _cpu_data
 	UINT8 *					region;					/* pointer to memory region */
 	size_t					regionsize;				/* size of region, in bytes */
 
-	opbase_handler_func 	opbase_handler;			/* opcode base handler */
-	opbase_data				opbase;					/* dynamic opcode data */
-
 	UINT8					spacemask;				/* mask of which address spaces are used */
 	address_space		 	space[ADDRESS_SPACES];	/* info about each address space */
 };
@@ -263,8 +260,6 @@ struct _cpu_data
 /***************************************************************************
     GLOBAL VARIABLES
 ***************************************************************************/
-
-opbase_data					opbase;							/* opcode data */
 
 address_space *				active_address_space[ADDRESS_SPACES];/* address space data */
 
@@ -276,8 +271,6 @@ static memory_block *		memory_block_list;				/* head of the list of memory block
 
 static int					cur_context;					/* current CPU context */
 
-static opbase_handler_func	opbase_handler;					/* opcode base override */
-
 static UINT8				debugger_access;				/* treat accesses as coming from the debugger */
 static UINT8				log_unmap[ADDRESS_SPACES];		/* log unmapped memory accesses */
 
@@ -288,7 +281,7 @@ static UINT8 *				wptable;						/* watchpoint-fill table */
 
 #define ACCESSOR_GROUP(type, width) \
 { \
-	memory_set_opbase, \
+	type##_set_direct_region, \
 	type##_read_byte_##width, \
 	type##_read_word_##width, \
 	type##_read_word_masked_##width, \
@@ -381,10 +374,10 @@ static void mem_dump(void);
     the opcode base
 -------------------------------------------------*/
 
-INLINE void force_opbase_update(running_machine *machine)
+INLINE void force_opbase_update(address_space *space)
 {
-	opbase.entry = 0xff;
-	memory_set_opbase(cpu_get_physical_pc_byte(Machine->activecpu));
+	space->direct.entry = 0xff;
+	memory_set_direct_region(space, cpu_get_physical_pc_byte(space->cpu));
 }
 
 
@@ -757,13 +750,8 @@ void memory_set_context(running_machine *machine, int activecpu)
 	/* remember dynamic RAM/ROM */
 	if (activecpu == -1)
 		activecpu = cur_context;
-	else if (cur_context != -1)
-		cpudata[cur_context].opbase = opbase;
 	cur_context = activecpu;
 
-	opbase = cpudata[activecpu].opbase;
-	opbase_handler = cpudata[activecpu].opbase_handler;
-	
 	active_address_space[ADDRESS_SPACE_PROGRAM] = &cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM];
 	active_address_space[ADDRESS_SPACE_DATA] = &cpudata[activecpu].space[ADDRESS_SPACE_DATA];
 	active_address_space[ADDRESS_SPACE_IO] = &cpudata[activecpu].space[ADDRESS_SPACE_IO];
@@ -1085,8 +1073,8 @@ void memory_set_decrypted_region(int cpunum, offs_t addrstart, offs_t addrend, v
 				found = TRUE;
 
 				/* if we are executing from here, force an opcode base update */
-				if (cpunum_get_active() >= 0 && cpunum == cur_context && opbase.entry == banknum)
-					force_opbase_update(Machine);
+				if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
+					force_opbase_update(space);
 			}
 
 			/* fatal error if the decrypted region straddles the bank */
@@ -1107,44 +1095,43 @@ void memory_set_decrypted_region(int cpunum, offs_t addrstart, offs_t addrend, v
     CPU
 -------------------------------------------------*/
 
-opbase_handler_func memory_set_opbase_handler(int cpunum, opbase_handler_func function)
+direct_update_func memory_set_direct_update_handler(const address_space *space, direct_update_func function)
 {
-	opbase_handler_func old = cpudata[cpunum].opbase_handler;
-	cpudata[cpunum].opbase_handler = function;
-	if (cpunum == cpunum_get_active())
-		opbase_handler = function;
+	address_space *spacerw = (address_space *)space;
+	direct_update_func old = spacerw->directupdate;
+	spacerw->directupdate = function;
 	return old;
 }
 
 
 /*-------------------------------------------------
-    memory_set_opbase - called by CPU cores to
+    memory_set_direct_region - called by CPU cores to
     update the opcode base for the given address
 -------------------------------------------------*/
 
-void memory_set_opbase(offs_t byteaddress)
+void memory_set_direct_region(const address_space *space, offs_t byteaddress)
 {
-	const address_space *space = active_address_space[ADDRESS_SPACE_PROGRAM];
+	address_space *spacerw = (address_space *)space;
 	UINT8 *base = NULL, *based = NULL;
 	const handler_data *handlers;
 	UINT8 entry;
 
 	/* allow overrides */
-	if (opbase_handler != NULL)
+	if (spacerw->directupdate != NULL)
 	{
-		byteaddress = (*opbase_handler)(space, byteaddress, &opbase);
+		byteaddress = (*spacerw->directupdate)(spacerw, byteaddress, &spacerw->direct);
 		if (byteaddress == ~0)
 			return;
 	}
 
 	/* perform the lookup */
-	byteaddress &= space->bytemask;
-	entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
+	byteaddress &= spacerw->bytemask;
+	entry = spacerw->readlookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->readlookup[LEVEL2_INDEX(entry,byteaddress)];
+		entry = spacerw->readlookup[LEVEL2_INDEX(entry,byteaddress)];
 
 	/* keep track of current entry */
-	opbase.entry = entry;
+	spacerw->direct.entry = entry;
 
 	/* if we don't map to a bank, see if there are any banks we can map to */
 	if (entry < STATIC_BANK1 || entry >= STATIC_RAM)
@@ -1153,7 +1140,7 @@ void memory_set_opbase(offs_t byteaddress)
 		for (entry = 1; entry < STATIC_COUNT; entry++)
 		{
 			bank_info *bank = &bankdata[entry];
-			if (bank->used && bank->cpunum == cur_context && bank->spacenum == ADDRESS_SPACE_PROGRAM &&
+			if (bank->used && bank->cpunum == cur_context && bank->spacenum == space->spacenum &&
 				bank->bytestart < byteaddress && bank->byteend > byteaddress)
 				break;
 		}
@@ -1174,14 +1161,29 @@ void memory_set_opbase(offs_t byteaddress)
 		based = base;
 
 	/* compute the adjusted base */
-	handlers = active_address_space[ADDRESS_SPACE_PROGRAM]->read.handlers[entry];
-	opbase.mask = handlers->bytemask;
-	opbase.ram = base - (handlers->bytestart & opbase.mask);
-	opbase.rom = based - (handlers->bytestart & opbase.mask);
-	opbase.mem_min = handlers->bytestart;
-	opbase.mem_max = handlers->byteend;
+	handlers = spacerw->read.handlers[entry];
+	spacerw->direct.mask = handlers->bytemask;
+	spacerw->direct.raw = base - (handlers->bytestart & spacerw->direct.mask);
+	spacerw->direct.decrypted = based - (handlers->bytestart & spacerw->direct.mask);
+	spacerw->direct.min = handlers->bytestart;
+	spacerw->direct.max = handlers->byteend;
 }
 
+
+void program_set_direct_region(offs_t byteaddress)
+{
+	memory_set_direct_region(active_address_space[ADDRESS_SPACE_PROGRAM], byteaddress);
+}
+
+void data_set_direct_region(offs_t byteaddress)
+{
+	memory_set_direct_region(active_address_space[ADDRESS_SPACE_DATA], byteaddress);
+}
+
+void io_set_direct_region(offs_t byteaddress)
+{
+	memory_set_direct_region(active_address_space[ADDRESS_SPACE_IO], byteaddress);
+}
 
 
 /***************************************************************************
@@ -1248,30 +1250,30 @@ void *memory_get_write_ptr(int cpunum, int spacenum, offs_t byteaddress)
 
 void *memory_get_op_ptr(running_machine *machine, int cpunum, offs_t byteaddress, int arg)
 {
-	address_space *space = &cpudata[cpunum].space[ADDRESS_SPACE_PROGRAM];
+	address_space *spacerw = &cpudata[cpunum].space[ADDRESS_SPACE_PROGRAM];
 	offs_t byteoffset;
 	void *ptr = NULL;
 	UINT8 entry;
 
 	/* if there is a custom mapper, use that */
-	if (cpudata[cpunum].opbase_handler != NULL)
+	if (spacerw->directupdate != NULL)
 	{
 		/* need to save opcode info */
-		opbase_data saved_opbase = opbase;
+		direct_read_data saved_data = spacerw->direct;
 
 		/* query the handler */
-		offs_t new_byteaddress = (*cpudata[cpunum].opbase_handler)(space, byteaddress, &opbase);
+		offs_t new_byteaddress = (*spacerw->directupdate)(spacerw, byteaddress, &spacerw->direct);
 
 		/* if it returns ~0, we use whatever data the handler set */
 		if (new_byteaddress == ~0)
-			ptr = arg ? &opbase.ram[byteaddress] : &opbase.rom[byteaddress];
+			ptr = arg ? &spacerw->direct.raw[byteaddress] : &spacerw->direct.decrypted[byteaddress];
 
 		/* otherwise, we use the new offset in the generic case below */
 		else
 			byteaddress = new_byteaddress;
 
 		/* restore opcode info */
-		opbase = saved_opbase;
+		spacerw->direct = saved_data;
 
 		/* if we got our pointer, we're done */
 		if (ptr != NULL)
@@ -1279,17 +1281,17 @@ void *memory_get_op_ptr(running_machine *machine, int cpunum, offs_t byteaddress
 	}
 
 	/* perform the lookup */
-	byteaddress &= space->bytemask;
-	entry = space->read.table[LEVEL1_INDEX(byteaddress)];
+	byteaddress &= spacerw->bytemask;
+	entry = spacerw->read.table[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->read.table[LEVEL2_INDEX(entry, byteaddress)];
+		entry = spacerw->read.table[LEVEL2_INDEX(entry, byteaddress)];
 
 	/* if a non-RAM area, return NULL */
 	if (entry >= STATIC_RAM)
 		return NULL;
 
 	/* adjust the offset */
-	byteoffset = (byteaddress - space->read.handlers[entry]->bytestart) & space->read.handlers[entry]->bytemask;
+	byteoffset = (byteaddress - spacerw->read.handlers[entry]->bytestart) & spacerw->read.handlers[entry]->bytemask;
 	return (!arg && bankd_ptr[entry]) ? &bankd_ptr[entry][byteoffset] : &bank_ptr[entry][byteoffset];
 }
 
@@ -1372,8 +1374,8 @@ void memory_set_bank(int banknum, int entrynum)
 	bankd_ptr[banknum] = bankdata[banknum].entryd[entrynum];
 
 	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (opbase.entry == banknum && cpunum_get_active() >= 0)
-		force_opbase_update(Machine);
+	if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
+		force_opbase_update((address_space *)active_address_space[ADDRESS_SPACE_PROGRAM]);
 }
 
 
@@ -1415,8 +1417,8 @@ void memory_set_bankptr(int banknum, void *base)
 	bank_ptr[banknum] = base;
 
 	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (opbase.entry == banknum && cpunum_get_active() >= 0)
-		force_opbase_update(Machine);
+	if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
+		force_opbase_update((address_space *)active_address_space[ADDRESS_SPACE_PROGRAM]);
 }
 
 
@@ -1676,15 +1678,15 @@ static void memory_init_cpudata(running_machine *machine)
 				/* initialize the lookups */
 				space->readlookup = space->read.table;
 				space->writelookup = space->write.table;
-			}
 
-			/* set the RAM/ROM base */
-			cpu->opbase.ram = cpu->opbase.rom = cpu->region;
-			cpu->opbase.mask = cpu->space[ADDRESS_SPACE_PROGRAM].bytemask;
-			cpu->opbase.mem_min = 0;
-			cpu->opbase.mem_max = cpu->regionsize;
-			cpu->opbase.entry = STATIC_UNMAP;
-			cpu->opbase_handler = NULL;
+				/* set the RAM/ROM base */
+				space->direct.raw = space->direct.decrypted = cpu->region;
+				space->direct.mask = space->bytemask;
+				space->direct.min = 0;
+				space->direct.max = cpu->regionsize;
+				space->direct.entry = STATIC_UNMAP;
+				space->directupdate = NULL;
+			}
 		}
 }
 
@@ -2793,59 +2795,6 @@ static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress)
 	return NULL;
 }
 
-
-
-/*-------------------------------------------------
-    safe opcode reading
--------------------------------------------------*/
-
-UINT8 cpu_readop_safe(offs_t byteaddress)
-{
-	cpu_set_opbase(Machine->activecpu, byteaddress);
-	return cpu_readop_unsafe(byteaddress);
-}
-
-UINT16 cpu_readop16_safe(offs_t byteaddress)
-{
-	cpu_set_opbase(Machine->activecpu, byteaddress);
-	return cpu_readop16_unsafe(byteaddress);
-}
-
-UINT32 cpu_readop32_safe(offs_t byteaddress)
-{
-	cpu_set_opbase(Machine->activecpu, byteaddress);
-	return cpu_readop32_unsafe(byteaddress);
-}
-
-UINT64 cpu_readop64_safe(offs_t byteaddress)
-{
-	cpu_set_opbase(Machine->activecpu, byteaddress);
-	return cpu_readop64_unsafe(byteaddress);
-}
-
-UINT8 cpu_readop_arg_safe(offs_t byteaddress)
-{
-	cpu_set_opbase(Machine->activecpu, byteaddress);
-	return cpu_readop_arg_unsafe(byteaddress);
-}
-
-UINT16 cpu_readop_arg16_safe(offs_t byteaddress)
-{
-	cpu_set_opbase(Machine->activecpu, byteaddress);
-	return cpu_readop_arg16_unsafe(byteaddress);
-}
-
-UINT32 cpu_readop_arg32_safe(offs_t byteaddress)
-{
-	cpu_set_opbase(Machine->activecpu, byteaddress);
-	return cpu_readop_arg32_unsafe(byteaddress);
-}
-
-UINT64 cpu_readop_arg64_safe(offs_t byteaddress)
-{
-	cpu_set_opbase(Machine->activecpu, byteaddress);
-	return cpu_readop_arg64_unsafe(byteaddress);
-}
 
 
 /*-------------------------------------------------

@@ -66,7 +66,7 @@ static int mb88_icount;
     MACROS
 ***************************************************************************/
 
-#define READOP(a) 			(cpu_readop(a))
+#define READOP(a) 			(program_decrypted_read_byte(a))
 
 #define RDMEM(a)			(data_read_byte_8be(a))
 #define WRMEM(a,v)			(data_write_byte_8be((a), (v)))

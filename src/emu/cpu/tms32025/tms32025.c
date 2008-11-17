@@ -176,8 +176,8 @@ INLINE void M_WRTRAM(offs_t addr, UINT16 data)
 #define S_IN(A)			(io_read_word_16be((A)<<1))
 #define S_OUT(A,V)		(io_write_word_16be(((A)<<1),(V)))
 
-#define M_RDOP(A)		((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : cpu_readop16((A)<<1))
-#define M_RDOP_ARG(A)	((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : cpu_readop16((A)<<1))
+#define M_RDOP(A)		((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : program_decrypted_read_word((A)<<1))
+#define M_RDOP_ARG(A)	((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : program_decrypted_read_word((A)<<1))
 
 
 

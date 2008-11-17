@@ -253,13 +253,13 @@ static void hc11_regs_w(UINT32 address, UINT8 value)
 
 INLINE UINT8 FETCH(void)
 {
-	return cpu_readop(hc11.pc++);
+	return program_decrypted_read_byte(hc11.pc++);
 }
 
 INLINE UINT16 FETCH16(void)
 {
 	UINT16 w;
-	w = (cpu_readop(hc11.pc) << 8) | (cpu_readop(hc11.pc+1));
+	w = (program_decrypted_read_byte(hc11.pc) << 8) | (program_decrypted_read_byte(hc11.pc+1));
 	hc11.pc += 2;
 	return w;
 }

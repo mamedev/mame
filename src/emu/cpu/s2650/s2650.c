@@ -171,7 +171,7 @@ static void s2650_set_sense(int state);
  ***************************************************************/
 INLINE UINT8 ROP(void)
 {
-	UINT8 result = cpu_readop(S.page + S.iar);
+	UINT8 result = program_decrypted_read_byte(S.page + S.iar);
 	S.iar = (S.iar + 1) & PMSK;
 	return result;
 }
@@ -182,7 +182,7 @@ INLINE UINT8 ROP(void)
  ***************************************************************/
 INLINE UINT8 ARG(void)
 {
-	UINT8 result = cpu_readop_arg(S.page + S.iar);
+	UINT8 result = program_raw_read_byte(S.page + S.iar);
 	S.iar = (S.iar + 1) & PMSK;
 	return result;
 }

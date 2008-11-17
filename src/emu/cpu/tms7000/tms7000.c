@@ -89,9 +89,9 @@ INLINE void WRF16( UINT32 mAddr, PAIR p )	/*Write register file (16 bit) */
 	WM( mAddr, p.b.l );
 }
 
-#define IMMBYTE(b)	b = ((unsigned)cpu_readop_arg(pPC)); pPC++
-#define SIMMBYTE(b)	b = ((signed)cpu_readop_arg(pPC)); pPC++
-#define IMMWORD(w)	w.b.h = (unsigned)cpu_readop_arg(pPC++); w.b.l = (unsigned)cpu_readop_arg(pPC++)
+#define IMMBYTE(b)	b = ((unsigned)program_raw_read_byte(pPC)); pPC++
+#define SIMMBYTE(b)	b = ((signed)program_raw_read_byte(pPC)); pPC++
+#define IMMWORD(w)	w.b.h = (unsigned)program_raw_read_byte(pPC++); w.b.l = (unsigned)program_raw_read_byte(pPC++)
 
 #define PUSHBYTE(b) pSP++; WM(pSP,b)
 #define PUSHWORD(w) pSP++; WM(pSP,w.b.h); pSP++; WM(pSP,w.b.l)
@@ -474,7 +474,7 @@ static CPU_EXECUTE( tms7000 )
 
 		if( tms7000.idle_state == 0 )
 		{
-			op = cpu_readop(pPC++);
+			op = program_decrypted_read_byte(pPC++);
 
 			opfn[op]();
 		}
@@ -514,7 +514,7 @@ static CPU_EXECUTE( tms7000_exl )
 		if( tms7000.idle_state == 0 )
 		{
 
-			op = cpu_readop(pPC++);
+			op = program_decrypted_read_byte(pPC++);
 
 			opfn_exl[op]();
 		}

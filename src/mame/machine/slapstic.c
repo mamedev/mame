@@ -877,7 +877,7 @@ static int alt2_kludge(running_machine *machine, offs_t offset)
 		if (MATCHES_MASK_VALUE(cpu_get_pc(machine->activecpu) >> 1, slapstic.alt1))
 		{
 			/* now look for a move.w (An),(An) or cmpm.w (An)+,(An)+ */
-			UINT16 opcode = cpu_readop16(cpu_get_previouspc(machine->activecpu) & 0xffffff);
+			UINT16 opcode = program_decrypted_read_word(cpu_get_previouspc(machine->activecpu) & 0xffffff);
 			if ((opcode & 0xf1f8) == 0x3090 || (opcode & 0xf1f8) == 0xb148)
 			{
 				/* fetch the value of the register for the second operand, and see */

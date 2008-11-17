@@ -536,8 +536,8 @@ struct opcode_s {
 	UINT8 mask_l0_l1;
 };
 
-#define RDOP(O) 	O = cpu_readop(PCD); PC++
-#define RDOPARG(A)	A = cpu_readop_arg(PCD); PC++
+#define RDOP(O) 	O = program_decrypted_read_byte(PCD); PC++
+#define RDOPARG(A)	A = program_raw_read_byte(PCD); PC++
 #define RM(A)		program_read_byte_8le(A)
 #define WM(A,V) 	program_write_byte_8le(A,V)
 

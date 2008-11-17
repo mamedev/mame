@@ -1625,15 +1625,15 @@ void snes_hdma_init()
 
 
 /* should we treat this as nvram in MAME? */
-static OPBASE_HANDLER(spc_opbase)
+static DIRECT_UPDATE_HANDLER(spc_direct)
 {
-	opbase->rom = opbase->ram = spc_ram;
+	direct->raw = direct->decrypted = spc_ram;
 	return ~0;
 }
 
-static OPBASE_HANDLER(snes_opbase)
+static DIRECT_UPDATE_HANDLER(snes_direct)
 {
-	opbase->rom = opbase->ram = snes_ram;
+	direct->raw = direct->decrypted = snes_ram;
 	return ~0;
 }
 
@@ -1642,8 +1642,8 @@ MACHINE_START( snes )
 	snes_vram = auto_malloc(SNES_VRAM_SIZE);
 	snes_cgram = auto_malloc(SNES_CGRAM_SIZE);
 	snes_oam = auto_malloc(SNES_OAM_SIZE);
-	memory_set_opbase_handler(0, snes_opbase);
-	memory_set_opbase_handler(1, spc_opbase);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), snes_direct);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), spc_direct);
 
 	// power-on sets these registers like this
 	snes_ram[WRIO] = 0xff;

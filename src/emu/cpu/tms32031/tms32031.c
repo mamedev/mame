@@ -144,7 +144,7 @@ static tms32031_regs tms32031;
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		cpu_readop32((pc) << 2)
+#define ROPCODE(pc)		program_decrypted_read_dword((pc) << 2)
 #define OP				tms32031.op
 
 #define RMEM(addr)		program_read_dword_32le((addr) << 2)

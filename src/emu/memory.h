@@ -97,21 +97,21 @@ typedef struct _address_space address_space;
 typedef UINT32	offs_t;
 
 
-/* opbase_data contains state data for opcode handling */
-typedef struct _opbase_data opbase_data;
-struct _opbase_data
+/* direct_read_data contains state data for direct read access */
+typedef struct _direct_read_data direct_read_data;
+struct _direct_read_data
 {
-	UINT8 *					rom;				/* opcode ROM base pointer */
-	UINT8 *					ram;				/* opcode RAM base pointer */
-	offs_t					mask;				/* opcode ROM address mask */
-	offs_t					mem_min;			/* opcode ROM/RAM min */
-	offs_t					mem_max;			/* opcode ROM/RAM max */
-	UINT8		 			entry;				/* opcode readmem entry */
+	UINT8 *					raw;				/* direct access data pointer (raw) */
+	UINT8 *					decrypted;			/* direct access data pointer (decrypted) */
+	offs_t					mask;				/* address mask */
+	offs_t					min;				/* minimum valid address */
+	offs_t					max;				/* maximum valid address */
+	UINT8		 			entry;				/* live entry */
 };
 
 
 /* opcode base adjustment handler */
-typedef offs_t	(*opbase_handler_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t address, ATTR_UNUSED opbase_data *opbase);
+typedef offs_t	(*direct_update_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t address, ATTR_UNUSED direct_read_data *direct);
 
 
 /* space read/write handlers */
@@ -277,6 +277,8 @@ struct _address_space
 	UINT8 *					readlookup;			/* live lookup table for reads */
 	UINT8 *					writelookup;		/* live lookup table for writes */
 	data_accessors		 	accessors;			/* data access handlers */
+	direct_read_data		direct;				/* fast direct-access read info */
+	direct_update_func 		directupdate;		/* fast direct-access update callback */
 	UINT64					unmap;				/* unmapped value */
 	offs_t					addrmask;			/* global address mask */
 	offs_t					bytemask;			/* byte-converted global address mask */
@@ -406,7 +408,7 @@ union _addrmap64_token
 ***************************************************************************/
 
 /* opcode base adjustment handler function macro */
-#define OPBASE_HANDLER(name)			offs_t name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t address, opbase_data *opbase)
+#define DIRECT_UPDATE_HANDLER(name)		offs_t name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t address, direct_read_data *direct)
 
 
 /* space read/write handler function macros */
@@ -493,23 +495,55 @@ union _addrmap64_token
 
 
 /* bank switching for CPU cores */
-#define change_pc(byteaddress)			memory_set_opbase(byteaddress)
+#define change_pc(byteaddress)			memory_set_direct_region(active_address_space[ADDRESS_SPACE_PROGRAM], byteaddress)
 
 
 /* opcode range safety check */
-#define address_is_unsafe(A)			((UNEXPECTED((A) < opbase.mem_min) || UNEXPECTED((A) > opbase.mem_max)))
+#define address_is_unsafe(S,A)			((UNEXPECTED((A) < (S)->direct.min) || UNEXPECTED((A) > (S)->direct.max)))
 
 
-/* unsafe opcode and opcode argument reading */
-#define cpu_opptr_unsafe(A)				((void *)&opbase.rom[(A) & opbase.mask])
-#define cpu_readop_unsafe(A)			(opbase.rom[(A) & opbase.mask])
-#define cpu_readop16_unsafe(A)			(*(UINT16 *)&opbase.rom[(A) & opbase.mask])
-#define cpu_readop32_unsafe(A)			(*(UINT32 *)&opbase.rom[(A) & opbase.mask])
-#define cpu_readop64_unsafe(A)			(*(UINT64 *)&opbase.rom[(A) & opbase.mask])
-#define cpu_readop_arg_unsafe(A)		(opbase.ram[(A) & opbase.mask])
-#define cpu_readop_arg16_unsafe(A)		(*(UINT16 *)&opbase.ram[(A) & opbase.mask])
-#define cpu_readop_arg32_unsafe(A)		(*(UINT32 *)&opbase.ram[(A) & opbase.mask])
-#define cpu_readop_arg64_unsafe(A)		(*(UINT64 *)&opbase.ram[(A) & opbase.mask])
+/* temporary shortcuts for accessing the active address space */
+#define program_read_byte(_addr)			memory_read_byte(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_read_word(_addr)			memory_read_word(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_read_dword(_addr)			memory_read_dword(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_read_qword(_addr)			memory_read_qword(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+
+#define program_write_byte(_addr,_data)		memory_write_byte(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr), (_data))
+#define program_write_word(_addr,_data)		memory_write_word(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr), (_data))
+#define program_write_dword(_addr,_data)	memory_write_dword(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr), (_data))
+#define program_write_qword(_addr,_data)	memory_write_qword(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr), (_data))
+
+#define program_decrypted_read_ptr(_addr)	memory_decrypted_read_ptr(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_decrypted_read_byte(_addr)	memory_decrypted_read_byte(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_decrypted_read_word(_addr)	memory_decrypted_read_word(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_decrypted_read_dword(_addr)	memory_decrypted_read_dword(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_decrypted_read_qword(_addr)	memory_decrypted_read_qword(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+
+#define program_raw_read_ptr(_addr)			memory_raw_read_ptr(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_raw_read_byte(_addr)		memory_raw_read_byte(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_raw_read_word(_addr)		memory_raw_read_word(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_raw_read_dword(_addr)		memory_raw_read_dword(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+#define program_raw_read_qword(_addr)		memory_raw_read_qword(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
+
+#define data_read_byte(_addr)				memory_read_byte(active_address_space[ADDRESS_SPACE_DATA], (_addr))
+#define data_read_word(_addr)				memory_read_word(active_address_space[ADDRESS_SPACE_DATA], (_addr))
+#define data_read_dword(_addr)				memory_read_dword(active_address_space[ADDRESS_SPACE_DATA], (_addr))
+#define data_read_qword(_addr)				memory_read_qword(active_address_space[ADDRESS_SPACE_DATA], (_addr))
+
+#define data_write_byte(_addr,_data)		memory_write_byte(active_address_space[ADDRESS_SPACE_DATA], (_addr), (_data))
+#define data_write_word(_addr,_data)		memory_write_word(active_address_space[ADDRESS_SPACE_DATA], (_addr), (_data))
+#define data_write_dword(_addr,_data)		memory_write_dword(active_address_space[ADDRESS_SPACE_DATA], (_addr), (_data))
+#define data_write_qword(_addr,_data)		memory_write_qword(active_address_space[ADDRESS_SPACE_DATA], (_addr), (_data))
+
+#define io_read_byte(_addr)					memory_read_byte(active_address_space[ADDRESS_SPACE_IO], (_addr))
+#define io_read_word(_addr)					memory_read_word(active_address_space[ADDRESS_SPACE_IO], (_addr))
+#define io_read_dword(_addr)				memory_read_dword(active_address_space[ADDRESS_SPACE_IO], (_addr))
+#define io_read_qword(_addr)				memory_read_qword(active_address_space[ADDRESS_SPACE_IO], (_addr))
+
+#define io_write_byte(_addr,_data)			memory_write_byte(active_address_space[ADDRESS_SPACE_IO], (_addr), (_data))
+#define io_write_word(_addr,_data)			memory_write_word(active_address_space[ADDRESS_SPACE_IO], (_addr), (_data))
+#define io_write_dword(_addr,_data)			memory_write_dword(active_address_space[ADDRESS_SPACE_IO], (_addr), (_data))
+#define io_write_qword(_addr,_data)			memory_write_qword(active_address_space[ADDRESS_SPACE_IO], (_addr), (_data))
 
 
 /* wrappers for dynamic read handler installation */
@@ -890,10 +924,10 @@ const address_map *memory_get_address_map(int cpunum, int spacenum);
 void memory_set_decrypted_region(int cpunum, offs_t addrstart, offs_t addrend, void *base);
 
 /* register a handler for opcode base changes on a given CPU */
-opbase_handler_func memory_set_opbase_handler(int cpunum, opbase_handler_func function);
+direct_update_func memory_set_direct_update_handler(const address_space *space, direct_update_func function);
 
 /* called by CPU cores to update the opcode base for the given address */
-void memory_set_opbase(offs_t byteaddress);
+void memory_set_direct_region(const address_space *space, offs_t byteaddress);
 
 
 
@@ -936,66 +970,160 @@ const char *memory_get_handler_string(int read0_or_write1, int cpunum, int space
 
 
 /***************************************************************************
-    HELPER MACROS AND INLINES
+    INLINE FUNCTIONS
 ***************************************************************************/
 
-/* generic memory access */
-INLINE UINT8  program_read_byte (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_PROGRAM]->accessors.read_byte)(byteaddress); }
-INLINE UINT16 program_read_word (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_PROGRAM]->accessors.read_word)(byteaddress); }
-INLINE UINT32 program_read_dword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_PROGRAM]->accessors.read_dword)(byteaddress); }
-INLINE UINT64 program_read_qword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_PROGRAM]->accessors.read_qword)(byteaddress); }
+/*-------------------------------------------------
+    memory_read_byte/word/dword/qword - read a
+    value from the specified address space
+-------------------------------------------------*/
 
-INLINE void	program_write_byte (offs_t byteaddress, UINT8  data) { (*active_address_space[ADDRESS_SPACE_PROGRAM]->accessors.write_byte)(byteaddress, data); }
-INLINE void	program_write_word (offs_t byteaddress, UINT16 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM]->accessors.write_word)(byteaddress, data); }
-INLINE void	program_write_dword(offs_t byteaddress, UINT32 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM]->accessors.write_dword)(byteaddress, data); }
-INLINE void	program_write_qword(offs_t byteaddress, UINT64 data) { (*active_address_space[ADDRESS_SPACE_PROGRAM]->accessors.write_qword)(byteaddress, data); }
+INLINE UINT8 memory_read_byte(const address_space *space, offs_t byteaddress)
+{
+	return (*space->accessors.read_byte)(byteaddress);
+}
 
-INLINE UINT8  data_read_byte (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_DATA]->accessors.read_byte)(byteaddress); }
-INLINE UINT16 data_read_word (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_DATA]->accessors.read_word)(byteaddress); }
-INLINE UINT32 data_read_dword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_DATA]->accessors.read_dword)(byteaddress); }
-INLINE UINT64 data_read_qword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_DATA]->accessors.read_qword)(byteaddress); }
+INLINE UINT16 memory_read_word(const address_space *space, offs_t byteaddress)
+{
+	return (*space->accessors.read_word)(byteaddress);
+}
 
-INLINE void	data_write_byte (offs_t byteaddress, UINT8  data) { (*active_address_space[ADDRESS_SPACE_DATA]->accessors.write_byte)(byteaddress, data); }
-INLINE void	data_write_word (offs_t byteaddress, UINT16 data) { (*active_address_space[ADDRESS_SPACE_DATA]->accessors.write_word)(byteaddress, data); }
-INLINE void	data_write_dword(offs_t byteaddress, UINT32 data) { (*active_address_space[ADDRESS_SPACE_DATA]->accessors.write_dword)(byteaddress, data); }
-INLINE void	data_write_qword(offs_t byteaddress, UINT64 data) { (*active_address_space[ADDRESS_SPACE_DATA]->accessors.write_qword)(byteaddress, data); }
+INLINE UINT32 memory_read_dword(const address_space *space, offs_t byteaddress)
+{
+	return (*space->accessors.read_dword)(byteaddress);
+}
 
-INLINE UINT8  io_read_byte (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_IO]->accessors.read_byte)(byteaddress); }
-INLINE UINT16 io_read_word (offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_IO]->accessors.read_word)(byteaddress); }
-INLINE UINT32 io_read_dword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_IO]->accessors.read_dword)(byteaddress); }
-INLINE UINT64 io_read_qword(offs_t byteaddress) { return (*active_address_space[ADDRESS_SPACE_IO]->accessors.read_qword)(byteaddress); }
+INLINE UINT64 memory_read_qword(const address_space *space, offs_t byteaddress)
+{
+	return (*space->accessors.read_qword)(byteaddress);
+}
 
-INLINE void	io_write_byte (offs_t byteaddress, UINT8  data) { (*active_address_space[ADDRESS_SPACE_IO]->accessors.write_byte)(byteaddress, data); }
-INLINE void	io_write_word (offs_t byteaddress, UINT16 data) { (*active_address_space[ADDRESS_SPACE_IO]->accessors.write_word)(byteaddress, data); }
-INLINE void	io_write_dword(offs_t byteaddress, UINT32 data) { (*active_address_space[ADDRESS_SPACE_IO]->accessors.write_dword)(byteaddress, data); }
-INLINE void	io_write_qword(offs_t byteaddress, UINT64 data) { (*active_address_space[ADDRESS_SPACE_IO]->accessors.write_qword)(byteaddress, data); }
 
-/* safe opcode and opcode argument reading */
-UINT8	cpu_readop_safe(offs_t byteaddress);
-UINT16	cpu_readop16_safe(offs_t byteaddress);
-UINT32	cpu_readop32_safe(offs_t byteaddress);
-UINT64	cpu_readop64_safe(offs_t byteaddress);
-UINT8	cpu_readop_arg_safe(offs_t byteaddress);
-UINT16	cpu_readop_arg16_safe(offs_t byteaddress);
-UINT32	cpu_readop_arg32_safe(offs_t byteaddress);
-UINT64	cpu_readop_arg64_safe(offs_t byteaddress);
+/*-------------------------------------------------
+    memory_write_byte/word/dword/qword - write a
+    value to the specified address space
+-------------------------------------------------*/
 
-/* opcode and opcode argument reading */
-INLINE void * cpu_opptr(offs_t byteaddress)			{ extern opbase_data opbase; if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_opptr_unsafe(byteaddress); }
-INLINE UINT8  cpu_readop(offs_t byteaddress)		{ extern opbase_data opbase; if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_unsafe(byteaddress); }
-INLINE UINT16 cpu_readop16(offs_t byteaddress)		{ extern opbase_data opbase; if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop16_unsafe(byteaddress); }
-INLINE UINT32 cpu_readop32(offs_t byteaddress)		{ extern opbase_data opbase; if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop32_unsafe(byteaddress); }
-INLINE UINT64 cpu_readop64(offs_t byteaddress)		{ extern opbase_data opbase; if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop64_unsafe(byteaddress); }
-INLINE UINT8  cpu_readop_arg(offs_t byteaddress)	{ extern opbase_data opbase; if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_arg_unsafe(byteaddress); }
-INLINE UINT16 cpu_readop_arg16(offs_t byteaddress)	{ extern opbase_data opbase; if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_arg16_unsafe(byteaddress); }
-INLINE UINT32 cpu_readop_arg32(offs_t byteaddress)	{ extern opbase_data opbase; if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_arg32_unsafe(byteaddress); }
-INLINE UINT64 cpu_readop_arg64(offs_t byteaddress)	{ extern opbase_data opbase; if (address_is_unsafe(byteaddress)) { memory_set_opbase(byteaddress); } return cpu_readop_arg64_unsafe(byteaddress); }
+INLINE void memory_write_byte(const address_space *space, offs_t byteaddress, UINT8 data)
+{
+	(*space->accessors.write_byte)(byteaddress, data);
+}
 
+INLINE void memory_write_word(const address_space *space, offs_t byteaddress, UINT16 data)
+{
+	(*space->accessors.write_word)(byteaddress, data);
+}
+
+INLINE void memory_write_dword(const address_space *space, offs_t byteaddress, UINT32 data)
+{
+	(*space->accessors.write_dword)(byteaddress, data);
+}
+
+INLINE void memory_write_qword(const address_space *space, offs_t byteaddress, UINT64 data)
+{
+	(*space->accessors.write_qword)(byteaddress, data);
+}
+
+
+/*-------------------------------------------------
+    memory_decrypted_read_byte/word/dword/qword - 
+    read a value from the specified address space 
+    using the direct addressing mechanism and
+    the decrypted base pointer
+-------------------------------------------------*/
+
+INLINE void *memory_decrypted_read_ptr(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return &space->direct.decrypted[byteaddress & space->direct.mask];
+}
+
+INLINE UINT8 memory_decrypted_read_byte(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return space->direct.decrypted[byteaddress & space->direct.mask];
+}
+
+INLINE UINT16 memory_decrypted_read_word(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return *(UINT16 *)&space->direct.decrypted[byteaddress & space->direct.mask];
+}
+
+INLINE UINT32 memory_decrypted_read_dword(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return *(UINT32 *)&space->direct.decrypted[byteaddress & space->direct.mask];
+}
+
+INLINE UINT64 memory_decrypted_read_qword(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return *(UINT64 *)&space->direct.decrypted[byteaddress & space->direct.mask];
+}
+
+
+/*-------------------------------------------------
+    memory_raw_read_byte/word/dword/qword - 
+    read a value from the specified address space 
+    using the direct addressing mechanism and
+    the raw base pointer
+-------------------------------------------------*/
+
+INLINE void *memory_raw_read_ptr(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return &space->direct.raw[byteaddress & space->direct.mask];
+}
+
+INLINE UINT8 memory_raw_read_byte(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return space->direct.raw[byteaddress & space->direct.mask];
+}
+
+INLINE UINT16 memory_raw_read_word(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return *(UINT16 *)&space->direct.raw[byteaddress & space->direct.mask];
+}
+
+INLINE UINT32 memory_raw_read_dword(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return *(UINT32 *)&space->direct.raw[byteaddress & space->direct.mask];
+}
+
+INLINE UINT64 memory_raw_read_qword(const address_space *space, offs_t byteaddress)
+{
+	if (address_is_unsafe(space, byteaddress))
+		memory_set_direct_region(space, byteaddress);
+	return *(UINT64 *)&space->direct.raw[byteaddress & space->direct.mask];
+}
+
+
+/*-------------------------------------------------
+    program_* - shortcuts to the above for the
+    active program address space
+-------------------------------------------------*/
 
 
 /***************************************************************************
     FUNCTION PROTOTYPES FOR CORE READ/WRITE ROUTINES
 ***************************************************************************/
+
+void program_set_direct_region(offs_t byteaddress);
+void data_set_direct_region(offs_t byteaddress);
+void io_set_direct_region(offs_t byteaddress);
 
 /* declare generic address space handlers */
 UINT8 memory_read_byte_8le(const address_space *space, offs_t address);

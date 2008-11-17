@@ -507,7 +507,7 @@ static STATE_POSTLOAD( slapstic_postload )
 }
 
 
-static OPBASE_HANDLER( atarigen_slapstic_setopbase )
+static DIRECT_UPDATE_HANDLER( atarigen_slapstic_setdirect )
 {
 	/* if we jump to an address in the slapstic region, tweak the slapstic
        at that address and return ~0; this will cause us to be called on
@@ -560,7 +560,7 @@ void atarigen_slapstic_init(running_machine *machine, int cpunum, offs_t base, o
 		/* install an opcode base handler if we are a 68000 or variant */
 		atarigen_slapstic_base = base;
 		atarigen_slapstic_mirror = mirror;
-		memory_set_opbase_handler(cpunum, atarigen_slapstic_setopbase);
+		memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), atarigen_slapstic_setdirect);
 	}
 }
 

@@ -475,7 +475,7 @@ static CPU_EXECUTE( h8 )
 
 		debugger_instruction_hook(device->machine, h8.pc);
 
-		opcode = cpu_readop16(h8.pc);
+		opcode = program_decrypted_read_word(h8.pc);
 //      mame_printf_debug("[%06x]: %04x => %x\n", h8.pc, opcode, (opcode>>12)&0xf);
 		h8.pc += 2;
 

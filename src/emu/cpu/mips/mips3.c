@@ -150,7 +150,7 @@ static mips3_regs mips3;
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		cpu_readop32(pc)
+#define ROPCODE(pc)		program_decrypted_read_dword(pc)
 
 
 

@@ -410,7 +410,7 @@ INLINE UINT8 FETCH(void)
 		translate_address(&address);
 	}
 
-	value = cpu_readop(address & I.a20_mask);
+	value = program_decrypted_read_byte(address & I.a20_mask);
 	I.eip++;
 	I.pc++;
 	return value;
@@ -427,11 +427,11 @@ INLINE UINT16 FETCH16(void)
 
 	if( address & 0x1 ) {		/* Unaligned read */
 		address &= I.a20_mask;
-		value = (cpu_readop(address+0) << 0) |
-				(cpu_readop(address+1) << 8);
+		value = (program_decrypted_read_byte(address+0) << 0) |
+				(program_decrypted_read_byte(address+1) << 8);
 	} else {
 		address &= I.a20_mask;
-		value = cpu_readop16(address);
+		value = program_decrypted_read_word(address);
 	}
 	I.eip += 2;
 	I.pc += 2;
@@ -449,13 +449,13 @@ INLINE UINT32 FETCH32(void)
 
 	if( I.pc & 0x3 ) {		/* Unaligned read */
 		address &= I.a20_mask;
-		value = (cpu_readop(address+0) << 0) |
-				(cpu_readop(address+1) << 8) |
-				(cpu_readop(address+2) << 16) |
-				(cpu_readop(address+3) << 24);
+		value = (program_decrypted_read_byte(address+0) << 0) |
+				(program_decrypted_read_byte(address+1) << 8) |
+				(program_decrypted_read_byte(address+2) << 16) |
+				(program_decrypted_read_byte(address+3) << 24);
 	} else {
 		address &= I.a20_mask;
-		value = cpu_readop32(address);
+		value = program_decrypted_read_dword(address);
 	}
 	I.eip += 4;
 	I.pc += 4;

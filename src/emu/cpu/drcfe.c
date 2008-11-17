@@ -57,6 +57,7 @@ struct _drcfe_state
 
 	/* CPU parameters */
 	const device_config *device;					/* CPU device object */
+	const address_space *program;					/* program address space for this CPU */
 	offs_t				pageshift;					/* shift to convert address to a page index */
 	cpu_translate_func	translate;					/* pointer to translation function */
 	offs_t				codexor;					/* XOR to reach code */
@@ -144,6 +145,7 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 
 	/* initialize the state */
 	drcfe->device = cpu;
+	drcfe->program = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->translate = (cpu_translate_func)cpu_get_info_fct(cpu, CPUINFO_PTR_TRANSLATE);
 #ifdef LSB_FIRST
@@ -299,8 +301,8 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc, const opcode_
 	}
 
 	/* get a pointer to the physical address */
-	memory_set_opbase(desc->physpc);
-	desc->opptr.v = cpu_opptr(desc->physpc ^ drcfe->codexor);
+	memory_set_direct_region(drcfe->program, desc->physpc);
+	desc->opptr.v = program_decrypted_read_ptr(desc->physpc ^ drcfe->codexor);
 	assert(desc->opptr.v != NULL);
 	if (desc->opptr.v == NULL)
 	{

@@ -717,9 +717,6 @@ void cpu_write_byte(const device_config *cpu, offs_t address, UINT8 data);
 /* return the PC, corrected to a byte offset and translated to physical space, on a given CPU */
 offs_t cpu_get_physical_pc_byte(const device_config *cpu);
 
-/* update the banking on a given CPU */
-void cpu_set_opbase(const device_config *cpu, offs_t val);
-
 /* disassemble a line at a given PC on a given CPU */
 offs_t cpu_dasm(const device_config *cpu, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
 

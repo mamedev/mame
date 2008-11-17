@@ -78,13 +78,13 @@ static void unimpl(tms34010_state *tms, UINT16 op)
 {
 	/* kludge for Super High Impact -- this doesn't seem to cause */
 	/* an illegal opcode exception */
-	if (cpu_readop16(TOBYTE(tms->pc - 0x10)) == 0x0007)
+	if (program_decrypted_read_word(TOBYTE(tms->pc - 0x10)) == 0x0007)
 		return;
 
 	/* 9 Ball Shootout calls to FFDF7468, expecting it */
 	/* to execute the next instruction from FFDF7470 */
 	/* but the instruction at FFDF7460 is an 0x0001 */
-	if (cpu_readop16(TOBYTE(tms->pc - 0x10)) == 0x0001)
+	if (program_decrypted_read_word(TOBYTE(tms->pc - 0x10)) == 0x0001)
 		return;
 
 	PUSH(tms, tms->pc);
@@ -95,7 +95,7 @@ static void unimpl(tms34010_state *tms, UINT16 op)
   	COUNT_UNKNOWN_CYCLES(tms,16);
 
 	/* extra check to prevent bad things */
-	if (tms->pc == 0 || opcode_table[cpu_readop16(TOBYTE(tms->pc)) >> 4] == unimpl)
+	if (tms->pc == 0 || opcode_table[program_decrypted_read_word(TOBYTE(tms->pc)) >> 4] == unimpl)
 	{
 		cpu_set_input_line(tms->device, INPUT_LINE_HALT, ASSERT_LINE);
 		debugger_break(tms->device->machine);

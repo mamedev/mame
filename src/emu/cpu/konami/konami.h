@@ -39,14 +39,14 @@ CPU_GET_INFO( konami );
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define KONAMI_RDOP(Addr) ((unsigned)cpu_readop(Addr))
+#define KONAMI_RDOP(Addr) ((unsigned)program_decrypted_read_byte(Addr))
 
 /****************************************************************************/
 /* Z80_RDOP_ARG() is identical to Z80_RDOP() except it is used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define KONAMI_RDOP_ARG(Addr) ((unsigned)cpu_readop_arg(Addr))
+#define KONAMI_RDOP_ARG(Addr) ((unsigned)program_raw_read_byte(Addr))
 
 #ifndef FALSE
 #    define FALSE 0

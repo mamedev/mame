@@ -267,7 +267,7 @@ static void (*const conditiontable[16])(void) =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		cpu_readop32(pc)
+#define ROPCODE(pc)		program_decrypted_read_dword(pc)
 #define UPDATEPC()		change_pc(asap.pc)
 
 

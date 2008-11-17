@@ -151,18 +151,18 @@ static void PortWrite32_16(offs_t address, UINT32 data)
 
 static UINT8 OpRead8_16(offs_t address)
 {
-	return cpu_readop(BYTE_XOR_LE(address));
+	return program_decrypted_read_byte(BYTE_XOR_LE(address));
 }
 
 static UINT16 OpRead16_16(offs_t address)
 {
-	return cpu_readop(BYTE_XOR_LE(address)) | (cpu_readop(BYTE_XOR_LE(address+1)) << 8);
+	return program_decrypted_read_byte(BYTE_XOR_LE(address)) | (program_decrypted_read_byte(BYTE_XOR_LE(address+1)) << 8);
 }
 
 static UINT32 OpRead32_16(offs_t address)
 {
-	return cpu_readop(BYTE_XOR_LE(address)) | (cpu_readop(BYTE_XOR_LE(address+1)) << 8) |
-			(cpu_readop(BYTE_XOR_LE(address+2)) << 16) | (cpu_readop(BYTE_XOR_LE(address+3)) << 24);
+	return program_decrypted_read_byte(BYTE_XOR_LE(address)) | (program_decrypted_read_byte(BYTE_XOR_LE(address+1)) << 8) |
+			(program_decrypted_read_byte(BYTE_XOR_LE(address+2)) << 16) | (program_decrypted_read_byte(BYTE_XOR_LE(address+3)) << 24);
 }
 
 static void ChangePC_16(offs_t pc)
@@ -312,18 +312,18 @@ static void PortWrite32_32(offs_t address, UINT32 data)
 
 static UINT8 OpRead8_32(offs_t address)
 {
-	return cpu_readop(BYTE4_XOR_LE(address));
+	return program_decrypted_read_byte(BYTE4_XOR_LE(address));
 }
 
 static UINT16 OpRead16_32(offs_t address)
 {
-	return cpu_readop(BYTE4_XOR_LE(address)) | (cpu_readop(BYTE4_XOR_LE(address+1)) << 8);
+	return program_decrypted_read_byte(BYTE4_XOR_LE(address)) | (program_decrypted_read_byte(BYTE4_XOR_LE(address+1)) << 8);
 }
 
 static UINT32 OpRead32_32(offs_t address)
 {
-	return cpu_readop(BYTE4_XOR_LE(address)) | (cpu_readop(BYTE4_XOR_LE(address+1)) << 8) |
-			(cpu_readop(BYTE4_XOR_LE(address+2)) << 16) | (cpu_readop(BYTE4_XOR_LE(address+3)) << 24);
+	return program_decrypted_read_byte(BYTE4_XOR_LE(address)) | (program_decrypted_read_byte(BYTE4_XOR_LE(address+1)) << 8) |
+			(program_decrypted_read_byte(BYTE4_XOR_LE(address+2)) << 16) | (program_decrypted_read_byte(BYTE4_XOR_LE(address+3)) << 24);
 }
 
 static void ChangePC_32(offs_t pc)
@@ -376,9 +376,9 @@ static const struct cpu_info v70_i =
 #define PortWrite32 v60.info.pw32
 
 #if defined(LSB_FIRST) && !defined(ALIGN_INTS)
-#define OpRead8(a)	(cpu_readop(a))
-#define OpRead16(a)	(cpu_readop16(a))
-#define OpRead32(a)	(cpu_readop32(a))
+#define OpRead8(a)	(program_decrypted_read_byte(a))
+#define OpRead16(a)	(program_decrypted_read_word(a))
+#define OpRead32(a)	(program_decrypted_read_dword(a))
 #else
 #define OpRead8     v60.info.mr8
 #define OpRead16    v60.info.mr16

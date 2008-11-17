@@ -75,14 +75,14 @@ extern CPU_GET_INFO( hd63705 );
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M6805_RDOP(Addr) ((unsigned)cpu_readop(Addr))
+#define M6805_RDOP(Addr) ((unsigned)program_decrypted_read_byte(Addr))
 
 /****************************************************************************/
 /* M6805_RDOP_ARG() is identical to M6805_RDOP() but it's used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M6805_RDOP_ARG(Addr) ((unsigned)cpu_readop_arg(Addr))
+#define M6805_RDOP_ARG(Addr) ((unsigned)program_raw_read_byte(Addr))
 
 CPU_DISASSEMBLE( m6805 );
 

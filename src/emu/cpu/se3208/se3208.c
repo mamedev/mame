@@ -1769,7 +1769,7 @@ static CPU_EXECUTE( SE3208 )
 	SE3208_ICount=cycles;
 	do
 	{
-		UINT16 Opcode=cpu_readop16(WORD_XOR_LE(Context.PC));
+		UINT16 Opcode=program_decrypted_read_word(WORD_XOR_LE(Context.PC));
 
 		debugger_instruction_hook(device->machine, Context.PC);
 

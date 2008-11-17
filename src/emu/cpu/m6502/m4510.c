@@ -164,13 +164,13 @@ static void *token;
 INLINE int m4510_cpu_readop(m4510_Regs *m4510)
 {
 	register UINT16 t=m4510->pc.w.l++;
-	return cpu_readop(M4510_MEM(t));
+	return program_decrypted_read_byte(M4510_MEM(t));
 }
 
 INLINE int m4510_cpu_readop_arg(m4510_Regs *m4510)
 {
 	register UINT16 t=m4510->pc.w.l++;
-	return cpu_readop_arg(M4510_MEM(t));
+	return program_raw_read_byte(M4510_MEM(t));
 }
 
 #define M4510

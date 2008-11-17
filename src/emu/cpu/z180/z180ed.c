@@ -1,7 +1,7 @@
 OP(illegal,2)
 {
 	logerror("Z180 #%d ill. opcode $ed $%02x\n",
-			cpunum_get_active(), cpu_readop((_PCD-1)&0xffff));
+			cpunum_get_active(), program_decrypted_read_byte((_PCD-1)&0xffff));
 }
 
 /**********************************************************

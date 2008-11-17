@@ -148,8 +148,8 @@ struct _upi41_state_t {
 #define RP(a)	io_read_byte_8le(a)
 #define WP(a,v) io_write_byte_8le(a,v)
 
-#define ROP(pc) cpu_readop(pc)
-#define ROP_ARG(pc) cpu_readop_arg(pc)
+#define ROP(pc) program_decrypted_read_byte(pc)
+#define ROP_ARG(pc) program_raw_read_byte(pc)
 
 /* PC vectors */
 #define V_RESET 0x000	/* power on address */
@@ -919,7 +919,7 @@ static CPU_EXECUTE( i8x41 )
 
 	do
 	{
-		UINT8 op = cpu_readop(PC);
+		UINT8 op = program_decrypted_read_byte(PC);
 
 		PPC = PC;
 

@@ -3328,12 +3328,12 @@ static CPU_EXECUTE( sh4 )
 
 		if (sh4.delay)
 		{
-			opcode = cpu_readop16(WORD2_XOR_LE((UINT32)(sh4.delay & AM)));
+			opcode = program_decrypted_read_word(WORD2_XOR_LE((UINT32)(sh4.delay & AM)));
 			change_pc(sh4.pc & AM);
 			sh4.pc -= 2;
 		}
 		else
-			opcode = cpu_readop16(WORD2_XOR_LE((UINT32)(sh4.pc & AM)));
+			opcode = program_decrypted_read_word(WORD2_XOR_LE((UINT32)(sh4.pc & AM)));
 
 		debugger_instruction_hook(device->machine, sh4.pc & AM);
 

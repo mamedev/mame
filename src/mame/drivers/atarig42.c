@@ -136,11 +136,11 @@ static WRITE16_HANDLER( mo_command_w )
  *
  *************************************/
 
-static OPBASE_HANDLER( sloop_opbase_handler )
+static DIRECT_UPDATE_HANDLER( sloop_direct_handler )
 {
-	if  (address < 0x80000)
+	if (address < 0x80000)
 	{
-		opbase->rom = opbase->ram = (void *)sloop_base;
+		direct->raw = direct->decrypted = (void *)sloop_base;
 		return (offs_t)-1;
 	}
 	return address;
@@ -687,7 +687,7 @@ static DRIVER_INIT( roadriot )
 	atarig42_motion_object_mask = 0x1ff;
 
 	sloop_base = memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, roadriot_sloop_data_r, roadriot_sloop_data_w);
-	memory_set_opbase_handler(0, sloop_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), sloop_direct_handler);
 
 	asic65_config(machine, ASIC65_ROMBASED);
 /*
@@ -740,7 +740,7 @@ static DRIVER_INIT( guardian )
 	*(UINT16 *)&memory_region(machine, "main")[0x80000] = 0x4E75;
 
 	sloop_base = memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);
-	memory_set_opbase_handler(0, sloop_opbase_handler);
+	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), sloop_direct_handler);
 
 	asic65_config(machine, ASIC65_GUARDIANS);
 /*

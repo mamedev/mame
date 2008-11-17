@@ -790,7 +790,7 @@ void m68k_set_encrypted_opcode_range(const device_config *device, offs_t start, 
 static UINT16 m68008_read_immediate_16(const address_space *space, offs_t address)
 {
 	offs_t addr = address;
-	return (cpu_readop(addr) << 8) | (cpu_readop(addr + 1));
+	return (program_decrypted_read_byte(addr) << 8) | (program_decrypted_read_byte(addr + 1));
 }
 
 /* interface for 20/22-bit address bus, 8-bit data bus (68008) */
@@ -813,12 +813,12 @@ static const m68k_memory_interface interface_d8 =
 static UINT16 read_immediate_16(const address_space *space, offs_t address)
 {
 	m68ki_cpu_core *m68k = space->cpu->token;
-	return cpu_readop16((address) ^ m68k->memory.opcode_xor);
+	return program_decrypted_read_word((address) ^ m68k->memory.opcode_xor);
 }
 
 static UINT16 simple_read_immediate_16(const address_space *space, offs_t address)
 {
-	return cpu_readop16(address);
+	return program_decrypted_read_word(address);
 }
 
 /* interface for 24-bit address bus, 16-bit data bus (68000, 68010) */

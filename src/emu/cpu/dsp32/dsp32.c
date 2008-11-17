@@ -186,6 +186,7 @@ typedef struct
 	int				interrupt_cycles;
 	void			(*output_pins_changed)(UINT32 pins);
 	const device_config *device;
+	const address_space *program;
 } dsp32_regs;
 
 
@@ -211,7 +212,7 @@ static int dsp32_icount;
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)			cpu_readop32(pc)
+#define ROPCODE(pc)			program_decrypted_read_dword(pc)
 
 #define RBYTE(addr)			program_read_byte_32le(addr)
 #define WBYTE(addr,data)	program_write_byte_32le((addr), data)
@@ -335,7 +336,7 @@ static CPU_SET_CONTEXT( dsp32c )
 	/* copy the context */
 	if (src)
 		dsp32 = *(dsp32_regs *)src;
-	memory_set_opbase(dsp32.PC);
+	memory_set_direct_region(dsp32.program, dsp32.PC);
 
 	/* check for IRQs */
 	check_irqs();
@@ -356,6 +357,7 @@ static CPU_INIT( dsp32c )
 		dsp32.output_pins_changed = configdata->output_pins_changed;
 
 	dsp32.device = device;
+	dsp32.program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 
@@ -363,7 +365,7 @@ static CPU_RESET( dsp32c )
 {
 	/* reset goes to 0 */
 	dsp32.PC = 0;
-	memory_set_opbase(dsp32.PC);
+	memory_set_direct_region(dsp32.program, dsp32.PC);
 
 	/* clear some registers */
 	dsp32.pcw &= 0x03ff;

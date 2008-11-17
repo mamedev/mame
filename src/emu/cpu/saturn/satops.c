@@ -7,7 +7,7 @@ INLINE int READ_OP(void)
 {
 	UINT8 data;
 	saturn_ICount-=3;
-        data=cpu_readop(saturn.pc);
+        data=program_decrypted_read_byte(saturn.pc);
 	saturn_assert(data<0x10);
 	saturn.pc=(saturn.pc+1)&0xfffff;
 	return data;
@@ -17,7 +17,7 @@ INLINE int READ_OP_ARG(void)
 {
 	UINT8 data;
 	saturn_ICount-=3;
-        data=cpu_readop_arg(saturn.pc);
+        data=program_raw_read_byte(saturn.pc);
 	saturn_assert(data<0x10);
 	saturn.pc=(saturn.pc+1)&0xfffff;
 	return data;

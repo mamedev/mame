@@ -380,8 +380,8 @@ static int bus_freq_multiplier = 1;
 static PPC_REGS ppc;
 static UINT32 ppc_rotate_mask[32][32];
 
-#define ROPCODE(pc)			cpu_readop32(pc)
-#define ROPCODE64(pc)		cpu_readop64(DWORD_XOR_BE(pc))
+#define ROPCODE(pc)			program_decrypted_read_dword(pc)
+#define ROPCODE64(pc)		program_decrypted_read_qword(DWORD_XOR_BE(pc))
 
 /*********************************************************************/
 

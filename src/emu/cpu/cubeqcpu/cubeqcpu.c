@@ -549,7 +549,7 @@ static CPU_EXECUTE( cquestsnd )
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = cpu_readop64(SND_PC << 3);
+		UINT64 inst = program_decrypted_read_qword(SND_PC << 3);
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
 
@@ -883,7 +883,7 @@ static CPU_EXECUTE( cquestrot )
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = cpu_readop64(ROT_PC << 3);
+		UINT64 inst = program_decrypted_read_qword(ROT_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
@@ -1405,7 +1405,7 @@ static CPU_EXECUTE( cquestlin )
 		/* Are we executing the foreground or backgroud program? */
 		int prog = (cquestlin.clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
-		UINT64 inst = cpu_readop64(LINE_PC << 3);
+		UINT64 inst = program_decrypted_read_qword(LINE_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
