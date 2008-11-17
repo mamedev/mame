@@ -675,7 +675,7 @@ WRITE16_HANDLER( galpani3_regs1_go_w )
 	UINT8* rledata = memory_region(space->machine,"gfx2");
 
 	printf("galpani3_regs1_go_w? %08x\n",address );
-	gp3_do_rle(address, galpani3_framebuffer1, rledata);
+	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, galpani3_framebuffer1, rledata);
 }
 
 
@@ -691,7 +691,10 @@ WRITE16_HANDLER( galpani3_regs2_go_w )
 	UINT8* rledata = memory_region(space->machine,"gfx2");
 
 	printf("galpani3_regs2_go_w? %08x\n", address );
-	gp3_do_rle(address, galpani3_framebuffer2, rledata);
+
+	// hack to prevent title screen being corrupt - these might actually be size registers
+	// for the RLE request
+	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, galpani3_framebuffer2, rledata);
 }
 
 
@@ -708,7 +711,8 @@ WRITE16_HANDLER( galpani3_regs3_go_w )
 	UINT8* rledata = memory_region(space->machine,"gfx2");
 
 	printf("galpani3_regs3_go_w? %08x\n",address );
-	gp3_do_rle(address, galpani3_framebuffer3, rledata);
+
+	if ((data==0x2000) || (data==0x3000)) gp3_do_rle(address, galpani3_framebuffer3, rledata);
 }
 
 static void set_color_555_gp3(running_machine *machine, pen_t color, int rshift, int gshift, int bshift, UINT16 data)
@@ -959,4 +963,4 @@ static DRIVER_INIT( galpani3 )
 	memset(galpani3_mcu_com, 0, 4 * sizeof( UINT16) );
 }
 
-GAME( 1995, galpani3, 0, galpani3, galpani3, galpani3, ROT90, "Kaneko", "Gals Panic 3", GAME_NOT_WORKING )
+GAME( 1995, galpani3, 0, galpani3, galpani3, galpani3, ROT90, "Kaneko", "Gals Panic 3", GAME_IMPERFECT_GRAPHICS )
