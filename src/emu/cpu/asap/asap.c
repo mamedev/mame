@@ -10,7 +10,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "asap.h"
 
 
@@ -34,31 +33,31 @@
 #define REGBASE				0xffe0
 
 
-#define SET_C_ADD(a,b)		(asap.cflag = (UINT32)(b) > (UINT32)(~(a)))
-#define SET_C_SUB(a,b)		(asap.cflag = (UINT32)(b) <= (UINT32)(a))
-#define SET_V_ADD(r,a,b)	(asap.vflag = ~((a) ^ (b)) & ((a) ^ (r)))
-#define SET_V_SUB(r,a,b)	(asap.vflag =  ((a) ^ (b)) & ((a) ^ (r)))
-#define SET_ZN(r)			(asap.znflag = (r))
-#define SET_ZNCV_ADD(r,a,b)	SET_ZN(r); SET_C_ADD(a,b); SET_V_ADD(r,a,b)
-#define SET_ZNCV_SUB(r,a,b)	SET_ZN(r); SET_C_SUB(a,b); SET_V_SUB(r,a,b)
+#define SET_C_ADD(A,a,b)		((A)->cflag = (UINT32)(b) > (UINT32)(~(a)))
+#define SET_C_SUB(A,a,b)		((A)->cflag = (UINT32)(b) <= (UINT32)(a))
+#define SET_V_ADD(A,r,a,b)		((A)->vflag = ~((a) ^ (b)) & ((a) ^ (r)))
+#define SET_V_SUB(A,r,a,b)		((A)->vflag =  ((a) ^ (b)) & ((a) ^ (r)))
+#define SET_ZN(A,r)				((A)->znflag = (r))
+#define SET_ZNCV_ADD(A,r,a,b)	SET_ZN(A,r); SET_C_ADD(A,a,b); SET_V_ADD(A,r,a,b)
+#define SET_ZNCV_SUB(A,r,a,b)	SET_ZN(A,r); SET_C_SUB(A,a,b); SET_V_SUB(A,r,a,b)
 
-#define SET_VFLAG(val)		(asap.vflag = (val) << 31)
-#define SET_CFLAG(val)		(asap.cflag = (val))
+#define SET_VFLAG(A,val)		((A)->vflag = (val) << 31)
+#define SET_CFLAG(A,val)		((A)->cflag = (val))
 
-#define GET_FLAGS(r)		((r)->cflag | \
-							 (((r)->vflag >> 30) & PS_VFLAG) | \
-							 (((r)->znflag == 0) << 2) | \
-							 (((r)->znflag >> 28) & PS_NFLAG) | \
-							 ((r)->iflag << 4) | \
-							 ((r)->pflag << 5))
+#define GET_FLAGS(A)			((A)->cflag | \
+								 (((A)->vflag >> 30) & PS_VFLAG) | \
+								 (((A)->znflag == 0) << 2) | \
+								 (((A)->znflag >> 28) & PS_NFLAG) | \
+								 ((A)->iflag << 4) | \
+								 ((A)->pflag << 5))
 
-#define SET_FLAGS(r,v)		do { \
-								(r)->cflag = (v) & PS_CFLAG; \
-								(r)->vflag = ((v) & PS_VFLAG) << 30; \
-								(r)->znflag = ((v) & PS_ZFLAG) ? 0 : ((v) & PS_NFLAG) ? -1 : 1; \
-								(r)->iflag = ((v) & PS_IFLAG) >> 4; \
-								(r)->pflag = ((v) & PS_PFLAG) >> 5; \
-							} while (0);
+#define SET_FLAGS(A,v)			do { \
+									(A)->cflag = (v) & PS_CFLAG; \
+									(A)->vflag = ((v) & PS_VFLAG) << 30; \
+									(A)->znflag = ((v) & PS_ZFLAG) ? 0 : ((v) & PS_NFLAG) ? -1 : 1; \
+									(A)->iflag = ((v) & PS_IFLAG) >> 4; \
+									(A)->pflag = ((v) & PS_PFLAG) >> 5; \
+								} while (0);
 
 
 /***************************************************************************
@@ -66,10 +65,10 @@
 ***************************************************************************/
 
 /* ASAP Registers */
-typedef struct
+typedef struct _asap_state asap_state;
+struct _asap_state
 {
 	/* core registers */
-	UINT32		r[32];
 	UINT32		pc;
 
 	/* expanded flags */
@@ -84,10 +83,14 @@ typedef struct
 	UINT32		ppc;
 	UINT32		nextpc;
 	UINT8		irq_state;
-	int			interrupt_cycles;
+	int			icount;
 	cpu_irq_callback irq_callback;
+	const address_space *program;
 	const device_config *device;
-} asap_regs;
+
+	/* src2val table, registers are at the end */
+	UINT32		src2val[65536];
+};
 
 
 
@@ -95,12 +98,7 @@ typedef struct
     PRIVATE GLOBAL VARIABLES
 ***************************************************************************/
 
-static asap_regs asap;
-
-static void (**opcode)(void);
-static UINT32 *src2val;
-
-static int asap_icount;
+static void (**opcode)(asap_state *);
 
 
 
@@ -108,118 +106,118 @@ static int asap_icount;
     OPCODE TABLE
 ***************************************************************************/
 
-static void noop(void);
-static void trap0(void);
-static void bsp(void);
-static void bmz(void);
-static void bgt(void);
-static void ble(void);
-static void bge(void);
-static void blt(void);
-static void bhi(void);
-static void bls(void);
-static void bcc(void);
-static void bcs(void);
-static void bpl(void);
-static void bmi(void);
-static void bne(void);
-static void beq(void);
-static void bvc(void);
-static void bvs(void);
-static void bsr(void);
-static void bsr_0(void);
-static void lea(void);
-static void lea_c(void);
-static void lea_c0(void);
-static void leah(void);
-static void leah_c(void);
-static void leah_c0(void);
-static void subr(void);
-static void subr_c(void);
-static void subr_c0(void);
-static void xor(void);
-static void xor_c(void);
-static void xor_c0(void);
-static void xorn(void);
-static void xorn_c(void);
-static void xorn_c0(void);
-static void add(void);
-static void add_c(void);
-static void add_c0(void);
-static void sub(void);
-static void sub_c(void);
-static void sub_c0(void);
-static void addc(void);
-static void addc_c(void);
-static void addc_c0(void);
-static void subc(void);
-static void subc_c(void);
-static void subc_c0(void);
-static void and(void);
-static void and_c(void);
-static void and_c0(void);
-static void andn(void);
-static void andn_c(void);
-static void andn_c0(void);
-static void or(void);
-static void or_c(void);
-static void or_c0(void);
-static void orn(void);
-static void orn_c(void);
-static void orn_c0(void);
-static void ld(void);
-static void ld_0(void);
-static void ld_c(void);
-static void ld_c0(void);
-static void ldh(void);
-static void ldh_0(void);
-static void ldh_c(void);
-static void ldh_c0(void);
-static void lduh(void);
-static void lduh_0(void);
-static void lduh_c(void);
-static void lduh_c0(void);
-static void sth(void);
-static void sth_0(void);
-static void sth_c(void);
-static void sth_c0(void);
-static void st(void);
-static void st_0(void);
-static void st_c(void);
-static void st_c0(void);
-static void ldb(void);
-static void ldb_0(void);
-static void ldb_c(void);
-static void ldb_c0(void);
-static void ldub(void);
-static void ldub_0(void);
-static void ldub_c(void);
-static void ldub_c0(void);
-static void stb(void);
-static void stb_0(void);
-static void stb_c(void);
-static void stb_c0(void);
-static void ashr(void);
-static void ashr_c(void);
-static void ashr_c0(void);
-static void lshr(void);
-static void lshr_c(void);
-static void lshr_c0(void);
-static void ashl(void);
-static void ashl_c(void);
-static void ashl_c0(void);
-static void rotl(void);
-static void rotl_c(void);
-static void rotl_c0(void);
-static void getps(void);
-static void putps(void);
-static void jsr(void);
-static void jsr_0(void);
-static void jsr_c(void);
-static void jsr_c0(void);
-static void trapf(void);
+static void noop(asap_state *);
+static void trap0(asap_state *);
+static void bsp(asap_state *);
+static void bmz(asap_state *);
+static void bgt(asap_state *);
+static void ble(asap_state *);
+static void bge(asap_state *);
+static void blt(asap_state *);
+static void bhi(asap_state *);
+static void bls(asap_state *);
+static void bcc(asap_state *);
+static void bcs(asap_state *);
+static void bpl(asap_state *);
+static void bmi(asap_state *);
+static void bne(asap_state *);
+static void beq(asap_state *);
+static void bvc(asap_state *);
+static void bvs(asap_state *);
+static void bsr(asap_state *);
+static void bsr_0(asap_state *);
+static void lea(asap_state *);
+static void lea_c(asap_state *);
+static void lea_c0(asap_state *);
+static void leah(asap_state *);
+static void leah_c(asap_state *);
+static void leah_c0(asap_state *);
+static void subr(asap_state *);
+static void subr_c(asap_state *);
+static void subr_c0(asap_state *);
+static void xor(asap_state *);
+static void xor_c(asap_state *);
+static void xor_c0(asap_state *);
+static void xorn(asap_state *);
+static void xorn_c(asap_state *);
+static void xorn_c0(asap_state *);
+static void add(asap_state *);
+static void add_c(asap_state *);
+static void add_c0(asap_state *);
+static void sub(asap_state *);
+static void sub_c(asap_state *);
+static void sub_c0(asap_state *);
+static void addc(asap_state *);
+static void addc_c(asap_state *);
+static void addc_c0(asap_state *);
+static void subc(asap_state *);
+static void subc_c(asap_state *);
+static void subc_c0(asap_state *);
+static void and(asap_state *);
+static void and_c(asap_state *);
+static void and_c0(asap_state *);
+static void andn(asap_state *);
+static void andn_c(asap_state *);
+static void andn_c0(asap_state *);
+static void or(asap_state *);
+static void or_c(asap_state *);
+static void or_c0(asap_state *);
+static void orn(asap_state *);
+static void orn_c(asap_state *);
+static void orn_c0(asap_state *);
+static void ld(asap_state *);
+static void ld_0(asap_state *);
+static void ld_c(asap_state *);
+static void ld_c0(asap_state *);
+static void ldh(asap_state *);
+static void ldh_0(asap_state *);
+static void ldh_c(asap_state *);
+static void ldh_c0(asap_state *);
+static void lduh(asap_state *);
+static void lduh_0(asap_state *);
+static void lduh_c(asap_state *);
+static void lduh_c0(asap_state *);
+static void sth(asap_state *);
+static void sth_0(asap_state *);
+static void sth_c(asap_state *);
+static void sth_c0(asap_state *);
+static void st(asap_state *);
+static void st_0(asap_state *);
+static void st_c(asap_state *);
+static void st_c0(asap_state *);
+static void ldb(asap_state *);
+static void ldb_0(asap_state *);
+static void ldb_c(asap_state *);
+static void ldb_c0(asap_state *);
+static void ldub(asap_state *);
+static void ldub_0(asap_state *);
+static void ldub_c(asap_state *);
+static void ldub_c0(asap_state *);
+static void stb(asap_state *);
+static void stb_0(asap_state *);
+static void stb_c(asap_state *);
+static void stb_c0(asap_state *);
+static void ashr(asap_state *);
+static void ashr_c(asap_state *);
+static void ashr_c0(asap_state *);
+static void lshr(asap_state *);
+static void lshr_c(asap_state *);
+static void lshr_c0(asap_state *);
+static void ashl(asap_state *);
+static void ashl_c(asap_state *);
+static void ashl_c0(asap_state *);
+static void rotl(asap_state *);
+static void rotl_c(asap_state *);
+static void rotl_c0(asap_state *);
+static void getps(asap_state *);
+static void putps(asap_state *);
+static void jsr(asap_state *);
+static void jsr_0(asap_state *);
+static void jsr_c(asap_state *);
+static void jsr_c0(asap_state *);
+static void trapf(asap_state *);
 
-static void (*const opcodetable[32][4])(void) =
+static void (*const opcodetable[32][4])(asap_state *) =
 {
 	{	trap0,		trap0,		trap0,		trap0		},
 	{	NULL,		NULL,		NULL,		NULL		},
@@ -255,7 +253,7 @@ static void (*const opcodetable[32][4])(void) =
 	{	trapf,		trapf,		trapf,		trapf		}
 };
 
-static void (*const conditiontable[16])(void) =
+static void (*const conditiontable[16])(asap_state *) =
 {
 	bsp, bmz, bgt, ble, bge, blt, bhi, bls,
 	bcc, bcs, bpl, bmi, bne, beq, bvc, bvs
@@ -267,67 +265,67 @@ static void (*const conditiontable[16])(void) =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		program_decrypted_read_dword(pc)
-#define UPDATEPC()		change_pc(asap.pc)
+#define ROPCODE(A,pc)	memory_decrypted_read_dword((A)->program, pc)
+#define UPDATEPC(A)		change_pc((A)->pc)
 
 
-INLINE UINT8 READBYTE(offs_t address)
+INLINE UINT8 READBYTE(asap_state *asap, offs_t address)
 {
 	/* no alignment issues with bytes */
-	return program_read_byte_32le(address);
+	return memory_read_byte_32le(asap->program, address);
 }
 
-INLINE UINT16 READWORD(offs_t address)
+INLINE UINT16 READWORD(asap_state *asap, offs_t address)
 {
 	/* aligned reads are easy */
 	if (!(address & 1))
-		return program_read_word_32le(address);
+		return memory_read_word_32le(asap->program, address);
 
 	/* misaligned reads are tricky */
-	return program_read_dword_32le(address & ~3) >> (address & 3);
+	return memory_read_dword_32le(asap->program, address & ~3) >> (address & 3);
 }
 
-INLINE UINT32 READLONG(offs_t address)
+INLINE UINT32 READLONG(asap_state *asap, offs_t address)
 {
 	/* aligned reads are easy */
 	if (!(address & 3))
-		return program_read_dword_32le(address);
+		return memory_read_dword_32le(asap->program, address);
 
 	/* misaligned reads are tricky */
-	return program_read_dword_32le(address & ~3) >> (address & 3);
+	return memory_read_dword_32le(asap->program, address & ~3) >> (address & 3);
 }
 
-INLINE void WRITEBYTE(offs_t address, UINT8 data)
+INLINE void WRITEBYTE(asap_state *asap, offs_t address, UINT8 data)
 {
 	/* no alignment issues with bytes */
-	program_write_byte_32le(address, data);
+	memory_write_byte_32le(asap->program, address, data);
 }
 
-INLINE void WRITEWORD(offs_t address, UINT16 data)
+INLINE void WRITEWORD(asap_state *asap, offs_t address, UINT16 data)
 {
 	/* aligned writes are easy */
 	if (!(address & 1))
 	{
-		program_write_word_32le(address, data);
+		memory_write_word_32le(asap->program, address, data);
 		return;
 	}
 
 	/* misaligned writes are tricky */
 	if (!(address & 2))
 	{
-		program_write_byte_32le(address + 1, data);
-		program_write_byte_32le(address + 2, data >> 8);
+		memory_write_byte_32le(asap->program, address + 1, data);
+		memory_write_byte_32le(asap->program, address + 2, data >> 8);
 	}
 	else
-		program_write_byte_32le(address + 1, data);
+		memory_write_byte_32le(asap->program, address + 1, data);
 }
 
-INLINE void WRITELONG(offs_t address, UINT32 data)
+INLINE void WRITELONG(asap_state *asap, offs_t address, UINT32 data)
 {
 	/* aligned writes are easy */
 	if (!(address & 3))
 	{
-		program_write_dword_32le(address, data);
+		memory_write_dword_32le(asap->program, address, data);
 		return;
 	}
 
@@ -335,14 +333,14 @@ INLINE void WRITELONG(offs_t address, UINT32 data)
 	switch (address & 3)
 	{
 		case 1:
-			program_write_byte_32le(address, data);
-			program_write_word_32le(address + 1, data >> 8);
+			memory_write_byte_32le(asap->program, address, data);
+			memory_write_word_32le(asap->program, address + 1, data >> 8);
 			break;
 		case 2:
-			program_write_word_32le(address, data);
+			memory_write_word_32le(asap->program, address, data);
 			break;
 		case 3:
-			program_write_byte_32le(address, data);
+			memory_write_byte_32le(asap->program, address, data);
 			break;
 	}
 }
@@ -353,19 +351,19 @@ INLINE void WRITELONG(offs_t address, UINT32 data)
     EXCEPTION HANDLING
 ***************************************************************************/
 
-INLINE void generate_exception(int exception)
+INLINE void generate_exception(asap_state *asap, int exception)
 {
-	asap.pflag = asap.iflag;
-	asap.iflag = 0;
+	asap->pflag = asap->iflag;
+	asap->iflag = 0;
 
-	src2val[REGBASE + 30] = asap.pc;
-	src2val[REGBASE + 31] = (asap.nextpc == ~0) ? asap.pc + 4 : asap.nextpc;
+	asap->src2val[REGBASE + 30] = asap->pc;
+	asap->src2val[REGBASE + 31] = (asap->nextpc == ~0) ? asap->pc + 4 : asap->nextpc;
 
-	asap.pc = 0x40 * exception;
-	asap.nextpc = ~0;
-	UPDATEPC();
+	asap->pc = 0x40 * exception;
+	asap->nextpc = ~0;
+	UPDATEPC(asap);
 
-	asap.interrupt_cycles++;
+	asap->icount--;
 }
 
 
@@ -374,21 +372,20 @@ INLINE void generate_exception(int exception)
     IRQ HANDLING
 ***************************************************************************/
 
-INLINE void check_irqs(void)
+INLINE void check_irqs(asap_state *asap)
 {
-	if (asap.irq_state && asap.iflag)
+	if (asap->irq_state && asap->iflag)
 	{
-		generate_exception(EXCEPTION_INTERRUPT);
-		if (asap.irq_callback != NULL)
-			(*asap.irq_callback)(asap.device, ASAP_IRQ0);
+		generate_exception(asap, EXCEPTION_INTERRUPT);
+		if (asap->irq_callback != NULL)
+			(*asap->irq_callback)(asap->device, ASAP_IRQ0);
 	}
 }
 
 
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(asap_state *asap, int irqline, int state)
 {
-	asap.irq_state = (state != CLEAR_LINE);
-	check_irqs();
+	asap->irq_state = (state != CLEAR_LINE);
 }
 
 
@@ -399,29 +396,11 @@ static void set_irq_line(int irqline, int state)
 
 static CPU_GET_CONTEXT( asap )
 {
-	/* copy the context */
-	if (dst)
-	{
-		if (src2val)
-			memcpy(&asap.r[0], &src2val[REGBASE], 32 * sizeof(UINT32));
-		*(asap_regs *)dst = asap;
-	}
 }
 
 
 static CPU_SET_CONTEXT( asap )
 {
-	/* copy the context */
-	if (src)
-	{
-		asap = *(asap_regs *)src;
-		if (src2val)
-			memcpy(&src2val[REGBASE], &asap.r[0], 32 * sizeof(UINT32));
-		UPDATEPC();
-
-		/* check for IRQs */
-		check_irqs();
-	}
 }
 
 
@@ -455,50 +434,42 @@ static void init_tables(void)
 					else
 						opcode[(op << 6) + (dst << 1) + cond] = opcodetable[op][0];
 	}
-
-	/* allocate src2 table */
-	if (!src2val)
-		src2val = auto_malloc(65536 * sizeof(UINT32));
-
-	/* fill scr2 table */
-	if (src2val)
-	{
-		int i;
-
-		for (i = 0; i < REGBASE; i++)
-			src2val[i] = i;
-		memcpy(&src2val[REGBASE], &asap.r[0], 32 * sizeof(UINT32));
-	}
 }
 
 static CPU_INIT( asap )
 {
+	asap_state *asap = device->token;
+	int i;
+
 	init_tables();
-	asap.irq_callback = irqcallback;
-	asap.device = device;
+	for (i = 0; i < REGBASE; i++)
+		asap->src2val[i] = i;
+	asap->irq_callback = irqcallback;
+	asap->device = device;
+	asap->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( asap )
 {
+	asap_state *asap = device->token;
+
 	/* initialize the state */
-	src2val[REGBASE + 0] = 0;
-	asap.pc = 0;
-	asap.iflag = 0;
+	asap->src2val[REGBASE + 0] = 0;
+	asap->pc = 0;
+	asap->iflag = 0;
 
-	asap.ppc = 0;
-	asap.nextpc = ~0;
-	asap.irq_state = 0;
-	asap.interrupt_cycles = 0;
-	asap.irq_callback = NULL;
+	asap->ppc = 0;
+	asap->nextpc = ~0;
+	asap->irq_state = 0;
+	asap->irq_callback = NULL;
 
-	UPDATEPC();
+	UPDATEPC(asap);
 }
 
 
 static CPU_EXIT( asap )
 {
 	opcode = NULL;
-	src2val = NULL;
 }
 
 
@@ -507,40 +478,41 @@ static CPU_EXIT( asap )
     CORE EXECUTION LOOP
 ***************************************************************************/
 
-INLINE void fetch_instruction(void)
+INLINE void fetch_instruction(asap_state *asap)
 {
 	/* debugging */
-	asap.ppc = asap.pc;
+	asap->ppc = asap->pc;
 
 	/* instruction fetch */
-	asap.op.d = ROPCODE(asap.pc);
-	asap.pc += 4;
+	asap->op.d = ROPCODE(asap, asap->pc);
+	asap->pc += 4;
 }
 
-INLINE void fetch_instruction_debug(void)
+INLINE void fetch_instruction_debug(asap_state *asap)
 {
 	/* debugging */
-	asap.ppc = asap.pc;
-	debugger_instruction_hook(Machine, asap.pc);
+	asap->ppc = asap->pc;
+	debugger_instruction_hook(asap->device->machine, asap->pc);
 
 	/* instruction fetch */
-	asap.op.d = ROPCODE(asap.pc);
-	asap.pc += 4;
+	asap->op.d = ROPCODE(asap, asap->pc);
+	asap->pc += 4;
 }
 
-INLINE void execute_instruction(void)
+INLINE void execute_instruction(asap_state *asap)
 {
 	/* parse the instruction */
-	(*opcode[asap.op.d >> 21])();
+	(*opcode[asap->op.d >> 21])(asap);
 }
 
 static CPU_EXECUTE( asap )
 {
-	/* count cycles and interrupt cycles */
-	asap_icount = cycles;
-	asap_icount -= asap.interrupt_cycles;
-	asap.interrupt_cycles = 0;
-	UPDATEPC();
+	asap_state *asap = device->token;
+
+	/* check for IRQs */
+	asap->icount = cycles;
+	check_irqs(asap);
+	UPDATEPC(asap);
 
 	/* core execution loop */
 	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
@@ -548,54 +520,50 @@ static CPU_EXECUTE( asap )
 		do
 		{
 			/* fetch and execute the next instruction */
-			fetch_instruction();
-			execute_instruction();
+			fetch_instruction(asap);
+			execute_instruction(asap);
 
 			/* fetch and execute the next instruction */
-			fetch_instruction();
-			execute_instruction();
+			fetch_instruction(asap);
+			execute_instruction(asap);
 
 			/* fetch and execute the next instruction */
-			fetch_instruction();
-			execute_instruction();
+			fetch_instruction(asap);
+			execute_instruction(asap);
 
 			/* fetch and execute the next instruction */
-			fetch_instruction();
-			execute_instruction();
+			fetch_instruction(asap);
+			execute_instruction(asap);
 
-			asap_icount -= 4;
+			asap->icount -= 4;
 
-		} while (asap_icount > 0);
+		} while (asap->icount > 0);
 	}
 	else
 	{
 		do
 		{
 			/* fetch and execute the next instruction */
-			fetch_instruction_debug();
-			execute_instruction();
+			fetch_instruction_debug(asap);
+			execute_instruction(asap);
 
 			/* fetch and execute the next instruction */
-			fetch_instruction_debug();
-			execute_instruction();
+			fetch_instruction_debug(asap);
+			execute_instruction(asap);
 
 			/* fetch and execute the next instruction */
-			fetch_instruction_debug();
-			execute_instruction();
+			fetch_instruction_debug(asap);
+			execute_instruction(asap);
 
 			/* fetch and execute the next instruction */
-			fetch_instruction_debug();
-			execute_instruction();
+			fetch_instruction_debug(asap);
+			execute_instruction(asap);
 
-			asap_icount -= 4;
+			asap->icount -= 4;
 
-		} while (asap_icount > 0);
+		} while (asap->icount > 0);
 	}
-
-	/* eat any new interrupt cycles */
-	asap_icount -= asap.interrupt_cycles;
-	asap.interrupt_cycles = 0;
-	return cycles - asap_icount;
+	return cycles - asap->icount;
 }
 
 
@@ -612,12 +580,12 @@ extern CPU_DISASSEMBLE( asap );
     HELPER MACROS
 ***************************************************************************/
 
-#define OPCODE		(asap.op.d >> 27)
-#define DSTREG		((asap.op.d >> 22) & 31)
-#define DSTVAL		src2val[REGBASE + DSTREG]
-#define SRC1REG		((asap.op.d >> 16) & 31)
-#define SRC1VAL		src2val[REGBASE + SRC1REG]
-#define SRC2VAL		src2val[asap.op.w.l]
+#define OPCODE(A)	((A)->op.d >> 27)
+#define DSTREG(A)	(((A)->op.d >> 22) & 31)
+#define DSTVAL(A)	(A)->src2val[REGBASE + DSTREG(A)]
+#define SRC1REG(A)	(((A)->op.d >> 16) & 31)
+#define SRC1VAL(A)	(A)->src2val[REGBASE + SRC1REG(A)]
+#define SRC2VAL(A)	(A)->src2val[(A)->op.w.l]
 
 
 
@@ -625,1089 +593,1089 @@ extern CPU_DISASSEMBLE( asap );
     OPCODES
 ***************************************************************************/
 
-static void noop(void)
+static void noop(asap_state *asap)
 {
 }
 
 /**************************** TRAP 0 ******************************/
 
-static void trap0(void)
+static void trap0(asap_state *asap)
 {
-	generate_exception(EXCEPTION_TRAP0);
+	generate_exception(asap, EXCEPTION_TRAP0);
 }
 
 /**************************** Bcc ******************************/
 
-static void bsp(void)
+static void bsp(asap_state *asap)
 {
-	if ((INT32)asap.znflag > 0)
+	if ((INT32)asap->znflag > 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bmz(void)
+static void bmz(asap_state *asap)
 {
-	if ((INT32)asap.znflag <= 0)
+	if ((INT32)asap->znflag <= 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bgt(void)
+static void bgt(asap_state *asap)
 {
-	if (asap.znflag != 0 && (INT32)(asap.znflag ^ asap.vflag) >= 0)
+	if (asap->znflag != 0 && (INT32)(asap->znflag ^ asap->vflag) >= 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void ble(void)
+static void ble(asap_state *asap)
 {
-	if (asap.znflag == 0 || (INT32)(asap.znflag ^ asap.vflag) < 0)
+	if (asap->znflag == 0 || (INT32)(asap->znflag ^ asap->vflag) < 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bge(void)
+static void bge(asap_state *asap)
 {
-	if ((INT32)(asap.znflag ^ asap.vflag) >= 0)
+	if ((INT32)(asap->znflag ^ asap->vflag) >= 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void blt(void)
+static void blt(asap_state *asap)
 {
-	if ((INT32)(asap.znflag ^ asap.vflag) < 0)
+	if ((INT32)(asap->znflag ^ asap->vflag) < 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bhi(void)
+static void bhi(asap_state *asap)
 {
-	if (asap.znflag != 0 && asap.cflag)
+	if (asap->znflag != 0 && asap->cflag)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bls(void)
+static void bls(asap_state *asap)
 {
-	if (asap.znflag == 0 || !asap.cflag)
+	if (asap->znflag == 0 || !asap->cflag)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bcc(void)
+static void bcc(asap_state *asap)
 {
-	if (!asap.cflag)
+	if (!asap->cflag)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bcs(void)
+static void bcs(asap_state *asap)
 {
-	if (asap.cflag)
+	if (asap->cflag)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bpl(void)
+static void bpl(asap_state *asap)
 {
-	if ((INT32)asap.znflag >= 0)
+	if ((INT32)asap->znflag >= 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bmi(void)
+static void bmi(asap_state *asap)
 {
-	if ((INT32)asap.znflag < 0)
+	if ((INT32)asap->znflag < 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bne(void)
+static void bne(asap_state *asap)
 {
-	if (asap.znflag != 0)
+	if (asap->znflag != 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void beq(void)
+static void beq(asap_state *asap)
 {
-	if (asap.znflag == 0)
+	if (asap->znflag == 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bvc(void)
+static void bvc(asap_state *asap)
 {
-	if ((INT32)asap.vflag >= 0)
+	if ((INT32)asap->vflag >= 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
-static void bvs(void)
+static void bvs(asap_state *asap)
 {
-	if ((INT32)asap.vflag < 0)
+	if ((INT32)asap->vflag < 0)
 	{
-		asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+		asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-		fetch_instruction();
-		asap.pc = asap.nextpc;
-		asap.nextpc = ~0;
-		/*UPDATEPC();*/
+		fetch_instruction(asap);
+		asap->pc = asap->nextpc;
+		asap->nextpc = ~0;
+		/*UPDATEPC(asap);*/
 
-		execute_instruction();
-		asap_icount--;
+		execute_instruction(asap);
+		asap->icount--;
 	}
 }
 
 /**************************** BSR ******************************/
 
-static void bsr(void)
+static void bsr(asap_state *asap)
 {
-	DSTVAL = asap.pc + 4;
-	asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+	DSTVAL(asap) = asap->pc + 4;
+	asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-	fetch_instruction();
-	asap.pc = asap.nextpc;
-	asap.nextpc = ~0;
-	/*UPDATEPC();*/
+	fetch_instruction(asap);
+	asap->pc = asap->nextpc;
+	asap->nextpc = ~0;
+	/*UPDATEPC(asap);*/
 
-	execute_instruction();
-	asap_icount--;
+	execute_instruction(asap);
+	asap->icount--;
 }
 
-static void bsr_0(void)
+static void bsr_0(asap_state *asap)
 {
-	asap.nextpc = asap.ppc + ((INT32)(asap.op.d << 10) >> 8);
+	asap->nextpc = asap->ppc + ((INT32)(asap->op.d << 10) >> 8);
 
-	fetch_instruction();
-	asap.pc = asap.nextpc;
-	asap.nextpc = ~0;
-	/*UPDATEPC();*/
+	fetch_instruction(asap);
+	asap->pc = asap->nextpc;
+	asap->nextpc = ~0;
+	/*UPDATEPC(asap);*/
 
-	execute_instruction();
-	asap_icount--;
+	execute_instruction(asap);
+	asap->icount--;
 }
 
 /**************************** LEA ******************************/
 
-static void lea(void)
+static void lea(asap_state *asap)
 {
-	DSTVAL = SRC1VAL + (SRC2VAL << 2);
+	DSTVAL(asap) = SRC1VAL(asap) + (SRC2VAL(asap) << 2);
 }
 
-static void lea_c(void)
+static void lea_c(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
 	UINT32 dst = src1 + (src2 << 2);
 
-	SET_ZNCV_ADD(dst, src1, src2);
+	SET_ZNCV_ADD(asap, dst, src1, src2);
 	if (src1 & 0xc0000000)
-		SET_CFLAG(1);
+		SET_CFLAG(asap, 1);
 	if (((src1 ^ (src1 >> 1)) & 0x20000000) || (src1 ^ (src1 >> 2)) & 0x20000000)
-		SET_VFLAG(1);
-	DSTVAL = dst;
+		SET_VFLAG(asap, 1);
+	DSTVAL(asap) = dst;
 }
 
-static void lea_c0(void)
+static void lea_c0(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
 	UINT32 dst = src1 + (src2 << 2);
 
-	SET_ZNCV_ADD(dst, src1, src2);
+	SET_ZNCV_ADD(asap, dst, src1, src2);
 	if (src1 & 0xc0000000)
-		SET_CFLAG(1);
+		SET_CFLAG(asap, 1);
 	if (((src1 ^ (src1 >> 1)) & 0x20000000) || (src1 ^ (src1 >> 2)) & 0x20000000)
-		SET_VFLAG(1);
+		SET_VFLAG(asap, 1);
 }
 
 /**************************** LEAH ******************************/
 
-static void leah(void)
+static void leah(asap_state *asap)
 {
-	DSTVAL = SRC1VAL + (SRC2VAL << 1);
+	DSTVAL(asap) = SRC1VAL(asap) + (SRC2VAL(asap) << 1);
 }
 
-static void leah_c(void)
+static void leah_c(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
 	UINT32 dst = src1 + (src2 << 1);
 
-	SET_ZNCV_ADD(dst, src1, src2);
+	SET_ZNCV_ADD(asap, dst, src1, src2);
 	if (src1 & 0x80000000)
-		SET_CFLAG(1);
+		SET_CFLAG(asap, 1);
 	if ((src1 ^ (src1 >> 1)) & 0x40000000)
-		SET_VFLAG(1);
-	DSTVAL = dst;
+		SET_VFLAG(asap, 1);
+	DSTVAL(asap) = dst;
 }
 
-static void leah_c0(void)
+static void leah_c0(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
 	UINT32 dst = src1 + (src2 << 1);
 
-	SET_ZNCV_ADD(dst, src1, src2);
+	SET_ZNCV_ADD(asap, dst, src1, src2);
 	if (src1 & 0x80000000)
-		SET_CFLAG(1);
+		SET_CFLAG(asap, 1);
 	if ((src1 ^ (src1 >> 1)) & 0x40000000)
-		SET_VFLAG(1);
+		SET_VFLAG(asap, 1);
 }
 
 /**************************** SUBR ******************************/
 
-static void subr(void)
+static void subr(asap_state *asap)
 {
-	DSTVAL = SRC2VAL - SRC1VAL;
+	DSTVAL(asap) = SRC2VAL(asap) - SRC1VAL(asap);
 }
 
-static void subr_c(void)
+static void subr_c(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
 	UINT32 dst = src2 - src1;
 
-	SET_ZNCV_SUB(dst, src2, src1);
-	DSTVAL = dst;
+	SET_ZNCV_SUB(asap, dst, src2, src1);
+	DSTVAL(asap) = dst;
 }
 
-static void subr_c0(void)
+static void subr_c0(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
 	UINT32 dst = src2 - src1;
 
-	SET_ZNCV_SUB(dst, src2, src1);
+	SET_ZNCV_SUB(asap, dst, src2, src1);
 }
 
 /**************************** XOR ******************************/
 
-static void xor(void)
+static void xor(asap_state *asap)
 {
-	DSTVAL = SRC1VAL ^ SRC2VAL;
+	DSTVAL(asap) = SRC1VAL(asap) ^ SRC2VAL(asap);
 }
 
-static void xor_c(void)
+static void xor_c(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL ^ SRC2VAL;
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = SRC1VAL(asap) ^ SRC2VAL(asap);
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void xor_c0(void)
+static void xor_c0(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL ^ SRC2VAL;
-	SET_ZN(dst);
+	UINT32 dst = SRC1VAL(asap) ^ SRC2VAL(asap);
+	SET_ZN(asap, dst);
 }
 
 /**************************** XOR ******************************/
 
-static void xorn(void)
+static void xorn(asap_state *asap)
 {
-	DSTVAL = SRC1VAL ^ ~SRC2VAL;
+	DSTVAL(asap) = SRC1VAL(asap) ^ ~SRC2VAL(asap);
 }
 
-static void xorn_c(void)
+static void xorn_c(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL ^ ~SRC2VAL;
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = SRC1VAL(asap) ^ ~SRC2VAL(asap);
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void xorn_c0(void)
+static void xorn_c0(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL ^ ~SRC2VAL;
-	SET_ZN(dst);
-}
-
-/**************************** ADD ******************************/
-
-static void add(void)
-{
-	DSTVAL = SRC1VAL + SRC2VAL;
-}
-
-static void add_c(void)
-{
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
-	UINT32 dst = src1 + src2;
-
-	SET_ZNCV_ADD(dst, src1, src2);
-	DSTVAL = dst;
-}
-
-static void add_c0(void)
-{
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
-	UINT32 dst = src1 + src2;
-
-	SET_ZNCV_ADD(dst, src1, src2);
+	UINT32 dst = SRC1VAL(asap) ^ ~SRC2VAL(asap);
+	SET_ZN(asap, dst);
 }
 
 /**************************** ADD ******************************/
 
-static void sub(void)
+static void add(asap_state *asap)
 {
-	DSTVAL = SRC1VAL - SRC2VAL;
+	DSTVAL(asap) = SRC1VAL(asap) + SRC2VAL(asap);
 }
 
-static void sub_c(void)
+static void add_c(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
-	UINT32 dst = src1 - src2;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
+	UINT32 dst = src1 + src2;
 
-	SET_ZNCV_SUB(dst, src1, src2);
-	DSTVAL = dst;
+	SET_ZNCV_ADD(asap, dst, src1, src2);
+	DSTVAL(asap) = dst;
 }
 
-static void sub_c0(void)
+static void add_c0(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
+	UINT32 dst = src1 + src2;
+
+	SET_ZNCV_ADD(asap, dst, src1, src2);
+}
+
+/**************************** ADD ******************************/
+
+static void sub(asap_state *asap)
+{
+	DSTVAL(asap) = SRC1VAL(asap) - SRC2VAL(asap);
+}
+
+static void sub_c(asap_state *asap)
+{
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
 	UINT32 dst = src1 - src2;
 
-	SET_ZNCV_SUB(dst, src1, src2);
+	SET_ZNCV_SUB(asap, dst, src1, src2);
+	DSTVAL(asap) = dst;
+}
+
+static void sub_c0(asap_state *asap)
+{
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
+	UINT32 dst = src1 - src2;
+
+	SET_ZNCV_SUB(asap, dst, src1, src2);
 }
 
 /**************************** ADDC ******************************/
 
-static void addc(void)
+static void addc(asap_state *asap)
 {
-	DSTVAL = SRC1VAL + SRC2VAL + asap.cflag;
+	DSTVAL(asap) = SRC1VAL(asap) + SRC2VAL(asap) + asap->cflag;
 }
 
-static void addc_c(void)
+static void addc_c(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
-	UINT32 dst = src1 + src2 + asap.cflag;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
+	UINT32 dst = src1 + src2 + asap->cflag;
 
-	SET_ZNCV_ADD(dst, src1, src2);
-	DSTVAL = dst;
+	SET_ZNCV_ADD(asap, dst, src1, src2);
+	DSTVAL(asap) = dst;
 }
 
-static void addc_c0(void)
+static void addc_c0(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
-	UINT32 dst = src1 + src2 + asap.cflag;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
+	UINT32 dst = src1 + src2 + asap->cflag;
 
-	SET_ZNCV_ADD(dst, src1, src2);
+	SET_ZNCV_ADD(asap, dst, src1, src2);
 }
 
 /**************************** SUBC ******************************/
 
-static void subc(void)
+static void subc(asap_state *asap)
 {
-	DSTVAL = SRC1VAL - SRC2VAL - 1 + asap.cflag;
+	DSTVAL(asap) = SRC1VAL(asap) - SRC2VAL(asap) - 1 + asap->cflag;
 }
 
-static void subc_c(void)
+static void subc_c(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
-	UINT32 dst = src1 - src2 - 1 + asap.cflag;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
+	UINT32 dst = src1 - src2 - 1 + asap->cflag;
 
-	SET_ZNCV_SUB(dst, src1, src2);
-	DSTVAL = dst;
+	SET_ZNCV_SUB(asap, dst, src1, src2);
+	DSTVAL(asap) = dst;
 }
 
-static void subc_c0(void)
+static void subc_c0(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL;
-	UINT32 dst = src1 - src2 - 1 + asap.cflag;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap);
+	UINT32 dst = src1 - src2 - 1 + asap->cflag;
 
-	SET_ZNCV_SUB(dst, src1, src2);
+	SET_ZNCV_SUB(asap, dst, src1, src2);
 }
 
 /**************************** AND ******************************/
 
-static void and(void)
+static void and(asap_state *asap)
 {
-	DSTVAL = SRC1VAL & SRC2VAL;
+	DSTVAL(asap) = SRC1VAL(asap) & SRC2VAL(asap);
 }
 
-static void and_c(void)
+static void and_c(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL & SRC2VAL;
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = SRC1VAL(asap) & SRC2VAL(asap);
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void and_c0(void)
+static void and_c0(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL & SRC2VAL;
-	SET_ZN(dst);
+	UINT32 dst = SRC1VAL(asap) & SRC2VAL(asap);
+	SET_ZN(asap, dst);
 }
 
 /**************************** ANDN ******************************/
 
-static void andn(void)
+static void andn(asap_state *asap)
 {
-	DSTVAL = SRC1VAL & ~SRC2VAL;
+	DSTVAL(asap) = SRC1VAL(asap) & ~SRC2VAL(asap);
 }
 
-static void andn_c(void)
+static void andn_c(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL & ~SRC2VAL;
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = SRC1VAL(asap) & ~SRC2VAL(asap);
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void andn_c0(void)
+static void andn_c0(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL & ~SRC2VAL;
-	SET_ZN(dst);
+	UINT32 dst = SRC1VAL(asap) & ~SRC2VAL(asap);
+	SET_ZN(asap, dst);
 }
 
 /**************************** OR ******************************/
 
-static void or(void)
+static void or(asap_state *asap)
 {
-	DSTVAL = SRC1VAL | SRC2VAL;
+	DSTVAL(asap) = SRC1VAL(asap) | SRC2VAL(asap);
 }
 
-static void or_c(void)
+static void or_c(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL | SRC2VAL;
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = SRC1VAL(asap) | SRC2VAL(asap);
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void or_c0(void)
+static void or_c0(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL | SRC2VAL;
-	SET_ZN(dst);
+	UINT32 dst = SRC1VAL(asap) | SRC2VAL(asap);
+	SET_ZN(asap, dst);
 }
 
 /**************************** ORN ******************************/
 
-static void orn(void)
+static void orn(asap_state *asap)
 {
-	DSTVAL = SRC1VAL | ~SRC2VAL;
+	DSTVAL(asap) = SRC1VAL(asap) | ~SRC2VAL(asap);
 }
 
-static void orn_c(void)
+static void orn_c(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL | ~SRC2VAL;
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = SRC1VAL(asap) | ~SRC2VAL(asap);
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void orn_c0(void)
+static void orn_c0(asap_state *asap)
 {
-	UINT32 dst = SRC1VAL | ~SRC2VAL;
-	SET_ZN(dst);
+	UINT32 dst = SRC1VAL(asap) | ~SRC2VAL(asap);
+	SET_ZN(asap, dst);
 }
 
 /**************************** LD ******************************/
 
-static void ld(void)
+static void ld(asap_state *asap)
 {
-	DSTVAL = READLONG(SRC1VAL + (SRC2VAL << 2));
+	DSTVAL(asap) = READLONG(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 2));
 }
 
-static void ld_0(void)
+static void ld_0(asap_state *asap)
 {
-	READLONG(SRC1VAL + (SRC2VAL << 2));
+	READLONG(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 2));
 }
 
-static void ld_c(void)
+static void ld_c(asap_state *asap)
 {
-	UINT32 dst = READLONG(SRC1VAL + (SRC2VAL << 2));
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = READLONG(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 2));
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void ld_c0(void)
+static void ld_c0(asap_state *asap)
 {
-	UINT32 dst = READLONG(SRC1VAL + (SRC2VAL << 2));
-	SET_ZN(dst);
+	UINT32 dst = READLONG(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 2));
+	SET_ZN(asap, dst);
 }
 
 /**************************** LDH ******************************/
 
-static void ldh(void)
+static void ldh(asap_state *asap)
 {
-	DSTVAL = (INT16)READWORD(SRC1VAL + (SRC2VAL << 1));
+	DSTVAL(asap) = (INT16)READWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1));
 }
 
-static void ldh_0(void)
+static void ldh_0(asap_state *asap)
 {
-	READWORD(SRC1VAL + (SRC2VAL << 1));
+	READWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1));
 }
 
-static void ldh_c(void)
+static void ldh_c(asap_state *asap)
 {
-	UINT32 dst = (INT16)READWORD(SRC1VAL + (SRC2VAL << 1));
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = (INT16)READWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1));
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void ldh_c0(void)
+static void ldh_c0(asap_state *asap)
 {
-	UINT32 dst = (INT16)READWORD(SRC1VAL + (SRC2VAL << 1));
-	SET_ZN(dst);
+	UINT32 dst = (INT16)READWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1));
+	SET_ZN(asap, dst);
 }
 
 /**************************** LDUH ******************************/
 
-static void lduh(void)
+static void lduh(asap_state *asap)
 {
-	DSTVAL = READWORD(SRC1VAL + (SRC2VAL << 1));
+	DSTVAL(asap) = READWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1));
 }
 
-static void lduh_0(void)
+static void lduh_0(asap_state *asap)
 {
-	READWORD(SRC1VAL + (SRC2VAL << 1));
+	READWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1));
 }
 
-static void lduh_c(void)
+static void lduh_c(asap_state *asap)
 {
-	UINT32 dst = READWORD(SRC1VAL + (SRC2VAL << 1));
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = READWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1));
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void lduh_c0(void)
+static void lduh_c0(asap_state *asap)
 {
-	UINT32 dst = READWORD(SRC1VAL + (SRC2VAL << 1));
-	SET_ZN(dst);
+	UINT32 dst = READWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1));
+	SET_ZN(asap, dst);
 }
 
 /**************************** STH ******************************/
 
-static void sth(void)
+static void sth(asap_state *asap)
 {
-	WRITEWORD(SRC1VAL + (SRC2VAL << 1), DSTVAL);
+	WRITEWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1), DSTVAL(asap));
 }
 
-static void sth_0(void)
+static void sth_0(asap_state *asap)
 {
-	WRITEWORD(SRC1VAL + (SRC2VAL << 1), 0);
+	WRITEWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1), 0);
 }
 
-static void sth_c(void)
+static void sth_c(asap_state *asap)
 {
-	UINT32 dst = (UINT16)DSTVAL;
-	SET_ZN(dst);
-	WRITEWORD(SRC1VAL + (SRC2VAL << 1), dst);
+	UINT32 dst = (UINT16)DSTVAL(asap);
+	SET_ZN(asap, dst);
+	WRITEWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1), dst);
 }
 
-static void sth_c0(void)
+static void sth_c0(asap_state *asap)
 {
-	SET_ZN(0);
-	WRITEWORD(SRC1VAL + (SRC2VAL << 1), 0);
+	SET_ZN(asap, 0);
+	WRITEWORD(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 1), 0);
 }
 
 /**************************** ST ******************************/
 
-static void st(void)
+static void st(asap_state *asap)
 {
-	WRITELONG(SRC1VAL + (SRC2VAL << 2), DSTVAL);
+	WRITELONG(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 2), DSTVAL(asap));
 }
 
-static void st_0(void)
+static void st_0(asap_state *asap)
 {
-	WRITELONG(SRC1VAL + (SRC2VAL << 2), 0);
+	WRITELONG(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 2), 0);
 }
 
-static void st_c(void)
+static void st_c(asap_state *asap)
 {
-	UINT32 dst = DSTVAL;
-	SET_ZN(dst);
-	WRITELONG(SRC1VAL + (SRC2VAL << 2), dst);
+	UINT32 dst = DSTVAL(asap);
+	SET_ZN(asap, dst);
+	WRITELONG(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 2), dst);
 }
 
-static void st_c0(void)
+static void st_c0(asap_state *asap)
 {
-	SET_ZN(0);
-	WRITELONG(SRC1VAL + (SRC2VAL << 2), 0);
+	SET_ZN(asap, 0);
+	WRITELONG(asap, SRC1VAL(asap) + (SRC2VAL(asap) << 2), 0);
 }
 
 /**************************** LDB ******************************/
 
-static void ldb(void)
+static void ldb(asap_state *asap)
 {
-	DSTVAL = (INT8)READBYTE(SRC1VAL + SRC2VAL);
+	DSTVAL(asap) = (INT8)READBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap));
 }
 
-static void ldb_0(void)
+static void ldb_0(asap_state *asap)
 {
-	READBYTE(SRC1VAL + SRC2VAL);
+	READBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap));
 }
 
-static void ldb_c(void)
+static void ldb_c(asap_state *asap)
 {
-	UINT32 dst = (INT8)READBYTE(SRC1VAL + SRC2VAL);
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = (INT8)READBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap));
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void ldb_c0(void)
+static void ldb_c0(asap_state *asap)
 {
-	UINT32 dst = (INT8)READBYTE(SRC1VAL + SRC2VAL);
-	SET_ZN(dst);
+	UINT32 dst = (INT8)READBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap));
+	SET_ZN(asap, dst);
 }
 
 /**************************** LDUB ******************************/
 
-static void ldub(void)
+static void ldub(asap_state *asap)
 {
-	DSTVAL = READBYTE(SRC1VAL + SRC2VAL);
+	DSTVAL(asap) = READBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap));
 }
 
-static void ldub_0(void)
+static void ldub_0(asap_state *asap)
 {
-	READBYTE(SRC1VAL + SRC2VAL);
+	READBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap));
 }
 
-static void ldub_c(void)
+static void ldub_c(asap_state *asap)
 {
-	UINT32 dst = READBYTE(SRC1VAL + SRC2VAL);
-	SET_ZN(dst);
-	DSTVAL = dst;
+	UINT32 dst = READBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap));
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void ldub_c0(void)
+static void ldub_c0(asap_state *asap)
 {
-	UINT32 dst = READBYTE(SRC1VAL + SRC2VAL);
-	SET_ZN(dst);
+	UINT32 dst = READBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap));
+	SET_ZN(asap, dst);
 }
 
 /**************************** STB ******************************/
 
-static void stb(void)
+static void stb(asap_state *asap)
 {
-	WRITEBYTE(SRC1VAL + SRC2VAL, DSTVAL);
+	WRITEBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap), DSTVAL(asap));
 }
 
-static void stb_0(void)
+static void stb_0(asap_state *asap)
 {
-	WRITEBYTE(SRC1VAL + SRC2VAL, 0);
+	WRITEBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap), 0);
 }
 
-static void stb_c(void)
+static void stb_c(asap_state *asap)
 {
-	UINT32 dst = (UINT8)DSTVAL;
-	SET_ZN(dst);
-	WRITEBYTE(SRC1VAL + SRC2VAL, dst);
+	UINT32 dst = (UINT8)DSTVAL(asap);
+	SET_ZN(asap, dst);
+	WRITEBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap), dst);
 }
 
-static void stb_c0(void)
+static void stb_c0(asap_state *asap)
 {
-	SET_ZN(0);
-	WRITEBYTE(SRC1VAL + SRC2VAL, 0);
+	SET_ZN(asap, 0);
+	WRITEBYTE(asap, SRC1VAL(asap) + SRC2VAL(asap), 0);
 }
 
 /**************************** ASHR ******************************/
 
-static void ashr(void)
+static void ashr(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL;
-	DSTVAL = (src2 < 32) ? ((INT32)SRC1VAL >> src2) : ((INT32)SRC1VAL >> 31);
+	UINT32 src2 = SRC2VAL(asap);
+	DSTVAL(asap) = (src2 < 32) ? ((INT32)SRC1VAL(asap) >> src2) : ((INT32)SRC1VAL(asap) >> 31);
 }
 
-static void ashr_c(void)
+static void ashr_c(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL;
-	asap.cflag = 0;
+	UINT32 src2 = SRC2VAL(asap);
+	asap->cflag = 0;
 	if (src2 < 32)
 	{
-		UINT32 src1 = SRC1VAL;
+		UINT32 src1 = SRC1VAL(asap);
 		UINT32 dst = (INT32)src1 >> src2;
-		SET_ZN(dst);
+		SET_ZN(asap, dst);
 		if (src2 != 0)
 		{
 			src1 = src1 << (32 - src2);
-			asap.cflag = src1 >> 31;
+			asap->cflag = src1 >> 31;
 		}
-		DSTVAL = dst;
+		DSTVAL(asap) = dst;
 	}
 	else
 	{
-		UINT32 dst = (INT32)SRC1VAL >> 31;
-		SET_ZN(dst);
-		DSTVAL = dst;
+		UINT32 dst = (INT32)SRC1VAL(asap) >> 31;
+		SET_ZN(asap, dst);
+		DSTVAL(asap) = dst;
 	}
 }
 
-static void ashr_c0(void)
+static void ashr_c0(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL;
-	asap.cflag = 0;
+	UINT32 src2 = SRC2VAL(asap);
+	asap->cflag = 0;
 	if (src2 < 32)
 	{
-		UINT32 src1 = SRC1VAL;
+		UINT32 src1 = SRC1VAL(asap);
 		UINT32 dst = (INT32)src1 >> src2;
-		SET_ZN(dst);
+		SET_ZN(asap, dst);
 		if (src2 != 0)
 		{
 			src1 = src1 << (32 - src2);
-			asap.cflag = src1 >> 31;
+			asap->cflag = src1 >> 31;
 		}
 	}
 	else
 	{
-		UINT32 dst = (INT32)SRC1VAL >> 31;
-		SET_ZN(dst);
+		UINT32 dst = (INT32)SRC1VAL(asap) >> 31;
+		SET_ZN(asap, dst);
 	}
 }
 
 /**************************** LSHR ******************************/
 
-static void lshr(void)
+static void lshr(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL;
-	DSTVAL = (src2 < 32) ? (SRC1VAL >> src2) : (SRC1VAL >> 31);
+	UINT32 src2 = SRC2VAL(asap);
+	DSTVAL(asap) = (src2 < 32) ? (SRC1VAL(asap) >> src2) : (SRC1VAL(asap) >> 31);
 }
 
-static void lshr_c(void)
+static void lshr_c(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL;
-	asap.cflag = 0;
+	UINT32 src2 = SRC2VAL(asap);
+	asap->cflag = 0;
 	if (src2 < 32)
 	{
-		UINT32 src1 = SRC1VAL;
+		UINT32 src1 = SRC1VAL(asap);
 		UINT32 dst = src1 >> src2;
-		SET_ZN(dst);
+		SET_ZN(asap, dst);
 		if (src2 != 0)
 		{
 			src1 = src1 << (32 - src2);
-			asap.cflag = src1 >> 31;
+			asap->cflag = src1 >> 31;
 		}
-		DSTVAL = dst;
+		DSTVAL(asap) = dst;
 	}
 	else
 	{
-		UINT32 dst = SRC1VAL >> 31;
-		SET_ZN(dst);
-		DSTVAL = dst;
+		UINT32 dst = SRC1VAL(asap) >> 31;
+		SET_ZN(asap, dst);
+		DSTVAL(asap) = dst;
 	}
 }
 
-static void lshr_c0(void)
+static void lshr_c0(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL;
-	asap.cflag = 0;
+	UINT32 src2 = SRC2VAL(asap);
+	asap->cflag = 0;
 	if (src2 < 32)
 	{
-		UINT32 src1 = SRC1VAL;
+		UINT32 src1 = SRC1VAL(asap);
 		UINT32 dst = src1 >> src2;
-		SET_ZN(dst);
+		SET_ZN(asap, dst);
 		if (src2 != 0)
 		{
 			src1 = src1 << (32 - src2);
-			asap.cflag = src1 >> 31;
+			asap->cflag = src1 >> 31;
 		}
 	}
 	else
 	{
-		SET_ZN(0);
-		DSTVAL = 0;
+		SET_ZN(asap, 0);
+		DSTVAL(asap) = 0;
 	}
 }
 
 /**************************** ASHL ******************************/
 
-static void ashl(void)
+static void ashl(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL;
-	DSTVAL = (src2 < 32) ? (SRC1VAL << src2) : 0;
+	UINT32 src2 = SRC2VAL(asap);
+	DSTVAL(asap) = (src2 < 32) ? (SRC1VAL(asap) << src2) : 0;
 }
 
-static void ashl_c(void)
+static void ashl_c(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL;
-	asap.cflag = asap.vflag = 0;
+	UINT32 src2 = SRC2VAL(asap);
+	asap->cflag = asap->vflag = 0;
 	if (src2 < 32)
 	{
-		UINT32 src1 = SRC1VAL;
+		UINT32 src1 = SRC1VAL(asap);
 		UINT32 dst = src1 << src2;
-		SET_ZN(dst);
+		SET_ZN(asap, dst);
 		if (src2 != 0)
 		{
 			src1 = (INT32)src1 >> (32 - src2);
-			asap.cflag = src1 & PS_CFLAG;
-			asap.vflag = (src1 != ((INT32)dst >> 31)) << 31;
+			asap->cflag = src1 & PS_CFLAG;
+			asap->vflag = (src1 != ((INT32)dst >> 31)) << 31;
 		}
-		DSTVAL = dst;
+		DSTVAL(asap) = dst;
 	}
 	else
 	{
-		SET_ZN(0);
-		DSTVAL = 0;
+		SET_ZN(asap, 0);
+		DSTVAL(asap) = 0;
 	}
 }
 
-static void ashl_c0(void)
+static void ashl_c0(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL;
-	asap.cflag = asap.vflag = 0;
+	UINT32 src2 = SRC2VAL(asap);
+	asap->cflag = asap->vflag = 0;
 	if (src2 < 32)
 	{
-		UINT32 src1 = SRC1VAL;
+		UINT32 src1 = SRC1VAL(asap);
 		UINT32 dst = src1 << src2;
-		SET_ZN(dst);
+		SET_ZN(asap, dst);
 		if (src2 != 0)
 		{
 			src1 = (INT32)src1 >> (32 - src2);
-			asap.cflag = src1 & PS_CFLAG;
-			asap.vflag = (src1 != ((INT32)dst >> 31)) << 31;
+			asap->cflag = src1 & PS_CFLAG;
+			asap->vflag = (src1 != ((INT32)dst >> 31)) << 31;
 		}
 	}
 	else
-		SET_ZN(0);
+		SET_ZN(asap, 0);
 }
 
 /**************************** ROTL ******************************/
 
-static void rotl(void)
+static void rotl(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL & 31;
-	DSTVAL = (src1 << src2) | (src1 >> (32 - src2));
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap) & 31;
+	DSTVAL(asap) = (src1 << src2) | (src1 >> (32 - src2));
 }
 
-static void rotl_c(void)
+static void rotl_c(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL & 31;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap) & 31;
 	UINT32 dst = (src1 << src2) | (src1 >> (32 - src2));
-	SET_ZN(dst);
-	DSTVAL = dst;
+	SET_ZN(asap, dst);
+	DSTVAL(asap) = dst;
 }
 
-static void rotl_c0(void)
+static void rotl_c0(asap_state *asap)
 {
-	UINT32 src1 = SRC1VAL;
-	UINT32 src2 = SRC2VAL & 31;
+	UINT32 src1 = SRC1VAL(asap);
+	UINT32 src2 = SRC2VAL(asap) & 31;
 	UINT32 dst = (src1 << src2) | (src1 >> (32 - src2));
-	SET_ZN(dst);
+	SET_ZN(asap, dst);
 }
 
 /**************************** GETPS ******************************/
 
-static void getps(void)
+static void getps(asap_state *asap)
 {
-	DSTVAL = GET_FLAGS(&asap);
+	DSTVAL(asap) = GET_FLAGS(asap);
 }
 
 /**************************** PUTPS ******************************/
 
-static void putps(void)
+static void putps(asap_state *asap)
 {
-	UINT32 src2 = SRC2VAL & 0x3f;
-	SET_FLAGS(&asap, src2);
-	check_irqs();
+	UINT32 src2 = SRC2VAL(asap) & 0x3f;
+	SET_FLAGS(asap, src2);
+	check_irqs(asap);
 }
 
 /**************************** JSR ******************************/
 
-static void jsr(void)
+static void jsr(asap_state *asap)
 {
-	DSTVAL = asap.pc + 4;
-	asap.nextpc = SRC1VAL + (SRC2VAL << 2);
+	DSTVAL(asap) = asap->pc + 4;
+	asap->nextpc = SRC1VAL(asap) + (SRC2VAL(asap) << 2);
 
-	fetch_instruction();
-	asap.pc = asap.nextpc;
-	asap.nextpc = ~0;
-	UPDATEPC();
+	fetch_instruction(asap);
+	asap->pc = asap->nextpc;
+	asap->nextpc = ~0;
+	UPDATEPC(asap);
 
-	execute_instruction();
-	asap_icount--;
+	execute_instruction(asap);
+	asap->icount--;
 }
 
-static void jsr_0(void)
+static void jsr_0(asap_state *asap)
 {
-	asap.nextpc = SRC1VAL + (SRC2VAL << 2);
+	asap->nextpc = SRC1VAL(asap) + (SRC2VAL(asap) << 2);
 
-	fetch_instruction();
-	asap.pc = asap.nextpc;
-	asap.nextpc = ~0;
-	UPDATEPC();
+	fetch_instruction(asap);
+	asap->pc = asap->nextpc;
+	asap->nextpc = ~0;
+	UPDATEPC(asap);
 
-	execute_instruction();
-	asap_icount--;
+	execute_instruction(asap);
+	asap->icount--;
 }
 
-static void jsr_c(void)
+static void jsr_c(asap_state *asap)
 {
-	DSTVAL = asap.pc + 4;
-	asap.nextpc = SRC1VAL + (SRC2VAL << 2);
-	asap.iflag = asap.pflag;
+	DSTVAL(asap) = asap->pc + 4;
+	asap->nextpc = SRC1VAL(asap) + (SRC2VAL(asap) << 2);
+	asap->iflag = asap->pflag;
 
-	fetch_instruction();
-	asap.pc = asap.nextpc;
-	asap.nextpc = ~0;
-	UPDATEPC();
+	fetch_instruction(asap);
+	asap->pc = asap->nextpc;
+	asap->nextpc = ~0;
+	UPDATEPC(asap);
 
-	execute_instruction();
-	asap_icount--;
-	check_irqs();
+	execute_instruction(asap);
+	asap->icount--;
+	check_irqs(asap);
 }
 
-static void jsr_c0(void)
+static void jsr_c0(asap_state *asap)
 {
-	asap.nextpc = SRC1VAL + (SRC2VAL << 2);
-	asap.iflag = asap.pflag;
+	asap->nextpc = SRC1VAL(asap) + (SRC2VAL(asap) << 2);
+	asap->iflag = asap->pflag;
 
-	fetch_instruction();
-	asap.pc = asap.nextpc;
-	asap.nextpc = ~0;
-	UPDATEPC();
+	fetch_instruction(asap);
+	asap->pc = asap->nextpc;
+	asap->nextpc = ~0;
+	UPDATEPC(asap);
 
-	execute_instruction();
-	asap_icount--;
-	check_irqs();
+	execute_instruction(asap);
+	asap->icount--;
+	check_irqs(asap);
 }
 
 /**************************** TRAP F ******************************/
 
-static void trapf(void)
+static void trapf(asap_state *asap)
 {
-	generate_exception(EXCEPTION_TRAPF);
+	generate_exception(asap, EXCEPTION_TRAPF);
 }
 
 
@@ -1717,48 +1685,50 @@ static void trapf(void)
 
 static CPU_SET_INFO( asap )
 {
+	asap_state *asap = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + ASAP_IRQ0:	set_irq_line(ASAP_IRQ0, info->i);			break;
+		case CPUINFO_INT_INPUT_STATE + ASAP_IRQ0:	set_irq_line(asap, ASAP_IRQ0, info->i);		break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ASAP_PC:	asap.pc = info->i;								break;
-		case CPUINFO_INT_REGISTER + ASAP_PS:	SET_FLAGS(&asap, info->i); 						break;
+		case CPUINFO_INT_REGISTER + ASAP_PC:	asap->pc = info->i;								break;
+		case CPUINFO_INT_REGISTER + ASAP_PS:	SET_FLAGS(asap, info->i); 						break;
 
-		case CPUINFO_INT_REGISTER + ASAP_R0:	src2val[REGBASE + 0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R1:	src2val[REGBASE + 1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R2:	src2val[REGBASE + 2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R3:	src2val[REGBASE + 3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R4:	src2val[REGBASE + 4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R5:	src2val[REGBASE + 5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R6:	src2val[REGBASE + 6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R7:	src2val[REGBASE + 7] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R8:	src2val[REGBASE + 8] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R9:	src2val[REGBASE + 9] = info->i;					break;
-		case CPUINFO_INT_REGISTER + ASAP_R10:	src2val[REGBASE + 10] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R11:	src2val[REGBASE + 11] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R12:	src2val[REGBASE + 12] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R13:	src2val[REGBASE + 13] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R14:	src2val[REGBASE + 14] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R15:	src2val[REGBASE + 15] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R16:	src2val[REGBASE + 16] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R17:	src2val[REGBASE + 17] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R18:	src2val[REGBASE + 18] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R19:	src2val[REGBASE + 19] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R20:	src2val[REGBASE + 20] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R21:	src2val[REGBASE + 21] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R22:	src2val[REGBASE + 22] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R23:	src2val[REGBASE + 23] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R24:	src2val[REGBASE + 24] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R25:	src2val[REGBASE + 25] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R26:	src2val[REGBASE + 26] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R27:	src2val[REGBASE + 27] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R28:	src2val[REGBASE + 28] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R29:	src2val[REGBASE + 29] = info->i;				break;
-		case CPUINFO_INT_REGISTER + ASAP_R30:	src2val[REGBASE + 30] = info->i;				break;
+		case CPUINFO_INT_REGISTER + ASAP_R0:	asap->src2val[REGBASE + 0] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R1:	asap->src2val[REGBASE + 1] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R2:	asap->src2val[REGBASE + 2] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R3:	asap->src2val[REGBASE + 3] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R4:	asap->src2val[REGBASE + 4] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R5:	asap->src2val[REGBASE + 5] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R6:	asap->src2val[REGBASE + 6] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R7:	asap->src2val[REGBASE + 7] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R8:	asap->src2val[REGBASE + 8] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R9:	asap->src2val[REGBASE + 9] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R10:	asap->src2val[REGBASE + 10] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R11:	asap->src2val[REGBASE + 11] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R12:	asap->src2val[REGBASE + 12] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R13:	asap->src2val[REGBASE + 13] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R14:	asap->src2val[REGBASE + 14] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R15:	asap->src2val[REGBASE + 15] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R16:	asap->src2val[REGBASE + 16] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R17:	asap->src2val[REGBASE + 17] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R18:	asap->src2val[REGBASE + 18] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R19:	asap->src2val[REGBASE + 19] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R20:	asap->src2val[REGBASE + 20] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R21:	asap->src2val[REGBASE + 21] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R22:	asap->src2val[REGBASE + 22] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R23:	asap->src2val[REGBASE + 23] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R24:	asap->src2val[REGBASE + 24] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R25:	asap->src2val[REGBASE + 25] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R26:	asap->src2val[REGBASE + 26] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R27:	asap->src2val[REGBASE + 27] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R28:	asap->src2val[REGBASE + 28] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R29:	asap->src2val[REGBASE + 29] = info->i;			break;
+		case CPUINFO_INT_REGISTER + ASAP_R30:	asap->src2val[REGBASE + 30] = info->i;			break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + ASAP_R31:	src2val[REGBASE + 31] = info->i;				break;
+		case CPUINFO_INT_REGISTER + ASAP_R31:	asap->src2val[REGBASE + 31] = info->i;			break;
 	}
 }
 
@@ -1770,10 +1740,12 @@ static CPU_SET_INFO( asap )
 
 CPU_GET_INFO( asap )
 {
+	asap_state *asap = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(asap);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(asap_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
@@ -1794,58 +1766,58 @@ CPU_GET_INFO( asap )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + ASAP_IRQ0:		info->i = asap.irq_state;				break;
+		case CPUINFO_INT_INPUT_STATE + ASAP_IRQ0:		info->i = asap->irq_state;				break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = asap.ppc;						break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = asap->ppc;					break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + ASAP_PC:			info->i = asap.pc;						break;
-		case CPUINFO_INT_REGISTER + ASAP_PS:			info->i = GET_FLAGS(&asap);				break;
+		case CPUINFO_INT_REGISTER + ASAP_PC:			info->i = asap->pc;						break;
+		case CPUINFO_INT_REGISTER + ASAP_PS:			info->i = GET_FLAGS(asap);				break;
 
-		case CPUINFO_INT_REGISTER + ASAP_R0:			info->i = src2val[REGBASE + 0];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R1:			info->i = src2val[REGBASE + 1];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R2:			info->i = src2val[REGBASE + 2];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R3:			info->i = src2val[REGBASE + 3];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R4:			info->i = src2val[REGBASE + 4];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R5:			info->i = src2val[REGBASE + 5];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R6:			info->i = src2val[REGBASE + 6];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R7:			info->i = src2val[REGBASE + 7];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R8:			info->i = src2val[REGBASE + 8];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R9:			info->i = src2val[REGBASE + 9];			break;
-		case CPUINFO_INT_REGISTER + ASAP_R10:			info->i = src2val[REGBASE + 10];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R11:			info->i = src2val[REGBASE + 11];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R12:			info->i = src2val[REGBASE + 12];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R13:			info->i = src2val[REGBASE + 13];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R14:			info->i = src2val[REGBASE + 14];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R15:			info->i = src2val[REGBASE + 15];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R16:			info->i = src2val[REGBASE + 16];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R17:			info->i = src2val[REGBASE + 17];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R18:			info->i = src2val[REGBASE + 18];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R19:			info->i = src2val[REGBASE + 19];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R20:			info->i = src2val[REGBASE + 20];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R21:			info->i = src2val[REGBASE + 21];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R22:			info->i = src2val[REGBASE + 22];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R23:			info->i = src2val[REGBASE + 23];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R24:			info->i = src2val[REGBASE + 24];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R25:			info->i = src2val[REGBASE + 25];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R26:			info->i = src2val[REGBASE + 26];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R27:			info->i = src2val[REGBASE + 27];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R28:			info->i = src2val[REGBASE + 28];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R29:			info->i = src2val[REGBASE + 29];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R30:			info->i = src2val[REGBASE + 30];		break;
-		case CPUINFO_INT_REGISTER + ASAP_R31:			info->i = src2val[REGBASE + 31];		break;
+		case CPUINFO_INT_REGISTER + ASAP_R0:			info->i = asap->src2val[REGBASE + 0];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R1:			info->i = asap->src2val[REGBASE + 1];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R2:			info->i = asap->src2val[REGBASE + 2];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R3:			info->i = asap->src2val[REGBASE + 3];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R4:			info->i = asap->src2val[REGBASE + 4];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R5:			info->i = asap->src2val[REGBASE + 5];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R6:			info->i = asap->src2val[REGBASE + 6];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R7:			info->i = asap->src2val[REGBASE + 7];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R8:			info->i = asap->src2val[REGBASE + 8];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R9:			info->i = asap->src2val[REGBASE + 9];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R10:			info->i = asap->src2val[REGBASE + 10];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R11:			info->i = asap->src2val[REGBASE + 11];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R12:			info->i = asap->src2val[REGBASE + 12];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R13:			info->i = asap->src2val[REGBASE + 13];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R14:			info->i = asap->src2val[REGBASE + 14];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R15:			info->i = asap->src2val[REGBASE + 15];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R16:			info->i = asap->src2val[REGBASE + 16];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R17:			info->i = asap->src2val[REGBASE + 17];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R18:			info->i = asap->src2val[REGBASE + 18];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R19:			info->i = asap->src2val[REGBASE + 19];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R20:			info->i = asap->src2val[REGBASE + 20];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R21:			info->i = asap->src2val[REGBASE + 21];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R22:			info->i = asap->src2val[REGBASE + 22];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R23:			info->i = asap->src2val[REGBASE + 23];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R24:			info->i = asap->src2val[REGBASE + 24];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R25:			info->i = asap->src2val[REGBASE + 25];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R26:			info->i = asap->src2val[REGBASE + 26];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R27:			info->i = asap->src2val[REGBASE + 27];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R28:			info->i = asap->src2val[REGBASE + 28];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R29:			info->i = asap->src2val[REGBASE + 29];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R30:			info->i = asap->src2val[REGBASE + 30];	break;
+		case CPUINFO_INT_REGISTER + ASAP_R31:			info->i = asap->src2val[REGBASE + 31];	break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(asap);			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(asap);		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(asap);	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(asap);	break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(asap);					break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(asap);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(asap);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(asap);					break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(asap);				break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(asap);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(asap);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &asap_icount;			break;
+		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(asap);	break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &asap->icount;					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "ASAP");				break;
@@ -1856,40 +1828,40 @@ CPU_GET_INFO( asap )
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " ");					break;
 
-		case CPUINFO_STR_REGISTER + ASAP_PC:  			sprintf(info->s, "PC: %08X", asap.pc);	break;
-		case CPUINFO_STR_REGISTER + ASAP_PS:  			sprintf(info->s, "PS: %08X", GET_FLAGS(&asap)); break;
+		case CPUINFO_STR_REGISTER + ASAP_PC:  			sprintf(info->s, "PC: %08X", asap->pc);	break;
+		case CPUINFO_STR_REGISTER + ASAP_PS:  			sprintf(info->s, "PS: %08X", GET_FLAGS(asap)); break;
 
-		case CPUINFO_STR_REGISTER + ASAP_R0:			sprintf(info->s, "R0: %08X", asap.r[0]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R1:			sprintf(info->s, "R1: %08X", asap.r[1]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R2:			sprintf(info->s, "R2: %08X", asap.r[2]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R3:			sprintf(info->s, "R3: %08X", asap.r[3]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R4:			sprintf(info->s, "R4: %08X", asap.r[4]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R5:			sprintf(info->s, "R5: %08X", asap.r[5]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R6:			sprintf(info->s, "R6: %08X", asap.r[6]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R7:			sprintf(info->s, "R7: %08X", asap.r[7]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R8:			sprintf(info->s, "R8: %08X", asap.r[8]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R9:			sprintf(info->s, "R9: %08X", asap.r[9]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R10:			sprintf(info->s, "R10:%08X", asap.r[10]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R11:			sprintf(info->s, "R11:%08X", asap.r[11]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R12:			sprintf(info->s, "R12:%08X", asap.r[12]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R13:			sprintf(info->s, "R13:%08X", asap.r[13]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R14:			sprintf(info->s, "R14:%08X", asap.r[14]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R15:			sprintf(info->s, "R15:%08X", asap.r[15]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R16:			sprintf(info->s, "R16:%08X", asap.r[16]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R17:			sprintf(info->s, "R17:%08X", asap.r[17]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R18:			sprintf(info->s, "R18:%08X", asap.r[18]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R19:			sprintf(info->s, "R19:%08X", asap.r[19]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R20:			sprintf(info->s, "R20:%08X", asap.r[20]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R21:			sprintf(info->s, "R21:%08X", asap.r[21]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R22:			sprintf(info->s, "R22:%08X", asap.r[22]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R23:			sprintf(info->s, "R23:%08X", asap.r[23]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R24:			sprintf(info->s, "R24:%08X", asap.r[24]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R25:			sprintf(info->s, "R25:%08X", asap.r[25]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R26:			sprintf(info->s, "R26:%08X", asap.r[26]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R27:			sprintf(info->s, "R27:%08X", asap.r[27]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R28:			sprintf(info->s, "R28:%08X", asap.r[28]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R29:			sprintf(info->s, "R29:%08X", asap.r[29]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R30:			sprintf(info->s, "R30:%08X", asap.r[30]); break;
-		case CPUINFO_STR_REGISTER + ASAP_R31:			sprintf(info->s, "R31:%08X", asap.r[31]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R0:			sprintf(info->s, "R0: %08X", asap->src2val[REGBASE + 0]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R1:			sprintf(info->s, "R1: %08X", asap->src2val[REGBASE + 1]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R2:			sprintf(info->s, "R2: %08X", asap->src2val[REGBASE + 2]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R3:			sprintf(info->s, "R3: %08X", asap->src2val[REGBASE + 3]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R4:			sprintf(info->s, "R4: %08X", asap->src2val[REGBASE + 4]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R5:			sprintf(info->s, "R5: %08X", asap->src2val[REGBASE + 5]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R6:			sprintf(info->s, "R6: %08X", asap->src2val[REGBASE + 6]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R7:			sprintf(info->s, "R7: %08X", asap->src2val[REGBASE + 7]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R8:			sprintf(info->s, "R8: %08X", asap->src2val[REGBASE + 8]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R9:			sprintf(info->s, "R9: %08X", asap->src2val[REGBASE + 9]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R10:			sprintf(info->s, "R10:%08X", asap->src2val[REGBASE + 10]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R11:			sprintf(info->s, "R11:%08X", asap->src2val[REGBASE + 11]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R12:			sprintf(info->s, "R12:%08X", asap->src2val[REGBASE + 12]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R13:			sprintf(info->s, "R13:%08X", asap->src2val[REGBASE + 13]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R14:			sprintf(info->s, "R14:%08X", asap->src2val[REGBASE + 14]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R15:			sprintf(info->s, "R15:%08X", asap->src2val[REGBASE + 15]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R16:			sprintf(info->s, "R16:%08X", asap->src2val[REGBASE + 16]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R17:			sprintf(info->s, "R17:%08X", asap->src2val[REGBASE + 17]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R18:			sprintf(info->s, "R18:%08X", asap->src2val[REGBASE + 18]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R19:			sprintf(info->s, "R19:%08X", asap->src2val[REGBASE + 19]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R20:			sprintf(info->s, "R20:%08X", asap->src2val[REGBASE + 20]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R21:			sprintf(info->s, "R21:%08X", asap->src2val[REGBASE + 21]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R22:			sprintf(info->s, "R22:%08X", asap->src2val[REGBASE + 22]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R23:			sprintf(info->s, "R23:%08X", asap->src2val[REGBASE + 23]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R24:			sprintf(info->s, "R24:%08X", asap->src2val[REGBASE + 24]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R25:			sprintf(info->s, "R25:%08X", asap->src2val[REGBASE + 25]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R26:			sprintf(info->s, "R26:%08X", asap->src2val[REGBASE + 26]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R27:			sprintf(info->s, "R27:%08X", asap->src2val[REGBASE + 27]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R28:			sprintf(info->s, "R28:%08X", asap->src2val[REGBASE + 28]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R29:			sprintf(info->s, "R29:%08X", asap->src2val[REGBASE + 29]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R30:			sprintf(info->s, "R30:%08X", asap->src2val[REGBASE + 30]); break;
+		case CPUINFO_STR_REGISTER + ASAP_R31:			sprintf(info->s, "R31:%08X", asap->src2val[REGBASE + 31]); break;
 	}
 }
