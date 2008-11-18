@@ -337,7 +337,7 @@ static MACHINE_RESET( bgaregga )
 
 	// Set Z80 bank switch - default bank is 2
 	current_bank = 4;
-	memory_configure_bank(1, 0, 10, Z80, 0x4000);
+	memory_configure_bank(1, 0, 16, Z80, 0x4000);
 	memory_set_bank(1, 4);
 
 	if (memory_region(machine, "oki1") != NULL)
@@ -4703,7 +4703,7 @@ ROM_START( bgaregga )
 	ROM_LOAD16_BYTE( "prg0.bin", 0x000000, 0x080000, CRC(f80c2fc2) SHA1(a9aac5c7f5439b6fe8d1b3db1fb02a27cc28fdf6) )
 	ROM_LOAD16_BYTE( "prg1.bin", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4726,7 +4726,7 @@ ROM_START( bgareghk )
 	ROM_LOAD16_BYTE( "prg_0.rom", 0x000000, 0x080000, CRC(26e0019e) SHA1(5197001f5d59246b137e19ed1952a8207b25d4c0) )
 	ROM_LOAD16_BYTE( "prg_1.rom", 0x000001, 0x080000, CRC(2ccfdd1e) SHA1(7a9f11f851854f3f8389b9c3c0906ebb8dc28712) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4749,7 +4749,7 @@ ROM_START( bgaregnv )
 	ROM_LOAD16_BYTE( "prg_0.bin", 0x000000, 0x080000, CRC(951ecc07) SHA1(a82e4b59e4a974566e59f3ab2fbae1aec7d88a2b) )
 	ROM_LOAD16_BYTE( "prg_1.bin", 0x000001, 0x080000, CRC(729a60c6) SHA1(cb6f5d138bb82c32910f42d8ee16fa573a23cef3) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4772,7 +4772,7 @@ ROM_START( bgaregt2 )
 	ROM_LOAD16_BYTE( "prg0", 0x000000, 0x080000, CRC(84094099) SHA1(49fc68a8bcdae4477e20eade9dd569de88b0b798) )
 	ROM_LOAD16_BYTE( "prg1", 0x000001, 0x080000, CRC(46f92fe4) SHA1(62a02cc1dbdc3ac362339aebb62368eb89b06bad) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4795,7 +4795,7 @@ ROM_START( bgaregcn )
 	ROM_LOAD16_BYTE( "u123", 0x000000, 0x080000, CRC(88a4e66a) SHA1(ca97e564eed0c5e028b937312e55da56400d5c8c) )
 	ROM_LOAD16_BYTE( "u65",  0x000001, 0x080000, CRC(5dea32a3) SHA1(59df6689e3eb5ea9e49a758604d21a64c65ca14d) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code + bank */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code + bank */
 	ROM_LOAD( "snd.bin", 0x00000, 0x08000, CRC(68632952) SHA1(fb834db83157948e2b420b6051102a9c6ac3969b) )
 	ROM_CONTINUE(        0x10000, 0x18000 )
 
@@ -4943,7 +4943,7 @@ ROM_START( bbakraid )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 
@@ -4967,7 +4967,7 @@ ROM_START( bbakradu )
 	ROM_LOAD16_BYTE( "prg2u021.bin", 0x100000, 0x080000, CRC(ffba8656) SHA1(6526bb65fad3384de3f301a7d1095cbf03757433) )
 	ROM_LOAD16_BYTE( "prg3u024.bin", 0x100001, 0x080000, CRC(834b8ad6) SHA1(0dd6223bb0749819ad29811eeb04fd08d937abb0) )
 
-	ROM_REGION( 0x28000, "audio", 0 )			/* Sound Z80 code */
+	ROM_REGION( 0x40000, "audio", 0 )			/* Sound Z80 code */
 	ROM_LOAD( "sndu0720.bin", 0x00000, 0x08000, CRC(e62ab246) SHA1(00d23689dd423ecd4024c58b5903d16e890f1dff) )
 	ROM_CONTINUE(             0x10000, 0x18000 )
 
