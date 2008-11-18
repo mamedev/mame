@@ -503,6 +503,7 @@ union _addrmap64_token
 
 
 /* temporary shortcuts for accessing the active address space */
+#ifndef NO_LEGACY_MEMORY_HANDLERS
 #define program_read_byte(_addr)			memory_read_byte(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
 #define program_read_word(_addr)			memory_read_word(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
 #define program_read_dword(_addr)			memory_read_dword(active_address_space[ADDRESS_SPACE_PROGRAM], (_addr))
@@ -544,7 +545,7 @@ union _addrmap64_token
 #define io_write_word(_addr,_data)			memory_write_word(active_address_space[ADDRESS_SPACE_IO], (_addr), (_data))
 #define io_write_dword(_addr,_data)			memory_write_dword(active_address_space[ADDRESS_SPACE_IO], (_addr), (_data))
 #define io_write_qword(_addr,_data)			memory_write_qword(active_address_space[ADDRESS_SPACE_IO], (_addr), (_data))
-
+#endif
 
 /* wrappers for dynamic read handler installation */
 #define memory_install_read_handler(machine, cpu, space, start, end, mask, mirror, rhandler) \
@@ -1246,7 +1247,7 @@ void memory_write_dword_masked_64be(const address_space *space, offs_t address, 
 void memory_write_qword_64be(const address_space *space, offs_t address, UINT64 data);
 void memory_write_qword_masked_64be(const address_space *space, offs_t address, UINT64 data, UINT64 mask);
 
-
+#ifndef NO_LEGACY_MEMORY_HANDLERS
 /* declare program address space handlers */
 UINT8 program_read_byte_8le(offs_t address);
 UINT16 program_read_word_8le(offs_t address);
@@ -1611,6 +1612,6 @@ void io_write_dword_64be(offs_t address, UINT32 data);
 void io_write_dword_masked_64be(offs_t address, UINT32 data, UINT32 mask);
 void io_write_qword_64be(offs_t address, UINT64 data);
 void io_write_qword_masked_64be(offs_t address, UINT64 data, UINT64 mask);
-
+#endif
 
 #endif	/* __MEMORY_H__ */
