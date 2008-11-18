@@ -74,6 +74,7 @@ static MACHINE_RESET( midvunit )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
+	cpu_reset(machine->cpu[0]);
 
 	timer[0] = timer_alloc(NULL, NULL);
 	timer[1] = timer_alloc(NULL, NULL);
@@ -86,6 +87,7 @@ static MACHINE_RESET( midvplus )
 	dcs_reset_w(0);
 
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
+	cpu_reset(machine->cpu[0]);
 
 	timer[0] = timer_alloc(NULL, NULL);
 	timer[1] = timer_alloc(NULL, NULL);
