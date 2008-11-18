@@ -1003,9 +1003,9 @@ static WRITE8_HANDLER( checkman_sound_command_w )
 }
 
 
-static TIMER_CALLBACK( checkmaj_irq0_gen )
+static TIMER_DEVICE_CALLBACK( checkmaj_irq0_gen )
 {
-	cpu_set_input_line(machine->cpu[1], 0, HOLD_LINE);
+	cpu_set_input_line(timer->machine->cpu[1], 0, HOLD_LINE);
 }
 
 
