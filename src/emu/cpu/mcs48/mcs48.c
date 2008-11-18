@@ -40,6 +40,8 @@ T0 output clock
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS	1
+
 #include "debugger.h"
 #include "mcs48.h"
 
@@ -94,6 +96,11 @@ struct _mcs48_state
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	int			icount;
+	
+	/* Memory spaces */
+    const address_space *program;
+    const address_space *data;
+    const address_space *io;
 
 	int			inst_cycles;		/* cycles for the current instruction */
 	UINT8		cpu_feature;		/* processor feature flags */
@@ -129,22 +136,22 @@ struct _mcs48_opcode
 
 
 /* ROM is mapped to ADDRESS_SPACE_PROGRAM */
-#define program_r(a)	program_read_byte_8le(a)
+#define program_r(a)	memory_read_byte_8le(mcs48->program, a)
 
 /* RAM is mapped to ADDRESS_SPACE_DATA */
-#define ram_r(a)		data_read_byte_8le(a)
-#define ram_w(a,V)		data_write_byte_8le(a, V)
+#define ram_r(a)		memory_read_byte_8le(mcs48->data, a)
+#define ram_w(a,V)		memory_write_byte_8le(mcs48->data, a, V)
 
 /* ports are mapped to ADDRESS_SPACE_IO */
-#define ext_r(a)		io_read_byte_8le(a)
-#define ext_w(a,V)		io_write_byte_8le(a, V)
-#define port_r(a)		io_read_byte_8le(MCS48_PORT_P0 + a)
-#define port_w(a,V)		io_write_byte_8le(MCS48_PORT_P0 + a, V)
-#define test_r(a)		io_read_byte_8le(MCS48_PORT_T0 + a)
-#define test_w(a,V)		io_write_byte_8le(MCS48_PORT_T0 + a, V)
-#define bus_r()			io_read_byte_8le(MCS48_PORT_BUS)
-#define bus_w(V)		io_write_byte_8le(MCS48_PORT_BUS, V)
-#define ea_r()			io_read_byte_8le(MCS48_PORT_EA)
+#define ext_r(a)		memory_read_byte_8le(mcs48->io, a)
+#define ext_w(a,V)		memory_write_byte_8le(mcs48->io, a, V)
+#define port_r(a)		memory_read_byte_8le(mcs48->io, MCS48_PORT_P0 + a)
+#define port_w(a,V)		memory_write_byte_8le(mcs48->io, MCS48_PORT_P0 + a, V)
+#define test_r(a)		memory_read_byte_8le(mcs48->io, MCS48_PORT_T0 + a)
+#define test_w(a,V)		memory_write_byte_8le(mcs48->io, MCS48_PORT_T0 + a, V)
+#define bus_r()			memory_read_byte_8le(mcs48->io, MCS48_PORT_BUS)
+#define bus_w(V)		memory_write_byte_8le(mcs48->io, MCS48_PORT_BUS, V)
+#define ea_r()			memory_read_byte_8le(mcs48->io, MCS48_PORT_EA)
 
 /* simplfied access to common bits */
 #undef A
@@ -185,9 +192,9 @@ static void check_irqs(	mcs48_state *mcs48);
     opcode_fetch - fetch an opcode byte
 -------------------------------------------------*/
 
-INLINE UINT8 opcode_fetch(offs_t address)
+INLINE UINT8 opcode_fetch(mcs48_state *mcs48, offs_t address)
 {
-	return program_decrypted_read_byte(address);
+	return memory_decrypted_read_byte(mcs48->program, address);
 }
 
 
@@ -196,9 +203,9 @@ INLINE UINT8 opcode_fetch(offs_t address)
     byte
 -------------------------------------------------*/
 
-INLINE UINT8 argument_fetch(offs_t address)
+INLINE UINT8 argument_fetch(mcs48_state *mcs48, offs_t address)
 {
-	return program_raw_read_byte(address);
+	return memory_raw_read_byte(mcs48->program, address);
 }
 
 
@@ -325,7 +332,7 @@ INLINE void execute_call(mcs48_state *mcs48, UINT16 address)
 
 INLINE void execute_jcc(mcs48_state *mcs48, UINT8 result)
 {
-	UINT8 offset = argument_fetch(PC++);
+	UINT8 offset = argument_fetch(mcs48, PC++);
 	if (result != 0)
 	{
 		PC = ((PC - 1) & 0xf00) | offset;
@@ -358,7 +365,7 @@ OPHANDLER( add_a_r6 )		{ execute_add(mcs48, R6); }
 OPHANDLER( add_a_r7 )		{ execute_add(mcs48, R7); }
 OPHANDLER( add_a_xr0 )		{ execute_add(mcs48, ram_r(R0)); }
 OPHANDLER( add_a_xr1 )		{ execute_add(mcs48, ram_r(R1)); }
-OPHANDLER( add_a_n )		{ execute_add(mcs48, argument_fetch(PC++)); }
+OPHANDLER( add_a_n )		{ execute_add(mcs48, argument_fetch(mcs48, PC++)); }
 
 OPHANDLER( adc_a_r0 )		{ execute_addc(mcs48, R0); }
 OPHANDLER( adc_a_r1 )		{ execute_addc(mcs48, R1); }
@@ -370,7 +377,7 @@ OPHANDLER( adc_a_r6 )		{ execute_addc(mcs48, R6); }
 OPHANDLER( adc_a_r7 )		{ execute_addc(mcs48, R7); }
 OPHANDLER( adc_a_xr0 )		{ execute_addc(mcs48, ram_r(R0)); }
 OPHANDLER( adc_a_xr1 )		{ execute_addc(mcs48, ram_r(R1)); }
-OPHANDLER( adc_a_n )		{ execute_addc(mcs48, argument_fetch(PC++)); }
+OPHANDLER( adc_a_n )		{ execute_addc(mcs48, argument_fetch(mcs48, PC++)); }
 
 OPHANDLER( anl_a_r0 )		{ A &= R0; }
 OPHANDLER( anl_a_r1 )		{ A &= R1; }
@@ -382,24 +389,24 @@ OPHANDLER( anl_a_r6 )		{ A &= R6; }
 OPHANDLER( anl_a_r7 )		{ A &= R7; }
 OPHANDLER( anl_a_xr0 )		{ A &= ram_r(R0); }
 OPHANDLER( anl_a_xr1 )		{ A &= ram_r(R1); }
-OPHANDLER( anl_a_n )		{ A &= argument_fetch(PC++); }
-OPHANDLER( anl_bus_n )		{ bus_w(bus_r() & argument_fetch(PC++)); }
-OPHANDLER( anl_p1_n )		{ port_w(1, mcs48->p1 &= argument_fetch(PC++)); }
-OPHANDLER( anl_p2_n )		{ port_w(2, mcs48->p2 &= argument_fetch(PC++)); }
+OPHANDLER( anl_a_n )		{ A &= argument_fetch(mcs48, PC++); }
+OPHANDLER( anl_bus_n )		{ bus_w(bus_r() & argument_fetch(mcs48, PC++)); }
+OPHANDLER( anl_p1_n )		{ port_w(1, mcs48->p1 &= argument_fetch(mcs48, PC++)); }
+OPHANDLER( anl_p2_n )		{ port_w(2, mcs48->p2 &= argument_fetch(mcs48, PC++)); }
 
 OPHANDLER( anld_p4_a )		{ port_w(4, port_r(4) & A & 0x0f); }
 OPHANDLER( anld_p5_a )		{ port_w(5, port_r(5) & A & 0x0f); }
 OPHANDLER( anld_p6_a )		{ port_w(6, port_r(6) & A & 0x0f); }
 OPHANDLER( anld_p7_a )		{ port_w(7, port_r(7) & A & 0x0f); }
 
-OPHANDLER( call_0 )		{ execute_call(mcs48, argument_fetch(PC++) | 0x000); }
-OPHANDLER( call_1 )		{ execute_call(mcs48, argument_fetch(PC++) | 0x100); }
-OPHANDLER( call_2 )		{ execute_call(mcs48, argument_fetch(PC++) | 0x200); }
-OPHANDLER( call_3 )		{ execute_call(mcs48, argument_fetch(PC++) | 0x300); }
-OPHANDLER( call_4 )		{ execute_call(mcs48, argument_fetch(PC++) | 0x400); }
-OPHANDLER( call_5 )		{ execute_call(mcs48, argument_fetch(PC++) | 0x500); }
-OPHANDLER( call_6 )		{ execute_call(mcs48, argument_fetch(PC++) | 0x600); }
-OPHANDLER( call_7 )		{ execute_call(mcs48, argument_fetch(PC++) | 0x700); }
+OPHANDLER( call_0 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x000); }
+OPHANDLER( call_1 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x100); }
+OPHANDLER( call_2 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x200); }
+OPHANDLER( call_3 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x300); }
+OPHANDLER( call_4 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x400); }
+OPHANDLER( call_5 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x500); }
+OPHANDLER( call_6 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x600); }
+OPHANDLER( call_7 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x700); }
 
 OPHANDLER( clr_a )			{ A = 0; }
 OPHANDLER( clr_c )			{ PSW &= ~C_FLAG; }
@@ -486,14 +493,14 @@ OPHANDLER( jc )			{ execute_jcc(mcs48, (PSW & C_FLAG) != 0); }
 OPHANDLER( jf0 )			{ execute_jcc(mcs48, (PSW & F_FLAG) != 0); }
 OPHANDLER( jf1 )			{ execute_jcc(mcs48, mcs48->f1 != 0); }
 
-OPHANDLER( jmp_0 )			{ execute_jmp(mcs48, argument_fetch(PC) | 0x000); }
-OPHANDLER( jmp_1 )			{ execute_jmp(mcs48, argument_fetch(PC) | 0x100); }
-OPHANDLER( jmp_2 )			{ execute_jmp(mcs48, argument_fetch(PC) | 0x200); }
-OPHANDLER( jmp_3 )			{ execute_jmp(mcs48, argument_fetch(PC) | 0x300); }
-OPHANDLER( jmp_4 )			{ execute_jmp(mcs48, argument_fetch(PC) | 0x400); }
-OPHANDLER( jmp_5 )			{ execute_jmp(mcs48, argument_fetch(PC) | 0x500); }
-OPHANDLER( jmp_6 )			{ execute_jmp(mcs48, argument_fetch(PC) | 0x600); }
-OPHANDLER( jmp_7 )			{ execute_jmp(mcs48, argument_fetch(PC) | 0x700); }
+OPHANDLER( jmp_0 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x000); }
+OPHANDLER( jmp_1 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x100); }
+OPHANDLER( jmp_2 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x200); }
+OPHANDLER( jmp_3 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x300); }
+OPHANDLER( jmp_4 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x400); }
+OPHANDLER( jmp_5 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x500); }
+OPHANDLER( jmp_6 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x600); }
+OPHANDLER( jmp_7 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x700); }
 OPHANDLER( jmpp_xa )		{ PC &= 0xf00; PC |= program_r(PC | A); change_pc(PC); }
 
 OPHANDLER( jnc )			{ execute_jcc(mcs48, (PSW & C_FLAG) == 0); }
@@ -506,7 +513,7 @@ OPHANDLER( jt_0 )  		{ execute_jcc(mcs48, test_r(0) != 0); }
 OPHANDLER( jt_1 )  		{ execute_jcc(mcs48, test_r(1) != 0); }
 OPHANDLER( jz )			{ execute_jcc(mcs48, A == 0); }
 
-OPHANDLER( mov_a_n )		{ A = argument_fetch(PC++); }
+OPHANDLER( mov_a_n )		{ A = argument_fetch(mcs48, PC++); }
 OPHANDLER( mov_a_psw )		{ A = PSW; }
 OPHANDLER( mov_a_r0 )		{ A = R0; }
 OPHANDLER( mov_a_r1 )		{ A = R1; }
@@ -529,19 +536,19 @@ OPHANDLER( mov_r4_a )		{ R4 = A; }
 OPHANDLER( mov_r5_a )		{ R5 = A; }
 OPHANDLER( mov_r6_a )		{ R6 = A; }
 OPHANDLER( mov_r7_a )		{ R7 = A; }
-OPHANDLER( mov_r0_n )		{ R0 = argument_fetch(PC++); }
-OPHANDLER( mov_r1_n )		{ R1 = argument_fetch(PC++); }
-OPHANDLER( mov_r2_n )		{ R2 = argument_fetch(PC++); }
-OPHANDLER( mov_r3_n )		{ R3 = argument_fetch(PC++); }
-OPHANDLER( mov_r4_n )		{ R4 = argument_fetch(PC++); }
-OPHANDLER( mov_r5_n )		{ R5 = argument_fetch(PC++); }
-OPHANDLER( mov_r6_n )		{ R6 = argument_fetch(PC++); }
-OPHANDLER( mov_r7_n )		{ R7 = argument_fetch(PC++); }
+OPHANDLER( mov_r0_n )		{ R0 = argument_fetch(mcs48, PC++); }
+OPHANDLER( mov_r1_n )		{ R1 = argument_fetch(mcs48, PC++); }
+OPHANDLER( mov_r2_n )		{ R2 = argument_fetch(mcs48, PC++); }
+OPHANDLER( mov_r3_n )		{ R3 = argument_fetch(mcs48, PC++); }
+OPHANDLER( mov_r4_n )		{ R4 = argument_fetch(mcs48, PC++); }
+OPHANDLER( mov_r5_n )		{ R5 = argument_fetch(mcs48, PC++); }
+OPHANDLER( mov_r6_n )		{ R6 = argument_fetch(mcs48, PC++); }
+OPHANDLER( mov_r7_n )		{ R7 = argument_fetch(mcs48, PC++); }
 OPHANDLER( mov_t_a )		{ mcs48->timer = A; }
 OPHANDLER( mov_xr0_a )		{ ram_w(R0, A); }
 OPHANDLER( mov_xr1_a )		{ ram_w(R1, A); }
-OPHANDLER( mov_xr0_n )		{ ram_w(R0, argument_fetch(PC++)); }
-OPHANDLER( mov_xr1_n )		{ ram_w(R1, argument_fetch(PC++)); }
+OPHANDLER( mov_xr0_n )		{ ram_w(R0, argument_fetch(mcs48, PC++)); }
+OPHANDLER( mov_xr1_n )		{ ram_w(R1, argument_fetch(mcs48, PC++)); }
 
 OPHANDLER( movd_a_p4 )		{ A = port_r(4) & 0x0f; }
 OPHANDLER( movd_a_p5 )		{ A = port_r(5) & 0x0f; }
@@ -572,10 +579,10 @@ OPHANDLER( orl_a_r6 )		{ A |= R6; }
 OPHANDLER( orl_a_r7 )		{ A |= R7; }
 OPHANDLER( orl_a_xr0 )		{ A |= ram_r(R0); }
 OPHANDLER( orl_a_xr1 )		{ A |= ram_r(R1); }
-OPHANDLER( orl_a_n )		{ A |= argument_fetch(PC++); }
-OPHANDLER( orl_bus_n )		{ bus_w(bus_r() | argument_fetch(PC++)); }
-OPHANDLER( orl_p1_n )		{ port_w(1, mcs48->p1 |= argument_fetch(PC++)); }
-OPHANDLER( orl_p2_n )		{ port_w(2, mcs48->p2 |= argument_fetch(PC++)); }
+OPHANDLER( orl_a_n )		{ A |= argument_fetch(mcs48, PC++); }
+OPHANDLER( orl_bus_n )		{ bus_w(bus_r() | argument_fetch(mcs48, PC++)); }
+OPHANDLER( orl_p1_n )		{ port_w(1, mcs48->p1 |= argument_fetch(mcs48, PC++)); }
+OPHANDLER( orl_p2_n )		{ port_w(2, mcs48->p2 |= argument_fetch(mcs48, PC++)); }
 OPHANDLER( orld_p4_a )		{ port_w(4, port_r(4) | A); }
 OPHANDLER( orld_p5_a )		{ port_w(5, port_r(5) | A); }
 OPHANDLER( orld_p6_a )		{ port_w(6, port_r(6) | A); }
@@ -638,7 +645,7 @@ OPHANDLER( xrl_a_r6 )		{ A ^= R6; }
 OPHANDLER( xrl_a_r7 )		{ A ^= R7; }
 OPHANDLER( xrl_a_xr0 )		{ A ^= ram_r(R0); }
 OPHANDLER( xrl_a_xr1 )		{ A ^= ram_r(R1); }
-OPHANDLER( xrl_a_n )		{ A ^= argument_fetch(PC++); }
+OPHANDLER( xrl_a_n )		{ A ^= argument_fetch(mcs48, PC++); }
 
 
 
@@ -707,6 +714,10 @@ static void mcs48_init(const device_config *device, int index, int clock, cpu_ir
 	mcs48->irq_callback = irqcallback;
 	mcs48->device = device;
 	mcs48->int_rom_size = romsize;
+
+	mcs48->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	mcs48->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	mcs48->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item("mcs48", device->tag, 0, mcs48->prevpc.w.l);
 	state_save_register_item("mcs48", device->tag, 0, PC);
@@ -934,7 +945,7 @@ static CPU_EXECUTE( mcs48 )
 		/* fetch next opcode */
 		mcs48->prevpc = mcs48->pc;
 		debugger_instruction_hook(device->machine, PC);
-		opcode = opcode_fetch(PC++);
+		opcode = opcode_fetch(mcs48, PC++);
 
 		/* process opcode and count cycles */
 		mcs48->inst_cycles = opcode_table[opcode].cycles;
