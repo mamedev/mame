@@ -35,11 +35,11 @@ static UINT8 orbit_misc_flags;
  *
  *************************************/
 
-static TIMER_CALLBACK( nmi_32v )
+static TIMER_DEVICE_CALLBACK( nmi_32v )
 {
 	int scanline = param;
 	int nmistate = (scanline & 32) && (orbit_misc_flags & 4);
-	cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(timer->machine->cpu[0], INPUT_LINE_NMI, nmistate ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
