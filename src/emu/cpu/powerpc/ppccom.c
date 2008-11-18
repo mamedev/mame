@@ -217,9 +217,6 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 		ppc->spu.timer = timer_alloc(ppc4xx_spu_callback, ppc);
 	}
 
-	/* reset the state */
-	ppccom_reset(ppc);
-
 	/* register for save states */
 	state_save_register_item("ppc", device->tag, 0, ppc->pc);
 	state_save_register_item_array("ppc", device->tag, 0, ppc->r);
