@@ -581,9 +581,10 @@ static int has_write_handler(int cpunum, write16_space_func handler)
 {
 	const address_map *map = memory_get_address_map(cpunum, ADDRESS_SPACE_PROGRAM);
 	const address_map_entry *entry;
-	for (entry = map->entrylist; entry != NULL; entry = entry->next)
-		if (entry->write.shandler16 == handler)
-			return 1;
+	if (map != NULL)
+		for (entry = map->entrylist; entry != NULL; entry = entry->next)
+			if (entry->write.shandler16 == handler)
+				return 1;
 
 	return 0;
 }
