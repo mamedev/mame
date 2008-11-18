@@ -1019,6 +1019,7 @@ static void model3_init(running_machine *machine, int step)
 
 	// copy the 68k vector table into RAM
 	memcpy(model3_soundram, memory_region(machine, "audio")+0x80000, 16);
+	cpu_reset(cputag_get_cpu(machine, "audio"));
 
 	model3_machine_init(step);	// step 1.5
 	model3_tap_reset();
