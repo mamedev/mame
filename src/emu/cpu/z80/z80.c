@@ -18,9 +18,9 @@
  *   - This entire notice must remain in the source code.
  *
  *   Changes in 3.8 [Miodrag Milanovic]
- *   - Added z80->MEMPTR register (according to informations provided
+ *   - Added MEMPTR register (according to informations provided
  *     by Vladimir Kladov
- *   - BIT n,(z80->HL) now return valid values due to use of z80->MEMPTR
+ *   - BIT n,(HL) now return valid values due to use of MEMPTR
  *   - Fixed BIT 6,(XY+o) undocumented instructions
  *   Changes in 3.7 [Aaron Giles]
  *   - Changed NMI handling. NMIs are now latched in set_irq_state
@@ -52,14 +52,14 @@
  *   Changes in 3.1
  *   - removed the REPEAT_AT_ONCE execution of LDIR/CPIR etc. opcodes
  *     for readabilities sake and because the implementation was buggy
- *     (and z80->i was not able to find the difference)
+ *     (and i was not able to find the difference)
  *   Changes in 3.0
  *   - 'finished' switch to dynamically overrideable cycle count tables
  *   Changes in 2.9:
  *   - added methods to access and override the cycle count tables
  *   - fixed handling and timing of multiple DD/FD prefixed opcodes
  *   Changes in 2.8:
- *   - OUTI/OUTD/OTIR/OTDR also pre-decrement the z80->B register now.
+ *   - OUTI/OUTD/OTIR/OTDR also pre-decrement the B register now.
  *     This was wrong because of a bug fix on the wrong side
  *     (astrocade sound driver).
  *   Changes in 2.7:
@@ -71,25 +71,25 @@
  *      Thanks to Sean Young for finding this nasty bug.
  *   Changes in 2.5:
  *    - Burning cycles always adjusts the ICount by a multiple of 4.
- *    - In REPEAT_AT_ONCE cases the z80->r register wasn't incremented twice
+ *    - In REPEAT_AT_ONCE cases the r register wasn't incremented twice
  *      per repetition as it should have been. Those repeated opcodes
  *      could also underflow the ICount.
- *    - Simplified TIME_LOOP_HACKS for z80->BC and added two more for z80->DE + z80->HL
- *      timing loops. z80->i think those hacks weren't endian safe before too.
+ *    - Simplified TIME_LOOP_HACKS for BC and added two more for DE + HL
+ *      timing loops. i think those hacks weren't endian safe before too.
  *   Changes in 2.4:
- *    - z80_reset zaps the entire context, sets z80->IX and z80->IY to 0xffff(!) and
+ *    - z80_reset zaps the entire context, sets IX and IY to 0xffff(!) and
  *      sets the Z flag. With these changes the Tehkan World Cup driver
  *      _seems_ to work again.
  *   Changes in 2.3:
  *    - External termination of the execution loop calls z80_burn() and
- *      z80_vm_burn() to burn an amount of cycles (z80->r adjustment)
+ *      z80_vm_burn() to burn an amount of cycles (r adjustment)
  *    - Shortcuts which burn CPU cycles (BUSY_LOOP_HACKS and TIME_LOOP_HACKS)
- *      now also adjust the z80->r register depending on the skipped opcodes.
+ *      now also adjust the r register depending on the skipped opcodes.
  *   Changes in 2.2:
  *    - Fixed bugs in CPL, SCF and CCF instructions flag handling.
- *    - Changed variable z80->ea and ARG16() function to UINT32; this
+ *    - Changed variable ea and ARG16() function to UINT32; this
  *      produces slightly more efficient code.
- *    - The DD/FD XY CB opcodes where XY is 40-7F and Y is not 6/z80->E
+ *    - The DD/FD XY CB opcodes where XY is 40-7F and Y is not 6/E
  *      are changed to calls to the X6/XE opcodes to reduce object size.
  *      They're hardly ever used so this should not yield a speed penalty.
  *   New in 2.0:
@@ -115,7 +115,7 @@
 
 /****************************************************************************/
 /* The Z80 registers. halt is set to 1 when the CPU is halted, the refresh  */
-/* register is calculated as follows: refresh=(z80->r&127)|(z80->r2&128)    */
+/* register is calculated as follows: refresh=(r&127)|(r2&128)    */
 /****************************************************************************/
 typedef struct _z80_state z80_state;
 struct _z80_state
@@ -559,12 +559,12 @@ INLINE void BURNODD(z80_state *z80, int cycles, int opcodes, int cyclesum)
 } while (0)
 
 /***************************************************************
- * Input a byte from given z80->i/O port
+ * Input a byte from given I/O port
  ***************************************************************/
 #define IN(Z,port)   		memory_read_byte_8le((Z)->io, port)
 
 /***************************************************************
- * Output a byte to given z80->i/O port
+ * Output a byte to given I/O port
  ***************************************************************/
 #define OUT(Z,port,value) 	memory_write_byte_8le((Z)->io, port, value)
 
@@ -598,7 +598,7 @@ INLINE void WM16(z80_state *z80, UINT32 addr, PAIR *r)
 
 /***************************************************************
  * ROP() is identical to RM() except it is used for
- * reading opcodes. In case of system with memory mapped z80->i/O,
+ * reading opcodes. In case of system with memory mapped I/O,
  * this function can be used to greatly speed up emulation
  ***************************************************************/
 INLINE UINT8 ROP(z80_state *z80)
@@ -629,8 +629,8 @@ INLINE UINT32 ARG16(z80_state *z80)
 }
 
 /***************************************************************
- * Calculate the effective address z80->ea of an opcode using
- * z80->IX+offset resp. z80->IY+offset addressing.
+ * Calculate the effective address EA of an opcode using
+ * IX+offset resp. IY+offset addressing.
  ***************************************************************/
 #define EAX(Z) 		do { (Z)->ea = (UINT32)(UINT16)((Z)->IX + (INT8)ARG(Z)); (Z)->MEMPTR = (Z)->ea; } while (0)
 #define EAY(Z)		do { (Z)->ea = (UINT32)(UINT16)((Z)->IY + (INT8)ARG(Z)); (Z)->MEMPTR = (Z)->ea; } while (0)
@@ -1729,7 +1729,7 @@ OP(cb,ff) { z80->A = SET(7, z80->A);												} /* SET  7,A         */
 
 /**********************************************************
 * opcodes with DD/FD CB prefix
-* rotate, shift and bit operations with (z80->IX+o)
+* rotate, shift and bit operations with (IX+o)
 **********************************************************/
 OP(xycb,00) { z80->B = RLC(z80, RM(z80, z80->ea)); WM(z80, z80->ea,z80->B);			} /* RLC  B=(XY+o)    */
 OP(xycb,01) { z80->C = RLC(z80, RM(z80, z80->ea)); WM(z80, z80->ea,z80->C);			} /* RLC  C=(XY+o)    */
@@ -2025,7 +2025,7 @@ OP(illegal,1) {
 }
 
 /**********************************************************
- * z80->IX register related opcodes (DD prefix)
+ * IX register related opcodes (DD prefix)
  **********************************************************/
 OP(dd,00) { illegal_1(z80); op_00(z80);												} /* DB   DD          */
 OP(dd,01) { illegal_1(z80); op_01(z80);												} /* DB   DD          */
@@ -2316,7 +2316,7 @@ OP(dd,fe) { illegal_1(z80); op_fe(z80);												} /* DB   DD          */
 OP(dd,ff) { illegal_1(z80); op_ff(z80);												} /* DB   DD          */
 
 /**********************************************************
- * z80->IY register related opcodes (FD prefix)
+ * IY register related opcodes (FD prefix)
  **********************************************************/
 OP(fd,00) { illegal_1(z80); op_00(z80);												} /* DB   FD          */
 OP(fd,01) { illegal_1(z80); op_01(z80);												} /* DB   FD          */
