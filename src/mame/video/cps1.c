@@ -433,6 +433,9 @@ CPS_B_21_QSx are various battery configurations in Q-Sound games
 */
 
 
+// LWCHR and LW621 are equivalent as far as the game is concerned, though the
+// equations are different
+
 #define mapper_LWCHR	{ 0x8000, 0x8000, 0, 0 }, mapper_LWCHR_table
 static const struct gfx_range mapper_LWCHR_table[] =
 {
@@ -440,6 +443,38 @@ static const struct gfx_range mapper_LWCHR_table[] =
 	// bank 0 = pin 19 (ROMs 1,5,8,12)
 	// bank 1 = pin 16 (ROMs 2,6,9,13)
 	// pin 12 and pin 14 are always enabled (except for stars)
+	// note that allowed codes go up to 0x1ffff but physical ROM is half that size
+
+	/* type            start    end      bank */
+	{ GFXTYPE_SPRITES, 0x00000, 0x07fff, 0 },
+	{ GFXTYPE_SCROLL1, 0x00000, 0x1ffff, 0 },
+
+	{ GFXTYPE_STARS,   0x00000, 0x1ffff, 1 },
+	{ GFXTYPE_SCROLL2, 0x00000, 0x1ffff, 1 },
+	{ GFXTYPE_SCROLL3, 0x00000, 0x1ffff, 1 },
+	{ 0 }
+};
+
+#define mapper_LW621	{ 0x8000, 0x8000, 0, 0 }, mapper_LW621_table
+static const struct gfx_range mapper_LW621_table[] =
+{
+	// verified from PAL dump (PAL @ 1A):
+	// bank 0 = pin 18
+	// bank 1 = pin 14
+	// pins 19, 16, 17, and 12 give an alternate half-size mapping which would
+	// allow to use smaller ROMs:
+	// pin 19
+	// 0 00000-03fff
+	// pin 16
+	// 0 04000-07fff
+	// 1 00000-1ffff
+	// pin 17
+	// 2 00000-1ffff
+	// 3 00000-1ffff
+	// 4 00000-1ffff
+	// pin 12
+	// 3 00000-1ffff
+	//
 	// note that allowed codes go up to 0x1ffff but physical ROM is half that size
 
 	/* type            start    end      bank */
@@ -1199,7 +1234,7 @@ static const struct CPS1config cps1_config_table[]=
 {
 	/* name       CPSB         gfx mapper   in2  in3  out2   kludge */
 	{"forgottn", CPS_B_01,     mapper_LWCHR },
-	{"forgott1", CPS_B_01,     mapper_LWCHR },
+	{"forgott1", CPS_B_01,     mapper_LW621 },
 	{"lostwrld", CPS_B_01,     mapper_LWCHR },
 	{"ghouls",   CPS_B_01,     mapper_DM620 },
 	{"ghoulsu",  CPS_B_01,     mapper_DM620 },
