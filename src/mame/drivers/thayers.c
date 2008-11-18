@@ -571,10 +571,6 @@ static ADDRESS_MAP_START( thayers_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xf7, 0xf7) AM_WRITE(den2_w)
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( thayers_cop_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x000, 0x3ff) AM_ROM
-ADDRESS_MAP_END
-
 static ADDRESS_MAP_START( thayers_cop_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(COP400_PORT_L, COP400_PORT_L) AM_READWRITE(cop_l_r, cop_l_w)
 	AM_RANGE(COP400_PORT_G, COP400_PORT_G) AM_READWRITE(cop_g_r, cop_g_w)
@@ -751,7 +747,7 @@ static MACHINE_RESET( thayers )
 
 static COP400_INTERFACE( thayers_cop_intf )
 {
-	COP400_CKI_DIVISOR_16, // ???
+	COP400_CKI_DIVISOR_4, // ???
 	COP400_CKO_OSCILLATOR_OUTPUT, // ???
 	COP400_MICROBUS_DISABLED
 };
@@ -765,7 +761,6 @@ static MACHINE_DRIVER_START( thayers )
 	MDRV_CPU_IO_MAP(thayers_io_map, 0)
 
 	MDRV_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
-	MDRV_CPU_PROGRAM_MAP(thayers_cop_map, 0)
 	MDRV_CPU_IO_MAP(thayers_cop_io_map, 0)
 	MDRV_CPU_CONFIG(thayers_cop_intf)
 

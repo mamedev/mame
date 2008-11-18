@@ -395,10 +395,19 @@ enum _cpu_type
 	CPU_ALPHA8201,
 	CPU_ALPHA8301,
 	CPU_CDP1802,
-	CPU_COP420,
-	CPU_COP421,
+	CPU_COP401,
 	CPU_COP410,
 	CPU_COP411,
+	CPU_COP402,
+	CPU_COP420,
+	CPU_COP421,
+	CPU_COP422,
+	CPU_COP404,
+	CPU_COP424,
+	CPU_COP425,
+	CPU_COP426,
+	CPU_COP444,
+	CPU_COP445,
 	CPU_TMP90840,
 	CPU_TMP90841,
 	CPU_TMP91640,
@@ -744,7 +753,7 @@ const char *cputype_get_info_string(cpu_type cputype, UINT32 state);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    safe_cpu_get_pc - return the current PC or ~0 
+    safe_cpu_get_pc - return the current PC or ~0
     if the CPU is invalid
 -------------------------------------------------*/
 
@@ -792,9 +801,9 @@ INLINE offs_t cpu_address_to_byte(const device_config *cpu, int space, offs_t ad
 
 
 /*-------------------------------------------------
-    cpu_address_to_byte_end - convert an address 
-    in the specified address space to a byte 
-    offset specifying the last byte covered by 
+    cpu_address_to_byte_end - convert an address
+    in the specified address space to a byte
+    offset specifying the last byte covered by
     the address
 -------------------------------------------------*/
 

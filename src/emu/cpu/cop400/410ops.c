@@ -9,7 +9,73 @@
 
 ***************************************************************************/
 
-#define INSTRUCTION(mnemonic) INLINE void (mnemonic)(UINT8 opcode)
+#define UINT1	UINT8
+#define UINT4	UINT8
+#define UINT6	UINT8
+#define UINT10	UINT16
+
+typedef struct _cop400_state cop400_state;
+struct _cop400_state
+{
+	const cop400_interface *intf;
+
+	/* registers */
+	UINT10 	pc;	   			/* 11-bit ROM address program counter */
+	UINT10	prevpc;			/* previous value of program counter */
+	UINT4	a;				/* 4-bit accumulator */
+	UINT8	b;				/* 5/6/7-bit RAM address register */
+	UINT1	c;				/* 1-bit carry register */
+	UINT4	en;				/* 4-bit enable register */
+	UINT4	g;				/* 4-bit general purpose I/O port */
+	UINT8	q;				/* 8-bit latch for L port */
+	UINT10	sa, sb, sc;		/* subroutine save registers */
+	UINT4	sio;			/* 4-bit shift register and counter */
+	UINT1	skl;			/* 1-bit latch for SK output */
+	UINT8	si;				/* serial input */
+
+	/* counter */
+	UINT8	t;				/* 8-bit timer */
+	int		skt_latch;		/* timer overflow latch */
+
+	/* input/output ports */
+	UINT8	g_mask;			/* G port mask */
+	UINT8	d_mask;			/* D port mask */
+	UINT8	in_mask;		/* IN port mask */
+	UINT4	il;				/* IN latch */
+	UINT4	in[4];			/* IN port shift register */
+
+	/* skipping logic */
+	int skip;				/* skip next instruction */
+	int skip_lbi;			/* skip until next non-LBI instruction */
+	int last_skip;			/* last value of skip */
+	int halt;				/* halt mode */
+	int idle;				/* idle mode */
+
+	/* microbus */
+	int microbus_int;		/* microbus interrupt */
+
+	/* execution logic */
+	int InstLen[256];		/* instruction length in bytes */
+	int LBIops[256];
+	int LBIops33[256];
+	int icount;				/* instruction counter */
+
+	const device_config *device;
+
+	/* timers */
+	emu_timer *serial_timer;
+	emu_timer *counter_timer;
+	emu_timer *inil_timer;
+	emu_timer *microbus_timer;
+};
+
+/* The opcode table now is a combination of cycle counts and function pointers */
+typedef struct {
+	unsigned cycles;
+	void (*function) (cop400_state *cop400, UINT8 opcode);
+}	s_opcode;
+
+#define INSTRUCTION(mnemonic) INLINE void (mnemonic)(cop400_state *cop400, UINT8 opcode)
 
 #define ROM(addr)			program_decrypted_read_byte(addr)
 #define RAM_W(addr, value)	(data_write_byte_8le(addr, value))
@@ -18,28 +84,26 @@
 #define IN(addr)			io_read_byte_8le(addr)
 #define OUT(addr, value)	io_write_byte_8le(addr, value)
 
-#define A				R.A
-#define B				R.B
-#define C				R.C
-#define G				R.G
-#define Q				R.Q
-#define EN				R.EN
-#define SA				R.SA
-#define SB				R.SB
-#define SIO				R.SIO
-#define SKL				R.SKL
-#define PC				R.PC
-#define prevPC			R.PREVPC
-#define skip			R.skip
-#define skipLBI			R.skipLBI
+#define A				cop400->a
+#define B				cop400->b
+#define C				cop400->c
+#define G				cop400->g
+#define Q				cop400->q
+#define EN				cop400->en
+#define SA				cop400->sa
+#define SB				cop400->sb
+#define SIO				cop400->sio
+#define SKL				cop400->skl
+#define PC				cop400->pc
+#define prevPC			cop400->prevpc
 
 #define IN_G()			IN(COP400_PORT_G)
 #define IN_L()			IN(COP400_PORT_L)
 #define IN_SI()			BIT(IN(COP400_PORT_SIO), 0)
 #define IN_CKO()		BIT(IN(COP400_PORT_CKO), 0)
-#define OUT_G(A)		OUT(COP400_PORT_G, (A) & R.G_mask)
+#define OUT_G(A)		OUT(COP400_PORT_G, (A) & cop400->g_mask)
 #define OUT_L(A)		OUT(COP400_PORT_L, (A))
-#define OUT_D(A)		OUT(COP400_PORT_D, (A) & R.D_mask)
+#define OUT_D(A)		OUT(COP400_PORT_D, (A) & cop400->d_mask)
 #define OUT_SK(A)		OUT(COP400_PORT_SK, (A))
 #define OUT_SO(A)		OUT(COP400_PORT_SIO, (A))
 
@@ -50,11 +114,11 @@
 
 /* Serial I/O */
 
-static TIMER_CALLBACK(cop410_serial_tick)
+static TIMER_CALLBACK( cop400_serial_tick )
 {
-    int cpunum = param;
+	cop400_state *cop400 = ptr;
 
-	cpu_push_context(machine->cpu[cpunum]);
+    cpu_push_context(cop400->device);
 
 	if (BIT(EN, 0))
 	{
@@ -76,10 +140,10 @@ static TIMER_CALLBACK(cop410_serial_tick)
 
 		// serial input
 
-		R.si <<= 1;
-		R.si = (R.si & 0x0e) | IN_SI();
+		cop400->si <<= 1;
+		cop400->si = (cop400->si & 0x0e) | IN_SI();
 
-		if ((R.si & 0x0f) == 0x0c) // 1100
+		if ((cop400->si & 0x0f) == 0x0c) // 1100
 		{
 			SIO--;
 			SIO &= 0x0f;
@@ -129,7 +193,7 @@ static TIMER_CALLBACK(cop410_serial_tick)
 	cpu_pop_context();
 }
 
-INLINE void WRITE_Q(UINT8 data)
+INLINE void WRITE_Q(cop400_state *cop400, UINT8 data)
 {
 	Q = data;
 
@@ -139,11 +203,11 @@ INLINE void WRITE_Q(UINT8 data)
 	}
 }
 
-INLINE void WRITE_G(UINT8 data)
+INLINE void WRITE_G(cop400_state *cop400, UINT8 data)
 {
-	if (R.intf->microbus == COP400_MICROBUS_ENABLED)
+	if (cop400->intf->microbus == COP400_MICROBUS_ENABLED)
 	{
-		data = (data & 0x0e) | R.microbus_int;
+		data = (data & 0x0e) | cop400->microbus_int;
 	}
 
 	G = data;
@@ -181,7 +245,7 @@ INSTRUCTION(asc)
 	if (A > 0xF)
 	{
 		C = 1;
-		skip = 1;
+		cop400->skip = 1;
 		A &= 0xF;
 	}
 	else
@@ -203,7 +267,7 @@ INSTRUCTION(asc)
 
 */
 
-INSTRUCTION(add)
+INSTRUCTION( add )
 {
 	A = (A + RAM_R(B)) & 0x0F;
 }
@@ -224,7 +288,7 @@ INSTRUCTION(add)
 
 */
 
-INSTRUCTION(aisc)
+INSTRUCTION( aisc )
 {
 	UINT4 y = opcode & 0x0f;
 
@@ -232,7 +296,7 @@ INSTRUCTION(aisc)
 
 	if (A > 0x0f)
 	{
-		skip = 1;
+		cop400->skip = 1;
 		A &= 0xF;
 	}
 }
@@ -250,7 +314,7 @@ INSTRUCTION(aisc)
 
 */
 
-INSTRUCTION(clra)
+INSTRUCTION( clra )
 {
 	A = 0;
 }
@@ -268,7 +332,7 @@ INSTRUCTION(clra)
 
 */
 
-INSTRUCTION(comp)
+INSTRUCTION( comp )
 {
 	A = A ^ 0xF;
 }
@@ -284,7 +348,7 @@ INSTRUCTION(comp)
 
 */
 
-INSTRUCTION(nop)
+INSTRUCTION( nop )
 {
 	// do nothing
 }
@@ -302,7 +366,7 @@ INSTRUCTION(nop)
 
 */
 
-INSTRUCTION(rc)
+INSTRUCTION( rc )
 {
 	C = 0;
 }
@@ -320,7 +384,7 @@ INSTRUCTION(rc)
 
 */
 
-INSTRUCTION(sc)
+INSTRUCTION( sc )
 {
 	C = 1;
 }
@@ -338,7 +402,7 @@ INSTRUCTION(sc)
 
 */
 
-INSTRUCTION(xor)
+INSTRUCTION( xor )
 {
 	A = A ^ RAM_R(B);
 }
@@ -358,7 +422,7 @@ INSTRUCTION(xor)
 
 */
 
-INSTRUCTION(jid)
+INSTRUCTION( jid )
 {
 	UINT16 addr = (PC & 0x300) | (A << 4) | RAM_R(B);
 	PC = (PC & 0x300) | ROM(addr);
@@ -378,7 +442,7 @@ INSTRUCTION(jid)
 
 */
 
-INSTRUCTION(jmp)
+INSTRUCTION( jmp )
 {
 	UINT16 a = ((opcode & 0x03) << 8) | ROM(PC);
 
@@ -405,7 +469,7 @@ INSTRUCTION(jmp)
 
 */
 
-INSTRUCTION(jp)
+INSTRUCTION( jp )
 {
 	UINT4 page = PC >> 6;
 
@@ -443,7 +507,7 @@ INSTRUCTION(jp)
 
 */
 
-INSTRUCTION(jsr)
+INSTRUCTION( jsr )
 {
 	UINT16 a = ((opcode & 0x03) << 8) | ROM(PC);
 
@@ -464,7 +528,7 @@ INSTRUCTION(jsr)
 
 */
 
-INSTRUCTION(ret)
+INSTRUCTION( ret )
 {
 	POP();
 }
@@ -484,10 +548,10 @@ INSTRUCTION(ret)
 
 */
 
-INSTRUCTION(retsk)
+INSTRUCTION( retsk )
 {
 	POP();
-	skip = 1;
+	cop400->skip = 1;
 }
 
 /*
@@ -503,9 +567,9 @@ INSTRUCTION(retsk)
 
 */
 
-INSTRUCTION(halt)
+INSTRUCTION( halt )
 {
-	R.halt = 1;
+	cop400->halt = 1;
 }
 
 /* Memory Reference Instructions */
@@ -524,7 +588,7 @@ INSTRUCTION(halt)
 
 */
 
-INSTRUCTION(camq)
+INSTRUCTION( camq )
 {
 	/*
 
@@ -559,11 +623,11 @@ INSTRUCTION(camq)
 
 	UINT8 data = (A << 4) | RAM_R(B);
 
-	WRITE_Q(data);
+	WRITE_Q(cop400, data);
 
 #ifdef CAMQ_BUG
-	WRITE_Q(0x3c);
-	WRITE_Q(data);
+	WRITE_Q(cop400, 0x3c);
+	WRITE_Q(cop400, data);
 #endif
 }
 
@@ -582,7 +646,7 @@ INSTRUCTION(camq)
 
 */
 
-INSTRUCTION(ld)
+INSTRUCTION( ld )
 {
 	UINT8 r = opcode & 0x30;
 
@@ -604,11 +668,11 @@ INSTRUCTION(ld)
 
 */
 
-INSTRUCTION(lqid)
+INSTRUCTION( lqid )
 {
 	PUSH(PC);
 	PC = (PC & 0x300) | (A << 4) | RAM_R(B);
-	WRITE_Q(ROM(PC));
+	WRITE_Q(cop400, ROM(PC));
 	POP();
 }
 
@@ -640,10 +704,10 @@ INSTRUCTION(lqid)
 
 */
 
-INSTRUCTION(rmb0) { RAM_W(B, RAM_R(B) & 0xE); }
-INSTRUCTION(rmb1) { RAM_W(B, RAM_R(B) & 0xD); }
-INSTRUCTION(rmb2) { RAM_W(B, RAM_R(B) & 0xB); }
-INSTRUCTION(rmb3) { RAM_W(B, RAM_R(B) & 0x7); }
+INSTRUCTION( rmb0 ) { RAM_W(B, RAM_R(B) & 0xE); }
+INSTRUCTION( rmb1 ) { RAM_W(B, RAM_R(B) & 0xD); }
+INSTRUCTION( rmb2 ) { RAM_W(B, RAM_R(B) & 0xB); }
+INSTRUCTION( rmb3 ) { RAM_W(B, RAM_R(B) & 0x7); }
 
 /*
 
@@ -673,10 +737,10 @@ INSTRUCTION(rmb3) { RAM_W(B, RAM_R(B) & 0x7); }
 
 */
 
-INSTRUCTION(smb0) { RAM_W(B, RAM_R(B) | 0x1); }
-INSTRUCTION(smb1) { RAM_W(B, RAM_R(B) | 0x2); }
-INSTRUCTION(smb2) { RAM_W(B, RAM_R(B) | 0x4); }
-INSTRUCTION(smb3) { RAM_W(B, RAM_R(B) | 0x8); }
+INSTRUCTION( smb0 ) { RAM_W(B, RAM_R(B) | 0x1); }
+INSTRUCTION( smb1 ) { RAM_W(B, RAM_R(B) | 0x2); }
+INSTRUCTION( smb2 ) { RAM_W(B, RAM_R(B) | 0x4); }
+INSTRUCTION( smb3 ) { RAM_W(B, RAM_R(B) | 0x8); }
 
 /*
 
@@ -693,7 +757,7 @@ INSTRUCTION(smb3) { RAM_W(B, RAM_R(B) | 0x8); }
 
 */
 
-INSTRUCTION(stii)
+INSTRUCTION( stii )
 {
 	UINT4 y = opcode & 0x0f;
 	UINT16 Bd;
@@ -719,7 +783,7 @@ INSTRUCTION(stii)
 
 */
 
-INSTRUCTION(x)
+INSTRUCTION( x )
 {
 	UINT4 r = opcode & 0x30;
 	UINT8 t = RAM_R(B);
@@ -744,7 +808,7 @@ INSTRUCTION(x)
 
 */
 
-INSTRUCTION(xad)
+INSTRUCTION( xad )
 {
 	UINT8 rd = opcode & 0x3f;
 	UINT8 t = A;
@@ -772,7 +836,7 @@ INSTRUCTION(xad)
 
 */
 
-INSTRUCTION(xds)
+INSTRUCTION( xds )
 {
 	UINT8 t, Bd;
 	UINT4 r = opcode & 0x30;
@@ -786,7 +850,7 @@ INSTRUCTION(xds)
 
 	B = B ^ r;
 
-	if (Bd == 0x0f) skip = 1;
+	if (Bd == 0x0f) cop400->skip = 1;
 }
 
 /*
@@ -807,7 +871,7 @@ INSTRUCTION(xds)
 
 */
 
-INSTRUCTION(xis)
+INSTRUCTION( xis )
 {
 	UINT8 t, Bd;
 	UINT4 r = opcode & 0x30;
@@ -821,7 +885,7 @@ INSTRUCTION(xis)
 
 	B = B ^ r;
 
-	if (Bd == 0x00) skip = 1;
+	if (Bd == 0x00) cop400->skip = 1;
 }
 
 /* Register Reference Instructions */
@@ -839,7 +903,7 @@ INSTRUCTION(xis)
 
 */
 
-INSTRUCTION(cab)
+INSTRUCTION( cab )
 {
 	B = (B & 0x30) | A;
 }
@@ -857,7 +921,7 @@ INSTRUCTION(cab)
 
 */
 
-INSTRUCTION(cba)
+INSTRUCTION( cba )
 {
 	A = B & 0xF;
 }
@@ -881,7 +945,7 @@ INSTRUCTION(cba)
 
 */
 
-INSTRUCTION(lbi)
+INSTRUCTION( lbi )
 {
 	if (opcode & 0x80)
 	{
@@ -892,7 +956,7 @@ INSTRUCTION(lbi)
 		B = (opcode & 0x30) | (((opcode & 0x0f) + 1) & 0x0f);
 	}
 
-	skipLBI = 1;
+	cop400->skip_lbi = 1;
 }
 
 /*
@@ -909,7 +973,7 @@ INSTRUCTION(lbi)
 
 */
 
-INSTRUCTION(lei)
+INSTRUCTION( lei )
 {
 	UINT4 y = opcode & 0x0f;
 
@@ -936,9 +1000,9 @@ INSTRUCTION(lei)
 
 */
 
-INSTRUCTION(skc)
+INSTRUCTION( skc )
 {
-	if (C == 1) skip = 1;
+	if (C == 1) cop400->skip = 1;
 }
 
 /*
@@ -954,9 +1018,9 @@ INSTRUCTION(skc)
 
 */
 
-INSTRUCTION(ske)
+INSTRUCTION( ske )
 {
-	if (A == RAM_R(B)) skip = 1;
+	if (A == RAM_R(B)) cop400->skip = 1;
 }
 
 /*
@@ -972,9 +1036,9 @@ INSTRUCTION(ske)
 
 */
 
-INSTRUCTION(skgz)
+INSTRUCTION( skgz )
 {
-	if (IN_G() == 0) skip = 1;
+	if (IN_G() == 0) cop400->skip = 1;
 }
 
 /*
@@ -997,15 +1061,15 @@ INSTRUCTION(skgz)
 
 */
 
-INLINE void skgbz(int bit)
+INLINE void skgbz(cop400_state *cop400, int bit)
 {
-	if (!BIT(IN_G(), bit)) skip = 1;
+	if (!BIT(IN_G(), bit)) cop400->skip = 1;
 }
 
-INSTRUCTION(skgbz0) { skgbz(0); }
-INSTRUCTION(skgbz1) { skgbz(1); }
-INSTRUCTION(skgbz2) { skgbz(2); }
-INSTRUCTION(skgbz3) { skgbz(3); }
+INSTRUCTION( skgbz0 ) { skgbz(cop400, 0); }
+INSTRUCTION( skgbz1 ) { skgbz(cop400, 1); }
+INSTRUCTION( skgbz2 ) { skgbz(cop400, 2); }
+INSTRUCTION( skgbz3 ) { skgbz(cop400, 3); }
 
 /*
 
@@ -1027,15 +1091,15 @@ INSTRUCTION(skgbz3) { skgbz(3); }
 
 */
 
-INLINE void skmbz(int bit)
+INLINE void skmbz(cop400_state *cop400, int bit)
 {
-	if (!BIT(RAM_R(B), bit)) skip = 1;
+	if (!BIT(RAM_R(B), bit)) cop400->skip = 1;
 }
 
-INSTRUCTION(skmbz0) { skmbz(0); }
-INSTRUCTION(skmbz1) { skmbz(1); }
-INSTRUCTION(skmbz2) { skmbz(2); }
-INSTRUCTION(skmbz3) { skmbz(3); }
+INSTRUCTION( skmbz0 ) { skmbz(cop400, 0); }
+INSTRUCTION( skmbz1 ) { skmbz(cop400, 1); }
+INSTRUCTION( skmbz2 ) { skmbz(cop400, 2); }
+INSTRUCTION( skmbz3 ) { skmbz(cop400, 3); }
 
 /* Input/Output Instructions */
 
@@ -1052,7 +1116,7 @@ INSTRUCTION(skmbz3) { skmbz(3); }
 
 */
 
-INSTRUCTION(ing)
+INSTRUCTION( ing )
 {
 	A = IN_G();
 }
@@ -1071,7 +1135,7 @@ INSTRUCTION(ing)
 
 */
 
-INSTRUCTION(inl)
+INSTRUCTION( inl )
 {
 	UINT8 L = IN_L();
 
@@ -1092,7 +1156,7 @@ INSTRUCTION(inl)
 
 */
 
-INSTRUCTION(obd)
+INSTRUCTION( obd )
 {
 	OUT_D(B & 0x0f);
 }
@@ -1110,9 +1174,9 @@ INSTRUCTION(obd)
 
 */
 
-INSTRUCTION(omg)
+INSTRUCTION( omg )
 {
-	WRITE_G(RAM_R(B));
+	WRITE_G(cop400, RAM_R(B));
 }
 
 /*
@@ -1129,7 +1193,7 @@ INSTRUCTION(omg)
 
 */
 
-INSTRUCTION(xas)
+INSTRUCTION( xas )
 {
 	UINT8 t = SIO;
 	SIO = A;

@@ -24,7 +24,7 @@
 
 enum
 {
-	COP400_PC=1,
+	COP400_PC = 1,
 	COP400_A,
 	COP400_B,
 	COP400_C,
@@ -35,7 +35,8 @@ enum
     COP400_SB,
     COP400_SC,
     COP400_SIO,
-    COP400_SKL
+    COP400_SKL,
+    COP400_T
 };
 
 typedef enum _cop400_cki_bond cop400_cki_bond;
@@ -102,5 +103,6 @@ extern CPU_GET_INFO( cop445 );
 
 CPU_DISASSEMBLE( cop410 );
 CPU_DISASSEMBLE( cop420 );
+CPU_DISASSEMBLE( cop444 );
 
 #endif  /* __COP400__ */

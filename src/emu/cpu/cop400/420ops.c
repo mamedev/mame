@@ -9,15 +9,101 @@
 
 ***************************************************************************/
 
-#define SC				R.SC
-#define IL				R.IL
+#define T				cop400->t
+#define SC				cop400->sc
+#define IL				cop400->il
 
 #define PUSH(addr) 		{ SC = SB; SB = SA; SA = addr; }
 #define POP() 			{ PC = SA; SA = SB; SB = SC; }
 
 #include "410ops.c"
 
-#define IN_IN()			(R.IN_mask ? IN(COP400_PORT_IN) : 0)
+#define IN_IN()			(cop400->in_mask ? IN(COP400_PORT_IN) : 0)
+
+/* Timer Counter */
+
+static TIMER_CALLBACK( cop400_counter_tick )
+{
+	cop400_state *cop400 = ptr;
+
+    cpu_push_context(cop400->device);
+
+	T++;
+
+	if (T == 0)
+	{
+		cop400->skt_latch = 1;
+
+		if (cop400->idle)
+		{
+			cop400->idle = 0;
+			cop400->halt = 0;
+		}
+	}
+
+	cpu_pop_context();
+}
+
+/* IN Latches */
+
+static TIMER_CALLBACK( cop400_inil_tick )
+{
+	cop400_state *cop400 = ptr;
+	UINT8 in;
+	int i;
+
+    cpu_push_context(cop400->device);
+
+	in = IN_IN();
+
+	for (i = 0; i < 4; i++)
+	{
+		cop400->in[i] = (cop400->in[i] << 1) | BIT(in, i);
+
+		if ((cop400->in[i] & 0x07) == 0x04) // 100
+		{
+			IL |= (1 << i);
+		}
+	}
+
+	cpu_pop_context();
+}
+
+/* Microbus */
+
+static TIMER_CALLBACK( cop400_microbus_tick )
+{
+	cop400_state *cop400 = ptr;
+	UINT8 in;
+
+    cpu_push_context(cop400->device);
+
+	in = IN_IN();
+
+	if (!BIT(in, 2))
+	{
+		// chip select
+
+		if (!BIT(in, 1))
+		{
+			// read strobe
+
+			OUT_L(Q);
+
+			cop400->microbus_int = 1;
+		}
+		else if (!BIT(in, 3))
+		{
+			// write strobe
+
+			Q = IN_L();
+
+			cop400->microbus_int = 0;
+		}
+	}
+
+	cpu_pop_context();
+}
 
 /* Arithmetic Instructions */
 
@@ -34,7 +120,7 @@
 
 */
 
-INSTRUCTION(adt)
+INSTRUCTION( adt )
 {
 	A = (A + 10) & 0x0F;
 }
@@ -55,14 +141,14 @@ INSTRUCTION(adt)
 
 */
 
-INSTRUCTION(casc)
+INSTRUCTION( casc )
 {
 	A = (A ^ 0xF) + RAM_R(B) + C;
 
 	if (A > 0xF)
 	{
 		C = 1;
-		skip = 1;
+		cop400->skip = 1;
 		A &= 0xF;
 	}
 	else
@@ -86,10 +172,10 @@ INSTRUCTION(casc)
 
 */
 
-INSTRUCTION(cop420_ret)
+INSTRUCTION( cop420_ret )
 {
 	POP();
-	skip = R.last_skip;
+	cop400->skip = cop400->last_skip;
 }
 
 /* Memory Reference Instructions */
@@ -108,7 +194,7 @@ INSTRUCTION(cop420_ret)
 
 */
 
-INSTRUCTION(cqma)
+INSTRUCTION( cqma )
 {
 	RAM_W(B, Q >> 4);
 	A = Q & 0xF;
@@ -128,7 +214,7 @@ INSTRUCTION(cqma)
 
 */
 
-INSTRUCTION(ldd)
+INSTRUCTION( ldd )
 {
 	UINT8 rd = opcode & 0x3f;
 
@@ -150,7 +236,7 @@ INSTRUCTION(ldd)
 
 */
 
-INSTRUCTION(xabr)
+INSTRUCTION( xabr )
 {
 	UINT8 Br = A & 0x03;
 	UINT8 Bd = B & 0x0f;
@@ -174,12 +260,12 @@ INSTRUCTION(xabr)
 
 */
 
-INSTRUCTION(skt)
+INSTRUCTION( skt )
 {
-	if (R.timerlatch)
+	if (cop400->skt_latch)
 	{
-		R.timerlatch = 0;
-		skip = 1;
+		cop400->skt_latch = 0;
+		cop400->skip = 1;
 	}
 }
 
@@ -198,7 +284,7 @@ INSTRUCTION(skt)
 
 */
 
-INSTRUCTION(inin)
+INSTRUCTION( inin )
 {
 	A = IN_IN();
 }
@@ -218,7 +304,7 @@ INSTRUCTION(inin)
 
 */
 
-INSTRUCTION(cop402m_inin)
+INSTRUCTION( cop402m_inin )
 {
 	A = IN_IN() | 0x02;
 }
@@ -236,7 +322,7 @@ INSTRUCTION(cop402m_inin)
 
 */
 
-INSTRUCTION(inil)
+INSTRUCTION( inil )
 {
 	A = (IL & 0x09) | IN_CKO() << 2;
 
@@ -257,9 +343,9 @@ INSTRUCTION(inil)
 
 */
 
-INSTRUCTION(ogi)
+INSTRUCTION( ogi )
 {
 	UINT4 y = opcode & 0x0f;
 
-	WRITE_G(y);
+	WRITE_G(cop400, y);
 }

@@ -229,10 +229,19 @@ CPU_GET_INFO( rsp );
 CPU_GET_INFO( alpha8201 );
 CPU_GET_INFO( alpha8301 );
 CPU_GET_INFO( cdp1802 );
-CPU_GET_INFO( cop420 );
-CPU_GET_INFO( cop421 );
+CPU_GET_INFO( cop401 );
 CPU_GET_INFO( cop410 );
 CPU_GET_INFO( cop411 );
+CPU_GET_INFO( cop402 );
+CPU_GET_INFO( cop420 );
+CPU_GET_INFO( cop421 );
+CPU_GET_INFO( cop422 );
+CPU_GET_INFO( cop404 );
+CPU_GET_INFO( cop424 );
+CPU_GET_INFO( cop425 );
+CPU_GET_INFO( cop426 );
+CPU_GET_INFO( cop444 );
+CPU_GET_INFO( cop445 );
 CPU_GET_INFO( tmp90840 );
 CPU_GET_INFO( tmp90841 );
 CPU_GET_INFO( tmp91640 );
@@ -801,17 +810,44 @@ static const struct
 #if (HAS_CDP1802)
 	{ CPU_CDP1802, CPU_GET_INFO_NAME(cdp1802) },
 #endif
-#if (HAS_COP420)
-	{ CPU_COP420, CPU_GET_INFO_NAME(cop420) },
-#endif
-#if (HAS_COP421)
-	{ CPU_COP421, CPU_GET_INFO_NAME(cop421) },
+#if (HAS_COP401)
+	{ CPU_COP401, CPU_GET_INFO_NAME(cop401) },
 #endif
 #if (HAS_COP410)
 	{ CPU_COP410, CPU_GET_INFO_NAME(cop410) },
 #endif
 #if (HAS_COP411)
 	{ CPU_COP411, CPU_GET_INFO_NAME(cop411) },
+#endif
+#if (HAS_COP402)
+	{ CPU_COP402, CPU_GET_INFO_NAME(cop402) },
+#endif
+#if (HAS_COP420)
+	{ CPU_COP420, CPU_GET_INFO_NAME(cop420) },
+#endif
+#if (HAS_COP421)
+	{ CPU_COP421, CPU_GET_INFO_NAME(cop421) },
+#endif
+#if (HAS_COP422)
+	{ CPU_COP422, CPU_GET_INFO_NAME(cop422) },
+#endif
+#if (HAS_COP404)
+	{ CPU_COP404, CPU_GET_INFO_NAME(cop404) },
+#endif
+#if (HAS_COP424)
+	{ CPU_COP424, CPU_GET_INFO_NAME(cop424) },
+#endif
+#if (HAS_COP425)
+	{ CPU_COP425, CPU_GET_INFO_NAME(cop425) },
+#endif
+#if (HAS_COP426)
+	{ CPU_COP426, CPU_GET_INFO_NAME(cop426) },
+#endif
+#if (HAS_COP444)
+	{ CPU_COP444, CPU_GET_INFO_NAME(cop444) },
+#endif
+#if (HAS_COP445)
+	{ CPU_COP445, CPU_GET_INFO_NAME(cop445) },
 #endif
 #if (HAS_TLCS90)
 	{ CPU_TMP90840, CPU_GET_INFO_NAME(tmp90840) },
@@ -921,7 +957,7 @@ INLINE char *get_temp_string_buffer(void)
 
 
 /*-------------------------------------------------
-    get_safe_classheader - makes sure that the 
+    get_safe_classheader - makes sure that the
     passed in device is, in fact, a CPU, and
     return the class token
 -------------------------------------------------*/
@@ -944,7 +980,7 @@ INLINE cpu_class_header *get_safe_classheader(const device_config *device)
 INLINE void set_cpu_context(const device_config *oldcpu, const device_config *newcpu)
 {
 	cpu_class_header *classheader;
-	
+
 	/* if nothing is changing, quick exit */
 	if (oldcpu == newcpu)
 		return;
@@ -955,7 +991,7 @@ INLINE void set_cpu_context(const device_config *oldcpu, const device_config *ne
 		classheader = oldcpu->classtoken;
 		(*classheader->get_context)(oldcpu->token);
 	}
-	
+
 	/* swap in the new context if we have one */
 	if (newcpu != NULL)
 	{
@@ -1108,7 +1144,7 @@ int cpunum_get_active(void)
 int cpu_get_index_slow(const device_config *cpu)
 {
 	int cpunum;
-	
+
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(Machine->cpu); cpunum++)
 		if (Machine->cpu[cpunum] == cpu)
 			return cpunum;
@@ -1131,7 +1167,7 @@ void cpu_init(const device_config *device, int index, int clock, cpu_irq_callbac
 
 	memory_set_context(device->machine, index);
 	device->machine->activecpu = device;
-	
+
 	classheader->index = index;
 	classheader->space[ADDRESS_SPACE_PROGRAM] = active_address_space[ADDRESS_SPACE_PROGRAM];
 	classheader->space[ADDRESS_SPACE_DATA] = active_address_space[ADDRESS_SPACE_DATA];
@@ -1139,7 +1175,7 @@ void cpu_init(const device_config *device, int index, int clock, cpu_irq_callbac
 
 	(*classheader->init)(device, index, clock, irqcallback);
 	(*classheader->get_context)(device->token);
-	
+
 	device->machine->activecpu = NULL;
 }
 
@@ -1151,7 +1187,7 @@ void cpu_init(const device_config *device, int index, int clock, cpu_irq_callbac
 void cpu_exit(const device_config *device)
 {
 	cpu_class_header *classheader = get_safe_classheader(device);
-	
+
 	if (classheader->exit != NULL)
 	{
 		set_cpu_context(device->machine->activecpu, device);
@@ -1162,7 +1198,7 @@ void cpu_exit(const device_config *device)
 
 
 /*-------------------------------------------------
-    cpu_get_info_* - return information about a 
+    cpu_get_info_* - return information about a
     live CPU
 -------------------------------------------------*/
 
@@ -1216,7 +1252,7 @@ const char *cpu_get_info_string(const device_config *device, UINT32 state)
 
 
 /*-------------------------------------------------
-    cpu_set_info_* - set information about a 
+    cpu_set_info_* - set information about a
     live CPU
 -------------------------------------------------*/
 
@@ -1256,7 +1292,7 @@ void cpu_set_info_fct(const device_config *device, UINT32 state, genf *data)
 
 
 /*-------------------------------------------------
-    cpu_execute - execute the requested cycles on 
+    cpu_execute - execute the requested cycles on
     a given CPU
 -------------------------------------------------*/
 
@@ -1288,7 +1324,7 @@ void cpu_reset(const device_config *device)
 
 
 /*-------------------------------------------------
-    cpu_read_byte - read a byte from another CPU's 
+    cpu_read_byte - read a byte from another CPU's
     memory space
 -------------------------------------------------*/
 
@@ -1304,7 +1340,7 @@ UINT8 cpu_read_byte(const device_config *device, offs_t address)
 
 
 /*-------------------------------------------------
-    cpu_write_byte - write a byte to another CPU's 
+    cpu_write_byte - write a byte to another CPU's
     memory space
 -------------------------------------------------*/
 
@@ -1317,7 +1353,7 @@ void cpu_write_byte(const device_config *device, offs_t address, UINT8 data)
 
 
 /*-------------------------------------------------
-    cpu_get_physical_pc_byte - return the PC, 
+    cpu_get_physical_pc_byte - return the PC,
     corrected to a byte offset and translated to
     physical space, on a given CPU
 -------------------------------------------------*/
@@ -1335,7 +1371,7 @@ offs_t cpu_get_physical_pc_byte(const device_config *device)
 
 
 /*-------------------------------------------------
-    cpu_dasm - disassemble a line at a given PC 
+    cpu_dasm - disassemble a line at a given PC
     on a given CPU
 -------------------------------------------------*/
 
@@ -1343,7 +1379,7 @@ offs_t cpu_dasm(const device_config *device, char *buffer, offs_t pc, const UINT
 {
 	cpu_class_header *classheader = get_safe_classheader(device);
 	offs_t result = 0;
-	
+
 	cpu_push_context(device);
 
 	/* check for disassembler override */
@@ -1396,7 +1432,7 @@ offs_t cpu_dasm(const device_config *device, char *buffer, offs_t pc, const UINT
 
 
 /*-------------------------------------------------
-    cpu_set_dasm_override - set a dasm override 
+    cpu_set_dasm_override - set a dasm override
     handler
 -------------------------------------------------*/
 
@@ -1413,7 +1449,7 @@ void cpu_set_dasm_override(const device_config *device, cpu_disassemble_func das
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cputype_get_header_template - return a header 
+    cputype_get_header_template - return a header
     template for a given CPU type
 -------------------------------------------------*/
 
@@ -1425,7 +1461,7 @@ const cpu_class_header *cputype_get_header_template(cpu_type cputype)
 
 
 /*-------------------------------------------------
-    cputype_get_info_* - return information about a 
+    cputype_get_info_* - return information about a
     given CPU type
 -------------------------------------------------*/
 

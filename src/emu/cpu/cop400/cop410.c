@@ -13,10 +13,11 @@
 
     TODO:
 
+	- COP413/COP414/COP415/COP405
+	- get rid of LBIOps/InstLen
     - run interrupt test suite
     - run production test suite
     - run microbus test suite
-    - remove LBIops
 
 */
 
@@ -25,53 +26,11 @@
 #include "debugger.h"
 #include "cop400.h"
 
-/* The opcode table now is a combination of cycle counts and function pointers */
-typedef struct {
-	unsigned cycles;
-	void (*function) (UINT8 opcode);
-}	s_opcode;
-
-#define UINT1	UINT8
-#define UINT4	UINT8
-#define UINT6	UINT8
-#define UINT9	UINT16
-
-typedef struct
-{
-	const cop400_interface *intf;
-
-	UINT9 	PC;
-	UINT9	PREVPC;
-	UINT4	A;
-	UINT6	B;
-	UINT1	C;
-	UINT4	EN;
-	UINT4	G;
-	UINT8	Q;
-	UINT9	SA, SB;
-	UINT4	SIO;
-	UINT1	SKL;
-	UINT8   skip, skipLBI;
-	UINT8	G_mask;
-	UINT8	D_mask;
-	UINT8	si;
-	int		microbus_int;
-	int		halt;
-} COP410_Regs;
-
-static COP410_Regs R;
-static int    cop410_ICount;
-
-static int InstLen[256];
-static int LBIops[256];
-
-static emu_timer *cop410_serial_timer;
-
 #include "410ops.c"
 
 /* Opcode Maps */
 
-static const s_opcode opcode_23_map[256]=
+static const s_opcode COP410_OPCODE_23_MAP[]=
 {
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
@@ -110,14 +69,14 @@ static const s_opcode opcode_23_map[256]=
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
 };
 
-static void cop410_op23(UINT8 opcode)
+static void cop410_op23(cop400_state *cop400, UINT8 opcode)
 {
 	UINT8 opcode23 = ROM(PC++);
 
-	(*(opcode_23_map[opcode23].function))(opcode23);
+	(*(COP410_OPCODE_23_MAP[opcode23].function))(cop400, opcode23);
 }
 
-static const s_opcode opcode_33_map[256]=
+static const s_opcode COP410_OPCODE_33_MAP[]=
 {
 	{1, illegal 	},{1, skgbz0	},{1, illegal   },{1, skgbz2	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},
@@ -156,14 +115,14 @@ static const s_opcode opcode_33_map[256]=
 	{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	},{1, illegal 	}
 };
 
-static void cop410_op33(UINT8 opcode)
+static void cop410_op33(cop400_state *cop400, UINT8 opcode)
 {
 	UINT8 opcode33 = ROM(PC++);
 
-	(*(opcode_33_map[opcode33].function))(opcode33);
+	(*(COP410_OPCODE_33_MAP[opcode33].function))(cop400, opcode33);
 }
 
-static const s_opcode opcode_map[256]=
+static const s_opcode COP410_OPCODE_MAP[]=
 {
 	{1, clra		},{1, skmbz0	},{1, xor		},{1, skmbz2		},{1, xis		},{1, ld		},{1, x			},{1, xds		},
 	{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi			},{1, lbi		},{1, lbi		},{1, lbi		},{1, lbi		},
@@ -217,72 +176,72 @@ ADDRESS_MAP_END
  ****************************************************************************/
 static CPU_INIT( cop410 )
 {
+	cop400_state *cop400 = device->token;
 	int i;
 
-	memset(&R, 0, sizeof(R));
-
-	R.intf = (cop400_interface *) device->static_config;
-
-	assert(R.intf != NULL);
+	cop400->device = device;
+	cop400->intf = (cop400_interface *) device->static_config;
 
 	/* set output pin masks */
 
-	R.G_mask = 0x0f;
-	R.D_mask = 0x0f;
+	cop400->g_mask = 0x0f;
+	cop400->d_mask = 0x0f;
 
 	/* set clock divider */
 
-	cpu_set_info_int(device, CPUINFO_INT_CLOCK_DIVIDER, R.intf->cki);
+	cpu_set_info_int(device, CPUINFO_INT_CLOCK_DIVIDER, cop400->intf->cki);
 
 	/* allocate serial timer */
 
-	cop410_serial_timer = timer_alloc(cop410_serial_tick, NULL);
-	timer_adjust_periodic(cop410_serial_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
+	cop400->serial_timer = timer_alloc(cop400_serial_tick, cop400);
+	timer_adjust_periodic(cop400->serial_timer, attotime_zero, index, ATTOTIME_IN_HZ(clock));
 
 	/* initialize instruction length array */
 
-	for (i=0; i<256; i++) InstLen[i]=1;
+	for (i=0; i<256; i++) cop400->InstLen[i]=1;
 
-	InstLen[0x60] = InstLen[0x61] = InstLen[0x68] = InstLen[0x69] = InstLen[0x33] = InstLen[0x23] = 2;
+	cop400->InstLen[0x60] = cop400->InstLen[0x61] = cop400->InstLen[0x68] = cop400->InstLen[0x69] = cop400->InstLen[0x33] = cop400->InstLen[0x23] = 2;
 
 	/* initialize LBI opcode array */
 
-	for (i=0; i<256; i++) LBIops[i] = 0;
-	for (i=0x08; i<0x10; i++) LBIops[i] = 1;
-	for (i=0x18; i<0x20; i++) LBIops[i] = 1;
-	for (i=0x28; i<0x30; i++) LBIops[i] = 1;
-	for (i=0x38; i<0x40; i++) LBIops[i] = 1;
+	for (i=0; i<256; i++) cop400->LBIops[i] = 0;
+	for (i=0x08; i<0x10; i++) cop400->LBIops[i] = 1;
+	for (i=0x18; i<0x20; i++) cop400->LBIops[i] = 1;
+	for (i=0x28; i<0x30; i++) cop400->LBIops[i] = 1;
+	for (i=0x38; i<0x40; i++) cop400->LBIops[i] = 1;
 
 	/* register for state saving */
 
-	state_save_register_item("cop410", device->tag, 0, PC);
-	state_save_register_item("cop410", device->tag, 0, R.PREVPC);
-	state_save_register_item("cop410", device->tag, 0, A);
-	state_save_register_item("cop410", device->tag, 0, B);
-	state_save_register_item("cop410", device->tag, 0, C);
-	state_save_register_item("cop410", device->tag, 0, EN);
-	state_save_register_item("cop410", device->tag, 0, G);
-	state_save_register_item("cop410", device->tag, 0, Q);
-	state_save_register_item("cop410", device->tag, 0, SA);
-	state_save_register_item("cop410", device->tag, 0, SB);
-	state_save_register_item("cop410", device->tag, 0, SIO);
-	state_save_register_item("cop410", device->tag, 0, SKL);
-	state_save_register_item("cop410", device->tag, 0, skip);
-	state_save_register_item("cop410", device->tag, 0, skipLBI);
-	state_save_register_item("cop410", device->tag, 0, R.G_mask);
-	state_save_register_item("cop410", device->tag, 0, R.D_mask);
-	state_save_register_item("cop410", device->tag, 0, R.si);
-	state_save_register_item("cop410", device->tag, 0, R.microbus_int);
-	state_save_register_item("cop410", device->tag, 0, R.halt);
+	state_save_register_item("cop410", device->tag, 0, cop400->pc);
+	state_save_register_item("cop410", device->tag, 0, cop400->prevpc);
+	state_save_register_item("cop410", device->tag, 0, cop400->a);
+	state_save_register_item("cop410", device->tag, 0, cop400->b);
+	state_save_register_item("cop410", device->tag, 0, cop400->c);
+	state_save_register_item("cop410", device->tag, 0, cop400->en);
+	state_save_register_item("cop410", device->tag, 0, cop400->g);
+	state_save_register_item("cop410", device->tag, 0, cop400->q);
+	state_save_register_item("cop410", device->tag, 0, cop400->sa);
+	state_save_register_item("cop410", device->tag, 0, cop400->sb);
+	state_save_register_item("cop410", device->tag, 0, cop400->sio);
+	state_save_register_item("cop410", device->tag, 0, cop400->skl);
+	state_save_register_item("cop410", device->tag, 0, cop400->skip);
+	state_save_register_item("cop410", device->tag, 0, cop400->skip_lbi);
+	state_save_register_item("cop410", device->tag, 0, cop400->g_mask);
+	state_save_register_item("cop410", device->tag, 0, cop400->d_mask);
+	state_save_register_item("cop410", device->tag, 0, cop400->si);
+	state_save_register_item("cop410", device->tag, 0, cop400->microbus_int);
+	state_save_register_item("cop410", device->tag, 0, cop400->halt);
 }
 
 static CPU_INIT( cop411 )
 {
+	cop400_state *cop400 = device->token;
+
 	CPU_INIT_CALL(cop410);
 
 	/* the COP411 is like the COP410, just with less output ports */
-	R.G_mask = 0x07;
-	R.D_mask = 0x03;
+	cop400->g_mask = 0x07;
+	cop400->d_mask = 0x03;
 }
 
 /****************************************************************************
@@ -290,15 +249,18 @@ static CPU_INIT( cop411 )
  ****************************************************************************/
 static CPU_RESET( cop410 )
 {
+	cop400_state *cop400 = device->token;
+
 	PC = 0;
 	A = 0;
 	B = 0;
 	C = 0;
 	OUT_D(0);
 	EN = 0;
-	WRITE_G(0);
+	WRITE_G(cop400, 0);
+	SKL = 1;
 
-	R.halt = 0;
+	cop400->halt = 0;
 }
 
 /****************************************************************************
@@ -306,9 +268,11 @@ static CPU_RESET( cop410 )
  ****************************************************************************/
 static CPU_EXECUTE( cop410 )
 {
+	cop400_state *cop400 = device->token;
+
 	UINT8 opcode;
 
-	cop410_ICount = cycles;
+	cop400->icount = cycles;
 
 	do
 	{
@@ -316,59 +280,65 @@ static CPU_EXECUTE( cop410 )
 
 		debugger_instruction_hook(device->machine, PC);
 
-		if (R.intf->cko == COP400_CKO_HALT_IO_PORT)
+		if (cop400->intf->cko == COP400_CKO_HALT_IO_PORT)
 		{
-			R.halt = IN_CKO();
+			cop400->halt = IN_CKO();
 		}
 
-		if (R.halt) continue;
+		if (cop400->halt)
+		{
+			cop400->icount -= 1;
+			continue;
+		}
 
 		opcode = ROM(PC);
 
-		if (skipLBI == 1)
+		if (cop400->skip_lbi)
 		{
-			if (LBIops[opcode] == 0)
+			if (cop400->LBIops[opcode])
 			{
-				skipLBI = 0;
-			}
-			else {
-				cop410_ICount -= opcode_map[opcode].cycles;
+				cop400->icount -= COP410_OPCODE_MAP[opcode].cycles;
 
-				PC += InstLen[opcode];
+				PC += cop400->InstLen[opcode];
+			}
+			else
+			{
+				cop400->skip_lbi = 0;
 			}
 		}
 
-		if (skipLBI == 0)
+		if (!cop400->skip_lbi)
 		{
-			int inst_cycles = opcode_map[opcode].cycles;
+			int inst_cycles = COP410_OPCODE_MAP[opcode].cycles;
 			PC++;
-			(*(opcode_map[opcode].function))(opcode);
-			cop410_ICount -= inst_cycles;
+			(*(COP410_OPCODE_MAP[opcode].function))(cop400, opcode);
+			cop400->icount -= inst_cycles;
 
 			// skip next instruction?
 
-			if (skip == 1)
+			if (cop400->skip)
 			{
-				void *function = opcode_map[ROM(PC)].function;
+				void *function = COP410_OPCODE_MAP[ROM(PC)].function;
 
 				opcode = ROM(PC);
 
 				if ((function == lqid) || (function == jid))
 				{
-					cop410_ICount -= 1;
+					cop400->icount -= 1;
 				}
 				else
 				{
-					cop410_ICount -= opcode_map[opcode].cycles;
+					cop400->icount -= COP410_OPCODE_MAP[opcode].cycles;
 				}
-				PC += InstLen[opcode];
 
-				skip = 0;
+				PC += cop400->InstLen[opcode];
+
+				cop400->skip = 0;
 			}
 		}
-	} while (cop410_ICount > 0);
+	} while (cop400->icount > 0);
 
-	return cycles - cop410_ICount;
+	return cycles - cop400->icount;
 }
 
 /****************************************************************************
@@ -376,18 +346,13 @@ static CPU_EXECUTE( cop410 )
  ****************************************************************************/
 static CPU_GET_CONTEXT( cop410 )
 {
-	if( dst )
-		*(COP410_Regs*)dst = R;
 }
-
 
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
 static CPU_SET_CONTEXT( cop410 )
 {
-	if( src )
-		R = *(COP410_Regs*)src;
 }
 
 /**************************************************************************
@@ -413,6 +378,8 @@ static CPU_VALIDITY_CHECK( cop410 )
 
 static CPU_SET_INFO( cop410 )
 {
+	cop400_state *cop400 = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -438,10 +405,12 @@ static CPU_SET_INFO( cop410 )
 
 CPU_GET_INFO( cop410 )
 {
+	cop400_state *cop400 = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(R);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cop400_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
@@ -456,7 +425,7 @@ CPU_GET_INFO( cop410 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 9;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 8;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 8;	/* Really 6 */	break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 6;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;					break;
@@ -488,7 +457,7 @@ CPU_GET_INFO( cop410 )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(cop410);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(cop410);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop410_ICount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cop400->icount;			break;
 		case CPUINFO_PTR_VALIDITY_CHECK:				info->validity_check = CPU_VALIDITY_CHECK_NAME(cop410);	break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM:

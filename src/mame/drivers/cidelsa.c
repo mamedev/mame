@@ -579,7 +579,7 @@ static MACHINE_START( draco )
 
 static MACHINE_RESET( cidelsa )
 {
-	cputag_set_input_line(machine, "main", INPUT_LINE_RESET, PULSE_LINE); 
+	cputag_set_input_line(machine, "main", INPUT_LINE_RESET, PULSE_LINE);
 }
 
 /* Machine Drivers */
@@ -689,7 +689,7 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_MACHINE_START(draco)
 	MDRV_MACHINE_RESET(cidelsa)
 
-	MDRV_CPU_ADD("audio", COP420, DRACO_SND_CHR1) // COP402N
+	MDRV_CPU_ADD("audio", COP402, DRACO_SND_CHR1) // COP402N
 	MDRV_CPU_PROGRAM_MAP(draco_sound_map, 0)
 	MDRV_CPU_IO_MAP(draco_sound_io_map, 0)
 	MDRV_CPU_CONFIG(draco_cop_intf)
