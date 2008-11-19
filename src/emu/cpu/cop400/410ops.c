@@ -19,6 +19,10 @@ struct _cop400_state
 {
 	const cop400_interface *intf;
 
+    const address_space *program;
+    const address_space *data;
+    const address_space *io;
+
 	/* registers */
 	UINT10 	pc;	   			/* 11-bit ROM address program counter */
 	UINT10	prevpc;			/* previous value of program counter */
@@ -32,6 +36,8 @@ struct _cop400_state
 	UINT4	sio;			/* 4-bit shift register and counter */
 	UINT1	skl;			/* 1-bit latch for SK output */
 	UINT8	si;				/* serial input */
+	UINT4	h;				/* 4-bit general purpose I/O port (COP440 only) */
+	UINT8	r;				/* 8-bit general purpose I/O port (COP440 only) */
 
 	/* counter */
 	UINT8	t;				/* 8-bit timer */
@@ -77,12 +83,11 @@ typedef struct {
 
 #define INSTRUCTION(mnemonic) INLINE void (mnemonic)(cop400_state *cop400, UINT8 opcode)
 
-#define ROM(addr)			program_decrypted_read_byte(addr)
-#define RAM_W(addr, value)	(data_write_byte_8le(addr, value))
-#define RAM_R(addr)			(data_read_byte_8le(addr))
-
-#define IN(addr)			io_read_byte_8le(addr)
-#define OUT(addr, value)	io_write_byte_8le(addr, value)
+#define ROM(a)			memory_decrypted_read_byte(cop400->program, a)
+#define RAM_R(a)		memory_read_byte_8le(cop400->data, a)
+#define RAM_W(a, v)		memory_write_byte_8le(cop400->data, a, v)
+#define IN(a)			memory_read_byte_8le(cop400->io, a)
+#define OUT(a, v)		memory_write_byte_8le(cop400->io, a, v)
 
 #define A				cop400->a
 #define B				cop400->b

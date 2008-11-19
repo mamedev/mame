@@ -23,6 +23,8 @@
 
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS    1
+
 #include "driver.h"
 #include "cpuintrf.h"
 #include "debugger.h"
@@ -183,6 +185,12 @@ static CPU_INIT( cop420 )
 
 	cop400->device = device;
 	cop400->intf = (cop400_interface *) device->static_config;
+
+	/* get address spaces */
+
+	cop400->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cop400->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	cop400->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	/* set output pin masks */
 

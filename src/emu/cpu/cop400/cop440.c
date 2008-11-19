@@ -13,7 +13,8 @@
 
     TODO:
 
-	- COP441
+	- rename this file to cop444.c
+	- COP440/COP441/COP442 (new registers: 4-bit H, 8-bit R; some new opcodes, 2Kx8 ROM, 160x4 RAM)
 	- COP404 emulation configuration inputs
 	- RAM bus width
 	- get rid of LBIOps/InstLen
@@ -25,6 +26,8 @@
     - run microbus test suite
 
 */
+
+#define NO_LEGACY_MEMORY_HANDLERS    1
 
 #include "driver.h"
 #include "cpuintrf.h"
@@ -194,6 +197,12 @@ static CPU_INIT( cop444 )
 
 	cop400->device = device;
 	cop400->intf = (cop400_interface *) device->static_config;
+
+	/* get address spaces */
+
+	cop400->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cop400->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	cop400->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	/* set output pin masks */
 
