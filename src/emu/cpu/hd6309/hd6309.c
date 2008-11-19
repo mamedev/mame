@@ -102,22 +102,16 @@
 
 *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS	1
+
 #include "debugger.h"
 #include "hd6309.h"
+
+#define BIG_SWITCH 0
 
 #define VERBOSE 0
 
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
-
-#ifndef true
-#define true 1
-#endif
-
-#ifndef false
-#define false 0
-#endif
-
-#define BIG_SWITCH 0
 
 /* 6309 Registers */
 typedef struct _m68_state_t m68_state_t;
@@ -125,29 +119,40 @@ struct _m68_state_t
 {
 	PAIR	pc; 		/* Program counter */
 	PAIR	ppc;		/* Previous program counter */
-	PAIR	d;		/* Accumlator d and w (ab = d, ef = w, abef = q) */
-	PAIR	w;
+	PAIR	d;		/* Accumulator a and b */
+	PAIR	w;		/* Accumlator e and f */
+	/* abef = q */
 	PAIR	dp; 		/* Direct Page register (page in MSB) */
 	PAIR	u, s;		/* Stack pointers */
 	PAIR	x, y;		/* Index registers */
-	PAIR	v;		/* New 6309 register */
 	UINT8	cc;
+	PAIR	v;		/* New 6309 register */
 	UINT8	md; 		/* Special mode register */
 	UINT8	ireg;		/* First opcode */
 	UINT8	irq_state[2];
+
 	int 	extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	int		icount;
 	PAIR	ea; 		/* effective address */
+	
+	/* Memory spaces */
+    const address_space *program;
+    
 	UINT8	int_state;	/* SYNC and CWAI flags */
 	UINT8	nmi_state;
 
 	UINT8	dummy_byte;
 	UINT8 	*regTable[4];
+	
+	UINT8 const *cycle_counts_page0;
+	UINT8 const *cycle_counts_page01;
+	UINT8 const *cycle_counts_page11;
+	UINT8 const *index_cycle;
 };
 
-static void CHECK_IRQ_LINES( m68_state_t *m68_state );
+static void check_irq_lines( m68_state_t *m68_state );
 static void IIError(m68_state_t *m68_state);
 static void DZError(m68_state_t *m68_state);
 
@@ -217,11 +222,29 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 #define M6809_SYNC 	16	/* set when SYNC is waiting for an interrupt */
 #define M6809_LDS		32	/* set when LDS occured at least once */
 
-/* these are re-defined in m68_state->h TO RAM, ROM or functions in cpuintrf.c */
-#define RM(mAddr)		HD6309_RDMEM(mAddr)
-#define WM(mAddr,Value) HD6309_WRMEM(mAddr,Value)
-#define ROP(mAddr)		HD6309_RDOP(mAddr)
-#define ROP_ARG(mAddr)	HD6309_RDOP_ARG(mAddr)
+/****************************************************************************/
+/* Read a byte from given memory location                                   */
+/****************************************************************************/
+#define RM(Addr) ((unsigned)memory_read_byte_8be(m68_state->program, Addr))
+
+/****************************************************************************/
+/* Write a byte to given memory location                                    */
+/****************************************************************************/
+#define WM(Addr,Value) (memory_write_byte_8be(m68_state->program, Addr,Value))
+
+/****************************************************************************/
+/* Z80_RDOP() is identical to Z80_RDMEM() except it is used for reading     */
+/* opcodes. In case of system with memory mapped I/O, this function can be  */
+/* used to greatly speed up emulation                                       */
+/****************************************************************************/
+#define ROP(Addr) ((unsigned)memory_decrypted_read_byte(m68_state->program, Addr))
+
+/****************************************************************************/
+/* Z80_RDOP_ARG() is identical to Z80_RDOP() except it is used for reading  */
+/* opcode arguments. This difference can be used to support systems that    */
+/* use different encoding mechanisms for opcodes and opcode arguments       */
+/****************************************************************************/
+#define ROP_ARG(Addr) ((unsigned)memory_raw_read_byte(m68_state->program, Addr))
 
 /* macros to access memory */
 #define IMMBYTE(b)	b = ROP_ARG(PCD); PC++
@@ -263,11 +286,6 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 
 #define SET_FLAGS8I(a)		{CC|=flags8i[(a)&0xff];}
 #define SET_FLAGS8D(a)		{CC|=flags8d[(a)&0xff];}
-
-static UINT8 const *cycle_counts_page0;
-static UINT8 const *cycle_counts_page01;
-static UINT8 const *cycle_counts_page11;
-static UINT8 const *index_cycle;
 
 /* combos */
 #define SET_NZ8(a)			{SET_N8(a);SET_Z(a);}
@@ -316,12 +334,12 @@ static UINT8 const *index_cycle;
 
 /* macros for convenience */
 #define DIRBYTE(b) {DIRECT;b=RM(EAD);}
-#define DIRWORD(w) {DIRECT;w.d=RM16(EAD);}
+#define DIRWORD(w) {DIRECT;w.d=RM16(m68_state, EAD);}
 #define EXTBYTE(b) {EXTENDED;b=RM(EAD);}
-#define EXTWORD(w) {EXTENDED;w.d=RM16(EAD);}
+#define EXTWORD(w) {EXTENDED;w.d=RM16(m68_state, EAD);}
 
-#define DIRLONG(lng) {DIRECT;lng.w.h=RM16(EAD);lng.w.l=RM16(EAD+2);}
-#define EXTLONG(lng) {EXTENDED;lng.w.h=RM16(EAD);lng.w.l=RM16(EAD+2);}
+#define DIRLONG(lng) {DIRECT;lng.w.h=RM16(m68_state, EAD);lng.w.l=RM16(m68_state, EAD+2);}
+#define EXTLONG(lng) {EXTENDED;lng.w.h=RM16(m68_state, EAD);lng.w.l=RM16(m68_state, EAD+2);}
 
 /* includes the static function prototypes and other tables */
 #include "6309tbl.c"
@@ -349,13 +367,15 @@ static UINT8 const *index_cycle;
 	}									\
 }
 
-INLINE UINT32 RM16( UINT32 Addr )
+/* macros for setting/getting registers in TFR/EXG instructions */
+
+INLINE UINT32 RM16(m68_state_t *m68_state, UINT32 Addr )
 {
 	UINT32 result = RM(Addr) << 8;
 	return result | RM((Addr+1)&0xffff);
 }
 
-INLINE UINT32 RM32( UINT32 Addr )
+INLINE UINT32 RM32(m68_state_t *m68_state, UINT32 Addr )
 {
 	UINT32 result = RM(Addr) << 24;
 	result += RM(Addr+1) << 16;
@@ -364,13 +384,13 @@ INLINE UINT32 RM32( UINT32 Addr )
 	return result;
 }
 
-INLINE void WM16( UINT32 Addr, PAIR *p )
+INLINE void WM16(m68_state_t *m68_state, UINT32 Addr, PAIR *p )
 {
 	WM( Addr, p->b.h );
 	WM( (Addr+1)&0xffff, p->b.l );
 }
 
-INLINE void WM32( UINT32 Addr, PAIR *p )
+INLINE void WM32(m68_state_t *m68_state, UINT32 Addr, PAIR *p )
 {
 	WM( Addr, p->b.h3 );
 	WM( (Addr+1)&0xffff, p->b.h2 );
@@ -382,21 +402,21 @@ static void UpdateState(m68_state_t *m68_state)
 {
 	if ( m68_state->md & MD_EM )
 	{
-		cycle_counts_page0  = ccounts_page0_na;
-		cycle_counts_page01 = ccounts_page01_na;
-		cycle_counts_page11 = ccounts_page11_na;
-		index_cycle         = index_cycle_na;
+		m68_state->cycle_counts_page0  = ccounts_page0_na;
+		m68_state->cycle_counts_page01 = ccounts_page01_na;
+		m68_state->cycle_counts_page11 = ccounts_page11_na;
+		m68_state->index_cycle         = index_cycle_na;
 	}
 	else
 	{
-		cycle_counts_page0  = ccounts_page0_em;
-		cycle_counts_page01 = ccounts_page01_em;
-		cycle_counts_page11 = ccounts_page11_em;
-		index_cycle         = index_cycle_em;
+		m68_state->cycle_counts_page0  = ccounts_page0_em;
+		m68_state->cycle_counts_page01 = ccounts_page01_em;
+		m68_state->cycle_counts_page11 = ccounts_page11_em;
+		m68_state->index_cycle         = index_cycle_em;
 	}
 }
 
-static void CHECK_IRQ_LINES( m68_state_t *m68_state )
+static void check_irq_lines( m68_state_t *m68_state )
 {
 	if( m68_state->irq_state[HD6309_IRQ_LINE] != CLEAR_LINE ||
 		m68_state->irq_state[HD6309_FIRQ_LINE] != CLEAR_LINE )
@@ -440,7 +460,7 @@ static void CHECK_IRQ_LINES( m68_state_t *m68_state )
 			}
 		}
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
-		PCD=RM16(0xfff6);
+		PCD=RM16(m68_state, 0xfff6);
 		CHANGE_PC;
 		(void)(*m68_state->irq_callback)(m68_state->device, HD6309_FIRQ_LINE);
 	}
@@ -474,7 +494,7 @@ static void CHECK_IRQ_LINES( m68_state_t *m68_state )
 			m68_state->extra_cycles += 19;	 /* subtract +19 cycles */
 		}
 		CC |= CC_II;					/* inhibit IRQ */
-		PCD=RM16(0xfff8);
+		PCD=RM16(m68_state, 0xfff8);
 		CHANGE_PC;
 		(void)(*m68_state->irq_callback)(m68_state->device, HD6309_IRQ_LINE);
 	}
@@ -485,7 +505,6 @@ static void CHECK_IRQ_LINES( m68_state_t *m68_state )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-
 static CPU_GET_CONTEXT( hd6309 )
 {
 }
@@ -495,12 +514,6 @@ static CPU_GET_CONTEXT( hd6309 )
  ****************************************************************************/
 static CPU_SET_CONTEXT( hd6309 )
 {
-	m68_state_t *m68_state = src;
-
-	CHANGE_PC;
-
-	CHECK_IRQ_LINES(m68_state);
-	UpdateState(m68_state);
 }
 
 static STATE_POSTLOAD( hd6309_postload )
@@ -521,7 +534,9 @@ static CPU_INIT( hd6309 )
 	
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
-	
+
+	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+
 	/* setup regtable */
 	
 	m68_state->regTable[0] = &(CC);
@@ -555,8 +570,7 @@ static CPU_RESET( hd6309 )
 	m68_state->int_state = 0;
 	m68_state->nmi_state = CLEAR_LINE;
 	m68_state->irq_state[0] = CLEAR_LINE;
-	/*FIXME: BUG ?*/
-	m68_state->irq_state[0] = CLEAR_LINE;
+	m68_state->irq_state[1] = CLEAR_LINE;
 
 	DPD = 0;			/* Reset direct page register */
 
@@ -564,7 +578,7 @@ static CPU_RESET( hd6309 )
 	CC |= CC_II;		/* IRQ disabled */
 	CC |= CC_IF;		/* FIRQ disabled */
 
-	PCD = RM16(0xfffe);
+	PCD = RM16(m68_state, 0xfffe);
 	CHANGE_PC;
 	UpdateState(m68_state);
 }
@@ -617,7 +631,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 			m68_state->extra_cycles += 19;	/* subtract +19 cycles next time */
 		}
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
-		PCD = RM16(0xfffc);
+		PCD = RM16(m68_state, 0xfffc);
 		CHANGE_PC;
 	}
 	else if (irqline < 2)
@@ -625,7 +639,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 		LOG(("HD6309#%d set_irq_line %d, %d (PC=%4.4X)\n", cpunum_get_active(), irqline, state, pPC.d));
 		m68_state->irq_state[irqline] = state;
 		if (state == CLEAR_LINE) return;
-		CHECK_IRQ_LINES(m68_state);
+		check_irq_lines(m68_state);
 	}
 }
 
@@ -641,6 +655,8 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 	
 	m68_state->icount = cycles - m68_state->extra_cycles;
 	m68_state->extra_cycles = 0;
+
+	check_irq_lines(m68_state);
 
 	if (m68_state->int_state & (M6809_CWAI | M6809_SYNC))
 	{
@@ -921,7 +937,7 @@ static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 			(*hd6309_main[m68_state->ireg])(m68_state);
 #endif    /* BIG_SWITCH */
 
-			m68_state->icount -= cycle_counts_page0[m68_state->ireg];
+			m68_state->icount -= m68_state->cycle_counts_page0[m68_state->ireg];
 
 		} while( m68_state->icount > 0 );
 
@@ -1092,22 +1108,22 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0x8e: EA=X+W;													break;
 	case 0x8f: EA=W;		 											break;
 
-	case 0x90: EA=W;								EAD=RM16(EAD);		break;
-	case 0x91: EA=X;	X+=2;						EAD=RM16(EAD);		break;
+	case 0x90: EA=W;								EAD=RM16(m68_state, EAD);		break;
+	case 0x91: EA=X;	X+=2;						EAD=RM16(m68_state, EAD);		break;
 	case 0x92: IIError(m68_state);												break;
-	case 0x93: X-=2;	EA=X;						EAD=RM16(EAD);		break;
-	case 0x94: EA=X;								EAD=RM16(EAD);		break;
-	case 0x95: EA=X+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0x96: EA=X+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0x97: EA=X+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0x98: IMMBYTE(EA); 	EA=X+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0x99: IMMWORD(EAP); 	EA+=X;				EAD=RM16(EAD);		break;
-	case 0x9a: EA=X+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0x9b: EA=X+D;								EAD=RM16(EAD);		break;
-	case 0x9c: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0x9d: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0x9e: EA=X+W;								EAD=RM16(EAD);		break;
-	case 0x9f: IMMWORD(EAP); 						EAD=RM16(EAD);		break;
+	case 0x93: X-=2;	EA=X;						EAD=RM16(m68_state, EAD);		break;
+	case 0x94: EA=X;								EAD=RM16(m68_state, EAD);		break;
+	case 0x95: EA=X+SIGNED(B);						EAD=RM16(m68_state, EAD);		break;
+	case 0x96: EA=X+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
+	case 0x97: EA=X+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
+	case 0x98: IMMBYTE(EA); 	EA=X+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0x99: IMMWORD(EAP); 	EA+=X;				EAD=RM16(m68_state, EAD);		break;
+	case 0x9a: EA=X+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
+	case 0x9b: EA=X+D;								EAD=RM16(m68_state, EAD);		break;
+	case 0x9c: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0x9d: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0x9e: EA=X+W;								EAD=RM16(m68_state, EAD);		break;
+	case 0x9f: IMMWORD(EAP); 						EAD=RM16(m68_state, EAD);		break;
 
 	case 0xa0: EA=Y;	Y++;											break;
 	case 0xa1: EA=Y;	Y+=2;											break;
@@ -1126,21 +1142,21 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xae: EA=Y+W;													break;
 	case 0xaf: IMMWORD(EAP);     EA+=W;									break;
 
-	case 0xb0: IMMWORD(EAP); 	EA+=W;				EAD=RM16(EAD);		break;
-	case 0xb1: EA=Y;	Y+=2;						EAD=RM16(EAD);		break;
+	case 0xb0: IMMWORD(EAP); 	EA+=W;				EAD=RM16(m68_state, EAD);		break;
+	case 0xb1: EA=Y;	Y+=2;						EAD=RM16(m68_state, EAD);		break;
 	case 0xb2: IIError(m68_state);												break;
-	case 0xb3: Y-=2;	EA=Y;						EAD=RM16(EAD);		break;
-	case 0xb4: EA=Y;								EAD=RM16(EAD);		break;
-	case 0xb5: EA=Y+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0xb6: EA=Y+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0xb7: EA=Y+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0xb8: IMMBYTE(EA); 	EA=Y+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xb9: IMMWORD(EAP); 	EA+=Y;				EAD=RM16(EAD);		break;
-	case 0xba: EA=Y+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0xbb: EA=Y+D;								EAD=RM16(EAD);		break;
-	case 0xbc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xbd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0xbe: EA=Y+W;								EAD=RM16(EAD);		break;
+	case 0xb3: Y-=2;	EA=Y;						EAD=RM16(m68_state, EAD);		break;
+	case 0xb4: EA=Y;								EAD=RM16(m68_state, EAD);		break;
+	case 0xb5: EA=Y+SIGNED(B);						EAD=RM16(m68_state, EAD);		break;
+	case 0xb6: EA=Y+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
+	case 0xb7: EA=Y+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
+	case 0xb8: IMMBYTE(EA); 	EA=Y+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xb9: IMMWORD(EAP); 	EA+=Y;				EAD=RM16(m68_state, EAD);		break;
+	case 0xba: EA=Y+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
+	case 0xbb: EA=Y+D;								EAD=RM16(m68_state, EAD);		break;
+	case 0xbc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xbd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0xbe: EA=Y+W;								EAD=RM16(m68_state, EAD);		break;
 	case 0xbf: IIError(m68_state);												break;
 
 	case 0xc0: EA=U;			U++;									break;
@@ -1160,21 +1176,21 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xce: EA=U+W;													break;
 	case 0xcf: EA=W;            W+=2;									break;
 
-	case 0xd0: EA=W;	W+=2;						EAD=RM16(EAD);		break;
-	case 0xd1: EA=U;	U+=2;						EAD=RM16(EAD);		break;
+	case 0xd0: EA=W;	W+=2;						EAD=RM16(m68_state, EAD);		break;
+	case 0xd1: EA=U;	U+=2;						EAD=RM16(m68_state, EAD);		break;
 	case 0xd2: IIError(m68_state);												break;
-	case 0xd3: U-=2;	EA=U;						EAD=RM16(EAD);		break;
-	case 0xd4: EA=U;								EAD=RM16(EAD);		break;
-	case 0xd5: EA=U+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0xd6: EA=U+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0xd7: EA=U+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0xd8: IMMBYTE(EA); 	EA=U+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xd9: IMMWORD(EAP); 	EA+=U;				EAD=RM16(EAD);		break;
-	case 0xda: EA=U+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0xdb: EA=U+D;								EAD=RM16(EAD);		break;
-	case 0xdc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xdd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0xde: EA=U+W;								EAD=RM16(EAD);		break;
+	case 0xd3: U-=2;	EA=U;						EAD=RM16(m68_state, EAD);		break;
+	case 0xd4: EA=U;								EAD=RM16(m68_state, EAD);		break;
+	case 0xd5: EA=U+SIGNED(B);						EAD=RM16(m68_state, EAD);		break;
+	case 0xd6: EA=U+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
+	case 0xd7: EA=U+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
+	case 0xd8: IMMBYTE(EA); 	EA=U+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xd9: IMMWORD(EAP); 	EA+=U;				EAD=RM16(m68_state, EAD);		break;
+	case 0xda: EA=U+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
+	case 0xdb: EA=U+D;								EAD=RM16(m68_state, EAD);		break;
+	case 0xdc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xdd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0xde: EA=U+W;								EAD=RM16(m68_state, EAD);		break;
 	case 0xdf: IIError(m68_state);												break;
 
 	case 0xe0: EA=S;	S++;											break;
@@ -1194,25 +1210,25 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 	case 0xee: EA=S+W;													break;
 	case 0xef: W-=2;	EA=W;											break;
 
-	case 0xf0: W-=2;	EA=W;						EAD=RM16(EAD);		break;
-	case 0xf1: EA=S;	S+=2;						EAD=RM16(EAD);		break;
+	case 0xf0: W-=2;	EA=W;						EAD=RM16(m68_state, EAD);		break;
+	case 0xf1: EA=S;	S+=2;						EAD=RM16(m68_state, EAD);		break;
 	case 0xf2: IIError(m68_state);												break;
-	case 0xf3: S-=2;	EA=S;						EAD=RM16(EAD);		break;
-	case 0xf4: EA=S;								EAD=RM16(EAD);		break;
-	case 0xf5: EA=S+SIGNED(B);						EAD=RM16(EAD);		break;
-	case 0xf6: EA=S+SIGNED(A);						EAD=RM16(EAD);		break;
-	case 0xf7: EA=S+SIGNED(E);						EAD=RM16(EAD);		break;
-	case 0xf8: IMMBYTE(EA); 	EA=S+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xf9: IMMWORD(EAP); 	EA+=S;				EAD=RM16(EAD);		break;
-	case 0xfa: EA=S+SIGNED(F);						EAD=RM16(EAD);		break;
-	case 0xfb: EA=S+D;								EAD=RM16(EAD);		break;
-	case 0xfc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(EAD);		break;
-	case 0xfd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(EAD);		break;
-	case 0xfe: EA=S+W;								EAD=RM16(EAD);		break;
+	case 0xf3: S-=2;	EA=S;						EAD=RM16(m68_state, EAD);		break;
+	case 0xf4: EA=S;								EAD=RM16(m68_state, EAD);		break;
+	case 0xf5: EA=S+SIGNED(B);						EAD=RM16(m68_state, EAD);		break;
+	case 0xf6: EA=S+SIGNED(A);						EAD=RM16(m68_state, EAD);		break;
+	case 0xf7: EA=S+SIGNED(E);						EAD=RM16(m68_state, EAD);		break;
+	case 0xf8: IMMBYTE(EA); 	EA=S+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xf9: IMMWORD(EAP); 	EA+=S;				EAD=RM16(m68_state, EAD);		break;
+	case 0xfa: EA=S+SIGNED(F);						EAD=RM16(m68_state, EAD);		break;
+	case 0xfb: EA=S+D;								EAD=RM16(m68_state, EAD);		break;
+	case 0xfc: IMMBYTE(EA); 	EA=PC+SIGNED(EA);	EAD=RM16(m68_state, EAD);		break;
+	case 0xfd: IMMWORD(EAP); 	EA+=PC; 			EAD=RM16(m68_state, EAD);		break;
+	case 0xfe: EA=S+W;								EAD=RM16(m68_state, EAD);		break;
 	case 0xff: IIError(m68_state);												break;
 	}
 
-	m68_state->icount -= index_cycle[postbyte];
+	m68_state->icount -= m68_state->index_cycle[postbyte];
 }
 
 
@@ -1235,7 +1251,7 @@ static CPU_SET_INFO( hd6309 )
 		case CPUINFO_INT_REGISTER + HD6309_PC:		PC = info->i; CHANGE_PC;					break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + HD6309_S:		S = info->i;								break;
-		case CPUINFO_INT_REGISTER + HD6309_CC:		CC = info->i; CHECK_IRQ_LINES(m68_state);			break;
+		case CPUINFO_INT_REGISTER + HD6309_CC:		CC = info->i; check_irq_lines(m68_state);			break;
 		case CPUINFO_INT_REGISTER + HD6309_MD:		MD = info->i; UpdateState(m68_state);				break;
 		case CPUINFO_INT_REGISTER + HD6309_U: 		U = info->i;								break;
 		case CPUINFO_INT_REGISTER + HD6309_A: 		A = info->i;								break;
@@ -1257,7 +1273,7 @@ static CPU_SET_INFO( hd6309 )
 
 CPU_GET_INFO( hd6309 )
 {
-	m68_state_t *m68_state = device ? device->token : NULL;
+	m68_state_t *m68_state = (device != NULL) ? device->token : NULL;
 
 	switch (state)
 	{

@@ -14,13 +14,14 @@ HNZVC
 
 #define OP_HANDLER(_name) INLINE void _name (m68_state_t *m68_state)
 
-#ifdef NEW
-static void illegal )
-#else
 OP_HANDLER( illegal )
-#endif
 {
 	logerror("M6809: illegal opcode at %04x\n",PC);
+}
+
+static void IIError(m68_state_t *m68_state)
+{
+	illegal(m68_state);		// Vector to Trap handler
 }
 
 /* $00 NEG direct ?**** */
@@ -179,8 +180,8 @@ OP_HANDLER( sync )
 	/* This doesn't require the corresponding interrupt to be enabled: if it */
 	/* is disabled, execution continues with the next instruction. */
 	m68_state->int_state |= M6809_SYNC;	 /* HJB 990227 */
-	CHECK_IRQ_LINES(m68_state);
-	/* if M6809_SYNC has not been cleared by CHECK_IRQ_LINES(m68_state),
+	check_irq_lines(m68_state);
+	/* if M6809_SYNC has not been cleared by check_irq_lines(m68_state),
      * stop execution until the interrupt lines change. */
 	if( m68_state->int_state & M6809_SYNC )
 		if (m68_state->icount > 0) m68_state->icount = 0;
@@ -234,7 +235,7 @@ OP_HANDLER( orcc )
 	UINT8 t;
 	IMMBYTE(t);
 	CC |= t;
-	CHECK_IRQ_LINES(m68_state);	/* HJB 990116 */
+	check_irq_lines(m68_state);	/* HJB 990116 */
 }
 
 /* $1B ILLEGAL */
@@ -245,7 +246,7 @@ OP_HANDLER( andcc )
 	UINT8 t;
 	IMMBYTE(t);
 	CC &= t;
-	CHECK_IRQ_LINES(m68_state);	/* HJB 990116 */
+	check_irq_lines(m68_state);	/* HJB 990116 */
 }
 
 /* $1D SEX inherent -**-- */
@@ -624,7 +625,7 @@ OP_HANDLER( puls )
 	if( t&0x80 ) { PULLWORD(PCD); CHANGE_PC; m68_state->icount -= 2; }
 
 	/* HJB 990225: moved check after all PULLs */
-	if( t&0x01 ) { CHECK_IRQ_LINES(m68_state); }
+	if( t&0x01 ) { check_irq_lines(m68_state); }
 }
 
 /* $36 PSHU inherent ----- */
@@ -657,7 +658,7 @@ OP_HANDLER( pulu )
 	if( t&0x80 ) { PULUWORD(PCD); CHANGE_PC; m68_state->icount -= 2; }
 
 	/* HJB 990225: moved check after all PULLs */
-	if( t&0x01 ) { CHECK_IRQ_LINES(m68_state); }
+	if( t&0x01 ) { check_irq_lines(m68_state); }
 }
 
 /* $38 ILLEGAL */
@@ -693,7 +694,7 @@ OP_HANDLER( rti )
 	}
 	PULLWORD(PCD);
 	CHANGE_PC;
-	CHECK_IRQ_LINES(m68_state);	/* HJB 990116 */
+	check_irq_lines(m68_state);	/* HJB 990116 */
 }
 
 /* $3C CWAI inherent ----1 */
@@ -717,7 +718,7 @@ OP_HANDLER( cwai )
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
 	m68_state->int_state |= M6809_CWAI;	 /* HJB 990228 */
-	CHECK_IRQ_LINES(m68_state);    /* HJB 990116 */
+	check_irq_lines(m68_state);    /* HJB 990116 */
 	if( m68_state->int_state & M6809_CWAI )
 		if( m68_state->icount > 0 )
 			m68_state->icount = 0;
@@ -747,7 +748,7 @@ OP_HANDLER( swi )
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
 	CC |= CC_IF | CC_II;	/* inhibit FIRQ and IRQ */
-	PCD=RM16(0xfffa);
+	PCD=RM16(m68_state, 0xfffa);
 	CHANGE_PC;
 }
 
@@ -763,7 +764,7 @@ OP_HANDLER( swi2 )
 	PUSHBYTE(B);
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
-	PCD = RM16(0xfff4);
+	PCD = RM16(m68_state, 0xfff4);
 	CHANGE_PC;
 }
 
@@ -779,7 +780,7 @@ OP_HANDLER( swi3 )
 	PUSHBYTE(B);
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
-	PCD = RM16(0xfff2);
+	PCD = RM16(m68_state, 0xfff2);
 	CHANGE_PC;
 }
 
@@ -1480,7 +1481,7 @@ OP_HANDLER( stx_im )
 	CLR_NZV;
 	SET_NZ16(X);
 	IMM16;
-	WM16(EAD,&pX);
+	WM16(m68_state, EAD,&pX);
 }
 
 /* is this a legal instruction? */
@@ -1490,7 +1491,7 @@ OP_HANDLER( sty_im )
 	CLR_NZV;
 	SET_NZ16(Y);
 	IMM16;
-	WM16(EAD,&pY);
+	WM16(m68_state, EAD,&pY);
 }
 
 /* $90 SUBA direct ?**** */
@@ -1710,7 +1711,7 @@ OP_HANDLER( stx_di )
 	CLR_NZV;
 	SET_NZ16(X);
 	DIRECT;
-	WM16(EAD,&pX);
+	WM16(m68_state, EAD,&pX);
 }
 
 /* $109F STY direct -**0- */
@@ -1719,7 +1720,7 @@ OP_HANDLER( sty_di )
 	CLR_NZV;
 	SET_NZ16(Y);
 	DIRECT;
-	WM16(EAD,&pY);
+	WM16(m68_state, EAD,&pY);
 }
 
 /* $a0 SUBA indexed ?**** */
@@ -1763,7 +1764,7 @@ OP_HANDLER( subd_ix )
 	UINT32 r,d;
 	PAIR b;
 	fetch_effective_address(m68_state);
-	b.d=RM16(EAD);
+	b.d=RM16(m68_state, EAD);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1777,7 +1778,7 @@ OP_HANDLER( cmpd_ix )
 	UINT32 r,d;
 	PAIR b;
 	fetch_effective_address(m68_state);
-	b.d=RM16(EAD);
+	b.d=RM16(m68_state, EAD);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1790,7 +1791,7 @@ OP_HANDLER( cmpu_ix )
 	UINT32 r;
 	PAIR b;
 	fetch_effective_address(m68_state);
-	b.d=RM16(EAD);
+	b.d=RM16(m68_state, EAD);
 	r = U - b.d;
 	CLR_NZVC;
 	SET_FLAGS16(U,b.d,r);
@@ -1883,7 +1884,7 @@ OP_HANDLER( cmpx_ix )
 	UINT32 r,d;
 	PAIR b;
 	fetch_effective_address(m68_state);
-	b.d=RM16(EAD);
+	b.d=RM16(m68_state, EAD);
 	d = X;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1896,7 +1897,7 @@ OP_HANDLER( cmpy_ix )
 	UINT32 r,d;
 	PAIR b;
 	fetch_effective_address(m68_state);
-	b.d=RM16(EAD);
+	b.d=RM16(m68_state, EAD);
 	d = Y;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1909,7 +1910,7 @@ OP_HANDLER( cmps_ix )
 	UINT32 r,d;
 	PAIR b;
 	fetch_effective_address(m68_state);
-	b.d=RM16(EAD);
+	b.d=RM16(m68_state, EAD);
 	d = S;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1929,7 +1930,7 @@ OP_HANDLER( jsr_ix )
 OP_HANDLER( ldx_ix )
 {
 	fetch_effective_address(m68_state);
-	X=RM16(EAD);
+	X=RM16(m68_state, EAD);
 	CLR_NZV;
 	SET_NZ16(X);
 }
@@ -1938,7 +1939,7 @@ OP_HANDLER( ldx_ix )
 OP_HANDLER( ldy_ix )
 {
 	fetch_effective_address(m68_state);
-	Y=RM16(EAD);
+	Y=RM16(m68_state, EAD);
 	CLR_NZV;
 	SET_NZ16(Y);
 }
@@ -1949,7 +1950,7 @@ OP_HANDLER( stx_ix )
 	fetch_effective_address(m68_state);
 	CLR_NZV;
 	SET_NZ16(X);
-	WM16(EAD,&pX);
+	WM16(m68_state, EAD,&pX);
 }
 
 /* $10aF STY indexed -**0- */
@@ -1958,7 +1959,7 @@ OP_HANDLER( sty_ix )
 	fetch_effective_address(m68_state);
 	CLR_NZV;
 	SET_NZ16(Y);
-	WM16(EAD,&pY);
+	WM16(m68_state, EAD,&pY);
 }
 
 /* $b0 SUBA extended ?**** */
@@ -2177,7 +2178,7 @@ OP_HANDLER( stx_ex )
 	CLR_NZV;
 	SET_NZ16(X);
 	EXTENDED;
-	WM16(EAD,&pX);
+	WM16(m68_state, EAD,&pX);
 }
 
 /* $10bF STY extended -**0- */
@@ -2186,7 +2187,7 @@ OP_HANDLER( sty_ex )
 	CLR_NZV;
 	SET_NZ16(Y);
 	EXTENDED;
-	WM16(EAD,&pY);
+	WM16(m68_state, EAD,&pY);
 }
 
 /* $c0 SUBB immediate ?**** */
@@ -2330,7 +2331,7 @@ OP_HANDLER( std_im )
 	CLR_NZV;
 	SET_NZ16(D);
     IMM16;
-	WM16(EAD,&pD);
+	WM16(m68_state, EAD,&pD);
 }
 
 /* $cE LDU (LDS) immediate -**0- */
@@ -2357,7 +2358,7 @@ OP_HANDLER( stu_im )
 	CLR_NZV;
 	SET_NZ16(U);
     IMM16;
-	WM16(EAD,&pU);
+	WM16(m68_state, EAD,&pU);
 }
 
 /* is this a legal instruction? */
@@ -2367,7 +2368,7 @@ OP_HANDLER( sts_im )
 	CLR_NZV;
 	SET_NZ16(S);
     IMM16;
-	WM16(EAD,&pS);
+	WM16(m68_state, EAD,&pS);
 }
 
 /* $d0 SUBB direct ?**** */
@@ -2510,7 +2511,7 @@ OP_HANDLER( std_di )
 	CLR_NZV;
 	SET_NZ16(D);
 	DIRECT;
-	WM16(EAD,&pD);
+	WM16(m68_state, EAD,&pD);
 }
 
 /* $dE LDU (LDS) direct -**0- */
@@ -2536,7 +2537,7 @@ OP_HANDLER( stu_di )
 	CLR_NZV;
 	SET_NZ16(U);
 	DIRECT;
-	WM16(EAD,&pU);
+	WM16(m68_state, EAD,&pU);
 }
 
 /* $10dF STS direct -**0- */
@@ -2545,7 +2546,7 @@ OP_HANDLER( sts_di )
 	CLR_NZV;
 	SET_NZ16(S);
 	DIRECT;
-	WM16(EAD,&pS);
+	WM16(m68_state, EAD,&pS);
 }
 
 /* $e0 SUBB indexed ?**** */
@@ -2589,7 +2590,7 @@ OP_HANDLER( addd_ix )
 	UINT32 r,d;
     PAIR b;
     fetch_effective_address(m68_state);
-	b.d=RM16(EAD);
+	b.d=RM16(m68_state, EAD);
 	d = D;
 	r = d + b.d;
 	CLR_NZVC;
@@ -2682,7 +2683,7 @@ OP_HANDLER( addb_ix )
 OP_HANDLER( ldd_ix )
 {
 	fetch_effective_address(m68_state);
-	D=RM16(EAD);
+	D=RM16(m68_state, EAD);
 	CLR_NZV; SET_NZ16(D);
 }
 
@@ -2692,14 +2693,14 @@ OP_HANDLER( std_ix )
 	fetch_effective_address(m68_state);
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&pD);
+	WM16(m68_state, EAD,&pD);
 }
 
 /* $eE LDU (LDS) indexed -**0- */
 OP_HANDLER( ldu_ix )
 {
 	fetch_effective_address(m68_state);
-	U=RM16(EAD);
+	U=RM16(m68_state, EAD);
 	CLR_NZV;
 	SET_NZ16(U);
 }
@@ -2708,7 +2709,7 @@ OP_HANDLER( ldu_ix )
 OP_HANDLER( lds_ix )
 {
 	fetch_effective_address(m68_state);
-	S=RM16(EAD);
+	S=RM16(m68_state, EAD);
 	CLR_NZV;
 	SET_NZ16(S);
 	m68_state->int_state |= M6809_LDS;
@@ -2720,7 +2721,7 @@ OP_HANDLER( stu_ix )
 	fetch_effective_address(m68_state);
 	CLR_NZV;
 	SET_NZ16(U);
-	WM16(EAD,&pU);
+	WM16(m68_state, EAD,&pU);
 }
 
 /* $10eF STS indexed -**0- */
@@ -2729,7 +2730,7 @@ OP_HANDLER( sts_ix )
 	fetch_effective_address(m68_state);
 	CLR_NZV;
 	SET_NZ16(S);
-	WM16(EAD,&pS);
+	WM16(m68_state, EAD,&pS);
 }
 
 /* $f0 SUBB extended ?**** */
@@ -2872,7 +2873,7 @@ OP_HANDLER( std_ex )
 	CLR_NZV;
 	SET_NZ16(D);
 	EXTENDED;
-	WM16(EAD,&pD);
+	WM16(m68_state, EAD,&pD);
 }
 
 /* $fE LDU (LDS) extended -**0- */
@@ -2898,7 +2899,7 @@ OP_HANDLER( stu_ex )
 	CLR_NZV;
 	SET_NZ16(U);
 	EXTENDED;
-	WM16(EAD,&pU);
+	WM16(m68_state, EAD,&pU);
 }
 
 /* $10fF STS extended -**0- */
@@ -2907,7 +2908,7 @@ OP_HANDLER( sts_ex )
 	CLR_NZV;
 	SET_NZ16(S);
 	EXTENDED;
-	WM16(EAD,&pS);
+	WM16(m68_state, EAD,&pS);
 }
 
 /* $10xx opcodes */
@@ -2967,7 +2968,7 @@ OP_HANDLER( pref10 )
 		case 0xfe: lds_ex(m68_state);	m68_state->icount-=7;	break;
 		case 0xff: sts_ex(m68_state);	m68_state->icount-=7;	break;
 
-		default:   illegal(m68_state);						break;
+		default:   IIError(m68_state);						break;
 	}
 }
 
@@ -2992,8 +2993,7 @@ OP_HANDLER( pref11 )
 		case 0xb3: cmpu_ex(m68_state);	m68_state->icount-=8;	break;
 		case 0xbc: cmps_ex(m68_state);	m68_state->icount-=8;	break;
 
-		default:   illegal(m68_state);						break;
+		default:   IIError(m68_state);						break;
 	}
 }
-
 

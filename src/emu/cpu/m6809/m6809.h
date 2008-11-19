@@ -21,40 +21,8 @@ CPU_GET_INFO( m6809 );
 /* M6809e has LIC line to indicate opcode/data fetch */
 CPU_GET_INFO( m6809e );
 
-/****************************************************************************/
-/* Read a byte from given memory location                                   */
-/****************************************************************************/
-/* ASG 971005 -- changed to program_read_byte_8/cpu_writemem16 */
-#define M6809_RDMEM(Addr) ((unsigned)program_read_byte_8be(Addr))
-
-/****************************************************************************/
-/* Write a byte to given memory location                                    */
-/****************************************************************************/
-#define M6809_WRMEM(Addr,Value) (program_write_byte_8be(Addr,Value))
-
-/****************************************************************************/
-/* Z80_RDOP() is identical to Z80_RDMEM() except it is used for reading     */
-/* opcodes. In case of system with memory mapped I/O, this function can be  */
-/* used to greatly speed up emulation                                       */
-/****************************************************************************/
-#define M6809_RDOP(Addr) ((unsigned)program_decrypted_read_byte(Addr))
-
-/****************************************************************************/
-/* Z80_RDOP_ARG() is identical to Z80_RDOP() except it is used for reading  */
-/* opcode arguments. This difference can be used to support systems that    */
-/* use different encoding mechanisms for opcodes and opcode arguments       */
-/****************************************************************************/
-#define M6809_RDOP_ARG(Addr) ((unsigned)program_raw_read_byte(Addr))
-
-#ifndef FALSE
-#    define FALSE 0
-#endif
-#ifndef TRUE
-#    define TRUE (!FALSE)
-#endif
 
 CPU_DISASSEMBLE( m6809 );
-
 
 typedef struct _m6809_config m6809_config;
 struct _m6809_config
