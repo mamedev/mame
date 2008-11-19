@@ -1321,7 +1321,7 @@ void cpu_reset(const device_config *device)
 	cpu_class_header *classheader = get_safe_classheader(device);
 
 	cpu_push_context(device);
-	memory_set_direct_region(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0);
+	change_pc(0);
 	(*classheader->reset)(device);
 	cpu_pop_context();
 }

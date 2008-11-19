@@ -1596,7 +1596,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 
 	/* reset the opcode base */
 	if (dasmdata->cpunum == original_cpunum)
-		memory_set_direct_region(space, cpu_get_physical_pc_byte(Machine->activecpu));
+		change_pc(cpu_get_physical_pc_byte(Machine->activecpu));
 
 	/* update opcode base information */
 	dasmdata->last_direct_decrypted = space->direct.decrypted;

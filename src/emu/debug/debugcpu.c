@@ -2086,7 +2086,7 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
 	address &= info->space[ADDRESS_SPACE_PROGRAM].physbytemask;
 
 	/* adjust the address */
-	memory_set_direct_region(cpu_get_address_space(info->device, ADDRESS_SPACE_PROGRAM), address);
+	change_pc(address);
 
 	switch (info->space[ADDRESS_SPACE_PROGRAM].databytes * 10 + size)
 	{

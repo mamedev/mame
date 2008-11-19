@@ -301,7 +301,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc, const opcode_
 	}
 
 	/* get a pointer to the physical address */
-	memory_set_direct_region(drcfe->program, desc->physpc);
+	change_pc(desc->physpc);
 	desc->opptr.v = program_decrypted_read_ptr(desc->physpc ^ drcfe->codexor);
 	assert(desc->opptr.v != NULL);
 	if (desc->opptr.v == NULL)

@@ -279,9 +279,11 @@ static bank_info 			bankdata[STATIC_COUNT];			/* data gathered for each bank */
 
 static UINT8 *				wptable;						/* watchpoint-fill table */
 
+static void dummy_change_pc(offs_t byteaddress) { }
+
 #define ACCESSOR_GROUP(type, width) \
 { \
-	type##_set_direct_region, \
+	dummy_change_pc, \
 	type##_read_byte_##width, \
 	type##_read_word_##width, \
 	type##_read_word_masked_##width, \
@@ -1109,7 +1111,7 @@ direct_update_func memory_set_direct_update_handler(const address_space *space, 
     update the opcode base for the given address
 -------------------------------------------------*/
 
-void memory_set_direct_region(const address_space *space, offs_t byteaddress)
+int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 {
 	address_space *spacerw = (address_space *)space;
 	UINT8 *base = NULL, *based = NULL;
@@ -1121,7 +1123,7 @@ void memory_set_direct_region(const address_space *space, offs_t byteaddress)
 	{
 		byteaddress = (*spacerw->directupdate)(spacerw, byteaddress, &spacerw->direct);
 		if (byteaddress == ~0)
-			return;
+			return TRUE;
 	}
 
 	/* perform the lookup */
@@ -1129,6 +1131,10 @@ void memory_set_direct_region(const address_space *space, offs_t byteaddress)
 	entry = spacerw->readlookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
 		entry = spacerw->readlookup[LEVEL2_INDEX(entry,byteaddress)];
+	
+	/* stop if nothing changed */
+	if (spacerw->direct.entry == entry)
+		return (entry >= STATIC_BANK1 && entry < STATIC_RAM);
 
 	/* keep track of current entry */
 	spacerw->direct.entry = entry;
@@ -1148,9 +1154,8 @@ void memory_set_direct_region(const address_space *space, offs_t byteaddress)
 		/* if nothing was found, leave everything alone */
 		if (entry == STATIC_COUNT)
 		{
-			logerror("cpu #%d (PC=%08X): warning - op-code execute on mapped I/O\n",
-						cpunum_get_active(), cpu_get_pc(Machine->activecpu));
-			return;
+			logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, byteaddress, address_space_names[space->spacenum]);
+			return FALSE;
 		}
 	}
 
@@ -1167,22 +1172,7 @@ void memory_set_direct_region(const address_space *space, offs_t byteaddress)
 	spacerw->direct.decrypted = based - (handlers->bytestart & spacerw->direct.mask);
 	spacerw->direct.min = handlers->bytestart;
 	spacerw->direct.max = handlers->byteend;
-}
-
-
-void program_set_direct_region(offs_t byteaddress)
-{
-	memory_set_direct_region(active_address_space[ADDRESS_SPACE_PROGRAM], byteaddress);
-}
-
-void data_set_direct_region(offs_t byteaddress)
-{
-	memory_set_direct_region(active_address_space[ADDRESS_SPACE_DATA], byteaddress);
-}
-
-void io_set_direct_region(offs_t byteaddress)
-{
-	memory_set_direct_region(active_address_space[ADDRESS_SPACE_IO], byteaddress);
+	return TRUE;
 }
 
 
@@ -1348,6 +1338,10 @@ void memory_configure_bank_decrypted(int banknum, int startentry, int numentries
 	/* fill in the requested bank entries */
 	for (entrynum = startentry; entrynum < startentry + numentries; entrynum++)
 		bankdata[banknum].entryd[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
+	
+	/* if we have no bankptr yet, set it to the first entry */
+	if (bankd_ptr[banknum] == NULL)
+		bankd_ptr[banknum] = bankdata[banknum].entryd[0];
 }
 
 
@@ -1682,8 +1676,8 @@ static void memory_init_cpudata(running_machine *machine)
 				/* set the RAM/ROM base */
 				space->direct.raw = space->direct.decrypted = cpu->region;
 				space->direct.mask = space->bytemask;
-				space->direct.min = 0;
-				space->direct.max = cpu->regionsize;
+				space->direct.min = 1;
+				space->direct.max = 0;
 				space->direct.entry = STATIC_UNMAP;
 				space->directupdate = NULL;
 			}
@@ -1956,6 +1950,14 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 		space->writelookup = space->write.table;
 	if (reset_read)
 		space->readlookup = space->read.table;
+	
+	/* recompute any direct access on this space if it is a read modification */
+	if (readorwrite == ROW_READ && entry == space->direct.entry)
+	{
+		space->direct.entry = STATIC_UNMAP;
+		space->direct.min = 1;
+		space->direct.max = 0;
+	}
 }
 
 
@@ -2803,40 +2805,40 @@ static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress)
 
 static READ8_HANDLER( unmap_read8 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("cpu '%s' (PC=%08X): unmapped %s memory byte read from %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset));
+	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte read from %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset));
 	return space->unmap;
 }
 static READ16_HANDLER( unmap_read16 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("cpu '%s' (PC=%08X): unmapped %s memory word read from %08X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*2), mem_mask);
+	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word read from %08X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*2), mem_mask);
 	return space->unmap;
 }
 static READ32_HANDLER( unmap_read32 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("cpu '%s' (PC=%08X): unmapped %s memory dword read from %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*4), mem_mask);
+	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword read from %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*4), mem_mask);
 	return space->unmap;
 }
 static READ64_HANDLER( unmap_read64 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("cpu '%s' (PC=%08X): unmapped %s memory qword read from %08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword read from %08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 	return space->unmap;
 }
 
 static WRITE8_HANDLER( unmap_write8 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("cpu '%s' (PC=%08X): unmapped %s memory byte write to %08X = %02X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset), data);
+	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte write to %08X = %02X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset), data);
 }
 static WRITE16_HANDLER( unmap_write16 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("cpu '%s' (PC=%08X): unmapped %s memory word write to %08X = %04X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*2), data, mem_mask);
+	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word write to %08X = %04X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*2), data, mem_mask);
 }
 static WRITE32_HANDLER( unmap_write32 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("cpu '%s' (PC=%08X): unmapped %s memory dword write to %08X = %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*4), data, mem_mask);
+	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword write to %08X = %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*4), data, mem_mask);
 }
 static WRITE64_HANDLER( unmap_write64 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("cpu '%s' (PC=%08X): unmapped %s memory qword write to %08X = %08X%08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword write to %08X = %08X%08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 }
 
 
