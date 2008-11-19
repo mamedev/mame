@@ -28,7 +28,8 @@
 #define S	h6280.sp.b.l
 
 #define TRANSLATED(addr)	((h6280.mmr[(addr)>>13] << 13) | ((addr)&0x1fff))
-#define CHANGE_PC			do { offs_t temp = TRANSLATED(PCW); change_pc(temp); } while (0)
+//#define CHANGE_PC			do { offs_t temp = TRANSLATED(PCW); change_pc(temp); } while (0)
+#define CHANGE_PC
 #define H6280_CYCLES(cyc)											\
 	{																\
 		h6280_ICount -= ((cyc) * h6280.clocks_per_cycle);			\

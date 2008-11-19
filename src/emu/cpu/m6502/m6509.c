@@ -97,22 +97,21 @@ static void *token;
 
 static READ8_HANDLER( m6509_read_00000 )
 {
-	m6509_Regs *m6509 = token;
+	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
 
 	return m6509->pc_bank.b.h2;
 }
 
 static READ8_HANDLER( m6509_read_00001 )
 {
-	m6509_Regs *m6509 = token;
+	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
 
 	return m6509->ind_bank.b.h2;
 }
 
 static WRITE8_HANDLER( m6509_write_00000 )
 {
-	m6509_Regs *m6509 = token;
-	m6509_Regs *m6502 = m6509;
+	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
 
 	m6509->pc_bank.b.h2=data&0xf;
 	m6509->pc.w.h=m6509->pc_bank.w.h;
@@ -122,7 +121,7 @@ static WRITE8_HANDLER( m6509_write_00000 )
 
 static WRITE8_HANDLER( m6509_write_00001 )
 {
-	m6509_Regs *m6509 = token;
+	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
 
 	m6509->ind_bank.b.h2=data&0xf;
 }
