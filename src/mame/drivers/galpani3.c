@@ -138,7 +138,7 @@ static VIDEO_START(galpani3)
 
 static int gp3_is_alpha_pen(int pen)
 {
-	UINT16 dat;
+	UINT16 dat = 0;
 
 	if (pen<0x4000)
 	{
