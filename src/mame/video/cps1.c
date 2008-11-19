@@ -1945,6 +1945,7 @@ static TILEMAP_MAPPER( tilemap2_scan )
 	return (row & 0x07) + ((col & 0x3f) << 3) + ((row & 0x38) << 6);
 }
 
+static UINT8 empty_tile8x8[8*8];
 static UINT8 empty_tile[32*32/2];
 
 static TILE_GET_INFO( get_tile0_info )
@@ -1970,7 +1971,7 @@ static TILE_GET_INFO( get_tile0_info )
 	// for out of range tiles, switch to fully transparent data
 	// (but still call SET_TILE_INFO, otherwise problems might occur on boot e.g. unsquad)
 	if (code == -1)
-		tileinfo->pen_data = empty_tile;
+		tileinfo->pen_data = empty_tile8x8;
 }
 
 static TILE_GET_INFO( get_tile1_info )
@@ -2046,7 +2047,8 @@ static VIDEO_START( cps )
 	/* front masks will change at runtime to handle sprite occluding */
 	cps1_update_transmasks();
 
-	memset(empty_tile,0xff,sizeof(empty_tile));
+	memset(empty_tile8x8,0x0f,sizeof(empty_tile8x8));
+	memset(empty_tile,0xff,sizeof(empty_tile));	// 16x16 and 32x32 use packed graphics, 8x8 does not
 
 	for (i = 0;i < cps1_palette_entries*16;i++)
 	{

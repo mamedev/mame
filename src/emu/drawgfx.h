@@ -44,8 +44,6 @@
    This special mode can be used to save memory in games that require several different
    handlings of the same ROM data (e.g. metro.c can use both 4bpp and 8bpp tiles, and both
    8x8 and 16x16; cps.c has 8x8, 16x16 and 32x32 tiles all fetched from the same ROMs).
-   Note, however, that performance will suffer in rotated games, since the gfx data will
-   not be prerotated and will rely on GFX_SWAPXY.
 */
 
 enum
