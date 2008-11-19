@@ -494,12 +494,12 @@ $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 
 
 #-------------------------------------------------
-# Hitachi H8/3344 (8/16-bit H8/3xx series)
+# Hitachi H8/3334 (8/16-bit H8/3xx series)
 #-------------------------------------------------
 
-CPUDEFS += -DHAS_H83344=$(if $(filter H83344,$(CPUS)),1,0)
+CPUDEFS += -DHAS_H83334=$(if $(filter H83334,$(CPUS)),1,0)
 
-ifneq ($(filter H83344,$(CPUS)),)
+ifneq ($(filter H83334,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/h83002
 CPUOBJS += $(CPUOBJ)/h83002/h8_8.o $(CPUOBJ)/h83002/h8periph.o
 DBGOBJS += $(CPUOBJ)/h83002/h8disasm.o

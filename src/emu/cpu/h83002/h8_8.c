@@ -518,13 +518,13 @@ static WRITE8_HANDLER( h8330_itu_w )
 	h8->per_regs[reg] = data;
 }
 
-static ADDRESS_MAP_START( h8_3344_internal_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( h8_3334_internal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	// 512B RAM
 	AM_RANGE(0xfb80, 0xff7f) AM_RAM
 	AM_RANGE(0xff88, 0xffff) AM_READWRITE( h8330_itu_r, h8330_itu_w )
 ADDRESS_MAP_END
 
-CPU_GET_INFO( h8_3344 )
+CPU_GET_INFO( h8_3334 )
 {
 	h83xx_state *h8 = (device != NULL) ? device->token : NULL; 
 
@@ -556,12 +556,12 @@ CPU_GET_INFO( h8_3344 )
 	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:	info->i = 0;						break;
 
 		// Internal maps
-	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_h8_3344_internal_map; break;
+	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map8 = address_map_h8_3334_internal_map; break;
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map8 = NULL;	break;
 	case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map16 = NULL;	break;
 
 		// CPU misc parameters
-	case CPUINFO_STR_NAME:					strcpy(info->s, "H8/3344");						break;
+	case CPUINFO_STR_NAME:					strcpy(info->s, "H8/3334");						break;
 	case CPUINFO_STR_CORE_FILE:				strcpy(info->s, __FILE__);						break;
 	case CPUINFO_STR_FLAGS:					strcpy(info->s, h8_get_ccr_str(h8));				break;
 	case CPUINFO_INT_ENDIANNESS:				info->i = CPU_IS_BE;							break;

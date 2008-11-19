@@ -49,14 +49,14 @@ Note! This document is a Work-In-Progress and will be updated from time to time 
 
 This document covers all the known Namco System 23 / Super System 23 games, including....
 *Angler King      Namco, 1999    System 23
-*Final Furlong    Namco, 1997    System 23
+*Final Furlong    Namco, 1997    System 22.5/Gorgon
 Gunmen Wars       Namco, 1998    System 23 [not dumped, but have]
 Motocross Go!     Namco, 1997    System 23
 *Panic Park       Namco, 1998    System 23
 Rapid River       Namco, 1997    System 22.5/Gorgon
 Time Crisis II    Namco, 1997    System 23
 *Underground King Namco, 1998    System 23
-*Downhill Bikers  Namco, 199?    System 23
+Downhill Bikers   Namco, 199?    System 23 [not dumped, but have]
 500 GP            Namco, 1999    Super System 23
 Crisis Zone       Namco, 2000    Super System 23 Evolution 2 [not dumped, but have]
 Final Furlong 2   Namco, 1999    Super System 23
@@ -1339,7 +1339,7 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
 
-	MDRV_CPU_ADD("ioboard", H83344, 14745600 )
+	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23iobrdmap, 0 )
 	MDRV_CPU_IO_MAP( s23iobrdiomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
@@ -1477,7 +1477,7 @@ ROM_START( motoxgo )
 	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "mg3vera.ic3",  0x000000, 0x080000, CRC(9e3d46a8) SHA1(9ffa5b91ea51cc0fb97def25ce47efa3441f3c6f) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3344 MCU code */
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
         ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
 
 	ROM_REGION( 0x20000, "exioboard", 0 )	/* "extra" I/O board (uses Fujitsu MB90611A MCU) */
@@ -1524,7 +1524,7 @@ ROM_START( timecrs2 )
 	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3344 MCU code */
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
@@ -1564,7 +1564,7 @@ ROM_START( timcrs2b )
 	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3344 MCU code */
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
