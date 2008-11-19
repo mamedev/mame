@@ -465,7 +465,7 @@ OP_HANDLER( swi )
 	PUSHBYTE(B);
     PUSHBYTE(CC);
     SEI;
-	PCD = RM16(0xfffa);
+	PCD = RM16(m68_state, 0xfffa);
 	CHANGE_PC(m68_state);
 }
 
@@ -1108,7 +1108,7 @@ OP_HANDLER( sts_im )
 	CLR_NZV;
 	SET_NZ16(S);
 	IMM16;
-	WM16(EAD,&m68_state->s);
+	WM16(m68_state, EAD,&m68_state->s);
 }
 
 /* $90 SUBA direct ?**** */
@@ -1275,7 +1275,7 @@ OP_HANDLER( sts_di )
 	CLR_NZV;
 	SET_NZ16(S);
 	DIRECT;
-	WM16(EAD,&m68_state->s);
+	WM16(m68_state, EAD,&m68_state->s);
 }
 
 /* $a0 SUBA indexed ?**** */
@@ -1450,7 +1450,7 @@ OP_HANDLER( sts_ix )
 	CLR_NZV;
 	SET_NZ16(S);
 	INDEXED;
-	WM16(EAD,&m68_state->s);
+	WM16(m68_state, EAD,&m68_state->s);
 }
 
 /* $b0 SUBA extended ?**** */
@@ -1627,7 +1627,7 @@ OP_HANDLER( sts_ex )
 	CLR_NZV;
 	SET_NZ16(S);
 	EXTENDED;
-	WM16(EAD,&m68_state->s);
+	WM16(m68_state, EAD,&m68_state->s);
 }
 
 /* $c0 SUBB immediate ?**** */
@@ -1772,7 +1772,7 @@ OP_HANDLER( std_im )
 	IMM16;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&m68_state->d);
+	WM16(m68_state, EAD,&m68_state->d);
 }
 
 /* $ce LDX immediate -**0- */
@@ -1789,7 +1789,7 @@ OP_HANDLER( stx_im )
 	CLR_NZV;
 	SET_NZ16(X);
 	IMM16;
-	WM16(EAD,&m68_state->x);
+	WM16(m68_state, EAD,&m68_state->x);
 }
 
 /* $d0 SUBB direct ?**** */
@@ -1932,7 +1932,7 @@ OP_HANDLER( std_di )
 	DIRECT;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&m68_state->d);
+	WM16(m68_state, EAD,&m68_state->d);
 }
 
 /* $de LDX direct -**0- */
@@ -1949,7 +1949,7 @@ OP_HANDLER( stx_di )
 	CLR_NZV;
 	SET_NZ16(X);
 	DIRECT;
-	WM16(EAD,&m68_state->x);
+	WM16(m68_state, EAD,&m68_state->x);
 }
 
 /* $e0 SUBB indexed ?**** */
@@ -2104,7 +2104,7 @@ OP_HANDLER( std_ix )
 	INDEXED;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&m68_state->d);
+	WM16(m68_state, EAD,&m68_state->d);
 }
 
 /* $ee LDX indexed -**0- */
@@ -2121,7 +2121,7 @@ OP_HANDLER( stx_ix )
 	CLR_NZV;
 	SET_NZ16(X);
 	INDEXED;
-	WM16(EAD,&m68_state->x);
+	WM16(m68_state, EAD,&m68_state->x);
 }
 
 /* $f0 SUBB extended ?**** */
@@ -2277,7 +2277,7 @@ OP_HANDLER( std_ex )
 	EXTENDED;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&m68_state->d);
+	WM16(m68_state, EAD,&m68_state->d);
 }
 
 /* $fe LDX extended -**0- */
@@ -2294,5 +2294,5 @@ OP_HANDLER( stx_ex )
 	CLR_NZV;
 	SET_NZ16(X);
 	EXTENDED;
-	WM16(EAD,&m68_state->x);
+	WM16(m68_state, EAD,&m68_state->x);
 }

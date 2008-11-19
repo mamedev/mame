@@ -73,6 +73,8 @@ TODO:
 
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS	1
+
 #include "debugger.h"
 #include "deprecat.h"
 #include "m6800.h"
@@ -113,6 +115,12 @@ struct _m68_state_t
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	
+	/* Memory spaces */
+    const address_space *program;
+    const address_space *data;
+    const address_space *io;
+    
 	int 	extra_cycles;	/* cycles used for interrupts */
 	void	(* const * insn)(m68_state_t *);	/* instruction table */
 	const UINT8 *cycles;			/* clock cycle of instruction table */
@@ -189,26 +197,26 @@ static UINT32 timer_next;
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
-#define RM(Addr) ((unsigned)program_read_byte_8be(Addr))
+#define RM(Addr) ((unsigned)memory_read_byte_8be(m68_state->program, Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define WM(Addr,Value) (program_write_byte_8be(Addr,Value))
+#define WM(Addr,Value) (memory_write_byte_8be(m68_state->program, Addr,Value))
 
 /****************************************************************************/
 /* M6800_RDOP() is identical to M6800_RDMEM() except it is used for reading */
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M_RDOP(Addr) ((unsigned)program_decrypted_read_byte(Addr))
+#define M_RDOP(Addr) ((unsigned)memory_decrypted_read_byte(m68_state->program, Addr))
 
 /****************************************************************************/
 /* M6800_RDOP_ARG() is identical to M6800_RDOP() but it's used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M_RDOP_ARG(Addr) ((unsigned)program_raw_read_byte(Addr))
+#define M_RDOP_ARG(Addr) ((unsigned)memory_raw_read_byte(m68_state->program, Addr))
 
 /* macros to access memory */
 #define IMMBYTE(b)	b = M_RDOP_ARG(PCD); PC++
@@ -400,12 +408,12 @@ static const UINT8 flags8d[256]= /* decrement */
 
 /* macros for convenience */
 #define DIRBYTE(b) {DIRECT;b=RM(EAD);}
-#define DIRWORD(w) {DIRECT;w.d=RM16(EAD);}
+#define DIRWORD(w) {DIRECT;w.d=RM16(m68_state, EAD);}
 #define EXTBYTE(b) {EXTENDED;b=RM(EAD);}
-#define EXTWORD(w) {EXTENDED;w.d=RM16(EAD);}
+#define EXTWORD(w) {EXTENDED;w.d=RM16(m68_state, EAD);}
 
 #define IDXBYTE(b) {INDEXED;b=RM(EAD);}
-#define IDXWORD(w) {INDEXED;w.d=RM16(EAD);}
+#define IDXWORD(w) {INDEXED;w.d=RM16(m68_state, EAD);}
 
 /* Macros for branch instructions */
 #define CHANGE_PC(m68_state) change_pc(PCD)
@@ -513,13 +521,13 @@ static const UINT8 cycles_nsc8105[] =
 	}																\
 }
 
-INLINE UINT32 RM16( UINT32 Addr )
+INLINE UINT32 RM16(m68_state_t *m68_state, UINT32 Addr )
 {
 	UINT32 result = RM(Addr) << 8;
 	return result | RM((Addr+1)&0xffff);
 }
 
-INLINE void WM16( UINT32 Addr, PAIR *p )
+INLINE void WM16(m68_state_t *m68_state, UINT32 Addr, PAIR *p )
 {
 	WM( Addr, p->b.h );
 	WM( (Addr+1)&0xffff, p->b.l );
@@ -545,7 +553,7 @@ static void enter_interrupt(m68_state_t *m68_state, const char *message,UINT16 i
 		m68_state->extra_cycles += 12;
 	}
 	SEI;
-	PCD = RM16( irq_vector );
+	PCD = RM16(m68_state,  irq_vector );
 	CHANGE_PC(m68_state);
 }
 
@@ -642,15 +650,15 @@ static void m6800_tx(m68_state_t *m68_state, int value)
 	m68_state->port2_data = (m68_state->port2_data & 0xef) | (value << 4);
 
 	if(m68_state->port2_ddr == 0xff)
-		io_write_byte_8be(M6803_PORT2,m68_state->port2_data);
+		memory_write_byte_8be(m68_state->io, M6803_PORT2,m68_state->port2_data);
 	else
-		io_write_byte_8be(M6803_PORT2,(m68_state->port2_data & m68_state->port2_ddr)
-			| (io_read_byte_8be(M6803_PORT2) & (m68_state->port2_ddr ^ 0xff)));
+		memory_write_byte_8be(m68_state->io, M6803_PORT2,(m68_state->port2_data & m68_state->port2_ddr)
+			| (memory_read_byte_8be(m68_state->io, M6803_PORT2) & (m68_state->port2_ddr ^ 0xff)));
 }
 
 static int m6800_rx(m68_state_t *m68_state)
 {
-	return (io_read_byte_8be(M6803_PORT2) & M6800_PORT2_IO3) >> 3;
+	return (memory_read_byte_8be(m68_state->io, M6803_PORT2) & M6800_PORT2_IO3) >> 3;
 }
 
 static TIMER_CALLBACK(m6800_tx_tick)
@@ -881,7 +889,12 @@ static void state_register(m68_state_t *m68_state, const char *type)
 static CPU_INIT( m6800 )
 {
 	m68_state_t *m68_state = device->token;
-//  m68_state->subtype   = SUBTYPE_M6800;
+
+	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+
+	//  m68_state->subtype   = SUBTYPE_M6800;
 	m68_state->insn = m6800_insn;
 	m68_state->cycles = cycles_6800;
 	m68_state->irq_callback = irqcallback;
@@ -894,7 +907,7 @@ static CPU_RESET( m6800 )
 	m68_state_t *m68_state = device->token;
 	
 	SEI;				/* IRQ disabled */
-	PCD = RM16( 0xfffe );
+	PCD = RM16(m68_state,  0xfffe );
 	CHANGE_PC(m68_state);
 
 	m68_state->wai_state = 0;
@@ -1311,6 +1324,10 @@ static CPU_INIT( m6801 )
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
 
+	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+
 	m68_state->clock = clock;
 	m68_state->m6800_rx_timer = timer_alloc(m6800_rx_tick, m68_state);
 	m68_state->m6800_tx_timer = timer_alloc(m6800_tx_tick, m68_state);
@@ -1331,6 +1348,11 @@ static CPU_INIT( m6802 )
 	m68_state->cycles = cycles_6800;
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
+
+	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+
 	state_register(m68_state, "m6802");
 }
 #endif
@@ -1347,6 +1369,10 @@ static CPU_INIT( m6803 )
 	m68_state->cycles = cycles_6803;
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
+
+	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	m68_state->clock = clock;
 	m68_state->m6800_rx_timer = timer_alloc(m6800_rx_tick, m68_state);
@@ -1686,6 +1712,11 @@ static CPU_INIT( m6808 )
 	m68_state->cycles = cycles_6800;
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
+	
+	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+
 	state_register(m68_state, "m6808");
 }
 #endif
@@ -1703,6 +1734,10 @@ static CPU_INIT( hd63701 )
 	m68_state->cycles = cycles_63701;
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
+
+	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	m68_state->clock = clock;
 	m68_state->m6800_rx_timer = timer_alloc(m6800_rx_tick, m68_state);
@@ -2051,6 +2086,12 @@ static CPU_INIT( nsc8105 )
 {
 	m68_state_t *m68_state = device->token;
 	//  m68_state->subtype = SUBTYPE_NSC8105;
+	m68_state->device = device;
+
+	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m68_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+
 	m68_state->insn = nsc8105_insn;
 	m68_state->cycles = cycles_nsc8105;
 	state_register(m68_state, "nsc8105");
@@ -2374,20 +2415,20 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x01:
 			return m68_state->port2_ddr;
 		case 0x02:
-			return (io_read_byte_8be(M6803_PORT1) & (m68_state->port1_ddr ^ 0xff))
+			return (memory_read_byte_8be(m68_state->io, M6803_PORT1) & (m68_state->port1_ddr ^ 0xff))
 					| (m68_state->port1_data & m68_state->port1_ddr);
 		case 0x03:
-			return (io_read_byte_8be(M6803_PORT2) & (m68_state->port2_ddr ^ 0xff))
+			return (memory_read_byte_8be(m68_state->io, M6803_PORT2) & (m68_state->port2_ddr ^ 0xff))
 					| (m68_state->port2_data & m68_state->port2_ddr);
 		case 0x04:
 			return m68_state->port3_ddr;
 		case 0x05:
 			return m68_state->port4_ddr;
 		case 0x06:
-			return (io_read_byte_8be(M6803_PORT3) & (m68_state->port3_ddr ^ 0xff))
+			return (memory_read_byte_8be(m68_state->io, M6803_PORT3) & (m68_state->port3_ddr ^ 0xff))
 					| (m68_state->port3_data & m68_state->port3_ddr);
 		case 0x07:
-			return (io_read_byte_8be(M6803_PORT4) & (m68_state->port4_ddr ^ 0xff))
+			return (memory_read_byte_8be(m68_state->io, M6803_PORT4) & (m68_state->port4_ddr ^ 0xff))
 					| (m68_state->port4_data & m68_state->port4_ddr);
 		case 0x08:
 			m68_state->pending_tcsr = 0;
@@ -2472,10 +2513,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 				m68_state->port1_ddr = data;
 				if(m68_state->port1_ddr == 0xff)
-					io_write_byte_8be(M6803_PORT1,m68_state->port1_data);
+					memory_write_byte_8be(m68_state->io, M6803_PORT1,m68_state->port1_data);
 				else
-					io_write_byte_8be(M6803_PORT1,(m68_state->port1_data & m68_state->port1_ddr)
-						| (io_read_byte_8be(M6803_PORT1) & (m68_state->port1_ddr ^ 0xff)));
+					memory_write_byte_8be(m68_state->io, M6803_PORT1,(m68_state->port1_data & m68_state->port1_ddr)
+						| (memory_read_byte_8be(m68_state->io, M6803_PORT1) & (m68_state->port1_ddr ^ 0xff)));
 			}
 			break;
 		case 0x01:
@@ -2483,10 +2524,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 				m68_state->port2_ddr = data;
 				if(m68_state->port2_ddr == 0xff)
-					io_write_byte_8be(M6803_PORT2,m68_state->port2_data);
+					memory_write_byte_8be(m68_state->io, M6803_PORT2,m68_state->port2_data);
 				else
-					io_write_byte_8be(M6803_PORT2,(m68_state->port2_data & m68_state->port2_ddr)
-						| (io_read_byte_8be(M6803_PORT2) & (m68_state->port2_ddr ^ 0xff)));
+					memory_write_byte_8be(m68_state->io, M6803_PORT2,(m68_state->port2_data & m68_state->port2_ddr)
+						| (memory_read_byte_8be(m68_state->io, M6803_PORT2) & (m68_state->port2_ddr ^ 0xff)));
 
 				if (m68_state->port2_ddr & 2)
 					logerror("CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpunum_get_active(),cpu_get_pc(space->cpu));
@@ -2495,10 +2536,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x02:
 			m68_state->port1_data = data;
 			if(m68_state->port1_ddr == 0xff)
-				io_write_byte_8be(M6803_PORT1,m68_state->port1_data);
+				memory_write_byte_8be(m68_state->io, M6803_PORT1,m68_state->port1_data);
 			else
-				io_write_byte_8be(M6803_PORT1,(m68_state->port1_data & m68_state->port1_ddr)
-					| (io_read_byte_8be(M6803_PORT1) & (m68_state->port1_ddr ^ 0xff)));
+				memory_write_byte_8be(m68_state->io, M6803_PORT1,(m68_state->port1_data & m68_state->port1_ddr)
+					| (memory_read_byte_8be(m68_state->io, M6803_PORT1) & (m68_state->port1_ddr ^ 0xff)));
 			break;
 		case 0x03:
 			if (m68_state->trcsr & M6800_TRCSR_TE)
@@ -2510,20 +2551,20 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 				m68_state->port2_data = data;
 			}
 			if(m68_state->port2_ddr == 0xff)
-				io_write_byte_8be(M6803_PORT2,m68_state->port2_data);
+				memory_write_byte_8be(m68_state->io, M6803_PORT2,m68_state->port2_data);
 			else
-				io_write_byte_8be(M6803_PORT2,(m68_state->port2_data & m68_state->port2_ddr)
-					| (io_read_byte_8be(M6803_PORT2) & (m68_state->port2_ddr ^ 0xff)));
+				memory_write_byte_8be(m68_state->io, M6803_PORT2,(m68_state->port2_data & m68_state->port2_ddr)
+					| (memory_read_byte_8be(m68_state->io, M6803_PORT2) & (m68_state->port2_ddr ^ 0xff)));
 			break;
 		case 0x04:
 			if (m68_state->port3_ddr != data)
 			{
 				m68_state->port3_ddr = data;
 				if(m68_state->port3_ddr == 0xff)
-					io_write_byte_8be(M6803_PORT3,m68_state->port3_data);
+					memory_write_byte_8be(m68_state->io, M6803_PORT3,m68_state->port3_data);
 				else
-					io_write_byte_8be(M6803_PORT3,(m68_state->port3_data & m68_state->port3_ddr)
-						| (io_read_byte_8be(M6803_PORT3) & (m68_state->port3_ddr ^ 0xff)));
+					memory_write_byte_8be(m68_state->io, M6803_PORT3,(m68_state->port3_data & m68_state->port3_ddr)
+						| (memory_read_byte_8be(m68_state->io, M6803_PORT3) & (m68_state->port3_ddr ^ 0xff)));
 			}
 			break;
 		case 0x05:
@@ -2531,27 +2572,27 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 				m68_state->port4_ddr = data;
 				if(m68_state->port4_ddr == 0xff)
-					io_write_byte_8be(M6803_PORT4,m68_state->port4_data);
+					memory_write_byte_8be(m68_state->io, M6803_PORT4,m68_state->port4_data);
 				else
-					io_write_byte_8be(M6803_PORT4,(m68_state->port4_data & m68_state->port4_ddr)
-						| (io_read_byte_8be(M6803_PORT4) & (m68_state->port4_ddr ^ 0xff)));
+					memory_write_byte_8be(m68_state->io, M6803_PORT4,(m68_state->port4_data & m68_state->port4_ddr)
+						| (memory_read_byte_8be(m68_state->io, M6803_PORT4) & (m68_state->port4_ddr ^ 0xff)));
 			}
 			break;
 		case 0x06:
 			m68_state->port3_data = data;
 			if(m68_state->port3_ddr == 0xff)
-				io_write_byte_8be(M6803_PORT3,m68_state->port3_data);
+				memory_write_byte_8be(m68_state->io, M6803_PORT3,m68_state->port3_data);
 			else
-				io_write_byte_8be(M6803_PORT3,(m68_state->port3_data & m68_state->port3_ddr)
-					| (io_read_byte_8be(M6803_PORT3) & (m68_state->port3_ddr ^ 0xff)));
+				memory_write_byte_8be(m68_state->io, M6803_PORT3,(m68_state->port3_data & m68_state->port3_ddr)
+					| (memory_read_byte_8be(m68_state->io, M6803_PORT3) & (m68_state->port3_ddr ^ 0xff)));
 			break;
 		case 0x07:
 			m68_state->port4_data = data;
 			if(m68_state->port4_ddr == 0xff)
-				io_write_byte_8be(M6803_PORT4,m68_state->port4_data);
+				memory_write_byte_8be(m68_state->io, M6803_PORT4,m68_state->port4_data);
 			else
-				io_write_byte_8be(M6803_PORT4,(m68_state->port4_data & m68_state->port4_ddr)
-					| (io_read_byte_8be(M6803_PORT4) & (m68_state->port4_ddr ^ 0xff)));
+				memory_write_byte_8be(m68_state->io, M6803_PORT4,(m68_state->port4_data & m68_state->port4_ddr)
+					| (memory_read_byte_8be(m68_state->io, M6803_PORT4) & (m68_state->port4_ddr ^ 0xff)));
 			break;
 		case 0x08:
 			m68_state->tcsr = data;
