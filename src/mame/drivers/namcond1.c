@@ -67,7 +67,7 @@ Notes:
 
 #include "driver.h"
 #include "video/ygv608.h"
-#include "cpu/h83002/h83002.h"
+#include "cpu/h83002/h8.h"
 #include "namcond1.h"
 #include "sound/c352.h"
 #include "machine/at28c16.h"
@@ -259,8 +259,8 @@ static ADDRESS_MAP_START( nd1h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( nd1h8iomap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(H8_PORT7, H8_PORT7) AM_READ( mcu_p7_read )
-	AM_RANGE(H8_PORTA, H8_PORTA) AM_READWRITE( mcu_pa_read, mcu_pa_write )
+	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ( mcu_p7_read )
+	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( mcu_pa_read, mcu_pa_write )
 	AM_RANGE(H8_ADC_0_L, H8_ADC_3_H) AM_NOP // MCU reads these, but the games have no analog controls
 ADDRESS_MAP_END
 

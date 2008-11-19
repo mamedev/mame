@@ -2,27 +2,32 @@
     Namco System 22.5 and (Super) System 23
     Extremely preliminary driver by R. Belmont, thanks to Phil Stroffolino & Olivier Galibert
 
-    Hardware: R4650 (MIPS III with IDT special instructions) main CPU @ 166 MHz
-              H8/3002 MCU for sound/inputs
-          Custom polygon hardware
-      1 text tilemap
-          Sprites?
+    Hardware: * R4650 (MIPS III with IDT special instructions) main CPU.
+                133 MHz for Gorgon, 166 MHz for System 23 and Super System 23, and
+		200 MHz for Super System 23 Evolution 2.
+              * H8/3002 MCU for sound/inputs
+              * Custom polygon hardware
+              * 1 text tilemap
+
+    Gorgon and System 23 use an I/O board based on the Namco C78, which is a Renesas H8/3334 MCU 
+    (8-bit version of the H8/3002).
+
+    Super System 23 uses a PIC16Cxx-based I/O board.  In both cases the I/O boards' MCUs apparently are connected
+    to the H8/3002's serial port, similar to System 22 where one 37702 reads the I/O and communicates serially
+    with the second 37702 which is the traditional "subcpu".
 
     NOTES:
     - First 128k of main program ROM is the BIOS, and after that is a 64-bit MIPS ELF image.
-
     - Text layer is (almost?) identical to System 22 & Super System 22.
 
     TODO:
     - Palette is not right.
 
-    - H8/3002 does not handshake.  Protocol should be the same as System 12 where the MIPS
-      writes 0x3163 to offset 0x3002 in the shared RAM and the H8/3002 notices and sets it to 0x7106.
-      The H8 currently never reads that location (core bug?).
+    - H8/3002 does not handshake.  Looks like it needs to speak serially with the I/O board.
 
-    - Hook up actual inputs via the 2 serial latches at d00004 and d00006.
+    - Hook up actual inputs (?) via the 2 serial latches at d00004 and d00006.
       Works like this: write to d00004, then read d00004 12 times.  Ditto at
-      d00006.  This gives 24 bits of inputs from the I/O board (?).
+      d00006.  This gives 24 bits of inputs (?) from the I/O board (?).
 
     - The entire 3D subsystem.  Is there a DSP living down there?  If not, why the 300k
       download on initial startup?
@@ -45,15 +50,15 @@ Note! This document is a Work-In-Progress and will be updated from time to time 
 This document covers all the known Namco System 23 / Super System 23 games, including....
 *Angler King      Namco, 1999    System 23
 *Final Furlong    Namco, 1997    System 23
-*Gunmen Wars      Namco, 1998    System 23
-*Motocross Go!    Namco, 1997    System 23
+Gunmen Wars       Namco, 1998    System 23 [not dumped, but have]
+Motocross Go!     Namco, 1997    System 23
 *Panic Park       Namco, 1998    System 23
 Rapid River       Namco, 1997    System 22.5/Gorgon
 Time Crisis II    Namco, 1997    System 23
 *Underground King Namco, 1998    System 23
 *Downhill Bikers  Namco, 199?    System 23
-GP 500            Namco, 1999    Super System 23
-Crisis Zone       Namco, 2000    Super System 23 [not dumped, but have]
+500 GP            Namco, 1999    Super System 23
+Crisis Zone       Namco, 2000    Super System 23 Evolution 2 [not dumped, but have]
 Final Furlong 2   Namco, 1999    Super System 23
 *Guitar Jam       Namco, 1999    Super System 23
 *Race On!         Namco, 1998    Super System 23
@@ -732,7 +737,7 @@ Notes:
 
 #include "driver.h"
 #include "cpu/mips/mips3.h"
-#include "cpu/h83002/h83002.h"
+#include "cpu/h83002/h8.h"
 #include "sound/c352.h"
 
 static int ss23_vstat = 0, hstat = 0, vstate = 0;
@@ -1055,7 +1060,7 @@ static ADDRESS_MAP_START( ss23_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x06a30000, 0x06a3ffff) AM_RAM
 	AM_RANGE(0x06820008, 0x0682000f) AM_READ( ss23_vstat_r )	// vblank status?
 	AM_RANGE(0x08000000, 0x08017fff) AM_RAM
-	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r)
+	AM_RANGE(0x0d000000, 0x0d000007) AM_READ(sysctl_stat_r) AM_WRITENOP
 	AM_RANGE(0x0fc00000, 0x0fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x1fc00000, 0x1fffffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -1074,6 +1079,15 @@ static READ16_HANDLER( sharedram_sub_r )
 	return shared16[BYTE_XOR_BE(offset)];
 }
 
+#if 1
+static WRITE16_HANDLER(cause_sync_w)
+{
+	UINT16 *shared16 = (UINT16 *)namcos23_shared_ram;
+
+	shared16[BYTE_XOR_BE(0x4052/2)] = 0;
+}
+#endif
+
 /* H8/3002 MCU stuff */
 static ADDRESS_MAP_START( s23h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_READ(SMH_ROM)
@@ -1082,7 +1096,7 @@ static ADDRESS_MAP_START( s23h8rwmap, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x300001) AM_READNOP //AM_READ_PORT("IN1")
 	AM_RANGE(0x300002, 0x300003) AM_READNOP //AM_READ_PORT("IN2")
 	AM_RANGE(0x300010, 0x300011) AM_NOP
-	AM_RANGE(0x300030, 0x300031) AM_NOP
+	AM_RANGE(0x300030, 0x300031) AM_WRITE(cause_sync_w)	// cheats comms with I/O board and makes SUBCPU TEST pass
 ADDRESS_MAP_END
 
 static READ8_HANDLER( s23_mcu_p8_r )
@@ -1200,11 +1214,11 @@ static WRITE8_HANDLER( s23_mcu_settings_w )
 }
 
 static ADDRESS_MAP_START( s23h8iomap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(H8_PORT7, H8_PORT7) AM_READ( input_port_0_r )
-	AM_RANGE(H8_PORT8, H8_PORT8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(H8_PORTA, H8_PORTA) AM_READWRITE( s23_mcu_pa_r, s23_mcu_pa_w )
-	AM_RANGE(H8_PORTB, H8_PORTB) AM_READWRITE( s23_mcu_portB_r, s23_mcu_portB_w )
-	AM_RANGE(H8_SERIAL_B, H8_SERIAL_B) AM_READ( s23_mcu_rtc_r ) AM_WRITE( s23_mcu_settings_w )
+	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ( input_port_0_r )
+	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s23_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s23_mcu_pa_r, s23_mcu_pa_w )
+	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE( s23_mcu_portB_r, s23_mcu_portB_w )
+	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ( s23_mcu_rtc_r ) AM_WRITE( s23_mcu_settings_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
 	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_NOP
 	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_NOP
@@ -1212,10 +1226,18 @@ static ADDRESS_MAP_START( s23h8iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+/* H8/3334 (Namco C78) I/O board MCU */
+static ADDRESS_MAP_START( s23iobrdmap, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( s23iobrdiomap, ADDRESS_SPACE_IO, 8 )
+ADDRESS_MAP_END
 
 static DRIVER_INIT(ss23)
 {
-    }
+}
 
 static const gfx_layout namcos23_cg_layout =
 {
@@ -1279,6 +1301,8 @@ static MACHINE_DRIVER_START( gorgon )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
 
+	MDRV_INTERLEAVE(1000)
+
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
@@ -1315,6 +1339,13 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
 
+	MDRV_CPU_ADD("ioboard", H83344, 14745600 )
+	MDRV_CPU_PROGRAM_MAP( s23iobrdmap, 0 )
+	MDRV_CPU_IO_MAP( s23iobrdiomap, 0 )
+	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
+
+
+	MDRV_INTERLEAVE(1000)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1352,6 +1383,8 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_CPU_PROGRAM_MAP( s23h8rwmap, 0 )
 	MDRV_CPU_IO_MAP( s23h8iomap, 0 )
 	MDRV_CPU_VBLANK_INT("main", irq1_line_pulse)
+
+	MDRV_INTERLEAVE(1000)
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -1436,6 +1469,53 @@ ROM_START( rapidrvr )
         ROM_LOAD( "rd1waveh.3s",  0x800000, 0x800000, CRC(ef0136b5) SHA1(a6d923ededca168fe555e0b86a72f53bec5424cc) )
 ROM_END
 
+ROM_START( motoxgo )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+        ROM_LOAD16_BYTE( "mg3vera.ic2",  0x000000, 0x200000, CRC(1bf06f00) SHA1(e9d04e9f19bff7a58cb280dd1d5db12801b68ba0) )
+        ROM_LOAD16_BYTE( "mg3vera.ic1",  0x000001, 0x200000, CRC(f5e6e25b) SHA1(1de30e8e831be66987112645a9db3a3001b89fe6) )
+
+	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
+        ROM_LOAD16_WORD_SWAP( "mg3vera.ic3",  0x000000, 0x080000, CRC(9e3d46a8) SHA1(9ffa5b91ea51cc0fb97def25ce47efa3441f3c6f) )
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3344 MCU code */
+        ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
+
+	ROM_REGION( 0x20000, "exioboard", 0 )	/* "extra" I/O board (uses Fujitsu MB90611A MCU) */
+        ROM_LOAD( "mg1prog0a.3a", 0x000000, 0x020000, CRC(b2b5be8f) SHA1(803652b7b8fde2196b7fb742ba8b9843e4fcd2de) )
+
+	ROM_REGION( 0x2000000, "sprite", ROMREGION_ERASEFF )	/* sprite? tilemap? tiles */
+        ROM_LOAD16_BYTE( "mg1mtal.2h",   0x000000, 0x800000, CRC(fdad0f0a) SHA1(420d50f012af40f80b196d3aae320376e6c32367) )
+        ROM_LOAD16_BYTE( "mg1mtah.2j",   0x000001, 0x800000, CRC(845f4768) SHA1(9c03b1f6dcd9d1f43c2958d855221be7f9415c47) )
+
+	ROM_REGION( 0x2000000, "textile", ROMREGION_ERASEFF )	/* texture tiles */
+        ROM_LOAD( "mg1cgum.4j",   0x000000, 0x800000, CRC(46a77d73) SHA1(132ce2452ee68ba374e98b59032ac0a1a277078d) )
+        ROM_LOAD( "mg1cgll.4m",   0x000000, 0x800000, CRC(175dfe34) SHA1(66ae35b0084159aea1afeb1a6486fffa635992b5) )
+        ROM_LOAD( "mg1cglm.4k",   0x000000, 0x800000, CRC(b3e648e7) SHA1(98018ae2276f905a7f74e1dab540a44247524436) )
+
+	ROM_REGION( 0x2000000, "textile2", ROMREGION_ERASEFF )	/* second copy of texture tiles */
+        ROM_LOAD( "mg1cgum.5j",   0x000000, 0x800000, CRC(46a77d73) SHA1(132ce2452ee68ba374e98b59032ac0a1a277078d) )
+        ROM_LOAD( "mg1cgll.5m",   0x000000, 0x800000, CRC(175dfe34) SHA1(66ae35b0084159aea1afeb1a6486fffa635992b5) )
+        ROM_LOAD( "mg1cglm.5k",   0x000000, 0x800000, CRC(b3e648e7) SHA1(98018ae2276f905a7f74e1dab540a44247524436) )
+
+	ROM_REGION( 0x600000, "textilemap", ROMREGION_ERASEFF )	/* texture tilemap */
+        ROM_LOAD( "mg1ccrl.7f",   0x000000, 0x400000, CRC(5372e300) SHA1(63a49782289ed93a321ca7d193241fb83ca97e6b) )
+        ROM_LOAD( "mg1ccrh.7e",   0x400000, 0x200000, CRC(2e77597d) SHA1(58dd83c1b0c08115e728c5e7dea5e62135b821ba) )
+
+	ROM_REGION( 0x600000, "textilemap2", ROMREGION_ERASEFF) /* second copy of texture tilemap */
+        ROM_LOAD( "mg1ccrl.7m",   0x000000, 0x400000, CRC(5372e300) SHA1(63a49782289ed93a321ca7d193241fb83ca97e6b) )
+        ROM_LOAD( "mg1ccrh.7k",   0x400000, 0x200000, CRC(2e77597d) SHA1(58dd83c1b0c08115e728c5e7dea5e62135b821ba) )
+
+	ROM_REGION32_LE( 0x2000000, "pointrom", ROMREGION_ERASEFF )	/* 3D model data */
+        ROM_LOAD32_WORD( "mg1pt0l.7c",   0x000000, 0x400000, CRC(3b9e95d3) SHA1(d7823ed6c590669ccd4098ed439599a3eb814ed1) )
+        ROM_LOAD32_WORD( "mg1pt0h.7a",   0x000002, 0x400000, CRC(c9ba1b47) SHA1(42ec0638edb4c502ff0a340c4cf590bdd767cfe2) )
+        ROM_LOAD32_WORD( "mg1pt1h.5a",   0x800000, 0x400000, CRC(8d4f7097) SHA1(004e9ed0b5d6ce83ffadb9bd429fa7560abdb598) )
+        ROM_LOAD32_WORD( "mg1pt1l.5c",   0x800002, 0x400000, CRC(0dd2f358) SHA1(3537e6be3fec9fec8d5a8dd02d9cf67b3805f8f0) )
+
+	ROM_REGION( 0x1000000, "c352", ROMREGION_ERASEFF ) /* C352 PCM samples */
+        ROM_LOAD( "mg1wavel.2c",  0x000000, 0x800000, CRC(f78b1b4d) SHA1(47cd654ec0a69de0dc81b8d83692eebf5611228b) )
+        ROM_LOAD( "mg1waveh.2a",  0x800000, 0x800000, CRC(8cb73877) SHA1(2e2b170c7ff889770c13b4ab7ac316b386ada153) ) 
+ROM_END
+
 ROM_START( timecrs2 )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
         ROM_LOAD16_BYTE( "tss3verb.2",   0x000000, 0x200000, CRC(c7be691f) SHA1(5e2e7a0db3d8ce6dfeb6c0d99e9fe6a9f9cab467) )
@@ -1443,6 +1523,9 @@ ROM_START( timecrs2 )
 
 	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
+
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3344 MCU code */
+	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
         ROM_LOAD16_BYTE( "tss1mtal.2h",  0x0000000, 0x800000, CRC(bfc79190) SHA1(04bda00c4cc5660d27af4f3b0ee3550dea8d3805) )
@@ -1481,7 +1564,7 @@ ROM_START( timcrs2b )
 	ROM_REGION( 0x80000, "audio", 0 )	/* Hitachi H8/3002 MCU code */
         ROM_LOAD16_WORD_SWAP( "tss3verb.3",   0x000000, 0x080000, CRC(41e41994) SHA1(eabc1a307c329070bfc6486cb68169c94ff8a162) )
 
-	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/300 MCU code */
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3344 MCU code */
 	ROM_LOAD( "tssioprog.ic3", 0x000000, 0x040000, CRC(edad4538) SHA1(1330189184a636328d956c0e435f8d9ad2e96a80) )
 
 	ROM_REGION( 0x2000000, "sprite", 0 )	/* sprite? tilemap? tiles */
@@ -1637,6 +1720,7 @@ ROM_END
 
 /* Games */
 GAME( 1997, rapidrvr, 0,      gorgon, 0, ss23, ROT0, "Namco", "Rapid River (RD3 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1997, motoxgo,  0,         s23, 0, ss23, ROT0, "Namco", "Motocross Go! (MG3 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timecrs2, 0,         s23, 0, ss23, ROT0, "Namco", "Time Crisis 2 (TSS3 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1997, timcrs2b, timecrs2,  s23, 0, ss23, ROT0, "Namco", "Time Crisis 2 (TSS2 Ver. B)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, 500gp,    0,        ss23, 0, ss23, ROT0, "Namco", "500GP", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )

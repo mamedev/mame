@@ -52,7 +52,7 @@
 #define SND_CLOCK	XTAL_14_31818MHz
 
 #include "driver.h"
-#include "cpu/h83002/h83002.h"
+#include "cpu/h83002/h8.h"
 #include "sound/upd7759.h"
 
 

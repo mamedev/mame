@@ -82,7 +82,7 @@ driver modified by Eisuke Watanabe
 
 #include "driver.h"
 #include "deprecat.h"
-#include "cpu/h83002/h83002.h"
+#include "cpu/h83002/h8.h"
 #include "cpu/upd7810/upd7810.h"
 #include "machine/eeprom.h"
 #include "video/konamiic.h"
@@ -2188,9 +2188,9 @@ static WRITE8_HANDLER( puzzlet_portb_w )
 }
 
 static ADDRESS_MAP_START( puzzlet_io_map, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE( H8_PORT7,		H8_PORT7	)	AM_READ_PORT("IN2")
-	AM_RANGE( H8_SERIAL_B,	H8_SERIAL_B	)	AM_READ_PORT("IN0")		// coin
-	AM_RANGE( H8_PORTB,		H8_PORTB	)	AM_READ_PORT("DSW0") AM_WRITE( puzzlet_portb_w )
+	AM_RANGE( H8_PORT_7,		H8_PORT_7	)	AM_READ_PORT("IN2")
+	AM_RANGE( H8_SERIAL_1,	H8_SERIAL_1	)	AM_READ_PORT("IN0")		// coin
+	AM_RANGE( H8_PORT_B,		H8_PORT_B	)	AM_READ_PORT("DSW0") AM_WRITE( puzzlet_portb_w )
 ADDRESS_MAP_END
 
 
@@ -4693,7 +4693,7 @@ static INTERRUPT_GEN( puzzlet_interrupt )
 
 		default:
 			// timer
-			h8_3002_InterruptRequest(24);
+			cpu_set_input_line(device->machine->cpu[0], H8_METRO_TIMER_HACK, HOLD_LINE);
 			break;
 	}
 }

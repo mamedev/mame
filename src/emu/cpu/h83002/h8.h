@@ -35,7 +35,7 @@ enum
 	H8_CCR
 };
 
-// external interrupt lines
+// external input lines
 enum
 {
 	H8_IRQ0 = 0,
@@ -43,20 +43,33 @@ enum
 	H8_IRQ2,
 	H8_IRQ3,
 	H8_IRQ4,
-	H8_IRQ5
+	H8_IRQ5,
+	H8_IRQ6,	// IRQs 6+ only available on 8-bit H8/3xx
+	H8_IRQ7,
+	H8_NMI,
+
+	H8_METRO_TIMER_HACK,	// as described.  this needs to be fixed.
+
+	H8_SCI_0_RX,	// incoming character on SCI 0
+	H8_SCI_1_RX,	// incoming character on SCI 1
 };
 
 // I/O ports
 enum
 {
 	// digital I/O ports
-	H8_PORT4 = 0,	// 0
-	H8_PORT6,	// 1
-	H8_PORT7,	// 2
-	H8_PORT8,	// 3
-	H8_PORT9,	// 4
-	H8_PORTA,	// 5
-	H8_PORTB,	// 6
+	// ports 4-B are valid on 16-bit H8/3xx, ports 1-9 on 8-bit H8/3xx
+	H8_PORT_1 = 0,	// 0
+	H8_PORT_2,	// 1
+	H8_PORT_3,	// 2
+	H8_PORT_4,	// 3
+	H8_PORT_5,	// 4
+	H8_PORT_6,	// 5
+	H8_PORT_7,	// 6
+	H8_PORT_8,	// 7
+	H8_PORT_9,	// 8
+	H8_PORT_A,	// 9
+	H8_PORT_B,	// A
 
 	// analog inputs
 	H8_ADC_0_H = 0x10,
@@ -69,12 +82,12 @@ enum
 	H8_ADC_3_L,
 
 	// serial ports
-	H8_SERIAL_A = 0x20,
-	H8_SERIAL_B
+	H8_SERIAL_0 = 0x20,
+	H8_SERIAL_1,
 };
 
+CPU_GET_INFO( h8_300 );
 CPU_GET_INFO( h8_3002 );
-
-void h8_3002_InterruptRequest(UINT8 source);
+CPU_GET_INFO( h8_3344 );
 
 #endif /* __H83002_H__ */

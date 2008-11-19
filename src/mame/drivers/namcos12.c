@@ -924,7 +924,7 @@ Notes:
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/mips/psx.h"
-#include "cpu/h83002/h83002.h"
+#include "cpu/h83002/h8.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"
 #include "sound/c352.h"
@@ -1421,11 +1421,11 @@ static READ8_HANDLER( s12_mcu_gun_v_r )
 }
 
 static ADDRESS_MAP_START( s12h8iomap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(H8_PORT7, H8_PORT7) AM_READ_PORT("DSW")
-	AM_RANGE(H8_PORT8, H8_PORT8) AM_READ( s12_mcu_p8_r ) AM_WRITENOP
-	AM_RANGE(H8_PORTA, H8_PORTA) AM_READWRITE( s12_mcu_pa_r, s12_mcu_pa_w )
-	AM_RANGE(H8_PORTB, H8_PORTB) AM_READWRITE( s12_mcu_portB_r, s12_mcu_portB_w )
-	AM_RANGE(H8_SERIAL_B, H8_SERIAL_B) AM_READ( s12_mcu_rtc_r ) AM_WRITE( s12_mcu_settings_w )
+	AM_RANGE(H8_PORT_7, H8_PORT_7) AM_READ_PORT("DSW")
+	AM_RANGE(H8_PORT_8, H8_PORT_8) AM_READ( s12_mcu_p8_r ) AM_WRITENOP
+	AM_RANGE(H8_PORT_A, H8_PORT_A) AM_READWRITE( s12_mcu_pa_r, s12_mcu_pa_w )
+	AM_RANGE(H8_PORT_B, H8_PORT_B) AM_READWRITE( s12_mcu_portB_r, s12_mcu_portB_w )
+	AM_RANGE(H8_SERIAL_1, H8_SERIAL_1) AM_READ( s12_mcu_rtc_r ) AM_WRITE( s12_mcu_settings_w )
 	AM_RANGE(H8_ADC_0_H, H8_ADC_0_L) AM_NOP
 	AM_RANGE(H8_ADC_1_H, H8_ADC_1_L) AM_READ( s12_mcu_gun_h_r )	// golgo 13 gun X-axis
 	AM_RANGE(H8_ADC_2_H, H8_ADC_2_L) AM_READ( s12_mcu_gun_v_r )	// golgo 13 gun Y-axis

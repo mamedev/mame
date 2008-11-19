@@ -470,21 +470,21 @@ $(CPUOBJ)/hd6309/hd6309.o:	$(CPUSRC)/hd6309/hd6309.c \
 							$(CPUSRC)/hd6309/6309tbl.c
 
 
-
 #-------------------------------------------------
-# Hitachi H8/3002
+# Hitachi H8/30xx (16/32-bit H8/3xx series)
 #-------------------------------------------------
 
 CPUDEFS += -DHAS_H83002=$(if $(filter H83002,$(CPUS)),1,0)
 
 ifneq ($(filter H83002,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/h83002
-CPUOBJS += $(CPUOBJ)/h83002/h83002.o $(CPUOBJ)/h83002/h8periph.o
+CPUOBJS += $(CPUOBJ)/h83002/h8_16.o $(CPUOBJ)/h83002/h8periph.o
 DBGOBJS += $(CPUOBJ)/h83002/h8disasm.o
 endif
 
-$(CPUOBJ)/h83002/h83002.o:		$(CPUSRC)/h83002/h83002.c \
-								$(CPUSRC)/h83002/h83002.h \
+$(CPUOBJ)/h83002/h8_16.o:		$(CPUSRC)/h83002/h8_16.c \
+								$(CPUSRC)/h83002/h8.h \
+								$(CPUSRC)/h83002/h8ops.h \
 								$(CPUSRC)/h83002/h8priv.h
 
 $(CPUOBJ)/h83002/h8disasm.o: 	$(CPUSRC)/h83002/h8disasm.c
@@ -492,6 +492,28 @@ $(CPUOBJ)/h83002/h8disasm.o: 	$(CPUSRC)/h83002/h8disasm.c
 $(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
 								$(CPUSRC)/h83002/h8priv.h
 
+
+#-------------------------------------------------
+# Hitachi H8/3344 (8/16-bit H8/3xx series)
+#-------------------------------------------------
+
+CPUDEFS += -DHAS_H83344=$(if $(filter H83344,$(CPUS)),1,0)
+
+ifneq ($(filter H83344,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/h83002
+CPUOBJS += $(CPUOBJ)/h83002/h8_8.o $(CPUOBJ)/h83002/h8periph.o
+DBGOBJS += $(CPUOBJ)/h83002/h8disasm.o
+endif
+
+$(CPUOBJ)/h83002/h8_8.o:		$(CPUSRC)/h83002/h8_8.c \
+								$(CPUSRC)/h83002/h8.h \
+								$(CPUSRC)/h83002/h8ops.h \
+								$(CPUSRC)/h83002/h8priv.h
+
+$(CPUOBJ)/h83002/h8disasm.o: 	$(CPUSRC)/h83002/h8disasm.c
+
+$(CPUOBJ)/h83002/h8periph.o:	$(CPUSRC)/h83002/h8periph.c \
+								$(CPUSRC)/h83002/h8priv.h
 
 #-------------------------------------------------
 # Hitachi SH1/SH2

@@ -862,6 +862,7 @@ const game_driver * const drivers[] =
 
 	/* Namco System 23 */
 	DRIVER( rapidrvr )	/* (c) 1997 */
+	DRIVER( motoxgo )	/* (c) 1997 */
 	DRIVER( timecrs2 )	/* (c) 1997 */
 	DRIVER( timcrs2b )	/* (c) 1997 */
 	DRIVER( 500gp )		/* (c) 1999 */

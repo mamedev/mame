@@ -64,7 +64,7 @@ Notes:
 
 #include "driver.h"
 #include "deprecat.h"
-#include "cpu/h83002/h83002.h"
+#include "cpu/h83002/h8.h"
 
 /***************************************************************************
                                 Video Hardware
@@ -455,7 +455,7 @@ static INTERRUPT_GEN( unknown_interrupt )
 			cpu_set_input_line(device, 0, PULSE_LINE);
 			break;
 		default:
-			h8_3002_InterruptRequest(24);
+			cpu_set_input_line(device->machine->cpu[0], H8_METRO_TIMER_HACK, HOLD_LINE);
 			break;
 	}
 }
