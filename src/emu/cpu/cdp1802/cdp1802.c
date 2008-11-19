@@ -1,3 +1,5 @@
+#define NO_LEGACY_MEMORY_HANDLERS    1
+
 #include "driver.h"
 #include "debugger.h"
 #include "cdp1802.h"
@@ -9,7 +11,8 @@
 #define CDP1802_CYCLES_DMA			8
 #define CDP1802_CYCLES_INTERRUPT	8
 
-enum
+typedef enum _cdp1802_cpu_state cdp1802_cpu_state;
+enum _cdp1802_cpu_state
 {
 	CDP1802_STATE_0_FETCH,
 	CDP1802_STATE_1_RESET,
@@ -25,20 +28,42 @@ struct _cdp1802_state
 {
 	const cdp1802_interface *intf;
 
-	UINT8 p, x, d, b, t;
-	UINT16 r[16];
-	UINT8 df, ie, q, n, i;
+    const address_space *program;
+    const address_space *io;
 
-	int state;
-	int prevmode, mode;
-	int irq, dmain, dmaout;
-	int ef;
+	/* registers */
+	UINT8 d;				/* data register (accumulator) */
+	UINT8 df;				/* data flag (ALU carry) */
+	UINT8 b;				/* auxiliary holding register */
+	UINT16 r[16];			/* scratchpad registers */
+	UINT8 p;				/* designates which register is Program Counter */
+	UINT8 x;				/* designates which register is Data Pointer */
+	UINT8 n;				/* low-order instruction digit */
+	UINT8 i;				/* high-order instruction digit */
+	UINT8 t;				/* temporary register */
+	int ie;					/* interrupt enable */
+	int q;					/* output flip-flop */
 
-	int icount;
+	/* cpu state */
+	cdp1802_cpu_state state;		/* processor state */
+	cdp1802_control_mode mode;		/* control mode */
+	cdp1802_control_mode prevmode;	/* previous control mode */
+
+	/* input lines */
+	int irq;				/* interrupt request */
+	int dmain;				/* DMA input request */
+	int dmaout;				/* DMA output request */
+	int ef;					/* external flags */
+
+	/* execution logic */
+	int icount;				/* instruction counter */
 };
 
-#define M	program_read_byte
-#define MW	program_write_byte
+#define OPCODE_R(addr)		memory_decrypted_read_byte(cdp1802->program, addr)
+#define RAM_R(addr)			memory_read_byte_8le(cdp1802->program, addr)
+#define RAM_W(addr, data)	memory_write_byte_8le(cdp1802->program, addr, data)
+#define IO_R(addr)			memory_read_byte_8le(cdp1802->io, addr)
+#define IO_W(addr, data)	memory_write_byte_8le(cdp1802->io, addr, data)
 
 #define P	cdp1802->p
 #define X	cdp1802->x
@@ -51,46 +76,6 @@ struct _cdp1802_state
 #define Q	cdp1802->q
 #define N	cdp1802->n
 #define I	cdp1802->i
-
-static CPU_GET_CONTEXT( cdp1802 )
-{
-}
-
-static CPU_SET_CONTEXT( cdp1802 )
-{
-}
-
-static CPU_INIT( cdp1802 )
-{
-	cdp1802_state *cdp1802 = device->token;
-
-	cdp1802->intf = (cdp1802_interface *) device->static_config;
-
-	cdp1802->mode = CDP1802_MODE_RESET;
-	cdp1802->prevmode = cdp1802->mode;
-	cdp1802->irq = CLEAR_LINE;
-	cdp1802->dmain = CLEAR_LINE;
-	cdp1802->dmaout = CLEAR_LINE;
-
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->p);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->x);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->d);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->b);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->t);
-	state_save_register_item_array("cdp1802", device->tag, 0, cdp1802->r);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->df);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->ie);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->q);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->n);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->i);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->state);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->prevmode);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->mode);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->irq);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->dmain);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->dmaout);
-	state_save_register_item("cdp1802", device->tag, 0, cdp1802->ef);
-}
 
 INLINE void cdp1802_add(cdp1802_state *cdp1802, int left, int right)
 {
@@ -126,7 +111,7 @@ INLINE void cdp1802_short_branch(cdp1802_state *cdp1802, int taken)
 {
 	if (taken)
 	{
-		R[P] = (R[P] & 0xff00) | program_decrypted_read_byte(R[P]);
+		R[P] = (R[P] & 0xff00) | OPCODE_R(R[P]);
 	}
 	else
 	{
@@ -140,12 +125,12 @@ INLINE void cdp1802_long_branch(cdp1802_state *cdp1802, int taken)
 	{
 		// S1#1
 
-		B = program_decrypted_read_byte(R[P]);
+		B = OPCODE_R(R[P]);
 		R[P] = R[P] + 1;
 
 		// S1#2
 
-		R[P] = (B << 8) | program_decrypted_read_byte(R[P]);
+		R[P] = (B << 8) | OPCODE_R(R[P]);
 	}
 	else
 	{
@@ -202,6 +187,8 @@ static void cdp1802_output_state_code(const device_config *device)
 			break;
 
 		case CDP1802_STATE_1_EXECUTE:
+		case CDP1802_STATE_1_RESET:
+		case CDP1802_STATE_1_INIT:
 			state_code = CDP1802_STATE_CODE_S1_EXECUTE;
 			break;
 
@@ -267,7 +254,7 @@ static void cdp1802_run(const device_config *device)
 
 	case CDP1802_STATE_0_FETCH:
 		{
-		UINT8 opcode = program_decrypted_read_byte(R[P]);
+		UINT8 opcode = OPCODE_R(R[P]);
 
 		I = opcode >> 4;
 		N = opcode & 0x0f;
@@ -288,7 +275,7 @@ static void cdp1802_run(const device_config *device)
 		case 0:
 			if (N > 0)
 			{
-				D = M(R[N]);
+				D = RAM_R(R[N]);
 			}
 			break;
 
@@ -370,12 +357,12 @@ static void cdp1802_run(const device_config *device)
 			break;
 
 		case 4:
-			D = M(R[N]);
+			D = RAM_R(R[N]);
 			R[N] = R[N] + 1;
 			break;
 
 		case 5:
-			MW(R[N], D);
+			RAM_W(R[N], D);
 			break;
 
 		case 6:
@@ -392,7 +379,7 @@ static void cdp1802_run(const device_config *device)
 			case 5:
 			case 6:
 			case 7:
-				io_write_byte(N, M(R[X]));
+				IO_W(N, RAM_R(R[X]));
 				R[X] = R[X] + 1;
 				break;
 
@@ -423,8 +410,8 @@ static void cdp1802_run(const device_config *device)
 			case 0xe:
 			case 0xf:
 				{
-				UINT8 data = io_read_byte(N & 0x07);
-				MW(R[X], data);
+				UINT8 data = IO_R(N & 0x07);
+				RAM_W(R[X], data);
 				D = data;
 				}
 				break;
@@ -436,7 +423,7 @@ static void cdp1802_run(const device_config *device)
 			{
 			case 0:
 				{
-				UINT8 data = M(R[X]);
+				UINT8 data = RAM_R(R[X]);
 				R[X] = R[X] + 1;
 				P = data & 0xf;
 				X = data >> 4;
@@ -446,7 +433,7 @@ static void cdp1802_run(const device_config *device)
 
 			case 1:
 				{
-				UINT8 data = M(R[X]);
+				UINT8 data = RAM_R(R[X]);
 				R[X] = R[X] + 1;
 				P = data & 0xf;
 				X = data >> 4;
@@ -455,21 +442,21 @@ static void cdp1802_run(const device_config *device)
 				break;
 
 			case 2:
-				D = M(R[X]);
+				D = RAM_R(R[X]);
 				R[X] = R[X] + 1;
 				break;
 
 			case 3:
-				MW(R[X], D);
+				RAM_W(R[X], D);
 				R[X] = R[X] - 1;
 				break;
 
 			case 4:
-				cdp1802_add_carry(cdp1802, M(R[X]), D);
+				cdp1802_add_carry(cdp1802, RAM_R(R[X]), D);
 				break;
 
 			case 5:
-				cdp1802_sub_carry(cdp1802, M(R[X]), D);
+				cdp1802_sub_carry(cdp1802, RAM_R(R[X]), D);
 				break;
 
 			case 6:
@@ -482,18 +469,18 @@ static void cdp1802_run(const device_config *device)
 				break;
 
 			case 7:
-				cdp1802_sub_carry(cdp1802, D, M(R[X]));
+				cdp1802_sub_carry(cdp1802, D, RAM_R(R[X]));
 				break;
 
 			case 8:
-				MW(R[X], T);
+				RAM_W(R[X], T);
 				break;
 
 			case 9:
 				{
 				UINT8 result = (X << 4) | P;
 				T = result;
-				MW(R[2], result);
+				RAM_W(R[2], result);
 				X = P;
 				R[2] = R[2] - 1;
 				}
@@ -518,12 +505,12 @@ static void cdp1802_run(const device_config *device)
 				break;
 
 			case 0xc:
-				cdp1802_add_carry(cdp1802, M(R[P]), D);
+				cdp1802_add_carry(cdp1802, RAM_R(R[P]), D);
 				R[P] = R[P] + 1;
 				break;
 
 			case 0xd:
-				cdp1802_sub_carry(cdp1802, M(R[P]), D);
+				cdp1802_sub_carry(cdp1802, RAM_R(R[P]), D);
 				R[P] = R[P] + 1;
 				break;
 
@@ -537,7 +524,7 @@ static void cdp1802_run(const device_config *device)
 				break;
 
 			case 0xf:
-				cdp1802_sub_carry(cdp1802, D, M(R[P]));
+				cdp1802_sub_carry(cdp1802, D, RAM_R(R[P]));
 				R[P] = R[P] + 1;
 				break;
 			}
@@ -644,27 +631,27 @@ static void cdp1802_run(const device_config *device)
 			switch (N)
 			{
 			case 0:
-				D = M(R[X]);
+				D = RAM_R(R[X]);
 				break;
 
 			case 1:
-				D = M(R[X]) | D;
+				D = RAM_R(R[X]) | D;
 				break;
 
 			case 2:
-				D = M(R[X]) & D;
+				D = RAM_R(R[X]) & D;
 				break;
 
 			case 3:
-				D = M(R[X]) ^ D;
+				D = RAM_R(R[X]) ^ D;
 				break;
 
 			case 4:
-				cdp1802_add(cdp1802, M(R[X]), D);
+				cdp1802_add(cdp1802, RAM_R(R[X]), D);
 				break;
 
 			case 5:
-				cdp1802_sub(cdp1802, M(R[X]), D);
+				cdp1802_sub(cdp1802, RAM_R(R[X]), D);
 				break;
 
 			case 6:
@@ -673,36 +660,36 @@ static void cdp1802_run(const device_config *device)
 				break;
 
 			case 7:
-				cdp1802_sub(cdp1802, D, M(R[X]));
+				cdp1802_sub(cdp1802, D, RAM_R(R[X]));
 				break;
 
 			case 8:
-				D = M(R[P]);
+				D = RAM_R(R[P]);
 				R[P] = R[P] + 1;
 				break;
 
 			case 9:
-				D = M(R[P]) | D;
+				D = RAM_R(R[P]) | D;
 				R[P] = R[P] + 1;
 				break;
 
 			case 0xa:
-				D = M(R[P]) & D;
+				D = RAM_R(R[P]) & D;
 				R[P] = R[P] + 1;
 				break;
 
 			case 0xb:
-				D = M(R[P]) ^ D;
+				D = RAM_R(R[P]) ^ D;
 				R[P] = R[P] + 1;
 				break;
 
 			case 0xc:
-				cdp1802_add(cdp1802, M(R[P]), D);
+				cdp1802_add(cdp1802, RAM_R(R[P]), D);
 				R[P] = R[P] + 1;
 				break;
 
 			case 0xd:
-				cdp1802_sub(cdp1802, M(R[P]), D);
+				cdp1802_sub(cdp1802, RAM_R(R[P]), D);
 				R[P] = R[P] + 1;
 				break;
 
@@ -712,7 +699,7 @@ static void cdp1802_run(const device_config *device)
 				break;
 
 			case 0xf:
-				cdp1802_sub(cdp1802, D, M(R[P]));
+				cdp1802_sub(cdp1802, D, RAM_R(R[P]));
 				R[P] = R[P] + 1;
 				break;
 			}
@@ -746,7 +733,7 @@ static void cdp1802_run(const device_config *device)
 
 		if (cdp1802->intf->dma_r)
 		{
-			MW(R[0], cdp1802->intf->dma_r(device, R[0]));
+			RAM_W(R[0], cdp1802->intf->dma_r(device, R[0]));
 		}
 
 		R[0] = R[0] + 1;
@@ -779,7 +766,7 @@ static void cdp1802_run(const device_config *device)
 
 		if (cdp1802->intf->dma_w)
 		{
-	        cdp1802->intf->dma_w(device, R[0], M(R[0]));
+	        cdp1802->intf->dma_w(device, R[0], RAM_R(R[0]));
 		}
 
 		R[0] = R[0] + 1;
@@ -900,6 +887,55 @@ static CPU_RESET( cdp1802 )
 	cdp1802->mode = CDP1802_MODE_RESET;
 }
 
+static CPU_INIT( cdp1802 )
+{
+	cdp1802_state *cdp1802 = device->token;
+
+	cdp1802->intf = (cdp1802_interface *) device->static_config;
+
+	/* get address spaces */
+
+	cdp1802->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cdp1802->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+
+	/* set initial values */
+
+	cdp1802->mode = CDP1802_MODE_RESET;
+	cdp1802->prevmode = cdp1802->mode;
+	cdp1802->irq = CLEAR_LINE;
+	cdp1802->dmain = CLEAR_LINE;
+	cdp1802->dmaout = CLEAR_LINE;
+
+	/* register for state saving */
+
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->p);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->x);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->d);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->b);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->t);
+	state_save_register_item_array("cdp1802", device->tag, 0, cdp1802->r);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->df);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->ie);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->q);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->n);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->i);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->state);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->prevmode);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->mode);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->irq);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->dmain);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->dmaout);
+	state_save_register_item("cdp1802", device->tag, 0, cdp1802->ef);
+}
+
+static CPU_GET_CONTEXT( cdp1802 )
+{
+}
+
+static CPU_SET_CONTEXT( cdp1802 )
+{
+}
+
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
@@ -1010,7 +1046,7 @@ CPU_GET_INFO( cdp1802 )
 		case CPUINFO_INT_REGISTER + CDP1802_N:			info->i = cdp1802->n;					break;
 		case CPUINFO_INT_REGISTER + CDP1802_I:			info->i = cdp1802->i;					break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + CDP1802_PC:			info->i = cdp1802->r[cdp1802->p];			break;
+		case CPUINFO_INT_REGISTER + CDP1802_PC:			info->i = cdp1802->r[cdp1802->p];		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(cdp1802);			break;

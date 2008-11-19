@@ -3,6 +3,20 @@
 #ifndef __CDP1802_H__
 #define __CDP1802_H__
 
+/*
+
+	RCA COSMAC Series Microprocessors
+
+	Type			Internal ROM	Internal RAM	Timer
+	-----------------------------------------------------
+	CDP1802			none			none			no
+	CDP1803 		?				?				?
+	CDP1804			2 KB			64 bytes		yes
+	CDP1805			none			64 bytes		yes
+	CDP1806			none			none			yes
+
+*/
+
 #include "cpuintrf.h"
 
 enum
@@ -21,7 +35,8 @@ enum
 };
 
 typedef enum _cdp1802_control_mode cdp1802_control_mode;
-enum _cdp1802_control_mode {
+enum _cdp1802_control_mode
+{
 	CDP1802_MODE_LOAD,
 	CDP1802_MODE_RESET,
 	CDP1802_MODE_PAUSE,
@@ -29,7 +44,8 @@ enum _cdp1802_control_mode {
 };
 
 typedef enum _cdp1802_state_code cdp1802_state_code;
-enum _cdp1802_state_code {
+enum _cdp1802_state_code
+{
 	CDP1802_STATE_CODE_S0_FETCH,
 	CDP1802_STATE_CODE_S1_EXECUTE,
 	CDP1802_STATE_CODE_S2_DMA,
@@ -48,7 +64,7 @@ enum
 	CDP1802_T,		// Holds old X, P after Interrupt (X is high nibble)
 
 	CDP1802_R0,		// Scratchpad Register 0
-	CDP1802_R1,		
+	CDP1802_R1,
 	CDP1802_R2,
 	CDP1802_R3,
 	CDP1802_R4,
