@@ -1,5 +1,5 @@
 /*
- * MIPS disassembler for the MAME project written by smf
+ * PSXCPU disassembler for the MAME project written by smf
  *
  */
 
@@ -120,42 +120,38 @@ static const char *const s_gtelm[] =
 	"0", "1"
 };
 
-static char *effective_address( UINT32 pc, UINT32 op )
+static char *effective_address( DasmPSXCPU_state *state, UINT32 pc, UINT32 op )
 {
 	static char s_address[ 20 ];
-#ifndef STANDALONE
-	if( pc == cpu_get_pc(Machine->activecpu) )
+
+	if( state != NULL && state->pc == pc )
 	{
 		sprintf( s_address, "%s(%s) ; 0x%08x", make_signed_hex_str_16( INS_IMMEDIATE( op ) ), s_cpugenreg[ INS_RS( op ) ],
-			(UINT32)( cpu_get_reg( Machine->activecpu, MIPS_R0 + INS_RS( op ) ) + (INT16)INS_IMMEDIATE( op ) ) );
+			(UINT32)( state->r[ INS_RS( op ) ] + (INT16)INS_IMMEDIATE( op ) ) );
 		return s_address;
 	}
-#endif
 	sprintf( s_address, "%s(%s)", make_signed_hex_str_16( INS_IMMEDIATE( op ) ), s_cpugenreg[ INS_RS( op ) ] );
 	return s_address;
 }
 
-static UINT32 relative_address( UINT32 pc, UINT32 op )
+static UINT32 relative_address( DasmPSXCPU_state *state, UINT32 pc, UINT32 op )
 {
 	UINT32 nextpc = pc + 4;
-#ifndef STANDALONE
-	if( pc == cpu_get_pc(Machine->activecpu) && cpu_get_reg( Machine->activecpu, MIPS_DELAYR ) == 32 )
+	if( state != NULL && state->pc == pc && state->delayr == PSXCPU_DELAYR_PC )
 	{
-		nextpc = cpu_get_reg( Machine->activecpu, MIPS_DELAYV );
+		nextpc = state->delayv;
 	}
-#endif
-	return nextpc + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 );
+
+	return nextpc + ( PSXCPU_WORD_EXTEND( INS_IMMEDIATE( op ) ) << 2 );
 }
 
-static UINT32 jump_address( UINT32 pc, UINT32 op )
+static UINT32 jump_address( DasmPSXCPU_state *state, UINT32 pc, UINT32 op )
 {
 	UINT32 nextpc = pc + 4;
-#ifndef STANDALONE
-	if( pc == cpu_get_pc(Machine->activecpu) && cpu_get_reg( Machine->activecpu, MIPS_DELAYR ) == 32 )
+	if( state != NULL && state->pc == pc && state->delayr == PSXCPU_DELAYR_PC )
 	{
-		nextpc = cpu_get_reg( Machine->activecpu, MIPS_DELAYV );
+		nextpc = state->delayv;
 	}
-#endif
 	return ( nextpc & 0xf0000000 ) + ( INS_TARGET( op ) << 2 );
 }
 
@@ -185,7 +181,7 @@ static char *upper_address( UINT32 op, const UINT8 *opram )
 	return s_address;
 }
 
-unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
+unsigned DasmPSXCPU( DasmPSXCPU_state *state, char *buffer, UINT32 pc, const UINT8 *opram )
 {
 	UINT32 op;
 	const UINT8 *oldopram;
@@ -309,45 +305,45 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 		case RT_BLTZ:
 			if( INS_RT( op ) == RT_BLTZAL )
 			{
-				sprintf( buffer, "bltzal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				sprintf( buffer, "bltzal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( state, pc, op ) );
 				flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA( 1 );
 			}
 			else
 			{
-				sprintf( buffer, "bltz    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				sprintf( buffer, "bltz    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( state, pc, op ) );
 			}
 			break;
 		case RT_BGEZ:
 			if( INS_RT( op ) == RT_BGEZAL )
 			{
-				sprintf( buffer, "bgezal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				sprintf( buffer, "bgezal  %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( state, pc, op ) );
 				flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA( 1 );
 			}
 			else
 			{
-				sprintf( buffer, "bgez    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( pc, op ) );
+				sprintf( buffer, "bgez    %s,$%08x", s_cpugenreg[ INS_RS( op ) ], relative_address( state, pc, op ) );
 			}
 			break;
 		}
 		break;
 	case OP_J:
-		sprintf( buffer, "j       $%08x", jump_address( pc, op ) );
+		sprintf( buffer, "j       $%08x", jump_address( state, pc, op ) );
 		break;
 	case OP_JAL:
-		sprintf( buffer, "jal     $%08x", jump_address( pc, op ) );
+		sprintf( buffer, "jal     $%08x", jump_address( state, pc, op ) );
 		flags = DASMFLAG_STEP_OVER | DASMFLAG_STEP_OVER_EXTRA( 1 );
 		break;
 	case OP_BEQ:
-		sprintf( buffer, "beq     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
+		sprintf( buffer, "beq     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( state, pc, op ) );
 		break;
 	case OP_BNE:
-		sprintf( buffer, "bne     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
+		sprintf( buffer, "bne     %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( state, pc, op ) );
 		break;
 	case OP_BLEZ:
-		sprintf( buffer, "blez    %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
+		sprintf( buffer, "blez    %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( state, pc, op ) );
 		break;
 	case OP_BGTZ:
-		sprintf( buffer, "bgtz    %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( pc, op ) );
+		sprintf( buffer, "bgtz    %s,%s,$%08x", s_cpugenreg[ INS_RS( op ) ], s_cpugenreg[ INS_RT( op ) ], relative_address( state, pc, op ) );
 		break;
 	case OP_ADDI:
 		sprintf( buffer, "addi    %s,%s,%s", s_cpugenreg[ INS_RT( op ) ], s_cpugenreg[ INS_RS( op ) ], make_signed_hex_str_16( INS_IMMEDIATE( op ) ) );
@@ -393,10 +389,10 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 			switch( INS_BC( op ) )
 			{
 			case BC_BCF:
-				sprintf( buffer, "bc0f    $%08x", relative_address( pc, op ) );
+				sprintf( buffer, "bc0f    $%08x", relative_address( state, pc, op ) );
 				break;
 			case BC_BCT:
-				sprintf( buffer, "bc0t    $%08x", relative_address( pc, op ) );
+				sprintf( buffer, "bc0t    $%08x", relative_address( state, pc, op ) );
 				break;
 			}
 			break;
@@ -449,10 +445,10 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 			switch( INS_BC( op ) )
 			{
 			case BC_BCF:
-				sprintf( buffer, "bc1f    $%08x", relative_address( pc, op ) );
+				sprintf( buffer, "bc1f    $%08x", relative_address( state, pc, op ) );
 				break;
 			case BC_BCT:
-				sprintf( buffer, "bc1t    $%08x", relative_address( pc, op ) );
+				sprintf( buffer, "bc1t    $%08x", relative_address( state, pc, op ) );
 				break;
 			}
 			break;
@@ -486,10 +482,10 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 			switch( INS_BC( op ) )
 			{
 			case BC_BCF:
-				sprintf( buffer, "bc2f    $%08x", relative_address( pc, op ) );
+				sprintf( buffer, "bc2f    $%08x", relative_address( state, pc, op ) );
 				break;
 			case BC_BCT:
-				sprintf( buffer, "bc2t    $%08x", relative_address( pc, op ) );
+				sprintf( buffer, "bc2t    $%08x", relative_address( state, pc, op ) );
 				break;
 			}
 			break;
@@ -664,10 +660,10 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 			switch( INS_BC( op ) )
 			{
 			case BC_BCF:
-				sprintf( buffer, "bc3f    $%08x", relative_address( pc, op ) );
+				sprintf( buffer, "bc3f    $%08x", relative_address( state, pc, op ) );
 				break;
 			case BC_BCT:
-				sprintf( buffer, "bc3t    $%08x", relative_address( pc, op ) );
+				sprintf( buffer, "bc3t    $%08x", relative_address( state, pc, op ) );
 				break;
 			}
 			break;
@@ -682,64 +678,64 @@ unsigned DasmMIPS( char *buffer, UINT32 pc, const UINT8 *opram )
 		}
 		break;
 	case OP_LB:
-		sprintf( buffer, "lb      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lb      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LH:
-		sprintf( buffer, "lh      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lh      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LWL:
-		sprintf( buffer, "lwl     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lwl     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LW:
-		sprintf( buffer, "lw      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lw      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LBU:
-		sprintf( buffer, "lbu     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lbu     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LHU:
-		sprintf( buffer, "lhu     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lhu     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LWR:
-		sprintf( buffer, "lwr     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lwr     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_SB:
-		sprintf( buffer, "sb      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "sb      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_SH:
-		sprintf( buffer, "sh      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "sh      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_SWL:
-		sprintf( buffer, "swl     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "swl     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_SW:
-		sprintf( buffer, "sw      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "sw      %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_SWR:
-		sprintf( buffer, "swr     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "swr     %s,%s", s_cpugenreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LWC0:
-		sprintf( buffer, "lwc0    %s,%s", s_cp0genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lwc0    %s,%s", s_cp0genreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LWC1:
-		sprintf( buffer, "lwc1    %s,%s", s_cp1genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lwc1    %s,%s", s_cp1genreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LWC2:
-		sprintf( buffer, "lwc2    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lwc2    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_LWC3:
-		sprintf( buffer, "lwc3    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "lwc3    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_SWC0:
-		sprintf( buffer, "swc0    %s,%s", s_cp0genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "swc0    %s,%s", s_cp0genreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_SWC1:
-		sprintf( buffer, "swc1    %s,%s", s_cp1genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "swc1    %s,%s", s_cp1genreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_SWC2:
-		sprintf( buffer, "swc2    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "swc2    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	case OP_SWC3:
-		sprintf( buffer, "swc3    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( pc, op ) );
+		sprintf( buffer, "swc3    %s,%s", s_cp2genreg[ INS_RT( op ) ], effective_address( state, pc, op ) );
 		break;
 	}
 	return ( opram - oldopram ) | flags | DASMFLAG_SUPPORTED;

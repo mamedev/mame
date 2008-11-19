@@ -290,7 +290,7 @@ int main( int argc, char *argv[] )
 		switch( cpu )
 		{
 		case CPU_PSX:
-			i = DasmMIPS( buf, pc + offset, filebuf + pc );
+			i = DasmPSXCPU( NULL, buf, pc + offset, filebuf + pc );
 			break;
 		case CPU_R3000:
 			{

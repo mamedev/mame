@@ -1500,7 +1500,7 @@ CPUDEFS += -DHAS_CXD8661R=$(if $(filter CXD8661R,$(CPUS)),1,0)
 ifneq ($(filter PSXCPU CXD8661R,$(CPUS)),)
 OBJDIRS += $(CPUOBJ)/mips
 CPUOBJS += $(CPUOBJ)/mips/psx.o
-DBGOBJS += $(CPUOBJ)/mips/mipsdasm.o
+DBGOBJS += $(CPUOBJ)/mips/psxdasm.o
 endif
 
 $(CPUOBJ)/mips/psx.o:	$(CPUSRC)/mips/psx.c \

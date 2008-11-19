@@ -72,12 +72,12 @@ static void psx_irq_update( running_machine *machine )
 	if( ( m_n_irqdata & m_n_irqmask ) != 0 )
 	{
 		verboselog( 2, "psx irq assert\n" );
-		cpu_set_input_line(machine->cpu[0], MIPS_IRQ0, ASSERT_LINE );
+		cpu_set_input_line(machine->cpu[0], PSXCPU_IRQ0, ASSERT_LINE );
 	}
 	else
 	{
 		verboselog( 2, "psx irq clear\n" );
-		cpu_set_input_line(machine->cpu[0], MIPS_IRQ0, CLEAR_LINE );
+		cpu_set_input_line(machine->cpu[0], PSXCPU_IRQ0, CLEAR_LINE );
 	}
 }
 

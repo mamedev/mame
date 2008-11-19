@@ -160,8 +160,11 @@ static const char *const delayn[] =
 	"pc", "!pc"
 };
 
-typedef struct
+typedef struct _psxcpu_state psxcpu_state;
+
+struct _psxcpu_state
 {
+	int icount;
 	UINT32 op;
 	UINT32 pc;
 	UINT32 delayv;
@@ -182,20 +185,12 @@ typedef struct
 	UINT32 multiplier_operand2;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
-	UINT8 (*readbyte)( UINT32 );
-	UINT16 (*readhalf)( UINT32 );
-	UINT32 (*readword)( UINT32 );
-	UINT32 (*readword_masked)( UINT32, UINT32 );
-	void (*writeword)( UINT32, UINT32 );
-	void (*writeword_masked)( UINT32, UINT32, UINT32 );
+	const address_space *program;
+	int bus_attached;
 	UINT32 bad_byte_address_mask;
 	UINT32 bad_half_address_mask;
 	UINT32 bad_word_address_mask;
-} mips_cpu_context;
-
-static mips_cpu_context mipscpu;
-
-static int mips_ICount = 0;
+};
 
 static const UINT32 mips_mtc0_writemask[]=
 {
@@ -225,41 +220,180 @@ void ATTR_PRINTF(1,2) GTELOG(const char *a,...)
 	va_start( va, a );
 	vsprintf( s_text, a, va );
 	va_end( va );
-	logerror( "%08x: GTE: %08x %s\n", mipscpu.pc, INS_COFUN( mipscpu.op ), s_text );
+	logerror( "%08x: GTE: %08x %s\n", psxcpu->pc, INS_COFUN( psxcpu->op ), s_text );
 }
 #else
 INLINE void ATTR_PRINTF(1,2) GTELOG(const char *a, ...) {}
 #endif
 
-static UINT32 getcp1dr( int reg );
-static void setcp1dr( int reg, UINT32 value );
-static UINT32 getcp1cr( int reg );
-static void setcp1cr( int reg, UINT32 value );
+static UINT32 getcp1dr( psxcpu_state *psxcpu, int reg );
+static void setcp1dr( psxcpu_state *psxcpu, int reg, UINT32 value );
+static UINT32 getcp1cr( psxcpu_state *psxcpu, int reg );
+static void setcp1cr( psxcpu_state *psxcpu, int reg, UINT32 value );
 //static void docop1( int op );
 
 
-static UINT32 getcp2dr( int reg );
-static void setcp2dr( int reg, UINT32 value );
-static UINT32 getcp2cr( int reg );
-static void setcp2cr( int reg, UINT32 value );
-static void docop2( int op );
+static UINT32 getcp2dr( psxcpu_state *psxcpu, int reg );
+static void setcp2dr( psxcpu_state *psxcpu, int reg, UINT32 value );
+static UINT32 getcp2cr( psxcpu_state *psxcpu, int reg );
+static void setcp2cr( psxcpu_state *psxcpu, int reg, UINT32 value );
+static void docop2( psxcpu_state *psxcpu, int op );
 
 
-static UINT32 getcp3dr( int reg );
-static void setcp3dr( int reg, UINT32 value );
-static UINT32 getcp3cr( int reg );
-static void setcp3cr( int reg, UINT32 value );
+static UINT32 getcp3dr( psxcpu_state *psxcpu, int reg );
+static void setcp3dr( psxcpu_state *psxcpu, int reg, UINT32 value );
+static UINT32 getcp3cr( psxcpu_state *psxcpu, int reg );
+static void setcp3cr( psxcpu_state *psxcpu, int reg, UINT32 value );
 //static void docop3( int op );
 
 
-static void mips_exception( int exception );
-static void mips_load_bad_address( UINT32 address );
+static void mips_exception( psxcpu_state *psxcpu, int exception );
+static void mips_load_bad_address( psxcpu_state *psxcpu, UINT32 address );
 
-static void mips_stop( void )
+static void mips_stop( psxcpu_state *psxcpu )
 {
-	debugger_break(Machine);
-	debugger_instruction_hook(Machine,  mipscpu.pc );
+	debugger_break( Machine );
+	debugger_instruction_hook( Machine,  psxcpu->pc );
 }
+
+static UINT32 mips_cache_readword( psxcpu_state *psxcpu, UINT32 offset )
+{
+	UINT32 data = 0;
+
+	if( ( psxcpu->biu & BIU_TAG ) != 0 )
+	{
+		if( ( psxcpu->biu & BIU_IS1 ) != 0 )
+		{
+			UINT32 tag = psxcpu->icacheTag[ ( offset / 16 ) % ( ICACHE_ENTRIES / 4 ) ];
+			data |= tag & TAG_VALID;
+
+			if( ( ( tag ^ offset ) & TAG_MATCH_MASK ) == 0 )
+			{
+				data |= TAG_MATCH;
+			}
+		}
+	}
+	else if( ( psxcpu->biu & ( BIU_LOCK | BIU_INV ) ) != 0 )
+	{
+	}
+	else
+	{
+		if( ( psxcpu->biu & BIU_IS1 ) == BIU_IS1 )
+		{
+			data |= psxcpu->icache[ ( offset / 4 ) % ICACHE_ENTRIES ];
+		}
+
+		if( ( psxcpu->biu & BIU_DS ) == BIU_DS )
+		{
+			data |= psxcpu->dcache[ ( offset / 4 ) % DCACHE_ENTRIES ];
+		}
+	}
+
+	return data;
+}
+
+static void mips_cache_writeword( psxcpu_state *psxcpu, UINT32 offset, UINT32 data )
+{
+	if( ( psxcpu->biu & BIU_TAG ) != 0 )
+	{
+		if( ( psxcpu->biu & BIU_IS1 ) != 0 )
+		{
+			psxcpu->icacheTag[ ( offset / 16 ) % ( ICACHE_ENTRIES / 4 ) ] = ( data & TAG_VALID ) | ( offset & TAG_MATCH_MASK );
+		}
+	}
+	else if( ( psxcpu->biu & ( BIU_LOCK | BIU_INV ) ) != 0 )
+	{
+		if( ( psxcpu->biu & BIU_IS1 ) != 0 )
+		{
+			psxcpu->icacheTag[ ( offset / 16 ) % ( ICACHE_ENTRIES / 4 ) ] = ( offset & TAG_MATCH_MASK );
+		}
+	}
+	else
+	{
+		if( ( psxcpu->biu & BIU_IS1 ) != 0 )
+		{
+			psxcpu->icache[ ( offset / 4 ) % ICACHE_ENTRIES ] = data;
+		}
+
+		if( ( psxcpu->biu & BIU_DS ) != 0 )
+		{
+			psxcpu->dcache[ ( offset / 4 ) % DCACHE_ENTRIES ] = data;
+		}
+	}
+}
+
+INLINE UINT8 psx_readbyte( psxcpu_state *psxcpu, UINT32 address )
+{
+	if( psxcpu->bus_attached )
+	{
+		return memory_read_byte_32le( psxcpu->program, address );
+	}
+	else
+	{
+		return mips_cache_readword( psxcpu, address ) >> ( ( address & 3 ) * 8 );
+	}
+}
+
+INLINE UINT16 psx_readhalf( psxcpu_state *psxcpu, UINT32 address )
+{
+	if( psxcpu->bus_attached )
+	{
+		return memory_read_word_32le( psxcpu->program, address );
+	}
+	else
+	{
+		return mips_cache_readword( psxcpu, address ) >> ( ( address & 2 ) * 8 );
+	}
+}
+
+INLINE UINT32 psx_readword( psxcpu_state *psxcpu, UINT32 address )
+{
+	if( psxcpu->bus_attached )
+	{
+		return memory_read_dword_32le( psxcpu->program, address );
+	}
+	else
+	{
+		return mips_cache_readword( psxcpu, address );
+	}
+}
+
+INLINE UINT32 psx_readword_masked( psxcpu_state *psxcpu, UINT32 address, UINT32 mask )
+{
+	if( psxcpu->bus_attached )
+	{
+		return memory_read_dword_masked_32le( psxcpu->program, address, mask );
+	}
+	else
+	{
+		return mips_cache_readword( psxcpu, address );
+	}
+}
+
+INLINE void psx_writeword( psxcpu_state *psxcpu, UINT32 address, UINT32 data )
+{
+	if( psxcpu->bus_attached )
+	{
+		memory_write_dword_32le( psxcpu->program, address, data );
+	}
+	else
+	{
+		mips_cache_writeword( psxcpu, address, data );
+	}
+}
+
+INLINE void psx_writeword_masked( psxcpu_state *psxcpu, UINT32 address, UINT32 data, UINT32 mask )
+{
+	if( psxcpu->bus_attached )
+	{
+		memory_write_dword_masked_32le( psxcpu->program, address, data, mask );
+	}
+	else
+	{
+		mips_cache_writeword( psxcpu, address, data );
+	}
+}
+
 
 static const struct
 {
@@ -577,25 +711,25 @@ static const struct
 	{ 0x00, 0x00, NULL }
 };
 
-static UINT32 log_bioscall_parameter( int parm )
+static UINT32 log_bioscall_parameter( psxcpu_state *psxcpu, int parm )
 {
 	if( parm < 4 )
 	{
-		return cpu_get_reg( Machine->activecpu, MIPS_R4 + parm );
+		return cpu_get_reg( Machine->activecpu, PSXCPU_R4 + parm );
 	}
 	else
 	{
-		return mipscpu.readword( cpu_get_reg( Machine->activecpu, MIPS_R29 ) + ( parm * 4 ) );
+		return psx_readword( psxcpu, cpu_get_reg( Machine->activecpu, PSXCPU_R29 ) + ( parm * 4 ) );
 	}
 }
 
-static const char *log_bioscall_string( int parm )
+static const char *log_bioscall_string( psxcpu_state *psxcpu, int parm )
 {
 	int pos;
 	UINT32 address;
 	static char string[ 1024 ];
 
-	address = log_bioscall_parameter( parm );
+	address = log_bioscall_parameter( psxcpu, parm );
 	if( address == 0 )
 	{
 		return "NULL";
@@ -606,7 +740,7 @@ static const char *log_bioscall_string( int parm )
 
 	for( ;; )
 	{
-		UINT8 c = mipscpu.readbyte( address );
+		UINT8 c = psx_readbyte( psxcpu, address );
 		if( c == 0 )
 		{
 			break;
@@ -646,21 +780,21 @@ static const char *log_bioscall_string( int parm )
 	return string;
 }
 
-static const char *log_bioscall_hex( int parm )
+static const char *log_bioscall_hex( psxcpu_state *psxcpu, int parm )
 {
 	static char string[ 1024 ];
 
-	sprintf( string, "0x%08x", log_bioscall_parameter( parm ) );
+	sprintf( string, "0x%08x", log_bioscall_parameter( psxcpu, parm ) );
 
 	return string;
 }
 
-static const char *log_bioscall_char( int parm )
+static const char *log_bioscall_char( psxcpu_state *psxcpu, int parm )
 {
 	int c;
 	static char string[ 1024 ];
 
-	c = log_bioscall_parameter( parm );
+	c = log_bioscall_parameter( psxcpu, parm );
 	if( c < 32 || c > 127 )
 	{
 		sprintf( string, "0x%02x", c );
@@ -673,35 +807,35 @@ static const char *log_bioscall_char( int parm )
 	return string;
 }
 
-static void log_bioscall( void )
+static void log_bioscall( psxcpu_state *psxcpu )
 {
-	int address = cpu_get_reg( Machine->activecpu, MIPS_PC ) - 0x04;
+	int address = cpu_get_reg( Machine->activecpu, PSXCPU_PC ) - 0x04;
 	if( address == 0xa0 ||
 		address == 0xb0 ||
 		address == 0xc0 )
 	{
 		char buf[ 1024 ];
-		int operation = cpu_get_reg( Machine->activecpu, MIPS_R9 ) & 0xff;
+		int operation = cpu_get_reg( Machine->activecpu, PSXCPU_R9 ) & 0xff;
 		int bioscall = 0;
 
 		if( ( address == 0xa0 && operation == 0x3c ) ||
 			( address == 0xb0 && operation == 0x3d ) )
 		{
-			putchar( log_bioscall_parameter( 0 ) );
+			putchar( log_bioscall_parameter( psxcpu, 0 ) );
 		}
 
 		if( ( address == 0xa0 && operation == 0x03 ) ||
 			( address == 0xb0 && operation == 0x35 ) )
 		{
-			int fd = log_bioscall_parameter( 0 );
-			int buf = log_bioscall_parameter( 1 );
-			int nbytes = log_bioscall_parameter( 2 );
+			int fd = log_bioscall_parameter( psxcpu, 0 );
+			int buf = log_bioscall_parameter( psxcpu, 1 );
+			int nbytes = log_bioscall_parameter( psxcpu, 2 );
 
 			if( fd == 1 )
 			{
 				while( nbytes > 0 )
 				{
-					UINT8 c = mipscpu.readbyte( buf );
+					UINT8 c = psx_readbyte( psxcpu, buf );
 					putchar( c );
 					nbytes--;
 					buf++;
@@ -788,13 +922,13 @@ static void log_bioscall( void )
 					{
 						if( parm > 0 )
 						{
-							UINT32 format = log_bioscall_parameter( parm - 1 );
+							UINT32 format = log_bioscall_parameter( psxcpu, parm - 1 );
 							const char *parmstr = NULL;
 							int percent = 0;
 
 							for( ;; )
 							{
-								UINT8 c = mipscpu.readbyte( format );
+								UINT8 c = psx_readbyte( psxcpu, format );
 								if( c == 0 )
 								{
 									break;
@@ -814,21 +948,21 @@ static void log_bioscall( void )
 									}
 									else if( c == '*' )
 									{
-										parmstr = log_bioscall_hex( parm );
+										parmstr = log_bioscall_hex( psxcpu, parm );
 									}
 									else if( c == 's' )
 									{
-										parmstr = log_bioscall_string( parm );
+										parmstr = log_bioscall_string( psxcpu, parm );
 										percent = 0;
 									}
 									else if( c == 'c' )
 									{
-										parmstr = log_bioscall_char( parm );
+										parmstr = log_bioscall_char( psxcpu, parm );
 										percent = 0;
 									}
 									else if( c != '-' && c != '.' && c != 'l' && ( c < '0' || c > '9' ) )
 									{
-										parmstr = log_bioscall_hex( parm );
+										parmstr = log_bioscall_hex( psxcpu, parm );
 										percent = 0;
 									}
 								}
@@ -863,15 +997,15 @@ static void log_bioscall( void )
 
 						if( typelen == 5 && memcmp( parmstart, "char ", 5 ) == 0 )
 						{
-							parmstr = log_bioscall_char( parm );
+							parmstr = log_bioscall_char( psxcpu, parm );
 						}
 						else if( typelen == 12 && memcmp( parmstart, "const char *", 12 ) == 0 )
 						{
-							parmstr = log_bioscall_string( parm );
+							parmstr = log_bioscall_string( psxcpu, parm );
 						}
 						else
 						{
-							parmstr = log_bioscall_hex( parm );
+							parmstr = log_bioscall_hex( psxcpu, parm );
 						}
 
 						if( parm > 0 )
@@ -907,14 +1041,14 @@ static void log_bioscall( void )
 		{
 			sprintf( buf, "unknown_%02x_%02x", address, operation );
 		}
-		logerror( "%08x: bioscall %s\n", (unsigned int)cpu_get_reg( Machine->activecpu, MIPS_R31 ) - 8, buf );
+		logerror( "%08x: bioscall %s\n", (unsigned int)cpu_get_reg( Machine->activecpu, PSXCPU_R31 ) - 8, buf );
 	}
 }
 
 static void log_syscall( void )
 {
 	char buf[ 1024 ];
-	int operation = cpu_get_reg( Machine->activecpu, MIPS_R4 );
+	int operation = cpu_get_reg( Machine->activecpu, PSXCPU_R4 );
 
 	switch( operation )
 	{
@@ -934,269 +1068,173 @@ static void log_syscall( void )
 		sprintf( buf, "unknown_%02x", operation );
 		break;
 	}
-	logerror( "%08x: syscall %s\n", (unsigned int)cpu_get_reg( Machine->activecpu, MIPS_R31 ) - 8, buf );
+	logerror( "%08x: syscall %s\n", (unsigned int)cpu_get_reg( Machine->activecpu, PSXCPU_R31 ) - 8, buf );
 }
 
-static UINT32 mips_cache_readword( UINT32 offset )
+static void mips_update_memory_handlers( psxcpu_state *psxcpu )
 {
-	UINT32 data = 0;
-
-	if( ( mipscpu.biu & BIU_TAG ) != 0 )
+	if( ( psxcpu->cp0r[ CP0_SR ] & SR_ISC ) != 0 )
 	{
-		if( ( mipscpu.biu & BIU_IS1 ) != 0 )
-		{
-			UINT32 tag = mipscpu.icacheTag[ ( offset / 16 ) % ( ICACHE_ENTRIES / 4 ) ];
-			data |= tag & TAG_VALID;
-
-			if( ( ( tag ^ offset ) & TAG_MATCH_MASK ) == 0 )
-			{
-				data |= TAG_MATCH;
-			}
-		}
-	}
-	else if( ( mipscpu.biu & ( BIU_LOCK | BIU_INV ) ) != 0 )
-	{
+		psxcpu->bus_attached = 0;
 	}
 	else
 	{
-		if( ( mipscpu.biu & BIU_IS1 ) == BIU_IS1 )
-		{
-			data |= mipscpu.icache[ ( offset / 4 ) % ICACHE_ENTRIES ];
-		}
-
-		if( ( mipscpu.biu & BIU_DS ) == BIU_DS )
-		{
-			data |= mipscpu.dcache[ ( offset / 4 ) % DCACHE_ENTRIES ];
-		}
-	}
-
-	return data;
-}
-
-static UINT8 mips_cache_readbyte( UINT32 offset )
-{
-	return mips_cache_readword( offset ) >> ( ( offset & 3 ) * 8 );
-}
-
-static UINT16 mips_cache_readhalf( UINT32 offset )
-{
-	return mips_cache_readword( offset ) >> ( ( offset & 2 ) * 8 );
-}
-
-static UINT32 mips_cache_readword_masked( UINT32 offset, UINT32 mask )
-{
-	return mips_cache_readword( offset );
-}
-
-static void mips_cache_writeword( UINT32 offset, UINT32 data )
-{
-	if( ( mipscpu.biu & BIU_TAG ) != 0 )
-	{
-		if( ( mipscpu.biu & BIU_IS1 ) != 0 )
-		{
-			mipscpu.icacheTag[ ( offset / 16 ) % ( ICACHE_ENTRIES / 4 ) ] = ( data & TAG_VALID ) | ( offset & TAG_MATCH_MASK );
-		}
-	}
-	else if( ( mipscpu.biu & ( BIU_LOCK | BIU_INV ) ) != 0 )
-	{
-		if( ( mipscpu.biu & BIU_IS1 ) != 0 )
-		{
-			mipscpu.icacheTag[ ( offset / 16 ) % ( ICACHE_ENTRIES / 4 ) ] = ( offset & TAG_MATCH_MASK );
-		}
-	}
-	else
-	{
-		if( ( mipscpu.biu & BIU_IS1 ) != 0 )
-		{
-			mipscpu.icache[ ( offset / 4 ) % ICACHE_ENTRIES ] = data;
-		}
-
-		if( ( mipscpu.biu & BIU_DS ) != 0 )
-		{
-			mipscpu.dcache[ ( offset / 4 ) % DCACHE_ENTRIES ] = data;
-		}
+		psxcpu->bus_attached = 1;
 	}
 }
 
-static void mips_cache_writeword_masked( UINT32 offset, UINT32 data, UINT32 mask )
+INLINE void funct_mthi( psxcpu_state *psxcpu )
 {
-	mips_cache_writeword( offset, data );
+	psxcpu->multiplier_operation = MULTIPLIER_OPERATION_IDLE;
+	psxcpu->hi = psxcpu->r[ INS_RS( psxcpu->op ) ];
 }
 
-static void mips_update_memory_handlers( void )
+INLINE void funct_mtlo( psxcpu_state *psxcpu )
 {
-	if( ( mipscpu.cp0r[ CP0_SR ] & SR_ISC ) != 0 )
-	{
-		mipscpu.readbyte = mips_cache_readbyte;
-		mipscpu.readhalf = mips_cache_readhalf;
-		mipscpu.readword = mips_cache_readword;
-		mipscpu.readword_masked = mips_cache_readword_masked;
-		mipscpu.writeword = mips_cache_writeword;
-		mipscpu.writeword_masked = mips_cache_writeword_masked;
-	}
-	else
-	{
-		mipscpu.readbyte = program_read_byte_32le;
-		mipscpu.readhalf = program_read_word_32le;
-		mipscpu.readword = program_read_dword_32le;
-		mipscpu.readword_masked = program_read_dword_masked_32le;
-		mipscpu.writeword = program_write_dword_32le;
-		mipscpu.writeword_masked = program_write_dword_masked_32le;
-	}
+	psxcpu->multiplier_operation = MULTIPLIER_OPERATION_IDLE;
+	psxcpu->lo = psxcpu->r[ INS_RS( psxcpu->op ) ];
 }
 
-INLINE void funct_mthi( void )
+INLINE void funct_mult( psxcpu_state *psxcpu )
 {
-	mipscpu.multiplier_operation = MULTIPLIER_OPERATION_IDLE;
-	mipscpu.hi = mipscpu.r[ INS_RS( mipscpu.op ) ];
+	psxcpu->multiplier_operation = MULTIPLIER_OPERATION_MULT;
+	psxcpu->multiplier_operand1 = psxcpu->r[ INS_RS( psxcpu->op ) ];
+	psxcpu->multiplier_operand2 = psxcpu->r[ INS_RT( psxcpu->op ) ];
+	psxcpu->lo = psxcpu->multiplier_operand1;
 }
 
-INLINE void funct_mtlo( void )
+INLINE void funct_multu( psxcpu_state *psxcpu )
 {
-	mipscpu.multiplier_operation = MULTIPLIER_OPERATION_IDLE;
-	mipscpu.lo = mipscpu.r[ INS_RS( mipscpu.op ) ];
+	psxcpu->multiplier_operation = MULTIPLIER_OPERATION_MULTU;
+	psxcpu->multiplier_operand1 = psxcpu->r[ INS_RS( psxcpu->op ) ];
+	psxcpu->multiplier_operand2 = psxcpu->r[ INS_RT( psxcpu->op ) ];
+	psxcpu->lo = psxcpu->multiplier_operand1;
 }
 
-INLINE void funct_mult( void )
+INLINE void funct_div( psxcpu_state *psxcpu )
 {
-	mipscpu.multiplier_operation = MULTIPLIER_OPERATION_MULT;
-	mipscpu.multiplier_operand1 = mipscpu.r[ INS_RS( mipscpu.op ) ];
-	mipscpu.multiplier_operand2 = mipscpu.r[ INS_RT( mipscpu.op ) ];
-	mipscpu.lo = mipscpu.multiplier_operand1;
+	psxcpu->multiplier_operation = MULTIPLIER_OPERATION_DIV;
+	psxcpu->multiplier_operand1 = psxcpu->r[ INS_RS( psxcpu->op ) ];
+	psxcpu->multiplier_operand2 = psxcpu->r[ INS_RT( psxcpu->op ) ];
+	psxcpu->lo = psxcpu->multiplier_operand1;
+	psxcpu->hi = 0;
 }
 
-INLINE void funct_multu( void )
+INLINE void funct_divu( psxcpu_state *psxcpu )
 {
-	mipscpu.multiplier_operation = MULTIPLIER_OPERATION_MULTU;
-	mipscpu.multiplier_operand1 = mipscpu.r[ INS_RS( mipscpu.op ) ];
-	mipscpu.multiplier_operand2 = mipscpu.r[ INS_RT( mipscpu.op ) ];
-	mipscpu.lo = mipscpu.multiplier_operand1;
+	psxcpu->multiplier_operation = MULTIPLIER_OPERATION_DIVU;
+	psxcpu->multiplier_operand1 = psxcpu->r[ INS_RS( psxcpu->op ) ];
+	psxcpu->multiplier_operand2 = psxcpu->r[ INS_RT( psxcpu->op ) ];
+	psxcpu->lo = psxcpu->multiplier_operand1;
+	psxcpu->hi = 0;
 }
 
-INLINE void funct_div( void )
+static void multiplier_update( psxcpu_state *psxcpu )
 {
-	mipscpu.multiplier_operation = MULTIPLIER_OPERATION_DIV;
-	mipscpu.multiplier_operand1 = mipscpu.r[ INS_RS( mipscpu.op ) ];
-	mipscpu.multiplier_operand2 = mipscpu.r[ INS_RT( mipscpu.op ) ];
-	mipscpu.lo = mipscpu.multiplier_operand1;
-	mipscpu.hi = 0;
-}
-
-INLINE void funct_divu( void )
-{
-	mipscpu.multiplier_operation = MULTIPLIER_OPERATION_DIVU;
-	mipscpu.multiplier_operand1 = mipscpu.r[ INS_RS( mipscpu.op ) ];
-	mipscpu.multiplier_operand2 = mipscpu.r[ INS_RT( mipscpu.op ) ];
-	mipscpu.lo = mipscpu.multiplier_operand1;
-	mipscpu.hi = 0;
-}
-
-static void multiplier_update( void )
-{
-	switch( mipscpu.multiplier_operation )
+	switch( psxcpu->multiplier_operation )
 	{
 	case MULTIPLIER_OPERATION_MULT:
 		{
-			INT64 result = MUL_64_32_32( (INT32)mipscpu.multiplier_operand1, (INT32)mipscpu.multiplier_operand2 );
-			mipscpu.lo = LO32_32_64( result );
-			mipscpu.hi = HI32_32_64( result );
+			INT64 result = MUL_64_32_32( (INT32)psxcpu->multiplier_operand1, (INT32)psxcpu->multiplier_operand2 );
+			psxcpu->lo = LO32_32_64( result );
+			psxcpu->hi = HI32_32_64( result );
 		}
 		break;
 
 	case MULTIPLIER_OPERATION_MULTU:
 		{
-			UINT64 result = MUL_U64_U32_U32( mipscpu.multiplier_operand1, mipscpu.multiplier_operand2 );
-			mipscpu.lo = LO32_U32_U64( result );
-			mipscpu.hi = HI32_U32_U64( result );
+			UINT64 result = MUL_U64_U32_U32( psxcpu->multiplier_operand1, psxcpu->multiplier_operand2 );
+			psxcpu->lo = LO32_U32_U64( result );
+			psxcpu->hi = HI32_U32_U64( result );
 		}
 		break;
 
 	case MULTIPLIER_OPERATION_DIV:
-		if( mipscpu.multiplier_operand2 != 0 )
+		if( psxcpu->multiplier_operand2 != 0 )
 		{
-			mipscpu.lo = (INT32)mipscpu.multiplier_operand1 / (INT32)mipscpu.multiplier_operand2;
-			mipscpu.hi = (INT32)mipscpu.multiplier_operand1 % (INT32)mipscpu.multiplier_operand2;
+			psxcpu->lo = (INT32)psxcpu->multiplier_operand1 / (INT32)psxcpu->multiplier_operand2;
+			psxcpu->hi = (INT32)psxcpu->multiplier_operand1 % (INT32)psxcpu->multiplier_operand2;
 		}
 		else
 		{
-			if( (INT32)mipscpu.multiplier_operand1 < 0 )
+			if( (INT32)psxcpu->multiplier_operand1 < 0 )
 			{
-				mipscpu.lo = 1;
+				psxcpu->lo = 1;
 			}
 			else
 			{
-				mipscpu.lo = 0xffffffff;
+				psxcpu->lo = 0xffffffff;
 			}
 
-			mipscpu.hi = mipscpu.multiplier_operand1;
+			psxcpu->hi = psxcpu->multiplier_operand1;
 		}
 		break;
 
 	case MULTIPLIER_OPERATION_DIVU:
-		if( mipscpu.multiplier_operand2 != 0 )
+		if( psxcpu->multiplier_operand2 != 0 )
 		{
-			mipscpu.lo = mipscpu.multiplier_operand1 / mipscpu.multiplier_operand2;
-			mipscpu.hi = mipscpu.multiplier_operand1 % mipscpu.multiplier_operand2;
+			psxcpu->lo = psxcpu->multiplier_operand1 / psxcpu->multiplier_operand2;
+			psxcpu->hi = psxcpu->multiplier_operand1 % psxcpu->multiplier_operand2;
 		}
 		else
 		{
-			mipscpu.lo = 0xffffffff;
-			mipscpu.hi = mipscpu.multiplier_operand1;
+			psxcpu->lo = 0xffffffff;
+			psxcpu->hi = psxcpu->multiplier_operand1;
 		}
 		break;
 	}
 
-	mipscpu.multiplier_operation = MULTIPLIER_OPERATION_IDLE;
+	psxcpu->multiplier_operation = MULTIPLIER_OPERATION_IDLE;
 }
 
-static UINT32 mips_get_hi( void )
+static UINT32 mips_get_hi( psxcpu_state *psxcpu )
 {
-	if( mipscpu.multiplier_operation != MULTIPLIER_OPERATION_IDLE )
+	if( psxcpu->multiplier_operation != MULTIPLIER_OPERATION_IDLE )
 	{
-		multiplier_update();
+		multiplier_update( psxcpu );
 	}
 
-	return mipscpu.hi;
+	return psxcpu->hi;
 }
 
-static UINT32 mips_get_lo( void )
+static UINT32 mips_get_lo( psxcpu_state *psxcpu )
 {
-	if( mipscpu.multiplier_operation != MULTIPLIER_OPERATION_IDLE )
+	if( psxcpu->multiplier_operation != MULTIPLIER_OPERATION_IDLE )
 	{
-		multiplier_update();
+		multiplier_update( psxcpu );
 	}
-	return mipscpu.lo;
+	return psxcpu->lo;
 }
 
-static int mips_execute_unstoppable_instructions( int executeCop2 )
+static int mips_execute_unstoppable_instructions( psxcpu_state *psxcpu, int executeCop2 )
 {
-	switch( INS_OP( mipscpu.op ) )
+	switch( INS_OP( psxcpu->op ) )
 	{
 	case OP_SPECIAL:
-		switch( INS_FUNCT( mipscpu.op ) )
+		switch( INS_FUNCT( psxcpu->op ) )
 		{
 		case FUNCT_MTHI:
-			funct_mthi();
+			funct_mthi( psxcpu );
 			break;
 
 		case FUNCT_MTLO:
-			funct_mtlo();
+			funct_mtlo( psxcpu );
 			break;
 
 		case FUNCT_MULT:
-			funct_mult();
+			funct_mult( psxcpu );
 			break;
 
 		case FUNCT_MULTU:
-			funct_multu();
+			funct_multu( psxcpu );
 			break;
 
 		case FUNCT_DIV:
-			funct_div();
+			funct_div( psxcpu );
 			break;
 
 		case FUNCT_DIVU:
-			funct_divu();
+			funct_divu( psxcpu );
 			break;
 		}
 		break;
@@ -1204,15 +1242,15 @@ static int mips_execute_unstoppable_instructions( int executeCop2 )
 	case OP_COP2:
 		if( executeCop2 )
 		{
-			switch( INS_CO( mipscpu.op ) )
+			switch( INS_CO( psxcpu->op ) )
 			{
 			case 1:
-				if( ( mipscpu.cp0r[ CP0_SR ] & SR_CU2 ) == 0 )
+				if( ( psxcpu->cp0r[ CP0_SR ] & SR_CU2 ) == 0 )
 				{
 					return 0;
 				}
 
-				docop2( INS_COFUN( mipscpu.op ) );
+				docop2( psxcpu, INS_COFUN( psxcpu->op ) );
 				break;
 			}
 		}
@@ -1221,317 +1259,322 @@ static int mips_execute_unstoppable_instructions( int executeCop2 )
 	return 1;
 }
 
-static void mips_update_address_masks( void )
+static void mips_update_address_masks( psxcpu_state *psxcpu )
 {
-	if( ( mipscpu.cp0r[ CP0_SR ] & SR_KUC ) != 0 )
+	if( ( psxcpu->cp0r[ CP0_SR ] & SR_KUC ) != 0 )
 	{
-		mipscpu.bad_byte_address_mask = 0x80000000;
-		mipscpu.bad_half_address_mask = 0x80000001;
-		mipscpu.bad_word_address_mask = 0x80000003;
+		psxcpu->bad_byte_address_mask = 0x80000000;
+		psxcpu->bad_half_address_mask = 0x80000001;
+		psxcpu->bad_word_address_mask = 0x80000003;
 	}
 	else
 	{
-		mipscpu.bad_byte_address_mask = 0;
-		mipscpu.bad_half_address_mask = 1;
-		mipscpu.bad_word_address_mask = 3;
+		psxcpu->bad_byte_address_mask = 0;
+		psxcpu->bad_half_address_mask = 1;
+		psxcpu->bad_word_address_mask = 3;
 	}
 }
 
 static READ32_HANDLER( psx_berr_r )
 {
-	mipscpu.berr = 1;
+	psxcpu_state *psxcpu = space->cpu->token;
+
+	psxcpu->berr = 1;
 
 	return 0;
 }
 
 static WRITE32_HANDLER( psx_berr_w )
 {
-	mipscpu.berr = 1;
+	psxcpu_state *psxcpu = space->cpu->token;
+
+	psxcpu->berr = 1;
 }
 
-static void mips_update_scratchpad( running_machine *machine )
+static void mips_update_scratchpad( const address_space *space )
 {
 	int cpu = cpunum_get_active();
+	psxcpu_state *psxcpu = space->cpu->token;
 
-	if( ( mipscpu.biu & BIU_RAM ) == 0 )
+	if( ( psxcpu->biu & BIU_RAM ) == 0 )
 	{
-		memory_install_readwrite32_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, psx_berr_w );
+		memory_install_readwrite32_handler( space->machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, psx_berr_w );
 	}
-	else if( ( mipscpu.biu & BIU_DS ) == 0 )
+	else if( ( psxcpu->biu & BIU_DS ) == 0 )
 	{
-		memory_install_readwrite32_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, SMH_NOP );
+		memory_install_readwrite32_handler( space->machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, SMH_NOP );
 	}
 	else
 	{
-		memory_install_readwrite32_handler( machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, SMH_BANK32, SMH_BANK32 );
+		memory_install_readwrite32_handler( space->machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, SMH_BANK32, SMH_BANK32 );
 
-		memory_set_bankptr( 32, mipscpu.dcache );
+		memory_set_bankptr( 32, psxcpu->dcache );
 	}
 }
 
-INLINE void mips_set_cp0r( int reg, UINT32 value )
+INLINE void mips_set_cp0r( psxcpu_state *psxcpu, int reg, UINT32 value )
 {
-	UINT32 old = mipscpu.cp0r[ reg ];
+	UINT32 old = psxcpu->cp0r[ reg ];
 
-	mipscpu.cp0r[ reg ] = value;
+	psxcpu->cp0r[ reg ] = value;
 
 	if( reg == CP0_SR )
 	{
 		if( ( old & SR_ISC ) != ( value & SR_ISC ) )
 		{
-			mips_update_memory_handlers();
+			mips_update_memory_handlers( psxcpu );
 		}
 
 		if( ( old & SR_KUC ) != ( value & SR_KUC ) )
 		{
-			mips_update_address_masks();
+			mips_update_address_masks( psxcpu );
 		}
 	}
 
 	if( ( reg == CP0_SR || reg == CP0_CAUSE ) &&
-		( mipscpu.cp0r[ CP0_SR ] & SR_IEC ) != 0 &&
-		( mipscpu.cp0r[ CP0_SR ] & mipscpu.cp0r[ CP0_CAUSE ] & CAUSE_IP ) != 0 )
+		( psxcpu->cp0r[ CP0_SR ] & SR_IEC ) != 0 &&
+		( psxcpu->cp0r[ CP0_SR ] & psxcpu->cp0r[ CP0_CAUSE ] & CAUSE_IP ) != 0 )
 	{
-		mipscpu.op = program_decrypted_read_dword( mipscpu.pc );
-		mips_execute_unstoppable_instructions( 1 );
-		mips_exception( EXC_INT );
+		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, psxcpu->pc );
+		mips_execute_unstoppable_instructions( psxcpu, 1 );
+		mips_exception( psxcpu, EXC_INT );
 	}
 	else if( reg == CP0_SR &&
-		mipscpu.delayr != MIPS_DELAYR_PC &&
-		( mipscpu.pc & mipscpu.bad_word_address_mask ) != 0 )
+		psxcpu->delayr != PSXCPU_DELAYR_PC &&
+		( psxcpu->pc & psxcpu->bad_word_address_mask ) != 0 )
 	{
-		mips_load_bad_address( mipscpu.pc );
+		mips_load_bad_address( psxcpu, psxcpu->pc );
 	}
 }
 
-INLINE void mips_commit_delayed_load( void )
+INLINE void mips_commit_delayed_load( psxcpu_state *psxcpu )
 {
-	if( mipscpu.delayr != 0 )
+	if( psxcpu->delayr != 0 )
 	{
-		mipscpu.r[ mipscpu.delayr ] = mipscpu.delayv;
-		mipscpu.delayr = 0;
-		mipscpu.delayv = 0;
+		psxcpu->r[ psxcpu->delayr ] = psxcpu->delayv;
+		psxcpu->delayr = 0;
+		psxcpu->delayv = 0;
 	}
 }
 
-static void mips_set_pc( unsigned val )
+static void mips_set_pc( psxcpu_state *psxcpu, unsigned pc )
 {
-	mipscpu.pc = val;
-	change_pc( val );
+	psxcpu->pc = pc;
+	change_pc( pc );
 }
 
-static void mips_fetch_next_op( void )
+static void mips_fetch_next_op( psxcpu_state *psxcpu )
 {
-	if( mipscpu.delayr == MIPS_DELAYR_PC )
+	if( psxcpu->delayr == PSXCPU_DELAYR_PC )
 	{
-		UINT32 safepc = mipscpu.delayv & ~mipscpu.bad_word_address_mask;
+		UINT32 safepc = psxcpu->delayv & ~psxcpu->bad_word_address_mask;
 
 		change_pc( safepc );
-		mipscpu.op = program_decrypted_read_dword( safepc );
-		change_pc( mipscpu.pc );
+		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, safepc );
+		change_pc( psxcpu->pc );
 	}
 	else
 	{
-		mipscpu.op = program_decrypted_read_dword( mipscpu.pc + 4 );
+		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, psxcpu->pc + 4 );
 	}
 }
 
-INLINE int mips_advance_pc( void )
+INLINE int mips_advance_pc( psxcpu_state *psxcpu )
 {
-	if( mipscpu.delayr == MIPS_DELAYR_PC )
+	if( psxcpu->delayr == PSXCPU_DELAYR_PC )
 	{
-		mipscpu.pc = mipscpu.delayv;
-		mipscpu.delayr = 0;
-		mipscpu.delayv = 0;
+		psxcpu->pc = psxcpu->delayv;
+		psxcpu->delayr = 0;
+		psxcpu->delayv = 0;
 
-		if( ( mipscpu.pc & mipscpu.bad_word_address_mask ) != 0 )
+		if( ( psxcpu->pc & psxcpu->bad_word_address_mask ) != 0 )
 		{
-			mips_load_bad_address( mipscpu.pc );
+			mips_load_bad_address( psxcpu, psxcpu->pc );
 			return 0;
 		}
 		else
 		{
-			change_pc( mipscpu.pc );
+			change_pc( psxcpu->pc );
 		}
 	}
-	else if( mipscpu.delayr == MIPS_DELAYR_NOTPC )
+	else if( psxcpu->delayr == PSXCPU_DELAYR_NOTPC )
 	{
-		mipscpu.delayr = 0;
-		mipscpu.delayv = 0;
-		mipscpu.pc += 4;
+		psxcpu->delayr = 0;
+		psxcpu->delayv = 0;
+		psxcpu->pc += 4;
 	}
 	else
 	{
-		mips_commit_delayed_load();
-		mipscpu.pc += 4;
+		mips_commit_delayed_load( psxcpu );
+		psxcpu->pc += 4;
 	}
 
 	return 1;
 }
 
-INLINE void mips_load( UINT32 reg, UINT32 value )
+INLINE void mips_load( psxcpu_state *psxcpu, UINT32 reg, UINT32 value )
 {
-	mips_advance_pc();
+	mips_advance_pc( psxcpu );
 
 	if( reg != 0 )
 	{
-		mipscpu.r[ reg ] = value;
+		psxcpu->r[ reg ] = value;
 	}
 }
 
-INLINE void mips_delayed_load( UINT32 reg, UINT32 value )
+INLINE void mips_delayed_load( psxcpu_state *psxcpu, UINT32 reg, UINT32 value )
 {
-	mips_advance_pc();
+	mips_advance_pc( psxcpu );
 
-	mipscpu.delayr = reg;
-	mipscpu.delayv = value;
+	psxcpu->delayr = reg;
+	psxcpu->delayv = value;
 }
 
-INLINE void mips_branch( UINT32 address )
+INLINE void mips_branch( psxcpu_state *psxcpu, UINT32 address )
 {
-	mips_advance_pc();
+	mips_advance_pc( psxcpu );
 
-	mipscpu.delayr = MIPS_DELAYR_PC;
-	mipscpu.delayv = address;
+	psxcpu->delayr = PSXCPU_DELAYR_PC;
+	psxcpu->delayv = address;
 }
 
-INLINE void mips_conditional_branch( int takeBranch )
+INLINE void mips_conditional_branch( psxcpu_state *psxcpu, int takeBranch )
 {
-	mips_advance_pc();
+	mips_advance_pc( psxcpu );
 
 	if( takeBranch )
 	{
-		mipscpu.delayr = MIPS_DELAYR_PC;
-		mipscpu.delayv = mipscpu.pc + ( MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) ) << 2 );
+		psxcpu->delayr = PSXCPU_DELAYR_PC;
+		psxcpu->delayv = psxcpu->pc + ( PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) ) << 2 );
 	}
 	else
 	{
-		mipscpu.delayr = MIPS_DELAYR_NOTPC;
-		mipscpu.delayv = 0;
+		psxcpu->delayr = PSXCPU_DELAYR_NOTPC;
+		psxcpu->delayv = 0;
 	}
 }
 
-INLINE void mips_unconditional_branch( void )
+INLINE void mips_unconditional_branch( psxcpu_state *psxcpu )
 {
-	mips_advance_pc();
+	mips_advance_pc( psxcpu );
 
-	mipscpu.delayr = MIPS_DELAYR_PC;
-	mipscpu.delayv = ( mipscpu.pc & 0xf0000000 ) + ( INS_TARGET( mipscpu.op ) << 2 );
+	psxcpu->delayr = PSXCPU_DELAYR_PC;
+	psxcpu->delayv = ( psxcpu->pc & 0xf0000000 ) + ( INS_TARGET( psxcpu->op ) << 2 );
 }
 
-static void mips_common_exception( int exception, UINT32 romOffset, UINT32 ramOffset )
+static void mips_common_exception( psxcpu_state *psxcpu, int exception, UINT32 romOffset, UINT32 ramOffset )
 {
-	int cause = ( exception << 2 ) | ( ( ( mipscpu.op >> 26 ) & 3 ) << 28 );
+	int cause = ( exception << 2 ) | ( ( ( psxcpu->op >> 26 ) & 3 ) << 28 );
 
-	if( mipscpu.delayr == MIPS_DELAYR_PC )
+	if( psxcpu->delayr == PSXCPU_DELAYR_PC )
 	{
 		cause |= CAUSE_BT;
-		mips_set_cp0r( CP0_TAR, mipscpu.delayv );
+		mips_set_cp0r( psxcpu, CP0_TAR, psxcpu->delayv );
 	}
-	else if( mipscpu.delayr == MIPS_DELAYR_NOTPC )
+	else if( psxcpu->delayr == PSXCPU_DELAYR_NOTPC )
 	{
-		mips_set_cp0r( CP0_TAR, mipscpu.pc + 4 );
+		mips_set_cp0r( psxcpu, CP0_TAR, psxcpu->pc + 4 );
 	}
 	else
 	{
-		mips_commit_delayed_load();
+		mips_commit_delayed_load( psxcpu );
 	}
 
-	if( mipscpu.delayr == MIPS_DELAYR_PC || mipscpu.delayr == MIPS_DELAYR_NOTPC )
+	if( psxcpu->delayr == PSXCPU_DELAYR_PC || psxcpu->delayr == PSXCPU_DELAYR_NOTPC )
 	{
 		cause |= CAUSE_BD;
-		mips_set_cp0r( CP0_EPC, mipscpu.pc - 4 );
+		mips_set_cp0r( psxcpu, CP0_EPC, psxcpu->pc - 4 );
 	}
 	else
 	{
-		mips_set_cp0r( CP0_EPC, mipscpu.pc );
+		mips_set_cp0r( psxcpu, CP0_EPC, psxcpu->pc );
 	}
 
 	if( LOG_BIOSCALL && exception != EXC_INT )
 	{
-		logerror( "%08x: Exception %d\n", mipscpu.pc, exception );
+		logerror( "%08x: Exception %d\n", psxcpu->pc, exception );
 	}
 
-	mipscpu.delayr = 0;
-	mipscpu.delayv = 0;
-	mipscpu.berr = 0;
+	psxcpu->delayr = 0;
+	psxcpu->delayv = 0;
+	psxcpu->berr = 0;
 
-	if( mipscpu.cp0r[ CP0_SR ] & SR_BEV )
+	if( psxcpu->cp0r[ CP0_SR ] & SR_BEV )
 	{
-		mips_set_pc( romOffset );
+		mips_set_pc( psxcpu, romOffset );
 	}
 	else
 	{
-		mips_set_pc( ramOffset );
+		mips_set_pc( psxcpu, ramOffset );
 	}
 
-	mips_set_cp0r( CP0_SR, ( mipscpu.cp0r[ CP0_SR ] & ~0x3f ) | ( ( mipscpu.cp0r[ CP0_SR ] << 2 ) & 0x3f ) );
-	mips_set_cp0r( CP0_CAUSE, ( mipscpu.cp0r[ CP0_CAUSE ] & ~( CAUSE_EXC | CAUSE_BD | CAUSE_BT | CAUSE_CE ) ) | cause );
+	mips_set_cp0r( psxcpu, CP0_SR, ( psxcpu->cp0r[ CP0_SR ] & ~0x3f ) | ( ( psxcpu->cp0r[ CP0_SR ] << 2 ) & 0x3f ) );
+	mips_set_cp0r( psxcpu, CP0_CAUSE, ( psxcpu->cp0r[ CP0_CAUSE ] & ~( CAUSE_EXC | CAUSE_BD | CAUSE_BT | CAUSE_CE ) ) | cause );
 }
 
-static void mips_exception( int exception )
+static void mips_exception( psxcpu_state *psxcpu, int exception )
 {
-	mips_common_exception( exception, 0xbfc00180, 0x80000080 );
+	mips_common_exception( psxcpu, exception, 0xbfc00180, 0x80000080 );
 }
 
-static void mips_breakpoint_exception( void )
+static void mips_breakpoint_exception( psxcpu_state *psxcpu )
 {
-	mips_fetch_next_op();
-	mips_execute_unstoppable_instructions( 1 );
-	mips_common_exception( EXC_BP, 0xbfc00140, 0x80000040 );
+	mips_fetch_next_op( psxcpu );
+	mips_execute_unstoppable_instructions( psxcpu, 1 );
+	mips_common_exception( psxcpu, EXC_BP, 0xbfc00140, 0x80000040 );
 }
 
-static void mips_load_bus_error_exception( void )
+static void mips_load_bus_error_exception( psxcpu_state *psxcpu )
 {
-	mips_fetch_next_op();
-	mips_execute_unstoppable_instructions( 0 );
-	mips_common_exception( EXC_DBE, 0xbfc00180, 0x80000080 );
+	mips_fetch_next_op( psxcpu );
+	mips_execute_unstoppable_instructions( psxcpu, 0 );
+	mips_common_exception( psxcpu, EXC_DBE, 0xbfc00180, 0x80000080 );
 }
 
-static void mips_store_bus_error_exception( void )
+static void mips_store_bus_error_exception( psxcpu_state *psxcpu )
 {
-	mips_fetch_next_op();
+	mips_fetch_next_op( psxcpu );
 
-	if( mips_execute_unstoppable_instructions( 1 ) )
+	if( mips_execute_unstoppable_instructions( psxcpu, 1 ) )
 	{
-		if( !mips_advance_pc() )
+		if( !mips_advance_pc( psxcpu ) )
 		{
 			return;
 		}
 
-		mips_fetch_next_op();
-		mips_execute_unstoppable_instructions( 0 );
+		mips_fetch_next_op( psxcpu );
+		mips_execute_unstoppable_instructions( psxcpu, 0 );
 	}
 
-	mips_common_exception( EXC_DBE, 0xbfc00180, 0x80000080 );
+	mips_common_exception( psxcpu, EXC_DBE, 0xbfc00180, 0x80000080 );
 }
 
-static void mips_load_bad_address( UINT32 address )
+static void mips_load_bad_address( psxcpu_state *psxcpu, UINT32 address )
 {
-	mips_set_cp0r( CP0_BADA, address );
-	mips_exception( EXC_ADEL );
+	mips_set_cp0r( psxcpu, CP0_BADA, address );
+	mips_exception( psxcpu, EXC_ADEL );
 }
 
-static void mips_store_bad_address( UINT32 address )
+static void mips_store_bad_address( psxcpu_state *psxcpu, UINT32 address )
 {
-	mips_set_cp0r( CP0_BADA, address );
-	mips_exception( EXC_ADES );
+	mips_set_cp0r( psxcpu, CP0_BADA, address );
+	mips_exception( psxcpu, EXC_ADES );
 }
 
-INLINE int mips_data_address_breakpoint( int dcic_rw, int dcic_status, UINT32 address )
+INLINE int mips_data_address_breakpoint( psxcpu_state *psxcpu, int dcic_rw, int dcic_status, UINT32 address )
 {
 	if( address < 0x1f000000 || address > 0x1fffffff )
 	{
-		if( ( mipscpu.cp0r[ CP0_DCIC ] & DCIC_DE ) != 0 &&
-			( ( ( mipscpu.cp0r[ CP0_DCIC ] & DCIC_KD ) != 0 && ( mipscpu.cp0r[ CP0_SR ] & SR_KUC ) == 0 ) ||
-			( ( mipscpu.cp0r[ CP0_DCIC ] & DCIC_UD ) != 0 && ( mipscpu.cp0r[ CP0_SR ] & SR_KUC ) != 0 ) ) )
+		if( ( psxcpu->cp0r[ CP0_DCIC ] & DCIC_DE ) != 0 &&
+			( ( ( psxcpu->cp0r[ CP0_DCIC ] & DCIC_KD ) != 0 && ( psxcpu->cp0r[ CP0_SR ] & SR_KUC ) == 0 ) ||
+			( ( psxcpu->cp0r[ CP0_DCIC ] & DCIC_UD ) != 0 && ( psxcpu->cp0r[ CP0_SR ] & SR_KUC ) != 0 ) ) )
 		{
-			if( ( mipscpu.cp0r[ CP0_DCIC ] & dcic_rw ) == dcic_rw &&
-				( address & mipscpu.cp0r[ CP0_BDAM ] ) == ( mipscpu.cp0r[ CP0_BDA ] & mipscpu.cp0r[ CP0_BDAM ] ) )
+			if( ( psxcpu->cp0r[ CP0_DCIC ] & dcic_rw ) == dcic_rw &&
+				( address & psxcpu->cp0r[ CP0_BDAM ] ) == ( psxcpu->cp0r[ CP0_BDA ] & psxcpu->cp0r[ CP0_BDAM ] ) )
 			{
-				mipscpu.cp0r[ CP0_DCIC ] = ( mipscpu.cp0r[ CP0_DCIC ] & ~DCIC_STATUS ) | dcic_status;
+				psxcpu->cp0r[ CP0_DCIC ] = ( psxcpu->cp0r[ CP0_DCIC ] & ~DCIC_STATUS ) | dcic_status;
 
-				if( ( mipscpu.cp0r[ CP0_DCIC ] & DCIC_TR ) != 0 )
+				if( ( psxcpu->cp0r[ CP0_DCIC ] & DCIC_TR ) != 0 )
 				{
 					return 1;
 				}
@@ -1542,97 +1585,107 @@ INLINE int mips_data_address_breakpoint( int dcic_rw, int dcic_status, UINT32 ad
 	return 0;
 }
 
-INLINE int mips_load_data_address_breakpoint( UINT32 address )
+INLINE int mips_load_data_address_breakpoint( psxcpu_state *psxcpu, UINT32 address )
 {
-	return mips_data_address_breakpoint( DCIC_DR | DCIC_DAE, DCIC_DB | DCIC_DA | DCIC_R, address );
+	return mips_data_address_breakpoint( psxcpu, DCIC_DR | DCIC_DAE, DCIC_DB | DCIC_DA | DCIC_R, address );
 }
 
-INLINE int mips_store_data_address_breakpoint( UINT32 address )
+INLINE int mips_store_data_address_breakpoint( psxcpu_state *psxcpu, UINT32 address )
 {
-	return mips_data_address_breakpoint( DCIC_DW | DCIC_DAE, DCIC_DB | DCIC_DA | DCIC_W, address );
+	return mips_data_address_breakpoint( psxcpu, DCIC_DW | DCIC_DAE, DCIC_DB | DCIC_DA | DCIC_W, address );
 }
 
 static STATE_POSTLOAD( mips_postload )
 {
-	mips_update_memory_handlers();
-	mips_update_address_masks();
-	mips_update_scratchpad(machine);
+	psxcpu_state *psxcpu = param;
+
+	mips_update_memory_handlers( psxcpu );
+	mips_update_address_masks( psxcpu );
+	mips_update_scratchpad( psxcpu->program );
 }
 
 static void mips_state_register( const char *type, const device_config *device )
 {
-	state_save_register_item( type, device->tag, 0, mipscpu.op );
-	state_save_register_item( type, device->tag, 0, mipscpu.pc );
-	state_save_register_item( type, device->tag, 0, mipscpu.delayv );
-	state_save_register_item( type, device->tag, 0, mipscpu.delayr );
-	state_save_register_item( type, device->tag, 0, mipscpu.hi );
-	state_save_register_item( type, device->tag, 0, mipscpu.lo );
-	state_save_register_item( type, device->tag, 0, mipscpu.biu );
-	state_save_register_item_array( type, device->tag, 0, mipscpu.r );
-	state_save_register_item_array( type, device->tag, 0, mipscpu.cp0r );
-	state_save_register_item_array( type, device->tag, 0, mipscpu.cp2cr );
-	state_save_register_item_array( type, device->tag, 0, mipscpu.cp2dr );
-	state_save_register_item_array( type, device->tag, 0, mipscpu.icacheTag );
-	state_save_register_item_array( type, device->tag, 0, mipscpu.icache );
-	state_save_register_item_array( type, device->tag, 0, mipscpu.dcache );
-	state_save_register_item( type, device->tag, 0, mipscpu.multiplier_operation );
-	state_save_register_item( type, device->tag, 0, mipscpu.multiplier_operand1 );
-	state_save_register_item( type, device->tag, 0, mipscpu.multiplier_operand2 );
-	state_save_register_postload( device->machine, mips_postload, NULL );
+	psxcpu_state *psxcpu = device->token;
+
+	state_save_register_item( type, device->tag, 0, psxcpu->op );
+	state_save_register_item( type, device->tag, 0, psxcpu->pc );
+	state_save_register_item( type, device->tag, 0, psxcpu->delayv );
+	state_save_register_item( type, device->tag, 0, psxcpu->delayr );
+	state_save_register_item( type, device->tag, 0, psxcpu->hi );
+	state_save_register_item( type, device->tag, 0, psxcpu->lo );
+	state_save_register_item( type, device->tag, 0, psxcpu->biu );
+	state_save_register_item_array( type, device->tag, 0, psxcpu->r );
+	state_save_register_item_array( type, device->tag, 0, psxcpu->cp0r );
+	state_save_register_item_array( type, device->tag, 0, psxcpu->cp2cr );
+	state_save_register_item_array( type, device->tag, 0, psxcpu->cp2dr );
+	state_save_register_item_array( type, device->tag, 0, psxcpu->icacheTag );
+	state_save_register_item_array( type, device->tag, 0, psxcpu->icache );
+	state_save_register_item_array( type, device->tag, 0, psxcpu->dcache );
+	state_save_register_item( type, device->tag, 0, psxcpu->multiplier_operation );
+	state_save_register_item( type, device->tag, 0, psxcpu->multiplier_operand1 );
+	state_save_register_item( type, device->tag, 0, psxcpu->multiplier_operand2 );
+	state_save_register_postload( device->machine, mips_postload, psxcpu );
 }
 
-static CPU_INIT( mips )
+static CPU_INIT( psxcpu )
 {
-	mipscpu.irq_callback = irqcallback;
-	mipscpu.device = device;
+	psxcpu_state *psxcpu = device->token;
+//	psxcpu->intf = (psxcpu_interface *) device->static_config;
+
+	psxcpu->irq_callback = irqcallback;
+	psxcpu->device = device;
+	psxcpu->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	mips_state_register( "psxcpu", device );
 }
 
-static CPU_RESET( mips )
+static CPU_RESET( psxcpu )
 {
-	mipscpu.delayr = 0;
-	mipscpu.delayv = 0;
+	psxcpu_state *psxcpu = device->token;
 
-	mipscpu.multiplier_operation = MULTIPLIER_OPERATION_IDLE;
+	psxcpu->delayr = 0;
+	psxcpu->delayv = 0;
 
-	mips_update_memory_handlers();
-	mips_update_address_masks();
-	mips_update_scratchpad(device->machine);
+	psxcpu->multiplier_operation = MULTIPLIER_OPERATION_IDLE;
 
-	mips_set_cp0r( CP0_SR, SR_BEV );
-	mips_set_cp0r( CP0_CAUSE, 0x00000000 );
-	mips_set_cp0r( CP0_PRID, 0x00000002 );
-	mips_set_cp0r( CP0_DCIC, 0x00000000 );
-	mips_set_cp0r( CP0_BPCM, 0xffffffff );
-	mips_set_cp0r( CP0_BDAM, 0xffffffff );
-	mips_set_pc( 0xbfc00000 );
+	mips_update_memory_handlers( psxcpu );
+	mips_update_address_masks( psxcpu );
+	mips_update_scratchpad( psxcpu->program );
+
+	mips_set_cp0r( psxcpu, CP0_SR, SR_BEV );
+	mips_set_cp0r( psxcpu, CP0_CAUSE, 0x00000000 );
+	mips_set_cp0r( psxcpu, CP0_PRID, 0x00000002 );
+	mips_set_cp0r( psxcpu, CP0_DCIC, 0x00000000 );
+	mips_set_cp0r( psxcpu, CP0_BPCM, 0xffffffff );
+	mips_set_cp0r( psxcpu, CP0_BDAM, 0xffffffff );
+	mips_set_pc( psxcpu, 0xbfc00000 );
 }
 
-static CPU_EXIT( mips )
+static CPU_EXIT( psxcpu )
 {
 }
 
-static UINT32 mips_get_register_from_pipeline( int reg )
+static UINT32 mips_get_register_from_pipeline( psxcpu_state *psxcpu, int reg )
 {
-	if( mipscpu.delayr == reg )
+	if( psxcpu->delayr == reg )
 	{
-		UINT32 data = mipscpu.delayv;
+		UINT32 data = psxcpu->delayv;
 
-		mipscpu.delayr = 0;
-		mipscpu.delayv = 0;
+		psxcpu->delayr = 0;
+		psxcpu->delayv = 0;
 
 		return data;
 	}
 
-	return mipscpu.r[ reg ];
+	return psxcpu->r[ reg ];
 }
 
-static int mips_cop0_usable( void )
+static int mips_cop0_usable( psxcpu_state *psxcpu )
 {
-	if( ( mipscpu.cp0r[ CP0_SR ] & SR_KUC ) != 0 && ( mipscpu.cp0r[ CP0_SR ] & SR_CU0 ) == 0 )
+	if( ( psxcpu->cp0r[ CP0_SR ] & SR_KUC ) != 0 && ( psxcpu->cp0r[ CP0_SR ] & SR_CU0 ) == 0 )
 	{
-		mips_exception( EXC_CPU );
+		mips_exception( psxcpu, EXC_CPU );
 
 		return 0;
 	}
@@ -1640,36 +1693,36 @@ static int mips_cop0_usable( void )
 	return 1;
 }
 
-static void mips_lwc( int cop, int sr_cu )
+static void mips_lwc( psxcpu_state *psxcpu, int cop, int sr_cu )
 {
-	UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-	int breakpoint = mips_load_data_address_breakpoint( address );
+	UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+	int breakpoint = mips_load_data_address_breakpoint( psxcpu, address );
 
-	if( ( mipscpu.cp0r[ CP0_SR ] & sr_cu ) == 0 )
+	if( ( psxcpu->cp0r[ CP0_SR ] & sr_cu ) == 0 )
 	{
-		mips_exception( EXC_CPU );
+		mips_exception( psxcpu, EXC_CPU );
 	}
-	else if( ( address & mipscpu.bad_word_address_mask ) != 0 )
+	else if( ( address & psxcpu->bad_word_address_mask ) != 0 )
 	{
-		mips_load_bad_address( address );
+		mips_load_bad_address( psxcpu, address );
 	}
 	else if( breakpoint )
 	{
-		mips_breakpoint_exception();
+		mips_breakpoint_exception( psxcpu );
 	}
 	else
 	{
-		UINT32 data = mipscpu.readword( address );
+		UINT32 data = psx_readword( psxcpu, address );
 
-		if( mipscpu.berr )
+		if( psxcpu->berr )
 		{
-			mips_load_bus_error_exception();
+			mips_load_bus_error_exception( psxcpu );
 		}
 		else
 		{
-			int reg = INS_RT( mipscpu.op );
+			int reg = INS_RT( psxcpu->op );
 
-			mips_advance_pc();
+			mips_advance_pc( psxcpu );
 
 			switch( cop )
 			{
@@ -1678,33 +1731,33 @@ static void mips_lwc( int cop, int sr_cu )
 				break;
 
 			case 1:
-				setcp1dr( reg, data );
+				setcp1dr( psxcpu, reg, data );
 				break;
 
 			case 2:
-				setcp2dr( reg, data );
+				setcp2dr( psxcpu, reg, data );
 				break;
 
 			case 3:
-				setcp3dr( reg, data );
+				setcp3dr( psxcpu, reg, data );
 				break;
 			}
 		}
 	}
 }
 
-static void mips_swc( int cop, int sr_cu )
+static void mips_swc( psxcpu_state *psxcpu, int cop, int sr_cu )
 {
-	UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-	int breakpoint = mips_store_data_address_breakpoint( address );
+	UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+	int breakpoint = mips_store_data_address_breakpoint( psxcpu, address );
 
-	if( ( mipscpu.cp0r[ CP0_SR ] & sr_cu ) == 0 )
+	if( ( psxcpu->cp0r[ CP0_SR ] & sr_cu ) == 0 )
 	{
-		mips_exception( EXC_CPU );
+		mips_exception( psxcpu, EXC_CPU );
 	}
-	else if( ( address & mipscpu.bad_word_address_mask ) != 0 )
+	else if( ( address & psxcpu->bad_word_address_mask ) != 0 )
 	{
-		mips_store_bad_address( address );
+		mips_store_bad_address( psxcpu, address );
 	}
 	else
 	{
@@ -1716,340 +1769,343 @@ static void mips_swc( int cop, int sr_cu )
 			{
 				int address;
 
-				if( mipscpu.delayr == MIPS_DELAYR_PC )
+				if( psxcpu->delayr == PSXCPU_DELAYR_PC )
 				{
-					switch( mipscpu.delayv & 0x0c )
+					switch( psxcpu->delayv & 0x0c )
 					{
 					case 0x0c:
-						address = mipscpu.delayv;
+						address = psxcpu->delayv;
 						break;
 
 					default:
-						address = mipscpu.delayv + 4;
+						address = psxcpu->delayv + 4;
 						break;
 					}
 				}
 				else
 				{
-					switch( mipscpu.pc & 0x0c )
+					switch( psxcpu->pc & 0x0c )
 					{
 					case 0x0:
 					case 0xc:
-						address = mipscpu.pc + 0x08;
+						address = psxcpu->pc + 0x08;
 						break;
 
 					default:
-						address = mipscpu.pc | 0x0c;
+						address = psxcpu->pc | 0x0c;
 						break;
 					}
 				}
 
-				data = program_read_dword_32le( address );
+				data = memory_read_dword_32le( psxcpu->program, address );
 			}
 			break;
 
 		case 1:
-			data = getcp1dr( INS_RT( mipscpu.op ) );
+			data = getcp1dr( psxcpu, INS_RT( psxcpu->op ) );
 			break;
 
 		case 2:
-			data = getcp2dr( INS_RT( mipscpu.op ) );
+			data = getcp2dr( psxcpu, INS_RT( psxcpu->op ) );
 			break;
 
 		case 3:
-			data = getcp3dr( INS_RT( mipscpu.op ) );
+			data = getcp3dr( psxcpu, INS_RT( psxcpu->op ) );
 			break;
 		}
 
-		mipscpu.writeword( address, data );
+		psx_writeword( psxcpu, address, data );
 
 		if( breakpoint )
 		{
-			mips_breakpoint_exception();
+			mips_breakpoint_exception( psxcpu );
 		}
-		else if( mipscpu.berr )
+		else if( psxcpu->berr )
 		{
-			mips_store_bus_error_exception();
+			mips_store_bus_error_exception( psxcpu );
 		}
 		else
 		{
-			mips_advance_pc();
+			mips_advance_pc( psxcpu );
 		}
 	}
 }
 
-static void mips_bc( int cop, int sr_cu, int condition )
+static void mips_bc( psxcpu_state *psxcpu, int cop, int sr_cu, int condition )
 {
-	if( ( mipscpu.cp0r[ CP0_SR ] & sr_cu ) == 0 )
+	if( ( psxcpu->cp0r[ CP0_SR ] & sr_cu ) == 0 )
 	{
-		mips_exception( EXC_CPU );
+		mips_exception( psxcpu, EXC_CPU );
 	}
 	else
 	{
-		mips_conditional_branch( !condition );
+		mips_conditional_branch( psxcpu, !condition );
 	}
 }
 
-static CPU_EXECUTE( mips )
+static CPU_EXECUTE( psxcpu )
 {
-	mips_ICount = cycles;
+	psxcpu_state *psxcpu = device->token;
+
+	psxcpu->icount = cycles;
+
 	do
 	{
-		if (LOG_BIOSCALL) log_bioscall();
-		debugger_instruction_hook(device->machine,  mipscpu.pc );
+		if (LOG_BIOSCALL) log_bioscall( psxcpu );
+		debugger_instruction_hook(device->machine,  psxcpu->pc );
 
-		mipscpu.op = program_decrypted_read_dword( mipscpu.pc );
-		switch( INS_OP( mipscpu.op ) )
+		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, psxcpu->pc );
+		switch( INS_OP( psxcpu->op ) )
 		{
 		case OP_SPECIAL:
-			switch( INS_FUNCT( mipscpu.op ) )
+			switch( INS_FUNCT( psxcpu->op ) )
 			{
 			case FUNCT_SLL:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] << INS_SHAMT( mipscpu.op ) );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] << INS_SHAMT( psxcpu->op ) );
 				break;
 
 			case FUNCT_SRL:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] >> INS_SHAMT( mipscpu.op ) );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] >> INS_SHAMT( psxcpu->op ) );
 				break;
 
 			case FUNCT_SRA:
-				mips_load( INS_RD( mipscpu.op ), (INT32)mipscpu.r[ INS_RT( mipscpu.op ) ] >> INS_SHAMT( mipscpu.op ) );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), (INT32)psxcpu->r[ INS_RT( psxcpu->op ) ] >> INS_SHAMT( psxcpu->op ) );
 				break;
 
 			case FUNCT_SLLV:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] << ( mipscpu.r[ INS_RS( mipscpu.op ) ] & 31 ) );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] << ( psxcpu->r[ INS_RS( psxcpu->op ) ] & 31 ) );
 				break;
 
 			case FUNCT_SRLV:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] >> ( mipscpu.r[ INS_RS( mipscpu.op ) ] & 31 ) );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] >> ( psxcpu->r[ INS_RS( psxcpu->op ) ] & 31 ) );
 				break;
 
 			case FUNCT_SRAV:
-				mips_load( INS_RD( mipscpu.op ), (INT32)mipscpu.r[ INS_RT( mipscpu.op ) ] >> ( mipscpu.r[ INS_RS( mipscpu.op ) ] & 31 ) );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), (INT32)psxcpu->r[ INS_RT( psxcpu->op ) ] >> ( psxcpu->r[ INS_RS( psxcpu->op ) ] & 31 ) );
 				break;
 
 			case FUNCT_JR:
-				mips_branch( mipscpu.r[ INS_RS( mipscpu.op ) ] );
+				mips_branch( psxcpu, psxcpu->r[ INS_RS( psxcpu->op ) ] );
 				break;
 
 			case FUNCT_JALR:
-				mips_branch( mipscpu.r[ INS_RS( mipscpu.op ) ] );
-				if( INS_RD( mipscpu.op ) != 0 )
+				mips_branch( psxcpu, psxcpu->r[ INS_RS( psxcpu->op ) ] );
+				if( INS_RD( psxcpu->op ) != 0 )
 				{
-					mipscpu.r[ INS_RD( mipscpu.op ) ] = mipscpu.pc + 4;
+					psxcpu->r[ INS_RD( psxcpu->op ) ] = psxcpu->pc + 4;
 				}
 				break;
 
 			case FUNCT_SYSCALL:
 				if (LOG_BIOSCALL) log_syscall();
-				mips_exception( EXC_SYS );
+				mips_exception( psxcpu, EXC_SYS );
 				break;
 
 			case FUNCT_BREAK:
-				mips_exception( EXC_BP );
+				mips_exception( psxcpu, EXC_BP );
 				break;
 
 			case FUNCT_MFHI:
-				mips_load( INS_RD( mipscpu.op ), mips_get_hi() );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), mips_get_hi( psxcpu ) );
 				break;
 
 			case FUNCT_MTHI:
-				funct_mthi();
-				mips_advance_pc();
+				funct_mthi( psxcpu );
+				mips_advance_pc( psxcpu );
 				break;
 
 			case FUNCT_MFLO:
-				mips_load( INS_RD( mipscpu.op ), mips_get_lo() );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), mips_get_lo( psxcpu ) );
 				break;
 
 			case FUNCT_MTLO:
-				funct_mtlo();
-				mips_advance_pc();
+				funct_mtlo( psxcpu );
+				mips_advance_pc( psxcpu );
 				break;
 
 			case FUNCT_MULT:
-				funct_mult();
-				mips_advance_pc();
+				funct_mult( psxcpu );
+				mips_advance_pc( psxcpu );
 				break;
 
 			case FUNCT_MULTU:
-				funct_multu();
-				mips_advance_pc();
+				funct_multu( psxcpu );
+				mips_advance_pc( psxcpu );
 				break;
 
 			case FUNCT_DIV:
-				funct_div();
-				mips_advance_pc();
+				funct_div( psxcpu );
+				mips_advance_pc( psxcpu );
 				break;
 
 			case FUNCT_DIVU:
-				funct_divu();
-				mips_advance_pc();
+				funct_divu( psxcpu );
+				mips_advance_pc( psxcpu );
 				break;
 
 			case FUNCT_ADD:
 				{
-					UINT32 result = mipscpu.r[ INS_RS( mipscpu.op ) ] + mipscpu.r[ INS_RT( mipscpu.op ) ];
-					if( (INT32)( ~( mipscpu.r[ INS_RS( mipscpu.op ) ] ^ mipscpu.r[ INS_RT( mipscpu.op ) ] ) & ( mipscpu.r[ INS_RS( mipscpu.op ) ] ^ result ) ) < 0 )
+					UINT32 result = psxcpu->r[ INS_RS( psxcpu->op ) ] + psxcpu->r[ INS_RT( psxcpu->op ) ];
+					if( (INT32)( ~( psxcpu->r[ INS_RS( psxcpu->op ) ] ^ psxcpu->r[ INS_RT( psxcpu->op ) ] ) & ( psxcpu->r[ INS_RS( psxcpu->op ) ] ^ result ) ) < 0 )
 					{
-						mips_exception( EXC_OVF );
+						mips_exception( psxcpu, EXC_OVF );
 					}
 					else
 					{
-						mips_load( INS_RD( mipscpu.op ), result );
+						mips_load( psxcpu, INS_RD( psxcpu->op ), result );
 					}
 				}
 				break;
 
 			case FUNCT_ADDU:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] + mipscpu.r[ INS_RT( mipscpu.op ) ] );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] + psxcpu->r[ INS_RT( psxcpu->op ) ] );
 				break;
 
 			case FUNCT_SUB:
 				{
-					UINT32 result = mipscpu.r[ INS_RS( mipscpu.op ) ] - mipscpu.r[ INS_RT( mipscpu.op ) ];
-					if( (INT32)( ( mipscpu.r[ INS_RS( mipscpu.op ) ] ^ mipscpu.r[ INS_RT( mipscpu.op ) ] ) & ( mipscpu.r[ INS_RS( mipscpu.op ) ] ^ result ) ) < 0 )
+					UINT32 result = psxcpu->r[ INS_RS( psxcpu->op ) ] - psxcpu->r[ INS_RT( psxcpu->op ) ];
+					if( (INT32)( ( psxcpu->r[ INS_RS( psxcpu->op ) ] ^ psxcpu->r[ INS_RT( psxcpu->op ) ] ) & ( psxcpu->r[ INS_RS( psxcpu->op ) ] ^ result ) ) < 0 )
 					{
-						mips_exception( EXC_OVF );
+						mips_exception( psxcpu, EXC_OVF );
 					}
 					else
 					{
-						mips_load( INS_RD( mipscpu.op ), result );
+						mips_load( psxcpu, INS_RD( psxcpu->op ), result );
 					}
 				}
 				break;
 
 			case FUNCT_SUBU:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] - mipscpu.r[ INS_RT( mipscpu.op ) ] );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] - psxcpu->r[ INS_RT( psxcpu->op ) ] );
 				break;
 
 			case FUNCT_AND:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] & mipscpu.r[ INS_RT( mipscpu.op ) ] );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] & psxcpu->r[ INS_RT( psxcpu->op ) ] );
 				break;
 
 			case FUNCT_OR:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] | mipscpu.r[ INS_RT( mipscpu.op ) ] );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] | psxcpu->r[ INS_RT( psxcpu->op ) ] );
 				break;
 
 			case FUNCT_XOR:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] ^ mipscpu.r[ INS_RT( mipscpu.op ) ] );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] ^ psxcpu->r[ INS_RT( psxcpu->op ) ] );
 				break;
 
 			case FUNCT_NOR:
-				mips_load( INS_RD( mipscpu.op ), ~( mipscpu.r[ INS_RS( mipscpu.op ) ] | mipscpu.r[ INS_RT( mipscpu.op ) ] ) );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), ~( psxcpu->r[ INS_RS( psxcpu->op ) ] | psxcpu->r[ INS_RT( psxcpu->op ) ] ) );
 				break;
 
 			case FUNCT_SLT:
-				mips_load( INS_RD( mipscpu.op ), (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] < (INT32)mipscpu.r[ INS_RT( mipscpu.op ) ] );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), (INT32)psxcpu->r[ INS_RS( psxcpu->op ) ] < (INT32)psxcpu->r[ INS_RT( psxcpu->op ) ] );
 				break;
 
 			case FUNCT_SLTU:
-				mips_load( INS_RD( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] < mipscpu.r[ INS_RT( mipscpu.op ) ] );
+				mips_load( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] < psxcpu->r[ INS_RT( psxcpu->op ) ] );
 				break;
 
 			default:
-				mips_exception( EXC_RI );
+				mips_exception( psxcpu, EXC_RI );
 				break;
 			}
 			break;
 
 		case OP_REGIMM:
-			switch( INS_RT_REGIMM( mipscpu.op ) )
+			switch( INS_RT_REGIMM( psxcpu->op ) )
 			{
 			case RT_BLTZ:
-				mips_conditional_branch( (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] < 0 );
+				mips_conditional_branch( psxcpu, (INT32)psxcpu->r[ INS_RS( psxcpu->op ) ] < 0 );
 
-				if( INS_RT( mipscpu.op ) == RT_BLTZAL )
+				if( INS_RT( psxcpu->op ) == RT_BLTZAL )
 				{
-					mipscpu.r[ 31 ] = mipscpu.pc + 4;
+					psxcpu->r[ 31 ] = psxcpu->pc + 4;
 				}
 				break;
 
 			case RT_BGEZ:
-				mips_conditional_branch( (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] >= 0 );
+				mips_conditional_branch( psxcpu, (INT32)psxcpu->r[ INS_RS( psxcpu->op ) ] >= 0 );
 
-				if( INS_RT( mipscpu.op ) == RT_BGEZAL )
+				if( INS_RT( psxcpu->op ) == RT_BGEZAL )
 				{
-					mipscpu.r[ 31 ] = mipscpu.pc + 4;
+					psxcpu->r[ 31 ] = psxcpu->pc + 4;
 				}
 				break;
 			}
 			break;
 
 		case OP_J:
-			mips_unconditional_branch();
+			mips_unconditional_branch( psxcpu );
 			break;
 
 		case OP_JAL:
-			mips_unconditional_branch();
-			mipscpu.r[ 31 ] = mipscpu.pc + 4;
+			mips_unconditional_branch( psxcpu );
+			psxcpu->r[ 31 ] = psxcpu->pc + 4;
 			break;
 
 		case OP_BEQ:
-			mips_conditional_branch( mipscpu.r[ INS_RS( mipscpu.op ) ] == mipscpu.r[ INS_RT( mipscpu.op ) ] );
+			mips_conditional_branch( psxcpu, psxcpu->r[ INS_RS( psxcpu->op ) ] == psxcpu->r[ INS_RT( psxcpu->op ) ] );
 			break;
 
 		case OP_BNE:
-			mips_conditional_branch( mipscpu.r[ INS_RS( mipscpu.op ) ] != mipscpu.r[ INS_RT( mipscpu.op ) ] );
+			mips_conditional_branch( psxcpu, psxcpu->r[ INS_RS( psxcpu->op ) ] != psxcpu->r[ INS_RT( psxcpu->op ) ] );
 			break;
 
 		case OP_BLEZ:
-			mips_conditional_branch( (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] < 0 || mipscpu.r[ INS_RS( mipscpu.op ) ] == mipscpu.r[ INS_RT( mipscpu.op ) ] );
+			mips_conditional_branch( psxcpu, (INT32)psxcpu->r[ INS_RS( psxcpu->op ) ] < 0 || psxcpu->r[ INS_RS( psxcpu->op ) ] == psxcpu->r[ INS_RT( psxcpu->op ) ] );
 			break;
 
 		case OP_BGTZ:
-			mips_conditional_branch( (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] >= 0 && mipscpu.r[ INS_RS( mipscpu.op ) ] != mipscpu.r[ INS_RT( mipscpu.op ) ] );
+			mips_conditional_branch( psxcpu, (INT32)psxcpu->r[ INS_RS( psxcpu->op ) ] >= 0 && psxcpu->r[ INS_RS( psxcpu->op ) ] != psxcpu->r[ INS_RT( psxcpu->op ) ] );
 			break;
 
 		case OP_ADDI:
 			{
-				UINT32 immediate = MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				UINT32 result = mipscpu.r[ INS_RS( mipscpu.op ) ] + immediate;
-				if( (INT32)( ~( mipscpu.r[ INS_RS( mipscpu.op ) ] ^ immediate ) & ( mipscpu.r[ INS_RS( mipscpu.op ) ] ^ result ) ) < 0 )
+				UINT32 immediate = PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				UINT32 result = psxcpu->r[ INS_RS( psxcpu->op ) ] + immediate;
+				if( (INT32)( ~( psxcpu->r[ INS_RS( psxcpu->op ) ] ^ immediate ) & ( psxcpu->r[ INS_RS( psxcpu->op ) ] ^ result ) ) < 0 )
 				{
-					mips_exception( EXC_OVF );
+					mips_exception( psxcpu, EXC_OVF );
 				}
 				else
 				{
-					mips_load( INS_RT( mipscpu.op ), result );
+					mips_load( psxcpu, INS_RT( psxcpu->op ), result );
 				}
 			}
 			break;
 
 		case OP_ADDIU:
-			mips_load( INS_RT( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) ) );
+			mips_load( psxcpu, INS_RT( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) ) );
 			break;
 
 		case OP_SLTI:
-			mips_load( INS_RT( mipscpu.op ), (INT32)mipscpu.r[ INS_RS( mipscpu.op ) ] < MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) ) );
+			mips_load( psxcpu, INS_RT( psxcpu->op ), (INT32)psxcpu->r[ INS_RS( psxcpu->op ) ] < PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) ) );
 			break;
 
 		case OP_SLTIU:
-			mips_load( INS_RT( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] < (UINT32)MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) ) );
+			mips_load( psxcpu, INS_RT( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] < (UINT32)PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) ) );
 			break;
 
 		case OP_ANDI:
-			mips_load( INS_RT( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] & INS_IMMEDIATE( mipscpu.op ) );
+			mips_load( psxcpu, INS_RT( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] & INS_IMMEDIATE( psxcpu->op ) );
 			break;
 
 		case OP_ORI:
-			mips_load( INS_RT( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] | INS_IMMEDIATE( mipscpu.op ) );
+			mips_load( psxcpu, INS_RT( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] | INS_IMMEDIATE( psxcpu->op ) );
 			break;
 
 		case OP_XORI:
-			mips_load( INS_RT( mipscpu.op ), mipscpu.r[ INS_RS( mipscpu.op ) ] ^ INS_IMMEDIATE( mipscpu.op ) );
+			mips_load( psxcpu, INS_RT( psxcpu->op ), psxcpu->r[ INS_RS( psxcpu->op ) ] ^ INS_IMMEDIATE( psxcpu->op ) );
 			break;
 
 		case OP_LUI:
-			mips_load( INS_RT( mipscpu.op ), INS_IMMEDIATE( mipscpu.op ) << 16 );
+			mips_load( psxcpu, INS_RT( psxcpu->op ), INS_IMMEDIATE( psxcpu->op ) << 16 );
 			break;
 
 		case OP_COP0:
-			switch( INS_RS( mipscpu.op ) )
+			switch( INS_RS( psxcpu->op ) )
 			{
 			case RS_MFC:
 				{
-					int reg = INS_RD( mipscpu.op );
+					int reg = INS_RD( psxcpu->op );
 
 					if( reg == CP0_INDEX ||
 						reg == CP0_RANDOM ||
@@ -2057,29 +2113,29 @@ static CPU_EXECUTE( mips )
 						reg == CP0_CONTEXT ||
 						reg == CP0_ENTRYHI )
 					{
-						mips_exception( EXC_RI );
+						mips_exception( psxcpu, EXC_RI );
 					}
 					else if( reg < 16 )
 					{
-						if( mips_cop0_usable() )
+						if( mips_cop0_usable( psxcpu ) )
 						{
-							mips_delayed_load( INS_RT( mipscpu.op ), mipscpu.cp0r[ reg ] );
+							mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), psxcpu->cp0r[ reg ] );
 						}
 					}
 					else
 					{
-						mips_advance_pc();
+						mips_advance_pc( psxcpu );
 					}
 				}
 				break;
 
 			case RS_CFC:
-				mips_exception( EXC_RI );
+				mips_exception( psxcpu, EXC_RI );
 				break;
 
 			case RS_MTC:
 				{
-					int reg = INS_RD( mipscpu.op );
+					int reg = INS_RD( psxcpu->op );
 
 					if( reg == CP0_INDEX ||
 						reg == CP0_RANDOM ||
@@ -2087,73 +2143,73 @@ static CPU_EXECUTE( mips )
 						reg == CP0_CONTEXT ||
 						reg == CP0_ENTRYHI )
 					{
-						mips_exception( EXC_RI );
+						mips_exception( psxcpu, EXC_RI );
 					}
 					else if( reg < 16 )
 					{
-						if( mips_cop0_usable() )
+						if( mips_cop0_usable( psxcpu ) )
 						{
-							UINT32 data = ( mipscpu.cp0r[ reg ] & ~mips_mtc0_writemask[ reg ] ) |
-								( mipscpu.r[ INS_RT( mipscpu.op ) ] & mips_mtc0_writemask[ reg ] );
-							mips_advance_pc();
+							UINT32 data = ( psxcpu->cp0r[ reg ] & ~mips_mtc0_writemask[ reg ] ) |
+								( psxcpu->r[ INS_RT( psxcpu->op ) ] & mips_mtc0_writemask[ reg ] );
+							mips_advance_pc( psxcpu );
 
-							mips_set_cp0r( reg, data );
+							mips_set_cp0r( psxcpu, reg, data );
 						}
 					}
 					else
 					{
-						mips_advance_pc();
+						mips_advance_pc( psxcpu );
 					}
 				}
 				break;
 
 			case RS_CTC:
-				mips_exception( EXC_RI );
+				mips_exception( psxcpu, EXC_RI );
 				break;
 
 			case RS_BC:
 			case RS_BC_ALT:
-				switch( INS_BC( mipscpu.op ) )
+				switch( INS_BC( psxcpu->op ) )
 				{
 				case BC_BCF:
-					mips_bc( 0, SR_CU0, 0 );
+					mips_bc( psxcpu, 0, SR_CU0, 0 );
 					break;
 
 				case BC_BCT:
-					mips_bc( 0, SR_CU0, 1 );
+					mips_bc( psxcpu, 0, SR_CU0, 1 );
 					break;
 				}
 				break;
 
 			default:
-				switch( INS_CO( mipscpu.op ) )
+				switch( INS_CO( psxcpu->op ) )
 				{
 				case 1:
-					switch( INS_CF( mipscpu.op ) )
+					switch( INS_CF( psxcpu->op ) )
 					{
 					case CF_TLBR:
 					case CF_TLBWI:
 					case CF_TLBWR:
 					case CF_TLBP:
-						mips_exception( EXC_RI );
+						mips_exception( psxcpu, EXC_RI );
 						break;
 
 					case CF_RFE:
-						if( mips_cop0_usable() )
+						if( mips_cop0_usable( psxcpu ) )
 						{
-							mips_advance_pc();
-							mips_set_cp0r( CP0_SR, ( mipscpu.cp0r[ CP0_SR ] & ~0xf ) | ( ( mipscpu.cp0r[ CP0_SR ] >> 2 ) & 0xf ) );
+							mips_advance_pc( psxcpu );
+							mips_set_cp0r( psxcpu, CP0_SR, ( psxcpu->cp0r[ CP0_SR ] & ~0xf ) | ( ( psxcpu->cp0r[ CP0_SR ] >> 2 ) & 0xf ) );
 						}
 						break;
 
 					default:
-						mips_advance_pc();
+						mips_advance_pc( psxcpu );
 						break;
 					}
 					break;
 
 				default:
-					mips_advance_pc();
+					mips_advance_pc( psxcpu );
 					break;
 				}
 				break;
@@ -2161,104 +2217,104 @@ static CPU_EXECUTE( mips )
 			break;
 
 		case OP_COP1:
-			if( ( mipscpu.cp0r[ CP0_SR ] & SR_CU1 ) == 0 )
+			if( ( psxcpu->cp0r[ CP0_SR ] & SR_CU1 ) == 0 )
 			{
-				mips_exception( EXC_CPU );
+				mips_exception( psxcpu, EXC_CPU );
 			}
 			else
 			{
-				switch( INS_RS( mipscpu.op ) )
+				switch( INS_RS( psxcpu->op ) )
 				{
 				case RS_MFC:
-					mips_delayed_load( INS_RT( mipscpu.op ), getcp1dr( INS_RD( mipscpu.op ) ) );
+					mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), getcp1dr( psxcpu, INS_RD( psxcpu->op ) ) );
 					break;
 
 				case RS_CFC:
-					mips_delayed_load( INS_RT( mipscpu.op ), getcp1cr( INS_RD( mipscpu.op ) ) );
+					mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), getcp1cr( psxcpu, INS_RD( psxcpu->op ) ) );
 					break;
 
 				case RS_MTC:
-					setcp1dr( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] );
-					mips_advance_pc();
+					setcp1dr( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] );
+					mips_advance_pc( psxcpu );
 					break;
 
 				case RS_CTC:
-					setcp1cr( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] );
-					mips_advance_pc();
+					setcp1cr( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] );
+					mips_advance_pc( psxcpu );
 					break;
 
 				case RS_BC:
 				case RS_BC_ALT:
-					switch( INS_BC( mipscpu.op ) )
+					switch( INS_BC( psxcpu->op ) )
 					{
 					case BC_BCF:
-						mips_bc( 1, SR_CU1, 0 );
+						mips_bc( psxcpu, 1, SR_CU1, 0 );
 						break;
 
 					case BC_BCT:
-						mips_bc( 1, SR_CU1, 1 );
+						mips_bc( psxcpu, 1, SR_CU1, 1 );
 						break;
 					}
 					break;
 
 				default:
-					mips_advance_pc();
+					mips_advance_pc( psxcpu );
 					break;
 				}
 			}
 			break;
 
 		case OP_COP2:
-			if( ( mipscpu.cp0r[ CP0_SR ] & SR_CU2 ) == 0 )
+			if( ( psxcpu->cp0r[ CP0_SR ] & SR_CU2 ) == 0 )
 			{
-				mips_exception( EXC_CPU );
+				mips_exception( psxcpu, EXC_CPU );
 			}
 			else
 			{
-				switch( INS_RS( mipscpu.op ) )
+				switch( INS_RS( psxcpu->op ) )
 				{
 				case RS_MFC:
-					mips_delayed_load( INS_RT( mipscpu.op ), getcp2dr( INS_RD( mipscpu.op ) ) );
+					mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), getcp2dr( psxcpu, INS_RD( psxcpu->op ) ) );
 					break;
 
 				case RS_CFC:
-					mips_delayed_load( INS_RT( mipscpu.op ), getcp2cr( INS_RD( mipscpu.op ) ) );
+					mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), getcp2cr( psxcpu, INS_RD( psxcpu->op ) ) );
 					break;
 
 				case RS_MTC:
-					setcp2dr( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] );
-					mips_advance_pc();
+					setcp2dr( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] );
+					mips_advance_pc( psxcpu );
 					break;
 
 				case RS_CTC:
-					setcp2cr( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] );
-					mips_advance_pc();
+					setcp2cr( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] );
+					mips_advance_pc( psxcpu );
 					break;
 
 				case RS_BC:
 				case RS_BC_ALT:
-					switch( INS_BC( mipscpu.op ) )
+					switch( INS_BC( psxcpu->op ) )
 					{
 					case BC_BCF:
-						mips_bc( 2, SR_CU2, 0 );
+						mips_bc( psxcpu, 2, SR_CU2, 0 );
 						break;
 
 					case BC_BCT:
-						mips_bc( 2, SR_CU2, 1 );
+						mips_bc( psxcpu, 2, SR_CU2, 1 );
 						break;
 					}
 					break;
 
 				default:
-					switch( INS_CO( mipscpu.op ) )
+					switch( INS_CO( psxcpu->op ) )
 					{
 					case 1:
-						docop2( INS_COFUN( mipscpu.op ) );
-						mips_advance_pc();
+						docop2( psxcpu, INS_COFUN( psxcpu->op ) );
+						mips_advance_pc( psxcpu );
 						break;
 
 					default:
-						mips_advance_pc();
+						mips_advance_pc( psxcpu );
 						break;
 					}
 					break;
@@ -2267,48 +2323,48 @@ static CPU_EXECUTE( mips )
 			break;
 
 		case OP_COP3:
-			if( ( mipscpu.cp0r[ CP0_SR ] & SR_CU3 ) == 0 )
+			if( ( psxcpu->cp0r[ CP0_SR ] & SR_CU3 ) == 0 )
 			{
-				mips_exception( EXC_CPU );
+				mips_exception( psxcpu, EXC_CPU );
 			}
 			else
 			{
-				switch( INS_RS( mipscpu.op ) )
+				switch( INS_RS( psxcpu->op ) )
 				{
 				case RS_MFC:
-					mips_delayed_load( INS_RT( mipscpu.op ), getcp3dr( INS_RD( mipscpu.op ) ) );
+					mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), getcp3dr( psxcpu, INS_RD( psxcpu->op ) ) );
 					break;
 
 				case RS_CFC:
-					mips_delayed_load( INS_RT( mipscpu.op ), getcp3cr( INS_RD( mipscpu.op ) ) );
+					mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), getcp3cr( psxcpu, INS_RD( psxcpu->op ) ) );
 					break;
 
 				case RS_MTC:
-					setcp3dr( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] );
-					mips_advance_pc();
+					setcp3dr( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] );
+					mips_advance_pc( psxcpu );
 					break;
 
 				case RS_CTC:
-					setcp3cr( INS_RD( mipscpu.op ), mipscpu.r[ INS_RT( mipscpu.op ) ] );
-					mips_advance_pc();
+					setcp3cr( psxcpu, INS_RD( psxcpu->op ), psxcpu->r[ INS_RT( psxcpu->op ) ] );
+					mips_advance_pc( psxcpu );
 					break;
 
 				case RS_BC:
 				case RS_BC_ALT:
-					switch( INS_BC( mipscpu.op ) )
+					switch( INS_BC( psxcpu->op ) )
 					{
 					case BC_BCF:
-						mips_bc( 3, SR_CU3, 0 );
+						mips_bc( psxcpu, 3, SR_CU3, 0 );
 						break;
 
 					case BC_BCT:
-						mips_bc( 3, SR_CU3, 1 );
+						mips_bc( psxcpu, 3, SR_CU3, 1 );
 						break;
 					}
 					break;
 
 				default:
-					mips_advance_pc();
+					mips_advance_pc( psxcpu );
 					break;
 				}
 			}
@@ -2316,28 +2372,28 @@ static CPU_EXECUTE( mips )
 
 		case OP_LB:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_load_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_load_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_byte_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_byte_address_mask ) != 0 )
 				{
-					mips_load_bad_address( address );
+					mips_load_bad_address( psxcpu, address );
 				}
 				else if( breakpoint )
 				{
-					mips_breakpoint_exception();
+					mips_breakpoint_exception( psxcpu );
 				}
 				else
 				{
-					UINT32 data = MIPS_BYTE_EXTEND( mipscpu.readbyte( address ) );
+					UINT32 data = PSXCPU_BYTE_EXTEND( psx_readbyte( psxcpu, address ) );
 
-					if( mipscpu.berr )
+					if( psxcpu->berr )
 					{
-						mips_load_bus_error_exception();
+						mips_load_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_delayed_load( INS_RT( mipscpu.op ), data );
+						mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), data );
 					}
 				}
 			}
@@ -2345,28 +2401,28 @@ static CPU_EXECUTE( mips )
 
 		case OP_LH:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_load_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_load_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_half_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_half_address_mask ) != 0 )
 				{
-					mips_load_bad_address( address );
+					mips_load_bad_address( psxcpu, address );
 				}
 				else if( breakpoint )
 				{
-					mips_breakpoint_exception();
+					mips_breakpoint_exception( psxcpu );
 				}
 				else
 				{
-					UINT32 data = MIPS_WORD_EXTEND( mipscpu.readhalf( address ) );
+					UINT32 data = PSXCPU_WORD_EXTEND( psx_readhalf( psxcpu, address ) );
 
-					if( mipscpu.berr )
+					if( psxcpu->berr )
 					{
-						mips_load_bus_error_exception();
+						mips_load_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_delayed_load( INS_RT( mipscpu.op ), data );
+						mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), data );
 					}
 				}
 			}
@@ -2374,51 +2430,51 @@ static CPU_EXECUTE( mips )
 
 		case OP_LWL:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
 				int load_type = address & 3;
 				int breakpoint;
 
 				address &= ~3;
-				breakpoint = mips_load_data_address_breakpoint( address );
+				breakpoint = mips_load_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_byte_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_byte_address_mask ) != 0 )
 				{
-					mips_load_bad_address( address );
+					mips_load_bad_address( psxcpu, address );
 				}
 				else if( breakpoint )
 				{
-					mips_breakpoint_exception();
+					mips_breakpoint_exception( psxcpu );
 				}
 				else
 				{
-					UINT32 data = mips_get_register_from_pipeline( INS_RT( mipscpu.op ) );
+					UINT32 data = mips_get_register_from_pipeline( psxcpu, INS_RT( psxcpu->op ) );
 
 					switch( load_type )
 					{
 					case 0:
-						data = ( data & 0x00ffffff ) | ( mipscpu.readword_masked( address, 0x000000ff ) << 24 );
+						data = ( data & 0x00ffffff ) | ( psx_readword_masked( psxcpu, address, 0x000000ff ) << 24 );
 						break;
 
 					case 1:
-						data = ( data & 0x0000ffff ) | ( mipscpu.readword_masked( address, 0x0000ffff ) << 16 );
+						data = ( data & 0x0000ffff ) | ( psx_readword_masked( psxcpu, address, 0x0000ffff ) << 16 );
 						break;
 
 					case 2:
-						data = ( data & 0x000000ff ) | ( mipscpu.readword_masked( address, 0x00ffffff ) << 8 );
+						data = ( data & 0x000000ff ) | ( psx_readword_masked( psxcpu, address, 0x00ffffff ) << 8 );
 						break;
 
 					case 3:
-						data = mipscpu.readword( address );
+						data = psx_readword( psxcpu, address );
 						break;
 					}
 
-					if( mipscpu.berr )
+					if( psxcpu->berr )
 					{
-						mips_load_bus_error_exception();
+						mips_load_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_delayed_load( INS_RT( mipscpu.op ), data );
+						mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), data );
 					}
 				}
 			}
@@ -2426,28 +2482,28 @@ static CPU_EXECUTE( mips )
 
 		case OP_LW:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_load_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_load_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_word_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_word_address_mask ) != 0 )
 				{
-					mips_load_bad_address( address );
+					mips_load_bad_address( psxcpu, address );
 				}
 				else if( breakpoint )
 				{
-					mips_breakpoint_exception();
+					mips_breakpoint_exception( psxcpu );
 				}
 				else
 				{
-					UINT32 data = mipscpu.readword( address );
+					UINT32 data = psx_readword( psxcpu, address );
 
-					if( mipscpu.berr )
+					if( psxcpu->berr )
 					{
-						mips_load_bus_error_exception();
+						mips_load_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_delayed_load( INS_RT( mipscpu.op ), data );
+						mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), data );
 					}
 				}
 			}
@@ -2455,28 +2511,28 @@ static CPU_EXECUTE( mips )
 
 		case OP_LBU:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_load_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_load_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_byte_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_byte_address_mask ) != 0 )
 				{
-					mips_load_bad_address( address );
+					mips_load_bad_address( psxcpu, address );
 				}
 				else if( breakpoint )
 				{
-					mips_breakpoint_exception();
+					mips_breakpoint_exception( psxcpu );
 				}
 				else
 				{
-					UINT32 data = mipscpu.readbyte( address );
+					UINT32 data = psx_readbyte( psxcpu, address );
 
-					if( mipscpu.berr )
+					if( psxcpu->berr )
 					{
-						mips_load_bus_error_exception();
+						mips_load_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_delayed_load( INS_RT( mipscpu.op ), data );
+						mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), data );
 					}
 				}
 			}
@@ -2484,28 +2540,28 @@ static CPU_EXECUTE( mips )
 
 		case OP_LHU:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_load_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_load_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_half_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_half_address_mask ) != 0 )
 				{
-					mips_load_bad_address( address );
+					mips_load_bad_address( psxcpu, address );
 				}
 				else if( breakpoint )
 				{
-					mips_breakpoint_exception();
+					mips_breakpoint_exception( psxcpu );
 				}
 				else
 				{
-					UINT32 data = mipscpu.readhalf( address );
+					UINT32 data = psx_readhalf( psxcpu, address );
 
-					if( mipscpu.berr )
+					if( psxcpu->berr )
 					{
-						mips_load_bus_error_exception();
+						mips_load_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_delayed_load( INS_RT( mipscpu.op ), data );
+						mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), data );
 					}
 				}
 			}
@@ -2513,47 +2569,47 @@ static CPU_EXECUTE( mips )
 
 		case OP_LWR:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_load_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_load_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_byte_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_byte_address_mask ) != 0 )
 				{
-					mips_load_bad_address( address );
+					mips_load_bad_address( psxcpu, address );
 				}
 				else if( breakpoint )
 				{
-					mips_breakpoint_exception();
+					mips_breakpoint_exception( psxcpu );
 				}
 				else
 				{
-					UINT32 data = mips_get_register_from_pipeline( INS_RT( mipscpu.op ) );
+					UINT32 data = mips_get_register_from_pipeline( psxcpu, INS_RT( psxcpu->op ) );
 
 					switch( address & 3 )
 					{
 					case 0:
-						data = mipscpu.readword( address );
+						data = psx_readword( psxcpu, address );
 						break;
 
 					case 1:
-						data = ( data & 0xff000000 ) | ( mipscpu.readword_masked( address, 0x00ffffff ) >> 8 );
+						data = ( data & 0xff000000 ) | ( psx_readword_masked( psxcpu, address, 0x00ffffff ) >> 8 );
 						break;
 
 					case 2:
-						data = ( data & 0xffff0000 ) | ( mipscpu.readword_masked( address, 0xffff0000 ) >> 16 );
+						data = ( data & 0xffff0000 ) | ( psx_readword_masked( psxcpu, address, 0xffff0000 ) >> 16 );
 						break;
 
 					case 3:
-						data = ( data & 0xffffff00 ) | ( mipscpu.readword_masked( address, 0xff000000 ) >> 24 );
+						data = ( data & 0xffffff00 ) | ( psx_readword_masked( psxcpu, address, 0xff000000 ) >> 24 );
 						break;
 					}
 
-					if( mipscpu.berr )
+					if( psxcpu->berr )
 					{
-						mips_load_bus_error_exception();
+						mips_load_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_delayed_load( INS_RT( mipscpu.op ), data );
+						mips_delayed_load( psxcpu, INS_RT( psxcpu->op ), data );
 					}
 				}
 			}
@@ -2561,29 +2617,29 @@ static CPU_EXECUTE( mips )
 
 		case OP_SB:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_store_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_store_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_byte_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_byte_address_mask ) != 0 )
 				{
-					mips_store_bad_address( address );
+					mips_store_bad_address( psxcpu, address );
 				}
 				else
 				{
 					int shift = 8 * ( address & 3 );
-					mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << shift, 0xff << shift );
+					psx_writeword_masked( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] << shift, 0xff << shift );
 
 					if( breakpoint )
 					{
-						mips_breakpoint_exception();
+						mips_breakpoint_exception( psxcpu );
 					}
-					else if( mipscpu.berr )
+					else if( psxcpu->berr )
 					{
-						mips_store_bus_error_exception();
+						mips_store_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_advance_pc();
+						mips_advance_pc( psxcpu );
 					}
 				}
 			}
@@ -2591,29 +2647,29 @@ static CPU_EXECUTE( mips )
 
 		case OP_SH:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_store_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_store_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_half_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_half_address_mask ) != 0 )
 				{
-					mips_store_bad_address( address );
+					mips_store_bad_address( psxcpu, address );
 				}
 				else
 				{
 					int shift = 8 * ( address & 2 );
-					mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << shift, 0xffff << shift );
+					psx_writeword_masked( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] << shift, 0xffff << shift );
 
 					if( breakpoint )
 					{
-						mips_breakpoint_exception();
+						mips_breakpoint_exception( psxcpu );
 					}
-					else if( mipscpu.berr )
+					else if( psxcpu->berr )
 					{
-						mips_store_bus_error_exception();
+						mips_store_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_advance_pc();
+						mips_advance_pc( psxcpu );
 					}
 				}
 			}
@@ -2621,49 +2677,49 @@ static CPU_EXECUTE( mips )
 
 		case OP_SWL:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
 				int save_type = address & 3;
 				int breakpoint;
 
 				address &= ~3;
-				breakpoint = mips_store_data_address_breakpoint( address );
+				breakpoint = mips_store_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_byte_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_byte_address_mask ) != 0 )
 				{
-					mips_store_bad_address( address );
+					mips_store_bad_address( psxcpu, address );
 				}
 				else
 				{
 					switch( save_type )
 					{
 					case 0:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] >> 24, 0x000000ff );
+						psx_writeword_masked( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] >> 24, 0x000000ff );
 						break;
 
 					case 1:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] >> 16, 0x0000ffff );
+						psx_writeword_masked( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] >> 16, 0x0000ffff );
 						break;
 
 					case 2:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] >> 8, 0x00ffffff );
+						psx_writeword_masked( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] >> 8, 0x00ffffff );
 						break;
 
 					case 3:
-						mipscpu.writeword( address, mipscpu.r[ INS_RT( mipscpu.op ) ] );
+						psx_writeword( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] );
 						break;
 					}
 
 					if( breakpoint )
 					{
-						mips_breakpoint_exception();
+						mips_breakpoint_exception( psxcpu );
 					}
-					else if( mipscpu.berr )
+					else if( psxcpu->berr )
 					{
-						mips_store_bus_error_exception();
+						mips_store_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_advance_pc();
+						mips_advance_pc( psxcpu );
 					}
 				}
 			}
@@ -2671,28 +2727,28 @@ static CPU_EXECUTE( mips )
 
 		case OP_SW:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_store_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_store_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_word_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_word_address_mask ) != 0 )
 				{
-					mips_store_bad_address( address );
+					mips_store_bad_address( psxcpu, address );
 				}
 				else
 				{
-					mipscpu.writeword( address, mipscpu.r[ INS_RT( mipscpu.op ) ] );
+					psx_writeword( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] );
 
 					if( breakpoint )
 					{
-						mips_breakpoint_exception();
+						mips_breakpoint_exception( psxcpu );
 					}
-					else if( mipscpu.berr )
+					else if( psxcpu->berr )
 					{
-						mips_store_bus_error_exception();
+						mips_store_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_advance_pc();
+						mips_advance_pc( psxcpu );
 					}
 				}
 			}
@@ -2700,138 +2756,129 @@ static CPU_EXECUTE( mips )
 
 		case OP_SWR:
 			{
-				UINT32 address = mipscpu.r[ INS_RS( mipscpu.op ) ] + MIPS_WORD_EXTEND( INS_IMMEDIATE( mipscpu.op ) );
-				int breakpoint = mips_store_data_address_breakpoint( address );
+				UINT32 address = psxcpu->r[ INS_RS( psxcpu->op ) ] + PSXCPU_WORD_EXTEND( INS_IMMEDIATE( psxcpu->op ) );
+				int breakpoint = mips_store_data_address_breakpoint( psxcpu, address );
 
-				if( ( address & mipscpu.bad_byte_address_mask ) != 0 )
+				if( ( address & psxcpu->bad_byte_address_mask ) != 0 )
 				{
-					mips_store_bad_address( address );
+					mips_store_bad_address( psxcpu, address );
 				}
 				else
 				{
 					switch( address & 3 )
 					{
 					case 0:
-						mipscpu.writeword( address, mipscpu.r[ INS_RT( mipscpu.op ) ] );
+						psx_writeword( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] );
 						break;
 
 					case 1:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << 8, 0xffffff00 );
+						psx_writeword_masked( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] << 8, 0xffffff00 );
 						break;
 
 					case 2:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << 16, 0xffff0000 );
+						psx_writeword_masked( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] << 16, 0xffff0000 );
 						break;
 
 					case 3:
-						mipscpu.writeword_masked( address, mipscpu.r[ INS_RT( mipscpu.op ) ] << 24, 0xff000000 );
+						psx_writeword_masked( psxcpu, address, psxcpu->r[ INS_RT( psxcpu->op ) ] << 24, 0xff000000 );
 						break;
 					}
 
 					if( breakpoint )
 					{
-						mips_breakpoint_exception();
+						mips_breakpoint_exception( psxcpu );
 					}
-					else if( mipscpu.berr )
+					else if( psxcpu->berr )
 					{
-						mips_store_bus_error_exception();
+						mips_store_bus_error_exception( psxcpu );
 					}
 					else
 					{
-						mips_advance_pc();
+						mips_advance_pc( psxcpu );
 					}
 				}
 			}
 			break;
 
 		case OP_LWC0:
-			mips_lwc( 0, SR_CU0 );
+			mips_lwc( psxcpu, 0, SR_CU0 );
 			break;
 
 		case OP_LWC1:
-			mips_lwc( 1, SR_CU1 );
+			mips_lwc( psxcpu, 1, SR_CU1 );
 			break;
 
 		case OP_LWC2:
-			mips_lwc( 2, SR_CU2 );
+			mips_lwc( psxcpu, 2, SR_CU2 );
 			break;
 
 		case OP_LWC3:
-			mips_lwc( 3, SR_CU3 );
+			mips_lwc( psxcpu, 3, SR_CU3 );
 			break;
 
 		case OP_SWC0:
-			mips_swc( 0, SR_CU0 );
+			mips_swc( psxcpu, 0, SR_CU0 );
 			break;
 
 		case OP_SWC1:
-			mips_swc( 1, SR_CU1 );
+			mips_swc( psxcpu, 1, SR_CU1 );
 			break;
 
 		case OP_SWC2:
-			mips_swc( 2, SR_CU2 );
+			mips_swc( psxcpu, 2, SR_CU2 );
 			break;
 
 		case OP_SWC3:
-			mips_swc( 3, SR_CU3 );
+			mips_swc( psxcpu, 3, SR_CU3 );
 			break;
 
 		default:
-			logerror( "%08x: unknown opcode %08x\n", mipscpu.pc, mipscpu.op );
-			mips_stop();
-			mips_exception( EXC_RI );
+			logerror( "%08x: unknown opcode %08x\n", psxcpu->pc, psxcpu->op );
+			mips_stop( psxcpu );
+			mips_exception( psxcpu, EXC_RI );
 			break;
 		}
-		mips_ICount--;
-	} while( mips_ICount > 0 );
+		psxcpu->icount--;
+	} while( psxcpu->icount > 0 );
 
-	return cycles - mips_ICount;
+	return cycles - psxcpu->icount;
 }
 
-static CPU_GET_CONTEXT( mips )
+static CPU_GET_CONTEXT( psxcpu )
 {
-	if( dst )
-	{
-		*(mips_cpu_context *)dst = mipscpu;
-	}
 }
 
-static CPU_SET_CONTEXT( mips )
+static CPU_SET_CONTEXT( psxcpu )
 {
-	if( src )
-	{
-		mipscpu = *(mips_cpu_context *)src;
-		change_pc( mipscpu.pc );
-	}
 }
 
-static void set_irq_line( int irqline, int state )
+static void set_irq_line( psxcpu_state *psxcpu, int irqline, int state )
 {
 	UINT32 ip;
 
 	switch( irqline )
 	{
-	case MIPS_IRQ0:
+	case PSXCPU_IRQ0:
 		ip = CAUSE_IP2;
 		break;
 
-	case MIPS_IRQ1:
+	case PSXCPU_IRQ1:
 		ip = CAUSE_IP3;
 		break;
 
-	case MIPS_IRQ2:
+	case PSXCPU_IRQ2:
 		ip = CAUSE_IP4;
 		break;
 
-	case MIPS_IRQ3:
+	case PSXCPU_IRQ3:
 		ip = CAUSE_IP5;
 		break;
 
-	case MIPS_IRQ4:
+	case PSXCPU_IRQ4:
 		ip = CAUSE_IP6;
 		break;
 
-	case MIPS_IRQ5:
+	case PSXCPU_IRQ5:
 		ip = CAUSE_IP7;
 		break;
 
@@ -2842,13 +2889,13 @@ static void set_irq_line( int irqline, int state )
 	switch( state )
 	{
 	case CLEAR_LINE:
-		mips_set_cp0r( CP0_CAUSE, mipscpu.cp0r[ CP0_CAUSE ] & ~ip );
+		mips_set_cp0r( psxcpu, CP0_CAUSE, psxcpu->cp0r[ CP0_CAUSE ] & ~ip );
 		break;
 
 	case ASSERT_LINE:
-		mips_set_cp0r( CP0_CAUSE, mipscpu.cp0r[ CP0_CAUSE ] |= ip );
+		mips_set_cp0r( psxcpu, CP0_CAUSE, psxcpu->cp0r[ CP0_CAUSE ] |= ip );
 
-		if( mipscpu.irq_callback )
+		if( psxcpu->irq_callback )
 		{
 			/* HOLD_LINE interrupts are not supported by the architecture.
             By acknowledging the interupt here they are treated like PULSE_LINE
@@ -2856,7 +2903,7 @@ static void set_irq_line( int irqline, int state )
             There is also a problem with PULSE_LINE interrupts as the interrupt
             pending bits aren't latched the emulated code won't know what caused
             the interrupt. */
-			(*mipscpu.irq_callback)( mipscpu.device, irqline );
+			(*psxcpu->irq_callback)( psxcpu->device, irqline );
 		}
 		break;
 	}
@@ -2864,18 +2911,21 @@ static void set_irq_line( int irqline, int state )
 
 static READ32_HANDLER( psx_biu_r )
 {
-	return mipscpu.biu;
+	psxcpu_state *psxcpu = space->cpu->token;
+
+	return psxcpu->biu;
 }
 
 static WRITE32_HANDLER( psx_biu_w )
 {
-	UINT32 old = mipscpu.biu;
+	psxcpu_state *psxcpu = space->cpu->token;
+	UINT32 old = psxcpu->biu;
 
-	COMBINE_DATA( &mipscpu.biu );
+	COMBINE_DATA( &psxcpu->biu );
 
-	if( ( old & ( BIU_RAM | BIU_DS ) ) != ( mipscpu.biu & ( BIU_RAM | BIU_DS ) ) )
+	if( ( old & ( BIU_RAM | BIU_DS ) ) != ( psxcpu->biu & ( BIU_RAM | BIU_DS ) ) )
 	{
-		mips_update_scratchpad(space->machine);
+		mips_update_scratchpad( space );
 	}
 }
 
@@ -2904,171 +2954,194 @@ ADDRESS_MAP_END
  * Return a formatted string for a register
  ****************************************************************************/
 
-static CPU_DISASSEMBLE( mips )
+static CPU_DISASSEMBLE( psxcpu )
 {
-	return DasmMIPS( buffer, pc, opram );
+	psxcpu_state *psxcpu = device->token;
+	DasmPSXCPU_state state;
+
+	state.pc = psxcpu->pc;
+	state.delayr = psxcpu->delayr;
+	state.delayv = psxcpu->delayv;
+	memcpy( state.r, psxcpu->r, sizeof( state.r ) );
+	return DasmPSXCPU( &state, buffer, pc, opram );
 }
 
 
-static UINT32 getcp1dr( int reg )
-{
-	/* if a mtc/ctc precedes then this will get the value moved (which cop1 register is irrelevant). */
-	/* if a mfc/cfc follows then it will get the same value as this one. */
-	return program_read_dword_32le( mipscpu.pc + 4 );
-}
-
-static void setcp1dr( int reg, UINT32 value )
-{
-}
-
-static UINT32 getcp1cr( int reg )
+static UINT32 getcp1dr( psxcpu_state *psxcpu, int reg )
 {
 	/* if a mtc/ctc precedes then this will get the value moved (which cop1 register is irrelevant). */
 	/* if a mfc/cfc follows then it will get the same value as this one. */
-	return program_read_dword_32le( mipscpu.pc + 4 );
+	return memory_read_dword_32le( psxcpu->program, psxcpu->pc + 4 );
 }
 
-static void setcp1cr( int reg, UINT32 value )
+static void setcp1dr( psxcpu_state *psxcpu, int reg, UINT32 value )
+{
+}
+
+static UINT32 getcp1cr( psxcpu_state *psxcpu, int reg )
+{
+	/* if a mtc/ctc precedes then this will get the value moved (which cop1 register is irrelevant). */
+	/* if a mfc/cfc follows then it will get the same value as this one. */
+	return memory_read_dword_32le( psxcpu->program, psxcpu->pc + 4 );
+}
+
+static void setcp1cr( psxcpu_state *psxcpu, int reg, UINT32 value )
 {
 }
 
 
-static UINT32 getcp3dr( int reg )
+static UINT32 getcp3dr( psxcpu_state *psxcpu, int reg )
 {
 	/* if you have mtc/ctc with an mfc/cfc directly afterwards then you get the value that was moved. */
 	/* if you have an lwc with an mfc/cfc somewhere after it then you get the value that is loaded */
 	/* otherwise you get the next opcode. which register you transfer to or from is irrelevant. */
-	return program_read_dword_32le( mipscpu.pc + 4 );
+	return memory_read_dword_32le( psxcpu->program, psxcpu->pc + 4 );
 }
 
-static void setcp3dr( int reg, UINT32 value )
+static void setcp3dr( psxcpu_state *psxcpu, int reg, UINT32 value )
 {
 }
 
-static UINT32 getcp3cr( int reg )
+static UINT32 getcp3cr( psxcpu_state *psxcpu, int reg )
 {
 	/* if you have mtc/ctc with an mfc/cfc directly afterwards then you get the value that was moved. */
 	/* if you have an lwc with an mfc/cfc somewhere after it then you get the value that is loaded */
 	/* otherwise you get the next opcode. which register you transfer to or from is irrelevant. */
-	return program_read_dword_32le( mipscpu.pc + 4 );
+	return memory_read_dword_32le( psxcpu->program, psxcpu->pc + 4 );
 }
 
-static void setcp3cr( int reg, UINT32 value )
+static void setcp3cr( psxcpu_state *psxcpu, int reg, UINT32 value )
 {
 }
 
 
 /* preliminary gte code */
 
-#define VXY0 ( mipscpu.cp2dr[ 0 ].d )
-#define VX0  ( mipscpu.cp2dr[ 0 ].w.l )
-#define VY0  ( mipscpu.cp2dr[ 0 ].w.h )
-#define VZ0  ( mipscpu.cp2dr[ 1 ].w.l )
-#define VXY1 ( mipscpu.cp2dr[ 2 ].d )
-#define VX1  ( mipscpu.cp2dr[ 2 ].w.l )
-#define VY1  ( mipscpu.cp2dr[ 2 ].w.h )
-#define VZ1  ( mipscpu.cp2dr[ 3 ].w.l )
-#define VXY2 ( mipscpu.cp2dr[ 4 ].d )
-#define VX2  ( mipscpu.cp2dr[ 4 ].w.l )
-#define VY2  ( mipscpu.cp2dr[ 4 ].w.h )
-#define VZ2  ( mipscpu.cp2dr[ 5 ].w.l )
-#define RGB  ( mipscpu.cp2dr[ 6 ].d )
-#define R    ( mipscpu.cp2dr[ 6 ].b.l )
-#define G    ( mipscpu.cp2dr[ 6 ].b.h )
-#define B    ( mipscpu.cp2dr[ 6 ].b.h2 )
-#define CODE ( mipscpu.cp2dr[ 6 ].b.h3 )
-#define OTZ  ( mipscpu.cp2dr[ 7 ].w.l )
-#define IR0  ( mipscpu.cp2dr[ 8 ].sw.l )
-#define IR1  ( mipscpu.cp2dr[ 9 ].sw.l )
-#define IR2  ( mipscpu.cp2dr[ 10 ].sw.l )
-#define IR3  ( mipscpu.cp2dr[ 11 ].sw.l )
-#define SXY0 ( mipscpu.cp2dr[ 12 ].d )
-#define SX0  ( mipscpu.cp2dr[ 12 ].sw.l )
-#define SY0  ( mipscpu.cp2dr[ 12 ].sw.h )
-#define SXY1 ( mipscpu.cp2dr[ 13 ].d )
-#define SX1  ( mipscpu.cp2dr[ 13 ].sw.l )
-#define SY1  ( mipscpu.cp2dr[ 13 ].sw.h )
-#define SXY2 ( mipscpu.cp2dr[ 14 ].d )
-#define SX2  ( mipscpu.cp2dr[ 14 ].sw.l )
-#define SY2  ( mipscpu.cp2dr[ 14 ].sw.h )
-#define SXYP ( mipscpu.cp2dr[ 15 ].d )
-#define SXP  ( mipscpu.cp2dr[ 15 ].sw.l )
-#define SYP  ( mipscpu.cp2dr[ 15 ].sw.h )
-#define SZ0  ( mipscpu.cp2dr[ 16 ].w.l )
-#define SZ1  ( mipscpu.cp2dr[ 17 ].w.l )
-#define SZ2  ( mipscpu.cp2dr[ 18 ].w.l )
-#define SZ3  ( mipscpu.cp2dr[ 19 ].w.l )
-#define RGB0 ( mipscpu.cp2dr[ 20 ].d )
-#define R0   ( mipscpu.cp2dr[ 20 ].b.l )
-#define G0   ( mipscpu.cp2dr[ 20 ].b.h )
-#define B0   ( mipscpu.cp2dr[ 20 ].b.h2 )
-#define CD0  ( mipscpu.cp2dr[ 20 ].b.h3 )
-#define RGB1 ( mipscpu.cp2dr[ 21 ].d )
-#define R1   ( mipscpu.cp2dr[ 21 ].b.l )
-#define G1   ( mipscpu.cp2dr[ 21 ].b.h )
-#define B1   ( mipscpu.cp2dr[ 21 ].b.h2 )
-#define CD1  ( mipscpu.cp2dr[ 21 ].b.h3 )
-#define RGB2 ( mipscpu.cp2dr[ 22 ].d )
-#define R2   ( mipscpu.cp2dr[ 22 ].b.l )
-#define G2   ( mipscpu.cp2dr[ 22 ].b.h )
-#define B2   ( mipscpu.cp2dr[ 22 ].b.h2 )
-#define CD2  ( mipscpu.cp2dr[ 22 ].b.h3 )
-#define RES1 ( mipscpu.cp2dr[ 23 ].d )
-#define MAC0 ( mipscpu.cp2dr[ 24 ].d )
-#define MAC1 ( mipscpu.cp2dr[ 25 ].sd )
-#define MAC2 ( mipscpu.cp2dr[ 26 ].sd )
-#define MAC3 ( mipscpu.cp2dr[ 27 ].sd )
-#define IRGB ( mipscpu.cp2dr[ 28 ].d )
-#define ORGB ( mipscpu.cp2dr[ 29 ].d )
-#define LZCS ( mipscpu.cp2dr[ 30 ].d )
-#define LZCR ( mipscpu.cp2dr[ 31 ].d )
+#define VX( n ) ( psxcpu->cp2dr[ n << 1 ].w.l )
+#define VY( n ) ( psxcpu->cp2dr[ n << 1 ].w.h )
+#define VZ( n ) ( psxcpu->cp2dr[ ( n << 1 ) + 1 ].w.l )
+#define MX11( n ) ( psxcpu->cp2cr[ ( n << 3 ) ].sw.l )
+#define MX12( n ) ( psxcpu->cp2cr[ ( n << 3 ) ].sw.h )
+#define MX13( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 1 ].sw.l )
+#define MX21( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 1 ].sw.h )
+#define MX22( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 2 ].sw.l )
+#define MX23( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 2 ].sw.h )
+#define MX31( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 3 ].sw.l )
+#define MX32( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 3 ].sw.h )
+#define MX33( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 4 ].sw.l )
+#define CV0( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 5 ].sd )
+#define CV1( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 6 ].sd )
+#define CV2( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 7 ].sd )
 
-#define R11 ( mipscpu.cp2cr[ 0 ].sw.l )
-#define R12 ( mipscpu.cp2cr[ 0 ].sw.h )
-#define R13 ( mipscpu.cp2cr[ 1 ].sw.l )
-#define R21 ( mipscpu.cp2cr[ 1 ].sw.h )
-#define R22 ( mipscpu.cp2cr[ 2 ].sw.l )
-#define R23 ( mipscpu.cp2cr[ 2 ].sw.h )
-#define R31 ( mipscpu.cp2cr[ 3 ].sw.l )
-#define R32 ( mipscpu.cp2cr[ 3 ].sw.h )
-#define R33 ( mipscpu.cp2cr[ 4 ].sw.l )
-#define TRX ( mipscpu.cp2cr[ 5 ].sd )
-#define TRY ( mipscpu.cp2cr[ 6 ].sd )
-#define TRZ ( mipscpu.cp2cr[ 7 ].sd )
-#define L11 ( mipscpu.cp2cr[ 8 ].sw.l )
-#define L12 ( mipscpu.cp2cr[ 8 ].sw.h )
-#define L13 ( mipscpu.cp2cr[ 9 ].sw.l )
-#define L21 ( mipscpu.cp2cr[ 9 ].sw.h )
-#define L22 ( mipscpu.cp2cr[ 10 ].sw.l )
-#define L23 ( mipscpu.cp2cr[ 10 ].sw.h )
-#define L31 ( mipscpu.cp2cr[ 11 ].sw.l )
-#define L32 ( mipscpu.cp2cr[ 11 ].sw.h )
-#define L33 ( mipscpu.cp2cr[ 12 ].sw.l )
-#define RBK ( mipscpu.cp2cr[ 13 ].sd )
-#define GBK ( mipscpu.cp2cr[ 14 ].sd )
-#define BBK ( mipscpu.cp2cr[ 15 ].sd )
-#define LR1 ( mipscpu.cp2cr[ 16 ].sw.l )
-#define LR2 ( mipscpu.cp2cr[ 16 ].sw.h )
-#define LR3 ( mipscpu.cp2cr[ 17 ].sw.l )
-#define LG1 ( mipscpu.cp2cr[ 17 ].sw.h )
-#define LG2 ( mipscpu.cp2cr[ 18 ].sw.l )
-#define LG3 ( mipscpu.cp2cr[ 18 ].sw.h )
-#define LB1 ( mipscpu.cp2cr[ 19 ].sw.l )
-#define LB2 ( mipscpu.cp2cr[ 19 ].sw.h )
-#define LB3 ( mipscpu.cp2cr[ 20 ].sw.l )
-#define RFC ( mipscpu.cp2cr[ 21 ].sd )
-#define GFC ( mipscpu.cp2cr[ 22 ].sd )
-#define BFC ( mipscpu.cp2cr[ 23 ].sd )
-#define OFX ( mipscpu.cp2cr[ 24 ].d )
-#define OFY ( mipscpu.cp2cr[ 25 ].d )
-#define H   ( mipscpu.cp2cr[ 26 ].w.l )
-#define DQA ( mipscpu.cp2cr[ 27 ].w.l )
-#define DQB ( mipscpu.cp2cr[ 28 ].d )
-#define ZSF3 ( mipscpu.cp2cr[ 29 ].sw.l )
-#define ZSF4 ( mipscpu.cp2cr[ 30 ].sw.l )
-#define FLAG ( mipscpu.cp2cr[ 31 ].d )
+#define VXY0 ( psxcpu->cp2dr[ 0 ].d )
+#define VX0  ( psxcpu->cp2dr[ 0 ].w.l )
+#define VY0  ( psxcpu->cp2dr[ 0 ].w.h )
+#define VZ0  ( psxcpu->cp2dr[ 1 ].w.l )
+#define VXY1 ( psxcpu->cp2dr[ 2 ].d )
+#define VX1  ( psxcpu->cp2dr[ 2 ].w.l )
+#define VY1  ( psxcpu->cp2dr[ 2 ].w.h )
+#define VZ1  ( psxcpu->cp2dr[ 3 ].w.l )
+#define VXY2 ( psxcpu->cp2dr[ 4 ].d )
+#define VX2  ( psxcpu->cp2dr[ 4 ].w.l )
+#define VY2  ( psxcpu->cp2dr[ 4 ].w.h )
+#define VZ2  ( psxcpu->cp2dr[ 5 ].w.l )
+#define RGB  ( psxcpu->cp2dr[ 6 ].d )
+#define R    ( psxcpu->cp2dr[ 6 ].b.l )
+#define G    ( psxcpu->cp2dr[ 6 ].b.h )
+#define B    ( psxcpu->cp2dr[ 6 ].b.h2 )
+#define CODE ( psxcpu->cp2dr[ 6 ].b.h3 )
+#define OTZ  ( psxcpu->cp2dr[ 7 ].w.l )
+#define IR0  ( psxcpu->cp2dr[ 8 ].sw.l )
+#define IR1  ( psxcpu->cp2dr[ 9 ].sw.l )
+#define IR2  ( psxcpu->cp2dr[ 10 ].sw.l )
+#define IR3  ( psxcpu->cp2dr[ 11 ].sw.l )
+#define SXY0 ( psxcpu->cp2dr[ 12 ].d )
+#define SX0  ( psxcpu->cp2dr[ 12 ].sw.l )
+#define SY0  ( psxcpu->cp2dr[ 12 ].sw.h )
+#define SXY1 ( psxcpu->cp2dr[ 13 ].d )
+#define SX1  ( psxcpu->cp2dr[ 13 ].sw.l )
+#define SY1  ( psxcpu->cp2dr[ 13 ].sw.h )
+#define SXY2 ( psxcpu->cp2dr[ 14 ].d )
+#define SX2  ( psxcpu->cp2dr[ 14 ].sw.l )
+#define SY2  ( psxcpu->cp2dr[ 14 ].sw.h )
+#define SXYP ( psxcpu->cp2dr[ 15 ].d )
+#define SXP  ( psxcpu->cp2dr[ 15 ].sw.l )
+#define SYP  ( psxcpu->cp2dr[ 15 ].sw.h )
+#define SZ0  ( psxcpu->cp2dr[ 16 ].w.l )
+#define SZ1  ( psxcpu->cp2dr[ 17 ].w.l )
+#define SZ2  ( psxcpu->cp2dr[ 18 ].w.l )
+#define SZ3  ( psxcpu->cp2dr[ 19 ].w.l )
+#define RGB0 ( psxcpu->cp2dr[ 20 ].d )
+#define R0   ( psxcpu->cp2dr[ 20 ].b.l )
+#define G0   ( psxcpu->cp2dr[ 20 ].b.h )
+#define B0   ( psxcpu->cp2dr[ 20 ].b.h2 )
+#define CD0  ( psxcpu->cp2dr[ 20 ].b.h3 )
+#define RGB1 ( psxcpu->cp2dr[ 21 ].d )
+#define R1   ( psxcpu->cp2dr[ 21 ].b.l )
+#define G1   ( psxcpu->cp2dr[ 21 ].b.h )
+#define B1   ( psxcpu->cp2dr[ 21 ].b.h2 )
+#define CD1  ( psxcpu->cp2dr[ 21 ].b.h3 )
+#define RGB2 ( psxcpu->cp2dr[ 22 ].d )
+#define R2   ( psxcpu->cp2dr[ 22 ].b.l )
+#define G2   ( psxcpu->cp2dr[ 22 ].b.h )
+#define B2   ( psxcpu->cp2dr[ 22 ].b.h2 )
+#define CD2  ( psxcpu->cp2dr[ 22 ].b.h3 )
+#define RES1 ( psxcpu->cp2dr[ 23 ].d )
+#define MAC0 ( psxcpu->cp2dr[ 24 ].d )
+#define MAC1 ( psxcpu->cp2dr[ 25 ].sd )
+#define MAC2 ( psxcpu->cp2dr[ 26 ].sd )
+#define MAC3 ( psxcpu->cp2dr[ 27 ].sd )
+#define IRGB ( psxcpu->cp2dr[ 28 ].d )
+#define ORGB ( psxcpu->cp2dr[ 29 ].d )
+#define LZCS ( psxcpu->cp2dr[ 30 ].d )
+#define LZCR ( psxcpu->cp2dr[ 31 ].d )
 
-INLINE INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag )
+#define R11 ( psxcpu->cp2cr[ 0 ].sw.l )
+#define R12 ( psxcpu->cp2cr[ 0 ].sw.h )
+#define R13 ( psxcpu->cp2cr[ 1 ].sw.l )
+#define R21 ( psxcpu->cp2cr[ 1 ].sw.h )
+#define R22 ( psxcpu->cp2cr[ 2 ].sw.l )
+#define R23 ( psxcpu->cp2cr[ 2 ].sw.h )
+#define R31 ( psxcpu->cp2cr[ 3 ].sw.l )
+#define R32 ( psxcpu->cp2cr[ 3 ].sw.h )
+#define R33 ( psxcpu->cp2cr[ 4 ].sw.l )
+#define TRX ( psxcpu->cp2cr[ 5 ].sd )
+#define TRY ( psxcpu->cp2cr[ 6 ].sd )
+#define TRZ ( psxcpu->cp2cr[ 7 ].sd )
+#define L11 ( psxcpu->cp2cr[ 8 ].sw.l )
+#define L12 ( psxcpu->cp2cr[ 8 ].sw.h )
+#define L13 ( psxcpu->cp2cr[ 9 ].sw.l )
+#define L21 ( psxcpu->cp2cr[ 9 ].sw.h )
+#define L22 ( psxcpu->cp2cr[ 10 ].sw.l )
+#define L23 ( psxcpu->cp2cr[ 10 ].sw.h )
+#define L31 ( psxcpu->cp2cr[ 11 ].sw.l )
+#define L32 ( psxcpu->cp2cr[ 11 ].sw.h )
+#define L33 ( psxcpu->cp2cr[ 12 ].sw.l )
+#define RBK ( psxcpu->cp2cr[ 13 ].sd )
+#define GBK ( psxcpu->cp2cr[ 14 ].sd )
+#define BBK ( psxcpu->cp2cr[ 15 ].sd )
+#define LR1 ( psxcpu->cp2cr[ 16 ].sw.l )
+#define LR2 ( psxcpu->cp2cr[ 16 ].sw.h )
+#define LR3 ( psxcpu->cp2cr[ 17 ].sw.l )
+#define LG1 ( psxcpu->cp2cr[ 17 ].sw.h )
+#define LG2 ( psxcpu->cp2cr[ 18 ].sw.l )
+#define LG3 ( psxcpu->cp2cr[ 18 ].sw.h )
+#define LB1 ( psxcpu->cp2cr[ 19 ].sw.l )
+#define LB2 ( psxcpu->cp2cr[ 19 ].sw.h )
+#define LB3 ( psxcpu->cp2cr[ 20 ].sw.l )
+#define RFC ( psxcpu->cp2cr[ 21 ].sd )
+#define GFC ( psxcpu->cp2cr[ 22 ].sd )
+#define BFC ( psxcpu->cp2cr[ 23 ].sd )
+#define OFX ( psxcpu->cp2cr[ 24 ].d )
+#define OFY ( psxcpu->cp2cr[ 25 ].d )
+#define H   ( psxcpu->cp2cr[ 26 ].w.l )
+#define DQA ( psxcpu->cp2cr[ 27 ].w.l )
+#define DQB ( psxcpu->cp2cr[ 28 ].d )
+#define ZSF3 ( psxcpu->cp2cr[ 29 ].sw.l )
+#define ZSF4 ( psxcpu->cp2cr[ 30 ].sw.l )
+#define FLAG ( psxcpu->cp2cr[ 31 ].d )
+
+INLINE INT32 LIM( psxcpu_state *psxcpu, INT32 value, INT32 max, INT32 min, UINT32 flag )
 {
 	if( value > max )
 	{
@@ -3083,7 +3156,7 @@ INLINE INT32 LIM( INT32 value, INT32 max, INT32 min, UINT32 flag )
 	return value;
 }
 
-static UINT32 getcp2dr( int reg )
+static UINT32 getcp2dr( psxcpu_state *psxcpu, int reg )
 {
 	switch( reg )
 	{
@@ -3094,7 +3167,7 @@ static UINT32 getcp2dr( int reg )
 	case 9:
 	case 10:
 	case 11:
-		mipscpu.cp2dr[ reg ].d = (INT32)mipscpu.cp2dr[ reg ].sw.l;
+		psxcpu->cp2dr[ reg ].d = (INT32)psxcpu->cp2dr[ reg ].sw.l;
 		break;
 
 	case 7:
@@ -3102,24 +3175,24 @@ static UINT32 getcp2dr( int reg )
 	case 17:
 	case 18:
 	case 19:
-		mipscpu.cp2dr[ reg ].d = (UINT32)mipscpu.cp2dr[ reg ].w.l;
+		psxcpu->cp2dr[ reg ].d = (UINT32)psxcpu->cp2dr[ reg ].w.l;
 		break;
 
 	case 15:
-		mipscpu.cp2dr[ reg ].d = SXY2;
+		psxcpu->cp2dr[ reg ].d = SXY2;
 		break;
 
 	case 28:
 	case 29:
-		mipscpu.cp2dr[ reg ].d = LIM( (INT16)IR1 >> 7, 0x1f, 0, 0 ) | ( LIM( (INT16)IR2 >> 7, 0x1f, 0, 0 ) << 5 ) | ( LIM( (INT16)IR3 >> 7, 0x1f, 0, 0 ) << 10 );
+		psxcpu->cp2dr[ reg ].d = LIM( psxcpu, (INT16)IR1 >> 7, 0x1f, 0, 0 ) | ( LIM( psxcpu, (INT16)IR2 >> 7, 0x1f, 0, 0 ) << 5 ) | ( LIM( psxcpu, (INT16)IR3 >> 7, 0x1f, 0, 0 ) << 10 );
 		break;
 	}
 
-	GTELOG( "get CP2DR%u=%08x", reg, mipscpu.cp2dr[ reg ].d );
-	return mipscpu.cp2dr[ reg ].d;
+	GTELOG( "get CP2DR%u=%08x", reg, psxcpu->cp2dr[ reg ].d );
+	return psxcpu->cp2dr[ reg ].d;
 }
 
-static void setcp2dr( int reg, UINT32 value )
+static void setcp2dr( psxcpu_state *psxcpu, int reg, UINT32 value )
 {
 	GTELOG( "set CP2DR%u=%08x", reg, value );
 
@@ -3156,21 +3229,21 @@ static void setcp2dr( int reg, UINT32 value )
 	}
 
 	case 31:
-		value = mipscpu.cp2dr[ reg ].d;
+		value = psxcpu->cp2dr[ reg ].d;
 		break;
 	}
 
-	mipscpu.cp2dr[ reg ].d = value;
+	psxcpu->cp2dr[ reg ].d = value;
 }
 
-static UINT32 getcp2cr( int reg )
+static UINT32 getcp2cr( psxcpu_state *psxcpu, int reg )
 {
-	GTELOG( "get CP2CR%u=%08x", reg, mipscpu.cp2cr[ reg ].d );
+	GTELOG( "get CP2CR%u=%08x", reg, psxcpu->cp2cr[ reg ].d );
 
-	return mipscpu.cp2cr[ reg ].d;
+	return psxcpu->cp2cr[ reg ].d;
 }
 
-static void setcp2cr( int reg, UINT32 value )
+static void setcp2cr( psxcpu_state *psxcpu, int reg, UINT32 value )
 {
 	GTELOG( "set CP2CR%u=%08x", reg, value );
 
@@ -3195,10 +3268,10 @@ static void setcp2cr( int reg, UINT32 value )
 		break;
 	}
 
-	mipscpu.cp2cr[ reg ].d = value;
+	psxcpu->cp2cr[ reg ].d = value;
 }
 
-INLINE INT64 BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int n_minflag )
+INLINE INT64 BOUNDS( psxcpu_state *psxcpu, INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int n_minflag )
 {
 	if( n_value > n_max )
 	{
@@ -3213,18 +3286,18 @@ INLINE INT64 BOUNDS( INT64 n_value, INT64 n_max, int n_maxflag, INT64 n_min, int
 
 /* Setting bits 12 & 19-22 in FLAG does not set bit 31 */
 
-#define A1( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 30 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 27 ) )
-#define A2( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 29 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 26 ) )
-#define A3( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 28 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 25 ) )
-#define Lm_B1( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 31 ) | ( 1 << 24 ) )
-#define Lm_B2( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 31 ) | ( 1 << 23 ) )
-#define Lm_B3( a, l ) LIM( ( a ), 0x7fff, -0x8000 * !l, ( 1 << 22 ) )
-#define Lm_C1( a ) LIM( ( a ), 0x00ff, 0x0000, ( 1 << 21 ) )
-#define Lm_C2( a ) LIM( ( a ), 0x00ff, 0x0000, ( 1 << 20 ) )
-#define Lm_C3( a ) LIM( ( a ), 0x00ff, 0x0000, ( 1 << 19 ) )
-#define Lm_D( a ) LIM( ( a ), 0xffff, 0x0000, ( 1 << 31 ) | ( 1 << 18 ) )
+#define A1( a ) BOUNDS( psxcpu, ( a ), 0x7fffffff, ( 1 << 30 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 27 ) )
+#define A2( a ) BOUNDS( psxcpu, ( a ), 0x7fffffff, ( 1 << 29 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 26 ) )
+#define A3( a ) BOUNDS( psxcpu, ( a ), 0x7fffffff, ( 1 << 28 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 25 ) )
+#define Lm_B1( a, l ) LIM( psxcpu, ( a ), 0x7fff, -0x8000 * !l, ( 1 << 31 ) | ( 1 << 24 ) )
+#define Lm_B2( a, l ) LIM( psxcpu, ( a ), 0x7fff, -0x8000 * !l, ( 1 << 31 ) | ( 1 << 23 ) )
+#define Lm_B3( a, l ) LIM( psxcpu, ( a ), 0x7fff, -0x8000 * !l, ( 1 << 22 ) )
+#define Lm_C1( a ) LIM( psxcpu, ( a ), 0x00ff, 0x0000, ( 1 << 21 ) )
+#define Lm_C2( a ) LIM( psxcpu, ( a ), 0x00ff, 0x0000, ( 1 << 20 ) )
+#define Lm_C3( a ) LIM( psxcpu, ( a ), 0x00ff, 0x0000, ( 1 << 19 ) )
+#define Lm_D( a ) LIM( psxcpu, ( a ), 0xffff, 0x0000, ( 1 << 31 ) | ( 1 << 18 ) )
 
-INLINE UINT32 Lm_E( UINT32 n_z )
+INLINE UINT32 Lm_E( psxcpu_state *psxcpu, UINT32 n_z )
 {
 	if( n_z <= H / 2 )
 	{
@@ -3238,37 +3311,22 @@ INLINE UINT32 Lm_E( UINT32 n_z )
 	return n_z;
 }
 
-#define F( a ) BOUNDS( ( a ), 0x7fffffff, ( 1 << 31 ) | ( 1 << 16 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 15 ) )
-#define Lm_G1( a ) LIM( ( a ), 0x3ff, -0x400, ( 1 << 31 ) | ( 1 << 14 ) )
-#define Lm_G2( a ) LIM( ( a ), 0x3ff, -0x400, ( 1 << 31 ) | ( 1 << 13 ) )
-#define Lm_H( a ) LIM( ( a ), 0xfff, 0x000, ( 1 << 12 ) )
+#define F( a ) BOUNDS( psxcpu, ( a ), 0x7fffffff, ( 1 << 31 ) | ( 1 << 16 ), -(INT64)0x80000000, ( 1 << 31 ) | ( 1 << 15 ) )
+#define Lm_G1( a ) LIM( psxcpu, ( a ), 0x3ff, -0x400, ( 1 << 31 ) | ( 1 << 14 ) )
+#define Lm_G2( a ) LIM( psxcpu, ( a ), 0x3ff, -0x400, ( 1 << 31 ) | ( 1 << 13 ) )
+#define Lm_H( a ) LIM( psxcpu, ( a ), 0xfff, 0x000, ( 1 << 12 ) )
 
-static void docop2( int gteop )
+static void docop2( psxcpu_state *psxcpu, int gteop )
 {
 	int shift;
 	int n_v;
 	int lm;
+	int cv;
+	int mx;
 	int n_pass;
 	UINT16 n_v1;
 	UINT16 n_v2;
 	UINT16 n_v3;
-	const INT16 *const *p_n_mx;
-	const INT32 *const *p_n_cv;
-	static const INT16 n_zm = 0;
-	static const INT32 n_zc = 0;
-	static const UINT16 *const p_n_vx[] = { &VX0, &VX1, &VX2 };
-	static const UINT16 *const p_n_vy[] = { &VY0, &VY1, &VY2 };
-	static const UINT16 *const p_n_vz[] = { &VZ0, &VZ1, &VZ2 };
-	static const INT16 *const p_n_rm[] = { &R11, &R12, &R13, &R21, &R22, &R23, &R31, &R32, &R33 };
-	static const INT16 *const p_n_lm[] = { &L11, &L12, &L13, &L21, &L22, &L23, &L31, &L32, &L33 };
-	static const INT16 *const p_n_cm[] = { &LR1, &LR2, &LR3, &LG1, &LG2, &LG3, &LB1, &LB2, &LB3 };
-	static const INT16 *const p_n_zm[] = { &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm, &n_zm };
-	static const INT16 *const *const p_p_n_mx[] = { p_n_rm, p_n_lm, p_n_cm, p_n_zm };
-	static const INT32 *const p_n_tr[] = { &TRX, &TRY, &TRZ };
-	static const INT32 *const p_n_bk[] = { &RBK, &GBK, &BBK };
-	static const INT32 *const p_n_fc[] = { &RFC, &GFC, &BFC };
-	static const INT32 *const p_n_zc[] = { &n_zc, &n_zc, &n_zc };
-	static const INT32 *const *const p_p_n_cv[] = { p_n_tr, p_n_bk, p_n_fc, p_n_zc };
 	INT64 mac0;
 
 	switch( GTE_FUNCT( gteop ) )
@@ -3291,9 +3349,9 @@ static void docop2( int gteop )
 			SZ3 = Lm_D( (INT32)MAC3 );
 			SXY0 = SXY1;
 			SXY1 = SXY2;
-			SX2 = Lm_G1( F( (INT64)(INT32)OFX + ( (INT64)(INT16)IR1 * ( ( (UINT32)H << 16 ) / Lm_E( SZ3 ) ) ) ) >> 16 );
-			SY2 = Lm_G2( F( (INT64)(INT32)OFY + ( (INT64)(INT16)IR2 * ( ( (UINT32)H << 16 ) / Lm_E( SZ3 ) ) ) ) >> 16 );
-			MAC0 = F( (INT64)(INT32)DQB + ( (INT64)(INT16)DQA * ( ( (UINT32)H << 16 ) / Lm_E( SZ3 ) ) ) );
+			SX2 = Lm_G1( F( (INT64)(INT32)OFX + ( (INT64)(INT16)IR1 * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 );
+			SY2 = Lm_G2( F( (INT64)(INT32)OFY + ( (INT64)(INT16)IR2 * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 );
+			MAC0 = F( (INT64)(INT32)DQB + ( (INT64)(INT16)DQA * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) );
 			IR0 = Lm_H( (INT32)MAC0 >> 12 );
 			return;
 		}
@@ -3368,13 +3426,13 @@ static void docop2( int gteop )
 		{
 			GTELOG( "MVMVA" );
 			shift = 12 * GTE_SF( gteop );
-			p_n_mx = p_p_n_mx[ GTE_MX( gteop ) ];
+			mx = GTE_MX( gteop );
 			n_v = GTE_V( gteop );
 			if( n_v < 3 )
 			{
-				n_v1 = *p_n_vx[ n_v ];
-				n_v2 = *p_n_vy[ n_v ];
-				n_v3 = *p_n_vz[ n_v ];
+				n_v1 = VX( n_v );
+				n_v2 = VY( n_v );
+				n_v3 = VZ( n_v );
 			}
 			else
 			{
@@ -3382,13 +3440,13 @@ static void docop2( int gteop )
 				n_v2 = IR2;
 				n_v3 = IR3;
 			}
-			p_n_cv = p_p_n_cv[ GTE_CV( gteop ) ];
+			cv = GTE_CV( gteop );
 			lm = GTE_LM( gteop );
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)(INT32)*p_n_cv[ 0 ] << 12 ) + ( (INT16)*p_n_mx[ 0 ] * (INT16)n_v1 ) + ( (INT16)*p_n_mx[ 1 ] * (INT16)n_v2 ) + ( (INT16)*p_n_mx[ 2 ] * (INT16)n_v3 ) ) >> shift );
-			MAC2 = A2( ( ( (INT64)(INT32)*p_n_cv[ 1 ] << 12 ) + ( (INT16)*p_n_mx[ 3 ] * (INT16)n_v1 ) + ( (INT16)*p_n_mx[ 4 ] * (INT16)n_v2 ) + ( (INT16)*p_n_mx[ 5 ] * (INT16)n_v3 ) ) >> shift );
-			MAC3 = A3( ( ( (INT64)(INT32)*p_n_cv[ 2 ] << 12 ) + ( (INT16)*p_n_mx[ 6 ] * (INT16)n_v1 ) + ( (INT16)*p_n_mx[ 7 ] * (INT16)n_v2 ) + ( (INT16)*p_n_mx[ 8 ] * (INT16)n_v3 ) ) >> shift );
+			MAC1 = A1( ( ( (INT64)(INT32)CV0( cv ) << 12 ) + ( (INT16)MX11( mx ) * (INT16)n_v1 ) + ( (INT16)MX12( mx ) * (INT16)n_v2 ) + ( (INT16)MX13( mx ) * (INT16)n_v3 ) ) >> shift );
+			MAC2 = A2( ( ( (INT64)(INT32)CV1( cv ) << 12 ) + ( (INT16)MX21( mx ) * (INT16)n_v1 ) + ( (INT16)MX22( mx ) * (INT16)n_v2 ) + ( (INT16)MX23( mx ) * (INT16)n_v3 ) ) >> shift );
+			MAC3 = A3( ( ( (INT64)(INT32)CV2( cv ) << 12 ) + ( (INT16)MX31( mx ) * (INT16)n_v1 ) + ( (INT16)MX32( mx ) * (INT16)n_v2 ) + ( (INT16)MX33( mx ) * (INT16)n_v3 ) ) >> shift );
 
 			IR1 = Lm_B1( (INT32)MAC1, lm );
 			IR2 = Lm_B2( (INT32)MAC2, lm );
@@ -3476,9 +3534,9 @@ static void docop2( int gteop )
 
 			for( n_v = 0; n_v < 3; n_v++ )
 			{
-				MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)L12 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)L13 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)L22 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)L23 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)L32 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)L33 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
+				MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)VX( n_v ) ) + ( (INT16)L12 * (INT16)VY( n_v ) ) + ( (INT16)L13 * (INT16)VZ( n_v ) ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)VX( n_v ) ) + ( (INT16)L22 * (INT16)VY( n_v ) ) + ( (INT16)L23 * (INT16)VZ( n_v ) ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)VX( n_v ) ) + ( (INT16)L32 * (INT16)VY( n_v ) ) + ( (INT16)L33 * (INT16)VZ( n_v ) ) ) >> 12 );
 				IR1 = Lm_B1( (INT32)MAC1, 1 );
 				IR2 = Lm_B2( (INT32)MAC2, 1 );
 				IR3 = Lm_B3( (INT32)MAC3, 1 );
@@ -3623,9 +3681,9 @@ static void docop2( int gteop )
 
 			for( n_v = 0; n_v < 3; n_v++ )
 			{
-				MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)L12 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)L13 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)L22 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)L23 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)L32 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)L33 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
+				MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)VX( n_v ) ) + ( (INT16)L12 * (INT16)VY( n_v ) ) + ( (INT16)L13 * (INT16)VZ( n_v ) ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)VX( n_v ) ) + ( (INT16)L22 * (INT16)VY( n_v ) ) + ( (INT16)L23 * (INT16)VZ( n_v ) ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)VX( n_v ) ) + ( (INT16)L32 * (INT16)VY( n_v ) ) + ( (INT16)L33 * (INT16)VZ( n_v ) ) ) >> 12 );
 				IR1 = Lm_B1( (INT32)MAC1, 1 );
 				IR2 = Lm_B2( (INT32)MAC2, 1 );
 				IR3 = Lm_B3( (INT32)MAC3, 1 );
@@ -3727,9 +3785,9 @@ static void docop2( int gteop )
 
 			for( n_v = 0; n_v < 3; n_v++ )
 			{
-				MAC1 = A1( ( ( (INT64)(INT32)TRX << 12 ) + ( (INT16)R11 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)R12 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)R13 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)(INT32)TRY << 12 ) + ( (INT16)R21 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)R22 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)R23 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)(INT32)TRZ << 12 ) + ( (INT16)R31 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)R32 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)R33 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
+				MAC1 = A1( ( ( (INT64)(INT32)TRX << 12 ) + ( (INT16)R11 * (INT16)VX( n_v ) ) + ( (INT16)R12 * (INT16)VY( n_v ) ) + ( (INT16)R13 * (INT16)VZ( n_v ) ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64)(INT32)TRY << 12 ) + ( (INT16)R21 * (INT16)VX( n_v ) ) + ( (INT16)R22 * (INT16)VY( n_v ) ) + ( (INT16)R23 * (INT16)VZ( n_v ) ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64)(INT32)TRZ << 12 ) + ( (INT16)R31 * (INT16)VX( n_v ) ) + ( (INT16)R32 * (INT16)VY( n_v ) ) + ( (INT16)R33 * (INT16)VZ( n_v ) ) ) >> 12 );
 				IR1 = Lm_B1( (INT32)MAC1, 0 );
 				IR2 = Lm_B2( (INT32)MAC2, 0 );
 				IR3 = Lm_B3( (INT32)MAC3, 0 );
@@ -3739,9 +3797,9 @@ static void docop2( int gteop )
 				SZ3 = Lm_D( (INT32)MAC3 );
 				SXY0 = SXY1;
 				SXY1 = SXY2;
-				SX2 = Lm_G1( F( ( (INT64)(INT32)OFX + ( (INT64)(INT16)IR1 * ( ( (UINT32)H << 16 ) / Lm_E( SZ3 ) ) ) ) >> 16 ) );
-				SY2 = Lm_G2( F( ( (INT64)(INT32)OFY + ( (INT64)(INT16)IR2 * ( ( (UINT32)H << 16 ) / Lm_E( SZ3 ) ) ) ) >> 16 ) );
-				MAC0 = F( (INT64)(INT32)DQB + ( (INT64)(INT16)DQA * ( ( (UINT32)H << 16 ) / Lm_E( SZ3 ) ) ) );
+				SX2 = Lm_G1( F( ( (INT64)(INT32)OFX + ( (INT64)(INT16)IR1 * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 ) );
+				SY2 = Lm_G2( F( ( (INT64)(INT32)OFY + ( (INT64)(INT16)IR2 * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 ) );
+				MAC0 = F( (INT64)(INT32)DQB + ( (INT64)(INT16)DQA * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) );
 				IR0 = Lm_H( (INT32)MAC0 >> 12 );
 			}
 			return;
@@ -3813,9 +3871,9 @@ static void docop2( int gteop )
 
 			for( n_v = 0; n_v < 3; n_v++ )
 			{
-				MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)L12 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)L13 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)L22 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)L23 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)*p_n_vx[ n_v ] ) + ( (INT16)L32 * (INT16)*p_n_vy[ n_v ] ) + ( (INT16)L33 * (INT16)*p_n_vz[ n_v ] ) ) >> 12 );
+				MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)VX( n_v ) ) + ( (INT16)L12 * (INT16)VY( n_v ) ) + ( (INT16)L13 * (INT16)VZ( n_v ) ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)VX( n_v ) ) + ( (INT16)L22 * (INT16)VY( n_v ) ) + ( (INT16)L23 * (INT16)VZ( n_v ) ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)VX( n_v ) ) + ( (INT16)L32 * (INT16)VY( n_v ) ) + ( (INT16)L33 * (INT16)VZ( n_v ) ) ) >> 12 );
 				IR1 = Lm_B1( (INT32)MAC1, 1 );
 				IR2 = Lm_B2( (INT32)MAC2, 1 );
 				IR3 = Lm_B3( (INT32)MAC3, 1 );
@@ -3849,146 +3907,147 @@ static void docop2( int gteop )
 		break;
 	}
 	popmessage( "unknown GTE op %08x", gteop );
-	logerror( "%08x: unknown GTE op %08x\n", mipscpu.pc, gteop );
-	mips_stop();
+	logerror( "%08x: unknown GTE op %08x\n", psxcpu->pc, gteop );
+	mips_stop( psxcpu );
 }
 
 /**************************************************************************
  * Generic set_info
  **************************************************************************/
 
-static CPU_SET_INFO( mips )
+static CPU_SET_INFO( psxcpu )
 {
+	psxcpu_state *psxcpu = device->token;
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ0:		set_irq_line(MIPS_IRQ0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ1:		set_irq_line(MIPS_IRQ1, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ2:		set_irq_line(MIPS_IRQ2, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ3:		set_irq_line(MIPS_IRQ3, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ4:		set_irq_line(MIPS_IRQ4, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ5:		set_irq_line(MIPS_IRQ5, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ0:		set_irq_line( psxcpu, PSXCPU_IRQ0, info->i );	break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ1:		set_irq_line( psxcpu, PSXCPU_IRQ1, info->i );	break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ2:		set_irq_line( psxcpu, PSXCPU_IRQ2, info->i );	break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ3:		set_irq_line( psxcpu, PSXCPU_IRQ3, info->i );	break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ4:		set_irq_line( psxcpu, PSXCPU_IRQ4, info->i );	break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ5:		set_irq_line( psxcpu, PSXCPU_IRQ5, info->i );	break;
 
-		case CPUINFO_INT_PC:							mips_set_pc( info->i );					break;
-		case CPUINFO_INT_REGISTER + MIPS_PC:			mips_set_pc( info->i );					break;
+		case CPUINFO_INT_PC:							mips_set_pc( psxcpu, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_PC:			mips_set_pc( psxcpu, info->i );			break;
 		case CPUINFO_INT_SP:							/* no stack */							break;
-		case CPUINFO_INT_REGISTER + MIPS_DELAYV:		mipscpu.delayv = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_DELAYR:		if( info->i <= MIPS_DELAYR_NOTPC ) mipscpu.delayr = info->i; break;
-		case CPUINFO_INT_REGISTER + MIPS_HI:			mipscpu.hi = info->i;					break;
-		case CPUINFO_INT_REGISTER + MIPS_LO:			mipscpu.lo = info->i;					break;
-		case CPUINFO_INT_REGISTER + MIPS_BIU:			mipscpu.biu = info->i;					break;
-		case CPUINFO_INT_REGISTER + MIPS_R0:			mipscpu.r[ 0 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R1:			mipscpu.r[ 1 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R2:			mipscpu.r[ 2 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R3:			mipscpu.r[ 3 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R4:			mipscpu.r[ 4 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R5:			mipscpu.r[ 5 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R6:			mipscpu.r[ 6 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R7:			mipscpu.r[ 7 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R8:			mipscpu.r[ 8 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R9:			mipscpu.r[ 9 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R10:			mipscpu.r[ 10 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R11:			mipscpu.r[ 11 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R12:			mipscpu.r[ 12 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R13:			mipscpu.r[ 13 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R14:			mipscpu.r[ 14 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R15:			mipscpu.r[ 15 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R16:			mipscpu.r[ 16 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R17:			mipscpu.r[ 17 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R18:			mipscpu.r[ 18 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R19:			mipscpu.r[ 19 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R20:			mipscpu.r[ 20 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R21:			mipscpu.r[ 21 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R22:			mipscpu.r[ 22 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R23:			mipscpu.r[ 23 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R24:			mipscpu.r[ 24 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R25:			mipscpu.r[ 25 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R26:			mipscpu.r[ 26 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R27:			mipscpu.r[ 27 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R28:			mipscpu.r[ 28 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R29:			mipscpu.r[ 29 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R30:			mipscpu.r[ 30 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_R31:			mipscpu.r[ 31 ] = info->i;				break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R0:			mips_set_cp0r( 0, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R1:			mips_set_cp0r( 1, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R2:			mips_set_cp0r( 2, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R3:			mips_set_cp0r( 3, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R4:			mips_set_cp0r( 4, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R5:			mips_set_cp0r( 5, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R6:			mips_set_cp0r( 6, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R7:			mips_set_cp0r( 7, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R8:			mips_set_cp0r( 8, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R9:			mips_set_cp0r( 9, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R10:		mips_set_cp0r( 10, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R11:		mips_set_cp0r( 11, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R12:		mips_set_cp0r( 12, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R13:		mips_set_cp0r( 13, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R14:		mips_set_cp0r( 14, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R15:		mips_set_cp0r( 15, info->i );			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR0:		mipscpu.cp2dr[ 0 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR1:		mipscpu.cp2dr[ 1 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR2:		mipscpu.cp2dr[ 2 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR3:		mipscpu.cp2dr[ 3 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR4:		mipscpu.cp2dr[ 4 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR5:		mipscpu.cp2dr[ 5 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR6:		mipscpu.cp2dr[ 6 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR7:		mipscpu.cp2dr[ 7 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR8:		mipscpu.cp2dr[ 8 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR9:		mipscpu.cp2dr[ 9 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR10:		mipscpu.cp2dr[ 10 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR11:		mipscpu.cp2dr[ 11 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR12:		mipscpu.cp2dr[ 12 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR13:		mipscpu.cp2dr[ 13 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR14:		mipscpu.cp2dr[ 14 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR15:		mipscpu.cp2dr[ 15 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR16:		mipscpu.cp2dr[ 16 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR17:		mipscpu.cp2dr[ 17 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR18:		mipscpu.cp2dr[ 18 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR19:		mipscpu.cp2dr[ 19 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR20:		mipscpu.cp2dr[ 20 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR21:		mipscpu.cp2dr[ 21 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR22:		mipscpu.cp2dr[ 22 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR23:		mipscpu.cp2dr[ 23 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR24:		mipscpu.cp2dr[ 24 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR25:		mipscpu.cp2dr[ 25 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR26:		mipscpu.cp2dr[ 26 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR27:		mipscpu.cp2dr[ 27 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR28:		mipscpu.cp2dr[ 28 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR29:		mipscpu.cp2dr[ 29 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR30:		mipscpu.cp2dr[ 30 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR31:		mipscpu.cp2dr[ 31 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR0:		mipscpu.cp2cr[ 0 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR1:		mipscpu.cp2cr[ 1 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR2:		mipscpu.cp2cr[ 2 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR3:		mipscpu.cp2cr[ 3 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR4:		mipscpu.cp2cr[ 4 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR5:		mipscpu.cp2cr[ 5 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR6:		mipscpu.cp2cr[ 6 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR7:		mipscpu.cp2cr[ 7 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR8:		mipscpu.cp2cr[ 8 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR9:		mipscpu.cp2cr[ 9 ].d = info->i;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR10:		mipscpu.cp2cr[ 10 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR11:		mipscpu.cp2cr[ 11 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR12:		mipscpu.cp2cr[ 12 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR13:		mipscpu.cp2cr[ 13 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR14:		mipscpu.cp2cr[ 14 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR15:		mipscpu.cp2cr[ 15 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR16:		mipscpu.cp2cr[ 16 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR17:		mipscpu.cp2cr[ 17 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR18:		mipscpu.cp2cr[ 18 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR19:		mipscpu.cp2cr[ 19 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR20:		mipscpu.cp2cr[ 20 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR21:		mipscpu.cp2cr[ 21 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR22:		mipscpu.cp2cr[ 22 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR23:		mipscpu.cp2cr[ 23 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR24:		mipscpu.cp2cr[ 24 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR25:		mipscpu.cp2cr[ 25 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR26:		mipscpu.cp2cr[ 26 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR27:		mipscpu.cp2cr[ 27 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR28:		mipscpu.cp2cr[ 28 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR29:		mipscpu.cp2cr[ 29 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR30:		mipscpu.cp2cr[ 30 ].d = info->i;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR31:		mipscpu.cp2cr[ 31 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_DELAYV:		psxcpu->delayv = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_DELAYR:		if( info->i <= PSXCPU_DELAYR_NOTPC ) psxcpu->delayr = info->i; break;
+		case CPUINFO_INT_REGISTER + PSXCPU_HI:			psxcpu->hi = info->i;					break;
+		case CPUINFO_INT_REGISTER + PSXCPU_LO:			psxcpu->lo = info->i;					break;
+		case CPUINFO_INT_REGISTER + PSXCPU_BIU:			psxcpu->biu = info->i;					break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R0:			psxcpu->r[ 0 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R1:			psxcpu->r[ 1 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R2:			psxcpu->r[ 2 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R3:			psxcpu->r[ 3 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R4:			psxcpu->r[ 4 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R5:			psxcpu->r[ 5 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R6:			psxcpu->r[ 6 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R7:			psxcpu->r[ 7 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R8:			psxcpu->r[ 8 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R9:			psxcpu->r[ 9 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R10:			psxcpu->r[ 10 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R11:			psxcpu->r[ 11 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R12:			psxcpu->r[ 12 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R13:			psxcpu->r[ 13 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R14:			psxcpu->r[ 14 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R15:			psxcpu->r[ 15 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R16:			psxcpu->r[ 16 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R17:			psxcpu->r[ 17 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R18:			psxcpu->r[ 18 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R19:			psxcpu->r[ 19 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R20:			psxcpu->r[ 20 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R21:			psxcpu->r[ 21 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R22:			psxcpu->r[ 22 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R23:			psxcpu->r[ 23 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R24:			psxcpu->r[ 24 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R25:			psxcpu->r[ 25 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R26:			psxcpu->r[ 26 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R27:			psxcpu->r[ 27 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R28:			psxcpu->r[ 28 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R29:			psxcpu->r[ 29 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R30:			psxcpu->r[ 30 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R31:			psxcpu->r[ 31 ] = info->i;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R0:			mips_set_cp0r( psxcpu, 0, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R1:			mips_set_cp0r( psxcpu, 1, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R2:			mips_set_cp0r( psxcpu, 2, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R3:			mips_set_cp0r( psxcpu, 3, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R4:			mips_set_cp0r( psxcpu, 4, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R5:			mips_set_cp0r( psxcpu, 5, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R6:			mips_set_cp0r( psxcpu, 6, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R7:			mips_set_cp0r( psxcpu, 7, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R8:			mips_set_cp0r( psxcpu, 8, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R9:			mips_set_cp0r( psxcpu, 9, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R10:		mips_set_cp0r( psxcpu, 10, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R11:		mips_set_cp0r( psxcpu, 11, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R12:		mips_set_cp0r( psxcpu, 12, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R13:		mips_set_cp0r( psxcpu, 13, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R14:		mips_set_cp0r( psxcpu, 14, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R15:		mips_set_cp0r( psxcpu, 15, info->i );			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR0:		psxcpu->cp2dr[ 0 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR1:		psxcpu->cp2dr[ 1 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR2:		psxcpu->cp2dr[ 2 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR3:		psxcpu->cp2dr[ 3 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR4:		psxcpu->cp2dr[ 4 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR5:		psxcpu->cp2dr[ 5 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR6:		psxcpu->cp2dr[ 6 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR7:		psxcpu->cp2dr[ 7 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR8:		psxcpu->cp2dr[ 8 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR9:		psxcpu->cp2dr[ 9 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR10:		psxcpu->cp2dr[ 10 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR11:		psxcpu->cp2dr[ 11 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR12:		psxcpu->cp2dr[ 12 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR13:		psxcpu->cp2dr[ 13 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR14:		psxcpu->cp2dr[ 14 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR15:		psxcpu->cp2dr[ 15 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR16:		psxcpu->cp2dr[ 16 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR17:		psxcpu->cp2dr[ 17 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR18:		psxcpu->cp2dr[ 18 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR19:		psxcpu->cp2dr[ 19 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR20:		psxcpu->cp2dr[ 20 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR21:		psxcpu->cp2dr[ 21 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR22:		psxcpu->cp2dr[ 22 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR23:		psxcpu->cp2dr[ 23 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR24:		psxcpu->cp2dr[ 24 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR25:		psxcpu->cp2dr[ 25 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR26:		psxcpu->cp2dr[ 26 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR27:		psxcpu->cp2dr[ 27 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR28:		psxcpu->cp2dr[ 28 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR29:		psxcpu->cp2dr[ 29 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR30:		psxcpu->cp2dr[ 30 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR31:		psxcpu->cp2dr[ 31 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR0:		psxcpu->cp2cr[ 0 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR1:		psxcpu->cp2cr[ 1 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR2:		psxcpu->cp2cr[ 2 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR3:		psxcpu->cp2cr[ 3 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR4:		psxcpu->cp2cr[ 4 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR5:		psxcpu->cp2cr[ 5 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR6:		psxcpu->cp2cr[ 6 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR7:		psxcpu->cp2cr[ 7 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR8:		psxcpu->cp2cr[ 8 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR9:		psxcpu->cp2cr[ 9 ].d = info->i;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR10:		psxcpu->cp2cr[ 10 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR11:		psxcpu->cp2cr[ 11 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR12:		psxcpu->cp2cr[ 12 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR13:		psxcpu->cp2cr[ 13 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR14:		psxcpu->cp2cr[ 14 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR15:		psxcpu->cp2cr[ 15 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR16:		psxcpu->cp2cr[ 16 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR17:		psxcpu->cp2cr[ 17 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR18:		psxcpu->cp2cr[ 18 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR19:		psxcpu->cp2cr[ 19 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR20:		psxcpu->cp2cr[ 20 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR21:		psxcpu->cp2cr[ 21 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR22:		psxcpu->cp2cr[ 22 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR23:		psxcpu->cp2cr[ 23 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR24:		psxcpu->cp2cr[ 24 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR25:		psxcpu->cp2cr[ 25 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR26:		psxcpu->cp2cr[ 26 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR27:		psxcpu->cp2cr[ 27 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR28:		psxcpu->cp2cr[ 28 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR29:		psxcpu->cp2cr[ 29 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR30:		psxcpu->cp2cr[ 30 ].d = info->i;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR31:		psxcpu->cp2cr[ 31 ].d = info->i;		break;
 	}
 }
 
@@ -3998,12 +4057,13 @@ static CPU_SET_INFO( mips )
  * Generic get_info
  **************************************************************************/
 
-static CPU_GET_INFO( mips )
+CPU_GET_INFO( psxcpu )
 {
+	psxcpu_state *psxcpu = (device != NULL) ? device->token : NULL;
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mipscpu);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(psxcpu_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 6;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
@@ -4024,151 +4084,151 @@ static CPU_GET_INFO( mips )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ0:		info->i = (mipscpu.cp0r[ CP0_CAUSE ] & 0x400) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ1:		info->i = (mipscpu.cp0r[ CP0_CAUSE ] & 0x800) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ2:		info->i = (mipscpu.cp0r[ CP0_CAUSE ] & 0x1000) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ3:		info->i = (mipscpu.cp0r[ CP0_CAUSE ] & 0x2000) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ4:		info->i = (mipscpu.cp0r[ CP0_CAUSE ] & 0x4000) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + MIPS_IRQ5:		info->i = (mipscpu.cp0r[ CP0_CAUSE ] & 0x8000) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ0:		info->i = (psxcpu->cp0r[ CP0_CAUSE ] & 0x400) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ1:		info->i = (psxcpu->cp0r[ CP0_CAUSE ] & 0x800) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ2:		info->i = (psxcpu->cp0r[ CP0_CAUSE ] & 0x1000) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ3:		info->i = (psxcpu->cp0r[ CP0_CAUSE ] & 0x2000) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ4:		info->i = (psxcpu->cp0r[ CP0_CAUSE ] & 0x4000) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + PSXCPU_IRQ5:		info->i = (psxcpu->cp0r[ CP0_CAUSE ] & 0x8000) ? ASSERT_LINE : CLEAR_LINE; break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 
-		case CPUINFO_INT_PC:							info->i = mipscpu.pc;					break;
-		case CPUINFO_INT_REGISTER + MIPS_PC:			info->i = mipscpu.pc;					break;
+		case CPUINFO_INT_PC:							info->i = psxcpu->pc;					break;
+		case CPUINFO_INT_REGISTER + PSXCPU_PC:			info->i = psxcpu->pc;					break;
 		case CPUINFO_INT_SP:
 			/* because there is no hardware stack and the pipeline causes the cpu to execute the
             instruction after a subroutine call before the subroutine is executed there is little
             chance of cmd_step_over() in mamedbg.c working. */
 								info->i = 0;													break;
-		case CPUINFO_INT_REGISTER + MIPS_DELAYV:		info->i = mipscpu.delayv;				break;
-		case CPUINFO_INT_REGISTER + MIPS_DELAYR:		info->i = mipscpu.delayr;				break;
-		case CPUINFO_INT_REGISTER + MIPS_HI:			info->i = mipscpu.hi;					break;
-		case CPUINFO_INT_REGISTER + MIPS_LO:			info->i = mipscpu.lo;					break;
-		case CPUINFO_INT_REGISTER + MIPS_BIU:			info->i = mipscpu.biu;					break;
-		case CPUINFO_INT_REGISTER + MIPS_R0:			info->i = mipscpu.r[ 0 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R1:			info->i = mipscpu.r[ 1 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R2:			info->i = mipscpu.r[ 2 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R3:			info->i = mipscpu.r[ 3 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R4:			info->i = mipscpu.r[ 4 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R5:			info->i = mipscpu.r[ 5 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R6:			info->i = mipscpu.r[ 6 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R7:			info->i = mipscpu.r[ 7 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R8:			info->i = mipscpu.r[ 8 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R9:			info->i = mipscpu.r[ 9 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R10:			info->i = mipscpu.r[ 10 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R11:			info->i = mipscpu.r[ 11 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R12:			info->i = mipscpu.r[ 12 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R13:			info->i = mipscpu.r[ 13 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R14:			info->i = mipscpu.r[ 14 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R15:			info->i = mipscpu.r[ 15 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R16:			info->i = mipscpu.r[ 16 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R17:			info->i = mipscpu.r[ 17 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R18:			info->i = mipscpu.r[ 18 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R19:			info->i = mipscpu.r[ 19 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R20:			info->i = mipscpu.r[ 20 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R21:			info->i = mipscpu.r[ 21 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R22:			info->i = mipscpu.r[ 22 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R23:			info->i = mipscpu.r[ 23 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R24:			info->i = mipscpu.r[ 24 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R25:			info->i = mipscpu.r[ 25 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R26:			info->i = mipscpu.r[ 26 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R27:			info->i = mipscpu.r[ 27 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R28:			info->i = mipscpu.r[ 28 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R29:			info->i = mipscpu.r[ 29 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R30:			info->i = mipscpu.r[ 30 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_R31:			info->i = mipscpu.r[ 31 ];				break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R0:			info->i = mipscpu.cp0r[ 0 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R1:			info->i = mipscpu.cp0r[ 1 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R2:			info->i = mipscpu.cp0r[ 2 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R3:			info->i = mipscpu.cp0r[ 3 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R4:			info->i = mipscpu.cp0r[ 4 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R5:			info->i = mipscpu.cp0r[ 5 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R6:			info->i = mipscpu.cp0r[ 6 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R7:			info->i = mipscpu.cp0r[ 7 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R8:			info->i = mipscpu.cp0r[ 8 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R9:			info->i = mipscpu.cp0r[ 9 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R10:		info->i = mipscpu.cp0r[ 10 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R11:		info->i = mipscpu.cp0r[ 11 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R12:		info->i = mipscpu.cp0r[ 12 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R13:		info->i = mipscpu.cp0r[ 13 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R14:		info->i = mipscpu.cp0r[ 14 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP0R15:		info->i = mipscpu.cp0r[ 15 ];			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR0:		info->i = mipscpu.cp2dr[ 0 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR1:		info->i = mipscpu.cp2dr[ 1 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR2:		info->i = mipscpu.cp2dr[ 2 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR3:		info->i = mipscpu.cp2dr[ 3 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR4:		info->i = mipscpu.cp2dr[ 4 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR5:		info->i = mipscpu.cp2dr[ 5 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR6:		info->i = mipscpu.cp2dr[ 6 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR7:		info->i = mipscpu.cp2dr[ 7 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR8:		info->i = mipscpu.cp2dr[ 8 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR9:		info->i = mipscpu.cp2dr[ 9 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR10:		info->i = mipscpu.cp2dr[ 10 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR11:		info->i = mipscpu.cp2dr[ 11 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR12:		info->i = mipscpu.cp2dr[ 12 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR13:		info->i = mipscpu.cp2dr[ 13 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR14:		info->i = mipscpu.cp2dr[ 14 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR15:		info->i = mipscpu.cp2dr[ 15 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR16:		info->i = mipscpu.cp2dr[ 16 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR17:		info->i = mipscpu.cp2dr[ 17 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR18:		info->i = mipscpu.cp2dr[ 18 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR19:		info->i = mipscpu.cp2dr[ 19 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR20:		info->i = mipscpu.cp2dr[ 20 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR21:		info->i = mipscpu.cp2dr[ 21 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR22:		info->i = mipscpu.cp2dr[ 22 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR23:		info->i = mipscpu.cp2dr[ 23 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR24:		info->i = mipscpu.cp2dr[ 24 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR25:		info->i = mipscpu.cp2dr[ 25 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR26:		info->i = mipscpu.cp2dr[ 26 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR27:		info->i = mipscpu.cp2dr[ 27 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR28:		info->i = mipscpu.cp2dr[ 28 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR29:		info->i = mipscpu.cp2dr[ 29 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR30:		info->i = mipscpu.cp2dr[ 30 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2DR31:		info->i = mipscpu.cp2dr[ 31 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR0:		info->i = mipscpu.cp2cr[ 0 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR1:		info->i = mipscpu.cp2cr[ 1 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR2:		info->i = mipscpu.cp2cr[ 2 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR3:		info->i = mipscpu.cp2cr[ 3 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR4:		info->i = mipscpu.cp2cr[ 4 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR5:		info->i = mipscpu.cp2cr[ 5 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR6:		info->i = mipscpu.cp2cr[ 6 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR7:		info->i = mipscpu.cp2cr[ 7 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR8:		info->i = mipscpu.cp2cr[ 8 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR9:		info->i = mipscpu.cp2cr[ 9 ].d;			break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR10:		info->i = mipscpu.cp2cr[ 10 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR11:		info->i = mipscpu.cp2cr[ 11 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR12:		info->i = mipscpu.cp2cr[ 12 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR13:		info->i = mipscpu.cp2cr[ 13 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR14:		info->i = mipscpu.cp2cr[ 14 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR15:		info->i = mipscpu.cp2cr[ 15 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR16:		info->i = mipscpu.cp2cr[ 16 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR17:		info->i = mipscpu.cp2cr[ 17 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR18:		info->i = mipscpu.cp2cr[ 18 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR19:		info->i = mipscpu.cp2cr[ 19 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR20:		info->i = mipscpu.cp2cr[ 20 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR21:		info->i = mipscpu.cp2cr[ 21 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR22:		info->i = mipscpu.cp2cr[ 22 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR23:		info->i = mipscpu.cp2cr[ 23 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR24:		info->i = mipscpu.cp2cr[ 24 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR25:		info->i = mipscpu.cp2cr[ 25 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR26:		info->i = mipscpu.cp2cr[ 26 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR27:		info->i = mipscpu.cp2cr[ 27 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR28:		info->i = mipscpu.cp2cr[ 28 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR29:		info->i = mipscpu.cp2cr[ 29 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR30:		info->i = mipscpu.cp2cr[ 30 ].d;		break;
-		case CPUINFO_INT_REGISTER + MIPS_CP2CR31:		info->i = mipscpu.cp2cr[ 31 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_DELAYV:		info->i = psxcpu->delayv;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_DELAYR:		info->i = psxcpu->delayr;				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_HI:			info->i = psxcpu->hi;					break;
+		case CPUINFO_INT_REGISTER + PSXCPU_LO:			info->i = psxcpu->lo;					break;
+		case CPUINFO_INT_REGISTER + PSXCPU_BIU:			info->i = psxcpu->biu;					break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R0:			info->i = psxcpu->r[ 0 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R1:			info->i = psxcpu->r[ 1 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R2:			info->i = psxcpu->r[ 2 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R3:			info->i = psxcpu->r[ 3 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R4:			info->i = psxcpu->r[ 4 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R5:			info->i = psxcpu->r[ 5 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R6:			info->i = psxcpu->r[ 6 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R7:			info->i = psxcpu->r[ 7 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R8:			info->i = psxcpu->r[ 8 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R9:			info->i = psxcpu->r[ 9 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R10:			info->i = psxcpu->r[ 10 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R11:			info->i = psxcpu->r[ 11 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R12:			info->i = psxcpu->r[ 12 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R13:			info->i = psxcpu->r[ 13 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R14:			info->i = psxcpu->r[ 14 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R15:			info->i = psxcpu->r[ 15 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R16:			info->i = psxcpu->r[ 16 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R17:			info->i = psxcpu->r[ 17 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R18:			info->i = psxcpu->r[ 18 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R19:			info->i = psxcpu->r[ 19 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R20:			info->i = psxcpu->r[ 20 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R21:			info->i = psxcpu->r[ 21 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R22:			info->i = psxcpu->r[ 22 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R23:			info->i = psxcpu->r[ 23 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R24:			info->i = psxcpu->r[ 24 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R25:			info->i = psxcpu->r[ 25 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R26:			info->i = psxcpu->r[ 26 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R27:			info->i = psxcpu->r[ 27 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R28:			info->i = psxcpu->r[ 28 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R29:			info->i = psxcpu->r[ 29 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R30:			info->i = psxcpu->r[ 30 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_R31:			info->i = psxcpu->r[ 31 ];				break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R0:		info->i = psxcpu->cp0r[ 0 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R1:		info->i = psxcpu->cp0r[ 1 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R2:		info->i = psxcpu->cp0r[ 2 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R3:		info->i = psxcpu->cp0r[ 3 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R4:		info->i = psxcpu->cp0r[ 4 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R5:		info->i = psxcpu->cp0r[ 5 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R6:		info->i = psxcpu->cp0r[ 6 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R7:		info->i = psxcpu->cp0r[ 7 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R8:		info->i = psxcpu->cp0r[ 8 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R9:		info->i = psxcpu->cp0r[ 9 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R10:		info->i = psxcpu->cp0r[ 10 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R11:		info->i = psxcpu->cp0r[ 11 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R12:		info->i = psxcpu->cp0r[ 12 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R13:		info->i = psxcpu->cp0r[ 13 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R14:		info->i = psxcpu->cp0r[ 14 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP0R15:		info->i = psxcpu->cp0r[ 15 ];			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR0:		info->i = psxcpu->cp2dr[ 0 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR1:		info->i = psxcpu->cp2dr[ 1 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR2:		info->i = psxcpu->cp2dr[ 2 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR3:		info->i = psxcpu->cp2dr[ 3 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR4:		info->i = psxcpu->cp2dr[ 4 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR5:		info->i = psxcpu->cp2dr[ 5 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR6:		info->i = psxcpu->cp2dr[ 6 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR7:		info->i = psxcpu->cp2dr[ 7 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR8:		info->i = psxcpu->cp2dr[ 8 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR9:		info->i = psxcpu->cp2dr[ 9 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR10:		info->i = psxcpu->cp2dr[ 10 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR11:		info->i = psxcpu->cp2dr[ 11 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR12:		info->i = psxcpu->cp2dr[ 12 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR13:		info->i = psxcpu->cp2dr[ 13 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR14:		info->i = psxcpu->cp2dr[ 14 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR15:		info->i = psxcpu->cp2dr[ 15 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR16:		info->i = psxcpu->cp2dr[ 16 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR17:		info->i = psxcpu->cp2dr[ 17 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR18:		info->i = psxcpu->cp2dr[ 18 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR19:		info->i = psxcpu->cp2dr[ 19 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR20:		info->i = psxcpu->cp2dr[ 20 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR21:		info->i = psxcpu->cp2dr[ 21 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR22:		info->i = psxcpu->cp2dr[ 22 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR23:		info->i = psxcpu->cp2dr[ 23 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR24:		info->i = psxcpu->cp2dr[ 24 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR25:		info->i = psxcpu->cp2dr[ 25 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR26:		info->i = psxcpu->cp2dr[ 26 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR27:		info->i = psxcpu->cp2dr[ 27 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR28:		info->i = psxcpu->cp2dr[ 28 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR29:		info->i = psxcpu->cp2dr[ 29 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR30:		info->i = psxcpu->cp2dr[ 30 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2DR31:		info->i = psxcpu->cp2dr[ 31 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR0:		info->i = psxcpu->cp2cr[ 0 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR1:		info->i = psxcpu->cp2cr[ 1 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR2:		info->i = psxcpu->cp2cr[ 2 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR3:		info->i = psxcpu->cp2cr[ 3 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR4:		info->i = psxcpu->cp2cr[ 4 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR5:		info->i = psxcpu->cp2cr[ 5 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR6:		info->i = psxcpu->cp2cr[ 6 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR7:		info->i = psxcpu->cp2cr[ 7 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR8:		info->i = psxcpu->cp2cr[ 8 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR9:		info->i = psxcpu->cp2cr[ 9 ].d;			break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR10:		info->i = psxcpu->cp2cr[ 10 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR11:		info->i = psxcpu->cp2cr[ 11 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR12:		info->i = psxcpu->cp2cr[ 12 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR13:		info->i = psxcpu->cp2cr[ 13 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR14:		info->i = psxcpu->cp2cr[ 14 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR15:		info->i = psxcpu->cp2cr[ 15 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR16:		info->i = psxcpu->cp2cr[ 16 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR17:		info->i = psxcpu->cp2cr[ 17 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR18:		info->i = psxcpu->cp2cr[ 18 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR19:		info->i = psxcpu->cp2cr[ 19 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR20:		info->i = psxcpu->cp2cr[ 20 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR21:		info->i = psxcpu->cp2cr[ 21 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR22:		info->i = psxcpu->cp2cr[ 22 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR23:		info->i = psxcpu->cp2cr[ 23 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR24:		info->i = psxcpu->cp2cr[ 24 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR25:		info->i = psxcpu->cp2cr[ 25 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR26:		info->i = psxcpu->cp2cr[ 26 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR27:		info->i = psxcpu->cp2cr[ 27 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR28:		info->i = psxcpu->cp2cr[ 28 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR29:		info->i = psxcpu->cp2cr[ 29 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR30:		info->i = psxcpu->cp2cr[ 30 ].d;		break;
+		case CPUINFO_INT_REGISTER + PSXCPU_CP2CR31:		info->i = psxcpu->cp2cr[ 31 ].d;		break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(mips);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(mips);	break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(mips);	break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(mips);					break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(mips);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(mips);					break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(mips);			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(psxcpu);			break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(psxcpu);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(psxcpu);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(psxcpu);					break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(psxcpu);				break;
+		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(psxcpu);					break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(psxcpu);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(mips);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &mips_ICount;			break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(psxcpu);	break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &psxcpu->icount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map32 = ADDRESS_MAP_NAME(psxcpu_internal_map); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map32 = 0; break;
@@ -4183,146 +4243,127 @@ static CPU_GET_INFO( mips )
 
 		case CPUINFO_STR_FLAGS:							strcpy(info->s, " "); break;
 
-		case CPUINFO_STR_REGISTER + MIPS_PC:			sprintf( info->s, "pc      :%08x", mipscpu.pc ); break;
-		case CPUINFO_STR_REGISTER + MIPS_DELAYV:		sprintf( info->s, "delayv  :%08x", mipscpu.delayv ); break;
-		case CPUINFO_STR_REGISTER + MIPS_DELAYR:		sprintf( info->s, "delayr  :%02x %s", mipscpu.delayr, delayn[ mipscpu.delayr ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_HI:			sprintf( info->s, "hi      :%08x", mipscpu.hi ); break;
-		case CPUINFO_STR_REGISTER + MIPS_LO:			sprintf( info->s, "lo      :%08x", mipscpu.lo ); break;
-		case CPUINFO_STR_REGISTER + MIPS_BIU:			sprintf( info->s, "biu     :%08x", mipscpu.biu ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R0:			sprintf( info->s, "zero    :%08x", mipscpu.r[ 0 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R1:			sprintf( info->s, "at      :%08x", mipscpu.r[ 1 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R2:			sprintf( info->s, "v0      :%08x", mipscpu.r[ 2 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R3:			sprintf( info->s, "v1      :%08x", mipscpu.r[ 3 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R4:			sprintf( info->s, "a0      :%08x", mipscpu.r[ 4 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R5:			sprintf( info->s, "a1      :%08x", mipscpu.r[ 5 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R6:			sprintf( info->s, "a2      :%08x", mipscpu.r[ 6 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R7:			sprintf( info->s, "a3      :%08x", mipscpu.r[ 7 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R8:			sprintf( info->s, "t0      :%08x", mipscpu.r[ 8 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R9:			sprintf( info->s, "t1      :%08x", mipscpu.r[ 9 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R10:			sprintf( info->s, "t2      :%08x", mipscpu.r[ 10 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R11:			sprintf( info->s, "t3      :%08x", mipscpu.r[ 11 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R12:			sprintf( info->s, "t4      :%08x", mipscpu.r[ 12 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R13:			sprintf( info->s, "t5      :%08x", mipscpu.r[ 13 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R14:			sprintf( info->s, "t6      :%08x", mipscpu.r[ 14 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R15:			sprintf( info->s, "t7      :%08x", mipscpu.r[ 15 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R16:			sprintf( info->s, "s0      :%08x", mipscpu.r[ 16 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R17:			sprintf( info->s, "s1      :%08x", mipscpu.r[ 17 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R18:			sprintf( info->s, "s2      :%08x", mipscpu.r[ 18 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R19:			sprintf( info->s, "s3      :%08x", mipscpu.r[ 19 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R20:			sprintf( info->s, "s4      :%08x", mipscpu.r[ 20 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R21:			sprintf( info->s, "s5      :%08x", mipscpu.r[ 21 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R22:			sprintf( info->s, "s6      :%08x", mipscpu.r[ 22 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R23:			sprintf( info->s, "s7      :%08x", mipscpu.r[ 23 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R24:			sprintf( info->s, "t8      :%08x", mipscpu.r[ 24 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R25:			sprintf( info->s, "t9      :%08x", mipscpu.r[ 25 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R26:			sprintf( info->s, "k0      :%08x", mipscpu.r[ 26 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R27:			sprintf( info->s, "k1      :%08x", mipscpu.r[ 27 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R28:			sprintf( info->s, "gp      :%08x", mipscpu.r[ 28 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R29:			sprintf( info->s, "sp      :%08x", mipscpu.r[ 29 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R30:			sprintf( info->s, "fp      :%08x", mipscpu.r[ 30 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_R31:			sprintf( info->s, "ra      :%08x", mipscpu.r[ 31 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R0:			sprintf( info->s, "!Index  :%08x", mipscpu.cp0r[ 0 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R1:			sprintf( info->s, "!Random :%08x", mipscpu.cp0r[ 1 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R2:			sprintf( info->s, "!EntryLo:%08x", mipscpu.cp0r[ 2 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R3:			sprintf( info->s, "BPC     :%08x", mipscpu.cp0r[ 3 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R4:			sprintf( info->s, "!Context:%08x", mipscpu.cp0r[ 4 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R5:			sprintf( info->s, "BDA     :%08x", mipscpu.cp0r[ 5 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R6:			sprintf( info->s, "TAR     :%08x", mipscpu.cp0r[ 6 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R7:			sprintf( info->s, "DCIC    :%08x", mipscpu.cp0r[ 7 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R8:			sprintf( info->s, "BadA    :%08x", mipscpu.cp0r[ 8 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R9:			sprintf( info->s, "BDAM    :%08x", mipscpu.cp0r[ 9 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R10:		sprintf( info->s, "!EntryHi:%08x", mipscpu.cp0r[ 10 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R11:		sprintf( info->s, "BPCM    :%08x", mipscpu.cp0r[ 11 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R12:		sprintf( info->s, "SR      :%08x", mipscpu.cp0r[ 12 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R13:		sprintf( info->s, "Cause   :%08x", mipscpu.cp0r[ 13 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R14:		sprintf( info->s, "EPC     :%08x", mipscpu.cp0r[ 14 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP0R15:		sprintf( info->s, "PRId    :%08x", mipscpu.cp0r[ 15 ] ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR0:		sprintf( info->s, "vxy0    :%08x", mipscpu.cp2dr[ 0 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR1:		sprintf( info->s, "vz0     :%08x", mipscpu.cp2dr[ 1 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR2:		sprintf( info->s, "vxy1    :%08x", mipscpu.cp2dr[ 2 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR3:		sprintf( info->s, "vz1     :%08x", mipscpu.cp2dr[ 3 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR4:		sprintf( info->s, "vxy2    :%08x", mipscpu.cp2dr[ 4 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR5:		sprintf( info->s, "vz2     :%08x", mipscpu.cp2dr[ 5 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR6:		sprintf( info->s, "rgb     :%08x", mipscpu.cp2dr[ 6 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR7:		sprintf( info->s, "otz     :%08x", mipscpu.cp2dr[ 7 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR8:		sprintf( info->s, "ir0     :%08x", mipscpu.cp2dr[ 8 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR9:		sprintf( info->s, "ir1     :%08x", mipscpu.cp2dr[ 9 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR10:		sprintf( info->s, "ir2     :%08x", mipscpu.cp2dr[ 10 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR11:		sprintf( info->s, "ir3     :%08x", mipscpu.cp2dr[ 11 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR12:		sprintf( info->s, "sxy0    :%08x", mipscpu.cp2dr[ 12 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR13:		sprintf( info->s, "sxy1    :%08x", mipscpu.cp2dr[ 13 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR14:		sprintf( info->s, "sxy2    :%08x", mipscpu.cp2dr[ 14 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR15:		sprintf( info->s, "sxyp    :%08x", mipscpu.cp2dr[ 15 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR16:		sprintf( info->s, "sz0     :%08x", mipscpu.cp2dr[ 16 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR17:		sprintf( info->s, "sz1     :%08x", mipscpu.cp2dr[ 17 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR18:		sprintf( info->s, "sz2     :%08x", mipscpu.cp2dr[ 18 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR19:		sprintf( info->s, "sz3     :%08x", mipscpu.cp2dr[ 19 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR20:		sprintf( info->s, "rgb0    :%08x", mipscpu.cp2dr[ 20 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR21:		sprintf( info->s, "rgb1    :%08x", mipscpu.cp2dr[ 21 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR22:		sprintf( info->s, "rgb2    :%08x", mipscpu.cp2dr[ 22 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR23:		sprintf( info->s, "res1    :%08x", mipscpu.cp2dr[ 23 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR24:		sprintf( info->s, "mac0    :%08x", mipscpu.cp2dr[ 24 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR25:		sprintf( info->s, "mac1    :%08x", mipscpu.cp2dr[ 25 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR26:		sprintf( info->s, "mac2    :%08x", mipscpu.cp2dr[ 26 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR27:		sprintf( info->s, "mac3    :%08x", mipscpu.cp2dr[ 27 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR28:		sprintf( info->s, "irgb    :%08x", mipscpu.cp2dr[ 28 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR29:		sprintf( info->s, "orgb    :%08x", mipscpu.cp2dr[ 29 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR30:		sprintf( info->s, "lzcs    :%08x", mipscpu.cp2dr[ 30 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2DR31:		sprintf( info->s, "lzcr    :%08x", mipscpu.cp2dr[ 31 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR0:		sprintf( info->s, "r11r12  :%08x", mipscpu.cp2cr[ 0 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR1:		sprintf( info->s, "r13r21  :%08x", mipscpu.cp2cr[ 1 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR2:		sprintf( info->s, "r22r23  :%08x", mipscpu.cp2cr[ 2 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR3:		sprintf( info->s, "r31r32  :%08x", mipscpu.cp2cr[ 3 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR4:		sprintf( info->s, "r33     :%08x", mipscpu.cp2cr[ 4 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR5:		sprintf( info->s, "trx     :%08x", mipscpu.cp2cr[ 5 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR6:		sprintf( info->s, "try     :%08x", mipscpu.cp2cr[ 6 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR7:		sprintf( info->s, "trz     :%08x", mipscpu.cp2cr[ 7 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR8:		sprintf( info->s, "l11l12  :%08x", mipscpu.cp2cr[ 8 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR9:		sprintf( info->s, "l13l21  :%08x", mipscpu.cp2cr[ 9 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR10:		sprintf( info->s, "l22l23  :%08x", mipscpu.cp2cr[ 10 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR11:		sprintf( info->s, "l31l32  :%08x", mipscpu.cp2cr[ 11 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR12:		sprintf( info->s, "l33     :%08x", mipscpu.cp2cr[ 12 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR13:		sprintf( info->s, "rbk     :%08x", mipscpu.cp2cr[ 13 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR14:		sprintf( info->s, "gbk     :%08x", mipscpu.cp2cr[ 14 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR15:		sprintf( info->s, "bbk     :%08x", mipscpu.cp2cr[ 15 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR16:		sprintf( info->s, "lr1lr2  :%08x", mipscpu.cp2cr[ 16 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR17:		sprintf( info->s, "lr31g1  :%08x", mipscpu.cp2cr[ 17 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR18:		sprintf( info->s, "lg2lg3  :%08x", mipscpu.cp2cr[ 18 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR19:		sprintf( info->s, "lb1lb2  :%08x", mipscpu.cp2cr[ 19 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR20:		sprintf( info->s, "lb3     :%08x", mipscpu.cp2cr[ 20 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR21:		sprintf( info->s, "rfc     :%08x", mipscpu.cp2cr[ 21 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR22:		sprintf( info->s, "gfc     :%08x", mipscpu.cp2cr[ 22 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR23:		sprintf( info->s, "bfc     :%08x", mipscpu.cp2cr[ 23 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR24:		sprintf( info->s, "ofx     :%08x", mipscpu.cp2cr[ 24 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR25:		sprintf( info->s, "ofy     :%08x", mipscpu.cp2cr[ 25 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR26:		sprintf( info->s, "h       :%08x", mipscpu.cp2cr[ 26 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR27:		sprintf( info->s, "dqa     :%08x", mipscpu.cp2cr[ 27 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR28:		sprintf( info->s, "dqb     :%08x", mipscpu.cp2cr[ 28 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR29:		sprintf( info->s, "zsf3    :%08x", mipscpu.cp2cr[ 29 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR30:		sprintf( info->s, "zsf4    :%08x", mipscpu.cp2cr[ 30 ].d ); break;
-		case CPUINFO_STR_REGISTER + MIPS_CP2CR31:		sprintf( info->s, "flag    :%08x", mipscpu.cp2cr[ 31 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_PC:			sprintf( info->s, "pc      :%08x", psxcpu->pc ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_DELAYV:		sprintf( info->s, "delayv  :%08x", psxcpu->delayv ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_DELAYR:		sprintf( info->s, "delayr  :%02x %s", psxcpu->delayr, delayn[ psxcpu->delayr ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_HI:			sprintf( info->s, "hi      :%08x", psxcpu->hi ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_LO:			sprintf( info->s, "lo      :%08x", psxcpu->lo ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_BIU:			sprintf( info->s, "biu     :%08x", psxcpu->biu ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R0:			sprintf( info->s, "zero    :%08x", psxcpu->r[ 0 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R1:			sprintf( info->s, "at      :%08x", psxcpu->r[ 1 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R2:			sprintf( info->s, "v0      :%08x", psxcpu->r[ 2 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R3:			sprintf( info->s, "v1      :%08x", psxcpu->r[ 3 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R4:			sprintf( info->s, "a0      :%08x", psxcpu->r[ 4 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R5:			sprintf( info->s, "a1      :%08x", psxcpu->r[ 5 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R6:			sprintf( info->s, "a2      :%08x", psxcpu->r[ 6 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R7:			sprintf( info->s, "a3      :%08x", psxcpu->r[ 7 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R8:			sprintf( info->s, "t0      :%08x", psxcpu->r[ 8 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R9:			sprintf( info->s, "t1      :%08x", psxcpu->r[ 9 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R10:			sprintf( info->s, "t2      :%08x", psxcpu->r[ 10 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R11:			sprintf( info->s, "t3      :%08x", psxcpu->r[ 11 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R12:			sprintf( info->s, "t4      :%08x", psxcpu->r[ 12 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R13:			sprintf( info->s, "t5      :%08x", psxcpu->r[ 13 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R14:			sprintf( info->s, "t6      :%08x", psxcpu->r[ 14 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R15:			sprintf( info->s, "t7      :%08x", psxcpu->r[ 15 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R16:			sprintf( info->s, "s0      :%08x", psxcpu->r[ 16 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R17:			sprintf( info->s, "s1      :%08x", psxcpu->r[ 17 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R18:			sprintf( info->s, "s2      :%08x", psxcpu->r[ 18 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R19:			sprintf( info->s, "s3      :%08x", psxcpu->r[ 19 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R20:			sprintf( info->s, "s4      :%08x", psxcpu->r[ 20 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R21:			sprintf( info->s, "s5      :%08x", psxcpu->r[ 21 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R22:			sprintf( info->s, "s6      :%08x", psxcpu->r[ 22 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R23:			sprintf( info->s, "s7      :%08x", psxcpu->r[ 23 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R24:			sprintf( info->s, "t8      :%08x", psxcpu->r[ 24 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R25:			sprintf( info->s, "t9      :%08x", psxcpu->r[ 25 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R26:			sprintf( info->s, "k0      :%08x", psxcpu->r[ 26 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R27:			sprintf( info->s, "k1      :%08x", psxcpu->r[ 27 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R28:			sprintf( info->s, "gp      :%08x", psxcpu->r[ 28 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R29:			sprintf( info->s, "sp      :%08x", psxcpu->r[ 29 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R30:			sprintf( info->s, "fp      :%08x", psxcpu->r[ 30 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_R31:			sprintf( info->s, "ra      :%08x", psxcpu->r[ 31 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R0:		sprintf( info->s, "!Index  :%08x", psxcpu->cp0r[ 0 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R1:		sprintf( info->s, "!Random :%08x", psxcpu->cp0r[ 1 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R2:		sprintf( info->s, "!EntryLo:%08x", psxcpu->cp0r[ 2 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R3:		sprintf( info->s, "BPC     :%08x", psxcpu->cp0r[ 3 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R4:		sprintf( info->s, "!Context:%08x", psxcpu->cp0r[ 4 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R5:		sprintf( info->s, "BDA     :%08x", psxcpu->cp0r[ 5 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R6:		sprintf( info->s, "TAR     :%08x", psxcpu->cp0r[ 6 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R7:		sprintf( info->s, "DCIC    :%08x", psxcpu->cp0r[ 7 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R8:		sprintf( info->s, "BadA    :%08x", psxcpu->cp0r[ 8 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R9:		sprintf( info->s, "BDAM    :%08x", psxcpu->cp0r[ 9 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R10:		sprintf( info->s, "!EntryHi:%08x", psxcpu->cp0r[ 10 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R11:		sprintf( info->s, "BPCM    :%08x", psxcpu->cp0r[ 11 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R12:		sprintf( info->s, "SR      :%08x", psxcpu->cp0r[ 12 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R13:		sprintf( info->s, "Cause   :%08x", psxcpu->cp0r[ 13 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R14:		sprintf( info->s, "EPC     :%08x", psxcpu->cp0r[ 14 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP0R15:		sprintf( info->s, "PRId    :%08x", psxcpu->cp0r[ 15 ] ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR0:		sprintf( info->s, "vxy0    :%08x", psxcpu->cp2dr[ 0 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR1:		sprintf( info->s, "vz0     :%08x", psxcpu->cp2dr[ 1 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR2:		sprintf( info->s, "vxy1    :%08x", psxcpu->cp2dr[ 2 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR3:		sprintf( info->s, "vz1     :%08x", psxcpu->cp2dr[ 3 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR4:		sprintf( info->s, "vxy2    :%08x", psxcpu->cp2dr[ 4 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR5:		sprintf( info->s, "vz2     :%08x", psxcpu->cp2dr[ 5 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR6:		sprintf( info->s, "rgb     :%08x", psxcpu->cp2dr[ 6 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR7:		sprintf( info->s, "otz     :%08x", psxcpu->cp2dr[ 7 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR8:		sprintf( info->s, "ir0     :%08x", psxcpu->cp2dr[ 8 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR9:		sprintf( info->s, "ir1     :%08x", psxcpu->cp2dr[ 9 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR10:		sprintf( info->s, "ir2     :%08x", psxcpu->cp2dr[ 10 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR11:		sprintf( info->s, "ir3     :%08x", psxcpu->cp2dr[ 11 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR12:		sprintf( info->s, "sxy0    :%08x", psxcpu->cp2dr[ 12 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR13:		sprintf( info->s, "sxy1    :%08x", psxcpu->cp2dr[ 13 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR14:		sprintf( info->s, "sxy2    :%08x", psxcpu->cp2dr[ 14 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR15:		sprintf( info->s, "sxyp    :%08x", psxcpu->cp2dr[ 15 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR16:		sprintf( info->s, "sz0     :%08x", psxcpu->cp2dr[ 16 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR17:		sprintf( info->s, "sz1     :%08x", psxcpu->cp2dr[ 17 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR18:		sprintf( info->s, "sz2     :%08x", psxcpu->cp2dr[ 18 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR19:		sprintf( info->s, "sz3     :%08x", psxcpu->cp2dr[ 19 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR20:		sprintf( info->s, "rgb0    :%08x", psxcpu->cp2dr[ 20 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR21:		sprintf( info->s, "rgb1    :%08x", psxcpu->cp2dr[ 21 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR22:		sprintf( info->s, "rgb2    :%08x", psxcpu->cp2dr[ 22 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR23:		sprintf( info->s, "res1    :%08x", psxcpu->cp2dr[ 23 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR24:		sprintf( info->s, "mac0    :%08x", psxcpu->cp2dr[ 24 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR25:		sprintf( info->s, "mac1    :%08x", psxcpu->cp2dr[ 25 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR26:		sprintf( info->s, "mac2    :%08x", psxcpu->cp2dr[ 26 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR27:		sprintf( info->s, "mac3    :%08x", psxcpu->cp2dr[ 27 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR28:		sprintf( info->s, "irgb    :%08x", psxcpu->cp2dr[ 28 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR29:		sprintf( info->s, "orgb    :%08x", psxcpu->cp2dr[ 29 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR30:		sprintf( info->s, "lzcs    :%08x", psxcpu->cp2dr[ 30 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2DR31:		sprintf( info->s, "lzcr    :%08x", psxcpu->cp2dr[ 31 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR0:		sprintf( info->s, "r11r12  :%08x", psxcpu->cp2cr[ 0 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR1:		sprintf( info->s, "r13r21  :%08x", psxcpu->cp2cr[ 1 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR2:		sprintf( info->s, "r22r23  :%08x", psxcpu->cp2cr[ 2 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR3:		sprintf( info->s, "r31r32  :%08x", psxcpu->cp2cr[ 3 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR4:		sprintf( info->s, "r33     :%08x", psxcpu->cp2cr[ 4 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR5:		sprintf( info->s, "trx     :%08x", psxcpu->cp2cr[ 5 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR6:		sprintf( info->s, "try     :%08x", psxcpu->cp2cr[ 6 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR7:		sprintf( info->s, "trz     :%08x", psxcpu->cp2cr[ 7 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR8:		sprintf( info->s, "l11l12  :%08x", psxcpu->cp2cr[ 8 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR9:		sprintf( info->s, "l13l21  :%08x", psxcpu->cp2cr[ 9 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR10:		sprintf( info->s, "l22l23  :%08x", psxcpu->cp2cr[ 10 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR11:		sprintf( info->s, "l31l32  :%08x", psxcpu->cp2cr[ 11 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR12:		sprintf( info->s, "l33     :%08x", psxcpu->cp2cr[ 12 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR13:		sprintf( info->s, "rbk     :%08x", psxcpu->cp2cr[ 13 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR14:		sprintf( info->s, "gbk     :%08x", psxcpu->cp2cr[ 14 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR15:		sprintf( info->s, "bbk     :%08x", psxcpu->cp2cr[ 15 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR16:		sprintf( info->s, "lr1lr2  :%08x", psxcpu->cp2cr[ 16 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR17:		sprintf( info->s, "lr31g1  :%08x", psxcpu->cp2cr[ 17 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR18:		sprintf( info->s, "lg2lg3  :%08x", psxcpu->cp2cr[ 18 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR19:		sprintf( info->s, "lb1lb2  :%08x", psxcpu->cp2cr[ 19 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR20:		sprintf( info->s, "lb3     :%08x", psxcpu->cp2cr[ 20 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR21:		sprintf( info->s, "rfc     :%08x", psxcpu->cp2cr[ 21 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR22:		sprintf( info->s, "gfc     :%08x", psxcpu->cp2cr[ 22 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR23:		sprintf( info->s, "bfc     :%08x", psxcpu->cp2cr[ 23 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR24:		sprintf( info->s, "ofx     :%08x", psxcpu->cp2cr[ 24 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR25:		sprintf( info->s, "ofy     :%08x", psxcpu->cp2cr[ 25 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR26:		sprintf( info->s, "h       :%08x", psxcpu->cp2cr[ 26 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR27:		sprintf( info->s, "dqa     :%08x", psxcpu->cp2cr[ 27 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR28:		sprintf( info->s, "dqb     :%08x", psxcpu->cp2cr[ 28 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR29:		sprintf( info->s, "zsf3    :%08x", psxcpu->cp2cr[ 29 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR30:		sprintf( info->s, "zsf4    :%08x", psxcpu->cp2cr[ 30 ].d ); break;
+		case CPUINFO_STR_REGISTER + PSXCPU_CP2CR31:		sprintf( info->s, "flag    :%08x", psxcpu->cp2cr[ 31 ].d ); break;
 	}
 }
 
-
-#if (HAS_PSXCPU)
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( psxcpu )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "PSX CPU"); break;
-
-		default:
-			CPU_GET_INFO_CALL(mips);
-			break;
-	}
-}
-#endif
 
 #if (HAS_CXD8661R)
 
@@ -4336,7 +4377,7 @@ CPU_GET_INFO( cxd8661r )
 		case CPUINFO_STR_NAME:							strcpy(info->s, "CXD8661R"); break;
 
 		default:
-			CPU_GET_INFO_CALL(mips);
+			CPU_GET_INFO_CALL(psxcpu);
 			break;
 	}
 }
