@@ -51,8 +51,8 @@ WRITE32_HANDLER( jaguar_serial_w );
 void jaguar_gpu_suspend(running_machine *machine);
 void jaguar_gpu_resume(running_machine *machine);
 
-void jaguar_gpu_cpu_int(void);
-void jaguar_dsp_cpu_int(void);
+void jaguar_gpu_cpu_int(const device_config *device);
+void jaguar_dsp_cpu_int(const device_config *device);
 
 READ32_HANDLER( jaguar_blitter_r );
 WRITE32_HANDLER( jaguar_blitter_w );

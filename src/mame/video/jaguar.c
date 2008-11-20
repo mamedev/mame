@@ -335,17 +335,17 @@ static void update_cpu_irq(running_machine *machine)
 }
 
 
-void jaguar_gpu_cpu_int(void)
+void jaguar_gpu_cpu_int(const device_config *device)
 {
 	cpu_irq_state |= 2;
-	update_cpu_irq(Machine);
+	update_cpu_irq(device->machine);
 }
 
 
-void jaguar_dsp_cpu_int(void)
+void jaguar_dsp_cpu_int(const device_config *device)
 {
 	cpu_irq_state |= 16;
-	update_cpu_irq(Machine);
+	update_cpu_irq(device->machine);
 }
 
 
