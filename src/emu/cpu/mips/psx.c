@@ -3028,9 +3028,9 @@ static void setcp3cr( psxcpu_state *psxcpu, int reg, UINT32 value )
 #define MX31( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 3 ].sw.l : 0 )
 #define MX32( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 3 ].sw.h : 0 )
 #define MX33( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 4 ].sw.l : 0 )
-#define CV0( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 5 ].sd : 0 )
-#define CV1( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 6 ].sd : 0 )
-#define CV2( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 7 ].sd : 0 )
+#define CV1( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 5 ].sd : 0 )
+#define CV2( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 6 ].sd : 0 )
+#define CV3( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 7 ].sd : 0 )
 
 #define VXY0 ( psxcpu->cp2dr[ 0 ].d )
 #define VX0  ( psxcpu->cp2dr[ 0 ].sw.l )
@@ -3428,9 +3428,9 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64) CV0( cv ) << 12 ) + ( MX11( mx ) * VX( v ) ) + ( MX12( mx ) * VY( v ) ) + ( MX13( mx ) * VZ( v ) ) ) >> shift );
-			MAC2 = A2( ( ( (INT64) CV1( cv ) << 12 ) + ( MX21( mx ) * VX( v ) ) + ( MX22( mx ) * VY( v ) ) + ( MX23( mx ) * VZ( v ) ) ) >> shift );
-			MAC3 = A3( ( ( (INT64) CV2( cv ) << 12 ) + ( MX31( mx ) * VX( v ) ) + ( MX32( mx ) * VY( v ) ) + ( MX33( mx ) * VZ( v ) ) ) >> shift );
+			MAC1 = A1( ( ( (INT64) CV1( cv ) << 12 ) + ( MX11( mx ) * VX( v ) ) + ( MX12( mx ) * VY( v ) ) + ( MX13( mx ) * VZ( v ) ) ) >> shift );
+			MAC2 = A2( ( ( (INT64) CV2( cv ) << 12 ) + ( MX21( mx ) * VX( v ) ) + ( MX22( mx ) * VY( v ) ) + ( MX23( mx ) * VZ( v ) ) ) >> shift );
+			MAC3 = A3( ( ( (INT64) CV3( cv ) << 12 ) + ( MX31( mx ) * VX( v ) ) + ( MX32( mx ) * VY( v ) ) + ( MX33( mx ) * VZ( v ) ) ) >> shift );
 
 			IR1 = Lm_B1( MAC1, lm );
 			IR2 = Lm_B2( MAC2, lm );
