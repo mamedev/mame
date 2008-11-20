@@ -1599,7 +1599,7 @@ static WRITE8_HANDLER( qb3_sound_w )
 static MACHINE_RESET( qb3_sound )
 {
 	MACHINE_RESET_CALL(demon_sound);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, qb3_sound_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, qb3_sound_w);
 
 	/* this patch prevents the sound ROM from eating itself when command $0A is sent */
 	/* on a cube rotate */

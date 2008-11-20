@@ -181,8 +181,8 @@ VIDEO_START( phoenix )
 	videoram_pg[0] = auto_malloc(0x1000);
 	videoram_pg[1] = auto_malloc(0x1000);
 
-	memory_configure_bank(1, 0, 1, videoram_pg[0], 0);
-	memory_configure_bank(1, 1, 1, videoram_pg[1], 0);
+	memory_configure_bank(machine, 1, 0, 1, videoram_pg[0], 0);
+	memory_configure_bank(machine, 1, 1, 1, videoram_pg[1], 0);
 	memory_set_bank(1, 0);
 
     videoram_pg_index = 0;

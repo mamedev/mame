@@ -533,6 +533,7 @@ Newer version of the I/O chip ?
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "taitoic.h"
 
 #define TOPSPEED_ROAD_COLORS
@@ -579,12 +580,16 @@ INLINE void taitoic_drawscanline(
 
 static int has_write_handler(int cpunum, write16_space_func handler)
 {
-	const address_map *map = memory_get_address_map(cpunum, ADDRESS_SPACE_PROGRAM);
-	const address_map_entry *entry;
-	if (map != NULL)
-		for (entry = map->entrylist; entry != NULL; entry = entry->next)
-			if (entry->write.shandler16 == handler)
-				return 1;
+	if (Machine->cpu[cpunum] != NULL)
+	{
+		const address_space *space = cpu_get_address_space(Machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM);
+		const address_map_entry *entry;
+
+		if (space != NULL && space->map != NULL)
+			for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+				if (entry->write.shandler16 == handler)
+					return 1;
+	}
 
 	return 0;
 }

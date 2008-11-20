@@ -375,8 +375,8 @@ MACHINE_RESET( williams )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the memory bank */
-	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "main") + 0x10000, 0);
+	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "main") + 0x10000, 0);
 }
 
 
@@ -449,8 +449,8 @@ MACHINE_RESET( williams2 )
 	pia_reset();
 
 	/* configure memory banks */
-	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 4, memory_region(machine, "main") + 0x10000, 0x10000);
+	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, 1, 1, 4, memory_region(machine, "main") + 0x10000, 0x10000);
 
 	/* make sure our banking is reset */
 	williams2_bank_select_w(space, 0, 0);
@@ -495,8 +495,8 @@ WRITE8_HANDLER( williams2_bank_select_w )
 	{
 		/* page 0 is video ram */
 		case 0:
-			memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
+			memory_install_read8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
 			memory_set_bank(1, 0);
 			memory_set_bankptr(4, &williams_videoram[0x8000]);
 			break;
@@ -504,15 +504,15 @@ WRITE8_HANDLER( williams2_bank_select_w )
 		/* pages 1 and 2 are ROM */
 		case 1:
 		case 2:
-			memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
-			memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
+			memory_install_read8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
+			memory_install_write8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
 			memory_set_bank(1, 1 + ((vram_bank & 6) >> 1));
 			memory_set_bankptr(4, &williams_videoram[0x8000]);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
-			memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x87ff, 0, 0, SMH_BANK4, williams2_paletteram_w);
+			memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK4, williams2_paletteram_w);
 			memory_set_bank(1, 1 + ((vram_bank & 4) >> 1));
 			memory_set_bankptr(4, paletteram);
 			break;
@@ -727,7 +727,7 @@ MACHINE_RESET( defender )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* configure the banking and make sure it is reset to 0 */
-	memory_configure_bank(1, 0, 9, &memory_region(machine, "main")[0x10000], 0x1000);
+	memory_configure_bank(machine, 1, 0, 9, &memory_region(machine, "main")[0x10000], 0x1000);
 	defender_bank_select_w(space, 0, 0);
 
 	state_save_register_postload(machine, defender_postload, NULL);
@@ -762,13 +762,13 @@ WRITE8_HANDLER( defender_bank_select_w )
 		case 7:
 		case 8:
 		case 9:
-			memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+			memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
 			memory_set_bank(1, vram_bank - 1);
 			break;
 
 		/* pages A-F are not connected */
 		default:
-			memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_NOP, SMH_NOP);
+			memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, SMH_NOP, SMH_NOP);
 			break;
 	}
 }
@@ -821,11 +821,11 @@ MACHINE_RESET( blaster )
 	MACHINE_RESET_CALL(williams_common);
 
 	/* banking is different for blaster */
-	memory_configure_bank(1, 0, 1, williams_videoram, 0);
-	memory_configure_bank(1, 1, 16, memory_region(machine, "main") + 0x18000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 1, williams_videoram, 0);
+	memory_configure_bank(machine, 1, 1, 16, memory_region(machine, "main") + 0x18000, 0x4000);
 
-	memory_configure_bank(2, 0, 1, williams_videoram + 0x4000, 0);
-	memory_configure_bank(2, 1, 16, memory_region(machine, "main") + 0x10000, 0x0000);
+	memory_configure_bank(machine, 2, 0, 1, williams_videoram + 0x4000, 0);
+	memory_configure_bank(machine, 2, 1, 16, memory_region(machine, "main") + 0x10000, 0x0000);
 
 	state_save_register_global(blaster_bank);
 }

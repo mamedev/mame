@@ -1767,33 +1767,34 @@ static void memory_determine_combo_items(running_machine *machine)
 	int itemnum;
 
 	// first add all the CPUs' address spaces
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-		if (cpuinfo->valid)
-			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-				if (cpuinfo->space[spacenum].databytes != 0)
-				{
-					memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-					TCHAR *t_tag, *t_name, *t_space;
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
+			if (cpuinfo->valid)
+				for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+					if (cpuinfo->space[spacenum].databytes != 0)
+					{
+						memorycombo_item *ci = malloc_or_die(sizeof(*ci));
+						TCHAR *t_tag, *t_name, *t_space;
 
-					memset(ci, 0, sizeof(*ci));
-					ci->cpunum = cpunum;
-					ci->spacenum = spacenum;
-					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
+						memset(ci, 0, sizeof(*ci));
+						ci->cpunum = cpunum;
+						ci->spacenum = spacenum;
+						ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
 
-					t_tag = tstring_from_utf8(machine->config->cpu[cpunum].tag);
-					t_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
-					t_space = tstring_from_utf8(address_space_names[spacenum]);
-					_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU #%d \"%s\" (%s) %s memory"), cpunum, t_tag, t_name, t_space);
-					free(t_space),
-					free(t_name);
-					free(t_tag);
+						t_tag = tstring_from_utf8(machine->config->cpu[cpunum].tag);
+						t_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
+						t_space = tstring_from_utf8(address_space_names[spacenum]);
+						_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU #%d \"%s\" (%s) %s memory"), cpunum, t_tag, t_name, t_space);
+						free(t_space),
+						free(t_name);
+						free(t_tag);
 
-					*tail = ci;
-					tail = &ci->next;
-				}
-	}
+						*tail = ci;
+						tail = &ci->next;
+					}
+		}
 
 	// then add all the memory regions
 	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
@@ -2259,24 +2260,25 @@ static void disasm_create_window(running_machine *machine)
 	SendMessage(info->otherwnd[0], WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 
 	// populate the combobox
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		TCHAR* t_cpunum_name;
-		const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-		if (cpuinfo->valid)
-			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
-			{
-				TCHAR name[100];
-				int item;
-				t_cpunum_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
-				_sntprintf(name, ARRAY_LENGTH(name), TEXT("CPU #%d (%s)"), cpunum, t_cpunum_name);
-				free(t_cpunum_name);
-				t_cpunum_name = NULL;
-				item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)name);
-				if (cpunum == curcpu)
-					cursel = item;
-			}
-	}
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			TCHAR* t_cpunum_name;
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
+			if (cpuinfo->valid)
+				if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
+				{
+					TCHAR name[100];
+					int item;
+					t_cpunum_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
+					_sntprintf(name, ARRAY_LENGTH(name), TEXT("CPU #%d (%s)"), cpunum, t_cpunum_name);
+					free(t_cpunum_name);
+					t_cpunum_name = NULL;
+					item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)name);
+					if (cpunum == curcpu)
+						cursel = item;
+				}
+		}
 	SendMessage(info->otherwnd[0], CB_SETCURSEL, cursel, 0);
 
 	// set the child functions
@@ -2405,19 +2407,20 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 			{
 				// find the matching entry
 				UINT32 cpunum;
-				for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-				{
-					const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum);
-					if (cpuinfo->valid)
-						if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
-							if (sel-- == 0)
-							{
-								debug_view_begin_update(info->view[0].view);
-								debug_view_set_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM, cpunum);
-								debug_view_end_update(info->view[0].view);
-								disasm_update_caption(info->machine, info->wnd);
-							}
-				}
+				for (cpunum = 0; cpunum < ARRAY_LENGTH(info->machine->cpu); cpunum++)
+					if (info->machine->cpu[cpunum] != NULL)
+					{
+						const cpu_debug_data *cpuinfo = cpu_get_debug_data(info->machine->cpu[cpunum]);
+						if (cpuinfo->valid)
+							if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
+								if (sel-- == 0)
+								{
+									debug_view_begin_update(info->view[0].view);
+									debug_view_set_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM, cpunum);
+									debug_view_end_update(info->view[0].view);
+									disasm_update_caption(info->machine, info->wnd);
+								}
+					}
 
 				// reset the focus
 				SetFocus(info->focuswnd);
@@ -2455,11 +2458,11 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 					if (debug_view_get_property_UINT32(info->view[0].view, DVP_CURSOR_VISIBLE))
 					{
 						UINT32 cpu_num = 0;
-						debug_cpu_info *cpuinfo ;
+						cpu_debug_data *cpuinfo ;
 
 						/* for BYTE2ADDR */
 						cpu_num = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
-						cpuinfo = (debug_cpu_info *)debug_get_cpu_info(cpu_num);
+						cpuinfo = (cpu_debug_data *)cpu_get_debug_data(info->machine->cpu[cpu_num]);
 
 						active_address = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_ACTIVE_ADDRESS);
 						sprintf(command, "go %X", BYTE2ADDR(active_address, cpuinfo, ADDRESS_SPACE_PROGRAM));
@@ -2471,7 +2474,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 					if (debug_view_get_property_UINT32(info->view[0].view, DVP_CURSOR_VISIBLE))
 					{
 						UINT32 cpu_num = 0;
-						debug_cpu_info *cpuinfo ;
+						cpu_debug_data *cpuinfo ;
 						debug_cpu_breakpoint *bp;
 						INT8 bp_exists = 0;
 						UINT32 bp_num = 0;
@@ -2481,7 +2484,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 
 						/* is there already a breakpoint there? */
 						cpu_num = debug_view_get_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM);
-						cpuinfo = (debug_cpu_info*)debug_get_cpu_info(cpu_num);
+						cpuinfo = cpu_get_debug_data(info->machine->cpu[cpu_num]);
 
 						for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
 						{

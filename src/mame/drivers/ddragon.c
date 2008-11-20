@@ -176,7 +176,7 @@ static TIMER_CALLBACK( ddragon_scanline_callback )
 static MACHINE_START( ddragon )
 {
 	/* configure banks */
-	memory_configure_bank(1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
 
 	/* allocate timer for scanlines */
 	scanline_timer = timer_alloc(ddragon_scanline_callback, NULL);
@@ -300,9 +300,9 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 
 	memory_set_bank(1, newbank);
 	if (newbank == 4 && oldbank != 4)
-		memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, darktowr_mcu_bank_r, darktowr_mcu_bank_w);
+		memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, darktowr_mcu_bank_r, darktowr_mcu_bank_w);
 	else if (newbank != 4 && oldbank == 4)
-		memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1);
 }
 
 
@@ -1932,7 +1932,7 @@ static DRIVER_INIT( darktowr )
 	sound_irq = M6809_IRQ_LINE;
 	ym_irq = M6809_FIRQ_LINE;
 	technos_video_hw = 0;
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3808, 0x3808, 0, 0, darktowr_bankswitch_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3808, 0x3808, 0, 0, darktowr_bankswitch_w);
 }
 
 
@@ -1944,7 +1944,7 @@ static DRIVER_INIT( toffy )
 	sound_irq = M6809_IRQ_LINE;
 	ym_irq = M6809_FIRQ_LINE;
 	technos_video_hw = 0;
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3808, 0x3808, 0, 0, toffy_bankswitch_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3808, 0x3808, 0, 0, toffy_bankswitch_w);
 
 	/* the program rom has a simple bitswap encryption */
 	rom = memory_region(machine, "main");

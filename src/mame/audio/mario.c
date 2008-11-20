@@ -267,9 +267,9 @@ static SOUND_START( mario )
 	if (audiocpu != -1 && machine->config->cpu[audiocpu].type != CPU_Z80)
 	{
 		state->eabank = 1;
-		memory_install_read8_handler(machine, audiocpu, ADDRESS_SPACE_PROGRAM, 0x000, 0x7ff, 0, 0, SMH_BANK1);
-		memory_configure_bank(1, 0, 1, memory_region(machine, "audio"), 0);
-	    memory_configure_bank(1, 1, 1, memory_region(machine, "audio") + 0x1000, 0x800);
+		memory_install_read8_handler(cpu_get_address_space(machine->cpu[audiocpu], ADDRESS_SPACE_PROGRAM), 0x000, 0x7ff, 0, 0, SMH_BANK1);
+		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "audio"), 0);
+	    memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "audio") + 0x1000, 0x800);
 	}
 
     state_save_register_global(state->last);

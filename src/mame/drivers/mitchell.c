@@ -1997,14 +1997,15 @@ ROM_END
 
 static void bootleg_decode(running_machine *machine)
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x50000);
-	memory_configure_bank_decrypted(1, 0, 16, memory_region(machine, "main") + 0x60000, 0x4000);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x50000);
+	memory_configure_bank_decrypted(machine, 1, 0, 16, memory_region(machine, "main") + 0x60000, 0x4000);
 }
 
 
 static void configure_banks(running_machine *machine)
 {
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 	pang_port5_kludge = 0;
 }
 

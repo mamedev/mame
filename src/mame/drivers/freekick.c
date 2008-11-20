@@ -87,7 +87,7 @@ static READ8_HANDLER( spinner_r )
 
 static MACHINE_RESET( pbillrd )
 {
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 static WRITE8_HANDLER( pbillrd_bankswitch_w )
@@ -1051,7 +1051,8 @@ ROM_END
 
 static DRIVER_INIT(gigas)
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
 }
 
 

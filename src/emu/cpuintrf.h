@@ -570,10 +570,20 @@ typedef enum _cpu_type cpu_type;
 #define cputype_get_core_credits(cputype)			cputype_get_info_string(cputype, CPUINFO_STR_CORE_CREDITS)
 
 
+/* helpers for using machine/cputag instead of cpu objects */
+#define cputag_reset(mach, tag)						cpu_reset(cputag_get_cpu(mach, tag))
+#define cputag_get_index(mach, tag)					cpu_get_index(cputag_get_cpu(mach, tag))
+#define cputag_get_address_space(mach, tag, space)	cpu_get_address_space(cputag_get_cpu(mach, tag), space)
+
+
 
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
+
+/* opaque definition of CPU debugging info */
+typedef struct _cpu_debug_data cpu_debug_data;
+
 
 /* forward declaration of this union */
 typedef union _cpuinfo cpuinfo;
@@ -638,7 +648,8 @@ struct _cpu_class_header
 {
 	int						index;					/* index of this CPU */
 	cpu_type				cputype; 				/* type index of this CPU */
-	address_space *			space[ADDRESS_SPACES];	/* address spaces */
+	cpu_debug_data *		debug;					/* debugging data */
+	const address_space *	space[ADDRESS_SPACES];	/* address spaces */
 
 	/* table of core functions */
 	cpu_get_info_func		get_info;
@@ -773,6 +784,18 @@ INLINE int cpu_get_index(const device_config *cpu)
 {
 	cpu_class_header *classheader = cpu->classtoken;
 	return (classheader != NULL) ? classheader->index : cpu_get_index_slow(cpu);
+}
+
+
+/*-------------------------------------------------
+    cpu_get_debug_data - return a pointer to
+    the given CPU's debugger data
+-------------------------------------------------*/
+
+INLINE cpu_debug_data *cpu_get_debug_data(const device_config *cpu)
+{
+	cpu_class_header *classheader = cpu->classtoken;
+	return classheader->debug;
 }
 
 

@@ -1676,7 +1676,7 @@ static DRIVER_INIT( ge765pwbba )
 
 	uPD4701_init( 0 );
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, ge765pwbba_r, ge765pwbba_w );
 }
 
 /*
@@ -1787,7 +1787,7 @@ static void gx700pwfbf_init( running_machine *machine, void (*output_callback_fu
 
 	gx700pwfbf_output_callback = output_callback_func;
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
 
 	state_save_register_global_array( gx700pwbf_output_data );
 }
@@ -2030,7 +2030,7 @@ static DRIVER_INIT( gtrfrks )
 {
 	DRIVER_INIT_CALL(konami573);
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
 }
 
 /* GX894 digital i/o */
@@ -2320,7 +2320,7 @@ static void gx894pwbba_init( running_machine *machine, void (*output_callback_fu
 
 	gx894pwbba_output_callback = output_callback_func;
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_r, gx894pwbba_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_r, gx894pwbba_w );
 
 	gx894_ram_write_offset = 0;
 	gx894_ram_read_offset = 0;
@@ -2349,7 +2349,7 @@ static DRIVER_INIT( gtrfrkdigital )
 
 	gx894pwbba_init( machine, NULL );
 
-	memory_install_readwrite32_handler( machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
+	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, gtrfrks_io_r, gtrfrks_io_w );
 }
 
 /* ddr solo */
@@ -2642,7 +2642,7 @@ static DRIVER_INIT( dmx )
 
 	gx894pwbba_init( machine, dmx_output_callback );
 
-	memory_install_write32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6000ff, 0, 0, dmx_io_w );
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, dmx_io_w );
 }
 
 /* salary man champ */

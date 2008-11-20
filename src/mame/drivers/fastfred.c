@@ -948,8 +948,8 @@ ROM_END
 
 static DRIVER_INIT( flyboy )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc085, 0xc099, 0, 0, flyboy_custom1_io_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc8fb, 0xc900, 0, 0, flyboy_custom2_io_r);
 	fastfred_hardware_type = 1;
 }
 
@@ -960,19 +960,19 @@ static DRIVER_INIT( flyboyb )
 
 static DRIVER_INIT( fastfred )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r, SMH_NOP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, fastfred_custom_io_r, SMH_NOP);
 	fastfred_hardware_type = 1;
 }
 
 static DRIVER_INIT( jumpcoas )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
 	fastfred_hardware_type = 0;
 }
 
 static DRIVER_INIT( boggy84 )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcfff, 0, 0, jumpcoas_custom_io_r, SMH_NOP);
 	fastfred_hardware_type = 2;
 }
 

@@ -66,7 +66,7 @@ static WRITE8_HANDLER( lastday_bankswitch_w )
 
 static MACHINE_START( lastday )
 {
-	memory_configure_bank(1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 static WRITE8_HANDLER( flip_screen_w )

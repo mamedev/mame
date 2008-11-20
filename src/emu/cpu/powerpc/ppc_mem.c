@@ -209,7 +209,7 @@ static int ppc_translate_address(offs_t *addr_ptr, int flags)
 					| (((ppc.sdr1 & 0x01FF) & (hash >> 10)) << 16)
 					| ((hash & 0x03FF) << 6);
 
-				pteg_ptr[hash_type] = memory_get_read_ptr(cpunum_get_active(), ADDRESS_SPACE_PROGRAM, pteg_address);
+				pteg_ptr[hash_type] = memory_get_read_ptr(cpu_get_address_space(Machine->activecpu), ADDRESS_SPACE_PROGRAM), pteg_address);
 				if (pteg_ptr[hash_type])
 				{
 					for (i = 0; i < 8; i++)

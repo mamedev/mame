@@ -52,10 +52,9 @@ enum
 typedef struct _debugger_private debugger_private;
 struct _debugger_private
 {
-	debug_cpu_info	cpuinfo[MAX_CPU];
-	debug_cpu_info *livecpu;
-	debug_cpu_info *visiblecpu;
-	debug_cpu_info *breakcpu;
+	cpu_debug_data *livecpu;
+	cpu_debug_data *visiblecpu;
+	cpu_debug_data *breakcpu;
 
 	UINT8			within_instruction_hook;
 	UINT8			vblank_occurred;
@@ -92,12 +91,12 @@ static debugger_private global;
 ***************************************************************************/
 
 static void debug_cpu_exit(running_machine *machine);
-static void perform_trace(running_machine *machine, debug_cpu_info *info);
-static void prepare_for_step_overout(running_machine *machine, debug_cpu_info *info);
+static void perform_trace(running_machine *machine, cpu_debug_data *info);
+static void prepare_for_step_overout(running_machine *machine, cpu_debug_data *info);
 static void process_source_file(running_machine *machine);
-static void breakpoint_check(running_machine *machine, debug_cpu_info *info, offs_t pc);
-static void watchpoint_check(running_machine *machine, int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask);
-static void check_hotspots(running_machine *machine, int cpunum, int spacenum, offs_t address);
+static void breakpoint_check(running_machine *machine, cpu_debug_data *info, offs_t pc);
+static void watchpoint_check(const address_space *space, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask);
+static void check_hotspots(const address_space *space, offs_t address);
 
 /* expression handlers */
 static UINT64 expression_read_memory(const char *name, int space, UINT32 address, int size);
@@ -213,95 +212,97 @@ void debug_cpu_init(running_machine *machine)
 	}
 
 	/* loop over CPUs and build up their info */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		cpu_type cputype = machine->config->cpu[cpunum].type;
-		debug_cpu_info *info = &global.cpuinfo[cpunum];
-
-		/* if this is a dummy, stop looking */
-		memset(info, 0, sizeof(*info));
-		if (cputype == CPU_DUMMY)
-			break;
-
-		/* reset the PC data */
-		info->valid = TRUE;
-		info->flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
-		info->device = machine->cpu[cpunum];
-		info->endianness = cpu_get_endianness(info->device);
-		info->opwidth = cpu_get_min_opcode_bytes(info->device);
-
-		/* fetch the memory accessors */
-		info->translate = (cpu_translate_func)cpu_get_info_fct(info->device, CPUINFO_PTR_TRANSLATE);
-		info->read = (cpu_read_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READ);
-		info->write = (cpu_write_func)cpu_get_info_fct(info->device, CPUINFO_PTR_WRITE);
-		info->readop = (cpu_readop_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READOP);
-
-		/* allocate a symbol table */
-		info->symtable = symtable_alloc(global_symtable);
-
-		/* add a global symbol for the current instruction pointer */
-		symtable_add_register(info->symtable, "curpc", machine, get_current_pc, 0);
-
-		/* add all registers into it */
-		for (regnum = 0; regnum < MAX_REGS; regnum++)
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
 		{
-			const char *str = cpu_get_reg_string(info->device, regnum);
-			const char *colon;
-			char symname[256];
-			int charnum;
+			const device_config *cpu = machine->cpu[cpunum];
+			cpu_class_header *classheader = cpu->classtoken;
+			cpu_debug_data *info;
+			
+			/* allocate some information */
+			info = auto_malloc(sizeof(*info));
+			memset(info, 0, sizeof(*info));
+			classheader->debug = info;
 
-			/* skip if we don't get a valid string, or one without a colon */
-			if (str == NULL)
-				continue;
-			if (str[0] == '~')
-				str++;
-			colon = strchr(str, ':');
-			if (colon == NULL)
-				continue;
+			/* reset the PC data */
+			info->valid = TRUE;
+			info->flags = DEBUG_FLAG_OBSERVING | DEBUG_FLAG_HISTORY;
+			info->device = machine->cpu[cpunum];
+			info->endianness = cpu_get_endianness(info->device);
+			info->opwidth = cpu_get_min_opcode_bytes(info->device);
 
-			/* strip all spaces from the name and convert to lowercase */
-			for (charnum = 0; charnum < sizeof(symname) - 1 && str < colon; str++)
-				if (!isspace(*str))
-					symname[charnum++] = tolower(*str);
-			symname[charnum] = 0;
+			/* fetch the memory accessors */
+			info->translate = (cpu_translate_func)cpu_get_info_fct(info->device, CPUINFO_PTR_TRANSLATE);
+			info->read = (cpu_read_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READ);
+			info->write = (cpu_write_func)cpu_get_info_fct(info->device, CPUINFO_PTR_WRITE);
+			info->readop = (cpu_readop_func)cpu_get_info_fct(info->device, CPUINFO_PTR_READOP);
 
-			/* add the symbol to the table */
-			symtable_add_register(info->symtable, symname, (void *)(FPTR)regnum, get_cpu_reg, set_cpu_reg);
+			/* allocate a symbol table */
+			info->symtable = symtable_alloc(global_symtable);
+
+			/* add a global symbol for the current instruction pointer */
+			symtable_add_register(info->symtable, "curpc", machine, get_current_pc, 0);
+
+			/* add all registers into it */
+			for (regnum = 0; regnum < MAX_REGS; regnum++)
+			{
+				const char *str = cpu_get_reg_string(info->device, regnum);
+				const char *colon;
+				char symname[256];
+				int charnum;
+
+				/* skip if we don't get a valid string, or one without a colon */
+				if (str == NULL)
+					continue;
+				if (str[0] == '~')
+					str++;
+				colon = strchr(str, ':');
+				if (colon == NULL)
+					continue;
+
+				/* strip all spaces from the name and convert to lowercase */
+				for (charnum = 0; charnum < sizeof(symname) - 1 && str < colon; str++)
+					if (!isspace(*str))
+						symname[charnum++] = tolower(*str);
+				symname[charnum] = 0;
+
+				/* add the symbol to the table */
+				symtable_add_register(info->symtable, symname, (void *)(FPTR)regnum, get_cpu_reg, set_cpu_reg);
+			}
+
+			/* loop over address spaces and get info */
+			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+			{
+				debug_space_info *spaceinfo = &info->space[spacenum];
+				int datawidth = cpu_get_databus_width(info->device, spacenum);
+				int logwidth = cpu_get_logaddr_width(info->device, spacenum);
+				int physwidth = cpu_get_addrbus_width(info->device, spacenum);
+				int addrshift = cpu_get_addrbus_shift(info->device, spacenum);
+				int pageshift = cpu_get_page_shift(info->device, spacenum);
+
+				if (logwidth == 0)
+					logwidth = physwidth;
+
+				spaceinfo->databytes = datawidth / 8;
+				spaceinfo->pageshift = pageshift;
+
+				/* left/right shifts to convert addresses to bytes */
+				spaceinfo->addr2byte_lshift = (addrshift < 0) ? -addrshift : 0;
+				spaceinfo->addr2byte_rshift = (addrshift > 0) ?  addrshift : 0;
+
+				/* number of character used to display addresses */
+				spaceinfo->physchars = (physwidth + 3) / 4;
+				spaceinfo->logchars = (logwidth + 3) / 4;
+
+				/* masks to apply to addresses */
+				spaceinfo->physaddrmask = (0xfffffffful >> (32 - physwidth));
+				spaceinfo->logaddrmask = (0xfffffffful >> (32 - logwidth));
+
+				/* masks to apply to byte addresses */
+				spaceinfo->physbytemask = ((spaceinfo->physaddrmask << spaceinfo->addr2byte_lshift) | ((1 << spaceinfo->addr2byte_lshift) - 1)) >> spaceinfo->addr2byte_rshift;
+				spaceinfo->logbytemask = ((spaceinfo->logaddrmask << spaceinfo->addr2byte_lshift) | ((1 << spaceinfo->addr2byte_lshift) - 1)) >> spaceinfo->addr2byte_rshift;
+			}
 		}
-
-		/* loop over address spaces and get info */
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-		{
-			debug_space_info *spaceinfo = &info->space[spacenum];
-			int datawidth = cpu_get_databus_width(info->device, spacenum);
-			int logwidth = cpu_get_logaddr_width(info->device, spacenum);
-			int physwidth = cpu_get_addrbus_width(info->device, spacenum);
-			int addrshift = cpu_get_addrbus_shift(info->device, spacenum);
-			int pageshift = cpu_get_page_shift(info->device, spacenum);
-
-			if (logwidth == 0)
-				logwidth = physwidth;
-
-			spaceinfo->databytes = datawidth / 8;
-			spaceinfo->pageshift = pageshift;
-
-			/* left/right shifts to convert addresses to bytes */
-			spaceinfo->addr2byte_lshift = (addrshift < 0) ? -addrshift : 0;
-			spaceinfo->addr2byte_rshift = (addrshift > 0) ?  addrshift : 0;
-
-			/* number of character used to display addresses */
-			spaceinfo->physchars = (physwidth + 3) / 4;
-			spaceinfo->logchars = (logwidth + 3) / 4;
-
-			/* masks to apply to addresses */
-			spaceinfo->physaddrmask = (0xfffffffful >> (32 - physwidth));
-			spaceinfo->logaddrmask = (0xfffffffful >> (32 - logwidth));
-
-			/* masks to apply to byte addresses */
-			spaceinfo->physbytemask = ((spaceinfo->physaddrmask << spaceinfo->addr2byte_lshift) | ((1 << spaceinfo->addr2byte_lshift) - 1)) >> spaceinfo->addr2byte_rshift;
-			spaceinfo->logbytemask = ((spaceinfo->logaddrmask << spaceinfo->addr2byte_lshift) | ((1 << spaceinfo->addr2byte_lshift) - 1)) >> spaceinfo->addr2byte_rshift;
-		}
-	}
 
 	/* add callback for breaking on VBLANK */
 	if (machine->primary_screen != NULL)
@@ -320,32 +321,33 @@ static void debug_cpu_exit(running_machine *machine)
 	int cpunum, spacenum;
 
 	/* loop over all watchpoints and breakpoints to free their memory */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		debug_cpu_info *info = &global.cpuinfo[cpunum];
-
-		/* close any tracefiles */
-		if (info->trace.file)
-			fclose(info->trace.file);
-		if (info->trace.action)
-			free(info->trace.action);
-
-		/* free the symbol table */
-		if (info->symtable)
-			symtable_free(info->symtable);
-
-		/* free all breakpoints */
-		while (info->bplist)
-			debug_cpu_breakpoint_clear(machine, info->bplist->index);
-
-		/* loop over all address spaces */
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
 		{
-			/* free all watchpoints */
-			while (info->space[spacenum].wplist)
-				debug_cpu_watchpoint_clear(machine, info->space[spacenum].wplist->index);
+			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
+
+			/* close any tracefiles */
+			if (info->trace.file)
+				fclose(info->trace.file);
+			if (info->trace.action)
+				free(info->trace.action);
+
+			/* free the symbol table */
+			if (info->symtable)
+				symtable_free(info->symtable);
+
+			/* free all breakpoints */
+			while (info->bplist)
+				debug_cpu_breakpoint_clear(machine, info->bplist->index);
+
+			/* loop over all address spaces */
+			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+			{
+				/* free all watchpoints */
+				while (info->space[spacenum].wplist)
+					debug_cpu_watchpoint_clear(machine, info->space[spacenum].wplist->index);
+			}
 		}
-	}
 
 	/* free the global symbol table */
 	if (global_symtable)
@@ -363,7 +365,7 @@ static void debug_cpu_exit(running_machine *machine)
     debug flags for optimal efficiency
 -------------------------------------------------*/
 
-static void compute_debug_flags(running_machine *machine, const debug_cpu_info *info)
+static void compute_debug_flags(running_machine *machine, const cpu_debug_data *info)
 {
 	/* clear out all global flags by default */
 	machine->debug_flags = DEBUG_FLAG_ENABLED;
@@ -382,13 +384,6 @@ static void compute_debug_flags(running_machine *machine, const debug_cpu_info *
 	/* if we are stopping at a particular time and that time is within the current timeslice, we need to be called */
 	if ((info->flags & DEBUG_FLAG_STOP_TIME) && attotime_compare(info->endexectime, info->stoptime) <= 0)
 		machine->debug_flags |= DEBUG_FLAG_CALL_HOOK;
-
-	/* add in the watchpoint flags */
-	machine->debug_flags |= (info->flags & DEBUG_FLAG_WATCHPOINT) >> (24 - 4);
-
-	/* if any of the watchpoint flags are set and we're live, tell the memory system */
-	if (global.livecpu != NULL && ((info->flags & DEBUG_FLAG_WATCHPOINT) != 0))
-		memory_set_context(machine, -1);
 }
 
 
@@ -402,8 +397,9 @@ static void reset_transient_flags(running_machine *machine)
 	int cpunum;
 
 	/* loop over CPUs and reset the transient flags */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(global.cpuinfo); cpunum++)
-		global.cpuinfo[cpunum].flags &= ~DEBUG_FLAG_TRANSIENT;
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+			cpu_get_debug_data(machine->cpu[cpunum])->flags &= ~DEBUG_FLAG_TRANSIENT;
 }
 
 
@@ -415,7 +411,7 @@ static void reset_transient_flags(running_machine *machine)
 
 void debug_cpu_start_hook(running_machine *machine, int cpunum, attotime endtime)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
 
 	assert((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 
@@ -474,7 +470,7 @@ void debug_cpu_start_hook(running_machine *machine, int cpunum, attotime endtime
 
 void debug_cpu_stop_hook(running_machine *machine, int cpunum)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
 
 	assert(global.livecpu == info);
 
@@ -497,10 +493,10 @@ void debug_cpu_stop_hook(running_machine *machine, int cpunum)
 
 void debug_cpu_interrupt_hook(running_machine *machine, int cpunum, int irqline)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
 
 	/* see if this matches a pending interrupt request */
-	if ((info->flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (info->stopirq == -1 || info->stopirq == irqline))
+	if (info != NULL && (info->flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (info->stopirq == -1 || info->stopirq == irqline))
 	{
 		global.execution_state = EXECUTION_STATE_STOPPED;
 		debug_console_printf("Stopped on interrupt (CPU %d, IRQ %d)\n", cpunum, irqline);
@@ -516,7 +512,7 @@ void debug_cpu_interrupt_hook(running_machine *machine, int cpunum, int irqline)
 
 void debug_cpu_exception_hook(running_machine *machine, int cpunum, int exception)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
 
 	/* see if this matches a pending interrupt request */
 	if ((info->flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (info->stopexception == -1 || info->stopexception == exception))
@@ -535,7 +531,7 @@ void debug_cpu_exception_hook(running_machine *machine, int cpunum, int exceptio
 
 void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	/* note that we are in the debugger code */
 	global.within_instruction_hook = TRUE;
@@ -587,7 +583,7 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
 		/* check the temp running breakpoint and break if we hit it */
 		else if ((info->flags & DEBUG_FLAG_STOP_PC) != 0 && info->stopaddr == curpc)
 		{
-			debug_console_printf("Stopped at temporary breakpoint %X on CPU %d\n", info->stopaddr, (int)(info - global.cpuinfo));
+			debug_console_printf("Stopped at temporary breakpoint %X on CPU %d\n", info->stopaddr, 0);//(int)(info - global.cpuinfo));
 			global.execution_state = EXECUTION_STATE_STOPPED;
 		}
 
@@ -653,17 +649,16 @@ void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc)
     and a memory read happens
 -------------------------------------------------*/
 
-void debug_cpu_memory_read_hook(running_machine *machine, int cpunum, int spacenum, offs_t address, UINT64 mem_mask)
+void debug_cpu_memory_read_hook(const address_space *space, offs_t address, UINT64 mem_mask)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(space->cpu);
 
 	/* check watchpoints */
-	if ((info->flags & (DEBUG_FLAG_LIVE_WPR_PROGRAM << spacenum)) != 0)
-		watchpoint_check(machine, cpunum, spacenum, WATCHPOINT_READ, address, 0, mem_mask);
+	watchpoint_check(space, WATCHPOINT_READ, address, 0, mem_mask);
 
 	/* check hotspots */
 	if (info->hotspots != NULL)
-		check_hotspots(machine, cpunum, spacenum, address);
+		check_hotspots(space, address);
 }
 
 
@@ -673,13 +668,9 @@ void debug_cpu_memory_read_hook(running_machine *machine, int cpunum, int spacen
     enabled and a memory write happens
 -------------------------------------------------*/
 
-void debug_cpu_memory_write_hook(running_machine *machine, int cpunum, int spacenum, offs_t address, UINT64 data, UINT64 mem_mask)
+void debug_cpu_memory_write_hook(const address_space *space, offs_t address, UINT64 data, UINT64 mem_mask)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
-
-	/* check watchpoints */
-	if ((info->flags & (DEBUG_FLAG_LIVE_WPW_PROGRAM << spacenum)) != 0)
-		watchpoint_check(machine, cpunum, spacenum, WATCHPOINT_WRITE, address, data, mem_mask);
+	watchpoint_check(space, WATCHPOINT_WRITE, address, data, mem_mask);
 }
 
 
@@ -695,7 +686,7 @@ void debug_cpu_memory_write_hook(running_machine *machine, int cpunum, int space
 
 void debug_cpu_single_step(int numsteps)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	if (!global.within_instruction_hook)
 		return;
@@ -715,7 +706,7 @@ void debug_cpu_single_step(int numsteps)
 
 void debug_cpu_single_step_over(int numsteps)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	if (!global.within_instruction_hook)
 		return;
@@ -735,7 +726,7 @@ void debug_cpu_single_step_over(int numsteps)
 
 void debug_cpu_single_step_out(void)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	if (!global.within_instruction_hook)
 		return;
@@ -754,7 +745,7 @@ void debug_cpu_single_step_out(void)
 
 void debug_cpu_go(offs_t targetpc)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	if (!global.within_instruction_hook)
 		return;
@@ -773,7 +764,7 @@ void debug_cpu_go(offs_t targetpc)
 
 void debug_cpu_go_vblank(void)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	if (!global.within_instruction_hook)
 		return;
@@ -792,7 +783,7 @@ void debug_cpu_go_vblank(void)
 
 void debug_cpu_go_interrupt(int irqline)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	if (!global.within_instruction_hook)
 		return;
@@ -812,7 +803,7 @@ void debug_cpu_go_interrupt(int irqline)
 #ifdef UNUSED_FUNCTION
 void debug_cpu_go_exception(int exception)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	if (!global.within_instruction_hook)
 		return;
@@ -832,7 +823,7 @@ void debug_cpu_go_exception(int exception)
 
 void debug_cpu_go_milliseconds(UINT64 milliseconds)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	if (!global.within_instruction_hook)
 		return;
@@ -851,7 +842,7 @@ void debug_cpu_go_milliseconds(UINT64 milliseconds)
 
 void debug_cpu_next_cpu(void)
 {
-	debug_cpu_info *info = global.livecpu;
+	cpu_debug_data *info = global.livecpu;
 
 	if (!global.within_instruction_hook)
 		return;
@@ -867,9 +858,9 @@ void debug_cpu_next_cpu(void)
     CPU
 -------------------------------------------------*/
 
-void debug_cpu_ignore_cpu(int cpunum, int ignore)
+void debug_cpu_ignore_cpu(const device_config *cpu, int ignore)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(cpu);
 
 	if (!global.within_instruction_hook)
 		return;
@@ -891,7 +882,7 @@ void debug_cpu_ignore_cpu(int cpunum, int ignore)
 
 void debug_cpu_trace(int cpunum, FILE *file, int trace_over, const char *action)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->cpu[cpunum]);
 
 	/* close existing files and delete expressions */
 	if (info->trace.file != NULL)
@@ -926,29 +917,18 @@ void debug_cpu_trace(int cpunum, FILE *file, int trace_over, const char *action)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_get_cpu_info - returns the cpu info
-    block for a given CPU
--------------------------------------------------*/
-
-const debug_cpu_info *debug_get_cpu_info(int cpunum)
-{
-	return &global.cpuinfo[cpunum];
-}
-
-
-/*-------------------------------------------------
     debug_cpu_halt_on_next_instruction - halt in
     the debugger on the next instruction
 -------------------------------------------------*/
 
 void debug_cpu_halt_on_next_instruction(running_machine *machine, int cpunum, const char *fmt, ...)
 {
-	debug_cpu_info *info;
+	cpu_debug_data *info;
 	va_list arg;
 
 	/* pick the best CPU to land on */
 	if (cpunum != -1)
-		info = &global.cpuinfo[cpunum];
+		info = cpu_get_debug_data(machine->cpu[cpunum]);
 	else if (global.visiblecpu != NULL)
 		info = global.visiblecpu;
 	else
@@ -991,7 +971,7 @@ int debug_cpu_is_stopped(running_machine *machine)
 
 static UINT32 dasm_wrapped(running_machine *machine, char *buffer, offs_t pc)
 {
-	const debug_cpu_info *cpuinfo = debug_get_cpu_info(cpunum_get_active());
+	const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->activecpu);
 	int maxbytes = cpu_get_max_opcode_bytes(machine->activecpu);
 	UINT8 opbuf[64], argbuf[64];
 	offs_t pcbyte;
@@ -1009,7 +989,7 @@ static UINT32 dasm_wrapped(running_machine *machine, char *buffer, offs_t pc)
 }
 
 
-static void perform_trace(running_machine *machine, debug_cpu_info *info)
+static void perform_trace(running_machine *machine, cpu_debug_data *info)
 {
 	offs_t pc = cpu_get_pc(machine->activecpu);
 	int offset, count, i;
@@ -1079,7 +1059,7 @@ static void perform_trace(running_machine *machine, debug_cpu_info *info)
     stepping over an instruction
 -------------------------------------------------*/
 
-static void prepare_for_step_overout(running_machine *machine, debug_cpu_info *info)
+static void prepare_for_step_overout(running_machine *machine, cpu_debug_data *info)
 {
 	offs_t pc = cpu_get_pc(machine->activecpu);
 	char dasmbuffer[100];
@@ -1161,7 +1141,7 @@ static void process_source_file(running_machine *machine)
 
 void debug_cpu_set_instruction_hook(int cpunum, int (*hook)(offs_t pc))
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->cpu[cpunum]);
 
 	/* set the hook and also the CPU's flag for fast knowledge of the hook */
 	info->instrhook = hook;
@@ -1182,7 +1162,7 @@ void debug_cpu_set_instruction_hook(int cpunum, int (*hook)(offs_t pc))
     breakpoint flags
 -------------------------------------------------*/
 
-static void breakpoint_update_flags(running_machine *machine, debug_cpu_info *info)
+static void breakpoint_update_flags(running_machine *machine, cpu_debug_data *info)
 {
 	debug_cpu_breakpoint *bp;
 
@@ -1206,7 +1186,7 @@ static void breakpoint_update_flags(running_machine *machine, debug_cpu_info *in
     a given CPU
 -------------------------------------------------*/
 
-static void breakpoint_check(running_machine *machine, debug_cpu_info *info, offs_t pc)
+static void breakpoint_check(running_machine *machine, cpu_debug_data *info, offs_t pc)
 {
 	debug_cpu_breakpoint *bp;
 	UINT64 result;
@@ -1239,7 +1219,7 @@ static void breakpoint_check(running_machine *machine, debug_cpu_info *info, off
 
 int debug_cpu_breakpoint_set(running_machine *machine, int cpunum, offs_t address, parsed_expression *condition, const char *action)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
 	debug_cpu_breakpoint *bp;
 
 	assert_always(cpunum >= 0 && cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL, "debug_cpu_breakpoint_set() called with invalid cpunum!");
@@ -1277,30 +1257,31 @@ int debug_cpu_breakpoint_clear(running_machine *machine, int bpnum)
 	int cpunum;
 
 	/* loop over CPUs and find the requested breakpoint */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		debug_cpu_info *info = &global.cpuinfo[cpunum];
-		for (pbp = NULL, bp = info->bplist; bp != NULL; pbp = bp, bp = bp->next)
-			if (bp->index == bpnum)
-			{
-				/* unlink us from the list */
-				if (pbp == NULL)
-					info->bplist = bp->next;
-				else
-					pbp->next = bp->next;
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
+			for (pbp = NULL, bp = info->bplist; bp != NULL; pbp = bp, bp = bp->next)
+				if (bp->index == bpnum)
+				{
+					/* unlink us from the list */
+					if (pbp == NULL)
+						info->bplist = bp->next;
+					else
+						pbp->next = bp->next;
 
-				/* free the memory */
-				if (bp->condition != NULL)
-					expression_free(bp->condition);
-				if (bp->action != NULL)
-					free(bp->action);
-				free(bp);
+					/* free the memory */
+					if (bp->condition != NULL)
+						expression_free(bp->condition);
+					if (bp->action != NULL)
+						free(bp->action);
+					free(bp);
 
-				/* update the flags */
-				breakpoint_update_flags(machine, info);
-				return 1;
-			}
-	}
+					/* update the flags */
+					breakpoint_update_flags(machine, info);
+					return 1;
+				}
+		}
 
 	/* we didn't find it; return an error */
 	return 0;
@@ -1318,17 +1299,18 @@ int debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable)
 	int cpunum;
 
 	/* loop over CPUs and find the requested breakpoint */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		debug_cpu_info *info = &global.cpuinfo[cpunum];
-		for (bp = info->bplist; bp != NULL; bp = bp->next)
-			if (bp->index == bpnum)
-			{
-				bp->enabled = (enable != 0);
-				breakpoint_update_flags(machine, info);
-				return 1;
-			}
-	}
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
+			for (bp = info->bplist; bp != NULL; bp = bp->next)
+				if (bp->index == bpnum)
+				{
+					bp->enabled = (enable != 0);
+					breakpoint_update_flags(machine, info);
+					return 1;
+				}
+		}
 
 	return 0;
 }
@@ -1344,41 +1326,30 @@ int debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable)
     watchpoint flags
 -------------------------------------------------*/
 
-static void watchpoint_update_flags(running_machine *machine, debug_cpu_info *info, int spacenum)
+static void watchpoint_update_flags(const address_space *space)
 {
-	UINT32 writeflag = DEBUG_FLAG_LIVE_WPW_PROGRAM << spacenum;
-	UINT32 readflag = DEBUG_FLAG_LIVE_WPR_PROGRAM << spacenum;
+	const cpu_debug_data *info = cpu_get_debug_data(space->cpu);
 	debug_cpu_watchpoint *wp;
+	int enablewrite = FALSE;
+	int enableread = FALSE;
 
 	/* if hotspots are enabled, turn on all reads */
 	if (info->hotspots != NULL)
-	{
-		info->flags |= DEBUG_FLAG_READ_WATCHPOINT;
-		readflag = 0;
-	}
+		enableread = TRUE;
 
 	/* see if there are any enabled breakpoints */
-	info->flags &= ~(readflag | writeflag);
-	for (wp = info->space[spacenum].wplist; wp != NULL; wp = wp->next)
+	for (wp = info->space[space->spacenum].wplist; wp != NULL; wp = wp->next)
 		if (wp->enabled)
 		{
 			if (wp->type & WATCHPOINT_READ)
-			{
-				info->flags |= readflag;
-				readflag = 0;
-			}
+				enableread = TRUE;
 			if (wp->type & WATCHPOINT_WRITE)
-			{
-				info->flags |= writeflag;
-				writeflag = 0;
-			}
-			if ((readflag | writeflag) == 0)
-				break;
+				enablewrite = TRUE;
 		}
 
 	/* push the flags out globally */
-	if (global.livecpu != NULL)
-		compute_debug_flags(machine, global.livecpu);
+	memory_enable_read_watchpoints(space, enableread);
+	memory_enable_write_watchpoints(space, enablewrite);
 }
 
 
@@ -1387,9 +1358,9 @@ static void watchpoint_update_flags(running_machine *machine, debug_cpu_info *in
     for a given CPU and address space
 -------------------------------------------------*/
 
-static void watchpoint_check(running_machine *machine, int cpunum, int spacenum, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask)
+static void watchpoint_check(const address_space *space, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum];
+	const cpu_debug_data *info = cpu_get_debug_data(space->cpu);
 	debug_cpu_watchpoint *wp;
 	offs_t size = 0;
 	UINT64 result;
@@ -1403,7 +1374,7 @@ static void watchpoint_check(running_machine *machine, int cpunum, int spacenum,
 	/* adjust address, size & value_to_write based on mem_mask. */
 	if (mem_mask != 0)
 	{
-		int bus_size = info->space[spacenum].databytes;
+		int bus_size = info->space[space->spacenum].databytes;
 		int address_offset = 0;
 
 		while (address_offset < bus_size && (mem_mask & 0xff) == 0)
@@ -1431,7 +1402,7 @@ static void watchpoint_check(running_machine *machine, int cpunum, int spacenum,
 		global.wpdata = value_to_write;
 
 	/* see if we match */
-	for (wp = info->space[spacenum].wplist; wp != NULL; wp = wp->next)
+	for (wp = info->space[space->spacenum].wplist; wp != NULL; wp = wp->next)
 		if (wp->enabled && (wp->type & type) != 0 && address + size > wp->address && address < wp->address + wp->length)
 
 			/* if we do, evaluate the condition */
@@ -1442,7 +1413,7 @@ static void watchpoint_check(running_machine *machine, int cpunum, int spacenum,
 
 				/* if we hit, evaluate the action */
 				if (wp->action != NULL)
-					debug_console_execute_command(machine, wp->action, 0);
+					debug_console_execute_command(space->machine, wp->action, 0);
 
 				/* print a notification, unless the action made us go again */
 				if (global.execution_state == EXECUTION_STATE_STOPPED)
@@ -1455,16 +1426,16 @@ static void watchpoint_check(running_machine *machine, int cpunum, int spacenum,
 
 					if (type & WATCHPOINT_WRITE)
 					{
-						sprintf(buffer, "Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index, sizes[size], BYTE2ADDR(address, &global.cpuinfo[cpunum], spacenum), cpu_get_pc(machine->activecpu));
+						sprintf(buffer, "Stopped at watchpoint %X writing %s to %08X (PC=%X)", wp->index, sizes[size], cpu_byte_to_address(space->cpu, space->spacenum, address), cpu_get_pc(space->cpu));
 						if (value_to_write >> 32)
 							sprintf(&buffer[strlen(buffer)], " (data=%X%08X)", (UINT32)(value_to_write >> 32), (UINT32)value_to_write);
 						else
 							sprintf(&buffer[strlen(buffer)], " (data=%X)", (UINT32)value_to_write);
 					}
 					else
-						sprintf(buffer, "Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index, sizes[size], BYTE2ADDR(address, &global.cpuinfo[cpunum], spacenum), cpu_get_pc(machine->activecpu));
+						sprintf(buffer, "Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index, sizes[size], cpu_byte_to_address(space->cpu, space->spacenum, address), cpu_get_pc(space->cpu));
 					debug_console_printf("%s\n", buffer);
-					compute_debug_flags(machine, info);
+					compute_debug_flags(space->machine, info);
 				}
 				break;
 			}
@@ -1479,15 +1450,15 @@ static void watchpoint_check(running_machine *machine, int cpunum, int spacenum,
 
 int debug_cpu_watchpoint_set(running_machine *machine, int cpunum, int spacenum, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
 	debug_cpu_watchpoint *wp = malloc_or_die(sizeof(*wp));
 
 	/* fill in the structure */
 	wp->index = global.wpindex++;
 	wp->enabled = TRUE;
 	wp->type = type;
-	wp->address = ADDR2BYTE_MASKED(address, &global.cpuinfo[cpunum], spacenum);
-	wp->length = ADDR2BYTE(length, &global.cpuinfo[cpunum], spacenum);
+	wp->address = ADDR2BYTE_MASKED(address, info, spacenum);
+	wp->length = ADDR2BYTE(length, info, spacenum);
 	wp->condition = condition;
 	wp->action = NULL;
 	if (action != NULL)
@@ -1500,7 +1471,7 @@ int debug_cpu_watchpoint_set(running_machine *machine, int cpunum, int spacenum,
 	wp->next = info->space[spacenum].wplist;
 	info->space[spacenum].wplist = wp;
 
-	watchpoint_update_flags(machine, info, spacenum);
+	watchpoint_update_flags(cpu_get_address_space(machine->cpu[cpunum], spacenum));
 
 	return wp->index;
 }
@@ -1516,30 +1487,31 @@ int debug_cpu_watchpoint_clear(running_machine *machine, int wpnum)
 	int cpunum, spacenum;
 
 	/* loop over CPUs and find the requested watchpoint */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		debug_cpu_info *info = &global.cpuinfo[cpunum];
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
 
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			for (pwp = NULL, wp = info->space[spacenum].wplist; wp != NULL; pwp = wp, wp = wp->next)
-				if (wp->index == wpnum)
-				{
-					/* unlink us from the list */
-					if (pwp == NULL)
-						info->space[spacenum].wplist = wp->next;
-					else
-						pwp->next = wp->next;
+			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+				for (pwp = NULL, wp = info->space[spacenum].wplist; wp != NULL; pwp = wp, wp = wp->next)
+					if (wp->index == wpnum)
+					{
+						/* unlink us from the list */
+						if (pwp == NULL)
+							info->space[spacenum].wplist = wp->next;
+						else
+							pwp->next = wp->next;
 
-					/* free the memory */
-					if (wp->condition != NULL)
-						expression_free(wp->condition);
-					if (wp->action != NULL)
-						free(wp->action);
-					free(wp);
+						/* free the memory */
+						if (wp->condition != NULL)
+							expression_free(wp->condition);
+						if (wp->action != NULL)
+							free(wp->action);
+						free(wp);
 
-					watchpoint_update_flags(machine, info, spacenum);
-					return 1;
-				}
+						watchpoint_update_flags(cpu_get_address_space(machine->cpu[cpunum], spacenum));
+						return 1;
+					}
 	}
 
 	/* we didn't find it; return an error */
@@ -1558,19 +1530,20 @@ int debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable)
 	int cpunum, spacenum;
 
 	/* loop over CPUs and address spaces and find the requested watchpoint */
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-	{
-		debug_cpu_info *info = &global.cpuinfo[cpunum];
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
 
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			for (wp = info->space[spacenum].wplist; wp; wp = wp->next)
-				if (wp->index == wpnum)
-				{
-					wp->enabled = (enable != 0);
-					watchpoint_update_flags(machine, info, spacenum);
-					return 1;
-				}
-	}
+			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+				for (wp = info->space[spacenum].wplist; wp; wp = wp->next)
+					if (wp->index == wpnum)
+					{
+						wp->enabled = (enable != 0);
+						watchpoint_update_flags(cpu_get_address_space(machine->cpu[cpunum], spacenum));
+						return 1;
+					}
+		}
 	return 0;
 }
 
@@ -1587,7 +1560,7 @@ int debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable)
 
 int debug_cpu_hotspot_track(running_machine *machine, int cpunum, int numspots, int threshhold)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(machine->cpu[cpunum]);
 
 	/* if we already have tracking info, kill it */
 	if (info->hotspots)
@@ -1606,7 +1579,7 @@ int debug_cpu_hotspot_track(running_machine *machine, int cpunum, int numspots, 
 		info->hotspot_threshhold = threshhold;
 	}
 
-	watchpoint_update_flags(machine, info, ADDRESS_SPACE_PROGRAM);
+	watchpoint_update_flags(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM));
 	return 1;
 }
 
@@ -1616,15 +1589,15 @@ int debug_cpu_hotspot_track(running_machine *machine, int cpunum, int numspots, 
     hotspots on a memory read access
 -------------------------------------------------*/
 
-static void check_hotspots(running_machine *machine, int cpunum, int spacenum, offs_t address)
+static void check_hotspots(const address_space *space, offs_t address)
 {
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
-	offs_t pc = cpu_get_pc(machine->activecpu);
+	cpu_debug_data *info = cpu_get_debug_data(space->cpu);
+	offs_t pc = cpu_get_pc(space->cpu);
 	int hotindex;
 
 	/* see if we have a match in our list */
 	for (hotindex = 0; hotindex < info->hotspot_count; hotindex++)
-		if (info->hotspots[hotindex].access == address && info->hotspots[hotindex].pc == pc && info->hotspots[hotindex].spacenum == spacenum)
+		if (info->hotspots[hotindex].access == address && info->hotspots[hotindex].pc == pc && info->hotspots[hotindex].spacenum == space->spacenum)
 			break;
 
 	/* if we didn't find any, make a new entry */
@@ -1639,7 +1612,7 @@ static void check_hotspots(running_machine *machine, int cpunum, int spacenum, o
 		memmove(&info->hotspots[1], &info->hotspots[0], sizeof(info->hotspots[0]) * (info->hotspot_count - 1));
 		info->hotspots[0].access = address;
 		info->hotspots[0].pc = pc;
-		info->hotspots[0].spacenum = spacenum;
+		info->hotspots[0].spacenum = space->spacenum;
 		info->hotspots[0].count = 1;
 	}
 
@@ -1668,7 +1641,7 @@ static void check_hotspots(running_machine *machine, int cpunum, int spacenum, o
 
 UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum_get_active()];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 	UINT64 custom;
 	UINT8 result;
 
@@ -1676,7 +1649,7 @@ UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 	address &= info->space[spacenum].logbytemask;
 
 	/* all accesses from this point on are for the debugger */
-	memory_set_debugger_access(global.debugger_access = TRUE);
+	memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, return 0xff */
 	if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1688,10 +1661,10 @@ UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 
 	/* otherwise, call the byte reading function for the translated address */
 	else
-		result = (*active_address_space[spacenum]->accessors.read_byte)(address);
+		result = memory_read_byte(active_address_space[spacenum], address);
 
 	/* no longer accessing via the debugger */
-	memory_set_debugger_access(global.debugger_access = FALSE);
+	memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = FALSE);
 	return result;
 }
 
@@ -1703,7 +1676,7 @@ UINT8 debug_read_byte(int spacenum, offs_t address, int apply_translation)
 
 UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum_get_active()];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 	UINT64 custom;
 	UINT16 result;
 
@@ -1711,13 +1684,13 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is misaligned read, or if there are no word readers, just read two bytes */
-	if ((address & 1) || !active_address_space[spacenum]->accessors.read_word)
+	if ((address & 1) != 0)
 	{
 		UINT8 byte0 = debug_read_byte(spacenum, address + 0, apply_translation);
 		UINT8 byte1 = debug_read_byte(spacenum, address + 1, apply_translation);
 
 		/* based on the endianness, the result is assembled differently */
-		if (global.cpuinfo[cpunum_get_active()].endianness == CPU_IS_LE)
+		if (info->endianness == CPU_IS_LE)
 			result = byte0 | (byte1 << 8);
 		else
 			result = byte1 | (byte0 << 8);
@@ -1727,7 +1700,7 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(global.debugger_access = TRUE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffff */
 		if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1739,10 +1712,10 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			result = (*active_address_space[spacenum]->accessors.read_word)(address);
+			result = memory_read_word(active_address_space[spacenum], address);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(global.debugger_access = FALSE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = FALSE);
 	}
 
 	return result;
@@ -1756,7 +1729,7 @@ UINT16 debug_read_word(int spacenum, offs_t address, int apply_translation)
 
 UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum_get_active()];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 	UINT64 custom;
 	UINT32 result;
 
@@ -1764,13 +1737,13 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is misaligned read, or if there are no dword readers, just read two words */
-	if ((address & 3) || !active_address_space[spacenum]->accessors.read_dword)
+	if ((address & 3) != 0)
 	{
 		UINT16 word0 = debug_read_word(spacenum, address + 0, apply_translation);
 		UINT16 word1 = debug_read_word(spacenum, address + 2, apply_translation);
 
 		/* based on the endianness, the result is assembled differently */
-		if (global.cpuinfo[cpunum_get_active()].endianness == CPU_IS_LE)
+		if (info->endianness == CPU_IS_LE)
 			result = word0 | (word1 << 16);
 		else
 			result = word1 | (word0 << 16);
@@ -1780,7 +1753,7 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(global.debugger_access = TRUE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffff */
 		if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1792,10 +1765,10 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			result = (*active_address_space[spacenum]->accessors.read_dword)(address);
+			result = memory_read_dword(active_address_space[spacenum], address);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(global.debugger_access = FALSE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = FALSE);
 	}
 
 	return result;
@@ -1809,7 +1782,7 @@ UINT32 debug_read_dword(int spacenum, offs_t address, int apply_translation)
 
 UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum_get_active()];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 	UINT64 custom;
 	UINT64 result;
 
@@ -1817,13 +1790,13 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is misaligned read, or if there are no qword readers, just read two dwords */
-	if ((address & 7) || !active_address_space[spacenum]->accessors.read_qword)
+	if ((address & 7) != 0)
 	{
 		UINT32 dword0 = debug_read_dword(spacenum, address + 0, apply_translation);
 		UINT32 dword1 = debug_read_dword(spacenum, address + 4, apply_translation);
 
 		/* based on the endianness, the result is assembled differently */
-		if (global.cpuinfo[cpunum_get_active()].endianness == CPU_IS_LE)
+		if (info->endianness == CPU_IS_LE)
 			result = dword0 | ((UINT64)dword1 << 32);
 		else
 			result = dword1 | ((UINT64)dword0 << 32);
@@ -1833,7 +1806,7 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(global.debugger_access = TRUE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, return 0xffffffffffffffff */
 		if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_READ_DEBUG, &address))
@@ -1845,10 +1818,10 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			result = (*active_address_space[spacenum]->accessors.read_qword)(address);
+			result = memory_read_qword(active_address_space[spacenum], address);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(global.debugger_access = FALSE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = FALSE);
 	}
 
 	return result;
@@ -1862,13 +1835,13 @@ UINT64 debug_read_qword(int spacenum, offs_t address, int apply_translation)
 
 void debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_translation)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum_get_active()];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 
 	/* mask against the logical byte mask */
 	address &= info->space[spacenum].logbytemask;
 
 	/* all accesses from this point on are for the debugger */
-	memory_set_debugger_access(global.debugger_access = TRUE);
+	memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = TRUE);
 
 	/* translate if necessary; if not mapped, we're done */
 	if (apply_translation && info->translate != NULL && !(*info->translate)(info->device, spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -1880,10 +1853,10 @@ void debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_transl
 
 	/* otherwise, call the byte reading function for the translated address */
 	else
-		(*active_address_space[spacenum]->accessors.write_byte)(address, data);
+		memory_write_byte(active_address_space[spacenum], address, data);
 
 	/* no longer accessing via the debugger */
-	memory_set_debugger_access(global.debugger_access = FALSE);
+	memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = FALSE);
 	global.memory_modified = TRUE;
 }
 
@@ -1895,15 +1868,15 @@ void debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_transl
 
 void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_translation)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum_get_active()];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 
 	/* mask against the logical byte mask */
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is a misaligned write, or if there are no word writers, just read two bytes */
-	if ((address & 1) || !active_address_space[spacenum]->accessors.write_word)
+	if ((address & 1) != 0)
 	{
-		if (global.cpuinfo[cpunum_get_active()].endianness == CPU_IS_LE)
+		if (info->endianness == CPU_IS_LE)
 		{
 			debug_write_byte(spacenum, address + 0, data >> 0, apply_translation);
 			debug_write_byte(spacenum, address + 1, data >> 8, apply_translation);
@@ -1919,7 +1892,7 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(global.debugger_access = TRUE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && info->translate && !(*info->translate)(info->device, spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -1931,10 +1904,10 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			(*active_address_space[spacenum]->accessors.write_word)(address, data);
+			memory_write_word(active_address_space[spacenum], address, data);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(global.debugger_access = FALSE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = FALSE);
 		global.memory_modified = TRUE;
 	}
 }
@@ -1947,15 +1920,15 @@ void debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_trans
 
 void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_translation)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum_get_active()];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 
 	/* mask against the logical byte mask */
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is a misaligned write, or if there are no dword writers, just read two words */
-	if ((address & 3) || !active_address_space[spacenum]->accessors.write_dword)
+	if ((address & 3) != 0)
 	{
-		if (global.cpuinfo[cpunum_get_active()].endianness == CPU_IS_LE)
+		if (info->endianness == CPU_IS_LE)
 		{
 			debug_write_word(spacenum, address + 0, data >> 0, apply_translation);
 			debug_write_word(spacenum, address + 2, data >> 16, apply_translation);
@@ -1971,7 +1944,7 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(global.debugger_access = TRUE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && info->translate && !(*info->translate)(info->device, spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -1983,10 +1956,10 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			(*active_address_space[spacenum]->accessors.write_dword)(address, data);
+			memory_write_dword(active_address_space[spacenum], address, data);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(global.debugger_access = FALSE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = FALSE);
 		global.memory_modified = TRUE;
 	}
 }
@@ -1999,15 +1972,15 @@ void debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_tran
 
 void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_translation)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum_get_active()];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 
 	/* mask against the logical byte mask */
 	address &= info->space[spacenum].logbytemask;
 
 	/* if this is a misaligned write, or if there are no qword writers, just read two dwords */
-	if ((address & 7) || !active_address_space[spacenum]->accessors.write_qword)
+	if ((address & 7) != 0)
 	{
-		if (global.cpuinfo[cpunum_get_active()].endianness == CPU_IS_LE)
+		if (info->endianness == CPU_IS_LE)
 		{
 			debug_write_dword(spacenum, address + 0, data >> 0, apply_translation);
 			debug_write_dword(spacenum, address + 4, data >> 32, apply_translation);
@@ -2022,7 +1995,7 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 	else
 	{
 		/* all accesses from this point on are for the debugger */
-		memory_set_debugger_access(global.debugger_access = TRUE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = TRUE);
 
 		/* translate if necessary; if not mapped, we're done */
 		if (apply_translation && info->translate && !(*info->translate)(info->device, spacenum, TRANSLATE_WRITE_DEBUG, &address))
@@ -2034,10 +2007,10 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 
 		/* otherwise, call the byte reading function for the translated address */
 		else
-			(*active_address_space[spacenum]->accessors.write_qword)(address, data);
+			memory_write_qword(active_address_space[spacenum], address, data);
 
 		/* no longer accessing via the debugger */
-		memory_set_debugger_access(global.debugger_access = FALSE);
+		memory_set_debugger_access(active_address_space[spacenum], global.debugger_access = FALSE);
 		global.memory_modified = TRUE;
 	}
 }
@@ -2050,7 +2023,8 @@ void debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_tran
 
 UINT64 debug_read_opcode(offs_t address, int size, int arg)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpunum_get_active()];
+	const address_space *space = cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM);
+	cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 	offs_t lowbits_mask;
 	const void *ptr;
 
@@ -2144,19 +2118,18 @@ UINT64 debug_read_opcode(offs_t address, int size, int arg)
 	/* get pointer to data */
 	/* note that we query aligned to the bus width, and then add back the low bits */
 	lowbits_mask = info->space[ADDRESS_SPACE_PROGRAM].databytes - 1;
-	ptr = memory_get_op_ptr(Machine, cpunum_get_active(), address & ~lowbits_mask, arg);
-	if (!ptr)
+	if (!arg)
+		ptr = memory_decrypted_read_ptr(space, address & ~lowbits_mask);
+	else
+		ptr = memory_raw_read_ptr(space, address & ~lowbits_mask);
+	if (ptr == NULL)
 		return ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size));
 	ptr = (UINT8 *)ptr + (address & lowbits_mask);
-
-	/* gross! */
-//  if (osd_is_bad_read_ptr(ptr, size))
-//      fatalerror("debug_read_opcode: cpu %d address %x mapped to invalid memory %p", cpunum_get_active(), address, ptr);
 
 	/* return based on the size */
 	switch (size)
 	{
-		case 1:	return *(UINT8 *) ptr;
+		case 1: return *(UINT8 *) ptr;
 		case 2:	return *(UINT16 *)ptr;
 		case 4:	return *(UINT32 *)ptr;
 		case 8:	return *(UINT64 *)ptr;
@@ -2229,27 +2202,31 @@ static UINT64 expression_read_memory(const char *name, int space, UINT32 address
     from a specific CPU's address space
 -------------------------------------------------*/
 
-static UINT64 expression_read_address_space(int cpuindex, int space, offs_t address, int size)
+static UINT64 expression_read_address_space(int cpuindex, int spacenum, offs_t address, int size)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpuindex];
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 
-	/* only process if in of range and we have a bus */
-	if (cpuindex < ARRAY_LENGTH(global.cpuinfo) && info->space[space].databytes != 0)
+	if (cpuindex >= 0 && cpuindex < ARRAY_LENGTH(Machine->cpu) && Machine->cpu[cpuindex] != NULL)
 	{
-		/* adjust the address into a byte address */
-		address = ADDR2BYTE(address, info, space);
+		cpu_debug_data *info = cpu_get_debug_data(Machine->cpu[cpuindex]);
 
-		/* switch contexts and do the read */
-		cpu_push_context(Machine->cpu[cpuindex]);
-		switch (size)
+		/* only process if in of range and we have a bus */
+		if (info->space[spacenum].databytes != 0)
 		{
-			case 1:		result = debug_read_byte(space, address, TRUE);		break;
-			case 2:		result = debug_read_word(space, address, TRUE);		break;
-			case 4:		result = debug_read_dword(space, address, TRUE);	break;
-			case 8:		result = debug_read_qword(space, address, TRUE);	break;
+			/* adjust the address into a byte address */
+			address = ADDR2BYTE(address, info, spacenum);
+
+			/* switch contexts and do the read */
+			cpu_push_context(Machine->cpu[cpuindex]);
+			switch (size)
+			{
+				case 1:		result = debug_read_byte(spacenum, address, TRUE);		break;
+				case 2:		result = debug_read_word(spacenum, address, TRUE);		break;
+				case 4:		result = debug_read_dword(spacenum, address, TRUE);	break;
+				case 8:		result = debug_read_qword(spacenum, address, TRUE);	break;
+			}
+			cpu_pop_context();
 		}
-		cpu_pop_context();
 	}
 	return result;
 }
@@ -2262,53 +2239,57 @@ static UINT64 expression_read_address_space(int cpuindex, int space, offs_t addr
 
 static UINT64 expression_read_program_direct(int cpuindex, int opcode, offs_t address, int size)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpuindex];
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
-	UINT8 *base;
 
-	/* only process if in of range and we have a bus */
-	if (cpuindex < ARRAY_LENGTH(global.cpuinfo) && info->space[ADDRESS_SPACE_PROGRAM].databytes != 0)
+	if (cpuindex >= 0 && cpuindex < ARRAY_LENGTH(Machine->cpu) && Machine->cpu[cpuindex] != NULL)
 	{
-		/* adjust the address into a byte address, but not if being called recursively */
-		if ((opcode & 2) == 0)
-			address = ADDR2BYTE(address, info, ADDRESS_SPACE_PROGRAM);
+		cpu_debug_data *info = cpu_get_debug_data(Machine->cpu[cpuindex]);
+		UINT8 *base;
 
-		/* call ourself recursively until we are byte-sized */
-		if (size > 1)
+		/* only process if in of range and we have a bus */
+		if (info->space[ADDRESS_SPACE_PROGRAM].databytes != 0)
 		{
-			int halfsize = size / 2;
-			UINT64 r0, r1;
+			/* adjust the address into a byte address, but not if being called recursively */
+			if ((opcode & 2) == 0)
+				address = ADDR2BYTE(address, info, ADDRESS_SPACE_PROGRAM);
 
-			/* read each half, from lower address to upper address */
-			r0 = expression_read_program_direct(cpuindex, opcode | 2, address + 0, halfsize);
-			r1 = expression_read_program_direct(cpuindex, opcode | 2, address + halfsize, halfsize);
-
-			/* assemble based on the target endianness */
-			if (info->endianness == CPU_IS_LE)
-				result = r0 | (r1 << (8 * halfsize));
-			else
-				result = r1 | (r0 << (8 * halfsize));
-		}
-
-		/* handle the byte-sized final requests */
-		else
-		{
-			/* lowmask specified which address bits are within the databus width */
-			offs_t lowmask = info->space[ADDRESS_SPACE_PROGRAM].databytes - 1;
-
-			/* get the base of memory, aligned to the address minus the lowbits */
-			if (opcode & 1)
-				base = memory_get_op_ptr(Machine, cpuindex, address & ~lowmask, FALSE);
-			else
-				base = memory_get_read_ptr(cpuindex, ADDRESS_SPACE_PROGRAM, address & ~lowmask);
-
-			/* if we have a valid base, return the appropriate byte */
-			if (base != NULL)
+			/* call ourself recursively until we are byte-sized */
+			if (size > 1)
 			{
+				int halfsize = size / 2;
+				UINT64 r0, r1;
+
+				/* read each half, from lower address to upper address */
+				r0 = expression_read_program_direct(cpuindex, opcode | 2, address + 0, halfsize);
+				r1 = expression_read_program_direct(cpuindex, opcode | 2, address + halfsize, halfsize);
+
+				/* assemble based on the target endianness */
 				if (info->endianness == CPU_IS_LE)
-					result = base[BYTE8_XOR_LE(address) & lowmask];
+					result = r0 | (r1 << (8 * halfsize));
 				else
-					result = base[BYTE8_XOR_BE(address) & lowmask];
+					result = r1 | (r0 << (8 * halfsize));
+			}
+
+			/* handle the byte-sized final requests */
+			else
+			{
+				/* lowmask specified which address bits are within the databus width */
+				offs_t lowmask = info->space[ADDRESS_SPACE_PROGRAM].databytes - 1;
+
+				/* get the base of memory, aligned to the address minus the lowbits */
+				if (opcode & 1)
+					base = memory_decrypted_read_ptr(cpu_get_address_space(Machine->cpu[cpuindex], ADDRESS_SPACE_PROGRAM), address & ~lowmask);
+				else
+					base = memory_get_read_ptr(cpu_get_address_space(Machine->cpu[cpuindex], ADDRESS_SPACE_PROGRAM), address & ~lowmask);
+
+				/* if we have a valid base, return the appropriate byte */
+				if (base != NULL)
+				{
+					if (info->endianness == CPU_IS_LE)
+						result = base[BYTE8_XOR_LE(address) & lowmask];
+					else
+						result = base[BYTE8_XOR_BE(address) & lowmask];
+				}
 			}
 		}
 	}
@@ -2441,24 +2422,27 @@ static void expression_write_memory(const char *name, int space, UINT32 address,
 
 static void expression_write_address_space(int cpuindex, int space, offs_t address, int size, UINT64 data)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpuindex];
-
-	/* only process if in of range and we have a bus */
-	if (cpuindex < ARRAY_LENGTH(global.cpuinfo) && info->space[space].databytes != 0)
+	if (cpuindex >= 0 && cpuindex < ARRAY_LENGTH(Machine->cpu) && Machine->cpu[cpuindex] != NULL)
 	{
-		/* adjust the address into a byte address */
-		address = ADDR2BYTE(address, info, space);
+		const cpu_debug_data *info = cpu_get_debug_data(Machine->cpu[cpuindex]);
 
-		/* switch contexts and do the write */
-		cpu_push_context(Machine->cpu[cpuindex]);
-		switch (size)
+		/* only process if in of range and we have a bus */
+		if (info->space[space].databytes != 0)
 		{
-			case 1:		debug_write_byte(space, address, data, TRUE);	break;
-			case 2:		debug_write_word(space, address, data, TRUE);	break;
-			case 4:		debug_write_dword(space, address, data, TRUE);	break;
-			case 8:		debug_write_qword(space, address, data, TRUE);	break;
+			/* adjust the address into a byte address */
+			address = ADDR2BYTE(address, info, space);
+
+			/* switch contexts and do the write */
+			cpu_push_context(Machine->cpu[cpuindex]);
+			switch (size)
+			{
+				case 1:		debug_write_byte(space, address, data, TRUE);	break;
+				case 2:		debug_write_word(space, address, data, TRUE);	break;
+				case 4:		debug_write_dword(space, address, data, TRUE);	break;
+				case 8:		debug_write_qword(space, address, data, TRUE);	break;
+			}
+			cpu_pop_context();
 		}
-		cpu_pop_context();
 	}
 }
 
@@ -2470,60 +2454,63 @@ static void expression_write_address_space(int cpuindex, int space, offs_t addre
 
 static void expression_write_program_direct(int cpuindex, int opcode, offs_t address, int size, UINT64 data)
 {
-	const debug_cpu_info *info = &global.cpuinfo[cpuindex];
-	UINT8 *base;
-
-	/* only process if in of range and we have a bus */
-	if (cpuindex < ARRAY_LENGTH(global.cpuinfo) && info->space[ADDRESS_SPACE_PROGRAM].databytes != 0)
+	if (cpuindex >= 0 && cpuindex < ARRAY_LENGTH(Machine->cpu) && Machine->cpu[cpuindex] != NULL)
 	{
-		/* adjust the address into a byte address, but not if being called recursively */
-		if ((opcode & 2) == 0)
-			address = ADDR2BYTE(address, info, ADDRESS_SPACE_PROGRAM);
+		const cpu_debug_data *info = cpu_get_debug_data(Machine->cpu[cpuindex]);
+		UINT8 *base;
 
-		/* call ourself recursively until we are byte-sized */
-		if (size > 1)
+		/* only process if in of range and we have a bus */
+		if (info->space[ADDRESS_SPACE_PROGRAM].databytes != 0)
 		{
-			int halfsize = size / 2;
-			UINT64 r0, r1, halfmask;
+			/* adjust the address into a byte address, but not if being called recursively */
+			if ((opcode & 2) == 0)
+				address = ADDR2BYTE(address, info, ADDRESS_SPACE_PROGRAM);
 
-			/* break apart based on the target endianness */
-			halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
-			if (info->endianness == CPU_IS_LE)
+			/* call ourself recursively until we are byte-sized */
+			if (size > 1)
 			{
-				r0 = data & halfmask;
-				r1 = (data >> (8 * halfsize)) & halfmask;
-			}
-			else
-			{
-				r0 = (data >> (8 * halfsize)) & halfmask;
-				r1 = data & halfmask;
-			}
+				int halfsize = size / 2;
+				UINT64 r0, r1, halfmask;
 
-			/* write each half, from lower address to upper address */
-			expression_write_program_direct(cpuindex, opcode | 2, address + 0, halfsize, r0);
-			expression_write_program_direct(cpuindex, opcode | 2, address + halfsize, halfsize, r1);
-		}
-
-		/* handle the byte-sized final case */
-		else
-		{
-			/* lowmask specified which address bits are within the databus width */
-			offs_t lowmask = info->space[ADDRESS_SPACE_PROGRAM].databytes - 1;
-
-			/* get the base of memory, aligned to the address minus the lowbits */
-			if (opcode & 1)
-				base = memory_get_op_ptr(Machine, cpuindex, address & ~lowmask, FALSE);
-			else
-				base = memory_get_read_ptr(cpuindex, ADDRESS_SPACE_PROGRAM, address & ~lowmask);
-
-			/* if we have a valid base, write the appropriate byte */
-			if (base != NULL)
-			{
+				/* break apart based on the target endianness */
+				halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
 				if (info->endianness == CPU_IS_LE)
-					base[BYTE8_XOR_LE(address) & lowmask] = data;
+				{
+					r0 = data & halfmask;
+					r1 = (data >> (8 * halfsize)) & halfmask;
+				}
 				else
-					base[BYTE8_XOR_BE(address) & lowmask] = data;
-				global.memory_modified = TRUE;
+				{
+					r0 = (data >> (8 * halfsize)) & halfmask;
+					r1 = data & halfmask;
+				}
+
+				/* write each half, from lower address to upper address */
+				expression_write_program_direct(cpuindex, opcode | 2, address + 0, halfsize, r0);
+				expression_write_program_direct(cpuindex, opcode | 2, address + halfsize, halfsize, r1);
+			}
+
+			/* handle the byte-sized final case */
+			else
+			{
+				/* lowmask specified which address bits are within the databus width */
+				offs_t lowmask = info->space[ADDRESS_SPACE_PROGRAM].databytes - 1;
+
+				/* get the base of memory, aligned to the address minus the lowbits */
+				if (opcode & 1)
+					base = memory_decrypted_read_ptr(cpu_get_address_space(Machine->cpu[cpuindex], ADDRESS_SPACE_PROGRAM), address & ~lowmask);
+				else
+					base = memory_get_read_ptr(cpu_get_address_space(Machine->cpu[cpuindex], ADDRESS_SPACE_PROGRAM), address & ~lowmask);
+
+				/* if we have a valid base, write the appropriate byte */
+				if (base != NULL)
+				{
+					if (info->endianness == CPU_IS_LE)
+						base[BYTE8_XOR_LE(address) & lowmask] = data;
+					else
+						base[BYTE8_XOR_BE(address) & lowmask] = data;
+					global.memory_modified = TRUE;
+				}
 			}
 		}
 	}
@@ -2679,7 +2666,7 @@ void debug_cpu_trace_printf(int cpunum, const char *fmt, ...)
 {
 	va_list va;
 
-	debug_cpu_info *info = &global.cpuinfo[cpunum];
+	cpu_debug_data *info = cpu_get_debug_data(Machine->cpu[cpunum]);
 
 	if (info->trace.file)
 	{
@@ -2730,8 +2717,9 @@ void debug_cpu_flush_traces(void)
 		for (cpunum = 0; cpunum < ARRAY_LENGTH(Machine->cpu); cpunum++)
 			if (Machine->cpu[cpunum] != NULL)
 			{
-				if (global.cpuinfo[cpunum].trace.file)
-					fflush(global.cpuinfo[cpunum].trace.file);
+				cpu_debug_data *info = cpu_get_debug_data(Machine->cpu[cpunum]);
+				if (info->trace.file != NULL)
+					fflush(info->trace.file);
 			}
 }
 
@@ -2814,7 +2802,8 @@ static void set_tempvar(void *ref, UINT64 value)
 
 static UINT64 get_logunmap(void *ref)
 {
-	return memory_get_log_unmap((FPTR)ref);
+	const address_space *space = cpu_get_address_space(Machine->activecpu, (FPTR)ref);
+	return (space != NULL) ? memory_get_log_unmap(space) : TRUE;
 }
 
 
@@ -2873,7 +2862,9 @@ static UINT64 get_frame(void *ref)
 
 static void set_logunmap(void *ref, UINT64 value)
 {
-	memory_set_log_unmap((FPTR)ref, value ? 1 : 0);
+	const address_space *space = cpu_get_address_space(Machine->activecpu, (FPTR)ref);
+	if (space != NULL)
+		memory_set_log_unmap(space, value ? 1 : 0);
 }
 
 

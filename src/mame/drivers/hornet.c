@@ -1028,7 +1028,7 @@ static MACHINE_RESET( hornet )
 	UINT8 *usr5 = memory_region(machine, "user5");
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
+		memory_configure_bank(machine, 1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
 		memory_set_bank(1, 0);
 	}
 
@@ -1101,7 +1101,7 @@ static MACHINE_RESET( hornet_2board )
 
 	if (usr3 != NULL)
 	{
-		memory_configure_bank(1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
+		memory_configure_bank(machine, 1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
 		memory_set_bank(1, 0);
 	}
 	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);

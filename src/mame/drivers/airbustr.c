@@ -762,7 +762,7 @@ ROM_END
 
 static DRIVER_INIT( airbustr )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe000, 0xefff, 0, 0, devram_r); // protection device lives here
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe000, 0xefff, 0, 0, devram_r); // protection device lives here
 }
 
 

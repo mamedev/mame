@@ -106,7 +106,7 @@ static WRITE8_HANDLER( skykid_irq_2_ctrl_w )
 static MACHINE_START( skykid )
 {
 	/* configure the banks */
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x2000);
 
 	state_save_register_global(inputport_selected);
 }

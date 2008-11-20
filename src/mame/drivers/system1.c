@@ -39,13 +39,13 @@ static MACHINE_RESET( system1 )
 static MACHINE_RESET( system1_banked )
 {
 	MACHINE_RESET_CALL(system1);
-	memory_configure_bank(1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 static MACHINE_RESET( wbml )
 {
 	system1_define_background_memory(system1_BACKGROUND_MEMORY_BANKED);
-	memory_configure_bank(1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 // Noboranka: there seems to be some protection? involving reads / writes to ports in the 2x region
@@ -3995,11 +3995,11 @@ static DRIVER_INIT( dakkochn )
 {
 	mc8123_decrypt_rom(machine, "main", "user1", 1, 4);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x00, 0x00, 0, 0, dakkochn_port_00_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, dakkochn_port_03_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, dakkochn_port_04_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x00, 0x00, 0, 0, dakkochn_port_00_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, dakkochn_port_03_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, dakkochn_port_04_r);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0x15, 0x15, 0, 0, dakkochn_port_15_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x15, 0x15, 0, 0, dakkochn_port_15_w);
 
 }
 
@@ -4073,14 +4073,16 @@ static DRIVER_INIT( noboranb )
 
 static DRIVER_INIT( bootleg )
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x10000);
 }
 
 
 static DRIVER_INIT( bootlegb )
 {
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, memory_region(machine, "main") + 0x20000);
-	memory_configure_bank_decrypted(1, 0, 4, memory_region(machine, "main") + 0x30000, 0x4000);
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "main") + 0x20000);
+	memory_configure_bank_decrypted(machine, 1, 0, 4, memory_region(machine, "main") + 0x30000, 0x4000);
 }
 
 /*************************************

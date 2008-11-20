@@ -105,11 +105,12 @@ static UINT8 decrypt_opcode(int a,int src)
 
 void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 {
+	const address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_malloc(length);
 	UINT8 *rom = memory_region(machine, cpu);
 	int i;
 
-	memory_set_decrypted_region(mame_find_cpu_index(machine, cpu), 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 
 	for (i = 0;i < length;i++)
 	{
@@ -120,7 +121,7 @@ void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 	}
 
 	if (length > 0x10000)
-		memory_configure_bank_decrypted(1, 0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
+		memory_configure_bank_decrypted(machine, 1, 0, (length - 0x10000) / 0x8000, decrypt + 0x10000, 0x8000);
 }
 
 
@@ -362,7 +363,7 @@ MACHINE_RESET( seibu_sound )
 	sound_cpu=mame_find_cpu_index(machine, "audio");
 	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
-		memory_configure_bank(1, 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
+		memory_configure_bank(machine, 1, 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
 }
 
 /***************************************************************************/

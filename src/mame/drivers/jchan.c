@@ -882,8 +882,8 @@ static DRIVER_INIT( jchan )
 {
 	DRIVER_INIT_CALL( decrypt_toybox_rom );
 	// install these here, putting them in the memory map causes issues
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x403ffe, 0x403fff, 0, 0, main2sub_cmd_w );
-	memory_install_write16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x400000, 0x400001, 0, 0, sub2main_cmd_w );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x403ffe, 0x403fff, 0, 0, main2sub_cmd_w );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x400000, 0x400001, 0, 0, sub2main_cmd_w );
 
 
 	memset(jchan_mcu_com, 0, 4 * sizeof( UINT16 ) );

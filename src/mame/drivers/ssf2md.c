@@ -18,12 +18,12 @@ static READ16_HANDLER( ssf2ghw_dsw_r )
 
 static DRIVER_INIT( ssf2ghw )
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xA130F0, 0xA130FF, 0, 0, SMH_NOP); // custom banking is disabled (!)
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x400000, 0x5fffff, 0, 0, SMH_BANK5, SMH_UNMAP);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xA130F0, 0xA130FF, 0, 0, SMH_NOP); // custom banking is disabled (!)
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400000, 0x5fffff, 0, 0, SMH_BANK5, SMH_UNMAP);
 
 	memory_set_bankptr( 5, memory_region( machine, "main" )+0x400000 );
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x770070, 0x770075, 0, 0, ssf2ghw_dsw_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, ssf2ghw_dsw_r );
 
 	DRIVER_INIT_CALL(megadrij);
 

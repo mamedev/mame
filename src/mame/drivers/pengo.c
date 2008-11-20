@@ -659,11 +659,12 @@ static DRIVER_INIT( penta )
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 },	/* ...1...1...0.... */
 		{ 0x88,0x0a,0x82,0x00,0xa0,0x22,0xaa,0x28 }		/* ...1...1...1.... */
 	};
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_malloc(0x8000);
 	UINT8 *rom = memory_region(machine, "main");
 	int A;
 
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	for (A = 0x0000;A < 0x8000;A++)
 	{

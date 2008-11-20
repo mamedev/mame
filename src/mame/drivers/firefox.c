@@ -435,7 +435,7 @@ static void firq_gen(const device_config *device, int state)
 
 static MACHINE_START( firefox )
 {
-	memory_configure_bank(1, 0, 32, memory_region(machine, "main") + 0x10000, 0x1000);
+	memory_configure_bank(machine, 1, 0, 32, memory_region(machine, "main") + 0x10000, 0x1000);
 	nvram_1c = devtag_get_device(machine, X2212, "nvram_1c");
 	nvram_1d = devtag_get_device(machine, X2212, "nvram_1d");
 

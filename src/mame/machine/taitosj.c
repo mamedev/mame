@@ -26,8 +26,8 @@ static UINT32 address;
 
 MACHINE_START( taitosj )
 {
-	memory_configure_bank(1, 0, 1, memory_region(machine, "main") + 0x6000, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "main") + 0x10000, 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x6000, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "main") + 0x10000, 0);
 
 	state_save_register_global(fromz80);
 	state_save_register_global(toz80);

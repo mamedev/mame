@@ -632,6 +632,7 @@ static void optimise_sboxes(struct optimised_sbox* out, const struct sbox* in)
 
 static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UINT32 upper_limit)
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
 	int length = memory_region_length(machine, "main");
 	UINT16 *dec = auto_malloc(length);
@@ -719,7 +720,7 @@ static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UIN
 		}
 	}
 
-	memory_set_decrypted_region(0, 0x000000, length - 1, dec);
+	memory_set_decrypted_region(space, 0x000000, length - 1, dec);
 	m68k_set_encrypted_opcode_range(machine->cpu[0],0,length);
 }
 

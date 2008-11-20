@@ -185,8 +185,8 @@ MACHINE_RESET( balsente )
 
 	/* point the banks to bank 0 */
 	numbanks = (memory_region_length(machine, "main") > 0x40000) ? 16 : 8;
-	memory_configure_bank(1, 0, numbanks, &memory_region(machine, "main")[0x10000], 0x6000);
-	memory_configure_bank(2, 0, numbanks, &memory_region(machine, "main")[0x12000], 0x6000);
+	memory_configure_bank(machine, 1, 0, numbanks, &memory_region(machine, "main")[0x10000], 0x6000);
+	memory_configure_bank(machine, 2, 0, numbanks, &memory_region(machine, "main")[0x12000], 0x6000);
 	memory_set_bank(1, 0);
 	memory_set_bank(2, 0);
 

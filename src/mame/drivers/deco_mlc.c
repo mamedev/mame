@@ -732,7 +732,7 @@ static DRIVER_INIT( avengrgs )
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x32dc);
 
 	mainCpuIsArm=0;
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x01089a0, 0x01089a3, 0, 0, avengrgs_speedup_r );
 	descramble_sound(machine);
 }
 

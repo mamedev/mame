@@ -123,15 +123,15 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 {
 	if ((data & 0x07) == 0)
 	{
-		memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc600, 0xc7ff, 0, 0, watchdog_reset_w);
-		memory_install_write8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc800, 0xc9ff, 0, 0, beezer_map_w);
-		memory_install_read8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xca00, 0xcbff, 0, 0, beezer_line_r);
-		memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xce00, 0xcfff, 0, 0, via_0_r, via_0_w);
+		memory_install_write8_handler(space, 0xc600, 0xc7ff, 0, 0, watchdog_reset_w);
+		memory_install_write8_handler(space, 0xc800, 0xc9ff, 0, 0, beezer_map_w);
+		memory_install_read8_handler(space, 0xca00, 0xcbff, 0, 0, beezer_line_r);
+		memory_install_readwrite8_handler(space, 0xce00, 0xcfff, 0, 0, via_0_r, via_0_w);
 	}
 	else
 	{
 		UINT8 *rom = memory_region(space->machine, "main") + 0x10000;
-		memory_install_readwrite8_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_BANK1);
+		memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_BANK1);
 		memory_set_bankptr(1, rom + (data & 0x07) * 0x2000 + ((data & 0x08) ? 0x1000: 0));
 	}
 }

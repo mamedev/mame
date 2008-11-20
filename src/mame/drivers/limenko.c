@@ -1007,21 +1007,21 @@ static READ32_HANDLER( spotty_speedup_r )
 
 static DRIVER_INIT( dynabomb )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe2784, 0xe2787, 0, 0, dynabomb_speedup_r );
 
 	spriteram_bit = 1;
 }
 
 static DRIVER_INIT( legendoh )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x32ab0, 0x32ab3, 0, 0, legendoh_speedup_r );
 
 	spriteram_bit = 1;
 }
 
 static DRIVER_INIT( sb2003 )
 {
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x135800, 0x135803, 0, 0, sb2003_speedup_r );
 
 	spriteram_bit = 1;
 }
@@ -1041,7 +1041,7 @@ static DRIVER_INIT( spotty )
 		dst[x+2] = (src[x+1]&0x0f) >> 0;
 	}
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6626c, 0x6626f, 0, 0, spotty_speedup_r );
 
 	spriteram_bit = 1;
 }

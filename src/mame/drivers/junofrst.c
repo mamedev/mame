@@ -431,8 +431,8 @@ static DRIVER_INIT( junofrst )
 {
 	UINT8 *decrypted = konami1_decode(machine, "main");
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x1000);
-	memory_configure_bank_decrypted(1, 0, 16, decrypted + 0x10000, 0x1000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x1000);
+	memory_configure_bank_decrypted(machine, 1, 0, 16, decrypted + 0x10000, 0x1000);
 }
 
 

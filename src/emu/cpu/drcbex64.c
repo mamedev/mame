@@ -278,6 +278,7 @@ struct _drcbe_state
 	x86code *				debug_log_hashjmp;		/* hashjmp debugging */
 	x86code *				drcmap_get_value;		/* map lookup helper */
 	data_accessors			accessors[ADDRESS_SPACES];/* memory accessors */
+	const address_space *	space[ADDRESS_SPACES];	/* address spaces */
 
 	UINT8					sse41;					/* do we have SSE4.1 support? */
 	UINT32					ssemode;				/* saved SSE mode */
@@ -706,6 +707,14 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, UINT32
 	drcbe->cache = cache;
 	drcbe->rbpvalue = drccache_near(cache) + 0x80;
 
+	/* get address spaces and accessors */
+	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+		if (active_address_space[spacenum] != NULL)
+		{
+			drcbe->accessors[spacenum] = active_address_space[spacenum]->accessors;
+			drcbe->space[spacenum] = active_address_space[spacenum];
+		}
+
 	/* build up necessary arrays */
 	memcpy(drcbe->ssecontrol, sse_control, sizeof(drcbe->ssecontrol));
 	drcbe->absmask32 = drccache_memory_alloc_near(cache, 16*2 + 15);
@@ -794,12 +803,6 @@ static void drcbex64_reset(drcbe_state *drcbe)
 	/* output a note to the log */
 	if (drcbe->log != NULL)
 		x86log_printf(drcbe->log, "\n\n===========\nCACHE RESET\n===========\n\n");
-
-	/* fetch the accessors now that things are ready to go */
-	/* FIXME: Not sure about this one */
-	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-		if (active_address_space[spacenum] != NULL)
-			drcbe->accessors[spacenum] = active_address_space[spacenum]->accessors;
 
 	/* generate a little bit of glue code to set up the environment */
 	dst = (x86code **)drccache_begin_codegen(drcbe->cache, 500);
@@ -4075,7 +4078,9 @@ static x86code *op_read(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
 	/* set up a call to the read byte handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
+	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+																						// mov    param1,space
+	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
 	{
 		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].read_byte);
@@ -4134,11 +4139,13 @@ static x86code *op_readm(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
 	/* set up a call to the read byte handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
+	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+																						// mov    param1,space
+	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
-		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &maskp);								// mov    param2,maskp
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &maskp);								// mov    param3,maskp
 	else
-		emit_mov_r64_p64(drcbe, &dst, REG_PARAM2, &maskp);								// mov    param2,maskp
+		emit_mov_r64_p64(drcbe, &dst, REG_PARAM3, &maskp);								// mov    param3,maskp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
 	{
 		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].read_word_masked);
@@ -4187,11 +4194,13 @@ static x86code *op_write(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	param_normalize_3(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
 	/* set up a call to the write byte handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
+	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+																						// mov    param1,space
+	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
-		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &srcp);								// mov    param1,srcp
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &srcp);								// mov    param3,srcp
 	else
-		emit_mov_r64_p64(drcbe, &dst, REG_PARAM2, &srcp);								// mov    param1,srcp
+		emit_mov_r64_p64(drcbe, &dst, REG_PARAM3, &srcp);								// mov    param3,srcp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
 		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_byte);
 																						// call   write_byte
@@ -4225,16 +4234,18 @@ static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	param_normalize_4(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI, &maskp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
 	/* set up a call to the write byte handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
+	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+																						// mov    param1,space
+	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
 	{
-		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &srcp);								// mov    param2,srcp
-		emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &maskp);								// mov    param3,maskp
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &srcp);								// mov    param3,srcp
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM4, &maskp);								// mov    param4,maskp
 	}
 	else
 	{
-		emit_mov_r64_p64(drcbe, &dst, REG_PARAM2, &srcp);								// mov    param2,srcp
-		emit_mov_r64_p64(drcbe, &dst, REG_PARAM3, &maskp);								// mov    param3,maskp
+		emit_mov_r64_p64(drcbe, &dst, REG_PARAM3, &srcp);								// mov    param3,srcp
+		emit_mov_r64_p64(drcbe, &dst, REG_PARAM4, &maskp);								// mov    param4,maskp
 	}
 	if ((spacesizep.value & 3) == DRCUML_SIZE_WORD)
 		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacesizep.value / 16].write_word_masked);
@@ -6220,7 +6231,9 @@ static x86code *op_fread(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MF, &addrp, PTYPE_MRI, &spacep, PTYPE_I);
 
 	/* set up a call to the read dword/qword handler */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
+	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+																						// mov    param1,space
+	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if (inst->size == 4)
 		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_dword);// call   read_dword
 	else if (inst->size == 8)
@@ -6262,15 +6275,17 @@ static x86code *op_fwrite(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	param_normalize_3(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MF, &spacep, PTYPE_I);
 
 	/* general case */
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param1,addrp
+	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+																						// mov    param1,space
+	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param21,addrp
 
 	/* 32-bit form */
 	if (inst->size == 4)
 	{
 		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_mov_r32_m32(&dst, REG_PARAM2, MABS(drcbe, srcp.value));				// mov    param2,[srcp]
+			emit_mov_r32_m32(&dst, REG_PARAM3, MABS(drcbe, srcp.value));				// mov    param3,[srcp]
 		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_movd_r32_r128(&dst, REG_PARAM2, srcp.value);							// movd   param2,srcp
+			emit_movd_r32_r128(&dst, REG_PARAM3, srcp.value);							// movd   param3,srcp
 		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].write_dword);// call   write_dword
 	}
 
@@ -6278,9 +6293,9 @@ static x86code *op_fwrite(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	else if (inst->size == 8)
 	{
 		if (srcp.type == DRCUML_PTYPE_MEMORY)
-			emit_mov_r64_m64(&dst, REG_PARAM2, MABS(drcbe, srcp.value));				// mov    param2,[srcp]
+			emit_mov_r64_m64(&dst, REG_PARAM3, MABS(drcbe, srcp.value));				// mov    param3,[srcp]
 		else if (srcp.type == DRCUML_PTYPE_FLOAT_REGISTER)
-			emit_movq_r64_r128(&dst, REG_PARAM2, srcp.value);							// movq   param2,srcp
+			emit_movq_r64_r128(&dst, REG_PARAM3, srcp.value);							// movq   param3,srcp
 		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].write_qword);// call   write_qword
 	}
 

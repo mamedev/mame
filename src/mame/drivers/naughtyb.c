@@ -770,7 +770,7 @@ ROM_END
 static DRIVER_INIT( popflame )
 {
 	/* install a handler to catch protection checks */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9000, 0x9000, 0, 0, popflame_protection_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9000, 0x9000, 0, 0, popflame_protection_r);
 }
 
 static int question_offset = 0;
@@ -799,7 +799,7 @@ static WRITE8_HANDLER( trvmstr_questions_w )
 static DRIVER_INIT( trvmstr )
 {
 	/* install questions' handlers  */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc002, 0, 0, trvmstr_questions_r, trvmstr_questions_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc002, 0, 0, trvmstr_questions_r, trvmstr_questions_w);
 }
 
 

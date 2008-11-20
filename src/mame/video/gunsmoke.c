@@ -134,7 +134,7 @@ VIDEO_START( gunsmoke )
 {
 	/* configure ROM banking */
 	UINT8 *rombase = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 4, &rombase[0x10000], 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, &rombase[0x10000], 0x4000);
 
 	/* create tilemaps */
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_cols,  32, 32, 2048, 8);

@@ -62,7 +62,7 @@ static WRITE8_HANDLER( rom_bank_select_w )
 static MACHINE_START( crgolf )
 {
 	/* configure the banking */
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
 	memory_set_bank(1, 0);
 
 	/* register for save states */
@@ -580,7 +580,7 @@ ROM_END
 
 static DRIVER_INIT( crgolfhi )
 {
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xa000, 0xa003, 0, 0, crgolfhi_sample_w);
 }
 
 

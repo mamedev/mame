@@ -1190,7 +1190,7 @@ static void install_speedups(running_machine *machine, speedup_entry *entries, i
 	speedup_count = count;
 
 	for (i = 0; i < count; i++)
-		memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
+		memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), entries[i].offset, entries[i].offset + 3, 0, 0, speedup_handlers[i]);
 
 #ifdef MAME_DEBUG
 	add_exit_callback(machine, report_speedups);

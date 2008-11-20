@@ -791,13 +791,13 @@ static WRITE32_HANDLER( quizmoon_speedup_w )
 
 static DRIVER_INIT( macrossp )
 {
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf10158, 0xf1015b, 0, 0, macrossp_speedup_w );
 }
 
 static DRIVER_INIT( quizmoon )
 {
 #ifdef UNUSED_FUNCTION
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf00020, 0xf00023, 0, 0, quizmoon_speedup_w );
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00020, 0xf00023, 0, 0, quizmoon_speedup_w );
 #endif
 }
 

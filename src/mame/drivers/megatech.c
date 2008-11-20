@@ -272,7 +272,7 @@ static WRITE8_HANDLER( mt_sms_standard_rom_bank_w )
 	{
 		case 0:
 			logerror("bank w %02x %02x\n", offset, data);
-			memory_install_readwrite8_handler(space->machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
+			memory_install_readwrite8_handler(space, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
 
 			//printf("bank ram??\n");
 			break;
@@ -306,19 +306,19 @@ READ8_HANDLER( md_sms_ioport_dd_r )
 static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0x7e, 0x7e, 0, 0, md_sms_vdp_vcounter_r, sms_sn76496_w);
-	memory_install_write8_handler    (machine, 1, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, sms_sn76496_w);
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0xbe, 0xbe, 0, 0, md_sms_vdp_data_r, md_sms_vdp_data_w);
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0xbf, 0xbf, 0, 0, md_sms_vdp_ctrl_r, md_sms_vdp_ctrl_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x7e, 0x7e, 0, 0, md_sms_vdp_vcounter_r, sms_sn76496_w);
+	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, sms_sn76496_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xbe, 0xbe, 0, 0, md_sms_vdp_data_r, md_sms_vdp_data_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xbf, 0xbf, 0, 0, md_sms_vdp_ctrl_r, md_sms_vdp_ctrl_w);
 
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0x10, 0x10, 0, 0, megatech_sms_ioport_dd_r); // super tetris
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x10, 0x10, 0, 0, megatech_sms_ioport_dd_r); // super tetris
 
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0xdc, 0xdc, 0, 0, megatech_sms_ioport_dc_r);
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0xdd, 0xdd, 0, 0, megatech_sms_ioport_dd_r);
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0xde, 0xde, 0, 0, megatech_sms_ioport_dd_r);
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_IO, 0xdf, 0xdf, 0, 0, megatech_sms_ioport_dd_r); // adams family
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xdc, 0xdc, 0, 0, megatech_sms_ioport_dc_r);
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xdd, 0xdd, 0, 0, megatech_sms_ioport_dd_r);
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xde, 0xde, 0, 0, megatech_sms_ioport_dd_r);
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0xdf, 0xdf, 0, 0, megatech_sms_ioport_dd_r); // adams family
 }
 
 static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)
@@ -326,24 +326,24 @@ static void megatech_set_genz80_as_sms_standard_map(running_machine *machine)
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* fixed rom bank area */
 	sms_rom = auto_malloc(0x400000);
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, SMH_BANK5, SMH_UNMAP);
 	memory_set_bankptr( 5, sms_rom );
 
 	memcpy(sms_rom, memory_region(machine, "main"), 0x400000);
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x2000); // 8kb of main ram
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc000, 0xdfff, 0, 0, SMH_BANK6, SMH_BANK6);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc000, 0xdfff, 0, 0, SMH_BANK6, SMH_BANK6);
 	memory_set_bankptr( 6, sms_mainram );
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xe000, 0xffff, 0, 0, SMH_BANK7, SMH_BANK7);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xe000, 0xffff, 0, 0, SMH_BANK7, SMH_BANK7);
 	memory_set_bankptr( 7, sms_mainram );
 	memset(sms_mainram,0x00,0x2000);
 
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfffc, 0xffff, 0, 0, mt_sms_standard_rom_bank_w);
 
 	megatech_set_genz80_as_sms_standard_ports(machine);
 //  smsgg_backupram = NULL;

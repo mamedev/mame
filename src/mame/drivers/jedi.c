@@ -161,7 +161,7 @@ static MACHINE_START( jedi )
 	timer_adjust_oneshot(state->interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), 32);
 
 	/* configure the banks */
-	memory_configure_bank(1, 0, 3, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 3, memory_region(machine, "main") + 0x10000, 0x4000);
 
 	/* set up save state */
 	state_save_register_global(state->nvram_enabled);

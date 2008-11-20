@@ -54,7 +54,6 @@
     - Automatically mirror program space into data space if no data space
     - Get rid of opcode/data separation by using address spaces?
     - Add support for internal addressing (maybe just accessors - see TMS3202x)
-    - Evaluate min/max opcode ranges and do we include a check in program_decrypted_read_byte?
 
 ****************************************************************************
 
@@ -161,6 +160,7 @@ enum _read_or_write
 typedef enum _read_or_write read_or_write;
 
 
+
 /***************************************************************************
     MACROS
 ***************************************************************************/
@@ -198,8 +198,7 @@ typedef struct _memory_block memory_block;
 struct _memory_block
 {
 	memory_block *			next;					/* next memory block in the list */
-	UINT8					cpunum;					/* which CPU are we associated with? */
-	UINT8					spacenum;				/* which address space are we associated with? */
+	const address_space *	space;					/* which address space are we associated with? */
 	UINT8					isallocated;			/* did we allocate this ourselves? */
 	offs_t 					bytestart, byteend;		/* byte-normalized start/end for verifying a match */
 	UINT8 *					data;					/* pointer to the data for this block */
@@ -210,8 +209,7 @@ struct _bank_data
 {
 	UINT8 					used;					/* is this bank used? */
 	UINT8 					dynamic;				/* is this bank allocated dynamically? */
-	UINT8 					cpunum;					/* the CPU it is used for */
-	UINT8 					spacenum;				/* the address space it is used for */
+	const address_space *	space;					/* address space it is used for */
 	UINT8 					read;					/* is this bank used for reads? */
 	UINT8 					write;					/* is this bank used for writes? */
 	offs_t 					bytestart;				/* byte-adjusted start offset */
@@ -234,6 +232,7 @@ struct _handler_data
 	offs_t					bytestart;				/* byte-adjusted start address for handler */
 	offs_t					byteend;				/* byte-adjusted end address for handler */
 	offs_t					bytemask;				/* byte-adjusted mask against the final address */
+	UINT8 **				bankbaseptr;			/* pointer to the bank base */
 };
 
 /* In memory.h: typedef struct _subtable_data subtable_data; */
@@ -244,15 +243,21 @@ struct _subtable_data
 	UINT32					usecount;				/* number of times this has been used */
 };
 
-typedef struct _cpu_data cpu_data;
-struct _cpu_data
+struct _memory_private
 {
-	const char *			tag;					/* CPU's tag */
-	UINT8 *					region;					/* pointer to memory region */
-	size_t					regionsize;				/* size of region, in bytes */
+	const address_space *	spacelist;						/* list of address spaces */
+	
+	UINT8 *					bank_ptr[STATIC_COUNT];			/* array of bank pointers */
+	UINT8 *					bankd_ptr[STATIC_COUNT];		/* array of decrypted bank pointers */
+	void *					shared_ptr[MAX_SHARED_POINTERS];/* array of shared pointers */
 
-	UINT8					spacemask;				/* mask of which address spaces are used */
-	address_space		 	space[ADDRESS_SPACES];	/* info about each address space */
+	memory_block *			memory_block_list;				/* head of the list of memory blocks */
+
+	int						cur_context;					/* current CPU context */
+
+	bank_info 				bankdata[STATIC_COUNT];			/* data gathered for each bank */
+
+	UINT8 *					wptable;						/* watchpoint-fill table */
 };
 
 
@@ -261,70 +266,32 @@ struct _cpu_data
     GLOBAL VARIABLES
 ***************************************************************************/
 
-address_space *				active_address_space[ADDRESS_SPACES];/* address space data */
+const address_space *		active_address_space[ADDRESS_SPACES];/* address space data */
 
-static UINT8 *				bank_ptr[STATIC_COUNT];			/* array of bank pointers */
-static UINT8 *				bankd_ptr[STATIC_COUNT];		/* array of decrypted bank pointers */
-static void *				shared_ptr[MAX_SHARED_POINTERS];/* array of shared pointers */
-
-static memory_block *		memory_block_list;				/* head of the list of memory blocks */
-
-static int					cur_context;					/* current CPU context */
-
-static UINT8				debugger_access;				/* treat accesses as coming from the debugger */
-static UINT8				log_unmap[ADDRESS_SPACES];		/* log unmapped memory accesses */
-
-static cpu_data				cpudata[MAX_CPU];				/* data gathered for each CPU */
-static bank_info 			bankdata[STATIC_COUNT];			/* data gathered for each bank */
-
-static UINT8 *				wptable;						/* watchpoint-fill table */
-
-static void dummy_change_pc(offs_t byteaddress) { }
-
-#define ACCESSOR_GROUP(type, width) \
+#define ACCESSOR_GROUP(width) \
 { \
-	dummy_change_pc, \
-	type##_read_byte_##width, \
-	type##_read_word_##width, \
-	type##_read_word_masked_##width, \
-	type##_read_dword_##width, \
-	type##_read_dword_masked_##width, \
-	type##_read_qword_##width, \
-	type##_read_qword_masked_##width, \
-	type##_write_byte_##width, \
-	type##_write_word_##width, \
-	type##_write_word_masked_##width, \
-	type##_write_dword_##width, \
-	type##_write_dword_masked_##width, \
-	type##_write_qword_##width, \
-	type##_write_qword_masked_##width \
+	memory_read_byte_##width, \
+	memory_read_word_##width, \
+	memory_read_word_masked_##width, \
+	memory_read_dword_##width, \
+	memory_read_dword_masked_##width, \
+	memory_read_qword_##width, \
+	memory_read_qword_masked_##width, \
+	memory_write_byte_##width, \
+	memory_write_word_##width, \
+	memory_write_word_masked_##width, \
+	memory_write_dword_##width, \
+	memory_write_dword_masked_##width, \
+	memory_write_qword_##width, \
+	memory_write_qword_masked_##width \
 }
 
-static const data_accessors memory_accessors[ADDRESS_SPACES][4][2] =
+static const data_accessors memory_accessors[4][2] =
 {
-	/* program accessors */
-	{
-		{ ACCESSOR_GROUP(program, 8le),  ACCESSOR_GROUP(program, 8be)  },
-		{ ACCESSOR_GROUP(program, 16le), ACCESSOR_GROUP(program, 16be) },
-		{ ACCESSOR_GROUP(program, 32le), ACCESSOR_GROUP(program, 32be) },
-		{ ACCESSOR_GROUP(program, 64le), ACCESSOR_GROUP(program, 64be) }
-	},
-
-	/* data accessors */
-	{
-		{ ACCESSOR_GROUP(data, 8le),  ACCESSOR_GROUP(data, 8be)  },
-		{ ACCESSOR_GROUP(data, 16le), ACCESSOR_GROUP(data, 16be) },
-		{ ACCESSOR_GROUP(data, 32le), ACCESSOR_GROUP(data, 32be) },
-		{ ACCESSOR_GROUP(data, 64le), ACCESSOR_GROUP(data, 64be) }
-	},
-
-	/* I/O accessors */
-	{
-		{ ACCESSOR_GROUP(io, 8le),  ACCESSOR_GROUP(io, 8be)  },
-		{ ACCESSOR_GROUP(io, 16le), ACCESSOR_GROUP(io, 16be) },
-		{ ACCESSOR_GROUP(io, 32le), ACCESSOR_GROUP(io, 32be) },
-		{ ACCESSOR_GROUP(io, 64le), ACCESSOR_GROUP(io, 64be) }
-	},
+	{ ACCESSOR_GROUP(8le),  ACCESSOR_GROUP(8be)  },
+	{ ACCESSOR_GROUP(16le), ACCESSOR_GROUP(16be) },
+	{ ACCESSOR_GROUP(32le), ACCESSOR_GROUP(32be) },
+	{ ACCESSOR_GROUP(64le), ACCESSOR_GROUP(64be) }
 };
 
 const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/O" };
@@ -335,34 +302,53 @@ const char *const address_space_names[ADDRESS_SPACES] = { "program", "data", "I/
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void address_map_detokenize(address_map *map, const game_driver *driver, const char *cputag, const addrmap_token *tokens);
-
-static void memory_init_cpudata(running_machine *machine);
+/* internal initialization */
+static void memory_init_spaces(running_machine *machine);
 static void memory_init_preflight(running_machine *machine);
 static void memory_init_populate(running_machine *machine);
+static void memory_init_allocate(running_machine *machine);
+static void memory_init_locate(running_machine *machine);
+static void memory_exit(running_machine *machine);
+
+/* address map helpers */
+static void map_detokenize(address_map *map, const game_driver *driver, const char *cputag, const addrmap_token *tokens);
+
+/* memory mapping helpers */
 static void space_map_range_private(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
 static void space_map_range(address_space *space, read_or_write readorwrite, int handlerbits, int handlerunitmask, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, genf *handler, void *object, const char *handler_name);
-static void bank_assign_static(int banknum, int cpunum, int spacenum, read_or_write readorwrite, offs_t bytestart, offs_t byteend);
-static genf *bank_assign_dynamic(int cpunum, int spacenum, read_or_write readorwrite, offs_t bytestart, offs_t byteend);
-static UINT8 table_assign_handler(handler_data **table, void *object, genf *handler, const char *handler_name, offs_t bytestart, offs_t byteend, offs_t bytemask);
+static void *space_find_backing_memory(const address_space *space, offs_t byteaddress);
+static int space_needs_backing_store(const address_space *space, const address_map_entry *entry);
+
+/* banking helpers */
+static void bank_assign_static(int banknum, const address_space *space, read_or_write readorwrite, offs_t bytestart, offs_t byteend);
+static genf *bank_assign_dynamic(const address_space *space, read_or_write readorwrite, offs_t bytestart, offs_t byteend);
+static STATE_POSTLOAD( bank_reattach );
+
+/* table management */
+static UINT8 table_assign_handler(const address_space *space, handler_data **table, void *object, genf *handler, const char *handler_name, offs_t bytestart, offs_t byteend, offs_t bytemask);
 static void table_compute_subhandler(handler_data **table, UINT8 entry, read_or_write readorwrite, int spacebits, int spaceendian, int handlerbits, int handlerunitmask);
 static void table_populate_range(address_table *tabledata, offs_t bytestart, offs_t byteend, UINT8 handler);
 static void table_populate_range_mirrored(address_table *tabledata, offs_t bytestart, offs_t byteend, offs_t bytemirror, UINT8 handler);
+
+/* subtable management */
 static UINT8 subtable_alloc(address_table *tabledata);
 static void subtable_realloc(address_table *tabledata, UINT8 subentry);
 static int subtable_merge(address_table *tabledata);
 static void subtable_release(address_table *tabledata, UINT8 subentry);
 static UINT8 *subtable_open(address_table *tabledata, offs_t l1index);
 static void subtable_close(address_table *tabledata, offs_t l1index);
-static void memory_init_allocate(running_machine *machine);
-static void *allocate_memory_block(running_machine *machine, int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory);
-static void register_for_save(int cpunum, int spacenum, offs_t bytestart, void *base, size_t numbytes);
-static address_map_entry *assign_intersecting_blocks(address_space *space, offs_t bytestart, offs_t byteend, UINT8 *base);
-static void memory_init_locate(running_machine *machine);
-static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress);
+
+/* memory block allocation */
+static void *block_allocate(const address_space *space, offs_t bytestart, offs_t byteend, void *memory);
+static address_map_entry *block_assign_intersecting(address_space *space, offs_t bytestart, offs_t byteend, UINT8 *base);
+
+/* internal handlers */
 static memory_handler get_stub_handler(read_or_write readorwrite, int spacedbits, int handlerdbits);
 static genf *get_static_handler(int handlerbits, int readorwrite, int which);
-static void memory_exit(running_machine *machine);
+
+/* debugging */
+static const char *handler_to_string(const address_table *table, UINT8 entry);
+static void dump_map(FILE *file, const address_space *space, const address_table *table);
 static void mem_dump(void);
 
 
@@ -411,26 +397,26 @@ INLINE void adjust_addresses(address_space *space, offs_t *start, offs_t *end, o
     arbitrary address space
 -------------------------------------------------*/
 
-INLINE UINT8 read_byte_generic(const address_space *space, offs_t address)
+INLINE UINT8 read_byte_generic(const address_space *space, offs_t byteaddress)
 {
 	const handler_data *handler;
-	offs_t offset;
+	offs_t byteoffset;
 	UINT32 entry;
 	UINT8 result;
 
 	profiler_mark(PROFILER_MEMREAD);
 
-	address &= space->bytemask;
-	entry = space->readlookup[LEVEL1_INDEX(address)];
+	byteaddress &= space->bytemask;
+	entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->readlookup[LEVEL2_INDEX(entry, address)];
+		entry = space->readlookup[LEVEL2_INDEX(entry, byteaddress)];
 	handler = space->read.handlers[entry];
 
-	offset = (address - handler->bytestart) & handler->bytemask;
+	byteoffset = (byteaddress - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
-		result = bank_ptr[entry][offset];
+		result = (*handler->bankbaseptr)[byteoffset];
 	else
-		result = (*handler->handler.read.shandler8)(handler->object, offset);
+		result = (*handler->handler.read.shandler8)(handler->object, byteoffset);
 
 	profiler_mark(PROFILER_END);
 	return result;
@@ -442,25 +428,25 @@ INLINE UINT8 read_byte_generic(const address_space *space, offs_t address)
     arbitrary address space
 -------------------------------------------------*/
 
-INLINE void write_byte_generic(const address_space *space, offs_t address, UINT8 data)
+INLINE void write_byte_generic(const address_space *space, offs_t byteaddress, UINT8 data)
 {
 	const handler_data *handler;
-	offs_t offset;
+	offs_t byteoffset;
 	UINT32 entry;
 
 	profiler_mark(PROFILER_MEMWRITE);
 
-	address &= space->bytemask;
-	entry = space->writelookup[LEVEL1_INDEX(address)];
+	byteaddress &= space->bytemask;
+	entry = space->writelookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->writelookup[LEVEL2_INDEX(entry, address)];
+		entry = space->writelookup[LEVEL2_INDEX(entry, byteaddress)];
 	handler = space->write.handlers[entry];
 
-	offset = (address - handler->bytestart) & handler->bytemask;
+	byteoffset = (byteaddress - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
-		bank_ptr[entry][offset] = data;
+		(*handler->bankbaseptr)[byteoffset] = data;
 	else
-		(*handler->handler.write.shandler8)(handler->object, offset, data);
+		(*handler->handler.write.shandler8)(handler->object, byteoffset, data);
 
 	profiler_mark(PROFILER_END);
 }
@@ -471,26 +457,26 @@ INLINE void write_byte_generic(const address_space *space, offs_t address, UINT8
     arbitrary address space
 -------------------------------------------------*/
 
-INLINE UINT16 read_word_generic(const address_space *space, offs_t address, UINT16 mem_mask)
+INLINE UINT16 read_word_generic(const address_space *space, offs_t byteaddress, UINT16 mem_mask)
 {
 	const handler_data *handler;
-	offs_t offset;
+	offs_t byteoffset;
 	UINT32 entry;
 	UINT16 result;
 
 	profiler_mark(PROFILER_MEMREAD);
 
-	address &= space->bytemask;
-	entry = space->readlookup[LEVEL1_INDEX(address)];
+	byteaddress &= space->bytemask;
+	entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->readlookup[LEVEL2_INDEX(entry, address)];
+		entry = space->readlookup[LEVEL2_INDEX(entry, byteaddress)];
 	handler = space->read.handlers[entry];
 
-	offset = (address - handler->bytestart) & handler->bytemask;
+	byteoffset = (byteaddress - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
-		result = *(UINT16 *)&bank_ptr[entry][offset & ~1];
+		result = *(UINT16 *)&(*handler->bankbaseptr)[byteoffset & ~1];
 	else
-		result = (*handler->handler.read.shandler16)(handler->object, offset >> 1, mem_mask);
+		result = (*handler->handler.read.shandler16)(handler->object, byteoffset >> 1, mem_mask);
 
 	profiler_mark(PROFILER_END);
 	return result;
@@ -502,28 +488,28 @@ INLINE UINT16 read_word_generic(const address_space *space, offs_t address, UINT
     arbitrary address space
 -------------------------------------------------*/
 
-INLINE void write_word_generic(const address_space *space, offs_t address, UINT16 data, UINT16 mem_mask)
+INLINE void write_word_generic(const address_space *space, offs_t byteaddress, UINT16 data, UINT16 mem_mask)
 {
 	const handler_data *handler;
-	offs_t offset;
+	offs_t byteoffset;
 	UINT32 entry;
 
 	profiler_mark(PROFILER_MEMWRITE);
 
-	address &= space->bytemask;
-	entry = space->writelookup[LEVEL1_INDEX(address)];
+	byteaddress &= space->bytemask;
+	entry = space->writelookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->writelookup[LEVEL2_INDEX(entry, address)];
+		entry = space->writelookup[LEVEL2_INDEX(entry, byteaddress)];
 	handler = space->write.handlers[entry];
 
-	offset = (address - handler->bytestart) & handler->bytemask;
+	byteoffset = (byteaddress - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 	{
-		UINT16 *dest = (UINT16 *)&bank_ptr[entry][offset & ~1];
+		UINT16 *dest = (UINT16 *)&(*handler->bankbaseptr)[byteoffset & ~1];
 		*dest = (*dest & ~mem_mask) | (data & mem_mask);
 	}
 	else
-		(*handler->handler.write.shandler16)(handler->object, offset >> 1, data, mem_mask);
+		(*handler->handler.write.shandler16)(handler->object, byteoffset >> 1, data, mem_mask);
 
 	profiler_mark(PROFILER_END);
 }
@@ -534,26 +520,26 @@ INLINE void write_word_generic(const address_space *space, offs_t address, UINT1
     arbitrary address space
 -------------------------------------------------*/
 
-INLINE UINT32 read_dword_generic(const address_space *space, offs_t address, UINT32 mem_mask)
+INLINE UINT32 read_dword_generic(const address_space *space, offs_t byteaddress, UINT32 mem_mask)
 {
 	const handler_data *handler;
-	offs_t offset;
+	offs_t byteoffset;
 	UINT32 entry;
 	UINT32 result;
 
 	profiler_mark(PROFILER_MEMREAD);
 
-	address &= space->bytemask;
-	entry = space->readlookup[LEVEL1_INDEX(address)];
+	byteaddress &= space->bytemask;
+	entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->readlookup[LEVEL2_INDEX(entry, address)];
+		entry = space->readlookup[LEVEL2_INDEX(entry, byteaddress)];
 	handler = space->read.handlers[entry];
 
-	offset = (address - handler->bytestart) & handler->bytemask;
+	byteoffset = (byteaddress - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
-		result = *(UINT32 *)&bank_ptr[entry][offset & ~3];
+		result = *(UINT32 *)&(*handler->bankbaseptr)[byteoffset & ~3];
 	else
-		result = (*handler->handler.read.shandler32)(handler->object, offset >> 2, mem_mask);
+		result = (*handler->handler.read.shandler32)(handler->object, byteoffset >> 2, mem_mask);
 
 	profiler_mark(PROFILER_END);
 	return result;
@@ -565,28 +551,28 @@ INLINE UINT32 read_dword_generic(const address_space *space, offs_t address, UIN
     arbitrary address space
 -------------------------------------------------*/
 
-INLINE void write_dword_generic(const address_space *space, offs_t address, UINT32 data, UINT32 mem_mask)
+INLINE void write_dword_generic(const address_space *space, offs_t byteaddress, UINT32 data, UINT32 mem_mask)
 {
 	const handler_data *handler;
-	offs_t offset;
+	offs_t byteoffset;
 	UINT32 entry;
 
 	profiler_mark(PROFILER_MEMWRITE);
 
-	address &= space->bytemask;
-	entry = space->writelookup[LEVEL1_INDEX(address)];
+	byteaddress &= space->bytemask;
+	entry = space->writelookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->writelookup[LEVEL2_INDEX(entry, address)];
+		entry = space->writelookup[LEVEL2_INDEX(entry, byteaddress)];
 	handler = space->write.handlers[entry];
 
-	offset = (address - handler->bytestart) & handler->bytemask;
+	byteoffset = (byteaddress - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 	{
-		UINT32 *dest = (UINT32 *)&bank_ptr[entry][offset & ~3];
+		UINT32 *dest = (UINT32 *)&(*handler->bankbaseptr)[byteoffset & ~3];
 		*dest = (*dest & ~mem_mask) | (data & mem_mask);
 	}
 	else
-		(*handler->handler.write.shandler32)(handler->object, offset >> 2, data, mem_mask);
+		(*handler->handler.write.shandler32)(handler->object, byteoffset >> 2, data, mem_mask);
 
 	profiler_mark(PROFILER_END);
 }
@@ -597,26 +583,26 @@ INLINE void write_dword_generic(const address_space *space, offs_t address, UINT
     arbitrary address space
 -------------------------------------------------*/
 
-INLINE UINT64 read_qword_generic(const address_space *space, offs_t address, UINT64 mem_mask)
+INLINE UINT64 read_qword_generic(const address_space *space, offs_t byteaddress, UINT64 mem_mask)
 {
 	const handler_data *handler;
-	offs_t offset;
+	offs_t byteoffset;
 	UINT32 entry;
 	UINT64 result;
 
 	profiler_mark(PROFILER_MEMREAD);
 
-	address &= space->bytemask;
-	entry = space->readlookup[LEVEL1_INDEX(address)];
+	byteaddress &= space->bytemask;
+	entry = space->readlookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->readlookup[LEVEL2_INDEX(entry, address)];
+		entry = space->readlookup[LEVEL2_INDEX(entry, byteaddress)];
 	handler = space->read.handlers[entry];
 
-	offset = (address - handler->bytestart) & handler->bytemask;
+	byteoffset = (byteaddress - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
-		result = *(UINT64 *)&bank_ptr[entry][offset & ~7];
+		result = *(UINT64 *)&(*handler->bankbaseptr)[byteoffset & ~7];
 	else
-		result = (*handler->handler.read.shandler64)(handler->object, offset >> 3, mem_mask);
+		result = (*handler->handler.read.shandler64)(handler->object, byteoffset >> 3, mem_mask);
 
 	profiler_mark(PROFILER_END);
 	return result;
@@ -628,7 +614,7 @@ INLINE UINT64 read_qword_generic(const address_space *space, offs_t address, UIN
     arbitrary address space
 -------------------------------------------------*/
 
-INLINE void write_qword_generic(const address_space *space, offs_t address, UINT64 data, UINT64 mem_mask)
+INLINE void write_qword_generic(const address_space *space, offs_t byteaddress, UINT64 data, UINT64 mem_mask)
 {
 	const handler_data *handler;
 	offs_t offset;
@@ -636,16 +622,16 @@ INLINE void write_qword_generic(const address_space *space, offs_t address, UINT
 
 	profiler_mark(PROFILER_MEMWRITE);
 
-	address &= space->bytemask;
-	entry = space->writelookup[LEVEL1_INDEX(address)];
+	byteaddress &= space->bytemask;
+	entry = space->writelookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
-		entry = space->writelookup[LEVEL2_INDEX(entry, address)];
+		entry = space->writelookup[LEVEL2_INDEX(entry, byteaddress)];
 	handler = space->write.handlers[entry];
 
-	offset = (address - handler->bytestart) & handler->bytemask;
+	offset = (byteaddress - handler->bytestart) & handler->bytemask;
 	if (entry < STATIC_RAM)
 	{
-		UINT64 *dest = (UINT64 *)&bank_ptr[entry][offset & ~7];
+		UINT64 *dest = (UINT64 *)&(*handler->bankbaseptr)[offset & ~7];
 		*dest = (*dest & ~mem_mask) | (data & mem_mask);
 	}
 	else
@@ -666,22 +652,24 @@ INLINE void write_qword_generic(const address_space *space, offs_t address, UINT
 
 void memory_init(running_machine *machine)
 {
-	int spacenum;
+	memory_private *memdata;
 
 	add_exit_callback(machine, memory_exit);
+	
+	/* allocate our private data */
+	machine->memory_data = auto_malloc(sizeof(*machine->memory_data));
+	memdata = machine->memory_data;
 
 	/* no current context to start */
-	cur_context = -1;
-	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-		log_unmap[spacenum] = TRUE;
+	memdata->cur_context = -1;
 
 	/* reset the shared pointers and bank pointers */
-	memset(shared_ptr, 0, sizeof(shared_ptr));
-	memset(bank_ptr, 0, sizeof(bank_ptr));
-	memset(bankd_ptr, 0, sizeof(bankd_ptr));
+	memset(memdata->shared_ptr, 0, sizeof(memdata->shared_ptr));
+	memset(memdata->bank_ptr, 0, sizeof(memdata->bank_ptr));
+	memset(memdata->bankd_ptr, 0, sizeof(memdata->bankd_ptr));
 
 	/* build up the cpudata array with info about all CPUs and address spaces */
-	memory_init_cpudata(machine);
+	memory_init_spaces(machine);
 
 	/* preflight the memory handlers and check banks */
 	memory_init_preflight(machine);
@@ -701,45 +689,20 @@ void memory_init(running_machine *machine)
 
 
 /*-------------------------------------------------
-    memory_exit - free memory
+    memory_find_address_space - find an address 
+    space in our internal list; for faster access 
+    use cpu_get_address_space()
 -------------------------------------------------*/
 
-static void memory_exit(running_machine *machine)
+const address_space *memory_find_address_space(const device_config *cpu, int spacenum)
 {
-	int cpunum, spacenum;
-
-	/* free the memory blocks */
-	while (memory_block_list != NULL)
-	{
-		memory_block *block = memory_block_list;
-		memory_block_list = block->next;
-		free(block);
-	}
-
-	/* free all the tables */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(cpudata); cpunum++)
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-		{
-			address_space *space = &cpudata[cpunum].space[spacenum];
-			if (space->map != NULL)
-				address_map_free(space->map);
-			if (space->read.table != NULL)
-				free(space->read.table);
-			if (space->read.subtable != NULL)
-				free(space->read.subtable);
-			if (space->read.handlers[0] != NULL)
-				free(space->read.handlers[0]);
-			if (space->write.table != NULL)
-				free(space->write.table);
-			if (space->write.subtable != NULL)
-				free(space->write.subtable);
-			if (space->write.handlers[0] != NULL)
-				free(space->write.handlers[0]);
-		}
-
-	/* free the global watchpoint table */
-	if (wptable != NULL)
-		free(wptable);
+	memory_private *memdata = cpu->machine->memory_data;
+	const address_space *space;
+	
+	for (space = memdata->spacelist; space != NULL; space = space->next)
+		if (space->cpu == cpu && space->spacenum == spacenum)
+			return space;
+	return NULL;
 }
 
 
@@ -749,31 +712,19 @@ static void memory_exit(running_machine *machine)
 
 void memory_set_context(running_machine *machine, int activecpu)
 {
+	memory_private *memdata = machine->memory_data;
+
 	/* remember dynamic RAM/ROM */
 	if (activecpu == -1)
-		activecpu = cur_context;
-	cur_context = activecpu;
+		activecpu = memdata->cur_context;
+	memdata->cur_context = activecpu;
 
-	active_address_space[ADDRESS_SPACE_PROGRAM] = &cpudata[activecpu].space[ADDRESS_SPACE_PROGRAM];
-	active_address_space[ADDRESS_SPACE_DATA] = &cpudata[activecpu].space[ADDRESS_SPACE_DATA];
-	active_address_space[ADDRESS_SPACE_IO] = &cpudata[activecpu].space[ADDRESS_SPACE_IO];
+	active_address_space[ADDRESS_SPACE_PROGRAM] = cpu_get_address_space(machine->cpu[activecpu], ADDRESS_SPACE_PROGRAM);
+	active_address_space[ADDRESS_SPACE_DATA] = cpu_get_address_space(machine->cpu[activecpu], ADDRESS_SPACE_DATA);
+	active_address_space[ADDRESS_SPACE_IO] = cpu_get_address_space(machine->cpu[activecpu], ADDRESS_SPACE_IO);
 
 // need to handle:
 //	active_address_space[ADDRESS_SPACE_PROGRAM].readlookup = ((machine->debug_flags & DEBUG_FLAG_WPR_PROGRAM) != 0) ? wptable : space->read.table;
-}
-
-
-/*-------------------------------------------------
-    memory_get_accessors - get a pointer to the
-    set of memory accessor functions based on
-    the address space, databus width, and
-    endianness
--------------------------------------------------*/
-
-const data_accessors *memory_get_accessors(int spacenum, int databits, int endianness)
-{
-	int accessorindex = (databits == 8) ? 0 : (databits == 16) ? 1 : (databits == 32) ? 2 : 3;
-	return &memory_accessors[spacenum][accessorindex][(endianness == CPU_IS_LE) ? 0 : 1];
 }
 
 
@@ -799,13 +750,13 @@ address_map *address_map_alloc(const machine_config *config, const game_driver *
 
 	/* append the internal CPU map (first so it takes priority) */
 	if (internal_map != NULL)
-		address_map_detokenize(map, driver, cputag, internal_map);
+		map_detokenize(map, driver, cputag, internal_map);
 
 	/* construct the standard map */
 	if (config->cpu[cpunum].address_map[spacenum][0] != NULL)
-		address_map_detokenize(map, driver, cputag, config->cpu[cpunum].address_map[spacenum][0]);
+		map_detokenize(map, driver, cputag, config->cpu[cpunum].address_map[spacenum][0]);
 	if (config->cpu[cpunum].address_map[spacenum][1] != NULL)
-		address_map_detokenize(map, driver, cputag, config->cpu[cpunum].address_map[spacenum][1]);
+		map_detokenize(map, driver, cputag, config->cpu[cpunum].address_map[spacenum][1]);
 
 	return map;
 }
@@ -837,21 +788,1099 @@ void address_map_free(address_map *map)
 }
 
 
+
+/***************************************************************************
+    DIRECT ACCESS CONTROL
+***************************************************************************/
+
 /*-------------------------------------------------
-    memory_get_address_map - return a pointer to
-    the constructed address map for a CPU's
-    address space
+    memory_set_decrypted_region - registers an
+    address range as having a decrypted data
+    pointer
 -------------------------------------------------*/
 
-const address_map *memory_get_address_map(int cpunum, int spacenum)
+void memory_set_decrypted_region(const address_space *space, offs_t addrstart, offs_t addrend, void *base)
 {
-	return cpudata[cpunum].space[spacenum].map;
+	offs_t bytestart = ADDR2BYTE(space, addrstart);
+	offs_t byteend = ADDR2BYTE_END(space, addrend);
+	int banknum, found = FALSE;
+
+	/* loop over banks looking for a match */
+	for (banknum = 0; banknum < STATIC_COUNT; banknum++)
+	{
+		bank_info *bank = &space->machine->memory_data->bankdata[banknum];
+
+		/* consider this bank if it is used for reading and matches the address space */
+		if (bank->used && bank->read && bank->space == space)
+		{
+			/* verify that the region fully covers the decrypted range */
+			if (bank->bytestart >= bytestart && bank->byteend <= byteend)
+			{
+				/* set the decrypted pointer for the corresponding memory bank */
+				space->machine->memory_data->bankd_ptr[banknum] = (UINT8 *)base + bank->bytestart - bytestart;
+				found = TRUE;
+
+				/* if we are executing from here, force an opcode base update */
+				if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
+					force_opbase_update((address_space *)space);
+			}
+
+			/* fatal error if the decrypted region straddles the bank */
+			else if (bank->bytestart < byteend && bank->byteend > bytestart)
+				fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for CPU '%s'", bytestart, byteend, space->cpu->tag);
+		}
+	}
+
+	/* fatal error as well if we didn't find any relevant memory banks */
+	if (!found)
+		fatalerror("memory_set_decrypted_region unable to find matching region %08X-%08X for CPU '%s'", bytestart, byteend, space->cpu->tag);
 }
 
 
 /*-------------------------------------------------
-    address_map_detokenize - detokenize an array
-    of address map tokens
+    memory_set_direct_update_handler - register a
+    handler for opcode base changes on a given
+    CPU
+-------------------------------------------------*/
+
+direct_update_func memory_set_direct_update_handler(const address_space *space, direct_update_func function)
+{
+	address_space *spacerw = (address_space *)space;
+	direct_update_func old = spacerw->directupdate;
+	spacerw->directupdate = function;
+	return old;
+}
+
+
+/*-------------------------------------------------
+    memory_set_direct_region - called by CPU cores to
+    update the opcode base for the given address
+-------------------------------------------------*/
+
+int memory_set_direct_region(const address_space *space, offs_t byteaddress)
+{
+	memory_private *memdata = space->machine->memory_data;
+	address_space *spacerw = (address_space *)space;
+	UINT8 *base = NULL, *based = NULL;
+	const handler_data *handlers;
+	UINT8 entry;
+
+	/* allow overrides */
+	if (spacerw->directupdate != NULL)
+	{
+		byteaddress = (*spacerw->directupdate)(spacerw, byteaddress, &spacerw->direct);
+		if (byteaddress == ~0)
+			return TRUE;
+	}
+
+	/* perform the lookup */
+	byteaddress &= spacerw->bytemask;
+	entry = spacerw->readlookup[LEVEL1_INDEX(byteaddress)];
+	if (entry >= SUBTABLE_BASE)
+		entry = spacerw->readlookup[LEVEL2_INDEX(entry,byteaddress)];
+	
+	/* keep track of current entry */
+	spacerw->direct.entry = entry;
+
+	/* if we don't map to a bank, see if there are any banks we can map to */
+	if (entry < STATIC_BANK1 || entry >= STATIC_RAM)
+	{
+		/* loop over banks and find a match */
+		for (entry = 1; entry < STATIC_COUNT; entry++)
+		{
+			bank_info *bank = &memdata->bankdata[entry];
+			if (bank->used && bank->space == space && bank->bytestart < byteaddress && bank->byteend > byteaddress)
+				break;
+		}
+
+		/* if nothing was found, leave everything alone */
+		if (entry == STATIC_COUNT)
+		{
+			logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, byteaddress, space->name);
+			return FALSE;
+		}
+	}
+
+	/* if no decrypted opcodes, point to the same base */
+	base = memdata->bank_ptr[entry];
+	based = memdata->bankd_ptr[entry];
+	if (based == NULL)
+		based = base;
+
+	/* compute the adjusted base */
+	handlers = spacerw->read.handlers[entry];
+	spacerw->direct.mask = handlers->bytemask;
+	spacerw->direct.raw = base - (handlers->bytestart & spacerw->direct.mask);
+	spacerw->direct.decrypted = based - (handlers->bytestart & spacerw->direct.mask);
+	spacerw->direct.min = handlers->bytestart;
+	spacerw->direct.max = handlers->byteend;
+	return TRUE;
+}
+
+
+/*-------------------------------------------------
+    memory_get_read_ptr - return a pointer the 
+    memory byte provided in the given address 
+    space, or NULL if it is not mapped to a bank
+-------------------------------------------------*/
+
+void *memory_get_read_ptr(const address_space *space, offs_t byteaddress)
+{
+	const handler_data *handler;
+	offs_t byteoffset;
+	UINT8 entry;
+
+	/* perform the lookup */
+	byteaddress &= space->bytemask;
+	entry = space->read.table[LEVEL1_INDEX(byteaddress)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->read.table[LEVEL2_INDEX(entry, byteaddress)];
+	handler = space->read.handlers[entry];
+
+	/* 8-bit case: RAM/ROM */
+	if (entry >= STATIC_RAM)
+		return NULL;
+	byteoffset = (byteaddress - handler->bytestart) & handler->bytemask;
+	return &(*handler->bankbaseptr)[byteoffset];
+}
+
+
+/*-------------------------------------------------
+    memory_get_write_ptr - return a pointer the 
+    memory byte provided in the given address 
+    space, or NULL if it is not mapped to a 
+    writeable bank
+-------------------------------------------------*/
+
+void *memory_get_write_ptr(const address_space *space, offs_t byteaddress)
+{
+	const handler_data *handler;
+	offs_t byteoffset;
+	UINT8 entry;
+
+	/* perform the lookup */
+	byteaddress &= space->bytemask;
+	entry = space->write.table[LEVEL1_INDEX(byteaddress)];
+	if (entry >= SUBTABLE_BASE)
+		entry = space->write.table[LEVEL2_INDEX(entry, byteaddress)];
+	handler = space->write.handlers[entry];
+
+	/* 8-bit case: RAM/ROM */
+	if (entry >= STATIC_RAM)
+		return NULL;
+	byteoffset = (byteaddress - handler->bytestart) & handler->bytemask;
+	return &(*handler->bankbaseptr)[byteoffset];
+}
+
+
+
+/***************************************************************************
+    MEMORY BANKING
+***************************************************************************/
+
+/*-------------------------------------------------
+    memory_configure_bank - configure the
+    addresses for a bank
+-------------------------------------------------*/
+
+void memory_configure_bank(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride)
+{
+	memory_private *memdata = machine->memory_data;
+	bank_info *bank = &memdata->bankdata[banknum];
+	int entrynum;
+
+	/* validation checks */
+	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
+		fatalerror("memory_configure_bank called with invalid bank %d", banknum);
+	if (bank->dynamic)
+		fatalerror("memory_configure_bank called with dynamic bank %d", banknum);
+	if (startentry < 0 || startentry + numentries > MAX_BANK_ENTRIES)
+		fatalerror("memory_configure_bank called with out-of-range entries %d-%d", startentry, startentry + numentries - 1);
+	if (!base)
+		fatalerror("memory_configure_bank called NULL base");
+
+	/* fill in the requested bank entries */
+	for (entrynum = startentry; entrynum < startentry + numentries; entrynum++)
+		bank->entry[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
+	
+	/* if we have no bankptr yet, set it to the first entry */
+	if (memdata->bank_ptr[banknum] == NULL)
+		memdata->bank_ptr[banknum] = bank->entry[0];
+}
+
+
+/*-------------------------------------------------
+    memory_configure_bank_decrypted - configure
+    the decrypted addresses for a bank
+-------------------------------------------------*/
+
+void memory_configure_bank_decrypted(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride)
+{
+	memory_private *memdata = machine->memory_data;
+	bank_info *bank = &memdata->bankdata[banknum];
+	int entrynum;
+
+	/* validation checks */
+	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
+		fatalerror("memory_configure_bank called with invalid bank %d", banknum);
+	if (bank->dynamic)
+		fatalerror("memory_configure_bank called with dynamic bank %d", banknum);
+	if (startentry < 0 || startentry + numentries > MAX_BANK_ENTRIES)
+		fatalerror("memory_configure_bank called with out-of-range entries %d-%d", startentry, startentry + numentries - 1);
+	if (!base)
+		fatalerror("memory_configure_bank_decrypted called NULL base");
+
+	/* fill in the requested bank entries */
+	for (entrynum = startentry; entrynum < startentry + numentries; entrynum++)
+		bank->entryd[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
+	
+	/* if we have no bankptr yet, set it to the first entry */
+	if (memdata->bankd_ptr[banknum] == NULL)
+		memdata->bankd_ptr[banknum] = bank->entryd[0];
+}
+
+
+/*-------------------------------------------------
+    memory_set_bank - select one pre-configured 
+    entry to be the new bank base
+-------------------------------------------------*/
+
+void memory_set_bank(int banknum, int entrynum)
+{
+	memory_private *memdata = Machine->memory_data;
+	bank_info *bank = &memdata->bankdata[banknum];
+
+	/* validation checks */
+	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
+		fatalerror("memory_set_bank called with invalid bank %d", banknum);
+	if (bank->dynamic)
+		fatalerror("memory_set_bank called with dynamic bank %d", banknum);
+	if (entrynum < 0 || entrynum > MAX_BANK_ENTRIES)
+		fatalerror("memory_set_bank called with out-of-range entry %d", entrynum);
+	if (!bank->entry[entrynum])
+		fatalerror("memory_set_bank called for bank %d with invalid bank entry %d", banknum, entrynum);
+
+	/* set the base */
+	bank->curentry = entrynum;
+	memdata->bank_ptr[banknum] = bank->entry[entrynum];
+	memdata->bankd_ptr[banknum] = bank->entryd[entrynum];
+
+	/* if we're executing out of this bank, adjust the opbase pointer */
+	if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
+		force_opbase_update((address_space *)active_address_space[ADDRESS_SPACE_PROGRAM]);
+}
+
+
+/*-------------------------------------------------
+    memory_get_bank - return the currently
+    selected bank
+-------------------------------------------------*/
+
+int memory_get_bank(int banknum)
+{
+	memory_private *memdata = Machine->memory_data;
+	bank_info *bank = &memdata->bankdata[banknum];
+
+	/* validation checks */
+	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
+		fatalerror("memory_get_bank called with invalid bank %d", banknum);
+	if (bank->dynamic)
+		fatalerror("memory_get_bank called with dynamic bank %d", banknum);
+	return bank->curentry;
+}
+
+
+/*-------------------------------------------------
+    memory_set_bankptr - set the base of a bank
+-------------------------------------------------*/
+
+void memory_set_bankptr(int banknum, void *base)
+{
+	memory_private *memdata = Machine->memory_data;
+	bank_info *bank = &memdata->bankdata[banknum];
+
+	/* validation checks */
+	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bank->used)
+		fatalerror("memory_set_bankptr called with invalid bank %d", banknum);
+	if (bank->dynamic)
+		fatalerror("memory_set_bankptr called with dynamic bank %d", banknum);
+	if (base == NULL)
+		fatalerror("memory_set_bankptr called NULL base");
+	if (ALLOW_ONLY_AUTO_MALLOC_BANKS)
+		validate_auto_malloc_memory(base, bank->byteend - bank->bytestart + 1);
+
+	/* set the base */
+	memdata->bank_ptr[banknum] = base;
+
+	/* if we're executing out of this bank, adjust the opbase pointer */
+	if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
+		force_opbase_update((address_space *)active_address_space[ADDRESS_SPACE_PROGRAM]);
+}
+
+
+
+/***************************************************************************
+    DYNAMIC ADDRESS SPACE MAPPING
+***************************************************************************/
+
+/*-------------------------------------------------
+    _memory_install_handler - install a new memory 
+    handler into the given address space, 
+    returning a pointer to the memory backing it, 
+    if present
+-------------------------------------------------*/
+
+void *_memory_install_handler(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler >= STATIC_COUNT || whandler >= STATIC_COUNT)
+		fatalerror("fatal: can only use static banks with memory_install_handler()");
+	if (rhandler != 0)
+		space_map_range(spacerw, ROW_READ, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, spacerw, rhandler_name);
+	if (whandler != 0)
+		space_map_range(spacerw, ROW_WRITE, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, spacerw, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+/*-------------------------------------------------
+    _memory_install_handler8 - same as above but
+    explicitly for 8-bit handlers
+-------------------------------------------------*/
+
+UINT8 *_memory_install_handler8(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, write8_space_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL)
+		space_map_range(spacerw, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(spacerw, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+/*-------------------------------------------------
+    _memory_install_handler16 - same as above but
+    explicitly for 16-bit handlers
+-------------------------------------------------*/
+
+UINT16 *_memory_install_handler16(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, write16_space_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL)
+		space_map_range(spacerw, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(spacerw, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+/*-------------------------------------------------
+    _memory_install_handler32 - same as above but
+    explicitly for 32-bit handlers
+-------------------------------------------------*/
+
+UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, write32_space_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL)
+		space_map_range(spacerw, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(spacerw, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+/*-------------------------------------------------
+    _memory_install_handler64 - same as above but
+    explicitly for 64-bit handlers
+-------------------------------------------------*/
+
+UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, write64_space_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL)
+		space_map_range(spacerw, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(spacerw, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+/*-------------------------------------------------
+    _memory_install_device_handler - install a new 
+    device memory handler into the given address 
+    space, returning a pointer to the memory 
+    backing it, if present
+-------------------------------------------------*/
+
+void *_memory_install_device_handler(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler >= STATIC_COUNT || whandler >= STATIC_COUNT)
+		fatalerror("fatal: can only use static banks with memory_install_device_handler()");
+	if (rhandler != 0)
+		space_map_range(spacerw, ROW_READ, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, (void *)device, rhandler_name);
+	if (whandler != 0)
+		space_map_range(spacerw, ROW_WRITE, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, (void *)device, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+/*-------------------------------------------------
+    _memory_install_device_handler8 - same as above 
+    but explicitly for 8-bit handlers
+-------------------------------------------------*/
+
+UINT8 *_memory_install_device_handler8(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, write8_device_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL)
+		space_map_range(spacerw, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(spacerw, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+/*-------------------------------------------------
+    _memory_install_device_handler16 - same as 
+    above but explicitly for 16-bit handlers
+-------------------------------------------------*/
+
+UINT16 *_memory_install_device_handler16(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, write16_device_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL)
+		space_map_range(spacerw, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(spacerw, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+/*-------------------------------------------------
+    _memory_install_device_handler32 - same as 
+    above but explicitly for 32-bit handlers
+-------------------------------------------------*/
+
+UINT32 *_memory_install_device_handler32(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, write32_device_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL)
+		space_map_range(spacerw, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(spacerw, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+/*-------------------------------------------------
+    _memory_install_device_handler64 - same as 
+    above but explicitly for 64-bit handlers
+-------------------------------------------------*/
+
+UINT64 *_memory_install_device_handler64(const address_space *space, const device_config *device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name)
+{
+	address_space *spacerw = (address_space *)space;
+	if (rhandler != NULL)
+		space_map_range(spacerw, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
+	if (whandler != NULL)
+		space_map_range(spacerw, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
+	mem_dump();
+	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
+}
+
+
+
+/***************************************************************************
+    DEBUGGER HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    memory_get_handler_string - return a string
+    describing the handler at a particular offset
+-------------------------------------------------*/
+
+const char *memory_get_handler_string(const address_space *space, int read0_or_write1, offs_t byteaddress)
+{
+	const address_table *table = read0_or_write1 ? &space->write : &space->read;
+	UINT8 entry;
+
+	/* perform the lookup */
+	byteaddress &= space->bytemask;
+	entry = table->table[LEVEL1_INDEX(byteaddress)];
+	if (entry >= SUBTABLE_BASE)
+		entry = table->table[LEVEL2_INDEX(entry, byteaddress)];
+
+	/* 8-bit case: RAM/ROM */
+	return handler_to_string(table, entry);
+}
+
+
+/*-------------------------------------------------
+    memory_enable_read_watchpoints - enable/disable 
+    read watchpoint tracking for a given address 
+    space
+-------------------------------------------------*/
+
+void memory_enable_read_watchpoints(const address_space *space, int enable)
+{
+	address_space *spacerw = (address_space *)space;
+	if (enable)
+		spacerw->readlookup = space->machine->memory_data->wptable;
+	else
+		spacerw->readlookup = spacerw->read.table;
+}
+
+
+/*-------------------------------------------------
+    memory_enable_write_watchpoints - enable/disable 
+    write watchpoint tracking for a given address 
+    space
+-------------------------------------------------*/
+
+void memory_enable_write_watchpoints(const address_space *space, int enable)
+{
+	address_space *spacerw = (address_space *)space;
+	if (enable)
+		spacerw->writelookup = space->machine->memory_data->wptable;
+	else
+		spacerw->writelookup = spacerw->write.table;
+}
+
+
+/*-------------------------------------------------
+    memory_set_debugger_access - control whether
+    subsequent accesses are treated as coming from
+    the debugger
+-------------------------------------------------*/
+
+void memory_set_debugger_access(const address_space *space, int debugger)
+{
+	address_space *spacerw = (address_space *)space;
+	spacerw->debugger_access = debugger;
+}
+
+
+/*-------------------------------------------------
+    memory_set_log_unmap - sets whether unmapped
+    memory accesses should be logged or not
+-------------------------------------------------*/
+
+void memory_set_log_unmap(const address_space *space, int log)
+{
+	address_space *spacerw = (address_space *)space;
+	spacerw->log_unmap = log;
+}
+
+
+/*-------------------------------------------------
+    memory_get_log_unmap - gets whether unmapped
+    memory accesses should be logged or not
+-------------------------------------------------*/
+
+int memory_get_log_unmap(const address_space *space)
+{
+	return space->log_unmap;
+}
+
+
+/*-------------------------------------------------
+    memory_dump - dump the internal memory tables 
+    to the given file
+-------------------------------------------------*/
+
+void memory_dump(running_machine *machine, FILE *file)
+{
+	memory_private *memdata = machine->memory_data;
+	const address_space *space;
+
+	/* skip if we can't open the file */
+	if (!file)
+		return;
+
+	/* loop over valid address spaces */
+	for (space = memdata->spacelist; space != NULL; space = space->next)
+	{
+		fprintf(file, "\n\n"
+		              "====================================================\n"
+		              "CPU '%s' %s address space read handler dump\n"
+		              "====================================================\n", space->cpu->tag, space->name);
+		dump_map(file, space, &space->read);
+
+		fprintf(file, "\n\n"
+		              "====================================================\n"
+		              "CPU '%s' %s address space write handler dump\n"
+		              "====================================================\n", space->cpu->tag, space->name);
+		dump_map(file, space, &space->read);
+	}
+}
+
+
+
+/***************************************************************************
+    INTERNAL INITIALIZATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    memory_init_spaces - create the address
+    spaces
+-------------------------------------------------*/
+
+static void memory_init_spaces(running_machine *machine)
+{
+	const machine_config *config = machine->config;
+	memory_private *memdata = machine->memory_data;
+	address_space **nextptr = (address_space **)&memdata->spacelist;
+	int cpunum, spacenum;
+
+	/* create a global watchpoint-filled table */
+	memdata->wptable = auto_malloc(1 << LEVEL1_BITS);
+	memset(memdata->wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
+
+	/* loop over CPUs */
+	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
+		if (machine->cpu[cpunum] != NULL)
+		{
+			cpu_type cputype = config->cpu[cpunum].type;
+
+			/* initialize each address space with an actual address bus */
+			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+				if (cputype_get_addrbus_width(cputype, spacenum) > 0)
+				{
+					address_space *space = malloc_or_die(sizeof(*space));
+					int accessorindex;
+					int entrynum;
+					
+					/* determine the address and data bits */
+					memset(space, 0, sizeof(*space));
+					space->machine = machine;
+					space->cpu = machine->cpu[cpunum];
+					space->spacenum = spacenum;
+					space->name = address_space_names[spacenum];
+					space->endianness = cputype_get_endianness(cputype);
+					space->ashift = cputype_get_addrbus_shift(cputype, spacenum);
+					space->abits = cputype_get_addrbus_width(cputype, spacenum);
+					space->dbits = cputype_get_databus_width(cputype, spacenum);
+					space->addrmask = 0xffffffffUL >> (32 - space->abits);
+					space->bytemask = ADDR2BYTE_END(space, space->addrmask);
+					accessorindex = (space->dbits == 8) ? 0 : (space->dbits == 16) ? 1 : (space->dbits == 32) ? 2 : 3;
+					space->accessors = memory_accessors[accessorindex][(space->endianness == CPU_IS_LE) ? 0 : 1];
+					space->map = NULL;
+					space->log_unmap = TRUE;
+					
+					/* allocate subtable information; we malloc this manually because it will be realloc'ed */
+					space->read.subtable = auto_malloc(sizeof(*space->read.subtable) * SUBTABLE_COUNT);
+					memset(space->read.subtable, 0, sizeof(*space->read.subtable) * SUBTABLE_COUNT);
+					space->write.subtable = auto_malloc(sizeof(*space->write.subtable) * SUBTABLE_COUNT);
+					memset(space->write.subtable, 0, sizeof(*space->write.subtable) * SUBTABLE_COUNT);
+					
+					/* allocate the handler table */
+					space->read.handlers[0] = auto_malloc(sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
+					memset(space->read.handlers[0], 0, sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
+					space->write.handlers[0] = auto_malloc(sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
+					memset(space->write.handlers[0], 0, sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
+					for (entrynum = 1; entrynum < ARRAY_LENGTH(space->read.handlers); entrynum++)
+					{
+						space->read.handlers[entrynum] = space->read.handlers[0] + entrynum;
+						space->write.handlers[entrynum] = space->write.handlers[0] + entrynum;
+					}
+
+					/* init the static handlers */
+					for (entrynum = 0; entrynum < ENTRY_COUNT; entrynum++)
+					{
+						space->read.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 0, entrynum);
+						space->read.handlers[entrynum]->object = space;
+						space->write.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 1, entrynum);
+						space->write.handlers[entrynum]->object = space;
+					}
+
+					/* make sure we fix up the mask for the unmap and watchpoint handlers */
+					space->read.handlers[STATIC_UNMAP]->bytemask = ~0;
+					space->write.handlers[STATIC_UNMAP]->bytemask = ~0;
+					space->read.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
+					space->write.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
+
+					/* allocate memory; these aren't auto-malloc'ed as we need to expand them */
+					space->read.table = malloc_or_die(1 << LEVEL1_BITS);
+					space->write.table = malloc_or_die(1 << LEVEL1_BITS);
+
+					/* initialize everything to unmapped */
+					memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
+					memset(space->write.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
+
+					/* initialize the lookups */
+					space->readlookup = space->read.table;
+					space->writelookup = space->write.table;
+
+					/* set the direct access information base */
+					space->direct.raw = space->direct.decrypted = NULL;
+					space->direct.mask = space->bytemask;
+					space->direct.min = 1;
+					space->direct.max = 0;
+					space->direct.entry = STATIC_UNMAP;
+					space->directupdate = NULL;
+					
+					/* link us in */
+					*nextptr = space;
+					nextptr = (address_space **)&space->next;
+				}
+		}
+}
+
+
+/*-------------------------------------------------
+    memory_init_preflight - verify the memory structs
+    and track which banks are referenced
+-------------------------------------------------*/
+
+static void memory_init_preflight(running_machine *machine)
+{
+	memory_private *memdata = machine->memory_data;
+	address_space *space;
+
+	/* zap the bank data */
+	memset(&memdata->bankdata, 0, sizeof(memdata->bankdata));
+
+	/* loop over valid address spaces */
+	for (space = (address_space *)memdata->spacelist; space != NULL; space = (address_space *)space->next)
+	{
+		int regionsize = (space->spacenum == ADDRESS_SPACE_PROGRAM) ? memory_region_length(space->machine, space->cpu->tag) : 0;
+		address_map_entry *entry;
+		int entrynum;
+
+		/* allocate the address map */
+		space->map = address_map_alloc(machine->config, machine->gamedrv, cpu_get_index(space->cpu), space->spacenum);
+
+		/* extract global parameters specified by the map */
+		space->unmap = (space->map->unmapval == 0) ? 0 : ~0;
+		if (space->map->globalmask != 0)
+		{
+			space->addrmask = space->map->globalmask;
+			space->bytemask = ADDR2BYTE_END(space, space->addrmask);
+		}
+
+		/* make a pass over the address map, adjusting for the CPU and getting memory pointers */
+		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+		{
+			/* computed adjusted addresses first */
+			entry->bytestart = entry->addrstart;
+			entry->byteend = entry->addrend;
+			entry->bytemirror = entry->addrmirror;
+			entry->bytemask = entry->addrmask;
+			adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
+
+			/* if this is a ROM handler without a specified region, attach it to the implicit region */
+			if (space->spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->region == NULL)
+			{
+				/* make sure it fits within the memory region before doing so, however */
+				if (entry->byteend < regionsize)
+				{
+					entry->region = space->cpu->tag;
+					entry->rgnoffs = entry->bytestart;
+				}
+			}
+
+			/* validate adjusted addresses against implicit regions */
+			if (entry->region != NULL && entry->share == 0 && entry->baseptr == NULL)
+			{
+				UINT8 *base = memory_region(machine, entry->region);
+				offs_t length = memory_region_length(machine, entry->region);
+
+				/* validate the region */
+				if (base == NULL)
+					fatalerror("Error: CPU '%s' %s space memory map entry %X-%X references non-existant region \"%s\"", space->cpu->tag, space->name, entry->addrstart, entry->addrend, entry->region);
+				if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > length)
+					fatalerror("Error: CPU '%s' %s space memory map entry %X-%X extends beyond region \"%s\" size (%X)", space->cpu->tag, space->name, entry->addrstart, entry->addrend, entry->region, length);
+			}
+
+			/* convert any region-relative entries to their memory pointers */
+			if (entry->region != NULL)
+				entry->memory = memory_region(machine, entry->region) + entry->rgnoffs;
+
+			/* assign static banks for explicitly specified entries */
+			if (HANDLER_IS_BANK(entry->read.generic))
+				bank_assign_static(HANDLER_TO_BANK(entry->read.generic), space, ROW_READ, entry->bytestart, entry->byteend);
+			if (HANDLER_IS_BANK(entry->write.generic))
+				bank_assign_static(HANDLER_TO_BANK(entry->write.generic), space, ROW_WRITE, entry->bytestart, entry->byteend);
+		}
+
+		/* now loop over all the handlers and enforce the address mask */
+		/* we don't loop over map entries because the mask applies to static handlers as well */
+		for (entrynum = 0; entrynum < ENTRY_COUNT; entrynum++)
+		{
+			space->read.handlers[entrynum]->bytemask &= space->bytemask;
+			space->write.handlers[entrynum]->bytemask &= space->bytemask;
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    memory_init_populate - populate the memory
+    mapping tables with entries
+-------------------------------------------------*/
+
+static void memory_init_populate(running_machine *machine)
+{
+	memory_private *memdata = machine->memory_data;
+	address_space *space;
+
+	/* loop over valid address spaces */
+	for (space = (address_space *)memdata->spacelist; space != NULL; space = (address_space *)space->next)
+		if (space->map != NULL)
+		{
+			const address_map_entry *last_entry = NULL;
+
+			/* install the handlers, using the original, unadjusted memory map */
+			while (last_entry != space->map->entrylist)
+			{
+				const address_map_entry *entry;
+				read_handler rhandler;
+				write_handler whandler;
+
+				/* find the entry before the last one we processed */
+				for (entry = space->map->entrylist; entry->next != last_entry; entry = entry->next) ;
+				last_entry = entry;
+				rhandler = entry->read;
+				whandler = entry->write;
+
+				/* if we have a read port tag, look it up */
+				if (entry->read_porttag != NULL)
+				{
+					switch (space->dbits)
+					{
+						case 8:		rhandler.shandler8  = input_port_read_handler8(machine->portconfig, entry->read_porttag);	break;
+						case 16:	rhandler.shandler16 = input_port_read_handler16(machine->portconfig, entry->read_porttag);	break;
+						case 32:	rhandler.shandler32 = input_port_read_handler32(machine->portconfig, entry->read_porttag);	break;
+						case 64:	rhandler.shandler64 = input_port_read_handler64(machine->portconfig, entry->read_porttag);	break;
+					}
+					if (rhandler.generic == NULL)
+						fatalerror("Non-existent port referenced: '%s'\n", entry->read_porttag);
+				}
+
+				/* install the read handler if present */
+				if (rhandler.generic != NULL)
+				{
+					int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
+					void *object = space;
+					if (entry->read_devtype != NULL)
+					{
+						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->read_devtype, entry->read_devtag);
+						if (object == NULL)
+							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->read_devtype), entry->read_devtag);
+					}
+					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, rhandler.generic, object, entry->read_name);
+				}
+
+				/* install the write handler if present */
+				if (whandler.generic != NULL)
+				{
+					int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
+					void *object = space;
+					if (entry->write_devtype != NULL)
+					{
+						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->write_devtype, entry->write_devtag);
+						if (object == NULL)
+							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->write_devtype), entry->write_devtag);
+					}
+					space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, whandler.generic, object, entry->write_name);
+				}
+			}
+		}
+}
+
+
+/*-------------------------------------------------
+    memory_init_allocate - allocate memory for
+    CPU address spaces
+-------------------------------------------------*/
+
+static void memory_init_allocate(running_machine *machine)
+{
+	memory_private *memdata = machine->memory_data;
+	address_space *space;
+
+	/* loop over valid address spaces */
+	for (space = (address_space *)memdata->spacelist; space != NULL; space = (address_space *)space->next)
+	{
+		address_map_entry *unassigned = NULL;
+		address_map_entry *entry;
+		memory_block *prev_memblock_head = memdata->memory_block_list;
+		memory_block *memblock;
+
+		/* make a first pass over the memory map and track blocks with hardcoded pointers */
+		/* we do this to make sure they are found by space_find_backing_memory first */
+		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+			if (entry->memory != NULL)
+				block_allocate(space, entry->bytestart, entry->byteend, entry->memory);
+
+		/* loop over all blocks just allocated and assign pointers from them */
+		for (memblock = memdata->memory_block_list; memblock != prev_memblock_head; memblock = memblock->next)
+			unassigned = block_assign_intersecting(space, memblock->bytestart, memblock->byteend, memblock->data);
+
+		/* if we don't have an unassigned pointer yet, try to find one */
+		if (unassigned == NULL)
+			unassigned = block_assign_intersecting(space, ~0, 0, NULL);
+
+		/* loop until we've assigned all memory in this space */
+		while (unassigned != NULL)
+		{
+			offs_t curbytestart, curbyteend;
+			int changed;
+			void *block;
+
+			/* work in MEMORY_BLOCK_CHUNK-sized chunks */
+			offs_t curblockstart = unassigned->bytestart / MEMORY_BLOCK_CHUNK;
+			offs_t curblockend = unassigned->byteend / MEMORY_BLOCK_CHUNK;
+
+			/* loop while we keep finding unassigned blocks in neighboring MEMORY_BLOCK_CHUNK chunks */
+			do
+			{
+				changed = FALSE;
+
+				/* scan for unmapped blocks in the adjusted map */
+				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+					if (entry->memory == NULL && entry != unassigned && space_needs_backing_store(space, entry))
+					{
+						offs_t blockstart, blockend;
+
+						/* get block start/end blocks for this block */
+						blockstart = entry->bytestart / MEMORY_BLOCK_CHUNK;
+						blockend = entry->byteend / MEMORY_BLOCK_CHUNK;
+
+						/* if we intersect or are adjacent, adjust the start/end */
+						if (blockstart <= curblockend + 1 && blockend >= curblockstart - 1)
+						{
+							if (blockstart < curblockstart)
+								curblockstart = blockstart, changed = TRUE;
+							if (blockend > curblockend)
+								curblockend = blockend, changed = TRUE;
+						}
+					}
+			} while (changed);
+
+			/* we now have a block to allocate; do it */
+			curbytestart = curblockstart * MEMORY_BLOCK_CHUNK;
+			curbyteend = curblockend * MEMORY_BLOCK_CHUNK + (MEMORY_BLOCK_CHUNK - 1);
+			block = block_allocate(space, curbytestart, curbyteend, NULL);
+
+			/* assign memory that intersected the new block */
+			unassigned = block_assign_intersecting(space, curbytestart, curbyteend, block);
+		}
+	}
+}
+
+
+/*-------------------------------------------------
+    memory_init_locate - find all the requested 
+    pointers into the final allocated memory
+-------------------------------------------------*/
+
+static void memory_init_locate(running_machine *machine)
+{
+	memory_private *memdata = machine->memory_data;
+	address_space *space;
+	int banknum;
+
+	/* loop over valid address spaces */
+	for (space = (address_space *)memdata->spacelist; space != NULL; space = (address_space *)space->next)
+	{
+		const address_map_entry *entry;
+
+		/* fill in base/size entries, and handle shared memory */
+		for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+		{
+			/* assign base/size values */
+			if (entry->baseptr != NULL)
+				*entry->baseptr = entry->memory;
+			if (entry->baseptroffs_plus1 != 0)
+				*(void **)((UINT8 *)machine->driver_data + entry->baseptroffs_plus1 - 1) = entry->memory;
+			if (entry->sizeptr != NULL)
+				*entry->sizeptr = entry->byteend - entry->bytestart + 1;
+			if (entry->sizeptroffs_plus1 != 0)
+				*(size_t *)((UINT8 *)machine->driver_data + entry->sizeptroffs_plus1 - 1) = entry->byteend - entry->bytestart + 1;
+		}
+	}
+
+	/* once this is done, find the starting bases for the banks */
+	for (banknum = 1; banknum <= MAX_BANKS; banknum++)
+	{
+		bank_info *bank = &memdata->bankdata[banknum];
+		if (bank->used)
+		{
+			address_map_entry *entry;
+
+			/* set the initial bank pointer */
+			for (entry = bank->space->map->entrylist; entry != NULL; entry = entry->next)
+				if (entry->bytestart == bank->bytestart)
+				{
+					memdata->bank_ptr[banknum] = entry->memory;
+	 				VPRINTF(("assigned bank %d pointer to memory from range %08X-%08X [%p]\n", banknum, entry->addrstart, entry->addrend, entry->memory));
+					break;
+				}
+
+			/* if the entry was set ahead of time, override the automatically found pointer */
+			if (!bank->dynamic && bank->curentry != MAX_BANK_ENTRIES)
+				memdata->bank_ptr[banknum] = bank->entry[bank->curentry];
+		}
+	}
+
+	/* request a callback to fix up the banks when done */
+	state_save_register_postload(machine, bank_reattach, NULL);
+}
+
+
+/*-------------------------------------------------
+    memory_exit - free memory
+-------------------------------------------------*/
+
+static void memory_exit(running_machine *machine)
+{
+	memory_private *memdata = machine->memory_data;
+	address_space *space, *nextspace;
+
+	/* free the memory blocks */
+	while (memdata->memory_block_list != NULL)
+	{
+		memory_block *block = memdata->memory_block_list;
+		memdata->memory_block_list = block->next;
+		free(block);
+	}
+
+	/* free all the address spaces and tables */
+	for (space = (address_space *)memdata->spacelist; space != NULL; space = nextspace)
+	{
+		nextspace = (address_space *)space->next;
+		if (space->map != NULL)
+			address_map_free(space->map);
+		if (space->read.table != NULL)
+			free(space->read.table);
+		if (space->write.table != NULL)
+			free(space->write.table);
+		free(space);
+	}
+}
+
+
+
+/***************************************************************************
+    ADDRESS MAP HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
+    map_detokenize - detokenize an array of
+    address map tokens
 -------------------------------------------------*/
 
 #define check_map(field) do { \
@@ -870,7 +1899,7 @@ const address_map *memory_get_address_map(int cpunum, int spacenum)
 		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
 	} while (0)
 
-static void address_map_detokenize(address_map *map, const game_driver *driver, const char *cputag, const addrmap_token *tokens)
+static void map_detokenize(address_map *map, const game_driver *driver, const char *cputag, const addrmap_token *tokens)
 {
 	address_map_entry **entryptr;
 	address_map_entry *entry;
@@ -909,7 +1938,7 @@ static void address_map_detokenize(address_map *map, const game_driver *driver, 
 
 			/* including */
 			case ADDRMAP_TOKEN_INCLUDE:
-				address_map_detokenize(map, driver, cputag, TOKEN_GET_PTR(tokens, tokenptr));
+				map_detokenize(map, driver, cputag, TOKEN_GET_PTR(tokens, tokenptr));
 				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
 				entry = NULL;
 				break;
@@ -1043,821 +2072,8 @@ static void address_map_detokenize(address_map *map, const game_driver *driver, 
 
 
 /***************************************************************************
-    OPCODE BASE CONTROL
+    MEMORY MAPPING HELPERS
 ***************************************************************************/
-
-/*-------------------------------------------------
-    memory_set_decrypted_region - registers an
-    address range as having a decrypted data
-    pointer
--------------------------------------------------*/
-
-void memory_set_decrypted_region(int cpunum, offs_t addrstart, offs_t addrend, void *base)
-{
-	address_space *space = &cpudata[cpunum].space[ADDRESS_SPACE_PROGRAM];
-	offs_t bytestart = ADDR2BYTE(space, addrstart);
-	offs_t byteend = ADDR2BYTE_END(space, addrend);
-	int banknum, found = FALSE;
-
-	/* loop over banks looking for a match */
-	for (banknum = 0; banknum < STATIC_COUNT; banknum++)
-	{
-		bank_info *bank = &bankdata[banknum];
-
-		/* consider this bank if it is used for reading and matches the CPU/address space */
-		if (bank->used && bank->read && bank->cpunum == cpunum && bank->spacenum == ADDRESS_SPACE_PROGRAM)
-		{
-			/* verify that the region fully covers the decrypted range */
-			if (bank->bytestart >= bytestart && bank->byteend <= byteend)
-			{
-				/* set the decrypted pointer for the corresponding memory bank */
-				bankd_ptr[banknum] = (UINT8 *)base + bank->bytestart - bytestart;
-				found = TRUE;
-
-				/* if we are executing from here, force an opcode base update */
-				if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
-					force_opbase_update(space);
-			}
-
-			/* fatal error if the decrypted region straddles the bank */
-			else if (bank->bytestart < byteend && bank->byteend > bytestart)
-				fatalerror("memory_set_decrypted_region found straddled region %08X-%08X for CPU %d", bytestart, byteend, cpunum);
-		}
-	}
-
-	/* fatal error as well if we didn't find any relevant memory banks */
-	if (!found)
-		fatalerror("memory_set_decrypted_region unable to find matching region %08X-%08X for CPU %d", bytestart, byteend, cpunum);
-}
-
-
-/*-------------------------------------------------
-    memory_set_opbase_handler - register a
-    handler for opcode base changes on a given
-    CPU
--------------------------------------------------*/
-
-direct_update_func memory_set_direct_update_handler(const address_space *space, direct_update_func function)
-{
-	address_space *spacerw = (address_space *)space;
-	direct_update_func old = spacerw->directupdate;
-	spacerw->directupdate = function;
-	return old;
-}
-
-
-/*-------------------------------------------------
-    memory_set_direct_region - called by CPU cores to
-    update the opcode base for the given address
--------------------------------------------------*/
-
-int memory_set_direct_region(const address_space *space, offs_t byteaddress)
-{
-	address_space *spacerw = (address_space *)space;
-	UINT8 *base = NULL, *based = NULL;
-	const handler_data *handlers;
-	UINT8 entry;
-
-	/* allow overrides */
-	if (spacerw->directupdate != NULL)
-	{
-		byteaddress = (*spacerw->directupdate)(spacerw, byteaddress, &spacerw->direct);
-		if (byteaddress == ~0)
-			return TRUE;
-	}
-
-	/* perform the lookup */
-	byteaddress &= spacerw->bytemask;
-	entry = spacerw->readlookup[LEVEL1_INDEX(byteaddress)];
-	if (entry >= SUBTABLE_BASE)
-		entry = spacerw->readlookup[LEVEL2_INDEX(entry,byteaddress)];
-	
-	/* stop if nothing changed */
-	if (spacerw->direct.entry == entry)
-		return (entry >= STATIC_BANK1 && entry < STATIC_RAM);
-
-	/* keep track of current entry */
-	spacerw->direct.entry = entry;
-
-	/* if we don't map to a bank, see if there are any banks we can map to */
-	if (entry < STATIC_BANK1 || entry >= STATIC_RAM)
-	{
-		/* loop over banks and find a match */
-		for (entry = 1; entry < STATIC_COUNT; entry++)
-		{
-			bank_info *bank = &bankdata[entry];
-			if (bank->used && bank->cpunum == cur_context && bank->spacenum == space->spacenum &&
-				bank->bytestart < byteaddress && bank->byteend > byteaddress)
-				break;
-		}
-
-		/* if nothing was found, leave everything alone */
-		if (entry == STATIC_COUNT)
-		{
-			logerror("CPU '%s': warning - attempt to direct-map address %08X in %s space\n", space->cpu->tag, byteaddress, address_space_names[space->spacenum]);
-			return FALSE;
-		}
-	}
-
-	/* if no decrypted opcodes, point to the same base */
-	base = bank_ptr[entry];
-	based = bankd_ptr[entry];
-	if (based == NULL)
-		based = base;
-
-	/* compute the adjusted base */
-	handlers = spacerw->read.handlers[entry];
-	spacerw->direct.mask = handlers->bytemask;
-	spacerw->direct.raw = base - (handlers->bytestart & spacerw->direct.mask);
-	spacerw->direct.decrypted = based - (handlers->bytestart & spacerw->direct.mask);
-	spacerw->direct.min = handlers->bytestart;
-	spacerw->direct.max = handlers->byteend;
-	return TRUE;
-}
-
-
-/***************************************************************************
-    OPCODE BASE CONTROL
-***************************************************************************/
-
-/*-------------------------------------------------
-    memory_get_read_ptr - return a pointer to the
-    base of RAM associated with the given CPU
-    and offset
--------------------------------------------------*/
-
-void *memory_get_read_ptr(int cpunum, int spacenum, offs_t byteaddress)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	offs_t byteoffset;
-	UINT8 entry;
-
-	/* perform the lookup */
-	byteaddress &= space->bytemask;
-	entry = space->read.table[LEVEL1_INDEX(byteaddress)];
-	if (entry >= SUBTABLE_BASE)
-		entry = space->read.table[LEVEL2_INDEX(entry, byteaddress)];
-
-	/* 8-bit case: RAM/ROM */
-	if (entry >= STATIC_RAM)
-		return NULL;
-	byteoffset = (byteaddress - space->read.handlers[entry]->bytestart) & space->read.handlers[entry]->bytemask;
-	return &bank_ptr[entry][byteoffset];
-}
-
-
-/*-------------------------------------------------
-    memory_get_write_ptr - return a pointer to the
-    base of RAM associated with the given CPU
-    and offset
--------------------------------------------------*/
-
-void *memory_get_write_ptr(int cpunum, int spacenum, offs_t byteaddress)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	offs_t byteoffset;
-	UINT8 entry;
-
-	/* perform the lookup */
-	byteaddress &= space->bytemask;
-	entry = space->write.table[LEVEL1_INDEX(byteaddress)];
-	if (entry >= SUBTABLE_BASE)
-		entry = space->write.table[LEVEL2_INDEX(entry, byteaddress)];
-
-	/* 8-bit case: RAM/ROM */
-	if (entry >= STATIC_RAM)
-		return NULL;
-	byteoffset = (byteaddress - space->write.handlers[entry]->bytestart) & space->write.handlers[entry]->bytemask;
-	return &bank_ptr[entry][byteoffset];
-}
-
-
-/*-------------------------------------------------
-    memory_get_op_ptr - return a pointer to the
-    base of opcode RAM associated with the given
-    CPU and offset
--------------------------------------------------*/
-
-void *memory_get_op_ptr(running_machine *machine, int cpunum, offs_t byteaddress, int arg)
-{
-	address_space *spacerw = &cpudata[cpunum].space[ADDRESS_SPACE_PROGRAM];
-	offs_t byteoffset;
-	void *ptr = NULL;
-	UINT8 entry;
-
-	/* if there is a custom mapper, use that */
-	if (spacerw->directupdate != NULL)
-	{
-		/* need to save opcode info */
-		direct_read_data saved_data = spacerw->direct;
-
-		/* query the handler */
-		offs_t new_byteaddress = (*spacerw->directupdate)(spacerw, byteaddress, &spacerw->direct);
-
-		/* if it returns ~0, we use whatever data the handler set */
-		if (new_byteaddress == ~0)
-			ptr = arg ? &spacerw->direct.raw[byteaddress] : &spacerw->direct.decrypted[byteaddress];
-
-		/* otherwise, we use the new offset in the generic case below */
-		else
-			byteaddress = new_byteaddress;
-
-		/* restore opcode info */
-		spacerw->direct = saved_data;
-
-		/* if we got our pointer, we're done */
-		if (ptr != NULL)
-			return ptr;
-	}
-
-	/* perform the lookup */
-	byteaddress &= spacerw->bytemask;
-	entry = spacerw->read.table[LEVEL1_INDEX(byteaddress)];
-	if (entry >= SUBTABLE_BASE)
-		entry = spacerw->read.table[LEVEL2_INDEX(entry, byteaddress)];
-
-	/* if a non-RAM area, return NULL */
-	if (entry >= STATIC_RAM)
-		return NULL;
-
-	/* adjust the offset */
-	byteoffset = (byteaddress - spacerw->read.handlers[entry]->bytestart) & spacerw->read.handlers[entry]->bytemask;
-	return (!arg && bankd_ptr[entry]) ? &bankd_ptr[entry][byteoffset] : &bank_ptr[entry][byteoffset];
-}
-
-
-/*-------------------------------------------------
-    memory_configure_bank - configure the
-    addresses for a bank
--------------------------------------------------*/
-
-void memory_configure_bank(int banknum, int startentry, int numentries, void *base, offs_t stride)
-{
-	int entrynum;
-
-	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bankdata[banknum].used)
-		fatalerror("memory_configure_bank called with invalid bank %d", banknum);
-	if (bankdata[banknum].dynamic)
-		fatalerror("memory_configure_bank called with dynamic bank %d", banknum);
-	if (startentry < 0 || startentry + numentries > MAX_BANK_ENTRIES)
-		fatalerror("memory_configure_bank called with out-of-range entries %d-%d", startentry, startentry + numentries - 1);
-	if (!base)
-		fatalerror("memory_configure_bank called NULL base");
-
-	/* fill in the requested bank entries */
-	for (entrynum = startentry; entrynum < startentry + numentries; entrynum++)
-		bankdata[banknum].entry[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
-	
-	/* if we have no bankptr yet, set it to the first entry */
-	if (bank_ptr[banknum] == NULL)
-		bank_ptr[banknum] = bankdata[banknum].entry[0];
-}
-
-
-
-/*-------------------------------------------------
-    memory_configure_bank_decrypted - configure
-    the decrypted addresses for a bank
--------------------------------------------------*/
-
-void memory_configure_bank_decrypted(int banknum, int startentry, int numentries, void *base, offs_t stride)
-{
-	int entrynum;
-
-	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bankdata[banknum].used)
-		fatalerror("memory_configure_bank called with invalid bank %d", banknum);
-	if (bankdata[banknum].dynamic)
-		fatalerror("memory_configure_bank called with dynamic bank %d", banknum);
-	if (startentry < 0 || startentry + numentries > MAX_BANK_ENTRIES)
-		fatalerror("memory_configure_bank called with out-of-range entries %d-%d", startentry, startentry + numentries - 1);
-	if (!base)
-		fatalerror("memory_configure_bank_decrypted called NULL base");
-
-	/* fill in the requested bank entries */
-	for (entrynum = startentry; entrynum < startentry + numentries; entrynum++)
-		bankdata[banknum].entryd[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
-	
-	/* if we have no bankptr yet, set it to the first entry */
-	if (bankd_ptr[banknum] == NULL)
-		bankd_ptr[banknum] = bankdata[banknum].entryd[0];
-}
-
-
-
-/*-------------------------------------------------
-    memory_set_bank - set the base of a bank
--------------------------------------------------*/
-
-void memory_set_bank(int banknum, int entrynum)
-{
-	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bankdata[banknum].used)
-		fatalerror("memory_set_bank called with invalid bank %d", banknum);
-	if (bankdata[banknum].dynamic)
-		fatalerror("memory_set_bank called with dynamic bank %d", banknum);
-	if (entrynum < 0 || entrynum > MAX_BANK_ENTRIES)
-		fatalerror("memory_set_bank called with out-of-range entry %d", entrynum);
-	if (!bankdata[banknum].entry[entrynum])
-		fatalerror("memory_set_bank called for bank %d with invalid bank entry %d", banknum, entrynum);
-
-	/* set the base */
-	bankdata[banknum].curentry = entrynum;
-	bank_ptr[banknum] = bankdata[banknum].entry[entrynum];
-	bankd_ptr[banknum] = bankdata[banknum].entryd[entrynum];
-
-	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
-		force_opbase_update((address_space *)active_address_space[ADDRESS_SPACE_PROGRAM]);
-}
-
-
-
-/*-------------------------------------------------
-    memory_get_bank - return the currently
-    selected bank
--------------------------------------------------*/
-
-int memory_get_bank(int banknum)
-{
-	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bankdata[banknum].used)
-		fatalerror("memory_get_bank called with invalid bank %d", banknum);
-	if (bankdata[banknum].dynamic)
-		fatalerror("memory_get_bank called with dynamic bank %d", banknum);
-	return bankdata[banknum].curentry;
-}
-
-
-
-/*-------------------------------------------------
-    memory_set_bankptr - set the base of a bank
--------------------------------------------------*/
-
-void memory_set_bankptr(int banknum, void *base)
-{
-	/* validation checks */
-	if (banknum < STATIC_BANK1 || banknum > MAX_EXPLICIT_BANKS || !bankdata[banknum].used)
-		fatalerror("memory_set_bankptr called with invalid bank %d", banknum);
-	if (bankdata[banknum].dynamic)
-		fatalerror("memory_set_bankptr called with dynamic bank %d", banknum);
-	if (base == NULL)
-		fatalerror("memory_set_bankptr called NULL base");
-	if (ALLOW_ONLY_AUTO_MALLOC_BANKS)
-		validate_auto_malloc_memory(base, bankdata[banknum].byteend - bankdata[banknum].bytestart + 1);
-
-	/* set the base */
-	bank_ptr[banknum] = base;
-
-	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
-		force_opbase_update((address_space *)active_address_space[ADDRESS_SPACE_PROGRAM]);
-}
-
-
-/*-------------------------------------------------
-    memory_set_debugger_access - set debugger access
--------------------------------------------------*/
-
-void memory_set_debugger_access(int debugger)
-{
-	debugger_access = debugger;
-}
-
-
-/*-------------------------------------------------
-    memory_set_log_unmap - sets whether unmapped
-    memory accesses should be logged or not
--------------------------------------------------*/
-
-void memory_set_log_unmap(int spacenum, int log)
-{
-	log_unmap[spacenum] = log;
-}
-
-
-/*-------------------------------------------------
-    memory_get_log_unmap - gets whether unmapped
-    memory accesses should be logged or not
--------------------------------------------------*/
-
-int memory_get_log_unmap(int spacenum)
-{
-	return log_unmap[spacenum];
-}
-
-
-/*-------------------------------------------------
-    memory_install_handlerX - install
-    dynamic machine read and write handlers for
-    X-bit case
--------------------------------------------------*/
-
-void *_memory_install_handler(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler >= STATIC_COUNT || whandler >= STATIC_COUNT)
-		fatalerror("fatal: can only use static banks with memory_install_handler()");
-	if (rhandler != 0)
-		space_map_range(space, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, space, rhandler_name);
-	if (whandler != 0)
-		space_map_range(space, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, space, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT8 *_memory_install_handler8(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, write8_space_func whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, space, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, space, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT16 *_memory_install_handler16(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_space_func rhandler, write16_space_func whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, space, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, space, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT32 *_memory_install_handler32(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_space_func rhandler, write32_space_func whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, space, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, space, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT64 *_memory_install_handler64(running_machine *machine, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_space_func rhandler, write64_space_func whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, space, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, space, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-
-/*-------------------------------------------------
-    memory_install_device_handlerX -
-    install dynamic device read and write handlers
-    for X-bit case
--------------------------------------------------*/
-
-void *_memory_install_device_handler(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, FPTR rhandler, FPTR whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler >= STATIC_COUNT || whandler >= STATIC_COUNT)
-		fatalerror("fatal: can only use static banks with memory_install_device_handler()");
-	if (rhandler != 0)
-		space_map_range(space, ROW_READ, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, (void *)device, rhandler_name);
-	if (whandler != 0)
-		space_map_range(space, ROW_WRITE, space->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, (void *)device, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT8 *_memory_install_device_handler8(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, write8_device_func whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT16 *_memory_install_device_handler16(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read16_device_func rhandler, write16_device_func whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT32 *_memory_install_device_handler32(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read32_device_func rhandler, write32_device_func whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-UINT64 *_memory_install_device_handler64(const device_config *device, int cpunum, int spacenum, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read64_device_func rhandler, write64_device_func whandler, const char *rhandler_name, const char *whandler_name)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	if (rhandler != NULL)
-		space_map_range(space, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
-	if (whandler != NULL)
-		space_map_range(space, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
-	mem_dump();
-	return memory_find_base(cpunum, spacenum, ADDR2BYTE(space, addrstart));
-}
-
-
-/*-------------------------------------------------
-    memory_init_cpudata - initialize the cpudata
-    structure for each CPU
--------------------------------------------------*/
-
-static void memory_init_cpudata(running_machine *machine)
-{
-	const machine_config *config = machine->config;
-	int cpunum, spacenum;
-
-	/* zap the cpudata structure */
-	memset(&cpudata, 0, sizeof(cpudata));
-
-	/* create a global watchpoint-filled table */
-	wptable = malloc_or_die(1 << LEVEL1_BITS);
-	memset(wptable, STATIC_WATCHPOINT, 1 << LEVEL1_BITS);
-
-	/* loop over CPUs */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			cpu_type cputype = config->cpu[cpunum].type;
-			cpu_data *cpu = &cpudata[cpunum];
-
-			/* get pointers to the CPU's memory region */
-			cpu->tag = config->cpu[cpunum].tag;
-			cpu->region = memory_region(machine, cpu->tag);
-			cpu->regionsize = memory_region_length(machine, cpu->tag);
-
-			/* initialize each address space, and build up a mask of spaces */
-			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			{
-				address_space *space = &cpu->space[spacenum];
-				int entrynum;
-
-				/* determine the address and data bits */
-				space->machine = machine;
-				space->cpu = machine->cpu[cpunum];
-				space->spacenum = spacenum;
-				space->endianness = cputype_get_endianness(cputype);
-				space->ashift = cputype_get_addrbus_shift(cputype, spacenum);
-				space->abits = cputype_get_addrbus_width(cputype, spacenum);
-				space->dbits = cputype_get_databus_width(cputype, spacenum);
-				space->addrmask = 0xffffffffUL >> (32 - space->abits);
-				space->bytemask = ADDR2BYTE_END(space, space->addrmask);
-				space->accessors = *memory_get_accessors(spacenum, space->dbits, space->endianness);
-				space->map = NULL;
-
-				/* if there's nothing here, just punt */
-				if (space->abits == 0)
-					continue;
-				cpu->spacemask |= 1 << spacenum;
-				
-				/* allocate subtable information */
-				space->read.subtable = malloc_or_die(sizeof(*space->read.subtable) * SUBTABLE_COUNT);
-				memset(space->read.subtable, 0, sizeof(*space->read.subtable) * SUBTABLE_COUNT);
-				space->write.subtable = malloc_or_die(sizeof(*space->write.subtable) * SUBTABLE_COUNT);
-				memset(space->write.subtable, 0, sizeof(*space->write.subtable) * SUBTABLE_COUNT);
-				
-				/* allocate the handler table */
-				space->read.handlers[0] = malloc_or_die(sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
-				memset(space->read.handlers[0], 0, sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
-				space->write.handlers[0] = malloc_or_die(sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
-				memset(space->write.handlers[0], 0, sizeof(*space->write.handlers[0]) * ARRAY_LENGTH(space->write.handlers));
-				for (entrynum = 1; entrynum < ARRAY_LENGTH(space->read.handlers); entrynum++)
-				{
-					space->read.handlers[entrynum] = space->read.handlers[0] + entrynum;
-					space->write.handlers[entrynum] = space->write.handlers[0] + entrynum;
-				}
-
-				/* init the static handlers */
-				for (entrynum = 0; entrynum < ENTRY_COUNT; entrynum++)
-				{
-					space->read.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 0, entrynum);
-					space->read.handlers[entrynum]->object = space;
-					space->write.handlers[entrynum]->handler.generic = get_static_handler(space->dbits, 1, entrynum);
-					space->write.handlers[entrynum]->object = space;
-				}
-
-				/* make sure we fix up the mask for the unmap and watchpoint handlers */
-				space->read.handlers[STATIC_UNMAP]->bytemask = ~0;
-				space->write.handlers[STATIC_UNMAP]->bytemask = ~0;
-				space->read.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
-				space->write.handlers[STATIC_WATCHPOINT]->bytemask = ~0;
-
-				/* allocate memory */
-				space->read.table = malloc_or_die(1 << LEVEL1_BITS);
-				space->write.table = malloc_or_die(1 << LEVEL1_BITS);
-
-				/* initialize everything to unmapped */
-				memset(space->read.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
-				memset(space->write.table, STATIC_UNMAP, 1 << LEVEL1_BITS);
-
-				/* initialize the lookups */
-				space->readlookup = space->read.table;
-				space->writelookup = space->write.table;
-
-				/* set the RAM/ROM base */
-				space->direct.raw = space->direct.decrypted = cpu->region;
-				space->direct.mask = space->bytemask;
-				space->direct.min = 1;
-				space->direct.max = 0;
-				space->direct.entry = STATIC_UNMAP;
-				space->directupdate = NULL;
-			}
-		}
-}
-
-
-/*-------------------------------------------------
-    memory_init_preflight - verify the memory structs
-    and track which banks are referenced
--------------------------------------------------*/
-
-static void memory_init_preflight(running_machine *machine)
-{
-	int cpunum;
-
-	/* zap the bank data */
-	memset(&bankdata, 0, sizeof(bankdata));
-
-	/* loop over CPUs */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(cpudata); cpunum++)
-	{
-		cpu_data *cpu = &cpudata[cpunum];
-		int spacenum;
-
-		/* loop over valid address spaces */
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (cpu->spacemask & (1 << spacenum))
-			{
-				address_space *space = &cpu->space[spacenum];
-				address_map_entry *entry;
-				int entrynum;
-
-				/* allocate the address map */
-				space->map = address_map_alloc(machine->config, machine->gamedrv, cpunum, spacenum);
-
-				/* extract global parameters specified by the map */
-				space->unmap = (space->map->unmapval == 0) ? 0 : ~0;
-				if (space->map->globalmask != 0)
-				{
-					space->addrmask = space->map->globalmask;
-					space->bytemask = ADDR2BYTE_END(space, space->addrmask);
-				}
-
-				/* make a pass over the address map, adjusting for the CPU and getting memory pointers */
-				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
-				{
-					/* computed adjusted addresses first */
-					entry->bytestart = entry->addrstart;
-					entry->byteend = entry->addrend;
-					entry->bytemirror = entry->addrmirror;
-					entry->bytemask = entry->addrmask;
-					adjust_addresses(space, &entry->bytestart, &entry->byteend, &entry->bytemask, &entry->bytemirror);
-
-					/* if this is a ROM handler without a specified region, attach it to the implicit region */
-					if (spacenum == ADDRESS_SPACE_PROGRAM && HANDLER_IS_ROM(entry->read.generic) && entry->region == NULL)
-					{
-						/* make sure it fits within the memory region before doing so, however */
-						if (entry->byteend < cpu->regionsize)
-						{
-							entry->region = cpu->tag;
-							entry->rgnoffs = entry->bytestart;
-						}
-					}
-
-					/* validate adjusted addresses against implicit regions */
-					if (entry->region != NULL && entry->share == 0 && entry->baseptr == NULL)
-					{
-						UINT8 *base = memory_region(machine, entry->region);
-						offs_t length = memory_region_length(machine, entry->region);
-
-						/* validate the region */
-						if (base == NULL)
-							fatalerror("Error: CPU %d space %d memory map entry %X-%X references non-existant region \"%s\"", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region);
-						if (entry->rgnoffs + (entry->byteend - entry->bytestart + 1) > length)
-							fatalerror("Error: CPU %d space %d memory map entry %X-%X extends beyond region \"%s\" size (%X)", cpunum, spacenum, entry->addrstart, entry->addrend, entry->region, length);
-					}
-
-					/* convert any region-relative entries to their memory pointers */
-					if (entry->region != NULL)
-						entry->memory = memory_region(machine, entry->region) + entry->rgnoffs;
-
-					/* assign static banks for explicitly specified entries */
-					if (HANDLER_IS_BANK(entry->read.generic))
-						bank_assign_static(HANDLER_TO_BANK(entry->read.generic), cpunum, spacenum, ROW_READ, entry->bytestart, entry->byteend);
-					if (HANDLER_IS_BANK(entry->write.generic))
-						bank_assign_static(HANDLER_TO_BANK(entry->write.generic), cpunum, spacenum, ROW_WRITE, entry->bytestart, entry->byteend);
-				}
-
-				/* now loop over all the handlers and enforce the address mask */
-				/* we don't loop over map entries because the mask applies to static handlers as well */
-				for (entrynum = 0; entrynum < ENTRY_COUNT; entrynum++)
-				{
-					space->read.handlers[entrynum]->bytemask &= space->bytemask;
-					space->write.handlers[entrynum]->bytemask &= space->bytemask;
-				}
-			}
-	}
-}
-
-
-/*-------------------------------------------------
-    memory_init_populate - populate the memory
-    mapping tables with entries
--------------------------------------------------*/
-
-static void memory_init_populate(running_machine *machine)
-{
-	int cpunum, spacenum;
-
-	/* loop over CPUs and address spaces */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(cpudata); cpunum++)
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (cpudata[cpunum].spacemask & (1 << spacenum))
-			{
-				address_space *space = &cpudata[cpunum].space[spacenum];
-
-				/* install the handlers, using the original, unadjusted memory map */
-				if (space->map != NULL)
-				{
-					const address_map_entry *last_entry = NULL;
-
-					while (last_entry != space->map->entrylist)
-					{
-						const address_map_entry *entry;
-						read_handler rhandler;
-						write_handler whandler;
-
-						/* find the entry before the last one we processed */
-						for (entry = space->map->entrylist; entry->next != last_entry; entry = entry->next) ;
-						last_entry = entry;
-						rhandler = entry->read;
-						whandler = entry->write;
-
-						/* if we have a read port tag, look it up */
-						if (entry->read_porttag != NULL)
-						{
-							switch (space->dbits)
-							{
-								case 8:		rhandler.shandler8  = input_port_read_handler8(machine->portconfig, entry->read_porttag);	break;
-								case 16:	rhandler.shandler16 = input_port_read_handler16(machine->portconfig, entry->read_porttag);	break;
-								case 32:	rhandler.shandler32 = input_port_read_handler32(machine->portconfig, entry->read_porttag);	break;
-								case 64:	rhandler.shandler64 = input_port_read_handler64(machine->portconfig, entry->read_porttag);	break;
-							}
-							if (rhandler.generic == NULL)
-								fatalerror("Non-existent port referenced: '%s'\n", entry->read_porttag);
-						}
-
-						/* install the read handler if present */
-						if (rhandler.generic != NULL)
-						{
-							int bits = (entry->read_bits == 0) ? space->dbits : entry->read_bits;
-							void *object = space;
-							if (entry->read_devtype != NULL)
-							{
-								object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->read_devtype, entry->read_devtag);
-								if (object == NULL)
-									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->read_devtype), entry->read_devtag);
-							}
-							space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, rhandler.generic, object, entry->read_name);
-						}
-
-						/* install the write handler if present */
-						if (whandler.generic != NULL)
-						{
-							int bits = (entry->write_bits == 0) ? space->dbits : entry->write_bits;
-							void *object = space;
-							if (entry->write_devtype != NULL)
-							{
-								object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->write_devtype, entry->write_devtag);
-								if (object == NULL)
-									fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->write_devtype), entry->write_devtag);
-							}
-							space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, whandler.generic, object, entry->write_name);
-						}
-					}
-				}
-			}
-}
-
 
 /*-------------------------------------------------
     space_map_range_private - wrapper for
@@ -1875,6 +2091,7 @@ static void space_map_range_private(address_space *space, read_or_write readorwr
 	/* assign banks for RAM/ROM areas */
 	if (HANDLER_IS_RAM(handler))
 	{
+		memory_private *memdata = space->machine->memory_data;
 		offs_t bytestart = addrstart;
 		offs_t byteend = addrend;
 		offs_t bytemask = addrmask;
@@ -1884,9 +2101,9 @@ static void space_map_range_private(address_space *space, read_or_write readorwr
 		adjust_addresses(space, &bytestart, &byteend, &bytemask, &bytemirror);
 
 		/* assign a bank to the adjusted addresses */
-		handler = (genf *)bank_assign_dynamic(cpu_get_index(space->cpu), space->spacenum, readorwrite, bytestart, byteend);
-		if (bank_ptr[HANDLER_TO_BANK(handler)] == NULL)
-			bank_ptr[HANDLER_TO_BANK(handler)] = memory_find_base(cpu_get_index(space->cpu), space->spacenum, bytestart);
+		handler = (genf *)bank_assign_dynamic(space, readorwrite, bytestart, byteend);
+		if (memdata->bank_ptr[HANDLER_TO_BANK(handler)] == NULL)
+			memdata->bank_ptr[HANDLER_TO_BANK(handler)] = space_find_backing_memory(space, bytestart);
 	}
 
 	/* then do a normal installation */
@@ -1929,10 +2146,10 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 
 	/* if we're installing a new bank, make sure we mark it */
 	if (HANDLER_IS_BANK(handler))
-		bank_assign_static(HANDLER_TO_BANK(handler), cpu_get_index(space->cpu), space->spacenum, readorwrite, bytestart, byteend);
+		bank_assign_static(HANDLER_TO_BANK(handler), space, readorwrite, bytestart, byteend);
 
 	/* get the final handler index */
-	entry = table_assign_handler(tabledata->handlers, object, handler, handler_name, bytestart, byteend, bytemask);
+	entry = table_assign_handler(space, tabledata->handlers, object, handler, handler_name, bytestart, byteend, bytemask);
 
 	/* fix up the handler if a stub is required */
 	if (handlerbits != space->dbits)
@@ -1940,10 +2157,6 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 
 	/* populate it */
 	table_populate_range_mirrored(tabledata, bytestart, byteend, bytemirror, entry);
-
-	/* if this is being installed to a live CPU, update the context */
-	if (cur_context != -1 && cpu_get_index(space->cpu) == cur_context)
-		memory_set_context(space->machine, cur_context);
 
 	/* reset read/write pointers if necessary (could have moved due to realloc) */
 	if (reset_write)
@@ -1962,13 +2175,94 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 
 
 /*-------------------------------------------------
+    space_find_backing_memory - return a pointer to 
+    the base of RAM associated with the given CPU
+    and offset
+-------------------------------------------------*/
+
+static void *space_find_backing_memory(const address_space *space, offs_t byteaddress)
+{
+	memory_private *memdata = space->machine->memory_data;
+	address_map_entry *entry;
+	memory_block *block;
+
+	VPRINTF(("space_find_backing_memory('%s',%s,%08X) -> ", space->cpu->tag, space->name, byteaddress));
+
+	/* look in the address map first */
+	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
+	{
+		offs_t maskoffs = byteaddress & entry->bytemask;
+		if (maskoffs >= entry->bytestart && maskoffs <= entry->byteend)
+		{
+			VPRINTF(("found in entry %08X-%08X [%p]\n", entry->addrstart, entry->addrend, (UINT8 *)entry->memory + (maskoffs - entry->bytestart)));
+			return (UINT8 *)entry->memory + (maskoffs - entry->bytestart);
+		}
+	}
+
+	/* if not found there, look in the allocated blocks */
+	for (block = memdata->memory_block_list; block != NULL; block = block->next)
+		if (block->space == space && block->bytestart <= byteaddress && block->byteend > byteaddress)
+		{
+			VPRINTF(("found in allocated memory block %08X-%08X [%p]\n", block->bytestart, block->byteend, block->data + (byteaddress - block->bytestart)));
+			return block->data + byteaddress - block->bytestart;
+		}
+
+	VPRINTF(("did not find\n"));
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    space_needs_backing_store - return whether a 
+    given memory map entry implies the need of 
+    allocating and registering memory
+-------------------------------------------------*/
+
+static int space_needs_backing_store(const address_space *space, const address_map_entry *entry)
+{
+	FPTR handler;
+
+	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0)
+		return TRUE;
+
+	handler = (FPTR)entry->write.generic;
+	if (handler < STATIC_COUNT)
+	{
+		if (handler != STATIC_INVALID &&
+			handler != STATIC_ROM &&
+			handler != STATIC_NOP &&
+			handler != STATIC_UNMAP)
+			return TRUE;
+	}
+
+	handler = (FPTR)entry->read.generic;
+	if (handler < STATIC_COUNT)
+	{
+		if (handler != STATIC_INVALID &&
+			(handler < STATIC_BANK1 || handler > STATIC_BANK1 + MAX_BANKS - 1) &&
+			(handler != STATIC_ROM || space->spacenum != ADDRESS_SPACE_PROGRAM || entry->addrstart >= memory_region_length(space->machine, space->cpu->tag)) &&
+			handler != STATIC_NOP &&
+			handler != STATIC_UNMAP)
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+
+
+/***************************************************************************
+    BANKING HELPERS
+***************************************************************************/
+
+/*-------------------------------------------------
     bank_assign_static - assign and tag a static
     bank
 -------------------------------------------------*/
 
-static void bank_assign_static(int banknum, int cpunum, int spacenum, read_or_write readorwrite, offs_t bytestart, offs_t byteend)
+static void bank_assign_static(int banknum, const address_space *space, read_or_write readorwrite, offs_t bytestart, offs_t byteend)
 {
-	bank_info *bank = &bankdata[banknum];
+	bank_info *bank = &space->machine->memory_data->bankdata[banknum];
 
 	/* if we're not yet used, fill in the data */
 	if (!bank->used)
@@ -1980,8 +2274,7 @@ static void bank_assign_static(int banknum, int cpunum, int spacenum, read_or_wr
 		/* fill in information about the bank */
 		bank->used = TRUE;
 		bank->dynamic = FALSE;
-		bank->cpunum = cpunum;
-		bank->spacenum = spacenum;
+		bank->space = space;
 		bank->bytestart = bytestart;
 		bank->byteend = byteend;
 		bank->curentry = MAX_BANK_ENTRIES;
@@ -2000,39 +2293,66 @@ static void bank_assign_static(int banknum, int cpunum, int spacenum, read_or_wr
     matching bank
 -------------------------------------------------*/
 
-static genf *bank_assign_dynamic(int cpunum, int spacenum, read_or_write readorwrite, offs_t bytestart, offs_t byteend)
+static genf *bank_assign_dynamic(const address_space *space, read_or_write readorwrite, offs_t bytestart, offs_t byteend)
 {
 	int banknum;
 
 	/* loop over banks, searching for an exact match or an empty */
 	for (banknum = MAX_BANKS; banknum >= 1; banknum--)
 	{
-		bank_info *bank = &bankdata[banknum];
-		if (!bank->used || (bank->dynamic && bank->cpunum == cpunum && bank->spacenum == spacenum && bank->bytestart == bytestart))
+		bank_info *bank = &space->machine->memory_data->bankdata[banknum];
+		if (!bank->used || (bank->dynamic && bank->space == space && bank->bytestart == bytestart))
 		{
 			bank->used = TRUE;
 			bank->dynamic = TRUE;
-			bank->cpunum = cpunum;
-			bank->spacenum = spacenum;
+			bank->space = space;
 			bank->bytestart = bytestart;
 			bank->byteend = byteend;
-			VPRINTF(("Assigned bank %d to %d,%d,%08X\n", banknum, cpunum, spacenum, bytestart));
+			VPRINTF(("Assigned bank %d to '%s',%s,%08X\n", banknum, space->cpu->tag, space->name, bytestart));
 			return BANK_TO_HANDLER(banknum);
 		}
 	}
 
 	/* if we got here, we failed */
-	fatalerror("cpu #%d: ran out of banks for RAM/ROM regions!", cpunum);
+	fatalerror("CPU '%s': ran out of banks for RAM/ROM regions!", space->cpu->tag);
 	return NULL;
 }
 
+
+/*-------------------------------------------------
+    bank_reattach - reconnect banks after a load
+-------------------------------------------------*/
+
+static STATE_POSTLOAD( bank_reattach )
+{
+	memory_private *memdata = machine->memory_data;
+	int banknum;
+
+	/* once this is done, find the starting bases for the banks */
+	for (banknum = 1; banknum <= MAX_BANKS; banknum++)
+	{
+		bank_info *bank = &memdata->bankdata[banknum];
+		if (bank->used && !bank->dynamic)
+		{
+			/* if this entry has a changed entry, set the appropriate pointer */
+			if (bank->curentry != MAX_BANK_ENTRIES)
+				memdata->bank_ptr[banknum] = bank->entry[bank->curentry];
+		}
+	}
+}
+
+
+
+/***************************************************************************
+    TABLE MANAGEMENT
+***************************************************************************/
 
 /*-------------------------------------------------
     table_assign_handler - finds the index of a
     handler, or allocates a new one as necessary
 -------------------------------------------------*/
 
-static UINT8 table_assign_handler(handler_data **table, void *object, genf *handler, const char *handler_name, offs_t bytestart, offs_t byteend, offs_t bytemask)
+static UINT8 table_assign_handler(const address_space *space, handler_data **table, void *object, genf *handler, const char *handler_name, offs_t bytestart, offs_t byteend, offs_t bytemask)
 {
 	int entry;
 
@@ -2048,6 +2368,7 @@ static UINT8 table_assign_handler(handler_data **table, void *object, genf *hand
 			hdata->bytestart = bytestart;
 			hdata->byteend = byteend;
 			hdata->bytemask = bytemask;
+			hdata->bankbaseptr = &space->machine->memory_data->bank_ptr[entry];
 			hdata->name = handler_name;
 		}
 		return entry;
@@ -2260,6 +2581,11 @@ static void table_populate_range_mirrored(address_table *tabledata, offs_t bytes
 }
 
 
+
+/***************************************************************************
+    SUBTABLE MANAGEMENT
+***************************************************************************/
+
 /*-------------------------------------------------
     subtable_alloc - allocate a fresh subtable
     and set its usecount to 1
@@ -2451,139 +2777,25 @@ static void subtable_close(address_table *tabledata, offs_t l1index)
 }
 
 
-/*-------------------------------------------------
-    Return whether a given memory map entry implies
-    the need of allocating and registering memory
--------------------------------------------------*/
 
-static int amentry_needs_backing_store(int cpunum, int spacenum, const address_map_entry *entry)
-{
-	FPTR handler;
-
-	if (entry->baseptr != NULL || entry->baseptroffs_plus1 != 0)
-		return TRUE;
-
-	handler = (FPTR)entry->write.generic;
-	if (handler < STATIC_COUNT)
-	{
-		if (handler != STATIC_INVALID &&
-			handler != STATIC_ROM &&
-			handler != STATIC_NOP &&
-			handler != STATIC_UNMAP)
-			return TRUE;
-	}
-
-	handler = (FPTR)entry->read.generic;
-	if (handler < STATIC_COUNT)
-	{
-		if (handler != STATIC_INVALID &&
-			(handler < STATIC_BANK1 || handler > STATIC_BANK1 + MAX_BANKS - 1) &&
-			(handler != STATIC_ROM || spacenum != ADDRESS_SPACE_PROGRAM || entry->addrstart >= cpudata[cpunum].regionsize) &&
-			handler != STATIC_NOP &&
-			handler != STATIC_UNMAP)
-			return TRUE;
-	}
-
-	return FALSE;
-}
-
+/***************************************************************************
+    MEMORY BLOCK ALLOCATION
+***************************************************************************/
 
 /*-------------------------------------------------
-    memory_init_allocate - allocate memory for
-    CPU address spaces
--------------------------------------------------*/
-
-static void memory_init_allocate(running_machine *machine)
-{
-	int cpunum, spacenum;
-
-	/* loop over all CPUs and memory spaces */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(cpudata); cpunum++)
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (cpudata[cpunum].spacemask & (1 << spacenum))
-			{
-				address_space *space = &cpudata[cpunum].space[spacenum];
-				address_map_entry *unassigned = NULL;
-				address_map_entry *entry;
-				memory_block *prev_memblock_head = memory_block_list;
-				memory_block *memblock;
-
-				/* make a first pass over the memory map and track blocks with hardcoded pointers */
-				/* we do this to make sure they are found by memory_find_base first */
-				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
-					if (entry->memory != NULL)
-						allocate_memory_block(machine, cpunum, spacenum, entry->bytestart, entry->byteend, entry->memory);
-
-				/* loop over all blocks just allocated and assign pointers from them */
-				for (memblock = memory_block_list; memblock != prev_memblock_head; memblock = memblock->next)
-					unassigned = assign_intersecting_blocks(space, memblock->bytestart, memblock->byteend, memblock->data);
-
-				/* if we don't have an unassigned pointer yet, try to find one */
-				if (unassigned == NULL)
-					unassigned = assign_intersecting_blocks(space, ~0, 0, NULL);
-
-				/* loop until we've assigned all memory in this space */
-				while (unassigned != NULL)
-				{
-					offs_t curbytestart, curbyteend;
-					int changed;
-					void *block;
-
-					/* work in MEMORY_BLOCK_CHUNK-sized chunks */
-					offs_t curblockstart = unassigned->bytestart / MEMORY_BLOCK_CHUNK;
-					offs_t curblockend = unassigned->byteend / MEMORY_BLOCK_CHUNK;
-
-					/* loop while we keep finding unassigned blocks in neighboring MEMORY_BLOCK_CHUNK chunks */
-					do
-					{
-						changed = FALSE;
-
-						/* scan for unmapped blocks in the adjusted map */
-						for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
-							if (entry->memory == NULL && entry != unassigned && amentry_needs_backing_store(cpunum, spacenum, entry))
-							{
-								offs_t blockstart, blockend;
-
-								/* get block start/end blocks for this block */
-								blockstart = entry->bytestart / MEMORY_BLOCK_CHUNK;
-								blockend = entry->byteend / MEMORY_BLOCK_CHUNK;
-
-								/* if we intersect or are adjacent, adjust the start/end */
-								if (blockstart <= curblockend + 1 && blockend >= curblockstart - 1)
-								{
-									if (blockstart < curblockstart)
-										curblockstart = blockstart, changed = TRUE;
-									if (blockend > curblockend)
-										curblockend = blockend, changed = TRUE;
-								}
-							}
-					} while (changed);
-
-					/* we now have a block to allocate; do it */
-					curbytestart = curblockstart * MEMORY_BLOCK_CHUNK;
-					curbyteend = curblockend * MEMORY_BLOCK_CHUNK + (MEMORY_BLOCK_CHUNK - 1);
-					block = allocate_memory_block(machine, cpunum, spacenum, curbytestart, curbyteend, NULL);
-
-					/* assign memory that intersected the new block */
-					unassigned = assign_intersecting_blocks(space, curbytestart, curbyteend, block);
-				}
-			}
-}
-
-
-/*-------------------------------------------------
-    allocate_memory_block - allocate a single
+    block_allocate - allocate a single
     memory block of data
 -------------------------------------------------*/
 
-static void *allocate_memory_block(running_machine *machine, int cpunum, int spacenum, offs_t bytestart, offs_t byteend, void *memory)
+static void *block_allocate(const address_space *space, offs_t bytestart, offs_t byteend, void *memory)
 {
+	memory_private *memdata = space->machine->memory_data;
 	int allocatemem = (memory == NULL);
 	memory_block *block;
 	size_t bytestoalloc;
 	const char *region;
 
-	VPRINTF(("allocate_memory_block(%d,%d,%08X,%08X,%p)\n", cpunum, spacenum, bytestart, byteend, memory));
+	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space->cpu->tag, space->name, bytestart, byteend, memory));
 
 	/* determine how much memory to allocate for this */
 	bytestoalloc = sizeof(*block);
@@ -2597,57 +2809,50 @@ static void *allocate_memory_block(running_machine *machine, int cpunum, int spa
 		memory = block + 1;
 
 	/* register for saving, but only if we're not part of a memory region */
-	for (region = memory_region_next(machine, NULL); region != NULL; region = memory_region_next(machine, region))
+	for (region = memory_region_next(space->machine, NULL); region != NULL; region = memory_region_next(space->machine, region))
 	{
-		UINT8 *region_base = memory_region(machine, region);
-		UINT32 region_length = memory_region_length(machine, region);
+		UINT8 *region_base = memory_region(space->machine, region);
+		UINT32 region_length = memory_region_length(space->machine, region);
 		if (region_base != NULL && region_length != 0 && (UINT8 *)memory >= region_base && ((UINT8 *)memory + (byteend - bytestart + 1)) < region_base + region_length)
 		{
 			VPRINTF(("skipping save of this memory block as it is covered by a memory region\n"));
 			break;
 		}
 	}
+	
+	/* if we didn't find a match, register */
 	if (region == NULL)
-		register_for_save(cpunum, spacenum, bytestart, memory, byteend - bytestart + 1);
+	{
+		int bytes_per_element = space->dbits/8;
+		char name[256];
+
+		sprintf(name, "%08x-%08x", bytestart, byteend);
+		state_save_register_memory("memory", space->cpu->tag, space->spacenum, name, memory, bytes_per_element, (UINT32)(byteend - bytestart + 1) / bytes_per_element);
+	}
 
 	/* fill in the tracking block */
-	block->cpunum = cpunum;
-	block->spacenum = spacenum;
+	block->space = space;
 	block->isallocated = allocatemem;
 	block->bytestart = bytestart;
 	block->byteend = byteend;
 	block->data = memory;
 
 	/* attach us to the head of the list */
-	block->next = memory_block_list;
-	memory_block_list = block;
+	block->next = memdata->memory_block_list;
+	memdata->memory_block_list = block;
 
 	return memory;
 }
 
 
 /*-------------------------------------------------
-    register_for_save - register a block of
-    memory for save states
--------------------------------------------------*/
-
-static void register_for_save(int cpunum, int spacenum, offs_t bytestart, void *base, size_t numbytes)
-{
-	int bytes_per_element = cpudata[cpunum].space[spacenum].dbits/8;
-	char name[256];
-
-	sprintf(name, "%08x-%08x", bytestart, (int)(bytestart + numbytes - 1));
-	state_save_register_memory("memory", address_space_names[spacenum], cpunum, name, base, bytes_per_element, (UINT32)numbytes / bytes_per_element);
-}
-
-
-/*-------------------------------------------------
-    assign_intersecting_blocks - find all
+    block_assign_intersecting - find all
     intersecting blocks and assign their pointers
 -------------------------------------------------*/
 
-static address_map_entry *assign_intersecting_blocks(address_space *space, offs_t bytestart, offs_t byteend, UINT8 *base)
+static address_map_entry *block_assign_intersecting(address_space *space, offs_t bytestart, offs_t byteend, UINT8 *base)
 {
+	memory_private *memdata = space->machine->memory_data;
 	address_map_entry *entry, *unassigned = NULL;
 
 	/* loop over the adjusted map and assign memory to any blocks we can */
@@ -2657,9 +2862,9 @@ static address_map_entry *assign_intersecting_blocks(address_space *space, offs_
 		if (entry->memory == NULL)
 		{
 			/* inherit shared pointers first */
-			if (entry->share != 0 && shared_ptr[entry->share] != NULL)
+			if (entry->share != 0 && memdata->shared_ptr[entry->share] != NULL)
 			{
-				entry->memory = shared_ptr[entry->share];
+				entry->memory = memdata->shared_ptr[entry->share];
  				VPRINTF(("memory range %08X-%08X -> shared_ptr[%d] [%p]\n", entry->addrstart, entry->addrend, entry->share, entry->memory));
  			}
 
@@ -2672,11 +2877,11 @@ static address_map_entry *assign_intersecting_blocks(address_space *space, offs_
 		}
 
 		/* if we're the first match on a shared pointer, assign it now */
-		if (entry->memory != NULL && entry->share && shared_ptr[entry->share] == NULL)
-			shared_ptr[entry->share] = entry->memory;
+		if (entry->memory != NULL && entry->share && memdata->shared_ptr[entry->share] == NULL)
+			memdata->shared_ptr[entry->share] = entry->memory;
 
 		/* keep track of the first unassigned entry */
-		if (entry->memory == NULL && unassigned == NULL && amentry_needs_backing_store(cpu_get_index(space->cpu), space->spacenum, entry))
+		if (entry->memory == NULL && unassigned == NULL && space_needs_backing_store(space, entry))
 			unassigned = entry;
 	}
 
@@ -2684,120 +2889,10 @@ static address_map_entry *assign_intersecting_blocks(address_space *space, offs_
 }
 
 
-/*-------------------------------------------------
-    reattach_banks - reconnect banks after a load
--------------------------------------------------*/
 
-static STATE_POSTLOAD( reattach_banks )
-{
-	int banknum;
-
-	/* once this is done, find the starting bases for the banks */
-	for (banknum = 1; banknum <= MAX_BANKS; banknum++)
-		if (bankdata[banknum].used && !bankdata[banknum].dynamic)
-		{
-			/* if this entry has a changed entry, set the appropriate pointer */
-			if (bankdata[banknum].curentry != MAX_BANK_ENTRIES)
-				bank_ptr[banknum] = bankdata[banknum].entry[bankdata[banknum].curentry];
-		}
-}
-
-
-/*-------------------------------------------------
-    memory_init_locate - find all the requested pointers
-    into the final allocated memory
--------------------------------------------------*/
-
-static void memory_init_locate(running_machine *machine)
-{
-	int cpunum, spacenum, banknum;
-
-	/* loop over CPUs and address spaces */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(cpudata); cpunum++)
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (cpudata[cpunum].spacemask & (1 << spacenum))
-			{
-				address_space *space = &cpudata[cpunum].space[spacenum];
-				const address_map_entry *entry;
-
-				/* fill in base/size entries, and handle shared memory */
-				for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
-				{
-					/* assign base/size values */
-					if (entry->baseptr != NULL)
-						*entry->baseptr = entry->memory;
-					if (entry->baseptroffs_plus1 != 0)
-						*(void **)((UINT8 *)machine->driver_data + entry->baseptroffs_plus1 - 1) = entry->memory;
-					if (entry->sizeptr != NULL)
-						*entry->sizeptr = entry->byteend - entry->bytestart + 1;
-					if (entry->sizeptroffs_plus1 != 0)
-						*(size_t *)((UINT8 *)machine->driver_data + entry->sizeptroffs_plus1 - 1) = entry->byteend - entry->bytestart + 1;
-				}
-			}
-
-	/* once this is done, find the starting bases for the banks */
-	for (banknum = 1; banknum <= MAX_BANKS; banknum++)
-		if (bankdata[banknum].used)
-		{
-			address_map_entry *entry;
-
-			/* set the initial bank pointer */
-			for (entry = cpudata[bankdata[banknum].cpunum].space[bankdata[banknum].spacenum].map->entrylist; entry != NULL; entry = entry->next)
-				if (entry->bytestart == bankdata[banknum].bytestart)
-				{
-					bank_ptr[banknum] = entry->memory;
-	 				VPRINTF(("assigned bank %d pointer to memory from range %08X-%08X [%p]\n", banknum, entry->addrstart, entry->addrend, entry->memory));
-					break;
-				}
-
-			/* if the entry was set ahead of time, override the automatically found pointer */
-			if (!bankdata[banknum].dynamic && bankdata[banknum].curentry != MAX_BANK_ENTRIES)
-				bank_ptr[banknum] = bankdata[banknum].entry[bankdata[banknum].curentry];
-		}
-
-	/* request a callback to fix up the banks when done */
-	state_save_register_postload(machine, reattach_banks, NULL);
-}
-
-
-/*-------------------------------------------------
-    memory_find_base - return a pointer to the
-    base of RAM associated with the given CPU
-    and offset
--------------------------------------------------*/
-
-static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	address_map_entry *entry;
-	memory_block *block;
-
-	VPRINTF(("memory_find_base(%d,%d,%08X) -> ", cpunum, spacenum, byteaddress));
-
-	/* look in the address map first */
-	for (entry = space->map->entrylist; entry != NULL; entry = entry->next)
-	{
-		offs_t maskoffs = byteaddress & entry->bytemask;
-		if (maskoffs >= entry->bytestart && maskoffs <= entry->byteend)
-		{
-			VPRINTF(("found in entry %08X-%08X [%p]\n", entry->addrstart, entry->addrend, (UINT8 *)entry->memory + (maskoffs - entry->bytestart)));
-			return (UINT8 *)entry->memory + (maskoffs - entry->bytestart);
-		}
-	}
-
-	/* if not found there, look in the allocated blocks */
-	for (block = memory_block_list; block != NULL; block = block->next)
-		if (block->cpunum == cpunum && block->spacenum == spacenum && block->bytestart <= byteaddress && block->byteend > byteaddress)
-		{
-			VPRINTF(("found in allocated memory block %08X-%08X [%p]\n", block->bytestart, block->byteend, block->data + (byteaddress - block->bytestart)));
-			return block->data + byteaddress - block->bytestart;
-		}
-
-	VPRINTF(("did not find\n"));
-	return NULL;
-}
-
-
+/***************************************************************************
+    INTERNAL HANDLERS
+***************************************************************************/
 
 /*-------------------------------------------------
     unmapped memory handlers
@@ -2805,40 +2900,40 @@ static void *memory_find_base(int cpunum, int spacenum, offs_t byteaddress)
 
 static READ8_HANDLER( unmap_read8 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte read from %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset));
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte read from %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset));
 	return space->unmap;
 }
 static READ16_HANDLER( unmap_read16 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word read from %08X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*2), mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word read from %08X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*2), mem_mask);
 	return space->unmap;
 }
 static READ32_HANDLER( unmap_read32 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword read from %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*4), mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword read from %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*4), mem_mask);
 	return space->unmap;
 }
 static READ64_HANDLER( unmap_read64 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword read from %08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword read from %08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 	return space->unmap;
 }
 
 static WRITE8_HANDLER( unmap_write8 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte write to %08X = %02X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset), data);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory byte write to %08X = %02X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset), data);
 }
 static WRITE16_HANDLER( unmap_write16 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word write to %08X = %04X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*2), data, mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory word write to %08X = %04X & %04X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*2), data, mem_mask);
 }
 static WRITE32_HANDLER( unmap_write32 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword write to %08X = %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*4), data, mem_mask);
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory dword write to %08X = %08X & %08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*4), data, mem_mask);
 }
 static WRITE64_HANDLER( unmap_write64 )
 {
-	if (log_unmap[space->spacenum] && !debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword write to %08X = %08X%08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), address_space_names[space->spacenum], cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
+	if (space->log_unmap && !space->debugger_access) logerror("CPU '%s' (PC=%08X): unmapped %s memory qword write to %08X = %08X%08X & %08X%08X\n", space->cpu->tag, cpu_get_pc(space->cpu), space->name, cpu_byte_to_address(space->cpu, space->spacenum, offset*8), (int)(data >> 32), (int)(data & 0xffffffff), (int)(mem_mask >> 32), (int)(mem_mask & 0xffffffff));
 }
 
 
@@ -2863,82 +2958,98 @@ static WRITE64_HANDLER( nop_write64 )  {  }
 
 static READ8_HANDLER( watchpoint_read8 )
 {
-	address_space *modspace = (address_space *)space;
+	address_space *spacerw = (address_space *)space;
+	UINT8 *oldtable = spacerw->readlookup;
 	UINT8 result;
-	debug_cpu_memory_read_hook(modspace->machine, cur_context, modspace->spacenum, offset, 0xff);
-	modspace->readlookup = space->read.table;
-	result = read_byte_generic(modspace, offset);
-	modspace->readlookup = wptable;
+
+	debug_cpu_memory_read_hook(spacerw, offset, 0xff);
+	spacerw->readlookup = space->read.table;
+	result = read_byte_generic(spacerw, offset);
+	spacerw->readlookup = oldtable;
 	return result;
 }
 
 static READ16_HANDLER( watchpoint_read16 )
 {
-	address_space *modspace = (address_space *)space;
+	address_space *spacerw = (address_space *)space;
+	UINT8 *oldtable = spacerw->readlookup;
 	UINT16 result;
-	debug_cpu_memory_read_hook(modspace->machine, cur_context, modspace->spacenum, offset << 1, mem_mask);
-	modspace->readlookup = modspace->read.table;
-	result = read_word_generic(modspace, offset << 1, mem_mask);
-	modspace->readlookup = wptable;
+
+	debug_cpu_memory_read_hook(spacerw, offset << 1, mem_mask);
+	spacerw->readlookup = spacerw->read.table;
+	result = read_word_generic(spacerw, offset << 1, mem_mask);
+	spacerw->readlookup = oldtable;
 	return result;
 }
 
 static READ32_HANDLER( watchpoint_read32 )
 {
-	address_space *modspace = (address_space *)space;
+	address_space *spacerw = (address_space *)space;
+	UINT8 *oldtable = spacerw->readlookup;
 	UINT32 result;
-	debug_cpu_memory_read_hook(modspace->machine, cur_context, modspace->spacenum, offset << 2, mem_mask);
-	modspace->readlookup = modspace->read.table;
-	result = read_dword_generic(modspace, offset << 2, mem_mask);
-	modspace->readlookup = wptable;
+
+	debug_cpu_memory_read_hook(spacerw, offset << 2, mem_mask);
+	spacerw->readlookup = spacerw->read.table;
+	result = read_dword_generic(spacerw, offset << 2, mem_mask);
+	spacerw->readlookup = oldtable;
 	return result;
 }
 
 static READ64_HANDLER( watchpoint_read64 )
 {
-	address_space *modspace = (address_space *)space;
+	address_space *spacerw = (address_space *)space;
+	UINT8 *oldtable = spacerw->readlookup;
 	UINT64 result;
-	debug_cpu_memory_read_hook(modspace->machine, cur_context, modspace->spacenum, offset << 3, mem_mask);
-	modspace->readlookup = modspace->read.table;
-	result = read_qword_generic(modspace, offset << 3, mem_mask);
-	modspace->readlookup = wptable;
+
+	debug_cpu_memory_read_hook(spacerw, offset << 3, mem_mask);
+	spacerw->readlookup = spacerw->read.table;
+	result = read_qword_generic(spacerw, offset << 3, mem_mask);
+	spacerw->readlookup = oldtable;
 	return result;
 }
 
 static WRITE8_HANDLER( watchpoint_write8 )
 {
-	address_space *modspace = (address_space *)space;
-	debug_cpu_memory_write_hook(modspace->machine, cur_context, modspace->spacenum, offset, data, 0xff);
-	modspace->writelookup = modspace->write.table;
-	write_byte_generic(modspace, offset, data);
-	modspace->writelookup = wptable;
+	address_space *spacerw = (address_space *)space;
+	UINT8 *oldtable = spacerw->writelookup;
+
+	debug_cpu_memory_write_hook(spacerw, offset, data, 0xff);
+	spacerw->writelookup = spacerw->write.table;
+	write_byte_generic(spacerw, offset, data);
+	spacerw->writelookup = oldtable;
 }
 
 static WRITE16_HANDLER( watchpoint_write16 )
 {
-	address_space *modspace = (address_space *)space;
-	debug_cpu_memory_write_hook(modspace->machine, cur_context, modspace->spacenum, offset << 1, data, mem_mask);
-	modspace->writelookup = modspace->write.table;
-	write_word_generic(modspace, offset << 1, data, mem_mask);
-	modspace->writelookup = wptable;
+	address_space *spacerw = (address_space *)space;
+	UINT8 *oldtable = spacerw->writelookup;
+
+	debug_cpu_memory_write_hook(spacerw, offset << 1, data, mem_mask);
+	spacerw->writelookup = spacerw->write.table;
+	write_word_generic(spacerw, offset << 1, data, mem_mask);
+	spacerw->writelookup = oldtable;
 }
 
 static WRITE32_HANDLER( watchpoint_write32 )
 {
-	address_space *modspace = (address_space *)space;
-	debug_cpu_memory_write_hook(modspace->machine, cur_context, modspace->spacenum, offset << 2, data, mem_mask);
-	modspace->writelookup = modspace->write.table;
-	write_dword_generic(modspace, offset << 2, data, mem_mask);
-	modspace->writelookup = wptable;
+	address_space *spacerw = (address_space *)space;
+	UINT8 *oldtable = spacerw->writelookup;
+
+	debug_cpu_memory_write_hook(spacerw, offset << 2, data, mem_mask);
+	spacerw->writelookup = spacerw->write.table;
+	write_dword_generic(spacerw, offset << 2, data, mem_mask);
+	spacerw->writelookup = oldtable;
 }
 
 static WRITE64_HANDLER( watchpoint_write64 )
 {
-	address_space *modspace = (address_space *)space;
-	debug_cpu_memory_write_hook(modspace->machine, cur_context, modspace->spacenum, offset << 3, data, mem_mask);
-	modspace->writelookup = modspace->write.table;
-	write_qword_generic(modspace, offset << 3, data, mem_mask);
-	modspace->writelookup = wptable;
+	address_space *spacerw = (address_space *)space;
+	UINT8 *oldtable = spacerw->writelookup;
+
+	debug_cpu_memory_write_hook(spacerw, offset << 3, data, mem_mask);
+	spacerw->writelookup = spacerw->write.table;
+	write_qword_generic(spacerw, offset << 3, data, mem_mask);
+	spacerw->writelookup = oldtable;
 }
 
 
@@ -2983,8 +3094,14 @@ static genf *get_static_handler(int handlerbits, int readorwrite, int which)
 }
 
 
+
+/***************************************************************************
+    DEBUGGING
+***************************************************************************/
+
 /*-------------------------------------------------
-    debugging
+    handler_to_string - return friendly string
+    description of a handler
 -------------------------------------------------*/
 
 static const char *handler_to_string(const address_table *table, UINT8 entry)
@@ -3017,6 +3134,12 @@ static const char *handler_to_string(const address_table *table, UINT8 entry)
 	else
 		return table->handlers[entry]->name ? table->handlers[entry]->name : "???";
 }
+
+
+/*-------------------------------------------------
+    dump_map - dump the contents of a single
+    address space
+-------------------------------------------------*/
 
 static void dump_map(FILE *file, const address_space *space, const address_table *table)
 {
@@ -3113,55 +3236,10 @@ static void dump_map(FILE *file, const address_space *space, const address_table
 						table->handlers[lastentry]->bytestart);
 }
 
-void memory_dump(FILE *file)
-{
-	int cpunum, spacenum;
-
-	/* skip if we can't open the file */
-	if (!file)
-		return;
-
-	/* loop over CPUs */
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(cpudata); cpunum++)
-		for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			if (cpudata[cpunum].spacemask & (1 << spacenum))
-			{
-				fprintf(file, "\n\n"
-				              "=========================================\n"
-				              "CPU %d address space %d read handler dump\n"
-				              "=========================================\n", cpunum, spacenum);
-				dump_map(file, &cpudata[cpunum].space[spacenum], &cpudata[cpunum].space[spacenum].read);
-
-				fprintf(file, "\n\n"
-				              "==========================================\n"
-				              "CPU %d address space %d write handler dump\n"
-				              "==========================================\n", cpunum, spacenum);
-				dump_map(file, &cpudata[cpunum].space[spacenum], &cpudata[cpunum].space[spacenum].write);
-			}
-}
-
 
 /*-------------------------------------------------
-    memory_get_handler_string - return a string
-    describing the handler at a particular offset
+    mem_dump - internal memory dump
 -------------------------------------------------*/
-
-const char *memory_get_handler_string(int read0_or_write1, int cpunum, int spacenum, offs_t byteaddress)
-{
-	address_space *space = &cpudata[cpunum].space[spacenum];
-	const address_table *table = read0_or_write1 ? &space->write : &space->read;
-	UINT8 entry;
-
-	/* perform the lookup */
-	byteaddress &= space->bytemask;
-	entry = table->table[LEVEL1_INDEX(byteaddress)];
-	if (entry >= SUBTABLE_BASE)
-		entry = table->table[LEVEL2_INDEX(entry, byteaddress)];
-
-	/* 8-bit case: RAM/ROM */
-	return handler_to_string(table, entry);
-}
-
 
 static void mem_dump(void)
 {
@@ -3172,7 +3250,7 @@ static void mem_dump(void)
 		file = fopen("memdump.log", "w");
 		if (file)
 		{
-			memory_dump(file);
+			memory_dump(Machine, file);
 			fclose(file);
 		}
 	}

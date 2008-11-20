@@ -132,11 +132,11 @@ MACHINE_RESET( simpsons )
 	simpsons_firq_enabled = 0;
 
 	/* init the default banks */
-	memory_configure_bank(1, 0, 64, memory_region(machine, "main") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 64, memory_region(machine, "main") + 0x10000, 0x2000);
 	memory_set_bank(1, 0);
 
-	memory_configure_bank(2, 0, 2, memory_region(machine, "audio") + 0x10000, 0);
-	memory_configure_bank(2, 2, 6, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audio") + 0x10000, 0);
+	memory_configure_bank(machine, 2, 2, 6, memory_region(machine, "audio") + 0x10000, 0x4000);
 	memory_set_bank(2, 0);
 
 	simpsons_video_banking( machine, 0 );

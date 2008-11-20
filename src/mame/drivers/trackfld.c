@@ -1239,6 +1239,7 @@ static DRIVER_INIT( trackfld )
 
 static DRIVER_INIT( atlantol )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *decrypt;
 	int A;
@@ -1250,9 +1251,9 @@ static DRIVER_INIT( atlantol )
 	for (A = 0;A < 0x6000;A++)
 		decrypt[A] = rom[A];
 
-	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1000, 0x1000, 0, 0, SMH_NOP );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1000, 0x1000, 0, 0, SMH_NOP );
 }
 
 static DRIVER_INIT( mastkin )

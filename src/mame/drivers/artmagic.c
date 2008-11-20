@@ -879,7 +879,7 @@ static DRIVER_INIT( ultennis )
 	protection_handler = ultennis_protection;
 
 	/* additional (protection?) hack */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x300000, 0x300001, 0, 0, ultennis_hack_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x300000, 0x300001, 0, 0, ultennis_hack_r);
 }
 
 

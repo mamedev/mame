@@ -88,7 +88,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, const 
 	mips->system_clock = config->system_clock;
 
 	/* set up the endianness */
-	mips->memory = *memory_get_accessors(ADDRESS_SPACE_PROGRAM, 32, mips->bigendian ? CPU_IS_BE : CPU_IS_LE);
+	mips->memory = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM)->accessors;
 
 	/* allocate the virtual TLB */
 	mips->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, 2 * MIPS3_TLB_ENTRIES + 2, 0);

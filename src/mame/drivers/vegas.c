@@ -1568,7 +1568,7 @@ static void remap_dynamic_addresses(running_machine *machine)
 
 	/* unmap everything we know about */
 	for (addr = 0; addr < dynamic_count; addr++)
-		memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, SMH_UNMAP, SMH_UNMAP);
 
 	/* the build the list of stuff */
 	dynamic_count = 0;
@@ -1688,9 +1688,9 @@ static void remap_dynamic_addresses(running_machine *machine)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
 		if (dynamic[addr].mread != NULL || dynamic[addr].mwrite != NULL)
-			_memory_install_handler32(machine, 0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].mwrite, dynamic[addr].rdname, dynamic[addr].wrname);
+			_memory_install_handler32(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].mwrite, dynamic[addr].rdname, dynamic[addr].wrname);
 		if (dynamic[addr].dread != NULL || dynamic[addr].dwrite != NULL)
-			_memory_install_device_handler32(dynamic[addr].device, 0, ADDRESS_SPACE_PROGRAM, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].dwrite, dynamic[addr].rdname, dynamic[addr].wrname);
+			_memory_install_device_handler32(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].dwrite, dynamic[addr].rdname, dynamic[addr].wrname);
 	}
 
 	if (LOG_DYNAMIC)

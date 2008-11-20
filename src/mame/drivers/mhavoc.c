@@ -761,8 +761,8 @@ static DRIVER_INIT( mhavocrv )
 {
 	/* install the speech support that was only optionally stuffed for use */
 	/* in the Return to Vax hack */
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x5800, 0x5800, 0, 0, speech_data_w);
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x5900, 0x5900, 0, 0, speech_strobe_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x5800, 0x5800, 0, 0, speech_data_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x5900, 0x5900, 0, 0, speech_strobe_w);
 }
 
 

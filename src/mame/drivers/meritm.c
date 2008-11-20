@@ -847,7 +847,7 @@ static MACHINE_START(merit_common)
 
 static MACHINE_START(meritm_crt250)
 {
-	memory_configure_bank(1, 0, 8, memory_region(machine, "main"), 0x10000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main"), 0x10000);
 	meritm_bank = 0xff;
 	meritm_crt250_switch_banks();
 	MACHINE_START_CALL(merit_common);
@@ -865,9 +865,9 @@ static MACHINE_START(meritm_crt260)
 {
 	meritm_ram = auto_malloc( 0x8000 );
 	memset( meritm_ram, 0x8000, 0x00 );
-	memory_configure_bank(1, 0, 128, memory_region(machine, "main"), 0x8000);
-	memory_configure_bank(2, 0, 128, memory_region(machine, "main"), 0x8000);
-	memory_configure_bank(3, 0, 4, meritm_ram, 0x2000);
+	memory_configure_bank(machine, 1, 0, 128, memory_region(machine, "main"), 0x8000);
+	memory_configure_bank(machine, 2, 0, 128, memory_region(machine, "main"), 0x8000);
+	memory_configure_bank(machine, 3, 0, 4, meritm_ram, 0x2000);
 	meritm_bank = 0xff;
 	meritm_psd_a15 = 0;
 	meritm_switch_banks();
@@ -1384,7 +1384,7 @@ static DRIVER_INIT(megat3te)
 
 	ds1204_init(megat3_ds1204_key, megat3_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
 
@@ -1403,7 +1403,7 @@ static DRIVER_INIT(megat4te)
 
 	ds1204_init(0, megat4te_ds1204_nvram);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xfff8, 0xffff, 0, 0, meritm_ds1644_r, meritm_ds1644_w );
 
 };
 

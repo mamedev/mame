@@ -1419,11 +1419,11 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 
 			temp = (i80186.mem.peripheral & 0xffc0) << 4;
 			if (i80186.mem.middle_size & 0x0040)
-				memory_install_readwrite16_handler(space->machine, 2, ADDRESS_SPACE_PROGRAM, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
+				memory_install_readwrite16_handler(cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM), temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
 			else
 			{
 				temp &= 0xffff;
-				memory_install_readwrite16_handler(space->machine, 2, ADDRESS_SPACE_IO, temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
+				memory_install_readwrite16_handler(cpu_get_address_space(space->cpu, ADDRESS_SPACE_IO), temp, temp + 0x2ff, 0, 0, peripheral_r, peripheral_w);
 			}
 
 			/* we need to do this at a time when the 80186 context is swapped in */
@@ -1488,11 +1488,11 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 			/* okay to leave us mapped where we were */
 			temp = (data & 0x0fff) << 8;
 			if (data & 0x1000)
-				memory_install_readwrite16_handler(space->machine, 2, ADDRESS_SPACE_PROGRAM, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
+				memory_install_readwrite16_handler(cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM), temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
 			else
 			{
 				temp &= 0xffff;
-				memory_install_readwrite16_handler(space->machine, 2, ADDRESS_SPACE_IO, temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
+				memory_install_readwrite16_handler(cpu_get_address_space(space->cpu, ADDRESS_SPACE_IO), temp, temp + 0xff, 0, 0, i80186_internal_port_r, i80186_internal_port_w);
 			}
 /*          popmessage("Sound CPU reset");*/
 			break;

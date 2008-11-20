@@ -61,8 +61,8 @@ static MACHINE_START( gng )
 {
 	/* configure ROM banking */
 	UINT8 *rombase = memory_region(machine, "main");
-	memory_configure_bank(1,0,4,&rombase[0x10000],0x2000);
-	memory_configure_bank(1,4,1,&rombase[0x4000],0x2000);
+	memory_configure_bank(machine, 1,0,4,&rombase[0x10000],0x2000);
+	memory_configure_bank(machine, 1,4,1,&rombase[0x4000],0x2000);
 }
 
 static ADDRESS_MAP_START( readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -703,7 +703,7 @@ static READ8_HANDLER( diamond_hack_r )
 
 static DRIVER_INIT( diamond )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, diamond_hack_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, diamond_hack_r);
 }
 
 

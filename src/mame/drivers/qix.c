@@ -1224,6 +1224,8 @@ static int kram3_decrypt(int address, int value)
 
 static DRIVER_INIT( kram3 )
 {
+	const address_space *mainspace = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
+	const address_space *videospace = cputag_get_address_space(machine, "video", ADDRESS_SPACE_PROGRAM);
 	const UINT8 *patch;
 	UINT8 *rom, *decrypted;
 	int i, size;
@@ -1247,7 +1249,7 @@ static DRIVER_INIT( kram3 )
 	rom = memory_region(machine, "main");
 	decrypted = auto_malloc(0x6000);
 
-	memory_set_decrypted_region(0, 0xa000, 0xffff, decrypted);
+	memory_set_decrypted_region(mainspace, 0xa000, 0xffff, decrypted);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)
@@ -1261,7 +1263,7 @@ static DRIVER_INIT( kram3 )
 	rom = memory_region(machine, "video");
 	decrypted = auto_malloc(0x6000);
 
-	memory_set_decrypted_region(1, 0xa000, 0xffff, decrypted);
+	memory_set_decrypted_region(videospace, 0xa000, 0xffff, decrypted);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)
@@ -1274,15 +1276,15 @@ static DRIVER_INIT( kram3 )
 static DRIVER_INIT( zookeep )
 {
 	/* configure the banking */
-	memory_configure_bank(1, 0, 1, memory_region(machine, "video") + 0xa000, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "video") + 0x10000, 0);
+	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "video") + 0xa000, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "video") + 0x10000, 0);
 	memory_set_bank(1, 0);
 }
 
 
 static DRIVER_INIT( slither )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x9800, 0x9bff, 0, 0, pia_1_r, pia_1_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9800, 0x9bff, 0, 0, pia_1_r, pia_1_w);
 }
 
 

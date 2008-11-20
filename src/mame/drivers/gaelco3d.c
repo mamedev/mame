@@ -200,7 +200,7 @@ static MACHINE_RESET( common )
 	/* allocate a timer for feeding the autobuffer */
 	adsp_autobuffer_timer = timer_alloc(adsp_autobuffer_irq, NULL);
 
-	memory_configure_bank(1, 0, 256, memory_region(machine, "user1"), 0x4000);
+	memory_configure_bank(machine, 1, 0, 256, memory_region(machine, "user1"), 0x4000);
 	memory_set_bank(1, 0);
 
 	/* keep the TMS32031 halted until the code is ready to go */

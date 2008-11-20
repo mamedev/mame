@@ -44,12 +44,6 @@
 #define DEBUG_FLAG_STOP_VBLANK		0x00001000		/* there is a pending stop on the next VBLANK */
 #define DEBUG_FLAG_STOP_TIME		0x00002000		/* there is a pending stop at cpu->stoptime */
 #define DEBUG_FLAG_LIVE_BP			0x00010000		/* there are live breakpoints for this CPU */
-#define DEBUG_FLAG_LIVE_WPR_PROGRAM	0x01000000		/* there are live read watchpoints in program address space */
-#define DEBUG_FLAG_LIVE_WPR_DATA	0x02000000		/* there are live read watchpoints in data address space */
-#define DEBUG_FLAG_LIVE_WPR_IO		0x04000000		/* there are live read watchpoints in io address space */
-#define DEBUG_FLAG_LIVE_WPW_PROGRAM	0x10000000		/* there are live write watchpoints in program address space */
-#define DEBUG_FLAG_LIVE_WPW_DATA	0x20000000		/* there are live write watchpoints in data address space */
-#define DEBUG_FLAG_LIVE_WPW_IO		0x40000000		/* there are live write watchpoints in io address space */
 
 #define DEBUG_FLAG_STEPPING_ANY		(DEBUG_FLAG_STEPPING | \
 									 DEBUG_FLAG_STEPPING_OVER | \
@@ -65,17 +59,6 @@
 									 DEBUG_FLAG_STOP_EXCEPTION | \
 									 DEBUG_FLAG_STOP_VBLANK | \
 									 DEBUG_FLAG_STOP_TIME)
-
-#define DEBUG_FLAG_READ_WATCHPOINT	(DEBUG_FLAG_LIVE_WPR_PROGRAM | \
-									 DEBUG_FLAG_LIVE_WPR_DATA | \
-									 DEBUG_FLAG_LIVE_WPR_IO)
-
-#define DEBUG_FLAG_WRITE_WATCHPOINT	(DEBUG_FLAG_LIVE_WPW_PROGRAM | \
-									 DEBUG_FLAG_LIVE_WPW_DATA | \
-									 DEBUG_FLAG_LIVE_WPW_IO)
-
-#define DEBUG_FLAG_WATCHPOINT		(DEBUG_FLAG_READ_WATCHPOINT | \
-									 DEBUG_FLAG_WRITE_WATCHPOINT)
 
 
 
@@ -142,8 +125,8 @@ struct _debug_hotspot_entry
 };
 
 
-typedef struct _debug_cpu_info debug_cpu_info;
-struct _debug_cpu_info
+/* In cpuintrf.h: typedef struct _cpu_debug_data cpu_debug_data; */
+struct _cpu_debug_data
 {
 	UINT8			valid;						/* are we valid? */
 	UINT8			endianness;					/* little or bigendian */
@@ -237,17 +220,16 @@ void debug_cpu_exception_hook(running_machine *machine, int cpunum, int exceptio
 void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc);
 
 /* the memory system calls this hook when watchpoints are enabled and a memory read happens */
-void debug_cpu_memory_read_hook(running_machine *machine, int cpunum, int spacenum, offs_t address, UINT64 mem_mask);
+void debug_cpu_memory_read_hook(const address_space *space, offs_t address, UINT64 mem_mask);
 
 /* the memory system calls this hook when watchpoints are enabled and a memory write happens */
-void debug_cpu_memory_write_hook(running_machine *machine, int cpunum, int spacenum, offs_t address, UINT64 data, UINT64 mem_mask);
+void debug_cpu_memory_write_hook(const address_space *space, offs_t address, UINT64 data, UINT64 mem_mask);
 
 
 
 /* ----- core debugger functions ----- */
 
 int debug_cpu_within_instruction_hook(running_machine *machine);
-const debug_cpu_info *debug_get_cpu_info(int cpunum);
 void debug_cpu_halt_on_next_instruction(running_machine *machine, int cpunum, const char *fmt, ...) ATTR_PRINTF(3,4);
 int	debug_cpu_is_stopped(running_machine *machine);
 void debug_cpu_trace_printf(int cpunum, const char *fmt, ...) ATTR_PRINTF(2,3);
@@ -267,7 +249,7 @@ void				debug_cpu_go_vblank(void);
 void				debug_cpu_go_interrupt(int irqline);
 void				debug_cpu_go_milliseconds(UINT64 milliseconds);
 void				debug_cpu_next_cpu(void);
-void				debug_cpu_ignore_cpu(int cpunum, int ignore);
+void				debug_cpu_ignore_cpu(const device_config *cpu, int ignore);
 
 /* tracing support */
 void				debug_cpu_trace(int cpunum, FILE *file, int trace_over, const char *action);

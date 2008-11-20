@@ -810,7 +810,7 @@ static DRIVER_INIT( namcos11 )
 		{
 			if( namcos11_config_table[ n_game ].keycus_r != NULL )
 			{
-				memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fa20000, 0x1fa2ffff, 0, 0, namcos11_config_table[ n_game ].keycus_r );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa20000, 0x1fa2ffff, 0, 0, namcos11_config_table[ n_game ].keycus_r );
 			}
 			if( namcos11_config_table[ n_game ].n_daughterboard != 0 )
 			{
@@ -818,36 +818,36 @@ static DRIVER_INIT( namcos11 )
 				UINT32 len = memory_region_length( machine, "user2" );
 				UINT8 *rgn = memory_region( machine, "user2" );
 
-				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f000000, 0x1f0fffff, 0, 0, SMH_BANK1 );
-				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f100000, 0x1f1fffff, 0, 0, SMH_BANK2 );
-				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f200000, 0x1f2fffff, 0, 0, SMH_BANK3 );
-				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f300000, 0x1f3fffff, 0, 0, SMH_BANK4 );
-				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f400000, 0x1f4fffff, 0, 0, SMH_BANK5 );
-				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f500000, 0x1f5fffff, 0, 0, SMH_BANK6 );
-				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f600000, 0x1f6fffff, 0, 0, SMH_BANK7 );
-				memory_install_read32_handler(machine,  0, ADDRESS_SPACE_PROGRAM, 0x1f700000, 0x1f7fffff, 0, 0, SMH_BANK8 );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f0fffff, 0, 0, SMH_BANK1 );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f100000, 0x1f1fffff, 0, 0, SMH_BANK2 );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f200000, 0x1f2fffff, 0, 0, SMH_BANK3 );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f300000, 0x1f3fffff, 0, 0, SMH_BANK4 );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f400000, 0x1f4fffff, 0, 0, SMH_BANK5 );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f500000, 0x1f5fffff, 0, 0, SMH_BANK6 );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6fffff, 0, 0, SMH_BANK7 );
+				memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f700000, 0x1f7fffff, 0, 0, SMH_BANK8 );
 
 				for( bank = 0; bank < 8; bank++ )
 				{
-					memory_configure_bank( bank + 1, 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
+					memory_configure_bank(machine,  bank + 1, 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
 					memory_set_bank( bank + 1, 0 );
 				}
 
 				if( namcos11_config_table[ n_game ].n_daughterboard == 32 )
 				{
-					memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, bankswitch_rom32_w );
+					memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, bankswitch_rom32_w );
 				}
 				if( namcos11_config_table[ n_game ].n_daughterboard == 64 )
 				{
 					m_n_bankoffset = 0;
-					memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f080000, 0x1f080003, 0, 0, bankswitch_rom64_upper_w );
-					memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, SMH_NOP, bankswitch_rom64_w );
+					memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f080000, 0x1f080003, 0, 0, bankswitch_rom64_upper_w );
+					memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, SMH_NOP, bankswitch_rom64_w );
 					state_save_register_global( m_n_bankoffset );
 				}
 			}
 			else
 			{
-				memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fa10020, 0x1fa1002f, 0, 0, SMH_NOP );
+				memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, SMH_NOP );
 			}
 			break;
 		}
@@ -856,8 +856,8 @@ static DRIVER_INIT( namcos11 )
 
 	if( strcmp( machine->gamedrv->name, "ptblnk2a" ) == 0 )
 	{
-		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f788000, 0x1f788003, 0, 0, lightgun_w );
-		memory_install_read32_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f780000, 0x1f78000f, 0, 0, lightgun_r );
+		memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f788000, 0x1f788003, 0, 0, lightgun_w );
+		memory_install_read32_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, lightgun_r );
 	}
 
 	state_save_register_global( m_n_oldcoin );

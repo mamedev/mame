@@ -182,7 +182,7 @@ MACHINE_RESET( mspacman )
 	UINT8 *RAM = memory_region(machine, "main");
 	mspacman_decode(machine);
 
-	memory_configure_bank(1, 0, 2, &RAM[0x00000], 0x10000);
+	memory_configure_bank(machine, 1, 0, 2, &RAM[0x00000], 0x10000);
 	memory_set_bank(1, 0);
 }
 

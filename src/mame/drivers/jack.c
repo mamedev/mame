@@ -1334,11 +1334,12 @@ ROM_END
 static void treahunt_decode(running_machine *machine)
 {
 	int A;
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *decrypt = auto_malloc(0x4000);
 	int data;
 
-	memory_set_decrypted_region(0, 0x0000, 0x3fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypt);
 
 	/* Thanks to Mike Balfour for helping out with the decryption */
 	for (A = 0; A < 0x4000; A++)
@@ -1435,10 +1436,10 @@ static DRIVER_INIT( striv )
 	}
 
 	// Set-up the weirdest questions read ever done
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xcfff, 0, 0, striv_question_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xcfff, 0, 0, striv_question_r);
 
 	// Nop out unused sprites writes
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xb000, 0xb0ff, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb000, 0xb0ff, 0, 0, SMH_NOP);
 
 	timer_rate = 128;
 }

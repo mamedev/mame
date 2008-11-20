@@ -1164,8 +1164,8 @@ static READ32_HANDLER( system11gun_r )
 
 static void system11gun_install( running_machine *machine )
 {
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
-	memory_install_read32_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f788000, 0x1f788003, 0, 0, system11gun_w );
+	memory_install_read32_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, system11gun_r );
 }
 
 static UINT8 kcram[ 12 ];
@@ -1216,8 +1216,8 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "tektagtb" ) == 0 ||
 		strcmp( machine->gamedrv->name, "tektagtc" ) == 0 )
 	{
-		memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb00000, 0x1fb00003, 0, 0, tektagt_protection_1_r, tektagt_protection_1_w );
-		memory_install_readwrite32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fb80000, 0x1fb80003, 0, 0, tektagt_protection_2_r, tektagt_protection_2_w );
+		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fb00000, 0x1fb00003, 0, 0, tektagt_protection_1_r, tektagt_protection_1_w );
+		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fb80000, 0x1fb80003, 0, 0, tektagt_protection_2_r, tektagt_protection_2_w );
 	}
 
 	if( strcmp( machine->gamedrv->name, "tektagt" ) == 0 ||
@@ -1239,9 +1239,9 @@ static MACHINE_RESET( namcos12 )
 		strcmp( machine->gamedrv->name, "ghlpanic" ) == 0 )
 	{
 		/* this is based on guesswork, it might not even be keycus. */
-		memory_install_read32_handler (machine, 0, ADDRESS_SPACE_PROGRAM, 0x1fc20280, 0x1fc2028b, 0, 0, SMH_BANK2 );
-		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f008000, 0x1f008003, 0, 0, kcon_w );
-		memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
+		memory_install_read32_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fc20280, 0x1fc2028b, 0, 0, SMH_BANK2 );
+		memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f008000, 0x1f008003, 0, 0, kcon_w );
+		memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
 
 		memset( kcram, 0, sizeof( kcram ) );
 		memory_set_bankptr( 2, kcram );
@@ -1438,7 +1438,7 @@ static DRIVER_INIT( namcos12 )
 
 	psx_dma_install_read_handler( 5, namcos12_rom_read );
 
-	memory_configure_bank( 1, 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
+	memory_configure_bank(machine,  1, 0, memory_region_length( machine, "user2" ) / 0x200000, memory_region( machine, "user2" ), 0x200000 );
 
 	s12_porta = 0;
 	s12_rtcstate = 0;

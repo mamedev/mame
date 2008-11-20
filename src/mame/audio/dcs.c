@@ -924,7 +924,7 @@ void dcs_init(running_machine *machine)
 	dcs.sounddata = dcs.bootrom;
 	dcs.sounddata_words = dcs.bootrom_words;
 	dcs.sounddata_banks = dcs.sounddata_words / 0x1000;
-	memory_configure_bank(20, 0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
+	memory_configure_bank(machine, 20, 0, dcs.sounddata_banks, dcs.sounddata, 0x1000*2);
 
 	/* create the timers */
 	dcs.internal_timer = timer_alloc(internal_timer_callback, NULL);
@@ -986,7 +986,7 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	}
 	dcs.sounddata_banks = dcs.sounddata_words / soundbank_words;
 	if (dcs.rev != 2)
-		memory_configure_bank(20, 0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
+		memory_configure_bank(machine, 20, 0, dcs.sounddata_banks, dcs.sounddata, soundbank_words*2);
 
 	/* allocate memory for the SRAM */
 	dcs_sram = auto_malloc(0x8000*4);
@@ -1001,7 +1001,7 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 
 	/* install the speedup handler */
 	if (polling_offset)
-		dcs_polling_base = memory_install_read16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, polling_offset, polling_offset, 0, 0, dcs_polling_r);
+		dcs_polling_base = memory_install_read16_handler(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA), polling_offset, polling_offset, 0, 0, dcs_polling_r);
 
 	/* allocate a watchdog timer for HLE transfers */
 	transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
@@ -1092,24 +1092,24 @@ static void sdrc_remap_memory(running_machine *machine)
 	/* if SRAM disabled, clean it out */
 	if (SDRC_SM_EN == 0)
 	{
-		memory_install_readwrite32_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, 0x0800, 0x37ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_PROGRAM), 0x0800, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x0800, 0x37ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	}
 
 	/* otherwise, map the SRAM */
 	else
 	{
 		/* first start with a clean program map */
-		memory_install_readwrite32_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_PROGRAM, 0x0800, 0x3fff, 0, 0, SMH_BANK21, SMH_BANK21);
+		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_PROGRAM), 0x0800, 0x3fff, 0, 0, SMH_BANK21, SMH_BANK21);
 		memory_set_bankptr(21, dcs_sram + 0x4800);
 
 		/* set up the data map based on the SRAM banking */
 		/* map 0: ram from 0800-37ff */
 		if (SDRC_SM_BK == 0)
 		{
-			memory_install_readwrite16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, SMH_BANK22, SMH_BANK22);
-			memory_install_readwrite16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
-			memory_install_readwrite16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, SMH_BANK24,  SMH_BANK24);
+			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x0800, 0x17ff, 0, 0, SMH_BANK22, SMH_BANK22);
+			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
+			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x2800, 0x37ff, 0, 0, SMH_BANK24,  SMH_BANK24);
 			memory_set_bankptr(22, dcs_sram + 0x0000);
 			memory_set_bankptr(23, dcs_sram + 0x1000);
 			memory_set_bankptr(24, dcs_sram + 0x2000);
@@ -1118,9 +1118,9 @@ static void sdrc_remap_memory(running_machine *machine)
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
 		else
 		{
-			memory_install_readwrite16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, 0x0800, 0x17ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-			memory_install_readwrite16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
-			memory_install_readwrite16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, 0x2800, 0x37ff, 0, 0, SMH_BANK24, SMH_BANK24);
+			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x0800, 0x17ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
+			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x2800, 0x37ff, 0, 0, SMH_BANK24, SMH_BANK24);
 			memory_set_bankptr(23, dcs_sram + 0x3000);
 			memory_set_bankptr(24, dcs_sram + 0x2000);
 		}
@@ -1131,14 +1131,14 @@ static void sdrc_remap_memory(running_machine *machine)
 	{
 		int baseaddr = (SDRC_ROM_ST == 0) ? 0x0000 : (SDRC_ROM_ST == 1) ? 0x3000 : 0x3400;
 		int pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
-		memory_install_read16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, baseaddr, baseaddr + pagesize - 1, 0, 0, SMH_BANK25);
+		memory_install_read16_handler(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA), baseaddr, baseaddr + pagesize - 1, 0, 0, SMH_BANK25);
 	}
 
 	/* map the DRAM page as bank 26 */
 	if (SDRC_DM_ST != 0)
 	{
 		int baseaddr = (SDRC_DM_ST == 1) ? 0x0000 : (SDRC_DM_ST == 2) ? 0x3000 : 0x3400;
-		memory_install_readwrite16_handler(machine, cpu_get_index(dcs.cpu), ADDRESS_SPACE_DATA, baseaddr, baseaddr + 0x3ff, 0, 0, SMH_BANK26, SMH_BANK26);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), baseaddr, baseaddr + 0x3ff, 0, 0, SMH_BANK26, SMH_BANK26);
 	}
 
 	/* update the bank pointers */

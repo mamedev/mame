@@ -33,7 +33,7 @@ void debugger_refresh_display(running_machine *machine);
 
 
 /***************************************************************************
-    INLINE FUNCTIONS
+    CPU CORE INLINE FUNCTIONS
 ***************************************************************************/
 
 /*-------------------------------------------------
@@ -47,6 +47,23 @@ INLINE void debugger_instruction_hook(running_machine *machine, offs_t curpc)
 		debug_cpu_instruction_hook(machine, curpc);
 }
 
+
+/*-------------------------------------------------
+    debugger_exception_hook - CPU cores call this
+    anytime an exception is generated
+-------------------------------------------------*/
+
+INLINE void debugger_exception_hook(running_machine *machine, int cpunum, int exception)
+{
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_exception_hook(machine, cpunum, exception);
+}
+
+
+
+/***************************************************************************
+    CPU EXECUTION SYSTEM INLINE FUNCTIONS
+***************************************************************************/
 
 /*-------------------------------------------------
     debugger_start_cpu_hook - the CPU execution
@@ -73,6 +90,24 @@ INLINE void debugger_stop_cpu_hook(running_machine *machine, int cpunum)
 		debug_cpu_stop_hook(machine, cpunum);
 }
 
+
+/*-------------------------------------------------
+    debugger_interrupt_hook - the CPU execution
+    system calls this hook when an interrupt is
+    acknowledged
+-------------------------------------------------*/
+
+INLINE void debugger_interrupt_hook(running_machine *machine, int cpunum, int irqline)
+{
+	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_interrupt_hook(machine, cpunum, irqline);
+}
+
+
+
+/***************************************************************************
+    GENERAL INLINE FUNCTIONS
+***************************************************************************/
 
 /*-------------------------------------------------
     debugger_break - stop in the debugger at the

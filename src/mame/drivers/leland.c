@@ -1920,11 +1920,11 @@ static void dasm_chunk(char *tag, UINT8 *base, UINT16 pc, UINT32 length, FILE *o
 static void init_master_ports(running_machine *machine, UINT8 mvram_base, UINT8 io_base)
 {
 	/* set up the master CPU VRAM I/O */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, mvram_base, mvram_base + 0x1f, 0, 0, leland_mvram_port_r, leland_mvram_port_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), mvram_base, mvram_base + 0x1f, 0, 0, leland_mvram_port_r, leland_mvram_port_w);
 
 	/* set up the master CPU I/O ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, io_base, io_base + 0x1f, 0, 0, leland_master_input_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, io_base, io_base + 0x0f, 0, 0, leland_master_output_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), io_base, io_base + 0x1f, 0, 0, leland_master_input_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), io_base, io_base + 0x0f, 0, 0, leland_master_output_w);
 }
 
 
@@ -1959,8 +1959,8 @@ static DRIVER_INIT( cerberus )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x80, 0x80, 0, 0, cerberus_dial_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x90, 0x90, 0, 0, cerberus_dial_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x80, 0x80, 0, 0, cerberus_dial_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x90, 0x90, 0, 0, cerberus_dial_2_r);
 }
 
 
@@ -2079,7 +2079,7 @@ static DRIVER_INIT( alleymas )
 	/* kludge warning: the game uses location E0CA to determine if the joysticks are available */
 	/* it gets cleared by the code, but there is no obvious way for the value to be set to a */
 	/* non-zero value. If the value is zero, the joystick is never read. */
-	alleymas_kludge_mem = memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe0ca, 0xe0ca, 0, 0, alleymas_joystick_kludge);
+	alleymas_kludge_mem = memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe0ca, 0xe0ca, 0, 0, alleymas_joystick_kludge);
 }
 
 
@@ -2132,9 +2132,9 @@ static DRIVER_INIT( dangerz )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf4, 0xf4, 0, 0, dangerz_input_upper_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, dangerz_input_y_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfc, 0xfc, 0, 0, dangerz_input_x_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf4, 0xf4, 0, 0, dangerz_input_upper_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, dangerz_input_y_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfc, 0xfc, 0, 0, dangerz_input_x_r);
 }
 
 
@@ -2225,10 +2225,10 @@ static DRIVER_INIT( redlin2p )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xc0, 0xc0, 0, 0, redline_pedal_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xd0, 0xd0, 0, 0, redline_pedal_2_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, redline_wheel_2_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfb, 0xfb, 0, 0, redline_wheel_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xc0, 0xc0, 0, 0, redline_pedal_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xd0, 0xd0, 0, 0, redline_pedal_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, redline_wheel_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfb, 0xfb, 0, 0, redline_wheel_1_r);
 }
 
 
@@ -2283,9 +2283,9 @@ static DRIVER_INIT( viper )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xa4, 0xa4, 0, 0, dangerz_input_upper_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xb8, 0xb8, 0, 0, dangerz_input_y_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xbc, 0xbc, 0, 0, dangerz_input_x_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xa4, 0xa4, 0, 0, dangerz_input_upper_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xb8, 0xb8, 0, 0, dangerz_input_y_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xbc, 0xbc, 0, 0, dangerz_input_x_r);
 }
 
 
@@ -2314,8 +2314,8 @@ static DRIVER_INIT( teamqb )
 	init_master_ports(machine, 0x40, 0x80);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2344,8 +2344,8 @@ static DRIVER_INIT( aafb )
 	init_master_ports(machine, 0x00, 0xc0);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2374,8 +2374,8 @@ static DRIVER_INIT( aafbb )
 	init_master_ports(machine, 0x80, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2404,8 +2404,8 @@ static DRIVER_INIT( aafbd2p )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7c, 0x7c, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN5"));
 }
 
 
@@ -2440,9 +2440,9 @@ static DRIVER_INIT( offroad )
 	init_master_ports(machine, 0x40, 0x80);	/* yes, this is intentional */
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
 }
 
 
@@ -2476,9 +2476,9 @@ static DRIVER_INIT( offroadt )
 	init_master_ports(machine, 0x80, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, offroad_wheel_3_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf9, 0xf9, 0, 0, offroad_wheel_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfb, 0xfb, 0, 0, offroad_wheel_2_r);
 }
 
 
@@ -2510,7 +2510,7 @@ static DRIVER_INIT( pigout )
 	init_master_ports(machine, 0x00, 0x40);
 
 	/* set up additional input ports */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, input_port_read_handler8(machine->portconfig, "IN4"));
 }
 
 

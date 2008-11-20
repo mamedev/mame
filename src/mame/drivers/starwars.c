@@ -503,7 +503,7 @@ static DRIVER_INIT( starwars )
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x6000, 0x10000 - 0x6000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x6000, 0x10000 - 0x6000);
 	memory_set_bank(1, 0);
 }
 
@@ -524,19 +524,19 @@ static DRIVER_INIT( esb )
 	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), esb_setdirect);
 
 	/* install read/write handlers for it */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);
 
 	/* install additional banking */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xffff, 0, 0, SMH_BANK2);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xffff, 0, 0, SMH_BANK2);
 
 	/* prepare the matrix processor */
 	starwars_is_esb = 1;
 	starwars_mproc_init(machine);
 
 	/* initialize banking */
-	memory_configure_bank(1, 0, 2, rom + 0x6000, 0x10000 - 0x6000);
+	memory_configure_bank(machine, 1, 0, 2, rom + 0x6000, 0x10000 - 0x6000);
 	memory_set_bank(1, 0);
-	memory_configure_bank(2, 0, 2, rom + 0xa000, 0x1c000 - 0xa000);
+	memory_configure_bank(machine, 2, 0, 2, rom + 0xa000, 0x1c000 - 0xa000);
 	memory_set_bank(2, 0);
 
 	/* additional globals for state saving */

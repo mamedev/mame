@@ -282,7 +282,7 @@ void williams_cvsd_init(int pianum)
             D3 -> A16
          */
 		offs_t offset = 0x8000 * ((bank >> 2) & 3) + 0x20000 * (bank & 3);
-		memory_configure_bank(5, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(Machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
 	}
 	memory_set_bank(5, 0);
 
@@ -314,7 +314,7 @@ void williams_narc_init(void)
             D3 -> A16
          */
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		memory_configure_bank(5, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(Machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
 	}
 	memory_set_bankptr(6, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
@@ -328,7 +328,7 @@ void williams_narc_init(void)
             D3 -> A16
         */
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
-		memory_configure_bank(7, bank, 1, &ROM[0x10000 + offset], 0);
+		memory_configure_bank(Machine, 7, bank, 1, &ROM[0x10000 + offset], 0);
 	}
 	memory_set_bankptr(8, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
@@ -349,7 +349,7 @@ void williams_adpcm_init(void)
 
 	/* configure banks */
 	ROM = memory_region(Machine, "adpcm");
-	memory_configure_bank(5, 0, 8, &ROM[0x10000], 0x8000);
+	memory_configure_bank(Machine, 5, 0, 8, &ROM[0x10000], 0x8000);
 	memory_set_bankptr(6, &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	/* expand ADPCM data */

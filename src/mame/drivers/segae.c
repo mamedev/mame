@@ -2166,23 +2166,23 @@ static void init_ports_systeme(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	memory_install_write8_handler    (machine, 0, ADDRESS_SPACE_IO, 0x7b, 0x7b, 0, 0, sms_sn76496_2_w);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0x7e, 0x7e, 0, 0, sms_vcounter_r, sms_sn76496_w);
-	memory_install_write8_handler    (machine, 0, ADDRESS_SPACE_IO, 0x7f, 0x7f, 0, 0, sms_sn76496_w);
+	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7b, 0x7b, 0, 0, sms_sn76496_2_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7e, 0x7e, 0, 0, sms_vcounter_r, sms_sn76496_w);
+	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x7f, 0x7f, 0, 0, sms_sn76496_w);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0xba, 0xba, 0, 0, sms_vdp_data_r, sms_vdp_data_w);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0xbb, 0xbb, 0, 0, sms_vdp_ctrl_r, sms_vdp_ctrl_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xba, 0xba, 0, 0, sms_vdp_data_r, sms_vdp_data_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xbb, 0xbb, 0, 0, sms_vdp_ctrl_r, sms_vdp_ctrl_w);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0xbe, 0xbe, 0, 0, sms_vdp_2_data_r, sms_vdp_2_data_w);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_IO, 0xbf, 0xbf, 0, 0, sms_vdp_2_ctrl_r, sms_vdp_2_ctrl_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xbe, 0xbe, 0, 0, sms_vdp_2_data_r, sms_vdp_2_data_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xbf, 0xbf, 0, 0, sms_vdp_2_ctrl_r, sms_vdp_2_ctrl_w);
 
-	memory_install_read8_handler     (machine, 0, ADDRESS_SPACE_IO, 0xe0, 0xe0, 0, 0, input_port_read_handler8(machine->portconfig, "e0"));
-	memory_install_read8_handler     (machine, 0, ADDRESS_SPACE_IO, 0xe1, 0xe1, 0, 0, input_port_read_handler8(machine->portconfig, "e1"));
-	memory_install_read8_handler     (machine, 0, ADDRESS_SPACE_IO, 0xe2, 0xe2, 0, 0, input_port_read_handler8(machine->portconfig, "e2"));
-	memory_install_read8_handler     (machine, 0, ADDRESS_SPACE_IO, 0xf2, 0xf2, 0, 0, input_port_read_handler8(machine->portconfig, "f2"));
-	memory_install_read8_handler     (machine, 0, ADDRESS_SPACE_IO, 0xf3, 0xf3, 0, 0, input_port_read_handler8(machine->portconfig, "f3"));
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xe0, 0xe0, 0, 0, input_port_read_handler8(machine->portconfig, "e0"));
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xe1, 0xe1, 0, 0, input_port_read_handler8(machine->portconfig, "e1"));
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xe2, 0xe2, 0, 0, input_port_read_handler8(machine->portconfig, "e2"));
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf2, 0xf2, 0, 0, input_port_read_handler8(machine->portconfig, "f2"));
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf3, 0xf3, 0, 0, input_port_read_handler8(machine->portconfig, "f3"));
 
-	memory_install_write8_handler    (machine, 0, ADDRESS_SPACE_IO, 0xf7, 0xf7, 0, 0, systeme_bank_w );
+	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf7, 0xf7, 0, 0, systeme_bank_w );
 }
 
 
@@ -2192,24 +2192,24 @@ static void init_systeme_map(running_machine *machine)
 	/* INIT THE MEMMAP / BANKING *********************************************************************************/
 
 	/* catch any addresses that don't get mapped */
-//  memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 	/* fixed rom bank area */
 //  sms_rom = auto_malloc(0xc000);
-//  memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
+//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
 //  memory_set_bankptr( 1, sms_rom );
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, "z80") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "z80") + 0x10000, 0x4000);
 
 	/* alternate way of accessing video ram */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, segasyse_videoram_w);
 
 
 //  memcpy(sms_rom, memory_region(machine, "user1"), 0x8000);
 
 	/* main ram area */
 	sms_mainram = auto_malloc(0x4000);
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
 	memory_set_bankptr( 2, sms_mainram );
 	memset(sms_mainram,0x00,0x4000);
 
@@ -2334,8 +2334,8 @@ static DRIVER_INIT( ridleofp )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, segae_ridleofp_port_f8_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfa, 0xfa, 0, 0, segae_ridleofp_port_fa_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, segae_ridleofp_port_f8_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfa, 0xfa, 0, 0, segae_ridleofp_port_fa_w);
 }
 
 
@@ -2343,8 +2343,8 @@ static DRIVER_INIT( hangonjr )
 {
 	DRIVER_INIT_CALL(segasyse);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0xf8, 0xf8, 0, 0, segae_hangonjr_port_f8_r);
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_IO, 0xfa, 0xfa, 0, 0, segae_hangonjr_port_fa_w);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xf8, 0xf8, 0, 0, segae_hangonjr_port_f8_r);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0xfa, 0xfa, 0, 0, segae_hangonjr_port_fa_w);
 }
 
 static DRIVER_INIT( opaopa )

@@ -252,7 +252,7 @@ MACHINE_RESET( theglobp )
 
 	/* The initial state of the counter is 0x0A */
 	counter = 0x0A;
-	memory_configure_bank(1, 0, 4, &RAM[0x10000], 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, &RAM[0x10000], 0x4000);
 	memory_set_bank(1, 2);
 
 	state_save_register_global(counter);

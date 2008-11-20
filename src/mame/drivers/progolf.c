@@ -272,10 +272,11 @@ ROM_END
 static DRIVER_INIT( progolf )
 {
 	int A;
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	UINT8* decrypted = auto_malloc(0x10000);
 
-	memory_set_decrypted_region(0,0x0000,0xffff, decrypted);
+	memory_set_decrypted_region(space,0x0000,0xffff, decrypted);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (A = 0;A < 0x10000;A++)

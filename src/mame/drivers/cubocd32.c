@@ -62,10 +62,10 @@ static WRITE32_HANDLER( aga_overlay_w )
 		/* swap the write handlers between ROM and bank 1 based on the bit */
 		if ((data & 1) == 0)
 			/* overlay disabled, map RAM on 0x000000 */
-			memory_install_write32_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, SMH_BANK1);
+			memory_install_write32_handler(space, 0x000000, 0x1fffff, 0, 0, SMH_BANK1);
 		else
 			/* overlay enabled, map Amiga system ROM on 0x000000 */
-			memory_install_write32_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x1fffff, 0, 0, SMH_UNMAP);
+			memory_install_write32_handler(space, 0x000000, 0x1fffff, 0, 0, SMH_UNMAP);
 	}
 }
 
@@ -337,8 +337,8 @@ static DRIVER_INIT( cd32 )
 	amiga_machine_config(machine, &cubocd32_intf);
 
 	/* set up memory */
-	memory_configure_bank(1, 0, 1, amiga_chip_ram32, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram32, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
 
 	/* intialize akiko */
 	amiga_akiko_init(machine);

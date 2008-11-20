@@ -307,14 +307,14 @@ UINT32 debug_comment_all_change_count(void)
 
 UINT32 debug_comment_get_opcode_crc32(offs_t address)
 {
-	const debug_cpu_info *info = debug_get_cpu_info(cpunum_get_active());
+	const cpu_debug_data *info = cpu_get_debug_data(Machine->activecpu);
 	int i;
 	UINT32 crc;
 	UINT8 opbuf[64], argbuf[64];
 	char buff[256];
 	offs_t numbytes;
 	int maxbytes = cpu_get_max_opcode_bytes(Machine->activecpu);
-	UINT32 addrmask = (debug_get_cpu_info(cpunum_get_active()))->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
+	UINT32 addrmask = (cpu_get_debug_data(Machine->activecpu))->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
 
 	memset(opbuf, 0x00, sizeof(opbuf));
 	memset(argbuf, 0x00, sizeof(argbuf));

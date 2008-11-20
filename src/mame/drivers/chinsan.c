@@ -73,7 +73,7 @@ static VIDEO_UPDATE(chinsan)
 
 static MACHINE_RESET( chinsan )
 {
-	memory_configure_bank(1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 

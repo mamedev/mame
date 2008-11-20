@@ -189,7 +189,7 @@ void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decry
 		if (region_start >= romsize)
 			continue;
 
-		memory_configure_bank_decrypted(banknum, 0, 1, decrypted + region_start, 0);
+		memory_configure_bank_decrypted(machine, banknum, 0, 1, decrypted + region_start, 0);
 		memory_set_bank(banknum, 0);
 	}
 }
@@ -327,7 +327,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 	if (LOG_MEMORY_MAP) mame_printf_debug("----\nRemapping:\n");
 
 	/* first reset everything back to the beginning */
-	memory_install_readwrite16_handler(machine, cpu_get_index(chip->cpu), ADDRESS_SPACE_PROGRAM, 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(chip->cpu)], ADDRESS_SPACE_PROGRAM), 0x000000, 0xffffff, 0, 0, segaic16_memory_mapper_lsb_r, segaic16_memory_mapper_lsb_w);
 
 	/* loop over the regions */
 	for (rgnum = 0; chip->map[rgnum].regbase != 0; rgnum++)
@@ -361,16 +361,16 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 
 		/* map it */
 		if (read)
-			memory_install_read16_handler(machine, cpu_get_index(chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, read);
+			memory_install_read16_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, read);
 		if (write)
-			memory_install_write16_handler(machine, cpu_get_index(chip->cpu), ADDRESS_SPACE_PROGRAM, region_start, region_end, 0, region_mirror, write);
+			memory_install_write16_handler(cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM), region_start, region_end, 0, region_mirror, write);
 
 		/* set the bank pointer */
 		if (banknum && read)
 		{
 			if (rgn->base)
 			{
-				memory_configure_bank(banknum, 0, 1, *rgn->base, 0);
+				memory_configure_bank(machine, banknum, 0, 1, *rgn->base, 0);
 				memory_set_bank(banknum, 0);
 			}
 			else if (rgn->romoffset != ~0)
@@ -381,9 +381,9 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 				if (!decrypted)
 					decrypted = fd1089_get_decrypted_base();
 
-				memory_configure_bank(banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);
+				memory_configure_bank(machine, banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);
 				if (decrypted)
-					memory_configure_bank_decrypted(banknum, 0, 1, decrypted ? (decrypted + region_start) : 0, 0);
+					memory_configure_bank_decrypted(machine, banknum, 0, 1, decrypted ? (decrypted + region_start) : 0, 0);
 				memory_set_bank(banknum, 0);
 			}
 		}

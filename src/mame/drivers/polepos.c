@@ -1744,16 +1744,16 @@ static DRIVER_INIT( topracra )
 	polepos_gear_bit = 0x20;
 
 	/* extra direct mapped inputs read */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x02, 0x02, 0, 0, input_port_read_handler8(machine->portconfig, "STEER"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x03, 0x03, 0, 0, input_port_read_handler8(machine->portconfig, "IN0"));
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_IO, 0x04, 0x04, 0, 0, input_port_read_handler8(machine->portconfig, "DSWA"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x02, 0x02, 0, 0, input_port_read_handler8(machine->portconfig, "STEER"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x03, 0x03, 0, 0, input_port_read_handler8(machine->portconfig, "IN0"));
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x04, 0x04, 0, 0, input_port_read_handler8(machine->portconfig, "DSWA"));
 
 }
 
 static DRIVER_INIT( polepos2 )
 {
 	/* note that the bootleg version doesn't need this custom IC; it has a hacked ROM in its place */
-	memory_install_read16_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4000, 0x5fff, 0, 0, polepos2_ic25_r);
 
 	DRIVER_INIT_CALL(polepos);
 }

@@ -1019,7 +1019,7 @@ static DRIVER_INIT( amatelas )
 static DRIVER_INIT( horekid )
 {
 	mpProtData = mHoreKidProtData;
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x44004, 0x44005, 0, 0, horekid_IN2_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x44004, 0x44005, 0, 0, horekid_IN2_r);
 }
 
 /*    YEAR, NAME,   PARENT,     MACHINE, INPUT,    INIT,     MONITOR,  COMPANY,      FULLNAME, FLAGS */

@@ -551,7 +551,7 @@ DRIVER_INIT( drtoppel )
 	memcpy(&RAM[0x08000],&RAM[0x18000],0x4000);
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf800, 0xfbff, 0, 0, SMH_NOP);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf800, 0xfbff, 0, 0, SMH_NOP);
 }
 
 DRIVER_INIT( chukatai )
@@ -569,7 +569,7 @@ DRIVER_INIT( tnzs )
 	memcpy(&RAM[0x08000],&RAM[0x2c000],0x4000);
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
 }
 
 DRIVER_INIT( tnzsb )
@@ -582,7 +582,7 @@ DRIVER_INIT( tnzsb )
 	memcpy(&RAM[0x08000],&RAM[0x2c000],0x4000);
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
 }
 
 DRIVER_INIT( kabukiz )
@@ -595,9 +595,9 @@ DRIVER_INIT( insectx )
 	mcu_type = MCU_NONE_INSECTX;
 
 	/* this game has no mcu, replace the handler with plain input port handlers */
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc000, 0xc000, 0, 0, input_port_2_r );
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc001, 0xc001, 0, 0, input_port_3_r );
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0xc002, 0xc002, 0, 0, input_port_4_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc000, 0, 0, input_port_2_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc001, 0xc001, 0, 0, input_port_3_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xc002, 0xc002, 0, 0, input_port_4_r );
 }
 
 DRIVER_INIT( kageki )

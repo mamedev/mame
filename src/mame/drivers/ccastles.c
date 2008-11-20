@@ -229,7 +229,7 @@ static MACHINE_START( ccastles )
 	video_screen_configure(machine->primary_screen, 320, 256, &visarea, HZ_TO_ATTOSECONDS(PIXEL_CLOCK) * VTOTAL * HTOTAL);
 
 	/* configure the ROM banking */
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0xa000, 0x6000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0xa000, 0x6000);
 
 	/* create a timer for IRQs and set up the first callback */
 	irq_timer = timer_alloc(clock_irq, NULL);

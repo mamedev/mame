@@ -1359,7 +1359,7 @@ static IRQ_CALLBACK( standard_irq_callback )
 		vector = (*classdata->driver_irq)(device, irqline);
 
 	/* notify the debugger */
-	debug_cpu_interrupt_hook(device->machine, classdata->header.index, irqline);
+	debugger_interrupt_hook(device->machine, classdata->header.index, irqline);
 
 	/* otherwise, just return the current vector */
 	return vector;

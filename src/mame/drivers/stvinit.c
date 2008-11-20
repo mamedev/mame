@@ -354,8 +354,8 @@ DRIVER_INIT( groovef )
 	cpu_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x60060c2);
 
 	/* prevent game from hanging on startup -- todo: remove these hacks */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ca6cc, 0x60ca6cf, 0, 0, groovef_hack2_r );
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60fffcc, 0x60fffcf, 0, 0, groovef_hack1_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60ca6cc, 0x60ca6cf, 0, 0, groovef_hack2_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60fffcc, 0x60fffcf, 0, 0, groovef_hack1_r );
 
 	DRIVER_INIT_CALL(stv);
 
@@ -408,7 +408,7 @@ DRIVER_INIT( danchih )
 	cpu_set_info_int(machine->cpu[1], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x602ae26);
 
 	/* prevent game from hanging on title screen -- todo: remove these hacks */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60ffcbc, 0x60ffcbf, 0, 0, danchih_hack_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60ffcbc, 0x60ffcbf, 0, 0, danchih_hack_r );
 
 	DRIVER_INIT_CALL(stv);
 
@@ -451,7 +451,7 @@ DRIVER_INIT( astrass )
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_SELECT, FIRST_SPEEDUP_SLOT+1);
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_PCFLUSH_ADDR, 0x605b9da);
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x06000770, 0x06000773, 0, 0, astrass_hack_r );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x06000770, 0x06000773, 0, 0, astrass_hack_r );
 
 	install_astrass_protection(machine);
 

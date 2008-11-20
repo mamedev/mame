@@ -521,8 +521,8 @@ ROM_END
 static DRIVER_INIT(pturn)
 {
 	/*
-    memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
-    memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
+    memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc0dd, 0xc0dd, 0, 0, pturn_protection_r);
+    memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc0db, 0xc0db, 0, 0, pturn_protection2_r);
     */
 }
 

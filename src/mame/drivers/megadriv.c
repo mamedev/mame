@@ -2741,26 +2741,26 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		if (data & 0x01)
 		{
 			_32x_adapter_enabled = 1;
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
+			memory_install_readwrite16_handler(space, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
 			memory_set_bankptr( 11, memory_region(space->machine, "gamecart") );
 
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
+			memory_install_readwrite16_handler(space, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
 			memory_set_bankptr( 12, memory_region(space->machine, "gamecart") );
 
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
 			memory_set_bankptr( 10, memory_region(space->machine, "32x_68k_bios") );
 
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_a15180_r, _32x_68k_a15180_w); // mode control regs
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15182, 0x0a15183, 0, 0, _32x_68k_a15182_r, _32x_68k_a15182_w); // screen shift
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15184, 0x0a15185, 0, 0, _32x_68k_a15184_r, _32x_68k_a15184_w); // autofill length reg
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15186, 0x0a15187, 0, 0, _32x_68k_a15186_r, _32x_68k_a15186_w); // autofill address reg
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15188, 0x0a15189, 0, 0, _32x_68k_a15188_r, _32x_68k_a15188_w); // autofill data reg / start fill
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_a1518a_r, _32x_68k_a1518a_w); // framebuffer control regs
+			memory_install_readwrite16_handler(space, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_a15180_r, _32x_68k_a15180_w); // mode control regs
+			memory_install_readwrite16_handler(space, 0x0a15182, 0x0a15183, 0, 0, _32x_68k_a15182_r, _32x_68k_a15182_w); // screen shift
+			memory_install_readwrite16_handler(space, 0x0a15184, 0x0a15185, 0, 0, _32x_68k_a15184_r, _32x_68k_a15184_w); // autofill length reg
+			memory_install_readwrite16_handler(space, 0x0a15186, 0x0a15187, 0, 0, _32x_68k_a15186_r, _32x_68k_a15186_w); // autofill address reg
+			memory_install_readwrite16_handler(space, 0x0a15188, 0x0a15189, 0, 0, _32x_68k_a15188_r, _32x_68k_a15188_w); // autofill data reg / start fill
+			memory_install_readwrite16_handler(space, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_a1518a_r, _32x_68k_a1518a_w); // framebuffer control regs
 
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
+			memory_install_readwrite16_handler(space, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
 
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0860000, 0x087ffff, 0, 0, _32x_68k_dram_overwrite_r, _32x_68k_dram_overwrite_w); // access to 'display ram' (framebuffer)
+			memory_install_readwrite16_handler(space, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
+			memory_install_readwrite16_handler(space, 0x0860000, 0x087ffff, 0, 0, _32x_68k_dram_overwrite_r, _32x_68k_dram_overwrite_w); // access to 'display ram' (framebuffer)
 
 
 
@@ -2770,7 +2770,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		{
 			_32x_adapter_enabled = 0;
 
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
 			memory_set_bankptr( 10, memory_region(space->machine, "gamecart") );
 
 
@@ -3936,14 +3936,14 @@ static void svp_init(running_machine *machine)
 
 	/* SVP stuff */
 	svp.dram = auto_malloc(0x20000);
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x300000, 0x31ffff, 0, 0, SMH_BANK2, SMH_BANK2);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, SMH_BANK2, SMH_BANK2);
 	memory_set_bankptr( 2, svp.dram );
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
 	// "cell arrange" 1 and 2
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3a0000, 0x3affff, 0, 0, svp_68k_cell2_r);
 
-	memory_install_read16_handler(machine, 2, ADDRESS_SPACE_PROGRAM, 0x438, 0x438, 0, 0, svp_speedup_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x438, 0x438, 0, 0, svp_speedup_r);
 
 	svp.iram = auto_malloc(0x800);
 	memory_set_bankptr( 3, svp.iram );
@@ -6611,28 +6611,28 @@ static WRITE8_HANDLER( z80_unmapped_w )
 void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_IO, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_IO), 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);
 
 	/* catch any addresses that don't get mapped */
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0xffff, 0, 0, z80_unmapped_r, z80_unmapped_w);
 
 
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK1, SMH_BANK1);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK1, SMH_BANK1);
 	memory_set_bankptr( 1, genz80.z80_prgram );
 
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x0000, 0x1fff, 0, 0, SMH_BANK6, SMH_BANK6);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK6, SMH_BANK6);
 	memory_set_bankptr( 6, genz80.z80_prgram );
 
 
 	// not allowed??
-//  memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x2000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
+//  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x2000, 0x3fff, 0, 0, SMH_BANK1, SMH_BANK1);
 
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4000, 0x4003, 0, 0, megadriv_z80_YM2612_read, megadriv_z80_YM2612_write);
-	memory_install_write8_handler    (machine, 1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_write8_handler    (machine, 1, ADDRESS_SPACE_PROGRAM, 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
-	memory_install_read8_handler     (machine, 1, ADDRESS_SPACE_PROGRAM, 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4000, 0x4003, 0, 0, megadriv_z80_YM2612_read, megadriv_z80_YM2612_write);
+	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6000, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_write8_handler    (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6001, 0x6001, 0, 0, megadriv_z80_z80_bank_w);
+	memory_install_read8_handler     (cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6100, 0x7eff, 0, 0, megadriv_z80_unmapped_read);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x7f00, 0x7fff, 0, 0, megadriv_z80_vdp_read, megadriv_z80_vdp_write);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, z80_read_68k_banked_data, z80_write_68k_banked_data);
 }
 
 // these are tests for 'special case' hardware to make sure I don't break anything while rearranging things
@@ -6664,20 +6664,20 @@ DRIVER_INIT( _32x )
 
 	if (_32x_adapter_enabled == 0)
 	{
-		memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
+		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
 		memory_set_bankptr( 10, memory_region(machine, "gamecart") );
 	};
 
 
 	a15100_reg = 0x0000;
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15100, 0xa15101, 0, 0, _32x_68k_a15100_r, _32x_68k_a15100_w); // framebuffer control regs
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r, _32x_68k_a15104_w); // 68k BANK rom set
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r, _32x_68k_a15106_w); // dreq stuff
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15100, 0xa15101, 0, 0, _32x_68k_a15100_r, _32x_68k_a15100_w); // framebuffer control regs
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r, _32x_68k_a15104_w); // 68k BANK rom set
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r, _32x_68k_a15106_w); // dreq stuff
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa15120, 0xa1512f, 0, 0, _32x_68k_commsram_r, _32x_68k_commsram_w); // comms reg 0-7
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15120, 0xa1512f, 0, 0, _32x_68k_commsram_r, _32x_68k_commsram_w); // comms reg 0-7
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
 
 
 

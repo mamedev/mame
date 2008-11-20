@@ -3445,19 +3445,16 @@ ROM_END
 /* Ghostbusters, Darwin, Oscar use a "Deco 222" custom 6502 for sound. */
 static DRIVER_INIT( deco222 )
 {
-	int A,sound_cpu;
+	const address_space *space = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
+	int A;
 	UINT8 *decrypt;
 	UINT8 *rom;
-
-	sound_cpu = 1;
-	/* Oscar has three CPUs */
-	if (machine->config->cpu[2].type != CPU_DUMMY) sound_cpu = 2;
 
 	/* bits 5 and 6 of the opcodes are swapped */
 	rom = memory_region(machine, "audio");
 	decrypt = auto_malloc(0x8000);
 
-	memory_set_decrypted_region(sound_cpu, 0x8000, 0xffff, decrypt);
+	memory_set_decrypted_region(space, 0x8000, 0xffff, decrypt);
 
 	for (A = 0x8000;A < 0x10000;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);

@@ -426,17 +426,18 @@ ROM_END
 static DRIVER_INIT( deco222 )
 {
 	int A;
+	const address_space *space = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x10000);
 	UINT8 *rom = memory_region(machine, "audio");
 
-	memory_set_decrypted_region(1, 0x8000, 0xffff, decrypted);
+	memory_set_decrypted_region(space, 0x8000, 0xffff, decrypted);
 
 	/* bits 5 and 6 of the opcodes are swapped */
 	for (A = 0x8000;A < 0x18000;A++)
 		decrypted[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);
 
-	memory_configure_bank(3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(3, 0, 2, &decrypted[0x8000], 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank_decrypted(machine, 3, 0, 2, &decrypted[0x8000], 0x4000);
 }
 
 static DRIVER_INIT( graphics )
@@ -445,7 +446,7 @@ static DRIVER_INIT( graphics )
 	int len = memory_region_length(machine, "gfx1");
 	int i,j,temp[16];
 
-	memory_configure_bank(3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
 
 	/* Tile graphics roms have some swapped lines, original version only */
 	for (i = 0x00000;i < len;i += 32)

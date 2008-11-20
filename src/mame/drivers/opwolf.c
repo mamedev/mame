@@ -805,7 +805,7 @@ static DRIVER_INIT( opwolf )
 	opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);
 	opwolf_gun_yoffs = 0x1c - (rom[0x03ffae / 2] & 0xff);
 
-	memory_configure_bank(10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
 }
 
 
@@ -819,7 +819,7 @@ static DRIVER_INIT( opwolfb )
 	opwolf_gun_xoffs = -2;
 	opwolf_gun_yoffs = 17;
 
-	memory_configure_bank(10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 10, 0, 4, memory_region(machine, "audio") + 0x10000, 0x4000);
 }
 
 

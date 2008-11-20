@@ -468,7 +468,7 @@ static MACHINE_RESET( strtheat )
 	MACHINE_RESET_CALL(dkong);
 
 	/* The initial state of the counter is 0x08 */
-	memory_configure_bank(1, 0, 4, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
 	state->decrypt_counter = 0x08;
 	memory_set_bank(1, 0);
 }
@@ -481,7 +481,7 @@ static MACHINE_RESET( drakton )
 	MACHINE_RESET_CALL(dkong);
 
 	/* The initial state of the counter is 0x09 */
-	memory_configure_bank(1, 0, 4, &ROM[0x10000], 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
 	state->decrypt_counter = 0x09;
 	memory_set_bank(1, 1);
 }
@@ -2877,7 +2877,7 @@ static DRIVER_INIT( drakton )
 			{7,1,4,0,3,6,2,5},
 	};
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -2899,7 +2899,7 @@ static DRIVER_INIT( strtheat )
 			{6,3,4,1,0,7,2,5},
 	};
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1 );
 
 	/* While the PAL supports up to 16 decryption methods, only four
         are actually used in the PAL.  Therefore, we'll take a little
@@ -2910,8 +2910,8 @@ static DRIVER_INIT( strtheat )
 	drakton_decrypt_rom(machine, 0x88, 0x1c000, bs[3]);
 
 	/* custom handlers supporting Joystick or Steering Wheel */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7c00, 0x7c00, 0, 0, strtheat_inputport_0_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x7c80, 0x7c80, 0, 0, strtheat_inputport_1_r);
 }
 
 /*************************************

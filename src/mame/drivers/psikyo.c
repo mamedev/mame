@@ -1456,10 +1456,10 @@ static DRIVER_INIT( sngkace )
 	}
 
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, sngkace_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, sngkace_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
 
 	psikyo_ka302c_banking = 0; // SH201B doesn't have any gfx banking
 	psikyo_switch_banks(0, 0); // sngkace / samuraia don't use banking
@@ -1628,10 +1628,10 @@ ROM_END
 static DRIVER_INIT( gunbird )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, psikyo_soundlatch_w);
 
 	psikyo_ka302c_banking = 1;
 }
@@ -1686,10 +1686,10 @@ ROM_END
 static DRIVER_INIT( s1945jn )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, gunbird_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	psikyo_ka302c_banking = 1;
 }
@@ -1893,13 +1893,13 @@ ROM_END
 static DRIVER_INIT( s1945 )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	/* protection and tile bank switching */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
 	s1945_mcu_init(s1945_table);
 
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu
@@ -1908,13 +1908,13 @@ static DRIVER_INIT( s1945 )
 static DRIVER_INIT( s1945a )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	/* protection and tile bank switching */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
 	s1945_mcu_init(s1945a_table);
 
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu
@@ -1923,13 +1923,13 @@ static DRIVER_INIT( s1945a )
 static DRIVER_INIT( s1945j )
 {
 	/* input ports*/
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	/* protection and tile bank switching */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
 	s1945_mcu_init(s1945j_table);
 
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu
@@ -2020,13 +2020,13 @@ ROM_END
 static DRIVER_INIT( tengai )
 {
 	/* input ports */
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00000, 0xc0000b, 0, 0, s1945_input_r);
 
 	/* sound latch */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00010, 0xc00013, 0, 0, s1945_soundlatch_w);
 
 	/* protection */
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc00004, 0xc0000b, 0, 0, s1945_mcu_w);
 	s1945_mcu_init(0);
 
 	psikyo_ka302c_banking = 0; // Banking is controlled by mcu

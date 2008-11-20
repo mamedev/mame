@@ -660,8 +660,8 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 static void main_cpu_banking_init(running_machine *machine)
 {
 	/* create vector banks */
-	memory_configure_bank(NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, "mainbios"), 0);
-	memory_configure_bank(NEOGEO_BANK_VECTORS, 1, 1, memory_region(machine, "main"), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, "mainbios"), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, memory_region(machine, "main"), 0);
 
 	/* set initial main CPU bank */
 	if (memory_region_length(machine, "main") > 0x100000)
@@ -765,8 +765,8 @@ static void audio_cpu_banking_init(running_machine *machine)
 
 	/* audio bios/cartridge selection */
  	if (memory_region(machine, "audiobios"))
-		memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(machine, "audiobios"), 0);
-	memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(machine, "audio"), 0);
+		memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 0, 1, memory_region(machine, "audiobios"), 0);
+	memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, 1, 1, memory_region(machine, "audio"), 0);
 
 	/* audio banking */
 	address_mask = memory_region_length(machine, "audio") - 0x10000 - 1;
@@ -777,7 +777,7 @@ static void audio_cpu_banking_init(running_machine *machine)
 		for (bank = 0; bank < 0x100; bank++)
 		{
 			UINT32 bank_address = 0x10000 + (((bank << (11 + region)) & 0x3ffff) & address_mask);
-			memory_configure_bank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, bank, 1, &rgn[bank_address], 0);
+			memory_configure_bank(machine, NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, bank, 1, &rgn[bank_address], 0);
 		}
 	}
 

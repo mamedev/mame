@@ -7604,7 +7604,7 @@ static DRIVER_INIT( rongrong )
        version of the game might be a bootleg with the protection
        patched. (both sets need this)
      */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x60d4, 0x60d4, 0, 0, SMH_NOP);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60d4, 0x60d4, 0, 0, SMH_NOP);
 }
 
 /***************************************************************************

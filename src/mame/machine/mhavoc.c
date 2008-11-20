@@ -87,9 +87,9 @@ MACHINE_RESET( mhavoc )
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	has_gamma_cpu = (machine->cpu[1] != NULL);
 
-	memory_configure_bank(1, 0, 1, mhavoc_zram0, 0);
-	memory_configure_bank(1, 1, 1, mhavoc_zram1, 0);
-	memory_configure_bank(2, 0, 4, memory_region(machine, "alpha") + 0x10000, 0x2000);
+	memory_configure_bank(machine, 1, 0, 1, mhavoc_zram0, 0);
+	memory_configure_bank(machine, 1, 1, 1, mhavoc_zram1, 0);
+	memory_configure_bank(machine, 2, 0, 4, memory_region(machine, "alpha") + 0x10000, 0x2000);
 
 	/* reset RAM/ROM banks to 0 */
 	mhavoc_ram_banksel_w(space, 0, 0);

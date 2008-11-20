@@ -459,23 +459,24 @@ ROM_END
 
 static DRIVER_INIT( shootout )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	int length = memory_region_length(machine, "main");
 	UINT8 *decrypt = auto_malloc(length - 0x8000);
 	UINT8 *rom = memory_region(machine, "main");
 	int A;
 
-	memory_set_decrypted_region(0, 0x8000, 0xffff, decrypt);
+	memory_set_decrypted_region(space, 0x8000, 0xffff, decrypt);
 
 	for (A = 0x8000;A < length;A++)
 		decrypt[A-0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x40) >> 1) | ((rom[A] & 0x20) << 1);
 
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
-	memory_configure_bank_decrypted(1, 0, 16, decrypt + 0x8000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank_decrypted(machine, 1, 0, 16, decrypt + 0x8000, 0x4000);
 }
 
 static DRIVER_INIT( shootouj )
 {
-	memory_configure_bank(1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x4000);
 }
 
 

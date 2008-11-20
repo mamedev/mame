@@ -1350,11 +1350,11 @@ static DRIVER_INIT( galgames )
 {
 	UINT8 *ROM = memory_region(machine, "main");
 	// configure memory banks
-	memory_configure_bank(1, 0, 2, ROM+0x1c0000, 0x40000);
-	memory_configure_bank(3, 0, 2, ROM+0x1c0000, 0x40000);
+	memory_configure_bank(machine, 1, 0, 2, ROM+0x1c0000, 0x40000);
+	memory_configure_bank(machine, 3, 0, 2, ROM+0x1c0000, 0x40000);
 
-	memory_configure_bank(2, 0, 1, ROM+0x200000, 0x40000);
-	memory_configure_bank(4, 0, 1, ROM+0x200000, 0x40000);
+	memory_configure_bank(machine, 2, 0, 1, ROM+0x200000, 0x40000);
+	memory_configure_bank(machine, 4, 0, 1, ROM+0x200000, 0x40000);
 }
 
 GAME( 1996, tm,       0,    tm,       tm,       0,        ROT0, "Midway",                         "Touchmaster (v3.00 Euro)",           0 )

@@ -49,11 +49,12 @@ static int stfight_coin_mech_query;
 
 DRIVER_INIT( empcity )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	int A;
 
 	decrypt = auto_malloc(0x8000);
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	for (A = 0;A < 0x8000;A++)
 	{

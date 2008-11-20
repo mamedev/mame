@@ -104,7 +104,7 @@ void fatfury2_install_protection(running_machine *machine)
 {
 	/* the protection involves reading and writing addresses in the */
 	/* 0x2xxxxx range. There are several checks all around the code. */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x2fffff, 0, 0, fatfury2_protection_16_r, fatfury2_protection_16_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x2fffff, 0, 0, fatfury2_protection_16_r, fatfury2_protection_16_w);
 
 	state_save_register_global(fatfury2_prot_data);
 }
@@ -146,7 +146,7 @@ void install_kof98_protection(running_machine *machine)
 	/* when 0x20aaaa contains 0x0090 (word) then 0x100 (normally the neogeo header) should return 0x00c200fd
    worked out using real hw */
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x20aaaa, 0x20aaab, 0, 0, kof98_prot_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x20aaaa, 0x20aaab, 0, 0, kof98_prot_w);
 }
 
 
@@ -402,15 +402,15 @@ static void sma_install_random_read_handler(running_machine *machine, int addr1,
 {
 	state_save_register_global(neogeo_rng);
 
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, addr1, addr1 + 1, 0, 0, sma_random_r);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, addr2, addr2 + 1, 0, 0, sma_random_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), addr1, addr1 + 1, 0, 0, sma_random_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), addr2, addr2 + 1, 0, 0, sma_random_r);
 }
 
 
 void kof99_install_protection(running_machine *machine)
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2ffff0, 0x2ffff1, 0, 0, kof99_bankswitch_w);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2ffff0, 0x2ffff1, 0, 0, kof99_bankswitch_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
 
 	sma_install_random_read_handler(machine, 0x2ffff8, 0x2ffffa);
 }
@@ -418,8 +418,8 @@ void kof99_install_protection(running_machine *machine)
 
 void garou_install_protection(running_machine *machine)
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fffc0, 0x2fffc1, 0, 0, garou_bankswitch_w);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fffc0, 0x2fffc1, 0, 0, garou_bankswitch_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
 
 	sma_install_random_read_handler(machine, 0x2fffcc, 0x2ffff0);
 }
@@ -427,8 +427,8 @@ void garou_install_protection(running_machine *machine)
 
 void garouo_install_protection(running_machine *machine)
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fffc0, 0x2fffc1, 0, 0, garouo_bankswitch_w);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fffc0, 0x2fffc1, 0, 0, garouo_bankswitch_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
 
 	sma_install_random_read_handler(machine, 0x2fffcc, 0x2ffff0);
 }
@@ -436,8 +436,8 @@ void garouo_install_protection(running_machine *machine)
 
 void mslug3_install_protection(running_machine *machine)
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fffe4, 0x2fffe5, 0, 0, mslug3_bankswitch_w);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fffe4, 0x2fffe5, 0, 0, mslug3_bankswitch_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
 
 //  sma_install_random_read_handler(machine, 0x2ffff8, 0x2ffffa);
 }
@@ -445,8 +445,8 @@ void mslug3_install_protection(running_machine *machine)
 
 void kof2000_install_protection(running_machine *machine)
 {
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fffec, 0x2fffed, 0, 0, kof2000_bankswitch_w);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fffec, 0x2fffed, 0, 0, kof2000_bankswitch_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fe446, 0x2fe447, 0, 0, prot_9a37_r);
 
 	sma_install_random_read_handler(machine, 0x2fffd8, 0x2fffda);
 }
@@ -524,5 +524,5 @@ void install_pvc_protection( running_machine *machine )
 	pvc_cartridge_ram = auto_malloc(0x2000);
 	state_save_register_global_pointer(pvc_cartridge_ram, 0x2000 / 2);
 
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2fe000, 0x2fffff, 0, 0, pvc_prot_r, pvc_prot_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fe000, 0x2fffff, 0, 0, pvc_prot_r, pvc_prot_w);
 }

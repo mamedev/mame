@@ -160,8 +160,8 @@ WRITE8_HANDLER( zigzag_sillyprotection_w )
 DRIVER_INIT( zigzag )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 2, &RAM[0x2000], 0x1000);
-	memory_configure_bank(2, 0, 2, &RAM[0x2000], 0x1000);
+	memory_configure_bank(machine, 1, 0, 2, &RAM[0x2000], 0x1000);
+	memory_configure_bank(machine, 2, 0, 2, &RAM[0x2000], 0x1000);
 	memory_set_bank(1, 0);
 	memory_set_bank(2, 1);
 }
@@ -210,7 +210,7 @@ DRIVER_INIT( dingoe )
 			rom[i] = BITSWAP8(rom[i],7,6,5,0,3,2,1,4);
 	}
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3001, 0x3001, 0, 0, dingoe_3001_r);	/* Protection check */
 
 }
 
@@ -257,19 +257,19 @@ CUSTOM_INPUT( _4in1_fake_port_r )
 DRIVER_INIT( pisces )
 {
 	/* the coin lockout was replaced */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( checkmaj )
 {
 	/* for the title screen */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3800, 0, 0, checkmaj_protection_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, checkmaj_protection_r);
 }
 
 DRIVER_INIT( dingo )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3000, 0, 0, dingo_3000_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3035, 0x3035, 0, 0, dingo_3035_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3000, 0x3000, 0, 0, dingo_3000_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3035, 0x3035, 0, 0, dingo_3035_r);
 }
 
 
@@ -287,7 +287,7 @@ static UINT8 decode_mooncrst(UINT8 data,offs_t addr)
 
 DRIVER_INIT( mooncrsu )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa002, 0, 0, galaxold_gfxbank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xa002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( mooncrst )
@@ -304,16 +304,17 @@ DRIVER_INIT( mooncrst )
 
 DRIVER_INIT( mooncrgx )
 {
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x6002, 0, 0, galaxold_gfxbank_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x6002, 0, 0, galaxold_gfxbank_w);
 }
 
 DRIVER_INIT( moonqsr )
 {
 	offs_t i;
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *decrypt = auto_malloc(0x8000);
 
-	memory_set_decrypted_region(0, 0x0000, 0x7fff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
 
 	for (i = 0;i < 0x8000;i++)
 		decrypt[i] = decode_mooncrst(rom[i],i);
@@ -395,7 +396,7 @@ DRIVER_INIT( 4in1 )
 		RAM[i] = RAM[i] ^ (i & 0xff);
 
 	/* games are banked at 0x0000 - 0x3fff */
-	memory_configure_bank(1, 0, 4, &RAM[0x10000], 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, &RAM[0x10000], 0x4000);
 
 	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
 
@@ -410,5 +411,5 @@ INTERRUPT_GEN( hunchbks_vh_interrupt )
 DRIVER_INIT( ladybugg )
 {
 /* Doesn't actually use the bank, but it mustn't have a coin lock! */
-memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
+memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6002, 0x6002, 0, 0, galaxold_gfxbank_w);
 }

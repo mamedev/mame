@@ -1099,14 +1099,15 @@ ROM_END
 
 static DRIVER_INIT( decocass )
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	int A;
 
 	/* allocate memory and mark all RAM regions with their decrypted pointers */
 	decrypted = auto_malloc(0x10000);
-	memory_set_decrypted_region(0, 0x0000, 0xc7ff, &decrypted[0x0000]);
-	memory_set_decrypted_region(0, 0xd000, 0xdbff, &decrypted[0xd000]);
-	memory_set_decrypted_region(0, 0xf000, 0xffff, &decrypted[0xf000]);
+	memory_set_decrypted_region(space, 0x0000, 0xc7ff, &decrypted[0x0000]);
+	memory_set_decrypted_region(space, 0xd000, 0xdbff, &decrypted[0xd000]);
+	memory_set_decrypted_region(space, 0xf000, 0xffff, &decrypted[0xf000]);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (A = 0xf000;A < 0x10000;A++)
@@ -1133,15 +1134,15 @@ static DRIVER_INIT( decocrom )
 		decrypted2[i] = swap_bits_5_6(rom[i]);
 
 	/* convert charram to a banked ROM */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0xafff, 0, 0, SMH_BANK1, decocass_de0091_w);
-	memory_configure_bank(1, 0, 1, decocass_charram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "user3"), 0);
-	memory_configure_bank_decrypted(1, 0, 1, &decrypted[0x6000], 0);
-	memory_configure_bank_decrypted(1, 1, 1, decrypted2, 0);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0xafff, 0, 0, SMH_BANK1, decocass_de0091_w);
+	memory_configure_bank(machine, 1, 0, 1, decocass_charram, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user3"), 0);
+	memory_configure_bank_decrypted(machine, 1, 0, 1, &decrypted[0x6000], 0);
+	memory_configure_bank_decrypted(machine, 1, 1, 1, decrypted2, 0);
 	memory_set_bank(1, 0);
 
 	/* install the bank selector */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xe900, 0xe900, 0, 0, decocass_e900_w);
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe900, 0xe900, 0, 0, decocass_e900_w);
 }
 
 

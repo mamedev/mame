@@ -511,7 +511,7 @@ static void machine_init_common(void)
 static MACHINE_START( superqix )
 {
 	/* configure the banks */
-	memory_configure_bank(1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "main") + 0x10000, 0x4000);
 
 	machine_init_common();
 }
@@ -519,7 +519,7 @@ static MACHINE_START( superqix )
 static MACHINE_START( pbillian )
 {
 	/* configure the banks */
-	memory_configure_bank(1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x4000);
 
 	machine_init_common();
 }

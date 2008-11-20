@@ -1323,7 +1323,7 @@ static void disasm_free(debug_view *view)
     of instructions from the given PC
 -------------------------------------------------*/
 
-static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t startpc, int numinstrs)
+static offs_t disasm_back_up(int cpunum, const cpu_debug_data *cpuinfo, offs_t startpc, int numinstrs)
 {
 	int minlen = BYTE2ADDR(cpu_get_min_opcode_bytes(Machine->activecpu), cpuinfo, ADDRESS_SPACE_PROGRAM);
 	int maxlen = BYTE2ADDR(cpu_get_max_opcode_bytes(Machine->activecpu), cpuinfo, ADDRESS_SPACE_PROGRAM);
@@ -1405,7 +1405,7 @@ static offs_t disasm_back_up(int cpunum, const debug_cpu_info *cpuinfo, offs_t s
     byte values
 -------------------------------------------------*/
 
-static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const debug_cpu_info *cpuinfo, int minbytes, char *string, int maxchars, int encrypted)
+static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const cpu_debug_data *cpuinfo, int minbytes, char *string, int maxchars, int encrypted)
 {
 	int byte, offset = 0;
 	UINT64 val;
@@ -1464,7 +1464,7 @@ static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const debug_cpu_i
 static int disasm_recompute(debug_view *view, offs_t pc, int startline, int lines, int original_cpunum)
 {
 	debug_view_disasm *dasmdata = view->extra_data;
-	const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
+	const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[dasmdata->cpunum]);
 	const address_space *space = cpu_get_address_space(cpuinfo->device, ADDRESS_SPACE_PROGRAM);
 	int chunksize, minbytes, maxbytes, maxbytes_clamped;
 	int changed = FALSE;
@@ -1617,7 +1617,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 static void disasm_update(debug_view *view)
 {
 	debug_view_disasm *dasmdata = view->extra_data;
-	const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
+	const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[dasmdata->cpunum]);
 	const address_space *space = cpu_get_address_space(cpuinfo->device, ADDRESS_SPACE_PROGRAM);
 	offs_t pc = cpu_get_reg(Machine->cpu[dasmdata->cpunum], REG_PC);
 	offs_t pcbyte = ADDR2BYTE_MASKED(pc, cpuinfo, ADDRESS_SPACE_PROGRAM);
@@ -1636,7 +1636,7 @@ static void disasm_update(debug_view *view)
 		parsed_expression *expr;
 
 		/* parse the new expression */
-		exprerr = expression_parse(dasmdata->expression_string, debug_get_cpu_info(dasmdata->cpunum)->symtable, &debug_expression_callbacks, &expr);
+		exprerr = expression_parse(dasmdata->expression_string, cpu_get_debug_data(Machine->cpu[dasmdata->cpunum])->symtable, &debug_expression_callbacks, &expr);
 
 		/* if it worked, update the expression */
 		if (exprerr == EXPRERR_NONE)
@@ -1851,7 +1851,7 @@ static void disasm_handle_char(debug_view *view, char chval)
 
 		case DCH_HOME:				/* set the active column to the PC */
 		{
-			const debug_cpu_info *cpuinfo = debug_get_cpu_info(dasmdata->cpunum);
+			const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[dasmdata->cpunum]);
 			offs_t pc = cpu_get_reg(Machine->cpu[dasmdata->cpunum], REG_PC);
 			int i;
 
@@ -2479,7 +2479,7 @@ static void generic_write_qword(debug_view_memory *memdata, offs_t offs, UINT64 
 static void memory_handle_char(debug_view *view, char chval)
 {
 	debug_view_memory *memdata = view->extra_data;
-	const debug_cpu_info *cpuinfo = debug_get_cpu_info(memdata->cpunum);
+	const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[memdata->cpunum]);
 	static const char hexvals[] = "0123456789abcdef";
 	char *hexchar = strchr(hexvals, tolower(chval));
 	UINT32 bytes_per_row;
@@ -2638,7 +2638,7 @@ static void memory_handle_char(debug_view *view, char chval)
 static void memory_update(debug_view *view)
 {
 	debug_view_memory *memdata = view->extra_data;
-	const debug_cpu_info *cpuinfo = debug_get_cpu_info(memdata->cpunum);
+	const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[memdata->cpunum]);
 	debug_view_char *dest = view->viewdata;
 	char addrformat[16];
 	EXPRERR exprerr;
@@ -2707,7 +2707,7 @@ static void memory_update(debug_view *view)
 		parsed_expression *expr;
 
 		/* parse the new expression */
-		exprerr = expression_parse(memdata->expression_string, debug_get_cpu_info(memdata->cpunum)->symtable, &debug_expression_callbacks, &expr);
+		exprerr = expression_parse(memdata->expression_string, cpu_get_debug_data(Machine->cpu[memdata->cpunum])->symtable, &debug_expression_callbacks, &expr);
 
 		/* if it worked, update the expression */
 		if (exprerr == EXPRERR_NONE)

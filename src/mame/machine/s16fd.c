@@ -43,7 +43,7 @@ static void set_decrypted_region(void)
 	if (fd1094_set_decrypted != NULL)
 		(*fd1094_set_decrypted)(Machine, (UINT8 *)fd1094_userregion);
 	else
-		memory_set_decrypted_region(0, 0, fd1094_cpuregionsize - 1, fd1094_userregion);
+		memory_set_decrypted_region(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0, fd1094_cpuregionsize - 1, fd1094_userregion);
 }
 
 /* this function checks the cache to see if the current state is cached,

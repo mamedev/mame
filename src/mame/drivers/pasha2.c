@@ -464,7 +464,7 @@ static READ16_HANDLER( pasha2_speedup_r )
 
 static DRIVER_INIT( pasha2 )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x95744, 0x95747, 0, 0, pasha2_speedup_r );
 
 	memory_set_bankptr(1, memory_region(machine, "user2"));
 }

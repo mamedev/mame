@@ -598,7 +598,7 @@ static READ8_HANDLER( undoukai_mcu_status_r )
 static DRIVER_INIT( undoukai )
 {
 	UINT8 *ROM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 2, &ROM[0x10000], 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x2000);
 
 	from_mcu = 0xff;
 	mcu_cmd = -1;
@@ -612,7 +612,7 @@ static DRIVER_INIT( undoukai )
 static DRIVER_INIT( 40love )
 {
 	UINT8 *ROM = memory_region(machine, "main");
-	memory_configure_bank(1, 0, 2, &ROM[0x10000], 0x2000);
+	memory_configure_bank(machine, 1, 0, 2, &ROM[0x10000], 0x2000);
 
 	#if 0
 		/* character ROM hack

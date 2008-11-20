@@ -285,7 +285,7 @@ MACHINE_DRIVER_END
 
 static DRIVER_INIT( pokechmp )
 {
-	memory_configure_bank(3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 3, 0, 2, memory_region(machine, "audio") + 0x10000, 0x4000);
 }
 
 

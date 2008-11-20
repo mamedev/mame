@@ -293,7 +293,7 @@ static WRITE8_HANDLER( vsnormal_vrom_banking )
 DRIVER_INIT( vsnormal )
 {
 	/* vrom switching is enabled with bit 2 of $4016 */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, vsnormal_vrom_banking );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vsnormal_vrom_banking );
 }
 
 static WRITE8_HANDLER( ppuRC2C05_protection )
@@ -322,7 +322,7 @@ DRIVER_INIT( suprmrio )
 	DRIVER_INIT_CALL(vsnormal);
 
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	/* now override the vidaccess callback */
@@ -388,7 +388,7 @@ static WRITE8_HANDLER( gun_in0_w )
 DRIVER_INIT( duckhunt )
 {
 	/* vrom switching is enabled with bit 2 of $4016 */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, gun_in0_r, gun_in0_w );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, gun_in0_r, gun_in0_w );
 
 	/* common init */
 	init_vsnes(machine);
@@ -436,7 +436,7 @@ DRIVER_INIT( goonies )
 	memcpy( &prg[0x08000], &prg[0x18000], 0x8000 );
 
 	/* banking is done with writes to the $8000-$ffff area */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, goonies_rom_banking );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, goonies_rom_banking );
 
 	/* common init */
 	init_vsnes(machine);
@@ -453,7 +453,7 @@ DRIVER_INIT( vsgradus )
 	memcpy( &prg[0x08000], &prg[0x18000], 0x8000 );
 
 	/* banking is done with writes to the $8000-$ffff area */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, goonies_rom_banking );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, goonies_rom_banking );
 
 	/* common init */
 	init_vsnes(machine);
@@ -479,7 +479,7 @@ DRIVER_INIT( hogalley )
 {
 
 	/* vrom switching is enabled with bit 2 of $4016 */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, gun_in0_r, gun_in0_w );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, gun_in0_r, gun_in0_w );
 
 	/* common init */
 	init_vsnes(machine);
@@ -524,11 +524,11 @@ DRIVER_INIT( vsgshoe )
 	memcpy (&prg[0x08000], &prg[0x12000], 0x2000);
 
 	/* Protection */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2002, 0x2002, 0, 0, vsgshoe_security_r );
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2001, 0, 0, ppuRC2C05_protection );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2002, 0x2002, 0, 0, vsgshoe_security_r );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2001, 0, 0, ppuRC2C05_protection );
 
 	/* vrom switching is enabled with bit 2 of $4016 */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, gun_in0_r, vsgshoe_gun_in0_w );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, gun_in0_r, vsgshoe_gun_in0_w );
 
 	/* common init */
 	init_vsnes(machine);
@@ -664,7 +664,7 @@ DRIVER_INIT( drmario )
 	memcpy( &prg[0x0c000], &prg[0x1c000], 0x4000 );
 
 	/* MMC1 mapper at writes to $8000-$ffff */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, drmario_rom_banking );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, drmario_rom_banking );
 
 	drmario_shiftreg = 0;
 	drmario_shiftcount = 0;
@@ -761,7 +761,7 @@ DRIVER_INIT( cstlevna )
 	memcpy( &prg[0x08000], &prg[0x28000], 0x8000 );
 
    	/* banking is done with writes to the $8000-$ffff area */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, castlevania_rom_banking );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, castlevania_rom_banking );
 
 	/* common init */
 	init_vsnes(machine);
@@ -789,11 +789,11 @@ DRIVER_INIT( topgun )
 	memcpy( &prg[0x08000], &prg[0x28000], 0x8000 );
 
    	/* banking is done with writes to the $8000-$ffff area */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, castlevania_rom_banking );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, castlevania_rom_banking );
 
 	/* tap on the PPU, due to some tricky protection */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2002, 0x2002, 0, 0, topgun_security_r );
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2001, 0, 0, ppuRC2C05_protection );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2002, 0x2002, 0, 0, topgun_security_r );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2001, 0, 0, ppuRC2C05_protection );
 
 	/* common init */
 	init_vsnes(machine);
@@ -971,10 +971,10 @@ DRIVER_INIT( MMC3 )
 	memcpy( &prg[0xe000], &prg[(MMC3_prg_chunks-1) * 0x4000 + 0x12000], 0x2000 );
 
 	/* MMC3 mapper at writes to $8000-$ffff */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, mapper4_w );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mapper4_w );
 
 	/* extra ram at $6000-$7fff */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	/* common init */
@@ -1019,7 +1019,7 @@ DRIVER_INIT( rbibb )
 	DRIVER_INIT_CALL(MMC3);
 
 	/* RBI Base ball hack */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5e00, 0x5e01, 0, 0, rbi_hack_r) ;
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5e00, 0x5e01, 0, 0, rbi_hack_r) ;
 
 	remapped_colortable = rp2c04003_colortable;
 }
@@ -1069,10 +1069,10 @@ DRIVER_INIT( supxevs )
 	DRIVER_INIT_CALL(MMC3);
 
 	/* Vs. Super Xevious Protection */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x54ff, 0x54ff, 0, 0, supxevs_read_prot_1_r );
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5678, 0x5678, 0, 0, supxevs_read_prot_2_r );
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x578f, 0x578f, 0, 0, supxevs_read_prot_3_r );
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5567, 0x5567, 0, 0, supxevs_read_prot_4_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x54ff, 0x54ff, 0, 0, supxevs_read_prot_1_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5678, 0x5678, 0, 0, supxevs_read_prot_2_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x578f, 0x578f, 0, 0, supxevs_read_prot_3_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5567, 0x5567, 0, 0, supxevs_read_prot_4_r );
 
 	remapped_colortable = rp2c04001_colortable;
 }
@@ -1104,7 +1104,7 @@ DRIVER_INIT( tkoboxng )
 	DRIVER_INIT_CALL(MMC3);
 
 	/* security device at $5e00-$5e01 */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5e00, 0x5e01, 0, 0, tko_security_r );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5e00, 0x5e01, 0, 0, tko_security_r );
 
 	/* now override the vidaccess callback */
 	/* we need to remap color tables */
@@ -1118,7 +1118,7 @@ DRIVER_INIT( vsfdf )
 {
 	DRIVER_INIT_CALL(MMC3);
 
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, gun_in0_r, gun_in0_w );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, gun_in0_r, gun_in0_w );
 
 	vsnes_gun_controller = 1;
 	vsnes_do_vrom_bank = 0;
@@ -1171,7 +1171,7 @@ DRIVER_INIT( platoon )
 	memcpy( &prg[0x08000], &prg[0x10000], 0x4000 );
 	memcpy( &prg[0x0c000], &prg[0x2c000], 0x4000 );
 
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x8000, 0xffff, 0, 0, mapper68_rom_banking );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, mapper68_rom_banking );
 
 	init_vsnes(machine);
 
@@ -1198,10 +1198,10 @@ static READ8_HANDLER ( set_bnglngby_irq_r )
 
 DRIVER_INIT( bnglngby )
 {
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x0231, 0x0231, 0, 0, set_bnglngby_irq_r, set_bnglngby_irq_w );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0231, 0x0231, 0, 0, set_bnglngby_irq_r, set_bnglngby_irq_w );
 
 	/* extra ram */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	ret = 0;
@@ -1231,8 +1231,8 @@ DRIVER_INIT( jajamaru )
 	//Maybe it should be a DOP (double NOP)
 
 	/* Protection */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2002, 0x2002, 0, 0, jajamaru_security_r );
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2001, 0, 0, ppuRC2C05_protection );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2002, 0x2002, 0, 0, jajamaru_security_r );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2001, 0, 0, ppuRC2C05_protection );
 
 	/* common init */
 	init_vsnes(machine);
@@ -1254,8 +1254,8 @@ static READ8_HANDLER( mightybj_security_r )
 DRIVER_INIT( mightybj )
 {
 	/* Protection */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2002, 0x2002, 0, 0, mightybj_security_r );
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2000, 0x2001, 0, 0, ppuRC2C05_protection );
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2002, 0x2002, 0, 0, mightybj_security_r );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2001, 0, 0, ppuRC2C05_protection );
 
 	/* common init */
 	init_vsnes(machine);
@@ -1286,12 +1286,12 @@ DRIVER_INIT( vstennis )
 	UINT8 *prg = memory_region( machine, "main" );
 
 	/* vrom switching is enabled with bit 2 of $4016 */
-	memory_install_write8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, vstennis_vrom_banking );
-	memory_install_write8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x4016, 0x4016, 0, 0, vstennis_vrom_banking );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vstennis_vrom_banking );
+	memory_install_write8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x4016, 0x4016, 0, 0, vstennis_vrom_banking );
 
 	/* shared ram at $6000 */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
-	memory_install_readwrite8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 
 	memory_set_bankptr(1, &prg[0x6000]);
 }
@@ -1361,7 +1361,7 @@ DRIVER_INIT( btlecity )
 DRIVER_INIT( vstetris )
 {
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_set_bankptr(1, auto_malloc(0x2000));
 
 	init_vsnes(machine);

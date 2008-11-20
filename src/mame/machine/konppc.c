@@ -122,7 +122,7 @@ void set_cgboard_texture_bank(int board, int bank, UINT8 *rom)
 {
 	texture_bank[board] = bank;
 
-	memory_configure_bank(bank, 0, 2, rom, 0x800000);
+	memory_configure_bank(Machine, bank, 0, 2, rom, 0x800000);
 }
 
 /*****************************************************************************/

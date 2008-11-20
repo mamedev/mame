@@ -761,13 +761,13 @@ static DRIVER_INIT( exprraid )
 
 static DRIVER_INIT( wexpresb )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3800, 0x3800, 0, 0, vblank_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3800, 0x3800, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 
 static DRIVER_INIT( wexpresc )
 {
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xFFC0, 0xFFC0, 0, 0, vblank_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xFFC0, 0xFFC0, 0, 0, vblank_r);
 	exprraid_gfx_expand(machine);
 }
 

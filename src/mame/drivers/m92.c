@@ -2027,7 +2027,7 @@ static DRIVER_INIT( majtitl2 )
 	init_m92(machine, 1);
 
 	/* This game has an eprom on the game board */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf0000, 0xf3fff, 0, 0, m92_eeprom_r, m92_eeprom_w);
 
 	m92_game_kludge=2;
 }
@@ -2049,7 +2049,7 @@ static DRIVER_INIT( lethalth )
 	m92_irq_vectorbase=0x20;
 
 	/* NOP out the bankswitcher */
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_IO, 0x20, 0x21, 0, 0, SMH_NOP);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x20, 0x21, 0, 0, SMH_NOP);
 }
 
 static DRIVER_INIT( nbbatman )

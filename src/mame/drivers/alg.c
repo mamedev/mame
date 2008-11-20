@@ -203,11 +203,11 @@ static void alg_cia_0_porta_w(UINT8 data)
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
+		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(Machine, 0, ADDRESS_SPACE_PROGRAM, 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
+		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
 }
 
 
@@ -659,8 +659,8 @@ static void alg_init(running_machine *machine)
 	amiga_machine_config(machine, &alg_intf);
 
 	/* set up memory */
-	memory_configure_bank(1, 0, 1, amiga_chip_ram, 0);
-	memory_configure_bank(1, 1, 1, memory_region(machine, "user1"), 0);
+	memory_configure_bank(machine, 1, 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user1"), 0);
 }
 
 

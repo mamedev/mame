@@ -370,8 +370,8 @@ static MACHINE_RESET( mschamp )
 	UINT8 *rom = memory_region(machine, "main") + 0x10000;
 	int whichbank = input_port_read(machine, "GAME") & 1;
 
-	memory_configure_bank(1, 0, 2, &rom[0x0000], 0x8000);
-	memory_configure_bank(2, 0, 2, &rom[0x4000], 0x8000);
+	memory_configure_bank(machine, 1, 0, 2, &rom[0x0000], 0x8000);
+	memory_configure_bank(machine, 2, 0, 2, &rom[0x4000], 0x8000);
 
 	memory_set_bank(1, whichbank);
 	memory_set_bank(2, whichbank);
@@ -5176,12 +5176,13 @@ ROM_END
 
 static void maketrax_rom_decode(running_machine *machine)
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x4000);
 	UINT8 *rom = memory_region(machine, "main");
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	memory_set_decrypted_region(0, 0x0000, 0x3fff, decrypted);
+	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypted);
 
 	memcpy(decrypted,rom,0x4000);
 
@@ -5199,20 +5200,21 @@ static void maketrax_rom_decode(running_machine *machine)
 static DRIVER_INIT( maketrax )
 {
 	/* set up protection handlers */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5080, 0x50bf, 0, 0, maketrax_special_port2_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x50c0, 0x50ff, 0, 0, maketrax_special_port3_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5080, 0x50bf, 0, 0, maketrax_special_port2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x50c0, 0x50ff, 0, 0, maketrax_special_port3_r);
 
 	maketrax_rom_decode(machine);
 }
 
 static void korosuke_rom_decode(running_machine *machine)
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x4000);
 	UINT8 *rom = memory_region(machine, "main");
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	memory_set_decrypted_region(0, 0x0000, 0x3fff, decrypted);
+	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypted);
 
 	memcpy(decrypted,rom,0x4000);
 
@@ -5230,8 +5232,8 @@ static void korosuke_rom_decode(running_machine *machine)
 static DRIVER_INIT( korosuke )
 {
 	/* set up protection handlers */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x5080, 0x5080, 0, 0, korosuke_special_port2_r);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x50c0, 0x50ff, 0, 0, korosuke_special_port3_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5080, 0x5080, 0, 0, korosuke_special_port2_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x50c0, 0x50ff, 0, 0, korosuke_special_port3_r);
 
 	korosuke_rom_decode(machine);
 }
@@ -5372,7 +5374,7 @@ static DRIVER_INIT( porky )
 	}
 
 	for( i = 0; i < 4; i++)
-		memory_configure_bank(i + 1, 0, 2, &ROM[i * 0x2000], 0x8000);
+		memory_configure_bank(machine, i + 1, 0, 2, &ROM[i * 0x2000], 0x8000);
 
 	for( i = 0; i < 4; i++)
 		memory_set_bankptr(i + 1, &ROM[i * 0x2000]);
@@ -5456,11 +5458,11 @@ static READ8_HANDLER( cannonbp_protection_r )
 static DRIVER_INIT( cannonbp )
 {
 	/* extra memory */
-	memory_install_readwrite8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4800, 0x4bff, 0, 0, SMH_BANK5, SMH_BANK5);
+	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, SMH_BANK5, SMH_BANK5);
 	memory_set_bankptr(5, auto_malloc(0x400));
 
 	/* protection? */
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x3000, 0x3fff, 0, 0, cannonbp_protection_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3000, 0x3fff, 0, 0, cannonbp_protection_r);
 }
 
 

@@ -1293,20 +1293,19 @@ static WRITE32_HANDLER( psx_berr_w )
 
 static void mips_update_scratchpad( const address_space *space )
 {
-	int cpu = cpunum_get_active();
 	psxcpu_state *psxcpu = space->cpu->token;
 
 	if( ( psxcpu->biu & BIU_RAM ) == 0 )
 	{
-		memory_install_readwrite32_handler( space->machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, psx_berr_w );
+		memory_install_readwrite32_handler( space, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, psx_berr_w );
 	}
 	else if( ( psxcpu->biu & BIU_DS ) == 0 )
 	{
-		memory_install_readwrite32_handler( space->machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, SMH_NOP );
+		memory_install_readwrite32_handler( space, 0x1f800000, 0x1f8003ff, 0, 0, psx_berr_r, SMH_NOP );
 	}
 	else
 	{
-		memory_install_readwrite32_handler( space->machine, cpu, ADDRESS_SPACE_PROGRAM, 0x1f800000, 0x1f8003ff, 0, 0, SMH_BANK32, SMH_BANK32 );
+		memory_install_readwrite32_handler( space, 0x1f800000, 0x1f8003ff, 0, 0, SMH_BANK32, SMH_BANK32 );
 
 		memory_set_bankptr( 32, psxcpu->dcache );
 	}

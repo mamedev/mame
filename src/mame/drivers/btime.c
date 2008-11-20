@@ -1640,19 +1640,20 @@ ROM_START( sdtennis )
 	ROM_LOAD( "ao_04.10f",   0x1000, 0x1000, CRC(921952af) SHA1(4e9248f3493a5f4651278f27c11f507571242317) )
 ROM_END
 
-static void decrypt_C10707_cpu(running_machine *machine, int cpu, const char *cputag)
+static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 {
+	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_malloc(0x10000);
 	UINT8 *rom = memory_region(machine, cputag);
 	offs_t addr;
 
-	memory_set_decrypted_region(cpu, 0x0000, 0xffff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (addr = 0; addr < 0x10000; addr++)
 		decrypt[addr] = swap_bits_5_6(rom[addr]);
 
-	if (cpu == 0)
+	if (space->cpu == machine->cpu[0])
 		decrypted = decrypt;
 }
 
@@ -1671,10 +1672,11 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 
 static void init_rom1(running_machine *machine)
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 
 	decrypted = auto_malloc(0x10000);
-	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypted);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
 
 	/* For now, just copy the RAM array over to ROM. Decryption will happen */
 	/* at run time, since the CPU applies the decryption only if the previous */
@@ -1702,26 +1704,26 @@ static DRIVER_INIT( zoar )
 
 static DRIVER_INIT( lnc )
 {
-	decrypt_C10707_cpu(machine, 0, "main");
+	decrypt_C10707_cpu(machine, "main");
 }
 
 static DRIVER_INIT( cookrace )
 {
 	memcpy(&audio_rambase[0x200], memory_region(machine, "audio") + 0xf200, 0x200);
-	decrypt_C10707_cpu(machine, 0, "main");
+	decrypt_C10707_cpu(machine, "main");
 }
 
 static DRIVER_INIT( wtennis )
 {
 	memcpy(&audio_rambase[0x200], memory_region(machine, "audio") + 0xf200, 0x200);
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
-	decrypt_C10707_cpu(machine, 0, "main");
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc15f, 0xc15f, 0, 0, wtennis_reset_hack_r);
+	decrypt_C10707_cpu(machine, "main");
 }
 
 static DRIVER_INIT( sdtennis )
 {
-	decrypt_C10707_cpu(machine, 0, "main");
-	decrypt_C10707_cpu(machine, 1, "audio");
+	decrypt_C10707_cpu(machine, "main");
+	decrypt_C10707_cpu(machine, "audio");
 }
 
 

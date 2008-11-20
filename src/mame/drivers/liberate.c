@@ -898,6 +898,7 @@ ROM_END
 
 static void sound_cpu_decrypt(running_machine *machine)
 {
+	const address_space *space = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x4000);
 	UINT8 *rom = memory_region(machine, "audio");
 	int i;
@@ -906,7 +907,7 @@ static void sound_cpu_decrypt(running_machine *machine)
 	for (i=0xc000; i<0x10000; i++)
 		decrypted[i-0xc000]=((rom[i] & 0x20) << 1) | ((rom[i] & 0x40) >> 1) | (rom[i] & 0x9f);
 
-	memory_set_decrypted_region(1, 0xc000, 0xffff, decrypted);
+	memory_set_decrypted_region(space, 0xc000, 0xffff, decrypted);
 }
 
 static DRIVER_INIT( prosport )
@@ -925,16 +926,17 @@ static DRIVER_INIT( yellowcb )
 {
 	DRIVER_INIT_CALL(prosport);
 
-	memory_install_read8_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xa000, 0xa000, 0, 0, input_port_0_r);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa000, 0xa000, 0, 0, input_port_0_r);
 }
 
 static DRIVER_INIT( liberate )
 {
 	int A;
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_malloc(0x10000);
 	UINT8 *ROM = memory_region(machine, "main");
 
-	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypted);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
 
 	/* Swap bits for opcodes only, not data */
 	for (A = 0;A < 0x10000;A++) {

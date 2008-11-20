@@ -9307,10 +9307,10 @@ logerror("%04x: twineagl_200100_w %d = %02x\n",cpu_get_pc(space->cpu),offset,dat
 static DRIVER_INIT( twineagl )
 {
 	/* debug? */
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x800000, 0x8000ff, 0, 0, twineagl_debug_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x800000, 0x8000ff, 0, 0, twineagl_debug_r);
 
 	/* This allows 2 simultaneous players and the use of the "Copyright" Dip Switch. */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200100, 0x20010f, 0, 0, twineagl_200100_r, twineagl_200100_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200100, 0x20010f, 0, 0, twineagl_200100_r, twineagl_200100_w);
 }
 
 
@@ -9340,7 +9340,7 @@ static WRITE16_HANDLER( downtown_protection_w )
 
 static DRIVER_INIT( downtown )
 {
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x200000, 0x2001ff, 0, 0, downtown_protection_r, downtown_protection_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x2001ff, 0, 0, downtown_protection_r, downtown_protection_w);
 }
 
 
@@ -9360,7 +9360,7 @@ static READ16_HANDLER( arbalest_debug_r )
 
 static DRIVER_INIT( arbalest )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80000, 0x8000f, 0, 0, arbalest_debug_r);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80000, 0x8000f, 0, 0, arbalest_debug_r);
 }
 
 
@@ -9369,7 +9369,7 @@ static DRIVER_INIT( metafox )
 	UINT16 *RAM = (UINT16 *) memory_region(machine, "main");
 
 	/* This game uses the 21c000-21ffff area for protection? */
-//  memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x21c000, 0x21ffff, 0, 0, SMH_NOP, SMH_NOP);
+//  memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x21c000, 0x21ffff, 0, 0, SMH_NOP, SMH_NOP);
 
 	RAM[0x8ab1c/2] = 0x4e71;	// patch protection test: "cp error"
 	RAM[0x8ab1e/2] = 0x4e71;
@@ -9413,14 +9413,14 @@ static DRIVER_INIT ( blandia )
 
 static DRIVER_INIT( eightfrc )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500004, 0x500005, 0, 0, SMH_NOP);	// watchdog??
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500004, 0x500005, 0, 0, SMH_NOP);	// watchdog??
 }
 
 
 static DRIVER_INIT( zombraid )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf00002, 0xf00003, 0, 0, zombraid_gun_r);
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xf00000, 0xf00001, 0, 0, zombraid_gun_w);
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00002, 0xf00003, 0, 0, zombraid_gun_r);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf00000, 0xf00001, 0, 0, zombraid_gun_w);
 }
 
 
@@ -9438,7 +9438,7 @@ static DRIVER_INIT( kiwame )
 
 static DRIVER_INIT( rezon )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x500006, 0x500007, 0, 0, SMH_NOP);	// irq ack?
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x500006, 0x500007, 0, 0, SMH_NOP);	// irq ack?
 }
 
 static DRIVER_INIT(wiggie)
@@ -9470,9 +9470,9 @@ static DRIVER_INIT(wiggie)
 	}
 
 	/* X1_010 is not used. */
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x100000, 0x103fff, 0, 0, SMH_NOP, SMH_NOP);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x100000, 0x103fff, 0, 0, SMH_NOP, SMH_NOP);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xB00008, 0xB00009, 0, 0, wiggie_soundlatch_w);
 
 }
 

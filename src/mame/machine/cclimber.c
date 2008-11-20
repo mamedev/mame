@@ -6,11 +6,12 @@
 
 static void cclimber_decode(running_machine *machine, const UINT8 convtable[8][16])
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "main");
 	UINT8 *decrypt = auto_malloc(0x10000);
 	int A;
 
-	memory_set_decrypted_region(0, 0x0000, 0xffff, decrypt);
+	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
 
 	for (A = 0x0000;A < 0x10000;A++)
 	{

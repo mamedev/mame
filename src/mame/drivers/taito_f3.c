@@ -3659,8 +3659,8 @@ static DRIVER_INIT( bubsympb )
 		}
 	}
 
-	memory_install_read32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
-	memory_install_write32_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
+	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
 }
 
 

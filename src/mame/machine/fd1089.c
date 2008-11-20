@@ -400,12 +400,13 @@ static UINT16 *decrypted;
 
 static void sys16_decrypt(running_machine *machine, const UINT8 *key,int cputype)
 {
+	const address_space *space = cputag_get_address_space(machine, "main", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "main");
 	int size = memory_region_length(machine, "main");
 	int A;
 	decrypted = (UINT16 *)auto_malloc(size);
 
-	memory_set_decrypted_region(0, 0x000000, size - 1, decrypted);
+	memory_set_decrypted_region(space, 0x000000, size - 1, decrypted);
 
 	for (A = 0;A < size;A+=2)
 	{

@@ -298,8 +298,8 @@ static WRITE8_HANDLER( asuka_msm5205_stop_w )
 static MACHINE_START( asuka )
 {
 	/* configure the banks */
-    memory_configure_bank(1, 0, 1, memory_region(machine, "audio"), 0);
-	memory_configure_bank(1, 1, 3, memory_region(machine, "audio") + 0x10000, 0x04000);
+    memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "audio"), 0);
+	memory_configure_bank(machine, 1, 1, 3, memory_region(machine, "audio") + 0x10000, 0x04000);
 
 	state_save_register_global(adpcm_pos);
 }

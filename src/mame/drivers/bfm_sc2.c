@@ -374,8 +374,8 @@ send data to them, although obviously there's no response. */
 	{
 		UINT8 *rom = memory_region(machine, "main");
 
-		memory_configure_bank(1, 0, 1, &rom[0x10000], 0);
-		memory_configure_bank(1, 1, 3, &rom[0x02000], 0x02000);
+		memory_configure_bank(machine, 1, 0, 1, &rom[0x10000], 0);
+		memory_configure_bank(machine, 1, 1, 3, &rom[0x02000], 0x02000);
 
 		memory_set_bank(1,3);
 	}

@@ -337,7 +337,7 @@ static MACHINE_RESET( bgaregga )
 
 	// Set Z80 bank switch - default bank is 2
 	current_bank = 4;
-	memory_configure_bank(1, 0, 16, Z80, 0x4000);
+	memory_configure_bank(machine, 1, 0, 16, Z80, 0x4000);
 	memory_set_bank(1, 4);
 
 	if (memory_region(machine, "oki1") != NULL)
@@ -386,7 +386,7 @@ static DRIVER_INIT( fixeight )
 	#if USE_V25
 
 	#else
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2 );
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2 );
 	memory_set_bankptr(2, fixeight_sec_cpu_mem);
 	#endif
 
@@ -913,11 +913,11 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* game keeping service mode. It writes/reads the settings to/from */
 			/* these shared RAM locations. The secondary CPU reads/writes them */
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2);
+			memory_install_readwrite16_handler(space, 0x28f002, 0x28fbff, 0, 0, SMH_BANK2, SMH_BANK2);
 			memory_set_bankptr(2, fixeight_sec_cpu_mem);
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f004, 0x28f005, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWA"), SMH_NOP);	/* Dip Switch A - Wrong !!! */
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f006, 0x28f007, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWB"), SMH_NOP);	/* Dip Switch B - Wrong !!! */
-			memory_install_readwrite16_handler(space->machine, 0, ADDRESS_SPACE_PROGRAM, 0x28f008, 0x28f009, 0, 0, input_port_read_handler16(space->machine->portconfig, "JMPR"), SMH_NOP);	/* Territory Jumper block - Wrong !!! */
+			memory_install_readwrite16_handler(space, 0x28f004, 0x28f005, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWA"), SMH_NOP);	/* Dip Switch A - Wrong !!! */
+			memory_install_readwrite16_handler(space, 0x28f006, 0x28f007, 0, 0, input_port_read_handler16(space->machine->portconfig, "DSWB"), SMH_NOP);	/* Dip Switch B - Wrong !!! */
+			memory_install_readwrite16_handler(space, 0x28f008, 0x28f009, 0, 0, input_port_read_handler16(space->machine->portconfig, "JMPR"), SMH_NOP);	/* Territory Jumper block - Wrong !!! */
 
 			mcu_data = data;
 		}

@@ -852,7 +852,7 @@ static DRIVER_INIT(witch)
  	UINT8 *ROM = (UINT8 *)memory_region(machine, "main");
 	memory_set_bankptr(1,&ROM[0x10000+UNBANKED_SIZE]);
 
-	memory_install_read8_handler(machine, 1, ADDRESS_SPACE_PROGRAM, 0x7000, 0x700f, 0, 0, prot_read_700x);
+	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);
 	bank = -1;
 }
 

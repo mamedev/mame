@@ -438,7 +438,7 @@ INLINE int pc_is_valid(running_machine *machine, UINT32 pc, UINT32 flags)
 		return 0;
 	if (pc & 0xff000000)
 		return 0;
-	if (memory_get_op_ptr(machine, cpunum_get_active(), pc, 0) == NULL)
+	if (memory_decrypted_read_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), pc) == NULL)
 		return 0;
 	return 1;
 }
@@ -462,7 +462,7 @@ INLINE int addr_is_valid(running_machine *machine, UINT32 addr, UINT32 flags)
 		return 0;
 
 	/* if we're invalid, fail */
-	if (strcmp(memory_get_handler_string(0, cpunum_get_active(), ADDRESS_SPACE_PROGRAM, addr), "segaic16_memory_mapper_lsb_r") == 0)
+	if (strcmp(memory_get_handler_string(cpu_get_address_space(machine->activecpu, ADDRESS_SPACE_PROGRAM), 0, addr), "segaic16_memory_mapper_lsb_r") == 0)
 		return 2;
 
 	return 1;

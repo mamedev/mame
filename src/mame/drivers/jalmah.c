@@ -2230,45 +2230,45 @@ static READ16_HANDLER( suchipi_mcu_r )
 
 static DRIVER_INIT( urashima )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, urashima_mcu_r );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80012, 0x80013, 0, 0, urashima_mcu_w );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, urashima_mcu_r );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, urashima_mcu_w );
 
 	mcu_prg = 0x12;
 }
 
 static DRIVER_INIT( daireika )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, daireika_mcu_r );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80012, 0x80013, 0, 0, daireika_mcu_w );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, daireika_mcu_r );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, daireika_mcu_w );
 
 	mcu_prg = 0x11;
 }
 
 static DRIVER_INIT( mjzoomin )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, mjzoomin_mcu_r );
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80012, 0x80013, 0, 0, mjzoomin_mcu_w );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, mjzoomin_mcu_r );
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80012, 0x80013, 0, 0, mjzoomin_mcu_w );
 
 	mcu_prg = 0x13;
 }
 
 static DRIVER_INIT( kakumei )
 {
-	memory_install_read16_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
 
 	mcu_prg = 0x21;
 }
 
 static DRIVER_INIT( kakumei2 )
 {
-	memory_install_read16_handler(machine, 0,  ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, kakumei_mcu_r );
 
 	mcu_prg = 0x22;
 }
 
 static DRIVER_INIT( suchipi )
 {
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x80004, 0x80005, 0, 0, suchipi_mcu_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x80004, 0x80005, 0, 0, suchipi_mcu_r );
 	mcu_prg = 0x23;
 }
 

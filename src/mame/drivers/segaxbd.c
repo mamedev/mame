@@ -2600,7 +2600,7 @@ static DRIVER_INIT( aburner2 )
 	xboard_generic_init(machine);
 	xboard_set_road_priority(0);
 
-	memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
+	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x140006, 0x140007, 0, 0x00fff0, aburner2_iochip_0_D_w);
 }
 
 
@@ -2617,14 +2617,14 @@ static DRIVER_INIT( loffire )
 	adc_reverse[1] = adc_reverse[3] = 1;
 
 	/* install extra synchronization on core shared memory */
-	loffire_sync = memory_install_write16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
+	loffire_sync = memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x29c000, 0x29c011, 0, 0, loffire_sync0_w);
 }
 
 
 static DRIVER_INIT( smgp )
 {
 	xboard_generic_init(machine);
-	memory_install_readwrite16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2f0000, 0x2f3fff, 0, 0, smgp_excs_r, smgp_excs_w);
 }
 
 

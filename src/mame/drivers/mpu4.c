@@ -431,7 +431,7 @@ static MACHINE_RESET( mpu4 )
 	{
 		UINT8 *rom = memory_region(machine, "main");
 
-		memory_configure_bank(1, 0, 8, &rom[0x01000], 0x10000);
+		memory_configure_bank(machine, 1, 0, 8, &rom[0x01000], 0x10000);
 
 		memory_set_bank(1,0);
 	}

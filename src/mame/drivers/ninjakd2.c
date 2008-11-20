@@ -152,15 +152,15 @@ static INTERRUPT_GEN( ninjakd2_interrupt )
 static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
 	memory_set_bank(1, 0);
 }
 
 static void robokid_init_banks(running_machine *machine)
 {
 	/* initialize main Z80 bank */
-	memory_configure_bank(1, 0,  2, memory_region(machine, "main"), 0x4000);
-	memory_configure_bank(1, 2, 14, memory_region(machine, "main") + 0x10000, 0x4000);
+	memory_configure_bank(machine, 1, 0,  2, memory_region(machine, "main"), 0x4000);
+	memory_configure_bank(machine, 1, 2, 14, memory_region(machine, "main") + 0x10000, 0x4000);
 	memory_set_bank(1, 0);
 }
 
@@ -1457,7 +1457,8 @@ static DRIVER_INIT( ninjakd2 )
 
 static DRIVER_INIT( bootleg )
 {
-	memory_set_decrypted_region(1, 0x0000, 0x7fff, memory_region(machine, "sound") + 0x10000);
+	const address_space *space = cputag_get_address_space(machine, "sound", ADDRESS_SPACE_PROGRAM);
+	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "sound") + 0x10000);
 
 	gfx_unscramble(machine);
 }

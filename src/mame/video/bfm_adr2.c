@@ -188,7 +188,7 @@ VIDEO_RESET( adder2 )
 	{
 		UINT8 *rom = memory_region(machine, "adder2");
 
-		memory_configure_bank(2, 0, 4, &rom[0x00000], 0x08000);
+		memory_configure_bank(machine, 2, 0, 4, &rom[0x00000], 0x08000);
 
 		memory_set_bank(2,0&0x03);
 	}

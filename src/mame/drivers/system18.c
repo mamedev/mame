@@ -753,7 +753,7 @@ static DRIVER_INIT( shdancbl )
 		mem[i] ^= 0xFF;
 
 	MACHINE_RESET_CALL(sys16_onetime);
-	memory_install_read16_handler(machine, 0, ADDRESS_SPACE_PROGRAM, 0xffc000, 0xffc001, 0, 0, shdancbl_skip_r );
+	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xffc000, 0xffc001, 0, 0, shdancbl_skip_r );
 
 	sys18_splittab_fg_x=&sys16_textram[0x0f80/2];
 	sys18_splittab_bg_x=&sys16_textram[0x0fc0/2];
