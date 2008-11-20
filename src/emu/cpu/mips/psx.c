@@ -3016,26 +3016,26 @@ static void setcp3cr( psxcpu_state *psxcpu, int reg, UINT32 value )
 
 /* preliminary gte code */
 
-#define VX( n ) ( psxcpu->cp2dr[ n << 1 ].w.l )
-#define VY( n ) ( psxcpu->cp2dr[ n << 1 ].w.h )
-#define VZ( n ) ( psxcpu->cp2dr[ ( n << 1 ) + 1 ].w.l )
-#define MX11( n ) ( psxcpu->cp2cr[ ( n << 3 ) ].sw.l )
-#define MX12( n ) ( psxcpu->cp2cr[ ( n << 3 ) ].sw.h )
-#define MX13( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 1 ].sw.l )
-#define MX21( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 1 ].sw.h )
-#define MX22( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 2 ].sw.l )
-#define MX23( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 2 ].sw.h )
-#define MX31( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 3 ].sw.l )
-#define MX32( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 3 ].sw.h )
-#define MX33( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 4 ].sw.l )
-#define CV0( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 5 ].sd )
-#define CV1( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 6 ].sd )
-#define CV2( n ) ( psxcpu->cp2cr[ ( n << 3 ) + 7 ].sd )
+#define VX( n ) ( n < 3 ? psxcpu->cp2dr[ n << 1 ].sw.l : psxcpu->cp2dr[ 9 ].sw.l )
+#define VY( n ) ( n < 3 ? psxcpu->cp2dr[ n << 1 ].sw.h : psxcpu->cp2dr[ 10 ].sw.l )
+#define VZ( n ) ( n < 3 ? psxcpu->cp2dr[ ( n << 1 ) + 1 ].sw.l : psxcpu->cp2dr[ 11 ].sw.l )
+#define MX11( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) ].sw.l : 0 )
+#define MX12( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) ].sw.h : 0 )
+#define MX13( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 1 ].sw.l : 0 )
+#define MX21( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 1 ].sw.h : 0 )
+#define MX22( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 2 ].sw.l : 0 )
+#define MX23( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 2 ].sw.h : 0 )
+#define MX31( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 3 ].sw.l : 0 )
+#define MX32( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 3 ].sw.h : 0 )
+#define MX33( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 4 ].sw.l : 0 )
+#define CV0( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 5 ].sd : 0 )
+#define CV1( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 6 ].sd : 0 )
+#define CV2( n ) ( n < 3 ? psxcpu->cp2cr[ ( n << 3 ) + 7 ].sd : 0 )
 
 #define VXY0 ( psxcpu->cp2dr[ 0 ].d )
-#define VX0  ( psxcpu->cp2dr[ 0 ].w.l )
-#define VY0  ( psxcpu->cp2dr[ 0 ].w.h )
-#define VZ0  ( psxcpu->cp2dr[ 1 ].w.l )
+#define VX0  ( psxcpu->cp2dr[ 0 ].sw.l )
+#define VY0  ( psxcpu->cp2dr[ 0 ].sw.h )
+#define VZ0  ( psxcpu->cp2dr[ 1 ].sw.l )
 #define VXY1 ( psxcpu->cp2dr[ 2 ].d )
 #define VX1  ( psxcpu->cp2dr[ 2 ].w.l )
 #define VY1  ( psxcpu->cp2dr[ 2 ].w.h )
@@ -3086,7 +3086,7 @@ static void setcp3cr( psxcpu_state *psxcpu, int reg, UINT32 value )
 #define B2   ( psxcpu->cp2dr[ 22 ].b.h2 )
 #define CD2  ( psxcpu->cp2dr[ 22 ].b.h3 )
 #define RES1 ( psxcpu->cp2dr[ 23 ].d )
-#define MAC0 ( psxcpu->cp2dr[ 24 ].d )
+#define MAC0 ( psxcpu->cp2dr[ 24 ].sd )
 #define MAC1 ( psxcpu->cp2dr[ 25 ].sd )
 #define MAC2 ( psxcpu->cp2dr[ 26 ].sd )
 #define MAC3 ( psxcpu->cp2dr[ 27 ].sd )
@@ -3131,11 +3131,11 @@ static void setcp3cr( psxcpu_state *psxcpu, int reg, UINT32 value )
 #define RFC ( psxcpu->cp2cr[ 21 ].sd )
 #define GFC ( psxcpu->cp2cr[ 22 ].sd )
 #define BFC ( psxcpu->cp2cr[ 23 ].sd )
-#define OFX ( psxcpu->cp2cr[ 24 ].d )
-#define OFY ( psxcpu->cp2cr[ 25 ].d )
+#define OFX ( psxcpu->cp2cr[ 24 ].sd )
+#define OFY ( psxcpu->cp2cr[ 25 ].sd )
 #define H   ( psxcpu->cp2cr[ 26 ].w.l )
-#define DQA ( psxcpu->cp2cr[ 27 ].w.l )
-#define DQB ( psxcpu->cp2cr[ 28 ].d )
+#define DQA ( psxcpu->cp2cr[ 27 ].sw.l )
+#define DQB ( psxcpu->cp2cr[ 28 ].sd )
 #define ZSF3 ( psxcpu->cp2cr[ 29 ].sw.l )
 #define ZSF4 ( psxcpu->cp2cr[ 30 ].sw.l )
 #define FLAG ( psxcpu->cp2cr[ 31 ].d )
@@ -3183,7 +3183,7 @@ static UINT32 getcp2dr( psxcpu_state *psxcpu, int reg )
 
 	case 28:
 	case 29:
-		psxcpu->cp2dr[ reg ].d = LIM( psxcpu, (INT16)IR1 >> 7, 0x1f, 0, 0 ) | ( LIM( psxcpu, (INT16)IR2 >> 7, 0x1f, 0, 0 ) << 5 ) | ( LIM( psxcpu, (INT16)IR3 >> 7, 0x1f, 0, 0 ) << 10 );
+		psxcpu->cp2dr[ reg ].d = LIM( psxcpu, IR1 >> 7, 0x1f, 0, 0 ) | ( LIM( psxcpu, IR2 >> 7, 0x1f, 0, 0 ) << 5 ) | ( LIM( psxcpu, IR3 >> 7, 0x1f, 0, 0 ) << 10 );
 		break;
 	}
 
@@ -3318,14 +3318,10 @@ INLINE UINT32 Lm_E( psxcpu_state *psxcpu, UINT32 n_z )
 static void docop2( psxcpu_state *psxcpu, int gteop )
 {
 	int shift;
-	int n_v;
+	int v;
 	int lm;
 	int cv;
 	int mx;
-	int n_pass;
-	UINT16 n_v1;
-	UINT16 n_v2;
-	UINT16 n_v3;
 	INT64 mac0;
 
 	switch( GTE_FUNCT( gteop ) )
@@ -3336,22 +3332,22 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "RTPS" );
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)(INT32)TRX << 12 ) + ( (INT16)R11 * (INT16)VX0 ) + ( (INT16)R12 * (INT16)VY0 ) + ( (INT16)R13 * (INT16)VZ0 ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)(INT32)TRY << 12 ) + ( (INT16)R21 * (INT16)VX0 ) + ( (INT16)R22 * (INT16)VY0 ) + ( (INT16)R23 * (INT16)VZ0 ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)(INT32)TRZ << 12 ) + ( (INT16)R31 * (INT16)VX0 ) + ( (INT16)R32 * (INT16)VY0 ) + ( (INT16)R33 * (INT16)VZ0 ) ) >> 12 );
-			IR1 = Lm_B1( (INT32)MAC1, 0 );
-			IR2 = Lm_B2( (INT32)MAC2, 0 );
-			IR3 = Lm_B3( (INT32)MAC3, 0 );
+			MAC1 = A1( ( ( (INT64) TRX << 12 ) + ( R11 * VX0 ) + ( R12 * VY0 ) + ( R13 * VZ0 ) ) >> 12 );
+			MAC2 = A2( ( ( (INT64) TRY << 12 ) + ( R21 * VX0 ) + ( R22 * VY0 ) + ( R23 * VZ0 ) ) >> 12 );
+			MAC3 = A3( ( ( (INT64) TRZ << 12 ) + ( R31 * VX0 ) + ( R32 * VY0 ) + ( R33 * VZ0 ) ) >> 12 );
+			IR1 = Lm_B1( MAC1, 0 );
+			IR2 = Lm_B2( MAC2, 0 );
+			IR3 = Lm_B3( MAC3, 0 );
 			SZ0 = SZ1;
 			SZ1 = SZ2;
 			SZ2 = SZ3;
-			SZ3 = Lm_D( (INT32)MAC3 );
+			SZ3 = Lm_D( MAC3 );
 			SXY0 = SXY1;
 			SXY1 = SXY2;
-			SX2 = Lm_G1( F( (INT64)(INT32)OFX + ( (INT64)(INT16)IR1 * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 );
-			SY2 = Lm_G2( F( (INT64)(INT32)OFY + ( (INT64)(INT16)IR2 * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 );
-			MAC0 = F( (INT64)(INT32)DQB + ( (INT64)(INT16)DQA * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) );
-			IR0 = Lm_H( (INT32)MAC0 >> 12 );
+			SX2 = Lm_G1( F( (INT64) OFX + ( (INT64) IR1 * ( ( (UINT32) H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 );
+			SY2 = Lm_G2( F( (INT64) OFY + ( (INT64) IR2 * ( ( (UINT32) H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 );
+			MAC0 = F( (INT64) DQB + ( (INT64) DQA * ( ( (UINT32) H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) );
+			IR0 = Lm_H( MAC0 >> 12 );
 			return;
 		}
 		break;
@@ -3426,30 +3422,19 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "MVMVA" );
 			shift = 12 * GTE_SF( gteop );
 			mx = GTE_MX( gteop );
-			n_v = GTE_V( gteop );
-			if( n_v < 3 )
-			{
-				n_v1 = VX( n_v );
-				n_v2 = VY( n_v );
-				n_v3 = VZ( n_v );
-			}
-			else
-			{
-				n_v1 = IR1;
-				n_v2 = IR2;
-				n_v3 = IR3;
-			}
+			v = GTE_V( gteop );
 			cv = GTE_CV( gteop );
 			lm = GTE_LM( gteop );
+
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)(INT32)CV0( cv ) << 12 ) + ( (INT16)MX11( mx ) * (INT16)n_v1 ) + ( (INT16)MX12( mx ) * (INT16)n_v2 ) + ( (INT16)MX13( mx ) * (INT16)n_v3 ) ) >> shift );
-			MAC2 = A2( ( ( (INT64)(INT32)CV1( cv ) << 12 ) + ( (INT16)MX21( mx ) * (INT16)n_v1 ) + ( (INT16)MX22( mx ) * (INT16)n_v2 ) + ( (INT16)MX23( mx ) * (INT16)n_v3 ) ) >> shift );
-			MAC3 = A3( ( ( (INT64)(INT32)CV2( cv ) << 12 ) + ( (INT16)MX31( mx ) * (INT16)n_v1 ) + ( (INT16)MX32( mx ) * (INT16)n_v2 ) + ( (INT16)MX33( mx ) * (INT16)n_v3 ) ) >> shift );
+			MAC1 = A1( ( ( (INT64) CV0( cv ) << 12 ) + ( MX11( mx ) * VX( v ) ) + ( MX12( mx ) * VY( v ) ) + ( MX13( mx ) * VZ( v ) ) ) >> shift );
+			MAC2 = A2( ( ( (INT64) CV1( cv ) << 12 ) + ( MX21( mx ) * VX( v ) ) + ( MX22( mx ) * VY( v ) ) + ( MX23( mx ) * VZ( v ) ) ) >> shift );
+			MAC3 = A3( ( ( (INT64) CV2( cv ) << 12 ) + ( MX31( mx ) * VX( v ) ) + ( MX32( mx ) * VY( v ) ) + ( MX33( mx ) * VZ( v ) ) ) >> shift );
 
-			IR1 = Lm_B1( (INT32)MAC1, lm );
-			IR2 = Lm_B2( (INT32)MAC2, lm );
-			IR3 = Lm_B3( (INT32)MAC3, lm );
+			IR1 = Lm_B1( MAC1, lm );
+			IR2 = Lm_B2( MAC2, lm );
+			IR3 = Lm_B3( MAC3, lm );
 			return;
 		}
 		break;
@@ -3459,36 +3444,36 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "NCDS" );
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)VX0 ) + ( (INT16)L12 * (INT16)VY0 ) + ( (INT16)L13 * (INT16)VZ0 ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)VX0 ) + ( (INT16)L22 * (INT16)VY0 ) + ( (INT16)L23 * (INT16)VZ0 ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)VX0 ) + ( (INT16)L32 * (INT16)VY0 ) + ( (INT16)L33 * (INT16)VZ0 ) ) >> 12 );
-			IR1 = Lm_B1( (INT32)MAC1, 1 );
-			IR2 = Lm_B2( (INT32)MAC2, 1 );
-			IR3 = Lm_B3( (INT32)MAC3, 1 );
-			MAC1 = A1( ( ( (INT64)RBK << 12 ) + ( (INT16)LR1 * (INT16)IR1 ) + ( (INT16)LR2 * (INT16)IR2 ) + ( (INT16)LR3 * (INT16)IR3 ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)GBK << 12 ) + ( (INT16)LG1 * (INT16)IR1 ) + ( (INT16)LG2 * (INT16)IR2 ) + ( (INT16)LG3 * (INT16)IR3 ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)BBK << 12 ) + ( (INT16)LB1 * (INT16)IR1 ) + ( (INT16)LB2 * (INT16)IR2 ) + ( (INT16)LB3 * (INT16)IR3 ) ) >> 12 );
-			IR1 = Lm_B1( (INT32)MAC1, 1 );
-			IR2 = Lm_B2( (INT32)MAC2, 1 );
-			IR3 = Lm_B3( (INT32)MAC3, 1 );
-			MAC1 = A1( ( ( ( (INT64)R << 4 ) * (INT16)IR1 ) + ( (INT16)IR0 * Lm_B1( (INT32)RFC - ( ( R * (INT16)IR1 ) >> 8 ), 0 ) ) ) >> 12 );
-			MAC2 = A2( ( ( ( (INT64)G << 4 ) * (INT16)IR2 ) + ( (INT16)IR0 * Lm_B2( (INT32)GFC - ( ( G * (INT16)IR2 ) >> 8 ), 0 ) ) ) >> 12 );
-			MAC3 = A3( ( ( ( (INT64)B << 4 ) * (INT16)IR3 ) + ( (INT16)IR0 * Lm_B3( (INT32)BFC - ( ( B * (INT16)IR3 ) >> 8 ), 0 ) ) ) >> 12 );
-			IR1 = Lm_B1( (INT32)MAC1, 1 );
-			IR2 = Lm_B2( (INT32)MAC2, 1 );
-			IR3 = Lm_B3( (INT32)MAC3, 1 );
+			MAC1 = A1( ( ( (INT64) L11 * VX0 ) + ( L12 * VY0 ) + ( L13 * VZ0 ) ) >> 12 );
+			MAC2 = A2( ( ( (INT64) L21 * VX0 ) + ( L22 * VY0 ) + ( L23 * VZ0 ) ) >> 12 );
+			MAC3 = A3( ( ( (INT64) L31 * VX0 ) + ( L32 * VY0 ) + ( L33 * VZ0 ) ) >> 12 );
+			IR1 = Lm_B1( MAC1, 1 );
+			IR2 = Lm_B2( MAC2, 1 );
+			IR3 = Lm_B3( MAC3, 1 );
+			MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
+			MAC2 = A2( ( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) ) >> 12 );
+			MAC3 = A3( ( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) ) >> 12 );
+			IR1 = Lm_B1( MAC1, 1 );
+			IR2 = Lm_B2( MAC2, 1 );
+			IR3 = Lm_B3( MAC3, 1 );
+			MAC1 = A1( ( ( ( (INT64) R << 4 ) * IR1 ) + ( IR0 * Lm_B1( RFC - ( ( R * IR1 ) >> 8 ), 0 ) ) ) >> 12 );
+			MAC2 = A2( ( ( ( (INT64) G << 4 ) * IR2 ) + ( IR0 * Lm_B2( GFC - ( ( G * IR2 ) >> 8 ), 0 ) ) ) >> 12 );
+			MAC3 = A3( ( ( ( (INT64) B << 4 ) * IR3 ) + ( IR0 * Lm_B3( BFC - ( ( B * IR3 ) >> 8 ), 0 ) ) ) >> 12 );
+			IR1 = Lm_B1( MAC1, 1 );
+			IR2 = Lm_B2( MAC2, 1 );
+			IR3 = Lm_B3( MAC3, 1 );
 			CD0 = CD1;
 			CD1 = CD2;
 			CD2 = CODE;
 			R0 = R1;
 			R1 = R2;
-			R2 = Lm_C1( (INT32)MAC1 >> 4 );
+			R2 = Lm_C1( MAC1 >> 4 );
 			G0 = G1;
 			G1 = G2;
-			G2 = Lm_C2( (INT32)MAC2 >> 4 );
+			G2 = Lm_C2( MAC2 >> 4 );
 			B0 = B1;
 			B1 = B2;
-			B2 = Lm_C3( (INT32)MAC3 >> 4 );
+			B2 = Lm_C3( MAC3 >> 4 );
 			return;
 		}
 		break;
@@ -3498,15 +3483,15 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "CDP" );
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)RBK << 12 ) + ( (INT16)LR1 * (INT16)IR1 ) + ( (INT16)LR2 * (INT16)IR2 ) + ( (INT16)LR3 * (INT16)IR3 ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)GBK << 12 ) + ( (INT16)LG1 * (INT16)IR1 ) + ( (INT16)LG2 * (INT16)IR2 ) + ( (INT16)LG3 * (INT16)IR3 ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)BBK << 12 ) + ( (INT16)LB1 * (INT16)IR1 ) + ( (INT16)LB2 * (INT16)IR2 ) + ( (INT16)LB3 * (INT16)IR3 ) ) >> 12 );
+			MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
+			MAC2 = A2( ( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) ) >> 12 );
+			MAC3 = A3( ( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) ) >> 12 );
 			IR1 = Lm_B1( MAC1, 1 );
 			IR2 = Lm_B2( MAC2, 1 );
 			IR3 = Lm_B3( MAC3, 1 );
-			MAC1 = A1( ( ( ( (INT64)R << 4 ) * (INT16)IR1 ) + ( (INT16)IR0 * Lm_B1( (INT32)RFC - ( ( R * (INT16)IR1 ) >> 8 ), 0 ) ) ) >> 12 );
-			MAC2 = A2( ( ( ( (INT64)G << 4 ) * (INT16)IR2 ) + ( (INT16)IR0 * Lm_B2( (INT32)GFC - ( ( G * (INT16)IR2 ) >> 8 ), 0 ) ) ) >> 12 );
-			MAC3 = A3( ( ( ( (INT64)B << 4 ) * (INT16)IR3 ) + ( (INT16)IR0 * Lm_B3( (INT32)BFC - ( ( B * (INT16)IR3 ) >> 8 ), 0 ) ) ) >> 12 );
+			MAC1 = A1( ( ( ( (INT64) R << 4 ) * IR1 ) + ( IR0 * Lm_B1( RFC - ( ( R * IR1 ) >> 8 ), 0 ) ) ) >> 12 );
+			MAC2 = A2( ( ( ( (INT64) G << 4 ) * IR2 ) + ( IR0 * Lm_B2( GFC - ( ( G * IR2 ) >> 8 ), 0 ) ) ) >> 12 );
+			MAC3 = A3( ( ( ( (INT64) B << 4 ) * IR3 ) + ( IR0 * Lm_B3( BFC - ( ( B * IR3 ) >> 8 ), 0 ) ) ) >> 12 );
 			IR1 = Lm_B1( MAC1, 1 );
 			IR2 = Lm_B2( MAC2, 1 );
 			IR3 = Lm_B3( MAC3, 1 );
@@ -3515,13 +3500,13 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			CD2 = CODE;
 			R0 = R1;
 			R1 = R2;
-			R2 = Lm_C1( (INT32)MAC1 >> 4 );
+			R2 = Lm_C1( MAC1 >> 4 );
 			G0 = G1;
 			G1 = G2;
-			G2 = Lm_C2( (INT32)MAC2 >> 4 );
+			G2 = Lm_C2( MAC2 >> 4 );
 			B0 = B1;
 			B1 = B2;
-			B2 = Lm_C3( (INT32)MAC3 >> 4 );
+			B2 = Lm_C3( MAC3 >> 4 );
 			return;
 		}
 		break;
@@ -3531,38 +3516,38 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "NCDT" );
 			FLAG = 0;
 
-			for( n_v = 0; n_v < 3; n_v++ )
+			for( v = 0; v < 3; v++ )
 			{
-				MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)VX( n_v ) ) + ( (INT16)L12 * (INT16)VY( n_v ) ) + ( (INT16)L13 * (INT16)VZ( n_v ) ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)VX( n_v ) ) + ( (INT16)L22 * (INT16)VY( n_v ) ) + ( (INT16)L23 * (INT16)VZ( n_v ) ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)VX( n_v ) ) + ( (INT16)L32 * (INT16)VY( n_v ) ) + ( (INT16)L33 * (INT16)VZ( n_v ) ) ) >> 12 );
-				IR1 = Lm_B1( (INT32)MAC1, 1 );
-				IR2 = Lm_B2( (INT32)MAC2, 1 );
-				IR3 = Lm_B3( (INT32)MAC3, 1 );
-				MAC1 = A1( ( ( (INT64)RBK << 12 ) + ( (INT16)LR1 * (INT16)IR1 ) + ( (INT16)LR2 * (INT16)IR2 ) + ( (INT16)LR3 * (INT16)IR3 ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)GBK << 12 ) + ( (INT16)LG1 * (INT16)IR1 ) + ( (INT16)LG2 * (INT16)IR2 ) + ( (INT16)LG3 * (INT16)IR3 ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)BBK << 12 ) + ( (INT16)LB1 * (INT16)IR1 ) + ( (INT16)LB2 * (INT16)IR2 ) + ( (INT16)LB3 * (INT16)IR3 ) ) >> 12 );
-				IR1 = Lm_B1( (INT32)MAC1, 1 );
-				IR2 = Lm_B2( (INT32)MAC2, 1 );
-				IR3 = Lm_B3( (INT32)MAC3, 1 );
-				MAC1 = A1( ( ( ( (INT64)R << 4 ) * (INT16)IR1 ) + ( (INT16)IR0 * Lm_B1( (INT32)RFC - ( ( R * (INT16)IR1 ) >> 8 ), 0 ) ) ) >> 12 );
-				MAC2 = A2( ( ( ( (INT64)G << 4 ) * (INT16)IR2 ) + ( (INT16)IR0 * Lm_B2( (INT32)GFC - ( ( G * (INT16)IR2 ) >> 8 ), 0 ) ) ) >> 12 );
-				MAC3 = A3( ( ( ( (INT64)B << 4 ) * (INT16)IR3 ) + ( (INT16)IR0 * Lm_B3( (INT32)BFC - ( ( B * (INT16)IR3 ) >> 8 ), 0 ) ) ) >> 12 );
-				IR1 = Lm_B1( (INT32)MAC1, 1 );
-				IR2 = Lm_B2( (INT32)MAC2, 1 );
-				IR3 = Lm_B3( (INT32)MAC3, 1 );
+				MAC1 = A1( ( ( (INT64) L11 * VX( v ) ) + ( L12 * VY( v ) ) + ( L13 * VZ( v ) ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64) L21 * VX( v ) ) + ( L22 * VY( v ) ) + ( L23 * VZ( v ) ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64) L31 * VX( v ) ) + ( L32 * VY( v ) ) + ( L33 * VZ( v ) ) ) >> 12 );
+				IR1 = Lm_B1( MAC1, 1 );
+				IR2 = Lm_B2( MAC2, 1 );
+				IR3 = Lm_B3( MAC3, 1 );
+				MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) ) >> 12 );
+				IR1 = Lm_B1( MAC1, 1 );
+				IR2 = Lm_B2( MAC2, 1 );
+				IR3 = Lm_B3( MAC3, 1 );
+				MAC1 = A1( ( ( ( (INT64) R << 4 ) * IR1 ) + ( IR0 * Lm_B1( RFC - ( ( R * IR1 ) >> 8 ), 0 ) ) ) >> 12 );
+				MAC2 = A2( ( ( ( (INT64) G << 4 ) * IR2 ) + ( IR0 * Lm_B2( GFC - ( ( G * IR2 ) >> 8 ), 0 ) ) ) >> 12 );
+				MAC3 = A3( ( ( ( (INT64) B << 4 ) * IR3 ) + ( IR0 * Lm_B3( BFC - ( ( B * IR3 ) >> 8 ), 0 ) ) ) >> 12 );
+				IR1 = Lm_B1( MAC1, 1 );
+				IR2 = Lm_B2( MAC2, 1 );
+				IR3 = Lm_B3( MAC3, 1 );
 				CD0 = CD1;
 				CD1 = CD2;
 				CD2 = CODE;
 				R0 = R1;
 				R1 = R2;
-				R2 = Lm_C1( (INT32)MAC1 >> 4 );
+				R2 = Lm_C1( MAC1 >> 4 );
 				G0 = G1;
 				G1 = G2;
-				G2 = Lm_C2( (INT32)MAC2 >> 4 );
+				G2 = Lm_C2( MAC2 >> 4 );
 				B0 = B1;
 				B1 = B2;
-				B2 = Lm_C3( (INT32)MAC3 >> 4 );
+				B2 = Lm_C3( MAC3 >> 4 );
 			}
 			return;
 		}
@@ -3573,36 +3558,36 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "NCCS" );
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)VX0 ) + ( (INT16)L12 * (INT16)VY0 ) + ( (INT16)L13 * (INT16)VZ0 ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)VX0 ) + ( (INT16)L22 * (INT16)VY0 ) + ( (INT16)L23 * (INT16)VZ0 ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)VX0 ) + ( (INT16)L32 * (INT16)VY0 ) + ( (INT16)L33 * (INT16)VZ0 ) ) >> 12 );
-			IR1 = Lm_B1( (INT32)MAC1, 1 );
-			IR2 = Lm_B2( (INT32)MAC2, 1 );
-			IR3 = Lm_B3( (INT32)MAC3, 1 );
-			MAC1 = A1( ( ( (INT64)RBK << 12 ) + ( (INT16)LR1 * (INT16)IR1 ) + ( (INT16)LR2 * (INT16)IR2 ) + ( (INT16)LR3 * (INT16)IR3 ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)GBK << 12 ) + ( (INT16)LG1 * (INT16)IR1 ) + ( (INT16)LG2 * (INT16)IR2 ) + ( (INT16)LG3 * (INT16)IR3 ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)BBK << 12 ) + ( (INT16)LB1 * (INT16)IR1 ) + ( (INT16)LB2 * (INT16)IR2 ) + ( (INT16)LB3 * (INT16)IR3 ) ) >> 12 );
-			IR1 = Lm_B1( (INT32)MAC1, 1 );
-			IR2 = Lm_B2( (INT32)MAC2, 1 );
-			IR3 = Lm_B3( (INT32)MAC3, 1 );
-			MAC1 = A1( ( (INT64)R * (INT16)IR1 ) >> 8 );
-			MAC2 = A2( ( (INT64)G * (INT16)IR2 ) >> 8 );
-			MAC3 = A3( ( (INT64)B * (INT16)IR3 ) >> 8 );
-			IR1 = Lm_B1( (INT32)MAC1, 1 );
-			IR2 = Lm_B2( (INT32)MAC2, 1 );
-			IR3 = Lm_B3( (INT32)MAC3, 1 );
+			MAC1 = A1( ( ( (INT64) L11 * VX0 ) + ( L12 * VY0 ) + ( L13 * VZ0 ) ) >> 12 );
+			MAC2 = A2( ( ( (INT64) L21 * VX0 ) + ( L22 * VY0 ) + ( L23 * VZ0 ) ) >> 12 );
+			MAC3 = A3( ( ( (INT64) L31 * VX0 ) + ( L32 * VY0 ) + ( L33 * VZ0 ) ) >> 12 );
+			IR1 = Lm_B1( MAC1, 1 );
+			IR2 = Lm_B2( MAC2, 1 );
+			IR3 = Lm_B3( MAC3, 1 );
+			MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
+			MAC2 = A2( ( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) ) >> 12 );
+			MAC3 = A3( ( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) ) >> 12 );
+			IR1 = Lm_B1( MAC1, 1 );
+			IR2 = Lm_B2( MAC2, 1 );
+			IR3 = Lm_B3( MAC3, 1 );
+			MAC1 = A1( ( (INT64) R * IR1 ) >> 8 );
+			MAC2 = A2( ( (INT64) G * IR2 ) >> 8 );
+			MAC3 = A3( ( (INT64) B * IR3 ) >> 8 );
+			IR1 = Lm_B1( MAC1, 1 );
+			IR2 = Lm_B2( MAC2, 1 );
+			IR3 = Lm_B3( MAC3, 1 );
 			CD0 = CD1;
 			CD1 = CD2;
 			CD2 = CODE;
 			R0 = R1;
 			R1 = R2;
-			R2 = Lm_C1( (INT32)MAC1 >> 4 );
+			R2 = Lm_C1( MAC1 >> 4 );
 			G0 = G1;
 			G1 = G2;
-			G2 = Lm_C2( (INT32)MAC2 >> 4 );
+			G2 = Lm_C2( MAC2 >> 4 );
 			B0 = B1;
 			B1 = B2;
-			B2 = Lm_C3( (INT32)MAC3 >> 4 );
+			B2 = Lm_C3( MAC3 >> 4 );
 			return;
 		}
 		break;
@@ -3612,15 +3597,15 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "CC" );
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)RBK << 12 ) + ( (INT16)LR1 * (INT16)IR1 ) + ( (INT16)LR2 * (INT16)IR2 ) + ( (INT16)LR3 * (INT16)IR3 ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)GBK << 12 ) + ( (INT16)LG1 * (INT16)IR1 ) + ( (INT16)LG2 * (INT16)IR2 ) + ( (INT16)LG3 * (INT16)IR3 ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)BBK << 12 ) + ( (INT16)LB1 * (INT16)IR1 ) + ( (INT16)LB2 * (INT16)IR2 ) + ( (INT16)LB3 * (INT16)IR3 ) ) >> 12 );
+			MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
+			MAC2 = A2( ( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) ) >> 12 );
+			MAC3 = A3( ( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) ) >> 12 );
 			IR1 = Lm_B1( MAC1, 1 );
 			IR2 = Lm_B2( MAC2, 1 );
 			IR3 = Lm_B3( MAC3, 1 );
-			MAC1 = A1( ( (INT64)R * (INT16)IR1 ) >> 8 );
-			MAC2 = A2( ( (INT64)G * (INT16)IR2 ) >> 8 );
-			MAC3 = A3( ( (INT64)B * (INT16)IR3 ) >> 8 );
+			MAC1 = A1( ( (INT64) R * IR1 ) >> 8 );
+			MAC2 = A2( ( (INT64) G * IR2 ) >> 8 );
+			MAC3 = A3( ( (INT64) B * IR3 ) >> 8 );
 			IR1 = Lm_B1( MAC1, 1 );
 			IR2 = Lm_B2( MAC2, 1 );
 			IR3 = Lm_B3( MAC3, 1 );
@@ -3629,13 +3614,13 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			CD2 = CODE;
 			R0 = R1;
 			R1 = R2;
-			R2 = Lm_C1( (INT32)MAC1 >> 4 );
+			R2 = Lm_C1( MAC1 >> 4 );
 			G0 = G1;
 			G1 = G2;
-			G2 = Lm_C2( (INT32)MAC2 >> 4 );
+			G2 = Lm_C2( MAC2 >> 4 );
 			B0 = B1;
 			B1 = B2;
-			B2 = Lm_C3( (INT32)MAC3 >> 4 );
+			B2 = Lm_C3( MAC3 >> 4 );
 			return;
 		}
 		break;
@@ -3645,30 +3630,30 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "NCS" );
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)VX0 ) + ( (INT16)L12 * (INT16)VY0 ) + ( (INT16)L13 * (INT16)VZ0 ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)VX0 ) + ( (INT16)L22 * (INT16)VY0 ) + ( (INT16)L23 * (INT16)VZ0 ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)VX0 ) + ( (INT16)L32 * (INT16)VY0 ) + ( (INT16)L33 * (INT16)VZ0 ) ) >> 12 );
-			IR1 = Lm_B1( (INT32)MAC1, 1 );
-			IR2 = Lm_B2( (INT32)MAC2, 1 );
-			IR3 = Lm_B3( (INT32)MAC3, 1 );
-			MAC1 = A1( ( ( (INT64)RBK << 12 ) + ( (INT16)LR1 * (INT16)IR1 ) + ( (INT16)LR2 * (INT16)IR2 ) + ( (INT16)LR3 * (INT16)IR3 ) ) >> 12 );
-			MAC2 = A2( ( ( (INT64)GBK << 12 ) + ( (INT16)LG1 * (INT16)IR1 ) + ( (INT16)LG2 * (INT16)IR2 ) + ( (INT16)LG3 * (INT16)IR3 ) ) >> 12 );
-			MAC3 = A3( ( ( (INT64)BBK << 12 ) + ( (INT16)LB1 * (INT16)IR1 ) + ( (INT16)LB2 * (INT16)IR2 ) + ( (INT16)LB3 * (INT16)IR3 ) ) >> 12 );
-			IR1 = Lm_B1( (INT32)MAC1, 1 );
-			IR2 = Lm_B2( (INT32)MAC2, 1 );
-			IR3 = Lm_B3( (INT32)MAC3, 1 );
+			MAC1 = A1( ( ( (INT64) L11 * VX0 ) + ( L12 * VY0 ) + ( L13 * VZ0 ) ) >> 12 );
+			MAC2 = A2( ( ( (INT64) L21 * VX0 ) + ( L22 * VY0 ) + ( L23 * VZ0 ) ) >> 12 );
+			MAC3 = A3( ( ( (INT64) L31 * VX0 ) + ( L32 * VY0 ) + ( L33 * VZ0 ) ) >> 12 );
+			IR1 = Lm_B1( MAC1, 1 );
+			IR2 = Lm_B2( MAC2, 1 );
+			IR3 = Lm_B3( MAC3, 1 );
+			MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
+			MAC2 = A2( ( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) ) >> 12 );
+			MAC3 = A3( ( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) ) >> 12 );
+			IR1 = Lm_B1( MAC1, 1 );
+			IR2 = Lm_B2( MAC2, 1 );
+			IR3 = Lm_B3( MAC3, 1 );
 			CD0 = CD1;
 			CD1 = CD2;
 			CD2 = CODE;
 			R0 = R1;
 			R1 = R2;
-			R2 = Lm_C1( (INT32)MAC1 >> 4 );
+			R2 = Lm_C1( MAC1 >> 4 );
 			G0 = G1;
 			G1 = G2;
-			G2 = Lm_C2( (INT32)MAC2 >> 4 );
+			G2 = Lm_C2( MAC2 >> 4 );
 			B0 = B1;
 			B1 = B2;
-			B2 = Lm_C3( (INT32)MAC3 >> 4 );
+			B2 = Lm_C3( MAC3 >> 4 );
 			return;
 		}
 		break;
@@ -3678,32 +3663,32 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "NCT" );
 			FLAG = 0;
 
-			for( n_v = 0; n_v < 3; n_v++ )
+			for( v = 0; v < 3; v++ )
 			{
-				MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)VX( n_v ) ) + ( (INT16)L12 * (INT16)VY( n_v ) ) + ( (INT16)L13 * (INT16)VZ( n_v ) ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)VX( n_v ) ) + ( (INT16)L22 * (INT16)VY( n_v ) ) + ( (INT16)L23 * (INT16)VZ( n_v ) ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)VX( n_v ) ) + ( (INT16)L32 * (INT16)VY( n_v ) ) + ( (INT16)L33 * (INT16)VZ( n_v ) ) ) >> 12 );
-				IR1 = Lm_B1( (INT32)MAC1, 1 );
-				IR2 = Lm_B2( (INT32)MAC2, 1 );
-				IR3 = Lm_B3( (INT32)MAC3, 1 );
-				MAC1 = A1( ( ( (INT64)RBK << 12 ) + ( (INT16)LR1 * (INT16)IR1 ) + ( (INT16)LR2 * (INT16)IR2 ) + ( (INT16)LR3 * (INT16)IR3 ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)GBK << 12 ) + ( (INT16)LG1 * (INT16)IR1 ) + ( (INT16)LG2 * (INT16)IR2 ) + ( (INT16)LG3 * (INT16)IR3 ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)BBK << 12 ) + ( (INT16)LB1 * (INT16)IR1 ) + ( (INT16)LB2 * (INT16)IR2 ) + ( (INT16)LB3 * (INT16)IR3 ) ) >> 12 );
-				IR1 = Lm_B1( (INT32)MAC1, 1 );
-				IR2 = Lm_B2( (INT32)MAC2, 1 );
-				IR3 = Lm_B3( (INT32)MAC3, 1 );
+				MAC1 = A1( ( ( (INT64) L11 * VX( v ) ) + ( L12 * VY( v ) ) + ( L13 * VZ( v ) ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64) L21 * VX( v ) ) + ( L22 * VY( v ) ) + ( L23 * VZ( v ) ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64) L31 * VX( v ) ) + ( L32 * VY( v ) ) + ( L33 * VZ( v ) ) ) >> 12 );
+				IR1 = Lm_B1( MAC1, 1 );
+				IR2 = Lm_B2( MAC2, 1 );
+				IR3 = Lm_B3( MAC3, 1 );
+				MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) ) >> 12 );
+				IR1 = Lm_B1( MAC1, 1 );
+				IR2 = Lm_B2( MAC2, 1 );
+				IR3 = Lm_B3( MAC3, 1 );
 				CD0 = CD1;
 				CD1 = CD2;
 				CD2 = CODE;
 				R0 = R1;
 				R1 = R2;
-				R2 = Lm_C1( (INT32)MAC1 >> 4 );
+				R2 = Lm_C1( MAC1 >> 4 );
 				G0 = G1;
 				G1 = G2;
-				G2 = Lm_C2( (INT32)MAC2 >> 4 );
+				G2 = Lm_C2( MAC2 >> 4 );
 				B0 = B1;
 				B1 = B2;
-				B2 = Lm_C3( (INT32)MAC3 >> 4 );
+				B2 = Lm_C3( MAC3 >> 4 );
 			}
 			return;
 		}
@@ -3731,26 +3716,26 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "DPCT" );
 			FLAG = 0;
 
-			for( n_pass = 0; n_pass < 3; n_pass++ )
+			for( v = 0; v < 3; v++ )
 			{
-				MAC1 = A1( ( ( (INT64)R0 << 16 ) + ( (INT64)(INT16)IR0 * ( Lm_B1( (INT32)RFC - ( R0 << 4 ), 0 ) ) ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)G0 << 16 ) + ( (INT64)(INT16)IR0 * ( Lm_B1( (INT32)GFC - ( G0 << 4 ), 0 ) ) ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)B0 << 16 ) + ( (INT64)(INT16)IR0 * ( Lm_B1( (INT32)BFC - ( B0 << 4 ), 0 ) ) ) ) >> 12 );
-				IR1 = Lm_B1( (INT32)MAC1, 0 );
-				IR2 = Lm_B2( (INT32)MAC2, 0 );
-				IR3 = Lm_B3( (INT32)MAC3, 0 );
+				MAC1 = A1( ( ( (INT64) R0 << 16 ) + ( (INT64) IR0 * ( Lm_B1( RFC - ( R0 << 4 ), 0 ) ) ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64) G0 << 16 ) + ( (INT64) IR0 * ( Lm_B1( GFC - ( G0 << 4 ), 0 ) ) ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64) B0 << 16 ) + ( (INT64) IR0 * ( Lm_B1( BFC - ( B0 << 4 ), 0 ) ) ) ) >> 12 );
+				IR1 = Lm_B1( MAC1, 0 );
+				IR2 = Lm_B2( MAC2, 0 );
+				IR3 = Lm_B3( MAC3, 0 );
 				CD0 = CD1;
 				CD1 = CD2;
 				CD2 = CODE;
 				R0 = R1;
 				R1 = R2;
-				R2 = Lm_C1( (INT32)MAC1 >> 4 );
+				R2 = Lm_C1( MAC1 >> 4 );
 				G0 = G1;
 				G1 = G2;
-				G2 = Lm_C2( (INT32)MAC2 >> 4 );
+				G2 = Lm_C2( MAC2 >> 4 );
 				B0 = B1;
 				B1 = B2;
-				B2 = Lm_C3( (INT32)MAC3 >> 4 );
+				B2 = Lm_C3( MAC3 >> 4 );
 			}
 			return;
 		}
@@ -3760,7 +3745,7 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 		GTELOG( "AVSZ3" );
 		FLAG = 0;
 
-		mac0 = F( (INT64)( ZSF3 * SZ1 ) + ( ZSF3 * SZ2 ) + ( ZSF3 * SZ3 ) );
+		mac0 = F( (INT64) ( ZSF3 * SZ1 ) + ( ZSF3 * SZ2 ) + ( ZSF3 * SZ3 ) );
 		OTZ = Lm_D( mac0 >> 12 );
 
 		MAC0 = mac0;
@@ -3770,7 +3755,7 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 		GTELOG( "AVSZ4" );
 		FLAG = 0;
 
-		mac0 = F( (INT64)( ZSF4 * SZ0 ) + ( ZSF4 * SZ1 ) + ( ZSF4 * SZ2 ) + ( ZSF4 * SZ3 ) );
+		mac0 = F( (INT64) ( ZSF4 * SZ0 ) + ( ZSF4 * SZ1 ) + ( ZSF4 * SZ2 ) + ( ZSF4 * SZ3 ) );
 		OTZ = Lm_D( mac0 >> 12 );
 
 		MAC0 = mac0;
@@ -3782,24 +3767,24 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "RTPT" );
 			FLAG = 0;
 
-			for( n_v = 0; n_v < 3; n_v++ )
+			for( v = 0; v < 3; v++ )
 			{
-				MAC1 = A1( ( ( (INT64)(INT32)TRX << 12 ) + ( (INT16)R11 * (INT16)VX( n_v ) ) + ( (INT16)R12 * (INT16)VY( n_v ) ) + ( (INT16)R13 * (INT16)VZ( n_v ) ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)(INT32)TRY << 12 ) + ( (INT16)R21 * (INT16)VX( n_v ) ) + ( (INT16)R22 * (INT16)VY( n_v ) ) + ( (INT16)R23 * (INT16)VZ( n_v ) ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)(INT32)TRZ << 12 ) + ( (INT16)R31 * (INT16)VX( n_v ) ) + ( (INT16)R32 * (INT16)VY( n_v ) ) + ( (INT16)R33 * (INT16)VZ( n_v ) ) ) >> 12 );
-				IR1 = Lm_B1( (INT32)MAC1, 0 );
-				IR2 = Lm_B2( (INT32)MAC2, 0 );
-				IR3 = Lm_B3( (INT32)MAC3, 0 );
+				MAC1 = A1( ( ( (INT64) TRX << 12 ) + ( R11 * VX( v ) ) + ( R12 * VY( v ) ) + ( R13 * VZ( v ) ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64) TRY << 12 ) + ( R21 * VX( v ) ) + ( R22 * VY( v ) ) + ( R23 * VZ( v ) ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64) TRZ << 12 ) + ( R31 * VX( v ) ) + ( R32 * VY( v ) ) + ( R33 * VZ( v ) ) ) >> 12 );
+				IR1 = Lm_B1( MAC1, 0 );
+				IR2 = Lm_B2( MAC2, 0 );
+				IR3 = Lm_B3( MAC3, 0 );
 				SZ0 = SZ1;
 				SZ1 = SZ2;
 				SZ2 = SZ3;
-				SZ3 = Lm_D( (INT32)MAC3 );
+				SZ3 = Lm_D( MAC3 );
 				SXY0 = SXY1;
 				SXY1 = SXY2;
-				SX2 = Lm_G1( F( ( (INT64)(INT32)OFX + ( (INT64)(INT16)IR1 * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 ) );
-				SY2 = Lm_G2( F( ( (INT64)(INT32)OFY + ( (INT64)(INT16)IR2 * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 ) );
-				MAC0 = F( (INT64)(INT32)DQB + ( (INT64)(INT16)DQA * ( ( (UINT32)H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) );
-				IR0 = Lm_H( (INT32)MAC0 >> 12 );
+				SX2 = Lm_G1( F( ( (INT64) OFX + ( (INT64) IR1 * ( ( (UINT32) H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 ) );
+				SY2 = Lm_G2( F( ( (INT64) OFY + ( (INT64) IR2 * ( ( (UINT32) H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) ) >> 16 ) );
+				MAC0 = F( (INT64) DQB + ( (INT64) DQA * ( ( (UINT32) H << 16 ) / Lm_E( psxcpu, SZ3 ) ) ) );
+				IR0 = Lm_H( MAC0 >> 12 );
 			}
 			return;
 		}
@@ -3812,24 +3797,24 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			shift = 12 * GTE_SF( gteop );
 			FLAG = 0;
 
-			MAC1 = A1( ( (INT64)(INT16)IR0 * (INT16)IR1 ) >> shift );
-			MAC2 = A2( ( (INT64)(INT16)IR0 * (INT16)IR2 ) >> shift );
-			MAC3 = A3( ( (INT64)(INT16)IR0 * (INT16)IR3 ) >> shift );
-			IR1 = Lm_B1( (INT32)MAC1, 0 );
-			IR2 = Lm_B2( (INT32)MAC2, 0 );
-			IR3 = Lm_B3( (INT32)MAC3, 0 );
+			MAC1 = A1( ( (INT64) IR0 * IR1 ) >> shift );
+			MAC2 = A2( ( (INT64) IR0 * IR2 ) >> shift );
+			MAC3 = A3( ( (INT64) IR0 * IR3 ) >> shift );
+			IR1 = Lm_B1( MAC1, 0 );
+			IR2 = Lm_B2( MAC2, 0 );
+			IR3 = Lm_B3( MAC3, 0 );
 			CD0 = CD1;
 			CD1 = CD2;
 			CD2 = CODE;
 			R0 = R1;
 			R1 = R2;
-			R2 = Lm_C1( (INT32)MAC1 >> 4 );
+			R2 = Lm_C1( MAC1 >> 4 );
 			G0 = G1;
 			G1 = G2;
-			G2 = Lm_C2( (INT32)MAC2 >> 4 );
+			G2 = Lm_C2( MAC2 >> 4 );
 			B0 = B1;
 			B1 = B2;
-			B2 = Lm_C3( (INT32)MAC3 >> 4 );
+			B2 = Lm_C3( MAC3 >> 4 );
 			return;
 		}
 		break;
@@ -3840,24 +3825,24 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			shift = 12 * GTE_SF( gteop );
 			FLAG = 0;
 
-			MAC1 = A1( ( ( (INT64)(INT32)MAC1 << shift ) + ( (INT16)IR0 * (INT16)IR1 ) ) >> shift );
-			MAC2 = A2( ( ( (INT64)(INT32)MAC2 << shift ) + ( (INT16)IR0 * (INT16)IR2 ) ) >> shift );
-			MAC3 = A3( ( ( (INT64)(INT32)MAC3 << shift ) + ( (INT16)IR0 * (INT16)IR3 ) ) >> shift );
-			IR1 = Lm_B1( (INT32)MAC1, 0 );
-			IR2 = Lm_B2( (INT32)MAC2, 0 );
-			IR3 = Lm_B3( (INT32)MAC3, 0 );
+			MAC1 = A1( ( ( (INT64) MAC1 << shift ) + ( IR0 * IR1 ) ) >> shift );
+			MAC2 = A2( ( ( (INT64) MAC2 << shift ) + ( IR0 * IR2 ) ) >> shift );
+			MAC3 = A3( ( ( (INT64) MAC3 << shift ) + ( IR0 * IR3 ) ) >> shift );
+			IR1 = Lm_B1( MAC1, 0 );
+			IR2 = Lm_B2( MAC2, 0 );
+			IR3 = Lm_B3( MAC3, 0 );
 			CD0 = CD1;
 			CD1 = CD2;
 			CD2 = CODE;
 			R0 = R1;
 			R1 = R2;
-			R2 = Lm_C1( (INT32)MAC1 >> 4 );
+			R2 = Lm_C1( MAC1 >> 4 );
 			G0 = G1;
 			G1 = G2;
-			G2 = Lm_C2( (INT32)MAC2 >> 4 );
+			G2 = Lm_C2( MAC2 >> 4 );
 			B0 = B1;
 			B1 = B2;
-			B2 = Lm_C3( (INT32)MAC3 >> 4 );
+			B2 = Lm_C3( MAC3 >> 4 );
 			return;
 		}
 		break;
@@ -3868,38 +3853,38 @@ static void docop2( psxcpu_state *psxcpu, int gteop )
 			GTELOG( "NCCT" );
 			FLAG = 0;
 
-			for( n_v = 0; n_v < 3; n_v++ )
+			for( v = 0; v < 3; v++ )
 			{
-				MAC1 = A1( ( ( (INT64)(INT16)L11 * (INT16)VX( n_v ) ) + ( (INT16)L12 * (INT16)VY( n_v ) ) + ( (INT16)L13 * (INT16)VZ( n_v ) ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)(INT16)L21 * (INT16)VX( n_v ) ) + ( (INT16)L22 * (INT16)VY( n_v ) ) + ( (INT16)L23 * (INT16)VZ( n_v ) ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)(INT16)L31 * (INT16)VX( n_v ) ) + ( (INT16)L32 * (INT16)VY( n_v ) ) + ( (INT16)L33 * (INT16)VZ( n_v ) ) ) >> 12 );
-				IR1 = Lm_B1( (INT32)MAC1, 1 );
-				IR2 = Lm_B2( (INT32)MAC2, 1 );
-				IR3 = Lm_B3( (INT32)MAC3, 1 );
-				MAC1 = A1( ( ( (INT64)RBK << 12 ) + ( (INT16)LR1 * (INT16)IR1 ) + ( (INT16)LR2 * (INT16)IR2 ) + ( (INT16)LR3 * (INT16)IR3 ) ) >> 12 );
-				MAC2 = A2( ( ( (INT64)GBK << 12 ) + ( (INT16)LG1 * (INT16)IR1 ) + ( (INT16)LG2 * (INT16)IR2 ) + ( (INT16)LG3 * (INT16)IR3 ) ) >> 12 );
-				MAC3 = A3( ( ( (INT64)BBK << 12 ) + ( (INT16)LB1 * (INT16)IR1 ) + ( (INT16)LB2 * (INT16)IR2 ) + ( (INT16)LB3 * (INT16)IR3 ) ) >> 12 );
-				IR1 = Lm_B1( (INT32)MAC1, 1 );
-				IR2 = Lm_B2( (INT32)MAC2, 1 );
-				IR3 = Lm_B3( (INT32)MAC3, 1 );
-				MAC1 = A1( ( (INT64)R * (INT16)IR1 ) >> 8 );
-				MAC2 = A2( ( (INT64)G * (INT16)IR2 ) >> 8 );
-				MAC3 = A3( ( (INT64)B * (INT16)IR3 ) >> 8 );
-				IR1 = Lm_B1( (INT32)MAC1, 1 );
-				IR2 = Lm_B2( (INT32)MAC2, 1 );
-				IR3 = Lm_B3( (INT32)MAC3, 1 );
+				MAC1 = A1( ( ( (INT64) L11 * VX( v ) ) + ( L12 * VY( v ) ) + ( L13 * VZ( v ) ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64) L21 * VX( v ) ) + ( L22 * VY( v ) ) + ( L23 * VZ( v ) ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64) L31 * VX( v ) ) + ( L32 * VY( v ) ) + ( L33 * VZ( v ) ) ) >> 12 );
+				IR1 = Lm_B1( MAC1, 1 );
+				IR2 = Lm_B2( MAC2, 1 );
+				IR3 = Lm_B3( MAC3, 1 );
+				MAC1 = A1( ( ( (INT64) RBK << 12 ) + ( LR1 * IR1 ) + ( LR2 * IR2 ) + ( LR3 * IR3 ) ) >> 12 );
+				MAC2 = A2( ( ( (INT64) GBK << 12 ) + ( LG1 * IR1 ) + ( LG2 * IR2 ) + ( LG3 * IR3 ) ) >> 12 );
+				MAC3 = A3( ( ( (INT64) BBK << 12 ) + ( LB1 * IR1 ) + ( LB2 * IR2 ) + ( LB3 * IR3 ) ) >> 12 );
+				IR1 = Lm_B1( MAC1, 1 );
+				IR2 = Lm_B2( MAC2, 1 );
+				IR3 = Lm_B3( MAC3, 1 );
+				MAC1 = A1( ( (INT64) R * IR1 ) >> 8 );
+				MAC2 = A2( ( (INT64) G * IR2 ) >> 8 );
+				MAC3 = A3( ( (INT64) B * IR3 ) >> 8 );
+				IR1 = Lm_B1( MAC1, 1 );
+				IR2 = Lm_B2( MAC2, 1 );
+				IR3 = Lm_B3( MAC3, 1 );
 				CD0 = CD1;
 				CD1 = CD2;
 				CD2 = CODE;
 				R0 = R1;
 				R1 = R2;
-				R2 = Lm_C1( (INT32)MAC1 >> 4 );
+				R2 = Lm_C1( MAC1 >> 4 );
 				G0 = G1;
 				G1 = G2;
-				G2 = Lm_C2( (INT32)MAC2 >> 4 );
+				G2 = Lm_C2( MAC2 >> 4 );
 				B0 = B1;
 				B1 = B2;
-				B2 = Lm_C3( (INT32)MAC3 >> 4 );
+				B2 = Lm_C3( MAC3 >> 4 );
 			}
 			return;
 		}
