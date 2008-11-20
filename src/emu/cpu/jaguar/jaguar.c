@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "cpuexec.h"
 #include "jaguar.h"
 
@@ -774,7 +773,7 @@ void jr_cc_n(jaguar_state *jaguar, UINT16 op)
 	{
 		INT32 r1 = (INT8)((op >> 2) & 0xf8) >> 2;
 		UINT32 newpc = jaguar->PC + r1;
-		debugger_instruction_hook(Machine, jaguar->PC);
+		debugger_instruction_hook(jaguar->device->machine, jaguar->PC);
 		op = ROPCODE(jaguar->PC);
 		jaguar->PC = newpc;
 		(*jaguar->table[op >> 10])(jaguar, op);
@@ -791,7 +790,7 @@ void jump_cc_rn(jaguar_state *jaguar, UINT16 op)
 
 		/* special kludge for risky code in the cojag DSP interrupt handlers */
 		UINT32 newpc = (jaguar->icount == jaguar->bankswitch_icount) ? jaguar->a[reg] : jaguar->r[reg];
-		debugger_instruction_hook(Machine, jaguar->PC);
+		debugger_instruction_hook(jaguar->device->machine, jaguar->PC);
 		op = ROPCODE(jaguar->PC);
 		jaguar->PC = newpc;
 		(*jaguar->table[op >> 10])(jaguar, op);
