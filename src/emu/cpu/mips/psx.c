@@ -62,7 +62,6 @@
  */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "osd_cpu.h"
 #include "psx.h"
 
@@ -252,8 +251,8 @@ static void mips_load_bad_address( psxcpu_state *psxcpu, UINT32 address );
 
 static void mips_stop( psxcpu_state *psxcpu )
 {
-	debugger_break( Machine );
-	debugger_instruction_hook( Machine,  psxcpu->pc );
+	debugger_break( psxcpu->program->machine );
+	debugger_instruction_hook( psxcpu->program->machine,  psxcpu->pc );
 }
 
 static UINT32 mips_cache_readword( psxcpu_state *psxcpu, UINT32 offset )
@@ -715,11 +714,11 @@ static UINT32 log_bioscall_parameter( psxcpu_state *psxcpu, int parm )
 {
 	if( parm < 4 )
 	{
-		return cpu_get_reg( Machine->activecpu, PSXCPU_R4 + parm );
+		return psxcpu->r[ 4 + parm ];
 	}
 	else
 	{
-		return psx_readword( psxcpu, cpu_get_reg( Machine->activecpu, PSXCPU_R29 ) + ( parm * 4 ) );
+		return psx_readword( psxcpu, psxcpu->r[ 29 ] + ( parm * 4 ) );
 	}
 }
 
@@ -809,13 +808,13 @@ static const char *log_bioscall_char( psxcpu_state *psxcpu, int parm )
 
 static void log_bioscall( psxcpu_state *psxcpu )
 {
-	int address = cpu_get_reg( Machine->activecpu, PSXCPU_PC ) - 0x04;
+	int address = psxcpu->pc - 0x04;
 	if( address == 0xa0 ||
 		address == 0xb0 ||
 		address == 0xc0 )
 	{
 		char buf[ 1024 ];
-		int operation = cpu_get_reg( Machine->activecpu, PSXCPU_R9 ) & 0xff;
+		int operation = psxcpu->r[ 9 ] & 0xff;
 		int bioscall = 0;
 
 		if( ( address == 0xa0 && operation == 0x3c ) ||
@@ -1041,14 +1040,14 @@ static void log_bioscall( psxcpu_state *psxcpu )
 		{
 			sprintf( buf, "unknown_%02x_%02x", address, operation );
 		}
-		logerror( "%08x: bioscall %s\n", (unsigned int)cpu_get_reg( Machine->activecpu, PSXCPU_R31 ) - 8, buf );
+		logerror( "%08x: bioscall %s\n", (unsigned int)psxcpu->r[ 31 ] - 8, buf );
 	}
 }
 
-static void log_syscall( void )
+static void log_syscall( psxcpu_state *psxcpu )
 {
 	char buf[ 1024 ];
-	int operation = cpu_get_reg( Machine->activecpu, PSXCPU_R4 );
+	int operation = psxcpu->r[ 4 ];
 
 	switch( operation )
 	{
@@ -1068,7 +1067,7 @@ static void log_syscall( void )
 		sprintf( buf, "unknown_%02x", operation );
 		break;
 	}
-	logerror( "%08x: syscall %s\n", (unsigned int)cpu_get_reg( Machine->activecpu, PSXCPU_R31 ) - 8, buf );
+	logerror( "%08x: syscall %s\n", (unsigned int)psxcpu->r[ 31 ] - 8, buf );
 }
 
 static void mips_update_memory_handlers( psxcpu_state *psxcpu )
@@ -1896,7 +1895,7 @@ static CPU_EXECUTE( psxcpu )
 				break;
 
 			case FUNCT_SYSCALL:
-				if (LOG_BIOSCALL) log_syscall();
+				if (LOG_BIOSCALL) log_syscall( psxcpu );
 				mips_exception( psxcpu, EXC_SYS );
 				break;
 

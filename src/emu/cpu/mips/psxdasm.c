@@ -5,7 +5,6 @@
 
 #include "psx.h"
 #include "driver.h"
-#include "deprecat.h"
 
 static char *make_signed_hex_str_16( UINT32 value )
 {
