@@ -602,7 +602,7 @@ static WRITE32_HANDLER( speedup_w )
  *
  *************************************/
 
-static const struct tms32031_config cage_config =
+static const tms32031_config cage_config =
 {
 	0x400000
 };

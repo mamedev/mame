@@ -459,7 +459,7 @@ static WRITE32_HANDLER( midvplus_misc_w )
  *
  *************************************/
 
-static void midvplus_xf1_w(UINT8 val)
+static void midvplus_xf1_w(const device_config *device, UINT8 val)
 {
 	static int lastval;
 //  mame_printf_debug("xf1_w = %d\n", val);
@@ -509,7 +509,7 @@ static ADDRESS_MAP_START( midvunit_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 
-static const struct tms32031_config midvplus_config = { 0, NULL, midvplus_xf1_w };
+static const tms32031_config midvplus_config = { 0, NULL, midvplus_xf1_w };
 
 static ADDRESS_MAP_START( midvplus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x01ffff) AM_RAM AM_BASE(&ram_base)

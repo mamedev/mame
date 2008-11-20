@@ -409,10 +409,10 @@ static WRITE32_HANDLER( tms_m68k_ram_w )
 }
 
 
-static void iack_w(UINT8 state, offs_t addr)
+static void iack_w(const device_config *device, UINT8 state, offs_t addr)
 {
 	logerror("iack_w(%d) - %06X\n", state, addr);
-	cpu_set_input_line(Machine->cpu[1], 0, CLEAR_LINE);
+	cpu_set_input_line(device, 0, CLEAR_LINE);
 }
 
 
@@ -908,7 +908,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const struct tms32031_config tms_config =
+static const tms32031_config tms_config =
 {
 	0x1000,
 	0,
