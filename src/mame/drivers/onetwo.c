@@ -66,7 +66,7 @@ static WRITE8_HANDLER( onetwo_cpubank_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "main") + 0x10000;
 
-	memory_set_bankptr(1,&RAM[data * 0x4000]);
+	memory_set_bankptr(space->machine, 1,&RAM[data * 0x4000]);
 }
 
 static WRITE8_HANDLER( onetwo_coin_counters_w )

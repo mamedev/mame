@@ -74,7 +74,7 @@ static UINT8 sound_latch;
 
 static WRITE8_HANDLER( shangkid_maincpu_bank_w )
 {
-	memory_set_bank(1, data & 1);
+	memory_set_bank(space->machine, 1, data & 1);
 }
 
 static WRITE8_HANDLER( shangkid_bbx_enable_w )
@@ -140,7 +140,7 @@ static WRITE8_HANDLER( shangkid_bbx_AY8910_write_w )
 				cpu_set_input_line(space->machine->cpu[2], 0, HOLD_LINE );
 		}
 		else
-			memory_set_bank(2, data ? 0 : 1);
+			memory_set_bank(space->machine, 2, data ? 0 : 1);
 		break;
 
 	case 0x0f:
@@ -187,8 +187,8 @@ static MACHINE_RESET( shangkid )
 {
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, 1 );
 
-	memory_set_bank(1, 0);
-	memory_set_bank(2, 0);
+	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, 2, 0);
 }
 
 /***************************************************************************************/

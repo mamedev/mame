@@ -92,7 +92,7 @@ static int i8039_status;
 
 static WRITE8_HANDLER( junofrst_bankselect_w )
 {
-	memory_set_bank(1, data & 0x0f);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 

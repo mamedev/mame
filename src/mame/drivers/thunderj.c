@@ -51,7 +51,7 @@ static MACHINE_RESET( thunderj )
 
 	rom_base[0] = (UINT16 *)memory_region(machine, "main");
 	rom_base[1] = (UINT16 *)memory_region(machine, "extra");
-	memory_set_bankptr(1, shared_ram);
+	memory_set_bankptr(machine, 1, shared_ram);
 }
 
 

@@ -327,7 +327,7 @@ INLINE DRIVER_INIT( loht_mcu )
 	protection_ram = auto_malloc(0x10000);
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
-	memory_set_bankptr(1, protection_ram);
+	memory_set_bankptr(machine, 1, protection_ram);
 
 	//memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
@@ -700,7 +700,7 @@ static void install_protection_handler(running_machine *machine, const UINT8 *co
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, SMH_BANK1);
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb0ffa, 0xb0ffb, 0, 0, protection_r);
 	memory_install_write16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, protection_w);
-	memory_set_bankptr(1, protection_ram);
+	memory_set_bankptr(machine, 1, protection_ram);
 }
 
 static DRIVER_INIT( bchopper )

@@ -725,7 +725,7 @@ WRITE8_HANDLER( namcos2_sound_bankselect_w )
 	UINT8 *RAM=memory_region(space->machine, "audio");
 	UINT32 max = (memory_region_length(space->machine, "audio") - 0x10000) / 0x4000;
 	int bank = ( data >> 4 ) % max;	/* 991104.CAB */
-	memory_set_bankptr( CPU3_ROM1, &RAM[ 0x10000 + ( 0x4000 * bank ) ] );
+	memory_set_bankptr(space->machine,  CPU3_ROM1, &RAM[ 0x10000 + ( 0x4000 * bank ) ] );
 }
 
 /**************************************************************/

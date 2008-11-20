@@ -33,7 +33,7 @@ WRITE8_HANDLER( xxmissio_paletteram_w );
 
 static WRITE8_HANDLER( xxmissio_bank_sel_w )
 {
-	memory_set_bank(1, data & 7);
+	memory_set_bank(space->machine, 1, data & 7);
 }
 
 static CUSTOM_INPUT( xxmissio_status_r )
@@ -95,7 +95,7 @@ static INTERRUPT_GEN( xxmissio_interrupt_s )
 static MACHINE_START( xxmissio )
 {
 	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "user1"), 0x4000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 /****************************************************************************/

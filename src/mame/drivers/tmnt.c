@@ -252,7 +252,7 @@ static WRITE8_HANDLER( prmrsocr_audio_bankswitch_w )
 {
 	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
 
-	memory_set_bankptr(1,rom + (data & 7) * 0x4000);
+	memory_set_bankptr(space->machine, 1,rom + (data & 7) * 0x4000);
 }
 
 

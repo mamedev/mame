@@ -1828,11 +1828,11 @@ static WRITE8_HANDLER( rongrong_select_w )
 
 //logerror("%04x: rongrong_select_w %02x\n",cpu_get_pc(space->cpu),data);
 	/* bits 0-4 = **both** ROM bank **AND** input select */
-	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x1f)]);
+	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x1f)]);
 	ddenlovr_select = data;
 
 	/* bits 5-7 = RAM bank */
-	memory_set_bankptr(2, &rom[0x110000 + 0x1000 * ((data & 0xe0) >> 5)]);
+	memory_set_bankptr(space->machine, 2, &rom[0x110000 + 0x1000 * ((data & 0xe0) >> 5)]);
 }
 
 
@@ -1943,7 +1943,7 @@ static READ8_HANDLER( magic_r )
 static WRITE8_HANDLER( mmpanic_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "main");
-	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
+	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	/* Bit 4? */
 }
 
@@ -2129,9 +2129,9 @@ static WRITE8_HANDLER( funkyfig_rombank_w )
 
 	ddenlovr_select = data;
 
-	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
+	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
 	// bit 4 selects palette ram at 8000?
-	memory_set_bankptr(2, &rom[0x90000 + 0x1000 * ((data & 0xe0) >> 5)]);
+	memory_set_bankptr(space->machine, 2, &rom[0x90000 + 0x1000 * ((data & 0xe0) >> 5)]);
 }
 
 static READ8_HANDLER( funkyfig_dsw_r )
@@ -2240,9 +2240,9 @@ static WRITE8_HANDLER( hanakanz_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "main");
 
-	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
+	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x0f)]);
 
-	memory_set_bankptr(2, &rom[0x90000 + 0x1000 * ((data & 0xf0) >> 4)]);
+	memory_set_bankptr(space->machine, 2, &rom[0x90000 + 0x1000 * ((data & 0xf0) >> 4)]);
 }
 
 static ADDRESS_MAP_START( hanakanz_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2623,7 +2623,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( mjmyster_rambank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "main");
-	memory_set_bankptr(2, &rom[0x90000 + 0x1000 * (data & 0x07)]);
+	memory_set_bankptr(space->machine, 2, &rom[0x90000 + 0x1000 * (data & 0x07)]);
 //  logerror("%04x: rambank = %02x\n", cpu_get_pc(space->cpu), data);
 }
 
@@ -2740,7 +2740,7 @@ static UINT8 hginga_rombank;
 static WRITE8_HANDLER( hginga_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "main");
-	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
+	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x7)]);
 	hginga_rombank = data;
 }
 
@@ -3036,8 +3036,8 @@ static WRITE8_HANDLER( hparadis_select_w )
 	ddenlovr_select = data;
 	hginga_ip = 0;
 
-	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0x07)]);
-	memory_set_bankptr(2, &rom[0x50000 + 0x1000 * ((data & 0xe0) >> 5)]);
+	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0x07)]);
+	memory_set_bankptr(space->machine, 2, &rom[0x50000 + 0x1000 * ((data & 0xe0) >> 5)]);
 }
 
 
@@ -3273,7 +3273,7 @@ ADDRESS_MAP_END
 static WRITE8_HANDLER( mjflove_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "main");
-	memory_set_bankptr(1, &rom[0x10000 + 0x8000 * (data & 0xf)]);
+	memory_set_bankptr(space->machine, 1, &rom[0x10000 + 0x8000 * (data & 0xf)]);
 }
 
 static WRITE8_HANDLER( mjflove_okibank_w )

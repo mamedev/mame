@@ -43,7 +43,7 @@ int darkmist_hw;
 static WRITE8_HANDLER(darkmist_hw_w)
 {
   darkmist_hw=data;
-  memory_set_bankptr(1,&memory_region(space->machine, "main")[0x010000+((data&0x80)?0x4000:0)]);
+  memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "main")[0x010000+((data&0x80)?0x4000:0)]);
 }
 
 static READ8_HANDLER(t5182shared_r)
@@ -457,7 +457,7 @@ static DRIVER_INIT(darkmist)
 	}
 
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
-	memory_set_bankptr(1,&ROM[0x010000]);
+	memory_set_bankptr(space->machine, 1,&ROM[0x010000]);
 
 	/* adr line swaps */
 	ROM = memory_region(machine, "user1");

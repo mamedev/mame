@@ -338,7 +338,7 @@ static MACHINE_RESET( ssv )
 {
 	requested_int = 0;
 	cpu_set_irq_callback(machine->cpu[0], ssv_irq_callback);
-	memory_set_bankptr(1, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
 }
 
 

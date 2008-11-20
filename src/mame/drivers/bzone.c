@@ -803,7 +803,7 @@ static WRITE8_HANDLER( analog_select_w )
 static DRIVER_INIT( bradley )
 {
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x400, 0x7ff, 0, 0, SMH_BANK1, SMH_BANK1);
-	memory_set_bankptr(1, auto_malloc(0x400));
+	memory_set_bankptr(machine, 1, auto_malloc(0x400));
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1808, 0x1808, 0, 0, input_port_read_handler8(machine->portconfig, "1808"));
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1809, 0x1809, 0, 0, input_port_read_handler8(machine->portconfig, "1809"));

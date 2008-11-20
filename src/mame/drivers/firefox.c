@@ -388,7 +388,7 @@ static WRITE8_HANDLER( novram_store_w )
 
 static WRITE8_HANDLER( rom_bank_w )
 {
-	memory_set_bank(1, data & 0x1f);
+	memory_set_bank(space->machine, 1, data & 0x1f);
 }
 
 static WRITE8_HANDLER( main_irq_clear_w )

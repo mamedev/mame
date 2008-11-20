@@ -1108,14 +1108,14 @@ static void ym3438_irq_handler(running_machine *machine, int state)
 static WRITE8_HANDLER( sound_bank_lo_w )
 {
 	sound_bank = (sound_bank & ~0x3f) | (data & 0x3f);
-	memory_set_bankptr(1, memory_region(space->machine, "sound") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "sound") + 0x100000 + 0x2000 * sound_bank);
 }
 
 
 static WRITE8_HANDLER( sound_bank_hi_w )
 {
 	sound_bank = (sound_bank & 0x3f) | ((data & 0x04) << 4) | ((data & 0x03) << 7);
-	memory_set_bankptr(1, memory_region(space->machine, "sound") + 0x100000 + 0x2000 * sound_bank);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "sound") + 0x100000 + 0x2000 * sound_bank);
 }
 
 

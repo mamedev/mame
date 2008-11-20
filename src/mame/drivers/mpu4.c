@@ -433,7 +433,7 @@ static MACHINE_RESET( mpu4 )
 
 		memory_configure_bank(machine, 1, 0, 8, &rom[0x01000], 0x10000);
 
-		memory_set_bank(1,0);
+		memory_set_bank(machine, 1,0);
 	}
 
 }
@@ -467,13 +467,13 @@ static void cpu0_irq(running_machine *machine, int state)
 /* Bankswitching */
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(1,data & 0x07);
+	memory_set_bank(space->machine, 1,data & 0x07);
 }
 
 
 static READ8_HANDLER( bankswitch_r )
 {
-	return memory_get_bank(1);
+	return memory_get_bank(space->machine, 1);
 }
 
 

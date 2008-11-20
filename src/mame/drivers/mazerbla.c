@@ -595,13 +595,13 @@ static WRITE8_HANDLER(cfb_rom_bank_sel_w)	/* mazer blazer */
 {
 	gfx_rom_bank = data;
 
-	memory_set_bankptr( 1, memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 static WRITE8_HANDLER(cfb_rom_bank_sel_w_gg)	/* great guns */
 {
 	gfx_rom_bank = data>>1;
 
-	memory_set_bankptr( 1, memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "sub2") + (gfx_rom_bank * 0x2000) + 0x10000 );
 }
 
 

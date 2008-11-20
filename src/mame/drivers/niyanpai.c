@@ -61,7 +61,7 @@ static void niyanpai_soundbank_w(running_machine *machine, int data)
 {
 	UINT8 *SNDROM = memory_region(machine, "audio");
 
-	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	memory_set_bankptr(machine, 1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
 static READ8_HANDLER( niyanpai_sound_r )

@@ -64,7 +64,7 @@ static MACHINE_START( tutankhm )
 
 static WRITE8_HANDLER( tutankhm_bankselect_w )
 {
-	memory_set_bank(1, data & 0x0f);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 

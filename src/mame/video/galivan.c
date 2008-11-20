@@ -250,7 +250,7 @@ WRITE8_HANDLER( galivan_gfxbank_w )
 	tilemap_set_flip (tx_tilemap, flipscreen ? TILEMAP_FLIPX|TILEMAP_FLIPY : 0);
 
 	/* bit 7 selects one of two ROM banks for c000-dfff */
-	memory_set_bank(1, (data & 0x80) >> 7);
+	memory_set_bank(space->machine, 1, (data & 0x80) >> 7);
 
 /*  logerror("Address: %04X - port 40 = %02x\n",cpu_get_pc(space->cpu),data); */
 }
@@ -291,7 +291,7 @@ logerror("%04x: write %02x to port 80\n",cpu_get_pc(space->cpu),data);
 	/* bit 5 sprite flag ??? */
 
 	/* bit 6, 7 ROM bank select */
-	memory_set_bank(1, (data & 0xc0) >> 6);
+	memory_set_bank(space->machine, 1, (data & 0xc0) >> 6);
 
 #if 0
 	{

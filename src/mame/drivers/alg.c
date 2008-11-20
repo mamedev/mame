@@ -198,7 +198,7 @@ static CUSTOM_INPUT( lightgun_holster_r )
 static void alg_cia_0_porta_w(UINT8 data)
 {
 	/* switch banks as appropriate */
-	memory_set_bank(1, data & 1);
+	memory_set_bank(Machine, 1, data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)

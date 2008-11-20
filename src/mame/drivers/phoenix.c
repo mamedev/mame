@@ -433,7 +433,7 @@ static const ay8910_interface survival_ay8910_interface =
 
 static MACHINE_RESET( phoenix )
 {
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x4000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x4000);
 }
 
 

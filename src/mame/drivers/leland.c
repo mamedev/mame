@@ -1951,9 +1951,9 @@ static DRIVER_INIT( cerberus )
 
 	/* master CPU bankswitching */
 	leland_update_master_bank = cerberus_bankswitch;
-	memory_set_bankptr(1, memory_region(machine, "master") + 0x2000);
-	memory_set_bankptr(2, memory_region(machine, "master") + 0xa000);
-	memory_set_bankptr(3, memory_region(machine, "slave") + 0x2000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "master") + 0x2000);
+	memory_set_bankptr(machine, 2, memory_region(machine, "master") + 0xa000);
+	memory_set_bankptr(machine, 3, memory_region(machine, "slave") + 0x2000);
 
 	/* set up the master CPU I/O ports */
 	init_master_ports(machine, 0x40, 0x80);

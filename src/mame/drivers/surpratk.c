@@ -334,7 +334,7 @@ logerror("%04x: setlines %02x\n",cpu_get_pc(Machine->activecpu),lines);
 
 	offs = 0x10000 + ((lines & 0x1f) * 0x2000);
 	if (offs >= 0x48000) offs -= 0x40000;
-	memory_set_bankptr(1,&RAM[offs]);
+	memory_set_bankptr(Machine, 1,&RAM[offs]);
 }
 
 static MACHINE_RESET( surpratk )

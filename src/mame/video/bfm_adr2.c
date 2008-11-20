@@ -190,7 +190,7 @@ VIDEO_RESET( adder2 )
 
 		memory_configure_bank(machine, 2, 0, 4, &rom[0x00000], 0x08000);
 
-		memory_set_bank(2,0&0x03);
+		memory_set_bank(machine, 2,0&0x03);
 	}
 }
 
@@ -323,7 +323,7 @@ static WRITE8_HANDLER( normal_ram_w )
 
 static WRITE8_HANDLER( adder2_rom_page_w )
 {
-	memory_set_bank(2,data&0x03);
+	memory_set_bank(space->machine, 2,data&0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -45,14 +45,14 @@ static WRITE8_HANDLER( rom_bank_select_w )
 	suprgolf_rom_bank = data;
 
 	mame_printf_debug("ROM_BANK 0x8000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
-	memory_set_bankptr(2, region_base + (data&0x3f ) * 0x4000);
+	memory_set_bankptr(space->machine, 2, region_base + (data&0x3f ) * 0x4000);
 }
 
 static WRITE8_HANDLER( rom2_bank_select_w )
 {
 	UINT8 *region_base = memory_region(space->machine, "user2");
 	mame_printf_debug("ROM_BANK 0x4000 - %X @%X\n",data,cpu_get_previouspc(space->cpu));
-	memory_set_bankptr(1, region_base + (data&0x3f ) * 0x4000);
+	memory_set_bankptr(space->machine, 1, region_base + (data&0x3f ) * 0x4000);
 }
 
 static MACHINE_RESET( suprgolf )

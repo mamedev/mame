@@ -108,7 +108,7 @@ VBlank = 58Hz
 static WRITE8_HANDLER( vb_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "main");
-	memory_set_bankptr( 1,&RAM[ 0x10000 + ( 0x4000 * ( data & 1 ) ) ] );
+	memory_set_bankptr(space->machine,  1,&RAM[ 0x10000 + ( 0x4000 * ( data & 1 ) ) ] );
 
 	if (vball_gfxset != ((data  & 0x20) ^ 0x20)) {
 		vball_gfxset = (data  & 0x20) ^ 0x20;

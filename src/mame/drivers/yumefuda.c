@@ -186,7 +186,7 @@ static WRITE8_HANDLER( mux_w )
 
 		bank = new_bank;
 		bankaddress = 0x10000 + 0x2000 * bank;
-		memory_set_bankptr(1, &ROM[bankaddress]);
+		memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 	}
 
 	mux_data = data & ~0xc0;

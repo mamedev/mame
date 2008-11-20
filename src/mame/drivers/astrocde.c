@@ -422,7 +422,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 
 	/* set the main banking */
 	memory_install_read8_handler(space, 0x4000, 0xbfff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(space->machine, "user1") + 0x8000 * bank);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "user1") + 0x8000 * bank);
 
 	/* bank 0 reads video RAM in the 4000-7FFF range */
 	if (bank == 0)
@@ -438,7 +438,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 		if (bank < 0x28)
 		{
 			memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_BANK2);
-			memory_set_bankptr(2, memory_region(space->machine, "user2") + 0x4000 * bank);
+			memory_set_bankptr(space->machine, 2, memory_region(space->machine, "user2") + 0x4000 * bank);
 		}
 		else
 			memory_install_read8_handler(space, 0x4000, 0x7fff, 0, 0, SMH_UNMAP);

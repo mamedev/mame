@@ -40,7 +40,7 @@ WRITE8_HANDLER( hexa_d008_w )
 
 	/* bit 4 could be the ROM bank selector for 8000-bfff (not sure) */
 	bankaddress = 0x10000 + ((data & 0x10) >> 4) * 0x4000;
-	memory_set_bankptr(1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 
 	/* bit 5 = char bank */
 	if (charbank != ((data & 0x20) >> 5))

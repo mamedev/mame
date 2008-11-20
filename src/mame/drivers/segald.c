@@ -206,7 +206,7 @@ static WRITE8_HANDLER( astron_FIX_write )
 static WRITE8_HANDLER( astron_io_bankswitch_w )
 {
 	logerror("Banking 0x%x\n", data);
-	memory_set_bank(1, data & 0xff);
+	memory_set_bank(space->machine, 1, data & 0xff);
 }
 
 

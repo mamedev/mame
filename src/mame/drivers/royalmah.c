@@ -295,7 +295,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 	/* bits 6, 4 and 3 used for something input related? */
 
 	address = 0x10000 + (data & 0x07) * 0x8000;
-	memory_set_bankptr(1,&rom[address]);
+	memory_set_bankptr(space->machine, 1,&rom[address]);
 }
 
 
@@ -303,7 +303,7 @@ static WRITE8_HANDLER ( mjapinky_bank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "main");
 	rombank = data;
-	memory_set_bankptr(1,ROM + 0x10000 + 0x8000 * data);
+	memory_set_bankptr(space->machine, 1,ROM + 0x10000 + 0x8000 * data);
 }
 
 static WRITE8_HANDLER( mjapinky_palbank_w )
@@ -333,7 +333,7 @@ logerror("%04x: bank %02x\n",cpu_get_pc(space->cpu),data);
 
 	address = 0x10000 + data * 0x8000;
 
-	memory_set_bankptr(1,&rom[address]);
+	memory_set_bankptr(space->machine, 1,&rom[address]);
 }
 
 
@@ -351,7 +351,7 @@ static WRITE8_HANDLER ( dynax_bank_w )
 
 	address = 0x10000 + data * 0x8000;
 
-	memory_set_bankptr(1,&rom[address]);
+	memory_set_bankptr(space->machine, 1,&rom[address]);
 }
 
 
@@ -517,12 +517,12 @@ static READ8_HANDLER( janptr96_dsw_r )
 static WRITE8_HANDLER( janptr96_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "main");
-	memory_set_bankptr(1,ROM + 0x10000 + 0x8000 * data);
+	memory_set_bankptr(space->machine, 1,ROM + 0x10000 + 0x8000 * data);
 }
 
 static WRITE8_HANDLER( janptr96_rambank_w )
 {
-	memory_set_bankptr(2,generic_nvram + 0x1000 + 0x1000 * data);
+	memory_set_bankptr(space->machine, 2,generic_nvram + 0x1000 + 0x1000 * data);
 }
 
 static READ8_HANDLER( janptr96_unknown_r )
@@ -736,7 +736,7 @@ static READ8_HANDLER( mjtensin_p3_r )
 
 static void mjtensin_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr( 1, memory_region(machine, "main") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr(machine,  1, memory_region(machine, "main") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( mjtensin_p4_w )
 {
@@ -778,7 +778,7 @@ ADDRESS_MAP_END
 
 static void cafetime_update_rombank(running_machine *machine)
 {
-	memory_set_bankptr( 1, memory_region(machine, "main") + 0x10000 + rombank * 0x8000 );
+	memory_set_bankptr(machine,  1, memory_region(machine, "main") + 0x10000 + rombank * 0x8000 );
 }
 static WRITE8_HANDLER( cafetime_p4_w )
 {
@@ -3148,14 +3148,14 @@ ROM_START( janoh )
 ROM_END
 
 
-static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(1, memory_region(machine, "main") + 0x8000 );	}
+static DRIVER_INIT( ippatsu )	{	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x8000 );	}
 
 static DRIVER_INIT( janptr96 )
 {
 	generic_nvram_size = 0x1000 * 9;
 	generic_nvram = auto_malloc( generic_nvram_size );
 
-	memory_set_bankptr(3,generic_nvram);
+	memory_set_bankptr(machine, 3,generic_nvram);
 }
 
 

@@ -390,7 +390,7 @@ static WRITE8_HANDLER( metro_sound_rombank_w )
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x03) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x0000;
 
-	memory_set_bankptr(1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 }
 
 static WRITE8_HANDLER( daitorid_sound_rombank_w )
@@ -401,7 +401,7 @@ static WRITE8_HANDLER( daitorid_sound_rombank_w )
 	bankaddress = 0x10000-0x4000 + ((data >> 4) & 0x07) * 0x4000;
 	if (bankaddress < 0x10000) bankaddress = 0x10000;
 
-	memory_set_bankptr(1, &ROM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 }
 
 
@@ -1977,7 +1977,7 @@ static WRITE8_HANDLER( blzntrnd_sh_bankswitch_w )
 	int bankaddress;
 
 	bankaddress = 0x10000 + (data & 0x03) * 0x4000;
-	memory_set_bankptr(1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 }
 
 static void blzntrnd_irqhandler(running_machine *machine, int irq)

@@ -319,7 +319,7 @@ static WRITE8_HANDLER ( fuuki32_sound_bw_w )
 {
 	UINT8 *rom = memory_region(space->machine, "sound");
 
-	memory_set_bankptr(1, rom + 0x10000 + (data * 0x8000));
+	memory_set_bankptr(space->machine, 1, rom + 0x10000 + (data * 0x8000));
 }
 
 static READ8_HANDLER( snd_z80_r )

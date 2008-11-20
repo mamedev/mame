@@ -98,7 +98,7 @@ static WRITE8_HANDLER( bank_select_w )
 	if (offset & 1)
 		rom_bank |= mask;
 
-	memory_set_bank(1, rom_bank);
+	memory_set_bank(space->machine, 1, rom_bank);
 }
 
 static UINT8 keyboard_select;

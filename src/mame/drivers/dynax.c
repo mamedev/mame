@@ -269,13 +269,13 @@ static WRITE8_HANDLER( hanamai_keyboard_w )
 static WRITE8_HANDLER( dynax_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "main");
-	memory_set_bankptr(1,&ROM[0x08000+0x8000*(data & 0x0f)]);
+	memory_set_bankptr(space->machine, 1,&ROM[0x08000+0x8000*(data & 0x0f)]);
 }
 
 static WRITE8_HANDLER( jantouki_sound_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "sound");
-	memory_set_bankptr(2,&ROM[0x08000+0x8000*data]);
+	memory_set_bankptr(space->machine, 2,&ROM[0x08000+0x8000*data]);
 }
 
 
@@ -285,7 +285,7 @@ static WRITE8_HANDLER( hnoridur_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "main") + 0x10000 + 0x8000*data;
 //logerror("%04x: rom bank = %02x\n",cpu_get_pc(space->cpu),data);
-	memory_set_bankptr(1,ROM);
+	memory_set_bankptr(space->machine, 1,ROM);
 	hnoridur_bank = data;
 }
 
@@ -655,7 +655,7 @@ static READ8_HANDLER( yarunara_input_r )
 static WRITE8_HANDLER( yarunara_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "main") + 0x10000 + 0x8000 * data;
-	memory_set_bankptr(1, rom);
+	memory_set_bankptr(space->machine, 1, rom);
 
 	hnoridur_bank = data;
 }
@@ -877,7 +877,7 @@ static READ8_HANDLER( jantouki_blitter_busy_r )
 static WRITE8_HANDLER( jantouki_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "main");
-	memory_set_bankptr(1,&ROM[0x8000 + 0x8000*(data&0x0f)]);
+	memory_set_bankptr(space->machine, 1,&ROM[0x8000 + 0x8000*(data&0x0f)]);
 	set_led_status(0,data & 0x10);	// maybe
 }
 
@@ -1098,7 +1098,7 @@ static READ8_HANDLER( htengoku_coin_r )
 static WRITE8_HANDLER( htengoku_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "main") + 0x10000 + 0x8000 * (data & 0x7);
-	memory_set_bankptr(1, rom);
+	memory_set_bankptr(space->machine, 1, rom);
 
 	hnoridur_bank = data;
 }

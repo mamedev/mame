@@ -77,7 +77,7 @@ if ((data & 1) == 0) popmessage("bankswitch RAM bank 0");
 	/* bit 1-4 = ROM bank */
 	if (data & 0x10) offs = 0x20000 + (data & 0x06) * 0x1000;
 	else offs = 0x10000 + (data & 0x0e) * 0x1000;
-	memory_set_bankptr(1,&RAM[offs]);
+	memory_set_bankptr(space->machine, 1,&RAM[offs]);
 }
 
 static WRITE8_HANDLER( bottom9_1f90_w )

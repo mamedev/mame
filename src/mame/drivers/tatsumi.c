@@ -1266,11 +1266,11 @@ static DRIVER_INIT( cyclwarr )
 
 	dst = memory_region(machine, "main");
 	memcpy(cyclwarr_cpua_ram,dst,8);
-	memory_set_bankptr(1, dst);
+	memory_set_bankptr(machine, 1, dst);
 
 	dst = memory_region(machine, "sub");
 	memcpy(cyclwarr_cpub_ram,dst,8);
-	memory_set_bankptr(2, dst);
+	memory_set_bankptr(machine, 2, dst);
 
 	// Copy sprite & palette data out of GFX rom area
 	tatsumi_rom_sprite_lookup1 = memory_region(machine, "gfx2");

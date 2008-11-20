@@ -281,7 +281,7 @@ static READ16_HANDLER( sound_status_r )
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr(2, memory_region(machine, "audio") + 0x10000 + cur_sound_region*0x4000);
+	memory_set_bankptr(machine, 2, memory_region(machine, "audio") + 0x10000 + cur_sound_region*0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

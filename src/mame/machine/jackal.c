@@ -25,7 +25,7 @@ MACHINE_RESET( jackal )
 	// at the beginning of the game. This fixes it.
 	cpu_set_clockscale(machine->cpu[1], 1.2f);
 
-	memory_set_bankptr(1,&rgn[0x4000]);
+	memory_set_bankptr(machine, 1,&rgn[0x4000]);
  	jackal_rambank = rgn;
 	jackal_spritebank = rgn;
 }
@@ -59,7 +59,7 @@ WRITE8_HANDLER( jackal_rambank_w )
 	coin_counter_w(1,data & 0x02);
 	jackal_spritebank = &rgn[((data & 0x08) << 13)];
 	jackal_rambank = &rgn[((data & 0x10) << 12)];
-	memory_set_bankptr(1,&rgn[((data & 0x20) << 11) + 0x4000]);
+	memory_set_bankptr(space->machine, 1,&rgn[((data & 0x20) << 11) + 0x4000]);
 }
 
 

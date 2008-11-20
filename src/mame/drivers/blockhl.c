@@ -297,7 +297,7 @@ static void blockhl_banking( int lines )
 	/* bits 0-1 = ROM bank */
 	rombank = lines & 0x03;
 	offs = 0x10000 + (lines & 0x03) * 0x2000;
-	memory_set_bankptr(1,&RAM[offs]);
+	memory_set_bankptr(Machine, 1,&RAM[offs]);
 
 	/* bits 3/4 = coin counters */
 	coin_counter_w(0,lines & 0x08);

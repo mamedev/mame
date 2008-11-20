@@ -295,7 +295,7 @@ static WRITE8_HANDLER( macross2_sound_bank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
 
-	memory_set_bankptr(1,rom + (data & 0x07) * 0x4000);
+	memory_set_bankptr(space->machine, 1,rom + (data & 0x07) * 0x4000);
 }
 
 static WRITE8_HANDLER( tharrier_oki6295_bankswitch_0_w )
@@ -1000,7 +1000,7 @@ static WRITE8_HANDLER( okibank_w )
 
 static WRITE8_HANDLER( raphero_sound_rombank_w )
 {
-	memory_set_bankptr(1,memory_region(space->machine, "audio") + 0x10000 + (data & 0x07) * 0x4000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "audio") + 0x10000 + (data & 0x07) * 0x4000);
 }
 
 static ADDRESS_MAP_START( raphero_sound_mem_map, ADDRESS_SPACE_PROGRAM, 8 )

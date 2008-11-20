@@ -90,7 +90,7 @@ Dip locations and factory settings verified from dip listing
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bankptr(1,&memory_region(space->machine, "main")[0x10000 + (data & 7) * 0x2000]);
+	memory_set_bankptr(space->machine, 1,&memory_region(space->machine, "main")[0x10000 + (data & 7) * 0x2000]);
 }
 
 

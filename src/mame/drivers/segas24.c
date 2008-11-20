@@ -723,8 +723,8 @@ static void reset_bank(running_machine *machine)
 {
 	if (memory_region(machine, "romboard"))
 	{
-		memory_set_bank(1, curbank & 15);
-		memory_set_bank(2, curbank & 15);
+		memory_set_bank(machine, 1, curbank & 15);
+		memory_set_bank(machine, 2, curbank & 15);
 	}
 }
 

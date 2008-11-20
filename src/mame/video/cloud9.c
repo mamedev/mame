@@ -39,7 +39,7 @@ VIDEO_START( cloud9 )
 
 	/* allocate second bank of videoram */
 	videoram = auto_malloc(0x8000);
-	memory_set_bankptr(1, videoram);
+	memory_set_bankptr(machine, 1, videoram);
 
 	/* get pointers to our PROMs */
 	syncprom = memory_region(machine, "proms") + 0x000;

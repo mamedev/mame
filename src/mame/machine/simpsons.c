@@ -4,6 +4,7 @@
 #include "machine/eeprom.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
+#include "deprecat.h"
 
 int simpsons_firq_enabled;
 
@@ -116,7 +117,7 @@ READ8_HANDLER( simpsons_sound_r )
 
 static void simpsons_banking( int lines )
 {
-	memory_set_bank(1, lines & 0x3f);
+	memory_set_bank(Machine, 1, lines & 0x3f);
 }
 
 MACHINE_RESET( simpsons )
@@ -133,11 +134,11 @@ MACHINE_RESET( simpsons )
 
 	/* init the default banks */
 	memory_configure_bank(machine, 1, 0, 64, memory_region(machine, "main") + 0x10000, 0x2000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
 	memory_configure_bank(machine, 2, 0, 2, memory_region(machine, "audio") + 0x10000, 0);
 	memory_configure_bank(machine, 2, 2, 6, memory_region(machine, "audio") + 0x10000, 0x4000);
-	memory_set_bank(2, 0);
+	memory_set_bank(machine, 2, 0);
 
 	simpsons_video_banking( machine, 0 );
 }

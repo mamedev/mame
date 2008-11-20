@@ -388,7 +388,7 @@ static WRITE8_HANDLER( disk_iobank_w )
 	if (newbank != bank)
 	{
 		bank = newbank;
-		memory_set_bankptr( 1,memory_region(space->machine, "user1") + 0x10000 * bank );
+		memory_set_bankptr(space->machine,  1,memory_region(space->machine, "user1") + 0x10000 * bank );
 	}
 
 	lastvalue = data;

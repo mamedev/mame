@@ -792,7 +792,7 @@ static DRIVER_INIT( asylum )
 
 	/* asylum appears to have some extra RAM for the slave CPU */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xf000, 0xfffb, 0, 0, SMH_BANK4, SMH_BANK4);
-	memory_set_bankptr(4, auto_malloc(0x1000));
+	memory_set_bankptr(machine, 4, auto_malloc(0x1000));
 
 	/* set up additional input ports */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x0d, 0x0d, 0, 0, input_port_read_handler8(machine->portconfig, "P2"));

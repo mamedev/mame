@@ -97,7 +97,7 @@ static WRITE16_HANDLER( pcup_prgbank_w )
     if (ACCESSING_BITS_0_7)
     {
         bank = (data>>4) &0x07;
-        memory_set_bankptr(2,&ROM1[0x80000*(bank)]);
+        memory_set_bankptr(space->machine, 2,&ROM1[0x80000*(bank)]);
     }
 }
 #endif
@@ -322,8 +322,8 @@ ROM_END
 static DRIVER_INIT (ttchamp)
 {
 	UINT8 *ROM1 = memory_region(machine, "user1");
-	memory_set_bankptr(1,&ROM1[0x120000]);
-	memory_set_bankptr(2,&ROM1[0x180000]);
+	memory_set_bankptr(machine, 1,&ROM1[0x120000]);
+	memory_set_bankptr(machine, 2,&ROM1[0x180000]);
 }
 
 GAME( 199?, ttchamp, 0,        ttchamp, ttchamp, ttchamp, ROT0,  "Gamart?", "Table Tennis Champions (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND )

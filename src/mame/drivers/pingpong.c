@@ -54,7 +54,7 @@ static WRITE8_HANDLER( cashquiz_question_bank_low_w )
 		int bank = data & 7;
 		int bankaddr = question_addr_high | ((data - 0x60) * 0x100);
 		UINT8 *questions = memory_region(space->machine, "user1") + bankaddr;
-		memory_set_bankptr(bank + 1,questions);
+		memory_set_bankptr(space->machine, bank + 1,questions);
 
 	}
 }
@@ -608,7 +608,7 @@ static DRIVER_INIT( cashquiz )
 
 	// setup default banks
 	for(i = 0; i < 8; i++)
-		memory_set_bankptr( i+1, memory_region(machine, "user1") + 0x100*i );
+		memory_set_bankptr(machine,  i+1, memory_region(machine, "user1") + 0x100*i );
 }
 
 

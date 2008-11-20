@@ -92,7 +92,7 @@ static MACHINE_RESET( pbillrd )
 
 static WRITE8_HANDLER( pbillrd_bankswitch_w )
 {
-	memory_set_bank(1, data & 1);
+	memory_set_bank(space->machine, 1, data & 1);
 }
 
 static WRITE8_HANDLER( nmi_enable_w )

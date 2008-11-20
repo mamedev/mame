@@ -366,7 +366,7 @@ static WRITE8_HANDLER( reikaids_upd7807_portc_w )
 //  logerror("%04x: port C wr %02x (STATUS %d DATA %d)\n",cpu_get_pc(space->cpu),data,BIT(data,2),BIT(data,6));
 
 
-	memory_set_bankptr(2,memory_region(space->machine, "audio") + 0x10000 * (data & 0x03));
+	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audio") + 0x10000 * (data & 0x03));
 
 	coin_counter_w(0,~data & 0x80);
 
@@ -526,7 +526,7 @@ static WRITE8_HANDLER( pteacher_upd7807_portc_w )
 
 //  logerror("%04x: port C wr %02x\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bankptr(2,memory_region(space->machine, "audio") + 0x10000 * ((data & 0x0c) >> 2));
+	memory_set_bankptr(space->machine, 2,memory_region(space->machine, "audio") + 0x10000 * ((data & 0x0c) >> 2));
 
 	coin_counter_w(0,~data & 0x80);
 
@@ -556,11 +556,11 @@ static WRITE8_HANDLER( bankswitch_w )
 	/* last bank is fixed */
 	if (offs < len - 0x4000)
 	{
-		memory_set_bankptr(1, &rom[offs + 0x10000]);
+		memory_set_bankptr(space->machine, 1, &rom[offs + 0x10000]);
 	}
 	else
 	{
-		memory_set_bankptr(1, &rom[0xc000]);
+		memory_set_bankptr(space->machine, 1, &rom[0xc000]);
 	}
 }
 

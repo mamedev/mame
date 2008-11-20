@@ -249,9 +249,9 @@ void taito_f3_soundsystem_reset(running_machine *machine)
 {
 	/* Sound cpu program loads to 0xc00000 so we use a bank */
 	UINT16 *ROM = (UINT16 *)memory_region(machine, "audio");
-	memory_set_bankptr(1,&ROM[0x80000]);
-	memory_set_bankptr(2,&ROM[0x90000]);
-	memory_set_bankptr(3,&ROM[0xa0000]);
+	memory_set_bankptr(machine, 1,&ROM[0x80000]);
+	memory_set_bankptr(machine, 2,&ROM[0x90000]);
+	memory_set_bankptr(machine, 3,&ROM[0xa0000]);
 
 	sound_ram[0]=ROM[0x80000]; /* Stack and Reset vectors */
 	sound_ram[1]=ROM[0x80001];

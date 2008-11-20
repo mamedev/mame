@@ -174,7 +174,7 @@ static WRITE8_HANDLER( fax_bank_select_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "main");
 
-	memory_set_bankptr(1, &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
+	memory_set_bankptr(space->machine, 1, &RAM[0x10000 + (0x2000 * (data & 0x1f))]);
 	if ((data & 0x1f) > 0x17)
 		logerror("Banking to unpopulated ROM bank %02X!\n",data & 0x1f);
 }
@@ -1372,7 +1372,7 @@ static DRIVER_INIT( phantoma )
 
 	/* the ROM is actually mapped high */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf800, 0xffff, 0, 0, SMH_BANK1);
-	memory_set_bankptr(1, memory_region(machine, "main") + 0xf800);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0xf800);
 }
 
 

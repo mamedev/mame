@@ -144,7 +144,7 @@ static UINT8 sound_curbank;
 
 static void sound_reset_bank(running_machine *machine)
 {
-	memory_set_bankptr(4, memory_region(machine, "audio") + 0x10000 + (sound_curbank & 0x07) * 0x4000);
+	memory_set_bankptr(machine, 4, memory_region(machine, "audio") + 0x10000 + (sound_curbank & 0x07) * 0x4000);
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )

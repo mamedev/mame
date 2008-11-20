@@ -504,7 +504,7 @@ static DRIVER_INIT( starwars )
 
 	/* initialize banking */
 	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x6000, 0x10000 - 0x6000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 
@@ -535,9 +535,9 @@ static DRIVER_INIT( esb )
 
 	/* initialize banking */
 	memory_configure_bank(machine, 1, 0, 2, rom + 0x6000, 0x10000 - 0x6000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 	memory_configure_bank(machine, 2, 0, 2, rom + 0xa000, 0x1c000 - 0xa000);
-	memory_set_bank(2, 0);
+	memory_set_bank(machine, 2, 0);
 
 	/* additional globals for state saving */
 	state_save_register_global(slapstic_current_bank);

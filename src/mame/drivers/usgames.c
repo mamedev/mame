@@ -46,7 +46,7 @@ static WRITE8_HANDLER( usgames_rombank_w )
 //  logerror ("BANK WRITE? -%02x-\n",data);
 //popmessage("%02x",data);
 
-	memory_set_bankptr( 1,&RAM[ 0x10000 + 0x4000 * data] );
+	memory_set_bankptr(space->machine,  1,&RAM[ 0x10000 + 0x4000 * data] );
 }
 
 static WRITE8_HANDLER( lamps1_w )

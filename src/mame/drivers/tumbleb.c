@@ -829,7 +829,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER(jumppop_z80_bank_w)
 {
-	memory_set_bankptr(1, memory_region(space->machine, "audio") + 0x10000 + (0x4000 * data));
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "audio") + 0x10000 + (0x4000 * data));
 }
 
 static ADDRESS_MAP_START( jumppop_sound_map, ADDRESS_SPACE_PROGRAM, 8 )

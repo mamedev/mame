@@ -80,7 +80,7 @@ static WRITE8_HANDLER( bladestl_bankswitch_w )
 
 	/* bits 5-6 = bank number */
 	bankaddress = 0x10000 + ((data & 0x60) >> 5) * 0x2000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bit 7 = select sprite bank */
 	bladestl_spritebank = (data & 0x80) << 3;

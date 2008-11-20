@@ -284,7 +284,7 @@ void williams_cvsd_init(int pianum)
 		offs_t offset = 0x8000 * ((bank >> 2) & 3) + 0x20000 * (bank & 3);
 		memory_configure_bank(Machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bank(5, 0);
+	memory_set_bank(sound_cpu->machine, 5, 0);
 
 	/* reset the IRQ state */
 	pia_set_input_ca1(williams_pianum, 1);
@@ -316,7 +316,7 @@ void williams_narc_init(void)
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
 		memory_configure_bank(Machine, 5, bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bankptr(6, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	memory_set_bankptr(sound_cpu->machine, 6, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* configure slave CPU banks */
 	ROM = memory_region(Machine, "narc2");
@@ -330,7 +330,7 @@ void williams_narc_init(void)
 		offs_t offset = 0x8000 * (bank & 1) + 0x10000 * ((bank >> 3) & 1) + 0x20000 * ((bank >> 1) & 3);
 		memory_configure_bank(Machine, 7, bank, 1, &ROM[0x10000 + offset], 0);
 	}
-	memory_set_bankptr(8, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
+	memory_set_bankptr(sound_cpu->machine, 8, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* register for save states */
 	state_save_register_global(williams_sound_int_state);
@@ -350,7 +350,7 @@ void williams_adpcm_init(void)
 	/* configure banks */
 	ROM = memory_region(Machine, "adpcm");
 	memory_configure_bank(Machine, 5, 0, 8, &ROM[0x10000], 0x8000);
-	memory_set_bankptr(6, &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
+	memory_set_bankptr(sound_cpu->machine, 6, &ROM[0x10000 + 0x4000 + 7 * 0x8000]);
 
 	/* expand ADPCM data */
 	/* it is assumed that U12 is loaded @ 0x00000 and U13 is loaded @ 0x40000 */
@@ -440,7 +440,7 @@ static void adpcm_ym2151_irq(running_machine *machine, int state)
 
 static WRITE8_HANDLER( cvsd_bank_select_w )
 {
-	memory_set_bank(5, data & 0x0f);
+	memory_set_bank(space->machine, 5, data & 0x0f);
 }
 
 
@@ -506,13 +506,13 @@ void williams_cvsd_reset_w(int state)
 
 static WRITE8_HANDLER( narc_master_bank_select_w )
 {
-	memory_set_bank(5, data & 0x0f);
+	memory_set_bank(space->machine, 5, data & 0x0f);
 }
 
 
 static WRITE8_HANDLER( narc_slave_bank_select_w )
 {
-	memory_set_bank(7, data & 0x0f);
+	memory_set_bank(space->machine, 7, data & 0x0f);
 }
 
 
@@ -625,7 +625,7 @@ int williams_narc_talkback_r(void)
 
 static WRITE8_HANDLER( adpcm_bank_select_w )
 {
-	memory_set_bank(5, data & 0x07);
+	memory_set_bank(space->machine, 5, data & 0x07);
 }
 
 

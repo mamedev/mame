@@ -399,7 +399,7 @@ static WRITE8_HANDLER( sngkace_sound_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "audio");
 	int bank = data & 3;
-	memory_set_bankptr(1, &RAM[bank * 0x8000 + 0x10000]);
+	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x8000 + 0x10000]);
 }
 
 static ADDRESS_MAP_START( sngkace_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -437,7 +437,7 @@ static WRITE8_HANDLER( gunbird_sound_bankswitch_w )
 	/* The banked rom is seen at 8200-ffff, so the last 0x200 bytes
        of the rom not reachable. */
 
-	memory_set_bankptr(1, &RAM[bank * 0x8000 + 0x10000 + 0x200]);
+	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x8000 + 0x10000 + 0x200]);
 }
 
 static ADDRESS_MAP_START( gunbird_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )

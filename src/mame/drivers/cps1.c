@@ -282,7 +282,7 @@ static WRITE8_HANDLER( cps1_snd_bankswitch_w )
 	int bankaddr;
 
 	bankaddr = ((data & 1) * 0x4000);
-	memory_set_bankptr(1,&RAM[0x10000 + bankaddr]);
+	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bankaddr]);
 }
 
 static WRITE8_HANDLER( cps1_oki_pin7_w )
@@ -395,7 +395,7 @@ static WRITE8_HANDLER( qsound_banksw_w )
 		logerror("WARNING: Q sound bank overflow (%02x)\n", data);
 		bankaddress=0x10000;
 	}
-	memory_set_bankptr(1, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);
 }
 
 

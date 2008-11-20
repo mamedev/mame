@@ -228,7 +228,7 @@ static WRITE8_HANDLER ( mcatadv_sound_bw_w )
 {
 	UINT8 *rom = memory_region(space->machine, "sound") + 0x10000;
 
-	memory_set_bankptr(1,rom + data * 0x4000);
+	memory_set_bankptr(space->machine, 1,rom + data * 0x4000);
 }
 
 
@@ -520,7 +520,7 @@ static DRIVER_INIT( mcatadv )
 {
 	UINT8 *z80rom = memory_region(machine, "sound") + 0x10000;
 
-	memory_set_bankptr(1, z80rom + 0x4000);
+	memory_set_bankptr(machine, 1, z80rom + 0x4000);
 }
 
 

@@ -208,7 +208,7 @@ static WRITE8_HANDLER( bankswitch1_w )
 	/* with bankswitch1_ext_w() in wndrmomo */
 	if (memory_region(space->machine, "user1")) return;
 
-	memory_set_bankptr(1,base + ((data & 0x03) * 0x2000));
+	memory_set_bankptr(space->machine, 1,base + ((data & 0x03) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch1_ext_w )
@@ -217,14 +217,14 @@ static WRITE8_HANDLER( bankswitch1_ext_w )
 
 	if (base == 0) return;
 
-	memory_set_bankptr(1,base + ((data & 0x1f) * 0x2000));
+	memory_set_bankptr(space->machine, 1,base + ((data & 0x1f) * 0x2000));
 }
 
 static WRITE8_HANDLER( bankswitch2_w )
 {
 	UINT8 *base = memory_region(space->machine, "cpu2") + 0x10000;
 
-	memory_set_bankptr(2,base + ((data & 0x03) * 0x2000));
+	memory_set_bankptr(space->machine, 2,base + ((data & 0x03) * 0x2000));
 }
 
 /* Stubs to pass the correct Dip Switch setup to the MCU */
@@ -346,7 +346,7 @@ static MACHINE_RESET( namco86 )
 {
 	UINT8 *base = memory_region(machine, "cpu1") + 0x10000;
 
-	memory_set_bankptr(1,base);
+	memory_set_bankptr(machine, 1,base);
 }
 
 

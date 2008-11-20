@@ -804,7 +804,7 @@ static INTERRUPT_GEN( taitof2_interrupt )
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( 2, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  2, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )
@@ -3706,7 +3706,7 @@ static MACHINE_START( f2 )
 static MACHINE_RESET( qcrayon )
 {
 	/* point to the extra ROM */
-	memory_set_bankptr(1,memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 1,memory_region(machine, "user1"));
 }
 
 

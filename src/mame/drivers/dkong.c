@@ -470,7 +470,7 @@ static MACHINE_RESET( strtheat )
 	/* The initial state of the counter is 0x08 */
 	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
 	state->decrypt_counter = 0x08;
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 static MACHINE_RESET( drakton )
@@ -483,7 +483,7 @@ static MACHINE_RESET( drakton )
 	/* The initial state of the counter is 0x09 */
 	memory_configure_bank(machine, 1, 0, 4, &ROM[0x10000], 0x4000);
 	state->decrypt_counter = 0x09;
-	memory_set_bank(1, 1);
+	memory_set_bank(machine, 1, 1);
 }
 
 
@@ -633,10 +633,10 @@ static READ8_HANDLER( epos_decrypt_rom )
 
 	switch(state->decrypt_counter)
 	{
-		case 0x08:	memory_set_bank(1, 0);		break;
-		case 0x09:	memory_set_bank(1, 1);		break;
-		case 0x0A:	memory_set_bank(1, 2);		break;
-		case 0x0B:	memory_set_bank(1, 3);		break;
+		case 0x08:	memory_set_bank(space->machine, 1, 0);		break;
+		case 0x09:	memory_set_bank(space->machine, 1, 1);		break;
+		case 0x0A:	memory_set_bank(space->machine, 1, 2);		break;
+		case 0x0B:	memory_set_bank(space->machine, 1, 3);		break;
 		default:
 			logerror("Invalid counter = %02X\n",state->decrypt_counter);
 			break;

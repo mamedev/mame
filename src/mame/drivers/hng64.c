@@ -1459,8 +1459,8 @@ static MACHINE_RESET(hyperneo)
 
 	/* Sound CPU */
 	UINT8 *RAM = (UINT8*)hng64_soundram;
-	memory_set_bankptr(1,&RAM[0x1e0000]);
-	memory_set_bankptr(2,&RAM[0x001000]); // where..
+	memory_set_bankptr(machine, 1,&RAM[0x1e0000]);
+	memory_set_bankptr(machine, 2,&RAM[0x001000]); // where..
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 

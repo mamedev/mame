@@ -191,7 +191,7 @@ static READ8_HANDLER( z80_input2_r )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bank(10, (data-1) & 0x03);
+	memory_set_bank(space->machine, 10, (data-1) & 0x03);
 }
 
 /***********************************************************

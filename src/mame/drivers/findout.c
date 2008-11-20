@@ -144,27 +144,27 @@ static READ8_HANDLER( catchall )
 
 static WRITE8_HANDLER( banksel_main_w )
 {
-	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x8000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x8000);
 }
 static WRITE8_HANDLER( banksel_1_w )
 {
-	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x10000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x10000);
 }
 static WRITE8_HANDLER( banksel_2_w )
 {
-	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x18000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x18000);
 }
 static WRITE8_HANDLER( banksel_3_w )
 {
-	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x20000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x20000);
 }
 static WRITE8_HANDLER( banksel_4_w )
 {
-	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x28000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x28000);
 }
 static WRITE8_HANDLER( banksel_5_w )
 {
-	memory_set_bankptr(1,memory_region(space->machine, "main") + 0x30000);
+	memory_set_bankptr(space->machine, 1,memory_region(space->machine, "main") + 0x30000);
 }
 
 

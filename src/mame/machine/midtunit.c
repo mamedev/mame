@@ -451,7 +451,7 @@ DRIVER_INIT( mktunit )
 
 	/* sound chip protection (hidden RAM) */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfb9c, 0xfbc6, 0, 0, SMH_BANK9, SMH_BANK9);
-	memory_set_bankptr(9, auto_malloc(0x80));
+	memory_set_bankptr(machine, 9, auto_malloc(0x80));
 }
 
 static void init_nbajam_common(running_machine *machine, int te_protection)
@@ -477,7 +477,7 @@ static void init_nbajam_common(running_machine *machine, int te_protection)
 		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfbaa, 0xfbd4, 0, 0, SMH_BANK9, SMH_BANK9);
 	else
 		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfbec, 0xfc16, 0, 0, SMH_BANK9, SMH_BANK9);
-	memory_set_bankptr(9, auto_malloc(0x80));
+	memory_set_bankptr(machine, 9, auto_malloc(0x80));
 }
 
 DRIVER_INIT( nbajam )
@@ -503,7 +503,7 @@ DRIVER_INIT( jdreddp )
 
 	/* sound chip protection (hidden RAM) */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0xfbcf, 0xfbf9, 0, 0, SMH_BANK7, SMH_BANK9);
-	memory_set_bankptr(9, auto_malloc(0x80));
+	memory_set_bankptr(machine, 9, auto_malloc(0x80));
 
 #if ENABLE_ALL_JDREDD_LEVELS
 	/* how about the final levels? */

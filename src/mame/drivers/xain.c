@@ -185,16 +185,16 @@ static WRITE8_HANDLER( xainCPUA_bankswitch_w )
 
 	xain_pri=data&0x7;
 
-	if (data & 0x08) {memory_set_bankptr(1,&RAM[0x10000]);}
-	else {memory_set_bankptr(1,&RAM[0x4000]);}
+	if (data & 0x08) {memory_set_bankptr(space->machine, 1,&RAM[0x10000]);}
+	else {memory_set_bankptr(space->machine, 1,&RAM[0x4000]);}
 }
 
 static WRITE8_HANDLER( xainCPUB_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "sub");
 
-	if (data & 0x01) {memory_set_bankptr(2,&RAM[0x10000]);}
-	else {memory_set_bankptr(2,&RAM[0x4000]);}
+	if (data & 0x01) {memory_set_bankptr(space->machine, 2,&RAM[0x10000]);}
+	else {memory_set_bankptr(space->machine, 2,&RAM[0x4000]);}
 }
 
 static WRITE8_HANDLER( xain_sound_command_w )

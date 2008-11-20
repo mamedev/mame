@@ -99,7 +99,7 @@ extern VIDEO_UPDATE( 1942 );
 
 static WRITE8_HANDLER( c1942_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x03);
+	memory_set_bank(space->machine, 1, data & 0x03);
 }
 
 

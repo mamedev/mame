@@ -123,7 +123,7 @@ static WRITE8_HANDLER( G_STATUS_W )
 	int bankaddress;
 	UINT8 *ROM = memory_region(space->machine, "main");
 	bankaddress = 0x10000 + (data & 0x03) * 0x10000;
-	memory_set_bankptr(1,&ROM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&ROM[bankaddress]);
 
         cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, (data&0x80) ? ASSERT_LINE : CLEAR_LINE);
         cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, (data&0x80) ? ASSERT_LINE : CLEAR_LINE);

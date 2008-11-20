@@ -7305,7 +7305,7 @@ static DRIVER_INIT( mslug5 )
 static TIMER_CALLBACK( ms5pcb_bios_timer_callback )
 {
 	int harddip3 = input_port_read(machine, "HARDDIP") & 1;
-	memory_set_bankptr(NEOGEO_BANK_BIOS, memory_region(machine, "mainbios")+0x20000+harddip3*0x20000);
+	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, memory_region(machine, "mainbios")+0x20000+harddip3*0x20000);
 }
 
 static DRIVER_INIT( ms5pcb )
@@ -7339,7 +7339,7 @@ static DRIVER_INIT( ms5plus )
 static TIMER_CALLBACK( svcpcb_bios_timer_callback )
 {
 	int harddip3 = input_port_read(machine, "HARDDIP") & 1;
-	memory_set_bankptr(NEOGEO_BANK_BIOS, memory_region(machine, "mainbios")+0x20000+harddip3*0x20000);
+	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, memory_region(machine, "mainbios")+0x20000+harddip3*0x20000);
 }
 
 static DRIVER_INIT( svcpcb )
@@ -7527,7 +7527,7 @@ static DRIVER_INIT( jockeygp )
 	state_save_register_global_pointer(extra_ram, 0x2000 / 2);
 
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, SMH_BANK8, SMH_BANK8);
-	memory_set_bankptr(NEOGEO_BANK_EXTRA_RAM, extra_ram);
+	memory_set_bankptr(machine, NEOGEO_BANK_EXTRA_RAM, extra_ram);
 
 //  memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x280000, 0x280001, 0, 0, input_port_read_handler16(machine->portconfig, "IN5") );
 //  memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2c0000, 0x2c0001, 0, 0, input_port_read_handler16(machine->portconfig, "IN6") );
@@ -7544,7 +7544,7 @@ static DRIVER_INIT( vliner )
 	state_save_register_global_pointer(extra_ram, 0x2000 / 2);
 
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, SMH_BANK8, SMH_BANK8);
-	memory_set_bankptr(NEOGEO_BANK_EXTRA_RAM, extra_ram);
+	memory_set_bankptr(machine, NEOGEO_BANK_EXTRA_RAM, extra_ram);
 
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x280000, 0x280001, 0, 0, input_port_read_handler16(machine->portconfig, "IN5") );
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2c0000, 0x2c0001, 0, 0, input_port_read_handler16(machine->portconfig, "IN6") );

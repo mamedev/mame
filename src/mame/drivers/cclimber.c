@@ -241,7 +241,7 @@ static WRITE8_HANDLER(toprollr_rombank_w)
 	toprollr_rombank |= (data & 1) << offset;
 
 	if (toprollr_rombank < 3)
-		memory_set_bank(1, toprollr_rombank);
+		memory_set_bank(space->machine, 1, toprollr_rombank);
 }
 
 

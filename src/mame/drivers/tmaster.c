@@ -573,13 +573,13 @@ static WRITE16_HANDLER( galgames_cart_clock_w )
 		// ROM/RAM banking
 		if ((data & 0xf7) == 0x05)
 		{
-			memory_set_bank(1, 1);	// ram
-			memory_set_bank(3, 0);	// rom
+			memory_set_bank(space->machine, 1, 1);	// ram
+			memory_set_bank(space->machine, 3, 0);	// rom
 			logerror("%06x: romram bank = %04x\n", cpu_get_pc(space->cpu), data);
 		}
 		else
 		{
-			memory_set_bank(1, 0);	// rom
+			memory_set_bank(space->machine, 1, 0);	// rom
 			logerror("%06x: unknown romram bank = %04x\n", cpu_get_pc(space->cpu), data);
 		}
 	}
@@ -826,11 +826,11 @@ static INTERRUPT_GEN( galgames_interrupt )
 
 static MACHINE_RESET( galgames )
 {
-	memory_set_bank(1, 0);	// rom
-	memory_set_bank(3, 1);	// ram
+	memory_set_bank(machine, 1, 0);	// rom
+	memory_set_bank(machine, 3, 1);	// ram
 
-	memory_set_bank(2, 0);	// ram
-	memory_set_bank(4, 0);	// ram
+	memory_set_bank(machine, 2, 0);	// ram
+	memory_set_bank(machine, 4, 0);	// ram
 }
 
 static MACHINE_DRIVER_START( galgames )

@@ -797,7 +797,7 @@ static WRITE32_HANDLER( comm_rombank_w )
 	int bank = data >> 24;
 	UINT8 *usr3 = memory_region(space->machine, "user3");
 	if (usr3 != NULL)
-		memory_set_bank(1, bank & 0x7f);
+		memory_set_bank(space->machine, 1, bank & 0x7f);
 }
 
 static READ32_HANDLER( comm0_unk_r )
@@ -1029,13 +1029,13 @@ static MACHINE_RESET( hornet )
 	if (usr3 != NULL)
 	{
 		memory_configure_bank(machine, 1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
-		memory_set_bank(1, 0);
+		memory_set_bank(machine, 1, 0);
 	}
 
 	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		memory_set_bankptr(5, usr5);
+		memory_set_bankptr(machine, 5, usr5);
 }
 
 static NVRAM_HANDLER( hornet )
@@ -1102,13 +1102,13 @@ static MACHINE_RESET( hornet_2board )
 	if (usr3 != NULL)
 	{
 		memory_configure_bank(machine, 1, 0, memory_region_length(machine, "user3") / 0x40000, usr3, 0x40000);
-		memory_set_bank(1, 0);
+		memory_set_bank(machine, 1, 0);
 	}
 	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
 
 	if (usr5)
-		memory_set_bankptr(5, usr5);
+		memory_set_bankptr(machine, 5, usr5);
 }
 
 static MACHINE_DRIVER_START( hornet_2board )

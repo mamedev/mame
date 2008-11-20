@@ -57,7 +57,7 @@ static WRITE8_HANDLER( fastlane_bankswitch_w )
 
 	/* bits 2 & 3 = bank number */
 	bankaddress = 0x10000 + ((data & 0x0c) >> 2) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bit 4: bank # for the 007232 (chip 2) */
 	k007232_set_bank(1,0 + ((data & 0x10) >> 4),2 + ((data & 0x10) >> 4));

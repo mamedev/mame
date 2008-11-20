@@ -95,7 +95,7 @@ static WRITE8_HANDLER(speedspn_banked_rom_change)
 			break;
 	}
 
-	memory_set_bankptr(1,&rom[addr + 0x8000]);
+	memory_set_bankptr(space->machine, 1,&rom[addr + 0x8000]);
 }
 
 /*** SOUND RELATED ***********************************************************/

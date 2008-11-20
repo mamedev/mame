@@ -377,7 +377,7 @@ send data to them, although obviously there's no response. */
 		memory_configure_bank(machine, 1, 0, 1, &rom[0x10000], 0);
 		memory_configure_bank(machine, 1, 1, 3, &rom[0x02000], 0x02000);
 
-		memory_set_bank(1,3);
+		memory_set_bank(machine, 1,3);
 	}
 }
 
@@ -492,7 +492,7 @@ static WRITE8_HANDLER( watchdog_w )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(1,data & 0x03);
+	memory_set_bank(space->machine, 1,data & 0x03);
 }
 
 ///////////////////////////////////////////////////////////////////////////

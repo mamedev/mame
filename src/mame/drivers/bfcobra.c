@@ -976,15 +976,15 @@ INLINE void z80_bank(running_machine *machine, int num, int data)
 
 		UINT32 offset = ((bank[0] >> 1) * 0x20000) + offs_table[bank[0] & 0x1][data];
 
-		memory_set_bankptr(num, memory_region(machine, "user1") + offset);
+		memory_set_bankptr(machine, num, memory_region(machine, "user1") + offset);
 	}
 	else if (data < 0x10)
 	{
-		memory_set_bankptr(num, &video_ram[(data - 0x08) * 0x4000]);
+		memory_set_bankptr(machine, num, &video_ram[(data - 0x08) * 0x4000]);
 	}
 	else
 	{
-		memory_set_bankptr(num, &work_ram[(data - 0x10) * 0x4000]);
+		memory_set_bankptr(machine, num, &work_ram[(data - 0x10) * 0x4000]);
 	}
 }
 
@@ -1672,7 +1672,7 @@ static DRIVER_INIT( bfcobra )
 	bank[3] = 0;
 
 	/* Fixed 16kB ROM region */
-	memory_set_bankptr(4, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 4, memory_region(machine, "user1"));
 
 	/* Configure the ACIAs */
 	acia6850_config(0, &z80_acia_if);

@@ -1004,7 +1004,7 @@ ROM_END
 
 static DRIVER_INIT( searchar )
 {
-	memory_set_bankptr(1, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 1, memory_region(machine, "user1"));
 }
 
 /******************************************************************************/

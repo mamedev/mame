@@ -213,7 +213,7 @@ WRITE16_HANDLER(genesis_ctrl_w)
 		else
 		{
 			z80running = 1;
-//          memory_set_bankptr(1, &genesis_z80_ram[0]);
+//          memory_set_bankptr(space->machine, 1, &genesis_z80_ram[0]);
 
 			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_HALT, CLEAR_LINE);
 			/* logerror("z80 started, BusReq ends\n"); */

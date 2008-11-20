@@ -1278,7 +1278,7 @@ static DRIVER_INIT( zookeep )
 	/* configure the banking */
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "video") + 0xa000, 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "video") + 0x10000, 0);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 

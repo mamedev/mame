@@ -551,7 +551,7 @@ static WRITE16_HANDLER( wwally_custom_io_w )
 
 static WRITE8_HANDLER( soundbank_w )
 {
-	memory_set_bankptr(1, memory_region(space->machine, "sound") + 0x10000 + 0x2000 * data);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "sound") + 0x10000 + 0x2000 * data);
 }
 
 

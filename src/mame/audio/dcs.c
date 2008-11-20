@@ -786,7 +786,7 @@ static TIMER_CALLBACK( dcs_reset )
 		/* rev 1: just reset the bank to 0 */
 		case 1:
 			dcs.sounddata_bank = 0;
-			memory_set_bank(20, 0);
+			memory_set_bank(machine, 20, 0);
 			break;
 
 		/* rev 2: reset the SDRC ASIC */
@@ -1046,7 +1046,7 @@ static WRITE16_HANDLER( dcs_dataram_w )
 static WRITE16_HANDLER( dcs_data_bank_select_w )
 {
 	dcs.sounddata_bank = data & 0x7ff;
-	memory_set_bank(20, dcs.sounddata_bank % dcs.sounddata_banks);
+	memory_set_bank(space->machine, 20, dcs.sounddata_bank % dcs.sounddata_banks);
 
 	/* bit 11 = sound board led */
 #if 0
@@ -1073,15 +1073,15 @@ INLINE void sdrc_update_bank_pointers(void)
 		{
 			/* ROM-based; use the memory page to select from ROM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(25, &dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
+				memory_set_bankptr(Machine, 25, &dcs.sounddata[(SDRC_EPM_PG * pagesize) % dcs.sounddata_words]);
 		}
 		else
 		{
 			/* RAM-based; use the ROM page to select from ROM, and the memory page to select from RAM */
 			if (SDRC_ROM_MS == 1 && SDRC_ROM_ST != 3)
-				memory_set_bankptr(25, &dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
+				memory_set_bankptr(Machine, 25, &dcs.bootrom[(SDRC_ROM_PG * 4096 /*pagesize*/) % dcs.bootrom_words]);
 			if (SDRC_DM_ST != 0)
-				memory_set_bankptr(26, &dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
+				memory_set_bankptr(Machine, 26, &dcs.sounddata[(SDRC_DM_PG * 1024) % dcs.sounddata_words]);
 		}
 	}
 }
@@ -1101,7 +1101,7 @@ static void sdrc_remap_memory(running_machine *machine)
 	{
 		/* first start with a clean program map */
 		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_PROGRAM), 0x0800, 0x3fff, 0, 0, SMH_BANK21, SMH_BANK21);
-		memory_set_bankptr(21, dcs_sram + 0x4800);
+		memory_set_bankptr(machine, 21, dcs_sram + 0x4800);
 
 		/* set up the data map based on the SRAM banking */
 		/* map 0: ram from 0800-37ff */
@@ -1110,9 +1110,9 @@ static void sdrc_remap_memory(running_machine *machine)
 			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x0800, 0x17ff, 0, 0, SMH_BANK22, SMH_BANK22);
 			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
 			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x2800, 0x37ff, 0, 0, SMH_BANK24,  SMH_BANK24);
-			memory_set_bankptr(22, dcs_sram + 0x0000);
-			memory_set_bankptr(23, dcs_sram + 0x1000);
-			memory_set_bankptr(24, dcs_sram + 0x2000);
+			memory_set_bankptr(machine, 22, dcs_sram + 0x0000);
+			memory_set_bankptr(machine, 23, dcs_sram + 0x1000);
+			memory_set_bankptr(machine, 24, dcs_sram + 0x2000);
 		}
 
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
@@ -1121,8 +1121,8 @@ static void sdrc_remap_memory(running_machine *machine)
 			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x0800, 0x17ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
 			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x2800, 0x37ff, 0, 0, SMH_BANK24, SMH_BANK24);
-			memory_set_bankptr(23, dcs_sram + 0x3000);
-			memory_set_bankptr(24, dcs_sram + 0x2000);
+			memory_set_bankptr(machine, 23, dcs_sram + 0x3000);
+			memory_set_bankptr(machine, 24, dcs_sram + 0x2000);
 		}
 	}
 
@@ -1326,7 +1326,7 @@ static WRITE16_HANDLER( dsio_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bank(20, DSIO_DM_PG % dcs.sounddata_banks);
+			memory_set_bank(space->machine, 20, DSIO_DM_PG % dcs.sounddata_banks);
 			break;
 	}
 }
@@ -1386,7 +1386,7 @@ static WRITE16_HANDLER( denver_w )
 		/* offset 2 controls RAM pages */
 		case 2:
 			dsio.reg[2] = data;
-			memory_set_bank(20, DENV_DM_PG % dcs.sounddata_bank);
+			memory_set_bank(space->machine, 20, DENV_DM_PG % dcs.sounddata_bank);
 			break;
 
 		/* offset 3 controls FIFO reset */

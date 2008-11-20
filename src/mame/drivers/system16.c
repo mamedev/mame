@@ -374,7 +374,7 @@ static WRITE8_HANDLER( upd7759_bank_w ) //*
 
 	upd7759_reset_w(0, data & 0x40);
 	offs = 0x10000 + (data * 0x4000) % size;
-	memory_set_bankptr(1, memory_region(space->machine, "sound") + offs);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "sound") + offs);
 }
 
 

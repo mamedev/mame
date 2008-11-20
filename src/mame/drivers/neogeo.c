@@ -605,23 +605,23 @@ static CUSTOM_INPUT( get_audio_result )
  *
  *************************************/
 
-static void _set_main_cpu_vector_table_source(void)
+static void _set_main_cpu_vector_table_source(running_machine *machine)
 {
-	memory_set_bank(NEOGEO_BANK_VECTORS, main_cpu_vector_table_source);
+	memory_set_bank(machine, NEOGEO_BANK_VECTORS, main_cpu_vector_table_source);
 }
 
 
-static void set_main_cpu_vector_table_source(UINT8 data)
+static void set_main_cpu_vector_table_source(running_machine *machine, UINT8 data)
 {
 	main_cpu_vector_table_source = data;
 
-	_set_main_cpu_vector_table_source();
+	_set_main_cpu_vector_table_source(machine);
 }
 
 
 static void _set_main_cpu_bank_address(running_machine *machine)
 {
-	memory_set_bankptr(NEOGEO_BANK_CARTRIDGE, &memory_region(machine, "main")[main_cpu_bank_address]);
+	memory_set_bankptr(machine, NEOGEO_BANK_CARTRIDGE, &memory_region(machine, "main")[main_cpu_bank_address]);
 }
 
 
@@ -678,12 +678,12 @@ static void main_cpu_banking_init(running_machine *machine)
  *
  *************************************/
 
-static void set_audio_cpu_banking(void)
+static void set_audio_cpu_banking(running_machine *machine)
 {
 	int region;
 
 	for (region = 0; region < 4; region++)
-		memory_set_bank(NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, audio_cpu_banks[region]);
+		memory_set_bank(machine, NEOGEO_BANK_AUDIO_CPU_CART_BANK + region, audio_cpu_banks[region]);
 }
 
 
@@ -693,7 +693,7 @@ static void audio_cpu_bank_select(running_machine *machine, int region, UINT8 ba
 
 	audio_cpu_banks[region] = bank;
 
-	set_audio_cpu_banking();
+	set_audio_cpu_banking(machine);
 }
 
 
@@ -734,7 +734,7 @@ static void _set_audio_cpu_rom_source(running_machine *machine)
 /*  if (!memory_region(machine, "audiobios"))   */
 		audio_cpu_rom_source = 1;
 
-	memory_set_bank(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, audio_cpu_rom_source);
+	memory_set_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, audio_cpu_rom_source);
 
 	/* reset CPU if the source changed -- this is a guess */
 	if (audio_cpu_rom_source != audio_cpu_rom_source_last)
@@ -788,7 +788,7 @@ static void audio_cpu_banking_init(running_machine *machine)
 	audio_cpu_banks[2] = 0x06;
 	audio_cpu_banks[3] = 0x02;
 
-	set_audio_cpu_banking();
+	set_audio_cpu_banking(machine);
 
 	audio_cpu_rom_source_last = 0;
 	set_audio_cpu_rom_source(machine, 0);
@@ -812,7 +812,7 @@ static WRITE16_HANDLER( system_control_w )
 		{
 		default:
 		case 0x00: neogeo_set_screen_dark(space->machine, bit); break;
-		case 0x01: set_main_cpu_vector_table_source(bit);
+		case 0x01: set_main_cpu_vector_table_source(space->machine, bit);
 				   set_audio_cpu_rom_source(space->machine, bit); /* this is a guess */
 				   break;
 		case 0x05: neogeo_set_fixed_layer_source(bit); break;
@@ -941,8 +941,8 @@ static void set_output_data(UINT8 data)
 static STATE_POSTLOAD( neogeo_postload )
 {
 	_set_main_cpu_bank_address(machine);
-	_set_main_cpu_vector_table_source();
-	set_audio_cpu_banking();
+	_set_main_cpu_vector_table_source(machine);
+	set_audio_cpu_banking(machine);
 	_set_audio_cpu_rom_source(machine);
 	set_outputs();
 }
@@ -950,7 +950,7 @@ static STATE_POSTLOAD( neogeo_postload )
 static MACHINE_START( neogeo )
 {
 	/* set the BIOS bank */
-	memory_set_bankptr(NEOGEO_BANK_BIOS, memory_region(machine, "mainbios"));
+	memory_set_bankptr(machine, NEOGEO_BANK_BIOS, memory_region(machine, "mainbios"));
 
 	/* set the initial main CPU bank */
 	main_cpu_banking_init(machine);

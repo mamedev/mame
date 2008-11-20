@@ -772,7 +772,7 @@ static WRITE8_HANDLER( sound_bank_w )
 	UINT8 *RAM = memory_region(space->machine, "audio");
 
 	bankaddress = 0x10000 + (data) * 0x4000;
-	memory_set_bankptr(7,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 7,&RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3178,7 +3178,7 @@ static DRIVER_INIT( btlfildb )
 static DRIVER_INIT( skysoldr )
 {
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40008, 0x40009, 0, 0, skysoldr_cycle_r);
-	memory_set_bankptr(8, (memory_region(machine, "user1"))+0x40000);
+	memory_set_bankptr(machine, 8, (memory_region(machine, "user1"))+0x40000);
 	invert_controls=0;
 	microcontroller_id=0;
 	coin_id=0x22|(0x22<<8);
@@ -3193,7 +3193,7 @@ static DRIVER_INIT( goldmedl )
 
 static DRIVER_INIT( goldmeda )
 {
-	memory_set_bankptr(8, memory_region(machine, "main") + 0x20000);
+	memory_set_bankptr(machine, 8, memory_region(machine, "main") + 0x20000);
 	invert_controls=0;
 	microcontroller_id=0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	coin_id=0x23|(0x24<<8);
@@ -3218,7 +3218,7 @@ static DRIVER_INIT( skyadvnu )
 static DRIVER_INIT( gangwars )
 {
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwars_cycle_r);
-	memory_set_bankptr(8, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 8, memory_region(machine, "user1"));
 	invert_controls=0;
 	microcontroller_id=0x8512;
 	coin_id=0x23|(0x24<<8);
@@ -3227,7 +3227,7 @@ static DRIVER_INIT( gangwars )
 static DRIVER_INIT( gangwarb )
 {
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x40206, 0x40207, 0, 0, gangwarb_cycle_r);
-	memory_set_bankptr(8, memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 8, memory_region(machine, "user1"));
 	invert_controls=0;
 	microcontroller_id=0x8512;
 	coin_id=0x23|(0x24<<8);

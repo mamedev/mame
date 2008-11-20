@@ -153,7 +153,7 @@ static MACHINE_RESET( ninjakd2 )
 {
 	/* initialize main Z80 bank */
 	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 static void robokid_init_banks(running_machine *machine)
@@ -161,7 +161,7 @@ static void robokid_init_banks(running_machine *machine)
 	/* initialize main Z80 bank */
 	memory_configure_bank(machine, 1, 0,  2, memory_region(machine, "main"), 0x4000);
 	memory_configure_bank(machine, 1, 2, 14, memory_region(machine, "main") + 0x10000, 0x4000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 static MACHINE_RESET( robokid )
@@ -179,12 +179,12 @@ static MACHINE_RESET( omegaf )
 
 static WRITE8_HANDLER( ninjakd2_bankselect_w )
 {
-	memory_set_bank(1, data & 0x7);
+	memory_set_bank(space->machine, 1, data & 0x7);
 }
 
 static WRITE8_HANDLER( robokid_bankselect_w )
 {
-	memory_set_bank(1, data & 0xf);
+	memory_set_bank(space->machine, 1, data & 0xf);
 }
 
 

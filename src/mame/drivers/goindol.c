@@ -41,7 +41,7 @@ static WRITE8_HANDLER( goindol_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "main");
 
 	bankaddress = 0x10000 + ((data & 3) * 0x4000);
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	if (goindol_char_bank != ((data & 0x10) >> 4))
 	{

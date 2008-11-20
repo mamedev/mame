@@ -32,7 +32,7 @@ static WRITE8_HANDLER( bank_sel_w )
 {
 	UINT8 *BANKROM = memory_region(space->machine, "main");
 	int bank = ((data & 0x80)) >> 7 | ((data & 0x40) >> 5);
-	memory_set_bankptr(1, &BANKROM[0x10000+bank*0x4000]);
+	memory_set_bankptr(space->machine, 1, &BANKROM[0x10000+bank*0x4000]);
 
 	int_enable = data & 1;
 

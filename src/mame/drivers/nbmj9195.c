@@ -64,7 +64,7 @@ static WRITE8_HANDLER( nbmj9195_soundbank_w )
 {
 	UINT8 *SNDROM = memory_region(space->machine, "audio");
 
-	memory_set_bankptr(1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
+	memory_set_bankptr(space->machine, 1, &SNDROM[0x08000 + (0x8000 * (data & 0x03))]);
 }
 
 static READ8_HANDLER( nbmj9195_sound_r )

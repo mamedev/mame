@@ -1307,7 +1307,7 @@ static void expand_colourdata(running_machine *machine)
 static void pgm_basic_init(running_machine *machine)
 {
 	UINT8 *ROM = memory_region(machine, "main");
-	memory_set_bankptr(1,&ROM[0x100000]);
+	memory_set_bankptr(machine, 1,&ROM[0x100000]);
 
 	expand_32x32x5bpp(machine);
 	expand_colourdata(machine);

@@ -390,7 +390,7 @@ static void parodius_banking(int lines)
 
 	offs = 0x10000 + (((lines & 0x0f)^0x0f) * 0x4000);
 	if (offs >= 0x48000) offs -= 0x40000;
-	memory_set_bankptr( 1, &RAM[offs] );
+	memory_set_bankptr(Machine,  1, &RAM[offs] );
 }
 
 static MACHINE_RESET( parodius )
@@ -404,7 +404,7 @@ static MACHINE_RESET( parodius )
 	videobank = 0;
 
 	/* init the default bank */
-	memory_set_bankptr(1,&RAM[0x10000]);
+	memory_set_bankptr(machine, 1,&RAM[0x10000]);
 }
 
 

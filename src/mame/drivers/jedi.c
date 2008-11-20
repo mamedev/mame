@@ -194,9 +194,9 @@ static MACHINE_RESET( jedi )
 
 static WRITE8_HANDLER( rom_banksel_w )
 {
-	if (data & 0x01) memory_set_bank(1, 0);
-	if (data & 0x02) memory_set_bank(1, 1);
-	if (data & 0x04) memory_set_bank(1, 2);
+	if (data & 0x01) memory_set_bank(space->machine, 1, 0);
+	if (data & 0x02) memory_set_bank(space->machine, 1, 1);
+	if (data & 0x04) memory_set_bank(space->machine, 1, 2);
 }
 
 

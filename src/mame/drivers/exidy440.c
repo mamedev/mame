@@ -316,7 +316,7 @@ void exidy440_bank_select(running_machine *machine, UINT8 bank)
 
 	/* select the bank and update the bank pointer */
 	exidy440_bank = bank;
-	memory_set_bankptr(1, &memory_region(machine, "main")[0x10000 + exidy440_bank * 0x4000]);
+	memory_set_bankptr(machine, 1, &memory_region(machine, "main")[0x10000 + exidy440_bank * 0x4000]);
 }
 
 

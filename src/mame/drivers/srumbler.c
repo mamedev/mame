@@ -46,7 +46,7 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
 		int bank = ((prom1[i] & 0x03) << 4) | (prom2[i] & 0x0f);
 		/* bit 2 of prom1 selects ROM or RAM - not supported */
 
-		memory_set_bankptr(i+1,&ROM[bank*0x1000]);
+		memory_set_bankptr(space->machine, i+1,&ROM[bank*0x1000]);
 	}
 }
 

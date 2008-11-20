@@ -158,8 +158,8 @@ void cage_init(running_machine *machine, offs_t speedup)
 
 	cage_irqhandler = NULL;
 
-	memory_set_bankptr(10, memory_region(machine, "cageboot"));
-	memory_set_bankptr(11, memory_region(machine, "cage"));
+	memory_set_bankptr(machine, 10, memory_region(machine, "cageboot"));
+	memory_set_bankptr(machine, 11, memory_region(machine, "cage"));
 
 	cage_cpu = mame_find_cpu_index(machine, "cage");
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[cage_cpu]));

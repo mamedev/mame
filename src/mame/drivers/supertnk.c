@@ -126,7 +126,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_0_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(1, &memory_region(space->machine, "main")[bank_address]);
+	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "main")[bank_address]);
 }
 
 
@@ -138,7 +138,7 @@ static WRITE8_HANDLER( supertnk_bankswitch_1_w )
 
 	bank_address = 0x10000 + (supertnk_rom_bank * 0x1000);
 
-	memory_set_bankptr(1, &memory_region(space->machine, "main")[bank_address]);
+	memory_set_bankptr(space->machine, 1, &memory_region(space->machine, "main")[bank_address]);
 }
 
 

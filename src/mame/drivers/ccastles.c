@@ -284,7 +284,7 @@ static WRITE8_HANDLER( ccounter_w )
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(1, data & 1);
+	memory_set_bank(space->machine, 1, data & 1);
 }
 
 

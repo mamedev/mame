@@ -210,7 +210,7 @@ static void vendetta_video_banking( running_machine *machine, int select )
 	{
 		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), video_banking_base + 0x2000, video_banking_base + 0x2fff, 0, 0, SMH_BANK4, paletteram_xBBBBBGGGGGRRRRR_be_w );
 		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), video_banking_base + 0x0000, video_banking_base + 0x0fff, 0, 0, K053247_r, K053247_w );
-		memory_set_bankptr(4, paletteram);
+		memory_set_bankptr(machine, 4, paletteram);
 	}
 	else
 	{
@@ -784,7 +784,7 @@ static void vendetta_banking( int lines )
 		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(Machine->activecpu), lines );
 	}
 	else
-		memory_set_bankptr( 1, &RAM[ 0x10000 + ( lines * 0x2000 ) ] );
+		memory_set_bankptr(Machine,  1, &RAM[ 0x10000 + ( lines * 0x2000 ) ] );
 }
 
 static MACHINE_RESET( vendetta )
@@ -795,7 +795,7 @@ static MACHINE_RESET( vendetta )
 	irq_enabled = 0;
 
 	/* init banks */
-	memory_set_bankptr( 1, &memory_region(machine, "main")[0x10000] );
+	memory_set_bankptr(machine,  1, &memory_region(machine, "main")[0x10000] );
 	vendetta_video_banking( machine, 0 );
 }
 

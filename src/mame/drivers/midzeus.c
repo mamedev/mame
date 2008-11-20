@@ -285,7 +285,7 @@ static WRITE32_HANDLER( bitlatches_w )
 
 		/* ROM bank selection on Zeus 2 */
 		case 5:
-			memory_set_bank(1, bitlatch[offset] & 3);
+			memory_set_bank(space->machine, 1, bitlatch[offset] & 3);
 			break;
 
 		/* unknown purpose; crusnexo/thegrid write 1 at startup */

@@ -131,19 +131,19 @@ READ8_HANDLER( triplep_pap_r )
 
 
 
-static void cavelon_banksw(void)
+static void cavelon_banksw(running_machine *machine)
 {
 	/* any read/write access in the 0x8000-0xffff region causes a bank switch.
        Only the lower 0x2000 is switched but we switch the whole region
        to keep the CPU core happy at the boundaries */
 
 	cavelon_bank = !cavelon_bank;
-	memory_set_bank(1, cavelon_bank);
+	memory_set_bank(machine, 1, cavelon_bank);
 }
 
 static READ8_HANDLER( cavelon_banksw_r )
 {
-	cavelon_banksw();
+	cavelon_banksw(space->machine);
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
 		return ppi8255_r((device_config*)devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset - 0x0100);
@@ -155,7 +155,7 @@ static READ8_HANDLER( cavelon_banksw_r )
 
 static WRITE8_HANDLER( cavelon_banksw_w )
 {
-	cavelon_banksw();
+	cavelon_banksw(space->machine);
 
 	if      ((offset >= 0x0100) && (offset <= 0x0103))
 		ppi8255_w(devtag_get_device(space->machine, PPI8255, "ppi8255_0"), offset - 0x0100, data);
@@ -273,7 +273,7 @@ DRIVER_INIT( mariner )
 {
 	/* extra ROM */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x5800, 0x67ff, 0, 0, SMH_BANK1, SMH_UNMAP);
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x5800);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x5800);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x9008, 0x9008, 0, 0, mariner_protection_2_r);
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xb401, 0xb401, 0, 0, mariner_protection_1_r);
@@ -357,7 +357,7 @@ DRIVER_INIT( cavelon )
 	/* banked ROM */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x3fff, 0, 0, SMH_BANK1);
 	memory_configure_bank(machine, 1, 0, 2, &ROM[0x00000], 0x10000);
-	cavelon_banksw();
+	cavelon_banksw(machine);
 
 	/* A15 switches memory banks */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, cavelon_banksw_r, cavelon_banksw_w);

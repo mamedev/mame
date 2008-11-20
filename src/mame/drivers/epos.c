@@ -47,7 +47,7 @@ static WRITE8_HANDLER( dealer_decrypt_rom )
 
 //  logerror("PC %08x: ctr=%04x\n",cpu_get_pc(space->cpu),counter);
 
-	memory_set_bankptr(1, rom + 0x10000 * counter);
+	memory_set_bankptr(space->machine, 1, rom + 0x10000 * counter);
 
 	// is the 2nd bank changed by the counter or it always uses the 1st key?
 }
@@ -116,7 +116,7 @@ ADDRESS_MAP_END
 static WRITE8_DEVICE_HANDLER( write_prtc )
 {
 	UINT8 *rom = memory_region(device->machine, "main");
-	memory_set_bankptr(2, rom + 0x6000 + (0x1000 * (data & 1)));
+	memory_set_bankptr(device->machine, 2, rom + 0x6000 + (0x1000 * (data & 1)));
 }
 
 static const ppi8255_interface ppi8255_intf =
@@ -594,8 +594,8 @@ static MACHINE_RESET( dealer )
 {
 	UINT8 *rom = memory_region(machine, "main");
 	counter = 0;
-	memory_set_bankptr(1, rom);
-	memory_set_bankptr(2, rom + 0x6000);
+	memory_set_bankptr(machine, 1, rom);
+	memory_set_bankptr(machine, 2, rom + 0x6000);
 }
 
 static DRIVER_INIT( dealer )

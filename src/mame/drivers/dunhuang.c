@@ -374,7 +374,7 @@ static READ8_HANDLER( dunhuang_input_r )
 static WRITE8_HANDLER( dunhuang_rombank_w )
 {
 	UINT8 *rom = memory_region(space->machine, "main");
-	memory_set_bankptr( 1, rom + 0x10000 + 0x8000 * ((data >> 2) & 0x7) );
+	memory_set_bankptr(space->machine,  1, rom + 0x10000 + 0x8000 * ((data >> 2) & 0x7) );
 
 	// ?                data & 0x01
 	// ?                data & 0x02

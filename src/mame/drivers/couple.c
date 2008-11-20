@@ -468,7 +468,7 @@ static DRIVER_INIT( couple )
       dumpers it's just the way it is,a.k.a. it's an "hardware" banking.
     update 20060118 by f205v: now we have 3 dumps from 3 different boards and they
     all behave the same...*/
-	memory_set_bankptr(1,ROM + 0x10000 + (0x2000 * 2));
+	memory_set_bankptr(machine, 1,ROM + 0x10000 + (0x2000 * 2));
 }
 
 /*Year is uncertain:

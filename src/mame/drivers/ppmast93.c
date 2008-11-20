@@ -159,7 +159,7 @@ static WRITE8_HANDLER( ppmast93_port4_w )
 	coin_counter_w(1, data & 0x10);
 
 	bank = data & 0x07;
-	memory_set_bankptr(1,&rom[0x10000+(bank*0x4000)]);
+	memory_set_bankptr(space->machine, 1,&rom[0x10000+(bank*0x4000)]);
 }
 
 static ADDRESS_MAP_START( ppmast93_cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )

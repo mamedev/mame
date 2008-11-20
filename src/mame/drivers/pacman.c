@@ -373,8 +373,8 @@ static MACHINE_RESET( mschamp )
 	memory_configure_bank(machine, 1, 0, 2, &rom[0x0000], 0x8000);
 	memory_configure_bank(machine, 2, 0, 2, &rom[0x4000], 0x8000);
 
-	memory_set_bank(1, whichbank);
-	memory_set_bank(2, whichbank);
+	memory_set_bank(machine, 1, whichbank);
+	memory_set_bank(machine, 2, whichbank);
 }
 
 
@@ -687,7 +687,7 @@ static WRITE8_HANDLER( porky_banking_w )
 {
 	int i;
 	for(i = 0; i < 4; i++)
-		memory_set_bank(i + 1, data & 1);
+		memory_set_bank(space->machine, i + 1, data & 1);
 }
 
 static READ8_HANDLER( drivfrcp_port1_r )
@@ -5344,7 +5344,7 @@ static DRIVER_INIT( drivfrcp )
 	int i;
 
 	for( i = 0; i < 4; i++)
-		memory_set_bankptr(i + 1, &ROM[i * 0x2000]);
+		memory_set_bankptr(machine, i + 1, &ROM[i * 0x2000]);
 }
 
 static DRIVER_INIT( 8bpm )
@@ -5359,7 +5359,7 @@ static DRIVER_INIT( 8bpm )
 	}
 
 	for( i = 0; i < 4; i++)
-		memory_set_bankptr(i + 1, &ROM[i * 0x2000]);
+		memory_set_bankptr(machine, i + 1, &ROM[i * 0x2000]);
 }
 
 static DRIVER_INIT( porky )
@@ -5377,7 +5377,7 @@ static DRIVER_INIT( porky )
 		memory_configure_bank(machine, i + 1, 0, 2, &ROM[i * 0x2000], 0x8000);
 
 	for( i = 0; i < 4; i++)
-		memory_set_bankptr(i + 1, &ROM[i * 0x2000]);
+		memory_set_bankptr(machine, i + 1, &ROM[i * 0x2000]);
 }
 
 static DRIVER_INIT( rocktrv2 )
@@ -5459,7 +5459,7 @@ static DRIVER_INIT( cannonbp )
 {
 	/* extra memory */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x4800, 0x4bff, 0, 0, SMH_BANK5, SMH_BANK5);
-	memory_set_bankptr(5, auto_malloc(0x400));
+	memory_set_bankptr(machine, 5, auto_malloc(0x400));
 
 	/* protection? */
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3000, 0x3fff, 0, 0, cannonbp_protection_r);

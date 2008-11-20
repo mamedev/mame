@@ -99,7 +99,7 @@ static WRITE8_HANDLER( mjsister_banksel1_w )
 	if (tmp != mjsister_colorbank)
 		mjsister_screen_redraw = 1;
 
-	memory_set_bankptr(1,&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);
+	memory_set_bankptr(space->machine, 1,&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);
 }
 
 static WRITE8_HANDLER( mjsister_banksel2_w )
@@ -118,7 +118,7 @@ static WRITE8_HANDLER( mjsister_banksel2_w )
 			logerror("%04x p31_w:%02x\n",cpu_get_pc(space->cpu),data);
 	}
 
-	memory_set_bankptr(1,&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);
+	memory_set_bankptr(space->machine, 1,&BANKROM[rombank0*0x10000+rombank1*0x8000]+0x10000);
 }
 
 static WRITE8_HANDLER( mjsister_input_sel1_w )

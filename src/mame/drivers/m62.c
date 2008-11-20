@@ -90,7 +90,7 @@ static READ8_HANDLER( ldrun2_bankswitch_r )
 
 		/* swap to bank #1 on second read */
 		if (ldrun2_bankswap == 0)
-			memory_set_bank(1, 1);
+			memory_set_bank(space->machine, 1, 1);
 	}
 	return 0;
 }
@@ -114,7 +114,7 @@ static WRITE8_HANDLER( ldrun2_bankswitch_w )
 logerror("unknown bank select %02x\n",data);
 			return;
 		}
-		memory_set_bank(1, banks[data-1]);
+		memory_set_bank(space->machine, 1, banks[data-1]);
 	}
 	else
 	{
@@ -142,30 +142,30 @@ static READ8_HANDLER( ldrun3_prot_7_r )
 
 static WRITE8_HANDLER( ldrun4_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x01);
+	memory_set_bank(space->machine, 1, data & 0x01);
 }
 
 static WRITE8_HANDLER( kidniki_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x0f);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 #define battroad_bankswitch_w kidniki_bankswitch_w
 
 static WRITE8_HANDLER( spelunkr_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x03);
+	memory_set_bank(space->machine, 1, data & 0x03);
 }
 
 static WRITE8_HANDLER( spelunk2_bankswitch_w )
 {
-	memory_set_bank(1, (data & 0xc0)>>6);
-	memory_set_bank(2, (data & 0x3c)>>2);
+	memory_set_bank(space->machine, 1, (data & 0xc0)>>6);
+	memory_set_bank(space->machine, 2, (data & 0x3c)>>2);
 }
 
 static WRITE8_HANDLER( youjyudn_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x01);
+	memory_set_bank(space->machine, 1, data & 0x01);
 }
 
 

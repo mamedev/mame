@@ -346,7 +346,7 @@ static WRITE8_HANDLER( dec8_bank_w )
 	UINT8 *RAM = memory_region(space->machine, "main");
 
 	bankaddress = 0x10000 + (data & 0x0f) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 }
 
 /* Used by Ghostbusters, Meikyuu Hunter G & Gondomania */
@@ -363,7 +363,7 @@ static WRITE8_HANDLER( ghostb_bank_w )
     */
 
 	bankaddress = 0x10000 + (data >> 4) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	if (data&1) int_enable=1; else int_enable=0;
 	if (data&2) nmi_enable=1; else nmi_enable=0;
@@ -381,7 +381,7 @@ static WRITE8_HANDLER( csilver_control_w )
         Bit 0x40 - Unused.
         Bit 0x80 - Hold subcpu reset line high if clear, else low?  (Not needed anyway)
     */
-	memory_set_bankptr(1,&RAM[0x10000 + (data & 0x0f) * 0x4000]);
+	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + (data & 0x0f) * 0x4000]);
 }
 
 static WRITE8_HANDLER( dec8_sound_w )
@@ -423,8 +423,8 @@ static WRITE8_HANDLER( csilver_sound_bank_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "audio");
 
-	if (data&8) { memory_set_bankptr(3,&RAM[0x14000]); }
-	else { memory_set_bankptr(3,&RAM[0x10000]); }
+	if (data&8) { memory_set_bankptr(space->machine, 3,&RAM[0x14000]); }
+	else { memory_set_bankptr(space->machine, 3,&RAM[0x10000]); }
 }
 
 /******************************************************************************/

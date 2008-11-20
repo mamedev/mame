@@ -106,7 +106,7 @@ ADDRESS_MAP_END
 
 static WRITE8_HANDLER( z80_bankswitch_w )
 {
-	memory_set_bank(2, data & 7);
+	memory_set_bank(space->machine, 2, data & 7);
 }
 
 #if 0

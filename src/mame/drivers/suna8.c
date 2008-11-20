@@ -489,7 +489,7 @@ static WRITE8_HANDLER( hardhead_bankswitch_w )
 	int bank = data & 0x0f;
 
 	if (data & ~0xef) 	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 }
 
 
@@ -557,7 +557,7 @@ static WRITE8_HANDLER( rranger_bankswitch_w )
 
 	if (data & ~0xf7) 	logerror("CPU #0 - PC %04X: unknown bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 
 	flip_screen_set(    data & 0x20);
 	coin_lockout_w ( 0,	data & 0x40);
@@ -660,7 +660,7 @@ static WRITE8_HANDLER( brickzn_rombank_w )
 
 	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 	suna8_rombank = data;
 }
 
@@ -744,7 +744,7 @@ static WRITE8_HANDLER( hardhea2_rombank_w )
 
 	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 	suna8_rombank = data;
 }
 
@@ -759,11 +759,11 @@ static WRITE8_HANDLER( hardhea2_spritebank_1_w )
 
 static WRITE8_HANDLER( hardhea2_rambank_0_w )
 {
-	memory_set_bank(2, 0);
+	memory_set_bank(space->machine, 2, 0);
 }
 static WRITE8_HANDLER( hardhea2_rambank_1_w )
 {
-	memory_set_bank(2, 1);
+	memory_set_bank(space->machine, 2, 1);
 }
 
 
@@ -909,7 +909,7 @@ static WRITE8_HANDLER( sparkman_rombank_w )
 
 	if (data & ~0x0f) 	logerror("CPU #0 - PC %04X: unknown rom bank bits: %02X\n",cpu_get_pc(space->cpu),data);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 	suna8_rombank = data;
 }
 

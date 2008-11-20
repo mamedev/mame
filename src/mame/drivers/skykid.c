@@ -84,7 +84,7 @@ static WRITE8_HANDLER( skykid_subreset_w )
 
 static WRITE8_HANDLER( skykid_bankswitch_w )
 {
-	memory_set_bank(1, !BIT(offset,11));
+	memory_set_bank(space->machine, 1, !BIT(offset,11));
 }
 
 static WRITE8_HANDLER( skykid_irq_1_ctrl_w )

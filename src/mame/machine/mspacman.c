@@ -183,13 +183,13 @@ MACHINE_RESET( mspacman )
 	mspacman_decode(machine);
 
 	memory_configure_bank(machine, 1, 0, 2, &RAM[0x00000], 0x10000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 }
 
 
 WRITE8_HANDLER( mspacman_activate_rom )
 {
-	if (data==1) memory_set_bank(1, 1);
+	if (data==1) memory_set_bank(space->machine, 1, 1);
 }
 
 

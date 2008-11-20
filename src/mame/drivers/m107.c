@@ -51,7 +51,7 @@ static WRITE16_HANDLER( bankswitch_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		UINT8 *RAM = memory_region(space->machine, "main");
-		memory_set_bankptr(1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x100000 + ((data&0x7)*0x10000)]);
 	}
 }
 
@@ -631,7 +631,7 @@ static DRIVER_INIT( firebarr )
 	UINT8 *RAM = memory_region(machine, "main");
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
-	memory_set_bankptr(1,&RAM[0xa0000]); /* Initial bank */
+	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "sound");
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
@@ -645,7 +645,7 @@ static DRIVER_INIT( dsoccr94 )
 	UINT8 *RAM = memory_region(machine, "main");
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
-	memory_set_bankptr(1,&RAM[0xa0000]); /* Initial bank */
+	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "sound");
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */
@@ -659,7 +659,7 @@ static DRIVER_INIT( wpksoc )
 	UINT8 *RAM = memory_region(machine, "main");
 
 	memcpy(RAM+0xffff0,RAM+0x7fff0,0x10); /* Start vector */
-	memory_set_bankptr(1,&RAM[0xa0000]); /* Initial bank */
+	memory_set_bankptr(machine, 1,&RAM[0xa0000]); /* Initial bank */
 
 	RAM = memory_region(machine, "sound");
 	memcpy(RAM+0xffff0,RAM+0x1fff0,0x10); /* Sound cpu Start vector */

@@ -518,18 +518,18 @@ static ADDRESS_MAP_START( defender_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-void defender_install_io_space(running_machine *machine)
+void defender_install_io_space(const address_space *space)
 {
 	/* this routine dynamically installs the memory mapped above from c000-cfff */
-	memory_install_write8_handler     (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xc00f, 0, 0x03e0, SMH_BANK4);
-	memory_install_write8_handler     (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc010, 0xc01f, 0, 0x03e0, defender_video_control_w);
-	memory_install_write8_handler     (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc3ff, 0xc3ff, 0, 0,      williams_watchdog_reset_w);
-	memory_install_readwrite8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc400, 0xc4ff, 0, 0x0300, SMH_BANK3, williams_cmos_w);
-	memory_install_read8_handler      (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc800, 0xcbff, 0, 0x03e0, williams_video_counter_r);
-	memory_install_readwrite8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcc00, 0xcc03, 0, 0x03e0, pia_1_r, pia_1_w);
-	memory_install_readwrite8_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xcc04, 0xcc07, 0, 0x03e0, pia_0_r, pia_0_w);
-	memory_set_bankptr(3, generic_nvram);
-	memory_set_bankptr(4, paletteram);
+	memory_install_write8_handler     (space, 0xc000, 0xc00f, 0, 0x03e0, SMH_BANK4);
+	memory_install_write8_handler     (space, 0xc010, 0xc01f, 0, 0x03e0, defender_video_control_w);
+	memory_install_write8_handler     (space, 0xc3ff, 0xc3ff, 0, 0,      williams_watchdog_reset_w);
+	memory_install_readwrite8_handler (space, 0xc400, 0xc4ff, 0, 0x0300, SMH_BANK3, williams_cmos_w);
+	memory_install_read8_handler      (space, 0xc800, 0xcbff, 0, 0x03e0, williams_video_counter_r);
+	memory_install_readwrite8_handler (space, 0xcc00, 0xcc03, 0, 0x03e0, pia_1_r, pia_1_w);
+	memory_install_readwrite8_handler (space, 0xcc04, 0xcc07, 0, 0x03e0, pia_0_r, pia_0_w);
+	memory_set_bankptr(space->machine, 3, generic_nvram);
+	memory_set_bankptr(space->machine, 4, paletteram);
 }
 
 

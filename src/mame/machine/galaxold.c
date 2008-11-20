@@ -147,13 +147,13 @@ WRITE8_HANDLER( zigzag_sillyprotection_w )
 	if (data)
 	{
 		/* swap ROM 2 and 3! */
-		memory_set_bank(1, 1);
-		memory_set_bank(2, 0);
+		memory_set_bank(space->machine, 1, 1);
+		memory_set_bank(space->machine, 2, 0);
 	}
 	else
 	{
-		memory_set_bank(1, 0);
-		memory_set_bank(2, 1);
+		memory_set_bank(space->machine, 1, 0);
+		memory_set_bank(space->machine, 2, 1);
 	}
 }
 
@@ -162,8 +162,8 @@ DRIVER_INIT( zigzag )
 	UINT8 *RAM = memory_region(machine, "main");
 	memory_configure_bank(machine, 1, 0, 2, &RAM[0x2000], 0x1000);
 	memory_configure_bank(machine, 2, 0, 2, &RAM[0x2000], 0x1000);
-	memory_set_bank(1, 0);
-	memory_set_bank(2, 1);
+	memory_set_bank(machine, 1, 0);
+	memory_set_bank(machine, 2, 1);
 }
 
 
@@ -243,7 +243,7 @@ WRITE8_HANDLER( _4in1_bank_w )
 {
 	_4in1_bank = data & 0x03;
 	galaxold_gfxbank_w(space, 0, _4in1_bank);
-	memory_set_bank(1, _4in1_bank);
+	memory_set_bank(space->machine, 1, _4in1_bank);
 }
 
 CUSTOM_INPUT( _4in1_fake_port_r )

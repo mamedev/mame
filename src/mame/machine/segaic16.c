@@ -190,7 +190,7 @@ void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decry
 			continue;
 
 		memory_configure_bank_decrypted(machine, banknum, 0, 1, decrypted + region_start, 0);
-		memory_set_bank(banknum, 0);
+		memory_set_bank(machine, banknum, 0);
 	}
 }
 
@@ -371,7 +371,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 			if (rgn->base)
 			{
 				memory_configure_bank(machine, banknum, 0, 1, *rgn->base, 0);
-				memory_set_bank(banknum, 0);
+				memory_set_bank(machine, banknum, 0);
 			}
 			else if (rgn->romoffset != ~0)
 			{
@@ -384,7 +384,7 @@ static void update_memory_mapping(running_machine *machine, struct memory_mapper
 				memory_configure_bank(machine, banknum, 0, 1, (UINT8 *)chip->cpu->region + region_start, 0);
 				if (decrypted)
 					memory_configure_bank_decrypted(machine, banknum, 0, 1, decrypted ? (decrypted + region_start) : 0, 0);
-				memory_set_bank(banknum, 0);
+				memory_set_bank(machine, banknum, 0);
 			}
 		}
 

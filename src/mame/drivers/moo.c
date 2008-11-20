@@ -224,7 +224,7 @@ static READ16_HANDLER( sound_status_r )
 
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
-	memory_set_bankptr(2, memory_region(space->machine, "sound") + 0x10000 + (data&0xf)*0x4000);
+	memory_set_bankptr(space->machine, 2, memory_region(space->machine, "sound") + 0x10000 + (data&0xf)*0x4000);
 }
 
 

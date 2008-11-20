@@ -182,7 +182,7 @@ Notes:
 
 static WRITE8_HANDLER( bankswitch_w )
 {
-	memory_set_bank(1, (data - 1) & 3);
+	memory_set_bank(space->machine, 1, (data - 1) & 3);
 }
 
 static TIMER_CALLBACK( rsaga2_interrupt2  )

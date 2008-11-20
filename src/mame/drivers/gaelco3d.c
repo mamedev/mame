@@ -201,7 +201,7 @@ static MACHINE_RESET( common )
 	adsp_autobuffer_timer = timer_alloc(adsp_autobuffer_irq, NULL);
 
 	memory_configure_bank(machine, 1, 0, 256, memory_region(machine, "user1"), 0x4000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
 	/* keep the TMS32031 halted until the code is ready to go */
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
@@ -531,7 +531,7 @@ static WRITE16_HANDLER( adsp_control_w )
 static WRITE16_HANDLER( adsp_rombank_w )
 {
 	logerror("adsp_rombank_w(%d) = %04X\n", offset, data);
-	memory_set_bank(1, (offset & 1) * 0x80 + (data & 0x7f));
+	memory_set_bank(space->machine, 1, (offset & 1) * 0x80 + (data & 0x7f));
 }
 
 

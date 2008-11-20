@@ -2742,13 +2742,13 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 		{
 			_32x_adapter_enabled = 1;
 			memory_install_readwrite16_handler(space, 0x0880000, 0x08fffff, 0, 0, SMH_BANK11, SMH_BANK11); // 'fixed' 512kb rom bank
-			memory_set_bankptr( 11, memory_region(space->machine, "gamecart") );
+			memory_set_bankptr(space->machine,  11, memory_region(space->machine, "gamecart") );
 
 			memory_install_readwrite16_handler(space, 0x0900000, 0x09fffff, 0, 0, SMH_BANK12, SMH_BANK12); // 'bankable' 1024kb rom bank
-			memory_set_bankptr( 12, memory_region(space->machine, "gamecart") );
+			memory_set_bankptr(space->machine,  12, memory_region(space->machine, "gamecart") );
 
 			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
-			memory_set_bankptr( 10, memory_region(space->machine, "32x_68k_bios") );
+			memory_set_bankptr(space->machine,  10, memory_region(space->machine, "32x_68k_bios") );
 
 			memory_install_readwrite16_handler(space, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_a15180_r, _32x_68k_a15180_w); // mode control regs
 			memory_install_readwrite16_handler(space, 0x0a15182, 0x0a15183, 0, 0, _32x_68k_a15182_r, _32x_68k_a15182_w); // screen shift
@@ -2771,7 +2771,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 			_32x_adapter_enabled = 0;
 
 			memory_install_readwrite16_handler(space, 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
-			memory_set_bankptr( 10, memory_region(space->machine, "gamecart") );
+			memory_set_bankptr(space->machine,  10, memory_region(space->machine, "gamecart") );
 
 
 		}
@@ -2838,7 +2838,7 @@ static WRITE16_HANDLER( _32x_68k_a15104_w )
 		_32x_68k_a15104_reg = (_32x_68k_a15104_reg & 0x00ff) | (data & 0xff00);
 	}
 
-	memory_set_bankptr( 12, memory_region(space->machine, "gamecart")+((_32x_68k_a15104_reg&0x3)*0x100000) );
+	memory_set_bankptr(space->machine,  12, memory_region(space->machine, "gamecart")+((_32x_68k_a15104_reg&0x3)*0x100000) );
 }
 
 /**********************************************************************************************/
@@ -3937,7 +3937,7 @@ static void svp_init(running_machine *machine)
 	/* SVP stuff */
 	svp.dram = auto_malloc(0x20000);
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x300000, 0x31ffff, 0, 0, SMH_BANK2, SMH_BANK2);
-	memory_set_bankptr( 2, svp.dram );
+	memory_set_bankptr(machine,  2, svp.dram );
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xa15000, 0xa150ff, 0, 0, svp_68k_io_r, svp_68k_io_w);
 	// "cell arrange" 1 and 2
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x390000, 0x39ffff, 0, 0, svp_68k_cell1_r);
@@ -3946,10 +3946,10 @@ static void svp_init(running_machine *machine)
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[2], ADDRESS_SPACE_PROGRAM), 0x438, 0x438, 0, 0, svp_speedup_r);
 
 	svp.iram = auto_malloc(0x800);
-	memory_set_bankptr( 3, svp.iram );
+	memory_set_bankptr(machine,  3, svp.iram );
 	/* SVP ROM just shares m68k region.. */
 	ROM = memory_region(machine, "main");
-	memory_set_bankptr( 4, ROM + 0x800 );
+	memory_set_bankptr(machine,  4, ROM + 0x800 );
 
 	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_svp;
 	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
@@ -6480,7 +6480,7 @@ static void megadriv_init_common(running_machine *machine)
 	{
 		genz80.z80_cpunum = 1;
 		genz80.z80_prgram = auto_malloc(0x2000);
-		memory_set_bankptr( 1, genz80.z80_prgram );
+		memory_set_bankptr(machine,  1, genz80.z80_prgram );
 	}
 
 	cpu_set_irq_callback(machine->cpu[0], genesis_int_callback);
@@ -6618,10 +6618,10 @@ void megatech_set_megadrive_z80_as_megadrive_z80(running_machine *machine)
 
 
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK1, SMH_BANK1);
-	memory_set_bankptr( 1, genz80.z80_prgram );
+	memory_set_bankptr(machine,  1, genz80.z80_prgram );
 
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x0000, 0x1fff, 0, 0, SMH_BANK6, SMH_BANK6);
-	memory_set_bankptr( 6, genz80.z80_prgram );
+	memory_set_bankptr(machine,  6, genz80.z80_prgram );
 
 
 	// not allowed??
@@ -6665,7 +6665,7 @@ DRIVER_INIT( _32x )
 	if (_32x_adapter_enabled == 0)
 	{
 		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, SMH_BANK10, SMH_BANK10);
-		memory_set_bankptr( 10, memory_region(machine, "gamecart") );
+		memory_set_bankptr(machine,  10, memory_region(machine, "gamecart") );
 	};
 
 

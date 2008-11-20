@@ -52,7 +52,7 @@ static MACHINE_RESET( galivan )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	memory_set_bankptr(1,&RAM[0x10000]);
+	memory_set_bankptr(machine, 1,&RAM[0x10000]);
 //  layers = 0x60;
 }
 
@@ -957,11 +957,11 @@ static WRITE8_HANDLER( youmab_extra_bank_w )
 {
 	if (data==0xff)
 	{
-		memory_set_bankptr( 2, memory_region(space->machine, "user2")+0x4000 );
+		memory_set_bankptr(space->machine,  2, memory_region(space->machine, "user2")+0x4000 );
 	}
 	else if (data==0x00)
 	{
-		memory_set_bankptr( 2, memory_region(space->machine, "user2") );
+		memory_set_bankptr(space->machine,  2, memory_region(space->machine, "user2") );
 	}
 	else
 	{
@@ -988,7 +988,7 @@ static DRIVER_INIT( youmab )
 {
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x82, 0x82, 0, 0, youmab_extra_bank_w); // banks rom at 0x8000? writes 0xff and 0x00 before executing code there
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xbfff, 0, 0, SMH_BANK2);
-	memory_set_bankptr( 2, memory_region(machine, "user2") );
+	memory_set_bankptr(machine,  2, memory_region(machine, "user2") );
 
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x81, 0x81, 0, 0, youmab_81_w); // ?? often, alternating values
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x84, 0x84, 0, 0, youmab_84_w); // ?? often, sequence..

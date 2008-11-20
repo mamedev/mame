@@ -193,11 +193,11 @@ static void mxtc_config_w(running_machine *machine, int function, int reg, UINT8
 		{
 			if (data & 0x10)		// enable RAM access to region 0xf0000 - 0xfffff
 			{
-				memory_set_bankptr(1, bios_ram);
+				memory_set_bankptr(machine, 1, bios_ram);
 			}
 			else					// disable RAM access (reads go to BIOS ROM)
 			{
-				memory_set_bankptr(1, memory_region(machine, "user1") + 0x30000);
+				memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
 			}
 			break;
 		}
@@ -586,7 +586,7 @@ static IRQ_CALLBACK(irq_callback)
 
 static MACHINE_RESET(gamecstl)
 {
-	memory_set_bankptr(1, memory_region(machine, "user1") + 0x30000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "user1") + 0x30000);
 
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 

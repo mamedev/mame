@@ -51,7 +51,7 @@ static WRITE8_HANDLER( paradise_rombank_w )
 	}
 
 	if (bank >= 3)	bank+=1;
-	memory_set_bankptr(1, memory_region(space->machine, "main") + bank * 0x4000);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + bank * 0x4000);
 }
 
 static WRITE8_HANDLER( paradise_okibank_w )

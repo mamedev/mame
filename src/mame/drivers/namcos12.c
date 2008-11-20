@@ -1001,7 +1001,7 @@ static WRITE32_HANDLER( bankoffset_w )
 		m_n_bankoffset = data;
 	}
 
-	memory_set_bank( 1, m_n_bankoffset );
+	memory_set_bank(space->machine,  1, m_n_bankoffset );
 
 	verboselog( 1, "bankoffset_w( %08x, %08x, %08x ) %08x\n", offset, data, mem_mask, m_n_bankoffset );
 }
@@ -1172,12 +1172,12 @@ static UINT8 kcram[ 12 ];
 
 static WRITE32_HANDLER( kcoff_w )
 {
-	memory_set_bankptr( 2, memory_region( space->machine, "user1" ) + 0x20280 );
+	memory_set_bankptr(space->machine,  2, memory_region( space->machine, "user1" ) + 0x20280 );
 }
 
 static WRITE32_HANDLER( kcon_w )
 {
-	memory_set_bankptr( 2, kcram );
+	memory_set_bankptr(space->machine,  2, kcram );
 }
 
 static WRITE32_HANDLER( tektagt_protection_1_w )
@@ -1244,7 +1244,7 @@ static MACHINE_RESET( namcos12 )
 		memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f018000, 0x1f018003, 0, 0, kcoff_w );
 
 		memset( kcram, 0, sizeof( kcram ) );
-		memory_set_bankptr( 2, kcram );
+		memory_set_bankptr(space->machine,  2, kcram );
 	}
 }
 
@@ -1451,7 +1451,7 @@ static DRIVER_INIT( namcos12 )
 	m_n_dmaoffset = 0;
 	m_n_dmabias = 0;
 	m_n_bankoffset = 0;
-	memory_set_bank( 1, 0 );
+	memory_set_bank(machine,  1, 0 );
 
 	state_save_register_global( m_n_dmaoffset );
 	state_save_register_global( m_n_dmabias );

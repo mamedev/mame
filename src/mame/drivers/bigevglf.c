@@ -78,7 +78,7 @@ static WRITE8_HANDLER( beg_banking_w )
 /* d0-d3 connect to A11-A14 of the ROMs (via ls273 latch)
    d4-d7 select one of ROMs (via ls273(above) and then ls154)
 */
-	memory_set_bankptr(1, memory_region(space->machine, "main") + 0x10000 + 0x800*(beg_bank&0xff)); /* empty sockets for IC37-IC44 ROMS */
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x10000 + 0x800*(beg_bank&0xff)); /* empty sockets for IC37-IC44 ROMS */
 }
 
 static TIMER_CALLBACK( from_sound_latch_callback )

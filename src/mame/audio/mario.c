@@ -244,7 +244,7 @@ static void set_ea(const address_space *space, int ea)
 	//printf("ea: %d\n", ea);
 	//cputag_set_input_line(machine, "audio", MCS48_INPUT_EA, (ea) ? ASSERT_LINE : CLEAR_LINE);
 	if (state->eabank != 0)
-		memory_set_bank(state->eabank, ea);
+		memory_set_bank(space->machine, state->eabank, ea);
 }
 
 /****************************************************************

@@ -323,7 +323,7 @@ DRIVER_INIT( suprmrio )
 
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
-	memory_set_bankptr(1, auto_malloc(0x2000));
+	memory_set_bankptr(machine, 1, auto_malloc(0x2000));
 
 	/* now override the vidaccess callback */
 	/* we need to remap color tables */
@@ -975,7 +975,7 @@ DRIVER_INIT( MMC3 )
 
 	/* extra ram at $6000-$7fff */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
-	memory_set_bankptr(1, auto_malloc(0x2000));
+	memory_set_bankptr(machine, 1, auto_malloc(0x2000));
 
 	/* common init */
 	init_vsnes(machine);
@@ -1202,7 +1202,7 @@ DRIVER_INIT( bnglngby )
 
 	/* extra ram */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
-	memory_set_bankptr(1, auto_malloc(0x2000));
+	memory_set_bankptr(machine, 1, auto_malloc(0x2000));
 
 	ret = 0;
 
@@ -1293,7 +1293,7 @@ DRIVER_INIT( vstennis )
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
 
-	memory_set_bankptr(1, &prg[0x6000]);
+	memory_set_bankptr(machine, 1, &prg[0x6000]);
 }
 
 /**********************************************************************/
@@ -1362,7 +1362,7 @@ DRIVER_INIT( vstetris )
 {
 	/* extra ram at $6000 is enabled with bit 1 of $4016 */
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x6000, 0x7fff, 0, 0, SMH_BANK1, SMH_BANK1 );
-	memory_set_bankptr(1, auto_malloc(0x2000));
+	memory_set_bankptr(machine, 1, auto_malloc(0x2000));
 
 	init_vsnes(machine);
 	DRIVER_INIT_CALL(vsnormal);

@@ -351,16 +351,16 @@ static MACHINE_RESET( cojag )
 		if (cojag_is_r3000)
 		{
 			memory_configure_bank(machine, 1, 0, 2, rom + 0x800000, 0x400000);
-			memory_set_bank(1, 0);
+			memory_set_bank(machine, 1, 0);
 		}
 		memory_configure_bank(machine, 8, 0, 2, rom + 0x800000, 0x400000);
-		memory_set_bank(8, 0);
+		memory_set_bank(machine, 8, 0);
 
 		/* sound banks */
 		memory_configure_bank(machine, 2, 0, 8, rom + 0x000000, 0x200000);
 		memory_configure_bank(machine, 9, 0, 8, rom + 0x000000, 0x200000);
-		memory_set_bank(2, 0);
-		memory_set_bank(9, 0);
+		memory_set_bank(machine, 2, 0);
+		memory_set_bank(machine, 9, 0);
 	}
 
 	/* clear any spinuntil stuff */
@@ -425,8 +425,8 @@ static WRITE32_HANDLER( misc_control_w )
 	/* adjust banking */
 	if (memory_region(space->machine, "user2"))
 	{
-		memory_set_bank(2, (data >> 1) & 7);
-		memory_set_bank(9, (data >> 1) & 7);
+		memory_set_bank(space->machine, 2, (data >> 1) & 7);
+		memory_set_bank(space->machine, 9, (data >> 1) & 7);
 	}
 
 	COMBINE_DATA(&misc_control_data);
@@ -492,8 +492,8 @@ static WRITE32_HANDLER( latch_w )
 	if (memory_region(space->machine, "user2"))
 	{
 		if (cojag_is_r3000)
-			memory_set_bank(1, data & 1);
-		memory_set_bank(8, data & 1);
+			memory_set_bank(space->machine, 1, data & 1);
+		memory_set_bank(space->machine, 8, data & 1);
 	}
 }
 

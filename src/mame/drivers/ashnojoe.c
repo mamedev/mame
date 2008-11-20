@@ -306,7 +306,7 @@ static WRITE8_HANDLER( ym2203_write_a )
 
 static WRITE8_HANDLER( ym2203_write_b )
 {
-	memory_set_bankptr(4, memory_region(space->machine, "adpcm") + ((data & 0xf) * 0x8000));
+	memory_set_bankptr(space->machine, 4, memory_region(space->machine, "adpcm") + ((data & 0xf) * 0x8000));
 }
 
 static const ym2203_interface ym2203_config =
@@ -346,7 +346,7 @@ static const msm5205_interface msm5205_config =
 
 static DRIVER_INIT( ashnojoe )
 {
-	memory_set_bankptr(4, memory_region(machine, "adpcm"));
+	memory_set_bankptr(machine, 4, memory_region(machine, "adpcm"));
 }
 
 static MACHINE_DRIVER_START( ashnojoe )

@@ -223,7 +223,7 @@ static WRITE8_HANDLER( ddragon_bankswitch_w )
 	else if (dd_sub_cpu_busy == 0)
 		cpu_set_input_line(space->machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(1, (data & 0xe0) >> 5);
+	memory_set_bank(space->machine, 1, (data & 0xe0) >> 5);
 }
 
 
@@ -237,7 +237,7 @@ static WRITE8_HANDLER( toffy_bankswitch_w )
 	/* bit 3 unknown */
 
 	/* I don't know ... */
-	memory_set_bank(1, (data & 0x20) >> 5);
+	memory_set_bank(space->machine, 1, (data & 0x20) >> 5);
 }
 
 
@@ -283,7 +283,7 @@ static WRITE8_HANDLER( darktowr_mcu_bank_w )
 
 static WRITE8_HANDLER( darktowr_bankswitch_w )
 {
-	int oldbank = memory_get_bank(1);
+	int oldbank = memory_get_bank(space->machine, 1);
 	int newbank = (data & 0xe0) >> 5;
 
 	ddragon_scrollx_hi = ((data & 0x01) << 8);
@@ -298,7 +298,7 @@ static WRITE8_HANDLER( darktowr_bankswitch_w )
 	else if (dd_sub_cpu_busy == 0)
 		cpu_set_input_line(space->machine->cpu[1], sprite_irq, (sprite_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 
-	memory_set_bank(1, newbank);
+	memory_set_bank(space->machine, 1, newbank);
 	if (newbank == 4 && oldbank != 4)
 		memory_install_readwrite8_handler(space, 0x4000, 0x7fff, 0, 0, darktowr_mcu_bank_r, darktowr_mcu_bank_w);
 	else if (newbank != 4 && oldbank == 4)

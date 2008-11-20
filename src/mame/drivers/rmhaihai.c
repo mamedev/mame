@@ -159,8 +159,8 @@ static WRITE8_HANDLER( themj_rombank_w )
 	UINT8 *rom = memory_region(space->machine, "main") + 0x10000;
 	int bank = data & 0x03;
 logerror("banksw %d\n",bank);
-	memory_set_bankptr(1, rom + bank*0x4000);
-	memory_set_bankptr(2, rom + bank*0x4000 + 0x2000);
+	memory_set_bankptr(space->machine, 1, rom + bank*0x4000);
+	memory_set_bankptr(space->machine, 2, rom + bank*0x4000 + 0x2000);
 }
 
 static MACHINE_RESET( themj )

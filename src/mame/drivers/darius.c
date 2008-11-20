@@ -298,8 +298,8 @@ static UINT8 nmi_enable = 0;
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( STATIC_BANK1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
-//  memory_set_bankptr( 1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
+	memory_set_bankptr(machine,  STATIC_BANK1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
+//  memory_set_bankptr(machine,  1, memory_region(machine, "audio") + (banknum * 0x8000) + 0x10000 );
 
 }
 
@@ -1220,7 +1220,7 @@ static MACHINE_RESET( darius )
 		memcpy( RAM + 0x8000*i + 0x10000, RAM,            0x4000 );
 		memcpy( RAM + 0x8000*i + 0x14000, RAM + 0x4000*i, 0x4000 );
 	}
-	memory_set_bankptr(1, RAM);
+	memory_set_bankptr(machine, 1, RAM);
 
 	sound_global_enable( 1 );	/* mixer enabled */
 

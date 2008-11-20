@@ -170,7 +170,7 @@ void discoboy_setrombank(UINT8 data)
 {
 	UINT8 *ROM = memory_region(machine, "main");
 	data &=0x2f;
-	memory_set_bankptr(1, &ROM[0x6000+(data*0x1000)] );
+	memory_set_bankptr(space->machine, 1, &ROM[0x6000+(data*0x1000)] );
 }
 #endif
 
@@ -197,7 +197,7 @@ static WRITE8_HANDLER( discoboy_port_01_w )
 	discoboy_gfxbank = data&0xf0;
 	rombank = data&0x07;
 
-	memory_set_bankptr(1, &ROM[0x10000 + rombank * 0x4000] );
+	memory_set_bankptr(space->machine, 1, &ROM[0x10000 + rombank * 0x4000] );
 }
 
 static WRITE8_HANDLER( discoboy_port_03_w ) // sfx? (to sound cpu)
@@ -525,7 +525,7 @@ static DRIVER_INIT( discoboy )
 
 	discoboy_ram_bank = 0;
 
-	memory_set_bankptr(1, &ROM[0x10000] );
+	memory_set_bankptr(machine, 1, &ROM[0x10000] );
 }
 
 ROM_START( discoboy )

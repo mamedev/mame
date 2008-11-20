@@ -381,7 +381,7 @@ static void meritm_crt250_switch_banks( void )
 	int rombank = (meritm_bank & 0x07) ^ 0x07;
 
 	//logerror( "CRT250: Switching banks: rom = %0x (bank = %x)\n", rombank, meritm_bank );
-	memory_set_bank(1, rombank );
+	memory_set_bank(Machine, 1, rombank );
 };
 
 static WRITE8_HANDLER(meritm_crt250_bank_w)
@@ -398,9 +398,9 @@ static void meritm_switch_banks( void )
 			  (meritm_psd_a15 & 0x1);
 
 	//logerror( "Switching banks: rom = %0x (bank = %x), ram = %0x\n", rombank, meritm_bank, rambank);
-	memory_set_bank(1, rombank );
-	memory_set_bank(2, rombank | 0x01);
-	memory_set_bank(3, rambank);
+	memory_set_bank(Machine, 1, rombank );
+	memory_set_bank(Machine, 2, rombank | 0x01);
+	memory_set_bank(Machine, 3, rambank);
 };
 
 static WRITE8_HANDLER(meritm_psd_a15_w)

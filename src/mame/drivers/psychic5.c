@@ -378,7 +378,7 @@ static WRITE8_HANDLER( psychic5_bankselect_w )
 	{
 		psychic5_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 3) * 0x4000);
-		memory_set_bankptr(1,&RAM[bankaddress]);	 /* Select 4 banks of 16k */
+		memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);	 /* Select 4 banks of 16k */
 	}
 }
 
@@ -391,7 +391,7 @@ static WRITE8_HANDLER( bombsa_bankselect_w )
 	{
 		psychic5_bank_latch = data;
 		bankaddress = 0x10000 + ((data & 7) * 0x4000);
-		memory_set_bankptr(1, &RAM[bankaddress]);	 /* Select 8 banks of 16k */
+		memory_set_bankptr(space->machine, 1, &RAM[bankaddress]);	 /* Select 8 banks of 16k */
 	}
 }
 

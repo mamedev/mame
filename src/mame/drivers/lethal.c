@@ -276,7 +276,7 @@ static WRITE8_HANDLER( le_bankswitch_w )
 {
 	UINT8 *prgrom = (UINT8 *)memory_region(space->machine, "main")+0x10000;
 
-	memory_set_bankptr(1, &prgrom[data * 0x2000]);
+	memory_set_bankptr(space->machine, 1, &prgrom[data * 0x2000]);
 }
 
 static READ8_HANDLER( le_4800_r )
@@ -590,8 +590,8 @@ static MACHINE_RESET( lethalen )
 {
 	UINT8 *prgrom = (UINT8 *)memory_region(machine, "main");
 
-	memory_set_bankptr(1, &prgrom[0x10000]);
-	memory_set_bankptr(2, &prgrom[0x48000]);
+	memory_set_bankptr(machine, 1, &prgrom[0x10000]);
+	memory_set_bankptr(machine, 2, &prgrom[0x48000]);
 	/* force reset again to read proper reset vector */
 	cpu_reset(machine->cpu[0]);
 }

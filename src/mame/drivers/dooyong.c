@@ -59,7 +59,7 @@ Flying Tiger
 
 static WRITE8_HANDLER( lastday_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x07);
+	memory_set_bank(space->machine, 1, data & 0x07);
 
 	if (data & 0xf8) popmessage("bankswitch %02x",data);
 }

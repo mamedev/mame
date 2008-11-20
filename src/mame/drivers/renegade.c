@@ -240,7 +240,7 @@ static const UINT8 kuniokun_xor_table[0x2a] =
 static void setbank(running_machine *machine)
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1, &RAM[bank ? 0x10000 : 0x4000]);
+	memory_set_bankptr(machine, 1, &RAM[bank ? 0x10000 : 0x4000]);
 }
 
 static STATE_POSTLOAD( renegade_postload )

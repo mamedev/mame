@@ -110,7 +110,7 @@ static WRITE8_HANDLER( questions_bank_w )
 			break;
 		}
 
-		memory_set_bankptr(1,&questions[bankaddr]);
+		memory_set_bankptr(space->machine, 1,&questions[bankaddr]);
 	}
 }
 

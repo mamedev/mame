@@ -31,16 +31,16 @@ static WRITE8_HANDLER( pcktgal_bank_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "main");
 
-	if (data & 1) { memory_set_bankptr(1,&RAM[0x4000]); }
-	else { memory_set_bankptr(1,&RAM[0x10000]); }
+	if (data & 1) { memory_set_bankptr(space->machine, 1,&RAM[0x4000]); }
+	else { memory_set_bankptr(space->machine, 1,&RAM[0x10000]); }
 
-	if (data & 2) { memory_set_bankptr(2,&RAM[0x6000]); }
-	else { memory_set_bankptr(2,&RAM[0x12000]); }
+	if (data & 2) { memory_set_bankptr(space->machine, 2,&RAM[0x6000]); }
+	else { memory_set_bankptr(space->machine, 2,&RAM[0x12000]); }
 }
 
 static WRITE8_HANDLER( pcktgal_sound_bank_w )
 {
-	memory_set_bank(3, (data >> 2) & 1);
+	memory_set_bank(space->machine, 3, (data >> 2) & 1);
 }
 
 static WRITE8_HANDLER( pcktgal_sound_w )

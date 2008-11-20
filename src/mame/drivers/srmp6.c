@@ -341,7 +341,7 @@ static WRITE16_HANDLER( video_regs_w )
 		case 0x5e/2: // bank switch, used by ROM check
 			LOG(("%x\n",data));
 
-			memory_set_bankptr(1,(UINT16 *)(memory_region(space->machine, "nile") + (data & 0x0f)*0x200000));
+			memory_set_bankptr(space->machine, 1,(UINT16 *)(memory_region(space->machine, "nile") + (data & 0x0f)*0x200000));
 			break;
 
 		// set by IT4

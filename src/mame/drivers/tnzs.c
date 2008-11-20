@@ -739,7 +739,7 @@ static WRITE8_HANDLER( kabukiz_sound_bank_w )
 	if(data != 0xff)
 	{
 		UINT8 *ROM = memory_region(space->machine, "audio");
-		memory_set_bankptr(3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
+		memory_set_bankptr(space->machine, 3, &ROM[0x10000 + 0x4000 * (data & 0x07)]);
 	}
 }
 
@@ -937,7 +937,7 @@ static WRITE8_HANDLER( jpopnics_subbankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "sub");
 
 	/* bits 0-1 select ROM bank */
-	memory_set_bankptr (2, &RAM[0x10000 + 0x2000 * (data & 3)]);
+	memory_set_bankptr (space->machine, 2, &RAM[0x10000 + 0x2000 * (data & 3)]);
 }
 
 static ADDRESS_MAP_START( jpopnics_sub_map, ADDRESS_SPACE_PROGRAM, 8 )

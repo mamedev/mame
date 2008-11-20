@@ -335,7 +335,7 @@ static WRITE8_HANDLER( welltris_sh_bankswitch_w )
 {
 	UINT8 *rom = memory_region(space->machine, "audio") + 0x10000;
 
-	memory_set_bankptr(1,rom + (data & 0x03) * 0x8000);
+	memory_set_bankptr(space->machine, 1,rom + (data & 0x03) * 0x8000);
 }
 
 

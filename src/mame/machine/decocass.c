@@ -1566,7 +1566,7 @@ WRITE8_HANDLER( decocass_e5xx_w )
 WRITE8_HANDLER( decocass_e900_w )
 {
 	de0091_enable = data & 1;
-	memory_set_bank(1, data & 1);
+	memory_set_bank(space->machine, 1, data & 1);
 	/* Perhaps the second row of ROMs is enabled by another bit.
      * There is no way to verify this yet, so for now just look
      * at bit 0 to enable the daughter board at reads between

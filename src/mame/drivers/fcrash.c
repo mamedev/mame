@@ -60,7 +60,7 @@ static WRITE8_HANDLER( fcrash_snd_bankswitch_w )
 	sndti_set_output_gain(SOUND_MSM5205, 1, 0, (data & 0x10) ? 0.0 : 1.0);
 
 	bankaddr = ((data & 7) * 0x4000);
-	memory_set_bankptr(1,&RAM[0x10000 + bankaddr]);
+	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bankaddr]);
 }
 
 static void m5205_int1(running_machine *machine, int data)

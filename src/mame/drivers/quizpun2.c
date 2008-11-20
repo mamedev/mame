@@ -274,7 +274,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 static WRITE8_HANDLER( quizpun2_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "main");
-	memory_set_bankptr( 1, &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
+	memory_set_bankptr(space->machine,  1, &ROM[ 0x10000 + 0x2000 * (data & 0x1f) ] );
 }
 
 static WRITE8_HANDLER( quizpun2_irq_ack )

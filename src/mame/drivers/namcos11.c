@@ -640,7 +640,7 @@ static UINT32 m_n_bankoffset;
 
 INLINE void bankswitch_rom8( int n_bank, int n_data )
 {
-	memory_set_bank( n_bank + 1, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
+	memory_set_bank( Machine,  n_bank + 1, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
 }
 
 static WRITE32_HANDLER( bankswitch_rom32_w )
@@ -674,7 +674,7 @@ static WRITE32_HANDLER( bankswitch_rom64_upper_w )
 INLINE void bankswitch_rom64( int n_bank, int n_data )
 {
 	/* todo: verify behaviour */
-	memory_set_bank( n_bank + 1, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ m_n_bankoffset ) );
+	memory_set_bank( Machine,  n_bank + 1, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ m_n_bankoffset ) );
 }
 
 static WRITE32_HANDLER( bankswitch_rom64_w )
@@ -830,7 +830,7 @@ static DRIVER_INIT( namcos11 )
 				for( bank = 0; bank < 8; bank++ )
 				{
 					memory_configure_bank(machine,  bank + 1, 0, len / ( 1024 * 1024 ), rgn, 1024 * 1024 );
-					memory_set_bank( bank + 1, 0 );
+					memory_set_bank(machine,  bank + 1, 0 );
 				}
 
 				if( namcos11_config_table[ n_game ].n_daughterboard == 32 )

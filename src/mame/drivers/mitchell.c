@@ -116,7 +116,7 @@ static UINT8 pang_port5_kludge = 0;
 
 static WRITE8_HANDLER( pang_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x0f);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 

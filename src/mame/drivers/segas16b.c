@@ -1331,7 +1331,7 @@ static WRITE8_HANDLER( upd7759_control_w )
 				bankoffs += (data & 0x07) * 0x04000;
 				break;
 		}
-		memory_set_bankptr(1, memory_region(space->machine, "sound") + 0x10000 + (bankoffs % size));
+		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "sound") + 0x10000 + (bankoffs % size));
 	}
 }
 

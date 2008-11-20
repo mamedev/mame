@@ -55,7 +55,7 @@ extern VIDEO_UPDATE( shootouj );
 
 static WRITE8_HANDLER( shootout_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x0f);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 static WRITE8_HANDLER( sound_cpu_command_w )

@@ -85,7 +85,7 @@ static WRITE8_HANDLER( lwings_bankswitch_w )
 	/* bits 1 and 2 select ROM bank */
 	RAM = memory_region(space->machine, "main");
 	bank = (data & 0x06) >> 1;
-	memory_set_bankptr(1,&RAM[0x10000 + bank*0x4000]);
+	memory_set_bankptr(space->machine, 1,&RAM[0x10000 + bank*0x4000]);
 
 	/* bit 3 enables NMI */
 	interrupt_enable_w(space,0,data & 0x08);

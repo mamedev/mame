@@ -76,14 +76,14 @@ static WRITE8_HANDLER( ojankohs_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "main");
 
-	memory_set_bankptr(1, &ROM[0x10000 + (0x4000 * (data & 0x3f))]);
+	memory_set_bankptr(space->machine, 1, &ROM[0x10000 + (0x4000 * (data & 0x3f))]);
 }
 
 static WRITE8_HANDLER( ojankoy_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "main");
 
-	memory_set_bankptr(1, &ROM[0x10000 + (0x4000 * (data & 0x1f))]);
+	memory_set_bankptr(space->machine, 1, &ROM[0x10000 + (0x4000 * (data & 0x1f))]);
 
 	ojankohs_adpcm_reset = ((data & 0x20) >> 5);
 	if (!ojankohs_adpcm_reset) ojankohs_vclk_left = 0;
@@ -128,7 +128,7 @@ static WRITE8_HANDLER( ojankoc_ctrl_w )
 	UINT8 *BANKROM = memory_region(space->machine, "user1");
 	UINT32 bank_address = (data & 0x0f) * 0x8000;
 
-	memory_set_bankptr(1, &BANKROM[bank_address]);
+	memory_set_bankptr(space->machine, 1, &BANKROM[bank_address]);
 
 	ojankohs_adpcm_reset = ((data & 0x10) >> 4);
 	msm5205_reset_w(0, (!(data & 0x10) >> 4));

@@ -70,8 +70,8 @@ ADDRESS_MAP_END
 /* Wrong ! */
 static WRITE8_HANDLER(pzlestar_bank_w)
 {
-	memory_set_bankptr(2,&memory_region(space->machine, "user1")[0x20000+ ( ((0x8000*data)^0x10000))  ]);
-	memory_set_bankptr(3,&memory_region(space->machine, "user1")[  0x18000  ]);
+	memory_set_bankptr(space->machine, 2,&memory_region(space->machine, "user1")[0x20000+ ( ((0x8000*data)^0x10000))  ]);
+	memory_set_bankptr(space->machine, 3,&memory_region(space->machine, "user1")[  0x18000  ]);
 }
 
 /* Puzzle Star Ports */
@@ -170,12 +170,12 @@ static INPUT_PORTS_START( sangho )
 INPUT_PORTS_END
 
 
-static void sangho_common_machine_reset(void)
+static void sangho_common_machine_reset(running_machine *machine)
 {
-	memory_set_bankptr(1,&sangho_ram[0]);
-	memory_set_bankptr(2,&sangho_ram[0x4000]);
-	memory_set_bankptr(3,&sangho_ram[0x8000]);
-	memory_set_bankptr(4,&sangho_ram[0xc000]);
+	memory_set_bankptr(machine, 1,&sangho_ram[0]);
+	memory_set_bankptr(machine, 2,&sangho_ram[0x4000]);
+	memory_set_bankptr(machine, 3,&sangho_ram[0x8000]);
+	memory_set_bankptr(machine, 4,&sangho_ram[0xc000]);
 	v9938_reset(0);
 }
 
@@ -189,7 +189,7 @@ static MACHINE_RESET(pzlestar)
 	sangho_ram[0x25c1]=0xaf;
 	sangho_ram[0x25c2]=0xc9;
 
-	sangho_common_machine_reset();
+	sangho_common_machine_reset(machine);
 }
 
 static MACHINE_RESET(sexyboom)
@@ -200,7 +200,7 @@ static MACHINE_RESET(sexyboom)
 	sangho_ram[0x022e]=0xc9;
 	sangho_ram[0x4604]=0xc9;
 
-	sangho_common_machine_reset();
+	sangho_common_machine_reset(machine);
 }
 
 static void msx_vdp_interrupt(running_machine *machine, int i)

@@ -87,7 +87,7 @@ WRITE8_HANDLER( kangaroo_video_control_w )
 			break;
 
 		case 8:	/* bank select */
-			memory_set_bank(1, (data & 0x05) ? 0 : 1);
+			memory_set_bank(space->machine, 1, (data & 0x05) ? 0 : 1);
 			break;
 	}
 }

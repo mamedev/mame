@@ -424,7 +424,7 @@ static void crimfght_banking( int lines )
 	if (lines & 0x20)
 	{
 		memory_install_readwrite8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK3, paletteram_xBBBBBGGGGGRRRRR_be_w);
-		memory_set_bankptr(3, paletteram);
+		memory_set_bankptr(Machine, 3, paletteram);
 	}
 	else
 		memory_install_readwrite8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK1, SMH_BANK1);								/* RAM */
@@ -433,7 +433,7 @@ static void crimfght_banking( int lines )
 	K052109_set_RMRD_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	offs = 0x10000 + ((lines & 0x0f) * 0x2000);
-	memory_set_bankptr(2, &RAM[offs]);
+	memory_set_bankptr(Machine, 2, &RAM[offs]);
 }
 
 static MACHINE_RESET( crimfght )
@@ -443,7 +443,7 @@ static MACHINE_RESET( crimfght )
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)crimfght_banking);
 
 	/* init the default bank */
-	memory_set_bankptr( 2, &RAM[0x10000] );
+	memory_set_bankptr(machine,  2, &RAM[0x10000] );
 }
 
 static DRIVER_INIT( crimfght )

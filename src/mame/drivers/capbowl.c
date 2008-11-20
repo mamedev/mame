@@ -149,7 +149,7 @@ static MACHINE_RESET( capbowl )
 static WRITE8_HANDLER( capbowl_rom_select_w )
 {
 	int bankaddress = ((data & 0x0c) << 13) + ((data & 0x01) << 14);
-	memory_set_bankptr(1, memory_region(space->machine, "main") + 0x10000 + bankaddress);
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x10000 + bankaddress);
 }
 
 

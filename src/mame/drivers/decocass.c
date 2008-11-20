@@ -1139,7 +1139,7 @@ static DRIVER_INIT( decocrom )
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "user3"), 0);
 	memory_configure_bank_decrypted(machine, 1, 0, 1, &decrypted[0x6000], 0);
 	memory_configure_bank_decrypted(machine, 1, 1, 1, decrypted2, 0);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
 	/* install the bank selector */
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe900, 0xe900, 0, 0, decocass_e900_w);

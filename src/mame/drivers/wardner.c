@@ -155,7 +155,7 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 				case 6:  bankaddress = 0x30000; break; /* not used */
 				default: bankaddress = 0x00000; break; /* not used */
 			}
-			memory_set_bankptr(1,&RAM[bankaddress]);
+			memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 		}
 		else
 		{
@@ -163,10 +163,10 @@ static WRITE8_HANDLER( wardner_ramrom_bank_sw )
 			memory_install_read8_handler(space, 0xa000, 0xadff, 0, 0, SMH_BANK4);
 			memory_install_read8_handler(space, 0xae00, 0xafff, 0, 0, SMH_BANK2);
 			memory_install_read8_handler(space, 0xc000, 0xc7ff, 0, 0, SMH_BANK3);
-			memory_set_bankptr(1, &RAM[0x0000]);
-			memory_set_bankptr(2, rambase_ae00);
-			memory_set_bankptr(3, rambase_c000);
-			memory_set_bankptr(4, paletteram);
+			memory_set_bankptr(space->machine, 1, &RAM[0x0000]);
+			memory_set_bankptr(space->machine, 2, rambase_ae00);
+			memory_set_bankptr(space->machine, 3, rambase_c000);
+			memory_set_bankptr(space->machine, 4, paletteram);
 		}
 	}
 }

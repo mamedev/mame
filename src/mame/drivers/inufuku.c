@@ -112,7 +112,7 @@ static WRITE8_HANDLER( inufuku_soundrombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "audio") + 0x10000;
 
-	memory_set_bankptr(1, ROM + (data & 0x03) * 0x8000);
+	memory_set_bankptr(space->machine, 1, ROM + (data & 0x03) * 0x8000);
 }
 
 

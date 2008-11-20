@@ -131,13 +131,13 @@ static WRITE8_HANDLER( chinagat_video_ctrl_w )
 static WRITE8_HANDLER( chinagat_bankswitch_w )
 {
 	UINT8 *RAM = memory_region(space->machine, "main");
-	memory_set_bankptr( 1,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
+	memory_set_bankptr(space->machine,  1,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
 }
 
 static WRITE8_HANDLER( chinagat_sub_bankswitch_w )
 {
 	UINT8 *RAM = memory_region( space->machine, "sub" );
-	memory_set_bankptr( 4,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
+	memory_set_bankptr(space->machine,  4,&RAM[ 0x10000 + (0x4000 * (data & 7)) ] );
 }
 
 static WRITE8_HANDLER( chinagat_sub_IRQ_w )

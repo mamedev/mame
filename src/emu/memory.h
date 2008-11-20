@@ -945,13 +945,13 @@ void memory_configure_bank(running_machine *machine, int banknum, int startentry
 void memory_configure_bank_decrypted(running_machine *machine, int banknum, int startentry, int numentries, void *base, offs_t stride);
 
 /* select one pre-configured entry to be the new bank base */
-void memory_set_bank(int banknum, int entrynum);
+void memory_set_bank(running_machine *machine, int banknum, int entrynum);
 
 /* return the currently selected bank */
-int memory_get_bank(int banknum);
+int memory_get_bank(running_machine *machine, int banknum);
 
 /* set the absolute address of a bank base */
-void memory_set_bankptr(int banknum, void *base);
+void memory_set_bankptr(running_machine *machine, int banknum, void *base);
 
 
 

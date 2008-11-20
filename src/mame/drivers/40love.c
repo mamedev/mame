@@ -305,7 +305,7 @@ static WRITE8_HANDLER( bank_select_w )
 //      popmessage("WRONG BANK SELECT = %x !!!!\n",data);
 	}
 
-	memory_set_bank( 1, data&1 );
+	memory_set_bank(space->machine,  1, data&1 );
 }
 
 

@@ -95,8 +95,8 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 		address |= (data & 0x10) ? 0x10000 : 0;
 
-		memory_set_bankptr(1, &rom[address]);
-		memory_set_bankptr(2, &rom[address + 0x1000]);
+		memory_set_bankptr(space->machine, 1, &rom[address]);
+		memory_set_bankptr(space->machine, 2, &rom[address + 0x1000]);
 	}
 	else
 	{
@@ -135,7 +135,7 @@ static WRITE8_HANDLER( trvmadns_banking_w )
 
 //      printf("add = %X\n",address);
 
-		memory_set_bankptr(1, &rom[address]);
+		memory_set_bankptr(space->machine, 1, &rom[address]);
 	}
 }
 

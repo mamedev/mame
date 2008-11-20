@@ -96,19 +96,19 @@ static WRITE8_HANDLER( outport24_w )
 
 static WRITE8_HANDLER( hvymetal_videomode_w )
 {
-	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
+	memory_set_bank(space->machine, 1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
 	system1_videomode_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( brain_videomode_w )
 {
-	memory_set_bank(1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
+	memory_set_bank(space->machine, 1, ((data & 0x04)>>2) + ((data & 0x40)>>5));
 	system1_videomode_w(space, 0, data);
 }
 
 static WRITE8_HANDLER( chplft_videomode_w )
 {
-	memory_set_bank(1, (data & 0x0c)>>2);
+	memory_set_bank(space->machine, 1, (data & 0x0c)>>2);
 	system1_videomode_w(space, 0, data);
 }
 

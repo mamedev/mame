@@ -170,10 +170,10 @@ static void machine_init(running_machine *machine)
 		cur_rambank[i] = 0x80;
 		current_base[i] = palette_ram;
 		current_notifier[i] = palette_notifier;
-		memory_set_bankptr(2+i, current_base[i]);
+		memory_set_bankptr(machine, 2+i, current_base[i]);
 	}
 	cur_rombank = cur_rombank2 = 0;
-	memory_set_bankptr(1, memory_region(machine, "main") + 0x10000);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x10000);
 
 	for(i=0;i<512;i++)
 	{
@@ -358,7 +358,7 @@ static WRITE8_HANDLER( rombankswitch_w )
 
 //      logerror("robs %d, %02x (%04x)\n", offset, data, cpu_get_pc(space->cpu));
 		cur_rombank = data;
-		memory_set_bankptr(1, memory_region(space->machine, "main")+0x10000+0x2000*cur_rombank);
+		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main")+0x10000+0x2000*cur_rombank);
 	}
 }
 
@@ -377,7 +377,7 @@ static WRITE8_HANDLER( rombank2switch_w )
 //      logerror("robs2 %02x (%04x)\n", data, cpu_get_pc(space->cpu));
 
 		cur_rombank2 = data;
-		memory_set_bankptr(6, memory_region(space->machine, "slave")+0x10000+0x4000*cur_rombank2);
+		memory_set_bankptr(space->machine, 6, memory_region(space->machine, "slave")+0x10000+0x4000*cur_rombank2);
 	}
 }
 
@@ -414,7 +414,7 @@ logerror("unknown rambankswitch %d, %02x (%04x)\n", offset, data, cpu_get_pc(spa
 			current_notifier[offset] = 0;
 			current_base[offset] = empty_ram;
 		}
-		memory_set_bankptr(2+offset, current_base[offset]);
+		memory_set_bankptr(space->machine, 2+offset, current_base[offset]);
 	}
 }
 
@@ -810,7 +810,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "audio");
 	int banknum = (data - 1) & 3;
 
-	memory_set_bankptr (7, &RAM [0x10000 + (banknum * 0x4000)]);
+	memory_set_bankptr (space->machine, 7, &RAM [0x10000 + (banknum * 0x4000)]);
 }
 
 static ADDRESS_MAP_START( raimais_3_writemem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -2067,7 +2067,7 @@ static WRITE8_HANDLER( portA_w )
 
 		cur_bank = data & 0x03;
 		bankaddress = 0x10000 + (cur_bank-1) * 0x4000;
-		memory_set_bankptr(7,&RAM[bankaddress]);
+		memory_set_bankptr(space->machine, 7,&RAM[bankaddress]);
 		//logerror ("YM2203 bank change val=%02x  pc=%04x\n",cur_bank, cpu_get_pc(space->cpu) );
 	}
 }

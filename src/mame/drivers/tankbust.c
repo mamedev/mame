@@ -113,8 +113,8 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	case 7: /* 0xe007 bankswitch */
 		/* bank 1 at 0x6000-9fff = from 0x10000 when bit0=0 else from 0x14000 */
 		/* bank 2 at 0xa000-bfff = from 0x18000 when bit0=0 else from 0x1a000 */
-		memory_set_bankptr( 1, memory_region(space->machine, "main") + 0x10000 + ((data&1) * 0x4000) );
-		memory_set_bankptr( 2, memory_region(space->machine, "main") + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
+		memory_set_bankptr(space->machine,  1, memory_region(space->machine, "main") + 0x10000 + ((data&1) * 0x4000) );
+		memory_set_bankptr(space->machine,  2, memory_region(space->machine, "main") + 0x18000 + ((data&1) * 0x2000) ); /* verified (the game will reset after the "game over" otherwise) */
 	break;
 	}
 }

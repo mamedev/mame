@@ -46,7 +46,7 @@ if (data & 0xe0) popmessage("bankswitch %02x",data);
 
 	/* bits 0-2 = bank number */
 	bankaddress = 0x10000 + (data & 0x07) * 0x4000;
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress]);
 
 	/* bits 3 and 4 are coin counters */
 	coin_counter_w(0,data & 0x08);

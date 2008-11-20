@@ -166,7 +166,7 @@ static WRITE8_HANDLER(bg2_w)
 	bgadr = (bgadr & 0xfb) | ((data & 1)<<2);
 	if(bgadr > 2)
 		bgadr = 0;
-	memory_set_bankptr( 1, memory_region(space->machine, "user1") + bgadr * 0x4000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "user1") + bgadr * 0x4000 );
 }
 
 static WRITE8_HANDLER( sound_w )
@@ -572,7 +572,7 @@ static DRIVER_INIT( ddayjlc )
 		free(temp);
 	}
 
-	memory_set_bankptr( 1, memory_region(machine, "user1") );
+	memory_set_bankptr(machine,  1, memory_region(machine, "user1") );
 
 }
 

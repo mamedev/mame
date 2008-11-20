@@ -507,8 +507,8 @@ static WRITE32_HANDLER ( rabbit_rombank_w )
 //  mame_printf_debug("rabbit rombank %08x\n",data&0x3ff);
 	bank = data & 0x3ff;
 
-//  memory_set_bankptr(1,&dataroms[0x40000*(bank&0x3ff)]);
-	memory_set_bankptr(1,&dataroms[0]);
+//  memory_set_bankptr(space->machine, 1,&dataroms[0x40000*(bank&0x3ff)]);
+	memory_set_bankptr(space->machine, 1,&dataroms[0]);
 }
 
 /*

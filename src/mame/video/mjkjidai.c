@@ -70,12 +70,12 @@ WRITE8_HANDLER( mjkjidai_ctrl_w )
 	/* bits 6-7 select ROM bank */
 	if (data & 0xc0)
 	{
-		memory_set_bankptr(1,rom + 0x10000-0x4000 + ((data & 0xc0) << 8));
+		memory_set_bankptr(space->machine, 1,rom + 0x10000-0x4000 + ((data & 0xc0) << 8));
 	}
 	else
 	{
 		/* there is code flowing from 7fff to this bank so they have to be contiguous in memory */
-		memory_set_bankptr(1,rom + 0x08000);
+		memory_set_bankptr(space->machine, 1,rom + 0x08000);
 	}
 }
 

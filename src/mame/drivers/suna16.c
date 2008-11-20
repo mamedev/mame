@@ -339,7 +339,7 @@ static WRITE8_HANDLER( bssoccer_pcm_1_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "pcm1");
 	int bank = data & 7;
 	if (bank & ~7)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
-	memory_set_bankptr(1, &RAM[bank * 0x10000 + 0x1000]);
+	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x10000 + 0x1000]);
 }
 
 static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
@@ -347,7 +347,7 @@ static WRITE8_HANDLER( bssoccer_pcm_2_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "pcm2");
 	int bank = data & 7;
 	if (bank & ~7)	logerror("CPU#3 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
-	memory_set_bankptr(2, &RAM[bank * 0x10000 + 0x1000]);
+	memory_set_bankptr(space->machine, 2, &RAM[bank * 0x10000 + 0x1000]);
 }
 
 
@@ -411,7 +411,7 @@ static WRITE8_HANDLER( uballoon_pcm_1_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "pcm");
 	int bank = data & 1;
 	if (bank & ~1)	logerror("CPU#2 PC %06X - ROM bank unknown bits: %02X\n", cpu_get_pc(space->cpu), data);
-	memory_set_bankptr(1, &RAM[bank * 0x10000 + 0x400]);
+	memory_set_bankptr(space->machine, 1, &RAM[bank * 0x10000 + 0x400]);
 }
 
 /* Memory maps: Yes, *no* RAM */

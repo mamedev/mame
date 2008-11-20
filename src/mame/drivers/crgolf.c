@@ -55,7 +55,7 @@ static UINT8 sample_count;
 
 static WRITE8_HANDLER( rom_bank_select_w )
 {
-	memory_set_bank(1, data & 15);
+	memory_set_bank(space->machine, 1, data & 15);
 }
 
 
@@ -63,7 +63,7 @@ static MACHINE_START( crgolf )
 {
 	/* configure the banking */
 	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x2000);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
 	/* register for save states */
 	state_save_register_global(port_select);

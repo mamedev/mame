@@ -112,7 +112,7 @@ static WRITE8_HANDLER(port60_w)
 		data=0;
 	}
 	port60=data;
-	memory_set_bankptr( 1, &memory_region(space->machine, "user1")[rombankLookup[data]*0x4000] );
+	memory_set_bankptr(space->machine,  1, &memory_region(space->machine, "user1")[rombankLookup[data]*0x4000] );
 }
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )

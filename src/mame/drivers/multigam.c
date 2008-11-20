@@ -362,7 +362,7 @@ static void multigam_init_smb3(running_machine *machine)
 
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8000, 0xffff, 0, 0, multigam3_mmc3_rom_switch_w );
 
-	memory_set_bankptr(1, multigmc_mmc3_6000_ram);
+	memory_set_bankptr(machine, 1, multigmc_mmc3_6000_ram);
 
 	multigam3_mmc3_banks[0] = 0x1e;
 	multigam3_mmc3_banks[1] = 0x1f;
@@ -399,7 +399,7 @@ static WRITE8_HANDLER(multigm3_switch_prg_rom)
 	else
 	{
 		memory_install_write8_handler(space, 0x8000, 0xffff, 0, 0, multigm3_mapper2_w );
-		memory_set_bankptr(1, memory_region(space->machine, "main") + 0x6000);
+		memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x6000);
 	}
 
 	if ( data & 0x80 )

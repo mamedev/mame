@@ -405,7 +405,7 @@ logerror("CPU #0 PC %06x: warning - write %04x to motor cpu %03x\n",cpu_get_pc(s
 
 static void reset_sound_region(running_machine *machine)
 {
-	memory_set_bankptr( 10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
+	memory_set_bankptr(machine,  10, memory_region(machine, "audio") + (banknum * 0x4000) + 0x10000 );
 }
 
 static WRITE8_HANDLER( sound_bankswitch_w )	/* assumes Z80 sandwiched between 68Ks */

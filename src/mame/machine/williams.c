@@ -479,7 +479,7 @@ WRITE8_HANDLER( williams_vram_select_w )
 {
 	/* VRAM/ROM banking from bit 0 */
 	vram_bank = data & 0x01;
-	memory_set_bank(1, vram_bank);
+	memory_set_bank(space->machine, 1, vram_bank);
 
 	/* cocktail flip from bit 1 */
 	williams_cocktail = data & 0x02;
@@ -497,8 +497,8 @@ WRITE8_HANDLER( williams2_bank_select_w )
 		case 0:
 			memory_install_read8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
 			memory_install_write8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
-			memory_set_bank(1, 0);
-			memory_set_bankptr(4, &williams_videoram[0x8000]);
+			memory_set_bank(space->machine, 1, 0);
+			memory_set_bankptr(space->machine, 4, &williams_videoram[0x8000]);
 			break;
 
 		/* pages 1 and 2 are ROM */
@@ -506,15 +506,15 @@ WRITE8_HANDLER( williams2_bank_select_w )
 		case 2:
 			memory_install_read8_handler(space, 0x0000, 0x8fff, 0, 0, SMH_BANK1);
 			memory_install_write8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK4);
-			memory_set_bank(1, 1 + ((vram_bank & 6) >> 1));
-			memory_set_bankptr(4, &williams_videoram[0x8000]);
+			memory_set_bank(space->machine, 1, 1 + ((vram_bank & 6) >> 1));
+			memory_set_bankptr(space->machine, 4, &williams_videoram[0x8000]);
 			break;
 
 		/* page 3 accesses palette RAM; the remaining areas are as if page 1 ROM was selected */
 		case 3:
 			memory_install_readwrite8_handler(space, 0x8000, 0x87ff, 0, 0, SMH_BANK4, williams2_paletteram_w);
-			memory_set_bank(1, 1 + ((vram_bank & 4) >> 1));
-			memory_set_bankptr(4, paletteram);
+			memory_set_bank(space->machine, 1, 1 + ((vram_bank & 4) >> 1));
+			memory_set_bankptr(space->machine, 4, paletteram);
 			break;
 	}
 }
@@ -749,7 +749,7 @@ WRITE8_HANDLER( defender_bank_select_w )
 	{
 		/* page 0 is I/O space */
 		case 0:
-			defender_install_io_space(space->machine);
+			defender_install_io_space(space);
 			break;
 
 		/* pages 1-9 map to ROM banks */
@@ -763,7 +763,7 @@ WRITE8_HANDLER( defender_bank_select_w )
 		case 8:
 		case 9:
 			memory_install_readwrite8_handler(space, 0xc000, 0xcfff, 0, 0, SMH_BANK1, SMH_UNMAP);
-			memory_set_bank(1, vram_bank - 1);
+			memory_set_bank(space->machine, 1, vram_bank - 1);
 			break;
 
 		/* pages A-F are not connected */
@@ -831,10 +831,10 @@ MACHINE_RESET( blaster )
 }
 
 
-INLINE void update_blaster_banking(void)
+INLINE void update_blaster_banking(running_machine *machine)
 {
-	memory_set_bank(1, vram_bank * (blaster_bank + 1));
-	memory_set_bank(2, vram_bank * (blaster_bank + 1));
+	memory_set_bank(machine, 1, vram_bank * (blaster_bank + 1));
+	memory_set_bank(machine, 2, vram_bank * (blaster_bank + 1));
 }
 
 
@@ -842,7 +842,7 @@ WRITE8_HANDLER( blaster_vram_select_w )
 {
 	/* VRAM/ROM banking from bit 0 */
 	vram_bank = data & 0x01;
-	update_blaster_banking();
+	update_blaster_banking(space->machine);
 
 	/* cocktail flip from bit 1 */
 	williams_cocktail = data & 0x02;
@@ -855,7 +855,7 @@ WRITE8_HANDLER( blaster_vram_select_w )
 WRITE8_HANDLER( blaster_bank_select_w )
 {
 	blaster_bank = data & 15;
-	update_blaster_banking();
+	update_blaster_banking(space->machine);
 }
 
 

@@ -221,7 +221,7 @@ static TIMER_CALLBACK( m92_scanline_interrupt );
 static void set_m92_bank(running_machine *machine)
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1,&RAM[bankaddress]);
+	memory_set_bankptr(machine, 1,&RAM[bankaddress]);
 }
 
 static STATE_POSTLOAD( m92_postload )
@@ -1972,7 +1972,7 @@ static void init_m92(running_machine *machine, int hasbanks)
 
 		/* Mirror used by In The Hunt for protection */
 		memcpy(RAM+0xc0000,RAM+0x00000,0x10000);
-		memory_set_bankptr(2,&RAM[0xc0000]);
+		memory_set_bankptr(machine, 2,&RAM[0xc0000]);
 	}
 
 	RAM = memory_region(machine, "sound");

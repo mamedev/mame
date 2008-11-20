@@ -1176,7 +1176,7 @@ static WRITE8_HANDLER( hotdogst_rombank_w )
 	int bank = data & 0x0f;
 	if ( data & ~0x0f )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank > 1)	bank+=2;
-	memory_set_bankptr(2, &RAM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, 2, &RAM[ 0x4000 * bank ]);
 }
 
 static WRITE8_HANDLER( hotdogst_okibank_w )
@@ -1229,7 +1229,7 @@ static WRITE8_HANDLER( mazinger_rombank_w )
 	int bank = data & 0x07;
 	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank > 1)	bank+=2;
-	memory_set_bankptr(2, &RAM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, 2, &RAM[ 0x4000 * bank ]);
 }
 
 static ADDRESS_MAP_START( mazinger_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1273,7 +1273,7 @@ static WRITE8_HANDLER( metmqstr_rombank_w )
 	int bank = data & 0xf;
 	if ( bank != data )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank >= 2)	bank += 2;
-	memory_set_bankptr(1, &ROM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, 1, &ROM[ 0x4000 * bank ]);
 }
 
 static WRITE8_HANDLER( metmqstr_okibank0_w )
@@ -1336,7 +1336,7 @@ static WRITE8_HANDLER( pwrinst2_rombank_w )
 	int bank = data & 0x07;
 	if ( data & ~0x07 )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank > 2)	bank+=1;
-	memory_set_bankptr(1, &ROM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, 1, &ROM[ 0x4000 * bank ]);
 }
 
 static ADDRESS_MAP_START( pwrinst2_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1394,7 +1394,7 @@ static WRITE8_HANDLER( sailormn_rombank_w )
 	int bank = data & 0x1f;
 	if ( data & ~0x1f )	logerror("CPU #1 - PC %04X: Bank %02X\n",cpu_get_pc(space->cpu),data);
 	if (bank > 1)	bank+=2;
-	memory_set_bankptr(1, &RAM[ 0x4000 * bank ]);
+	memory_set_bankptr(space->machine, 1, &RAM[ 0x4000 * bank ]);
 }
 
 static WRITE8_HANDLER( sailormn_okibank0_w )
@@ -4246,7 +4246,7 @@ static DRIVER_INIT( mazinger )
 	time_vblank_irq = 2100;
 
 	/* setup extra ROM */
-	memory_set_bankptr(1,memory_region(machine, "user1"));
+	memory_set_bankptr(machine, 1,memory_region(machine, "user1"));
 }
 
 

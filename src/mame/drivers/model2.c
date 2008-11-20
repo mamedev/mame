@@ -362,8 +362,8 @@ static MACHINE_RESET(model2o)
 
 static MACHINE_RESET(model2_scsp)
 {
-	memory_set_bankptr(4, memory_region(machine, "scsp") + 0x200000);
-	memory_set_bankptr(5, memory_region(machine, "scsp") + 0x600000);
+	memory_set_bankptr(machine, 4, memory_region(machine, "scsp") + 0x200000);
+	memory_set_bankptr(machine, 5, memory_region(machine, "scsp") + 0x600000);
 
 	// copy the 68k vector table into RAM
 	memcpy(model2_soundram, memory_region(machine, "audio")+0x80000, 16);
@@ -1697,13 +1697,13 @@ static WRITE16_HANDLER( model2snd_ctrl )
 		UINT8 *snd = memory_region(space->machine, "scsp");
 		if (data & 0x20)
 		{
-	  		memory_set_bankptr(4, snd + 0x200000);
-			memory_set_bankptr(5, snd + 0x600000);
+	  		memory_set_bankptr(space->machine, 4, snd + 0x200000);
+			memory_set_bankptr(space->machine, 5, snd + 0x600000);
 		}
 		else
 		{
-			memory_set_bankptr(4, snd + 0x800000);
-			memory_set_bankptr(5, snd + 0xa00000);
+			memory_set_bankptr(space->machine, 4, snd + 0x800000);
+			memory_set_bankptr(space->machine, 5, snd + 0xa00000);
 		}
 	}
 }

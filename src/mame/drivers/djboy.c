@@ -664,7 +664,7 @@ static WRITE8_HANDLER( cpu0_bankswitch_w )
 {
 	unsigned char *RAM = memory_region(space->machine, "main");
 	data ^= bankxor;
-	memory_set_bankptr(4,&RAM[0x10000]); /* unsure if/how this area is banked */
+	memory_set_bankptr(space->machine, 4,&RAM[0x10000]); /* unsure if/how this area is banked */
 	if( data < 4 )
 	{
 		RAM = &RAM[0x2000 * data];
@@ -673,7 +673,7 @@ static WRITE8_HANDLER( cpu0_bankswitch_w )
 	{
 		RAM = &RAM[0x10000 + 0x2000 * (data-4)];
 	}
-	memory_set_bankptr(1,RAM);
+	memory_set_bankptr(space->machine, 1,RAM);
 }
 
 /******************************************************************************/
@@ -691,20 +691,20 @@ static WRITE8_HANDLER( cpu1_bankswitch_w )
 	switch( data&0xf )
 	{
 	/* bs65.5y */
-	case 0x00: memory_set_bankptr(2,&RAM[0x00000]); break;
-	case 0x01: memory_set_bankptr(2,&RAM[0x04000]); break;
-	case 0x02: memory_set_bankptr(2,&RAM[0x10000]); break;
-	case 0x03: memory_set_bankptr(2,&RAM[0x14000]); break;
+	case 0x00: memory_set_bankptr(space->machine, 2,&RAM[0x00000]); break;
+	case 0x01: memory_set_bankptr(space->machine, 2,&RAM[0x04000]); break;
+	case 0x02: memory_set_bankptr(space->machine, 2,&RAM[0x10000]); break;
+	case 0x03: memory_set_bankptr(space->machine, 2,&RAM[0x14000]); break;
 
 	/* bs101.6w */
-	case 0x08: memory_set_bankptr(2,&RAM[0x18000]); break;
-	case 0x09: memory_set_bankptr(2,&RAM[0x1c000]); break;
-	case 0x0a: memory_set_bankptr(2,&RAM[0x20000]); break;
-	case 0x0b: memory_set_bankptr(2,&RAM[0x24000]); break;
-	case 0x0c: memory_set_bankptr(2,&RAM[0x28000]); break;
-	case 0x0d: memory_set_bankptr(2,&RAM[0x2c000]); break;
-	case 0x0e: memory_set_bankptr(2,&RAM[0x30000]); break;
-	case 0x0f: memory_set_bankptr(2,&RAM[0x34000]); break;
+	case 0x08: memory_set_bankptr(space->machine, 2,&RAM[0x18000]); break;
+	case 0x09: memory_set_bankptr(space->machine, 2,&RAM[0x1c000]); break;
+	case 0x0a: memory_set_bankptr(space->machine, 2,&RAM[0x20000]); break;
+	case 0x0b: memory_set_bankptr(space->machine, 2,&RAM[0x24000]); break;
+	case 0x0c: memory_set_bankptr(space->machine, 2,&RAM[0x28000]); break;
+	case 0x0d: memory_set_bankptr(space->machine, 2,&RAM[0x2c000]); break;
+	case 0x0e: memory_set_bankptr(space->machine, 2,&RAM[0x30000]); break;
+	case 0x0f: memory_set_bankptr(space->machine, 2,&RAM[0x34000]); break;
 
 	default:
 		break;
@@ -731,7 +731,7 @@ static WRITE8_HANDLER( cpu2_bankswitch_w )
 	{
 		RAM = &RAM[0x10000 + 0x4000*(data-3)];
 	}
-	memory_set_bankptr(3,RAM);
+	memory_set_bankptr(space->machine, 3,RAM);
 }
 
 /******************************************************************************/

@@ -63,31 +63,31 @@ static WRITE8_HANDLER( pokechmp_bank_w )
 
 	if (data == 0x00)
 	{
-		memory_set_bankptr(1,&RAM[0x10000]);
-		memory_set_bankptr(2,&RAM[0x12000]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x10000]);
+		memory_set_bankptr(space->machine, 2,&RAM[0x12000]);
 	}
 	if (data == 0x01)
 	{
-		memory_set_bankptr(1,&RAM[0x14000]);
-		memory_set_bankptr(2,&RAM[0x16000]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x14000]);
+		memory_set_bankptr(space->machine, 2,&RAM[0x16000]);
 	}
 	if (data == 0x02)
 	{
-		memory_set_bankptr(1,&RAM[0x20000]);
-		memory_set_bankptr(2,&RAM[0x22000]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x20000]);
+		memory_set_bankptr(space->machine, 2,&RAM[0x22000]);
 	}
 
 	if (data == 0x03)
 	{
-		memory_set_bankptr(1,&RAM[0x04000]);
-		memory_set_bankptr(2,&RAM[0x06000]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x04000]);
+		memory_set_bankptr(space->machine, 2,&RAM[0x06000]);
 	}
 }
 
 #ifdef UNUSED_FUNCTION
 static WRITE8_HANDLER( pokechmp_sound_bank_w )
 {
-	memory_set_bank(3, (data >> 2) & 1);
+	memory_set_bank(space->machine, 3, (data >> 2) & 1);
 }
 #endif
 

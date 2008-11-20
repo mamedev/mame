@@ -72,7 +72,7 @@ static WRITE8_HANDLER( draco_sound_bankswitch_w )
 
 	int bank = BIT(data, 3);
 
-	memory_set_bank(1, bank);
+	memory_set_bank(space->machine, 1, bank);
 }
 
 static WRITE8_HANDLER( draco_sound_g_w )
@@ -567,7 +567,7 @@ static MACHINE_START( draco )
 	/* setup COP402 memory banking */
 
 	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "audio"), 0x400);
-	memory_set_bank(1, 0);
+	memory_set_bank(machine, 1, 0);
 
 	/* register for state saving */
 

@@ -99,7 +99,7 @@ static VIDEO_UPDATE( cultures )
 
 static WRITE8_HANDLER( cpu_bankswitch_w )
 {
-	memory_set_bankptr(1, memory_region(space->machine, "main") + 0x4000 * (data & 0xf));
+	memory_set_bankptr(space->machine, 1, memory_region(space->machine, "main") + 0x4000 * (data & 0xf));
 	video_enable = ~data & 0x20;
 }
 

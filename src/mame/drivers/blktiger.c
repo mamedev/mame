@@ -48,7 +48,7 @@ static READ8_HANDLER( blktiger_protection_r )
 
 static WRITE8_HANDLER( blktiger_bankswitch_w )
 {
-	memory_set_bank(1, data & 0x0f);
+	memory_set_bank(space->machine, 1, data & 0x0f);
 }
 
 static WRITE8_HANDLER( blktiger_coinlockout_w )

@@ -84,7 +84,7 @@ static void set_vram_bank(running_machine *machine)
 	else
 		bankaddress = 0x10000;
 
-	memory_set_bankptr(STATIC_BANK1, &RAM[bankaddress]);	 /* Select 2 banks of 16k */
+	memory_set_bankptr(machine, STATIC_BANK1, &RAM[bankaddress]);	 /* Select 2 banks of 16k */
 }
 
 

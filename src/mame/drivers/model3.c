@@ -1012,10 +1012,10 @@ static MACHINE_START(model3_21)
 static void model3_init(running_machine *machine, int step)
 {
 	model3_step = step;
-	memory_set_bankptr( 1, memory_region( machine, "user1" ) + 0x800000 ); /* banked CROM */
+	memory_set_bankptr(machine,  1, memory_region( machine, "user1" ) + 0x800000 ); /* banked CROM */
 
-	memory_set_bankptr(4, memory_region(machine, "samples") + 0x200000);
-	memory_set_bankptr(5, memory_region(machine, "samples") + 0x600000);
+	memory_set_bankptr(machine, 4, memory_region(machine, "samples") + 0x200000);
+	memory_set_bankptr(machine, 5, memory_region(machine, "samples") + 0x600000);
 
 	// copy the 68k vector table into RAM
 	memcpy(model3_soundram, memory_region(machine, "audio")+0x80000, 16);
@@ -1277,7 +1277,7 @@ static WRITE64_HANDLER( model3_sys_w )
 
 				data >>= 56;
 				data = (~data) & 0xf;
-				memory_set_bankptr( 1, memory_region( space->machine, "user1" ) + 0x800000 + (data * 0x800000)); /* banked CROM */
+				memory_set_bankptr(space->machine,  1, memory_region( space->machine, "user1" ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 			}
 			if (ACCESSING_BITS_24_31)
 			{
@@ -1497,7 +1497,7 @@ static WRITE64_HANDLER(daytona2_rombank_w)
 	{
 		data >>= 56;
 		data = (~data) & 0xf;
-		memory_set_bankptr( 1, memory_region( space->machine, "user1" ) + 0x800000 + (data * 0x800000)); /* banked CROM */
+		memory_set_bankptr(space->machine,  1, memory_region( space->machine, "user1" ) + 0x800000 + (data * 0x800000)); /* banked CROM */
 	}
 }
 
@@ -4240,13 +4240,13 @@ static WRITE16_HANDLER( model3snd_ctrl )
 		UINT8 *snd = memory_region(space->machine, "scsp2");
 		if (data & 0x20)
 		{
-	  		memory_set_bankptr(4, snd + 0x200000);
-			memory_set_bankptr(5, snd + 0x600000);
+	  		memory_set_bankptr(space->machine, 4, snd + 0x200000);
+			memory_set_bankptr(space->machine, 5, snd + 0x600000);
 		}
 		else
 		{
-			memory_set_bankptr(4, snd + 0x800000);
-			memory_set_bankptr(5, snd + 0xa00000);
+			memory_set_bankptr(space->machine, 4, snd + 0x800000);
+			memory_set_bankptr(space->machine, 5, snd + 0xa00000);
 		}
 	}
 }

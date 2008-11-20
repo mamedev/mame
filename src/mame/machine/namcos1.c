@@ -576,7 +576,7 @@ WRITE8_HANDLER( namcos1_sound_bankswitch_w )
 	UINT8 *rom = memory_region(space->machine, "audio") + 0xc000;
 
 	int bank = (data & 0x70) >> 4;
-	memory_set_bankptr(17,rom + 0x4000 * bank);
+	memory_set_bankptr(space->machine, 17,rom + 0x4000 * bank);
 }
 
 
@@ -686,7 +686,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 
 	/* for BANK handlers , memory direct and OP-code base */
 	if (handler->bank_pointer)
-		memory_set_bankptr(banknum + 1, handler->bank_pointer);
+		memory_set_bankptr(machine, banknum + 1, handler->bank_pointer);
 
 	/* read handlers */
 	if (!handler->bank_handler_r)
@@ -875,7 +875,8 @@ MACHINE_RESET( namcos1 )
 	namcos1_bankswitch(machine, 1, 0x0e00, 0x03); /* bank7 = 0x3ff(PRG7) */
 	namcos1_bankswitch(machine, 1, 0x0e01, 0xff);
 
-	/* stop all CPUs */
+	/* reset Cpu 0 and stop all other CPUs */
+	cpu_reset(machine->cpu[0]);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);
@@ -924,7 +925,7 @@ WRITE8_HANDLER( namcos1_mcu_bankswitch_w )
 	/* bit 0-1 : address line A15-A16 */
 	addr += (data & 3) * 0x8000;
 
-	memory_set_bankptr(20, memory_region(space->machine, "mcu") + addr);
+	memory_set_bankptr(space->machine, 20, memory_region(space->machine, "mcu") + addr);
 }
 
 
@@ -1000,8 +1001,8 @@ static void namcos1_driver_init( running_machine *machine, const struct namcos1_
 	state_save_register_global_pointer(namcos1_paletteram, 0x8000);
 
 	/* Point mcu & sound shared RAM to destination */
-	memory_set_bankptr( 18, namcos1_triram );
-	memory_set_bankptr( 19, namcos1_triram );
+	memory_set_bankptr(machine,  18, namcos1_triram );
+	memory_set_bankptr(machine,  19, namcos1_triram );
 
 	/* build bank elements */
 	namcos1_build_banks(machine,specific->key_r,specific->key_w);

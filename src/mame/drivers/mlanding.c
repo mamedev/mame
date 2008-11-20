@@ -87,7 +87,7 @@ static WRITE16_HANDLER(ml_subreset_w)
 static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	data=0;
-	memory_set_bankptr( 1, memory_region(space->machine, "z80") + ((data) & 0x03) * 0x4000 + 0x10000 );
+	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "z80") + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
 static void ml_msm5205_vck(running_machine *machine, int chip)

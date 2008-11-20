@@ -77,7 +77,7 @@ static WRITE8_HANDLER( exzisus_cpua_bankswitch_w )
 		exzisus_cpua_bank = data & 0x0f;
 		if (exzisus_cpua_bank >= 2)
 		{
-			memory_set_bankptr( 2, &RAM[ 0x10000 + ( (exzisus_cpua_bank - 2) * 0x4000 ) ] );
+			memory_set_bankptr(space->machine,  2, &RAM[ 0x10000 + ( (exzisus_cpua_bank - 2) * 0x4000 ) ] );
 		}
 	}
 
@@ -94,7 +94,7 @@ static WRITE8_HANDLER( exzisus_cpub_bankswitch_w )
 		exzisus_cpub_bank = data & 0x0f;
 		if (exzisus_cpub_bank >= 2)
 		{
-			memory_set_bankptr( 1, &RAM[ 0x10000 + ( (exzisus_cpub_bank - 2) * 0x4000 ) ] );
+			memory_set_bankptr(space->machine,  1, &RAM[ 0x10000 + ( (exzisus_cpub_bank - 2) * 0x4000 ) ] );
 		}
 	}
 

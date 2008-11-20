@@ -2153,7 +2153,7 @@ static WRITE8_HANDLER( systeme_bank_w )
 	}
 
 	//memcpy(sms_rom+0x8000, memory_region(space->machine, "user1")+0x10000+rombank*0x4000, 0x4000);
-	memory_set_bank(1, rombank);
+	memory_set_bank(space->machine, 1, rombank);
 
 }
 
@@ -2197,7 +2197,7 @@ static void init_systeme_map(running_machine *machine)
 	/* fixed rom bank area */
 //  sms_rom = auto_malloc(0xc000);
 //  memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0xbfff, 0, 0, SMH_BANK1, SMH_UNMAP);
-//  memory_set_bankptr( 1, sms_rom );
+//  memory_set_bankptr(machine,  1, sms_rom );
 
 	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "z80") + 0x10000, 0x4000);
 
@@ -2210,7 +2210,7 @@ static void init_systeme_map(running_machine *machine)
 	/* main ram area */
 	sms_mainram = auto_malloc(0x4000);
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xc000, 0xffff, 0, 0, SMH_BANK2, SMH_BANK2);
-	memory_set_bankptr( 2, sms_mainram );
+	memory_set_bankptr(machine,  2, sms_mainram );
 	memset(sms_mainram,0x00,0x4000);
 
 	init_ports_systeme(machine);

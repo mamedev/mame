@@ -50,7 +50,7 @@ Notes:
 static WRITE8_HANDLER( nbmj8991_soundbank_w )
 {
 	if (!(data & 0x80)) soundlatch_clear_w(space, 0, 0);
-	memory_set_bank(1, data & 0x03);
+	memory_set_bank(space->machine, 1, data & 0x03);
 }
 
 static WRITE8_HANDLER( nbmj8991_sound_w )
@@ -71,7 +71,7 @@ static MACHINE_RESET( nbmj8991 )
 	if (machine->config->cpu[1].type == CPU_Z80)
 	{
 		memory_configure_bank(machine, 1, 0, 4, memory_region(machine, "audio") + 0x8000, 0x8000);
-		memory_set_bank(1, 0);
+		memory_set_bank(machine, 1, 0);
 	}
 	MACHINE_RESET_CALL(nb1413m3);
 }

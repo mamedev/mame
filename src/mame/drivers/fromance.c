@@ -137,7 +137,7 @@ static WRITE8_HANDLER( fromance_rombank_w )
 {
 	UINT8 *ROM = memory_region(space->machine, "sub");
 
-	memory_set_bankptr(1, &ROM[0x010000 + (0x4000 * data)]);
+	memory_set_bankptr(space->machine, 1, &ROM[0x010000 + (0x4000 * data)]);
 }
 
 

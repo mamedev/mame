@@ -79,7 +79,7 @@ static MACHINE_RESET( chinsan )
 
 static WRITE8_HANDLER(ctrl_w)
 {
-	memory_set_bank(1, data >> 6);
+	memory_set_bank(space->machine, 1, data >> 6);
 }
 
 static WRITE8_HANDLER( ym_port_w1 )

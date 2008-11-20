@@ -164,7 +164,7 @@ static WRITE8_HANDLER ( angelkds_cpu_bank_write )
 	UINT8 *RAM = memory_region(space->machine, "user1");
 
 	bankaddress = data & 0x0f;
-	memory_set_bankptr(1,&RAM[bankaddress*0x4000]);
+	memory_set_bankptr(space->machine, 1,&RAM[bankaddress*0x4000]);
 }
 
 

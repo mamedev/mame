@@ -127,7 +127,7 @@ static WRITE8_HANDLER( mg_bankswitch_w )
 	UINT8 *RAM = memory_region(space->machine, "audio");
 
 	bankaddress = 0x10000 + (data & 0x01) * 0x4000;
-	memory_set_bankptr(3,&RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 3,&RAM[bankaddress]);
 }
 
 static ADDRESS_MAP_START( mg_sound_readmem, ADDRESS_SPACE_PROGRAM, 8 )

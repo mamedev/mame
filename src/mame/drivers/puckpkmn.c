@@ -310,8 +310,8 @@ static DRIVER_INIT( puckpkmn )
 	for (i = 0; i < len; i++)
 		rom[i] = BITSWAP8(rom[i],1,4,2,0,7,5,3,6);
 
-	memory_set_bankptr(1, memory_region(machine, "main") );	// VDP reads the roms from here
-	memory_set_bankptr(2, main_ram );						// VDP reads the ram from here
+	memory_set_bankptr(machine, 1, memory_region(machine, "main") );	// VDP reads the roms from here
+	memory_set_bankptr(machine, 2, main_ram );						// VDP reads the ram from here
 }
 
 ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */

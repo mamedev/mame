@@ -44,11 +44,11 @@ static WRITE8_HANDLER( gng_bankswitch_w )
 {
 	if (data == 4)
 	{
-		memory_set_bank(1,4);
+		memory_set_bank(space->machine, 1,4);
 	}
 	else
 	{
-		memory_set_bank(1,(data & 0x03));
+		memory_set_bank(space->machine, 1,(data & 0x03));
 	}
 }
 

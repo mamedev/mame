@@ -201,13 +201,13 @@ READ8_HANDLER( mhavoc_gamma_r )
 
 WRITE8_HANDLER( mhavoc_ram_banksel_w )
 {
-	memory_set_bank(1, data & 1);
+	memory_set_bank(space->machine, 1, data & 1);
 }
 
 
 WRITE8_HANDLER( mhavoc_rom_banksel_w )
 {
-	memory_set_bank(2, data & 3);
+	memory_set_bank(space->machine, 2, data & 3);
 }
 
 

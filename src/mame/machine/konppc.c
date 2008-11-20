@@ -255,7 +255,7 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 
-					memory_set_bank(texture_bank[board], offset);
+					memory_set_bank(space->machine, texture_bank[board], offset);
 				}
 			}
 			break;
@@ -269,7 +269,7 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 				{
 					int offset = (data & 0x08) ? 1 : 0;
 
-					memory_set_bank(texture_bank[board], offset);
+					memory_set_bank(space->machine, texture_bank[board], offset);
 				}
 			}
 			break;

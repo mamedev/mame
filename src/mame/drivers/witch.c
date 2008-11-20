@@ -356,7 +356,7 @@ static WRITE8_HANDLER(write_a00x)
 				UINT8 *ROM = memory_region(space->machine, "main");
 				bank = newbank;
 				ROM = &ROM[0x10000+0x8000 * newbank + UNBANKED_SIZE];
-				memory_set_bankptr(1,ROM);
+				memory_set_bankptr(space->machine, 1,ROM);
 			}
 		}
 		break;
@@ -850,7 +850,7 @@ ROM_END
 static DRIVER_INIT(witch)
 {
  	UINT8 *ROM = (UINT8 *)memory_region(machine, "main");
-	memory_set_bankptr(1,&ROM[0x10000+UNBANKED_SIZE]);
+	memory_set_bankptr(machine, 1,&ROM[0x10000+UNBANKED_SIZE]);
 
 	memory_install_read8_handler(cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM), 0x7000, 0x700f, 0, 0, prot_read_700x);
 	bank = -1;

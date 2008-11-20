@@ -230,9 +230,9 @@ static WRITE32_HANDLER(Banksw_w)
 {
 	Bank=(data>>1)&7;
 	if(Bank<=2)
-		memory_set_bankptr(1,memory_region(space->machine, "user1")+Bank*0x1000000);
+		memory_set_bankptr(space->machine, 1,memory_region(space->machine, "user1")+Bank*0x1000000);
 	else
-		memory_set_bankptr(1,memory_region(space->machine, "user2"));
+		memory_set_bankptr(space->machine, 1,memory_region(space->machine, "user2"));
 }
 
 static TIMER_CALLBACK( Timercb )
@@ -516,7 +516,7 @@ static MACHINE_RESET(crystal)
 	IntHigh=0;
 	cpu_set_irq_callback(machine->cpu[0],icallback);
 	Bank=0;
-	memory_set_bankptr(1,memory_region(machine, "user1")+0);
+	memory_set_bankptr(machine, 1,memory_region(machine, "user1")+0);
 	FlashCmd=0xff;
 	OldPort4=0;
 

@@ -104,7 +104,7 @@ static WRITE8_HANDLER( aquarium_z80_bank_w )
 	int soundbank = ((data & 0x7) + 1) * 0x8000;
 	UINT8 *Z80 = (UINT8 *)memory_region(space->machine, "audio");
 
-	memory_set_bankptr(1, &Z80[soundbank + 0x10000]);
+	memory_set_bankptr(space->machine, 1, &Z80[soundbank + 0x10000]);
 }
 
 static UINT8 aquarium_snd_bitswap(UINT8 scrambled_data)

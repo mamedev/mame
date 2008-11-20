@@ -1160,8 +1160,8 @@ static READ8_HANDLER( latch_r )
 
 static WRITE8_HANDLER( ms32_snd_bank_w )
 {
-	memory_set_bank(4, (data >> 0) & 0x0F);
-	memory_set_bank(5, (data >> 4) & 0x0F);
+	memory_set_bank(space->machine, 4, (data >> 0) & 0x0F);
+	memory_set_bank(space->machine, 5, (data >> 4) & 0x0F);
 }
 
 static WRITE8_HANDLER( to_main_w )
@@ -1196,9 +1196,9 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ms32 )
 {
-	memory_set_bankptr(1, memory_region(machine, "main"));
-	memory_set_bank(4, 0);
-	memory_set_bank(5, 1);
+	memory_set_bankptr(machine, 1, memory_region(machine, "main"));
+	memory_set_bank(machine, 4, 0);
+	memory_set_bank(machine, 5, 1);
 	irq_init(machine);
 }
 

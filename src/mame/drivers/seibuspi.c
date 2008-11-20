@@ -959,7 +959,7 @@ static WRITE8_HANDLER( z80_bank_w )
 	if ((data & 7) != z80_lastbank)
 	{
 		z80_lastbank = (data & 7);
-		memory_set_bankptr(4, z80_rom + (0x8000 * z80_lastbank));
+		memory_set_bankptr(space->machine, 4, z80_rom + (0x8000 * z80_lastbank));
 	}
 }
 
@@ -1713,8 +1713,8 @@ static MACHINE_RESET( spi )
 	memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000068c, 0x0000068f, 0, 0, z80_enable_w);
 
 	z80_rom = auto_malloc(0x40000);
-	memory_set_bankptr(4, z80_rom);
-	memory_set_bankptr(5, z80_rom);
+	memory_set_bankptr(machine, 4, z80_rom);
+	memory_set_bankptr(machine, 5, z80_rom);
 
 	/* If the first value doesn't match, the game shows a checksum error */
 	/* If any of the other values are wrong, the game goes to update mode */
@@ -1776,8 +1776,8 @@ static MACHINE_RESET( sxx2f )
 	UINT8 *rom = memory_region(machine, "sound");
 
 	z80_rom = auto_malloc(0x40000);
-	memory_set_bankptr(4, z80_rom);
-	memory_set_bankptr(5, z80_rom);
+	memory_set_bankptr(machine, 4, z80_rom);
+	memory_set_bankptr(machine, 5, z80_rom);
 
 	memcpy(z80_rom, rom, 0x40000);
 

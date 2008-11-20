@@ -347,7 +347,7 @@ static WRITE32_HANDLER( ps4_vidregs_w )
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
 			UINT8 *ROM = memory_region(space->machine, "gfx1");
-			memory_set_bankptr(2,&ROM[0x2000 * (psikyo4_vidregs[offset]&0x1fff)]); /* Bank comes from vidregs */
+			memory_set_bankptr(space->machine, 2,&ROM[0x2000 * (psikyo4_vidregs[offset]&0x1fff)]); /* Bank comes from vidregs */
 		}
 	}
 #endif
@@ -1116,7 +1116,7 @@ static void install_hotgmck_pcm_bank(running_machine *machine)
 static DRIVER_INIT( hotgmck )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1,&RAM[0x100000]);
+	memory_set_bankptr(machine, 1,&RAM[0x100000]);
 	install_hotgmck_pcm_bank(machine);	// Banked PCM ROM
 }
 

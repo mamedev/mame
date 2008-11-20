@@ -240,7 +240,7 @@ static WRITE8_HANDLER( sandscrp_bankswitch_w )
 	if (bank < 3)	RAM = &RAM[0x4000 * bank];
 	else			RAM = &RAM[0x4000 * (bank-3) + 0x10000];
 
-	memory_set_bankptr(1, RAM);
+	memory_set_bankptr(space->machine, 1, RAM);
 }
 
 static READ8_HANDLER( sandscrp_latchstatus_r )

@@ -136,7 +136,7 @@ static WRITE8_HANDLER( missb2_bg_bank_w )
 
 	// I don't know how this is really connected,bit 1 is always high afaik...
 	bankaddress = ((data & 2) ? 0x1000 : 0x0000) | ((data & 1) ? 0x4000 : 0x0000) | (0x8000);
-	memory_set_bankptr(2, &RAM[bankaddress]);
+	memory_set_bankptr(space->machine, 2, &RAM[bankaddress]);
 }
 
 /* Memory Maps */

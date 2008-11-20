@@ -114,7 +114,6 @@
 
 #include "driver.h"
 #include "profiler.h"
-#include "deprecat.h"
 #include "debug/debugcpu.h"
 
 
@@ -349,7 +348,7 @@ static genf *get_static_handler(int handlerbits, int readorwrite, int which);
 /* debugging */
 static const char *handler_to_string(const address_table *table, UINT8 entry);
 static void dump_map(FILE *file, const address_space *space, const address_table *table);
-static void mem_dump(void);
+static void mem_dump(running_machine *machine);
 
 
 
@@ -362,10 +361,11 @@ static void mem_dump(void);
     the opcode base
 -------------------------------------------------*/
 
-INLINE void force_opbase_update(address_space *space)
+INLINE void force_opbase_update(const address_space *space)
 {
-	space->direct.entry = 0xff;
-	memory_set_direct_region(space, cpu_get_physical_pc_byte(space->cpu));
+	address_space *spacerw = (address_space *)space;
+	spacerw->direct.max = 0;
+	spacerw->direct.min = 1;
 }
 
 
@@ -684,7 +684,7 @@ void memory_init(running_machine *machine)
 	memory_init_locate(machine);
 
 	/* dump the final memory configuration */
-	mem_dump();
+	mem_dump(machine);
 }
 
 
@@ -821,8 +821,8 @@ void memory_set_decrypted_region(const address_space *space, offs_t addrstart, o
 				found = TRUE;
 
 				/* if we are executing from here, force an opcode base update */
-				if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
-					force_opbase_update((address_space *)space);
+				if (space->direct.entry == banknum)
+					force_opbase_update(space);
 			}
 
 			/* fatal error if the decrypted region straddles the bank */
@@ -1045,9 +1045,10 @@ void memory_configure_bank_decrypted(running_machine *machine, int banknum, int 
     entry to be the new bank base
 -------------------------------------------------*/
 
-void memory_set_bank(int banknum, int entrynum)
+void memory_set_bank(running_machine *machine, int banknum, int entrynum)
 {
-	memory_private *memdata = Machine->memory_data;
+	const address_space *space = active_address_space[ADDRESS_SPACE_PROGRAM];
+	memory_private *memdata = machine->memory_data;
 	bank_info *bank = &memdata->bankdata[banknum];
 
 	/* validation checks */
@@ -1066,8 +1067,8 @@ void memory_set_bank(int banknum, int entrynum)
 	memdata->bankd_ptr[banknum] = bank->entryd[entrynum];
 
 	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
-		force_opbase_update((address_space *)active_address_space[ADDRESS_SPACE_PROGRAM]);
+	if (space != NULL && space->direct.entry == banknum)
+		force_opbase_update(space);
 }
 
 
@@ -1076,9 +1077,9 @@ void memory_set_bank(int banknum, int entrynum)
     selected bank
 -------------------------------------------------*/
 
-int memory_get_bank(int banknum)
+int memory_get_bank(running_machine *machine, int banknum)
 {
-	memory_private *memdata = Machine->memory_data;
+	memory_private *memdata = machine->memory_data;
 	bank_info *bank = &memdata->bankdata[banknum];
 
 	/* validation checks */
@@ -1094,9 +1095,10 @@ int memory_get_bank(int banknum)
     memory_set_bankptr - set the base of a bank
 -------------------------------------------------*/
 
-void memory_set_bankptr(int banknum, void *base)
+void memory_set_bankptr(running_machine *machine, int banknum, void *base)
 {
-	memory_private *memdata = Machine->memory_data;
+	const address_space *space = active_address_space[ADDRESS_SPACE_PROGRAM];
+	memory_private *memdata = machine->memory_data;
 	bank_info *bank = &memdata->bankdata[banknum];
 
 	/* validation checks */
@@ -1113,8 +1115,8 @@ void memory_set_bankptr(int banknum, void *base)
 	memdata->bank_ptr[banknum] = base;
 
 	/* if we're executing out of this bank, adjust the opbase pointer */
-	if (active_address_space[ADDRESS_SPACE_PROGRAM] != NULL && active_address_space[ADDRESS_SPACE_PROGRAM]->direct.entry == banknum)
-		force_opbase_update((address_space *)active_address_space[ADDRESS_SPACE_PROGRAM]);
+	if (space != NULL && space->direct.entry == banknum)
+		force_opbase_update(space);
 }
 
 
@@ -1139,7 +1141,7 @@ void *_memory_install_handler(const address_space *space, offs_t addrstart, offs
 		space_map_range(spacerw, ROW_READ, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, spacerw, rhandler_name);
 	if (whandler != 0)
 		space_map_range(spacerw, ROW_WRITE, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, spacerw, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -1156,7 +1158,7 @@ UINT8 *_memory_install_handler8(const address_space *space, offs_t addrstart, of
 		space_map_range(spacerw, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -1173,7 +1175,7 @@ UINT16 *_memory_install_handler16(const address_space *space, offs_t addrstart, 
 		space_map_range(spacerw, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -1190,7 +1192,7 @@ UINT32 *_memory_install_handler32(const address_space *space, offs_t addrstart, 
 		space_map_range(spacerw, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -1207,7 +1209,7 @@ UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, 
 		space_map_range(spacerw, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, spacerw, rhandler_name);
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, spacerw, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -1228,7 +1230,7 @@ void *_memory_install_device_handler(const address_space *space, const device_co
 		space_map_range(spacerw, ROW_READ, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)rhandler, (void *)device, rhandler_name);
 	if (whandler != 0)
 		space_map_range(spacerw, ROW_WRITE, spacerw->dbits, 0, addrstart, addrend, addrmask, addrmirror, (genf *)(FPTR)whandler, (void *)device, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -1245,7 +1247,7 @@ UINT8 *_memory_install_device_handler8(const address_space *space, const device_
 		space_map_range(spacerw, ROW_READ, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 8, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -1262,7 +1264,7 @@ UINT16 *_memory_install_device_handler16(const address_space *space, const devic
 		space_map_range(spacerw, ROW_READ, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 16, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -1279,7 +1281,7 @@ UINT32 *_memory_install_device_handler32(const address_space *space, const devic
 		space_map_range(spacerw, ROW_READ, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 32, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -1296,7 +1298,7 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 		space_map_range(spacerw, ROW_READ, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)rhandler, (void *)device, rhandler_name);
 	if (whandler != NULL)
 		space_map_range(spacerw, ROW_WRITE, 64, 0, addrstart, addrend, addrmask, addrmirror, (genf *)whandler, (void *)device, whandler_name);
-	mem_dump();
+	mem_dump(space->machine);
 	return space_find_backing_memory(spacerw, ADDR2BYTE(spacerw, addrstart));
 }
 
@@ -3241,7 +3243,7 @@ static void dump_map(FILE *file, const address_space *space, const address_table
     mem_dump - internal memory dump
 -------------------------------------------------*/
 
-static void mem_dump(void)
+static void mem_dump(running_machine *machine)
 {
 	FILE *file;
 
@@ -3250,7 +3252,7 @@ static void mem_dump(void)
 		file = fopen("memdump.log", "w");
 		if (file)
 		{
-			memory_dump(Machine, file);
+			memory_dump(machine, file);
 			fclose(file);
 		}
 	}

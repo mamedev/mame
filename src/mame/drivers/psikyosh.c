@@ -458,7 +458,7 @@ static WRITE32_HANDLER( psikyosh_vidregs_w )
 		if (ACCESSING_BITS_0_15)	// Bank
 		{
 			UINT8 *ROM = memory_region(space->machine, "gfx1");
-			memory_set_bankptr(2,&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
+			memory_set_bankptr(space->machine, 2,&ROM[0x20000 * (psikyosh_vidregs[offset]&0xfff)]); /* Bank comes from vidregs */
 		}
 	}
 #endif
@@ -1152,7 +1152,7 @@ static DRIVER_INIT( s1945ii )
 static DRIVER_INIT( daraku )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1,&RAM[0x100000]);
+	memory_set_bankptr(machine, 1,&RAM[0x100000]);
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DARAKU;
 }
@@ -1166,7 +1166,7 @@ static DRIVER_INIT( sbomberb )
 static DRIVER_INIT( gunbird2 )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1,&RAM[0x100000]);
+	memory_set_bankptr(machine, 1,&RAM[0x100000]);
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_DEFAULT;
 }
@@ -1174,7 +1174,7 @@ static DRIVER_INIT( gunbird2 )
 static DRIVER_INIT( s1945iii )
 {
 	UINT8 *RAM = memory_region(machine, "main");
-	memory_set_bankptr(1,&RAM[0x100000]);
+	memory_set_bankptr(machine, 1,&RAM[0x100000]);
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_SH2_DRC_OPTIONS, SH2DRC_FASTEST_OPTIONS);
 	use_factory_eeprom=eeprom_S1945III;
 }

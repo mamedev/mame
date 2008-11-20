@@ -83,7 +83,7 @@ WRITE8_HANDLER( gunsmoke_c804_w )
 	coin_counter_w(0, data & 0x02);
 
 	/* bits 2 and 3 select the ROM bank */
-	memory_set_bank(1, (data & 0x0c) >> 2);
+	memory_set_bank(space->machine, 1, (data & 0x0c) >> 2);
 
 	/* bit 5 resets the sound CPU? - we ignore it */
 

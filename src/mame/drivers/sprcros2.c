@@ -97,7 +97,7 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 	//-------x nmi enable
 
 	if((sprcros2_m_port7^data)&0x40)
-		memory_set_bankptr(1,&RAM[0x10000+((data&0x40)<<7)]);
+		memory_set_bankptr(space->machine, 1,&RAM[0x10000+((data&0x40)<<7)]);
 
 	tilemap_set_flip( ALL_TILEMAPS,data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
@@ -115,7 +115,7 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 	//-------x nmi enable
 
 	if((sprcros2_s_port3^data)&0x08)
-		memory_set_bankptr(2,&RAM[0x10000+((data&0x08)<<10)]);
+		memory_set_bankptr(space->machine, 2,&RAM[0x10000+((data&0x08)<<10)]);
 
 	sprcros2_s_port3 = data;
 }
