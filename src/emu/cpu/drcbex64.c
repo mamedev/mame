@@ -695,6 +695,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, UINT32
 	};
 	drcbe_state *drcbe;
 	int opnum, entry;
+	int spacenum;
 
 	/* allocate space in the cache for our state */
 	drcbe = drccache_memory_alloc_near(cache, sizeof(*drcbe));
@@ -798,7 +799,6 @@ static void drcbex64_reset(drcbe_state *drcbe)
 {
 	UINT32 (*cpuid_ecx_stub)(void);
 	x86code **dst;
-	int spacenum;
 
 	/* output a note to the log */
 	if (drcbe->log != NULL)
@@ -4078,7 +4078,7 @@ static x86code *op_read(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
 	/* set up a call to the read byte handler */
-	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacesizep.value / 16]));	
 																						// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
@@ -4139,7 +4139,7 @@ static x86code *op_readm(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
 	/* set up a call to the read byte handler */
-	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacesizep.value / 16]));	
 																						// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
@@ -4194,7 +4194,7 @@ static x86code *op_write(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	param_normalize_3(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
 	/* set up a call to the write byte handler */
-	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacesizep.value / 16]));	
 																						// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
@@ -4234,7 +4234,7 @@ static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	param_normalize_4(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI, &maskp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
 	/* set up a call to the write byte handler */
-	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacesizep.value / 16]));	
 																						// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
@@ -6231,7 +6231,7 @@ static x86code *op_fread(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MF, &addrp, PTYPE_MRI, &spacep, PTYPE_I);
 
 	/* set up a call to the read dword/qword handler */
-	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacep.value]));	
 																						// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if (inst->size == 4)
@@ -6275,7 +6275,7 @@ static x86code *op_fwrite(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	param_normalize_3(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MF, &spacep, PTYPE_I);
 
 	/* general case */
-	emit_mov_r64_m64(drcbe, &dst, REG_PARAM1, MBD(REG_RCX, offsetof(drcuml_machine_state, &drcbe->space[spacesizep.value / 16]));	
+	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacep.value]));	
 																						// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param21,addrp
 

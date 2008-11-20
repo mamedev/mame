@@ -6189,7 +6189,7 @@ static x86code *op_fread(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 	/* set up a call to the read dword/qword handler */
 	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &addrp);								// mov    [esp+4],addrp
-	emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (UINT32)drcbe->space[spacep.value / 16]);	// mov    [esp],space
+	emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (UINT32)drcbe->space[spacep.value]);		// mov    [esp],space
 	if (inst->size == 4)
 		emit_call(&dst, (x86code *)drcbe->space[spacep.value]->accessors.read_dword);	// call   read_dword
 	else if (inst->size == 8)
@@ -6227,7 +6227,7 @@ static x86code *op_fwrite(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	else if (inst->size == 8)
 		emit_mov_m64_p64(drcbe, &dst, MBD(REG_ESP, 8), &srcp);							// mov    [esp+8],srcp
 	emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &addrp);								// mov    [esp+4],addrp
-	emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (UINT32)drcbe->space[spacep.value / 16]);	// mov    [esp],space
+	emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (UINT32)drcbe->space[spacep.value]);		// mov    [esp],space
 	if (inst->size == 4)
 		emit_call(&dst, (x86code *)drcbe->space[spacep.value]->accessors.write_dword);	// call   write_dword
 	else if (inst->size == 8)

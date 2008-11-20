@@ -1169,13 +1169,13 @@ void cpu_init(const device_config *device, int index, int clock, cpu_irq_callbac
 {
 	cpu_class_header *classheader = get_safe_classheader(device);
 
-	memory_set_context(device->machine, index);
-	device->machine->activecpu = device;
-
 	classheader->index = index;
 	classheader->space[ADDRESS_SPACE_PROGRAM] = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	classheader->space[ADDRESS_SPACE_DATA] = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 	classheader->space[ADDRESS_SPACE_IO] = memory_find_address_space(device, ADDRESS_SPACE_IO);
+
+	memory_set_context(device->machine, index);
+	device->machine->activecpu = device;
 
 	(*classheader->init)(device, index, clock, irqcallback);
 	(*classheader->get_context)(device->token);
