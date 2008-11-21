@@ -409,7 +409,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 	/* if out of range, complain */
 	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
 	{
-		debug_console_printf("Invalid CPU index %d\n", (UINT32)*result);
+		debug_console_printf("Invalid CPU index %d\n", (UINT32) ((FPTR)*result));
 		return FALSE;
 	}
 	
