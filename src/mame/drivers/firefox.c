@@ -308,7 +308,7 @@ static UINT8 riot_porta_r(const device_config *device, UINT8 olddata)
 static void riot_porta_w(const device_config *device, UINT8 newdata, UINT8 olddata)
 {
 	const address_space *space = cpu_get_address_space(device->machine->cpu[1], ADDRESS_SPACE_PROGRAM);
-	
+
 	/* handle 5220 read */
 	if ((olddata & 2) != 0 && (newdata & 2) == 0)
 		riot6532_portb_in_set(device, tms5220_status_r(space, 0), 0xff);
@@ -658,7 +658,7 @@ static MACHINE_DRIVER_START( firefox )
 	MDRV_CPU_ADD("audio", M6502, MASTER_XTAL/8)
 	MDRV_CPU_PROGRAM_MAP(audio_map, 0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(1000)
 
 	MDRV_MACHINE_START(firefox)
 	MDRV_WATCHDOG_TIME_INIT(UINT64_ATTOTIME_IN_HZ((double)MASTER_XTAL/8/16/16/16/16))
