@@ -539,7 +539,7 @@ static CPU_EXECUTE( ssp1601 )
 
 		PPC = rPC;
 
-		debugger_instruction_hook(device->machine, rPC);
+		debugger_instruction_hook(device, rPC);
 
 		op = FETCH();
 

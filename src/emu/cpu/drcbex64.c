@@ -263,6 +263,7 @@ struct _opcode_table_entry
 /* internal backend-specific state */
 struct _drcbe_state
 {
+	const device_config *	device;					/* CPU device we are associated with */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drccache *				cache;					/* pointer to the cache */
 	drcuml_machine_state 	state;					/* state of the machine */
@@ -304,7 +305,7 @@ struct _drcbe_state
 ***************************************************************************/
 
 /* primary back-end callbacks */
-static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits);
+static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits);
 static void drcbex64_free(drcbe_state *drcbe);
 static void drcbex64_reset(drcbe_state *drcbe);
 static int drcbex64_execute(drcbe_state *drcbe, drcuml_codehandle *entry);
@@ -683,7 +684,7 @@ INLINE void emit_smart_call_m64(drcbe_state *drcbe, x86code **dst, x86code **tar
     state
 -------------------------------------------------*/
 
-static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits)
+static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	/* SSE control register mapping */
 	static const UINT32 sse_control[4] =
@@ -704,6 +705,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, UINT32
 	memset(drcbe, 0, sizeof(*drcbe));
 
 	/* remember our pointers */
+	drcbe->device = device;
 	drcbe->drcuml = drcuml;
 	drcbe->cache = cache;
 	drcbe->rbpvalue = drccache_near(cache) + 0x80;
@@ -3099,13 +3101,13 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 		param_normalize_1(drcbe, inst, &pcp, PTYPE_MRI);
 
 		/* test and branch */
-		emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)Machine);							// mov   param1,pcp
-		emit_test_m32_imm(&dst, MBD(REG_PARAM1, offsetof(running_machine, debug_flags)), DEBUG_FLAG_CALL_HOOK);
-																						// test  [Machine->debug_flags],DEBUG_FLAG_CALL_HOOK
+		emit_mov_r64_imm(&dst, REG_RAX, (FPTR)&drcbe->device->machine->debug_flags);	// mov   rax,&debug_flags
+		emit_test_m32_imm(&dst, MBD(REG_RAX, 0), DEBUG_FLAG_CALL_HOOK);					// test  [debug_flags],DEBUG_FLAG_CALL_HOOK
 		emit_jcc_short_link(&dst, COND_Z, &skip);										// jz    skip
 
 		/* push the parameter */
-		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &pcp);								// mov   param1,pcp
+		emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)drcbe->device);						// mov   param1,device
+		emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &pcp);								// mov   param2,pcp
 		emit_smart_call_m64(drcbe, &dst, &drcbe->debug_cpu_instruction_hook);			// call  debug_cpu_instruction_hook
 
 		resolve_link(&dst, &skip);													// skip:
@@ -4078,8 +4080,7 @@ static x86code *op_read(drcbe_state *drcbe, x86code *dst, const drcuml_instructi
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
 	/* set up a call to the read byte handler */
-	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacesizep.value / 16]));	
-																						// mov    param1,space
+	emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)drcbe->space[spacesizep.value / 16]));		// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) == DRCUML_SIZE_BYTE)
 	{
@@ -4139,8 +4140,7 @@ static x86code *op_readm(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	dstreg = param_select_register(REG_EAX, &dstp, NULL);
 
 	/* set up a call to the read byte handler */
-	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacesizep.value / 16]));	
-																						// mov    param1,space
+	emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)drcbe->space[spacesizep.value / 16]));		// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
 		emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &maskp);								// mov    param3,maskp
@@ -4194,8 +4194,7 @@ static x86code *op_write(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	param_normalize_3(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
 	/* set up a call to the write byte handler */
-	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacesizep.value / 16]));	
-																						// mov    param1,space
+	emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)drcbe->space[spacesizep.value / 16]));		// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
 		emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &srcp);								// mov    param3,srcp
@@ -4234,9 +4233,8 @@ static x86code *op_writem(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	param_normalize_4(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MRI, &maskp, PTYPE_MRI, &spacesizep, PTYPE_I);
 
 	/* set up a call to the write byte handler */
-	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacesizep.value / 16]));	
-																						// mov    param1,space
-	emit_mov_r32_p32(drcbe, &dst, REG_PARAM1, &addrp);									// mov    param2,addrp
+	emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)drcbe->space[spacesizep.value / 16]));		// mov    param1,space
+	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if ((spacesizep.value & 3) != DRCUML_SIZE_QWORD)
 	{
 		emit_mov_r32_p32(drcbe, &dst, REG_PARAM3, &srcp);								// mov    param3,srcp
@@ -6231,8 +6229,7 @@ static x86code *op_fread(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 	param_normalize_3(drcbe, inst, &dstp, PTYPE_MF, &addrp, PTYPE_MRI, &spacep, PTYPE_I);
 
 	/* set up a call to the read dword/qword handler */
-	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacep.value]));	
-																						// mov    param1,space
+	emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)drcbe->space[spacep.value]));				// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param2,addrp
 	if (inst->size == 4)
 		emit_smart_call_m64(drcbe, &dst, (x86code **)&drcbe->accessors[spacep.value].read_dword);// call   read_dword
@@ -6275,8 +6272,7 @@ static x86code *op_fwrite(drcbe_state *drcbe, x86code *dst, const drcuml_instruc
 	param_normalize_3(drcbe, inst, &addrp, PTYPE_MRI, &srcp, PTYPE_MF, &spacep, PTYPE_I);
 
 	/* general case */
-	emit_mov_r64_m64(&dst, REG_PARAM1, MABS(drcbe, &drcbe->space[spacep.value]));	
-																						// mov    param1,space
+	emit_mov_r64_imm(&dst, REG_PARAM1, (FPTR)drcbe->space[spacep.value]));				// mov    param1,space
 	emit_mov_r32_p32(drcbe, &dst, REG_PARAM2, &addrp);									// mov    param21,addrp
 
 	/* 32-bit form */

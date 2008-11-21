@@ -5385,11 +5385,11 @@ INLINE void execute_delayed(tms32031_state *tms, UINT32 newpc)
 	}
 	else
 	{
-		debugger_instruction_hook(tms->device->machine, tms->pc);
+		debugger_instruction_hook(tms->device, tms->pc);
 		execute_one(tms);
-		debugger_instruction_hook(tms->device->machine, tms->pc);
+		debugger_instruction_hook(tms->device, tms->pc);
 		execute_one(tms);
-		debugger_instruction_hook(tms->device->machine, tms->pc);
+		debugger_instruction_hook(tms->device, tms->pc);
 		execute_one(tms);
 	}
 

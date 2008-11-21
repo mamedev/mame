@@ -4765,7 +4765,7 @@ static CPU_EXECUTE( hyperstone )
 		UINT16 opcode;
 
 		PPC = PC;	/* copy PC to previous PC */
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		opcode = READ_OP(PC);
 		PC += 2;

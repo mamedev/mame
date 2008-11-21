@@ -789,7 +789,7 @@ static CPU_EXECUTE( tms32010 )
 
 		R.PREVPC = R.PC;
 
-		debugger_instruction_hook(device->machine, R.PC);
+		debugger_instruction_hook(device, R.PC);
 
 		R.opcode.d = M_RDOP(R.PC);
 		R.PC++;

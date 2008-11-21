@@ -252,7 +252,7 @@ static void mips_load_bad_address( psxcpu_state *psxcpu, UINT32 address );
 static void mips_stop( psxcpu_state *psxcpu )
 {
 	debugger_break( psxcpu->program->machine );
-	debugger_instruction_hook( psxcpu->program->machine,  psxcpu->pc );
+	debugger_instruction_hook( psxcpu->program->cpu,  psxcpu->pc );
 }
 
 static UINT32 mips_cache_readword( psxcpu_state *psxcpu, UINT32 offset )
@@ -1850,7 +1850,7 @@ static CPU_EXECUTE( psxcpu )
 	do
 	{
 		if (LOG_BIOSCALL) log_bioscall( psxcpu );
-		debugger_instruction_hook(device->machine,  psxcpu->pc );
+		debugger_instruction_hook(device,  psxcpu->pc );
 
 		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, psxcpu->pc );
 		switch( INS_OP( psxcpu->op ) )

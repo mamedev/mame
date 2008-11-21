@@ -52,6 +52,7 @@ struct _debug_view_callbacks
 /* typedef struct _debug_view debug_view -- defined in debugvw.h */
 struct _debug_view
 {
+	running_machine *machine;					/* machine associated with this view */
 	debug_view *	next;						/* link to the next view */
 	UINT8			type;						/* type of view */
 	void *			extra_data;					/* extra view-specific data */
@@ -263,7 +264,7 @@ void debug_view_exit(running_machine *machine)
     view
 -------------------------------------------------*/
 
-debug_view *debug_view_alloc(int type)
+debug_view *debug_view_alloc(running_machine *machine, int type)
 {
 	debug_view *view;
 
@@ -274,6 +275,7 @@ debug_view *debug_view_alloc(int type)
 	memset(view, 0, sizeof(*view));
 
 	/* set the view type information */
+	view->machine = machine;
 	view->type = type;
 	view->cb = callback_table[type];
 
@@ -1272,7 +1274,7 @@ static int disasm_alloc(debug_view *view)
 	/* count the number of comments */
 	for (i = 0; i < ARRAY_LENGTH(Machine->cpu); i++)
 		if (Machine->cpu[i] != NULL)
-			total_comments += debug_comment_get_count(i);
+			total_comments += debug_comment_get_count(Machine->cpu[i]);
 
 	/* initialize */
 	dasmdata->recompute = TRUE;
@@ -1569,7 +1571,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 			offs_t comment_address = BYTE2ADDR(dasmdata->address[instr], cpuinfo, ADDRESS_SPACE_PROGRAM) ;
 
 			/* get and add the comment */
-			if (debug_comment_get_text(cpunum_get_active(), comment_address, debug_comment_get_opcode_crc32(comment_address)) != 0x00)
+			if (debug_comment_get_text(Machine->activecpu, comment_address, debug_comment_get_opcode_crc32(Machine->activecpu, comment_address)) != 0x00)
 			{
 				int i ;
 				char bob[DEBUG_COMMENT_MAX_LINE_LENGTH] ;
@@ -1581,7 +1583,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 					destbuf[dasmdata->divider2+i] = pre[i] ;
 
 				// Stick in the comment itself
-				strcpy(bob, debug_comment_get_text(cpunum_get_active(), comment_address, debug_comment_get_opcode_crc32(comment_address))) ;
+				strcpy(bob, debug_comment_get_text(Machine->activecpu, comment_address, debug_comment_get_opcode_crc32(Machine->activecpu, comment_address))) ;
 				for (i = 0; i < (dasmdata->allocated_cols - dasmdata->divider2 - strlen(pre) - 1); i++)
 					destbuf[dasmdata->divider2+i+strlen(pre)] = bob[i] ;
 			}
@@ -1601,7 +1603,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 	/* update opcode base information */
 	dasmdata->last_direct_decrypted = space->direct.decrypted;
 	dasmdata->last_direct_raw = space->direct.raw;
-	dasmdata->last_change_count = debug_comment_all_change_count();
+	dasmdata->last_change_count = debug_comment_all_change_count(Machine);
 
 	/* now longer need to recompute */
 	dasmdata->recompute = FALSE;
@@ -1636,7 +1638,7 @@ static void disasm_update(debug_view *view)
 		parsed_expression *expr;
 
 		/* parse the new expression */
-		exprerr = expression_parse(dasmdata->expression_string, cpu_get_debug_data(Machine->cpu[dasmdata->cpunum])->symtable, &debug_expression_callbacks, &expr);
+		exprerr = expression_parse(dasmdata->expression_string, cpu_get_debug_data(Machine->cpu[dasmdata->cpunum])->symtable, &debug_expression_callbacks, Machine, &expr);
 
 		/* if it worked, update the expression */
 		if (exprerr == EXPRERR_NONE)
@@ -1684,7 +1686,7 @@ static void disasm_update(debug_view *view)
 		dasmdata->recompute = TRUE;
 
 	/* if the comments have changed, redo it */
-	if (dasmdata->last_change_count != debug_comment_all_change_count())
+	if (dasmdata->last_change_count != debug_comment_all_change_count(Machine))
 		dasmdata->recompute = TRUE;
 
 	/* if we need to recompute, do it */
@@ -1695,7 +1697,7 @@ recompute:
 		offs_t backpc = disasm_back_up(dasmdata->cpunum, cpuinfo, (UINT32)dasmdata->last_result, dasmdata->backwards_steps);
 
 		/* recompute the view */
-		if (dasmdata->last_change_count != debug_comment_all_change_count())
+		if (dasmdata->last_change_count != debug_comment_all_change_count(Machine))
 		{
 			/* smoosh us against the left column, but not the top row */
 			view->left_col = 0;
@@ -2296,7 +2298,7 @@ static UINT8 generic_read_byte(debug_view_memory *memdata, offs_t offs, int appl
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
-		return debug_read_byte(memdata->spacenum, offs, apply_translation);
+		return debug_read_byte(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, apply_translation);
 
 	/* all 0xff if out of bounds */
 	offs ^= memdata->raw_offset_xor;
@@ -2314,7 +2316,7 @@ static UINT16 generic_read_word(debug_view_memory *memdata, offs_t offs, int app
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
-		return debug_read_word(memdata->spacenum, offs, apply_translation);
+		return debug_read_word(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, apply_translation);
 
 	/* otherwise, decompose into bytes */
 	if (memdata->raw_little_endian)
@@ -2332,7 +2334,7 @@ static UINT32 generic_read_dword(debug_view_memory *memdata, offs_t offs, int ap
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
-		return debug_read_dword(memdata->spacenum, offs, apply_translation);
+		return debug_read_dword(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, apply_translation);
 
 	/* otherwise, decompose into words */
 	if (memdata->raw_little_endian)
@@ -2350,7 +2352,7 @@ static UINT64 generic_read_qword(debug_view_memory *memdata, offs_t offs, int ap
 {
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
-		return debug_read_qword(memdata->spacenum, offs, apply_translation);
+		return debug_read_qword(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, apply_translation);
 
 	/* otherwise, decompose into dwords */
 	if (memdata->raw_little_endian)
@@ -2369,7 +2371,7 @@ static void generic_write_byte(debug_view_memory *memdata, offs_t offs, UINT8 da
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
 	{
-		debug_write_byte(memdata->spacenum, offs, data, apply_translation);
+		debug_write_byte(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, data, apply_translation);
 		return;
 	}
 
@@ -2399,7 +2401,7 @@ static void generic_write_word(debug_view_memory *memdata, offs_t offs, UINT16 d
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
 	{
-		debug_write_word(memdata->spacenum, offs, data, apply_translation);
+		debug_write_word(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, data, apply_translation);
 		return;
 	}
 
@@ -2426,7 +2428,7 @@ static void generic_write_dword(debug_view_memory *memdata, offs_t offs, UINT32 
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
 	{
-		debug_write_dword(memdata->spacenum, offs, data, apply_translation);
+		debug_write_dword(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, data, apply_translation);
 		return;
 	}
 
@@ -2453,7 +2455,7 @@ static void generic_write_qword(debug_view_memory *memdata, offs_t offs, UINT64 
 	/* if no raw data, just use the standard debug routines */
 	if (memdata->raw_base == NULL)
 	{
-		debug_write_qword(memdata->spacenum, offs, data, apply_translation);
+		debug_write_qword(cpu_get_address_space(Machine->activecpu, memdata->spacenum), offs, data, apply_translation);
 		return;
 	}
 
@@ -2707,7 +2709,7 @@ static void memory_update(debug_view *view)
 		parsed_expression *expr;
 
 		/* parse the new expression */
-		exprerr = expression_parse(memdata->expression_string, cpu_get_debug_data(Machine->cpu[memdata->cpunum])->symtable, &debug_expression_callbacks, &expr);
+		exprerr = expression_parse(memdata->expression_string, cpu_get_debug_data(Machine->cpu[memdata->cpunum])->symtable, &debug_expression_callbacks, Machine, &expr);
 
 		/* if it worked, update the expression */
 		if (exprerr == EXPRERR_NONE)

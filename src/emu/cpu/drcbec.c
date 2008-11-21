@@ -178,6 +178,7 @@ enum
 /* internal backend-specific state */
 struct _drcbe_state
 {
+	const device_config *	device;					/* CPU device we are associated with */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drccache *				cache;					/* pointer to the cache */
 	drcuml_machine_state 	state;					/* state of the machine */
@@ -218,7 +219,7 @@ union _drcbec_instruction
 ***************************************************************************/
 
 /* primary back-end callbacks */
-static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits);
+static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits);
 static void drcbec_free(drcbe_state *drcbe);
 static void drcbec_reset(drcbe_state *drcbe);
 static int drcbec_execute(drcbe_state *state, drcuml_codehandle *entry);
@@ -304,7 +305,7 @@ const drcbe_interface drcbe_c_be_interface =
     state
 -------------------------------------------------*/
 
-static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits)
+static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	/* allocate space in the cache for our state */
 	drcbe_state *drcbe = drccache_memory_alloc(cache, sizeof(*drcbe));
@@ -313,6 +314,7 @@ static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, UINT32 f
 	memset(drcbe, 0, sizeof(*drcbe));
 
 	/* remember our pointers */
+	drcbe->device = device;
 	drcbe->drcuml = drcuml;
 	drcbe->cache = cache;
 
@@ -595,7 +597,7 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_DEBUG, 4, 0):		/* DEBUG   pc                     */
-				debugger_instruction_hook(Machine, PARAM0);
+				debugger_instruction_hook(drcbe->device, PARAM0);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_HASHJMP, 4, 0):	/* HASHJMP mode,pc,handle         */

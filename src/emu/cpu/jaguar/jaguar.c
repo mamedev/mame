@@ -502,7 +502,7 @@ static CPU_EXECUTE( jaguargpu )
 		/* debugging */
 		//if (jaguar->PC < 0xf03000 || jaguar->PC > 0xf04000) { fatalerror("GPU: jaguar->PC = %06X (ppc = %06X)", jaguar->PC, jaguar->ppc); }
 		jaguar->ppc = jaguar->PC;
-		debugger_instruction_hook(device->machine, jaguar->PC);
+		debugger_instruction_hook(device, jaguar->PC);
 
 		/* instruction fetch */
 		op = ROPCODE(jaguar->PC);
@@ -543,7 +543,7 @@ static CPU_EXECUTE( jaguardsp )
 		/* debugging */
 		//if (jaguar->PC < 0xf1b000 || jaguar->PC > 0xf1d000) { fatalerror(stderr, "DSP: jaguar->PC = %06X", jaguar->PC); }
 		jaguar->ppc = jaguar->PC;
-		debugger_instruction_hook(device->machine, jaguar->PC);
+		debugger_instruction_hook(device, jaguar->PC);
 
 		/* instruction fetch */
 		op = ROPCODE(jaguar->PC);
@@ -773,7 +773,7 @@ void jr_cc_n(jaguar_state *jaguar, UINT16 op)
 	{
 		INT32 r1 = (INT8)((op >> 2) & 0xf8) >> 2;
 		UINT32 newpc = jaguar->PC + r1;
-		debugger_instruction_hook(jaguar->device->machine, jaguar->PC);
+		debugger_instruction_hook(jaguar->device, jaguar->PC);
 		op = ROPCODE(jaguar->PC);
 		jaguar->PC = newpc;
 		(*jaguar->table[op >> 10])(jaguar, op);
@@ -790,7 +790,7 @@ void jump_cc_rn(jaguar_state *jaguar, UINT16 op)
 
 		/* special kludge for risky code in the cojag DSP interrupt handlers */
 		UINT32 newpc = (jaguar->icount == jaguar->bankswitch_icount) ? jaguar->a[reg] : jaguar->r[reg];
-		debugger_instruction_hook(jaguar->device->machine, jaguar->PC);
+		debugger_instruction_hook(jaguar->device, jaguar->PC);
 		op = ROPCODE(jaguar->PC);
 		jaguar->PC = newpc;
 		(*jaguar->table[op >> 10])(jaguar, op);

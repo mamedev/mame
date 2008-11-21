@@ -721,7 +721,7 @@ static CPU_EXIT( ALPHA8201 )
  * Execute cycles CPU cycles. Return number of cycles really executed
  ****************************************************************************/
 
-static int alpha8xxx_execute(const s_opcode *op_map,int cycles)
+static int alpha8xxx_execute(const device_config *device,const s_opcode *op_map,int cycles)
 {
 	unsigned opcode;
 	UINT8 pcptr;
@@ -787,7 +787,7 @@ mame_printf_debug("ALPHA8201 START ENTRY=%02X PC=%03X\n",pcptr,PC);
 
 		/* run */
 		R.PREVPC = PC;
-		debugger_instruction_hook(Machine, PC);
+		debugger_instruction_hook(device, PC);
 		opcode =M_RDOP(PC);
 #if TRACE_PC
 mame_printf_debug("ALPHA8201:  PC = %03x,  opcode = %02x\n", PC, opcode);
@@ -802,11 +802,11 @@ mame_printf_debug("ALPHA8201:  PC = %03x,  opcode = %02x\n", PC, opcode);
 }
 
 #if (HAS_ALPHA8201)
-static CPU_EXECUTE( ALPHA8201 ) { return alpha8xxx_execute(opcode_8201,cycles); }
+static CPU_EXECUTE( ALPHA8201 ) { return alpha8xxx_execute(device,opcode_8201,cycles); }
 #endif
 
 #if (HAS_ALPHA8301)
-static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(opcode_8301,cycles); }
+static CPU_EXECUTE( ALPHA8301 ) { return alpha8xxx_execute(device,opcode_8301,cycles); }
 #endif
 
 /****************************************************************************

@@ -196,10 +196,10 @@ static void cheat_entry_free(cheat_entry *cheat);
 static cheat_parameter *cheat_parameter_load(const char *filename, xml_data_node *paramnode);
 static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *param);
 static void cheat_parameter_free(cheat_parameter *param);
-static cheat_script *cheat_script_load(const char *filename, xml_data_node *scriptnode, cheat_entry *cheat);
+static cheat_script *cheat_script_load(running_machine *machine, const char *filename, xml_data_node *scriptnode, cheat_entry *cheat);
 static void cheat_script_save(mame_file *cheatfile, const cheat_script *script);
 static void cheat_script_free(cheat_script *script);
-static script_entry *script_entry_load(const char *filename, xml_data_node *entrynode, cheat_entry *cheat, int isaction);
+static script_entry *script_entry_load(running_machine *machine, const char *filename, xml_data_node *entrynode, cheat_entry *cheat, int isaction);
 static void script_entry_save(mame_file *cheatfile, const script_entry *entry);
 static void script_entry_free(script_entry *entry);
 
@@ -999,7 +999,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	for (scriptnode = xml_get_sibling(cheatnode->child, "script"); scriptnode != NULL; scriptnode = xml_get_sibling(scriptnode->next, "script"))
 	{
 		/* load this entry */
-		cheat_script *curscript = cheat_script_load(filename, scriptnode, cheat);
+		cheat_script *curscript = cheat_script_load(machine, filename, scriptnode, cheat);
 		if (curscript == NULL)
 			goto error;
 
@@ -1229,7 +1229,7 @@ static void cheat_parameter_free(cheat_parameter *param)
     structures
 -------------------------------------------------*/
 
-static cheat_script *cheat_script_load(const char *filename, xml_data_node *scriptnode, cheat_entry *cheat)
+static cheat_script *cheat_script_load(running_machine *machine, const char *filename, xml_data_node *scriptnode, cheat_entry *cheat)
 {
 	script_entry **entrytailptr;
 	xml_data_node *entrynode;
@@ -1263,11 +1263,11 @@ static cheat_script *cheat_script_load(const char *filename, xml_data_node *scri
 
 		/* handle action nodes */
 		if (strcmp(entrynode->name, "action") == 0)
-			curentry = script_entry_load(filename, entrynode, cheat, TRUE);
+			curentry = script_entry_load(machine, filename, entrynode, cheat, TRUE);
 
 		/* handle output nodes */
 		else if (strcmp(entrynode->name, "output") == 0)
-			curentry = script_entry_load(filename, entrynode, cheat, FALSE);
+			curentry = script_entry_load(machine, filename, entrynode, cheat, FALSE);
 
 		/* anything else is ignored */
 		else
@@ -1345,7 +1345,7 @@ static void cheat_script_free(cheat_script *script)
     structures
 -------------------------------------------------*/
 
-static script_entry *script_entry_load(const char *filename, xml_data_node *entrynode, cheat_entry *cheat, int isaction)
+static script_entry *script_entry_load(running_machine *machine, const char *filename, xml_data_node *entrynode, cheat_entry *cheat, int isaction)
 {
 	const char *expression;
 	script_entry *entry;
@@ -1359,7 +1359,7 @@ static script_entry *script_entry_load(const char *filename, xml_data_node *entr
 	expression = xml_get_attribute_string(entrynode, "condition", NULL);
 	if (expression != NULL)
 	{
-		experr = expression_parse(expression, cheat->symbols, &debug_expression_callbacks, &entry->condition);
+		experr = expression_parse(expression, cheat->symbols, &debug_expression_callbacks, machine, &entry->condition);
 		if (experr != EXPRERR_NONE)
 		{
 			mame_printf_error("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode->line, expression, exprerr_to_string(experr));
@@ -1376,7 +1376,7 @@ static script_entry *script_entry_load(const char *filename, xml_data_node *entr
 			mame_printf_error("%s.xml(%d): missing expression in action tag\n", filename, entrynode->line);
 			goto error;
 		}
-		experr = expression_parse(expression, cheat->symbols, &debug_expression_callbacks, &entry->expression);
+		experr = expression_parse(expression, cheat->symbols, &debug_expression_callbacks, machine, &entry->expression);
 		if (experr != EXPRERR_NONE)
 		{
 			mame_printf_error("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode->line, expression, exprerr_to_string(experr));
@@ -1436,7 +1436,7 @@ static script_entry *script_entry_load(const char *filename, xml_data_node *entr
 				mame_printf_error("%s.xml(%d): missing expression in argument tag\n", filename, argnode->line);
 				goto error;
 			}
-			experr = expression_parse(expression, cheat->symbols, &debug_expression_callbacks, &curarg->expression);
+			experr = expression_parse(expression, cheat->symbols, &debug_expression_callbacks, machine, &curarg->expression);
 			if (experr != EXPRERR_NONE)
 			{
 				mame_printf_error("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, argnode->line, expression, exprerr_to_string(experr));

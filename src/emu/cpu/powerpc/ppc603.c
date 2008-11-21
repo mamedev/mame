@@ -260,7 +260,7 @@ static CPU_EXECUTE( ppc603 )
 	while( ppc_icount > 0 )
 	{
 		ppc.pc = ppc.npc;
-		debugger_instruction_hook(device->machine, ppc.pc);
+		debugger_instruction_hook(device, ppc.pc);
 
 		if (MSR & MSR_IR)
 			opcode = ppc_readop_translated(ppc.pc);

@@ -232,7 +232,7 @@ static void execute_one(void)
 	UINT8 cycle_count = 0;
 
 	/* For MAME */
-	debugger_instruction_hook(Machine, PC);
+	debugger_instruction_hook(core.device, PC);
 	OP = ROPCODE(WORD(PC));
 
 	/* The words we're going to be working with */

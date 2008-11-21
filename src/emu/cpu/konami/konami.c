@@ -498,7 +498,7 @@ static CPU_EXECUTE( konami )
 		{
 			pPPC = pPC;
 
-			debugger_instruction_hook(device->machine, PCD);
+			debugger_instruction_hook(device, PCD);
 
 			konami.ireg = ROP(PCD);
 			PC++;

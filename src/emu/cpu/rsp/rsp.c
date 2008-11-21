@@ -2598,7 +2598,7 @@ static CPU_EXECUTE( rsp )
 	while (rsp_icount > 0)
 	{
 		rsp.ppc = rsp.pc;
-		debugger_instruction_hook(device->machine, rsp.pc);
+		debugger_instruction_hook(device, rsp.pc);
 
 		op = ROPCODE(rsp.pc);
 		if (rsp.nextpc != ~0)

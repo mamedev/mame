@@ -144,7 +144,7 @@ void				debug_view_init(running_machine *machine);
 void				debug_view_exit(running_machine *machine);
 
 /* view creation/deletion */
-debug_view *		debug_view_alloc(int type);
+debug_view *		debug_view_alloc(running_machine *machine, int type);
 void				debug_view_free(debug_view *view);
 
 /* property management */

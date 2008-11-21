@@ -389,9 +389,9 @@ void cpuexec_timeslice(running_machine *machine)
 					ran = cpu_execute(machine->cpu[cpunum], cycles_running);
 				else
 				{
-					debugger_start_cpu_hook(machine, cpunum, target);
+					debugger_start_cpu_hook(machine->cpu[cpunum], target);
 					ran = cpu_execute(machine->cpu[cpunum], cycles_running);
-					debugger_stop_cpu_hook(machine, cpunum);
+					debugger_stop_cpu_hook(machine->cpu[cpunum]);
 				}
 
 #ifdef MAME_DEBUG
@@ -1359,7 +1359,7 @@ static IRQ_CALLBACK( standard_irq_callback )
 		vector = (*classdata->driver_irq)(device, irqline);
 
 	/* notify the debugger */
-	debugger_interrupt_hook(device->machine, classdata->header.index, irqline);
+	debugger_interrupt_hook(device, irqline);
 
 	/* otherwise, just return the current vector */
 	return vector;

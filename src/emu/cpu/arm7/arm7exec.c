@@ -47,7 +47,7 @@
     ARM7_ICOUNT = cycles;
     do
     {
-        debugger_instruction_hook(Machine, R15);
+        debugger_instruction_hook(arm7.device, R15);
 
         /* handle Thumb instructions if active */
         if (T_IS_SET(GET_CPSR))

@@ -76,8 +76,7 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef void (*debug_hook_read_func)(int spacenum, offs_t address, UINT64 mem_mask);
-typedef void (*debug_hook_write_func)(int spacenum, offs_t address, UINT64 data, UINT64 mem_mask);
+typedef int (*debug_instruction_hook_func)(const device_config *device, offs_t curpc);
 
 
 typedef struct _debug_cpu_breakpoint debug_cpu_breakpoint;
@@ -101,6 +100,8 @@ struct _debug_trace_info
 typedef struct _debug_space_info debug_space_info;
 struct _debug_space_info
 {
+	const address_space *space;					/* pointer to the CPU's address space */
+	debug_cpu_watchpoint *wplist;				/* list of watchpoints */
 	UINT8			databytes;					/* width of the data bus, in bytes */
 	UINT8			pageshift;					/* page shift */
 	UINT8			addr2byte_lshift;			/* left shift to convert CPU address to a byte value */
@@ -111,7 +112,6 @@ struct _debug_space_info
 	offs_t			logaddrmask;				/* logical address mask */
 	offs_t			physbytemask;				/* physical byte mask */
 	offs_t			logbytemask;				/* logical byte mask */
-	debug_cpu_watchpoint *wplist;				/* list of watchpoints */
 };
 
 
@@ -128,10 +128,11 @@ struct _debug_hotspot_entry
 /* In cpuintrf.h: typedef struct _cpu_debug_data cpu_debug_data; */
 struct _cpu_debug_data
 {
-	UINT8			valid;						/* are we valid? */
+	const device_config *device;				/* CPU device object */
+	symbol_table *	symtable;					/* symbol table for expression evaluation */
+	UINT32			flags;						/* debugging flags for this CPU */
 	UINT8			endianness;					/* little or bigendian */
 	UINT8			opwidth;					/* width of an opcode */
-	UINT32			flags;						/* debugging flags for this CPU */
 	offs_t			stepaddr;					/* step target address for DEBUG_FLAG_STEPPING_OVER */
 	int				stepsleft;					/* number of steps left until done */
 	offs_t			stopaddr;					/* stop address for DEBUG_FLAG_STOP_PC */
@@ -139,21 +140,19 @@ struct _cpu_debug_data
 	int				stopirq;					/* stop IRQ number for DEBUG_FLAG_STOP_INTERRUPT */
 	int				stopexception;				/* stop exception number for DEBUG_FLAG_STOP_EXCEPTION */
 	attotime		endexectime;				/* ending time of the current execution */
-	symbol_table *	symtable;					/* symbol table for expression evaluation */
 	debug_trace_info trace;						/* trace info */
 	debug_cpu_breakpoint *bplist;				/* list of breakpoints */
-	debug_space_info space[ADDRESS_SPACES];		/* per-address space info */
 	debug_hotspot_entry *hotspots;				/* hotspot list */
 	offs_t			pc_history[DEBUG_HISTORY_SIZE]; /* history of recent PCs */
 	UINT32			pc_history_index;			/* current history index */
 	int				hotspot_count;				/* number of hotspots */
 	int				hotspot_threshhold;			/* threshhold for the number of hits to print */
-	const device_config *device;				/* CPU device object */
 	cpu_translate_func translate;				/* address translation routine */
 	cpu_read_func	read; 						/* memory read routine */
 	cpu_write_func	write;						/* memory write routine */
 	cpu_readop_func	readop;						/* opcode read routine */
-	int				(*instrhook)(offs_t pc);	/* per-instruction callback hook */
+	debug_instruction_hook_func instrhook;		/* per-instruction callback hook */
+	debug_space_info space[ADDRESS_SPACES];		/* per-address space info */
 };
 
 
@@ -187,7 +186,6 @@ struct _debug_cpu_watchpoint
 ***************************************************************************/
 
 extern FILE *debug_source_file;
-extern symbol_table *global_symtable;
 extern const express_callbacks debug_expression_callbacks;
 
 
@@ -201,23 +199,36 @@ extern const express_callbacks debug_expression_callbacks;
 /* initialize the CPU tracking for the debugger */
 void debug_cpu_init(running_machine *machine);
 
+/* return the visible CPU device (the one that commands should apply to) */
+const device_config *debug_cpu_get_visible_cpu(running_machine *machine);
+
+/* return the global symbol table */
+symbol_table *debug_cpu_get_global_symtable(running_machine *machine);
+
+/* return the locally-visible symbol table */
+symbol_table *debug_cpu_get_visible_symtable(running_machine *machine);
+
+/* return a specific CPU's symbol table */
+symbol_table *debug_cpu_get_symtable(const device_config *device);
+
+
 
 /* ----- core debugger hooks ----- */
 
 /* the CPU execution system calls this hook before beginning execution for the given CPU */
-void debug_cpu_start_hook(running_machine *machine, int cpunum, attotime endtime);
+void debug_cpu_start_hook(const device_config *device, attotime endtime);
 
 /* the CPU execution system calls this hook when ending execution for the given CPU */
-void debug_cpu_stop_hook(running_machine *machine, int cpunum);
+void debug_cpu_stop_hook(const device_config *device);
 
 /* the CPU execution system calls this hook when an interrupt is acknowledged */
-void debug_cpu_interrupt_hook(running_machine *machine, int cpunum, int irqline);
+void debug_cpu_interrupt_hook(const device_config *device, int irqline);
 
 /* called by the CPU cores when an exception is generated */
-void debug_cpu_exception_hook(running_machine *machine, int cpunum, int exception);
+void debug_cpu_exception_hook(const device_config *device, int exception);
 
 /* called by the CPU cores before executing each instruction */
-void debug_cpu_instruction_hook(running_machine *machine, offs_t curpc);
+void debug_cpu_instruction_hook(const device_config *device, offs_t curpc);
 
 /* the memory system calls this hook when watchpoints are enabled and a memory read happens */
 void debug_cpu_memory_read_hook(const address_space *space, offs_t address, UINT64 mem_mask);
@@ -232,16 +243,15 @@ void debug_cpu_memory_write_hook(const address_space *space, offs_t address, UIN
 int debug_cpu_within_instruction_hook(running_machine *machine);
 void debug_cpu_halt_on_next_instruction(running_machine *machine, int cpunum, const char *fmt, ...) ATTR_PRINTF(3,4);
 int	debug_cpu_is_stopped(running_machine *machine);
-void debug_cpu_trace_printf(int cpunum, const char *fmt, ...) ATTR_PRINTF(2,3);
+void debug_cpu_trace_printf(const device_config *device, const char *fmt, ...) ATTR_PRINTF(2,3);
 void debug_cpu_source_script(running_machine *machine, const char *file);
 void debug_cpu_flush_traces(void);
 
 /* debugging hooks */
-void				debug_cpu_get_memory_hooks(int cpunum, debug_hook_read_func *read, debug_hook_write_func *write);
-void				debug_cpu_set_instruction_hook(int cpunum, int (*hook)(offs_t pc));
+void debug_cpu_set_instruction_hook(const device_config *device, debug_instruction_hook_func hook);
 
 /* execution control */
-void				debug_cpu_single_step(int numsteps);
+void debug_cpu_single_step(int numsteps);
 void				debug_cpu_single_step_over(int numsteps);
 void				debug_cpu_single_step_out(void);
 void				debug_cpu_go(offs_t targetpc);
@@ -252,30 +262,30 @@ void				debug_cpu_next_cpu(void);
 void				debug_cpu_ignore_cpu(const device_config *cpu, int ignore);
 
 /* tracing support */
-void				debug_cpu_trace(int cpunum, FILE *file, int trace_over, const char *action);
+void				debug_cpu_trace(const device_config *device, FILE *file, int trace_over, const char *action);
 
 /* breakpoints */
-int					debug_cpu_breakpoint_set(running_machine *machine, int cpunum, offs_t address, parsed_expression *condition, const char *action);
-int					debug_cpu_breakpoint_clear(running_machine *machine, int bpnum);
-int					debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable);
+int	debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed_expression *condition, const char *action);
+int	debug_cpu_breakpoint_clear(running_machine *machine, int bpnum);
+int	debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable);
 
 /* watchpoints */
-int					debug_cpu_watchpoint_set(running_machine *machine, int cpunum, int spacenum, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action);
-int					debug_cpu_watchpoint_clear(running_machine *machine, int wpnum);
-int					debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable);
+int	debug_cpu_watchpoint_set(const address_space *space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action);
+int	debug_cpu_watchpoint_clear(running_machine *machine, int wpnum);
+int	debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable);
 
 /* hotspots */
-int					debug_cpu_hotspot_track(running_machine *machine, int cpunum, int numspots, int threshhold);
+int	debug_cpu_hotspot_track(const device_config *device, int numspots, int threshhold);
 
 /* memory accessors */
-UINT8				debug_read_byte(int spacenum, offs_t address, int apply_translation);
-UINT16				debug_read_word(int spacenum, offs_t address, int apply_translation);
-UINT32				debug_read_dword(int spacenum, offs_t address, int apply_translation);
-UINT64				debug_read_qword(int spacenum, offs_t address, int apply_translation);
-void				debug_write_byte(int spacenum, offs_t address, UINT8 data, int apply_translation);
-void				debug_write_word(int spacenum, offs_t address, UINT16 data, int apply_translation);
-void				debug_write_dword(int spacenum, offs_t address, UINT32 data, int apply_translation);
-void				debug_write_qword(int spacenum, offs_t address, UINT64 data, int apply_translation);
+UINT8				debug_read_byte(const address_space *space, offs_t address, int apply_translation);
+UINT16				debug_read_word(const address_space *space, offs_t address, int apply_translation);
+UINT32				debug_read_dword(const address_space *space, offs_t address, int apply_translation);
+UINT64				debug_read_qword(const address_space *space, offs_t address, int apply_translation);
+void				debug_write_byte(const address_space *space, offs_t address, UINT8 data, int apply_translation);
+void				debug_write_word(const address_space *space, offs_t address, UINT16 data, int apply_translation);
+void				debug_write_dword(const address_space *space, offs_t address, UINT32 data, int apply_translation);
+void				debug_write_qword(const address_space *space, offs_t address, UINT64 data, int apply_translation);
 UINT64				debug_read_opcode(UINT32 offset, int size, int arg);
 
 #endif

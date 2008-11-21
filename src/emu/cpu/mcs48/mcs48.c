@@ -944,7 +944,7 @@ static CPU_EXECUTE( mcs48 )
 	{
 		/* fetch next opcode */
 		mcs48->prevpc = mcs48->pc;
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 		opcode = opcode_fetch(mcs48, PC++);
 
 		/* process opcode and count cycles */

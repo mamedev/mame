@@ -325,7 +325,7 @@ static CPU_EXECUTE( arm )
 	arm_icount = cycles;
 	do
 	{
-		debugger_instruction_hook(device->machine, R15);
+		debugger_instruction_hook(device, R15);
 
 		/* load instruction */
 		pc = R15;

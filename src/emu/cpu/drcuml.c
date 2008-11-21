@@ -137,6 +137,7 @@ struct _drcuml_symbol
 /* structure describing UML generation state */
 struct _drcuml_state
 {
+	const device_config *	device;				/* CPU device we are associated with */
 	drccache *				cache;				/* pointer to the codegen cache */
 	drcuml_block *			blocklist;			/* list of active blocks */
 	const drcbe_interface *	beintf;				/* backend interface pointer */
@@ -539,7 +540,7 @@ INLINE void convert_to_mov_param(drcuml_instruction *inst, int pnum)
     generator and initialize the back-end
 -------------------------------------------------*/
 
-drcuml_state *drcuml_alloc(drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits)
+drcuml_state *drcuml_alloc(const device_config *device, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	drcuml_state *drcuml;
 	int opnum;
@@ -551,6 +552,7 @@ drcuml_state *drcuml_alloc(drccache *cache, UINT32 flags, int modes, int addrbit
 	memset(drcuml, 0, sizeof(*drcuml));
 
 	/* initialize the state */
+	drcuml->device = device;
 	drcuml->cache = cache;
 	drcuml->beintf = (flags & DRCUML_OPTION_USE_C) ? &drcbe_c_be_interface : &NATIVE_DRC;
 	drcuml->symtailptr = &drcuml->symlist;
@@ -560,7 +562,7 @@ drcuml_state *drcuml_alloc(drccache *cache, UINT32 flags, int modes, int addrbit
 		drcuml->umllog = fopen("drcuml.asm", "w");
 
 	/* allocate the back-end */
-	drcuml->bestate = (*drcuml->beintf->be_alloc)(drcuml, cache, flags, modes, addrbits, ignorebits);
+	drcuml->bestate = (*drcuml->beintf->be_alloc)(drcuml, cache, device, flags, modes, addrbits, ignorebits);
 	if (drcuml->bestate == NULL)
 	{
 		drcuml_free(drcuml);

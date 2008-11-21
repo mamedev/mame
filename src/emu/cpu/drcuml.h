@@ -395,7 +395,7 @@ struct _drcbe_info
 
 
 /* typedefs for back-end callback functions */
-typedef drcbe_state *(*drcbe_alloc_func)(drcuml_state *drcuml, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits);
+typedef drcbe_state *(*drcbe_alloc_func)(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits);
 typedef void (*drcbe_free_func)(drcbe_state *state);
 typedef void (*drcbe_reset_func)(drcbe_state *state);
 typedef int	(*drcbe_execute_func)(drcbe_state *state, drcuml_codehandle *entry);
@@ -426,7 +426,7 @@ struct _drcbe_interface
 /* ----- initialization/teardown ----- */
 
 /* allocate state for the code generator and initialize the back-end */
-drcuml_state *drcuml_alloc(drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits);
+drcuml_state *drcuml_alloc(const device_config *device, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits);
 
 /* return information about the back-end */
 void drcuml_get_backend_info(drcuml_state *drcuml, drcbe_info *info);

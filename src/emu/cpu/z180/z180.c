@@ -2218,7 +2218,7 @@ again:
 		if ((IO_DSTAT & Z180_DSTAT_DE0) == Z180_DSTAT_DE0 &&
 			(IO_DMODE & Z180_DMODE_MMOD) == Z180_DMODE_MMOD)
 		{
-			debugger_instruction_hook(device->machine, _PCD);
+			debugger_instruction_hook(device, _PCD);
 
 			z180_dma0();
 			old_icount = handle_timers(z180_icount, old_icount);
@@ -2231,7 +2231,7 @@ again:
 				Z180.after_EI = 0;
 
 				_PPC = _PCD;
-				debugger_instruction_hook(device->machine, _PCD);
+				debugger_instruction_hook(device, _PCD);
 				_R++;
 
 				EXEC_INLINE(op,ROP());
@@ -2258,7 +2258,7 @@ again:
 			Z180.after_EI = 0;
 
 			_PPC = _PCD;
-			debugger_instruction_hook(device->machine, _PCD);
+			debugger_instruction_hook(device, _PCD);
 			_R++;
 			EXEC_INLINE(op,ROP());
 			old_icount = handle_timers(z180_icount, old_icount);

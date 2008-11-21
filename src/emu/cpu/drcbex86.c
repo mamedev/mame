@@ -160,6 +160,7 @@ struct _opcode_table_entry
 /* internal backend-specific state */
 struct _drcbe_state
 {
+	const device_config *	device;					/* CPU device we are associated with */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drccache *				cache;					/* pointer to the cache */
 	drcuml_machine_state 	state;					/* state of the machine */
@@ -199,7 +200,7 @@ struct _drcbe_state
 ***************************************************************************/
 
 /* primary back-end callbacks */
-static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits);
+static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits);
 static void drcbex86_free(drcbe_state *drcbe);
 static void drcbex86_reset(drcbe_state *drcbe);
 static int drcbex86_execute(drcbe_state *drcbe, drcuml_codehandle *entry);
@@ -533,7 +534,7 @@ INLINE void emit_combine_z_shl_flags(x86code **dst)
     state
 -------------------------------------------------*/
 
-static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, UINT32 flags, int modes, int addrbits, int ignorebits)
+static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	int opnum, regnum, entry, spacenum;
 	drcbe_state *drcbe;
@@ -545,6 +546,7 @@ static drcbe_state *drcbex86_alloc(drcuml_state *drcuml, drccache *cache, UINT32
 	memset(drcbe, 0, sizeof(*drcbe));
 
 	/* remember our pointers */
+	drcbe->device = device;
 	drcbe->drcuml = drcuml;
 	drcbe->cache = cache;
 
@@ -3232,7 +3234,7 @@ static x86code *op_debug(drcbe_state *drcbe, x86code *dst, const drcuml_instruct
 
 		/* push the parameter */
 		emit_mov_m32_p32(drcbe, &dst, MBD(REG_ESP, 4), &pcp);							// mov   [esp+4],pcp
-		emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)Machine);							// mov   [esp],Machine
+		emit_mov_m32_imm(&dst, MBD(REG_ESP, 0), (FPTR)drcbe->device);					// mov   [esp],device
 		emit_call(&dst, (x86code *)debug_cpu_instruction_hook);							// call  debug_cpu_instruction_hook
 
 		resolve_link(&dst, &skip);													// skip:

@@ -479,8 +479,8 @@ static UINT64 i386_debug_seglimit(void *ref, UINT32 params, const UINT64 *param)
 
 static CPU_DEBUG_INIT( i386 )
 {
-	symtable_add_function(global_symtable, "segbase", NULL, 1, 1, i386_debug_segbase);
-	symtable_add_function(global_symtable, "seglimit", NULL, 1, 1, i386_debug_seglimit);
+	symtable_add_function(debug_cpu_get_symtable(device), "segbase", NULL, 1, 1, i386_debug_segbase);
+	symtable_add_function(debug_cpu_get_symtable(device), "seglimit", NULL, 1, 1, i386_debug_seglimit);
 }
 
 /*************************************************************************/
@@ -715,7 +715,7 @@ static CPU_EXECUTE( i386 )
 		I.segment_prefix = 0;
 		I.prev_eip = I.eip;
 
-		debugger_instruction_hook(device->machine, I.pc);
+		debugger_instruction_hook(device, I.pc);
 
 		i386_check_irq_line();
 		I386OP(decode_opcode)();

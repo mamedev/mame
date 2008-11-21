@@ -531,7 +531,7 @@ static CPU_EXECUTE( tms32031 )
 				continue;
 			}
 
-			debugger_instruction_hook(device->machine, tms->pc);
+			debugger_instruction_hook(device, tms->pc);
 			execute_one(tms);
 		}
 	}

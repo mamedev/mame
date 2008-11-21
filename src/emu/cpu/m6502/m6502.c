@@ -245,7 +245,7 @@ static CPU_EXECUTE( m6502 )
 		UINT8 op;
 		PPC = PCD;
 
-		debugger_instruction_hook(Machine, PCD);
+		debugger_instruction_hook(device, PCD);
 
 		/* if an irq is pending, take it now */
 		if( m6502->pending_irq )
@@ -475,7 +475,7 @@ static CPU_EXECUTE( m65c02 )
 		UINT8 op;
 		PPC = PCD;
 
-		debugger_instruction_hook(Machine, PCD);
+		debugger_instruction_hook(device, PCD);
 
 		op = RDOP();
 		(*m6502->insn[op])(m6502);
@@ -650,7 +650,7 @@ static CPU_EXECUTE( deco16 )
 		UINT8 op;
 		PPC = PCD;
 
-		debugger_instruction_hook(Machine, PCD);
+		debugger_instruction_hook(device, PCD);
 
 		op = RDOP();
 		(*m6502->insn[op])(m6502);

@@ -203,6 +203,7 @@ struct _parsed_expression
 	const symbol_table *	table; 							/* symbol table */
 	char *					original_string;				/* original string (prior to parsing) */
 	express_callbacks 		callbacks;						/* callbacks */
+	void *					cbparam;						/* callbakc parameter */
 	expression_string *		stringlist; 					/* string list */
 	UINT16					stringcount;					/* number of strings allocated so far */
 	parse_token				token[MAX_TOKENS];				/* array of tokens */
@@ -348,7 +349,7 @@ INLINE EXPRERR pop_token_rval(parsed_expression *expr, parse_token *token, const
 		int size = (token->info & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT;
 		token->type = TOK_NUMBER;
 		if (expr->callbacks.read != NULL)
-			token->value.i = (*expr->callbacks.read)(name, space, token->value.i, 1 << size);
+			token->value.i = (*expr->callbacks.read)(expr->cbparam, name, space, token->value.i, 1 << size);
 		else
 			token->value.i = 0;
 	}
@@ -379,7 +380,7 @@ INLINE UINT64 get_lval_value(parsed_expression *expr, parse_token *token, const 
 		int space = (token->info & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT;
 		int size = (token->info & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT;
 		if (expr->callbacks.read != NULL)
-			return (*expr->callbacks.read)(name, space, token->value.i, 1 << size);
+			return (*expr->callbacks.read)(expr->cbparam, name, space, token->value.i, 1 << size);
 	}
 	return 0;
 }
@@ -404,7 +405,7 @@ INLINE void set_lval_value(parsed_expression *expr, parse_token *token, const sy
 		int space = (token->info & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT;
 		int size = (token->info & TIN_MEMORY_SIZE_MASK) >> TIN_MEMORY_SIZE_SHIFT;
 		if (expr->callbacks.write != NULL)
-			(*expr->callbacks.write)(name, space, token->value.i, 1 << size, value);
+			(*expr->callbacks.write)(expr->cbparam, name, space, token->value.i, 1 << size, value);
 	}
 }
 
@@ -583,7 +584,7 @@ static EXPRERR parse_memory_operator(parsed_expression *expr, int offset, const 
 	/* validate the name */
 	if (expr->callbacks.valid != NULL)
 	{
-		EXPRERR err = (*expr->callbacks.valid)(namestring, (*flags & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT);
+		EXPRERR err = (*expr->callbacks.valid)(expr->cbparam, namestring, (*flags & TIN_MEMORY_SPACE_MASK) >> TIN_MEMORY_SPACE_SHIFT);
 		if (err == EXPRERR_INVALID_MEMORY_SPACE)
 			return MAKE_EXPRERR_INVALID_MEMORY_SPACE(offset + (buffer - startbuffer));
 		else if (err != EXPRERR_NONE)
@@ -1731,7 +1732,7 @@ static void free_expression_strings(parsed_expression *expr)
     expression using the passed symbol table
 -------------------------------------------------*/
 
-EXPRERR expression_evaluate(const char *expression, const symbol_table *table, const express_callbacks *callbacks, UINT64 *result)
+EXPRERR expression_evaluate(const char *expression, const symbol_table *table, const express_callbacks *callbacks, void *cbparam, UINT64 *result)
 {
 	parsed_expression temp_expression;
 	EXPRERR exprerr;
@@ -1740,6 +1741,7 @@ EXPRERR expression_evaluate(const char *expression, const symbol_table *table, c
 	memset(&temp_expression, 0, sizeof(temp_expression));
 	if (callbacks != NULL)
 		temp_expression.callbacks = *callbacks;
+	temp_expression.cbparam = cbparam;
 
 	/* first parse the tokens into the token array in order */
 	exprerr = parse_string_into_tokens(expression, &temp_expression, table);
@@ -1771,7 +1773,7 @@ cleanup:
     return an allocated token array
 -------------------------------------------------*/
 
-EXPRERR expression_parse(const char *expression, const symbol_table *table, const express_callbacks *callbacks, parsed_expression **result)
+EXPRERR expression_parse(const char *expression, const symbol_table *table, const express_callbacks *callbacks, void *cbparam, parsed_expression **result)
 {
 	parsed_expression temp_expression;
 	EXPRERR exprerr;
@@ -1780,6 +1782,7 @@ EXPRERR expression_parse(const char *expression, const symbol_table *table, cons
 	memset(&temp_expression, 0, sizeof(temp_expression));
 	if (callbacks != NULL)
 		temp_expression.callbacks = *callbacks;
+	temp_expression.cbparam = cbparam;
 
 	/* first parse the tokens into the token array in order */
 	exprerr = parse_string_into_tokens(expression, &temp_expression, table);

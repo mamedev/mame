@@ -381,7 +381,7 @@ static void mips3_init(mips3_flavor flavor, int bigendian, const device_config *
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	mips3->impstate->drcuml = drcuml_alloc(cache, flags, 8, 32, 2);
+	mips3->impstate->drcuml = drcuml_alloc(device, cache, flags, 8, 32, 2);
 	if (mips3->impstate->drcuml == NULL)
 		fatalerror("Error initializing the UML");
 

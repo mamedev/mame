@@ -286,7 +286,7 @@ static CPU_EXECUTE( cop410 )
 	{
 		prevPC = PC;
 
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		if (cop400->intf->cko == COP400_CKO_HALT_IO_PORT)
 		{

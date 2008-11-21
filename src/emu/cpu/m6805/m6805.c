@@ -529,7 +529,7 @@ static CPU_EXECUTE( m6805 )
 			}
 		}
 
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		ireg=M_RDOP(PC++);
 

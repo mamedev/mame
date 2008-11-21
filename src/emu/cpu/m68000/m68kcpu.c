@@ -474,7 +474,7 @@ static CPU_EXECUTE( m68k )
 			m68ki_trace_t1(); /* auto-disable (see m68kcpu.h) */
 
 			/* Call external hook to peek at CPU */
-			debugger_instruction_hook(device->machine, REG_PC);
+			debugger_instruction_hook(device, REG_PC);
 
 			/* Record previous program counter */
 			REG_PPC = REG_PC;

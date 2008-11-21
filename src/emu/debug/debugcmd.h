@@ -18,9 +18,10 @@
 ***************************************************************************/
 
 /* initialization */
-void				debug_command_init(running_machine *machine);
+void debug_command_init(running_machine *machine);
 
 /*  parameter validation */
-int					debug_command_parameter_number(const char *param, UINT64 *result);
+int	debug_command_parameter_number(running_machine *machine, const char *param, UINT64 *result);
+int debug_command_parameter_cpu(running_machine *machine, const char *param, const device_config **result);
 
 #endif

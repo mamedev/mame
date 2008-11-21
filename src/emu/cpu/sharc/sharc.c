@@ -706,7 +706,7 @@ static CPU_EXECUTE( sharc )
 		}
 
 		sharc_icount = 0;
-		debugger_instruction_hook(device->machine, sharc.daddr);
+		debugger_instruction_hook(device, sharc.daddr);
 
 		return cycles;
 	}
@@ -741,7 +741,7 @@ static CPU_EXECUTE( sharc )
 		// fetch next instruction
 		sharc.fetch_opcode = ROPCODE(sharc.faddr);
 
-		debugger_instruction_hook(device->machine, sharc.pc);
+		debugger_instruction_hook(device, sharc.pc);
 
 		// handle looping
 		if (sharc.pc == (sharc.laddr & 0xffffff))

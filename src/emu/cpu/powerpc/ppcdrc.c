@@ -572,7 +572,7 @@ static void ppcdrc_init(powerpc_flavor flavor, UINT8 cap, int tb_divisor, const 
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	ppc->impstate->drcuml = drcuml_alloc(cache, flags, 8, 32, 2);
+	ppc->impstate->drcuml = drcuml_alloc(device, cache, flags, 8, 32, 2);
 	if (ppc->impstate->drcuml == NULL)
 		fatalerror("Error initializing the UML");
 

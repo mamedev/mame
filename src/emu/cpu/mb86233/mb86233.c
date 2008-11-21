@@ -973,7 +973,7 @@ static CPU_EXECUTE( mb86233 )
 		UINT32		val;
 		UINT32		opcode;
 
-		debugger_instruction_hook(device->machine, GETPC());
+		debugger_instruction_hook(device, GETPC());
 
 		opcode = ROPCODE(GETPC());
 

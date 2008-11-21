@@ -485,7 +485,7 @@ static CPU_EXECUTE( z8000 )
         if (IRQ_REQ)
 			Interrupt();
 
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		if (IRQ_REQ & Z8000_HALT)
         {

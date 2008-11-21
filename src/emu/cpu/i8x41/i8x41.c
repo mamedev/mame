@@ -923,7 +923,7 @@ static CPU_EXECUTE( i8x41 )
 
 		PPC = PC;
 
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		PC += 1;
 		upi41_state->icount  -= i8x41_cycles[op];

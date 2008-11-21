@@ -260,7 +260,7 @@ static void load_overlay_file(running_machine *machine);
 static void save_overlay_file(running_machine *machine);
 static void fd1094_regenerate_key(void);
 
-static int instruction_hook(offs_t curpc);
+static int instruction_hook(const device_config *device, offs_t curpc);
 
 static void execute_fdsave(running_machine *machine, int ref, int params, const char **param);
 static void execute_fdoutput(running_machine *machine, int ref, int params, const char **param);
@@ -538,7 +538,7 @@ void fd1094_init_debugging(running_machine *machine, const char *cpureg, const c
 	debug_console_register_command(machine, "fdcsearch", CMDFLAG_NONE, 0, 0, 0, execute_fdcsearch);
 
 	/* set up the instruction hook */
-	debug_cpu_set_instruction_hook(0, instruction_hook);
+	debug_cpu_set_instruction_hook(machine->cpu[0], instruction_hook);
 
 	/* regenerate the key */
 	if (keydirty)
@@ -691,7 +691,7 @@ void fd1094_regenerate_key(void)
     instruction_hook - per-instruction hook
 -----------------------------------------------*/
 
-static int instruction_hook(offs_t curpc)
+static int instruction_hook(const device_config *device, offs_t curpc)
 {
 	int curfdstate = fd1094_set_state(keyregion, -1);
 	UINT8 instrbuffer[10], keybuffer[5];
@@ -723,7 +723,7 @@ static int instruction_hook(offs_t curpc)
 	}
 
 	/* try all possible decodings at the current pc */
-	posscount = try_all_possibilities(Machine, curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
+	posscount = try_all_possibilities(device->machine, curpc, 0, 0, instrbuffer, keybuffer, posslist) - posslist;
 	if (keydirty)
 		fd1094_regenerate_key();
 
@@ -786,9 +786,9 @@ static void execute_fdseed(running_machine *machine, int ref, int params, const 
 	UINT64 num1, num2;
 
 	/* extract the parameters */
-	if (!debug_command_parameter_number(param[0], &num1))
+	if (!debug_command_parameter_number(machine, param[0], &num1))
 		return;
-	if (!debug_command_parameter_number(param[1], &num2))
+	if (!debug_command_parameter_number(machine, param[1], &num2))
 		return;
 
 	/* set the global and seed, and then regenerate the key */
@@ -813,7 +813,7 @@ static void execute_fdlockguess(running_machine *machine, int ref, int params, c
 	UINT64 num1;
 
 	/* extract the parameter */
-	if (!debug_command_parameter_number(param[0], &num1))
+	if (!debug_command_parameter_number(machine, param[0], &num1))
 		return;
 
 	/* make sure it is within range of our recent possibilities */
@@ -848,7 +848,7 @@ static void execute_fdeliminate(running_machine *machine, int ref, int params, c
 		UINT64 num1;
 
 		/* extract the parameters */
-		if (!debug_command_parameter_number(param[pnum], &num1))
+		if (!debug_command_parameter_number(machine, param[pnum], &num1))
 			return;
 
 		/* make sure it is within range of our recent possibilities */
@@ -895,7 +895,7 @@ static void execute_fdunlock(running_machine *machine, int ref, int params, cons
 	UINT64 offset;
 
 	/* support 0 or 1 parameters */
-	if (params != 1 || !debug_command_parameter_number(param[0], &offset))
+	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
  		offset = cpu_get_pc(machine->activecpu);
  	keyaddr = addr_to_keyaddr(offset / 2);
 
@@ -936,7 +936,7 @@ static void execute_fdignore(running_machine *machine, int ref, int params, cons
 		debug_console_printf("Ignoring all unknown opcodes\n");
 		return;
 	}
-	if (params != 1 || !debug_command_parameter_number(param[0], &offset))
+	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
  		offset = cpu_get_pc(machine->activecpu);
  	offset /= 2;
 
@@ -1011,7 +1011,7 @@ static void execute_fdstate(running_machine *machine, int ref, int params, const
 	/* set the new state if we got a parameter */
 	if (params > 0)
 	{
-		if (!debug_command_parameter_number(param[0], &newstate))
+		if (!debug_command_parameter_number(machine, param[0], &newstate))
 			return;
 		fd1094_set_state(keyregion, newstate);
 		fd1094_regenerate_key();
@@ -1034,14 +1034,14 @@ static void execute_fdpc(running_machine *machine, int ref, int params, const ch
 	UINT64 newpc;
 
 	/* support 0 or 1 parameters */
-	if (!debug_command_parameter_number(param[0], &newpc))
+	if (!debug_command_parameter_number(machine, param[0], &newpc))
  		newpc = cpu_get_pc(machine->activecpu);
 
  	/* set the new PC */
  	cpu_set_reg(machine->activecpu, REG_PC, newpc);
 
  	/* recompute around that */
- 	instruction_hook(newpc);
+ 	instruction_hook(machine->activecpu, newpc);
 }
 
 
@@ -1091,7 +1091,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 
 			/* set this as our current PC and run the instruction hook */
 			cpu_set_reg(machine->activecpu, REG_PC, pc);
-			if (instruction_hook(pc))
+			if (instruction_hook(machine->activecpu, pc))
 				break;
 		}
 		keystatus[pc/2] |= SEARCH_MASK;
@@ -1298,17 +1298,17 @@ static void execute_fdcset(running_machine *machine, int ref, int params, const 
 	int cnum;
 
 	/* extract the parameters */
-	if (!debug_command_parameter_number(param[0], &pc))
+	if (!debug_command_parameter_number(machine, param[0], &pc))
 		return;
-	if (!debug_command_parameter_number(param[1], &value))
+	if (!debug_command_parameter_number(machine, param[1], &value))
 		return;
-	if (params >= 3 && !debug_command_parameter_number(param[2], &mask))
+	if (params >= 3 && !debug_command_parameter_number(machine, param[2], &mask))
 		return;
 	if (params >= 4)
 	{
 		if (strcmp(param[3], "irq") == 0)
 			state = FD1094_STATE_IRQ;
-		else if (!debug_command_parameter_number(param[3], &state))
+		else if (!debug_command_parameter_number(machine, param[3], &state))
 			return;
 	}
 

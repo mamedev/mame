@@ -1506,7 +1506,7 @@ static CPU_EXECUTE( tms99xx )
 				#endif
 			#endif
 
-			debugger_instruction_hook(device->machine, I.IR);
+			debugger_instruction_hook(device, I.IR);
 		}
 
 		if (I.IDLE)

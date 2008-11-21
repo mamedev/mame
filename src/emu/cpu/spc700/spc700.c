@@ -1410,7 +1410,7 @@ CPU_EXECUTE( spc700 )
 	while(CLOCKS > 0)
 	{
 		REG_PPC = REG_PC;
-		debugger_instruction_hook(device->machine, REG_PC);
+		debugger_instruction_hook(device, REG_PC);
 		REG_PC++;
 
 #if 0

@@ -182,7 +182,7 @@ static CPU_EXECUTE( tx0_64kw )
 
 	do
 	{
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 
 
 		if (tx0.ioh && tx0.ios)
@@ -290,7 +290,7 @@ static CPU_EXECUTE( tx0_8kw )
 
 	do
 	{
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 
 
 		if (tx0.ioh && tx0.ios)

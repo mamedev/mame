@@ -427,7 +427,7 @@ static CPU_EXECUTE( v60 )
 		v60_try_irq();
 	while(v60_ICount >= 0) {
 		v60.PPC = PC;
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 		v60_ICount -= 8;	/* fix me -- this is just an average */
 		inc = OpCodeTable[OpRead8(PC)]();
 		PC += inc;

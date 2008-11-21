@@ -116,7 +116,7 @@ static CPU_EXECUTE( sc61860 )
 	{
 		sc61860.oldpc = sc61860.pc;
 
-		debugger_instruction_hook(device->machine, sc61860.pc);
+		debugger_instruction_hook(device, sc61860.pc);
 
 		sc61860_instruction();
 

@@ -1332,7 +1332,7 @@ static CPU_EXECUTE( t90 )
 	do
 	{
 		T90.prvpc.d = T90.pc.d;
-		debugger_instruction_hook(device->machine, T90.pc.d);
+		debugger_instruction_hook(device, T90.pc.d);
 
 		check_interrupts();
 

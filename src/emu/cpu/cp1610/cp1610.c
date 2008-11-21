@@ -2167,7 +2167,7 @@ static CPU_EXECUTE( cp1610 )
 
     do
     {
-        debugger_instruction_hook(device->machine, cp1610.r[7]);
+        debugger_instruction_hook(device, cp1610.r[7]);
 
 		cp1610.mask_interrupts = 0;
 

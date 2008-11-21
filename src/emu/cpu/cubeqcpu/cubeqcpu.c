@@ -571,7 +571,7 @@ static CPU_EXECUTE( cquestsnd )
 		int _rin    = (inslow >> 26) & 1;
 
 		if (calldebugger)
-			debugger_instruction_hook(device->machine, cquestsnd.pc);
+			debugger_instruction_hook(device, cquestsnd.pc);
 
 		/* Don't think this matters, but just in case */
 		if (rtn)
@@ -907,7 +907,7 @@ static CPU_EXECUTE( cquestrot )
 		UINT16 data_in = 0xffff;
 
 		if (calldebugger)
-			debugger_instruction_hook(device->machine, ROT_PC);
+			debugger_instruction_hook(device, ROT_PC);
 
 		/* Handle DRAM accesses - I ought to check this... */
 		if (!(cquestrot.clkcnt & 3))
@@ -1426,7 +1426,7 @@ static CPU_EXECUTE( cquestlin )
 		UINT16	data_in = 0;
 
 		if (calldebugger)
-			debugger_instruction_hook(device->machine, cquestlin.pc[prog]);
+			debugger_instruction_hook(device, cquestlin.pc[prog]);
 
 		/* Handle accesses to and from shared SRAM */
 		if (prog == FOREGROUND)

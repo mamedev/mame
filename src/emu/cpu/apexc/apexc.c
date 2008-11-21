@@ -802,7 +802,7 @@ static CPU_EXECUTE( apexc )
 
 	do
 	{
-		debugger_instruction_hook(device->machine, effective_address(apexc.ml));
+		debugger_instruction_hook(device, effective_address(apexc.ml));
 
 		if (apexc.running)
 			execute();

@@ -292,7 +292,7 @@ enum
 #define ONE_MORE_INSN() {		\
 	UINT8 ireg; 							\
 	pPPC = pPC; 							\
-	debugger_instruction_hook(Machine, PCD);						\
+	debugger_instruction_hook(m68_state->device, PCD);						\
 	ireg=M_RDOP(PCD);						\
 	PC++;									\
 	(*m68_state->insn[ireg])(m68_state);					\
@@ -1297,7 +1297,7 @@ static CPU_EXECUTE( m6800 )
 		else
 		{
 			pPPC = pPC;
-			debugger_instruction_hook(device->machine, PCD);
+			debugger_instruction_hook(device, PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 			m6800_execute_one(m68_state, ireg);
@@ -1672,7 +1672,7 @@ static CPU_EXECUTE( m6803 )
 		else
 		{
 			pPPC = pPC;
-			debugger_instruction_hook(device->machine, PCD);
+			debugger_instruction_hook(device, PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 			m6803_execute_one(m68_state, ireg);
@@ -2035,7 +2035,7 @@ static CPU_EXECUTE( hd63701 )
 		else
 		{
 			pPPC = pPC;
-			debugger_instruction_hook(device->machine, PCD);
+			debugger_instruction_hook(device, PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 			hd63071_execute_one(m68_state, ireg);
@@ -2386,7 +2386,7 @@ static CPU_EXECUTE( nsc8105 )
 		else
 		{
 			pPPC = pPC;
-			debugger_instruction_hook(device->machine, PCD);
+			debugger_instruction_hook(device, PCD);
 			ireg=M_RDOP(PCD);
 			PC++;
 			nsc8105_execute_one(m68_state, ireg);

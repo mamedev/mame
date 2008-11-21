@@ -702,7 +702,7 @@ static CPU_INIT( sh2 )
 		flags |= DRCUML_OPTION_LOG_UML;
 	if (LOG_NATIVE)
 		flags |= DRCUML_OPTION_LOG_NATIVE;
-	sh2->drcuml = drcuml_alloc(cache, flags, 1, 32, 1);
+	sh2->drcuml = drcuml_alloc(device, cache, flags, 1, 32, 1);
 	if (sh2->drcuml == NULL)
 		fatalerror("Error initializing the UML");
 

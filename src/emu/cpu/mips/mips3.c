@@ -1677,7 +1677,7 @@ CPU_EXECUTE( mips3 )
 
 		/* debugging */
 		mips3.ppc = mips3.core.pc;
-		debugger_instruction_hook(device->machine, mips3.core.pc);
+		debugger_instruction_hook(device, mips3.core.pc);
 
 		/* instruction fetch */
 		op = ROPCODE(mips3.pcbase | (mips3.core.pc & 0xfff));

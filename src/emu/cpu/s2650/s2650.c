@@ -867,7 +867,7 @@ static CPU_EXECUTE( s2650 )
 	{
 		S.ppc = S.page + S.iar;
 
-		debugger_instruction_hook(device->machine, S.page + S.iar);
+		debugger_instruction_hook(device, S.page + S.iar);
 
 		S.ir = ROP();
 		S.r = S.ir & 3; 		/* register / value */

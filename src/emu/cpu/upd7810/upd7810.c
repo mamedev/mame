@@ -1707,7 +1707,7 @@ static CPU_EXECUTE( upd7810 )
 	{
 		int cc = 0;
 
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		PPC = PC;
 		RDOP(OP);

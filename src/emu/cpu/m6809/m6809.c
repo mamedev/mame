@@ -509,7 +509,7 @@ static CPU_EXECUTE( m6809 )	/* NS 970908 */
 
 	if (m68_state->int_state & (M6809_CWAI | M6809_SYNC))
 	{
-		debugger_instruction_hook(device->machine, PCD);
+		debugger_instruction_hook(device, PCD);
 		m68_state->icount = 0;
 	}
 	else
@@ -518,7 +518,7 @@ static CPU_EXECUTE( m6809 )	/* NS 970908 */
 		{
 			pPPC = pPC;
 
-			debugger_instruction_hook(device->machine, PCD);
+			debugger_instruction_hook(device, PCD);
 
 			m68_state->ireg = ROP(PCD);
 			PC++;

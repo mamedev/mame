@@ -168,7 +168,7 @@ static CPU_EXECUTE( minx )
 
 	do
 	{
-		debugger_instruction_hook(Machine, GET_MINX_PC);
+		debugger_instruction_hook(device, GET_MINX_PC);
 		oldpc = GET_MINX_PC;
 
 		if ( regs.interrupt_pending )

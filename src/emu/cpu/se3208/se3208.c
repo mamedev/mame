@@ -1771,7 +1771,7 @@ static CPU_EXECUTE( SE3208 )
 	{
 		UINT16 Opcode=program_decrypted_read_word(WORD_XOR_LE(Context.PC));
 
-		debugger_instruction_hook(device->machine, Context.PC);
+		debugger_instruction_hook(device, Context.PC);
 
 		OpTable[Opcode](Opcode);
 		Context.PPC=Context.PC;

@@ -1945,7 +1945,7 @@ static CPU_EXECUTE( mcs51 )
 	{
 		/* Read next opcode */
 		PPC = PC;
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 		op = memory_decrypted_read_byte(mcs51_state->program, PC++);
 
 		/* process opcode and count cycles */

@@ -1250,7 +1250,7 @@ static CPU_EXECUTE( necv )
 		if (I.no_interrupt)
 			I.no_interrupt--;
 
-		debugger_instruction_hook(device->machine, (I.sregs[PS]<<4) + I.ip);
+		debugger_instruction_hook(device, (I.sregs[PS]<<4) + I.ip);
 		prev_ICount = nec_ICount;
 		nec_instruction[fetchop()]();
 		do_prefetch(prev_ICount);

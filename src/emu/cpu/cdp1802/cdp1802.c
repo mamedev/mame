@@ -223,7 +223,7 @@ static void cdp1802_run(const device_config *device)
 
 		cdp1802->icount -= CDP1802_CYCLES_RESET;
 
-		debugger_instruction_hook(device->machine, cdp1802->r[cdp1802->p]);
+		debugger_instruction_hook(device, cdp1802->r[cdp1802->p]);
 
 		break;
 
@@ -248,7 +248,7 @@ static void cdp1802_run(const device_config *device)
 			cdp1802->state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(device->machine, cdp1802->r[cdp1802->p]);
+		debugger_instruction_hook(device, cdp1802->r[cdp1802->p]);
 
 		break;
 
@@ -725,7 +725,7 @@ static void cdp1802_run(const device_config *device)
 			cdp1802->state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(device->machine, cdp1802->r[cdp1802->p]);
+		debugger_instruction_hook(device, cdp1802->r[cdp1802->p]);
 
 		break;
 
@@ -813,7 +813,7 @@ static void cdp1802_run(const device_config *device)
 			cdp1802->state = CDP1802_STATE_0_FETCH;
 		}
 
-		debugger_instruction_hook(device->machine, cdp1802->r[cdp1802->p]);
+		debugger_instruction_hook(device, cdp1802->r[cdp1802->p]);
 
 		break;
 	}

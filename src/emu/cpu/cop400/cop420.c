@@ -330,7 +330,7 @@ static CPU_EXECUTE( cop420 )
 	{
 		prevPC = PC;
 
-		debugger_instruction_hook(device->machine, PC);
+		debugger_instruction_hook(device, PC);
 
 		opcode = ROM(PC);
 

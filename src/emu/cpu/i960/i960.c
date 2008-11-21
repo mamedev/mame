@@ -1958,7 +1958,7 @@ static CPU_EXECUTE( i960 )
 	check_irqs(i960_state);
 	while(i960_state->icount >= 0) {
 		i960_state->PIP = i960_state->IP;
-		debugger_instruction_hook(device->machine, i960_state->IP);
+		debugger_instruction_hook(device, i960_state->IP);
 
 		i960_state->bursting = 0;
 

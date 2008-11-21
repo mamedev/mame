@@ -177,7 +177,7 @@ static CPU_EXECUTE( ppc403 )
 	{
 		UINT32 opcode;
 
-		debugger_instruction_hook(device->machine, ppc.pc);
+		debugger_instruction_hook(device, ppc.pc);
 		ppc.pc = ppc.npc;
 		ppc.npc += 4;
 		opcode = ROPCODE(ppc.pc);

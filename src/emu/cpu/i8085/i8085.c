@@ -1307,7 +1307,7 @@ static CPU_EXECUTE( i8085 )
 	i8085_ICount = cycles;
 	do
 	{
-		debugger_instruction_hook(device->machine, I.PC.d);
+		debugger_instruction_hook(device, I.PC.d);
 		/* interrupts enabled or TRAP pending ? */
 		if ( (I.IM & IM_IEN) || (I.IREQ & IM_TRAP) )
 		{

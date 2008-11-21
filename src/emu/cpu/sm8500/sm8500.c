@@ -217,7 +217,7 @@ static CPU_EXECUTE( sm8500 )
 		UINT32	d1,d2;
 		UINT32	res;
 
-		debugger_instruction_hook(device->machine, regs.PC);
+		debugger_instruction_hook(device, regs.PC);
 		oldpc = regs.PC;
 		mycycles = 0;
 		sm8500_process_interrupts();

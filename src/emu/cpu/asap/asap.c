@@ -492,7 +492,7 @@ INLINE void fetch_instruction_debug(asap_state *asap)
 {
 	/* debugging */
 	asap->ppc = asap->pc;
-	debugger_instruction_hook(asap->device->machine, asap->pc);
+	debugger_instruction_hook(asap->device, asap->pc);
 
 	/* instruction fetch */
 	asap->op.d = ROPCODE(asap, asap->pc);

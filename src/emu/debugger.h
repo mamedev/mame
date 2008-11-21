@@ -41,10 +41,10 @@ void debugger_refresh_display(running_machine *machine);
     this once per instruction from CPU cores
 -------------------------------------------------*/
 
-INLINE void debugger_instruction_hook(running_machine *machine, offs_t curpc)
+INLINE void debugger_instruction_hook(const device_config *device, offs_t curpc)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
-		debug_cpu_instruction_hook(machine, curpc);
+	if ((device->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
+		debug_cpu_instruction_hook(device, curpc);
 }
 
 
@@ -53,10 +53,10 @@ INLINE void debugger_instruction_hook(running_machine *machine, offs_t curpc)
     anytime an exception is generated
 -------------------------------------------------*/
 
-INLINE void debugger_exception_hook(running_machine *machine, int cpunum, int exception)
+INLINE void debugger_exception_hook(const device_config *device, int exception)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_exception_hook(machine, cpunum, exception);
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_exception_hook(device, exception);
 }
 
 
@@ -71,10 +71,10 @@ INLINE void debugger_exception_hook(running_machine *machine, int cpunum, int ex
     execution for the given CPU
 -------------------------------------------------*/
 
-INLINE void debugger_start_cpu_hook(running_machine *machine, int cpunum, attotime endtime)
+INLINE void debugger_start_cpu_hook(const device_config *device, attotime endtime)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_start_hook(machine, cpunum, endtime);
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_start_hook(device, endtime);
 }
 
 
@@ -84,10 +84,10 @@ INLINE void debugger_start_cpu_hook(running_machine *machine, int cpunum, attoti
     for the given CPU
 -------------------------------------------------*/
 
-INLINE void debugger_stop_cpu_hook(running_machine *machine, int cpunum)
+INLINE void debugger_stop_cpu_hook(const device_config *device)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_stop_hook(machine, cpunum);
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_stop_hook(device);
 }
 
 
@@ -97,10 +97,10 @@ INLINE void debugger_stop_cpu_hook(running_machine *machine, int cpunum)
     acknowledged
 -------------------------------------------------*/
 
-INLINE void debugger_interrupt_hook(running_machine *machine, int cpunum, int irqline)
+INLINE void debugger_interrupt_hook(const device_config *device, int irqline)
 {
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_interrupt_hook(machine, cpunum, irqline);
+	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_cpu_interrupt_hook(device, irqline);
 }
 
 

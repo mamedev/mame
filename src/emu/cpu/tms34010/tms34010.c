@@ -826,7 +826,7 @@ static CPU_EXECUTE( tms34010 )
 			if ((tms->device->machine->debug_flags & DEBUG_FLAG_CALL_HOOK) != 0)
 			{
 				tms->st = GET_ST(tms);
-				debugger_instruction_hook(tms->device->machine, tms->pc);
+				debugger_instruction_hook(tms->device, tms->pc);
 			}
 			op = ROPCODE(tms);
 			(*opcode_table[op >> 4])(tms, op);

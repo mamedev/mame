@@ -1577,7 +1577,7 @@ static CPU_EXECUTE( f8 )
     do
     {
 	UINT8 op=f8.dbus;
-        debugger_instruction_hook(device->machine, (f8.pc0 - 1) & 0xffff);
+        debugger_instruction_hook(device, (f8.pc0 - 1) & 0xffff);
 
 	switch( op )
         {

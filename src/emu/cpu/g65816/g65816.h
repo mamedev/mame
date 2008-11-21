@@ -92,7 +92,7 @@ enum
 CPU_GET_INFO( g65816 );
 
 #undef G65816_CALL_DEBUGGER
-#define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(Machine, x)
+#define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(g65816i_cpu.device, x)
 
 #define g65816_read_8(addr) 			program_read_byte_8be(addr)
 #define g65816_write_8(addr,data)		program_write_byte_8be(addr,data)

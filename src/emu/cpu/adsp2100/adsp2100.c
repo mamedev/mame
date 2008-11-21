@@ -920,7 +920,7 @@ static CPU_EXECUTE( adsp21xx )
 		/* debugging */
 		adsp->ppc = adsp->pc;	/* copy PC to previous PC */
 		if (check_debugger)
-			debugger_instruction_hook(device->machine, adsp->pc);
+			debugger_instruction_hook(device, adsp->pc);
 
 #if TRACK_HOTSPOTS
 		pcbucket[adsp->pc & 0x3fff]++;

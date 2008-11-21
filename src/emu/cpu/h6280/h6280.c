@@ -248,7 +248,7 @@ static CPU_EXECUTE( h6280 )
     		CHANGE_PC;
 		h6280.ppc = h6280.pc;
 
-		debugger_instruction_hook(device->machine, PCW);
+		debugger_instruction_hook(device, PCW);
 
 		/* Execute 1 instruction */
 		in=RDOP();

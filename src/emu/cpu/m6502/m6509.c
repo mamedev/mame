@@ -230,7 +230,7 @@ static CPU_EXECUTE( m6509 )
 		UINT8 op;
 		PPC = PCD;
 
-		debugger_instruction_hook(Machine, PCD);
+		debugger_instruction_hook(device, PCD);
 
 		/* if an irq is pending, take it now */
 		if( m6509->pending_irq )

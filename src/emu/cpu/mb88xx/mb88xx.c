@@ -238,7 +238,7 @@ static CPU_EXECUTE( mb88 )
 		UINT8 opcode, arg, oc;
 
 		/* fetch the opcode */
-		debugger_instruction_hook(device->machine, GETPC());
+		debugger_instruction_hook(device, GETPC());
 		opcode = READOP(GETPC());
 
 		/* increment the PC */

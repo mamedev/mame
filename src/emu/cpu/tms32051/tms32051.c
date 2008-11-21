@@ -362,7 +362,7 @@ static CPU_EXECUTE( tms )
 		}
 
 		ppc = tms.pc;
-		debugger_instruction_hook(device->machine, tms.pc);
+		debugger_instruction_hook(device, tms.pc);
 
 		tms.op = ROPCODE();
 		tms32051_opcode_table[tms.op >> 8]();

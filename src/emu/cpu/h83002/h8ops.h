@@ -117,7 +117,7 @@ static CPU_EXECUTE(h8)
 	{
 		h8->ppc = h8->pc;
 
-		debugger_instruction_hook(device->machine, h8->pc);
+		debugger_instruction_hook(device, h8->pc);
 
 		opcode = h8_readop16(h8, h8->pc);
 		h8->pc += 2;

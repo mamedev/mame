@@ -104,9 +104,9 @@ typedef void (*symbol_setter_func)(void *ref, UINT64 value);
 typedef UINT64 (*function_execute_func)(void *ref, UINT32 numparams, const UINT64 *paramlist);
 
 /* callback function for memory reads/writes */
-typedef UINT64 (*express_read_func)(const char *name, int space, UINT32 offset, int size);
-typedef void (*express_write_func)(const char *name, int space, UINT32 offset, int size, UINT64 value);
-typedef EXPRERR (*express_valid_func)(const char *name, int space);
+typedef UINT64 (*express_read_func)(void *cbparam, const char *name, int space, UINT32 offset, int size);
+typedef void (*express_write_func)(void *cbparam, const char *name, int space, UINT32 offset, int size, UINT64 value);
+typedef EXPRERR (*express_valid_func)(void *cbparam, const char *name, int space);
 
 
 /* callback parameter for executing expressions */
@@ -166,8 +166,8 @@ typedef struct _parsed_expression parsed_expression;
 ***************************************************************************/
 
 /* expression evaluation */
-EXPRERR 					expression_evaluate(const char *expression, const symbol_table *table, const express_callbacks *callbacks, UINT64 *result);
-EXPRERR 					expression_parse(const char *expression, const symbol_table *table, const express_callbacks *callbacks, parsed_expression **result);
+EXPRERR 					expression_evaluate(const char *expression, const symbol_table *table, const express_callbacks *callbacks, void *cbparam, UINT64 *result);
+EXPRERR 					expression_parse(const char *expression, const symbol_table *table, const express_callbacks *callbacks, void *cbparam, parsed_expression **result);
 EXPRERR 					expression_execute(parsed_expression *expr, UINT64 *result);
 void 						expression_free(parsed_expression *expr);
 const char *				expression_original_string(parsed_expression *expr);

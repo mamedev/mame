@@ -826,7 +826,7 @@ static int debug_view_create(debugwin_info *info, int which, int type)
 		goto cleanup;
 
 	// create the debug view
-	view->view = debug_view_alloc(type);
+	view->view = debug_view_alloc(info->machine, type);
 	if (view->view == NULL)
 		goto cleanup;
 
@@ -1653,14 +1653,14 @@ static LRESULT CALLBACK debug_edit_proc(HWND wnd, UINT message, WPARAM wparam, L
 //============================================================
 
 #ifdef UNUSED_FUNCTION
-static void generic_create_window(int type)
+static void generic_create_window(running_machine *machine, int type)
 {
 	debugwin_info *info;
 	char title[256];
 
 	// create the window
 	_snprintf(title, ARRAY_LENGTH(title), "Debug: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
-	info = debug_window_create(title, NULL);
+	info = debug_window_create(machine, title, NULL);
 	if (info == NULL || !debug_view_create(info, 0, type))
 		return;
 
@@ -1771,29 +1771,28 @@ static void memory_determine_combo_items(running_machine *machine)
 		if (machine->cpu[cpunum] != NULL)
 		{
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
-			if (cpuinfo->valid)
-				for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-					if (cpuinfo->space[spacenum].databytes != 0)
-					{
-						memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-						TCHAR *t_tag, *t_name, *t_space;
+			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
+				if (cpuinfo->space[spacenum].databytes != 0)
+				{
+					memorycombo_item *ci = malloc_or_die(sizeof(*ci));
+					TCHAR *t_tag, *t_name, *t_space;
 
-						memset(ci, 0, sizeof(*ci));
-						ci->cpunum = cpunum;
-						ci->spacenum = spacenum;
-						ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
+					memset(ci, 0, sizeof(*ci));
+					ci->cpunum = cpunum;
+					ci->spacenum = spacenum;
+					ci->prefsize = MIN(cpuinfo->space[spacenum].databytes, 8);
 
-						t_tag = tstring_from_utf8(machine->config->cpu[cpunum].tag);
-						t_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
-						t_space = tstring_from_utf8(address_space_names[spacenum]);
-						_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU #%d \"%s\" (%s) %s memory"), cpunum, t_tag, t_name, t_space);
-						free(t_space),
-						free(t_name);
-						free(t_tag);
+					t_tag = tstring_from_utf8(machine->config->cpu[cpunum].tag);
+					t_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
+					t_space = tstring_from_utf8(address_space_names[spacenum]);
+					_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU #%d \"%s\" (%s) %s memory"), cpunum, t_tag, t_name, t_space);
+					free(t_space),
+					free(t_name);
+					free(t_tag);
 
-						*tail = ci;
-						tail = &ci->next;
-					}
+					*tail = ci;
+					tail = &ci->next;
+				}
 		}
 
 	// then add all the memory regions
@@ -2265,19 +2264,18 @@ static void disasm_create_window(running_machine *machine)
 		{
 			TCHAR* t_cpunum_name;
 			const cpu_debug_data *cpuinfo = cpu_get_debug_data(machine->cpu[cpunum]);
-			if (cpuinfo->valid)
-				if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
-				{
-					TCHAR name[100];
-					int item;
-					t_cpunum_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
-					_sntprintf(name, ARRAY_LENGTH(name), TEXT("CPU #%d (%s)"), cpunum, t_cpunum_name);
-					free(t_cpunum_name);
-					t_cpunum_name = NULL;
-					item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)name);
-					if (cpunum == curcpu)
-						cursel = item;
-				}
+			if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
+			{
+				TCHAR name[100];
+				int item;
+				t_cpunum_name = tstring_from_utf8(cpu_get_name(machine->cpu[cpunum]));
+				_sntprintf(name, ARRAY_LENGTH(name), TEXT("CPU #%d (%s)"), cpunum, t_cpunum_name);
+				free(t_cpunum_name);
+				t_cpunum_name = NULL;
+				item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)name);
+				if (cpunum == curcpu)
+					cursel = item;
+			}
 		}
 	SendMessage(info->otherwnd[0], CB_SETCURSEL, cursel, 0);
 
@@ -2411,15 +2409,14 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 					if (info->machine->cpu[cpunum] != NULL)
 					{
 						const cpu_debug_data *cpuinfo = cpu_get_debug_data(info->machine->cpu[cpunum]);
-						if (cpuinfo->valid)
-							if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
-								if (sel-- == 0)
-								{
-									debug_view_begin_update(info->view[0].view);
-									debug_view_set_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM, cpunum);
-									debug_view_end_update(info->view[0].view);
-									disasm_update_caption(info->machine, info->wnd);
-								}
+						if (cpuinfo->space[ADDRESS_SPACE_PROGRAM].databytes)
+							if (sel-- == 0)
+							{
+								debug_view_begin_update(info->view[0].view);
+								debug_view_set_property_UINT32(info->view[0].view, DVP_DASM_CPUNUM, cpunum);
+								debug_view_end_update(info->view[0].view);
+								disasm_update_caption(info->machine, info->wnd);
+							}
 					}
 
 				// reset the focus

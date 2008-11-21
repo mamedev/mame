@@ -399,7 +399,7 @@ static CPU_EXECUTE( t11 )
 	{
 		t11.ppc = t11.reg[7];	/* copy PC to previous PC */
 
-		debugger_instruction_hook(device->machine, PCD);
+		debugger_instruction_hook(device, PCD);
 
 		t11.op = ROPCODE();
 		(*opcode_table[t11.op >> 3])();

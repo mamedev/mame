@@ -3473,7 +3473,7 @@ static CPU_EXECUTE( z80 )
 		z80->after_ei = FALSE;
 
 		z80->PRVPC = z80->PCD;
-		debugger_instruction_hook(device->machine, z80->PCD);
+		debugger_instruction_hook(device, z80->PCD);
 		z80->r++;
 		EXEC_INLINE(z80,op,ROP(z80));
 	} while (z80->icount > 0);

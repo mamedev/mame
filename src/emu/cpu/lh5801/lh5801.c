@@ -132,7 +132,7 @@ static CPU_EXECUTE( lh5801 )
 		{
 			lh5801.oldpc = P;
 
-			debugger_instruction_hook(device->machine, P);
+			debugger_instruction_hook(device, P);
 			lh5801_instruction();
 
 		} while (lh5801_icount > 0);
