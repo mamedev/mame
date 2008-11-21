@@ -16,8 +16,8 @@
 
 #define H8_SP	(7)
 
-#define h8_mem_read8(x) program_read_byte_8be(x)
-#define h8_mem_write8(x, y)  program_write_byte_8be(x, y)
+#define h8_mem_read8(x)		memory_read_byte(h8->program, x)
+#define h8_mem_write8(x, y)	memory_write_byte(h8->program, x, y)
 
 // timing macros
 #define H8_IFETCH_TIMING(x)	h8->cyccnt -= (x) * 4;
@@ -27,40 +27,40 @@
 #define H8_WORD_TIMING(x, adr)	if (address24 >= 0xff90) h8->cyccnt -= (x) * 3; else h8->cyccnt -= (x) * 4;
 #define H8_IOP_TIMING(x)	h8->cyccnt -= (x);
 
-INLINE UINT16 h8_mem_read16(offs_t address)
+INLINE UINT16 h8_mem_read16(h83xx_state *h8, offs_t address)
 {
-	UINT16 result =  program_read_byte_8be(address)<<8;
-	return result | program_read_byte_8be(address+1);
+	UINT16 result =  memory_read_byte(h8->program, address)<<8;
+	return result | memory_read_byte(h8->program, address+1);
 }
 
-INLINE UINT16 h8_readop16(offs_t address)
+INLINE UINT16 h8_readop16(h83xx_state *h8, offs_t address)
 {
-	UINT16 result =  program_decrypted_read_byte(address)<<8;
-	return result | program_decrypted_read_byte(address+1);
+	UINT16 result =  memory_decrypted_read_byte(h8->program, address)<<8;
+	return result | memory_decrypted_read_byte(h8->program, address+1);
 }
 
-INLINE void h8_mem_write16(offs_t address, UINT16 data)
+INLINE void h8_mem_write16(h83xx_state *h8, offs_t address, UINT16 data)
 {
-	program_write_byte_8be(address, data >> 8);
-	program_write_byte_8be(address+1, data);
+	memory_write_byte(h8->program, address, data >> 8);
+	memory_write_byte(h8->program, address+1, data);
 }
 
-INLINE UINT32 h8_mem_read32(offs_t address)
+INLINE UINT32 h8_mem_read32(h83xx_state *h8, offs_t address)
 {
-	UINT32 result = program_read_byte_8be(address) << 24;
-	result |= program_read_byte_8be(address+1) << 16; 
-	result |= program_read_byte_8be(address+2) << 8; 
-	result |= program_read_byte_8be(address+3);
+	UINT32 result = memory_read_byte(h8->program, address) << 24;
+	result |= memory_read_byte(h8->program, address+1) << 16; 
+	result |= memory_read_byte(h8->program, address+2) << 8; 
+	result |= memory_read_byte(h8->program, address+3);
 
 	return result;		
 }
 
-INLINE void h8_mem_write32(offs_t address, UINT32 data)
+INLINE void h8_mem_write32(h83xx_state *h8, offs_t address, UINT32 data)
 {
-	program_write_byte_8be(address, data >> 24);
-	program_write_byte_8be(address+1, data >> 16);
-	program_write_byte_8be(address+2, data >> 8);
-	program_write_byte_8be(address+3, data);
+	memory_write_byte(h8->program, address, data >> 24);
+	memory_write_byte(h8->program, address+1, data >> 16);
+	memory_write_byte(h8->program, address+2, data >> 8);
+	memory_write_byte(h8->program, address+3, data);
 }
 
 static void *token;
@@ -222,7 +222,10 @@ static CPU_INIT(h8bit)
 	h8->irq_cb = irqcallback;
 	h8->device = device;
 
-	h8->h8300_mode = 1;
+	h8->mode_8bit = 1;
+
+	h8->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	h8->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item("H8/300", device->tag, 0, h8->h8err);
 	state_save_register_item_array("H8/300", device->tag, 0, h8->regs);
@@ -231,7 +234,7 @@ static CPU_INIT(h8bit)
 	state_save_register_item("H8/300", device->tag, 0, h8->h8_IRQrequestH);
 	state_save_register_item("H8/300", device->tag, 0, h8->h8_IRQrequestL);
 	state_save_register_item("H8/300", device->tag, 0, h8->ccr);
-	state_save_register_item("H8/300", device->tag, 0, h8->h8300_mode);
+	state_save_register_item("H8/300", device->tag, 0, h8->mode_8bit);
 
 	state_save_register_item_array("H8/300", device->tag, 0, h8->per_regs);
 	state_save_register_item("H8/300", device->tag, 0, h8->h8TSTR);
@@ -245,7 +248,7 @@ static CPU_RESET(h8bit)
 	h83xx_state *h8 = device->token;
 
 	h8->h8err = 0;
-	h8->pc = h8_mem_read16(0);
+	h8->pc = h8_mem_read16(h8, 0);
 	change_pc(h8->pc);
 
 	// disable timers
@@ -256,16 +259,16 @@ static void h8_GenException(h83xx_state *h8, UINT8 vectornr)
 {
 	// push PC on stack
 	h8_setreg16(h8, H8_SP, h8_getreg16(h8, H8_SP)-2);
-	h8_mem_write16(h8_getreg16(h8, H8_SP), h8->pc);
+	h8_mem_write16(h8, h8_getreg16(h8, H8_SP), h8->pc);
 	// push ccr
 	h8_setreg16(h8, H8_SP, h8_getreg16(h8, H8_SP)-2);
-	h8_mem_write16(h8_getreg16(h8, H8_SP), h8_get_ccr(h8));
+	h8_mem_write16(h8, h8_getreg16(h8, H8_SP), h8_get_ccr(h8));
 
 	// generate address from vector
 	h8_set_ccr(h8, h8_get_ccr(h8) | 0x80);
 	if (h8->h8uiflag == 0)
 		h8_set_ccr(h8, h8_get_ccr(h8) | 0x40);
-	h8->pc = h8_mem_read16(vectornr * 2) & 0xffff;
+	h8->pc = h8_mem_read16(h8, vectornr * 2) & 0xffff;
 	change_pc(h8->pc);
 
 	// I couldn't find timing info for exceptions, so this is a guess (based on JSR/BSR)
@@ -410,40 +413,40 @@ static READ8_HANDLER( h8330_itu_r )
 	switch(reg)
 	{
 	case 0x8d:		// serial Rx 1
-		val = io_read_byte(H8_SERIAL_1);
+		val = memory_read_byte(h8->io, H8_SERIAL_1);
 		break;
 	case 0xb2:    		// port 1 data
-		val = io_read_byte(H8_PORT_1);
+		val = memory_read_byte(h8->io, H8_PORT_1);
 		break;
 	case 0xb3:    		// port 2 data
-		val = io_read_byte(H8_PORT_2);
+		val = memory_read_byte(h8->io, H8_PORT_2);
 		break;
 	case 0xb6:		// port 3 data
-		val = io_read_byte(H8_PORT_3);
+		val = memory_read_byte(h8->io, H8_PORT_3);
 		break;
 	case 0xb7:		// port 4 data
-		val = io_read_byte(H8_PORT_4);
+		val = memory_read_byte(h8->io, H8_PORT_4);
 		break;
 	case 0xba:		// port 5 data
-		val = io_read_byte(H8_PORT_5);
+		val = memory_read_byte(h8->io, H8_PORT_5);
 		break;
 	case 0xbb:		// port 6 data
-		val = io_read_byte(H8_PORT_6);
+		val = memory_read_byte(h8->io, H8_PORT_6);
 		break;
 	case 0xbe:		// port 7 data
-		val = io_read_byte(H8_PORT_7);
+		val = memory_read_byte(h8->io, H8_PORT_7);
 		break;
 	case 0xbf:		// port 8 data
-		val = io_read_byte(H8_PORT_8);
+		val = memory_read_byte(h8->io, H8_PORT_8);
 		break;
 	case 0xc1:		// port 9 data
-		val = io_read_byte(H8_PORT_9);
+		val = memory_read_byte(h8->io, H8_PORT_9);
 		break;
 	case 0xdc:	// serial status
 		val = 0x87;
 		break;
 	case 0xdd:		// serial Rx 0
-		val = io_read_byte(H8_SERIAL_0);
+		val = memory_read_byte(h8->io, H8_SERIAL_0);
 		break;
 	default:
 		val = h8->per_regs[reg];
@@ -463,37 +466,37 @@ static WRITE8_HANDLER( h8330_itu_w )
 	switch (reg)
 	{
 	case 0x8b:		// serial Tx 1
-		io_write_byte(H8_SERIAL_1, data);
+		memory_write_byte(h8->io, H8_SERIAL_1, data);
 		break;
 	case 0xb2:    		// port 1 data
-		io_write_byte(H8_PORT_1, data);
+		memory_write_byte(h8->io, H8_PORT_1, data);
 		break;
 	case 0xb3:    		// port 2 data
-		io_write_byte(H8_PORT_2, data);
+		memory_write_byte(h8->io, H8_PORT_2, data);
 		break;
 	case 0xb6:		// port 3 data
-		io_write_byte(H8_PORT_3, data);
+		memory_write_byte(h8->io, H8_PORT_3, data);
 		break;
 	case 0xb7:		// port 4 data
-		io_write_byte(H8_PORT_4, data);
+		memory_write_byte(h8->io, H8_PORT_4, data);
 		break;
 	case 0xba:		// port 5 data
-		io_write_byte(H8_PORT_5, data);
+		memory_write_byte(h8->io, H8_PORT_5, data);
 		break;
 	case 0xbb:		// port 6 data
-		io_write_byte(H8_PORT_6, data);
+		memory_write_byte(h8->io, H8_PORT_6, data);
 		break;
 	case 0xbe:		// port 7 data
-		io_write_byte(H8_PORT_7, data);
+		memory_write_byte(h8->io, H8_PORT_7, data);
 		break;
 	case 0xbf:		// port 8 data
-		io_write_byte(H8_PORT_8, data);
+		memory_write_byte(h8->io, H8_PORT_8, data);
 		break;
 	case 0xc1:		// port 9 data
-		io_write_byte(H8_PORT_9, data);
+		memory_write_byte(h8->io, H8_PORT_9, data);
 		break;
 	case 0xdb:		// serial Tx 0
-		io_write_byte(H8_SERIAL_0, data);
+		memory_write_byte(h8->io, H8_SERIAL_0, data);
 		break;
 
 	case 0xd8:

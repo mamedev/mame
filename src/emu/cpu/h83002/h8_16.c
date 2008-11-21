@@ -18,11 +18,11 @@
 
 #define H8_SP	(7)
 
-#define h8_mem_read8(x) program_read_byte_16be(x)
-#define h8_mem_read16(x) program_read_word_16be(x)
-#define h8_mem_write8(x, y)  program_write_byte_16be(x, y)
-#define h8_mem_write16(x, y) program_write_word_16be(x, y)
-#define h8_readop16(x) program_decrypted_read_word(x)
+#define h8_mem_read8(x) memory_read_byte(h8->program, x)
+#define h8_mem_read16(z, x) memory_read_word(h8->program, x)
+#define h8_mem_write8(x, y)  memory_write_byte(h8->program, x, y)
+#define h8_mem_write16(z, x, y) memory_write_word(h8->program, x, y)
+#define h8_readop16(x, y) memory_decrypted_read_word(x->program, y)
 
 // timing macros
 // note: we assume a system 12 - type setup where external access is 3+1 states
@@ -34,16 +34,16 @@
 #define H8_WORD_TIMING(x, adr)	if (address24 >= 0xffff10) h8->cyccnt -= (x) * 3; else h8->cyccnt -= (x) * 4;
 #define H8_IOP_TIMING(x)	h8->cyccnt -= (x);
 
-INLINE UINT32 h8_mem_read32(offs_t address)
+INLINE UINT32 h8_mem_read32(h83xx_state *h8, offs_t address)
 {
-	UINT32 result = program_read_word_16be(address) << 16;
-	return result | program_read_word_16be(address + 2);
+	UINT32 result = memory_read_word_16be(h8->program, address) << 16;
+	return result | memory_read_word_16be(h8->program, address + 2);
 }
 
-INLINE void h8_mem_write32(offs_t address, UINT32 data)
+INLINE void h8_mem_write32(h83xx_state *h8, offs_t address, UINT32 data)
 {
-	program_write_word_16be(address, data >> 16);
-	program_write_word_16be(address + 2, data);
+	memory_write_word_16be(h8->program, address, data >> 16);
+	memory_write_word_16be(h8->program, address + 2, data);
 }
 
 static void *token;
@@ -213,7 +213,10 @@ static CPU_INIT(h8)
 	h8->irq_cb = irqcallback;
 	h8->device = device;
 
-	h8->h8300_mode = 0;
+	h8->mode_8bit = 0;
+
+	h8->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	h8->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item("H8/3002", device->tag, 0, h8->h8err);
 	state_save_register_item_array("H8/3002", device->tag, 0, h8->regs);
@@ -222,7 +225,7 @@ static CPU_INIT(h8)
 	state_save_register_item("H8/3002", device->tag, 0, h8->h8_IRQrequestH);
 	state_save_register_item("H8/3002", device->tag, 0, h8->h8_IRQrequestL);
 	state_save_register_item("H8/3002", device->tag, 0, h8->ccr);
-	state_save_register_item("H8/3002", device->tag, 0, h8->h8300_mode);
+	state_save_register_item("H8/3002", device->tag, 0, h8->mode_8bit);
 
 	state_save_register_item_array("H8/3002", device->tag, 0, h8->per_regs);
 	state_save_register_item("H8/3002", device->tag, 0, h8->h8TSTR);
@@ -248,7 +251,7 @@ static CPU_RESET(h8)
 	h83xx_state *h8 = device->token;
 
 	h8->h8err = 0;
-	h8->pc = h8_mem_read32(0) & 0xffffff;
+	h8->pc = h8_mem_read32(h8, 0) & 0xffffff;
 	change_pc(h8->pc);
 
 	// disable timers
@@ -262,16 +265,16 @@ static void h8_GenException(h83xx_state *h8, UINT8 vectornr)
 	// push PC on stack
 	// extended mode stack push!
 	h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)-4);
-	h8_mem_write32(h8_getreg32(h8, H8_SP), h8->pc);
+	h8_mem_write32(h8, h8_getreg32(h8, H8_SP), h8->pc);
 	// push ccr
 	h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)-2);
-	h8_mem_write16(h8_getreg32(h8, H8_SP), h8_get_ccr(h8));
+	h8_mem_write16(h8, h8_getreg32(h8, H8_SP), h8_get_ccr(h8));
 
 	// generate address from vector
 	h8_set_ccr(h8, h8_get_ccr(h8) | 0x80);
 	if (h8->h8uiflag == 0)
 		h8_set_ccr(h8, h8_get_ccr(h8) | 0x40);
-	h8->pc = h8_mem_read32(vectornr * 4) & 0xffffff;
+	h8->pc = h8_mem_read32(h8, vectornr * 4) & 0xffffff;
 	change_pc(h8->pc);
 
 	// I couldn't find timing info for exceptions, so this is a guess (based on JSR/BSR)

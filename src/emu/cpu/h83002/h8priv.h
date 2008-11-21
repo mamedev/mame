@@ -27,6 +27,9 @@ struct _h83xx_state
 	cpu_irq_callback irq_cb;
 	const device_config *device;
 
+	const address_space *program;
+	const address_space *io;
+
 	// H8/3002 onboard peripherals stuff
 
 	UINT8 per_regs[256];
@@ -37,7 +40,7 @@ struct _h83xx_state
 	emu_timer *timer[5];
 
 	int cpu_number;
-	int h8300_mode;
+	int mode_8bit;
 };
 extern h83xx_state h8;
 
