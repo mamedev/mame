@@ -9,7 +9,8 @@
 
 */
 
-typedef struct
+typedef struct _se3208_state_t se3208_state_t;
+struct _se3208_state_t
 {
 	//GPR
 	UINT32 R[8];
@@ -24,7 +25,9 @@ typedef struct
 	const device_config *device;
 	UINT8 IRQ;
 	UINT8 NMI;
-} _SE3208Context;
+
+	int SE3208_ICount;
+};
 
 #define FLAG_C		0x0080
 #define FLAG_V		0x0010
@@ -37,12 +40,9 @@ typedef struct
 #define FLAG_ENI	0x2000
 #define FLAG_NMI	0x4000
 
-static _SE3208Context Context;
-static int SE3208_ICount;
-
-#define CLRFLAG(f)	Context.SR&=~(f);
-#define SETFLAG(f)	Context.SR|=(f);
-#define TESTFLAG(f)	(Context.SR&(f))
+#define CLRFLAG(f)	se3208_state->SR&=~(f);
+#define SETFLAG(f)	se3208_state->SR|=(f);
+#define TESTFLAG(f)	(se3208_state->SR&(f))
 
 #define EXTRACT(val,sbit,ebit)	(((val)>>sbit)&((1<<((ebit-sbit)+1))-1))
 #define SEX8(val)	((val&0x80)?(val|0xFFFFFF00):(val&0xFF))
@@ -52,8 +52,8 @@ static int SE3208_ICount;
 #define SEX(bits,val)	((val)&(1<<(bits-1))?((val)|(~((1<<bits)-1))):(val&((1<<bits)-1)))
 
 //Precompute the instruction decoding in a big table
-typedef void (*_OP)(UINT16 Opcode);
-#define INST(a) static void a(UINT16 Opcode)
+typedef void (*_OP)(se3208_state_t *se3208_state, UINT16 Opcode);
+#define INST(a) static void a(se3208_state_t *se3208_state, UINT16 Opcode)
 static _OP *OpTable=NULL;
 
 INLINE UINT32 read_dword_unaligned(UINT32 address)
@@ -133,7 +133,7 @@ INLINE void SE3208_Write32(UINT32 addr,UINT32 val)
 
 
 
-INLINE UINT32 AddWithFlags(UINT32 a,UINT32 b)
+INLINE UINT32 AddWithFlags(se3208_state_t *se3208_state, UINT32 a,UINT32 b)
 {
 	UINT32 r=a+b;
 	CLRFLAG(FLAG_Z|FLAG_C|FLAG_V|FLAG_S);
@@ -148,7 +148,7 @@ INLINE UINT32 AddWithFlags(UINT32 a,UINT32 b)
 	return r;
 }
 
-INLINE UINT32 SubWithFlags(UINT32 a,UINT32 b)	//a-b
+INLINE UINT32 SubWithFlags(se3208_state_t *se3208_state, UINT32 a,UINT32 b)	//a-b
 {
 	UINT32 r=a-b;
 	CLRFLAG(FLAG_Z|FLAG_C|FLAG_V|FLAG_S);
@@ -163,9 +163,9 @@ INLINE UINT32 SubWithFlags(UINT32 a,UINT32 b)	//a-b
 	return r;
 }
 
-INLINE UINT32 AdcWithFlags(UINT32 a,UINT32 b)
+INLINE UINT32 AdcWithFlags(se3208_state_t *se3208_state,UINT32 a,UINT32 b)
 {
-	UINT32 C=(Context.SR&FLAG_C)?1:0;
+	UINT32 C=(se3208_state->SR&FLAG_C)?1:0;
 	UINT32 r=a+b+C;
 	CLRFLAG(FLAG_Z|FLAG_C|FLAG_V|FLAG_S);
 	if(!r)
@@ -180,9 +180,9 @@ INLINE UINT32 AdcWithFlags(UINT32 a,UINT32 b)
 
 }
 
-INLINE UINT32 SbcWithFlags(UINT32 a,UINT32 b)
+INLINE UINT32 SbcWithFlags(se3208_state_t *se3208_state,UINT32 a,UINT32 b)
 {
-	UINT32 C=(Context.SR&FLAG_C)?1:0;
+	UINT32 C=(se3208_state->SR&FLAG_C)?1:0;
 	UINT32 r=a-b-C;
 	CLRFLAG(FLAG_Z|FLAG_C|FLAG_V|FLAG_S);
 	if(!r)
@@ -196,7 +196,7 @@ INLINE UINT32 SbcWithFlags(UINT32 a,UINT32 b)
 	return r;
 }
 
-INLINE UINT32 MulWithFlags(UINT32 a,UINT32 b)
+INLINE UINT32 MulWithFlags(se3208_state_t *se3208_state,UINT32 a,UINT32 b)
 {
 	INT64 r=(INT64) a*(INT64) b;
 	CLRFLAG(FLAG_V);
@@ -205,12 +205,12 @@ INLINE UINT32 MulWithFlags(UINT32 a,UINT32 b)
 	return (UINT32) (r&0xffffffff);
 }
 
-INLINE UINT32 NegWithFlags(UINT32 a)
+INLINE UINT32 NegWithFlags(se3208_state_t *se3208_state,UINT32 a)
 {
-	return SubWithFlags(0,a);
+	return SubWithFlags(se3208_state,0,a);
 }
 
-INLINE UINT32 AsrWithFlags(UINT32 Val, UINT8 By)
+INLINE UINT32 AsrWithFlags(se3208_state_t *se3208_state,UINT32 Val, UINT8 By)
 {
 	signed int v=(signed int) Val;
 	v>>=By;
@@ -224,7 +224,7 @@ INLINE UINT32 AsrWithFlags(UINT32 Val, UINT8 By)
 	return (UINT32) v;
 }
 
-INLINE UINT32 LsrWithFlags(UINT32 Val, UINT8 By)
+INLINE UINT32 LsrWithFlags(se3208_state_t *se3208_state,UINT32 Val, UINT8 By)
 {
 	UINT32 v=Val;
 	v>>=By;
@@ -238,7 +238,7 @@ INLINE UINT32 LsrWithFlags(UINT32 Val, UINT8 By)
 	return v;
 }
 
-INLINE UINT32 AslWithFlags(UINT32 Val, UINT8 By)
+INLINE UINT32 AslWithFlags(se3208_state_t *se3208_state,UINT32 Val, UINT8 By)
 {
 	UINT32 v=Val;
 	v<<=By;
@@ -266,15 +266,15 @@ INST(LDB)
 	UINT32 Val;
 
 	if(Index)
-		Index=Context.R[Index];
+		Index=se3208_state->R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
 	Val=SE3208_Read8(Index+Offset);
-	Context.R[SrcDst]=SEX8(Val);
+	se3208_state->R[SrcDst]=SEX8(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -286,14 +286,14 @@ INST(STB)
 	UINT32 SrcDst=EXTRACT(Opcode,8,10);
 
 	if(Index)
-		Index=Context.R[Index];
+		Index=se3208_state->R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write8(Index+Offset,ZEX8(Context.R[SrcDst]));
+	SE3208_Write8(Index+Offset,ZEX8(se3208_state->R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -308,15 +308,15 @@ INST(LDS)
 	Offset<<=1;
 
 	if(Index)
-		Index=Context.R[Index];
+		Index=se3208_state->R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
 	Val=SE3208_Read16(Index+Offset);
-	Context.R[SrcDst]=SEX16(Val);
+	se3208_state->R[SrcDst]=SEX16(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -330,14 +330,14 @@ INST(STS)
 	Offset<<=1;
 
 	if(Index)
-		Index=Context.R[Index];
+		Index=se3208_state->R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write16(Index+Offset,ZEX16(Context.R[SrcDst]));
+	SE3208_Write16(Index+Offset,ZEX16(se3208_state->R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -351,14 +351,14 @@ INST(LD)
 	Offset<<=2;
 
 	if(Index)
-		Index=Context.R[Index];
+		Index=se3208_state->R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Context.R[SrcDst]=SE3208_Read32(Index+Offset);
+	se3208_state->R[SrcDst]=SE3208_Read32(Index+Offset);
 
 	CLRFLAG(FLAG_E);
 }
@@ -372,14 +372,14 @@ INST(ST)
 	Offset<<=2;
 
 	if(Index)
-		Index=Context.R[Index];
+		Index=se3208_state->R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write32(Index+Offset,Context.R[SrcDst]);
+	SE3208_Write32(Index+Offset,se3208_state->R[SrcDst]);
 
 	CLRFLAG(FLAG_E);
 }
@@ -392,15 +392,15 @@ INST(LDBU)
 	UINT32 Val;
 
 	if(Index)
-		Index=Context.R[Index];
+		Index=se3208_state->R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
 	Val=SE3208_Read8(Index+Offset);
-	Context.R[SrcDst]=ZEX8(Val);
+	se3208_state->R[SrcDst]=ZEX8(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -415,15 +415,15 @@ INST(LDSU)
 	Offset<<=1;
 
 	if(Index)
-		Index=Context.R[Index];
+		Index=se3208_state->R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
 	Val=SE3208_Read16(Index+Offset);
-	Context.R[SrcDst]=ZEX16(Val);
+	se3208_state->R[SrcDst]=ZEX16(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -433,9 +433,9 @@ INST(LERI)
 {
 	UINT32 Imm=EXTRACT(Opcode,0,13);
 	if(TESTFLAG(FLAG_E))
-		Context.ER=(EXTRACT(Context.ER,0,17)<<14)|Imm;
+		se3208_state->ER=(EXTRACT(se3208_state->ER,0,17)<<14)|Imm;
 	else
-		Context.ER=SEX(14,Imm);
+		se3208_state->ER=SEX(14,Imm);
 
 
 	SETFLAG(FLAG_E);
@@ -444,15 +444,15 @@ INST(LERI)
 INST(LDSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,7);
-	UINT32 Index=Context.SP;
+	UINT32 Index=se3208_state->SP;
 	UINT32 SrcDst=EXTRACT(Opcode,8,10);
 
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Context.R[SrcDst]=SE3208_Read32(Index+Offset);
+	se3208_state->R[SrcDst]=SE3208_Read32(Index+Offset);
 
 	CLRFLAG(FLAG_E);
 }
@@ -460,29 +460,29 @@ INST(LDSP)
 INST(STSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,7);
-	UINT32 Index=Context.SP;
+	UINT32 Index=se3208_state->SP;
 	UINT32 SrcDst=EXTRACT(Opcode,8,10);
 
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write32(Index+Offset,Context.R[SrcDst]);
+	SE3208_Write32(Index+Offset,se3208_state->R[SrcDst]);
 
 	CLRFLAG(FLAG_E);
 }
 
-static void PushVal(UINT32 Val)
+static void PushVal(se3208_state_t *se3208_state, UINT32 Val)
 {
-	Context.SP-=4;
-	SE3208_Write32(Context.SP,Val);
+	se3208_state->SP-=4;
+	SE3208_Write32(se3208_state->SP,Val);
 }
 
-static UINT32 PopVal(void)
+static UINT32 PopVal(se3208_state_t *se3208_state)
 {
-	UINT32 Val=SE3208_Read32(Context.SP);
-	Context.SP+=4;
+	UINT32 Val=SE3208_Read32(se3208_state->SP);
+	se3208_state->SP+=4;
 	return Val;
 }
 
@@ -490,56 +490,56 @@ INST(PUSH)
 {
 	UINT32 Set=EXTRACT(Opcode,0,10);
 	if(Set&(1<<10))
-		PushVal(Context.PC);
+		PushVal(se3208_state,se3208_state->PC);
 	if(Set&(1<<9))
-		PushVal(Context.SR);
+		PushVal(se3208_state,se3208_state->SR);
 	if(Set&(1<<8))
-		PushVal(Context.ER);
+		PushVal(se3208_state,se3208_state->ER);
 	if(Set&(1<<7))
-		PushVal(Context.R[7]);
+		PushVal(se3208_state,se3208_state->R[7]);
 	if(Set&(1<<6))
-		PushVal(Context.R[6]);
+		PushVal(se3208_state,se3208_state->R[6]);
 	if(Set&(1<<5))
-		PushVal(Context.R[5]);
+		PushVal(se3208_state,se3208_state->R[5]);
 	if(Set&(1<<4))
-		PushVal(Context.R[4]);
+		PushVal(se3208_state,se3208_state->R[4]);
 	if(Set&(1<<3))
-		PushVal(Context.R[3]);
+		PushVal(se3208_state,se3208_state->R[3]);
 	if(Set&(1<<2))
-		PushVal(Context.R[2]);
+		PushVal(se3208_state,se3208_state->R[2]);
 	if(Set&(1<<1))
-		PushVal(Context.R[1]);
+		PushVal(se3208_state,se3208_state->R[1]);
 	if(Set&(1<<0))
-		PushVal(Context.R[0]);
+		PushVal(se3208_state,se3208_state->R[0]);
 }
 
 INST(POP)
 {
 	UINT32 Set=EXTRACT(Opcode,0,10);
 	if(Set&(1<<0))
-		Context.R[0]=PopVal();
+		se3208_state->R[0]=PopVal(se3208_state);
 	if(Set&(1<<1))
-		Context.R[1]=PopVal();
+		se3208_state->R[1]=PopVal(se3208_state);
 	if(Set&(1<<2))
-		Context.R[2]=PopVal();
+		se3208_state->R[2]=PopVal(se3208_state);
 	if(Set&(1<<3))
-		Context.R[3]=PopVal();
+		se3208_state->R[3]=PopVal(se3208_state);
 	if(Set&(1<<4))
-		Context.R[4]=PopVal();
+		se3208_state->R[4]=PopVal(se3208_state);
 	if(Set&(1<<5))
-		Context.R[5]=PopVal();
+		se3208_state->R[5]=PopVal(se3208_state);
 	if(Set&(1<<6))
-		Context.R[6]=PopVal();
+		se3208_state->R[6]=PopVal(se3208_state);
 	if(Set&(1<<7))
-		Context.R[7]=PopVal();
+		se3208_state->R[7]=PopVal(se3208_state);
 	if(Set&(1<<8))
-		Context.ER=PopVal();
+		se3208_state->ER=PopVal(se3208_state);
 	if(Set&(1<<9))
-		Context.SR=PopVal();
+		se3208_state->SR=PopVal(se3208_state);
 	if(Set&(1<<10))
 	{
-		Context.PC=PopVal()-2;		//PC automatically incresases by 2
-		change_pc(Context.PC+2);
+		se3208_state->PC=PopVal(se3208_state)-2;		//PC automatically incresases by 2
+		change_pc(se3208_state->PC+2);
 	}
 }
 
@@ -549,16 +549,16 @@ INST(LEATOSP)
 	UINT32 Index=EXTRACT(Opcode,3,5);
 
 	if(Index)
-		Index=Context.R[Index];
+		Index=se3208_state->R[Index];
 	else
 		Index=0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 	else
 		Offset=SEX(4,Offset);
 
-	Context.SP=Index+Offset;
+	se3208_state->SP=Index+Offset;
 
 	CLRFLAG(FLAG_E);
 }
@@ -569,11 +569,11 @@ INST(LEAFROMSP)
 	UINT32 Index=EXTRACT(Opcode,3,5);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 	else
 		Offset=SEX(4,Offset);
 
-	Context.R[Index]=Context.SP+Offset;
+	se3208_state->R[Index]=se3208_state->SP+Offset;
 
 	CLRFLAG(FLAG_E);
 }
@@ -585,11 +585,11 @@ INST(LEASPTOSP)
 	Offset<<=2;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,23)<<8)|(Offset&0xff);
+		Offset=(EXTRACT(se3208_state->ER,0,23)<<8)|(Offset&0xff);
 	else
 		Offset=SEX(10,Offset);
 
-	Context.SP=Context.SP+Offset;
+	se3208_state->SP=se3208_state->SP+Offset;
 
 	CLRFLAG(FLAG_E);
 }
@@ -599,7 +599,7 @@ INST(MOV)
 	UINT32 Src=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,9,11);
 
-	Context.R[Dst]=Context.R[Src];
+	se3208_state->R[Dst]=se3208_state->R[Src];
 }
 
 INST(LDI)
@@ -608,11 +608,11 @@ INST(LDI)
 	UINT32 Imm=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX8(Imm);
 
-	Context.R[Dst]=Imm;
+	se3208_state->R[Dst]=Imm;
 
 	CLRFLAG(FLAG_E);
 }
@@ -620,15 +620,15 @@ INST(LDI)
 INST(LDBSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=Context.SP;
+	UINT32 Index=se3208_state->SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 	UINT32 Val;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
 	Val=SE3208_Read8(Index+Offset);
-	Context.R[SrcDst]=SEX8(Val);
+	se3208_state->R[SrcDst]=SEX8(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -636,13 +636,13 @@ INST(LDBSP)
 INST(STBSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=Context.SP;
+	UINT32 Index=se3208_state->SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write8(Index+Offset,ZEX8(Context.R[SrcDst]));
+	SE3208_Write8(Index+Offset,ZEX8(se3208_state->R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -650,17 +650,17 @@ INST(STBSP)
 INST(LDSSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=Context.SP;
+	UINT32 Index=se3208_state->SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 	UINT32 Val;
 
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
 	Val=SE3208_Read16(Index+Offset);
-	Context.R[SrcDst]=SEX16(Val);
+	se3208_state->R[SrcDst]=SEX16(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -668,15 +668,15 @@ INST(LDSSP)
 INST(STSSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=Context.SP;
+	UINT32 Index=se3208_state->SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write16(Index+Offset,ZEX16(Context.R[SrcDst]));
+	SE3208_Write16(Index+Offset,ZEX16(se3208_state->R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -684,15 +684,15 @@ INST(STSSP)
 INST(LDBUSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=Context.SP;
+	UINT32 Index=se3208_state->SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 	UINT32 Val;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
 	Val=SE3208_Read8(Index+Offset);
-	Context.R[SrcDst]=ZEX8(Val);
+	se3208_state->R[SrcDst]=ZEX8(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -700,17 +700,17 @@ INST(LDBUSP)
 INST(LDSUSP)
 {
 	UINT32 Offset=EXTRACT(Opcode,0,3);
-	UINT32 Index=Context.SP;
+	UINT32 Index=se3208_state->SP;
 	UINT32 SrcDst=EXTRACT(Opcode,4,6);
 	UINT32 Val;
 
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,27)<<4)|(Offset&0xf);
+		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
 	Val=SE3208_Read16(Index+Offset);
-	Context.R[SrcDst]=ZEX16(Val);
+	se3208_state->R[SrcDst]=ZEX16(Val);
 
 	CLRFLAG(FLAG_E);
 }
@@ -722,11 +722,11 @@ INST(ADDI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	Context.R[Dst]=AddWithFlags(Context.R[Src],Imm);
+	se3208_state->R[Dst]=AddWithFlags(se3208_state,se3208_state->R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -738,11 +738,11 @@ INST(SUBI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	Context.R[Dst]=SubWithFlags(Context.R[Src],Imm);
+	se3208_state->R[Dst]=SubWithFlags(se3208_state,se3208_state->R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -754,11 +754,11 @@ INST(ADCI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	Context.R[Dst]=AdcWithFlags(Context.R[Src],Imm);
+	se3208_state->R[Dst]=AdcWithFlags(se3208_state,se3208_state->R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -770,11 +770,11 @@ INST(SBCI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	Context.R[Dst]=SbcWithFlags(Context.R[Src],Imm);
+	se3208_state->R[Dst]=SbcWithFlags(se3208_state,se3208_state->R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -786,16 +786,16 @@ INST(ANDI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	Context.R[Dst]=Context.R[Src]&Imm;
+	se3208_state->R[Dst]=se3208_state->R[Src]&Imm;
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!Context.R[Dst])
+	if(!se3208_state->R[Dst])
 		SETFLAG(FLAG_Z);
-	if(Context.R[Dst]&0x80000000)
+	if(se3208_state->R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -806,16 +806,16 @@ INST(ORI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	Context.R[Dst]=Context.R[Src]|Imm;
+	se3208_state->R[Dst]=se3208_state->R[Src]|Imm;
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!Context.R[Dst])
+	if(!se3208_state->R[Dst])
 		SETFLAG(FLAG_Z);
-	if(Context.R[Dst]&0x80000000)
+	if(se3208_state->R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -826,16 +826,16 @@ INST(XORI)
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	Context.R[Dst]=Context.R[Src]^Imm;
+	se3208_state->R[Dst]=se3208_state->R[Src]^Imm;
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!Context.R[Dst])
+	if(!se3208_state->R[Dst])
 		SETFLAG(FLAG_Z);
-	if(Context.R[Dst]&0x80000000)
+	if(se3208_state->R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -845,11 +845,11 @@ INST(CMPI)
 	UINT32 Src=EXTRACT(Opcode,3,5);
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	SubWithFlags(Context.R[Src],Imm);
+	SubWithFlags(se3208_state,se3208_state->R[Src],Imm);
 
 	CLRFLAG(FLAG_E);
 }
@@ -861,11 +861,11 @@ INST(TSTI)
 	UINT32 Dst;
 
 	if(TESTFLAG(FLAG_E))
-		Imm=(EXTRACT(Context.ER,0,27)<<4)|(Imm&0xf);
+		Imm=(EXTRACT(se3208_state->ER,0,27)<<4)|(Imm&0xf);
 	else
 		Imm=SEX(4,Imm);
 
-	Dst=Context.R[Src]&Imm;
+	Dst=se3208_state->R[Src]&Imm;
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
 	if(!Dst)
@@ -880,7 +880,7 @@ INST(ADD)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	Context.R[Dst]=AddWithFlags(Context.R[Src1],Context.R[Src2]);
+	se3208_state->R[Dst]=AddWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
 }
 
 INST(SUB)
@@ -889,7 +889,7 @@ INST(SUB)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	Context.R[Dst]=SubWithFlags(Context.R[Src1],Context.R[Src2]);
+	se3208_state->R[Dst]=SubWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
 }
 
 INST(ADC)
@@ -898,7 +898,7 @@ INST(ADC)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	Context.R[Dst]=AdcWithFlags(Context.R[Src1],Context.R[Src2]);
+	se3208_state->R[Dst]=AdcWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
 }
 
 INST(SBC)
@@ -907,7 +907,7 @@ INST(SBC)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	Context.R[Dst]=SbcWithFlags(Context.R[Src1],Context.R[Src2]);
+	se3208_state->R[Dst]=SbcWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
 }
 
 INST(AND)
@@ -916,12 +916,12 @@ INST(AND)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	Context.R[Dst]=Context.R[Src1]&Context.R[Src2];
+	se3208_state->R[Dst]=se3208_state->R[Src1]&se3208_state->R[Src2];
 
 	CLRFLAG(FLAG_S|FLAG_Z);
-	if(!Context.R[Dst])
+	if(!se3208_state->R[Dst])
 		SETFLAG(FLAG_Z);
-	if(Context.R[Dst]&0x80000000)
+	if(se3208_state->R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -931,12 +931,12 @@ INST(OR)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	Context.R[Dst]=Context.R[Src1]|Context.R[Src2];
+	se3208_state->R[Dst]=se3208_state->R[Src1]|se3208_state->R[Src2];
 
 	CLRFLAG(FLAG_S|FLAG_Z);
-	if(!Context.R[Dst])
+	if(!se3208_state->R[Dst])
 		SETFLAG(FLAG_Z);
-	if(Context.R[Dst]&0x80000000)
+	if(se3208_state->R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 
 }
@@ -947,12 +947,12 @@ INST(XOR)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	Context.R[Dst]=Context.R[Src1]^Context.R[Src2];
+	se3208_state->R[Dst]=se3208_state->R[Src1]^se3208_state->R[Src2];
 
 	CLRFLAG(FLAG_S|FLAG_Z);
-	if(!Context.R[Dst])
+	if(!se3208_state->R[Dst])
 		SETFLAG(FLAG_Z);
-	if(Context.R[Dst]&0x80000000)
+	if(se3208_state->R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 
 }
@@ -962,7 +962,7 @@ INST(CMP)
 	UINT32 Src2=EXTRACT(Opcode,9,11);
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 
-	SubWithFlags(Context.R[Src1],Context.R[Src2]);
+	SubWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
 }
 
 INST(TST)
@@ -971,7 +971,7 @@ INST(TST)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst;
 
-	Dst=Context.R[Src1]&Context.R[Src2];
+	Dst=se3208_state->R[Src1]&se3208_state->R[Src2];
 
 	CLRFLAG(FLAG_S|FLAG_Z);
 	if(!Dst)
@@ -986,7 +986,7 @@ INST(MULS)
 	UINT32 Src1=EXTRACT(Opcode,3,5);
 	UINT32 Dst=EXTRACT(Opcode,0,2);
 
-	Context.R[Dst]=MulWithFlags(Context.R[Src1],Context.R[Src2]);
+	se3208_state->R[Dst]=MulWithFlags(se3208_state,se3208_state->R[Src1],se3208_state->R[Src2]);
 
 	CLRFLAG(FLAG_E);
 }
@@ -996,7 +996,7 @@ INST(NEG)
 	UINT32 Dst=EXTRACT(Opcode,9,11);
 	UINT32 Src=EXTRACT(Opcode,3,5);
 
-	Context.R[Dst]=NegWithFlags(Context.R[Src]);
+	se3208_state->R[Dst]=NegWithFlags(se3208_state,se3208_state->R[Src]);
 }
 
 INST(CALL)
@@ -1004,13 +1004,13 @@ INST(CALL)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
-	PushVal(Context.PC+2);
-	Context.PC=Context.PC+Offset;
-	change_pc(Context.PC+2);
+	PushVal(se3208_state,se3208_state->PC+2);
+	se3208_state->PC=se3208_state->PC+Offset;
+	change_pc(se3208_state->PC+2);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1020,15 +1020,15 @@ INST(JV)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_V))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1040,15 +1040,15 @@ INST(JNV)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!TESTFLAG(FLAG_V))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1059,15 +1059,15 @@ INST(JC)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_C))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1078,15 +1078,15 @@ INST(JNC)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!TESTFLAG(FLAG_C))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1097,15 +1097,15 @@ INST(JP)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!TESTFLAG(FLAG_S))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1116,15 +1116,15 @@ INST(JM)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_S))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1135,15 +1135,15 @@ INST(JNZ)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!TESTFLAG(FLAG_Z))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1154,15 +1154,15 @@ INST(JZ)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_Z))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1175,15 +1175,15 @@ INST(JGE)
 	UINT32 V=TESTFLAG(FLAG_V)?1:0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!(S^V))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1196,15 +1196,15 @@ INST(JLE)
 	UINT32 V=TESTFLAG(FLAG_V)?1:0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_Z) || (S^V))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 	CLRFLAG(FLAG_E);
 }
@@ -1214,15 +1214,15 @@ INST(JHI)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!(TESTFLAG(FLAG_Z) || TESTFLAG(FLAG_C)))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1233,15 +1233,15 @@ INST(JLS)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(TESTFLAG(FLAG_Z) || TESTFLAG(FLAG_C))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1254,15 +1254,15 @@ INST(JGT)
 	UINT32 V=TESTFLAG(FLAG_V)?1:0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(!(TESTFLAG(FLAG_Z) || (S^V)))
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1275,15 +1275,15 @@ INST(JLT)
 	UINT32 V=TESTFLAG(FLAG_V)?1:0;
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 	Offset<<=1;
 
 	if(S^V)
 	{
-		Context.PC=Context.PC+Offset;
-		change_pc(Context.PC+2);
+		se3208_state->PC=se3208_state->PC+Offset;
+		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1296,14 +1296,14 @@ INST(JMP)
 	UINT32 Offset=EXTRACT(Opcode,0,7);
 
 	if(TESTFLAG(FLAG_E))
-		Offset=(EXTRACT(Context.ER,0,22)<<8)|Offset;
+		Offset=(EXTRACT(se3208_state->ER,0,22)<<8)|Offset;
 	else
 		Offset=SEX(8,Offset);
 
 	Offset<<=1;
 
-	Context.PC=Context.PC+Offset;
-	change_pc(Context.PC+2);
+	se3208_state->PC=se3208_state->PC+Offset;
+	change_pc(se3208_state->PC+2);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1312,8 +1312,8 @@ INST(JR)
 {
 	UINT32 Src=EXTRACT(Opcode,0,3);
 
-	Context.PC=Context.R[Src]-2;
-	change_pc(Context.PC+2);
+	se3208_state->PC=se3208_state->R[Src]-2;
+	change_pc(se3208_state->PC+2);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1321,9 +1321,9 @@ INST(JR)
 INST(CALLR)
 {
 	UINT32 Src=EXTRACT(Opcode,0,3);
-	PushVal(Context.PC+2);
-	Context.PC=Context.R[Src]-2;
-	change_pc(Context.PC+2);
+	PushVal(se3208_state,se3208_state->PC+2);
+	se3208_state->PC=se3208_state->R[Src]-2;
+	change_pc(se3208_state->PC+2);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1336,9 +1336,9 @@ INST(ASR)
 	UINT32 Cnt=EXTRACT(Opcode,5,7);
 
 	if(CS)
-		Context.R[Dst]=AsrWithFlags(Context.R[Dst],Context.R[Cnt]&0x1f);
+		se3208_state->R[Dst]=AsrWithFlags(se3208_state,se3208_state->R[Dst],se3208_state->R[Cnt]&0x1f);
 	else
-		Context.R[Dst]=AsrWithFlags(Context.R[Dst],Imm&0x1f);
+		se3208_state->R[Dst]=AsrWithFlags(se3208_state,se3208_state->R[Dst],Imm&0x1f);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1351,9 +1351,9 @@ INST(LSR)
 	UINT32 Cnt=EXTRACT(Opcode,5,7);
 
 	if(CS)
-		Context.R[Dst]=LsrWithFlags(Context.R[Dst],Context.R[Cnt]&0x1f);
+		se3208_state->R[Dst]=LsrWithFlags(se3208_state,se3208_state->R[Dst],se3208_state->R[Cnt]&0x1f);
 	else
-		Context.R[Dst]=LsrWithFlags(Context.R[Dst],Imm&0x1f);
+		se3208_state->R[Dst]=LsrWithFlags(se3208_state,se3208_state->R[Dst],Imm&0x1f);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1366,9 +1366,9 @@ INST(ASL)
 	UINT32 Cnt=EXTRACT(Opcode,5,7);
 
 	if(CS)
-		Context.R[Dst]=AslWithFlags(Context.R[Dst],Context.R[Cnt]&0x1f);
+		se3208_state->R[Dst]=AslWithFlags(se3208_state,se3208_state->R[Dst],se3208_state->R[Cnt]&0x1f);
 	else
-		Context.R[Dst]=AslWithFlags(Context.R[Dst],Imm&0x1f);
+		se3208_state->R[Dst]=AslWithFlags(se3208_state,se3208_state->R[Dst],Imm&0x1f);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1376,14 +1376,14 @@ INST(ASL)
 INST(EXTB)
 {
 	UINT32 Dst=EXTRACT(Opcode,0,3);
-	UINT32 Val=Context.R[Dst];
+	UINT32 Val=se3208_state->R[Dst];
 
-	Context.R[Dst]=SEX8(Val);
+	se3208_state->R[Dst]=SEX8(Val);
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!Context.R[Dst])
+	if(!se3208_state->R[Dst])
 		SETFLAG(FLAG_Z);
-	if(Context.R[Dst]&0x80000000)
+	if(se3208_state->R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 
 }
@@ -1391,14 +1391,14 @@ INST(EXTB)
 INST(EXTS)
 {
 	UINT32 Dst=EXTRACT(Opcode,0,3);
-	UINT32 Val=Context.R[Dst];
+	UINT32 Val=se3208_state->R[Dst];
 
-	Context.R[Dst]=SEX16(Val);
+	se3208_state->R[Dst]=SEX16(Val);
 
 	CLRFLAG(FLAG_S|FLAG_Z|FLAG_E);
-	if(!Context.R[Dst])
+	if(!se3208_state->R[Dst])
 		SETFLAG(FLAG_Z);
-	if(Context.R[Dst]&0x80000000)
+	if(se3208_state->R[Dst]&0x80000000)
 		SETFLAG(FLAG_S);
 }
 
@@ -1406,14 +1406,14 @@ INST(SET)
 {
 	UINT32 Imm=EXTRACT(Opcode,0,3);
 
-	Context.SR|=(1<<Imm);
+	se3208_state->SR|=(1<<Imm);
 }
 
 INST(CLR)
 {
 	UINT32 Imm=EXTRACT(Opcode,0,3);
 
-	Context.SR&=~(1<<Imm);
+	se3208_state->SR&=~(1<<Imm);
 }
 
 INST(SWI)
@@ -1422,13 +1422,13 @@ INST(SWI)
 
 	if(!TESTFLAG(FLAG_ENI))
 		return;
-	PushVal(Context.PC);
-	PushVal(Context.SR);
+	PushVal(se3208_state,se3208_state->PC);
+	PushVal(se3208_state,se3208_state->SR);
 
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);
 
-	Context.PC=SE3208_Read32(4*Imm+0x40)-2;
-	change_pc(Context.PC+2);
+	se3208_state->PC=SE3208_Read32(4*Imm+0x40)-2;
+	change_pc(se3208_state->PC+2);
 }
 
 INST(HALT)
@@ -1723,81 +1723,87 @@ static void BuildTable(void)
 
 static CPU_RESET( SE3208 )
 {
-	cpu_irq_callback save_irqcallback = Context.irq_callback;
-	memset(&Context,0,sizeof(_SE3208Context));
-	Context.irq_callback = save_irqcallback;
-	Context.device = device;
-	Context.PC=SE3208_Read32(0);
-	Context.SR=0;
-	Context.IRQ=CLEAR_LINE;
-	Context.NMI=CLEAR_LINE;
-	change_pc(Context.PC+2);
+	se3208_state_t *se3208_state = device->token;
+
+	cpu_irq_callback save_irqcallback = se3208_state->irq_callback;
+	memset(se3208_state,0,sizeof(se3208_state_t));
+	se3208_state->irq_callback = save_irqcallback;
+	se3208_state->device = device;
+	se3208_state->PC=SE3208_Read32(0);
+	se3208_state->SR=0;
+	se3208_state->IRQ=CLEAR_LINE;
+	se3208_state->NMI=CLEAR_LINE;
+	change_pc(se3208_state->PC+2);
 }
 
-static void SE3208_NMI(void)
+static void SE3208_NMI(se3208_state_t *se3208_state)
 {
-	PushVal(Context.PC);
-	PushVal(Context.SR);
+	PushVal(se3208_state,se3208_state->PC);
+	PushVal(se3208_state,se3208_state->SR);
 
 	CLRFLAG(FLAG_NMI|FLAG_ENI|FLAG_E|FLAG_M);
 
-	Context.PC=SE3208_Read32(4);
-	change_pc(Context.PC+2);
+	se3208_state->PC=SE3208_Read32(4);
+	change_pc(se3208_state->PC+2);
 }
 
-static void SE3208_Interrupt(void)
+static void SE3208_Interrupt(se3208_state_t *se3208_state)
 {
 	if(!TESTFLAG(FLAG_ENI))
 		return;
 
-	PushVal(Context.PC);
-	PushVal(Context.SR);
+	PushVal(se3208_state,se3208_state->PC);
+	PushVal(se3208_state,se3208_state->SR);
 
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);
 
 
 	if(!(TESTFLAG(FLAG_AUT)))
-		Context.PC=SE3208_Read32(8);
+		se3208_state->PC=SE3208_Read32(8);
 	else
-		Context.PC=SE3208_Read32(4*Context.irq_callback(Context.device, 0));
-	change_pc(Context.PC+2);
+		se3208_state->PC=SE3208_Read32(4*se3208_state->irq_callback(se3208_state->device, 0));
+	change_pc(se3208_state->PC+2);
 }
 
 
 static CPU_EXECUTE( SE3208 )
 {
-	SE3208_ICount=cycles;
+	se3208_state_t *se3208_state = device->token;
+
+	se3208_state->SE3208_ICount=cycles;
 	do
 	{
-		UINT16 Opcode=program_decrypted_read_word(WORD_XOR_LE(Context.PC));
+		UINT16 Opcode=program_decrypted_read_word(WORD_XOR_LE(se3208_state->PC));
 
-		debugger_instruction_hook(device, Context.PC);
+		debugger_instruction_hook(device, se3208_state->PC);
 
-		OpTable[Opcode](Opcode);
-		Context.PPC=Context.PC;
-		Context.PC+=2;
+		OpTable[Opcode](se3208_state, Opcode);
+		se3208_state->PPC=se3208_state->PC;
+		se3208_state->PC+=2;
 		//Check interrupts
-		if(Context.NMI==ASSERT_LINE)
+		if(se3208_state->NMI==ASSERT_LINE)
 		{
-			SE3208_NMI();
-			Context.NMI=CLEAR_LINE;
+			SE3208_NMI(se3208_state);
+			se3208_state->NMI=CLEAR_LINE;
 		}
-		else if(Context.IRQ==ASSERT_LINE && TESTFLAG(FLAG_ENI))
+		else if(se3208_state->IRQ==ASSERT_LINE && TESTFLAG(FLAG_ENI))
 		{
-			SE3208_Interrupt();
+			SE3208_Interrupt(se3208_state);
 		}
-		--SE3208_ICount;
-	} while(SE3208_ICount>0);
+		--(se3208_state->SE3208_ICount);
+	} while(se3208_state->SE3208_ICount>0);
 
-	return cycles-SE3208_ICount;
+	return cycles-se3208_state->SE3208_ICount;
 }
 
 static CPU_INIT( SE3208 )
 {
+	se3208_state_t *se3208_state = device->token;
+
 	BuildTable();
 
-	Context.irq_callback = irqcallback;
-	Context.device = device;
+	se3208_state->irq_callback = irqcallback;
+	se3208_state->device = device;
 }
 
 static CPU_EXIT( SE3208 )
@@ -1809,57 +1815,57 @@ static CPU_EXIT( SE3208 )
 
 static CPU_GET_CONTEXT( SE3208 )
 {
-	if(dst)
-		memcpy(dst,&Context,sizeof(Context));
 }
 
 static CPU_SET_CONTEXT( SE3208 )
 {
-	if(src)
-		memcpy(&Context,src,sizeof(Context));
 }
 
-static void set_irq_line(int line,int state)
+static void set_irq_line(se3208_state_t *se3208_state, int line,int state)
 {
 	if(line==INPUT_LINE_NMI)	//NMI
-		Context.NMI=state;
+		se3208_state->NMI=state;
 	else
-		Context.IRQ=state;
+		se3208_state->IRQ=state;
 }
 
 
 static CPU_SET_INFO( SE3208 )
 {
+	se3208_state_t *se3208_state = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + SE3208_INT:		set_irq_line(0, info->i);				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + SE3208_INT:		set_irq_line(se3208_state, 0, info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(se3208_state, INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_REGISTER + SE3208_PC:
-		case CPUINFO_INT_PC:							Context.PC = info->i;					break;
+		case CPUINFO_INT_PC:							se3208_state->PC = info->i;					break;
 		case CPUINFO_INT_REGISTER + SE3208_SP:
-		case CPUINFO_INT_SP:							Context.SP = info->i;    				break;
-		case CPUINFO_INT_REGISTER + SE3208_ER:   		Context.ER = info->i;	   				break;
-		case CPUINFO_INT_REGISTER + SE3208_SR:			Context.SR = info->i;				    break;
-		case CPUINFO_INT_REGISTER + SE3208_R0:			Context.R[ 0] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SE3208_R1:			Context.R[ 1] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SE3208_R2:			Context.R[ 2] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SE3208_R3:			Context.R[ 3] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SE3208_R4:			Context.R[ 4] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SE3208_R5:			Context.R[ 5] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SE3208_R6:			Context.R[ 6] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SE3208_R7:			Context.R[ 7] = info->i;				break;
+		case CPUINFO_INT_SP:							se3208_state->SP = info->i;    				break;
+		case CPUINFO_INT_REGISTER + SE3208_ER:   		se3208_state->ER = info->i;	   				break;
+		case CPUINFO_INT_REGISTER + SE3208_SR:			se3208_state->SR = info->i;				    break;
+		case CPUINFO_INT_REGISTER + SE3208_R0:			se3208_state->R[ 0] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SE3208_R1:			se3208_state->R[ 1] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SE3208_R2:			se3208_state->R[ 2] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SE3208_R3:			se3208_state->R[ 3] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SE3208_R4:			se3208_state->R[ 4] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SE3208_R5:			se3208_state->R[ 5] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SE3208_R6:			se3208_state->R[ 6] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SE3208_R7:			se3208_state->R[ 7] = info->i;				break;
 	}
 }
 
 
 CPU_GET_INFO( SE3208 )
 {
+	se3208_state_t *se3208_state = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(Context);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(se3208_state_t);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
@@ -1880,25 +1886,25 @@ CPU_GET_INFO( SE3208 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + SE3208_INT:		info->i = Context.IRQ;					break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = Context.NMI;					break;
+		case CPUINFO_INT_INPUT_STATE + SE3208_INT:		info->i = se3208_state->IRQ;					break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = se3208_state->NMI;					break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = Context.PPC;					break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = se3208_state->PPC;					break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SE3208_PC:			info->i = Context.PC;					break;
+		case CPUINFO_INT_REGISTER + SE3208_PC:			info->i = se3208_state->PC;					break;
 		case CPUINFO_INT_REGISTER + SE3208_SP:
-		case CPUINFO_INT_SP:   							info->i = Context.SP;					break;
-		case CPUINFO_INT_REGISTER + SE3208_SR:			info->i = Context.SR;					break;
-		case CPUINFO_INT_REGISTER + SE3208_ER:			info->i = Context.ER;					break;
-		case CPUINFO_INT_REGISTER + SE3208_R0:			info->i = Context.R[ 0];				break;
-		case CPUINFO_INT_REGISTER + SE3208_R1:			info->i = Context.R[ 1];				break;
-		case CPUINFO_INT_REGISTER + SE3208_R2:			info->i = Context.R[ 2];				break;
-		case CPUINFO_INT_REGISTER + SE3208_R3:			info->i = Context.R[ 3];				break;
-		case CPUINFO_INT_REGISTER + SE3208_R4:			info->i = Context.R[ 4];				break;
-		case CPUINFO_INT_REGISTER + SE3208_R5:			info->i = Context.R[ 5];				break;
-		case CPUINFO_INT_REGISTER + SE3208_R6:			info->i = Context.R[ 6];				break;
-		case CPUINFO_INT_REGISTER + SE3208_R7:			info->i = Context.R[ 7];				break;
+		case CPUINFO_INT_SP:   							info->i = se3208_state->SP;					break;
+		case CPUINFO_INT_REGISTER + SE3208_SR:			info->i = se3208_state->SR;					break;
+		case CPUINFO_INT_REGISTER + SE3208_ER:			info->i = se3208_state->ER;					break;
+		case CPUINFO_INT_REGISTER + SE3208_R0:			info->i = se3208_state->R[ 0];				break;
+		case CPUINFO_INT_REGISTER + SE3208_R1:			info->i = se3208_state->R[ 1];				break;
+		case CPUINFO_INT_REGISTER + SE3208_R2:			info->i = se3208_state->R[ 2];				break;
+		case CPUINFO_INT_REGISTER + SE3208_R3:			info->i = se3208_state->R[ 3];				break;
+		case CPUINFO_INT_REGISTER + SE3208_R4:			info->i = se3208_state->R[ 4];				break;
+		case CPUINFO_INT_REGISTER + SE3208_R5:			info->i = se3208_state->R[ 5];				break;
+		case CPUINFO_INT_REGISTER + SE3208_R6:			info->i = se3208_state->R[ 6];				break;
+		case CPUINFO_INT_REGISTER + SE3208_R7:			info->i = se3208_state->R[ 7];				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(SE3208);		break;
@@ -1910,7 +1916,7 @@ CPU_GET_INFO( SE3208 )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(SE3208);break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(SE3208);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &SE3208_ICount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &se3208_state->SE3208_ICount;			break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "SE3208");				break;
@@ -1921,34 +1927,34 @@ CPU_GET_INFO( SE3208 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c %c%c%c%c%c",
-					Context.SR&FLAG_C?'C':'.',
-					Context.SR&FLAG_V?'V':'.',
-					Context.SR&FLAG_S?'S':'.',
-					Context.SR&FLAG_Z?'Z':'.',
+					se3208_state->SR&FLAG_C?'C':'.',
+					se3208_state->SR&FLAG_V?'V':'.',
+					se3208_state->SR&FLAG_S?'S':'.',
+					se3208_state->SR&FLAG_Z?'Z':'.',
 
-					Context.SR&FLAG_M?'M':'.',
-					Context.SR&FLAG_E?'E':'.',
-					Context.SR&FLAG_AUT?'A':'.',
-					Context.SR&FLAG_ENI?'I':'.',
-					Context.SR&FLAG_NMI?'N':'.'
+					se3208_state->SR&FLAG_M?'M':'.',
+					se3208_state->SR&FLAG_E?'E':'.',
+					se3208_state->SR&FLAG_AUT?'A':'.',
+					se3208_state->SR&FLAG_ENI?'I':'.',
+					se3208_state->SR&FLAG_NMI?'N':'.'
 
 					);
 
 			break;
 
-		case CPUINFO_STR_REGISTER + SE3208_PC:				sprintf(info->s, "PC  :%08X", Context.PC); break;
-		case CPUINFO_STR_REGISTER + SE3208_SR:				sprintf(info->s, "SR  :%08X", Context.SR); break;
-		case CPUINFO_STR_REGISTER + SE3208_ER:				sprintf(info->s, "ER  :%08X", Context.ER); break;
-		case CPUINFO_STR_REGISTER + SE3208_SP: 				sprintf(info->s, "SP  :%08X", Context.SP); break;
-		case CPUINFO_STR_REGISTER + SE3208_R0:				sprintf(info->s, "R0  :%08X", Context.R[ 0]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R1:				sprintf(info->s, "R1  :%08X", Context.R[ 1]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R2:				sprintf(info->s, "R2  :%08X", Context.R[ 2]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R3:				sprintf(info->s, "R3  :%08X", Context.R[ 3]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R4:				sprintf(info->s, "R4  :%08X", Context.R[ 4]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R5:				sprintf(info->s, "R5  :%08X", Context.R[ 5]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R6:				sprintf(info->s, "R6  :%08X", Context.R[ 6]); break;
-		case CPUINFO_STR_REGISTER + SE3208_R7:				sprintf(info->s, "R7  :%08X", Context.R[ 7]); break;
-		case CPUINFO_STR_REGISTER + SE3208_PPC:				sprintf(info->s, "PPC  :%08X", Context.PPC); break;
+		case CPUINFO_STR_REGISTER + SE3208_PC:				sprintf(info->s, "PC  :%08X", se3208_state->PC); break;
+		case CPUINFO_STR_REGISTER + SE3208_SR:				sprintf(info->s, "SR  :%08X", se3208_state->SR); break;
+		case CPUINFO_STR_REGISTER + SE3208_ER:				sprintf(info->s, "ER  :%08X", se3208_state->ER); break;
+		case CPUINFO_STR_REGISTER + SE3208_SP: 				sprintf(info->s, "SP  :%08X", se3208_state->SP); break;
+		case CPUINFO_STR_REGISTER + SE3208_R0:				sprintf(info->s, "R0  :%08X", se3208_state->R[ 0]); break;
+		case CPUINFO_STR_REGISTER + SE3208_R1:				sprintf(info->s, "R1  :%08X", se3208_state->R[ 1]); break;
+		case CPUINFO_STR_REGISTER + SE3208_R2:				sprintf(info->s, "R2  :%08X", se3208_state->R[ 2]); break;
+		case CPUINFO_STR_REGISTER + SE3208_R3:				sprintf(info->s, "R3  :%08X", se3208_state->R[ 3]); break;
+		case CPUINFO_STR_REGISTER + SE3208_R4:				sprintf(info->s, "R4  :%08X", se3208_state->R[ 4]); break;
+		case CPUINFO_STR_REGISTER + SE3208_R5:				sprintf(info->s, "R5  :%08X", se3208_state->R[ 5]); break;
+		case CPUINFO_STR_REGISTER + SE3208_R6:				sprintf(info->s, "R6  :%08X", se3208_state->R[ 6]); break;
+		case CPUINFO_STR_REGISTER + SE3208_R7:				sprintf(info->s, "R7  :%08X", se3208_state->R[ 7]); break;
+		case CPUINFO_STR_REGISTER + SE3208_PPC:				sprintf(info->s, "PPC  :%08X", se3208_state->PPC); break;
 	}
 }
 
