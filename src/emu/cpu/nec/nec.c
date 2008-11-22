@@ -103,6 +103,7 @@
 
 ****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 
@@ -133,15 +134,10 @@ typedef struct
 {
 	offs_t	fetch_xor;
 
-	UINT8	(*rbyte)(offs_t);
-	UINT16	(*rword)(offs_t);
-	void	(*wbyte)(offs_t, UINT8);
-	void	(*wword)(offs_t, UINT16);
-
-	UINT8	(*rbyte_port)(offs_t);
-	UINT16	(*rword_port)(offs_t);
-	void	(*wbyte_port)(offs_t, UINT8);
-	void	(*wword_port)(offs_t, UINT16);
+	UINT8	(*rbyte)(const address_space *, offs_t);
+	UINT16	(*rword)(const address_space *, offs_t);
+	void	(*wbyte)(const address_space *, offs_t, UINT8);
+	void	(*wword)(const address_space *, offs_t, UINT16);
 } memory_interface;
 
 
@@ -165,6 +161,8 @@ struct _nec_state_t
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	int		icount;
 
 	memory_interface	mem;
@@ -230,7 +228,7 @@ static void do_prefetch(nec_state_t *nec_state, int previous_ICount)
 INLINE UINT8 fetch(nec_state_t *nec_state)
 {
 	prefetch(nec_state);
-	return program_raw_read_byte(FETCH_XOR((nec_state->sregs[PS]<<4)+nec_state->ip++));
+	return memory_raw_read_byte(nec_state->program, FETCH_XOR((nec_state->sregs[PS]<<4)+nec_state->ip++));
 }
 
 INLINE UINT16 fetchword(nec_state_t *nec_state)
@@ -253,7 +251,7 @@ static UINT8 fetchop(nec_state_t *nec_state)
 	UINT8 ret;
 
 	prefetch(nec_state);
-	ret = program_decrypted_read_byte( FETCH_XOR( ( nec_state->sregs[PS]<<4)+nec_state->ip++));
+	ret = memory_decrypted_read_byte(nec_state->program, FETCH_XOR( ( nec_state->sregs[PS]<<4)+nec_state->ip++));
 
 	if (nec_state->MF == 1)
 		if (nec_state->config->v25v35_decryptiontable)
@@ -1129,6 +1127,8 @@ static void nec_init(const device_config *device, int index, int clock, cpu_irq_
 
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;
+	nec_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	nec_state->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 
@@ -1141,15 +1141,10 @@ static void configure_memory_8bit(nec_state_t *nec_state)
 {
 	nec_state->mem.fetch_xor = 0;
 
-	nec_state->mem.rbyte = program_read_byte_8le;
-	nec_state->mem.rword = program_read_word_8le;
-	nec_state->mem.wbyte = program_write_byte_8le;
-	nec_state->mem.wword = program_write_word_8le;
-
-	nec_state->mem.rbyte_port = io_read_byte_8le;
-	nec_state->mem.rword_port = io_read_word_8le;
-	nec_state->mem.wbyte_port = io_write_byte_8le;
-	nec_state->mem.wword_port = io_write_word_8le;
+	nec_state->mem.rbyte = memory_read_byte_8le;
+	nec_state->mem.rword = memory_read_word_8le;
+	nec_state->mem.wbyte = memory_write_byte_8le;
+	nec_state->mem.wword = memory_write_word_8le;
 }
 #endif
 
@@ -1159,47 +1154,25 @@ static void configure_memory_8bit(nec_state_t *nec_state)
  *****************************************************************************/
 
 #if (HAS_V30||HAS_V33||HAS_V35)
-static UINT16 read_word_16le(offs_t addr)
+static UINT16 read_word_16le(const address_space *space, offs_t addr)
 {
 	if (!(addr & 1))
-		return program_read_word_16le(addr);
+		return memory_read_word_16le(space, addr);
 	else
 	{
-		UINT16 result = program_read_byte_16le(addr);
-		return result | (program_read_byte_16le(addr + 1) << 8);
+		UINT16 result = memory_read_byte_16le(space, addr);
+		return result | (memory_read_byte_16le(space, addr + 1) << 8);
 	}
 }
 
-static void write_word_16le(offs_t addr, UINT16 data)
+static void write_word_16le(const address_space *space, offs_t addr, UINT16 data)
 {
 	if (!(addr & 1))
-		program_write_word_16le(addr, data);
+		memory_write_word_16le(space, addr, data);
 	else
 	{
-		program_write_byte_16le(addr, data);
-		program_write_byte_16le(addr + 1, data >> 8);
-	}
-}
-
-static UINT16 read_port_word_16le(offs_t addr)
-{
-	if (!(addr & 1))
-		return io_read_word_16le(addr);
-	else
-	{
-		UINT16 result = io_read_byte_16le(addr);
-		return result | (io_read_byte_16le(addr + 1) << 8);
-	}
-}
-
-static void write_port_word_16le(offs_t addr, UINT16 data)
-{
-	if (!(addr & 1))
-		io_write_word_16le(addr, data);
-	else
-	{
-		io_write_byte_16le(addr, data);
-		io_write_byte_16le(addr + 1, data >> 8);
+		memory_write_byte_16le(space, addr, data);
+		memory_write_byte_16le(space, addr + 1, data >> 8);
 	}
 }
 
@@ -1207,15 +1180,10 @@ static void configure_memory_16bit(nec_state_t *nec_state)
 {
 	nec_state->mem.fetch_xor = BYTE_XOR_LE(0);
 
-	nec_state->mem.rbyte = program_read_byte_16le;
+	nec_state->mem.rbyte = memory_read_byte_16le;
 	nec_state->mem.rword = read_word_16le;
-	nec_state->mem.wbyte = program_write_byte_16le;
+	nec_state->mem.wbyte = memory_write_byte_16le;
 	nec_state->mem.wword = write_word_16le;
-
-	nec_state->mem.rbyte_port = io_read_byte_16le;
-	nec_state->mem.rword_port = read_port_word_16le;
-	nec_state->mem.wbyte_port = io_write_byte_16le;
-	nec_state->mem.wword_port = write_port_word_16le;
 }
 #endif
 

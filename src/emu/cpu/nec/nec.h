@@ -76,15 +76,15 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 /************************************************************************/
 
-#define read_byte(a)			(*nec_state->mem.rbyte)(a)
-#define read_word(a)			(*nec_state->mem.rword)(a)
-#define write_byte(a,d)			(*nec_state->mem.wbyte)((a),(d))
-#define write_word(a,d)			(*nec_state->mem.wword)((a),(d))
+#define read_byte(a)			(*nec_state->mem.rbyte)(nec_state->program, a)
+#define read_word(a)			(*nec_state->mem.rword)(nec_state->program, a)
+#define write_byte(a,d)			(*nec_state->mem.wbyte)(nec_state->program, (a),(d))
+#define write_word(a,d)			(*nec_state->mem.wword)(nec_state->program, (a),(d))
 
-#define read_port_byte(a)		(*nec_state->mem.rbyte_port)(a)
-#define read_port_word(a)		(*nec_state->mem.rword_port)(a)
-#define write_port_byte(a,d)	(*nec_state->mem.wbyte_port)((a),(d))
-#define write_port_word(a,d)	(*nec_state->mem.wword_port)((a),(d))
+#define read_port_byte(a)		(*nec_state->mem.rbyte)(nec_state->io, a)
+#define read_port_word(a)		(*nec_state->mem.rword)(nec_state->io, a)
+#define write_port_byte(a,d)	(*nec_state->mem.wbyte)(nec_state->io, (a),(d))
+#define write_port_word(a,d)	(*nec_state->mem.wword)(nec_state->io, (a),(d))
 
 /************************************************************************/
 
