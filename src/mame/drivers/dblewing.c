@@ -153,7 +153,6 @@ static VIDEO_START(dblewing)
 
 static VIDEO_UPDATE(dblewing)
 {
-
 	flip_screen_set( deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
@@ -469,20 +468,24 @@ static READ8_HANDLER( unk_r )
 }
 #endif
 
+static READ8_HANDLER( unk_r )
+{
+//	popmessage("%02x 1",x1);
+	return 0x10;
+}
+
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
  	AM_RANGE(0xa000, 0xa001) AM_READWRITE(ym2151_status_port_0_r,ym2151_word_0_w)
 	AM_RANGE(0xb000, 0xb000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(okim6295_status_0_r) //might be rom bank for the BGM
+	AM_RANGE(0xc000, 0xc000) AM_READ(unk_r) //another soundlatch?
  	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
- 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP //AM_READWRITE(okim6295_status_1_r,okim6295_data_1_w)
+ 	AM_RANGE(0xf000, 0xf000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x0000, 0xffff)  AM_ROM
-//	AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
+	AM_RANGE(0x0000, 0xffff)  AM_ROM AM_REGION("audio_data", 0)
 ADDRESS_MAP_END
 
 
@@ -749,8 +752,12 @@ ROM_START( dblewing )
 	ROM_LOAD16_BYTE( "kp_01-.5d",    0x000000, 0x040000, CRC(7a210c33) SHA1(ced89140af6d6a1bc0ffb7728afca428ed007165) )
 
 	ROM_REGION( 0x18000, "audio", 0 ) // sound cpu
-	ROM_LOAD( "kp_02-.10h",    0x00000, 0x8000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
-	ROM_CONTINUE(              0x10000, 0x8000 )
+	ROM_LOAD( "kp_02-.10h",    0x00000, 0x08000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
+	ROM_CONTINUE(              0x10000, 0x08000 )
+
+	ROM_REGION( 0x10000, "audio_data", 0 ) // sound data
+	ROM_COPY( "audio" ,  0x00000, 0x00000, 0x8000 )
+	ROM_COPY( "audio" ,  0x10000, 0x08000, 0x8000 )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mbe-02.8h",    0x00000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
