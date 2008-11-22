@@ -263,10 +263,11 @@ static READ16_HANDLER ( dlbewing_prot_r )
 		case 0x784: return boss_6_data;
 
 		case 0x330: return 0; // controls bonuses such as shoot type,bombs etc.
+		case 0x1d4: return dblwings_70c_data;  //controls restart points
 
 		case 0x0ac: return input_port_read(space->machine, "DSW");//x
 		case 0x4b0: return dblwings_608_data;//coinage
-		case 0x068: return 0;//starting lives,rol $5,res!
+//		case 0x068: return 0;//starting lives,rol $5,res!
 		case 0x094: return dblwings_104_data;// p1 inputs select screen  OK
 		case 0x24c: return dblwings_008_data;//read DSW (mirror for coinage/territory)
 //		case 0x330: return dblwings_78a_data;
@@ -283,8 +284,7 @@ static READ16_HANDLER ( dlbewing_prot_r )
 	if ((offset*2)==0x0f8) return 0;// dblwings_080_data;
 	if ((offset*2)==0x104) return 0;
 	if ((offset*2)==0x10e) return 0;
-	if ((offset*2)==0x1d4) return 0;
-	if ((offset*2)==0x206) return 0; //dblwings_70c_data;
+	if ((offset*2)==0x206) return 0; // dblwings_70c_data;
 	if ((offset*2)==0x246) return 0; // end of level
 	if ((offset*2)==0x25c) return 0;
 	if ((offset*2)==0x284) return 0; // 3rd player 2nd boss
@@ -305,116 +305,107 @@ static WRITE16_HANDLER( dblewing_prot_w )
 //	if(offset*2 != 0x380)
 //	printf("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
 
-	if ((offset*2)==0x008) { dblwings_008_data = data; return; }
-	if ((offset*2)==0x088)
+	switch(offset*2)
 	{
-		dblwings_088_data = data;
-		if(dblwings_088_data == 0)          { boss_4_data = 0;    }
-		else if(dblwings_088_data & 0x8000) { boss_4_data = 0x50; }
-		else                                { boss_4_data = 0x40; }
+		case 0x088:
+			dblwings_088_data = data;
+			if(dblwings_088_data == 0)          { boss_4_data = 0;    }
+			else if(dblwings_088_data & 0x8000) { boss_4_data = 0x50; }
+			else                                { boss_4_data = 0x40; }
 
-		return;
+			return;
+		case 0x18a:
+			dblwings_18a_data = data;
+			switch(dblwings_18a_data)
+			{
+				case 0x6b94: boss_5_data = 0x10; break; //initialize
+				case 0x7c68: boss_5_data = 0x60; break; //go up
+				case 0xfb1d: boss_5_data = 0x50; break;
+				case 0x977c: boss_5_data = 0x50; break;
+				case 0x8a49: boss_5_data = 0x60; break;
+			}
+			return;
+		case 0x200:
+			dblwings_200_data = data;
+			switch(dblwings_200_data)
+			{
+				case 0x5a19: boss_move = 1; break;
+				case 0x3b28: boss_move = 2; break;
+				case 0x1d4d: boss_move = 1; break;
+			}
+			//popmessage("%04x",dblwings_200_data);
+			return;
+		case 0x280:
+			dblwings_280_data = data;
+			switch(dblwings_280_data)
+			{
+				case 0x6b94: boss_5sx_data = 0x10; break;
+				case 0x7519: boss_5sx_data = 0x60; break;
+				case 0xfc68: boss_5sx_data = 0x50; break;
+				case 0x02dd: boss_5sx_data = 0x50; break;
+				case 0x613c: boss_5sx_data = 0x50; break;
+			}
+			//printf("%04x\n",dblwings_280_data);
+			return;
+		case 0x380:
+			soundlatch_w(space,0,data&0xff);
+		 	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+			return; // sound SFX write
+		case 0x384:
+			dblwings_384_data = data;
+			switch(dblwings_384_data)
+			{
+				case 0xaa41: boss_6_data = 1; break;
+				case 0x5a97: boss_6_data = 2; break;
+				case 0xbac5: boss_6_data = 3; break;
+				case 0x0afb: boss_6_data = 4; break;
+				case 0x6a99: boss_6_data = 5; break;
+				case 0xda8f: boss_6_data = 6; break;
+			}
+			return;
+		case 0x38e:
+			dblwings_38e_data = data;
+			/*TODO: boss_bgm shouldn't be there...*/
+			boss_bgm = 1;
+			switch(dblwings_38e_data)
+			{
+				case 0x6c13: boss_shoot_type = 3; break;
+				case 0xc311: boss_shoot_type = 0; break;
+				case 0x1593: boss_shoot_type = 1; break;
+				case 0xf9db: boss_shoot_type = 2; break;
+				case 0xf742: boss_shoot_type = 3; break;
+
+				case 0xeff5: boss_move = 1; break;
+				case 0xd2f1: boss_move = 2; break;
+				//default:   printf("%04x\n",dblwings_38e_data); break;
+				//case 0xe65a: boss_shoot_type = 0; break;
+			}
+			return;
+		case 0x58c: // 3rd player 1st level
+			dblwings_58c_data = data;
+			if(dblwings_58c_data == 0)     { boss_move = 5; }
+			else                           { boss_move = 2; }
+
+			return;
+		case 0x60a:
+			dblwings_60a_data = data;
+			if(dblwings_60a_data & 0x8000) { boss_3_data = 2; }
+			else                           { boss_3_data = 9; }
+
+			return;
 	}
+
+//	printf("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
+
+	if ((offset*2)==0x008) { dblwings_008_data = data; return; }
 	if ((offset*2)==0x080) { dblwings_080_data = data; return; } // p3 3rd boss?
 	if ((offset*2)==0x104) { dblwings_104_data = data; return; } // p1 inputs select screen  OK
-	if ((offset*2)==0x18a)
-	{
-		dblwings_18a_data = data;
-		switch(dblwings_18a_data)
-		{
-			case 0x6b94: boss_5_data = 0x10; break; //initialize
-			case 0x7c68: boss_5_data = 0x60; break; //go up
-			case 0xfb1d: boss_5_data = 0x50; break;
-			case 0x977c: boss_5_data = 0x50; break;
-			case 0x8a49: boss_5_data = 0x60; break;
-		}
-		return;
-	}
-	if ((offset*2)==0x200)
-	{
-		dblwings_200_data = data;
-		switch(dblwings_200_data)
-		{
-			case 0x5a19: boss_move = 1; break;
-			case 0x3b28: boss_move = 2; break;
-			case 0x1d4d: boss_move = 1; break;
-		}
-		//popmessage("%04x",dblwings_200_data);
-		return;
-	}
-	if ((offset*2)==0x280)
-	{
-		dblwings_280_data = data;
-		switch(dblwings_280_data)
-		{
-			case 0x6b94: boss_5sx_data = 0x10; break;
-			case 0x7519: boss_5sx_data = 0x60; break;
-			case 0xfc68: boss_5sx_data = 0x50; break;
-			case 0x02dd: boss_5sx_data = 0x50; break;
-			case 0x613c: boss_5sx_data = 0x50; break;
-		}
-		//printf("%04x\n",dblwings_280_data);
-		return;
-	}
 	if ((offset*2)==0x28c) { dblwings_28c_data = data; return; }
-	if ((offset*2)==0x380) { soundlatch_w(space,0,data&0xff);	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE); return; } // sound write
-	if ((offset*2)==0x384)
-	{
-		dblwings_384_data = data;
-		switch(dblwings_384_data)
-		{
-			case 0xaa41: boss_6_data = 1; break;
-			case 0x5a97: boss_6_data = 2; break;
-			case 0xbac5: boss_6_data = 3; break;
-			case 0x0afb: boss_6_data = 4; break;
-			case 0x6a99: boss_6_data = 5; break;
-			case 0xda8f: boss_6_data = 6; break;
-		}
-		return;
-	}
-	/*1st boss sub-routine*/
-	if ((offset*2)==0x38e)
-	{
-		dblwings_38e_data = data;
-		/*TODO: boss_bgm shouldn't be there...*/
-		boss_bgm = 1;
-		switch(dblwings_38e_data)
-		{
-			case 0x6c13: boss_shoot_type = 3; break;
-			case 0xc311: boss_shoot_type = 1; break;
-			case 0x1593: boss_shoot_type = 2; break;
-			case 0xf9db: boss_shoot_type = 1; break;
-			case 0xf742: boss_shoot_type = 2; break;
-
-			case 0xeff5: boss_move = 1; break;
-			case 0xd2f1: boss_move = 2; break;
-			default:  	 printf("%04x\n",dblwings_38e_data); break;
-			//case 0xe65a: boss_shoot_type = 0; break;
-		}
-		return;
-	}
 	if ((offset*2)==0x406) { dblwings_406_data = data; return; } // p2 inputs select screen  OK
 	if ((offset*2)==0x408) { dblwings_408_data = data; return; } // 3rd player 1st level?
 	if ((offset*2)==0x40e) { dblwings_40e_data = data; return; } // 3rd player 2nd level?
 	if ((offset*2)==0x580) { dblwings_580_data = data; return; }
-	if ((offset*2)==0x58c)
-	{
-		dblwings_58c_data = data;
-		if(dblwings_58c_data == 0)          { boss_move = 5; }
-		else                                { boss_move = 2; }
-
-		return;
-	} // 3rd player 1st level
 	if ((offset*2)==0x608) { dblwings_608_data = data; return; }
-	/*3rd boss sub-routine*/
-	if ((offset*2)==0x60a)
-	{
-		dblwings_60a_data = data;
-		if(dblwings_60a_data & 0x8000) { boss_3_data = 2; }
-		else                           { boss_3_data = 9; }
-
-		return;
-	}
 	if ((offset*2)==0x70c) { dblwings_70c_data = data; return; }
 	if ((offset*2)==0x78a) { dblwings_78a_data = data; return; }
 	if ((offset*2)==0x788) { dblwings_788_data = data; return; }
@@ -468,16 +459,30 @@ static WRITE8_HANDLER( YM2151_w )
 		break;
 	}
 }
+
+static READ8_HANDLER( unk_r )
+{
+//	okim6295_data_0_w(space,0,0x80 | (offset & 0x3f));
+//	okim6295_data_0_w(space,0,0x10);
+
+	return okim6295_status_0_r(space,0);
+}
 #endif
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
  	AM_RANGE(0xa000, 0xa001) AM_READWRITE(ym2151_status_port_0_r,ym2151_word_0_w)
-// 	AM_RANGE(0xb000, 0xb000) AM_READ(ym2151_status_port_0_r)//AM_READ(okim6295_status_0_r)
 	AM_RANGE(0xb000, 0xb000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
+	AM_RANGE(0xc000, 0xc000) AM_READ(okim6295_status_0_r) //might be rom bank for the BGM
  	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
+ 	AM_RANGE(0xf000, 0xf000) AM_WRITENOP //AM_READWRITE(okim6295_status_1_r,okim6295_data_1_w)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( sound_io, ADDRESS_SPACE_IO, 8 )
+//	ADDRESS_MAP_GLOBAL_MASK(0xff)
+//	AM_RANGE(0x0000, 0xffff)  AM_ROM
+//	AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 ADDRESS_MAP_END
 
 
@@ -650,7 +655,7 @@ INPUT_PORTS_END
 
 static void sound_irq(running_machine *machine, int irq)
 {
-  	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
+ 	cpu_set_input_line(machine->cpu[1],0,irq ? ASSERT_LINE : CLEAR_LINE);
 //  mame_printf_debug("sound irq\n");
 }
 
@@ -667,6 +672,7 @@ static MACHINE_DRIVER_START( dblewing )
 
 	MDRV_CPU_ADD("audio", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(sound_map,0)
+	MDRV_CPU_IO_MAP(sound_io,0)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -742,8 +748,9 @@ ROM_START( dblewing )
 	ROM_LOAD16_BYTE( "kp_00-.3d",    0x000001, 0x040000, CRC(547dc83e) SHA1(f6f96bd4338d366f06df718093f035afabc073d1) )
 	ROM_LOAD16_BYTE( "kp_01-.5d",    0x000000, 0x040000, CRC(7a210c33) SHA1(ced89140af6d6a1bc0ffb7728afca428ed007165) )
 
-	ROM_REGION( 0x10000, "audio", 0 ) // sound cpu?
-	ROM_LOAD( "kp_02-.10h",    0x00000, 0x10000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
+	ROM_REGION( 0x18000, "audio", 0 ) // sound cpu
+	ROM_LOAD( "kp_02-.10h",    0x00000, 0x8000, CRC(def035fa) SHA1(fd50314e5c94c25df109ee52c0ce701b0ff2140c) )
+	ROM_CONTINUE(              0x10000, 0x8000 )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
 	ROM_LOAD( "mbe-02.8h",    0x00000, 0x100000, CRC(5a6d3ac5) SHA1(738bb833e2c5d929ac75fe4e69ee0af88197d8a6) )
@@ -754,6 +761,10 @@ ROM_START( dblewing )
 
 	ROM_REGION( 0x80000, "oki", 0 ) /* Oki samples */
 	ROM_LOAD( "kp_03-.16h",    0x00000, 0x20000, CRC(5d7f930d) SHA1(ad23aa804ea3ccbd7630ade9b53fc3ea2718a6ec) )
+	ROM_RELOAD(                0x20000, 0x20000 )
+	ROM_RELOAD(                0x40000, 0x20000 )
+	ROM_RELOAD(                0x60000, 0x20000 )
+
 ROM_END
 
 static DRIVER_INIT( dblewing )
@@ -763,4 +774,4 @@ static DRIVER_INIT( dblewing )
 }
 
 
-GAME( 1993, dblewing, 0,        dblewing, dblewing,  dblewing,  ROT90,"Mitchell", "Double Wings", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND )
+GAME( 1993, dblewing, 0,        dblewing, dblewing,  dblewing,  ROT90,"Mitchell", "Double Wings", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
