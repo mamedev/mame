@@ -58,7 +58,7 @@
 
 typedef struct 	_m65ce02_Regs m65ce02_Regs;
 struct 	_m65ce02_Regs {
-	void	(*const *insn)(void); /* pointer to the function pointer table */
+	void	(*const *insn)(m65ce02_Regs *); /* pointer to the function pointer table */
 	PAIR	ppc;			/* previous program counter */
 	PAIR	pc;				/* program counter */
 	PAIR	sp;				/* stack pointer (always 100 - 1FF) */
@@ -74,6 +74,7 @@ struct 	_m65ce02_Regs {
 	UINT8	after_cli;		/* pending IRQ and last insn cleared I */
 	UINT8	nmi_state;
 	UINT8	irq_state;
+	int		icount;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	const address_space *space;
@@ -93,16 +94,20 @@ static void default_wdmem_id(const address_space *space, offs_t address, UINT8 d
 
 static CPU_INIT( m65ce02 )
 {
-	m65ce02.rdmem_id = default_rdmem_id;
-	m65ce02.wrmem_id = default_wdmem_id;
-	m65ce02.irq_callback = irqcallback;
-	m65ce02.device = device;
-	m65ce02.space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m65ce02_Regs *m65ce02 = device->token;
+	
+	m65ce02->rdmem_id = default_rdmem_id;
+	m65ce02->wrmem_id = default_wdmem_id;
+	m65ce02->irq_callback = irqcallback;
+	m65ce02->device = device;
+	m65ce02->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m65ce02 )
 {
-	m65ce02.insn = insn65ce02;
+	m65ce02_Regs *m65ce02 = device->token;
+
+	m65ce02->insn = insn65ce02;
 
 	/* wipe out the rest of the m65ce02 structure */
 	/* read the reset vector into PC */
@@ -111,13 +116,13 @@ static CPU_RESET( m65ce02 )
 	PCH = RDMEM(M65CE02_RST_VEC+1);
 
 	/* after reset in 6502 compatibility mode */
-	m65ce02.sp.d = 0x01ff; /* high byte descriped in databook */
-	m65ce02.z = 0;
+	m65ce02->sp.d = 0x01ff; /* high byte descriped in databook */
+	m65ce02->z = 0;
 	B = 0;
-	m65ce02.p = F_E|F_B|F_I|F_Z;	/* set E, I and Z flags */
-	m65ce02.pending_irq = 0;	/* nonzero if an IRQ is pending */
-	m65ce02.after_cli = 0;		/* pending IRQ and last insn cleared I */
-	m65ce02.irq_callback = NULL;
+	m65ce02->p = F_E|F_B|F_I|F_Z;	/* set E, I and Z flags */
+	m65ce02->pending_irq = 0;	/* nonzero if an IRQ is pending */
+	m65ce02->after_cli = 0;		/* pending IRQ and last insn cleared I */
+	m65ce02->irq_callback = NULL;
 
 	change_pc(PCD);
 }
@@ -129,20 +134,13 @@ static CPU_EXIT( m65ce02 )
 
 static CPU_GET_CONTEXT( m65ce02 )
 {
-	if( dst )
-		*(m65ce02_Regs*)dst = m65ce02;
 }
 
 static CPU_SET_CONTEXT( m65ce02 )
 {
-	if( src )
-	{
-		m65ce02 = *(m65ce02_Regs*)src;
-		change_pc(PCD);
-	}
 }
 
-INLINE void m65ce02_take_irq(void)
+INLINE void m65ce02_take_irq(m65ce02_Regs *m65ce02)
 {
 	if( !(P & F_I) )
 	{
@@ -156,14 +154,16 @@ INLINE void m65ce02_take_irq(void)
 		PCH = RDMEM(EAD+1);
 		LOG(("M65ce02#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m65ce02.irq_callback) (*m65ce02.irq_callback)(m65ce02.device, 0);
+		if (m65ce02->irq_callback) (*m65ce02->irq_callback)(m65ce02->device, 0);
 		change_pc(PCD);
 	}
-	m65ce02.pending_irq = 0;
+	m65ce02->pending_irq = 0;
 }
 
 static CPU_EXECUTE( m65ce02 )
 {
+	m65ce02_Regs *m65ce02 = device->token;
+
 	m65ce02->icount = cycles;
 
 	change_pc(PCD);
@@ -176,21 +176,21 @@ static CPU_EXECUTE( m65ce02 )
 		debugger_instruction_hook(device, PCD);
 
 		/* if an irq is pending, take it now */
-		if( m65ce02.pending_irq )
-			m65ce02_take_irq();
+		if( m65ce02->pending_irq )
+			m65ce02_take_irq(m65ce02);
 
 		op = RDOP();
-		(*insn65ce02[op])();
+		(*insn65ce02[op])(m65ce02);
 
 		/* check if the I flag was just reset (interrupts enabled) */
-		if( m65ce02.after_cli )
+		if( m65ce02->after_cli )
 		{
 			LOG(("M65ce02#%d after_cli was >0", cpunum_get_active()));
-			m65ce02.after_cli = 0;
-			if (m65ce02.irq_state != CLEAR_LINE)
+			m65ce02->after_cli = 0;
+			if (m65ce02->irq_state != CLEAR_LINE)
 			{
 				LOG((": irq line is asserted: set pending IRQ\n"));
-				m65ce02.pending_irq = 1;
+				m65ce02->pending_irq = 1;
 			}
 			else
 			{
@@ -198,20 +198,20 @@ static CPU_EXECUTE( m65ce02 )
 			}
 		}
 		else
-		if( m65ce02.pending_irq )
-			m65ce02_take_irq();
+		if( m65ce02->pending_irq )
+			m65ce02_take_irq(m65ce02);
 
 	} while (m65ce02->icount > 0);
 
 	return cycles - m65ce02->icount;
 }
 
-static void m65ce02_set_irq_line(int irqline, int state)
+static void m65ce02_set_irq_line(m65ce02_Regs *m65ce02, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (m65ce02.nmi_state == state) return;
-		m65ce02.nmi_state = state;
+		if (m65ce02->nmi_state == state) return;
+		m65ce02->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
 			LOG(("M65ce02#%d set_nmi_line(ASSERT)\n", cpunum_get_active()));
@@ -229,11 +229,11 @@ static void m65ce02_set_irq_line(int irqline, int state)
 	}
 	else
 	{
-		m65ce02.irq_state = state;
+		m65ce02->irq_state = state;
 		if( state != CLEAR_LINE )
 		{
 			LOG(("M65ce02#%d set_irq_line(ASSERT)\n", cpunum_get_active()));
-			m65ce02.pending_irq = 1;
+			m65ce02->pending_irq = 1;
 		}
 	}
 }
@@ -244,28 +244,30 @@ static void m65ce02_set_irq_line(int irqline, int state)
 
 static CPU_SET_INFO( m65ce02 )
 {
+	m65ce02_Regs *m65ce02 = device->token;
+
 	switch( state )
  	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M65CE02_IRQ_STATE: m65ce02_set_irq_line( M65CE02_IRQ_LINE, info->i ); break;
-		case CPUINFO_INT_INPUT_STATE + M65CE02_NMI_STATE: m65ce02_set_irq_line( INPUT_LINE_NMI, info->i ); break;
+		case CPUINFO_INT_INPUT_STATE + M65CE02_IRQ_STATE: m65ce02_set_irq_line( m65ce02, M65CE02_IRQ_LINE, info->i ); break;
+		case CPUINFO_INT_INPUT_STATE + M65CE02_NMI_STATE: m65ce02_set_irq_line( m65ce02, INPUT_LINE_NMI, info->i ); break;
 
 		case CPUINFO_INT_PC: PCW = info->i; change_pc(PCD); break;
-		case CPUINFO_INT_REGISTER + M65CE02_PC: m65ce02.pc.w.l = info->i; break;
-		case CPUINFO_INT_SP: m65ce02.sp.b.l = info->i; break;
-		case CPUINFO_INT_REGISTER + M65CE02_S: m65ce02.sp.w.l = info->i; break;
-		case CPUINFO_INT_REGISTER + M65CE02_P: m65ce02.p = info->i; break;
-		case CPUINFO_INT_REGISTER + M65CE02_A: m65ce02.a = info->i; break;
-		case CPUINFO_INT_REGISTER + M65CE02_X: m65ce02.x = info->i; break;
-		case CPUINFO_INT_REGISTER + M65CE02_Y: m65ce02.y = info->i; break;
-		case CPUINFO_INT_REGISTER + M65CE02_Z: m65ce02.z = info->i; break;
-		case CPUINFO_INT_REGISTER + M65CE02_B: m65ce02.zp.b.h = info->i; break;
-		case CPUINFO_INT_REGISTER + M65CE02_EA: m65ce02.ea.w.l = info->i; break;
-		case CPUINFO_INT_REGISTER + M65CE02_ZP: m65ce02.zp.b.l = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_PC: m65ce02->pc.w.l = info->i; break;
+		case CPUINFO_INT_SP: m65ce02->sp.b.l = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_S: m65ce02->sp.w.l = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_P: m65ce02->p = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_A: m65ce02->a = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_X: m65ce02->x = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_Y: m65ce02->y = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_Z: m65ce02->z = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_B: m65ce02->zp.b.h = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_EA: m65ce02->ea.w.l = info->i; break;
+		case CPUINFO_INT_REGISTER + M65CE02_ZP: m65ce02->zp.b.l = info->i; break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m65ce02.rdmem_id = (m6502_read_indexed_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m65ce02.wrmem_id = (m6502_write_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m65ce02->rdmem_id = (m6502_read_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m65ce02->wrmem_id = (m6502_write_indexed_func) info->f; break;
 	}
 }
 
@@ -275,6 +277,8 @@ static CPU_SET_INFO( m65ce02 )
 
 CPU_GET_INFO( m65ce02 )
 {
+	m65ce02_Regs *m65ce02 = (device != NULL) ? device->token : NULL;
+
 	switch( state )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
@@ -301,23 +305,23 @@ CPU_GET_INFO( m65ce02 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE+M65CE02_NMI_STATE: info->i = m65ce02.nmi_state;			break;
-		case CPUINFO_INT_INPUT_STATE+M65CE02_IRQ_STATE: info->i = m65ce02.irq_state;			break;
+		case CPUINFO_INT_INPUT_STATE+M65CE02_NMI_STATE: info->i = m65ce02->nmi_state;			break;
+		case CPUINFO_INT_INPUT_STATE+M65CE02_IRQ_STATE: info->i = m65ce02->irq_state;			break;
 
-		case CPUINFO_INT_PREVIOUSPC: info->i = m65ce02.ppc.w.l; break;
+		case CPUINFO_INT_PREVIOUSPC: info->i = m65ce02->ppc.w.l; break;
 
 		case CPUINFO_INT_PC:							info->i = PCD;							break;
-		case CPUINFO_INT_REGISTER+M65CE02_PC:			info->i = m65ce02.pc.w.l;				break;
-		case CPUINFO_INT_SP:							info->i = m65ce02.sp.b.l;				break;
-		case CPUINFO_INT_REGISTER+M65CE02_S:			info->i = m65ce02.sp.w.l;				break;
-		case CPUINFO_INT_REGISTER+M65CE02_P:			info->i = m65ce02.p;					break;
-		case CPUINFO_INT_REGISTER+M65CE02_A:			info->i = m65ce02.a;					break;
-		case CPUINFO_INT_REGISTER+M65CE02_X:			info->i = m65ce02.x;					break;
-		case CPUINFO_INT_REGISTER+M65CE02_Y:			info->i = m65ce02.y;					break;
-		case CPUINFO_INT_REGISTER+M65CE02_Z:			info->i = m65ce02.z;					break;
-		case CPUINFO_INT_REGISTER+M65CE02_B:			info->i = m65ce02.zp.b.h;				break;
-		case CPUINFO_INT_REGISTER+M65CE02_EA:			info->i = m65ce02.ea.w.l;				break;
-		case CPUINFO_INT_REGISTER+M65CE02_ZP:			info->i = m65ce02.zp.w.l;				break;
+		case CPUINFO_INT_REGISTER+M65CE02_PC:			info->i = m65ce02->pc.w.l;				break;
+		case CPUINFO_INT_SP:							info->i = m65ce02->sp.b.l;				break;
+		case CPUINFO_INT_REGISTER+M65CE02_S:			info->i = m65ce02->sp.w.l;				break;
+		case CPUINFO_INT_REGISTER+M65CE02_P:			info->i = m65ce02->p;					break;
+		case CPUINFO_INT_REGISTER+M65CE02_A:			info->i = m65ce02->a;					break;
+		case CPUINFO_INT_REGISTER+M65CE02_X:			info->i = m65ce02->x;					break;
+		case CPUINFO_INT_REGISTER+M65CE02_Y:			info->i = m65ce02->y;					break;
+		case CPUINFO_INT_REGISTER+M65CE02_Z:			info->i = m65ce02->z;					break;
+		case CPUINFO_INT_REGISTER+M65CE02_B:			info->i = m65ce02->zp.b.h;				break;
+		case CPUINFO_INT_REGISTER+M65CE02_EA:			info->i = m65ce02->ea.w.l;				break;
+		case CPUINFO_INT_REGISTER+M65CE02_ZP:			info->i = m65ce02->zp.w.l;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m65ce02);			break;
@@ -330,8 +334,8 @@ CPU_GET_INFO( m65ce02 )
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m65ce02);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m65ce02->icount;			break;
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m65ce02.rdmem_id;		break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m65ce02.wrmem_id;		break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m65ce02->rdmem_id;		break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m65ce02->wrmem_id;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME: strcpy(info->s, "M65CE02");  break;
@@ -344,25 +348,25 @@ CPU_GET_INFO( m65ce02 )
 				"all rights reserved.");  break;
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				m65ce02.p & 0x80 ? 'N':'.',
-				m65ce02.p & 0x40 ? 'V':'.',
-				m65ce02.p & 0x20 ? 'E':'.',
-				m65ce02.p & 0x10 ? 'B':'.',
-				m65ce02.p & 0x08 ? 'D':'.',
-				m65ce02.p & 0x04 ? 'I':'.',
-				m65ce02.p & 0x02 ? 'Z':'.',
-				m65ce02.p & 0x01 ? 'C':'.');
+				m65ce02->p & 0x80 ? 'N':'.',
+				m65ce02->p & 0x40 ? 'V':'.',
+				m65ce02->p & 0x20 ? 'E':'.',
+				m65ce02->p & 0x10 ? 'B':'.',
+				m65ce02->p & 0x08 ? 'D':'.',
+				m65ce02->p & 0x04 ? 'I':'.',
+				m65ce02->p & 0x02 ? 'Z':'.',
+				m65ce02->p & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + M65CE02_PC:			sprintf(info->s, "PC:%04X", m65ce02.pc.w.l); break;
-		case CPUINFO_STR_REGISTER + M65CE02_S:			sprintf(info->s, "S:%02X", m65ce02.sp.b.l); break;
-		case CPUINFO_STR_REGISTER + M65CE02_P:			sprintf(info->s, "P:%02X", m65ce02.p); break;
-		case CPUINFO_STR_REGISTER + M65CE02_A:			sprintf(info->s, "A:%02X", m65ce02.a); break;
-		case CPUINFO_STR_REGISTER + M65CE02_X:			sprintf(info->s, "X:%02X", m65ce02.x); break;
-		case CPUINFO_STR_REGISTER + M65CE02_Y:			sprintf(info->s, "Y:%02X", m65ce02.y); break;
-		case CPUINFO_STR_REGISTER + M65CE02_Z:			sprintf(info->s, "Z:%02X", m65ce02.z); break;
-		case CPUINFO_STR_REGISTER + M65CE02_B:			sprintf(info->s, "B:%02X", m65ce02.zp.b.h); break;
-		case CPUINFO_STR_REGISTER + M65CE02_EA:			sprintf(info->s, "EA:%04X", m65ce02.ea.w.l); break;
-		case CPUINFO_STR_REGISTER + M65CE02_ZP:			sprintf(info->s, "ZP:%03X", m65ce02.zp.w.l); break;
+		case CPUINFO_STR_REGISTER + M65CE02_PC:			sprintf(info->s, "PC:%04X", m65ce02->pc.w.l); break;
+		case CPUINFO_STR_REGISTER + M65CE02_S:			sprintf(info->s, "S:%02X", m65ce02->sp.b.l); break;
+		case CPUINFO_STR_REGISTER + M65CE02_P:			sprintf(info->s, "P:%02X", m65ce02->p); break;
+		case CPUINFO_STR_REGISTER + M65CE02_A:			sprintf(info->s, "A:%02X", m65ce02->a); break;
+		case CPUINFO_STR_REGISTER + M65CE02_X:			sprintf(info->s, "X:%02X", m65ce02->x); break;
+		case CPUINFO_STR_REGISTER + M65CE02_Y:			sprintf(info->s, "Y:%02X", m65ce02->y); break;
+		case CPUINFO_STR_REGISTER + M65CE02_Z:			sprintf(info->s, "Z:%02X", m65ce02->z); break;
+		case CPUINFO_STR_REGISTER + M65CE02_B:			sprintf(info->s, "B:%02X", m65ce02->zp.b.h); break;
+		case CPUINFO_STR_REGISTER + M65CE02_EA:			sprintf(info->s, "EA:%04X", m65ce02->ea.w.l); break;
+		case CPUINFO_STR_REGISTER + M65CE02_ZP:			sprintf(info->s, "ZP:%03X", m65ce02->zp.w.l); break;
 	}
 }

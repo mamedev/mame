@@ -361,7 +361,7 @@ static void (*const insn4510[0x100])(m4510_Regs *) = {
 	m4510_f8,m4510_f9,m4510_fa,m4510_fb,m4510_fc,m4510_fd,m4510_fe,m4510_ff
 };
 #else
-static void (*const insn65ce02[0x100])(m4510_Regs *) = {
+static void (*const insn65ce02[0x100])(m65ce02_Regs *) = {
 	m65ce02_00,m65ce02_01,m65ce02_02,m65ce02_03,m65ce02_04,m65ce02_05,m65ce02_06,m65ce02_07,
 	m65ce02_08,m65ce02_09,m65ce02_0a,m65ce02_0b,m65ce02_0c,m65ce02_0d,m65ce02_0e,m65ce02_0f,
 	m65ce02_10,m65ce02_11,m65ce02_12,m65ce02_13,m65ce02_14,m65ce02_15,m65ce02_16,m65ce02_17,

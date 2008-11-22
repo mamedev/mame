@@ -420,6 +420,9 @@ typedef struct
 
 	/* 1 for 16-line sequence break system, 0 for default break system */
 	int type_20_sbs;
+	
+	const device_config *device;
+	const address_space *program;
 }
 pdp1_Regs;
 
@@ -533,6 +536,8 @@ static CPU_INIT( pdp1 )
 
 	/* clean-up */
 	memset (&pdp1, 0, sizeof (pdp1));
+	pdp1.device = device;
+	pdp1.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* set up params and callbacks */
 	for (i=0; i<64; i++)

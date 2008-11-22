@@ -46,8 +46,8 @@ struct _pdp1_reset_param_t
 /* PUBLIC FUNCTIONS */
 CPU_GET_INFO( pdp1 );
 
-#define READ_PDP_18BIT(A) ((signed)program_read_dword_32be((A)<<2))
-#define WRITE_PDP_18BIT(A,V) (program_write_dword_32be((A)<<2,(V)))
+#define READ_PDP_18BIT(A) ((signed)memory_read_dword_32be(pdp1.program, (A)<<2))
+#define WRITE_PDP_18BIT(A,V) (memory_write_dword_32be(pdp1.program, (A)<<2,(V)))
 
 #define AND 001
 #define IOR 002

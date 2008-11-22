@@ -289,7 +289,7 @@
 	t1=RDOPARG();									\
 	t2=RDOPARG();									\
 	t3=RDOPARG();									\
-	logerror("m65ce02 at pc:%.4x reserved op aug %.2x %.2x %.2x\n", cpu_get_pc(machine->activecpu),t1,t2,t3);
+	logerror("m65ce02 at pc:%.4x reserved op aug %.2x %.2x %.2x\n", cpu_get_pc(m65ce02->device),t1,t2,t3);
 
 /* 65ce02 ******************************************************
  *  BBR Branch if bit is reset
@@ -971,9 +971,9 @@
  ***************************************************************/
 #define TXS										\
 	SPL = X;									\
-	if (PEEK_OP() == 0x2b /*TYS*/ ) {						\
-		UINT8 op = RDOP();							\
-		(*m65ce02.insn[op])();							\
+	if (PEEK_OP() == 0x2b /*TYS*/ ) {			\
+		UINT8 op = RDOP();						\
+		(*m65ce02->insn[op])(m65ce02);			\
 	}
 
 
