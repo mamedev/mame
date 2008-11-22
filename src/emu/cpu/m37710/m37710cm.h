@@ -98,6 +98,8 @@ struct _m37710i_cpu_struct
 	uint irq_level;		/* irq level */
 	cpu_irq_callback int_ack;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	uint stopped;		/* Sets how the CPU is stopped */
 	void (*const *opcodes)(void);		/* opcodes with no prefix */
 	void (*const *opcodes42)(void);	/* opcodes with 0x42 prefix */

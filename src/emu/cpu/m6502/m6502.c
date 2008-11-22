@@ -24,6 +24,8 @@
 /* 10.March   2000 PeT added 6502 set overflow input line */
 /* 13.September 2000 PeT N2A03 jmp indirect */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
+
 #if ((HAS_M65SC02 || HAS_DECO16) && !HAS_M65C02)
 #undef HAS_M65C02
 #define HAS_M65C02 1
@@ -76,17 +78,18 @@ struct _m6502_Regs
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	const address_space *space;
+	const address_space *io;
 	int		int_occured;
 	int		icount;
 
-	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_space_func wrmem_id;				/* writemem callback for indexed instructions */
+	m6502_read_indexed_func rdmem_id;					/* readmem callback for indexed instructions */
+	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
 
 #if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
 	UINT8    ddr;
 	UINT8    port;
-	UINT8	(*port_read)(UINT8 direction);
-	void	(*port_write)(UINT8 direction, UINT8 data);
+	m6510_port_read_func port_read;
+	m6510_port_write_func port_write;
 #endif
 
 };
@@ -95,8 +98,8 @@ struct _m6502_Regs
 static void *token;
 //static m6502_Regs *m6502;
 
-static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
-static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
+static UINT8 default_rdmem_id(const address_space *space, offs_t offset) { return memory_read_byte_8le(space, offset); }
+static void default_wdmem_id(const address_space *space, offs_t offset, UINT8 data) { memory_write_byte_8le(space, offset, data); }
 
 /***************************************************************
  * include the opcode macros, functions and tables
@@ -141,7 +144,7 @@ static void m6502_common_init(const device_config *device, int index, int clock,
 
 	m6502->irq_callback = irqcallback;
 	m6502->device = device;
-	m6502->space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m6502->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	m6502->subtype = subtype;
 	m6502->insn = insn;
 	m6502->rdmem_id = default_rdmem_id;
@@ -392,7 +395,7 @@ static READ8_HANDLER( m6510_read_0000 )
 			break;
 		case 0x0001:	/* Data Port */
 			if (m6502->port_read)
-				result = m6502->port_read( m6502->ddr );
+				result = m6502->port_read( m6502->device, m6502->ddr );
 			result = (m6502->ddr & m6502->port) | (~m6502->ddr & result);
 			break;
 	}
@@ -414,7 +417,7 @@ static WRITE8_HANDLER( m6510_write_0000 )
 	}
 
 	if (m6502->port_write)
-		m6502->port_write( m6502->ddr, m6502->port & m6502->ddr );
+		m6502->port_write( m6502->device, m6502->ddr, m6502->port & m6502->ddr );
 }
 
 static ADDRESS_MAP_START(m6510_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -552,7 +555,9 @@ static CPU_INIT( m65sc02 )
 
 static CPU_INIT( deco16 )
 {
+	m6502_Regs *m6502 = device->token;
 	m6502_common_init(device, index, clock, irqcallback, SUBTYPE_DECO16, insndeco16, "deco16");
+	m6502->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 
@@ -715,8 +720,8 @@ static CPU_SET_INFO( m6502 )
 		case CPUINFO_INT_REGISTER + M6502_ZP:			m6502->zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6502->rdmem_id = (read8_space_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6502->wrmem_id = (write8_space_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6502->rdmem_id = (m6502_read_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6502->wrmem_id = (m6502_write_indexed_func) info->f; break;
 	}
 }
 
@@ -850,8 +855,8 @@ static CPU_SET_INFO( m6510 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6510_PORTREAD:	m6502->port_read = (UINT8 (*)(UINT8)) info->f;	break;
-		case CPUINFO_PTR_M6510_PORTWRITE:	m6502->port_write = (void (*)(UINT8,UINT8)) info->f;	break;
+		case CPUINFO_PTR_M6510_PORTREAD:	m6502->port_read = (m6510_port_read_func) info->f;	break;
+		case CPUINFO_PTR_M6510_PORTWRITE:	m6502->port_write = (m6510_port_write_func) info->f;	break;
 
 		default:							CPU_SET_INFO_CALL(m6502);			break;
 	}

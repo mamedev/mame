@@ -72,22 +72,22 @@
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
-#define RDOP() program_decrypted_read_byte(PCW++); m6502->icount -= 1
+#define RDOP() memory_decrypted_read_byte(m6502->space, PCW++); m6502->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
-#define RDOPARG() program_raw_read_byte(PCW++); m6502->icount -= 1
+#define RDOPARG() memory_raw_read_byte(m6502->space, PCW++); m6502->icount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
-#define RDMEM(addr) program_read_byte_8le(addr); m6502->icount -= 1
+#define RDMEM(addr) memory_read_byte_8le(m6502->space, addr); m6502->icount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
-#define WRMEM(addr,data) program_write_byte_8le(addr,data); m6502->icount -= 1
+#define WRMEM(addr,data) memory_write_byte_8le(m6502->space, addr,data); m6502->icount -= 1
 
 /***************************************************************
  *  BRA  branch relative
@@ -508,7 +508,7 @@
  *  ILL Illegal opcode
  ***************************************************************/
 #define ILL 													\
-	logerror("M6502 illegal opcode %04x: %02x\n",(PCW-1)&0xffff, program_decrypted_read_byte((PCW-1)&0xffff))
+	logerror("M6502 illegal opcode %04x: %02x\n",(PCW-1)&0xffff, memory_decrypted_read_byte(m6502->space, (PCW-1)&0xffff))
 
 /* 6502 ********************************************************
  *  INC Increment memory

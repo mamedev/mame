@@ -37,6 +37,7 @@
 
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "m65ce02.h"
@@ -75,8 +76,9 @@ struct 	_m65ce02_Regs {
 	UINT8	irq_state;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
-	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_space_func wrmem_id;				/* writemem callback for indexed instructions */
+	const address_space *space;
+	m6502_read_indexed_func rdmem_id;					/* readmem callback for indexed instructions */
+	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
 };
 
 static void *token;
@@ -86,8 +88,8 @@ static void *token;
 
 #include "t65ce02.c"
 
-static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
-static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
+static UINT8 default_rdmem_id(const address_space *space, offs_t address) { return memory_read_byte_8le(space, address); }
+static void default_wdmem_id(const address_space *space, offs_t address, UINT8 data) { memory_write_byte_8le(space, address, data); }
 
 static CPU_INIT( m65ce02 )
 {
@@ -95,6 +97,7 @@ static CPU_INIT( m65ce02 )
 	m65ce02.wrmem_id = default_wdmem_id;
 	m65ce02.irq_callback = irqcallback;
 	m65ce02.device = device;
+	m65ce02.space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m65ce02 )
@@ -261,8 +264,8 @@ static CPU_SET_INFO( m65ce02 )
 		case CPUINFO_INT_REGISTER + M65CE02_ZP: m65ce02.zp.b.l = info->i; break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m65ce02.rdmem_id = (read8_space_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m65ce02.wrmem_id = (write8_space_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m65ce02.rdmem_id = (m6502_read_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m65ce02.wrmem_id = (m6502_write_indexed_func) info->f; break;
 	}
 }
 

@@ -62,6 +62,12 @@ enum
    positiv edge sets overflow flag */
 #define M6502_SET_OVERFLOW	1
 
+typedef UINT8 (*m6502_read_indexed_func)(const address_space *space, offs_t address);
+typedef void (*m6502_write_indexed_func)(const address_space *space, offs_t address, UINT8 data);
+typedef UINT8 (*m6510_port_read_func)(const device_config *device, UINT8 direction);
+typedef void (*m6510_port_write_func)(const device_config *device, UINT8 direction, UINT8 data);
+
+
 enum
 {
 	CPUINFO_PTR_M6502_READINDEXED_CALLBACK = CPUINFO_PTR_CPU_SPECIFIC,

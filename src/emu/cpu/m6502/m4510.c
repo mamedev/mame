@@ -100,6 +100,7 @@ z:      xxxx address bits a19 .. a16 for memory accesses with a15 1 ?
       1      map 8000-9fff
  */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "m6502.h"
@@ -144,15 +145,16 @@ struct _m4510_Regs {
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *space;
 	int 	icount;
 
-	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_space_func wrmem_id;				/* writemem callback for indexed instructions */
+	m6502_read_indexed_func rdmem_id;					/* readmem callback for indexed instructions */
+	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
 
 	UINT8    ddr;
 	UINT8    port;
-	UINT8 (*port_read)(void);
-	void (*port_write)(UINT8 data);
+	m6510_port_read_func port_read;
+	m6510_port_write_func port_write;
 };
 
 static void *token;
@@ -164,27 +166,27 @@ static void *token;
 INLINE int m4510_cpu_readop(m4510_Regs *m4510)
 {
 	register UINT16 t=m4510->pc.w.l++;
-	return program_decrypted_read_byte(M4510_MEM(t));
+	return memory_decrypted_read_byte(m4510->space, M4510_MEM(t));
 }
 
 INLINE int m4510_cpu_readop_arg(m4510_Regs *m4510)
 {
 	register UINT16 t=m4510->pc.w.l++;
-	return program_raw_read_byte(M4510_MEM(t));
+	return memory_raw_read_byte(m4510->space, M4510_MEM(t));
 }
 
 #define M4510
 #include "t65ce02.c"
 
-static READ8_HANDLER( default_rdmem_id )
+static UINT8 default_rdmem_id(const address_space *space, offs_t address)
 {
-	m4510_Regs *m4510 = token;
-	return program_read_byte_8le(M4510_MEM(offset));
+	m4510_Regs *m4510 = space->cpu->token;
+	return memory_read_byte_8le(space, M4510_MEM(address));
 }
-static WRITE8_HANDLER( default_wrmem_id )
+static void default_wrmem_id(const address_space *space, offs_t address, UINT8 data)
 {
-	m4510_Regs *m4510 = token;
-	program_write_byte_8le(M4510_MEM(offset), data);
+	m4510_Regs *m4510 = space->cpu->token;
+	memory_write_byte_8le(space, M4510_MEM(address), data);
 }
 
 static CPU_INIT( m4510 )
@@ -198,6 +200,7 @@ static CPU_INIT( m4510 )
 	m4510->wrmem_id = default_wrmem_id;
 	m4510->irq_callback = irqcallback;
 	m4510->device = device;
+	m4510->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m4510 )
@@ -368,7 +371,7 @@ static READ8_HANDLER( m4510_read_0000 )
 			break;
 		case 0x0001:	/* Data Port */
 			if (m4510->port_read)
-				result = m4510->port_read();
+				result = m4510->port_read(m4510->device, 0);
 			result = (m4510->ddr & m4510->port) | (~m4510->ddr & result);
 			break;
 	}
@@ -390,7 +393,7 @@ static WRITE8_HANDLER( m4510_write_0000 )
 	}
 
 	if (m4510->port_write)
-		m4510->port_write(m4510_get_port(m4510));
+		m4510->port_write(m4510->device, 0, m4510_get_port(m4510));
 }
 
 static ADDRESS_MAP_START(m4510_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -444,10 +447,10 @@ static CPU_SET_INFO( m4510 )
 		case CPUINFO_INT_REGISTER + M4510_MEM7:			m4510->mem[7] = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m4510->rdmem_id = (read8_space_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m4510->wrmem_id = (write8_space_func) info->f; break;
-		case CPUINFO_PTR_M6510_PORTREAD:				m4510->port_read = (UINT8 (*)(void)) info->f; break;
-		case CPUINFO_PTR_M6510_PORTWRITE:				m4510->port_write = (void (*)(UINT8)) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m4510->rdmem_id = (m6502_read_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m4510->wrmem_id = (m6502_write_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6510_PORTREAD:				m4510->port_read = (m6510_port_read_func) info->f; break;
+		case CPUINFO_PTR_M6510_PORTWRITE:				m4510->port_write = (m6510_port_write_func) info->f; break;
 	}
 }
 

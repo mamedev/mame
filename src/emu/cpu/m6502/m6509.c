@@ -37,6 +37,7 @@ addresses take place.
 
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "m6509.h"
@@ -83,8 +84,8 @@ struct _m6509_Regs {
 
 	int 	icount;
 
-	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
-	write8_space_func wrmem_id;				/* readmem callback for indexed instructions */
+	m6502_read_indexed_func rdmem_id;					/* readmem callback for indexed instructions */
+	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
 };
 
 static void *token;
@@ -131,8 +132,8 @@ static ADDRESS_MAP_START(m6509_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00001, 0x00001) AM_MIRROR(0xF0000) AM_READWRITE(m6509_read_00001, m6509_write_00001)
 ADDRESS_MAP_END
 
-static READ8_HANDLER( default_rdmem_id ) { return program_read_byte_8le(offset); }
-static WRITE8_HANDLER( default_wdmem_id ) { program_write_byte_8le(offset, data); }
+static UINT8 default_rdmem_id(const address_space *space, offs_t address) { return memory_read_byte_8le(space, address); }
+static void default_wdmem_id(const address_space *space, offs_t address, UINT8 data) { memory_write_byte_8le(space, address, data); }
 
 static CPU_INIT( m6509 )
 {
@@ -144,7 +145,7 @@ static CPU_INIT( m6509 )
 	m6509->wrmem_id = default_wdmem_id;
 	m6509->irq_callback = irqcallback;
 	m6509->device = device;
-	m6509->space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m6509->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m6509 )
@@ -338,8 +339,8 @@ static CPU_SET_INFO( m6509 )
 		case CPUINFO_INT_REGISTER + M6509_ZP:			m6509->zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6509->rdmem_id = (read8_space_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6509->wrmem_id = (write8_space_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6509->rdmem_id = (m6502_read_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6509->wrmem_id = (m6502_write_indexed_func) info->f; break;
 	}
 }
 

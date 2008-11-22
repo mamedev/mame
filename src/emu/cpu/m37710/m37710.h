@@ -107,11 +107,11 @@ void m37710_state_load(void *file);
 #undef M37710_CALL_DEBUGGER
 
 #define M37710_CALL_DEBUGGER(x) 		debugger_instruction_hook(m37710i_cpu.device, x)
-#define m37710_read_8(addr) 			program_read_byte_16le(addr)
-#define m37710_write_8(addr,data)		program_write_byte_16le(addr,data)
-#define m37710_read_8_immediate(A)		program_read_byte_16le(A)
-#define m37710_read_16(addr) 			program_read_word_16le(addr)
-#define m37710_write_16(addr,data)		program_write_word_16le(addr,data)
+#define m37710_read_8(addr) 			memory_read_byte_16le(m37710i_cpu.program, addr)
+#define m37710_write_8(addr,data)		memory_write_byte_16le(m37710i_cpu.program, addr,data)
+#define m37710_read_8_immediate(A)		memory_read_byte_16le(m37710i_cpu.program, A)
+#define m37710_read_16(addr) 			memory_read_word_16le(m37710i_cpu.program, addr)
+#define m37710_write_16(addr,data)		memory_write_word_16le(m37710i_cpu.program, addr,data)
 #define m37710_jumping(A)				change_pc(A)
 #define m37710_branching(A)
 

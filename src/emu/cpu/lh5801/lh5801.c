@@ -17,6 +17,7 @@
  * based on info found on an artikel for the tandy trs80 pc2
  *
  *****************************************************************************/
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 
 #include "lh5801.h"
@@ -47,6 +48,8 @@ enum
 typedef struct
 {
 	const lh5801_cpu_core *config;
+	const device_config *device;
+	const address_space *program;
 
 	PAIR s, p, u, x, y;
 	int tm; //9 bit
@@ -93,11 +96,13 @@ static CPU_INIT( lh5801 )
 {
 	memset(&lh5801, 0, sizeof(lh5801));
 	lh5801.config = (const lh5801_cpu_core *) device->static_config;
+	lh5801.device = device;
+	lh5801.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( lh5801 )
 {
-	P = (program_read_byte(0xfffe)<<8) | program_read_byte(0xffff);
+	P = (memory_read_byte(lh5801.program, 0xfffe)<<8) | memory_read_byte(lh5801.program, 0xffff);
 
 	change_pc(P);
 

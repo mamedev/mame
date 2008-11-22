@@ -34,6 +34,7 @@
 
 *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "konami.h"
 
@@ -56,6 +57,7 @@ typedef struct
     int     extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
     UINT8   int_state;  /* SYNC and CWAI flags */
 	UINT8	nmi_state;
 	void 	(*setlines_callback)( int lines ); /* callback called when A16-A23 are set */
@@ -392,6 +394,7 @@ static CPU_INIT( konami )
 {
 	konami.irq_callback = irqcallback;
 	konami.device = device;
+	konami.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	state_save_register_item("KONAMI", device->tag, 0, PC);
 	state_save_register_item("KONAMI", device->tag, 0, U);

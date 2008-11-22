@@ -47,8 +47,8 @@
 
 #define PPC	m65ce02->ppc.d
 
-#define RDMEM_ID	m65ce02->rdmem_id
-#define WRMEM_ID	m65ce02->wrmem_id
+#define RDMEM_ID(a)		m65ce02->rdmem_id(m65ce02->space, a)
+#define WRMEM_ID(a,d)	m65ce02->wrmem_id(m65ce02->space, a, d)
 
 #define IRQ_STATE	m65ce02->irq_state
 #define AFTER_CLI	m65ce02->after_cli
@@ -58,14 +58,14 @@
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
-#define RDOP()	program_decrypted_read_byte(PCW++); m65ce02->icount -= 1
+#define RDOP()	memory_decrypted_read_byte(m65ce02->space, PCW++); m65ce02->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
-#define RDOPARG()	program_raw_read_byte(PCW++); m65ce02->icount -= 1
+#define RDOPARG()	memory_raw_read_byte(m65ce02->space, PCW++); m65ce02->icount -= 1
 
-#define PEEK_OP()	program_decrypted_read_byte(PCW)
+#define PEEK_OP()	memory_decrypted_read_byte(m65ce02->space, PCW)
 
-#define RDMEM(addr)			program_read_byte_8le(addr); m65ce02->icount -= 1
-#define WRMEM(addr,data)	program_write_byte_8le(addr,data); m65ce02->icount -= 1
+#define RDMEM(addr)			memory_read_byte_8le(m65ce02->space, addr); m65ce02->icount -= 1
+#define WRMEM(addr,data)	memory_write_byte_8le(m65ce02->space, addr,data); m65ce02->icount -= 1

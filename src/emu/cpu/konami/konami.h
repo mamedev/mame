@@ -27,26 +27,26 @@ CPU_GET_INFO( konami );
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
-#define KONAMI_RDMEM(Addr) ((unsigned)program_read_byte_8be(Addr))
+#define KONAMI_RDMEM(Addr) ((unsigned)memory_read_byte_8be(konami.program, Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define KONAMI_WRMEM(Addr,Value) (program_write_byte_8be(Addr,Value))
+#define KONAMI_WRMEM(Addr,Value) (memory_write_byte_8be(konami.program, Addr,Value))
 
 /****************************************************************************/
 /* Z80_RDOP() is identical to Z80_RDMEM() except it is used for reading     */
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define KONAMI_RDOP(Addr) ((unsigned)program_decrypted_read_byte(Addr))
+#define KONAMI_RDOP(Addr) ((unsigned)memory_decrypted_read_byte(konami.program, Addr))
 
 /****************************************************************************/
 /* Z80_RDOP_ARG() is identical to Z80_RDOP() except it is used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define KONAMI_RDOP_ARG(Addr) ((unsigned)program_raw_read_byte(Addr))
+#define KONAMI_RDOP_ARG(Addr) ((unsigned)memory_raw_read_byte(konami.program, Addr))
 
 #ifndef FALSE
 #    define FALSE 0

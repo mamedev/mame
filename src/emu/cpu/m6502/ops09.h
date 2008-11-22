@@ -37,25 +37,25 @@
  *  RDOP    read an opcode
  ***************************************************************/
 #undef RDOP
-#define RDOP() program_decrypted_read_byte((PCW++)|PB); m6502->icount -= 1
+#define RDOP() memory_decrypted_read_byte(m6502->space, (PCW++)|PB); m6502->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #undef RDOPARG
-#define RDOPARG() program_raw_read_byte((PCW++)|PB); m6502->icount -= 1
+#define RDOPARG() memory_raw_read_byte(m6502->space, (PCW++)|PB); m6502->icount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
 #undef RDMEM
-#define RDMEM(addr) program_read_byte_8le(addr); m6502->icount -= 1
+#define RDMEM(addr) memory_read_byte_8le(m6502->space, addr); m6502->icount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
 #undef WRMEM
-#define WRMEM(addr,data) program_write_byte_8le(addr,data); m6502->icount -= 1
+#define WRMEM(addr,data) memory_write_byte_8le(m6502->space, addr,data); m6502->icount -= 1
 
 /***************************************************************
  * push a register onto the stack
@@ -208,4 +208,4 @@
 #undef KIL
 #define KIL 													\
 	PCW--;														\
-	logerror("M6509 KILL opcode %05x: %02x\n", PCD, program_decrypted_read_byte(PCD))
+	logerror("M6509 KILL opcode %05x: %02x\n", PCD, memory_decrypted_read_byte(m6502->space, PCD))

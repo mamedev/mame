@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "cpuexec.h"
 #include "jaguar.h"
@@ -237,7 +238,7 @@ static void (*const dsp_op_table[64])(jaguar_state *jaguar, UINT16 op) =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		(program_decrypted_read_word(WORD_XOR_BE((UINT32)(pc))))
+#define ROPCODE(J,pc)		(memory_decrypted_read_word((J)->program, WORD_XOR_BE((UINT32)(pc))))
 
 
 
@@ -505,7 +506,7 @@ static CPU_EXECUTE( jaguargpu )
 		debugger_instruction_hook(device, jaguar->PC);
 
 		/* instruction fetch */
-		op = ROPCODE(jaguar->PC);
+		op = ROPCODE(jaguar, jaguar->PC);
 		jaguar->PC += 2;
 
 		/* parse the instruction */
@@ -546,7 +547,7 @@ static CPU_EXECUTE( jaguardsp )
 		debugger_instruction_hook(device, jaguar->PC);
 
 		/* instruction fetch */
-		op = ROPCODE(jaguar->PC);
+		op = ROPCODE(jaguar, jaguar->PC);
 		jaguar->PC += 2;
 
 		/* parse the instruction */
@@ -751,14 +752,14 @@ void imultn_rn_rn(jaguar_state *jaguar, UINT16 op)
 	jaguar->accum = (INT32)res;
 	CLR_ZN(jaguar); SET_ZN(jaguar, res);
 
-	op = ROPCODE(jaguar->PC);
+	op = ROPCODE(jaguar, jaguar->PC);
 	while ((op >> 10) == 20)
 	{
 		r1 = jaguar->r[(op >> 5) & 31];
 		r2 = jaguar->r[op & 31];
 		jaguar->accum += (INT64)((INT16)r1 * (INT16)r2);
 		jaguar->PC += 2;
-		op = ROPCODE(jaguar->PC);
+		op = ROPCODE(jaguar, jaguar->PC);
 	}
 	if ((op >> 10) == 19)
 	{
@@ -774,7 +775,7 @@ void jr_cc_n(jaguar_state *jaguar, UINT16 op)
 		INT32 r1 = (INT8)((op >> 2) & 0xf8) >> 2;
 		UINT32 newpc = jaguar->PC + r1;
 		debugger_instruction_hook(jaguar->device, jaguar->PC);
-		op = ROPCODE(jaguar->PC);
+		op = ROPCODE(jaguar, jaguar->PC);
 		jaguar->PC = newpc;
 		(*jaguar->table[op >> 10])(jaguar, op);
 
@@ -791,7 +792,7 @@ void jump_cc_rn(jaguar_state *jaguar, UINT16 op)
 		/* special kludge for risky code in the cojag DSP interrupt handlers */
 		UINT32 newpc = (jaguar->icount == jaguar->bankswitch_icount) ? jaguar->a[reg] : jaguar->r[reg];
 		debugger_instruction_hook(jaguar->device, jaguar->PC);
-		op = ROPCODE(jaguar->PC);
+		op = ROPCODE(jaguar, jaguar->PC);
 		jaguar->PC = newpc;
 		(*jaguar->table[op >> 10])(jaguar, op);
 
@@ -903,7 +904,7 @@ void movefa_rn_rn(jaguar_state *jaguar, UINT16 op)
 
 void movei_n_rn(jaguar_state *jaguar, UINT16 op)
 {
-	UINT32 res = ROPCODE(jaguar->PC) | (ROPCODE(jaguar->PC + 2) << 16);
+	UINT32 res = ROPCODE(jaguar, jaguar->PC) | (ROPCODE(jaguar, jaguar->PC + 2) << 16);
 	jaguar->PC += 4;
 	jaguar->r[op & 31] = res;
 }
