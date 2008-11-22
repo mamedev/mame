@@ -26,59 +26,61 @@
 //#define DO_CHECKS
 
 
-typedef struct
-{
-		PAIR gr[8];		/* general regs, some are 16bit, some 32bit */
-		union {
-				unsigned char r[8];             /* pointer registers, 4 for earch bank */
-				struct {
-						unsigned char r0[4];
-						unsigned char r1[4];
-				};
-		};
-		union {
-				unsigned short RAM[256*2];      /* 2 256-word internal RAM banks */
-				struct {
-						unsigned short RAM0[256];
-						unsigned short RAM1[256];
-				};
-		};
-		UINT16 stack[6]; /* 6-level hardware stack */
-		PAIR ppc;
-}
-ssp1601_regs;
 
-static ssp1601_regs ssp1601;
-static int g_cycles;
+typedef struct _ssp1601_state_t ssp1601_state_t;
+struct _ssp1601_state_t
+{
+	PAIR gr[8];		/* general regs, some are 16bit, some 32bit */
+	union {
+			unsigned char r[8];             /* pointer registers, 4 for earch bank */
+			struct {
+					unsigned char r0[4];
+					unsigned char r1[4];
+			};
+	};
+	union {
+			unsigned short RAM[256*2];      /* 2 256-word internal RAM banks */
+			struct {
+					unsigned short RAM0[256];
+					unsigned short RAM1[256];
+			};
+	};
+	UINT16 stack[6]; /* 6-level hardware stack */
+	PAIR ppc;
+
+	int g_cycles;
+};
+
+
 
 
 // 0
-#define rX     ssp1601.gr[SSP_X].w.h
-#define rY     ssp1601.gr[SSP_Y].w.h
-#define rA     ssp1601.gr[SSP_A].w.h
-#define rST    ssp1601.gr[SSP_ST].w.h	// 4
-#define rSTACK ssp1601.gr[SSP_STACK].w.h
-#define rPC    ssp1601.gr[SSP_PC].w.h
-#define rP     ssp1601.gr[SSP_P]
+#define rX     ssp1601_state->gr[SSP_X].w.h
+#define rY     ssp1601_state->gr[SSP_Y].w.h
+#define rA     ssp1601_state->gr[SSP_A].w.h
+#define rST    ssp1601_state->gr[SSP_ST].w.h	// 4
+#define rSTACK ssp1601_state->gr[SSP_STACK].w.h
+#define rPC    ssp1601_state->gr[SSP_PC].w.h
+#define rP     ssp1601_state->gr[SSP_P]
 
-#define rAL    ssp1601.gr[SSP_A].w.l
-#define rA32   ssp1601.gr[SSP_A].d
-#define rIJ    ssp1601.r
+#define rAL    ssp1601_state->gr[SSP_A].w.l
+#define rA32   ssp1601_state->gr[SSP_A].d
+#define rIJ    ssp1601_state->r
 
 #define IJind  (((op>>6)&4)|(op&3))
 
-#define PPC    ssp1601.ppc.w.h
+#define PPC    ssp1601_state->ppc.w.h
 
 #define FETCH() program_decrypted_read_word(rPC++ << 1)
 #define PROGRAM_WORD(a) program_read_word((a) << 1)
 #define GET_PPC_OFFS() PPC
 #define CHANGEPC() change_pc(rPC << 1)
 
-#define REG_READ(r) (((r) <= 4) ? ssp1601.gr[r].w.h : reg_read_handlers[r](r))
-#define REG_WRITE(r,d) { \
+#define REG_READ(ssp1601_state,r) (((r) <= 4) ? ssp1601_state->gr[r].w.h : reg_read_handlers[r](ssp1601_state, r))
+#define REG_WRITE(ssp1601_state,r,d) { \
 	int r1 = r; \
-	if (r1 >= 4) reg_write_handlers[r1](r1,d); \
-	else if (r1 > 0) ssp1601.gr[r1].w.h = d; \
+	if (r1 >= 4) reg_write_handlers[r1](ssp1601_state, r1,d); \
+	else if (r1 > 0) ssp1601_state->gr[r1].w.h = d; \
 }
 
 // flags
@@ -178,7 +180,7 @@ static int g_cycles;
 
 #define OP_CHECK32(OP) { \
 	 if ((op & 0x0f) == SSP_P) { /* A <- P */ \
-		update_P(); \
+		update_P(ssp1601_state); \
 		OP(rP.d); \
 		break; \
 	} \
@@ -220,101 +222,101 @@ static int g_cycles;
 // -----------------------------------------------------
 // register i/o handlers
 
-static void update_P(void)
+static void update_P(ssp1601_state_t *ssp1601_state)
 {
 	int m1 = (signed short)rX;
 	int m2 = (signed short)rY;
 	rP.d = (m1 * m2 * 2);
 }
 
-static UINT32 read_unknown(int reg)
+static UINT32 read_unknown(ssp1601_state_t *ssp1601_state, int reg)
 {
 	logerror("%s:%i FIXME\n", __FILE__, __LINE__);
 	return 0;
 }
 
-static void write_unknown(int reg, UINT32 d)
+static void write_unknown(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 {
 	logerror("%s:%i FIXME\n", __FILE__, __LINE__);
 }
 
 /* map EXT regs to virtual I/O range of 0x00-0x0f */
-static UINT32 read_ext(int reg)
+static UINT32 read_ext(ssp1601_state_t *ssp1601_state, int reg)
 {
 	reg &= 7;
 	return io_read_word_16be((reg << 1));
 }
 
-static void write_ext(int reg, UINT32 d)
+static void write_ext(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 {
 	reg &= 7;
 	io_write_word_16be((reg << 1), d);
 }
 
 // 4
-static void write_ST(int reg, UINT32 d)
+static void write_ST(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 {
 	CHECK_ST(d);
 	rST = d;
 }
 
 // 5
-static UINT32 read_STACK(int reg)
+static UINT32 read_STACK(ssp1601_state_t *ssp1601_state, int reg)
 {
 	--rSTACK;
 	if ((signed short)rSTACK < 0) {
 		rSTACK = 5;
 		logerror(__FILE__ " FIXME: stack underflow! (%i) @ %04x\n", rSTACK, GET_PPC_OFFS());
 	}
-	return ssp1601.stack[rSTACK];
+	return ssp1601_state->stack[rSTACK];
 }
 
-static void write_STACK(int reg, UINT32 d)
+static void write_STACK(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 {
 	if (rSTACK >= 6) {
 		logerror(__FILE__ " FIXME: stack overflow! (%i) @ %04x\n", rSTACK, GET_PPC_OFFS());
 		rSTACK = 0;
 	}
-	ssp1601.stack[rSTACK++] = d;
+	ssp1601_state->stack[rSTACK++] = d;
 }
 
 // 6
-static UINT32 read_PC(int reg)
+static UINT32 read_PC(ssp1601_state_t *ssp1601_state, int reg)
 {
 	return rPC;
 }
 
-static void write_PC(int reg, UINT32 d)
+static void write_PC(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 {
 	rPC = d;
-	g_cycles--;
+	ssp1601_state->g_cycles--;
 	CHANGEPC();
 }
 
 // 7
-static UINT32 read_P(int reg)
+static UINT32 read_P(ssp1601_state_t *ssp1601_state, int reg)
 {
-	update_P();
+	update_P(ssp1601_state);
 	return rP.w.h;
 }
 
 // 15
-static UINT32 read_AL(int reg)
+static UINT32 read_AL(ssp1601_state_t *ssp1601_state, int reg)
 {
 	/* apparently reading AL causes some effect on EXT bus, VR depends on that.. */
-	read_ext(reg);
+	read_ext(ssp1601_state, reg);
 	return rAL;
 }
 
-static void write_AL(int reg, UINT32 d)
+static void write_AL(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 {
-	write_ext(reg, d);
+	write_ext(ssp1601_state, reg, d);
 	rAL = d;
 }
 
 
-typedef UINT32 (*read_func_t)(int reg);
-typedef void (*write_func_t)(int reg, UINT32 d);
+typedef UINT32 (*read_func_t)(ssp1601_state_t *ssp1601_state, int reg);
+typedef void (*write_func_t)(ssp1601_state_t *ssp1601_state, int reg, UINT32 d);
 
 static const read_func_t reg_read_handlers[16] =
 {
@@ -354,9 +356,9 @@ static const write_func_t reg_write_handlers[16] =
 // pointer register handlers
 
 //
-#define ptr1_read(op) ptr1_read_(op&3,(op>>6)&4,(op<<1)&0x18)
+#define ptr1_read(ssp1601_state, op) ptr1_read_(ssp1601_state, op&3,(op>>6)&4,(op<<1)&0x18)
 
-static UINT32 ptr1_read_(int ri, int isj2, int modi3)
+static UINT32 ptr1_read_(ssp1601_state_t *ssp1601_state, int ri, int isj2, int modi3)
 {
 	//int t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	UINT32 mask, add = 0, t = ri | isj2 | modi3;
@@ -366,47 +368,47 @@ static UINT32 ptr1_read_(int ri, int isj2, int modi3)
 		// mod=0 (00)
 		case 0x00:
 		case 0x01:
-		case 0x02: return ssp1601.RAM0[ssp1601.r0[t&3]];
-		case 0x03: return ssp1601.RAM0[0];
+		case 0x02: return ssp1601_state->RAM0[ssp1601_state->r0[t&3]];
+		case 0x03: return ssp1601_state->RAM0[0];
 		case 0x04:
 		case 0x05:
-		case 0x06: return ssp1601.RAM1[ssp1601.r1[t&3]];
-		case 0x07: return ssp1601.RAM1[0];
+		case 0x06: return ssp1601_state->RAM1[ssp1601_state->r1[t&3]];
+		case 0x07: return ssp1601_state->RAM1[0];
 		// mod=1 (01), "+!"
 		case 0x08:
 		case 0x09:
-		case 0x0a: return ssp1601.RAM0[ssp1601.r0[t&3]++];
-		case 0x0b: return ssp1601.RAM0[1];
+		case 0x0a: return ssp1601_state->RAM0[ssp1601_state->r0[t&3]++];
+		case 0x0b: return ssp1601_state->RAM0[1];
 		case 0x0c:
 		case 0x0d:
-		case 0x0e: return ssp1601.RAM1[ssp1601.r1[t&3]++];
-		case 0x0f: return ssp1601.RAM1[1];
+		case 0x0e: return ssp1601_state->RAM1[ssp1601_state->r1[t&3]++];
+		case 0x0f: return ssp1601_state->RAM1[1];
 		// mod=2 (10), "-"
 		case 0x10:
 		case 0x11:
-		case 0x12: rp = &ssp1601.r0[t&3]; t = ssp1601.RAM0[*rp];
+		case 0x12: rp = &ssp1601_state->r0[t&3]; t = ssp1601_state->RAM0[*rp];
 		           if (!(rST&7)) { (*rp)--; return t; }
 		           add = -1; goto modulo;
-		case 0x13: return ssp1601.RAM0[2];
+		case 0x13: return ssp1601_state->RAM0[2];
 		case 0x14:
 		case 0x15:
-		case 0x16: rp = &ssp1601.r1[t&3]; t = ssp1601.RAM1[*rp];
+		case 0x16: rp = &ssp1601_state->r1[t&3]; t = ssp1601_state->RAM1[*rp];
 		           if (!(rST&7)) { (*rp)--; return t; }
 		           add = -1; goto modulo;
-		case 0x17: return ssp1601.RAM1[2];
+		case 0x17: return ssp1601_state->RAM1[2];
 		// mod=3 (11), "+"
 		case 0x18:
 		case 0x19:
-		case 0x1a: rp = &ssp1601.r0[t&3]; t = ssp1601.RAM0[*rp];
+		case 0x1a: rp = &ssp1601_state->r0[t&3]; t = ssp1601_state->RAM0[*rp];
 		           if (!(rST&7)) { (*rp)++; return t; }
 		           add = 1; goto modulo;
-		case 0x1b: return ssp1601.RAM0[3];
+		case 0x1b: return ssp1601_state->RAM0[3];
 		case 0x1c:
 		case 0x1d:
-		case 0x1e: rp = &ssp1601.r1[t&3]; t = ssp1601.RAM1[*rp];
+		case 0x1e: rp = &ssp1601_state->r1[t&3]; t = ssp1601_state->RAM1[*rp];
 		           if (!(rST&7)) { (*rp)++; return t; }
 		           add = 1; goto modulo;
-		case 0x1f: return ssp1601.RAM1[3];
+		case 0x1f: return ssp1601_state->RAM1[3];
 	}
 
 	return 0;
@@ -417,7 +419,7 @@ modulo:
 	return t;
 }
 
-static void ptr1_write(int op, UINT32 d)
+static void ptr1_write(ssp1601_state_t *ssp1601_state, int op, UINT32 d)
 {
 	int t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	switch (t)
@@ -425,44 +427,44 @@ static void ptr1_write(int op, UINT32 d)
 		// mod=0 (00)
 		case 0x00:
 		case 0x01:
-		case 0x02: ssp1601.RAM0[ssp1601.r0[t&3]] = d; return;
-		case 0x03: ssp1601.RAM0[0] = d; return;
+		case 0x02: ssp1601_state->RAM0[ssp1601_state->r0[t&3]] = d; return;
+		case 0x03: ssp1601_state->RAM0[0] = d; return;
 		case 0x04:
 		case 0x05:
-		case 0x06: ssp1601.RAM1[ssp1601.r1[t&3]] = d; return;
-		case 0x07: ssp1601.RAM1[0] = d; return;
+		case 0x06: ssp1601_state->RAM1[ssp1601_state->r1[t&3]] = d; return;
+		case 0x07: ssp1601_state->RAM1[0] = d; return;
 		// mod=1 (01), "+!"
 		// mod=3,      "+"
 		case 0x08:
 		case 0x09:
-		case 0x0a: ssp1601.RAM0[ssp1601.r0[t&3]++] = d; return;
-		case 0x0b: ssp1601.RAM0[1] = d; return;
+		case 0x0a: ssp1601_state->RAM0[ssp1601_state->r0[t&3]++] = d; return;
+		case 0x0b: ssp1601_state->RAM0[1] = d; return;
 		case 0x0c:
 		case 0x0d:
-		case 0x0e: ssp1601.RAM1[ssp1601.r1[t&3]++] = d; return;
-		case 0x0f: ssp1601.RAM1[1] = d; return;
+		case 0x0e: ssp1601_state->RAM1[ssp1601_state->r1[t&3]++] = d; return;
+		case 0x0f: ssp1601_state->RAM1[1] = d; return;
 		// mod=2 (10), "-"
 		case 0x10:
 		case 0x11:
-		case 0x12: ssp1601.RAM0[ssp1601.r0[t&3]--] = d; CHECK_RPL(); return;
-		case 0x13: ssp1601.RAM0[2] = d; return;
+		case 0x12: ssp1601_state->RAM0[ssp1601_state->r0[t&3]--] = d; CHECK_RPL(); return;
+		case 0x13: ssp1601_state->RAM0[2] = d; return;
 		case 0x14:
 		case 0x15:
-		case 0x16: ssp1601.RAM1[ssp1601.r1[t&3]--] = d; CHECK_RPL(); return;
-		case 0x17: ssp1601.RAM1[2] = d; return;
+		case 0x16: ssp1601_state->RAM1[ssp1601_state->r1[t&3]--] = d; CHECK_RPL(); return;
+		case 0x17: ssp1601_state->RAM1[2] = d; return;
 		// mod=3 (11), "+"
 		case 0x18:
 		case 0x19:
-		case 0x1a: ssp1601.RAM0[ssp1601.r0[t&3]++] = d; CHECK_RPL(); return;
-		case 0x1b: ssp1601.RAM0[3] = d; return;
+		case 0x1a: ssp1601_state->RAM0[ssp1601_state->r0[t&3]++] = d; CHECK_RPL(); return;
+		case 0x1b: ssp1601_state->RAM0[3] = d; return;
 		case 0x1c:
 		case 0x1d:
-		case 0x1e: ssp1601.RAM1[ssp1601.r1[t&3]++] = d; CHECK_RPL(); return;
-		case 0x1f: ssp1601.RAM1[3] = d; return;
+		case 0x1e: ssp1601_state->RAM1[ssp1601_state->r1[t&3]++] = d; CHECK_RPL(); return;
+		case 0x1f: ssp1601_state->RAM1[3] = d; return;
 	}
 }
 
-static UINT32 ptr2_read(int op)
+static UINT32 ptr2_read(ssp1601_state_t *ssp1601_state, int op)
 {
 	int mv = 0, t = (op&3) | ((op>>6)&4) | ((op<<1)&0x18);
 	switch (t)
@@ -470,21 +472,21 @@ static UINT32 ptr2_read(int op)
 		// mod=0 (00)
 		case 0x00:
 		case 0x01:
-		case 0x02: mv = ssp1601.RAM0[ssp1601.r0[t&3]]++; break;
-		case 0x03: mv = ssp1601.RAM0[0]++; break;
+		case 0x02: mv = ssp1601_state->RAM0[ssp1601_state->r0[t&3]]++; break;
+		case 0x03: mv = ssp1601_state->RAM0[0]++; break;
 		case 0x04:
 		case 0x05:
-		case 0x06: mv = ssp1601.RAM1[ssp1601.r1[t&3]]++; break;
-		case 0x07: mv = ssp1601.RAM1[0]++; break;
+		case 0x06: mv = ssp1601_state->RAM1[ssp1601_state->r1[t&3]]++; break;
+		case 0x07: mv = ssp1601_state->RAM1[0]++; break;
 		// mod=1 (01)
-		case 0x0b: mv = ssp1601.RAM0[1]++; break;
-		case 0x0f: mv = ssp1601.RAM1[1]++; break;
+		case 0x0b: mv = ssp1601_state->RAM0[1]++; break;
+		case 0x0f: mv = ssp1601_state->RAM1[1]++; break;
 		// mod=2 (10)
-		case 0x13: mv = ssp1601.RAM0[2]++; break;
-		case 0x17: mv = ssp1601.RAM1[2]++; break;
+		case 0x13: mv = ssp1601_state->RAM0[2]++; break;
+		case 0x17: mv = ssp1601_state->RAM1[2]++; break;
 		// mod=3 (11)
-		case 0x1b: mv = ssp1601.RAM0[3]++; break;
-		case 0x1f: mv = ssp1601.RAM1[3]++; break;
+		case 0x1b: mv = ssp1601_state->RAM0[3]++; break;
+		case 0x1f: mv = ssp1601_state->RAM1[3]++; break;
 		default:   logerror(__FILE__ " FIXME: unimplemented mod in ((rX)) @ %04x\n", GET_PPC_OFFS());
 		           return 0;
 	}
@@ -498,6 +500,8 @@ static UINT32 ptr2_read(int op)
 
 static CPU_INIT( ssp1601 )
 {
+	ssp1601_state_t *ssp1601_state = device->token;
+
 	state_save_register_item(CHIP_NAME, device->tag, 0, rX);
 	state_save_register_item(CHIP_NAME, device->tag, 0, rY);
 	state_save_register_item(CHIP_NAME, device->tag, 0, rA32);
@@ -506,13 +510,13 @@ static CPU_INIT( ssp1601 )
 	state_save_register_item(CHIP_NAME, device->tag, 0, rPC);
 	state_save_register_item(CHIP_NAME, device->tag, 0, rP.d);
 	state_save_register_item(CHIP_NAME, device->tag, 0, PPC);
-	state_save_register_item_array(CHIP_NAME, device->tag, 0, ssp1601.stack);
-	state_save_register_item_array(CHIP_NAME, device->tag, 0, ssp1601.r);
-	state_save_register_item_array(CHIP_NAME, device->tag, 0, ssp1601.RAM);
+	state_save_register_item_array(CHIP_NAME, device->tag, 0, ssp1601_state->stack);
+	state_save_register_item_array(CHIP_NAME, device->tag, 0, ssp1601_state->r);
+	state_save_register_item_array(CHIP_NAME, device->tag, 0, ssp1601_state->RAM);
 
 	/* clear the state */
-	memset(&ssp1601, 0, sizeof(ssp1601));
-	ssp1601.gr[0].w.h = 0xffff; // constant reg
+	memset(ssp1601_state, 0, sizeof(ssp1601_state_t));
+	ssp1601_state->gr[0].w.h = 0xffff; // constant reg
 }
 
 static CPU_EXIT( ssp1601 )
@@ -522,6 +526,8 @@ static CPU_EXIT( ssp1601 )
 
 static CPU_RESET( ssp1601 )
 {
+	ssp1601_state_t *ssp1601_state = device->token;
+
 	rPC = 0x400;
 	rSTACK = 0; // ? using ascending stack
 	rST = 0;
@@ -530,9 +536,11 @@ static CPU_RESET( ssp1601 )
 
 static CPU_EXECUTE( ssp1601 )
 {
-	g_cycles = cycles;
+	ssp1601_state_t *ssp1601_state = device->token;
 
-	while (g_cycles > 0)
+	ssp1601_state->g_cycles = cycles;
+
+	while (ssp1601_state->g_cycles > 0)
 	{
 		int op;
 		UINT32 tmpv;
@@ -550,39 +558,39 @@ static CPU_EXECUTE( ssp1601 )
 				CHECK_B_SET();
 				if (op == 0) break; // nop
 				if (op == ((SSP_A<<4)|SSP_P)) { // A <- P
-					update_P();
+					update_P(ssp1601_state);
 					rA32 = rP.d;
 				}
 				else
 				{
-					tmpv = REG_READ(op & 0x0f);
-					REG_WRITE((op & 0xf0) >> 4, tmpv);
+					tmpv = REG_READ(ssp1601_state,op & 0x0f);
+					REG_WRITE(ssp1601_state,(op & 0xf0) >> 4, tmpv);
 				}
 				break;
 
 			// ld d, (ri)
-			case 0x01: tmpv = ptr1_read(op); REG_WRITE((op & 0xf0) >> 4, tmpv); break;
+			case 0x01: tmpv = ptr1_read(ssp1601_state, op); REG_WRITE(ssp1601_state, (op & 0xf0) >> 4, tmpv); break;
 
 			// ld (ri), s
-			case 0x02: tmpv = REG_READ((op & 0xf0) >> 4); ptr1_write(op, tmpv); break;
+			case 0x02: tmpv = REG_READ(ssp1601_state,(op & 0xf0) >> 4); ptr1_write(ssp1601_state, op, tmpv); break;
 
 			// ldi d, imm
-			case 0x04: CHECK_10f(); tmpv = FETCH(); REG_WRITE((op & 0xf0) >> 4, tmpv); g_cycles--; break;
+			case 0x04: CHECK_10f(); tmpv = FETCH(); REG_WRITE(ssp1601_state, (op & 0xf0) >> 4, tmpv);ssp1601_state->g_cycles--; break;
 
 			// ld d, ((ri))
-			case 0x05: CHECK_MOD(); tmpv = ptr2_read(op); REG_WRITE((op & 0xf0) >> 4, tmpv); g_cycles -= 2; break;
+			case 0x05: CHECK_MOD(); tmpv = ptr2_read(ssp1601_state, op); REG_WRITE(ssp1601_state, (op & 0xf0) >> 4, tmpv); ssp1601_state->g_cycles -= 2; break;
 
 			// ldi (ri), imm
-			case 0x06: tmpv = FETCH(); ptr1_write(op, tmpv); g_cycles--; break;
+			case 0x06: tmpv = FETCH(); ptr1_write(ssp1601_state, op, tmpv); ssp1601_state->g_cycles--; break;
 
 			// ld adr, a
-			case 0x07: ssp1601.RAM[op & 0x1ff] = rA; break;
+			case 0x07: ssp1601_state->RAM[op & 0x1ff] = rA; break;
 
 			// ld d, ri
-			case 0x09: CHECK_MOD(); tmpv = rIJ[(op&3)|((op>>6)&4)]; REG_WRITE((op & 0xf0) >> 4, tmpv); break;
+			case 0x09: CHECK_MOD(); tmpv = rIJ[(op&3)|((op>>6)&4)]; REG_WRITE(ssp1601_state,(op & 0xf0) >> 4, tmpv); break;
 
 			// ld ri, s
-			case 0x0a: CHECK_MOD(); rIJ[(op&3)|((op>>6)&4)] = REG_READ((op & 0xf0) >> 4); break;
+			case 0x0a: CHECK_MOD(); rIJ[(op&3)|((op>>6)&4)] = REG_READ(ssp1601_state,(op & 0xf0) >> 4); break;
 
 			// ldi ri, simm
 			case 0x0c:
@@ -595,9 +603,9 @@ static CPU_EXECUTE( ssp1601 )
 				int cond = 0;
 				CHECK_00f();
 				COND_CHECK
-				if (cond) { int new_PC = FETCH(); write_STACK(SSP_STACK, rPC); rPC = new_PC; CHANGEPC(); }
+				if (cond) { int new_PC = FETCH(); write_STACK(ssp1601_state, SSP_STACK, rPC); rPC = new_PC; CHANGEPC(); }
 				else rPC++;
-				g_cycles--; // always 2 cycles
+				ssp1601_state->g_cycles--; // always 2 cycles
 				break;
 			}
 
@@ -605,8 +613,8 @@ static CPU_EXECUTE( ssp1601 )
 			case 0x25:
 				CHECK_10f();
 				tmpv = PROGRAM_WORD(rA);
-				REG_WRITE((op & 0xf0) >> 4, tmpv);
-				g_cycles -= 2; // 3 cycles total
+				REG_WRITE(ssp1601_state,(op & 0xf0) >> 4, tmpv);
+				ssp1601_state->g_cycles -= 2; // 3 cycles total
 				break;
 
 			// bra cond, addr
@@ -616,7 +624,7 @@ static CPU_EXECUTE( ssp1601 )
 				COND_CHECK
 				if (cond) { rPC = FETCH(); CHANGEPC(); }
 				else rPC++;
-				g_cycles--;
+				ssp1601_state->g_cycles--;
 				break;
 			}
 
@@ -642,21 +650,21 @@ static CPU_EXECUTE( ssp1601 )
 			// mpys?
 			case 0x1b:
 				CHECK_B_CLEAR();
-				update_P();
+				update_P(ssp1601_state);
 				rA32 -= rP.d;
 				UPD_ACC_ZN
-				rX = ptr1_read_(op&3, 0, (op<<1)&0x18);
-				rY = ptr1_read_((op>>4)&3, 4, (op>>3)&0x18);
+				rX = ptr1_read_(ssp1601_state, op&3, 0, (op<<1)&0x18);
+				rY = ptr1_read_(ssp1601_state, (op>>4)&3, 4, (op>>3)&0x18);
 				break;
 
 			// mpya (rj), (ri), b
 			case 0x4b:
 				CHECK_B_CLEAR();
-				update_P();
+				update_P(ssp1601_state);
 				rA32 += rP.d;
 				UPD_ACC_ZN
-				rX = ptr1_read_(op&3, 0, (op<<1)&0x18);
-				rY = ptr1_read_((op>>4)&3, 4, (op>>3)&0x18);
+				rX = ptr1_read_(ssp1601_state, op&3, 0, (op<<1)&0x18);
+				rY = ptr1_read_(ssp1601_state, (op>>4)&3, 4, (op>>3)&0x18);
 				break;
 
 			// mld (rj), (ri), b
@@ -665,50 +673,50 @@ static CPU_EXECUTE( ssp1601 )
 				rA32 = 0;
 				rST &= 0x0fff;
 				rST |= SSP_FLAG_Z;
-				rX = ptr1_read_(op&3, 0, (op<<1)&0x18);
-				rY = ptr1_read_((op>>4)&3, 4, (op>>3)&0x18);
+				rX = ptr1_read_(ssp1601_state, op&3, 0, (op<<1)&0x18);
+				rY = ptr1_read_(ssp1601_state, (op>>4)&3, 4, (op>>3)&0x18);
 				break;
 
 			// OP a, s
-			case 0x10: CHECK_1f0(); OP_CHECK32(OP_SUBA32); tmpv = REG_READ(op & 0x0f); OP_SUBA(tmpv); break;
-			case 0x30: CHECK_1f0(); OP_CHECK32(OP_CMPA32); tmpv = REG_READ(op & 0x0f); OP_CMPA(tmpv); break;
-			case 0x40: CHECK_1f0(); OP_CHECK32(OP_ADDA32); tmpv = REG_READ(op & 0x0f); OP_ADDA(tmpv); break;
-			case 0x50: CHECK_1f0(); OP_CHECK32(OP_ANDA32); tmpv = REG_READ(op & 0x0f); OP_ANDA(tmpv); break;
-			case 0x60: CHECK_1f0(); OP_CHECK32(OP_ORA32 ); tmpv = REG_READ(op & 0x0f); OP_ORA (tmpv); break;
-			case 0x70: CHECK_1f0(); OP_CHECK32(OP_EORA32); tmpv = REG_READ(op & 0x0f); OP_EORA(tmpv); break;
+			case 0x10: CHECK_1f0(); OP_CHECK32(OP_SUBA32); tmpv = REG_READ(ssp1601_state,op & 0x0f); OP_SUBA(tmpv); break;
+			case 0x30: CHECK_1f0(); OP_CHECK32(OP_CMPA32); tmpv = REG_READ(ssp1601_state,op & 0x0f); OP_CMPA(tmpv); break;
+			case 0x40: CHECK_1f0(); OP_CHECK32(OP_ADDA32); tmpv = REG_READ(ssp1601_state,op & 0x0f); OP_ADDA(tmpv); break;
+			case 0x50: CHECK_1f0(); OP_CHECK32(OP_ANDA32); tmpv = REG_READ(ssp1601_state,op & 0x0f); OP_ANDA(tmpv); break;
+			case 0x60: CHECK_1f0(); OP_CHECK32(OP_ORA32 ); tmpv = REG_READ(ssp1601_state,op & 0x0f); OP_ORA (tmpv); break;
+			case 0x70: CHECK_1f0(); OP_CHECK32(OP_EORA32); tmpv = REG_READ(ssp1601_state,op & 0x0f); OP_EORA(tmpv); break;
 
 			// OP a, (ri)
-			case 0x11: CHECK_0f0(); tmpv = ptr1_read(op); OP_SUBA(tmpv); break;
-			case 0x31: CHECK_0f0(); tmpv = ptr1_read(op); OP_CMPA(tmpv); break;
-			case 0x41: CHECK_0f0(); tmpv = ptr1_read(op); OP_ADDA(tmpv); break;
-			case 0x51: CHECK_0f0(); tmpv = ptr1_read(op); OP_ANDA(tmpv); break;
-			case 0x61: CHECK_0f0(); tmpv = ptr1_read(op); OP_ORA (tmpv); break;
-			case 0x71: CHECK_0f0(); tmpv = ptr1_read(op); OP_EORA(tmpv); break;
+			case 0x11: CHECK_0f0(); tmpv = ptr1_read(ssp1601_state, op); OP_SUBA(tmpv); break;
+			case 0x31: CHECK_0f0(); tmpv = ptr1_read(ssp1601_state, op); OP_CMPA(tmpv); break;
+			case 0x41: CHECK_0f0(); tmpv = ptr1_read(ssp1601_state, op); OP_ADDA(tmpv); break;
+			case 0x51: CHECK_0f0(); tmpv = ptr1_read(ssp1601_state, op); OP_ANDA(tmpv); break;
+			case 0x61: CHECK_0f0(); tmpv = ptr1_read(ssp1601_state, op); OP_ORA (tmpv); break;
+			case 0x71: CHECK_0f0(); tmpv = ptr1_read(ssp1601_state, op); OP_EORA(tmpv); break;
 
 			// OP a, adr
-			case 0x03: tmpv = ssp1601.RAM[op & 0x1ff]; OP_LDA (tmpv); break;
-			case 0x13: tmpv = ssp1601.RAM[op & 0x1ff]; OP_SUBA(tmpv); break;
-			case 0x33: tmpv = ssp1601.RAM[op & 0x1ff]; OP_CMPA(tmpv); break;
-			case 0x43: tmpv = ssp1601.RAM[op & 0x1ff]; OP_ADDA(tmpv); break;
-			case 0x53: tmpv = ssp1601.RAM[op & 0x1ff]; OP_ANDA(tmpv); break;
-			case 0x63: tmpv = ssp1601.RAM[op & 0x1ff]; OP_ORA (tmpv); break;
-			case 0x73: tmpv = ssp1601.RAM[op & 0x1ff]; OP_EORA(tmpv); break;
+			case 0x03: tmpv = ssp1601_state->RAM[op & 0x1ff]; OP_LDA (tmpv); break;
+			case 0x13: tmpv = ssp1601_state->RAM[op & 0x1ff]; OP_SUBA(tmpv); break;
+			case 0x33: tmpv = ssp1601_state->RAM[op & 0x1ff]; OP_CMPA(tmpv); break;
+			case 0x43: tmpv = ssp1601_state->RAM[op & 0x1ff]; OP_ADDA(tmpv); break;
+			case 0x53: tmpv = ssp1601_state->RAM[op & 0x1ff]; OP_ANDA(tmpv); break;
+			case 0x63: tmpv = ssp1601_state->RAM[op & 0x1ff]; OP_ORA (tmpv); break;
+			case 0x73: tmpv = ssp1601_state->RAM[op & 0x1ff]; OP_EORA(tmpv); break;
 
 			// OP a, imm
-			case 0x14: CHECK_IMM16(); tmpv = FETCH(); OP_SUBA(tmpv); g_cycles--; break;
-			case 0x34: CHECK_IMM16(); tmpv = FETCH(); OP_CMPA(tmpv); g_cycles--; break;
-			case 0x44: CHECK_IMM16(); tmpv = FETCH(); OP_ADDA(tmpv); g_cycles--; break;
-			case 0x54: CHECK_IMM16(); tmpv = FETCH(); OP_ANDA(tmpv); g_cycles--; break;
-			case 0x64: CHECK_IMM16(); tmpv = FETCH(); OP_ORA (tmpv); g_cycles--; break;
-			case 0x74: CHECK_IMM16(); tmpv = FETCH(); OP_EORA(tmpv); g_cycles--; break;
+			case 0x14: CHECK_IMM16(); tmpv = FETCH(); OP_SUBA(tmpv); ssp1601_state->g_cycles--; break;
+			case 0x34: CHECK_IMM16(); tmpv = FETCH(); OP_CMPA(tmpv); ssp1601_state->g_cycles--; break;
+			case 0x44: CHECK_IMM16(); tmpv = FETCH(); OP_ADDA(tmpv); ssp1601_state->g_cycles--; break;
+			case 0x54: CHECK_IMM16(); tmpv = FETCH(); OP_ANDA(tmpv); ssp1601_state->g_cycles--; break;
+			case 0x64: CHECK_IMM16(); tmpv = FETCH(); OP_ORA (tmpv); ssp1601_state->g_cycles--; break;
+			case 0x74: CHECK_IMM16(); tmpv = FETCH(); OP_EORA(tmpv); ssp1601_state->g_cycles--; break;
 
 			// OP a, ((ri))
-			case 0x15: CHECK_MOD(); tmpv = ptr2_read(op); OP_SUBA(tmpv); g_cycles -= 2; break;
-			case 0x35: CHECK_MOD(); tmpv = ptr2_read(op); OP_CMPA(tmpv); g_cycles -= 2; break;
-			case 0x45: CHECK_MOD(); tmpv = ptr2_read(op); OP_ADDA(tmpv); g_cycles -= 2; break;
-			case 0x55: CHECK_MOD(); tmpv = ptr2_read(op); OP_ANDA(tmpv); g_cycles -= 2; break;
-			case 0x65: CHECK_MOD(); tmpv = ptr2_read(op); OP_ORA (tmpv); g_cycles -= 2; break;
-			case 0x75: CHECK_MOD(); tmpv = ptr2_read(op); OP_EORA(tmpv); g_cycles -= 2; break;
+			case 0x15: CHECK_MOD(); tmpv = ptr2_read(ssp1601_state, op); OP_SUBA(tmpv); ssp1601_state->g_cycles -= 2; break;
+			case 0x35: CHECK_MOD(); tmpv = ptr2_read(ssp1601_state, op); OP_CMPA(tmpv); ssp1601_state->g_cycles -= 2; break;
+			case 0x45: CHECK_MOD(); tmpv = ptr2_read(ssp1601_state, op); OP_ADDA(tmpv); ssp1601_state->g_cycles -= 2; break;
+			case 0x55: CHECK_MOD(); tmpv = ptr2_read(ssp1601_state, op); OP_ANDA(tmpv); ssp1601_state->g_cycles -= 2; break;
+			case 0x65: CHECK_MOD(); tmpv = ptr2_read(ssp1601_state, op); OP_ORA (tmpv); ssp1601_state->g_cycles -= 2; break;
+			case 0x75: CHECK_MOD(); tmpv = ptr2_read(ssp1601_state, op); OP_EORA(tmpv); ssp1601_state->g_cycles -= 2; break;
 
 			// OP a, ri
 			case 0x19: CHECK_MOD(); tmpv = rIJ[IJind]; OP_SUBA(tmpv); break;
@@ -730,11 +738,11 @@ static CPU_EXECUTE( ssp1601 )
 				logerror(__FILE__ " FIXME unhandled op %04x @ %04x\n", op, GET_PPC_OFFS());
 				break;
 		}
-		g_cycles--;
+		ssp1601_state->g_cycles--;
 	}
 
-	update_P();
-	return cycles - g_cycles;
+	update_P(ssp1601_state);
+	return cycles - ssp1601_state->g_cycles;
 }
 
 
@@ -744,20 +752,16 @@ static CPU_EXECUTE( ssp1601 )
 
 static CPU_GET_CONTEXT( ssp1601 )
 {
-	/* copy the context */
-	if (dst)
-		*(ssp1601_regs *)dst = ssp1601;
 }
 
 static CPU_SET_CONTEXT( ssp1601 )
 {
-	/* copy the context */
-	if (src)
-		ssp1601 = *(ssp1601_regs *)src;
 }
 
 static CPU_DISASSEMBLE( ssp1601 )
 {
+	//ssp1601_state_t *ssp1601_state = device->token;
+
 	return dasm_ssp1601(buffer, pc, oprom);
 }
 
@@ -765,6 +769,8 @@ static CPU_DISASSEMBLE( ssp1601 )
 
 static CPU_SET_INFO( ssp1601 )
 {
+	ssp1601_state_t *ssp1601_state = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -777,20 +783,20 @@ static CPU_SET_INFO( ssp1601 )
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + SSP_PC:				rPC = info->i;							break;
 		case CPUINFO_INT_REGISTER + SSP_P:				rP.d = info->i;							break;
-		case CPUINFO_INT_REGISTER + SSP_STACK0:			ssp1601.stack[0] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK1:			ssp1601.stack[1] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK2:			ssp1601.stack[2] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK3:			ssp1601.stack[3] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK4:			ssp1601.stack[4] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK5:			ssp1601.stack[5] = info->i;				break;
-		case CPUINFO_INT_REGISTER + SSP_PR0:			ssp1601.r[0] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR1:			ssp1601.r[1] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR2:			ssp1601.r[2] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR3:			ssp1601.r[3] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR4:			ssp1601.r[4] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR5:			ssp1601.r[5] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR6:			ssp1601.r[6] = info->i;					break;
-		case CPUINFO_INT_REGISTER + SSP_PR7:			ssp1601.r[7] = info->i;					break;
+		case CPUINFO_INT_REGISTER + SSP_STACK0:			ssp1601_state->stack[0] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK1:			ssp1601_state->stack[1] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK2:			ssp1601_state->stack[2] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK3:			ssp1601_state->stack[3] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK4:			ssp1601_state->stack[4] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK5:			ssp1601_state->stack[5] = info->i;				break;
+		case CPUINFO_INT_REGISTER + SSP_PR0:			ssp1601_state->r[0] = info->i;					break;
+		case CPUINFO_INT_REGISTER + SSP_PR1:			ssp1601_state->r[1] = info->i;					break;
+		case CPUINFO_INT_REGISTER + SSP_PR2:			ssp1601_state->r[2] = info->i;					break;
+		case CPUINFO_INT_REGISTER + SSP_PR3:			ssp1601_state->r[3] = info->i;					break;
+		case CPUINFO_INT_REGISTER + SSP_PR4:			ssp1601_state->r[4] = info->i;					break;
+		case CPUINFO_INT_REGISTER + SSP_PR5:			ssp1601_state->r[5] = info->i;					break;
+		case CPUINFO_INT_REGISTER + SSP_PR6:			ssp1601_state->r[6] = info->i;					break;
+		case CPUINFO_INT_REGISTER + SSP_PR7:			ssp1601_state->r[7] = info->i;					break;
 
 //      case CPUINFO_INT_INPUT_STATE + 0:               set_irq_line(0, info->i);               break;
 //      case CPUINFO_INT_INPUT_STATE + 1:               set_irq_line(1, info->i);               break;
@@ -804,10 +810,12 @@ static CPU_SET_INFO( ssp1601 )
 
 CPU_GET_INFO( ssp1601 )
 {
+	ssp1601_state_t *ssp1601_state = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(ssp1601);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(ssp1601_state_t);				break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 3;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
@@ -832,7 +840,7 @@ CPU_GET_INFO( ssp1601 )
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = PPC;							break;
 
-		case CPUINFO_INT_REGISTER + SSP_R0:				info->i = ssp1601.gr[0].w.h;			break;
+		case CPUINFO_INT_REGISTER + SSP_R0:				info->i = ssp1601_state->gr[0].w.h;			break;
 		case CPUINFO_INT_REGISTER + SSP_X:				info->i = rX;							break;
 		case CPUINFO_INT_REGISTER + SSP_Y:				info->i = rY;							break;
 		case CPUINFO_INT_REGISTER + SSP_A:				info->i = rA32;							break;
@@ -841,20 +849,20 @@ CPU_GET_INFO( ssp1601 )
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + SSP_PC:				info->i = rPC;							break;
 		case CPUINFO_INT_REGISTER + SSP_P:				info->i = rP.d;							break;
-		case CPUINFO_INT_REGISTER + SSP_STACK0:			info->i = ssp1601.stack[0];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK1:			info->i = ssp1601.stack[1];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK2:			info->i = ssp1601.stack[2];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK3:			info->i = ssp1601.stack[3];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK4:			info->i = ssp1601.stack[4];				break;
-		case CPUINFO_INT_REGISTER + SSP_STACK5:			info->i = ssp1601.stack[5];				break;
-		case CPUINFO_INT_REGISTER + SSP_PR0:			info->i = ssp1601.r[0];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR1:			info->i = ssp1601.r[1];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR2:			info->i = ssp1601.r[2];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR3:			info->i = ssp1601.r[3];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR4:			info->i = ssp1601.r[4];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR5:			info->i = ssp1601.r[5];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR6:			info->i = ssp1601.r[6];					break;
-		case CPUINFO_INT_REGISTER + SSP_PR7:			info->i = ssp1601.r[7];					break;
+		case CPUINFO_INT_REGISTER + SSP_STACK0:			info->i = ssp1601_state->stack[0];				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK1:			info->i = ssp1601_state->stack[1];				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK2:			info->i = ssp1601_state->stack[2];				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK3:			info->i = ssp1601_state->stack[3];				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK4:			info->i = ssp1601_state->stack[4];				break;
+		case CPUINFO_INT_REGISTER + SSP_STACK5:			info->i = ssp1601_state->stack[5];				break;
+		case CPUINFO_INT_REGISTER + SSP_PR0:			info->i = ssp1601_state->r[0];					break;
+		case CPUINFO_INT_REGISTER + SSP_PR1:			info->i = ssp1601_state->r[1];					break;
+		case CPUINFO_INT_REGISTER + SSP_PR2:			info->i = ssp1601_state->r[2];					break;
+		case CPUINFO_INT_REGISTER + SSP_PR3:			info->i = ssp1601_state->r[3];					break;
+		case CPUINFO_INT_REGISTER + SSP_PR4:			info->i = ssp1601_state->r[4];					break;
+		case CPUINFO_INT_REGISTER + SSP_PR5:			info->i = ssp1601_state->r[5];					break;
+		case CPUINFO_INT_REGISTER + SSP_PR6:			info->i = ssp1601_state->r[6];					break;
+		case CPUINFO_INT_REGISTER + SSP_PR7:			info->i = ssp1601_state->r[7];					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(ssp1601);	break;
@@ -866,7 +874,7 @@ CPU_GET_INFO( ssp1601 )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(ssp1601);		break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(ssp1601);	break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &g_cycles;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &ssp1601_state->g_cycles;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_IO:      info->internal_map16 = NULL;	break;
@@ -883,7 +891,7 @@ CPU_GET_INFO( ssp1601 )
 				(rST&SSP_FLAG_Z)?'Z':'.', (rST&SSP_FLAG_L)?'L':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + SSP_R0:			sprintf(info->s, "REG0  :%04X", ssp1601.gr[0].w.h);			break;
+		case CPUINFO_STR_REGISTER + SSP_R0:			sprintf(info->s, "REG0  :%04X", ssp1601_state->gr[0].w.h);			break;
 		case CPUINFO_STR_REGISTER + SSP_X:			sprintf(info->s, "X  :%04X", rX);							break;
 		case CPUINFO_STR_REGISTER + SSP_Y:			sprintf(info->s, "Y  :%04X", rY);							break;
 		case CPUINFO_STR_REGISTER + SSP_A:			sprintf(info->s, "A  :%08X", rA32);							break;
@@ -891,20 +899,20 @@ CPU_GET_INFO( ssp1601 )
 		case CPUINFO_STR_REGISTER + SSP_STACK:		sprintf(info->s, "STACK  :%04X", rSTACK);					break;
 		case CPUINFO_STR_REGISTER + SSP_PC:  		sprintf(info->s, "PC  :%04X", rPC);							break;
 		case CPUINFO_STR_REGISTER + SSP_P:			sprintf(info->s, "P  :%08X", rP.d);							break;
-		case CPUINFO_STR_REGISTER + SSP_STACK0:		sprintf(info->s, "STACK0  :%04X", ssp1601.stack[0]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK1:		sprintf(info->s, "STACK1  :%04X", ssp1601.stack[1]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK2:		sprintf(info->s, "STACK2  :%04X", ssp1601.stack[2]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK3:		sprintf(info->s, "STACK3  :%04X", ssp1601.stack[3]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK4:		sprintf(info->s, "STACK4  :%04X", ssp1601.stack[4]);		break;
-		case CPUINFO_STR_REGISTER + SSP_STACK5:		sprintf(info->s, "STACK5  :%04X", ssp1601.stack[5]);		break;
-		case CPUINFO_STR_REGISTER + SSP_PR0:		sprintf(info->s, "R0  :%02X", ssp1601.r[0]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR1:		sprintf(info->s, "R1  :%02X", ssp1601.r[1]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR2:		sprintf(info->s, "R2  :%02X", ssp1601.r[2]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR3:		sprintf(info->s, "R3  :%02X", ssp1601.r[3]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR4:		sprintf(info->s, "R4  :%02X", ssp1601.r[4]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR5:		sprintf(info->s, "R5  :%02X", ssp1601.r[5]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR6:		sprintf(info->s, "R6  :%02X", ssp1601.r[6]);				break;
-		case CPUINFO_STR_REGISTER + SSP_PR7:		sprintf(info->s, "R7  :%02X", ssp1601.r[7]);				break;
+		case CPUINFO_STR_REGISTER + SSP_STACK0:		sprintf(info->s, "STACK0  :%04X", ssp1601_state->stack[0]);		break;
+		case CPUINFO_STR_REGISTER + SSP_STACK1:		sprintf(info->s, "STACK1  :%04X", ssp1601_state->stack[1]);		break;
+		case CPUINFO_STR_REGISTER + SSP_STACK2:		sprintf(info->s, "STACK2  :%04X", ssp1601_state->stack[2]);		break;
+		case CPUINFO_STR_REGISTER + SSP_STACK3:		sprintf(info->s, "STACK3  :%04X", ssp1601_state->stack[3]);		break;
+		case CPUINFO_STR_REGISTER + SSP_STACK4:		sprintf(info->s, "STACK4  :%04X", ssp1601_state->stack[4]);		break;
+		case CPUINFO_STR_REGISTER + SSP_STACK5:		sprintf(info->s, "STACK5  :%04X", ssp1601_state->stack[5]);		break;
+		case CPUINFO_STR_REGISTER + SSP_PR0:		sprintf(info->s, "R0  :%02X", ssp1601_state->r[0]);				break;
+		case CPUINFO_STR_REGISTER + SSP_PR1:		sprintf(info->s, "R1  :%02X", ssp1601_state->r[1]);				break;
+		case CPUINFO_STR_REGISTER + SSP_PR2:		sprintf(info->s, "R2  :%02X", ssp1601_state->r[2]);				break;
+		case CPUINFO_STR_REGISTER + SSP_PR3:		sprintf(info->s, "R3  :%02X", ssp1601_state->r[3]);				break;
+		case CPUINFO_STR_REGISTER + SSP_PR4:		sprintf(info->s, "R4  :%02X", ssp1601_state->r[4]);				break;
+		case CPUINFO_STR_REGISTER + SSP_PR5:		sprintf(info->s, "R5  :%02X", ssp1601_state->r[5]);				break;
+		case CPUINFO_STR_REGISTER + SSP_PR6:		sprintf(info->s, "R6  :%02X", ssp1601_state->r[6]);				break;
+		case CPUINFO_STR_REGISTER + SSP_PR7:		sprintf(info->s, "R7  :%02X", ssp1601_state->r[7]);				break;
 	}
 }
 #endif
