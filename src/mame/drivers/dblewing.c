@@ -313,6 +313,11 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			else                                { boss_4_data = 0x40; }
 
 			return;
+
+		case 0x104:
+			dblwings_104_data = data;
+			return; // p1 inputs select screen  OK
+
 		case 0x18a:
 			dblwings_18a_data = data;
 			switch(dblwings_18a_data)
@@ -348,7 +353,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			return;
 		case 0x380:
 			soundlatch_w(space,0,data&0xff);
-		 	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+		 	//cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 			return; // sound SFX write
 		case 0x384:
 			dblwings_384_data = data;
@@ -398,7 +403,6 @@ static WRITE16_HANDLER( dblewing_prot_w )
 
 	if ((offset*2)==0x008) { dblwings_008_data = data; return; }
 	if ((offset*2)==0x080) { dblwings_080_data = data; return; } // p3 3rd boss?
-	if ((offset*2)==0x104) { dblwings_104_data = data; return; } // p1 inputs select screen  OK
 	if ((offset*2)==0x28c) { dblwings_28c_data = data; return; }
 	if ((offset*2)==0x406) { dblwings_406_data = data; return; } // p2 inputs select screen  OK
 	if ((offset*2)==0x408) { dblwings_408_data = data; return; } // 3rd player 1st level?
@@ -468,10 +472,12 @@ static READ8_HANDLER( unk_r )
 }
 #endif
 
-static READ8_HANDLER( unk_r )
+static READ8_HANDLER(unk2_r )
 {
-//	popmessage("%02x 1",x1);
-	return 0x10;
+	static UINT8 x = 0;
+
+//	popmessage("%02x",x);
+	return x--;
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -479,8 +485,8 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
  	AM_RANGE(0xa000, 0xa001) AM_READWRITE(ym2151_status_port_0_r,ym2151_word_0_w)
 	AM_RANGE(0xb000, 0xb000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
-	AM_RANGE(0xc000, 0xc000) AM_READ(unk_r) //another soundlatch?
- 	AM_RANGE(0xd000, 0xd000) AM_READ(soundlatch_r)
+	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
+ 	AM_RANGE(0xd000, 0xd000) AM_READ(unk2_r) //timing? sound latch?
  	AM_RANGE(0xf000, 0xf000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 ADDRESS_MAP_END
 
