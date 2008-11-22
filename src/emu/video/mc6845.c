@@ -442,10 +442,6 @@ static void update_hsync_changed_timers(mc6845_t *mc6845)
 		else
 			next_y = (video_screen_get_vpos(mc6845->screen) + 1) % mc6845->vert_pix_total;
 
-		/* if the next line is not in the visible region, go to the beginning of the screen */
-		if (next_y > mc6845->max_visible_y)
-			next_y = 0;
-
 		timer_adjust_oneshot(mc6845->hsync_on_timer,  video_screen_get_time_until_pos(mc6845->screen, next_y, mc6845->hsync_on_pos) , 0);
 		timer_adjust_oneshot(mc6845->hsync_off_timer, video_screen_get_time_until_pos(mc6845->screen, next_y, mc6845->hsync_off_pos), 0);
 	}
