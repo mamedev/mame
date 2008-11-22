@@ -311,6 +311,7 @@ UINT32 debug_comment_all_change_count(running_machine *machine)
 UINT32 debug_comment_get_opcode_crc32(const device_config *device, offs_t address)
 {
 	const cpu_debug_data *info = cpu_get_debug_data(device);
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int i;
 	UINT32 crc;
 	UINT8 opbuf[64], argbuf[64];
@@ -325,8 +326,8 @@ UINT32 debug_comment_get_opcode_crc32(const device_config *device, offs_t addres
 	// fetch the bytes up to the maximum
 	for (i = 0; i < maxbytes; i++)
 	{
-		opbuf[i] = debug_read_opcode(address + i, 1, FALSE);
-		argbuf[i] = debug_read_opcode(address + i, 1, TRUE);
+		opbuf[i] = debug_read_opcode(space, address + i, 1, FALSE);
+		argbuf[i] = debug_read_opcode(space, address + i, 1, TRUE);
 	}
 
 	numbytes = cpu_dasm(device, buff, address & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;

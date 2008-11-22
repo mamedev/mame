@@ -455,7 +455,11 @@ static LONG CALLBACK exception_filter(struct _EXCEPTION_POINTERS *info)
 	already_hit = 1;
 
 	// flush any debugging traces that were live
-	debug_cpu_flush_traces();
+	{
+		extern running_machine *Machine;
+		if (Machine != NULL)
+			debug_cpu_flush_traces(Machine);
+	}
 
 	// find our man
 	for (i = 0; exception_table[i].code != 0; i++)

@@ -184,6 +184,7 @@ struct _internal_symbol_entry
 struct _symbol_table
 {
 	symbol_table *			parent;							/* pointer to the parent symbol table */
+	void *					globalref;						/* global reference parameter */
 	internal_symbol_entry *	hash[SYM_TABLE_HASH_SIZE]; 		/* hash table */
 };
 
@@ -336,7 +337,7 @@ INLINE EXPRERR pop_token_rval(parsed_expression *expr, parse_token *token, const
 			return MAKE_EXPRERR_NOT_RVAL(token->offset);
 		token->type = TOK_NUMBER;
 		if (symbol->type == SMT_REGISTER)
-			token->value.i = (*symbol->info.reg.getter)(symbol->ref);
+			token->value.i = (*symbol->info.reg.getter)(symbol->table->globalref, symbol->ref);
 		else
 			token->value.i = symbol->info.gen.value;
 	}
@@ -372,7 +373,7 @@ INLINE UINT64 get_lval_value(parsed_expression *expr, parse_token *token, const 
 	{
 		symbol_entry *symbol = token->value.p;
 		if (symbol != NULL && symbol->type == SMT_REGISTER)
-			return (*symbol->info.reg.getter)(symbol->ref);
+			return (*symbol->info.reg.getter)(symbol->table->globalref, symbol->ref);
 	}
 	else if (token->type == TOK_MEMORY)
 	{
@@ -397,7 +398,7 @@ INLINE void set_lval_value(parsed_expression *expr, parse_token *token, const sy
 	{
 		symbol_entry *symbol = token->value.p;
 		if (symbol != NULL && symbol->type == SMT_REGISTER && symbol->info.reg.setter)
-			(*symbol->info.reg.setter)(symbol->ref, value);
+			(*symbol->info.reg.setter)(symbol->table->globalref, symbol->ref, value);
 	}
 	else if (token->type == TOK_MEMORY)
 	{
@@ -1233,7 +1234,7 @@ static EXPRERR execute_function(parsed_expression *expr, parse_token *token)
 	/* execute the function and push the result */
 	t1.type = TOK_NUMBER;
 	t1.offset = token->offset;
-	t1.value.i = (*symbol->info.func.execute)(symbol->ref, paramcount, &funcparams[MAX_FUNCTION_PARAMS - paramcount]);
+	t1.value.i = (*symbol->info.func.execute)(symbol->table->globalref, symbol->ref, paramcount, &funcparams[MAX_FUNCTION_PARAMS - paramcount]);
 	push_token(expr, &t1);
 
 	return EXPRERR_NONE;
@@ -1910,7 +1911,7 @@ INLINE UINT32 hash_string(const char *string)
     symtable_alloc - allocate a symbol table
 -------------------------------------------------*/
 
-symbol_table *symtable_alloc(symbol_table *parent)
+symbol_table *symtable_alloc(symbol_table *parent, void *globalref)
 {
 	symbol_table *table;
 
@@ -1922,7 +1923,19 @@ symbol_table *symtable_alloc(symbol_table *parent)
 	/* initialize the data */
 	memset(table, 0, sizeof(*table));
 	table->parent = parent;
+	table->globalref = globalref;
 	return table;
+}
+
+
+/*-------------------------------------------------
+    symtable_get_globalref - return the globalref
+    value for a given symtable
+-------------------------------------------------*/
+
+void *symtable_get_globalref(symbol_table *table)
+{
+	return table->globalref;
 }
 
 
@@ -1982,6 +1995,7 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
 	/* fill in the details */
 	symbol->name = newstring;
 	symbol->entry = *entry;
+	symbol->entry.table = table;
 
 	/* add the entry to the hash table */
 	hash_index = hash_string(newstring) % SYM_TABLE_HASH_SIZE;
@@ -1996,11 +2010,11 @@ int symtable_add(symbol_table *table, const char *name, const symbol_entry *entr
     register symbol to a symbol table
 -------------------------------------------------*/
 
-int	symtable_add_register(symbol_table *table, const char *name, void *ref, symbol_getter_func getter, symbol_setter_func setter)
+int	symtable_add_register(symbol_table *table, const char *name, void *symref, symbol_getter_func getter, symbol_setter_func setter)
 {
 	symbol_entry symbol;
 
-	symbol.ref = ref;
+	symbol.ref = symref;
 	symbol.type = SMT_REGISTER;
 	symbol.info.reg.getter = getter;
 	symbol.info.reg.setter = setter;
@@ -2013,11 +2027,11 @@ int	symtable_add_register(symbol_table *table, const char *name, void *ref, symb
     function symbol to a symbol table
 -------------------------------------------------*/
 
-int symtable_add_function(symbol_table *table, const char *name, void *ref, UINT16 minparams, UINT16 maxparams, function_execute_func execute)
+int symtable_add_function(symbol_table *table, const char *name, void *symref, UINT16 minparams, UINT16 maxparams, function_execute_func execute)
 {
 	symbol_entry symbol;
 
-	symbol.ref = ref;
+	symbol.ref = symref;
 	symbol.type = SMT_FUNCTION;
 	symbol.info.func.minparams = minparams;
 	symbol.info.func.maxparams = maxparams;

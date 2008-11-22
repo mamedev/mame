@@ -22,6 +22,14 @@
 
 
 /***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+static void debugger_flush_traces(void);
+
+
+
+/***************************************************************************
     CENTRAL INITIALIZATION POINT
 ***************************************************************************/
 
@@ -39,7 +47,7 @@ void debugger_init(running_machine *machine)
 		debug_console_init(machine);
 		debug_view_init(machine);
 		debug_comment_init(machine);
-		atexit(debug_cpu_flush_traces);
+		atexit(debugger_flush_traces);
 		add_logerror_callback(machine, debug_errorlog_write_line);
 	}
 }
@@ -56,3 +64,14 @@ void debugger_refresh_display(running_machine *machine)
 }
 
 
+/*-------------------------------------------------
+    debugger_flush_traces - flush any traces in
+    the event of an aborted execution
+-------------------------------------------------*/
+
+static void debugger_flush_traces(void)
+{
+	extern running_machine *Machine;
+	if (Machine != NULL)
+		debug_cpu_flush_traces(Machine);
+}

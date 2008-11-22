@@ -205,10 +205,10 @@ static void script_entry_free(script_entry *entry);
 
 static astring *quote_astring_expression(astring *string, int isattribute);
 static int validate_format(const char *filename, int line, const script_entry *entry);
-static UINT64 cheat_variable_get(void *ref);
-static void cheat_variable_set(void *ref, UINT64 value);
-static UINT64 execute_frombcd(void *ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_tobcd(void *ref, UINT32 params, const UINT64 *param);
+static UINT64 cheat_variable_get(void *globalref, void *ref);
+static void cheat_variable_set(void *globalref, void *ref, UINT64 value);
+static UINT64 execute_frombcd(void *globalref, void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_tobcd(void *globalref, void *ref, UINT32 params, const UINT64 *param);
 
 
 
@@ -951,7 +951,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	cheat->description = astring_dupc(description);
 
 	/* create the symbol table */
-	cheat->symbols = symtable_alloc(NULL);
+	cheat->symbols = symtable_alloc(NULL, machine);
 	symtable_add_register(cheat->symbols, "frame", &cheatinfo->framecount, cheat_variable_get, NULL);
 	symtable_add_register(cheat->symbols, "argindex", &cheat->argindex, cheat_variable_get, NULL);
 	for (curtemp = 0; curtemp < tempcount; curtemp++)
@@ -1653,7 +1653,7 @@ static int validate_format(const char *filename, int line, const script_entry *e
     cheat variable
 -------------------------------------------------*/
 
-static UINT64 cheat_variable_get(void *ref)
+static UINT64 cheat_variable_get(void *globalref, void *ref)
 {
 	return *(UINT64 *)ref;
 }
@@ -1664,7 +1664,7 @@ static UINT64 cheat_variable_get(void *ref)
     cheat variable
 -------------------------------------------------*/
 
-static void cheat_variable_set(void *ref, UINT64 value)
+static void cheat_variable_set(void *globalref, void *ref, UINT64 value)
 {
 	*(UINT64 *)ref = value;
 }
@@ -1674,7 +1674,7 @@ static void cheat_variable_set(void *ref, UINT64 value)
     execute_frombcd - convert a value from BCD
 -------------------------------------------------*/
 
-static UINT64 execute_frombcd(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_frombcd(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	UINT64 value = param[0];
 	UINT64 multiplier = 1;
@@ -1694,7 +1694,7 @@ static UINT64 execute_frombcd(void *ref, UINT32 params, const UINT64 *param)
     execute_tobcd - convert a value to BCD
 -------------------------------------------------*/
 
-static UINT64 execute_tobcd(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_tobcd(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	UINT64 value = param[0];
 	UINT64 result = 0;

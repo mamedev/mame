@@ -494,7 +494,7 @@ void debugwin_update_during_game(running_machine *machine)
 			HWND focuswnd = GetFocus();
 			debugwin_info *info;
 
-			debug_cpu_halt_on_next_instruction(machine, -1, "User-initiated break\n");
+			debug_cpu_halt_on_next_instruction(debug_cpu_get_visible_cpu(machine), "User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
 			for (info = window_list; info; info = info->next)
@@ -778,7 +778,7 @@ static LRESULT CALLBACK debug_window_proc(HWND wnd, UINT message, WPARAM wparam,
 			if (main_console && main_console->wnd == wnd)
 			{
 				smart_show_all(FALSE);
-				debug_cpu_go(~0);
+				debug_cpu_go(info->machine, ~0);
 			}
 			else
 				DestroyWindow(wnd);
@@ -2767,7 +2767,7 @@ static void console_process_string(debugwin_info *info, const char *string)
 
 	// an empty string is a single step
 	if (string[0] == 0)
-		debug_cpu_single_step(1);
+		debug_cpu_single_step(info->machine, 1);
 
 	// otherwise, just process the command
 	else
@@ -2870,31 +2870,31 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 			case ID_RUN_AND_HIDE:
 				smart_show_all(FALSE);
 			case ID_RUN:
-				debug_cpu_go(~0);
+				debug_cpu_go(info->machine, ~0);
 				return 1;
 
 			case ID_NEXT_CPU:
-				debug_cpu_next_cpu();
+				debug_cpu_next_cpu(info->machine);
 				return 1;
 
 			case ID_RUN_VBLANK:
-				debug_cpu_go_vblank();
+				debug_cpu_go_vblank(info->machine);
 				return 1;
 
 			case ID_RUN_IRQ:
-				debug_cpu_go_interrupt(-1);
+				debug_cpu_go_interrupt(info->machine, -1);
 				return 1;
 
 			case ID_STEP:
-				debug_cpu_single_step(1);
+				debug_cpu_single_step(info->machine, 1);
 				return 1;
 
 			case ID_STEP_OVER:
-				debug_cpu_single_step_over(1);
+				debug_cpu_single_step_over(info->machine, 1);
 				return 1;
 
 			case ID_STEP_OUT:
-				debug_cpu_single_step_out();
+				debug_cpu_single_step_out(info->machine);
 				return 1;
 
 			case ID_HARD_RESET:
@@ -2903,7 +2903,7 @@ static int global_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 
 			case ID_SOFT_RESET:
 				mame_schedule_soft_reset(info->machine);
-				debug_cpu_go(~0);
+				debug_cpu_go(info->machine, ~0);
 				return 1;
 
 			case ID_EXIT:

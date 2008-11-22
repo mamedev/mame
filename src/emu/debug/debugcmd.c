@@ -58,12 +58,12 @@ static global_entry global_array[MAX_GLOBALS];
 
 static void debug_command_exit(running_machine *machine);
 
-static UINT64 execute_min(void *ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_max(void *ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_if(void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_min(void *globalref, void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_max(void *globalref, void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_if(void *globalref, void *ref, UINT32 params, const UINT64 *param);
 
-static UINT64 global_get(void *ref);
-static void global_set(void *ref, UINT64 value);
+static UINT64 global_get(void *globalref, void *ref);
+static void global_set(void *globalref, void *ref, UINT64 value);
 
 static void execute_help(running_machine *machine, int ref, int params, const char **param);
 static void execute_print(running_machine *machine, int ref, int params, const char **param);
@@ -291,7 +291,7 @@ static void debug_command_exit(running_machine *machine)
     execute_min - return the minimum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_min(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_min(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	return (param[0] < param[1]) ? param[0] : param[1];
 }
@@ -301,7 +301,7 @@ static UINT64 execute_min(void *ref, UINT32 params, const UINT64 *param)
     execute_max - return the maximum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_max(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_max(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	return (param[0] > param[1]) ? param[0] : param[1];
 }
@@ -311,7 +311,7 @@ static UINT64 execute_max(void *ref, UINT32 params, const UINT64 *param)
     execute_if - if (a) return b; else return c;
 -------------------------------------------------*/
 
-static UINT64 execute_if(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_if(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	return param[0] ? param[1] : param[2];
 }
@@ -328,7 +328,7 @@ static UINT64 execute_if(void *ref, UINT32 params, const UINT64 *param)
     global_get - symbol table getter for globals
 -------------------------------------------------*/
 
-static UINT64 global_get(void *ref)
+static UINT64 global_get(void *globalref, void *ref)
 {
 	global_entry *global = ref;
 	switch (global->size)
@@ -346,7 +346,7 @@ static UINT64 global_get(void *ref)
     global_set - symbol table setter for globals
 -------------------------------------------------*/
 
-static void global_set(void *ref, UINT64 value)
+static void global_set(void *globalref, void *ref, UINT64 value)
 {
 	global_entry *global = ref;
 	switch (global->size)
@@ -694,7 +694,7 @@ static void execute_step(running_machine *machine, int ref, int params, const ch
 	if (params > 0 && !debug_command_parameter_number(machine, param[0], &steps))
 		return;
 
-	debug_cpu_single_step(steps);
+	debug_cpu_single_step(machine, steps);
 }
 
 
@@ -710,7 +710,7 @@ static void execute_over(running_machine *machine, int ref, int params, const ch
 	if (params > 0 && !debug_command_parameter_number(machine, param[0], &steps))
 		return;
 
-	debug_cpu_single_step_over(steps);
+	debug_cpu_single_step_over(machine, steps);
 }
 
 
@@ -720,7 +720,7 @@ static void execute_over(running_machine *machine, int ref, int params, const ch
 
 static void execute_out(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_cpu_single_step_out();
+	debug_cpu_single_step_out(machine);
 }
 
 
@@ -736,7 +736,7 @@ static void execute_go(running_machine *machine, int ref, int params, const char
 	if (params > 0 && !debug_command_parameter_number(machine, param[0], &addr))
 		return;
 
-	debug_cpu_go(addr);
+	debug_cpu_go(machine, addr);
 }
 
 
@@ -747,7 +747,7 @@ static void execute_go(running_machine *machine, int ref, int params, const char
 
 static void execute_go_vblank(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_cpu_go_vblank();
+	debug_cpu_go_vblank(machine);
 }
 
 
@@ -763,7 +763,7 @@ static void execute_go_interrupt(running_machine *machine, int ref, int params, 
 	if (params > 0 && !debug_command_parameter_number(machine, param[0], &irqline))
 		return;
 
-	debug_cpu_go_interrupt(irqline);
+	debug_cpu_go_interrupt(machine, irqline);
 }
 
 
@@ -779,7 +779,7 @@ static void execute_go_time(running_machine *machine, int ref, int params, const
 	if (params > 0 && !debug_command_parameter_number(machine, param[0], &milliseconds))
 		return;
 
-	debug_cpu_go_milliseconds(milliseconds);
+	debug_cpu_go_milliseconds(machine, milliseconds);
 }
 
 
@@ -789,7 +789,7 @@ static void execute_go_time(running_machine *machine, int ref, int params, const
 
 static void execute_next(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_cpu_next_cpu();
+	debug_cpu_next_cpu(machine);
 }
 
 
@@ -1728,6 +1728,7 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 static void execute_dasm(running_machine *machine, int ref, int params, const char *param[])
 {
 	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
+	const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 	UINT64 offset, length, bytes = 1;
 	const cpu_debug_data *info;
 	int minbytes, maxbytes, byteswidth;
@@ -1788,12 +1789,12 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 			/* fetch the bytes up to the maximum */
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, FALSE);
-				argbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, TRUE);
+				opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, FALSE);
+				argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, TRUE);
 			}
 
 			/* disassemble the result */
-			i += numbytes = cpu_dasm(machine->activecpu, disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			i += numbytes = cpu_dasm(cpu, disasm, offset + i, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 
 		/* print the bytes */
@@ -1805,23 +1806,23 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 			{
 				case 1:
 					for (j = 0; j < numbytes; j++)
-						outdex += sprintf(&output[outdex], "%02X ", (UINT32)debug_read_opcode(pcbyte + j, 1, FALSE));
+						outdex += sprintf(&output[outdex], "%02X ", (UINT32)debug_read_opcode(space, pcbyte + j, 1, FALSE));
 					break;
 
 				case 2:
 					for (j = 0; j < numbytes; j += 2)
-						outdex += sprintf(&output[outdex], "%04X ", (UINT32)debug_read_opcode(pcbyte + j, 2, FALSE));
+						outdex += sprintf(&output[outdex], "%04X ", (UINT32)debug_read_opcode(space, pcbyte + j, 2, FALSE));
 					break;
 
 				case 4:
 					for (j = 0; j < numbytes; j += 4)
-						outdex += sprintf(&output[outdex], "%08X ", (UINT32)debug_read_opcode(pcbyte + j, 4, FALSE));
+						outdex += sprintf(&output[outdex], "%08X ", (UINT32)debug_read_opcode(space, pcbyte + j, 4, FALSE));
 					break;
 
 				case 8:
 					for (j = 0; j < numbytes; j += 8)
 					{
-						UINT64 val = debug_read_opcode(pcbyte + j, 8, FALSE);
+						UINT64 val = debug_read_opcode(space, pcbyte + j, 8, FALSE);
 						outdex += sprintf(&output[outdex], "%08X%08X ", (UINT32)(val >> 32), (UINT32)val);
 					}
 					break;
@@ -1940,7 +1941,7 @@ static void execute_traceover(running_machine *machine, int ref, int params, con
 
 static void execute_traceflush(running_machine *machine, int ref, int params, const char *param[])
 {
-	debug_cpu_flush_traces();
+	debug_cpu_flush_traces(machine);
 }
 
 
@@ -1951,6 +1952,7 @@ static void execute_traceflush(running_machine *machine, int ref, int params, co
 static void execute_history(running_machine *machine, int ref, int params, const char *param[])
 {
 	const device_config *cpu = debug_cpu_get_visible_cpu(machine);
+	const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 	UINT64 count = DEBUG_HISTORY_SIZE;
 	const cpu_debug_data *info;
 	int i;
@@ -1982,8 +1984,8 @@ static void execute_history(running_machine *machine, int ref, int params, const
 		pcbyte = ADDR2BYTE_MASKED(pc, info, ADDRESS_SPACE_PROGRAM);
 		for (numbytes = 0; numbytes < maxbytes; numbytes++)
 		{
-			opbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, FALSE);
-			argbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, TRUE);
+			opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, FALSE);
+			argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, TRUE);
 		}
 
 		cpu_dasm(cpu, buffer, pc, opbuf, argbuf);
@@ -2177,7 +2179,7 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 	for (symnum = 0; symnum < count; symnum++)
 	{
 		const symbol_entry *entry = symtable_find(symtable, namelist[symnum]);
-		UINT64 value = (*entry->info.reg.getter)(entry->ref);
+		UINT64 value = (*entry->info.reg.getter)(symtable_get_globalref(entry->table), entry->ref);
 		assert(entry != NULL);
 
 		/* only display "register" type symbols */

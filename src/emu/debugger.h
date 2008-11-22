@@ -117,7 +117,7 @@ INLINE void debugger_interrupt_hook(const device_config *device, int irqline)
 INLINE void debugger_break(running_machine *machine)
 {
 	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0)
-		debug_cpu_halt_on_next_instruction(machine, cpunum_get_active(), "Internal breakpoint\n");
+		debug_cpu_halt_on_next_instruction(debug_cpu_get_visible_cpu(machine), "Internal breakpoint\n");
 }
 
 

@@ -185,7 +185,6 @@ struct _debug_cpu_watchpoint
     GLOBAL VARIABLES
 ***************************************************************************/
 
-extern FILE *debug_source_file;
 extern const express_callbacks debug_expression_callbacks;
 
 
@@ -194,13 +193,30 @@ extern const express_callbacks debug_expression_callbacks;
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-/* ----- initialization ----- */
+/* ----- initialization and cleanup ----- */
 
 /* initialize the CPU tracking for the debugger */
 void debug_cpu_init(running_machine *machine);
 
+/* flushes all traces; this is useful if a trace is going on when we fatalerror */
+void debug_cpu_flush_traces(running_machine *machine);
+
+
+
+/* ----- debugging status & information ----- */
+
 /* return the visible CPU device (the one that commands should apply to) */
 const device_config *debug_cpu_get_visible_cpu(running_machine *machine);
+
+/* TRUE if the debugger is currently stopped within an instruction hook callback */
+int debug_cpu_within_instruction_hook(running_machine *machine);
+
+/* return TRUE if the current execution state is stopped */
+int	debug_cpu_is_stopped(running_machine *machine);
+
+
+
+/* ----- symbol table interfaces ----- */
 
 /* return the global symbol table */
 symbol_table *debug_cpu_get_global_symtable(running_machine *machine);
@@ -238,54 +254,115 @@ void debug_cpu_memory_write_hook(const address_space *space, offs_t address, UIN
 
 
 
-/* ----- core debugger functions ----- */
+/* ----- execution control ----- */
 
-int debug_cpu_within_instruction_hook(running_machine *machine);
-void debug_cpu_halt_on_next_instruction(running_machine *machine, int cpunum, const char *fmt, ...) ATTR_PRINTF(3,4);
-int	debug_cpu_is_stopped(running_machine *machine);
-void debug_cpu_trace_printf(const device_config *device, const char *fmt, ...) ATTR_PRINTF(2,3);
-void debug_cpu_source_script(running_machine *machine, const char *file);
-void debug_cpu_flush_traces(void);
+/* halt in the debugger on the next instruction */
+void debug_cpu_halt_on_next_instruction(const device_config *device, const char *fmt, ...) ATTR_PRINTF(2,3);
 
-/* debugging hooks */
-void debug_cpu_set_instruction_hook(const device_config *device, debug_instruction_hook_func hook);
+/* ignore/observe a given CPU */
+void debug_cpu_ignore_cpu(const device_config *cpu, int ignore);
 
-/* execution control */
-void debug_cpu_single_step(int numsteps);
-void				debug_cpu_single_step_over(int numsteps);
-void				debug_cpu_single_step_out(void);
-void				debug_cpu_go(offs_t targetpc);
-void				debug_cpu_go_vblank(void);
-void				debug_cpu_go_interrupt(int irqline);
-void				debug_cpu_go_milliseconds(UINT64 milliseconds);
-void				debug_cpu_next_cpu(void);
-void				debug_cpu_ignore_cpu(const device_config *cpu, int ignore);
+/* single step the visible CPU past the requested number of instructions */
+void debug_cpu_single_step(running_machine *machine, int numsteps);
 
-/* tracing support */
-void				debug_cpu_trace(const device_config *device, FILE *file, int trace_over, const char *action);
+/* single step the visible over the requested number of instructions */
+void debug_cpu_single_step_over(running_machine *machine, int numsteps);
 
-/* breakpoints */
+/* single step the visible CPU out of the current function */
+void debug_cpu_single_step_out(running_machine *machine);
+
+/* execute the visible CPU until it hits the given address */
+void debug_cpu_go(running_machine *machine, offs_t targetpc);
+
+/* execute until the next VBLANK */
+void debug_cpu_go_vblank(running_machine *machine);
+
+/* execute until the specified interrupt fires on the visible CPU */
+void debug_cpu_go_interrupt(running_machine *machine, int irqline);
+
+/* execute until the specified exception fires on the visible CPU */
+void debug_cpu_go_exception(running_machine *machine, int exception);
+
+/* execute until the specified delay elapses */
+void debug_cpu_go_milliseconds(running_machine *machine, UINT64 milliseconds);
+
+/* execute until we hit the next CPU */
+void debug_cpu_next_cpu(running_machine *machine);
+
+
+
+/* ----- breakpoints ----- */
+
+/* set a new breakpoint, returning its index */
 int	debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed_expression *condition, const char *action);
+
+/* clear a breakpoint by index */
 int	debug_cpu_breakpoint_clear(running_machine *machine, int bpnum);
+
+/* enable/disable a breakpoint by index */
 int	debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable);
 
-/* watchpoints */
+
+
+/* ----- watchpoints ----- */
+
+/* set a new watchpoint, returning its index */
 int	debug_cpu_watchpoint_set(const address_space *space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action);
+
+/* clear a watchpoint by index */
 int	debug_cpu_watchpoint_clear(running_machine *machine, int wpnum);
+
+/* enable/disable a watchpoint by index */
 int	debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable);
+
+
+
+/* ----- misc debugger functions ----- */
+
+/* specifies a debug command script to execute */
+void debug_cpu_source_script(running_machine *machine, const char *file);
+
+/* trace execution of a given CPU */
+void debug_cpu_trace(const device_config *device, FILE *file, int trace_over, const char *action);
+
+/* output data into the given CPU's tracefile, if tracing */
+void debug_cpu_trace_printf(const device_config *device, const char *fmt, ...) ATTR_PRINTF(2,3);
+
+/* set a hook to be called on each instruction for a given CPU */
+void debug_cpu_set_instruction_hook(const device_config *device, debug_instruction_hook_func hook);
 
 /* hotspots */
 int	debug_cpu_hotspot_track(const device_config *device, int numspots, int threshhold);
 
-/* memory accessors */
-UINT8				debug_read_byte(const address_space *space, offs_t address, int apply_translation);
-UINT16				debug_read_word(const address_space *space, offs_t address, int apply_translation);
-UINT32				debug_read_dword(const address_space *space, offs_t address, int apply_translation);
-UINT64				debug_read_qword(const address_space *space, offs_t address, int apply_translation);
-void				debug_write_byte(const address_space *space, offs_t address, UINT8 data, int apply_translation);
-void				debug_write_word(const address_space *space, offs_t address, UINT16 data, int apply_translation);
-void				debug_write_dword(const address_space *space, offs_t address, UINT32 data, int apply_translation);
-void				debug_write_qword(const address_space *space, offs_t address, UINT64 data, int apply_translation);
-UINT64				debug_read_opcode(UINT32 offset, int size, int arg);
+
+
+/* ----- debugger memory accessors ----- */
+
+/* return a byte from the the specified memory space */
+UINT8 debug_read_byte(const address_space *space, offs_t address, int apply_translation);
+
+/* return a word from the the specified memory space */
+UINT16 debug_read_word(const address_space *space, offs_t address, int apply_translation);
+
+/* return a dword from the the specified memory space */
+UINT32 debug_read_dword(const address_space *space, offs_t address, int apply_translation);
+
+/* return a qword from the the specified memory space */
+UINT64 debug_read_qword(const address_space *space, offs_t address, int apply_translation);
+
+/* write a byte to the specified memory space */
+void debug_write_byte(const address_space *space, offs_t address, UINT8 data, int apply_translation);
+
+/* write a word to the specified memory space */
+void debug_write_word(const address_space *space, offs_t address, UINT16 data, int apply_translation);
+
+/* write a dword to the specified memory space */
+void debug_write_dword(const address_space *space, offs_t address, UINT32 data, int apply_translation);
+
+/* write a qword to the specified memory space */
+void debug_write_qword(const address_space *space, offs_t address, UINT64 data, int apply_translation);
+
+/* read 1,2,4 or 8 bytes at the given offset from opcode space */
+UINT64 debug_read_opcode(const address_space *space, offs_t offset, int size, int arg);
 
 #endif

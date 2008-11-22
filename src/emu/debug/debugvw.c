@@ -1327,8 +1327,9 @@ static void disasm_free(debug_view *view)
 
 static offs_t disasm_back_up(int cpunum, const cpu_debug_data *cpuinfo, offs_t startpc, int numinstrs)
 {
-	int minlen = BYTE2ADDR(cpu_get_min_opcode_bytes(Machine->activecpu), cpuinfo, ADDRESS_SPACE_PROGRAM);
-	int maxlen = BYTE2ADDR(cpu_get_max_opcode_bytes(Machine->activecpu), cpuinfo, ADDRESS_SPACE_PROGRAM);
+	int minlen = BYTE2ADDR(cpu_get_min_opcode_bytes(cpuinfo->device), cpuinfo, ADDRESS_SPACE_PROGRAM);
+	int maxlen = BYTE2ADDR(cpu_get_max_opcode_bytes(cpuinfo->device), cpuinfo, ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(cpuinfo->device, ADDRESS_SPACE_PROGRAM);
 	UINT32 addrmask = cpuinfo->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
 	offs_t curpc, lastgoodpc = startpc, temppc;
 	UINT8 opbuf[1024], argbuf[1024];
@@ -1346,8 +1347,8 @@ static offs_t disasm_back_up(int cpunum, const cpu_debug_data *cpuinfo, offs_t s
 	/* prefetch the opcode bytes */
 	for (temppc = curpc; temppc < startpc; temppc++)
 	{
-		opbuf[1000 + temppc - startpc] = debug_read_opcode(temppc, 1, FALSE);
-		argbuf[1000 + temppc - startpc] = debug_read_opcode(temppc, 1, TRUE);
+		opbuf[1000 + temppc - startpc] = debug_read_opcode(space, temppc, 1, FALSE);
+		argbuf[1000 + temppc - startpc] = debug_read_opcode(space, temppc, 1, TRUE);
 	}
 
 	/* loop until we hit it */
@@ -1364,7 +1365,7 @@ static offs_t disasm_back_up(int cpunum, const cpu_debug_data *cpuinfo, offs_t s
 			/* get the disassembly, but only if mapped */
 			instlen = 1;
 			if (cpuinfo->translate == NULL || (*cpuinfo->translate)(cpuinfo->device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH_DEBUG, &pcbyte))
-				instlen = cpu_dasm(Machine->activecpu, dasmbuffer, testpc & addrmask, &opbuf[1000 + testpc - startpc], &argbuf[1000 + testpc - startpc]) & DASMFLAG_LENGTHMASK;
+				instlen = cpu_dasm(cpuinfo->device, dasmbuffer, testpc & addrmask, &opbuf[1000 + testpc - startpc], &argbuf[1000 + testpc - startpc]) & DASMFLAG_LENGTHMASK;
 
 			/* count this one */
 			instcount++;
@@ -1390,8 +1391,8 @@ static offs_t disasm_back_up(int cpunum, const cpu_debug_data *cpuinfo, offs_t s
 		/* prefetch the opcode bytes */
 		for (temppc = nextcurpc; temppc < curpc; temppc++)
 		{
-			opbuf[1000 + temppc - startpc] = debug_read_opcode(temppc, 1, FALSE);
-			argbuf[1000 + temppc - startpc] = debug_read_opcode(temppc, 1, TRUE);
+			opbuf[1000 + temppc - startpc] = debug_read_opcode(space, temppc, 1, FALSE);
+			argbuf[1000 + temppc - startpc] = debug_read_opcode(space, temppc, 1, TRUE);
 		}
 
 		/* update curpc once we're done fetching */
@@ -1409,6 +1410,7 @@ static offs_t disasm_back_up(int cpunum, const cpu_debug_data *cpuinfo, offs_t s
 
 static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const cpu_debug_data *cpuinfo, int minbytes, char *string, int maxchars, int encrypted)
 {
+	const address_space *space = cpu_get_address_space(cpuinfo->device, ADDRESS_SPACE_PROGRAM);
 	int byte, offset = 0;
 	UINT64 val;
 
@@ -1416,32 +1418,32 @@ static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const cpu_debug_d
 	{
 		case 1:
 			if (maxchars >= 2)
-				offset = sprintf(string, "%02X", (UINT32)debug_read_opcode(pcbyte, 1, FALSE));
+				offset = sprintf(string, "%02X", (UINT32)debug_read_opcode(space, pcbyte, 1, FALSE));
 			for (byte = 1; byte < numbytes && offset + 3 < maxchars; byte++)
-				offset += sprintf(&string[offset], " %02X", (UINT32)debug_read_opcode(pcbyte + byte, 1, encrypted));
+				offset += sprintf(&string[offset], " %02X", (UINT32)debug_read_opcode(space, pcbyte + byte, 1, encrypted));
 			break;
 
 		case 2:
 			if (maxchars >= 4)
-				offset = sprintf(string, "%04X", (UINT32)debug_read_opcode(pcbyte, 2, FALSE));
+				offset = sprintf(string, "%04X", (UINT32)debug_read_opcode(space, pcbyte, 2, FALSE));
 			for (byte = 2; byte < numbytes && offset + 5 < maxchars; byte += 2)
-				offset += sprintf(&string[offset], " %04X", (UINT32)debug_read_opcode(pcbyte + byte, 2, encrypted));
+				offset += sprintf(&string[offset], " %04X", (UINT32)debug_read_opcode(space, pcbyte + byte, 2, encrypted));
 			break;
 
 		case 4:
 			if (maxchars >= 8)
-				offset = sprintf(string, "%08X", (UINT32)debug_read_opcode(pcbyte, 4, FALSE));
+				offset = sprintf(string, "%08X", (UINT32)debug_read_opcode(space, pcbyte, 4, FALSE));
 			for (byte = 4; byte < numbytes && offset + 9 < maxchars; byte += 4)
-				offset += sprintf(&string[offset], " %08X", (UINT32)debug_read_opcode(pcbyte + byte, 4, encrypted));
+				offset += sprintf(&string[offset], " %08X", (UINT32)debug_read_opcode(space, pcbyte + byte, 4, encrypted));
 			break;
 
 		case 8:
-			val = debug_read_opcode(pcbyte, 8, FALSE);
+			val = debug_read_opcode(space, pcbyte, 8, FALSE);
 			if (maxchars >= 16)
 				offset = sprintf(string, "%08X%08X", (UINT32)(val >> 32), (UINT32)val);
 			for (byte = 8; byte < numbytes && offset + 17 < maxchars; byte += 8)
 			{
-				val = debug_read_opcode(pcbyte + byte, 8, encrypted);
+				val = debug_read_opcode(space, pcbyte + byte, 8, encrypted);
 				offset += sprintf(&string[offset], " %08X%08X", (UINT32)(val >> 32), (UINT32)val);
 			}
 			break;
@@ -1483,13 +1485,13 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 	dasmdata->divider2 = dasmdata->divider1 + 1 + dasmdata->dasm_width + 1;
 
 	/* determine how many bytes we might need to display */
-	minbytes = cpu_get_min_opcode_bytes(Machine->activecpu);
-	maxbytes = cpu_get_max_opcode_bytes(Machine->activecpu);
+	minbytes = cpu_get_min_opcode_bytes(cpuinfo->device);
+	maxbytes = cpu_get_max_opcode_bytes(cpuinfo->device);
 
 	/* set the width of the third column according to display mode */
 	if (dasmdata->right_column == DVP_DASM_RIGHTCOL_RAW || dasmdata->right_column == DVP_DASM_RIGHTCOL_ENCRYPTED)
 	{
-		chunksize = cpu_get_databus_width(Machine->activecpu, ADDRESS_SPACE_PROGRAM) / 8;
+		chunksize = cpu_get_databus_width(cpuinfo->device, ADDRESS_SPACE_PROGRAM) / 8;
 		maxbytes_clamped = maxbytes;
 		if (maxbytes_clamped > DASM_MAX_BYTES)
 			maxbytes_clamped = DASM_MAX_BYTES;
@@ -1548,12 +1550,12 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 			/* fetch the bytes up to the maximum */
 			for (numbytes = 0; numbytes < maxbytes; numbytes++)
 			{
-				opbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, FALSE);
-				argbuf[numbytes] = debug_read_opcode(pcbyte + numbytes, 1, TRUE);
+				opbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, FALSE);
+				argbuf[numbytes] = debug_read_opcode(space, pcbyte + numbytes, 1, TRUE);
 			}
 
 			/* disassemble the result */
-			pc += numbytes = cpu_dasm(Machine->activecpu, buffer, pc & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+			pc += numbytes = cpu_dasm(cpuinfo->device, buffer, pc & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
 		}
 		else
 			sprintf(buffer, "<unmapped>");
@@ -1571,7 +1573,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 			offs_t comment_address = BYTE2ADDR(dasmdata->address[instr], cpuinfo, ADDRESS_SPACE_PROGRAM) ;
 
 			/* get and add the comment */
-			if (debug_comment_get_text(Machine->activecpu, comment_address, debug_comment_get_opcode_crc32(Machine->activecpu, comment_address)) != 0x00)
+			if (debug_comment_get_text(cpuinfo->device, comment_address, debug_comment_get_opcode_crc32(cpuinfo->device, comment_address)) != 0x00)
 			{
 				int i ;
 				char bob[DEBUG_COMMENT_MAX_LINE_LENGTH] ;
@@ -1583,7 +1585,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 					destbuf[dasmdata->divider2+i] = pre[i] ;
 
 				// Stick in the comment itself
-				strcpy(bob, debug_comment_get_text(Machine->activecpu, comment_address, debug_comment_get_opcode_crc32(Machine->activecpu, comment_address))) ;
+				strcpy(bob, debug_comment_get_text(cpuinfo->device, comment_address, debug_comment_get_opcode_crc32(cpuinfo->device, comment_address))) ;
 				for (i = 0; i < (dasmdata->allocated_cols - dasmdata->divider2 - strlen(pre) - 1); i++)
 					destbuf[dasmdata->divider2+i+strlen(pre)] = bob[i] ;
 			}
@@ -1598,7 +1600,7 @@ static int disasm_recompute(debug_view *view, offs_t pc, int startline, int line
 
 	/* reset the opcode base */
 	if (dasmdata->cpunum == original_cpunum)
-		change_pc(cpu_get_physical_pc_byte(Machine->activecpu));
+		change_pc(cpu_get_physical_pc_byte(cpuinfo->device));
 
 	/* update opcode base information */
 	dasmdata->last_direct_decrypted = space->direct.decrypted;

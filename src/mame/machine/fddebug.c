@@ -949,7 +949,7 @@ static void execute_fdignore(running_machine *machine, int ref, int params, cons
 
 	/* if no parameter given, implicitly run as well */
 	if (params == 0)
-		debug_cpu_go(~0);
+		debug_cpu_go(machine, ~0);
 }
 
 
