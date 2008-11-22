@@ -10,7 +10,6 @@
 ****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "h8.h"
 #include "h8priv.h"
 
@@ -240,7 +239,7 @@ static CPU_INIT(h8bit)
 	state_save_register_item("H8/300", device->tag, 0, h8->h8TSTR);
 	state_save_register_item_array("H8/300", device->tag, 0, h8->h8TCNT);
 
-	state_save_register_postload(Machine, h8_onstateload, h8);
+	state_save_register_postload(h8->device->machine, h8_onstateload, h8);
 }
 
 static CPU_RESET(h8bit)
