@@ -323,6 +323,7 @@ field:      X address   D           Function    Y address   D (part 2)
       another track.
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "apexc.h"
@@ -339,6 +340,10 @@ typedef struct
 
 	int running;	/* 1 flag: */
 				/* running: flag implied by the existence of the stop instruction */
+
+	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 } apexc_regs;
 
 static apexc_regs apexc;
@@ -447,12 +452,12 @@ static void word_write(int address, UINT32 data, UINT32 mask)
 
 static int papertape_read(void)
 {
-	return io_read_byte_8be(0) & 0x1f;
+	return memory_read_byte_8be(apexc.io, 0) & 0x1f;
 }
 
 static void papertape_punch(int data)
 {
-	io_write_byte_8be(0, data);
+	memory_write_byte_8be(apexc.io, 0, data);
 }
 
 /*
@@ -769,6 +774,9 @@ special_fetch:
 
 static CPU_INIT( apexc )
 {
+	apexc.device = device;
+	apexc.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	apexc.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 static CPU_RESET( apexc )

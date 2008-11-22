@@ -3,6 +3,7 @@
 #ifndef __I386_H__
 #define __I386_H__
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 
 #define I386OP(XX)		i386_##XX
@@ -251,6 +252,8 @@ typedef struct {
 	UINT8 irq_state;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	UINT32 a20_mask;
 
 	int cpuid_max_input_value_eax;
@@ -361,8 +364,8 @@ INLINE int translate_address(UINT32 *address)
 	UINT32 offset = a & 0xfff;
 
 	// TODO: 4MB pages
-	UINT32 page_dir = program_read_dword_32le(pdbr + directory * 4);
-	UINT32 page_entry = program_read_dword_32le((page_dir & 0xfffff000) + (table * 4));
+	UINT32 page_dir = memory_read_dword_32le(I.program, pdbr + directory * 4);
+	UINT32 page_entry = memory_read_dword_32le(I.program, (page_dir & 0xfffff000) + (table * 4));
 
 	*address = (page_entry & 0xfffff000) | offset;
 	return 1;
@@ -410,7 +413,7 @@ INLINE UINT8 FETCH(void)
 		translate_address(&address);
 	}
 
-	value = program_decrypted_read_byte(address & I.a20_mask);
+	value = memory_decrypted_read_byte(I.program, address & I.a20_mask);
 	I.eip++;
 	I.pc++;
 	return value;
@@ -427,11 +430,11 @@ INLINE UINT16 FETCH16(void)
 
 	if( address & 0x1 ) {		/* Unaligned read */
 		address &= I.a20_mask;
-		value = (program_decrypted_read_byte(address+0) << 0) |
-				(program_decrypted_read_byte(address+1) << 8);
+		value = (memory_decrypted_read_byte(I.program, address+0) << 0) |
+				(memory_decrypted_read_byte(I.program, address+1) << 8);
 	} else {
 		address &= I.a20_mask;
-		value = program_decrypted_read_word(address);
+		value = memory_decrypted_read_word(I.program, address);
 	}
 	I.eip += 2;
 	I.pc += 2;
@@ -449,13 +452,13 @@ INLINE UINT32 FETCH32(void)
 
 	if( I.pc & 0x3 ) {		/* Unaligned read */
 		address &= I.a20_mask;
-		value = (program_decrypted_read_byte(address+0) << 0) |
-				(program_decrypted_read_byte(address+1) << 8) |
-				(program_decrypted_read_byte(address+2) << 16) |
-				(program_decrypted_read_byte(address+3) << 24);
+		value = (memory_decrypted_read_byte(I.program, address+0) << 0) |
+				(memory_decrypted_read_byte(I.program, address+1) << 8) |
+				(memory_decrypted_read_byte(I.program, address+2) << 16) |
+				(memory_decrypted_read_byte(I.program, address+3) << 24);
 	} else {
 		address &= I.a20_mask;
-		value = program_decrypted_read_dword(address);
+		value = memory_decrypted_read_dword(I.program, address);
 	}
 	I.eip += 4;
 	I.pc += 4;
@@ -472,7 +475,7 @@ INLINE UINT8 READ8(UINT32 ea)
 	}
 
 	address &= I.a20_mask;
-	return program_read_byte_32le(address);
+	return memory_read_byte_32le(I.program, address);
 }
 INLINE UINT16 READ16(UINT32 ea)
 {
@@ -486,10 +489,10 @@ INLINE UINT16 READ16(UINT32 ea)
 
 	address &= I.a20_mask;
 	if( ea & 0x1 ) {		/* Unaligned read */
-		value = (program_read_byte_32le( address+0 ) << 0) |
-				(program_read_byte_32le( address+1 ) << 8);
+		value = (memory_read_byte_32le( I.program, address+0 ) << 0) |
+				(memory_read_byte_32le( I.program, address+1 ) << 8);
 	} else {
-		value = program_read_word_32le( address );
+		value = memory_read_word_32le( I.program, address );
 	}
 	return value;
 }
@@ -505,12 +508,12 @@ INLINE UINT32 READ32(UINT32 ea)
 
 	address &= I.a20_mask;
 	if( ea & 0x3 ) {		/* Unaligned read */
-		value = (program_read_byte_32le( address+0 ) << 0) |
-				(program_read_byte_32le( address+1 ) << 8) |
-				(program_read_byte_32le( address+2 ) << 16) |
-				(program_read_byte_32le( address+3 ) << 24);
+		value = (memory_read_byte_32le( I.program, address+0 ) << 0) |
+				(memory_read_byte_32le( I.program, address+1 ) << 8) |
+				(memory_read_byte_32le( I.program, address+2 ) << 16) |
+				(memory_read_byte_32le( I.program, address+3 ) << 24);
 	} else {
-		value = program_read_dword_32le( address );
+		value = memory_read_dword_32le( I.program, address );
 	}
 	return value;
 }
@@ -527,17 +530,17 @@ INLINE UINT64 READ64(UINT32 ea)
 
 	address &= I.a20_mask;
 	if( ea & 0x7 ) {		/* Unaligned read */
-		value = (((UINT64) program_read_byte_32le( address+0 )) << 0) |
-				(((UINT64) program_read_byte_32le( address+1 )) << 8) |
-				(((UINT64) program_read_byte_32le( address+2 )) << 16) |
-				(((UINT64) program_read_byte_32le( address+3 )) << 24) |
-				(((UINT64) program_read_byte_32le( address+4 )) << 32) |
-				(((UINT64) program_read_byte_32le( address+5 )) << 40) |
-				(((UINT64) program_read_byte_32le( address+6 )) << 48) |
-				(((UINT64) program_read_byte_32le( address+7 )) << 56);
+		value = (((UINT64) memory_read_byte_32le( I.program, address+0 )) << 0) |
+				(((UINT64) memory_read_byte_32le( I.program, address+1 )) << 8) |
+				(((UINT64) memory_read_byte_32le( I.program, address+2 )) << 16) |
+				(((UINT64) memory_read_byte_32le( I.program, address+3 )) << 24) |
+				(((UINT64) memory_read_byte_32le( I.program, address+4 )) << 32) |
+				(((UINT64) memory_read_byte_32le( I.program, address+5 )) << 40) |
+				(((UINT64) memory_read_byte_32le( I.program, address+6 )) << 48) |
+				(((UINT64) memory_read_byte_32le( I.program, address+7 )) << 56);
 	} else {
-		value = (((UINT64) program_read_dword_32le( address+0 )) << 0) |
-				(((UINT64) program_read_dword_32le( address+4 )) << 32);
+		value = (((UINT64) memory_read_dword_32le( I.program, address+0 )) << 0) |
+				(((UINT64) memory_read_dword_32le( I.program, address+4 )) << 32);
 	}
 	return value;
 }
@@ -552,7 +555,7 @@ INLINE void WRITE8(UINT32 ea, UINT8 value)
 	}
 
 	address &= I.a20_mask;
-	program_write_byte_32le(address, value);
+	memory_write_byte_32le(I.program, address, value);
 }
 INLINE void WRITE16(UINT32 ea, UINT16 value)
 {
@@ -565,10 +568,10 @@ INLINE void WRITE16(UINT32 ea, UINT16 value)
 
 	address &= I.a20_mask;
 	if( ea & 0x1 ) {		/* Unaligned write */
-		program_write_byte_32le( address+0, value & 0xff );
-		program_write_byte_32le( address+1, (value >> 8) & 0xff );
+		memory_write_byte_32le( I.program, address+0, value & 0xff );
+		memory_write_byte_32le( I.program, address+1, (value >> 8) & 0xff );
 	} else {
-		program_write_word_32le(address, value);
+		memory_write_word_32le(I.program, address, value);
 	}
 }
 INLINE void WRITE32(UINT32 ea, UINT32 value)
@@ -582,12 +585,12 @@ INLINE void WRITE32(UINT32 ea, UINT32 value)
 
 	ea &= I.a20_mask;
 	if( ea & 0x3 ) {		/* Unaligned write */
-		program_write_byte_32le( address+0, value & 0xff );
-		program_write_byte_32le( address+1, (value >> 8) & 0xff );
-		program_write_byte_32le( address+2, (value >> 16) & 0xff );
-		program_write_byte_32le( address+3, (value >> 24) & 0xff );
+		memory_write_byte_32le( I.program, address+0, value & 0xff );
+		memory_write_byte_32le( I.program, address+1, (value >> 8) & 0xff );
+		memory_write_byte_32le( I.program, address+2, (value >> 16) & 0xff );
+		memory_write_byte_32le( I.program, address+3, (value >> 24) & 0xff );
 	} else {
-		program_write_dword_32le(address, value);
+		memory_write_dword_32le(I.program, address, value);
 	}
 }
 
@@ -602,17 +605,17 @@ INLINE void WRITE64(UINT32 ea, UINT64 value)
 
 	ea &= I.a20_mask;
 	if( ea & 0x7 ) {		/* Unaligned write */
-		program_write_byte_32le( address+0, value & 0xff );
-		program_write_byte_32le( address+1, (value >> 8) & 0xff );
-		program_write_byte_32le( address+2, (value >> 16) & 0xff );
-		program_write_byte_32le( address+3, (value >> 24) & 0xff );
-		program_write_byte_32le( address+4, (value >> 32) & 0xff );
-		program_write_byte_32le( address+5, (value >> 40) & 0xff );
-		program_write_byte_32le( address+6, (value >> 48) & 0xff );
-		program_write_byte_32le( address+7, (value >> 56) & 0xff );
+		memory_write_byte_32le( I.program, address+0, value & 0xff );
+		memory_write_byte_32le( I.program, address+1, (value >> 8) & 0xff );
+		memory_write_byte_32le( I.program, address+2, (value >> 16) & 0xff );
+		memory_write_byte_32le( I.program, address+3, (value >> 24) & 0xff );
+		memory_write_byte_32le( I.program, address+4, (value >> 32) & 0xff );
+		memory_write_byte_32le( I.program, address+5, (value >> 40) & 0xff );
+		memory_write_byte_32le( I.program, address+6, (value >> 48) & 0xff );
+		memory_write_byte_32le( I.program, address+7, (value >> 56) & 0xff );
 	} else {
-		program_write_dword_32le(address+0, value & 0xffffffff);
-		program_write_dword_32le(address+4, (value >> 32) & 0xffffffff);
+		memory_write_dword_32le(I.program, address+0, value & 0xffffffff);
+		memory_write_dword_32le(I.program, address+4, (value >> 32) & 0xffffffff);
 	}
 }
 
@@ -893,11 +896,11 @@ INLINE void BUMP_DI(int adjustment)
 
 /***********************************************************************************/
 
-#define READPORT8(port)		       	(io_read_byte_32le(port))
-#define READPORT16(port)	       	(io_read_word_32le(port))
-#define READPORT32(port)	       	(io_read_dword_32le(port))
-#define WRITEPORT8(port, value)		(io_write_byte_32le(port, value))
-#define WRITEPORT16(port, value)	(io_write_word_32le(port, value))
-#define WRITEPORT32(port, value)	(io_write_dword_32le(port, value))
+#define READPORT8(port)		       	(memory_read_byte_32le(I.io, port))
+#define READPORT16(port)	       	(memory_read_word_32le(I.io, port))
+#define READPORT32(port)	       	(memory_read_dword_32le(I.io, port))
+#define WRITEPORT8(port, value)		(memory_write_byte_32le(I.io, port, value))
+#define WRITEPORT16(port, value)	(memory_write_word_32le(I.io, port, value))
+#define WRITEPORT32(port, value)	(memory_write_dword_32le(I.io, port, value))
 
 #endif /* __I386_H__ */

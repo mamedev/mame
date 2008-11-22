@@ -47,26 +47,26 @@ extern CPU_GET_INFO( alpha8301 );
 /*
  *   Read a UINT8 from given memory location
  */
-#define ALPHA8201_RDMEM(A) ((unsigned)program_read_byte_8le(A))
+#define ALPHA8201_RDMEM(A) ((unsigned)memory_read_byte_8le(R.program, A))
 
 /*
  *   Write a UINT8 to given memory location
  */
-#define ALPHA8201_WRMEM(A,V) (program_write_byte_8le(A,V))
+#define ALPHA8201_WRMEM(A,V) (memory_write_byte_8le(R.program, A,V))
 
 /*
  *   ALPHA8201_RDOP() is identical to ALPHA8201_RDMEM() except it is used for reading
  *   opcodes. In case of system with memory mapped I/O, this function can be
  *   used to greatly speed up emulation
  */
-#define ALPHA8201_RDOP(A) ((unsigned)program_decrypted_read_byte(A))
+#define ALPHA8201_RDOP(A) ((unsigned)memory_decrypted_read_byte(R.program, A))
 
 /*
  *   ALPHA8201_RDOP_ARG() is identical to ALPHA8201_RDOP() except it is used for reading
  *   opcode arguments. This difference can be used to support systems that
  *   use different encoding mechanisms for opcodes and opcode arguments
  */
-#define ALPHA8201_RDOP_ARG(A) ((unsigned)program_raw_read_byte(A))
+#define ALPHA8201_RDOP_ARG(A) ((unsigned)memory_raw_read_byte(R.program, A))
 
 CPU_DISASSEMBLE( ALPHA8201 );
 

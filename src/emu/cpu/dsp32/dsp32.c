@@ -27,6 +27,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "dsp32.h"
@@ -212,17 +213,17 @@ static int dsp32_icount;
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)			program_decrypted_read_dword(pc)
+#define ROPCODE(pc)			memory_decrypted_read_dword(dsp32.program, pc)
 
-#define RBYTE(addr)			program_read_byte_32le(addr)
-#define WBYTE(addr,data)	program_write_byte_32le((addr), data)
+#define RBYTE(addr)			memory_read_byte_32le(dsp32.program, addr)
+#define WBYTE(addr,data)	memory_write_byte_32le(dsp32.program, (addr), data)
 
 #if (!DETECT_MISALIGNED_MEMORY)
 
-#define RWORD(addr)			program_read_word_32le(addr)
-#define WWORD(addr,data)	program_write_word_32le((addr), data)
-#define RLONG(addr)			program_read_dword_32le(addr)
-#define WLONG(addr,data)	program_write_dword_32le((addr), data)
+#define RWORD(addr)			memory_read_word_32le(dsp32.program, addr)
+#define WWORD(addr,data)	memory_write_word_32le(dsp32.program, (addr), data)
+#define RLONG(addr)			memory_read_dword_32le(dsp32.program, addr)
+#define WLONG(addr,data)	memory_write_dword_32le(dsp32.program, (addr), data)
 
 #else
 
@@ -230,7 +231,7 @@ INLINE UINT16 RWORD(offs_t addr)
 {
 	UINT16 data;
 	if (addr & 1) fprintf(stderr, "Unaligned word read @ %06X, PC=%06X\n", addr, dsp32.PC);
-	data = program_read_word_32le(addr);
+	data = memory_read_word_32le(dsp32.program, addr);
 	return data;
 }
 
@@ -238,20 +239,20 @@ INLINE UINT32 RLONG(offs_t addr)
 {
 	UINT32 data;
 	if (addr & 3) fprintf(stderr, "Unaligned long read @ %06X, PC=%06X\n", addr, dsp32.PC);
-	data = program_write_word_32le(addr);
+	data = memory_write_word_32le(dsp32.program, addr);
 	return data;
 }
 
 INLINE void WWORD(offs_t addr, UINT16 data)
 {
 	if (addr & 1) fprintf(stderr, "Unaligned word write @ %06X, PC=%06X\n", addr, dsp32.PC);
-	program_read_dword_32le((addr), data);
+	memory_read_dword_32le(dsp32.program, (addr), data);
 }
 
 INLINE void WLONG(offs_t addr, UINT32 data)
 {
 	if (addr & 3) fprintf(stderr, "Unaligned long write @ %06X, PC=%06X\n", addr, dsp32.PC);
-	program_write_dword_32le((addr), data);
+	memory_write_dword_32le(dsp32.program, (addr), data);
 }
 
 #endif
@@ -357,7 +358,7 @@ static CPU_INIT( dsp32c )
 		dsp32.output_pins_changed = configdata->output_pins_changed;
 
 	dsp32.device = device;
-	dsp32.program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	dsp32.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 

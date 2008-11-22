@@ -81,32 +81,30 @@ CPU_GET_INFO( gms30c2232 );
 
 extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, unsigned h_flag, int private_fp);
 
-extern int hyp_type_16bit;
-
 /* Memory access */
 /* read byte */
-#define READ_B(addr)           ((*hyp_cpu_read_byte)(addr))
+#define READ_B(addr)           memory_read_byte(hyperstone.program, (addr))
 /* read half-word */
-#define READ_HW(addr)          ((*hyp_cpu_read_half_word)((addr) & ~1))
+#define READ_HW(addr)          memory_read_word(hyperstone.program, (addr) & ~1)
 /* read word */
-#define READ_W(addr)           ((*hyp_cpu_read_word)((addr) & ~3))
+#define READ_W(addr)           memory_read_dword(hyperstone.program, (addr) & ~3)
 
 /* write byte */
-#define WRITE_B(addr, data)    ((*hyp_cpu_write_byte)(addr, data))
+#define WRITE_B(addr, data)    memory_write_byte(hyperstone.program, addr, data)
 /* write half-word */
-#define WRITE_HW(addr, data)   ((*hyp_cpu_write_half_word)((addr) & ~1, data))
+#define WRITE_HW(addr, data)   memory_write_word(hyperstone.program, (addr) & ~1, data)
 /* write word */
-#define WRITE_W(addr, data)    ((*hyp_cpu_write_word)((addr) & ~3, data))
+#define WRITE_W(addr, data)    memory_write_dword(hyperstone.program, (addr) & ~3, data)
 
 
 /* I/O access */
 /* read word */
-#define IO_READ_W(addr)        ((*hyp_cpu_read_io_word)(((addr) >> 11) & 0x7ffc))
+#define IO_READ_W(addr)        memory_read_dword(hyperstone.io, ((addr) >> 11) & 0x7ffc)
 /* write word */
-#define IO_WRITE_W(addr, data) ((*hyp_cpu_write_io_word)(((addr) >> 11) & 0x7ffc, data))
+#define IO_WRITE_W(addr, data) memory_write_dword(hyperstone.io, ((addr) >> 11) & 0x7ffc, data)
 
 
-#define READ_OP(addr)	       (program_decrypted_read_word(hyp_type_16bit ? addr: WORD_XOR_BE(addr)))
+#define READ_OP(addr)	       memory_decrypted_read_word(hyperstone.program, (addr) ^ hyperstone.opcodexor)
 
 
 /* Registers Number */

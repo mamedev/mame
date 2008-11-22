@@ -10,6 +10,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "cubeqcpu.h"
@@ -127,6 +128,9 @@ typedef struct
 
 	void (*dac_w)(UINT16 data);
 	UINT16 *sound_data;
+	
+	const device_config *device;
+	const address_space *program;
 } cquestsnd_state;
 
 
@@ -163,6 +167,9 @@ typedef struct
 	UINT8 wc;
 	UINT8 rc;
 	UINT8 clkcnt;
+	
+	const device_config *device;
+	const address_space *program;
 } cquestrot_state;
 
 
@@ -204,6 +211,9 @@ typedef struct
 	UINT8	*ptr_ram;
 	UINT32	*e_stack;
 	UINT32	*o_stack;
+	
+	const device_config *device;
+	const address_space *program;
 
 } cquestlin_state;
 
@@ -343,6 +353,9 @@ static CPU_INIT( cquestsnd )
 
 	cquestsnd.dac_w = _config->dac_w;
 	cquestsnd.sound_data = (UINT16*)memory_region(device->machine, _config->sound_data_region);
+	
+	cquestsnd.device = device;
+	cquestsnd.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* Allocate RAM shared with 68000 */
 	cquestsnd.sram = malloc(4096);
@@ -410,6 +423,9 @@ static CPU_INIT( cquestrot )
 	/* Allocate RAM */
 	cquestrot.dram = malloc(16384 * sizeof(UINT16));  /* Shared with 68000 */
 	cquestrot.sram = malloc(2048 * sizeof(UINT16));   /* Private */
+
+	cquestrot.device = device;
+	cquestrot.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	cquestrot_state_register(device, "cquestrot");
 }
@@ -489,6 +505,9 @@ static CPU_INIT( cquestlin )
 	cquestlin.e_stack = malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
 	cquestlin.o_stack = malloc(32768 * sizeof(UINT32));  /* Stack DRAM: 32kx20 */
 
+	cquestlin.device = device;
+	cquestlin.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+
 	cquestlin_state_register(device, "cquestlin");
 }
 
@@ -549,7 +568,7 @@ static CPU_EXECUTE( cquestsnd )
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = program_decrypted_read_qword(SND_PC << 3);
+		UINT64 inst = memory_decrypted_read_qword(cquestsnd.program, SND_PC << 3);
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
 
@@ -883,7 +902,7 @@ static CPU_EXECUTE( cquestrot )
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = program_decrypted_read_qword(ROT_PC << 3);
+		UINT64 inst = memory_decrypted_read_qword(cquestrot.program, ROT_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
@@ -1405,7 +1424,7 @@ static CPU_EXECUTE( cquestlin )
 		/* Are we executing the foreground or backgroud program? */
 		int prog = (cquestlin.clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
-		UINT64 inst = program_decrypted_read_qword(LINE_PC << 3);
+		UINT64 inst = memory_decrypted_read_qword(cquestlin.program, LINE_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;

@@ -17,6 +17,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include <stddef.h>
 #include "cpuintrf.h"
 #include "mame.h"
@@ -145,7 +146,7 @@ drcfe_state *drcfe_init(const device_config *cpu, const drcfe_config *config, vo
 
 	/* initialize the state */
 	drcfe->device = cpu;
-	drcfe->program = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
+	drcfe->program = memory_find_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->pageshift = cpu_get_page_shift(cpu, ADDRESS_SPACE_PROGRAM);
 	drcfe->translate = (cpu_translate_func)cpu_get_info_fct(cpu, CPUINFO_PTR_TRANSLATE);
 #ifdef LSB_FIRST
@@ -302,7 +303,7 @@ static opcode_desc *describe_one(drcfe_state *drcfe, offs_t curpc, const opcode_
 
 	/* get a pointer to the physical address */
 	change_pc(desc->physpc);
-	desc->opptr.v = program_decrypted_read_ptr(desc->physpc ^ drcfe->codexor);
+	desc->opptr.v = memory_decrypted_read_ptr(drcfe->program, desc->physpc ^ drcfe->codexor);
 	assert(desc->opptr.v != NULL);
 	if (desc->opptr.v == NULL)
 	{

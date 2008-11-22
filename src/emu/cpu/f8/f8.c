@@ -26,6 +26,7 @@
    added interrupt functionality
  */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "f8.h"
 
@@ -51,6 +52,8 @@ typedef struct {
     UINT16  irq_vector;
     cpu_irq_callback irq_callback;
     const device_config *device;
+    const address_space *program;
+    const address_space *iospace;
     UINT8   r[64];  /* scratchpad RAM */
     int     irq_request;
 }	f8_Regs;
@@ -109,7 +112,7 @@ static void ROMC_00(int insttim)	/* SKR - added parameter to tell if  */
      * of PC0.
      */
 
-	f8.dbus = program_decrypted_read_byte(f8.pc0);
+	f8.dbus = memory_decrypted_read_byte(f8.program, f8.pc0);
     f8.pc0 += 1;
     f8_icount -= insttim;	/* SKR - ROMC00 is usually short, not short+long, */
                             /* but DS is long */
@@ -123,7 +126,7 @@ static void ROMC_01(void)
      * location addressed by PC0; then all devices add the 8-bit value
      * on the data bus as signed binary number to PC0.
      */
-	f8.dbus = program_raw_read_byte(f8.pc0);
+	f8.dbus = memory_raw_read_byte(f8.program, f8.pc0);
 	f8.pc0 += (INT8)f8.dbus;
     f8_icount -= cL;
 }
@@ -136,7 +139,7 @@ static void ROMC_02(void)
      * the memory location addressed by DC0; then all devices increment
      * DC0.
      */
-    f8.dbus = program_read_byte_8be(f8.dc0);
+    f8.dbus = memory_read_byte_8be(f8.program, f8.dc0);
     f8.dc0 += 1;
     f8_icount -= cL;
 }
@@ -147,7 +150,7 @@ static void ROMC_03(int insttim)	/* SKR - added parameter to tell if  */
      * Similiar to 0x00, except that it is used for immediate operands
      * fetches (using PC0) instead of instruction fetches.
      */
-    f8.dbus = f8.io = program_raw_read_byte(f8.pc0);
+    f8.dbus = f8.io = memory_raw_read_byte(f8.program, f8.pc0);
     f8.pc0 += 1;
     f8_icount -= insttim;
 }
@@ -167,7 +170,7 @@ static void ROMC_05(void)
      * Store the data bus contents into the memory location pointed
      * to by DC0; increment DC0.
      */
-    program_write_byte_8be(f8.dc0, f8.dbus);
+    memory_write_byte_8be(f8.program, f8.dc0, f8.dbus);
     f8.dc0 += 1;
     f8_icount -= cL;
 }
@@ -241,7 +244,7 @@ static void ROMC_0C(void)
      * by PC0 into the data bus; then all devices move the value that
      * has just been placed on the data bus into the low order byte of PC0.
      */
-    f8.dbus = program_raw_read_byte(f8.pc0);
+    f8.dbus = memory_raw_read_byte(f8.program, f8.pc0);
     f8.pc0 = (f8.pc0 & 0xff00) | f8.dbus;
     f8_icount -= cL;
 }
@@ -264,7 +267,7 @@ static void ROMC_0E(void)
      * The value on the data bus is then moved to the low order byte
      * of DC0 by all devices.
      */
-    f8.dbus = program_raw_read_byte(f8.pc0);
+    f8.dbus = memory_raw_read_byte(f8.program, f8.pc0);
     f8.dc0 = (f8.dc0 & 0xff00) | f8.dbus;
     f8_icount -= cL;
 }
@@ -304,7 +307,7 @@ static void ROMC_11(void)
      * data bus. All devices must then move the contents of the
      * data bus to the upper byte of DC0.
      */
-    f8.dbus = program_raw_read_byte(f8.pc0);
+    f8.dbus = memory_raw_read_byte(f8.program, f8.pc0);
 	f8.dc0 = (f8.dc0 & 0x00ff) | (f8.dbus << 8);
     f8_icount -= cL;
 }
@@ -403,7 +406,7 @@ static void ROMC_1A(void)
      * register was addressed; the device containing the addressed port
      * must place the contents of the data bus into the address port.
      */
-    io_write_byte_8be(f8.io, f8.dbus);
+    memory_write_byte_8be(f8.iospace, f8.io, f8.dbus);
     f8_icount -= cL;
 }
 
@@ -416,7 +419,7 @@ static void ROMC_1B(void)
      * contents of timer and interrupt control registers cannot be read
      * back onto the data bus).
      */
-	f8.dbus = io_read_byte_8be(f8.io);
+	f8.dbus = memory_read_byte_8be(f8.iospace, f8.io);
     f8_icount -= cL;
 }
 
@@ -1258,7 +1261,7 @@ static void f8_ins_0(int n)
 {
     ROMC_1C(cS);
     CLR_OZCS;
-    f8.a = io_read_byte_8be(n);
+    f8.a = memory_read_byte_8be(f8.iospace, n);
     SET_SZ(f8.a);
 }
 
@@ -1283,7 +1286,7 @@ static void f8_ins_1(int n)
 static void f8_outs_0(int n)
 {
     ROMC_1C(cS);
-    io_write_byte_8be(n, f8.a);
+    memory_write_byte_8be(f8.iospace, n, f8.a);
 }
 
 /***************************************************
@@ -1540,6 +1543,8 @@ static CPU_RESET( f8 )
 	memset(&f8, 0, sizeof(f8_Regs));
 	f8.irq_callback = save_callback;
 	f8.device = device;
+	f8.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	f8.iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
     f8.w&=~I;
 
 	/* save PC0 to PC1 and reset PC0 */
@@ -1898,6 +1903,8 @@ static CPU_INIT( f8 )
 {
 	f8.irq_callback = irqcallback;
 	f8.device = device;
+	f8.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	f8.iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 static CPU_SET_INFO( f8 )
@@ -1908,14 +1915,14 @@ static CPU_SET_INFO( f8 )
 	case CPUINFO_INT_SP:			f8.pc1 = info->i;						break;
 	case CPUINFO_INT_PC:
 		f8.pc0 = info->i;
-		f8.dbus = program_decrypted_read_byte(f8.pc0);
+		f8.dbus = memory_decrypted_read_byte(f8.program, f8.pc0);
     	f8.pc0 += 1;
   		break;
 	case CPUINFO_INT_PREVIOUSPC:	break;	/* TODO? */
 	case CPUINFO_INT_INPUT_STATE:		f8.irq_request = info->i;				break;
 	case CPUINFO_INT_REGISTER + F8_PC0:
 		f8.pc0 = info->i;
-		f8.dbus = program_decrypted_read_byte(f8.pc0);
+		f8.dbus = memory_decrypted_read_byte(f8.program, f8.pc0);
     	f8.pc0 += 1;
 		break;
 	case CPUINFO_INT_REGISTER + F8_PC1: f8.pc1 = info->i; break;

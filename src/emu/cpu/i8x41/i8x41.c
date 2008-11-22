@@ -114,6 +114,7 @@
 
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "i8x41.h"
 
@@ -137,19 +138,22 @@ struct _upi41_state_t {
 	UINT8	ram_mask;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *data;
+	const address_space *io;
 	int		icount;
 };
 
-#define RM(a)	program_read_byte_8le(a)
+#define RM(s,a)	memory_read_byte_8le((s)->program, a)
 
-#define IRAM_R(a)	data_read_byte_8le((a) & upi41_state->ram_mask)
-#define IRAM_W(a,v) data_write_byte_8le((a)  & upi41_state->ram_mask, v)
+#define IRAM_R(s,a)	memory_read_byte_8le((s)->data, (a) & upi41_state->ram_mask)
+#define IRAM_W(s,a,v) memory_write_byte_8le((s)->data, (a)  & upi41_state->ram_mask, v)
 
-#define RP(a)	io_read_byte_8le(a)
-#define WP(a,v) io_write_byte_8le(a,v)
+#define RP(s,a)	memory_read_byte_8le((s)->io, a)
+#define WP(s,a,v) memory_write_byte_8le((s)->io, a,v)
 
-#define ROP(pc) program_decrypted_read_byte(pc)
-#define ROP_ARG(pc) program_raw_read_byte(pc)
+#define ROP(s,pc) memory_decrypted_read_byte((s)->program, pc)
+#define ROP_ARG(s,pc) memory_raw_read_byte((s)->program, pc)
 
 /* PC vectors */
 #define V_RESET 0x000	/* power on address */
@@ -218,8 +222,8 @@ struct _upi41_state_t {
 #define CONTROL		upi41_state->control
 
 
-#define GETR(n) (IRAM_R(((PSW & BS) ? M_BANK1:M_BANK0)+(n)))
-#define SETR(n,v) (IRAM_W(((PSW & BS) ? M_BANK1:M_BANK0)+(n), (v)))
+#define GETR(s,n) (IRAM_R((s), ((PSW & BS) ? M_BANK1:M_BANK0)+(n)))
+#define SETR(s,n,v) (IRAM_W((s), ((PSW & BS) ? M_BANK1:M_BANK0)+(n), (v)))
 
 static void set_irq_line(upi41_state_t *upi41_state, int irqline, int state);
 
@@ -229,8 +233,8 @@ static void set_irq_line(upi41_state_t *upi41_state, int irqline, int state);
 
 INLINE void push_pc_to_stack(upi41_state_t *upi41_state)
 {
-	IRAM_W( M_STACK + (PSW&SP) * 2 + 0, PC & 0xff);
-	IRAM_W( M_STACK + (PSW&SP) * 2 + 1, ((PC >> 8) & 0x0f) | (PSW & 0xf0) );
+	IRAM_W( upi41_state, M_STACK + (PSW&SP) * 2 + 0, PC & 0xff);
+	IRAM_W( upi41_state, M_STACK + (PSW&SP) * 2 + 1, ((PC >> 8) & 0x0f) | (PSW & 0xf0) );
 	PSW = (PSW & ~SP) | ((PSW + 1) & SP);
 }
 
@@ -839,6 +843,9 @@ static CPU_INIT( i8x41 )
 	
 	upi41_state->irq_callback = irqcallback;
 	upi41_state->device = device;
+	upi41_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	upi41_state->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	upi41_state->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	upi41_state->subtype = 8041;
 	upi41_state->ram_mask = I8X41_intRAM_MASK;
 
@@ -919,7 +926,7 @@ static CPU_EXECUTE( i8x41 )
 
 	do
 	{
-		UINT8 op = program_decrypted_read_byte(PC);
+		UINT8 op = memory_decrypted_read_byte(upi41_state->program, PC);
 
 		PPC = PC;
 
@@ -935,7 +942,7 @@ static CPU_EXECUTE( i8x41 )
 			inst_cycles = i8x41_cycles[op];
 			for ( ; inst_cycles > 0; inst_cycles-- )
 			{
-				T1_level = RP(I8X41_t1);
+				T1_level = RP(upi41_state, I8X41_t1);
 				if( (CONTROL & TEST1) && (T1_level == 0) )	/* Negative Edge */
 				{
 					upi41_state->timer++;
@@ -1112,15 +1119,15 @@ static CPU_SET_INFO( i8x41 )
 
 		case CPUINFO_INT_REGISTER + I8X41_PSW:			PSW = info->i;							break;
 		case CPUINFO_INT_REGISTER + I8X41_A:			A = info->i;							break;
-		case CPUINFO_INT_REGISTER + I8X41_T:			upi41_state->timer = info->i & 0x1fff;				break;
-		case CPUINFO_INT_REGISTER + I8X41_R0:			SETR(0, info->i);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R1:			SETR(1, info->i);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R2:			SETR(2, info->i);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R3:			SETR(3, info->i);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R4:			SETR(4, info->i);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R5:			SETR(5, info->i);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R6:			SETR(6, info->i);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R7:			SETR(7, info->i);						break;
+		case CPUINFO_INT_REGISTER + I8X41_T:			upi41_state->timer = info->i & 0x1fff;	break;
+		case CPUINFO_INT_REGISTER + I8X41_R0:			SETR(upi41_state, 0, info->i);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R1:			SETR(upi41_state, 1, info->i);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R2:			SETR(upi41_state, 2, info->i);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R3:			SETR(upi41_state, 3, info->i);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R4:			SETR(upi41_state, 4, info->i);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R5:			SETR(upi41_state, 5, info->i);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R6:			SETR(upi41_state, 6, info->i);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R7:			SETR(upi41_state, 7, info->i);			break;
 
 		case CPUINFO_INT_REGISTER + I8X41_DATA:
 			DBBI = info->i;
@@ -1135,7 +1142,7 @@ static CPU_SET_INFO( i8x41 )
 				P2_HS |= 0x20;
 				if( 0 == (STATE & OBF) ) P2_HS |= 0x10;
 				else P2_HS &= 0xef;
-				WP(0x02, (P2 & P2_HS) );	/* Assert the DBBI IRQ out on P25 */
+				WP(upi41_state, 0x02, (P2 & P2_HS) );	/* Assert the DBBI IRQ out on P25 */
 			}
 			break;
 
@@ -1160,7 +1167,7 @@ static CPU_SET_INFO( i8x41 )
 				P2_HS |= 0x20;
 				if( 0 == (STATE & OBF) ) P2_HS |= 0x10;
 				else P2_HS &= 0xef;
-				WP(0x02, (P2 & P2_HS) );	/* Assert the DBBI IRQ out on P25 */
+				WP(upi41_state, 0x02, (P2 & P2_HS) );	/* Assert the DBBI IRQ out on P25 */
 			}
 			break;
 
@@ -1231,14 +1238,14 @@ CPU_GET_INFO( i8041 )
 		case CPUINFO_INT_REGISTER + I8X41_PSW:			info->i = PSW;							break;
 		case CPUINFO_INT_REGISTER + I8X41_A:			info->i = A;							break;
 		case CPUINFO_INT_REGISTER + I8X41_T:			info->i = upi41_state->timer;			break;
-		case CPUINFO_INT_REGISTER + I8X41_R0:			info->i = GETR(0);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R1:			info->i = GETR(1);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R2:			info->i = GETR(2);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R3:			info->i = GETR(3);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R4:			info->i = GETR(4);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R5:			info->i = GETR(5);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R6:			info->i = GETR(6);						break;
-		case CPUINFO_INT_REGISTER + I8X41_R7:			info->i = GETR(7);						break;
+		case CPUINFO_INT_REGISTER + I8X41_R0:			info->i = GETR(upi41_state, 0);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R1:			info->i = GETR(upi41_state, 1);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R2:			info->i = GETR(upi41_state, 2);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R3:			info->i = GETR(upi41_state, 3);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R4:			info->i = GETR(upi41_state, 4);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R5:			info->i = GETR(upi41_state, 5);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R6:			info->i = GETR(upi41_state, 6);			break;
+		case CPUINFO_INT_REGISTER + I8X41_R7:			info->i = GETR(upi41_state, 7);			break;
 
 		case CPUINFO_INT_REGISTER + I8X41_DATA:
 			STATE &= ~OBF;	/* reset the output buffer full flag */
@@ -1247,7 +1254,7 @@ CPU_GET_INFO( i8041 )
 				P2_HS &= 0xef;
 				if( STATE & IBF ) P2_HS |= 0x20;
 				else P2_HS &= 0xdf;
-				WP(0x02, (P2 & P2_HS) );	/* Clear the DBBO IRQ out on P24 */
+				WP(upi41_state, 0x02, (P2 & P2_HS) );	/* Clear the DBBO IRQ out on P24 */
 			}
 			info->i = DBBO;
 			break;
@@ -1299,14 +1306,14 @@ CPU_GET_INFO( i8041 )
 		case CPUINFO_STR_REGISTER + I8X41_PSW:			sprintf(info->s, "PSW:%02X", upi41_state->psw); break;
 		case CPUINFO_STR_REGISTER + I8X41_A:			sprintf(info->s, "A:%02X", upi41_state->a);		break;
 		case CPUINFO_STR_REGISTER + I8X41_T:			sprintf(info->s, "T:%02X.%02X", upi41_state->timer, (upi41_state->prescaler & 0x1f) ); break;
-		case CPUINFO_STR_REGISTER + I8X41_R0:			sprintf(info->s, "R0:%02X", GETR(0));			break;
-		case CPUINFO_STR_REGISTER + I8X41_R1:			sprintf(info->s, "R1:%02X", GETR(1));			break;
-		case CPUINFO_STR_REGISTER + I8X41_R2:			sprintf(info->s, "R2:%02X", GETR(2));			break;
-		case CPUINFO_STR_REGISTER + I8X41_R3:			sprintf(info->s, "R3:%02X", GETR(3));			break;
-		case CPUINFO_STR_REGISTER + I8X41_R4:			sprintf(info->s, "R4:%02X", GETR(4));			break;
-		case CPUINFO_STR_REGISTER + I8X41_R5:			sprintf(info->s, "R5:%02X", GETR(5));			break;
-		case CPUINFO_STR_REGISTER + I8X41_R6:			sprintf(info->s, "R6:%02X", GETR(6));			break;
-		case CPUINFO_STR_REGISTER + I8X41_R7:			sprintf(info->s, "R7:%02X", GETR(7));			break;
+		case CPUINFO_STR_REGISTER + I8X41_R0:			sprintf(info->s, "R0:%02X", GETR(upi41_state, 0));break;
+		case CPUINFO_STR_REGISTER + I8X41_R1:			sprintf(info->s, "R1:%02X", GETR(upi41_state, 1));break;
+		case CPUINFO_STR_REGISTER + I8X41_R2:			sprintf(info->s, "R2:%02X", GETR(upi41_state, 2));break;
+		case CPUINFO_STR_REGISTER + I8X41_R3:			sprintf(info->s, "R3:%02X", GETR(upi41_state, 3));break;
+		case CPUINFO_STR_REGISTER + I8X41_R4:			sprintf(info->s, "R4:%02X", GETR(upi41_state, 4));break;
+		case CPUINFO_STR_REGISTER + I8X41_R5:			sprintf(info->s, "R5:%02X", GETR(upi41_state, 5));break;
+		case CPUINFO_STR_REGISTER + I8X41_R6:			sprintf(info->s, "R6:%02X", GETR(upi41_state, 6));break;
+		case CPUINFO_STR_REGISTER + I8X41_R7:			sprintf(info->s, "R7:%02X", GETR(upi41_state, 7));break;
 		case CPUINFO_STR_REGISTER + I8X41_P1:			sprintf(info->s, "P1:%02X", upi41_state->p1);	break;
 		case CPUINFO_STR_REGISTER + I8X41_P2:			sprintf(info->s, "P2:%02X", upi41_state->p2);	break;
 		case CPUINFO_STR_REGISTER + I8X41_DATA_DASM:	sprintf(info->s, "DBBI:%02X", upi41_state->dbbi); break;

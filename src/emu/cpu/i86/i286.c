@@ -3,6 +3,7 @@
 *               (initial work based on David Hedley's pcemu)                *
 ****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "host.h"
 
@@ -59,6 +60,8 @@ typedef struct
 	} ldtr, tr;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
     INT32     AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal; /* 0 or non-0 valued flags */
     UINT8	ParityVal;
 	UINT8	TF, IF; 	/* 0 or 1 valued flags */
@@ -288,6 +291,8 @@ static CPU_INIT( i80286 )
 
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	/* If a reset parameter is given, take it as pointer to an address mask */
 	if( device->static_config )

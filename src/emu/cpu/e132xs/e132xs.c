@@ -211,6 +211,7 @@
 
 *********************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "cpuexec.h"
@@ -223,16 +224,6 @@
 #else
 #define DEBUG_PRINTF(x) do { } while (0)
 #endif
-
-static UINT8  (*hyp_cpu_read_byte)(offs_t address);
-static UINT16 (*hyp_cpu_read_half_word)(offs_t address);
-static UINT32 (*hyp_cpu_read_word)(offs_t address);
-static UINT32 (*hyp_cpu_read_io_word)(offs_t address);
-static void (*hyp_cpu_write_byte)(offs_t address, UINT8 data);
-static void (*hyp_cpu_write_half_word)(offs_t address, UINT16 data);
-static void (*hyp_cpu_write_word)(offs_t address, UINT32 data);
-static void (*hyp_cpu_write_io_word)(offs_t address, UINT32 data);
-int hyp_type_16bit;
 
 // set C in adds/addsi/subs/sums
 #define SETCARRYS 0
@@ -334,6 +325,9 @@ typedef struct
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
+	UINT32 opcodexor;
 
 	INT32 instruction_length;
 	INT32 intblock;
@@ -385,31 +379,6 @@ static void check_interrupts(void);
 #define SAME_SRC_DST   (decode)->same_src_dst
 #define SAME_SRC_DSTF  (decode)->same_src_dstf
 #define SAME_SRCF_DST  (decode)->same_srcf_dst
-
-#if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
-static UINT32 internal_program_read_dword_16be(offs_t address)
-{
-	return (program_read_word_16be(address & ~1) << 16) | program_read_word_16be((address & ~1) + 2);
-}
-
-static void internal_program_write_dword_16be(offs_t address, UINT32 data)
-{
-	program_write_word_16be(address & ~1, (data & 0xffff0000)>>16);
-	program_write_word_16be((address & ~1)+2, data & 0xffff);
-}
-
-static UINT32 internal_io_read_dword_16be(offs_t address)
-{
-	return (io_read_word_16be(address & ~1)<< 16) | io_read_word_16be((address & ~1) + 2);
-}
-
-static void internal_io_write_dword_16be(offs_t address, UINT32 data)
-{
-	io_write_word_16be(address & ~1, (data & 0xffff0000)>>16);
-	io_write_word_16be((address & ~1)+2, data & 0xffff);
-}
-#endif
-
 
 // 4Kb IRAM (On-Chip Memory)
 #if (HAS_E116T || HAS_GMS30C2116)
@@ -1580,6 +1549,8 @@ static void hyperstone_init(const device_config *device, int index, int clock, c
 
 	hyperstone.irq_callback = irqcallback;
 	hyperstone.device = device;
+	hyperstone.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	hyperstone.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	hyperstone.timer = timer_alloc(e132xs_timer_callback, NULL);
 	hyperstone.clock_scale_mask = scale_mask;
 }
@@ -1587,19 +1558,8 @@ static void hyperstone_init(const device_config *device, int index, int clock, c
 #if (HAS_E116T || HAS_E116XT || HAS_E116XS || HAS_E116XSR || HAS_GMS30C2116 || HAS_GMS30C2216)
 static void e116_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
-	hyp_cpu_read_byte      = program_read_byte_16be;
-	hyp_cpu_read_half_word = program_read_word_16be;
-	hyp_cpu_read_word      = internal_program_read_dword_16be;
-	hyp_cpu_read_io_word   = internal_io_read_dword_16be;
-
-	hyp_cpu_write_byte      = program_write_byte_16be;
-	hyp_cpu_write_half_word = program_write_word_16be;
-	hyp_cpu_write_word      = internal_program_write_dword_16be;
-	hyp_cpu_write_io_word   = internal_io_write_dword_16be;
-
-	hyp_type_16bit = 1;
-
 	hyperstone_init(device, index, clock, irqcallback, scale_mask);
+	hyperstone.opcodexor = 0;
 }
 #endif
 
@@ -1648,19 +1608,8 @@ static CPU_INIT( gms30c2216 )
 #if (HAS_E132N || HAS_E132T || HAS_E132XN || HAS_E132XT || HAS_E132XS || HAS_E132XSR || HAS_GMS30C2132 || HAS_GMS30C2232)
 static void e132_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
-	hyp_cpu_read_byte      = program_read_byte_32be;
-	hyp_cpu_read_half_word = program_read_word_32be;
-	hyp_cpu_read_word      = program_read_dword_32be;
-	hyp_cpu_read_io_word   = io_read_dword_32be;
-
-	hyp_cpu_write_byte      = program_write_byte_32be;
-	hyp_cpu_write_half_word = program_write_word_32be;
-	hyp_cpu_write_word      = program_write_dword_32be;
-	hyp_cpu_write_io_word   = io_write_dword_32be;
-
-	hyp_type_16bit = 0;
-
 	hyperstone_init(device, index, clock, irqcallback, scale_mask);
+	hyperstone.opcodexor = WORD_XOR_BE(0);
 }
 #endif
 
@@ -1726,12 +1675,17 @@ static CPU_RESET( hyperstone )
 
 	emu_timer *save_timer;
 	cpu_irq_callback save_irqcallback;
+	UINT32 save_opcodexor;
 
 	save_timer = hyperstone.timer;
 	save_irqcallback = hyperstone.irq_callback;
+	save_opcodexor = hyperstone.opcodexor;
 	memset(&hyperstone, 0, sizeof(hyperstone_regs));
 	hyperstone.irq_callback = save_irqcallback;
+	hyperstone.opcodexor = save_opcodexor;
 	hyperstone.device = device;
+	hyperstone.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	hyperstone.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	hyperstone.timer = save_timer;
 
 	hyperstone.tr_clocks_per_tick = 2;

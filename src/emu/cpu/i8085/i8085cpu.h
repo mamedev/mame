@@ -109,12 +109,12 @@ int q = I.AF.b.h+R; 							\
 #define M_IN													\
 	I.STATUS = 0x42; 											\
 	I.XX.d=ARG();												\
-	I.AF.b.h=io_read_byte_8le(I.XX.d);
+	I.AF.b.h=memory_read_byte_8le(I.io, I.XX.d);
 
 #define M_OUT													\
 	I.STATUS = 0x10; 											\
 	I.XX.d=ARG();												\
-	io_write_byte_8le(I.XX.d,I.AF.b.h)
+	memory_write_byte_8le(I.io, I.XX.d,I.AF.b.h)
 
 #define M_DAD(R) {                                              \
 	int q = I.HL.d + I.R.d; 									\
@@ -126,14 +126,14 @@ int q = I.AF.b.h+R; 							\
 
 #define M_PUSH(R) {                                             \
 	I.STATUS = 0x04; 											\
-	program_write_byte_8le(--I.SP.w.l, I.R.b.h);									\
-	program_write_byte_8le(--I.SP.w.l, I.R.b.l);									\
+	memory_write_byte_8le(I.program, --I.SP.w.l, I.R.b.h);									\
+	memory_write_byte_8le(I.program, --I.SP.w.l, I.R.b.l);									\
 }
 
 #define M_POP(R) {												\
 	I.STATUS = 0x86;											\
-	I.R.b.l = program_read_byte_8le(I.SP.w.l++);									\
-	I.R.b.h = program_read_byte_8le(I.SP.w.l++);									\
+	I.R.b.l = memory_read_byte_8le(I.program, I.SP.w.l++);									\
+	I.R.b.h = memory_read_byte_8le(I.program, I.SP.w.l++);									\
 }
 
 #define M_RET(cc)												\

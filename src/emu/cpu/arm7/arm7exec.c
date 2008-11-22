@@ -58,7 +58,7 @@
             INT32 offs;
 
             pc = R15;
-            insn = program_decrypted_read_word(pc & (~1));
+            insn = memory_decrypted_read_word(ARM7.program, pc & (~1));
             ARM7_ICOUNT -= (3 - thumbCycles[insn >> 8]);
             switch ((insn & THUMB_INSN_TYPE) >> THUMB_INSN_TYPE_SHIFT)
             {
@@ -1168,7 +1168,7 @@
 
             /* load 32 bit instruction */
             pc = R15;
-            insn = program_decrypted_read_dword(pc);
+            insn = memory_decrypted_read_dword(ARM7.program, pc);
 
             /* process condition codes for this instruction */
             switch (insn >> INSN_COND_SHIFT)

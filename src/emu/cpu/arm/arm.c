@@ -15,6 +15,7 @@
 
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "arm.h"
 #include "debugger.h"
 
@@ -231,6 +232,7 @@ typedef struct
 	UINT8 pendingFiq;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 } ARM_REGS;
 
 static ARM_REGS arm;
@@ -252,18 +254,18 @@ static void arm_check_irq_state(void);
 INLINE void cpu_write32( int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
-	program_write_dword_32le(addr&ADDRESS_MASK,data);
+	memory_write_dword_32le(arm.program, addr&ADDRESS_MASK,data);
 	if (ARM_DEBUG_CORE && addr&3) logerror("%08x: Unaligned write %08x\n",R15,addr);
 }
 
 INLINE void cpu_write8( int addr, UINT8 data )
 {
-	program_write_byte_32le(addr,data);
+	memory_write_byte_32le(arm.program,addr,data);
 }
 
 INLINE UINT32 cpu_read32( int addr )
 {
-	UINT32 result = program_read_dword_32le(addr&ADDRESS_MASK);
+	UINT32 result = memory_read_dword_32le(arm.program,addr&ADDRESS_MASK);
 
 	/* Unaligned reads rotate the word, they never combine words */
 	if (addr&3) {
@@ -283,7 +285,7 @@ INLINE UINT32 cpu_read32( int addr )
 
 INLINE UINT8 cpu_read8( int addr )
 {
-	return program_read_byte_32le(addr);
+	return memory_read_byte_32le(arm.program, addr);
 }
 
 INLINE UINT32 GetRegister( int rIndex )
@@ -306,6 +308,7 @@ static CPU_RESET( arm )
 	memset(&arm, 0, sizeof(arm));
 	arm.irq_callback = save_irqcallback;
 	arm.device = device;
+	arm.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
@@ -329,7 +332,7 @@ static CPU_EXECUTE( arm )
 
 		/* load instruction */
 		pc = R15;
-		insn = program_decrypted_read_dword( pc & ADDRESS_MASK );
+		insn = memory_decrypted_read_dword( arm.program, pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{
@@ -514,6 +517,7 @@ static CPU_INIT( arm )
 {
 	arm.irq_callback = irqcallback;
 	arm.device = device;
+	arm.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	state_save_register_item_array("arm", device->tag, 0, arm.sArmRegister);
 	state_save_register_item_array("arm", device->tag, 0, arm.coproRegister);

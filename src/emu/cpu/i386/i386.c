@@ -443,7 +443,7 @@ static void I386OP(decode_two_byte)(void)
 
 /*************************************************************************/
 
-static UINT64 i386_debug_segbase(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 i386_debug_segbase(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	UINT32 result;
 	I386_SREG seg;
@@ -462,7 +462,7 @@ static UINT64 i386_debug_segbase(void *ref, UINT32 params, const UINT64 *param)
 	return result;
 }
 
-static UINT64 i386_debug_seglimit(void *ref, UINT32 params, const UINT64 *param)
+static UINT64 i386_debug_seglimit(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	UINT32 result = 0;
 	I386_SREG seg;
@@ -524,6 +524,8 @@ static CPU_INIT( i386 )
 
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item_array(state_type, device->tag, 0,	I.reg.d);
 	state_save_register_item(state_type, device->tag, 0, I.sreg[ES].selector);
@@ -620,6 +622,8 @@ static CPU_RESET( i386 )
 	memset( &I, 0, sizeof(I386_REGS) );
 	I.irq_callback = save_irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	I.sreg[CS].selector = 0xf000;
 	I.sreg[CS].base		= 0xffff0000;

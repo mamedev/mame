@@ -21,6 +21,7 @@
  *
  *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuexec.h"
 #include "debugger.h"
 #include "cp1610.h"
@@ -36,7 +37,6 @@ typedef struct {
 	int 	intr_enabled;
 	//int       (*reset_callback)(void);
 	cpu_irq_callback irq_callback;
-	const device_config *device;
 	UINT16	intr_vector;
 	int 	reset_state;
 	int		intr_state;
@@ -45,6 +45,8 @@ typedef struct {
 	int		intr_pending;
 	int		intrm_pending;
 	int		mask_interrupts;
+	const device_config *device;
+	const address_space *program;
 }	cp1610_Regs;
 
 static int cp1610_icount;
@@ -1550,7 +1552,7 @@ static void cp1610_xori(int d)
 static CPU_RESET( cp1610 )
 {
 	/* This is how we set the reset vector */
-	cpu_set_input_line(device->machine->activecpu, CP1610_RESET, PULSE_LINE);
+	cpu_set_input_line(device, CP1610_RESET, PULSE_LINE);
 }
 
 /***************************************************
@@ -3392,6 +3394,7 @@ static CPU_INIT( cp1610 )
 	cp1610.intrm_pending = 0;
 	cp1610.irq_callback = irqcallback;
 	cp1610.device = device;
+	cp1610.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static void cp1610_set_irq_line(UINT32 irqline, int state)

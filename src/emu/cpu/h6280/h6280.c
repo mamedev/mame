@@ -107,6 +107,7 @@
         - Improvements to the handling of taking of delayed interrupts.
 
 ******************************************************************************/
+#define  NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "h6280.h"
@@ -139,6 +140,8 @@ typedef struct
 	UINT8 irq_pending;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 
 #if LAZY_FLAGS
     INT32 NZ;             /* last value (lazy N and Z flag) */
@@ -188,6 +191,8 @@ static CPU_INIT( h6280 )
 
 	h6280.irq_callback = irqcallback;
 	h6280.device = device;
+	h6280.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	h6280.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 static CPU_RESET( h6280 )
@@ -200,6 +205,7 @@ static CPU_RESET( h6280 )
 	memset(&h6280, 0, sizeof(h6280_Regs));
 	h6280.irq_callback = save_irqcallback;
 	h6280.device = device;
+	h6280.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* set I and B flags */
 	P = _fI | _fB;

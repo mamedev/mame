@@ -10,7 +10,7 @@
  ***********************************/
 OP_HANDLER( illegal )
 {
-	logerror("i8x41 #%d: illegal opcode at 0x%03x: %02x\n", cpunum_get_active(), PC, ROP(PC));
+	logerror("i8x41 #%d: illegal opcode at 0x%03x: %02x\n", cpunum_get_active(), PC, ROP(upi41_state, PC));
 }
 
 /***********************************
@@ -18,7 +18,7 @@ OP_HANDLER( illegal )
  ***********************************/
 OP_HANDLER( add_r )
 {
-	UINT8 res = A + GETR(r);
+	UINT8 res = A + GETR(upi41_state, r);
 	if( res < A ) PSW |= FC;
 	if( (res & 0x0f) < (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -30,7 +30,7 @@ OP_HANDLER( add_r )
  ***********************************/
 OP_HANDLER( add_rm )
 {
-	UINT8 res = A + IRAM_R(GETR(r));
+	UINT8 res = A + IRAM_R(upi41_state, GETR(upi41_state, r));
 	if( res < A ) PSW |= FC;
 	if( (res & 0x0f) < (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -42,7 +42,7 @@ OP_HANDLER( add_rm )
  ***********************************/
 OP_HANDLER( add_i )
 {
-	UINT8 res = A + ROP_ARG(PC);
+	UINT8 res = A + ROP_ARG(upi41_state, PC);
 	PC++;
 	if( res < A ) PSW |= FC;
 	if( (res & 0x0f) < (A & 0x0f) ) PSW |= FA;
@@ -55,7 +55,7 @@ OP_HANDLER( add_i )
  ***********************************/
 OP_HANDLER( addc_r )
 {
-	UINT8 res = A + GETR(r) + (PSW >> 7);
+	UINT8 res = A + GETR(upi41_state, r) + (PSW >> 7);
 	if( res <= A ) PSW |= FC;
 	if( (res & 0x0f) <= (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -67,7 +67,7 @@ OP_HANDLER( addc_r )
  ***********************************/
 OP_HANDLER( addc_rm )
 {
-	UINT8 res = A + IRAM_R(GETR(r)) + (PSW >> 7);
+	UINT8 res = A + IRAM_R(upi41_state, GETR(upi41_state, r)) + (PSW >> 7);
 	if( res <= A ) PSW |= FC;
 	if( (res & 0x0f) <= (A & 0x0f) ) PSW |= FA;
 	A = res;
@@ -79,7 +79,7 @@ OP_HANDLER( addc_rm )
  ***********************************/
 OP_HANDLER( addc_i )
 {
-	UINT8 res = A + ROP_ARG(PC) + (PSW >> 7);
+	UINT8 res = A + ROP_ARG(upi41_state, PC) + (PSW >> 7);
 	PC++;
 	if( res <= A ) PSW |= FC;
 	if( (res & 0x0f) < (A & 0x0f) ) PSW |= FA;
@@ -92,7 +92,7 @@ OP_HANDLER( addc_i )
  ***********************************/
 OP_HANDLER( anl_r )
 {
-	A = A & GETR(r);
+	A = A & GETR(upi41_state, r);
 }
 
 /***********************************
@@ -101,7 +101,7 @@ OP_HANDLER( anl_r )
  ***********************************/
 OP_HANDLER( anl_rm )
 {
-	A = A & IRAM_R(GETR(r));
+	A = A & IRAM_R(upi41_state, GETR(upi41_state, r));
 }
 
 /***********************************
@@ -110,7 +110,7 @@ OP_HANDLER( anl_rm )
  ***********************************/
 OP_HANDLER( anl_i )
 {
-	A = A & ROP_ARG(PC);
+	A = A & ROP_ARG(upi41_state, PC);
 	PC++;
 }
 
@@ -121,14 +121,14 @@ OP_HANDLER( anl_i )
 OP_HANDLER( anl_p_i )
 {
 	UINT8 p = r;
-	UINT8 val = ROP_ARG(PC);
+	UINT8 val = ROP_ARG(upi41_state, PC);
 	PC++;
 	/* changed to latched port scheme */
 	switch (p)
 	{
 		case 00:	break;	/* invalid port */
-		case 01:	P1 &= val; WP(p, P1); break;
-		case 02:	P2 &= val; WP(p, (P2 & P2_HS) ); break;
+		case 01:	P1 &= val; WP(upi41_state, p, P1); break;
+		case 02:	P2 &= val; WP(upi41_state, p, (P2 & P2_HS) ); break;
 		case 03:	break;	/* invalid port */
 		default:	break;
 	}
@@ -142,10 +142,10 @@ OP_HANDLER( anld_p_a )
 {
 	UINT8 p = r;
 	/* added proper expanded port setup */
-	WP(2, (P2 & 0xf0) | 0x0c | p); /* AND mode */
-	WP(I8X41_ps, 0);	/* activate command strobe */
-	WP(2, (A & 0x0f)); 	/* Expander to take care of AND function */
-	WP(I8X41_ps, 1);	/* release command strobe */
+	WP(upi41_state, 2, (P2 & 0xf0) | 0x0c | p); /* AND mode */
+	WP(upi41_state, I8X41_ps, 0);	/* activate command strobe */
+	WP(upi41_state, 2, (A & 0x0f)); 	/* Expander to take care of AND function */
+	WP(upi41_state, I8X41_ps, 1);	/* release command strobe */
 }
 
 /***********************************
@@ -155,7 +155,7 @@ OP_HANDLER( anld_p_a )
 OP_HANDLER( call_i )
 {
 	UINT16 page = (r & 0xe0) << 3;
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC++;
 	PUSH_PC_TO_STACK();
 	PC = page | adr;
@@ -266,7 +266,7 @@ OP_HANDLER( dec_a )
  ***********************************/
 OP_HANDLER( dec_r )
 {
-	SETR(r, GETR(r) - 1);
+	SETR(upi41_state, r, GETR(upi41_state, r) - 1);
 }
 
 /***********************************
@@ -293,10 +293,10 @@ OP_HANDLER( dis_tcnti )
  ***********************************/
 OP_HANDLER( djnz_r_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC++;
-	SETR(r, GETR(r) - 1);
-	if( GETR(r) )
+	SETR(upi41_state, r, GETR(upi41_state, r) - 1);
+	if( GETR(upi41_state, r) )
 		PC = (PC & 0x700) | adr;
 }
 
@@ -308,7 +308,7 @@ OP_HANDLER( en_dma )
 {
 	ENABLE |= DMA;		/* enable DMA handshake lines */
 	P2_HS &= 0xbf;
-	WP(0x02, (P2 & P2_HS) );
+	WP(upi41_state, 0x02, (P2 & P2_HS) );
 }
 
 /***********************************
@@ -326,7 +326,7 @@ OP_HANDLER( en_flags )
 		else P2_HS &= 0xef;
 		if( STATE & IBF ) P2_HS |= 0x20;
 		else P2_HS &= 0xdf;
-		WP(0x02, (P2 & P2_HS) );
+		WP(upi41_state, 0x02, (P2 & P2_HS) );
 	}
 }
 
@@ -370,7 +370,7 @@ OP_HANDLER( in_a_dbb )
 		P2_HS &= 0xdf;
 		if( STATE & OBF ) P2_HS |= 0x10;
 		else P2_HS &= 0xef;
-		WP(0x02, (P2 & P2_HS) );	/* Clear the DBBI IRQ out on P25 */
+		WP(upi41_state, 0x02, (P2 & P2_HS) );	/* Clear the DBBI IRQ out on P25 */
 	}
 	A = DBBI;
 }
@@ -386,8 +386,8 @@ OP_HANDLER( in_a_p )
 	switch( p )
 	{
 		case 00:	break;	/* invalid port */
-		case 01:	A = (RP(p) & P1); break;
-		case 02:	A = (RP(p) & P2); break;
+		case 01:	A = (RP(upi41_state, p) & P1); break;
+		case 02:	A = (RP(upi41_state, p) & P2); break;
 		case 03:	break;	/* invalid port */
 		default:	break;
 	}
@@ -408,7 +408,7 @@ OP_HANDLER( inc_a )
  ***********************************/
 OP_HANDLER( inc_r )
 {
-	SETR(r, GETR(r) + 1);
+	SETR(upi41_state, r, GETR(upi41_state, r) + 1);
 }
 
 /***********************************
@@ -417,8 +417,8 @@ OP_HANDLER( inc_r )
  ***********************************/
 OP_HANDLER( inc_rm )
 {
-	UINT16 addr = GETR(r);
-	IRAM_W( addr, IRAM_R(addr) + 1 );
+	UINT16 addr = GETR(upi41_state, r);
+	IRAM_W(upi41_state,  addr, IRAM_R(upi41_state, addr) + 1 );
 }
 
 /***********************************
@@ -428,7 +428,7 @@ OP_HANDLER( inc_rm )
 OP_HANDLER( jbb_i )
 {
 	UINT8 bit = r;
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( A & (1 << bit) )
 		PC = (PC & 0x700) | adr;
@@ -440,7 +440,7 @@ OP_HANDLER( jbb_i )
  ***********************************/
 OP_HANDLER( jc_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( PSW & FC )
 		PC = (PC & 0x700) | adr;
@@ -452,7 +452,7 @@ OP_HANDLER( jc_i )
  ***********************************/
 OP_HANDLER( jf0_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( STATE & F0 )
 		PC = (PC & 0x700) | adr;
@@ -464,7 +464,7 @@ OP_HANDLER( jf0_i )
  ***********************************/
 OP_HANDLER( jf1_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( STATE & F1 )
 		PC = (PC & 0x700) | adr;
@@ -481,7 +481,7 @@ OP_HANDLER( jmp_i )
      * JMP is said to use aaa0 (8 pages)
      */
 	UINT16 page = ((r & 0xe0) << 3);
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC = page | adr;
 }
 
@@ -492,7 +492,7 @@ OP_HANDLER( jmp_i )
 OP_HANDLER( jmpp_a )
 {
 	UINT16 adr = (PC & 0x700) | A;
-	PC = (PC & 0x700) | RM(adr);
+	PC = (PC & 0x700) | RM(upi41_state, adr);
 }
 
 /***********************************
@@ -501,7 +501,7 @@ OP_HANDLER( jmpp_a )
  ***********************************/
 OP_HANDLER( jnc_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( !(PSW & FC) )
 		PC = (PC & 0x700) | adr;
@@ -513,7 +513,7 @@ OP_HANDLER( jnc_i )
  ***********************************/
 OP_HANDLER( jnibf_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( 0 == (STATE & IBF) )
 		PC = (PC & 0x700) | adr;
@@ -525,9 +525,9 @@ OP_HANDLER( jnibf_i )
  ***********************************/
 OP_HANDLER( jnt0_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
-	if( 0 == RP(I8X41_t0) )
+	if( 0 == RP(upi41_state, I8X41_t0) )
 		PC = (PC & 0x700) | adr;
 }
 
@@ -537,11 +537,11 @@ OP_HANDLER( jnt0_i )
  ***********************************/
 OP_HANDLER( jnt1_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( !(ENABLE & CNT) )
 	{
-		UINT8 level = RP(I8X41_t1);
+		UINT8 level = RP(upi41_state, I8X41_t1);
 		if( level ) CONTROL |= TEST1;
 		else CONTROL &= ~TEST1;
 	}
@@ -555,7 +555,7 @@ OP_HANDLER( jnt1_i )
  ***********************************/
 OP_HANDLER( jnz_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( A )
 		PC = (PC & 0x700) | adr;
@@ -567,7 +567,7 @@ OP_HANDLER( jnz_i )
  ***********************************/
 OP_HANDLER( jobf_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( STATE & OBF )
 		PC = (PC & 0x700) | adr;
@@ -579,7 +579,7 @@ OP_HANDLER( jobf_i )
  ***********************************/
 OP_HANDLER( jtf_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( CONTROL & TOVF )
 		PC = (PC & 0x700) | adr;
@@ -592,9 +592,9 @@ OP_HANDLER( jtf_i )
  ***********************************/
 OP_HANDLER( jt0_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
-	if( RP(I8X41_t0) )
+	if( RP(upi41_state, I8X41_t0) )
 		PC = (PC & 0x700) | adr;
 }
 
@@ -604,11 +604,11 @@ OP_HANDLER( jt0_i )
  ***********************************/
 OP_HANDLER( jt1_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( !(ENABLE & CNT) )
 	{
-		UINT8 level = RP(I8X41_t1);
+		UINT8 level = RP(upi41_state, I8X41_t1);
 		if( level ) CONTROL |= TEST1;
 		else CONTROL &= ~TEST1;
 	}
@@ -622,7 +622,7 @@ OP_HANDLER( jt1_i )
  ***********************************/
 OP_HANDLER( jz_i )
 {
-	UINT8 adr = ROP_ARG(PC);
+	UINT8 adr = ROP_ARG(upi41_state, PC);
 	PC += 1;
 	if( !A )
 		PC = (PC & 0x700) | adr;
@@ -634,7 +634,7 @@ OP_HANDLER( jz_i )
  ***********************************/
 OP_HANDLER( mov_a_i )
 {
-	A = ROP(PC);
+	A = ROP(upi41_state, PC);
 	PC += 1;
 }
 
@@ -653,7 +653,7 @@ OP_HANDLER( mov_a_psw )
  ***********************************/
 OP_HANDLER( mov_a_r )
 {
-	A = GETR(r);
+	A = GETR(upi41_state, r);
 }
 
 /***********************************
@@ -662,7 +662,7 @@ OP_HANDLER( mov_a_r )
  ***********************************/
 OP_HANDLER( mov_a_rm )
 {
-	A = IRAM_R(GETR(r));
+	A = IRAM_R(upi41_state, GETR(upi41_state, r));
 }
 
 /***********************************
@@ -689,7 +689,7 @@ OP_HANDLER( mov_psw_a )
  ***********************************/
 OP_HANDLER( mov_r_a )
 {
-	SETR(r, A);
+	SETR(upi41_state, r, A);
 }
 
 /***********************************
@@ -698,9 +698,9 @@ OP_HANDLER( mov_r_a )
  ***********************************/
 OP_HANDLER( mov_r_i )
 {
-	UINT8 val = ROP_ARG(PC);
+	UINT8 val = ROP_ARG(upi41_state, PC);
 	PC += 1;
-	SETR(r, val);
+	SETR(upi41_state, r, val);
 }
 
 /***********************************
@@ -709,7 +709,7 @@ OP_HANDLER( mov_r_i )
  ***********************************/
 OP_HANDLER( mov_rm_a )
 {
-	IRAM_W(GETR(r), A );
+	IRAM_W(upi41_state, GETR(upi41_state, r), A );
 }
 
 /***********************************
@@ -718,9 +718,9 @@ OP_HANDLER( mov_rm_a )
  ***********************************/
 OP_HANDLER( mov_rm_i )
 {
-	UINT8 val = ROP_ARG(PC);
+	UINT8 val = ROP_ARG(upi41_state, PC);
 	PC += 1;
-	IRAM_W(GETR(r), val );
+	IRAM_W(upi41_state, GETR(upi41_state, r), val );
 }
 
 /***********************************
@@ -749,10 +749,10 @@ OP_HANDLER( movd_a_p )
 {
 	UINT8 p = r;
 	/* added proper expanded port setup */
-	WP(2, (P2 & 0xf0) | 0x00 | p);	/* READ mode */
-	WP(I8X41_ps, 0);		/* activate command strobe */
-	A = RP(2) & 0xf;
-	WP(I8X41_ps, 1);		/* release command strobe */
+	WP(upi41_state, 2, (P2 & 0xf0) | 0x00 | p);	/* READ mode */
+	WP(upi41_state, I8X41_ps, 0);		/* activate command strobe */
+	A = RP(upi41_state, 2) & 0xf;
+	WP(upi41_state, I8X41_ps, 1);		/* release command strobe */
 }
 
 /***********************************
@@ -763,10 +763,10 @@ OP_HANDLER( movd_p_a )
 {
 	UINT8 p = r;
 	/* added proper expanded port setup */
-	WP(2, (P2 & 0xf0) | 0x04 | p);	/* WRITE mode */
-	WP(I8X41_ps, 0);		/* activate command strobe */
-	WP(2, A & 0x0f);
-	WP(I8X41_ps, 1);		/* release command strobe */
+	WP(upi41_state, 2, (P2 & 0xf0) | 0x04 | p);	/* WRITE mode */
+	WP(upi41_state, I8X41_ps, 0);		/* activate command strobe */
+	WP(upi41_state, 2, A & 0x0f);
+	WP(upi41_state, I8X41_ps, 1);		/* release command strobe */
 }
 
 /***********************************
@@ -776,7 +776,7 @@ OP_HANDLER( movd_p_a )
 OP_HANDLER( movp_a_am )
 {
 	UINT16 addr = (PC & 0x700) | A;
-	A = RM(addr);
+	A = RM(upi41_state, addr);
 }
 
 /***********************************
@@ -786,7 +786,7 @@ OP_HANDLER( movp_a_am )
 OP_HANDLER( movp3_a_am )
 {
 	UINT16 addr = 0x300 | A;
-	A = RM(addr);
+	A = RM(upi41_state, addr);
 }
 
 /***********************************
@@ -803,7 +803,7 @@ OP_HANDLER( nop )
  ***********************************/
 OP_HANDLER( orl_r )
 {
-	A = A | GETR(r);
+	A = A | GETR(upi41_state, r);
 }
 
 /***********************************
@@ -812,7 +812,7 @@ OP_HANDLER( orl_r )
  ***********************************/
 OP_HANDLER( orl_rm )
 {
-	A = A | IRAM_R(GETR(r));
+	A = A | IRAM_R(upi41_state, GETR(upi41_state, r));
 }
 
 /***********************************
@@ -821,7 +821,7 @@ OP_HANDLER( orl_rm )
  ***********************************/
 OP_HANDLER( orl_i )
 {
-	UINT8 val = ROP_ARG(PC);
+	UINT8 val = ROP_ARG(upi41_state, PC);
 	PC++;
 	A = A | val;
 }
@@ -833,14 +833,14 @@ OP_HANDLER( orl_i )
 OP_HANDLER( orl_p_i )
 {
 	UINT8 p = r;
-	UINT8 val = ROP_ARG(PC);
+	UINT8 val = ROP_ARG(upi41_state, PC);
 	PC++;
 	/* changed to latched port scheme */
 	switch (p)
 	{
 		case 00:	break;	/* invalid port */
-		case 01:	P1 |= val; WP(p, P1); break;
-		case 02:	P2 |= val; WP(p, P2); break;
+		case 01:	P1 |= val; WP(upi41_state, p, P1); break;
+		case 02:	P2 |= val; WP(upi41_state, p, P2); break;
 		case 03:	break;	/* invalid port */
 		default:	break;
 	}
@@ -854,10 +854,10 @@ OP_HANDLER( orld_p_a )
 {
 	UINT8 p = r;
 	/* added proper expanded port setup */
-	WP(2, (P2 & 0xf0) | 0x08 | p);	/* OR mode */
-	WP(I8X41_ps, 0);	/* activate command strobe */
-	WP(2, A & 0x0f);	/* Expander to take care of OR function */
-	WP(I8X41_ps, 1);	/* release command strobe */
+	WP(upi41_state, 2, (P2 & 0xf0) | 0x08 | p);	/* OR mode */
+	WP(upi41_state, I8X41_ps, 0);	/* activate command strobe */
+	WP(upi41_state, 2, A & 0x0f);	/* Expander to take care of OR function */
+	WP(upi41_state, I8X41_ps, 1);	/* release command strobe */
 }
 
 /***********************************
@@ -873,7 +873,7 @@ OP_HANDLER( out_dbb_a )
 		P2_HS |= 0x10;
 		if( STATE & IBF ) P2_HS |= 0x20;
 		else P2_HS &= 0xdf;
-		WP(0x02, (P2 & P2_HS) );	/* Assert the DBBO IRQ out on P24 */
+		WP(upi41_state, 0x02, (P2 & P2_HS) );	/* Assert the DBBO IRQ out on P24 */
 	}
 }
 
@@ -888,8 +888,8 @@ OP_HANDLER( out_p_a )
 	switch (p)
 	{
 		case 00:	break;	/* invalid port */
-		case 01:	WP(p, A); P1 = A; break;
-		case 02:	WP(p, A); P2 = A; break;
+		case 01:	WP(upi41_state, p, A); P1 = A; break;
+		case 02:	WP(upi41_state, p, A); P2 = A; break;
 		case 03:	break;	/* invalid port */
 		default:	break;
 	}
@@ -903,8 +903,8 @@ OP_HANDLER( ret )
 {
 	UINT8 msb;
 	PSW = (PSW & ~SP) | ((PSW - 1) & SP);
-	msb = IRAM_R(M_STACK + (PSW&SP) * 2 + 1);
-	PC = IRAM_R(M_STACK + (PSW&SP) * 2 + 0);
+	msb = IRAM_R(upi41_state, M_STACK + (PSW&SP) * 2 + 1);
+	PC = IRAM_R(upi41_state, M_STACK + (PSW&SP) * 2 + 0);
 	PC |= (msb << 8) & 0x700;
 }
 
@@ -916,8 +916,8 @@ OP_HANDLER( retr )
 {
 	UINT8 msb;
 	PSW = (PSW & ~SP) | ((PSW - 1) & SP);
-	msb = IRAM_R(M_STACK + (PSW&SP) * 2 + 1);
-	PC = IRAM_R(M_STACK + (PSW&SP) * 2 + 0);
+	msb = IRAM_R(upi41_state, M_STACK + (PSW&SP) * 2 + 1);
+	PC = IRAM_R(upi41_state, M_STACK + (PSW&SP) * 2 + 0);
 	PC |= (msb << 8) & 0x700;
 	PSW = (PSW & 0x0f) | (msb & 0xf0);
 	CONTROL &= ~IRQ_IGNR;
@@ -1025,8 +1025,8 @@ OP_HANDLER( swap_a )
  ***********************************/
 OP_HANDLER( xch_a_r )
 {
-	UINT8 tmp = GETR(r);
-	SETR(r, A);
+	UINT8 tmp = GETR(upi41_state, r);
+	SETR(upi41_state, r, A);
 	A = tmp;
 }
 
@@ -1036,9 +1036,9 @@ OP_HANDLER( xch_a_r )
  ***********************************/
 OP_HANDLER( xch_a_rm )
 {
-	UINT16 addr = GETR(r);
-	UINT8 tmp = IRAM_R(addr);
-	IRAM_W( addr, A );
+	UINT16 addr = GETR(upi41_state, r);
+	UINT8 tmp = IRAM_R(upi41_state, addr);
+	IRAM_W(upi41_state,  addr, A );
 	A = tmp;
 }
 
@@ -1048,9 +1048,9 @@ OP_HANDLER( xch_a_rm )
  ***********************************/
 OP_HANDLER( xchd_a_rm )
 {
-	UINT16 addr = GETR(r);
-	UINT8 tmp = IRAM_R(addr);
-	IRAM_W( addr, (tmp & 0xf0) | (A & 0x0f) );
+	UINT16 addr = GETR(upi41_state, r);
+	UINT8 tmp = IRAM_R(upi41_state, addr);
+	IRAM_W(upi41_state,  addr, (tmp & 0xf0) | (A & 0x0f) );
 	A = (A & 0xf0) | (tmp & 0x0f);
 }
 
@@ -1060,7 +1060,7 @@ OP_HANDLER( xchd_a_rm )
  ***********************************/
 OP_HANDLER( xrl_r )
 {
-	A = A ^ GETR(r);
+	A = A ^ GETR(upi41_state, r);
 }
 
 /***********************************
@@ -1069,7 +1069,7 @@ OP_HANDLER( xrl_r )
  ***********************************/
 OP_HANDLER( xrl_rm )
 {
-	A = A ^ IRAM_R(GETR(r));
+	A = A ^ IRAM_R(upi41_state, GETR(upi41_state, r));
 }
 
 /***********************************
@@ -1078,7 +1078,7 @@ OP_HANDLER( xrl_rm )
  ***********************************/
 OP_HANDLER( xrl_i )
 {
-	UINT8 val = ROP_ARG(PC);
+	UINT8 val = ROP_ARG(upi41_state, PC);
 	PC++;
 	A = A ^ val;
 }

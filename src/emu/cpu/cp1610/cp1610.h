@@ -41,8 +41,8 @@ CPU_GET_INFO( cp1610 );
 CPU_DISASSEMBLE( cp1610 );
 
 // Temporary
-#define cp1610_readop(A) program_read_word_16be((A)<<1)
-#define cp1610_readmem16(A) program_read_word_16be((A)<<1)
-#define cp1610_writemem16(A,B) program_write_word_16be((A)<<1,B)
+#define cp1610_readop(A) memory_read_word_16be(cp1610.program, (A)<<1)
+#define cp1610_readmem16(A) memory_read_word_16be(cp1610.program, (A)<<1)
+#define cp1610_writemem16(A,B) memory_write_word_16be(cp1610.program, (A)<<1,B)
 
 #endif /* __CP1610_H__ */

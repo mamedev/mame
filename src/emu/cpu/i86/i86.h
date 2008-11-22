@@ -71,15 +71,15 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,SIH,SIL,DIH,DIL } BREGS;
 
 /************************************************************************/
 
-#define read_byte(a)			(*I.mem.rbyte)(a)
-#define read_word(a)			(*I.mem.rword)(a)
-#define write_byte(a,d)			(*I.mem.wbyte)((a),(d))
-#define write_word(a,d)			(*I.mem.wword)((a),(d))
+#define read_byte(a)			(*I.mem.rbyte)(I.program, a)
+#define read_word(a)			(*I.mem.rword)(I.program, a)
+#define write_byte(a,d)			(*I.mem.wbyte)(I.program, (a),(d))
+#define write_word(a,d)			(*I.mem.wword)(I.program, (a),(d))
 
-#define read_port_byte(a)		(*I.mem.rbyte_port)(a)
-#define read_port_word(a)		(*I.mem.rword_port)(a)
-#define write_port_byte(a,d)	(*I.mem.wbyte_port)((a),(d))
-#define write_port_word(a,d)	(*I.mem.wword_port)((a),(d))
+#define read_port_byte(a)		(*I.mem.rbyte)(I.io, a)
+#define read_port_word(a)		(*I.mem.rword)(I.io, a)
+#define write_port_byte(a,d)	(*I.mem.wbyte)(I.io, (a),(d))
+#define write_port_word(a,d)	(*I.mem.wword)(I.io, (a),(d))
 
 /************************************************************************/
 
@@ -99,10 +99,10 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,SIH,SIL,DIH,DIL } BREGS;
 #define WriteWord(ea,val)		write_word((ea) & AMASK, val);
 
 #define FETCH_XOR(a)			((a) ^ I.mem.fetch_xor)
-#define FETCH					(program_raw_read_byte(FETCH_XOR(I.pc++)))
-#define FETCHOP					(program_decrypted_read_byte(FETCH_XOR(I.pc++)))
-#define PEEKOP(addr)			(program_decrypted_read_byte(FETCH_XOR(addr)))
-#define FETCHWORD(var) 			{ var = program_raw_read_byte(FETCH_XOR(I.pc)); var += (program_raw_read_byte(FETCH_XOR(I.pc + 1)) << 8); I.pc += 2; }
+#define FETCH					(memory_raw_read_byte(I.program, FETCH_XOR(I.pc++)))
+#define FETCHOP					(memory_decrypted_read_byte(I.program, FETCH_XOR(I.pc++)))
+#define PEEKOP(addr)			(memory_decrypted_read_byte(I.program, FETCH_XOR(addr)))
+#define FETCHWORD(var) 			{ var = memory_raw_read_byte(I.program, FETCH_XOR(I.pc)); var += (memory_raw_read_byte(I.program, FETCH_XOR(I.pc + 1)) << 8); I.pc += 2; }
 #define CHANGE_PC(addr)			change_pc(addr)
 #define PUSH(val)				{ I.regs.w[SP] -= 2; WriteWord(((I.base[SS] + I.regs.w[SP]) & AMASK), val); }
 #define POP(var)				{ var = ReadWord(((I.base[SS] + I.regs.w[SP]) & AMASK)); I.regs.w[SP] += 2; }

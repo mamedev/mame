@@ -4,6 +4,7 @@
 ****************************************************************************/
 /* 26.March 2000 PeT changed set_irq_line */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "cpuintrf.h"
 
@@ -41,6 +42,8 @@ typedef struct
 	UINT16 flags;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	INT32 AuxVal, OverVal, SignVal, ZeroVal, CarryVal, DirVal;		/* 0 or non-0 valued flags */
 	UINT8 ParityVal;
 	UINT8 TF, IF;				   /* 0 or 1 valued flags */
@@ -143,6 +146,8 @@ static CPU_INIT( i8086 )
 
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	i8086_state_register(device);
 	configure_memory_16bit();
@@ -167,6 +172,8 @@ static CPU_RESET( i8086 )
 	I.irq_callback = save_irqcallback;
 	I.mem = save_mem;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	I.sregs[CS] = 0xf000;
 	I.base[CS] = SegBase(CS);

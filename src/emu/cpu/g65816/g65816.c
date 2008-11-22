@@ -84,6 +84,7 @@ TODO general:
 /* ================================= DATA ================================= */
 /* ======================================================================== */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "g65816cm.h"
 
 /* Our CPU structure */
@@ -330,6 +331,7 @@ static CPU_INIT( g65816 )
 {
 	g65816_set_irq_callback(irqcallback);
 	g65816i_cpu.device = device;
+	g65816i_cpu.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.a);
 	state_save_register_item("G65816", device->tag, 0, g65816i_cpu.b);

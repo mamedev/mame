@@ -94,9 +94,9 @@ CPU_GET_INFO( g65816 );
 #undef G65816_CALL_DEBUGGER
 #define G65816_CALL_DEBUGGER(x) debugger_instruction_hook(g65816i_cpu.device, x)
 
-#define g65816_read_8(addr) 			program_read_byte_8be(addr)
-#define g65816_write_8(addr,data)		program_write_byte_8be(addr,data)
-#define g65816_read_8_immediate(A)		program_read_byte_8be(A)
+#define g65816_read_8(addr) 			memory_read_byte_8be(g65816i_cpu.program, addr)
+#define g65816_write_8(addr,data)		memory_write_byte_8be(g65816i_cpu.program, addr,data)
+#define g65816_read_8_immediate(A)		memory_read_byte_8be(g65816i_cpu.program, A)
 #define g65816_jumping(A)				change_pc(A)
 #define g65816_branching(A)
 

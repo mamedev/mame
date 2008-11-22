@@ -8,6 +8,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "ccpu.h"
 
@@ -38,6 +39,11 @@ typedef struct
 
 	UINT8		waiting;
 	UINT8		watchdog;
+	
+	const device_config *device;
+	const address_space *program;
+	const address_space *data;
+	const address_space *io;
 } ccpuRegs;
 
 
@@ -55,13 +61,13 @@ static int ccpu_icount;
     MACROS
 ***************************************************************************/
 
-#define READOP(a) 			(program_decrypted_read_byte(a))
+#define READOP(a) 			(memory_decrypted_read_byte(ccpu.program, a))
 
-#define RDMEM(a)			(data_read_word_16be((a) * 2) & 0xfff)
-#define WRMEM(a,v)			(data_write_word_16be((a) * 2, (v)))
+#define RDMEM(a)			(memory_read_word_16be(ccpu.data, (a) * 2) & 0xfff)
+#define WRMEM(a,v)			(memory_write_word_16be(ccpu.data, (a) * 2, (v)))
 
-#define READPORT(a)			(io_read_byte_8be(a))
-#define WRITEPORT(a,v)		(io_write_byte_8be((a), (v)))
+#define READPORT(a)			(memory_read_byte_8be(ccpu.io, a))
+#define WRITEPORT(a,v)		(memory_write_byte_8be(ccpu.io, (a), (v)))
 
 #define SET_A0()			do { ccpu.a0flag = ccpu.A; } while (0)
 #define SET_CMP_VAL(x)		do { ccpu.cmpacc = *ccpu.acc; ccpu.cmpval = (x) & 0xfff; } while (0)
@@ -140,6 +146,10 @@ static CPU_INIT( ccpu )
 	/* copy input params */
 	ccpu.external_input = configdata->external_input ? configdata->external_input : read_jmi;
 	ccpu.vector_callback = configdata->vector_callback;
+	ccpu.device = device;
+	ccpu.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	ccpu.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	ccpu.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item("ccpu", device->tag, 0, ccpu.PC);
 	state_save_register_item("ccpu", device->tag, 0, ccpu.A);

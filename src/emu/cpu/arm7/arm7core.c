@@ -77,6 +77,7 @@
     By Bryan McPhail (bmcphail@tendril.co.uk) and Phil Stroffolino
 *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include <stdarg.h>
 #include "deprecat.h"
 
@@ -139,19 +140,19 @@ char *(*arm7_dasm_cop_do_callback)(char *pBuf, UINT32 opcode, char *pConditionCo
 INLINE void arm7_cpu_write32(UINT32 addr, UINT32 data)
 {
     addr &= ~3;
-    program_write_dword_32le(addr, data);
+    memory_write_dword_32le(ARM7.program, addr, data);
 }
 
 
 INLINE void arm7_cpu_write16(UINT32 addr, UINT16 data)
 {
     addr &= ~1;
-    program_write_word_32le(addr, data);
+    memory_write_word_32le(ARM7.program, addr, data);
 }
 
 INLINE void arm7_cpu_write8(UINT32 addr, UINT8 data)
 {
-    program_write_byte_32le(addr, data);
+    memory_write_byte_32le(ARM7.program, addr, data);
 }
 
 INLINE UINT32 arm7_cpu_read32(offs_t addr)
@@ -160,12 +161,12 @@ INLINE UINT32 arm7_cpu_read32(offs_t addr)
 
     if (addr & 3)
     {
-        result = program_read_dword_32le(addr & ~3);
+        result = memory_read_dword_32le(ARM7.program, addr & ~3);
         result = (result >> (8 * (addr & 3))) | (result << (32 - (8 * (addr & 3))));
     }
     else
     {
-        result = program_read_dword_32le(addr);
+        result = memory_read_dword_32le(ARM7.program, addr);
     }
 
     return result;
@@ -175,7 +176,7 @@ INLINE UINT16 arm7_cpu_read16(offs_t addr)
 {
     UINT16 result;
 
-    result = program_read_word_32le(addr & ~1);
+    result = memory_read_word_32le(ARM7.program, addr & ~1);
 
     if (addr & 1)
     {
@@ -188,7 +189,7 @@ INLINE UINT16 arm7_cpu_read16(offs_t addr)
 INLINE UINT8 arm7_cpu_read8(offs_t addr)
 {
     // Handle through normal 8 bit handler (for 32 bit cpu)
-    return program_read_byte_32le(addr);
+    return memory_read_byte_32le(ARM7.program, addr);
 }
 
 /***************
@@ -527,6 +528,7 @@ static void arm7_core_reset(const device_config *device)
     memset(&ARM7, 0, sizeof(ARM7));
     ARM7.irq_callback = save_irqcallback;
     ARM7.device = device;
+    ARM7.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
     /* start up in SVC mode with interrupts disabled. */
     SwitchMode(eARM7_MODE_SVC);

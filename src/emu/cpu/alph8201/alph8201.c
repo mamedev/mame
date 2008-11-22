@@ -147,6 +147,7 @@ Timming
 
 ****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "alph8201.h"
@@ -195,6 +196,9 @@ typedef struct
 #if HANDLE_HALT_LINE
 	UINT8 halt;     /* halt input line                        */
 #endif
+
+	const device_config *device;
+	const address_space *program;
 } ALPHA8201_Regs;
 
 /* The opcode table now is a combination of cycle counts and function pointers */
@@ -664,6 +668,9 @@ static const s_opcode opcode_8301[256]=
  ****************************************************************************/
 static CPU_INIT( ALPHA8201 )
 {
+	R.device = device;
+	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+
 	state_save_register_item_array("ALPHA8201", device->tag, 0, R.RAM);
 	state_save_register_item("ALPHA8201", device->tag, 0, R.PREVPC);
 	state_save_register_item("ALPHA8201", device->tag, 0, PC);

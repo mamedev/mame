@@ -124,6 +124,7 @@
 
 /*int survival_prot = 0; */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "i8085.h"
 #include "i8085cpu.h"
@@ -149,6 +150,8 @@ typedef struct {
 	INT8	irq_state[4];
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	void	(*sod_callback)(int state);
 	int		(*sid_callback)(void);
 }	i8085_Regs;
@@ -162,20 +165,20 @@ static UINT8 RIM_IEN = 0; //AT: IEN status latch used by the RIM instruction
 static UINT8 ROP(void)
 {
 	I.STATUS = 0xa2; // instruction fetch
-	return program_decrypted_read_byte(I.PC.w.l++);
+	return memory_decrypted_read_byte(I.program, I.PC.w.l++);
 }
 
 static UINT8 ARG(void)
 {
-	return program_raw_read_byte(I.PC.w.l++);
+	return memory_raw_read_byte(I.program, I.PC.w.l++);
 }
 
 static UINT16 ARG16(void)
 {
 	UINT16 w;
-	w  = program_raw_read_byte(I.PC.d);
+	w  = memory_raw_read_byte(I.program, I.PC.d);
 	I.PC.w.l++;
-	w += program_raw_read_byte(I.PC.d) << 8;
+	w += memory_raw_read_byte(I.program, I.PC.d) << 8;
 	I.PC.w.l++;
 	return w;
 }
@@ -183,13 +186,13 @@ static UINT16 ARG16(void)
 static UINT8 RM(UINT32 a)
 {
 	I.STATUS = 0x82; // memory read
-	return program_read_byte_8le(a);
+	return memory_read_byte_8le(I.program, a);
 }
 
 static void WM(UINT32 a, UINT8 v)
 {
 	I.STATUS = 0x00; // memory write
-	program_write_byte_8le(a, v);
+	memory_write_byte_8le(I.program, a, v);
 }
 
 INLINE void execute_one(int opcode)
@@ -1362,6 +1365,8 @@ static CPU_INIT( i8085 )
 	I.cputype = 1;
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item("i8085", device->tag, 0, I.AF.w.l);
 	state_save_register_item("i8085", device->tag, 0, I.BC.w.l);
@@ -1399,6 +1404,7 @@ static CPU_RESET( i8085 )
 	I.sod_callback = save_sodcallback;
 	I.sid_callback = save_sidcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	change_pc(I.PC.d);
 
 	I.cputype = cputype_bak;

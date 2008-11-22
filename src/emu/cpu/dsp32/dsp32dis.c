@@ -13,8 +13,6 @@
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		program_decrypted_read_dword(pc)
-
 #define ABS(x) (((x) >= 0) ? (x) : -(x))
 
 

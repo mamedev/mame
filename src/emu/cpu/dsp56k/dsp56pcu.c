@@ -150,8 +150,8 @@ static void pcu_reset(void)
 				// ...
 				// P:$cffe -> Internal P:$07ff low byte
 				// P:$cfff -> Internal P:$07ff high byte
-				UINT8 mem_value_low  = program_read_byte_16le(mem_offset);		/* TODO: IS THIS READING RIGHT? */
-				UINT8 mem_value_high = program_read_byte_16be(mem_offset);
+				UINT8 mem_value_low  = memory_read_byte_16le(core.program, mem_offset);		/* TODO: IS THIS READING RIGHT? */
+				UINT8 mem_value_high = memory_read_byte_16be(core.program, mem_offset);
 				dsp56k_program_ram[i] = (mem_value_high << 8) || mem_value_low;
 			}
 
@@ -172,7 +172,7 @@ static void pcu_reset(void)
 			//        they need.  Once they've had their fill, they turn bootstrap mode off
 			//        and the CPU begins execution at 0x0000;
 			// HACK - Read bit 15 at 0xc000 to see if we're working with the SSIO or host interface.
-			if (program_read_word_16le(0xc000<<1) & 0x8000)
+			if (memory_read_word_16le(core.program, 0xc000<<1) & 0x8000)
 			{
 				core.bootstrap_mode = BOOTSTRAP_SSIX;
 				logerror("DSP56k : Currently in (hacked) bootstrap mode - reading from SSIx.\n");
