@@ -1964,65 +1964,65 @@ static void shift_op(adsp2100_state *adsp, int op)
 	INT32 xop = (op >> 8) & 7;
 	UINT32 res;
 
-	switch (op & (15<<11))	/*JB*/
+	switch ((op>>11) & 15)	/*JB*/
 	{
-		case 0x00<<11:
+		case 0x00:
 			/* LSHIFT (HI) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
 			adsp->core.sr.sr = res;
 			break;
-		case 0x01<<11:
+		case 0x01:
 			/* LSHIFT (HI, OR) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x02<<11:
+		case 0x02:
 			/* LSHIFT (LO) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : 0;
 			adsp->core.sr.sr = res;
 			break;
-		case 0x03<<11:
+		case 0x03:
 			/* LSHIFT (LO, OR) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : 0;
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x04<<11:
+		case 0x04:
 			/* ASHIFT (HI) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
 			adsp->core.sr.sr = res;
 			break;
-		case 0x05<<11:
+		case 0x05:
 			/* ASHIFT (HI, OR) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x06<<11:
+		case 0x06:
 			/* ASHIFT (LO) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
 			adsp->core.sr.sr = res;
 			break;
-		case 0x07<<11:
+		case 0x07:
 			/* ASHIFT (LO, OR) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x08<<11:
+		case 0x08:
 			/* NORM (HI) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0)
@@ -2033,7 +2033,7 @@ static void shift_op(adsp2100_state *adsp, int op)
 			else res = (sc > -32) ? (xop << -sc) : 0;
 			adsp->core.sr.sr = res;
 			break;
-		case 0x09<<11:
+		case 0x09:
 			/* NORM (HI, OR) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0)
@@ -2044,21 +2044,21 @@ static void shift_op(adsp2100_state *adsp, int op)
 			else res = (sc > -32) ? (xop << -sc) : 0;
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x0a<<11:
+		case 0x0a:
 			/* NORM (LO) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop >> sc) : 0;
 			else res = (sc > -32) ? (xop << -sc) : 0;
 			adsp->core.sr.sr = res;
 			break;
-		case 0x0b<<11:
+		case 0x0b:
 			/* NORM (LO, OR) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop >> sc) : 0;
 			else res = (sc > -32) ? (xop << -sc) : 0;
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x0c<<11:
+		case 0x0c:
 			/* EXP (HI) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			res = 0;
@@ -2075,7 +2075,7 @@ static void shift_op(adsp2100_state *adsp, int op)
 			}
 			adsp->core.se.s = -res;
 			break;
-		case 0x0d<<11:
+		case 0x0d:
 			/* EXP (HIX) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (GET_V)
@@ -2101,7 +2101,7 @@ static void shift_op(adsp2100_state *adsp, int op)
 				adsp->core.se.s = -res;
 			}
 			break;
-		case 0x0e<<11:
+		case 0x0e:
 			/* EXP (LO) */
 			if (adsp->core.se.s == -15)
 			{
@@ -2117,7 +2117,7 @@ static void shift_op(adsp2100_state *adsp, int op)
 				adsp->core.se.s = -res;
 			}
 			break;
-		case 0x0f<<11:
+		case 0x0f:
 			/* EXPADJ */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			res = 0;
@@ -2146,65 +2146,65 @@ static void shift_op_imm(adsp2100_state *adsp, int op)
 	INT32 xop = (op >> 8) & 7;
 	UINT32 res;
 
-	switch (op & (15<<11))	/*JB*/
+	switch ((op>>11) & 15)	/*JB*/
 	{
-		case 0x00<<11:
+		case 0x00:
 			/* LSHIFT (HI) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
 			adsp->core.sr.sr = res;
 			break;
-		case 0x01<<11:
+		case 0x01:
 			/* LSHIFT (HI, OR) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? ((UINT32)xop >> -sc) : 0;
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x02<<11:
+		case 0x02:
 			/* LSHIFT (LO) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : 0;
 			adsp->core.sr.sr = res;
 			break;
-		case 0x03<<11:
+		case 0x03:
 			/* LSHIFT (LO, OR) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : 0;
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x04<<11:
+		case 0x04:
 			/* ASHIFT (HI) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
 			adsp->core.sr.sr = res;
 			break;
-		case 0x05<<11:
+		case 0x05:
 			/* ASHIFT (HI, OR) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x06<<11:
+		case 0x06:
 			/* ASHIFT (LO) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
 			adsp->core.sr.sr = res;
 			break;
-		case 0x07<<11:
+		case 0x07:
 			/* ASHIFT (LO, OR) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop << sc) : 0;
 			else res = (sc > -32) ? (xop >> -sc) : (xop >> 31);
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x08<<11:
+		case 0x08:
 			/* NORM (HI) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0)
@@ -2215,7 +2215,7 @@ static void shift_op_imm(adsp2100_state *adsp, int op)
 			else res = (sc > -32) ? (xop << -sc) : 0;
 			adsp->core.sr.sr = res;
 			break;
-		case 0x09<<11:
+		case 0x09:
 			/* NORM (HI, OR) */
 			xop = SHIFT_GETXREG_SIGNED(adsp, xop) << 16;
 			if (sc > 0)
@@ -2226,14 +2226,14 @@ static void shift_op_imm(adsp2100_state *adsp, int op)
 			else res = (sc > -32) ? (xop << -sc) : 0;
 			adsp->core.sr.sr |= res;
 			break;
-		case 0x0a<<11:
+		case 0x0a:
 			/* NORM (LO) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop >> sc) : 0;
 			else res = (sc > -32) ? (xop << -sc) : 0;
 			adsp->core.sr.sr = res;
 			break;
-		case 0x0b<<11:
+		case 0x0b:
 			/* NORM (LO, OR) */
 			xop = SHIFT_GETXREG_UNSIGNED(adsp, xop);
 			if (sc > 0) res = (sc < 32) ? (xop >> sc) : 0;
