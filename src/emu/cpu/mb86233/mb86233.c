@@ -13,6 +13,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "mb86233.h"
 #include "debugger.h"
 
@@ -45,6 +46,9 @@ typedef struct
 
 	UINT32			gpr[16];
 	UINT32			extport[0x30];
+	
+	const device_config *device;
+	const address_space *program;
 
 	/* FIFO */
 	int				fifo_wait;
@@ -87,9 +91,9 @@ static int mb86233_icount;
 #define ALU(a)				mb86233_alu(a)
 #define GETREPCNT()			mb86233.repcnt
 
-#define ROPCODE(a)			program_decrypted_read_dword(a<<2)
-#define RDMEM(a)			program_read_dword_32le((a<<2))
-#define WRMEM(a,v)			program_write_dword_32le((a<<2),v)
+#define ROPCODE(a)			memory_decrypted_read_dword(mb86233.program, a<<2)
+#define RDMEM(a)			memory_read_dword_32le(mb86233.program, (a<<2))
+#define WRMEM(a,v)			memory_write_dword_32le(mb86233.program, (a<<2), v)
 
 /***************************************************************************
     Context Switching
@@ -122,6 +126,8 @@ static CPU_INIT( mb86233 )
 	(void)irqcallback;
 
 	memset(&mb86233, 0, sizeof( MB86233_REGS ) );
+	mb86233.device = device;
+	mb86233.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	if ( _config )
 	{

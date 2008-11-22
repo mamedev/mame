@@ -42,6 +42,7 @@ TODO:
 
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "minx.h"
 #include "debugger.h"
 #include "deprecat.h"
@@ -85,13 +86,14 @@ typedef struct {
 	UINT8	interrupt_pending;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 } minx_regs;
 
 static minx_regs regs;
 static int minx_icount;
 
-#define RD(offset)		program_read_byte_8be( offset )
-#define WR(offset,data)	program_write_byte_8be( offset, data )
+#define RD(offset)		memory_read_byte_8be( regs.program, offset )
+#define WR(offset,data)	memory_write_byte_8be( regs.program, offset, data )
 #define GET_MINX_PC		( ( regs.PC & 0x8000 ) ? ( regs.V << 15 ) | (regs.PC & 0x7FFF ) : regs.PC )
 
 
@@ -112,6 +114,7 @@ static CPU_INIT( minx )
 {
 	regs.irq_callback = irqcallback;
 	regs.device = device;
+	regs.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	if ( device->static_config != NULL )
 	{
 	}

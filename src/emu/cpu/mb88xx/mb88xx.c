@@ -13,6 +13,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "mb88xx.h"
 
@@ -53,6 +54,9 @@ typedef struct
     int	pending_interrupt;
     cpu_irq_callback irqcallback;
     const device_config *device;
+    const address_space *program;
+    const address_space *data;
+    const address_space *io;
 } mb88Regs;
 
 /***************************************************************************
@@ -66,13 +70,13 @@ static int mb88_icount;
     MACROS
 ***************************************************************************/
 
-#define READOP(a) 			(program_decrypted_read_byte(a))
+#define READOP(a) 			(memory_decrypted_read_byte(mb88.program, a))
 
-#define RDMEM(a)			(data_read_byte_8be(a))
-#define WRMEM(a,v)			(data_write_byte_8be((a), (v)))
+#define RDMEM(a)			(memory_read_byte_8be(mb88.data, a))
+#define WRMEM(a,v)			(memory_write_byte_8be(mb88.data, (a), (v)))
 
-#define READPORT(a)			(io_read_byte_8be(a))
-#define WRITEPORT(a,v)		(io_write_byte_8be((a), (v)))
+#define READPORT(a)			(memory_read_byte_8be(mb88.io, a))
+#define WRITEPORT(a,v)		(memory_write_byte_8be(mb88.io, (a), (v)))
 
 #define TEST_ST()			(mb88.st & 1)
 #define TEST_ZF()			(mb88.zf & 1)
@@ -128,6 +132,9 @@ static CPU_INIT( mb88 )
 
 	mb88.irqcallback = irqcallback;
 	mb88.device = device;
+	mb88.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	mb88.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	mb88.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item("mb88", device->tag, 0, mb88.PC);
 	state_save_register_item("mb88", device->tag, 0, mb88.PA);

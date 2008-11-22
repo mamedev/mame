@@ -9,6 +9,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "mips3com.h"
 
@@ -150,7 +151,7 @@ static mips3_regs mips3;
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(pc)		program_decrypted_read_dword(pc)
+#define ROPCODE(pc)		memory_decrypted_read_dword(mips3.core.program, pc)
 
 
 

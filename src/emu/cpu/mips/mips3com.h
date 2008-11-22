@@ -196,6 +196,7 @@ struct _mips3_state
 	mips3_flavor	flavor;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 	UINT32			system_clock;
 	UINT32			cpu_clock;
 	UINT64			count_zero_time;
