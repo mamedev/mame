@@ -30,7 +30,7 @@
 
 *****************************************************************************/
 
-
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "m6805.h"
 
@@ -58,6 +58,7 @@ typedef struct
 	UINT16	pending_interrupts; /* MB */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
 } m6805_Regs;
@@ -445,6 +446,7 @@ static CPU_INIT( m6805 )
 	state_register("m6805", device);
 	m6805.irq_callback = irqcallback;
 	m6805.device = device;
+	m6805.program = memory_find_address_space(m6805.device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m6805 )
@@ -453,6 +455,7 @@ static CPU_RESET( m6805 )
 	memset(&m6805, 0, sizeof(m6805));
 	m6805.irq_callback = save_irqcallback;
 	m6805.device = device;
+	m6805.program = memory_find_address_space(m6805.device, ADDRESS_SPACE_PROGRAM);
 	/* Force CPU sub-type and relevant masks */
 	m6805.subtype	= SUBTYPE_M6805;
 	SP_MASK = 0x07f;
