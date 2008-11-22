@@ -95,6 +95,8 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS	1
+
 #include "debugger.h"
 #include "adsp2100.h"
 #include <stddef.h>
@@ -260,6 +262,12 @@ typedef struct
 	RX_CALLBACK sport_rx_callback;
 	TX_CALLBACK sport_tx_callback;
 	ADSP2100_TIMER_CALLBACK timer_fired_func;
+	
+	/* Memory spaces */
+    const address_space *program;
+    const address_space *data;
+    const address_space *io;
+    
 } adsp2100_state;
 
 
@@ -289,37 +297,37 @@ static void check_irqs(adsp2100_state *adsp);
     MEMORY ACCESSORS
 ***************************************************************************/
 
-INLINE UINT16 RWORD_DATA(UINT32 addr)
+INLINE UINT16 RWORD_DATA(adsp2100_state *adsp, UINT32 addr)
 {
-	return data_read_word_16le(addr << 1);
+	return memory_read_word_16le(adsp->data, addr << 1);
 }
 
-INLINE void WWORD_DATA(UINT32 addr, UINT16 data)
+INLINE void WWORD_DATA(adsp2100_state *adsp, UINT32 addr, UINT16 data)
 {
-	data_write_word_16le(addr << 1, data);
+	memory_write_word_16le(adsp->data, addr << 1, data);
 }
 
-INLINE UINT16 RWORD_IO(UINT32 addr)
+INLINE UINT16 RWORD_IO(adsp2100_state *adsp, UINT32 addr)
 {
-	return io_read_word_16le(addr << 1);
+	return memory_read_word_16le(adsp->io, addr << 1);
 }
 
-INLINE void WWORD_IO(UINT32 addr, UINT16 data)
+INLINE void WWORD_IO(adsp2100_state *adsp, UINT32 addr, UINT16 data)
 {
-	io_write_word_16le(addr << 1, data);
+	memory_write_word_16le(adsp->io, addr << 1, data);
 }
 
-INLINE UINT32 RWORD_PGM(UINT32 addr)
+INLINE UINT32 RWORD_PGM(adsp2100_state *adsp, UINT32 addr)
 {
-	return program_read_dword_32le(addr << 2);
+	return memory_read_dword_32le(adsp->program, addr << 2);
 }
 
-INLINE void WWORD_PGM(UINT32 addr, UINT32 data)
+INLINE void WWORD_PGM(adsp2100_state *adsp, UINT32 addr, UINT32 data)
 {
-	program_write_dword_32le(addr << 2, data & 0xffffff);
+	memory_write_dword_32le(adsp->program, addr << 2, data & 0xffffff);
 }
 
-#define ROPCODE(a) program_decrypted_read_dword((a)->pc << 2)
+#define ROPCODE(a) memory_decrypted_read_dword((a)->program, (a)->pc << 2)
 
 #define CHANGEPC(a) change_pc((a)->pc << 2)
 
@@ -573,6 +581,12 @@ static adsp2100_state *adsp21xx_init(const device_config *device, int index, int
 	/* set the IRQ callback */
 	adsp->irq_callback = irqcallback;
 	adsp->device = device;
+	
+	adsp->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	adsp->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	adsp->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+    
+
 
 	/* set up ALU register pointers */
 	adsp->alu_xregs[0] = &adsp->core.ax0;
@@ -962,9 +976,9 @@ static CPU_EXECUTE( adsp21xx )
 				if (adsp->chip_type >= CHIP_TYPE_ADSP2181)
 				{
 					if ((op & 0x008000) == 0x000000)
-						WRITE_REG(adsp, 0, op & 15, RWORD_IO((op >> 4) & 0x7ff));
+						WRITE_REG(adsp, 0, op & 15, RWORD_IO(adsp, (op >> 4) & 0x7ff));
 					else
-						WWORD_IO((op >> 4) & 0x7ff, READ_REG(adsp, 0, op & 15));
+						WWORD_IO(adsp, (op >> 4) & 0x7ff, READ_REG(adsp, 0, op & 15));
 				}
 				break;
 			case 0x02:
@@ -1410,35 +1424,35 @@ static CPU_EXECUTE( adsp21xx )
 				break;
 			case 0x80: case 0x81: case 0x82: case 0x83:
 				/* 100000xx xxxxxxxx xxxxxxxx  read data memory (immediate addr) to reg group 0 */
-				WRITE_REG(adsp, 0, op & 15, RWORD_DATA((op >> 4) & 0x3fff));
+				WRITE_REG(adsp, 0, op & 15, RWORD_DATA(adsp, (op >> 4) & 0x3fff));
 				break;
 			case 0x84: case 0x85: case 0x86: case 0x87:
 				/* 100001xx xxxxxxxx xxxxxxxx  read data memory (immediate addr) to reg group 1 */
-				WRITE_REG(adsp, 1, op & 15, RWORD_DATA((op >> 4) & 0x3fff));
+				WRITE_REG(adsp, 1, op & 15, RWORD_DATA(adsp, (op >> 4) & 0x3fff));
 				break;
 			case 0x88: case 0x89: case 0x8a: case 0x8b:
 				/* 100010xx xxxxxxxx xxxxxxxx  read data memory (immediate addr) to reg group 2 */
-				WRITE_REG(adsp, 2, op & 15, RWORD_DATA((op >> 4) & 0x3fff));
+				WRITE_REG(adsp, 2, op & 15, RWORD_DATA(adsp, (op >> 4) & 0x3fff));
 				break;
 			case 0x8c: case 0x8d: case 0x8e: case 0x8f:
 				/* 100011xx xxxxxxxx xxxxxxxx  read data memory (immediate addr) to reg group 3 */
-				WRITE_REG(adsp, 3, op & 15, RWORD_DATA((op >> 4) & 0x3fff));
+				WRITE_REG(adsp, 3, op & 15, RWORD_DATA(adsp, (op >> 4) & 0x3fff));
 				break;
 			case 0x90: case 0x91: case 0x92: case 0x93:
 				/* 1001xxxx xxxxxxxx xxxxxxxx  write data memory (immediate addr) from reg group 0 */
-				WWORD_DATA((op >> 4) & 0x3fff, READ_REG(adsp, 0, op & 15));
+				WWORD_DATA(adsp, (op >> 4) & 0x3fff, READ_REG(adsp, 0, op & 15));
 				break;
 			case 0x94: case 0x95: case 0x96: case 0x97:
 				/* 1001xxxx xxxxxxxx xxxxxxxx  write data memory (immediate addr) from reg group 1 */
-				WWORD_DATA((op >> 4) & 0x3fff, READ_REG(adsp, 1, op & 15));
+				WWORD_DATA(adsp, (op >> 4) & 0x3fff, READ_REG(adsp, 1, op & 15));
 				break;
 			case 0x98: case 0x99: case 0x9a: case 0x9b:
 				/* 1001xxxx xxxxxxxx xxxxxxxx  write data memory (immediate addr) from reg group 2 */
-				WWORD_DATA((op >> 4) & 0x3fff, READ_REG(adsp, 2, op & 15));
+				WWORD_DATA(adsp, (op >> 4) & 0x3fff, READ_REG(adsp, 2, op & 15));
 				break;
 			case 0x9c: case 0x9d: case 0x9e: case 0x9f:
 				/* 1001xxxx xxxxxxxx xxxxxxxx  write data memory (immediate addr) from reg group 3 */
-				WWORD_DATA((op >> 4) & 0x3fff, READ_REG(adsp, 3, op & 15));
+				WWORD_DATA(adsp, (op >> 4) & 0x3fff, READ_REG(adsp, 3, op & 15));
 				break;
 			case 0xa0: case 0xa1: case 0xa2: case 0xa3: case 0xa4: case 0xa5: case 0xa6: case 0xa7:
 			case 0xa8: case 0xa9: case 0xaa: case 0xab: case 0xac: case 0xad: case 0xae: case 0xaf:
@@ -2508,14 +2522,14 @@ void adsp2181_idma_data_w(const device_config *device, UINT16 data)
 		/* lower 8 bits */
 		else
 		{
-			WWORD_PGM(adsp->idma_addr++ & 0x3fff, (adsp->idma_cache << 8) | (data & 0xff));
+			WWORD_PGM(adsp, adsp->idma_addr++ & 0x3fff, (adsp->idma_cache << 8) | (data & 0xff));
 			adsp->idma_offs = 0;
 		}
 	}
 
 	/* data memory */
 	else
-		WWORD_DATA(adsp->idma_addr++ & 0x3fff, data);
+		WWORD_DATA(adsp, adsp->idma_addr++ & 0x3fff, data);
 }
 
 UINT16 adsp2181_idma_data_r(const device_config *device)
@@ -2529,21 +2543,21 @@ UINT16 adsp2181_idma_data_r(const device_config *device)
 		/* upper 16 bits */
 		if (adsp->idma_offs == 0)
 		{
-			result = RWORD_PGM(adsp->idma_addr & 0x3fff) >> 8;
+			result = RWORD_PGM(adsp, adsp->idma_addr & 0x3fff) >> 8;
 			adsp->idma_offs = 1;
 		}
 
 		/* lower 8 bits */
 		else
 		{
-			result = RWORD_PGM(adsp->idma_addr++ & 0x3fff) & 0xff;
+			result = RWORD_PGM(adsp, adsp->idma_addr++ & 0x3fff) & 0xff;
 			adsp->idma_offs = 0;
 		}
 	}
 
 	/* data memory */
 	else
-		result = RWORD_DATA(adsp->idma_addr++ & 0x3fff);
+		result = RWORD_DATA(adsp, adsp->idma_addr++ & 0x3fff);
 
 	return result;
 }
