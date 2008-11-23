@@ -52,23 +52,13 @@
 */
 #define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
-#include "deprecat.h"
 #include "cpuexec.h"
 #include "m37710cm.h"
 
 #define M37710_DEBUG	(0)	// enables verbose logging for peripherals, etc.
 
-static void m37710_set_irq_line(int line, int state);
-
-/* Our CPU structure */
-m37710i_cpu_struct m37710i_cpu = {0};
-
-int m37710_ICount = 0;
-static int m37710_fullCount = 0;
-
-/* Temporary Variables */
-uint m37710i_source;
-uint m37710i_destination;
+static void m37710_set_irq_line(m37710i_cpu_struct *m37710i_cpu, int line, int state);
+void *token;
 
 /* interrupt control mapping */
 
@@ -269,22 +259,29 @@ static const char *const m37710_tnames[8] =
 };
 #endif
 
-static TIMER_CALLBACK( m37710_timer_cb )
+static void m37710_timer_cb_common(m37710i_cpu_struct *m37710i_cpu, int which, int cpunum)
 {
-	int which = (int)(FPTR)ptr;
 	int curirq = M37710_LINE_TIMERA0 - which;
-	int cpunum = param;
 
-	cpu_push_context(machine->cpu[cpunum]);
-	timer_adjust_oneshot(m37710i_cpu.timers[which], m37710i_cpu.reload[which], cpunum);
+	cpu_push_context(m37710i_cpu->device->machine->cpu[cpunum]);
+	timer_adjust_oneshot(m37710i_cpu->timers[which], m37710i_cpu->reload[which], cpunum);
 
-	m37710i_cpu.m37710_regs[m37710_irq_levels[curirq]] |= 0x04;
-	m37710_set_irq_line(curirq, PULSE_LINE);
-	cpu_triggerint(machine->cpu[cpunum]);
+	m37710i_cpu->m37710_regs[m37710_irq_levels[curirq]] |= 0x04;
+	m37710_set_irq_line(m37710i_cpu, curirq, PULSE_LINE);
+	cpu_triggerint(m37710i_cpu->device->machine->cpu[cpunum]);
 	cpu_pop_context();
 }
 
-static void m37710_external_tick(int timer, int state)
+static TIMER_CALLBACK( m37710_timer_0_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 0, cpunum); }
+static TIMER_CALLBACK( m37710_timer_1_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 1, cpunum); }
+static TIMER_CALLBACK( m37710_timer_2_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 2, cpunum); }
+static TIMER_CALLBACK( m37710_timer_3_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 3, cpunum); }
+static TIMER_CALLBACK( m37710_timer_4_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 4, cpunum); }
+static TIMER_CALLBACK( m37710_timer_5_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 5, cpunum); }
+static TIMER_CALLBACK( m37710_timer_6_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 6, cpunum); }
+static TIMER_CALLBACK( m37710_timer_7_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 7, cpunum); }
+
+static void m37710_external_tick(m37710i_cpu_struct *m37710i_cpu, int timer, int state)
 {
 	// we only care if the state is "on"
 	if (!state)
@@ -293,18 +290,18 @@ static void m37710_external_tick(int timer, int state)
 	}
 
 	// check if enabled
-	if (m37710i_cpu.m37710_regs[0x40] & (1<<timer))
+	if (m37710i_cpu->m37710_regs[0x40] & (1<<timer))
 	{
-		if ((m37710i_cpu.m37710_regs[0x56+timer] & 0x3) == 1)
+		if ((m37710i_cpu->m37710_regs[0x56+timer] & 0x3) == 1)
 		{
-			if (m37710i_cpu.m37710_regs[0x46+(timer*2)] == 0xff)
+			if (m37710i_cpu->m37710_regs[0x46+(timer*2)] == 0xff)
 			{
-				m37710i_cpu.m37710_regs[0x46+(timer*2)] = 0;
-				m37710i_cpu.m37710_regs[0x46+(timer*2)+1]++;
+				m37710i_cpu->m37710_regs[0x46+(timer*2)] = 0;
+				m37710i_cpu->m37710_regs[0x46+(timer*2)+1]++;
 			}
 			else
 			{
-				m37710i_cpu.m37710_regs[0x46+(timer*2)]++;
+				m37710i_cpu->m37710_regs[0x46+(timer*2)]++;
 			}
 		}
 		else
@@ -314,7 +311,7 @@ static void m37710_external_tick(int timer, int state)
 	}
 }
 
-static void m37710_recalc_timer(int timer)
+static void m37710_recalc_timer(m37710i_cpu_struct *m37710i_cpu, running_machine *machine, int timer)
 {
 	int cpunum = cpunum_get_active();
 	int tval;
@@ -323,31 +320,31 @@ static void m37710_recalc_timer(int timer)
 	static const int tscales[4] = { 2, 16, 64, 512 };
 
 	// check if enabled
-	if (m37710i_cpu.m37710_regs[0x40] & (1<<timer))
+	if (m37710i_cpu->m37710_regs[0x40] & (1<<timer))
 	{
 		#if M37710_DEBUG
 		mame_printf_debug("Timer %d (%s) is enabled\n", timer, m37710_tnames[timer]);
 		#endif
 
 		// set the timer's value
-		tval = m37710i_cpu.m37710_regs[0x46+(timer*2)] | (m37710i_cpu.m37710_regs[0x47+(timer*2)]<<8);
+		tval = m37710i_cpu->m37710_regs[0x46+(timer*2)] | (m37710i_cpu->m37710_regs[0x47+(timer*2)]<<8);
 
 		// check timer's mode
 		// modes are slightly different between timer groups A and B
 		if (timer < 5)
 		{
-			switch (m37710i_cpu.m37710_regs[0x56+timer] & 0x3)
+			switch (m37710i_cpu->m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	      	// timer mode
-					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(Machine->activecpu)), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
+					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(machine->activecpu)), tscales[m37710i_cpu->m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
 					#if M37710_DEBUG
 					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, 1.0 / attotime_to_double(time));
 					#endif
 
-					timer_adjust_oneshot(m37710i_cpu.timers[timer], time, cpunum);
-					m37710i_cpu.reload[timer] = time;
+					timer_adjust_oneshot(m37710i_cpu->timers[timer], time, cpunum);
+					m37710i_cpu->reload[timer] = time;
 					break;
 
 				case 1:	      	// event counter mode
@@ -371,18 +368,18 @@ static void m37710_recalc_timer(int timer)
 		}
 		else
 		{
-			switch (m37710i_cpu.m37710_regs[0x56+timer] & 0x3)
+			switch (m37710i_cpu->m37710_regs[0x56+timer] & 0x3)
 			{
 				case 0:	      	// timer mode
-					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(Machine->activecpu)), tscales[m37710i_cpu.m37710_regs[tcr[timer]]>>6]);
+					time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(machine->activecpu)), tscales[m37710i_cpu->m37710_regs[tcr[timer]]>>6]);
 					time = attotime_mul(time, tval + 1);
 
 					#if M37710_DEBUG
 					mame_printf_debug("Timer %d in timer mode, %f Hz\n", timer, 1.0 / attotime_to_double(time));
 					#endif
 
-					timer_adjust_oneshot(m37710i_cpu.timers[timer], time, cpunum);
-					m37710i_cpu.reload[timer] = time;
+					timer_adjust_oneshot(m37710i_cpu->timers[timer], time, cpunum);
+					m37710i_cpu->reload[timer] = time;
 					break;
 
 				case 1:	      	// event counter mode
@@ -407,7 +404,7 @@ static void m37710_recalc_timer(int timer)
 	}
 }
 
-static UINT8 m37710_internal_r(int offset)
+static UINT8 m37710_internal_r(m37710i_cpu_struct *m37710i_cpu, int offset)
 {
 	#if M37710_DEBUG
 	if (offset > 1)
@@ -417,147 +414,147 @@ static UINT8 m37710_internal_r(int offset)
 	switch (offset)
 	{
 		case 2: // p0
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_PORT0);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_PORT0);
 			break;
 		case 3: // p1
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_PORT1);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_PORT1);
 			break;
 		case 6: // p2
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_PORT2);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_PORT2);
 			break;
 		case 7: // p3
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_PORT3);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_PORT3);
 			break;
 		case 0xa: // p4
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_PORT4);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_PORT4);
 			break;
 		case 0xb: // p5
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_PORT5);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_PORT5);
 			break;
 		case 0xe: // p6
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_PORT6);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_PORT6);
 			break;
 		case 0xf: // p7
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_PORT7);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_PORT7);
 			break;
 		case 0x12: // p8
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_PORT8);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_PORT8);
 			break;
 
 		case 0x20:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC0_L);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC0_L);
 			break;
 		case 0x21:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC0_H);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC0_H);
 			break;
 		case 0x22:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC1_L);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC1_L);
 			break;
 		case 0x23:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC1_H);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC1_H);
 			break;
 		case 0x24:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC2_L);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC2_L);
 			break;
 		case 0x25:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC2_H);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC2_H);
 			break;
 		case 0x26:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC3_L);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC3_L);
 			break;
 		case 0x27:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC3_H);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC3_H);
 			break;
 		case 0x28:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC4_L);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC4_L);
 			break;
 		case 0x29:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC4_H);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC4_H);
 			break;
 		case 0x2a:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC5_L);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC5_L);
 			break;
 		case 0x2b:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC5_H);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC5_H);
 			break;
 		case 0x2c:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC6_L);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC6_L);
 			break;
 		case 0x2d:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC6_H);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC6_H);
 			break;
 		case 0x2e:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC7_L);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC7_L);
 			break;
 		case 0x2f:
-			return memory_read_byte_8le(m37710i_cpu.io, M37710_ADC7_H);
+			return memory_read_byte_8le(m37710i_cpu->io, M37710_ADC7_H);
 			break;
 		case 0x35:
 			return 0xff;	// UART control
 			break;
 
 		case 0x70:	// A/D IRQ control
-			return m37710i_cpu.m37710_regs[offset] | 8;
+			return m37710i_cpu->m37710_regs[offset] | 8;
 			break;
 	}
 
-	return m37710i_cpu.m37710_regs[offset];
+	return m37710i_cpu->m37710_regs[offset];
 }
 
-static void m37710_internal_w(int offset, UINT8 data)
+static void m37710_internal_w(m37710i_cpu_struct *m37710i_cpu, int offset, UINT8 data)
 {
 	int i;
 
 	switch(offset)
 	{
 		case 2: // p0
-			memory_write_byte_8le(m37710i_cpu.io, M37710_PORT0, data);
+			memory_write_byte_8le(m37710i_cpu->io, M37710_PORT0, data);
 			return;
 			break;
 		case 3: // p1
-			memory_write_byte_8le(m37710i_cpu.io, M37710_PORT1, data);
+			memory_write_byte_8le(m37710i_cpu->io, M37710_PORT1, data);
 			return;
 			break;
 		case 6: // p2
-			memory_write_byte_8le(m37710i_cpu.io, M37710_PORT2, data);
+			memory_write_byte_8le(m37710i_cpu->io, M37710_PORT2, data);
 			return;
 			break;
 		case 7: // p3
-			memory_write_byte_8le(m37710i_cpu.io, M37710_PORT3, data);
+			memory_write_byte_8le(m37710i_cpu->io, M37710_PORT3, data);
 			return;
 			break;
 		case 0xa: // p4
-			memory_write_byte_8le(m37710i_cpu.io, M37710_PORT4, data);
+			memory_write_byte_8le(m37710i_cpu->io, M37710_PORT4, data);
 			return;
 			break;
 		case 0xb: // p5
-			memory_write_byte_8le(m37710i_cpu.io, M37710_PORT5, data);
+			memory_write_byte_8le(m37710i_cpu->io, M37710_PORT5, data);
 			return;
 			break;
 		case 0xe: // p6
-			memory_write_byte_8le(m37710i_cpu.io, M37710_PORT6, data);
+			memory_write_byte_8le(m37710i_cpu->io, M37710_PORT6, data);
 			return;
 			break;
 		case 0xf: // p7
-			memory_write_byte_8le(m37710i_cpu.io, M37710_PORT7, data);
+			memory_write_byte_8le(m37710i_cpu->io, M37710_PORT7, data);
 			return;
 			break;
 		case 0x12: // p8
-			memory_write_byte_8le(m37710i_cpu.io, M37710_PORT8, data);
+			memory_write_byte_8le(m37710i_cpu->io, M37710_PORT8, data);
 			return;
 			break;
 
 		case 0x40:	// count start
 			for (i = 0; i < 8; i++)
 			{
-				if ((data & (1<<i)) && !(m37710i_cpu.m37710_regs[offset] & (1<<i)))
+				if ((data & (1<<i)) && !(m37710i_cpu->m37710_regs[offset] & (1<<i)))
 				{
-					m37710i_cpu.m37710_regs[offset] |= (1<<i);
-					m37710_recalc_timer(i);
+					m37710i_cpu->m37710_regs[offset] |= (1<<i);
+					m37710_recalc_timer(m37710i_cpu, m37710i_cpu->device->machine, i);
 				}
 			}
 
-			m37710i_cpu.m37710_regs[offset] = data;
+			m37710i_cpu->m37710_regs[offset] = data;
 
 			return;
 			break;
@@ -567,27 +564,29 @@ static void m37710_internal_w(int offset, UINT8 data)
 			break;
 	}
 
-	m37710i_cpu.m37710_regs[offset] = data;
+	m37710i_cpu->m37710_regs[offset] = data;
 
 	#if M37710_DEBUG
 	if (offset >= 0x1e && offset <= 0x40)
-	logerror("m37710_internal_w %x to %02x: %s = %x\n", data, (int)offset, m37710_rnames[(int)offset], m37710i_cpu.m37710_regs[offset]);
+	logerror("m37710_internal_w %x to %02x: %s = %x\n", data, (int)offset, m37710_rnames[(int)offset], m37710i_cpu->m37710_regs[offset]);
 	#endif
 }
 
 static READ16_HANDLER( m37710_internal_word_r )
 {
+	m37710i_cpu_struct *m37710i_cpu = (m37710i_cpu_struct *)space->cpu->token;
+
 	if (mem_mask == 0xffff)
 	{
-		return (m37710_internal_r(offset*2) | m37710_internal_r((offset*2)+1)<<8);
+		return (m37710_internal_r(m37710i_cpu, offset*2) | m37710_internal_r(m37710i_cpu, (offset*2)+1)<<8);
 	}
 	else if (mem_mask == 0xff00)
 	{
-		return m37710_internal_r((offset*2)+1)<<8;
+		return m37710_internal_r(m37710i_cpu, (offset*2)+1)<<8;
 	}
 	else if (mem_mask == 0x00ff)
 	{
-		return m37710_internal_r((offset*2));
+		return m37710_internal_r(m37710i_cpu, (offset*2));
 	}
 
 	return 0;
@@ -595,54 +594,56 @@ static READ16_HANDLER( m37710_internal_word_r )
 
 static WRITE16_HANDLER( m37710_internal_word_w )
 {
+	m37710i_cpu_struct *m37710i_cpu = (m37710i_cpu_struct *)space->cpu->token;
+
 	if (mem_mask == 0xffff)
 	{
-		m37710_internal_w((offset*2), data & 0xff);
-		m37710_internal_w((offset*2)+1, data>>8);
+		m37710_internal_w(m37710i_cpu, (offset*2), data & 0xff);
+		m37710_internal_w(m37710i_cpu, (offset*2)+1, data>>8);
 	}
 	else if (mem_mask == 0xff00)
 	{
-		m37710_internal_w((offset*2)+1, data>>8);
+		m37710_internal_w(m37710i_cpu, (offset*2)+1, data>>8);
 	}
 	else if (mem_mask == 0x00ff)
 	{
-		m37710_internal_w((offset*2), data & 0xff);
+		m37710_internal_w(m37710i_cpu, (offset*2), data & 0xff);
 	}
 }
 
-extern void (*const m37710i_opcodes_M0X0[])(void);
-extern void (*const m37710i_opcodes42_M0X0[])(void);
-extern void (*const m37710i_opcodes89_M0X0[])(void);
-extern uint m37710i_get_reg_M0X0(int regnum);
-extern void m37710i_set_reg_M0X0(int regnum, uint val);
-extern void m37710i_set_line_M0X0(int line, int state);
-extern int  m37710i_execute_M0X0(int cycles);
+extern void (*const m37710i_opcodes_M0X0[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const m37710i_opcodes42_M0X0[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const m37710i_opcodes89_M0X0[])(m37710i_cpu_struct *m37710i_cpu);
+extern uint m37710i_get_reg_M0X0(m37710i_cpu_struct *m37710i_cpu, int regnum);
+extern void m37710i_set_reg_M0X0(m37710i_cpu_struct *m37710i_cpu, int regnum, uint val);
+extern void m37710i_set_line_M0X0(m37710i_cpu_struct *m37710i_cpu, int line, int state);
+extern int  m37710i_execute_M0X0(m37710i_cpu_struct *m37710i_cpu, int cycles);
 
-extern void (*const m37710i_opcodes_M0X1[])(void);
-extern void (*const m37710i_opcodes42_M0X1[])(void);
-extern void (*const m37710i_opcodes89_M0X1[])(void);
-extern uint m37710i_get_reg_M0X1(int regnum);
-extern void m37710i_set_reg_M0X1(int regnum, uint val);
-extern void m37710i_set_line_M0X1(int line, int state);
-extern int  m37710i_execute_M0X1(int cycles);
+extern void (*const m37710i_opcodes_M0X1[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const m37710i_opcodes42_M0X1[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const m37710i_opcodes89_M0X1[])(m37710i_cpu_struct *m37710i_cpu);
+extern uint m37710i_get_reg_M0X1(m37710i_cpu_struct *m37710i_cpu, int regnum);
+extern void m37710i_set_reg_M0X1(m37710i_cpu_struct *m37710i_cpu, int regnum, uint val);
+extern void m37710i_set_line_M0X1(m37710i_cpu_struct *m37710i_cpu, int line, int state);
+extern int  m37710i_execute_M0X1(m37710i_cpu_struct *m37710i_cpu, int cycles);
 
-extern void (*const m37710i_opcodes_M1X0[])(void);
-extern void (*const m37710i_opcodes42_M1X0[])(void);
-extern void (*const m37710i_opcodes89_M1X0[])(void);
-extern uint m37710i_get_reg_M1X0(int regnum);
-extern void m37710i_set_reg_M1X0(int regnum, uint val);
-extern void m37710i_set_line_M1X0(int line, int state);
-extern int  m37710i_execute_M1X0(int cycles);
+extern void (*const m37710i_opcodes_M1X0[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const m37710i_opcodes42_M1X0[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const m37710i_opcodes89_M1X0[])(m37710i_cpu_struct *m37710i_cpu);
+extern uint m37710i_get_reg_M1X0(m37710i_cpu_struct *m37710i_cpu, int regnum);
+extern void m37710i_set_reg_M1X0(m37710i_cpu_struct *m37710i_cpu, int regnum, uint val);
+extern void m37710i_set_line_M1X0(m37710i_cpu_struct *m37710i_cpu, int line, int state);
+extern int  m37710i_execute_M1X0(m37710i_cpu_struct *m37710i_cpu, int cycles);
 
-extern void (*const m37710i_opcodes_M1X1[])(void);
-extern void (*const m37710i_opcodes42_M1X1[])(void);
-extern void (*const m37710i_opcodes89_M1X1[])(void);
-extern uint m37710i_get_reg_M1X1(int regnum);
-extern void m37710i_set_reg_M1X1(int regnum, uint val);
-extern void m37710i_set_line_M1X1(int line, int state);
-extern int  m37710i_execute_M1X1(int cycles);
+extern void (*const m37710i_opcodes_M1X1[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const m37710i_opcodes42_M1X1[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const m37710i_opcodes89_M1X1[])(m37710i_cpu_struct *m37710i_cpu);
+extern uint m37710i_get_reg_M1X1(m37710i_cpu_struct *m37710i_cpu, int regnum);
+extern void m37710i_set_reg_M1X1(m37710i_cpu_struct *m37710i_cpu, int regnum, uint val);
+extern void m37710i_set_line_M1X1(m37710i_cpu_struct *m37710i_cpu, int line, int state);
+extern int  m37710i_execute_M1X1(m37710i_cpu_struct *m37710i_cpu, int cycles);
 
-void (*const *const m37710i_opcodes[4])(void) =
+void (*const *const m37710i_opcodes[4])(m37710i_cpu_struct *m37710i_cpu) =
 {
 	m37710i_opcodes_M0X0,
 	m37710i_opcodes_M0X1,
@@ -650,7 +651,7 @@ void (*const *const m37710i_opcodes[4])(void) =
 	m37710i_opcodes_M1X1,
 };
 
-void (*const *const m37710i_opcodes2[4])(void) =
+void (*const *const m37710i_opcodes2[4])(m37710i_cpu_struct *m37710i_cpu) =
 {
 	m37710i_opcodes42_M0X0,
 	m37710i_opcodes42_M0X1,
@@ -658,7 +659,7 @@ void (*const *const m37710i_opcodes2[4])(void) =
 	m37710i_opcodes42_M1X1,
 };
 
-void (*const *const m37710i_opcodes3[4])(void) =
+void (*const *const m37710i_opcodes3[4])(m37710i_cpu_struct *m37710i_cpu) =
 {
 	m37710i_opcodes89_M0X0,
 	m37710i_opcodes89_M0X1,
@@ -666,7 +667,7 @@ void (*const *const m37710i_opcodes3[4])(void) =
 	m37710i_opcodes89_M1X1,
 };
 
-uint (*const m37710i_get_reg[4])(int regnum) =
+uint (*const m37710i_get_reg[4])(m37710i_cpu_struct *m37710i_cpu, int regnum) =
 {
 	m37710i_get_reg_M0X0,
 	m37710i_get_reg_M0X1,
@@ -674,7 +675,7 @@ uint (*const m37710i_get_reg[4])(int regnum) =
 	m37710i_get_reg_M1X1,
 };
 
-void (*const m37710i_set_reg[4])(int regnum, uint val) =
+void (*const m37710i_set_reg[4])(m37710i_cpu_struct *m37710i_cpu, int regnum, uint val) =
 {
 	m37710i_set_reg_M0X0,
 	m37710i_set_reg_M0X1,
@@ -682,7 +683,7 @@ void (*const m37710i_set_reg[4])(int regnum, uint val) =
 	m37710i_set_reg_M1X1,
 };
 
-void (*const m37710i_set_line[4])(int line, int state) =
+void (*const m37710i_set_line[4])(m37710i_cpu_struct *m37710i_cpu, int line, int state) =
 {
 	m37710i_set_line_M0X0,
 	m37710i_set_line_M0X1,
@@ -690,7 +691,7 @@ void (*const m37710i_set_line[4])(int line, int state) =
 	m37710i_set_line_M1X1,
 };
 
-int (*const m37710i_execute[4])(int cycles) =
+int (*const m37710i_execute[4])(m37710i_cpu_struct *m37710i_cpu, int cycles) =
 {
 	m37710i_execute_M0X0,
 	m37710i_execute_M0X1,
@@ -700,19 +701,19 @@ int (*const m37710i_execute[4])(int cycles) =
 
 /* internal functions */
 
-INLINE void m37710i_push_8(uint value)
+INLINE void m37710i_push_8(m37710i_cpu_struct *m37710i_cpu, uint value)
 {
 	m37710_write_8(REG_S, value);
 	REG_S = MAKE_UINT_16(REG_S-1);
 }
 
-INLINE void m37710i_push_16(uint value)
+INLINE void m37710i_push_16(m37710i_cpu_struct *m37710i_cpu, uint value)
 {
-	m37710i_push_8(value>>8);
-	m37710i_push_8(value&0xff);
+	m37710i_push_8(m37710i_cpu, value>>8);
+	m37710i_push_8(m37710i_cpu, value&0xff);
 }
 
-INLINE uint m37710i_get_reg_p(void)
+INLINE uint m37710i_get_reg_p(m37710i_cpu_struct *m37710i_cpu)
 {
 	return	(FLAG_N&0x80)		|
 			((FLAG_V>>1)&0x40)	|
@@ -724,7 +725,7 @@ INLINE uint m37710i_get_reg_p(void)
 			((FLAG_C>>8)&1);
 }
 
-void m37710i_update_irqs(void)
+void m37710i_update_irqs(m37710i_cpu_struct *m37710i_cpu)
 {
 	int curirq, pending = LINE_IRQ;
 	int wantedIRQ, curpri;
@@ -744,16 +745,16 @@ void m37710i_update_irqs(void)
 			// this IRQ is set
 			if (m37710_irq_levels[curirq])
 			{
-//              logerror("line %d set, level %x curpri %x IPL %x\n", curirq, m37710i_cpu.m37710_regs[m37710_irq_levels[curirq]] & 7, curpri, m37710i_cpu.ipl);
+//              logerror("line %d set, level %x curpri %x IPL %x\n", curirq, m37710i_cpu->m37710_regs[m37710_irq_levels[curirq]] & 7, curpri, m37710i_cpu->ipl);
 				// it's maskable, check if the level works
-				if ((m37710i_cpu.m37710_regs[m37710_irq_levels[curirq]] & 7) > curpri)
+				if ((m37710i_cpu->m37710_regs[m37710_irq_levels[curirq]] & 7) > curpri)
 				{
 					// also make sure it's acceptable for the current CPU level
-					if ((m37710i_cpu.m37710_regs[m37710_irq_levels[curirq]] & 7) > m37710i_cpu.ipl)
+					if ((m37710i_cpu->m37710_regs[m37710_irq_levels[curirq]] & 7) > m37710i_cpu->ipl)
 					{
 						// mark us as the best candidate
 						wantedIRQ = curirq;
-						curpri = m37710i_cpu.m37710_regs[m37710_irq_levels[curirq]] & 7;
+						curpri = m37710i_cpu->m37710_regs[m37710_irq_levels[curirq]] & 7;
 					}
 				}
 			}
@@ -769,7 +770,7 @@ void m37710i_update_irqs(void)
 
 	if (wantedIRQ != -1)
 	{
-		if (INT_ACK) INT_ACK(m37710i_cpu.device, wantedIRQ);
+		if (INT_ACK) INT_ACK(m37710i_cpu->device, wantedIRQ);
 
 		// make sure we're running to service the interrupt
 		CPU_STOPPED &= ~STOP_LEVEL_WAI;
@@ -777,27 +778,27 @@ void m37710i_update_irqs(void)
 		// indicate we're servicing it now
 		if (m37710_irq_levels[wantedIRQ])
 		{
-			m37710i_cpu.m37710_regs[m37710_irq_levels[wantedIRQ]] &= ~8;
+			m37710i_cpu->m37710_regs[m37710_irq_levels[wantedIRQ]] &= ~8;
 		}
 
 		// auto-clear if it's an internal line
 		if (wantedIRQ <= 12)
 		{
-			m37710_set_irq_line(wantedIRQ, CLEAR_LINE);
+			m37710_set_irq_line(m37710i_cpu, wantedIRQ, CLEAR_LINE);
 		}
 
 		// let's do it...
 		// push PB, then PC, then status
 		CLK(8);
-//      mame_printf_debug("taking IRQ %d: PC = %06x, SP = %04x, IPL %d\n", wantedIRQ, REG_PB | REG_PC, REG_S, m37710i_cpu.ipl);
-		m37710i_push_8(REG_PB>>16);
-		m37710i_push_16(REG_PC);
-		m37710i_push_8(m37710i_cpu.ipl);
-		m37710i_push_8(m37710i_get_reg_p());
+//      mame_printf_debug("taking IRQ %d: PC = %06x, SP = %04x, IPL %d\n", wantedIRQ, REG_PB | REG_PC, REG_S, m37710i_cpu->ipl);
+		m37710i_push_8(m37710i_cpu, REG_PB>>16);
+		m37710i_push_16(m37710i_cpu, REG_PC);
+		m37710i_push_8(m37710i_cpu, m37710i_cpu->ipl);
+		m37710i_push_8(m37710i_cpu, m37710i_get_reg_p(m37710i_cpu));
 
 		// set I to 1, set IPL to the interrupt we're taking
 		FLAG_I = IFLAG_SET;
-		m37710i_cpu.ipl = curpri;
+		m37710i_cpu->ipl = curpri;
 		// then PB=0, PC=(vector)
 		REG_PB = 0;
 		REG_PC = m37710_read_8(m37710_irq_vectors[wantedIRQ]) |
@@ -811,6 +812,8 @@ void m37710i_update_irqs(void)
 
 static CPU_RESET( m37710 )
 {
+	m37710i_cpu_struct *m37710i_cpu = device->token;
+
 	/* Start the CPU */
 	CPU_STOPPED = 0;
 
@@ -838,7 +841,7 @@ static CPU_RESET( m37710 )
 	IRQ_DELAY = 0;
 
 	/* Set the function tables to emulation mode */
-	m37710i_set_execution_mode(EXECUTION_MODE_M0X0);
+	m37710i_set_execution_mode(m37710i_cpu, EXECUTION_MODE_M0X0);
 
 	FLAG_Z = ZFLAG_CLEAR;
 	REG_S = 0x1ff;
@@ -854,44 +857,29 @@ CPU_EXIT( m37710 )
 	/* nothing to do yet */
 }
 
-#ifdef UNUSED_FUNCTION
-/* return elapsed cycles in the current slice */
-int m37710_getcycles(void)
-{
-	return (m37710_fullCount - m37710_ICount);
-}
-
-/* yield the current slice */
-void m37710_yield(void)
-{
-	m37710_fullCount = m37710_getcycles();
-
-	m37710_ICount = 0;
-}
-#endif
-
 /* Execute some instructions */
 static CPU_EXECUTE( m37710 )
 {
-	m37710_fullCount = cycles;
+	m37710i_cpu_struct *m37710 = device->token;
 
-	m37710i_update_irqs();
+	m37710i_update_irqs(m37710);
 
-	return FTABLE_EXECUTE(cycles);
+	return m37710->execute(m37710, cycles);
 }
 
 
 /* Get the current CPU context */
 static CPU_GET_CONTEXT( m37710 )
 {
-	*(m37710i_cpu_struct*)dst = m37710i_cpu;
 }
 
 /* Set the current CPU context */
 static CPU_SET_CONTEXT( m37710 )
 {
-	m37710i_cpu = *(m37710i_cpu_struct*)src;
-	m37710i_jumping(REG_PB | REG_PC);
+	if (src)
+	{
+		token = src;
+	}
 }
 
 /* Get the current Program Counter */
@@ -903,34 +891,34 @@ unsigned m37710_get_pc(void)
 #endif
 
 /* Set the Program Counter */
-static void m37710_set_pc(unsigned val)
+static void m37710_set_pc(m37710i_cpu_struct *m37710i_cpu, unsigned val)
 {
 	REG_PC = MAKE_UINT_16(val);
 	m37710_jumping(REG_PB | REG_PC);
 }
 
 /* Get the current Stack Pointer */
-static unsigned m37710_get_sp(void)
+static unsigned m37710_get_sp(m37710i_cpu_struct *m37710i_cpu)
 {
 	return REG_S;
 }
 
 /* Set the Stack Pointer */
-static void m37710_set_sp(unsigned val)
+static void m37710_set_sp(m37710i_cpu_struct *m37710i_cpu, unsigned val)
 {
 	REG_S = MAKE_UINT_16(val);
 }
 
 /* Get a register */
-static unsigned m37710_get_reg(int regnum)
+static unsigned m37710_get_reg(m37710i_cpu_struct *m37710i_cpu, int regnum)
 {
-	return FTABLE_GET_REG(regnum);
+	return FTABLE_GET_REG(m37710i_cpu, regnum);
 }
 
 /* Set a register */
-static void m37710_set_reg(int regnum, unsigned value)
+static void m37710_set_reg(m37710i_cpu_struct *m37710i_cpu, int regnum, unsigned value)
 {
-	FTABLE_SET_REG(regnum, value);
+	FTABLE_SET_REG(m37710i_cpu, regnum, value);
 }
 
 /* Load a CPU state */
@@ -944,9 +932,9 @@ void m37710_state_save(void *file)
 }
 
 /* Set an interrupt line */
-static void m37710_set_irq_line(int line, int state)
+static void m37710_set_irq_line(m37710i_cpu_struct *m37710i_cpu, int line, int state)
 {
-	FTABLE_SET_LINE(line, state);
+	FTABLE_SET_LINE(m37710i_cpu, line, state);
 }
 
 /* Set the callback that is called when servicing an interrupt */
@@ -962,13 +950,17 @@ void m37710_set_irq_callback(cpu_irq_callback callback)
 
 static CPU_DISASSEMBLE( m37710 )
 {
+	m37710i_cpu_struct *m37710i_cpu = device->token;
+
 	return m7700_disassemble(buffer, (pc&0xffff), pc>>16, oprom, FLAG_M, FLAG_X);
 }
 
 static STATE_POSTLOAD( m37710_restore_state )
 {
+	m37710i_cpu_struct *m37710i_cpu = (m37710i_cpu_struct *)param;
+
 	// restore proper function pointers
-	m37710i_set_execution_mode((FLAG_M>>4) | (FLAG_X>>4));
+	m37710i_set_execution_mode(m37710i_cpu, (FLAG_M>>4) | (FLAG_X>>4));
 
 	// make sure the memory system can keep up
 	m37710i_jumping(REG_PB | REG_PC);
@@ -976,74 +968,81 @@ static STATE_POSTLOAD( m37710_restore_state )
 
 static CPU_INIT( m37710 )
 {
-	int i;
+	m37710i_cpu_struct *m37710i_cpu = device->token;
 
-	memset(&m37710i_cpu, 0, sizeof(m37710i_cpu));
+	token = device->token;
+
+	memset(m37710i_cpu, 0, sizeof(m37710i_cpu));
 
 	INT_ACK = irqcallback;
-	m37710i_cpu.device = device;
-	m37710i_cpu.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	m37710i_cpu.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+	m37710i_cpu->device = device;
+	m37710i_cpu->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	m37710i_cpu->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	m37710_ICount = 0;
-	m37710_fullCount = 0;
+	m37710i_cpu->ICount = 0;
 
-	m37710i_source = 0;
-	m37710i_destination = 0;
+	m37710i_cpu->source = 0;
+	m37710i_cpu->destination = 0;
 
-	for (i=0; i<8; i++)
-		m37710i_cpu.timers[i] = timer_alloc(m37710_timer_cb, (void*)(FPTR)i);
+	m37710i_cpu->timers[0] = timer_alloc(m37710_timer_0_cb, m37710i_cpu);
+	m37710i_cpu->timers[1] = timer_alloc(m37710_timer_1_cb, m37710i_cpu);
+	m37710i_cpu->timers[2] = timer_alloc(m37710_timer_2_cb, m37710i_cpu);
+	m37710i_cpu->timers[3] = timer_alloc(m37710_timer_3_cb, m37710i_cpu);
+	m37710i_cpu->timers[4] = timer_alloc(m37710_timer_4_cb, m37710i_cpu);
+	m37710i_cpu->timers[5] = timer_alloc(m37710_timer_5_cb, m37710i_cpu);
+	m37710i_cpu->timers[6] = timer_alloc(m37710_timer_6_cb, m37710i_cpu);
+	m37710i_cpu->timers[7] = timer_alloc(m37710_timer_7_cb, m37710i_cpu);
 
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.a);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.b);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.ba);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.bb);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.x);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.y);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.s);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.pc);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.ppc);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.pb);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.db);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.d);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.flag_e);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.flag_m);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.flag_x);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.flag_n);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.flag_v);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.flag_d);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.flag_i);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.flag_z);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.flag_c);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.line_irq);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.ipl);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.ir);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.im);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.im2);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.im3);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.im4);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.irq_delay);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.irq_level);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.stopped);
-	state_save_register_item_array("M377xx", device->tag, 0, m37710i_cpu.m37710_regs);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[0].seconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[0].attoseconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[1].seconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[1].attoseconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[2].seconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[2].attoseconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[3].seconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[3].attoseconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[4].seconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[4].attoseconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[5].seconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[5].attoseconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[6].seconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[6].attoseconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[7].seconds);
-	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu.reload[7].attoseconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->a);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->b);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->ba);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->bb);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->x);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->y);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->s);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->pc);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->ppc);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->pb);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->db);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->d);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->flag_e);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->flag_m);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->flag_x);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->flag_n);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->flag_v);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->flag_d);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->flag_i);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->flag_z);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->flag_c);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->line_irq);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->ipl);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->ir);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->im);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->im2);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->im3);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->im4);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->irq_delay);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->irq_level);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->stopped);
+	state_save_register_item_array("M377xx", device->tag, 0, m37710i_cpu->m37710_regs);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[0].seconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[0].attoseconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[1].seconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[1].attoseconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[2].seconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[2].attoseconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[3].seconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[3].attoseconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[4].seconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[4].attoseconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[5].seconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[5].attoseconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[6].seconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[6].attoseconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[7].seconds);
+	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->reload[7].attoseconds);
 
-	state_save_register_postload(device->machine, m37710_restore_state, NULL);
+	state_save_register_postload(device->machine, m37710_restore_state, m37710i_cpu);
 }
 
 /**************************************************************************
@@ -1052,38 +1051,40 @@ static CPU_INIT( m37710 )
 
 static CPU_SET_INFO( m37710 )
 {
+	m37710i_cpu_struct *m37710i_cpu = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_ADC: 	m37710_set_irq_line(M37710_LINE_ADC, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ0: 	m37710_set_irq_line(M37710_LINE_IRQ0, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ1: 	m37710_set_irq_line(M37710_LINE_IRQ1, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ2: 	m37710_set_irq_line(M37710_LINE_IRQ2, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_ADC: 	m37710_set_irq_line(m37710i_cpu, M37710_LINE_ADC, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ0: 	m37710_set_irq_line(m37710i_cpu, M37710_LINE_IRQ0, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ1: 	m37710_set_irq_line(m37710i_cpu, M37710_LINE_IRQ1, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_IRQ2: 	m37710_set_irq_line(m37710i_cpu, M37710_LINE_IRQ2, info->i); break;
 
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA0TICK: m37710_external_tick(state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA1TICK: m37710_external_tick(state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA2TICK: m37710_external_tick(state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA3TICK: m37710_external_tick(state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA4TICK: m37710_external_tick(state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB0TICK: m37710_external_tick(state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB1TICK: m37710_external_tick(state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB2TICK: m37710_external_tick(state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA0TICK: m37710_external_tick(m37710i_cpu, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA1TICK: m37710_external_tick(m37710i_cpu, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA2TICK: m37710_external_tick(m37710i_cpu, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA3TICK: m37710_external_tick(m37710i_cpu, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERA4TICK: m37710_external_tick(m37710i_cpu, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB0TICK: m37710_external_tick(m37710i_cpu, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB1TICK: m37710_external_tick(m37710i_cpu, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M37710_LINE_TIMERB2TICK: m37710_external_tick(m37710i_cpu, state - CPUINFO_INT_INPUT_STATE - M37710_LINE_TIMERA0TICK, info->i); break;
 
-		case CPUINFO_INT_PC:							REG_PB = info->i & 0xff0000; m37710_set_pc(info->i & 0xffff); break;
-		case CPUINFO_INT_SP:							m37710_set_sp(info->i);	     			break;
+		case CPUINFO_INT_PC:							REG_PB = info->i & 0xff0000; m37710_set_pc(m37710i_cpu, info->i & 0xffff); break;
+		case CPUINFO_INT_SP:							m37710_set_sp(m37710i_cpu, info->i);	     			break;
 
-		case CPUINFO_INT_REGISTER + M37710_PC:			m37710_set_reg(M37710_PC, info->i);		break;
-		case CPUINFO_INT_REGISTER + M37710_S:			m37710_set_reg(M37710_S, info->i);		break;
-		case CPUINFO_INT_REGISTER + M37710_P:			m37710_set_reg(M37710_P, info->i&0xff);	m37710i_cpu.ipl = (info->i>>8)&0xff;	break;
-		case CPUINFO_INT_REGISTER + M37710_A:			m37710_set_reg(M37710_A, info->i);		break;
-		case CPUINFO_INT_REGISTER + M37710_X:			m37710_set_reg(M37710_X, info->i);		break;
-		case CPUINFO_INT_REGISTER + M37710_Y:			m37710_set_reg(M37710_Y, info->i);		break;
-		case CPUINFO_INT_REGISTER + M37710_PB:			m37710_set_reg(M37710_PB, info->i);		break;
-		case CPUINFO_INT_REGISTER + M37710_DB:			m37710_set_reg(M37710_DB, info->i);		break;
-		case CPUINFO_INT_REGISTER + M37710_D:			m37710_set_reg(M37710_D, info->i);		break;
-		case CPUINFO_INT_REGISTER + M37710_E:			m37710_set_reg(M37710_E, info->i);		break;
-		case CPUINFO_INT_REGISTER + M37710_NMI_STATE:	m37710_set_reg(M37710_NMI_STATE, info->i); break;
-		case CPUINFO_INT_REGISTER + M37710_IRQ_STATE:	m37710_set_reg(M37710_IRQ_STATE, info->i); break;
+		case CPUINFO_INT_REGISTER + M37710_PC:			m37710_set_reg(m37710i_cpu, M37710_PC, info->i);		break;
+		case CPUINFO_INT_REGISTER + M37710_S:			m37710_set_reg(m37710i_cpu, M37710_S, info->i);		break;
+		case CPUINFO_INT_REGISTER + M37710_P:			m37710_set_reg(m37710i_cpu, M37710_P, info->i&0xff);	m37710i_cpu->ipl = (info->i>>8)&0xff;	break;
+		case CPUINFO_INT_REGISTER + M37710_A:			m37710_set_reg(m37710i_cpu, M37710_A, info->i);		break;
+		case CPUINFO_INT_REGISTER + M37710_X:			m37710_set_reg(m37710i_cpu, M37710_X, info->i);		break;
+		case CPUINFO_INT_REGISTER + M37710_Y:			m37710_set_reg(m37710i_cpu, M37710_Y, info->i);		break;
+		case CPUINFO_INT_REGISTER + M37710_PB:			m37710_set_reg(m37710i_cpu, M37710_PB, info->i);		break;
+		case CPUINFO_INT_REGISTER + M37710_DB:			m37710_set_reg(m37710i_cpu, M37710_DB, info->i);		break;
+		case CPUINFO_INT_REGISTER + M37710_D:			m37710_set_reg(m37710i_cpu, M37710_D, info->i);		break;
+		case CPUINFO_INT_REGISTER + M37710_E:			m37710_set_reg(m37710i_cpu, M37710_E, info->i);		break;
+		case CPUINFO_INT_REGISTER + M37710_NMI_STATE:	m37710_set_reg(m37710i_cpu, M37710_NMI_STATE, info->i); break;
+		case CPUINFO_INT_REGISTER + M37710_IRQ_STATE:	m37710_set_reg(m37710i_cpu, M37710_IRQ_STATE, info->i); break;
 	}
 }
 
@@ -1099,10 +1100,12 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( m37710 )
 {
+	m37710i_cpu_struct *m37710i_cpu = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m37710i_cpu);			break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m37710i_cpu_struct);			break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
@@ -1130,21 +1133,21 @@ CPU_GET_INFO( m37710 )
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = REG_PPC;						break;
 		case CPUINFO_INT_PC:	 						info->i = (REG_PB | REG_PC);			break;
-		case CPUINFO_INT_SP:							info->i = m37710_get_sp();				break;
+		case CPUINFO_INT_SP:							info->i = m37710_get_sp(m37710i_cpu);				break;
 
-		case CPUINFO_INT_REGISTER + M37710_PC:			info->i = m37710_get_reg(M37710_PC);	break;
-		case CPUINFO_INT_REGISTER + M37710_S:			info->i = m37710_get_reg(M37710_S);		break;
-		case CPUINFO_INT_REGISTER + M37710_P:			info->i = m37710_get_reg(M37710_P) | (m37710i_cpu.ipl<<8); break;
-		case CPUINFO_INT_REGISTER + M37710_A:			info->i = m37710_get_reg(M37710_A);		break;
-		case CPUINFO_INT_REGISTER + M37710_B:			info->i = m37710_get_reg(M37710_B);		break;
-		case CPUINFO_INT_REGISTER + M37710_X:			info->i = m37710_get_reg(M37710_X);		break;
-		case CPUINFO_INT_REGISTER + M37710_Y:			info->i = m37710_get_reg(M37710_Y);		break;
-		case CPUINFO_INT_REGISTER + M37710_PB:			info->i = m37710_get_reg(M37710_PB);	break;
-		case CPUINFO_INT_REGISTER + M37710_DB:			info->i = m37710_get_reg(M37710_DB);	break;
-		case CPUINFO_INT_REGISTER + M37710_D:			info->i = m37710_get_reg(M37710_D);		break;
-		case CPUINFO_INT_REGISTER + M37710_E:			info->i = m37710_get_reg(M37710_E);		break;
-		case CPUINFO_INT_REGISTER + M37710_NMI_STATE:	info->i = m37710_get_reg(M37710_NMI_STATE); break;
-		case CPUINFO_INT_REGISTER + M37710_IRQ_STATE:	info->i = m37710_get_reg(M37710_IRQ_STATE); break;
+		case CPUINFO_INT_REGISTER + M37710_PC:			info->i = m37710_get_reg(m37710i_cpu, M37710_PC);	break;
+		case CPUINFO_INT_REGISTER + M37710_S:			info->i = m37710_get_reg(m37710i_cpu, M37710_S);		break;
+		case CPUINFO_INT_REGISTER + M37710_P:			info->i = m37710_get_reg(m37710i_cpu, M37710_P) | (m37710i_cpu->ipl<<8); break;
+		case CPUINFO_INT_REGISTER + M37710_A:			info->i = m37710_get_reg(m37710i_cpu, M37710_A);		break;
+		case CPUINFO_INT_REGISTER + M37710_B:			info->i = m37710_get_reg(m37710i_cpu, M37710_B);		break;
+		case CPUINFO_INT_REGISTER + M37710_X:			info->i = m37710_get_reg(m37710i_cpu, M37710_X);		break;
+		case CPUINFO_INT_REGISTER + M37710_Y:			info->i = m37710_get_reg(m37710i_cpu, M37710_Y);		break;
+		case CPUINFO_INT_REGISTER + M37710_PB:			info->i = m37710_get_reg(m37710i_cpu, M37710_PB);	break;
+		case CPUINFO_INT_REGISTER + M37710_DB:			info->i = m37710_get_reg(m37710i_cpu, M37710_DB);	break;
+		case CPUINFO_INT_REGISTER + M37710_D:			info->i = m37710_get_reg(m37710i_cpu, M37710_D);		break;
+		case CPUINFO_INT_REGISTER + M37710_E:			info->i = m37710_get_reg(m37710i_cpu, M37710_E);		break;
+		case CPUINFO_INT_REGISTER + M37710_NMI_STATE:	info->i = m37710_get_reg(m37710i_cpu, M37710_NMI_STATE); break;
+		case CPUINFO_INT_REGISTER + M37710_IRQ_STATE:	info->i = m37710_get_reg(m37710i_cpu, M37710_IRQ_STATE); break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m37710);		break;
@@ -1156,7 +1159,7 @@ CPU_GET_INFO( m37710 )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m37710);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m37710);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m37710_ICount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m37710i_cpu->ICount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: info->internal_map16 = ADDRESS_MAP_NAME(m37710_internal_map); break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA:    info->internal_map16 = NULL;	break;
@@ -1171,36 +1174,36 @@ CPU_GET_INFO( m37710 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				m37710i_cpu.flag_n & NFLAG_SET ? 'N':'.',
-				m37710i_cpu.flag_v & VFLAG_SET ? 'V':'.',
-				m37710i_cpu.flag_m & MFLAG_SET ? 'M':'.',
-				m37710i_cpu.flag_x & XFLAG_SET ? 'X':'.',
-				m37710i_cpu.flag_d & DFLAG_SET ? 'D':'.',
-				m37710i_cpu.flag_i & IFLAG_SET ? 'I':'.',
-				m37710i_cpu.flag_z == 0        ? 'Z':'.',
-				m37710i_cpu.flag_c & CFLAG_SET ? 'C':'.');
+				m37710i_cpu->flag_n & NFLAG_SET ? 'N':'.',
+				m37710i_cpu->flag_v & VFLAG_SET ? 'V':'.',
+				m37710i_cpu->flag_m & MFLAG_SET ? 'M':'.',
+				m37710i_cpu->flag_x & XFLAG_SET ? 'X':'.',
+				m37710i_cpu->flag_d & DFLAG_SET ? 'D':'.',
+				m37710i_cpu->flag_i & IFLAG_SET ? 'I':'.',
+				m37710i_cpu->flag_z == 0        ? 'Z':'.',
+				m37710i_cpu->flag_c & CFLAG_SET ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + M37710_PC:			sprintf(info->s, "PC:%04X", m37710i_cpu.pc); break;
-		case CPUINFO_STR_REGISTER + M37710_PB:			sprintf(info->s, "PB:%02X", m37710i_cpu.pb>>16); break;
-		case CPUINFO_STR_REGISTER + M37710_DB:			sprintf(info->s, "DB:%02X", m37710i_cpu.db>>16); break;
-		case CPUINFO_STR_REGISTER + M37710_D:			sprintf(info->s, "D:%04X", m37710i_cpu.d); break;
-		case CPUINFO_STR_REGISTER + M37710_S:			sprintf(info->s, "S:%04X", m37710i_cpu.s); break;
+		case CPUINFO_STR_REGISTER + M37710_PC:			sprintf(info->s, "PC:%04X", m37710i_cpu->pc); break;
+		case CPUINFO_STR_REGISTER + M37710_PB:			sprintf(info->s, "PB:%02X", m37710i_cpu->pb>>16); break;
+		case CPUINFO_STR_REGISTER + M37710_DB:			sprintf(info->s, "DB:%02X", m37710i_cpu->db>>16); break;
+		case CPUINFO_STR_REGISTER + M37710_D:			sprintf(info->s, "D:%04X", m37710i_cpu->d); break;
+		case CPUINFO_STR_REGISTER + M37710_S:			sprintf(info->s, "S:%04X", m37710i_cpu->s); break;
 		case CPUINFO_STR_REGISTER + M37710_P:			sprintf(info->s, "P:%04X",
-																 (m37710i_cpu.flag_n&0x80)		|
-																((m37710i_cpu.flag_v>>1)&0x40)	|
-																m37710i_cpu.flag_m				|
-																m37710i_cpu.flag_x				|
-																m37710i_cpu.flag_d				|
-																m37710i_cpu.flag_i				|
-																((!m37710i_cpu.flag_z)<<1)		|
-																((m37710i_cpu.flag_c>>8)&1) | (m37710i_cpu.ipl<<8)); break;
-		case CPUINFO_STR_REGISTER + M37710_E:			sprintf(info->s, "E:%d", m37710i_cpu.flag_e); break;
-		case CPUINFO_STR_REGISTER + M37710_A:			sprintf(info->s, "A:%04X", m37710i_cpu.a | m37710i_cpu.b); break;
-		case CPUINFO_STR_REGISTER + M37710_B:			sprintf(info->s, "B:%04X", m37710i_cpu.ba | m37710i_cpu.bb); break;
-		case CPUINFO_STR_REGISTER + M37710_X:			sprintf(info->s, "X:%04X", m37710i_cpu.x); break;
-		case CPUINFO_STR_REGISTER + M37710_Y:			sprintf(info->s, "Y:%04X", m37710i_cpu.y); break;
-		case CPUINFO_STR_REGISTER + M37710_IRQ_STATE:	sprintf(info->s, "IRQ:%X", m37710i_cpu.line_irq); break;
+																 (m37710i_cpu->flag_n&0x80)		|
+																((m37710i_cpu->flag_v>>1)&0x40)	|
+																m37710i_cpu->flag_m				|
+																m37710i_cpu->flag_x				|
+																m37710i_cpu->flag_d				|
+																m37710i_cpu->flag_i				|
+																((!m37710i_cpu->flag_z)<<1)		|
+																((m37710i_cpu->flag_c>>8)&1) | (m37710i_cpu->ipl<<8)); break;
+		case CPUINFO_STR_REGISTER + M37710_E:			sprintf(info->s, "E:%d", m37710i_cpu->flag_e); break;
+		case CPUINFO_STR_REGISTER + M37710_A:			sprintf(info->s, "A:%04X", m37710i_cpu->a | m37710i_cpu->b); break;
+		case CPUINFO_STR_REGISTER + M37710_B:			sprintf(info->s, "B:%04X", m37710i_cpu->ba | m37710i_cpu->bb); break;
+		case CPUINFO_STR_REGISTER + M37710_X:			sprintf(info->s, "X:%04X", m37710i_cpu->x); break;
+		case CPUINFO_STR_REGISTER + M37710_Y:			sprintf(info->s, "Y:%04X", m37710i_cpu->y); break;
+		case CPUINFO_STR_REGISTER + M37710_IRQ_STATE:	sprintf(info->s, "IRQ:%X", m37710i_cpu->line_irq); break;
 	}
 }
 

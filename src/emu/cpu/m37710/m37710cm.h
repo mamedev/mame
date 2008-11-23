@@ -96,18 +96,21 @@ struct _m37710i_cpu_struct
 	uint im4;		/* Immediate load target */
 	uint irq_delay;		/* delay 1 instruction before checking irq */
 	uint irq_level;		/* irq level */
+	int ICount;		/* cycle count */
+	uint source;		/* temp register */
+	uint destination;	/* temp register */
 	cpu_irq_callback int_ack;
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
 	uint stopped;		/* Sets how the CPU is stopped */
-	void (*const *opcodes)(void);		/* opcodes with no prefix */
-	void (*const *opcodes42)(void);	/* opcodes with 0x42 prefix */
-	void (*const *opcodes89)(void);	/* opcodes with 0x89 prefix */
-	uint (*get_reg)(int regnum);
-	void (*set_reg)(int regnum, uint val);
-	void (*set_line)(int line, int state);
-	int  (*execute)(int cycles);
+	void (*const *opcodes)(m37710i_cpu_struct *m37710i_cpu);		/* opcodes with no prefix */
+	void (*const *opcodes42)(m37710i_cpu_struct *m37710i_cpu);	/* opcodes with 0x42 prefix */
+	void (*const *opcodes89)(m37710i_cpu_struct *m37710i_cpu);	/* opcodes with 0x89 prefix */
+	uint (*get_reg)(m37710i_cpu_struct *m37710i_cpu, int regnum);
+	void (*set_reg)(m37710i_cpu_struct *m37710i_cpu, int regnum, uint val);
+	void (*set_line)(m37710i_cpu_struct *m37710i_cpu, int line, int state);
+	int  (*execute)(m37710i_cpu_struct *m37710i_cpu, int cycles);
 
 	// on-board peripheral stuff
 	UINT8 m37710_regs[128];
@@ -116,62 +119,54 @@ struct _m37710i_cpu_struct
 };
 
 
-extern m37710i_cpu_struct m37710i_cpu;
-extern int m37710_ICount;
-extern uint m37710i_source;
-extern uint m37710i_destination;
 extern uint m37710i_adc_tbl[];
 extern uint m37710i_sbc_tbl[];
 
-extern void (*const *const m37710i_opcodes[])(void);
-extern void (*const *const m37710i_opcodes2[])(void);
-extern void (*const *const m37710i_opcodes3[])(void);
-extern uint (*const m37710i_get_reg[])(int regnum);
-extern void (*const m37710i_set_reg[])(int regnum, uint val);
-extern void (*const m37710i_set_line[])(int line, int state);
-extern int (*const m37710i_execute[])(int cycles);
+extern void (*const *const m37710i_opcodes[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const *const m37710i_opcodes2[])(m37710i_cpu_struct *m37710i_cpu);
+extern void (*const *const m37710i_opcodes3[])(m37710i_cpu_struct *m37710i_cpu);
+extern uint (*const m37710i_get_reg[])(m37710i_cpu_struct *m37710i_cpu,int regnum);
+extern void (*const m37710i_set_reg[])(m37710i_cpu_struct *m37710i_cpu,int regnum, uint val);
+extern void (*const m37710i_set_line[])(m37710i_cpu_struct *m37710i_cpu,int line, int state);
+extern int (*const m37710i_execute[])(m37710i_cpu_struct *m37710i_cpu, int cycles);
 
-#define REG_A			m37710i_cpu.a		/* Accumulator */
-#define REG_B			m37710i_cpu.b		/* Accumulator hi byte */
-#define REG_BA			m37710i_cpu.ba		/* Secondary Accumulator */
-#define REG_BB			m37710i_cpu.bb		/* Secondary Accumulator hi byte */
-#define REG_X			m37710i_cpu.x		/* Index X Register */
-#define REG_Y			m37710i_cpu.y		/* Index Y Register */
-#define REG_S			m37710i_cpu.s		/* Stack Pointer */
-#define REG_PC			m37710i_cpu.pc		/* Program Counter */
-#define REG_PPC			m37710i_cpu.ppc		/* Previous Program Counter */
-#define REG_PB			m37710i_cpu.pb		/* Program Bank */
-#define REG_DB			m37710i_cpu.db		/* Data Bank */
-#define REG_D			m37710i_cpu.d		/* Direct Register */
-#define FLAG_M			m37710i_cpu.flag_m	/* Memory/Accumulator Select Flag */
-#define FLAG_X			m37710i_cpu.flag_x	/* Index Select Flag */
-#define FLAG_N			m37710i_cpu.flag_n	/* Negative Flag */
-#define FLAG_V			m37710i_cpu.flag_v	/* Overflow Flag */
-#define FLAG_D			m37710i_cpu.flag_d	/* Decimal Mode Flag */
-#define FLAG_I			m37710i_cpu.flag_i	/* Interrupt Mask Flag */
-#define FLAG_Z			m37710i_cpu.flag_z	/* Zero Flag (inverted) */
-#define FLAG_C			m37710i_cpu.flag_c	/* Carry Flag */
-#define LINE_IRQ		m37710i_cpu.line_irq	/* Status of the IRQ line */
-#define REG_IR			m37710i_cpu.ir		/* Instruction Register */
-#define REG_IM			m37710i_cpu.im		/* Immediate load value */
-#define REG_IM2			m37710i_cpu.im2		/* Immediate load target */
-#define REG_IM3			m37710i_cpu.im3		/* Immediate load target */
-#define REG_IM4			m37710i_cpu.im4		/* Immediate load target */
-#define INT_ACK			m37710i_cpu.int_ack	/* Interrupt Acknowledge function pointer */
-#define CLOCKS			m37710_ICount		/* Clock cycles remaining */
-#define IRQ_DELAY		m37710i_cpu.irq_delay /* Delay 1 instruction before checking IRQ */
-#define CPU_STOPPED 	m37710i_cpu.stopped	/* Stopped status of the CPU */
+#define REG_A			m37710i_cpu->a		/* Accumulator */
+#define REG_B			m37710i_cpu->b		/* Accumulator hi byte */
+#define REG_BA			m37710i_cpu->ba		/* Secondary Accumulator */
+#define REG_BB			m37710i_cpu->bb		/* Secondary Accumulator hi byte */
+#define REG_X			m37710i_cpu->x		/* Index X Register */
+#define REG_Y			m37710i_cpu->y		/* Index Y Register */
+#define REG_S			m37710i_cpu->s		/* Stack Pointer */
+#define REG_PC			m37710i_cpu->pc		/* Program Counter */
+#define REG_PPC			m37710i_cpu->ppc		/* Previous Program Counter */
+#define REG_PB			m37710i_cpu->pb		/* Program Bank */
+#define REG_DB			m37710i_cpu->db		/* Data Bank */
+#define REG_D			m37710i_cpu->d		/* Direct Register */
+#define FLAG_M			m37710i_cpu->flag_m	/* Memory/Accumulator Select Flag */
+#define FLAG_X			m37710i_cpu->flag_x	/* Index Select Flag */
+#define FLAG_N			m37710i_cpu->flag_n	/* Negative Flag */
+#define FLAG_V			m37710i_cpu->flag_v	/* Overflow Flag */
+#define FLAG_D			m37710i_cpu->flag_d	/* Decimal Mode Flag */
+#define FLAG_I			m37710i_cpu->flag_i	/* Interrupt Mask Flag */
+#define FLAG_Z			m37710i_cpu->flag_z	/* Zero Flag (inverted) */
+#define FLAG_C			m37710i_cpu->flag_c	/* Carry Flag */
+#define LINE_IRQ		m37710i_cpu->line_irq	/* Status of the IRQ line */
+#define REG_IR			m37710i_cpu->ir		/* Instruction Register */
+#define REG_IM			m37710i_cpu->im		/* Immediate load value */
+#define REG_IM2			m37710i_cpu->im2		/* Immediate load target */
+#define REG_IM3			m37710i_cpu->im3		/* Immediate load target */
+#define REG_IM4			m37710i_cpu->im4		/* Immediate load target */
+#define INT_ACK			m37710i_cpu->int_ack	/* Interrupt Acknowledge function pointer */
+#define CLOCKS			m37710i_cpu->ICount		/* Clock cycles remaining */
+#define IRQ_DELAY		m37710i_cpu->irq_delay /* Delay 1 instruction before checking IRQ */
+#define CPU_STOPPED 	m37710i_cpu->stopped	/* Stopped status of the CPU */
 
-#define FTABLE_OPCODES	m37710i_cpu.opcodes
-#define FTABLE_OPCODES2	m37710i_cpu.opcodes42
-#define FTABLE_OPCODES3	m37710i_cpu.opcodes89
-#define FTABLE_GET_REG	m37710i_cpu.get_reg
-#define FTABLE_SET_REG	m37710i_cpu.set_reg
-#define FTABLE_SET_LINE	m37710i_cpu.set_line
-#define FTABLE_EXECUTE	m37710i_cpu.execute
+#define FTABLE_GET_REG	m37710i_cpu->get_reg
+#define FTABLE_SET_REG	m37710i_cpu->set_reg
+#define FTABLE_SET_LINE	m37710i_cpu->set_line
 
-#define SRC  		m37710i_source		/* Source Operand */
-#define DST  		m37710i_destination	/* Destination Operand */
+#define SRC  		m37710i_cpu->source		/* Source Operand */
+#define DST  		m37710i_cpu->destination	/* Destination Operand */
 
 #define STOP_LEVEL_WAI	1
 #define STOP_LEVEL_STOP	2
@@ -181,15 +176,15 @@ extern int (*const m37710i_execute[])(int cycles);
 #define EXECUTION_MODE_M1X0	2
 #define EXECUTION_MODE_M1X1	3
 
-INLINE void m37710i_set_execution_mode(uint mode)
+INLINE void m37710i_set_execution_mode(m37710i_cpu_struct *m37710i_cpu, uint mode)
 {
-	FTABLE_OPCODES = m37710i_opcodes[mode];
-	FTABLE_OPCODES2 = m37710i_opcodes2[mode];
-	FTABLE_OPCODES3 = m37710i_opcodes3[mode];
+	m37710i_cpu->opcodes = m37710i_opcodes[mode];
+	m37710i_cpu->opcodes42 = m37710i_opcodes2[mode];
+	m37710i_cpu->opcodes89 = m37710i_opcodes3[mode];
 	FTABLE_GET_REG = m37710i_get_reg[mode];
 	FTABLE_SET_REG = m37710i_set_reg[mode];
 	FTABLE_SET_LINE = m37710i_set_line[mode];
-	FTABLE_EXECUTE = m37710i_execute[mode];
+	m37710i_cpu->execute = m37710i_execute[mode];
 }
 
 /* ======================================================================== */
@@ -317,7 +312,7 @@ INLINE void m37710i_set_execution_mode(uint mode)
 #define CFLAG_AS_1()	((FLAG_C>>8)&1)
 
 /* update IRQ state (internal use only) */
-void m37710i_update_irqs(void);
+void m37710i_update_irqs(m37710i_cpu_struct *m37710i_cpu);
 
 /* ======================================================================== */
 /* ================================== CPU ================================= */
