@@ -364,7 +364,7 @@ static UINT8 analog_bank;
 static UINT8 analog_value[4];
 static UINT8 sonic_last[6];
 
-static void (*system32_prot_vblank)(void);
+static void (*system32_prot_vblank)(const device_config *device);
 
 
 
@@ -573,7 +573,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
 	system32_set_vblank(1);
 	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), NULL, 0, end_of_vblank_int);
 	if (system32_prot_vblank)
-		(*system32_prot_vblank)();
+		(*system32_prot_vblank)(device);
 }
 
 

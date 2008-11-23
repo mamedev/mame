@@ -61,10 +61,10 @@ static WRITE16_HANDLER( soundcmd_w )
 /* The protection of the japanese version */
 /* I'd love to see someone dump the 68705 rom */
 
-static void write_dword(offs_t offset,UINT32 data)
+static void write_dword(const address_space *space,offs_t offset,UINT32 data)
 {
-	program_write_word(offset,data >> 16);
-	program_write_word(offset+2,data);
+	memory_write_word(space, offset,data >> 16);
+	memory_write_word(space, offset+2,data);
 }
 
 static WRITE16_HANDLER( protection_w )
@@ -78,31 +78,31 @@ static WRITE16_HANDLER( protection_w )
 	int map;
 
 	map = maplist
-		[program_read_byte(0xffc006)]
-		[(program_read_byte(0xffc003)<<1) + (program_read_word(0xffc004)>>8)];
+		[memory_read_byte(space, 0xffc006)]
+		[(memory_read_byte(space, 0xffc003)<<1) + (memory_read_word(space, 0xffc004)>>8)];
 
-	switch(program_read_byte(0xffc684)) {
+	switch(memory_read_byte(space, 0xffc684)) {
 	case 1:
 		{
 			int base;
 
 			base = 0x1b6e8+0x300e*map;
 
-			write_dword(0xffc01c, 0x16bfc+0x270*map);
-			write_dword(0xffc020, base+0x80);
-			write_dword(0xffc024, base);
-			write_dword(0xffc028, base+0x86);
-			write_dword(0xffc02c, base+0x8e);
-			write_dword(0xffc030, base+0x20e);
-			write_dword(0xffc034, base+0x30e);
-			write_dword(0xffc038, base+0x38e);
-			write_dword(0xffc03c, base+0x40e);
-			write_dword(0xffc040, base+0x80e);
-			write_dword(0xffc044, base+0xc0e);
-			write_dword(0xffc048, base+0x180e);
-			write_dword(0xffc04c, base+0x240e);
-			write_dword(0xffc050, 0x19548+0x60*map);
-			write_dword(0xffc054, 0x19578+0x60*map);
+			write_dword(space, 0xffc01c, 0x16bfc+0x270*map);
+			write_dword(space, 0xffc020, base+0x80);
+			write_dword(space, 0xffc024, base);
+			write_dword(space, 0xffc028, base+0x86);
+			write_dword(space, 0xffc02c, base+0x8e);
+			write_dword(space, 0xffc030, base+0x20e);
+			write_dword(space, 0xffc034, base+0x30e);
+			write_dword(space, 0xffc038, base+0x38e);
+			write_dword(space, 0xffc03c, base+0x40e);
+			write_dword(space, 0xffc040, base+0x80e);
+			write_dword(space, 0xffc044, base+0xc0e);
+			write_dword(space, 0xffc048, base+0x180e);
+			write_dword(space, 0xffc04c, base+0x240e);
+			write_dword(space, 0xffc050, 0x19548+0x60*map);
+			write_dword(space, 0xffc054, 0x19578+0x60*map);
 			break;
 		}
 	case 2:
@@ -117,10 +117,10 @@ static WRITE16_HANDLER( protection_w )
 			int d1 = delta1[map] + 0xc0;
 			int d2 = delta2[map];
 
-			program_write_word(0xffc680, d1);
-			program_write_word(0xffc682, d2);
-			program_write_word(0xffc00c, 0xc0);
-			program_write_word(0xffc00e, 0);
+			memory_write_word(space, 0xffc680, d1);
+			memory_write_word(space, 0xffc682, d2);
+			memory_write_word(space, 0xffc00c, 0xc0);
+			memory_write_word(space, 0xffc00e, 0);
 
 			sf_fg_scroll_w(space, 0, d1, 0xffff);
 			sf_bg_scroll_w(space, 0, d2, 0xffff);
@@ -128,12 +128,12 @@ static WRITE16_HANDLER( protection_w )
 		}
 	case 4:
 		{
-			int pos = program_read_byte(0xffc010);
+			int pos = memory_read_byte(space, 0xffc010);
 			pos = (pos+1) & 3;
-			program_write_byte(0xffc010, pos);
+			memory_write_byte(space, 0xffc010, pos);
 			if(!pos) {
-				int d1 = program_read_word(0xffc682);
-				int off = program_read_word(0xffc00e);
+				int d1 = memory_read_word(space, 0xffc682);
+				int off = memory_read_word(space, 0xffc00e);
 				if(off!=512) {
 					off++;
 					d1++;
@@ -141,8 +141,8 @@ static WRITE16_HANDLER( protection_w )
 					off = 0;
 					d1 -= 512;
 				}
-				program_write_word(0xffc682, d1);
-				program_write_word(0xffc00e, off);
+				memory_write_word(space, 0xffc682, d1);
+				memory_write_word(space, 0xffc00e, off);
 				sf_bg_scroll_w(space, 0, d1, 0xffff);
 			}
 			break;
@@ -150,7 +150,7 @@ static WRITE16_HANDLER( protection_w )
 	default:
 		{
 			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(space->cpu), data&0xffff);
-			logerror("*** Unknown protection %d\n", program_read_byte(0xffc684));
+			logerror("*** Unknown protection %d\n", memory_read_byte(space, 0xffc684));
 			break;
 		}
 	}

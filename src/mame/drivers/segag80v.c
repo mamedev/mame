@@ -212,26 +212,20 @@ static MACHINE_RESET( g80v )
  *
  *************************************/
 
-static offs_t decrypt_offset(running_machine *machine, offs_t offset)
+static offs_t decrypt_offset(const address_space *space, offs_t offset)
 {
-	offs_t pc;
-
-	/* if no active CPU, don't do anything */
-	if (machine->activecpu == NULL)
-		return offset;
-
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
-	pc = cpu_get_previouspc(machine->activecpu);
-	if ((UINT16)pc == 0xffff || program_read_byte(pc) != 0x32)
+	offs_t pc = cpu_get_previouspc(space->cpu);
+	if ((UINT16)pc == 0xffff || memory_read_byte(space, pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*sega_decrypt)(pc, program_read_byte(pc + 1));
+	return (offset & 0xff00) | (*sega_decrypt)(pc, memory_read_byte(space, pc + 1));
 }
 
-static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(space->machine, offset)] = data; }
-static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(space, decrypt_offset(space->machine, offset), data); }
-static WRITE8_HANDLER( vectorram_w ) { vectorram[decrypt_offset(space->machine, offset)] = data; }
+static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(space, offset)] = data; }
+static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(space, decrypt_offset(space, offset), data); }
+static WRITE8_HANDLER( vectorram_w ) { vectorram[decrypt_offset(space, offset)] = data; }
 
 
 

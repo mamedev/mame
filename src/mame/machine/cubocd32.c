@@ -498,7 +498,7 @@ static void akiko_start_dma( void )
 	timer_adjust_oneshot( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0 );
 }
 
-static void akiko_setup_response( int len, UINT8 *r1 )
+static void akiko_setup_response( const address_space *space, int len, UINT8 *r1 )
 {
 	int		resp_addr = akiko.cdrom_address[1];
 	UINT8	resp_csum = 0xff;
@@ -517,7 +517,7 @@ static void akiko_setup_response( int len, UINT8 *r1 )
 
 	for( i = 0; i < len; i++ )
 	{
-		program_write_byte( resp_addr + ((akiko.cdrom_cmd_resp + i) & 0xff), resp_buffer[i] );
+		memory_write_byte( space, resp_addr + ((akiko.cdrom_cmd_resp + i) & 0xff), resp_buffer[i] );
 	}
 
 	akiko.cdrom_cmd_resp = (akiko.cdrom_cmd_resp+len) & 0xff;
@@ -545,6 +545,7 @@ static TIMER_CALLBACK( akiko_cd_delayed_cmd )
 
 	if ( param == 0x05 )
 	{
+		const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 		if (LOG_AKIKO_CD) logerror( "AKIKO: Completing Command %d\n", param );
 
 		resp[0] = 0x06;
@@ -552,7 +553,7 @@ static TIMER_CALLBACK( akiko_cd_delayed_cmd )
 		if ( akiko.cdrom == NULL || akiko.cdrom_numtracks == 0 )
 		{
 			resp[1] = 0x80;
-			akiko_setup_response( 15, resp );
+			akiko_setup_response( space, 15, resp );
 		}
 		else
 		{
@@ -561,12 +562,12 @@ static TIMER_CALLBACK( akiko_cd_delayed_cmd )
 
 			akiko.cdrom_track_index = ( akiko.cdrom_track_index + 1 ) % akiko.cdrom_numtracks;
 
-			akiko_setup_response( 15, resp );
+			akiko_setup_response( space, 15, resp );
 		}
 	}
 }
 
-static void akiko_update_cdrom( void )
+static void akiko_update_cdrom(const address_space *space)
 {
 	UINT8	resp[32], cmdbuf[32];
 
@@ -576,7 +577,7 @@ static void akiko_update_cdrom( void )
 	while ( akiko.cdrom_cmd_start != akiko.cdrom_cmd_end )
 	{
 		UINT32	cmd_addr = akiko.cdrom_address[1] + 0x200 + akiko.cdrom_cmd_start;
-		int		cmd = program_read_byte( cmd_addr );
+		int		cmd = memory_read_byte( space, cmd_addr );
 
 		memset( resp, 0, sizeof( resp ) );
 		resp[0] = cmd;
@@ -596,7 +597,7 @@ static void akiko_update_cdrom( void )
 
 			akiko.cdrom_cmd_start = (akiko.cdrom_cmd_start+2) & 0xff;
 
-			akiko_setup_response( 2, resp );
+			akiko_setup_response( space, 2, resp );
 		}
 		else if ( cmd == 0x03 ) /* unpause audio (and check audiocd playing status) */
 		{
@@ -609,7 +610,7 @@ static void akiko_update_cdrom( void )
 
 			akiko.cdrom_cmd_start = (akiko.cdrom_cmd_start+2) & 0xff;
 
-			akiko_setup_response( 2, resp );
+			akiko_setup_response( space, 2, resp );
 		}
 		else if ( cmd == 0x04 ) /* seek/read/play cd multi command */
 		{
@@ -618,7 +619,7 @@ static void akiko_update_cdrom( void )
 
 			for( i = 0; i < 13; i++ )
 			{
-				cmdbuf[i] = program_read_byte( cmd_addr );
+				cmdbuf[i] = memory_read_byte( space, cmd_addr );
 				cmd_addr &= 0xffffff00;
 				cmd_addr += ( akiko.cdrom_cmd_start + i + 1 ) & 0xff;
 			}
@@ -628,7 +629,7 @@ static void akiko_update_cdrom( void )
 			if ( akiko.cdrom == NULL || akiko.cdrom_numtracks == 0 )
 			{
 				resp[1] = 0x80;
-				akiko_setup_response( 2, resp );
+				akiko_setup_response( space, 2, resp );
 			}
 			else
 			{
@@ -671,7 +672,7 @@ static void akiko_update_cdrom( void )
 					}
 				}
 
-				akiko_setup_response( 2, resp );
+				akiko_setup_response( space, 2, resp );
 			}
 		}
 		else if ( cmd == 0x05 ) /* read toc */
@@ -724,7 +725,7 @@ static void akiko_update_cdrom( void )
 				resp[1] = 0x80;
 			}
 
-			akiko_setup_response( 15, resp );
+			akiko_setup_response( space, 15, resp );
 		}
 		else if ( cmd == 0x07 )	/* check door status */
 		{
@@ -735,7 +736,7 @@ static void akiko_update_cdrom( void )
 			if ( akiko.cdrom == NULL || akiko.cdrom_numtracks == 0 )
 				resp[1] = 0x80;
 
-			akiko_setup_response( 20, resp );
+			akiko_setup_response( space, 20, resp );
 			break;
 		}
 		else
@@ -773,7 +774,7 @@ READ32_HANDLER(amiga_akiko32_r)
 			return akiko.cdrom_address[1];
 
 		case 0x18/4:	/* CDROM COMMAND 1 */
-			akiko_update_cdrom();
+			akiko_update_cdrom(space);
 			retval = akiko.cdrom_cmd_start;
 			retval <<= 8;
 			retval |= akiko.cdrom_cmd_resp;
@@ -781,7 +782,7 @@ READ32_HANDLER(amiga_akiko32_r)
 			return retval;
 
 		case 0x1C/4:	/* CDROM COMMAND 2 */
-			akiko_update_cdrom();
+			akiko_update_cdrom(space);
 			retval = akiko.cdrom_cmd_end;
 			retval <<= 16;
 			return retval;
@@ -840,14 +841,14 @@ WRITE32_HANDLER(amiga_akiko32_w)
 			if ( ACCESSING_BITS_8_15 )
 				akiko.cdrom_cmd_resp = ( data >> 8 ) & 0xff;
 
-			akiko_update_cdrom();
+			akiko_update_cdrom(space);
 			break;
 
 		case 0x1C/4:	/* CDROM COMMAND 2 */
 			if ( ACCESSING_BITS_16_23 )
 				akiko.cdrom_cmd_end = ( data >> 16 ) & 0xff;
 
-			akiko_update_cdrom();
+			akiko_update_cdrom(space);
 			break;
 
 		case 0x20/4:	/* CDROM DMA SECTOR READ REQUEST WRITE */

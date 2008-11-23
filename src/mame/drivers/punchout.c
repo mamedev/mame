@@ -173,10 +173,10 @@ static READ8_HANDLER( spunchout_prot_r ) {
 	switch ( offset ) {
 		case 0x00:
 			if ( prot_mode_sel == 0x0a )
-				return program_read_byte(0xd012);
+				return memory_read_byte(space, 0xd012);
 
 			if ( prot_mode_sel == 0x0b || prot_mode_sel == 0x23 )
-				return program_read_byte(0xd7c1);
+				return memory_read_byte(space, 0xd7c1);
 
 			return prot_mem[offset];
 		break;
@@ -248,12 +248,12 @@ static WRITE8_HANDLER( spunchout_prot_w ) {
 	switch ( offset ) {
 		case 0x00:
 			if ( prot_mode_sel == 0x0a ) {
-				program_write_byte(0xd012, data);
+				memory_write_byte(space, 0xd012, data);
 				return;
 			}
 
 			if ( prot_mode_sel == 0x0b || prot_mode_sel == 0x23 ) {
-				program_write_byte(0xd7c1, data);
+				memory_write_byte(space, 0xd7c1, data);
 				return;
 			}
 

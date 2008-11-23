@@ -421,12 +421,13 @@ static WRITE8_HANDLER(at_page8_w)
 
 static DMA8237_MEM_READ( pc_dma_read_byte )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 result;
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(device->machine->cpu[0]);
-	result = program_read_byte(page_offset + offset);
+	cpu_push_context(space->cpu);
+	result = memory_read_byte(space, page_offset + offset);
 	cpu_pop_context();
 
 	return result;
@@ -435,11 +436,12 @@ static DMA8237_MEM_READ( pc_dma_read_byte )
 
 static DMA8237_MEM_WRITE( pc_dma_write_byte )
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	offs_t page_offset = (((offs_t) dma_offset[0][channel]) << 16)
 		& 0xFF0000;
 
-	cpu_push_context(device->machine->cpu[0]);
-	program_write_byte(page_offset + offset, data);
+	cpu_push_context(space->cpu);
+	memory_write_byte(space, page_offset + offset, data);
 	cpu_pop_context();
 }
 

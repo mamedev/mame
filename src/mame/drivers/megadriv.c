@@ -178,7 +178,7 @@ static bitmap_t* render_bitmap;
 #ifdef UNUSED_FUNCTION
 /* taken from segaic16.c */
 /* doesn't seem to meet my needs, not used */
-static UINT16 read_next_instruction(void)
+static UINT16 read_next_instruction(const address_space *space)
 {
 	static UINT8 recurse = 0;
 	UINT16 result;
@@ -197,7 +197,7 @@ static UINT16 read_next_instruction(void)
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = program_read_word_16be(cpu_get_pc(machine->activecpu));
+	result = memory_read_word(space, cpu_get_pc(space->cpu));
 	recurse = 0;
 	return result;
 }
@@ -2288,7 +2288,7 @@ static READ16_HANDLER( megadriv_68k_check_z80_bus )
        the value is never zero.  Time Killers is the most fussy, and doesn't like the
        read_next_instruction function from system16, so I just return a random value
        in the unused bits */
-	UINT16 nextvalue = mame_rand(space->machine);//read_next_instruction()&0xff00;
+	UINT16 nextvalue = mame_rand(space->machine);//read_next_instruction(space)&0xff00;
 
 
 	/* Check if the 68k has the z80 bus */

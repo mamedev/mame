@@ -968,6 +968,8 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 		dcs.rev = 4;
 		soundbank_words = 0x800;
 	}
+	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
+	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.channels = 2;
 
 	/* initialize the ADSP Tx and timer callbacks */

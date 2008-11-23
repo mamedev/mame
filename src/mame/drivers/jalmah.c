@@ -634,13 +634,14 @@ static WRITE16_HANDLER( urashima_dma_w )
 	{
 		UINT32 i;
 		for(i=0;i<0x200;i+=2)
-			program_write_word(0x88200+i,program_read_word(0x88400+i));
+			memory_write_word(space,0x88200+i,memory_read_word(space,0x88400+i));
 	}
 }
 
 /*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
 static void daireika_palette_dma(running_machine *machine,UINT16 val)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT32 index_1,index_2,src_addr,tmp_addr;
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/
@@ -649,10 +650,10 @@ static void daireika_palette_dma(running_machine *machine,UINT16 val)
 	for(index_1=0;index_1<0x200;index_1+=0x20)
 	{
 		tmp_addr = src_addr;
-		src_addr = program_read_dword(src_addr);
+		src_addr = memory_read_dword(space,src_addr);
 
 		for(index_2=0;index_2<0x20;index_2+=2)
-			program_write_word(0x88000+index_2+index_1,program_read_word(src_addr+index_2));
+			memory_write_word(space,0x88000+index_2+index_1,memory_read_word(space,src_addr+index_2));
 
 		src_addr = tmp_addr + 4;
 	}

@@ -392,7 +392,7 @@ READ16_HANDLER( neogeo_unmapped_r )
 	else
 	{
 		recurse = 1;
-		ret = program_read_word(cpu_get_pc(space->cpu));
+		ret = memory_read_word(space, cpu_get_pc(space->cpu));
 		recurse = 0;
 	}
 

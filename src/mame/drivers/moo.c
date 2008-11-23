@@ -283,11 +283,11 @@ static WRITE16_HANDLER( moo_prot_w )
 
 		while (length)
 		{
-			a = program_read_word(src1);
-			b = program_read_word(src2);
+			a = memory_read_word(space, src1);
+			b = memory_read_word(space, src2);
 			res = a+2*b;
 
-			program_write_word(dst, res);
+			memory_write_word(space, dst, res);
 
 			src1 += 2;
 			src2 += 2;

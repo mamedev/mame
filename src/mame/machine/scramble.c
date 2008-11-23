@@ -166,12 +166,12 @@ static WRITE8_HANDLER( cavelon_banksw_w )
 
 READ8_HANDLER( hunchbks_mirror_r )
 {
-	return program_read_byte(0x1000+offset);
+	return memory_read_byte(space, 0x1000+offset);
 }
 
 WRITE8_HANDLER( hunchbks_mirror_w )
 {
-	program_write_byte(0x1000+offset,data);
+	memory_write_byte(space, 0x1000+offset,data);
 }
 
 static WRITE8_DEVICE_HANDLER( sound_latch_w ) 

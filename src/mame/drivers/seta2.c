@@ -679,7 +679,7 @@ ADDRESS_MAP_END
     The offset to use is stored in RAM at address 0x20BA16 */
 static READ16_HANDLER( pzlbowl_protection_r )
 {
-	UINT32 address = (program_read_word(0x20ba16) << 16) | program_read_word(0x20ba18);
+	UINT32 address = (memory_read_word(space, 0x20ba16) << 16) | memory_read_word(space, 0x20ba18);
 	return memory_region(space->machine, "main")[address - 2];
 }
 

@@ -472,7 +472,7 @@ static void vblank_assert(const device_config *device, int state);
 static void update_vblank_irq(running_machine *machine);
 static void galileo_reset(void);
 static TIMER_CALLBACK( galileo_timer_callback );
-static void galileo_perform_dma(running_machine *machine, int which);
+static void galileo_perform_dma(const address_space *space, int which);
 static void voodoo_stall(const device_config *device, int stall);
 static void widget_reset(running_machine *machine);
 static void update_widget_irq(running_machine *machine);
@@ -936,7 +936,7 @@ static TIMER_CALLBACK( galileo_timer_callback )
  *
  *************************************/
 
-static int galileo_dma_fetch_next(running_machine *machine, int which)
+static int galileo_dma_fetch_next(const address_space *space, int which)
 {
 	offs_t address = 0;
 	UINT32 data;
@@ -951,32 +951,32 @@ static int galileo_dma_fetch_next(running_machine *machine, int which)
 		if (galileo.reg[GREG_DMA0_CONTROL + which] & 0x400)
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs(machine);
+			update_galileo_irqs(space->machine);
 		}
 		galileo.reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 		return 0;
 	}
 
 	/* fetch the byte count */
-	data = program_read_dword(address); address += 4;
+	data = memory_read_dword(space, address); address += 4;
 	galileo.reg[GREG_DMA0_COUNT + which] = data;
 
 	/* fetch the source address */
-	data = program_read_dword(address); address += 4;
+	data = memory_read_dword(space, address); address += 4;
 	galileo.reg[GREG_DMA0_SOURCE + which] = data;
 
 	/* fetch the dest address */
-	data = program_read_dword(address); address += 4;
+	data = memory_read_dword(space, address); address += 4;
 	galileo.reg[GREG_DMA0_DEST + which] = data;
 
 	/* fetch the next record address */
-	data = program_read_dword(address); address += 4;
+	data = memory_read_dword(space, address); address += 4;
 	galileo.reg[GREG_DMA0_NEXT + which] = data;
 	return 1;
 }
 
 
-static void galileo_perform_dma(running_machine *machine, int which)
+static void galileo_perform_dma(const address_space *space, int which)
 {
 	do
 	{
@@ -1027,7 +1027,7 @@ static void galileo_perform_dma(running_machine *machine, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_w(voodoo_device, (dstaddr & 0xffffff) / 4, program_read_dword(srcaddr), 0xffffffff);
+				voodoo_w(voodoo_device, (dstaddr & 0xffffff) / 4, memory_read_dword(space, srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1039,7 +1039,7 @@ static void galileo_perform_dma(running_machine *machine, int which)
 		{
 			while (bytesleft > 0)
 			{
-				program_write_byte(dstaddr, program_read_byte(srcaddr));
+				memory_write_byte(space, dstaddr, memory_read_byte(space, srcaddr));
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft--;
@@ -1060,9 +1060,9 @@ static void galileo_perform_dma(running_machine *machine, int which)
 		if (!(galileo.reg[GREG_DMA0_CONTROL + which] & 0x400))
 		{
 			galileo.reg[GREG_INT_STATE] |= 1 << (GINT_DMA0COMP_SHIFT + which);
-			update_galileo_irqs(machine);
+			update_galileo_irqs(space->machine);
 		}
-	} while (galileo_dma_fetch_next(machine, which));
+	} while (galileo_dma_fetch_next(space, which));
 
 	galileo.reg[GREG_DMA0_CONTROL + which] &= ~0x5000;
 }
@@ -1186,12 +1186,12 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* fetch next record */
 			if (data & 0x2000)
-				galileo_dma_fetch_next(space->machine, which);
+				galileo_dma_fetch_next(space, which);
 			galileo.reg[offset] &= ~0x2000;
 
 			/* if enabling, start the DMA */
 			if (!(oldata & 0x1000) && (data & 0x1000))
-				galileo_perform_dma(space->machine, which);
+				galileo_perform_dma(space, which);
 			break;
 		}
 
@@ -1358,14 +1358,15 @@ static void voodoo_stall(const device_config *device, int stall)
 		for (which = 0; which < 4; which++)
 			if (galileo.dma_stalled_on_voodoo[which])
 			{
+				const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 				if (LOG_DMA) logerror("Resuming DMA%d on voodoo\n", which);
 
 				/* mark this DMA as no longer stalled */
 				galileo.dma_stalled_on_voodoo[which] = FALSE;
 
 				/* resume execution */
-				cpu_push_context(device->machine->cpu[0]);
-				galileo_perform_dma(device->machine, which);
+				cpu_push_context(space->cpu);
+				galileo_perform_dma(space, which);
 				cpu_pop_context();
 				break;
 			}

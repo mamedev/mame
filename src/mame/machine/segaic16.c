@@ -111,7 +111,7 @@ READ16_HANDLER( segaic16_open_bus_r )
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = program_read_word_16be(cpu_get_pc(space->cpu));
+	result = memory_read_word_16be(space, cpu_get_pc(space->cpu));
 	recurse = 0;
 	return result;
 }
@@ -238,17 +238,19 @@ static void memory_mapper_w(const address_space *space, struct memory_mapper_chi
 			/*   02 - read data into latches 00,01 from 2 * (address in 07,08,09) */
 			if (data == 0x01)
 			{
+				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
-				cpu_push_context(chip->cpu);
-				program_write_word_16be(addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
+				cpu_push_context(targetspace->cpu);
+				memory_write_word(targetspace, addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
 				cpu_pop_context();
 			}
 			else if (data == 0x02)
 			{
+				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
-				cpu_push_context(chip->cpu);
-				result = program_read_word_16be(addr);
+				cpu_push_context(targetspace->cpu);
+				result = memory_read_word(targetspace, addr);
 				cpu_pop_context();
 				chip->regs[0x00] = result >> 8;
 				chip->regs[0x01] = result;

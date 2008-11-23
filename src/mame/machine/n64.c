@@ -978,8 +978,8 @@ WRITE32_HANDLER( n64_pi_reg_w )
 			{
 				for (i=0; i < dma_length; i++)
 				{
-					UINT8 b = program_read_byte_32be(pi_dram_addr);
-					program_write_byte_32be(pi_cart_addr, b);
+					UINT8 b = memory_read_byte(space, pi_dram_addr);
+					memory_write_byte(space, pi_cart_addr, b);
 					pi_cart_addr += 1;
 					pi_dram_addr += 1;
 				}
@@ -1005,13 +1005,13 @@ WRITE32_HANDLER( n64_pi_reg_w )
 			{
 				for (i=0; i < dma_length; i++)
 				{
-					/*UINT32 d = program_read_dword_32be(pi_cart_addr);
-                    program_write_dword_32be(pi_dram_addr, d);
+					/*UINT32 d = memory_read_dword(space, pi_cart_addr);
+                    memory_write_dword(space, pi_dram_addr, d);
                     pi_cart_addr += 4;
                     pi_dram_addr += 4;*/
 
-					UINT8 b = program_read_byte_32be(pi_cart_addr);
-					program_write_byte_32be(pi_dram_addr, b);
+					UINT8 b = memory_read_byte(space, pi_cart_addr);
+					memory_write_byte(space, pi_dram_addr, b);
 					pi_cart_addr += 1;
 					pi_dram_addr += 1;
 				}
@@ -1021,8 +1021,8 @@ WRITE32_HANDLER( n64_pi_reg_w )
 			if (pi_first_dma)
 			{
 				// TODO: CIC-6105 has different address...
-				program_write_dword_32be(0x00000318, 0x400000);
-				program_write_dword_32be(0x000003f0, 0x800000);
+				memory_write_dword(space, 0x00000318, 0x400000);
+				memory_write_dword(space, 0x000003f0, 0x800000);
 				pi_first_dma = 0;
 			}
 

@@ -127,10 +127,11 @@ static const z80dma_interface mario_dma =
 
 static READ8_DEVICE_HANDLER(mario_dma_read_byte)
 {
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT8 result;
 
-	cpu_push_context(device->machine->cpu[0]);
-	result = program_read_byte(offset);
+	cpu_push_context(space->cpu);
+	result = memory_read_byte(space, offset);
 	cpu_pop_context();
 
 	return result;
@@ -138,8 +139,9 @@ static READ8_DEVICE_HANDLER(mario_dma_read_byte)
 
 static WRITE8_DEVICE_HANDLER(mario_dma_write_byte)
 {
-	cpu_push_context(device->machine->cpu[0]);
-	program_write_byte(offset, data);
+	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	cpu_push_context(space->cpu);
+	memory_write_byte(space, offset, data);
 	cpu_pop_context();
 }
 

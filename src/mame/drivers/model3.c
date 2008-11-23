@@ -767,8 +767,9 @@ static WRITE64_HANDLER(scsi_w)
 
 static UINT32 scsi_fetch(UINT32 dsp)
 {
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT32 result;
-	result = program_read_dword_64be(dsp);
+	result = memory_read_dword(space, dsp);
 	return FLIPENDIAN_INT32(result);
 }
 

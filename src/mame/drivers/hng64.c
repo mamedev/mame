@@ -644,7 +644,7 @@ static READ32_HANDLER( hng64_port_read )
 
 /* preliminary dma code, dma is used to copy program code -> ram */
 static int hng_dma_start,hng_dma_dst,hng_dma_len;
-static void hng64_do_dma (void)
+static void hng64_do_dma (const address_space *space)
 {
 	logerror("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 
@@ -652,8 +652,8 @@ static void hng64_do_dma (void)
 	{
 		UINT32 dat;
 
-		dat = program_read_dword(hng_dma_start);
-		program_write_dword(hng_dma_dst,dat);
+		dat = memory_read_dword(space,hng_dma_start);
+		memory_write_dword(space,hng_dma_dst,dat);
 		hng_dma_start+=4;
 		hng_dma_dst+=4;
 		hng_dma_len--;
@@ -680,7 +680,7 @@ static WRITE32_HANDLER( hng_dma_len_w )
 {
 	logerror ("DMA Len Write %08x\n",data);
 	hng_dma_len = data;
-	hng64_do_dma();
+	hng64_do_dma(space);
 
 }
 

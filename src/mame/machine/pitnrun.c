@@ -106,6 +106,7 @@ static TIMER_CALLBACK( pitnrun_mcu_status_real_w )
 
 WRITE8_HANDLER( pitnrun_68705_portB_w )
 {
+	const address_space *cpu0space = cpu_get_address_space(space->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
@@ -120,14 +121,14 @@ WRITE8_HANDLER( pitnrun_68705_portB_w )
 	}
 	if (~data & 0x10)
 	{
-    cpu_push_context(space->machine->cpu[0]);
-		program_write_byte(address, portA_out);
+    cpu_push_context(cpu0space->cpu);
+		memory_write_byte(cpu0space, address, portA_out);
     cpu_pop_context();
 	}
 	if (~data & 0x20)
 	{
-        cpu_push_context(space->machine->cpu[0]);
-				portA_in = program_read_byte(address);
+        cpu_push_context(cpu0space->cpu);
+				portA_in = memory_read_byte(cpu0space, address);
         cpu_pop_context();
 	}
 	if (~data & 0x40)

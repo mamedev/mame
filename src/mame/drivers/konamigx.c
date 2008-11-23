@@ -203,7 +203,7 @@ static struct sprite_entry {
 	UINT32 adr;
 } sprites[0x100];
 
-static void generate_sprites(UINT32 src, UINT32 spr, int count)
+static void generate_sprites(const address_space *space, UINT32 src, UINT32 spr, int count)
 {
 	int i;
 	int scount;
@@ -214,9 +214,9 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 	for(i=0; i<count; i++) {
 		UINT32 adr = src + 0x100*i;
 		int pri;
-		if(!program_read_word(adr+2))
+		if(!memory_read_word(space, adr+2))
 			continue;
-		pri = program_read_word(adr+28);
+		pri = memory_read_word(space, adr+28);
 
 		if(pri < 256) {
 			sprites[ecount].pri = pri;
@@ -229,39 +229,39 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 	for(i=0; i<ecount; i++) {
 		UINT32 adr = sprites[i].adr;
 		if(adr) {
-			UINT32 set =(program_read_word(adr) << 16)|program_read_word(adr+2);
-			UINT16 glob_x = program_read_word(adr+4);
-			UINT16 glob_y = program_read_word(adr+8);
-			UINT16 flip_x = program_read_word(adr+12) ? 0x1000 : 0x0000;
-			UINT16 flip_y = program_read_word(adr+14) ? 0x2000 : 0x0000;
+			UINT32 set =(memory_read_word(space, adr) << 16)|memory_read_word(space, adr+2);
+			UINT16 glob_x = memory_read_word(space, adr+4);
+			UINT16 glob_y = memory_read_word(space, adr+8);
+			UINT16 flip_x = memory_read_word(space, adr+12) ? 0x1000 : 0x0000;
+			UINT16 flip_y = memory_read_word(space, adr+14) ? 0x2000 : 0x0000;
 			UINT16 glob_f = flip_x | (flip_y ^ 0x2000);
-			UINT16 zoom_x = program_read_word(adr+20);
-			UINT16 zoom_y = program_read_word(adr+22);
+			UINT16 zoom_x = memory_read_word(space, adr+20);
+			UINT16 zoom_y = memory_read_word(space, adr+22);
 			UINT16 color_val    = 0x0000;
 			UINT16 color_mask   = 0xffff;
 			UINT16 color_set    = 0x0000;
 			UINT16 color_rotate = 0x0000;
 			UINT16 v;
 
-			v = program_read_word(adr+24);
+			v = memory_read_word(space, adr+24);
 			if(v & 0x8000) {
 				color_mask = 0xf3ff;
 				color_val |= (v & 3) << 10;
 			}
 
-			v = program_read_word(adr+26);
+			v = memory_read_word(space, adr+26);
 			if(v & 0x8000) {
 				color_mask &= 0xfcff;
 				color_val  |= (v & 3) << 8;
 			}
 
-			v = program_read_word(adr+18);
+			v = memory_read_word(space, adr+18);
 			if(v & 0x8000) {
 				color_mask &= 0xff1f;
 				color_val  |= v & 0xe0;
 			}
 
-			v = program_read_word(adr+16);
+			v = memory_read_word(space, adr+16);
 			if(v & 0x8000)
 				color_set = v & 0x1f;
 			if(v & 0x4000)
@@ -274,14 +274,14 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 
 			if(set >= 0x200000 && set < 0xd00000)
 			{
-				UINT16 count2 = program_read_word(set);
+				UINT16 count2 = memory_read_word(space, set);
 				set += 2;
 				while(count2) {
-					UINT16 idx  = program_read_word(set);
-					UINT16 flip = program_read_word(set+2);
-					UINT16 col  = program_read_word(set+4);
-					short y = program_read_word(set+6);
-					short x = program_read_word(set+8);
+					UINT16 idx  = memory_read_word(space, set);
+					UINT16 flip = memory_read_word(space, set+2);
+					UINT16 col  = memory_read_word(space, set+4);
+					short y = memory_read_word(space, set+6);
+					short x = memory_read_word(space, set+8);
 
 					if(idx == 0xffff) {
 						set = (flip<<16) | col;
@@ -316,13 +316,13 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 					if(color_rotate)
 						col = (col & 0xffe0) | ((col + color_rotate) & 0x1f);
 
-					program_write_word(spr   , (flip ^ glob_f) | sprites[i].pri);
-					program_write_word(spr+ 2, idx);
-					program_write_word(spr+ 4, y);
-					program_write_word(spr+ 6, x);
-					program_write_word(spr+ 8, zoom_y);
-					program_write_word(spr+10, zoom_x);
-					program_write_word(spr+12, col);
+					memory_write_word(space, spr   , (flip ^ glob_f) | sprites[i].pri);
+					memory_write_word(space, spr+ 2, idx);
+					memory_write_word(space, spr+ 4, y);
+					memory_write_word(space, spr+ 6, x);
+					memory_write_word(space, spr+ 8, zoom_y);
+					memory_write_word(space, spr+10, zoom_x);
+					memory_write_word(space, spr+12, col);
 					spr += 16;
 					scount++;
 					if(scount == 256)
@@ -335,45 +335,45 @@ static void generate_sprites(UINT32 src, UINT32 spr, int count)
 		}
 	}
 	while(scount < 256) {
-		program_write_word(spr, scount);
+		memory_write_word(space, spr, scount);
 		scount++;
 		spr += 16;
 	}
 }
 
-static void tkmmpzdm_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void tkmmpzdm_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	konamigx_esc_alert(gx_workram, 0x0142, 0x100, 0);
 }
 
-static void dragoonj_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void dragoonj_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	konamigx_esc_alert(gx_workram, 0x5c00, 0x100, 0);
 }
 
-static void sal2_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void sal2_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	konamigx_esc_alert(gx_workram, 0x1c8c, 0x172, 1);
 }
 
-static void sexyparo_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void sexyparo_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	// The d20000 should probably be p3
-	generate_sprites(0xc00604, 0xd20000, 0xfc);
+	generate_sprites(space, 0xc00604, 0xd20000, 0xfc);
 }
 
-static void tbyahhoo_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void tbyahhoo_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	generate_sprites(0xc00000, 0xd20000, 0x100);
+	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-static void daiskiss_esc(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void daiskiss_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
-	generate_sprites(0xc00000, 0xd20000, 0x100);
+	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
 static UINT8 esc_program[4096];
-static void (*esc_cb)(UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
+static void (*esc_cb)(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 
 static WRITE32_HANDLER( esc_w )
 {
@@ -393,7 +393,7 @@ static WRITE32_HANDLER( esc_w )
 	}
 
 	/* the master opcode can be at an unaligned address, so get it "safely" */
-	opcode = (program_read_word(data+2))|(program_read_word(data)<<16);
+	opcode = (memory_read_word(space, data+2))|(memory_read_word(space, data)<<16);
 
 	/* if there's an OBJECT_MAGIC_ID, that means
        there is a valid ESC command packet. */
@@ -401,15 +401,15 @@ static WRITE32_HANDLER( esc_w )
 	{
 		int i;
 		/* get the subop now */
-		opcode = program_read_byte(data+8);
-		params = (program_read_word(data+12) << 16) | program_read_word(data+14);
+		opcode = memory_read_byte(space, data+8);
+		params = (memory_read_word(space, data+12) << 16) | memory_read_word(space, data+14);
 
 		switch(opcode) {
 		case 5: // Reset
 			break;
 		case 2: // Load program
 			for(i=0; i<4096; i++)
-				esc_program[i] = program_read_byte(params+i);
+				esc_program[i] = memory_read_byte(space, params+i);
 /*
             {
                 FILE *f;
@@ -424,18 +424,18 @@ static WRITE32_HANDLER( esc_w )
 			break;
 		case 1: // Run program
 			if(esc_cb) {
-				UINT32 p1 = (program_read_word(params+0)<<16) | program_read_word(params+2);
-				UINT32 p2 = (program_read_word(params+4)<<16) | program_read_word(params+6);
-				UINT32 p3 = (program_read_word(params+8)<<16) | program_read_word(params+10);
-				UINT32 p4 = (program_read_word(params+12)<<16) | program_read_word(params+14);
-				esc_cb(p1, p2, p3, p4);
+				UINT32 p1 = (memory_read_word(space, params+0)<<16) | memory_read_word(space, params+2);
+				UINT32 p2 = (memory_read_word(space, params+4)<<16) | memory_read_word(space, params+6);
+				UINT32 p3 = (memory_read_word(space, params+8)<<16) | memory_read_word(space, params+10);
+				UINT32 p4 = (memory_read_word(space, params+12)<<16) | memory_read_word(space, params+14);
+				esc_cb(space, p1, p2, p3, p4);
 			}
 			break;
 		default:
 //          logerror("Unknown ESC opcode %d\n", opcode);
 			break;
 		}
-		program_write_byte(data+9, ESTATE_END);
+		memory_write_byte(space, data+9, ESTATE_END);
 
 		if (konamigx_wrport1_1 & 0x10)
 		{
@@ -1052,15 +1052,15 @@ static WRITE32_HANDLER( type4_prot_w )
 					// memcpy from c01000 to c01400 for 0x400 bytes (startup check for type 4 games)
 					for (i = 0; i < 0x400; i += 2)
 					{
-						program_write_word(0xc01400+i, program_read_word(0xc01000+i));
+						memory_write_word(space, 0xc01400+i, memory_read_word(space, 0xc01000+i));
 					}
 				}
 				else if(last_prot_op == 0x57a)	// winspike
 				{
-					program_write_dword(0xc10f00, program_read_dword(0xc00f10));
-					program_write_dword(0xc10f04, program_read_dword(0xc00f14));
-					program_write_dword(0xc0fe00, program_read_dword(0xc00f30));
-					program_write_dword(0xc0fe04, program_read_dword(0xc00f34));
+					memory_write_dword(space, 0xc10f00, memory_read_dword(space, 0xc00f10));
+					memory_write_dword(space, 0xc10f04, memory_read_dword(space, 0xc00f14));
+					memory_write_dword(space, 0xc0fe00, memory_read_dword(space, 0xc00f30));
+					memory_write_dword(space, 0xc0fe04, memory_read_dword(space, 0xc00f34));
 				}
 				else if(last_prot_op == 0xd97)	// rushhero
 				{
@@ -1072,7 +1072,7 @@ static WRITE32_HANDLER( type4_prot_w )
 					{
 						for (i = 0; i <= 0x10; i += 4)
 						{
-							program_write_dword(dst + i, program_read_dword(src+i));
+							memory_write_dword(space, dst + i, memory_read_dword(space, src+i));
 						}
 
 						src -= 0x10;

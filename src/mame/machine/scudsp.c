@@ -313,12 +313,12 @@ static UINT32 dsp_get_mem_source_dma( UINT32 memcode, UINT32 counter )
 	return 0;
 }
 
-void dsp_prg_ctrl(running_machine *machine, UINT32 data)
+void dsp_prg_ctrl(const address_space *space, UINT32 data)
 {
 	if(LEF) dsp_reg.pc = (data & 0xff);
-	if(EXF) dsp_execute_program();
+	if(EXF) dsp_execute_program(space);
 	if(EF && (!(stv_scu[40] & 0x0020)))
-		cpu_set_input_line_and_vector(machine->cpu[0], 0xa, HOLD_LINE , 0x45);
+		cpu_set_input_line_and_vector(space->machine->cpu[0], 0xa, HOLD_LINE , 0x45);
 }
 
 void dsp_prg_data(UINT32 data)
@@ -591,7 +591,7 @@ static void dsp_move_immediate( void )
 }
 
 
-static void dsp_dma( void )
+static void dsp_dma( const address_space *space )
 {
 	UINT8 hold = (opcode &  0x4000) >> 14;
 	UINT32 add = (opcode & 0x38000) >> 15;
@@ -650,7 +650,7 @@ static void dsp_dma( void )
 
 			if ( source >= 0x06000000 && source <= 0x060fffff )
 			{
-				data = program_read_dword(source );
+				data = memory_read_dword(space, source );
 			}
 			else
 			{
@@ -688,7 +688,7 @@ static void dsp_dma( void )
 #endif
 		for ( counter = 0; counter < transfer_cnt; counter++ )
 		{
-			program_write_dword(dest, dsp_get_mem_source_dma( dsp_mem, counter ) );
+			memory_write_dword(space, dest, dsp_get_mem_source_dma( dsp_mem, counter ) );
 			dest += add;
 		}
 
@@ -787,7 +787,7 @@ static void dsp_dump_mem( FILE *f )
 }
 #endif
 
-void dsp_execute_program()
+void dsp_execute_program(const address_space *dmaspace)
 {
 	UINT32 cycles_run = 0;
 	UINT8 cont = 1;
@@ -837,7 +837,7 @@ void dsp_execute_program()
 			switch( (opcode & 0x30000000) >> 28 )
 			{
 				case 0x00:
-					dsp_dma();
+					dsp_dma(dmaspace);
 					break;
 				case 0x01:
 					dsp_jump();
