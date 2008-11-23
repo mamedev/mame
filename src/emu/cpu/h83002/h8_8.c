@@ -62,7 +62,6 @@ INLINE void h8_mem_write32(h83xx_state *h8, offs_t address, UINT32 data)
 	memory_write_byte(h8->program, address+3, data);
 }
 
-static void *token;
 static void h8_check_irqs(h83xx_state *h8);
 
 /* implementation */
@@ -358,10 +357,6 @@ static CPU_GET_CONTEXT( h8 )
 
 static CPU_SET_CONTEXT( h8 )
 {
-	if (src)
-	{
-		token = src;
-	}
 }
 
 static CPU_SET_INFO( h8 )

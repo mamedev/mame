@@ -58,7 +58,6 @@
 #define M37710_DEBUG	(0)	// enables verbose logging for peripherals, etc.
 
 static void m37710_set_irq_line(m37710i_cpu_struct *m37710i_cpu, int line, int state);
-void *token;
 
 /* interrupt control mapping */
 
@@ -876,19 +875,7 @@ static CPU_GET_CONTEXT( m37710 )
 /* Set the current CPU context */
 static CPU_SET_CONTEXT( m37710 )
 {
-	if (src)
-	{
-		token = src;
-	}
 }
-
-/* Get the current Program Counter */
-#ifdef UNUSED_FUNCTION
-unsigned m37710_get_pc(void)
-{
-	return REG_PC;
-}
-#endif
 
 /* Set the Program Counter */
 static void m37710_set_pc(m37710i_cpu_struct *m37710i_cpu, unsigned val)
@@ -969,8 +956,6 @@ static STATE_POSTLOAD( m37710_restore_state )
 static CPU_INIT( m37710 )
 {
 	m37710i_cpu_struct *m37710i_cpu = device->token;
-
-	token = device->token;
 
 	memset(m37710i_cpu, 0, sizeof(m37710i_cpu));
 

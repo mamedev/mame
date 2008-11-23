@@ -46,7 +46,6 @@ INLINE void h8_mem_write32(h83xx_state *h8, offs_t address, UINT32 data)
 	memory_write_word_16be(h8->program, address + 2, data);
 }
 
-static void *token;
 static void h8_check_irqs(h83xx_state *h8);
 
 /* implementation */
@@ -207,8 +206,6 @@ static CPU_INIT(h8)
 {
 	h83xx_state *h8 = device->token;
 
-	token = device->token;
-
 	h8->h8iflag = 1;
 	h8->irq_cb = irqcallback;
 	h8->device = device;
@@ -239,8 +236,6 @@ static CPU_INIT(h8)
 static CPU_INIT(h8_3007)
 {
 	h83xx_state *h8 = device->token;
-
-	token = device->token;
 
 	CPU_INIT_CALL(h8);
 	h8_3007_itu_init(h8);
@@ -371,10 +366,6 @@ static CPU_GET_CONTEXT( h8 )
 
 static CPU_SET_CONTEXT( h8 )
 {
-	if (src)
-	{
-		token = src;
-	}
 }
 
 static CPU_SET_INFO( h8 )
