@@ -3489,11 +3489,11 @@ ROM_START( soldam )
 	ROM_LOAD( "23ver1.bin", 0x000000, 0x080000, CRC(0ca09432) SHA1(c9b12d564032c2a668e18ba95fd71ab540e798ce) )
 
 	ROM_REGION( 0x040000, "oki1", 0 )		/* Samples */
-	ROM_LOAD( "10ver1.bin", 0x000000, 0x020000, CRC(3848a32e) SHA1(3d1562d71f25a4f7a3ee2f42222f37f906226082) ) // matches first half of japan rom, check size
-
+	ROM_LOAD( "10ver1.bin", 0x000000, 0x040000, CRC(8d5613bf) SHA1(eee217dd2ab64d86b7f5eda55a3c331d862c079e) )
+	
 	ROM_REGION( 0x040000, "oki2", 0 )		/* Samples */
-	ROM_LOAD( "8ver1.bin",  0x000000, 0x020000, CRC(b5076706) SHA1(95478083817a4ce153c16f1d57237054089c2fee) )  // matches first half of japan rom, check size
-
+	ROM_LOAD( "8ver1.bin",  0x000000, 0x040000, CRC(fcd36019) SHA1(f4edb55bd62b697c5a73c461008e764c2f16956b) )
+	
 	ROM_REGION( 0x0200, "proms", 0 )		/* Priority PROM */
 	ROM_LOAD( "pr-91023.bin",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
