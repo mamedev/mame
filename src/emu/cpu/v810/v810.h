@@ -7,24 +7,24 @@
 
 void v810_get_info(UINT32, cpuinfo*);
 
-#define R_B(addr) (program_read_byte_32le(addr))
-#define R_H(addr) (program_read_word_32le(addr))
-#define R_W(addr) (program_read_dword_32le(addr))
+#define R_B(addr) (memory_read_byte_32le(v810.program, addr))
+#define R_H(addr) (memory_read_word_32le(v810.program, addr))
+#define R_W(addr) (memory_read_dword_32le(v810.program, addr))
 
 
-#define W_B(addr, val) (program_write_byte_32le(addr,val))
-#define W_H(addr, val) (program_write_word_32le(addr,val))
-#define W_W(addr, val) (program_write_dword_32le(addr,val))
+#define W_B(addr, val) (memory_write_byte_32le(v810.program, addr,val))
+#define W_H(addr, val) (memory_write_word_32le(v810.program, addr,val))
+#define W_W(addr, val) (memory_write_dword_32le(v810.program, addr,val))
 
 
-#define RIO_B(addr) (io_read_byte_32le(addr))
-#define RIO_H(addr) (io_read_word_32le(addr))
-#define RIO_W(addr) (io_read_dword_32le(addr))
+#define RIO_B(addr) (memory_read_byte_32le(v810.io, addr))
+#define RIO_H(addr) (memory_read_word_32le(v810.io, addr))
+#define RIO_W(addr) (memory_read_dword_32le(v810.io, addr))
 
 
-#define WIO_B(addr, val) (io_write_byte_32le(addr,val))
-#define WIO_H(addr, val) (io_write_word_32le(addr,val))
-#define WIO_W(addr, val) (io_write_dword_32le(addr,val))
+#define WIO_B(addr, val) (memory_write_byte_32le(v810.io, addr,val))
+#define WIO_H(addr, val) (memory_write_word_32le(v810.io, addr,val))
+#define WIO_W(addr, val) (memory_write_dword_32le(v810.io, addr,val))
 
 #define R_OP(addr)	(R_H(addr))
 

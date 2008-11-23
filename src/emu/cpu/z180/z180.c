@@ -76,6 +76,7 @@ Hitachi HD647180 series:
 
  *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "driver.h"
 #include "z180.h"
@@ -118,6 +119,8 @@ typedef struct {
 	z80_daisy_state *daisy;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *iospace;
 }	Z180_Regs;
 
 #define CF	0x01
@@ -812,7 +815,7 @@ static CPU_SET_INFO( z180 );
 static UINT8 z180_readcontrol(offs_t port)
 {
 	/* normal external readport */
-	UINT8 data = io_read_byte_8le(port);
+	UINT8 data = memory_read_byte_8le(Z180.iospace, port);
 
 	/* remap internal I/O registers */
 	if((port & (IO_IOCR & 0xc0)) == (IO_IOCR & 0xc0))
@@ -1240,7 +1243,7 @@ data |= 0x02; // kludge for 20pacgal
 static void z180_writecontrol(offs_t port, UINT8 data)
 {
 	/* normal external write port */
-	io_write_byte_8le(port, data);
+	memory_write_byte_8le(Z180.iospace, port, data);
 
 	/* remap internal I/O registers */
 	if((port & (IO_IOCR & 0xc0)) == (IO_IOCR & 0xc0))
@@ -1605,18 +1608,18 @@ static void z180_dma0(void)
 		switch( IO_DMODE & (Z180_DMODE_SM | Z180_DMODE_DM) )
 		{
 		case 0x00:	/* memory SAR0+1 to memory DAR0+1 */
-			program_write_byte_8le(dar0++, program_read_byte_8le(sar0++));
+			memory_write_byte_8le(Z180.program, dar0++, memory_read_byte_8le(Z180.program, sar0++));
 			break;
 		case 0x04:	/* memory SAR0-1 to memory DAR0+1 */
-			program_write_byte_8le(dar0++, program_read_byte_8le(sar0--));
+			memory_write_byte_8le(Z180.program, dar0++, memory_read_byte_8le(Z180.program, sar0--));
 			break;
 		case 0x08:	/* memory SAR0 fixed to memory DAR0+1 */
-			program_write_byte_8le(dar0++, program_read_byte_8le(sar0));
+			memory_write_byte_8le(Z180.program, dar0++, memory_read_byte_8le(Z180.program, sar0));
 			break;
 		case 0x0c:	/* I/O SAR0 fixed to memory DAR0+1 */
 			if (Z180.iol & Z180_DREQ0)
 			{
-				program_write_byte_8le(dar0++, IN(sar0));
+				memory_write_byte_8le(Z180.program, dar0++, IN(sar0));
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1626,18 +1629,18 @@ static void z180_dma0(void)
 			}
 			break;
 		case 0x10:	/* memory SAR0+1 to memory DAR0-1 */
-			program_write_byte_8le(dar0--, program_read_byte_8le(sar0++));
+			memory_write_byte_8le(Z180.program, dar0--, memory_read_byte_8le(Z180.program, sar0++));
 			break;
 		case 0x14:	/* memory SAR0-1 to memory DAR0-1 */
-			program_write_byte_8le(dar0--, program_read_byte_8le(sar0--));
+			memory_write_byte_8le(Z180.program, dar0--, memory_read_byte_8le(Z180.program, sar0--));
 			break;
 		case 0x18:	/* memory SAR0 fixed to memory DAR0-1 */
-			program_write_byte_8le(dar0--, program_read_byte_8le(sar0));
+			memory_write_byte_8le(Z180.program, dar0--, memory_read_byte_8le(Z180.program, sar0));
 			break;
 		case 0x1c:	/* I/O SAR0 fixed to memory DAR0-1 */
 			if (Z180.iol & Z180_DREQ0)
             {
-				program_write_byte_8le(dar0--, IN(sar0));
+				memory_write_byte_8le(Z180.program, dar0--, IN(sar0));
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1647,10 +1650,10 @@ static void z180_dma0(void)
 			}
 			break;
 		case 0x20:	/* memory SAR0+1 to memory DAR0 fixed */
-			program_write_byte_8le(dar0, program_read_byte_8le(sar0++));
+			memory_write_byte_8le(Z180.program, dar0, memory_read_byte_8le(Z180.program, sar0++));
 			break;
 		case 0x24:	/* memory SAR0-1 to memory DAR0 fixed */
-			program_write_byte_8le(dar0, program_read_byte_8le(sar0--));
+			memory_write_byte_8le(Z180.program, dar0, memory_read_byte_8le(Z180.program, sar0--));
 			break;
 		case 0x28:	/* reserved */
 			break;
@@ -1659,7 +1662,7 @@ static void z180_dma0(void)
 		case 0x30:	/* memory SAR0+1 to I/O DAR0 fixed */
 			if (Z180.iol & Z180_DREQ0)
             {
-				OUT(dar0, program_read_byte_8le(sar0++));
+				OUT(dar0, memory_read_byte_8le(Z180.program, sar0++));
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1671,7 +1674,7 @@ static void z180_dma0(void)
 		case 0x34:	/* memory SAR0-1 to I/O DAR0 fixed */
 			if (Z180.iol & Z180_DREQ0)
             {
-				OUT(dar0, program_read_byte_8le(sar0--));
+				OUT(dar0, memory_read_byte_8le(Z180.program, sar0--));
 				/* edge sensitive DREQ0 ? */
 				if (IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1736,16 +1739,16 @@ static void z180_dma1(void)
 	switch (IO_DCNTL & (Z180_DCNTL_DIM1 | Z180_DCNTL_DIM0))
 	{
 	case 0x00:	/* memory MAR1+1 to I/O IAR1 fixed */
-		io_write_byte_8le(iar1, program_read_byte_8le(mar1++));
+		memory_write_byte_8le(Z180.iospace, iar1, memory_read_byte_8le(Z180.program, mar1++));
 		break;
 	case 0x01:	/* memory MAR1-1 to I/O IAR1 fixed */
-		io_write_byte_8le(iar1, program_read_byte_8le(mar1--));
+		memory_write_byte_8le(Z180.iospace, iar1, memory_read_byte_8le(Z180.program, mar1--));
 		break;
 	case 0x02:	/* I/O IAR1 fixed to memory MAR1+1 */
-		program_write_byte_8le(mar1++, io_read_byte_8le(iar1));
+		memory_write_byte_8le(Z180.program, mar1++, memory_read_byte_8le(Z180.iospace, iar1));
 		break;
 	case 0x03:	/* I/O IAR1 fixed to memory MAR1-1 */
-		program_write_byte_8le(mar1--, io_read_byte_8le(iar1));
+		memory_write_byte_8le(Z180.program, mar1--, memory_read_byte_8le(Z180.iospace, iar1));
 		break;
 	}
 
@@ -1904,6 +1907,8 @@ static CPU_INIT( z180 )
 		Z180.daisy = z80daisy_init(device, device->static_config);
 	Z180.irq_callback = irqcallback;
 	Z180.device = device;
+	Z180.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	Z180.iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item("z180", device->tag, 0, Z180.AF.w.l);
 	state_save_register_item("z180", device->tag, 0, Z180.BC.w.l);
@@ -2023,6 +2028,8 @@ static CPU_RESET( z180 )
 	Z180.daisy = save_daisy;
 	Z180.irq_callback = save_irqcallback;
 	Z180.device = device;
+	Z180.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	Z180.iospace = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	_IX = _IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	_F = ZF;			/* Zero flag is set */
 	Z180.nmi_state = CLEAR_LINE;

@@ -16,6 +16,7 @@
 
 ********************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "v810.h"
 
@@ -29,6 +30,8 @@ typedef struct
 	UINT8 nmi_line;
 	cpu_irq_callback irq_cb;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	UINT32 PPC;
 	UINT32 op;
 } v810info;
@@ -952,6 +955,8 @@ static CPU_INIT( v810 )
 	v810.nmi_line = CLEAR_LINE;
 	v810.irq_cb = irqcallback;
 	v810.device = device;
+	v810.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	v810.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item_array("v810", device->tag, 0, v810.reg);
 	state_save_register_item("v810", device->tag, 0, v810.irq_line);

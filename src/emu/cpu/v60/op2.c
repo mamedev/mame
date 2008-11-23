@@ -13,13 +13,13 @@
 	if (f2Flag##num)								\
 		appf = u2f(v60.reg[f2Op##num]);  \
 	else	\
-		appf = u2f(MemRead32(f2Op##num));
+		appf = u2f(MemRead32(v60.program, f2Op##num));
 
 #define F2STOREOPFLOAT(num) \
 	if (f2Flag##num)		\
 		v60.reg[f2Op##num] = f2u(appf);  \
 	else	\
-		MemWrite32(f2Op##num, f2u(appf));
+		MemWrite32(v60.program, f2Op##num, f2u(appf));
 
 static void F2DecodeFirstOperand(UINT32 (*DecodeOp1)(void), UINT8 dim1)
 {
@@ -347,13 +347,13 @@ static UINT32 (*const Op5CTable[32])(void) =
 
 static UINT32 op5F(void)
 {
-	if2 = OpRead8(PC + 1);
+	if2 = OpRead8(v60.program,PC + 1);
 	return Op5FTable[if2&0x1F]();
 }
 
 
 static UINT32 op5C(void)
 {
-	if2 = OpRead8(PC + 1);
+	if2 = OpRead8(v60.program,PC + 1);
 	return Op5CTable[if2&0x1F]();
 }

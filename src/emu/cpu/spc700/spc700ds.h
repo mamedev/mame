@@ -23,7 +23,5 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 
 CPU_DISASSEMBLE( spc700 );
 
-#define spc700_read_8_disassembler(addr)				program_read_byte_8(addr)
-
 
 #endif /* __SPC700DS_H__ */

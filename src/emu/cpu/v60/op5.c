@@ -9,13 +9,12 @@ static UINT32 opBRK(void)
     UINT32 oldPSW = v60_update_psw_for_exception(0, 0);
 
     SP -=4;
-    MemWrite32(SP, EXCEPTION_CODE_AND_SIZE(0x0d00, 4));
+    MemWrite32(v60.program, SP, EXCEPTION_CODE_AND_SIZE(0x0d00, 4));
     SP -=4;
-    MemWrite32(SP, oldPSW);
+    MemWrite32(v60.program, SP, oldPSW);
     SP -=4;
-    MemWrite32(SP, PC + 1);
+    MemWrite32(v60.program, SP, PC + 1);
     PC = GETINTVECT(13);
-    ChangePC(PC);
 */
 	logerror("Skipping BRK opcode! PC=%x", PC);
 
@@ -27,15 +26,14 @@ static UINT32 opBRKV(void)
 	UINT32 oldPSW = v60_update_psw_for_exception(0, 0);
 
 	SP -=4;
-	MemWrite32(SP, PC);
+	MemWrite32(v60.program, SP, PC);
 	SP -=4;
-	MemWrite32(SP, EXCEPTION_CODE_AND_SIZE(0x1501, 4));
+	MemWrite32(v60.program, SP, EXCEPTION_CODE_AND_SIZE(0x1501, 4));
 	SP -=4;
-	MemWrite32(SP, oldPSW);
+	MemWrite32(v60.program, SP, oldPSW);
 	SP -=4;
-	MemWrite32(SP, PC + 1);
+	MemWrite32(v60.program, SP, PC + 1);
 	PC = GETINTVECT(21);
-	ChangePC(PC);
 
 	return 0;
 }
@@ -50,7 +48,7 @@ static UINT32 opCLRTLBA(void)
 static UINT32 opDISPOSE(void)
 {
 	SP = FP;
-	FP = MemRead32(SP);
+	FP = MemRead32(v60.program,SP);
 	SP +=4;
 
 	return 1;
@@ -70,9 +68,8 @@ static UINT32 opNOP(void) /* TRUSTED */
 
 static UINT32 opRSR(void)
 {
-	PC = MemRead32(SP);
+	PC = MemRead32(v60.program,SP);
 	SP +=4;
-	ChangePC(PC);
 
 	return 0;
 }

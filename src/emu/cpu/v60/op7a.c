@@ -58,7 +58,7 @@ static void F7aDecodeOperands(UINT32 (*DecodeOp1)(void), UINT8 dim1, UINT32 (*De
 	f7aOp1=amOut;
 
 	// Decode length
-	appb=OpRead8(PC+2+amLength1);
+	appb=OpRead8(v60.program,PC+2+amLength1);
 	if (appb&0x80)
 		f7aLenOp1=v60.reg[appb&0x1F];
 	else
@@ -73,7 +73,7 @@ static void F7aDecodeOperands(UINT32 (*DecodeOp1)(void), UINT8 dim1, UINT32 (*De
 	f7aOp2=amOut;
 
 	// Decode length
-	appb=OpRead8(PC+3+amLength1+amLength2);
+	appb=OpRead8(v60.program,PC+3+amLength1+amLength2);
 	if (appb&0x80)
 		f7aLenOp2=v60.reg[appb&0x1F];
 	else
@@ -92,7 +92,7 @@ static void F7bDecodeFirstOperand(UINT32 (*DecodeOp1)(void), UINT8 dim1)
 	f7bOp1=amOut;
 
 	// Decode ext
-	appb=OpRead8(PC+2+amLength1);
+	appb=OpRead8(v60.program,PC+2+amLength1);
 	if (appb&0x80)
 		f7bLen=v60.reg[appb&0x1F];
 	else
@@ -145,7 +145,7 @@ static void F7cDecodeOperands(UINT32 (*DecodeOp1)(void), UINT8 dim1, UINT32 (*De
 	f7cOp2=amOut;
 
 	// Decode ext
-	appb=OpRead8(PC+2+amLength1+amLength2);
+	appb=OpRead8(v60.program,PC+2+amLength1+amLength2);
 	if (appb&0x80)
 		f7cLen=v60.reg[appb&0x1F];
 	else
@@ -156,26 +156,26 @@ static void F7cDecodeOperands(UINT32 (*DecodeOp1)(void), UINT8 dim1, UINT32 (*De
 	if (f7cFlag1) \
 		appb = (UINT8)(v60.reg[f7cOp1]&0xFF); \
 	else \
-		appb = MemRead8(f7cOp1);
+		appb = MemRead8(v60.program, f7cOp1);
 
 #define F7CLOADOP2BYTE(appb) \
 	if (f7cFlag2) \
 		appb = (UINT8)(v60.reg[f7cOp2]&0xFF); \
 	else \
-		appb = MemRead8(f7cOp2);
+		appb = MemRead8(v60.program, f7cOp2);
 
 
 #define F7CSTOREOP2BYTE() \
 	if (f7cFlag2) \
 		SETREG8(v60.reg[f7cOp2], appb); \
 	else \
-		MemWrite8(f7cOp2, appb);
+		MemWrite8(v60.program, f7cOp2, appb);
 
 #define F7CSTOREOP2HALF() \
 	if (f7cFlag2) \
 		SETREG16(v60.reg[f7cOp2], apph); \
 	else \
-		MemWrite16(f7cOp2, apph);
+		MemWrite16(v60.program, f7cOp2, apph);
 
 static UINT32 opCMPSTRB(UINT8 bFill, UINT8 bStop)
 {
@@ -190,12 +190,12 @@ static UINT32 opCMPSTRB(UINT8 bFill, UINT8 bStop)
 		if (f7aLenOp1 < f7aLenOp2)
 		{
 			for (i=f7aLenOp1;i<f7aLenOp2;i++)
-				MemWrite8(f7aOp1+i,(UINT8)R26);
+				MemWrite8(v60.program, f7aOp1+i,(UINT8)R26);
 		}
 		else if (f7aLenOp2 < f7aLenOp1)
 		{
 			for (i=f7aLenOp2;i<f7aLenOp1;i++)
-				MemWrite8(f7aOp2+i,(UINT8)R26);
+				MemWrite8(v60.program, f7aOp2+i,(UINT8)R26);
 		}
 	}
 
@@ -207,8 +207,8 @@ static UINT32 opCMPSTRB(UINT8 bFill, UINT8 bStop)
 
 	for (i=0;i<dest;i++)
 	{
-		c1=MemRead8(f7aOp1+i);
-		c2=MemRead8(f7aOp2+i);
+		c1=MemRead8(v60.program, f7aOp1+i);
+		c2=MemRead8(v60.program, f7aOp2+i);
 
 		if (c1>c2)
 		{
@@ -256,12 +256,12 @@ static UINT32 opCMPSTRH(UINT8 bFill, UINT8 bStop)
 		if (f7aLenOp1 < f7aLenOp2)
 		{
 			for (i=f7aLenOp1;i<f7aLenOp2;i++)
-				MemWrite16(f7aOp1+i*2,(UINT16)R26);
+				MemWrite16(v60.program, f7aOp1+i*2,(UINT16)R26);
 		}
 		else if (f7aLenOp2 < f7aLenOp1)
 		{
 			for (i=f7aLenOp2;i<f7aLenOp1;i++)
-				MemWrite16(f7aOp2+i*2,(UINT16)R26);
+				MemWrite16(v60.program, f7aOp2+i*2,(UINT16)R26);
 		}
 	}
 
@@ -273,8 +273,8 @@ static UINT32 opCMPSTRH(UINT8 bFill, UINT8 bStop)
 
 	for (i=0;i<dest;i++)
 	{
-		c1=MemRead16(f7aOp1+i*2);
-		c2=MemRead16(f7aOp2+i*2);
+		c1=MemRead16(v60.program, f7aOp1+i*2);
+		c2=MemRead16(v60.program, f7aOp2+i*2);
 
 		if (c1>c2)
 		{
@@ -327,7 +327,7 @@ static UINT32 opMOVSTRUB(UINT8 bFill, UINT8 bStop) /* TRUSTED (0,0) (1,0) */
 
 	for (i=0;i<dest;i++)
 	{
-		MemWrite8(f7aOp2+i,(c1=MemRead8(f7aOp1+i)));
+		MemWrite8(v60.program, f7aOp2+i,(c1=MemRead8(v60.program, f7aOp1+i)));
 
 		if (bStop && c1==(UINT8)R26)
 			break;
@@ -339,7 +339,7 @@ static UINT32 opMOVSTRUB(UINT8 bFill, UINT8 bStop) /* TRUSTED (0,0) (1,0) */
 	if (bFill && f7aLenOp1 < f7aLenOp2)
 	{
 		for (;i<f7aLenOp2;i++)
-			MemWrite8(f7aOp2+i,(UINT8)R26);
+			MemWrite8(v60.program, f7aOp2+i,(UINT8)R26);
 
 		R27=f7aOp2+i;
 	}
@@ -359,7 +359,7 @@ static UINT32 opMOVSTRDB(UINT8 bFill, UINT8 bStop)
 
 	for (i=0;i<dest;i++)
 	{
-		MemWrite8(f7aOp2+(dest-i-1),(c1=MemRead8(f7aOp1+(dest-i-1))));
+		MemWrite8(v60.program, f7aOp2+(dest-i-1),(c1=MemRead8(v60.program, f7aOp1+(dest-i-1))));
 
 		if (bStop && c1==(UINT8)R26)
 			break;
@@ -371,7 +371,7 @@ static UINT32 opMOVSTRDB(UINT8 bFill, UINT8 bStop)
 	if (bFill && f7aLenOp1 < f7aLenOp2)
 	{
 		for (;i<f7aLenOp2;i++)
-			MemWrite8(f7aOp2+dest+(f7aLenOp2-i-1),(UINT8)R26);
+			MemWrite8(v60.program, f7aOp2+dest+(f7aLenOp2-i-1),(UINT8)R26);
 
 		R27=f7aOp2+(f7aLenOp2-i-1);
 	}
@@ -395,7 +395,7 @@ static UINT32 opMOVSTRUH(UINT8 bFill, UINT8 bStop) /* TRUSTED (0,0) (1,0) */
 
 	for (i=0;i<dest;i++)
 	{
-		MemWrite16(f7aOp2+i*2,(c1=MemRead16(f7aOp1+i*2)));
+		MemWrite16(v60.program, f7aOp2+i*2,(c1=MemRead16(v60.program, f7aOp1+i*2)));
 
 		if (bStop && c1==(UINT16)R26)
 			break;
@@ -407,7 +407,7 @@ static UINT32 opMOVSTRUH(UINT8 bFill, UINT8 bStop) /* TRUSTED (0,0) (1,0) */
 	if (bFill && f7aLenOp1 < f7aLenOp2)
 	{
 		for (;i<f7aLenOp2;i++)
-			MemWrite16(f7aOp2+i*2,(UINT16)R26);
+			MemWrite16(v60.program, f7aOp2+i*2,(UINT16)R26);
 
 		R27=f7aOp2+i*2;
 	}
@@ -432,7 +432,7 @@ static UINT32 opMOVSTRDH(UINT8 bFill, UINT8 bStop)
 
 	for (i=0;i<dest;i++)
 	{
-		MemWrite16(f7aOp2+(dest-i-1)*2,(c1=MemRead16(f7aOp1+(dest-i-1)*2)));
+		MemWrite16(v60.program, f7aOp2+(dest-i-1)*2,(c1=MemRead16(v60.program, f7aOp1+(dest-i-1)*2)));
 
 		if (bStop && c1==(UINT16)R26)
 			break;
@@ -444,7 +444,7 @@ static UINT32 opMOVSTRDH(UINT8 bFill, UINT8 bStop)
 	if (bFill && f7aLenOp1 < f7aLenOp2)
 	{
 		for (;i<f7aLenOp2;i++)
-			MemWrite16(f7aOp2+(f7aLenOp2-i-1)*2,(UINT16)R26);
+			MemWrite16(v60.program, f7aOp2+(f7aLenOp2-i-1)*2,(UINT16)R26);
 
 		R27=f7aOp2+(f7aLenOp2-i-1)*2;
 	}
@@ -461,7 +461,7 @@ static UINT32 opSEARCHUB(UINT8 bSearch)
 
 	for (i=0;i<f7bLen;i++)
 	{
-		appb = (MemRead8(f7bOp1+i)==(UINT8)f7bOp2);
+		appb = (MemRead8(v60.program, f7bOp1+i)==(UINT8)f7bOp2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -487,7 +487,7 @@ static UINT32 opSEARCHUH(UINT8 bSearch)
 
 	for (i=0;i<f7bLen;i++)
 	{
-		appb = (MemRead16(f7bOp1+i*2)==(UINT16)f7bOp2);
+		appb = (MemRead16(v60.program, f7bOp1+i*2)==(UINT16)f7bOp2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -512,7 +512,7 @@ static UINT32 opSEARCHDB(UINT8 bSearch)
 
 	for (i=f7bLen;i>=0;i--)
 	{
-		appb = (MemRead8(f7bOp1+i)==(UINT8)f7bOp2);
+		appb = (MemRead8(v60.program, f7bOp1+i)==(UINT8)f7bOp2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -538,7 +538,7 @@ static UINT32 opSEARCHDH(UINT8 bSearch)
 
 	for (i=f7bLen-1;i>=0;i--)
 	{
-		appb = (MemRead16(f7bOp1+i*2)==(UINT16)f7bOp2);
+		appb = (MemRead16(v60.program, f7bOp1+i*2)==(UINT16)f7bOp2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -637,7 +637,7 @@ static UINT32 opSCHBS(UINT32 bSearch1)
 
 	// Read first UINT8
 	f7bOp1 += bamOffset/8;
-	data = MemRead8(f7bOp1);
+	data = MemRead8(v60.program, f7bOp1);
 	offset = bamOffset&7;
 
 	// Scan bitstring
@@ -658,7 +658,7 @@ static UINT32 opSCHBS(UINT32 bSearch1)
 			// Next UINT8 please
 			offset=0;
 			f7bOp1++;
-			data = MemRead8(f7bOp1);
+			data = MemRead8(v60.program, f7bOp1);
 		}
 	}
 
@@ -683,13 +683,13 @@ static UINT32 opINSBFR(void)
 	F7CCREATEBITMASK(f7cLen);
 
 	f7cOp2 += bamOffset/8;
-	appw = MemRead32(f7cOp2);
+	appw = MemRead32(v60.program,f7cOp2);
 	bamOffset &= 7;
 
 	appw &= ~(f7cLen << bamOffset);
 	appw |=  (f7cLen & f7cOp1) << bamOffset;
 
-	MemWrite32(f7cOp2, appw);
+	MemWrite32(v60.program, f7cOp2, appw);
 
 	F7CEND();
 }
@@ -704,13 +704,13 @@ static UINT32 opINSBFL(void)
 	F7CCREATEBITMASK(f7cLen);
 
 	f7cOp2 += bamOffset/8;
-	appw = MemRead32(f7cOp2);
+	appw = MemRead32(v60.program,f7cOp2);
 	bamOffset &= 7;
 
 	appw &= ~(f7cLen << bamOffset);
 	appw |=  (f7cLen & f7cOp1) << bamOffset;
 
-	MemWrite32(f7cOp2, appw);
+	MemWrite32(v60.program, f7cOp2, appw);
 
 	F7CEND();
 }
@@ -734,8 +734,8 @@ static UINT32 opMOVBSD(void)
 	f7bBamOffset1 &= 7;
 	f7bBamOffset2 &= 7;
 
-	srcdata = MemRead8(f7bOp1);
-	dstdata = MemRead8(f7bOp2);
+	srcdata = MemRead8(v60.program, f7bOp1);
+	dstdata = MemRead8(v60.program, f7bOp2);
 
 	for (i=0;i<f7bLen;i++)
 	{
@@ -750,14 +750,14 @@ static UINT32 opMOVBSD(void)
 		{
 			f7bBamOffset1 = 8;
 			f7bOp1--;
-			srcdata = MemRead8(f7bOp1);
+			srcdata = MemRead8(v60.program, f7bOp1);
 		}
 		if (f7bBamOffset2 == 0)
 		{
-			MemWrite8(f7bOp2, dstdata);
+			MemWrite8(v60.program, f7bOp2, dstdata);
 			f7bBamOffset2 = 8;
 			f7bOp2--;
-			dstdata = MemRead8(f7bOp2);
+			dstdata = MemRead8(v60.program, f7bOp2);
 		}
 
 		f7bBamOffset1--;
@@ -766,7 +766,7 @@ static UINT32 opMOVBSD(void)
 
 	// Flush of the final data
 	if (f7bBamOffset2 != 7)
-		MemWrite8(f7bOp2, dstdata);
+		MemWrite8(v60.program, f7bOp2, dstdata);
 
 	F7BEND();
 }
@@ -784,8 +784,8 @@ static UINT32 opMOVBSU(void)
 	f7bBamOffset1 &= 7;
 	f7bBamOffset2 &= 7;
 
-	srcdata = MemRead8(f7bOp1);
-	dstdata = MemRead8(f7bOp2);
+	srcdata = MemRead8(v60.program, f7bOp1);
+	dstdata = MemRead8(v60.program, f7bOp2);
 
 	for (i=0;i<f7bLen;i++)
 	{
@@ -802,20 +802,20 @@ static UINT32 opMOVBSU(void)
 		{
 			f7bBamOffset1 = 0;
 			f7bOp1++;
-			srcdata = MemRead8(f7bOp1);
+			srcdata = MemRead8(v60.program, f7bOp1);
 		}
 		if (f7bBamOffset2 == 8)
 		{
-			MemWrite8(f7bOp2, dstdata);
+			MemWrite8(v60.program, f7bOp2, dstdata);
 			f7bBamOffset2 = 0;
 			f7bOp2++;
-			dstdata = MemRead8(f7bOp2);
+			dstdata = MemRead8(v60.program, f7bOp2);
 		}
 	}
 
 	// Flush of the final data
 	if (f7bBamOffset2 != 0)
-		MemWrite8(f7bOp2, dstdata);
+		MemWrite8(v60.program, f7bOp2, dstdata);
 
 	F7BEND();
 }
@@ -1196,35 +1196,35 @@ static UINT32 (*const Op5ATable[32])(void) =
 
 static UINT32 op58(void)
 {
-	subOp = OpRead8(PC + 1);
+	subOp = OpRead8(v60.program,PC + 1);
 
 	return Op58Table[subOp&0x1F]();
 }
 
 static UINT32 op5A(void)
 {
-	subOp = OpRead8(PC + 1);
+	subOp = OpRead8(v60.program,PC + 1);
 
 	return Op5ATable[subOp&0x1F]();
 }
 
 static UINT32 op5B(void)
 {
-	subOp = OpRead8(PC + 1);
+	subOp = OpRead8(v60.program,PC + 1);
 
 	return Op5BTable[subOp&0x1F]();
 }
 
 static UINT32 op5D(void)
 {
-	subOp = OpRead8(PC + 1);
+	subOp = OpRead8(v60.program,PC + 1);
 
 	return Op5DTable[subOp&0x1F]();
 }
 
 static UINT32 op59(void)
 {
-	subOp = OpRead8(PC + 1);
+	subOp = OpRead8(v60.program,PC + 1);
 
 	return Op59Table[subOp&0x1F]();
 }

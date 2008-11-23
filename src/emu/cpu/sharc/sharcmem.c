@@ -153,7 +153,7 @@ static UINT32 dm_read32(UINT32 address)
 		}
 	}
 
-	return data_read_dword_32le(address << 2);
+	return memory_read_dword_32le(sharc.data, address << 2);
 }
 
 static void dm_write32(UINT32 address, UINT32 data)
@@ -198,5 +198,5 @@ static void dm_write32(UINT32 address, UINT32 data)
 		return;
 	}
 
-	data_write_dword_32le(address << 2, data);
+	memory_write_dword_32le(sharc.data, address << 2, data);
 }

@@ -43,14 +43,14 @@ static UINT8 modDim;
 static UINT32 ReadAM(void)
 {
 	modM=modM?1:0;
-	modVal=OpRead8(modAdd);
+	modVal=OpRead8(v60.program,modAdd);
 	return AMTable1[modM][modVal>>5]();
 }
 
 static UINT32 BitReadAM(void)
 {
 	modM=modM?1:0;
-	modVal=OpRead8(modAdd);
+	modVal=OpRead8(v60.program,modAdd);
 	return BAMTable1[modM][modVal>>5]();
 }
 
@@ -70,14 +70,14 @@ static UINT32 BitReadAM(void)
 static UINT32 ReadAMAddress(void)
 {
 	modM=modM?1:0;
-	modVal=OpRead8(modAdd);
+	modVal=OpRead8(v60.program,modAdd);
 	return AMTable2[modM][modVal>>5]();
 }
 
 static UINT32 BitReadAMAddress(void)
 {
 	modM=modM?1:0;
-	modVal=OpRead8(modAdd);
+	modVal=OpRead8(v60.program,modAdd);
 	return BAMTable2[modM][modVal>>5]();
 }
 
@@ -95,7 +95,7 @@ static UINT32 BitReadAMAddress(void)
 static UINT32 WriteAM(void)
 {
 	modM=modM?1:0;
-	modVal=OpRead8(modAdd);
+	modVal=OpRead8(v60.program,modAdd);
 	return AMTable3[modM][modVal>>5]();
 }
 

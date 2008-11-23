@@ -3,6 +3,7 @@
 // Main hacking and coding by Farfetch'd
 // Portability fixes by Richter Belmont
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "v60.h"
 
@@ -75,6 +76,8 @@ static struct v60info {
 	UINT8 nmi_line;
 	cpu_irq_callback irq_cb;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	UINT32 PPC;
 } v60;
 
@@ -268,7 +271,7 @@ INLINE UINT32 v60_update_psw_for_exception(int is_interrupt, int target_level)
 }
 
 
-#define GETINTVECT(nint)	MemRead32((SBR & ~0xfff) + (nint)*4)
+#define GETINTVECT(nint)	MemRead32(v60.program,(SBR & ~0xfff) + (nint)*4)
 #define EXCEPTION_CODE_AND_SIZE(code, size)	(((code) << 16) | (size))
 
 
@@ -286,7 +289,7 @@ INLINE UINT32 v60_update_psw_for_exception(int is_interrupt, int target_level)
 
 static UINT32 opUNHANDLED(void)
 {
-	fatalerror("Unhandled OpCode found : %02x at %08x", OpRead16(PC), PC);
+	fatalerror("Unhandled OpCode found : %02x at %08x", OpRead16(v60.program,PC), PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
@@ -325,6 +328,9 @@ static CPU_INIT( v60 )
 	// so I don't know what it contains.
 	PIR = 0x00006000;
 	v60.info = v60_i;
+	v60.device = device;
+	v60.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	v60.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 static CPU_INIT( v70 )
@@ -334,6 +340,9 @@ static CPU_INIT( v70 )
 	// so I don't know what it contains.
 	PIR = 0x00007000;
 	v60.info = v70_i;
+	v60.device = device;
+	v60.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	v60.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 static CPU_RESET( v60 )
@@ -344,7 +353,6 @@ static CPU_RESET( v60 )
 	SYCW	= 0x00000070;
 	TKCW	= 0x0000e000;
 	PSW2	= 0x0000f002;
-	ChangePC(PC);
 
 	_CY	= 0;
 	_OV	= 0;
@@ -367,9 +375,9 @@ static void v60_do_irq(int vector)
 
 	// Push PC and PSW onto the stack
 	SP-=4;
-	MemWrite32(SP, oldPSW);
+	MemWrite32(v60.program, SP, oldPSW);
 	SP-=4;
-	MemWrite32(SP, PC);
+	MemWrite32(v60.program, SP, PC);
 
 	// Jump to vector for user interrupt
 	PC = GETINTVECT(vector);
@@ -429,7 +437,7 @@ static CPU_EXECUTE( v60 )
 		v60.PPC = PC;
 		debugger_instruction_hook(device, PC);
 		v60_ICount -= 8;	/* fix me -- this is just an average */
-		inc = OpCodeTable[OpRead8(PC)]();
+		inc = OpCodeTable[OpRead8(v60.program,PC)]();
 		PC += inc;
 		if(v60.irq_line != CLEAR_LINE)
 			v60_try_irq();
@@ -449,7 +457,6 @@ static CPU_SET_CONTEXT( v60 )
 	if(src)
 	{
 		v60 = *(struct v60info *)src;
-		ChangePC(PC);
 	}
 }
 
@@ -470,7 +477,7 @@ static CPU_SET_INFO( v60 )
 		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(0, info->i);				break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(INPUT_LINE_NMI, info->i);	break;
 
-		case CPUINFO_INT_PC:							PC = info->i; ChangePC(PC);				break;
+		case CPUINFO_INT_PC:							PC = info->i; 							break;
 		case CPUINFO_INT_SP:							SP = info->i;							break;
 
 		case CPUINFO_INT_REGISTER + V60_R0:				R0 = info->i;							break;

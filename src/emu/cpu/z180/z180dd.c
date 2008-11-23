@@ -1,6 +1,6 @@
 OP(illegal,1) {
 	logerror("Z180 #%d ill. opcode $%02x $%02x\n",
-			cpunum_get_active(), program_decrypted_read_byte((_PCD-1)&0xffff), program_decrypted_read_byte(_PCD));
+			cpunum_get_active(), memory_decrypted_read_byte(Z180.program, (_PCD-1)&0xffff), memory_decrypted_read_byte(Z180.program, _PCD));
 }
 
 /**********************************************************

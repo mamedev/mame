@@ -25,13 +25,13 @@ static UINT32 am1RegisterIndirect(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(v60.reg[modVal&0x1F]);
+		amOut=MemRead16(v60.program,v60.reg[modVal&0x1F]);
 		break;
 	case 2:
-		amOut=MemRead32(v60.reg[modVal&0x1F]);
+		amOut=MemRead32(v60.program,v60.reg[modVal&0x1F]);
 		break;
 	}
 
@@ -41,7 +41,7 @@ static UINT32 am1RegisterIndirect(void)
 static UINT32 bam1RegisterIndirect(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(v60.reg[modVal&0x1F]);
+	amOut=MemRead32(v60.program,v60.reg[modVal&0x1F]);
 	return 1;
 }
 
@@ -50,13 +50,13 @@ static UINT32 am1RegisterIndirectIndexed(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(v60.reg[modVal2&0x1F]+v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,v60.reg[modVal2&0x1F]+v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(v60.reg[modVal2&0x1F]+v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,v60.reg[modVal2&0x1F]+v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(v60.reg[modVal2&0x1F]+v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,v60.reg[modVal2&0x1F]+v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -66,7 +66,7 @@ static UINT32 am1RegisterIndirectIndexed(void)
 static UINT32 bam1RegisterIndirectIndexed(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(v60.reg[modVal2&0x1F]+bamOffset/8);
+	amOut=MemRead32(v60.program,v60.reg[modVal2&0x1F]+bamOffset/8);
 	bamOffset&=7;
 	return 2;
 }
@@ -76,15 +76,15 @@ static UINT32 am1Autoincrement(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,v60.reg[modVal&0x1F]);
 		v60.reg[modVal&0x1F]++;
 		break;
 	case 1:
-		amOut=MemRead16(v60.reg[modVal&0x1F]);
+		amOut=MemRead16(v60.program,v60.reg[modVal&0x1F]);
 		v60.reg[modVal&0x1F]+=2;
 		break;
 	case 2:
-		amOut=MemRead32(v60.reg[modVal&0x1F]);
+		amOut=MemRead32(v60.program,v60.reg[modVal&0x1F]);
 		v60.reg[modVal&0x1F]+=4;
 		break;
 	}
@@ -95,7 +95,7 @@ static UINT32 am1Autoincrement(void)
 static UINT32 bam1Autoincrement(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(v60.reg[modVal&0x1F]);
+	amOut=MemRead32(v60.program,v60.reg[modVal&0x1F]);
 	switch (modDim)
 	{
 	case 10:
@@ -117,15 +117,15 @@ static UINT32 am1Autodecrement(void)
 	{
 	case 0:
 		v60.reg[modVal&0x1F]--;
-		amOut=MemRead8(v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,v60.reg[modVal&0x1F]);
 		break;
 	case 1:
 		v60.reg[modVal&0x1F]-=2;
-		amOut=MemRead16(v60.reg[modVal&0x1F]);
+		amOut=MemRead16(v60.program,v60.reg[modVal&0x1F]);
 		break;
 	case 2:
 		v60.reg[modVal&0x1F]-=4;
-		amOut=MemRead32(v60.reg[modVal&0x1F]);
+		amOut=MemRead32(v60.program,v60.reg[modVal&0x1F]);
 		break;
 	}
 
@@ -147,7 +147,7 @@ static UINT32 bam1Autodecrement(void)
 		fatalerror("CPU - BAM1 - 7");
 		break;
 	}
-	amOut=MemRead32(v60.reg[modVal&0x1F]);
+	amOut=MemRead32(v60.program,v60.reg[modVal&0x1F]);
 	return 1;
 }
 
@@ -156,13 +156,13 @@ static UINT32 am1Displacement8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1));
+		amOut=MemRead8(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1));
 		break;
 	case 1:
-		amOut=MemRead16(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1));
+		amOut=MemRead16(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1));
 		break;
 	case 2:
-		amOut=MemRead32(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1));
+		amOut=MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1));
 		break;
 	}
 
@@ -171,8 +171,8 @@ static UINT32 am1Displacement8(void)
 
 static UINT32 bam1Displacement8(void)
 {
-	bamOffset=MemRead8(modAdd+1);
-	amOut=MemRead32(v60.reg[modVal&0x1F]+bamOffset/8);
+	bamOffset=MemRead8(v60.program,modAdd+1);
+	amOut=MemRead32(v60.program,v60.reg[modVal&0x1F]+bamOffset/8);
 	bamOffset&=7;
 	return 2;
 }
@@ -183,13 +183,13 @@ static UINT32 am1Displacement16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1));
+		amOut=MemRead8(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1));
 		break;
 	case 1:
-		amOut=MemRead16(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1));
+		amOut=MemRead16(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1));
 		break;
 	case 2:
-		amOut=MemRead32(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1));
+		amOut=MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1));
 		break;
 	}
 
@@ -198,8 +198,8 @@ static UINT32 am1Displacement16(void)
 
 static UINT32 bam1Displacement16(void)
 {
-	bamOffset=OpRead16(modAdd+1);
-	amOut=MemRead32(v60.reg[modVal&0x1F]+bamOffset/8);
+	bamOffset=OpRead16(v60.program,modAdd+1);
+	amOut=MemRead32(v60.program,v60.reg[modVal&0x1F]+bamOffset/8);
 	bamOffset&=7;
 	return 3;
 }
@@ -209,13 +209,13 @@ static UINT32 am1Displacement32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(v60.reg[modVal&0x1F] + OpRead32(modAdd+1));
+		amOut=MemRead8(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1));
 		break;
 	case 1:
-		amOut=MemRead16(v60.reg[modVal&0x1F] + OpRead32(modAdd+1));
+		amOut=MemRead16(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1));
 		break;
 	case 2:
-		amOut=MemRead32(v60.reg[modVal&0x1F] + OpRead32(modAdd+1));
+		amOut=MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1));
 		break;
 	}
 
@@ -224,8 +224,8 @@ static UINT32 am1Displacement32(void)
 
 static UINT32 bam1Displacement32(void)
 {
-	bamOffset=OpRead32(modAdd+1);
-	amOut=MemRead32(v60.reg[modVal&0x1F]+bamOffset/8);
+	bamOffset=OpRead32(v60.program,modAdd+1);
+	amOut=MemRead32(v60.program,v60.reg[modVal&0x1F]+bamOffset/8);
 	bamOffset&=7;
 	return 5;
 }
@@ -235,13 +235,13 @@ static UINT32 am1DisplacementIndexed8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(v60.reg[modVal2&0x1F] + (INT8)OpRead8(modAdd+2) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(v60.reg[modVal2&0x1F] + (INT8)OpRead8(modAdd+2) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(v60.reg[modVal2&0x1F] + (INT8)OpRead8(modAdd+2) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -251,7 +251,7 @@ static UINT32 am1DisplacementIndexed8(void)
 static UINT32 bam1DisplacementIndexed8(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(v60.reg[modVal2&0x1F] + (INT8)OpRead8(modAdd+2)+bamOffset/8);
+	amOut=MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2)+bamOffset/8);
 	bamOffset&=7;
 	return 3;
 }
@@ -261,13 +261,13 @@ static UINT32 am1DisplacementIndexed16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(v60.reg[modVal2&0x1F] + (INT16)OpRead16(modAdd+2) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(v60.reg[modVal2&0x1F] + (INT16)OpRead16(modAdd+2) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(v60.reg[modVal2&0x1F] + (INT16)OpRead16(modAdd+2) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -277,7 +277,7 @@ static UINT32 am1DisplacementIndexed16(void)
 static UINT32 bam1DisplacementIndexed16(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(v60.reg[modVal2&0x1F] + (INT16)OpRead16(modAdd+2)+bamOffset/8);
+	amOut=MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2)+bamOffset/8);
 	bamOffset&=7;
 	return 4;
 }
@@ -287,13 +287,13 @@ static UINT32 am1DisplacementIndexed32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(v60.reg[modVal2&0x1F] + OpRead32(modAdd+2) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(v60.reg[modVal2&0x1F] + OpRead32(modAdd+2) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(v60.reg[modVal2&0x1F] + OpRead32(modAdd+2) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -303,7 +303,7 @@ static UINT32 am1DisplacementIndexed32(void)
 static UINT32 bam1DisplacementIndexed32(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(v60.reg[modVal2&0x1F] + OpRead32(modAdd+2)+bamOffset/8);
+	amOut=MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2)+bamOffset/8);
 	bamOffset&=7;
 	return 6;
 }
@@ -314,13 +314,13 @@ static UINT32 am1PCDisplacement8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(PC + (INT8)OpRead8(modAdd+1));
+		amOut=MemRead8(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1));
 		break;
 	case 1:
-		amOut=MemRead16(PC + (INT8)OpRead8(modAdd+1));
+		amOut=MemRead16(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1));
 		break;
 	case 2:
-		amOut=MemRead32(PC + (INT8)OpRead8(modAdd+1));
+		amOut=MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1));
 		break;
 	}
 
@@ -329,8 +329,8 @@ static UINT32 am1PCDisplacement8(void)
 
 static UINT32 bam1PCDisplacement8(void)
 {
-	bamOffset=OpRead8(modAdd+1);
-	amOut=MemRead32(PC+bamOffset/8);
+	bamOffset=OpRead8(v60.program,modAdd+1);
+	amOut=MemRead32(v60.program,PC+bamOffset/8);
 	bamOffset&=7;
 	return 2;
 }
@@ -340,13 +340,13 @@ static UINT32 am1PCDisplacement16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(PC + (INT16)OpRead16(modAdd+1));
+		amOut=MemRead8(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1));
 		break;
 	case 1:
-		amOut=MemRead16(PC + (INT16)OpRead16(modAdd+1));
+		amOut=MemRead16(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1));
 		break;
 	case 2:
-		amOut=MemRead32(PC + (INT16)OpRead16(modAdd+1));
+		amOut=MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1));
 		break;
 	}
 
@@ -355,8 +355,8 @@ static UINT32 am1PCDisplacement16(void)
 
 static UINT32 bam1PCDisplacement16(void)
 {
-	bamOffset=OpRead16(modAdd+1);
-	amOut=MemRead32(PC+bamOffset/8);
+	bamOffset=OpRead16(v60.program,modAdd+1);
+	amOut=MemRead32(v60.program,PC+bamOffset/8);
 	bamOffset&=7;
 	return 3;
 }
@@ -366,13 +366,13 @@ static UINT32 am1PCDisplacement32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(PC + OpRead32(modAdd+1));
+		amOut=MemRead8(v60.program,PC + OpRead32(v60.program,modAdd+1));
 		break;
 	case 1:
-		amOut=MemRead16(PC + OpRead32(modAdd+1));
+		amOut=MemRead16(v60.program,PC + OpRead32(v60.program,modAdd+1));
 		break;
 	case 2:
-		amOut=MemRead32(PC + OpRead32(modAdd+1));
+		amOut=MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1));
 		break;
 	}
 
@@ -381,8 +381,8 @@ static UINT32 am1PCDisplacement32(void)
 
 static UINT32 bam1PCDisplacement32(void)
 {
-	bamOffset=OpRead32(modAdd+1);
-	amOut=MemRead32(PC+bamOffset/8);
+	bamOffset=OpRead32(v60.program,modAdd+1);
+	amOut=MemRead32(v60.program,PC+bamOffset/8);
 	bamOffset&=7;
 	return 5;
 }
@@ -392,13 +392,13 @@ static UINT32 am1PCDisplacementIndexed8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(PC + (INT8)OpRead8(modAdd+2) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(PC + (INT8)OpRead8(modAdd+2) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(PC + (INT8)OpRead8(modAdd+2) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -408,7 +408,7 @@ static UINT32 am1PCDisplacementIndexed8(void)
 static UINT32 bam1PCDisplacementIndexed8(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(PC + (INT8)OpRead8(modAdd+2)+bamOffset/8);
+	amOut=MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2)+bamOffset/8);
 	bamOffset&=7;
 	return 3;
 }
@@ -419,13 +419,13 @@ static UINT32 am1PCDisplacementIndexed16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(PC + (INT16)OpRead16(modAdd+2) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(PC + (INT16)OpRead16(modAdd+2) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(PC + (INT16)OpRead16(modAdd+2) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -435,7 +435,7 @@ static UINT32 am1PCDisplacementIndexed16(void)
 static UINT32 bam1PCDisplacementIndexed16(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(PC + (INT16)OpRead16(modAdd+2)+bamOffset/8);
+	amOut=MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2)+bamOffset/8);
 	bamOffset&=7;
 	return 4;
 }
@@ -445,13 +445,13 @@ static UINT32 am1PCDisplacementIndexed32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(PC + OpRead32(modAdd+2) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,PC + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(PC + OpRead32(modAdd+2) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,PC + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(PC + OpRead32(modAdd+2) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -461,7 +461,7 @@ static UINT32 am1PCDisplacementIndexed32(void)
 static UINT32 bam1PCDisplacementIndexed32(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(PC + OpRead32(modAdd+2)+bamOffset/8);
+	amOut=MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2)+bamOffset/8);
 	bamOffset&=7;
 	return 6;
 }
@@ -471,13 +471,13 @@ static UINT32 am1DisplacementIndirect8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1)));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1)));
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1)));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1)));
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1)));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1)));
 		break;
 	}
 
@@ -487,7 +487,7 @@ static UINT32 am1DisplacementIndirect8(void)
 static UINT32 bam1DisplacementIndirect8(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1)));
+	amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1)));
 	return 2;
 }
 
@@ -496,13 +496,13 @@ static UINT32 am1DisplacementIndirect16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1)));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1)));
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1)));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1)));
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1)));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1)));
 		break;
 	}
 
@@ -512,7 +512,7 @@ static UINT32 am1DisplacementIndirect16(void)
 static UINT32 bam1DisplacementIndirect16(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1)));
+	amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1)));
 	return 3;
 }
 
@@ -521,13 +521,13 @@ static UINT32 am1DisplacementIndirect32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(v60.reg[modVal&0x1F] + OpRead32(modAdd+1)));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1)));
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(v60.reg[modVal&0x1F] + OpRead32(modAdd+1)));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1)));
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + OpRead32(modAdd+1)));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1)));
 		break;
 	}
 
@@ -537,7 +537,7 @@ static UINT32 am1DisplacementIndirect32(void)
 static UINT32 bam1DisplacementIndirect32(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + OpRead32(modAdd+1)));
+	amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1)));
 	return 5;
 }
 
@@ -546,13 +546,13 @@ static UINT32 am1DisplacementIndirectIndexed8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(v60.reg[modVal2&0x1F] + (INT8)OpRead8(modAdd+2)) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(v60.reg[modVal2&0x1F] + (INT8)OpRead8(modAdd+2)) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(v60.reg[modVal2&0x1F] + (INT8)OpRead8(modAdd+2)) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -562,7 +562,7 @@ static UINT32 am1DisplacementIndirectIndexed8(void)
 static UINT32 bam1DisplacementIndirectIndexed8(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(MemRead32(v60.reg[modVal2&0x1F] + (INT8)OpRead8(modAdd+2))+bamOffset/8);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2))+bamOffset/8);
 	bamOffset&=7;
 	return 3;
 }
@@ -572,13 +572,13 @@ static UINT32 am1DisplacementIndirectIndexed16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(v60.reg[modVal2&0x1F] + (INT16)OpRead16(modAdd+2)) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(v60.reg[modVal2&0x1F] + (INT16)OpRead16(modAdd+2)) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(v60.reg[modVal2&0x1F] + (INT16)OpRead16(modAdd+2)) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -588,7 +588,7 @@ static UINT32 am1DisplacementIndirectIndexed16(void)
 static UINT32 bam1DisplacementIndirectIndexed16(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(MemRead32(v60.reg[modVal2&0x1F] + (INT16)OpRead16(modAdd+2))+bamOffset/8);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2))+bamOffset/8);
 	bamOffset&=7;
 	return 4;
 }
@@ -598,13 +598,13 @@ static UINT32 am1DisplacementIndirectIndexed32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(v60.reg[modVal2&0x1F] + OpRead32(modAdd+2)) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(v60.reg[modVal2&0x1F] + OpRead32(modAdd+2)) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(v60.reg[modVal2&0x1F] + OpRead32(modAdd+2)) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -614,7 +614,7 @@ static UINT32 am1DisplacementIndirectIndexed32(void)
 static UINT32 bam1DisplacementIndirectIndexed32(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(MemRead32(v60.reg[modVal2&0x1F] + OpRead32(modAdd+2))+bamOffset/8);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2))+bamOffset/8);
 	bamOffset&=7;
 	return 6;
 }
@@ -624,13 +624,13 @@ static UINT32 am1PCDisplacementIndirect8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(PC + (INT8)OpRead8(modAdd+1)));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1)));
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(PC + (INT8)OpRead8(modAdd+1)));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1)));
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(PC + (INT8)OpRead8(modAdd+1)));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1)));
 		break;
 	}
 
@@ -640,7 +640,7 @@ static UINT32 am1PCDisplacementIndirect8(void)
 static UINT32 bam1PCDisplacementIndirect8(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(MemRead32(PC + (INT8)OpRead8(modAdd+1)));
+	amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1)));
 	return 2;
 }
 
@@ -649,13 +649,13 @@ static UINT32 am1PCDisplacementIndirect16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(PC + (INT16)OpRead16(modAdd+1)));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1)));
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(PC + (INT16)OpRead16(modAdd+1)));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1)));
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(PC + (INT16)OpRead16(modAdd+1)));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1)));
 		break;
 	}
 
@@ -665,7 +665,7 @@ static UINT32 am1PCDisplacementIndirect16(void)
 static UINT32 bam1PCDisplacementIndirect16(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(MemRead32(PC + (INT16)OpRead16(modAdd+1)));
+	amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1)));
 	return 3;
 }
 
@@ -674,13 +674,13 @@ static UINT32 am1PCDisplacementIndirect32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(PC + OpRead32(modAdd+1)));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1)));
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(PC + OpRead32(modAdd+1)));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1)));
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(PC + OpRead32(modAdd+1)));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1)));
 		break;
 	}
 
@@ -690,7 +690,7 @@ static UINT32 am1PCDisplacementIndirect32(void)
 static UINT32 bam1PCDisplacementIndirect32(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(MemRead32(PC + OpRead32(modAdd+1)));
+	amOut=MemRead32(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1)));
 	return 5;
 }
 
@@ -699,13 +699,13 @@ static UINT32 am1PCDisplacementIndirectIndexed8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(PC + (INT8)OpRead8(modAdd+2)) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(PC + (INT8)OpRead8(modAdd+2)) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(PC + (INT8)OpRead8(modAdd+2)) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -715,7 +715,7 @@ static UINT32 am1PCDisplacementIndirectIndexed8(void)
 static UINT32 bam1PCDisplacementIndirectIndexed8(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(MemRead32(PC + (INT8)OpRead8(modAdd+2))+bamOffset/8);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2))+bamOffset/8);
 	bamOffset&=7;
 	return 3;
 }
@@ -725,13 +725,13 @@ static UINT32 am1PCDisplacementIndirectIndexed16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(PC + (INT16)OpRead16(modAdd+2)) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(PC + (INT16)OpRead16(modAdd+2)) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(PC + (INT16)OpRead16(modAdd+2)) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -741,7 +741,7 @@ static UINT32 am1PCDisplacementIndirectIndexed16(void)
 static UINT32 bam1PCDisplacementIndirectIndexed16(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(MemRead32(PC + (INT16)OpRead16(modAdd+2))+bamOffset/8);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2))+bamOffset/8);
 	bamOffset&=7;
 	return 4;
 }
@@ -751,13 +751,13 @@ static UINT32 am1PCDisplacementIndirectIndexed32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(PC + OpRead32(modAdd+2)) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]);
 		break;
 	case 1:
-		amOut=MemRead16(MemRead32(PC + OpRead32(modAdd+2)) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*2);
 		break;
 	case 2:
-		amOut=MemRead32(MemRead32(PC + OpRead32(modAdd+2)) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -767,7 +767,7 @@ static UINT32 am1PCDisplacementIndirectIndexed32(void)
 static UINT32 bam1PCDisplacementIndirectIndexed32(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(MemRead32(PC + OpRead32(modAdd+2))+bamOffset/8);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2))+bamOffset/8);
 	bamOffset&=7;
 	return 6;
 }
@@ -777,15 +777,15 @@ static UINT32 am1DoubleDisplacement8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1)) + (INT8)OpRead8(modAdd+2));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1)) + (INT8)OpRead8(v60.program,modAdd+2));
 		break;
 
 	case 1:
-		amOut=MemRead16(MemRead32(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1)) + (INT8)OpRead8(modAdd+2));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1)) + (INT8)OpRead8(v60.program,modAdd+2));
 		break;
 
 	case 2:
-		amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1)) + (INT8)OpRead8(modAdd+2));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1)) + (INT8)OpRead8(v60.program,modAdd+2));
 		break;
 	}
 
@@ -794,8 +794,8 @@ static UINT32 am1DoubleDisplacement8(void)
 
 static UINT32 bam1DoubleDisplacement8(void)
 {
-	bamOffset=OpRead8(modAdd+2);
-	amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + (INT8)OpRead8(modAdd+1))+bamOffset/8);
+	bamOffset=OpRead8(v60.program,modAdd+2);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1))+bamOffset/8);
 	bamOffset&=7;
 	return 3;
 }
@@ -805,15 +805,15 @@ static UINT32 am1DoubleDisplacement16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1)) + (INT16)OpRead16(modAdd+3));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1)) + (INT16)OpRead16(v60.program,modAdd+3));
 		break;
 
 	case 1:
-		amOut=MemRead16(MemRead32(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1)) + (INT16)OpRead16(modAdd+3));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1)) + (INT16)OpRead16(v60.program,modAdd+3));
 		break;
 
 	case 2:
-		amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1)) + (INT16)OpRead16(modAdd+3));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1)) + (INT16)OpRead16(v60.program,modAdd+3));
 		break;
 	}
 
@@ -822,8 +822,8 @@ static UINT32 am1DoubleDisplacement16(void)
 
 static UINT32 bam1DoubleDisplacement16(void)
 {
-	bamOffset=OpRead16(modAdd+3);
-	amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + (INT16)OpRead16(modAdd+1))+bamOffset/8);
+	bamOffset=OpRead16(v60.program,modAdd+3);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1))+bamOffset/8);
 	bamOffset&=7;
 	return 5;
 }
@@ -833,15 +833,15 @@ static UINT32 am1DoubleDisplacement32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(v60.reg[modVal&0x1F] + OpRead32(modAdd+1)) + OpRead32(modAdd+5));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1)) + OpRead32(v60.program,modAdd+5));
 		break;
 
 	case 1:
-		amOut=MemRead16(MemRead32(v60.reg[modVal&0x1F] + OpRead32(modAdd+1)) + OpRead32(modAdd+5));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1)) + OpRead32(v60.program,modAdd+5));
 		break;
 
 	case 2:
-		amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + OpRead32(modAdd+1)) + OpRead32(modAdd+5));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1)) + OpRead32(v60.program,modAdd+5));
 		break;
 	}
 
@@ -850,8 +850,8 @@ static UINT32 am1DoubleDisplacement32(void)
 
 static UINT32 bam1DoubleDisplacement32(void)
 {
-	bamOffset=OpRead32(modAdd+5);
-	amOut=MemRead32(MemRead32(v60.reg[modVal&0x1F] + OpRead32(modAdd+1))+bamOffset/8);
+	bamOffset=OpRead32(v60.program,modAdd+5);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1))+bamOffset/8);
 	bamOffset&=7;
 	return 9;
 }
@@ -861,15 +861,15 @@ static UINT32 am1PCDoubleDisplacement8(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(PC + (INT8)OpRead8(modAdd+1)) + (INT8)OpRead8(modAdd+2));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1)) + (INT8)OpRead8(v60.program,modAdd+2));
 		break;
 
 	case 1:
-		amOut=MemRead16(MemRead32(PC + (INT8)OpRead8(modAdd+1)) + (INT8)OpRead8(modAdd+2));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1)) + (INT8)OpRead8(v60.program,modAdd+2));
 		break;
 
 	case 2:
-		amOut=MemRead32(MemRead32(PC + (INT8)OpRead8(modAdd+1)) + (INT8)OpRead8(modAdd+2));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1)) + (INT8)OpRead8(v60.program,modAdd+2));
 		break;
 	}
 
@@ -878,8 +878,8 @@ static UINT32 am1PCDoubleDisplacement8(void)
 
 static UINT32 bam1PCDoubleDisplacement8(void)
 {
-	bamOffset=OpRead8(modAdd+2);
-	amOut=MemRead32(MemRead32(PC + (INT8)OpRead8(modAdd+1))+bamOffset/8);
+	bamOffset=OpRead8(v60.program,modAdd+2);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1))+bamOffset/8);
 	bamOffset&=7;
 	return 3;
 }
@@ -889,15 +889,15 @@ static UINT32 am1PCDoubleDisplacement16(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(PC + (INT16)OpRead16(modAdd+1)) + (INT16)OpRead16(modAdd+3));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1)) + (INT16)OpRead16(v60.program,modAdd+3));
 		break;
 
 	case 1:
-		amOut=MemRead16(MemRead32(PC + (INT16)OpRead16(modAdd+1)) + (INT16)OpRead16(modAdd+3));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1)) + (INT16)OpRead16(v60.program,modAdd+3));
 		break;
 
 	case 2:
-		amOut=MemRead32(MemRead32(PC + (INT16)OpRead16(modAdd+1)) + (INT16)OpRead16(modAdd+3));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1)) + (INT16)OpRead16(v60.program,modAdd+3));
 		break;
 	}
 
@@ -906,8 +906,8 @@ static UINT32 am1PCDoubleDisplacement16(void)
 
 static UINT32 bam1PCDoubleDisplacement16(void)
 {
-	bamOffset=OpRead16(modAdd+3);
-	amOut=MemRead32(MemRead32(PC + (INT16)OpRead16(modAdd+1))+bamOffset/8);
+	bamOffset=OpRead16(v60.program,modAdd+3);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1))+bamOffset/8);
 	bamOffset&=7;
 	return 5;
 }
@@ -918,15 +918,15 @@ static UINT32 am1PCDoubleDisplacement32(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(PC + OpRead32(modAdd+1)) + OpRead32(modAdd+5));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1)) + OpRead32(v60.program,modAdd+5));
 		break;
 
 	case 1:
-		amOut=MemRead16(MemRead32(PC + OpRead32(modAdd+1)) + OpRead32(modAdd+5));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1)) + OpRead32(v60.program,modAdd+5));
 		break;
 
 	case 2:
-		amOut=MemRead32(MemRead32(PC + OpRead32(modAdd+1)) + OpRead32(modAdd+5));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1)) + OpRead32(v60.program,modAdd+5));
 		break;
 	}
 
@@ -935,8 +935,8 @@ static UINT32 am1PCDoubleDisplacement32(void)
 
 static UINT32 bam1PCDoubleDisplacement32(void)
 {
-	bamOffset=OpRead32(modAdd+5);
-	amOut=MemRead32(MemRead32(PC + OpRead32(modAdd+1))+bamOffset/8);
+	bamOffset=OpRead32(v60.program,modAdd+5);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1))+bamOffset/8);
 	bamOffset&=7;
 	return 9;
 }
@@ -946,15 +946,15 @@ static UINT32 am1DirectAddress(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(OpRead32(modAdd+1));
+		amOut=MemRead8(v60.program,OpRead32(v60.program,modAdd+1));
 		break;
 
 	case 1:
-		amOut=MemRead16(OpRead32(modAdd+1));
+		amOut=MemRead16(v60.program,OpRead32(v60.program,modAdd+1));
 		break;
 
 	case 2:
-		amOut=MemRead32(OpRead32(modAdd+1));
+		amOut=MemRead32(v60.program,OpRead32(v60.program,modAdd+1));
 		break;
 	}
 
@@ -964,7 +964,7 @@ static UINT32 am1DirectAddress(void)
 static UINT32 bam1DirectAddress(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(OpRead32(modAdd+1));
+	amOut=MemRead32(v60.program,OpRead32(v60.program,modAdd+1));
 	return 5;
 }
 
@@ -973,15 +973,15 @@ static UINT32 am1DirectAddressIndexed(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(OpRead32(modAdd+2) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F]);
 		break;
 
 	case 1:
-		amOut=MemRead16(OpRead32(modAdd+2) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*2);
 		break;
 
 	case 2:
-		amOut=MemRead32(OpRead32(modAdd+2) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -991,7 +991,7 @@ static UINT32 am1DirectAddressIndexed(void)
 static UINT32 bam1DirectAddressIndexed(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(OpRead32(modAdd+2)+bamOffset/8);
+	amOut=MemRead32(v60.program,OpRead32(v60.program,modAdd+2)+bamOffset/8);
 	bamOffset&=7;
 	return 6;
 }
@@ -1001,15 +1001,15 @@ static UINT32 am1DirectAddressDeferred(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(OpRead32(modAdd+1)));
+		amOut=MemRead8(v60.program,MemRead32(v60.program,OpRead32(v60.program,modAdd+1)));
 		break;
 
 	case 1:
-		amOut=MemRead16(MemRead32(OpRead32(modAdd+1)));
+		amOut=MemRead16(v60.program,MemRead32(v60.program,OpRead32(v60.program,modAdd+1)));
 		break;
 
 	case 2:
-		amOut=MemRead32(MemRead32(OpRead32(modAdd+1)));
+		amOut=MemRead32(v60.program,MemRead32(v60.program,OpRead32(v60.program,modAdd+1)));
 		break;
 	}
 
@@ -1019,7 +1019,7 @@ static UINT32 am1DirectAddressDeferred(void)
 static UINT32 bam1DirectAddressDeferred(void)
 {
 	bamOffset=0;
-	amOut=MemRead32(MemRead32(OpRead32(modAdd+1)));
+	amOut=MemRead32(v60.program,MemRead32(v60.program,OpRead32(v60.program,modAdd+1)));
 	return 5;
 }
 
@@ -1028,15 +1028,15 @@ static UINT32 am1DirectAddressDeferredIndexed(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=MemRead8(MemRead32(OpRead32(modAdd+2)) + v60.reg[modVal&0x1F]);
+		amOut=MemRead8(v60.program,MemRead32(v60.program,OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]);
 		break;
 
 	case 1:
-		amOut=MemRead16(MemRead32(OpRead32(modAdd+2)) + v60.reg[modVal&0x1F]*2);
+		amOut=MemRead16(v60.program,MemRead32(v60.program,OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*2);
 		break;
 
 	case 2:
-		amOut=MemRead32(MemRead32(OpRead32(modAdd+2)) + v60.reg[modVal&0x1F]*4);
+		amOut=MemRead32(v60.program,MemRead32(v60.program,OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F]*4);
 		break;
 	}
 
@@ -1046,7 +1046,7 @@ static UINT32 am1DirectAddressDeferredIndexed(void)
 static UINT32 bam1DirectAddressDeferredIndexed(void)
 {
 	bamOffset=v60.reg[modVal&0x1F];
-	amOut=MemRead32(MemRead32(OpRead32(modAdd+2))+bamOffset/8);
+	amOut=MemRead32(v60.program,MemRead32(v60.program,OpRead32(v60.program,modAdd+2))+bamOffset/8);
 	bamOffset&=7;
 	return 6;
 }
@@ -1056,17 +1056,17 @@ static UINT32 am1Immediate(void)
 	switch (modDim)
 	{
 	case 0:
-		amOut=OpRead8(modAdd+1);
+		amOut=OpRead8(v60.program,modAdd+1);
 		return 2;
 		break;
 
 	case 1:
-		amOut=OpRead16(modAdd+1);
+		amOut=OpRead16(v60.program,modAdd+1);
 		return 3;
 		break;
 
 	case 2:
-		amOut=OpRead32(modAdd+1);
+		amOut=OpRead32(v60.program,modAdd+1);
 		return 5;
 		break;
 	}
@@ -1314,13 +1314,13 @@ static UINT32 (*const BAMTable1_G6[8])(void) =
 
 static UINT32 am1Group6(void)
 {
-	modVal2=OpRead8(modAdd+1);
+	modVal2=OpRead8(v60.program,modAdd+1);
 	return AMTable1_G6[modVal2>>5]();
 }
 
 static UINT32 bam1Group6(void)
 {
-	modVal2=OpRead8(modAdd+1);
+	modVal2=OpRead8(v60.program,modAdd+1);
 	return BAMTable1_G6[modVal2>>5]();
 }
 

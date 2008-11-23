@@ -540,6 +540,11 @@ CPU_INIT( z8000 )
     int i;
 	const Z8000_init *init;
 
+	Z.irq_callback = irqcallback;
+	Z.device = device;
+	Z.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	Z.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+
 	/* already initialized? */
 	if( z8000_exec )
 		return;
@@ -582,9 +587,6 @@ CPU_INIT( z8000 )
 			z8000_exec[i].dasmflags = init->dasmflags;
 		}
 	}
-
-	Z.irq_callback = irqcallback;
-	Z.device = device;
 }
 
 void z8000_deinit(void)

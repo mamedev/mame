@@ -24,7 +24,7 @@
  ***************************************************************/
 #define IN(port)												\
 	(((port ^ IO_IOCR) & 0xffc0) == 0) ?						\
-		z180_readcontrol(port) : io_read_byte_8le(port)
+		z180_readcontrol(port) : memory_read_byte_8le(Z180.iospace, port)
 
 /***************************************************************
  * Output a byte to given I/O port
@@ -32,7 +32,7 @@
 #define OUT(port,value) 										\
 	if (((port ^ IO_IOCR) & 0xffc0) == 0)						\
 		z180_writecontrol(port,value);							\
-	else io_write_byte_8le(port,value)
+	else memory_write_byte_8le(Z180.iospace,port,value)
 
 /***************************************************************
  * MMU calculate the memory managemant lookup table
@@ -68,7 +68,7 @@ INLINE void z180_mmu( void )
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-#define RM(addr)	program_read_byte_8le(MMU_REMAP_ADDR(addr))
+#define RM(addr)	memory_read_byte_8le(Z180.program, MMU_REMAP_ADDR(addr))
 UINT8 z180_readmem(offs_t offset)
 {
 	return RM(offset);
@@ -77,7 +77,7 @@ UINT8 z180_readmem(offs_t offset)
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-#define WM(addr,value) program_write_byte_8le(MMU_REMAP_ADDR(addr),value)
+#define WM(addr,value) memory_write_byte_8le(Z180.program, MMU_REMAP_ADDR(addr),value)
 void z180_writemem(offs_t offset, UINT8 data)
 {
 	WM(offset, data);
@@ -111,7 +111,7 @@ INLINE UINT8 ROP(void)
 {
 	offs_t addr = _PCD;
 	_PC++;
-	return program_decrypted_read_byte(MMU_REMAP_ADDR(addr));
+	return memory_decrypted_read_byte(Z180.program, MMU_REMAP_ADDR(addr));
 }
 
 /****************************************************************
@@ -124,14 +124,14 @@ INLINE UINT8 ARG(void)
 {
 	offs_t addr = _PCD;
 	_PC++;
-	return program_raw_read_byte(MMU_REMAP_ADDR(addr));
+	return memory_raw_read_byte(Z180.program, MMU_REMAP_ADDR(addr));
 }
 
 INLINE UINT32 ARG16(void)
 {
 	offs_t addr = _PCD;
 	_PC += 2;
-	return program_raw_read_byte(MMU_REMAP_ADDR(addr)) | (program_raw_read_byte(MMU_REMAP_ADDR(addr+1)) << 8);
+	return memory_raw_read_byte(Z180.program, MMU_REMAP_ADDR(addr)) | (memory_raw_read_byte(Z180.program, MMU_REMAP_ADDR(addr+1)) << 8);
 }
 
 /****************************************************************************
@@ -200,7 +200,7 @@ void z180_setOPbase(int pc)
 	}															\
 	else														\
 	{															\
-		UINT8 op = program_decrypted_read_byte(_PCD);							\
+		UINT8 op = memory_decrypted_read_byte(Z180.program, _PCD);							\
 		if( _PCD == oldpc-1 )									\
 		{														\
 			/* NOP - JR $-1 or EI - JR $-1 */					\

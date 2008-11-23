@@ -78,6 +78,8 @@ typedef struct
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 } nec_Regs;
 
 /***************************************************************************/
@@ -117,6 +119,8 @@ static CPU_RESET( nec )
 	memset( &I, 0, sizeof(I) );
 	I.irq_callback = save_irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	I.sregs[CS] = 0xffff;
 
@@ -949,6 +953,8 @@ static void nec_init(const device_config *device, int index, int clock, cpu_irq_
 
 	I.irq_callback = irqcallback;
 	I.device = device;
+	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 static CPU_INIT( v30mz ) { nec_init(device, index, clock, irqcallback, 3); }

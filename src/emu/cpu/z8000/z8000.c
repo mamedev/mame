@@ -43,6 +43,7 @@
  *
  *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "z8000.h"
 #include "z8000cpu.h"
@@ -79,6 +80,8 @@ typedef struct {
 	int irq_state[2];	/* IRQ line states (NVI, VI) */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 }   z8000_Regs;
 
 static int z8000_ICount;
@@ -187,53 +190,53 @@ static UINT64   *const pRQ[16] = {
 
 INLINE UINT16 RDOP(void)
 {
-	UINT16 res = program_decrypted_read_word(PC);
+	UINT16 res = memory_decrypted_read_word(Z.program, PC);
     PC += 2;
     return res;
 }
 
 INLINE UINT8 RDMEM_B(UINT16 addr)
 {
-	return program_read_byte_16be(addr);
+	return memory_read_byte_16be(Z.program, addr);
 }
 
 INLINE UINT16 RDMEM_W(UINT16 addr)
 {
 	addr &= ~1;
-	return program_read_word_16be(addr);
+	return memory_read_word_16be(Z.program, addr);
 }
 
 INLINE UINT32 RDMEM_L(UINT16 addr)
 {
 	UINT32 result;
 	addr &= ~1;
-	result = program_read_word_16be(addr) << 16;
-	return result + program_read_word_16be(addr + 2);
+	result = memory_read_word_16be(Z.program, addr) << 16;
+	return result + memory_read_word_16be(Z.program, addr + 2);
 }
 
 INLINE void WRMEM_B(UINT16 addr, UINT8 value)
 {
-	program_write_byte_16be(addr, value);
+	memory_write_byte_16be(Z.program, addr, value);
 }
 
 INLINE void WRMEM_W(UINT16 addr, UINT16 value)
 {
 	addr &= ~1;
-	program_write_word_16be(addr, value);
+	memory_write_word_16be(Z.program, addr, value);
 }
 
 INLINE void WRMEM_L(UINT16 addr, UINT32 value)
 {
 	addr &= ~1;
-	program_write_word_16be(addr, value >> 16);
-	program_write_word_16be((UINT16)(addr + 2), value & 0xffff);
+	memory_write_word_16be(Z.program, addr, value >> 16);
+	memory_write_word_16be(Z.program, (UINT16)(addr + 2), value & 0xffff);
 }
 
 INLINE UINT8 RDPORT_B(int mode, UINT16 addr)
 {
 	if( mode == 0 )
 	{
-		return io_read_byte_8le(addr);
+		return memory_read_byte_8le(Z.io, addr);
 	}
 	else
 	{
@@ -246,8 +249,8 @@ INLINE UINT16 RDPORT_W(int mode, UINT16 addr)
 {
 	if( mode == 0 )
 	{
-		return io_read_byte_8le((UINT16)(addr)) +
-			  (io_read_byte_8le((UINT16)(addr+1)) << 8);
+		return memory_read_byte_8le(Z.io, (UINT16)(addr)) +
+			  (memory_read_byte_8le(Z.io, (UINT16)(addr+1)) << 8);
 	}
 	else
 	{
@@ -261,10 +264,10 @@ INLINE UINT32 RDPORT_L(int mode, UINT16 addr)
 {
 	if( mode == 0 )
 	{
-		return	io_read_byte_8le((UINT16)(addr)) +
-			   (io_read_byte_8le((UINT16)(addr+1)) <<  8) +
-			   (io_read_byte_8le((UINT16)(addr+2)) << 16) +
-			   (io_read_byte_8le((UINT16)(addr+3)) << 24);
+		return	memory_read_byte_8le(Z.io, (UINT16)(addr)) +
+			   (memory_read_byte_8le(Z.io, (UINT16)(addr+1)) <<  8) +
+			   (memory_read_byte_8le(Z.io, (UINT16)(addr+2)) << 16) +
+			   (memory_read_byte_8le(Z.io, (UINT16)(addr+3)) << 24);
 	}
 	else
 	{
@@ -278,7 +281,7 @@ INLINE void WRPORT_B(int mode, UINT16 addr, UINT8 value)
 {
 	if( mode == 0 )
 	{
-        io_write_byte_8le(addr,value);
+        memory_write_byte_8le(Z.io, addr,value);
 	}
 	else
 	{
@@ -290,8 +293,8 @@ INLINE void WRPORT_W(int mode, UINT16 addr, UINT16 value)
 {
 	if( mode == 0 )
 	{
-		io_write_byte_8le((UINT16)(addr),value & 0xff);
-		io_write_byte_8le((UINT16)(addr+1),(value >> 8) & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr),value & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr+1),(value >> 8) & 0xff);
 	}
 	else
 	{
@@ -304,10 +307,10 @@ INLINE void WRPORT_L(int mode, UINT16 addr, UINT32 value)
 {
 	if( mode == 0 )
 	{
-		io_write_byte_8le((UINT16)(addr),value & 0xff);
-		io_write_byte_8le((UINT16)(addr+1),(value >> 8) & 0xff);
-		io_write_byte_8le((UINT16)(addr+2),(value >> 16) & 0xff);
-		io_write_byte_8le((UINT16)(addr+3),(value >> 24) & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr),value & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr+1),(value >> 8) & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr+2),(value >> 16) & 0xff);
+		memory_write_byte_8le(Z.io, (UINT16)(addr+3),(value >> 24) & 0xff);
 	}
 	else
 	{

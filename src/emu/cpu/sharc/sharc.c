@@ -3,6 +3,7 @@
    Written by Ville Linde
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "sharc.h"
 #include "debugger.h"
 
@@ -127,6 +128,8 @@ typedef struct
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *data;
 	void (*opcode_handler)(void);
 	UINT64 opcode;
 	UINT64 fetch_opcode;
@@ -427,6 +430,8 @@ static CPU_INIT( sharc )
 
 	sharc.irq_callback = irqcallback;
 	sharc.device = device;
+	sharc.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sharc.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 
 	build_opcode_table();
 

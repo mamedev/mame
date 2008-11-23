@@ -165,6 +165,8 @@ typedef struct {
 	UPD7810_CONFIG config;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 }	UPD7810;
 
 CPU_DISASSEMBLE( upd7810 );

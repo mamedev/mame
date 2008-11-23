@@ -404,7 +404,7 @@ STOP            01001000  10111011          12  stop
 
 */
 
-
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "upd7810.h"
 
@@ -536,10 +536,10 @@ struct opcode_s {
 	UINT8 mask_l0_l1;
 };
 
-#define RDOP(O) 	O = program_decrypted_read_byte(PCD); PC++
-#define RDOPARG(A)	A = program_raw_read_byte(PCD); PC++
-#define RM(A)		program_read_byte_8le(A)
-#define WM(A,V) 	program_write_byte_8le(A,V)
+#define RDOP(O) 	O = memory_decrypted_read_byte(upd7810.program, PCD); PC++
+#define RDOPARG(A)	A = memory_raw_read_byte(upd7810.program, PCD); PC++
+#define RM(A)		memory_read_byte_8le(upd7810.program, A)
+#define WM(A,V) 	memory_write_byte_8le(upd7810.program, A,V)
 
 #define ZHC_ADD(after,before,carry) 	\
 	if (after == 0) PSW |= Z; else PSW &= ~Z; \
@@ -580,17 +580,17 @@ static UINT8 RP(offs_t port)
 	{
 	case UPD7810_PORTA:
 		if (upd7810.ma)	// NS20031301 no need to read if the port is set as output
-			upd7810.pa_in = io_read_byte_8le(port);
+			upd7810.pa_in = memory_read_byte_8le(upd7810.io, port);
 		data = (upd7810.pa_in & upd7810.ma) | (upd7810.pa_out & ~upd7810.ma);
 		break;
 	case UPD7810_PORTB:
 		if (upd7810.mb)	// NS20031301 no need to read if the port is set as output
-			upd7810.pb_in = io_read_byte_8le(port);
+			upd7810.pb_in = memory_read_byte_8le(upd7810.io, port);
 		data = (upd7810.pb_in & upd7810.mb) | (upd7810.pb_out & ~upd7810.mb);
 		break;
 	case UPD7810_PORTC:
 		if (upd7810.mc)	// NS20031301 no need to read if the port is set as output
-			upd7810.pc_in = io_read_byte_8le(port);
+			upd7810.pc_in = memory_read_byte_8le(upd7810.io, port);
 		data = (upd7810.pc_in & upd7810.mc) | (upd7810.pc_out & ~upd7810.mc);
 		if (upd7810.mcc & 0x01) 	/* PC0 = TxD output */
 			data = (data & ~0x01) | (upd7810.txd & 1 ? 0x01 : 0x00);
@@ -610,7 +610,7 @@ static UINT8 RP(offs_t port)
 			data = (data & ~0x80) | (upd7810.co1 & 1 ? 0x80 : 0x00);
 		break;
 	case UPD7810_PORTD:
-		upd7810.pd_in = io_read_byte_8le(port);
+		upd7810.pd_in = memory_read_byte_8le(upd7810.io, port);
 		switch (upd7810.mm & 0x07)
 		{
 		case 0x00:			/* PD input mode, PF port mode */
@@ -625,7 +625,7 @@ static UINT8 RP(offs_t port)
 		}
 		break;
 	case UPD7810_PORTF:
-		upd7810.pf_in = io_read_byte_8le(port);
+		upd7810.pf_in = memory_read_byte_8le(upd7810.io, port);
 		switch (upd7810.mm & 0x06)
 		{
 		case 0x00:			/* PD input/output mode, PF port mode */
@@ -645,7 +645,7 @@ static UINT8 RP(offs_t port)
 		}
 		break;
 	case UPD7807_PORTT:	// NS20031301 partial implementation
-		data = io_read_byte_8le(port);
+		data = memory_read_byte_8le(upd7810.io, port);
 		break;
 	default:
 		logerror("uPD7810 internal error: RP() called with invalid port number\n");
@@ -661,13 +661,13 @@ static void WP(offs_t port, UINT8 data)
 		upd7810.pa_out = data;
 //      data = (data & ~upd7810.ma) | (upd7810.pa_in & upd7810.ma);
 		data = (data & ~upd7810.ma) | (upd7810.ma);	// NS20031401
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	case UPD7810_PORTB:
 		upd7810.pb_out = data;
 //      data = (data & ~upd7810.mb) | (upd7810.pb_in & upd7810.mb);
 		data = (data & ~upd7810.mb) | (upd7810.mb);	// NS20031401
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	case UPD7810_PORTC:
 		upd7810.pc_out = data;
@@ -689,7 +689,7 @@ static void WP(offs_t port, UINT8 data)
 			data = (data & ~0x40) | (upd7810.co0 & 1 ? 0x40 : 0x00);
 		if (upd7810.mcc & 0x80) 	/* PC7 = CO1 output */
 			data = (data & ~0x80) | (upd7810.co1 & 1 ? 0x80 : 0x00);
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	case UPD7810_PORTD:
 		upd7810.pd_out = data;
@@ -704,7 +704,7 @@ static void WP(offs_t port, UINT8 data)
 		default:			/* PD extension mode, PF port/extension mode */
 			return;
 		}
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	case UPD7810_PORTF:
 		upd7810.pf_out = data;
@@ -723,7 +723,7 @@ static void WP(offs_t port, UINT8 data)
 			data |= 0xff;	/* what would come out for the lower bits here? */
 			break;
 		}
-		io_write_byte_8le(port, data);
+		memory_write_byte_8le(upd7810.io, port, data);
 		break;
 	default:
 		logerror("uPD7810 internal error: RP() called with invalid port number\n");
@@ -1534,6 +1534,8 @@ static CPU_INIT( upd7810 )
 	upd7810.config = *(const UPD7810_CONFIG*) device->static_config;
 	upd7810.irq_callback = irqcallback;
 	upd7810.device = device;
+	upd7810.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	upd7810.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item("upd7810", device->tag, 0, upd7810.ppc.w.l);
 	state_save_register_item("upd7810", device->tag, 0, upd7810.pc.w.l);
@@ -1613,6 +1615,8 @@ static CPU_RESET( upd7810 )
 	upd7810.config = save_config;
 	upd7810.irq_callback = save_irqcallback;
 	upd7810.device = device;
+	upd7810.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	upd7810.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	upd7810.opXX = opXX_7810;
 	upd7810.op48 = op48;

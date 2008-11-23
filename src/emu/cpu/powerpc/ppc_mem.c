@@ -392,10 +392,10 @@ static CPU_READOP( ppc )
 	{
 		switch(size)
 		{
-			case 1:	*value = program_read_byte(offset);	break;
-			case 2:	*value = program_read_word(offset);	break;
-			case 4:	*value = program_read_dword(offset);	break;
-			case 8:	*value = program_read_qword(offset);	break;
+			case 1:	*value = memory_read_byte(ppc.program, offset);	break;
+			case 2:	*value = memory_read_word(ppc.program, offset);	break;
+			case 4:	*value = memory_read_dword(ppc.program, offset);	break;
+			case 8:	*value = memory_read_qword(ppc.program, offset);	break;
 		}
 	}
 
@@ -413,10 +413,10 @@ static CPU_READ( ppc )
 	{
 		switch(size)
 		{
-			case 1:	*value = program_read_byte(offset);	break;
-			case 2:	*value = program_read_word(offset);	break;
-			case 4:	*value = program_read_dword(offset);	break;
-			case 8:	*value = program_read_qword(offset);	break;
+			case 1:	*value = memory_read_byte(ppc.program, offset);	break;
+			case 2:	*value = memory_read_word(ppc.program, offset);	break;
+			case 4:	*value = memory_read_dword(ppc.program, offset);	break;
+			case 8:	*value = memory_read_qword(ppc.program, offset);	break;
 		}
 	}
 
@@ -432,10 +432,10 @@ static CPU_WRITE( ppc )
 	{
 		switch(size)
 		{
-			case 1:	program_write_byte(offset, value);	break;
-			case 2:	program_write_word(offset, value);	break;
-			case 4:	program_write_dword(offset, value);	break;
-			case 8:	program_write_qword(offset, value);	break;
+			case 1:	memory_write_byte(ppc.program, offset, value);	break;
+			case 2:	memory_write_word(ppc.program, offset, value);	break;
+			case 4:	memory_write_dword(ppc.program, offset, value);	break;
+			case 8:	memory_write_qword(ppc.program, offset, value);	break;
 		}
 	}
 

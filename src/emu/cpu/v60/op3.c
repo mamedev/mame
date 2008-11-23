@@ -9,14 +9,14 @@ static UINT32 opINCB(void) /* TRUSTED */
 	if (amFlag)
 		appb=(UINT8)v60.reg[amOut];
 	else
-		appb=MemRead8(amOut);
+		appb=MemRead8(v60.program, amOut);
 
 	ADDB(appb, 1);
 
 	if (amFlag)
 		SETREG8(v60.reg[amOut], appb);
 	else
-		MemWrite8(amOut, appb);
+		MemWrite8(v60.program, amOut, appb);
 
 	return amLength1+1;
 }
@@ -32,14 +32,14 @@ static UINT32 opINCH(void) /* TRUSTED */
 	if (amFlag)
 		apph=(UINT16)v60.reg[amOut];
 	else
-		apph=MemRead16(amOut);
+		apph=MemRead16(v60.program, amOut);
 
 	ADDW(apph, 1);
 
 	if (amFlag)
 		SETREG16(v60.reg[amOut], apph);
 	else
-		MemWrite16(amOut, apph);
+		MemWrite16(v60.program, amOut, apph);
 
 	return amLength1+1;
 }
@@ -55,14 +55,14 @@ static UINT32 opINCW(void) /* TRUSTED */
 	if (amFlag)
 		appw=v60.reg[amOut];
 	else
-		appw=MemRead32(amOut);
+		appw=MemRead32(v60.program,amOut);
 
 	ADDL(appw, 1);
 
 	if (amFlag)
 		v60.reg[amOut]=appw;
 	else
-		MemWrite32(amOut,appw);
+		MemWrite32(v60.program, amOut,appw);
 
 	return amLength1+1;
 }
@@ -78,14 +78,14 @@ static UINT32 opDECB(void) /* TRUSTED */
 	if (amFlag)
 		appb=(UINT8)v60.reg[amOut];
 	else
-		appb=MemRead8(amOut);
+		appb=MemRead8(v60.program, amOut);
 
 	SUBB(appb, 1);
 
 	if (amFlag)
 		SETREG8(v60.reg[amOut], appb);
 	else
-		MemWrite8(amOut, appb);
+		MemWrite8(v60.program, amOut, appb);
 
 	return amLength1+1;
 }
@@ -101,14 +101,14 @@ static UINT32 opDECH(void) /* TRUSTED */
 	if (amFlag)
 		apph=(UINT16)v60.reg[amOut];
 	else
-		apph=MemRead16(amOut);
+		apph=MemRead16(v60.program, amOut);
 
 	SUBW(apph, 1);
 
 	if (amFlag)
 		SETREG16(v60.reg[amOut], apph);
 	else
-		MemWrite16(amOut, apph);
+		MemWrite16(v60.program, amOut, apph);
 
 	return amLength1+1;
 }
@@ -124,14 +124,14 @@ static UINT32 opDECW(void) /* TRUSTED */
 	if (amFlag)
 		appw=v60.reg[amOut];
 	else
-		appw=MemRead32(amOut);
+		appw=MemRead32(v60.program,amOut);
 
 	SUBL(appw, 1);
 
 	if (amFlag)
 		v60.reg[amOut]=appw;
 	else
-		MemWrite32(amOut,appw);
+		MemWrite32(v60.program, amOut,appw);
 
 	return amLength1+1;
 }
@@ -149,7 +149,6 @@ static UINT32 opJMP(void) /* TRUSTED */
 
 	// Jump there
 	PC=amOut;
-	ChangePC(PC);
 
 	return 0;
 }
@@ -167,11 +166,10 @@ static UINT32 opJSR(void) /* TRUSTED */
 
 	// Save NextPC into the stack
 	SP -= 4;
-	MemWrite32(SP, PC + amLength1 + 1);
+	MemWrite32(v60.program, SP, PC + amLength1 + 1);
 
 	// Jump there
 	PC=amOut;
-	ChangePC(PC);
 
 	return 0;
 }
@@ -186,7 +184,7 @@ static UINT32 opPREPARE(void)	/* somewhat TRUSTED */
 
 	// step 1: save frame pointer on the stack
 	SP -= 4;
-	MemWrite32(SP, FP);
+	MemWrite32(v60.program, SP, FP);
 
 	// step 2: FP = new SP
 	FP = SP;
@@ -206,12 +204,11 @@ static UINT32 opRET(void) /* TRUSTED */
 	ReadAM();
 
 	// Read return address from stack
-	PC=MemRead32(SP);
+	PC=MemRead32(v60.program,SP);
 	SP+=4;
-	ChangePC(PC);
 
 	// Restore AP from stack
-	AP=MemRead32(SP);
+	AP=MemRead32(v60.program,SP);
 	SP+=4;
 
 	// Skip stack frame
@@ -287,16 +284,15 @@ static UINT32 opTRAP(void)
 
 	// Issue the software trap with interrupts
 	SP -= 4;
-	MemWrite32(SP, EXCEPTION_CODE_AND_SIZE(0x3000 + 0x100 * (amOut&0xF), 4));
+	MemWrite32(v60.program, SP, EXCEPTION_CODE_AND_SIZE(0x3000 + 0x100 * (amOut&0xF), 4));
 
 	SP -= 4;
-	MemWrite32(SP, oldPSW);
+	MemWrite32(v60.program, SP, oldPSW);
 
 	SP -= 4;
-	MemWrite32(SP, PC + amLength1 + 1);
+	MemWrite32(v60.program, SP, PC + amLength1 + 1);
 
 	PC = GETINTVECT(48 + (amOut&0xF));
-	ChangePC(PC);
 
 	return 0;
 }
@@ -311,11 +307,10 @@ static UINT32 opRETIU(void) /* TRUSTED */
 	ReadAM();
 
 	// Restore PC and PSW from stack
-	PC = MemRead32(SP);
+	PC = MemRead32(v60.program,SP);
 	SP += 4;
-	ChangePC(PC);
 
-	newPSW = MemRead32(SP);
+	newPSW = MemRead32(v60.program,SP);
 	SP += 4;
 
 	// Destroy stack frame
@@ -337,11 +332,10 @@ static UINT32 opRETIS(void)
 	ReadAM();
 
 	// Restore PC and PSW from stack
-	PC = MemRead32(SP);
+	PC = MemRead32(v60.program,SP);
 	SP += 4;
-	ChangePC(PC);
 
-	newPSW = MemRead32(SP);
+	newPSW = MemRead32(v60.program,SP);
 	SP += 4;
 
 	// Destroy stack frame
@@ -367,29 +361,29 @@ static UINT32 opSTTASK(void)
 	v60WritePSW(v60ReadPSW() | 0x10000000);
 	v60SaveStack();
 
-	MemWrite32(adr, TKCW);
+	MemWrite32(v60.program, adr, TKCW);
 	adr += 4;
 	if(SYCW & 0x100) {
-		MemWrite32(adr, L0SP);
+		MemWrite32(v60.program, adr, L0SP);
 		adr += 4;
 	}
 	if(SYCW & 0x200) {
-		MemWrite32(adr, L1SP);
+		MemWrite32(v60.program, adr, L1SP);
 		adr += 4;
 	}
 	if(SYCW & 0x400) {
-		MemWrite32(adr, L2SP);
+		MemWrite32(v60.program, adr, L2SP);
 		adr += 4;
 	}
 	if(SYCW & 0x800) {
-		MemWrite32(adr, L3SP);
+		MemWrite32(v60.program, adr, L3SP);
 		adr += 4;
 	}
 
 	// 31 registers supported, _not_ 32
 	for(i=0; i<31; i++)
 		if(amOut & (1<<i)) {
-			MemWrite32(adr, v60.reg[i]);
+			MemWrite32(v60.program, adr, v60.reg[i]);
 			adr += 4;
 		}
 
@@ -423,7 +417,7 @@ static UINT32 opTASI(void)
 	if (amFlag)
 		appb=(UINT8)v60.reg[amOut&0x1F];
 	else
-		appb=MemRead8(amOut);
+		appb=MemRead8(v60.program, amOut);
 
 	// Set the flags for SUB appb,FF
 	SUBB(appb, 0xff);
@@ -432,7 +426,7 @@ static UINT32 opTASI(void)
 	if (amFlag)
 		SETREG8(v60.reg[amOut&0x1F], 0xFF);
 	else
-		MemWrite8(amOut,0xFF);
+		MemWrite8(v60.program, amOut,0xFF);
 
 	return amLength1 + 1;
 }
@@ -463,13 +457,13 @@ static UINT32 opPOPM(void)
 	for (i=0;i<31;i++)
 		if (amOut & (1<<i))
 		{
-			v60.reg[i] = MemRead32(SP);
+			v60.reg[i] = MemRead32(v60.program,SP);
 			SP += 4;
 		}
 
 	if (amOut & (1<<31))
 	{
-		v60WritePSW((v60ReadPSW() & 0xffff0000) | MemRead16(SP));
+		v60WritePSW((v60ReadPSW() & 0xffff0000) | MemRead16(v60.program, SP));
 		SP += 4;
 	}
 
@@ -489,14 +483,14 @@ static UINT32 opPUSHM(void)
 	if (amOut & (1<<31))
 	{
 		SP -= 4;
-		MemWrite32(SP,v60ReadPSW());
+		MemWrite32(v60.program, SP,v60ReadPSW());
 	}
 
 	for (i=0;i<31;i++)
 		if (amOut & (1<<(30-i)))
 		{
 			SP -= 4;
-			MemWrite32(SP,v60.reg[(30-i)]);
+			MemWrite32(v60.program, SP,v60.reg[(30-i)]);
 		}
 
 
@@ -559,7 +553,7 @@ static UINT32 opPUSH(void)
 	amLength1=ReadAM();
 
 	SP-=4;
-	MemWrite32(SP,amOut);
+	MemWrite32(v60.program, SP,amOut);
 
 	return amLength1 + 1;
 }
@@ -568,7 +562,7 @@ static UINT32 opPOP(void)
 {
 	modAdd=PC+1;
 	modDim=2;
-	modWriteValW=MemRead32(SP);
+	modWriteValW=MemRead32(v60.program,SP);
 	SP+=4;
 	amLength1=WriteAM();
 
