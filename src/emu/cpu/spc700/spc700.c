@@ -60,6 +60,7 @@ Address  Function Register  R/W  When Reset          Remarks
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include <limits.h>
 #include "debugger.h"
 #include "spc700.h"
@@ -123,6 +124,7 @@ typedef struct
 	uint ir;		/* Instruction Register */
 	cpu_irq_callback int_ack;
 	const device_config *device;
+	const address_space *program;
 	uint stopped;	/* stopped status */
 } spc700i_cpu_struct;
 
@@ -1260,6 +1262,7 @@ CPU_INIT( spc700 )
 {
 	INT_ACK = irqcallback;
 	spc700i_cpu.device = device;
+	spc700i_cpu.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 

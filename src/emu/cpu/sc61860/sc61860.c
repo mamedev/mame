@@ -27,6 +27,7 @@
  *         Extended execute procudure with HLT-mode of CPU.
  *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 
 #include "sc61860.h"
@@ -52,6 +53,9 @@ typedef struct
     int carry, zero;
 
     struct { int t2ms, t512ms; int count;} timer;
+    
+    const device_config *device;
+    const address_space *program;
 }   SC61860_Regs;
 
 static int sc61860_ICount = 0;
@@ -89,6 +93,8 @@ static CPU_INIT( sc61860 )
 {
 	sc61860.config = (sc61860_cpu_core *) device->static_config;
 	timer_pulse(ATTOTIME_IN_HZ(500), NULL, 0, sc61860_2ms_tick);
+	sc61860.device = device;
+	sc61860.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_GET_CONTEXT( sc61860 )

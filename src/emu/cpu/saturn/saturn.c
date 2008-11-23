@@ -21,6 +21,7 @@
  *   - This entire notice must remain in the source code.
  *
  *****************************************************************************/
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 
@@ -79,6 +80,7 @@ typedef struct
 	UINT8   sleeping;       /* low-consumption state */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 }	Saturn_Regs;
 
 static int saturn_ICount = 0;
@@ -103,6 +105,7 @@ static CPU_INIT( saturn )
 	saturn.config = (saturn_cpu_core *) device->static_config;
 	saturn.irq_callback = irqcallback;
 	saturn.device = device;
+	saturn.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[R0]);
 	state_save_register_item_array("saturn",device->tag, 0,saturn.reg[R1]);

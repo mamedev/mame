@@ -100,6 +100,7 @@
 
  *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "sh2.h"
@@ -120,43 +121,43 @@ SH2 *sh2;
 INLINE UINT8 RB(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xff << (((~A) & 3)*8)) >> (((~A) & 3)*8);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xff << (((~A) & 3)*8)) >> (((~A) & 3)*8);
 
 	if (A >= 0xc0000000)
-		return program_read_byte_32be(A);
+		return memory_read_byte_32be(sh2->program, A);
 
 	if (A >= 0x40000000)
 		return 0xa5;
 
-	return program_read_byte_32be(A & AM);
+	return memory_read_byte_32be(sh2->program, A & AM);
 }
 
 INLINE UINT16 RW(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
-		return program_read_word_32be(A);
+		return memory_read_word_32be(sh2->program, A);
 
 	if (A >= 0x40000000)
 		return 0xa5a5;
 
-	return program_read_word_32be(A & AM);
+	return memory_read_word_32be(sh2->program, A & AM);
 }
 
 INLINE UINT32 RL(offs_t A)
 {
 	if (A >= 0xe0000000)
-		return sh2_internal_r(Machine, (A & 0x1fc)>>2, 0xffffffff);
+		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
-		return program_read_dword_32be(A);
+		return memory_read_dword_32be(sh2->program, A);
 
 	if (A >= 0x40000000)
 		return 0xa5a5a5a5;
 
-  return program_read_dword_32be(A & AM);
+  return memory_read_dword_32be(sh2->program, A & AM);
 }
 
 INLINE void WB(offs_t A, UINT8 V)
@@ -164,60 +165,60 @@ INLINE void WB(offs_t A, UINT8 V)
 
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(Machine, (A & 0x1fc)>>2, V << (((~A) & 3)*8), 0xff << (((~A) & 3)*8));
+		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V << (((~A) & 3)*8), 0xff << (((~A) & 3)*8));
 		return;
 	}
 
 	if (A >= 0xc0000000)
 	{
-		program_write_byte_32be(A,V);
+		memory_write_byte_32be(sh2->program, A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	program_write_byte_32be(A & AM,V);
+	memory_write_byte_32be(sh2->program, A & AM,V);
 }
 
 INLINE void WW(offs_t A, UINT16 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(Machine, (A & 0x1fc)>>2, V << (((~A) & 2)*8), 0xffff << (((~A) & 2)*8));
+		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V << (((~A) & 2)*8), 0xffff << (((~A) & 2)*8));
 		return;
 	}
 
 	if (A >= 0xc0000000)
 	{
-		program_write_word_32be(A,V);
+		memory_write_word_32be(sh2->program, A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	program_write_word_32be(A & AM,V);
+	memory_write_word_32be(sh2->program, A & AM,V);
 }
 
 INLINE void WL(offs_t A, UINT32 V)
 {
 	if (A >= 0xe0000000)
 	{
-		sh2_internal_w(Machine, (A & 0x1fc)>>2, V, 0xffffffff);
+		sh2_internal_w(sh2->internal, (A & 0x1fc)>>2, V, 0xffffffff);
 		return;
 	}
 
 	if (A >= 0xc0000000)
 	{
-		program_write_dword_32be(A,V);
+		memory_write_dword_32be(sh2->program, A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	program_write_dword_32be(A & AM,V);
+	memory_write_dword_32be(sh2->program, A & AM,V);
 }
 
 /*  code                 cycles  t-bit
@@ -2205,12 +2206,12 @@ static CPU_EXECUTE( sh2 )
 
 		if (sh2->delay)
 		{
-			opcode = program_decrypted_read_word(WORD_XOR_BE((UINT32)(sh2->delay & AM)));
+			opcode = memory_decrypted_read_word(sh2->program, WORD_XOR_BE((UINT32)(sh2->delay & AM)));
 			change_pc(sh2->pc & AM);
 			sh2->pc -= 2;
 		}
 		else
-			opcode = program_decrypted_read_word(WORD_XOR_BE((UINT32)(sh2->pc & AM)));
+			opcode = memory_decrypted_read_word(sh2->program, WORD_XOR_BE((UINT32)(sh2->pc & AM)));
 
 		debugger_instruction_hook(device, sh2->pc);
 

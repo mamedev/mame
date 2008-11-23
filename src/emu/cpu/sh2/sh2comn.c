@@ -6,6 +6,7 @@
  *
  *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "cpuexec.h"
@@ -29,12 +30,12 @@ INLINE UINT32 RL(SH2 *sh2, offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
-		return program_read_dword_32be(A);
+		return memory_read_dword_32be(sh2->program, A);
 
 	if (A >= 0x40000000)
 		return 0xa5a5a5a5;
 
-  return program_read_dword_32be(A & AM);
+  return memory_read_dword_32be(sh2->program, A & AM);
 }
 
 INLINE void WL(SH2 *sh2, offs_t A, UINT32 V)
@@ -47,14 +48,14 @@ INLINE void WL(SH2 *sh2, offs_t A, UINT32 V)
 
 	if (A >= 0xc0000000)
 	{
-		program_write_dword_32be(A,V);
+		memory_write_dword_32be(sh2->program, A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	program_write_dword_32be(A & AM,V);
+	memory_write_dword_32be(sh2->program, A & AM,V);
 }
 
 static void sh2_timer_resync(void)
@@ -189,9 +190,9 @@ static void sh2_dmac_check(int dma)
 					if(incd == 2)
 						dst --;
 
-					dmadata = program_read_byte_32be(src);
+					dmadata = memory_read_byte_32be(sh2->program, src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					program_write_byte_32be(dst, dmadata);
+					memory_write_byte_32be(sh2->program, dst, dmadata);
 
 					if(incs == 1)
 						src ++;
@@ -211,9 +212,9 @@ static void sh2_dmac_check(int dma)
 						dst -= 2;
 
 					// check: should this really be using read_word_32 / write_word_32?
-					dmadata	= program_read_word_32be(src);
+					dmadata	= memory_read_word_32be(sh2->program, src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					program_write_word_32be(dst, dmadata);
+					memory_write_word_32be(sh2->program, dst, dmadata);
 
 					if(incs == 1)
 						src += 2;
@@ -231,9 +232,9 @@ static void sh2_dmac_check(int dma)
 					if(incd == 2)
 						dst -= 4;
 
-					dmadata	= program_read_dword_32be(src);
+					dmadata	= memory_read_dword_32be(sh2->program, src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					program_write_dword_32be(dst, dmadata);
+					memory_write_dword_32be(sh2->program, dst, dmadata);
 
 					if(incs == 1)
 						src += 4;
@@ -251,21 +252,21 @@ static void sh2_dmac_check(int dma)
 					if(incd == 2)
 						dst -= 16;
 
-					dmadata = program_read_dword_32be(src);
+					dmadata = memory_read_dword_32be(sh2->program, src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					program_write_dword_32be(dst, dmadata);
+					memory_write_dword_32be(sh2->program, dst, dmadata);
 
-					dmadata = program_read_dword_32be(src+4);
+					dmadata = memory_read_dword_32be(sh2->program, src+4);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					program_write_dword_32be(dst+4, dmadata);
+					memory_write_dword_32be(sh2->program, dst+4, dmadata);
 
-					dmadata = program_read_dword_32be(src+8);
+					dmadata = memory_read_dword_32be(sh2->program, src+8);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					program_write_dword_32be(dst+8, dmadata);
+					memory_write_dword_32be(sh2->program, dst+8, dmadata);
 
-					dmadata = program_read_dword_32be(src+12);
+					dmadata = memory_read_dword_32be(sh2->program, src+12);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					program_write_dword_32be(dst+12, dmadata);
+					memory_write_dword_32be(sh2->program, dst+12, dmadata);
 
 					src += 16;
 					if(incd == 1)
@@ -734,6 +735,7 @@ void sh2_common_init(int alloc, const device_config *device, int index, int cloc
 	sh2->cpu_number = index;
 	sh2->irq_callback = irqcallback;
 	sh2->device = device;
+	sh2->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	sh2->internal = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	state_save_register_item("sh2", device->tag, 0, sh2->pc);

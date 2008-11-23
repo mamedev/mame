@@ -28,29 +28,29 @@
 
 INLINE UINT8 READ_OP(void)
 {
-	return program_decrypted_read_byte(sc61860.pc++);
+	return memory_decrypted_read_byte(sc61860.program, sc61860.pc++);
 }
 
 INLINE UINT8 READ_OP_ARG(void)
 {
-	return program_raw_read_byte(sc61860.pc++);
+	return memory_raw_read_byte(sc61860.program, sc61860.pc++);
 }
 
 INLINE UINT16 READ_OP_ARG_WORD(void)
 {
-	UINT16 t=program_decrypted_read_byte(sc61860.pc++)<<8;
-	t|=program_decrypted_read_byte(sc61860.pc++);
+	UINT16 t=memory_decrypted_read_byte(sc61860.program, sc61860.pc++)<<8;
+	t|=memory_decrypted_read_byte(sc61860.program, sc61860.pc++);
 	return t;
 }
 
 INLINE UINT8 READ_BYTE(UINT16 adr)
 {
-	return program_read_byte(adr);
+	return memory_read_byte(sc61860.program, adr);
 }
 
 INLINE void WRITE_BYTE(UINT16 a,UINT8 v)
 {
-	program_write_byte(a,v);
+	memory_write_byte(sc61860.program, a,v);
 }
 
 #define PUSH(v) sc61860.ram[--sc61860.r]=v

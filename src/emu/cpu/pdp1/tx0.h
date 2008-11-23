@@ -47,8 +47,8 @@ struct _tx0_reset_param_t
 CPU_GET_INFO( tx0_64kw );
 CPU_GET_INFO( tx0_8kw );
 
-#define READ_TX0_18BIT(A) ((signed)program_read_dword_32be((A)<<2))
-#define WRITE_TX0_18BIT(A,V) (program_write_dword_32be((A)<<2,(V)))
+#define READ_TX0_18BIT(A) ((signed)memory_read_dword_32be(tx0.program, (A)<<2))
+#define WRITE_TX0_18BIT(A,V) (memory_write_dword_32be(tx0.program, (A)<<2,(V)))
 
 CPU_DISASSEMBLE( tx0_64kw );
 CPU_DISASSEMBLE( tx0_8kw );

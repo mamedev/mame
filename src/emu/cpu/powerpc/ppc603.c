@@ -263,7 +263,7 @@ static CPU_EXECUTE( ppc603 )
 		debugger_instruction_hook(device, ppc.pc);
 
 		if (MSR & MSR_IR)
-			opcode = ppc_readop_translated(ppc.pc);
+			opcode = ppc_readop_translated(ppc.program, ppc.pc);
 		else
 		opcode = ROPCODE64(ppc.pc);
 

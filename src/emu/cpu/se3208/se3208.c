@@ -1,3 +1,5 @@
+#define NO_LEGACY_MEMORY_HANDLERS 1
+
 #include "debugger.h"
 #include "se3208.h"
 
@@ -23,6 +25,7 @@ struct _se3208_state_t
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 	UINT8 IRQ;
 	UINT8 NMI;
 
@@ -56,79 +59,79 @@ typedef void (*_OP)(se3208_state_t *se3208_state, UINT16 Opcode);
 #define INST(a) static void a(se3208_state_t *se3208_state, UINT16 Opcode)
 static _OP *OpTable=NULL;
 
-INLINE UINT32 read_dword_unaligned(UINT32 address)
+INLINE UINT32 read_dword_unaligned(const address_space *space, UINT32 address)
 {
 	if (address & 3)
-		return program_read_byte_32le(address) | program_read_byte_32le(address+1)<<8 | program_read_byte_32le(address+2)<<16 | program_read_byte_32le(address+3)<<24;
+		return memory_read_byte_32le(space,address) | memory_read_byte_32le(space,address+1)<<8 | memory_read_byte_32le(space,address+2)<<16 | memory_read_byte_32le(space,address+3)<<24;
 	else
-		return program_read_dword_32le(address);
+		return memory_read_dword_32le(space,address);
 }
 
-INLINE UINT16 read_word_unaligned(UINT32 address)
+INLINE UINT16 read_word_unaligned(const address_space *space, UINT32 address)
 {
 	if (address & 1)
-		return program_read_byte_32le(address) | program_read_byte_32le(address+1)<<8;
+		return memory_read_byte_32le(space,address) | memory_read_byte_32le(space,address+1)<<8;
 	else
-		return program_read_word_32le(address);
+		return memory_read_word_32le(space,address);
 }
 
-INLINE void write_dword_unaligned(UINT32 address, UINT32 data)
+INLINE void write_dword_unaligned(const address_space *space, UINT32 address, UINT32 data)
 {
 	if (address & 3)
 	{
-		program_write_byte_32le(address, data & 0xff);
-		program_write_byte_32le(address+1, (data>>8)&0xff);
-		program_write_byte_32le(address+2, (data>>16)&0xff);
-		program_write_byte_32le(address+3, (data>>24)&0xff);
+		memory_write_byte_32le(space, address, data & 0xff);
+		memory_write_byte_32le(space, address+1, (data>>8)&0xff);
+		memory_write_byte_32le(space, address+2, (data>>16)&0xff);
+		memory_write_byte_32le(space, address+3, (data>>24)&0xff);
 	}
 	else
 	{
-		program_write_dword_32le(address, data);
+		memory_write_dword_32le(space, address, data);
 	}
 }
 
-INLINE void write_word_unaligned(UINT32 address, UINT16 data)
+INLINE void write_word_unaligned(const address_space *space, UINT32 address, UINT16 data)
 {
 	if (address & 1)
 	{
-		program_write_byte_32le(address, data & 0xff);
-		program_write_byte_32le(address+1, (data>>8)&0xff);
+		memory_write_byte_32le(space, address, data & 0xff);
+		memory_write_byte_32le(space, address+1, (data>>8)&0xff);
 	}
 	else
 	{
-		program_write_word_32le(address, data);
+		memory_write_word_32le(space, address, data);
 	}
 }
 
 
-INLINE UINT8 SE3208_Read8(UINT32 addr)
+INLINE UINT8 SE3208_Read8(se3208_state_t *se3208_state, UINT32 addr)
 {
-	return program_read_byte_32le(addr);
+	return memory_read_byte_32le(se3208_state->program,addr);
 }
 
-INLINE UINT16 SE3208_Read16(UINT32 addr)
+INLINE UINT16 SE3208_Read16(se3208_state_t *se3208_state, UINT32 addr)
 {
-	return read_word_unaligned(addr);
+	return read_word_unaligned(se3208_state->program,addr);
 }
 
-INLINE UINT32 SE3208_Read32(UINT32 addr)
+INLINE UINT32 SE3208_Read32(se3208_state_t *se3208_state, UINT32 addr)
 {
-	return read_dword_unaligned(addr);
+	return read_dword_unaligned(se3208_state->program,addr);
 }
 
-INLINE void SE3208_Write8(UINT32 addr,UINT8 val)
+INLINE void SE3208_Write8(se3208_state_t *se3208_state, UINT32 addr,UINT8 val)
 {
-	program_write_byte_32le(addr,val);
+	memory_write_byte_32le(se3208_state->program,addr,val);
 }
 
-INLINE void SE3208_Write16(UINT32 addr,UINT16 val)
+INLINE void SE3208_Write16(se3208_state_t *se3208_state, UINT32 addr,UINT16 val)
 {
-	write_word_unaligned(addr,val);
+	write_word_unaligned(se3208_state->program,addr,val);
 }
 
-INLINE void SE3208_Write32(UINT32 addr,UINT32 val)
+INLINE void SE3208_Write32(se3208_state_t *se3208_state, UINT32 addr,UINT32 val)
 {
-	write_dword_unaligned(addr,val);
+	write_dword_unaligned(se3208_state->program,addr,val);
 }
 
 
@@ -273,7 +276,7 @@ INST(LDB)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read8(Index+Offset);
+	Val=SE3208_Read8(se3208_state, Index+Offset);
 	se3208_state->R[SrcDst]=SEX8(Val);
 
 	CLRFLAG(FLAG_E);
@@ -293,7 +296,7 @@ INST(STB)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write8(Index+Offset,ZEX8(se3208_state->R[SrcDst]));
+	SE3208_Write8(se3208_state, Index+Offset,ZEX8(se3208_state->R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -315,7 +318,7 @@ INST(LDS)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read16(Index+Offset);
+	Val=SE3208_Read16(se3208_state, Index+Offset);
 	se3208_state->R[SrcDst]=SEX16(Val);
 
 	CLRFLAG(FLAG_E);
@@ -337,7 +340,7 @@ INST(STS)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write16(Index+Offset,ZEX16(se3208_state->R[SrcDst]));
+	SE3208_Write16(se3208_state, Index+Offset,ZEX16(se3208_state->R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -358,7 +361,7 @@ INST(LD)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	se3208_state->R[SrcDst]=SE3208_Read32(Index+Offset);
+	se3208_state->R[SrcDst]=SE3208_Read32(se3208_state, Index+Offset);
 
 	CLRFLAG(FLAG_E);
 }
@@ -379,7 +382,7 @@ INST(ST)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write32(Index+Offset,se3208_state->R[SrcDst]);
+	SE3208_Write32(se3208_state, Index+Offset,se3208_state->R[SrcDst]);
 
 	CLRFLAG(FLAG_E);
 }
@@ -399,7 +402,7 @@ INST(LDBU)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read8(Index+Offset);
+	Val=SE3208_Read8(se3208_state, Index+Offset);
 	se3208_state->R[SrcDst]=ZEX8(Val);
 
 	CLRFLAG(FLAG_E);
@@ -422,7 +425,7 @@ INST(LDSU)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read16(Index+Offset);
+	Val=SE3208_Read16(se3208_state, Index+Offset);
 	se3208_state->R[SrcDst]=ZEX16(Val);
 
 	CLRFLAG(FLAG_E);
@@ -452,7 +455,7 @@ INST(LDSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	se3208_state->R[SrcDst]=SE3208_Read32(Index+Offset);
+	se3208_state->R[SrcDst]=SE3208_Read32(se3208_state, Index+Offset);
 
 	CLRFLAG(FLAG_E);
 }
@@ -468,7 +471,7 @@ INST(STSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write32(Index+Offset,se3208_state->R[SrcDst]);
+	SE3208_Write32(se3208_state, Index+Offset,se3208_state->R[SrcDst]);
 
 	CLRFLAG(FLAG_E);
 }
@@ -476,12 +479,12 @@ INST(STSP)
 static void PushVal(se3208_state_t *se3208_state, UINT32 Val)
 {
 	se3208_state->SP-=4;
-	SE3208_Write32(se3208_state->SP,Val);
+	SE3208_Write32(se3208_state, se3208_state->SP,Val);
 }
 
 static UINT32 PopVal(se3208_state_t *se3208_state)
 {
-	UINT32 Val=SE3208_Read32(se3208_state->SP);
+	UINT32 Val=SE3208_Read32(se3208_state, se3208_state->SP);
 	se3208_state->SP+=4;
 	return Val;
 }
@@ -627,7 +630,7 @@ INST(LDBSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read8(Index+Offset);
+	Val=SE3208_Read8(se3208_state, Index+Offset);
 	se3208_state->R[SrcDst]=SEX8(Val);
 
 	CLRFLAG(FLAG_E);
@@ -642,7 +645,7 @@ INST(STBSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write8(Index+Offset,ZEX8(se3208_state->R[SrcDst]));
+	SE3208_Write8(se3208_state, Index+Offset,ZEX8(se3208_state->R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -659,7 +662,7 @@ INST(LDSSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read16(Index+Offset);
+	Val=SE3208_Read16(se3208_state, Index+Offset);
 	se3208_state->R[SrcDst]=SEX16(Val);
 
 	CLRFLAG(FLAG_E);
@@ -676,7 +679,7 @@ INST(STSSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	SE3208_Write16(Index+Offset,ZEX16(se3208_state->R[SrcDst]));
+	SE3208_Write16(se3208_state, Index+Offset,ZEX16(se3208_state->R[SrcDst]));
 
 	CLRFLAG(FLAG_E);
 }
@@ -691,7 +694,7 @@ INST(LDBUSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read8(Index+Offset);
+	Val=SE3208_Read8(se3208_state, Index+Offset);
 	se3208_state->R[SrcDst]=ZEX8(Val);
 
 	CLRFLAG(FLAG_E);
@@ -709,7 +712,7 @@ INST(LDSUSP)
 	if(TESTFLAG(FLAG_E))
 		Offset=(EXTRACT(se3208_state->ER,0,27)<<4)|(Offset&0xf);
 
-	Val=SE3208_Read16(Index+Offset);
+	Val=SE3208_Read16(se3208_state, Index+Offset);
 	se3208_state->R[SrcDst]=ZEX16(Val);
 
 	CLRFLAG(FLAG_E);
@@ -1427,7 +1430,7 @@ INST(SWI)
 
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);
 
-	se3208_state->PC=SE3208_Read32(4*Imm+0x40)-2;
+	se3208_state->PC=SE3208_Read32(se3208_state, 4*Imm+0x40)-2;
 	change_pc(se3208_state->PC+2);
 }
 
@@ -1729,7 +1732,8 @@ static CPU_RESET( SE3208 )
 	memset(se3208_state,0,sizeof(se3208_state_t));
 	se3208_state->irq_callback = save_irqcallback;
 	se3208_state->device = device;
-	se3208_state->PC=SE3208_Read32(0);
+	se3208_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	se3208_state->PC=SE3208_Read32(se3208_state, 0);
 	se3208_state->SR=0;
 	se3208_state->IRQ=CLEAR_LINE;
 	se3208_state->NMI=CLEAR_LINE;
@@ -1743,7 +1747,7 @@ static void SE3208_NMI(se3208_state_t *se3208_state)
 
 	CLRFLAG(FLAG_NMI|FLAG_ENI|FLAG_E|FLAG_M);
 
-	se3208_state->PC=SE3208_Read32(4);
+	se3208_state->PC=SE3208_Read32(se3208_state, 4);
 	change_pc(se3208_state->PC+2);
 }
 
@@ -1759,9 +1763,9 @@ static void SE3208_Interrupt(se3208_state_t *se3208_state)
 
 
 	if(!(TESTFLAG(FLAG_AUT)))
-		se3208_state->PC=SE3208_Read32(8);
+		se3208_state->PC=SE3208_Read32(se3208_state, 8);
 	else
-		se3208_state->PC=SE3208_Read32(4*se3208_state->irq_callback(se3208_state->device, 0));
+		se3208_state->PC=SE3208_Read32(se3208_state, 4*se3208_state->irq_callback(se3208_state->device, 0));
 	change_pc(se3208_state->PC+2);
 }
 
@@ -1773,7 +1777,7 @@ static CPU_EXECUTE( SE3208 )
 	se3208_state->SE3208_ICount=cycles;
 	do
 	{
-		UINT16 Opcode=program_decrypted_read_word(WORD_XOR_LE(se3208_state->PC));
+		UINT16 Opcode=memory_decrypted_read_word(se3208_state->program, WORD_XOR_LE(se3208_state->PC));
 
 		debugger_instruction_hook(device, se3208_state->PC);
 
@@ -1804,6 +1808,7 @@ static CPU_INIT( SE3208 )
 
 	se3208_state->irq_callback = irqcallback;
 	se3208_state->device = device;
+	se3208_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_EXIT( SE3208 )

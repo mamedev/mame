@@ -132,15 +132,15 @@ void spc700_branching(unsigned int new_pc);
 
 extern CPU_GET_INFO( spc700 );
 
-#define spc700_read_8(addr) program_read_byte_8le(addr)
-#define spc700_write_8(addr,data) program_write_byte_8le(addr,data)
+#define spc700_read_8(addr) memory_read_byte_8le(spc700i_cpu.program,addr)
+#define spc700_write_8(addr,data) memory_write_byte_8le(spc700i_cpu.program,addr,data)
 
 #define spc700_read_8_direct(A)     spc700_read_8(A)
 #define spc700_write_8_direct(A, V) spc700_write_8(A, V)
-//#define spc700_read_instruction(A)    program_decrypted_read_byte(A)
-//#define spc700_read_8_immediate(A)    program_raw_read_byte(A)
-#define spc700_read_instruction(A)    program_read_byte_8le(A)
-#define spc700_read_8_immediate(A)    program_read_byte_8le(A)
+//#define spc700_read_instruction(A)    memory_decrypted_read_byte(spc700i_cpu.program,A)
+//#define spc700_read_8_immediate(A)    memory_raw_read_byte(spc700i_cpu.program,A)
+#define spc700_read_instruction(A)    memory_read_byte_8le(spc700i_cpu.program,A)
+#define spc700_read_8_immediate(A)    memory_read_byte_8le(spc700i_cpu.program,A)
 #define spc700_jumping(A)             change_pc(A)
 #define spc700_branching(A)	      change_pc(A)
 

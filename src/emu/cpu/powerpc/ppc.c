@@ -314,6 +314,7 @@ typedef struct {
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 
 	// STUFF added for the 6xx series
 	UINT32 dec, dec_frac;
@@ -340,20 +341,20 @@ typedef struct {
 
 	/* PowerPC function pointers for memory accesses/exceptions */
 	jmp_buf exception_jmpbuf;
-	UINT8 (*read8)(offs_t address);
-	UINT16 (*read16)(offs_t address);
-	UINT32 (*read32)(offs_t address);
-	UINT64 (*read64)(offs_t address);
-	void (*write8)(offs_t address, UINT8 data);
-	void (*write16)(offs_t address, UINT16 data);
-	void (*write32)(offs_t address, UINT32 data);
-	void (*write64)(offs_t address, UINT64 data);
-	UINT16 (*read16_unaligned)(offs_t address);
-	UINT32 (*read32_unaligned)(offs_t address);
-	UINT64 (*read64_unaligned)(offs_t address);
-	void (*write16_unaligned)(offs_t address, UINT16 data);
-	void (*write32_unaligned)(offs_t address, UINT32 data);
-	void (*write64_unaligned)(offs_t address, UINT64 data);
+	UINT8 (*read8)(const address_space *space, offs_t address);
+	UINT16 (*read16)(const address_space *space, offs_t address);
+	UINT32 (*read32)(const address_space *space, offs_t address);
+	UINT64 (*read64)(const address_space *space, offs_t address);
+	void (*write8)(const address_space *space, offs_t address, UINT8 data);
+	void (*write16)(const address_space *space, offs_t address, UINT16 data);
+	void (*write32)(const address_space *space, offs_t address, UINT32 data);
+	void (*write64)(const address_space *space, offs_t address, UINT64 data);
+	UINT16 (*read16_unaligned)(const address_space *space, offs_t address);
+	UINT32 (*read32_unaligned)(const address_space *space, offs_t address);
+	UINT64 (*read64_unaligned)(const address_space *space, offs_t address);
+	void (*write16_unaligned)(const address_space *space, offs_t address, UINT16 data);
+	void (*write32_unaligned)(const address_space *space, offs_t address, UINT32 data);
+	void (*write64_unaligned)(const address_space *space, offs_t address, UINT64 data);
 
 	void (* optable19[1024])(UINT32);
 	void (* optable31[1024])(UINT32);
@@ -380,8 +381,8 @@ static int bus_freq_multiplier = 1;
 static PPC_REGS ppc;
 static UINT32 ppc_rotate_mask[32][32];
 
-#define ROPCODE(pc)			program_decrypted_read_dword(pc)
-#define ROPCODE64(pc)		program_decrypted_read_qword(DWORD_XOR_BE(pc))
+#define ROPCODE(pc)			memory_decrypted_read_dword(ppc.program, pc)
+#define ROPCODE64(pc)		memory_decrypted_read_qword(ppc.program, DWORD_XOR_BE(pc))
 
 /*********************************************************************/
 
@@ -824,14 +825,14 @@ INLINE UINT32 ppc_get_spr(int spr)
 	return 0;
 }
 
-static UINT8 ppc_read8_translated(offs_t address);
-static UINT16 ppc_read16_translated(offs_t address);
-static UINT32 ppc_read32_translated(offs_t address);
-static UINT64 ppc_read64_translated(offs_t address);
-static void ppc_write8_translated(offs_t address, UINT8 data);
-static void ppc_write16_translated(offs_t address, UINT16 data);
-static void ppc_write32_translated(offs_t address, UINT32 data);
-static void ppc_write64_translated(offs_t address, UINT64 data);
+static UINT8 ppc_read8_translated(const address_space *space, offs_t address);
+static UINT16 ppc_read16_translated(const address_space *space, offs_t address);
+static UINT32 ppc_read32_translated(const address_space *space, offs_t address);
+static UINT64 ppc_read64_translated(const address_space *space, offs_t address);
+static void ppc_write8_translated(const address_space *space, offs_t address, UINT8 data);
+static void ppc_write16_translated(const address_space *space, offs_t address, UINT16 data);
+static void ppc_write32_translated(const address_space *space, offs_t address, UINT32 data);
+static void ppc_write64_translated(const address_space *space, offs_t address, UINT64 data);
 
 INLINE void ppc_set_msr(UINT32 value)
 {
@@ -844,14 +845,14 @@ INLINE void ppc_set_msr(UINT32 value)
 	{
 		if (!(MSR & MSR_DR))
 		{
-			ppc.read8 = program_read_byte_64be;
-			ppc.read16 = program_read_word_64be;
-			ppc.read32 = program_read_dword_64be;
-			ppc.read64 = program_read_qword_64be;
-			ppc.write8 = program_write_byte_64be;
-			ppc.write16 = program_write_word_64be;
-			ppc.write32 = program_write_dword_64be;
-			ppc.write64 = program_write_qword_64be;
+			ppc.read8 = memory_read_byte_64be;
+			ppc.read16 = memory_read_word_64be;
+			ppc.read32 = memory_read_dword_64be;
+			ppc.read64 = memory_read_qword_64be;
+			ppc.write8 = memory_write_byte_64be;
+			ppc.write16 = memory_write_word_64be;
+			ppc.write32 = memory_write_dword_64be;
+			ppc.write64 = memory_write_qword_64be;
 		}
 		else
 		{
@@ -1010,6 +1011,7 @@ static CPU_INIT( ppc403 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
+	ppc.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 }
@@ -1120,14 +1122,14 @@ static CPU_INIT( ppc603 )
 
 	ppc.is603 = 1;
 
-	ppc.read8 = program_read_byte_64be;
-	ppc.read16 = program_read_word_64be;
-	ppc.read32 = program_read_dword_64be;
-	ppc.read64 = program_read_qword_64be;
-	ppc.write8 = program_write_byte_64be;
-	ppc.write16 = program_write_word_64be;
-	ppc.write32 = program_write_dword_64be;
-	ppc.write64 = program_write_qword_64be;
+	ppc.read8 = memory_read_byte_64be;
+	ppc.read16 = memory_read_word_64be;
+	ppc.read32 = memory_read_dword_64be;
+	ppc.read64 = memory_read_qword_64be;
+	ppc.write8 = memory_write_byte_64be;
+	ppc.write16 = memory_write_word_64be;
+	ppc.write32 = memory_write_dword_64be;
+	ppc.write64 = memory_write_qword_64be;
 	ppc.read16_unaligned = ppc_read16_unaligned;
 	ppc.read32_unaligned = ppc_read32_unaligned;
 	ppc.read64_unaligned = ppc_read64_unaligned;
@@ -1137,6 +1139,7 @@ static CPU_INIT( ppc603 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
+	ppc.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1269,14 +1272,14 @@ static CPU_INIT( ppc602 )
 
 	ppc.is602 = 1;
 
-	ppc.read8 = program_read_byte_64be;
-	ppc.read16 = program_read_word_64be;
-	ppc.read32 = program_read_dword_64be;
-	ppc.read64 = program_read_qword_64be;
-	ppc.write8 = program_write_byte_64be;
-	ppc.write16 = program_write_word_64be;
-	ppc.write32 = program_write_dword_64be;
-	ppc.write64 = program_write_qword_64be;
+	ppc.read8 = memory_read_byte_64be;
+	ppc.read16 = memory_read_word_64be;
+	ppc.read32 = memory_read_dword_64be;
+	ppc.read64 = memory_read_qword_64be;
+	ppc.write8 = memory_write_byte_64be;
+	ppc.write16 = memory_write_word_64be;
+	ppc.write32 = memory_write_dword_64be;
+	ppc.write64 = memory_write_qword_64be;
 	ppc.read16_unaligned = ppc_read16_unaligned;
 	ppc.read32_unaligned = ppc_read32_unaligned;
 	ppc.read64_unaligned = ppc_read64_unaligned;
@@ -1286,6 +1289,7 @@ static CPU_INIT( ppc602 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
+	ppc.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1412,14 +1416,14 @@ static CPU_INIT( mpc8240 )
 
 	ppc.is603 = 1;
 
-	ppc.read8 = program_read_byte_64be;
-	ppc.read16 = program_read_word_64be;
-	ppc.read32 = program_read_dword_64be;
-	ppc.read64 = program_read_qword_64be;
-	ppc.write8 = program_write_byte_64be;
-	ppc.write16 = program_write_word_64be;
-	ppc.write32 = program_write_dword_64be;
-	ppc.write64 = program_write_qword_64be;
+	ppc.read8 = memory_read_byte_64be;
+	ppc.read16 = memory_read_word_64be;
+	ppc.read32 = memory_read_dword_64be;
+	ppc.read64 = memory_read_qword_64be;
+	ppc.write8 = memory_write_byte_64be;
+	ppc.write16 = memory_write_word_64be;
+	ppc.write32 = memory_write_dword_64be;
+	ppc.write64 = memory_write_qword_64be;
 	ppc.read16_unaligned = ppc_read16_unaligned;
 	ppc.read32_unaligned = ppc_read32_unaligned;
 	ppc.read64_unaligned = ppc_read64_unaligned;
@@ -1429,6 +1433,7 @@ static CPU_INIT( mpc8240 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
+	ppc.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1540,14 +1545,14 @@ static CPU_INIT( ppc601 )
 
 	ppc.is603 = 1;
 
-	ppc.read8 = program_read_byte_64be;
-	ppc.read16 = program_read_word_64be;
-	ppc.read32 = program_read_dword_64be;
-	ppc.read64 = program_read_qword_64be;
-	ppc.write8 = program_write_byte_64be;
-	ppc.write16 = program_write_word_64be;
-	ppc.write32 = program_write_dword_64be;
-	ppc.write64 = program_write_qword_64be;
+	ppc.read8 = memory_read_byte_64be;
+	ppc.read16 = memory_read_word_64be;
+	ppc.read32 = memory_read_dword_64be;
+	ppc.read64 = memory_read_qword_64be;
+	ppc.write8 = memory_write_byte_64be;
+	ppc.write16 = memory_write_word_64be;
+	ppc.write32 = memory_write_dword_64be;
+	ppc.write64 = memory_write_qword_64be;
 	ppc.read16_unaligned = ppc_read16_unaligned;
 	ppc.read32_unaligned = ppc_read32_unaligned;
 	ppc.read64_unaligned = ppc_read64_unaligned;
@@ -1557,6 +1562,7 @@ static CPU_INIT( ppc601 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
+	ppc.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 
@@ -1671,14 +1677,14 @@ static CPU_INIT( ppc604 )
 
 	ppc.is603 = 1;
 
-	ppc.read8 = program_read_byte_64be;
-	ppc.read16 = program_read_word_64be;
-	ppc.read32 = program_read_dword_64be;
-	ppc.read64 = program_read_qword_64be;
-	ppc.write8 = program_write_byte_64be;
-	ppc.write16 = program_write_word_64be;
-	ppc.write32 = program_write_dword_64be;
-	ppc.write64 = program_write_qword_64be;
+	ppc.read8 = memory_read_byte_64be;
+	ppc.read16 = memory_read_word_64be;
+	ppc.read32 = memory_read_dword_64be;
+	ppc.read64 = memory_read_qword_64be;
+	ppc.write8 = memory_write_byte_64be;
+	ppc.write16 = memory_write_word_64be;
+	ppc.write32 = memory_write_dword_64be;
+	ppc.write64 = memory_write_qword_64be;
 	ppc.read16_unaligned = ppc_read16_unaligned;
 	ppc.read32_unaligned = ppc_read32_unaligned;
 	ppc.read64_unaligned = ppc_read64_unaligned;
@@ -1688,6 +1694,7 @@ static CPU_INIT( ppc604 )
 
 	ppc.irq_callback = irqcallback;
 	ppc.device = device;
+	ppc.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	ppc.pvr = configdata->pvr;
 

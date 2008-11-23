@@ -6,6 +6,7 @@
  *
  *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "cpuexec.h"
@@ -483,7 +484,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 				src --;
 			if(incd == 2)
 				dst --;
-			program_write_byte_64le(dst, program_read_byte_64le(src));
+			memory_write_byte_64le(sh4.program, dst, memory_read_byte_64le(sh4.program, src));
 			if(incs == 1)
 				src ++;
 			if(incd == 1)
@@ -499,7 +500,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 				src -= 2;
 			if(incd == 2)
 				dst -= 2;
-			program_write_word_64le(dst, program_read_word_64le(src));
+			memory_write_word_64le(sh4.program, dst, memory_read_word_64le(sh4.program, src));
 			if(incs == 1)
 				src += 2;
 			if(incd == 1)
@@ -515,7 +516,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 				src -= 8;
 			if(incd == 2)
 				dst -= 8;
-			program_write_qword_64le(dst, program_read_qword_64le(src));
+			memory_write_qword_64le(sh4.program, dst, memory_read_qword_64le(sh4.program, src));
 			if(incs == 1)
 				src += 8;
 			if(incd == 1)
@@ -532,7 +533,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 				src -= 4;
 			if(incd == 2)
 				dst -= 4;
-			program_write_dword_64le(dst, program_read_dword_64le(src));
+			memory_write_dword_64le(sh4.program, dst, memory_read_dword_64le(sh4.program, src));
 			if(incs == 1)
 				src += 4;
 			if(incd == 1)
@@ -549,10 +550,10 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 				src -= 32;
 			if(incd == 2)
 				dst -= 32;
-			program_write_qword_64le(dst, program_read_qword_64le(src));
-			program_write_qword_64le(dst+8, program_read_qword_64le(src+8));
-			program_write_qword_64le(dst+16, program_read_qword_64le(src+16));
-			program_write_qword_64le(dst+24, program_read_qword_64le(src+24));
+			memory_write_qword_64le(sh4.program, dst, memory_read_qword_64le(sh4.program, src));
+			memory_write_qword_64le(sh4.program, dst+8, memory_read_qword_64le(sh4.program, src+8));
+			memory_write_qword_64le(sh4.program, dst+16, memory_read_qword_64le(sh4.program, src+16));
+			memory_write_qword_64le(sh4.program, dst+24, memory_read_qword_64le(sh4.program, src+24));
 			if(incs == 1)
 				src += 32;
 			if(incd == 1)
@@ -886,11 +887,11 @@ WRITE32_HANDLER( sh4_internal_w )
 		sh4.ioport16_direction &= 0xffff;
 		sh4.ioport16_pullup = (sh4.ioport16_pullup | sh4.ioport16_direction) ^ 0xffff;
 		if (sh4.m[BCR2] & 1)
-			io_write_dword_64le(SH4_IOPORT_16, (UINT64)(sh4.m[PDTRA] & sh4.ioport16_direction) | ((UINT64)sh4.m[PCTRA] << 16));
+			memory_write_dword_64le(sh4.io, SH4_IOPORT_16, (UINT64)(sh4.m[PDTRA] & sh4.ioport16_direction) | ((UINT64)sh4.m[PCTRA] << 16));
 		break;
 	case PDTRA:
 		if (sh4.m[BCR2] & 1)
-			io_write_dword_64le(SH4_IOPORT_16, (UINT64)(sh4.m[PDTRA] & sh4.ioport16_direction) | ((UINT64)sh4.m[PCTRA] << 16));
+			memory_write_dword_64le(sh4.io, SH4_IOPORT_16, (UINT64)(sh4.m[PDTRA] & sh4.ioport16_direction) | ((UINT64)sh4.m[PCTRA] << 16));
 		break;
 	case PCTRB:
 		sh4.ioport4_pullup = 0;
@@ -902,11 +903,11 @@ WRITE32_HANDLER( sh4_internal_w )
 		sh4.ioport4_direction &= 0xf;
 		sh4.ioport4_pullup = (sh4.ioport4_pullup | sh4.ioport4_direction) ^ 0xf;
 		if (sh4.m[BCR2] & 1)
-			io_write_dword_64le(SH4_IOPORT_4, (sh4.m[PDTRB] & sh4.ioport4_direction) | (sh4.m[PCTRB] << 16));
+			memory_write_dword_64le(sh4.io, SH4_IOPORT_4, (sh4.m[PDTRB] & sh4.ioport4_direction) | (sh4.m[PCTRB] << 16));
 		break;
 	case PDTRB:
 		if (sh4.m[BCR2] & 1)
-			io_write_dword_64le(SH4_IOPORT_4, (sh4.m[PDTRB] & sh4.ioport4_direction) | (sh4.m[PCTRB] << 16));
+			memory_write_dword_64le(sh4.io, SH4_IOPORT_4, (sh4.m[PDTRB] & sh4.ioport4_direction) | (sh4.m[PCTRB] << 16));
 		break;
 
 	case SCBRR2:
@@ -956,11 +957,11 @@ READ32_HANDLER( sh4_internal_r )
 		// I/O ports
 	case PDTRA:
 		if (sh4.m[BCR2] & 1)
-			return (io_read_dword_64le(SH4_IOPORT_16) & ~sh4.ioport16_direction) | (sh4.m[PDTRA] & sh4.ioport16_direction);
+			return (memory_read_dword_64le(sh4.io, SH4_IOPORT_16) & ~sh4.ioport16_direction) | (sh4.m[PDTRA] & sh4.ioport16_direction);
 		break;
 	case PDTRB:
 		if (sh4.m[BCR2] & 1)
-			return (io_read_dword_64le(SH4_IOPORT_4) & ~sh4.ioport4_direction) | (sh4.m[PDTRB] & sh4.ioport4_direction);
+			return (memory_read_dword_64le(sh4.io, SH4_IOPORT_4) & ~sh4.ioport4_direction) | (sh4.m[PDTRB] & sh4.ioport4_direction);
 		break;
 	}
 	return sh4.m[offset];
@@ -1248,7 +1249,7 @@ UINT32 pos,len,siz;
 				len = s->length;
 				p32bits = (UINT32 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					*p32bits = program_read_dword_64le(s->source);
+					*p32bits = memory_read_dword_64le(sh4.program, s->source);
 					p32bits++;
 					s->source = s->source + 4;
 				}
@@ -1256,7 +1257,7 @@ UINT32 pos,len,siz;
 				len = s->length;
 				p32bits = (UINT32 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					program_write_dword_64le(s->destination, *p32bits);
+					memory_write_dword_64le(sh4.program, s->destination, *p32bits);
 					p32bits++;
 					s->destination = s->destination + 4;
 				}
@@ -1268,9 +1269,9 @@ UINT32 pos,len,siz;
 				p32bytes = (UINT64 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
 #ifdef LSB_FIRST
-					*p32bytes = program_read_qword_64le(s->source);
+					*p32bytes = memory_read_qword_64le(sh4.program, s->source);
 #else
-					*p32bytes = program_read_qword_64be(s->source);
+					*p32bytes = memory_read_qword_64be(sh4.program, s->source);
 #endif
 					p32bytes++;
 					s->destination = s->destination + 8;
@@ -1280,9 +1281,9 @@ UINT32 pos,len,siz;
 				p32bytes = (UINT64 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
 #ifdef LSB_FIRST
-					program_write_qword_64le(s->destination, *p32bytes);
+					memory_write_qword_64le(sh4.program, s->destination, *p32bytes);
 #else
-					program_write_qword_64be(s->destination, *p32bytes);
+					memory_write_qword_64be(sh4.program, s->destination, *p32bytes);
 #endif
 					p32bytes++;
 					s->destination = s->destination + 8;

@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "ppccom.h"
 #include "cpuexec.h"
 #include "mame.h"
@@ -199,6 +200,7 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	ppc->cpu_clock = clock;
 	ppc->irq_callback = irqcallback;
 	ppc->device = device;
+	ppc->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	ppc->system_clock = (config != NULL) ? config->bus_frequency : clock;
 	ppc->tb_divisor = (ppc->tb_divisor * clock + ppc->system_clock / 2 - 1) / ppc->system_clock;
 
@@ -1377,7 +1379,7 @@ static int ppc4xx_dma_fetch_transmit_byte(powerpc_state *ppc, int dmachan, UINT8
 
 	/* fetch the data */
 	cpu_push_context(Machine->cpu[ppc->cpunum]);
-	*byte = program_read_byte(dmaregs[DCR4XX_DMADA0]++);
+	*byte = memory_read_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
 	cpu_pop_context();
 	return TRUE;
@@ -1403,7 +1405,7 @@ static int ppc4xx_dma_handle_receive_byte(powerpc_state *ppc, int dmachan, UINT8
 
 	/* store the data */
 	cpu_push_context(Machine->cpu[ppc->cpunum]);
-	program_write_byte(dmaregs[DCR4XX_DMADA0]++, byte);
+	memory_write_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++, byte);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
 	cpu_pop_context();
 	return TRUE;
@@ -1457,7 +1459,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 				case 1:
 					do
 					{
-						program_write_byte(dmaregs[DCR4XX_DMADA0], program_read_byte(dmaregs[DCR4XX_DMASA0]));
+						memory_write_byte(ppc->program, dmaregs[DCR4XX_DMADA0], memory_read_byte(ppc->program, dmaregs[DCR4XX_DMASA0]));
 						dmaregs[DCR4XX_DMASA0] += srcinc;
 						dmaregs[DCR4XX_DMADA0] += destinc;
 					} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
@@ -1467,7 +1469,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 				case 2:
 					do
 					{
-						program_write_word(dmaregs[DCR4XX_DMADA0], program_read_word(dmaregs[DCR4XX_DMASA0]));
+						memory_write_word(ppc->program, dmaregs[DCR4XX_DMADA0], memory_read_word(ppc->program, dmaregs[DCR4XX_DMASA0]));
 						dmaregs[DCR4XX_DMASA0] += srcinc;
 						dmaregs[DCR4XX_DMADA0] += destinc;
 					} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
@@ -1477,7 +1479,7 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 				case 4:
 					do
 					{
-						program_write_dword(dmaregs[DCR4XX_DMADA0], program_read_dword(dmaregs[DCR4XX_DMASA0]));
+						memory_write_dword(ppc->program, dmaregs[DCR4XX_DMADA0], memory_read_dword(ppc->program, dmaregs[DCR4XX_DMASA0]));
 						dmaregs[DCR4XX_DMASA0] += srcinc;
 						dmaregs[DCR4XX_DMADA0] += destinc;
 					} while (!ppc4xx_dma_decrement_count(ppc, dmachan));
@@ -1487,8 +1489,8 @@ static void ppc4xx_dma_exec(powerpc_state *ppc, int dmachan)
 				case 16:
 					do
 					{
-						program_write_qword(dmaregs[DCR4XX_DMADA0], program_read_qword(dmaregs[DCR4XX_DMASA0]));
-						program_write_qword(dmaregs[DCR4XX_DMADA0] + 8, program_read_qword(dmaregs[DCR4XX_DMASA0] + 8));
+						memory_write_qword(ppc->program, dmaregs[DCR4XX_DMADA0], memory_read_qword(ppc->program, dmaregs[DCR4XX_DMASA0]));
+						memory_write_qword(ppc->program, dmaregs[DCR4XX_DMADA0] + 8, memory_read_qword(ppc->program, dmaregs[DCR4XX_DMASA0] + 8));
 						dmaregs[DCR4XX_DMASA0] += srcinc;
 						dmaregs[DCR4XX_DMADA0] += destinc;
 					} while (!ppc4xx_dma_decrement_count(ppc, dmachan));

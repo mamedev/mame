@@ -4,6 +4,7 @@
     Written by Ville Linde
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "deprecat.h"
@@ -60,6 +61,7 @@ typedef struct
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 } RSP_REGS;
 
 
@@ -150,12 +152,12 @@ typedef struct
 static RSP_REGS rsp;
 static int rsp_icount;
 
-#define ROPCODE(pc)		program_decrypted_read_dword(pc)
+#define ROPCODE(pc)		memory_decrypted_read_dword(rsp.program, pc)
 
 INLINE UINT8 READ8(UINT32 address)
 {
 	address = 0x04000000 | (address & 0xfff);
-	return program_read_byte_32be(address);
+	return memory_read_byte_32be(rsp.program, address);
 }
 
 INLINE UINT16 READ16(UINT32 address)
@@ -165,10 +167,10 @@ INLINE UINT16 READ16(UINT32 address)
 	if (address & 1)
 	{
 		//osd_die("RSP: READ16: unaligned %08X at %08X\n", address, rsp.ppc);
-		return ((program_read_byte_32be(address+0) & 0xff) << 8) | (program_read_byte_32be(address+1) & 0xff);
+		return ((memory_read_byte_32be(rsp.program, address+0) & 0xff) << 8) | (memory_read_byte_32be(rsp.program, address+1) & 0xff);
 	}
 
-	return program_read_word_32be(address);
+	return memory_read_word_32be(rsp.program, address);
 }
 
 INLINE UINT32 READ32(UINT32 address)
@@ -178,19 +180,19 @@ INLINE UINT32 READ32(UINT32 address)
 	if (address & 3)
 	{
 		//osd_die("RSP: READ32: unaligned %08X at %08X\n", address, rsp.ppc);
-		return ((program_read_byte_32be(address + 0) & 0xff) << 24) |
-			   ((program_read_byte_32be(address + 1) & 0xff) << 16) |
-			   ((program_read_byte_32be(address + 2) & 0xff) << 8) |
-			   ((program_read_byte_32be(address + 3) & 0xff) << 0);
+		return ((memory_read_byte_32be(rsp.program, address + 0) & 0xff) << 24) |
+			   ((memory_read_byte_32be(rsp.program, address + 1) & 0xff) << 16) |
+			   ((memory_read_byte_32be(rsp.program, address + 2) & 0xff) << 8) |
+			   ((memory_read_byte_32be(rsp.program, address + 3) & 0xff) << 0);
 	}
 
-	return program_read_dword_32be(address);
+	return memory_read_dword_32be(rsp.program, address);
 }
 
 INLINE void WRITE8(UINT32 address, UINT8 data)
 {
 	address = 0x04000000 | (address & 0xfff);
-	program_write_byte_32be(address, data);
+	memory_write_byte_32be(rsp.program, address, data);
 }
 
 INLINE void WRITE16(UINT32 address, UINT16 data)
@@ -200,12 +202,12 @@ INLINE void WRITE16(UINT32 address, UINT16 data)
 	if (address & 1)
 	{
 		//fatalerror("RSP: WRITE16: unaligned %08X, %04X at %08X\n", address, data, rsp.ppc);
-		program_write_byte_32be(address + 0, (data >> 8) & 0xff);
-		program_write_byte_32be(address + 1, (data >> 0) & 0xff);
+		memory_write_byte_32be(rsp.program, address + 0, (data >> 8) & 0xff);
+		memory_write_byte_32be(rsp.program, address + 1, (data >> 0) & 0xff);
 		return;
 	}
 
-	program_write_word_32be(address, data);
+	memory_write_word_32be(rsp.program, address, data);
 }
 
 INLINE void WRITE32(UINT32 address, UINT32 data)
@@ -215,28 +217,27 @@ INLINE void WRITE32(UINT32 address, UINT32 data)
 	if (address & 3)
 	{
 		//osd_die("RSP: WRITE32: unaligned %08X, %08X at %08X\n", address, data, rsp.ppc);
-		program_write_byte_32be(address + 0, (data >> 24) & 0xff);
-		program_write_byte_32be(address + 1, (data >> 16) & 0xff);
-		program_write_byte_32be(address + 2, (data >> 8) & 0xff);
-		program_write_byte_32be(address + 3, (data >> 0) & 0xff);
+		memory_write_byte_32be(rsp.program, address + 0, (data >> 24) & 0xff);
+		memory_write_byte_32be(rsp.program, address + 1, (data >> 16) & 0xff);
+		memory_write_byte_32be(rsp.program, address + 2, (data >> 8) & 0xff);
+		memory_write_byte_32be(rsp.program, address + 3, (data >> 0) & 0xff);
 		return;
 	}
 
-	program_write_dword_32be(address, data);
+	memory_write_dword_32be(rsp.program, address, data);
 }
 
 /*****************************************************************************/
 
 static UINT32 get_cop0_reg(int reg)
 {
-	const address_space *space = cpu_get_address_space(rsp.device, ADDRESS_SPACE_PROGRAM);
 	if (reg >= 0 && reg < 8)
 	{
-		return (configdata->sp_reg_r)(space, reg, 0x00000000);
+		return (configdata->sp_reg_r)(rsp.program, reg, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		return (configdata->dp_reg_r)(space, reg - 8, 0x00000000);
+		return (configdata->dp_reg_r)(rsp.program, reg - 8, 0x00000000);
 	}
 	else
 	{
@@ -246,14 +247,13 @@ static UINT32 get_cop0_reg(int reg)
 
 static void set_cop0_reg(int reg, UINT32 data)
 {
-	const address_space *space = cpu_get_address_space(rsp.device, ADDRESS_SPACE_PROGRAM);
 	if (reg >= 0 && reg < 8)
 	{
-		(configdata->sp_reg_w)(space, reg, data, 0x00000000);
+		(configdata->sp_reg_w)(rsp.program, reg, data, 0x00000000);
 	}
 	else if (reg >= 8 && reg < 16)
 	{
-		(configdata->dp_reg_w)(space, reg - 8, data, 0x00000000);
+		(configdata->dp_reg_w)(rsp.program, reg - 8, data, 0x00000000);
 	}
 	else
 	{
@@ -356,6 +356,7 @@ static CPU_INIT( rsp )
 
 	rsp.irq_callback = irqcallback;
 	rsp.device = device;
+	rsp.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 #if 1
     // Inaccurate.  RSP registers power on to a random state...

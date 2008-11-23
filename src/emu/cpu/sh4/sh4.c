@@ -22,6 +22,7 @@
  *
  *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "sh4.h"
 #include "sh4regs.h"
@@ -117,9 +118,9 @@ INLINE UINT8 RB(offs_t A)
 		return sh4_internal_r(sh4.internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xff << ((A & 3)*8)) >> ((A & 3)*8);
 
 	if (A >= 0xe0000000)
-		return program_read_byte_64le(A);
+		return memory_read_byte_64le(sh4.program, A);
 
-	return program_read_byte_64le(A & AM);
+	return memory_read_byte_64le(sh4.program, A & AM);
 }
 
 INLINE UINT16 RW(offs_t A)
@@ -128,9 +129,9 @@ INLINE UINT16 RW(offs_t A)
 		return sh4_internal_r(sh4.internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffff << ((A & 2)*8)) >> ((A & 2)*8);
 
 	if (A >= 0xe0000000)
-		return program_read_word_64le(A);
+		return memory_read_word_64le(sh4.program, A);
 
-	return program_read_word_64le(A & AM);
+	return memory_read_word_64le(sh4.program, A & AM);
 }
 
 INLINE UINT32 RL(offs_t A)
@@ -139,9 +140,9 @@ INLINE UINT32 RL(offs_t A)
 		return sh4_internal_r(sh4.internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffffffff);
 
 	if (A >= 0xe0000000)
-		return program_read_dword_64le(A);
+		return memory_read_dword_64le(sh4.program, A);
 
-  return program_read_dword_64le(A & AM);
+  return memory_read_dword_64le(sh4.program, A & AM);
 }
 
 INLINE void WB(offs_t A, UINT8 V)
@@ -155,11 +156,11 @@ INLINE void WB(offs_t A, UINT8 V)
 
 	if (A >= 0xe0000000)
 	{
-		program_write_byte_64le(A,V);
+		memory_write_byte_64le(sh4.program, A,V);
 		return;
 	}
 
-	program_write_byte_64le(A & AM,V);
+	memory_write_byte_64le(sh4.program, A & AM,V);
 }
 
 INLINE void WW(offs_t A, UINT16 V)
@@ -172,11 +173,11 @@ INLINE void WW(offs_t A, UINT16 V)
 
 	if (A >= 0xe0000000)
 	{
-		program_write_word_64le(A,V);
+		memory_write_word_64le(sh4.program, A,V);
 		return;
 	}
 
-	program_write_word_64le(A & AM,V);
+	memory_write_word_64le(sh4.program, A & AM,V);
 }
 
 INLINE void WL(offs_t A, UINT32 V)
@@ -189,14 +190,14 @@ INLINE void WL(offs_t A, UINT32 V)
 
 	if (A >= 0xe0000000)
 	{
-		program_write_dword_64le(A,V);
+		memory_write_dword_64le(sh4.program, A,V);
 		return;
 	}
 
 /*  if (A >= 0x40000000)
         return;*/
 
-	program_write_dword_64le(A & AM,V);
+	memory_write_dword_64le(sh4.program, A & AM,V);
 }
 
 /*  code                 cycles  t-bit
@@ -2083,7 +2084,7 @@ UINT32 addr,dest,sq;
 		addr = addr & 0xFFFFFFE0;
 		for (a = 0;a < 4;a++)
 		{
-			program_write_qword_64le(dest, program_read_qword_64le(addr));
+			memory_write_qword_64le(sh4.program, dest, memory_read_qword_64le(sh4.program, addr));
 			addr += 8;
 			dest += 8;
 		}
@@ -3275,6 +3276,9 @@ static CPU_RESET( sh4 )
 	sh4.ftcsr_read_callback = f;
 	sh4.irq_callback = save_irqcallback;
 	sh4.device = device;
+	sh4.internal = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh4.program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh4.io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	sh4.dma_timer[0] = tsaved[0];
 	sh4.dma_timer[1] = tsaved[1];
@@ -3328,12 +3332,12 @@ static CPU_EXECUTE( sh4 )
 
 		if (sh4.delay)
 		{
-			opcode = program_decrypted_read_word(WORD2_XOR_LE((UINT32)(sh4.delay & AM)));
+			opcode = memory_decrypted_read_word(sh4.program, WORD2_XOR_LE((UINT32)(sh4.delay & AM)));
 			change_pc(sh4.pc & AM);
 			sh4.pc -= 2;
 		}
 		else
-			opcode = program_decrypted_read_word(WORD2_XOR_LE((UINT32)(sh4.pc & AM)));
+			opcode = memory_decrypted_read_word(sh4.program, WORD2_XOR_LE((UINT32)(sh4.pc & AM)));
 
 		debugger_instruction_hook(device, sh4.pc & AM);
 
@@ -3402,6 +3406,8 @@ static CPU_INIT( sh4 )
 	sh4.irq_callback = irqcallback;
 	sh4.device = device;
 	sh4.internal = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh4.program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	sh4.io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 	sh4_default_exception_priorities();
 	sh4.irln = 15;
 	sh4.test_irq = 0;

@@ -51,7 +51,7 @@
  *                                                                          *
  \**************************************************************************/
 
-
+#define NO_LEGACY_MEMORY_HANDLERS 1
 
 #include "debugger.h"
 #include "pic16c5x.h"
@@ -94,6 +94,10 @@ typedef struct
 	UINT16	prescaler;	/* Note: this is really an 8-bit register */
 	PAIR	opcode;
 	UINT8	internalram[8];
+	const device_config *device;
+	const address_space *program;
+	const address_space *data;
+	const address_space *io;
 } pic16C5x_Regs;
 
 static pic16C5x_Regs R;
@@ -718,6 +722,11 @@ static CPU_INIT( pic16C5x )
 	state_save_register_item("pic16C5x", device->tag, 0, delay_timer);
 	state_save_register_item("pic16C5x", device->tag, 0, picmodel);
 	state_save_register_item("pic16C5x", device->tag, 0, pic16C5x_reset_vector);
+
+	R.device = device;
+	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	R.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	R.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 }
 
 

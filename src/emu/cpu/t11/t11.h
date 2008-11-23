@@ -38,14 +38,14 @@ extern CPU_GET_INFO( t11 );
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
-#define T11_RDMEM(A) ((unsigned)program_read_byte_16le(A))
-#define T11_RDMEM_WORD(A) ((unsigned)program_read_word_16le(A))
+#define T11_RDMEM(A) ((unsigned)memory_read_byte_16le(t11.program, A))
+#define T11_RDMEM_WORD(A) ((unsigned)memory_read_word_16le(t11.program, A))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define T11_WRMEM(A,V) (program_write_byte_16le(A,V))
-#define T11_WRMEM_WORD(A,V) (program_write_word_16le(A,V))
+#define T11_WRMEM(A,V) (memory_write_byte_16le(t11.program, A,V))
+#define T11_WRMEM_WORD(A,V) (memory_write_word_16le(t11.program, A,V))
 
 CPU_DISASSEMBLE( t11 );
 

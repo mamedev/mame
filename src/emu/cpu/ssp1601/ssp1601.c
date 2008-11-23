@@ -17,6 +17,7 @@
  *   ops not used by VR are not implemented
  */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "ssp1601.h"
 
@@ -49,6 +50,10 @@ struct _ssp1601_state_t
 	PAIR ppc;
 
 	int g_cycles;
+	
+	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 };
 
 
@@ -71,8 +76,8 @@ struct _ssp1601_state_t
 
 #define PPC    ssp1601_state->ppc.w.h
 
-#define FETCH() program_decrypted_read_word(rPC++ << 1)
-#define PROGRAM_WORD(a) program_read_word((a) << 1)
+#define FETCH() memory_decrypted_read_word(ssp1601_state->program, rPC++ << 1)
+#define PROGRAM_WORD(a) memory_read_word(ssp1601_state->program, (a) << 1)
 #define GET_PPC_OFFS() PPC
 #define CHANGEPC() change_pc(rPC << 1)
 
@@ -244,13 +249,13 @@ static void write_unknown(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 static UINT32 read_ext(ssp1601_state_t *ssp1601_state, int reg)
 {
 	reg &= 7;
-	return io_read_word_16be((reg << 1));
+	return memory_read_word_16be(ssp1601_state->io, (reg << 1));
 }
 
 static void write_ext(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 {
 	reg &= 7;
-	io_write_word_16be((reg << 1), d);
+	memory_write_word_16be(ssp1601_state->io, (reg << 1), d);
 }
 
 // 4
@@ -501,7 +506,7 @@ static UINT32 ptr2_read(ssp1601_state_t *ssp1601_state, int op)
 static CPU_INIT( ssp1601 )
 {
 	ssp1601_state_t *ssp1601_state = device->token;
-
+	
 	state_save_register_item(CHIP_NAME, device->tag, 0, rX);
 	state_save_register_item(CHIP_NAME, device->tag, 0, rY);
 	state_save_register_item(CHIP_NAME, device->tag, 0, rA32);
@@ -517,6 +522,10 @@ static CPU_INIT( ssp1601 )
 	/* clear the state */
 	memset(ssp1601_state, 0, sizeof(ssp1601_state_t));
 	ssp1601_state->gr[0].w.h = 0xffff; // constant reg
+	ssp1601_state->device = device;
+	ssp1601_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	ssp1601_state->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
+
 }
 
 static CPU_EXIT( ssp1601 )

@@ -15,6 +15,7 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "sh2.h"
@@ -147,9 +148,9 @@ INLINE UINT16 RW(offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
-		return program_read_word_32be(A);
+		return memory_read_word_32be(sh2->program, A);
 
-	return program_read_word_32be(A & AM);
+	return memory_read_word_32be(sh2->program, A & AM);
 }
 
 INLINE UINT32 RL(offs_t A)
@@ -158,9 +159,9 @@ INLINE UINT32 RL(offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
-		return program_read_dword_32be(A);
+		return memory_read_dword_32be(sh2->program, A);
 
-	return program_read_dword_32be(A & AM);
+	return memory_read_dword_32be(sh2->program, A & AM);
 }
 
 /*-------------------------------------------------
@@ -818,8 +819,8 @@ static CPU_RESET( sh2 )
 	sh2->m = m;
 	memset(sh2->m, 0, 0x200);
 
-	sh2->pc = program_read_dword_32be(0);
-	sh2->r[15] = program_read_dword_32be(4);
+	sh2->pc = memory_read_dword_32be(sh2->program, 0);
+	sh2->r[15] = memory_read_dword_32be(sh2->program, 4);
 	sh2->sr = I;
 	change_pc(sh2->pc & AM);
 

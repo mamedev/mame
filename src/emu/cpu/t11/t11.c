@@ -11,6 +11,7 @@
 
 *****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "t11.h"
 
@@ -33,6 +34,7 @@ typedef struct
     INT32	interrupt_cycles;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 } t11_Regs;
 
 static t11_Regs t11;
@@ -77,7 +79,7 @@ static int	t11_ICount;
 
 INLINE int ROPCODE(void)
 {
-	int val = program_decrypted_read_word(PC);
+	int val = memory_decrypted_read_word(t11.program, PC);
 	PC += 2;
 	return val;
 }
@@ -296,6 +298,7 @@ static CPU_INIT( t11 )
 	t11.initial_pc = initial_pc[setup->mode >> 13];
 	t11.irq_callback = irqcallback;
 	t11.device = device;
+	t11.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	state_save_register_item("t11", device->tag, 0, t11.ppc.w.l);
 	state_save_register_item("t11", device->tag, 0, t11.reg[0].w.l);

@@ -9,6 +9,7 @@
   Code by Wilbert Pol
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "sm8500.h"
 
@@ -48,6 +49,7 @@ typedef struct {
 	int halted;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
 	UINT8 internal_ram[0x500];
 } sm8500_regs;
 
@@ -61,14 +63,14 @@ static const UINT8 sm8500_b2w[8] = {
 };
 
 UINT8 sm85cpu_mem_readbyte( UINT32 offset ) {
-	return ( offset < 0x10 ) ? regs.register_base[offset] : program_read_byte_8be( offset );
+	return ( offset < 0x10 ) ? regs.register_base[offset] : memory_read_byte_8be( regs.program, offset );
 }
 
 void sm85cpu_mem_writebyte( UINT32 offset, UINT8 data ) {
 	if ( offset < 0x10 ) {
 		regs.register_base[offset] = data;
 	} else {
-		program_write_byte_8be( offset, data );
+		memory_write_byte_8be( regs.program, offset, data );
 	}
 }
 
@@ -80,6 +82,7 @@ UINT8* sm8500_internal_ram( void )
 static CPU_INIT( sm8500 ) {
 	regs.irq_callback = irqcallback;
 	regs.device = device;
+	regs.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	if ( device->static_config != NULL ) {
 		regs.config.handle_dma = ((SM8500_CONFIG *)device->static_config)->handle_dma;
 		regs.config.handle_timers = ((SM8500_CONFIG *)device->static_config)->handle_timers;

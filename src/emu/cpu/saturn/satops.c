@@ -7,7 +7,7 @@ INLINE int READ_OP(void)
 {
 	UINT8 data;
 	saturn_ICount-=3;
-        data=program_decrypted_read_byte(saturn.pc);
+        data=memory_decrypted_read_byte(saturn.program, saturn.pc);
 	saturn_assert(data<0x10);
 	saturn.pc=(saturn.pc+1)&0xfffff;
 	return data;
@@ -17,7 +17,7 @@ INLINE int READ_OP_ARG(void)
 {
 	UINT8 data;
 	saturn_ICount-=3;
-        data=program_raw_read_byte(saturn.pc);
+        data=memory_raw_read_byte(saturn.program, saturn.pc);
 	saturn_assert(data<0x10);
 	saturn.pc=(saturn.pc+1)&0xfffff;
 	return data;
@@ -78,7 +78,7 @@ INLINE int READ_NIBBLE(SaturnAdr adr)
 {
 	UINT8 data;
 	saturn_ICount-=3;
-	data=program_read_byte(adr&0xfffff);
+	data=memory_read_byte(saturn.program, adr&0xfffff);
 	saturn_assert(data<0x10);
 	if (saturn.config&&saturn.config->crc) saturn.config->crc(Machine, adr&0xfffff, data);
 	return data;
@@ -108,7 +108,7 @@ INLINE void WRITE_NIBBLE(SaturnAdr adr, SaturnNib nib)
 {
 	saturn_ICount-=3;
 	saturn_assert(nib<0x10);
-	program_write_byte(adr&0xfffff,nib);
+	memory_write_byte(saturn.program, adr&0xfffff,nib);
 }
 
 #define BEGIN_B 0
