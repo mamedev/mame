@@ -228,7 +228,7 @@ static TIMER_CALLBACK( dma_timer_callback )
 }
 
 
-static void update_dma_state(void)
+static void update_dma_state(const address_space *space)
 {
 	/* determine the new enabled state */
 	int enabled = ((tms32031_io_regs[DMA_GLOBAL_CTL] & 3) == 3) && (tms32031_io_regs[DMA_TRANSFER_COUNT] != 0);
@@ -251,7 +251,7 @@ static void update_dma_state(void)
 		inc = (tms32031_io_regs[DMA_GLOBAL_CTL] >> 4) & 1;
 		for (i = 0; i < tms32031_io_regs[DMA_TRANSFER_COUNT]; i++)
 		{
-			sound_data[i % STACK_SOUND_BUFSIZE] = program_read_dword(addr * 4);
+			sound_data[i % STACK_SOUND_BUFSIZE] = memory_read_dword(space, addr * 4);
 			addr += inc;
 			if (i % STACK_SOUND_BUFSIZE == STACK_SOUND_BUFSIZE - 1)
 				dmadac_transfer(0, DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);
@@ -399,7 +399,7 @@ static WRITE32_HANDLER( tms32031_io_w )
 		case DMA_SOURCE_ADDR:
 		case DMA_DEST_ADDR:
 		case DMA_TRANSFER_COUNT:
-			update_dma_state();
+			update_dma_state(space);
 			break;
 
 		case TIMER0_GLOBAL_CTL:

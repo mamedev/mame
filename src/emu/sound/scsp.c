@@ -227,7 +227,7 @@ struct _SCSP
 	struct _SCSPDSP DSP;
 };
 
-static void dma_scsp(running_machine *machine, struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
+static void dma_scsp(const address_space *space, struct _SCSP *SCSP); 		/*SCSP DMA transfer function*/
 #define	scsp_dgate		scsp_regs[0x16/2] & 0x4000
 #define	scsp_ddir		scsp_regs[0x16/2] & 0x2000
 #define scsp_dexe 		scsp_regs[0x16/2] & 0x1000
@@ -1153,7 +1153,7 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 	}
 }
 
-static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
+static void dma_scsp(const address_space *space, struct _SCSP *SCSP)
 {
 	static UINT16 tmp_dma[3], *scsp_regs;
 
@@ -1176,7 +1176,7 @@ static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
 	{
 		for(;SCSP->scsp_dtlg > 0;SCSP->scsp_dtlg-=2)
 		{
-			program_write_word(SCSP->scsp_dmea, program_read_word(0x100000|SCSP->scsp_drga));
+			memory_write_word(space,SCSP->scsp_dmea, memory_read_word(space,0x100000|SCSP->scsp_drga));
 			SCSP->scsp_dmea+=2;
 			SCSP->scsp_drga+=2;
 		}
@@ -1185,7 +1185,7 @@ static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
 	{
 		for(;SCSP->scsp_dtlg > 0;SCSP->scsp_dtlg-=2)
 		{
-  			program_write_word(0x100000|SCSP->scsp_drga,program_read_word(SCSP->scsp_dmea));
+  			memory_write_word(space,0x100000|SCSP->scsp_drga,memory_read_word(space,SCSP->scsp_dmea));
 			SCSP->scsp_dmea+=2;
 			SCSP->scsp_drga+=2;
 		}
@@ -1201,7 +1201,7 @@ static void dma_scsp(running_machine *machine, struct _SCSP *SCSP)
 
 	/*Job done,request a dma end irq*/
 	if(scsp_regs[0x1e/2] & 0x10)
-	cpu_set_input_line(machine->cpu[2],dma_transfer_end,HOLD_LINE);
+		cpu_set_input_line(space->machine->cpu[2],dma_transfer_end,HOLD_LINE);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1310,7 +1310,7 @@ WRITE16_HANDLER( scsp_0_w )
 		SCSP->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(space->machine, SCSP);
+			dma_scsp(space, SCSP);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;

@@ -370,6 +370,7 @@ static void leland_80186_dac_update(void *param, stream_sample_t **inputs, strea
 
 static void leland_80186_dma_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length)
 {
+	const address_space *dmaspace = param;
 	stream_sample_t *buffer = outputs[0];
 	int i, j;
 
@@ -377,7 +378,7 @@ static void leland_80186_dma_update(void *param, stream_sample_t **inputs, strea
 	memset(buffer, 0, length * sizeof(*buffer));
 
 	/* loop over DMA buffers */
-	cpu_push_context(Machine->cpu[2]);
+	cpu_push_context(dmaspace->cpu);
 	for (i = 0; i < 2; i++)
 	{
 		struct dma_state *d = &i80186.dma[i];
@@ -419,7 +420,7 @@ static void leland_80186_dma_update(void *param, stream_sample_t **inputs, strea
 				/* sample-rate convert to the output frequency */
 				for (j = 0; j < length && count > 0; j++)
 				{
-					buffer[j] += ((int)program_read_byte(source) - 0x80) * volume;
+					buffer[j] += ((int)memory_read_byte(dmaspace, source) - 0x80) * volume;
 					frac += step;
 					source += frac >> 24;
 					count -= frac >> 24;
@@ -504,6 +505,7 @@ static TIMER_CALLBACK( dma_timer_callback );
 
 void *leland_80186_sh_start(int clock, const custom_sound_interface *config)
 {
+	const address_space *dmaspace = cputag_get_address_space(Machine, "audio", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */
@@ -513,7 +515,7 @@ void *leland_80186_sh_start(int clock, const custom_sound_interface *config)
 			has_ym2151 = 1;
 
 	/* allocate separate streams for the DMA and non-DMA DACs */
-	dma_stream = stream_create(0, 1, OUTPUT_RATE, NULL, leland_80186_dma_update);
+	dma_stream = stream_create(0, 1, OUTPUT_RATE, (void *)dmaspace, leland_80186_dma_update);
 	nondma_stream = stream_create(0, 1, OUTPUT_RATE, NULL, leland_80186_dac_update);
 
 	/* if we have a 2151, install an externally driven DAC stream */

@@ -141,12 +141,13 @@ static UINT32 *ResetPatch;
 
 static void IntReq(running_machine *machine, int num)
 {
-	UINT32 IntEn=program_read_dword_32le(0x01800c08);
-	UINT32 IntPend=program_read_dword_32le(0x01800c0c);
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	UINT32 IntEn=memory_read_dword(space, 0x01800c08);
+	UINT32 IntPend=memory_read_dword(space, 0x01800c0c);
 	if(IntEn&(1<<num))
 	{
 		IntPend|=(1<<num);
-		program_write_dword_32le(0x01800c0c,IntPend);
+		memory_write_dword(space,0x01800c0c,IntPend);
 		cpu_set_input_line(machine->cpu[0],SE3208_INT,ASSERT_LINE);
 	}
 #ifdef IDLE_LOOP_SPEEDUP
@@ -158,7 +159,7 @@ static void IntReq(running_machine *machine, int num)
 static READ32_HANDLER(FlipCount_r)
 {
 #ifdef IDLE_LOOP_SPEEDUP
-	UINT32 IntPend=program_read_dword_32le(0x01800c0c);
+	UINT32 IntPend=memory_read_dword(space, 0x01800c0c);
 	FlipCntRead++;
 	if(FlipCntRead>=16 && !IntPend && FlipCount!=0)
 		cpu_suspend(space->machine->cpu[0],SUSPEND_REASON_SPIN,1);
@@ -199,11 +200,11 @@ static READ32_HANDLER(Input_r)
 
 static WRITE32_HANDLER(IntAck_w)
 {
-	UINT32 IntPend=program_read_dword_32le(0x01800c0c);
+	UINT32 IntPend=memory_read_dword(space, 0x01800c0c);
 	if(mem_mask&0xff)
 	{
 		IntPend&=~(1<<(data&0x1f));
-		program_write_dword_32le(0x01800c0c,IntPend);
+		memory_write_dword(space, 0x01800c0c,IntPend);
 		if(!IntPend)
 			cpu_set_input_line(space->machine->cpu[0],SE3208_INT,CLEAR_LINE);
 	}
@@ -213,8 +214,9 @@ static WRITE32_HANDLER(IntAck_w)
 
 static IRQ_CALLBACK(icallback)
 {
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	UINT32 IntPend=memory_read_dword(space, 0x01800c0c);
 	int i;
-	UINT32 IntPend=program_read_dword_32le(0x01800c0c);
 
 	for(i=0;i<32;++i)
 	{
@@ -245,12 +247,12 @@ static TIMER_CALLBACK( Timercb )
 	IntReq(machine, num[which]);
 }
 
-INLINE void Timer_w(int which, UINT32 data, UINT32 mem_mask)
+INLINE void Timer_w(const address_space *space, int which, UINT32 data, UINT32 mem_mask)
 {
 	if(((data^Timerctrl[which])&1) && (data&1))	//Timer activate
 	{
 		int PD=(data>>8)&0xff;
-		int TCV=program_read_dword_32le(0x01801404+which*8);
+		int TCV=memory_read_dword(space, 0x01801404+which*8);
 		attotime period = attotime_mul(ATTOTIME_IN_HZ(43000000), (PD + 1) * (TCV + 1));
 
 		if(Timerctrl[which]&2)
@@ -263,7 +265,7 @@ INLINE void Timer_w(int which, UINT32 data, UINT32 mem_mask)
 
 static WRITE32_HANDLER(Timer0_w)
 {
-	Timer_w(0, data, mem_mask);
+	Timer_w(space, 0, data, mem_mask);
 }
 
 static READ32_HANDLER(Timer0_r)
@@ -273,7 +275,7 @@ static READ32_HANDLER(Timer0_r)
 
 static WRITE32_HANDLER(Timer1_w)
 {
-	Timer_w(1, data, mem_mask);
+	Timer_w(space, 1, data, mem_mask);
 }
 
 static READ32_HANDLER(Timer1_r)
@@ -283,7 +285,7 @@ static READ32_HANDLER(Timer1_r)
 
 static WRITE32_HANDLER(Timer2_w)
 {
-	Timer_w(2, data, mem_mask);
+	Timer_w(space, 2, data, mem_mask);
 }
 
 static READ32_HANDLER(Timer2_r)
@@ -293,7 +295,7 @@ static READ32_HANDLER(Timer2_r)
 
 static WRITE32_HANDLER(Timer3_w)
 {
-	Timer_w(3, data, mem_mask);
+	Timer_w(space, 3, data, mem_mask);
 }
 
 static READ32_HANDLER(Timer3_r)
@@ -344,50 +346,50 @@ static WRITE32_HANDLER(PIO_w)
 	DS1302_CLK(space->machine, CLK?1:0);
 
 	if(DS1302_RD())
-		program_write_dword_32le(0x01802008,program_read_dword_32le(0x01802008)|0x10000000);
+		memory_write_dword(space,0x01802008,memory_read_dword(space,0x01802008)|0x10000000);
 	else
-		program_write_dword_32le(0x01802008,program_read_dword_32le(0x01802008)&(~0x10000000));
+		memory_write_dword(space,0x01802008,memory_read_dword(space,0x01802008)&(~0x10000000));
 
 	COMBINE_DATA(&PIO);
 }
 
-INLINE void DMA_w(running_machine *machine, int which, UINT32 data, UINT32 mem_mask)
+INLINE void DMA_w(const address_space *space, int which, UINT32 data, UINT32 mem_mask)
 {
 	if(((data^DMActrl[which])&(1<<10)) && (data&(1<<10)))	//DMAOn
 	{
 		UINT32 CTR=data;
-		UINT32 SRC=program_read_dword_32le(0x01800804+which*0x10);
-		UINT32 DST=program_read_dword_32le(0x01800808+which*0x10);
-		UINT32 CNT=program_read_dword_32le(0x0180080C+which*0x10);
+		UINT32 SRC=memory_read_dword(space,0x01800804+which*0x10);
+		UINT32 DST=memory_read_dword(space,0x01800808+which*0x10);
+		UINT32 CNT=memory_read_dword(space,0x0180080C+which*0x10);
 		int i;
 
 		if(CTR&0x2)	//32 bits
 		{
 			for(i=0;i<CNT;++i)
 			{
-				UINT32 v=program_read_dword_32le(SRC+i*4);
-				program_write_dword_32le(DST+i*4,v);
+				UINT32 v=memory_read_dword(space,SRC+i*4);
+				memory_write_dword(space,DST+i*4,v);
 			}
 		}
 		else if(CTR&0x1)	//16 bits
 		{
 			for(i=0;i<CNT;++i)
 			{
-				UINT16 v=program_read_word_32le(SRC+i*2);
-				program_write_word_32le(DST+i*2,v);
+				UINT16 v=memory_read_word(space,SRC+i*2);
+				memory_write_word(space,DST+i*2,v);
 			}
 		}
 		else	//8 bits
 		{
 			for(i=0;i<CNT;++i)
 			{
-				UINT8 v=program_read_byte_32le(SRC+i);
-				program_write_byte_32le(DST+i,v);
+				UINT8 v=memory_read_byte(space,SRC+i);
+				memory_write_byte(space,DST+i,v);
 			}
 		}
 		data&=~(1<<10);
-		program_write_dword_32le(0x0180080C+which*0x10,0);
-		IntReq(machine, 7+which);
+		memory_write_dword(space,0x0180080C+which*0x10,0);
+		IntReq(space->machine, 7+which);
 	}
 	COMBINE_DATA(&DMActrl[which]);
 }
@@ -399,7 +401,7 @@ static READ32_HANDLER(DMA0_r)
 
 static WRITE32_HANDLER(DMA0_w)
 {
-	DMA_w(space->machine, 0, data, mem_mask);
+	DMA_w(space, 0, data, mem_mask);
 }
 
 static READ32_HANDLER(DMA1_r)
@@ -409,7 +411,7 @@ static READ32_HANDLER(DMA1_r)
 
 static WRITE32_HANDLER(DMA1_w)
 {
-	DMA_w(space->machine, 1, data, mem_mask);
+	DMA_w(space, 1, data, mem_mask);
 }
 
 
@@ -541,14 +543,14 @@ static VIDEO_START(crystal)
 {
 }
 
-static UINT16 GetVidReg(UINT16 reg)
+static UINT16 GetVidReg(const address_space *space, UINT16 reg)
 {
-	return program_read_word_32le(0x03000000+reg);
+	return memory_read_word(space,0x03000000+reg);
 }
 
-static void SetVidReg(UINT16 reg,UINT16 val)
+static void SetVidReg(const address_space *space, UINT16 reg,UINT16 val)
 {
-	program_write_word_32le(0x03000000+reg,val);
+	memory_write_word(space,0x03000000+reg,val);
 }
 
 
@@ -559,7 +561,7 @@ static VIDEO_UPDATE(crystal)
 
 
 	UINT32 B0=0x0;
-	UINT32 B1=(GetVidReg(0x90)&0x8000)?0x400000:0x100000;
+	UINT32 B1=(GetVidReg(space,0x90)&0x8000)?0x400000:0x100000;
 	UINT16 *Front,*Back;
 	UINT16 *Visible,*DrawDest;
 	UINT16 *srcline;
@@ -567,7 +569,7 @@ static VIDEO_UPDATE(crystal)
 	UINT16 head,tail;
 	UINT32 width=video_screen_get_width(screen);
 
-	if(GetVidReg(0x8e)&1)
+	if(GetVidReg(space,0x8e)&1)
 	{
 		Front=(UINT16*) (frameram+B1/4);
 		Back=(UINT16*) (frameram+B0/4);
@@ -582,7 +584,7 @@ static VIDEO_UPDATE(crystal)
 	DrawDest=(UINT16 *) frameram;
 
 
-	if(GetVidReg(0x8c)&0x80)
+	if(GetVidReg(space,0x8c)&0x80)
 		DrawDest=Front;
 	else
 		DrawDest=Back;
@@ -592,8 +594,8 @@ static VIDEO_UPDATE(crystal)
 	srcline=(UINT16 *) DrawDest;
 
 	DoFlip=0;
-	head=GetVidReg(0x82);
-	tail=GetVidReg(0x80);
+	head=GetVidReg(space,0x82);
+	tail=GetVidReg(space,0x80);
 	while((head&0x7ff)!=(tail&0x7ff))
 	{
 		DoFlip=vrender0_ProcessPacket(space,0x03800000+head*64,DrawDest,(UINT8*)textureram);
@@ -604,7 +606,7 @@ static VIDEO_UPDATE(crystal)
 	}
 
 	if(DoFlip)
-		SetVidReg(0x8e,GetVidReg(0x8e)^1);
+		SetVidReg(space,0x8e,GetVidReg(space,0x8e)^1);
 
 	srcline=(UINT16 *) Visible;
 	for(y=0;y<240;y++)
@@ -615,14 +617,15 @@ static VIDEO_UPDATE(crystal)
 
 static VIDEO_EOF(crystal)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	UINT16 head,tail;
 	int DoFlip=0;
 
-	head=GetVidReg(0x82);
-	tail=GetVidReg(0x80);
+	head=GetVidReg(space,0x82);
+	tail=GetVidReg(space,0x80);
 	while((head&0x7ff)!=(tail&0x7ff))
 	{
-		UINT16 Packet0=program_read_word_32le(0x03800000+head*64);
+		UINT16 Packet0=memory_read_word(space,0x03800000+head*64);
 		if(Packet0&0x81)
 			DoFlip=1;
 		head++;
@@ -630,7 +633,7 @@ static VIDEO_EOF(crystal)
 		if(DoFlip)
 			break;
 	}
-	SetVidReg(0x82,head);
+	SetVidReg(space,0x82,head);
 	if(DoFlip)
 	{
 		if(FlipCount)

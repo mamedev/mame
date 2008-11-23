@@ -41,8 +41,8 @@ UINT8 atarigt_is_primrage;
 
 static UINT32 *	mo_command;
 
-static void (*protection_w)(running_machine *machine, offs_t offset, UINT16 data);
-static void (*protection_r)(running_machine *machine, offs_t offset, UINT16 *data);
+static void (*protection_w)(const address_space *space, offs_t offset, UINT16 data);
+static void (*protection_r)(const address_space *space, offs_t offset, UINT16 *data);
 
 static void cage_irq_callback(running_machine *machine, int reason);
 
@@ -276,9 +276,9 @@ static void tmek_update_mode(offs_t offset)
 }
 
 
-static void tmek_protection_w(running_machine *machine, offs_t offset, UINT16 data)
+static void tmek_protection_w(const address_space *space, offs_t offset, UINT16 data)
 {
-	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", cpu_get_previouspc(machine->activecpu), offset, data);
+	if (LOG_PROTECTION) logerror("%06X:Protection W@%06X = %04X\n", cpu_get_previouspc(space->cpu), offset, data);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -291,9 +291,9 @@ static void tmek_protection_w(running_machine *machine, offs_t offset, UINT16 da
 	}
 }
 
-static void tmek_protection_r(running_machine *machine, offs_t offset, UINT16 *data)
+static void tmek_protection_r(const address_space *space, offs_t offset, UINT16 *data)
 {
-	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", cpu_get_previouspc(machine->activecpu), offset);
+	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", cpu_get_previouspc(space->cpu), offset);
 
 	/* track accesses */
 	tmek_update_mode(offset);
@@ -357,11 +357,11 @@ static void primage_update_mode(offs_t offset)
 
 
 
-static void primrage_protection_w(running_machine *machine, offs_t offset, UINT16 data)
+static void primrage_protection_w(const address_space *space, offs_t offset, UINT16 data)
 {
 	if (LOG_PROTECTION)
 	{
-	UINT32 pc = cpu_get_previouspc(machine->activecpu);
+	UINT32 pc = cpu_get_previouspc(space->cpu);
 	switch (pc)
 	{
 		/* protection code from 20f90 - 21000 */
@@ -394,7 +394,7 @@ static void primrage_protection_w(running_machine *machine, offs_t offset, UINT1
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection W@%06X = %04X\n", cpu_get_previouspc(machine->activecpu), offset, data);
+			logerror("%06X:Unknown protection W@%06X = %04X\n", cpu_get_previouspc(space->cpu), offset, data);
 			break;
 	}
 	}
@@ -427,14 +427,14 @@ static void primrage_protection_w(running_machine *machine, offs_t offset, UINT1
 
 
 
-static void primrage_protection_r(running_machine *machine, offs_t offset, UINT16 *data)
+static void primrage_protection_r(const address_space *space, offs_t offset, UINT16 *data)
 {
 	/* track accesses */
 	primage_update_mode(offset);
 
 if (LOG_PROTECTION)
 {
-	UINT32 pc = cpu_get_previouspc(machine->activecpu);
+	UINT32 pc = cpu_get_previouspc(space->cpu);
 	UINT32 p1, p2, a6;
 	switch (pc)
 	{
@@ -454,9 +454,9 @@ if (LOG_PROTECTION)
 		case 0x275bc:
 			break;
 		case 0x275cc:
-			a6 = cpu_get_reg(machine->activecpu, M68K_A6);
-			p1 = (program_read_word(a6+8) << 16) | program_read_word(a6+10);
-			p2 = (program_read_word(a6+12) << 16) | program_read_word(a6+14);
+			a6 = cpu_get_reg(space->cpu, M68K_A6);
+			p1 = (memory_read_word(space, a6+8) << 16) | memory_read_word(space, a6+10);
+			p2 = (memory_read_word(space, a6+12) << 16) | memory_read_word(space, a6+14);
 			logerror("Known Protection @ 275BC(%08X, %08X): R@%06X ", p1, p2, offset);
 			break;
 		case 0x275d2:
@@ -472,8 +472,8 @@ if (LOG_PROTECTION)
 
 		/* protection code from 3d8dc - 3d95a */
 		case 0x3d8f4:
-			a6 = cpu_get_reg(machine->activecpu, M68K_A6);
-			p1 = (program_read_word(a6+12) << 16) | program_read_word(a6+14);
+			a6 = cpu_get_reg(space->cpu, M68K_A6);
+			p1 = (memory_read_word(space, a6+12) << 16) | memory_read_word(space, a6+14);
 			logerror("Known Protection @ 3D8F4(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x3d8fa:
@@ -483,8 +483,8 @@ if (LOG_PROTECTION)
 
 		/* protection code from 437fa - 43860 */
 		case 0x43814:
-			a6 = cpu_get_reg(machine->activecpu, M68K_A6);
-			p1 = program_read_dword(a6+14) & 0xffffff;
+			a6 = cpu_get_reg(space->cpu, M68K_A6);
+			p1 = memory_read_dword(space, a6+14) & 0xffffff;
 			logerror("Known Protection @ 43814(%08X): R@%06X ", p1, offset);
 			break;
 		case 0x4381c:
@@ -497,7 +497,7 @@ if (LOG_PROTECTION)
 
 		/* catch anything else */
 		default:
-			logerror("%06X:Unknown protection R@%06X\n", cpu_get_previouspc(machine->activecpu), offset);
+			logerror("%06X:Unknown protection R@%06X\n", cpu_get_previouspc(space->cpu), offset);
 			break;
 	}
 }
@@ -550,13 +550,13 @@ static READ32_HANDLER( colorram_protection_r )
 	if (ACCESSING_BITS_16_31)
 	{
 		result = atarigt_colorram_r(address);
-		(*protection_r)(space->machine, address, &result);
+		(*protection_r)(space, address, &result);
 		result32 |= result << 16;
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		result = atarigt_colorram_r(address + 2);
-		(*protection_r)(space->machine, address + 2, &result);
+		(*protection_r)(space, address + 2, &result);
 		result32 |= result;
 	}
 
@@ -572,13 +572,13 @@ static WRITE32_HANDLER( colorram_protection_w )
 	{
 		if (!ignore_writes)
 			atarigt_colorram_w(address, data >> 16, mem_mask >> 16);
-		(*protection_w)(space->machine, address, data >> 16);
+		(*protection_w)(space, address, data >> 16);
 	}
 	if (ACCESSING_BITS_0_15)
 	{
 		if (!ignore_writes)
 			atarigt_colorram_w(address + 2, data, mem_mask);
-		(*protection_w)(space->machine, address + 2, data);
+		(*protection_w)(space, address + 2, data);
 	}
 }
 

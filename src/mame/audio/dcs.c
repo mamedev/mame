@@ -149,6 +149,7 @@
 
 ****************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/adsp2100/adsp2100.h"
@@ -286,6 +287,8 @@ typedef struct _dcs_state dcs_state;
 struct _dcs_state
 {
 	const device_config *cpu;
+	const address_space *program;
+	const address_space *data;
 	UINT8		rev;
 
 	/* sound output */
@@ -911,6 +914,8 @@ void dcs_init(running_machine *machine)
 
 	/* find the DCS CPU and the sound ROMs */
 	dcs.cpu = cputag_get_cpu(machine, "dcs");
+	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
+	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
 	dcs.rev = 1;
 	dcs.channels = 1;
 
@@ -1092,24 +1097,24 @@ static void sdrc_remap_memory(running_machine *machine)
 	/* if SRAM disabled, clean it out */
 	if (SDRC_SM_EN == 0)
 	{
-		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_PROGRAM), 0x0800, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x0800, 0x37ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite32_handler(dcs.program, 0x0800, 0x3fff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+		memory_install_readwrite16_handler(dcs.data, 0x0800, 0x37ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
 	}
 
 	/* otherwise, map the SRAM */
 	else
 	{
 		/* first start with a clean program map */
-		memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_PROGRAM), 0x0800, 0x3fff, 0, 0, SMH_BANK21, SMH_BANK21);
+		memory_install_readwrite32_handler(dcs.program, 0x0800, 0x3fff, 0, 0, SMH_BANK21, SMH_BANK21);
 		memory_set_bankptr(machine, 21, dcs_sram + 0x4800);
 
 		/* set up the data map based on the SRAM banking */
 		/* map 0: ram from 0800-37ff */
 		if (SDRC_SM_BK == 0)
 		{
-			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x0800, 0x17ff, 0, 0, SMH_BANK22, SMH_BANK22);
-			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
-			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x2800, 0x37ff, 0, 0, SMH_BANK24,  SMH_BANK24);
+			memory_install_readwrite16_handler(dcs.data, 0x0800, 0x17ff, 0, 0, SMH_BANK22, SMH_BANK22);
+			memory_install_readwrite16_handler(dcs.data, 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
+			memory_install_readwrite16_handler(dcs.data, 0x2800, 0x37ff, 0, 0, SMH_BANK24,  SMH_BANK24);
 			memory_set_bankptr(machine, 22, dcs_sram + 0x0000);
 			memory_set_bankptr(machine, 23, dcs_sram + 0x1000);
 			memory_set_bankptr(machine, 24, dcs_sram + 0x2000);
@@ -1118,9 +1123,9 @@ static void sdrc_remap_memory(running_machine *machine)
 		/* map 1: nothing from 0800-17ff, alternate RAM at 1800-27ff, same RAM at 2800-37ff */
 		else
 		{
-			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x0800, 0x17ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
-			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
-			memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), 0x2800, 0x37ff, 0, 0, SMH_BANK24, SMH_BANK24);
+			memory_install_readwrite16_handler(dcs.data, 0x0800, 0x17ff, 0, 0, SMH_UNMAP, SMH_UNMAP);
+			memory_install_readwrite16_handler(dcs.data, 0x1800, 0x27ff, 0, 0, SMH_BANK23, SMH_BANK23);
+			memory_install_readwrite16_handler(dcs.data, 0x2800, 0x37ff, 0, 0, SMH_BANK24, SMH_BANK24);
 			memory_set_bankptr(machine, 23, dcs_sram + 0x3000);
 			memory_set_bankptr(machine, 24, dcs_sram + 0x2000);
 		}
@@ -1131,14 +1136,14 @@ static void sdrc_remap_memory(running_machine *machine)
 	{
 		int baseaddr = (SDRC_ROM_ST == 0) ? 0x0000 : (SDRC_ROM_ST == 1) ? 0x3000 : 0x3400;
 		int pagesize = (SDRC_ROM_SZ == 0 && SDRC_ROM_ST != 0) ? 4096 : 1024;
-		memory_install_read16_handler(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA), baseaddr, baseaddr + pagesize - 1, 0, 0, SMH_BANK25);
+		memory_install_read16_handler(dcs.data, baseaddr, baseaddr + pagesize - 1, 0, 0, SMH_BANK25);
 	}
 
 	/* map the DRAM page as bank 26 */
 	if (SDRC_DM_ST != 0)
 	{
 		int baseaddr = (SDRC_DM_ST == 1) ? 0x0000 : (SDRC_DM_ST == 2) ? 0x3000 : 0x3400;
-		memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[cpu_get_index(dcs.cpu)], ADDRESS_SPACE_DATA), baseaddr, baseaddr + 0x3ff, 0, 0, SMH_BANK26, SMH_BANK26);
+		memory_install_readwrite16_handler(dcs.data, baseaddr, baseaddr + 0x3ff, 0, 0, SMH_BANK26, SMH_BANK26);
 	}
 
 	/* update the bank pointers */
@@ -1747,11 +1752,11 @@ static void reset_timer(running_machine *machine)
 		/* Road Burners: @ 28: JMP $0032  18032F, same code at $32 */
 
 		cpu_push_context(dcs.cpu);
-		if (program_read_dword(0x18*4) == 0x0c0030 &&		/* ENA SEC_REG */
-			program_read_dword(0x19*4) == 0x804828 &&		/* SI = DM($0482) */
-			program_read_dword(0x1a*4) == 0x904828 &&		/* DM($0482) = SI */
-			program_read_dword(0x1b*4) == 0x0C0020 &&		/* DIS SEC_REG */
-			program_read_dword(0x1c*4) == 0x0A001F)			/* RTI */
+		if (memory_read_dword(dcs.program, 0x18*4) == 0x0c0030 &&		/* ENA SEC_REG */
+			memory_read_dword(dcs.program, 0x19*4) == 0x804828 &&		/* SI = DM($0482) */
+			memory_read_dword(dcs.program, 0x1a*4) == 0x904828 &&		/* DM($0482) = SI */
+			memory_read_dword(dcs.program, 0x1b*4) == 0x0C0020 &&		/* DIS SEC_REG */
+			memory_read_dword(dcs.program, 0x1c*4) == 0x0A001F)			/* RTI */
 		{
 			dcs.timer_ignore = TRUE;
 		}
@@ -1923,7 +1928,7 @@ static TIMER_CALLBACK( dcs_irq )
 		cpu_push_context(dcs.cpu);
 		for (i = 0; i < count; i++)
 		{
-			buffer[i] = data_read_word_16le(reg * 2);
+			buffer[i] = memory_read_word(dcs.data, reg * 2);
 			reg += dcs.incs;
 		}
 		cpu_pop_context();
@@ -2213,10 +2218,10 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 					if (transfer.writes_left & 1)
 						transfer.temp = data;
 					else
-						program_write_dword(transfer.start++ * 4, (transfer.temp << 8) | (data & 0xff));
+						memory_write_dword(dcs.program, transfer.start++ * 4, (transfer.temp << 8) | (data & 0xff));
 				}
 				else
-					data_write_word(transfer.start++ * 2, data);
+					memory_write_word(dcs.data, transfer.start++ * 2, data);
 				cpu_pop_context();
 
 				/* if we're done, start a timer to send the response words */
