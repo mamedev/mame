@@ -27,7 +27,7 @@
 #define FO      0x40            /* flag output */
 #define SI      0x80            /* sense input */
 
-#define R0      S.reg[0]
-#define R1      S.reg[1]
-#define R2      S.reg[2]
-#define R3      S.reg[3]
+#define R0      s2650c->reg[0]
+#define R1      s2650c->reg[1]
+#define R2      s2650c->reg[2]
+#define R3      s2650c->reg[3]
