@@ -63,7 +63,7 @@ Notes:
 static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = ( data & 7 );
-	ppu2c0x_spriteram_dma( 0, source );
+	ppu2c0x_spriteram_dma( space, 0, source );
 }
 
 static READ8_HANDLER( psg_4015_r )

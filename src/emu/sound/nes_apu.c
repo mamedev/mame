@@ -45,6 +45,7 @@
  *****************************************************************************/
 
 #include "sndintrf.h"
+#include "cpuexec.h"
 #include "streams.h"
 #include "deprecat.h"
 #include "nes_apu.h"
@@ -366,7 +367,7 @@ static int8 apu_dpcm(struct nesapu_info *info, dpcm_t *chan)
                if (chan->regs[0] & 0x80) /* IRQ Generator */
                {
                   chan->irq_occurred = TRUE;
-                  n2a03_irq(Machine->cpu[info->APU.dpcm.cpu_num]);
+                  n2a03_irq(info->APU.dpcm.memory->cpu);
                }
                break;
             }
@@ -377,7 +378,7 @@ static int8 apu_dpcm(struct nesapu_info *info, dpcm_t *chan)
          bit_pos = 7 - (chan->bits_left & 7);
          if (7 == bit_pos)
          {
-            chan->cur_byte = program_read_byte(chan->address);
+            chan->cur_byte = memory_read_byte(info->APU.dpcm.memory, chan->address);
             chan->address++;
             chan->length--;
          }
@@ -601,7 +602,7 @@ INLINE void apu_update(struct nesapu_info *info, stream_sample_t *buffer16, int 
 {
    int accum;
 
-	cpu_push_context( Machine->cpu[info->APU.dpcm.cpu_num ]);
+	cpu_push_context( info->APU.dpcm.memory->cpu );
    while (samples--)
    {
       accum = apu_square(info, &info->APU.squ[0]);
@@ -694,7 +695,7 @@ static SND_START( nesapu )
 	info->buffer_size+=info->samps_per_sync;
 
 	/* Initialize individual chips */
-	(info->APU.dpcm).cpu_num= mame_find_cpu_index(Machine, intf->cpu_tag);
+	(info->APU.dpcm).memory = cputag_get_address_space(Machine, intf->cpu_tag, ADDRESS_SPACE_PROGRAM);
 
 	info->stream = stream_create(0, 1, rate, info, nes_psg_update_sound);
 

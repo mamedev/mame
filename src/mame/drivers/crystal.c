@@ -554,6 +554,7 @@ static void SetVidReg(UINT16 reg,UINT16 val)
 
 static VIDEO_UPDATE(crystal)
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int DoFlip;
 
 
@@ -595,7 +596,7 @@ static VIDEO_UPDATE(crystal)
 	tail=GetVidReg(0x80);
 	while((head&0x7ff)!=(tail&0x7ff))
 	{
-		DoFlip=vrender0_ProcessPacket(0x03800000+head*64,DrawDest,(UINT8*)textureram);
+		DoFlip=vrender0_ProcessPacket(space,0x03800000+head*64,DrawDest,(UINT8*)textureram);
 		head++;
 		head&=0x7ff;
 		if(DoFlip)

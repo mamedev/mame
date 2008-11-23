@@ -826,64 +826,64 @@ void real3d_display_list_end(void)
 //  real3d_display_list = 1;
 }
 
-void real3d_display_list1_dma(UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_display_list1_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
 	int i;
 	int d = (dst & 0xffffff) / 4;
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(program_read_dword_64le(src^4));
+			w = BYTE_REVERSE32(memory_read_dword(space, src^4));
 		} else {
-			w = program_read_dword_64le(src^4);
+			w = memory_read_dword(space, src^4);
 		}
 		display_list_ram[d++] = w;
 		src += 4;
 	}
 }
 
-void real3d_display_list2_dma(UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_display_list2_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
 	int i;
 	int d = (dst & 0xffffff) / 4;
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(program_read_dword_64le(src^4));
+			w = BYTE_REVERSE32(memory_read_dword(space, src^4));
 		} else {
-			w = program_read_dword_64le(src^4);
+			w = memory_read_dword(space, src^4);
 		}
 		culling_ram[d++] = w;
 		src += 4;
 	}
 }
 
-void real3d_vrom_texture_dma(UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_vrom_texture_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
 	if((dst & 0xff) == 0) {
 
 		UINT32 address, header;
 
 		if (byteswap) {
-			address = BYTE_REVERSE32(program_read_dword_64le((src+0)^4));
-			header = BYTE_REVERSE32(program_read_dword_64le((src+4)^4));
+			address = BYTE_REVERSE32(memory_read_dword(space, (src+0)^4));
+			header = BYTE_REVERSE32(memory_read_dword(space, (src+4)^4));
 		} else {
-			address = program_read_dword_64le((src+0)^4);
-			header = program_read_dword_64le((src+4)^4);
+			address = memory_read_dword(space, (src+0)^4);
+			header = memory_read_dword(space, (src+4)^4);
 		}
 		real3d_upload_texture(header, (UINT32*)&model3_vrom[address]);
 	}
 }
 
-void real3d_texture_fifo_dma(UINT32 src, int length, int byteswap)
+void real3d_texture_fifo_dma(const address_space *space, UINT32 src, int length, int byteswap)
 {
 	int i;
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(program_read_dword_64le(src^4));
+			w = BYTE_REVERSE32(memory_read_dword(space, src^4));
 		} else {
-			w = program_read_dword_64le(src^4);
+			w = memory_read_dword(space, src^4);
 		}
 		texture_fifo[texture_fifo_pos] = w;
 		texture_fifo_pos++;
@@ -891,16 +891,16 @@ void real3d_texture_fifo_dma(UINT32 src, int length, int byteswap)
 	}
 }
 
-void real3d_polygon_ram_dma(UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_polygon_ram_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
 	int i;
 	int d = (dst & 0xffffff) / 4;
 	for(i=0; i < length; i+=4) {
 		UINT32 w;
 		if (byteswap) {
-			w = BYTE_REVERSE32(program_read_dword_64le(src^4));
+			w = BYTE_REVERSE32(memory_read_dword(space, src^4));
 		} else {
-			w = program_read_dword_64le(src^4);
+			w = memory_read_dword(space, src^4);
 		}
 		polygon_ram[d++] = w;
 		src += 4;

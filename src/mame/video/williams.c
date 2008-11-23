@@ -158,7 +158,7 @@ static UINT8 williams2_fg_color;
 static void blitter_init(int blitter_config, const UINT8 *remap_prom);
 static void create_palette_lookup(void);
 static TILE_GET_INFO( get_tile_info );
-static int blitter_core(int sstart, int dstart, int w, int h, int data);
+static int blitter_core(const address_space *space, int sstart, int dstart, int w, int h, int data);
 
 
 
@@ -572,7 +572,7 @@ WRITE8_HANDLER( williams_blitter_w )
 	if (h == 255) h = 256;
 
 	/* do the actual blit */
-	accesses = blitter_core(sstart, dstart, w, h, data);
+	accesses = blitter_core(space, sstart, dstart, w, h, data);
 
 	/* based on the number of memory accesses needed to do the blit, compute how long the blit will take */
 	/* this is just a guess */
@@ -603,10 +603,10 @@ WRITE8_HANDLER( williams2_blit_window_enable_w )
  *
  *************************************/
 
-INLINE void blit_pixel(int offset, int srcdata, int data, int mask, int solid)
+INLINE void blit_pixel(const address_space *space, int offset, int srcdata, int data, int mask, int solid)
 {
 	/* always read from video RAM regardless of the bank setting */
-	int pix = (offset < 0xc000) ? williams_videoram[offset] : program_read_byte(offset);
+	int pix = (offset < 0xc000) ? williams_videoram[offset] : memory_read_byte(space, offset);
 
 	/* handle transparency */
 	if (data & 0x08)
@@ -630,7 +630,7 @@ INLINE void blit_pixel(int offset, int srcdata, int data, int mask, int solid)
 }
 
 
-static int blitter_core(int sstart, int dstart, int w, int h, int data)
+static int blitter_core(const address_space *space, int sstart, int dstart, int w, int h, int data)
 {
 	int source, sxadv, syadv;
 	int dest, dxadv, dyadv;
@@ -666,7 +666,7 @@ static int blitter_core(int sstart, int dstart, int w, int h, int data)
 			/* loop over the width */
 			for (j = w; j > 0; j--)
 			{
-				blit_pixel(dest, blitter_remap[program_read_byte(source)], data, keepmask, solid);
+				blit_pixel(space, dest, blitter_remap[memory_read_byte(space, source)], data, keepmask, solid);
 				accesses += 2;
 
 				/* advance */
@@ -700,8 +700,8 @@ static int blitter_core(int sstart, int dstart, int w, int h, int data)
 			dest = dstart & 0xffff;
 
 			/* left edge case */
-			pixdata = blitter_remap[program_read_byte(source)];
-			blit_pixel(dest, (pixdata >> 4) & 0x0f, data, keepmask | 0xf0, solid);
+			pixdata = blitter_remap[memory_read_byte(space, source)];
+			blit_pixel(space, dest, (pixdata >> 4) & 0x0f, data, keepmask | 0xf0, solid);
 			accesses += 2;
 
 			source = (source + sxadv) & 0xffff;
@@ -710,8 +710,8 @@ static int blitter_core(int sstart, int dstart, int w, int h, int data)
 			/* loop over the width */
 			for (j = w - 1; j > 0; j--)
 			{
-				pixdata = (pixdata << 8) | blitter_remap[program_read_byte(source)];
-				blit_pixel(dest, (pixdata >> 4) & 0xff, data, keepmask, solid);
+				pixdata = (pixdata << 8) | blitter_remap[memory_read_byte(space, source)];
+				blit_pixel(space, dest, (pixdata >> 4) & 0xff, data, keepmask, solid);
 				accesses += 2;
 
 				source = (source + sxadv) & 0xffff;
@@ -719,7 +719,7 @@ static int blitter_core(int sstart, int dstart, int w, int h, int data)
 			}
 
 			/* right edge case */
-			blit_pixel(dest, (pixdata << 4) & 0xf0, data, keepmask | 0x0f, solid);
+			blit_pixel(space, dest, (pixdata << 4) & 0xf0, data, keepmask | 0x0f, solid);
 			accesses++;
 
 			sstart += syadv;

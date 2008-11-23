@@ -872,25 +872,26 @@ static WRITE64_HANDLER( real3d_dma_w )
 
 static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap)
 {
+	const address_space *space = cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM);
 	switch(dst >> 24)
 	{
 		case 0x88:		/* Display List End Trigger */
 			real3d_display_list_end();
 			break;
 		case 0x8c:		/* Display List RAM 2 */
-			real3d_display_list2_dma(src, dst, length, byteswap);
+			real3d_display_list2_dma(space, src, dst, length, byteswap);
 			break;
 		case 0x8e:		/* Display List RAM 1 */
-			real3d_display_list1_dma(src, dst, length, byteswap);
+			real3d_display_list1_dma(space, src, dst, length, byteswap);
 			break;
 		case 0x90:		/* VROM Texture Download */
-			real3d_vrom_texture_dma(src, dst, length, byteswap);
+			real3d_vrom_texture_dma(space, src, dst, length, byteswap);
 			break;
 		case 0x94:		/* Texture FIFO */
-			real3d_texture_fifo_dma(src, length, byteswap);
+			real3d_texture_fifo_dma(space, src, length, byteswap);
 			break;
 		case 0x98:		/* Polygon RAM */
-			real3d_polygon_ram_dma(src, dst, length, byteswap);
+			real3d_polygon_ram_dma(space, src, dst, length, byteswap);
 			break;
 		case 0x9c:		/* Unknown */
 			break;

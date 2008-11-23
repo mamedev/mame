@@ -215,28 +215,28 @@ WRITE64_HANDLER( pvr_ta_w )
 		offsetra=pvrta_regs[REGION_BASE];
 		for (;;)
 		{
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			mame_printf_verbose("Tile X:%d Y:%d\n  ", (v >> 2) & 0x3f, (v >> 8) & 0x3f);
 			offsetra = offsetra+4;
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			if (!(v & 0x80000000))
 				mame_printf_verbose("OLP %d ",v & 0xFFFFFC);
 			offsetra = offsetra+4;
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			if (!(v & 0x80000000))
 				mame_printf_verbose("OMVLP %d ",v & 0xFFFFFC);
 			offsetra = offsetra+4;
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			if (!(v & 0x80000000))
 				mame_printf_verbose("TLP %d ",v & 0xFFFFFC);
 			offsetra = offsetra+4;
-			v=program_read_dword_64le(0x05000000+offsetra);
+			v=memory_read_dword(space,0x05000000+offsetra);
 			if (!(v & 0x80000000))
 				mame_printf_verbose("TMVLP %d ",v & 0xFFFFFC);
 			if (sizera == 6)
 			{
 				offsetra = offsetra+4;
-				v=program_read_dword_64le(0x05000000+offsetra);
+				v=memory_read_dword(space,0x05000000+offsetra);
 				if (!(v & 0x80000000))
 					mame_printf_verbose("PTLP %d ",v & 0xFFFFFC);
 			}
@@ -744,8 +744,9 @@ INLINE UINT32 alpha_blend_r16_565(UINT32 d, UINT32 s, UINT8 level)
 }
 #endif
 
-static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
+static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
+	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int cs,x,y,dx,dy,xi,yi,a,rs,ns;
 	float iu,iv,u,v;
 	UINT32 addrp;
@@ -762,7 +763,7 @@ static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 		return;
 	rs=state_ta.renderselect;
 	c=pvrta_regs[ISP_BACKGND_T];
-	c=program_read_dword_64le(0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
+	c=memory_read_dword(space,0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
 	fillbitmap(bitmap,c,cliprect);
 #if 0
 	stride=pvrta_regs[FB_W_LINESTRIDE] << 3;
@@ -770,9 +771,9 @@ static void testdrawscreen(bitmap_t *bitmap,const rectangle *cliprect)
 	a=(c & 0xfffff8) >> 1;
 	cs=(c >> 24) & 7;
 	cs=cs+3; // cs*2+3
-	c=program_read_dword_64le(0x05000000+a+3*4+(cs-1)*4);
-	dx=(int)u2f(program_read_dword_64le(0x05000000+a+3*4+cs*4+0));
-	dy=(int)u2f(program_read_dword_64le(0x05000000+a+3*4+2*cs*4+4));
+	c=memory_read_dword(space,0x05000000+a+3*4+(cs-1)*4);
+	dx=(int)u2f(memory_read_dword(space,0x05000000+a+3*4+cs*4+0));
+	dy=(int)u2f(memory_read_dword(space,0x05000000+a+3*4+2*cs*4+4));
 	for (y=0;y < dy;y++)
 	{
 		addrp=state_ta.grab[rs].fbwsof1+y*stride;
@@ -1074,7 +1075,7 @@ static int useframebuffer=1;
 	if (state_ta.start_render_received)
 	{
 		useframebuffer=0;
-		testdrawscreen(bitmap,cliprect);
+		testdrawscreen(screen->machine,bitmap,cliprect);
 		if (pvrta_regs[VO_CONTROL] & (1 << 3))
 			fillbitmap(bitmap,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF,cliprect);
 		state_ta.start_render_received=0;
