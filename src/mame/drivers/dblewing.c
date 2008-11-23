@@ -5,12 +5,12 @@
 the most protected of the DE102 games?
 
 Protection TODO:
-- Fix dip-switches reading (lives etc.);
-- Apparently power-ups sometimes gives wrong power effect,investigate on it;
-- Fix the sound;
+- 3rd Boss (with Red Plane) causes a crash to the main CPU if you don't beat him on time;
+- What is the $330 related for? Appears to be read when you collect a power-up.
 - Check the remaining unmapped read/writes effect;
+- Boss BGM might be wrong / variable;
+- Haven't yet checked if bonus life and difficulty DIP-SW are rightly tested;
 - Clean-up the whole routine;
-
 
 
 -- Dip locations verified with Japanese manual
@@ -243,7 +243,7 @@ static UINT16 dblwings_18a_data;
 static UINT16 dblwings_280_data;
 static UINT16 dblwings_384_data;
 
-static UINT16 boss_move,boss_bgm,boss_shoot_type,boss_3_data,boss_4_data,boss_5_data,boss_5sx_data,boss_6_data;
+static UINT16 boss_move,boss_shoot_type,boss_3_data,boss_4_data,boss_5_data,boss_5sx_data,boss_6_data;
 
 static READ16_HANDLER ( dlbewing_prot_r )
 {
@@ -253,7 +253,7 @@ static READ16_HANDLER ( dlbewing_prot_r )
 		case 0x6d6: return boss_move;          // boss 1 2nd pilot
 		case 0x748: return boss_move;          // boss 1 3rd pilot
 
-		case 0x566: return boss_bgm;    	   // boss 1 bgm (read->write to the sound latch)
+		case 0x566: return 0x0009;   	   	   // boss BGM,might be a variable one (read->write to the sound latch)
 		case 0x1ea: return boss_shoot_type;    // boss 1 shoot type
 		case 0x596: return boss_3_data;		   // boss 3 appearing
 		case 0x692:	return boss_4_data;
@@ -264,22 +264,31 @@ static READ16_HANDLER ( dlbewing_prot_r )
 		case 0x330: return 0; // controls bonuses such as shoot type,bombs etc.
 		case 0x1d4: return dblwings_70c_data;  //controls restart points
 
-		case 0x0ac: return input_port_read(space->machine, "DSW");//x
+		case 0x0ac: return (input_port_read(space->machine, "DSW") & 0x40)<<4;//flip screen
 		case 0x4b0: return dblwings_608_data;//coinage
-//		case 0x068: return 0;//starting lives,rol $5,res!
+		case 0x068:
+		{
+			switch(input_port_read(space->machine, "DSW") & 0x0300) //I don't know how to relationate this...
+			{
+				case 0x0000: return 0x000;//0
+				case 0x0100: return 0x060;//3
+				case 0x0200: return 0x0d0;//6
+				case 0x0300: return 0x160;//b
+			}
+		}
 		case 0x094: return dblwings_104_data;// p1 inputs select screen  OK
 		case 0x24c: return dblwings_008_data;//read DSW (mirror for coinage/territory)
-//		case 0x330: return dblwings_78a_data;
 		case 0x298: return input_port_read(space->machine, "SYSTEM");//vblank
 		case 0x476: return input_port_read(space->machine, "SYSTEM");//mirror for coins
 		case 0x506: return input_port_read(space->machine, "DSW");
 		case 0x5d8: return dblwings_406_data;
 		case 0x2b4: return input_port_read(space->machine, "P1_P2");
+		case 0x1a8: return (input_port_read(space->machine, "DSW") & 0x4000) >> 12;//allow continue
+		case 0x3ec: return dblwings_70c_data; //score entry
 	}
 
-//	printf("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask);
+	printf("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask);
 
-	if ((offset*2)==0x068) return 0; //??? //dblwings_78a_data;
 	if ((offset*2)==0x0f8) return 0;// dblwings_080_data;
 	if ((offset*2)==0x104) return 0;
 	if ((offset*2)==0x10e) return 0;
@@ -287,7 +296,6 @@ static READ16_HANDLER ( dlbewing_prot_r )
 	if ((offset*2)==0x246) return 0; // end of level
 	if ((offset*2)==0x25c) return 0;
 	if ((offset*2)==0x284) return 0; // 3rd player 2nd boss
-	if ((offset*2)==0x3ec) return 0; // sound?
 	if ((offset*2)==0x432) return 0; // boss on water level?
 	if ((offset*2)==0x52e) return 0; // end of level
 	if ((offset*2)==0x532) return 0; // end of level
@@ -353,7 +361,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			return;
 		case 0x380:
 			soundlatch_w(space,0,data&0xff);
-		 	//cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
+		 	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
 			return; // sound SFX write
 		case 0x384:
 			dblwings_384_data = data;
@@ -369,8 +377,6 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			return;
 		case 0x38e:
 			dblwings_38e_data = data;
-			/*TODO: boss_bgm shouldn't be there...*/
-			boss_bgm = 1;
 			switch(dblwings_38e_data)
 			{
 				case 0x6c13: boss_shoot_type = 3; break;
@@ -442,42 +448,11 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff0000, 0xff3fff) AM_MIRROR(0xc000) AM_RAM
 ADDRESS_MAP_END
 
-
-#ifdef UNUSED_FUNCTION
-static WRITE8_HANDLER( YM2151_w )
-{
-	if(offset == 0)
-		y = data;
-	else
-		z = data;
-
-	popmessage("%02x %02x %02x",x,y,z);
-
-	switch (offset) {
-	case 0:
-		ym2151_register_port_0_w(space,0,data);
-		break;
-	case 1:
-		ym2151_data_port_0_w(space,0,data);
-		break;
-	}
-}
-
 static READ8_HANDLER( unk_r )
-{
-//	okim6295_data_0_w(space,0,0x80 | (offset & 0x3f));
-//	okim6295_data_0_w(space,0,0x10);
-
-	return okim6295_status_0_r(space,0);
-}
-#endif
-
-static READ8_HANDLER(unk2_r )
 {
 	static UINT8 x = 0;
 
-//	popmessage("%02x",x);
-	return x--;
+	return x^=1;
 }
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -486,7 +461,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
  	AM_RANGE(0xa000, 0xa001) AM_READWRITE(ym2151_status_port_0_r,ym2151_word_0_w)
 	AM_RANGE(0xb000, 0xb000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 	AM_RANGE(0xc000, 0xc000) AM_READ(soundlatch_r)
- 	AM_RANGE(0xd000, 0xd000) AM_READ(unk2_r) //timing? sound latch?
+ 	AM_RANGE(0xd000, 0xd000) AM_READ(unk_r) //timing? sound latch?
  	AM_RANGE(0xf000, 0xf000) AM_READWRITE(okim6295_status_0_r,okim6295_data_0_w)
 ADDRESS_MAP_END
 
@@ -590,10 +565,10 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x0000, "Korea" )
 	/* 16bit - These values are for Dip Switch #2 */
 	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
-	PORT_DIPSETTING(      0x0200, "1" )
-	PORT_DIPSETTING(      0x0100, "2" )
+	PORT_DIPSETTING(      0x0100, "1" )
+	PORT_DIPSETTING(      0x0000, "2" )
 	PORT_DIPSETTING(      0x0300, "3" )
-	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPSETTING(      0x0200, "5" )
 	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:3,4")
 	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
@@ -605,8 +580,8 @@ static INPUT_PORTS_START( dblewing )
 	PORT_DIPSETTING(      0x1000, "Every 300,000" )
 	PORT_DIPSETTING(      0x0000, "250,000 Only" )
 	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("SW2:7")
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -787,4 +762,4 @@ static DRIVER_INIT( dblewing )
 }
 
 
-GAME( 1993, dblewing, 0,        dblewing, dblewing,  dblewing,  ROT90,"Mitchell", "Double Wings", GAME_UNEMULATED_PROTECTION | GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1993, dblewing, 0,        dblewing, dblewing,  dblewing,  ROT90,"Mitchell", "Double Wings", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
