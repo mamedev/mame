@@ -59,21 +59,21 @@ CPU_GET_INFO( tms32010 );
  *  Read the state of the BIO pin
  */
 
-#define TMS32010_BIO_In (io_read_word_16be(TMS32010_BIO<<1))
+#define TMS32010_BIO_In (memory_read_word_16be(R.io, TMS32010_BIO<<1))
 
 
 /****************************************************************************
  *  Input a word from given I/O port
  */
 
-#define TMS32010_In(Port) (io_read_word_16be((Port)<<1))
+#define TMS32010_In(Port) (memory_read_word_16be(R.io, (Port)<<1))
 
 
 /****************************************************************************
  *  Output a word to given I/O port
  */
 
-#define TMS32010_Out(Port,Value) (io_write_word_16be((Port)<<1,Value))
+#define TMS32010_Out(Port,Value) (memory_write_word_16be(R.io, (Port)<<1,Value))
 
 
 
@@ -81,14 +81,14 @@ CPU_GET_INFO( tms32010 );
  *  Read a word from given ROM memory location
  */
 
-#define TMS32010_ROM_RDMEM(A) (program_read_word_16be((A)<<1))
+#define TMS32010_ROM_RDMEM(A) (memory_read_word_16be(R.program, (A)<<1))
 
 
 /****************************************************************************
  *  Write a word to given ROM memory location
  */
 
-#define TMS32010_ROM_WRMEM(A,V) (program_write_word_16be((A)<<1,V))
+#define TMS32010_ROM_WRMEM(A,V) (memory_write_word_16be(R.program, (A)<<1,V))
 
 
 
@@ -96,14 +96,14 @@ CPU_GET_INFO( tms32010 );
  *  Read a word from given RAM memory location
  */
 
-#define TMS32010_RAM_RDMEM(A) (data_read_word_16be((A)<<1))
+#define TMS32010_RAM_RDMEM(A) (memory_read_word_16be(R.data, (A)<<1))
 
 
 /****************************************************************************
  *  Write a word to given RAM memory location
  */
 
-#define TMS32010_RAM_WRMEM(A,V) (data_write_word_16be((A)<<1,V))
+#define TMS32010_RAM_WRMEM(A,V) (memory_write_word_16be(R.data, (A)<<1,V))
 
 
 
@@ -113,7 +113,7 @@ CPU_GET_INFO( tms32010 );
  *  used to greatly speed up emulation
  */
 
-#define TMS32010_RDOP(A) (program_decrypted_read_word((A)<<1))
+#define TMS32010_RDOP(A) (memory_decrypted_read_word(R.program, (A)<<1))
 
 
 /****************************************************************************
@@ -122,7 +122,7 @@ CPU_GET_INFO( tms32010 );
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define TMS32010_RDOP_ARG(A) (program_raw_read_word((A)<<1))
+#define TMS32010_RDOP_ARG(A) (memory_raw_read_word(R.program, (A)<<1))
 
 
 

@@ -28,6 +28,7 @@
 // SJE: Fixed a mistake in tms70x0_pf_w where the wrong register was referenced
 // SJE: Implemented internal register file
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 #include "cpuexec.h"
 #include "debugger.h"
@@ -58,40 +59,12 @@ static int tms7000_icount;
 static int tms7000_div_by_16_trigger;
 static int tms7000_cycles_per_INT2;
 
-#define RM(Addr) ((unsigned)program_read_byte_8be(Addr))
-#define WM(Addr,Value) (program_write_byte_8be(Addr,Value))
+#define RM(Addr) ((unsigned)memory_read_byte_8be(tms7000.program, Addr))
+#define WM(Addr,Value) (memory_write_byte_8be(tms7000.program, Addr, Value))
 
-INLINE UINT16 RM16( UINT32 mAddr )	/* Read memory (16-bit) */
-{
-	UINT32 result = RM(mAddr) << 8;
-	return result | RM((mAddr+1)&0xffff);
-}
-
-#ifdef UNUSED_FUNCTION
-INLINE void WM16( UINT32 mAddr, PAIR p )	/*Write memory file (16 bit) */
-{
-	WM( mAddr, p.b.h );
-	WM( (mAddr+1)&0xffff, p.b.l );
-}
-#endif
-
-INLINE UINT16 RRF16( UINT32 mAddr )	/*Read register file (16 bit) */
-{
-	PAIR result;
-	result.b.h = RM((mAddr-1)&0xffff);
-	result.b.l = RM(mAddr);
-	return result.w.l;
-}
-
-INLINE void WRF16( UINT32 mAddr, PAIR p )	/*Write register file (16 bit) */
-{
-	WM( (mAddr-1)&0xffff, p.b.h );
-	WM( mAddr, p.b.l );
-}
-
-#define IMMBYTE(b)	b = ((unsigned)program_raw_read_byte(pPC)); pPC++
-#define SIMMBYTE(b)	b = ((signed)program_raw_read_byte(pPC)); pPC++
-#define IMMWORD(w)	w.b.h = (unsigned)program_raw_read_byte(pPC++); w.b.l = (unsigned)program_raw_read_byte(pPC++)
+#define IMMBYTE(b)	b = ((unsigned)memory_raw_read_byte(tms7000.program, pPC)); pPC++
+#define SIMMBYTE(b)	b = ((signed)memory_raw_read_byte(tms7000.program, pPC)); pPC++
+#define IMMWORD(w)	w.b.h = (unsigned)memory_raw_read_byte(tms7000.program, pPC++); w.b.l = (unsigned)memory_raw_read_byte(tms7000.program, pPC++)
 
 #define PUSHBYTE(b) pSP++; WM(pSP,b)
 #define PUSHWORD(w) pSP++; WM(pSP,w.b.h); pSP++; WM(pSP,w.b.l)
@@ -108,6 +81,8 @@ typedef struct
 	UINT8		pf[0x100];	/* Perpherial file */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *io;
 	UINT8		t1_capture_latch; /* Timer 1 capture latch */
 	INT8		t1_prescaler;	/* Timer 1 prescaler (5 bits) */
 	INT16		t1_decrementer;	/* Timer 1 decrementer (8 bits) */
@@ -163,6 +138,34 @@ static ADDRESS_MAP_START(tms7000_mem, ADDRESS_SPACE_PROGRAM, 8)
 ADDRESS_MAP_END
 
 
+INLINE UINT16 RM16( UINT32 mAddr )	/* Read memory (16-bit) */
+{
+	UINT32 result = RM(mAddr) << 8;
+	return result | RM((mAddr+1)&0xffff);
+}
+
+#ifdef UNUSED_FUNCTION
+INLINE void WM16( UINT32 mAddr, PAIR p )	/*Write memory file (16 bit) */
+{
+	WM( mAddr, p.b.h );
+	WM( (mAddr+1)&0xffff, p.b.l );
+}
+#endif
+
+INLINE UINT16 RRF16( UINT32 mAddr )	/*Read register file (16 bit) */
+{
+	PAIR result;
+	result.b.h = RM((mAddr-1)&0xffff);
+	result.b.l = RM(mAddr);
+	return result.w.l;
+}
+
+INLINE void WRF16( UINT32 mAddr, PAIR p )	/*Write register file (16 bit) */
+{
+	WM( (mAddr-1)&0xffff, p.b.h );
+	WM( mAddr, p.b.l );
+}
+
 
 /****************************************************************************
  * Get all registers in given buffer
@@ -189,6 +192,8 @@ static CPU_INIT( tms7000 )
 {
 	tms7000.irq_callback = irqcallback;
 	tms7000.device = device;
+	tms7000.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	tms7000.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	memset(tms7000.pf, 0, 0x100);
 	memset(tms7000.rf, 0, 0x80);
@@ -474,7 +479,7 @@ static CPU_EXECUTE( tms7000 )
 
 		if( tms7000.idle_state == 0 )
 		{
-			op = program_decrypted_read_byte(pPC++);
+			op = memory_decrypted_read_byte(tms7000.program, pPC++);
 
 			opfn[op]();
 		}
@@ -514,7 +519,7 @@ static CPU_EXECUTE( tms7000_exl )
 		if( tms7000.idle_state == 0 )
 		{
 
-			op = program_decrypted_read_byte(pPC++);
+			op = memory_decrypted_read_byte(tms7000.program, pPC++);
 
 			opfn_exl[op]();
 		}
@@ -616,19 +621,19 @@ static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 			break;
 
 		case 0x06: /* Port B write */
-			io_write_byte_8be( TMS7000_PORTB, data );
+			memory_write_byte_8be( tms7000.io, TMS7000_PORTB, data );
 			tms7000.pf[ 0x06 ] = data;
 			break;
 
 		case 0x08: /* Port C write */
 			temp1 = data & tms7000.pf[ 0x09 ];	/* Mask off input bits */
-			io_write_byte_8be( TMS7000_PORTC, temp1 );
+			memory_write_byte_8be( tms7000.io, TMS7000_PORTC, temp1 );
 			tms7000.pf[ 0x08 ] = temp1;
 			break;
 
 		case 0x0a: /* Port D write */
 			temp1 = data & tms7000.pf[ 0x0b ];	/* Mask off input bits */
-			io_write_byte_8be( TMS7000_PORTD, temp1 );
+			memory_write_byte_8be( tms7000.io, TMS7000_PORTD, temp1 );
 			tms7000.pf[ 0x0a ] = temp1;
 			break;
 
@@ -663,7 +668,7 @@ static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 			break;
 
 		case 0x04: /* Port A read */
-			result = io_read_byte_8be( TMS7000_PORTA );
+			result = memory_read_byte_8be( tms7000.io, TMS7000_PORTA );
 			break;
 
 
@@ -674,14 +679,14 @@ static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 
 		case 0x08: /* Port C read */
 			temp1 = tms7000.pf[ 0x08 ] & tms7000.pf[ 0x09 ];	/* Get previous output bits */
-			temp2 = io_read_byte_8be( TMS7000_PORTC );			/* Read port */
+			temp2 = memory_read_byte_8be( tms7000.io, TMS7000_PORTC );			/* Read port */
 			temp3 = temp2 & (~tms7000.pf[ 0x09 ]);				/* Mask off output bits */
 			result = temp1 | temp3;								/* OR together */
 			break;
 
 		case 0x0a: /* Port D read */
 			temp1 = tms7000.pf[ 0x0a ] & tms7000.pf[ 0x0b ];	/* Get previous output bits */
-			temp2 = io_read_byte_8be( TMS7000_PORTD );			/* Read port */
+			temp2 = memory_read_byte_8be( tms7000.io, TMS7000_PORTD );			/* Read port */
 			temp3 = temp2 & (~tms7000.pf[ 0x0b ]);				/* Mask off output bits */
 			result = temp1 | temp3;								/* OR together */
 			break;

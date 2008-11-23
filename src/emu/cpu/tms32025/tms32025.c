@@ -117,7 +117,7 @@ Table 3-2.  TMS32025/26 Memory Blocks
 */
 
 
-
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "tms32025.h"
 
@@ -135,49 +135,13 @@ static UINT16 *tms32025_datamap[0x200];
 
 #define SET_PC(x)	do { R.PC = (x); change_pc(R.PC<<1); } while (0)
 
-INLINE UINT16 M_RDROM(offs_t addr)
-{
-	UINT16 *ram;
-	addr &= 0xffff;
-	ram = tms32025_pgmmap[addr >> 7];
-	if (ram) return ram[addr & 0x7f];
-	return program_read_word_16be(addr << 1);
-}
+#define P_IN(A)			(memory_read_word_16be(R.io, (A)<<1))
+#define P_OUT(A,V)		(memory_write_word_16be(R.io, ((A)<<1),(V)))
+#define S_IN(A)			(memory_read_word_16be(R.io, (A)<<1))
+#define S_OUT(A,V)		(memory_write_word_16be(R.io, ((A)<<1),(V)))
 
-INLINE void M_WRTROM(offs_t addr, UINT16 data)
-{
-	UINT16 *ram;
-	addr &= 0xffff;
-	ram = tms32025_pgmmap[addr >> 7];
-	if (ram) { ram[addr & 0x7f] = data; }
-	else program_write_word_16be(addr << 1, data);
-}
-
-INLINE UINT16 M_RDRAM(offs_t addr)
-{
-	UINT16 *ram;
-	addr &= 0xffff;
-	ram = tms32025_datamap[addr >> 7];
-	if (ram) return ram[addr & 0x7f];
-	return data_read_word_16be(addr << 1);
-}
-
-INLINE void M_WRTRAM(offs_t addr, UINT16 data)
-{
-	UINT16 *ram;
-	addr &= 0xffff;
-	ram = tms32025_datamap[addr >> 7];
-	if (ram) { ram[addr & 0x7f] = data; }
-	else data_write_word_16be(addr << 1, data);
-}
-
-#define P_IN(A)			(io_read_word_16be((A)<<1))
-#define P_OUT(A,V)		(io_write_word_16be(((A)<<1),(V)))
-#define S_IN(A)			(io_read_word_16be((A)<<1))
-#define S_OUT(A,V)		(io_write_word_16be(((A)<<1),(V)))
-
-#define M_RDOP(A)		((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : program_decrypted_read_word((A)<<1))
-#define M_RDOP_ARG(A)	((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : program_decrypted_read_word((A)<<1))
+#define M_RDOP(A)		((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(R.program, (A)<<1))
+#define M_RDOP_ARG(A)	((tms32025_pgmmap[(A) >> 7]) ? (tms32025_pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(R.program, (A)<<1))
 
 
 
@@ -209,6 +173,9 @@ typedef struct			/* Page 3-6 (45) shows all registers */
 	int		tms32025_dec_cycles;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *data;
+	const address_space *io;
 	UINT16 *datamap_save[16];
 	UINT16 *pgmmap_save[12];
 } tms32025_Regs;
@@ -299,6 +266,43 @@ INLINE void MODIFY_ARB(int data) { R.STR1 &= ~ARB_REG; R.STR1 |= ((data << 13) &
 #endif
 
 static int mHackIgnoreARP; /* special handling for lst, lst1 instructions */
+
+INLINE UINT16 M_RDROM(offs_t addr)
+{
+	UINT16 *ram;
+	addr &= 0xffff;
+	ram = tms32025_pgmmap[addr >> 7];
+	if (ram) return ram[addr & 0x7f];
+	return memory_read_word_16be(R.program, addr << 1);
+}
+
+INLINE void M_WRTROM(offs_t addr, UINT16 data)
+{
+	UINT16 *ram;
+	addr &= 0xffff;
+	ram = tms32025_pgmmap[addr >> 7];
+	if (ram) { ram[addr & 0x7f] = data; }
+	else memory_write_word_16be(R.program, addr << 1, data);
+}
+
+INLINE UINT16 M_RDRAM(offs_t addr)
+{
+	UINT16 *ram;
+	addr &= 0xffff;
+	ram = tms32025_datamap[addr >> 7];
+	if (ram) return ram[addr & 0x7f];
+	return memory_read_word_16be(R.data, addr << 1);
+}
+
+INLINE void M_WRTRAM(offs_t addr, UINT16 data)
+{
+	UINT16 *ram;
+	addr &= 0xffff;
+	ram = tms32025_datamap[addr >> 7];
+	if (ram) { ram[addr & 0x7f] = data; }
+	else memory_write_word_16be(R.data, addr << 1, data);
+}
+
 
 static UINT16 reverse_carry_add( UINT16 arg0, UINT16 arg1 )
 {
@@ -1733,6 +1737,9 @@ static CPU_INIT( tms32025 )
 	R.intRAM = auto_malloc(0x800*2);
 	R.irq_callback = irqcallback;
 	R.device = device;
+	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	R.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
+	R.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	state_save_register_item("tms32025", device->tag, 0, R.PC);
 	state_save_register_item("tms32025", device->tag, 0, R.STR0);

@@ -4,6 +4,7 @@
    Written by Ville Linde
 */
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "cpuintrf.h"
 #include "tms32051.h"
@@ -147,6 +148,8 @@ typedef struct {
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
+	const address_space *program;
+	const address_space *data;
 } TMS_REGS;
 
 static TMS_REGS tms;
@@ -154,7 +157,7 @@ static int tms_icount;
 
 #define CYCLES(x)		(tms_icount -= x)
 
-#define ROPCODE()		program_decrypted_read_word((tms.pc++) << 1)
+#define ROPCODE()		memory_decrypted_read_word(tms.program, (tms.pc++) << 1)
 
 INLINE void CHANGE_PC(UINT16 new_pc)
 {
@@ -164,22 +167,22 @@ INLINE void CHANGE_PC(UINT16 new_pc)
 
 INLINE UINT16 PM_READ16(UINT16 address)
 {
-	return program_read_word_16le(address << 1);
+	return memory_read_word_16le(tms.program, address << 1);
 }
 
 INLINE void PM_WRITE16(UINT16 address, UINT16 data)
 {
-	program_write_word_16le(address << 1, data);
+	memory_write_word_16le(tms.program, address << 1, data);
 }
 
 INLINE UINT16 DM_READ16(UINT16 address)
 {
-	return data_read_word_16le(address << 1);
+	return memory_read_word_16le(tms.data, address << 1);
 }
 
 INLINE void DM_WRITE16(UINT16 address, UINT16 data)
 {
-	data_write_word_16le(address << 1, data);
+	memory_write_word_16le(tms.data, address << 1, data);
 }
 
 #include "32051ops.c"
@@ -211,7 +214,9 @@ static void delay_slot(UINT16 startpc)
 
 static CPU_INIT( tms )
 {
-
+	tms.device = device;
+	tms.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	tms.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 }
 
 static CPU_RESET( tms )

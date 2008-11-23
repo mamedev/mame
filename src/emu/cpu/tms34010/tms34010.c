@@ -7,10 +7,10 @@
 
 ***************************************************************************/
 
+#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "osd_cpu.h"
 #include "tms34010.h"
-#include "34010ops.h"
 
 
 /***************************************************************************
@@ -63,6 +63,7 @@ struct _tms34010_state
 	UINT8				executing;
 	cpu_irq_callback 	irq_callback;
 	const device_config *device;
+	const address_space *program;
 	const tms34010_config *config;
 	const device_config *screen;
 	emu_timer *			scantimer;
@@ -80,6 +81,7 @@ struct _tms34010_state
 	UINT16 IOregs[64];
 };
 
+#include "34010ops.h"
 
 
 /***************************************************************************
@@ -215,58 +217,58 @@ INLINE UINT32 ROPCODE(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
 	tms->pc += 2 << 3;
-	return program_decrypted_read_word(pc);
+	return memory_decrypted_read_word(tms->program, pc);
 }
 
 INLINE INT16 PARAM_WORD(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
 	tms->pc += 2 << 3;
-	return program_raw_read_word(pc);
+	return memory_raw_read_word(tms->program, pc);
 }
 
 INLINE INT32 PARAM_LONG(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
 	tms->pc += 4 << 3;
-	return (UINT16)program_raw_read_word(pc) | (program_raw_read_word(pc + 2) << 16);
+	return (UINT16)memory_raw_read_word(tms->program, pc) | (memory_raw_read_word(tms->program, pc + 2) << 16);
 }
 
 INLINE INT16 PARAM_WORD_NO_INC(tms34010_state *tms)
 {
-	return program_raw_read_word(TOBYTE(tms->pc));
+	return memory_raw_read_word(tms->program, TOBYTE(tms->pc));
 }
 
 INLINE INT32 PARAM_LONG_NO_INC(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
-	return (UINT16)program_raw_read_word(pc) | (program_raw_read_word(pc + 2) << 16);
+	return (UINT16)memory_raw_read_word(tms->program, pc) | (memory_raw_read_word(tms->program, pc + 2) << 16);
 }
 
 /* read memory byte */
 INLINE UINT32 RBYTE(tms34010_state *tms, offs_t offset)
 {
 	UINT32 ret;
-	RFIELDMAC_8;
+	RFIELDMAC_8(tms);
 	return ret;
 }
 
 /* write memory byte */
 INLINE void WBYTE(tms34010_state *tms, offs_t offset, UINT32 data)
 {
-	WFIELDMAC_8;
+	WFIELDMAC_8(tms);
 }
 
 /* read memory long */
 INLINE UINT32 RLONG(tms34010_state *tms, offs_t offset)
 {
-	RFIELDMAC_32;
+	RFIELDMAC_32(tms);
 }
 
 /* write memory long */
 INLINE void WLONG(tms34010_state *tms, offs_t offset, UINT32 data)
 {
-	WFIELDMAC_32;
+	WFIELDMAC_32(tms);
 }
 
 /* pushes/pops a value from the stack */
@@ -289,23 +291,23 @@ INLINE INT32 POP(tms34010_state *tms)
     PIXEL READS
 ***************************************************************************/
 
-#define RP(m1,m2)  											\
+#define RP(T,m1,m2)  											\
 	/* TODO: Plane masking */								\
-	return (TMS34010_RDMEM_WORD(TOBYTE(offset & 0xfffffff0)) >> (offset & m1)) & m2;
+	return (TMS34010_RDMEM_WORD(T, TOBYTE(offset & 0xfffffff0)) >> (offset & m1)) & m2;
 
-static UINT32 read_pixel_1(tms34010_state *tms, offs_t offset) { RP(0x0f,0x01) }
-static UINT32 read_pixel_2(tms34010_state *tms, offs_t offset) { RP(0x0e,0x03) }
-static UINT32 read_pixel_4(tms34010_state *tms, offs_t offset) { RP(0x0c,0x0f) }
-static UINT32 read_pixel_8(tms34010_state *tms, offs_t offset) { RP(0x08,0xff) }
+static UINT32 read_pixel_1(tms34010_state *tms, offs_t offset) { RP(tms,0x0f,0x01) }
+static UINT32 read_pixel_2(tms34010_state *tms, offs_t offset) { RP(tms,0x0e,0x03) }
+static UINT32 read_pixel_4(tms34010_state *tms, offs_t offset) { RP(tms,0x0c,0x0f) }
+static UINT32 read_pixel_8(tms34010_state *tms, offs_t offset) { RP(tms,0x08,0xff) }
 static UINT32 read_pixel_16(tms34010_state *tms, offs_t offset)
 {
 	/* TODO: Plane masking */
-	return TMS34010_RDMEM_WORD(TOBYTE(offset & 0xfffffff0));
+	return TMS34010_RDMEM_WORD(tms, TOBYTE(offset & 0xfffffff0));
 }
 static UINT32 read_pixel_32(tms34010_state *tms, offs_t offset)
 {
 	/* TODO: Plane masking */
-	return TMS34010_RDMEM_DWORD(TOBYTE(offset & 0xffffffe0));
+	return TMS34010_RDMEM_DWORD(tms, TOBYTE(offset & 0xffffffe0));
 }
 
 /* Shift register read */
@@ -327,13 +329,13 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 /* No Raster Op + No Transparency */
 #define WP(T,m1,m2)  																			\
 	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
-	UINT32 pix = TMS34010_RDMEM_WORD(a);													\
+	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
 	UINT32 shiftcount = offset & m1;														\
 																							\
 	/* TODO: plane masking */																\
 	data &= m2;																				\
 	pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);								\
-	TMS34010_WRMEM_WORD(a, pix);															\
+	TMS34010_WRMEM_WORD(T, a, pix);															\
 
 /* No Raster Op + Transparency */
 #define WP_T(T,m1,m2)  																		\
@@ -342,29 +344,29 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 	if (data)																				\
 	{																						\
 		UINT32 a = TOBYTE(offset & 0xfffffff0);												\
-		UINT32 pix = TMS34010_RDMEM_WORD(a);												\
+		UINT32 pix = TMS34010_RDMEM_WORD(T,a);												\
 		UINT32 shiftcount = offset & m1;													\
 																							\
 		/* TODO: plane masking */															\
 		pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);							\
-		TMS34010_WRMEM_WORD(a, pix);														\
+		TMS34010_WRMEM_WORD(T, a, pix);														\
 	}						  																\
 
 /* Raster Op + No Transparency */
 #define WP_R(T,m1,m2)  																		\
 	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
-	UINT32 pix = TMS34010_RDMEM_WORD(a);													\
+	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
 	UINT32 shiftcount = offset & m1;														\
 																							\
 	/* TODO: plane masking */																\
 	data = (*(T)->raster_op)(tms, data & m2, (pix >> shiftcount) & m2) & m2;				\
 	pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);								\
-	TMS34010_WRMEM_WORD(a, pix);															\
+	TMS34010_WRMEM_WORD(T, a, pix);															\
 
 /* Raster Op + Transparency */
 #define WP_R_T(T,m1,m2)  																		\
 	UINT32 a = TOBYTE(offset & 0xfffffff0);													\
-	UINT32 pix = TMS34010_RDMEM_WORD(a);													\
+	UINT32 pix = TMS34010_RDMEM_WORD(T,a);													\
 	UINT32 shiftcount = offset & m1;														\
 																							\
 	/* TODO: plane masking */																\
@@ -372,7 +374,7 @@ static UINT32 read_pixel_shiftreg(tms34010_state *tms, offs_t offset)
 	if (data)																				\
 	{																						\
 		pix = (pix & ~(m2 << shiftcount)) | (data << shiftcount);							\
-		TMS34010_WRMEM_WORD(a, pix);														\
+		TMS34010_WRMEM_WORD(T, a, pix);														\
 	}						  																\
 
 
@@ -384,12 +386,12 @@ static void write_pixel_8(tms34010_state *tms, offs_t offset, UINT32 data) { WP(
 static void write_pixel_16(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	/* TODO: plane masking */
-	TMS34010_WRMEM_WORD(TOBYTE(offset & 0xfffffff0), data);
+	TMS34010_WRMEM_WORD(tms, TOBYTE(offset & 0xfffffff0), data);
 }
 static void write_pixel_32(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	/* TODO: plane masking */
-	TMS34010_WRMEM_WORD(TOBYTE(offset & 0xffffffe0), data);
+	TMS34010_WRMEM_WORD(tms, TOBYTE(offset & 0xffffffe0), data);
 }
 
 /* No Raster Op + Transparency */
@@ -401,13 +403,13 @@ static void write_pixel_t_16(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	/* TODO: plane masking */
 	if (data)
-		TMS34010_WRMEM_WORD(TOBYTE(offset & 0xfffffff0), data);
+		TMS34010_WRMEM_WORD(tms, TOBYTE(offset & 0xfffffff0), data);
 }
 static void write_pixel_t_32(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	/* TODO: plane masking */
 	if (data)
-		TMS34010_WRMEM_DWORD(TOBYTE(offset & 0xffffffe0), data);
+		TMS34010_WRMEM_DWORD(tms, TOBYTE(offset & 0xffffffe0), data);
 }
 
 /* Raster Op + No Transparency */
@@ -419,13 +421,13 @@ static void write_pixel_r_16(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	/* TODO: plane masking */
 	UINT32 a = TOBYTE(offset & 0xfffffff0);
-	TMS34010_WRMEM_WORD(a, (*tms->raster_op)(tms, data, TMS34010_RDMEM_WORD(a)));
+	TMS34010_WRMEM_WORD(tms, a, (*tms->raster_op)(tms, data, TMS34010_RDMEM_WORD(tms, a)));
 }
 static void write_pixel_r_32(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	/* TODO: plane masking */
 	UINT32 a = TOBYTE(offset & 0xffffffe0);
-	TMS34010_WRMEM_DWORD(a, (*tms->raster_op)(tms, data, TMS34010_RDMEM_DWORD(a)));
+	TMS34010_WRMEM_DWORD(tms, a, (*tms->raster_op)(tms, data, TMS34010_RDMEM_DWORD(tms, a)));
 }
 
 /* Raster Op + Transparency */
@@ -437,19 +439,19 @@ static void write_pixel_r_t_16(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	/* TODO: plane masking */
 	UINT32 a = TOBYTE(offset & 0xfffffff0);
-	data = (*tms->raster_op)(tms, data, TMS34010_RDMEM_WORD(a));
+	data = (*tms->raster_op)(tms, data, TMS34010_RDMEM_WORD(tms, a));
 
 	if (data)
-		TMS34010_WRMEM_WORD(a, data);
+		TMS34010_WRMEM_WORD(tms, a, data);
 }
 static void write_pixel_r_t_32(tms34010_state *tms, offs_t offset, UINT32 data)
 {
 	/* TODO: plane masking */
 	UINT32 a = TOBYTE(offset & 0xffffffe0);
-	data = (*tms->raster_op)(tms, data, TMS34010_RDMEM_DWORD(a));
+	data = (*tms->raster_op)(tms, data, TMS34010_RDMEM_DWORD(tms, a));
 
 	if (data)
-		TMS34010_WRMEM_DWORD(a, data);
+		TMS34010_WRMEM_DWORD(tms, a, data);
 }
 
 /* Shift register write */
@@ -624,6 +626,7 @@ static CPU_INIT( tms34010 )
 	tms->config = configdata;
 	tms->irq_callback = irqcallback;
 	tms->device = device;
+	tms->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	tms->screen = device_list_find_by_tag(device->machine->config->devicelist, VIDEO_SCREEN, configdata->screen_tag);
 
 	/* allocate a scanline timer and set it to go off at the start */
@@ -665,6 +668,7 @@ static CPU_RESET( tms34010 )
 	tms->irq_callback = save_irqcallback;
 	tms->scantimer = save_scantimer;
 	tms->device = device;
+	tms->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* fetch the initial PC and reset the state */
 	tms->pc = RLONG(tms, 0xffffffe0) & 0xfffffff0;
@@ -1606,7 +1610,7 @@ void tms34010_host_w(const device_config *cpu, int reg, int data)
 
 			/* write to the address */
 			addr = (IOREG(tms, REG_HSTADRH) << 16) | IOREG(tms, REG_HSTADRL);
-			TMS34010_WRMEM_WORD(TOBYTE(addr & 0xfffffff0), data);
+			TMS34010_WRMEM_WORD(tms, TOBYTE(addr & 0xfffffff0), data);
 
 			/* optional postincrement */
 			if (IOREG(tms, REG_HSTCTLH) & 0x0800)
@@ -1668,7 +1672,7 @@ int tms34010_host_r(const device_config *cpu, int reg)
 			/* read from the address */
 			addr = (IOREG(tms, REG_HSTADRH) << 16) | IOREG(tms, REG_HSTADRL);
 			cpu_push_context(cpu);
-			result = TMS34010_RDMEM_WORD(TOBYTE(addr & 0xfffffff0));
+			result = TMS34010_RDMEM_WORD(tms, TOBYTE(addr & 0xfffffff0));
 			cpu_pop_context();
 
 			/* optional postincrement (it says preincrement, but data is preloaded, so it
