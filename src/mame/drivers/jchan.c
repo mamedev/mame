@@ -3,7 +3,8 @@
     Jackie Chan in Fists of Fire
     (c) Kaneko 1995
 
-WIP Driver by Sebastien Volpe, based on "this does nothing" by Haze ;)
+	Driver by David Haywood
+	 based on work by Sebastien Volpe
 
  started: May 12 2004
 
@@ -15,29 +16,6 @@ jchan2 : "95/11/28 Jackie ChanVer 2.31"
 jchan  : "1995/05/24 The kung-Fu Master Jackie Chan   "
 jchan2 : "1995/10/24 Fists Of Fire"
 
-STILL TO DO:
-  - video registers meaning:
-    have a look at subcpu routines $11,$12 (different registers init according flipscreen dsw)
-
-  - sound: can be guessed from DSW and what main68k does with 'DemoSounds On/Off'
-    subcpu routines $05,$06,$07 + elsewhere  (search for $10600c in dasm)
-    status/data register is probably $10600c + 2/6 (hooked up but commented out for now)
-
-  - player controls not really understood - they end up @ $2000b1.b,$2000b5.b, see $21e2a
-
-  - sub68k IT not hooked up (except the one triggered by main68k)
-    NOTE: triggering any IT at VBL makes self-test HANG!
-
-DONE:
-  - almost figured out Main<->Sub 68k communication (read below)
-  - started MCU simulation, following the existing implementation of kaneko16.c
-    MCU is the TBS0P01 ("TOYBOX") which is a NEC uPD78324 with 32K internal rom & 1024 byte ram
-  - located (at least main) sprite RAM and format
-  - inputs (coin, controls, dsw) - controls not understood! :/
-
- turns out to be quite similar to other kaneko16 games (main 68k + mcu),
- mcu communication triggering is identical to bloodwar & gtmr,
- except it has a sub 68k that seems to drive a 2nd video chip (and sound)?
 
  main2sub comunication is done within $400000-$403fff (mainsub_shared_ram):
  - $403C02(W) : ]
@@ -57,20 +35,7 @@ DONE:
 wait    tst.w   $400002.l           ; read (shared ram) sub-cpu busy status word
         beq     wait                ; active wait-loop
 
-
-********
-
-    there are error-msgs for (palette/sprite/bg) RAM + sub*(palette/sprite/bg) RAM, suggesting each 68k holds palette/sprite/bg ???
-
-    main spriteram is located @ $500000-$5005ff
-
-    sprite format is similar as what's described in video\kaneko16.c:
-    -> each field is coded on a long, lo-word is zeroes except code
-    .L  attributes
-    .L  code.w|color.w ???
-    .L  x << 6
-    .L  y << 6
-
+***********************************************************************************************
 
  probably IT 1,2 triggered at a time for maincpu and IT 1,2,3 for subcpu ?
 
@@ -84,6 +49,10 @@ lev 1 : 0x64 : 0000 103a -
 lev 2 : 0x68 : 0000 1066 -
 lev 3 : 0x6c : 0000 10a4 -
 lev 4 : 0x70 : 0000 10d0 - comm. with main68k, triggered when main writes cmd @ $403ffe
+
+***********************************************************************************************
+ PCB info
+***********************************************************************************************
 
 
 Jackie Chan Kung Fu Master
@@ -219,6 +188,9 @@ static UINT16* jchan_sprregs_1;
 static UINT16 *jchan_spriteram_2;
 static UINT16* jchan_sprregs_2;
 
+extern int suprnova_alt_enable_sprites;
+static UINT16 *mainsub_shared_ram;
+
 /***************************************************************************
 
                             MCU Code Simulation
@@ -267,37 +239,6 @@ static void jchan_mcu_run(running_machine *machine)
 
 		case 0x02: /* load game settings from 93C46 EEPROM ($1090-$10dc) */
 		{
-/*
-Current feeling of devs is that this EEPROM might also play a role in the protection scheme,
-but I (SV) feel that it is very unlikely because of the following, which has been verified:
-if the checksum test fails at most 3 times, then the initial settings, stored in main68k ROM,
-are loaded in RAM then saved with cmd 0x42 (see code @ $5196 & $50d4)
-*/
-#if 0
-			int	i;
-
-			/* MCU writes 128 bytes to shared ram: last byte is the byte-sum */
-			/* first 32 bytes (header): 0x8BE08E71.L, then the string:       */
-			/* "95/05/24 Jackie ChanVer 1.20" for jchan (the one below)      */
-			/* "95/11/28 Jackie ChanVer 2.31" for jchan2                     */
-			mcu_ram[mcu_offset +  0] = 0x8BE0; mcu_ram[mcu_offset +  1] = 0x8E71;
-			mcu_ram[mcu_offset +  2] = 0x3935; mcu_ram[mcu_offset +  3] = 0x2F30;
-			mcu_ram[mcu_offset +  4] = 0x352F; mcu_ram[mcu_offset +  5] = 0x3234;
-			mcu_ram[mcu_offset +  6] = 0x204A; mcu_ram[mcu_offset +  7] = 0x6163;
-			mcu_ram[mcu_offset +  8] = 0x6B69; mcu_ram[mcu_offset +  9] = 0x6520;
-			mcu_ram[mcu_offset + 10] = 0x4368; mcu_ram[mcu_offset + 11] = 0x616E;
-			mcu_ram[mcu_offset + 12] = 0x5665; mcu_ram[mcu_offset + 13] = 0x7220;
-			mcu_ram[mcu_offset + 14] = 0x312E; mcu_ram[mcu_offset + 15] = 0x3230;
-			/* next 12 bytes - initial NVRAM settings */
-			mcu_ram[mcu_offset + 16] = 0x0001; mcu_ram[mcu_offset + 17] = 0x0101;
-			mcu_ram[mcu_offset + 18] = 0x0100; mcu_ram[mcu_offset + 19] = 0x0310;
-			mcu_ram[mcu_offset + 20] = 0x1028; mcu_ram[mcu_offset + 21] = 0x0201;
-			/* rest is zeroes */
-			for (i=22;i<63;i++)
-				mcu_ram[mcu_offset + i] = 0;
-			/* and sum is $62.b */
-			mcu_ram[mcu_offset + 63] = 0x0062;
-#endif
 			mame_file *f;
 			if ((f = nvram_fopen(machine, OPEN_FLAG_READ)) != 0)
 			{
@@ -358,6 +299,10 @@ static READ16_HANDLER( jchan_mcu_status_r )
 
 
 // interrupt generation is NOT understood
+//  but the order must be something like this,
+//  if it is incorrect jchan2 will crash when
+//  certain characters win/lose but no finish
+//  move was performed
 static INTERRUPT_GEN( jchan_vblank )
 {
 	int i = cpu_getiloops(device);
@@ -368,7 +313,7 @@ static INTERRUPT_GEN( jchan_vblank )
 			cpu_set_input_line(device, 1, HOLD_LINE);
 			break;
 
-		case 220:
+		case 100:
 			cpu_set_input_line(device, 2, HOLD_LINE);
 			break;
 
@@ -383,11 +328,11 @@ static INTERRUPT_GEN( jchan_vblank )
 				cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
 				break;
 
-			case 100:
+			case 220:
 				cpu_set_input_line(device->machine->cpu[1], 2, HOLD_LINE);
 				break;
 
-			case 220:
+			case 100:
 				cpu_set_input_line(device->machine->cpu[1], 3, HOLD_LINE);
 				break;
 
@@ -395,7 +340,8 @@ static INTERRUPT_GEN( jchan_vblank )
 	}
 }
 
-extern int suprnova_alt_enable_sprites;
+
+
 
 static VIDEO_START(jchan)
 {
@@ -416,7 +362,7 @@ static VIDEO_START(jchan)
 }
 
 
-static UINT16 *mainsub_shared_ram;
+
 
 
 
@@ -434,14 +380,13 @@ static VIDEO_UPDATE(jchan)
 
 	VIDEO_UPDATE_CALL(jchan_view2);
 
-	//skns_draw_sprites(screen->machine,bitmap,cliprect);
 	fillbitmap(sprite_bitmap_1, 0x0000, cliprect);
 	fillbitmap(sprite_bitmap_2, 0x0000, cliprect);
 
 	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, jchan_sprite_ram32_1, 0x4000, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), jchan_sprite_regs32_1 );
 	skns_draw_sprites(screen->machine, sprite_bitmap_2, cliprect, jchan_sprite_ram32_2, 0x4000, memory_region(screen->machine,"gfx2"), memory_region_length (screen->machine, "gfx2"), jchan_sprite_regs32_2 );
 
-	// ignoring priority bits for now..
+	// ignoring priority bits for now - might use alpha too, check 0x8000 of palette writes
 	for (y=0;y<240;y++)
 	{
 		src1 = BITMAP_ADDR16(sprite_bitmap_1, y, 0);
@@ -470,7 +415,7 @@ static VIDEO_UPDATE(jchan)
 
 /***************************************************************************
 
- controls - working like this but not really understood :/
+ controls
 
 ***************************************************************************/
 /*
@@ -483,17 +428,7 @@ static UINT16 *jchan_ctrl;
 
 static WRITE16_HANDLER( jchan_ctrl_w )
 {
-	//printf("jchan_ctrl_w %d %04x %04x\n", offset, data,mem_mask);
 	jchan_irq_sub_enable = data & 0x8000; // hack / guess!
-#if 0
-// Player 1 buttons C/D for are ON
-// Coin 1 affects Button C and sometimes(!) makes Player 2 buttons C/D both ON definitively
-// Coin 2 affects Button D and sometimes(!) makes Player 2 buttons C/D both ON definitively
-	jchan_ctrl[6/2] = data;
-
-// both players C/D buttons don't work
-	jchan_ctrl[6/2] = -1;
-#endif
 }
 
 static READ16_HANDLER ( jchan_ctrl_r )
@@ -520,8 +455,6 @@ static UINT16 *mainsub_shared_ram;
 
 static WRITE16_HANDLER( main2sub_cmd_w )
 {
-	//printf("main2sub\n");
-
 	COMBINE_DATA(&mainsub_shared_ram[0x03ffe/2]);
 	cpu_set_input_line(space->machine->cpu[1], 4, HOLD_LINE);
 }
@@ -529,7 +462,6 @@ static WRITE16_HANDLER( main2sub_cmd_w )
 // is this called?
 static WRITE16_HANDLER( sub2main_cmd_w )
 {
-	//printf("sub2main\n");
 	COMBINE_DATA(&mainsub_shared_ram[0x0000/2]);
 	cpu_set_input_line(space->machine->cpu[0], 3, HOLD_LINE);
 }
@@ -602,7 +534,7 @@ static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x503000, 0x503fff) AM_RAM AM_BASE(&kaneko16_vscroll_0)									//
 	AM_RANGE(0x600000, 0x60001f) AM_RAM_WRITE(kaneko16_layers_0_regs_w) AM_BASE(&kaneko16_layers_0_regs)	// Layers 0 Regs
 
-	/* 2nd sprite layer? - [C] grid tested, cleared ($1e2a), also cleared at startup ($7dc-$80a) */
+	/* background prites */
 	AM_RANGE(0x700000, 0x703fff) AM_RAM AM_BASE(&jchan_spriteram_2) AM_WRITE(jchan_suprnova_sprite32_2_w)
 	AM_RANGE(0x780000, 0x78003f) AM_RAM AM_BASE(&jchan_sprregs_2) AM_WRITE(jchan_suprnova_sprite32regs_2_w)
 
@@ -612,43 +544,7 @@ static ADDRESS_MAP_START( jchan_sub, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa00000, 0xa00001) AM_READWRITE(watchdog_reset16_r, watchdog_reset16_w)	// watchdog
 ADDRESS_MAP_END
 
-/* video registers ?!? according values, can be seen as 2 functionnal blocks: 780000-780014 & 780018-780034
-cpu #1 (PC=00000702): unmapped program memory word write to 00780000 = 0040 & FFFF
-cpu #1 (PC=00000708): unmapped program memory word write to 00780004 = 0000 & FFFF
-cpu #1 (PC=00000716): unmapped program memory word write to 00780008 = 0000 & FFFF
-cpu #1 (PC=0000071C): unmapped program memory word write to 0078000C = 0200 & FFFF
-cpu #1 (PC=00000722): unmapped program memory word write to 00780010 = 0000 & FFFF
-cpu #1 (PC=00000728): unmapped program memory word write to 00780014 = 0000 & FFFF
 
-cpu #1 (PC=0000072E): unmapped program memory word write to 00780018 = 0000 & FFFF
-cpu #1 (PC=00000734): unmapped program memory word write to 0078001C = FC00 & FFFF
-cpu #1 (PC=0000073A): unmapped program memory word write to 00780020 = 0000 & FFFF
-cpu #1 (PC=00000740): unmapped program memory word write to 00780024 = FC00 & FFFF
-cpu #1 (PC=00000746): unmapped program memory word write to 00780028 = 0000 & FFFF
-cpu #1 (PC=0000074C): unmapped program memory word write to 0078002C = FC00 & FFFF
-cpu #1 (PC=00000752): unmapped program memory word write to 00780030 = 0000 & FFFF
-cpu #1 (PC=00000758): unmapped program memory word write to 00780034 = FC00 & FFFF
-
---- the previous ones are suprnova sprite registers, similar to 600000 of main cpu!!!
---- the next ones are probable tilemap registers...
-
-cpu #1 (PC=00000760): unmapped program memory word write to 0060000E = 0000 & FFFF
-cpu #1 (PC=00000768): unmapped program memory word write to 0060000A = 0002 & FFFF
-cpu #1 (PC=00000770): unmapped program memory word write to 00600008 = 0C00 & FF00   (2)
-cpu #1 (PC=00000780): unmapped program memory word write to 00600008 = 000C & 00FF (1)
-cpu #1 (PC=00000790): unmapped program memory word write to 00600010 = 0000 & FFFF
-cpu #1 (PC=00000796): unmapped program memory word write to 00600012 = 0000 & FFFF
-cpu #1 (PC=0000079E): unmapped program memory word write to 00600000 = 7740 & FFFF (1)
-cpu #1 (PC=000007A6): unmapped program memory word write to 00600002 = 0140 & FFFF (1)
-cpu #1 (PC=000007AE): unmapped program memory word write to 00600004 = 77C0 & FFFF   (2)
-cpu #1 (PC=000007B6): unmapped program memory word write to 00600006 = 0140 & FFFF   (2)
-
-(1) seems to be grouped - see subcpu routine $09 @ $16e2
-(2) seems to be grouped - see subcpu routine $0A @ $172c
-*/
-
-
-/* gfx decode , this one seems ok */
 static const gfx_layout tilelayout =
 {
 	16,16,
@@ -663,8 +559,6 @@ static const gfx_layout tilelayout =
 // we don't decode the sprites, they are non-tile based and RLE encoded!, see suprnova.c */
 
 static GFXDECODE_START( jchan )
-//  GFXDECODE_ENTRY( "gfx1", 0, char2layout,   0, 512  )
-//  GFXDECODE_ENTRY( "gfx2", 0, char2layout,   0, 512  )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout,   0, 0x4000/16  ) // video/kaneko16.c is hardcoded to here for now
 GFXDECODE_END
