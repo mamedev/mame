@@ -204,16 +204,16 @@ static UINT32 protection_bcd_jsr(UINT16 prot_data)
 /*      -the second value should be end of calculation (in other words,check everything between the two values) */
 #define PLAYER 0
 #define ENEMY 1
-static void protection_move_jsr(UINT32 work_ram,UINT8 k)
+static void protection_move_jsr(const address_space *space,UINT32 work_ram,UINT8 k)
 {
 	static UINT32 move_data,x_data,y_data;
 	/*Read the movement data to execute*/
-	move_data = ((program_read_word(work_ram+0x34)<<16) & 0xffff0000) |
-	             (program_read_word(work_ram+0x36) & 0xffff);
+	move_data = ((memory_read_word(space, work_ram+0x34)<<16) & 0xffff0000) |
+	             (memory_read_word(space, work_ram+0x36) & 0xffff);
 
 	/*Read the x/y axis of the sprite to change*/
-	x_data = (program_read_word(work_ram+0x8));
-	y_data = (program_read_word(work_ram+0x4));
+	x_data = (memory_read_word(space, work_ram+0x8));
+	y_data = (memory_read_word(space, work_ram+0x4));
 	/*it's bit sensitive AFAIK*/
 	/*move_data hi-word on player
       $17 = walk floor
@@ -255,22 +255,22 @@ static void protection_move_jsr(UINT32 work_ram,UINT8 k)
 			break;
 	}
 	/*Write the new values to the sprite x/y data*/
-	program_write_word(work_ram+0x8,x_data);
-	program_write_word(work_ram+0x4,y_data);
+	memory_write_word(space, work_ram+0x8,x_data);
+	memory_write_word(space, work_ram+0x4,y_data);
 }
 
 
 static UINT16 hit_check;
 
-static void protection_hit_jsr(UINT32 work_ram1,UINT32 work_ram2)
+static void protection_hit_jsr(const address_space *space,UINT32 work_ram1,UINT32 work_ram2)
 {
 	int x1,y1,x2,y2/*,hit1,hit2*/;
-	x1 = (program_read_word(work_ram1+0x8));
-	y1 = (program_read_word(work_ram1+0x4));
-	//hit1 = (program_read_word(work_ram1-));//this sprite is attacking
-	x2 = (program_read_word(work_ram2+0x8));
-	y2 = (program_read_word(work_ram2+0x4));
-	//hit2 = (program_read_word());
+	x1 = (memory_read_word(space, work_ram1+0x8));
+	y1 = (memory_read_word(space, work_ram1+0x4));
+	//hit1 = (memory_read_word(space, work_ram1-));//this sprite is attacking
+	x2 = (memory_read_word(space, work_ram2+0x8));
+	y2 = (memory_read_word(space, work_ram2+0x4));
+	//hit2 = (memory_read_word(space));
 
 	popmessage("%08x:x=%04x y=%04x %08x:x=%04x y=%04x",work_ram1,x1,y1,work_ram2,x2,y2);
 
@@ -284,46 +284,46 @@ static void protection_hit_jsr(UINT32 work_ram1,UINT32 work_ram2)
 }
 
 /*directional movement protection*/
-static void moveprot_jsr(void)
+static void moveprot_jsr(const address_space *space)
 {
 	static INT16 x_axis,y_axis;
 	static UINT16 move_data,distance,move_type;
-	move_data = program_read_word(cop_register[0]+0x36);
-	x_axis = program_read_word(cop_register[0]+0x08);
-	y_axis = program_read_word(cop_register[0]+0x04);
+	move_data = memory_read_word(space, cop_register[0]+0x36);
+	x_axis = memory_read_word(space, cop_register[0]+0x08);
+	y_axis = memory_read_word(space, cop_register[0]+0x04);
 
 	distance = (move_data & 0xf);
 	move_type = (move_data & 0xf0)>>4;
 	switch(move_type)
 	{
 		case 0x0f://right
-			program_write_word(cop_register[0]+0x08,x_axis+distance);
-			//program_write_word(0x110004,);
+			memory_write_word(space, cop_register[0]+0x08,x_axis+distance);
+			//memory_write_word(space, 0x110004,);
 			break;
 		case 0x0b://up
-			program_write_word(cop_register[0]+0x04,y_axis-distance);
+			memory_write_word(space, cop_register[0]+0x04,y_axis-distance);
 			break;
 		case 0x07://left
-			program_write_word(cop_register[0]+0x08,x_axis-distance);
+			memory_write_word(space, cop_register[0]+0x08,x_axis-distance);
 			break;
 		case 0x03://down
-			program_write_word(cop_register[0]+0x04,y_axis+distance);
+			memory_write_word(space, cop_register[0]+0x04,y_axis+distance);
 			break;
 		case 0x0d://up-right
-			program_write_word(cop_register[0]+0x08,x_axis+distance);
-			program_write_word(cop_register[0]+0x04,y_axis-distance);
+			memory_write_word(space, cop_register[0]+0x08,x_axis+distance);
+			memory_write_word(space, cop_register[0]+0x04,y_axis-distance);
 			break;
 		case 0x09://up-left
-			program_write_word(cop_register[0]+0x04,y_axis-distance);
-			program_write_word(cop_register[0]+0x08,x_axis-distance);
+			memory_write_word(space, cop_register[0]+0x04,y_axis-distance);
+			memory_write_word(space, cop_register[0]+0x08,x_axis-distance);
 			break;
 		case 0x01://down-right
-			program_write_word(cop_register[0]+0x04,y_axis+distance);
-			program_write_word(cop_register[0]+0x08,x_axis+distance);
+			memory_write_word(space, cop_register[0]+0x04,y_axis+distance);
+			memory_write_word(space, cop_register[0]+0x08,x_axis+distance);
 			break;
 		case 0x05://down-left
-			program_write_word(cop_register[0]+0x04,y_axis+distance);
-			program_write_word(cop_register[0]+0x08,x_axis-distance);
+			memory_write_word(space, cop_register[0]+0x04,y_axis+distance);
+			memory_write_word(space, cop_register[0]+0x08,x_axis-distance);
 			break;
 		default:
 			logerror("Warning: \"0x205\" command called with move_type parameter = %02x\n",move_type);
@@ -331,11 +331,11 @@ static void moveprot_jsr(void)
 			//down-right
 			//down-left
 	}
-	//program_write_word(0x110008,x_axis+tmp);
-	//program_write_word(0x110004,y_axis+tmp);
+	//memory_write_word(space, 0x110008,x_axis+tmp);
+	//memory_write_word(space, 0x110004,y_axis+tmp);
 
-	//program_write_word(0x110008,x_axis);
-	//program_write_word(0x110004,y_axis);
+	//memory_write_word(space, 0x110008,x_axis);
+	//memory_write_word(space, 0x110004,y_axis);
 }
 
 /*
@@ -350,13 +350,13 @@ static void moveprot_jsr(void)
 
 */
 /*sprite "look" protection*/
-static void move2prot_jsr(void)
+static void move2prot_jsr(const address_space *space)
 {
 	static INT16 x_pl,y_pl,x_en,y_en,res;
-	x_pl = program_read_word(cop_register[1]+0x8);
-	y_pl = program_read_word(cop_register[1]+0x4);
-	x_en = program_read_word(cop_register[0]+0x8);
-	y_en = program_read_word(cop_register[0]+0x4);
+	x_pl = memory_read_word(space, cop_register[1]+0x8);
+	y_pl = memory_read_word(space, cop_register[1]+0x4);
+	x_en = memory_read_word(space, cop_register[0]+0x8);
+	y_en = memory_read_word(space, cop_register[0]+0x4);
 
 	res = 0;
 	if(x_en > x_pl)
@@ -368,37 +368,37 @@ static void move2prot_jsr(void)
 	//if(y_en > y_pl)
 	//  res|=0x40;
 
-	program_write_word(cop_register[0]+0x36,res);
+	memory_write_word(space, cop_register[0]+0x36,res);
 }
 
 #ifdef UNUSED_FUNCTION
 /*"To point" movement protection*/
-static void move3x_prot_jsr(void)
+static void move3x_prot_jsr(const address_space *space)
 {
 	static INT16 x_pl,x_en,x_dis;
-	x_pl = program_read_word(cop_register[1]+0x8);
-	x_en = program_read_word(cop_register[0]+0x8);
-	x_dis = ((program_read_word(cop_register[0]+0x34) & 0xf0) >> 4);
+	x_pl = memory_read_word(space, cop_register[1]+0x8);
+	x_en = memory_read_word(space, cop_register[0]+0x8);
+	x_dis = ((memory_read_word(space, cop_register[0]+0x34) & 0xf0) >> 4);
 
 	if(x_en > x_pl)
 		x_dis^=0xffff;
 
-	program_write_word(cop_register[0]+0x36,-0x40);/*enable command*/
-	program_write_word(cop_register[0]+0x14,x_dis);
+	memory_write_word(space, cop_register[0]+0x36,-0x40);/*enable command*/
+	memory_write_word(space, cop_register[0]+0x14,x_dis);
 }
 
-static void move3y_prot_jsr(void)
+static void move3y_prot_jsr(const address_space *space)
 {
 	static INT16 y_pl,y_en,y_dis;
-	y_pl = program_read_word(cop_register[1]+0x4);
-	y_en = program_read_word(cop_register[0]+0x4);
-	y_dis = (program_read_word(cop_register[0]+0x34) & 0xf);
+	y_pl = memory_read_word(space, cop_register[1]+0x4);
+	y_en = memory_read_word(space, cop_register[0]+0x4);
+	y_dis = (memory_read_word(space, cop_register[0]+0x34) & 0xf);
 
 	if(y_en > y_pl)
 		y_dis^=0xffff;
 
-	program_write_word(cop_register[0]+0x36,-0x80);/*enable command*/
-	program_write_word(cop_register[0]+0x10,y_dis);
+	memory_write_word(space, cop_register[0]+0x36,-0x80);/*enable command*/
+	memory_write_word(space, cop_register[0]+0x10,y_dis);
 }
 #endif
 
@@ -503,7 +503,7 @@ x/y check [2]
 
 static UINT16 s_i;
 
-static void dma_transfer(void)
+static void dma_transfer(const address_space *space)
 {
 	static UINT16 rel_xy;
 	static UINT16 abs_x,abs_y;
@@ -512,20 +512,20 @@ static void dma_transfer(void)
 	//for(s_i = dma_size;s_i > 0;s_i--)
 	{
 		/*Sprite Color*/
-		param = program_read_word(0x100400) & 0x3f;
+		param = memory_read_word(space, 0x100400) & 0x3f;
 		/*Write the entire parameters [offs+0]*/
-		program_write_word(cop_register[5]+4,program_read_word(dma_src) + param);
+		memory_write_word(space, cop_register[5]+4,memory_read_word(space, dma_src) + param);
 		/*Sprite Priority (guess)*/
-		//param = ((program_read_word(0x100400) & 0x40) ? 0x4000 : 0);
+		//param = ((memory_read_word(space, 0x100400) & 0x40) ? 0x4000 : 0);
 		/*Write the sprite number [offs+1]*/
-		program_write_word(cop_register[5]+6,program_read_word(dma_src+2));
+		memory_write_word(space, cop_register[5]+6,memory_read_word(space, dma_src+2));
 		/*Sprite Relative x/y coords*/
-		rel_xy = program_read_word(dma_src+4); /*???*/
+		rel_xy = memory_read_word(space, dma_src+4); /*???*/
 		/*temporary hardwired,it should point to 0x4c0/0x4a0*/
-		abs_x = (program_read_word(0x110008) - program_read_word(0x10048e));
-		abs_y = (program_read_word(0x110004) - program_read_word(0x10048c));
-		program_write_word(cop_register[5]+8,((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0)) & 0x1ff);
-		program_write_word(cop_register[5]+10,(((rel_xy & 0x7f00) >> 8) + (abs_y) + (0x10) - ((rel_xy & 0x8000) ? 0x80 : 0)) & 0x1ff);
+		abs_x = (memory_read_word(space, 0x110008) - memory_read_word(space, 0x10048e));
+		abs_y = (memory_read_word(space, 0x110004) - memory_read_word(space, 0x10048c));
+		memory_write_word(space, cop_register[5]+8,((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0)) & 0x1ff);
+		memory_write_word(space, cop_register[5]+10,(((rel_xy & 0x7f00) >> 8) + (abs_y) + (0x10) - ((rel_xy & 0x8000) ? 0x80 : 0)) & 0x1ff);
 		cop_register[5]+=8;
 		dma_src+=6;
 	}
@@ -533,7 +533,7 @@ static void dma_transfer(void)
 
 
 /*
-    switch(program_read_word(cop_register[2]))
+    switch(memory_read_word(space, cop_register[2]))
     {
         case 0xb4: xparam = 0x0c/2; break;
         case 0xb8: xparam = 0x10/2; break;
@@ -560,23 +560,23 @@ static UINT16 check_calc(UINT16 param)
 	return num;
 }
 
-static UINT16 hit_check_jsr(void)
+static UINT16 hit_check_jsr(const address_space *space)
 {
 	static INT16 xsrc,xdst,ysrc,ydst,xparam,yparam;
-	xsrc = (program_read_word(0x110008));
-	ysrc = (program_read_word(0x110004));
-	xdst = (program_read_word(0x110048));
-	ydst = (program_read_word(0x110044));
+	xsrc = (memory_read_word(space, 0x110008));
+	ysrc = (memory_read_word(space, 0x110004));
+	xdst = (memory_read_word(space, 0x110048));
+	ydst = (memory_read_word(space, 0x110044));
 
 	/*Here we check the destination sprite width*/
 	/*0x4a4/0x4c4*/
-	xparam = check_calc(program_read_word(cop_register[2]));
+	xparam = check_calc(memory_read_word(space, cop_register[2]));
 	/*Here we check the destination sprite height*/
 	/*0x4a6/0x4c6*/
-	yparam = check_calc(program_read_word(cop_register[3]));
+	yparam = check_calc(memory_read_word(space, cop_register[3]));
 
 	if(!xparam || !yparam)
-		popmessage("SRC:%04x %04x DST:%04x %04x V:%08x %08x",xsrc,ysrc,xdst,ydst,program_read_word(cop_register[2]),program_read_word(cop_register[3]));
+		popmessage("SRC:%04x %04x DST:%04x %04x V:%08x %08x",xsrc,ysrc,xdst,ydst,memory_read_word(space, cop_register[2]),memory_read_word(space, cop_register[3]));
 	if(xdst >= (xsrc-xparam) && ydst >= (ysrc-yparam) &&
 	   xdst <= (xsrc+xparam) && ydst <= (ysrc+yparam))
 		return 0;//sprites collide
@@ -596,17 +596,17 @@ static UINT16 hit_check_jsr(void)
 /*Heated Barrel*/
 /*command 0x8100 will check for the direction of the sprite*/
 /*command 0x8900 will check the "point" movement*/
-static void cop2_move3_prot(void)
+static void cop2_move3_prot(const address_space *space)
 {
 	static INT16 x_pl,x_en;
 	static INT16 y_pl,y_en;
 	static INT16 x_dis,y_dis;
 	static INT16 dir,dis;
-	x_pl = program_read_word(cop_register[1]+0x8);
-	x_en = program_read_word(cop_register[0]+0x8);
-	dis = ((program_read_word(cop_register[0]+0x34) & 0xf0) >> 4);
-	y_pl = program_read_word(cop_register[1]+0x4);
-	y_en = program_read_word(cop_register[0]+0x4);
+	x_pl = memory_read_word(space, cop_register[1]+0x8);
+	x_en = memory_read_word(space, cop_register[0]+0x8);
+	dis = ((memory_read_word(space, cop_register[0]+0x34) & 0xf0) >> 4);
+	y_pl = memory_read_word(space, cop_register[1]+0x4);
+	y_en = memory_read_word(space, cop_register[0]+0x4);
 
 	/*
     xxxx ---- select the direction of the enemy sprite
@@ -645,7 +645,7 @@ static void cop2_move3_prot(void)
 			dir = DOWN;
 	}
 
-	program_write_word(cop_register[0]+0x36,dir);
+	memory_write_word(space, cop_register[0]+0x36,dir);
 
 	/*TODO*/
 	x_dis = (x_pl-x_en);
@@ -669,12 +669,12 @@ static void cop2_move3_prot(void)
 	//if(x_en > x_pl)
 	//  x_dis^=0xffff;
 
-	program_write_word(cop_register[0]+0x10,y_dis);
-	program_write_word(cop_register[0]+0x14,x_dis);
+	memory_write_word(space, cop_register[0]+0x10,y_dis);
+	memory_write_word(space, cop_register[0]+0x14,x_dis);
 }
 
 /**/
-static UINT16 cop2_hit_prot(void)
+static UINT16 cop2_hit_prot(const address_space *space)
 {
 	static INT16 xsrc,xdst;
 	static INT16 ysrc,ydst;
@@ -682,13 +682,13 @@ static UINT16 cop2_hit_prot(void)
 	static INT16 param1,param2;
 	static INT16 val;
 
-	param1 = program_read_word(cop_register[2]);
-	param2 = program_read_word(cop_register[3]);
+	param1 = memory_read_word(space, cop_register[2]);
+	param2 = memory_read_word(space, cop_register[3]);
 
-	xsrc = program_read_word(cop_register[0]+0x8) + program_read_word(cop_register[0]+0x14);
-	ysrc = program_read_word(cop_register[0]+0x4) + program_read_word(cop_register[0]+0x10);
-	xdst = program_read_word(cop_register[1]+0x8) + program_read_word(cop_register[1]+0x14);
-	ydst = program_read_word(cop_register[1]+0x4) + program_read_word(cop_register[1]+0x10);
+	xsrc = memory_read_word(space, cop_register[0]+0x8) + memory_read_word(space, cop_register[0]+0x14);
+	ysrc = memory_read_word(space, cop_register[0]+0x4) + memory_read_word(space, cop_register[0]+0x10);
+	xdst = memory_read_word(space, cop_register[1]+0x8) + memory_read_word(space, cop_register[1]+0x14);
+	ydst = memory_read_word(space, cop_register[1]+0x4) + memory_read_word(space, cop_register[1]+0x10);
 
 //  xp = (param1 & 0x00f0) >> 4;
 //  yp = (param1 & 0x0f00) >> 8;
@@ -713,14 +713,14 @@ static UINT16 cop2_hit_prot(void)
 		return 3;
 }
 
-static void cop2_move2_prot(void)
+static void cop2_move2_prot(const address_space *space)
 {
 	static INT16 xsrc,ysrc;
 	static INT16 param2;
 
-	xsrc = program_read_word(cop_register[0]+0x14);
-	ysrc = program_read_word(cop_register[0]+0x10);
-	param2 = program_read_word(cop_register[3]);
+	xsrc = memory_read_word(space, cop_register[0]+0x14);
+	ysrc = memory_read_word(space, cop_register[0]+0x10);
+	param2 = memory_read_word(space, cop_register[3]);
 
 	switch(param2)
 	{
@@ -734,8 +734,8 @@ static void cop2_move2_prot(void)
 		case 0x18:  ysrc++; xsrc++; break; //down-right
 	}
 
-	program_write_word(cop_register[0]+0x14,xsrc);
-	program_write_word(cop_register[0]+0x10,ysrc);
+	memory_write_word(space, cop_register[0]+0x14,xsrc);
+	memory_write_word(space, cop_register[0]+0x10,ysrc);
 }
 
 
@@ -946,14 +946,14 @@ INLINE void cop_ram_w(cop_state *cop, UINT16 offset, UINT16 data)
 
 INLINE UINT32 r32(offs_t address)
 {
-	return 	(program_read_word(address + 0) << 0) |
-			(program_read_word(address + 2) << 16);
+	return 	(memory_read_word(space, address + 0) << 0) |
+			(memory_read_word(space, address + 2) << 16);
 }
 
 INLINE void w32(offs_t address, UINT32 data)
 {
-	program_write_word(address + 0, data >> 0);
-	program_write_word(address + 2, data >> 16);
+	memory_write_word(space, address + 0, data >> 0);
+	memory_write_word(space, address + 2, data >> 16);
 }
 
 
@@ -1025,7 +1025,7 @@ WRITE16_HANDLER( raiden2_cop2_w )
 				int count = (cop_ram_r(cop, 0x47a) + 1) << 5;
 				COP_LOG(("%05X:COP RAM clear from %05X to %05X\n", cpu_get_pc(space->cpu), addr, addr + count));
 				while (count--)
-					program_write_byte(addr++, 0);
+					memory_write_byte(space, addr++, 0);
 			}
 			else
 			{
@@ -1274,7 +1274,7 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				for (i=address;i<address+length;i+=2)
 				{
-					program_write_word(i, 0x0000);
+					memory_write_word(space, i, 0x0000);
 				}
 			}
 			break;
@@ -1350,12 +1350,12 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 					break;
 				case 0x8900:
 				{
-					cop2_move3_prot();
+					cop2_move3_prot(space);
 					break;
 				}
 				case 0x205:
 				{
-					cop2_move2_prot();
+					cop2_move2_prot(space);
 					break;
 				}
 				case 0xa100:
@@ -1366,7 +1366,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 					break;
 				case 0xb880:
 				{
-					xy_check = cop2_hit_prot();
+					xy_check = cop2_hit_prot(space);
 					break;
 				}
 				default:
@@ -1460,30 +1460,30 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 				case 0x8100:
 				{
 					UINT32 src = cop_register[0];
-					program_write_word(src+0x36,0xffc0);
+					memory_write_word(space, src+0x36,0xffc0);
 					break;
 				}
 				case 0x8900:
 				{
 					UINT32 src = cop_register[0];
-					program_write_word(src+0x36,0xff80);
+					memory_write_word(space, src+0x36,0xff80);
 					break;
 				}
 				/*Right*/
 				case 0x0205:
 				{
 					UINT32 src = cop_register[0];
-					INT16 y = program_read_word(src+0x4);
-					INT16 x = program_read_word(src+0x8);
-					INT16 y_rel = program_read_word(src+0x10);
-					INT16 x_rel = program_read_word(src+0x14);
-					program_write_word(src+0x4,(y+y_rel));
-					program_write_word(src+0x8,(x+x_rel));
+					INT16 y = memory_read_word(space, src+0x4);
+					INT16 x = memory_read_word(space, src+0x8);
+					INT16 y_rel = memory_read_word(space, src+0x10);
+					INT16 x_rel = memory_read_word(space, src+0x14);
+					memory_write_word(space, src+0x4,(y+y_rel));
+					memory_write_word(space, src+0x8,(x+x_rel));
 					/*logerror("%08x %08x %08x %08x %08x\n",cop_register[0],
-                                                   program_read_word(cop_reg[0]+0x4),
-                                                   program_read_word(cop_reg[0]+0x8),
-                                                   program_read_word(cop_reg[0]+0x10),
-                                                   program_read_word(cop_reg[0]+0x14));*/
+                                                   memory_read_word(space, cop_reg[0]+0x4),
+                                                   memory_read_word(space, cop_reg[0]+0x8),
+                                                   memory_read_word(space, cop_reg[0]+0x10),
+                                                   memory_read_word(space, cop_reg[0]+0x14));*/
 					break;
 				}
 				/*???*/
@@ -1491,10 +1491,10 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 				{
 					//UINT32 dst = cop_register[0];
 					//UINT32 dst = cop_register[1];
-					//program_write_word(dst,  mame_rand(space->machine)/*program_read_word(src)*/);
-					//program_write_word(dst+2,mame_rand(space->machine)/*program_read_word(src+2)*/);
-					//program_write_word(dst+4,mame_rand(space->machine)/*program_read_word(src+4)*/);
-					//program_write_word(dst+6,mame_rand(space->machine)/*program_read_word(src+6)*/);
+					//memory_write_word(space, dst,  mame_rand(space->machine)/*memory_read_word(space, src)*/);
+					//memory_write_word(space, dst+2,mame_rand(space->machine)/*memory_read_word(space, src+2)*/);
+					//memory_write_word(space, dst+4,mame_rand(space->machine)/*memory_read_word(space, src+4)*/);
+					//memory_write_word(space, dst+6,mame_rand(space->machine)/*memory_read_word(space, src+6)*/);
 					//logerror("%04x\n",cop_register[0]);
 					break;
 				}
@@ -1737,8 +1737,8 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 					dma_src+=4;
 					//cop_register[5]+=4;
 					s_i = dma_size;
-					//cop_register[5]+=((program_read_word(0x110000) & 0x000f) * 8);
-					//program_write_word(0x1004c8,cop_register[5] & 0xffff);
+					//cop_register[5]+=((memory_read_word(space, 0x110000) & 0x000f) * 8);
+					//memory_write_word(space, 0x1004c8,cop_register[5] & 0xffff);
 					//dma_status = 1;
 					break;
 				}
@@ -1748,30 +1748,30 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 					break;
 				case 0xb900:
 				{
-					xy_check = hit_check_jsr();
+					xy_check = hit_check_jsr(space);
 					break;
 				}
 				/*bullet movement protection,conflicts with [3],will be worked out*/
 				case 0x8100:
 				{
-					//move3x_prot_jsr();
+					//move3x_prot_jsr(space);
 					break;
 				}
 				case 0x8900:
 				{
-					//move3y_prot_jsr();
+					//move3y_prot_jsr(space);
 					break;
 				}
 				case 0x0205:/*do the job [3]*/
 				{
-					moveprot_jsr();
+					moveprot_jsr(space);
 					break;
 				}
 				case 0x138e:/*do the job [4]*/
 					break;
 				case 0x3bb0:
 				{
-					move2prot_jsr();
+					move2prot_jsr(space);
 					break;
 				}
 				default:
@@ -1784,7 +1784,7 @@ WRITE16_HANDLER( sdgndmrb_mcu_w )
 		{
 			if(cop_mcu_ram[offset] == 0xc480)
 			{
-				dma_transfer();
+				dma_transfer(space);
 				s_i--;
 				if(s_i == 0)
 					dma_status = 1;
@@ -1934,16 +1934,16 @@ WRITE16_HANDLER( legionna_mcu_w )
 			{
 				static UINT16 xy_data[2];
 				static UINT8 k;
-				xy_data[0] = program_read_word(cop_register[2]);
-				xy_data[1] = program_read_word(cop_register[3]);
+				xy_data[0] = memory_read_word(space, cop_register[2]);
+				xy_data[1] = memory_read_word(space, cop_register[3]);
 				k = (cop_mcu_ram[offset] == 0x0205) ? ENEMY : PLAYER;
-				protection_move_jsr(cop_register[0],k);
-				//protection_move_jsr(cop_register[1]); //???
+				protection_move_jsr(space,cop_register[0],k);
+				//protection_move_jsr(space,cop_register[1]); //???
 				//popmessage("%08x %08x %04x %04x",cop_register[0],cop_register[1],xy_data[0],xy_data[1]);
 			}
 			else if(cop_mcu_ram[offset] == 0x3bb0 || cop_mcu_ram[offset] == 0x138e)
 			{
-				protection_hit_jsr(cop_register[0],cop_register[1]);
+				protection_hit_jsr(space,cop_register[0],cop_register[1]);
 			}
 			break;
 		}

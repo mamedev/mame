@@ -137,6 +137,7 @@ INTERRUPT_GEN( attckufo_raster_interrupt )
 
 VIDEO_UPDATE( attckufo )
 {
+	const address_space *space = cpu_get_address_space(screen->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	int x, y, yy;
 
 	for (y = cliprect->min_y & ~7; y <= cliprect->max_y; y += 8)
@@ -148,13 +149,13 @@ VIDEO_UPDATE( attckufo )
 
 		for (x = cliprect->min_x & ~7; x <= cliprect->max_x; x += 8)
 		{
-			UINT8 ch = program_read_byte(offs + x/8);
-			UINT8 attr = program_read_byte(offs + x/8 + 0x400) & 0xf;
+			UINT8 ch = memory_read_byte(space, offs + x/8);
+			UINT8 attr = memory_read_byte(space, offs + x/8 + 0x400) & 0xf;
 			UINT16 *dest = destrow;
 
 			for (yy = ymin; yy <= ymax; yy++)
 			{
-				UINT8 code = program_read_byte(chargenaddr + ch * 8 + yy);
+				UINT8 code = memory_read_byte(space, chargenaddr + ch * 8 + yy);
 				dest[x + 0] = (code & 0x80) ? attr : 0;
 				dest[x + 1] = (code & 0x40) ? attr : 0;
 				dest[x + 2] = (code & 0x20) ? attr : 0;

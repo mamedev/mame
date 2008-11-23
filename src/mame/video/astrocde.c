@@ -727,7 +727,7 @@ WRITE8_HANDLER( astrocade_funcgen_w )
 	/* OR/XOR */
 	if (funcgen_control & 0x30)
 	{
-		UINT8 olddata = program_read_byte(0x4000 + offset);
+		UINT8 olddata = memory_read_byte(space, 0x4000 + offset);
 
 		/* compute any intercepts */
 		funcgen_intercept &= 0x0f;
@@ -748,7 +748,7 @@ WRITE8_HANDLER( astrocade_funcgen_w )
 	}
 
 	/* write the result */
-	program_write_byte(0x4000 + offset, data);
+	memory_write_byte(space, 0x4000 + offset, data);
 }
 
 
@@ -788,7 +788,7 @@ INLINE void increment_dest(UINT8 curwidth)
 }
 
 
-static void execute_blit(running_machine *machine)
+static void execute_blit(const address_space *space)
 {
 	/*
         pattern_source = counter set U7/U16/U25/U34
@@ -842,7 +842,7 @@ static void execute_blit(running_machine *machine)
 			if (curwidth == 0 && (pattern_mode & 0x08) != 0)
 				busdata = 0;
 			else
-				busdata = program_read_byte(busaddr);
+				busdata = memory_read_byte(space, busaddr);
 
 			/* increment the appropriate address */
 			if ((pattern_mode & 0x01) == 0)
@@ -854,7 +854,7 @@ static void execute_blit(running_machine *machine)
 
 			/* address is selected between source/dest based on mode.d0 */
 			busaddr = ((pattern_mode & 0x01) != 0) ? pattern_source : pattern_dest;
-			program_write_byte(busaddr, busdata);
+			memory_write_byte(space, busaddr, busdata);
 
 			/* increment the appropriate address */
 			if ((pattern_mode & 0x01) == 0)
@@ -880,7 +880,7 @@ static void execute_blit(running_machine *machine)
 	} while (pattern_height-- != 0);
 
 	/* count cycles we ran the bus */
-	cpu_adjust_icount(machine->activecpu, -cycles);
+	cpu_adjust_icount(space->cpu, -cycles);
 }
 
 
@@ -915,7 +915,7 @@ WRITE8_HANDLER( astrocade_pattern_board_w )
 
 		case 6:		/* height of blit and initiator */
 			pattern_height = data;
-			execute_blit(space->machine);
+			execute_blit(cpu_get_address_space(space->cpu, ADDRESS_SPACE_PROGRAM));
 			break;
 	}
 }

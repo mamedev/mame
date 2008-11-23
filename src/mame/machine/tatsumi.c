@@ -86,6 +86,7 @@ WRITE16_HANDLER( apache3_irq_ack_w )
 
 READ16_HANDLER( apache3_v30_v20_r )
 {
+	const address_space *targetspace = cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
 	UINT8 value;
 
 	/* Each V20 byte maps to a V30 word */
@@ -98,22 +99,24 @@ READ16_HANDLER( apache3_v30_v20_r )
 	else
 		logerror("%08x: unmapped read z80 rom %08x\n",cpu_get_pc(space->cpu),offset);
 
-	cpu_push_context(space->machine->cpu[2]);
-	value = program_read_byte(offset);
+	cpu_push_context(targetspace->cpu);
+	value = memory_read_byte(targetspace, offset);
 	cpu_pop_context();
 	return value | 0xff00;
 }
 
 WRITE16_HANDLER( apache3_v30_v20_w )
 {
+	const address_space *targetspace = cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
+
 	if ((tatsumi_control_word&0xe0)!=0x80)
 		logerror("%08x: write unmapped v30 rom %08x\n",cpu_get_pc(space->cpu),offset);
 
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
 	{
-		cpu_push_context(space->machine->cpu[2]);
-		program_write_byte(offset, data&0xff);
+		cpu_push_context(targetspace->cpu);
+		memory_write_byte(targetspace, offset, data&0xff);
 		cpu_pop_context();
 	}
 }
@@ -154,28 +157,31 @@ WRITE16_HANDLER( apache3_a0000_w )
 
 READ16_HANDLER( roundup_v30_z80_r )
 {
+	const address_space *targetspace = cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
 	UINT8 value;
 
 	/* Each Z80 byte maps to a V30 word */
 	if (tatsumi_control_word&0x20)
 		offset+=0x8000; /* Upper half */
 
-	cpu_push_context(space->machine->cpu[2]);
-	value = program_read_byte(offset);
+	cpu_push_context(targetspace->cpu);
+	value = memory_read_byte(targetspace, offset);
 	cpu_pop_context();
 	return value | 0xff00;
 }
 
 WRITE16_HANDLER( roundup_v30_z80_w )
 {
+	const address_space *targetspace = cpu_get_address_space(space->machine->cpu[2], ADDRESS_SPACE_PROGRAM);
+
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
 	{
 		if (tatsumi_control_word&0x20)
 			offset+=0x8000; /* Upper half of Z80 address space */
 
-		cpu_push_context(space->machine->cpu[2]);
-		program_write_byte(offset, data&0xff);
+		cpu_push_context(targetspace->cpu);
+		memory_write_byte(targetspace, offset, data&0xff);
 		cpu_pop_context();
 	}
 }
