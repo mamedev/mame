@@ -3451,11 +3451,12 @@ static INPUT_PORTS_START( stdragon )
 INPUT_PORTS_END
 
 
+
+
 /***************************************************************************
 
                                 [ Soldam ]
 
-(Japan version)
 f00c2.l *** score/10 (BCD) ***
 
 The country code is at ROM address $3a9d, copied to RAM address
@@ -3463,6 +3464,40 @@ f0025: 0 = japan, 1 = USA. Change f0025 to 1 to have all the
 text in english.
 
 ***************************************************************************/
+
+ROM_START( soldam )
+	ROM_REGION( 0x60000, "main", 0 )		/* Main CPU Code */
+	ROM_LOAD16_BYTE( "2ver1j.bin",0x000000, 0x020000, CRC(45444b07) SHA1(d991dd52904671fbd8cfcfe07c956d9fd45b3470) )
+	ROM_LOAD16_BYTE( "1euro.bin", 0x000001, 0x020000, CRC(9f9da28a) SHA1(8ce9cd72d12cf66f0b1611ec3933383d2995e5f2) )
+	ROM_LOAD16_BYTE( "3ver1.bin", 0x040000, 0x010000, CRC(c5382a07) SHA1(5342775f2925772e23bb460e88cd2b7e524e57fa) )
+	ROM_LOAD16_BYTE( "4ver1.bin", 0x040001, 0x010000, CRC(1df7816f) SHA1(7c069470ec0e884eae5a52581f2be17d9e692105) )
+
+	ROM_REGION( 0x20000, "sound", 0 )		/* Sound CPU Code */
+	ROM_LOAD16_BYTE( "5ver1.bin", 0x000000, 0x010000, CRC(d1019a67) SHA1(32d77914a67c009bf1bb397772f195594f7cc03f) )
+	ROM_LOAD16_BYTE( "6ver1.bin", 0x000001, 0x010000, CRC(3ed219b4) SHA1(afffa5596027181ae94488d54d6266f8a7ead180) )
+
+	ROM_REGION( 0x080000, "gfx1", ROMREGION_DISPOSE ) /* Scroll 0 */
+	ROM_LOAD( "14ver1.bin", 0x000000, 0x080000, CRC(73c90610) SHA1(044462fd41e8502ba57f814c61db6f0cfb1cc18b) )
+
+	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE ) /* Scroll 1 */
+	ROM_LOAD( "18ver1.bin", 0x000000, 0x080000, CRC(e91a1afd) SHA1(66a686d61de105ee571fbdabc774ed0b848bf426) )
+
+	ROM_REGION( 0x020000, "gfx3", ROMREGION_DISPOSE ) /* Scroll 2 */
+	ROM_LOAD( "19ver1.bin", 0x000000, 0x020000, CRC(38465da1) SHA1(461fc0d81b711d0646dc366c057da66d4b8c6e23) )
+
+	ROM_REGION( 0x080000, "gfx4", ROMREGION_DISPOSE ) /* Sprites */
+	ROM_LOAD( "23ver1.bin", 0x000000, 0x080000, CRC(0ca09432) SHA1(c9b12d564032c2a668e18ba95fd71ab540e798ce) )
+
+	ROM_REGION( 0x040000, "oki1", 0 )		/* Samples */
+	ROM_LOAD( "10ver1.bin", 0x000000, 0x020000, CRC(3848a32e) SHA1(3d1562d71f25a4f7a3ee2f42222f37f906226082) ) // matches first half of japan rom, check size
+
+	ROM_REGION( 0x040000, "oki2", 0 )		/* Samples */
+	ROM_LOAD( "8ver1.bin",  0x000000, 0x020000, CRC(b5076706) SHA1(95478083817a4ce153c16f1d57237054089c2fee) )  // matches first half of japan rom, check size
+
+	ROM_REGION( 0x0200, "proms", 0 )		/* Priority PROM */
+	ROM_LOAD( "pr-91023.bin",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
+ROM_END
+
 
 ROM_START( soldamj )
 	ROM_REGION( 0x60000, "main", 0 )		/* Main CPU Code */
@@ -4018,11 +4053,19 @@ static DRIVER_INIT( rodlandj )
 	astyanax_rom_decode(machine, "main");
 }
 
-static DRIVER_INIT( soldam )
+static DRIVER_INIT( soldamj )
 {
 	astyanax_rom_decode(machine, "main");
+	
+	/* Sprite RAM is mirrored */
+	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
+}
 
-	/* Sprite RAM is mirrored. Why? */
+static DRIVER_INIT( soldam )
+{
+	phantasm_rom_decode(machine, "main");
+	
+	/* Sprite RAM is mirrored */
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
 
@@ -4080,7 +4123,8 @@ GAME( 1991, edf,      0,        system_B,          edf,      edf,      ROT0,   "
 GAME( 1991, edfu,     edf,      system_B,          edf,      edf,      ROT0,   "Jaleco", "E.D.F. : Earth Defense Force (North America)", 0 )
 GAME( 1991, 64street, 0,        system_C,          64street, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (World)", 0 )
 GAME( 1991, 64streej, 64street, system_C,          64street, 64street, ROT0,   "Jaleco", "64th. Street - A Detective Story (Japan)", 0 )
-GAME( 1992, soldamj,  0,        system_A,          soldamj,  soldam,   ROT0,   "Jaleco", "Soldam (Japan)", 0 )
+GAME( 1992, soldam,   0,        system_A,          soldamj,  soldam,   ROT0,   "Jaleco", "Soldam", 0 )
+GAME( 1992, soldamj,  soldam,   system_A,          soldamj,  soldamj,  ROT0,   "Jaleco", "Soldam (Japan)", 0 )
 GAME( 1992, bigstrik, 0,        system_C,          bigstrik, bigstrik, ROT0,   "Jaleco", "Big Striker", 0 )
 GAME( 1993, chimerab, 0,        system_C,          chimerab, chimerab, ROT0,   "Jaleco", "Chimera Beast (prototype)", 0 )
 GAME( 1993, cybattlr, 0,        system_C,          cybattlr, cybattlr, ROT90,  "Jaleco", "Cybattler", 0 )
