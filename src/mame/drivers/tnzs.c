@@ -1648,7 +1648,7 @@ static MACHINE_DRIVER_START( arknoid2 )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1687,7 +1687,7 @@ static MACHINE_DRIVER_START( drtoppel )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1727,9 +1727,9 @@ static MACHINE_DRIVER_START( tnzs )
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
 	MDRV_CPU_ADD("mcu", I8742 ,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_IO_MAP(i8742_io_map,0) 
+	MDRV_CPU_IO_MAP(i8742_io_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1767,7 +1767,7 @@ static MACHINE_DRIVER_START( insectx )
 	MDRV_CPU_PROGRAM_MAP(sub_readmem,sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1805,7 +1805,7 @@ static MACHINE_DRIVER_START( kageki )
 	MDRV_CPU_PROGRAM_MAP(kageki_sub_readmem,kageki_sub_writemem)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1854,7 +1854,7 @@ static MACHINE_DRIVER_START( tnzsb )
 	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map,0)
 	MDRV_CPU_IO_MAP(tnzsb_io_map,0)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	MDRV_MACHINE_RESET(tnzs)
 
@@ -1918,7 +1918,7 @@ static MACHINE_DRIVER_START( jpopnics )
 	MDRV_CPU_PROGRAM_MAP(jpopnics_sub_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
 
-	MDRV_INTERLEAVE(100)
+	MDRV_INTERLEAVE(10000)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
