@@ -8,13 +8,13 @@ static int y;
 
 INLINE void ea (void)
 {
-	while (1)
+/*	while (1)
 	{
 		if (ib == 0)
 			return;
 		ib = (READ_PDP_18BIT (y) >> 12) & 1;
 		y = READ_PDP_18BIT (y) & 07777;
-	}
+	}*/
 }
 
 #define IN if (ib) sprintf(buffer+strlen(buffer)," i")

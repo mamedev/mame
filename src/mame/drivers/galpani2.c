@@ -82,16 +82,19 @@ static MACHINE_RESET( galpani2 )
 
 static void galpani2_write_kaneko(running_machine *machine)
 {
-	cpu_write_byte(machine->cpu[0],0x100000,0x4b);
-	cpu_write_byte(machine->cpu[0],0x100001,0x41);
-	cpu_write_byte(machine->cpu[0],0x100002,0x4e);
-	cpu_write_byte(machine->cpu[0],0x100003,0x45);
-	cpu_write_byte(machine->cpu[0],0x100004,0x4b);
-	cpu_write_byte(machine->cpu[0],0x100005,0x4f);
+	const address_space *dstspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	memory_write_byte(dstspace,0x100000,0x4b);
+	memory_write_byte(dstspace,0x100001,0x41);
+	memory_write_byte(dstspace,0x100002,0x4e);
+	memory_write_byte(dstspace,0x100003,0x45);
+	memory_write_byte(dstspace,0x100004,0x4b);
+	memory_write_byte(dstspace,0x100005,0x4f);
 }
 
 void galpani2_mcu_run(running_machine *machine)
 {
+	const address_space *srcspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *dstspace = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
 	int i,x;
 
 	/* Write "KANEKO" to 100000-100005, but do not clash with ram test */
@@ -99,18 +102,20 @@ void galpani2_mcu_run(running_machine *machine)
 	x  = 0;
 
 	for (i = 0x100000; i < 0x100007; i++)
-		x |= cpu_read_byte(machine->cpu[0],i);
+		x |= memory_read_byte(srcspace,i);
 
 	if	( x == 0 )
 	{
 		galpani2_write_kaneko(machine);
-		cpu_write_byte(machine->cpu[1],0x100006,1);
+		memory_write_byte(dstspace,0x100006,1);
 		logerror("MCU executes CHECK0\n");
 	}
 }
 
 static void galpani2_mcu_nmi(running_machine *machine)
 {
+	const address_space *srcspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	const address_space *dstspace = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_src, mcu_dst, mcu_size;
 
 	/* "Last Check" */
@@ -118,11 +123,11 @@ static void galpani2_mcu_nmi(running_machine *machine)
 
 	for ( mcu_list = 0x100020; mcu_list < (0x100020 + 0x40); mcu_list += 4 )
 	{
-		mcu_command		=	cpu_read_byte(machine->cpu[0], mcu_list + 1 );
+		mcu_command		=	memory_read_byte(srcspace, mcu_list + 1 );
 
 		mcu_address		=	0x100000 +
-							(cpu_read_byte(machine->cpu[0], mcu_list + 2)<<8) +
-							(cpu_read_byte(machine->cpu[0], mcu_list + 3)<<0) ;
+							(memory_read_byte(srcspace, mcu_list + 2)<<8) +
+							(memory_read_byte(srcspace, mcu_list + 3)<<0) ;
 
 		switch (mcu_command)
 		{
@@ -130,40 +135,40 @@ static void galpani2_mcu_nmi(running_machine *machine)
 			break;
 
 		case 0x0a:	// Copy N bytes from RAM1 to RAM2
-			mcu_src		=	(cpu_read_byte(machine->cpu[0], mcu_address + 2)<<8) +
-							(cpu_read_byte(machine->cpu[0], mcu_address + 3)<<0) ;
+			mcu_src		=	(memory_read_byte(srcspace, mcu_address + 2)<<8) +
+							(memory_read_byte(srcspace, mcu_address + 3)<<0) ;
 
-			mcu_dst		=	(cpu_read_byte(machine->cpu[0], mcu_address + 6)<<8) +
-							(cpu_read_byte(machine->cpu[0], mcu_address + 7)<<0) ;
+			mcu_dst		=	(memory_read_byte(srcspace, mcu_address + 6)<<8) +
+							(memory_read_byte(srcspace, mcu_address + 7)<<0) ;
 
-			mcu_size	=	(cpu_read_byte(machine->cpu[0], mcu_address + 8)<<8) +
-							(cpu_read_byte(machine->cpu[0], mcu_address + 9)<<0) ;
+			mcu_size	=	(memory_read_byte(srcspace, mcu_address + 8)<<8) +
+							(memory_read_byte(srcspace, mcu_address + 9)<<0) ;
 
 			logerror("CPU #0 PC %06X : MCU executes command $A, %04X %02X-> %04x\n",cpu_get_pc(machine->activecpu),mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
 				mcu_src &= 0xffff;	mcu_dst &= 0xffff;
-				cpu_write_byte(machine->cpu[1],0x100000 + mcu_dst,cpu_read_byte(machine->cpu[0],0x100000 + mcu_src));
+				memory_write_byte(dstspace,0x100000 + mcu_dst,memory_read_byte(srcspace,0x100000 + mcu_src));
 				mcu_src ++;			mcu_dst ++;
 			}
 
 			/* Raise a "job done" flag */
-			cpu_write_byte(machine->cpu[0],mcu_address+0,0xff);
-			cpu_write_byte(machine->cpu[0],mcu_address+1,0xff);
+			memory_write_byte(srcspace,mcu_address+0,0xff);
+			memory_write_byte(srcspace,mcu_address+1,0xff);
 
 			break;
 
 		default:
 			/* Raise a "job done" flag */
-			cpu_write_byte(machine->cpu[0],mcu_address+0,0xff);
-			cpu_write_byte(machine->cpu[0],mcu_address+1,0xff);
+			memory_write_byte(srcspace,mcu_address+0,0xff);
+			memory_write_byte(srcspace,mcu_address+1,0xff);
 
 			logerror("CPU #0 PC %06X : MCU ERROR, unknown command %02X\n",cpu_get_pc(machine->activecpu),mcu_command);
 		}
 
 		/* Erase command? */
-		cpu_write_byte(machine->cpu[0],mcu_list + 1,0x00);
+		memory_write_byte(srcspace,mcu_list + 1,0x00);
 	}
 }
 

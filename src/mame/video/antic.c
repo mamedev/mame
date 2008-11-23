@@ -258,19 +258,22 @@ void antic_mode_0_xx(VIDEO *video)
 
 void antic_mode_2_32(VIDEO *video)
 {
-	PREPARE_TXT2(Machine->cpu[0], 32);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT2(space, 32);
 	REP32(MODE2);
 	POST_TXT(32);
 }
 void antic_mode_2_40(VIDEO *video)
 {
-	PREPARE_TXT2(Machine->cpu[0], 40);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT2(space, 40);
 	REP40(MODE2);
 	POST_TXT(40);
 }
 void antic_mode_2_48(VIDEO *video)
 {
-	PREPARE_TXT2(Machine->cpu[0], 48);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT2(space, 48);
 	REP48(MODE2);
 	POST_TXT(48);
 }
@@ -282,19 +285,22 @@ void antic_mode_2_48(VIDEO *video)
 
 void antic_mode_3_32(VIDEO *video)
 {
-	PREPARE_TXT3(Machine->cpu[0], 32);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT3(space, 32);
 	REP32(MODE3);
 	POST_TXT(32);
 }
 void antic_mode_3_40(VIDEO *video)
 {
-	PREPARE_TXT3(Machine->cpu[0], 40);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT3(space, 40);
 	REP40(MODE3);
 	POST_TXT(40);
 }
 void antic_mode_3_48(VIDEO *video)
 {
-	PREPARE_TXT3(Machine->cpu[0], 48);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT3(space, 48);
 	REP48(MODE3);
 	POST_TXT(48);
 }
@@ -306,19 +312,22 @@ void antic_mode_3_48(VIDEO *video)
 
 void antic_mode_4_32(VIDEO *video)
 {
-	PREPARE_TXT45(Machine->cpu[0], 32,0);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT45(space, 32,0);
 	REP32(MODE4);
 	POST_TXT(32);
 }
 void antic_mode_4_40(VIDEO *video)
 {
-	PREPARE_TXT45(Machine->cpu[0], 40,0);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT45(space, 40,0);
 	REP40(MODE4);
 	POST_TXT(40);
 }
 void antic_mode_4_48(VIDEO *video)
 {
-	PREPARE_TXT45(Machine->cpu[0], 48,0);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT45(space, 48,0);
 	REP48(MODE4);
 	POST_TXT(48);
 }
@@ -330,19 +339,22 @@ void antic_mode_4_48(VIDEO *video)
 
 void antic_mode_5_32(VIDEO *video)
 {
-	PREPARE_TXT45(Machine->cpu[0], 32,1);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT45(space, 32,1);
 	REP32(MODE5);
 	POST_TXT(32);
 }
 void antic_mode_5_40(VIDEO *video)
 {
-	PREPARE_TXT45(Machine->cpu[0], 40,1);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT45(space, 40,1);
 	REP40(MODE5);
 	POST_TXT(40);
 }
 void antic_mode_5_48(VIDEO *video)
 {
-	PREPARE_TXT45(Machine->cpu[0], 48,1);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT45(space, 48,1);
 	REP48(MODE5);
 	POST_TXT(48);
 }
@@ -354,19 +366,22 @@ void antic_mode_5_48(VIDEO *video)
 
 void antic_mode_6_32(VIDEO *video)
 {
-	PREPARE_TXT67(Machine->cpu[0], 16,0);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT67(space, 16,0);
 	REP16(MODE6);
 	POST_TXT(16);
 }
 void antic_mode_6_40(VIDEO *video)
 {
-	PREPARE_TXT67(Machine->cpu[0], 20,0);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT67(space, 20,0);
 	REP20(MODE6);
 	POST_TXT(20);
 }
 void antic_mode_6_48(VIDEO *video)
 {
-	PREPARE_TXT67(Machine->cpu[0], 24,0);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT67(space, 24,0);
 	REP24(MODE6);
 	POST_TXT(24);
 }
@@ -378,19 +393,22 @@ void antic_mode_6_48(VIDEO *video)
 
 void antic_mode_7_32(VIDEO *video)
 {
-	PREPARE_TXT67(Machine->cpu[0], 16,1);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT67(space, 16,1);
 	REP16(MODE7);
 	POST_TXT(16);
 }
 void antic_mode_7_40(VIDEO *video)
 {
-	PREPARE_TXT67(Machine->cpu[0], 20,1);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT67(space, 20,1);
 	REP20(MODE7);
 	POST_TXT(20);
 }
 void antic_mode_7_48(VIDEO *video)
 {
-	PREPARE_TXT67(Machine->cpu[0], 24,1);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_TXT67(space, 24,1);
 	REP24(MODE7);
 	POST_TXT(24);
 }
@@ -402,19 +420,22 @@ void antic_mode_7_48(VIDEO *video)
 
 void antic_mode_8_32(VIDEO *video)
 {
-	PREPARE_GFX8(Machine->cpu[0], 8);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX8(space, 8);
 	REP08(MODE8);
 	POST_GFX(8);
 }
 void antic_mode_8_40(VIDEO *video)
 {
-	PREPARE_GFX8(Machine->cpu[0], 10);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX8(space, 10);
 	REP10(MODE8);
 	POST_GFX(10);
 }
 void antic_mode_8_48(VIDEO *video)
 {
-	PREPARE_GFX8(Machine->cpu[0], 12);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX8(space, 12);
 	REP12(MODE8);
 	POST_GFX(12);
 }
@@ -426,19 +447,22 @@ void antic_mode_8_48(VIDEO *video)
 
 void antic_mode_9_32(VIDEO *video)
 {
-	PREPARE_GFX9BC(Machine->cpu[0], 16);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX9BC(space, 16);
 	REP16(MODE9);
 	POST_GFX(16);
 }
 void antic_mode_9_40(VIDEO *video)
 {
-	PREPARE_GFX9BC(Machine->cpu[0], 20);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX9BC(space, 20);
 	REP20(MODE9);
 	POST_GFX(20);
 }
 void antic_mode_9_48(VIDEO *video)
 {
-	PREPARE_GFX9BC(Machine->cpu[0], 24);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX9BC(space, 24);
 	REP24(MODE9);
 	POST_GFX(24);
 }
@@ -450,19 +474,22 @@ void antic_mode_9_48(VIDEO *video)
 
 void antic_mode_a_32(VIDEO *video)
 {
-	PREPARE_GFXA(Machine->cpu[0], 16);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXA(space, 16);
 	REP16(MODEA);
 	POST_GFX(16);
 }
 void antic_mode_a_40(VIDEO *video)
 {
-	PREPARE_GFXA(Machine->cpu[0], 20);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXA(space, 20);
 	REP20(MODEA);
 	POST_GFX(20);
 }
 void antic_mode_a_48(VIDEO *video)
 {
-	PREPARE_GFXA(Machine->cpu[0], 24);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXA(space, 24);
 	REP24(MODEA);
 	POST_GFX(24);
 }
@@ -474,19 +501,22 @@ void antic_mode_a_48(VIDEO *video)
 
 void antic_mode_b_32(VIDEO *video)
 {
-	PREPARE_GFX9BC(Machine->cpu[0], 16);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX9BC(space, 16);
 	REP16(MODEB);
 	POST_GFX(16);
 }
 void antic_mode_b_40(VIDEO *video)
 {
-	PREPARE_GFX9BC(Machine->cpu[0], 20);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX9BC(space, 20);
 	REP20(MODEB);
 	POST_GFX(20);
 }
 void antic_mode_b_48(VIDEO *video)
 {
-	PREPARE_GFX9BC(Machine->cpu[0], 24);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX9BC(space, 24);
 	REP24(MODEB);
 	POST_GFX(24);
 }
@@ -498,19 +528,22 @@ void antic_mode_b_48(VIDEO *video)
 
 void antic_mode_c_32(VIDEO *video)
 {
-	PREPARE_GFX9BC(Machine->cpu[0], 16);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX9BC(space, 16);
 	REP16(MODEC);
 	POST_GFX(16);
 }
 void antic_mode_c_40(VIDEO *video)
 {
-	PREPARE_GFX9BC(Machine->cpu[0], 20);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX9BC(space, 20);
 	REP20(MODEC);
 	POST_GFX(20);
 }
 void antic_mode_c_48(VIDEO *video)
 {
-	PREPARE_GFX9BC(Machine->cpu[0], 24);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFX9BC(space, 24);
 	REP24(MODEC);
 	POST_GFX(24);
 }
@@ -522,19 +555,22 @@ void antic_mode_c_48(VIDEO *video)
 
 void antic_mode_d_32(VIDEO *video)
 {
-	PREPARE_GFXDE(Machine->cpu[0], 32);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXDE(space, 32);
 	REP32(MODED);
 	POST_GFX(32);
 }
 void antic_mode_d_40(VIDEO *video)
 {
-	PREPARE_GFXDE(Machine->cpu[0], 40);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXDE(space, 40);
 	REP40(MODED);
 	POST_GFX(40);
 }
 void antic_mode_d_48(VIDEO *video)
 {
-	PREPARE_GFXDE(Machine->cpu[0], 48);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXDE(space, 48);
 	REP48(MODED);
 	POST_GFX(48);
 }
@@ -546,19 +582,22 @@ void antic_mode_d_48(VIDEO *video)
 
 void antic_mode_e_32(VIDEO *video)
 {
-	PREPARE_GFXDE(Machine->cpu[0], 32);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXDE(space, 32);
 	REP32(MODEE);
 	POST_GFX(32);
 }
 void antic_mode_e_40(VIDEO *video)
 {
-	PREPARE_GFXDE(Machine->cpu[0], 40);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXDE(space, 40);
 	REP40(MODEE);
 	POST_GFX(40);
 }
 void antic_mode_e_48(VIDEO *video)
 {
-	PREPARE_GFXDE(Machine->cpu[0], 48);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXDE(space, 48);
 	REP48(MODEE);
 	POST_GFX(48);
 }
@@ -570,19 +609,22 @@ void antic_mode_e_48(VIDEO *video)
 
 void antic_mode_f_32(VIDEO *video)
 {
-	PREPARE_GFXF(Machine->cpu[0], 32);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXF(space, 32);
 	REP32(MODEF);
 	POST_GFX(32);
 }
 void antic_mode_f_40(VIDEO *video)
 {
-	PREPARE_GFXF(Machine->cpu[0], 40);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXF(space, 40);
 	REP40(MODEF);
 	POST_GFX(40);
 }
 void antic_mode_f_48(VIDEO *video)
 {
-	PREPARE_GFXF(Machine->cpu[0], 48);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXF(space, 48);
 	REP48(MODEF);
 	POST_GFX(48);
 }

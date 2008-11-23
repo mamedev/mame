@@ -1071,19 +1071,22 @@ void gtia_render(VIDEO *video)
 
 void gtia_mode_1_32(VIDEO *video)
 {
-	PREPARE_GFXG1(Machine->cpu[0], 32);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXG1(space, 32);
 	REP32(GTIA1);
 	POST_GFX(32);
 }
 void gtia_mode_1_40(VIDEO *video)
 {
-	PREPARE_GFXG1(Machine->cpu[0], 40);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXG1(space, 40);
 	REP40(GTIA1);
 	POST_GFX(40);
 }
 void gtia_mode_1_48(VIDEO *video)
 {
-	PREPARE_GFXG1(Machine->cpu[0], 48);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXG1(space, 48);
 	REP48(GTIA1);
 	POST_GFX(48);
 }
@@ -1095,19 +1098,22 @@ void gtia_mode_1_48(VIDEO *video)
 
 void gtia_mode_2_32(VIDEO *video)
 {
-	PREPARE_GFXG2(Machine->cpu[0], 32);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXG2(space, 32);
 	REP32(GTIA2);
 	POST_GFX(32);
 }
 void gtia_mode_2_40(VIDEO *video)
 {
-	PREPARE_GFXG2(Machine->cpu[0], 40);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXG2(space, 40);
 	REP40(GTIA2);
 	POST_GFX(40);
 }
 void gtia_mode_2_48(VIDEO *video)
 {
-	PREPARE_GFXG2(Machine->cpu[0], 48);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXG2(space, 48);
 	REP48(GTIA2);
 	POST_GFX(48);
 }
@@ -1119,19 +1125,22 @@ void gtia_mode_2_48(VIDEO *video)
 
 void gtia_mode_3_32(VIDEO *video)
 {
-	PREPARE_GFXG3(Machine->cpu[0], 32);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXG3(space, 32);
 	REP32(GTIA3);
 	POST_GFX(32);
 }
 void gtia_mode_3_40(VIDEO *video)
 {
-	PREPARE_GFXG3(Machine->cpu[0], 40);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXG3(space, 40);
 	REP40(GTIA3);
 	POST_GFX(40);
 }
 void gtia_mode_3_48(VIDEO *video)
 {
-	PREPARE_GFXG3(Machine->cpu[0], 48);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	PREPARE_GFXG3(space, 48);
 	REP48(GTIA3);
 	POST_GFX(48);
 }

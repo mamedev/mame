@@ -289,15 +289,8 @@ enum _cpu_type
 	CPU_TMS34020,
 	CPU_TI990_10,
 	CPU_TMS9900,
-	CPU_TMS9940,
 	CPU_TMS9980,
-	CPU_TMS9985,
-	CPU_TMS9989,
 	CPU_TMS9995,
-	CPU_TMS99100,
-	CPU_TMS99105A,
-	CPU_TMS99110A,
-	CPU_TMS99000,
 	CPU_Z8000,
 	CPU_TMS32010,
 	CPU_TMS32025,
@@ -728,12 +721,6 @@ int cpu_execute(const device_config *cpu, int cycles);
 
 /* signal a reset for a given CPU */
 void cpu_reset(const device_config *cpu);
-
-/* read a byte from another CPU's memory space */
-UINT8 cpu_read_byte(const device_config *cpu, offs_t address);
-
-/* write a byte from another CPU's memory space */
-void cpu_write_byte(const device_config *cpu, offs_t address, UINT8 data);
 
 /* return the PC, corrected to a byte offset and translated to physical space, on a given CPU */
 offs_t cpu_get_physical_pc_byte(const device_config *cpu);

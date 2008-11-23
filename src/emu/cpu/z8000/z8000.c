@@ -468,6 +468,8 @@ static CPU_RESET( z8000 )
 	memset(&Z, 0, sizeof(z8000_Regs));
 	Z.irq_callback = save_irqcallback;
 	Z.device = device;
+	Z.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	Z.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	FCW = RDMEM_W( 2 ); /* get reset FCW */
 	PC	= RDMEM_W( 4 ); /* get reset PC  */
 	change_pc(PC);

@@ -80,7 +80,6 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
-#include "cpu/tms34010/34010ops.h"
 #include "sound/upd7759.h"
 #include "jpmimpct.h"
 #include "machine/meters.h"

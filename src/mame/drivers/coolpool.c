@@ -26,7 +26,6 @@
 
 #include "driver.h"
 #include "cpu/tms34010/tms34010.h"
-#include "cpu/tms34010/34010ops.h"
 #include "cpu/tms32025/tms32025.h"
 #include "video/tlc34076.h"
 #include "sound/dac.h"

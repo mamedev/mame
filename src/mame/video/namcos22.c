@@ -2411,6 +2411,7 @@ WRITE16_HANDLER( namcos22_dspram16_w )
 static void
 Dump( FILE *f, unsigned addr1, unsigned addr2, const char *name )
 {
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
    unsigned addr;
    fprintf( f, "%s:\n", name );
    for( addr=addr1; addr<=addr2; addr+=16 )
@@ -2420,7 +2421,7 @@ Dump( FILE *f, unsigned addr1, unsigned addr2, const char *name )
       int i;
       for( i=0; i<16; i++ )
       {
-         data[i] = cpu_read_byte(Machine->cpu[0], addr+i );
+         data[i] = memory_read_byte(space, addr+i );
          if( data[i] )
          {
             bHasNonZero = 1;

@@ -257,9 +257,10 @@ WRITE16_HANDLER( hdsnd68k_320ram_w )
 
 READ16_HANDLER( hdsnd68k_320ports_r )
 {
+	const address_space *iospace = cpu_get_address_space(space->machine->cpu[hdcpu_sounddsp], ADDRESS_SPACE_IO);
 	UINT16 result;
-	cpu_push_context(space->machine->cpu[hdcpu_sounddsp]);
-	result = TMS32010_In(offset & 7);
+	cpu_push_context(iospace->cpu);
+	result = memory_read_word(iospace, (offset & 7) << 1);
 	cpu_pop_context();
 	return result;
 }
@@ -267,8 +268,9 @@ READ16_HANDLER( hdsnd68k_320ports_r )
 
 WRITE16_HANDLER( hdsnd68k_320ports_w )
 {
-	cpu_push_context(space->machine->cpu[hdcpu_sounddsp]);
-	TMS32010_Out(offset & 7, data);
+	const address_space *iospace = cpu_get_address_space(space->machine->cpu[hdcpu_sounddsp], ADDRESS_SPACE_IO);
+	cpu_push_context(iospace->machine->cpu[hdcpu_sounddsp]);
+	memory_write_word(iospace, (offset & 7) << 1, data);
 	cpu_pop_context();
 }
 

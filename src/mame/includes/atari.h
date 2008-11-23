@@ -309,39 +309,39 @@ typedef struct {
 	UINT8   *uc_g3;				/* used colors for gfx GTIA 3 */
 }   ANTIC;
 
-#define RDANTIC(cpu)	cpu_read_byte(cpu, antic.dpage+antic.doffs)
-#define RDVIDEO(cpu,o)	cpu_read_byte(cpu, antic.vpage+((antic.voffs+(o))&VOFFS))
-#define RDCHGEN(cpu,o)	cpu_read_byte(cpu, antic.chbase+(o))
-#define RDPMGFXS(cpu,o) cpu_read_byte(cpu, antic.pmbase_s+(o)+(antic.scanline>>1))
-#define RDPMGFXD(cpu,o) cpu_read_byte(cpu, antic.pmbase_d+(o)+antic.scanline)
+#define RDANTIC(space)		memory_read_byte(space, antic.dpage+antic.doffs)
+#define RDVIDEO(space,o)	memory_read_byte(space, antic.vpage+((antic.voffs+(o))&VOFFS))
+#define RDCHGEN(space,o)	memory_read_byte(space, antic.chbase+(o))
+#define RDPMGFXS(space,o) 	memory_read_byte(space, antic.pmbase_s+(o)+(antic.scanline>>1))
+#define RDPMGFXD(space,o) 	memory_read_byte(space, antic.pmbase_d+(o)+antic.scanline)
 
 #define PREPARE()												\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET]
 
-#define PREPARE_TXT2(cpu,width)									\
+#define PREPARE_TXT2(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
 	{															\
-		UINT16 ch = RDVIDEO(cpu,i) << 3;						\
+		UINT16 ch = RDVIDEO(space,i) << 3;						\
 		if( ch & 0x400 )										\
 		{														\
-			ch = RDCHGEN(cpu,(ch & 0x3f8) + antic.w.chbasl);	\
+			ch = RDCHGEN(space,(ch & 0x3f8) + antic.w.chbasl);	\
 			ch = (ch ^ antic.chxor) & antic.chand;				\
 		}														\
 		else													\
 		{														\
-			ch = RDCHGEN(cpu,ch + antic.w.chbasl);				\
+			ch = RDCHGEN(space,ch + antic.w.chbasl);			\
 		}														\
 		video->data[i] = ch;									\
 	}
 
-#define PREPARE_TXT3(cpu,width)									\
+#define PREPARE_TXT3(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
 	{															\
-		UINT16 ch = RDVIDEO(cpu,i) << 3;						\
+		UINT16 ch = RDVIDEO(space,i) << 3;						\
 		if( ch & 0x400 )										\
 		{														\
 			ch &= 0x3f8;										\
@@ -350,14 +350,14 @@ typedef struct {
 				if (antic.w.chbasl < 2) /* first two lines empty */ \
 					ch = 0x00;									\
 				else /* lines 2..7 are standard, 8&9 are 0&1 */ \
-					ch = RDCHGEN(cpu,ch + (antic.w.chbasl & 7));\
+					ch = RDCHGEN(space,ch + (antic.w.chbasl & 7));\
 			}													\
 			else												\
 			{													\
 				if (antic.w.chbasl > 7) /* last two lines empty */	\
 					ch = 0x00;									\
 				else /* lines 0..7 are standard */				\
-					ch = RDCHGEN(cpu,ch + antic.w.chbasl);		\
+					ch = RDCHGEN(space,ch + antic.w.chbasl);		\
 			}													\
 			ch = (ch ^ antic.chxor) & antic.chand;				\
 		}														\
@@ -368,87 +368,87 @@ typedef struct {
 				if (antic.w.chbasl < 2) /* first two lines empty */ \
 					ch = 0x00;									\
 				else /* lines 2..7 are standard, 8&9 are 0&1 */ \
-					ch = RDCHGEN(cpu,ch + (antic.w.chbasl & 7));\
+					ch = RDCHGEN(space,ch + (antic.w.chbasl & 7));\
 			}													\
 			else												\
 			{													\
 				if (antic.w.chbasl > 7) /* last two lines empty */	\
 					ch = 0x00;									\
 				else /* lines 0..7 are standard */				\
-					ch = RDCHGEN(cpu,ch + antic.w.chbasl);		\
+					ch = RDCHGEN(space,ch + antic.w.chbasl);		\
 			}													\
 		}														\
         video->data[i] = ch;                                    \
 	}
 
-#define PREPARE_TXT45(cpu,width,shift)							\
+#define PREPARE_TXT45(space,width,shift)							\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
 	{															\
-		UINT16 ch = RDVIDEO(cpu,i) << 3;						\
-		ch = ((ch>>2)&0x100)|RDCHGEN(cpu,(ch&0x3f8)+(antic.w.chbasl>>shift)); \
+		UINT16 ch = RDVIDEO(space,i) << 3;						\
+		ch = ((ch>>2)&0x100)|RDCHGEN(space,(ch&0x3f8)+(antic.w.chbasl>>shift)); \
 		video->data[i] = ch;									\
 	}
 
 
-#define PREPARE_TXT67(cpu,width,shift)							\
+#define PREPARE_TXT67(space,width,shift)							\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
 	{															\
-		UINT16 ch = RDVIDEO(cpu,i) << 3;						\
-		ch = (ch&0x600)|(RDCHGEN(cpu,(ch&0x1f8)+(antic.w.chbasl>>shift))<<1); \
+		UINT16 ch = RDVIDEO(space,i) << 3;						\
+		ch = (ch&0x600)|(RDCHGEN(space,(ch&0x1f8)+(antic.w.chbasl>>shift))<<1); \
 		video->data[i] = ch;									\
 	}
 
-#define PREPARE_GFX8(cpu,width)                                 \
+#define PREPARE_GFX8(space,width)                                 \
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(cpu,i) << 2
+		video->data[i] = RDVIDEO(space,i) << 2
 
-#define PREPARE_GFX9BC(cpu,width)								\
+#define PREPARE_GFX9BC(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(cpu,i) << 1
+		video->data[i] = RDVIDEO(space,i) << 1
 
-#define PREPARE_GFXA(cpu,width) 								\
+#define PREPARE_GFXA(space,width) 								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(cpu,i) << 1
+		video->data[i] = RDVIDEO(space,i) << 1
 
-#define PREPARE_GFXDE(cpu,width)								\
+#define PREPARE_GFXDE(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(cpu,i)
+		video->data[i] = RDVIDEO(space,i)
 
-#define PREPARE_GFXF(cpu,width) 								\
+#define PREPARE_GFXF(space,width) 								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(cpu,i)
+		video->data[i] = RDVIDEO(space,i)
 
-#define PREPARE_GFXG1(cpu,width)								\
+#define PREPARE_GFXG1(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(cpu,i)
+		video->data[i] = RDVIDEO(space,i)
 
-#define PREPARE_GFXG2(cpu,width)								\
+#define PREPARE_GFXG2(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(cpu,i)
+		video->data[i] = RDVIDEO(space,i)
 
-#define PREPARE_GFXG3(cpu,width)								\
+#define PREPARE_GFXG3(space,width)								\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET];			\
     int i;                                                      \
 	for( i = 0; i < width; i++ )								\
-		video->data[i] = RDVIDEO(cpu,i)
+		video->data[i] = RDVIDEO(space,i)
 
 /******************************************************************
  * common end of a single antic/gtia mode emulation function

@@ -24,7 +24,6 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/tms34010/tms34010.h"
-#include "cpu/tms34010/34010ops.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"

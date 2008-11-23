@@ -34,8 +34,8 @@ CPU_DISASSEMBLE( v810 )
 	UINT32 flags = 0;
 	UINT32 opc,opc2;
 	unsigned size;
-	opc = R_OP(pc);
-	opc2 = R_OP(pc+2);
+	opc = oprom[0] | (oprom[1] << 8);
+	opc2 = oprom[2] | (oprom[3] << 8);
 
 	switch(opc>>10)
 	{

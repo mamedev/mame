@@ -124,14 +124,8 @@ CPU_GET_INFO( tms34010 );
 CPU_GET_INFO( tms34020 );
 CPU_GET_INFO( ti990_10 );
 CPU_GET_INFO( tms9900 );
-CPU_GET_INFO( tms9940 );
 CPU_GET_INFO( tms9980a );
-CPU_GET_INFO( tms9985 );
-CPU_GET_INFO( tms9989 );
 CPU_GET_INFO( tms9995 );
-CPU_GET_INFO( tms99105a );
-CPU_GET_INFO( tms99110a );
-CPU_GET_INFO( tms99000 );
 CPU_GET_INFO( z8000 );
 CPU_GET_INFO( tms32010 );
 CPU_GET_INFO( tms32025 );
@@ -526,29 +520,11 @@ static const struct
 #if (HAS_TMS9900)
 	{ CPU_TMS9900, CPU_GET_INFO_NAME(tms9900) },
 #endif
-#if (HAS_TMS9940)
-	{ CPU_TMS9940, CPU_GET_INFO_NAME(tms9940) },
-#endif
 #if (HAS_TMS9980)
 	{ CPU_TMS9980, CPU_GET_INFO_NAME(tms9980a) },
 #endif
-#if (HAS_TMS9985)
-	{ CPU_TMS9985, CPU_GET_INFO_NAME(tms9985) },
-#endif
-#if (HAS_TMS9989)
-	{ CPU_TMS9989, CPU_GET_INFO_NAME(tms9989) },
-#endif
 #if (HAS_TMS9995)
 	{ CPU_TMS9995, CPU_GET_INFO_NAME(tms9995) },
-#endif
-#if (HAS_TMS99105A)
-	{ CPU_TMS99105A, CPU_GET_INFO_NAME(tms99105a) },
-#endif
-#if (HAS_TMS99110A)
-	{ CPU_TMS99110A, CPU_GET_INFO_NAME(tms99110a) },
-#endif
-#if (HAS_TMS99000)
-	{ CPU_TMS99000, CPU_GET_INFO_NAME(tms99000) },
 #endif
 #if (HAS_Z8000)
 	{ CPU_Z8000, CPU_GET_INFO_NAME(z8000) },
@@ -1323,35 +1299,6 @@ void cpu_reset(const device_config *device)
 	cpu_push_context(device);
 	change_pc(0);
 	(*classheader->reset)(device);
-	cpu_pop_context();
-}
-
-
-/*-------------------------------------------------
-    cpu_read_byte - read a byte from another CPU's
-    memory space
--------------------------------------------------*/
-
-UINT8 cpu_read_byte(const device_config *device, offs_t address)
-{
-	UINT8 result;
-
-	cpu_push_context(device);
-	result = program_read_byte(address);
-	cpu_pop_context();
-	return result;
-}
-
-
-/*-------------------------------------------------
-    cpu_write_byte - write a byte to another CPU's
-    memory space
--------------------------------------------------*/
-
-void cpu_write_byte(const device_config *device, offs_t address, UINT8 data)
-{
-	cpu_push_context(device);
-	program_write_byte(address, data);
 	cpu_pop_context();
 }
 

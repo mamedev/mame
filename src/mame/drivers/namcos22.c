@@ -2391,7 +2391,7 @@ static WRITE32_HANDLER( alpinesa_prot_w )
 	for(i=0;i<4;i++)
 	{
 		mAlpineSurferProtData<<=8;
-		mAlpineSurferProtData |= cpu_read_byte(space->machine->cpu[0], sptr+4+i );
+		mAlpineSurferProtData |= memory_read_byte(space, sptr+4+i );
 	}
 #endif
 } /* alpinesa_prot_w */
