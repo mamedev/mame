@@ -520,35 +520,17 @@ DRIVER_INIT( plumpop )
 
 DRIVER_INIT( extrmatn )
 {
-	UINT8 *RAM = memory_region(machine, "main");
-
 	mcu_type = MCU_EXTRMATN;
-
-	/* there's code which falls through from the fixed ROM to bank #7, I have to */
-	/* copy it there otherwise the CPU bank switching support will not catch it. */
-	memcpy(&RAM[0x08000],&RAM[0x2c000],0x4000);
 }
 
 DRIVER_INIT( arknoid2 )
 {
-	UINT8 *RAM = memory_region(machine, "main");
-
 	mcu_type = MCU_ARKANOID;
-
-	/* there's code which falls through from the fixed ROM to bank #2, I have to */
-	/* copy it there otherwise the CPU bank switching support will not catch it. */
-	memcpy(&RAM[0x08000],&RAM[0x18000],0x4000);
 }
 
 DRIVER_INIT( drtoppel )
 {
-	UINT8 *RAM = memory_region(machine, "main");
-
 	mcu_type = MCU_DRTOPPEL;
-
-	/* there's code which falls through from the fixed ROM to bank #2, I have to */
-	/* copy it there otherwise the CPU bank switching support will not catch it. */
-	memcpy(&RAM[0x08000],&RAM[0x18000],0x4000);
 
 	/* drtoppel writes to the palette RAM area even if it has PROMs! We have to patch it out. */
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xf800, 0xfbff, 0, 0, SMH_NOP);
@@ -561,25 +543,14 @@ DRIVER_INIT( chukatai )
 
 DRIVER_INIT( tnzs )
 {
-	UINT8 *RAM = memory_region(machine, "main");
 	mcu_type = MCU_TNZS;
-
-	/* there's code which falls through from the fixed ROM to bank #7, I have to */
-	/* copy it there otherwise the CPU bank switching support will not catch it. */
-	memcpy(&RAM[0x08000],&RAM[0x2c000],0x4000);
-
 	/* we need to install a kludge to avoid problems with a bug in the original code */
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
 }
 
 DRIVER_INIT( tnzsb )
 {
-	UINT8 *RAM = memory_region(machine, "main");
 	mcu_type = MCU_NONE_TNZSB;
-
-	/* there's code which falls through from the fixed ROM to bank #7, I have to */
-	/* copy it there otherwise the CPU bank switching support will not catch it. */
-	memcpy(&RAM[0x08000],&RAM[0x2c000],0x4000);
 
 	/* we need to install a kludge to avoid problems with a bug in the original code */
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xef10, 0xef10, 0, 0, tnzs_sync_kludge_w);
