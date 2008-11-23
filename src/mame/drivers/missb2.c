@@ -431,18 +431,6 @@ ROM_START( missb2 )
 	ROM_LOAD( "a71-25.bin",  0x0000, 0x0100, CRC(2d0f8545) SHA1(089c31e2f614145ef2743164f7b52ae35bc06808) )	/* video timing - taken from bublbobl */
 ROM_END
 
-/* Driver Initialization */
-
-static DRIVER_INIT( missb2 )
-{
-	UINT8 *ROM = memory_region(machine, "main");
-
-	/* in Bubble Bobble, bank 0 has code falling from 7fff to 8000,
-       so I have to copy it there because bank switching wouldn't catch it */
-	memcpy(ROM+0x08000,ROM+0x10000,0x4000);
-
-}
-
 /* Game Drivers */
 
-GAME( 1996, missb2, 0, missb2, missb2, missb2, ROT0,  "Alpha Co", "Miss Bubble 2", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1996, missb2, 0, missb2, missb2, 0, ROT0,  "Alpha Co", "Miss Bubble 2", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )

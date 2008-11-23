@@ -755,23 +755,14 @@ ROM_START( daikaiju )
 	ROM_LOAD( "a74_06.ic9",     0x0600, 0x0400, CRC(cad554e7) SHA1(7890d948bfef198309df810f8401d224224a73a1) )	/* priority */
 ROM_END
 
-static void init_common(running_machine *machine)
-{
-	UINT8 *ROM = memory_region(machine, "main");
 
-	/* an instruction at $7FFF straddles the bank switch boundary at
-       $8000 into rom bank #0 and then continues into the bank so
-       copy this bank as the CPU bank switching won't catch it */
-	memcpy(&ROM[0x08000], &ROM[0x10000], 0x2000);
-}
 
 /* coin inputs are inverted in storming */
-static DRIVER_INIT( lsasquad ) { lsasquad_invertcoin = 0x00; init_common(machine); }
-static DRIVER_INIT( storming ) { lsasquad_invertcoin = 0x0c; init_common(machine); }
-static DRIVER_INIT( daikaiju ) { init_common(machine); }
+static DRIVER_INIT( lsasquad ) { lsasquad_invertcoin = 0x00; }
+static DRIVER_INIT( storming ) { lsasquad_invertcoin = 0x0c; }
 
 
 GAME( 1986, lsasquad, 0,        lsasquad, lsasquad, lsasquad, ROT270, "Taito", "Land Sea Air Squad / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS )
 GAME( 1986, storming, lsasquad, lsasquad, lsasquad, storming, ROT270, "Taito", "Storming Party / Riku Kai Kuu Saizensen", GAME_IMPERFECT_GRAPHICS )
-GAME( 1986, daikaiju, 0,	daikaiju, daikaiju, daikaiju, ROT270, "Taito", "Daikaiju no Gyakushu", GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION)
+GAME( 1986, daikaiju, 0,	daikaiju, daikaiju, 0, ROT270, "Taito", "Daikaiju no Gyakushu", GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION)
 
