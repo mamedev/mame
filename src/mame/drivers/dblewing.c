@@ -285,20 +285,20 @@ static READ16_HANDLER ( dlbewing_prot_r )
 		case 0x2b4: return input_port_read(space->machine, "P1_P2");
 		case 0x1a8: return (input_port_read(space->machine, "DSW") & 0x4000) >> 12;//allow continue
 		case 0x3ec: return dblwings_70c_data; //score entry
+		case 0x246: return dblwings_580_data; // these three controls "perfect bonus" I suppose...
+		case 0x52e: return dblwings_580_data;
+		case 0x532: return dblwings_580_data;
 	}
 
-	printf("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask);
+//	printf("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask);
 
-	if ((offset*2)==0x0f8) return 0;// dblwings_080_data;
+	if ((offset*2)==0x0f8) return 0; // dblwings_080_data;
 	if ((offset*2)==0x104) return 0;
 	if ((offset*2)==0x10e) return 0;
 	if ((offset*2)==0x206) return 0; // dblwings_70c_data;
-	if ((offset*2)==0x246) return 0; // end of level
 	if ((offset*2)==0x25c) return 0;
 	if ((offset*2)==0x284) return 0; // 3rd player 2nd boss
 	if ((offset*2)==0x432) return 0; // boss on water level?
-	if ((offset*2)==0x52e) return 0; // end of level
-	if ((offset*2)==0x532) return 0; // end of level
 	if ((offset*2)==0x54a) return 0; // 3rd player 2nd boss
 	if ((offset*2)==0x786) return 0;
 
@@ -359,10 +359,10 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			}
 			//printf("%04x\n",dblwings_280_data);
 			return;
-		case 0x380:
+		case 0x380: // sound write
 			soundlatch_w(space,0,data&0xff);
 		 	cpu_set_input_line(space->machine->cpu[1],0,HOLD_LINE);
-			return; // sound SFX write
+			return;
 		case 0x384:
 			dblwings_384_data = data;
 			switch(dblwings_384_data)
@@ -403,6 +403,12 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			else                           { boss_3_data = 9; }
 
 			return;
+		case 0x580:
+			dblwings_580_data = data;
+			return;
+		case 0x406:
+			dblwings_406_data = data;
+			return;  // p2 inputs select screen  OK
 	}
 
 //	printf("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
@@ -410,10 +416,8 @@ static WRITE16_HANDLER( dblewing_prot_w )
 	if ((offset*2)==0x008) { dblwings_008_data = data; return; }
 	if ((offset*2)==0x080) { dblwings_080_data = data; return; } // p3 3rd boss?
 	if ((offset*2)==0x28c) { dblwings_28c_data = data; return; }
-	if ((offset*2)==0x406) { dblwings_406_data = data; return; } // p2 inputs select screen  OK
 	if ((offset*2)==0x408) { dblwings_408_data = data; return; } // 3rd player 1st level?
 	if ((offset*2)==0x40e) { dblwings_40e_data = data; return; } // 3rd player 2nd level?
-	if ((offset*2)==0x580) { dblwings_580_data = data; return; }
 	if ((offset*2)==0x608) { dblwings_608_data = data; return; }
 	if ((offset*2)==0x70c) { dblwings_70c_data = data; return; }
 	if ((offset*2)==0x78a) { dblwings_78a_data = data; return; }
