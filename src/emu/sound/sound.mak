@@ -366,6 +366,7 @@ endif
 SOUNDDEFS += -DHAS_MSM5205=$(if $(filter MSM5205,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_MSM5232=$(if $(filter MSM5232,$(SOUNDS)),1,0)
 SOUNDDEFS += -DHAS_OKIM6295=$(if $(filter OKIM6295,$(SOUNDS)),1,0)
+SOUNDDEFS += -DHAS_OKIM6258=$(if $(filter OKIM6258,$(SOUNDS)),1,0)
 
 ifneq ($(filter MSM5205,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/msm5205.o
@@ -377,6 +378,10 @@ endif
 
 ifneq ($(filter OKIM6295,$(SOUNDS)),)
 SOUNDOBJS += $(SOUNDOBJ)/okim6295.o
+endif
+
+ifneq ($(filter OKIM6258,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/okim6258.o
 endif
 
 
