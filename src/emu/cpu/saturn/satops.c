@@ -320,7 +320,6 @@ INLINE void saturn_jump_after_test(void)
 		} else {
 			saturn.pc=(saturn.pc+adr-2)&0xfffff;
 		}
-		change_pc(saturn.pc);
 	}
 }
 INLINE void saturn_st_clear_bit(void)
@@ -429,7 +428,6 @@ INLINE void saturn_jump(int adr, int jump)
 	if (jump) {
 		saturn.pc=adr;
 		saturn_ICount-=10;
-		change_pc(saturn.pc);
 	}
 }
 
@@ -439,7 +437,6 @@ INLINE void saturn_call(int adr)
 	saturn_push(saturn.pc);
 	saturn.pc=adr;
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_return(int yes)
@@ -447,7 +444,6 @@ INLINE void saturn_return(int yes)
 	if (yes) {
 		saturn.pc=saturn_pop();
 //  saturn_ICount-=10;
-		change_pc(saturn.pc);
 	}
 }
 
@@ -455,7 +451,6 @@ INLINE void saturn_return_carry_set(void)
 {
 	saturn.pc=saturn_pop();
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 	saturn.carry=1;
 }
 
@@ -463,7 +458,6 @@ INLINE void saturn_return_carry_clear(void)
 {
 	saturn.pc=saturn_pop();
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 	saturn.carry=0;
 }
 
@@ -473,7 +467,6 @@ INLINE void saturn_return_interrupt(void)
 	saturn.in_irq=0; /* set to 1 when an IRQ is taken */
 	saturn.pc=saturn_pop();
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_return_xm_set(void)
@@ -481,7 +474,6 @@ INLINE void saturn_return_xm_set(void)
 	saturn.pc=saturn_pop();
 	saturn.hst|=XM;
 //  saturn_ICount-=10;
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_pop_c(void)
@@ -498,7 +490,6 @@ INLINE void saturn_indirect_jump(int reg)
 {
 	saturn_assert(reg>=0 && reg<9);
 	saturn.pc=READ_20(S64_READ_A(reg));
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_equals_zero(int reg, int begin, int count)
@@ -649,7 +640,6 @@ INLINE void saturn_load_pc(int reg)
 {
 	saturn_assert(reg>=0 && reg<9);
 	saturn.pc=S64_READ_A(reg);
-	change_pc(saturn.pc);
 }
 
 INLINE void saturn_store_pc(int reg)
@@ -663,7 +653,6 @@ INLINE void saturn_exchange_pc(int reg)
 	int temp=saturn.pc;
 	saturn_assert(reg>=0 && reg<9);
 	saturn.pc=S64_READ_A(reg);
-	change_pc(saturn.pc);
 	S64_WRITE_A(reg, temp);
 }
 

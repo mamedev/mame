@@ -151,7 +151,6 @@ static CPU_EXECUTE(h8)
 			// bcc @xx:8
 			sdata8 = (opcode & 0xff);
 			if( h8_branch(h8, (opcode >> 8) & 0xf) == 1) h8->pc += sdata8;
-			change_pc(h8->pc);
 			break;
 		case 0x5:
 			h8_group5(h8, opcode);
@@ -1222,7 +1221,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 			h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)+4);
 			// extended mode
 			h8->pc = udata32;
-			change_pc(h8->pc);
 			H8_IFETCH_TIMING(2);
 			H8_STACK_TIMING(2);
 			H8_IOP_TIMING(2);
@@ -1240,7 +1238,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 		h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)-4);
 		h8_mem_write32(h8, h8_getreg32(h8, H8_SP), h8->pc);
 		h8->pc = h8->pc + sdata8;
-		change_pc(h8->pc);
 		H8_IFETCH_TIMING(2); H8_STACK_TIMING(2);
 		break;
 	case 0x6:
@@ -1258,7 +1255,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 				h8_setreg16(h8, H8_SP, h8_getreg16(h8, H8_SP)+2);
 
 				h8->pc = udata16;
-				change_pc(h8->pc);
 			}
 			else
 			{
@@ -1268,7 +1264,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 
 				// extended mode
 				h8->pc = udata32;
-				change_pc(h8->pc);
 			}
 			// must do this last, because set_ccr() does a check_irq()
 			h8_set_ccr(h8, (UINT8)udata16);
@@ -1299,7 +1294,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 			sdata16 = h8_mem_read16(h8, h8->pc);
 			h8->pc += 2;
 			if( h8_branch(h8, (opcode >> 4) & 0xf) == 1) h8->pc += sdata16;
-			change_pc(h8->pc);
 			H8_IOP_TIMING(2)
 		}
 		break;
@@ -1308,7 +1302,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 		address24 = h8_getreg32(h8, (opcode>>4)&7);
 		address24 &= H8_ADDR_MASK;
 		h8->pc = address24;
-		change_pc(h8->pc);
 		H8_IFETCH_TIMING(2);
 		break;
 		// jmp @aa:24
@@ -1316,7 +1309,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 		address24 = h8_mem_read32(h8, h8->pc-2);
 		address24 &= H8_ADDR_MASK;
 		h8->pc = address24;
-		change_pc(h8->pc);
 		H8_IFETCH_TIMING(2);
 		H8_IOP_TIMING(2);
 		break;
@@ -1334,7 +1326,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 			h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)-4);
 			h8_mem_write32(h8, h8_getreg32(h8, H8_SP), h8->pc+2);
 			h8->pc += sdata16 + 2;
-			change_pc(h8->pc);
 			H8_IFETCH_TIMING(2); H8_STACK_TIMING(2); H8_IOP_TIMING(2);
 		}
 		break;
@@ -1346,7 +1337,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 		h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)-4);
 		h8_mem_write32(h8, h8_getreg32(h8, H8_SP), h8->pc);
 		h8->pc = address24;
-		change_pc(h8->pc);
 		H8_STACK_TIMING(2);
 		H8_IOP_TIMING(2);
 		break;
@@ -1358,7 +1348,6 @@ static void h8_group5(h83xx_state *h8, UINT16 opcode)
 		h8_setreg32(h8, H8_SP, h8_getreg32(h8, H8_SP)-4);
 		h8_mem_write32(h8, h8_getreg32(h8, H8_SP), h8->pc+2);
 		h8->pc = address24;
-		change_pc(h8->pc);
 		H8_IFETCH_TIMING(2);
 		H8_STACK_TIMING(2);
 		H8_IOP_TIMING(2);

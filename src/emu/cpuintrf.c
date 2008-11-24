@@ -1295,7 +1295,6 @@ void cpu_reset(const device_config *device)
 	cpu_class_header *classheader = get_safe_classheader(device);
 
 	cpu_push_context(device);
-	change_pc(0);
 	(*classheader->reset)(device);
 	cpu_pop_context();
 }

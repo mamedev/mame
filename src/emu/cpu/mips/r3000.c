@@ -248,9 +248,6 @@ INLINE void generate_exception(r3000_state *r3000, int exception)
 		r3000->pc += 0x80;
 	else
 		r3000->pc += 0x180;
-
-	/* swap to the new space */
-	change_pc(r3000->pc);
 }
 
 
@@ -354,7 +351,6 @@ static void r3000_reset(r3000_state *r3000, int bigendian)
 	r3000->nextpc = ~0;
 	r3000->cpr[0][COP0_PRId] = 0x0200;
 	r3000->cpr[0][COP0_Status] = 0x0000;
-	change_pc(r3000->pc);
 }
 
 static CPU_RESET( r3000be )
@@ -702,7 +698,6 @@ static CPU_EXECUTE( r3000 )
 	r3000->icount = cycles;
 	r3000->icount -= r3000->interrupt_cycles;
 	r3000->interrupt_cycles = 0;
-	change_pc(r3000->pc);
 
 	/* check for IRQs */
 	check_irqs(r3000);
@@ -726,7 +721,6 @@ static CPU_EXECUTE( r3000 )
 		{
 			r3000->pc = r3000->nextpc;
 			r3000->nextpc = ~0;
-			change_pc(r3000->pc);
 		}
 		else
 			r3000->pc += 4;

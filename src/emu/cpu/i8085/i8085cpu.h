@@ -142,7 +142,6 @@ int q = I.AF.b.h+R; 							\
 	{															\
 		i8085_ICount -= 6;										\
 		M_POP(PC);												\
-		change_pc(I.PC.d);									\
 	}															\
 }
 
@@ -150,7 +149,6 @@ int q = I.AF.b.h+R; 							\
 #define M_JMP(cc) { 											\
 	if (cc) {													\
 		I.PC.w.l = ARG16(); 									\
-		change_pc(I.PC.d);										\
 	} else {													\
 		I.PC.w.l += 2;											\
 		i8085_ICount += (I.cputype) ? 3 : 0;					\
@@ -166,7 +164,6 @@ int q = I.AF.b.h+R; 							\
 		i8085_ICount -= (I.cputype) ? 7 : 6 ;					\
 		M_PUSH(PC); 											\
 		I.PC.d = a; 											\
-		change_pc(I.PC.d);										\
 	} else {													\
 		I.PC.w.l += 2;											\
 		i8085_ICount += (I.cputype) ? 2 : 0;					\
@@ -176,7 +173,6 @@ int q = I.AF.b.h+R; 							\
 #define M_RST(nn) { 											\
 	M_PUSH(PC); 												\
 	I.PC.d = 8 * nn;											\
-	change_pc(I.PC.d);										\
 }
 
 #define M_DSUB() {												\

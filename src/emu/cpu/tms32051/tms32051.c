@@ -161,7 +161,6 @@ static int tms_icount;
 INLINE void CHANGE_PC(UINT16 new_pc)
 {
 	tms.pc = new_pc;
-	change_pc(tms.pc << 1);
 }
 
 INLINE UINT16 PM_READ16(UINT16 address)

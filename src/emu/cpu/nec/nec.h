@@ -88,7 +88,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 /************************************************************************/
 
-#define CHANGE_PC do { EMPTY_PREFETCH(); change_pc((nec_state->sregs[PS]<<4) + nec_state->ip); } while (0)
+#define CHANGE_PC do { EMPTY_PREFETCH(); } while (0)
 
 #define SegBase(Seg) (nec_state->sregs[Seg] << 4)
 

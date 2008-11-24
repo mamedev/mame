@@ -692,8 +692,6 @@ static void nop(void)
 		return;
 	execute_one();
 	dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-	change_pc(dsp32.PC);
-
 }
 
 
@@ -702,7 +700,6 @@ static void goto_t(void)
 	UINT32 op = OP;
 	execute_one();
 	dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-	change_pc(dsp32.PC);
 }
 
 
@@ -713,7 +710,6 @@ static void goto_pl(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -725,7 +721,6 @@ static void goto_mi(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -737,7 +732,6 @@ static void goto_ne(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -749,7 +743,6 @@ static void goto_eq(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -761,7 +754,6 @@ static void goto_vc(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -773,7 +765,6 @@ static void goto_vs(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -785,7 +776,6 @@ static void goto_cc(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -797,7 +787,6 @@ static void goto_cs(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -809,7 +798,6 @@ static void goto_ge(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -821,7 +809,6 @@ static void goto_lt(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -833,7 +820,6 @@ static void goto_gt(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -845,7 +831,6 @@ static void goto_le(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -857,7 +842,6 @@ static void goto_hi(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -869,7 +853,6 @@ static void goto_ls(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -881,7 +864,6 @@ static void goto_auc(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -893,7 +875,6 @@ static void goto_aus(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -905,7 +886,6 @@ static void goto_age(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -917,7 +897,6 @@ static void goto_alt(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -929,7 +908,6 @@ static void goto_ane(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -941,7 +919,6 @@ static void goto_aeq(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -953,7 +930,6 @@ static void goto_avc(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -965,7 +941,6 @@ static void goto_avs(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -977,7 +952,6 @@ static void goto_agt(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -989,7 +963,6 @@ static void goto_ale(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -1100,7 +1073,6 @@ static void dec_goto(void)
 		UINT32 op = OP;
 		execute_one();
 		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-		change_pc(dsp32.PC);
 	}
 }
 
@@ -1113,7 +1085,6 @@ static void call(void)
 		dsp32.r[mr] = dsp32.PC + 4;
 	execute_one();
 	dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
-	change_pc(dsp32.PC);
 }
 
 
@@ -1122,7 +1093,6 @@ static void goto24(void)
 	UINT32 op = OP;
 	execute_one();
 	dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (op & 0xffff) + ((op >> 5) & 0xff0000));
-	change_pc(dsp32.PC);
 }
 
 
@@ -1134,7 +1104,6 @@ static void call24(void)
 		dsp32.r[mr] = dsp32.PC + 4;
 	execute_one();
 	dsp32.PC = (op & 0xffff) + ((op >> 5) & 0xff0000);
-	change_pc(dsp32.PC);
 }
 
 

@@ -697,7 +697,6 @@ void sh2_exception(const char *message, int irqline)
 
 	/* fetch PC */
 	sh2->pc = RL( sh2, sh2->vbr + vector * 4 );
-	change_pc(sh2->pc & AM);
 	#endif
 }
 

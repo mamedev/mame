@@ -130,7 +130,6 @@ static CPU_RESET( minx )
 	regs.halted = regs.interrupt_pending = 0;
 
 	regs.PC = rd16( 0 );
-	change_pc( regs.PC );
 }
 
 

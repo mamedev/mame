@@ -131,7 +131,6 @@ static PAIR ea;         /* effective address */
 		}																\
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */		\
 		PCD = RM16(0xfff6); 											\
-		change_pc(PC);					/* TS 971002 */ 				\
 		(void)(*konami.irq_callback)(konami.device, KONAMI_FIRQ_LINE);	\
 	}																	\
 	else																\
@@ -159,7 +158,6 @@ static PAIR ea;         /* effective address */
 		}																\
 		CC |= CC_II;					/* inhibit IRQ */				\
 		PCD = RM16(0xfff8); 											\
-		change_pc(PC);					/* TS 971002 */ 				\
 		(void)(*konami.irq_callback)(konami.device, KONAMI_IRQ_LINE);	\
 	}
 
@@ -291,7 +289,6 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 	if( f ) 							\
 	{									\
 		PC += SIGNED(t);				\
-		change_pc(PC);	/* TS 971002 */ \
 	}									\
 }
 
@@ -302,7 +299,6 @@ CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N,CC_N
 	{									\
 		konami_ICount -= 1;				\
 		PC += t.w.l;					\
-		change_pc(PC);	/* TS 971002 */ \
 	}									\
 }
 
@@ -381,7 +377,6 @@ static CPU_SET_CONTEXT( konami )
 {
 	if( src )
 		konami = *(konami_Regs*)src;
-    change_pc(PC);    /* TS 971002 */
 
     CHECK_IRQ_LINES;
 }
@@ -422,7 +417,6 @@ static CPU_RESET( konami )
     CC |= CC_IF;        /* FIRQ disabled */
 
 	PCD = RM16(0xfffe);
-    change_pc(PC);    /* TS 971002 */
 }
 
 static CPU_EXIT( konami )
@@ -467,7 +461,6 @@ static void set_irq_line(int irqline, int state)
 		}
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
 		PCD = RM16(0xfffc);
-		change_pc(PC);					/* TS 971002 */
 	}
 	else if (irqline < 2)
 	{
@@ -533,7 +526,7 @@ static CPU_SET_INFO( konami )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + KONAMI_PC:			PC = info->i; change_pc(PC);			break;
+		case CPUINFO_INT_REGISTER + KONAMI_PC:			PC = info->i; 							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + KONAMI_S:			S = info->i;							break;
 		case CPUINFO_INT_REGISTER + KONAMI_CC:			CC = info->i; CHECK_IRQ_LINES;			break;

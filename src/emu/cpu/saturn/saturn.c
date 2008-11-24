@@ -138,7 +138,6 @@ static CPU_RESET( saturn )
 	saturn.sleeping = 0;
 	saturn.irq_enable = 0;
 	saturn.in_irq = 0;
-	change_pc(saturn.pc);
 }
 
 static CPU_GET_CONTEXT( saturn )
@@ -152,7 +151,6 @@ static CPU_SET_CONTEXT( saturn )
 	if( src )
 	{
 		saturn = *(Saturn_Regs*)src;
-		change_pc(saturn.pc);
 	}
 }
 
@@ -169,14 +167,11 @@ INLINE void saturn_take_irq(void)
 	LOG(("Saturn#%d takes IRQ ($%04x)\n", cpunum_get_active(), saturn.pc));
 
 	if (saturn.irq_callback) (*saturn.irq_callback)(saturn.device, SATURN_IRQ_LINE);
-	change_pc(saturn.pc);
 }
 
 static CPU_EXECUTE( saturn )
 {
 	saturn_ICount = cycles;
-
-	change_pc(saturn.pc);
 
 	do
 	{
@@ -261,7 +256,7 @@ static CPU_SET_INFO( saturn )
  	        case CPUINFO_INT_INPUT_STATE + SATURN_WAKEUP_LINE:	saturn_set_wakeup_line(info->i);	break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SATURN_PC:			saturn.pc = info->i; change_pc(saturn.pc);				break;
+		case CPUINFO_INT_REGISTER + SATURN_PC:			saturn.pc = info->i; 							break;
 		case CPUINFO_INT_REGISTER + SATURN_D0:			saturn.d[0] = info->i;							break;
 		case CPUINFO_INT_REGISTER + SATURN_D1:			saturn.d[1] = info->i;							break;
   	        case CPUINFO_INT_REGISTER + SATURN_A:			IntReg64(saturn.reg[A], info->i);							break;

@@ -106,7 +106,7 @@ void m37710_state_load(void *file);
 #define m37710_read_8_immediate(A)		memory_read_byte_16le(m37710i_cpu->program, A)
 #define m37710_read_16(addr) 			memory_read_word_16le(m37710i_cpu->program, addr)
 #define m37710_write_16(addr,data)		memory_write_word_16le(m37710i_cpu->program, addr,data)
-#define m37710_jumping(A)			change_pc(A)
+#define m37710_jumping(A)
 #define m37710_branching(A)
 
 

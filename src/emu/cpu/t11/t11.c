@@ -224,7 +224,6 @@ static void t11_check_irqs(void)
 		PUSH(PC);
 		PCD = new_pc;
 		PSW = new_psw;
-		change_pc(PC);
 		t11_check_irqs();
 
 		/* count cycles and clear the WAIT flag */
@@ -273,7 +272,6 @@ static CPU_SET_CONTEXT( t11 )
 {
 	if (src)
 		t11 = *(t11_Regs *)src;
-	change_pc(PC);
 	t11_check_irqs();
 }
 
@@ -337,7 +335,6 @@ static CPU_RESET( t11 )
 
 	/* initial PC comes from the setup word */
 	PC = t11.initial_pc;
-	change_pc(PC);
 
 	/* PSW starts off at highest priority */
 	PSW = 0xe0;
@@ -433,7 +430,7 @@ static CPU_SET_INFO( t11 )
 		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:		set_irq_line(T11_IRQ3, info->i);		break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + T11_PC:				PC = info->i; change_pc(PC); 			break;
+		case CPUINFO_INT_REGISTER + T11_PC:				PC = info->i; 				 			break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + T11_SP:				SP = info->i;							break;
 		case CPUINFO_INT_REGISTER + T11_PSW:			PSW = info->i;							break;

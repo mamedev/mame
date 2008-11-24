@@ -213,8 +213,6 @@ static void ppc_bx(UINT32 op)
 	if( LKBIT ) {
 		LR = ppc.pc + 4;
 	}
-
-	change_pc(ppc.npc);
 }
 
 static void ppc_bcx(UINT32 op)
@@ -227,8 +225,6 @@ static void ppc_bcx(UINT32 op)
 		} else {
 			ppc.npc = ppc.pc + (SIMM16 & ~0x3);
 		}
-
-		change_pc(ppc.npc);
 	}
 
 	if( LKBIT ) {
@@ -242,7 +238,6 @@ static void ppc_bcctrx(UINT32 op)
 
 	if( condition ) {
 		ppc.npc = CTR & ~0x3;
-		change_pc(ppc.npc);
 	}
 
 	if( LKBIT ) {
@@ -256,7 +251,6 @@ static void ppc_bclrx(UINT32 op)
 
 	if( condition ) {
 		ppc.npc = LR & ~0x3;
-		change_pc(ppc.npc);
 	}
 
 	if( LKBIT ) {
@@ -1018,8 +1012,6 @@ static void ppc_rfi(UINT32 op)
 	ppc.npc = ppc_get_spr(SPR_SRR0);
 	msr = ppc_get_spr(SPR_SRR1);
 	ppc_set_msr( msr );
-
-	change_pc(ppc.npc);
 }
 
 static void ppc_rlwimix(UINT32 op)

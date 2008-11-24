@@ -1137,14 +1137,12 @@ INLINE void m68ki_fake_pull_32(m68ki_cpu_core *m68k)
 INLINE void m68ki_jump(m68ki_cpu_core *m68k, UINT32 new_pc)
 {
 	REG_PC = new_pc;
-	change_pc(REG_PC);
 }
 
 INLINE void m68ki_jump_vector(m68ki_cpu_core *m68k, UINT32 vector)
 {
 	REG_PC = (vector<<2) + m68k->vbr;
 	REG_PC = m68ki_read_data_32(m68k, REG_PC);
-	change_pc(REG_PC);
 }
 
 
@@ -1166,7 +1164,6 @@ INLINE void m68ki_branch_16(m68ki_cpu_core *m68k, UINT32 offset)
 INLINE void m68ki_branch_32(m68ki_cpu_core *m68k, UINT32 offset)
 {
 	REG_PC += offset;
-	change_pc(REG_PC);
 }
 
 

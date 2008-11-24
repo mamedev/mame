@@ -245,7 +245,6 @@ INLINE void pull_pc_psw(mcs48_state *mcs48)
 	PSW = (mcs48->pc.b.h & 0xf0) | 0x08 | sp;
 	mcs48->pc.b.h &= 0x0f;
 	update_regptr(mcs48);
-	change_pc(PC);
 }
 
 
@@ -260,7 +259,6 @@ INLINE void pull_pc(mcs48_state *mcs48)
 	mcs48->pc.b.l = ram_r(8 + 2*sp);
 	mcs48->pc.b.h = ram_r(9 + 2*sp) & 0x0f;
 	PSW = (PSW & 0xf0) | 0x08 | sp;
-	change_pc(PC);
 }
 
 
@@ -307,7 +305,6 @@ INLINE void execute_jmp(mcs48_state *mcs48, UINT16 address)
 {
 	UINT16 a11 = (mcs48->irq_in_progress) ? 0 : mcs48->a11;
 	PC = address | a11;
-	change_pc(PC);
 }
 
 
@@ -334,7 +331,6 @@ INLINE void execute_jcc(mcs48_state *mcs48, UINT8 result)
 	if (result != 0)
 	{
 		PC = ((PC - 1) & 0xf00) | offset;
-		change_pc(PC);
 	}
 	else
 		ADJUST_CYCLES;
@@ -499,7 +495,7 @@ OPHANDLER( jmp_4 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x400); }
 OPHANDLER( jmp_5 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x500); }
 OPHANDLER( jmp_6 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x600); }
 OPHANDLER( jmp_7 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x700); }
-OPHANDLER( jmpp_xa )		{ PC &= 0xf00; PC |= program_r(PC | A); change_pc(PC); }
+OPHANDLER( jmpp_xa )		{ PC &= 0xf00; PC |= program_r(PC | A); }
 
 OPHANDLER( jnc )			{ execute_jcc(mcs48, (PSW & C_FLAG) == 0); }
 OPHANDLER( jni )			{ execute_jcc(mcs48, mcs48->irq_state != 0); }
@@ -847,7 +843,6 @@ static void check_irqs(mcs48_state *mcs48)
 		/* transfer to location 0x03 */
 		push_pc_psw(mcs48);
 		PC = 0x03;
-		change_pc(0x03);
 		mcs48->inst_cycles += 2;
 
 		/* indicate we took the external IRQ */
@@ -863,7 +858,6 @@ static void check_irqs(mcs48_state *mcs48)
 		/* transfer to location 0x07 */
 		push_pc_psw(mcs48);
 		PC = 0x07;
-		change_pc(0x07);
 		mcs48->inst_cycles += 2;
 
 		/* timer overflow flip-flop is reset once taken */
@@ -926,7 +920,6 @@ static CPU_EXECUTE( mcs48 )
 	unsigned opcode;
 
 	update_regptr(mcs48);
-	change_pc(PC);
 
 	mcs48->icount = cycles;
 

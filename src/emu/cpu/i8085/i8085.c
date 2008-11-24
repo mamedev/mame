@@ -1084,7 +1084,6 @@ INLINE void execute_one(int opcode)
 			break;
 		case 0xe9: i8085_ICount -= (I.cputype) ? 6 : 5;	/* PCHL */
 			I.PC.d = I.HL.w.l;
-			change_pc(I.PC.d);
 			break;
 		case 0xea: i8085_ICount -= 10;	/* JPE  nnnn */
 			M_JMP( I.AF.b.l & VF );
@@ -1280,7 +1279,6 @@ static void Interrupt(void)
 		case 0xc30000:	/* JMP  nnnn */
 			i8085_ICount -= 10;
 			I.PC.d = I.IRQ1 & 0xffff;
-			change_pc(I.PC.d);
 			break;
 		default:
 			switch( I.ISRV )
@@ -1294,7 +1292,6 @@ static void Interrupt(void)
 						I.PC.d = I.IRQ1;
 					else
 						I.PC.d = 0x3c;
-					change_pc(I.PC.d);
 					break;
 				default:
 					LOG(("i8085 take int $%02x\n", I.IRQ1));
@@ -1405,7 +1402,6 @@ static CPU_RESET( i8085 )
 	I.device = device;
 	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
-	change_pc(I.PC.d);
 
 	I.cputype = cputype_bak;
 }
@@ -1435,7 +1431,6 @@ static CPU_SET_CONTEXT( i8085 )
 	if( src )
 	{
 		I = *(i8085_Regs*)src;
-		change_pc(I.PC.d);
 	}
 }
 
@@ -1663,7 +1658,7 @@ static CPU_SET_INFO( i8085 )
 		case CPUINFO_INT_INPUT_STATE + I8085_RST75_LINE:i8085_set_irq_line(I8085_RST75_LINE, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	i8085_set_irq_line(INPUT_LINE_NMI, info->i); break;
 
-		case CPUINFO_INT_PC:							I.PC.w.l = info->i; change_pc(I.PC.d);	break;
+		case CPUINFO_INT_PC:							I.PC.w.l = info->i; 					break;
 		case CPUINFO_INT_REGISTER + I8085_PC:			I.PC.w.l = info->i;						break;
 		case CPUINFO_INT_SP:							I.SP.w.l = info->i;						break;
 		case CPUINFO_INT_REGISTER + I8085_SP:			I.SP.w.l = info->i;						break;

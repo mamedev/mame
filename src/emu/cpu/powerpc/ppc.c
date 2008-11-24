@@ -1726,8 +1726,6 @@ static CPU_SET_CONTEXT( ppc )
 	/* copy the context */
 	if (src)
 		ppc = *(PPC_REGS *)src;
-
-	change_pc(ppc.pc);
 }
 
 /**************************************************************************

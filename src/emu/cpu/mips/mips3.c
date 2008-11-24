@@ -318,7 +318,6 @@ static int update_pcbase(void)
 		return 0;
 	}
 	mips3.pcbase = entry & ~0xfff;
-	change_pc(mips3.pcbase);
 	return 1;
 }
 

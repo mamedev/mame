@@ -30,9 +30,6 @@
 #define IBWH	m6502->ind_bank.w.h
 #define IB		m6502->ind_bank.d
 
-#undef CHANGE_PC
-#define CHANGE_PC change_pc(PCD|PB)
-
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
@@ -177,7 +174,6 @@
 		EAW = PCW + (signed char)tmp;							\
 		m6502->icount -= (PCH == EAH) ? 1 : 2;					\
 		PCD = EAD|PB;											\
-		CHANGE_PC;												\
 	}															\
 	else														\
 	{															\
@@ -197,8 +193,7 @@
 	PUSH(PCL);													\
 	EAH = RDOPARG();											\
 	EAWH = PBWH;												\
-	PCD = EAD;													\
-	CHANGE_PC
+	PCD = EAD
 
 /* 6510 ********************************************************
  *  KIL Illegal opcode

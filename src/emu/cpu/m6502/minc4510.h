@@ -52,8 +52,6 @@
 
 #define M4510_MEM(addr)	(m4510->mem[(addr)>>13]+(addr))
 
-#define CHANGE_PC	change_pc(M4510_MEM(PCD))
-
 #define PEEK_OP()	memory_decrypted_read_byte(m4510->space, M4510_MEM(PCW))
 
 #define RDMEM(addr)			memory_read_byte_8le(m4510->space, M4510_MEM(addr)); m4510->icount -= 1

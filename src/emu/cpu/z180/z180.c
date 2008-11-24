@@ -2114,7 +2114,6 @@ static CPU_RESET( z180 )
 	if (Z180.daisy)
 		z80daisy_reset(Z180.daisy);
 	z180_mmu();
-	z180_change_pc(_PCD);
 }
 
 /* Handle PRT timers, decreasing them after 20 clocks and returning the new icount base that needs to be used for the next check */
@@ -2308,7 +2307,6 @@ static CPU_SET_CONTEXT( z180 )
 {
 	if( src )
 		Z180 = *(Z180_Regs*)src;
-	z180_change_pc(_PCD);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -2374,7 +2372,7 @@ static CPU_SET_INFO( z180 )
 		case CPUINFO_INT_INPUT_STATE + Z180_INT1:		set_irq_line(Z180_INT1, info->i);		break;
 		case CPUINFO_INT_INPUT_STATE + Z180_INT2:		set_irq_line(Z180_INT2, info->i);		break;
 
-		case CPUINFO_INT_PC:							_PC = info->i; z180_change_pc(_PCD);	break;
+		case CPUINFO_INT_PC:							_PC = info->i; 							break;
 		case CPUINFO_INT_REGISTER + Z180_PC:			Z180.PC.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							_SP = info->i;							break;
 		case CPUINFO_INT_REGISTER + Z180_SP:			Z180.SP.w.l = info->i;					break;

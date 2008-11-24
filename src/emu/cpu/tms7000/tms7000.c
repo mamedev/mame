@@ -122,9 +122,6 @@ static tms7000_Regs tms7000;
 #define SETZ		pSR |= SR_Z
 #define SETN		pSR |= SR_N
 
-#define CHANGE_PC change_pc(pPC)
-
-
 static READ8_HANDLER( tms7000_internal_r );
 static WRITE8_HANDLER( tms7000_internal_w );
 static READ8_HANDLER( tms70x0_pf_r );
@@ -249,7 +246,6 @@ static CPU_RESET( tms7000 )
 	WRA( tms7000.pc.b.h );	/* Write previous PC to A:B */
 	WRB( tms7000.pc.b.l );
 	pPC = RM16(0xfffe);		/* Load reset vector */
-	CHANGE_PC;
 
 	tms7000_div_by_16_trigger = -16;
 }
@@ -270,7 +266,7 @@ static CPU_SET_INFO( tms7000 )
         case CPUINFO_INT_INPUT_STATE + TMS7000_IRQ3_LINE:	tms7000_set_irq_line(TMS7000_IRQ3_LINE, info->i);	break;
 
         case CPUINFO_INT_PC:
-        case CPUINFO_INT_REGISTER + TMS7000_PC:	pPC = info->i; CHANGE_PC;	break;
+        case CPUINFO_INT_REGISTER + TMS7000_PC:	pPC = info->i; break;
         case CPUINFO_INT_SP:
         case CPUINFO_INT_REGISTER + TMS7000_SP:	pSP = info->i;	break;
         case CPUINFO_INT_REGISTER + TMS7000_ST:	pSR = info->i;	tms7000_check_IRQ_lines();	break;
@@ -449,7 +445,6 @@ static void tms7000_do_interrupt( UINT16 address, UINT8 line )
 	PUSHWORD( PC );			/* Push Program Counter */
 	pSR = 0;				/* Clear Status register */
 	pPC = RM16(address);	/* Load PC with interrupt vector */
-	CHANGE_PC;
 
 	if( tms7000.idle_state == 0 )
 		tms7000_icount -= 19;		/* 19 cycles used */

@@ -97,7 +97,7 @@ CPU_GET_INFO( g65816 );
 #define g65816_read_8(addr) 			memory_read_byte_8be(g65816i_cpu.program, addr)
 #define g65816_write_8(addr,data)		memory_write_byte_8be(g65816i_cpu.program, addr,data)
 #define g65816_read_8_immediate(A)		memory_read_byte_8be(g65816i_cpu.program, A)
-#define g65816_jumping(A)				change_pc(A)
+#define g65816_jumping(A)
 #define g65816_branching(A)
 
 

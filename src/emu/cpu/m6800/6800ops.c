@@ -234,7 +234,6 @@ OP_HANDLER( bra )
 	UINT8 t;
 	IMMBYTE(t);
 	PC+=SIGNED(t);
-	CHANGE_PC(m68_state);
 	/* speed up busy loops */
 	if (t==0xfe) EAT_CYCLES;
 }
@@ -402,7 +401,6 @@ OP_HANDLER( pulx )
 OP_HANDLER( rts )
 {
 	PULLWORD(pPC);
-	CHANGE_PC(m68_state);
 }
 
 /* $3a ABX inherent ----- */
@@ -419,7 +417,6 @@ OP_HANDLER( rti )
 	PULLBYTE(A);
 	PULLWORD(pX);
 	PULLWORD(pPC);
-	CHANGE_PC(m68_state);
 	CHECK_IRQ_LINES(m68_state); /* HJB 990417 */
 }
 
@@ -466,7 +463,6 @@ OP_HANDLER( swi )
     PUSHBYTE(CC);
     SEI;
 	PCD = RM16(m68_state, 0xfffa);
-	CHANGE_PC(m68_state);
 }
 
 /* $40 NEGA inherent ?**** */
@@ -797,7 +793,7 @@ OP_HANDLER( tst_ix )
 /* $6e JMP indexed ----- */
 OP_HANDLER( jmp_ix )
 {
-	INDEXED; PC=EA; CHANGE_PC(m68_state);
+	INDEXED; PC=EA;
 }
 
 /* $6f CLR indexed -0100 */
@@ -946,7 +942,7 @@ OP_HANDLER( tst_ex )
 /* $7e JMP extended ----- */
 OP_HANDLER( jmp_ex )
 {
-	EXTENDED; PC=EA; CHANGE_PC(m68_state); /* TS 971002 */
+	EXTENDED; PC=EA;
 }
 
 /* $7f CLR extended -0100 */
@@ -1091,7 +1087,6 @@ OP_HANDLER( bsr )
 	IMMBYTE(t);
 	PUSHWORD(pPC);
 	PC += SIGNED(t);
-	CHANGE_PC(m68_state);	 /* TS 971002 */
 }
 
 /* $8e LDS immediate -**0- */
@@ -1258,7 +1253,6 @@ OP_HANDLER( jsr_di )
 	DIRECT;
 	PUSHWORD(pPC);
 	PC = EA;
-	CHANGE_PC(m68_state);
 }
 
 /* $9e LDS direct -**0- */
@@ -1433,7 +1427,6 @@ OP_HANDLER( jsr_ix )
 	INDEXED;
 	PUSHWORD(pPC);
 	PC = EA;
-	CHANGE_PC(m68_state);
 }
 
 /* $ae LDS indexed -**0- */
@@ -1610,7 +1603,6 @@ OP_HANDLER( jsr_ex )
 	EXTENDED;
 	PUSHWORD(pPC);
  	PC = EA;
-	CHANGE_PC(m68_state);
 }
 
 /* $be LDS extended -**0- */

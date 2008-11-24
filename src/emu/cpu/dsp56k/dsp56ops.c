@@ -594,7 +594,6 @@ static void execute_one(void)
 	if (size != 0x1337)
 	{
 		PC += size;
-		change_pc(PC);
 
 		dsp56k_process_loop();
 		dsp56k_process_rep(size);
@@ -1081,7 +1080,6 @@ static void execute_one(void)
 
 	/* Must have been a good opcode */
 	PC += size;
-	change_pc(PC);
 
 	dsp56k_process_loop();
 	dsp56k_process_rep(size);
@@ -2384,7 +2382,6 @@ static size_t dsp56k_op_bcc(const UINT16 op, const UINT16 op2, UINT8* cycles)
 
 		core.ppc = PC;
 		PC += offset;
-		change_pc(PC);
 
 		cycles += 4;
 		return 0;
@@ -2413,7 +2410,6 @@ static size_t dsp56k_op_bcc_1(const UINT16 op, UINT8* cycles)
 
 		core.ppc = PC;
 		PC += offset;
-		change_pc(PC) ;
 
 		cycles += 4;
 		return 0;
@@ -2457,7 +2453,6 @@ static size_t dsp56k_op_bra_1(const UINT16 op, UINT8* cycles)
 	/* Jump */
 	core.ppc = PC;
 	PC += branchOffset;
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -2483,7 +2478,6 @@ static size_t dsp56k_op_brkcc(const UINT16 op, UINT8* cycles)
 		/* TODO: I think this PC = LA thing is off-by-1, but it's working this way because its consistently so */
 		core.ppc = PC;
 		PC = LA;
-		change_pc(PC);
 
 		SR = SSL;	/* TODO: A-83.  I believe only the Loop Flag and Forever Flag come back here. */
 		SP--;
@@ -2524,7 +2518,6 @@ static size_t dsp56k_op_bscc(const UINT16 op, const UINT16 op2, UINT8* cycles)
 		/* Change */
 		core.ppc = PC;
 		PC = PC + (INT16)op2;
-		change_pc(PC);
 	}
 
 	/* S L E U N Z V C */
@@ -2555,7 +2548,6 @@ static size_t dsp56k_op_bsr(const UINT16 op, const UINT16 op2, UINT8* cycles)
 	/* Change */
 	core.ppc = PC;
 	PC = PC + (INT16)op2;
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -2813,7 +2805,6 @@ static size_t dsp56k_op_jmp(const UINT16 op, const UINT16 op2, UINT8* cycles)
 {
 	core.ppc = PC;
 	PC = op2;
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -2830,7 +2821,6 @@ static size_t dsp56k_op_jmp_1(const UINT16 op, UINT8* cycles)
 
 	core.ppc = PC;
 	PC = *((UINT16*)R.addr);
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -2858,7 +2848,6 @@ static size_t dsp56k_op_jscc(const UINT16 op, const UINT16 op2, UINT8* cycles)
 
 		core.ppc = PC;
 		PC = branchOffset;
-		change_pc(PC);
 
 		cycles += 4;	/* TODO: +jx oscillator clock cycles */
 		return 0;
@@ -2897,7 +2886,6 @@ static size_t dsp56k_op_jsr(const UINT16 op, const UINT16 op2, UINT8* cycles)
 
 	core.ppc = PC;
 	PC = branchOffset;
-	change_pc(PC);
 
 	/* S L E U N Z V C */
 	/* - - - - - - - - */
@@ -3569,7 +3557,6 @@ static size_t dsp56k_op_rti(const UINT16 op, UINT8* cycles)
 {
 	core.ppc = PC;
 	PC = SSH;
-	change_pc(PC);
 
 	SR = SSL;
 	SP = SP - 1;
@@ -3587,7 +3574,6 @@ static size_t dsp56k_op_rts(const UINT16 op, UINT8* cycles)
 	/* Pop */
 	core.ppc = PC;
 	PC = SSH;
-	change_pc(PC);
 
 	/* SR = SSL; The status register is not affected. */
 
@@ -4255,7 +4241,6 @@ static void dsp56k_process_loop(void)
 
 			core.ppc = PC;
 			PC = SSH;
-			change_pc(PC);
 		}
 	}
 	else if (LF_bit())
@@ -4277,7 +4262,6 @@ static void dsp56k_process_loop(void)
 			{
 				LC--;
 				PC = SSH;
-				change_pc(PC);
 			}
 		}
 	}
@@ -4300,7 +4284,6 @@ static void dsp56k_process_rep(size_t repSize)
 			{
 				LC--;
 				PC -= repSize;		/* A little strange - rewind by the size of the rep'd op */
-				change_pc(PC);
 			}
 		}
 	}

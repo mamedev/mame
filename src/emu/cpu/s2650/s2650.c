@@ -350,7 +350,6 @@ static const int S2650_relative[0x100] =
 		REL_EA( s2650c->page );										\
 		s2650c->page = s2650c->ea & PAGE;									\
 		s2650c->iar  = s2650c->ea & PMSK;									\
-		change_pc(s2650c->ea);										\
 	} else s2650c->iar = (s2650c->iar + 1) & PMSK;							\
 }
 
@@ -363,7 +362,6 @@ static const int S2650_relative[0x100] =
 	REL_ZERO( 0 );												\
 	s2650c->page = s2650c->ea & PAGE;										\
 	s2650c->iar  = s2650c->ea & PMSK;										\
-	change_pc(s2650c->ea);											\
 }
 
 /***************************************************************
@@ -377,7 +375,6 @@ static const int S2650_relative[0x100] =
 		BRA_EA();												\
 		s2650c->page = s2650c->ea & PAGE;									\
 		s2650c->iar  = s2650c->ea & PMSK;									\
-		change_pc(s2650c->ea);										\
 	} else s2650c->iar = (s2650c->iar + 2) & PMSK;							\
 }
 
@@ -391,7 +388,6 @@ static const int S2650_relative[0x100] =
 	s2650c->ea   = (s2650c->ea + s2650c->reg[3]) & AMSK;							\
 	s2650c->page = s2650c->ea & PAGE;										\
 	s2650c->iar  = s2650c->ea & PMSK;										\
-	change_pc(s2650c->ea);											\
 }
 
 /***************************************************************
@@ -407,7 +403,6 @@ static const int S2650_relative[0x100] =
 		s2650c->ras[s2650c->psu & SP] = s2650c->page + s2650c->iar;						\
 		s2650c->page = s2650c->ea & PAGE;									\
 		s2650c->iar  = s2650c->ea & PMSK;									\
-		change_pc(s2650c->ea);										\
 	} else	s2650c->iar = (s2650c->iar + 1) & PMSK; 						\
 }
 
@@ -422,7 +417,6 @@ static const int S2650_relative[0x100] =
 	s2650c->ras[s2650c->psu & SP] = s2650c->page + s2650c->iar;							\
 	s2650c->page = s2650c->ea & PAGE;										\
 	s2650c->iar  = s2650c->ea & PMSK;										\
-	change_pc(s2650c->ea);											\
 }
 
 /***************************************************************
@@ -438,7 +432,6 @@ static const int S2650_relative[0x100] =
 		s2650c->ras[s2650c->psu & SP] = s2650c->page + s2650c->iar;						\
 		s2650c->page = s2650c->ea & PAGE;									\
 		s2650c->iar  = s2650c->ea & PMSK;									\
-		change_pc(s2650c->ea);										\
 	} else s2650c->iar = (s2650c->iar + 2) & PMSK;							\
 }
 
@@ -454,7 +447,6 @@ static const int S2650_relative[0x100] =
 	s2650c->ras[s2650c->psu & SP] = s2650c->page + s2650c->iar;							\
 	s2650c->page = s2650c->ea & PAGE;										\
 	s2650c->iar  = s2650c->ea & PMSK;										\
-	change_pc(s2650c->ea);											\
 }
 
 /***************************************************************
@@ -470,7 +462,6 @@ static const int S2650_relative[0x100] =
 		s2650c->psu = (s2650c->psu & ~SP) | ((s2650c->psu - 1) & SP); 			\
 		s2650c->page = s2650c->ea & PAGE;									\
 		s2650c->iar  = s2650c->ea & PMSK;									\
-		change_pc(s2650c->ea);										\
 	}															\
 }
 
@@ -488,7 +479,6 @@ static const int S2650_relative[0x100] =
 		s2650c->psu = (s2650c->psu & ~SP) | ((s2650c->psu - 1) & SP); 			\
 		s2650c->page = s2650c->ea & PAGE;									\
 		s2650c->iar  = s2650c->ea & PMSK;									\
-		change_pc(s2650c->ea);										\
 		s2650c->psu &= ~II;											\
 		CHECK_IRQ_LINE; 										\
 	}															\
@@ -1499,7 +1489,6 @@ static CPU_SET_INFO( s2650 )
 		case CPUINFO_INT_PC:
 			s2650c->page = info->i & PAGE;
 			s2650c->iar = info->i & PMSK;
-			change_pc(s2650c->page + s2650c->iar);
 			break;
 
 		case CPUINFO_INT_REGISTER + S2650_PC:			s2650c->page = info->i & PAGE; s2650c->iar = info->i & PMSK; break;

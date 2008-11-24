@@ -30,7 +30,6 @@ INLINE void CYCLES(int cycles)
 INLINE void SET_PC(int pc)
 {
 	hc11.pc = pc;
-	change_pc(hc11.pc);
 }
 
 INLINE void PUSH8(UINT8 value)

@@ -546,7 +546,6 @@ static void check_interrupt(tms34010_state *tms)
 		/* leap to the vector */
 		RESET_ST(tms);
 		tms->pc = RLONG(tms, 0xfffffee0);
-		change_pc(TOBYTE(tms->pc));
 		COUNT_CYCLES(tms,16);
 		return;
 	}
@@ -600,7 +599,6 @@ static void check_interrupt(tms34010_state *tms)
 		PUSH(tms, GET_ST(tms));
 		RESET_ST(tms);
 		tms->pc = RLONG(tms, vector);
-		change_pc(TOBYTE(tms->pc));
 		COUNT_CYCLES(tms,16);
 
 		/* call the callback for externals */
@@ -671,7 +669,6 @@ static CPU_RESET( tms34010 )
 
 	/* fetch the initial PC and reset the state */
 	tms->pc = RLONG(tms, 0xffffffe0) & 0xfffffff0;
-	change_pc(TOBYTE(tms->pc));
 	RESET_ST(tms);
 
 	/* HALT the CPU if requested, and remember to re-read the starting PC */
@@ -808,7 +805,6 @@ static CPU_EXECUTE( tms34010 )
 
 	/* execute starting now */
 	tms->icount = cycles;
-	change_pc(TOBYTE(tms->pc));
 
 	/* check interrupts first */
 	tms->executing = TRUE;
@@ -1573,7 +1569,6 @@ READ16_HANDLER( tms34020_io_register_r )
 static STATE_POSTLOAD( tms34010_state_postload )
 {
 	tms34010_state *tms = param;
-	change_pc(TOBYTE(tms->pc));
 	set_raster_op(tms);
 	set_pixel_function(tms);
 }
@@ -1714,7 +1709,7 @@ static CPU_SET_INFO( tms34010 )
 		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(tms, 0, info->i);				break;
 		case CPUINFO_INT_INPUT_STATE + 1:				set_irq_line(tms, 1, info->i);				break;
 
-		case CPUINFO_INT_PC:       						tms->pc = info->i; change_pc(TOBYTE(tms->pc));	break;
+		case CPUINFO_INT_PC:       						tms->pc = info->i; 							break;
 		case CPUINFO_INT_REGISTER + TMS34010_PC:		tms->pc = info->i;							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + TMS34010_SP:		SP(tms) = info->i;							break;

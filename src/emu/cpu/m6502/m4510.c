@@ -228,8 +228,6 @@ static CPU_RESET( m4510 )
 	m4510->high=0x8200;
 	m4510->mem[7]=0x20000;
 
-	CHANGE_PC;
-
 	m4510->port = 0xff;
 	m4510->ddr = 0x00;
 }
@@ -250,7 +248,6 @@ static CPU_SET_CONTEXT( m4510 )
 	{
 		token = src;
 		m4510 = token;
-		CHANGE_PC;
 	}
 }
 
@@ -270,7 +267,6 @@ INLINE void m4510_take_irq(m4510_Regs *m4510)
 		LOG(("M4510#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m4510->irq_callback) (*m4510->irq_callback)(m4510->device, 0);
-		CHANGE_PC;
 	}
 	m4510->pending_irq = 0;
 }
@@ -280,8 +276,6 @@ static CPU_EXECUTE( m4510 )
 	m4510_Regs *m4510 = device->token;
 
 	m4510->icount = cycles;
-
-	CHANGE_PC;
 
 	do
 	{
@@ -339,7 +333,6 @@ static void m4510_set_irq_line(m4510_Regs *m4510, int irqline, int state)
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
 			LOG(("M4510#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
-			CHANGE_PC;
 		}
 	}
 	else
@@ -422,7 +415,7 @@ static CPU_SET_INFO( m4510 )
 		case CPUINFO_INT_INPUT_STATE + M4510_IRQ_LINE:	m4510_set_irq_line(m4510, M4510_IRQ_LINE, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m4510_set_irq_line(m4510, INPUT_LINE_NMI, info->i); break;
 
-		case CPUINFO_INT_PC:							PCW = info->i; change_pc(PCD);			break;
+		case CPUINFO_INT_PC:							PCW = info->i; 								break;
 		case CPUINFO_INT_REGISTER + M4510_PC:			m4510->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							SPL = info->i;							break;
 		case CPUINFO_INT_REGISTER + M4510_S:			m4510->sp.b.l = info->i;					break;

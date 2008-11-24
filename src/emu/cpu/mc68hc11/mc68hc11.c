@@ -379,7 +379,6 @@ static CPU_SET_CONTEXT( hc11 )
 	if (src) {
 		hc11 = *(HC11_REGS*)src;
 	}
-	change_pc(hc11.pc);
 }
 
 static CPU_EXECUTE( hc11 )
@@ -408,7 +407,7 @@ static CPU_SET_INFO( mc68hc11 )
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 		case CPUINFO_INT_PC:							hc11.pc = info->i;						break;
-		case CPUINFO_INT_REGISTER + HC11_PC:			hc11.pc = info->i; change_pc(hc11.pc);	break;
+		case CPUINFO_INT_REGISTER + HC11_PC:			hc11.pc = info->i; 						break;
 		case CPUINFO_INT_REGISTER + HC11_SP:			hc11.sp = info->i;						break;
 		case CPUINFO_INT_REGISTER + HC11_A:				hc11.d.d8.a = info->i;					break;
 		case CPUINFO_INT_REGISTER + HC11_B:				hc11.d.d8.b = info->i;					break;

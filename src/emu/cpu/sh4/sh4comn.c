@@ -206,7 +206,6 @@ void sh4_exception(const char *message, int exception) // handle exception
 
 	/* fetch PC */
 	sh4.pc = sh4.vbr + vector;
-	change_pc(sh4.pc & AM);
 }
 
 static UINT32 compute_ticks_refresh_timer(emu_timer *timer, int hertz, int base, int divisor)

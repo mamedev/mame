@@ -299,12 +299,10 @@ INLINE void sc61860_execute_table_call(void)
 		sc61860.zero=v==sc61860.ram[A];
 		if (sc61860.zero) {
 			sc61860.pc=adr;
-			change_pc(sc61860.pc);
 			return;
 		}
 	}
 	sc61860.pc=READ_OP_ARG_WORD();
-	change_pc(sc61860.pc);
 }
 
 
@@ -313,7 +311,6 @@ INLINE void sc61860_call(UINT16 adr)
 	PUSH(sc61860.pc>>8);
 	PUSH(sc61860.pc&0xff);
 	sc61860.pc=adr;
-	change_pc(sc61860.pc);
 }
 
 INLINE void sc61860_return(void)
@@ -321,7 +318,6 @@ INLINE void sc61860_return(void)
 	UINT16 t=POP();
 	t|=POP()<<8;
 	sc61860.pc=t;
-	change_pc(sc61860.pc);
 }
 
 INLINE void sc61860_jump(int yes)
@@ -329,7 +325,6 @@ INLINE void sc61860_jump(int yes)
 	UINT16 adr=READ_OP_ARG_WORD();
 	if (yes) {
 		sc61860.pc=adr;
-		change_pc(sc61860.pc);
 	}
 }
 
@@ -339,7 +334,6 @@ INLINE void sc61860_jump_rel_plus(int yes)
 	adr+=READ_OP_ARG();
 	if (yes) {
 		sc61860.pc=adr;
-		change_pc(sc61860.pc);
 		sc61860_ICount-=3;
 	}
 }
@@ -350,7 +344,6 @@ INLINE void sc61860_jump_rel_minus(int yes)
 	adr-=READ_OP_ARG();
 	if (yes) {
 		sc61860.pc=adr;
-		change_pc(sc61860.pc);
 		sc61860_ICount-=3;
 	}
 }
@@ -365,7 +358,6 @@ INLINE void sc61860_loop(void)
 	if (!sc61860.carry) {
 		sc61860.pc=adr;
 		adr=POP();
-		change_pc(sc61860.pc);
 		sc61860_ICount-=3;
 	}
 }

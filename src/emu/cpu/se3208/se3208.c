@@ -540,7 +540,6 @@ INST(POP)
 	if(Set&(1<<10))
 	{
 		se3208_state->PC=PopVal(se3208_state)-2;		//PC automatically incresases by 2
-		change_pc(se3208_state->PC+2);
 	}
 }
 
@@ -1011,7 +1010,6 @@ INST(CALL)
 	Offset<<=1;
 	PushVal(se3208_state,se3208_state->PC+2);
 	se3208_state->PC=se3208_state->PC+Offset;
-	change_pc(se3208_state->PC+2);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1029,7 +1027,6 @@ INST(JV)
 	if(TESTFLAG(FLAG_V))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1049,7 +1046,6 @@ INST(JNV)
 	if(!TESTFLAG(FLAG_V))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1068,7 +1064,6 @@ INST(JC)
 	if(TESTFLAG(FLAG_C))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1087,7 +1082,6 @@ INST(JNC)
 	if(!TESTFLAG(FLAG_C))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1106,7 +1100,6 @@ INST(JP)
 	if(!TESTFLAG(FLAG_S))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1125,7 +1118,6 @@ INST(JM)
 	if(TESTFLAG(FLAG_S))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1144,7 +1136,6 @@ INST(JNZ)
 	if(!TESTFLAG(FLAG_Z))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1163,7 +1154,6 @@ INST(JZ)
 	if(TESTFLAG(FLAG_Z))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1184,7 +1174,6 @@ INST(JGE)
 	if(!(S^V))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1205,7 +1194,6 @@ INST(JLE)
 	if(TESTFLAG(FLAG_Z) || (S^V))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 	CLRFLAG(FLAG_E);
 }
@@ -1223,7 +1211,6 @@ INST(JHI)
 	if(!(TESTFLAG(FLAG_Z) || TESTFLAG(FLAG_C)))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1242,7 +1229,6 @@ INST(JLS)
 	if(TESTFLAG(FLAG_Z) || TESTFLAG(FLAG_C))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1263,7 +1249,6 @@ INST(JGT)
 	if(!(TESTFLAG(FLAG_Z) || (S^V)))
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1284,7 +1269,6 @@ INST(JLT)
 	if(S^V)
 	{
 		se3208_state->PC=se3208_state->PC+Offset;
-		change_pc(se3208_state->PC+2);
 	}
 
 	CLRFLAG(FLAG_E);
@@ -1304,7 +1288,6 @@ INST(JMP)
 	Offset<<=1;
 
 	se3208_state->PC=se3208_state->PC+Offset;
-	change_pc(se3208_state->PC+2);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1314,7 +1297,6 @@ INST(JR)
 	UINT32 Src=EXTRACT(Opcode,0,3);
 
 	se3208_state->PC=se3208_state->R[Src]-2;
-	change_pc(se3208_state->PC+2);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1324,7 +1306,6 @@ INST(CALLR)
 	UINT32 Src=EXTRACT(Opcode,0,3);
 	PushVal(se3208_state,se3208_state->PC+2);
 	se3208_state->PC=se3208_state->R[Src]-2;
-	change_pc(se3208_state->PC+2);
 
 	CLRFLAG(FLAG_E);
 }
@@ -1429,7 +1410,6 @@ INST(SWI)
 	CLRFLAG(FLAG_ENI|FLAG_E|FLAG_M);
 
 	se3208_state->PC=SE3208_Read32(se3208_state, 4*Imm+0x40)-2;
-	change_pc(se3208_state->PC+2);
 }
 
 INST(HALT)
@@ -1735,7 +1715,6 @@ static CPU_RESET( SE3208 )
 	se3208_state->SR=0;
 	se3208_state->IRQ=CLEAR_LINE;
 	se3208_state->NMI=CLEAR_LINE;
-	change_pc(se3208_state->PC+2);
 }
 
 static void SE3208_NMI(se3208_state_t *se3208_state)
@@ -1746,7 +1725,6 @@ static void SE3208_NMI(se3208_state_t *se3208_state)
 	CLRFLAG(FLAG_NMI|FLAG_ENI|FLAG_E|FLAG_M);
 
 	se3208_state->PC=SE3208_Read32(se3208_state, 4);
-	change_pc(se3208_state->PC+2);
 }
 
 static void SE3208_Interrupt(se3208_state_t *se3208_state)
@@ -1764,7 +1742,6 @@ static void SE3208_Interrupt(se3208_state_t *se3208_state)
 		se3208_state->PC=SE3208_Read32(se3208_state, 8);
 	else
 		se3208_state->PC=SE3208_Read32(se3208_state, 4*se3208_state->irq_callback(se3208_state->device, 0));
-	change_pc(se3208_state->PC+2);
 }
 
 

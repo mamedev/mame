@@ -471,7 +471,6 @@ static CPU_RESET( z8000 )
 	Z.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	FCW = RDMEM_W( 2 ); /* get reset FCW */
 	PC	= RDMEM_W( 4 ); /* get reset PC  */
-	change_pc(PC);
 }
 
 static CPU_EXIT( z8000 )
@@ -527,7 +526,6 @@ static CPU_SET_CONTEXT( z8000 )
 	if( src )
 	{
 		Z = *(z8000_Regs*)src;
-		change_pc(PC);
 	}
 }
 
@@ -595,7 +593,7 @@ static CPU_SET_INFO( z8000 )
 		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(0, info->i);				break;
 		case CPUINFO_INT_INPUT_STATE + 1:				set_irq_line(1, info->i);				break;
 
-		case CPUINFO_INT_PC:							PC = info->i; change_pc(PC);	 		break;
+		case CPUINFO_INT_PC:							PC = info->i; 					 		break;
 		case CPUINFO_INT_REGISTER + Z8000_PC:			PC = info->i;							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + Z8000_NSP:			NSP = info->i;							break;

@@ -54,7 +54,6 @@
   m4510->mem[5]=(m4510->high&0x2000) ? (m4510->high&0xfff)<<8:0; \
   m4510->mem[6]=(m4510->high&0x4000) ? (m4510->high&0xfff)<<8:0; \
   m4510->mem[7]=(m4510->high&0x8000) ? (m4510->high&0xfff)<<8:0; \
-  CHANGE_PC; \
   m4510->icount -= 3; \
   { \
 				UINT8 op = RDOP();								\

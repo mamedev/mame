@@ -192,14 +192,12 @@ INLINE void lh5801_rtn(void)
 {
 	P=memory_read_byte(lh5801.program,++S)<<8;
 	P|=memory_read_byte(lh5801.program,++S);
-	change_pc(P);
 }
 
 INLINE void lh5801_rti(void)
 {
 	P=memory_read_byte(lh5801.program,++S)<<8;
 	P|=memory_read_byte(lh5801.program,++S);
-	change_pc(P);
 	lh5801.t=memory_read_byte(lh5801.program,++S);
 }
 
@@ -217,7 +215,6 @@ INLINE void lh5801_push_word(UINT16 data)
 INLINE void lh5801_jmp(UINT16 adr)
 {
 	P=adr;
-	change_pc(P);
 }
 
 INLINE void lh5801_branch_plus(int doit)
@@ -226,7 +223,6 @@ INLINE void lh5801_branch_plus(int doit)
 	if (doit) {
 		lh5801_icount-=3;
 		P+=t;
-		change_pc(P);
 	}
 }
 
@@ -236,7 +232,6 @@ INLINE void lh5801_branch_minus(int doit)
 	if (doit) {
 		lh5801_icount-=3;
 		P-=t;
-		change_pc(P);
 	}
 }
 
@@ -247,7 +242,6 @@ INLINE void lh5801_lop(void)
 	if (UL--) {
 		lh5801_icount-=3;
 		P-=t;
-		change_pc(P);
 	}
 }
 
@@ -256,7 +250,6 @@ INLINE void lh5801_sjp(void)
 	UINT16 n=lh5801_readop_word();
 	lh5801_push_word(P);
 	P=n;
-	change_pc(n);
 }
 
 INLINE void lh5801_vector(int doit, int nr)
@@ -265,7 +258,6 @@ INLINE void lh5801_vector(int doit, int nr)
 		lh5801_push_word(P);
 		P=memory_read_byte(lh5801.program,0xff00+nr)<<8;
 		P|=memory_read_byte(lh5801.program,0xff00+nr+1);
-		change_pc(P);
 		lh5801_icount-=21-8;
 	}
 	lh5801.t&=~Z; // after the jump!?

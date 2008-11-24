@@ -11,7 +11,6 @@ OPHANDLER( acall )
 	PUSH_PC();								//Save PC to the stack
 	//Thanks Gerrit for help with this! :)
 	PC = (PC & 0xf800) | ((r & 0xe0) << 3) | addr;
-	change_pc(PC);
 }
 
 //ADD A, #data                              /* 1: 0010 0100 */
@@ -94,7 +93,6 @@ OPHANDLER( ajmp )
 	UINT8 addr = ROP_ARG(PC++);				//Grab code address byte
 	//Thanks Gerrit for help with this! :)
 	PC = (PC & 0xf800) | ((r & 0xe0) << 3) | addr;
-	change_pc(PC);
 }
 
 //ANL data addr, A                          /* 1: 0101 0010 */
@@ -171,7 +169,6 @@ OPHANDLER( cjne_a_byte )
 	if(ACC != data)						//Jump if values are not equal
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 
 	//Set carry flag to 1 if 1st compare value is < 2nd compare value
@@ -188,7 +185,6 @@ OPHANDLER( cjne_a_mem )
 	if(ACC != data)						//Jump if values are not equal
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 
 	//Set carry flag to 1 if 1st compare value is < 2nd compare value
@@ -205,7 +201,6 @@ OPHANDLER( cjne_ir_byte )
 	if(srcdata != data)						//Jump if values are not equal
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 
 	//Set carry flag to 1 if 1st compare value is < 2nd compare value
@@ -222,7 +217,6 @@ OPHANDLER( cjne_r_byte )
 	if(srcdata != data)						//Jump if values are not equal
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 
 	//Set carry flag to 1 if 1st compare value is < 2nd compare value
@@ -350,7 +344,6 @@ OPHANDLER( djnz_mem )
 	if(IRAM_R(addr) != 0)					//Branch if contents of data address is not 0
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 }
 
@@ -362,7 +355,6 @@ OPHANDLER( djnz_r )
 	if(R_REG(r) != 0)							//Branch if contents of R0 - R7 is not 0
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 }
 
@@ -409,7 +401,6 @@ OPHANDLER( jb )
 	if(BIT_R(addr))							//If bit set at specified bit address, jump
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 }
 
@@ -421,7 +412,6 @@ OPHANDLER( jbc )
 	if(BIT_R(addr))	{						//If bit set at specified bit address, jump
 		PC = PC + rel_addr;
 		BIT_W(addr,0);						//Clear Bit also
-		change_pc(PC);
 	}
 }
 
@@ -432,7 +422,6 @@ OPHANDLER( jc )
 	if(GET_CY)								//Jump if Carry Flag Set
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 }
 
@@ -440,7 +429,6 @@ OPHANDLER( jc )
 OPHANDLER( jmp_iadptr )
 {
 	PC = ACC + DPTR;
-	change_pc(PC);
 }
 
 //JNB bit addr, code addr                   /* 1: 0011 0000 */
@@ -451,7 +439,6 @@ OPHANDLER( jnb )
 	if(!BIT_R(addr))						//If bit NOT set at specified bit address, jump
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 }
 
@@ -462,7 +449,6 @@ OPHANDLER( jnc )
 	if(!GET_CY)								//Jump if Carry Flag not set
 	{
 		PC = PC + rel_addr;
-		change_pc(PC);
 	}
 }
 
@@ -473,7 +459,6 @@ OPHANDLER( jnz )
 	if(ACC != 0)							//Branch if ACC is not 0
 	{
 		PC = PC+rel_addr;
-		change_pc(PC);
 	}
 }
 
@@ -484,7 +469,6 @@ OPHANDLER( jz )
 	if(ACC == 0)							//Branch if ACC is 0
 	{
 		PC = PC+rel_addr;
-		change_pc(PC);
 	}
 }
 
@@ -496,7 +480,6 @@ OPHANDLER( lcall )
 	addr_lo = ROP_ARG(PC++);
 	PUSH_PC();
 	PC = (UINT16)((addr_hi<<8) | addr_lo);
-	change_pc(PC);
 }
 
 //LJMP code addr                            /* 1: 0000 0010 */
@@ -506,7 +489,6 @@ OPHANDLER( ljmp )
 	addr_hi = ROP_ARG(PC++);
 	addr_lo = ROP_ARG(PC++);
 	PC = (UINT16)((addr_hi<<8) | addr_lo);
-	change_pc(PC);
 }
 
 //MOV A, #data                              /* 1: 0111 0100 */
@@ -858,7 +840,6 @@ OPHANDLER( sjmp )
 {
 	INT8 rel_addr = ROP_ARG(PC++);			//Grab relative code address
 	PC = PC + rel_addr;						//Update PC
-	change_pc(PC);
 }
 
 //SUBB A, #data                             /* 1: 1001 0100 */

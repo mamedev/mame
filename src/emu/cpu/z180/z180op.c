@@ -229,7 +229,7 @@ OP(op,c6) { ADD(ARG()); 											} /* ADD  A,n         */
 OP(op,c7) { RST(0x00);												} /* RST  0           */
 
 OP(op,c8) { RET_COND( _F & ZF, 0xc8 );								} /* RET  Z           */
-OP(op,c9) { POP(PC); z180_change_pc(_PCD);							} /* RET              */
+OP(op,c9) { POP(PC); 												} /* RET              */
 OP(op,ca) { JP_COND( _F & ZF ); 									} /* JP   Z,a         */
 OP(op,cb) { _R++; EXEC(cb,ROP());									} /* **** CB xx       */
 OP(op,cc) { CALL_COND( _F & ZF, 0xcc ); 							} /* CALL Z,a         */
@@ -265,7 +265,7 @@ OP(op,e6) { AND(ARG()); 											} /* AND  n           */
 OP(op,e7) { RST(0x20);												} /* RST  4           */
 
 OP(op,e8) { RET_COND( _F & PF, 0xe8 );								} /* RET  PE          */
-OP(op,e9) { _PC = _HL; z180_change_pc(_PCD);						} /* JP   (HL)        */
+OP(op,e9) { _PC = _HL; 												} /* JP   (HL)        */
 OP(op,ea) { JP_COND( _F & PF ); 									} /* JP   PE,a        */
 OP(op,eb) { EX_DE_HL;												} /* EX   DE,HL       */
 OP(op,ec) { CALL_COND( _F & PF, 0xec ); 							} /* CALL PE,a        */
@@ -375,8 +375,5 @@ static void take_interrupt(int irq)
 		/* CALL opcode timing */
 		z180_icount -= cc[Z180_TABLE_op][0xcd];
 	}
-	z180_change_pc(_PCD);
-
-
 }
 

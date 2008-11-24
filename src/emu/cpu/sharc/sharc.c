@@ -617,8 +617,6 @@ static CPU_SET_CONTEXT( sharc )
 	{
 		sharc = *(SHARC_REGS *)src;
 	}
-
-	change_pc(sharc.pc);
 }
 
 static void sharc_set_irq_line(int irqline, int state)

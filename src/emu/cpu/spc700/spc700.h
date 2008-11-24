@@ -141,8 +141,8 @@ extern CPU_GET_INFO( spc700 );
 //#define spc700_read_8_immediate(A)    memory_raw_read_byte(spc700i_cpu.program,A)
 #define spc700_read_instruction(A)    memory_read_byte_8le(spc700i_cpu.program,A)
 #define spc700_read_8_immediate(A)    memory_read_byte_8le(spc700i_cpu.program,A)
-#define spc700_jumping(A)             change_pc(A)
-#define spc700_branching(A)	      change_pc(A)
+#define spc700_jumping(A)
+#define spc700_branching(A)
 
 
 

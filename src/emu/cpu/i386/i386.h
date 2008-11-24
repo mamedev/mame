@@ -381,8 +381,6 @@ INLINE void CHANGE_PC(UINT32 pc)
 	{
 		translate_address(&address);
 	}
-
-	change_pc(address & I.a20_mask);
 }
 
 INLINE void NEAR_BRANCH(INT32 offs)
@@ -398,8 +396,6 @@ INLINE void NEAR_BRANCH(INT32 offs)
 	{
 		translate_address(&address);
 	}
-
-	change_pc(address & I.a20_mask);
 }
 
 INLINE UINT8 FETCH(void)

@@ -137,10 +137,8 @@ INLINE UINT32 ARG16(void)
 /****************************************************************************
  * Change program counter - MMU lookup
  ****************************************************************************/
-#define z180_change_pc(addr) change_pc(MMU_REMAP_ADDR(addr))
 void z180_setOPbase(int pc)
 {
-	z180_change_pc(pc);
 }
 
 /***************************************************************
@@ -165,7 +163,6 @@ void z180_setOPbase(int pc)
  ***************************************************************/
 #define JP {													\
 	_PCD = ARG16(); 											\
-	z180_change_pc(_PCD);										\
 }
 
 /***************************************************************
@@ -176,7 +173,6 @@ void z180_setOPbase(int pc)
 	if( cond )													\
 	{															\
 		_PCD = ARG16(); 										\
-		z180_change_pc(_PCD);									\
 	}															\
 	else														\
 	{															\
@@ -191,7 +187,6 @@ void z180_setOPbase(int pc)
 	unsigned oldpc = _PCD-1;									\
 	INT8 arg = (INT8)ARG(); /* ARG() also increments _PC */ 	\
 	_PC += arg; 			/* so don't do _PC += ARG() */      \
-	z180_change_pc(_PCD);										\
 	/* speed up busy loop */									\
 	if( _PCD == oldpc ) 										\
 	{															\
@@ -231,7 +226,6 @@ void z180_setOPbase(int pc)
 		INT8 arg = (INT8)ARG(); /* ARG() also increments _PC */ \
 		_PC += arg; 			/* so don't do _PC += ARG() */  \
 		CC(ex,opcode);											\
-		z180_change_pc(_PCD);									\
 	}															\
 	else _PC++; 												\
 
@@ -241,8 +235,7 @@ void z180_setOPbase(int pc)
 #define CALL()													\
 	EA = ARG16();												\
 	PUSH( PC ); 												\
-	_PCD = EA;													\
-	z180_change_pc(_PCD)
+	_PCD = EA;
 
 /***************************************************************
  * CALL_COND
@@ -254,7 +247,6 @@ void z180_setOPbase(int pc)
 		PUSH( PC ); 											\
 		_PCD = EA;												\
 		CC(ex,opcode);											\
-		z180_change_pc(_PCD);									\
 	}															\
 	else														\
 	{															\
@@ -268,7 +260,6 @@ void z180_setOPbase(int pc)
 	if( cond )													\
 	{															\
 		POP(PC);												\
-		z180_change_pc(_PCD);									\
 		CC(ex,opcode);											\
 	}
 
@@ -278,7 +269,6 @@ void z180_setOPbase(int pc)
 #define RETN	{												\
 	LOG(("Z180 #%d RETN IFF1:%d IFF2:%d\n", cpunum_get_active(), _IFF1, _IFF2)); \
 	POP(PC);													\
-	z180_change_pc(_PCD);										\
 	_IFF1 = _IFF2;												\
 }
 
@@ -287,7 +277,6 @@ void z180_setOPbase(int pc)
  ***************************************************************/
 #define RETI	{												\
 	POP(PC);													\
-	z180_change_pc(_PCD);										\
 /* according to http://www.msxnet.org/tech/Z80/z80undoc.txt */	\
 /*  _IFF1 = _IFF2;  */											\
 	if (Z180.daisy)												\
@@ -330,8 +319,7 @@ void z180_setOPbase(int pc)
  ***************************************************************/
 #define RST(addr)												\
 	PUSH( PC ); 												\
-	_PCD = addr;												\
-	z180_change_pc(_PCD)
+	_PCD = addr;
 
 /***************************************************************
  * INC  r8

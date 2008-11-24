@@ -67,8 +67,6 @@
 #define RDMEM_ID(a)		m6502->rdmem_id(m6502->space,a)
 #define WRMEM_ID(a,d)	m6502->wrmem_id(m6502->space,a,d)
 
-#define CHANGE_PC change_pc(PCD)
-
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
@@ -104,7 +102,6 @@
 				RDMEM( (PCH << 8 ) | EAL) ;							\
 			}														\
 			PCD = EAD;												\
-			CHANGE_PC;												\
 		}															\
 	}
 
@@ -409,8 +406,7 @@
 	PUSH(P | F_B);												\
 	P = (P | F_I);												\
 	PCL = RDMEM(M6502_IRQ_VEC); 								\
-	PCH = RDMEM(M6502_IRQ_VEC+1);								\
-	CHANGE_PC
+	PCH = RDMEM(M6502_IRQ_VEC+1)
 
 /* 6502 ********************************************************
  * BVC  Branch if overflow clear
@@ -538,8 +534,7 @@
 #define JMP 													\
 	if( EAD == PPC && !m6502->pending_irq && !m6502->after_cli )	\
 		if( m6502->icount > 0 ) m6502->icount = 0;				\
-	PCD = EAD;													\
-	CHANGE_PC
+	PCD = EAD
 
 /* 6502 ********************************************************
  *  JSR Jump to subroutine
@@ -552,8 +547,7 @@
 	PUSH(PCH);													\
 	PUSH(PCL);													\
 	EAH = RDOPARG();											\
-	PCD = EAD;													\
-	CHANGE_PC
+	PCD = EAD
 
 /* 6502 ********************************************************
  *  LDA Load accumulator
@@ -670,8 +664,7 @@
 	{															\
 		LOG(("M6502#%d RTI sets after_cli\n",cpunum_get_active())); 	\
 		m6502->after_cli = 1;									\
-	}															\
-	CHANGE_PC
+	}
 
 /* 6502 ********************************************************
  *  RTS Return from subroutine
@@ -682,8 +675,7 @@
 	RDMEM(SPD);													\
 	PULL(PCL);													\
 	PULL(PCH);													\
-	RDMEM(PCW); PCW++;											\
-	CHANGE_PC
+	RDMEM(PCW); PCW++
 
 /* 6502 ********************************************************
  *  SBC Subtract with carry

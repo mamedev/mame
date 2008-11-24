@@ -115,8 +115,6 @@ static WRITE8_HANDLER( m6509_write_00000 )
 
 	m6509->pc_bank.b.h2=data&0xf;
 	m6509->pc.w.h=m6509->pc_bank.w.h;
-	change_pc(PCD);
-
 }
 
 static WRITE8_HANDLER( m6509_write_00001 )
@@ -167,8 +165,6 @@ static CPU_RESET( m6509 )
 	m6509->pending_irq = 0;	/* nonzero if an IRQ is pending */
 	m6509->after_cli = 0;	/* pending IRQ and last insn cleared I */
 	m6509->irq_callback = NULL;
-
-	change_pc(PCD);
 }
 
 static CPU_EXIT( m6509 )
@@ -188,7 +184,6 @@ static CPU_SET_CONTEXT( m6509 )
 	{
 		token = src;
 		m6502 = token;
-		change_pc(PCD);
 	}
 }
 
@@ -211,7 +206,6 @@ INLINE void m6509_take_irq(	m6509_Regs *m6502)
 		LOG(("M6509#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
-		change_pc(PCD);
 	}
 	m6502->pending_irq = 0;
 }
@@ -222,8 +216,6 @@ static CPU_EXECUTE( m6509 )
 	m6509_Regs *m6509 = m6502;
 
 	m6502->icount = cycles;
-
-	change_pc(PCD);
 
 	do
 	{
@@ -284,7 +276,6 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
 			LOG(("M6509#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
-			change_pc(PCD);
 		}
 	}
 	else
@@ -324,7 +315,7 @@ static CPU_SET_INFO( m6509 )
 		case CPUINFO_INT_INPUT_STATE + M6509_SET_OVERFLOW:m6509_set_irq_line(m6509, M6509_SET_OVERFLOW, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m6509_set_irq_line(m6509, INPUT_LINE_NMI, info->i); break;
 
-		case CPUINFO_INT_PC:							PCW = info->i; change_pc(PCD);			break;
+		case CPUINFO_INT_PC:							PCW = info->i; 							break;
 		case CPUINFO_INT_REGISTER + M6509_PC:			m6509->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							S = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6509_S:			m6509->sp.b.l = info->i;					break;

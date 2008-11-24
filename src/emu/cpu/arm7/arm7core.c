@@ -533,7 +533,6 @@ static void arm7_core_reset(const device_config *device)
     SwitchMode(eARM7_MODE_SVC);
     SET_CPSR(GET_CPSR | I_MASK | F_MASK | 0x10);
     R15 = 0;
-    change_pc(R15);
 }
 
 // Execute used to be here.. moved to separate file (arm7exec.c) to be included by cpu cores separately
@@ -564,7 +563,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x10;                             /* IRQ Vector address */
-        change_pc(R15);
         ARM7.pendingAbtD = 0;
         return;
     }
@@ -577,7 +575,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK | F_MASK);   /* Mask both IRQ & FIQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x1c;                             /* IRQ Vector address */
-        change_pc(R15);
         return;
     }
 
@@ -589,7 +586,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x18;                             /* IRQ Vector address */
-        change_pc(R15);
         return;
     }
 
@@ -601,7 +597,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x0c;                             /* IRQ Vector address */
-        change_pc(R15);
         ARM7.pendingAbtP = 0;
         return;
     }
@@ -614,7 +609,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);
         R15 = 0x04;                             /* IRQ Vector address */
-        change_pc(R15);
         ARM7.pendingUnd = 0;
         return;
     }
@@ -635,7 +629,6 @@ static void arm7_check_irq_state(void)
         SET_CPSR(GET_CPSR | I_MASK);            /* Mask IRQ */
         SET_CPSR(GET_CPSR & ~T_MASK);           /* Go to ARM mode */
         R15 = 0x08;                             /* Jump to the SWI vector */
-        change_pc(R15);
         ARM7.pendingSwi = 0;
         return;
     }
@@ -792,8 +785,6 @@ static void HandleBranch(UINT32 insn)
     {
         R15 += off + 8;
     }
-
-    change_pc(R15);
 }
 
 static void HandleMemSingle(UINT32 insn)
@@ -866,7 +857,6 @@ static void HandleMemSingle(UINT32 insn)
             {
                 R15 = READ32(rnv);
                 R15 -= 4;
-                change_pc(R15);
                 // LDR, PC takes 2S + 2N + 1I (5 total cycles)
                 ARM7_ICOUNT -= 2;
             }
@@ -1100,7 +1090,6 @@ static void HandleHalfWordDT(UINT32 insn)
             }
         }
     }
-    change_pc(R15);
 }
 
 static void HandleSwap(UINT32 insn)
@@ -1234,7 +1223,6 @@ static void HandleALU(UINT32 insn)
 {
     UINT32 op2, sc = 0, rd, rn, opcode;
     UINT32 by, rdn;
-    UINT32 oldR15 = R15;
 
     opcode = (insn & INSN_OPCODE) >> INSN_OPCODE_SHIFT;
 
@@ -1396,9 +1384,6 @@ static void HandleALU(UINT32 insn)
 #endif
         }
     }
-
-    if (oldR15 != R15)
-        change_pc(R15);
 }
 
 static void HandleMul(UINT32 insn)
@@ -1512,7 +1497,6 @@ static void HandleMemBlock(UINT32 insn)
 {
     UINT32 rb = (insn & INSN_RN) >> INSN_RN_SHIFT;
     UINT32 rbp = GET_REGISTER(rb);
-    UINT32 oldR15 = R15;
     int result;
 
 #if ARM7_DEBUG_CORE
@@ -1687,7 +1671,4 @@ static void HandleMemBlock(UINT32 insn)
         // STM takes (n+1)S+2N+1I cycles (n = # of register transfers)
         ARM7_ICOUNT -= (result + 1) + 2 + 1;
     }
-
-    if (oldR15 != R15)
-        change_pc(R15);
 } /* HandleMemBlock */

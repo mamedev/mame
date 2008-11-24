@@ -331,7 +331,6 @@ INLINE void JMP( UINT16 arg )
 {
 	regs.V = regs.U;
 	regs.PC = arg;
-	change_pc( GET_MINX_PC );
 }
 
 

@@ -336,7 +336,6 @@ static CPU_SET_CONTEXT( dsp32c )
 	/* copy the context */
 	if (src)
 		dsp32 = *(dsp32_regs *)src;
-	change_pc(dsp32.PC);
 
 	/* check for IRQs */
 	check_irqs();
@@ -365,7 +364,6 @@ static CPU_RESET( dsp32c )
 {
 	/* reset goes to 0 */
 	dsp32.PC = 0;
-	change_pc(dsp32.PC);
 
 	/* clear some registers */
 	dsp32.pcw &= 0x03ff;

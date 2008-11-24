@@ -37,7 +37,6 @@ OP_HANDLER( illegal )
 	PUSHBYTE(CC);
 
 	PCD = RM16(m68_state, 0xfff0);
-	CHANGE_PC;
 }
 
 static void IIError(m68_state_t *m68_state)
@@ -217,7 +216,6 @@ OP_HANDLER( jmp_di )
 {
 	DIRECT;
 	PCD = EAD;
-	CHANGE_PC;
 }
 
 /* $0F CLR direct -0100 */
@@ -273,7 +271,6 @@ OP_HANDLER( lbra )
 {
 	IMMWORD(EAP);
 	PC += EA;
-	CHANGE_PC;
 
 	if ( EA == 0xfffd )  /* EHC 980508 speed up busy loop */
 		if ( m68_state->icount > 0)
@@ -286,7 +283,6 @@ OP_HANDLER( lbsr )
 	IMMWORD(EAP);
 	PUSHWORD(pPC);
 	PC += EA;
-	CHANGE_PC;
 }
 
 /* $18 ILLEGAL */
@@ -393,7 +389,7 @@ OP_HANDLER( exg )
 		case  2: Y = t2;  break;
 		case  3: U = t2;  break;
 		case  4: S = t2;  break;
-		case  5: PC = t2; CHANGE_PC; break;
+		case  5: PC = t2; break;
 		case  6: W = t2;  break;
 		case  7: V = t2;  break;
 		case  8: A = (promote ? t2 >> 8 : t2); break;
@@ -411,7 +407,7 @@ OP_HANDLER( exg )
 		case  2: Y = t1;  break;
 		case  3: U = t1;  break;
 		case  4: S = t1;  break;
-		case  5: PC = t1; CHANGE_PC; break;
+		case  5: PC = t1; break;
 		case  6: W = t1;  break;
 		case  7: V = t1;  break;
 		case  8: A = (promote ? t1 >> 8 : t1); break;
@@ -463,7 +459,7 @@ OP_HANDLER( tfr )
 		case  2: Y = t;  break;
 		case  3: U = t;  break;
 		case  4: S = t;  break;
-		case  5: PC = t; CHANGE_PC; break;
+		case  5: PC = t; break;
 		case  6: W = t;  break;
 		case  7: V = t;  break;
 		case  8: A = (promote ? t >> 8 : t); break;
@@ -483,7 +479,6 @@ OP_HANDLER( bra )
 	UINT8 t;
 	IMMBYTE(t);
 	PC += SIGNED(t);
-	CHANGE_PC;
 	/* JB 970823 - speed up busy loops */
 	if( t == 0xfe )
 		if( m68_state->icount > 0 ) m68_state->icount = 0;
@@ -730,11 +725,6 @@ OP_HANDLER( addr_r )
 		CLR_NZVC;
 		*dst16Reg = r16;
 		SET_FLAGS16(*src16Reg,*dst16Reg,r16);
-
-		if ( (tb&15) == 5 )
-		{
-			CHANGE_PC;
-		}
 	}
 	else
 	{
@@ -763,11 +753,6 @@ OP_HANDLER( adcr )
 		CLR_NZVC;
 		*dst16Reg = r16;
 		SET_FLAGS16(*src16Reg,*dst16Reg,r16);
-
-		if ( (tb&15) == 5 )
-		{
-			CHANGE_PC;
-		}
 	}
 	else
 	{
@@ -797,11 +782,6 @@ OP_HANDLER( subr )
 		CLR_NZVC;
 		*dst16Reg = r16;
 		SET_FLAGS16((UINT32)*dst16Reg,(UINT32)*src16Reg,r16);
-
-		if ( (tb&15) == 5 )
-		{
-			CHANGE_PC;
-		}
 	}
 	else
 	{
@@ -830,11 +810,6 @@ OP_HANDLER( sbcr )
 		CLR_NZVC;
 		*dst16Reg = r16;
 		SET_FLAGS16((UINT32)*dst16Reg,(UINT32)*src16Reg,r16);
-
-		if ( (tb&15) == 5 )
-		{
-			CHANGE_PC;
-		}
 	}
 	else
 	{
@@ -863,11 +838,6 @@ OP_HANDLER( andr )
 		CLR_NZV;
 		*dst16Reg = r16;
 		SET_NZ16(r16);
-
-		if ( (tb&15) == 5 )
-		{
-			CHANGE_PC;
-		}
 	}
 	else
 	{
@@ -896,11 +866,6 @@ OP_HANDLER( orr )
 		CLR_NZV;
 		*dst16Reg = r16;
 		SET_NZ16(r16);
-
-		if ( (tb&15) == 5 )
-		{
-			CHANGE_PC;
-		}
 	}
 	else
 	{
@@ -929,11 +894,6 @@ OP_HANDLER( eorr )
 		CLR_NZV;
 		*dst16Reg = r16;
 		SET_NZ16(r16);
-
-		if ( (tb&15) == 5 )
-		{
-			CHANGE_PC;
-		}
 	}
 	else
 	{
@@ -998,7 +958,6 @@ OP_HANDLER( tfmpp )
 		}
 
 		PCD = PCD - 3;
-		CHANGE_PC;
 		W--;
 	}
 	else
@@ -1033,7 +992,6 @@ OP_HANDLER( tfmmm )
 		}
 
 		PCD = PCD - 3;
-		CHANGE_PC;
 		W--;
 	}
 	else
@@ -1068,7 +1026,6 @@ OP_HANDLER( tfmpc )
 		}
 
 		PCD = PCD - 3;
-		CHANGE_PC;
 		W--;
 	}
 	else
@@ -1103,7 +1060,6 @@ OP_HANDLER( tfmcp )
 		}
 
 		PCD = PCD - 3;
-		CHANGE_PC;
 		W--;
 	}
 	else
@@ -1182,7 +1138,7 @@ OP_HANDLER( puls )
 	if( t&0x10 ) { PULLWORD(XD); m68_state->icount -= 2; }
 	if( t&0x20 ) { PULLWORD(YD); m68_state->icount -= 2; }
 	if( t&0x40 ) { PULLWORD(UD); m68_state->icount -= 2; }
-	if( t&0x80 ) { PULLWORD(PCD); CHANGE_PC; m68_state->icount -= 2; }
+	if( t&0x80 ) { PULLWORD(PCD); m68_state->icount -= 2; }
 
 	/* HJB 990225: moved check after all PULLs */
 	if( t&0x01 ) { check_irq_lines(m68_state); }
@@ -1227,7 +1183,7 @@ OP_HANDLER( pulu )
 	if( t&0x10 ) { PULUWORD(XD); m68_state->icount -= 2; }
 	if( t&0x20 ) { PULUWORD(YD); m68_state->icount -= 2; }
 	if( t&0x40 ) { PULUWORD(SD); m68_state->icount -= 2; }
-	if( t&0x80 ) { PULUWORD(PCD); CHANGE_PC; m68_state->icount -= 2; }
+	if( t&0x80 ) { PULUWORD(PCD); m68_state->icount -= 2; }
 
 	/* HJB 990225: moved check after all PULLs */
 	if( t&0x01 ) { check_irq_lines(m68_state); }
@@ -1239,7 +1195,6 @@ OP_HANDLER( pulu )
 OP_HANDLER( rts )
 {
 	PULLWORD(PCD);
-	CHANGE_PC;
 }
 
 /* $3A ABX inherent ----- */
@@ -1271,7 +1226,6 @@ OP_HANDLER( rti )
 		PULLWORD(UD);
 	}
 	PULLWORD(PCD);
-	CHANGE_PC;
 	check_irq_lines(m68_state);	/* HJB 990116 */
 }
 
@@ -1337,7 +1291,6 @@ OP_HANDLER( swi )
 	PUSHBYTE(CC);
 	CC |= CC_IF | CC_II;	/* inhibit FIRQ and IRQ */
 	PCD=RM16(m68_state, 0xfffa);
-	CHANGE_PC;
 }
 
 /* $1130 BAND */
@@ -1508,7 +1461,6 @@ OP_HANDLER( swi2 )
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
 	PCD = RM16(m68_state, 0xfff4);
-	CHANGE_PC;
 }
 
 /* $113F SWI3 absolute indirect ----- */
@@ -1529,7 +1481,6 @@ OP_HANDLER( swi3 )
 	PUSHBYTE(A);
 	PUSHBYTE(CC);
 	PCD = RM16(m68_state, 0xfff2);
-	CHANGE_PC;
 }
 
 /* $40 NEGA inherent ?**** */
@@ -2180,7 +2131,6 @@ OP_HANDLER( jmp_ix )
 {
 	fetch_effective_address(m68_state);
 	PCD = EAD;
-	CHANGE_PC;
 }
 
 /* $6F CLR indexed -0100 */
@@ -2334,7 +2284,6 @@ OP_HANDLER( jmp_ex )
 {
 	EXTENDED;
 	PCD = EAD;
-	CHANGE_PC;
 }
 
 /* $7F CLR extended -0100 */
@@ -2555,7 +2504,6 @@ OP_HANDLER( bsr )
 	IMMBYTE(t);
 	PUSHWORD(pPC);
 	PC += SIGNED(t);
-	CHANGE_PC;
 }
 
 /* $8E LDX (LDY) immediate -**0- */
@@ -2905,7 +2853,6 @@ OP_HANDLER( jsr_di )
 	DIRECT;
 	PUSHWORD(pPC);
 	PCD = EAD;
-	CHANGE_PC;
 }
 
 /* $9E LDX (LDY) direct -**0- */
@@ -3297,7 +3244,6 @@ OP_HANDLER( jsr_ix )
 	fetch_effective_address(m68_state);
 	PUSHWORD(pPC);
 	PCD = EAD;
-	CHANGE_PC;
 }
 
 /* $aE LDX (LDY) indexed -**0- */
@@ -3686,7 +3632,6 @@ OP_HANDLER( jsr_ex )
 	EXTENDED;
 	PUSHWORD(pPC);
 	PCD = EAD;
-	CHANGE_PC;
 }
 
 /* $bE LDX (LDY) extended -**0- */

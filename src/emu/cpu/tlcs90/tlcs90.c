@@ -1077,7 +1077,7 @@ INLINE void w16( const e_r r, UINT16 value )
 		case SP:	T90.sp.w.l  = value;	return;
 		case AF:	T90.af.w.l  = value;	return;
 		case AF2:	T90.af2.w.l = value;	return;
-		case PC:	change_pc( T90.pc.d = value );	return;
+		case PC:	T90.pc.d = value;	return;
 
 		default:
 			fatalerror("%04x: unimplemented w16 register index = %d\n",cpu_get_pc(Machine->activecpu),r);
@@ -1286,7 +1286,6 @@ static void take_interrupt(e_irq irq)
 	F &= ~IF;
 
 	T90.pc.w.l = 0x10 + irq * 8;
-	change_pc( T90.pc.d );
 
 	T90.extra_cycles += 20*2;
 }
@@ -1463,7 +1462,6 @@ static CPU_EXECUTE( t90 )
 				if ( Test( Read1_8() ) )
 				{
 					T90.pc.w.l = Read2_16();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1472,7 +1470,6 @@ static CPU_EXECUTE( t90 )
 				if ( Test( Read1_8() ) )
 				{
 					T90.pc.w.l += /*2 +*/ (INT8)Read2_8();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1481,7 +1478,6 @@ static CPU_EXECUTE( t90 )
 				if ( Test( Read1_8() ) )
 				{
 					T90.pc.w.l += /*2 +*/ Read2_16();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1493,7 +1489,6 @@ static CPU_EXECUTE( t90 )
 				{
 					Push( PC );
 					T90.pc.w.l = Read2_16();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1501,7 +1496,6 @@ static CPU_EXECUTE( t90 )
 			case CALLR:
 				Push( PC );
 				T90.pc.w.l += /*2 +*/ Read1_16();
-				change_pc( T90.pc.d );
 				Cyc();
 				break;
 
@@ -1912,7 +1906,6 @@ static CPU_EXECUTE( t90 )
 				if ( --T90.bc.b.h )
 				{
 					T90.pc.w.l += /*2 +*/ (INT8)Read1_8();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1921,7 +1914,6 @@ static CPU_EXECUTE( t90 )
 				if ( --T90.bc.w.l )
 				{
 					T90.pc.w.l += /*2 +*/ (INT8)Read2_8();
-					change_pc( T90.pc.d );
 					Cyc();
 				}
 				else	Cyc_f();
@@ -1973,7 +1965,7 @@ static CPU_RESET( t90 )
 {
 	T90.irq_state = 0;
 	T90.irq_mask = 0;
-	change_pc( T90.pc.d = 0x0000 );
+	T90.pc.d = 0x0000;
 	F &= ~IF;
 /*
     P0/D0-D7 P1/A0-A7 P2/A8-A15 P6 P7 = INPUT
@@ -2003,7 +1995,6 @@ static CPU_SET_CONTEXT( t90 )
 {
 	if( src )
 		T90 = *(t90_Regs*)src;
-	change_pc(T90.pc.d);
 }
 
 
@@ -2708,7 +2699,7 @@ static CPU_SET_INFO( t90 )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ1:		set_irq_line( INT1,   info->i);				break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_IRQ2:		set_irq_line( INT2,   info->i);				break;
 
-		case CPUINFO_INT_PC:								change_pc( T90.pc.d = info->i );			break;
+		case CPUINFO_INT_PC:								T90.pc.d = info->i;			break;
 		case CPUINFO_INT_REGISTER + T90_PC:					T90.pc.w.l = info->i;						break;
 		case CPUINFO_INT_SP:								T90.sp.w.l = info->i;						break;
 		case CPUINFO_INT_REGISTER + T90_SP:					T90.sp.w.l = info->i;						break;

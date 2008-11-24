@@ -742,9 +742,6 @@ static void namcos1_bankswitch(running_machine *machine, int cpu, offs_t offset,
 		logerror("CPU #%d PC %04x:warning unknown chip selected bank %x=$%04x\n", cpu , cpu_get_pc(machine->activecpu), bank , chip[bank] );
 //          if (chip) popmessage("CPU #%d PC %04x:unknown chip selected bank %x=$%04x", cpu , cpu_get_pc(machine->activecpu), bank , chip[bank] );
 	}
-
-	/* renew pc base */
-//  change_pc(cpu_get_pc(machine->activecpu));
 }
 
 WRITE8_HANDLER( namcos1_bankswitch_w )

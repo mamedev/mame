@@ -322,7 +322,6 @@
 		tmp = RDOPARG();							\
 		EAW = PCW + (signed char)tmp;					\
 		PCD = EAD;								\
-		CHANGE_PC;								\
 	}										\
 	else										\
 	{										\
@@ -339,7 +338,6 @@
 		EAH = RDOPARG();							\
 		EAW = PCW + (short)(EAW-1); 					\
 		PCD = EAD;								\
-		CHANGE_PC;								\
 	}										\
 	else										\
 	{										\
@@ -357,8 +355,7 @@
 	PUSH(P | F_B);									\
 	P = (P | F_I);									\
 	PCL = RDMEM(M6502_IRQ_VEC);							\
-	PCH = RDMEM(M6502_IRQ_VEC+1);							\
-	CHANGE_PC
+	PCH = RDMEM(M6502_IRQ_VEC+1);
 
 /* 65ce02 ********************************************************
  *  BSR Branch to subroutine
@@ -369,8 +366,7 @@
 	PUSH(PCL);									\
 	EAH = RDOPARG();								\
 	EAW = PCW + (INT16)(EAW-1);							\
-	PCD = EAD;									\
-	CHANGE_PC
+	PCD = EAD;
 
 /* 65ce02 ******************************************************
  * CLC  Clear carry flag
@@ -537,8 +533,7 @@
  *  set PC to the effective address
  ***************************************************************/
 #define JMP										\
-	PCD = EAD;									\
-	CHANGE_PC
+	PCD = EAD;
 
 /* 65ce02 ******************************************************
  *  JSR Jump to subroutine
@@ -550,8 +545,7 @@
 	PUSH(PCH);									\
 	PUSH(PCL);									\
 	EAH = RDOPARG();								\
-	PCD = EAD;									\
-	CHANGE_PC
+	PCD = EAD;
 
 /* 65ce02 ******************************************************
  *  JSR Jump to subroutine
@@ -564,8 +558,7 @@
 	PUSH(PCL);									\
 	EAH = RDOPARG();								\
 	PCL = RDMEM(EAD);								\
-	PCH = RDMEM(EAD+1);								\
-	CHANGE_PC
+	PCH = RDMEM(EAD+1);
 
 /* 65ce02 ******************************************************
  *  JSR Jump to subroutine
@@ -578,8 +571,7 @@
 	PUSH(PCL);									\
 	EAH = RDOPARG();								\
 	PCL = RDMEM(EAD);								\
-	PCH = RDMEM(EAD+1);								\
-	CHANGE_PC
+	PCH = RDMEM(EAD+1);
 
 /* 65ce02 ******************************************************
  *  LDA Load accumulator
@@ -766,8 +758,7 @@
 	{										\
 		LOG(("M65ce02#%d RTI sets after_cli\n", cpunum_get_active()));		\
 		AFTER_CLI = 1;							\
-	}										\
-	CHANGE_PC
+	}
 
 /* 65ce02 ******************************************************
  *  RTS Return from subroutine
@@ -776,8 +767,7 @@
 #define RTS										\
 	PULL(PCL);									\
 	PULL(PCH);									\
-	RDMEM(PCW); PCW++;								\
-	CHANGE_PC
+	RDMEM(PCW); PCW++;
 
 /* 65ce02 ******************************************************
  *  RTS imm
@@ -799,8 +789,7 @@
 	if( IRQ_STATE != CLEAR_LINE && !(P & F_I) ) {				\
 	LOG(("M65ce02#%d RTI sets after_cli\n", cpunum_get_active()));			\
 		AFTER_CLI = 1;							\
-	}										\
-	CHANGE_PC
+	}
 
 
 /* 65ce02 *******************************************************

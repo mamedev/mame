@@ -112,7 +112,6 @@ static CPU_SET_CONTEXT( ccpu )
 	/* copy the context */
 	if (src)
 		ccpu = *(ccpuRegs *)src;
-	change_pc(ccpu.PC);
 }
 
 
@@ -296,7 +295,6 @@ static CPU_EXECUTE( ccpu )
 			/* T4K */
 			case 0x50:
 				ccpu.PC = (ccpu.P << 12) + ccpu.J;
-				change_pc(ccpu.PC);
 				NEXT_ACC_B(); CYCLES(4);
 				break;
 

@@ -104,8 +104,6 @@ static CPU_RESET( lh5801 )
 {
 	P = (memory_read_byte(lh5801.program, 0xfffe)<<8) | memory_read_byte(lh5801.program, 0xffff);
 
-	change_pc(P);
-
 	lh5801.idle=0;
 }
 
@@ -120,15 +118,12 @@ static CPU_SET_CONTEXT( lh5801 )
 	if( src )
 	{
 		lh5801 = *(LH5801_Regs*)src;
-		change_pc(P);
 	}
 }
 
 static CPU_EXECUTE( lh5801 )
 {
 	lh5801_icount = cycles;
-
-	change_pc(P);
 
 	if (lh5801.idle) {
 		lh5801_icount=0;

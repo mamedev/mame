@@ -64,8 +64,6 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 /************************************************************************/
 
-#define CHANGE_PC change_pc((I.sregs[CS]<<4) + I.ip)
-
 #define SegBase(Seg) (I.sregs[Seg] << 4)
 
 #define DefaultBase(Seg) ((seg_prefix && (Seg==DS || Seg==SS)) ? prefix_base : I.sregs[Seg] << 4)
@@ -152,7 +150,6 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 		static const UINT8 table[3]={3,10,10}; 	\
 		I.ip = (WORD)(I.ip+tmp);			\
 		nec_ICount-=table[chip_type/8];		\
-		CHANGE_PC;							\
 		return;								\
 	}
 

@@ -49,7 +49,6 @@
 
     20021020 O. Galibert
     - DMA implementation, lightly tested
-    - change_pc() crap fixed
     - delay slot in debugger fixed
     - add divide box mirrors
     - Nicola-ify the indentation
@@ -334,7 +333,6 @@ INLINE void BF(UINT32 d)
 	{
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh2->pc = sh2->ea = sh2->pc + disp * 2 + 2;
-		change_pc(sh2->pc & AM);
 		sh2_icount -= 2;
 	}
 }
@@ -425,7 +423,6 @@ INLINE void BT(UINT32 d)
 	{
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh2->pc = sh2->ea = sh2->pc + disp * 2 + 2;
-		change_pc(sh2->pc & AM);
 		sh2_icount -= 2;
 	}
 }
@@ -1742,7 +1739,6 @@ INLINE void TRAPA(UINT32 i)
 	WL( sh2->r[15], sh2->pc );
 
 	sh2->pc = RL( sh2->ea );
-	change_pc(sh2->pc & AM);
 
 	sh2_icount -= 7;
 }
@@ -2173,7 +2169,6 @@ static CPU_RESET( sh2 )
 	sh2->pc = RL(0);
 	sh2->r[15] = RL(4);
 	sh2->sr = I;
-	change_pc(sh2->pc & AM);
 
 	sh2->internal_irq_level = -1;
 }
@@ -2203,7 +2198,6 @@ static CPU_EXECUTE( sh2 )
 		if (sh2->delay)
 		{
 			opcode = memory_decrypted_read_word(sh2->program, WORD_XOR_BE((UINT32)(sh2->delay & AM)));
-			change_pc(sh2->pc & AM);
 			sh2->pc -= 2;
 		}
 		else

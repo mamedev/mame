@@ -414,8 +414,7 @@ static const UINT8 flags8d[256]= /* decrement */
 #define IDXWORD(w) {INDEXED;w.d=RM16(m68_state, EAD);}
 
 /* Macros for branch instructions */
-#define CHANGE_PC(m68_state) change_pc(PCD)
-#define BRANCH(f) {IMMBYTE(t);if(f){PC+=SIGNED(t);CHANGE_PC(m68_state);}}
+#define BRANCH(f) {IMMBYTE(t);if(f){PC+=SIGNED(t);}}
 #define NXORV  ((CC&0x08)^((CC&0x02)<<2))
 
 #define M6800_WAI		8			/* set when WAI is waiting for an interrupt */
@@ -552,7 +551,6 @@ static void enter_interrupt(m68_state_t *m68_state, const char *message,UINT16 i
 	}
 	SEI;
 	PCD = RM16(m68_state,  irq_vector );
-	CHANGE_PC(m68_state);
 }
 
 
@@ -906,7 +904,6 @@ static CPU_RESET( m6800 )
 	
 	SEI;				/* IRQ disabled */
 	PCD = RM16(m68_state,  0xfffe );
-	CHANGE_PC(m68_state);
 
 	m68_state->wai_state = 0;
 	m68_state->nmi_state = 0;
@@ -957,7 +954,6 @@ static CPU_SET_CONTEXT( m6800 )
 {
 	m68_state_t *m68_state = src;
 	
-	CHANGE_PC(m68_state);
 	CHECK_IRQ_LINES(m68_state); /* HJB 990417 */
 }
 
@@ -2707,7 +2703,7 @@ static CPU_SET_INFO( m6800 )
 		case CPUINFO_INT_INPUT_STATE + M6800_TIN_LINE:	set_irq_line(m68_state, M6800_TIN_LINE, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(m68_state, INPUT_LINE_NMI, info->i);	break;
 
-		case CPUINFO_INT_PC:							PC = info->i; CHANGE_PC(m68_state);				break;
+		case CPUINFO_INT_PC:							PC = info->i; 								break;
 		case CPUINFO_INT_REGISTER + M6800_PC:			m68_state->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							S = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6800_S:			m68_state->s.w.l = info->i;					break;

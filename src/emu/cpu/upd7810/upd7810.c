@@ -843,7 +843,6 @@ static void upd7810_take_irq(void)
 		IFF = 0;
 		PSW &= ~(SK|L0|L1);
 		PC = vector;
-		change_pc( PCD );
 	}
 }
 
@@ -1769,7 +1768,6 @@ static CPU_EXECUTE( upd7810 )
 			}
 			PSW &= ~SK;
 			upd7810.handle_timers( cc );
-			change_pc( PCD );
 		}
 		else
 		{
@@ -1816,7 +1814,6 @@ static void set_irq_line(int irqline, int state)
 				IFF = 0;
 				PSW &= ~(SK|L0|L1);
 				PC = 0x0004;
-				change_pc( PCD );
 			}
 		}
 		else
@@ -1850,7 +1847,7 @@ static CPU_SET_INFO( upd7810 )
 		case CPUINFO_INT_INPUT_STATE + UPD7810_INTF2:	set_irq_line(UPD7810_INTF2, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + UPD7810_INTFE1:	set_irq_line(UPD7810_INTFE1, info->i);	break;
 
-		case CPUINFO_INT_PC:							PC = info->i; change_pc(PCD);			break;
+		case CPUINFO_INT_PC:							PC = info->i; 							break;
 		case CPUINFO_INT_REGISTER + UPD7810_PC:			PC = info->i; 							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + UPD7810_SP:			SP = info->i; 							break;

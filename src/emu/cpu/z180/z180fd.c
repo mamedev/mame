@@ -263,7 +263,7 @@ OP(fd,e6) { illegal_1(); op_e6();									} /* DB   FD          */
 OP(fd,e7) { illegal_1(); op_e7();									} /* DB   FD          */
 
 OP(fd,e8) { illegal_1(); op_e8();									} /* DB   FD          */
-OP(fd,e9) { _R++; _PC = _IY; z180_change_pc(_PCD);					} /* JP   (IY)        */
+OP(fd,e9) { _R++; _PC = _IY; 										} /* JP   (IY)        */
 OP(fd,ea) { illegal_1(); op_ea();									} /* DB   FD          */
 OP(fd,eb) { illegal_1(); op_eb();									} /* DB   FD          */
 OP(fd,ec) { illegal_1(); op_ec();									} /* DB   FD          */

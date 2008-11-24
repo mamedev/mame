@@ -513,7 +513,6 @@
                                             if (rd == 7)
                                             {
                                                 R15 += 2;
-                                                change_pc(R15);
                                             }
                                             break;
                                         case 0x3: /* Add HRd, HRs */
@@ -526,7 +525,6 @@
                                             if (rd == 7)
                                             {
                                                 R15 += 2;
-                                                change_pc(R15);
                                             }
                                             break;
                                         default:
@@ -595,7 +593,6 @@
                                             else
                                             {
                                                 R15 &= ~1;
-                                                change_pc(R15);
                                             }
                                             break;
                                         case 0x3:       // MOV Hd, Hs
@@ -616,7 +613,6 @@
                                             if (rd == 7)
                                             {
                                                 R15 &= ~1;
-                                                change_pc(R15);
                                             }
                                             break;
                                         default:
@@ -1354,8 +1350,6 @@
                         ARM7_ICOUNT +=2;    //Any unexecuted instruction only takes 1 cycle (page 193)
             }
         }
-
-        change_pc(R15);
 
         ARM7_CHECKIRQ;
 

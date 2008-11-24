@@ -324,9 +324,6 @@ static void amiga_m68k_reset(const device_config *device)
 	{
 		amiga_cia_w(space, 0x1001/2, 1, 0xffff);
 	}
-
-	if (cpu_get_pc(space->cpu) < 0x80000)
-		change_pc(0);
 }
 
 

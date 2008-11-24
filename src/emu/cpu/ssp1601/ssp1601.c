@@ -78,7 +78,6 @@ struct _ssp1601_state_t
 #define FETCH() memory_decrypted_read_word(ssp1601_state->program, rPC++ << 1)
 #define PROGRAM_WORD(a) memory_read_word(ssp1601_state->program, (a) << 1)
 #define GET_PPC_OFFS() PPC
-#define CHANGEPC() change_pc(rPC << 1)
 
 #define REG_READ(ssp1601_state,r) (((r) <= 4) ? ssp1601_state->gr[r].w.h : reg_read_handlers[r](ssp1601_state, r))
 #define REG_WRITE(ssp1601_state,r,d) { \
@@ -294,7 +293,6 @@ static void write_PC(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 {
 	rPC = d;
 	ssp1601_state->g_cycles--;
-	CHANGEPC();
 }
 
 // 7
@@ -611,7 +609,7 @@ static CPU_EXECUTE( ssp1601 )
 				int cond = 0;
 				CHECK_00f();
 				COND_CHECK
-				if (cond) { int new_PC = FETCH(); write_STACK(ssp1601_state, SSP_STACK, rPC); rPC = new_PC; CHANGEPC(); }
+				if (cond) { int new_PC = FETCH(); write_STACK(ssp1601_state, SSP_STACK, rPC); rPC = new_PC; }
 				else rPC++;
 				ssp1601_state->g_cycles--; // always 2 cycles
 				break;
@@ -630,7 +628,7 @@ static CPU_EXECUTE( ssp1601 )
 				int cond = 0;
 				CHECK_00f();
 				COND_CHECK
-				if (cond) { rPC = FETCH(); CHANGEPC(); }
+				if (cond) { rPC = FETCH(); }
 				else rPC++;
 				ssp1601_state->g_cycles--;
 				break;

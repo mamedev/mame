@@ -818,7 +818,6 @@ static CPU_RESET( sh2 )
 	sh2->pc = memory_read_dword_32be(sh2->program, 0);
 	sh2->r[15] = memory_read_dword_32be(sh2->program, 4);
 	sh2->sr = I;
-	change_pc(sh2->pc & AM);
 
 	sh2->internal_irq_level = -1;
 

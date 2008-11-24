@@ -145,7 +145,6 @@ static CPU_RESET( ppc403 )
 	ppc.pc = ppc.npc = 0xfffffffc;
 
 	ppc_set_msr(0);
-	change_pc(ppc.pc);
 }
 
 static CPU_EXECUTE( ppc403 )
@@ -153,7 +152,6 @@ static CPU_EXECUTE( ppc403 )
 	UINT32 fit_trigger_cycle;
 	ppc_icount = cycles;
 	ppc_tb_base_icount = cycles;
-	change_pc(ppc.npc);
 
 	fit_trigger_cycle = 0x7fffffff;
 
@@ -270,7 +268,6 @@ void ppc403_exception(int exception)
 				ppc_set_msr(msr);
 
 				ppc.npc = EVPR | 0x0500;
-				change_pc(ppc.npc);
 
 				ppc.interrupt_pending &= ~0x1;
 			}
@@ -295,7 +292,6 @@ void ppc403_exception(int exception)
 					ppc.npc = 0xfff00000 | 0x0700;
 				else
 					ppc.npc = EVPR | 0x0700;
-				change_pc(ppc.npc);
 			break;
 		}
 
@@ -317,7 +313,6 @@ void ppc403_exception(int exception)
 					ppc.npc = 0xfff00000 | 0x0c00;
 				else
 					ppc.npc = EVPR | 0x0c00;
-				change_pc(ppc.npc);
 			break;
 		}
 
@@ -337,7 +332,6 @@ void ppc403_exception(int exception)
 				ppc_set_msr(msr);
 
 				ppc.npc = EVPR | 0x1000;
-				change_pc(ppc.npc);
 
 				ppc.tsr |= 0x08000000;		// PIT interrupt
 				ppc.interrupt_pending &= ~0x2;
@@ -361,8 +355,7 @@ void ppc403_exception(int exception)
 				ppc_set_msr(msr);
 
 				ppc.npc = EVPR | 0x1010;
-				change_pc(ppc.npc);
-				ppc.interrupt_pending &= ~0x4;
+			ppc.interrupt_pending &= ~0x4;
 			}
 			break;
 		}
@@ -382,7 +375,6 @@ void ppc403_exception(int exception)
 			ppc_set_msr(msr);
 
 			ppc.npc = EVPR | 0x1020;
-			change_pc(ppc.npc);
 			break;
 		}
 
@@ -402,7 +394,6 @@ void ppc403_exception(int exception)
 
 			EXISR |= 0x80000000;
 			ppc.npc = EVPR | 0x100;
-			change_pc(ppc.npc);
 			break;
 		}
 
@@ -531,7 +522,6 @@ static void ppc_rfci(UINT32 op)
 	msr = ppc.srr3;
 	ppc_set_msr( msr );
 
-	change_pc(ppc.npc);
 }
 #endif
 

@@ -268,7 +268,7 @@ OP(dd,e6) { illegal_1(); op_e6();									} /* DB   DD          */
 OP(dd,e7) { illegal_1(); op_e7();									} /* DB   DD          */
 
 OP(dd,e8) { illegal_1(); op_e8();									} /* DB   DD          */
-OP(dd,e9) { _R++; _PC = _IX; z180_change_pc(_PCD);					} /* JP   (IX)        */
+OP(dd,e9) { _R++; _PC = _IX; 										} /* JP   (IX)        */
 OP(dd,ea) { illegal_1(); op_ea();									} /* DB   DD          */
 OP(dd,eb) { illegal_1(); op_eb();									} /* DB   DD          */
 OP(dd,ec) { illegal_1(); op_ec();									} /* DB   DD          */

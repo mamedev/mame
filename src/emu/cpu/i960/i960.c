@@ -98,7 +98,6 @@ INLINE void send_iac(i960_state_t *i960, UINT32 adr)
 		i960->SAT  = iac[1];
 		i960->PRCB = iac[2];
 		i960->IP   = iac[3];
-		change_pc(i960->IP);
 		break;
 	default:
 		fatalerror("I960: %x: IAC %08x %08x %08x %08x", i960->PIP, iac[0], iac[1], iac[2], iac[3]);
@@ -377,7 +376,6 @@ INLINE void bxx(i960_state_t *i960, UINT32 opcode, int mask)
 {
 	if(i960->AC & mask) {
 		i960->IP += get_disp(i960, opcode);
-		change_pc(i960->IP);
 	}
 }
 
@@ -385,7 +383,6 @@ INLINE void bxx_s(i960_state_t *i960, UINT32 opcode, int mask)
 {
 	if(i960->AC & mask) {
 		i960->IP += get_disp_s(i960, opcode);
-		change_pc(i960->IP);
 	}
 }
 
@@ -547,8 +544,6 @@ static void do_call(i960_state_t *i960, UINT32 adr, int type, UINT32 stack)
 
 	i960->r[I960_FP]  = (i960->r[I960_SP] + 63) & ~63;
 	i960->r[I960_SP]  = i960->r[I960_FP] + 64;
-
-	change_pc(i960->IP);
 }
 
 static void do_ret_0(i960_state_t *i960)
@@ -580,7 +575,6 @@ static void do_ret_0(i960_state_t *i960)
 
 //  mame_printf_debug("RET (type %d): FP %x, %x => %x, rcache_pos %d\n", type, i960->r[I960_FP], i960->IP, i960->r[I960_RIP], i960->rcache_pos);
 	i960->IP = i960->r[I960_RIP];
-	change_pc(i960->IP);
 }
 
 static void do_ret(i960_state_t *i960)
@@ -618,7 +612,6 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 		case 0x08: // b
 			i960->icount--;
 			i960->IP += get_disp(i960, opcode);
-			change_pc(i960->IP);
 			break;
 	
 		case 0x09: // call
@@ -633,14 +626,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			i960->icount -= 5;
 			i960->r[0x1e] = i960->IP;
 			i960->IP += get_disp(i960, opcode);
-			change_pc(i960->IP);
 			break;
 	
 		case 0x10: // bno
 			i960->icount--;
 			if(!(i960->AC & 7)) {
 				i960->IP += get_disp(i960, opcode);
-				change_pc(i960->IP);
 			}
 			break;
 	
@@ -729,7 +720,6 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			if(!(t2 & (1<<t1))) {
 				i960->AC = (i960->AC & ~7) | 2;
 				i960->IP += get_disp_s(i960, opcode);
-				change_pc(i960->IP);
 			} else
 				i960->AC &= ~7;
 			break;
@@ -789,7 +779,6 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			if(t2 & (1<<t1)) {
 				i960->AC = (i960->AC & ~7) | 2;
 				i960->IP += get_disp_s(i960, opcode);
-				change_pc(i960->IP);
 			} else
 				i960->AC &= ~7;
 			break;
@@ -1799,7 +1788,6 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 		case 0x84: // bx
 			i960->icount -= 3;
 			i960->IP = get_ea(i960, opcode);
-			change_pc(i960->IP);
 			break;
 	
 		case 0x85: // balx
@@ -1807,7 +1795,6 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			t1 = get_ea(i960, opcode);
 			i960->r[(opcode>>19)&0x1f] = i960->IP;
 			i960->IP = t1;
-			change_pc(i960->IP);
 			break;
 	
 		case 0x86: // callx
@@ -2058,7 +2045,7 @@ static CPU_SET_INFO( i960 )
 
 	switch(state) {
 		// Interfacing
-	case CPUINFO_INT_REGISTER + I960_IP:		i960->IP = info->i; change_pc(i960->IP);	break;
+	case CPUINFO_INT_REGISTER + I960_IP:		i960->IP = info->i; 						break;
 	case CPUINFO_INT_INPUT_STATE + I960_IRQ0:	set_irq_line(i960, I960_IRQ0, info->i);		break;
 	case CPUINFO_INT_INPUT_STATE + I960_IRQ1:	set_irq_line(i960, I960_IRQ1, info->i);		break;
 	case CPUINFO_INT_INPUT_STATE + I960_IRQ2:	set_irq_line(i960, I960_IRQ2, info->i);		break;

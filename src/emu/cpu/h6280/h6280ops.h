@@ -28,7 +28,6 @@
 #define S	h6280.sp.b.l
 
 #define TRANSLATED(addr)	((h6280.mmr[(addr)>>13] << 13) | ((addr)&0x1fff))
-//#define CHANGE_PC			do { offs_t temp = TRANSLATED(PCW); change_pc(temp); } while (0)
 #define CHANGE_PC
 #define H6280_CYCLES(cyc)											\
 	{																\
@@ -80,7 +79,6 @@
 	P = (P & ~_fD) | _fI;	/* knock out D and set I flag */	\
 	PCL = RDMEM(vector);										\
 	PCH = RDMEM((vector+1));									\
-	CHANGE_PC;													\
 }
 
 #define CHECK_AND_TAKE_IRQ_LINES 								\
@@ -203,7 +201,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 		PCW++;													\
 		EAW = PCW + (signed char)tmp;							\
 		PCD = EAD;												\
-		CHANGE_PC;												\
 	}															\
 	else														\
 	{															\
@@ -568,7 +565,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 	P = (P & ~_fD) | _fI;										\
 	PCL = RDMEM(H6280_IRQ2_VEC); 								\
 	PCH = RDMEM(H6280_IRQ2_VEC+1);								\
-	CHANGE_PC
 
 /* 6280 ********************************************************
  *  BSR Branch to subroutine
@@ -766,7 +762,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 #define JMP 													\
 	CLEAR_T;													\
 	PCD = EAD;													\
-	CHANGE_PC
 
 /* 6280 ********************************************************
  *  JSR Jump to subroutine
@@ -779,7 +774,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 	PUSH(PCH);													\
 	PUSH(PCL);													\
 	PCD = EAD;													\
-	CHANGE_PC
 
 /* 6280 ********************************************************
  *  LDA Load accumulator
@@ -958,7 +952,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 		 ((P & _fZ) ^ _fZ); 									\
 	PULL(PCL);													\
 	PULL(PCH);													\
-	CHANGE_PC;													\
 	CHECK_IRQ_LINES
 #else
 
@@ -967,7 +960,6 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 	P |= _fB;													\
 	PULL(PCL);													\
 	PULL(PCH);													\
-	CHANGE_PC;													\
 	CHECK_IRQ_LINES
 #endif
 
@@ -979,8 +971,7 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
 	CLEAR_T;													\
 	PULL(PCL);													\
 	PULL(PCH);													\
-	PCW++;														\
-	CHANGE_PC
+	PCW++;
 
 /* 6280 ********************************************************
  *  SAX Swap accumulator and index X
@@ -1204,8 +1195,7 @@ INLINE void WRMEM(offs_t addr, UINT8 data) {
     if (tmp&0x10) h6280.mmr[4] = A;                             \
     if (tmp&0x20) h6280.mmr[5] = A;                             \
     if (tmp&0x40) h6280.mmr[6] = A;                             \
-    if (tmp&0x80) h6280.mmr[7] = A;								\
-    CHANGE_PC
+    if (tmp&0x80) h6280.mmr[7] = A
 
 /* 6280 ********************************************************
  *  TAX Transfer accumulator to index X

@@ -313,7 +313,6 @@ INLINE void BF(UINT32 d)
 	{
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh4.pc = sh4.ea = sh4.pc + disp * 2 + 2;
-		change_pc(sh4.pc & AM);
 		sh4.sh4_icount -= 2;
 	}
 }
@@ -404,7 +403,6 @@ INLINE void BT(UINT32 d)
 	{
 		INT32 disp = ((INT32)d << 24) >> 24;
 		sh4.pc = sh4.ea = sh4.pc + disp * 2 + 2;
-		change_pc(sh4.pc & AM);
 		sh4.sh4_icount -= 2;
 	}
 }
@@ -1743,7 +1741,6 @@ INLINE void TRAPA(UINT32 i)
 
 	sh4.m[EXPEVT] = 0x00000160;
 	sh4.pc = sh4.vbr + 0x00000100;
-	change_pc(sh4.pc & AM);
 
 	sh4.sh4_icount -= 7;
 }
@@ -3311,7 +3308,6 @@ static CPU_RESET( sh4 )
 	sh4.fpu_pr = (sh4.fpscr & PR) ? 1 : 0;
 	sh4.fpul = 0;
 	sh4.dbr = 0;
-	change_pc(sh4.pc & AM);
 
 	sh4.internal_irq_level = -1;
 	sh4.irln = 15;
@@ -3332,7 +3328,6 @@ static CPU_EXECUTE( sh4 )
 		if (sh4.delay)
 		{
 			opcode = memory_decrypted_read_word(sh4.program, WORD2_XOR_LE((UINT32)(sh4.delay & AM)));
-			change_pc(sh4.pc & AM);
 			sh4.pc -= 2;
 		}
 		else

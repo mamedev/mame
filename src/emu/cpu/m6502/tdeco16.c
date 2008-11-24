@@ -16,8 +16,7 @@
 	PUSH(P | F_B);									\
 	P = (P | F_I);									\
 	PCL = RDMEM(DECO16_IRQ_VEC+1); 							\
-	PCH = RDMEM(DECO16_IRQ_VEC);							\
-	CHANGE_PC
+	PCH = RDMEM(DECO16_IRQ_VEC);
 
 
 /*****************************************************************************

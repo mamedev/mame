@@ -103,7 +103,7 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,SIH,SIL,DIH,DIL } BREGS;
 #define FETCHOP					(memory_decrypted_read_byte(I.program, FETCH_XOR(I.pc++)))
 #define PEEKOP(addr)			(memory_decrypted_read_byte(I.program, FETCH_XOR(addr)))
 #define FETCHWORD(var) 			{ var = memory_raw_read_byte(I.program, FETCH_XOR(I.pc)); var += (memory_raw_read_byte(I.program, FETCH_XOR(I.pc + 1)) << 8); I.pc += 2; }
-#define CHANGE_PC(addr)			change_pc(addr)
+#define CHANGE_PC(addr)
 #define PUSH(val)				{ I.regs.w[SP] -= 2; WriteWord(((I.base[SS] + I.regs.w[SP]) & AMASK), val); }
 #define POP(var)				{ var = ReadWord(((I.base[SS] + I.regs.w[SP]) & AMASK)); I.regs.w[SP] += 2; }
 

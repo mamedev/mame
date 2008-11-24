@@ -22,7 +22,6 @@ void ppc603_exception(int exception)
 					ppc.npc = 0x00000000 | 0x0500;
 
 				ppc.interrupt_pending &= ~0x1;
-				change_pc(ppc.npc);
 			}
 			break;
 
@@ -46,7 +45,6 @@ void ppc603_exception(int exception)
 					ppc.npc = 0x00000000 | 0x0900;
 
 				ppc.interrupt_pending &= ~0x2;
-				change_pc(ppc.npc);
 			}
 			break;
 
@@ -68,7 +66,6 @@ void ppc603_exception(int exception)
 					ppc.npc = 0xfff00000 | 0x0700;
 				else
 					ppc.npc = 0x00000000 | 0x0700;
-				change_pc(ppc.npc);
 			}
 			break;
 
@@ -90,7 +87,6 @@ void ppc603_exception(int exception)
 					ppc.npc = 0xfff00000 | 0x0c00;
 				else
 					ppc.npc = 0x00000000 | 0x0c00;
-				change_pc(ppc.npc);
 			}
 			break;
 
@@ -114,7 +110,6 @@ void ppc603_exception(int exception)
 					ppc.npc = 0x00000000 | 0x1400;
 
 				ppc.interrupt_pending &= ~0x4;
-				change_pc(ppc.npc);
 			}
 			break;
 
@@ -138,7 +133,6 @@ void ppc603_exception(int exception)
 					ppc.npc = 0x00000000 | 0x0300;
 
 				ppc.interrupt_pending &= ~0x4;
-				change_pc(ppc.npc);
 			}
 			break;
 
@@ -162,7 +156,6 @@ void ppc603_exception(int exception)
 					ppc.npc = 0x00000000 | 0x0400;
 
 				ppc.interrupt_pending &= ~0x4;
-				change_pc(ppc.npc);
 			}
 			break;
 
@@ -219,7 +212,6 @@ static CPU_RESET( ppc603 )
 	ppc.pc = ppc.npc = 0xfff00100;
 
 	ppc_set_msr(0x40);
-	change_pc(ppc.pc);
 
 	ppc.hid0 = 1;
 
@@ -244,8 +236,6 @@ static CPU_EXECUTE( ppc603 )
 	{
 		ppc_dec_trigger_cycle = 0x7fffffff;
 	}
-
-	change_pc(ppc.npc);
 
 	// MinGW's optimizer kills setjmp()/longjmp()
 	SETJMP_GNUC_PROTECT();

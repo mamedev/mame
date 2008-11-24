@@ -295,8 +295,6 @@ INLINE UINT32 GetRegister( int rIndex )
 INLINE void SetRegister( int rIndex, UINT32 value )
 {
 	arm.sArmRegister[sRegisterTable[MODE][rIndex]] = value;
-	if (rIndex == eR15)
-		change_pc(value & ADDRESS_MASK);
 }
 
 /***************************************************************************/
@@ -311,7 +309,6 @@ static CPU_RESET( arm )
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
-	change_pc(R15 & ADDRESS_MASK);
 }
 
 static CPU_EXIT( arm )
@@ -415,7 +412,6 @@ static CPU_EXECUTE( arm )
 			R15 = eARM_MODE_SVC;	/* Set SVC mode so PC is saved to correct R14 bank */
 			SetRegister( 14, pc );	/* save PC */
 			R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x8|eARM_MODE_SVC|I_MASK|(pc&MODE_MASK);
-			change_pc(pc&ADDRESS_MASK);
 			arm_icount -= 2 * S_CYCLE + N_CYCLE;
 		}
 		else /* Undefined */
@@ -447,7 +443,6 @@ static CPU_SET_CONTEXT( arm )
 	if (src)
 	{
 		memcpy( &arm, src, sizeof(arm) );
-		change_pc(R15 & ADDRESS_MASK);
 	}
 }
 
@@ -469,7 +464,6 @@ static void arm_check_irq_state(void)
 		R15 = eARM_MODE_FIQ;	/* Set FIQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );	/* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x1c|eARM_MODE_FIQ|I_MASK|F_MASK; /* Mask both IRQ & FIRQ, set PC=0x1c */
-		change_pc(R15 & ADDRESS_MASK);
 		arm.pendingFiq=0;
 		return;
 	}
@@ -478,7 +472,6 @@ static void arm_check_irq_state(void)
 		R15 = eARM_MODE_IRQ;	/* Set IRQ mode so PC is saved to correct R14 bank */
 		SetRegister( 14, pc );	/* save PC */
 		R15 = (pc&PSR_MASK)|(pc&IRQ_MASK)|0x18|eARM_MODE_IRQ|I_MASK|(pc&F_MASK); /* Mask only IRQ, set PC=0x18 */
-		change_pc(R15 & ADDRESS_MASK);
 		arm.pendingIrq=0;
 		return;
 	}
@@ -545,7 +538,6 @@ static void HandleBranch(  UINT32 insn )
 	{
 		R15 += off + 8;
 	}
-	change_pc(R15 & ADDRESS_MASK);
 	arm_icount -= 2 * S_CYCLE + N_CYCLE;
 }
 
@@ -621,7 +613,6 @@ static void HandleMemSingle( UINT32 insn )
 			if (rd == eR15)
 			{
 				R15 = (READ32(rnv) & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & MODE_MASK);
-				change_pc(R15 & ADDRESS_MASK);
 
 				/*
                 The docs are explicit in that the bottom bits should be masked off
@@ -857,7 +848,6 @@ static void HandleALU( UINT32 insn )
 		{
 			/* Merge the old NZCV flags into the new PC value */
 			R15 = (rd & ADDRESS_MASK) | (R15 & PSR_MASK) | (R15 & IRQ_MASK) | (R15&MODE_MASK);
-			change_pc(R15 & ADDRESS_MASK);
 			arm_icount -= S_CYCLE + N_CYCLE;
 		}
 		else

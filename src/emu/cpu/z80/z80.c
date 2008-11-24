@@ -651,7 +651,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 #define JP(Z) do {												\
 	(Z)->PCD = ARG16(Z);										\
 	(Z)->MEMPTR = (Z)->PCD;										\
-	change_pc((Z)->PCD);										\
 } while (0)
 
 /***************************************************************
@@ -662,7 +661,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 	{															\
 		(Z)->PCD = ARG16(Z);									\
 		(Z)->MEMPTR = (Z)->PCD;									\
-		change_pc((Z)->PCD);									\
 	}															\
 	else														\
 	{															\
@@ -677,7 +675,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 	INT8 arg = (INT8)ARG(Z); 	/* ARG() also increments PC */	\
 	(Z)->PC += arg;				/* so don't do PC += ARG() */	\
 	(Z)->MEMPTR = (Z)->PC;										\
-	change_pc((Z)->PCD);										\
 } while (0)
 
 /***************************************************************
@@ -700,7 +697,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 	(Z)->MEMPTR = (Z)->ea;										\
 	PUSH((Z), pc);												\
 	(Z)->PCD = (Z)->ea;											\
-	change_pc((Z)->PCD);										\
 } while (0)
 
 /***************************************************************
@@ -714,7 +710,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 		PUSH((Z), pc);											\
 		(Z)->PCD = (Z)->ea;										\
 		CC(Z, ex, opcode);										\
-		change_pc((Z)->PCD);									\
 	}															\
 	else														\
 	{															\
@@ -730,7 +725,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 	{															\
 		POP((Z), pc);											\
 		(Z)->MEMPTR = (Z)->PC;									\
-		change_pc((Z)->PCD);									\
 		CC(Z, ex, opcode);										\
 	}															\
 } while (0)
@@ -743,7 +737,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 		(Z)->device->tag, (Z)->iff1, (Z)->iff2)); 				\
 	POP((Z), pc);												\
 	(Z)->MEMPTR = (Z)->PC;										\
-	change_pc((Z)->PCD);										\
 	(Z)->iff1 = (Z)->iff2;										\
 } while (0)
 
@@ -753,7 +746,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 #define RETI(Z) do {											\
 	POP((Z), pc);												\
 	(Z)->MEMPTR = (Z)->PC;										\
-	change_pc((Z)->PCD);										\
 /* according to http://www.msxnet.org/tech/z80-documented.pdf */\
 	(Z)->iff1 = (Z)->iff2;										\
 	if ((Z)->daisy != NULL)										\
@@ -798,7 +790,6 @@ INLINE UINT32 ARG16(z80_state *z80)
 	PUSH((Z), pc);												\
 	(Z)->PCD = addr;											\
 	(Z)->MEMPTR = (Z)->PC;										\
-	change_pc((Z)->PCD);										\
 } while (0)
 
 /***************************************************************
@@ -2289,7 +2280,7 @@ OP(dd,e6) { illegal_1(z80); op_e6(z80);												} /* DB   DD          */
 OP(dd,e7) { illegal_1(z80); op_e7(z80);												} /* DB   DD          */
 
 OP(dd,e8) { illegal_1(z80); op_e8(z80);												} /* DB   DD          */
-OP(dd,e9) { z80->PC = z80->IX; change_pc(z80->PCD);									} /* JP   (IX)        */
+OP(dd,e9) { z80->PC = z80->IX; 														} /* JP   (IX)        */
 OP(dd,ea) { illegal_1(z80); op_ea(z80);												} /* DB   DD          */
 OP(dd,eb) { illegal_1(z80); op_eb(z80);												} /* DB   DD          */
 OP(dd,ec) { illegal_1(z80); op_ec(z80);												} /* DB   DD          */
@@ -2580,7 +2571,7 @@ OP(fd,e6) { illegal_1(z80); op_e6(z80);												} /* DB   FD          */
 OP(fd,e7) { illegal_1(z80); op_e7(z80);												} /* DB   FD          */
 
 OP(fd,e8) { illegal_1(z80); op_e8(z80);												} /* DB   FD          */
-OP(fd,e9) { z80->PC = z80->IY; change_pc(z80->PCD);									} /* JP   (IY)        */
+OP(fd,e9) { z80->PC = z80->IY; 														} /* JP   (IY)        */
 OP(fd,ea) { illegal_1(z80); op_ea(z80);												} /* DB   FD          */
 OP(fd,eb) { illegal_1(z80); op_eb(z80);												} /* DB   FD          */
 OP(fd,ec) { illegal_1(z80); op_ec(z80);												} /* DB   FD          */
@@ -3133,7 +3124,7 @@ OP(op,c6) { ADD(z80, ARG(z80));														} /* ADD  A,n         */
 OP(op,c7) { RST(z80, 0x00);															} /* RST  0           */
 
 OP(op,c8) { RET_COND(z80, z80->F & ZF, 0xc8);										} /* RET  Z           */
-OP(op,c9) { POP(z80, pc); change_pc(z80->PCD); z80->MEMPTR=z80->PCD;				} /* RET              */
+OP(op,c9) { POP(z80, pc); z80->MEMPTR=z80->PCD;										} /* RET              */
 OP(op,ca) { JP_COND(z80, z80->F & ZF);												} /* JP   Z,a         */
 OP(op,cb) { z80->r++; EXEC(z80,cb,ROP(z80));										} /* **** CB xx       */
 OP(op,cc) { CALL_COND(z80, z80->F & ZF, 0xcc);										} /* CALL Z,a         */
@@ -3169,7 +3160,7 @@ OP(op,e6) { AND(z80, ARG(z80));														} /* AND  n           */
 OP(op,e7) { RST(z80, 0x20);															} /* RST  4           */
 
 OP(op,e8) { RET_COND(z80, z80->F & PF, 0xe8);										} /* RET  PE          */
-OP(op,e9) { z80->PC = z80->HL; change_pc(z80->PCD);									} /* JP   (HL)        */
+OP(op,e9) { z80->PC = z80->HL; 														} /* JP   (HL)        */
 OP(op,ea) { JP_COND(z80, z80->F & PF);												} /* JP   PE,a        */
 OP(op,eb) { EX_DE_HL(z80);															} /* EX   DE,HL       */
 OP(op,ec) { CALL_COND(z80, z80->F & PF, 0xec);										} /* CALL PE,a        */
@@ -3266,7 +3257,6 @@ static void take_interrupt(z80_state *z80)
 				break;
 		}
 	}
-	change_pc(z80->PCD);
 	z80->MEMPTR=z80->PCD;
 }
 
@@ -3425,7 +3415,6 @@ static CPU_RESET( z80 )
 	if (z80->daisy)
 		z80daisy_reset(z80->daisy);
 
-	change_pc(z80->PCD);
 	z80->MEMPTR=z80->PCD;
 }
 
@@ -3445,7 +3434,6 @@ static CPU_EXECUTE( z80 )
 	z80_state *z80 = device->token;
 
 	z80->icount = cycles;
-	change_pc(z80->PCD);
 
 	/* check for NMIs on the way in; they can only be set externally */
 	/* via timers, and can't be dynamically enabled, so it is safe */
@@ -3459,7 +3447,6 @@ static CPU_EXECUTE( z80 )
 		z80->iff1 = 0;
 		PUSH(z80, pc);
 		z80->PCD = 0x0066;
-		change_pc(z80->PCD);
 		z80->MEMPTR=z80->PCD;
 		z80->icount -= 11;
 		z80->nmi_pending = FALSE;
@@ -3549,7 +3536,7 @@ static CPU_SET_INFO( z80 )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line(z80, INPUT_LINE_NMI, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + 0:					set_irq_line(z80, 0, info->i);			break;
 
-		case CPUINFO_INT_PC:								z80->PC = info->i; change_pc(z80->PCD);	break;
+		case CPUINFO_INT_PC:								z80->PC = info->i; 						break;
 		case CPUINFO_INT_REGISTER + Z80_PC:					z80->PC = info->i;						break;
 		case CPUINFO_INT_SP:								z80->SP = info->i;						break;
 		case CPUINFO_INT_REGISTER + Z80_SP:					z80->SP = info->i;						break;

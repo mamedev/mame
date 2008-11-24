@@ -85,7 +85,6 @@ static CPU_RESET( sc61860 )
 	sc61860.timer.t512ms=0;
 	sc61860.timer.count=256;
 	sc61860.pc=0;
-	change_pc(sc61860.pc);
 }
 
 static CPU_INIT( sc61860 )
@@ -107,15 +106,12 @@ static CPU_SET_CONTEXT( sc61860 )
 	if( src )
 	{
 		sc61860 = *(SC61860_Regs*)src;
-		change_pc(sc61860.pc);
 	}
 }
 
 static CPU_EXECUTE( sc61860 )
 {
 	sc61860_ICount = cycles;
-
-	change_pc(sc61860.pc);
 
 	do
 	{
@@ -155,7 +151,7 @@ static CPU_SET_INFO( sc61860 )
 	{
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SC61860_PC:			sc61860.pc = info->i; change_pc(sc61860.pc); break;
+		case CPUINFO_INT_REGISTER + SC61860_PC:			sc61860.pc = info->i; break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + SC61860_R:			sc61860.r = info->i & 0x7F;						break;
 		case CPUINFO_INT_REGISTER + SC61860_DP:			sc61860.dp = info->i;			break;

@@ -178,8 +178,6 @@ static CPU_RESET( i8086 )
 	I.base[CS] = SegBase(CS);
 	I.pc = 0xffff0 & AMASK;
 	ExpandFlags(I.flags);
-
-	change_pc(I.pc);
 }
 
 static CPU_EXIT( i8086 )
@@ -204,7 +202,6 @@ static CPU_SET_CONTEXT( i8086 )
 		I.base[DS] = SegBase(DS);
 		I.base[ES] = SegBase(ES);
 		I.base[SS] = SegBase(SS);
-		change_pc(I.pc);
 	}
 }
 

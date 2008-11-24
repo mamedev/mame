@@ -1358,7 +1358,6 @@ INLINE void mips_commit_delayed_load( psxcpu_state *psxcpu )
 static void mips_set_pc( psxcpu_state *psxcpu, unsigned pc )
 {
 	psxcpu->pc = pc;
-	change_pc( pc );
 }
 
 static void mips_fetch_next_op( psxcpu_state *psxcpu )
@@ -1367,9 +1366,7 @@ static void mips_fetch_next_op( psxcpu_state *psxcpu )
 	{
 		UINT32 safepc = psxcpu->delayv & ~psxcpu->bad_word_address_mask;
 
-		change_pc( safepc );
 		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, safepc );
-		change_pc( psxcpu->pc );
 	}
 	else
 	{
@@ -1389,10 +1386,6 @@ INLINE int mips_advance_pc( psxcpu_state *psxcpu )
 		{
 			mips_load_bad_address( psxcpu, psxcpu->pc );
 			return 0;
-		}
-		else
-		{
-			change_pc( psxcpu->pc );
 		}
 	}
 	else if( psxcpu->delayr == PSXCPU_DELAYR_NOTPC )

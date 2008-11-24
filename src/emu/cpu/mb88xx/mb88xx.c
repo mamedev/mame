@@ -114,7 +114,6 @@ static CPU_SET_CONTEXT( mb88 )
 	/* copy the context */
 	if (src)
 		mb88 = *(mb88Regs *)src;
-	change_pc(GETPC());
 }
 
 /***************************************************************************
@@ -225,7 +224,6 @@ static void update_pio( void )
 		mb88.PC = 0x02;
 		mb88.PA = 0x00;
 		mb88.st = 1;
-		change_pc(GETPC());
 
 		mb88.pending_interrupt = 0;
 
@@ -533,7 +531,6 @@ static CPU_EXECUTE( mb88 )
 				mb88.SI = ( mb88.SI - 1 ) & 3;
 				mb88.PC = mb88.SP[mb88.SI] & 0x3f;
 				mb88.PA = mb88.SP[mb88.SI] >> 6;
-				change_pc(GETPC());
 				mb88.st = 1;
 				break;
 
@@ -583,7 +580,6 @@ static CPU_EXECUTE( mb88 )
 				mb88.st = (mb88.SP[mb88.SI] >> 13)&1;
 				mb88.zf = (mb88.SP[mb88.SI] >> 14)&1;
 				mb88.cf = (mb88.SP[mb88.SI] >> 15)&1;
-				change_pc(GETPC());
 				break;
 
 			case 0x3d: /* jpa imm ZCS:..x */
@@ -664,8 +660,6 @@ static CPU_EXECUTE( mb88 )
 					mb88.SI = ( mb88.SI + 1 ) & 3;
 					mb88.PC = arg & 0x3f;
 					mb88.PA = ( ( opcode & 7 ) << 2 ) | ( arg >> 6 );
-					change_pc(GETPC());
-
 				}
 				mb88.st = 1;
 				break;
@@ -679,7 +673,6 @@ static CPU_EXECUTE( mb88 )
 				{
 					mb88.PC = arg & 0x3f;
 					mb88.PA = ( ( opcode & 7 ) << 2 ) | ( arg >> 6 );
-					change_pc(GETPC());
 				}
 				mb88.st = 1;
 				break;
@@ -740,7 +733,6 @@ static CPU_EXECUTE( mb88 )
 				if ( TEST_ST() )
 				{
 					mb88.PC = opcode & 0x3f;
-					change_pc(GETPC());
 				}
 				mb88.st = 1;
 				break;
@@ -770,7 +762,6 @@ static CPU_SET_INFO( mb88 )
 		case CPUINFO_INT_PC:
 				mb88.PC = info->i & 0x3f;
 				mb88.PA = (info->i >> 6) & 0x1f;
-				change_pc(GETPC());
 				break;
 		case CPUINFO_INT_REGISTER + MB88_PC:			mb88.PC = info->i;						break;
 		case CPUINFO_INT_REGISTER + MB88_PA:			mb88.PA = info->i;						break;

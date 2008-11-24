@@ -155,8 +155,6 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 #define EAD m68_state->ea.d
 #define EAP m68_state->ea
 
-#define CHANGE_PC change_pc(PCD)
-
 #define M6809_CWAI		8	/* set when CWAI is waiting for an interrupt */
 #define M6809_SYNC		16	/* set when SYNC is waiting for an interrupt */
 #define M6809_LDS		32	/* set when LDS occured at least once */
@@ -269,7 +267,6 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 	if( f ) 							\
 	{									\
 		PC += SIGNED(t);				\
-		CHANGE_PC;						\
 	}									\
 }
 
@@ -280,7 +277,6 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 	{									\
 		m68_state->icount -= 1;				\
 		PC += t.w.l;					\
-		CHANGE_PC;						\
 	}									\
 }
 
@@ -326,7 +322,6 @@ static void check_irq_lines(m68_state_t *m68_state)
 		}
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
 		PCD=RM16(m68_state, 0xfff6);
-		CHANGE_PC;
 		(void)(*m68_state->irq_callback)(m68_state->device, M6809_FIRQ_LINE);
 	}
 	else
@@ -354,7 +349,6 @@ static void check_irq_lines(m68_state_t *m68_state)
 		}
 		CC |= CC_II;					/* inhibit IRQ */
 		PCD=RM16(m68_state, 0xfff8);
-		CHANGE_PC;
 		(void)(*m68_state->irq_callback)(m68_state->device, M6809_IRQ_LINE);
 	}
 }
@@ -431,7 +425,6 @@ static CPU_RESET( m6809 )
 	CC |= CC_IF;        /* FIRQ disabled */
 
 	PCD = RM16(m68_state, 0xfffe);
-	CHANGE_PC;
 	UpdateState(m68_state);
 }
 
@@ -477,7 +470,6 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 		}
 		CC |= CC_IF | CC_II;			/* inhibit FIRQ and IRQ */
 		PCD = RM16(m68_state, 0xfffc);
-		CHANGE_PC;
 	}
 	else if (irqline < 2)
 	{
@@ -1093,7 +1085,7 @@ static CPU_SET_INFO( m6809 )
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(m68_state, INPUT_LINE_NMI, info->i);	break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + M6809_PC:			PC = info->i; CHANGE_PC;				break;
+		case CPUINFO_INT_REGISTER + M6809_PC:			PC = info->i; 							break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + M6809_S:			S = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6809_CC:			CC = info->i; check_irq_lines(m68_state);			break;

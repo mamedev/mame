@@ -188,8 +188,6 @@ static CPU_RESET( m6502 )
 	m6502->after_cli = 0;	/* pending IRQ and last insn cleared I */
 	m6502->irq_state = 0;
 	m6502->nmi_state = 0;
-
-	change_pc(PCD);
 }
 
 static CPU_EXIT( m6502 )
@@ -209,7 +207,6 @@ static CPU_SET_CONTEXT( m6502 )
 	{
 		token = src;
 		m6502 = token;
-		change_pc(PCD);
 	}
 }
 
@@ -228,7 +225,6 @@ INLINE void m6502_take_irq(m6502_Regs *m6502)
 		LOG(("M6502#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
-		change_pc(PCD);
 	}
 	m6502->pending_irq = 0;
 }
@@ -238,8 +234,6 @@ static CPU_EXECUTE( m6502 )
 	m6502_Regs *m6502 = device->token;
 
 	m6502->icount = cycles;
-
-	change_pc(PCD);
 
 	do
 	{
@@ -306,7 +300,6 @@ static void m6502_set_irq_line(m6502_Regs *m6502, int irqline, int state)
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
 			LOG(("M6502#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
-			change_pc(PCD);
 		}
 	}
 	else
@@ -458,7 +451,6 @@ INLINE void m65c02_take_irq(m6502_Regs *m6502)
 		LOG(("M65c02#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
-		change_pc(PCD);
 	}
 	m6502->pending_irq = 0;
 }
@@ -468,8 +460,6 @@ static CPU_EXECUTE( m65c02 )
 	m6502_Regs *m6502 = device->token;
 
 	m6502->icount = cycles;
-
-	change_pc(PCD);
 
 	do
 	{
@@ -528,7 +518,6 @@ static void m65c02_set_irq_line(m6502_Regs *m6502, int irqline, int state)
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
 			LOG(("M6502#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
-			change_pc(PCD);
 		}
 	}
 	else
@@ -574,8 +563,6 @@ static CPU_RESET( deco16 )
 	m6502->p = F_T|F_I|F_Z|F_B|(P&F_D);	/* set T, I and Z flags */
 	m6502->pending_irq = 0;	/* nonzero if an IRQ is pending */
 	m6502->after_cli = 0;	/* pending IRQ and last insn cleared I */
-
-	change_pc(PCD);
 }
 
 INLINE void deco16_take_irq(m6502_Regs *m6502)
@@ -593,7 +580,6 @@ INLINE void deco16_take_irq(m6502_Regs *m6502)
 		LOG(("M6502#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
-		change_pc(PCD);
 	}
 	m6502->pending_irq = 0;
 }
@@ -616,7 +602,6 @@ static void deco16_set_irq_line(m6502_Regs *m6502, int irqline, int state)
 			PCL = RDMEM(EAD+1);
 			PCH = RDMEM(EAD);
 			LOG(("M6502#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
-			change_pc(PCD);
 		}
 	}
 	else
@@ -645,8 +630,6 @@ static CPU_EXECUTE( deco16 )
 	m6502_Regs *m6502 = device->token;
 
 	m6502->icount = cycles;
-
-	change_pc(PCD);
 
 	do
 	{
@@ -706,7 +689,7 @@ static CPU_SET_INFO( m6502 )
 		case CPUINFO_INT_INPUT_STATE + M6502_SET_OVERFLOW:	m6502_set_irq_line(m6502, M6502_SET_OVERFLOW, info->i); break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		m6502_set_irq_line(m6502, INPUT_LINE_NMI, info->i); break;
 
-		case CPUINFO_INT_PC:							PCW = info->i; change_pc(PCD);			break;
+		case CPUINFO_INT_PC:							PCW = info->i; 							break;
 		case CPUINFO_INT_REGISTER + M6502_PC:			m6502->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							S = info->i;							break;
 		case CPUINFO_INT_REGISTER + M6502_S:			m6502->sp.b.l = info->i;					break;

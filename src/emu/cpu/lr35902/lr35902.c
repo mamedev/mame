@@ -347,7 +347,6 @@ static CPU_SET_CONTEXT( lr35902 )
 {
 	if( src )
 		Regs = *(lr35902_regs *)src;
-	change_pc(Regs.w.PC);
 }
 
 /****************************************************************************/
@@ -403,9 +402,9 @@ static CPU_SET_INFO( lr35902 )
 	case CPUINFO_INT_INPUT_STATE + 4:			lr35902_set_irq_line(state-CPUINFO_INT_INPUT_STATE, info->i); break;
 
 	case CPUINFO_INT_SP:						Regs.w.SP = info->i;						break;
-	case CPUINFO_INT_PC:						Regs.w.PC = info->i; change_pc(Regs.w.PC);	break;
+	case CPUINFO_INT_PC:						Regs.w.PC = info->i; 						break;
 
-	case CPUINFO_INT_REGISTER + LR35902_PC:		Regs.w.PC = info->i; change_pc(Regs.w.PC);	break;
+	case CPUINFO_INT_REGISTER + LR35902_PC:		Regs.w.PC = info->i; 						break;
 	case CPUINFO_INT_REGISTER + LR35902_SP:		Regs.w.SP = info->i;						break;
 	case CPUINFO_INT_REGISTER + LR35902_AF:		Regs.w.AF = info->i;						break;
 	case CPUINFO_INT_REGISTER + LR35902_BC:		Regs.w.BC = info->i;						break;

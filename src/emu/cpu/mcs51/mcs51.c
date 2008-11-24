@@ -308,9 +308,6 @@ struct _mcs51_state_t
     MACROS
 ***************************************************************************/
 
-#undef change_pc
-#define change_pc(x)
-
 /* Read Opcode/Opcode Arguments from Program Code */
 #define ROP(pc)			memory_decrypted_read_byte(mcs51_state->program, pc)
 #define ROP_ARG(pc)		memory_raw_read_byte(mcs51_state->program, pc)
@@ -771,7 +768,6 @@ INLINE void pop_pc(mcs51_state_t *mcs51_state)
 	PC = (IRAM_IR(tmpSP--) & 0xff) << 8;		//Store hi byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
 	PC = PC | IRAM_IR(tmpSP--);					//Store lo byte to PC (must use IRAM_IR to access stack pointing above 128 bytes)
 	SP = tmpSP;								//Decrement Stack Pointer
-	change_pc(PC);
 }
 
 //Set the PSW Parity Flag
@@ -1720,7 +1716,6 @@ static void check_irqs(mcs51_state_t *mcs51_state)
  	//Save current pc to stack, set pc to new interrupt vector
 	push_pc(mcs51_state);
 	PC = int_vec;
-	change_pc(PC);
 
 	/* interrupts take 24 cycles */
 	mcs51_state->inst_cycles += 2;
@@ -1909,7 +1904,6 @@ static CPU_EXECUTE( mcs51 )
 	mcs51_state_t *mcs51_state = device->token;
 	UINT8 op;
 
-	change_pc(PC);
 	update_ptrs(mcs51_state);
 
 	mcs51_state->icount = cycles;

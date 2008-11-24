@@ -496,10 +496,6 @@ union _addrmap64_token
 #define ACCESSING_BITS_32_63			((mem_mask & U64(0xffffffff00000000)) != 0)
 
 
-/* bank switching for CPU cores */
-#define change_pc(byteaddress)			do  {} while (0)
-
-
 /* opcode range safety check */
 #define address_is_unsafe(S,A)			((UNEXPECTED((A) < (S)->direct.min) || UNEXPECTED((A) > (S)->direct.max)))
 

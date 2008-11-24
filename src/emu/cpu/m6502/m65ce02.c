@@ -122,8 +122,6 @@ static CPU_RESET( m65ce02 )
 	m65ce02->pending_irq = 0;	/* nonzero if an IRQ is pending */
 	m65ce02->after_cli = 0;		/* pending IRQ and last insn cleared I */
 	m65ce02->irq_callback = NULL;
-
-	change_pc(PCD);
 }
 
 static CPU_EXIT( m65ce02 )
@@ -154,7 +152,6 @@ INLINE void m65ce02_take_irq(m65ce02_Regs *m65ce02)
 		LOG(("M65ce02#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
 		/* call back the cpuintrf to let it clear the line */
 		if (m65ce02->irq_callback) (*m65ce02->irq_callback)(m65ce02->device, 0);
-		change_pc(PCD);
 	}
 	m65ce02->pending_irq = 0;
 }
@@ -164,8 +161,6 @@ static CPU_EXECUTE( m65ce02 )
 	m65ce02_Regs *m65ce02 = device->token;
 
 	m65ce02->icount = cycles;
-
-	change_pc(PCD);
 
 	do
 	{
@@ -223,7 +218,6 @@ static void m65ce02_set_irq_line(m65ce02_Regs *m65ce02, int irqline, int state)
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
 			LOG(("M65ce02#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
-			change_pc(PCD);
 		}
 	}
 	else
@@ -251,7 +245,7 @@ static CPU_SET_INFO( m65ce02 )
 		case CPUINFO_INT_INPUT_STATE + M65CE02_IRQ_STATE: m65ce02_set_irq_line( m65ce02, M65CE02_IRQ_LINE, info->i ); break;
 		case CPUINFO_INT_INPUT_STATE + M65CE02_NMI_STATE: m65ce02_set_irq_line( m65ce02, INPUT_LINE_NMI, info->i ); break;
 
-		case CPUINFO_INT_PC: PCW = info->i; change_pc(PCD); break;
+		case CPUINFO_INT_PC: PCW = info->i;  break;
 		case CPUINFO_INT_REGISTER + M65CE02_PC: m65ce02->pc.w.l = info->i; break;
 		case CPUINFO_INT_SP: m65ce02->sp.b.l = info->i; break;
 		case CPUINFO_INT_REGISTER + M65CE02_S: m65ce02->sp.w.l = info->i; break;

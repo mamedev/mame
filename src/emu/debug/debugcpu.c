@@ -1720,10 +1720,6 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 
 	/* keep in physical range */
 	address &= info->space[ADDRESS_SPACE_PROGRAM].physbytemask;
-
-	/* adjust the address */
-	change_pc(address);
-
 	switch (info->space[ADDRESS_SPACE_PROGRAM].databytes * 10 + size)
 	{
 		/* dump opcodes in bytes from a byte-sized bus */

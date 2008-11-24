@@ -247,7 +247,6 @@ static CPU_RESET(h8bit)
 
 	h8->h8err = 0;
 	h8->pc = h8_mem_read16(h8, 0);
-	change_pc(h8->pc);
 
 	// disable timers
 	h8->h8TSTR = 0;
@@ -267,7 +266,6 @@ static void h8_GenException(h83xx_state *h8, UINT8 vectornr)
 	if (h8->h8uiflag == 0)
 		h8_set_ccr(h8, h8_get_ccr(h8) | 0x40);
 	h8->pc = h8_mem_read16(h8, vectornr * 2) & 0xffff;
-	change_pc(h8->pc);
 
 	// I couldn't find timing info for exceptions, so this is a guess (based on JSR/BSR)
 	H8_IFETCH_TIMING(2);
@@ -364,9 +362,9 @@ static CPU_SET_INFO( h8 )
 	h83xx_state *h8 = device->token;
 
 	switch(state) {
-	case CPUINFO_INT_PC:			      		h8->pc = info->i; change_pc(h8->pc);				break;
-	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i; change_pc(h8->pc);				break;
-	case CPUINFO_INT_REGISTER + H8_CCR:			h8_set_ccr(h8, info->i);							break;
+	case CPUINFO_INT_PC:			      		h8->pc = info->i; 								break;
+	case CPUINFO_INT_REGISTER + H8_PC:			h8->pc = info->i; 								break;
+	case CPUINFO_INT_REGISTER + H8_CCR:			h8_set_ccr(h8, info->i);						break;
 
 	case CPUINFO_INT_REGISTER + H8_E0:			h8->regs[0] = info->i;							break;
 	case CPUINFO_INT_REGISTER + H8_E1:			h8->regs[1] = info->i;							break;

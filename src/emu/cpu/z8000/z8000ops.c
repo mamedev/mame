@@ -1841,7 +1841,6 @@ static void Z1E_ddN0_cccc(void)
 		case 14: if (CCE) PC = RW(dst); break;
 		case 15: if (CCF) PC = RW(dst); break;
 	}
-	change_pc(PC);
 }
 
 /******************************************
@@ -1853,7 +1852,6 @@ static void Z1F_ddN0_0000(void)
 	GET_DST(OP0,NIB2);
 	PUSHW( SP, PC );
     PC = RW(dst);
-	change_pc(PC);
 }
 
 /******************************************
@@ -2330,7 +2328,6 @@ static void Z39_ssN0_0000(void)
 	fcw = RDMEM_W( RW(src) );
 	PC	= RDMEM_W( (UINT16)(RW(src) + 2) );
 	CHANGE_FCW(fcw); /* check for user/system mode change */
-    change_pc(PC);
 }
 
 /******************************************
@@ -3785,7 +3782,6 @@ static void Z5E_0000_cccc_addr(void)
 		case 14: if (CCE) PC = addr; break;
 		case 15: if (CCF) PC = addr; break;
 	}
-	change_pc(PC);
 }
 
 /******************************************
@@ -3816,7 +3812,6 @@ static void Z5E_ddN0_cccc_addr(void)
 		case 14: if (CCE) PC = addr; break;
 		case 15: if (CCF) PC = addr; break;
 	}
-	change_pc(PC);
 }
 
 /******************************************
@@ -3828,7 +3823,6 @@ static void Z5F_0000_0000_addr(void)
 	GET_ADDR(OP1);
 	PUSHW( SP, PC );
 	PC = addr;
-	change_pc(PC);
 }
 
 /******************************************
@@ -3842,7 +3836,6 @@ static void Z5F_ddN0_0000_addr(void)
 	PUSHW( SP, PC );
 	addr += RW(dst);
 	PC = addr;
-	change_pc(PC);
 }
 
 /******************************************
@@ -4372,7 +4365,6 @@ static void Z79_0000_0000_addr(void)
 	fcw = RDMEM_W(addr);
 	PC	= RDMEM_W((UINT16)(addr + 2));
 	CHANGE_FCW(fcw); /* check for user/system mode change */
-    change_pc(PC);
 }
 
 /******************************************
@@ -4388,7 +4380,6 @@ static void Z79_ssN0_0000_addr(void)
 	fcw = RDMEM_W(addr);
 	PC	= RDMEM_W((UINT16)(addr + 2));
 	CHANGE_FCW(fcw); /* check for user/system mode change */
-    change_pc(PC);
 }
 
 /******************************************
@@ -4413,7 +4404,6 @@ static void Z7B_0000_0000(void)
 	PC	= POPW( SP );	/* get PC   */
     IRQ_SRV &= ~tag;    /* remove IRQ serviced flag */
 	CHANGE_FCW(fcw);		 /* check for user/system mode change */
-    change_pc(PC);
 	LOG(("Z8K#%d IRET tag $%04x, fcw $%04x, pc $%04x\n", cpunum_get_active(), tag, fcw, PC));
 }
 
@@ -5040,7 +5030,6 @@ static void Z9E_0000_cccc(void)
 		case 14: if (CCE) PC = POPW( SP ); break;
 		case 15: if (CCF) PC = POPW( SP ); break;
 	}
-	change_pc(PC);
 }
 
 /******************************************
@@ -6438,7 +6427,6 @@ static void ZD_dsp12(void)
 	PUSHW( SP, PC );
 	dsp12 = (dsp12 & 2048) ? 4096 -2 * (dsp12 & 2047) : -2 * (dsp12 & 2047);
 	PC += dsp12;
-	change_pc(PC);
 }
 
 /******************************************
@@ -6467,7 +6455,6 @@ static void ZE_cccc_dsp8(void)
 		case 14: if (CCE) PC += dsp8 * 2; break;
 		case 15: if (CCF) PC += dsp8 * 2; break;
     }
-	change_pc(PC);
 }
 
 /******************************************
@@ -6481,7 +6468,6 @@ static void ZF_dddd_0dsp7(void)
     RB(dst) -= 1;
     if (RB(dst)) {
         PC = PC - 2 * dsp7;
-        change_pc(PC);
     }
 }
 
@@ -6496,7 +6482,6 @@ static void ZF_dddd_1dsp7(void)
 	RW(dst) -= 1;
 	if (RW(dst)) {
 		PC = PC - 2 * dsp7;
-		change_pc(PC);
 	}
 }
 

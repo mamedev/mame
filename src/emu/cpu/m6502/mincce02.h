@@ -53,8 +53,6 @@
 #define IRQ_STATE	m65ce02->irq_state
 #define AFTER_CLI	m65ce02->after_cli
 
-#define CHANGE_PC	change_pc(PCD)
-
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/

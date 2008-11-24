@@ -149,7 +149,6 @@
 			RDMEM( PCW - 1 );									\
 		}														\
 		PCD = EAD;												\
-		CHANGE_PC;												\
 	}
 
 /* 65C02 ********************************************************
@@ -252,8 +251,7 @@
 	PUSH(P | F_B);												\
 	P = (P | F_I) & ~F_D;										\
 	PCL = RDMEM(M6502_IRQ_VEC); 								\
-	PCH = RDMEM(M6502_IRQ_VEC+1);								\
-	CHANGE_PC
+	PCH = RDMEM(M6502_IRQ_VEC+1);
 
 
 /* 65C02 *******************************************************
@@ -357,5 +355,4 @@
 	PUSH(PCL);													\
 	EAH = RDOPARG();											\
 	EAW = PCW + (INT16)(EAW-1); 								\
-	PCD = EAD;													\
-	CHANGE_PC
+	PCD = EAD;

@@ -709,7 +709,6 @@ INLINE void set_global_register(UINT8 code, UINT32 val)
 	if( code == PC_REGISTER )
 	{
 		SET_PC(val);
-		change_pc(PC);
 	}
 	else if( code == SR_REGISTER )
 	{
@@ -1266,7 +1265,6 @@ INLINE void execute_br(struct regs_decode *decode)
 {
 	PPC = PC;
 	PC += EXTRA_S;
-	change_pc(PC);
 	SET_M(0);
 
 	hyperstone_ICount -= hyperstone.clock_cycles_2;
@@ -1304,7 +1302,6 @@ static void execute_trap(UINT32 addr)
 
 	PPC = PC;
 	PC = addr;
-	change_pc(PC);
 
 	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
@@ -1334,7 +1331,6 @@ static void execute_int(UINT32 addr)
 
 	PPC = PC;
 	PC = addr;
-	change_pc(PC);
 
 	hyperstone_ICount -= hyperstone.clock_cycles_2;
 }
@@ -1363,7 +1359,6 @@ static void execute_exception(UINT32 addr)
 
 	PPC = PC;
 	PC = addr;
-	change_pc(PC);
 
 	DEBUG_PRINTF(("EXCEPTION! PPC = %08X PC = %08X\n",PPC-2,PC-2));
 	hyperstone_ICount -= hyperstone.clock_cycles_2;
@@ -1403,7 +1398,6 @@ static void execute_software(struct regs_decode *decode)
 
 	PPC = PC;
 	PC = addr;
-	change_pc(PC);
 }
 
 
@@ -1697,7 +1691,6 @@ static CPU_RESET( hyperstone )
 	set_global_register(TPR_REGISTER, 0xc000000);
 
 	PC = get_trap_addr(TRAPNO_RESET);
-	change_pc(PC);
 
 	SET_FP(0);
 	SET_FL(2);
@@ -1785,7 +1778,6 @@ INLINE void hyperstone_movd(struct regs_decode *decode)
 			PPC = PC;
 
 			PC = SET_PC(SREG);
-			change_pc(PC);
 			SR = (SREGF & 0xffe00000) | ((SREG & 0x01) << 18 ) | (SREGF & 0x3ffff);
 			if (hyperstone.intblock < 1)
 				hyperstone.intblock = 1;
@@ -4502,7 +4494,6 @@ INLINE void hyperstone_call(struct regs_decode *decode)
 
 	PPC = PC;
 	PC = EXTRA_S; // const value
-	change_pc(PC);
 
 	hyperstone.intblock = 2;
 
@@ -4759,9 +4750,9 @@ static CPU_SET_INFO( hyperstone )
 		/* --- the following bits of info are set as 64-bit signed integers --- */
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + E132XS_PC:			PC = info->i; change_pc(PC);			break;
-		case CPUINFO_INT_REGISTER + E132XS_SR:			SR = info->i;							break;
-		case CPUINFO_INT_REGISTER + E132XS_FER:			FER = info->i;							break;
+		case CPUINFO_INT_REGISTER + E132XS_PC:			PC = info->i; 						break;
+		case CPUINFO_INT_REGISTER + E132XS_SR:			SR = info->i;						break;
+		case CPUINFO_INT_REGISTER + E132XS_FER:			FER = info->i;						break;
 		case CPUINFO_INT_REGISTER + E132XS_G3:			set_global_register(3, info->i);	break;
 		case CPUINFO_INT_REGISTER + E132XS_G4:			set_global_register(4, info->i);	break;
 		case CPUINFO_INT_REGISTER + E132XS_G5:			set_global_register(5, info->i);	break;

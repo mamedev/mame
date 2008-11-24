@@ -289,7 +289,6 @@ static void pcu_service_interrupts(void)
 
 				core.ppc = PC;
 				PC = irq_vector;
-				change_pc(PC);
 
 				// TODO: 5-9 5-11 Gotta' Clear HC (HCP gets it too) when taking this exception!
 				HC_bit_set(0);

@@ -91,7 +91,6 @@ static void unimpl(tms34010_state *tms, UINT16 op)
 	PUSH(tms, GET_ST(tms));
 	RESET_ST(tms);
 	tms->pc = RLONG(tms, 0xfffffc20);
-	change_pc(TOBYTE(tms->pc));
   	COUNT_UNKNOWN_CYCLES(tms,16);
 
 	/* extra check to prevent bad things */
@@ -1425,7 +1424,6 @@ static void move1_aa (tms34010_state *tms, UINT16 op) { MOVE_AA(1); }
 	PUSH(tms, tms->pc);													\
 	tms->pc = R##REG(tms,DSTREG(op));										\
 	CORRECT_ODD_PC(tms,"CALL");										\
-	change_pc(TOBYTE(tms->pc));										\
 	COUNT_CYCLES(tms,3);											\
 }
 static void call_a (tms34010_state *tms, UINT16 op) { CALL(A); }
@@ -1443,7 +1441,6 @@ static void calla(tms34010_state *tms, UINT16 op)
 	PUSH(tms, tms->pc+0x20);
 	tms->pc = PARAM_LONG_NO_INC(tms);
 	CORRECT_ODD_PC(tms,"CALLA");
-	change_pc(TOBYTE(tms->pc));
 	COUNT_CYCLES(tms,4);
 }
 
@@ -1550,7 +1547,6 @@ static void emu(tms34010_state *tms, UINT16 op)
 	*rd = tms->pc;													\
 	tms->pc = temppc;												\
 	CORRECT_ODD_PC(tms,"EXGPC");									\
-	change_pc(TOBYTE(tms->pc));										\
 	COUNT_CYCLES(tms,2);											\
 }
 static void exgpc_a (tms34010_state *tms, UINT16 op) { EXGPC(A); }
@@ -1590,7 +1586,6 @@ static void getst_b (tms34010_state *tms, UINT16 op) { GETST(B); }
 		{														\
 			tms->pc = PARAM_LONG_NO_INC(tms);						\
 			CORRECT_ODD_PC(tms,"J_XX_8");							\
-			change_pc(TOBYTE(tms->pc));								\
 			COUNT_CYCLES(tms,3);									\
 		}														\
 		else													\
@@ -1836,7 +1831,6 @@ static void j_NN_x(tms34010_state *tms, UINT16 op)
 {																\
 	tms->pc = R##REG(tms,DSTREG(op));										\
 	CORRECT_ODD_PC(tms,"JUMP");										\
-	change_pc(TOBYTE(tms->pc));										\
 	COUNT_CYCLES(tms,2);											\
 }
 static void jump_a (tms34010_state *tms, UINT16 op) { JUMP(A); }
@@ -1867,7 +1861,6 @@ static void reti(tms34010_state *tms, UINT16 op)
 	INT32 st = POP(tms);
 	tms->pc = POP(tms);
 	CORRECT_ODD_PC(tms,"RETI");
-	change_pc(TOBYTE(tms->pc));
 	SET_ST(tms, st);
 	COUNT_CYCLES(tms,11);
 }
@@ -1877,7 +1870,6 @@ static void rets(tms34010_state *tms, UINT16 op)
 	UINT32 offs;
 	tms->pc = POP(tms);
 	CORRECT_ODD_PC(tms,"RETS");
-	change_pc(TOBYTE(tms->pc));
 	offs = PARAM_N(op);
 	if (offs)
 	{
@@ -1905,7 +1897,6 @@ static void trap(tms34010_state *tms, UINT16 op)
 	RESET_ST(tms);
 	tms->pc = RLONG(tms, 0xffffffe0-(t<<5));
 	CORRECT_ODD_PC(tms,"TRAP");
-	change_pc(TOBYTE(tms->pc));
 	COUNT_CYCLES(tms,16);
 }
 

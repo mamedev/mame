@@ -266,7 +266,6 @@ static void (*const conditiontable[16])(asap_state *) =
 ***************************************************************************/
 
 #define ROPCODE(A,pc)	memory_decrypted_read_dword((A)->program, pc)
-#define UPDATEPC(A)		change_pc((A)->pc)
 
 
 INLINE UINT8 READBYTE(asap_state *asap, offs_t address)
@@ -361,7 +360,6 @@ INLINE void generate_exception(asap_state *asap, int exception)
 
 	asap->pc = 0x40 * exception;
 	asap->nextpc = ~0;
-	UPDATEPC(asap);
 
 	asap->icount--;
 }
@@ -462,8 +460,6 @@ static CPU_RESET( asap )
 	asap->nextpc = ~0;
 	asap->irq_state = 0;
 	asap->irq_callback = NULL;
-
-	UPDATEPC(asap);
 }
 
 
@@ -512,7 +508,6 @@ static CPU_EXECUTE( asap )
 	/* check for IRQs */
 	asap->icount = cycles;
 	check_irqs(asap);
-	UPDATEPC(asap);
 
 	/* core execution loop */
 	if ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
@@ -615,7 +610,6 @@ static void bsp(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -631,7 +625,6 @@ static void bmz(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -647,7 +640,6 @@ static void bgt(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -663,7 +655,6 @@ static void ble(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -679,7 +670,6 @@ static void bge(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -695,7 +685,6 @@ static void blt(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -711,7 +700,6 @@ static void bhi(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -727,7 +715,6 @@ static void bls(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -743,7 +730,6 @@ static void bcc(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -759,7 +745,6 @@ static void bcs(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -775,7 +760,6 @@ static void bpl(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -791,7 +775,6 @@ static void bmi(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -807,7 +790,6 @@ static void bne(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -823,7 +805,6 @@ static void beq(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -839,7 +820,6 @@ static void bvc(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -855,7 +835,6 @@ static void bvs(asap_state *asap)
 		fetch_instruction(asap);
 		asap->pc = asap->nextpc;
 		asap->nextpc = ~0;
-		/*UPDATEPC(asap);*/
 
 		execute_instruction(asap);
 		asap->icount--;
@@ -872,7 +851,6 @@ static void bsr(asap_state *asap)
 	fetch_instruction(asap);
 	asap->pc = asap->nextpc;
 	asap->nextpc = ~0;
-	/*UPDATEPC(asap);*/
 
 	execute_instruction(asap);
 	asap->icount--;
@@ -885,7 +863,6 @@ static void bsr_0(asap_state *asap)
 	fetch_instruction(asap);
 	asap->pc = asap->nextpc;
 	asap->nextpc = ~0;
-	/*UPDATEPC(asap);*/
 
 	execute_instruction(asap);
 	asap->icount--;
@@ -1621,7 +1598,6 @@ static void jsr(asap_state *asap)
 	fetch_instruction(asap);
 	asap->pc = asap->nextpc;
 	asap->nextpc = ~0;
-	UPDATEPC(asap);
 
 	execute_instruction(asap);
 	asap->icount--;
@@ -1634,7 +1610,6 @@ static void jsr_0(asap_state *asap)
 	fetch_instruction(asap);
 	asap->pc = asap->nextpc;
 	asap->nextpc = ~0;
-	UPDATEPC(asap);
 
 	execute_instruction(asap);
 	asap->icount--;
@@ -1649,7 +1624,6 @@ static void jsr_c(asap_state *asap)
 	fetch_instruction(asap);
 	asap->pc = asap->nextpc;
 	asap->nextpc = ~0;
-	UPDATEPC(asap);
 
 	execute_instruction(asap);
 	asap->icount--;
@@ -1664,7 +1638,6 @@ static void jsr_c0(asap_state *asap)
 	fetch_instruction(asap);
 	asap->pc = asap->nextpc;
 	asap->nextpc = ~0;
-	UPDATEPC(asap);
 
 	execute_instruction(asap);
 	asap->icount--;
