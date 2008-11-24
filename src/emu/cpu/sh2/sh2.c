@@ -2142,13 +2142,11 @@ static CPU_RESET( sh2 )
 {
 	void *tsave, *tsaved0, *tsaved1;
 	UINT32 *m;
-	int cpunum;
 	int save_is_slave;
 
 	void (*f)(UINT32 data);
 	cpu_irq_callback save_irqcallback;
 
-	cpunum = sh2->cpu_number;
 	m = sh2->m;
 	tsave = sh2->timer;
 	tsaved0 = sh2->dma_timer[0];
@@ -2170,7 +2168,6 @@ static CPU_RESET( sh2 )
 	sh2->timer = tsave;
 	sh2->dma_timer[0] = tsaved0;
 	sh2->dma_timer[1] = tsaved1;
-	sh2->cpu_number = cpunum;
 	sh2->m = m;
 	memset(sh2->m, 0, 0x200);
 

@@ -61,7 +61,7 @@ INLINE void WL(SH2 *sh2, offs_t A, UINT32 V)
 static void sh2_timer_resync(void)
 {
 	int divider = div_tab[(sh2->m[5] >> 8) & 3];
-	UINT64 cur_time = cpu_get_total_cycles(Machine->cpu[sh2->cpu_number]);
+	UINT64 cur_time = cpu_get_total_cycles(sh2->device);
 
 	if(divider)
 		sh2->frc += (cur_time - sh2->frc_base) >> divider;
@@ -98,10 +98,10 @@ static void sh2_timer_activate(void)
 		int divider = div_tab[(sh2->m[5] >> 8) & 3];
 		if(divider) {
 			max_delta <<= divider;
-			sh2->frc_base = cpu_get_total_cycles(Machine->cpu[sh2->cpu_number]);
-			timer_adjust_oneshot(sh2->timer, ATTOTIME_IN_CYCLES(max_delta, sh2->cpu_number), sh2->cpu_number);
+			sh2->frc_base = cpu_get_total_cycles(sh2->device);
+			timer_adjust_oneshot(sh2->timer, ATTOTIME_IN_CYCLES(max_delta, cpu_get_index(sh2->device)), 0);
 		} else {
-			logerror("SH2.%d: Timer event in %d cycles of external clock", sh2->cpu_number, max_delta);
+			logerror("SH2.%d: Timer event in %d cycles of external clock", cpu_get_index(sh2->device), max_delta);
 		}
 	}
 }
@@ -109,9 +109,10 @@ static void sh2_timer_activate(void)
 TIMER_CALLBACK( sh2_timer_callback )
 {
 	UINT16 frc;
-	int cpunum = param;
 
-	cpu_push_context(machine->cpu[cpunum]);
+	sh2 = ptr;
+
+	cpu_push_context(sh2->device);
 	sh2_timer_resync();
 
 	frc = sh2->frc;
@@ -138,11 +139,12 @@ TIMER_CALLBACK( sh2_timer_callback )
 
 TIMER_CALLBACK( sh2_dmac_callback )
 {
-	int cpunum = param >> 1;
 	int dma = param & 1;
 
-	cpu_push_context(machine->cpu[cpunum]);
-	LOG(("SH2.%d: DMA %d complete\n", cpunum, dma));
+	sh2 = ptr;
+
+	cpu_push_context(sh2->device);
+	LOG(("SH2.%d: DMA %d complete\n", cpu_get_index(sh2->device), dma));
 	sh2->m[0x63+4*dma] |= 2;
 	sh2->dma_timer_active[dma] = 0;
 	sh2_recalc_irq();
@@ -175,7 +177,7 @@ static void sh2_dmac_check(int dma)
 			LOG(("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, src, dst, count, sh2->m[0x63+4*dma], incs, incd, size));
 
 			sh2->dma_timer_active[dma] = 1;
-			timer_adjust_oneshot(sh2->dma_timer[dma], ATTOTIME_IN_CYCLES(2*count+1, sh2->cpu_number), (sh2->cpu_number<<1)|dma);
+			timer_adjust_oneshot(sh2->dma_timer[dma], ATTOTIME_IN_CYCLES(2*count+1, cpu_get_index(sh2->device)), dma);
 
 			src &= AM;
 			dst &= AM;
@@ -310,7 +312,7 @@ WRITE32_HANDLER( sh2_internal_w )
 	case 0x04: // TIER, FTCSR, FRC
 		if((mem_mask & 0x00ffffff) != 0)
 			sh2_timer_resync();
-//      printf("SH2.%d: TIER write %04x @ %04x\n", sh2->cpu_number, data >> 16, mem_mask>>16);
+//      printf("SH2.%d: TIER write %04x @ %04x\n", cpu_get_index(sh2->device), data >> 16, mem_mask>>16);
 		sh2->m[4] = (sh2->m[4] & ~(ICF|OCFA|OCFB|OVF)) | (old & sh2->m[4] & (ICF|OCFA|OCFB|OVF));
 		COMBINE_DATA(&sh2->frc);
 		if((mem_mask & 0x00ffffff) != 0)
@@ -318,7 +320,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		sh2_recalc_irq();
 		break;
 	case 0x05: // OCRx, TCR, TOCR
-//      printf("SH2.%d: TCR write %08x @ %08x\n", sh2->cpu_number, data, mem_mask);
+//      printf("SH2.%d: TCR write %08x @ %08x\n", cpu_get_index(sh2->device), data, mem_mask);
 		sh2_timer_resync();
 		if(sh2->m[5] & 0x10)
 			sh2->ocrb = (sh2->ocrb & (~mem_mask >> 16)) | ((data & mem_mask) >> 16);
@@ -535,7 +537,7 @@ void sh2_set_frt_input(int cpunum, int state)
 	sh2_timer_resync();
 	sh2->icr = sh2->frc;
 	sh2->m[4] |= ICF;
-	logerror("SH2.%d: ICF activated (%x)\n", sh2->cpu_number, sh2->pc & AM);
+	logerror("SH2.%d: ICF activated (%x)\n", cpu_get_index(sh2->device), sh2->pc & AM);
 	sh2_recalc_irq();
 	cpu_pop_context();
 }
@@ -710,13 +712,13 @@ void sh2_common_init(int alloc, const device_config *device, int index, int cloc
 		memset(sh2, 0, sizeof(SH2));
 	}
 
-	sh2->timer = timer_alloc(sh2_timer_callback, NULL);
+	sh2->timer = timer_alloc(sh2_timer_callback, sh2);
 	timer_adjust_oneshot(sh2->timer, attotime_never, 0);
 
-	sh2->dma_timer[0] = timer_alloc(sh2_dmac_callback, NULL);
+	sh2->dma_timer[0] = timer_alloc(sh2_dmac_callback, sh2);
 	timer_adjust_oneshot(sh2->dma_timer[0], attotime_never, 0);
 
-	sh2->dma_timer[1] = timer_alloc(sh2_dmac_callback, NULL);
+	sh2->dma_timer[1] = timer_alloc(sh2_dmac_callback, sh2);
 	timer_adjust_oneshot(sh2->dma_timer[1], attotime_never, 0);
 
 	sh2->m = auto_malloc(0x200);
@@ -732,7 +734,6 @@ void sh2_common_init(int alloc, const device_config *device, int index, int cloc
 		sh2->dma_callback_kludge = NULL;
 
 	}
-	sh2->cpu_number = index;
 	sh2->irq_callback = irqcallback;
 	sh2->device = device;
 	sh2->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);

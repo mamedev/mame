@@ -132,7 +132,7 @@ typedef struct
 	emu_timer *dma_timer[2];
 	int     dma_timer_active[2];
 
-	int     is_slave, cpu_number, cpu_type;
+	int     is_slave, cpu_type;
 	int  (*dma_callback_kludge)(UINT32 src, UINT32 dst, UINT32 data, int size);
 
 	void	(*ftcsr_read_callback)(UINT32 data);
