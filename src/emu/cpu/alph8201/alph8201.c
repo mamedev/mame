@@ -286,7 +286,6 @@ INLINE void M_JMP(UINT8 dat)
 	PCL = dat;
 	/* update pc page */
 	R.pc.b.h  = R.ix0.b.h = R.ix1.b.h = R.ix2.b.h = R.mb & 3;
-	change_pc(PC);
 }
 
 INLINE void M_UNDEFINED(void)
@@ -844,7 +843,6 @@ static void set_irq_line(int irqline, int state)
 	{
 		R.halt = (state==ASSERT_LINE) ? 1 : 0;
 /* mame_printf_debug("ALPHA8201 HALT %d\n",R.halt); */
-		change_pc(PC);
 	}
 }
 #endif

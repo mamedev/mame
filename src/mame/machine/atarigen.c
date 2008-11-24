@@ -588,7 +588,7 @@ void atarigen_slapstic_reset(void)
 
 WRITE16_HANDLER( atarigen_slapstic_w )
 {
-	update_bank(slapstic_tweak(space->machine, offset));
+	update_bank(slapstic_tweak(space, offset));
 }
 
 
@@ -603,7 +603,7 @@ READ16_HANDLER( atarigen_slapstic_r )
 	int result = atarigen_slapstic[offset & 0xfff];
 
 	/* then determine the new one */
-	update_bank(slapstic_tweak(space->machine, offset));
+	update_bank(slapstic_tweak(space, offset));
 	return result;
 }
 

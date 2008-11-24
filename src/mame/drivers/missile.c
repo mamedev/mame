@@ -510,9 +510,9 @@ static MACHINE_RESET( missile )
  *
  *************************************/
 
-INLINE int get_madsel(running_machine *machine)
+INLINE int get_madsel(const address_space *space)
 {
-	UINT16 pc = cpu_get_previouspc(machine->activecpu);
+	UINT16 pc = cpu_get_previouspc(space->cpu);
 
 	/* if we're at a different instruction than last time, reset our delay counter */
 	if (pc != madsel_lastpc)
@@ -521,7 +521,7 @@ INLINE int get_madsel(running_machine *machine)
 	/* MADSEL signal disables standard address decoding and routes
         writes to video RAM; it is enabled if the IRQ signal is clear
         and the low 5 bits of the fetched opcode are 0x01 */
-	if (!irq_state && (program_decrypted_read_byte(pc) & 0x1f) == 0x01)
+	if (!irq_state && (memory_decrypted_read_byte(space, pc) & 0x1f) == 0x01)
 	{
 		/* the MADSEL signal goes high 5 cycles after the opcode is identified;
             this effectively skips the indirect memory read. Since this is difficult
@@ -663,7 +663,7 @@ static VIDEO_UPDATE( missile )
 static WRITE8_HANDLER( missile_w )
 {
 	/* if we're in MADSEL mode, write to video RAM */
-	if (get_madsel(space->machine))
+	if (get_madsel(space))
 	{
 		write_vram(space->machine, offset, data);
 		return;
@@ -721,7 +721,7 @@ static READ8_HANDLER( missile_r )
 	UINT8 result = 0xff;
 
 	/* if we're in MADSEL mode, read from video RAM */
-	if (get_madsel(space->machine))
+	if (get_madsel(space))
 		return read_vram(space->machine, offset);
 
 	/* otherwise, strip A15 and handle manually */

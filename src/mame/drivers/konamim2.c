@@ -786,7 +786,7 @@ static void cde_handle_reports(void)
 	}
 }
 
-static void cde_dma_transfer(int channel, int next)
+static void cde_dma_transfer(const address_space *space, int channel, int next)
 {
 	UINT32 address;
 	int length;
@@ -805,7 +805,7 @@ static void cde_dma_transfer(int channel, int next)
 
 	for (i=0; i < cde_dma[channel].next_length; i++)
 	{
-		program_write_byte_64be(address, 0xff);		// TODO: do the real transfer...
+		memory_write_byte(space, address, 0xff);		// TODO: do the real transfer...
 		address++;
 	}
 }
@@ -943,13 +943,13 @@ static WRITE64_HANDLER(cde_w)
 			{
 				cde_dma[0].dma_done = 1;
 
-				cde_dma_transfer(0, 0);
+				cde_dma_transfer(space, 0, 0);
 			}
 			if (d & 0x40)
 			{
 				cde_dma[0].dma_done = 1;
 
-				cde_dma_transfer(0, 1);
+				cde_dma_transfer(space, 0, 1);
 			}
 			break;
 		}

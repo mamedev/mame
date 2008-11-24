@@ -1405,6 +1405,7 @@ static CPU_RESET( i8085 )
 	I.sid_callback = save_sidcallback;
 	I.device = device;
 	I.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 	change_pc(I.PC.d);
 
 	I.cputype = cputype_bak;

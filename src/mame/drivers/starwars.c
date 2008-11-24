@@ -92,9 +92,9 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static void esb_slapstic_tweak(running_machine *machine, offs_t offset)
+static void esb_slapstic_tweak(const address_space *space, offs_t offset)
 {
-	int new_bank = slapstic_tweak(machine, offset);
+	int new_bank = slapstic_tweak(space, offset);
 
 	/* update for the new bank */
 	if (new_bank != slapstic_current_bank)
@@ -108,14 +108,14 @@ static void esb_slapstic_tweak(running_machine *machine, offs_t offset)
 static READ8_HANDLER( esb_slapstic_r )
 {
 	int result = slapstic_base[offset];
-	esb_slapstic_tweak(space->machine, offset);
+	esb_slapstic_tweak(space, offset);
 	return result;
 }
 
 
 static WRITE8_HANDLER( esb_slapstic_w )
 {
-	esb_slapstic_tweak(space->machine, offset);
+	esb_slapstic_tweak(space, offset);
 }
 
 
@@ -142,7 +142,7 @@ static DIRECT_UPDATE_HANDLER( esb_setdirect )
 		{
 			slapstic_last_pc = pc;
 			slapstic_last_address = address;
-			esb_slapstic_tweak(space->machine, address & 0x1fff);
+			esb_slapstic_tweak(space, address & 0x1fff);
 		}
 		return ~0;
 	}

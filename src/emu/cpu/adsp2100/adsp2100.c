@@ -329,8 +329,6 @@ INLINE void WWORD_PGM(adsp2100_state *adsp, UINT32 addr, UINT32 data)
 
 #define ROPCODE(a) memory_decrypted_read_dword((a)->program, (a)->pc << 2)
 
-#define CHANGEPC(a) change_pc((a)->pc << 2)
-
 
 /***************************************************************************
     IMPORT CORE UTILITIES
@@ -359,7 +357,6 @@ INLINE int adsp2100_generate_irq(adsp2100_state *adsp, int which)
 
 	/* vector to location & stop idling */
 	adsp->pc = which;
-	CHANGEPC(adsp);
 	adsp->idle = 0;
 
 	/* mask other interrupts based on the nesting bit */
@@ -385,7 +382,6 @@ INLINE int adsp2101_generate_irq(adsp2100_state *adsp, int which, int indx)
 
 	/* vector to location & stop idling */
 	adsp->pc = 0x04 + indx * 4;
-	CHANGEPC(adsp);
 	adsp->idle = 0;
 
 	/* mask other interrupts based on the nesting bit */
@@ -411,7 +407,6 @@ INLINE int adsp2181_generate_irq(adsp2100_state *adsp, int which, int indx)
 
 	/* vector to location & stop idling */
 	adsp->pc = 0x04 + indx * 4;
-	CHANGEPC(adsp);
 	adsp->idle = 0;
 
 	/* mask other interrupts based on the nesting bit */
@@ -750,7 +745,6 @@ static CPU_RESET( adsp21xx )
 			adsp->chip_type = CHIP_TYPE_ADSP2100;
 			break;
 	}
-	CHANGEPC(adsp);
 
 	adsp->ppc = -1;
 	adsp->loop = 0xffff;
@@ -917,7 +911,6 @@ static CPU_EXECUTE( adsp21xx )
 	int check_debugger = ((device->machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
 	adsp2100_state *adsp = device->token;
 
-	CHANGEPC(adsp);
 	check_irqs(adsp);
 
 	/* reset the core */
@@ -1017,7 +1010,6 @@ static CPU_EXECUTE( adsp21xx )
 						if (op & 0x000001)
 							pc_stack_push(adsp);
 						adsp->pc = ((op >> 4) & 0x0fff) | ((op << 10) & 0x3000);
-						CHANGEPC(adsp);
 					}
 				}
 				else
@@ -1027,7 +1019,6 @@ static CPU_EXECUTE( adsp21xx )
 						if (op & 0x000001)
 							pc_stack_push(adsp);
 						adsp->pc = ((op >> 4) & 0x0fff) | ((op << 10) & 0x3000);
-						CHANGEPC(adsp);
 					}
 				}
 				break;
@@ -1112,7 +1103,6 @@ static CPU_EXECUTE( adsp21xx )
 					if (op & 0x000010)
 						pc_stack_push(adsp);
 					adsp->pc = adsp->i[4 + ((op >> 6) & 3)] & 0x3fff;
-					CHANGEPC(adsp);
 				}
 				break;
 			case 0x0c:
@@ -1197,7 +1187,6 @@ static CPU_EXECUTE( adsp21xx )
 				if (CONDITION(adsp, op & 15))
 				{
 					adsp->pc = (op >> 4) & 0x3fff;
-					CHANGEPC(adsp);
 					/* check for a busy loop */
 					if (adsp->pc == adsp->ppc)
 						adsp->icount = 0;
@@ -1209,7 +1198,6 @@ static CPU_EXECUTE( adsp21xx )
 				{
 					pc_stack_push(adsp);
 					adsp->pc = (op >> 4) & 0x3fff;
-					CHANGEPC(adsp);
 				}
 				break;
 			case 0x20: case 0x21:

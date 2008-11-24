@@ -98,7 +98,7 @@ void pic16c5x_config(int data);
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define PIC16C5x_RDOP_ARG(A) (program_raw_read_word(R.program, (A)<<1))
+#define PIC16C5x_RDOP_ARG(A) (memory_raw_read_word(R.program, (A)<<1))
 
 
 

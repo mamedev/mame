@@ -626,7 +626,7 @@ INLINE void blit_pixel(const address_space *space, int offset, int srcdata, int 
 	/* note that we have to allow blits to non-video RAM (e.g. tileram) because those */
 	/* are not blocked by the window enable */
 	if (!williams_blitter_window_enable || offset < williams_blitter_clip_address || offset >= 0xc000)
-		program_write_byte(offset, pix);
+		memory_write_byte(space, offset, pix);
 }
 
 

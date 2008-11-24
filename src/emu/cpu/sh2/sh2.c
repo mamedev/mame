@@ -28,7 +28,7 @@
 /*****************************************************************************
     Changes
     20051129 Mariusz Wojcieszek
-    - introduced program_decrypted_read_word() for opcode fetching
+    - introduced memory_decrypted_read_word() for opcode fetching
 
     20050813 Mariusz Wojcieszek
     - fixed 64 bit / 32 bit division in division unit

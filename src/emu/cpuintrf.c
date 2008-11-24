@@ -980,7 +980,6 @@ INLINE void set_cpu_context(const device_config *oldcpu, const device_config *ne
 
 		/* set the memory context and swap in the new */
 		classheader = newcpu->classtoken;
-		memory_set_context(newcpu->machine, classheader->index);
 		(*classheader->set_context)(newcpu->token);
 	}
 	else
@@ -1150,7 +1149,6 @@ void cpu_init(const device_config *device, int index, int clock, cpu_irq_callbac
 	classheader->space[ADDRESS_SPACE_DATA] = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 	classheader->space[ADDRESS_SPACE_IO] = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	memory_set_context(device->machine, index);
 	device->machine->activecpu = device;
 
 	(*classheader->init)(device, index, clock, irqcallback);

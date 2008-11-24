@@ -169,7 +169,6 @@ INLINE void pc_stack_pop(adsp2100_state *adsp)
 			adsp->sstat |= PC_EMPTY;
 	}
 	adsp->pc = adsp->pc_stack[adsp->pc_sp];
-	CHANGEPC(adsp);
 }
 
 INLINE UINT32 pc_stack_pop_val(adsp2100_state *adsp)

@@ -318,7 +318,7 @@ static void amiga_m68k_reset(const device_config *device)
 	/* set the overlay bit */
 	if ( IS_AGA(amiga_intf) )
 	{
-		program_write_byte( 0xbfa001, 1 );
+		memory_write_byte( space, 0xbfa001, 1 );
 	}
 	else
 	{

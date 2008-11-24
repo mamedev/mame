@@ -712,11 +712,11 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, const 
 
 	/* get address spaces and accessors */
 	for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-		if (active_address_space[spacenum] != NULL)
-		{
-			drcbe->accessors[spacenum] = active_address_space[spacenum]->accessors;
-			drcbe->space[spacenum] = active_address_space[spacenum];
-		}
+	{
+		drcbe->space[spacenum] = memory_find_address_space(device, spacenum);
+		if (drcbe->space[spacenum] != NULL)
+			drcbe->accessors[spacenum] = drcbe->space[spacenum]->accessors;
+	}
 
 	/* build up necessary arrays */
 	memcpy(drcbe->ssecontrol, sse_control, sizeof(drcbe->ssecontrol));

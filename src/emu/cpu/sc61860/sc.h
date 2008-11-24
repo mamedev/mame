@@ -30,5 +30,3 @@ enum
 //  SC61860_NMI_STATE,
 //  SC61860_IRQ_STATE
 };
-
-#define PEEK_OP(pc) program_decrypted_read_byte(pc)

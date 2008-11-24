@@ -1200,7 +1200,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 	logerror("%06X:hd68k_ds3_gdata_r(%04X)\n", cpu_get_previouspc(space->cpu), ds3_gdata);
 
 	/* attempt to optimize the transfer if conditions are right */
-	if (cpunum_get_active() == 0 && pc == hdds3_transfer_pc &&
+	if (space->machine->activecpu == space->machine->cpu[0] && pc == hdds3_transfer_pc &&
 		!(!ds3_g68flag && ds3_g68irqs) && !(ds3_gflag && ds3_gfirqs))
 	{
 		UINT32 destaddr = cpu_get_reg(space->cpu, M68K_A1);
@@ -1214,7 +1214,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 
 		while (count68k > 0 && hdadsp_data_memory[0x16e6] > 0)
 		{
-			program_write_word(destaddr, ds3_gdata);
+			memory_write_word(space, destaddr, ds3_gdata);
 			{
 				hdadsp_data_memory[0x16e6]--;
 				ds3_gdata = hdadsp_pgm_memory[i6] >> 8;
@@ -1616,13 +1616,13 @@ WRITE16_HANDLER( hddspcom_control_w )
 
 WRITE16_HANDLER( rd68k_slapstic_w )
 {
-	slapstic_tweak(space->machine, offset & 0x3fff);
+	slapstic_tweak(space, offset & 0x3fff);
 }
 
 
 READ16_HANDLER( rd68k_slapstic_r )
 {
-	int bank = slapstic_tweak(space->machine, offset & 0x3fff) * 0x4000;
+	int bank = slapstic_tweak(space, offset & 0x3fff) * 0x4000;
 	return hd68k_slapstic_base[bank + (offset & 0x3fff)];
 }
 

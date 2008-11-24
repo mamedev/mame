@@ -1857,66 +1857,6 @@ ROM_END
  *
  *************************************/
 
-#if 0
-/*
-Copy this code into the init function and modify:
-{
-    UINT8 *ram = memory_region(machine, "master");
-    FILE *output;
-
-    output = fopen("indyheat.m", "w");
-    dasm_chunk("Resident",      &ram[0x00000], 0x0000, 0x2000, output);
-    dasm_chunk("Bank 0x02000:", &ram[0x02000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x10000:", &ram[0x10000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x18000:", &ram[0x18000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x20000:", &ram[0x20000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x28000:", &ram[0x28000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x30000:", &ram[0x30000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x38000:", &ram[0x38000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x40000:", &ram[0x40000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x48000:", &ram[0x48000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x50000:", &ram[0x50000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x58000:", &ram[0x58000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x60000:", &ram[0x60000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x68000:", &ram[0x68000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x70000:", &ram[0x70000], 0x2000, 0x8000, output);
-    dasm_chunk("Bank 0x78000:", &ram[0x78000], 0x2000, 0x8000, output);
-    fclose(output);
-}
-*/
-
-static void dasm_chunk(char *tag, UINT8 *base, UINT16 pc, UINT32 length, FILE *output)
-{
-	extern unsigned DasmZ80(char *buffer, unsigned _pc);
-
-	UINT8 *old_rom = opbase->rom;
-	UINT8 *old_ram = opbase->ram;
-	char buffer[256];
-	int count, offset, i;
-
-	fprintf(output, "\n\n\n%s:\n", tag);
-	opbase->rom = opbase->ram = &base[-pc];
-	for (offset = 0; offset < length; offset += count)
-	{
-		count = DasmZ80(buffer, pc);
-		for (i = 0; i < 4; i++)
-			if (i < count)
-				fprintf(output, "%c", (program_decrypted_read_byte(pc + i) >= 32 && program_decrypted_read_byte(pc + i) < 127) ? program_decrypted_read_byte(pc + i) : ' ');
-			else
-				fprintf(output, " ");
-		fprintf(output, " %04X: ", pc);
-		for (i = 0; i < 4; i++)
-			if (i < count)
-				fprintf(output, "%02X ", program_decrypted_read_byte(pc++));
-			else
-				fprintf(output, "   ");
-		fprintf(output, "%s\n", buffer);
-	}
-	opbase->rom = old_rom;
-	opbase->ram = old_ram;
-}
-#endif
-
 static void init_master_ports(running_machine *machine, UINT8 mvram_base, UINT8 io_base)
 {
 	/* set up the master CPU VRAM I/O */
