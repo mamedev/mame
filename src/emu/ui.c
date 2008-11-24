@@ -290,6 +290,8 @@ int ui_display_startup_screens(running_machine *machine, int first_time, int sho
 				if (show_warnings && astring_len(warnings_string(machine, messagebox_text)) > 0)
 				{
 					ui_set_handler(handler_messagebox_ok, 0);
+					if (machine->gamedrv->flags & (GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NO_SOUND))
+						messagebox_backcolor = UI_YELLOWCOLOR;
 					if (machine->gamedrv->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION))
 						messagebox_backcolor = UI_REDCOLOR;
 				}
