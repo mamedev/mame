@@ -18,14 +18,17 @@
 @rem    3. Open a command prompt to mametest/version
 @rem    4. Run "..\runtest"
 @rem    5. Wait for all the tests to complete
+@rem       (Note one window will be opened for each CPU)
 @rem
 @rem How to generate a report:
 @rem
+@rem    1. Concatenate the summary files together:
+@rem         copy summary*.log summary-final.log
 @rem    1. Open a command prompt to mametest.
 @rem    2. Make sure you have run tests for at least two 
 @rem        versions (mametest/ver1 and mametest/ver2)
 @rem    3. Create an output directory (mametest/report)
-@rem    4. Run "regrep report ver1\summary.log ver2\summary.log"
+@rem    4. Run "regrep report ver1\summary-final.log ver2\summary-final.log"
 @rem    5. Upload the report directory to mamedev.org :)
 @rem    6. Differing files are printed to stdout; redirect
 @rem        to create a list that can be run again via
@@ -33,6 +36,7 @@
 @rem ----------------------------------------------------
 
 @echo off
+@setlocal ENABLEDELAYEDEXPANSION
 
 @rem ----------------------------------------------------
 @rem We require mame.exe to be present
@@ -52,16 +56,27 @@ if not exist mame.exe (
 @rem ----------------------------------------------------
 
 set LIST=gamelist.txt
+set SUMMARY=summary.log
 if "%1"=="" (
 @echo Generating full list
 mame -ls >%LIST%
 @echo Deleting old data
 if exist log rmdir /s/q log
 if exist snap rmdir /s/q snap
-if exist summary.log del summary.log
+if exist %SUMMARY% del %SUMMARY%
 ) else (
 set LIST=%1
 @echo Re-testing %1
+)
+
+@rem ----------------------------------------------------
+@rem If we have a %2 parameter, then this is a sublaunch
+@rem and we should go right to the execution.
+@rem ----------------------------------------------------
+
+if not "%2"=="" (
+set SUMMARY=summary%2.log
+goto :sublaunch
 )
 
 @rem ----------------------------------------------------
@@ -86,9 +101,9 @@ copy /y ..\cross.png artwork\cross3.png
 @rem If we don't yet have a summary.log, create a new one.
 @rem ----------------------------------------------------
 
-if not exist summary.log (
-mame -help >summary.log
-echo @@@@@dir=%CD%>>summary.log
+if not exist %SUMMARY% (
+mame -help >%SUMMARY%
+echo @@@@@dir=%CD%>>%SUMMARY%
 )
 
 @rem ----------------------------------------------------
@@ -96,15 +111,34 @@ echo @@@@@dir=%CD%>>summary.log
 @rem ----------------------------------------------------
 
 if not exist log mkdir log
-echo @@@@@start=%TIME%>>summary.log
+echo @@@@@start=%TIME%>>%SUMMARY%
+
+@rem ----------------------------------------------------
+@rem Iterate over processors and sublaunch an entry for
+@rem each one.
+@rem ----------------------------------------------------
+
+for /l %%c in (1,1,%NUMBER_OF_PROCESSORS%) do (
+set /a CPU="%%c - 1"
+@echo call %0 %LIST% !CPU!
+start %0 %LIST% !CPU!
+)
+goto :eof
+
+
 
 @rem ----------------------------------------------------
 @rem Iterate over drivers in the log, extracting the 
 @rem source filename as well, and passing both to runone.
 @rem ----------------------------------------------------
 
+:sublaunch
+set CPU=0
 for /f "tokens=1-5 delims=/ " %%i in (%LIST%) do (
-if not "%%m"=="" (
+set /a CPU="(!CPU! + 1) %% %NUMBER_OF_PROCESSORS%" 
+if not "!CPU!"=="%2" (
+@rem do nothing
+) else if not "%%m"=="" (
 call :runone %%i %%m
 ) else if not "%%l"=="" (
 call :runone %%i %%l
@@ -119,7 +153,7 @@ call :runone %%i %%j
 @rem Add a final timestamp and we're done.
 @rem ----------------------------------------------------
 
-echo @@@@@stop=%TIME%>>summary.log
+echo @@@@@stop=%TIME%>>%SUMMARY%
 goto :eof
 
 
@@ -131,26 +165,26 @@ goto :eof
 
 :runone
 @echo Testing %1 (%2)...
-echo.>>summary.log
+echo.>>%SUMMARY%
 mame %1 -str 30 -watchdog 300 -nodebug -nothrottle -inipath .. -video none -nosound 1>log\%1.txt 2>log\%1.err
 if %errorlevel% equ 100 (
-echo @@@@@driver=%1: Exception>>summary.log
-type log\%1.err >>summary.log
+echo @@@@@driver=%1: Exception>>%SUMMARY%
+type log\%1.err >>%SUMMARY%
 ) else if %errorlevel% equ 5 (
 @rem Do nothing -- game does not exist in this build
 ) else if %errorlevel% equ 3 (
-echo @@@@@driver=%1: Fatal error>>summary.log
-type log\%1.err >>summary.log
+echo @@@@@driver=%1: Fatal error>>%SUMMARY%
+type log\%1.err >>%SUMMARY%
 ) else if %errorlevel% equ 2 (
-echo @@@@@driver=%1: Missing files>>summary.log
-type log\%1.err >>summary.log
+echo @@@@@driver=%1: Missing files>>%SUMMARY%
+type log\%1.err >>%SUMMARY%
 ) else if %errorlevel% equ 1 (
-echo @@@@@driver=%1: Failed validity check>>summary.log
-type log\%1.err >>summary.log
+echo @@@@@driver=%1: Failed validity check>>%SUMMARY%
+type log\%1.err >>%SUMMARY%
 ) else if %errorlevel% equ 0 (
-echo @@@@@driver=%1: Success>>summary.log
+echo @@@@@driver=%1: Success>>%SUMMARY%
 ) else (
-echo @@@@@driver=%1: Unknown error %errorlevel%>>summary.log
+echo @@@@@driver=%1: Unknown error %errorlevel%>>%SUMMARY%
 )
-echo @@@@@source=%2>>summary.log
+echo @@@@@source=%2>>%SUMMARY%
 goto :eof
