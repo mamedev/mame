@@ -34,12 +34,47 @@
     - Priorities.  From the original board it appears they're fixed, in front to back order:
       (all the way in front) TTL text layer -> polygons -> PSAC2 (all the way in back)
 
-Notes:
+    Tech info by Phil Bennett, from the schematics:
 
- (R. Belmont)
- 506000 is the DSP control
- 506004 is DSP status (in bit 0, where 0 = not ready, 1 = ready)
- 50600C and 50600E are the DSP comms ports (read/write)
+    68000 address map
+    =================
+
+    400000-43ffff = PSAC
+    440000-47ffff = PSVR
+    480000-4bffff = IO
+    4c0000-4fffff = SYS
+    500000-53ffff = DSP			    
+    540000-57ffff = FIX
+    580000-5bffff = OP1
+    5c0000-5fffff = UNUSED
+
+
+    SYS (Write only?)
+    =================
+
+    D28 = /FIXKILL     - Disable 'FIX' layer?
+    D27 = MUTE
+    D26 = EEPROM CLK
+    D25 = EEPROM CS
+    D24 = EEPROM DATA
+    D23 = BRMAS        - 68k bus error mask
+    D22 = L7MAS        - L7 interrupt mask (unusued - should always be '1')
+    D21 = /L5MAS       - L5 interrupt mask/acknowledge
+    D20 = L3MAS        - L3 interrupt mask
+    D19 = VFLIP        - Flip video vertically
+    D18 = HFLIP        - Flip video horizontally
+    D17 = COIN2        - Coin counter 2
+    D16 = COIN1        - Coin counter 1
+
+
+    DSP
+    ===
+
+    500000-503fff = HCOM     - 16kB common RAM
+    504000-504fff = CONTROL  - DSP/Host Control
+			        D10? = COMBNK - Switch between 68k and DSP access to common RAM
+			        D08? = RESN   - Reset DSP
+    506000-506fff = HEN      - DSP/Host interface
 
 */
 
@@ -479,10 +514,10 @@ WRITE32_HANDLER( plygonet_palette_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM
-	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE(&paletteram32)	// is all of this region the palette?
-	AM_RANGE(0x440000, 0x440fff) AM_RAM		/* PSAC2 lineram? */
-	AM_RANGE(0x480000, 0x480003) AM_READ(polygonet_eeprom_r)
-	AM_RANGE(0x4C0000, 0x4C0003) AM_WRITE(polygonet_eeprom_w)
+	AM_RANGE(0x200000, 0x21ffff) AM_RAM_WRITE(plygonet_palette_w) AM_BASE(&paletteram32)
+	AM_RANGE(0x440000, 0x440fff) AM_RAM		/* PSVR: PSAC2 VRAM? */
+	AM_RANGE(0x480000, 0x4bffff) AM_READ(polygonet_eeprom_r)
+	AM_RANGE(0x4C0000, 0x4fffff) AM_WRITE(polygonet_eeprom_w)
 	AM_RANGE(0x500000, 0x503fff) AM_RAM_WRITE(shared_ram_write) AM_BASE(&shared_ram)
 	AM_RANGE(0x504000, 0x504003) AM_WRITE(dsp_w_lines)
 	AM_RANGE(0x506000, 0x50600f) AM_READWRITE(dsp_host_interface_r, dsp_host_interface_w)
@@ -490,7 +525,6 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x541000, 0x54101f) AM_RAM
 	AM_RANGE(0x580000, 0x5807ff) AM_RAM
 	AM_RANGE(0x580800, 0x580803) AM_READ(network_r) AM_WRITENOP	/* network RAM | registers? */
-//  AM_RANGE(0x600000, 0x600000)
 	AM_RANGE(0x600004, 0x600007) AM_WRITE(sound_w)
 	AM_RANGE(0x600008, 0x60000b) AM_READ(sound_r)
 	AM_RANGE(0x640000, 0x640003) AM_WRITE(sound_irq_w)
@@ -595,7 +629,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_CPU_PROGRAM_MAP(main_map, 0)
 	MDRV_CPU_VBLANK_INT("main", polygonet_interrupt)
 
-	MDRV_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz */
+	MDRV_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
 	MDRV_CPU_PROGRAM_MAP(dsp_program_map, 0)
 	MDRV_CPU_DATA_MAP(dsp_data_map, 0)
 
@@ -609,7 +643,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_NVRAM_HANDLER(polygonet)
 
 	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
-	MDRV_INTERLEAVE(50000)
+	MDRV_INTERLEAVE(20000)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
