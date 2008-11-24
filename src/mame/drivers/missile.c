@@ -331,7 +331,7 @@ Notes:
 #include "sound/pokey.h"
 
 
-#define MASTER_CLOCK	(10000000)
+#define MASTER_CLOCK	XTAL_10MHz
 
 #define PIXEL_CLOCK		(MASTER_CLOCK/2)
 #define HTOTAL			(320)

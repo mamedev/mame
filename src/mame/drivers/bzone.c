@@ -212,7 +212,7 @@
 
 #include "bzone.lh"
 
-#define MASTER_CLOCK (12096000)
+#define MASTER_CLOCK (XTAL_12_096MHz)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
 

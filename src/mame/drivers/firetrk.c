@@ -9,9 +9,7 @@ Atari Fire Truck + Super Bug + Monte Carlo driver
 #include "firetrk.h"
 #include "sound/discrete.h"
 
-#define FIRETRK_CPU_CLOCK_1MHZ		(12096000 / 12)
-#define FIRETRK_CPU_CLOCK_750KZ		(12096000 / 16)
-
+#define MASTER_CLOCK (XTAL_12_096MHz)
 
 static UINT8 in_service_mode;
 static UINT32 dial[2];
@@ -28,7 +26,7 @@ static void set_service_mode(running_machine *machine, int enable)
 	watchdog_enable(machine, !enable);
 
 	/* change CPU clock speed according to service switch change */
-	cpu_set_clock(machine->cpu[0], enable ? FIRETRK_CPU_CLOCK_750KZ : FIRETRK_CPU_CLOCK_1MHZ);
+	cpu_set_clock(machine->cpu[0], enable ? (MASTER_CLOCK/12) : (MASTER_CLOCK/16));
 }
 
 
@@ -873,7 +871,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( firetrk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", M6800, FIRETRK_CPU_CLOCK_1MHZ)	/* 750Khz during service mode */
+	MDRV_CPU_ADD("main", M6800, MASTER_CLOCK/12)	/* 750Khz during service mode */
 	MDRV_CPU_PROGRAM_MAP(firetrk_map, 0)
 	MDRV_CPU_VBLANK_INT("main", firetrk_interrupt)
 	MDRV_WATCHDOG_VBLANK_INIT(5)
@@ -908,7 +906,7 @@ static MACHINE_DRIVER_START( superbug )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(firetrk)
-	MDRV_CPU_REPLACE("main", M6800, FIRETRK_CPU_CLOCK_750KZ)
+	MDRV_CPU_REPLACE("main", M6800, MASTER_CLOCK/12)
 	MDRV_CPU_PROGRAM_MAP(superbug_map, 0)
 
 	/* video hardware */
@@ -928,7 +926,7 @@ static MACHINE_DRIVER_START( montecar )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(firetrk)
-	MDRV_CPU_REPLACE("main", M6800, FIRETRK_CPU_CLOCK_1MHZ)	/* 750Khz during service mode */
+	MDRV_CPU_REPLACE("main", M6800, MASTER_CLOCK/12)	/* 750Khz during service mode */
 	MDRV_CPU_PROGRAM_MAP(montecar_map, 0)
 
 	/* video hardware */

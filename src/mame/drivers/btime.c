@@ -67,6 +67,8 @@ A few notes:
 #include "sound/ay8910.h"
 #include "includes/btime.h"
 
+#define MASTER_CLOCK (XTAL_12MHz)
+
 static WRITE8_HANDLER( audio_command_w );
 
 static UINT8 *decrypted;

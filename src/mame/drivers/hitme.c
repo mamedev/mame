@@ -18,6 +18,8 @@
 #include "hitme.h"
 #include "sound/discrete.h"
 
+#define MASTER_CLOCK (XTAL_8_945MHz) /* confirmed on schematic */
+
 static tilemap *hitme_tilemap;
 static attotime timeout_time;
 static UINT8 *hitme_vidram;
@@ -300,7 +302,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( hitme )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 8945000/16)
+	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/16)
 	MDRV_CPU_PROGRAM_MAP(hitme_map,0)
 	MDRV_CPU_IO_MAP(hitme_portmap,0)
 

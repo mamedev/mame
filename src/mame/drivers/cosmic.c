@@ -32,6 +32,8 @@ a physical DSW B but only read when SWA:3,4 are both set to OFF. Currently,
 #include "sound/samples.h"
 #include "sound/dac.h"
 
+#define MASTER_CLOCK (XTAL_9_828MHz)
+
 
 PALETTE_INIT( panic );
 PALETTE_INIT( cosmica );
@@ -1150,7 +1152,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( cosmicg )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", TMS9980, 1228500)
+	MDRV_CPU_ADD("main", TMS9980, MASTER_CLOCK/8)
 			/* 9.828 MHz Crystal */
 			/* R Nabet : huh ? This would imply the crystal frequency is somehow divided by 2 before being
             fed to the tms9904 or tms9980.  Also, I have never heard of a tms9900/9980 operating under

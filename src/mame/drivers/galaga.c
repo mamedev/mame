@@ -706,6 +706,7 @@ TODO:
 #include "audio/namco54.h"
 #include "nam_cust.h"
 
+#define MASTER_CLOCK (XTAL_18_432MHz)
 
 
 static emu_timer *cpu3_interrupt_timer;
@@ -990,45 +991,25 @@ ADDRESS_MAP_END
 
 /* bootleg 4th CPU replacing the 5xXX chips */
 static ADDRESS_MAP_START( readmem4_galaga, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x1000, 0x107f) AM_READ(SMH_RAM)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_ROM, SMH_ROM)
+	AM_RANGE(0x1000, 0x107f) AM_READWRITE(SMH_RAM, SMH_RAM)
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem4_galaga, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x1000, 0x107f) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( readmem4_battles, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
 	AM_RANGE(0x4000, 0x4003) AM_READ(battles_input_port_r)
-	AM_RANGE(0x6000, 0x6000) AM_READ(battles_customio3_r)
-	AM_RANGE(0x7000, 0x7000) AM_READ(battles_customio_data3_r)
-	AM_RANGE(0x8000, 0x80ff) AM_READ(SMH_RAM)
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem4_battles, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
 	AM_RANGE(0x4001, 0x4001) AM_WRITE(battles_CPU4_coin_w)
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(battles_noise_sound_w)
-	AM_RANGE(0x6000, 0x6000) AM_WRITE(battles_customio3_w)
-	AM_RANGE(0x7000, 0x7000) AM_WRITE(battles_customio_data3_w)
-	AM_RANGE(0x8000, 0x80ff) AM_WRITE(SMH_RAM)
+	AM_RANGE(0x6000, 0x6000) AM_READWRITE(battles_customio3_r, battles_customio3_w)
+	AM_RANGE(0x7000, 0x7000) AM_READWRITE(battles_customio_data3_r, battles_customio_data3_w)
+	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(SMH_RAM, SMH_RAM)
 ADDRESS_MAP_END
-
 
 static ADDRESS_MAP_START( readmem4_dzigzag, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_READ(SMH_ROM)
-	AM_RANGE(0x1000, 0x107f) AM_READ(SMH_RAM)
+	AM_RANGE(0x0000, 0x0fff) AM_READWRITE(SMH_ROM, SMH_ROM)
+	AM_RANGE(0x1000, 0x107f) AM_READWRITE(SMH_RAM, SMH_RAM)
 	AM_RANGE(0x4000, 0x4007) AM_READ(SMH_RAM)	// dip switches? bits 0 & 1 used
 ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( writemem4_dzigzag, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(SMH_ROM)
-	AM_RANGE(0x1000, 0x107f) AM_WRITE(SMH_RAM)
-ADDRESS_MAP_END
-
 
 
 static INPUT_PORTS_START( bosco )
@@ -1639,28 +1620,28 @@ static const samples_interface battles_samples_interface =
 static MACHINE_DRIVER_START( bosco )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(bosco_map,0)
 
-	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_50xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_50xx_map_io,0)
 
-	MDRV_CPU_ADD(CPUTAG_50XX_2, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_50XX_2, MB8842, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_50xx_2_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_50xx_2_map_data,0)
 	MDRV_CPU_IO_MAP(namco_50xx_2_map_io,0)
 
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -1690,11 +1671,11 @@ static MACHINE_DRIVER_START( bosco )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
+	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
-	MDRV_SOUND_ADD("namco2", NAMCO_52XX, 18432000/12)	/* 1.536 MHz */
+	MDRV_SOUND_ADD("namco2", NAMCO_52XX, MASTER_CLOCK/12)	/* 1.536 MHz */
 	MDRV_SOUND_CONFIG(namco_52xx_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
@@ -1708,18 +1689,18 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( galaga )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(galaga_map,0)
 
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -1749,7 +1730,7 @@ static MACHINE_DRIVER_START( galaga )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
+	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
@@ -1766,8 +1747,8 @@ static MACHINE_DRIVER_START( galagab )
 
 	MDRV_CPU_REMOVE(CPUTAG_54XX)
 
-	MDRV_CPU_ADD("sub3", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem4_galaga,writemem4_galaga)
+	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MDRV_CPU_PROGRAM_MAP(readmem4_galaga,0)
 
 	/* sound hardware */
 	MDRV_SOUND_REMOVE("discrete")
@@ -1777,23 +1758,23 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( xevious )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z80,MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(xevious_map,0)
 
-	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_50XX, MB8842, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_50xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_50xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_50xx_map_io,0)
 
-	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, 18432000/12/6)	/* 1.536 MHz, internally divided by 6 */
+	MDRV_CPU_ADD(CPUTAG_54XX, MB8844, MASTER_CLOCK/12/6)	/* 1.536 MHz, internally divided by 6 */
 	MDRV_CPU_PROGRAM_MAP(namco_54xx_map_program,0)
 	MDRV_CPU_DATA_MAP(namco_54xx_map_data,0)
 	MDRV_CPU_IO_MAP(namco_54xx_map_io,0)
@@ -1822,7 +1803,7 @@ static MACHINE_DRIVER_START( xevious )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
+	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 
@@ -1840,8 +1821,8 @@ static MACHINE_DRIVER_START( battles )
 	MDRV_CPU_REMOVE(CPUTAG_50XX)
 	MDRV_CPU_REMOVE(CPUTAG_54XX)
 
-	MDRV_CPU_ADD("sub3", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem4_battles,writemem4_battles)
+	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MDRV_CPU_PROGRAM_MAP(readmem4_battles,0)
 	MDRV_CPU_VBLANK_INT("main", battles_interrupt_4)
 
 	MDRV_MACHINE_RESET(battles)
@@ -1861,15 +1842,15 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( digdug )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("main", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
 	MDRV_CPU_VBLANK_INT("main", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z80, 18432000/6)	/* 3.072 MHz */
+	MDRV_CPU_ADD("sub2", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(digdug_map,0)
 
 	MDRV_INTERLEAVE(100)	/* 100 CPU slices per frame - an high value to ensure proper */
@@ -1896,7 +1877,7 @@ static MACHINE_DRIVER_START( digdug )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, 18432000/6/32)
+	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90 * 10.0 / 16.0)
 MACHINE_DRIVER_END
@@ -1906,8 +1887,8 @@ static MACHINE_DRIVER_START( dzigzag )
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(digdug)
 
-	MDRV_CPU_ADD("sub3", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(readmem4_dzigzag,writemem4_dzigzag)
+	MDRV_CPU_ADD("sub3", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
+	MDRV_CPU_PROGRAM_MAP(readmem4_dzigzag,0)
 MACHINE_DRIVER_END
 
 

@@ -69,6 +69,8 @@ enum
 	XTAL_7_8643MHz 		= 7864300,		/* Used on InterFlip games as video clock */
 	XTAL_8MHz    		= 8000000,		/* Extremely common, used on 100's of PCBs */
 	XTAL_8_664MHz		= 8664000,		/* Touchmaster */
+	XTAL_8_945MHz		= 8945000,		/* Hit Me */
+	XTAL_9_828MHz		= 9828000,		/* Universal PCBs */
 	XTAL_9_987MHz		= 9987000,		/* Crazy Balloon */
 	XTAL_10MHz   		= 10000000,
 	XTAL_10_595MHz  	= 10595000,		/* Mad Alien */
@@ -104,6 +106,7 @@ enum
 	XTAL_19_923MHz		= 19923000,		/* Cinematronics vectors */
 	XTAL_19_968MHz  	= 19968000,		/* Used mostly by some Taito games */
 	XTAL_20MHz   		= 20000000,
+	XTAL_20_079MHz		= 20790000,		/* Blockade-hardware Gremlin games */
 	XTAL_21MHz  		= 21000000,		/* Lock-On pixel clock */
 	XTAL_21_3MHz  		= 21300000,
 	XTAL_21_4772MHz 	= 21477200,		/* BMC bowling, some Data East 90's games */

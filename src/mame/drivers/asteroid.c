@@ -174,7 +174,7 @@ Kits are available immediately from your Atari Distributor.  To determine which 
 #include "sound/discrete.h"
 #include "sound/pokey.h"
 
-#define MASTER_CLOCK (12096000)
+#define MASTER_CLOCK (XTAL_12_096MHz)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
 
 /*************************************

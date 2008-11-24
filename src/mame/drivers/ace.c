@@ -39,6 +39,7 @@ A1                   2101            2101
 
 #include "driver.h"
 
+#define MASTER_CLOCK XTAL_18MHz
 
 static UINT8 *ace_scoreram;
 static UINT8 *ace_ram2;
@@ -306,7 +307,7 @@ GFXDECODE_END
 static MACHINE_DRIVER_START( ace )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", 8080, 18000000 / 9)	/* 2 MHz ? */
+	MDRV_CPU_ADD("main", 8080, MASTER_CLOCK/9)	/* 2 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(main_map,0)
 
 	/* video hardware */

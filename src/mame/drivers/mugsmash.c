@@ -251,8 +251,8 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_BIT( 0xfc, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")	/* Fake IN3 (SW1) */
-	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )						// SW1-1
-	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) )			// SW1-2 to SW1-4
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )	PORT_DIPLOCATION("DSW1:1")					// SW1-1
+	PORT_DIPNAME( 0x0e, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:2,3,4")			// SW1-2 to SW1-4
 	PORT_DIPSETTING(    0x0c, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(    0x0a, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
@@ -261,40 +261,38 @@ static INPUT_PORTS_START( mugsmash )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(    0x0e, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) )	// SW1-5
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("DSW1:5")	// SW1-5
 	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, "Sound Test" )				// SW1-6 (in "test mode" only)
+	PORT_DIPNAME( 0x20, 0x20, "Sound Test" ) PORT_DIPLOCATION("DSW1:6")				// SW1-6 (in "test mode" only)
 	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Color Test" )				// SW1-7 (in "test mode" only)
+	PORT_DIPNAME( 0x40, 0x40, "Color Test" ) PORT_DIPLOCATION("DSW1:7")				// SW1-7 (in "test mode" only)
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Draw SF." )					// SW1-8 (in "test mode" only)
+	PORT_DIPNAME( 0x80, 0x80, "Draw SF." ) PORT_DIPLOCATION("DSW1:8")					// SW1-8 (in "test mode" only)
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 	PORT_START("DSW2")	/* Fake IN4 (SW2) */
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) )		// SW2-1
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW2:1")		// SW2-1
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Lives ) )			// SW2-2 and SW2-3
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW2:2,3")			// SW2-2 and SW2-3
 	PORT_DIPSETTING(    0x00, "1" )
 	PORT_DIPSETTING(    0x02, "2" )
 	PORT_DIPSETTING(    0x04, "3" )
 	PORT_DIPSETTING(    0x06, "4" )
-	PORT_DIPNAME( 0x08, 0x08, "Unused SW 2-4" )				// SW2-4
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )		// SW2-5 and SW2-6
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSW2:4" )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("DSW2:5,6")		// SW2-5 and SW2-6
 	PORT_DIPSETTING(    0x00, DEF_STR( Very_Easy) )
 	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x40, 0x40, "Draw Objects" )				// SW2-7 (in "test mode" only)
+	PORT_DIPNAME( 0x40, 0x40, "Draw Objects" ) PORT_DIPLOCATION("DSW2:7")				// SW2-7 (in "test mode" only)
 	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Freeze" )					// SW2-8 (= "Screen Pause" in "test mode")
+	PORT_DIPNAME( 0x80, 0x80, "Freeze" ) PORT_DIPLOCATION("DSW2:8")					// SW2-8 (= "Screen Pause" in "test mode")
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END

@@ -29,8 +29,8 @@
 #include "sound/okim6295.h"
 
 
-#define MASTER_CLOCK_40MHz		(40000000)
-#define MASTER_CLOCK_25MHz		(25000000)
+#define MASTER_CLOCK_40MHz		(XTAL_40MHz)
+#define MASTER_CLOCK_25MHz		(XTAL_25MHz)
 
 
 static UINT16 *control;

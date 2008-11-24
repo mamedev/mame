@@ -125,6 +125,8 @@
 #include "deadeye.lh"
 #include "gypsyjug.lh"
 
+#define MASTER_CLOCK XTAL_5MHz
+
 
 
 /*************************************
@@ -412,7 +414,7 @@ static INPUT_PORTS_START( meadows )
 	PORT_BIT( 0xff, 0x80, IPT_AD_STICK_X ) PORT_MINMAX(0x10,0xf0) PORT_SENSITIVITY(100) PORT_KEYDELTA(10)
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("DSW1:3,2,1")
 	PORT_DIPSETTING(    0x00, "2" )
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -421,15 +423,15 @@ static INPUT_PORTS_START( meadows )
 	PORT_DIPSETTING(    0x05, "7" )
 	PORT_DIPSETTING(    0x06, "8" )
 	PORT_DIPSETTING(    0x07, "9" )
-	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x18, 0x00, DEF_STR( Coinage ) ) PORT_DIPLOCATION("DSW1:5,4")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x18, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:6")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( On ) )
-	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Bonus_Life ) )
+	PORT_DIPNAME( 0xc0, 0x40, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("DSW1:8,7")
 	PORT_DIPSETTING(    0x40, "5000")
 	PORT_DIPSETTING(    0x80, "15000")
 	PORT_DIPSETTING(    0xc0, "35000")
@@ -461,37 +463,37 @@ static INPUT_PORTS_START( minferno )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, "Coin Option" )
+	PORT_DIPNAME( 0x01, 0x01, "Coin Option" ) PORT_DIPLOCATION("DSW1:4")
 	PORT_DIPSETTING(    0x00, "1 Game/Coin" )
 	PORT_DIPSETTING(    0x01, "1 Player/Coin" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Game_Time ) )
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Game_Time ) ) PORT_DIPLOCATION("DSW1:2,1")
 	PORT_DIPSETTING(    0x00, "60s" )
 	PORT_DIPSETTING(    0x01, "90s" )
 	PORT_DIPSETTING(    0x02, "120s" )
 	PORT_DIPSETTING(    0x03, "180s" )
-	PORT_DIPNAME( 0x0c, 0x04, "Extended Play Score" )
+	PORT_DIPNAME( 0x0c, 0x04, "Extended Play Score" ) PORT_DIPLOCATION("DSW1:6,5")
 	PORT_DIPSETTING(    0x00, "3000/6000" )
 	PORT_DIPSETTING(    0x04, "4000/7000" )
 	PORT_DIPSETTING(    0x08, "5000/8000" )
 	PORT_DIPSETTING(    0x0c, "6000/9000" )
-	PORT_DIPNAME( 0x30, 0x10, "Extended Play Time" )
+	PORT_DIPNAME( 0x30, 0x10, "Extended Play Time" ) PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x00, DEF_STR( None ) )
 	PORT_DIPSETTING(    0x10, "20s" )
 	PORT_DIPSETTING(    0x20, "40s" )
 	PORT_DIPSETTING(    0x30, "60s" )
-	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unknown ) )
+/*	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unused ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) ) */
 INPUT_PORTS_END
 
 
@@ -587,11 +589,11 @@ static const samples_interface bowl3d_samples_interface =
 static MACHINE_DRIVER_START( meadows )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 5000000/8) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_ADD("main", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(meadows_main_map,0)
 	MDRV_CPU_VBLANK_INT("main", meadows_interrupt) 	/* one interrupt per frame!? */
 
-	MDRV_CPU_ADD("audio", S2650, 5000000/8) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_ADD("audio", S2650, MASTER_CLOCK/8) 	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map,0)
 	MDRV_CPU_PERIODIC_INT(audio_interrupt, (double)5000000/131072)
 
@@ -626,7 +628,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( minferno )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main", S2650, 5000000/8/3) 	/* 5MHz / 8 = 625 kHz */
+	MDRV_CPU_ADD("main", S2650, MASTER_CLOCK/24) 	/* 5MHz / 8 / 3 = 208.33 kHz */
 	MDRV_CPU_PROGRAM_MAP(minferno_main_map,0)
 	MDRV_CPU_IO_MAP(minferno_io_map,0)
 	MDRV_CPU_VBLANK_INT("main", minferno_interrupt)
