@@ -15,7 +15,6 @@ Tilemap flip flags were reversed
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/suprnova.h"
 
 static bitmap_t *sprite_bitmap;
@@ -30,7 +29,6 @@ static bitmap_t *tilemap_bitmapflags_higher;
 /* draws ROZ with linescroll OR columnscroll to 16-bit indexed bitmap */
 static void suprnova_draw_roz(bitmap_t* bitmap, bitmap_t* bitmapflags, const rectangle *cliprect, tilemap *tmap, UINT32 startx, UINT32 starty, int incxx, int incxy, int incyx, int incyy, int wraparound, int columnscroll, UINT32* scrollram)
 {
-//  const pen_t *clut = &Machine->pens[0];
 	//bitmap_t *destbitmap = bitmap;
 	bitmap_t *srcbitmap = tilemap_get_pixmap(tmap);
 	bitmap_t *srcbitmapflags = tilemap_get_flagsmap(tmap);
@@ -1081,7 +1079,7 @@ VIDEO_UPDATE(skns)
 			UINT32* dst;
 			UINT16 pri, pri2, pri3;
 			UINT16 bgpri;
-			const pen_t *clut = &Machine->pens[0];
+			const pen_t *clut = &screen->machine->pens[0];
 //          int drawpri;
 
 

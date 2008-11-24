@@ -20,7 +20,6 @@
 #include "driver.h"
 #include "cpu/cubeqcpu/cubeqcpu.h"
 #include "sound/dac.h"
-#include "deprecat.h"
 #include "sound/custom.h"
 #include "streams.h"
 #include "machine/laserdsc.h"

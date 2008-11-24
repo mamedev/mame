@@ -2608,7 +2608,7 @@ static WRITE16_HANDLER( _32x_68k_palette_w )
 
 	_32x_palette_lookup[offset] = (r << 10) | (g << 5) | (b << 0) | (p << 15);
 
-	palette_set_color_rgb(Machine,offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
+	palette_set_color_rgb(space->machine,offset+0x40,pal5bit(r),pal5bit(g),pal5bit(b));
 
 }
 
@@ -5539,7 +5539,7 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 					case 0x1a000: // (sprite)shadow set, highlight set - not possible
 					case 0x1e000: // (sprite)shadow set, highlight set, normal set, not possible
 					default:
-						lineptr[x] = mame_rand(Machine)&0x3f;
+						lineptr[x] = mame_rand(machine)&0x3f;
 					break;
 				}
 			}

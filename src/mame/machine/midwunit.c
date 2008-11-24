@@ -589,7 +589,7 @@ DRIVER_INIT( revx )
 
 	/* load the graphics ROMs -- quadruples */
 	midyunit_gfx_rom = base = memory_region(machine, "gfx1");
-	len = memory_region_length(Machine, "gfx1");
+	len = memory_region_length(machine, "gfx1");
 	for (i = 0; i < len / 0x200000; i++)
 	{
 		memcpy(midwunit_decode_memory, base, 0x200000);

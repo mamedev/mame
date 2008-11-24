@@ -30,7 +30,6 @@ SX008-14.BIN ; /
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/mips/r3000.h"
 #include "sound/st0016.h"
 #include "st0016.h"
