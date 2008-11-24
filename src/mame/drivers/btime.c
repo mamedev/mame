@@ -167,6 +167,26 @@ static WRITE8_HANDLER( btime_w )
 	btime_decrypt(space->machine);
 }
 
+static WRITE8_HANDLER( tisland_w )
+{
+	if      (offset <= 0x07ff)                     ;
+	else if (offset >= 0x0c00 && offset <= 0x0c0f) btime_paletteram_w(space,offset - 0x0c00,data);
+	else if (offset >= 0x1000 && offset <= 0x17ff) ;
+	else if (offset >= 0x1800 && offset <= 0x1bff) btime_mirrorvideoram_w(space,offset - 0x1800,data);
+	else if (offset >= 0x1c00 && offset <= 0x1fff) btime_mirrorcolorram_w(space,offset - 0x1c00,data);
+	else if (offset == 0x4002)                     btime_video_control_w(space,0,data);
+	else if (offset == 0x4003)                     audio_command_w(space,0,data);
+	else if (offset == 0x4004)                     bnj_scroll1_w(space,0,data);
+	else if (offset == 0x4005)					   bnj_scroll2_w(space,0,data);
+//	else if (offset == 0x8000)                     btime_video_control_w(space,0,data);
+	else logerror("CPU #%d PC %04x: warning - write %02x to unmapped memory address %04x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
+
+
+	rambase[offset] = data;
+
+	btime_decrypt(space->machine);
+}
+
 static WRITE8_HANDLER( zoar_w )
 {
 	if      (offset <= 0x07ff) 					   ;
@@ -235,6 +255,24 @@ static ADDRESS_MAP_START( cookrace_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe003, 0xe003) AM_READ_PORT("P2")
 	AM_RANGE(0xe004, 0xe004) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0xfff9, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( tisland_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xffff) AM_WRITE(tisland_w)	/* override the following entries to */
+													/* support ROM decryption */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&rambase)
+	AM_RANGE(0x0c00, 0x0c0f) AM_WRITE(btime_paletteram_w) AM_BASE(&paletteram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE(&btime_videoram) AM_SIZE(&btime_videoram_size)
+	AM_RANGE(0x1400, 0x17ff) AM_RAM AM_BASE(&btime_colorram)
+	AM_RANGE(0x1800, 0x1bff) AM_READWRITE(btime_mirrorvideoram_r, btime_mirrorvideoram_w)
+	AM_RANGE(0x1c00, 0x1fff) AM_READWRITE(btime_mirrorcolorram_r, btime_mirrorcolorram_w)
+	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITENOP
+	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("P2")
+	AM_RANGE(0x4002, 0x4002) AM_READ_PORT("SYSTEM") AM_WRITE(btime_video_control_w)
+	AM_RANGE(0x4003, 0x4003) AM_READ_PORT("DSW1") AM_WRITE(audio_command_w)
+	AM_RANGE(0x4004, 0x4004) AM_READ_PORT("DSW2") AM_WRITE(bnj_scroll1_w)
+	AM_RANGE(0x4005, 0x4005) AM_WRITE(bnj_scroll2_w)
+	AM_RANGE(0x9000, 0xffff) AM_READ(SMH_ROM)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( zoar_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1271,6 +1309,8 @@ static MACHINE_DRIVER_START( tisland )
 
 	/* basic machine hardware */
 	MDRV_IMPORT_FROM(btime)
+	MDRV_CPU_MODIFY("main")
+	MDRV_CPU_PROGRAM_MAP(tisland_map,0)
 
 	/* video hardware */
 	MDRV_GFXDECODE(zoar)
@@ -1399,6 +1439,7 @@ ROM_END
 ROM_START( tisland )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "t-04.b7",      0xa000, 0x1000, CRC(641af7f9) SHA1(50cd8f2372725356bb5a66024084363f5c5a870d) )
+	ROM_RELOAD(               0x9000, 0x1000 )
 	ROM_LOAD( "t-07.b11",     0xb000, 0x1000, CRC(6af00c8b) SHA1(e3948ca36642d3c2a1f94b017893d6e2fe178bb0) )
 	ROM_LOAD( "t-05.b9",      0xc000, 0x1000, CRC(95b1a1d3) SHA1(5636580f26e839d1140838c7efc1cabc2cf06f6f) )
 	ROM_LOAD( "t-08.b13",     0xd000, 0x1000, CRC(b7bbc008) SHA1(751491eac90f46985c83a6c06088638bcd0c0f20) )
@@ -1722,6 +1763,19 @@ static DRIVER_INIT( zoar )
 	init_rom1(machine);
 }
 
+static DRIVER_INIT( tisland )
+{
+	UINT8 *rom = memory_region(machine, "main");
+
+	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
+	unmapped area that causes the game to fail in several circumstances.On the Cassette
+	version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
+	wrong going on in the encryption scheme.*/
+	memset(&rom[0xa2b6],0x24,1);
+
+	init_rom1(machine);
+}
+
 static DRIVER_INIT( lnc )
 {
 	decrypt_C10707_cpu(machine, "main");
@@ -1751,7 +1805,7 @@ GAME( 1982, btime,    0,       btime,    btime,    btime,   ROT270, "Data East C
 GAME( 1982, btime2,   btime,   btime,    btime,    btime,   ROT270, "Data East Corporation", "Burger Time (Data East set 2)", 0 )
 GAME( 1982, btimem,   btime,   btime,    btime,    btime,   ROT270, "Data East (Bally Midway license)", "Burger Time (Midway)", 0 )
 GAME( 1982, cookrace, btime,   cookrace, cookrace, cookrace,ROT270, "bootleg", "Cook Race", 0 )
-GAME( 1981, tisland,  0,       tisland,  btime,    btime,   ROT270, "Data East Corporation", "Treasure Island", GAME_NOT_WORKING )
+GAME( 1981, tisland,  0,       tisland,  btime,    tisland, ROT270, "Data East Corporation", "Treasure Island", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( 1981, lnc,      0,       lnc,      lnc,      lnc,     ROT270, "Data East Corporation", "Lock'n'Chase", 0 )
 GAME( 1982, wtennis,  0,       wtennis,  wtennis,  wtennis, ROT270, "bootleg", "World Tennis", 0 )
 GAME( 1982, mmonkey,  0,       mmonkey,  mmonkey,  lnc,     ROT270, "Technos + Roller Tron", "Minky Monkey", 0 )
