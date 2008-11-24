@@ -21,7 +21,6 @@
  *
  *****************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuexec.h"
 #include "debugger.h"
 #include "cp1610.h"

@@ -9,7 +9,6 @@
   Code by Wilbert Pol
 */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "sm8500.h"
 

@@ -36,7 +36,7 @@
 /**   Split fetch and execute cycles.                       **/
 /**                                                         **/
 /*************************************************************/
-#define NO_LEGACY_MEMORY_HANDLERS 1
+
 #include "debugger.h"
 #include "lr35902.h"
 

@@ -50,7 +50,7 @@
                 fixed so top 8 bits of X & Y are preserved while in 8-bit mode,
         added save state support.
 */
-#define NO_LEGACY_MEMORY_HANDLERS 1
+
 #include "debugger.h"
 #include "cpuexec.h"
 #include "m37710cm.h"

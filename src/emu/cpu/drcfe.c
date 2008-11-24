@@ -17,7 +17,6 @@
 
 ***************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include <stddef.h>
 #include "cpuintrf.h"
 #include "mame.h"

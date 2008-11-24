@@ -76,7 +76,6 @@ Hitachi HD647180 series:
 
  *****************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "driver.h"
 #include "z180.h"

@@ -32,7 +32,6 @@ static const char copyright_notice[] =
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include <setjmp.h>
 #include "m68kcpu.h"
 #include "m68kops.h"

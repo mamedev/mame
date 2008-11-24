@@ -117,7 +117,6 @@ Table 3-2.  TMS32025/26 Memory Blocks
 */
 
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "tms32025.h"
 

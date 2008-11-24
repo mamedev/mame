@@ -1,5 +1,3 @@
-#define NO_LEGACY_MEMORY_HANDLERS    1
-
 #include "driver.h"
 #include "debugger.h"
 #include "cdp1802.h"

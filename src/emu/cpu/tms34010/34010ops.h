@@ -12,7 +12,6 @@
 #ifndef __34010OPS_H__
 #define __34010OPS_H__
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 
 #ifndef INLINE

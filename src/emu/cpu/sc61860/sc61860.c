@@ -27,7 +27,6 @@
  *         Extended execute procudure with HLT-mode of CPU.
  *****************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 
 #include "sc61860.h"

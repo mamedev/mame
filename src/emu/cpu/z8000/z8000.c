@@ -43,7 +43,6 @@
  *
  *****************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "z8000.h"
 #include "z8000cpu.h"

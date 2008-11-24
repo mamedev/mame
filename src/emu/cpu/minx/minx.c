@@ -42,7 +42,6 @@ TODO:
 
 */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "minx.h"
 #include "debugger.h"
 #include "deprecat.h"

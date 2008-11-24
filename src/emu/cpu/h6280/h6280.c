@@ -107,7 +107,7 @@
         - Improvements to the handling of taking of delayed interrupts.
 
 ******************************************************************************/
-#define  NO_LEGACY_MEMORY_HANDLERS 1
+
 #include "debugger.h"
 #include "deprecat.h"
 #include "h6280.h"

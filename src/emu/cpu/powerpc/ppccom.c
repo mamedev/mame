@@ -6,7 +6,6 @@
 
 ***************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "ppccom.h"
 #include "cpuexec.h"
 #include "mame.h"

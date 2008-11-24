@@ -149,7 +149,6 @@
 
 ****************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "driver.h"
 #include "deprecat.h"
 #include "cpu/adsp2100/adsp2100.h"

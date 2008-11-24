@@ -17,7 +17,7 @@
  * based on info found on an artikel for the tandy trs80 pc2
  *
  *****************************************************************************/
-#define NO_LEGACY_MEMORY_HANDLERS 1
+
 #include "debugger.h"
 
 #include "lh5801.h"

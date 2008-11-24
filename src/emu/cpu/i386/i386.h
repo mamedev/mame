@@ -3,7 +3,6 @@
 #ifndef __I386_H__
 #define __I386_H__
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 
 #define I386OP(XX)		i386_##XX

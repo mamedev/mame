@@ -15,7 +15,6 @@
 
 */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "arm.h"
 #include "debugger.h"
 

@@ -1,4 +1,3 @@
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "i960.h"
 #include "i960dis.h"

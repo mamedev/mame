@@ -124,7 +124,6 @@
 
 /*int survival_prot = 0; */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "i8085.h"
 #include "i8085cpu.h"

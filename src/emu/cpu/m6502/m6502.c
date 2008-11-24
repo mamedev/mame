@@ -24,8 +24,6 @@
 /* 10.March   2000 PeT added 6502 set overflow input line */
 /* 13.September 2000 PeT N2A03 jmp indirect */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
-
 #if ((HAS_M65SC02 || HAS_DECO16) && !HAS_M65C02)
 #undef HAS_M65C02
 #define HAS_M65C02 1

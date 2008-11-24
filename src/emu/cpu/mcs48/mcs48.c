@@ -40,8 +40,6 @@ T0 output clock
 
 ***************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS	1
-
 #include "debugger.h"
 #include "mcs48.h"
 

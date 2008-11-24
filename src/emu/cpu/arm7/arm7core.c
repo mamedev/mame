@@ -77,7 +77,6 @@
     By Bryan McPhail (bmcphail@tendril.co.uk) and Phil Stroffolino
 *****************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include <stdarg.h>
 #include "deprecat.h"
 

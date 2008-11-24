@@ -28,7 +28,6 @@
 // SJE: Fixed a mistake in tms70x0_pf_w where the wrong register was referenced
 // SJE: Implemented internal register file
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 #include "cpuexec.h"
 #include "debugger.h"

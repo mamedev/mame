@@ -4,7 +4,6 @@
 ****************************************************************************/
 /* 26.March 2000 PeT changed set_irq_line */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "cpuintrf.h"
 

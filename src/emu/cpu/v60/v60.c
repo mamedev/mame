@@ -3,7 +3,6 @@
 // Main hacking and coding by Farfetch'd
 // Portability fixes by Richter Belmont
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "v60.h"
 

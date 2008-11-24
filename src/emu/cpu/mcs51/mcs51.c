@@ -137,8 +137,6 @@
  * - more timer cleanups from manual
  */
 
-#define NO_LEGACY_MEMORY_HANDLERS	1
-
 #include "debugger.h"
 #include "mcs51.h"
 

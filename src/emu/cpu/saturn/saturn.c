@@ -21,7 +21,7 @@
  *   - This entire notice must remain in the source code.
  *
  *****************************************************************************/
-#define NO_LEGACY_MEMORY_HANDLERS 1
+
 #include "debugger.h"
 #include "deprecat.h"
 

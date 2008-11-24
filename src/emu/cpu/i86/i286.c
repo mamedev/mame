@@ -3,7 +3,6 @@
 *               (initial work based on David Hedley's pcemu)                *
 ****************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "host.h"
 

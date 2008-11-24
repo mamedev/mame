@@ -4,7 +4,6 @@
     Written by Ville Linde
 */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "deprecat.h"

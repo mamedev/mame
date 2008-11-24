@@ -8,7 +8,6 @@
     Raphael Nabet 2004
 */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "tx0.h"

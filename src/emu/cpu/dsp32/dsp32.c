@@ -27,7 +27,6 @@
 
 ***************************************************************************/
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "debugger.h"
 #include "deprecat.h"
 #include "dsp32.h"

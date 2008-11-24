@@ -60,7 +60,6 @@ Address  Function Register  R/W  When Reset          Remarks
 /* ================================ INCLUDES ============================== */
 /* ======================================================================== */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include <limits.h>
 #include "debugger.h"
 #include "spc700.h"

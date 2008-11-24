@@ -323,7 +323,6 @@ field:      X address   D           Function    Y address   D (part 2)
       another track.
 */
 
-#define NO_LEGACY_MEMORY_HANDLERS 1
 #include "cpuintrf.h"
 #include "debugger.h"
 #include "apexc.h"
