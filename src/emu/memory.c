@@ -253,7 +253,7 @@ struct _subtable_data
 struct _memory_private
 {
 	const address_space *	spacelist;						/* list of address spaces */
-	
+
 	UINT8 *					bank_ptr[STATIC_COUNT];			/* array of bank pointers */
 	UINT8 *					bankd_ptr[STATIC_COUNT];		/* array of decrypted bank pointers */
 	void *					shared_ptr[MAX_SHARED_POINTERS];/* array of shared pointers */
@@ -405,7 +405,7 @@ INLINE void adjust_addresses(address_space *space, offs_t *start, offs_t *end, o
 INLINE int bank_references_space(const bank_info *bank, const address_space *space)
 {
 	bank_reference *ref;
-	
+
 	for (ref = bank->reflist; ref != NULL; ref = ref->next)
 		if (ref->space == space)
 			return TRUE;
@@ -421,7 +421,7 @@ INLINE int bank_references_space(const bank_info *bank, const address_space *spa
 INLINE void add_bank_reference(bank_info *bank, const address_space *space)
 {
 	bank_reference **refptr;
-	
+
 	/* make sure we don't already have a reference to the bank */
 	for (refptr = &bank->reflist; *refptr != NULL; refptr = &(*refptr)->next)
 		if ((*refptr)->space == space)
@@ -697,7 +697,7 @@ void memory_init(running_machine *machine)
 	memory_private *memdata;
 
 	add_exit_callback(machine, memory_exit);
-	
+
 	/* allocate our private data */
 	memdata = machine->memory_data = auto_malloc(sizeof(*machine->memory_data));
 	memset(memdata, 0, sizeof(*memdata));
@@ -723,8 +723,8 @@ void memory_init(running_machine *machine)
 
 
 /*-------------------------------------------------
-    memory_find_address_space - find an address 
-    space in our internal list; for faster access 
+    memory_find_address_space - find an address
+    space in our internal list; for faster access
     use cpu_get_address_space()
 -------------------------------------------------*/
 
@@ -732,7 +732,7 @@ const address_space *memory_find_address_space(const device_config *cpu, int spa
 {
 	memory_private *memdata = cpu->machine->memory_data;
 	const address_space *space;
-	
+
 	for (space = memdata->spacelist; space != NULL; space = space->next)
 		if (space->cpu == cpu && space->spacenum == spacenum)
 			return space;
@@ -890,7 +890,7 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 	entry = spacerw->readlookup[LEVEL1_INDEX(byteaddress)];
 	if (entry >= SUBTABLE_BASE)
 		entry = spacerw->readlookup[LEVEL2_INDEX(entry,byteaddress)];
-	
+
 	/* keep track of current entry */
 	spacerw->direct.entry = entry;
 
@@ -931,8 +931,8 @@ int memory_set_direct_region(const address_space *space, offs_t byteaddress)
 
 
 /*-------------------------------------------------
-    memory_get_read_ptr - return a pointer the 
-    memory byte provided in the given address 
+    memory_get_read_ptr - return a pointer the
+    memory byte provided in the given address
     space, or NULL if it is not mapped to a bank
 -------------------------------------------------*/
 
@@ -958,9 +958,9 @@ void *memory_get_read_ptr(const address_space *space, offs_t byteaddress)
 
 
 /*-------------------------------------------------
-    memory_get_write_ptr - return a pointer the 
-    memory byte provided in the given address 
-    space, or NULL if it is not mapped to a 
+    memory_get_write_ptr - return a pointer the
+    memory byte provided in the given address
+    space, or NULL if it is not mapped to a
     writeable bank
 -------------------------------------------------*/
 
@@ -1014,7 +1014,7 @@ void memory_configure_bank(running_machine *machine, int banknum, int startentry
 	/* fill in the requested bank entries */
 	for (entrynum = startentry; entrynum < startentry + numentries; entrynum++)
 		bank->entry[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
-	
+
 	/* if we have no bankptr yet, set it to the first entry */
 	if (memdata->bank_ptr[banknum] == NULL)
 		memdata->bank_ptr[banknum] = bank->entry[0];
@@ -1045,7 +1045,7 @@ void memory_configure_bank_decrypted(running_machine *machine, int banknum, int 
 	/* fill in the requested bank entries */
 	for (entrynum = startentry; entrynum < startentry + numentries; entrynum++)
 		bank->entryd[entrynum] = (UINT8 *)base + (entrynum - startentry) * stride;
-	
+
 	/* if we have no bankptr yet, set it to the first entry */
 	if (memdata->bankd_ptr[banknum] == NULL)
 		memdata->bankd_ptr[banknum] = bank->entryd[0];
@@ -1053,7 +1053,7 @@ void memory_configure_bank_decrypted(running_machine *machine, int banknum, int 
 
 
 /*-------------------------------------------------
-    memory_set_bank - select one pre-configured 
+    memory_set_bank - select one pre-configured
     entry to be the new bank base
 -------------------------------------------------*/
 
@@ -1138,9 +1138,9 @@ void memory_set_bankptr(running_machine *machine, int banknum, void *base)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    _memory_install_handler - install a new memory 
-    handler into the given address space, 
-    returning a pointer to the memory backing it, 
+    _memory_install_handler - install a new memory
+    handler into the given address space,
+    returning a pointer to the memory backing it,
     if present
 -------------------------------------------------*/
 
@@ -1227,9 +1227,9 @@ UINT64 *_memory_install_handler64(const address_space *space, offs_t addrstart, 
 
 
 /*-------------------------------------------------
-    _memory_install_device_handler - install a new 
-    device memory handler into the given address 
-    space, returning a pointer to the memory 
+    _memory_install_device_handler - install a new
+    device memory handler into the given address
+    space, returning a pointer to the memory
     backing it, if present
 -------------------------------------------------*/
 
@@ -1248,7 +1248,7 @@ void *_memory_install_device_handler(const address_space *space, const device_co
 
 
 /*-------------------------------------------------
-    _memory_install_device_handler8 - same as above 
+    _memory_install_device_handler8 - same as above
     but explicitly for 8-bit handlers
 -------------------------------------------------*/
 
@@ -1265,7 +1265,7 @@ UINT8 *_memory_install_device_handler8(const address_space *space, const device_
 
 
 /*-------------------------------------------------
-    _memory_install_device_handler16 - same as 
+    _memory_install_device_handler16 - same as
     above but explicitly for 16-bit handlers
 -------------------------------------------------*/
 
@@ -1282,7 +1282,7 @@ UINT16 *_memory_install_device_handler16(const address_space *space, const devic
 
 
 /*-------------------------------------------------
-    _memory_install_device_handler32 - same as 
+    _memory_install_device_handler32 - same as
     above but explicitly for 32-bit handlers
 -------------------------------------------------*/
 
@@ -1299,7 +1299,7 @@ UINT32 *_memory_install_device_handler32(const address_space *space, const devic
 
 
 /*-------------------------------------------------
-    _memory_install_device_handler64 - same as 
+    _memory_install_device_handler64 - same as
     above but explicitly for 64-bit handlers
 -------------------------------------------------*/
 
@@ -1342,8 +1342,8 @@ const char *memory_get_handler_string(const address_space *space, int read0_or_w
 
 
 /*-------------------------------------------------
-    memory_enable_read_watchpoints - enable/disable 
-    read watchpoint tracking for a given address 
+    memory_enable_read_watchpoints - enable/disable
+    read watchpoint tracking for a given address
     space
 -------------------------------------------------*/
 
@@ -1358,8 +1358,8 @@ void memory_enable_read_watchpoints(const address_space *space, int enable)
 
 
 /*-------------------------------------------------
-    memory_enable_write_watchpoints - enable/disable 
-    write watchpoint tracking for a given address 
+    memory_enable_write_watchpoints - enable/disable
+    write watchpoint tracking for a given address
     space
 -------------------------------------------------*/
 
@@ -1410,7 +1410,7 @@ int memory_get_log_unmap(const address_space *space)
 
 
 /*-------------------------------------------------
-    memory_dump - dump the internal memory tables 
+    memory_dump - dump the internal memory tables
     to the given file
 -------------------------------------------------*/
 
@@ -1475,7 +1475,7 @@ static void memory_init_spaces(running_machine *machine)
 					address_space *space = malloc_or_die(sizeof(*space));
 					int accessorindex;
 					int entrynum;
-					
+
 					/* determine the address and data bits */
 					memset(space, 0, sizeof(*space));
 					space->machine = machine;
@@ -1492,13 +1492,13 @@ static void memory_init_spaces(running_machine *machine)
 					space->accessors = memory_accessors[accessorindex][(space->endianness == CPU_IS_LE) ? 0 : 1];
 					space->map = NULL;
 					space->log_unmap = TRUE;
-					
+
 					/* allocate subtable information; we malloc this manually because it will be realloc'ed */
 					space->read.subtable = auto_malloc(sizeof(*space->read.subtable) * SUBTABLE_COUNT);
 					memset(space->read.subtable, 0, sizeof(*space->read.subtable) * SUBTABLE_COUNT);
 					space->write.subtable = auto_malloc(sizeof(*space->write.subtable) * SUBTABLE_COUNT);
 					memset(space->write.subtable, 0, sizeof(*space->write.subtable) * SUBTABLE_COUNT);
-					
+
 					/* allocate the handler table */
 					space->read.handlers[0] = auto_malloc(sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
 					memset(space->read.handlers[0], 0, sizeof(*space->read.handlers[0]) * ARRAY_LENGTH(space->read.handlers));
@@ -1544,7 +1544,7 @@ static void memory_init_spaces(running_machine *machine)
 					space->direct.max = 0;
 					space->direct.entry = STATIC_UNMAP;
 					space->directupdate = NULL;
-					
+
 					/* link us in */
 					*nextptr = space;
 					nextptr = (address_space **)&space->next;
@@ -1797,7 +1797,7 @@ static void memory_init_allocate(running_machine *machine)
 
 
 /*-------------------------------------------------
-    memory_init_locate - find all the requested 
+    memory_init_locate - find all the requested
     pointers into the final allocated memory
 -------------------------------------------------*/
 
@@ -1876,7 +1876,7 @@ static void memory_exit(running_machine *machine)
 		memdata->memory_block_list = block->next;
 		free(block);
 	}
-	
+
 	/* free all the bank references */
 	for (banknum = 0; banknum < STATIC_COUNT; banknum++)
 	{
@@ -2194,7 +2194,7 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 		space->writelookup = space->write.table;
 	if (reset_read)
 		space->readlookup = space->read.table;
-	
+
 	/* recompute any direct access on this space if it is a read modification */
 	if (readorwrite == ROW_READ && entry == space->direct.entry)
 	{
@@ -2206,7 +2206,7 @@ static void space_map_range(address_space *space, read_or_write readorwrite, int
 
 
 /*-------------------------------------------------
-    space_find_backing_memory - return a pointer to 
+    space_find_backing_memory - return a pointer to
     the base of RAM associated with the given CPU
     and offset
 -------------------------------------------------*/
@@ -2244,8 +2244,8 @@ static void *space_find_backing_memory(const address_space *space, offs_t bytead
 
 
 /*-------------------------------------------------
-    space_needs_backing_store - return whether a 
-    given memory map entry implies the need of 
+    space_needs_backing_store - return whether a
+    given memory map entry implies the need of
     allocating and registering memory
 -------------------------------------------------*/
 
@@ -2850,7 +2850,7 @@ static void *block_allocate(const address_space *space, offs_t bytestart, offs_t
 			break;
 		}
 	}
-	
+
 	/* if we didn't find a match, register */
 	if (region == NULL)
 	{

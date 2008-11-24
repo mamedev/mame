@@ -49,7 +49,7 @@ struct _ssp1601_state_t
 	PAIR ppc;
 
 	int g_cycles;
-	
+
 	const device_config *device;
 	const address_space *program;
 	const address_space *io;
@@ -503,7 +503,7 @@ static UINT32 ptr2_read(ssp1601_state_t *ssp1601_state, int op)
 static CPU_INIT( ssp1601 )
 {
 	ssp1601_state_t *ssp1601_state = device->token;
-	
+
 	state_save_register_item(CHIP_NAME, device->tag, 0, rX);
 	state_save_register_item(CHIP_NAME, device->tag, 0, rY);
 	state_save_register_item(CHIP_NAME, device->tag, 0, rA32);

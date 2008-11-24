@@ -45,7 +45,7 @@ typedef struct
 
 	UINT32			gpr[16];
 	UINT32			extport[0x30];
-	
+
 	const device_config *device;
 	const address_space *program;
 

@@ -73,7 +73,7 @@ typedef struct
 	void (*sel_handler)(void);
 	/* called when reset line is pulsed: IO devices should reset */
 	void (*io_reset_callback)(void);
-	
+
 	const device_config *device;
 	const address_space *program;
 }
@@ -145,7 +145,7 @@ static void tx0_init_common(int is_64kw, const device_config *device, int index,
 
 	tx0.address_mask = is_64kw ? ADDRESS_MASK_64KW : ADDRESS_MASK_8KW;
 	tx0.ir_mask = is_64kw ? 03 : 037;
-	
+
 	tx0.device = device;
 	tx0.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }

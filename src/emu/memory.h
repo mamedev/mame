@@ -1047,8 +1047,8 @@ INLINE void memory_write_qword_masked(const address_space *space, offs_t byteadd
 
 
 /*-------------------------------------------------
-    memory_decrypted_read_byte/word/dword/qword - 
-    read a value from the specified address space 
+    memory_decrypted_read_byte/word/dword/qword -
+    read a value from the specified address space
     using the direct addressing mechanism and
     the decrypted base pointer
 -------------------------------------------------*/
@@ -1090,8 +1090,8 @@ INLINE UINT64 memory_decrypted_read_qword(const address_space *space, offs_t byt
 
 
 /*-------------------------------------------------
-    memory_raw_read_byte/word/dword/qword - 
-    read a value from the specified address space 
+    memory_raw_read_byte/word/dword/qword -
+    read a value from the specified address space
     using the direct addressing mechanism and
     the raw base pointer
 -------------------------------------------------*/

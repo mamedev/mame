@@ -174,10 +174,10 @@ WRITE8_HANDLER( hunchbks_mirror_w )
 	memory_write_byte(space, 0x1000+offset,data);
 }
 
-static WRITE8_DEVICE_HANDLER( sound_latch_w ) 
+static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
 	const address_space *space = cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM);
-	soundlatch_w(space, offset, data); 
+	soundlatch_w(space, offset, data);
 }
 
 const ppi8255_interface scramble_ppi_0_intf =

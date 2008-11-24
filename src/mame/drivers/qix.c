@@ -1235,7 +1235,7 @@ static DRIVER_INIT( kram3 )
     The encryption algorithm is only partially understood.
 
     We are currently using two incomplete 2048-nibble tables to get a address
-	 dependant xor.
+     dependant xor.
 
     One important thing to note is that for 6809 instructions that take two
     opcodes (that is, 10 xx and 11 xx) only the first opcode is encrypted, not the

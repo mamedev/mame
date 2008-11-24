@@ -468,7 +468,7 @@ static void h8itu_3007_timer_expire(h83xx_state *h8, int tnum)
 {
 	int base = 0x68 + (tnum*8);
 	UINT16 count;
-	
+
 	count = (h8->per_regs[base + 0x2]<<8) | h8->per_regs[base + 0x3];
 	count++;
 

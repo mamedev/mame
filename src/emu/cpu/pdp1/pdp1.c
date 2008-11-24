@@ -420,7 +420,7 @@ typedef struct
 
 	/* 1 for 16-line sequence break system, 0 for default break system */
 	int type_20_sbs;
-	
+
 	const device_config *device;
 	const address_space *program;
 }

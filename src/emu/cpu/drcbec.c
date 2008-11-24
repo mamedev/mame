@@ -309,7 +309,7 @@ const drcbe_interface drcbe_c_be_interface =
 static drcbe_state *drcbec_alloc(drcuml_state *drcuml, drccache *cache, const device_config *device, UINT32 flags, int modes, int addrbits, int ignorebits)
 {
 	int spacenum;
-	
+
 	/* allocate space in the cache for our state */
 	drcbe_state *drcbe = drccache_memory_alloc(cache, sizeof(*drcbe));
 	if (drcbe == NULL)

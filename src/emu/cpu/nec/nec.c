@@ -140,8 +140,8 @@ typedef struct
 } memory_interface;
 
 
-typedef struct _nec_state_t nec_state_t; 
-struct _nec_state_t 
+typedef struct _nec_state_t nec_state_t;
+struct _nec_state_t
 {
 	necbasicregs regs;
  	UINT16	sregs[4];
@@ -1090,7 +1090,7 @@ static void set_poll_line(nec_state_t *nec_state, int state)
 static CPU_DISASSEMBLE( nec )
 {
 	nec_state_t *nec_state = device->token;
-	
+
 	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
@@ -1220,7 +1220,7 @@ static CPU_EXECUTE( necv )
 static CPU_INIT( v20 )
 {
 	nec_state_t *nec_state = device->token;
-	
+
 	nec_init(device, index, clock, irqcallback, 0);
 	configure_memory_8bit(nec_state);
 	nec_state->chip_type=V20;
@@ -1233,7 +1233,7 @@ static CPU_INIT( v20 )
 static CPU_INIT( v30 )
 {
 	nec_state_t *nec_state = device->token;
-	
+
 	nec_init(device, index, clock, irqcallback, 1);
 	configure_memory_16bit(nec_state);
 	nec_state->chip_type=V30;
@@ -1247,7 +1247,7 @@ static CPU_INIT( v30 )
 static CPU_INIT( v33 )
 {
 	nec_state_t *nec_state = device->token;
-	
+
 	nec_init(device, index, clock, irqcallback, 2);
 	nec_state->chip_type=V33;
 	nec_state->prefetch_size = 6;		/* ???? */
@@ -1266,7 +1266,7 @@ static CPU_INIT( v33 )
 static CPU_SET_INFO( nec )
 {
 	nec_state_t *nec_state = device->token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */

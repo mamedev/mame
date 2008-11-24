@@ -103,14 +103,14 @@
  *****************************************************************************/
 
 /*
-    Chip   RAM  ROM 
-    ----   ---  --- 
+    Chip   RAM  ROM
+    ----   ---  ---
     8041   128   1k  (ROM)
     8741   128   1k  (EPROM)
     8042   256   2k  (ROM)
     8742   256   2k  (EPROM)
 
-	http://cpucharts.wallsoferyx.net/icmatrix0.html
+    http://cpucharts.wallsoferyx.net/icmatrix0.html
 
 */
 
@@ -839,7 +839,7 @@ static const UINT8 i8x41_cycles[] = {
 static CPU_INIT( i8x41 )
 {
 	upi41_state_t *upi41_state = device->token;
-	
+
 	upi41_state->irq_callback = irqcallback;
 	upi41_state->device = device;
 	upi41_state->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -882,7 +882,7 @@ static CPU_INIT( i8042 )
 static CPU_RESET( i8x41 )
 {
 	upi41_state_t *upi41_state = device->token;
-	
+
 	upi41_state->ppc = 0;
 	upi41_state->pc = 0;
 	upi41_state->timer = 0;
@@ -891,7 +891,7 @@ static CPU_RESET( i8x41 )
 	upi41_state->psw = 0;
 	upi41_state->state = 0;
 	upi41_state->enable = 0;
-	
+
 	ENABLE = IBFI | TCNTI;
 	DBBI = 0xff;
 	DBBO = 0xff;
@@ -1103,7 +1103,7 @@ ADDRESS_MAP_END
 static CPU_SET_INFO( i8x41 )
 {
 	upi41_state_t *upi41_state = device->token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
@@ -1195,7 +1195,7 @@ static CPU_SET_INFO( i8x41 )
 CPU_GET_INFO( i8041 )
 {
 	upi41_state_t *upi41_state = (device != NULL) ? device->token : NULL;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

@@ -38,7 +38,7 @@ typedef struct
 
 	UINT8		waiting;
 	UINT8		watchdog;
-	
+
 	const device_config *device;
 	const address_space *program;
 	const address_space *data;

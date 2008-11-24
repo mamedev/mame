@@ -290,7 +290,7 @@ static READ16_HANDLER ( dlbewing_prot_r )
 		case 0x532: return dblwings_580_data;
 	}
 
-//	printf("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask);
+//  printf("dblewing prot r %08x, %04x, %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask);
 
 	if ((offset*2)==0x0f8) return 0; // dblwings_080_data;
 	if ((offset*2)==0x104) return 0;
@@ -309,8 +309,8 @@ static READ16_HANDLER ( dlbewing_prot_r )
 
 static WRITE16_HANDLER( dblewing_prot_w )
 {
-//	if(offset*2 != 0x380)
-//	printf("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
+//  if(offset*2 != 0x380)
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
 
 	switch(offset*2)
 	{
@@ -411,7 +411,7 @@ static WRITE16_HANDLER( dblewing_prot_w )
 			return;  // p2 inputs select screen  OK
 	}
 
-//	printf("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
+//  printf("dblewing prot w %08x, %04x, %04x %04x\n",cpu_get_pc(space->cpu), offset*2, mem_mask,data);
 
 	if ((offset*2)==0x008) { dblwings_008_data = data; return; }
 	if ((offset*2)==0x080) { dblwings_080_data = data; return; } // p3 3rd boss?
@@ -434,10 +434,10 @@ static ADDRESS_MAP_START( dblewing_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	/* protection */
 //  AM_RANGE(0x280104, 0x280105) AM_WRITE(SMH_NOP)              // ??
-//	AM_RANGE(0x2800ac, 0x2800ad) AM_READ_PORT("DSW")			// dips
-//	AM_RANGE(0x280298, 0x280299) AM_READ_PORT("SYSTEM")			// vbl
-//	AM_RANGE(0x280506, 0x280507) AM_READ_PORT("UNK")
-//	AM_RANGE(0x2802B4, 0x2802B5) AM_READ_PORT("P1_P2")			// inverted?
+//  AM_RANGE(0x2800ac, 0x2800ad) AM_READ_PORT("DSW")            // dips
+//  AM_RANGE(0x280298, 0x280299) AM_READ_PORT("SYSTEM")         // vbl
+//  AM_RANGE(0x280506, 0x280507) AM_READ_PORT("UNK")
+//  AM_RANGE(0x2802B4, 0x2802B5) AM_READ_PORT("P1_P2")          // inverted?
 //  AM_RANGE(0x280330, 0x280331) AM_READ(SMH_NOP)               // sound?
 //  AM_RANGE(0x280380, 0x280381) AM_WRITE(SMH_NOP)              // sound
 

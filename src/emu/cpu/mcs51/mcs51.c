@@ -287,7 +287,7 @@ struct _mcs51_state_t
     const address_space *program;
     const address_space *data;
     const address_space *io;
-    
+
 	/* Serial Port TX/RX Callbacks */
 	// TODO: Move to special port r/w
 	void    (*serial_tx_callback)(int data);	//Call back funciton when sending data out of serial port
@@ -2060,7 +2060,7 @@ static CPU_INIT( mcs51 )
 	mcs51_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	mcs51_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	mcs51_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
-    
+
 	mcs51_state->features = FEATURE_NONE;
 	mcs51_state->ram_mask = 0x7F;  			/* 128 bytes of ram */
 	mcs51_state->num_interrupts = 5;			/* 5 interrupts */
@@ -2068,7 +2068,7 @@ static CPU_INIT( mcs51 )
 	mcs51_state->sfr_write = mcs51_sfr_write;
 
 	/* Save states */
-	
+
 	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ppc);
 	state_save_register_item("mcs51", device->tag, 0, mcs51_state->pc);
 	state_save_register_item("mcs51", device->tag, 0, mcs51_state->rwm );

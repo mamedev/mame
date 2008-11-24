@@ -545,7 +545,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3002 )
 {
-	h83xx_state *h8 = (device != NULL) ? device->token : NULL; 
+	h83xx_state *h8 = (device != NULL) ? device->token : NULL;
 
 	switch(state) {
 	// Interface functions and variables

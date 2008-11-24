@@ -395,7 +395,7 @@ static void (*const m6809_main[0x100])(m68_state_t *) = {
 /* 0x9X */  suba_di,cmpa_di,sbca_di,subd_di,anda_di,bita_di,lda_di, sta_di,
 	    eora_di,adca_di,ora_di, adda_di,cmpx_di,jsr_di, ldx_di, stx_di,
 
-/* 0xAX */  suba_ix,cmpa_ix,sbca_ix,subd_ix,anda_ix,bita_ix,lda_ix, sta_ix, 
+/* 0xAX */  suba_ix,cmpa_ix,sbca_ix,subd_ix,anda_ix,bita_ix,lda_ix, sta_ix,
 	    eora_ix,adca_ix,ora_ix, adda_ix,cmpx_ix,jsr_ix, ldx_ix, stx_ix,
 
 /* 0xBX */  suba_ex,cmpa_ex,sbca_ex,subd_ex,anda_ex,bita_ex,lda_ex, sta_ex,

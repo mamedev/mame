@@ -1622,7 +1622,7 @@ static void mips_state_register( const char *type, const device_config *device )
 static CPU_INIT( psxcpu )
 {
 	psxcpu_state *psxcpu = device->token;
-//	psxcpu->intf = (psxcpu_interface *) device->static_config;
+//  psxcpu->intf = (psxcpu_interface *) device->static_config;
 
 	psxcpu->irq_callback = irqcallback;
 	psxcpu->device = device;

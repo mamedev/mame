@@ -113,12 +113,12 @@ struct _m68_state_t
 
 	cpu_irq_callback irq_callback;
 	const device_config *device;
-	
+
 	/* Memory spaces */
     const address_space *program;
     const address_space *data;
     const address_space *io;
-    
+
 	int 	extra_cycles;	/* cycles used for interrupts */
 	void	(* const * insn)(m68_state_t *);	/* instruction table */
 	const UINT8 *cycles;			/* clock cycle of instruction table */
@@ -581,19 +581,19 @@ static void m6800_check_irq2(m68_state_t *m68_state)
 
 
 /* check the IRQ lines for pending interrupts */
-INLINE void CHECK_IRQ_LINES(m68_state_t *m68_state) 
-{										
-	if( !(CC & 0x10) )											
-	{															
-		if( m68_state->irq_state[M6800_IRQ_LINE] != CLEAR_LINE )		
-		{	/* standard IRQ */									
-			enter_interrupt(m68_state, "M6800#%d take IRQ1n",0xfff8);		
-			if( m68_state->irq_callback )							
-				(void)(*m68_state->irq_callback)(m68_state->device, M6800_IRQ_LINE);	
-		}														
-		else													
-			m6800_check_irq2(m68_state);									
-	}															
+INLINE void CHECK_IRQ_LINES(m68_state_t *m68_state)
+{
+	if( !(CC & 0x10) )
+	{
+		if( m68_state->irq_state[M6800_IRQ_LINE] != CLEAR_LINE )
+		{	/* standard IRQ */
+			enter_interrupt(m68_state, "M6800#%d take IRQ1n",0xfff8);
+			if( m68_state->irq_callback )
+				(void)(*m68_state->irq_callback)(m68_state->device, M6800_IRQ_LINE);
+		}
+		else
+			m6800_check_irq2(m68_state);
+	}
 }
 
 /* check OCI or TOI */
@@ -627,8 +627,8 @@ static void check_timer_event(m68_state_t *m68_state)
 }
 
 INLINE void increment_counter(m68_state_t *m68_state, int amount)
-{									
-	m68_state->icount -= amount;	
+{
+	m68_state->icount -= amount;
 	CTD += amount;
 	if( CTD >= timer_next)
 		check_timer_event(m68_state);
@@ -736,7 +736,7 @@ static TIMER_CALLBACK(m6800_tx_tick)
 static TIMER_CALLBACK(m6800_rx_tick)
 {
     m68_state_t *m68_state =ptr;
-    
+
     cpu_push_context(m68_state->device);
 	if (m68_state->trcsr & M6800_TRCSR_RE)
 	{
@@ -901,7 +901,7 @@ static CPU_INIT( m6800 )
 static CPU_RESET( m6800 )
 {
 	m68_state_t *m68_state = device->token;
-	
+
 	SEI;				/* IRQ disabled */
 	PCD = RM16(m68_state,  0xfffe );
 
@@ -953,7 +953,7 @@ static CPU_GET_CONTEXT( m6800 )
 static CPU_SET_CONTEXT( m6800 )
 {
 	m68_state_t *m68_state = src;
-	
+
 	CHECK_IRQ_LINES(m68_state); /* HJB 990417 */
 }
 
@@ -1706,7 +1706,7 @@ static CPU_INIT( m6808 )
 	m68_state->cycles = cycles_6800;
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
-	
+
 	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	m68_state->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);

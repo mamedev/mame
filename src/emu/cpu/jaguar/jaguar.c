@@ -361,7 +361,7 @@ static CPU_SET_CONTEXT( jaguar )
 static void init_tables(void)
 {
 	int i, j;
-	
+
 	/* if we're not the first, skip */
 	if (table_refcount++ != 0)
 	{
@@ -405,7 +405,7 @@ static STATE_POSTLOAD( jaguar_postload )
 {
 	const device_config *device = param;
 	jaguar_state *jaguar = device->token;
-	
+
 	update_register_banks(jaguar);
 	check_irqs(jaguar);
 }
@@ -498,7 +498,7 @@ static CPU_EXECUTE( jaguargpu )
 	do
 	{
 		UINT32 op;
-		
+
 		/* debugging */
 		//if (jaguar->PC < 0xf03000 || jaguar->PC > 0xf04000) { fatalerror("GPU: jaguar->PC = %06X (ppc = %06X)", jaguar->PC, jaguar->ppc); }
 		jaguar->ppc = jaguar->PC;
@@ -539,7 +539,7 @@ static CPU_EXECUTE( jaguardsp )
 	do
 	{
 		UINT32 op;
-		
+
 		/* debugging */
 		//if (jaguar->PC < 0xf1b000 || jaguar->PC > 0xf1d000) { fatalerror(stderr, "DSP: jaguar->PC = %06X", jaguar->PC); }
 		jaguar->ppc = jaguar->PC;

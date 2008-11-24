@@ -693,7 +693,7 @@ INLINE void handle_cop3(r3000_state *r3000, UINT32 op)
 static CPU_EXECUTE( r3000 )
 {
 	r3000_state *r3000 = device->token;
-	
+
 	/* count cycles and interrupt cycles */
 	r3000->icount = cycles;
 	r3000->icount -= r3000->interrupt_cycles;

@@ -16,7 +16,7 @@ struct _h83xx_state
 	UINT32 h8err;
 	UINT32 regs[8];
 	UINT32 pc, ppc;
-	
+
 	UINT32 h8_IRQrequestH, h8_IRQrequestL;
 	INT32 cyccnt;
 

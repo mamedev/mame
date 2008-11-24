@@ -123,8 +123,8 @@ static UINT16 defender_sensor,shutter_sensor;
 
 static READ16_HANDLER( drill_io_r )
 {
-//	if(offset*2 == 0x4)
-//	popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x",cpu_get_pc(space->cpu),iodata[0/2],iodata[2/2],iodata[4/2],iodata[6/2],iodata[8/2],iodata[0xa/2],iodata[0xc/2],iodata[0xe/2]);
+//  if(offset*2 == 0x4)
+//  popmessage("PC=%08x %04x %04x %04x %04x %04x %04x %04x %04x",cpu_get_pc(space->cpu),iodata[0/2],iodata[2/2],iodata[4/2],iodata[6/2],iodata[8/2],iodata[0xa/2],iodata[0xc/2],iodata[0xe/2]);
 
 	switch(offset)
 	{
@@ -142,7 +142,7 @@ static READ16_HANDLER( drill_io_r )
 		}
 		case 0x4/2: return (defender_sensor) | (shutter_sensor);
 		case 0xe/2: return input_port_read(space->machine, "IN2");//coins
-//		default:  printf("PC=%08x [%04x] -> %04x R\n",cpu_get_pc(space->cpu),offset*2,iodata[offset]);
+//      default:  printf("PC=%08x [%04x] -> %04x R\n",cpu_get_pc(space->cpu),offset*2,iodata[offset]);
 	}
 
 	return 0xffff;
@@ -162,23 +162,23 @@ static WRITE16_HANDLER( drill_io_w )
 			break;
 	}
 
-//	if(data != 0 && offset != 8)
-//	printf("PC=%08x [%04x] <- %04x W\n",cpu_get_pc(space->cpu),offset*2,data);
+//  if(data != 0 && offset != 8)
+//  printf("PC=%08x [%04x] <- %04x W\n",cpu_get_pc(space->cpu),offset*2,data);
 }
 
 /*
-	PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )//up sensor <- shutter
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )//down sensor
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )//left sensor <-defender
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )//right sensor
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0100, 0x0000, DEF_STR( Unknown ) )//up sensor <- shutter
+    PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0100, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0200, 0x0000, DEF_STR( Unknown ) )//down sensor
+    PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0200, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0400, 0x0000, DEF_STR( Unknown ) )//left sensor <-defender
+    PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0400, DEF_STR( On ) )
+    PORT_DIPNAME( 0x0800, 0x0000, DEF_STR( Unknown ) )//right sensor
+    PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x0800, DEF_STR( On ) )
 */
 #ifdef UNUSED_FUNCTION
 static TIMER_CALLBACK( shutter_req )
@@ -450,7 +450,7 @@ static DRIVER_INIT( drill )
 	// rearrange gfx roms to something we can decode, two of the roms form 4bpp of the graphics, the third forms another 2bpp but is in a different format
 	UINT32 *src = (UINT32*)memory_region( machine, "gfx2" );
 	UINT32 *dst = (UINT32*)memory_region( machine, "gfx1" );// + 0x400000;
-//	UINT8 *rom = memory_region( machine, "main" );
+//  UINT8 *rom = memory_region( machine, "main" );
 	int i;
 
 	for (i=0; i< 0x400000/4; i++)
@@ -461,10 +461,10 @@ static DRIVER_INIT( drill )
 	}
 
 	//enable some kind of debug mode (ignore errors)
-//	rom[0x7fffb]=0;
-//	rom[0x7fffc]=0;
-//	rom[0x7fffd]=0;
-//	rom[0x7fffe]=0;
+//  rom[0x7fffb]=0;
+//  rom[0x7fffc]=0;
+//  rom[0x7fffd]=0;
+//  rom[0x7fffe]=0;
 }
 
 GAME( 1993, 2mindril,    0,        drill,    drill,    drill, ROT0,  "Taito", "Two Minute Drill", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )

@@ -94,7 +94,7 @@ static void default_wdmem_id(const address_space *space, offs_t address, UINT8 d
 static CPU_INIT( m65ce02 )
 {
 	m65ce02_Regs *m65ce02 = device->token;
-	
+
 	m65ce02->rdmem_id = default_rdmem_id;
 	m65ce02->wrmem_id = default_wdmem_id;
 	m65ce02->irq_callback = irqcallback;

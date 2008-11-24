@@ -35,7 +35,7 @@ struct _i960_state_t {
 	cpu_irq_callback irq_cb;
 	const device_config *device;
 	const address_space *program;
-	
+
 	int icount;
 };
 
@@ -613,63 +613,63 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			i960->icount--;
 			i960->IP += get_disp(i960, opcode);
 			break;
-	
+
 		case 0x09: // call
 			do_call(i960, i960->IP+get_disp(i960, opcode), 0, i960->r[I960_SP]);
 			break;
-	
+
 		case 0x0a: // ret
 			do_ret(i960);
 			break;
-	
+
 		case 0x0b: // bal
 			i960->icount -= 5;
 			i960->r[0x1e] = i960->IP;
 			i960->IP += get_disp(i960, opcode);
 			break;
-	
+
 		case 0x10: // bno
 			i960->icount--;
 			if(!(i960->AC & 7)) {
 				i960->IP += get_disp(i960, opcode);
 			}
 			break;
-	
+
 		case 0x11: // bg
 			i960->icount--;
 			bxx(i960, opcode, 1);
 			break;
-	
+
 		case 0x12: // be
 			i960->icount--;
 			bxx(i960, opcode, 2);
 			break;
-	
+
 		case 0x13: // bge
 			i960->icount--;
 			bxx(i960, opcode, 3);
 			break;
-	
+
 		case 0x14: // bl
 			i960->icount--;
 			bxx(i960, opcode, 4);
 			break;
-	
+
 		case 0x15: // bne
 			i960->icount--;
 			bxx(i960, opcode, 5);
 			break;
-	
+
 		case 0x16: // ble
 			i960->icount--;
 			bxx(i960, opcode, 6);
 			break;
-	
+
 		case 0x17: // bo
 			i960->icount--;
 			bxx(i960, opcode, 7);
 			break;
-	
+
 		case 0x20: // testno
 			i960->icount--;
 			if(!(i960->AC & 7))
@@ -677,42 +677,42 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			else
 				i960->r[(opcode>>19) & 0x1f] = 0;
 			break;
-	
+
 		case 0x21: // testg
 			i960->icount--;
 			test(i960, opcode, 1);
 			break;
-	
+
 		case 0x22: // teste
 			i960->icount--;
 			test(i960, opcode, 2);
 			break;
-	
+
 		case 0x23: // testge
 			i960->icount--;
 			test(i960, opcode, 3);
 			break;
-	
+
 		case 0x24: // testl
 			i960->icount--;
 			test(i960, opcode, 4);
 			break;
-	
+
 		case 0x25: // testne
 			i960->icount--;
 			test(i960, opcode, 5);
 			break;
-	
+
 		case 0x26: // testle
 			i960->icount--;
 			test(i960, opcode, 6);
 			break;
-	
+
 		case 0x27: // testo
 			i960->icount--;
 			test(i960, opcode, 7);
 			break;
-	
+
 		case 0x30: // bbc
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode) & 0x1f;
@@ -723,7 +723,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			} else
 				i960->AC &= ~7;
 			break;
-	
+
 		case 0x31: // cmp0bg
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -731,7 +731,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_u(i960, t1, t2);
 			bxx_s(i960, opcode, 1);
 			break;
-	
+
 		case 0x32: // cmpobe
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -739,7 +739,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_u(i960, t1, t2);
 			bxx_s(i960, opcode, 2);
 			break;
-	
+
 		case 0x33: // cmpobge
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -747,7 +747,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_u(i960, t1, t2);
 			bxx_s(i960, opcode, 3);
 			break;
-	
+
 		case 0x34: // cmpobl
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -755,7 +755,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_u(i960, t1, t2);
 			bxx_s(i960, opcode, 4);
 			break;
-	
+
 		case 0x35: // cmpobne
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -763,7 +763,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_u(i960, t1, t2);
 			bxx_s(i960, opcode, 5);
 			break;
-	
+
 		case 0x36: // cmpoble
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -771,7 +771,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_u(i960, t1, t2);
 			bxx_s(i960, opcode, 6);
 			break;
-	
+
 		case 0x37: // bbs
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode) & 0x1f;
@@ -782,7 +782,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			} else
 				i960->AC &= ~7;
 			break;
-	
+
 		case 0x39: // cmpibg
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -790,7 +790,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_s(i960, t1, t2);
 			bxx_s(i960, opcode, 1);
 			break;
-	
+
 		case 0x3a: // cmpibe
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -798,7 +798,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_s(i960, t1, t2);
 			bxx_s(i960, opcode, 2);
 			break;
-	
+
 		case 0x3b: // cmpibge
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -806,7 +806,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_s(i960, t1, t2);
 			bxx_s(i960, opcode, 3);
 			break;
-	
+
 		case 0x3c: // cmpibl
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -814,7 +814,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_s(i960, t1, t2);
 			bxx_s(i960, opcode, 4);
 			break;
-	
+
 		case 0x3d: // cmpibne
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -822,7 +822,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_s(i960, t1, t2);
 			bxx_s(i960, opcode, 5);
 			break;
-	
+
 		case 0x3e: // cmpible
 			i960->icount -= 4;
 			t1 = get_1_ci(i960, opcode);
@@ -830,7 +830,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			cmp_s(i960, t1, t2);
 			bxx_s(i960, opcode, 6);
 			break;
-	
+
 		case 0x58:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // notbit
@@ -839,90 +839,90 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2 ^ (1<<(t1 & 31)));
 				break;
-	
+
 			case 0x1: // and
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2 & t1);
 				break;
-	
+
 			case 0x2: // andnot
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2 & ~t1);
 				break;
-	
+
 			case 0x3: // setbit
 				i960->icount -= 2;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2 | (1<<(t1 & 31)));
 				break;
-	
+
 			case 0x4: // notand
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, (~t2) & t1);
 				break;
-	
+
 			case 0x6: // xor
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2 ^ t1);
 				break;
-	
+
 			case 0x7: // or
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2 | t1);
 				break;
-	
+
 			case 0x8: // nor
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, ((~t2) ^ (~t1)));
 				break;
-	
+
 			case 0x9: // xnor
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, ~(t2 ^ t1));
 				break;
-	
+
 			case 0xa: // not
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				set_ri(i960, opcode, ~t1);
 				break;
-	
+
 			case 0xb: // ornot
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2 | ~t1);
 				break;
-	
+
 			case 0xc: // clrbit
 				i960->icount -= 2;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2 & ~(1<<(t1 & 31)));
 				break;
-	
+
 			case 0xe: // nand
 				i960->icount -= 2;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, ~t2 | ~t1);
 				break;
-	
+
 			case 0xf: // alterbit
 				i960->icount -= 2;
 				t1 = get_1_ri(i960, opcode);
@@ -932,12 +932,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				else
 					set_ri(i960, opcode, t2 & ~(1<<(t1 & 31)));
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 58.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x59:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // addo
@@ -946,7 +946,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2+t1);
 				break;
-	
+
 			case 0x1: // addi
 				// #### overflow
 				i960->icount--;
@@ -954,14 +954,14 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2+t1);
 				break;
-	
+
 			case 0x2: // subo
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2-t1);
 				break;
-	
+
 			case 0x3: // subi
 				// #### overflow
 				i960->icount--;
@@ -969,14 +969,14 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2-t1);
 				break;
-	
+
 			case 0x8: // shro
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2>>t1);
 				break;
-	
+
 			case 0xa: // shrdi
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
@@ -989,28 +989,28 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				} else
 					set_ri(i960, opcode, t2>>t1);
 				break;
-	
+
 			case 0xb: // shri
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, ((INT32)t2)>>t1);
 				break;
-	
+
 			case 0xc: // shlo
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2<<t1);
 				break;
-	
+
 			case 0xd: // rotate
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode) & 0x1f;
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, (t2<<t1)|(t2>>(32-t1)));
 				break;
-	
+
 			case 0xe: // shli
 				// missing overflow
 				i960->icount--;
@@ -1018,12 +1018,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2<<t1);
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 59.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x5a:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // cmpo
@@ -1032,14 +1032,14 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2 = get_2_ri(i960, opcode);
 				cmp_u(i960, t1, t2);
 				break;
-	
+
 			case 0x1: // cmpi
 				i960->icount--;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				cmp_s(i960, t1, t2);
 				break;
-	
+
 			case 0x2: // concmpo
 				i960->icount--;
 				if(!(i960->AC & 0x4)) {
@@ -1048,7 +1048,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 					concmp_u(i960, t1, t2);
 				}
 				break;
-	
+
 			case 0x3: // concmpi
 				i960->icount--;
 				if(!(i960->AC & 0x4)) {
@@ -1057,7 +1057,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 					concmp_s(i960, t1, t2);
 				}
 				break;
-	
+
 			case 0x4: // cmpinco
 				i960->icount -= 2;
 				t1 = get_1_ri(i960, opcode);
@@ -1065,7 +1065,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				cmp_u(i960, t1, t2);
 				set_ri(i960, opcode, t2+1);
 				break;
-	
+
 			case 0x5: // cmpinci
 				i960->icount -= 2;
 				t1 = get_1_ri(i960, opcode);
@@ -1073,7 +1073,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				cmp_s(i960, t1, t2);
 				set_ri(i960, opcode, t2+1);
 				break;
-	
+
 			case 0x6: // cmpdeco
 				i960->icount -= 2;
 				t1 = get_1_ri(i960, opcode);
@@ -1081,7 +1081,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				cmp_u(i960, t1, t2);
 				set_ri(i960, opcode, t2-1);
 				break;
-	
+
 			case 0x7: // cmpdeci
 				i960->icount -= 2;
 				t1 = get_1_ri(i960, opcode);
@@ -1089,7 +1089,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				cmp_s(i960, t1, t2);
 				set_ri(i960, opcode, t2-1);
 				break;
-	
+
 			case 0xe: // chkbit
 				i960->icount -= 2;
 				t1 = get_1_ri(i960, opcode) & 0x1f;
@@ -1099,24 +1099,24 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				else
 					i960->AC &= ~7;
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 5a.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x5b:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0:	// addc
 				{
 					UINT64 res;
-	
+
 					i960->icount -= 2;
 					t1 = get_1_ri(i960, opcode);
 					t2 = get_2_ri(i960, opcode);
 					res = t2+(t1+((i960->AC>>1)&1));
 					set_ri(i960, opcode, res&0xffffffff);
-	
+
 					i960->AC &= ~0x3;	// clear C and V
 					// set carry
 					i960->AC |= ((res) & (((UINT64)1) << 32)) ? 0x2 : 0;
@@ -1124,17 +1124,17 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 					i960->AC |= (((res) ^ (t1)) & ((res) ^ (t2)) & 0x80000000) ? 1: 0;
 				}
 				break;
-	
+
 			case 0x2:	// subc
 				{
 					UINT64 res;
-	
+
 					i960->icount -= 2;
 					t1 = get_1_ri(i960, opcode);
 					t2 = get_2_ri(i960, opcode);
 					res = t2-(t1+((i960->AC>>1)&1));
 					set_ri(i960, opcode, res&0xffffffff);
-	
+
 					i960->AC &= ~0x3;	// clear C and V
 					// set carry
 					i960->AC |= ((res) & (((UINT64)1) << 32)) ? 0x2 : 0;
@@ -1142,12 +1142,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 					i960->AC |= (((t2) ^ (t1)) & ((t2) ^ (res)) & 0x80000000) ? 1 : 0;
 				}
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 5b.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x5c:
 			switch((opcode >> 7) & 0xf) {
 			case 0xc: // mov
@@ -1155,12 +1155,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t1 = get_1_ri(i960, opcode);
 				set_ri(i960, opcode, t1);
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 5c.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x5d:
 			switch((opcode >> 7) & 0xf) {
 			case 0xc: // movl
@@ -1172,12 +1172,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				} else
 					memcpy(i960->r+t2, i960->r+(opcode & 0x1f), 2*sizeof(UINT32));
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 5d.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x5e:
 			switch((opcode >> 7) & 0xf) {
 			case 0xc: // movt
@@ -1189,12 +1189,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				} else
 					memcpy(i960->r+t2, i960->r+(opcode & 0x1f), 3*sizeof(UINT32));
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 5e.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x5f:
 			switch((opcode >> 7) & 0xf) {
 			case 0xc: // movq
@@ -1206,12 +1206,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				} else
 					memcpy(i960->r+t2, i960->r+(opcode & 0x1f), 4*sizeof(UINT32));
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 5f.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x60:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // synmov
@@ -1225,7 +1225,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 					memory_write_dword_32le(i960->program, t1,    memory_read_dword_32le(i960->program, t2));
 				i960->AC = (i960->AC & ~7) | 2;
 				break;
-	
+
 			case 0x2: // synmovq
 				i960->icount -= 12;
 				t1 = get_1_ri(i960, opcode);
@@ -1240,24 +1240,24 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				}
 				i960->AC = (i960->AC & ~7) | 2;
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 60.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x64:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // spanbit
 				{
 					UINT32 res = 0xffffffff;
 					int i;
-	
+
 					i960->icount -= 10;
-	
+
 					t1 = get_1_ri(i960, opcode);
 					i960->AC &= ~7;
-	
+
 					for (i = 31; i >= 0; i--)
 					{
 						if (!(t1 & (1<<i)))
@@ -1267,21 +1267,21 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 							break;
 						}
 					}
-	
+
 					set_ri(i960, opcode, res);
 				}
 				break;
-	
+
 			case 0x1: // scanbit
 				{
 					UINT32 res = 0xffffffff;
 					int i;
-	
+
 					i960->icount -= 10;
-	
+
 					t1 = get_1_ri(i960, opcode);
 					i960->AC &= ~7;
-	
+
 					for (i = 31; i >= 0; i--)
 					{
 						if (t1 & (1<<i))
@@ -1291,11 +1291,11 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 							break;
 						}
 					}
-	
+
 					set_ri(i960, opcode, res);
 				}
 				break;
-	
+
 			case 0x5: // modac
 				i960->icount -= 10;
 				t1 = get_1_ri(i960, opcode);
@@ -1303,12 +1303,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				set_ri(i960, opcode, i960->AC);
 				i960->AC = (i960->AC & ~t1) | (t2 & t1);
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 64.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x65:
 			switch((opcode >> 7) & 0xf) {
 			case 0x5: // modpc
@@ -1318,12 +1318,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				i960->PC = (i960->PC & ~t2) | (i960->r[(opcode>>19) & 0x1f] & t2);
 				set_ri(i960, opcode, t1);
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 65.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x66:
 			switch((opcode >> 7) & 0xf) {
 			case 0xd: // flushreg
@@ -1334,7 +1334,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				for(t1=0; t1 < i960->rcache_pos; t1++)
 				{
 					int i;
-	
+
 					for (i = 0; i < 0x10; i++)
 					{
 						memory_write_dword_32le(i960->program, i960->rcache_frame_addr[t1] + (i * sizeof(UINT32)), i960->rcache[t1][i]);
@@ -1342,59 +1342,59 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				}
 				i960->rcache_pos = 0;
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 66.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x67:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // emul
 				i960->icount -= 37;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
-	
+
 				set_ri64(i960, opcode, (INT64)t1 * (INT64)t2);
 				break;
-	
+
 			case 0x1: // ediv
 				i960->icount -= 37;
 				{
 					UINT64 src1, src2;
-	
+
 					src1 = get_1_ri(i960, opcode);
 					src2 = get_2_ri64(i960, opcode);
-	
+
 					set_ri2(i960, opcode, src2 % src1, src2 / src1);
 				}
 				break;
-	
+
 			case 0x4: // cvtir
 				i960->icount -= 30;
 				t1 = get_1_ri(i960, opcode);
 				set_rif(i960, opcode, (double)(INT32)t1);
 				break;
-	
+
 			case 0x6: // scalerl
 				i960->icount -= 30;
 				t1 = get_1_ri(i960, opcode);
 				t2f = get_2_rifl(i960, opcode);
 				set_rifl(i960, opcode, t2f * pow(2.0, (double)(INT32)t1));
 				break;
-	
+
 			case 0x7: // scaler
 				i960->icount -= 30;
 				t1 = get_1_ri(i960, opcode);
 				t2f = get_2_rif(i960, opcode);
 			set_rif(i960, opcode, t2f * pow(2.0, (double)(INT32)t1));
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 67.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x68:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // atanr
@@ -1403,40 +1403,40 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2f = get_2_rif(i960, opcode);
 				set_rif(i960, opcode, atan2(t2f, t1f));
 				break;
-	
+
 			case 0x1: // logepr
 				i960->icount -= 400;
 				t1f = get_1_rif(i960, opcode);
 				t2f = get_2_rif(i960, opcode);
 				set_rif(i960, opcode, t2f*log(t1f+1.0)/log(2.0));
 				break;
-	
+
 			case 0x3: // remr
 				i960->icount -= 67;	// (67 to 75878 depending on opcodes!!!)
 				t1f = get_1_rif(i960, opcode);
 				t2f = get_2_rif(i960, opcode);
 				set_rif(i960, opcode, fmod(t2f, t1f));
 				break;
-	
+
 			case 0x5: // cmpr
 				i960->icount -= 10;
 				t1f = get_1_rif(i960, opcode);
 				t2f = get_2_rif(i960, opcode);
 				cmp_d(i960, t1f, t2f);
 				break;
-	
+
 			case 0x8: // sqrtr
 				i960->icount -= 104;
 				t1f = get_1_rif(i960, opcode);
 				set_rif(i960, opcode, sqrt(t1f));
 				break;
-	
+
 			case 0xa: // logbnr
 				i960->icount -= 37;
 				t1f = get_1_rif(i960, opcode);
 				set_rif(i960, opcode, logb(t1f));
 				break;
-	
+
 			case 0xb: // roundr
 				{
 					INT32 st1 = get_1_rif(i960, opcode);
@@ -1444,30 +1444,30 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 					set_rif(i960, opcode, (double)st1);
 				}
 				break;
-	
+
 			case 0xc: // sinr
 				i960->icount -= 406;
 				t1f = get_1_rif(i960, opcode);
 				set_rif(i960, opcode, sin(t1f));
 				break;
-	
+
 			case 0xd: // cosr
 				i960->icount -= 406;
 				t1f = get_1_rif(i960, opcode);
 				set_rif(i960, opcode, sin(t1f));
 				break;
-	
+
 			case 0xe: // tanr
 				i960->icount -= 293;
 				t1f = get_1_rif(i960, opcode);
 				set_rif(i960, opcode, tan(t1f));
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 68.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x69:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // atanrl
@@ -1476,38 +1476,38 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2f = get_2_rifl(i960, opcode);
 				set_rifl(i960, opcode, atan2(t2f, t1f));
 				break;
-	
+
 			case 0x2: // logrl
 				i960->icount -= 438;
 				t1f = get_1_rifl(i960, opcode);
 				set_rifl(i960, opcode, log(t1f));
 				break;
-	
+
 			case 0x5: // cmprl
 				i960->icount -= 12;
 				t1f = get_1_rifl(i960, opcode);
 				t2f = get_2_rifl(i960, opcode);
 				cmp_d(i960, t1f, t2f);
 				break;
-	
+
 			case 0x8: // sqrtrl
 				i960->icount -= 104;
 				t1f = get_1_rifl(i960, opcode);
 				set_rifl(i960, opcode, sqrt(t1f));
 				break;
-	
+
 			case 0x9: // exprl
 				i960->icount -= 334;
 				t1f = get_1_rifl(i960, opcode);
 				set_rifl(i960, opcode, pow(2.0, t1f)-1.0);
 				break;
-	
+
 			case 0xa: // logbnrl
 				i960->icount -= 37;
 				t1f = get_1_rifl(i960, opcode);
 				set_rifl(i960, opcode, logb(t1f));
 				break;
-	
+
 			case 0xb: // roundrl
 				{
 					INT32 st1 = get_1_rifl(i960, opcode);
@@ -1515,30 +1515,30 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 					set_rifl(i960, opcode, (double)st1);
 				}
 				break;
-	
+
 			case 0xc: // sinrl
 				i960->icount -= 441;
 				t1f = get_1_rifl(i960, opcode);
 				set_rifl(i960, opcode, sin(t1f));
 				break;
-	
+
 			case 0xd: // cosrl
 				i960->icount -= 441;
 				t1f = get_1_rifl(i960, opcode);
 				set_rifl(i960, opcode, cos(t1f));
 				break;
-	
+
 			case 0xe: // tanrl
 				i960->icount -= 323;
 				t1f = get_1_rifl(i960, opcode);
 				set_rifl(i960, opcode, tan(t1f));
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 69.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x6c:
 			switch((opcode >> 7) & 0xf) {
 			case 0x0: // cvtri
@@ -1556,30 +1556,30 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				}
 				set_ri(i960, opcode, (INT32)t2f);
 				break;
-	
+
 			case 0x2: // cvtzri
 				i960->icount -= 43;
 				t1f = get_1_rif(i960, opcode);
 				set_ri(i960, opcode, (INT32)t1f);
 				break;
-	
+
 			case 0x3: // cvtzril
 				i960->icount -= 44;
 				t1f = get_1_rif(i960, opcode);
 				set_ri64(i960, opcode, (INT64)t1f);
 				break;
-	
+
 			case 0x9: // movr
 				i960->icount -= 5;
 				t1f = get_1_rif(i960, opcode);
 				set_rif(i960, opcode, t1f);
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 6c.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x6d:
 			switch((opcode >> 7) & 0xf) {
 			case 0x9: // movrl
@@ -1587,20 +1587,20 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t1f = get_1_rifl(i960, opcode);
 				set_rifl(i960, opcode, t1f);
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 6d.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x6e:
 			switch((opcode >> 7) & 0xf) {
 			case 0x1: // movre
 				{
 					UINT32 *src=0, *dst=0;
-	
+
 					i960->icount -= 8;
-	
+
 					if(!(opcode & 0x00000800)) {
 						src = (UINT32 *)&i960->r[opcode & 0x1e];
 					} else {
@@ -1608,12 +1608,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 						if(idx < 4)
 							src = (UINT32 *)&i960->fp[idx];
 					}
-	
+
 					if(!(opcode & 0x00002000)) {
 						dst = (UINT32 *)&i960->r[(opcode>>19) & 0x1e];
 					} else if(!(opcode & 0x00e00000))
 						dst = (UINT32 *)&i960->fp[(opcode>>19) & 3];
-	
+
 					dst[0] = src[0];
 					dst[1] = src[1];
 					dst[2] = src[2]&0xffff;
@@ -1623,7 +1623,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				i960->icount -= 8;
 				t1f = get_1_rifl(i960, opcode);
 				t2f = get_2_rifl(i960, opcode);
-	
+
 				if (t2f >= 0.0)
 					set_rifl(i960, opcode, fabs(t1f));
 				else
@@ -1633,7 +1633,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				fatalerror("I960: %x: Unhandled 6e.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x70:
 			switch((opcode >> 7) & 0xf) {
 			case 0x1: // mulo
@@ -1642,14 +1642,14 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2*t1);
 				break;
-	
+
 			case 0x8: // remo
 				i960->icount -= 37;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, t2%t1);
 				break;
-	
+
 			case 0xb: // divo
 				i960->icount -= 37;
 				t1 = get_1_ri(i960, opcode);
@@ -1659,12 +1659,12 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				else
 					set_ri(i960, opcode, t2/t1);
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 70.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x74:
 			switch((opcode >> 7) & 0xf) {
 			case 0x1: // muli
@@ -1673,14 +1673,14 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, ((INT32)t2)*((INT32)t1));
 				break;
-	
+
 			case 0x8: // remi
 				i960->icount -= 37;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, ((INT32)t2)%((INT32)t1));
 				break;
-	
+
 			case 0x9:{// modi
 				INT32 src1, src2, dst;
 				i960->icount -= 37;
@@ -1692,19 +1692,19 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				set_ri(i960, opcode, dst);
 				break;
 			}
-	
+
 			case 0xb: // divi
 				i960->icount -= 37;
 				t1 = get_1_ri(i960, opcode);
 				t2 = get_2_ri(i960, opcode);
 				set_ri(i960, opcode, ((INT32)t2)/((INT32)t1));
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 74.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x78:
 			switch((opcode >> 7) & 0xf) {
 			case 0xb: // divr
@@ -1713,33 +1713,33 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2f = get_2_rif(i960, opcode);
 				set_rif(i960, opcode, t2f/t1f);
 				break;
-	
+
 			case 0xc: // mulr
 				i960->icount -= 18;
 				t1f = get_1_rif(i960, opcode);
 				t2f = get_2_rif(i960, opcode);
 				set_rif(i960, opcode, t2f*t1f);
 				break;
-	
+
 			case 0xd: // subr
 				i960->icount -= 10;
 				t1f = get_1_rif(i960, opcode);
 				t2f = get_2_rif(i960, opcode);
 				set_rif(i960, opcode, t2f-t1f);
 				break;
-	
+
 			case 0xf: // addr
 				i960->icount -= 10;
 				t1f = get_1_rif(i960, opcode);
 				t2f = get_2_rif(i960, opcode);
 				set_rif(i960, opcode, t2f+t1f);
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 78.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x79:
 			switch((opcode >> 7) & 0xf) {
 			case 0xb: // divrl
@@ -1748,85 +1748,85 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 				t2f = get_2_rifl(i960, opcode);
 				set_rifl(i960, opcode, t2f/t1f);
 				break;
-	
+
 			case 0xc: // mulrl
 				i960->icount -= 36;
 				t1f = get_1_rifl(i960, opcode);
 				t2f = get_2_rifl(i960, opcode);
 				set_rifl(i960, opcode, t2f*t1f);
 				break;
-	
+
 			case 0xd: // subrl
 				i960->icount -= 13;
 				t1f = get_1_rifl(i960, opcode);
 				t2f = get_2_rifl(i960, opcode);
 				set_rifl(i960, opcode, t2f-t1f);
 				break;
-	
+
 			case 0xf: // addrl
 				i960->icount -= 13;
 				t1f = get_1_rifl(i960, opcode);
 				t2f = get_2_rifl(i960, opcode);
 				set_rifl(i960, opcode, t2f+t1f);
 				break;
-	
+
 			default:
 				fatalerror("I960: %x: Unhandled 79.%x", i960->PIP, (opcode >> 7) & 0xf);
 			}
 			break;
-	
+
 		case 0x80: // ldob
 			i960->icount -= 4;
 			i960->r[(opcode>>19)&0x1f] = memory_read_byte_32le(i960->program, get_ea(i960, opcode));
 			break;
-	
+
 		case 0x82: // stob
 			i960->icount -= 2;
 			memory_write_byte_32le(i960->program, get_ea(i960, opcode), i960->r[(opcode>>19)&0x1f]);
 			break;
-	
+
 		case 0x84: // bx
 			i960->icount -= 3;
 			i960->IP = get_ea(i960, opcode);
 			break;
-	
+
 		case 0x85: // balx
 			i960->icount -= 5;
 			t1 = get_ea(i960, opcode);
 			i960->r[(opcode>>19)&0x1f] = i960->IP;
 			i960->IP = t1;
 			break;
-	
+
 		case 0x86: // callx
 			t1 = get_ea(i960, opcode);
 			do_call(i960, t1, 0, i960->r[I960_SP]);
 			break;
-	
+
 		case 0x88: // ldos
 			i960->icount -= 4;
 			i960->r[(opcode>>19)&0x1f] = i960_read_word_unaligned(i960, get_ea(i960, opcode));
 			break;
-	
+
 		case 0x8a: // stos
 			i960->icount -= 2;
 			i960_write_word_unaligned(i960, get_ea(i960, opcode), i960->r[(opcode>>19)&0x1f]);
 			break;
-	
+
 		case 0x8c: // lda
 			i960->icount--;
 			i960->r[(opcode>>19)&0x1f] = get_ea(i960, opcode);
 			break;
-	
+
 		case 0x90: // ld
 			i960->icount -= 4;
 			i960->r[(opcode>>19)&0x1f] = i960_read_dword_unaligned(i960, get_ea(i960, opcode));
 			break;
-	
+
 		case 0x92: // st
 			i960->icount -= 2;
 			i960_write_dword_unaligned(i960, get_ea(i960, opcode), i960->r[(opcode>>19)&0x1f]);
 			break;
-	
+
 		case 0x98:{// ldl
 			int i;
 			i960->icount -= 5;
@@ -1840,7 +1840,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			}
 			break;
 		}
-	
+
 		case 0x9a:{// stl
 			int i;
 			i960->icount -= 3;
@@ -1854,7 +1854,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			}
 			break;
 		}
-	
+
 		case 0xa0:{// ldt
 			int i;
 			i960->icount -= 6;
@@ -1868,7 +1868,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			}
 			break;
 		}
-	
+
 		case 0xa2:{// stt
 			int i;
 			i960->icount -= 4;
@@ -1882,7 +1882,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			}
 			break;
 		}
-	
+
 		case 0xb0:{// ldq
 			int i;
 			i960->icount -= 7;
@@ -1896,7 +1896,7 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			}
 			break;
 		}
-	
+
 		case 0xb2:{// stq
 			int i;
 			i960->icount -= 5;
@@ -1910,31 +1910,31 @@ INLINE void execute_op(i960_state_t *i960, UINT32 opcode)
 			}
 			break;
 		}
-	
+
 		case 0xc0: // ldib
 			i960->icount -= 4;
 			i960->r[(opcode>>19)&0x1f] = (INT8)memory_read_byte_32le(i960->program, get_ea(i960, opcode));
 			break;
-	
+
 		case 0xc2: // stib
 			i960->icount -= 2;
 			memory_write_byte_32le(i960->program, get_ea(i960, opcode), i960->r[(opcode>>19)&0x1f]);
 			break;
-	
+
 		case 0xc8: // ldis
 			i960->icount -= 4;
 			i960->r[(opcode>>19)&0x1f] = (INT16)i960_read_word_unaligned(i960, get_ea(i960, opcode));
 			break;
-	
+
 		case 0xca: // stis
 			i960->icount -= 2;
 			i960_write_word_unaligned(i960, get_ea(i960, opcode), i960->r[(opcode>>19)&0x1f]);
 			break;
-	
+
 		default:
 			fatalerror("I960: %x: Unhandled %02x", i960->PIP, opcode >> 24);
 	}
-	
+
 }
 
 static CPU_EXECUTE( i960 )
@@ -2037,7 +2037,7 @@ static void set_irq_line(i960_state_t *i960, int irqline, int state)
 static CPU_SET_INFO( i960 )
 {
 	i960_state_t *i960 = device->token;
-	
+
 	if(state >= CPUINFO_INT_REGISTER+I960_R0 && state <= CPUINFO_INT_REGISTER + I960_G15) {
 		i960->r[state - (CPUINFO_INT_REGISTER + I960_R0)] = info->i;
 		return;
@@ -2059,7 +2059,7 @@ static CPU_SET_INFO( i960 )
 static CPU_INIT( i960 )
 {
 	i960_state_t *i960 = device->token;
-	
+
 	i960->irq_cb = irqcallback;
 	i960->device = device;
 	i960->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -2092,7 +2092,7 @@ static CPU_DISASSEMBLE( i960  )
 static CPU_RESET( i960 )
 {
 	i960_state_t *i960 = device->token;
-	
+
 	i960->SAT        = memory_read_dword_32le(i960->program, 0);
 	i960->PRCB       = memory_read_dword_32le(i960->program, 4);
 	i960->IP         = memory_read_dword_32le(i960->program, 12);
@@ -2113,7 +2113,7 @@ static CPU_RESET( i960 )
 CPU_GET_INFO( i960 )
 {
 	i960_state_t *i960 = (device != NULL) ? device->token : NULL;
-	
+
 	if(state >= CPUINFO_INT_REGISTER+I960_R0 && state <= CPUINFO_INT_REGISTER + I960_G15) {
 		info->i = i960->r[state - (CPUINFO_INT_REGISTER + I960_R0)];
 		return;

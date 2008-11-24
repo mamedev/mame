@@ -1476,14 +1476,14 @@ static void prepare_machine(running_machine *machine)
 static void destroy_machine(running_machine *machine)
 {
 	int cpunum;
-	
+
 	assert(machine == Machine);
 
 	/* temporary: free the fake CPU devices */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 		if (machine->cpu[cpunum] != NULL)
 			free((void *)machine->cpu[cpunum]);
-			
+
 	if (machine->driver_data != NULL)
 		free(machine->driver_data);
 	if (machine->config != NULL)

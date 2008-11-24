@@ -95,13 +95,13 @@ struct _m68_state_t
 	UINT8	cc;
 	UINT8	ireg;		/* First opcode */
 	UINT8	irq_state[2];
-	
+
 	int 	extra_cycles; /* cycles used up by interrupts */
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	const m6809_config *config;
 	int		icount;
-	PAIR	ea;			/* effective address */	
+	PAIR	ea;			/* effective address */
 
 	/* Memory spaces */
     const address_space *program;

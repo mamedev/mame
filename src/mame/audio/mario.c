@@ -280,7 +280,7 @@ static SOUND_RESET( mario )
 {
 	mario_state	*state = machine->driver_data;
 	const address_space *space = cpu_get_address_space(machine->cpu[1], ADDRESS_SPACE_PROGRAM);
-	
+
 #if USE_8039
     set_ea(machine, 1);
 #endif

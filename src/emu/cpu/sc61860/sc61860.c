@@ -52,7 +52,7 @@ typedef struct
     int carry, zero;
 
     struct { int t2ms, t512ms; int count;} timer;
-    
+
     const device_config *device;
     const address_space *program;
 }   SC61860_Regs;

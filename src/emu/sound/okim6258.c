@@ -137,7 +137,7 @@ static void okim6258_update(void *param, stream_sample_t **inputs, stream_sample
 			/* Compute the new amplitude and update the current step */
 			int nibble = (chip->data_in >> nibble_shift) & 0xf;
 
-			/* Output to the buffer */	
+			/* Output to the buffer */
 			INT16 sample = clock_adpcm(chip, nibble);
 
 			nibble_shift ^= 4;
@@ -186,7 +186,7 @@ static void okim6258_state_save_register(struct okim6258 *info, const char *tag)
 static SND_START( okim6258 )
 {
 	const okim6258_interface *intf = config;
-	struct okim6258 *info;           
+	struct okim6258 *info;
 
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
@@ -239,7 +239,7 @@ void okim6258_set_divider(int which, int val)
 {
 	struct okim6258 *info = sndti_token(SOUND_OKIM6258, which);
 	int divider = dividers[val];
-	
+
 	info->divider = dividers[val];
 	stream_set_sample_rate(info->stream, info->master_clock / divider);
 }

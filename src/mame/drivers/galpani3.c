@@ -2,7 +2,7 @@
     Gals Panic 3
     (c) Kaneko 1995
 
-	Driver by David Haywood
+    Driver by David Haywood
 
     Original Skeleton driver by David Haywood
     Early Progress by Sebastien Volpe
@@ -233,8 +233,8 @@ static VIDEO_UPDATE(galpani3)
 				else
 				{
 					/* this isn't right, but the registers have something to do with
-					   alpha / mixing, and bit 0x8000 of the palette is DEFINITELY alpha
-					   enable -- see fading in intro */
+                       alpha / mixing, and bit 0x8000 of the palette is DEFINITELY alpha
+                       enable -- see fading in intro */
 					if (dat1 && galpani3_framebuffer1_enable)
 					{
 						UINT16 pen = dat1+0x4000;
@@ -298,28 +298,28 @@ static VIDEO_UPDATE(galpani3)
 				}
 
 				/*
-				else if (pridat==0x2f) // area outside of the girl
-				{
-					//dst[0] = mame_rand(screen->machine)&0x3fff;
-				}
+                else if (pridat==0x2f) // area outside of the girl
+                {
+                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                }
 
-				else if (pridat==0x00) // the initial line / box that gets drawn
-				{
-					//dst[0] = mame_rand(screen->machine)&0x3fff;
-				}
-				else if (pridat==0x30) // during the 'gals boxes' on the intro
-				{
-					//dst[0] = mame_rand(screen->machine)&0x3fff;
-				}
-				else if (pridat==0x0c) // 'nice' at end of level
-				{
-					//dst[0] = mame_rand(screen->machine)&0x3fff;
-				}
-				else
-				{
-					//printf("%02x, ",pridat);
-				}
-				*/
+                else if (pridat==0x00) // the initial line / box that gets drawn
+                {
+                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                }
+                else if (pridat==0x30) // during the 'gals boxes' on the intro
+                {
+                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                }
+                else if (pridat==0x0c) // 'nice' at end of level
+                {
+                    //dst[0] = mame_rand(screen->machine)&0x3fff;
+                }
+                else
+                {
+                    //printf("%02x, ",pridat);
+                }
+                */
 			}
 		}
 	}

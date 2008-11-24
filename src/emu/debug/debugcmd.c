@@ -392,12 +392,12 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 {
 	UINT64 cpunum;
 	EXPRERR err;
-	
+
 	/* first look for a tag match */
 	*result = cputag_get_cpu(machine, param);
 	if (*result != NULL)
 		return TRUE;
-	
+
 	/* then evaluate as an expression; on an error assume it was a tag */
 	err = expression_evaluate(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, &cpunum);
 	if (err != EXPRERR_NONE)
@@ -405,14 +405,14 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 		debug_console_printf("Unable to find CPU '%s'\n", param);
 		return FALSE;
 	}
-	
+
 	/* if out of range, complain */
 	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
 	{
 		debug_console_printf("Invalid CPU index %d\n", (UINT32) ((FPTR)*result));
 		return FALSE;
 	}
-	
+
 	*result = machine->cpu[cpunum];
 	return TRUE;
 }
@@ -907,7 +907,7 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 				{
 					if (buflen == 0)
 						buflen += sprintf(&buffer[buflen], "Currently observing CPU %d", cpunum);
-					else 
+					else
 						buflen += sprintf(&buffer[buflen], ",%d", cpunum);
 				}
 			}
@@ -2140,7 +2140,7 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 	/* validate parameters */
 	if (params > 0 && !debug_command_parameter_cpu(machine, param[0], &cpu))
 		return;
-	
+
 	if (cpu != NULL)
 	{
 		symtable = debug_cpu_get_symtable(cpu);

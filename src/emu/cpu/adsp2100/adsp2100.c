@@ -260,12 +260,12 @@ typedef struct
 	RX_CALLBACK sport_rx_callback;
 	TX_CALLBACK sport_tx_callback;
 	ADSP2100_TIMER_CALLBACK timer_fired_func;
-	
+
 	/* Memory spaces */
     const address_space *program;
     const address_space *data;
     const address_space *io;
-    
+
 } adsp2100_state;
 
 
@@ -574,11 +574,11 @@ static adsp2100_state *adsp21xx_init(const device_config *device, int index, int
 	/* set the IRQ callback */
 	adsp->irq_callback = irqcallback;
 	adsp->device = device;
-	
+
 	adsp->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	adsp->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	adsp->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
-    
+
 
 
 	/* set up ALU register pointers */

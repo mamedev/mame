@@ -94,7 +94,7 @@ struct _mcs48_state
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	int			icount;
-	
+
 	/* Memory spaces */
     const address_space *program;
     const address_space *data;

@@ -38,7 +38,7 @@ struct _s2650_regs {
     UINT8   ir;     /* instruction register */
     UINT16  ras[8]; /* 8 return address stack entries */
 	UINT8	irq_state;
-	
+
 	int		icount;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
@@ -760,7 +760,7 @@ static void BRA_EA(void) _BRA_EA()
 static CPU_INIT( s2650 )
 {
 	s2650_regs *s2650c = device->token;
-	
+
 	s2650c->irq_callback = irqcallback;
 	s2650c->device = device;
 	s2650c->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
@@ -783,7 +783,7 @@ static CPU_INIT( s2650 )
 static CPU_RESET( s2650 )
 {
 	s2650_regs *s2650c = device->token;
-	
+
 	s2650c->ppc = 0;
 	s2650c->page = 0,
 	s2650c->iar = 0;
@@ -860,7 +860,7 @@ static int s2650_get_sense(s2650_regs *s2650c)
 static CPU_EXECUTE( s2650 )
 {
 	s2650_regs *s2650c = device->token;
-	
+
 	s2650c->icount = cycles;
 	do
 	{
@@ -1479,7 +1479,7 @@ static CPU_EXECUTE( s2650 )
 static CPU_SET_INFO( s2650 )
 {
 	s2650_regs *s2650c = device->token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */

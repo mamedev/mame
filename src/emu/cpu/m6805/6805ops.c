@@ -13,9 +13,9 @@ HNZC
 
 */
 
-#define OP_HANDLER(_name) INLINE void _name (void /*m68_state_t *m68_state*/) 
+#define OP_HANDLER(_name) INLINE void _name (void /*m68_state_t *m68_state*/)
 
-#define OP_HANDLER_BIT(_name) INLINE void _name (/*m68_state_t *m68_state,*/ UINT8 bit) 
+#define OP_HANDLER_BIT(_name) INLINE void _name (/*m68_state_t *m68_state,*/ UINT8 bit)
 
 OP_HANDLER( illegal )
 {
@@ -221,9 +221,9 @@ OP_HANDLER( neg_di )
 OP_HANDLER( com_di )
 {
 	UINT8 t;
-	DIRBYTE(t); 
+	DIRBYTE(t);
 	t = ~t;
-	CLR_NZ; 
+	CLR_NZ;
 	SET_NZ8(t);
 	SEC;
 	WM(EAD,t);

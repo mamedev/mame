@@ -3,8 +3,8 @@
     Jackie Chan in Fists of Fire
     (c) Kaneko 1995
 
-	Driver by David Haywood
-	 based on work by Sebastien Volpe
+    Driver by David Haywood
+     based on work by Sebastien Volpe
 
  started: May 12 2004
 
@@ -644,7 +644,7 @@ static INPUT_PORTS_START( jchan2 )
 
 	PORT_MODIFY("DSW")
 	PORT_DIPUNUSED( 0x4000, IP_ACTIVE_LOW )                      /* only read in the "test mode" ("Input Test" screen) */
-//	PORT_DIPNAME( 0x8000, 0x8000, "Buttons Layout" )             /* impacts $20011e.l once! -> impacts reading of controls at 0x0002a9b2 */
+//  PORT_DIPNAME( 0x8000, 0x8000, "Buttons Layout" )             /* impacts $20011e.l once! -> impacts reading of controls at 0x0002a9b2 */
 INPUT_PORTS_END
 
 

@@ -209,7 +209,7 @@ READ8_DEVICE_HANDLER( mc6845_register_r )
 		case 0x0f:  ret = (mc6845->cursor_addr    >> 0) & 0xff; break;
 		case 0x10:  ret = (mc6845->light_pen_addr >> 8) & 0xff; mc6845->light_pen_latched = FALSE; break;
 		case 0x11:  ret = (mc6845->light_pen_addr >> 0) & 0xff; mc6845->light_pen_latched = FALSE; break;
-		case 0x1f:  
+		case 0x1f:
 			if (supports_transparent[mc6845->device_type] && MODE_TRANSPARENT(mc6845))
 			{
 				mc6845->update_addr++;
@@ -252,12 +252,12 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 		case 0x0f:  mc6845->cursor_addr      = ((data & 0xff) << 0) | (mc6845->cursor_addr & 0xff00); break;
 		case 0x10: /* read-only */ break;
 		case 0x11: /* read-only */ break;
-		case 0x12:  
+		case 0x12:
 			if (supports_transparent[mc6845->device_type])
 			{
 				mc6845->update_addr = ((data & 0x3f) << 8) | (mc6845->update_addr & 0x00ff);
 				call_on_update_address(device, 0);
-			}				
+			}
 			break;
 		case 0x13:
 			if (supports_transparent[mc6845->device_type])
@@ -266,7 +266,7 @@ WRITE8_DEVICE_HANDLER( mc6845_register_w )
 				call_on_update_address(device, 0);
 			}
 			break;
-		case 0x1f:  
+		case 0x1f:
 			if (supports_transparent[mc6845->device_type] && MODE_TRANSPARENT(mc6845))
 			{
 				mc6845->update_addr++;

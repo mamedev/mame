@@ -201,8 +201,8 @@ void cpu_set_irq_callback(const device_config *cpu, cpu_irq_callback callback);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cputag_set_input_line - set the logical state 
-    (ASSERT_LINE/CLEAR_LINE) of an input line 
+    cputag_set_input_line - set the logical state
+    (ASSERT_LINE/CLEAR_LINE) of an input line
     on a CPU specified by machine/tag
 -------------------------------------------------*/
 
@@ -213,8 +213,8 @@ INLINE void cputag_set_input_line(running_machine *machine, const char *tag, int
 
 
 /*-------------------------------------------------
-    cputag_set_input_line_and_vector - set the 
-    logical state (ASSERT_LINE/CLEAR_LINE) of an 
+    cputag_set_input_line_and_vector - set the
+    logical state (ASSERT_LINE/CLEAR_LINE) of an
     input line on a CPU and its associated vector
 -------------------------------------------------*/
 

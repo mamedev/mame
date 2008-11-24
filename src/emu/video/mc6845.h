@@ -77,9 +77,9 @@ struct _mc6845_interface
 	/* if specified, this gets called for every change of the VSYNC pin (pin 40) */
 	mc6845_on_vsync_changed_func	on_vsync_changed;
 
-	/* Called whenenever the update address changes 
-	 * For vblank/hblank timing strobe indicates the physical update.
-	 * vblank/hblank timing not supported yet! */
+	/* Called whenenever the update address changes
+     * For vblank/hblank timing strobe indicates the physical update.
+     * vblank/hblank timing not supported yet! */
 
 	mc6845_on_update_addr_changed_func	on_update_addr_changed;
 };

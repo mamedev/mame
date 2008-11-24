@@ -152,7 +152,7 @@ struct _debugwin_info
 	int						last_history;
 
 	HWND					otherwnd[MAX_OTHER_WND];
-	
+
 	running_machine *		machine;
 };
 
@@ -540,7 +540,7 @@ static debugwin_info *debug_window_create(running_machine *machine, LPCSTR title
 	info->handle_command = global_handle_command;
 	info->handle_key = global_handle_key;
 	strcpy(info->edit_defstr, "");
-	
+
 	info->machine = machine;
 
 	// hook us in

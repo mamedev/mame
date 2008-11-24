@@ -283,7 +283,7 @@ Easter eggs:
 - Ms. Pac-Man has a hidden message at the very end of ROM memory 0x97d0-0x97ff:
 
     000097d0: 4745 4e45 5241 4c20 434f 4d50 5554 4552  GENERAL COMPUTER
-    000097e0: 2020 434f 5250 4f52 4154 494f 4e20 2020    CORPORATION   
+    000097e0: 2020 434f 5250 4f52 4154 494f 4e20 2020    CORPORATION
     000097f0: 4865 6c6c 6f2c 204e 616b 616d 7572 6121  Hello, Nakamura!
 
   Masaya Nakamura is the founder of Namco who originally produced Pac-Man in Japan.
@@ -939,7 +939,7 @@ static ADDRESS_MAP_START( mspacman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")		/* DSW2 */
 
-	/* overlay decode enable/disable on top */	
+	/* overlay decode enable/disable on top */
 	AM_RANGE(0x0038, 0x003f) AM_READWRITE(mspacman_disable_decode_r_0x0038,mspacman_disable_decode_w)
 	AM_RANGE(0x03b0, 0x03b7) AM_READWRITE(mspacman_disable_decode_r_0x03b0,mspacman_disable_decode_w)
 	AM_RANGE(0x1600, 0x1607) AM_READWRITE(mspacman_disable_decode_r_0x1600,mspacman_disable_decode_w)

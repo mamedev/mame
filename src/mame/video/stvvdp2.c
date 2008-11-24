@@ -5440,15 +5440,15 @@ static void stv_vdp2_dynamic_res_change(running_machine *machine)
 		case 6: horz_res = 640; vert_res = 480; break;
 		case 7: horz_res = 704; vert_res = 480; break;
 	}
-//	horz_res+=1;
-//	vert_res*=2;
+//  horz_res+=1;
+//  vert_res*=2;
 	if(old_vres != vert_res || old_hres != horz_res)
 	{
 		timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, dyn_res_change);
 		old_vres = vert_res;
 		old_hres = horz_res;
 	}
-//	video_screen_set_visarea(machine->primary_screen, 0*8, horz_res-1,0*8, vert_res-1);
+//  video_screen_set_visarea(machine->primary_screen, 0*8, horz_res-1,0*8, vert_res-1);
 	//if(LOG_VDP2) popmessage("%04d %04d",horz_res-1,vert-1);
 }
 

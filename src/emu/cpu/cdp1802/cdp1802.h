@@ -5,15 +5,15 @@
 
 /*
 
-	RCA COSMAC Series Microprocessors
+    RCA COSMAC Series Microprocessors
 
-	Type			Internal ROM	Internal RAM	Timer
-	-----------------------------------------------------
-	CDP1802			none			none			no
-	CDP1803 		?				?				?
-	CDP1804			2 KB			64 bytes		yes
-	CDP1805			none			64 bytes		yes
-	CDP1806			none			none			yes
+    Type            Internal ROM    Internal RAM    Timer
+    -----------------------------------------------------
+    CDP1802         none            none            no
+    CDP1803         ?               ?               ?
+    CDP1804         2 KB            64 bytes        yes
+    CDP1805         none            64 bytes        yes
+    CDP1806         none            none            yes
 
 */
 

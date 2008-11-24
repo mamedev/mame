@@ -19,7 +19,7 @@
     Binary:
 
     Data Flow:          A -> T7:4
-						RAM(B) -> T3:0
+                        RAM(B) -> T3:0
 
     Description:        Copy A, RAM to T
 
@@ -38,7 +38,7 @@ INSTRUCTION( camt )
     Binary:
 
     Data Flow:          T7:4 -> RAM(B)
-						T3:0 -> A
+                        T3:0 -> A
 
     Description:        Copy T to RAM, A
 

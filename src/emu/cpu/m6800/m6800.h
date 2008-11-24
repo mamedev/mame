@@ -28,7 +28,7 @@ enum
 /* are set to the value returned by a read from the same port. If you need to */
 /* know the DDR for e.g. port 1, do m6803_internal_registers_r(M6801_DDR1) */
 
-enum 
+enum
 {
 	M6803_DDR1	= 0x00,
 	M6803_DDR2	= 0x01,

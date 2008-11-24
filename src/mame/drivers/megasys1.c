@@ -3490,10 +3490,10 @@ ROM_START( soldam )
 
 	ROM_REGION( 0x040000, "oki1", 0 )		/* Samples */
 	ROM_LOAD( "10ver1.bin", 0x000000, 0x040000, CRC(8d5613bf) SHA1(eee217dd2ab64d86b7f5eda55a3c331d862c079e) )
-	
+
 	ROM_REGION( 0x040000, "oki2", 0 )		/* Samples */
 	ROM_LOAD( "8ver1.bin",  0x000000, 0x040000, CRC(fcd36019) SHA1(f4edb55bd62b697c5a73c461008e764c2f16956b) )
-	
+
 	ROM_REGION( 0x0200, "proms", 0 )		/* Priority PROM */
 	ROM_LOAD( "pr-91023.m14",   0x0000, 0x0200, CRC(8914e72d) SHA1(80a664471f14c8ed8544a5e226fdca425ab3c657) )
 ROM_END
@@ -3524,7 +3524,7 @@ ROM_START( soldamj )
 
 	ROM_REGION( 0x040000, "oki1", 0 )		/* Samples */
 	ROM_LOAD( "10ver1.bin", 0x000000, 0x040000, CRC(8d5613bf) SHA1(eee217dd2ab64d86b7f5eda55a3c331d862c079e) )
-	
+
 	ROM_REGION( 0x040000, "oki2", 0 )		/* Samples */
 	ROM_LOAD( "8ver1.bin",  0x000000, 0x040000, CRC(fcd36019) SHA1(f4edb55bd62b697c5a73c461008e764c2f16956b) )
 
@@ -4056,7 +4056,7 @@ static DRIVER_INIT( rodlandj )
 static DRIVER_INIT( soldamj )
 {
 	astyanax_rom_decode(machine, "main");
-	
+
 	/* Sprite RAM is mirrored */
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }
@@ -4064,7 +4064,7 @@ static DRIVER_INIT( soldamj )
 static DRIVER_INIT( soldam )
 {
 	phantasm_rom_decode(machine, "main");
-	
+
 	/* Sprite RAM is mirrored */
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x8c000, 0x8cfff, 0, 0, soldamj_spriteram16_r, soldamj_spriteram16_w);
 }

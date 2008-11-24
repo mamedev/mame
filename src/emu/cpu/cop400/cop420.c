@@ -13,7 +13,7 @@
 
     TODO:
 
-	- get rid of LBIOps/InstLen
+    - get rid of LBIOps/InstLen
     - when is the microbus int cleared?
     - CKO sync input
     - save internal RAM when CKO is RAM power supply pin

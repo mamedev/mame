@@ -195,7 +195,7 @@ void debug_cpu_init(running_machine *machine)
 			const device_config *cpu = machine->cpu[cpunum];
 			cpu_class_header *classheader = cpu->classtoken;
 			cpu_debug_data *info;
-			
+
 			/* allocate some information */
 			info = auto_malloc(sizeof(*info));
 			memset(info, 0, sizeof(*info));
@@ -287,7 +287,7 @@ void debug_cpu_init(running_machine *machine)
 				spaceinfo->logbytemask = ((spaceinfo->logaddrmask << spaceinfo->addr2byte_lshift) | ((1 << spaceinfo->addr2byte_lshift) - 1)) >> spaceinfo->addr2byte_rshift;
 			}
 		}
-	
+
 	/* first CPU is visible by default */
 	global->visiblecpu = machine->cpu[0];
 
@@ -300,8 +300,8 @@ void debug_cpu_init(running_machine *machine)
 
 
 /*-------------------------------------------------
-    debug_cpu_flush_traces - flushes all traces; 
-    this is useful if a trace is going on when we 
+    debug_cpu_flush_traces - flushes all traces;
+    this is useful if a trace is going on when we
     fatalerror
 -------------------------------------------------*/
 
@@ -325,7 +325,7 @@ void debug_cpu_flush_traces(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_get_visible_cpu - return the visible CPU 
+    cpu_get_visible_cpu - return the visible CPU
     device (the one that commands should apply to)
 -------------------------------------------------*/
 
@@ -364,7 +364,7 @@ int debug_cpu_is_stopped(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_cpu_get_global_symtable - return the 
+    debug_cpu_get_global_symtable - return the
     global symbol table
 -------------------------------------------------*/
 
@@ -375,7 +375,7 @@ symbol_table *debug_cpu_get_global_symtable(running_machine *machine)
 
 
 /*-------------------------------------------------
-    debug_cpu_get_visible_symtable - return the 
+    debug_cpu_get_visible_symtable - return the
     locally-visible symbol table
 -------------------------------------------------*/
 
@@ -386,7 +386,7 @@ symbol_table *debug_cpu_get_visible_symtable(running_machine *machine)
 
 
 /*-------------------------------------------------
-    debug_cpu_get_symtable - return a specific 
+    debug_cpu_get_symtable - return a specific
     CPU's symbol table
 -------------------------------------------------*/
 
@@ -759,8 +759,8 @@ void debug_cpu_single_step(running_machine *machine, int numsteps)
 
 
 /*-------------------------------------------------
-    debug_cpu_single_step_over - single step the 
-    visible over the requested number of 
+    debug_cpu_single_step_over - single step the
+    visible over the requested number of
     instructions
 -------------------------------------------------*/
 
@@ -926,7 +926,7 @@ void debug_cpu_next_cpu(running_machine *machine)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_cpu_breakpoint_set - set a new 
+    debug_cpu_breakpoint_set - set a new
     breakpoint, returning its index
 -------------------------------------------------*/
 
@@ -962,7 +962,7 @@ int debug_cpu_breakpoint_set(const device_config *device, offs_t address, parsed
 
 
 /*-------------------------------------------------
-    debug_cpu_breakpoint_clear - clear a 
+    debug_cpu_breakpoint_clear - clear a
     breakpoint by index
 -------------------------------------------------*/
 
@@ -1004,7 +1004,7 @@ int debug_cpu_breakpoint_clear(running_machine *machine, int bpnum)
 
 
 /*-------------------------------------------------
-    debug_cpu_breakpoint_enable - enable/disable 
+    debug_cpu_breakpoint_enable - enable/disable
     a breakpoint by index
 -------------------------------------------------*/
 
@@ -1037,7 +1037,7 @@ int debug_cpu_breakpoint_enable(running_machine *machine, int bpnum, int enable)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_cpu_watchpoint_set - set a new 
+    debug_cpu_watchpoint_set - set a new
     watchpoint, returning its index
 -------------------------------------------------*/
 
@@ -1072,7 +1072,7 @@ int debug_cpu_watchpoint_set(const address_space *space, int type, offs_t addres
 
 
 /*-------------------------------------------------
-    debug_cpu_watchpoint_clear - clear a 
+    debug_cpu_watchpoint_clear - clear a
     watchpoint by index
 -------------------------------------------------*/
 
@@ -1115,7 +1115,7 @@ int debug_cpu_watchpoint_clear(running_machine *machine, int wpnum)
 
 
 /*-------------------------------------------------
-    debug_cpu_watchpoint_enable - enable/disable a 
+    debug_cpu_watchpoint_enable - enable/disable a
     watchpoint by index
 -------------------------------------------------*/
 
@@ -1149,14 +1149,14 @@ int debug_cpu_watchpoint_enable(running_machine *machine, int wpnum, int enable)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_cpu_source_script - specifies a debug 
+    debug_cpu_source_script - specifies a debug
     command script to execute
 -------------------------------------------------*/
 
 void debug_cpu_source_script(running_machine *machine, const char *file)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	
+
 	/* close any existing source file */
 	if (global->source_file != NULL)
 	{
@@ -1216,7 +1216,7 @@ void debug_cpu_trace(const device_config *device, FILE *file, int trace_over, co
 
 
 /*-------------------------------------------------
-    debug_cpu_trace_printf - output data into the 
+    debug_cpu_trace_printf - output data into the
     given CPU's tracefile, if tracing
 -------------------------------------------------*/
 
@@ -1254,7 +1254,7 @@ void debug_cpu_set_instruction_hook(const device_config *device, debug_instructi
 
 
 /*-------------------------------------------------
-    debug_cpu_hotspot_track - enable/disable 
+    debug_cpu_hotspot_track - enable/disable
     tracking of hotspots
 -------------------------------------------------*/
 
@@ -1884,7 +1884,7 @@ static void compute_debug_flags(const device_config *device)
 	cpu_debug_data *info = cpu_get_debug_data(device);
 	running_machine *machine = device->machine;
 	debugcpu_private *global = machine->debugcpu_data;
-	
+
 	/* clear out all global flags by default */
 	machine->debug_flags = DEBUG_FLAG_ENABLED;
 

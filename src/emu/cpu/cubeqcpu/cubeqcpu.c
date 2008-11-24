@@ -127,7 +127,7 @@ typedef struct
 
 	void (*dac_w)(UINT16 data);
 	UINT16 *sound_data;
-	
+
 	const device_config *device;
 	const address_space *program;
 } cquestsnd_state;
@@ -166,7 +166,7 @@ typedef struct
 	UINT8 wc;
 	UINT8 rc;
 	UINT8 clkcnt;
-	
+
 	const device_config *device;
 	const address_space *program;
 } cquestrot_state;
@@ -210,7 +210,7 @@ typedef struct
 	UINT8	*ptr_ram;
 	UINT32	*e_stack;
 	UINT32	*o_stack;
-	
+
 	const device_config *device;
 	const address_space *program;
 
@@ -352,7 +352,7 @@ static CPU_INIT( cquestsnd )
 
 	cquestsnd.dac_w = _config->dac_w;
 	cquestsnd.sound_data = (UINT16*)memory_region(device->machine, _config->sound_data_region);
-	
+
 	cquestsnd.device = device;
 	cquestsnd.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 

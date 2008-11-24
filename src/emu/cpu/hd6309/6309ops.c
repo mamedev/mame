@@ -12,7 +12,7 @@ HNZVC
 
 */
 
-#define OP_HANDLER(_name) INLINE void _name (m68_state_t *m68_state) 
+#define OP_HANDLER(_name) INLINE void _name (m68_state_t *m68_state)
 
 OP_HANDLER( illegal )
 {

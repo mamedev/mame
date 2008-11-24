@@ -13,8 +13,8 @@
 
     TODO:
 
-	- COP413/COP414/COP415/COP405
-	- get rid of LBIOps/InstLen
+    - COP413/COP414/COP415/COP405
+    - get rid of LBIOps/InstLen
     - run interrupt test suite
     - run production test suite
     - run microbus test suite

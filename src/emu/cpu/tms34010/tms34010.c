@@ -1290,8 +1290,8 @@ WRITE16_HANDLER( tms34010_io_register_w )
 			break;
 	}
 
-//	if (LOG_CONTROL_REGS)
-//		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
+//  if (LOG_CONTROL_REGS)
+//      logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
 }
 
 
@@ -1327,8 +1327,8 @@ WRITE16_HANDLER( tms34020_io_register_w )
 	oldreg = IOREG(tms, offset);
 	IOREG(tms, offset) = data;
 
-//	if (LOG_CONTROL_REGS)
-//		logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(space->cpu), ioreg020_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
+//  if (LOG_CONTROL_REGS)
+//      logerror("CPU#%d@%08X: %s = %04X (%d)\n", cpunum, cpu_get_pc(space->cpu), ioreg020_name[offset], IOREG(tms, offset), video_screen_get_vpos(tms->screen));
 
 	switch (offset)
 	{
@@ -1486,8 +1486,8 @@ READ16_HANDLER( tms34010_io_register_r )
 	tms34010_state *tms = space->cpu->token;
 	int result, total;
 
-//	if (LOG_CONTROL_REGS)
-//		logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset]);
+//  if (LOG_CONTROL_REGS)
+//      logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset]);
 
 	switch (offset)
 	{
@@ -1529,8 +1529,8 @@ READ16_HANDLER( tms34020_io_register_r )
 	tms34010_state *tms = space->cpu->token;
 	int result, total;
 
-//	if (LOG_CONTROL_REGS)
-//		logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset]);
+//  if (LOG_CONTROL_REGS)
+//      logerror("CPU#%d@%08X: read %s\n", cpunum, cpu_get_pc(space->cpu), ioreg_name[offset]);
 
 	switch (offset)
 	{

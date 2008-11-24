@@ -63,7 +63,7 @@ struct _cpu_class_data
 {
 	/* this item must remain first */
 	cpu_class_header header;				/* header containing public data */
-	
+
 	/* core interface */
 	int *			icount;					/* pointer to the icount */
 
@@ -78,7 +78,7 @@ struct _cpu_class_data
 	UINT8			nexteatcycles;			/* pending value */
 	INT32			trigger;				/* pending trigger to release a trigger suspension */
 	INT32			inttrigger;				/* interrupt trigger index */
-	
+
 	/* clock and timing information */
 	UINT64 			totalcycles;			/* total CPU cycles executed */
 	attotime 		localtime;				/* local time, relative to the timer system's global time */
@@ -131,7 +131,7 @@ static void register_save_states(const device_config *device);
 ***************************************************************************/
 
 /*-------------------------------------------------
-    get_safe_classtoken - makes sure that the 
+    get_safe_classtoken - makes sure that the
     passed in device is, in fact, a CPU, and
     return the class token
 -------------------------------------------------*/
@@ -186,7 +186,7 @@ const device_config *cpuexec_create_cpu_device(const cpu_config *config)
 	device->class = DEVICE_CLASS_CPU_CHIP;
 	device->inline_config = (void *)config;
 	device->static_config = config->reset_param;
-	
+
 	return device;
 }
 
@@ -214,10 +214,10 @@ void cpuexec_init(running_machine *machine)
 			/* allocate memory for our class state */
 			classdata = auto_malloc(sizeof(*classdata));
 			memset(classdata, 0, sizeof(*classdata));
-			
+
 			/* fill in the header */
 			classdata->header = *cputype_get_header_template(cputype);
-			
+
 			/* make the device run */
 			device->started = FALSE;
 			device->machine = machine;
@@ -226,7 +226,7 @@ void cpuexec_init(running_machine *machine)
 			device->token = auto_malloc(cputype_get_context_size(cputype));
 			memset(device->token, 0, cputype_get_context_size(cputype));
 			device->classtoken = classdata;
-			
+
 			/* fill in the input states and IRQ callback information */
 			for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
 			{
@@ -235,15 +235,15 @@ void cpuexec_init(running_machine *machine)
 				inputline->curstate = CLEAR_LINE;
 				inputline->qindex = 0;
 			}
-			
+
 			/* fill in the suspend states */
 			classdata->suspend = SUSPEND_REASON_RESET;
 			classdata->inttrigger = cpunum + TRIGGER_INT;
-			
+
 			/* fill in the clock and timing information */
 			classdata->clock = (UINT64)config->clock * classdata->header.clock_multiplier / classdata->header.clock_divider;
 			classdata->clockscale = 1.0;
-			
+
 			/* allocate timers if we need them */
 			if (config->vblank_interrupts_per_frame > 1)
 				classdata->partial_frame_timer = timer_alloc(trigger_partial_frame_interrupt, device);
@@ -266,7 +266,7 @@ void cpuexec_init(running_machine *machine)
 				inputline->curvector = inputline->vector;
 			}
 			update_clock_information(device);
-			
+
 			/* if no state registered for saving, we can't save */
 			if (num_regs == 0)
 			{
@@ -447,7 +447,7 @@ void cpuexec_timeslice(running_machine *machine)
 
 
 /*-------------------------------------------------
-    cpuexec_boost_interleave - temporarily boosts 
+    cpuexec_boost_interleave - temporarily boosts
     the interleave factor
 -------------------------------------------------*/
 
@@ -461,18 +461,18 @@ void cpuexec_boost_interleave(running_machine *machine, attotime timeslice_time,
 
 
 /*-------------------------------------------------
-    cputag_get_cpu - return a pointer to the given 
+    cputag_get_cpu - return a pointer to the given
     CPU by tag
 -------------------------------------------------*/
 
 const device_config *cputag_get_cpu(running_machine *machine, const char *tag)
 {
 	int cpunum;
-	
+
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 		if (machine->cpu[cpunum] != NULL && strcmp(tag, machine->cpu[cpunum]->tag) == 0)
 			return machine->cpu[cpunum];
-	
+
 	return NULL;
 }
 
@@ -490,11 +490,11 @@ const device_config *cputag_get_cpu(running_machine *machine, const char *tag)
 void cpu_suspend(const device_config *device, int reason, int eatcycles)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
-	
+
 	/* set the suspend reason and eat cycles flag */
 	classdata->nextsuspend |= reason;
 	classdata->nexteatcycles = eatcycles;
-	
+
 	/* if we're active, synchronize */
 	if (device == device->machine->activecpu)
 		cpu_abort_timeslice(device);
@@ -528,7 +528,7 @@ void cpu_resume(const device_config *device, int reason)
 int cpu_is_suspended(const device_config *device, int reason)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
-	
+
 	/* return true if the given reason is indicated */
 	return ((classdata->nextsuspend & reason) != 0);
 }
@@ -658,7 +658,7 @@ void cpu_eat_cycles(const device_config *device, int cycles)
 
 
 /*-------------------------------------------------
-    cpu_adjust_icount - apply a +/- to the current 
+    cpu_adjust_icount - apply a +/- to the current
     icount
 -------------------------------------------------*/
 
@@ -702,7 +702,7 @@ void cpu_abort_timeslice(const device_config *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_yield - yield the given CPU until the end 
+    cpu_yield - yield the given CPU until the end
     of the current timeslice
 -------------------------------------------------*/
 
@@ -762,7 +762,7 @@ void cpu_spinuntil_time(const device_config *device, attotime duration)
 
 	/* suspend until the given trigger fires */
 	suspend_until_trigger(device, TRIGGER_SUSPENDTIME + timetrig, TRUE);
-	
+
 	/* then set a timer for it */
 	cpuexec_triggertime(device->machine, TRIGGER_SUSPENDTIME + timetrig, duration);
 	timetrig = (timetrig + 1) % 256;
@@ -790,7 +790,7 @@ void cpuexec_trigger(running_machine *machine, int trigger)
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL; cpunum++)
 	{
 		cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
-		
+
 		/* see if this is a matching trigger */
 		if (classdata->suspend != 0 && classdata->trigger == trigger)
 		{
@@ -820,7 +820,7 @@ void cpuexec_triggertime(running_machine *machine, int trigger, attotime duratio
 void cpu_triggerint(const device_config *device)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
-	
+
 	/* signal this CPU's interrupt trigger */
 	cpuexec_trigger(device->machine, classdata->inttrigger);
 }
@@ -832,8 +832,8 @@ void cpu_triggerint(const device_config *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    cpu_set_input_line - set the logical state 
-    (ASSERT_LINE/CLEAR_LINE) of an input line 
+    cpu_set_input_line - set the logical state
+    (ASSERT_LINE/CLEAR_LINE) of an input line
     on a CPU
 -------------------------------------------------*/
 
@@ -846,8 +846,8 @@ void cpu_set_input_line(const device_config *device, int line, int state)
 
 
 /*-------------------------------------------------
-    cpu_set_input_line_vector - set the vector to 
-    be returned during a CPU's interrupt 
+    cpu_set_input_line_vector - set the vector to
+    be returned during a CPU's interrupt
     acknowledge cycle
 -------------------------------------------------*/
 
@@ -864,8 +864,8 @@ void cpu_set_input_line_vector(const device_config *device, int line, int vector
 
 
 /*-------------------------------------------------
-    cpu_set_input_line_and_vector - set the logical 
-    state (ASSERT_LINE/CLEAR_LINE) of an input 
+    cpu_set_input_line_and_vector - set the logical
+    state (ASSERT_LINE/CLEAR_LINE) of an input
     line on a CPU and its associated vector
 -------------------------------------------------*/
 
@@ -1236,7 +1236,7 @@ static TIMER_CALLBACK( triggertime_callback )
 
 
 /*-------------------------------------------------
-    empty_event_queue - empty a CPU's event queue 
+    empty_event_queue - empty a CPU's event queue
     for a specific input line
 -------------------------------------------------*/
 
@@ -1375,7 +1375,7 @@ static void register_save_states(const device_config *device)
 {
 	cpu_class_data *classdata = device->classtoken;
 	int line;
-	
+
 	state_save_register_item("cpu", device->tag, 0, classdata->suspend);
 	state_save_register_item("cpu", device->tag, 0, classdata->nextsuspend);
 	state_save_register_item("cpu", device->tag, 0, classdata->eatcycles);

@@ -47,11 +47,11 @@ INLINE void h8_mem_write16(h83xx_state *h8, offs_t address, UINT16 data)
 INLINE UINT32 h8_mem_read32(h83xx_state *h8, offs_t address)
 {
 	UINT32 result = memory_read_byte(h8->program, address) << 24;
-	result |= memory_read_byte(h8->program, address+1) << 16; 
-	result |= memory_read_byte(h8->program, address+2) << 8; 
+	result |= memory_read_byte(h8->program, address+1) << 16;
+	result |= memory_read_byte(h8->program, address+2) << 8;
 	result |= memory_read_byte(h8->program, address+3);
 
-	return result;		
+	return result;
 }
 
 INLINE void h8_mem_write32(h83xx_state *h8, offs_t address, UINT32 data)
@@ -521,7 +521,7 @@ ADDRESS_MAP_END
 
 CPU_GET_INFO( h8_3334 )
 {
-	h83xx_state *h8 = (device != NULL) ? device->token : NULL; 
+	h83xx_state *h8 = (device != NULL) ? device->token : NULL;
 
 	switch(state) {
 	// Interface functions and variables

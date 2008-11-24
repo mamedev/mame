@@ -315,7 +315,7 @@ static void handle_lightpen( const device_config *device )
     int y_val = input_port_read_safe(device->machine, "TOUCH_Y",0x00);
     const rectangle *vis_area = video_screen_get_visible_area(device->machine->primary_screen);
     int xt, yt;
-    
+
     xt = x_val * (vis_area->max_x - vis_area->min_x) / 1024 + vis_area->min_x;
     yt = y_val * (vis_area->max_y - vis_area->min_y) / 1024 + vis_area->min_y;
 
@@ -334,7 +334,7 @@ static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 	videoram[vid_address] = data;
 	palette_ram[vid_address] = io_port[1];
 	tilemap_mark_tile_dirty(bg_tilemap, vid_address);
-	
+
 	/* An access here triggers a device read !*/
 	(void) mc6845_register_r(device, 0);
 }

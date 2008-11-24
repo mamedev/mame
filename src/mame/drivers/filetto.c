@@ -116,7 +116,7 @@ static READ8_HANDLER( vga_hvretrace_r )
 	h = video_screen_get_height(space->machine->primary_screen);
 	w = video_screen_get_width(space->machine->primary_screen);
 
-//	popmessage("%d %d",h,w);
+//  popmessage("%d %d",h,w);
 
 	if (video_screen_get_hpos(space->machine->primary_screen) > h)
 		res|= 1;
@@ -365,7 +365,7 @@ static WRITE8_HANDLER( disk_iobank_w )
 */
 	int newbank = 0;
 
-//	printf("bank %d set to %02X\n", offset,data);
+//  printf("bank %d set to %02X\n", offset,data);
 
 	if (data == 0xF0)
 	{
@@ -383,7 +383,7 @@ static WRITE8_HANDLER( disk_iobank_w )
 			newbank = 3;
 	}
 
-//	printf("newbank = %d\n", newbank);
+//  printf("newbank = %d\n", newbank);
 
 	if (newbank != bank)
 	{
@@ -460,8 +460,8 @@ static READ8_DEVICE_HANDLER( port_c_r )
 static WRITE8_DEVICE_HANDLER( port_b_w )
 {
 	port_b_data = data;
-//	hc55516_digit_w(0, data);
-//	popmessage("%02x",data);
+//  hc55516_digit_w(0, data);
+//  popmessage("%02x",data);
 }
 
 static WRITE8_DEVICE_HANDLER( wss_1_w )
@@ -511,7 +511,7 @@ static UINT8 status;
 static READ8_HANDLER( fdc765_status_r )
 {
 	static UINT8 tmp,clr_status;
-//	popmessage("Read FDC status @ PC=%05x",cpu_get_pc(space->cpu));
+//  popmessage("Read FDC status @ PC=%05x",cpu_get_pc(space->cpu));
 	tmp = status | 0x80;
 	clr_status++;
 	if(clr_status == 0x10)
@@ -680,7 +680,7 @@ static ADDRESS_MAP_START( filetto_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port_r,mc146818_port_w)
 	AM_RANGE(0x0080, 0x0087) AM_READWRITE(dma_page_select_r,dma_page_select_w)
 	AM_RANGE(0x00a0, 0x00af) AM_DEVREADWRITE(PIC8259, "pic8259_2", pic8259_r, pic8259_w )
-//	AM_RANGE(0x0200, 0x020f) AM_RAM //game port
+//  AM_RANGE(0x0200, 0x020f) AM_RAM //game port
 	AM_RANGE(0x0201, 0x0201) AM_READ_PORT("COIN") //game port
 	AM_RANGE(0x0278, 0x027f) AM_RAM //printer (parallel) port latch
 	AM_RANGE(0x02f8, 0x02ff) AM_RAM //Modem port

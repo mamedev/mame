@@ -78,7 +78,7 @@ struct _naomibd_config
 	MDRV_DEVICE_REMOVE(_tag, NAOMI_BOARD)
 
 /*#define MDRV_NAOMIBD_TMU_MEMORY(_tmu, _tmumem) \
-	MDRV_DEVICE_CONFIG_DATA32(naomibd_config, tmumem##_tmu, _tmumem)*/
+    MDRV_DEVICE_CONFIG_DATA32(naomibd_config, tmumem##_tmu, _tmumem)*/
 
 
 /***************************************************************************

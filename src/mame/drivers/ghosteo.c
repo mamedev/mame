@@ -104,7 +104,7 @@ static WRITE32_HANDLER( flash_reg_w )
 	{
 	case 0:
 		//if((flash_regs[offset] & 0xff) != 0x60)
-		//	printf("%08x\n",flash_regs[offset]);
+		//  printf("%08x\n",flash_regs[offset]);
 		break;
 	case 1:
 		break;
@@ -323,7 +323,7 @@ static WRITE32_HANDLER( lcd_control_w )
 
 static READ32_HANDLER( io_port_r )
 {
-//	printf("%08x\n",offset*4);
+//  printf("%08x\n",offset*4);
 
 	switch(offset)
 	{
@@ -349,7 +349,7 @@ static READ32_HANDLER( io_port_r )
 static WRITE32_HANDLER( io_port_w )
 {
 	COMBINE_DATA(&io_port[offset]);
-//	printf("[%08x] <- %08x\n",offset*4,data);
+//  printf("[%08x] <- %08x\n",offset*4,data);
 }
 
 
@@ -483,7 +483,7 @@ static INTERRUPT_GEN( bballoon_interrupt )
 	cpu_set_input_line(device, ARM7_IRQ_LINE, HOLD_LINE);
 	//cpu_set_input_line(device, ARM7_FIRQ_LINE, HOLD_LINE);
 
-//	irq_en = 0;
+//  irq_en = 0;
 }
 
 static MACHINE_DRIVER_START( bballoon )
@@ -500,8 +500,8 @@ static MACHINE_DRIVER_START( bballoon )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(320, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-//	MDRV_SCREEN_SIZE(1024, 1024)
-//	MDRV_SCREEN_VISIBLE_AREA(0, 1023, 0, 1023)
+//  MDRV_SCREEN_SIZE(1024, 1024)
+//  MDRV_SCREEN_VISIBLE_AREA(0, 1023, 0, 1023)
 
 	MDRV_PALETTE_LENGTH(256)
 

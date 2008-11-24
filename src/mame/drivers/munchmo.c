@@ -167,10 +167,10 @@ static INPUT_PORTS_START( mnchmobl )
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x16, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x1a, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x1e, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x1c, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x1a, DEF_STR( 1C_1C ) )
+//  PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x12, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( 1C_3C ) )
@@ -243,13 +243,13 @@ static INPUT_PORTS_START( mnchmobl )
 	PORT_DIPSETTING(    0x82, "50k 150k" )
 	PORT_DIPSETTING(    0xa2, "60k 160k" )
 	PORT_DIPSETTING(    0xc2, "70k 170k" )
-//	PORT_DIPSETTING(    0x13, "10k" )                       /* duplicated setting */
-//	PORT_DIPSETTING(    0x33, "20k" )                       /* duplicated setting */
-//	PORT_DIPSETTING(    0x53, "30k" )                       /* duplicated setting */
-//	PORT_DIPSETTING(    0x73, "40k" )                       /* duplicated setting */
-//	PORT_DIPSETTING(    0x93, "50k" )                       /* duplicated setting */
-//	PORT_DIPSETTING(    0xb3, "60k" )                       /* duplicated setting */
-//	PORT_DIPSETTING(    0xd3, "70k" )                       /* duplicated setting */
+//  PORT_DIPSETTING(    0x13, "10k" )                       /* duplicated setting */
+//  PORT_DIPSETTING(    0x33, "20k" )                       /* duplicated setting */
+//  PORT_DIPSETTING(    0x53, "30k" )                       /* duplicated setting */
+//  PORT_DIPSETTING(    0x73, "40k" )                       /* duplicated setting */
+//  PORT_DIPSETTING(    0x93, "50k" )                       /* duplicated setting */
+//  PORT_DIPSETTING(    0xb3, "60k" )                       /* duplicated setting */
+//  PORT_DIPSETTING(    0xd3, "70k" )                       /* duplicated setting */
 	PORT_DIPSETTING(    0x03, "10k" )
 	PORT_DIPSETTING(    0x23, "20k" )
 	PORT_DIPSETTING(    0x43, "30k" )

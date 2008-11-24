@@ -345,7 +345,7 @@ GFXDECODE_END
 static MACHINE_RESET( crballoon )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
-	
+
 	pc3092_reset();
 	port_sound_w(space, 0, 0);
 	port_music_w(space, 0, 0);

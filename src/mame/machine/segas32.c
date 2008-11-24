@@ -231,7 +231,7 @@ WRITE16_HANDLER(brival_protection_w)
 void darkedge_fd1149_vblank(const device_config *device)
 {
 	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	
+
 	memory_write_word(space, 0x20f072, 0);
 	memory_write_word(space, 0x20f082, 0);
 

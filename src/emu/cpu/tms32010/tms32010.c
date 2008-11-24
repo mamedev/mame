@@ -92,7 +92,7 @@ typedef struct			/* Page 3-6 shows all registers */
 	/********************** Status data ****************************/
 	PAIR	opcode;
 	int		INTF;		/* Pending Interrupt flag */
-	
+
 	const device_config *device;
 	const address_space *program;
 	const address_space *data;
@@ -730,7 +730,7 @@ static CPU_INIT( tms32010 )
 	state_save_register_item("tms32010", device->tag, 0, R.STACK[3]);
 	state_save_register_item("tms32010", device->tag, 0, R.INTF);
 	state_save_register_item("tms32010", device->tag, 0, R.opcode.d);
-	
+
 	R.device = device;
 	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	R.data = memory_find_address_space(device, ADDRESS_SPACE_DATA);

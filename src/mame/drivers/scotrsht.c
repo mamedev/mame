@@ -168,7 +168,7 @@ static INPUT_PORTS_START( scotrsht )
 	PORT_DIPSETTING(    0xb0, DEF_STR( 1C_5C ) )
 	PORT_DIPSETTING(    0xa0, DEF_STR( 1C_6C ) )
 	PORT_DIPSETTING(    0x90, DEF_STR( 1C_7C ) )
-//	PORT_DIPSETTING(    0x00, "Disable All Coin Slots" )
+//  PORT_DIPSETTING(    0x00, "Disable All Coin Slots" )
 
 	PORT_START("DSW2")		/* $3100 -> $196f */
 	PORT_DIPNAME( 0x03, 0x02, DEF_STR( Lives ) )

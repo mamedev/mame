@@ -134,16 +134,16 @@ struct _m68_state_t
 	const device_config *device;
 	int		icount;
 	PAIR	ea; 		/* effective address */
-	
+
 	/* Memory spaces */
     const address_space *program;
-    
+
 	UINT8	int_state;	/* SYNC and CWAI flags */
 	UINT8	nmi_state;
 
 	UINT8	dummy_byte;
 	UINT8 	*regTable[4];
-	
+
 	UINT8 const *cycle_counts_page0;
 	UINT8 const *cycle_counts_page01;
 	UINT8 const *cycle_counts_page11;
@@ -184,7 +184,7 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 #define pW		m68_state->w
 
 /* #define pQ           m68_state->q */
-/* #define pZ		m68_state->z */
+/* #define pZ       m68_state->z */
 
 #define PPC 	m68_state->ppc.w.l
 #define PC		m68_state->pc.w.l
@@ -512,7 +512,7 @@ static STATE_POSTLOAD( hd6309_postload )
 {
 	const device_config *device = param;
 	m68_state_t *m68_state = device->token;
-	
+
 	UpdateState(m68_state);
 }
 
@@ -523,14 +523,14 @@ static STATE_POSTLOAD( hd6309_postload )
 static CPU_INIT( hd6309 )
 {
 	m68_state_t *m68_state = device->token;
-	
+
 	m68_state->irq_callback = irqcallback;
 	m68_state->device = device;
 
 	m68_state->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	/* setup regtable */
-	
+
 	m68_state->regTable[0] = &(CC);
 	m68_state->regTable[1] = &(A);
 	m68_state->regTable[2] = &(B);
@@ -558,7 +558,7 @@ static CPU_INIT( hd6309 )
 static CPU_RESET( hd6309 )
 {
 	m68_state_t *m68_state = device->token;
-	
+
 	m68_state->int_state = 0;
 	m68_state->nmi_state = CLEAR_LINE;
 	m68_state->irq_state[0] = CLEAR_LINE;
@@ -642,7 +642,7 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 static CPU_EXECUTE( hd6309 )	/* NS 970908 */
 {
 	m68_state_t *m68_state = device->token;
-	
+
 	m68_state->icount = cycles - m68_state->extra_cycles;
 	m68_state->extra_cycles = 0;
 
@@ -1229,7 +1229,7 @@ INLINE void fetch_effective_address( m68_state_t *m68_state )
 static CPU_SET_INFO( hd6309 )
 {
 	m68_state_t *m68_state = device->token;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */

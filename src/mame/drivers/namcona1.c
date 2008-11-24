@@ -526,7 +526,7 @@ static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source 
 		namcona1_gfxram_w(space, (dest-0xf40000)/2, data, 0xffff );
 	}
 	else if( dest>=0xff0000 && dest<0xffc000 )
-	{				 
+	{
 		namcona1_videoram_w(space, (dest-0xff0000)/2, data, 0xffff );
 	}
 	else if( dest>=0xfff000 && dest<0x1000000 )

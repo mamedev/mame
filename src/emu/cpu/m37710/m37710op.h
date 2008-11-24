@@ -312,7 +312,7 @@ INLINE void m37710i_interrupt_software(m37710i_cpu_struct *m37710i_cpu, uint vec
 	m37710i_set_flag_i(m37710i_cpu, IFLAG_SET);
 	REG_PB = 0;
 	m37710i_jump_16(m37710i_cpu, m37710i_read_16_normal(m37710i_cpu, vector));
-}							    
+}
 
 /* ======================================================================== */
 /* ========================== EFFECTIVE ADDRESSES ========================= */
@@ -504,7 +504,7 @@ INLINE uint EA_DLIY(m37710i_cpu_struct *m37710i_cpu)  {return OPER_24_D(m37710i_
 INLINE uint EA_AXI(m37710i_cpu_struct *m37710i_cpu)   {return read_16_AXI(MAKE_UINT_16(OPER_16_IMM(m37710i_cpu) + REG_X));}
 INLINE uint EA_S(m37710i_cpu_struct *m37710i_cpu)     {return MAKE_UINT_16(REG_S + OPER_8_IMM(m37710i_cpu));}
 INLINE uint EA_SIY(m37710i_cpu_struct *m37710i_cpu)   {return MAKE_UINT_16(read_16_SIY(REG_S + OPER_8_IMM(m37710i_cpu)) + REG_Y) | REG_DB;}
-													  
+
 
 /* ======================================================================== */
 /* =========================== OPERATION MACROS =========================== */

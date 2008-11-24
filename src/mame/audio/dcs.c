@@ -2239,7 +2239,7 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 static TIMER_CALLBACK( s2_ack_callback )
 {
 	const address_space *space = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
-	
+
 	/* if the output is full, stall for a usec */
 	if (IS_OUTPUT_FULL())
 	{

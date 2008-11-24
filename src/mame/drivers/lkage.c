@@ -74,7 +74,7 @@ TODO:
     is expected - the MCU computes 0x89, but the main CPU expects 0x5d.
     The game works anyway, it never gives the usual Taito "BAD HW" message
     (because there is no test at 0x033b after call at routine at 0xde1d).
-    
+
 
 ***************************************************************************/
 

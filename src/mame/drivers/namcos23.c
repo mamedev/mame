@@ -4,12 +4,12 @@
 
     Hardware: * R4650 (MIPS III with IDT special instructions) main CPU.
                 133 MHz for Gorgon, 166 MHz for System 23 and Super System 23, and
-		200 MHz for Super System 23 Evolution 2.
+        200 MHz for Super System 23 Evolution 2.
               * H8/3002 MCU for sound/inputs
               * Custom polygon hardware
               * 1 text tilemap
 
-    Gorgon and System 23 use an I/O board based on the Namco C78, which is a Renesas H8/3334 MCU 
+    Gorgon and System 23 use an I/O board based on the Namco C78, which is a Renesas H8/3334 MCU
     (8-bit version of the H8/3002).
 
     Super System 23 uses a PIC16Cxx-based I/O board.  In both cases the I/O boards' MCUs apparently are connected
@@ -1513,7 +1513,7 @@ ROM_START( motoxgo )
 
 	ROM_REGION( 0x1000000, "c352", ROMREGION_ERASEFF ) /* C352 PCM samples */
         ROM_LOAD( "mg1wavel.2c",  0x000000, 0x800000, CRC(f78b1b4d) SHA1(47cd654ec0a69de0dc81b8d83692eebf5611228b) )
-        ROM_LOAD( "mg1waveh.2a",  0x800000, 0x800000, CRC(8cb73877) SHA1(2e2b170c7ff889770c13b4ab7ac316b386ada153) ) 
+        ROM_LOAD( "mg1waveh.2a",  0x800000, 0x800000, CRC(8cb73877) SHA1(2e2b170c7ff889770c13b4ab7ac316b386ada153) )
 ROM_END
 
 ROM_START( timecrs2 )

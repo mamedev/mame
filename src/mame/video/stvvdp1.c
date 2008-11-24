@@ -303,7 +303,7 @@ WRITE32_HANDLER( stv_vdp1_regs_w )
 			/* needed by pblbeach, it doesn't clear local coordinates in its sprite list...*/
 			//if ( !strcmp(space->machine->gamedrv->name, "pblbeach") )
 			//{
-			//	stvvdp1_local_x = stvvdp1_local_y = 0;
+			//  stvvdp1_local_x = stvvdp1_local_y = 0;
 			//}
 		}
 	}

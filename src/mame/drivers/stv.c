@@ -2506,14 +2506,14 @@ static MACHINE_START( stv )
 	state_save_register_global_pointer(smpc_ram, 0x80);
 	state_save_register_global_pointer(stv_scu, 0x100/4);
 	state_save_register_global_pointer(scsp_regs, 0x1000/2);
-//	state_save_register_global(stv_vblank);
-//	state_save_register_global(stv_hblank);
+//  state_save_register_global(stv_vblank);
+//  state_save_register_global(stv_hblank);
 	state_save_register_global(stv_enable_slave_sh2);
 	state_save_register_global(NMI_reset);
 	state_save_register_global(en_68k);
 	state_save_register_global(timer_0);
 	state_save_register_global(timer_1);
-//	state_save_register_global(scanline);
+//  state_save_register_global(scanline);
 	state_save_register_global(IOSEL1);
 	state_save_register_global(IOSEL2);
 	state_save_register_global(EXLE1);
@@ -2608,8 +2608,8 @@ static TIMER_CALLBACK( hblank_in_irq )
 {
 	int scanline = param;
 
-//	h = video_screen_get_height(machine->primary_screen);
-//	w = video_screen_get_width(machine->primary_screen);
+//  h = video_screen_get_height(machine->primary_screen);
+//  w = video_screen_get_width(machine->primary_screen);
 
 	TIMER_0_IRQ;
 	HBLANK_IN_IRQ;
@@ -2652,7 +2652,7 @@ static TIMER_CALLBACK( vblank_in_irq )
 /*V-Blank-OUT event*/
 static INTERRUPT_GEN( stv_interrupt )
 {
-//	scanline = 0;
+//  scanline = 0;
 	h_sync = video_screen_get_height(device->machine->primary_screen)/2;//horz
 	v_sync = video_screen_get_width(device->machine->primary_screen)-2;//vert
 

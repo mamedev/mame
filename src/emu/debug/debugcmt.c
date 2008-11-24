@@ -104,7 +104,7 @@ static void debug_comment_free(void);
 int debug_comment_init(running_machine *machine)
 {
 	int numcpu;
-	
+
 	for (numcpu = 0; numcpu < ARRAY_LENGTH(machine->cpu); numcpu++)
 		if (machine->cpu[numcpu] == NULL)
 			break;

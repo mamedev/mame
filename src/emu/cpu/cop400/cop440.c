@@ -13,11 +13,11 @@
 
     TODO:
 
-	- rename this file to cop444.c
-	- COP440/COP441/COP442 (new registers: 4-bit H, 8-bit R; some new opcodes, 2Kx8 ROM, 160x4 RAM)
-	- COP404 emulation configuration inputs
-	- RAM bus width
-	- get rid of LBIOps/InstLen
+    - rename this file to cop444.c
+    - COP440/COP441/COP442 (new registers: 4-bit H, 8-bit R; some new opcodes, 2Kx8 ROM, 160x4 RAM)
+    - COP404 emulation configuration inputs
+    - RAM bus width
+    - get rid of LBIOps/InstLen
     - when is the microbus int cleared?
     - CKO sync input
     - save internal RAM when CKO is RAM power supply pin
