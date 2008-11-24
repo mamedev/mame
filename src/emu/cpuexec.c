@@ -103,6 +103,7 @@ struct _cpu_class_data
 /* general CPU variables */
 static int cycles_running;
 static int cycles_stolen;
+static const device_config *executingcpu;
 
 
 
@@ -385,6 +386,7 @@ void cpuexec_timeslice(running_machine *machine)
 				/* note that this global variable cycles_stolen can be modified */
 				/* via the call to the cpunum_execute */
 				cycles_stolen = 0;
+				executingcpu = machine->cpu[cpunum];
 				if (!call_debugger)
 					ran = cpu_execute(machine->cpu[cpunum], cycles_running);
 				else
@@ -399,6 +401,7 @@ void cpuexec_timeslice(running_machine *machine)
 					fatalerror("Negative CPU cycle count!");
 #endif /* MAME_DEBUG */
 
+				executingcpu = NULL;
 				ran -= cycles_stolen;
 				profiler_mark(PROFILER_END);
 
@@ -496,7 +499,7 @@ void cpu_suspend(const device_config *device, int reason, int eatcycles)
 	classdata->nexteatcycles = eatcycles;
 
 	/* if we're active, synchronize */
-	if (device == device->machine->activecpu)
+	if (device == executingcpu)
 		cpu_abort_timeslice(device);
 }
 
@@ -514,7 +517,7 @@ void cpu_resume(const device_config *device, int reason)
 	classdata->nextsuspend &= ~reason;
 
 	/* if we're active, synchronize */
-	if (device == device->machine->activecpu)
+	if (device == executingcpu)
 		cpu_abort_timeslice(device);
 }
 
@@ -614,7 +617,7 @@ attotime cpu_get_local_time(const device_config *device)
 
 	/* if we're active, add in the time from the current slice */
 	result = classdata->localtime;
-	if (device == device->machine->activecpu && classdata->icount != NULL)
+	if (device == executingcpu)
 	{
 		int cycles = cycles_running - *classdata->icount;
 		result = attotime_add(result, ATTOTIME_IN_CYCLES(cycles, classdata->header.index));
@@ -633,7 +636,7 @@ UINT64 cpu_get_total_cycles(const device_config *device)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
-	if (device == device->machine->activecpu && classdata->icount != NULL)
+	if (device == executingcpu)
 		return classdata->totalcycles + cycles_running - *classdata->icount;
 	else
 		return classdata->totalcycles;
@@ -649,7 +652,9 @@ void cpu_eat_cycles(const device_config *device, int cycles)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
-	assert(device == device->machine->activecpu);
+	/* ignore if not the executing CPU */
+	if (device != executingcpu)
+		return;
 
 	if (cycles > *classdata->icount)
 		cycles = *classdata->icount + 1;
@@ -666,7 +671,9 @@ void cpu_adjust_icount(const device_config *device, int delta)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
-	assert(device == device->machine->activecpu);
+	/* ignore if not the executing CPU */
+	if (device != executingcpu)
+		return;
 
 	*classdata->icount += delta;
 }
@@ -683,7 +690,9 @@ void cpu_abort_timeslice(const device_config *device)
 	cpu_class_data *classdata = get_safe_classtoken(device);
 	int delta;
 
-	assert(device == device->machine->activecpu);
+	/* ignore if not the executing CPU */
+	if (device != executingcpu)
+		return;
 
 	/* swallow the remaining cycles */
 	if (classdata->icount != NULL)
@@ -783,8 +792,8 @@ void cpuexec_trigger(running_machine *machine, int trigger)
 	int cpunum;
 
 	/* cause an immediate resynchronization */
-	if (machine->activecpu != NULL)
-		cpu_abort_timeslice(machine->activecpu);
+	if (executingcpu != NULL)
+		cpu_abort_timeslice(executingcpu);
 
 	/* look for suspended CPUs waiting for this trigger and unsuspend them */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL; cpunum++)
