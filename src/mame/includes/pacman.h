@@ -62,11 +62,6 @@ MACHINE_RESET( theglobp );
 READ8_HANDLER( theglobp_decrypt_rom );
 
 
-/*----------- defined in machine/mspacman.c -----------*/
-
-MACHINE_RESET( mspacman );
-WRITE8_HANDLER( mspacman_activate_rom );
-
 /*----------- defined in machine/acitya.c -------------*/
 
 MACHINE_RESET( acitya );

@@ -2653,7 +2653,6 @@ src/mame/machine/midwunit.c svneol=native#text/plain
 src/mame/machine/midyunit.c svneol=native#text/plain
 src/mame/machine/model1.c svneol=native#text/plain
 src/mame/machine/model3.c svneol=native#text/plain
-src/mame/machine/mspacman.c svneol=native#text/plain
 src/mame/machine/mw8080bw.c svneol=native#text/plain
 src/mame/machine/n64.c svneol=native#text/plain
 src/mame/machine/namco50.c svneol=native#text/plain

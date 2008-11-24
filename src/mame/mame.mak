@@ -1128,7 +1128,6 @@ $(MAMEOBJ)/pacman.a: \
 	$(DRIVERS)/pengo.o \
 	$(MACHINE)/acitya.o \
 	$(MACHINE)/jumpshot.o \
-	$(MACHINE)/mspacman.o \
 	$(MACHINE)/pacplus.o \
 	$(MACHINE)/theglobp.o \
 

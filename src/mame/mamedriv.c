@@ -81,7 +81,7 @@ const game_driver * const drivers[] =
 	DRIVER( piranhao )	/* GL */
 	DRIVER( nmouse )	/* (c) 1981 Amenip (Palcom Queen River) */
 	DRIVER( nmouseb )	/* (c) 1981 Amenip Nova Games Ltd. */
-	DRIVER( mspacman )	/* (c) 1981 Midway */ /* made by Gencomp */
+	DRIVER( mspacman )	/* (c) 1981 Midway */ /* made by General Computer */
 	DRIVER( mspacmnf )	/* hack */
 	DRIVER( mspacmat )	/* hack */
 	DRIVER( woodpek )	/* (c) 1981 Amenip (Palcom Queen River) */

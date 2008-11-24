@@ -280,6 +280,15 @@ Easter eggs:
 - Pacman, Ms Pacman, Piranha and similar display "MADE BY NAMCO" sideways in power pellets.  Hold start 1 and 2 and
   toggle the test switch to get to the convergence grid.  4xUp, 4xL, 4xR, 4xD.
 
+- Ms. Pac-Man has a hidden message at the very end of ROM memory 0x97d0-0x97ff:
+
+    000097d0: 4745 4e45 5241 4c20 434f 4d50 5554 4552  GENERAL COMPUTER
+    000097e0: 2020 434f 5250 4f52 4154 494f 4e20 2020    CORPORATION   
+    000097f0: 4865 6c6c 6f2c 204e 616b 616d 7572 6121  Hello, Nakamura!
+
+  Masaya Nakamura is the founder of Namco who originally produced Pac-Man in Japan.
+  General Computer Corporation designed Ms. Pac-Man and licensed it to Midway for manufacture in North America.
+
 Boards:
 -------
 - puckman is the same as pacman except they are slotted to break a part and have ribbon cables to connect the halves.
@@ -788,6 +797,90 @@ static READ8_HANDLER( pacman_read_nop )
 }
 
 
+/************************************
+ *
+ *  Ms. Pac-Man
+ *
+ ************************************/
+
+/*
+  Ms. Pac-Man has an auxiliary PCB with ribbon cable that plugs into the Z-80 CPU socket of a Pac-Man main PCB. Also the
+  graphics ROMs at 5E, 5F on the main board are replaced.
+
+  The aux board contains three ROMs (two 2532 at U6, U7 and one 2716 at U5), a Z-80, and four PAL/HAL logic chips.
+
+  The aux board logic decodes the Z-80 address and determines whether to enable the main board ROMs (containing Pac-Man
+  code) or the aux board ROMs (containing Ms. Pac-Man code). Normally the Pac-Man ROMs reside at address 0x0000-0x3fff
+  and are mirrored at 0x8000-0xbfff (Z-80 A15 is not used in Pac-Man). The aux board logic modifies the address map and
+  enables the aux board ROMs for addresses 0x3000-0x3fff and 0x8000-0x97ff. Furthermore there are forty 8-byte "patch"
+  regions which reside in the 0x0000-0x2fff address range. Any access to these patch addresses will disable the Pac-Man
+  ROMs and enable the aux board ROM. Aux board ROM addresses 0x8000-0x81ef are mapped onto the patch regions. These
+  patches typically insert jumps to new code above 0x8000.
+
+  The aux board logic also acts as a software protection circuit which inhibits dumping of the ROMs (e.g., using a
+  microprocessor emulator system). There are several "trap" address regions which enable and disable the decode
+  functions. In order to properly operate as Ms. Pac-Man you must access one of the "latch set" trap addresses. This
+  enables the decode. If a "latch clear" address is accessed then decode is disabled and all you get is Pac-Man. For
+  more info see U.S. Patent 4,525,599 "Software protection methods and apparatus".
+
+  The trap regions are 8 bytes in length starting on the following addresses:
+
+  latch clear, decode disable
+    0x0038
+    0x03b0
+    0x1600
+    0x2120
+    0x3ff0
+    0x8000
+    0x97f0
+
+  latch set, decode enable
+    0x3ff8
+
+  Any memory access will trigger the trap behavior: instruction fetch, data read, data write. The latch clear addresses
+  should never be accessed during normal Ms. Pac-Man operation, so when the circuitry detects an access it clears the
+  latch and prevents any further dumping of the aux board ROMs.
+
+  The Pac-Man self-test code does a checksum of the ROM 0x0000-0x2fff. This works because the checksum routine walks the
+  ROM starting from the low address and hits the latch clear trap at 0x0038 prior to encountering any of the patch
+  regions. The decode stays disabled for the rest of the checksum routine, and thus the checksum is calculated for the
+  Pac-Man ROMs with no patches applied.
+
+  During normal operation every VBLANK (60.6Hz) interrupt will fetch its interrupt vector from the 0x3ff8 trap region, so
+  the latch is continually being enabled.
+
+  David Widel points out that the Pac-Man pseudo-random number generator (RNG) routine at 0x2a23 might also access a
+  trap region. This RNG is only used when the monsters are blue (after a power pellet has been eaten) and is used to
+  select a "random" direction for the monsters to run away. The routine calculates a pointer address between
+  0x0000-0x1fff and fetches the ROM value from that address. This value is the "random" number returned by the
+  routine. During the blue mode only Pac-Man code is being executed, so a trap hit that clears the decode latch will
+  have no effect on gameplay. Every VBLANK interrupt vector fetch re-enables the latch and you are back in Ms. Pac-Man
+  mode.
+
+  In a further attempt to thwart copying, the aux board ROMs have a simple encryption scheme: their address and data
+  lines are bit flipped (i.e., wired in a nonstandard fashion). The specific bit flips were selected to minimize the
+  vias required to lay out the aux PCB.
+*/
+
+#define mspacman_enable_decode_latch(m)  memory_set_bank(m, 1, 1)
+#define mspacman_disable_decode_latch(m) memory_set_bank(m, 1, 0)
+
+// any access to these ROM addresses disables the decoder, and all you see is the original Pac-Man code
+static READ8_HANDLER(  mspacman_disable_decode_r_0x0038 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "main")[offset+0x0038]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x03b0 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "main")[offset+0x03b0]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x1600 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "main")[offset+0x1600]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x2120 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "main")[offset+0x2120]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x3ff0 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "main")[offset+0x3ff0]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x8000 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "main")[offset+0x8000]; }
+static READ8_HANDLER(  mspacman_disable_decode_r_0x97f0 ) { mspacman_disable_decode_latch(space->machine); return memory_region(space->machine, "main")[offset+0x97f0]; }
+static WRITE8_HANDLER( mspacman_disable_decode_w )        { mspacman_disable_decode_latch(space->machine); }
+
+// any access to these ROM addresses enables the decoder, and you'll see the Ms. Pac-Man code
+static READ8_HANDLER(  mspacman_enable_decode_r_0x3ff8 )  { mspacman_enable_decode_latch(space->machine); return memory_region(space->machine, "main")[offset+0x3ff8+0x10000]; }
+static WRITE8_HANDLER( mspacman_enable_decode_w )         { mspacman_enable_decode_latch(space->machine); }
+
+
+
 /*************************************
  *
  *  Main CPU memory handlers
@@ -824,7 +917,6 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( mspacman_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x3fff) AM_ROMBANK(1)
 	AM_RANGE(0x4000, 0x43ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_videoram_w) AM_BASE(&videoram) AM_SIZE(&videoram_size)
 	AM_RANGE(0x4400, 0x47ff) AM_MIRROR(0xa000) AM_READWRITE(SMH_RAM,pacman_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x4800, 0x4bff) AM_MIRROR(0xa000) AM_READWRITE(pacman_read_nop,SMH_NOP)
@@ -835,7 +927,7 @@ static ADDRESS_MAP_START( mspacman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5002, 0x5002) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP)
 	AM_RANGE(0x5003, 0x5003) AM_MIRROR(0xaf38) AM_WRITE(pacman_flipscreen_w)
 	AM_RANGE(0x5004, 0x5005) AM_MIRROR(0xaf38) AM_WRITE(SMH_NOP) // AM_WRITE(pacman_leds_w)
-	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(mspacman_activate_rom) /* Not actually, just handy */ // AM_WRITE(pacman_coin_lockout_global_w)
+	AM_RANGE(0x5006, 0x5006) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_lockout_global_w)
 	AM_RANGE(0x5007, 0x5007) AM_MIRROR(0xaf38) AM_WRITE(pacman_coin_counter_w)
 	AM_RANGE(0x5040, 0x505f) AM_MIRROR(0xaf00) AM_WRITE(pacman_sound_w) AM_BASE(&pacman_soundregs)
 	AM_RANGE(0x5060, 0x506f) AM_MIRROR(0xaf00) AM_WRITE(SMH_RAM) AM_BASE(&spriteram_2)
@@ -846,7 +938,20 @@ static ADDRESS_MAP_START( mspacman_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5040, 0x5040) AM_MIRROR(0xaf3f) AM_READ_PORT("IN1")		/* IN1 */
 	AM_RANGE(0x5080, 0x5080) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x50c0, 0x50c0) AM_MIRROR(0xaf3f) AM_READ_PORT("DSW2")		/* DSW2 */
-	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(1)
+
+	/* overlay decode enable/disable on top */	
+	AM_RANGE(0x0038, 0x003f) AM_READWRITE(mspacman_disable_decode_r_0x0038,mspacman_disable_decode_w)
+	AM_RANGE(0x03b0, 0x03b7) AM_READWRITE(mspacman_disable_decode_r_0x03b0,mspacman_disable_decode_w)
+	AM_RANGE(0x1600, 0x1607) AM_READWRITE(mspacman_disable_decode_r_0x1600,mspacman_disable_decode_w)
+	AM_RANGE(0x2120, 0x2127) AM_READWRITE(mspacman_disable_decode_r_0x2120,mspacman_disable_decode_w)
+	AM_RANGE(0x3ff0, 0x3ff7) AM_READWRITE(mspacman_disable_decode_r_0x3ff0,mspacman_disable_decode_w)
+	AM_RANGE(0x3ff8, 0x3fff) AM_READWRITE(mspacman_enable_decode_r_0x3ff8,mspacman_enable_decode_w)
+	AM_RANGE(0x8000, 0x8007) AM_READWRITE(mspacman_disable_decode_r_0x8000,mspacman_disable_decode_w)
+	AM_RANGE(0x97f0, 0x97f7) AM_READWRITE(mspacman_disable_decode_r_0x97f0,mspacman_disable_decode_w)
+
+	/* start with 0000-3fff and 8000-bfff mapped to the ROMs */
+	AM_RANGE(0x4000, 0x7fff) AM_MIRROR(0x8000) AM_UNMAP
+	AM_RANGE(0x0000, 0xffff) AM_ROMBANK(1)
 ADDRESS_MAP_END
 
 
@@ -3123,8 +3228,6 @@ static MACHINE_DRIVER_START( mspacman )
 
 	MDRV_CPU_MODIFY("main")
 	MDRV_CPU_PROGRAM_MAP(mspacman_map,0)
-
-	MDRV_MACHINE_RESET(mspacman)
 MACHINE_DRIVER_END
 
 
@@ -5314,6 +5417,116 @@ static DRIVER_INIT( eyes )
 		eyes_decode(&RAM[i]);
 }
 
+
+#define BITSWAP12(val,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
+	BITSWAP16(val,15,14,13,12,B11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
+
+#define BITSWAP11(val,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0) \
+	BITSWAP16(val,15,14,13,12,11,B10,B9,B8,B7,B6,B5,B4,B3,B2,B1,B0)
+
+static void mspacman_install_patches(UINT8 *ROM)
+{
+	int i;
+
+	/* copy forty 8-byte patches into Pac-Man code */
+
+	for (i = 0; i < 8; i++)
+	{
+		ROM[0x0410+i] = ROM[0x8008+i];
+		ROM[0x08E0+i] = ROM[0x81D8+i];
+		ROM[0x0A30+i] = ROM[0x8118+i];
+		ROM[0x0BD0+i] = ROM[0x80D8+i];
+		ROM[0x0C20+i] = ROM[0x8120+i];
+		ROM[0x0E58+i] = ROM[0x8168+i];
+		ROM[0x0EA8+i] = ROM[0x8198+i];
+
+		ROM[0x1000+i] = ROM[0x8020+i];
+		ROM[0x1008+i] = ROM[0x8010+i];
+		ROM[0x1288+i] = ROM[0x8098+i];
+		ROM[0x1348+i] = ROM[0x8048+i];
+		ROM[0x1688+i] = ROM[0x8088+i];
+		ROM[0x16B0+i] = ROM[0x8188+i];
+		ROM[0x16D8+i] = ROM[0x80C8+i];
+		ROM[0x16F8+i] = ROM[0x81C8+i];
+		ROM[0x19A8+i] = ROM[0x80A8+i];
+		ROM[0x19B8+i] = ROM[0x81A8+i];
+
+		ROM[0x2060+i] = ROM[0x8148+i];
+		ROM[0x2108+i] = ROM[0x8018+i];
+		ROM[0x21A0+i] = ROM[0x81A0+i];
+		ROM[0x2298+i] = ROM[0x80A0+i];
+		ROM[0x23E0+i] = ROM[0x80E8+i];
+		ROM[0x2418+i] = ROM[0x8000+i];
+		ROM[0x2448+i] = ROM[0x8058+i];
+		ROM[0x2470+i] = ROM[0x8140+i];
+		ROM[0x2488+i] = ROM[0x8080+i];
+		ROM[0x24B0+i] = ROM[0x8180+i];
+		ROM[0x24D8+i] = ROM[0x80C0+i];
+		ROM[0x24F8+i] = ROM[0x81C0+i];
+		ROM[0x2748+i] = ROM[0x8050+i];
+		ROM[0x2780+i] = ROM[0x8090+i];
+		ROM[0x27B8+i] = ROM[0x8190+i];
+		ROM[0x2800+i] = ROM[0x8028+i];
+		ROM[0x2B20+i] = ROM[0x8100+i];
+		ROM[0x2B30+i] = ROM[0x8110+i];
+		ROM[0x2BF0+i] = ROM[0x81D0+i];
+		ROM[0x2CC0+i] = ROM[0x80D0+i];
+		ROM[0x2CD8+i] = ROM[0x80E0+i];
+		ROM[0x2CF0+i] = ROM[0x81E0+i];
+		ROM[0x2D60+i] = ROM[0x8160+i];
+	}
+}
+
+static DRIVER_INIT( mspacman )
+{
+	int i;
+	UINT8 *ROM, *DROM;
+
+	/* CPU ROMs */
+
+	/* Pac-Man code is in low bank */
+	ROM = memory_region(machine, "main");
+
+	/* decrypted Ms. Pac-Man code is in high bank */
+	DROM = &memory_region(machine, "main")[0x10000];
+
+	/* copy ROMs into decrypted bank */
+	for (i = 0; i < 0x1000; i++)
+	{
+		DROM[0x0000+i] = ROM[0x0000+i];	/* pacman.6e */
+		DROM[0x1000+i] = ROM[0x1000+i];	/* pacman.6f */
+		DROM[0x2000+i] = ROM[0x2000+i];	/* pacman.6h */
+		DROM[0x3000+i] = BITSWAP8(ROM[0xb000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);	/* decrypt u7 */
+	}
+	for (i = 0; i < 0x800; i++)
+	{
+		DROM[0x8000+i] = BITSWAP8(ROM[0x8000+BITSWAP11(i,   8,7,5,9,10,6,3,4,2,1,0)],0,4,5,7,6,3,2,1);	/* decrypt u5 */
+		DROM[0x8800+i] = BITSWAP8(ROM[0x9800+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);	/* decrypt half of u6 */
+		DROM[0x9000+i] = BITSWAP8(ROM[0x9000+BITSWAP12(i,11,3,7,9,10,8,6,5,4,2,1,0)],0,4,5,7,6,3,2,1);	/* decrypt half of u6 */
+		DROM[0x9800+i] = ROM[0x1800+i];		/* mirror of pacman.6f high */
+	}
+	for (i = 0; i < 0x1000; i++)
+	{
+		DROM[0xa000+i] = ROM[0x2000+i];		/* mirror of pacman.6h */
+		DROM[0xb000+i] = ROM[0x3000+i];		/* mirror of pacman.6j */
+	}
+	/* install patches into decrypted bank */
+	mspacman_install_patches(DROM);
+
+	/* mirror Pac-Man ROMs into upper addresses of normal bank */
+	for (i = 0; i < 0x1000; i++)
+	{
+		ROM[0x8000+i] = ROM[0x0000+i];
+		ROM[0x9000+i] = ROM[0x1000+i];
+		ROM[0xa000+i] = ROM[0x2000+i];
+		ROM[0xb000+i] = ROM[0x3000+i];
+	}
+
+	/* initialize the banks */
+	memory_configure_bank(machine, 1, 0, 2, &ROM[0x00000], 0x10000);
+	memory_set_bank(machine, 1, 1);
+}
+
 static DRIVER_INIT( woodpek )
 {
 	int i, len;
@@ -5517,9 +5730,9 @@ GAME( 1981, piranhao, puckman,  piranha,  mspacman, eyes,     ROT90,  "GL (US Bi
 GAME( 1981, abscam,   puckman,  piranha,  mspacman, eyes,     ROT90,  "GL (US Billiards License)", "Abscam", GAME_SUPPORTS_SAVE )
 GAME( 1981, nmouse,   0	     ,  nmouse ,  nmouse,   eyes,     ROT90,  "Amenip (Palcom Queen River)", "Naughty Mouse (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, nmouseb,  nmouse ,  nmouse ,  nmouse,   eyes,     ROT90,  "Amenip Nova Games Ltd.", "Naughty Mouse (set 2)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mspacman, 0,        mspacman, mspacman, 0,        ROT90,  "Midway", "Ms. Pac-Man", GAME_SUPPORTS_SAVE )
-GAME( 1981, mspacmnf, mspacman, mspacman, mspacman, 0,        ROT90,  "Midway", "Ms. Pac-Man (with speedup hack)", GAME_SUPPORTS_SAVE )
-GAME( 1981, mspacmat, mspacman, mspacman, mspacman, 0,        ROT90,  "hack", "Ms. Pac Attack", GAME_SUPPORTS_SAVE )
+GAME( 1981, mspacman, 0,        mspacman, mspacman, mspacman, ROT90,  "Midway", "Ms. Pac-Man", GAME_SUPPORTS_SAVE )
+GAME( 1981, mspacmnf, mspacman, mspacman, mspacman, mspacman, ROT90,  "Midway", "Ms. Pac-Man (with speedup hack)", GAME_SUPPORTS_SAVE )
+GAME( 1981, mspacmat, mspacman, mspacman, mspacman, mspacman, ROT90,  "hack", "Ms. Pac Attack", GAME_SUPPORTS_SAVE )
 GAME( 1981, woodpek,  0,        woodpek,  woodpek,  woodpek,  ROT90,  "Amenip (Palcom Queen River)", "Woodpecker (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, woodpeka, woodpek,  woodpek,  woodpek,  woodpek,  ROT90,  "Amenip", "Woodpecker (set 2)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 GAME( 1981, mspacmab, mspacman, woodpek,  mspacman, 0,        ROT90,  "bootleg", "Ms. Pac-Man (bootleg)", GAME_SUPPORTS_SAVE )
