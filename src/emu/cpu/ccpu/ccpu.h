@@ -23,7 +23,7 @@
 enum
 {
 	CCPU_PC=1,
-	Ccpu_get_flags,
+	CCPU_FLAGS,
 	CCPU_A,
 	CCPU_B,
 	CCPU_I,
@@ -40,11 +40,14 @@ enum
     CONFIG STRUCTURE
 ***************************************************************************/
 
+typedef UINT8 (*ccpu_input_func)(const device_config *device);
+typedef void (*ccpu_vector_func)(const device_config *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
+
 typedef struct _ccpu_config ccpu_config;
 struct _ccpu_config
 {
-	UINT8		(*external_input)(void);		/* if NULL, assume JMI jumper is present */
-	void		(*vector_callback)(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
+	ccpu_input_func		external_input;		/* if NULL, assume JMI jumper is present */
+	ccpu_vector_func	vector_callback;
 };
 
 
@@ -54,7 +57,7 @@ struct _ccpu_config
 ***************************************************************************/
 
 CPU_GET_INFO( ccpu );
-void ccpu_wdt_timer_trigger(void);
+void ccpu_wdt_timer_trigger(const device_config *device);
 
 CPU_DISASSEMBLE( ccpu );
 

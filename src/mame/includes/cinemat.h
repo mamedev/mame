@@ -34,8 +34,8 @@ MACHINE_DRIVER_EXTERN( qb3_sound );
 
 /*----------- defined in video/cinemat.c -----------*/
 
-void cinemat_vector_callback(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
-WRITE8_HANDLER(cinemat_vector_control_w);
+void cinemat_vector_callback(const device_config *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift);
+WRITE8_HANDLER( cinemat_vector_control_w );
 
 VIDEO_START( cinemat_bilevel );
 VIDEO_START( cinemat_16level );

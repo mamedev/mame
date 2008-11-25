@@ -47,9 +47,9 @@ static UINT8 last_control;
  *
  *************************************/
 
-void cinemat_vector_callback(INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
+void cinemat_vector_callback(const device_config *device, INT16 sx, INT16 sy, INT16 ex, INT16 ey, UINT8 shift)
 {
-	const rectangle *visarea = video_screen_get_visible_area(Machine->primary_screen);
+	const rectangle *visarea = video_screen_get_visible_area(device->machine->primary_screen);
 	int intensity = 0xff;
 
 	/* adjust for slop */
@@ -227,7 +227,7 @@ VIDEO_UPDATE( cinemat )
 	vector_clear_list();
 
 	cpu_push_context(screen->machine->cpu[0]);
-	ccpu_wdt_timer_trigger();
+	ccpu_wdt_timer_trigger(screen->machine->cpu[0]);
 	cpu_pop_context();
 
 	return 0;

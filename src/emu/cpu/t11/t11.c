@@ -21,32 +21,20 @@
  *
  *************************************/
 
-typedef struct
+typedef struct _t11_state t11_state;
+struct _t11_state
 {
-	PAIR	ppc;	/* previous program counter */
-    PAIR	reg[8];
-    PAIR	psw;
-    UINT16	op;
-    UINT16	initial_pc;
-    UINT8	wait_state;
-    UINT8	irq_state;
-    INT32	interrupt_cycles;
-	cpu_irq_callback irq_callback;
+	PAIR				ppc;	/* previous program counter */
+    PAIR				reg[8];
+    PAIR				psw;
+    UINT16				initial_pc;
+    UINT8				wait_state;
+    UINT8				irq_state;
+    int					icount;
+	cpu_irq_callback 	irq_callback;
 	const device_config *device;
 	const address_space *program;
-} t11_Regs;
-
-static t11_Regs t11;
-
-
-
-/*************************************
- *
- *  Global variables
- *
- *************************************/
-
-static int	t11_ICount;
+};
 
 
 
@@ -57,16 +45,16 @@ static int	t11_ICount;
  *************************************/
 
 /* registers of various sizes */
-#define REGD(x) t11.reg[x].d
-#define REGW(x) t11.reg[x].w.l
-#define REGB(x) t11.reg[x].b.l
+#define REGD(x) reg[x].d
+#define REGW(x) reg[x].w.l
+#define REGB(x) reg[x].b.l
 
 /* PC, SP, and PSW definitions */
-#define SP REGW(6)
-#define PC REGW(7)
-#define SPD REGD(6)
-#define PCD REGD(7)
-#define PSW t11.psw.b.l
+#define SP 		REGW(6)
+#define PC 		REGW(7)
+#define SPD 	REGD(6)
+#define PCD 	REGD(7)
+#define PSW 	psw.b.l
 
 
 
@@ -76,35 +64,35 @@ static int	t11_ICount;
  *
  *************************************/
 
-INLINE int ROPCODE(void)
+INLINE int ROPCODE(t11_state *cpustate)
 {
-	int val = memory_decrypted_read_word(t11.program, PC);
-	PC += 2;
+	int val = memory_decrypted_read_word(cpustate->program, cpustate->PC);
+	cpustate->PC += 2;
 	return val;
 }
 
 
-INLINE int RBYTE(int addr)
+INLINE int RBYTE(t11_state *cpustate, int addr)
 {
-	return T11_RDMEM(addr);
+	return T11_RDMEM(cpustate, addr);
 }
 
 
-INLINE void WBYTE(int addr, int data)
+INLINE void WBYTE(t11_state *cpustate, int addr, int data)
 {
-	T11_WRMEM(addr, data);
+	T11_WRMEM(cpustate, addr, data);
 }
 
 
-INLINE int RWORD(int addr)
+INLINE int RWORD(t11_state *cpustate, int addr)
 {
-	return T11_RDMEM_WORD(addr & 0xfffe);
+	return T11_RDMEM_WORD(cpustate, addr & 0xfffe);
 }
 
 
-INLINE void WWORD(int addr, int data)
+INLINE void WWORD(t11_state *cpustate, int addr, int data)
 {
-	T11_WRMEM_WORD(addr & 0xfffe, data);
+	T11_WRMEM_WORD(cpustate, addr & 0xfffe, data);
 }
 
 
@@ -115,17 +103,17 @@ INLINE void WWORD(int addr, int data)
  *
  *************************************/
 
-INLINE void PUSH(int val)
+INLINE void PUSH(t11_state *cpustate, int val)
 {
-	SP -= 2;
-	WWORD(SPD, val);
+	cpustate->SP -= 2;
+	WWORD(cpustate, cpustate->SPD, val);
 }
 
 
-INLINE int POP(void)
+INLINE int POP(t11_state *cpustate)
 {
-	int result = RWORD(SPD);
-	SP += 2;
+	int result = RWORD(cpustate, cpustate->SPD);
+	cpustate->SP += 2;
 	return result;
 }
 
@@ -144,22 +132,22 @@ INLINE int POP(void)
 #define NFLAG 8
 
 /* extracts flags */
-#define GET_C (PSW & CFLAG)
-#define GET_V (PSW & VFLAG)
-#define GET_Z (PSW & ZFLAG)
-#define GET_N (PSW & NFLAG)
+#define GET_C (cpustate->PSW & CFLAG)
+#define GET_V (cpustate->PSW & VFLAG)
+#define GET_Z (cpustate->PSW & ZFLAG)
+#define GET_N (cpustate->PSW & NFLAG)
 
 /* clears flags */
-#define CLR_C (PSW &= ~CFLAG)
-#define CLR_V (PSW &= ~VFLAG)
-#define CLR_Z (PSW &= ~ZFLAG)
-#define CLR_N (PSW &= ~NFLAG)
+#define CLR_C (cpustate->PSW &= ~CFLAG)
+#define CLR_V (cpustate->PSW &= ~VFLAG)
+#define CLR_Z (cpustate->PSW &= ~ZFLAG)
+#define CLR_N (cpustate->PSW &= ~NFLAG)
 
 /* sets flags */
-#define SET_C (PSW |= CFLAG)
-#define SET_V (PSW |= VFLAG)
-#define SET_Z (PSW |= ZFLAG)
-#define SET_N (PSW |= NFLAG)
+#define SET_C (cpustate->PSW |= CFLAG)
+#define SET_V (cpustate->PSW |= VFLAG)
+#define SET_Z (cpustate->PSW |= ZFLAG)
+#define SET_N (cpustate->PSW |= NFLAG)
 
 
 
@@ -195,10 +183,10 @@ static const struct irq_table_entry irq_table[] =
 	{ 7<<5, 0x60 }
 };
 
-static void t11_check_irqs(void)
+static void t11_check_irqs(t11_state *cpustate)
 {
-	const struct irq_table_entry *irq = &irq_table[t11.irq_state & 15];
-	int priority = PSW & 0xe0;
+	const struct irq_table_entry *irq = &irq_table[cpustate->irq_state & 15];
+	int priority = cpustate->PSW & 0xe0;
 
 	/* compare the priority of the interrupt to the PSW */
 	if (irq->priority > priority)
@@ -207,28 +195,28 @@ static void t11_check_irqs(void)
 		int new_pc, new_psw;
 
 		/* call the callback; if we don't get -1 back, use the return value as our vector */
-		if (t11.irq_callback != NULL)
+		if (cpustate->irq_callback != NULL)
 		{
-			int new_vector = (*t11.irq_callback)(t11.device, t11.irq_state & 15);
+			int new_vector = (*cpustate->irq_callback)(cpustate->device, cpustate->irq_state & 15);
 			if (new_vector != -1)
 				vector = new_vector;
 		}
 
 		/* fetch the new PC and PSW from that vector */
 		assert((vector & 3) == 0);
-		new_pc = RWORD(vector);
-		new_psw = RWORD(vector + 2);
+		new_pc = RWORD(cpustate, vector);
+		new_psw = RWORD(cpustate, vector + 2);
 
 		/* push the old state, set the new one */
-		PUSH(PSW);
-		PUSH(PC);
-		PCD = new_pc;
-		PSW = new_psw;
-		t11_check_irqs();
+		PUSH(cpustate, cpustate->PSW);
+		PUSH(cpustate, cpustate->PC);
+		cpustate->PCD = new_pc;
+		cpustate->PSW = new_psw;
+		t11_check_irqs(cpustate);
 
 		/* count cycles and clear the WAIT flag */
-		t11.interrupt_cycles += 114;
-		t11.wait_state = 0;
+		cpustate->icount -= 114;
+		cpustate->wait_state = 0;
 	}
 }
 
@@ -256,8 +244,6 @@ static void t11_check_irqs(void)
 
 static CPU_GET_CONTEXT( t11 )
 {
-	if (dst)
-		*(t11_Regs *)dst = t11;
 }
 
 
@@ -270,9 +256,6 @@ static CPU_GET_CONTEXT( t11 )
 
 static CPU_SET_CONTEXT( t11 )
 {
-	if (src)
-		t11 = *(t11_Regs *)src;
-	t11_check_irqs();
 }
 
 
@@ -291,33 +274,26 @@ static CPU_INIT( t11 )
 		0x1000, 0x0000, 0xf600, 0xf400
 	};
 	const struct t11_setup *setup = device->static_config;
+	t11_state *cpustate = device->token;
 
-	t11.initial_pc = initial_pc[setup->mode >> 13];
-	t11.irq_callback = irqcallback;
-	t11.device = device;
-	t11.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->initial_pc = initial_pc[setup->mode >> 13];
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item("t11", device->tag, 0, t11.ppc.w.l);
-	state_save_register_item("t11", device->tag, 0, t11.reg[0].w.l);
-	state_save_register_item("t11", device->tag, 0, t11.reg[1].w.l);
-	state_save_register_item("t11", device->tag, 0, t11.reg[2].w.l);
-	state_save_register_item("t11", device->tag, 0, t11.reg[3].w.l);
-	state_save_register_item("t11", device->tag, 0, t11.reg[4].w.l);
-	state_save_register_item("t11", device->tag, 0, t11.reg[5].w.l);
-	state_save_register_item("t11", device->tag, 0, t11.reg[6].w.l);
-	state_save_register_item("t11", device->tag, 0, t11.reg[7].w.l);
-	state_save_register_item("t11", device->tag, 0, t11.psw.w.l);
-	state_save_register_item("t11", device->tag, 0, t11.op);
-	state_save_register_item("t11", device->tag, 0, t11.initial_pc);
-	state_save_register_item("t11", device->tag, 0, t11.wait_state);
-	state_save_register_item("t11", device->tag, 0, t11.irq_state);
-	state_save_register_item("t11", device->tag, 0, t11.interrupt_cycles);
-}
-
-
-static CPU_EXIT( t11 )
-{
-	/* nothing to do */
+	state_save_register_item("t11", device->tag, 0, cpustate->ppc.w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->reg[0].w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->reg[1].w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->reg[2].w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->reg[3].w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->reg[4].w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->reg[5].w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->reg[6].w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->reg[7].w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->psw.w.l);
+	state_save_register_item("t11", device->tag, 0, cpustate->initial_pc);
+	state_save_register_item("t11", device->tag, 0, cpustate->wait_state);
+	state_save_register_item("t11", device->tag, 0, cpustate->irq_state);
 }
 
 
@@ -330,28 +306,29 @@ static CPU_EXIT( t11 )
 
 static CPU_RESET( t11 )
 {
+	t11_state *cpustate = device->token;
+
 	/* initial SP is 376 octal, or 0xfe */
-	SP = 0x00fe;
+	cpustate->SP = 0x00fe;
 
 	/* initial PC comes from the setup word */
-	PC = t11.initial_pc;
+	cpustate->PC = cpustate->initial_pc;
 
 	/* PSW starts off at highest priority */
-	PSW = 0xe0;
+	cpustate->PSW = 0xe0;
 
 	/* initialize the IRQ state */
-	t11.irq_state = 0;
+	cpustate->irq_state = 0;
 
 	/* reset the remaining state */
-	REGD(0) = 0;
-	REGD(1) = 0;
-	REGD(2) = 0;
-	REGD(3) = 0;
-	REGD(4) = 0;
-	REGD(5) = 0;
-	t11.ppc.d = 0;
-	t11.wait_state = 0;
-	t11.interrupt_cycles = 0;
+	cpustate->REGD(0) = 0;
+	cpustate->REGD(1) = 0;
+	cpustate->REGD(2) = 0;
+	cpustate->REGD(3) = 0;
+	cpustate->REGD(4) = 0;
+	cpustate->REGD(5) = 0;
+	cpustate->ppc.d = 0;
+	cpustate->wait_state = 0;
 }
 
 
@@ -362,16 +339,13 @@ static CPU_RESET( t11 )
  *
  *************************************/
 
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(t11_state *cpustate, int irqline, int state)
 {
 	/* set the appropriate bit */
 	if (state == CLEAR_LINE)
-		t11.irq_state &= ~(1 << irqline);
+		cpustate->irq_state &= ~(1 << irqline);
 	else
-		t11.irq_state |= 1 << irqline;
-
-	/* recheck for interrupts */
-   	t11_check_irqs();
+		cpustate->irq_state |= 1 << irqline;
 }
 
 
@@ -384,33 +358,33 @@ static void set_irq_line(int irqline, int state)
 
 static CPU_EXECUTE( t11 )
 {
-	t11_ICount = cycles;
-	t11_ICount -= t11.interrupt_cycles;
-	t11.interrupt_cycles = 0;
+	t11_state *cpustate = device->token;
 
-	if (t11.wait_state)
+	cpustate->icount = cycles;
+	t11_check_irqs(cpustate);
+
+	if (cpustate->wait_state)
 	{
-		t11_ICount = 0;
+		cpustate->icount = 0;
 		goto getout;
 	}
 
 	do
 	{
-		t11.ppc = t11.reg[7];	/* copy PC to previous PC */
+		UINT16 op;
+		
+		cpustate->ppc = cpustate->reg[7];	/* copy PC to previous PC */
 
-		debugger_instruction_hook(device, PCD);
+		debugger_instruction_hook(device, cpustate->PCD);
 
-		t11.op = ROPCODE();
-		(*opcode_table[t11.op >> 3])();
+		op = ROPCODE(cpustate);
+		(*opcode_table[op >> 3])(cpustate, op);
 
-	} while (t11_ICount > 0);
+	} while (cpustate->icount > 0);
 
 getout:
 
-	t11_ICount -= t11.interrupt_cycles;
-	t11.interrupt_cycles = 0;
-
-	return cycles - t11_ICount;
+	return cycles - cpustate->icount;
 }
 
 
@@ -421,25 +395,27 @@ getout:
 
 static CPU_SET_INFO( t11 )
 {
+	t11_state *cpustate = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:		set_irq_line(T11_IRQ0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:		set_irq_line(T11_IRQ1, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ2:		set_irq_line(T11_IRQ2, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:		set_irq_line(T11_IRQ3, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:		set_irq_line(cpustate, T11_IRQ0, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:		set_irq_line(cpustate, T11_IRQ1, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ2:		set_irq_line(cpustate, T11_IRQ2, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:		set_irq_line(cpustate, T11_IRQ3, info->i);		break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + T11_PC:				PC = info->i; 				 			break;
+		case CPUINFO_INT_REGISTER + T11_PC:				cpustate->PC = info->i; 				 		break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + T11_SP:				SP = info->i;							break;
-		case CPUINFO_INT_REGISTER + T11_PSW:			PSW = info->i;							break;
-		case CPUINFO_INT_REGISTER + T11_R0:				REGW(0) = info->i;						break;
-		case CPUINFO_INT_REGISTER + T11_R1:				REGW(1) = info->i;						break;
-		case CPUINFO_INT_REGISTER + T11_R2:				REGW(2) = info->i;						break;
-		case CPUINFO_INT_REGISTER + T11_R3:				REGW(3) = info->i;						break;
-		case CPUINFO_INT_REGISTER + T11_R4:				REGW(4) = info->i;						break;
-		case CPUINFO_INT_REGISTER + T11_R5:				REGW(5) = info->i;						break;
+		case CPUINFO_INT_REGISTER + T11_SP:				cpustate->SP = info->i;							break;
+		case CPUINFO_INT_REGISTER + T11_PSW:			cpustate->PSW = info->i;						break;
+		case CPUINFO_INT_REGISTER + T11_R0:				cpustate->REGW(0) = info->i;					break;
+		case CPUINFO_INT_REGISTER + T11_R1:				cpustate->REGW(1) = info->i;					break;
+		case CPUINFO_INT_REGISTER + T11_R2:				cpustate->REGW(2) = info->i;					break;
+		case CPUINFO_INT_REGISTER + T11_R3:				cpustate->REGW(3) = info->i;					break;
+		case CPUINFO_INT_REGISTER + T11_R4:				cpustate->REGW(4) = info->i;					break;
+		case CPUINFO_INT_REGISTER + T11_R5:				cpustate->REGW(5) = info->i;					break;
 	}
 }
 
@@ -451,10 +427,12 @@ static CPU_SET_INFO( t11 )
 
 CPU_GET_INFO( t11 )
 {
+	t11_state *cpustate = (device != NULL) ? device->token : NULL;
+	
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(t11);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(t11_state);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 4;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = -1;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
@@ -475,36 +453,34 @@ CPU_GET_INFO( t11 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:		info->i = (t11.irq_state & 1) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:		info->i = (t11.irq_state & 2) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ2:		info->i = (t11.irq_state & 4) ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:		info->i = (t11.irq_state & 8) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ0:		info->i = (cpustate->irq_state & 1) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ1:		info->i = (cpustate->irq_state & 2) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ2:		info->i = (cpustate->irq_state & 4) ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + T11_IRQ3:		info->i = (cpustate->irq_state & 8) ? ASSERT_LINE : CLEAR_LINE; break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = t11.ppc.w.l;					break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc.w.l;			break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + T11_PC:				info->i = PCD;							break;
+		case CPUINFO_INT_REGISTER + T11_PC:				info->i = cpustate->PCD;				break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + T11_SP:				info->i = SPD;							break;
-		case CPUINFO_INT_REGISTER + T11_PSW:			info->i = PSW;							break;
-		case CPUINFO_INT_REGISTER + T11_R0:				info->i = REGD(0);						break;
-		case CPUINFO_INT_REGISTER + T11_R1:				info->i = REGD(1);						break;
-		case CPUINFO_INT_REGISTER + T11_R2:				info->i = REGD(2);						break;
-		case CPUINFO_INT_REGISTER + T11_R3:				info->i = REGD(3);						break;
-		case CPUINFO_INT_REGISTER + T11_R4:				info->i = REGD(4);						break;
-		case CPUINFO_INT_REGISTER + T11_R5:				info->i = REGD(5);						break;
+		case CPUINFO_INT_REGISTER + T11_SP:				info->i = cpustate->SPD;				break;
+		case CPUINFO_INT_REGISTER + T11_PSW:			info->i = cpustate->PSW;				break;
+		case CPUINFO_INT_REGISTER + T11_R0:				info->i = cpustate->REGD(0);			break;
+		case CPUINFO_INT_REGISTER + T11_R1:				info->i = cpustate->REGD(1);			break;
+		case CPUINFO_INT_REGISTER + T11_R2:				info->i = cpustate->REGD(2);			break;
+		case CPUINFO_INT_REGISTER + T11_R3:				info->i = cpustate->REGD(3);			break;
+		case CPUINFO_INT_REGISTER + T11_R4:				info->i = cpustate->REGD(4);			break;
+		case CPUINFO_INT_REGISTER + T11_R5:				info->i = cpustate->REGD(5);			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(t11);			break;
-		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(t11);		break;
-		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(t11);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(t11);					break;
+		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(t11);	break;
+		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(t11);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(t11);				break;
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(t11);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(t11);					break;
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(t11);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(t11);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &t11_ICount;				break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(t11);	break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "T11");					break;
@@ -515,24 +491,24 @@ CPU_GET_INFO( t11 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				t11.psw.b.l & 0x80 ? '?':'.',
-				t11.psw.b.l & 0x40 ? 'I':'.',
-				t11.psw.b.l & 0x20 ? 'I':'.',
-				t11.psw.b.l & 0x10 ? 'T':'.',
-				t11.psw.b.l & 0x08 ? 'N':'.',
-				t11.psw.b.l & 0x04 ? 'Z':'.',
-				t11.psw.b.l & 0x02 ? 'V':'.',
-				t11.psw.b.l & 0x01 ? 'C':'.');
+				cpustate->psw.b.l & 0x80 ? '?':'.',
+				cpustate->psw.b.l & 0x40 ? 'I':'.',
+				cpustate->psw.b.l & 0x20 ? 'I':'.',
+				cpustate->psw.b.l & 0x10 ? 'T':'.',
+				cpustate->psw.b.l & 0x08 ? 'N':'.',
+				cpustate->psw.b.l & 0x04 ? 'Z':'.',
+				cpustate->psw.b.l & 0x02 ? 'V':'.',
+				cpustate->psw.b.l & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + T11_PC:				sprintf(info->s, "PC:%04X", t11.reg[7].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_SP:				sprintf(info->s, "SP:%04X", t11.reg[6].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_PSW:			sprintf(info->s, "PSW:%02X", t11.psw.b.l);   break;
-		case CPUINFO_STR_REGISTER + T11_R0:				sprintf(info->s, "R0:%04X", t11.reg[0].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R1:				sprintf(info->s, "R1:%04X", t11.reg[1].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R2:				sprintf(info->s, "R2:%04X", t11.reg[2].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R3:				sprintf(info->s, "R3:%04X", t11.reg[3].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R4:				sprintf(info->s, "R4:%04X", t11.reg[4].w.l); break;
-		case CPUINFO_STR_REGISTER + T11_R5:				sprintf(info->s, "R5:%04X", t11.reg[5].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_PC:				sprintf(info->s, "PC:%04X", cpustate->reg[7].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_SP:				sprintf(info->s, "SP:%04X", cpustate->reg[6].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_PSW:			sprintf(info->s, "PSW:%02X", cpustate->psw.b.l);   break;
+		case CPUINFO_STR_REGISTER + T11_R0:				sprintf(info->s, "R0:%04X", cpustate->reg[0].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R1:				sprintf(info->s, "R1:%04X", cpustate->reg[1].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R2:				sprintf(info->s, "R2:%04X", cpustate->reg[2].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R3:				sprintf(info->s, "R3:%04X", cpustate->reg[3].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R4:				sprintf(info->s, "R4:%04X", cpustate->reg[4].w.l); break;
+		case CPUINFO_STR_REGISTER + T11_R5:				sprintf(info->s, "R5:%04X", cpustate->reg[5].w.l); break;
 	}
 }
