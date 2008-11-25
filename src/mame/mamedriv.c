@@ -4174,6 +4174,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( btime2 )	/* (c) 1982 */
 	DRIVER( btimem )	/* (c) 1982 + Midway */
 	DRIVER( tisland )   /* (c) 1982 */
+	DRIVER( protennb )  /* bootleg */
 	DRIVER( cookrace )	/* bootleg */
 	DRIVER( wtennis )	/* bootleg 1982 */
 	DRIVER( brubber )	/* (c) 1982 */
