@@ -1,6 +1,6 @@
 /**********************************************************************
 
- 8257 DMA interface and emulation
+    Z80 DMA interface and emulation
 
  **********************************************************************/
 
@@ -29,7 +29,7 @@ struct _z80dma_interface
 	write8_device_func	portB_write;
 
 	/* interrupt callback - not implemented */
-	/* void (*irqcb)(int state); */
+	void (*irq_cb)(const device_config *device, int state);
 };
 
 /* device interface */

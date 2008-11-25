@@ -343,7 +343,8 @@ static const z80dma_interface dk3_dma =
 
 	dk_dma_read_byte,
 	dk_dma_write_byte,
-	0, 0, 0, 0
+	0, 0, 0, 0,
+	NULL
 };
 
 static const dma8257_interface dk_dma =

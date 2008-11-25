@@ -110,7 +110,8 @@ static const z80dma_interface mario_dma =
 
 	mario_dma_read_byte,
 	mario_dma_write_byte,
-	0, 0, 0, 0
+	0, 0, 0, 0,
+	NULL
 };
 
 /*************************************
