@@ -142,9 +142,10 @@ static INPUT_PORTS_START( deshoros )
 	//                    0x40, Normal Mode again
 INPUT_PORTS_END
 
+/*Is it there an IRQ mask?*/
 static INTERRUPT_GEN( deshoros_irq )
 {
-	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, PULSE_LINE);
+	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, HOLD_LINE);
 }
 
 static MACHINE_RESET( deshoros )
