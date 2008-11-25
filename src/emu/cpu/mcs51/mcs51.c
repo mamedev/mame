@@ -2067,6 +2067,9 @@ static CPU_INIT( mcs51 )
 	mcs51_state->sfr_read = mcs51_sfr_read;
 	mcs51_state->sfr_write = mcs51_sfr_write;
 
+	/* ensure these pointers are set before get_info is called */
+	update_ptrs(mcs51_state);
+
 	/* Save states */
 
 	state_save_register_item("mcs51", device->tag, 0, mcs51_state->ppc);

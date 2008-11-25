@@ -713,6 +713,9 @@ static void mcs48_init(const device_config *device, int index, int clock, cpu_ir
 	mcs48->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
 	mcs48->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
+	/* ensure that regptr is valid before get_info gets called */
+	update_regptr(mcs48);
+
 	state_save_register_item("mcs48", device->tag, 0, mcs48->prevpc.w.l);
 	state_save_register_item("mcs48", device->tag, 0, PC);
 	state_save_register_item("mcs48", device->tag, 0, A);
