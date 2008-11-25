@@ -18,7 +18,7 @@
     DEBUGGING
 ***************************************************************************/
 
-#define VERBOSE		1
+#define VERBOSE		0
 
 #define VPRINTF(x) do { if (VERBOSE) logerror x; } while (0)
 
