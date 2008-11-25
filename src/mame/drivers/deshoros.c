@@ -17,7 +17,7 @@ TODO:
 
 static UINT8 *io_ram;
 /*Temporary,to show something on screen...*/
-static char led_array[32];
+static char led_array[21];
 
 VIDEO_START( deshoros )
 {
@@ -37,11 +37,9 @@ static void update_led_array(UINT8 new_data)
 {
 	static UINT8 i;
 	/*update the data*/
-	led_array[24] = new_data;
-	for(i=0;i<4;i++)
-		led_array[i] = 0x20;
+	led_array[20] = new_data;
 	/*scroll the data*/
-	for(i=4;i<25;i++)
+	for(i=0;i<21;i++)
 		led_array[i] = led_array[i+1];
 }
 
