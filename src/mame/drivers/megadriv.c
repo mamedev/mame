@@ -2102,7 +2102,7 @@ static void megadrive_io_write_data_port_6button(int portnum, UINT16 data)
 		if (((megadrive_io_data_regs[portnum]&0x40)==0x00) && ((data&0x40) == 0x40))
 		{
 			io_stage[portnum]++;
-			timer_adjust_oneshot(io_timeout[portnum], ATTOTIME_IN_CYCLES(8192,0), 0);
+			timer_adjust_oneshot(io_timeout[portnum], cpu_clocks_to_attotime(Machine->cpu[0],8192), 0);
 		}
 
 	}
@@ -4051,7 +4051,7 @@ VIDEO_UPDATE(megadriv)
 	/* reference */
 
 //  time_elapsed_since_crap = timer_timeelapsed(frame_timer);
-//  xxx = ATTOTIME_TO_CYCLES(0,time_elapsed_since_crap);
+//  xxx = cpu_attotime_to_clocks(screen->machine->cpu[0],time_elapsed_since_crap);
 //  mame_printf_debug("update cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 
 	return 0;
@@ -6226,7 +6226,7 @@ int megadrive_z80irq_hpos = 320;
 		frametime = ATTOSECONDS_PER_SECOND/megadriv_framerate;
 
 		time_elapsed_since_crap = timer_timeelapsed(frame_timer);
-		xxx = ATTOTIME_TO_CYCLES(0,time_elapsed_since_crap);
+		xxx = cpu_attotime_to_clocks(machine->cpu[0],time_elapsed_since_crap);
 		//mame_printf_debug("---------- cycles %d, %08x %08x\n",xxx, (UINT32)(time_elapsed_since_crap.attoseconds>>32),(UINT32)(time_elapsed_since_crap.attoseconds&0xffffffff));
 		//mame_printf_debug("---------- framet %d, %08x %08x\n",xxx, (UINT32)(frametime>>32),(UINT32)(frametime&0xffffffff));
 		timer_adjust_oneshot(frame_timer,  attotime_zero, 0);

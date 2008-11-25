@@ -1731,7 +1731,7 @@ static TIMER_CALLBACK( internal_timer_callback )
 
 	/* set the next timer, but only if it's for a reasonable number */
 	if (!dcs.timer_ignore && (dcs.timer_period > 10 || dcs.timer_scale > 1))
-		timer_adjust_oneshot(dcs.internal_timer, ATTOTIME_IN_CYCLES(target_cycles, cpu_get_index(dcs.cpu)), 0);
+		timer_adjust_oneshot(dcs.internal_timer, cpu_clocks_to_attotime(dcs.cpu, target_cycles), 0);
 	cpu_set_input_line(dcs.cpu, ADSP2105_TIMER, PULSE_LINE);
 }
 
@@ -1766,7 +1766,7 @@ static void reset_timer(running_machine *machine)
 
 	/* adjust the timer if not optimized */
 	if (!dcs.timer_ignore)
-		timer_adjust_oneshot(dcs.internal_timer, ATTOTIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_start_count + 1), cpu_get_index(dcs.cpu)), 0);
+		timer_adjust_oneshot(dcs.internal_timer, cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_start_count + 1)), 0);
 }
 
 
@@ -1776,7 +1776,7 @@ static void timer_enable_callback(int enable)
 	dcs.timer_ignore = 0;
 	if (enable)
 	{
-//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / ATTOTIME_IN_CYCLES(dcs.timer_scale * (dcs.timer_period + 1), cpu_get_index(dcs.cpu)));
+//      mame_printf_debug("Timer enabled @ %d cycles/int, or %f Hz\n", dcs.timer_scale * (dcs.timer_period + 1), 1.0 / cpu_clocks_to_attotime(dcs.cpu, dcs.timer_scale * (dcs.timer_period + 1)));
 		reset_timer(Machine);
 	}
 	else

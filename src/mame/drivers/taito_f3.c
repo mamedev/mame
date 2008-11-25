@@ -358,7 +358,7 @@ static TIMER_CALLBACK( f3_interrupt3 )
 static INTERRUPT_GEN( f3_interrupt2 )
 {
 	cpu_set_input_line(device, 2, HOLD_LINE);	// vblank
-	timer_set( ATTOTIME_IN_CYCLES(10000,0), NULL, 0, f3_interrupt3);
+	timer_set( cpu_clocks_to_attotime(device,10000), NULL, 0, f3_interrupt3);
 }
 
 static MACHINE_RESET( f3 )

@@ -248,7 +248,7 @@ static READ8_HANDLER ( combasc_YM2203_status_port_0_r )
 		if (boost)
 		{
 			boost = 0;
-			timer_adjust_periodic(combasc_interleave_timer, attotime_zero, 0, ATTOTIME_IN_CYCLES(80,1));
+			timer_adjust_periodic(combasc_interleave_timer, attotime_zero, 0, cpu_clocks_to_attotime(space->cpu,80));
 		}
 		else if (status & 2)
 		{

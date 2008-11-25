@@ -462,7 +462,7 @@ static int sh4_dma_transfer(int channel, int timermode, UINT32 chcr, UINT32 *sar
 	if (timermode == 1)
 	{
 		sh4.dma_timer_active[channel] = 1;
-		timer_adjust_oneshot(sh4.dma_timer[channel], ATTOTIME_IN_CYCLES(2*count+1, sh4.cpu_number), (sh4.cpu_number << 8) | channel);
+		timer_adjust_oneshot(sh4.dma_timer[channel], cpu_clocks_to_attotime(sh4.device, 2*count+1), (sh4.cpu_number << 8) | channel);
 	}
 	else if (timermode == 2)
 	{

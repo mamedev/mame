@@ -64,8 +64,8 @@ static INTERRUPT_GEN( gcpinbal_interrupt )
 {
 	/* Unsure of actual sequence */
 
-	timer_set(ATTOTIME_IN_CYCLES(500,0), NULL, 0, gcpinbal_interrupt1);
-//  timer_set(ATTOTIME_IN_CYCLES(1000,0), NULL, 0, gcpinbal_interrupt3);
+	timer_set(cpu_clocks_to_attotime(device,500), NULL, 0, gcpinbal_interrupt1);
+//  timer_set(cpu_clocks_to_attotime(device,1000), NULL, 0, gcpinbal_interrupt3);
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 

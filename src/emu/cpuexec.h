@@ -127,6 +127,12 @@ double cpu_get_clockscale(const device_config *device);
 /* sets the current scaling factor for a CPU's clock speed */
 void cpu_set_clockscale(const device_config *device, double clockscale);
 
+/* converts a number of clock ticks to an attotime */
+attotime cpu_clocks_to_attotime(const device_config *device, UINT32 clocks);
+
+/* converts a duration as attotime to CPU clock ticks */
+UINT32 cpu_attotime_to_clocks(const device_config *device, attotime duration);
+
 
 
 /* ----- CPU timing ----- */

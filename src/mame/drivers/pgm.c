@@ -324,7 +324,7 @@ static WRITE32_HANDLER( arm7_latch_arm_w )
 	cpuexec_trigger(space->machine, 1002);
 #else
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
-	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(100, 0));
+	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->cpu, 100));
 #endif
 }
 
@@ -358,7 +358,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 #else
 	cpu_set_input_line(space->machine->cpu[2], ARM7_FIRQ_LINE, PULSE_LINE);
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(200, 2)); // give the arm time to respond (just boosting the interleave doesn't help
+	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[2], 200)); // give the arm time to respond (just boosting the interleave doesn't help
 #endif
 }
 
@@ -740,13 +740,13 @@ static WRITE32_HANDLER( kovsh_arm7_protlatch_w )
 	}
 
 //  cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(100));
-//  cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(100, 0));
+//  cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[0], 100));
 }
 
 static READ16_HANDLER( kovsh_68k_protlatch_r )
 {
 	//cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(200));
-	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_CYCLES(600, 0));
+	cpu_spinuntil_time(space->cpu, cpu_clocks_to_attotime(space->machine->cpu[0], 600));
 
 	switch (offset)
 	{

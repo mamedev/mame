@@ -170,7 +170,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 		if( snes_ram[NMITIMEN] & 0x80 )	/* NMI only signaled if this bit set */
 		{
 			// NMI goes off about 12 cycles after this (otherwise Chrono Trigger, NFL QB Club, etc. lock up)
-			timer_adjust_oneshot(snes_nmi_timer, ATTOTIME_IN_CYCLES(12, 0), 0);
+			timer_adjust_oneshot(snes_nmi_timer, cpu_clocks_to_attotime(machine->cpu[0], 12), 0);
 		}
 	}
 

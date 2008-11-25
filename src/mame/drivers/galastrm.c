@@ -169,7 +169,7 @@ static READ32_HANDLER( galastrm_adstick_ctrl_r )
 
 static WRITE32_HANDLER( galastrm_adstick_ctrl_w )
 {
-	timer_set(ATTOTIME_IN_CYCLES(1000,0), NULL, 0, galastrm_interrupt6);
+	timer_set(cpu_clocks_to_attotime(space->cpu,1000), NULL, 0, galastrm_interrupt6);
 }
 
 /***********************************************************

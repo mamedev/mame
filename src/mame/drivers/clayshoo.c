@@ -91,11 +91,11 @@ static TIMER_CALLBACK( reset_analog_bit )
 }
 
 
-static attotime compute_duration(int analog_pos)
+static attotime compute_duration(const device_config *device, int analog_pos)
 {
 	/* the 58 comes from the length of the loop used to
        read the analog position */
-	return ATTOTIME_IN_CYCLES(58 * analog_pos, 0);
+	return cpu_clocks_to_attotime(device, 58 * analog_pos);
 }
 
 
@@ -107,8 +107,8 @@ static WRITE8_HANDLER( analog_reset_w )
 
 	analog_port_val = 0xff;
 
-	timer_adjust_oneshot(analog_timer_1, compute_duration(input_port_read(space->machine, "AN1")), 0x02);
-	timer_adjust_oneshot(analog_timer_2, compute_duration(input_port_read(space->machine, "AN2")), 0x01);
+	timer_adjust_oneshot(analog_timer_1, compute_duration(space->cpu, input_port_read(space->machine, "AN1")), 0x02);
+	timer_adjust_oneshot(analog_timer_2, compute_duration(space->cpu, input_port_read(space->machine, "AN2")), 0x01);
 }
 
 

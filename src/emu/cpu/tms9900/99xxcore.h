@@ -86,6 +86,7 @@ Other references can be found on spies.com:
 */
 
 #include "debugger.h"
+#include "cpuexec.h"
 #include "deprecat.h"
 #include "tms9900.h"
 
@@ -933,7 +934,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			/* read decrementer */
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				return ceil(ATTOTIME_TO_CYCLES(cpunum_get_active(), attotime_div(timer_timeleft(I.timer), 16)));
+				return ceil(cpu_attotime_to_clocks(I.device, attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				return I.decrementer_count;
@@ -997,7 +998,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 
 			if (I.decrementer_enabled && !(I.flag & 1))
 				/* timer mode, timer enabled */
-				value = ceil(ATTOTIME_TO_CYCLES(cpunum_get_active(), attotime_div(timer_timeleft(I.timer), 16)));
+				value = ceil(cpu_attotime_to_clocks(I.device, attotime_div(timer_timeleft(I.timer), 16)));
 			else
 				/* event counter mode or timer mode, timer disabled */
 				value = I.decrementer_count;
@@ -1830,7 +1831,7 @@ static void reset_decrementer(void)
 
 	if (I.decrementer_enabled && ! (I.flag & 1))
 		{	/* timer */
-		attotime period = ATTOTIME_IN_CYCLES(I.decrementer_interval * 16L, cpunum_get_active());
+		attotime period = cpu_clocks_to_attotime(I.device, I.decrementer_interval * 16L);
 		timer_adjust_periodic(I.timer, period, 0, period);
 	}
 }

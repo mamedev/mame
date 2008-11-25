@@ -98,10 +98,6 @@ struct _quantum_slot
     GLOBAL VARIABLES
 ***************************************************************************/
 
-/* conversion constants */
-attoseconds_t attoseconds_per_cycle[MAX_CPU];
-UINT32 cycles_per_second[MAX_CPU];
-
 /* list of active timers */
 static emu_timer timers[MAX_TIMERS];
 static emu_timer *timer_head;

@@ -38,10 +38,6 @@ enum
     MACROS
 ***************************************************************************/
 
-/* convert cycles on a given CPU to/from attotime */
-#define ATTOTIME_TO_CYCLES(cpu,t)		((t).seconds * cycles_per_second[cpu] + (t).attoseconds / attoseconds_per_cycle[cpu])
-#define ATTOTIME_IN_CYCLES(c,cpu)		(attotime_make((c) / cycles_per_second[cpu], (c) * attoseconds_per_cycle[cpu]))
-
 /* macro for the RC time constant on a 74LS123 with C > 1000pF */
 /* R is in ohms, C is in farads */
 #define TIME_OF_74LS123(r,c)			(0.45 * (double)(r) * (double)(c))
@@ -143,16 +139,6 @@ typedef struct _emu_timer emu_timer;
 
 #define MDRV_TIMER_PTR(_ptr) \
 	MDRV_DEVICE_CONFIG_DATAPTR(timer_config, ptr, _ptr)
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-/* arrays containing mappings between CPU cycle times and timer values */
-extern attoseconds_t attoseconds_per_cycle[];
-extern UINT32 cycles_per_second[];
 
 
 

@@ -558,7 +558,7 @@ static READ16_HANDLER( jpmio_r )
 
 static WRITE16_HANDLER( jpmio_w )
 {
-	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
+	UINT64 cycles = cpu_get_total_cycles(space->cpu);
 	switch (offset)
 	{
 		case 0x02:

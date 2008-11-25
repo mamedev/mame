@@ -222,8 +222,8 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 		protection_ram[offset] = val;
 		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		//timer_set(ATTOTIME_IN_CYCLES(2, mame_find_cpu_index(space->machine, "mcu")), NULL, 0, mcu_irq0_clear);
-		//timer_set(ATTOTIME_IN_CYCLES(0, mame_find_cpu_index(space->machine, "mcu")), NULL, 0, mcu_irq0_raise);
+		//timer_set(cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 2), NULL, 0, mcu_irq0_clear);
+		//timer_set(cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 0), NULL, 0, mcu_irq0_raise);
 	}
 	else
 		timer_call_after_resynch( protection_ram, (offset<<16) | val, delayed_ram16_w);

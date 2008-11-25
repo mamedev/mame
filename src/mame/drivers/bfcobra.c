@@ -1365,7 +1365,7 @@ static WRITE8_HANDLER( meter_w )
 {
 	int i;
 	int  changed = meter_latch ^ data;
-	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
+	UINT64 cycles = cpu_get_total_cycles(space->cpu);
 
 	meter_latch = data;
 
@@ -1378,7 +1378,7 @@ static WRITE8_HANDLER( meter_w )
 		if (changed & (1 << i))
 		{
 			Mechmtr_update(i, cycles, data & (1 << i) );
-			cpu_set_input_line(space->machine->cpu[1], M6809_FIRQ_LINE, PULSE_LINE );
+			cpu_set_input_line(space->cpu, M6809_FIRQ_LINE, PULSE_LINE );
 		}
  	}
 }

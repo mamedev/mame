@@ -97,7 +97,7 @@ static void update_irq_encoder(int line, int state)
 static PIT8253_OUTPUT_CHANGED( v_irq4_w )
 {
 	update_irq_encoder(INPUT_LINE_IRQ4, state);
-	vertigo_vproc(ATTOTIME_TO_CYCLES(0, attotime_sub(timer_get_time(), irq4_time)), state);
+	vertigo_vproc(cpu_attotime_to_clocks(device->machine->cpu[0], attotime_sub(timer_get_time(), irq4_time)), state);
 	irq4_time = timer_get_time();
 }
 

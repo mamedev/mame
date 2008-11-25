@@ -1033,7 +1033,7 @@ static void blitter_setup(void)
  	CUSTOM_REG(REG_DMACON) |= 0x4000;
 
 	/* set a timer */
-	timer_adjust_oneshot( amiga_blitter_timer, ATTOTIME_IN_CYCLES( blittime, 0 ), 0);
+	timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( Machine->activecpu, blittime ), 0);
 }
 
 
@@ -1399,7 +1399,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
-				timer_adjust_oneshot( amiga_blitter_timer, ATTOTIME_IN_CYCLES( BLITTER_NASTY_DELAY, 0 ), 0);
+				timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( Machine->activecpu, BLITTER_NASTY_DELAY ), 0);
 
 			break;
 
@@ -1410,7 +1410,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
-				timer_adjust_oneshot( amiga_irq_timer, ATTOTIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0);
+				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( Machine->activecpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
 			else /* if we're disabling irq's, process right away */
 				update_irqs(space->machine);
 			break;
@@ -1427,7 +1427,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
-				timer_adjust_oneshot( amiga_irq_timer, ATTOTIME_IN_CYCLES( AMIGA_IRQ_DELAY_CYCLES, 0 ), 0);
+				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( Machine->activecpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
 			else /* if we're clearing irq's, process right away */
 				update_irqs(space->machine);
 			break;

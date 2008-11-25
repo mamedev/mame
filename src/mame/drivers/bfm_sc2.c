@@ -605,7 +605,7 @@ static WRITE8_HANDLER( mmtr_w )
 {
 	int i;
 	int  changed = mmtr_latch ^ data;
-	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
+	UINT64 cycles  = cpu_get_total_cycles(space->cpu);
 
 	mmtr_latch = data;
 

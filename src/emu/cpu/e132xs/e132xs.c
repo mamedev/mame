@@ -607,7 +607,7 @@ static void adjust_timer_interrupt(void)
 	{
 		UINT64 clocks_until_int = hyperstone.tr_clocks_per_tick - (clocks_since_base % hyperstone.tr_clocks_per_tick);
 		UINT64 cycles_until_int = (clocks_until_int << hyperstone.clock_scale) + cycles_until_next_clock;
-		timer_adjust_oneshot(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int + 1, cpunum), cpunum * 2 + 1);
+		timer_adjust_oneshot(hyperstone.timer, cpu_clocks_to_attotime(Machine->activecpu, cycles_until_int + 1), cpunum * 2 + 1);
 	}
 
 	/* else if the timer interrupt is enabled, configure it to fire at the appropriate time */
@@ -624,7 +624,7 @@ static void adjust_timer_interrupt(void)
 		{
 			UINT64 clocks_until_int = mulu_32x32(delta, hyperstone.tr_clocks_per_tick);
 			UINT64 cycles_until_int = (clocks_until_int << hyperstone.clock_scale) + cycles_until_next_clock;
-			timer_adjust_oneshot(hyperstone.timer, ATTOTIME_IN_CYCLES(cycles_until_int, cpunum), cpunum * 2 + 0);
+			timer_adjust_oneshot(hyperstone.timer, cpu_clocks_to_attotime(Machine->activecpu, cycles_until_int), cpunum * 2 + 0);
 		}
 	}
 

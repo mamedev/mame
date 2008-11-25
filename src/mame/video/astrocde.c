@@ -448,7 +448,7 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		else
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector & 0xf0);
-			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
+			timer_set(cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
 		}
 
 		/* latch the feedback registers */
@@ -488,7 +488,7 @@ static TIMER_CALLBACK( scanline_callback )
 		else
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector);
-			timer_set(ATTOTIME_IN_CYCLES(1, 0), NULL, 0, interrupt_off);
+			timer_set(cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
 		}
 	}
 

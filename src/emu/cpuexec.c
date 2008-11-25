@@ -64,8 +64,11 @@ struct _cpu_class_data
 	/* this item must remain first */
 	cpu_class_header header;				/* header containing public data */
 
-	/* core interface */
+	/* cycle counting and executing */
+	UINT8			executing;				/* TRUE if the values below are valid */
 	int *			icount;					/* pointer to the icount */
+	int 			cycles_running;			/* number of cycles we are executing */
+	int				cycles_stolen;			/* number of cycles we artificially stole */
 
 	/* input states and IRQ callbacks */
 	cpu_irq_callback driver_irq;			/* driver-specific IRQ callback */
@@ -87,23 +90,14 @@ struct _cpu_class_data
 	INT32			divisor;				/* 32-bit attoseconds_per_cycle divisor */
 	UINT8			divshift;				/* right shift amount to fit the divisor into 32 bits */
 	emu_timer *		timedint_timer;			/* reference to this CPU's periodic interrupt timer */
+	UINT32			cycles_per_second;		/* cycles per second, adjusted for multipliers */
+	attoseconds_t	attoseconds_per_cycle;	/* attoseconds per adjusted clock cycle */
 
 	/* these below are hacks to support multiple interrupts per frame */
 	INT32 			iloops; 				/* number of interrupts remaining this frame */
 	emu_timer *		partial_frame_timer;	/* the timer that triggers partial frame interrupts */
 	attotime		partial_frame_period;	/* the length of one partial frame for interrupt purposes */
 };
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-/* general CPU variables */
-static int cycles_running;
-static int cycles_stolen;
-static const device_config *executingcpu;
 
 
 
@@ -375,39 +369,39 @@ void cpuexec_timeslice(running_machine *machine)
 		if (classdata->suspend == 0)
 		{
 			attotime delta = attotime_sub(target, classdata->localtime);
-			if (delta.seconds >= 0 && delta.attoseconds >= attoseconds_per_cycle[cpunum])
+			if (delta.seconds >= 0 && delta.attoseconds >= classdata->attoseconds_per_cycle)
 			{
 				/* compute how long to run */
-				cycles_running = div_64x32(delta.attoseconds >> classdata->divshift, classdata->divisor);
-				LOG(("  cpu %d: %d cycles\n", cpunum, cycles_running));
+				classdata->cycles_running = div_64x32(delta.attoseconds >> classdata->divshift, classdata->divisor);
+				LOG(("  cpu %d: %d cycles\n", cpunum, classdata->cycles_running));
 
 				profiler_mark(PROFILER_CPU1 + cpunum);
 
 				/* note that this global variable cycles_stolen can be modified */
 				/* via the call to the cpunum_execute */
-				cycles_stolen = 0;
-				executingcpu = machine->cpu[cpunum];
+				classdata->cycles_stolen = 0;
+				classdata->executing = TRUE;
 				if (!call_debugger)
-					ran = cpu_execute(machine->cpu[cpunum], cycles_running);
+					ran = cpu_execute(machine->cpu[cpunum], classdata->cycles_running);
 				else
 				{
 					debugger_start_cpu_hook(machine->cpu[cpunum], target);
-					ran = cpu_execute(machine->cpu[cpunum], cycles_running);
+					ran = cpu_execute(machine->cpu[cpunum], classdata->cycles_running);
 					debugger_stop_cpu_hook(machine->cpu[cpunum]);
 				}
 
 #ifdef MAME_DEBUG
-				if (ran < cycles_stolen)
+				if (ran < classdata->cycles_stolen)
 					fatalerror("Negative CPU cycle count!");
 #endif /* MAME_DEBUG */
 
-				executingcpu = NULL;
-				ran -= cycles_stolen;
+				classdata->executing = FALSE;
+				ran -= classdata->cycles_stolen;
 				profiler_mark(PROFILER_END);
 
 				/* account for these cycles */
 				classdata->totalcycles += ran;
-				classdata->localtime = attotime_add_attoseconds(classdata->localtime, ran * attoseconds_per_cycle[cpunum]);
+				classdata->localtime = attotime_add_attoseconds(classdata->localtime, ran * classdata->attoseconds_per_cycle);
 				LOG(("         %d ran, %d total, time = %s\n", ran, (INT32)classdata->totalcycles, attotime_string(classdata->localtime, 9)));
 
 				/* if the new local CPU time is less than our target, move the target up */
@@ -431,12 +425,12 @@ void cpuexec_timeslice(running_machine *machine)
 			attotime delta = attotime_sub(target, classdata->localtime);
 
 			/* compute how long to run */
-			cycles_running = div_64x32(delta.attoseconds >> classdata->divshift, classdata->divisor);
-			LOG(("  cpu %d: %d cycles (suspended)\n", cpunum, cycles_running));
+			classdata->cycles_running = div_64x32(delta.attoseconds >> classdata->divshift, classdata->divisor);
+			LOG(("  cpu %d: %d cycles (suspended)\n", cpunum, classdata->cycles_running));
 
-			classdata->totalcycles += cycles_running;
-			classdata->localtime = attotime_add_attoseconds(classdata->localtime, cycles_running * attoseconds_per_cycle[cpunum]);
-			LOG(("         %d skipped, %d total, time = %s\n", cycles_running, (INT32)classdata->totalcycles, attotime_string(classdata->localtime, 9)));
+			classdata->totalcycles += classdata->cycles_running;
+			classdata->localtime = attotime_add_attoseconds(classdata->localtime, classdata->cycles_running * classdata->attoseconds_per_cycle);
+			LOG(("         %d skipped, %d total, time = %s\n", classdata->cycles_running, (INT32)classdata->totalcycles, attotime_string(classdata->localtime, 9)));
 		}
 
 		/* update the suspend state (breaks steeltal if we don't) */
@@ -499,7 +493,7 @@ void cpu_suspend(const device_config *device, int reason, int eatcycles)
 	classdata->nexteatcycles = eatcycles;
 
 	/* if we're active, synchronize */
-	if (device == executingcpu)
+	if (classdata->executing)
 		cpu_abort_timeslice(device);
 }
 
@@ -517,7 +511,7 @@ void cpu_resume(const device_config *device, int reason)
 	classdata->nextsuspend &= ~reason;
 
 	/* if we're active, synchronize */
-	if (device == executingcpu)
+	if (classdata->executing)
 		cpu_abort_timeslice(device);
 }
 
@@ -600,6 +594,33 @@ void cpu_set_clockscale(const device_config *device, double clockscale)
 }
 
 
+/*-------------------------------------------------
+    cpu_clocks_to_attotime - converts a number of 
+    clock ticks to an attotime
+-------------------------------------------------*/
+
+attotime cpu_clocks_to_attotime(const device_config *device, UINT32 clocks)
+{
+	cpu_class_data *classdata = get_safe_classtoken(device);
+	if (clocks < classdata->cycles_per_second)
+		return attotime_make(0, clocks * classdata->attoseconds_per_cycle);
+	else
+		return attotime_make(clocks / classdata->cycles_per_second, (clocks % classdata->cycles_per_second) * classdata->attoseconds_per_cycle);
+}
+
+
+/*-------------------------------------------------
+    cpu_attotime_to_clocks - converts a duration 
+    as attotime to CPU clock ticks
+-------------------------------------------------*/
+
+UINT32 cpu_attotime_to_clocks(const device_config *device, attotime duration)
+{
+	cpu_class_data *classdata = get_safe_classtoken(device);
+	return duration.seconds * classdata->cycles_per_second + duration.attoseconds / classdata->attoseconds_per_cycle;
+}
+
+
 
 /***************************************************************************
     CPU TIMING
@@ -617,10 +638,10 @@ attotime cpu_get_local_time(const device_config *device)
 
 	/* if we're active, add in the time from the current slice */
 	result = classdata->localtime;
-	if (device == executingcpu)
+	if (classdata->executing)
 	{
-		int cycles = cycles_running - *classdata->icount;
-		result = attotime_add(result, ATTOTIME_IN_CYCLES(cycles, classdata->header.index));
+		int cycles = classdata->cycles_running - *classdata->icount;
+		result = attotime_add(result, cpu_clocks_to_attotime(device, cycles));
 	}
 	return result;
 }
@@ -636,8 +657,8 @@ UINT64 cpu_get_total_cycles(const device_config *device)
 {
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
-	if (device == executingcpu)
-		return classdata->totalcycles + cycles_running - *classdata->icount;
+	if (classdata->executing)
+		return classdata->totalcycles + classdata->cycles_running - *classdata->icount;
 	else
 		return classdata->totalcycles;
 }
@@ -653,7 +674,7 @@ void cpu_eat_cycles(const device_config *device, int cycles)
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
 	/* ignore if not the executing CPU */
-	if (device != executingcpu)
+	if (!classdata->executing)
 		return;
 
 	if (cycles > *classdata->icount)
@@ -672,7 +693,7 @@ void cpu_adjust_icount(const device_config *device, int delta)
 	cpu_class_data *classdata = get_safe_classtoken(device);
 
 	/* ignore if not the executing CPU */
-	if (device != executingcpu)
+	if (!classdata->executing)
 		return;
 
 	*classdata->icount += delta;
@@ -691,15 +712,15 @@ void cpu_abort_timeslice(const device_config *device)
 	int delta;
 
 	/* ignore if not the executing CPU */
-	if (device != executingcpu)
+	if (!classdata->executing)
 		return;
 
 	/* swallow the remaining cycles */
 	if (classdata->icount != NULL)
 	{
 		delta = *classdata->icount + 1;
-		cycles_stolen += delta;
-		cycles_running -= delta;
+		classdata->cycles_stolen += delta;
+		classdata->cycles_running -= delta;
 		*classdata->icount -= delta;
 	}
 }
@@ -791,14 +812,14 @@ void cpuexec_trigger(running_machine *machine, int trigger)
 {
 	int cpunum;
 
-	/* cause an immediate resynchronization */
-	if (executingcpu != NULL)
-		cpu_abort_timeslice(executingcpu);
-
 	/* look for suspended CPUs waiting for this trigger and unsuspend them */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL; cpunum++)
 	{
 		cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
+		
+		/* if we're executing, for an immediate abort */
+		if (classdata->executing)
+			cpu_abort_timeslice(machine->cpu[cpunum]);
 
 		/* see if this is a matching trigger */
 		if (classdata->suspend != 0 && classdata->trigger == trigger)
@@ -1067,11 +1088,11 @@ static void update_clock_information(const device_config *device)
 	INT64 attos;
 
 	/* recompute cps and spc */
-	cycles_per_second[classdata->header.index] = (double)classdata->clock * classdata->clockscale;
-	attoseconds_per_cycle[classdata->header.index] = ATTOSECONDS_PER_SECOND / ((double)classdata->clock * classdata->clockscale);
+	classdata->cycles_per_second = (double)classdata->clock * classdata->clockscale;
+	classdata->attoseconds_per_cycle = ATTOSECONDS_PER_SECOND / ((double)classdata->clock * classdata->clockscale);
 
 	/* update the CPU's divisor */
-	attos = attoseconds_per_cycle[classdata->header.index];
+	attos = classdata->attoseconds_per_cycle;
 	classdata->divshift = 0;
 	while (attos >= (1UL << 31))
 	{
@@ -1092,17 +1113,19 @@ static void update_clock_information(const device_config *device)
 
 static void compute_perfect_interleave(running_machine *machine)
 {
-	if (attoseconds_per_cycle[0] != 0)
+	if (machine->cpu[0] != NULL && machine->cpu[0]->classtoken != NULL)
 	{
-		attoseconds_t smallest = attoseconds_per_cycle[0] * cputype_get_min_cycles(machine->config->cpu[0].type);
+		cpu_class_data *classdata = machine->cpu[0]->classtoken;
+		attoseconds_t smallest = classdata->attoseconds_per_cycle * cputype_get_min_cycles(machine->config->cpu[0].type);
 		attoseconds_t perfect = ATTOSECONDS_PER_SECOND - 1;
 		int cpunum;
 
 		/* start with a huge time factor and find the 2nd smallest cycle time */
 		for (cpunum = 1; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL; cpunum++)
-			if (attoseconds_per_cycle[cpunum] != 0)
+			if (machine->cpu[cpunum] != NULL && machine->cpu[cpunum]->classtoken != NULL)
 			{
-				attoseconds_t curtime = attoseconds_per_cycle[cpunum] * cputype_get_min_cycles(machine->config->cpu[cpunum].type);
+				cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
+				attoseconds_t curtime = classdata->attoseconds_per_cycle * cputype_get_min_cycles(machine->config->cpu[cpunum].type);
 
 				/* find the 2nd smallest cycle interval */
 				if (curtime < smallest)
@@ -1111,7 +1134,7 @@ static void compute_perfect_interleave(running_machine *machine)
 					smallest = curtime;
 				}
 				else if (curtime < perfect)
-					perfect = attoseconds_per_cycle[cpunum];
+					perfect = classdata->attoseconds_per_cycle;
 			}
 
 		/* adjust the final value */

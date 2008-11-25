@@ -293,7 +293,7 @@ static WRITE32_HANDLER( znsecsel_w )
 		psx_sio_install_handler( 0, sio_dip_handler );
 		psx_sio_input( space->machine, 0, PSX_SIO_IN_DSR, 0 );
 
-		timer_adjust_oneshot( dip_timer, ATTOTIME_IN_CYCLES( 100, 0 ), 1 );
+		timer_adjust_oneshot( dip_timer, cpu_clocks_to_attotime( space->cpu, 100 ), 1 );
 	}
 
 	verboselog( 2, "znsecsel_w( %08x, %08x, %08x )\n", offset, data, mem_mask );
@@ -305,7 +305,7 @@ static TIMER_CALLBACK( dip_timer_fired )
 
 	if( param )
 	{
-		timer_adjust_oneshot( dip_timer, ATTOTIME_IN_CYCLES( 50, 0 ), 0 );
+		timer_adjust_oneshot( dip_timer, cpu_clocks_to_attotime( machine->cpu[0], 50 ), 0 );
 	}
 }
 

@@ -509,7 +509,7 @@ static TIMER_CALLBACK( atapi_xfer_end )
 		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
 
-		timer_adjust_oneshot(atapi_timer, ATTOTIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0);
+		timer_adjust_oneshot(atapi_timer, cpu_clocks_to_attotime(machine->cpu[0], (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
 	}
 	else
 	{
@@ -735,7 +735,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						timer_adjust_oneshot( atapi_timer, ATTOTIME_IN_CYCLES( ATAPI_CYCLES_PER_SECTOR, 0 ), 0 );
+						timer_adjust_oneshot( atapi_timer, cpu_clocks_to_attotime( space->cpu, ATAPI_CYCLES_PER_SECTOR ), 0 );
 						break;
 				}
 
@@ -974,7 +974,7 @@ static void cdrom_dma_write( UINT32 n_address, INT32 n_size )
 	verboselog( 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	timer_adjust_oneshot(atapi_timer, ATTOTIME_IN_CYCLES((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048)), 0), 0);
+	timer_adjust_oneshot(atapi_timer, cpu_clocks_to_attotime(Machine->cpu[0], (ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
 }
 
 static UINT32 m_n_security_control;

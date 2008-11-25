@@ -887,7 +887,7 @@ static WRITE8_HANDLER( pia_ic7_porta_w )
 static WRITE8_HANDLER( pia_ic7_portb_w )
 {
 	int meter;
-	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
+	UINT64 cycles = cpu_get_total_cycles(space->cpu);
 
 /* The meters are connected to a voltage drop sensor, where current
 flowing through them also passes through pin B7, meaning that when
@@ -928,7 +928,7 @@ static WRITE8_HANDLER( pia_ic7_cb2_w )
 {
 /* The eighth meter is connected here, because the voltage sensor
 is on PB7. */
-	long cycles  = ATTOTIME_TO_CYCLES(0, timer_get_time() );
+	UINT64 cycles = cpu_get_total_cycles(space->cpu);
 	if (data)
 	{
 		pia_set_input_b(4,mmtr_data|0x80);

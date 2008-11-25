@@ -98,7 +98,7 @@ static void sh2_timer_activate(void)
 		if(divider) {
 			max_delta <<= divider;
 			sh2->frc_base = cpu_get_total_cycles(sh2->device);
-			timer_adjust_oneshot(sh2->timer, ATTOTIME_IN_CYCLES(max_delta, cpu_get_index(sh2->device)), 0);
+			timer_adjust_oneshot(sh2->timer, cpu_clocks_to_attotime(sh2->device, max_delta), 0);
 		} else {
 			logerror("SH2.%d: Timer event in %d cycles of external clock", cpu_get_index(sh2->device), max_delta);
 		}
@@ -176,7 +176,7 @@ static void sh2_dmac_check(int dma)
 			LOG(("SH2: DMA %d start %x, %x, %x, %04x, %d, %d, %d\n", dma, src, dst, count, sh2->m[0x63+4*dma], incs, incd, size));
 
 			sh2->dma_timer_active[dma] = 1;
-			timer_adjust_oneshot(sh2->dma_timer[dma], ATTOTIME_IN_CYCLES(2*count+1, cpu_get_index(sh2->device)), dma);
+			timer_adjust_oneshot(sh2->dma_timer[dma], cpu_clocks_to_attotime(sh2->device, 2*count+1), dma);
 
 			src &= AM;
 			dst &= AM;

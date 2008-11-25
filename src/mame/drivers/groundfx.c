@@ -211,7 +211,7 @@ static WRITE32_HANDLER( groundfx_adc_w )
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
         1000 cycle delay is arbitrary */
-	timer_set(ATTOTIME_IN_CYCLES(1000,0), NULL, 0, groundfx_interrupt5);
+	timer_set(cpu_clocks_to_attotime(space->cpu,1000), NULL, 0, groundfx_interrupt5);
 }
 
 static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
