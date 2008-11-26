@@ -220,7 +220,8 @@ struct _rom_load_data
 
 
 /* ----- start/stop macros ----- */
-#define ROM_START(name)								static const rom_entry rom_##name[] = {
+#define ROM_NAME(name)								rom_##name
+#define ROM_START(name)								static const rom_entry ROM_NAME(name)[] = {
 #define ROM_END										{ NULL, NULL, 0, 0, ROMENTRYTYPE_END } };
 
 

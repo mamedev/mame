@@ -189,8 +189,11 @@ union _machine_config_token
 
 
 /* start/end tags for the machine driver */
+#define MACHINE_DRIVER_NAME(_name) \
+	machine_config_##_name
+
 #define MACHINE_DRIVER_START(_name) \
-	const machine_config_token machine_config_##_name[] = {
+	const machine_config_token MACHINE_DRIVER_NAME(_name)[] = {
 
 #define MACHINE_DRIVER_END \
 	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_END, 8) };
