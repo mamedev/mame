@@ -235,7 +235,7 @@
 #if 0
 #define SSH 													\
 	tmp = S = A & X;											\
-	tmp &= (UINT8)(memory_raw_read_byte(m6502->space, (PCW + 1) & 0xffff) + 1)
+	tmp &= (UINT8)(memory_raw_read_byte(cpustate->space, (PCW + 1) & 0xffff) + 1)
 #endif
 
 /* 6510 ********************************************************
@@ -264,7 +264,7 @@
 #define KIL 													\
 	PCW--;														\
 	logerror("M6510 KILL opcode %04x: %02x\n",                  \
-				PCW, memory_decrypted_read_byte(m6502->space, PCW))
+				PCW, memory_decrypted_read_byte(cpustate->space, PCW))
 
 /* N2A03 *******************************************************
  *  ARR logical and, rotate right - no decimal mode

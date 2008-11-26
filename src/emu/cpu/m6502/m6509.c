@@ -97,31 +97,31 @@ static void *token;
 
 static READ8_HANDLER( m6509_read_00000 )
 {
-	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
+	m6509_Regs *cpustate = (m6509_Regs *)space->cpu->token;
 
-	return m6509->pc_bank.b.h2;
+	return cpustate->pc_bank.b.h2;
 }
 
 static READ8_HANDLER( m6509_read_00001 )
 {
-	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
+	m6509_Regs *cpustate = (m6509_Regs *)space->cpu->token;
 
-	return m6509->ind_bank.b.h2;
+	return cpustate->ind_bank.b.h2;
 }
 
 static WRITE8_HANDLER( m6509_write_00000 )
 {
-	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
+	m6509_Regs *cpustate = (m6509_Regs *)space->cpu->token;
 
-	m6509->pc_bank.b.h2=data&0xf;
-	m6509->pc.w.h=m6509->pc_bank.w.h;
+	cpustate->pc_bank.b.h2=data&0xf;
+	cpustate->pc.w.h=cpustate->pc_bank.w.h;
 }
 
 static WRITE8_HANDLER( m6509_write_00001 )
 {
-	m6509_Regs *m6509 = (m6509_Regs *)space->cpu->token;
+	m6509_Regs *cpustate = (m6509_Regs *)space->cpu->token;
 
-	m6509->ind_bank.b.h2=data&0xf;
+	cpustate->ind_bank.b.h2=data&0xf;
 }
 
 static ADDRESS_MAP_START(m6509_mem, ADDRESS_SPACE_PROGRAM, 8)
@@ -134,37 +134,36 @@ static void default_wdmem_id(const address_space *space, offs_t address, UINT8 d
 
 static CPU_INIT( m6509 )
 {
-	m6509_Regs *m6509 = device->token;
+	m6509_Regs *cpustate = device->token;
 
 	token = device->token;	// temporary
 
-	m6509->rdmem_id = default_rdmem_id;
-	m6509->wrmem_id = default_wdmem_id;
-	m6509->irq_callback = irqcallback;
-	m6509->device = device;
-	m6509->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->rdmem_id = default_rdmem_id;
+	cpustate->wrmem_id = default_wdmem_id;
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->space = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m6509 )
 {
-	m6509_Regs *m6509 = device->token;
-	m6509_Regs *m6502 = m6509;
+	m6509_Regs *cpustate = device->token;
 
-	m6509->insn = insn6509;
+	cpustate->insn = insn6509;
 
-	m6509->pc_bank.d=m6509->ind_bank.d=0;
-	m6509->pc_bank.b.h2=m6509->ind_bank.b.h2=0xf; /* cbm500 needs this */
-	m6509->pc.w.h=m6509->pc_bank.w.h;
+	cpustate->pc_bank.d=cpustate->ind_bank.d=0;
+	cpustate->pc_bank.b.h2=cpustate->ind_bank.b.h2=0xf; /* cbm500 needs this */
+	cpustate->pc.w.h=cpustate->pc_bank.w.h;
 	/* wipe out the rest of the m6509 structure */
 	/* read the reset vector into PC */
 	PCL = RDMEM(M6509_RST_VEC|PB);
 	PCH = RDMEM((M6509_RST_VEC+1)|PB);
 
-	m6509->sp.d = 0x01ff;
-	m6509->p = F_T|F_B|F_I|F_Z|(P&F_D);	/* set T, I and Z flags */
-	m6509->pending_irq = 0;	/* nonzero if an IRQ is pending */
-	m6509->after_cli = 0;	/* pending IRQ and last insn cleared I */
-	m6509->irq_callback = NULL;
+	cpustate->sp.d = 0x01ff;
+	cpustate->p = F_T|F_B|F_I|F_Z|(P&F_D);	/* set T, I and Z flags */
+	cpustate->pending_irq = 0;	/* nonzero if an IRQ is pending */
+	cpustate->after_cli = 0;	/* pending IRQ and last insn cleared I */
+	cpustate->irq_callback = NULL;
 }
 
 static CPU_EXIT( m6509 )
@@ -178,44 +177,43 @@ static CPU_GET_CONTEXT( m6509 )
 
 static CPU_SET_CONTEXT( m6509 )
 {
-	m6509_Regs *m6502;
+	m6509_Regs *cpustate;
 
 	if( src )
 	{
 		token = src;
-		m6502 = token;
+		cpustate = token;
 	}
 }
 
 
 
-INLINE void m6509_take_irq(	m6509_Regs *m6502)
+INLINE void m6509_take_irq(	m6509_Regs *cpustate)
 {
 
 	if( !(P & F_I) )
 	{
 		EAD = M6509_IRQ_VEC;
 		EAWH = PBWH;
-		m6502->icount -= 2;
+		cpustate->icount -= 2;
 		PUSH(PCH);
 		PUSH(PCL);
 		PUSH(P & ~F_B);
 		P |= F_I;		/* knock out D and set I flag */
 		PCL = RDMEM(EAD);
 		PCH = RDMEM(EAD+1);
-		LOG(("M6509#%d takes IRQ ($%04x)\n", cpunum_get_active(), PCD));
+		LOG(("M6509 '%s' takes IRQ ($%04x)\n", cpustate->device->tag, PCD));
 		/* call back the cpuintrf to let it clear the line */
-		if (m6502->irq_callback) (*m6502->irq_callback)(m6502->device, 0);
+		if (cpustate->irq_callback) (*cpustate->irq_callback)(cpustate->device, 0);
 	}
-	m6502->pending_irq = 0;
+	cpustate->pending_irq = 0;
 }
 
 static CPU_EXECUTE( m6509 )
 {
-	m6509_Regs *m6502 = device->token;
-	m6509_Regs *m6509 = m6502;
+	m6509_Regs *cpustate = device->token;
 
-	m6502->icount = cycles;
+	cpustate->icount = cycles;
 
 	do
 	{
@@ -225,21 +223,21 @@ static CPU_EXECUTE( m6509 )
 		debugger_instruction_hook(device, PCD);
 
 		/* if an irq is pending, take it now */
-		if( m6509->pending_irq )
-			m6509_take_irq(m6509);
+		if( cpustate->pending_irq )
+			m6509_take_irq(cpustate);
 
 		op = RDOP();
-		(*m6509->insn[op])(m6509);
+		(*cpustate->insn[op])(cpustate);
 
 		/* check if the I flag was just reset (interrupts enabled) */
-		if( m6509->after_cli )
+		if( cpustate->after_cli )
 		{
-			LOG(("M6509#%d after_cli was >0", cpunum_get_active()));
-			m6509->after_cli = 0;
-			if (m6509->irq_state != CLEAR_LINE)
+			LOG(("M6509 '%s' after_cli was >0", cpustate->device->tag));
+			cpustate->after_cli = 0;
+			if (cpustate->irq_state != CLEAR_LINE)
 			{
 				LOG((": irq line is asserted: set pending IRQ\n"));
-				m6509->pending_irq = 1;
+				cpustate->pending_irq = 1;
 			}
 			else
 			{
@@ -247,54 +245,52 @@ static CPU_EXECUTE( m6509 )
 			}
 		}
 		else
-		if( m6509->pending_irq )
-			m6509_take_irq(m6502);
+		if( cpustate->pending_irq )
+			m6509_take_irq(cpustate);
 
-	} while (m6502->icount > 0);
+	} while (cpustate->icount > 0);
 
-	return cycles - m6502->icount;
+	return cycles - cpustate->icount;
 }
 
-static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
+static void m6509_set_irq_line(m6509_Regs *cpustate, int irqline, int state)
 {
-	m6509_Regs *m6502 = m6509;
-
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (m6509->nmi_state == state) return;
-		m6509->nmi_state = state;
+		if (cpustate->nmi_state == state) return;
+		cpustate->nmi_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6509#%d set_nmi_line(ASSERT)\n", cpunum_get_active()));
+			LOG(( "M6509 '%s' set_nmi_line(ASSERT)\n", cpustate->device->tag));
 			EAD = M6509_NMI_VEC;
 			EAWH = PBWH;
-			m6502->icount -= 2;
+			cpustate->icount -= 2;
 			PUSH(PCH);
 			PUSH(PCL);
 			PUSH(P & ~F_B);
 			P |= F_I;		/* knock out D and set I flag */
 			PCL = RDMEM(EAD);
 			PCH = RDMEM(EAD+1);
-			LOG(("M6509#%d takes NMI ($%04x)\n", cpunum_get_active(), PCD));
+			LOG(("M6509 '%s' takes NMI ($%04x)\n", cpustate->device->tag, PCD));
 		}
 	}
 	else
 	{
 		if( irqline == M6509_SET_OVERFLOW )
 		{
-			if( m6509->so_state && !state )
+			if( cpustate->so_state && !state )
 			{
-				LOG(( "M6509#%d set overflow\n", cpunum_get_active()));
+				LOG(( "M6509 '%s' set overflow\n", cpustate->device->tag));
 				P|=F_V;
 			}
-			m6509->so_state=state;
+			cpustate->so_state=state;
 			return;
 		}
-		m6509->irq_state = state;
+		cpustate->irq_state = state;
 		if( state != CLEAR_LINE )
 		{
-			LOG(( "M6509#%d set_irq_line(ASSERT)\n", cpunum_get_active()));
-			m6509->pending_irq = 1;
+			LOG(( "M6509 '%s' set_irq_line(ASSERT)\n", cpustate->device->tag));
+			cpustate->pending_irq = 1;
 		}
 	}
 }
@@ -305,32 +301,31 @@ static void m6509_set_irq_line(m6509_Regs *m6509, int irqline, int state)
 
 static CPU_SET_INFO( m6509 )
 {
-	m6509_Regs *m6509 = device->token;
-	m6509_Regs *m6502 = m6509;
+	m6509_Regs *cpustate = device->token;
 
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M6509_IRQ_LINE:	m6509_set_irq_line(m6509, M6509_IRQ_LINE, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + M6509_SET_OVERFLOW:m6509_set_irq_line(m6509, M6509_SET_OVERFLOW, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m6509_set_irq_line(m6509, INPUT_LINE_NMI, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M6509_IRQ_LINE:	m6509_set_irq_line(cpustate, M6509_IRQ_LINE, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M6509_SET_OVERFLOW:m6509_set_irq_line(cpustate, M6509_SET_OVERFLOW, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	m6509_set_irq_line(cpustate, INPUT_LINE_NMI, info->i); break;
 
 		case CPUINFO_INT_PC:							PCW = info->i; 							break;
-		case CPUINFO_INT_REGISTER + M6509_PC:			m6509->pc.w.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6509_PC:			cpustate->pc.w.l = info->i;					break;
 		case CPUINFO_INT_SP:							S = info->i;							break;
-		case CPUINFO_INT_REGISTER + M6509_S:			m6509->sp.b.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6509_P:			m6509->p = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6509_A:			m6509->a = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6509_X:			m6509->x = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6509_Y:			m6509->y = info->i;						break;
-		case CPUINFO_INT_REGISTER + M6509_PC_BANK:		m6509->pc_bank.b.h2 = info->i;			break;
-		case CPUINFO_INT_REGISTER + M6509_IND_BANK:		m6509->ind_bank.b.h2 = info->i;			break;
-		case CPUINFO_INT_REGISTER + M6509_EA:			m6509->ea.w.l = info->i;					break;
-		case CPUINFO_INT_REGISTER + M6509_ZP:			m6509->zp.w.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6509_S:			cpustate->sp.b.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6509_P:			cpustate->p = info->i;						break;
+		case CPUINFO_INT_REGISTER + M6509_A:			cpustate->a = info->i;						break;
+		case CPUINFO_INT_REGISTER + M6509_X:			cpustate->x = info->i;						break;
+		case CPUINFO_INT_REGISTER + M6509_Y:			cpustate->y = info->i;						break;
+		case CPUINFO_INT_REGISTER + M6509_PC_BANK:		cpustate->pc_bank.b.h2 = info->i;			break;
+		case CPUINFO_INT_REGISTER + M6509_IND_BANK:		cpustate->ind_bank.b.h2 = info->i;			break;
+		case CPUINFO_INT_REGISTER + M6509_EA:			cpustate->ea.w.l = info->i;					break;
+		case CPUINFO_INT_REGISTER + M6509_ZP:			cpustate->zp.w.l = info->i;					break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	m6509->rdmem_id = (m6502_read_indexed_func) info->f; break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	m6509->wrmem_id = (m6502_write_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	cpustate->rdmem_id = (m6502_read_indexed_func) info->f; break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	cpustate->wrmem_id = (m6502_write_indexed_func) info->f; break;
 	}
 }
 
@@ -342,13 +337,12 @@ static CPU_SET_INFO( m6509 )
 
 CPU_GET_INFO( m6509 )
 {
-	m6509_Regs *m6502 = (device != NULL) ? device->token : NULL;
-	m6509_Regs *m6509 = m6502;
+	m6509_Regs *cpustate = (device != NULL) ? device->token : NULL;
 
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6502);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6509_Regs);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 2;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
@@ -369,24 +363,24 @@ CPU_GET_INFO( m6509 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + M6509_IRQ_LINE:	info->i = m6509->irq_state;				break;
-		case CPUINFO_INT_INPUT_STATE + M6509_SET_OVERFLOW:info->i = m6509->so_state;				break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = m6509->nmi_state;				break;
+		case CPUINFO_INT_INPUT_STATE + M6509_IRQ_LINE:	info->i = cpustate->irq_state;				break;
+		case CPUINFO_INT_INPUT_STATE + M6509_SET_OVERFLOW:info->i = cpustate->so_state;				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_state;				break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = m6509->ppc.w.l;				break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->ppc.w.l;				break;
 
 		case CPUINFO_INT_PC:							info->i = PCD;							break;
-		case CPUINFO_INT_REGISTER + M6509_PC:			info->i = m6509->pc.w.l;					break;
+		case CPUINFO_INT_REGISTER + M6509_PC:			info->i = cpustate->pc.w.l;					break;
 		case CPUINFO_INT_SP:							info->i = S;							break;
-		case CPUINFO_INT_REGISTER + M6509_S:			info->i = m6509->sp.b.l;					break;
-		case CPUINFO_INT_REGISTER + M6509_P:			info->i = m6509->p;						break;
-		case CPUINFO_INT_REGISTER + M6509_A:			info->i = m6509->a;						break;
-		case CPUINFO_INT_REGISTER + M6509_X:			info->i = m6509->x;						break;
-		case CPUINFO_INT_REGISTER + M6509_Y:			info->i = m6509->y;						break;
-		case CPUINFO_INT_REGISTER + M6509_PC_BANK:		info->i = m6509->pc_bank.b.h2;			break;
-		case CPUINFO_INT_REGISTER + M6509_IND_BANK:		info->i = m6509->ind_bank.b.h2;			break;
-		case CPUINFO_INT_REGISTER + M6509_EA:			info->i = m6509->ea.w.l;					break;
-		case CPUINFO_INT_REGISTER + M6509_ZP:			info->i = m6509->zp.w.l;					break;
+		case CPUINFO_INT_REGISTER + M6509_S:			info->i = cpustate->sp.b.l;					break;
+		case CPUINFO_INT_REGISTER + M6509_P:			info->i = cpustate->p;						break;
+		case CPUINFO_INT_REGISTER + M6509_A:			info->i = cpustate->a;						break;
+		case CPUINFO_INT_REGISTER + M6509_X:			info->i = cpustate->x;						break;
+		case CPUINFO_INT_REGISTER + M6509_Y:			info->i = cpustate->y;						break;
+		case CPUINFO_INT_REGISTER + M6509_PC_BANK:		info->i = cpustate->pc_bank.b.h2;			break;
+		case CPUINFO_INT_REGISTER + M6509_IND_BANK:		info->i = cpustate->ind_bank.b.h2;			break;
+		case CPUINFO_INT_REGISTER + M6509_EA:			info->i = cpustate->ea.w.l;					break;
+		case CPUINFO_INT_REGISTER + M6509_ZP:			info->i = cpustate->zp.w.l;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6509);			break;
@@ -398,10 +392,10 @@ CPU_GET_INFO( m6509 )
 		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6509);			break;
 		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6502);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6502->icount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;			break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP:			info->internal_map8 = ADDRESS_MAP_NAME(m6509_mem); break;
-		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) m6509->rdmem_id;		break;
-		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) m6509->wrmem_id;		break;
+		case CPUINFO_PTR_M6502_READINDEXED_CALLBACK:	info->f = (genf *) cpustate->rdmem_id;		break;
+		case CPUINFO_PTR_M6502_WRITEINDEXED_CALLBACK:	info->f = (genf *) cpustate->wrmem_id;		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case CPUINFO_STR_NAME:							strcpy(info->s, "M6509");				break;
@@ -412,26 +406,26 @@ CPU_GET_INFO( m6509 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				m6509->p & 0x80 ? 'N':'.',
-				m6509->p & 0x40 ? 'V':'.',
-				m6509->p & 0x20 ? 'R':'.',
-				m6509->p & 0x10 ? 'B':'.',
-				m6509->p & 0x08 ? 'D':'.',
-				m6509->p & 0x04 ? 'I':'.',
-				m6509->p & 0x02 ? 'Z':'.',
-				m6509->p & 0x01 ? 'C':'.');
+				cpustate->p & 0x80 ? 'N':'.',
+				cpustate->p & 0x40 ? 'V':'.',
+				cpustate->p & 0x20 ? 'R':'.',
+				cpustate->p & 0x10 ? 'B':'.',
+				cpustate->p & 0x08 ? 'D':'.',
+				cpustate->p & 0x04 ? 'I':'.',
+				cpustate->p & 0x02 ? 'Z':'.',
+				cpustate->p & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + M6509_PC:			sprintf(info->s, "PC:%04X", m6509->pc.w.l); break;
-		case CPUINFO_STR_REGISTER + M6509_S:			sprintf(info->s, "S:%02X", m6509->sp.b.l); break;
-		case CPUINFO_STR_REGISTER + M6509_P:			sprintf(info->s, "P:%02X", m6509->p); break;
-		case CPUINFO_STR_REGISTER + M6509_A:			sprintf(info->s, "A:%02X", m6509->a); break;
-		case CPUINFO_STR_REGISTER + M6509_X:			sprintf(info->s, "X:%02X", m6509->x); break;
-		case CPUINFO_STR_REGISTER + M6509_Y:			sprintf(info->s, "Y:%02X", m6509->y); break;
-		case CPUINFO_STR_REGISTER + M6509_PC_BANK:		sprintf(info->s, "M0:%01X", m6509->pc_bank.b.h2); break;
-		case CPUINFO_STR_REGISTER + M6509_IND_BANK:		sprintf(info->s, "M1:%01X", m6509->ind_bank.b.h2); break;
-		case CPUINFO_STR_REGISTER + M6509_EA:			sprintf(info->s, "EA:%04X", m6509->ea.w.l); break;
-		case CPUINFO_STR_REGISTER + M6509_ZP:			sprintf(info->s, "ZP:%03X", m6509->zp.w.l); break;
+		case CPUINFO_STR_REGISTER + M6509_PC:			sprintf(info->s, "PC:%04X", cpustate->pc.w.l); break;
+		case CPUINFO_STR_REGISTER + M6509_S:			sprintf(info->s, "S:%02X", cpustate->sp.b.l); break;
+		case CPUINFO_STR_REGISTER + M6509_P:			sprintf(info->s, "P:%02X", cpustate->p); break;
+		case CPUINFO_STR_REGISTER + M6509_A:			sprintf(info->s, "A:%02X", cpustate->a); break;
+		case CPUINFO_STR_REGISTER + M6509_X:			sprintf(info->s, "X:%02X", cpustate->x); break;
+		case CPUINFO_STR_REGISTER + M6509_Y:			sprintf(info->s, "Y:%02X", cpustate->y); break;
+		case CPUINFO_STR_REGISTER + M6509_PC_BANK:		sprintf(info->s, "M0:%01X", cpustate->pc_bank.b.h2); break;
+		case CPUINFO_STR_REGISTER + M6509_IND_BANK:		sprintf(info->s, "M1:%01X", cpustate->ind_bank.b.h2); break;
+		case CPUINFO_STR_REGISTER + M6509_EA:			sprintf(info->s, "EA:%04X", cpustate->ea.w.l); break;
+		case CPUINFO_STR_REGISTER + M6509_ZP:			sprintf(info->s, "ZP:%03X", cpustate->zp.w.l); break;
 	}
 }
 

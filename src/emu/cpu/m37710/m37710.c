@@ -258,27 +258,20 @@ static const char *const m37710_tnames[8] =
 };
 #endif
 
-static void m37710_timer_cb_common(m37710i_cpu_struct *m37710i_cpu, int which, int cpunum)
+static TIMER_CALLBACK( m37710_timer_cb )
 {
+	m37710i_cpu_struct *m37710i_cpu = ptr;
+	int which = param;
 	int curirq = M37710_LINE_TIMERA0 - which;
 
-	cpu_push_context(m37710i_cpu->device->machine->cpu[cpunum]);
-	timer_adjust_oneshot(m37710i_cpu->timers[which], m37710i_cpu->reload[which], cpunum);
+	cpu_push_context(m37710i_cpu->device);
+	timer_adjust_oneshot(m37710i_cpu->timers[which], m37710i_cpu->reload[which], param);
 
 	m37710i_cpu->m37710_regs[m37710_irq_levels[curirq]] |= 0x04;
 	m37710_set_irq_line(m37710i_cpu, curirq, PULSE_LINE);
-	cpu_triggerint(m37710i_cpu->device->machine->cpu[cpunum]);
+	cpu_triggerint(m37710i_cpu->device);
 	cpu_pop_context();
 }
-
-static TIMER_CALLBACK( m37710_timer_0_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 0, cpunum); }
-static TIMER_CALLBACK( m37710_timer_1_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 1, cpunum); }
-static TIMER_CALLBACK( m37710_timer_2_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 2, cpunum); }
-static TIMER_CALLBACK( m37710_timer_3_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 3, cpunum); }
-static TIMER_CALLBACK( m37710_timer_4_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 4, cpunum); }
-static TIMER_CALLBACK( m37710_timer_5_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 5, cpunum); }
-static TIMER_CALLBACK( m37710_timer_6_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 6, cpunum); }
-static TIMER_CALLBACK( m37710_timer_7_cb ) { int cpunum = param; m37710_timer_cb_common((m37710i_cpu_struct *)ptr, 7, cpunum); }
 
 static void m37710_external_tick(m37710i_cpu_struct *m37710i_cpu, int timer, int state)
 {
@@ -956,6 +949,7 @@ static STATE_POSTLOAD( m37710_restore_state )
 static CPU_INIT( m37710 )
 {
 	m37710i_cpu_struct *m37710i_cpu = device->token;
+	int i;
 
 	memset(m37710i_cpu, 0, sizeof(m37710i_cpu));
 
@@ -968,15 +962,9 @@ static CPU_INIT( m37710 )
 
 	m37710i_cpu->source = 0;
 	m37710i_cpu->destination = 0;
-
-	m37710i_cpu->timers[0] = timer_alloc(device->machine, m37710_timer_0_cb, m37710i_cpu);
-	m37710i_cpu->timers[1] = timer_alloc(device->machine, m37710_timer_1_cb, m37710i_cpu);
-	m37710i_cpu->timers[2] = timer_alloc(device->machine, m37710_timer_2_cb, m37710i_cpu);
-	m37710i_cpu->timers[3] = timer_alloc(device->machine, m37710_timer_3_cb, m37710i_cpu);
-	m37710i_cpu->timers[4] = timer_alloc(device->machine, m37710_timer_4_cb, m37710i_cpu);
-	m37710i_cpu->timers[5] = timer_alloc(device->machine, m37710_timer_5_cb, m37710i_cpu);
-	m37710i_cpu->timers[6] = timer_alloc(device->machine, m37710_timer_6_cb, m37710i_cpu);
-	m37710i_cpu->timers[7] = timer_alloc(device->machine, m37710_timer_7_cb, m37710i_cpu);
+	
+	for (i = 0; i < 8; i++)
+		m37710i_cpu->timers[0] = timer_alloc(device->machine, m37710_timer_cb, m37710i_cpu);
 
 	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->a);
 	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->b);

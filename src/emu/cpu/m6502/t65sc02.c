@@ -32,7 +32,7 @@
 */
 
 #undef	OP
-#define OP(nn) INLINE void m65sc02_##nn(m6502_Regs *m6502)
+#define OP(nn) INLINE void m65sc02_##nn(m6502_Regs *cpustate)
 
 /*****************************************************************************
  *****************************************************************************
@@ -43,7 +43,7 @@
  * op    temp     cycles             rdmem   opc  wrmem   ********************/
 OP(63) { BSR;                                             } /* 5? BSR */
 
-static void (*const insn65sc02[0x100])(m6502_Regs *m6502) = {
+static void (*const insn65sc02[0x100])(m6502_Regs *cpustate) = {
 	m65c02_00,m65c02_01,m65c02_02,m65c02_03,m65c02_04,m65c02_05,m65c02_06,m65c02_07,
 	m65c02_08,m65c02_09,m65c02_0a,m65c02_0b,m65c02_0c,m65c02_0d,m65c02_0e,m65c02_0f,
 	m65c02_10,m65c02_11,m65c02_12,m65c02_13,m65c02_14,m65c02_15,m65c02_16,m65c02_17,

@@ -20,39 +20,39 @@
  *
  *****************************************************************************/
 
-#define ZPWH	m6502->zp.w.h
+#define ZPWH	cpustate->zp.w.h
 
-#define EAWH	m6502->ea.w.h
+#define EAWH	cpustate->ea.w.h
 
-#define PBWH	m6502->pc_bank.w.h
-#define PB		m6502->pc_bank.d
+#define PBWH	cpustate->pc_bank.w.h
+#define PB		cpustate->pc_bank.d
 
-#define IBWH	m6502->ind_bank.w.h
-#define IB		m6502->ind_bank.d
+#define IBWH	cpustate->ind_bank.w.h
+#define IB		cpustate->ind_bank.d
 
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
 #undef RDOP
-#define RDOP() memory_decrypted_read_byte(m6502->space, (PCW++)|PB); m6502->icount -= 1
+#define RDOP() memory_decrypted_read_byte(cpustate->space, (PCW++)|PB); cpustate->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #undef RDOPARG
-#define RDOPARG() memory_raw_read_byte(m6502->space, (PCW++)|PB); m6502->icount -= 1
+#define RDOPARG() memory_raw_read_byte(cpustate->space, (PCW++)|PB); cpustate->icount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
 #undef RDMEM
-#define RDMEM(addr) memory_read_byte_8le(m6502->space, addr); m6502->icount -= 1
+#define RDMEM(addr) memory_read_byte_8le(cpustate->space, addr); cpustate->icount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
 #undef WRMEM
-#define WRMEM(addr,data) memory_write_byte_8le(m6502->space, addr,data); m6502->icount -= 1
+#define WRMEM(addr,data) memory_write_byte_8le(cpustate->space, addr,data); cpustate->icount -= 1
 
 /***************************************************************
  * push a register onto the stack
@@ -128,7 +128,7 @@
 	EAH = RDMEM(ZPD);											\
 	EAWH = PBWH;												\
     if (EAL + Y > 0xff)                                         \
-		m6502->icount--; 										\
+		cpustate->icount--; 										\
 	EAW += Y
 
 
@@ -144,7 +144,7 @@
 	EAH = RDMEM(ZPD);											\
 	EAWH = IBWH;												\
     if (EAL + Y > 0xff)                                         \
-		m6502->icount--; 										\
+		cpustate->icount--; 										\
 	EAW += Y
 
 /***************************************************************
@@ -172,13 +172,13 @@
 	{															\
 		tmp = RDOPARG();										\
 		EAW = PCW + (signed char)tmp;							\
-		m6502->icount -= (PCH == EAH) ? 1 : 2;					\
+		cpustate->icount -= (PCH == EAH) ? 1 : 2;					\
 		PCD = EAD|PB;											\
 	}															\
 	else														\
 	{															\
 		PCW++;													\
-		m6502->icount -= 1;										\
+		cpustate->icount -= 1;										\
 	}
 
 /* 6502 ********************************************************
@@ -203,4 +203,4 @@
 #undef KIL
 #define KIL 													\
 	PCW--;														\
-	logerror("M6509 KILL opcode %05x: %02x\n", PCD, memory_decrypted_read_byte(m6502->space, PCD))
+	logerror("M6509 KILL opcode %05x: %02x\n", PCD, memory_decrypted_read_byte(cpustate->space, PCD))

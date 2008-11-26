@@ -128,11 +128,11 @@
 #define RD_ABX_C02_P	EA_ABX_C02_P; tmp = RDMEM(EAD)
 #define RD_ABX_C02_NP	EA_ABX_C02_NP; tmp = RDMEM(EAD)
 #define RD_ABY_C02_P	EA_ABY_C02_P; tmp = RDMEM(EAD)
-#define RD_IDY_C02_P	EA_IDY_C02_P; tmp = RDMEM_ID(EAD); m6502->icount -= 1
+#define RD_IDY_C02_P	EA_IDY_C02_P; tmp = RDMEM_ID(EAD); cpustate->icount -= 1
 
 #define WR_ABX_C02_NP	EA_ABX_C02_NP; WRMEM(EAD, tmp)
 #define WR_ABY_C02_NP	EA_ABY_C02_NP; WRMEM(EAD, tmp)
-#define WR_IDY_C02_NP	EA_IDY_C02_NP; WRMEM_ID(EAD, tmp); m6502->icount -= 1
+#define WR_IDY_C02_NP	EA_IDY_C02_NP; WRMEM_ID(EAD, tmp); cpustate->icount -= 1
 
 
 /* 65C02********************************************************

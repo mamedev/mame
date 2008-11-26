@@ -6,7 +6,7 @@
 #define DECO16_VERBOSE 0
 
 #undef	OP
-#define OP(nn) INLINE void deco16_##nn(m6502_Regs *m6502)
+#define OP(nn) INLINE void deco16_##nn(m6502_Regs *cpustate)
 
 #define DECO16_BRK									\
 	logerror("%04x: BRK\n",cpu_get_pc(Machine->activecpu));					\
@@ -84,7 +84,7 @@ OP(03) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(23) {
 	int tmp;
 
-	m6502->icount -= 1;
+	cpustate->icount -= 1;
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
@@ -94,7 +94,7 @@ OP(43) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(63) {
 	int tmp;
 
-	m6502->icount -= 1;
+	cpustate->icount -= 1;
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
@@ -104,7 +104,7 @@ OP(83) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(a3) {
 	int tmp;
 
-	m6502->icount -= 1;
+	cpustate->icount -= 1;
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
@@ -113,7 +113,7 @@ OP(a3) {
 OP(c3) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(e3) { RD_DUM; ILL; } 								/* 2 ILL */
 
-OP(13) { int tmp; m6502->icount -= 1; RD_IMM;
+OP(13) { int tmp; cpustate->icount -= 1; RD_IMM;
 
 	if (DECO16_VERBOSE)
 		logerror("%04x: OP13 %02x\n",cpu_get_pc(Machine->activecpu),tmp);
@@ -188,14 +188,14 @@ OP(27) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB2 ZPG ?? */
 OP(47) { RD_DUM; ILL; }									/* 2 ILL / 5 RMB4 ZPG ?? */
 OP(67) {
 	int tmp; RD_IMM;
-	m6502->a=memory_read_byte_8le(m6502->io,0);
+	cpustate->a=memory_read_byte_8le(cpustate->io,0);
 
 //  logerror("%04x: VBL (0x67)\n",cpu_get_pc(Machine->activecpu));
 
 // really - wait for status?
 
 } /*  */
-OP(87) { int tmp; m6502->icount -= 1; RD_IMM;
+OP(87) { int tmp; cpustate->icount -= 1; RD_IMM;
 	logerror("%04x: OP87 %02x\n",cpu_get_pc(Machine->activecpu),tmp);
 
 	  			} /*  */
@@ -266,15 +266,15 @@ OP(f7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB7 ZPG ?? */
 #define deco16_da m65c02_da								/* 3 PHX */
 #define deco16_fa m65c02_fa								/* 4 PLX */
 
-OP(0b) { int tmp; m6502->icount -= 1; RD_IMM;
+OP(0b) { int tmp; cpustate->icount -= 1; RD_IMM;
 	logerror("%04x: OP0B %02x\n",cpu_get_pc(Machine->activecpu),tmp);
 
 	  			}
 OP(2b) { RD_DUM; ILL; } 								/* 2 ILL */
-OP(4b) { int tmp; m6502->icount -= 1; RD_IMM;
+OP(4b) { int tmp; cpustate->icount -= 1; RD_IMM;
 	logerror("%04x: OP4B %02x\n",cpu_get_pc(Machine->activecpu),tmp);
 
-//  m6502->a=memory_read_byte_8le(m6502->io,0);
+//  cpustate->a=memory_read_byte_8le(cpustate->io,0);
 
 //tilt??
 
@@ -296,7 +296,7 @@ OP(9b) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(bb) {
 	int tmp;
 
-	m6502->icount -= 1;
+	cpustate->icount -= 1;
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
@@ -363,10 +363,10 @@ OP(0f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR0 ZPG ?? */
 OP(2f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR2 ZPG ?? */
 OP(4f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR4 ZPG ?? */
 OP(6f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR6 ZPG ?? */
-OP(8f) { int tmp; m6502->icount -= 1; RD_IMM;
+OP(8f) { int tmp; cpustate->icount -= 1; RD_IMM;
 	logerror("%04x: BANK (8F) %02x\n",cpu_get_pc(Machine->activecpu),tmp);
 
-	memory_write_byte_8le(m6502->io,0,tmp);
+	memory_write_byte_8le(cpustate->io,0,tmp);
 
 //swap bank in/out
 
@@ -379,7 +379,7 @@ OP(1f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR1 ZPG ?? */
 OP(3f) {
 	int tmp;
 
-	m6502->icount -= 1;
+	cpustate->icount -= 1;
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
@@ -392,7 +392,7 @@ OP(bf) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS3 ZPG ?? */
 OP(df) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS5 ZPG ?? */
 OP(ff) { RD_DUM; ILL; }									/* 2 ILL / 5 BBS7 ZPG ?? */
 
-static void (*const insndeco16[0x100])(m6502_Regs *m6502) = {
+static void (*const insndeco16[0x100])(m6502_Regs *cpustate) = {
 	deco16_00,deco16_01,deco16_02,deco16_03,deco16_04,deco16_05,deco16_06,deco16_07,
 	deco16_08,deco16_09,deco16_0a,deco16_0b,deco16_0c,deco16_0d,deco16_0e,deco16_0f,
 	deco16_10,deco16_11,deco16_12,deco16_13,deco16_14,deco16_15,deco16_16,deco16_17,

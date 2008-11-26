@@ -17,54 +17,54 @@
 #define F_N	0x80
 
 /* some shortcuts for improved readability */
-#define A	m4510->a
-#define X	m4510->x
-#define Y	m4510->y
-#define P	m4510->p
-#define Z	m4510->z
-#define B	m4510->zp.b.h
-#define SW	m4510->sp.w.l
-#define SPL	m4510->sp.b.l
-#define SPH	m4510->sp.b.h
-#define SPD	m4510->sp.d
+#define A	cpustate->a
+#define X	cpustate->x
+#define Y	cpustate->y
+#define P	cpustate->p
+#define Z	cpustate->z
+#define B	cpustate->zp.b.h
+#define SW	cpustate->sp.w.l
+#define SPL	cpustate->sp.b.l
+#define SPH	cpustate->sp.b.h
+#define SPD	cpustate->sp.d
 
-#define NZ	m4510->nz
+#define NZ	cpustate->nz
 
-#define EAL	m4510->ea.b.l
-#define EAH	m4510->ea.b.h
-#define EAW	m4510->ea.w.l
-#define EAD	m4510->ea.d
+#define EAL	cpustate->ea.b.l
+#define EAH	cpustate->ea.b.h
+#define EAW	cpustate->ea.w.l
+#define EAD	cpustate->ea.d
 
-#define ZPL	m4510->zp.b.l
-#define ZPH	m4510->zp.b.h
-#define ZPW	m4510->zp.w.l
-#define ZPD	m4510->zp.d
+#define ZPL	cpustate->zp.b.l
+#define ZPH	cpustate->zp.b.h
+#define ZPW	cpustate->zp.w.l
+#define ZPD	cpustate->zp.d
 
-#define PCL	m4510->pc.b.l
-#define PCH	m4510->pc.b.h
-#define PCW	m4510->pc.w.l
-#define PCD	m4510->pc.d
+#define PCL	cpustate->pc.b.l
+#define PCH	cpustate->pc.b.h
+#define PCW	cpustate->pc.w.l
+#define PCD	cpustate->pc.d
 
-#define PPC	m4510->ppc.d
+#define PPC	cpustate->ppc.d
 
-#define IRQ_STATE	m4510->irq_state
-#define AFTER_CLI	m4510->after_cli
+#define IRQ_STATE	cpustate->irq_state
+#define AFTER_CLI	cpustate->after_cli
 
-#define M4510_MEM(addr)	(m4510->mem[(addr)>>13]+(addr))
+#define M4510_MEM(addr)	(cpustate->mem[(addr)>>13]+(addr))
 
-#define PEEK_OP()	memory_decrypted_read_byte(m4510->space, M4510_MEM(PCW))
+#define PEEK_OP()	memory_decrypted_read_byte(cpustate->space, M4510_MEM(PCW))
 
-#define RDMEM(addr)			memory_read_byte_8le(m4510->space, M4510_MEM(addr)); m4510->icount -= 1
-#define WRMEM(addr,data)	memory_write_byte_8le(m4510->space, M4510_MEM(addr),data); m4510->icount -= 1
+#define RDMEM(addr)			memory_read_byte_8le(cpustate->space, M4510_MEM(addr)); cpustate->icount -= 1
+#define WRMEM(addr,data)	memory_write_byte_8le(cpustate->space, M4510_MEM(addr),data); cpustate->icount -= 1
 
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
 #undef RDOP
-#define RDOP() m4510_cpu_readop(m4510); m4510->icount -= 1
+#define RDOP() m4510_cpu_readop(cpustate); cpustate->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #undef RDOPARG
-#define RDOPARG() m4510_cpu_readop_arg(m4510); m4510->icount -= 1
+#define RDOPARG() m4510_cpu_readop_arg(cpustate); cpustate->icount -= 1

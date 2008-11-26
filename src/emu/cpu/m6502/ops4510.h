@@ -33,29 +33,29 @@
 	SPL = X;							\
 	if (PEEK_OP() == 0x2b /*TYS*/ ) {	            \
 		UINT8 op = RDOP();				\
-		(*m4510->insn[op])(m4510);			\
+		(*cpustate->insn[op])(cpustate);			\
 	}
 
 #undef NOP
 #define NOP       \
-  m4510->interrupt_inhibit = 0;
+  cpustate->interrupt_inhibit = 0;
 
 /* c65 docu says transfer of axyz to the mapper register
    so no readback!? */
 #define MAP 						\
-  m4510->interrupt_inhibit = 1;			\
-  m4510->low=m4510->a|(m4510->x<<8); \
-  m4510->high=m4510->y|(m4510->z<<8); \
-  m4510->mem[0]=(m4510->low&0x1000) ?  (m4510->low&0xfff)<<8:0;  \
-  m4510->mem[1]=(m4510->low&0x2000) ?  (m4510->low&0xfff)<<8:0;  \
-  m4510->mem[2]=(m4510->low&0x4000) ?  (m4510->low&0xfff)<<8:0;  \
-  m4510->mem[3]=(m4510->low&0x8000) ?  (m4510->low&0xfff)<<8:0;  \
-  m4510->mem[4]=(m4510->high&0x1000) ? (m4510->high&0xfff)<<8:0; \
-  m4510->mem[5]=(m4510->high&0x2000) ? (m4510->high&0xfff)<<8:0; \
-  m4510->mem[6]=(m4510->high&0x4000) ? (m4510->high&0xfff)<<8:0; \
-  m4510->mem[7]=(m4510->high&0x8000) ? (m4510->high&0xfff)<<8:0; \
-  m4510->icount -= 3; \
+  cpustate->interrupt_inhibit = 1;			\
+  cpustate->low=cpustate->a|(cpustate->x<<8); \
+  cpustate->high=cpustate->y|(cpustate->z<<8); \
+  cpustate->mem[0]=(cpustate->low&0x1000) ?  (cpustate->low&0xfff)<<8:0;  \
+  cpustate->mem[1]=(cpustate->low&0x2000) ?  (cpustate->low&0xfff)<<8:0;  \
+  cpustate->mem[2]=(cpustate->low&0x4000) ?  (cpustate->low&0xfff)<<8:0;  \
+  cpustate->mem[3]=(cpustate->low&0x8000) ?  (cpustate->low&0xfff)<<8:0;  \
+  cpustate->mem[4]=(cpustate->high&0x1000) ? (cpustate->high&0xfff)<<8:0; \
+  cpustate->mem[5]=(cpustate->high&0x2000) ? (cpustate->high&0xfff)<<8:0; \
+  cpustate->mem[6]=(cpustate->high&0x4000) ? (cpustate->high&0xfff)<<8:0; \
+  cpustate->mem[7]=(cpustate->high&0x8000) ? (cpustate->high&0xfff)<<8:0; \
+  cpustate->icount -= 3; \
   { \
 				UINT8 op = RDOP();								\
-				(*m4510->insn[op])(m4510);							\
+				(*cpustate->insn[op])(cpustate);							\
   }

@@ -289,7 +289,7 @@
 	t1=RDOPARG();									\
 	t2=RDOPARG();									\
 	t3=RDOPARG();									\
-	logerror("m65ce02 at pc:%.4x reserved op aug %.2x %.2x %.2x\n", cpu_get_pc(m65ce02->device),t1,t2,t3);
+	logerror("m65ce02 at pc:%.4x reserved op aug %.2x %.2x %.2x\n", cpu_get_pc(cpustate->device),t1,t2,t3);
 
 /* 65ce02 ******************************************************
  *  BBR Branch if bit is reset
@@ -676,7 +676,7 @@
 		PULL(temp);								\
 		P=(P&F_E)|F_B|(temp&~F_E);						\
 		if( IRQ_STATE != CLEAR_LINE && !(P & F_I) ) {			\
-			LOG(("M65ce02#%d PLP sets after_cli\n", cpunum_get_active()));	\
+			LOG(("M65ce02 '%s' PLP sets after_cli\n", cpustate->device->tag));	\
 			AFTER_CLI = 1;						\
 		}									\
 	} else {									\
@@ -756,7 +756,7 @@
 	PULL(PCH);									\
 	if( IRQ_STATE != CLEAR_LINE && !(P & F_I) )				\
 	{										\
-		LOG(("M65ce02#%d RTI sets after_cli\n", cpunum_get_active()));		\
+		LOG(("M65ce02 '%s' RTI sets after_cli\n", cpustate->device->tag));		\
 		AFTER_CLI = 1;							\
 	}
 
@@ -787,7 +787,7 @@
 	PULL(PCL);									\
 	PULL(PCH);									\
 	if( IRQ_STATE != CLEAR_LINE && !(P & F_I) ) {				\
-	LOG(("M65ce02#%d RTI sets after_cli\n", cpunum_get_active()));			\
+	LOG(("M65ce02 '%s' RTI sets after_cli\n", cpustate->device->tag));			\
 		AFTER_CLI = 1;							\
 	}
 
@@ -962,7 +962,7 @@
 	SPL = X;									\
 	if (PEEK_OP() == 0x2b /*TYS*/ ) {			\
 		UINT8 op = RDOP();						\
-		(*m65ce02->insn[op])(m65ce02);			\
+		(*cpustate->insn[op])(m65ce02);			\
 	}
 
 

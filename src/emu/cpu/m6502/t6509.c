@@ -24,7 +24,7 @@
  *****************************************************************************/
 
 #undef	OP
-#define OP(nn) INLINE void m6509_##nn(m6509_Regs *m6502)
+#define OP(nn) INLINE void m6509_##nn(m6509_Regs *cpustate)
 
 OP(00) {                  BRK;                 } /* 7 BRK */
 OP(20) {                  JSR;                 } /* 6 JSR */

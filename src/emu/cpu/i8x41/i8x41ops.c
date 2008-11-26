@@ -10,7 +10,7 @@
  ***********************************/
 OP_HANDLER( illegal )
 {
-	logerror("i8x41 #%d: illegal opcode at 0x%03x: %02x\n", cpunum_get_active(), PC, ROP(upi41_state, PC));
+	logerror("i8x41 '%s': illegal opcode at 0x%03x: %02x\n", upi41_state->device->tag, PC, ROP(upi41_state, PC));
 }
 
 /***********************************

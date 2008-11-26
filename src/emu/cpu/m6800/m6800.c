@@ -280,11 +280,11 @@ enum
 };
 
 /* take interrupt */
-#define TAKE_ICI enter_interrupt(m68_state, "M6800#%d take ICI\n",0xfff6)
-#define TAKE_OCI enter_interrupt(m68_state, "M6800#%d take OCI\n",0xfff4)
-#define TAKE_TOI enter_interrupt(m68_state, "M6800#%d take TOI\n",0xfff2)
-#define TAKE_SCI enter_interrupt(m68_state, "M6800#%d take SCI\n",0xfff0)
-#define TAKE_TRAP enter_interrupt(m68_state, "M6800#%d take TRAP\n",0xffee)
+#define TAKE_ICI enter_interrupt(m68_state, "M6800 '%s' take ICI\n",0xfff6)
+#define TAKE_OCI enter_interrupt(m68_state, "M6800 '%s' take OCI\n",0xfff4)
+#define TAKE_TOI enter_interrupt(m68_state, "M6800 '%s' take TOI\n",0xfff2)
+#define TAKE_SCI enter_interrupt(m68_state, "M6800 '%s' take SCI\n",0xfff0)
+#define TAKE_TRAP enter_interrupt(m68_state, "M6800 '%s' take TRAP\n",0xffee)
 
 /* operate one instruction for */
 #define ONE_MORE_INSN() {		\
@@ -533,7 +533,7 @@ INLINE void WM16(m68_state_t *m68_state, UINT32 Addr, PAIR *p )
 /* IRQ enter */
 static void enter_interrupt(m68_state_t *m68_state, const char *message,UINT16 irq_vector)
 {
-	LOG((message, cpunum_get_active()));
+	LOG((message, m68_state->device->tag));
 	if( m68_state->wai_state & (M6800_WAI|M6800_SLP) )
 	{
 		if( m68_state->wai_state & M6800_WAI )
@@ -587,7 +587,7 @@ INLINE void CHECK_IRQ_LINES(m68_state_t *m68_state)
 	{
 		if( m68_state->irq_state[M6800_IRQ_LINE] != CLEAR_LINE )
 		{	/* standard IRQ */
-			enter_interrupt(m68_state, "M6800#%d take IRQ1n",0xfff8);
+			enter_interrupt(m68_state, "M6800 '%s' take IRQ1n",0xfff8);
 			if( m68_state->irq_callback )
 				(void)(*m68_state->irq_callback)(m68_state->device, M6800_IRQ_LINE);
 		}
@@ -963,19 +963,19 @@ static void set_irq_line(m68_state_t *m68_state, int irqline, int state)
 	if (irqline == INPUT_LINE_NMI)
 	{
 		if (m68_state->nmi_state == state) return;
-		LOG(("M6800#%d set_nmi_line %d \n", cpunum_get_active(), state));
+		LOG(("M6800 '%s' set_nmi_line %d \n", m68_state->device->tag, state));
 		m68_state->nmi_state = state;
 		if (state == CLEAR_LINE) return;
 
 		/* NMI */
-		enter_interrupt(m68_state, "M6800#%d take NMI\n",0xfffc);
+		enter_interrupt(m68_state, "M6800 '%s' take NMI\n",0xfffc);
 	}
 	else
 	{
 		int eddge;
 
 		if (m68_state->irq_state[irqline] == state) return;
-		LOG(("M6800#%d set_irq_line %d,%d\n", cpunum_get_active(), irqline, state));
+		LOG(("M6800 '%s' set_irq_line %d,%d\n", m68_state->device->tag, irqline, state));
 		m68_state->irq_state[irqline] = state;
 
 		switch(irqline)
@@ -2460,7 +2460,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x0e:
 			return (m68_state->input_capture >> 8) & 0xff;
 		case 0x0f:
-			logerror("CPU #%d PC %04x: warning - read from unsupported register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),offset);
+			logerror("CPU '%s' PC %04x: warning - read from unsupported register %02x\n",space->cpu->tag,cpu_get_pc(space->cpu),offset);
 			return 0;
 		case 0x10:
 			return m68_state->rmcr;
@@ -2477,7 +2477,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x13:
 			return m68_state->tdr;
 		case 0x14:
-			logerror("CPU #%d PC %04x: read RAM control register\n",cpunum_get_active(),cpu_get_pc(space->cpu));
+			logerror("CPU '%s' PC %04x: read RAM control register\n",space->cpu->tag,cpu_get_pc(space->cpu));
 			return m68_state->ram_ctrl;
 		case 0x15:
 		case 0x16:
@@ -2491,7 +2491,7 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x1e:
 		case 0x1f:
 		default:
-			logerror("CPU #%d PC %04x: warning - read from reserved internal register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),offset);
+			logerror("CPU '%s' PC %04x: warning - read from reserved internal register %02x\n",space->cpu->tag,cpu_get_pc(space->cpu),offset);
 			return 0;
 	}
 }
@@ -2524,7 +2524,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 						| (memory_read_byte_8be(m68_state->io, M6803_PORT2) & (m68_state->port2_ddr ^ 0xff)));
 
 				if (m68_state->port2_ddr & 2)
-					logerror("CPU #%d PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",cpunum_get_active(),cpu_get_pc(space->cpu));
+					logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space->cpu->tag,cpu_get_pc(space->cpu));
 			}
 			break;
 		case 0x02:
@@ -2623,10 +2623,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x0d:
 		case 0x0e:
 		case 0x12:
-			logerror("CPU #%d PC %04x: warning - write %02x to read only internal register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
+			logerror("CPU '%s' PC %04x: warning - write %02x to read only internal register %02x\n",space->cpu->tag,cpu_get_pc(space->cpu),data,offset);
 			break;
 		case 0x0f:
-			logerror("CPU #%d PC %04x: warning - write %02x to unsupported internal register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
+			logerror("CPU '%s' PC %04x: warning - write %02x to unsupported internal register %02x\n",space->cpu->tag,cpu_get_pc(space->cpu),data,offset);
 			break;
 		case 0x10:
 			m68_state->rmcr = data & 0x0f;
@@ -2666,7 +2666,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			m68_state->tdr = data;
 			break;
 		case 0x14:
-			logerror("CPU #%d PC %04x: write %02x to RAM control register\n",cpunum_get_active(),cpu_get_pc(space->cpu),data);
+			logerror("CPU '%s' PC %04x: write %02x to RAM control register\n",space->cpu->tag,cpu_get_pc(space->cpu),data);
 			m68_state->ram_ctrl = data;
 			break;
 		case 0x15:
@@ -2681,7 +2681,7 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x1e:
 		case 0x1f:
 		default:
-			logerror("CPU #%d PC %04x: warning - write %02x to reserved internal register %02x\n",cpunum_get_active(),cpu_get_pc(space->cpu),data,offset);
+			logerror("CPU '%s' PC %04x: warning - write %02x to reserved internal register %02x\n",space->cpu->tag,cpu_get_pc(space->cpu),data,offset);
 			break;
 	}
 }

@@ -21,9 +21,9 @@
 
 #undef	OP
 #ifdef M4510
-#define OP(nn) INLINE void m4510_##nn(m4510_Regs *m4510)
+#define OP(nn) INLINE void m4510_##nn(m4510_Regs *cpustate)
 #else
-#define OP(nn) INLINE void m65ce02_##nn(m65ce02_Regs *m65ce02)
+#define OP(nn) INLINE void m65ce02_##nn(m65ce02_Regs *cpustate)
 #endif
 
 /*****************************************************************************
