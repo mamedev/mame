@@ -56,6 +56,7 @@ differences between OPL2 and OPL3 shown in datasheets:
 #include <math.h>
 
 #include "sndintrf.h"		/* use M.A.M.E. */
+#include "deprecat.h"
 #include "ymf262.h"
 
 
@@ -2264,7 +2265,7 @@ static int OPL3_LockTable(void)
 	{
 		cymfile = fopen("ymf262_.cym","wb");
 		if (cymfile)
-			timer_pulse ( ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+			timer_pulse ( Machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create ymf262_.cym file\n");
 	}

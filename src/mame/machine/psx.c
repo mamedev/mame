@@ -1565,19 +1565,19 @@ void psx_driver_init( running_machine *machine )
 
 	for( n = 0; n < 7; n++ )
 	{
-		m_p_timer_dma[ n ] = timer_alloc( dma_finished_callback , NULL);
+		m_p_timer_dma[ n ] = timer_alloc( machine, dma_finished_callback , NULL);
 		m_p_fn_dma_read[ n ] = NULL;
 		m_p_fn_dma_write[ n ] = NULL;
 	}
 
 	for( n = 0; n < 3; n++ )
 	{
-		m_p_timer_root[ n ] = timer_alloc( root_finished , NULL);
+		m_p_timer_root[ n ] = timer_alloc( machine, root_finished , NULL);
 	}
 
 	for( n = 0; n < 2; n++ )
 	{
-		m_p_timer_sio[ n ] = timer_alloc( sio_clock , NULL);
+		m_p_timer_sio[ n ] = timer_alloc( machine, sio_clock , NULL);
 	}
 
 	for( n = 0; n < 256; n++ )

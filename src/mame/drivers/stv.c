@@ -1516,7 +1516,7 @@ static void dma_direct_lv0(const address_space *space)
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
 	/*TODO: timing of this*/
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1617,7 +1617,7 @@ static void dma_direct_lv1(const address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1718,7 +1718,7 @@ static void dma_direct_lv2(const address_space *space)
 
 	if(LOG_SCU) logerror("DMA transfer END\n");
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 
 	if(scu_add_tmp & 0x80000000)
 	{
@@ -1793,7 +1793,7 @@ static void dma_indirect_lv0(const address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 }
 
 static void dma_indirect_lv1(const address_space *space)
@@ -1862,7 +1862,7 @@ static void dma_indirect_lv1(const address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 }
 
 static void dma_indirect_lv2(const address_space *space)
@@ -1930,7 +1930,7 @@ static void dma_indirect_lv2(const address_space *space)
 
 	}while(job_done == 0);
 
-	timer_set(ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
+	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv2_ended);
 }
 
 
@@ -2665,7 +2665,7 @@ static INTERRUPT_GEN( stv_interrupt )
 
 	/*TODO: timing of this one (related to the VDP1 speed)*/
 	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/
-	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen,0,0), NULL, 0, vdp1_irq);
+	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen,0,0), NULL, 0, vdp1_irq);
 }
 
 static MACHINE_RESET( stv )
@@ -2691,9 +2691,9 @@ static MACHINE_RESET( stv )
 	stvcd_reset(machine);
 
 	/* set the first scanline 0 timer to go off */
-	scan_timer = timer_alloc(hblank_in_irq, NULL);
-	t1_timer = timer_alloc(timer1_irq,NULL);
-	vblank_in_timer = timer_alloc(vblank_in_irq,NULL);
+	scan_timer = timer_alloc(machine, hblank_in_irq, NULL);
+	t1_timer = timer_alloc(machine, timer1_irq,NULL);
+	vblank_in_timer = timer_alloc(machine, vblank_in_irq,NULL);
 	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 224, 352), 0);
 }

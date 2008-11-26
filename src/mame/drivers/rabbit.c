@@ -639,7 +639,7 @@ static void rabbit_do_blit(running_machine *machine)
 				if (!blt_amount)
 				{
 					if(BLITLOG) mame_printf_debug("end of blit list\n");
-					timer_set(ATTOTIME_IN_USEC(500), NULL,0,rabbit_blit_done);
+					timer_set(machine, ATTOTIME_IN_USEC(500), NULL,0,rabbit_blit_done);
 					return;
 				}
 

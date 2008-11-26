@@ -97,8 +97,8 @@ static void update_irq_encoder(int line, int state)
 static PIT8253_OUTPUT_CHANGED( v_irq4_w )
 {
 	update_irq_encoder(INPUT_LINE_IRQ4, state);
-	vertigo_vproc(cpu_attotime_to_clocks(device->machine->cpu[0], attotime_sub(timer_get_time(), irq4_time)), state);
-	irq4_time = timer_get_time();
+	vertigo_vproc(cpu_attotime_to_clocks(device->machine->cpu[0], attotime_sub(timer_get_time(device->machine), irq4_time)), state);
+	irq4_time = timer_get_time(device->machine);
 }
 
 
@@ -188,7 +188,7 @@ static TIMER_CALLBACK( sound_command_w )
 WRITE16_HANDLER( vertigo_audio_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, sound_command_w);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, sound_command_w);
 }
 
 
@@ -221,7 +221,7 @@ MACHINE_RESET( vertigo )
 	TTL74148_update(0);
 	vertigo_vproc_init(machine);
 
-	irq4_time = timer_get_time();
+	irq4_time = timer_get_time(machine);
 	irq_state = 7;
 
 	state_save_register_global(irq_state);

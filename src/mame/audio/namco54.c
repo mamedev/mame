@@ -120,7 +120,7 @@ void namco_54xx_write(UINT8 data)
 	if (cpunum == -1)
 		return;
 
-	timer_call_after_resynch(NULL, data, namco_54xx_latch_callback);
+	timer_call_after_resynch(Machine, NULL, data, namco_54xx_latch_callback);
 
 	cpu_set_input_line(Machine->cpu[cpunum], 0, ASSERT_LINE);
 
@@ -129,5 +129,5 @@ void namco_54xx_write(UINT8 data)
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	timer_set(ATTOTIME_IN_USEC(21), NULL, cpunum, namco_54xx_irq_clear);
+	timer_set(Machine, ATTOTIME_IN_USEC(21), NULL, cpunum, namco_54xx_irq_clear);
 }

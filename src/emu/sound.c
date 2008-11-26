@@ -197,7 +197,7 @@ void sound_init(running_machine *machine)
 	finalmix = auto_malloc(machine->sample_rate * sizeof(*finalmix));
 
 	/* allocate a global timer for sound timing */
-	sound_update_timer = timer_alloc(sound_update, NULL);
+	sound_update_timer = timer_alloc(machine, sound_update, NULL);
 	timer_adjust_periodic(sound_update_timer, update_frequency, 0, update_frequency);
 
 	/* initialize the streams engine */

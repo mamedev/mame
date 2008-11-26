@@ -199,13 +199,13 @@ static TIMER_CALLBACK( kamizake_int_gen )
 	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, param, 0), param);
 
 	/* an RC circuit turns the interrupt off after a short amount of time */
-	timer_set(double_to_attotime(300 * 0.1e-6), NULL, 0, kamikaze_int_off);
+	timer_set(machine, double_to_attotime(300 * 0.1e-6), NULL, 0, kamikaze_int_off);
 }
 
 
 static MACHINE_START( kamikaze )
 {
-	int_timer = timer_alloc(kamizake_int_gen, NULL);
+	int_timer = timer_alloc(machine, kamizake_int_gen, NULL);
 	timer_adjust_oneshot(int_timer, video_screen_get_time_until_pos(machine->primary_screen, 128, 0), 128);
 }
 

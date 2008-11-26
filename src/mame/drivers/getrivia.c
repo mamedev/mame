@@ -458,7 +458,7 @@ static const ppi8255_interface gselect_ppi8255_intf[2] =
 
 static MACHINE_RESET( getrivia )
 {
-	ticket_dispenser_init(100, 1, 1);
+	ticket_dispenser_init(machine, 100, 1, 1);
 }
 
 static MACHINE_RESET( gselect )

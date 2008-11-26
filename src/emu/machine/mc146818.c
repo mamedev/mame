@@ -192,7 +192,7 @@ static TIMER_CALLBACK( mc146818_timer )
 		}
 	}
 	mc146818->updated = 1;  /* clock has been updated */
-	mc146818->last_refresh = timer_get_time();
+	mc146818->last_refresh = timer_get_time(machine);
 }
 
 
@@ -202,8 +202,8 @@ void mc146818_init(running_machine *machine, MC146818_TYPE type)
 	mc146818 = auto_malloc(sizeof(*mc146818));
 	memset(mc146818, 0, sizeof(*mc146818));
 	mc146818->type = type;
-	mc146818->last_refresh = timer_get_time();
-    timer_pulse(ATTOTIME_IN_HZ(1), NULL, 0, mc146818_timer);
+	mc146818->last_refresh = timer_get_time(machine);
+    timer_pulse(machine, ATTOTIME_IN_HZ(1), NULL, 0, mc146818_timer);
 	mc146818_set_base_datetime(machine);
 }
 
@@ -318,7 +318,7 @@ READ8_HANDLER(mc146818_port_r)
 		switch (mc146818->index % MC146818_DATA_SIZE) {
 		case 0xa:
 			data = mc146818->data[mc146818->index  % MC146818_DATA_SIZE];
-			if (attotime_compare(attotime_sub(timer_get_time(), mc146818->last_refresh), ATTOTIME_IN_HZ(32768)) < 0)
+			if (attotime_compare(attotime_sub(timer_get_time(space->machine), mc146818->last_refresh), ATTOTIME_IN_HZ(32768)) < 0)
 				data |= 0x80;
 #if 0
 			/* for pc1512 bios realtime clock test */

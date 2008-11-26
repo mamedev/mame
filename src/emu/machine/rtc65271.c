@@ -16,6 +16,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "rtc65271.h"
 
 static void field_interrupts(void);
@@ -316,9 +317,9 @@ void rtc65271_init(UINT8 *xram, void (*interrupt_callback)(int state))
 
 	rtc.xram = xram;
 
-	rtc.update_timer = timer_alloc(rtc_begin_update_callback, NULL);
+	rtc.update_timer = timer_alloc(Machine, rtc_begin_update_callback, NULL);
 	timer_adjust_periodic(rtc.update_timer, ATTOTIME_IN_SEC(1), 0, ATTOTIME_IN_SEC(1));
-	rtc.SQW_timer = timer_alloc(rtc_SQW_callback, NULL);
+	rtc.SQW_timer = timer_alloc(Machine, rtc_SQW_callback, NULL);
 	rtc.interrupt_callback = interrupt_callback;
 }
 
@@ -501,7 +502,7 @@ static TIMER_CALLBACK( rtc_begin_update_callback )
 		rtc.regs[reg_A] |= reg_A_UIP;
 
 		/* schedule end of update cycle */
-		timer_set(UPDATE_CYCLE_TIME, NULL, 0, rtc_end_update_callback);
+		timer_set(machine, UPDATE_CYCLE_TIME, NULL, 0, rtc_end_update_callback);
 	}
 }
 

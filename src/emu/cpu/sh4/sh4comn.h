@@ -143,7 +143,7 @@ void sh4_set_irln_input(int cpunum, int value);
 #ifdef LSB_FIRST
 void sh4_swap_fp_couples(void);
 #endif
-void sh4_common_init(void);
+void sh4_common_init(const device_config *device);
 
 INLINE void sh4_check_pending_irq(const char *message) // look for highest priority active exception and handle it
 {

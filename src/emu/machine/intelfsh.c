@@ -12,6 +12,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "intelfsh.h"
 
 enum
@@ -131,7 +132,7 @@ void intelflash_init(int chip, int type, void *data)
 	c->status = 0x80;
 	c->flash_mode = FM_NORMAL;
 	c->flash_master_lock = 0;
-	c->timer = timer_alloc(erase_finished, c);
+	c->timer = timer_alloc(Machine, erase_finished, c);
 	c->flash_memory = data;
 
 	state_save_register_item( "intelfsh", NULL, chip, c->status );

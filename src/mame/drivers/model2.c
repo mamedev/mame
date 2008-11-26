@@ -345,7 +345,7 @@ static MACHINE_RESET(model2_common)
 
 	for (i=0; i<4; i++)
 	{
-		model2_timers[i] = timer_alloc(model2_timer_cb, (void*)(FPTR)i);
+		model2_timers[i] = timer_alloc(machine, model2_timer_cb, (void*)(FPTR)i);
 		timer_adjust_oneshot(model2_timers[i], attotime_never, 0);
 	}
 }

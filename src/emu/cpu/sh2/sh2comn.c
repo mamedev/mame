@@ -710,13 +710,13 @@ void sh2_common_init(int alloc, const device_config *device, int index, int cloc
 		memset(sh2, 0, sizeof(SH2));
 	}
 
-	sh2->timer = timer_alloc(sh2_timer_callback, sh2);
+	sh2->timer = timer_alloc(device->machine, sh2_timer_callback, sh2);
 	timer_adjust_oneshot(sh2->timer, attotime_never, 0);
 
-	sh2->dma_timer[0] = timer_alloc(sh2_dmac_callback, sh2);
+	sh2->dma_timer[0] = timer_alloc(device->machine, sh2_dmac_callback, sh2);
 	timer_adjust_oneshot(sh2->dma_timer[0], attotime_never, 0);
 
-	sh2->dma_timer[1] = timer_alloc(sh2_dmac_callback, sh2);
+	sh2->dma_timer[1] = timer_alloc(device->machine, sh2_dmac_callback, sh2);
 	timer_adjust_oneshot(sh2->dma_timer[1], attotime_never, 0);
 
 	sh2->m = auto_malloc(0x200);

@@ -839,7 +839,7 @@ static TIMER_CALLBACK( irq_timer_clear_cb )
 	cpu_set_input_line(machine->cpu[1], IRQ_SPRITE+1, CLEAR_LINE);
 }
 
-static void irq_init(void)
+static void irq_init(running_machine *machine)
 {
 	irq_timera = 0;
 	irq_timerb = 0;
@@ -849,8 +849,8 @@ static void irq_init(void)
 	irq_timer_pend1 = 0;
 	irq_vblank = 0;
 	irq_sprite = 0;
-	irq_timer = timer_alloc(irq_timer_cb, NULL);
-	irq_timer_clear = timer_alloc(irq_timer_clear_cb, NULL);
+	irq_timer = timer_alloc(machine, irq_timer_cb, NULL);
+	irq_timer_clear = timer_alloc(machine, irq_timer_clear_cb, NULL);
 }
 
 static void irq_timer_reset(void)
@@ -1125,7 +1125,7 @@ static MACHINE_RESET( system24 )
 	fdc_init();
 	curbank = 0;
 	reset_bank(machine);
-	irq_init();
+	irq_init(machine);
 	mlatch = 0x00;
 }
 

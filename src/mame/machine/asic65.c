@@ -197,7 +197,7 @@ WRITE16_HANDLER( asic65_data_w )
 	/* rom-based use a deferred write mechanism */
 	if (asic65.type == ASIC65_ROMBASED)
 	{
-		timer_call_after_resynch(NULL, data | (offset << 16), m68k_asic65_deferred_w);
+		timer_call_after_resynch(space->machine, NULL, data | (offset << 16), m68k_asic65_deferred_w);
 		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(20));
 		return;
 	}

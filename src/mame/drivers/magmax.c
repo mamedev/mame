@@ -89,7 +89,7 @@ static TIMER_CALLBACK( scanline_callback )
 static MACHINE_START( magmax )
 {
 	/* Create interrupt timer */
-	interrupt_timer = timer_alloc(scanline_callback, NULL);
+	interrupt_timer = timer_alloc(machine, scanline_callback, NULL);
 
 	/* Set up save state */
 	state_save_register_global(sound_latch);

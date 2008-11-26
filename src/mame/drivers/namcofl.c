@@ -349,14 +349,14 @@ GFXDECODE_END
 static TIMER_CALLBACK( network_interrupt_callback )
 {
 	cpu_set_input_line(machine->cpu[0], I960_IRQ0, ASSERT_LINE);
-	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, network_interrupt_callback);
+	timer_set(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, network_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpu_set_input_line(machine->cpu[0], I960_IRQ2, ASSERT_LINE);
-	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
+	timer_set(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 }
 
 
@@ -370,14 +370,14 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 
 static MACHINE_START( namcofl )
 {
-	raster_interrupt_timer = timer_alloc(raster_interrupt_callback, NULL);
+	raster_interrupt_timer = timer_alloc(machine, raster_interrupt_callback, NULL);
 }
 
 
 static MACHINE_RESET( namcofl )
 {
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 3, 0), NULL, 0, network_interrupt_callback);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 3, 0), NULL, 0, network_interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, video_screen_get_visible_area(machine->primary_screen)->max_y + 1, 0), NULL, 0, vblank_interrupt_callback);
 }
 
 

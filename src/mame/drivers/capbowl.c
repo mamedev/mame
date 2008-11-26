@@ -129,13 +129,13 @@ static TIMER_CALLBACK( capbowl_update )
 	video_screen_update_partial(machine->primary_screen, scanline - 1);
 	scanline += 32;
 	if (scanline > 240) scanline = 32;
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, capbowl_update);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, capbowl_update);
 }
 
 
 static MACHINE_RESET( capbowl )
 {
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, capbowl_update);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, capbowl_update);
 }
 
 
@@ -492,7 +492,7 @@ static DRIVER_INIT( capbowl )
 {
 	/* Initialize the ticket dispenser to 100 milliseconds */
 	/* (I'm not sure what the correct value really is) */
-	ticket_dispenser_init(100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	ticket_dispenser_init(machine, 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 }
 
 

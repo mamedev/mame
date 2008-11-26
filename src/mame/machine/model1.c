@@ -2028,7 +2028,7 @@ static UINT32 copro_fifoout_pop(void)
 		extern void v60_stall(void);
 		v60_stall();
 
-		timer_call_after_resynch(NULL, 0, NULL);
+		timer_call_after_resynch(Machine, NULL, 0, NULL);
 
 		return 0;
 	}

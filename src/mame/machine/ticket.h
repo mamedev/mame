@@ -18,7 +18,7 @@
   activehigh = see constants above
 
 ***************************************************************************/
-void ticket_dispenser_init(int msec, int motoractivehigh, int statusactivehigh);
+void ticket_dispenser_init(running_machine *machine, int msec, int motoractivehigh, int statusactivehigh);
 
 
 /***************************************************************************

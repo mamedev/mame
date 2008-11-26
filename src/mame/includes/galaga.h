@@ -69,7 +69,7 @@ PALETTE_INIT( battles );
 
 /*----------- defined in machine/xevious.c -----------*/
 
-void battles_customio_init(void);
+void battles_customio_init(running_machine *machine);
 
 READ8_HANDLER( battles_customio0_r );
 READ8_HANDLER( battles_customio_data0_r );

@@ -2661,9 +2661,9 @@ static CPU_INIT( t90 )
 	// Timers
 
 	for (i = 0; i < 4; i++)
-		T90.timer[i] = timer_alloc(t90_timer_callback, NULL);
+		T90.timer[i] = timer_alloc(device->machine, t90_timer_callback, NULL);
 
-	T90.timer[4] = timer_alloc(t90_timer4_callback, NULL);
+	T90.timer[4] = timer_alloc(device->machine, t90_timer4_callback, NULL);
 }
 
 static ADDRESS_MAP_START(tmp90840_mem, ADDRESS_SPACE_PROGRAM, 8)

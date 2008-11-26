@@ -85,8 +85,8 @@ static TIMER_CALLBACK( pot_trigger_callback );
 static MACHINE_START( sbrkout )
 {
 	memory_set_bankptr(machine, 1, &videoram[0x380]);
-	scanline_timer = timer_alloc(scanline_callback, NULL);
-	pot_timer = timer_alloc(pot_trigger_callback, NULL);
+	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
+	pot_timer = timer_alloc(machine, pot_trigger_callback, NULL);
 
 	state_save_register_global(sync2_value);
 	state_save_register_global_array(pot_mask);

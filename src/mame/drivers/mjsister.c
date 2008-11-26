@@ -40,7 +40,7 @@ static TIMER_CALLBACK( dac_callback )
 	dac_data_w(0,DACROM[(dac_bank * 0x10000 + dac_adr++) & 0x1ffff]);
 
 	if (((dac_adr & 0xff00 ) >> 8) !=  dac_adr_e )
-		timer_set(attotime_mul(ATTOTIME_IN_HZ(MCLK), 1024), NULL, 0, dac_callback);
+		timer_set(machine, attotime_mul(ATTOTIME_IN_HZ(MCLK), 1024), NULL, 0, dac_callback);
 	else
 		dac_busy = 0;
 }
@@ -56,7 +56,7 @@ static WRITE8_HANDLER( mjsister_dac_adr_e_w )
 	dac_adr = dac_adr_s << 8;
 
 	if (dac_busy == 0)
-		timer_call_after_resynch(NULL, 0,dac_callback);
+		timer_call_after_resynch(space->machine, NULL, 0,dac_callback);
 
 	dac_busy = 1;
 }

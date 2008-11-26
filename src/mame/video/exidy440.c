@@ -374,7 +374,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							timer_set(video_screen_get_time_until_pos(screen, yoffs, currx), NULL, currx, collide_firq_callback);
+							timer_set(screen->machine, video_screen_get_time_until_pos(screen, yoffs, currx), NULL, currx, collide_firq_callback);
 					}
 					currx++;
 
@@ -387,7 +387,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap, const re
 
 						/* check the collisions bit */
 						if (check_collision && (palette[2 * pen] & 0x80) && (count++ < 128))
-							timer_set(video_screen_get_time_until_pos(screen, yoffs, currx), NULL, currx, collide_firq_callback);
+							timer_set(screen->machine, video_screen_get_time_until_pos(screen, yoffs, currx), NULL, currx, collide_firq_callback);
 					}
 					currx++;
 				}
@@ -458,7 +458,7 @@ static VIDEO_UPDATE( exidy440 )
 		attotime time = attotime_sub(video_screen_get_time_until_pos(screen, beamy, beamx), attotime_make(0, increment * 6));
 		for (i = 0; i <= 12; i++)
 		{
-			timer_set(time, NULL, beamx, beam_firq_callback);
+			timer_set(screen->machine, time, NULL, beamx, beam_firq_callback);
 			time = attotime_add(time, attotime_make(0, increment));
 		}
 	}

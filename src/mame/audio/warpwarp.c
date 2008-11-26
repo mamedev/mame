@@ -9,6 +9,7 @@
 
 #include <math.h>
 #include "driver.h"
+#include "deprecat.h"
 #include "streams.h"
 #include "sound/custom.h"
 #include "includes/warpwarp.h"
@@ -215,7 +216,7 @@ void *warpwarp_sh_start(int clock, const custom_sound_interface *config)
 
 	channel = stream_create(0, 1, CLOCK_16H, NULL, warpwarp_sound_update);
 
-	sound_volume_timer = timer_alloc(sound_volume_decay, NULL);
-	music_volume_timer = timer_alloc(music_volume_decay, NULL);
+	sound_volume_timer = timer_alloc(Machine, sound_volume_decay, NULL);
+	music_volume_timer = timer_alloc(Machine, music_volume_decay, NULL);
     return auto_malloc(1);
 }

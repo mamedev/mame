@@ -485,7 +485,7 @@ static DEVICE_START( z80ctc )
 		ctc_channel *channel = &ctc->channel[ch];
 		void *ptr = (void *)device;
 		channel->notimer = (intf->notimer >> ch) & 1;
-		channel->timer = timer_alloc(timercallback, ptr);
+		channel->timer = timer_alloc(device->machine, timercallback, ptr);
 	}
 	ctc->intr = intf->intr;
 	ctc->channel[0].zc = intf->zc0;

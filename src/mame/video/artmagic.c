@@ -93,7 +93,7 @@ void artmagic_from_shiftreg(offs_t address, UINT16 *data)
  *
  *************************************/
 
-static void execute_blit(void)
+static void execute_blit(running_machine *machine)
 {
 	UINT16 *dest = blitter_page ? artmagic_vram0 : artmagic_vram1;
 	int offset = ((blitter_data[1] & 0xff) << 16) | blitter_data[0];
@@ -303,7 +303,7 @@ static void execute_blit(void)
 	profiler_mark(PROFILER_END);
 
 #if (!INSTANT_BLIT)
-	blitter_busy_until = attotime_add(timer_get_time(), ATTOTIME_IN_NSEC(w*h*20));
+	blitter_busy_until = attotime_add(timer_get_time(machine), ATTOTIME_IN_NSEC(w*h*20));
 #endif
 }
 
@@ -317,7 +317,7 @@ READ16_HANDLER( artmagic_blitter_r )
     */
 	UINT16 result = 0xffef | (blitter_page << 4);
 #if (!INSTANT_BLIT)
-	if (attotime_compare(timer_get_time(), blitter_busy_until) < 0)
+	if (attotime_compare(timer_get_time(space->machine), blitter_busy_until) < 0)
 		result ^= 6;
 #endif
 	return result;
@@ -330,7 +330,7 @@ WRITE16_HANDLER( artmagic_blitter_w )
 
 	/* offset 3 triggers the blit */
 	if (offset == 3)
-		execute_blit();
+		execute_blit(space->machine);
 
 	/* offset 4 contains the target page */
 	else if (offset == 4)

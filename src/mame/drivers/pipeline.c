@@ -209,7 +209,7 @@ static TIMER_CALLBACK( protection_deferred_w )
 
 static WRITE8_DEVICE_HANDLER(protection_w)
 {
-	timer_call_after_resynch(NULL, data, protection_deferred_w);
+	timer_call_after_resynch(device->machine, NULL, data, protection_deferred_w);
 	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(100));
 }
 

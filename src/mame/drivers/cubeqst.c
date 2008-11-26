@@ -258,10 +258,10 @@ static TIMER_CALLBACK( delayed_bank_swap )
 }
 
 
-static void swap_linecpu_banks(void)
+static void swap_linecpu_banks(running_machine *machine)
 {
 	/* Best sync up before we switch banks around */
-	timer_call_after_resynch(NULL, 0, delayed_bank_swap);
+	timer_call_after_resynch(machine, NULL, 0, delayed_bank_swap);
 }
 
 
@@ -281,7 +281,7 @@ static WRITE16_HANDLER( reset_w )
 
 	/* Swap stack and pointer RAM banks on rising edge of display reset */
 	if (!BIT(reset_latch, 0) && BIT(data, 0))
-		swap_linecpu_banks();
+		swap_linecpu_banks(space->machine);
 
 	if (!BIT(data, 2))
 		device_reset(laserdisc);

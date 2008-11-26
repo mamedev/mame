@@ -208,7 +208,7 @@ static INTERRUPT_GEN( hyprduel_interrupt )
 		cpu_set_input_line(device, 2, HOLD_LINE);
 		cpu_set_input_line(device->machine->cpu[1], 1, HOLD_LINE);
 		/* the duration is a guess */
-		timer_set(ATTOTIME_IN_USEC(2500), NULL, 0x20, vblank_end_callback);
+		timer_set(device->machine, ATTOTIME_IN_USEC(2500), NULL, 0x20, vblank_end_callback);
 		rastersplit = 0;
 	} else {
 		requested_int |= 0x12;		/* hsync */
@@ -379,7 +379,7 @@ static WRITE16_HANDLER( hyprduel_blitter_w )
                        another blit. */
 					if (b1 == 0)
 					{
-						timer_set(ATTOTIME_IN_USEC(500), NULL,0,hyprduel_blit_done);
+						timer_set(space->machine, ATTOTIME_IN_USEC(500), NULL,0,hyprduel_blit_done);
 						return;
 					}
 

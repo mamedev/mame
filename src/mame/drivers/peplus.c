@@ -319,7 +319,7 @@ static void handle_lightpen( const device_config *device )
     xt = x_val * (vis_area->max_x - vis_area->min_x) / 1024 + vis_area->min_x;
     yt = y_val * (vis_area->max_y - vis_area->min_y) / 1024 + vis_area->min_y;
 
-     timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, yt, xt), (void *) device, 0, assert_lp_cb);
+     timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, yt, xt), (void *) device, 0, assert_lp_cb);
  }
 
 static MC6845_ON_VSYNC_CHANGED(crtc_vsync)

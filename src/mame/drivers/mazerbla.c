@@ -335,7 +335,7 @@ static UINT8 ls670_1[4];
 static READ8_HANDLER( ls670_0_r )
 {
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
 	return ls670_0[offset];
 }
@@ -351,7 +351,7 @@ static TIMER_CALLBACK( deferred_ls670_0_w )
 static WRITE8_HANDLER( ls670_0_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_call_after_resynch(NULL, (offset<<8) | data, deferred_ls670_0_w);
+	timer_call_after_resynch(space->machine, NULL, (offset<<8) | data, deferred_ls670_0_w);
 }
 
 
@@ -359,7 +359,7 @@ static WRITE8_HANDLER( ls670_0_w )
 static READ8_HANDLER( ls670_1_r )
 {
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
 	return ls670_1[offset];
 }
@@ -375,7 +375,7 @@ static TIMER_CALLBACK( deferred_ls670_1_w )
 static WRITE8_HANDLER( ls670_1_w )
 {
 	/* do this on a timer to let the CPUs synchronize */
-	timer_call_after_resynch(NULL, (offset<<8) | data, deferred_ls670_1_w);
+	timer_call_after_resynch(space->machine, NULL, (offset<<8) | data, deferred_ls670_1_w);
 }
 
 
@@ -1070,7 +1070,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 static WRITE8_HANDLER( main_sound_w )
 {
-	timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
+	timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
 }
 
 

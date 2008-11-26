@@ -309,9 +309,9 @@ static TIMER_CALLBACK( cvs_393hz_timer_cb )
 }
 
 
-static void start_393hz_timer(void)
+static void start_393hz_timer(running_machine *machine)
 {
-	cvs_393hz_timer = timer_alloc(cvs_393hz_timer_cb, NULL);
+	cvs_393hz_timer = timer_alloc(machine, cvs_393hz_timer_cb, NULL);
 	timer_adjust_periodic(cvs_393hz_timer, ATTOTIME_IN_HZ(2*393), 0, ATTOTIME_IN_HZ(2*393));
 }
 
@@ -497,7 +497,7 @@ MACHINE_START( cvs )
 	cvs_character_ram = auto_malloc(3 * 0x800);  /* only half is used, but
                                                     by allocating twice the amount,
                                                     we can use the same gfx_layout */
-	start_393hz_timer();
+	start_393hz_timer(machine);
 
 	/* register state save */
 	state_save_register_global_pointer(cvs_color_ram, 0x400);

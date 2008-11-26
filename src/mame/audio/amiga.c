@@ -272,7 +272,7 @@ void *amiga_sh_start(int clock, const custom_sound_interface *config)
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;
-		audio_state->channel[i].irq_timer = timer_alloc(signal_irq, NULL);
+		audio_state->channel[i].irq_timer = timer_alloc(Machine, signal_irq, NULL);
 	}
 
 	/* create the stream */

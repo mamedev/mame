@@ -118,7 +118,7 @@ static STATE_POSTLOAD( atetris_postload )
 static MACHINE_START( atetris )
 {
 	/* Allocate interrupt timer */
-	interrupt_timer = timer_alloc(interrupt_gen, NULL);
+	interrupt_timer = timer_alloc(machine, interrupt_gen, NULL);
 
 	/* Set up save state */
 	state_save_register_global(current_bank);

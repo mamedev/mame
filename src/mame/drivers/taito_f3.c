@@ -358,7 +358,7 @@ static TIMER_CALLBACK( f3_interrupt3 )
 static INTERRUPT_GEN( f3_interrupt2 )
 {
 	cpu_set_input_line(device, 2, HOLD_LINE);	// vblank
-	timer_set( cpu_clocks_to_attotime(device,10000), NULL, 0, f3_interrupt3);
+	timer_set(device->machine, cpu_clocks_to_attotime(device,10000), NULL, 0, f3_interrupt3);
 }
 
 static MACHINE_RESET( f3 )
@@ -366,7 +366,7 @@ static MACHINE_RESET( f3 )
 	taito_f3_soundsystem_reset(machine);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
-	f3_68681_reset();
+	f3_68681_reset(machine);
 }
 
 

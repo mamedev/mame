@@ -839,7 +839,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
+	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
 static void init_zr107(running_machine *machine)
@@ -850,7 +850,7 @@ static void init_zr107(running_machine *machine)
 
 	K001005_preprocess_texture_data(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"), 0);
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 
 	adc083x_init(0, ADC0838, adc0838_callback);
 }

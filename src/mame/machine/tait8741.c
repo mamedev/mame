@@ -203,7 +203,7 @@ static void taito8741_update(const address_space *space, int num)
 				st->txd[0] = st->portHandler ? st->portHandler(space,0) : 0;
 				if( sst )
 				{
-					timer_call_after_resynch(NULL, num, taito8741_serial_tx);
+					timer_call_after_resynch(space->machine, NULL, num, taito8741_serial_tx);
 					st->serial_out = 0;
 					st->status |= 0x04;
 					st->phase = CMD_08;
@@ -432,12 +432,12 @@ static TIMER_CALLBACK( josvolly_8741_tx )
 	dst->sts |=  0x01; /* RX ready  ? */
 }
 
-static void josvolly_8741_do(int num)
+static void josvolly_8741_do(running_machine *machine, int num)
 {
 	if( (i8741[num].sts & 0x02) )
 	{
 		/* transmit data */
-		timer_set (ATTOTIME_IN_USEC(1), NULL, num, josvolly_8741_tx);
+		timer_set (machine, ATTOTIME_IN_USEC(1), NULL, num, josvolly_8741_tx);
 	}
 }
 
@@ -501,7 +501,7 @@ static void josvolly_8741_w(const address_space *space,int num,int offset,int da
 		}
 #endif
 	}
-	josvolly_8741_do(num);
+	josvolly_8741_do(space->machine, num);
 }
 
 static INT8 josvolly_8741_r(const address_space *space,int num,int offset)

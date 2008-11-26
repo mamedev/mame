@@ -393,12 +393,12 @@ WRITE16_HANDLER( volfied_cchip_ram_w )
 			// Palette request cmd - verified to take around 122242 68000 cycles to complete
 			if (current_cmd >= 0x1 && current_cmd < 0x12)
 			{
-				timer_set(cpu_clocks_to_attotime(space->cpu,122242), NULL, 0, volfied_timer_callback);
+				timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,122242), NULL, 0, volfied_timer_callback);
 			}
 			// Unknown cmd - verified to take around 105500 68000 cycles to complete
 			else if (current_cmd >= 0x81 && current_cmd < 0x92)
 			{
-				timer_set(cpu_clocks_to_attotime(space->cpu,105500), NULL, 0, volfied_timer_callback);
+				timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,105500), NULL, 0, volfied_timer_callback);
 			}
 			else
 			{

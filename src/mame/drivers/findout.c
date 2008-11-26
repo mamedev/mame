@@ -128,7 +128,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static MACHINE_RESET( findout )
 {
-	ticket_dispenser_init(100, 1, 1);
+	ticket_dispenser_init(machine, 100, 1, 1);
 }
 
 

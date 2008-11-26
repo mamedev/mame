@@ -23,7 +23,7 @@ WRITE16_HANDLER( bonzeadv_cchip_ram_w );
 
 /*----------- defined in machine/opwolf.c -----------*/
 
-void opwolf_cchip_init(void);
+void opwolf_cchip_init(running_machine *machine);
 READ16_HANDLER( opwolf_cchip_status_r );
 READ16_HANDLER( opwolf_cchip_data_r );
 WRITE16_HANDLER( opwolf_cchip_status_w );
@@ -33,7 +33,7 @@ WRITE16_HANDLER( opwolf_cchip_bank_w );
 
 /*----------- defined in machine/rainbow.c -----------*/
 
-void rainbow_cchip_init(int version);
+void rainbow_cchip_init(running_machine *machine, int version);
 READ16_HANDLER( rainbow_cchip_ctrl_r );
 READ16_HANDLER( rainbow_cchip_ram_r );
 WRITE16_HANDLER( rainbow_cchip_ctrl_w );

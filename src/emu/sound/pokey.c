@@ -648,15 +648,15 @@ static SND_START( pokey )
 	chip->clockmult = DIV_64;
 	chip->KBCODE = 0x09;		 /* Atari 800 'no key' */
 	chip->SKCTL = SK_RESET;	 /* let the RNG run after reset */
-	chip->rtimer = timer_alloc(NULL, NULL);
+	chip->rtimer = timer_alloc(Machine,  NULL, NULL);
 
-	chip->timer[0] = timer_alloc(pokey_timer_expire, chip);
-	chip->timer[1] = timer_alloc(pokey_timer_expire, chip);
-	chip->timer[2] = timer_alloc(pokey_timer_expire, chip);
+	chip->timer[0] = timer_alloc(Machine, pokey_timer_expire, chip);
+	chip->timer[1] = timer_alloc(Machine, pokey_timer_expire, chip);
+	chip->timer[2] = timer_alloc(Machine, pokey_timer_expire, chip);
 
 	for (i=0; i<8; i++)
 	{
-		chip->ptimer[i] = timer_alloc(pokey_pot_trigger, chip);
+		chip->ptimer[i] = timer_alloc(Machine, pokey_pot_trigger, chip);
 		chip->pot_r[i] = chip->intf.pot_r[i];
 	}
 	chip->allpot_r = chip->intf.allpot_r;
@@ -1179,9 +1179,9 @@ static void pokey_register_w(int chip, int offs, int data)
          * loaders from Ballblazer and Escape from Fractalus
          * The real times are unknown
          */
-        timer_set(ATTOTIME_IN_USEC(200), p, 0, pokey_serout_ready);
+        timer_set(space->machine, ATTOTIME_IN_USEC(200), p, 0, pokey_serout_ready);
         /* 10 bits (assumption 1 start, 8 data and 1 stop bit) take how long? */
-        timer_set(ATTOTIME_IN_USEC(2000), p, 0, pokey_serout_complete);
+        timer_set(space->machine, ATTOTIME_IN_USEC(2000), p, 0, pokey_serout_complete);
         break;
 
     case IRQEN_C:
@@ -1395,25 +1395,25 @@ WRITE8_HANDLER( quad_pokey_w )
 void pokey1_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 0);
-	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
+	timer_set(Machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 void pokey2_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 1);
-	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
+	timer_set(Machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 void pokey3_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 2);
-	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
+	timer_set(Machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 void pokey4_serin_ready(int after)
 {
 	struct POKEYregisters *p = sndti_token(SOUND_POKEY, 3);
-	timer_set(attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
+	timer_set(Machine, attotime_mul(p->clock_period, after), p, 0, pokey_serin_ready);
 }
 
 static void pokey_break_w(int chip, int shift)

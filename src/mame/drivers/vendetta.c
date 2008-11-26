@@ -245,7 +245,7 @@ static WRITE8_HANDLER( z80_arm_nmi_w )
 {
 	cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_NMI, CLEAR_LINE );
 
-	timer_set( ATTOTIME_IN_USEC( 25 ), NULL, 0, z80_nmi_callback );
+	timer_set( space->machine, ATTOTIME_IN_USEC( 25 ), NULL, 0, z80_nmi_callback );
 }
 
 static WRITE8_HANDLER( z80_irq_w )

@@ -142,7 +142,7 @@ static READ16_HANDLER( ultennis_hack_r )
 	{
 		hack_irq = 1;
 		update_irq_state(space->machine);
-		timer_set(ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
+		timer_set(space->machine, ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
 	}
 	return input_port_read(space->machine, "300000");
 }

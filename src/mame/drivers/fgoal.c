@@ -95,13 +95,13 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline > 256)
 		scanline = 0;
 
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, 0, interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, 0, interrupt_callback);
 }
 
 
 static MACHINE_RESET( fgoal )
 {
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, interrupt_callback);
 }
 
 

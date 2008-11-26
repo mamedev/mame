@@ -127,7 +127,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static void sound_data_w(running_machine *machine, UINT8 data)
 {
-	timer_call_after_resynch(NULL, data, delayed_sound_data_w);
+	timer_call_after_resynch(machine, NULL, data, delayed_sound_data_w);
 }
 
 
@@ -199,7 +199,7 @@ static TIMER_CALLBACK( scanline_callback )
 		case 65:
 		case 129:
 		case 193:
-			timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, video_screen_get_visible_area(machine->primary_screen)->max_x + 1), NULL, 0, irq2_gen);
+			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, video_screen_get_visible_area(machine->primary_screen)->max_x + 1), NULL, 0, irq2_gen);
 			next_scanline = scanline + 1;
 			break;
 
@@ -230,7 +230,7 @@ static TIMER_CALLBACK( scanline_callback )
 	update_main_irqs(machine);
 
 	/* come back at the next targeted scanline */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, next_scanline, 0), NULL, next_scanline, scanline_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, next_scanline, 0), NULL, next_scanline, scanline_callback);
 }
 
 
@@ -261,7 +261,7 @@ static MACHINE_RESET( outrun )
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)outrun_reset);
 
 	/* start timers to track interrupts */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 223, 0), NULL, 223, scanline_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 223, 0), NULL, 223, scanline_callback);
 }
 
 

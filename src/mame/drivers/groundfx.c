@@ -211,7 +211,7 @@ static WRITE32_HANDLER( groundfx_adc_w )
 {
 	/* One interrupt per input port (4 per frame, though only 2 used).
         1000 cycle delay is arbitrary */
-	timer_set(cpu_clocks_to_attotime(space->cpu,1000), NULL, 0, groundfx_interrupt5);
+	timer_set(space->machine, cpu_clocks_to_attotime(space->cpu,1000), NULL, 0, groundfx_interrupt5);
 }
 
 static WRITE32_HANDLER( rotate_control_w )	/* only a guess that it's rotation */
@@ -384,7 +384,7 @@ GFXDECODE_END
 static MACHINE_RESET( groundfx )
 {
 	taito_f3_soundsystem_reset(machine);
-	f3_68681_reset();
+	f3_68681_reset(machine);
 }
 
 static INTERRUPT_GEN( groundfx_interrupt )

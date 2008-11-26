@@ -52,7 +52,7 @@ static TIMER_CALLBACK( irq_off )
 static INTERRUPT_GEN( orbit_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(video_screen_get_time_until_vblank_end(device->machine->primary_screen), NULL, 0, irq_off);
+	timer_set(device->machine, video_screen_get_time_until_vblank_end(device->machine->primary_screen), NULL, 0, irq_off);
 }
 
 

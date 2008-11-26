@@ -147,7 +147,7 @@ static void coolpool_from_shiftreg(UINT32 address, UINT16 *shiftreg)
 static MACHINE_RESET( amerdart )
 {
 	nvram_write_enable = 0;
-	nvram_write_timer = timer_alloc(nvram_write_timeout, NULL);
+	nvram_write_timer = timer_alloc(machine, nvram_write_timeout, NULL);
 }
 
 
@@ -155,7 +155,7 @@ static MACHINE_RESET( coolpool )
 {
 	tlc34076_reset(6);
 	nvram_write_enable = 0;
-	nvram_write_timer = timer_alloc(nvram_write_timeout, NULL);
+	nvram_write_timer = timer_alloc(machine, nvram_write_timeout, NULL);
 }
 
 
@@ -278,7 +278,7 @@ static WRITE16_HANDLER( amerdart_iop_w )
 {
 	logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
 	COMBINE_DATA(&iop_cmd);
-	timer_set(ATTOTIME_IN_USEC(100), NULL, 0, amerdart_iop_response);
+	timer_set(space->machine, ATTOTIME_IN_USEC(100), NULL, 0, amerdart_iop_response);
 }
 
 
@@ -322,7 +322,7 @@ static TIMER_CALLBACK( deferred_iop_w )
 static WRITE16_HANDLER( coolpool_iop_w )
 {
 	logerror("%08x:IOP write %04x\n", cpu_get_pc(space->cpu), data);
-	timer_call_after_resynch(NULL, data, deferred_iop_w);
+	timer_call_after_resynch(space->machine, NULL, data, deferred_iop_w);
 }
 
 

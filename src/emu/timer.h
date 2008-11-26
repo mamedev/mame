@@ -50,10 +50,10 @@ enum
 #define PERIOD_OF_555_ASTABLE(r1,r2,c)		ATTOTIME_IN_NSEC(PERIOD_OF_555_ASTABLE_NSEC(r1,r2,c))
 
 /* macros that map all allocations to provide file/line/functions to the callee */
-#define timer_alloc(c,ptr)				_timer_alloc_internal(c, ptr, __FILE__, __LINE__, #c)
-#define timer_pulse(e,ptr,p,c)			_timer_pulse_internal(e, ptr, p, c, __FILE__, __LINE__, #c)
-#define timer_set(d,ptr,p,c)			_timer_set_internal(d, ptr, p, c, __FILE__, __LINE__, #c)
-#define timer_call_after_resynch(ptr,p,c) _timer_set_internal(attotime_zero, ptr, p, c, __FILE__, __LINE__, #c)
+#define timer_alloc(m,c,ptr)			_timer_alloc_internal(m, c, ptr, __FILE__, __LINE__, #c)
+#define timer_pulse(m,e,ptr,p,c)		_timer_pulse_internal(m, e, ptr, p, c, __FILE__, __LINE__, #c)
+#define timer_set(m,d,ptr,p,c)			_timer_set_internal(m, d, ptr, p, c, __FILE__, __LINE__, #c)
+#define timer_call_after_resynch(m,ptr,p,c) _timer_set_internal(m, attotime_zero, ptr, p, c, __FILE__, __LINE__, #c)
 
 /* macros for a timer callback functions */
 #define TIMER_CALLBACK(name)			void name(running_machine *machine, void *ptr, int param)
@@ -160,7 +160,7 @@ void timer_destructor(void *ptr, size_t size);
 /* ----- scheduling helpers ----- */
 
 /* return the time when the next timer will fire */
-attotime timer_next_fire_time(void);
+attotime timer_next_fire_time(running_machine *machine);
 
 /* adjust the global time; this is also where we fire the timers */
 void timer_set_global_time(running_machine *machine, attotime newbase);
@@ -176,14 +176,14 @@ void timer_set_minimum_quantum(running_machine *machine, attoseconds_t quantum);
 /* ----- save/restore helpers ----- */
 
 /* count the number of anonymous (non-saveable) timers */
-int timer_count_anonymous(void);
+int timer_count_anonymous(running_machine *machine);
 
 
 
 /* ----- core timer management ----- */
 
 /* allocate a permament timer that isn't primed yet */
-emu_timer *_timer_alloc_internal(timer_fired_func callback, void *param, const char *file, int line, const char *func);
+emu_timer *_timer_alloc_internal(running_machine *machine, timer_fired_func callback, void *param, const char *file, int line, const char *func);
 
 /* adjust the time when this timer will fire and disable any periodic firings */
 void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param);
@@ -198,10 +198,10 @@ void timer_device_adjust_periodic(const device_config *timer, attotime start_del
 /* ----- anonymous timer management ----- */
 
 /* allocate a one-shot timer, which calls the callback after the given duration */
-void _timer_set_internal(attotime druation, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);
+void _timer_set_internal(running_machine *machine, attotime druation, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);
 
 /* allocate a pulse timer, which repeatedly calls the callback using the given period */
-void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);
+void _timer_pulse_internal(running_machine *machine, attotime period, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);
 
 
 
@@ -248,7 +248,7 @@ attotime timer_timeleft(emu_timer *which);
 attotime timer_device_timeleft(const device_config *timer);
 
 /* return the current time */
-attotime timer_get_time(void);
+attotime timer_get_time(running_machine *machine);
 
 /* return the time when this timer started counting */
 attotime timer_starttime(emu_timer *which);

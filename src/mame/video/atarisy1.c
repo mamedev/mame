@@ -222,9 +222,9 @@ VIDEO_START( atarisy1 )
 	/* reset the statics */
 	atarimo_set_yscroll(0, 256);
 	next_timer_scanline = -1;
-	scanline_timer = timer_alloc(int3_callback, NULL);
-	int3off_timer = timer_alloc(int3off_callback, NULL);
-	yscroll_reset_timer = timer_alloc(reset_yscroll_callback, NULL);
+	scanline_timer = timer_alloc(machine, int3_callback, NULL);
+	int3off_timer = timer_alloc(machine, int3off_callback, NULL);
+	yscroll_reset_timer = timer_alloc(machine, reset_yscroll_callback, NULL);
 }
 
 
@@ -249,7 +249,7 @@ WRITE16_HANDLER( atarisy1_bankselect_w )
 	if (diff & 0x0080)
 	{
 		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (newselect & 0x0080) ? CLEAR_LINE : ASSERT_LINE);
-		if (!(newselect & 0x0080)) atarigen_sound_reset();
+		if (!(newselect & 0x0080)) atarigen_sound_reset(space->machine);
 	}
 
 	/* if MO or playfield banks change, force a partial update */

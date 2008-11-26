@@ -2312,10 +2312,10 @@ static DRIVER_INIT(ppd)
 	cur_cab_data = ppd_cab_data;
 }
 
-static void init_keyboard(void)
+static void init_keyboard(running_machine *machine)
 {
 	// set keyboard timer
-	keyboard_timer = timer_alloc(keyboard_timer_callback, NULL);
+	keyboard_timer = timer_alloc(machine, keyboard_timer_callback, NULL);
 	timer_adjust_periodic(keyboard_timer, ATTOTIME_IN_MSEC(10), 0, ATTOTIME_IN_MSEC(10));
 }
 
@@ -2324,7 +2324,7 @@ static DRIVER_INIT(kbm)
 	init_firebeat(machine);
 	init_lights(machine, lamp_output_kbm_w, NULL, NULL);
 
-	init_keyboard();
+	init_keyboard(machine);
 
 	cur_cab_data = kbm_cab_data;
 }

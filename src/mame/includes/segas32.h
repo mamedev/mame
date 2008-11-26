@@ -51,7 +51,7 @@ VIDEO_START(system32);
 VIDEO_START(multi32);
 VIDEO_UPDATE(system32);
 VIDEO_UPDATE(multi32);
-void system32_set_vblank(int state);
+void system32_set_vblank(running_machine *machine, int state);
 
 READ16_HANDLER( system32_videoram_r );
 WRITE16_HANDLER( system32_videoram_w );

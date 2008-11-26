@@ -1048,10 +1048,10 @@ static TIMER_CALLBACK( real_nmk004_init )
 	NMK004_state.protection_check = 0;
 }
 
-void NMK004_init(void)
+void NMK004_init(running_machine *machine)
 {
 	/* we have to do this via a timer because we get called before the sound reset */
-	timer_call_after_resynch(NULL, 0, real_nmk004_init);
+	timer_call_after_resynch(machine, NULL, 0, real_nmk004_init);
 }
 
 

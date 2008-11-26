@@ -98,7 +98,7 @@ static INPUT_CHANGED( coin_changed )
 		cpu_set_input_line(field->port->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 
 		/* simulate the coin switch being closed for a while */
-		timer_set(double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(field->port->machine->primary_screen))), NULL, 0, clear_coin_status);
+		timer_set(field->port->machine, double_to_attotime(4 * attotime_to_double(video_screen_get_frame_period(field->port->machine->primary_screen))), NULL, 0, clear_coin_status);
 	}
 }
 
@@ -170,7 +170,7 @@ static CUSTOM_INPUT( vicdual_get_timer_value )
 	if (!timer_started)
 	{
 		timer_started = 1;
-		timer_pulse(TIMER_HALF_PERIOD, NULL, 0, vicdual_timer_callback);
+		timer_pulse(field->port->machine, TIMER_HALF_PERIOD, NULL, 0, vicdual_timer_callback);
 	}
 
 	return timer_value;

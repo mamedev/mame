@@ -822,7 +822,7 @@ static TIMER_CALLBACK( cpu3_interrupt_callback )
 static MACHINE_START( galaga )
 {
 	/* create the interrupt timer */
-	cpu3_interrupt_timer = timer_alloc(cpu3_interrupt_callback, NULL);
+	cpu3_interrupt_timer = timer_alloc(machine, cpu3_interrupt_callback, NULL);
 }
 
 static void bosco_latch_reset(running_machine *machine)
@@ -840,13 +840,13 @@ static MACHINE_RESET( bosco )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	namco_06xx_init(0, 0,
+	namco_06xx_init(machine, 0, 0,
 		NAMCOIO_51XX, &intf0,
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_50XX, NULL,
 		NAMCOIO_54XX, NULL);
 
-	namco_06xx_init(1, 1,
+	namco_06xx_init(machine, 1, 1,
 		NAMCOIO_50XX_2, NULL,
 		NAMCOIO_52XX, NULL,
 		NAMCOIO_NONE, NULL,
@@ -860,7 +860,7 @@ static MACHINE_RESET( galaga )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	namco_06xx_init(0, 0,
+	namco_06xx_init(machine, 0, 0,
 		NAMCOIO_51XX, &intf0,
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_NONE, NULL,
@@ -874,7 +874,7 @@ static MACHINE_RESET( xevious )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	namco_06xx_init(0, 0,
+	namco_06xx_init(machine, 0, 0,
 		NAMCOIO_51XX, &intf0,
 		NAMCOIO_NONE, NULL,
 		NAMCOIO_50XX, NULL,
@@ -888,7 +888,7 @@ static MACHINE_RESET( battles )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	battles_customio_init();
+	battles_customio_init(machine);
 
 	timer_adjust_oneshot(cpu3_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), 64);
 }
@@ -898,7 +898,7 @@ static MACHINE_RESET( digdug )
 	/* Reset all latches */
 	bosco_latch_reset(machine);
 
-	namco_06xx_init(0, 0,
+	namco_06xx_init(machine, 0, 0,
 		NAMCOIO_51XX, &intf0,
 		NAMCOIO_53XX_DIGDUG, &intf1,
 		NAMCOIO_NONE, NULL,

@@ -565,7 +565,7 @@ WRITE8_HANDLER( K056230_w )
 				if (mame_stricmp(space->machine->gamedrv->name, "thunderh") != 0)
 				{
 					cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_IRQ2, ASSERT_LINE);
-					timer_set(ATTOTIME_IN_USEC(10), NULL, 0, network_irq_clear);
+					timer_set(space->machine, ATTOTIME_IN_USEC(10), NULL, 0, network_irq_clear);
 				}
 			}
 //          else
@@ -1160,7 +1160,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
+	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
 static DRIVER_INIT(gticlub)
@@ -1172,7 +1172,7 @@ static DRIVER_INIT(gticlub)
 
 	K001005_preprocess_texture_data(memory_region(machine, "gfx1"), memory_region_length(machine, "gfx1"), 1);
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 
 	adc1038_init(machine);
 }
@@ -1187,7 +1187,7 @@ static DRIVER_INIT(hangplt)
 	sharc_dataram_1 = auto_malloc(0x100000);
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 	K033906_init();
 
 	adc1038_init(machine);

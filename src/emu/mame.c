@@ -661,7 +661,7 @@ void mame_schedule_save(running_machine *machine, const char *filename)
 
 	/* note the start time and set a timer for the next timeslice to actually schedule it */
 	mame->saveload_schedule_callback = handle_save;
-	mame->saveload_schedule_time = timer_get_time();
+	mame->saveload_schedule_time = timer_get_time(machine);
 
 	/* we can't be paused since we need to clear out anonymous timers */
 	mame_pause(machine, FALSE);
@@ -682,7 +682,7 @@ void mame_schedule_load(running_machine *machine, const char *filename)
 
 	/* note the start time and set a timer for the next timeslice to actually schedule it */
 	mame->saveload_schedule_callback = handle_load;
-	mame->saveload_schedule_time = timer_get_time();
+	mame->saveload_schedule_time = timer_get_time(machine);
 
 	/* we can't be paused since we need to clear out anonymous timers */
 	mame_pause(machine, FALSE);
@@ -1531,7 +1531,7 @@ static void init_machine(running_machine *machine)
 	/* initialize the timers and allocate a soft_reset timer */
 	/* this must be done before cpu_init so that CPU's can allocate timers */
 	timer_init(machine);
-	mame->soft_reset_timer = timer_alloc(soft_reset, NULL);
+	mame->soft_reset_timer = timer_alloc(machine, soft_reset, NULL);
 
 	/* init the osd layer */
 	osd_init(machine);
@@ -1653,7 +1653,7 @@ static TIMER_CALLBACK( soft_reset )
 
 	/* set the global time to the current time */
 	/* this allows 0-time queued callbacks to run before any CPUs execute */
-	timer_set_global_time(machine, timer_get_time());
+	timer_set_global_time(machine, timer_get_time(machine));
 }
 
 
@@ -1713,10 +1713,10 @@ static void handle_save(running_machine *machine)
 	}
 
 	/* if there are anonymous timers, we can't save just yet */
-	if (timer_count_anonymous() > 0)
+	if (timer_count_anonymous(machine) > 0)
 	{
 		/* if more than a second has passed, we're probably screwed */
-		if (attotime_sub(timer_get_time(), mame->saveload_schedule_time).seconds > 0)
+		if (attotime_sub(timer_get_time(machine), mame->saveload_schedule_time).seconds > 0)
 		{
 			popmessage("Unable to save due to pending anonymous timers. See error.log for details.");
 			goto cancel;
@@ -1798,10 +1798,10 @@ static void handle_load(running_machine *machine)
 
 	/* if there are anonymous timers, we can't load just yet because the timers might */
 	/* overwrite data we have loaded */
-	if (timer_count_anonymous() > 0)
+	if (timer_count_anonymous(machine) > 0)
 	{
 		/* if more than a second has passed, we're probably screwed */
-		if (attotime_sub(timer_get_time(), mame->saveload_schedule_time).seconds > 0)
+		if (attotime_sub(timer_get_time(machine), mame->saveload_schedule_time).seconds > 0)
 		{
 			popmessage("Unable to load due to pending anonymous timers. See error.log for details.");
 			goto cancel;
@@ -1913,5 +1913,5 @@ void mame_get_base_datetime(running_machine *machine, mame_system_time *systime)
 void mame_get_current_datetime(running_machine *machine, mame_system_time *systime)
 {
 	mame_private *mame = machine->mame_data;
-	fill_systime(systime, mame->base_time + timer_get_time().seconds);
+	fill_systime(systime, mame->base_time + timer_get_time(machine).seconds);
 }

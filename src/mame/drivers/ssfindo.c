@@ -694,15 +694,15 @@ ROM_END
 static DRIVER_INIT(ssfindo)
 {
 	flashType=0;
-	PS7500timer0 = timer_alloc(PS7500_Timer0_callback, NULL);
-	PS7500timer1 = timer_alloc(PS7500_Timer1_callback, NULL);
+	PS7500timer0 = timer_alloc(machine, PS7500_Timer0_callback, NULL);
+	PS7500timer1 = timer_alloc(machine, PS7500_Timer1_callback, NULL);
 }
 
 static DRIVER_INIT(ppcar)
 {
 	flashType=1;
-	PS7500timer0 = timer_alloc(PS7500_Timer0_callback, NULL);
-	PS7500timer1 = timer_alloc(PS7500_Timer1_callback, NULL);
+	PS7500timer0 = timer_alloc(machine, PS7500_Timer0_callback, NULL);
+	PS7500timer1 = timer_alloc(machine, PS7500_Timer1_callback, NULL);
 }
 
 GAME( 1999, ssfindo, 0,        ssfindo,  ssfindo,  ssfindo,	ROT0, "Icarus", "See See Find Out", GAME_NO_SOUND )

@@ -539,9 +539,9 @@ static void SCSP_Init(const char *tag, struct _SCSP *SCSP, const scsp_interface 
 		}
 	}
 
-	SCSP->timerA = timer_alloc(timerA_cb, SCSP);
-	SCSP->timerB = timer_alloc(timerB_cb, SCSP);
-	SCSP->timerC = timer_alloc(timerC_cb, SCSP);
+	SCSP->timerA = timer_alloc(Machine, timerA_cb, SCSP);
+	SCSP->timerB = timer_alloc(Machine, timerB_cb, SCSP);
+	SCSP->timerC = timer_alloc(Machine, timerC_cb, SCSP);
 
 	for(i=0;i<0x400;++i)
 	{

@@ -123,7 +123,7 @@ static MACHINE_RESET( polyplay )
 	polyplay_set_channel2(0);
 	polyplay_play_channel2(0);
 
-	polyplay_timer = timer_alloc(polyplay_timer_callback, NULL);
+	polyplay_timer = timer_alloc(machine, polyplay_timer_callback, NULL);
 }
 
 

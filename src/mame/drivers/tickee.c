@@ -82,13 +82,13 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 
 	/* generate interrupts for player 1's gun */
 	get_crosshair_xy(machine, 0, &beamx, &beamy);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, beamy,     beamx + 50), NULL, 0, trigger_gun_interrupt);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, beamy + 1, beamx + 50), NULL, 0, clear_gun_interrupt);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy,     beamx + 50), NULL, 0, trigger_gun_interrupt);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + 1, beamx + 50), NULL, 0, clear_gun_interrupt);
 
 	/* generate interrupts for player 2's gun */
 	get_crosshair_xy(machine, 1, &beamx, &beamy);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, beamy,     beamx + 50), NULL, 1, trigger_gun_interrupt);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, beamy + 1, beamx + 50), NULL, 1, clear_gun_interrupt);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy,     beamx + 50), NULL, 1, trigger_gun_interrupt);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, beamy + 1, beamx + 50), NULL, 1, clear_gun_interrupt);
 }
 
 
@@ -102,7 +102,7 @@ static TIMER_CALLBACK( setup_gun_interrupts )
 static VIDEO_START( tickee )
 {
 	/* start a timer going on the first scanline of every frame */
-	setup_gun_timer = timer_alloc(setup_gun_interrupts, NULL);
+	setup_gun_timer = timer_alloc(machine, setup_gun_interrupts, NULL);
 	timer_adjust_oneshot(setup_gun_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 }
 
@@ -147,7 +147,7 @@ static void scanline_update(const device_config *screen, bitmap_t *bitmap, int s
 
 static MACHINE_RESET( tickee )
 {
-	ticket_dispenser_init(100, 0, 1);
+	ticket_dispenser_init(machine, 100, 0, 1);
 	tlc34076_reset(6);
 }
 

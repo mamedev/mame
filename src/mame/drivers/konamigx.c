@@ -3341,7 +3341,7 @@ static DRIVER_INIT(konamigx)
 	snd020_hack = 0;
 	resume_trigger = 0;
 
-	dmadelay_timer = timer_alloc(dmaend_callback, NULL);
+	dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
 
 	i = match = 0;
 	while ((gameDefs[i].cfgport != -1) && (!match))

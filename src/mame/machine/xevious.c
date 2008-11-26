@@ -29,14 +29,14 @@ static char battles_sound_played;
 static TIMER_CALLBACK( battles_nmi_generate );
 
 
-void battles_customio_init(void)
+void battles_customio_init(running_machine *machine)
 {
 	battles_customio_command = 0;
 	battles_customio_prev_command = 0;
 	battles_customio_command_count = 0;
 	battles_customio_data = 0;
 	battles_sound_played = 0;
-	nmi_timer = timer_alloc(battles_nmi_generate, NULL);
+	nmi_timer = timer_alloc(machine, battles_nmi_generate, NULL);
 }
 
 

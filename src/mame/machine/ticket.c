@@ -40,7 +40,7 @@ static TIMER_CALLBACK( ticket_dispenser_toggle );
   ticket_dispenser_init
 
 ***************************************************************************/
-void ticket_dispenser_init(int msec, int motoronhigh, int statusactivehigh)
+void ticket_dispenser_init(running_machine *machine, int msec, int motoronhigh, int statusactivehigh)
 {
 	int i;
 
@@ -54,7 +54,7 @@ void ticket_dispenser_init(int msec, int motoronhigh, int statusactivehigh)
 	{
 		dispenser[i].status	= ticketnotdispensed;
 		dispenser[i].power 	= 0x00;
-		dispenser[i].timer 	= timer_alloc(ticket_dispenser_toggle, &dispenser[i]);
+		dispenser[i].timer 	= timer_alloc(machine, ticket_dispenser_toggle, &dispenser[i]);
 
 		state_save_register_item("ticket", NULL, i, dispenser[i].status);
 		state_save_register_item("ticket", NULL, i, dispenser[i].power);

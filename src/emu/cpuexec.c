@@ -15,8 +15,6 @@
 #include "debugger.h"
 
 
-
-
 /***************************************************************************
     DEBUGGING
 ***************************************************************************/
@@ -241,9 +239,9 @@ void cpuexec_init(running_machine *machine)
 
 			/* allocate timers if we need them */
 			if (config->vblank_interrupts_per_frame > 1)
-				classdata->partial_frame_timer = timer_alloc(trigger_partial_frame_interrupt, device);
+				classdata->partial_frame_timer = timer_alloc(machine, trigger_partial_frame_interrupt, device);
 			if (config->timed_interrupt_period != 0)
-				classdata->timedint_timer = timer_alloc(trigger_periodic_interrupt, device);
+				classdata->timedint_timer = timer_alloc(machine, trigger_periodic_interrupt, device);
 
 			/* initialize this CPU */
 			state_save_push_tag(cpunum + 1);
@@ -346,8 +344,8 @@ static void cpuexec_exit(running_machine *machine)
 void cpuexec_timeslice(running_machine *machine)
 {
 	int call_debugger = ((machine->debug_flags & DEBUG_FLAG_ENABLED) != 0);
-	attotime target = timer_next_fire_time();
-	attotime base = timer_get_time();
+	attotime target = timer_next_fire_time(machine);
+	attotime base = timer_get_time(machine);
 	int cpunum, ran;
 
 	LOG(("------------------\n"));
@@ -517,7 +515,19 @@ void cpu_resume(const device_config *device, int reason)
 
 
 /*-------------------------------------------------
-    cpu_is_suspended - returns true if the
+    cpu_is_executing - return TRUE if the given 
+    CPU is within its execute function
+-------------------------------------------------*/
+
+int cpu_is_executing(const device_config *device)
+{
+	cpu_class_data *classdata = get_safe_classtoken(device);
+	return classdata->executing;
+}
+
+
+/*-------------------------------------------------
+    cpu_is_suspended - returns TRUE if the
     given CPU is suspended for any of the given
     reasons
 -------------------------------------------------*/
@@ -838,7 +848,7 @@ void cpuexec_trigger(running_machine *machine, int trigger)
 
 void cpuexec_triggertime(running_machine *machine, int trigger, attotime duration)
 {
-	timer_set(duration, NULL, trigger, triggertime_callback);
+	timer_set(machine, duration, NULL, trigger, triggertime_callback);
 }
 
 
@@ -982,7 +992,7 @@ void cpu_set_input_line_and_vector(const device_config *device, int line, int st
 
 			/* if this is the first one, set the timer */
 			if (event_index == 0)
-				timer_call_after_resynch((void *)device, line, empty_event_queue);
+				timer_call_after_resynch(device->machine, (void *)device, line, empty_event_queue);
 		}
 	}
 }

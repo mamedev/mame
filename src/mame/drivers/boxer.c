@@ -55,7 +55,7 @@ static TIMER_CALLBACK( periodic_callback )
 
 		for (i = 1; i < 256; i++)
 			if (mask[i] != 0)
-				timer_set(video_screen_get_time_until_pos(machine->primary_screen, i, 0), NULL, mask[i], pot_interrupt);
+				timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, i, 0), NULL, mask[i], pot_interrupt);
 
 		pot_state = 0;
 	}
@@ -65,7 +65,7 @@ static TIMER_CALLBACK( periodic_callback )
 	if (scanline >= 262)
 		scanline = 0;
 
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, periodic_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, periodic_callback);
 }
 
 
@@ -81,7 +81,7 @@ static PALETTE_INIT( boxer )
 
 static MACHINE_RESET( boxer )
 {
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, periodic_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, periodic_callback);
 
 	pot_latch = 0;
 }

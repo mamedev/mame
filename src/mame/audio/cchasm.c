@@ -181,7 +181,7 @@ SOUND_START( cchasm )
 
 	ctc = devtag_get_device(machine, Z80CTC, "ctc");
 
-	timer_pulse(video_screen_get_frame_period(machine->primary_screen), NULL, 0, cchasm_sh_update);
+	timer_pulse(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, cchasm_sh_update);
 }
 
 

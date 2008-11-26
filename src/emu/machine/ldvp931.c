@@ -249,7 +249,7 @@ static void vp931_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldn
 
 	/* set the ERP signal to 1 to indicate start of frame, and set a timer to turn it off */
 	ld->player->daticerp = 1;
-	timer_set(video_screen_get_time_until_pos(ld->screen, 15*2, 0), ld, 0, erp_off);
+	timer_set(ld->device->machine, video_screen_get_time_until_pos(ld->screen, 15*2, 0), ld, 0, erp_off);
 }
 
 
@@ -261,7 +261,7 @@ static void vp931_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fieldn
 static INT32 vp931_update(laserdisc_state *ld, const vbi_metadata *vbi, int fieldnum, attotime curtime)
 {
 	/* set the first VBI timer to go at the start of line 16 */
-	timer_set(video_screen_get_time_until_pos(ld->screen, 16*2, 0), ld, LASERDISC_CODE_LINE16 << 2, vbi_data_fetch);
+	timer_set(ld->device->machine, video_screen_get_time_until_pos(ld->screen, 16*2, 0), ld, LASERDISC_CODE_LINE16 << 2, vbi_data_fetch);
 
 	/* play forward by default */
 	return fieldnum;
@@ -276,7 +276,7 @@ static INT32 vp931_update(laserdisc_state *ld, const vbi_metadata *vbi, int fiel
 static void vp931_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 {
 	/* set a timer to synchronize execution before sending the data */
-	timer_call_after_resynch(ld, data, deferred_data_w);
+	timer_call_after_resynch(ld->device->machine, ld, data, deferred_data_w);
 }
 
 
@@ -351,7 +351,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	if (which == 0)
 	{
 		cpu_set_input_line(machine->cpu[player->cpunum], MCS48_INPUT_IRQ, ASSERT_LINE);
-		timer_set(ATTOTIME_IN_NSEC(5580), ld, 0, irq_off);
+		timer_set(machine, ATTOTIME_IN_NSEC(5580), ld, 0, irq_off);
 	}
 
 	/* clock the data strobe on each subsequent callback */
@@ -359,7 +359,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	{
 		player->daticval = code >> (8 * (3 - which));
 		player->datastrobe = 1;
-		timer_set(ATTOTIME_IN_NSEC(5000), ld, 0, datastrobe_off);
+		timer_set(machine, ATTOTIME_IN_NSEC(5000), ld, 0, datastrobe_off);
 	}
 
 	/* determine the next bit to fetch and reprime ourself */
@@ -369,7 +369,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 		line++;
 	}
 	if (line <= LASERDISC_CODE_LINE18 + 1)
-		timer_set(video_screen_get_time_until_pos(ld->screen, line*2, which * 2 * video_screen_get_width(ld->screen) / 4), ld, (line << 2) | which, vbi_data_fetch);
+		timer_set(machine, video_screen_get_time_until_pos(ld->screen, line*2, which * 2 * video_screen_get_width(ld->screen) / 4), ld, (line << 2) | which, vbi_data_fetch);
 }
 
 

@@ -207,7 +207,7 @@ static MACHINE_START( gijoe )
 {
 	state_save_register_global(cur_control2);
 
-	dmadelay_timer = timer_alloc(dmaend_callback, NULL);
+	dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
 }
 
 

@@ -104,7 +104,7 @@ READ8_HANDLER( starwars_sin_r )
 
 WRITE8_HANDLER( starwars_sout_w )
 {
-	timer_call_after_resynch(NULL, data, sound_callback);
+	timer_call_after_resynch(space->machine, NULL, data, sound_callback);
 }
 
 
@@ -139,7 +139,7 @@ static TIMER_CALLBACK( main_callback )
 
 WRITE8_HANDLER( starwars_main_wr_w )
 {
-	timer_call_after_resynch(NULL, data, main_callback);
+	timer_call_after_resynch(space->machine, NULL, data, main_callback);
 }
 
 

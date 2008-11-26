@@ -123,7 +123,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_sound_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_w);
 }
 
 

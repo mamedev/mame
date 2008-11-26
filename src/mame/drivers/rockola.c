@@ -290,11 +290,11 @@ static TIMER_CALLBACK( sasuke_update_counter )
 	sasuke_counter += 0x10;
 }
 
-static void sasuke_start_counter(void)
+static void sasuke_start_counter(running_machine *machine)
 {
 	sasuke_counter = 0;
 
-	sasuke_timer = timer_alloc(sasuke_update_counter, NULL);
+	sasuke_timer = timer_alloc(machine, sasuke_update_counter, NULL);
 	timer_adjust_periodic(sasuke_timer, attotime_zero, 0, ATTOTIME_IN_HZ(11289000/8));	// 1.4 MHz
 }
 
@@ -769,7 +769,7 @@ static MACHINE_RESET( sasuke )
 	// adjusted
 	rockola_set_music_freq(38000);
 
-	sasuke_start_counter();
+	sasuke_start_counter(machine);
 }
 
 static MACHINE_RESET( satansat )
@@ -777,7 +777,7 @@ static MACHINE_RESET( satansat )
 	// same as sasuke
 	rockola_set_music_freq(38000);
 
-	sasuke_start_counter();
+	sasuke_start_counter(machine);
 }
 
 static MACHINE_RESET( vanguard )

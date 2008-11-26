@@ -35,7 +35,7 @@ static UINT8 bitvals[32];
 static MACHINE_RESET( xtheball )
 {
 	tlc34076_reset(6);
-	ticket_dispenser_init(100, 1, 1);
+	ticket_dispenser_init(machine, 100, 1, 1);
 }
 
 

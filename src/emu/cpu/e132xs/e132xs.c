@@ -1544,7 +1544,7 @@ static void hyperstone_init(const device_config *device, int index, int clock, c
 	hyperstone.device = device;
 	hyperstone.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	hyperstone.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
-	hyperstone.timer = timer_alloc(e132xs_timer_callback, NULL);
+	hyperstone.timer = timer_alloc(device->machine, e132xs_timer_callback, NULL);
 	hyperstone.clock_scale_mask = scale_mask;
 }
 

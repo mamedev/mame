@@ -411,7 +411,7 @@ WRITE8_DEVICE_HANDLER( z80dma_rdy_w)
 
 	param = (data ? 1 : 0);
 	LOG(("RDY: %d Active High: %d\n", data, READY_ACTIVE_HIGH(z80dma)));
-	timer_call_after_resynch((void *) device, param, z80dma_rdy_write_callback);
+	timer_call_after_resynch(device->machine, (void *) device, param, z80dma_rdy_write_callback);
 }
 
 
@@ -449,7 +449,7 @@ static DEVICE_START( z80dma )
 
 	z80dma->intf = device->static_config;
 
-	z80dma->timer = timer_alloc(z80dma_timerproc, (void *) device);
+	z80dma->timer = timer_alloc(device->machine, z80dma_timerproc, (void *) device);
 
 	state_save_register_item_array("z80dma", device->tag, 0, z80dma->regs);
 	state_save_register_item_array("z80dma", device->tag, 0, z80dma->regs_follow);

@@ -198,23 +198,23 @@ static WRITE16_HANDLER( sensors_w )
 	/*---- ---- ---- -x-- lamp*/
 	if(data & 1)
 	{
-		//timer_set( ATTOTIME_IN_SEC(2), NULL, 0x100, shutter_req );
+		//timer_set(space->machine,  ATTOTIME_IN_SEC(2), NULL, 0x100, shutter_req );
 		shutter_sensor = 0x100;
 	}
 	else if(data & 2)
 	{
-		//timer_set( ATTOTIME_IN_SEC(2), NULL, 0x200, shutter_req );
+		//timer_set( space->machine, ATTOTIME_IN_SEC(2), NULL, 0x200, shutter_req );
 		shutter_sensor = 0x200;
 	}
 
 	if(data & 0x1000 || data & 0x4000)
 	{
-		//timer_set( ATTOTIME_IN_SEC(2), NULL, 0x800, defender_req );
+		//timer_set( space->machine, ATTOTIME_IN_SEC(2), NULL, 0x800, defender_req );
 		defender_sensor = 0x800;
 	}
 	else if(data & 0x2000 || data & 0x8000)
 	{
-		//timer_set( ATTOTIME_IN_SEC(2), NULL, 0x400, defender_req );
+		//timer_set( space->machine, ATTOTIME_IN_SEC(2), NULL, 0x400, defender_req );
 		defender_sensor = 0x400;
 	}
 }

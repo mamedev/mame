@@ -3392,7 +3392,7 @@ static CPU_INIT( sh4 )
 {
 	const struct sh4_config *conf = device->static_config;
 
-	sh4_common_init();
+	sh4_common_init(device);
 
 	sh4_parse_configuration(conf);
 

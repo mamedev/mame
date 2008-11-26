@@ -1477,7 +1477,7 @@ MACHINE_START( tx1 )
 	prom = (UINT16*)memory_region(machine, "user1") + (0x8000 >> 1);
 
 	/* set a timer to run the interrupts */
-	interrupt_timer = timer_alloc(interrupt_callback, NULL);
+	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
 
 	/* /CUDISP CRTC interrupt */
 	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
@@ -1489,7 +1489,7 @@ MACHINE_START( buggyboy )
 	prom = (UINT16*)memory_region(machine, "user1") + (0x8000 >> 1);
 
 	/* set a timer to run the interrupts */
-	interrupt_timer = timer_alloc(interrupt_callback, NULL);
+	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
 
 	/* /CUDISP CRTC interrupt */
 	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);
@@ -1501,7 +1501,7 @@ MACHINE_START( buggybjr )
 	prom = (UINT16*)memory_region(machine, "user1") + (0x8000 >> 1);
 
 	/* set a timer to run the interrupts */
-	interrupt_timer = timer_alloc(interrupt_callback, NULL);
+	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
 
 	/* /CUDISP CRTC interrupt */
 	timer_adjust_oneshot(interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, CURSOR_YPOS, CURSOR_XPOS), 0);

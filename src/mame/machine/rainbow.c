@@ -813,7 +813,7 @@ READ16_HANDLER( rainbow_cchip_ram_r )
  *
  *************************************/
 
-void rainbow_cchip_init(int version)
+void rainbow_cchip_init(running_machine *machine, int version)
 {
 	int i;
 
@@ -828,5 +828,5 @@ void rainbow_cchip_init(int version)
 
 	state_save_register_item("cchip", NULL, 0, current_bank);
 
-	timer_pulse(ATTOTIME_IN_HZ(60), NULL, 0, cchip_timer);
+	timer_pulse(machine, ATTOTIME_IN_HZ(60), NULL, 0, cchip_timer);
 }

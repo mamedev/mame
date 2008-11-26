@@ -76,8 +76,8 @@ static MACHINE_RESET( midvunit )
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
 	cpu_reset(machine->cpu[0]);
 
-	timer[0] = timer_alloc(NULL, NULL);
-	timer[1] = timer_alloc(NULL, NULL);
+	timer[0] = timer_alloc(machine, NULL, NULL);
+	timer[1] = timer_alloc(machine, NULL, NULL);
 }
 
 
@@ -89,8 +89,8 @@ static MACHINE_RESET( midvplus )
 	memcpy(ram_base, memory_region(machine, "user1"), 0x20000*4);
 	cpu_reset(machine->cpu[0]);
 
-	timer[0] = timer_alloc(NULL, NULL);
-	timer[1] = timer_alloc(NULL, NULL);
+	timer[0] = timer_alloc(machine, NULL, NULL);
+	timer[1] = timer_alloc(machine, NULL, NULL);
 
 	devtag_reset(machine, IDE_CONTROLLER, "ide");
 }
@@ -160,7 +160,7 @@ static WRITE32_HANDLER( midvunit_adc_w )
 		if (which < 0 || which > 2)
 			logerror("adc_w: unexpected which = %02X\n", which + 4);
 		adc_data = input_port_read_safe(space->machine, adcnames[which], 0);
-		timer_set(ATTOTIME_IN_MSEC(1), NULL, 0, adc_ready);
+		timer_set(space->machine, ATTOTIME_IN_MSEC(1), NULL, 0, adc_ready);
 	}
 	else
 		logerror("adc_w without enabling writes!\n");

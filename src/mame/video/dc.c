@@ -1055,7 +1055,7 @@ VIDEO_START(dc)
 
 	computedilated();
 
-	vbout_timer = timer_alloc(vbout, 0);
+	vbout_timer = timer_alloc(machine, vbout, 0);
 	timer_adjust_oneshot(vbout_timer, attotime_never, 0);
 }
 

@@ -353,7 +353,7 @@ static WRITE16_HANDLER( arm7_latch_68k_w )
 
 #ifdef PGMARM7SPEEDHACK
 	cpuexec_trigger(space->machine, 1000);
-	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, arm_irq); // i don't know how long..
+	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, arm_irq); // i don't know how long..
 	cpu_spinuntil_trigger(space->cpu, 1002);
 #else
 	cpu_set_input_line(space->machine->cpu[2], ARM7_FIRQ_LINE, PULSE_LINE);

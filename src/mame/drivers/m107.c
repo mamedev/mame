@@ -57,7 +57,7 @@ static WRITE16_HANDLER( bankswitch_w )
 
 static MACHINE_START( m107 )
 {
-	scanline_timer = timer_alloc(m107_scanline_interrupt, NULL);
+	scanline_timer = timer_alloc(machine, m107_scanline_interrupt, NULL);
 }
 
 static MACHINE_RESET( m107 )
@@ -131,7 +131,7 @@ static TIMER_CALLBACK( setvector_callback )
 
 static WRITE16_HANDLER( m107_soundlatch_w )
 {
-	timer_call_after_resynch(NULL, V30_ASSERT,setvector_callback);
+	timer_call_after_resynch(space->machine, NULL, V30_ASSERT,setvector_callback);
 	soundlatch_w(space, 0, data & 0xff);
 //      logerror("soundlatch_w %02x\n",data);
 }
@@ -150,7 +150,7 @@ static READ16_HANDLER( m107_soundlatch_r )
 
 static WRITE16_HANDLER( m107_sound_irq_ack_w )
 {
-	timer_call_after_resynch(NULL, V30_CLEAR,setvector_callback);
+	timer_call_after_resynch(space->machine, NULL, V30_CLEAR,setvector_callback);
 }
 
 static WRITE16_HANDLER( m107_sound_status_w )
@@ -422,9 +422,9 @@ GFXDECODE_END
 static void sound_irq(running_machine *machine, int state)
 {
 	if (state)
-		timer_call_after_resynch(NULL, YM2151_ASSERT,setvector_callback);
+		timer_call_after_resynch(machine, NULL, YM2151_ASSERT,setvector_callback);
 	else
-		timer_call_after_resynch(NULL, YM2151_CLEAR,setvector_callback);
+		timer_call_after_resynch(machine, NULL, YM2151_CLEAR,setvector_callback);
 }
 
 static const ym2151_interface ym2151_config =

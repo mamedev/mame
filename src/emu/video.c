@@ -386,7 +386,7 @@ void video_init(running_machine *machine)
 	/* if no screens, create a periodic timer to drive updates */
 	if (machine->primary_screen == NULL)
 	{
-		global.screenless_frame_timer = timer_alloc(screenless_update_callback, NULL);
+		global.screenless_frame_timer = timer_alloc(machine, screenless_update_callback, NULL);
 		timer_adjust_periodic(global.screenless_frame_timer, DEFAULT_FRAME_PERIOD, 0, DEFAULT_FRAME_PERIOD);
 	}
 }
@@ -896,7 +896,7 @@ void video_screen_update_now(const device_config *screen)
 int video_screen_get_vpos(const device_config *screen)
 {
 	screen_state *state = get_safe_token(screen);
-	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), state->vblank_start_time));
+	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(screen->machine), state->vblank_start_time));
 	int vpos;
 
 	/* round to the nearest pixel */
@@ -919,7 +919,7 @@ int video_screen_get_vpos(const device_config *screen)
 int video_screen_get_hpos(const device_config *screen)
 {
 	screen_state *state = get_safe_token(screen);
-	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(), state->vblank_start_time));
+	attoseconds_t delta = attotime_to_attoseconds(attotime_sub(timer_get_time(screen->machine), state->vblank_start_time));
 	int vpos;
 
 	/* round to the nearest pixel */
@@ -949,7 +949,7 @@ int video_screen_get_vblank(const device_config *screen)
 	/* we should never be called with no VBLANK period - indication of a buggy driver */
 	assert(state->vblank_period != 0);
 
-	return (attotime_compare(timer_get_time(), state->vblank_end_time) < 0);
+	return (attotime_compare(timer_get_time(screen->machine), state->vblank_end_time) < 0);
 }
 
 
@@ -1008,7 +1008,7 @@ const rectangle *video_screen_get_visible_area(const device_config *screen)
 attotime video_screen_get_time_until_pos(const device_config *screen, int vpos, int hpos)
 {
 	screen_state *state = get_safe_token(screen);
-	attoseconds_t curdelta = attotime_to_attoseconds(attotime_sub(timer_get_time(), state->vblank_start_time));
+	attoseconds_t curdelta = attotime_to_attoseconds(attotime_sub(timer_get_time(screen->machine), state->vblank_start_time));
 	attoseconds_t targetdelta;
 
 	/* validate arguments */
@@ -1056,7 +1056,7 @@ attotime video_screen_get_time_until_vblank_end(const device_config *screen)
 {
 	attotime ret;
 	screen_state *state = get_safe_token(screen);
-	attotime current_time = timer_get_time();
+	attotime current_time = timer_get_time(screen->machine);
 
 	/* we are in the VBLANK region, compute the time until the end of the current VBLANK period */
 	if (video_screen_get_vblank(screen))
@@ -1214,11 +1214,11 @@ static DEVICE_START( video_screen )
 	assert(config->visarea.max_y > config->visarea.min_y);
 
 	/* allocate the VBLANK timers */
-	state->vblank_begin_timer = timer_alloc(vblank_begin_callback, (void *)screen);
-	state->vblank_end_timer = timer_alloc(vblank_end_callback, (void *)screen);
+	state->vblank_begin_timer = timer_alloc(screen->machine, vblank_begin_callback, (void *)screen);
+	state->vblank_end_timer = timer_alloc(screen->machine, vblank_end_callback, (void *)screen);
 
 	/* allocate a timer to reset partial updates */
-	state->scanline0_timer = timer_alloc(scanline0_callback, (void *)screen);
+	state->scanline0_timer = timer_alloc(screen->machine, scanline0_callback, (void *)screen);
 
 	/* configure the default cliparea */
 	render_container_get_user_settings(container, &settings);
@@ -1234,7 +1234,7 @@ static DEVICE_START( video_screen )
 
 	/* allocate a timer to generate per-scanline updates */
 	if (screen->machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
-		state->scanline_timer = timer_alloc(scanline_update_callback, (void *)screen);
+		state->scanline_timer = timer_alloc(screen->machine, scanline_update_callback, (void *)screen);
 
 	/* configure the screen with the default parameters */
 	video_screen_configure(screen, config->width, config->height, &config->visarea, config->refresh);
@@ -1363,7 +1363,7 @@ static TIMER_CALLBACK( vblank_begin_callback )
 	screen_state *state = get_safe_token(screen);
 
 	/* reset the starting VBLANK time */
-	state->vblank_start_time = timer_get_time();
+	state->vblank_start_time = timer_get_time(machine);
 	state->vblank_end_time = attotime_add_attoseconds(state->vblank_start_time, state->vblank_period);
 
 	/* call the screen specific callbacks */
@@ -1469,7 +1469,7 @@ static TIMER_CALLBACK( scanline_update_callback )
 
 void video_frame_update(running_machine *machine, int debug)
 {
-	attotime current_time = timer_get_time();
+	attotime current_time = timer_get_time(machine);
 	int skipped_it = global.skipping_this_frame;
 	int phase = mame_get_phase(machine);
 
@@ -2420,7 +2420,7 @@ void video_mng_begin_recording(running_machine *machine, const char *name)
 	}
 
 	/* compute the frame time */
-	global.movie_next_frame_time = timer_get_time();
+	global.movie_next_frame_time = timer_get_time(machine);
 	global.movie_frame_period = ATTOTIME_IN_HZ(rate);
 	global.movie_frame = 0;
 }
@@ -2454,7 +2454,7 @@ static void video_mng_record_frame(running_machine *machine)
 	/* only record if we have a file */
 	if (global.mng_file != NULL)
 	{
-		attotime curtime = timer_get_time();
+		attotime curtime = timer_get_time(machine);
 		png_info pnginfo = { 0 };
 		png_error error;
 
@@ -2553,7 +2553,7 @@ void video_avi_begin_recording(running_machine *machine, const char *name)
 
 	/* reset our tracking */
 	global.movie_frame = 0;
-	global.movie_next_frame_time = timer_get_time();
+	global.movie_next_frame_time = timer_get_time(machine);
 	global.movie_frame_period = attotime_div(ATTOTIME_IN_SEC(1000), info.video_timescale);
 
 	/* if we succeeded, make a copy of the name and create the real file over top */
@@ -2596,7 +2596,7 @@ static void video_avi_record_frame(running_machine *machine)
 	/* only record if we have a file */
 	if (global.avi_file != NULL)
 	{
-		attotime curtime = timer_get_time();
+		attotime curtime = timer_get_time(machine);
 		avi_error avierr;
 
 		profiler_mark(PROFILER_MOVIE_REC);

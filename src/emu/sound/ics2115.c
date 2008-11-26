@@ -451,8 +451,8 @@ static SND_START( ics2115 )
 	chip->intf = config;
 	chip->index = sndindex;
 	chip->rom = memory_region(Machine, tag);
-	chip->timer[0].timer = timer_alloc(timer_cb_0, chip);
-	chip->timer[1].timer = timer_alloc(timer_cb_1, chip);
+	chip->timer[0].timer = timer_alloc(Machine, timer_cb_0, chip);
+	chip->timer[1].timer = timer_alloc(Machine, timer_cb_1, chip);
 	chip->ulaw = auto_malloc(256*sizeof(INT16));
 	chip->stream = stream_create(0, 2, 33075, chip, update);
 

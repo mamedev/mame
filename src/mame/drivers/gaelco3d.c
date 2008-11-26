@@ -198,7 +198,7 @@ static MACHINE_RESET( common )
 	cpu_set_info_fct(machine->cpu[2], CPUINFO_PTR_ADSP2100_TX_HANDLER, (genf *)adsp_tx_callback);
 
 	/* allocate a timer for feeding the autobuffer */
-	adsp_autobuffer_timer = timer_alloc(adsp_autobuffer_irq, NULL);
+	adsp_autobuffer_timer = timer_alloc(machine, adsp_autobuffer_irq, NULL);
 
 	memory_configure_bank(machine, 1, 0, 256, memory_region(machine, "user1"), 0x4000);
 	memory_set_bank(machine, 1, 0);
@@ -311,7 +311,7 @@ static WRITE16_HANDLER( sound_data_w )
 {
 	logerror("%06X:sound_data_w(%02X) = %08X & %08X\n", cpu_get_pc(space->cpu), offset, data, mem_mask);
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
 }
 
 

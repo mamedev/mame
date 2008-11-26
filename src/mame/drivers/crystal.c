@@ -503,7 +503,7 @@ static MACHINE_START(crystal)
 
 	cpu_set_irq_callback(machine->cpu[0],icallback);
 	for (i=0; i<4; i++)
-		Timer[i] = timer_alloc(Timercb, (void*)(FPTR)i);
+		Timer[i] = timer_alloc(machine, Timercb, (void*)(FPTR)i);
 
 	PatchReset();
 }

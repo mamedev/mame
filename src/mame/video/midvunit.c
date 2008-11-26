@@ -61,7 +61,7 @@ static TIMER_CALLBACK( scanline_timer_cb )
 	{
 		cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 		timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline + 1, 0), scanline);
-		timer_set(ATTOTIME_IN_HZ(25000000), NULL, -1, scanline_timer_cb);
+		timer_set(machine, ATTOTIME_IN_HZ(25000000), NULL, -1, scanline_timer_cb);
 	}
 	else
 		cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
@@ -76,7 +76,7 @@ static void midvunit_exit(running_machine *machine)
 
 VIDEO_START( midvunit )
 {
-	scanline_timer = timer_alloc(scanline_timer_cb, NULL);
+	scanline_timer = timer_alloc(machine, scanline_timer_cb, NULL);
 	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, midvunit_exit);
 

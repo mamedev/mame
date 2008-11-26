@@ -950,7 +950,7 @@ static DRIVER_INIT( sslam )
 	state_save_register_global(sslam_bar);
 	state_save_register_global(sslam_snd_bank);
 
-	music_timer = timer_alloc(music_playback, NULL);
+	music_timer = timer_alloc(machine, music_playback, NULL);
 }
 
 static DRIVER_INIT( powerbls )

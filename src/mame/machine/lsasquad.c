@@ -42,7 +42,7 @@ WRITE8_HANDLER( lsasquad_sound_command_w )
 	lsasquad_sound_pending |= 0x01;
 	sound_cmd = data;
 //logerror("%04x: sound cmd %02x\n",cpu_get_pc(space->cpu),data);
-	timer_call_after_resynch(NULL, data,nmi_callback);
+	timer_call_after_resynch(space->machine, NULL, data,nmi_callback);
 }
 
 READ8_HANDLER( lsasquad_sh_sound_command_r )

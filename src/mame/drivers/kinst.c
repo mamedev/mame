@@ -275,7 +275,7 @@ static TIMER_CALLBACK( irq0_stop )
 static INTERRUPT_GEN( irq0_start )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq0_stop);
+	timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 0, irq0_stop);
 }
 
 

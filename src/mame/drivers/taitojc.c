@@ -1275,7 +1275,7 @@ static MACHINE_RESET( taitojc )
 
 	taito_f3_soundsystem_reset(machine);
 
-	f3_68681_reset();
+	f3_68681_reset(machine);
 
 	// hold the TMS in reset until we have code
 	cpu_set_input_line(machine->cpu[3], INPUT_LINE_RESET, ASSERT_LINE);

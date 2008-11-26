@@ -38,7 +38,7 @@ VIDEO_START( changela )
 	tree0_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 	tree1_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
-	changela_scanline_timer = timer_alloc(changela_scanline_callback, NULL);
+	changela_scanline_timer = timer_alloc(machine, changela_scanline_callback, NULL);
 	timer_adjust_oneshot(changela_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 30, 0), 30);
 
 	state_save_register_global(slopeROM_bank);

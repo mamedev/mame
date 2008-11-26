@@ -6,6 +6,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "pc16552d.h"
 
 #define REG_RECV_BUFFER			0x0		// Read
@@ -400,10 +401,10 @@ void pc16552d_init(int chip, int frequency, void (* irq_handler)(running_machine
 	duart[chip].ch[1].pending_interrupt = 0;
 
 	// allocate transmit timers
-	duart[chip].ch[0].tx_fifo_timer = timer_alloc(tx_fifo_timer_callback, NULL);
+	duart[chip].ch[0].tx_fifo_timer = timer_alloc(Machine, tx_fifo_timer_callback, NULL);
 	timer_adjust_oneshot(duart[chip].ch[0].tx_fifo_timer, attotime_never, (chip * 2) + 0);
 
-	duart[chip].ch[1].tx_fifo_timer = timer_alloc(tx_fifo_timer_callback, NULL);
+	duart[chip].ch[1].tx_fifo_timer = timer_alloc(Machine, tx_fifo_timer_callback, NULL);
 	timer_adjust_oneshot(duart[chip].ch[1].tx_fifo_timer, attotime_never, (chip * 2) + 1);
 }
 

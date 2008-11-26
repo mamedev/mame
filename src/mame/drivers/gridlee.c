@@ -119,15 +119,15 @@ static TIMER_CALLBACK( irq_timer )
 {
 	/* next interrupt after scanline 256 is scanline 64 */
 	if (param == 256)
-		timer_set(video_screen_get_time_until_pos(machine->primary_screen, 64, 0), NULL, 64, irq_timer);
+		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 64, 0), NULL, 64, irq_timer);
 	else
-		timer_set(video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), NULL, param + 64, irq_timer);
+		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, param + 64, 0), NULL, param + 64, irq_timer);
 
 	/* IRQ starts on scanline 0, 64, 128, etc. */
 	cpu_set_input_line(machine->cpu[0], M6809_IRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, param, BALSENTE_HBSTART), NULL, 0, irq_off);
 }
 
 
@@ -140,21 +140,21 @@ static TIMER_CALLBACK( firq_off )
 static TIMER_CALLBACK( firq_timer )
 {
 	/* same time next frame */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
 
 	/* IRQ starts on scanline FIRQ_SCANLINE? */
 	cpu_set_input_line(machine->cpu[0], M6809_FIRQ_LINE, ASSERT_LINE);
 
 	/* it will turn off on the next HBLANK */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, BALSENTE_HBSTART), NULL, 0, firq_off);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, BALSENTE_HBSTART), NULL, 0, firq_off);
 }
 
 
 static MACHINE_RESET( gridlee )
 {
 	/* start timers to generate interrupts */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, irq_timer);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, irq_timer);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, FIRQ_SCANLINE, 0), NULL, 0, firq_timer);
 
 	/* create the polynomial tables */
 	poly17_init();

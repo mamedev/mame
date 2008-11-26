@@ -414,7 +414,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( mlc )
 {
-	raster_irq_timer = timer_alloc(interrupt_gen, NULL);
+	raster_irq_timer = timer_alloc(machine, interrupt_gen, NULL);
 }
 
 static MACHINE_DRIVER_START( avengrgs )

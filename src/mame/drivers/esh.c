@@ -266,7 +266,7 @@ static INTERRUPT_GEN( vblank_callback_esh )
 {
 	// IRQ
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, irq_stop);
+	timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 0, irq_stop);
 }
 
 static MACHINE_START( esh )

@@ -126,7 +126,7 @@ static WRITE32_HANDLER(T1high_w)
 		T1high=data;
 }
 
-static void startTimer(void);
+static void startTimer(running_machine *machine);
 
 static TIMER_CALLBACK( ertictacTimer )
 {
@@ -135,17 +135,17 @@ static TIMER_CALLBACK( ertictacTimer )
 	{
 		cpu_set_input_line(machine->cpu[0], ARM_IRQ_LINE, HOLD_LINE);
 	}
-	startTimer();
+	startTimer(machine);
 }
 
-static void startTimer(void)
+static void startTimer(running_machine *machine)
 {
-	timer_set(ATTOTIME_IN_USEC( ((T1low&0xff)|((T1high&0xff)<<8))>>4), NULL, 0, ertictacTimer);
+	timer_set(machine, ATTOTIME_IN_USEC( ((T1low&0xff)|((T1high&0xff)<<8))>>4), NULL, 0, ertictacTimer);
 }
 
 static WRITE32_HANDLER(T1GO_w)
 {
-	startTimer();
+	startTimer(space->machine);
 }
 
 static ADDRESS_MAP_START( ertictac_map, ADDRESS_SPACE_PROGRAM, 32 )

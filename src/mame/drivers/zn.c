@@ -425,7 +425,7 @@ static void zn_driver_init( running_machine *machine )
 		n_game++;
 	}
 
-	dip_timer = timer_alloc( dip_timer_fired, NULL );
+	dip_timer = timer_alloc(machine,  dip_timer_fired, NULL );
 }
 
 static const psx_spu_interface psxspu_interface =

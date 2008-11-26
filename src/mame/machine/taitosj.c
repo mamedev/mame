@@ -120,7 +120,7 @@ static TIMER_CALLBACK( taitosj_mcu_real_data_w )
 WRITE8_HANDLER( taitosj_mcu_data_w )
 {
 	LOG(("%04x: protection write %02x\n",cpu_get_pc(space->cpu),data));
-	timer_call_after_resynch(NULL, data,taitosj_mcu_real_data_w);
+	timer_call_after_resynch(space->machine, NULL, data,taitosj_mcu_real_data_w);
 	/* temporarily boost the interleave to sync things up */
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(10));
 }
@@ -198,7 +198,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	if (~data & 0x02)
 	{
 		/* 68705 is going to read data from the Z80 */
-		timer_call_after_resynch(NULL, 0,taitosj_mcu_data_real_r);
+		timer_call_after_resynch(space->machine, NULL, 0,taitosj_mcu_data_real_r);
 		cpu_set_input_line(space->machine->cpu[2],0,CLEAR_LINE);
 		portA_in = fromz80;
 		LOG(("%04x: 68705 <- Z80 %02x\n",cpu_get_pc(space->cpu),portA_in));
@@ -212,7 +212,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 		LOG(("%04x: 68705 -> Z80 %02x\n",cpu_get_pc(space->cpu),portA_out));
 
 		/* 68705 is writing data for the Z80 */
-		timer_call_after_resynch(NULL, portA_out,taitosj_mcu_status_real_w);
+		timer_call_after_resynch(space->machine, NULL, portA_out,taitosj_mcu_status_real_w);
 	}
 	if (~data & 0x10)
 	{

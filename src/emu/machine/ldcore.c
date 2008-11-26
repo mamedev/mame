@@ -298,7 +298,7 @@ static void vblank_state_changed(const device_config *screen, void *param, int v
 	const device_config *device = param;
 	laserdisc_state *ld = get_safe_token(device);
 	ldcore_data *ldcore = ld->core;
-	attotime curtime = timer_get_time();
+	attotime curtime = timer_get_time(screen->machine);
 
 	/* update current track based on slider speed */
 	update_slider_pos(ldcore, curtime);
@@ -311,7 +311,7 @@ static void vblank_state_changed(const device_config *screen, void *param, int v
 			(*ldcore->intf.vsync)(ld, &ldcore->metadata[ldcore->fieldnum], ldcore->fieldnum, curtime);
 
 		/* set a timer to begin fetching the next frame just before the VBI data would be fetched */
-		timer_set(video_screen_get_time_until_pos(screen, 16*2, 0), ld, 0, perform_player_update);
+		timer_set(screen->machine, video_screen_get_time_until_pos(screen, 16*2, 0), ld, 0, perform_player_update);
 	}
 }
 
@@ -325,7 +325,7 @@ static TIMER_CALLBACK( perform_player_update )
 {
 	laserdisc_state *ld = ptr;
 	ldcore_data *ldcore = ld->core;
-	attotime curtime = timer_get_time();
+	attotime curtime = timer_get_time(machine);
 
 	/* wait for previous read and decode to finish */
 	process_track_data(ld->device);
@@ -556,7 +556,7 @@ void ldcore_set_slider_speed(laserdisc_state *ld, INT32 tracks_per_vsync)
 	ldcore_data *ldcore = ld->core;
 	attotime vsyncperiod = video_screen_get_frame_period(ld->screen);
 
-	update_slider_pos(ldcore, timer_get_time());
+	update_slider_pos(ldcore, timer_get_time(ld->device->machine));
 
 	/* if 0, set the time to 0 */
 	if (tracks_per_vsync == 0)
@@ -584,7 +584,7 @@ void ldcore_advance_slider(laserdisc_state *ld, INT32 numtracks)
 {
 	ldcore_data *ldcore = ld->core;
 
-	update_slider_pos(ldcore, timer_get_time());
+	update_slider_pos(ldcore, timer_get_time(ld->device->machine));
 	add_and_clamp_track(ldcore, numtracks);
 	if (LOG_SLIDER)
 		printf("Advance by %d\n", numtracks);
@@ -601,7 +601,7 @@ slider_position ldcore_get_slider_position(laserdisc_state *ld)
 	ldcore_data *ldcore = ld->core;
 
 	/* update the slider position first */
-	update_slider_pos(ldcore, timer_get_time());
+	update_slider_pos(ldcore, timer_get_time(ld->device->machine));
 
 	/* return the status */
 	if (ldcore->curtrack == 1)
@@ -1523,7 +1523,7 @@ static DEVICE_STOP( laserdisc )
 static DEVICE_RESET( laserdisc )
 {
 	laserdisc_state *ld = get_safe_token(device);
-	attotime curtime = timer_get_time();
+	attotime curtime = timer_get_time(device->machine);
 	ldcore_data *ldcore = ld->core;
 	int pltype, line;
 

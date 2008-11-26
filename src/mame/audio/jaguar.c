@@ -286,9 +286,9 @@ void cojag_sound_init(running_machine *machine)
 void cojag_sound_reset(void)
 {
 #if ENABLE_SPEEDUP_HACKS
-	serial_timer = timer_alloc(serial_chunky_callback, NULL);
+	serial_timer = timer_alloc(Machine, serial_chunky_callback, NULL);
 #else
-	serial_timer = timer_alloc(serial_callback, NULL);
+	serial_timer = timer_alloc(Machine, serial_callback, NULL);
 #endif
 }
 

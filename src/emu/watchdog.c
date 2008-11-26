@@ -40,7 +40,7 @@ static TIMER_CALLBACK( watchdog_callback );
 void watchdog_init(running_machine *machine)
 {
 	/* allocate a timer for the watchdog */
-	watchdog_timer = timer_alloc(watchdog_callback, NULL);
+	watchdog_timer = timer_alloc(machine, watchdog_callback, NULL);
 
 	add_reset_callback(machine, watchdog_internal_reset);
 

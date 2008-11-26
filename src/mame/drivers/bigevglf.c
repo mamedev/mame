@@ -88,13 +88,13 @@ static TIMER_CALLBACK( from_sound_latch_callback )
 }
 static WRITE8_HANDLER(beg_fromsound_w)	/* write to D800 sets bit 1 in status */
 {
-	timer_call_after_resynch(NULL, (cpu_get_pc(space->cpu)<<16)|data, from_sound_latch_callback);
+	timer_call_after_resynch(space->machine, NULL, (cpu_get_pc(space->cpu)<<16)|data, from_sound_latch_callback);
 }
 
 static READ8_HANDLER(beg_fromsound_r)
 {
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 	return from_sound;
 }
 
@@ -102,7 +102,7 @@ static READ8_HANDLER(beg_soundstate_r)
 {
 	UINT8 ret = sound_state;
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 	sound_state &= ~2; /* read from port 21 clears bit 1 in status */
 	return ret;
 }
@@ -110,7 +110,7 @@ static READ8_HANDLER(beg_soundstate_r)
 static READ8_HANDLER(soundstate_r)
 {
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 	return sound_state;
 }
 
@@ -123,7 +123,7 @@ static TIMER_CALLBACK( nmi_callback )
 static WRITE8_HANDLER( sound_command_w )	/* write to port 20 clears bit 0 in status */
 {
 	for_sound = data;
-	timer_call_after_resynch(NULL, data,nmi_callback);
+	timer_call_after_resynch(space->machine, NULL, data,nmi_callback);
 }
 
 static READ8_HANDLER( sound_command_r )	/* read from D800 sets bit 0 in status */
@@ -159,19 +159,19 @@ static TIMER_CALLBACK( deferred_ls74_w )
 /* do this on a timer to let the CPUs synchronize */
 static WRITE8_HANDLER (beg13A_clr_w)
 {
-	timer_call_after_resynch(NULL, (0<<8) | 0, deferred_ls74_w);
+	timer_call_after_resynch(space->machine, NULL, (0<<8) | 0, deferred_ls74_w);
 }
 static WRITE8_HANDLER (beg13B_clr_w)
 {
-	timer_call_after_resynch(NULL, (1<<8) | 0, deferred_ls74_w);
+	timer_call_after_resynch(space->machine, NULL, (1<<8) | 0, deferred_ls74_w);
 }
 static WRITE8_HANDLER (beg13A_set_w)
 {
-	timer_call_after_resynch(NULL, (0<<8) | 1, deferred_ls74_w);
+	timer_call_after_resynch(space->machine, NULL, (0<<8) | 1, deferred_ls74_w);
 }
 static WRITE8_HANDLER (beg13B_set_w)
 {
-	timer_call_after_resynch(NULL, (1<<8) | 1, deferred_ls74_w);
+	timer_call_after_resynch(space->machine, NULL, (1<<8) | 1, deferred_ls74_w);
 }
 
 static READ8_HANDLER( beg_status_r )
@@ -186,7 +186,7 @@ static READ8_HANDLER( beg_status_r )
 
 */
 	/* set a timer to force synchronization after the read */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 	return (beg13_ls74[0]<<0) | (beg13_ls74[1]<<1);
 }
 

@@ -314,7 +314,7 @@ static TIMER_CALLBACK( delayed_int_enable_w )
 static WRITE16_HANDLER( int_enable_w )
 {
 	if (offset == 0 && ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data, delayed_int_enable_w);
+		timer_call_after_resynch(space->machine, NULL, data, delayed_int_enable_w);
 }
 
 

@@ -87,7 +87,7 @@ static MACHINE_START( alg )
 {
 	laserdisc = device_list_find_by_tag(machine->config->devicelist, LASERDISC, "laserdisc");
 
-	serial_timer = timer_alloc(response_timer, NULL);
+	serial_timer = timer_alloc(machine, response_timer, NULL);
 	serial_timer_active = FALSE;
 }
 

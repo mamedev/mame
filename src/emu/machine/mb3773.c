@@ -7,6 +7,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/mb3773.h"
 
 static emu_timer *watchdog_timer;
@@ -33,7 +34,7 @@ void mb3773_set_ck( UINT8 new_ck )
 
 void mb3773_init( void )
 {
-	watchdog_timer = timer_alloc( watchdog_timeout , NULL);
+	watchdog_timer = timer_alloc(Machine, watchdog_timeout, NULL);
 	reset_timer();
 	state_save_register_global( ck );
 }

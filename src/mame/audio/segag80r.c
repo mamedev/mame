@@ -583,7 +583,7 @@ static void *sega005_custom_start(int clock, const custom_sound_interface *confi
 	sega005_stream = stream_create(0, 1, SEGA005_COUNTER_FREQ, NULL, sega005_stream_update);
 
 	/* create a timer for the 555 */
-	sega005_sound_timer = timer_alloc(sega005_auto_timer, NULL);
+	sega005_sound_timer = timer_alloc(Machine, sega005_auto_timer, NULL);
 
 	/* set the initial sound data */
 	sound_data = 0x00;

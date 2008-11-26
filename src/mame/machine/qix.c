@@ -365,7 +365,7 @@ static TIMER_CALLBACK( deferred_pia_4_porta_w )
 static WRITE8_HANDLER( sync_pia_4_porta_w )
 {
 	/* we need to synchronize this so the sound CPU doesn't drop anything important */
-	timer_call_after_resynch(NULL, data, deferred_pia_4_porta_w);
+	timer_call_after_resynch(space->machine, NULL, data, deferred_pia_4_porta_w);
 }
 
 
@@ -535,7 +535,7 @@ WRITE8_HANDLER( qix_pia_0_w )
 {
 	/* make all the CPUs synchronize, and only AFTER that write the command to the PIA */
 	/* otherwise the 68705 will miss commands */
-	timer_call_after_resynch(NULL, data | (offset << 8), pia_0_w_callback);
+	timer_call_after_resynch(space->machine, NULL, data | (offset << 8), pia_0_w_callback);
 }
 
 

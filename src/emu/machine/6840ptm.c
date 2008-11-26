@@ -398,7 +398,7 @@ void ptm6840_config(running_machine *machine, int which, const ptm6840_interface
 
 	for (i = 0; i < 3; i++)
 	{
-		ptm[which].timer[i] = timer_alloc(ptm6840_timer_cb, (void*)(FPTR)i);
+		ptm[which].timer[i] = timer_alloc(machine, ptm6840_timer_cb, (void*)(FPTR)i);
 		timer_enable(ptm[which].timer[i], FALSE);
 	}
 

@@ -445,7 +445,7 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 	init_gfxelement(mo, desc->gfxindex);
 
 	/* start a timer to update a few times during refresh */
-	force_update_timer = timer_alloc(force_update, NULL);
+	force_update_timer = timer_alloc(machine, force_update, NULL);
 	timer_adjust_oneshot(force_update_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	init_savestate(map, mo);

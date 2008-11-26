@@ -206,25 +206,25 @@ static TIMER_CALLBACK( setirq_callback )
 
 WRITE8_HANDLER( t5182_sound_irq_w )
 {
-	timer_call_after_resynch(NULL, CPU_ASSERT,setirq_callback);
+	timer_call_after_resynch(space->machine, NULL, CPU_ASSERT,setirq_callback);
 }
 
 static WRITE8_HANDLER( t5182_ym2151_irq_ack_w )
 {
-	timer_call_after_resynch(NULL, YM2151_ACK,setirq_callback);
+	timer_call_after_resynch(space->machine, NULL, YM2151_ACK,setirq_callback);
 }
 
 static WRITE8_HANDLER( t5182_cpu_irq_ack_w )
 {
-	timer_call_after_resynch(NULL, CPU_CLEAR,setirq_callback);
+	timer_call_after_resynch(space->machine, NULL, CPU_CLEAR,setirq_callback);
 }
 
 static void t5182_ym2151_irq_handler(running_machine *machine, int irq)
 {
 	if (irq)
-		timer_call_after_resynch(NULL, YM2151_ASSERT,setirq_callback);
+		timer_call_after_resynch(machine, NULL, YM2151_ASSERT,setirq_callback);
 	else
-		timer_call_after_resynch(NULL, YM2151_CLEAR,setirq_callback);
+		timer_call_after_resynch(machine, NULL, YM2151_CLEAR,setirq_callback);
 }
 
 

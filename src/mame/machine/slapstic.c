@@ -1141,7 +1141,7 @@ static void slapstic_log(running_machine *machine, offs_t offset)
 		slapsticlog = fopen("slapstic.log", "w");
 	if (slapsticlog)
 	{
-		attotime time = timer_get_time();
+		attotime time = timer_get_time(machine);
 
 		if (attotime_compare(attotime_sub(time, last_time), ATTOTIME_IN_SEC(1)) > 0)
 			fprintf(slapsticlog, "------------------------------------\n");

@@ -257,7 +257,7 @@ static MACHINE_RESET( cclimber )
 
 	/* we must do this on a timer in order to have it take effect */
 	/* otherwise, the reset process will override our changes */
-	timer_call_after_resynch(NULL, 0, disable_interrupts);
+	timer_call_after_resynch(machine, NULL, 0, disable_interrupts);
 
 	toprollr_rombank = 0;
 }

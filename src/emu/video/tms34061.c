@@ -122,7 +122,7 @@ void tms34061_start(running_machine *machine, const struct tms34061_interface *i
 	tms34061.regs[TMS34061_VERCOUNTER]   = 0x0000;
 
 	/* start vertical interrupt timer */
-	tms34061.timer = timer_alloc(tms34061_interrupt, NULL);
+	tms34061.timer = timer_alloc(machine, tms34061_interrupt, NULL);
 }
 
 

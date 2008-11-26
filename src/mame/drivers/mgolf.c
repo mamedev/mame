@@ -78,13 +78,13 @@ static void update_plunger(running_machine *machine)
 	{
 		if (val == 0)
 		{
-			time_released = timer_get_time();
+			time_released = timer_get_time(machine);
 
 			if (!mask)
 				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 		}
 		else
-			time_pushed = timer_get_time();
+			time_pushed = timer_get_time(machine);
 
 		prev = val;
 	}
@@ -104,19 +104,19 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 262)
 		scanline = 16;
 
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
 }
 
 
-static double calc_plunger_pos(void)
+static double calc_plunger_pos(running_machine *machine)
 {
-	return (attotime_to_double(timer_get_time()) - attotime_to_double(time_released)) * (attotime_to_double(time_released) - attotime_to_double(time_pushed) + 0.2);
+	return (attotime_to_double(timer_get_time(machine)) - attotime_to_double(time_released)) * (attotime_to_double(time_released) - attotime_to_double(time_pushed) + 0.2);
 }
 
 
 static MACHINE_RESET( mgolf )
 {
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 16, 0), NULL, 16, interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 16, 0), NULL, 16, interrupt_callback);
 }
 
 
@@ -154,7 +154,7 @@ static READ8_HANDLER( mgolf_dial_r )
 
 static READ8_HANDLER( mgolf_misc_r )
 {
-	double plunger = calc_plunger_pos(); /* see Video Pinball */
+	double plunger = calc_plunger_pos(space->machine); /* see Video Pinball */
 
 	UINT8 val = input_port_read(space->machine, "61");
 

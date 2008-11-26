@@ -352,7 +352,7 @@ static void tubep_setup_save_state(void)
 static MACHINE_START( tubep )
 {
 	/* Create interrupt timer */
-	interrupt_timer = timer_alloc(tubep_scanline_callback, NULL);
+	interrupt_timer = timer_alloc(machine, tubep_scanline_callback, NULL);
 
 	tubep_setup_save_state();
 }
@@ -516,7 +516,7 @@ logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(machi
 static MACHINE_START( rjammer )
 {
 	/* Create interrupt timer */
-	interrupt_timer = timer_alloc(rjammer_scanline_callback, NULL);
+	interrupt_timer = timer_alloc(machine, rjammer_scanline_callback, NULL);
 
 	tubep_setup_save_state();
 }

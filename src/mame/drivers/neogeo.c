@@ -263,11 +263,11 @@ static TIMER_CALLBACK( vblank_interrupt_callback )
 }
 
 
-static void create_interrupt_timers(void)
+static void create_interrupt_timers(running_machine *machine)
 {
-	display_position_interrupt_timer = timer_alloc(display_position_interrupt_callback, NULL);
-	display_position_vblank_timer = timer_alloc(display_position_vblank_callback, NULL);
-	vblank_interrupt_timer = timer_alloc(vblank_interrupt_callback, NULL);
+	display_position_interrupt_timer = timer_alloc(machine, display_position_interrupt_callback, NULL);
+	display_position_vblank_timer = timer_alloc(machine, display_position_vblank_callback, NULL);
+	vblank_interrupt_timer = timer_alloc(machine, vblank_interrupt_callback, NULL);
 }
 
 
@@ -958,7 +958,7 @@ static MACHINE_START( neogeo )
 	/* set the initial audio CPU ROM banks */
 	audio_cpu_banking_init(machine);
 
-	create_interrupt_timers();
+	create_interrupt_timers(machine);
 
 	/* initialize the celander IC to 'right now' */
 	calendar_init(machine);

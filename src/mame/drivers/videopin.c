@@ -33,13 +33,13 @@ static void update_plunger(running_machine *machine)
 	{
 		if (val == 0)
 		{
-			time_released = timer_get_time();
+			time_released = timer_get_time(machine);
 
 			if (!mask)
 				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, ASSERT_LINE);
 		}
 		else
-			time_pushed = timer_get_time();
+			time_pushed = timer_get_time(machine);
 
 		prev = val;
 	}
@@ -59,7 +59,7 @@ static TIMER_CALLBACK( interrupt_callback )
 	if (scanline >= 263)
 		scanline = 32;
 
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, interrupt_callback);
 }
 
 
@@ -67,7 +67,7 @@ static MACHINE_RESET( videopin )
 {
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 32, 0), NULL, 32, interrupt_callback);
 
 	/* both output latches are cleared on reset */
 
@@ -76,15 +76,15 @@ static MACHINE_RESET( videopin )
 }
 
 
-static double calc_plunger_pos(void)
+static double calc_plunger_pos(running_machine *machine)
 {
-	return (attotime_to_double(timer_get_time()) - attotime_to_double(time_released)) * (attotime_to_double(time_released) - attotime_to_double(time_pushed) + 0.2);
+	return (attotime_to_double(timer_get_time(machine)) - attotime_to_double(time_released)) * (attotime_to_double(time_released) - attotime_to_double(time_pushed) + 0.2);
 }
 
 
 static READ8_HANDLER( videopin_misc_r )
 {
-	double plunger = calc_plunger_pos();
+	double plunger = calc_plunger_pos(space->machine);
 
 	// The plunger of the ball shooter has a black piece of
 	// plastic (flag) attached to it. When the plunger flag passes

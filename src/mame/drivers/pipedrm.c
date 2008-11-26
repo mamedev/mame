@@ -187,13 +187,13 @@ static TIMER_CALLBACK( delayed_command_w	)
 
 static WRITE8_HANDLER( sound_command_w )
 {
-	timer_call_after_resynch(NULL, data | 0x100, delayed_command_w);
+	timer_call_after_resynch(space->machine, NULL, data | 0x100, delayed_command_w);
 }
 
 
 static WRITE8_HANDLER( sound_command_nonmi_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_command_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_command_w);
 }
 
 

@@ -279,7 +279,7 @@ static DRIVER_INIT( ultrsprt )
 {
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 }
 
 /*****************************************************************************/

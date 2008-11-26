@@ -173,14 +173,14 @@ void cia_config(running_machine *machine, int which, const cia6526_interface *in
 	for (t = 0; t < (sizeof(cia->timer) / sizeof(cia->timer[0])); t++)
 	{
 		cia_timer *timer = &cia->timer[t];
-		timer->timer = timer_alloc(cia_timer_proc, timer);
+		timer->timer = timer_alloc(machine, cia_timer_proc, timer);
 		timer->cia = cia;
 		timer->irq = 0x01 << t;
 	}
 
 	/* setup TOD timer, if appropriate */
 	if (intf->tod_clock)
-		timer_pulse(ATTOTIME_IN_HZ(intf->tod_clock), NULL, which, cia_clock_tod_callback);
+		timer_pulse(machine, ATTOTIME_IN_HZ(intf->tod_clock), NULL, which, cia_clock_tod_callback);
 
 	/* special case; for the first CIA, set up an exit handler to clear things out */
 	if (which == 0)

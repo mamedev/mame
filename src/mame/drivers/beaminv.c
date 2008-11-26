@@ -91,9 +91,9 @@ static TIMER_CALLBACK( interrupt_callback )
 }
 
 
-static void create_interrupt_timer(void)
+static void create_interrupt_timer(running_machine *machine)
 {
-	interrupt_timer = timer_alloc(interrupt_callback, NULL);
+	interrupt_timer = timer_alloc(machine, interrupt_callback, NULL);
 }
 
 
@@ -113,7 +113,7 @@ static void start_interrupt_timer(running_machine *machine)
 
 static MACHINE_START( beaminv )
 {
-	create_interrupt_timer();
+	create_interrupt_timer(machine);
 
 	/* setup for save states */
 	state_save_register_global(controller_select);

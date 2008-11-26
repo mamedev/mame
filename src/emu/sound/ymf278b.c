@@ -659,8 +659,8 @@ static void ymf278b_init(YMF278BChip *chip, UINT8 *rom, void (*cb)(running_machi
 {
 	chip->rom = rom;
 	chip->irq_callback = cb;
-	chip->timer_a = timer_alloc(ymf278b_timer_a_tick, chip);
-	chip->timer_b = timer_alloc(ymf278b_timer_b_tick, chip);
+	chip->timer_a = timer_alloc(Machine, ymf278b_timer_a_tick, chip);
+	chip->timer_b = timer_alloc(Machine, ymf278b_timer_b_tick, chip);
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = clock;
 

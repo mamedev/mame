@@ -402,7 +402,7 @@ static TIMER_CALLBACK( main_to_sub_comm_sync_w )
 
 static WRITE8_HANDLER( main_to_sub_comm_w )
 {
-	timer_call_after_resynch(NULL, data | (offset << 8), main_to_sub_comm_sync_w);
+	timer_call_after_resynch(space->machine, NULL, data | (offset << 8), main_to_sub_comm_sync_w);
 }
 
 

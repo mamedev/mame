@@ -42,11 +42,11 @@ static TIMER_CALLBACK( countdown_timer_callback )
 		timer_value = 99;
 }
 
-static void start_countdown_timer(void)
+static void start_countdown_timer(running_machine *machine)
 {
 	timer_value = 0;
 
-	timer_pulse(ATTOTIME_IN_SEC(1), NULL, 0, countdown_timer_callback);
+	timer_pulse(machine, ATTOTIME_IN_SEC(1), NULL, 0, countdown_timer_callback);
 }
 
 
@@ -233,7 +233,7 @@ VIDEO_START( dday )
 	sl_enable = 0;
 	sl_image = 0;
 
-	start_countdown_timer();
+	start_countdown_timer(machine);
 }
 
 WRITE8_HANDLER( dday_bgvideoram_w )

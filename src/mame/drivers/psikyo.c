@@ -110,7 +110,7 @@ static CUSTOM_INPUT( z80_nmi_r )
 
 		/* main CPU might be waiting for sound CPU to finish NMI,
            so set a timer to give sound CPU a chance to run */
-		timer_call_after_resynch(NULL, 0, NULL);
+		timer_call_after_resynch(field->port->machine, NULL, 0, NULL);
 //      logerror("PC %06X - Read coin port during Z80 NMI\n", cpu_get_pc(machine->activecpu));
 	}
 
@@ -177,7 +177,7 @@ static TIMER_CALLBACK( psikyo_soundlatch_callback )
 static WRITE32_HANDLER( psikyo_soundlatch_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, psikyo_soundlatch_callback);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, psikyo_soundlatch_callback);
 }
 
 /***************************************************************************
@@ -187,7 +187,7 @@ static WRITE32_HANDLER( psikyo_soundlatch_w )
 static WRITE32_HANDLER( s1945_soundlatch_w )
 {
 	if (ACCESSING_BITS_16_23)
-		timer_call_after_resynch(NULL, (data >> 16) & 0xff, psikyo_soundlatch_callback);
+		timer_call_after_resynch(space->machine, NULL, (data >> 16) & 0xff, psikyo_soundlatch_callback);
 }
 
 static const UINT8 s1945_table[256] = {

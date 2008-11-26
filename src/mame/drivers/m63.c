@@ -323,7 +323,7 @@ static WRITE8_HANDLER( coin_w )
 static WRITE8_HANDLER( snd_irq_w )
 {
 	cpu_set_input_line(space->machine->cpu[1], 0, ASSERT_LINE);
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 }
 
 static WRITE8_HANDLER( snddata_w )

@@ -179,7 +179,7 @@ static MACHINE_START( ddragon )
 	memory_configure_bank(machine, 1, 0, 8, memory_region(machine, "main") + 0x10000, 0x4000);
 
 	/* allocate timer for scanlines */
-	scanline_timer = timer_alloc(ddragon_scanline_callback, NULL);
+	scanline_timer = timer_alloc(machine, ddragon_scanline_callback, NULL);
 
 	/* determine the sound CPU index */
 	snd_cpu = mame_find_cpu_index(machine, "sound");

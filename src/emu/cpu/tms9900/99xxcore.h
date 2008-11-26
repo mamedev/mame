@@ -1293,7 +1293,7 @@ static CPU_INIT( tms99xx )
 	I.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	I.timer = timer_alloc(decrementer_callback, NULL);
+	I.timer = timer_alloc(device->machine, decrementer_callback, NULL);
 #endif
 
 	I.idle_callback = param ? param->idle_callback : NULL;

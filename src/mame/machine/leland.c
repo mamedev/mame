@@ -367,7 +367,7 @@ MACHINE_START( leland )
 	battery_ram = auto_malloc(LELAND_BATTERY_RAM_SIZE);
 
 	/* start scanline interrupts going */
-	master_int_timer = timer_alloc(leland_interrupt_callback, NULL);
+	master_int_timer = timer_alloc(machine, leland_interrupt_callback, NULL);
 }
 
 
@@ -421,7 +421,7 @@ MACHINE_START( ataxx )
 	extra_tram = auto_malloc(ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
-	master_int_timer = timer_alloc(ataxx_interrupt_callback, NULL);
+	master_int_timer = timer_alloc(machine, ataxx_interrupt_callback, NULL);
 }
 
 

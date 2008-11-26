@@ -604,7 +604,7 @@ void cpu_interrupt_enable(int cpunum, int enabled)
 
 	/* make sure there are no queued interrupts */
 	if (enabled == 0)
-		timer_call_after_resynch(NULL, cpunum, clear_all_lines);
+		timer_call_after_resynch(Machine, NULL, cpunum, clear_all_lines);
 }
 
 

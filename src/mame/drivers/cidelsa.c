@@ -551,7 +551,7 @@ static MACHINE_START( cidelsa )
 	/* reset the CPU */
 
 	state->cdp1802_mode = CDP1802_MODE_RESET;
-	timer_set(ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
+	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 
 	/* register for state saving */
 

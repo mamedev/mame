@@ -171,9 +171,9 @@ static TIMER_CALLBACK( irq_callback )
 }
 
 
-static void create_irq_timer(void)
+static void create_irq_timer(running_machine *machine)
 {
-	irq_timer = timer_alloc(irq_callback, NULL);
+	irq_timer = timer_alloc(machine, irq_callback, NULL);
 }
 
 
@@ -248,9 +248,9 @@ static TIMER_CALLBACK( nmi_callback )
 }
 
 
-static void create_nmi_timer(void)
+static void create_nmi_timer(running_machine *machine)
 {
-	nmi_timer = timer_alloc(nmi_callback, NULL);
+	nmi_timer = timer_alloc(machine, nmi_callback, NULL);
 }
 
 
@@ -270,8 +270,8 @@ static void start_nmi_timer(running_machine *machine)
 
 static MACHINE_START( berzerk )
 {
-	create_irq_timer();
-	create_nmi_timer();
+	create_irq_timer(machine);
+	create_nmi_timer(machine);
 
 	/* register for state saving */
 	state_save_register_global(magicram_control);

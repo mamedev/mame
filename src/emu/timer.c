@@ -42,27 +42,24 @@
 /* in timer.h: typedef struct _emu_timer emu_timer; */
 struct _emu_timer
 {
-	emu_timer *		next;
-	emu_timer *		prev;
-	timer_fired_func	callback;
-	INT32 			param;
-	void *			ptr;
-	const char *	file;
-	int 			line;
-	const char *	func;
-	UINT8 			enabled;
-	UINT8 			temporary;
-	attotime 		period;
-	attotime 		start;
-	attotime 		expire;
+	running_machine *		machine;		/* pointer to the owning machine */
+	emu_timer *				next;			/* next timer in order in the list */
+	emu_timer *				prev;			/* previous timer in order in the list */
+	timer_fired_func		callback;		/* callback function */
+	INT32 					param;			/* integer parameter */
+	void *					ptr;			/* pointer parameter */
+	const char *			file;			/* file that created the timer */
+	int 					line;			/* line number that created the timer */
+	const char *			func;			/* string name of the callback function */
+	UINT8 					enabled;		/* is the timer enabled? */
+	UINT8 					temporary;		/* is the timer temporary? */
+	attotime 				period;			/* the repeat frequency of the timer */
+	attotime 				start;			/* time when the timer was started */
+	attotime 				expire;			/* time when the timer will expire */
 };
 
 
-/*-------------------------------------------------
-    timer_state - configuration of a single
-    timer device
--------------------------------------------------*/
-
+/* configuration of a single timer device */
 typedef struct _timer_state timer_state;
 struct _timer_state
 {
@@ -79,11 +76,7 @@ struct _timer_state
 };
 
 
-/*-------------------------------------------------
-    quantum_slot - a single minimum quantum
-    request
--------------------------------------------------*/
-
+/* a single minimum quantum */
 typedef struct _quantum_slot quantum_slot;
 struct _quantum_slot
 {
@@ -93,27 +86,27 @@ struct _quantum_slot
 };
 
 
+/* global private data */
+/* In mame.h: typedef struct _timer_private timer_private; */
+struct _timer_private
+{
+	/* list of active timers */
+	emu_timer 				timers[MAX_TIMERS]; /* actual timers */
+	emu_timer *				activelist;		/* head of the active list */
+	emu_timer *				freelist; 		/* head of the free list */
+	emu_timer *				freelist_tail;	/* tail of the free list */
 
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
+	/* other internal states */
+	attotime 				basetime;		/* the current global base time */
+	emu_timer *				callback_timer;	/* pointer to the current callback timer */
+	UINT8					callback_timer_modified; /* TRUE if the current callback timer was modified */
+	attotime				callback_timer_expire_time; /* the original expiration time */
 
-/* list of active timers */
-static emu_timer timers[MAX_TIMERS];
-static emu_timer *timer_head;
-static emu_timer *timer_free_head;
-static emu_timer *timer_free_tail;
-
-/* other internal states */
-static attotime global_basetime;
-static emu_timer *callback_timer;
-static int callback_timer_modified;
-static attotime callback_timer_expire_time;
-
-/* scheduling quanta */
-static quantum_slot quantum_list[MAX_QUANTA];
-static quantum_slot *quantum_current;
-static attoseconds_t quantum_minimum;
+	/* scheduling quanta */
+	quantum_slot 			quantum_list[MAX_QUANTA]; /* list of scheduling quanta */
+	quantum_slot *			quantum_current;/* current minimum quantum */
+	attoseconds_t 			quantum_minimum;/* duration of minimum quantum */
+};
 
 
 
@@ -122,7 +115,7 @@ static attoseconds_t quantum_minimum;
 ***************************************************************************/
 
 static STATE_POSTLOAD( timer_postload );
-static void timer_logtimers(void);
+static void timer_logtimers(running_machine *machine);
 static void timer_remove(emu_timer *which);
 
 
@@ -135,18 +128,20 @@ static void timer_remove(emu_timer *which);
     get_current_time - return the current time
 -------------------------------------------------*/
 
-INLINE attotime get_current_time(void)
+INLINE attotime get_current_time(running_machine *machine)
 {
+	timer_private *global = machine->timer_data;
+
 	/* if we're currently in a callback, use the timer's expiration time as a base */
-	if (callback_timer != NULL)
-		return callback_timer_expire_time;
+	if (global->callback_timer != NULL)
+		return global->callback_timer_expire_time;
 
 	/* if we're executing as a particular CPU, use its local time as a base */
-	if (Machine->activecpu != NULL)
-		return cpu_get_local_time(Machine->activecpu);
+	if (machine->activecpu != NULL)
+		return cpu_get_local_time(machine->activecpu);
 
 	/* otherwise, return the current global base time */
-	return global_basetime;
+	return global->basetime;
 }
 
 
@@ -154,21 +149,26 @@ INLINE attotime get_current_time(void)
     timer_new - allocate a new timer
 -------------------------------------------------*/
 
-INLINE emu_timer *timer_new(void)
+INLINE emu_timer *timer_new(running_machine *machine)
 {
+	timer_private *global = machine->timer_data;
 	emu_timer *timer;
 
-	/* remove an empty entry */
-	if (!timer_free_head)
+	/* if nothing remains available, fatal error -- we should never hit this */
+	if (global->freelist == NULL)
 	{
-		timer_logtimers();
+		timer_logtimers(machine);
 		fatalerror("Out of timers!");
 	}
-	timer = timer_free_head;
-	timer_free_head = timer->next;
-	if (!timer_free_head)
-		timer_free_tail = NULL;
-
+	
+	/* pull an entry from the free list */
+	timer = global->freelist;
+	global->freelist = timer->next;
+	if (global->freelist == NULL)
+		global->freelist_tail = NULL;
+	
+	/* set up the machine */
+	timer->machine = machine;
 	return timer;
 }
 
@@ -181,6 +181,7 @@ INLINE emu_timer *timer_new(void)
 INLINE void timer_list_insert(emu_timer *timer)
 {
 	attotime expire = timer->enabled ? timer->expire : attotime_never;
+	timer_private *global = timer->machine->timer_data;
 	emu_timer *t, *lt = NULL;
 
 	/* sanity checks for the debug build */
@@ -189,7 +190,7 @@ INLINE void timer_list_insert(emu_timer *timer)
 		int tnum = 0;
 
 		/* loop over the timer list */
-		for (t = timer_head; t; t = t->next, tnum++)
+		for (t = global->activelist; t; t = t->next, tnum++)
 		{
 			if (t == timer)
 				fatalerror("This timer is already inserted in the list!");
@@ -200,7 +201,7 @@ INLINE void timer_list_insert(emu_timer *timer)
 	#endif
 
 	/* loop over the timer list */
-	for (t = timer_head; t; lt = t, t = t->next)
+	for (t = global->activelist; t; lt = t, t = t->next)
 	{
 		/* if the current list entry expires after us, we should be inserted before it */
 		if (attotime_compare(t->expire, expire) > 0)
@@ -212,7 +213,7 @@ INLINE void timer_list_insert(emu_timer *timer)
 			if (t->prev)
 				t->prev->next = timer;
 			else
-				timer_head = timer;
+				global->activelist = timer;
 			t->prev = timer;
 			return;
 		}
@@ -222,7 +223,7 @@ INLINE void timer_list_insert(emu_timer *timer)
 	if (lt)
 		lt->next = timer;
 	else
-		timer_head = timer;
+		global->activelist = timer;
 	timer->prev = lt;
 	timer->next = NULL;
 }
@@ -250,13 +251,15 @@ INLINE timer_state *get_safe_token(const device_config *device)
 
 INLINE void timer_list_remove(emu_timer *timer)
 {
+	timer_private *global = timer->machine->timer_data;
+
 	/* sanity checks for the debug build */
 	#ifdef MAME_DEBUG
 	{
 		emu_timer *t;
 
 		/* loop over the timer list */
-		for (t = timer_head; t && t != timer; t = t->next) ;
+		for (t = global->activelist; t && t != timer; t = t->next) ;
 		if (t == NULL)
 			fatalerror("timer (%s from %s:%d) not found in list", timer->func, timer->file, timer->line);
 	}
@@ -266,7 +269,7 @@ INLINE void timer_list_remove(emu_timer *timer)
 	if (timer->prev)
 		timer->prev->next = timer->next;
 	else
-		timer_head = timer->next;
+		global->activelist = timer->next;
 	if (timer->next)
 		timer->next->prev = timer->prev;
 }
@@ -283,38 +286,39 @@ INLINE void timer_list_remove(emu_timer *timer)
 
 void timer_init(running_machine *machine)
 {
+	timer_private *global;
 	int i;
+	
+	/* allocate global data */
+	global = machine->timer_data = auto_malloc(sizeof(*global));
+	memset(global, 0, sizeof(*global));
 
 	/* we need to wait until the first call to timer_cyclestorun before using real CPU times */
-	global_basetime = attotime_zero;
-	callback_timer = NULL;
-	callback_timer_modified = FALSE;
+	global->basetime = attotime_zero;
+	global->callback_timer = NULL;
+	global->callback_timer_modified = FALSE;
 
 	/* register with the save state system */
 	state_save_push_tag(0);
-	state_save_register_item("timer", NULL, 0, global_basetime.seconds);
-	state_save_register_item("timer", NULL, 0, global_basetime.attoseconds);
+	state_save_register_item("timer", NULL, 0, global->basetime.seconds);
+	state_save_register_item("timer", NULL, 0, global->basetime.attoseconds);
 	state_save_register_postload(machine, timer_postload, NULL);
 	state_save_pop_tag();
 
-	/* reset the timers */
-	memset(timers, 0, sizeof(timers));
-
 	/* initialize the lists */
-	timer_head = NULL;
-	timer_free_head = &timers[0];
+	global->activelist = NULL;
+	global->freelist = &global->timers[0];
 	for (i = 0; i < MAX_TIMERS-1; i++)
-		timers[i].next = &timers[i+1];
-	timers[MAX_TIMERS-1].next = NULL;
-	timer_free_tail = &timers[MAX_TIMERS-1];
+		global->timers[i].next = &global->timers[i+1];
+	global->timers[MAX_TIMERS-1].next = NULL;
+	global->freelist_tail = &global->timers[MAX_TIMERS-1];
 
 	/* reset the quanta */
-	memset(quantum_list, 0, sizeof(quantum_list));
-	quantum_list[0].requested = ATTOSECONDS_IN_MSEC(100);
-	quantum_list[0].actual = ATTOSECONDS_IN_MSEC(100);
-	quantum_list[0].expire = attotime_never;
-	quantum_current = &quantum_list[0];
-	quantum_minimum = ATTOSECONDS_IN_NSEC(1) / 1000;
+	global->quantum_list[0].requested = ATTOSECONDS_IN_MSEC(100);
+	global->quantum_list[0].actual = ATTOSECONDS_IN_MSEC(100);
+	global->quantum_list[0].expire = attotime_never;
+	global->quantum_current = &global->quantum_list[0];
+	global->quantum_minimum = ATTOSECONDS_IN_NSEC(1) / 1000;
 }
 
 
@@ -339,23 +343,24 @@ void timer_destructor(void *ptr, size_t size)
     time when the next timer will fire
 -------------------------------------------------*/
 
-attotime timer_next_fire_time(void)
+attotime timer_next_fire_time(running_machine *machine)
 {
+	timer_private *global = machine->timer_data;
 	attotime quantum_time;
 
 	/* if the current quantum has expired, find a new one */
-	if (attotime_compare(global_basetime, quantum_current->expire) >= 0)
+	if (attotime_compare(global->basetime, global->quantum_current->expire) >= 0)
 	{
 		int curr;
 
-		quantum_current->requested = 0;
-		quantum_current = &quantum_list[0];
-		for (curr = 1; curr < ARRAY_LENGTH(quantum_list); curr++)
-			if (quantum_list[curr].requested != 0 && quantum_list[curr].requested < quantum_current->requested)
-				quantum_current = &quantum_list[curr];
+		global->quantum_current->requested = 0;
+		global->quantum_current = &global->quantum_list[0];
+		for (curr = 1; curr < ARRAY_LENGTH(global->quantum_list); curr++)
+			if (global->quantum_list[curr].requested != 0 && global->quantum_list[curr].requested < global->quantum_current->requested)
+				global->quantum_current = &global->quantum_list[curr];
 	}
-	quantum_time = attotime_add_attoseconds(global_basetime, quantum_current->actual);
-	return attotime_min(quantum_time, timer_head->expire);
+	quantum_time = attotime_add_attoseconds(global->basetime, global->quantum_current->actual);
+	return attotime_min(quantum_time, global->activelist->expire);
 }
 
 
@@ -366,27 +371,28 @@ attotime timer_next_fire_time(void)
 
 void timer_set_global_time(running_machine *machine, attotime newbase)
 {
+	timer_private *global = machine->timer_data;
 	emu_timer *timer;
 
 	/* set the new global offset */
-	global_basetime = newbase;
+	global->basetime = newbase;
 
-	LOG(("timer_set_global_time: new=%s head->expire=%s\n", attotime_string(newbase, 9), attotime_string(timer_head->expire, 9)));
+	LOG(("timer_set_global_time: new=%s head->expire=%s\n", attotime_string(newbase, 9), attotime_string(global->activelist->expire, 9)));
 
 	/* now process any timers that are overdue */
-	while (attotime_compare(timer_head->expire, global_basetime) <= 0)
+	while (attotime_compare(global->activelist->expire, global->basetime) <= 0)
 	{
-		int was_enabled = timer_head->enabled;
+		int was_enabled = global->activelist->enabled;
 
 		/* if this is a one-shot timer, disable it now */
-		timer = timer_head;
+		timer = global->activelist;
 		if (attotime_compare(timer->period, attotime_zero) == 0 || attotime_compare(timer->period, attotime_never) == 0)
 			timer->enabled = FALSE;
 
 		/* set the global state of which callback we're in */
-		callback_timer_modified = FALSE;
-		callback_timer = timer;
-		callback_timer_expire_time = timer->expire;
+		global->callback_timer_modified = FALSE;
+		global->callback_timer = timer;
+		global->callback_timer_expire_time = timer->expire;
 
 		/* call the callback */
 		if (was_enabled && timer->callback != NULL)
@@ -398,10 +404,10 @@ void timer_set_global_time(running_machine *machine, attotime newbase)
 		}
 
 		/* clear the callback timer global */
-		callback_timer = NULL;
+		global->callback_timer = NULL;
 
 		/* reset or remove the timer, but only if it wasn't modified during the callback */
-		if (!callback_timer_modified)
+		if (!global->callback_timer_modified)
 		{
 			/* if the timer is temporary, remove it now */
 			if (timer->temporary)
@@ -429,7 +435,8 @@ void timer_set_global_time(running_machine *machine, attotime newbase)
 
 void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantum, attotime duration)
 {
-	attotime curtime = timer_get_time();
+	timer_private *global = machine->timer_data;
+	attotime curtime = timer_get_time(machine);
 	attotime expire = attotime_add(curtime, duration);
 	int curr, blank = -1;
 
@@ -438,9 +445,9 @@ void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantu
 		quantum = 1;
 
 	/* find an equal-duration slot or an empty slot */
-	for (curr = 1; curr < ARRAY_LENGTH(quantum_list); curr++)
+	for (curr = 1; curr < ARRAY_LENGTH(global->quantum_list); curr++)
 	{
-		quantum_slot *slot = &quantum_list[curr];
+		quantum_slot *slot = &global->quantum_list[curr];
 
 		/* look for a matching quantum and extend it */
 		if (slot->requested == quantum)
@@ -465,13 +472,13 @@ void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantu
 	assert_always(blank != -1, "Out of scheduling quantum slots!");
 
 	/* fill in the item */
-	quantum_list[blank].requested = quantum;
-	quantum_list[blank].actual = MAX(quantum_list[blank].requested, quantum_minimum);
-	quantum_list[blank].expire = expire;
+	global->quantum_list[blank].requested = quantum;
+	global->quantum_list[blank].actual = MAX(global->quantum_list[blank].requested, global->quantum_minimum);
+	global->quantum_list[blank].expire = expire;
 
 	/* update the minimum */
-	if (quantum < quantum_current->requested)
-		quantum_current = &quantum_list[blank];
+	if (quantum < global->quantum_current->requested)
+		global->quantum_current = &global->quantum_list[blank];
 }
 
 
@@ -482,17 +489,18 @@ void timer_add_scheduling_quantum(running_machine *machine, attoseconds_t quantu
 
 void timer_set_minimum_quantum(running_machine *machine, attoseconds_t quantum)
 {
+	timer_private *global = machine->timer_data;
 	int curr;
 
 	/* do nothing if nothing changed */
-	if (quantum_minimum == quantum)
+	if (global->quantum_minimum == quantum)
 		return;
-	quantum_minimum = quantum;
+	global->quantum_minimum = quantum;
 
 	/* adjust all the actuals; this doesn't affect the current */
-	for (curr = 0; curr < ARRAY_LENGTH(quantum_list); curr++)
-		if (quantum_list[curr].requested != 0)
-			quantum_list[curr].actual = MAX(quantum_list[curr].requested, quantum_minimum);
+	for (curr = 0; curr < ARRAY_LENGTH(global->quantum_list); curr++)
+		if (global->quantum_list[curr].requested != 0)
+			global->quantum_list[curr].actual = MAX(global->quantum_list[curr].requested, global->quantum_minimum);
 }
 
 
@@ -508,11 +516,12 @@ void timer_set_minimum_quantum(running_machine *machine, attoseconds_t quantum)
 
 static void timer_register_save(emu_timer *timer)
 {
+	timer_private *global = timer->machine->timer_data;
 	int count = 0;
 	emu_timer *t;
 
 	/* find other timers that match our func name */
-	for (t = timer_head; t; t = t->next)
+	for (t = global->activelist; t; t = t->next)
 		if (!strcmp(t->func, timer->func))
 			count++;
 
@@ -536,13 +545,14 @@ static void timer_register_save(emu_timer *timer)
 
 static STATE_POSTLOAD( timer_postload )
 {
+	timer_private *global = machine->timer_data;
 	emu_timer *privlist = NULL;
 	emu_timer *t;
 
 	/* remove all timers and make a private list */
-	while (timer_head != NULL)
+	while (global->activelist != NULL)
 	{
-		t = timer_head;
+		t = global->activelist;
 
 		/* temporary timers go away entirely */
 		if (t->temporary)
@@ -572,14 +582,15 @@ static STATE_POSTLOAD( timer_postload )
     anonymous (non-saveable) timers
 -------------------------------------------------*/
 
-int timer_count_anonymous(void)
+int timer_count_anonymous(running_machine *machine)
 {
+	timer_private *global = machine->timer_data;
 	emu_timer *t;
 	int count = 0;
 
 	logerror("timer_count_anonymous:\n");
-	for (t = timer_head; t; t = t->next)
-		if (t->temporary && t != callback_timer)
+	for (t = global->activelist; t; t = t->next)
+		if (t->temporary && t != global->callback_timer)
 		{
 			count++;
 			logerror("  Temp. timer %p, file %s:%d[%s]\n", (void *) t, t->file, t->line, t->func);
@@ -600,10 +611,10 @@ int timer_count_anonymous(void)
     isn't primed yet
 -------------------------------------------------*/
 
-INLINE emu_timer *_timer_alloc_common(timer_fired_func callback, void *ptr, const char *file, int line, const char *func, int temp)
+INLINE emu_timer *_timer_alloc_common(running_machine *machine, timer_fired_func callback, void *ptr, const char *file, int line, const char *func, int temp)
 {
-	attotime time = get_current_time();
-	emu_timer *timer = timer_new();
+	attotime time = get_current_time(machine);
+	emu_timer *timer = timer_new(machine);
 
 	/* fill in the record */
 	timer->callback = callback;
@@ -632,9 +643,9 @@ INLINE emu_timer *_timer_alloc_common(timer_fired_func callback, void *ptr, cons
 	return timer;
 }
 
-emu_timer *_timer_alloc_internal(timer_fired_func callback, void *ptr, const char *file, int line, const char *func)
+emu_timer *_timer_alloc_internal(running_machine *machine, timer_fired_func callback, void *ptr, const char *file, int line, const char *func)
 {
-	return _timer_alloc_common(callback, ptr, file, line, func, FALSE);
+	return _timer_alloc_common(machine, callback, ptr, file, line, func, FALSE);
 }
 
 
@@ -645,20 +656,22 @@ emu_timer *_timer_alloc_internal(timer_fired_func callback, void *ptr, const cha
 
 static void timer_remove(emu_timer *which)
 {
+	timer_private *global = which->machine->timer_data;
+
 	/* if this is a callback timer, note that */
-	if (which == callback_timer)
-		callback_timer_modified = TRUE;
+	if (which == global->callback_timer)
+		global->callback_timer_modified = TRUE;
 
 	/* remove it from the list */
 	timer_list_remove(which);
 
 	/* free it up by adding it back to the free list */
-	if (timer_free_tail)
-		timer_free_tail->next = which;
+	if (global->freelist_tail)
+		global->freelist_tail->next = which;
 	else
-		timer_free_head = which;
+		global->freelist = which;
 	which->next = NULL;
-	timer_free_tail = which;
+	global->freelist_tail = which;
 }
 
 
@@ -699,11 +712,12 @@ void timer_device_adjust_oneshot(const device_config *timer, attotime duration, 
 
 void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, attotime period)
 {
-	attotime time = get_current_time();
+	timer_private *global = which->machine->timer_data;
+	attotime time = get_current_time(which->machine);
 
 	/* if this is the callback timer, mark it modified */
-	if (which == callback_timer)
-		callback_timer_modified = TRUE;
+	if (which == global->callback_timer)
+		global->callback_timer_modified = TRUE;
 
 	/* compute the time of the next firing and insert into the list */
 	which->param = param;
@@ -724,8 +738,8 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 
 	/* if this was inserted as the head, abort the current timeslice and resync */
 	LOG(("timer_adjust_oneshot %s.%s:%d to expire @ %s\n", which->file, which->func, which->line, attotime_string(which->expire, 9)));
-	if (which == timer_head && Machine->activecpu != NULL)
-		cpu_abort_timeslice(Machine->activecpu);
+	if (which == global->activelist && which->machine->activecpu != NULL)
+		cpu_abort_timeslice(which->machine->activecpu);
 }
 
 
@@ -759,9 +773,9 @@ void timer_device_adjust_periodic(const device_config *timer, attotime start_del
     period
 -------------------------------------------------*/
 
-void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func)
+void _timer_pulse_internal(running_machine *machine, attotime period, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func)
 {
-	emu_timer *timer = _timer_alloc_common(callback, ptr, file, line, func, FALSE);
+	emu_timer *timer = _timer_alloc_common(machine, callback, ptr, file, line, func, FALSE);
 	timer_adjust_periodic(timer, period, param, period);
 }
 
@@ -771,9 +785,9 @@ void _timer_pulse_internal(attotime period, void *ptr, INT32 param, timer_fired_
     calls the callback after the given duration
 -------------------------------------------------*/
 
-void _timer_set_internal(attotime duration, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func)
+void _timer_set_internal(running_machine *machine, attotime duration, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func)
 {
-	emu_timer *timer = _timer_alloc_common(callback, ptr, file, line, func, TRUE);
+	emu_timer *timer = _timer_alloc_common(machine, callback, ptr, file, line, func, TRUE);
 	timer_adjust_oneshot(timer, duration, param);
 }
 
@@ -950,7 +964,7 @@ void timer_device_set_ptr(const device_config *timer, void *ptr)
 
 attotime timer_timeelapsed(emu_timer *which)
 {
-	return attotime_sub(get_current_time(), which->start);
+	return attotime_sub(get_current_time(which->machine), which->start);
 }
 
 
@@ -968,7 +982,7 @@ attotime timer_device_timeelapsed(const device_config *timer)
 
 attotime timer_timeleft(emu_timer *which)
 {
-	return attotime_sub(which->expire, get_current_time());
+	return attotime_sub(which->expire, get_current_time(which->machine));
 }
 
 
@@ -983,9 +997,9 @@ attotime timer_device_timeleft(const device_config *timer)
     timer_get_time - return the current time
 -------------------------------------------------*/
 
-attotime timer_get_time(void)
+attotime timer_get_time(running_machine *machine)
 {
-	return get_current_time();
+	return get_current_time(machine);
 }
 
 
@@ -1100,8 +1114,9 @@ static TIMER_CALLBACK( scanline_timer_device_timer_callback )
     timer_logtimers - log all the timers
 -------------------------------------------------*/
 
-static void timer_logtimers(void)
+static void timer_logtimers(running_machine *machine)
 {
+	timer_private *global = machine->timer_data;
 	emu_timer *t;
 
 	logerror("===============\n");
@@ -1109,12 +1124,12 @@ static void timer_logtimers(void)
 	logerror("===============\n");
 
 	logerror("Enqueued timers:\n");
-	for (t = timer_head; t; t = t->next)
+	for (t = global->activelist; t; t = t->next)
 		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
 			attotime_to_double(t->start), attotime_to_double(t->expire), attotime_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
 
 	logerror("Free timers:\n");
-	for (t = timer_free_head; t; t = t->next)
+	for (t = global->freelist; t; t = t->next)
 		logerror("  Start=%15.6f Exp=%15.6f Per=%15.6f Ena=%d Tmp=%d (%s:%d[%s])\n",
 			attotime_to_double(t->start), attotime_to_double(t->expire), attotime_to_double(t->period), t->enabled, t->temporary, t->file, t->line, t->func);
 
@@ -1178,7 +1193,7 @@ static DEVICE_START( timer )
 
 			/* allocate the backing timer */
 			param = (void *)device;
-			state->timer = timer_alloc(periodic_timer_device_timer_callback, param);
+			state->timer = timer_alloc(device->machine, periodic_timer_device_timer_callback, param);
 			break;
 
 		case TIMER_TYPE_PERIODIC:
@@ -1210,7 +1225,7 @@ static DEVICE_START( timer )
 
 			/* allocate the backing timer */
 			param = (void *)device;
-			state->timer = timer_alloc(periodic_timer_device_timer_callback, param);
+			state->timer = timer_alloc(device->machine, periodic_timer_device_timer_callback, param);
 
 			/* finally, start the timer */
 			timer_adjust_periodic(state->timer, state->start_delay, 0, state->period);
@@ -1227,7 +1242,7 @@ static DEVICE_START( timer )
 
 			/* allocate the backing timer */
 			param = (void *)device;
-			state->timer = timer_alloc(scanline_timer_device_timer_callback, param);
+			state->timer = timer_alloc(device->machine, scanline_timer_device_timer_callback, param);
 
 			/* indicate that this will be the first call */
 			state->first_time = TRUE;

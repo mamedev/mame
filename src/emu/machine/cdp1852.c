@@ -142,7 +142,7 @@ static DEVICE_START( cdp1852 )
 	/* create the timers */
 	if (cdp1852->intf->clock > 0)
 	{
-		cdp1852->scan_timer = timer_alloc(cdp1852_scan_tick, (void *)device);
+		cdp1852->scan_timer = timer_alloc(device->machine, cdp1852_scan_tick, (void *)device);
 		timer_adjust_periodic(cdp1852->scan_timer, attotime_zero, 0, ATTOTIME_IN_HZ(cdp1852->intf->clock));
 	}
 

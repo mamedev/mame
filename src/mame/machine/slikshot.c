@@ -400,7 +400,7 @@ static void words_to_sensors(UINT16 word1, UINT16 word2, UINT16 word3, UINT8 bea
  *
  *************************************/
 
-static void compute_sensors(void)
+static void compute_sensors(running_machine *machine)
 {
 	UINT16 inter1, inter2, inter3;
 	UINT16 word1 = 0, word2 = 0, word3 = 0;
@@ -415,7 +415,7 @@ static void compute_sensors(void)
 	inters_to_words(inter1, inter2, inter3, &beams, &word1, &word2, &word3);
 	words_to_sensors(word1, word2, word3, beams, &sensor0, &sensor1, &sensor2, &sensor3);
 
-	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", attotime_to_double(timer_get_time()), sensor0, sensor1, sensor2, sensor3);
+	logerror("%15f: Sensor values: %04x %04x %04x %04x\n", attotime_to_double(timer_get_time(machine)), sensor0, sensor1, sensor2, sensor3);
 }
 
 
@@ -525,7 +525,7 @@ static TIMER_CALLBACK( delayed_z80_control_w )
 
 WRITE8_HANDLER( slikshot_z80_control_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_z80_control_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_z80_control_w);
 }
 
 
@@ -581,7 +581,7 @@ VIDEO_UPDATE( slikshot )
 		if (temp >=  0x90) temp =  0x90;
 		curx = temp;
 
-		compute_sensors();
+		compute_sensors(screen->machine);
 //      popmessage("V=%02x,%02x  X=%02x", curvx, curvy, curx);
 		crosshair_vis = 0;
 	}

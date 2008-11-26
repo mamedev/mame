@@ -349,7 +349,7 @@ const ldplayer_interface pr8210_interface =
 static void pr8210_init(laserdisc_state *ld)
 {
 	astring *tempstring = astring_alloc();
-	attotime curtime = timer_get_time();
+	attotime curtime = timer_get_time(ld->device->machine);
 	ldplayer_data *player = ld->player;
 
 	/* reset our state */
@@ -389,10 +389,10 @@ static void pr8210_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int field
 
 	/* signal VSYNC and set a timer to turn it off */
 	player->vsync = TRUE;
-	timer_set(attotime_mul(video_screen_get_scan_period(ld->screen), 4), ld, 0, vsync_off);
+	timer_set(ld->device->machine, attotime_mul(video_screen_get_scan_period(ld->screen), 4), ld, 0, vsync_off);
 
 	/* also set a timer to fetch the VBI data when it is ready */
-	timer_set(video_screen_get_time_until_pos(ld->screen, 19*2, 0), ld, 0, vbi_data_fetch);
+	timer_set(ld->device->machine, video_screen_get_time_until_pos(ld->screen, 19*2, 0), ld, 0, vbi_data_fetch);
 }
 
 
@@ -460,7 +460,7 @@ static void pr8210_control_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 	/* handle rising edge */
 	if (prev != ASSERT_LINE && data == ASSERT_LINE)
 	{
-		attotime curtime = timer_get_time();
+		attotime curtime = timer_get_time(ld->device->machine);
 		attotime delta;
 		int longpulse;
 
@@ -759,7 +759,7 @@ static READ8_HANDLER( pr8210_bus_r )
 		result |= 0x02;
 
 	/* bus bit 0: SLOW TIMER OUT */
-//  if (attotime_compare(attotime_sub(timer_get_time(), player->slowtrg),
+//  if (attotime_compare(attotime_sub(timer_get_time(ld->device->machine), player->slowtrg),
 
 	/* loop at beginning waits for $40=0, $02=1 */
 	return result;
@@ -854,7 +854,7 @@ static WRITE8_HANDLER( pr8210_port2_w )
 
 	/* on the falling edge of bit 5, start the slow timer */
 	if (!(data & 0x20) && (prev & 0x20))
-		player->slowtrg = timer_get_time();
+		player->slowtrg = timer_get_time(space->machine);
 
 	/* bit 6 when low triggers an IRQ on the MCU */
 	cpu_set_input_line(space->machine->cpu[player->cpunum], MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
@@ -1133,7 +1133,7 @@ static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 		if (LOG_SIMUTREK)
 			printf("%3d:VSYNC IRQ\n", video_screen_get_vpos(ld->screen));
 		cpu_set_input_line(ld->device->machine->cpu[player->simutrek.cpunum], MCS48_INPUT_IRQ, ASSERT_LINE);
-		timer_set(video_screen_get_scan_period(ld->screen), ld, 0, irq_off);
+		timer_set(ld->device->machine, video_screen_get_scan_period(ld->screen), ld, 0, irq_off);
 	}
 }
 
@@ -1178,7 +1178,7 @@ static UINT8 simutrek_status_r(laserdisc_state *ld)
 
 static void simutrek_data_w(laserdisc_state *ld, UINT8 prev, UINT8 data)
 {
-	timer_call_after_resynch(ld, data, simutrek_latched_data_w);
+	timer_call_after_resynch(ld->device->machine, ld, data, simutrek_latched_data_w);
 	if (LOG_SIMUTREK)
 		printf("%03d:**** Simutrek Command = %02X\n", video_screen_get_vpos(ld->screen), data);
 }

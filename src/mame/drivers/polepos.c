@@ -381,7 +381,7 @@ static MACHINE_RESET( polepos )
 	for (i = 0;i < 8;i++)
 		polepos_latch_w(space,i,0);
 
-	namco_06xx_init(0, 0,
+	namco_06xx_init(machine, 0, 0,
 		NAMCOIO_51XX, &intf0,
 		NAMCOIO_53XX_POLEPOS, &intf1,
 		NAMCOIO_52XX, NULL,

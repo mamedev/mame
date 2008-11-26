@@ -191,7 +191,7 @@ MACHINE_RESET( harddriv )
 	memset(duart_read_data, 0, sizeof(duart_read_data));
 	memset(duart_write_data, 0, sizeof(duart_write_data));
 	duart_output_port = 0;
-	duart_timer = timer_alloc(duart_callback, NULL);
+	duart_timer = timer_alloc(machine, duart_callback, NULL);
 
 	/* reset the ADSP/DSIII/DSIV boards */
 	adsp_halt = 1;
@@ -764,7 +764,7 @@ INLINE void stmsp_sync_w(int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 
 	/* if being written from the 68000, synchronize on it */
 	if (hd34010_host_access)
-		timer_call_after_resynch(NULL, newdata | (offset << 16) | (which << 28), stmsp_sync_update);
+		timer_call_after_resynch(Machine, NULL, newdata | (offset << 16) | (which << 28), stmsp_sync_update);
 
 	/* otherwise, just update */
 	else
@@ -852,7 +852,7 @@ WRITE16_HANDLER( hd68k_adsp_data_w )
 	if (offset == 0x1fff)
 	{
 		logerror("%06X:ADSP sync address written (%04X)\n", cpu_get_previouspc(space->cpu), data);
-		timer_call_after_resynch(NULL, 0, 0);
+		timer_call_after_resynch(space->machine, NULL, 0, 0);
 		cpu_triggerint(space->machine->cpu[hdcpu_adsp]);
 	}
 	else
@@ -954,7 +954,7 @@ WRITE16_HANDLER( hd68k_adsp_control_w )
 
 		case 3:
 			logerror("ADSP bank = %d (deferred)\n", val);
-			timer_call_after_resynch(NULL, val, deferred_adsp_bank_switch);
+			timer_call_after_resynch(space->machine, NULL, val, deferred_adsp_bank_switch);
 			break;
 
 		case 5:
@@ -1551,7 +1551,7 @@ WRITE32_HANDLER( rddsp32_sync0_w )
 		COMBINE_DATA(&newdata);
 		dataptr[next_msp_sync % MAX_MSP_SYNC] = dptr;
 		dataval[next_msp_sync % MAX_MSP_SYNC] = newdata;
-		timer_call_after_resynch(NULL, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
+		timer_call_after_resynch(space->machine, NULL, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
 	}
 	else
 		COMBINE_DATA(&rddsp32_sync[0][offset]);
@@ -1567,7 +1567,7 @@ WRITE32_HANDLER( rddsp32_sync1_w )
 		COMBINE_DATA(&newdata);
 		dataptr[next_msp_sync % MAX_MSP_SYNC] = dptr;
 		dataval[next_msp_sync % MAX_MSP_SYNC] = newdata;
-		timer_call_after_resynch(NULL, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
+		timer_call_after_resynch(space->machine, NULL, next_msp_sync++ % MAX_MSP_SYNC, rddsp32_sync_cb);
 	}
 	else
 		COMBINE_DATA(&rddsp32_sync[1][offset]);

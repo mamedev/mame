@@ -46,7 +46,7 @@ static TIMER_CALLBACK( soundlatch_callback )
 
 static WRITE8_HANDLER( tankbust_soundlatch_w )
 {
-	timer_call_after_resynch(NULL, data,soundlatch_callback);
+	timer_call_after_resynch(space->machine, NULL, data,soundlatch_callback);
 }
 
 static READ8_HANDLER( tankbust_soundlatch_r )
@@ -95,7 +95,7 @@ static WRITE8_HANDLER( tankbust_e0xx_w )
 	break;
 
 	case 1:	/* 0xe001 (value 0 then 1) written right after the soundlatch_w */
-		timer_call_after_resynch(NULL, data,soundirqline_callback);
+		timer_call_after_resynch(space->machine, NULL, data,soundirqline_callback);
 	break;
 
 	case 2:	/* 0xe002 coin counter */

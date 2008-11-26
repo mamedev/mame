@@ -586,7 +586,7 @@ WRITE8_HANDLER( tubep_sprite_control_w )
 			cpu_set_input_line(space->machine->cpu[3],0,CLEAR_LINE);
 
 			/* 2.assert /SINT again after this time */
-			timer_set( attotime_mul(ATTOTIME_IN_HZ(19968000/8), (XSize+1)*(YSize+1)), NULL, 0, sprite_timer_callback);
+			timer_set( space->machine, attotime_mul(ATTOTIME_IN_HZ(19968000/8), (XSize+1)*(YSize+1)), NULL, 0, sprite_timer_callback);
 
 			/* 3.clear of /SINT starts sprite drawing circuit */
 			draw_sprite(space->machine);

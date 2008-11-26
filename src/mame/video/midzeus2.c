@@ -275,7 +275,7 @@ VIDEO_START( midzeus2 )
 
 	zeus_renderbase = waveram[1];
 
-	int_timer = timer_alloc(int_timer_callback, NULL);
+	int_timer = timer_alloc(machine, int_timer_callback, NULL);
 
 	/* save states */
 	state_save_register_global_pointer(waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));

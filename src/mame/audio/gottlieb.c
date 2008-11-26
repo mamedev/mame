@@ -276,7 +276,7 @@ logerror("Votrax: intonation %d, phoneme %02x %s\n",data >> 6,data & 0x3f,Phonem
 	}
 
 	/* generate a NMI after a while to make the CPU continue to send data */
-	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, gottlieb_nmi_generate);
+	timer_set(space->machine, ATTOTIME_IN_USEC(50), NULL, 0, gottlieb_nmi_generate);
 }
 
 static WRITE8_HANDLER( speech_clock_dac_w )
@@ -450,7 +450,7 @@ static TIMER_CALLBACK( nmi_callback )
 	nmi_state_update(machine);
 
 	/* set a timer to turn it off again on hte next SOUND_CLOCK/16 */
-	timer_set(ATTOTIME_IN_HZ(SOUND2_CLOCK/16), NULL, 0, nmi_clear);
+	timer_set(machine, ATTOTIME_IN_HZ(SOUND2_CLOCK/16), NULL, 0, nmi_clear);
 
 	/* adjust the NMI timer for the next time */
 	nmi_timer_adjust();
@@ -547,7 +547,7 @@ static WRITE8_HANDLER( speech_control_w )
 static SOUND_START( gottlieb2 )
 {
 	/* set up the NMI timer */
-	nmi_timer = timer_alloc(nmi_callback, NULL);
+	nmi_timer = timer_alloc(machine, nmi_callback, NULL);
 	nmi_rate = 0;
 	nmi_timer_adjust();
 

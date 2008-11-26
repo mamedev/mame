@@ -2149,7 +2149,7 @@ static WRITE32_HANDLER( namcos22_system_controller_w )
 		{ /* SUBCPU enable on System 22 (guessed, but too early crashes Rave Racer so it's a good test) */
 			if (data == 0xff00)
 			{
-				timer_set(ATTOTIME_IN_MSEC(50), NULL, 0, start_subcpu);
+				timer_set(space->machine, ATTOTIME_IN_MSEC(50), NULL, 0, start_subcpu);
 			}
 		}
 	}

@@ -494,12 +494,12 @@ static TIMER_CALLBACK( interrupt_callback )
     if (param==0)
     {
 	    cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
-	    timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+16, 0), NULL, 1,interrupt_callback);
+	    timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+16, 0), NULL, 1,interrupt_callback);
     }
     if (param==1)
     {
 	    cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
-    	timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+24, 0), NULL, 2,interrupt_callback);
+    	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBSTART+24, 0), NULL, 2,interrupt_callback);
     }
     if (param==-1)
 	    cpu_set_input_line(machine->cpu[0], 0, CLEAR_LINE);
@@ -510,7 +510,7 @@ static TIMER_CALLBACK( interrupt_callback )
 static INTERRUPT_GEN( m11_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	//timer_set(video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
+	//timer_set(device->machine, video_screen_get_time_until_pos(machine->primary_screen, IREMM10_VBEND, 0), NULL, -1,interrupt_callback);
 }
 
 static INTERRUPT_GEN( m10_interrupt )
@@ -522,7 +522,7 @@ static INTERRUPT_GEN( m10_interrupt )
 static INTERRUPT_GEN( m15_interrupt )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-   	timer_set(video_screen_get_time_until_pos(device->machine->primary_screen, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
+   	timer_set(device->machine, video_screen_get_time_until_pos(device->machine->primary_screen, IREMM10_VBSTART+1, 80), NULL, -1,interrupt_callback);
 }
 
 /*************************************

@@ -332,7 +332,7 @@ static DEVICE_START(timekeeper)
 	state_save_register_item( "timekeeper", device->tag, 0, c->century );
 	state_save_register_item_pointer( "timekeeper", device->tag, 0, c->data, c->size );
 
-	timer = timer_alloc( timekeeper_tick, c );
+	timer = timer_alloc( device->machine, timekeeper_tick, c );
 	duration = ATTOTIME_IN_SEC(1);
 	timer_adjust_periodic( timer, duration, 0, duration );
 

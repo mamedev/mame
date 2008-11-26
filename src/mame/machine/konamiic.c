@@ -53,7 +53,7 @@ static TIMER_CALLBACK( K056800_sound_cpu_timer_tick )
 	}
 }
 
-void K056800_init(void (* irq_callback)(running_machine *, int))
+void K056800_init(running_machine *machine, void (* irq_callback)(running_machine *, int))
 {
 	attotime timer_period;
 	K056800_sound_irq_callback = irq_callback;
@@ -63,7 +63,7 @@ void K056800_init(void (* irq_callback)(running_machine *, int))
 
 	timer_period = attotime_mul(ATTOTIME_IN_HZ(44100), 128);	// roughly 2.9us
 
-	K056800_sound_cpu_timer = timer_alloc(K056800_sound_cpu_timer_tick, NULL);
+	K056800_sound_cpu_timer = timer_alloc(machine, K056800_sound_cpu_timer_tick, NULL);
 	timer_adjust_periodic(K056800_sound_cpu_timer, timer_period, 0, timer_period);
 
 	state_save_register_item_array("K056800", NULL, 0, K056800_host_reg);

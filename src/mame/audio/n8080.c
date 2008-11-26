@@ -342,11 +342,11 @@ static TIMER_CALLBACK( delayed_sound_2_callback )
 
 WRITE8_HANDLER( n8080_sound_1_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_sound_1_callback); /* force CPUs to sync */
+	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_1_callback); /* force CPUs to sync */
 }
 WRITE8_HANDLER( n8080_sound_2_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_sound_2_callback); /* force CPUs to sync */
+	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_2_callback); /* force CPUs to sync */
 }
 
 
@@ -434,7 +434,7 @@ static WRITE8_HANDLER( helifire_sound_ctrl_w )
 		helifire_dac_timing = DECAY_RATE * log(helifire_dac_volume);
 	}
 
-	helifire_dac_timing += attotime_to_double(timer_get_time());
+	helifire_dac_timing += attotime_to_double(timer_get_time(space->machine));
 }
 
 
@@ -453,7 +453,7 @@ static TIMER_CALLBACK( spacefev_vco_voltage_timer )
 
 static TIMER_CALLBACK( helifire_dac_volume_timer )
 {
-	double t = helifire_dac_timing - attotime_to_double(timer_get_time());
+	double t = helifire_dac_timing - attotime_to_double(timer_get_time(machine));
 
 	if (helifire_dac_phase)
 	{
@@ -470,11 +470,11 @@ static MACHINE_RESET( spacefev_sound )
 {
 	n8080_hardware = 1;
 
-	timer_pulse(ATTOTIME_IN_HZ(1000), NULL, 0, spacefev_vco_voltage_timer);
+	timer_pulse(machine, ATTOTIME_IN_HZ(1000), NULL, 0, spacefev_vco_voltage_timer);
 
-	sound_timer[0] = timer_alloc(stop_mono_flop_callback, NULL);
-	sound_timer[1] = timer_alloc(stop_mono_flop_callback, NULL);
-	sound_timer[2] = timer_alloc(stop_mono_flop_callback, NULL);
+	sound_timer[0] = timer_alloc(machine, stop_mono_flop_callback, NULL);
+	sound_timer[1] = timer_alloc(machine, stop_mono_flop_callback, NULL);
+	sound_timer[2] = timer_alloc(machine, stop_mono_flop_callback, NULL);
 
 	mono_flop[0] = 0;
 	mono_flop[1] = 0;
@@ -489,8 +489,8 @@ static MACHINE_RESET( sheriff_sound )
 {
 	n8080_hardware = 2;
 
-	sound_timer[0] = timer_alloc(stop_mono_flop_callback, NULL);
-	sound_timer[1] = timer_alloc(stop_mono_flop_callback, NULL);
+	sound_timer[0] = timer_alloc(machine, stop_mono_flop_callback, NULL);
+	sound_timer[1] = timer_alloc(machine, stop_mono_flop_callback, NULL);
 
 	mono_flop[0] = 0;
 	mono_flop[1] = 0;
@@ -504,7 +504,7 @@ static MACHINE_RESET( helifire_sound )
 {
 	n8080_hardware = 3;
 
-	timer_pulse(ATTOTIME_IN_HZ(1000), NULL, 0, helifire_dac_volume_timer);
+	timer_pulse(machine, ATTOTIME_IN_HZ(1000), NULL, 0, helifire_dac_volume_timer);
 
 	helifire_dac_volume = 1;
 	helifire_dac_timing = 0;

@@ -168,7 +168,7 @@ static const pia6821_interface pia1_intf =
 static TIMER_CALLBACK( interrupt_gen )
 {
 	cpu_set_input_line(machine->cpu[0], 0, HOLD_LINE);
-	timer_set(video_screen_get_frame_period(machine->primary_screen), NULL, 0, interrupt_gen);
+	timer_set(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, interrupt_gen);
 }
 
 static MACHINE_START( tugboat )
@@ -180,7 +180,7 @@ static MACHINE_START( tugboat )
 static MACHINE_RESET( tugboat )
 {
 	pia_reset();
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 30*8+4, 0), NULL, 0, interrupt_gen);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 30*8+4, 0), NULL, 0, interrupt_gen);
 }
 
 

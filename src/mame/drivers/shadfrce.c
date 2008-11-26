@@ -512,7 +512,7 @@ static INTERRUPT_GEN( shadfrce_interrupt )
 
 static MACHINE_RESET( shadfrce )
 {
-	raster_irq_timer = timer_alloc(raster_interrupt, NULL);
+	raster_irq_timer = timer_alloc(machine, raster_interrupt, NULL);
 	timer_enable(raster_irq_timer, 0);
 	shadfrce_scanline = 0;
 }

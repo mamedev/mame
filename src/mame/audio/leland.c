@@ -529,17 +529,17 @@ void *leland_80186_sh_start(int clock, const custom_sound_interface *config)
 	is_redline = 0;
 
 	/* create timers here so they stick around */
-	i80186.timer[0].int_timer = timer_alloc(internal_timer_int, NULL);
-	i80186.timer[1].int_timer = timer_alloc(internal_timer_int, NULL);
-	i80186.timer[2].int_timer = timer_alloc(internal_timer_int, NULL);
-	i80186.timer[0].time_timer = timer_alloc(NULL, NULL);
-	i80186.timer[1].time_timer = timer_alloc(NULL, NULL);
-	i80186.timer[2].time_timer = timer_alloc(NULL, NULL);
-	i80186.dma[0].finish_timer = timer_alloc(dma_timer_callback, NULL);
-	i80186.dma[1].finish_timer = timer_alloc(dma_timer_callback, NULL);
+	i80186.timer[0].int_timer = timer_alloc(Machine, internal_timer_int, NULL);
+	i80186.timer[1].int_timer = timer_alloc(Machine, internal_timer_int, NULL);
+	i80186.timer[2].int_timer = timer_alloc(Machine, internal_timer_int, NULL);
+	i80186.timer[0].time_timer = timer_alloc(Machine, NULL, NULL);
+	i80186.timer[1].time_timer = timer_alloc(Machine, NULL, NULL);
+	i80186.timer[2].time_timer = timer_alloc(Machine, NULL, NULL);
+	i80186.dma[0].finish_timer = timer_alloc(Machine, dma_timer_callback, NULL);
+	i80186.dma[1].finish_timer = timer_alloc(Machine, dma_timer_callback, NULL);
 
 	for (i = 0; i < 9; i++)
-		counter[i].timer = timer_alloc(NULL, NULL);
+		counter[i].timer = timer_alloc(Machine, NULL, NULL);
 
 	return auto_malloc(1);
 }
@@ -615,7 +615,7 @@ void leland_80186_sound_init(void)
 
 static IRQ_CALLBACK(int_callback)
 {
-	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time()), i80186.intr.poll_status & 0x1f);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Acknowledged interrupt vector %02X\n", attotime_to_double(timer_get_time(device->machine)), i80186.intr.poll_status & 0x1f);
 
 	/* clear the interrupt */
 	cpu_set_info_int(device->machine->activecpu, CPUINFO_INT_INPUT_STATE + 0, CLEAR_LINE);
@@ -728,7 +728,7 @@ generate_int:
 	if (!i80186.intr.pending)
 		cpu_set_input_line(Machine->cpu[2], 0, ASSERT_LINE);
 	i80186.intr.pending = 1;
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time()), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time(Machine)), new_vector);
 }
 
 
@@ -753,7 +753,7 @@ static void handle_eoi(running_machine *machine, int data)
 			case 0x0f:	i80186.intr.in_service &= ~0x80;	break;
 			default:	logerror("%05X:ERROR - 80186 EOI with unknown vector %02X\n", cpu_get_pc(machine->activecpu), data & 0x1f);
 		}
-		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time()), data & 0x1f);
+		if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for vector %02X\n", attotime_to_double(timer_get_time(machine)), data & 0x1f);
 	}
 
 	/* non-specific case */
@@ -766,7 +766,7 @@ static void handle_eoi(running_machine *machine, int data)
 			if ((i80186.intr.timer & 7) == i && (i80186.intr.in_service & 0x01))
 			{
 				i80186.intr.in_service &= ~0x01;
-				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", attotime_to_double(timer_get_time()));
+				if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for timer\n", attotime_to_double(timer_get_time(machine)));
 				return;
 			}
 
@@ -775,7 +775,7 @@ static void handle_eoi(running_machine *machine, int data)
 				if ((i80186.intr.dma[j] & 7) == i && (i80186.intr.in_service & (0x04 << j)))
 				{
 					i80186.intr.in_service &= ~(0x04 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", attotime_to_double(timer_get_time()), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for DMA%d\n", attotime_to_double(timer_get_time(machine)), j);
 					return;
 				}
 
@@ -784,7 +784,7 @@ static void handle_eoi(running_machine *machine, int data)
 				if ((i80186.intr.ext[j] & 7) == i && (i80186.intr.in_service & (0x10 << j)))
 				{
 					i80186.intr.in_service &= ~(0x10 << j);
-					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", attotime_to_double(timer_get_time()), j);
+					if (LOG_INTERRUPTS) logerror("(%f) **** Got EOI for INT%d\n", attotime_to_double(timer_get_time(machine)), j);
 					return;
 				}
 		}
@@ -1715,7 +1715,7 @@ static TIMER_CALLBACK( command_lo_sync )
 
 WRITE8_HANDLER( leland_80186_command_lo_w )
 {
-	timer_call_after_resynch(NULL, data, command_lo_sync);
+	timer_call_after_resynch(space->machine, NULL, data, command_lo_sync);
 }
 
 
@@ -1770,7 +1770,7 @@ READ8_HANDLER( leland_80186_response_r )
 	if (LOG_COMM) logerror("%04X:Read sound response latch = %02X\n", cpu_get_previouspc(space->cpu), sound_response);
 
 	/* synchronize the response */
-	timer_call_after_resynch(NULL, cpu_get_previouspc(space->cpu) + 2, delayed_response_r);
+	timer_call_after_resynch(space->machine, NULL, cpu_get_previouspc(space->cpu) + 2, delayed_response_r);
 	return sound_response;
 }
 

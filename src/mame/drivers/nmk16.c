@@ -210,7 +210,7 @@ static MACHINE_RESET( nmk16 )
 
 static MACHINE_RESET( NMK004 )
 {
-	NMK004_init();
+	NMK004_init(machine);
 }
 
 static MACHINE_RESET( mustang_sound )

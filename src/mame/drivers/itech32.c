@@ -416,7 +416,7 @@ static MACHINE_RESET( itech32 )
 	via_reset();
 
 	/* reset the ticket dispenser */
-	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
+	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH);
 }
 
 
@@ -471,7 +471,7 @@ static READ32_HANDLER( trackball32_4bit_r )
 	static int effx, effy;
 	static int lastresult;
 	static attotime lasttime;
-	attotime curtime = timer_get_time();
+	attotime curtime = timer_get_time(space->machine);
 
 	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(space->machine->primary_screen)) > 0)
 	{
@@ -510,7 +510,7 @@ static READ32_HANDLER( trackball32_4bit_p2_r )
 	static int effx, effy;
 	static int lastresult;
 	static attotime lasttime;
-	attotime curtime = timer_get_time();
+	attotime curtime = timer_get_time(space->machine);
 
 	if (attotime_compare(attotime_sub(curtime, lasttime), video_screen_get_scan_period(space->machine->primary_screen)) > 0)
 	{
@@ -623,7 +623,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 static WRITE16_HANDLER( sound_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_data_w);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_data_w);
 }
 
 
@@ -636,7 +636,7 @@ static READ32_HANDLER( sound_data32_r )
 static WRITE32_HANDLER( sound_data32_w )
 {
 	if (ACCESSING_BITS_16_23)
-		timer_call_after_resynch(NULL, (data >> 16) & 0xff, delayed_sound_data_w);
+		timer_call_after_resynch(space->machine, NULL, (data >> 16) & 0xff, delayed_sound_data_w);
 }
 
 

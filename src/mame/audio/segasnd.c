@@ -225,7 +225,7 @@ static TIMER_CALLBACK( delayed_speech_w )
 
 WRITE8_HANDLER( sega_speech_data_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_speech_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_speech_w);
 }
 
 
@@ -317,7 +317,7 @@ void sega_usb_reset(UINT8 t1_clock_mask)
 	cpu_set_input_line(Machine->cpu[usb.cpunum], INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* start the clock timer */
-	timer_pulse(attotime_mul(ATTOTIME_IN_HZ(USB_2MHZ_CLOCK), 256), NULL, 0, increment_t1_clock);
+	timer_pulse(Machine, attotime_mul(ATTOTIME_IN_HZ(USB_2MHZ_CLOCK), 256), NULL, 0, increment_t1_clock);
 	usb.t1_clock_mask = t1_clock_mask;
 }
 
@@ -360,7 +360,7 @@ static TIMER_CALLBACK( delayed_usb_data_w )
 WRITE8_HANDLER( sega_usb_data_w )
 {
 	LOG(("%04X:usb_data_w = %02X\n", cpu_get_pc(space->cpu), data));
-	timer_call_after_resynch(NULL, data, delayed_usb_data_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_usb_data_w);
 
 	/* boost the interleave so that sequences can be sent */
 	cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(250));

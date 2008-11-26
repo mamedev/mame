@@ -107,7 +107,7 @@ WRITE8_DEVICE_HANDLER( latch8_w )
 	assert(offset == 0);
 
 	if (latch8->intf->nosync != 0xff)
-		timer_call_after_resynch((void *)device, (0xFF << 8) | data, latch8_timerproc);
+		timer_call_after_resynch(device->machine, (void *)device, (0xFF << 8) | data, latch8_timerproc);
 	else
 		update(device, data, 0xFF);
 }
@@ -167,7 +167,7 @@ INLINE void latch8_bitx_w(const device_config *device, int bit, offs_t offset, U
 	if (latch8->intf->nosync & mask)
 		update(device, masked_data, mask);
 	else
-		timer_call_after_resynch((void *) device, (mask << 8) | masked_data, latch8_timerproc);
+		timer_call_after_resynch(device->machine, (void *) device, (mask << 8) | masked_data, latch8_timerproc);
 }
 
 WRITE8_DEVICE_HANDLER( latch8_bit0_w ) { latch8_bitx_w(device, 0, offset, data); }

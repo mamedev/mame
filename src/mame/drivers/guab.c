@@ -734,7 +734,7 @@ INPUT_PORTS_END
 
  static MACHINE_START( guab )
 {
-	fdc_timer = timer_alloc(fdc_data_callback, NULL);
+	fdc_timer = timer_alloc(machine, fdc_data_callback, NULL);
 	ptm6840_config(machine, 0, &ptm_intf);
 }
 

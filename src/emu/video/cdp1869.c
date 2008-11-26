@@ -806,7 +806,7 @@ static DEVICE_START( cdp1869 )
 
 	if (cdp1869->intf->on_prd_changed != NULL)
 	{
-		cdp1869->prd_changed_timer = timer_alloc(prd_changed_tick, (void *)device);
+		cdp1869->prd_changed_timer = timer_alloc(device->machine, prd_changed_tick, (void *)device);
 		update_prd_changed_timer(cdp1869);
 	}
 

@@ -174,7 +174,7 @@ static MACHINE_RESET( atarisy1 )
 
 	/* reset the joystick parameters */
 	joystick_value = 0;
-	joystick_timer = timer_alloc(delayed_joystick_int, NULL);
+	joystick_timer = timer_alloc(machine, delayed_joystick_int, NULL);
 	joystick_int = 0;
 	joystick_int_enable = 0;
 }

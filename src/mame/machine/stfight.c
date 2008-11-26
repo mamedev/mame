@@ -130,7 +130,7 @@ INTERRUPT_GEN( stfight_vb_interrupt )
 {
     // Do a RST10
     cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xd7);
-    timer_set(ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
+    timer_set(device->machine, ATTOTIME_IN_HZ(120), NULL, 0, stfight_interrupt_1);
 }
 
 /*

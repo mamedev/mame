@@ -251,9 +251,9 @@ INLINE void signal_delayed_interrupt(ide_state *ide, attotime time, int buffer_r
 
 	/* set a timer */
 	if (buffer_ready)
-		timer_set(time, ide, 0, delayed_interrupt_buffer_ready);
+		timer_set(ide->device->machine, time, ide, 0, delayed_interrupt_buffer_ready);
 	else
-		timer_set(time, ide, 0, delayed_interrupt);
+		timer_set(ide->device->machine, time, ide, 0, delayed_interrupt);
 }
 
 
@@ -609,7 +609,7 @@ static void security_error(ide_state *ide)
 	ide->status &= ~IDE_STATUS_DRIVE_READY;
 
 	/* just set a timer and mark ourselves error */
-	timer_set(TIME_SECURITY_ERROR, ide, 0, security_error_done);
+	timer_set(ide->device->machine, TIME_SECURITY_ERROR, ide, 0, security_error_done);
 }
 
 
@@ -785,10 +785,10 @@ static void read_first_sector(ide_state *ide)
 			seek_time = TIME_SEEK_MULTISECTOR;
 
 		ide->cur_lba = new_lba;
-		timer_set(seek_time, ide, 0, read_sector_done_callback);
+		timer_set(ide->device->machine, seek_time, ide, 0, read_sector_done_callback);
 	}
 	else
-		timer_set(TIME_PER_SECTOR, ide, 0, read_sector_done_callback);
+		timer_set(ide->device->machine, TIME_PER_SECTOR, ide, 0, read_sector_done_callback);
 }
 
 
@@ -804,11 +804,11 @@ static void read_next_sector(ide_state *ide)
 			read_sector_done(ide);
 		else
 			/* just set a timer */
-			timer_set(ATTOTIME_IN_USEC(1), ide, 0, read_sector_done_callback);
+			timer_set(ide->device->machine, ATTOTIME_IN_USEC(1), ide, 0, read_sector_done_callback);
 	}
 	else
 		/* just set a timer */
-		timer_set(TIME_PER_SECTOR, ide, 0, read_sector_done_callback);
+		timer_set(ide->device->machine, TIME_PER_SECTOR, ide, 0, read_sector_done_callback);
 }
 
 
@@ -841,13 +841,13 @@ static void continue_write(ide_state *ide)
 		else
 		{
 			/* set a timer to do the write */
-			timer_set(TIME_PER_SECTOR, ide, 0, write_sector_done_callback);
+			timer_set(ide->device->machine, TIME_PER_SECTOR, ide, 0, write_sector_done_callback);
 		}
 	}
 	else
 	{
 		/* set a timer to do the write */
-		timer_set(TIME_PER_SECTOR, ide, 0, write_sector_done_callback);
+		timer_set(ide->device->machine, TIME_PER_SECTOR, ide, 0, write_sector_done_callback);
 	}
 }
 
@@ -1705,8 +1705,8 @@ static DEVICE_START( ide_controller )
 	ide_build_features(ide);
 
 	/* create a timer for timing status */
-	ide->last_status_timer = timer_alloc(NULL, NULL);
-	ide->reset_timer = timer_alloc(reset_callback, (void *)device);
+	ide->last_status_timer = timer_alloc(device->machine, NULL, NULL);
+	ide->reset_timer = timer_alloc(device->machine, reset_callback, (void *)device);
 
 	/* register ide states */
 	state_save_register_item("ide_controller", device->tag, 0, ide->adapter_control);

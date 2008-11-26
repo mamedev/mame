@@ -561,7 +561,7 @@ WRITE8_DEVICE_HANDLER( z80sio_set_cts )
 {
 	/* operate deferred */
 	void *ptr = (void *)device;
-	timer_call_after_resynch(ptr, (SIO_RR0_CTS << 8) + (data != 0) * 0x80 + (offset & 1), change_input_line);
+	timer_call_after_resynch(device->machine, ptr, (SIO_RR0_CTS << 8) + (data != 0) * 0x80 + (offset & 1), change_input_line);
 }
 
 
@@ -574,7 +574,7 @@ WRITE8_DEVICE_HANDLER( z80sio_set_dcd )
 {
 	/* operate deferred */
 	void *ptr = (void *)device;
-	timer_call_after_resynch(ptr, (SIO_RR0_DCD << 8) + (data != 0) * 0x80 + (offset & 1), change_input_line);
+	timer_call_after_resynch(device->machine, ptr, (SIO_RR0_DCD << 8) + (data != 0) * 0x80 + (offset & 1), change_input_line);
 }
 
 
@@ -800,8 +800,8 @@ static DEVICE_START( z80sio )
 	else
 		sio->clock = intf->baseclock;
 
-	sio->chan[0].receive_timer = timer_alloc(serial_callback, ptr);
-	sio->chan[1].receive_timer = timer_alloc(serial_callback, ptr);
+	sio->chan[0].receive_timer = timer_alloc(device->machine, serial_callback, ptr);
+	sio->chan[1].receive_timer = timer_alloc(device->machine, serial_callback, ptr);
 
 	sio->irq_cb = intf->irq_cb;
 	sio->dtr_changed_cb = intf->dtr_changed_cb;

@@ -70,14 +70,14 @@ static TIMER_CALLBACK( delayed_sound_w )
 	cpu_triggerint(machine->cpu[1]);
 
 	/* use a timer to make long transfers faster */
-	timer_set(ATTOTIME_IN_USEC(50), NULL, 0, 0);
+	timer_set(machine, ATTOTIME_IN_USEC(50), NULL, 0, 0);
 }
 
 
 static WRITE16_HANDLER( main_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
 }
 
 

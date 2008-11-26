@@ -10,6 +10,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "microtch.h"
 
 static struct
@@ -116,7 +117,7 @@ void microtouch_init(void (*tx_cb)(UINT8 data),
 	microtouch.tx_callback = tx_cb;
 	microtouch.touch_callback = touch_cb;
 
-	microtouch.timer = timer_alloc(microtouch_timer_callback, NULL);
+	microtouch.timer = timer_alloc(Machine, microtouch_timer_callback, NULL);
 	timer_adjust_periodic(microtouch.timer, ATTOTIME_IN_HZ(167*5), 0, ATTOTIME_IN_HZ(167*5));
 
 	state_save_register_item("microtouch", NULL, 0, microtouch.reset_done);

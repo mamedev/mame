@@ -430,14 +430,14 @@ static const ym3812_interface fuuki16_ym3812_intf =
 static TIMER_CALLBACK( level_1_interrupt_callback )
 {
 	cpu_set_input_line(machine->cpu[0], 1, HOLD_LINE);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 248, 0), NULL, 0, level_1_interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 248, 0), NULL, 0, level_1_interrupt_callback);
 }
 
 
 static TIMER_CALLBACK( vblank_interrupt_callback )
 {
 	cpu_set_input_line(machine->cpu[0], 3, HOLD_LINE);	// VBlank IRQ
-	timer_set(video_screen_get_time_until_vblank_start(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_vblank_start(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 }
 
 
@@ -451,7 +451,7 @@ static TIMER_CALLBACK( raster_interrupt_callback )
 
 static MACHINE_START( fuuki16 )
 {
-	raster_interrupt_timer = timer_alloc(raster_interrupt_callback, NULL);
+	raster_interrupt_timer = timer_alloc(machine, raster_interrupt_callback, NULL);
 }
 
 
@@ -459,8 +459,8 @@ static MACHINE_RESET( fuuki16 )
 {
 	const rectangle *visarea = video_screen_get_visible_area(machine->primary_screen);
 
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 248, 0), NULL, 0, level_1_interrupt_callback);
-	timer_set(video_screen_get_time_until_vblank_start(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 248, 0), NULL, 0, level_1_interrupt_callback);
+	timer_set(machine, video_screen_get_time_until_vblank_start(machine->primary_screen), NULL, 0, vblank_interrupt_callback);
 	timer_adjust_oneshot(raster_interrupt_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, visarea->max_x + 1), 0);
 }
 

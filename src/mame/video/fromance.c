@@ -73,7 +73,7 @@ static TILE_GET_INFO( get_nekkyoku_fg_tile_info ) { get_nekkyoku_tile_info(machi
  *
  *************************************/
 
-static void init_common(void)
+static void init_common(running_machine *machine)
 {
 	flipscreen_old = -1;
 
@@ -88,7 +88,7 @@ static void init_common(void)
 	tilemap_set_transparent_pen(fg_tilemap,15);
 
 	/* reset the timer */
-	crtc_timer = timer_alloc(crtc_interrupt_gen, NULL);
+	crtc_timer = timer_alloc(machine, crtc_interrupt_gen, NULL);
 
 	scrollx_ofs = 0x159;
 	scrolly_ofs = 0x10;
@@ -116,7 +116,7 @@ VIDEO_START( fromance )
 	bg_tilemap = tilemap_create(get_fromance_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
 	fg_tilemap = tilemap_create(get_fromance_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
 
-	init_common();
+	init_common(machine);
 }
 
 VIDEO_START( nekkyoku )
@@ -125,7 +125,7 @@ VIDEO_START( nekkyoku )
 	bg_tilemap = tilemap_create(get_nekkyoku_bg_tile_info, tilemap_scan_rows,       8,4, 64,64);
 	fg_tilemap = tilemap_create(get_nekkyoku_fg_tile_info, tilemap_scan_rows,  8,4, 64,64);
 
-	init_common();
+	init_common(machine);
 }
 
 VIDEO_START( pipedrm )

@@ -599,13 +599,13 @@ static DEVICE_RESET(duart68681)
 	duart68681->IVR = 0x0f;
 
 	// allocate timers
-	duart68681->channel[0].tx_timer = timer_alloc(tx_timer_callback, (void*)device);
+	duart68681->channel[0].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
 	timer_adjust_oneshot(duart68681->channel[0].tx_timer, attotime_never, 0);
 
-	duart68681->channel[1].tx_timer = timer_alloc(tx_timer_callback, (void*)device);
+	duart68681->channel[1].tx_timer = timer_alloc(device->machine, tx_timer_callback, (void*)device);
 	timer_adjust_oneshot(duart68681->channel[1].tx_timer, attotime_never, 1);
 
-	duart68681->duart_timer = timer_alloc(duart_timer_callback, (void*)device);
+	duart68681->duart_timer = timer_alloc(device->machine, duart_timer_callback, (void*)device);
 }
 
 /*-------------------------------------------------

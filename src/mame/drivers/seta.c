@@ -1352,7 +1352,7 @@ static TIMER_CALLBACK( uPD71054_timer_callback )
 /*------------------------------
     initialize
 ------------------------------*/
-static void uPD71054_timer_init( void )
+static void uPD71054_timer_init( running_machine *machine )
 {
 	int no;
 
@@ -1362,7 +1362,7 @@ static void uPD71054_timer_init( void )
 		uPD71054.max[no] = 0xffff;
 	}
 	for( no = 0; no < USED_TIMER_NUM; no++ ) {
-		uPD71054.timer[no] = timer_alloc( uPD71054_timer_callback , NULL);
+		uPD71054.timer[no] = timer_alloc( machine, uPD71054_timer_callback , NULL);
 	}
 }
 
@@ -7331,7 +7331,7 @@ static INTERRUPT_GEN( wrofaero_interrupt )
 	cpu_set_input_line(device, 2, HOLD_LINE );
 }
 
-static MACHINE_RESET( wrofaero ) { uPD71054_timer_init(); }
+static MACHINE_RESET( wrofaero ) { uPD71054_timer_init(machine); }
 #endif	// __uPD71054_TIMER
 
 

@@ -429,9 +429,9 @@ static TIMER_CALLBACK( equites_frq_adjuster_callback )
 
 static SOUND_START(equites)
 {
-	nmi_timer = timer_alloc(equites_nmi_callback, NULL);
+	nmi_timer = timer_alloc(machine, equites_nmi_callback, NULL);
 
-	adjuster_timer = timer_alloc(equites_frq_adjuster_callback, NULL);
+	adjuster_timer = timer_alloc(machine, equites_frq_adjuster_callback, NULL);
 	timer_adjust_periodic(adjuster_timer, ATTOTIME_IN_HZ(60), 0, ATTOTIME_IN_HZ(60));
 }
 

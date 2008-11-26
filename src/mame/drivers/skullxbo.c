@@ -54,7 +54,7 @@ static void alpha_row_update(const device_config *screen, int scanline)
 	{
 		int	width = video_screen_get_width(screen);
 		attotime period = video_screen_get_time_until_pos(screen, video_screen_get_vpos(screen) + 6, width * 0.9);
-		timer_set(period, NULL, 0, irq_gen);
+		timer_set(screen->machine, period, NULL, 0, irq_gen);
 	}
 
 	/* update the playfield and motion objects */

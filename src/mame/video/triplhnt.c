@@ -124,7 +124,7 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 	}
 
 	if (hit_line != 999 && hit_code != 999)
-		timer_set(video_screen_get_time_until_pos(machine->primary_screen, hit_line, 0), NULL, hit_code, triplhnt_hit_callback);
+		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, hit_line, 0), NULL, hit_code, triplhnt_hit_callback);
 }
 
 

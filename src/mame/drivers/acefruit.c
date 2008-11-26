@@ -48,7 +48,7 @@ static TIMER_CALLBACK( acefruit_refresh )
 
 static VIDEO_START( acefruit )
 {
-	acefruit_refresh_timer = timer_alloc( acefruit_refresh , NULL);
+	acefruit_refresh_timer = timer_alloc(machine, acefruit_refresh, NULL);
 }
 
 static INTERRUPT_GEN( acefruit_vblank )

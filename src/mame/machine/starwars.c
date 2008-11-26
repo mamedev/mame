@@ -192,7 +192,7 @@ void starwars_mproc_init(running_machine *machine)
 		PROM_AM[cnt]  = (val >> 7) & 0x0001;
 	}
 
-	math_timer = timer_alloc(math_run_clear, NULL);
+	math_timer = timer_alloc(machine, math_run_clear, NULL);
 }
 
 

@@ -202,24 +202,24 @@ static CPU_INIT( cop420 )
 
 	/* allocate serial timer */
 
-	cop400->serial_timer = timer_alloc(cop400_serial_tick, cop400);
+	cop400->serial_timer = timer_alloc(device->machine, cop400_serial_tick, cop400);
 	timer_adjust_periodic(cop400->serial_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock));
 
 	/* allocate counter timer */
 
-	cop400->counter_timer = timer_alloc(cop400_counter_tick, cop400);
+	cop400->counter_timer = timer_alloc(device->machine, cop400_counter_tick, cop400);
 	timer_adjust_periodic(cop400->counter_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock / 4));
 
 	/* allocate IN latch timer */
 
-	cop400->inil_timer = timer_alloc(cop400_inil_tick, cop400);
+	cop400->inil_timer = timer_alloc(device->machine, cop400_inil_tick, cop400);
 	timer_adjust_periodic(cop400->inil_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock));
 
 	/* allocate Microbus timer */
 
 	if (cop400->intf->microbus == COP400_MICROBUS_ENABLED)
 	{
-		cop400->microbus_timer = timer_alloc(cop400_microbus_tick, cop400);
+		cop400->microbus_timer = timer_alloc(device->machine, cop400_microbus_tick, cop400);
 		timer_adjust_periodic(cop400->microbus_timer, attotime_zero, 0, ATTOTIME_IN_HZ(clock));
 	}
 

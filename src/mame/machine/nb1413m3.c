@@ -45,7 +45,7 @@ static int nb1413m3_outcoin_flag;
 #define NB1413M3_TIMER_BASE 20000000
 static TIMER_CALLBACK( nb1413m3_timer_callback )
 {
-	timer_set(attotime_mul(ATTOTIME_IN_HZ(NB1413M3_TIMER_BASE), 256), NULL, 0, nb1413m3_timer_callback);
+	timer_set(machine, attotime_mul(ATTOTIME_IN_HZ(NB1413M3_TIMER_BASE), 256), NULL, 0, nb1413m3_timer_callback);
 
 	nb1413m3_74ls193_counter++;
 	nb1413m3_74ls193_counter &= 0x0f;
@@ -142,7 +142,7 @@ MACHINE_RESET( nb1413m3 )
 
 	nb1413m3_74ls193_counter = 0;
 
-	timer_call_after_resynch(NULL, 0, nb1413m3_timer_callback);
+	timer_call_after_resynch(machine, NULL, 0, nb1413m3_timer_callback);
 }
 
 WRITE8_HANDLER( nb1413m3_nmi_clock_w )

@@ -159,10 +159,10 @@ WRITE32_HANDLER( am53cf96_w )
 			case 3:	// reset SCSI bus
 				scsi_regs[REG_INTSTATE] = 4;	// command sent OK
 				xfer_state = 0;
-				timer_set( ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
+				timer_set( space->machine, ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
 				break;
 			case 0x42:    	// select with ATN steps
-				timer_set( ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
+				timer_set( space->machine, ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
 				if ((fifo[1] == 0) || (fifo[1] == 0x48) || (fifo[1] == 0x4b))
 				{
 					scsi_regs[REG_INTSTATE] = 6;
@@ -192,7 +192,7 @@ WRITE32_HANDLER( am53cf96_w )
 			case 0x10:	// information transfer (must not change xfer_state)
 			case 0x11:	// second phase of information transfer
 			case 0x12:	// message accepted
-				timer_set( ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
+				timer_set( space->machine, ATTOTIME_IN_HZ( 16384 ), NULL, 0, am53cf96_irq );
 				scsi_regs[REG_INTSTATE] = 6;	// command sent OK
 				break;
 			default:

@@ -299,8 +299,8 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 	cia_config(machine, 1, &cia_intf[1]);
 
 	/* setup the timers */
-	amiga_irq_timer = timer_alloc(amiga_irq_proc, NULL);
-	amiga_blitter_timer = timer_alloc(amiga_blitter_proc, NULL);
+	amiga_irq_timer = timer_alloc(machine, amiga_irq_proc, NULL);
+	amiga_blitter_timer = timer_alloc(machine, amiga_blitter_proc, NULL);
 }
 
 
@@ -341,7 +341,7 @@ MACHINE_RESET( amiga )
 		(*amiga_intf->reset_callback)();
 
 	/* start the scanline timer */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
 }
 
 
@@ -382,7 +382,7 @@ static TIMER_CALLBACK( scanline_callback )
 
 	/* set timer for next line */
 	scanline = (scanline + 1) % video_screen_get_height(machine->primary_screen);
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, scanline_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, scanline_callback);
 }
 
 
@@ -1305,7 +1305,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			if (amiga_intf->serdat_w != NULL)
 				(*amiga_intf->serdat_w)(data);
 			CUSTOM_REG(REG_SERDATR) &= ~0x3000;
-			timer_set(amiga_get_serial_char_period(), NULL, 0, finish_serial_write);
+			timer_set(space->machine, amiga_get_serial_char_period(), NULL, 0, finish_serial_write);
 			break;
 
 		case REG_BLTSIZE:

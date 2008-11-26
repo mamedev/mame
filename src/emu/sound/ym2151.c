@@ -829,7 +829,7 @@ static TIMER_CALLBACK( timer_callback_a )
 	if (chip->irq_enable & 0x04)
 	{
 		chip->status |= 1;
-		timer_set(attotime_zero,chip,0,irqAon_callback);
+		timer_set(machine, attotime_zero,chip,0,irqAon_callback);
 	}
 	if (chip->irq_enable & 0x80)
 		chip->csm_req = 2;		/* request KEY ON / KEY OFF sequence */
@@ -842,7 +842,7 @@ static TIMER_CALLBACK( timer_callback_b )
 	if (chip->irq_enable & 0x08)
 	{
 		chip->status |= 2;
-		timer_set(attotime_zero,chip,0,irqBon_callback);
+		timer_set(machine, attotime_zero,chip,0,irqBon_callback);
 	}
 }
 #if 0
@@ -1105,7 +1105,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~1;
-				timer_set(attotime_zero,chip,0,irqAoff_callback);
+				timer_set(Machine, attotime_zero,chip,0,irqAoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~1;
@@ -1117,7 +1117,7 @@ void ym2151_write_reg(void *_chip, int r, int v)
 			{
 #ifdef USE_MAME_TIMERS
 				chip->status &= ~2;
-				timer_set(attotime_zero,chip,0,irqBoff_callback);
+				timer_set(Machine, attotime_zero,chip,0,irqBoff_callback);
 #else
 				int oldstate = chip->status & 3;
 				chip->status &= ~2;
@@ -1534,8 +1534,8 @@ void * ym2151_init(const char *tag, int clock, int rate)
 
 #ifdef USE_MAME_TIMERS
 /* this must be done _before_ a call to ym2151_reset_chip() */
-	PSG->timer_A = timer_alloc(timer_callback_a, PSG);
-	PSG->timer_B = timer_alloc(timer_callback_b, PSG);
+	PSG->timer_A = timer_alloc(Machine, timer_callback_a, PSG);
+	PSG->timer_B = timer_alloc(Machine, timer_callback_b, PSG);
 #else
 	PSG->tim_A      = 0;
 	PSG->tim_B      = 0;
@@ -1547,7 +1547,7 @@ void * ym2151_init(const char *tag, int clock, int rate)
 	{
 		cymfile = fopen("2151_.cym","wb");
 		if (cymfile)
-			timer_pulse ( ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+			timer_pulse ( Machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 2151_.cym\n");
 	}

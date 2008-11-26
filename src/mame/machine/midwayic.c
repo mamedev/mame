@@ -282,7 +282,7 @@ void midway_serial_pic2_init(running_machine *machine, int upper, int yearoffs)
 
 	pic.yearoffs = yearoffs;
 	pic.time_just_written = 0;
-	pic.time_write_timer = timer_alloc(reset_timer, NULL);
+	pic.time_write_timer = timer_alloc(machine, reset_timer, NULL);
 	memset(pic.default_nvram, 0xff, sizeof(pic.default_nvram));
 	generate_serial_data(machine, upper);
 }
@@ -301,7 +301,7 @@ UINT8 midway_serial_pic2_status_r(void)
 	/* if we're still holding the data ready bit high, do it */
 	if (pic.latch & 0xf00)
 	{
-		if (attotime_compare(timer_get_time(), pic.latch_expire_time) > 0)
+		if (attotime_compare(timer_get_time(Machine), pic.latch_expire_time) > 0)
 			pic.latch &= 0xff;
 		else
 			pic.latch -= 0x100;
@@ -347,7 +347,7 @@ void midway_serial_pic2_w(running_machine *machine, UINT8 data)
 
 	/* store in the latch, along with a bit to indicate we have data */
 	pic.latch = (data & 0x00f) | 0x480;
-	pic.latch_expire_time = attotime_add(timer_get_time(), ATTOTIME_IN_MSEC(1));
+	pic.latch_expire_time = attotime_add(timer_get_time(machine), ATTOTIME_IN_MSEC(1));
 	if (data & 0x10)
 	{
 		int cmd = pic.state ? (pic.state & 0x0f) : (pic.latch & 0x0f);

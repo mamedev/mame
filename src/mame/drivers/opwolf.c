@@ -799,7 +799,7 @@ static DRIVER_INIT( opwolf )
 
 	opwolf_region = rom[0x03fffe / 2] & 0xff;
 
-	opwolf_cchip_init();
+	opwolf_cchip_init(machine);
 
 	// World & US version have different gun offsets, presumably slightly different gun hardware
 	opwolf_gun_xoffs = 0xec - (rom[0x03ffb0 / 2] & 0xff);

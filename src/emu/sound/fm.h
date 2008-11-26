@@ -42,7 +42,7 @@ struct _ssg_callbacks
 #if FM_BUSY_FLAG_SUPPORT
 #define TIME_TYPE 					attotime
 #define UNDEFINED_TIME				attotime_zero
-#define FM_GET_TIME_NOW() 			timer_get_time()
+#define FM_GET_TIME_NOW() 			timer_get_time(Machine)
 #define ADD_TIMES(t1, t2)    		attotime_add((t1), (t2))
 #define COMPARE_TIMES(t1, t2)		attotime_compare((t1), (t2))
 #define MULTIPLY_TIME_BY_INT(t,i)	attotime_mul(t, i)

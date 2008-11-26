@@ -85,9 +85,9 @@ static TIMER_CALLBACK( mw8080bw_interrupt_callback )
 }
 
 
-static void mw8080bw_create_interrupt_timer(void)
+static void mw8080bw_create_interrupt_timer(running_machine *machine)
 {
-	interrupt_timer = timer_alloc(mw8080bw_interrupt_callback, NULL);
+	interrupt_timer = timer_alloc(machine, mw8080bw_interrupt_callback, NULL);
 }
 
 
@@ -107,7 +107,7 @@ static void mw8080bw_start_interrupt_timer(running_machine *machine)
 
 MACHINE_START( mw8080bw )
 {
-	mw8080bw_create_interrupt_timer();
+	mw8080bw_create_interrupt_timer(machine);
 	mb14241_init(0);
 }
 

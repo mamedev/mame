@@ -113,10 +113,10 @@ static TIMER_CALLBACK( interrupt_assert_callback )
 }
 
 
-static void create_interrupt_timers(void)
+static void create_interrupt_timers(running_machine *machine)
 {
-	interrupt_clear_timer = timer_alloc(interrupt_clear_callback, NULL);
-	interrupt_assert_timer = timer_alloc(interrupt_assert_callback, NULL);
+	interrupt_clear_timer = timer_alloc(machine, interrupt_clear_callback, NULL);
+	interrupt_assert_timer = timer_alloc(machine, interrupt_assert_callback, NULL);
 }
 
 
@@ -130,7 +130,7 @@ static void start_interrupt_timers(running_machine *machine)
 
 static MACHINE_START( enigma2 )
 {
-	create_interrupt_timers();
+	create_interrupt_timers(machine);
 }
 
 

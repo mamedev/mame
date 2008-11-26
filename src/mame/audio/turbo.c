@@ -107,7 +107,7 @@ WRITE8_DEVICE_HANDLER( turbo_sound_a_w )
 #else
 
 	if (((data ^ last_sound_a) & 0x1e) && (last_sound_a & 0x1e) != 0x1e)
-		timer_set(ATTOTIME_IN_HZ(20000), NULL, data, update_sound_a);
+		timer_set(space->machine, ATTOTIME_IN_HZ(20000), NULL, data, update_sound_a);
 	else
 		update_sound_a(data);
 

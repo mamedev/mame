@@ -904,7 +904,7 @@ MACHINE_RESET( dc )
 	memset(dc_rtcregister, 0, sizeof(dc_rtcregister));
 	memset(dc_coin_counts, 0, sizeof(dc_coin_counts));
 
-	dc_rtc_timer = timer_alloc(dc_rtc_increment, 0);
+	dc_rtc_timer = timer_alloc(machine, dc_rtc_increment, 0);
 	timer_adjust_periodic(dc_rtc_timer, attotime_zero, 0, ATTOTIME_IN_SEC(1));
 
 	dc_sysctrl_regs[SB_SBREV] = 0x0b;

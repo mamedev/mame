@@ -1323,8 +1323,8 @@ static CPU_INIT( m6801 )
 	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	m68_state->clock = clock;
-	m68_state->m6800_rx_timer = timer_alloc(m6800_rx_tick, m68_state);
-	m68_state->m6800_tx_timer = timer_alloc(m6800_tx_tick, m68_state);
+	m68_state->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, m68_state);
+	m68_state->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, m68_state);
 
 	state_register(m68_state, "m6801");
 }
@@ -1369,8 +1369,8 @@ static CPU_INIT( m6803 )
 	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	m68_state->clock = clock;
-	m68_state->m6800_rx_timer = timer_alloc(m6800_rx_tick, m68_state);
-	m68_state->m6800_tx_timer = timer_alloc(m6800_tx_tick, m68_state);
+	m68_state->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, m68_state);
+	m68_state->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, m68_state);
 
 	state_register(m68_state, "m6803");
 }
@@ -1734,8 +1734,8 @@ static CPU_INIT( hd63701 )
 	m68_state->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	m68_state->clock = clock;
-	m68_state->m6800_rx_timer = timer_alloc(m6800_rx_tick, m68_state);
-	m68_state->m6800_tx_timer = timer_alloc(m6800_tx_tick, m68_state);
+	m68_state->m6800_rx_timer = timer_alloc(device->machine, m6800_rx_tick, m68_state);
+	m68_state->m6800_tx_timer = timer_alloc(device->machine, m6800_tx_tick, m68_state);
 
 	state_register(m68_state, "hd63701");
 }

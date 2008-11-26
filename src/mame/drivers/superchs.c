@@ -369,7 +369,7 @@ static MACHINE_RESET( superchs )
 {
 	taito_f3_soundsystem_reset(machine);
 
-	f3_68681_reset();
+	f3_68681_reset(machine);
 }
 
 static const eeprom_interface superchs_eeprom_interface =

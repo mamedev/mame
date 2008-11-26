@@ -108,7 +108,7 @@ static TIMER_CALLBACK( m72_scanline_interrupt );
 
 static MACHINE_START( m72 )
 {
-	scanline_timer = timer_alloc(m72_scanline_interrupt, NULL);
+	scanline_timer = timer_alloc(machine, m72_scanline_interrupt, NULL);
 }
 
 static TIMER_CALLBACK( synch_callback )
@@ -129,7 +129,7 @@ static MACHINE_RESET( m72 )
 	state_save_register_global(mcu_snd_cmd_latch);
 
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
-	timer_call_after_resynch( NULL, 0, synch_callback);
+	timer_call_after_resynch(machine,  NULL, 0, synch_callback);
 }
 
 static MACHINE_RESET( xmultipl )
@@ -222,11 +222,11 @@ static WRITE16_HANDLER( m72_main_mcu_w)
 		protection_ram[offset] = val;
 		cputag_set_input_line(space->machine, "mcu", 0, ASSERT_LINE);
 		/* Line driven, most likely by write line */
-		//timer_set(cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 2), NULL, 0, mcu_irq0_clear);
-		//timer_set(cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 0), NULL, 0, mcu_irq0_raise);
+		//timer_set(space->machine, cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 2), NULL, 0, mcu_irq0_clear);
+		//timer_set(space->machine, cpu_clocks_to_attotime(cputag_get_cpu(space->machine, "mcu"), 0), NULL, 0, mcu_irq0_raise);
 	}
 	else
-		timer_call_after_resynch( protection_ram, (offset<<16) | val, delayed_ram16_w);
+		timer_call_after_resynch( space->machine, protection_ram, (offset<<16) | val, delayed_ram16_w);
 }
 
 static WRITE8_HANDLER( m72_mcu_data_w )
@@ -235,7 +235,7 @@ static WRITE8_HANDLER( m72_mcu_data_w )
 	if (offset&1) val = (protection_ram[offset/2] & 0x00ff) | (data << 8);
 	else val = (protection_ram[offset/2] & 0xff00) | (data&0xff);
 
-	timer_call_after_resynch( protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
+	timer_call_after_resynch( space->machine, protection_ram, ((offset >>1 ) << 16) | val, delayed_ram16_w);
 }
 
 static READ8_HANDLER(m72_mcu_data_r )

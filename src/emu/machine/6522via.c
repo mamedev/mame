@@ -163,7 +163,7 @@ void via_config(int which, const struct via6522_interface *intf)
 	via[which].t1lh = 0xb5; /* ports are not written by kernel! */
 	via[which].t2ll = 0xff; /* taken from vice */
 	via[which].t2lh = 0xff;
-	via[which].time2 = via[which].time1 = timer_get_time();
+	via[which].time2 = via[which].time1 = timer_get_time(Machine);
 
 	/* Default clock is from CPU1 */
 	via_set_clock (which, cpu_get_clock(Machine->cpu[0]));
@@ -231,7 +231,7 @@ INLINE UINT16 v_get_counter1_value(struct via6522 *v) {
 	if (v->t1_active) {
 		val = v_time_to_cycles(v, timer_timeleft(v->t1)) - IFR_DELAY;
 	} else {
-		val = 0xFFFF - v_time_to_cycles(v, attotime_sub(timer_get_time(), v->time1));
+		val = 0xFFFF - v_time_to_cycles(v, attotime_sub(timer_get_time(Machine), v->time1));
 	}
 	return val;
 }
@@ -266,7 +266,7 @@ static void via_shift(running_machine *machine, int which)
 		v->shift_counter = (v->shift_counter + 1) % 8;
 
 		if (v->shift_counter)
-			timer_set(v_cycles_to_time(v, 2), NULL, which, via_shift_callback);
+			timer_set(machine, v_cycles_to_time(v, 2), NULL, which, via_shift_callback);
 		else
 		{
 			if (!(v->ifr & INT_SR))
@@ -334,7 +334,7 @@ static TIMER_CALLBACK( via_t1_timeout )
 		if (T1_SET_PB7(v->acr))
 			v->out_b |= 0x80;
 		v->t1_active = 0;
-		v->time1 = timer_get_time();
+		v->time1 = timer_get_time(machine);
     }
 	if (v->ddr_b)
 	{
@@ -356,7 +356,7 @@ static TIMER_CALLBACK( via_t2_timeout )
 	struct via6522 *v = via + which;
 
 	v->t2_active = 0;
-	v->time2 = timer_get_time();
+	v->time2 = timer_get_time(machine);
 
 	if (!(v->ifr & INT_T2))
 		via_set_int (machine, which, INT_T2);
@@ -382,9 +382,9 @@ void via_reset(void)
 		v.time2 = via[i].time2;
 		v.clock = via[i].clock;
 
-		v.t1 = timer_alloc(via_t1_timeout, NULL);
+		v.t1 = timer_alloc(Machine, via_t1_timeout, NULL);
 		v.t1_active = 0;
-		v.t2 = timer_alloc(via_t2_timeout, NULL);
+		v.t2 = timer_alloc(Machine, via_t2_timeout, NULL);
 		v.t2_active = 0;
 
 		via[i] = v;
@@ -505,7 +505,7 @@ int via_read(running_machine *machine, int which, int offset)
 			if (T2_COUNT_PB6(v->acr))
 				val = v->t2cl;
 			else
-				val = (0x10000- (v_time_to_cycles(v, attotime_sub(timer_get_time(), v->time2)) & 0xffff) - 1) & 0xff;
+				val = (0x10000- (v_time_to_cycles(v, attotime_sub(timer_get_time(machine), v->time2)) & 0xffff) - 1) & 0xff;
 		}
 		break;
 
@@ -517,7 +517,7 @@ int via_read(running_machine *machine, int which, int offset)
 			if (T2_COUNT_PB6(v->acr))
 				val = v->t2ch;
 			else
-				val = (0x10000- (v_time_to_cycles(v, attotime_sub(timer_get_time(), v->time2)) & 0xffff) - 1) >> 8;
+				val = (0x10000- (v_time_to_cycles(v, attotime_sub(timer_get_time(machine), v->time2)) & 0xffff) - 1) >> 8;
 		}
 		break;
 
@@ -527,7 +527,7 @@ int via_read(running_machine *machine, int which, int offset)
 		if (SO_O2_CONTROL(v->acr))
 		{
 			v->shift_counter=0;
-			timer_set(v_cycles_to_time(v, 2), NULL, which,via_shift_callback);
+			timer_set(machine, v_cycles_to_time(v, 2), NULL, which,via_shift_callback);
 		}
 		break;
 
@@ -749,7 +749,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 		}
 		else
 		{
-			v->time2 = timer_get_time();
+			v->time2 = timer_get_time(machine);
 		}
 		break;
 
@@ -759,7 +759,7 @@ void via_write(running_machine *machine, int which, int offset, int data)
 		via_clear_int(machine, which, INT_SR);
 		if (SO_O2_CONTROL(v->acr))
 		{
-			timer_set(v_cycles_to_time(v, 2), NULL, which, via_shift_callback);
+			timer_set(machine, v_cycles_to_time(v, 2), NULL, which, via_shift_callback);
 		}
 		break;
 

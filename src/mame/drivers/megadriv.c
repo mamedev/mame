@@ -1491,13 +1491,13 @@ static TIMER_CALLBACK( io_timeout_timer_callback )
 	io_stage[(int)(FPTR)ptr] = -1;
 }
 
-static void init_megadri6_io(void)
+static void init_megadri6_io(running_machine *machine)
 {
 	int i;
 
 	for (i=0; i<3; i++)
 	{
-		io_timeout[i] = timer_alloc(io_timeout_timer_callback, (void*)(FPTR)i);
+		io_timeout[i] = timer_alloc(machine, io_timeout_timer_callback, (void*)(FPTR)i);
 		io_stage[i] = -1;
 	}
 }
@@ -1810,10 +1810,10 @@ static void megadrive_init_io(running_machine *machine)
 	megadrive_io_tx_regs[2] = 0xff;
 
 	if (machine->gamedrv->ipt==ipt_megadri6)
-		init_megadri6_io();
+		init_megadri6_io(machine);
 
 	if (machine->gamedrv->ipt==ipt_ssf2ghw)
-		init_megadri6_io();
+		init_megadri6_io(machine);
 }
 
 /************* 6 button version **************************/
@@ -2854,7 +2854,7 @@ static UINT16 commsram[8];
 // reads
 static READ16_HANDLER( _32x_68k_commsram_r )
 {
-	if (_32X_COMMS_PORT_SYNC) timer_call_after_resynch(NULL, 0, NULL);
+	if (_32X_COMMS_PORT_SYNC) timer_call_after_resynch(space->machine, NULL, 0, NULL);
 	return commsram[offset];
 }
 
@@ -2862,7 +2862,7 @@ static READ16_HANDLER( _32x_68k_commsram_r )
 static WRITE16_HANDLER( _32x_68k_commsram_w )
 {
 	COMBINE_DATA(&commsram[offset]);
-	if (_32X_COMMS_PORT_SYNC) timer_call_after_resynch(NULL, 0, NULL);
+	if (_32X_COMMS_PORT_SYNC) timer_call_after_resynch(space->machine, NULL, 0, NULL);
 }
 
 /**********************************************************************************************/
@@ -5900,7 +5900,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
        top-left of the screen.  The first scanline is scanline 0 (we set scanline to -1 in
        VIDEO_EOF) */
 
-	timer_call_after_resynch(NULL, 0, 0);
+	timer_call_after_resynch(machine, NULL, 0, 0);
 	/* Compensate for some rounding errors
 
        When the counter reaches 261 we should have reached the end of the frame, however due
@@ -6067,12 +6067,12 @@ MACHINE_RESET( megadriv )
 
 	megadrive_init_io(machine);
 
-	frame_timer = timer_alloc(frame_timer_callback, NULL);
-	scanline_timer = timer_alloc(scanline_timer_callback, NULL);
-	render_timer = timer_alloc(render_timer_callback, NULL);
+	frame_timer = timer_alloc(machine, frame_timer_callback, NULL);
+	scanline_timer = timer_alloc(machine, scanline_timer_callback, NULL);
+	render_timer = timer_alloc(machine, render_timer_callback, NULL);
 
-	irq6_on_timer = timer_alloc(irq6_on_callback, NULL);
-	irq4_on_timer = timer_alloc(irq4_on_callback, NULL);
+	irq6_on_timer = timer_alloc(machine, irq6_on_callback, NULL);
+	irq4_on_timer = timer_alloc(machine, irq4_on_callback, NULL);
 
 	timer_adjust_oneshot(frame_timer, attotime_zero, 0);
 	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);

@@ -142,7 +142,7 @@ static TIMER_CALLBACK( exctsccr_fm_callback )
 static MACHINE_START( exctsccr )
 {
 	// FIXME
-	timer_pulse(ATTOTIME_IN_HZ(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
+	timer_pulse(machine, ATTOTIME_IN_HZ(75), NULL, 0, exctsccr_fm_callback); /* updates fm */
 }
 
 

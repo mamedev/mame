@@ -21,16 +21,17 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/pcshare.h"
 #include "machine/pckeybrd.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
 #define DBG_LOG(N,M,A) \
-	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
+	if(VERBOSE_DBG>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(Machine)),(char*)M ); logerror A; }
 
 #define VERBOSE_JOY 0		/* JOY (joystick port) */
 #define JOY_LOG(N,M,A) \
-	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time()),(char*)M ); logerror A; }
+	if(VERBOSE_JOY>=N){ if( M )logerror("%11.6f: %-24s",attotime_to_double(timer_get_time(Machine)),(char*)M ); logerror A; }
 
 
 static emu_timer *pc_keyboard_timer;
@@ -49,7 +50,7 @@ void init_pc_common(running_machine *machine, UINT32 flags, void (*set_keyb_int_
 
 	set_keyb_int = set_keyb_int_func;
 
-	pc_keyboard_timer = timer_alloc(pc_keyb_timer, NULL);
+	pc_keyboard_timer = timer_alloc(machine, pc_keyb_timer, NULL);
 }
 
 /*

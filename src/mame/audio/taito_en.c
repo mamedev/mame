@@ -78,9 +78,9 @@ static TIMER_CALLBACK( taito_en_timer_callback )
 	}
 }
 
-void f3_68681_reset(void)
+void f3_68681_reset(running_machine *machine)
 {
-	timer_68681 = timer_alloc(taito_en_timer_callback, NULL);
+	timer_68681 = timer_alloc(machine, taito_en_timer_callback, NULL);
 }
 
 READ16_HANDLER(f3_68681_r)

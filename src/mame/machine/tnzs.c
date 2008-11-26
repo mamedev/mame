@@ -507,7 +507,7 @@ static TIMER_CALLBACK( kludge_callback )
 
 static WRITE8_HANDLER( tnzs_sync_kludge_w )
 {
-	timer_call_after_resynch(NULL, data,kludge_callback);
+	timer_call_after_resynch(space->machine, NULL, data,kludge_callback);
 }
 
 

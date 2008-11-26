@@ -368,7 +368,7 @@ static void dma8237_drq_write_callback(const device_config *device, int param)
 void dma8237_drq_write(const device_config *device, int channel, int state)
 {
 	int param = (channel << 1) | (state ? 1 : 0);
-	//timer_call_after_resynch(NULL, param, dma8237_drq_write_callback);
+	//timer_call_after_resynch(device->machine, NULL, param, dma8237_drq_write_callback);
 	dma8237_drq_write_callback(device, param);
 }
 
@@ -404,8 +404,8 @@ static DEVICE_RESET( dma8237 ) {
 	dma8237_t	*dma8237 = get_safe_token(device);
 
 	dma8237->status = 0x0F;
-	dma8237->timer = timer_alloc(dma8237_timerproc, (void *)device);
-	dma8237->msbflip_timer = timer_alloc(dma8237_msbflip_timerproc, (void *)device);
+	dma8237->timer = timer_alloc(device->machine, dma8237_timerproc, (void *)device);
+	dma8237->msbflip_timer = timer_alloc(device->machine, dma8237_msbflip_timerproc, (void *)device);
 	dma8237->eop = 1;
 
 	dma8237->mask = 0x00;

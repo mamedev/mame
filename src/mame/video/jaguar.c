@@ -809,7 +809,7 @@ static STATE_POSTLOAD( cojag_postload )
 
 VIDEO_START( cojag )
 {
-	object_timer = timer_alloc(cojag_scanline_update, NULL);
+	object_timer = timer_alloc(machine, cojag_scanline_update, NULL);
 	adjust_object_timer(machine, 0);
 
 	screen_bitmap = auto_bitmap_alloc(720, 512, BITMAP_FORMAT_RGB32);

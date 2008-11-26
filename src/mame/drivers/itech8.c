@@ -622,7 +622,7 @@ static INTERRUPT_GEN( generate_nmi )
 {
 	/* signal the NMI */
 	itech8_update_interrupts(device->machine, 1, -1, -1);
-	timer_set(ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
+	timer_set(device->machine, ATTOTIME_IN_USEC(1), NULL, 0, irq_off);
 
 	if (FULL_LOGGING) logerror("------------ VBLANK (%d) --------------\n", video_screen_get_vpos(device->machine->primary_screen));
 }
@@ -661,7 +661,7 @@ static MACHINE_START( sstrike )
 	MACHINE_START_CALL(itech8);
 
 	/* we need to update behind the beam as well */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 32, behind_the_beam_update);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 32, behind_the_beam_update);
 }
 
 static MACHINE_RESET( itech8 )
@@ -682,7 +682,7 @@ static MACHINE_RESET( itech8 )
 	via_reset();
 
 	/* reset the ticket dispenser */
-	ticket_dispenser_init(200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
+	ticket_dispenser_init(machine, 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW);
 
 	/* reset the palette chip */
 	tlc34076_reset(6);
@@ -716,7 +716,7 @@ static TIMER_CALLBACK( behind_the_beam_update )
 	if (scanline >= 256) scanline = 0;
 
 	/* set a new timer */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, (scanline << 8) + interval, behind_the_beam_update);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, (scanline << 8) + interval, behind_the_beam_update);
 }
 
 
@@ -815,7 +815,7 @@ static TIMER_CALLBACK( delayed_sound_data_w )
 
 static WRITE8_HANDLER( sound_data_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_sound_data_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_data_w);
 }
 
 
@@ -826,7 +826,7 @@ static WRITE8_HANDLER( gtg2_sound_data_w )
 	       ((data & 0x5d) << 1) |
 	       ((data & 0x20) >> 3) |
 	       ((data & 0x02) << 5);
-	timer_call_after_resynch(NULL, data, delayed_sound_data_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_sound_data_w);
 }
 
 

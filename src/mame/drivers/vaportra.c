@@ -27,7 +27,7 @@ WRITE16_HANDLER( vaportra_palette_24bit_b_w );
 static WRITE16_HANDLER( vaportra_sound_w )
 {
 	/* Force synchronisation between CPUs with fake timer */
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 	soundlatch_w(space,0,data & 0xff);
 	cpu_set_input_line(space->machine->cpu[1],0,ASSERT_LINE);
 }

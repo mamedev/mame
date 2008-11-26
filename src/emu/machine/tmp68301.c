@@ -110,7 +110,7 @@ MACHINE_RESET( tmp68301 )
 {
 	int i;
 	for (i = 0; i < 3; i++)
-		tmp68301_timer[i] = timer_alloc(tmp68301_timer_callback, NULL);
+		tmp68301_timer[i] = timer_alloc(machine, tmp68301_timer_callback, NULL);
 
 	for (i = 0; i < 3; i++)
 		tmp68301_IE[i] = 0;

@@ -479,11 +479,11 @@ static MACHINE_START( missile )
 	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), missile_direct_handler);
 
 	/* create a timer to speed/slow the CPU */
-	cpu_timer = timer_alloc(adjust_cpu_speed, NULL);
+	cpu_timer = timer_alloc(machine, adjust_cpu_speed, NULL);
 	timer_adjust_oneshot(cpu_timer, video_screen_get_time_until_pos(machine->primary_screen, v_to_scanline(0), 0), 0);
 
 	/* create a timer for IRQs and set up the first callback */
-	irq_timer = timer_alloc(clock_irq, NULL);
+	irq_timer = timer_alloc(machine, clock_irq, NULL);
 	irq_state = 0;
 	schedule_next_irq(machine, -32);
 

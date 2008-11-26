@@ -292,7 +292,7 @@ VIDEO_EOF( tank8 )
 					index |= 0x80; /* collision on right side */
 			}
 
-			timer_set(video_screen_get_time_until_pos(machine->primary_screen, y, x), NULL, index, tank8_collision_callback);
+			timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, y, x), NULL, index, tank8_collision_callback);
 
 			state = 1;
 		}

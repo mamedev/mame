@@ -862,8 +862,8 @@ static INTERRUPT_GEN( mappy_interrupt_1 )
 	irq0_line_assert(device);	// this also checks if irq is enabled - IMPORTANT!
 						// so don't replace with cpu_set_input_line(machine->cpu[0], 0, ASSERT_LINE);
 
-	namcoio_set_irq_line(0,PULSE_LINE);
-	namcoio_set_irq_line(1,PULSE_LINE);
+	namcoio_set_irq_line(device->machine,0,PULSE_LINE);
+	namcoio_set_irq_line(device->machine,1,PULSE_LINE);
 }
 
 

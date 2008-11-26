@@ -597,7 +597,7 @@ static void	simulate2(const device_config *device, struct pit8253_timer *timer, 
 	{
 		attotime next_fire_time = attotime_add( timer->last_updated, double_to_attotime( cycles_to_output / timer->clockin ) );
 
-		timer_adjust_oneshot(timer->updatetimer, attotime_sub( next_fire_time, timer_get_time() ), timer->index );
+		timer_adjust_oneshot(timer->updatetimer, attotime_sub( next_fire_time, timer_get_time(device->machine) ), timer->index );
 	}
 
     LOG2(("pit8253: simulate2(): simulating %d cycles for %d in mode %d, bcd = %d, phase = %d, gate = %d, output %d, value = 0x%04x, cycles_to_output = %04x\n",
@@ -637,7 +637,7 @@ static void	update(const device_config *device, struct pit8253_timer *timer)
 {
 	/* With the 82C54's maximum clockin of 10MHz, 64 bits is nearly 60,000
        years of time. Should be enough for now. */
-	attotime now =	timer_get_time();
+	attotime now =	timer_get_time(device->machine);
 	attotime elapsed_time = attotime_sub(now,timer->last_updated);
 	INT64 elapsed_cycles =	attotime_to_double(elapsed_time) * timer->clockin;
 
@@ -904,7 +904,7 @@ WRITE8_DEVICE_HANDLER( pit8253_w )
 
 		update(device, timer);
 
-		if ( attotime_compare( timer_get_time(), timer->last_updated ) > 0 && timer->clockin != 0 )
+		if ( attotime_compare( timer_get_time(device->machine), timer->last_updated ) > 0 && timer->clockin != 0 )
 		{
 			middle_of_a_cycle = 1;
 		}
@@ -1059,7 +1059,7 @@ static device_start_err common_start( const device_config *device, int device_ty
 		timer->clockin = pit8253->config->timer[timerno].clockin;
 		timer->output_changed = pit8253->config->timer[timerno].output_changed;
 
-		timer->updatetimer = timer_alloc(update_timer_cb, (void *)device);
+		timer->updatetimer = timer_alloc(device->machine, update_timer_cb, (void *)device);
 		timer_adjust_oneshot(timer->updatetimer, attotime_never, timerno);
 
 		/* set up state save values */
@@ -1121,7 +1121,7 @@ static DEVICE_RESET( pit8253 ) {
 		timer->null_count = 1;
 		timer->cycles_to_output = CYCLES_NEVER;
 
-		timer->last_updated = timer_get_time();
+		timer->last_updated = timer_get_time(device->machine);
 
 		update(device, timer);
 	}

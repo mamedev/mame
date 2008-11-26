@@ -210,7 +210,7 @@ static WRITE16_HANDLER( sound_reset_w )
 		if ((oldword ^ sound_reset_val) & 1)
 		{
 			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, (sound_reset_val & 1) ? CLEAR_LINE : ASSERT_LINE);
-			atarigen_sound_reset();
+			atarigen_sound_reset(space->machine);
 		}
 	}
 }

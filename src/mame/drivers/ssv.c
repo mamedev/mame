@@ -1002,7 +1002,7 @@ static WRITE32_HANDLER(latch32_w)
 	if(!offset)
 		latches[2]|=1;
 	COMBINE_DATA(&latches[offset]);
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 }
 
 static READ16_HANDLER(latch16_r)
@@ -1017,7 +1017,7 @@ static WRITE16_HANDLER(latch16_w)
 	if(!offset)
 		latches[2]|=2;
 	latches[offset]=data;
-	timer_call_after_resynch(NULL, 0, NULL);
+	timer_call_after_resynch(space->machine, NULL, 0, NULL);
 }
 
 static ADDRESS_MAP_START( jsk_readmem, ADDRESS_SPACE_PROGRAM, 16 )

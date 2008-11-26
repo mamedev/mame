@@ -138,7 +138,7 @@ static TIMER_CALLBACK( frogs_croak_callback )
 
 MACHINE_START( frogs_audio )
 {
-	frogs_croak_timer = timer_alloc(frogs_croak_callback, NULL);
+	frogs_croak_timer = timer_alloc(machine, frogs_croak_callback, NULL);
 }
 
 

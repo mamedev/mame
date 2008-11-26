@@ -969,14 +969,14 @@ static CPU_INIT( m37710 )
 	m37710i_cpu->source = 0;
 	m37710i_cpu->destination = 0;
 
-	m37710i_cpu->timers[0] = timer_alloc(m37710_timer_0_cb, m37710i_cpu);
-	m37710i_cpu->timers[1] = timer_alloc(m37710_timer_1_cb, m37710i_cpu);
-	m37710i_cpu->timers[2] = timer_alloc(m37710_timer_2_cb, m37710i_cpu);
-	m37710i_cpu->timers[3] = timer_alloc(m37710_timer_3_cb, m37710i_cpu);
-	m37710i_cpu->timers[4] = timer_alloc(m37710_timer_4_cb, m37710i_cpu);
-	m37710i_cpu->timers[5] = timer_alloc(m37710_timer_5_cb, m37710i_cpu);
-	m37710i_cpu->timers[6] = timer_alloc(m37710_timer_6_cb, m37710i_cpu);
-	m37710i_cpu->timers[7] = timer_alloc(m37710_timer_7_cb, m37710i_cpu);
+	m37710i_cpu->timers[0] = timer_alloc(device->machine, m37710_timer_0_cb, m37710i_cpu);
+	m37710i_cpu->timers[1] = timer_alloc(device->machine, m37710_timer_1_cb, m37710i_cpu);
+	m37710i_cpu->timers[2] = timer_alloc(device->machine, m37710_timer_2_cb, m37710i_cpu);
+	m37710i_cpu->timers[3] = timer_alloc(device->machine, m37710_timer_3_cb, m37710i_cpu);
+	m37710i_cpu->timers[4] = timer_alloc(device->machine, m37710_timer_4_cb, m37710i_cpu);
+	m37710i_cpu->timers[5] = timer_alloc(device->machine, m37710_timer_5_cb, m37710i_cpu);
+	m37710i_cpu->timers[6] = timer_alloc(device->machine, m37710_timer_6_cb, m37710i_cpu);
+	m37710i_cpu->timers[7] = timer_alloc(device->machine, m37710_timer_7_cb, m37710i_cpu);
 
 	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->a);
 	state_save_register_item("M377xx", device->tag, 0, m37710i_cpu->b);

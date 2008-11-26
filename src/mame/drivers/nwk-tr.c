@@ -1158,7 +1158,7 @@ static DRIVER_INIT(nwktr)
 	sharc_dataram = auto_malloc(0x100000);
 	led_reg0 = led_reg1 = 0x7f;
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 	K033906_init();
 
 //  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);

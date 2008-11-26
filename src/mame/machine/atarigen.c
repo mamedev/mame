@@ -200,7 +200,7 @@ static emu_timer *get_scanline_interrupt_timer_for_screen(const device_config *s
 	if (scanline_interrupt_timer_screens[i] == NULL)
 	{
 		scanline_interrupt_timer_screens[i] = screen;
-		scanline_interrupt_timers[i] = timer_alloc(scanline_interrupt_callback, (void *)screen);
+		scanline_interrupt_timers[i] = timer_alloc(screen->machine, scanline_interrupt_callback, (void *)screen);
 	}
 
 	/* found it */
@@ -681,7 +681,7 @@ void atarigen_ym2151_irq_gen(running_machine *machine, int irq)
 
 WRITE16_HANDLER( atarigen_sound_reset_w )
 {
-	timer_call_after_resynch(NULL, 0, delayed_sound_reset);
+	timer_call_after_resynch(space->machine, NULL, 0, delayed_sound_reset);
 }
 
 
@@ -690,9 +690,9 @@ WRITE16_HANDLER( atarigen_sound_reset_w )
     manually.
 ---------------------------------------------------------------*/
 
-void atarigen_sound_reset(void)
+void atarigen_sound_reset(running_machine *machine)
 {
-	timer_call_after_resynch(NULL, 1, delayed_sound_reset);
+	timer_call_after_resynch(machine, NULL, 1, delayed_sound_reset);
 }
 
 
@@ -706,19 +706,19 @@ void atarigen_sound_reset(void)
 WRITE16_HANDLER( atarigen_sound_w )
 {
 	if (ACCESSING_BITS_0_7)
-		timer_call_after_resynch(NULL, data & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, data & 0xff, delayed_sound_w);
 }
 
 WRITE16_HANDLER( atarigen_sound_upper_w )
 {
 	if (ACCESSING_BITS_8_15)
-		timer_call_after_resynch(NULL, (data >> 8) & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, (data >> 8) & 0xff, delayed_sound_w);
 }
 
 WRITE32_HANDLER( atarigen_sound_upper32_w )
 {
 	if (ACCESSING_BITS_24_31)
-		timer_call_after_resynch(NULL, (data >> 24) & 0xff, delayed_sound_w);
+		timer_call_after_resynch(space->machine, NULL, (data >> 24) & 0xff, delayed_sound_w);
 }
 
 
@@ -758,7 +758,7 @@ READ32_HANDLER( atarigen_sound_upper32_r )
 
 WRITE8_HANDLER( atarigen_6502_sound_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_6502_sound_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_6502_sound_w);
 }
 
 
@@ -947,7 +947,7 @@ static emu_timer *get_scanline_timer_for_screen(const device_config *screen)
 	if (scanline_timer_screens[i] == NULL)
 	{
 		scanline_timer_screens[i] = screen;
-		scanline_timers[i] = timer_alloc(scanline_timer_callback, (void *)screen);
+		scanline_timers[i] = timer_alloc(screen->machine, scanline_timer_callback, (void *)screen);
 	}
 
 	/* found it */
@@ -1035,7 +1035,7 @@ static emu_timer *get_atarivc_eof_update_timer_for_screen(const device_config *s
 	if (atarivc_eof_update_timer_screens[i] == NULL)
 	{
 		atarivc_eof_update_timer_screens[i] = screen;
-		atarivc_eof_update_timers[i] = timer_alloc(atarivc_eof_update, (void *)screen);
+		atarivc_eof_update_timers[i] = timer_alloc(screen->machine, atarivc_eof_update, (void *)screen);
 	}
 
 	/* found it */
@@ -1481,7 +1481,7 @@ void atarigen_halt_until_hblank_0(const device_config *screen)
 
 	/* halt and set a timer to wake up */
 	fraction = (double)(hblank - hpos) / (double)width;
-	timer_set(double_to_attotime(attotime_to_double(video_screen_get_scan_period(screen)) * fraction), NULL, 0, unhalt_cpu);
+	timer_set(screen->machine, double_to_attotime(attotime_to_double(video_screen_get_scan_period(screen)) * fraction), NULL, 0, unhalt_cpu);
 	cpu_set_input_line(screen->machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 }
 

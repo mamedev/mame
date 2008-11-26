@@ -118,6 +118,7 @@
 #include <math.h>
 
 #ifndef __RAINE__
+#include "deprecat.h"
 #include "sndintrf.h"		/* use M.A.M.E. */
 #else
 #include "deftypes.h"		/* use RAINE */

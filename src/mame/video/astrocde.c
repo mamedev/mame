@@ -222,7 +222,7 @@ PALETTE_INIT( profpac )
 VIDEO_START( astrocde )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = timer_alloc(scanline_callback, NULL);
+	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 1);
 
 	/* register for save states */
@@ -237,7 +237,7 @@ VIDEO_START( astrocde )
 VIDEO_START( profpac )
 {
 	/* allocate a per-scanline timer */
-	scanline_timer = timer_alloc(scanline_callback, NULL);
+	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 1, 0), 1);
 
 	/* allocate videoram */
@@ -441,14 +441,14 @@ static void astrocade_trigger_lightpen(running_machine *machine, UINT8 vfeedback
 		if ((interrupt_enable & 0x01) == 0)
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector & 0xf0);
-			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
+			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector & 0xf0);
-			timer_set(cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
+			timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
 		}
 
 		/* latch the feedback registers */
@@ -481,14 +481,14 @@ static TIMER_CALLBACK( scanline_callback )
 		if ((interrupt_enable & 0x04) == 0)
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, HOLD_LINE, interrupt_vector);
-			timer_set(video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
+			timer_set(machine, video_screen_get_time_until_vblank_end(machine->primary_screen), NULL, 0, interrupt_off);
 		}
 
 		/* mode 1 means assert for 1 instruction */
 		else
 		{
 			cpu_set_input_line_and_vector(machine->cpu[0], 0, ASSERT_LINE, interrupt_vector);
-			timer_set(cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
+			timer_set(machine, cpu_clocks_to_attotime(machine->cpu[0], 1), NULL, 0, interrupt_off);
 		}
 	}
 

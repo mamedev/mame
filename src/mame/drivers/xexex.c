@@ -624,7 +624,7 @@ static MACHINE_START( xexex )
 	resume_trigger = 1000;
 	init_eeprom_count = 0;
 
-	dmadelay_timer = timer_alloc(dmaend_callback, NULL);
+	dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
 }
 
 

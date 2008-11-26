@@ -1247,7 +1247,7 @@ static void mpu4_config_common(running_machine *machine)
 	pia_config(4,&pia_ic7_intf);
 	pia_config(5,&pia_ic8_intf);
 
-	ic24_timer = timer_alloc(ic24_timeout, NULL);
+	ic24_timer = timer_alloc(machine, ic24_timeout, NULL);
 	/* setup 6840ptm */
 	ptm6840_config(machine, 0, &ptm_ic2_intf );
 }

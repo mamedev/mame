@@ -1314,7 +1314,7 @@ static void sound_irq_callback(running_machine *machine, int irq)
 {
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 	cpu_set_input_line(machine->cpu[1], line, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(1), NULL, line, irq_off);
+	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
 }
 
 static DRIVER_INIT(hornet)
@@ -1322,7 +1322,7 @@ static DRIVER_INIT(hornet)
 	init_konami_cgboard(1, CGBOARD_TYPE_HORNET);
 	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 	K033906_init();
 
 	led_reg0 = led_reg1 = 0x7f;
@@ -1336,7 +1336,7 @@ static DRIVER_INIT(hornet_2board)
 	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
 	set_cgboard_texture_bank(1, 6, memory_region(machine, "user5"));
 
-	K056800_init(sound_irq_callback);
+	K056800_init(machine, sound_irq_callback);
 	K033906_init();
 
 	led_reg0 = led_reg1 = 0x7f;

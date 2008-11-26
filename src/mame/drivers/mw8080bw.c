@@ -872,7 +872,7 @@ static TIMER_CALLBACK( maze_tone_timing_timer_callback )
 static MACHINE_START( maze )
 {
 	/* create astable timer for IC B1 */
-	timer_pulse(MAZE_555_B1_PERIOD, NULL, 0, maze_tone_timing_timer_callback);
+	timer_pulse(machine, MAZE_555_B1_PERIOD, NULL, 0, maze_tone_timing_timer_callback);
 
 	/* initialize state of Tone Timing FF, IC C1 */
 	maze_tone_timing_state = 0;

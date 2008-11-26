@@ -208,14 +208,14 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 
 	/* allocate a timer for the compare interrupt */
 	if (cap & PPCCAP_OEA)
-		ppc->decrementer_int_timer = timer_alloc(decrementer_int_callback, ppc);
+		ppc->decrementer_int_timer = timer_alloc(device->machine, decrementer_int_callback, ppc);
 
 	/* and for the 4XX interrupts if needed */
 	if (cap & PPCCAP_4XX)
 	{
-		ppc->fit_timer = timer_alloc(ppc4xx_fit_callback, ppc);
-		ppc->pit_timer = timer_alloc(ppc4xx_pit_callback, ppc);
-		ppc->spu.timer = timer_alloc(ppc4xx_spu_callback, ppc);
+		ppc->fit_timer = timer_alloc(device->machine, ppc4xx_fit_callback, ppc);
+		ppc->pit_timer = timer_alloc(device->machine, ppc4xx_pit_callback, ppc);
+		ppc->spu.timer = timer_alloc(device->machine, ppc4xx_spu_callback, ppc);
 	}
 
 	/* register for save states */

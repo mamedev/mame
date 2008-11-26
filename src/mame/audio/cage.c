@@ -165,9 +165,9 @@ void cage_init(running_machine *machine, offs_t speedup)
 	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[cage_cpu]));
 	cage_cpu_h1_clock_period = attotime_mul(cage_cpu_clock_period, 2);
 
-	dma_timer = timer_alloc(dma_timer_callback, NULL);
-	timer[0] = timer_alloc(cage_timer_callback, NULL);
-	timer[1] = timer_alloc(cage_timer_callback, NULL);
+	dma_timer = timer_alloc(machine, dma_timer_callback, NULL);
+	timer[0] = timer_alloc(machine, cage_timer_callback, NULL);
+	timer[1] = timer_alloc(machine, cage_timer_callback, NULL);
 
 	if (speedup)
 		speedup_ram = memory_install_write32_handler(cpu_get_address_space(machine->cpu[cage_cpu], ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
@@ -533,7 +533,7 @@ void main_to_cage_w(UINT16 data)
 {
 	if (LOG_COMM)
 		logerror("%06X:Command to CAGE = %04X\n", cpu_get_pc(Machine->activecpu), data);
-	timer_call_after_resynch(NULL, data, deferred_cage_w);
+	timer_call_after_resynch(Machine, NULL, data, deferred_cage_w);
 }
 
 

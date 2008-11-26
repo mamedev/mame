@@ -1131,27 +1131,27 @@ void sh4_parse_configuration(const struct sh4_config *conf)
 	}
 }
 
-void sh4_common_init(void)
+void sh4_common_init(const device_config *device)
 {
 	int i;
 
 	for (i=0; i<3; i++)
 	{
-		sh4.timer[i] = timer_alloc(sh4_timer_callback, (void*)(FPTR)i);
+		sh4.timer[i] = timer_alloc(device->machine, sh4_timer_callback, (void*)(FPTR)i);
 		timer_adjust_oneshot(sh4.timer[i], attotime_never, 0);
 	}
 
 	for (i=0; i<4; i++)
 	{
-		sh4.dma_timer[i] = timer_alloc(sh4_dmac_callback, NULL);
+		sh4.dma_timer[i] = timer_alloc(device->machine, sh4_dmac_callback, NULL);
 		timer_adjust_oneshot(sh4.dma_timer[i], attotime_never, 0);
 	}
 
-	sh4.refresh_timer = timer_alloc(sh4_refresh_timer_callback, NULL);
+	sh4.refresh_timer = timer_alloc(device->machine, sh4_refresh_timer_callback, NULL);
 	timer_adjust_oneshot(sh4.refresh_timer, attotime_never, 0);
 	sh4.refresh_timer_base = 0;
 
-	sh4.rtc_timer = timer_alloc(sh4_rtc_timer_callback, NULL);
+	sh4.rtc_timer = timer_alloc(device->machine, sh4_rtc_timer_callback, NULL);
 	timer_adjust_oneshot(sh4.rtc_timer, attotime_never, 0);
 
 	sh4.m = auto_malloc(16384*4);

@@ -351,7 +351,7 @@ WRITE8_DEVICE_HANDLER( dma8257_drq_w )
 {
 	int param = (offset << 1) | (data ? 1 : 0);
 
-	timer_call_after_resynch((void *) device, param, dma8257_drq_write_callback);
+	timer_call_after_resynch(device->machine, (void *) device, param, dma8257_drq_write_callback);
 }
 
 
@@ -371,8 +371,8 @@ static DEVICE_START( dma8257 )
 	dma8257->intf = device->static_config;
 
 	dma8257->status = 0x0f;
-	dma8257->timer = timer_alloc(dma8257_timerproc, (void *) device);
-	dma8257->msbflip_timer = timer_alloc(dma8257_msbflip_timerproc, (void *) device);
+	dma8257->timer = timer_alloc(device->machine, dma8257_timerproc, (void *) device);
+	dma8257->msbflip_timer = timer_alloc(device->machine, dma8257_msbflip_timerproc, (void *) device);
 
 	state_save_register_item_array("dma8257", device->tag, 0, dma8257->address);
 	state_save_register_item_array("dma8257", device->tag, 0, dma8257->count);

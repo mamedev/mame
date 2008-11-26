@@ -1135,7 +1135,7 @@ static MACHINE_START(videopkr)
 	p1 = 0xff;
 	ant_cio = 0;
 	count0 = 0;
-	t1_timer = timer_alloc(sound_t1_callback, NULL);
+	t1_timer = timer_alloc(machine, sound_t1_callback, NULL);
 	timer_adjust_periodic(t1_timer, attotime_zero, 0, ATTOTIME_IN_HZ(50));	/* 50Hz. */
 }
 

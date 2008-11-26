@@ -212,7 +212,7 @@ static MACHINE_RESET(supervisor_board)
 	portB_in = portB_out = ddrB	= 0;
 	portC_in = portC_out = ddrC	= 0;
 	tdr = tcr = 0;
-	mcu_timer = timer_alloc( mcu_timer_proc , NULL);
+	mcu_timer = timer_alloc(machine,  mcu_timer_proc , NULL);
 
 	output_set_lamp_value(0, 0);
 	output_set_lamp_value(1, 0);

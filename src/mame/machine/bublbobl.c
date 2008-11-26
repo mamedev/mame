@@ -101,7 +101,7 @@ static TIMER_CALLBACK( nmi_callback )
 WRITE8_HANDLER( bublbobl_sound_command_w )
 {
 	soundlatch_w(space,offset,data);
-	timer_call_after_resynch(NULL, data,nmi_callback);
+	timer_call_after_resynch(space->machine, NULL, data,nmi_callback);
 }
 
 WRITE8_HANDLER( bublbobl_sh_nmi_disable_w )

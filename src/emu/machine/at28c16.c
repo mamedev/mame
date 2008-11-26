@@ -133,7 +133,7 @@ static DEVICE_START(at28c16)
 	c->a9_12v = 0;
 	c->oe_12v = 0;
 	c->last_write = -1;
-	c->write_timer = timer_alloc( write_finished, c );
+	c->write_timer = timer_alloc(device->machine,  write_finished, c );
 
 	config = device->static_config;
 	if( config != NULL && config->data != NULL )

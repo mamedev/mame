@@ -793,12 +793,12 @@ ROM_END
 
 static DRIVER_INIT( rainbow )
 {
-	rainbow_cchip_init(0);
+	rainbow_cchip_init(machine, 0);
 }
 
 static DRIVER_INIT( rainbowe )
 {
-	rainbow_cchip_init(1);
+	rainbow_cchip_init(machine, 1);
 }
 
 static DRIVER_INIT( jumping )

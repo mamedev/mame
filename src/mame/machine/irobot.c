@@ -185,7 +185,7 @@ static TIMER_CALLBACK( scanline_callback )
     /* set a callback for the next 32-scanline increment */
     scanline += 32;
     if (scanline >= 256) scanline = 0;
-    timer_set(video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, scanline_callback);
+    timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, scanline, 0), NULL, scanline, scanline_callback);
 }
 
 static TIMER_CALLBACK( irmb_done_callback );
@@ -201,12 +201,12 @@ MACHINE_RESET( irobot )
 
 	irvg_vblank=0;
 	irvg_running = 0;
-	irvg_timer = timer_alloc(irvg_done_callback, NULL);
+	irvg_timer = timer_alloc(machine, irvg_done_callback, NULL);
 	irmb_running = 0;
-	irmb_timer = timer_alloc(irmb_done_callback, NULL);
+	irmb_timer = timer_alloc(machine, irmb_done_callback, NULL);
 
 	/* set an initial timer to go off on scanline 0 */
-	timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, scanline_callback);
 
 	irobot_rom_banksel_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);
 	irobot_out0_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM),0,0);

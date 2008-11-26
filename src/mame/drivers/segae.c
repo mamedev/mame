@@ -714,7 +714,7 @@ static void *start_vdp(running_machine *machine, int type)
 	chip->writemode = 0;
 	chip->r_bitmap = auto_bitmap_alloc(256, 256, BITMAP_FORMAT_RGB15);
 
-	chip->sms_scanline_timer = timer_alloc(sms_scanline_timer_callback, chip);
+	chip->sms_scanline_timer = timer_alloc(machine, sms_scanline_timer_callback, chip);
 
 	return chip;
 }

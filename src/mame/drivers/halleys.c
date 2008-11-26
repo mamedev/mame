@@ -2228,7 +2228,7 @@ static DRIVER_INIT( benberob )
 
 	init_common(machine);
 
-	blitter_reset_timer = timer_alloc(blitter_reset, NULL);
+	blitter_reset_timer = timer_alloc(machine, blitter_reset, NULL);
 }
 
 

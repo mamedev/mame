@@ -209,7 +209,7 @@ WRITE8_DEVICE_HANDLER( riot6532_w )
 	if ((offset & 0x14) == 0x14)
 	{
 		static const UINT8 timershift[4] = { 0, 3, 6, 10 };
-		attotime curtime = timer_get_time();
+		attotime curtime = timer_get_time(device->machine);
 		INT64 target;
 
 		/* A0-A1 contain the timer divisor */
@@ -446,7 +446,7 @@ static DEVICE_START( riot6532 )
 	riot->port[1].out_func = riot->intf->out_b_func;
 
 	/* allocate timers */
-	riot->timer = timer_alloc(timer_end_callback, (void *)device);
+	riot->timer = timer_alloc(device->machine, timer_end_callback, (void *)device);
 
 	/* register for save states */
 	state_save_register_item("riot6532", device->tag, 0, riot->port[0].in);

@@ -531,10 +531,10 @@ static MACHINE_START( vegas )
 	voodoo_device = device_list_find_by_tag(machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
 
 	/* allocate timers for the NILE */
-	timer[0] = timer_alloc(NULL, NULL);
-	timer[1] = timer_alloc(NULL, NULL);
-	timer[2] = timer_alloc(nile_timer_callback, NULL);
-	timer[3] = timer_alloc(nile_timer_callback, NULL);
+	timer[0] = timer_alloc(machine, NULL, NULL);
+	timer[1] = timer_alloc(machine, NULL, NULL);
+	timer[2] = timer_alloc(machine, nile_timer_callback, NULL);
+	timer[3] = timer_alloc(machine, nile_timer_callback, NULL);
 
 	/* identify our sound board */
 	if (mame_find_cpu_index(machine, "dsio") != -1)

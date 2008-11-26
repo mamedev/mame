@@ -214,7 +214,7 @@ static TIMER_CALLBACK( mcu_acknowledge_callback )
 
 static READ8_HANDLER( mcu_acknowledge_r )
 {
-	timer_call_after_resynch(NULL, 0, mcu_acknowledge_callback);
+	timer_call_after_resynch(space->machine, NULL, 0, mcu_acknowledge_callback);
 	return 0;
 }
 
@@ -421,7 +421,7 @@ logerror("%04x: z80 reads command %02x\n",cpu_get_pc(space->cpu),from_z80);
 				break;
 
 			case 0x5:	// answer to Z80
-				timer_call_after_resynch(NULL, portB_out, delayed_mcu_z80_w);
+				timer_call_after_resynch(space->machine, NULL, portB_out, delayed_mcu_z80_w);
 				break;
 
 			case 0x6:
@@ -437,7 +437,7 @@ logerror("%04x: z80 reads command %02x\n",cpu_get_pc(space->cpu),from_z80);
 
 static WRITE8_HANDLER( hotsmash_z80_mcu_w )
 {
-	timer_call_after_resynch(NULL, data, delayed_z80_mcu_w);
+	timer_call_after_resynch(space->machine, NULL, data, delayed_z80_mcu_w);
 }
 
 static READ8_HANDLER(hotsmash_from_mcu_r)

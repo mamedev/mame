@@ -85,7 +85,7 @@ static void set_output(const device_config *device)
 	ttl74123_t *chip = get_safe_token(device);
 	int output = timer_running(chip);
 
-	timer_set( attotime_zero, (void *) device, output, output_callback );
+	timer_set( device->machine, attotime_zero, (void *) device, output, output_callback );
 
 	if (LOG) logerror("74123 %s:  Output: %d\n", device->tag, output);
 }
@@ -197,7 +197,7 @@ static DEVICE_START( ttl74123 )
 	assert_always((chip->intf->connection_type != TTL74123_GROUNDED) || (chip->intf->cap >= CAP_U(0.01)), "Only capacitors >= 0.01uF supported for GROUNDED type");
 	assert_always(chip->intf->cap >= CAP_P(1000), "Only capacitors >= 1000pF supported ");
 
-	chip->timer = timer_alloc(clear_callback, (void *) device);
+	chip->timer = timer_alloc(device->machine, clear_callback, (void *) device);
 
 	/* start with the defaults */
 	chip->a = chip->intf->a;

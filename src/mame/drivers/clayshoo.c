@@ -118,10 +118,10 @@ static READ8_HANDLER( analog_r )
 }
 
 
-static void create_analog_timers(void)
+static void create_analog_timers(running_machine *machine)
 {
-	analog_timer_1 = timer_alloc(reset_analog_bit, NULL);
-	analog_timer_2 = timer_alloc(reset_analog_bit, NULL);
+	analog_timer_1 = timer_alloc(machine, reset_analog_bit, NULL);
+	analog_timer_2 = timer_alloc(machine, reset_analog_bit, NULL);
 }
 
 
@@ -155,7 +155,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 static MACHINE_START( clayshoo )
 {
-	create_analog_timers();
+	create_analog_timers(machine);
 
 	/* register for state saving */
 	state_save_register_global(input_port_select);

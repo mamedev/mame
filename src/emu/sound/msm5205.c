@@ -183,7 +183,7 @@ static SND_START( msm5205 )
 
 	/* stream system initialize */
 	voice->stream = stream_create(0,1,clock,voice,MSM5205_update);
-	voice->timer = timer_alloc(MSM5205_vclk_callback, voice);
+	voice->timer = timer_alloc(Machine, MSM5205_vclk_callback, voice);
 
 	/* initialize */
 	SND_RESET_NAME( msm5205 )(voice);

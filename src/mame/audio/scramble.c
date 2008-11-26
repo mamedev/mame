@@ -333,7 +333,7 @@ static TIMER_CALLBACK( ad2083_step )
 	tms5110_pdc_w(space, 0, ctrl & 0x02 ? 0 : 1);
 
 	if (!(ctrl & 0x80))
-		timer_set(ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);
+		timer_set(machine, ATTOTIME_IN_HZ(AD2083_TMS5110_CLOCK / 2),NULL,1,ad2083_step);
 }
 
 static int ad2083_speech_rom_read_bit(void)
@@ -371,7 +371,7 @@ static WRITE8_HANDLER( ad2083_tms5110_ctrl_w )
 			speech_rom_address_hi = 0x0000;
 			break;
 	}
-	timer_set(attotime_zero,NULL,0,ad2083_step);
+	timer_set(space->machine, attotime_zero,NULL,0,ad2083_step);
 }
 
 static const tms5110_interface ad2083_tms5110_interface =

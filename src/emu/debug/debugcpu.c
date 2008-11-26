@@ -577,9 +577,9 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 	if (global->execution_state != EXECUTION_STATE_STOPPED && (info->flags & (DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_LIVE_BP)) != 0)
 	{
 		/* see if we hit a target time */
-		if ((info->flags & DEBUG_FLAG_STOP_TIME) != 0 && attotime_compare(timer_get_time(), info->stoptime) >= 0)
+		if ((info->flags & DEBUG_FLAG_STOP_TIME) != 0 && attotime_compare(timer_get_time(device->machine), info->stoptime) >= 0)
 		{
-			debug_console_printf("Stopped at time interval %.1g\n", attotime_to_double(timer_get_time()));
+			debug_console_printf("Stopped at time interval %.1g\n", attotime_to_double(timer_get_time(device->machine)));
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
@@ -895,7 +895,7 @@ void debug_cpu_go_milliseconds(running_machine *machine, UINT64 milliseconds)
 		return;
 	assert(info != NULL);
 
-	info->stoptime = attotime_add(timer_get_time(), ATTOTIME_IN_MSEC(milliseconds));
+	info->stoptime = attotime_add(timer_get_time(machine), ATTOTIME_IN_MSEC(milliseconds));
 	info->flags |= DEBUG_FLAG_STOP_TIME;
 	global->execution_state = EXECUTION_STATE_RUNNING;
 }

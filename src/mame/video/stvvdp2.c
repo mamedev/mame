@@ -5444,7 +5444,7 @@ static void stv_vdp2_dynamic_res_change(running_machine *machine)
 //  vert_res*=2;
 	if(old_vres != vert_res || old_hres != horz_res)
 	{
-		timer_set(video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, dyn_res_change);
+		timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), NULL, 0, dyn_res_change);
 		old_vres = vert_res;
 		old_hres = horz_res;
 	}

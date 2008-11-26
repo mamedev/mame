@@ -187,7 +187,7 @@ static TIMER_CALLBACK( slapshot_interrupt6 )
 
 static INTERRUPT_GEN( slapshot_interrupt )
 {
-	timer_set(cpu_clocks_to_attotime(device,200000-500), NULL, 0, slapshot_interrupt6);
+	timer_set(device->machine, cpu_clocks_to_attotime(device,200000-500), NULL, 0, slapshot_interrupt6);
 	cpu_set_input_line(device,5,HOLD_LINE);
 }
 

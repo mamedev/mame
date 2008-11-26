@@ -296,5 +296,5 @@ MACHINE_RESET( nitedrvr )
 	ac_line = 0;
 	last_steering_val = 0;
 
-	timer_pulse(PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), NULL, 0, nitedrvr_crash_toggle_callback);
+	timer_pulse(machine, PERIOD_OF_555_ASTABLE(RES_K(180), 330, CAP_U(1)), NULL, 0, nitedrvr_crash_toggle_callback);
 }

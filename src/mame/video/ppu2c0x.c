@@ -300,9 +300,9 @@ void ppu2c0x_init(running_machine *machine, const ppu2c0x_interface *interface )
 		}
 
 		/* initialize the scanline handling portion */
-		chips[i].scanline_timer = timer_alloc(scanline_callback, NULL);
-		chips[i].hblank_timer = timer_alloc(hblank_callback, NULL);
-		chips[i].nmi_timer = timer_alloc(nmi_callback, NULL);
+		chips[i].scanline_timer = timer_alloc(machine, scanline_callback, NULL);
+		chips[i].hblank_timer = timer_alloc(machine, hblank_callback, NULL);
+		chips[i].nmi_timer = timer_alloc(machine, nmi_callback, NULL);
 		chips[i].scanline = 0;
 		chips[i].scan_scale = 1;
 

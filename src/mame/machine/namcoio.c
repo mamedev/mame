@@ -785,12 +785,12 @@ static TIMER_CALLBACK( namcoio_run )
 	}
 }
 
-void namcoio_set_irq_line(int chipnum, int state)
+void namcoio_set_irq_line(running_machine *machine, int chipnum, int state)
 {
 	if (chipnum < MAX_NAMCOIO && state != CLEAR_LINE && !io[chipnum].reset)
 	{
 		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(ATTOTIME_IN_USEC(50), NULL, chipnum, namcoio_run);
+		timer_set(machine, ATTOTIME_IN_USEC(50), NULL, chipnum, namcoio_run);
 	}
 }
 
@@ -855,7 +855,7 @@ static void namco_06xx_state_save(int chipnum)
 }
 
 
-void namco_06xx_init(int chipnum, int cpu,
+void namco_06xx_init(running_machine *machine, int chipnum, int cpu,
 	int type0, const struct namcoio_interface *intf0,
 	int type1, const struct namcoio_interface *intf1,
 	int type2, const struct namcoio_interface *intf2,
@@ -868,7 +868,7 @@ void namco_06xx_init(int chipnum, int cpu,
 		namcoio_init(4*chipnum + 2, type2, intf2);
 		namcoio_init(4*chipnum + 3, type3, intf3);
 		nmi_cpu[chipnum] = cpu;
-		nmi_timer[chipnum] = timer_alloc(nmi_generate, NULL);
+		nmi_timer[chipnum] = timer_alloc(machine, nmi_generate, NULL);
 		namco_06xx_state_save(chipnum);
 	}
 }

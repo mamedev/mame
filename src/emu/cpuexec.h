@@ -108,7 +108,10 @@ void cpu_suspend(const device_config *device, int reason, int eatcycles);
 /* resume the given CPU for a specific reason */
 void cpu_resume(const device_config *device, int reason);
 
-/* returns true if the given CPU is suspended for any of the given reasons */
+/* return TRUE if the given CPU is within its execute function */
+int cpu_is_executing(const device_config *device);
+
+/* returns TRUE if the given CPU is suspended for any of the given reasons */
 int cpu_is_suspended(const device_config *device, int reason);
 
 

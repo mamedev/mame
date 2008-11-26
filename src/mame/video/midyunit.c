@@ -542,7 +542,7 @@ if (LOG_DMA)
 	}
 
 	/* signal we're done */
-	timer_set(ATTOTIME_IN_NSEC(41 * dma_state.width * dma_state.height), NULL, 0, dma_callback);
+	timer_set(space->machine, ATTOTIME_IN_NSEC(41 * dma_state.width * dma_state.height), NULL, 0, dma_callback);
 
 	profiler_mark(PROFILER_END);
 }
@@ -581,5 +581,5 @@ void midyunit_scanline_update(const device_config *screen, bitmap_t *bitmap, int
 	/* if this is the last update of the screen, set a timer to clear out the final line */
 	/* (since we update one behind) */
 	if (scanline == video_screen_get_visible_area(screen)->max_y)
-		timer_set(video_screen_get_time_until_pos(screen, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
+		timer_set(screen->machine, video_screen_get_time_until_pos(screen, scanline + 1, 0), NULL, params->rowaddr, autoerase_line);
 }

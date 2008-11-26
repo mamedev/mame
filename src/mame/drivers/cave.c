@@ -124,8 +124,8 @@ static TIMER_CALLBACK( cave_vblank_end )
 /* Called once/frame to generate the VBLANK interrupt */
 static INTERRUPT_GEN( cave_interrupt )
 {
-	timer_set(ATTOTIME_IN_USEC(17376-time_vblank_irq), NULL, 0, cave_vblank_start);
-	timer_set(ATTOTIME_IN_USEC(17376-time_vblank_irq + 2000), NULL, 0, cave_vblank_end);
+	timer_set(device->machine, ATTOTIME_IN_USEC(17376-time_vblank_irq), NULL, 0, cave_vblank_start);
+	timer_set(device->machine, ATTOTIME_IN_USEC(17376-time_vblank_irq + 2000), NULL, 0, cave_vblank_end);
 }
 
 /* Called by the YMZ280B to set the IRQ state */

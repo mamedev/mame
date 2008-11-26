@@ -946,7 +946,7 @@ VIDEO_START( dkong )
 
 	VIDEO_START_CALL(dkong_base);
 
-	state->scanline_timer = timer_alloc(scanline_callback, NULL);
+	state->scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 
 	switch (state->hardware_type)

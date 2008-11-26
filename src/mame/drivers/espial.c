@@ -25,7 +25,7 @@ static TIMER_CALLBACK( interrupt_disable )
 MACHINE_RESET( espial )
 {
 	/* we must start with NMI interrupts disabled */
-	timer_call_after_resynch(NULL, 0, interrupt_disable);
+	timer_call_after_resynch(machine, NULL, 0, interrupt_disable);
 	sound_nmi_enabled = FALSE;
 }
 

@@ -420,7 +420,7 @@ static INTERRUPT_GEN( vblank_callback_gpworld )
 
 	/* The time the IRQ line stays high is set just long enough to happen after the NMI - hacky? */
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_USEC(100), NULL, 0, irq_stop);
+	timer_set(device->machine, ATTOTIME_IN_USEC(100), NULL, 0, irq_stop);
 }
 
 static const gfx_layout gpworld_tile_layout =

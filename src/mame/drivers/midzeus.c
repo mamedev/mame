@@ -74,11 +74,11 @@ static TIMER_CALLBACK( invasn_gun_callback );
 
 static MACHINE_START( midzeus )
 {
-	timer[0] = timer_alloc(NULL, NULL);
-	timer[1] = timer_alloc(NULL, NULL);
+	timer[0] = timer_alloc(machine, NULL, NULL);
+	timer[1] = timer_alloc(machine, NULL, NULL);
 
-	gun_timer[0] = timer_alloc(invasn_gun_callback, NULL);
-	gun_timer[1] = timer_alloc(invasn_gun_callback, NULL);
+	gun_timer[0] = timer_alloc(machine, invasn_gun_callback, NULL);
+	gun_timer[1] = timer_alloc(machine, invasn_gun_callback, NULL);
 
 	state_save_register_global(gun_control);
 	state_save_register_global(gun_irq_state);
@@ -114,7 +114,7 @@ static TIMER_CALLBACK( display_irq_off )
 static INTERRUPT_GEN( display_irq )
 {
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(ATTOTIME_IN_HZ(30000000), NULL, 0, display_irq_off);
+	timer_set(device->machine, ATTOTIME_IN_HZ(30000000), NULL, 0, display_irq_off);
 }
 
 
