@@ -44,6 +44,8 @@ typedef struct _object_entry object_entry;
 struct _object_entry
 {
 	object_entry *		next;
+	object_entry *		globalnext;
+	object_entry *		globalprev;
 	objtype_entry *		type;
 	void *				object;
 	size_t 				size;
@@ -65,6 +67,7 @@ struct _object_entry_block
 struct _object_pool
 {
 	object_entry *		hashtable[POOL_HASH_SIZE];
+	object_entry *		globallist;
 	object_entry *		freelist;
 	object_entry_block *blocklist;
 	objtype_entry *		typelist;
@@ -77,7 +80,6 @@ struct _object_pool_iterator
 {
 	object_pool *		pool;
 	object_type			type;
-	int					hashnum;
 	object_entry *		last;
 };
 
@@ -145,7 +147,7 @@ object_pool *pool_alloc(void (*fail)(const char *message))
 
 	/* set the failure handler */
 	pool->fail = fail;
-
+	
 	/* register the built-in types */
 	pool_type_register(pool, OBJTYPE_MEMORY, "Memory", memory_destruct);
 
@@ -193,30 +195,25 @@ void pool_type_register(object_pool *pool, object_type type, const char *friendl
 
 void pool_clear(object_pool *pool)
 {
-	int hashnum;
-
-	/* iterate over hash buckets */
-	for (hashnum = 0; hashnum < ARRAY_LENGTH(pool->hashtable); hashnum++)
+	object_entry *entry, *next;
+	
+	/* iterate over all entries in the global list and free them */
+	for (entry = pool->globallist; entry != NULL; entry = next)
 	{
-		object_entry *entry, *next;
+		/* remember the next entry */
+		next = entry->globalnext;
 
-		/* iterate over entries in this hash bucket and free them */
-		for (entry = pool->hashtable[hashnum]; entry != NULL; entry = next)
-		{
-			/* remember the next entry */
-			next = entry->next;
+		/* call the destructor */
+		(*entry->type->destructor)(entry->object, entry->size);
 
-			/* call the destructor */
-			(*entry->type->destructor)(entry->object, entry->size);
-
-			/* add ourself to the free list */
-			entry->next = pool->freelist;
-			pool->freelist = entry;
-		}
-
-		/* reset the list we just walked */
-		pool->hashtable[hashnum] = NULL;
+		/* add ourself to the free list */
+		entry->next = pool->freelist;
+		entry->globalnext = entry->globalprev = NULL;
+		pool->freelist = entry;
 	}
+	
+	/* zap the hashtable */
+	memset(pool->hashtable, 0, sizeof(pool->hashtable));
 }
 
 
@@ -317,7 +314,14 @@ void *pool_object_add_file_line(object_pool *pool, object_type _type, void *obje
 	entry->file = file;
 	entry->line = line;
 
-	/* hook us into the list */
+	/* hook us into the global list */
+	if (pool->globallist != NULL)
+		pool->globallist->globalprev = entry;
+	entry->globalprev = NULL;
+	entry->globalnext = pool->globallist;
+	pool->globallist = entry;
+	
+	/* hook up to the appropriate hash table */
 	entry->next = pool->hashtable[hashnum];
 	pool->hashtable[hashnum] = entry;
 	return object;
@@ -343,6 +347,14 @@ void *pool_object_remove(object_pool *pool, void *object, int destruct)
 			/* call the destructor */
 			if (destruct)
 				(*entry->type->destructor)(entry->object, entry->size);
+
+			/* remove us from the global list */
+			if (entry->globalprev != NULL)
+				entry->globalprev->globalnext = entry->globalnext;
+			if (entry->globalnext != NULL)
+				entry->globalnext->globalprev = entry->globalprev;
+			if (pool->globallist == entry)
+				pool->globallist = entry->globalnext;
 
 			/* remove us from the list */
 			*entryptr = entry->next;
@@ -399,7 +411,6 @@ object_pool_iterator *pool_iterate_begin(object_pool *pool, object_type type)
 	/* fill it in */
 	iter->pool = pool;
 	iter->type = type;
-	iter->hashnum = 0;
 	iter->last = NULL;
 	return iter;
 }
@@ -412,26 +423,22 @@ object_pool_iterator *pool_iterate_begin(object_pool *pool, object_type type)
 
 int pool_iterate_next(object_pool_iterator *iter, void **objectptr, size_t *sizeptr, object_type *typeptr)
 {
-	/* advance from the last one */
-	while (iter->hashnum < ARRAY_LENGTH(iter->pool->hashtable))
+	/* if no previous entry, find the first */
+	if (iter->last == NULL)
+		iter->last = iter->pool->globallist;
+	else
+		iter->last = iter->last->globalnext;
+		
+	/* stop when we get one */
+	if (iter->last != NULL)
 	{
-		/* if the last entry is non-NULL, advance */
-		if (iter->last == NULL)
-			iter->last = iter->pool->hashtable[iter->hashnum++];
-		else
-			iter->last = iter->last->next;
-
-		/* stop when we get one */
-		if (iter->last != NULL)
-		{
-			if (objectptr != NULL)
-				*objectptr = iter->last;
-			if (sizeptr != NULL)
-				*sizeptr = iter->last->size;
-			if (typeptr != NULL)
-				*typeptr = iter->last->type->type;
-			return TRUE;
-		}
+		if (objectptr != NULL)
+			*objectptr = iter->last;
+		if (sizeptr != NULL)
+			*sizeptr = iter->last->size;
+		if (typeptr != NULL)
+			*typeptr = iter->last->type->type;
+		return TRUE;
 	}
 
 	/* nothing left */
