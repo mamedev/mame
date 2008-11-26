@@ -552,7 +552,6 @@ struct _powerpc_state
 	UINT32			mmu603_r[4];
 
 	/* internal stuff */
-	int				cpunum;
 	cpu_irq_callback irq_callback;
 	const device_config *device;
 	const address_space *program;

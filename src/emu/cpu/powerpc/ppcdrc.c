@@ -976,7 +976,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), seqhead->physpc) != NULL)
+		if (memory_get_write_ptr(ppc->program, seqhead->physpc) != NULL)
 			generate_checksum_block(block, &compiler, seqhead, seqlast);					// <checksum>
 
 		/* label this instruction, if it may be jumped to locally */
@@ -1437,7 +1437,7 @@ static void static_generate_memory_accessor(drcuml_state *drcuml, int mode, int 
 	/* on entry, address is in I0; data for writes is in I1; masks are in I2 */
 	/* on exit, read result is in I0 */
 	/* routine trashes I0-I3 */
-	int fastxor = BYTE8_XOR_BE(0) >> (cpu_get_databus_width(Machine->activecpu, ADDRESS_SPACE_PROGRAM) < 64);
+	int fastxor = BYTE8_XOR_BE(0) >> (cpu_get_databus_width(ppc->device, ADDRESS_SPACE_PROGRAM) < 64);
 	drcuml_block *block;
 	jmp_buf errorbuf;
 	int translate_type;

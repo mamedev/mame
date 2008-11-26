@@ -123,7 +123,7 @@ INLINE void set_xer(powerpc_state *ppc, UINT32 value)
 
 INLINE UINT64 get_timebase(powerpc_state *ppc)
 {
-	return (cpu_get_total_cycles(Machine->cpu[ppc->cpunum]) - ppc->tb_zero_cycles) / ppc->tb_divisor;
+	return (cpu_get_total_cycles(ppc->device) - ppc->tb_zero_cycles) / ppc->tb_divisor;
 }
 
 
@@ -133,7 +133,7 @@ INLINE UINT64 get_timebase(powerpc_state *ppc)
 
 INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 {
-	ppc->tb_zero_cycles = cpu_get_total_cycles(Machine->activecpu) - newtb * ppc->tb_divisor;
+	ppc->tb_zero_cycles = cpu_get_total_cycles(ppc->device) - newtb * ppc->tb_divisor;
 }
 
 
@@ -144,7 +144,7 @@ INLINE void set_timebase(powerpc_state *ppc, UINT64 newtb)
 
 INLINE UINT32 get_decrementer(powerpc_state *ppc)
 {
-	INT64 cycles_until_zero = ppc->dec_zero_cycles - cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
+	INT64 cycles_until_zero = ppc->dec_zero_cycles - cpu_get_total_cycles(ppc->device);
 	cycles_until_zero = MAX(cycles_until_zero, 0);
 	return cycles_until_zero / ppc->tb_divisor;
 }
@@ -161,13 +161,13 @@ INLINE void set_decrementer(powerpc_state *ppc, UINT32 newdec)
 
 	if (PRINTF_DECREMENTER)
 	{
-		UINT64 total = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
+		UINT64 total = cpu_get_total_cycles(ppc->device);
 		mame_printf_debug("set_decrementer: olddec=%08X newdec=%08X divisor=%d totalcyc=%08X%08X timer=%08X%08X\n",
 				curdec, newdec, ppc->tb_divisor,
 				(UINT32)(total >> 32), (UINT32)total, (UINT32)(cycles_until_done >> 32), (UINT32)cycles_until_done);
 	}
 
-	ppc->dec_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]) + cycles_until_done;
+	ppc->dec_zero_cycles = cpu_get_total_cycles(ppc->device) + cycles_until_done;
 	timer_adjust_oneshot(ppc->decrementer_int_timer, cpu_clocks_to_attotime(ppc->device, cycles_until_done), 0);
 
 	if ((INT32)curdec >= 0 && (INT32)newdec < 0)
@@ -191,7 +191,6 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 
 	/* initialize based on the config */
 	memset(ppc, 0, sizeof(*ppc));
-	ppc->cpunum = cpunum_get_active();
 	ppc->flavor = flavor;
 	ppc->cap = cap;
 	ppc->cache_line_size = 32;
@@ -280,7 +279,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->msr = MSROEA_IP;
 
 		/* reset the decrementer */
-		ppc->dec_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
+		ppc->dec_zero_cycles = cpu_get_total_cycles(ppc->device);
 		decrementer_int_callback(Machine, ppc, 0);
 	}
 
@@ -301,7 +300,7 @@ void ppccom_reset(powerpc_state *ppc)
 		ppc->spr[SPR603_HID0] = 1;
 
 	/* time base starts here */
-	ppc->tb_zero_cycles = cpu_get_total_cycles(Machine->cpu[ppc->cpunum]);
+	ppc->tb_zero_cycles = cpu_get_total_cycles(ppc->device);
 
 	/* clear interrupts */
 	ppc->irq_pending = 0;
@@ -428,7 +427,7 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	for (hashnum = 0; hashnum < 2; hashnum++)
 	{
 		offs_t ptegaddr = hashbase | ((hash << 6) & hashmask);
-		UINT32 *ptegptr = memory_get_read_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), ptegaddr);
+		UINT32 *ptegptr = memory_get_read_ptr(ppc->program, ptegaddr);
 
 		/* should only have valid memory here, but make sure */
 		if (ptegptr != NULL)
@@ -1255,7 +1254,7 @@ static TIMER_CALLBACK( decrementer_int_callback )
 
 	/* advance by another full rev */
 	ppc->dec_zero_cycles += (UINT64)ppc->tb_divisor << 32;
-	cycles_until_next = ppc->dec_zero_cycles - cpu_get_total_cycles(machine->cpu[ppc->cpunum]);
+	cycles_until_next = ppc->dec_zero_cycles - cpu_get_total_cycles(ppc->device);
 	timer_adjust_oneshot(ppc->decrementer_int_timer, cpu_clocks_to_attotime(ppc->device, cycles_until_next), 0);
 }
 
@@ -1377,7 +1376,7 @@ static int ppc4xx_dma_fetch_transmit_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* fetch the data */
-	cpu_push_context(Machine->cpu[ppc->cpunum]);
+	cpu_push_context(ppc->device);
 	*byte = memory_read_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
 	cpu_pop_context();
@@ -1403,7 +1402,7 @@ static int ppc4xx_dma_handle_receive_byte(powerpc_state *ppc, int dmachan, UINT8
 		return FALSE;
 
 	/* store the data */
-	cpu_push_context(Machine->cpu[ppc->cpunum]);
+	cpu_push_context(ppc->device);
 	memory_write_byte(ppc->program, dmaregs[DCR4XX_DMADA0]++, byte);
 	ppc4xx_dma_decrement_count(ppc, dmachan);
 	cpu_pop_context();
