@@ -134,40 +134,40 @@ struct _mcs48_opcode
 
 
 /* ROM is mapped to ADDRESS_SPACE_PROGRAM */
-#define program_r(a)	memory_read_byte_8le(mcs48->program, a)
+#define program_r(a)	memory_read_byte_8le(cpustate->program, a)
 
 /* RAM is mapped to ADDRESS_SPACE_DATA */
-#define ram_r(a)		memory_read_byte_8le(mcs48->data, a)
-#define ram_w(a,V)		memory_write_byte_8le(mcs48->data, a, V)
+#define ram_r(a)		memory_read_byte_8le(cpustate->data, a)
+#define ram_w(a,V)		memory_write_byte_8le(cpustate->data, a, V)
 
 /* ports are mapped to ADDRESS_SPACE_IO */
-#define ext_r(a)		memory_read_byte_8le(mcs48->io, a)
-#define ext_w(a,V)		memory_write_byte_8le(mcs48->io, a, V)
-#define port_r(a)		memory_read_byte_8le(mcs48->io, MCS48_PORT_P0 + a)
-#define port_w(a,V)		memory_write_byte_8le(mcs48->io, MCS48_PORT_P0 + a, V)
-#define test_r(a)		memory_read_byte_8le(mcs48->io, MCS48_PORT_T0 + a)
-#define test_w(a,V)		memory_write_byte_8le(mcs48->io, MCS48_PORT_T0 + a, V)
-#define bus_r()			memory_read_byte_8le(mcs48->io, MCS48_PORT_BUS)
-#define bus_w(V)		memory_write_byte_8le(mcs48->io, MCS48_PORT_BUS, V)
-#define ea_r()			memory_read_byte_8le(mcs48->io, MCS48_PORT_EA)
+#define ext_r(a)		memory_read_byte_8le(cpustate->io, a)
+#define ext_w(a,V)		memory_write_byte_8le(cpustate->io, a, V)
+#define port_r(a)		memory_read_byte_8le(cpustate->io, MCS48_PORT_P0 + a)
+#define port_w(a,V)		memory_write_byte_8le(cpustate->io, MCS48_PORT_P0 + a, V)
+#define test_r(a)		memory_read_byte_8le(cpustate->io, MCS48_PORT_T0 + a)
+#define test_w(a,V)		memory_write_byte_8le(cpustate->io, MCS48_PORT_T0 + a, V)
+#define bus_r()			memory_read_byte_8le(cpustate->io, MCS48_PORT_BUS)
+#define bus_w(V)		memory_write_byte_8le(cpustate->io, MCS48_PORT_BUS, V)
+#define ea_r()			memory_read_byte_8le(cpustate->io, MCS48_PORT_EA)
 
 /* simplfied access to common bits */
 #undef A
-#define A				mcs48->a
+#define A				cpustate->a
 #undef PC
-#define PC				mcs48->pc.w.l
+#define PC				cpustate->pc.w.l
 #undef PSW
-#define PSW				mcs48->psw
+#define PSW				cpustate->psw
 
 /* r0-r7 map to memory via the regptr */
-#define R0				mcs48->regptr[0]
-#define R1				mcs48->regptr[1]
-#define R2				mcs48->regptr[2]
-#define R3				mcs48->regptr[3]
-#define R4				mcs48->regptr[4]
-#define R5				mcs48->regptr[5]
-#define R6				mcs48->regptr[6]
-#define R7				mcs48->regptr[7]
+#define R0				cpustate->regptr[0]
+#define R1				cpustate->regptr[1]
+#define R2				cpustate->regptr[2]
+#define R3				cpustate->regptr[3]
+#define R4				cpustate->regptr[4]
+#define R5				cpustate->regptr[5]
+#define R6				cpustate->regptr[6]
+#define R7				cpustate->regptr[7]
 
 /* the carry flag as 0 or 1, used for carry-in */
 #define CARRYIN			((PSW & C_FLAG) >> 7)
@@ -178,7 +178,7 @@ struct _mcs48_opcode
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-static void check_irqs(	mcs48_state *mcs48);
+static void check_irqs(	mcs48_state *cpustate);
 
 
 
@@ -190,9 +190,9 @@ static void check_irqs(	mcs48_state *mcs48);
     opcode_fetch - fetch an opcode byte
 -------------------------------------------------*/
 
-INLINE UINT8 opcode_fetch(mcs48_state *mcs48, offs_t address)
+INLINE UINT8 opcode_fetch(mcs48_state *cpustate, offs_t address)
 {
-	return memory_decrypted_read_byte(mcs48->program, address);
+	return memory_decrypted_read_byte(cpustate->program, address);
 }
 
 
@@ -201,9 +201,9 @@ INLINE UINT8 opcode_fetch(mcs48_state *mcs48, offs_t address)
     byte
 -------------------------------------------------*/
 
-INLINE UINT8 argument_fetch(mcs48_state *mcs48, offs_t address)
+INLINE UINT8 argument_fetch(mcs48_state *cpustate, offs_t address)
 {
-	return memory_raw_read_byte(mcs48->program, address);
+	return memory_raw_read_byte(cpustate->program, address);
 }
 
 
@@ -212,9 +212,9 @@ INLINE UINT8 argument_fetch(mcs48_state *mcs48, offs_t address)
     point to the appropriate register bank
 -------------------------------------------------*/
 
-INLINE void update_regptr(mcs48_state *mcs48)
+INLINE void update_regptr(mcs48_state *cpustate)
 {
-	mcs48->regptr = memory_get_write_ptr(mcs48->data, (PSW & B_FLAG) ? 24 : 0);
+	cpustate->regptr = memory_get_write_ptr(cpustate->data, (PSW & B_FLAG) ? 24 : 0);
 }
 
 
@@ -223,11 +223,11 @@ INLINE void update_regptr(mcs48_state *mcs48)
     the stack
 -------------------------------------------------*/
 
-INLINE void push_pc_psw(mcs48_state *mcs48)
+INLINE void push_pc_psw(mcs48_state *cpustate)
 {
 	UINT8 sp = PSW & 0x07;
-	ram_w(8 + 2*sp, mcs48->pc.b.l);
-	ram_w(9 + 2*sp, (mcs48->pc.b.h & 0x0f) | (PSW & 0xf0));
+	ram_w(8 + 2*sp, cpustate->pc.b.l);
+	ram_w(9 + 2*sp, (cpustate->pc.b.h & 0x0f) | (PSW & 0xf0));
 	PSW = (PSW & 0xf8) | ((sp + 1) & 0x07);
 }
 
@@ -237,14 +237,14 @@ INLINE void push_pc_psw(mcs48_state *mcs48)
     the stack
 -------------------------------------------------*/
 
-INLINE void pull_pc_psw(mcs48_state *mcs48)
+INLINE void pull_pc_psw(mcs48_state *cpustate)
 {
 	UINT8 sp = (PSW - 1) & 0x07;
-	mcs48->pc.b.l = ram_r(8 + 2*sp);
-	mcs48->pc.b.h = ram_r(9 + 2*sp);
-	PSW = (mcs48->pc.b.h & 0xf0) | 0x08 | sp;
-	mcs48->pc.b.h &= 0x0f;
-	update_regptr(mcs48);
+	cpustate->pc.b.l = ram_r(8 + 2*sp);
+	cpustate->pc.b.h = ram_r(9 + 2*sp);
+	PSW = (cpustate->pc.b.h & 0xf0) | 0x08 | sp;
+	cpustate->pc.b.h &= 0x0f;
+	update_regptr(cpustate);
 }
 
 
@@ -253,11 +253,11 @@ INLINE void pull_pc_psw(mcs48_state *mcs48)
     leaving the upper part of PSW intact
 -------------------------------------------------*/
 
-INLINE void pull_pc(mcs48_state *mcs48)
+INLINE void pull_pc(mcs48_state *cpustate)
 {
 	UINT8 sp = (PSW - 1) & 0x07;
-	mcs48->pc.b.l = ram_r(8 + 2*sp);
-	mcs48->pc.b.h = ram_r(9 + 2*sp) & 0x0f;
+	cpustate->pc.b.l = ram_r(8 + 2*sp);
+	cpustate->pc.b.h = ram_r(9 + 2*sp) & 0x0f;
 	PSW = (PSW & 0xf0) | 0x08 | sp;
 }
 
@@ -267,7 +267,7 @@ INLINE void pull_pc(mcs48_state *mcs48)
     instruction
 -------------------------------------------------*/
 
-INLINE void execute_add(mcs48_state *mcs48, UINT8 dat)
+INLINE void execute_add(mcs48_state *cpustate, UINT8 dat)
 {
 	UINT16 temp = A + dat;
 	UINT16 temp4 = (A & 0x0f) + (dat & 0x0f);
@@ -284,7 +284,7 @@ INLINE void execute_add(mcs48_state *mcs48, UINT8 dat)
     instruction
 -------------------------------------------------*/
 
-INLINE void execute_addc(mcs48_state *mcs48, UINT8 dat)
+INLINE void execute_addc(mcs48_state *cpustate, UINT8 dat)
 {
 	UINT16 temp = A + dat + CARRYIN;
 	UINT16 temp4 = (A & 0x0f) + (dat & 0x0f) + CARRYIN;
@@ -301,9 +301,9 @@ INLINE void execute_addc(mcs48_state *mcs48, UINT8 dat)
     instruction
 -------------------------------------------------*/
 
-INLINE void execute_jmp(mcs48_state *mcs48, UINT16 address)
+INLINE void execute_jmp(mcs48_state *cpustate, UINT16 address)
 {
-	UINT16 a11 = (mcs48->irq_in_progress) ? 0 : mcs48->a11;
+	UINT16 a11 = (cpustate->irq_in_progress) ? 0 : cpustate->a11;
 	PC = address | a11;
 }
 
@@ -313,10 +313,10 @@ INLINE void execute_jmp(mcs48_state *mcs48, UINT16 address)
     instruction
 -------------------------------------------------*/
 
-INLINE void execute_call(mcs48_state *mcs48, UINT16 address)
+INLINE void execute_call(mcs48_state *cpustate, UINT16 address)
 {
-	push_pc_psw(mcs48);
-	execute_jmp(mcs48, address);
+	push_pc_psw(cpustate);
+	execute_jmp(cpustate, address);
 }
 
 
@@ -325,9 +325,9 @@ INLINE void execute_call(mcs48_state *mcs48, UINT16 address)
     conditional jump instruction
 -------------------------------------------------*/
 
-INLINE void execute_jcc(mcs48_state *mcs48, UINT8 result)
+INLINE void execute_jcc(mcs48_state *cpustate, UINT8 result)
 {
-	UINT8 offset = argument_fetch(mcs48, PC++);
+	UINT8 offset = argument_fetch(cpustate, PC++);
 	if (result != 0)
 	{
 		PC = ((PC - 1) & 0xf00) | offset;
@@ -342,36 +342,36 @@ INLINE void execute_jcc(mcs48_state *mcs48, UINT8 result)
     OPCODE HANDLERS
 ***************************************************************************/
 
-#define OPHANDLER(_name) static void _name (mcs48_state *mcs48)
+#define OPHANDLER(_name) static void _name (mcs48_state *cpustate)
 
 OPHANDLER( illegal )
 {
 	logerror("I8039:  pc = %04x,  Illegal opcode = %02x\n", PC-1, program_r(PC-1));
 }
 
-OPHANDLER( add_a_r0 )		{ execute_add(mcs48, R0); }
-OPHANDLER( add_a_r1 )		{ execute_add(mcs48, R1); }
-OPHANDLER( add_a_r2 )		{ execute_add(mcs48, R2); }
-OPHANDLER( add_a_r3 )		{ execute_add(mcs48, R3); }
-OPHANDLER( add_a_r4 )		{ execute_add(mcs48, R4); }
-OPHANDLER( add_a_r5 )		{ execute_add(mcs48, R5); }
-OPHANDLER( add_a_r6 )		{ execute_add(mcs48, R6); }
-OPHANDLER( add_a_r7 )		{ execute_add(mcs48, R7); }
-OPHANDLER( add_a_xr0 )		{ execute_add(mcs48, ram_r(R0)); }
-OPHANDLER( add_a_xr1 )		{ execute_add(mcs48, ram_r(R1)); }
-OPHANDLER( add_a_n )		{ execute_add(mcs48, argument_fetch(mcs48, PC++)); }
+OPHANDLER( add_a_r0 )		{ execute_add(cpustate, R0); }
+OPHANDLER( add_a_r1 )		{ execute_add(cpustate, R1); }
+OPHANDLER( add_a_r2 )		{ execute_add(cpustate, R2); }
+OPHANDLER( add_a_r3 )		{ execute_add(cpustate, R3); }
+OPHANDLER( add_a_r4 )		{ execute_add(cpustate, R4); }
+OPHANDLER( add_a_r5 )		{ execute_add(cpustate, R5); }
+OPHANDLER( add_a_r6 )		{ execute_add(cpustate, R6); }
+OPHANDLER( add_a_r7 )		{ execute_add(cpustate, R7); }
+OPHANDLER( add_a_xr0 )		{ execute_add(cpustate, ram_r(R0)); }
+OPHANDLER( add_a_xr1 )		{ execute_add(cpustate, ram_r(R1)); }
+OPHANDLER( add_a_n )		{ execute_add(cpustate, argument_fetch(cpustate, PC++)); }
 
-OPHANDLER( adc_a_r0 )		{ execute_addc(mcs48, R0); }
-OPHANDLER( adc_a_r1 )		{ execute_addc(mcs48, R1); }
-OPHANDLER( adc_a_r2 )		{ execute_addc(mcs48, R2); }
-OPHANDLER( adc_a_r3 )		{ execute_addc(mcs48, R3); }
-OPHANDLER( adc_a_r4 )		{ execute_addc(mcs48, R4); }
-OPHANDLER( adc_a_r5 )		{ execute_addc(mcs48, R5); }
-OPHANDLER( adc_a_r6 )		{ execute_addc(mcs48, R6); }
-OPHANDLER( adc_a_r7 )		{ execute_addc(mcs48, R7); }
-OPHANDLER( adc_a_xr0 )		{ execute_addc(mcs48, ram_r(R0)); }
-OPHANDLER( adc_a_xr1 )		{ execute_addc(mcs48, ram_r(R1)); }
-OPHANDLER( adc_a_n )		{ execute_addc(mcs48, argument_fetch(mcs48, PC++)); }
+OPHANDLER( adc_a_r0 )		{ execute_addc(cpustate, R0); }
+OPHANDLER( adc_a_r1 )		{ execute_addc(cpustate, R1); }
+OPHANDLER( adc_a_r2 )		{ execute_addc(cpustate, R2); }
+OPHANDLER( adc_a_r3 )		{ execute_addc(cpustate, R3); }
+OPHANDLER( adc_a_r4 )		{ execute_addc(cpustate, R4); }
+OPHANDLER( adc_a_r5 )		{ execute_addc(cpustate, R5); }
+OPHANDLER( adc_a_r6 )		{ execute_addc(cpustate, R6); }
+OPHANDLER( adc_a_r7 )		{ execute_addc(cpustate, R7); }
+OPHANDLER( adc_a_xr0 )		{ execute_addc(cpustate, ram_r(R0)); }
+OPHANDLER( adc_a_xr1 )		{ execute_addc(cpustate, ram_r(R1)); }
+OPHANDLER( adc_a_n )		{ execute_addc(cpustate, argument_fetch(cpustate, PC++)); }
 
 OPHANDLER( anl_a_r0 )		{ A &= R0; }
 OPHANDLER( anl_a_r1 )		{ A &= R1; }
@@ -383,34 +383,34 @@ OPHANDLER( anl_a_r6 )		{ A &= R6; }
 OPHANDLER( anl_a_r7 )		{ A &= R7; }
 OPHANDLER( anl_a_xr0 )		{ A &= ram_r(R0); }
 OPHANDLER( anl_a_xr1 )		{ A &= ram_r(R1); }
-OPHANDLER( anl_a_n )		{ A &= argument_fetch(mcs48, PC++); }
-OPHANDLER( anl_bus_n )		{ bus_w(bus_r() & argument_fetch(mcs48, PC++)); }
-OPHANDLER( anl_p1_n )		{ port_w(1, mcs48->p1 &= argument_fetch(mcs48, PC++)); }
-OPHANDLER( anl_p2_n )		{ port_w(2, mcs48->p2 &= argument_fetch(mcs48, PC++)); }
+OPHANDLER( anl_a_n )		{ A &= argument_fetch(cpustate, PC++); }
+OPHANDLER( anl_bus_n )		{ bus_w(bus_r() & argument_fetch(cpustate, PC++)); }
+OPHANDLER( anl_p1_n )		{ port_w(1, cpustate->p1 &= argument_fetch(cpustate, PC++)); }
+OPHANDLER( anl_p2_n )		{ port_w(2, cpustate->p2 &= argument_fetch(cpustate, PC++)); }
 
 OPHANDLER( anld_p4_a )		{ port_w(4, port_r(4) & A & 0x0f); }
 OPHANDLER( anld_p5_a )		{ port_w(5, port_r(5) & A & 0x0f); }
 OPHANDLER( anld_p6_a )		{ port_w(6, port_r(6) & A & 0x0f); }
 OPHANDLER( anld_p7_a )		{ port_w(7, port_r(7) & A & 0x0f); }
 
-OPHANDLER( call_0 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x000); }
-OPHANDLER( call_1 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x100); }
-OPHANDLER( call_2 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x200); }
-OPHANDLER( call_3 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x300); }
-OPHANDLER( call_4 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x400); }
-OPHANDLER( call_5 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x500); }
-OPHANDLER( call_6 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x600); }
-OPHANDLER( call_7 )		{ execute_call(mcs48, argument_fetch(mcs48, PC++) | 0x700); }
+OPHANDLER( call_0 )		{ execute_call(cpustate, argument_fetch(cpustate, PC++) | 0x000); }
+OPHANDLER( call_1 )		{ execute_call(cpustate, argument_fetch(cpustate, PC++) | 0x100); }
+OPHANDLER( call_2 )		{ execute_call(cpustate, argument_fetch(cpustate, PC++) | 0x200); }
+OPHANDLER( call_3 )		{ execute_call(cpustate, argument_fetch(cpustate, PC++) | 0x300); }
+OPHANDLER( call_4 )		{ execute_call(cpustate, argument_fetch(cpustate, PC++) | 0x400); }
+OPHANDLER( call_5 )		{ execute_call(cpustate, argument_fetch(cpustate, PC++) | 0x500); }
+OPHANDLER( call_6 )		{ execute_call(cpustate, argument_fetch(cpustate, PC++) | 0x600); }
+OPHANDLER( call_7 )		{ execute_call(cpustate, argument_fetch(cpustate, PC++) | 0x700); }
 
 OPHANDLER( clr_a )			{ A = 0; }
 OPHANDLER( clr_c )			{ PSW &= ~C_FLAG; }
 OPHANDLER( clr_f0 )		{ PSW &= ~F_FLAG; }
-OPHANDLER( clr_f1 )		{ mcs48->f1 = 0; }
+OPHANDLER( clr_f1 )		{ cpustate->f1 = 0; }
 
 OPHANDLER( cpl_a )			{ A ^= 0xff; }
 OPHANDLER( cpl_c )			{ PSW ^= C_FLAG; }
 OPHANDLER( cpl_f0 )		{ PSW ^= F_FLAG; }
-OPHANDLER( cpl_f1 )		{ mcs48->f1 ^= 1; }
+OPHANDLER( cpl_f1 )		{ cpustate->f1 ^= 1; }
 
 OPHANDLER( da_a )
 {
@@ -439,28 +439,28 @@ OPHANDLER( dec_r5 )		{ R5--; }
 OPHANDLER( dec_r6 )		{ R6--; }
 OPHANDLER( dec_r7 )		{ R7--; }
 
-OPHANDLER( dis_i )			{ mcs48->xirq_enabled = FALSE; }
-OPHANDLER( dis_tcnti )		{ mcs48->tirq_enabled = FALSE; mcs48->timer_overflow = FALSE; }
+OPHANDLER( dis_i )			{ cpustate->xirq_enabled = FALSE; }
+OPHANDLER( dis_tcnti )		{ cpustate->tirq_enabled = FALSE; cpustate->timer_overflow = FALSE; }
 
-OPHANDLER( djnz_r0 )		{ execute_jcc(mcs48, --R0 != 0); }
-OPHANDLER( djnz_r1 )		{ execute_jcc(mcs48, --R1 != 0); }
-OPHANDLER( djnz_r2 )		{ execute_jcc(mcs48, --R2 != 0); }
-OPHANDLER( djnz_r3 )		{ execute_jcc(mcs48, --R3 != 0); }
-OPHANDLER( djnz_r4 )		{ execute_jcc(mcs48, --R4 != 0); }
-OPHANDLER( djnz_r5 )		{ execute_jcc(mcs48, --R5 != 0); }
-OPHANDLER( djnz_r6 )		{ execute_jcc(mcs48, --R6 != 0); }
-OPHANDLER( djnz_r7 )		{ execute_jcc(mcs48, --R7 != 0); }
+OPHANDLER( djnz_r0 )		{ execute_jcc(cpustate, --R0 != 0); }
+OPHANDLER( djnz_r1 )		{ execute_jcc(cpustate, --R1 != 0); }
+OPHANDLER( djnz_r2 )		{ execute_jcc(cpustate, --R2 != 0); }
+OPHANDLER( djnz_r3 )		{ execute_jcc(cpustate, --R3 != 0); }
+OPHANDLER( djnz_r4 )		{ execute_jcc(cpustate, --R4 != 0); }
+OPHANDLER( djnz_r5 )		{ execute_jcc(cpustate, --R5 != 0); }
+OPHANDLER( djnz_r6 )		{ execute_jcc(cpustate, --R6 != 0); }
+OPHANDLER( djnz_r7 )		{ execute_jcc(cpustate, --R7 != 0); }
 
-OPHANDLER( en_i )			{ mcs48->xirq_enabled = TRUE; check_irqs(mcs48); }
-OPHANDLER( en_tcnti )		{ mcs48->tirq_enabled = TRUE; check_irqs(mcs48); }
+OPHANDLER( en_i )			{ cpustate->xirq_enabled = TRUE; check_irqs(cpustate); }
+OPHANDLER( en_tcnti )		{ cpustate->tirq_enabled = TRUE; check_irqs(cpustate); }
 
 OPHANDLER( ento_clk )
 {
 	logerror("I8039:  pc = %04x,  Unimplemented opcode = %02x\n", PC-1, program_r(PC-1));
 }
 
-OPHANDLER( in_a_p1 )		{ A = port_r(1) & mcs48->p1; }
-OPHANDLER( in_a_p2 )		{ A = port_r(2) & mcs48->p2; }
+OPHANDLER( in_a_p1 )		{ A = port_r(1) & cpustate->p1; }
+OPHANDLER( in_a_p2 )		{ A = port_r(2) & cpustate->p2; }
 OPHANDLER( ins_a_bus )		{ A = bus_r(); }
 
 OPHANDLER( inc_a )			{ A++; }
@@ -475,39 +475,39 @@ OPHANDLER( inc_r7 )		{ R7++; }
 OPHANDLER( inc_xr0 )		{ ram_w(R0, ram_r(R0) + 1); }
 OPHANDLER( inc_xr1 )		{ ram_w(R1, ram_r(R1) + 1); }
 
-OPHANDLER( jb_0 )			{ execute_jcc(mcs48, (A & 0x01) != 0); }
-OPHANDLER( jb_1 )			{ execute_jcc(mcs48, (A & 0x02) != 0); }
-OPHANDLER( jb_2 )			{ execute_jcc(mcs48, (A & 0x04) != 0); }
-OPHANDLER( jb_3 )			{ execute_jcc(mcs48, (A & 0x08) != 0); }
-OPHANDLER( jb_4 )			{ execute_jcc(mcs48, (A & 0x10) != 0); }
-OPHANDLER( jb_5 )			{ execute_jcc(mcs48, (A & 0x20) != 0); }
-OPHANDLER( jb_6 )			{ execute_jcc(mcs48, (A & 0x40) != 0); }
-OPHANDLER( jb_7 )			{ execute_jcc(mcs48, (A & 0x80) != 0); }
-OPHANDLER( jc )			{ execute_jcc(mcs48, (PSW & C_FLAG) != 0); }
-OPHANDLER( jf0 )			{ execute_jcc(mcs48, (PSW & F_FLAG) != 0); }
-OPHANDLER( jf1 )			{ execute_jcc(mcs48, mcs48->f1 != 0); }
+OPHANDLER( jb_0 )			{ execute_jcc(cpustate, (A & 0x01) != 0); }
+OPHANDLER( jb_1 )			{ execute_jcc(cpustate, (A & 0x02) != 0); }
+OPHANDLER( jb_2 )			{ execute_jcc(cpustate, (A & 0x04) != 0); }
+OPHANDLER( jb_3 )			{ execute_jcc(cpustate, (A & 0x08) != 0); }
+OPHANDLER( jb_4 )			{ execute_jcc(cpustate, (A & 0x10) != 0); }
+OPHANDLER( jb_5 )			{ execute_jcc(cpustate, (A & 0x20) != 0); }
+OPHANDLER( jb_6 )			{ execute_jcc(cpustate, (A & 0x40) != 0); }
+OPHANDLER( jb_7 )			{ execute_jcc(cpustate, (A & 0x80) != 0); }
+OPHANDLER( jc )			{ execute_jcc(cpustate, (PSW & C_FLAG) != 0); }
+OPHANDLER( jf0 )			{ execute_jcc(cpustate, (PSW & F_FLAG) != 0); }
+OPHANDLER( jf1 )			{ execute_jcc(cpustate, cpustate->f1 != 0); }
 
-OPHANDLER( jmp_0 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x000); }
-OPHANDLER( jmp_1 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x100); }
-OPHANDLER( jmp_2 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x200); }
-OPHANDLER( jmp_3 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x300); }
-OPHANDLER( jmp_4 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x400); }
-OPHANDLER( jmp_5 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x500); }
-OPHANDLER( jmp_6 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x600); }
-OPHANDLER( jmp_7 )			{ execute_jmp(mcs48, argument_fetch(mcs48, PC) | 0x700); }
+OPHANDLER( jmp_0 )			{ execute_jmp(cpustate, argument_fetch(cpustate, PC) | 0x000); }
+OPHANDLER( jmp_1 )			{ execute_jmp(cpustate, argument_fetch(cpustate, PC) | 0x100); }
+OPHANDLER( jmp_2 )			{ execute_jmp(cpustate, argument_fetch(cpustate, PC) | 0x200); }
+OPHANDLER( jmp_3 )			{ execute_jmp(cpustate, argument_fetch(cpustate, PC) | 0x300); }
+OPHANDLER( jmp_4 )			{ execute_jmp(cpustate, argument_fetch(cpustate, PC) | 0x400); }
+OPHANDLER( jmp_5 )			{ execute_jmp(cpustate, argument_fetch(cpustate, PC) | 0x500); }
+OPHANDLER( jmp_6 )			{ execute_jmp(cpustate, argument_fetch(cpustate, PC) | 0x600); }
+OPHANDLER( jmp_7 )			{ execute_jmp(cpustate, argument_fetch(cpustate, PC) | 0x700); }
 OPHANDLER( jmpp_xa )		{ PC &= 0xf00; PC |= program_r(PC | A); }
 
-OPHANDLER( jnc )			{ execute_jcc(mcs48, (PSW & C_FLAG) == 0); }
-OPHANDLER( jni )			{ execute_jcc(mcs48, mcs48->irq_state != 0); }
-OPHANDLER( jnt_0 )  		{ execute_jcc(mcs48, test_r(0) == 0); }
-OPHANDLER( jnt_1 )  		{ execute_jcc(mcs48, test_r(1) == 0); }
-OPHANDLER( jnz )			{ execute_jcc(mcs48, A != 0); }
-OPHANDLER( jtf )			{ execute_jcc(mcs48, mcs48->timer_flag); mcs48->timer_flag = FALSE; }
-OPHANDLER( jt_0 )  		{ execute_jcc(mcs48, test_r(0) != 0); }
-OPHANDLER( jt_1 )  		{ execute_jcc(mcs48, test_r(1) != 0); }
-OPHANDLER( jz )			{ execute_jcc(mcs48, A == 0); }
+OPHANDLER( jnc )			{ execute_jcc(cpustate, (PSW & C_FLAG) == 0); }
+OPHANDLER( jni )			{ execute_jcc(cpustate, cpustate->irq_state != 0); }
+OPHANDLER( jnt_0 )  		{ execute_jcc(cpustate, test_r(0) == 0); }
+OPHANDLER( jnt_1 )  		{ execute_jcc(cpustate, test_r(1) == 0); }
+OPHANDLER( jnz )			{ execute_jcc(cpustate, A != 0); }
+OPHANDLER( jtf )			{ execute_jcc(cpustate, cpustate->timer_flag); cpustate->timer_flag = FALSE; }
+OPHANDLER( jt_0 )  		{ execute_jcc(cpustate, test_r(0) != 0); }
+OPHANDLER( jt_1 )  		{ execute_jcc(cpustate, test_r(1) != 0); }
+OPHANDLER( jz )			{ execute_jcc(cpustate, A == 0); }
 
-OPHANDLER( mov_a_n )		{ A = argument_fetch(mcs48, PC++); }
+OPHANDLER( mov_a_n )		{ A = argument_fetch(cpustate, PC++); }
 OPHANDLER( mov_a_psw )		{ A = PSW; }
 OPHANDLER( mov_a_r0 )		{ A = R0; }
 OPHANDLER( mov_a_r1 )		{ A = R1; }
@@ -519,9 +519,9 @@ OPHANDLER( mov_a_r6 )		{ A = R6; }
 OPHANDLER( mov_a_r7 )		{ A = R7; }
 OPHANDLER( mov_a_xr0 )		{ A = ram_r(R0); }
 OPHANDLER( mov_a_xr1 )		{ A = ram_r(R1); }
-OPHANDLER( mov_a_t )		{ A = mcs48->timer; }
+OPHANDLER( mov_a_t )		{ A = cpustate->timer; }
 
-OPHANDLER( mov_psw_a )		{ PSW = A; update_regptr(mcs48); }
+OPHANDLER( mov_psw_a )		{ PSW = A; update_regptr(cpustate); }
 OPHANDLER( mov_r0_a )		{ R0 = A; }
 OPHANDLER( mov_r1_a )		{ R1 = A; }
 OPHANDLER( mov_r2_a )		{ R2 = A; }
@@ -530,19 +530,19 @@ OPHANDLER( mov_r4_a )		{ R4 = A; }
 OPHANDLER( mov_r5_a )		{ R5 = A; }
 OPHANDLER( mov_r6_a )		{ R6 = A; }
 OPHANDLER( mov_r7_a )		{ R7 = A; }
-OPHANDLER( mov_r0_n )		{ R0 = argument_fetch(mcs48, PC++); }
-OPHANDLER( mov_r1_n )		{ R1 = argument_fetch(mcs48, PC++); }
-OPHANDLER( mov_r2_n )		{ R2 = argument_fetch(mcs48, PC++); }
-OPHANDLER( mov_r3_n )		{ R3 = argument_fetch(mcs48, PC++); }
-OPHANDLER( mov_r4_n )		{ R4 = argument_fetch(mcs48, PC++); }
-OPHANDLER( mov_r5_n )		{ R5 = argument_fetch(mcs48, PC++); }
-OPHANDLER( mov_r6_n )		{ R6 = argument_fetch(mcs48, PC++); }
-OPHANDLER( mov_r7_n )		{ R7 = argument_fetch(mcs48, PC++); }
-OPHANDLER( mov_t_a )		{ mcs48->timer = A; }
+OPHANDLER( mov_r0_n )		{ R0 = argument_fetch(cpustate, PC++); }
+OPHANDLER( mov_r1_n )		{ R1 = argument_fetch(cpustate, PC++); }
+OPHANDLER( mov_r2_n )		{ R2 = argument_fetch(cpustate, PC++); }
+OPHANDLER( mov_r3_n )		{ R3 = argument_fetch(cpustate, PC++); }
+OPHANDLER( mov_r4_n )		{ R4 = argument_fetch(cpustate, PC++); }
+OPHANDLER( mov_r5_n )		{ R5 = argument_fetch(cpustate, PC++); }
+OPHANDLER( mov_r6_n )		{ R6 = argument_fetch(cpustate, PC++); }
+OPHANDLER( mov_r7_n )		{ R7 = argument_fetch(cpustate, PC++); }
+OPHANDLER( mov_t_a )		{ cpustate->timer = A; }
 OPHANDLER( mov_xr0_a )		{ ram_w(R0, A); }
 OPHANDLER( mov_xr1_a )		{ ram_w(R1, A); }
-OPHANDLER( mov_xr0_n )		{ ram_w(R0, argument_fetch(mcs48, PC++)); }
-OPHANDLER( mov_xr1_n )		{ ram_w(R1, argument_fetch(mcs48, PC++)); }
+OPHANDLER( mov_xr0_n )		{ ram_w(R0, argument_fetch(cpustate, PC++)); }
+OPHANDLER( mov_xr1_n )		{ ram_w(R1, argument_fetch(cpustate, PC++)); }
 
 OPHANDLER( movd_a_p4 )		{ A = port_r(4) & 0x0f; }
 OPHANDLER( movd_a_p5 )		{ A = port_r(5) & 0x0f; }
@@ -573,27 +573,27 @@ OPHANDLER( orl_a_r6 )		{ A |= R6; }
 OPHANDLER( orl_a_r7 )		{ A |= R7; }
 OPHANDLER( orl_a_xr0 )		{ A |= ram_r(R0); }
 OPHANDLER( orl_a_xr1 )		{ A |= ram_r(R1); }
-OPHANDLER( orl_a_n )		{ A |= argument_fetch(mcs48, PC++); }
-OPHANDLER( orl_bus_n )		{ bus_w(bus_r() | argument_fetch(mcs48, PC++)); }
-OPHANDLER( orl_p1_n )		{ port_w(1, mcs48->p1 |= argument_fetch(mcs48, PC++)); }
-OPHANDLER( orl_p2_n )		{ port_w(2, mcs48->p2 |= argument_fetch(mcs48, PC++)); }
+OPHANDLER( orl_a_n )		{ A |= argument_fetch(cpustate, PC++); }
+OPHANDLER( orl_bus_n )		{ bus_w(bus_r() | argument_fetch(cpustate, PC++)); }
+OPHANDLER( orl_p1_n )		{ port_w(1, cpustate->p1 |= argument_fetch(cpustate, PC++)); }
+OPHANDLER( orl_p2_n )		{ port_w(2, cpustate->p2 |= argument_fetch(cpustate, PC++)); }
 OPHANDLER( orld_p4_a )		{ port_w(4, port_r(4) | A); }
 OPHANDLER( orld_p5_a )		{ port_w(5, port_r(5) | A); }
 OPHANDLER( orld_p6_a )		{ port_w(6, port_r(6) | A); }
 OPHANDLER( orld_p7_a )		{ port_w(7, port_r(7) | A); }
 
 OPHANDLER( outl_bus_a )	{ bus_w(A); }
-OPHANDLER( outl_p1_a )		{ port_w(1, mcs48->p1 = A); }
-OPHANDLER( outl_p2_a )		{ port_w(2, mcs48->p2 = A); }
-OPHANDLER( ret )			{ pull_pc(mcs48); }
+OPHANDLER( outl_p1_a )		{ port_w(1, cpustate->p1 = A); }
+OPHANDLER( outl_p2_a )		{ port_w(2, cpustate->p2 = A); }
+OPHANDLER( ret )			{ pull_pc(cpustate); }
 
 OPHANDLER( retr )
 {
-	pull_pc_psw(mcs48);
+	pull_pc_psw(cpustate);
 
 	/* implicitly clear the IRQ in progress flip flop and re-check interrupts */
-	mcs48->irq_in_progress = FALSE;
-	check_irqs(mcs48);
+	cpustate->irq_in_progress = FALSE;
+	check_irqs(cpustate);
 }
 
 OPHANDLER( rl_a )			{ A = (A << 1) | (A >> 7); }
@@ -602,16 +602,16 @@ OPHANDLER( rlc_a ) 		{ UINT8 newc = A & C_FLAG; A = (A << 1) | (PSW >> 7); PSW =
 OPHANDLER( rr_a )			{ A = (A >> 1) | (A << 7); }
 OPHANDLER( rrc_a )			{ UINT8 newc = (A << 7) & C_FLAG; A = (A >> 1) | (PSW & C_FLAG); PSW = (PSW & ~C_FLAG) | newc; }
 
-OPHANDLER( sel_mb0 )		{ mcs48->a11 = 0x000; }
-OPHANDLER( sel_mb1 )		{ mcs48->a11 = 0x800; }
+OPHANDLER( sel_mb0 )		{ cpustate->a11 = 0x000; }
+OPHANDLER( sel_mb1 )		{ cpustate->a11 = 0x800; }
 
-OPHANDLER( sel_rb0 )		{ PSW &= ~B_FLAG; update_regptr(mcs48);  }
-OPHANDLER( sel_rb1 )		{ PSW |=  B_FLAG; update_regptr(mcs48); }
+OPHANDLER( sel_rb0 )		{ PSW &= ~B_FLAG; update_regptr(cpustate);  }
+OPHANDLER( sel_rb1 )		{ PSW |=  B_FLAG; update_regptr(cpustate); }
 
-OPHANDLER( stop_tcnt )		{ mcs48->timecount_enabled = 0; }
+OPHANDLER( stop_tcnt )		{ cpustate->timecount_enabled = 0; }
 
-OPHANDLER( strt_cnt )		{ mcs48->timecount_enabled = COUNTER_ENABLED; mcs48->t1_history = test_r(1); }
-OPHANDLER( strt_t )		{ mcs48->timecount_enabled = TIMER_ENABLED; mcs48->prescaler = 0; }
+OPHANDLER( strt_cnt )		{ cpustate->timecount_enabled = COUNTER_ENABLED; cpustate->t1_history = test_r(1); }
+OPHANDLER( strt_t )		{ cpustate->timecount_enabled = TIMER_ENABLED; cpustate->prescaler = 0; }
 
 OPHANDLER( swap_a )		{ A = (A << 4) | (A >> 4); }
 
@@ -639,7 +639,7 @@ OPHANDLER( xrl_a_r6 )		{ A ^= R6; }
 OPHANDLER( xrl_a_r7 )		{ A ^= R7; }
 OPHANDLER( xrl_a_xr0 )		{ A ^= ram_r(R0); }
 OPHANDLER( xrl_a_xr1 )		{ A ^= ram_r(R1); }
-OPHANDLER( xrl_a_n )		{ A ^= argument_fetch(mcs48, PC++); }
+OPHANDLER( xrl_a_n )		{ A ^= argument_fetch(cpustate, PC++); }
 
 
 
@@ -695,7 +695,7 @@ static const mcs48_opcode opcode_table[256]=
 
 static void mcs48_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, UINT16 romsize)
 {
-	mcs48_state *mcs48 = device->token;
+	mcs48_state *cpustate = device->token;
 
 	/* External access line
      * EA=1 : read from external rom
@@ -703,38 +703,38 @@ static void mcs48_init(const device_config *device, int index, int clock, cpu_ir
      */
 
 	/* FIXME: Current implementation suboptimal */
-	mcs48->ea = (romsize ? 0 : 1);
+	cpustate->ea = (romsize ? 0 : 1);
 
-	mcs48->irq_callback = irqcallback;
-	mcs48->device = device;
-	mcs48->int_rom_size = romsize;
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->int_rom_size = romsize;
 
-	mcs48->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
-	mcs48->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
-	mcs48->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
+	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->data = cpu_get_address_space(device, ADDRESS_SPACE_DATA);
+	cpustate->io = cpu_get_address_space(device, ADDRESS_SPACE_IO);
 
 	/* ensure that regptr is valid before get_info gets called */
-	update_regptr(mcs48);
+	update_regptr(cpustate);
 
-	state_save_register_item("mcs48", device->tag, 0, mcs48->prevpc.w.l);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->prevpc.w.l);
 	state_save_register_item("mcs48", device->tag, 0, PC);
 	state_save_register_item("mcs48", device->tag, 0, A);
 	state_save_register_item("mcs48", device->tag, 0, PSW);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->p1);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->p2);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->f1);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->ea);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->timer);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->prescaler);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->t1_history);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->irq_state);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->irq_in_progress);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->timer_overflow);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->timer_flag);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->tirq_enabled);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->xirq_enabled);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->timecount_enabled);
-	state_save_register_item("mcs48", device->tag, 0, mcs48->a11);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->p1);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->p2);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->f1);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->ea);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->timer);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->prescaler);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->t1_history);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->irq_state);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->irq_in_progress);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->timer_overflow);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->timer_flag);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->tirq_enabled);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->xirq_enabled);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->timecount_enabled);
+	state_save_register_item("mcs48", device->tag, 0, cpustate->a11);
 }
 
 
@@ -800,26 +800,26 @@ static CPU_INIT( i8049 )
 
 static CPU_RESET( mcs48 )
 {
-	mcs48_state *mcs48 = device->token;
+	mcs48_state *cpustate = device->token;
 
 	/* confirmed from reset description */
 	PC = 0;
 	PSW = (PSW & (C_FLAG | A_FLAG)) | 0x08;
-	mcs48->a11 = 0x000;
+	cpustate->a11 = 0x000;
 	bus_w(0xff);
-	mcs48->p1 = 0xff;
-	mcs48->p2 = 0xff;
-	port_w(1, mcs48->p1);
-	port_w(2, mcs48->p2);
-	mcs48->tirq_enabled = FALSE;
-	mcs48->xirq_enabled = FALSE;
-	mcs48->timecount_enabled = 0;
-	mcs48->timer_flag = FALSE;
-	mcs48->f1 = 0;
+	cpustate->p1 = 0xff;
+	cpustate->p2 = 0xff;
+	port_w(1, cpustate->p1);
+	port_w(2, cpustate->p2);
+	cpustate->tirq_enabled = FALSE;
+	cpustate->xirq_enabled = FALSE;
+	cpustate->timecount_enabled = 0;
+	cpustate->timer_flag = FALSE;
+	cpustate->f1 = 0;
 
 	/* confirmed from interrupt logic description */
-	mcs48->irq_in_progress = FALSE;
-	mcs48->timer_overflow = FALSE;
+	cpustate->irq_in_progress = FALSE;
+	cpustate->timer_overflow = FALSE;
 }
 
 
@@ -832,39 +832,39 @@ static CPU_RESET( mcs48 )
     check_irqs - check for and process IRQs
 -------------------------------------------------*/
 
-static void check_irqs(mcs48_state *mcs48)
+static void check_irqs(mcs48_state *cpustate)
 {
 	/* if something is in progress, we do nothing */
-	if (mcs48->irq_in_progress)
+	if (cpustate->irq_in_progress)
 		return;
 
 	/* external interrupts take priority */
-	if (mcs48->irq_state && mcs48->xirq_enabled)
+	if (cpustate->irq_state && cpustate->xirq_enabled)
 	{
-		mcs48->irq_in_progress = TRUE;
+		cpustate->irq_in_progress = TRUE;
 
 		/* transfer to location 0x03 */
-		push_pc_psw(mcs48);
+		push_pc_psw(cpustate);
 		PC = 0x03;
-		mcs48->inst_cycles += 2;
+		cpustate->inst_cycles += 2;
 
 		/* indicate we took the external IRQ */
-		if (mcs48->irq_callback != NULL)
-			(*mcs48->irq_callback)(mcs48->device, 0);
+		if (cpustate->irq_callback != NULL)
+			(*cpustate->irq_callback)(cpustate->device, 0);
 	}
 
 	/* timer overflow interrupts follow */
-	if (mcs48->timer_overflow && mcs48->tirq_enabled)
+	if (cpustate->timer_overflow && cpustate->tirq_enabled)
 	{
-		mcs48->irq_in_progress = TRUE;
+		cpustate->irq_in_progress = TRUE;
 
 		/* transfer to location 0x07 */
-		push_pc_psw(mcs48);
+		push_pc_psw(cpustate);
 		PC = 0x07;
-		mcs48->inst_cycles += 2;
+		cpustate->inst_cycles += 2;
 
 		/* timer overflow flip-flop is reset once taken */
-		mcs48->timer_overflow = FALSE;
+		cpustate->timer_overflow = FALSE;
 	}
 }
 
@@ -874,39 +874,39 @@ static void check_irqs(mcs48_state *mcs48)
     and counters
 -------------------------------------------------*/
 
-static void burn_cycles(mcs48_state *mcs48, int count)
+static void burn_cycles(mcs48_state *cpustate, int count)
 {
 	int timerover = FALSE;
 
 	/* if the timer is enabled, accumulate prescaler cycles */
-	if (mcs48->timecount_enabled & TIMER_ENABLED)
+	if (cpustate->timecount_enabled & TIMER_ENABLED)
 	{
-		UINT8 oldtimer = mcs48->timer;
-		mcs48->prescaler += count;
-		mcs48->timer += mcs48->prescaler >> 5;
-		mcs48->prescaler &= 0x1f;
-		timerover = (oldtimer != 0 && mcs48->timer == 0);
+		UINT8 oldtimer = cpustate->timer;
+		cpustate->prescaler += count;
+		cpustate->timer += cpustate->prescaler >> 5;
+		cpustate->prescaler &= 0x1f;
+		timerover = (oldtimer != 0 && cpustate->timer == 0);
 	}
 
 	/* if the counter is enabled, poll the T1 test input once for each cycle */
-	else if (mcs48->timecount_enabled & COUNTER_ENABLED)
+	else if (cpustate->timecount_enabled & COUNTER_ENABLED)
 		for ( ; count > 0; count--)
 		{
-			mcs48->t1_history = (mcs48->t1_history << 1) | (test_r(1) & 1);
-			if ((mcs48->t1_history & 3) == 2)
-				timerover = (++mcs48->timer == 0);
+			cpustate->t1_history = (cpustate->t1_history << 1) | (test_r(1) & 1);
+			if ((cpustate->t1_history & 3) == 2)
+				timerover = (++cpustate->timer == 0);
 		}
 
 	/* if either source caused a timer overflow, set the flags and check IRQs */
 	if (timerover)
 	{
-		mcs48->timer_flag = TRUE;
+		cpustate->timer_flag = TRUE;
 
 		/* according to the docs, if an overflow occurs with interrupts disabled, the overflow is not stored */
-		if (mcs48->tirq_enabled)
+		if (cpustate->tirq_enabled)
 		{
-			mcs48->timer_overflow = TRUE;
-			check_irqs(mcs48);
+			cpustate->timer_overflow = TRUE;
+			check_irqs(cpustate);
 		}
 	}
 }
@@ -919,40 +919,40 @@ static void burn_cycles(mcs48_state *mcs48, int count)
 
 static CPU_EXECUTE( mcs48 )
 {
-	mcs48_state *mcs48 = device->token;
+	mcs48_state *cpustate = device->token;
 	unsigned opcode;
 
-	update_regptr(mcs48);
+	update_regptr(cpustate);
 
-	mcs48->icount = cycles;
+	cpustate->icount = cycles;
 
 	/* external interrupts may have been set since we last checked */
-	mcs48->inst_cycles = 0;
-	check_irqs(mcs48);
-	mcs48->icount -= mcs48->inst_cycles;
-	if (mcs48->timecount_enabled != 0)
-		burn_cycles(mcs48, mcs48->inst_cycles);
+	cpustate->inst_cycles = 0;
+	check_irqs(cpustate);
+	cpustate->icount -= cpustate->inst_cycles;
+	if (cpustate->timecount_enabled != 0)
+		burn_cycles(cpustate, cpustate->inst_cycles);
 
 	/* iterate over remaining cycles, guaranteeing at least one instruction */
 	do
 	{
 		/* fetch next opcode */
-		mcs48->prevpc = mcs48->pc;
+		cpustate->prevpc = cpustate->pc;
 		debugger_instruction_hook(device, PC);
-		opcode = opcode_fetch(mcs48, PC++);
+		opcode = opcode_fetch(cpustate, PC++);
 
 		/* process opcode and count cycles */
-		mcs48->inst_cycles = opcode_table[opcode].cycles;
-		(*opcode_table[opcode].function)(mcs48);
+		cpustate->inst_cycles = opcode_table[opcode].cycles;
+		(*opcode_table[opcode].function)(cpustate);
 
 		/* burn the cycles */
-		mcs48->icount -= mcs48->inst_cycles;
-		if (mcs48->timecount_enabled != 0)
-			burn_cycles(mcs48, mcs48->inst_cycles);
+		cpustate->icount -= cpustate->inst_cycles;
+		if (cpustate->timecount_enabled != 0)
+			burn_cycles(cpustate, cpustate->inst_cycles);
 
-	} while (mcs48->icount > 0);
+	} while (cpustate->icount > 0);
 
-	return cycles - mcs48->icount;
+	return cycles - cpustate->icount;
 }
 
 
@@ -1011,22 +1011,22 @@ static CPU_SET_CONTEXT( mcs48 )
 
 static CPU_SET_INFO( mcs48 )
 {
-	mcs48_state *mcs48 = device->token;
+	mcs48_state *cpustate = device->token;
 
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	mcs48->irq_state = (info->i != CLEAR_LINE);	break;
-		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	mcs48->ea = (info->i != CLEAR_LINE);			break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:	cpustate->irq_state = (info->i != CLEAR_LINE);	break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:	cpustate->ea = (info->i != CLEAR_LINE);			break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + MCS48_PC:			PC = info->i;								break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + MCS48_PSW:			PSW = info->i;								break;
 		case CPUINFO_INT_REGISTER + MCS48_A:			A = info->i;								break;
-		case CPUINFO_INT_REGISTER + MCS48_TC:			mcs48->timer = info->i;						break;
-		case CPUINFO_INT_REGISTER + MCS48_P1:			mcs48->p1 = info->i;							break;
-		case CPUINFO_INT_REGISTER + MCS48_P2:			mcs48->p2 = info->i;							break;
+		case CPUINFO_INT_REGISTER + MCS48_TC:			cpustate->timer = info->i;						break;
+		case CPUINFO_INT_REGISTER + MCS48_P1:			cpustate->p1 = info->i;							break;
+		case CPUINFO_INT_REGISTER + MCS48_P2:			cpustate->p2 = info->i;							break;
 		case CPUINFO_INT_REGISTER + MCS48_R0:			R0 = info->i;								break;
 		case CPUINFO_INT_REGISTER + MCS48_R1:			R1 = info->i;								break;
 		case CPUINFO_INT_REGISTER + MCS48_R2:			R2 = info->i;								break;
@@ -1035,7 +1035,7 @@ static CPU_SET_INFO( mcs48 )
 		case CPUINFO_INT_REGISTER + MCS48_R5:			R5 = info->i;								break;
 		case CPUINFO_INT_REGISTER + MCS48_R6:			R6 = info->i;								break;
 		case CPUINFO_INT_REGISTER + MCS48_R7:			R7 = info->i;								break;
-		case CPUINFO_INT_REGISTER + MCS48_EA:			mcs48->ea = info->i;							break;
+		case CPUINFO_INT_REGISTER + MCS48_EA:			cpustate->ea = info->i;							break;
 	}
 }
 
@@ -1047,7 +1047,7 @@ static CPU_SET_INFO( mcs48 )
 
 static CPU_GET_INFO( mcs48 )
 {
-	mcs48_state *mcs48 = (device != NULL) ? device->token : NULL;
+	mcs48_state *cpustate = (device != NULL) ? device->token : NULL;
 
 	switch (state)
 	{
@@ -1073,18 +1073,18 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 9;							break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;							break;
 
-		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:			info->i = mcs48->irq_state ? ASSERT_LINE : CLEAR_LINE; break;
-		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:			info->i = mcs48->ea;						break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_IRQ:			info->i = cpustate->irq_state ? ASSERT_LINE : CLEAR_LINE; break;
+		case CPUINFO_INT_INPUT_STATE + MCS48_INPUT_EA:			info->i = cpustate->ea;						break;
 
-		case CPUINFO_INT_PREVIOUSPC:							info->i = mcs48->prevpc.w.l;				break;
+		case CPUINFO_INT_PREVIOUSPC:							info->i = cpustate->prevpc.w.l;				break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + MCS48_PC:					info->i = PC;							break;
 		case CPUINFO_INT_REGISTER + MCS48_PSW:					info->i = PSW;							break;
 		case CPUINFO_INT_REGISTER + MCS48_A:					info->i = A;							break;
-		case CPUINFO_INT_REGISTER + MCS48_TC:					info->i = mcs48->timer;					break;
-		case CPUINFO_INT_REGISTER + MCS48_P1:					info->i = mcs48->p1;						break;
-		case CPUINFO_INT_REGISTER + MCS48_P2:					info->i = mcs48->p2;						break;
+		case CPUINFO_INT_REGISTER + MCS48_TC:					info->i = cpustate->timer;					break;
+		case CPUINFO_INT_REGISTER + MCS48_P1:					info->i = cpustate->p1;						break;
+		case CPUINFO_INT_REGISTER + MCS48_P2:					info->i = cpustate->p2;						break;
 		case CPUINFO_INT_REGISTER + MCS48_R0:					info->i = R0;							break;
 		case CPUINFO_INT_REGISTER + MCS48_R1:					info->i = R1;							break;
 		case CPUINFO_INT_REGISTER + MCS48_R2:					info->i = R2;							break;
@@ -1093,7 +1093,7 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_INT_REGISTER + MCS48_R5:					info->i = R5;							break;
 		case CPUINFO_INT_REGISTER + MCS48_R6:					info->i = R6;							break;
 		case CPUINFO_INT_REGISTER + MCS48_R7:					info->i = R7;							break;
-		case CPUINFO_INT_REGISTER + MCS48_EA:					info->i = mcs48->ea;						break;
+		case CPUINFO_INT_REGISTER + MCS48_EA:					info->i = cpustate->ea;						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_SET_INFO:								info->setinfo = CPU_SET_INFO_NAME(mcs48);			break;
@@ -1104,7 +1104,7 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_PTR_EXECUTE:								info->execute = CPU_EXECUTE_NAME(mcs48);			break;
 		case CPUINFO_PTR_BURN:									info->burn = NULL;						break;
 		case CPUINFO_PTR_DISASSEMBLE:							info->disassemble = CPU_DISASSEMBLE_NAME(mcs48);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:					info->icount = &mcs48->icount;			break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:					info->icount = &cpustate->icount;			break;
 
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_PROGRAM: /*info->internal_map8 = ADDRESS_MAP_NAME(program_10bit);*/ break;
 		case CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACE_DATA: 	/*info->internal_map8 = ADDRESS_MAP_NAME(data_7bit);*/ break;
@@ -1118,8 +1118,8 @@ static CPU_GET_INFO( mcs48 )
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c %c%c%c%c%c%c%c%c",
-				mcs48->irq_state ? 'I':'.',
-				mcs48->a11       ? 'M':'.',
+				cpustate->irq_state ? 'I':'.',
+				cpustate->a11       ? 'M':'.',
 				PSW & 0x80 ? 'C':'.',
 				PSW & 0x40 ? 'A':'.',
 				PSW & 0x20 ? 'F':'.',
@@ -1133,9 +1133,9 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_STR_REGISTER + MCS48_PC:					sprintf(info->s, "PC:%04X", PC); 		break;
 		case CPUINFO_STR_REGISTER + MCS48_PSW:					sprintf(info->s, "PSW:%02X", PSW); 		break;
 		case CPUINFO_STR_REGISTER + MCS48_A:					sprintf(info->s, "A:%02X", A); 			break;
-		case CPUINFO_STR_REGISTER + MCS48_TC:					sprintf(info->s, "TC:%02X", mcs48->timer); break;
-		case CPUINFO_STR_REGISTER + MCS48_P1:					sprintf(info->s, "P1:%02X", mcs48->p1); 	break;
-		case CPUINFO_STR_REGISTER + MCS48_P2:					sprintf(info->s, "P2:%02X", mcs48->p2); 	break;
+		case CPUINFO_STR_REGISTER + MCS48_TC:					sprintf(info->s, "TC:%02X", cpustate->timer); break;
+		case CPUINFO_STR_REGISTER + MCS48_P1:					sprintf(info->s, "P1:%02X", cpustate->p1); 	break;
+		case CPUINFO_STR_REGISTER + MCS48_P2:					sprintf(info->s, "P2:%02X", cpustate->p2); 	break;
 		case CPUINFO_STR_REGISTER + MCS48_R0:					sprintf(info->s, "R0:%02X", R0);		break;
 		case CPUINFO_STR_REGISTER + MCS48_R1:					sprintf(info->s, "R1:%02X", R1); 		break;
 		case CPUINFO_STR_REGISTER + MCS48_R2:					sprintf(info->s, "R2:%02X", R2); 		break;
@@ -1144,7 +1144,7 @@ static CPU_GET_INFO( mcs48 )
 		case CPUINFO_STR_REGISTER + MCS48_R5:					sprintf(info->s, "R5:%02X", R5); 		break;
 		case CPUINFO_STR_REGISTER + MCS48_R6:					sprintf(info->s, "R6:%02X", R6); 		break;
 		case CPUINFO_STR_REGISTER + MCS48_R7:					sprintf(info->s, "R7:%02X", R7); 		break;
-		case CPUINFO_STR_REGISTER + MCS48_EA:					sprintf(info->s, "EA:%02X", mcs48->ea); 	break;
+		case CPUINFO_STR_REGISTER + MCS48_EA:					sprintf(info->s, "EA:%02X", cpustate->ea); 	break;
 	}
 }
 
