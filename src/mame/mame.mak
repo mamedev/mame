@@ -1020,6 +1020,7 @@ $(MAMEOBJ)/namco.a: \
 	$(DRIVERS)/namcos12.o \
 	$(DRIVERS)/namcos2.o $(MACHINE)/namcos2.o $(VIDEO)/namcos2.o \
 	$(DRIVERS)/namcos21.o $(VIDEO)/namcos21.o \
+	$(DRIVERS)/gal3.o \
 	$(DRIVERS)/namcos22.o $(VIDEO)/namcos22.o \
 	$(DRIVERS)/namcos23.o \
 	$(DRIVERS)/namcos86.o $(VIDEO)/namcos86.o \

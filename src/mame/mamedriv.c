@@ -837,6 +837,9 @@ const game_driver * const drivers[] =
 	DRIVER( cybsled )	/* (c) 1993 */
 	DRIVER( cybsledj )	/* (c) 1993 */
 
+	/* Galaxian 3 HW */
+	DRIVER( gal3 )
+
 	/* Namco System 22 games */
 	DRIVER( ridgerac )	/* (c) 1993 */
 	DRIVER( ridgerab )	/* (c) 1993 */

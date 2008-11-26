@@ -1496,6 +1496,7 @@ src/mame/drivers/gaelco.c svneol=native#text/plain
 src/mame/drivers/gaelco2.c svneol=native#text/plain
 src/mame/drivers/gaelco3d.c svneol=native#text/plain
 src/mame/drivers/gaiden.c svneol=native#text/plain
+src/mame/drivers/gal3.c svneol=native#text/plain
 src/mame/drivers/galaga.c svneol=native#text/plain
 src/mame/drivers/galastrm.c svneol=native#text/plain
 src/mame/drivers/galaxi.c svneol=native#text/plain
