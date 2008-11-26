@@ -83,28 +83,28 @@ extern unsigned dasm_hyperstone(char *buffer, unsigned pc, const UINT8 *oprom, u
 
 /* Memory access */
 /* read byte */
-#define READ_B(addr)           memory_read_byte(hyperstone.program, (addr))
+#define READ_B(H,addr)         memory_read_byte((H)->program, (addr))
 /* read half-word */
-#define READ_HW(addr)          memory_read_word(hyperstone.program, (addr) & ~1)
+#define READ_HW(H,addr)        memory_read_word((H)->program, (addr) & ~1)
 /* read word */
-#define READ_W(addr)           memory_read_dword(hyperstone.program, (addr) & ~3)
+#define READ_W(H,addr)         memory_read_dword((H)->program, (addr) & ~3)
 
 /* write byte */
-#define WRITE_B(addr, data)    memory_write_byte(hyperstone.program, addr, data)
+#define WRITE_B(H,addr, data)  memory_write_byte((H)->program, addr, data)
 /* write half-word */
-#define WRITE_HW(addr, data)   memory_write_word(hyperstone.program, (addr) & ~1, data)
+#define WRITE_HW(H,addr, data) memory_write_word((H)->program, (addr) & ~1, data)
 /* write word */
-#define WRITE_W(addr, data)    memory_write_dword(hyperstone.program, (addr) & ~3, data)
+#define WRITE_W(H,addr, data)  memory_write_dword((H)->program, (addr) & ~3, data)
 
 
 /* I/O access */
 /* read word */
-#define IO_READ_W(addr)        memory_read_dword(hyperstone.io, ((addr) >> 11) & 0x7ffc)
+#define IO_READ_W(H,addr)      memory_read_dword((H)->io, ((addr) >> 11) & 0x7ffc)
 /* write word */
-#define IO_WRITE_W(addr, data) memory_write_dword(hyperstone.io, ((addr) >> 11) & 0x7ffc, data)
+#define IO_WRITE_W(H,addr, data) memory_write_dword((H)->io, ((addr) >> 11) & 0x7ffc, data)
 
 
-#define READ_OP(addr)	       memory_decrypted_read_word(hyperstone.program, (addr) ^ hyperstone.opcodexor)
+#define READ_OP(H,addr)	       memory_decrypted_read_word((H)->program, (addr) ^ (H)->opcodexor)
 
 
 /* Registers Number */
