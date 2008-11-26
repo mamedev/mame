@@ -1366,38 +1366,11 @@ void spc700_set_irq_callback(cpu_irq_callback callback)
 /* Save the current CPU state to disk */
 void spc700_state_save(void *file)
 {
-#if 0
-	int cpu = cpunum_get_active();
-	uint p = GET_REG_P();
-	state_save_UINT16(file,"spc700",cpu,"PC",&REG_PC,2);
-	state_save_UINT16(file,"spc700",cpu,"PPC",&REG_PPC,2);
-	state_save_UINT8(file,"spc700",cpu,"SP",&REG_SP,1);
-	state_save_UINT8(file,"spc700",cpu,"P",&p,1);
-	state_save_UINT8(file,"spc700",cpu,"A",&REG_A,1);
-	state_save_UINT8(file,"spc700",cpu,"X",&REG_X,1);
-	state_save_UINT8(file,"spc700",cpu,"Y",&REG_Y,1);
-	state_save_UINT8(file,"spc700",cpu,"IRQ",&LINE_IRQ,1);
-	state_save_UINT8(file,"spc700",cpu,"NMI",&LINE_NMI,1);
-#endif
 }
 
 /* Load a CPU state from disk */
 void spc700_state_load(void *file)
 {
-#if 0
-	int cpu = cpunum_get_active();
-	uint p;
-	state_load_UINT16(file,"spc700",cpu,"PC",&REG_PC,2);
-	state_load_UINT16(file,"spc700",cpu,"PPC",&REG_PPC,2);
-	state_load_UINT8(file,"spc700",cpu,"SP",&REG_SP,1);
-	state_load_UINT8(file,"spc700",cpu,"P",&p,1);
-	state_load_UINT8(file,"spc700",cpu,"A",&REG_A,1);
-	state_load_UINT8(file,"spc700",cpu,"X",&REG_X,1);
-	state_load_UINT8(file,"spc700",cpu,"Y",&REG_Y,1);
-	state_load_UINT8(file,"spc700",cpu,"IRQ",&LINE_IRQ,1);
-	state_load_UINT8(file,"spc700",cpu,"NMI",&LINE_NMI,1);
-	SET_REG_P(p);
-#endif
 }
 
 

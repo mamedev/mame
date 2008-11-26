@@ -9,12 +9,12 @@
 
 static void illegal(void)
 {
-	logerror("uPD7810 #%d: illegal opcode %02x at PC:%04x\n", cpunum_get_active(), OP, PC);
+	logerror("uPD7810 '%s': illegal opcode %02x at PC:%04x\n", upd7810.device->tag, OP, PC);
 }
 
 static void illegal2(void)
 {
-	logerror("uPD7810 #%d: illegal opcode %02x %02x at PC:%04x\n", cpunum_get_active(), OP, OP2, PC);
+	logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", upd7810.device->tag, OP, OP2, PC);
 }
 
 /* prefix 48 */
@@ -8648,7 +8648,7 @@ static void SKN_bit(void)
 			val = RP( UPD7807_PORTT );
 			break;
 		default:
-			logerror("uPD7810 #%d: illegal opcode %02x %02x at PC:%04x\n", cpunum_get_active(), OP, imm, PC);
+			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", upd7810.device->tag, OP, imm, PC);
 			val = 0;
 			break;
 	}
@@ -8702,7 +8702,7 @@ static void SETB(void)
 //          PT is input only
 //          break;
 		default:
-			logerror("uPD7810 #%d: illegal opcode %02x %02x at PC:%04x\n", cpunum_get_active(), OP, imm, PC);
+			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", upd7810.device->tag, OP, imm, PC);
 			break;
 	}
 }
@@ -8752,7 +8752,7 @@ static void CLR(void)
 //          PT is input only
 //          break;
 		default:
-			logerror("uPD7810 #%d: illegal opcode %02x %02x at PC:%04x\n", cpunum_get_active(), OP, imm, PC);
+			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", upd7810.device->tag, OP, imm, PC);
 			break;
 	}
 }
@@ -8801,7 +8801,7 @@ static void SK_bit(void)
 			val = RP( UPD7807_PORTT );
 			break;
 		default:
-			logerror("uPD7810 #%d: illegal opcode %02x %02x at PC:%04x\n", cpunum_get_active(), OP, imm, PC);
+			logerror("uPD7810 '%s': illegal opcode %02x %02x at PC:%04x\n", upd7810.device->tag, OP, imm, PC);
 			val = 0;
 			break;
 	}

@@ -3389,7 +3389,7 @@ static CPU_SET_INFO( sh2 )
 		case CPUINFO_INT_REGISTER + SH2_R15:			sh2->r[15] = info->i;					break;
 		case CPUINFO_INT_REGISTER + SH2_EA:				sh2->ea = info->i;						break;
 
-		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(cpunum_get_active(), info->i); break;
+		case CPUINFO_INT_SH2_FRT_INPUT:					sh2_set_frt_input(device, info->i); break;
 
 		/* --- the following bits of info are set as pointers to data or functions --- */
 		case CPUINFO_PTR_SH2_FTCSR_READ_CALLBACK:		sh2->ftcsr_read_callback = (void (*) (UINT32 ))info->f; break;

@@ -138,8 +138,8 @@ void sh4_default_exception_priorities(void); // setup default priorities for exc
 void sh4_parse_configuration(const struct sh4_config *conf);
 void sh4_dma_ddt(struct sh4_ddt_dma *s);
 void sh4_set_irq_line(int irqline, int state); // set state of external interrupt line
-void sh4_set_frt_input(int cpunum, int state);
-void sh4_set_irln_input(int cpunum, int value);
+void sh4_set_frt_input(const device_config *device, int state);
+void sh4_set_irln_input(const device_config *device, int value);
 #ifdef LSB_FIRST
 void sh4_swap_fp_couples(void);
 #endif

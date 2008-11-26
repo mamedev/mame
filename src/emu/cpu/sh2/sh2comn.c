@@ -363,7 +363,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		{
 			INT32 a = sh2->m[0x41];
 			INT32 b = sh2->m[0x40];
-			LOG(("SH2 #%d div+mod %d/%d\n", cpunum_get_active(), a, b));
+			LOG(("SH2 '%s' div+mod %d/%d\n", sh2->device->tag, a, b));
 			if (b)
 			{
 				sh2->m[0x45] = a / b;
@@ -391,7 +391,7 @@ WRITE32_HANDLER( sh2_internal_w )
 		{
 			INT64 a = sh2->m[0x45] | ((UINT64)(sh2->m[0x44]) << 32);
 			INT64 b = (INT32)sh2->m[0x40];
-			LOG(("SH2 #%d div+mod %lld/%lld\n", cpunum_get_active(), a, b));
+			LOG(("SH2 '%s' div+mod %lld/%lld\n", sh2->device->tag, a, b));
 			if (b)
 			{
 				INT64 q = a / b;
@@ -503,16 +503,16 @@ READ32_HANDLER( sh2_internal_r )
 	return sh2->m[offset];
 }
 
-void sh2_set_frt_input(int cpunum, int state)
+void sh2_set_frt_input(const device_config *device, int state)
 {
 	if(state == PULSE_LINE)
 	{
-		sh2_set_frt_input(cpunum, ASSERT_LINE);
-		sh2_set_frt_input(cpunum, CLEAR_LINE);
+		sh2_set_frt_input(device, ASSERT_LINE);
+		sh2_set_frt_input(device, CLEAR_LINE);
 		return;
 	}
 
-	cpu_push_context(Machine->cpu[cpunum]);
+	cpu_push_context(device);
 
 	if(sh2->frt_input == state) {
 		cpu_pop_context();
@@ -551,11 +551,11 @@ void sh2_set_irq_line(int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 #%d cleared nmi\n", cpunum_get_active()));
+			LOG(("SH-2 '%s' cleared nmi\n", sh2->device->tag));
 		}
 		else
 		{
-			LOG(("SH-2 #%d assert nmi\n", cpunum_get_active()));
+			LOG(("SH-2 '%s' assert nmi\n", sh2->device->tag));
 
 			sh2_exception("Set IRQ line", 16);
 
@@ -572,12 +572,12 @@ void sh2_set_irq_line(int irqline, int state)
 
 		if( state == CLEAR_LINE )
 		{
-			LOG(("SH-2 #%d cleared irq #%d\n", cpunum_get_active(), irqline));
+			LOG(("SH-2 '%s' cleared irq #%d\n", sh2->device->tag, irqline));
 			sh2->pending_irq &= ~(1 << irqline);
 		}
 		else
 		{
-			LOG(("SH-2 #%d assert irq #%d\n", cpunum_get_active(), irqline));
+			LOG(("SH-2 '%s' assert irq #%d\n", sh2->device->tag, irqline));
 			sh2->pending_irq |= 1 << irqline;
 			#ifdef USE_SH2DRC
 			sh2->test_irq = 1;
@@ -648,27 +648,27 @@ void sh2_exception(const char *message, int irqline)
 		if (sh2->internal_irq_level == irqline)
 		{
 			vector = sh2->internal_irq_vector;
-			LOG(("SH-2 #%d exception #%d (internal vector: $%x) after [%s]\n", cpunum_get_active(), irqline, vector, message));
+			LOG(("SH-2 '%s' exception #%d (internal vector: $%x) after [%s]\n", sh2->device->tag, irqline, vector, message));
 		}
 		else
 		{
 			if(sh2->m[0x38] & 0x00010000)
 			{
 				vector = sh2->irq_callback(sh2->device, irqline);
-				LOG(("SH-2 #%d exception #%d (external vector: $%x) after [%s]\n", cpunum_get_active(), irqline, vector, message));
+				LOG(("SH-2 '%s' exception #%d (external vector: $%x) after [%s]\n", sh2->device->tag, irqline, vector, message));
 			}
 			else
 			{
 				sh2->irq_callback(sh2->device, irqline);
 				vector = 64 + irqline/2;
-				LOG(("SH-2 #%d exception #%d (autovector: $%x) after [%s]\n", cpunum_get_active(), irqline, vector, message));
+				LOG(("SH-2 '%s' exception #%d (autovector: $%x) after [%s]\n", sh2->device->tag, irqline, vector, message));
 			}
 		}
 	}
 	else
 	{
 		vector = 11;
-		LOG(("SH-2 #%d nmi exception (autovector: $%x) after [%s]\n", cpunum_get_active(), vector, message));
+		LOG(("SH-2 '%s' nmi exception (autovector: $%x) after [%s]\n", sh2->device->tag, vector, message));
 	}
 
 	#ifdef USE_SH2DRC

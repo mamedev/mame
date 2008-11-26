@@ -385,7 +385,7 @@ void tms7000_set_irq_line(int irqline, int state)
 	{	/* check for transition */
 		tms7000.irq_state[irqline] = state;
 
-		LOG(("tms7000: (cpu #%d) set_irq_line (INT%d, state %d)\n", cpunum_get_active(), irqline+1, state));
+		LOG(("tms7000: (cpu '%s') set_irq_line (INT%d, state %d)\n", tms7000.device->tag, irqline+1, state));
 
 		if (state == CLEAR_LINE)
 		{

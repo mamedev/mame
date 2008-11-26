@@ -177,7 +177,7 @@ TIMER_CALLBACK( sh2_dmac_callback );
 void sh2_common_init(int alloc, const device_config *device, int index, int clock, cpu_irq_callback irqcallback);
 void sh2_recalc_irq(void);
 void sh2_set_irq_line(int irqline, int state);
-void sh2_set_frt_input(int cpunum, int state);
+void sh2_set_frt_input(const device_config *device, int state);
 void sh2_exception(const char *message, int irqline);
 
 #endif /* __SH2COMN_H__ */
