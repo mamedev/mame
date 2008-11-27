@@ -351,7 +351,7 @@ INLINE void set_irq(int type)
             IRQ_REQ = type;
             break;
         case Z8000_SYSCALL >> 8:
-            LOG(("Z8K#%d SYSCALL $%02x\n", cpunum_get_active(), type & 0xff));
+            LOG(("Z8K '%s' SYSCALL $%02x\n", Z.device->tag, type & 0xff));
             IRQ_REQ = type;
             break;
         default:
@@ -389,7 +389,7 @@ INLINE void Interrupt(void)
         IRQ_SRV = IRQ_REQ;
         IRQ_REQ &= ~Z8000_TRAP;
         PC = TRAP;
-        LOG(("Z8K#%d trap $%04x\n", cpunum_get_active(), PC ));
+        LOG(("Z8K '%s' trap $%04x\n", Z.device->tag, PC ));
    }
    else
    if ( IRQ_REQ & Z8000_SYSCALL )
@@ -401,7 +401,7 @@ INLINE void Interrupt(void)
         IRQ_SRV = IRQ_REQ;
         IRQ_REQ &= ~Z8000_SYSCALL;
         PC = SYSCALL;
-        LOG(("Z8K#%d syscall $%04x\n", cpunum_get_active(), PC ));
+        LOG(("Z8K '%s' syscall $%04x\n", Z.device->tag, PC ));
    }
    else
    if ( IRQ_REQ & Z8000_SEGTRAP )
@@ -413,7 +413,7 @@ INLINE void Interrupt(void)
         IRQ_SRV = IRQ_REQ;
         IRQ_REQ &= ~Z8000_SEGTRAP;
         PC = SEGTRAP;
-        LOG(("Z8K#%d segtrap $%04x\n", cpunum_get_active(), PC ));
+        LOG(("Z8K '%s' segtrap $%04x\n", Z.device->tag, PC ));
    }
    else
    if ( IRQ_REQ & Z8000_NMI )
@@ -428,7 +428,7 @@ INLINE void Interrupt(void)
         IRQ_REQ &= ~Z8000_NMI;
         CHANGE_FCW(fcw);
         PC = NMI;
-        LOG(("Z8K#%d NMI $%04x\n", cpunum_get_active(), PC ));
+        LOG(("Z8K '%s' NMI $%04x\n", Z.device->tag, PC ));
     }
     else
     if ( (IRQ_REQ & Z8000_NVI) && (FCW & F_NVIE) )
@@ -442,7 +442,7 @@ INLINE void Interrupt(void)
         PC = RDMEM_W( NVI + 2 );
         IRQ_REQ &= ~Z8000_NVI;
         CHANGE_FCW(fcw);
-        LOG(("Z8K#%d NVI $%04x\n", cpunum_get_active(), PC ));
+        LOG(("Z8K '%s' NVI $%04x\n", Z.device->tag, PC ));
     }
     else
     if ( (IRQ_REQ & Z8000_VI) && (FCW & F_VIE) )
@@ -456,7 +456,7 @@ INLINE void Interrupt(void)
         PC = RDMEM_W( VEC00 + 2 * (IRQ_REQ & 0xff) );
         IRQ_REQ &= ~Z8000_VI;
         CHANGE_FCW(fcw);
-        LOG(("Z8K#%d VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", cpunum_get_active(), IRQ_VEC, VEC00 + VEC00 + 2 * (IRQ_REQ & 0xff), FCW, PC ));
+        LOG(("Z8K '%s' VI [$%04x/$%04x] fcw $%04x, pc $%04x\n", Z.device->tag, IRQ_VEC, VEC00 + VEC00 + 2 * (IRQ_REQ & 0xff), FCW, PC ));
     }
 }
 

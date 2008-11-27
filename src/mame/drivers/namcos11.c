@@ -281,7 +281,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		logerror( "%02x:%08x: %s", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), buf );
+		logerror( "'%s':%08x: %s", Machine->activecpu->tag, safe_cpu_get_pc(Machine->activecpu), buf );
 	}
 }
 

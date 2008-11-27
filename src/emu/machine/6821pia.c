@@ -263,7 +263,7 @@ static UINT8 get_in_a_value(running_machine *machine, int which)
 
 			if (!p->logged_port_a_not_connected && (p->ddr_a != 0xff))
 			{
-				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port A read handler. Assuming pins 0x%02X not connected\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, p->ddr_a ^ 0xff);
+				logerror("PIA #%d: Warning! No port A read handler. Assuming pins 0x%02X not connected\n", which, p->ddr_a ^ 0xff);
 				p->logged_port_a_not_connected = TRUE;
 			}
 		}
@@ -305,7 +305,7 @@ static UINT8 get_in_b_value(running_machine *machine, int which)
 			{
 				if (!p->logged_port_b_not_connected && (p->ddr_b != 0xff))
 				{
-					logerror("cpu #%d (PC=%08X): PIA #%d: Error! No port B read handler. Three-state pins 0x%02X are undefined\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, p->ddr_b ^ 0xff);
+					logerror("PIA #%d: Error! No port B read handler. Three-state pins 0x%02X are undefined\n", which, p->ddr_b ^ 0xff);
 					p->logged_port_b_not_connected = TRUE;
 				}
 
@@ -378,7 +378,7 @@ static void set_out_ca2(running_machine *machine, int which, int data)
 		else
 		{
 			if (p->out_ca2_needs_pulled)
-				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port CA2 write handler. Previous value has been lost!\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which);
+				logerror("PIA #%d: Warning! No port CA2 write handler. Previous value has been lost!\n", which);
 
 			p->out_ca2_needs_pulled = TRUE;
 		}
@@ -405,7 +405,7 @@ static void set_out_cb2(running_machine *machine, int which, int data)
 		else
 		{
 			if (p->out_cb2_needs_pulled)
-				logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port CB2 write handler. Previous value has been lost!\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which);
+				logerror("PIA #%d: Warning! No port CB2 write handler. Previous value has been lost!\n", which);
 
 			p->out_cb2_needs_pulled = TRUE;
 		}
@@ -442,7 +442,7 @@ static UINT8 port_a_r(running_machine *machine, int which)
 			set_out_ca2(machine, which, TRUE);
 	}
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: port A read = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, ret));
+	LOG(("PIA #%d: port A read = %02X\n", which, ret));
 
 	return ret;
 }
@@ -454,7 +454,7 @@ static UINT8 ddr_a_r(running_machine *machine, int which)
 
 	UINT8 ret = p->ddr_a;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A read = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, ret));
+	LOG(("PIA #%d: DDR A read = %02X\n", which, ret));
 
 	return ret;
 }
@@ -478,7 +478,7 @@ static UINT8 port_b_r(running_machine *machine, int which)
 	p->irq_b2 = FALSE;
 	update_interrupts(machine, p);
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: port B read = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, ret));
+	LOG(("PIA #%d: port B read = %02X\n", which, ret));
 
 	return ret;
 }
@@ -490,7 +490,7 @@ static UINT8 ddr_b_r(running_machine *machine, int which)
 
 	UINT8 ret = p->ddr_b;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B read = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, ret));
+	LOG(("PIA #%d: DDR B read = %02X\n", which, ret));
 
 	return ret;
 }
@@ -508,7 +508,7 @@ static UINT8 control_a_r(running_machine *machine, int which)
 		pia_set_input_ca1(which, p->intf->in_ca1_func(space, 0));
 	else if (!p->logged_ca1_not_connected && (!p->in_ca1_pushed))
 	{
-		logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No CA1 read handler. Assuming pin not connected\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which);
+		logerror("PIA #%d: Warning! No CA1 read handler. Assuming pin not connected\n", which);
 		p->logged_ca1_not_connected = TRUE;
 	}
 
@@ -516,7 +516,7 @@ static UINT8 control_a_r(running_machine *machine, int which)
 		pia_set_input_ca2(which, p->intf->in_ca2_func(space, 0));
 	else if ( !p->logged_ca2_not_connected && C2_INPUT(p->ctl_a) && !p->in_ca2_pushed)
 	{
-		logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No CA2 read handler. Assuming pin not connected\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which);
+		logerror("PIA #%d: Warning! No CA2 read handler. Assuming pin not connected\n", which);
 		p->logged_ca2_not_connected = TRUE;
 	}
 
@@ -530,7 +530,7 @@ static UINT8 control_a_r(running_machine *machine, int which)
 	if (p->irq_a2 && C2_INPUT(p->ctl_a))
 		ret |= PIA_IRQ2;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: control A read = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, ret));
+	LOG(("PIA #%d: control A read = %02X\n", which, ret));
 
 	return ret;
 }
@@ -548,7 +548,7 @@ static UINT8 control_b_r(running_machine *machine, int which)
 		pia_set_input_cb1(which, p->intf->in_cb1_func(space, 0));
 	else if (!p->logged_cb1_not_connected && !p->in_cb1_pushed)
 	{
-		logerror("cpu #%d (PC=%08X): PIA #%d: Error! no CB1 read handler. Three-state pin is undefined\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which);
+		logerror("PIA #%d: Error! no CB1 read handler. Three-state pin is undefined\n", which);
 		p->logged_cb1_not_connected = TRUE;
 	}
 
@@ -556,7 +556,7 @@ static UINT8 control_b_r(running_machine *machine, int which)
 		pia_set_input_cb2(which, p->intf->in_cb2_func(space, 0));
 	else if (!p->logged_cb2_not_connected && C2_INPUT(p->ctl_b) && !p->in_cb2_pushed)
 	{
-		logerror("cpu #%d (PC=%08X): PIA #%d: Error! No CB2 read handler. Three-state pin is undefined\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which);
+		logerror("PIA #%d: Error! No CB2 read handler. Three-state pin is undefined\n", which);
 		p->logged_cb2_not_connected = TRUE;
 	}
 
@@ -570,7 +570,7 @@ static UINT8 control_b_r(running_machine *machine, int which)
 	if (p->irq_b2 && C2_INPUT(p->ctl_b))
 		ret |= PIA_IRQ2;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: control B read = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, ret));
+	LOG(("PIA #%d: control B read = %02X\n", which, ret));
 
 	return ret;
 }
@@ -641,14 +641,14 @@ static void send_to_out_a_func(running_machine *machine, int which, const char* 
 	/* input pins are pulled high */
 	UINT8 data = get_out_a_value(machine, which);
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: %s = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, message, data));
+	LOG(("PIA #%d: %s = %02X\n", which, message, data));
 
 	if (p->intf->out_a_func)
 		p->intf->out_a_func(space, 0, data);
 	else
 	{
 		if (p->out_a_needs_pulled)
-			logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port A write handler. Previous value has been lost!\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which);
+			logerror("PIA #%d: Warning! No port A write handler. Previous value has been lost!\n", which);
 
 		p->out_a_needs_pulled = TRUE;
 	}
@@ -664,14 +664,14 @@ static void send_to_out_b_func(running_machine *machine, int which, const char* 
 	/* input pins are high-impedance - we just send them as zeros for backwards compatibility */
 	UINT8 data = get_out_b_value(which);
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: %s = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, message, data));
+	LOG(("PIA #%d: %s = %02X\n", which, message, data));
 
 	if (p->intf->out_b_func)
 		p->intf->out_b_func(space, 0, data);
 	else
 	{
 		if (p->out_b_needs_pulled)
-			logerror("cpu #%d (PC=%08X): PIA #%d: Warning! No port B write handler. Previous value has been lost!\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which);
+			logerror("PIA #%d: Warning! No port B write handler. Previous value has been lost!\n", which);
 
 		p->out_b_needs_pulled = TRUE;
 	}
@@ -694,11 +694,11 @@ static void ddr_a_w(running_machine *machine, int which, UINT8 data)
 	pia6821 *p = &pias[which];
 
 	if (data == 0x00)
-		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (input mode)\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, data));
+		LOG(("PIA #%d: DDR A write = %02X (input mode)\n", which, data));
 	else if (data == 0xff)
-		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (output mode)\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, data));
+		LOG(("PIA #%d: DDR A write = %02X (output mode)\n", which, data));
 	else
-		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR A write = %02X (mixed mode)\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, data));
+		LOG(("PIA #%d: DDR A write = %02X (mixed mode)\n", which, data));
 
 	if (p->ddr_a != data)
 	{
@@ -737,11 +737,11 @@ static void ddr_b_w(running_machine *machine, int which, UINT8 data)
 	pia6821 *p = &pias[which];
 
 	if (data == 0x00)
-		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (input mode)\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, data));
+		LOG(("PIA #%d: DDR B write = %02X (input mode)\n", which, data));
 	else if (data == 0xff)
-		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (output mode)\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, data));
+		LOG(("PIA #%d: DDR B write = %02X (output mode)\n", which, data));
 	else
-		LOG(("cpu #%d (PC=%08X): PIA #%d: DDR B write = %02X (mixed mode)\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, data));
+		LOG(("PIA #%d: DDR B write = %02X (mixed mode)\n", which, data));
 
 	if (p->ddr_b != data)
 	{
@@ -760,7 +760,7 @@ static void control_a_w(running_machine *machine, int which, UINT8 data)
 	/* bit 7 and 6 are read only */
 	data &= 0x3f;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: control A write = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, data));
+	LOG(("PIA #%d: control A write = %02X\n", which, data));
 
 	/* update the control register */
 	p->ctl_a = data;
@@ -793,7 +793,7 @@ static void control_b_w(running_machine *machine, int which, UINT8 data)
 	/* bit 7 and 6 are read only */
 	data &= 0x3f;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: control B write = %02X\n", cpunum_get_active(), safe_cpu_get_pc(machine->activecpu), which, data));
+	LOG(("PIA #%d: control B write = %02X\n", which, data));
 
 	/* update the control register */
 	p->ctl_b = data;
@@ -879,7 +879,7 @@ void pia_set_input_a(int which, UINT8 data, UINT8 z_mask)
 
 	assert_always(p->intf->in_a_func == NULL, "pia_set_input_a() called when in_a_func implemented");
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: set input port A = %02X\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which, data));
+	LOG(("PIA #%d: set input port A = %02X\n", which, data));
 
 	p->in_a = data;
 	p->port_a_z_mask = z_mask;
@@ -919,13 +919,13 @@ void pia_set_input_ca1(int which, int data)
 	/* limit the data to 0 or 1 */
 	data = data ? TRUE : FALSE;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: set input CA1 = %d\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which, data));
+	LOG(("PIA #%d: set input CA1 = %d\n", which, data));
 
 	/* the new state has caused a transition */
 	if ((p->in_ca1 != data) &&
 		((data && C1_LOW_TO_HIGH(p->ctl_a)) || (!data && C1_HIGH_TO_LOW(p->ctl_a))))
 	{
-		LOG(("cpu #%d (PC=%08X): PIA #%d: CA1 triggering\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which));
+		LOG(("PIA #%d: CA1 triggering\n", which));
 
 		/* mark the IRQ */
 		p->irq_a1 = TRUE;
@@ -966,14 +966,14 @@ void pia_set_input_ca2(int which, int data)
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: set input CA2 = %d\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which, data));
+	LOG(("PIA #%d: set input CA2 = %d\n", which, data));
 
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_a) &&
 		(p->in_ca2 != data) &&
 		((data && C2_LOW_TO_HIGH(p->ctl_a)) || (!data && C2_HIGH_TO_LOW(p->ctl_a))))
 	{
-		LOG(("cpu #%d (PC=%08X): PIA #%d: CA2 triggering\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which));
+		LOG(("PIA #%d: CA2 triggering\n", which));
 
 		/* mark the IRQ */
 		p->irq_a2 = TRUE;
@@ -1032,7 +1032,7 @@ void pia_set_input_b(int which, UINT8 data)
 
 	assert_always(p->intf->in_b_func == NULL, "pia_set_input_b() called when in_b_func implemented");
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: set input port B = %02X\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which, data));
+	LOG(("PIA #%d: set input port B = %02X\n", which, data));
 
 	p->in_b = data;
 	p->in_b_pushed = TRUE;
@@ -1072,13 +1072,13 @@ void pia_set_input_cb1(int which, int data)
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: set input CB1 = %d\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which, data));
+	LOG(("PIA #%d: set input CB1 = %d\n", which, data));
 
 	/* the new state has caused a transition */
 	if ((p->in_cb1 != data) &&
 		((data && C1_LOW_TO_HIGH(p->ctl_b)) || (!data && C1_HIGH_TO_LOW(p->ctl_b))))
 	{
-		LOG(("cpu #%d (PC=%08X): PIA #%d: CB1 triggering\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which));
+		LOG(("PIA #%d: CB1 triggering\n", which));
 
 		/* mark the IRQ */
 		p->irq_b1 = 1;
@@ -1120,14 +1120,14 @@ void pia_set_input_cb2(int which, int data)
 	/* limit the data to 0 or 1 */
 	data = data ? 1 : 0;
 
-	LOG(("cpu #%d (PC=%08X): PIA #%d: set input CB2 = %d\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which, data));
+	LOG(("PIA #%d: set input CB2 = %d\n", which, data));
 
 	/* if input mode and the new state has caused a transition */
 	if (C2_INPUT(p->ctl_b) &&
 		(p->in_cb2 != data) &&
 		((data && C2_LOW_TO_HIGH(p->ctl_b)) || (!data && C2_HIGH_TO_LOW(p->ctl_b))))
 	{
-		LOG(("cpu #%d (PC=%08X): PIA #%d: CB2 triggering\n", cpunum_get_active(), safe_cpu_get_pc(Machine->activecpu), which));
+		LOG(("PIA #%d: CB2 triggering\n", which));
 
 		/* mark the IRQ */
 		p->irq_b2 = 1;

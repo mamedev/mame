@@ -422,7 +422,7 @@ static READ8_HANDLER( ddragon_spriteram_r )
 
 static WRITE8_HANDLER( ddragon_spriteram_w )
 {
-	if (cpunum_get_active() == 1 && offset == 0)
+	if (space->cpu == space->machine->cpu[1] && offset == 0)
 		dd_sub_cpu_busy = 1;
 
 	ddragon_spriteram[offset] = data;

@@ -267,7 +267,7 @@ void z180_setOPbase(int pc)
  * RETN
  ***************************************************************/
 #define RETN	{												\
-	LOG(("Z180 #%d RETN IFF1:%d IFF2:%d\n", cpunum_get_active(), _IFF1, _IFF2)); \
+	LOG(("Z180 '%s' RETN IFF1:%d IFF2:%d\n", Z180.device->tag, _IFF1, _IFF2)); \
 	POP(PC);													\
 	_IFF1 = _IFF2;												\
 }

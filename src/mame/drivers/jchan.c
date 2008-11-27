@@ -286,7 +286,7 @@ JCHAN_MCU_COM_W(3)
 
 static READ16_HANDLER( jchan_mcu_status_r )
 {
-	logerror("cpu #%d (PC=%06X): read mcu status\n", cpunum_get_active(), cpu_get_previouspc(space->cpu));
+	logerror("cpu '%s' (PC=%06X): read mcu status\n", space->cpu->tag, cpu_get_previouspc(space->cpu));
 	return 0;
 }
 

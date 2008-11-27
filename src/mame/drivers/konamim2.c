@@ -317,7 +317,7 @@ static WRITE64_HANDLER(unk4_w)
 	{
 		if (data & 0x800000)
 		{
-			mame_printf_debug("CPU%d: CPU1 IRQ at %08X\n", cpunum_get_active(), cpu_get_pc(space->cpu));
+			mame_printf_debug("CPU '%s': CPU1 IRQ at %08X\n", space->cpu->tag, cpu_get_pc(space->cpu));
 			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_IRQ0, ASSERT_LINE);
 		}
 
@@ -1075,7 +1075,7 @@ static READ64_HANDLER(cpu_r)
 
 	if (ACCESSING_BITS_32_63)
 	{
-		r = (UINT64)(cpunum_get_active() ? 0x80000000 : 0);
+		r = (UINT64)((space->machine->activecpu != space->machine->cpu[0]) ? 0x80000000 : 0);
 		//r |= 0x40000000;  // sets Video-LowRes !?
 		return r << 32;
 	}

@@ -39,7 +39,6 @@ struct _h83xx_state
 
 	emu_timer *timer[5];
 
-	int cpu_number;
 	int mode_8bit;
 };
 extern h83xx_state h8;

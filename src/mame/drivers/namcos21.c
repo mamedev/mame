@@ -607,7 +607,7 @@ static WRITE16_HANDLER( dspram16_w )
 		}
 		else if( namcos2_gametype == NAMCOS21_SOLVALOU &&
 					offset == 0x103 &&
-					cpunum_get_active()==0 )
+					space->cpu == space->machine->cpu[0] )
 		{ /* hack; synchronization for solvalou */
 			cpu_yield(space->cpu);
 		}
@@ -967,8 +967,8 @@ static WRITE16_HANDLER( pointram_control_w )
 
 	/* pointram_control&0x20 : bank for depthcue data */
 /*
-    logerror( "dsp_control_w:%x:%x[%x]:=%04x ",
-            cpunum_get_active(),
+    logerror( "dsp_control_w:'%s':%x[%x]:=%04x ",
+            space->cpu->tag,
             cpu_get_pc(space->cpu),
             offset,
             pointram_control );

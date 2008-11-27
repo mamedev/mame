@@ -599,7 +599,7 @@ void mame_schedule_soft_reset(running_machine *machine)
 	mame_pause(machine, FALSE);
 
 	/* if we're executing, abort out immediately */
-	if (cpunum_get_active() >= 0)
+	if (machine->activecpu != NULL)
 		cpu_eat_cycles(machine->activecpu, 1000000000);
 }
 
@@ -616,7 +616,7 @@ void mame_schedule_new_driver(running_machine *machine, const game_driver *drive
 	mame->new_driver_pending = driver;
 
 	/* if we're executing, abort out immediately */
-	if (cpunum_get_active() >= 0)
+	if (machine->activecpu != NULL)
 		cpu_eat_cycles(machine->activecpu, 1000000000);
 }
 

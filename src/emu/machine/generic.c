@@ -615,9 +615,7 @@ void cpu_interrupt_enable(int cpunum, int enabled)
 
 WRITE8_HANDLER( interrupt_enable_w )
 {
-	int activecpu = cpunum_get_active();
-	assert_always(activecpu >= 0, "interrupt_enable_w() called with no active cpu!");
-	cpu_interrupt_enable(activecpu, data);
+	cpu_interrupt_enable(cpu_get_index(space->cpu), data);
 }
 
 
@@ -628,9 +626,7 @@ WRITE8_HANDLER( interrupt_enable_w )
 
 READ8_HANDLER( interrupt_enable_r )
 {
-	int activecpu = cpunum_get_active();
-	assert_always(activecpu >= 0, "interrupt_enable_r() called with no active cpu!");
-	return interrupt_enable[activecpu];
+	return interrupt_enable[cpu_get_index(space->cpu)];
 }
 
 

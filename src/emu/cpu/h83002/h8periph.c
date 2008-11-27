@@ -97,7 +97,7 @@ static void h8_itu_refresh_timer(h83xx_state *h8, int tnum)
 	ourTCR = h8->per_regs[tcr[tnum]];
 	ourTVAL = h8->h8TCNT[tnum];
 
-	period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(h8->device->machine->cpu[h8->cpu_number])), tscales[ourTCR & 3] * (65536 - ourTVAL));
+	period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(h8->device)), tscales[ourTCR & 3] * (65536 - ourTVAL));
 
 	if (ourTCR & 4)
 	{
@@ -116,7 +116,7 @@ static void h8_itu_sync_timers(h83xx_state *h8, int tnum)
 	ourTCR = h8->per_regs[tcr[tnum]];
 
 	// get the time per unit
-	cycle_time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(h8->device->machine->cpu[h8->cpu_number])), tscales[ourTCR & 3]);
+	cycle_time = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(h8->device)), tscales[ourTCR & 3]);
 	cur = timer_timeelapsed(h8->timer[tnum]);
 
 	ratio = attotime_to_double(cur) / attotime_to_double(cycle_time);
@@ -454,7 +454,7 @@ static void h8_3007_itu_refresh_timer(h83xx_state *h8, int tnum)
 	attotime period;
 	int ourTCR = h8->per_regs[0x68+(tnum*8)];
 
-	period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(h8->device->machine->cpu[h8->cpu_number])), tscales[ourTCR & 3]);
+	period = attotime_mul(ATTOTIME_IN_HZ(cpu_get_clock(h8->device)), tscales[ourTCR & 3]);
 
 	if (ourTCR & 4)
 	{
@@ -746,7 +746,7 @@ UINT8 h8_3007_register1_read8(h83xx_state *h8, UINT32 address)
 		case 0xfee018:	return h8->per_regs[0xF8];	// IPRA
 	}
 
-	logerror("cpu #%d (PC=%08X): unmapped I/O(1) byte read from %08X\n",cpunum_get_active(),cpu_get_pc(h8->device->machine->activecpu),address);
+	logerror("cpu '%s' (PC=%08X): unmapped I/O(1) byte read from %08X\n",h8->device->tag,cpu_get_pc(h8->device->machine->activecpu),address);
 	return 0;
 }
 
@@ -758,7 +758,7 @@ void h8_3007_register1_write8(h83xx_state *h8, UINT32 address, UINT8 val)
 		case 0xfee016:	h8_ISR_w(h8, val);	  	return;	// ISR
 		case 0xfee018:	h8->per_regs[0xF8] = val;	return;	// IPRA
 	}
-	logerror("cpu #%d (PC=%08X): unmapped I/O(1) byte write to %08X = %02X\n",cpunum_get_active(),cpu_get_pc(h8->device->machine->activecpu),address,val);
+	logerror("cpu '%s' (PC=%08X): unmapped I/O(1) byte write to %08X = %02X\n",h8->device->tag,cpu_get_pc(h8->device->machine->activecpu),address,val);
 }
 
 void h8_3007_itu_init(h83xx_state *h8)
@@ -779,8 +779,6 @@ void h8_itu_init(h83xx_state *h8)
 	h8->timer[4] = timer_alloc(h8->device->machine, h8itu_timer_4_cb, h8);
 
 	h8_itu_reset(h8);
-
-	h8->cpu_number = cpunum_get_active();
 }
 
 void h8_itu_reset(h83xx_state *h8)

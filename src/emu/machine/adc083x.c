@@ -21,7 +21,7 @@ INLINE void ATTR_PRINTF(2,3) verboselog( int n_level, const char *s_fmt, ... )
 		va_start( v, s_fmt );
 		vsprintf( buf, s_fmt, v );
 		va_end( v );
-		if( cpunum_get_active() != -1 )
+		if( Machine->activecpu != NULL )
 		{
 			logerror( "%08x: %s", cpu_get_pc(Machine->activecpu), buf );
 		}

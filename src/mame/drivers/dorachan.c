@@ -31,7 +31,7 @@ static CUSTOM_INPUT( dorachan_protection_r )
 {
 	UINT8 ret = 0;
 
-	if ((cpunum_get_active() >= 0))
+	if (field->port->machine->activecpu != NULL)
 	{
 		switch (cpu_get_previouspc(field->port->machine->activecpu))
 		{

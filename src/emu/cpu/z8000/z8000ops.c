@@ -1530,7 +1530,7 @@ static void Z0D_ddN0_1001_imm16(void)
 static void Z0E_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: ext0e  $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: ext0e  $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -1544,7 +1544,7 @@ static void Z0E_imm8(void)
 static void Z0F_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: ext0f  $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: ext0f  $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -2272,7 +2272,7 @@ static void Z36_0000_0000(void)
 static void Z36_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd36 $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: rsvd36 $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -2310,7 +2310,7 @@ static void Z37_ddN0_ssss_imm16(void)
 static void Z38_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd38 $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: rsvd38 $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -4347,7 +4347,7 @@ static void Z77_ddN0_ssss_0000_xxxx_0000_0000(void)
 static void Z78_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd78 $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: rsvd78 $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -4404,7 +4404,7 @@ static void Z7B_0000_0000(void)
 	PC	= POPW( SP );	/* get PC   */
     IRQ_SRV &= ~tag;    /* remove IRQ serviced flag */
 	CHANGE_FCW(fcw);		 /* check for user/system mode change */
-	LOG(("Z8K#%d IRET tag $%04x, fcw $%04x, pc $%04x\n", cpunum_get_active(), tag, fcw, PC));
+	LOG(("Z8K '%s' IRET tag $%04x, fcw $%04x, pc $%04x\n", Z.device->tag, tag, fcw, PC));
 }
 
 /******************************************
@@ -4489,7 +4489,7 @@ static void Z7D_dddd_0ccc(void)
 			RW(dst) = NSP;
 			break;
 		default:
-			LOG(("Z8K#%d LDCTL R%d,%d\n", cpunum_get_active(), dst, imm3));
+			LOG(("Z8K '%s' LDCTL R%d,%d\n", Z.device->tag, dst, imm3));
     }
 }
 
@@ -4519,7 +4519,7 @@ static void Z7D_ssss_1ccc(void)
 			NSP = RW(src);
 			break;
 		default:
-			LOG(("Z8K#%d LDCTL %d,R%d\n", cpunum_get_active(), imm3, src));
+			LOG(("Z8K '%s' LDCTL %d,R%d\n", Z.device->tag, imm3, src));
     }
 }
 
@@ -4530,7 +4530,7 @@ static void Z7D_ssss_1ccc(void)
 static void Z7E_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd7e $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: rsvd7e $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -4826,7 +4826,7 @@ static void Z8D_imm4_0101(void)
 static void Z8E_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: ext8e  $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: ext8e  $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -4840,7 +4840,7 @@ static void Z8E_imm8(void)
 static void Z8F_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: ext8f  $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: ext8f  $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -4998,7 +4998,7 @@ static void Z9C_dddd_1000(void)
 static void Z9D_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd9d $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: rsvd9d $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -5039,7 +5039,7 @@ static void Z9E_0000_cccc(void)
 static void Z9F_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvd9f $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: rsvd9f $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -5740,7 +5740,7 @@ static void ZB8_ddN0_1100_0000_rrrr_ssN0_0000(void)
 static void ZB9_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvdb9 $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: rsvdb9 $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;
@@ -6398,7 +6398,7 @@ static void ZBE_aaaa_bbbb(void)
 static void ZBF_imm8(void)
 {
 	GET_IMM8(0);
-	LOG(("Z8K#%d %04x: rsvdbf $%02x\n", cpunum_get_active(), PC, imm8));
+	LOG(("Z8K '%s' %04x: rsvdbf $%02x\n", Z.device->tag, PC, imm8));
     if (FCW & F_EPU) {
 		/* Z8001 EPU code goes here */
 		(void)imm8;

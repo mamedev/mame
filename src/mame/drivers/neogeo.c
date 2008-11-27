@@ -592,7 +592,7 @@ static CUSTOM_INPUT( get_audio_result )
 {
 	UINT32 ret = audio_result;
 
-//  if (LOG_CPU_COMM && (cpunum_get_active() >= 0)) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(machine->activecpu), ret);
+//  if (LOG_CPU_COMM && (field->port->machine->activecpu != NULL)) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field->port->machine->activecpu), ret);
 
 	return ret;
 }

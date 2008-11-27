@@ -1081,7 +1081,7 @@ static void registers_update(debug_view *view)
 	const device_config *screen = Machine->primary_screen;
 
 	/* cannot update if no active CPU */
-	if (cpunum_get_active() < 0)
+	if (Machine->activecpu != NULL)
 		return;
 	total_cycles = cpu_get_total_cycles(Machine->activecpu);
 
@@ -1465,7 +1465,7 @@ static void disasm_generate_bytes(offs_t pcbyte, int numbytes, const cpu_debug_d
     for the disassembly view
 -------------------------------------------------*/
 
-static int disasm_recompute(debug_view *view, offs_t pc, int startline, int lines, int original_cpunum)
+static int disasm_recompute(debug_view *view, offs_t pc, int startline, int lines)
 {
 	debug_view_disasm *dasmdata = view->extra_data;
 	const cpu_debug_data *cpuinfo = cpu_get_debug_data(Machine->cpu[dasmdata->cpunum]);
@@ -1622,7 +1622,6 @@ static void disasm_update(debug_view *view)
 	offs_t pc = cpu_get_reg(Machine->cpu[dasmdata->cpunum], REG_PC);
 	offs_t pcbyte = ADDR2BYTE_MASKED(pc, cpuinfo, ADDRESS_SPACE_PROGRAM);
 	debug_view_char *dest = view->viewdata;
-	int original_cpunum = cpunum_get_active();
 	int recomputed_this_time = FALSE;
 	EXPRERR exprerr;
 	UINT32 row;
@@ -1701,7 +1700,7 @@ recompute:
 			view->left_col = 0;
 
 			/* recompute from where we last recomputed! */
-			disasm_recompute(view, BYTE2ADDR(dasmdata->address[0], cpuinfo, ADDRESS_SPACE_PROGRAM), 0, view->total_rows, original_cpunum);
+			disasm_recompute(view, BYTE2ADDR(dasmdata->address[0], cpuinfo, ADDRESS_SPACE_PROGRAM), 0, view->total_rows);
 		}
 		else
 		{
@@ -1709,7 +1708,7 @@ recompute:
 			view->top_row = 0;
 			view->left_col = 0;
 
-			disasm_recompute(view, backpc, 0, view->total_rows, original_cpunum);
+			disasm_recompute(view, backpc, 0, view->total_rows);
 		}
 		recomputed_this_time = TRUE;
 	}
@@ -1726,7 +1725,7 @@ recompute:
 			if (pcbyte == dasmdata->address[effrow])
 			{
 				/* see if we changed */
-				int changed = disasm_recompute(view, pc, effrow, 1, original_cpunum);
+				int changed = disasm_recompute(view, pc, effrow, 1);
 				if (changed && !recomputed_this_time)
 				{
 					dasmdata->recompute = TRUE;
