@@ -208,8 +208,8 @@ static int leland_vram_port_r(const address_space *space, int offset, int num)
 			break;
 
 		default:
-			logerror("CPU #%d %04x Warning: Unknown video port %02x read (address=%04x)\n",
-						cpunum_get_active(),cpu_get_pc(space->machine->activecpu), offset, addr);
+			logerror("CPU %s %04x Warning: Unknown video port %02x read (address=%04x)\n",
+						space->cpu->tag, cpu_get_pc(space->machine->activecpu), offset, addr);
 			ret = 0;
 			break;
 	}
@@ -294,8 +294,8 @@ static void leland_vram_port_w(const address_space *space, int offset, int data,
 			break;
 
 		default:
-			logerror("CPU #%d %04x Warning: Unknown video port write (address=%04x value=%02x)\n",
-						cpunum_get_active(),cpu_get_pc(space->machine->activecpu), offset, addr);
+			logerror("CPU %s %04x Warning: Unknown video port write (address=%04x value=%02x)\n",
+						space->cpu->tag, cpu_get_pc(space->machine->activecpu), offset, addr);
 			break;
 	}
 

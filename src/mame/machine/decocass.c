@@ -103,7 +103,7 @@ WRITE8_HANDLER( decocass_coin_counter_w )
 
 WRITE8_HANDLER( decocass_sound_command_w )
 {
-	LOG(2,("CPU #%d sound command -> $%02x\n", cpunum_get_active(), data));
+	LOG(2,("CPU %s sound command -> $%02x\n", space->cpu->tag, data));
 	soundlatch_w(space,0,data);
 	decocass_sound_ack |= 0x80;
 	/* remove snd cpu data ack bit. i don't see it in the schems, but... */
@@ -114,20 +114,20 @@ WRITE8_HANDLER( decocass_sound_command_w )
 READ8_HANDLER( decocass_sound_data_r )
 {
 	UINT8 data = soundlatch2_r(space, 0);
-	LOG(2,("CPU #%d sound data    <- $%02x\n", cpunum_get_active(), data));
+	LOG(2,("CPU %s sound data    <- $%02x\n", space->cpu->tag, data));
 	return data;
 }
 
 READ8_HANDLER( decocass_sound_ack_r )
 {
 	UINT8 data = decocass_sound_ack;	/* D6+D7 */
-	LOG(4,("CPU #%d sound ack     <- $%02x\n", cpunum_get_active(), data));
+	LOG(4,("CPU %s sound ack     <- $%02x\n", space->cpu->tag, data));
 	return data;
 }
 
 WRITE8_HANDLER( decocass_sound_data_w )
 {
-	LOG(2,("CPU #%d sound data    -> $%02x\n", cpunum_get_active(), data));
+	LOG(2,("CPU %s sound data    -> $%02x\n", space->cpu->tag, data));
 	soundlatch2_w(space, 0, data);
 	decocass_sound_ack |= 0x40;
 }
@@ -135,7 +135,7 @@ WRITE8_HANDLER( decocass_sound_data_w )
 READ8_HANDLER( decocass_sound_command_r )
 {
 	UINT8 data = soundlatch_r(space, 0);
-	LOG(4,("CPU #%d sound command <- $%02x\n", cpunum_get_active(), data));
+	LOG(4,("CPU %s sound command <- $%02x\n", space->cpu->tag, data));
 	cpu_set_input_line(space->machine->cpu[1], M6502_IRQ_LINE, CLEAR_LINE);
 	decocass_sound_ack &= ~0x80;
 	return data;
@@ -148,14 +148,14 @@ static TIMER_CALLBACK( decocass_sound_nmi_pulse )
 
 WRITE8_HANDLER( decocass_sound_nmi_enable_w )
 {
-	LOG(2,("CPU #%d sound NMI enb -> $%02x\n", cpunum_get_active(), data));
+	LOG(2,("CPU %s sound NMI enb -> $%02x\n", space->cpu->tag, data));
 	timer_adjust_periodic(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
 }
 
 READ8_HANDLER( decocass_sound_nmi_enable_r )
 {
 	UINT8 data = 0xff;
-	LOG(2,("CPU #%d sound NMI enb <- $%02x\n", cpunum_get_active(), data));
+	LOG(2,("CPU %s sound NMI enb <- $%02x\n", space->cpu->tag, data));
 	timer_adjust_periodic(decocass_sound_timer, ATTOTIME_IN_HZ(256 * 57 / 8 / 2), 0, ATTOTIME_IN_HZ(256 * 57 / 8 / 2));
 	return data;
 }
@@ -163,14 +163,14 @@ READ8_HANDLER( decocass_sound_nmi_enable_r )
 READ8_HANDLER( decocass_sound_data_ack_reset_r )
 {
 	UINT8 data = 0xff;
-	LOG(2,("CPU #%d sound ack rst <- $%02x\n", cpunum_get_active(), data));
+	LOG(2,("CPU %s sound ack rst <- $%02x\n", space->cpu->tag, data));
 	decocass_sound_ack &= ~0x40;
 	return data;
 }
 
 WRITE8_HANDLER( decocass_sound_data_ack_reset_w )
 {
-	LOG(2,("CPU #%d sound ack rst -> $%02x\n", cpunum_get_active(), data));
+	LOG(2,("CPU %s sound ack rst -> $%02x\n", space->cpu->tag, data));
 	decocass_sound_ack &= ~0x40;
 }
 
