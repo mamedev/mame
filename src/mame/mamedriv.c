@@ -8202,12 +8202,7 @@ Other Sun games
 	DRIVER( potnpkrd )	/* Bootleg */
 	DRIVER( potnpkre )	/* Bootleg */
 	DRIVER( goodluck )	/* Unknown */
-	DRIVER( bsuerte )	/* Unknown */
-	DRIVER( bsuertea )	/* Unknown */
 	DRIVER( royale )	/* Unknown */
-	DRIVER( witchcrd )	/* 1991, Unknown */
-	DRIVER( witchcda )	/* 1991, Unknown */
-	DRIVER( witchcdb )	/* 1991, Unknown */
 	DRIVER( sloco93 )	/* 1993, Unknown */
 	DRIVER( sloco93a )	/* 1993, Unknown */
 

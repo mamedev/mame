@@ -362,26 +362,26 @@
 *******************************************************************************
 
 
-    Buttons/Inputs   goldnpkr goldnpkb  pmpoker  bsuerte goodluck pottnpkr potnpkra potnpkrc potnpkrb
+    Buttons/Inputs   goldnpkr goldnpkb  pmpoker  goodluck pottnpkr potnpkra potnpkrc potnpkrb
     -------------------------------------------------------------------------------------------------
 
-    HOLD (5 buttons)  mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    CANCEL            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    BIG               mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    SMALL             mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    DOUBLE UP         mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    TAKE SCORE        mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    DEAL/DRAW         mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    BET               mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+    HOLD (5 buttons)  mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+    CANCEL            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+    BIG               mapped   mapped   mapped    ----     ----     ----     ----     ----
+    SMALL             mapped   mapped   mapped    ----     ----     ----     ----     ----
+    DOUBLE UP         mapped   mapped   mapped    ----     ----     ----     ----     ----
+    TAKE SCORE        mapped   mapped   mapped    ----     ----     ----     ----     ----
+    DEAL/DRAW         mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+    BET               mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
 
-    Coin 1 (coins)    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    Coin 2 (notes)    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   fixed 1c-1c
-    Coin 3 (coupons)  mapped   mapped   mapped   mapped    ----     ----     ----     ----     ----
-    Payout            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    Manual Collect    mapped   mapped   mapped    ----    mapped   mapped   mapped   mapped   mapped
+    Coin 1 (coins)    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+    Coin 2 (notes)    mapped   mapped   mapped   mapped   mapped   mapped   mapped   fixed 1c-1c
+    Coin 3 (coupons)  mapped   mapped   mapped    ----     ----     ----     ----     ----
+    Payout            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+    Manual Collect    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
 
-    LEARN/SETTINGS    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
-    METERS            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+    LEARN/SETTINGS    mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
+    METERS            mapped   mapped   mapped   mapped   mapped   mapped   mapped   mapped
 
 
     Inputs are different for some games. Normally each button has only one function.
@@ -697,9 +697,9 @@ static WRITE8_HANDLER( mux_port_w )
     L3 = Hold5
     L4 = Hold2 & Hold4
 
-    -----------------------
-    goldnpkr sets & bsuerte
-    -----------------------
+    -------------
+    goldnpkr sets
+    -------------
     L0 = Bet
     L1 = Deal
     L2 = Holds (all)
@@ -713,9 +713,9 @@ static WRITE8_HANDLER( mux_port_w )
     L1 = Deal
     L2 = Holds (all)
 
-    ------------------
-    witchcrd & sloco93
-    ------------------
+    -------
+    sloco93
+    -------
     NONE. Just lack of lamps...
 
 */
@@ -737,7 +737,7 @@ static WRITE8_HANDLER( lamps_a_w )
     bit 6 = Coin counter
     bit 7 = Note counter (only goldnpkr use it)
 
-    ONLY for witchcrd and sloco93 sets:
+    ONLY for sloco93 sets:
 
     bit3 = Coin counter (inverted).
     bit5 = Coin out (inverted).
@@ -919,67 +919,6 @@ static INPUT_PORTS_START( goldnpkr )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( bsuerte )
-	/* Multiplexed - 4x5bits */
-	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Apostar (Bet)") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Contabilidad (Meters)") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Doblar (Double Up)") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Dar/Virar (Deal/Draw)") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cancelar (Cancel)") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Pagar (Payout)") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Cobrar (Take)") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Mayor (Big)") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Menor (Small)") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Configuracion (settings)") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Billetes (Note In)")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Fichas (Coin In)")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )   PORT_NAME("Cupones (Coupon In)")
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("SW1")
-	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x10, 0x00, "Jotas o Mejores" )	PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "Modo de Pago" )		PORT_DIPLOCATION("SW1:3")	/* left as 'auto' */
-	PORT_DIPSETTING(    0x40, "Manual" )
-	PORT_DIPSETTING(    0x00, "Auto" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( goodluck )
 	/* Multiplexed - 4x5bits */
@@ -1252,68 +1191,6 @@ static INPUT_PORTS_START( potnpkrc )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( witchcrd )
-	/* Multiplexed - 4x5bits */
-	PORT_START("IN0-0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_NAME("Bet") PORT_CODE(KEYCODE_1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Meters") PORT_CODE(KEYCODE_9)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_NAME("Double Up") PORT_CODE(KEYCODE_3)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_NAME("Deal/Draw") PORT_CODE(KEYCODE_2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Cancel") PORT_CODE(KEYCODE_N)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN0-1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON13 ) PORT_IMPULSE(3) PORT_NAME("Out (Manual Collect)") PORT_CODE(KEYCODE_Q)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON14 ) PORT_NAME("Off (Payout)") PORT_CODE(KEYCODE_W)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON10 ) PORT_NAME("Take") PORT_CODE(KEYCODE_4)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON11 ) PORT_NAME("Big") PORT_CODE(KEYCODE_A)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON12 ) PORT_NAME("Small") PORT_CODE(KEYCODE_S)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN0-2")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold1") PORT_CODE(KEYCODE_Z)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold2") PORT_CODE(KEYCODE_X)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold3") PORT_CODE(KEYCODE_C)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold5") PORT_CODE(KEYCODE_B)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("IN0-3")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Learn Mode") PORT_CODE(KEYCODE_F2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("D-31") PORT_CODE(KEYCODE_E)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Note In")
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-	PORT_START("SW1")
-	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x10, 0x00, "Jacks or Better" )		PORT_DIPLOCATION("SW1:1")
-	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
-	PORT_DIPNAME( 0x20, 0x00, "Won Credits Counter" )	PORT_DIPLOCATION("SW1:2")
-	PORT_DIPSETTING(    0x20, "Show" )
-	PORT_DIPSETTING(    0x00, "Hide" )
-	PORT_DIPNAME( 0x40, 0x00, "Payout Mode" )			PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x40, "Manual" )
-	PORT_DIPSETTING(    0x00, "Auto" )
-	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Coinage ) )		PORT_DIPLOCATION("SW1:4")
-	/* Note In is always 1 Note - 10 Credits */
-	PORT_DIPSETTING(    0x00, "1 Coin - 1 Credit / 1 Note - 10 Credits" )
-	PORT_DIPSETTING(    0x80, "1 Coin - 5 Credits / 1 Note - 10 Credits" )
-INPUT_PORTS_END
 
 static INPUT_PORTS_START( sloco93 )
 	/* Multiplexed - 4x5bits */
@@ -1963,40 +1840,6 @@ ROM_START( goodluck )
 	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
-ROM_START( bsuerte )
-	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "ups39_12a.bin",	0x0000, 0x8000, CRC(e6b661b7) SHA1(b265f6814a168034d24bc1c25f67ece131281bc2) )
-
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
-	ROM_FILL(				0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "u38.bin",	0x2000, 0x1000, CRC(0a159dfa) SHA1(0a9c8e6177b36831b365917a10042aac3383983d) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( bsuertea )
-	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "x10d4esp.16c",	0x0000, 0x8000, CRC(0606bab4) SHA1(624b0cef1a23a4e7ba2d2d256f30f73b1e455fa7) )
-
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
-	ROM_FILL(				0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "u38.bin",	0x2000, 0x1000, CRC(0a159dfa) SHA1(0a9c8e6177b36831b365917a10042aac3383983d) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
 ROM_START( royale )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "royalex.bin",	0x4000, 0x4000, CRC(ef370617) SHA1(0fc5679e9787aeea3bc592b36efcaa20e859f912) )
@@ -2014,56 +1857,6 @@ ROM_START( royale )
 	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
-ROM_START( witchcrd )
-	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "wc_sbruj.256",	0x0000, 0x8000, CRC(5689ae41) SHA1(c7a624ec881204137489b147ce66cc9a9900650a) )
-
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
-	ROM_FILL(					0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "bs_4_wc.032",	0x2000, 0x1000, CRC(41924d13) SHA1(8ab69b6efdc20858960fa5df669470ba90b5f8d7) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( witchcda )
-	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "w_card.256",	0x0000, 0x8000, CRC(104218a4) SHA1(191e198f5443afc80a0e1bba3ccaad4e744b15e0) )
-
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
-	ROM_FILL(					0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "bs_4_wc.032",	0x2000, 0x1000, CRC(41924d13) SHA1(8ab69b6efdc20858960fa5df669470ba90b5f8d7) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
-
-ROM_START( witchcdb )
-	ROM_REGION( 0x10000, "main", 0 )
-	ROM_LOAD( "w_card.128",	0x4000, 0x4000, CRC(620ac5ca) SHA1(69275683780c65a83ee6dcef3bd14ac02f4929a0) )
-
-	ROM_REGION( 0x3000, "gfx1", ROMREGION_DISPOSE )
-	ROM_FILL(					0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
-	ROM_LOAD( "bs_4_wc.032",	0x2000, 0x1000, CRC(41924d13) SHA1(8ab69b6efdc20858960fa5df669470ba90b5f8d7) )    /* text layer */
-
-	ROM_REGION( 0x3000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "7.bin",	0x0000, 0x1000, CRC(28ecfaea) SHA1(19d73ed0fdb5a873447b46e250ad6e71abe257cd) )    /* cards deck gfx, bitplane1 */
-	ROM_LOAD( "6.bin",	0x1000, 0x1000, CRC(eeec8862) SHA1(ae03aba1bd43c3ffd140f76770fc1c8cf89ea115) )    /* cards deck gfx, bitplane2 */
-	ROM_LOAD( "5.bin",	0x2000, 0x1000, CRC(2712f297) SHA1(d3cc1469d07c3febbbe4a645cd6bdb57e09cf504) )    /* cards deck gfx, bitplane3 */
-
-	ROM_REGION( 0x0100, "proms", 0 )
-	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
-ROM_END
 
 ROM_START( sloco93 )
 	ROM_REGION( 0x10000, "main", 0 )
@@ -2135,13 +1928,8 @@ static DRIVER_INIT( pmpoker )
 
     newname    oldname    gameplay  music      settings    testmode
     ===================================================================
-    bsuerte    --------   normal    minimal    only 1-10   matrix/grill
-    bsuertea   --------   normal    minimal    only 1-10   matrix/grill
     goodluck   --------   fast      y.doodle   normal      matrix/grill
     royale     --------
-    witchcrd   --------   normal    y.doodle   12-param    only grid
-    witchcda   --------   fast      y.doodle   12-param    only grid
-    witchcdb   --------   normal    y.doodle   12-param    only grid
     sloco93    --------   fast      custom     complete    only grid
     sloco93a   --------   fast      custom     complete    only grid
 
@@ -2175,11 +1963,6 @@ GAMEL( 198?, potnpkrc, pottnpkr, pottnpkr, potnpkrc, pmpoker,  ROT0,   "Bootleg"
 GAMEL( 198?, potnpkrd, pottnpkr, pottnpkr, potnpkrc, pmpoker,  ROT0,   "Bootleg",                   "Jack Potten's Poker (set 5)",       0,                       layout_pottnpkr )
 GAMEL( 198?, potnpkre, pottnpkr, pottnpkr, pottnpkr, pmpoker,  ROT0,   "Bootleg",                   "Jack Potten's Poker (set 6)",       0,                       layout_pottnpkr )
 GAMEL( 198?, goodluck, 0,        witchcrd, goodluck, pmpoker,  ROT0,   "Unknown",                   "Good Luck",                         0,                       layout_pottnpkr )
-GAMEL( 198?, bsuerte,  0,        witchcrd, bsuerte,  pmpoker,  ROT0,   "Unknown",                   "Buena Suerte (spanish, set 1)",     0,                       layout_goldnpkr )
-GAMEL( 198?, bsuertea, bsuerte,  witchcrd, bsuerte,  pmpoker,  ROT0,   "Unknown",                   "Buena Suerte (spanish, set 2)",     0,                       layout_goldnpkr )
 GAMEL( 198?, royale,   0,        pmpoker,  royale,   royale,   ROT0,   "Unknown",                   "Royale (ver.X)",                    GAME_NOT_WORKING,        layout_goldnpkr )
-GAME(  1991, witchcrd, 0,        witchcrd, witchcrd, pmpoker,  ROT0,   "Unknown",                   "Witch Card (english)",              0 )
-GAME(  1991, witchcda, witchcrd, witchcrd, witchcrd, pmpoker,  ROT0,   "Unknown",                   "Witch Card (spanish, set 1)",       0 )
-GAME(  1991, witchcdb, witchcrd, witchcrd, witchcrd, pmpoker,  ROT0,   "Unknown",                   "Witch Card (spanish, set 2)",       0 )
 GAME(  1993, sloco93,  0,        sloco93,  sloco93,  pmpoker,  ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 1)",    0 )
 GAME(  1993, sloco93a, sloco93,  sloco93,  sloco93,  pmpoker,  ROT0,   "Unknown",                   "Super Loco 93 (spanish, set 2)",    0 )
