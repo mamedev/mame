@@ -20,7 +20,7 @@ struct _f3853_config
     void (*interrupt_request)(UINT16 addr, int level);
 };
 
-void f3853_init(running_machine *machine, const f3853_config *config);
+void f3853_init(const f3853_config *config);
 CPU_RESET( f3853 );
 
 // ports 0x0c - 0x0f
