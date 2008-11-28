@@ -2550,7 +2550,7 @@ SCU register[40] is for IRQ masking.
 
 /* to do, update bios idle skips so they work better with this arrangement.. */
 
-static emu_timer *vblank_in_timer,*scan_timer,*t1_timer;
+static emu_timer *vblank_out_timer,*scan_timer,*t1_timer;
 static int h_sync,v_sync;
 static int cur_scan;
 
@@ -2558,13 +2558,13 @@ static int cur_scan;
 timer_0 = 0; \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: VBlank-OUT Vector 0x41 Level 0x0e\n");*/ \
-	cpu_set_input_line_and_vector(device->machine->cpu[0], 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
+	cpu_set_input_line_and_vector(machine->cpu[0], 0xe, (stv_irq.vblank_out) ? HOLD_LINE : CLEAR_LINE , 0x41); \
 } \
 
 #define VBLANK_IN_IRQ \
 { \
 	/*if(LOG_IRQ) logerror ("Interrupt: VBlank IN Vector 0x40 Level 0x0f\n");*/ \
-	cpu_set_input_line_and_vector(machine->cpu[0], 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
+	cpu_set_input_line_and_vector(device->machine->cpu[0], 0xf, (stv_irq.vblank_in) ? HOLD_LINE : CLEAR_LINE , 0x40); \
 } \
 
 #define HBLANK_IN_IRQ \
@@ -2644,22 +2644,22 @@ static TIMER_CALLBACK( vdp1_irq )
 	VDP1_IRQ;
 }
 
-static TIMER_CALLBACK( vblank_in_irq )
+static TIMER_CALLBACK( vblank_out_irq )
 {
-	VBLANK_IN_IRQ;
+	VBLANK_OUT_IRQ;
 }
 
-/*V-Blank-OUT event*/
+/*V-Blank-IN event*/
 static INTERRUPT_GEN( stv_interrupt )
 {
 //  scanline = 0;
 	h_sync = video_screen_get_height(device->machine->primary_screen)/2;//horz
 	v_sync = video_screen_get_width(device->machine->primary_screen)-2;//vert
 
-	VBLANK_OUT_IRQ;
+	VBLANK_IN_IRQ;
 
-	/*Next V-Blank-IN event*/
-	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), 0);
+	/*Next V-Blank-OUT event*/
+	timer_adjust_oneshot(vblank_out_timer,video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), 0);
 	/*Set the first Hblank-IN event*/
 	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 0, h_sync), 0);
 
@@ -2693,8 +2693,8 @@ static MACHINE_RESET( stv )
 	/* set the first scanline 0 timer to go off */
 	scan_timer = timer_alloc(machine, hblank_in_irq, NULL);
 	t1_timer = timer_alloc(machine, timer1_irq,NULL);
-	vblank_in_timer = timer_alloc(machine, vblank_in_irq,NULL);
-	timer_adjust_oneshot(vblank_in_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
+	vblank_out_timer = timer_alloc(machine, vblank_out_irq,NULL);
+	timer_adjust_oneshot(vblank_out_timer,video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, 224, 352), 0);
 }
 
