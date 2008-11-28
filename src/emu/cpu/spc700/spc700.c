@@ -94,57 +94,6 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 #define MAKE_UINT_8(A) ((A)&0xff)
 #define MAKE_UINT_16(A) ((A)&0xffff)
 
-
-
-/* ======================================================================== */
-/* =============================== PROTOTYPES ============================= */
-/* ======================================================================== */
-
-/* CPU Structure */
-typedef struct
-{
-	uint a;		/* Accumulator */
-	uint x;		/* Index Register X */
-	uint y;		/* Index Register Y */
-	uint s;		/* Stack Pointer */
-	uint pc;	/* Program Counter */
-	uint ppc;	/* Previous Program Counter */
-	uint flag_n;	/* Negative Flag */
-	uint flag_z;	/* Zero flag */
-	uint flag_v;	/* Overflow Flag */
-	uint flag_p;	/* Direct Page Flag */
-	uint flag_b;	/* BRK Instruction Flag */
-	uint flag_h;	/* Half-carry Flag */
-	uint flag_i;	/* Interrupt Mask Flag */
-	uint flag_c;	/* Carry Flag */
-	uint line_irq;	/* Status of the IRQ line */
-	uint line_nmi;	/* Status of the NMI line */
-	uint line_rst;	/* Status of the RESET line */
-	uint ir;		/* Instruction Register */
-	cpu_irq_callback int_ack;
-	const device_config *device;
-	const address_space *program;
-	uint stopped;	/* stopped status */
-} spc700i_cpu_struct;
-
-
-
-/* ======================================================================== */
-/* ================================= DATA ================================= */
-/* ======================================================================== */
-
-/* Our CPU structure */
-static spc700i_cpu_struct spc700i_cpu = {0};
-
-static int spc700_ICount = 0;
-
-/* Temporary Variables */
-static uint spc700i_source;
-static uint spc700i_destination;
-static uint spc700i_temp1, spc700i_temp2, spc700i_temp3;
-static short spc_int16;
-static int spc_int32;
-
 /* ======================================================================== */
 /* ============================ GENERAL DEFINES =========================== */
 /* ======================================================================== */
@@ -198,34 +147,34 @@ static int spc_int32;
 #define VECTOR_IRQ	0xfffc				/* IRQ ??? what is real vector? */
 #define VECTOR_NMI	0xfffa				/* NMI ??? what is real vector? */
 
-#define REG_A		spc700i_cpu.a		/* Accumulator */
-#define REG_X		spc700i_cpu.x		/* Index X Register */
-#define REG_Y		spc700i_cpu.y		/* Index Y Register */
-#define REG_S		spc700i_cpu.s		/* Stack Pointer */
-#define REG_PC		spc700i_cpu.pc		/* Program Counter */
-#define REG_PPC		spc700i_cpu.ppc		/* Previous Program Counter */
-#define REG_P		spc700i_cpu.p		/* Processor Status Register */
-#define FLAG_NZ		spc700i_cpu.flag_n = spc700i_cpu.flag_z	/* Negative Flag and inverted Zero flag */
-#define FLAG_N		spc700i_cpu.flag_n	/* Negative flag */
-#define FLAG_Z		spc700i_cpu.flag_z	/* Inverted Zero flag */
-#define FLAG_V		spc700i_cpu.flag_v	/* Overflow Flag */
-#define FLAG_P		spc700i_cpu.flag_p	/* Direct Page Flag */
-#define FLAG_B		spc700i_cpu.flag_b	/* BRK Instruction Flag */
-#define FLAG_H		spc700i_cpu.flag_h	/* Decimal Mode Flag */
-#define FLAG_I		spc700i_cpu.flag_i	/* Interrupt Mask Flag */
-#define FLAG_C		spc700i_cpu.flag_c	/* Carry Flag */
-#define LINE_IRQ	spc700i_cpu.line_irq	/* Status of the IRQ line */
-#define LINE_NMI	spc700i_cpu.line_nmi	/* Status of the NMI line */
-#define REG_IR		spc700i_cpu.ir		/* Instruction Register */
-#define INT_ACK		spc700i_cpu.int_ack	/* Interrupt Acknowledge function pointer */
-#define CLOCKS		spc700_ICount		/* Clock cycles remaining */
-#define CPU_STOPPED	spc700i_cpu.stopped	/* Stopped status */
+#define REG_A		cpustate->a		/* Accumulator */
+#define REG_X		cpustate->x		/* Index X Register */
+#define REG_Y		cpustate->y		/* Index Y Register */
+#define REG_S		cpustate->s		/* Stack Pointer */
+#define REG_PC		cpustate->pc		/* Program Counter */
+#define REG_PPC		cpustate->ppc		/* Previous Program Counter */
+#define REG_P		cpustate->p		/* Processor Status Register */
+#define FLAG_NZ		cpustate->flag_n = cpustate->flag_z	/* Negative Flag and inverted Zero flag */
+#define FLAG_N		cpustate->flag_n	/* Negative flag */
+#define FLAG_Z		cpustate->flag_z	/* Inverted Zero flag */
+#define FLAG_V		cpustate->flag_v	/* Overflow Flag */
+#define FLAG_P		cpustate->flag_p	/* Direct Page Flag */
+#define FLAG_B		cpustate->flag_b	/* BRK Instruction Flag */
+#define FLAG_H		cpustate->flag_h	/* Decimal Mode Flag */
+#define FLAG_I		cpustate->flag_i	/* Interrupt Mask Flag */
+#define FLAG_C		cpustate->flag_c	/* Carry Flag */
+#define LINE_IRQ	cpustate->line_irq	/* Status of the IRQ line */
+#define LINE_NMI	cpustate->line_nmi	/* Status of the NMI line */
+#define REG_IR		cpustate->ir		/* Instruction Register */
+#define INT_ACK		cpustate->int_ack	/* Interrupt Acknowledge function pointer */
+#define CLOCKS		cpustate->ICount    	/* Clock cycles remaining */
+#define CPU_STOPPED	cpustate->stopped	/* Stopped status */
 
-#define SRC			spc700i_source		/* Source Operand */
-#define DST			spc700i_destination	/* Destination Operand */
-#define TMP1			spc700i_temp1		/* temporary result 1 */
-#define TMP2			spc700i_temp2		/* temporary result 2 */
-#define TMP3			spc700i_temp3		/* temporary result 3 */
+#define SRC		cpustate->source	/* Source Operand */
+#define DST		cpustate->destination	/* Destination Operand */
+#define TMP1		cpustate->temp1	/* temporary result 1 */
+#define TMP2		cpustate->temp2	/* temporary result 2 */
+#define TMP3		cpustate->temp3	/* temporary result 3 */
 
 #define STOP_LEVEL_STOP		1
 #define STOP_LEVEL_SLEEP	2
@@ -267,40 +216,40 @@ static int spc_int32;
 
 #define BREAKOUT break
 
-INLINE uint read_8_normal(uint address)
+INLINE uint read_8_normal(spc700i_cpu *cpustate, uint address)
 {
 	address = MAKE_UINT_16(address);
 	return spc700_read_8(address);
 }
 
-INLINE uint read_8_immediate(uint address)
+INLINE uint read_8_immediate(spc700i_cpu *cpustate, uint address)
 {
 	address = MAKE_UINT_16(address);
 	return spc700_read_8_immediate(address);
 }
 
 #ifdef UNUSED_FUNCTION
-INLINE uint read_8_instruction(uint address)
+INLINE uint read_8_instruction(spc700i_cpu *cpustate, uint address)
 {
 	address = MAKE_UINT_16(address);
 	return spc700_read_instruction(address);
 }
 #endif
 
-INLINE uint read_8_direct(uint address)
+INLINE uint read_8_direct(spc700i_cpu *cpustate, uint address)
 {
 	address = MAKE_UINT_8(address) | FLAG_P;
 	return spc700_read_8_direct(address);
 }
 
-INLINE void write_8_normal(uint address, uint value)
+INLINE void write_8_normal(spc700i_cpu *cpustate, uint address, uint value)
 {
 	address = MAKE_UINT_16(address);
 	value = MAKE_UINT_8(value);
 	spc700_write_8(address, value);
 }
 
-INLINE void write_8_direct(uint address, uint value)
+INLINE void write_8_direct(spc700i_cpu *cpustate, uint address, uint value)
 {
 	address = MAKE_UINT_8(address) | FLAG_P;
 	value = MAKE_UINT_8(value);
@@ -308,152 +257,149 @@ INLINE void write_8_direct(uint address, uint value)
 }
 
 
-INLINE uint read_16_normal(uint address)
+INLINE uint read_16_normal(spc700i_cpu *cpustate, uint address)
 {
-	return read_8_normal(address) | (read_8_normal(address+1)<<8);
+	return read_8_normal(cpustate, address) | (read_8_normal(cpustate, address+1)<<8);
 }
 
-INLINE uint read_16_immediate(uint address)
+INLINE uint read_16_immediate(spc700i_cpu *cpustate, uint address)
 {
-	return read_8_immediate(address) | (read_8_immediate(address+1)<<8);
+	return read_8_immediate(cpustate, address) | (read_8_immediate(cpustate, address+1)<<8);
 }
 
-INLINE uint read_16_direct(uint address)
+INLINE uint read_16_direct(spc700i_cpu *cpustate, uint address)
 {
-	return read_8_direct(address) | (read_8_direct(address+1)<<8);
+	return read_8_direct(cpustate, address) | (read_8_direct(cpustate, address+1)<<8);
 }
 
-INLINE void write_16_direct(uint address, uint value)
+INLINE void write_16_direct(spc700i_cpu *cpustate, uint address, uint value)
 {
-	write_8_direct(address, value);
-	write_8_direct(address+1, value>>8);
+	write_8_direct(cpustate, address, value);
+	write_8_direct(cpustate, address+1, value>>8);
 }
 
 /* Low level memory access macros */
-#define read_8_NORM(A)		read_8_normal(A)
-#define read_8_IMM(A)		read_8_immediate(A)
-#define read_8_ABS(A)		read_8_normal(A)
-#define read_8_ABX(A)		read_8_normal(A)
-#define read_8_ABY(A)		read_8_normal(A)
-#define read_8_AXI(A)		read_8_normal(A)
-#define read_8_DP(A)		read_8_direct(A)
-#define read_8_DPX(A)		read_8_direct(A)
-#define read_8_DPY(A)		read_8_direct(A)
-#define read_8_DPI(A)		read_8_normal(A)
-#define read_8_DXI(A)		read_8_normal(A)
-#define read_8_DIY(A)		read_8_normal(A)
-#define read_8_STK(A)		read_8_normal(A)
-#define read_8_XI(A)		read_8_direct(A)
-#define read_8_XII(A)		read_8_direct(A)
-#define read_8_YI(A)		read_8_direct(A)
+#define read_8_NORM(A)		read_8_normal(cpustate, A)
+#define read_8_IMM(A)		read_8_immediate(cpustate, A)
+#define read_8_ABS(A)		read_8_normal(cpustate, A)
+#define read_8_ABX(A)		read_8_normal(cpustate, A)
+#define read_8_ABY(A)		read_8_normal(cpustate, A)
+#define read_8_AXI(A)		read_8_normal(cpustate, A)
+#define read_8_DP(A)		read_8_direct(cpustate, A)
+#define read_8_DPX(A)		read_8_direct(cpustate, A)
+#define read_8_DPY(A)		read_8_direct(cpustate, A)
+#define read_8_DPI(A)		read_8_normal(cpustate, A)
+#define read_8_DXI(A)		read_8_normal(cpustate, A)
+#define read_8_DIY(A)		read_8_normal(cpustate, A)
+#define read_8_STK(A)		read_8_normal(cpustate, A)
+#define read_8_XI(A)		read_8_direct(cpustate, A)
+#define read_8_XII(A)		read_8_direct(cpustate, A)
+#define read_8_YI(A)		read_8_direct(cpustate, A)
 
 
-#define read_16_NORM(A)		read_16_normal(A)
-#define read_16_IMM(A)		read_16_immediate(A)
-#define read_16_ABS(A)		read_16_absolute(A)
-#define read_16_ABX(A)		read_16_normal(A)
-#define read_16_DP(A)		read_16_direct(A)
-#define read_16_DPX(A)		read_16_direct(A)
-#define read_16_DPY(A)		read_16_direct(A)
-#define read_16_DPI(A)		read_16_normal(A)
-#define read_16_VEC(A)		read_16_normal(A)
-#define read_16_XI(A)		read_16_direct(A)
-#define read_16_XII(A)		read_16_direct(A)
-#define read_16_YI(A)		read_16_direct(A)
+#define read_16_NORM(A)		read_16_normal(cpustate, A)
+#define read_16_IMM(A)		read_16_immediate(cpustate, A)
+#define read_16_ABS(A)		read_16_absolute(cpustate, A)
+#define read_16_ABX(A)		read_16_normal(cpustate, A)
+#define read_16_DP(A)		read_16_direct(cpustate, A)
+#define read_16_DPX(A)		read_16_direct(cpustate, A)
+#define read_16_DPY(A)		read_16_direct(cpustate, A)
+#define read_16_DPI(A)		read_16_normal(cpustate, A)
+#define read_16_VEC(A)		read_16_normal(cpustate, A)
+#define read_16_XI(A)		read_16_direct(cpustate, A)
+#define read_16_XII(A)		read_16_direct(cpustate, A)
+#define read_16_YI(A)		read_16_direct(cpustate, A)
 
-#define write_8_NORM(A, V)	write_8_normal(A, V)
-#define write_8_IMM(A, V)	write_8_normal(A, V)
-#define write_8_ABS(A, V)	write_8_normal(A, V)
-#define write_8_ABX(A, V)	write_8_normal(A, V)
-#define write_8_ABY(A, V)	write_8_normal(A, V)
-#define write_8_AXI(A, V)	write_8_normal(A, V)
-#define write_8_DP(A, V)	write_8_direct(A, V)
-#define write_8_DPX(A, V)	write_8_direct(A, V)
-#define write_8_DPY(A, V)	write_8_direct(A, V)
-#define write_8_DPI(A, V)	write_8_normal(A, V)
-#define write_8_DXI(A, V)	write_8_normal(A, V)
-#define write_8_DIY(A, V)	write_8_normal(A, V)
-#define write_8_STK(A, V)	write_8_normal(A, V)
-#define write_8_XI(A, V)	write_8_direct(A, V)
-#define write_8_XII(A, V)	write_8_direct(A, V)
-#define write_8_YI(A, V)	write_8_direct(A, V)
+#define write_8_NORM(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_IMM(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_ABS(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_ABX(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_ABY(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_AXI(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_DP(A, V)	write_8_direct(cpustate, A, V)
+#define write_8_DPX(A, V)	write_8_direct(cpustate, A, V)
+#define write_8_DPY(A, V)	write_8_direct(cpustate, A, V)
+#define write_8_DPI(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_DXI(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_DIY(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_STK(A, V)	write_8_normal(cpustate, A, V)
+#define write_8_XI(A, V)	write_8_direct(cpustate, A, V)
+#define write_8_XII(A, V)	write_8_direct(cpustate, A, V)
+#define write_8_YI(A, V)	write_8_direct(cpustate, A, V)
 
-#define write_16_NORM(A, V)	write_16_normal(A, V)
-#define write_16_ABS(A, V)	write_16_normal(A, V)
-#define write_16_ABX(A, V)	write_16_normal(A, V)
-#define write_16_ABY(A, V)	write_16_normal(A, V)
-#define write_16_AXI(A, V)	write_16_normal(A, V)
-#define write_16_DP(A, V)	write_16_direct(A, V)
-#define write_16_DPX(A, V)	write_16_direct(A, V)
-#define write_16_DPY(A, V)	write_16_direct(A, V)
-#define write_16_DPI(A, V)	write_16_normal(A, V)
-#define write_16_DXI(A, V)	write_16_normal(A, V)
-#define write_16_DIY(A, V)	write_16_normal(A, V)
-#define write_16_STK(A, V)	write_16_normal(A, V)
-#define write_16_XI(A, V)	write_16_direct(A, V)
-#define write_16_XII(A, V)	write_16_direct(A, V)
-#define write_16_YI(A, V)	write_16_direct(A, V)
+#define write_16_NORM(A, V)	write_16_normal(cpustate, A, V)
+#define write_16_ABS(A, V)	write_16_normal(cpustate, A, V)
+#define write_16_ABX(A, V)	write_16_normal(cpustate, A, V)
+#define write_16_ABY(A, V)	write_16_normal(cpustate, A, V)
+#define write_16_AXI(A, V)	write_16_normal(cpustate, A, V)
+#define write_16_DP(A, V)	write_16_direct(cpustate, A, V)
+#define write_16_DPX(A, V)	write_16_direct(cpustate, A, V)
+#define write_16_DPY(A, V)	write_16_direct(cpustate, A, V)
+#define write_16_DPI(A, V)	write_16_normal(cpustate, A, V)
+#define write_16_DXI(A, V)	write_16_normal(cpustate, A, V)
+#define write_16_DIY(A, V)	write_16_normal(cpustate, A, V)
+#define write_16_STK(A, V)	write_16_normal(cpustate, A, V)
+#define write_16_XI(A, V)	write_16_direct(cpustate, A, V)
+#define write_16_XII(A, V)	write_16_direct(cpustate, A, V)
+#define write_16_YI(A, V)	write_16_direct(cpustate, A, V)
 
 
-#define OPER_8_IMM()	read_8_IMM(EA_IMM())
-#define OPER_8_ABS()	read_8_ABS(EA_ABS())
-#define OPER_8_ABX()	read_8_ABX(EA_ABX())
-#define OPER_8_ABY()	read_8_ABY(EA_ABY())
-#define OPER_8_AXI()	read_8_IND(EA_IND())
-#define OPER_8_DP()		read_8_DP(EA_DP())
-#define OPER_8_DPX()	read_8_DPX(EA_DPX())
-#define OPER_8_DPY()	read_8_DPY(EA_DPY())
-#define OPER_8_DPI()	read_8_DPI(EA_DPI())
-#define OPER_8_DXI()	read_8_DXI(EA_DXI())
-#define OPER_8_DIY()	read_8_DIY(EA_DIY())
-#define OPER_8_XI()		read_8_XI(EA_XI())
-#define OPER_8_XII()	read_8_XI(EA_XII())
-#define OPER_8_YI()		read_8_YI(EA_YI())
+#define OPER_8_IMM(cpustate)	read_8_IMM(EA_IMM(cpustate))
+#define OPER_8_ABS(cpustate)	read_8_ABS(EA_ABS(cpustate))
+#define OPER_8_ABX(cpustate)	read_8_ABX(EA_ABX(cpustate))
+#define OPER_8_ABY(cpustate)	read_8_ABY(EA_ABY(cpustate))
+#define OPER_8_AXI(cpustate)	read_8_IND(EA_IND(cpustate))
+#define OPER_8_DP(cpustate)	read_8_DP(EA_DP(cpustate))
+#define OPER_8_DPX(cpustate)	read_8_DPX(EA_DPX(cpustate))
+#define OPER_8_DPY(cpustate)	read_8_DPY(EA_DPY(cpustate))
+#define OPER_8_DPI(cpustate)	read_8_DPI(EA_DPI(cpustate))
+#define OPER_8_DXI(cpustate)	read_8_DXI(EA_DXI(cpustate))
+#define OPER_8_DIY(cpustate)	read_8_DIY(EA_DIY(cpustate))
+#define OPER_8_XI(cpustate)	read_8_XI(EA_XI(cpustate))
+#define OPER_8_XII(cpustate)	read_8_XI(EA_XII(cpustate))
+#define OPER_8_YI(cpustate)	read_8_YI(EA_YI(cpustate))
 
-#define OPER_16_IMM()	read_16_IMM(EA_IMM16())
-#define OPER_16_ABS()	read_16_ABS(EA_ABS())
-#define OPER_16_ABX()	read_16_ABX(EA_ABX())
-#define OPER_16_ABY()	read_16_ABY(EA_ABY())
-#define OPER_16_AXI()	read_16_IND(EA_IND())
-#define OPER_16_DP()	read_16_DP(EA_DP())
-#define OPER_16_DPX()	read_16_DPX(EA_DPX())
-#define OPER_16_DPY()	read_16_DPY(EA_DPY())
-#define OPER_16_DPI()	read_16_DPI(EA_DXI())
-#define OPER_16_DXI()	read_16_DXI(EA_DXI())
-#define OPER_16_DIY()	read_16_DIY(EA_DIY())
-#define OPER_16_XI()	read_16_XI(EA_XI())
-#define OPER_16_XII()	read_16_XI(EA_XII())
-#define OPER_16_YI()	read_16_YI(EA_YI())
+#define OPER_16_IMM(cpustate)	read_16_IMM(EA_IMM16(cpustate))
+#define OPER_16_ABS(cpustate)	read_16_ABS(EA_ABS(cpustate))
+#define OPER_16_ABX(cpustate)	read_16_ABX(EA_ABX(cpustate))
+#define OPER_16_ABY(cpustate)	read_16_ABY(EA_ABY(cpustate))
+#define OPER_16_AXI(cpustate)	read_16_IND(EA_IND(cpustate))
+#define OPER_16_DP(cpustate)	read_16_DP(EA_DP(cpustate))
+#define OPER_16_DPX(cpustate)	read_16_DPX(EA_DPX(cpustate))
+#define OPER_16_DPY(cpustate)	read_16_DPY(EA_DPY(cpustate))
+#define OPER_16_DPI(cpustate)	read_16_DPI(EA_DXI(cpustate))
+#define OPER_16_DXI(cpustate)	read_16_DXI(EA_DXI(cpustate))
+#define OPER_16_DIY(cpustate)	read_16_DIY(EA_DIY(cpustate))
+#define OPER_16_XI(cpustate)	read_16_XI(EA_XI(cpustate))
+#define OPER_16_XII(cpustate)	read_16_XI(EA_XII(cpustate))
+#define OPER_16_YI(cpustate)	read_16_YI(EA_YI(cpustate))
 
 /* Effective Address Caluclations */
-INLINE uint EA_IMM(void)   {return REG_PC++;}
-INLINE uint EA_IMM16(void) {REG_PC += 2; return REG_PC-2;}
-INLINE uint EA_ABS(void)   {return OPER_16_IMM();}
-INLINE uint EA_ABX(void)   {return EA_ABS() + REG_X;}
-INLINE uint EA_ABY(void)   {return EA_ABS() + REG_Y;}
-INLINE uint EA_AXI(void)   {return OPER_16_ABX();}
-INLINE uint EA_DP(void)   {return OPER_8_IMM();}
-INLINE uint EA_DPX(void)   {return (EA_DP() + REG_X)&0xff;}
-INLINE uint EA_DPY(void)   {return (EA_DP() + REG_Y)&0xff;}
-#ifdef UNUSED_FUNCTION
-INLINE uint EA_DPI(void)   {return OPER_16_DP();}
-#endif
-INLINE uint EA_DXI(void)   {return OPER_16_DPX();}
-INLINE uint EA_DIY(void)   {uint addr = OPER_16_DP(); if((addr&0xff00) != ((addr+REG_Y)&0xff00)) CLK(1); return addr + REG_Y;}
-INLINE uint EA_XI(void)    {return REG_X;}
-INLINE uint EA_XII(void)   {uint val = REG_X;REG_X = MAKE_UINT_8(REG_X+1);return val;}
-INLINE uint EA_YI(void)    {return REG_Y;}
+INLINE uint EA_IMM(spc700i_cpu *cpustate)   {return REG_PC++;}
+INLINE uint EA_IMM16(spc700i_cpu *cpustate) {REG_PC += 2; return REG_PC-2;}
+INLINE uint EA_ABS(spc700i_cpu *cpustate)   {return OPER_16_IMM(cpustate);}
+INLINE uint EA_ABX(spc700i_cpu *cpustate)   {return EA_ABS(cpustate) + REG_X;}
+INLINE uint EA_ABY(spc700i_cpu *cpustate)   {return EA_ABS(cpustate) + REG_Y;}
+INLINE uint EA_AXI(spc700i_cpu *cpustate)   {return OPER_16_ABX(cpustate);}
+INLINE uint EA_DP(spc700i_cpu *cpustate)   {return OPER_8_IMM(cpustate);}
+INLINE uint EA_DPX(spc700i_cpu *cpustate)   {return (EA_DP(cpustate) + REG_X)&0xff;}
+INLINE uint EA_DPY(spc700i_cpu *cpustate)   {return (EA_DP(cpustate) + REG_Y)&0xff;}
+INLINE uint EA_DXI(spc700i_cpu *cpustate)   {return OPER_16_DPX(cpustate);}
+INLINE uint EA_DIY(spc700i_cpu *cpustate)   {uint addr = OPER_16_DP(cpustate); if((addr&0xff00) != ((addr+REG_Y)&0xff00)) CLK(1); return addr + REG_Y;}
+INLINE uint EA_XI(spc700i_cpu *cpustate)    {return REG_X;}
+INLINE uint EA_XII(spc700i_cpu *cpustate)   {uint val = REG_X;REG_X = MAKE_UINT_8(REG_X+1);return val;}
+INLINE uint EA_YI(spc700i_cpu *cpustate)    {return REG_Y;}
 
 
 
 /* Change the Program Counter */
-INLINE void JUMP(uint address)
+INLINE void JUMP(spc700i_cpu *cpustate, uint address)
 {
 	REG_PC = address;
 	spc700_jumping(REG_PC);
 }
 
-INLINE void BRANCH(uint offset)
+INLINE void BRANCH(spc700i_cpu *cpustate, uint offset)
 {
 	REG_PC = MAKE_UINT_16(REG_PC + MAKE_INT_8(offset));
 	spc700_branching(REG_PC);
@@ -462,7 +408,7 @@ INLINE void BRANCH(uint offset)
 
 #define GET_REG_YA() (REG_A | (REG_Y<<8))
 
-INLINE void SET_REG_YA(uint value)
+INLINE void SET_REG_YA(spc700i_cpu *cpustate, uint value)
 {
 	REG_A = MAKE_UINT_8(value);
 	REG_Y = MAKE_UINT_8(value>>8);
@@ -500,10 +446,10 @@ INLINE void SET_REG_YA(uint value)
 	((!FLAG_Z) << 1)		|	\
 	CFLAG_AS_1())
 
-INLINE void SET_FLAG_I(uint value);
+INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value);
 
 /* Set the Process Status Register */
-INLINE void SET_REG_P(uint value)
+INLINE void SET_REG_P(spc700i_cpu *cpustate, uint value)
 {
 	FLAG_N = (value & 0x80);
 	FLAG_Z = !(value & 2);
@@ -512,61 +458,48 @@ INLINE void SET_REG_P(uint value)
 	FLAG_B = value & FLAGPOS_B;
 	FLAG_H = value & HFLAG_SET;
 	FLAG_C = value << 8;
-	SET_FLAG_I(value);
+	SET_FLAG_I(cpustate, value);
 }
 
 /* Push/Pull data to/from the stack */
-INLINE void PUSH_8(uint value)
+INLINE void PUSH_8(spc700i_cpu *cpustate, uint value)
 {
 	write_8_STK(REG_S+STACK_PAGE, value);
 	REG_S = MAKE_UINT_8(REG_S - 1);
 }
 
-INLINE uint PULL_8(void)
+INLINE uint PULL_8(spc700i_cpu *cpustate)
 {
 	REG_S = MAKE_UINT_8(REG_S + 1);
 	return read_8_STK(REG_S+STACK_PAGE);
 }
 
-INLINE void PUSH_16(uint value)
+INLINE void PUSH_16(spc700i_cpu *cpustate, uint value)
 {
-	PUSH_8(value>>8);
-	PUSH_8(value);
+	PUSH_8(cpustate, value>>8);
+	PUSH_8(cpustate, value);
 }
 
-INLINE uint PULL_16(void)
+INLINE uint PULL_16(spc700i_cpu *cpustate)
 {
-	uint value = PULL_8();
-	return value | (PULL_8()<<8);
+	uint value = PULL_8(cpustate);
+	return value | (PULL_8(cpustate)<<8);
 }
-
-#ifdef UNUSED_FUNCTION
-INLINE void SERVICE_IRQ(void)
-{
-	CLK(7);
-	PUSH_16(REG_PC);
-	PUSH_8(GET_REG_P_INT());
-	FLAG_I = IFLAG_SET;
-	if(INT_ACK)
-		INT_ACK(spc700i_cpu.device, 0);
-	JUMP(read_16_VEC(VECTOR_IRQ));
-}
-#endif
 
 #if !SPC700_OPTIMIZE_SNES
-INLINE void CHECK_IRQ(void)
+INLINE void CHECK_IRQ(spc700i_cpu *cpustate)
 {
 	if(FLAG_I & LINE_IRQ)
 		SERVICE_IRQ();
 }
-#else
-#define CHECK_IRQ()
 #endif /* SPC700_OPTIMIZE_SNES */
 
-INLINE void SET_FLAG_I(uint value)
+INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 {
 	FLAG_I = value & IFLAG_SET;
-	CHECK_IRQ();
+#if !SPC700_OPTIMIZE_SNES
+	CHECK_IRQ(cpustate);
+#endif
 }
 
 /* ======================================================================== */
@@ -574,64 +507,64 @@ INLINE void SET_FLAG_I(uint value)
 /* ======================================================================== */
 
 #define SUBOP_ADC(A, B)						\
-	spc_int16 = (A) + (B) + CFLAG_AS_1();			\
+	cpustate->spc_int16 = (A) + (B) + CFLAG_AS_1();			\
 	TMP1 = ((A) & 0x0f) + (CFLAG_AS_1());			\
-	FLAG_C  = (spc_int16 > 0xff) ? CFLAG_SET : 0;		\
-	FLAG_V =  (~((A) ^ (B))) & (((A) ^ spc_int16) & 0x80); \
-	FLAG_H = (((spc_int16 & 0x0f) - TMP1) & 0x10) >> 1; 	\
-	FLAG_NZ = (UINT8)spc_int16
+	FLAG_C  = (cpustate->spc_int16 > 0xff) ? CFLAG_SET : 0;		\
+	FLAG_V =  (~((A) ^ (B))) & (((A) ^ cpustate->spc_int16) & 0x80); \
+	FLAG_H = (((cpustate->spc_int16 & 0x0f) - TMP1) & 0x10) >> 1; 	\
+	FLAG_NZ = (UINT8)cpustate->spc_int16
 
 
 /* Add With Carry */
 #define OP_ADC(BCLK, MODE)					\
 			CLK(BCLK);				\
-			SRC     = OPER_8_##MODE();		\
+			SRC     = OPER_8_##MODE(cpustate);		\
 			SUBOP_ADC(SRC, REG_A);			\
-			REG_A = (UINT8)spc_int16;
+			REG_A = (UINT8)cpustate->spc_int16;
 
 
 /* Add With Carry to memory */
 #define OP_ADCM(BCLK, SMODE, DMODE)				\
 			CLK(BCLK);				\
-			SRC     = OPER_8_##SMODE();		\
-			DST     = EA_##DMODE();			\
+			SRC     = OPER_8_##SMODE(cpustate);		\
+			DST     = EA_##DMODE(cpustate);			\
 			SUBOP_ADC(SRC, read_8_##DMODE(DST));	\
-			write_8_##DMODE(DST, (UINT8)spc_int16)
+			write_8_##DMODE(DST, (UINT8)cpustate->spc_int16)
 
 /* Add word */
 #define OP_ADDW(BCLK)						\
 			CLK(BCLK);				\
-			SRC = OPER_16_DP();			\
+			SRC = OPER_16_DP(cpustate);			\
 			DST = GET_REG_YA();			\
 			TMP1 = ((SRC) & 0xff) + ((DST) & 0xff);	\
 			TMP2 = (TMP1 > 0xff) ? 1 : 0;		\
 			TMP3 = ((SRC) >> 8) + ((DST) >> 8) + TMP2;	\
-			spc_int16 = ((TMP1 & 0xff) + (TMP3 << 8)) & 0xffff;	\
+			cpustate->spc_int16 = ((TMP1 & 0xff) + (TMP3 << 8)) & 0xffff;	\
 			FLAG_C = (TMP3 > 0xff) ? CFLAG_SET : 0;	\
 			FLAG_H = ((unsigned) ((((DST) >> 8) & 0x0F) + \
 				(((SRC) >> 8) & 0x0F) + TMP2)) > 0x0F ? HFLAG_SET : 0; \
-			FLAG_V = (~((DST) ^ (SRC)) & ((SRC) ^ (UINT16) spc_int16) & 0x8000) ? VFLAG_SET : 0; \
-			FLAG_Z = (spc_int16 != 0);		\
-			FLAG_N = (spc_int16>>8);		\
-			SET_REG_YA(spc_int16);
+			FLAG_V = (~((DST) ^ (SRC)) & ((SRC) ^ (UINT16) cpustate->spc_int16) & 0x8000) ? VFLAG_SET : 0; \
+			FLAG_Z = (cpustate->spc_int16 != 0);		\
+			FLAG_N = (cpustate->spc_int16>>8);		\
+			SET_REG_YA(cpustate, cpustate->spc_int16);
 
 /* Logical AND with accumulator */
 #define OP_AND(BCLK, MODE)													\
 			CLK(BCLK);														\
-			FLAG_NZ = REG_A &= OPER_8_##MODE()
+			FLAG_NZ = REG_A &= OPER_8_##MODE(cpustate)
 
 /* Logical AND operand */
 #define OP_ANDM(BCLK, SMODE, DMODE)											\
 			CLK(BCLK);														\
-			FLAG_NZ = OPER_8_##SMODE();										\
-			DST     = EA_##DMODE();											\
+			FLAG_NZ = OPER_8_##SMODE(cpustate);										\
+			DST     = EA_##DMODE(cpustate);											\
 			FLAG_NZ &= read_8_##DMODE(DST);									\
 			write_8_##DMODE(DST, FLAG_NZ)
 
 /* Logical AND bit to C */
 #define OP_AND1(BCLK)														\
 			CLK(BCLK);														\
-			DST = EA_IMM16();												\
+			DST = EA_IMM16(cpustate);												\
 			if(FLAG_C & CFLAG_SET)											\
 			{																\
 				DST = read_16_IMM(DST);										\
@@ -644,7 +577,7 @@ INLINE void SET_FLAG_I(uint value)
 /* AND negated bit to C */
 #define OP_ANDN1(BCLK)														\
 			CLK(BCLK);														\
-			DST = EA_IMM16();												\
+			DST = EA_IMM16(cpustate);												\
 			if(FLAG_C & CFLAG_SET)											\
 			{																\
 				DST = read_16_IMM(DST);										\
@@ -663,7 +596,7 @@ INLINE void SET_FLAG_I(uint value)
 /* Arithmetic Shift Left operand */
 #define OP_ASLM(BCLK, MODE)													\
 			CLK(BCLK);														\
-			DST     = EA_##MODE();											\
+			DST     = EA_##MODE(cpustate);											\
 			FLAG_C  = read_8_##MODE(DST) << 1;								\
 			FLAG_NZ = MAKE_UINT_8(FLAG_C);									\
 			write_8_##MODE(DST, FLAG_NZ)
@@ -671,68 +604,68 @@ INLINE void SET_FLAG_I(uint value)
 /* Branch if Bit Reset */
 #define OP_BBC(BCLK, BIT)													\
 			CLK(BCLK);														\
-			SRC     = OPER_8_DP();											\
-			DST     = OPER_8_IMM();											\
+			SRC     = OPER_8_DP(cpustate);											\
+			DST     = OPER_8_IMM(cpustate);											\
 			if(!(SRC & BIT))												\
 			{																\
 				CLK(1);														\
-				BRANCH(DST);												\
+				BRANCH(cpustate, DST);												\
 			}
 
 /* Branch if Bit Set */
 #define OP_BBS(BCLK, BIT)													\
 			CLK(BCLK);														\
-			SRC     = OPER_8_DP();											\
-			DST     = OPER_8_IMM();											\
+			SRC     = OPER_8_DP(cpustate);											\
+			DST     = OPER_8_IMM(cpustate);											\
 			if(SRC & BIT)													\
 			{																\
 				CLK(1);														\
-				BRANCH(DST);												\
+				BRANCH(cpustate, DST);												\
 			}
 
 /* Branch on Condition Code */
 #define OP_BCC(BCLK, COND)													\
 			CLK(BCLK);														\
-			DST     = OPER_8_IMM();											\
+			DST     = OPER_8_IMM(cpustate);											\
 			if(COND)														\
 			{																\
 				CLK(1);														\
-				BRANCH(DST);												\
+				BRANCH(cpustate, DST);												\
 			}
 
 /* Branch Unconditional */
 /* speed up busy loops */
 #define OP_BRA(BCLK)														\
 			CLK(BCLK);														\
-			BRANCH(OPER_8_IMM());											\
+			BRANCH(cpustate, OPER_8_IMM(cpustate));											\
 			if(REG_PC == REG_PPC)											\
 				CLK_ALL()
 
 /* Cause a Break interrupt */
 #define OP_BRK(BCLK)														\
 			CLK(BCLK);														\
-			PUSH_16(REG_PC);												\
-			PUSH_8(GET_REG_P_BRK());										\
+			PUSH_16(cpustate, REG_PC);												\
+			PUSH_8(cpustate, GET_REG_P_BRK());										\
 			FLAG_B |= FLAGPOS_B;												\
 			FLAG_I = IFLAG_CLEAR;												\
-			JUMP(read_16_VEC(VECTOR_BRK))
+			JUMP(cpustate, read_16_VEC(VECTOR_BRK))
 
 /* Call subroutine */
 #define OP_CALL(BCLK)														\
 			CLK(BCLK);														\
-			DST     = EA_ABS();												\
-			PUSH_16(REG_PC);												\
-			JUMP(DST)
+			DST     = EA_ABS(cpustate);												\
+			PUSH_16(cpustate, REG_PC);												\
+			JUMP(cpustate, DST)
 
 /* Compare accumulator and branch if not equal */
 #define OP_CBNE(BCLK, MODE)													\
 			CLK(BCLK);														\
-			SRC     = OPER_8_##MODE();										\
-			DST     = EA_IMM();												\
+			SRC     = OPER_8_##MODE(cpustate);										\
+			DST     = EA_IMM(cpustate);												\
 			if(SRC != REG_A)												\
 			{																\
 				CLK(1);														\
-				BRANCH(read_8_IMM(DST));									\
+				BRANCH(cpustate, read_8_IMM(DST));									\
 			}
 
 /* Clear Carry flag */
@@ -743,7 +676,7 @@ INLINE void SET_FLAG_I(uint value)
 /* Clear Memory Bit */
 #define OP_CLR(BCLK, BIT)													\
 			CLK(BCLK);														\
-			DST     = EA_DP();												\
+			DST     = EA_DP(cpustate);												\
 			SRC     = read_8_DP(DST) & ~BIT;								\
 			write_8_DP(DST, SRC)
 
@@ -761,26 +694,26 @@ INLINE void SET_FLAG_I(uint value)
 /* Compare operand to register */
 #define OP_CMPR(BCLK, REG, MODE)											\
 			CLK(BCLK);				\
-			SRC     = OPER_8_##MODE();		\
-			spc_int16 = (short)REG - (short)SRC;	\
-			FLAG_C  = (spc_int16 >= 0) ? CFLAG_SET : 0;	\
-			FLAG_NZ = MAKE_UINT_8(spc_int16);
+			SRC     = OPER_8_##MODE(cpustate);		\
+			cpustate->spc_int16 = (short)REG - (short)SRC;	\
+			FLAG_C  = (cpustate->spc_int16 >= 0) ? CFLAG_SET : 0;	\
+			FLAG_NZ = MAKE_UINT_8(cpustate->spc_int16);
 
 /* Compare memory */
 #define OP_CMPM(BCLK, SMODE, DMODE)											\
 			CLK(BCLK);				\
-			SRC     = OPER_8_##SMODE();		\
-			spc_int16 = (short)OPER_8_##DMODE() - (short)SRC;	\
-			FLAG_C  = (spc_int16 >= 0) ? CFLAG_SET : 0;	 \
-			FLAG_NZ = MAKE_UINT_8(spc_int16);
+			SRC     = OPER_8_##SMODE(cpustate);		\
+			cpustate->spc_int16 = (short)OPER_8_##DMODE(cpustate) - (short)SRC;	\
+			FLAG_C  = (cpustate->spc_int16 >= 0) ? CFLAG_SET : 0;	 \
+			FLAG_NZ = MAKE_UINT_8(cpustate->spc_int16);
 
 /* Compare word */
 #define OP_CMPW(BCLK, MODE)													\
 			CLK(BCLK);														\
-			SRC     = OPER_16_##MODE();										\
-			spc_int32 = (int)GET_REG_YA() - (int)SRC;								\
-			FLAG_C  = (spc_int32 >= 0) ? CFLAG_SET : 0;									\
-			FLAG_NZ = NZFLAG_16(spc_int32);
+			SRC     = OPER_16_##MODE(cpustate);										\
+			cpustate->spc_int32 = (int)GET_REG_YA() - (int)SRC;								\
+			FLAG_C  = (cpustate->spc_int32 >= 0) ? CFLAG_SET : 0;									\
+			FLAG_NZ = NZFLAG_16(cpustate->spc_int32);
 
 /* Decimal adjust for addition */
 #define OP_DAA(BCLK)					\
@@ -821,25 +754,25 @@ INLINE void SET_FLAG_I(uint value)
 #define OP_DBNZR(BCLK)														\
 			CLK(BCLK);														\
 			REG_Y  = MAKE_UINT_8(REG_Y - 1);								\
-			DST    = EA_IMM();												\
+			DST    = EA_IMM(cpustate);												\
 			if(REG_Y != 0)													\
 			{																\
 				CLK(1);														\
-				BRANCH(read_8_IMM(DST));									\
+				BRANCH(cpustate, read_8_IMM(DST));									\
 			}
 
 /* Decrement operand and branch if not zero */
 /* Speed up busy loops but do reads/writes for compatibility */
 #define OP_DBNZM(BCLK)														\
 			CLK(BCLK);														\
-			DST     = EA_DP();												\
+			DST     = EA_DP(cpustate);												\
 			SRC     = MAKE_UINT_8(read_8_DP(DST) - 1);						\
 			write_8_DP(DST, SRC);											\
-			DST = EA_IMM();													\
+			DST = EA_IMM(cpustate);													\
 			if(SRC != 0)													\
 			{																\
 				CLK(1);														\
-				BRANCH(read_8_IMM(DST));									\
+				BRANCH(cpustate, read_8_IMM(DST));									\
 			}
 
 /* Decrement register */
@@ -850,14 +783,14 @@ INLINE void SET_FLAG_I(uint value)
 /* Decrement operand */
 #define OP_DECM(BCLK, MODE)													\
 			CLK(BCLK);														\
-			DST     = EA_##MODE();											\
+			DST     = EA_##MODE(cpustate);											\
 			FLAG_NZ = MAKE_UINT_8(read_8_##MODE(DST) - 1);					\
 			write_8_##MODE(DST, FLAG_NZ)
 
 /* Decrement word */
 #define OP_DECW(BCLK)														\
 			CLK(BCLK);														\
-			DST     = EA_DP();												\
+			DST     = EA_DP(cpustate);												\
 			FLAG_NZ = MAKE_UINT_16(read_16_DP(DST) - 1);					\
 			write_16_DP(DST, FLAG_NZ);										\
 			FLAG_NZ = NZFLAG_16(FLAG_NZ)
@@ -882,7 +815,7 @@ INLINE void SET_FLAG_I(uint value)
 				if (TMP1 & 1) TMP1 = ((TMP1 - TMP2) & 0x1ffff);	\
 			}			\
 			FLAG_V = (TMP1 & 0x100) ? VFLAG_SET : 0;	\
-			SET_REG_YA((((TMP1 >> 9) & 0xff) << 8) + (TMP1 & 0xff));	\
+			SET_REG_YA(cpustate, (((TMP1 >> 9) & 0xff) << 8) + (TMP1 & 0xff));	\
 			FLAG_NZ = MAKE_UINT_8(GET_REG_YA());
 
 /* Enable interrupts */
@@ -893,20 +826,20 @@ INLINE void SET_FLAG_I(uint value)
 /* Exclusive Or operand to accumulator */
 #define OP_EOR(BCLK, MODE)													\
 			CLK(BCLK);														\
-			FLAG_NZ = REG_A ^= OPER_8_##MODE()
+			FLAG_NZ = REG_A ^= OPER_8_##MODE(cpustate)
 
 /* Logical EOR operand */
 #define OP_EORM(BCLK, SMODE, DMODE)											\
 			CLK(BCLK);														\
-			FLAG_NZ = OPER_8_##SMODE();										\
-			DST     = EA_##DMODE();											\
+			FLAG_NZ = OPER_8_##SMODE(cpustate);										\
+			DST     = EA_##DMODE(cpustate);											\
 			FLAG_NZ ^= read_8_##DMODE(DST);									\
 			write_8_##DMODE(DST, FLAG_NZ)
 
 /* Exclusive OR bit to C */
 #define OP_EOR1(BCLK)														\
 			CLK(BCLK);														\
-			DST     = OPER_16_IMM();										\
+			DST     = OPER_16_IMM(cpustate);										\
 			SRC     = 1 << (DST >> 13);										\
 			DST     &= 0x1fff;												\
 			if(read_8_NORM(DST) & SRC)										\
@@ -920,14 +853,14 @@ INLINE void SET_FLAG_I(uint value)
 /* Increment operand */
 #define OP_INCM(BCLK, MODE)													\
 			CLK(BCLK);														\
-			DST     = EA_##MODE();											\
+			DST     = EA_##MODE(cpustate);											\
 			FLAG_NZ = MAKE_UINT_8(read_8_##MODE(DST) + 1);					\
 			write_8_##MODE(DST, FLAG_NZ)
 
 /* Increment word */
 #define OP_INCW(BCLK)														\
 			CLK(BCLK);														\
-			DST     = EA_DP();												\
+			DST     = EA_DP(cpustate);												\
 			FLAG_NZ = MAKE_UINT_16(read_16_DP(DST) + 1);					\
 			write_16_DP(DST, FLAG_NZ);										\
 			FLAG_NZ = NZFLAG_16(FLAG_NZ)
@@ -936,15 +869,15 @@ INLINE void SET_FLAG_I(uint value)
 /* If we're in a busy loop, eat all clock cycles */
 #define OP_JMP(BCLK, MODE)													\
 			CLK(BCLK);														\
-			JUMP(EA_##MODE());												\
+			JUMP(cpustate, EA_##MODE(cpustate));												\
 			if(REG_PC == REG_PPC)											\
 				CLK_ALL()
 
 /* Jump to Subroutine */
 #define OP_JSR(BCLK, MODE)													\
 			CLK(BCLK);														\
-			PUSH_16(REG_PC);												\
-			JUMP(EA_##MODE())
+			PUSH_16(cpustate, REG_PC);												\
+			JUMP(cpustate, EA_##MODE(cpustate))
 
 /* Logical Shift Right accumulator */
 #define OP_LSR(BCLK)														\
@@ -955,7 +888,7 @@ INLINE void SET_FLAG_I(uint value)
 /* Logical Shift Right operand */
 #define OP_LSRM(BCLK, MODE)													\
 			CLK(BCLK);														\
-			DST     = EA_##MODE();											\
+			DST     = EA_##MODE(cpustate);											\
 			FLAG_NZ = read_8_##MODE(DST);									\
 			FLAG_C  = FLAG_NZ << 8;											\
 			FLAG_NZ >>= 1;													\
@@ -969,30 +902,30 @@ INLINE void SET_FLAG_I(uint value)
 /* Move from register to memory */
 #define OP_MOVRM(BCLK, SREG, DMODE)											\
 			CLK(BCLK);														\
-			write_8_##DMODE(EA_##DMODE(), SREG)
+			write_8_##DMODE(EA_##DMODE(cpustate), SREG)
 
 /* Move from memory to register */
 #define OP_MOVMR(BCLK, SMODE, DREG)											\
 			CLK(BCLK);														\
-			FLAG_NZ = DREG = OPER_8_##SMODE()
+			FLAG_NZ = DREG = OPER_8_##SMODE(cpustate)
 
 /* Move from memory to memory */
 #define OP_MOVMM(BCLK, SMODE, DMODE)										\
 			CLK(BCLK);														\
-			SRC     = OPER_8_##SMODE();										\
-			DST     = EA_##DMODE();											\
+			SRC     = OPER_8_##SMODE(cpustate);										\
+			DST     = EA_##DMODE(cpustate);											\
 			write_8_##DMODE(DST, SRC)
 
 /* Move word register to memory */
 #define OP_MOVWRM(BCLK)														\
 			CLK(BCLK);														\
-			write_16_DP(EA_DP(), GET_REG_YA())
+			write_16_DP(EA_DP(cpustate), GET_REG_YA())
 
 /* Move word memory to register */
 #define OP_MOVWMR(BCLK)														\
 			CLK(BCLK);														\
-			FLAG_NZ = OPER_16_DP();											\
-			SET_REG_YA(FLAG_NZ);											\
+			FLAG_NZ = OPER_16_DP(cpustate);											\
+			SET_REG_YA(cpustate, FLAG_NZ);											\
 			FLAG_NZ = NZFLAG_16(FLAG_NZ)
 
 /* Move from Stack pointer to X */
@@ -1008,7 +941,7 @@ INLINE void SET_FLAG_I(uint value)
 /* Move bit from memory to C */
 #define OP_MOV1C(BCLK)														\
 			CLK(BCLK);														\
-			DST     = OPER_16_IMM();										\
+			DST     = OPER_16_IMM(cpustate);										\
 			SRC     = 1 << (DST >> 13);										\
 			DST     &= 0x1fff;												\
 			FLAG_C  = ((read_8_NORM(DST) & SRC) != 0) << 8
@@ -1016,7 +949,7 @@ INLINE void SET_FLAG_I(uint value)
 /* Move bit from C to memory */
 #define OP_MOV1M(BCLK)														\
 			CLK(BCLK);														\
-			DST     = OPER_16_IMM();										\
+			DST     = OPER_16_IMM(cpustate);										\
 			SRC     = 1 << (DST >> 13);										\
 			DST     &= 0x1fff;												\
 			if(FLAG_C & CFLAG_SET)											\
@@ -1044,7 +977,7 @@ INLINE void SET_FLAG_I(uint value)
 /* NOT bit */
 #define OP_NOT1(BCLK)														\
 			CLK(BCLK);														\
-			DST     = OPER_16_IMM();										\
+			DST     = OPER_16_IMM(cpustate);										\
 			SRC     = 1 << (DST >> 13);										\
 			DST     &= 0x1fff;												\
 			write_8_NORM(DST, read_8_NORM(DST) ^ SRC)
@@ -1052,20 +985,20 @@ INLINE void SET_FLAG_I(uint value)
 /* Logical OR operand to accumulator */
 #define OP_OR(BCLK, MODE)													\
 			CLK(BCLK);														\
-			FLAG_NZ = REG_A |= OPER_8_##MODE()
+			FLAG_NZ = REG_A |= OPER_8_##MODE(cpustate)
 
 /* Logical OR operand */
 #define OP_ORM(BCLK, SMODE, DMODE)											\
 			CLK(BCLK);														\
-			FLAG_NZ = OPER_8_##SMODE();										\
-			DST     = EA_##DMODE();											\
+			FLAG_NZ = OPER_8_##SMODE(cpustate);										\
+			DST     = EA_##DMODE(cpustate);											\
 			FLAG_NZ |= read_8_##DMODE(DST);									\
 			write_8_##DMODE(DST, FLAG_NZ)
 
 /* Logical OR bit to C */
 #define OP_OR1(BCLK)														\
 			CLK(BCLK);														\
-			DST = EA_IMM16();												\
+			DST = EA_IMM16(cpustate);												\
 			if(!(FLAG_C & CFLAG_SET))										\
 			{																\
 				DST = read_16_IMM(DST);										\
@@ -1078,7 +1011,7 @@ INLINE void SET_FLAG_I(uint value)
 /* OR negated bit to C */
 #define OP_ORN1(BCLK)														\
 			CLK(BCLK);														\
-			DST = EA_IMM16();												\
+			DST = EA_IMM16(cpustate);												\
 			if(!(FLAG_C & CFLAG_SET))										\
 			{																\
 				DST = read_16_IMM(DST);										\
@@ -1091,40 +1024,40 @@ INLINE void SET_FLAG_I(uint value)
 /* UPage Call */
 #define OP_PCALL(BCLK)														\
 			CLK(BCLK);														\
-			DST     = EA_DP();												\
-			PUSH_16(REG_PC);												\
-			JUMP(0xff00 | DST)
+			DST     = EA_DP(cpustate);												\
+			PUSH_16(cpustate, REG_PC);												\
+			JUMP(cpustate, 0xff00 | DST)
 
 /* Push a register to the stack */
 #define OP_PUSH(BCLK, REG)													\
 			CLK(BCLK);														\
-			PUSH_8(REG)
+			PUSH_8(cpustate, REG)
 
 /* Push the Processor Status Register to the stack */
 #define OP_PHP(BCLK)														\
 			CLK(BCLK);														\
-			PUSH_8(GET_REG_P())
+			PUSH_8(cpustate, GET_REG_P())
 
 /* Pull a register from the stack */
 #define OP_PULL(BCLK, REG)													\
 			CLK(BCLK);														\
-			REG     = PULL_8()
+			REG     = PULL_8(cpustate)
 
 /* Pull the Processor Status Register from the stack */
 #define OP_PLP(BCLK)														\
 			CLK(BCLK);														\
-			SET_REG_P(PULL_8())
+			SET_REG_P(cpustate, PULL_8(cpustate))
 
 /* Return from Subroutine */
 #define OP_RET(BCLK)														\
 			CLK(BCLK);														\
-			JUMP(PULL_16())
+			JUMP(cpustate, PULL_16(cpustate))
 
 /* Return from Interrupt */
 #define OP_RETI(BCLK)														\
 			CLK(BCLK);														\
-			SET_REG_P(PULL_8());											\
-			JUMP(PULL_16())
+			SET_REG_P(cpustate, PULL_8(cpustate));											\
+			JUMP(cpustate, PULL_16(cpustate))
 
 /* Rotate Left the accumulator */
 #define OP_ROL(BCLK)														\
@@ -1135,7 +1068,7 @@ INLINE void SET_FLAG_I(uint value)
 /* Rotate Left an operand */
 #define OP_ROLM(BCLK, MODE)													\
 			CLK(BCLK);														\
-			DST     = EA_##MODE();											\
+			DST     = EA_##MODE(cpustate);											\
 			FLAG_C  = (read_8_##MODE(DST)<<1) | CFLAG_AS_1();				\
 			FLAG_NZ = MAKE_UINT_8(FLAG_C);									\
 			write_8_##MODE(DST, FLAG_NZ)
@@ -1150,7 +1083,7 @@ INLINE void SET_FLAG_I(uint value)
 /* Rotate Right an operand */
 #define OP_RORM(BCLK, MODE)													\
 			CLK(BCLK);														\
-			DST     = EA_##MODE();											\
+			DST     = EA_##MODE(cpustate);											\
 			FLAG_NZ = read_8_##MODE(DST) | (FLAG_C & 0x100);				\
 			FLAG_C  = FLAG_NZ << 8;											\
 			FLAG_NZ >>= 1;													\
@@ -1159,22 +1092,22 @@ INLINE void SET_FLAG_I(uint value)
 /* Subtract with Carry */
 #define OP_SBC(BCLK, MODE)					\
 			CLK(BCLK);				\
-			SRC     = OPER_8_##MODE();		\
+			SRC     = OPER_8_##MODE(cpustate);		\
 			TMP2 = REG_A - SRC - (CFLAG_AS_1() ^ 1); \
 			SUBOP_ADC(REG_A, ~SRC);			\
 			FLAG_C = (TMP2 <= 0xff) ? CFLAG_SET : 0; \
-			REG_A = (UINT8)spc_int16;
+			REG_A = (UINT8)cpustate->spc_int16;
 
 /* Subtract With Carry to memory */
 #define OP_SBCM(BCLK, SMODE, DMODE)				\
 			CLK(BCLK);				\
-			SRC     = OPER_8_##SMODE();		\
-			DST     = EA_##DMODE();			\
+			SRC     = OPER_8_##SMODE(cpustate);		\
+			DST     = EA_##DMODE(cpustate);			\
 			TMP3 = read_8_##DMODE(DST);		\
 			TMP2 = TMP3 - SRC - (CFLAG_AS_1() ^ 1);	\
 			SUBOP_ADC(~SRC, TMP3);			\
 			FLAG_C = (TMP2 <= 0xff) ? CFLAG_SET : 0; \
-			write_8_##DMODE(DST, (UINT8)spc_int16)
+			write_8_##DMODE(DST, (UINT8)cpustate->spc_int16)
 
 /* Set Carry flag */
 #define OP_SETC(BCLK)														\
@@ -1189,7 +1122,7 @@ INLINE void SET_FLAG_I(uint value)
 /* Set Memory Bit */
 #define OP_SET(BCLK, BIT)													\
 			CLK(BCLK);														\
-			DST    = EA_DP();												\
+			DST    = EA_DP(cpustate);												\
 			SRC    = read_8_DP(DST) | BIT;									\
 			write_8_DP(DST, SRC)
 
@@ -1208,30 +1141,30 @@ INLINE void SET_FLAG_I(uint value)
 /* Subtract word */
 #define OP_SUBW(BCLK)						\
 			CLK(BCLK);				\
-			SRC = OPER_16_DP();			\
+			SRC = OPER_16_DP(cpustate);			\
 			DST = GET_REG_YA();			\
 			TMP1 = ((DST) & 0xff) - ((SRC) & 0xff);	\
 			TMP2 = (TMP1 > 0xff) ? 1 : 0;		\
 			TMP3 = ((DST) >> 8) - ((SRC) >> 8) - TMP2;	\
-			spc_int16 = ((TMP1 & 0xff) + (TMP3 << 8)) & 0xffff;	\
+			cpustate->spc_int16 = ((TMP1 & 0xff) + (TMP3 << 8)) & 0xffff;	\
 			FLAG_C = (TMP3 <= 0xff) ? CFLAG_SET : 0;	\
 			FLAG_H = ((unsigned) ((((DST) >> 8) & 0x0F) - \
 				(((SRC) >> 8) & 0x0F) - TMP2)) > 0x0F ?  0: HFLAG_SET; \
-			FLAG_V = (((DST) ^ (SRC)) & ((DST) ^ (UINT16) spc_int16) & 0x8000) ? VFLAG_SET : 0; \
-			FLAG_Z = (spc_int16 != 0);		\
-			FLAG_N = (spc_int16>>8);		\
-			SET_REG_YA(spc_int16);
+			FLAG_V = (((DST) ^ (SRC)) & ((DST) ^ (UINT16) cpustate->spc_int16) & 0x8000) ? VFLAG_SET : 0; \
+			FLAG_Z = (cpustate->spc_int16 != 0);		\
+			FLAG_N = (cpustate->spc_int16>>8);		\
+			SET_REG_YA(cpustate, cpustate->spc_int16);
 
 /* Table Call */
 #define OP_TCALL(BCLK, NUM)													\
 			CLK(BCLK);														\
-			PUSH_16(REG_PC);												\
-			JUMP(read_16_NORM(0xffc0 + ((15-NUM)<<1)))
-
+			PUSH_16(cpustate, REG_PC);												\
+			JUMP(cpustate, read_16_NORM(0xffc0 + ((15-NUM)<<1)))
+			     	
 /* Test and Clear Bits */
 #define OP_TCLR1(BCLK, MODE)												\
 			CLK(BCLK);														\
-			DST     = EA_##MODE();											\
+			DST     = EA_##MODE(cpustate);											\
 			FLAG_NZ = read_8_##MODE(DST);									\
 			write_8_##MODE(DST, FLAG_NZ & ~REG_A);							\
 			FLAG_NZ &= REG_A
@@ -1239,7 +1172,7 @@ INLINE void SET_FLAG_I(uint value)
 /* Test and Set Bits */
 #define OP_TSET1(BCLK, MODE)												\
 			CLK(BCLK);														\
-			DST     = EA_##MODE();											\
+			DST     = EA_##MODE(cpustate);											\
 			FLAG_NZ = read_8_##MODE(DST);									\
 			write_8_##MODE(DST, FLAG_NZ | REG_A);							\
 			FLAG_NZ &= REG_A
@@ -1259,14 +1192,18 @@ INLINE void SET_FLAG_I(uint value)
 
 CPU_INIT( spc700 )
 {
+	spc700i_cpu *cpustate = device->token;
+
 	INT_ACK = irqcallback;
-	spc700i_cpu.device = device;
-	spc700i_cpu.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 
 CPU_RESET( spc700 )
 {
+	spc700i_cpu *cpustate = device->token;
+
 	CPU_STOPPED = 0;
 #if !SPC700_OPTIMIZE_SNES
 	LINE_IRQ = 0;
@@ -1280,7 +1217,7 @@ CPU_RESET( spc700 )
 	FLAG_H  = HFLAG_CLEAR;
 	FLAG_I  = IFLAG_CLEAR;
 	FLAG_C  = CFLAG_CLEAR;
-	JUMP(read_16_VEC(VECTOR_RST));
+	JUMP(cpustate, read_16_VEC(VECTOR_RST));
 }
 
 /* Exit and clean up */
@@ -1293,46 +1230,39 @@ CPU_EXIT( spc700 )
 /* Get the current CPU context */
 CPU_GET_CONTEXT( spc700 )
 {
-	if(dst)
-		*(spc700i_cpu_struct*)dst = spc700i_cpu;
 }
 
 /* Set the current CPU context */
 CPU_SET_CONTEXT( spc700 )
 {
-	if(src)
-	{
-		spc700i_cpu = *(spc700i_cpu_struct*)src;
-		JUMP(REG_PC);
-	}
 }
 
 /* Get the current Program Counter */
-unsigned spc700_get_pc(void)
+unsigned spc700_get_pc(spc700i_cpu *cpustate)
 {
 	return REG_PC;
 }
 
 /* Set the Program Counter */
-void spc700_set_pc(unsigned val)
+void spc700_set_pc(spc700i_cpu *cpustate,unsigned val)
 {
-	JUMP(val);
+	JUMP(cpustate, val);
 }
 
 /* Get the current Stack Pointer */
-unsigned spc700_get_sp(void)
+unsigned spc700_get_sp(spc700i_cpu *cpustate)
 {
 	return REG_S + STACK_PAGE;
 }
 
 /* Set the Stack Pointer */
-void spc700_set_sp(unsigned val)
+void spc700_set_sp(spc700i_cpu *cpustate,unsigned val)
 {
 	REG_S = MAKE_UINT_8(val);
 }
 
 /* Assert or clear the NMI line of the CPU */
-void spc700_set_nmi_line(int state)
+void spc700_set_nmi_line(spc700i_cpu *cpustate,int state)
 {
 #if !SPC700_OPTIMIZE_SNES
 	if(state == CLEAR_LINE)
@@ -1341,15 +1271,15 @@ void spc700_set_nmi_line(int state)
 	{
 		LINE_NMI = 1;
 		CLK(7);
-		PUSH_16(REG_PC);
-		PUSH_8(GET_REG_P_INT());
-		JUMP(read_16_VEC(VECTOR_NMI));
+		PUSH_16(cpustate, REG_PC);
+		PUSH_8(cpustate, GET_REG_P_INT());
+		JUMP(cpustate, read_16_VEC(VECTOR_NMI));
 	}
 #endif /* SPC700_OPTIMIZE_SNES */
 }
 
 /* Assert or clear the IRQ line of the CPU */
-void spc700_set_irq_line(int line, int state)
+void spc700_set_irq_line(spc700i_cpu *cpustate,int line, int state)
 {
 #if !SPC700_OPTIMIZE_SNES
 	LINE_IRQ = (state != CLEAR_LINE) ? IRQ_SET : IRQ_CLEAR;
@@ -1358,21 +1288,10 @@ void spc700_set_irq_line(int line, int state)
 }
 
 /* Set the callback that is called when servicing an interrupt */
-void spc700_set_irq_callback(cpu_irq_callback callback)
+void spc700_set_irq_callback(spc700i_cpu *cpustate,cpu_irq_callback callback)
 {
 	INT_ACK = callback;
 }
-
-/* Save the current CPU state to disk */
-void spc700_state_save(void *file)
-{
-}
-
-/* Load a CPU state from disk */
-void spc700_state_load(void *file)
-{
-}
-
 
 #include "spc700ds.h"
 
@@ -1381,6 +1300,8 @@ void spc700_state_load(void *file)
 /* Execute instructions for <clocks> cycles */
 CPU_EXECUTE( spc700 )
 {
+	spc700i_cpu *cpustate = device->token;
+
 	CLOCKS = CPU_STOPPED ? 0 : cycles;
 	while(CLOCKS > 0)
 	{
@@ -1388,34 +1309,7 @@ CPU_EXECUTE( spc700 )
 		debugger_instruction_hook(device, REG_PC);
 		REG_PC++;
 
-#if 0
-//      if ((!(REG_PPC & 0xf000)) && (dump_flag == 0)) { dump_flag = 1; mame_printf_debug("Dump started\n"); }
-
-		if (dump_flag && 0)
-		{
-			uint p = ((spc700i_cpu.flag_n & 0x80)			|
-						((spc700i_cpu.flag_v & 0x80) >> 1)	|
-						spc700i_cpu.flag_p>>3				|
-						spc700i_cpu.flag_b					|
-						(spc700i_cpu.flag_h & HFLAG_SET)		|
-						spc700i_cpu.flag_i					|
-						((!spc700i_cpu.flag_z) << 1)		|
-						((spc700i_cpu.flag_c >> 8)&1));
-
-		mame_printf_debug("[%04x]: A%02x X%02x Y%02x P%02x SP%02x - %c%c%c%c%c%c%c%c\n", REG_PPC, REG_A, REG_X, REG_Y, p, REG_S,
-				p & 0x80 ? 'N':'.',
-				p & 0x40 ? 'V':'.',
-				p & 0x20 ? 'P':'.',
-				p & 0x10 ? 'B':'.',
-				p & 0x08 ? 'H':'.',
-				p & 0x04 ? 'I':'.',
-				p & 0x02 ? 'Z':'.',
-				p & 0x01 ? 'C':'.');
-
-			dump_flag--;
-		}
-#endif
-		switch(REG_IR = read_8_immediate(REG_PPC))
+		switch(REG_IR = read_8_immediate(cpustate, REG_PPC))
 		{
 			case 0x00: OP_NOP   ( 2               ); break; /* NOP           */
 			case 0x01: OP_TCALL ( 8, 0            ); break; /* TCALL 0       */
@@ -1685,17 +1579,19 @@ CPU_EXECUTE( spc700 )
 
 static CPU_SET_INFO( spc700 )
 {
+	spc700i_cpu *cpustate = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:				spc700_set_irq_line(0, info->i);		break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	spc700_set_nmi_line(info->i);			break;
+		case CPUINFO_INT_INPUT_STATE + 0:			spc700_set_irq_line(cpustate, 0, info->i);		break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		spc700_set_nmi_line(cpustate, info->i);			break;
 
 		case CPUINFO_INT_PC:
 		case CPUINFO_INT_REGISTER + SPC700_PC:			REG_PC = MAKE_UINT_16(info->i);			break;
 		case CPUINFO_INT_SP:
 		case CPUINFO_INT_REGISTER + SPC700_S:			REG_S = MAKE_UINT_8(info->i);			break;
-		case CPUINFO_INT_REGISTER + SPC700_P:			SET_REG_P(info->i);						break;
+		case CPUINFO_INT_REGISTER + SPC700_P:			SET_REG_P(cpustate, info->i);						break;
 		case CPUINFO_INT_REGISTER + SPC700_A:			REG_A = MAKE_UINT_8(info->i);			break;
 		case CPUINFO_INT_REGISTER + SPC700_X:			REG_X = MAKE_UINT_8(info->i);			break;
 		case CPUINFO_INT_REGISTER + SPC700_Y:			REG_Y = MAKE_UINT_8(info->i);			break;
@@ -1710,14 +1606,20 @@ static CPU_SET_INFO( spc700 )
 
 CPU_GET_INFO( spc700 )
 {
-	uint p = ((spc700i_cpu.flag_n & 0x80)			|
-				((spc700i_cpu.flag_v & 0x80) >> 1)	|
-				spc700i_cpu.flag_p>>3				|
-				spc700i_cpu.flag_b					|
-				(spc700i_cpu.flag_h & HFLAG_SET)	|
-				spc700i_cpu.flag_i					|
-				((!spc700i_cpu.flag_z) << 1)		|
-				((spc700i_cpu.flag_c >> 8)&1));
+	spc700i_cpu *cpustate = (device != NULL) ? device->token : NULL;
+	uint p = 0;
+	
+	if (device != NULL)
+	{	
+		p = ((cpustate->flag_n & 0x80)			|
+					((cpustate->flag_v & 0x80) >> 1)	|
+					cpustate->flag_p>>3				|
+					cpustate->flag_b					|
+					(cpustate->flag_h & HFLAG_SET)	|		  
+					cpustate->flag_i					|
+					((!cpustate->flag_z) << 1)		|
+					((cpustate->flag_c >> 8)&1));
+	}
 
 	switch (state)
 	{
@@ -1739,41 +1641,41 @@ CPU_GET_INFO( spc700 )
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;				break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;				break;
+		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;				break;
 
 		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (LINE_IRQ == IRQ_SET) ? ASSERT_LINE : CLEAR_LINE; break;
 
-		case CPUINFO_INT_PREVIOUSPC:					info->i = REG_PPC;						break;
+		case CPUINFO_INT_PREVIOUSPC:					info->i = REG_PPC;			break;
 
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + SPC700_PC:			info->i = REG_PC;						break;
+		case CPUINFO_INT_REGISTER + SPC700_PC:				info->i = REG_PC;			break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + SPC700_S:			info->i = REG_S + STACK_PAGE;			break;
-		case CPUINFO_INT_REGISTER + SPC700_P:			info->i = GET_REG_P();					break;
-		case CPUINFO_INT_REGISTER + SPC700_A:			info->i = REG_A;						break;
-		case CPUINFO_INT_REGISTER + SPC700_X:			info->i = REG_X;						break;
-		case CPUINFO_INT_REGISTER + SPC700_Y:			info->i = REG_Y;						break;
+		case CPUINFO_INT_REGISTER + SPC700_S:	      			info->i = REG_S + STACK_PAGE;		break;
+		case CPUINFO_INT_REGISTER + SPC700_P:	     			info->i = GET_REG_P();			break;
+		case CPUINFO_INT_REGISTER + SPC700_A:	       			info->i = REG_A;			break;
+		case CPUINFO_INT_REGISTER + SPC700_X:				info->i = REG_X;			break;
+		case CPUINFO_INT_REGISTER + SPC700_Y:				info->i = REG_Y;			break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(spc700);		break;
+		case CPUINFO_PTR_SET_INFO:					info->setinfo = CPU_SET_INFO_NAME(spc700);		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(spc700);	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(spc700);	break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(spc700);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(spc700);				break;
-		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(spc700);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(spc700);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(spc700);		break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &spc700_ICount;			break;
+		case CPUINFO_PTR_INIT:						info->init = CPU_INIT_NAME(spc700);			break;
+		case CPUINFO_PTR_RESET:						info->reset = CPU_RESET_NAME(spc700);			break;
+		case CPUINFO_PTR_EXIT:						info->exit = CPU_EXIT_NAME(spc700);			break;
+		case CPUINFO_PTR_EXECUTE:					info->execute = CPU_EXECUTE_NAME(spc700);		break;
+		case CPUINFO_PTR_BURN:						info->burn = NULL;					break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(spc700);	break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->ICount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "SPC700");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Sony SPC700");			break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright , all rights reserved."); break;
+		case CPUINFO_STR_NAME:						strcpy(info->s, "SPC700");				break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Sony SPC700");				break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.1");					break;
+		case CPUINFO_STR_CORE_FILE:					strcpy(info->s, __FILE__);				break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Copyright Nicola Salmoria and the MAME team, all rights reserved."); break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
@@ -1787,12 +1689,12 @@ CPU_GET_INFO( spc700 )
 				p & 0x01 ? 'C':'.');
 			break;
 
-		case CPUINFO_STR_REGISTER + SPC700_PC:			sprintf(info->s, "PC:%04X", spc700i_cpu.pc); break;
-		case CPUINFO_STR_REGISTER + SPC700_S:			sprintf(info->s, "S:%02X", spc700i_cpu.s); break;
+		case CPUINFO_STR_REGISTER + SPC700_PC:			sprintf(info->s, "PC:%04X", cpustate->pc); break;
+		case CPUINFO_STR_REGISTER + SPC700_S:			sprintf(info->s, "S:%02X", cpustate->s); break;
 		case CPUINFO_STR_REGISTER + SPC700_P:			sprintf(info->s, "P:%02X", p); break;
-		case CPUINFO_STR_REGISTER + SPC700_A:			sprintf(info->s, "A:%02X", spc700i_cpu.a); break;
-		case CPUINFO_STR_REGISTER + SPC700_X:			sprintf(info->s, "X:%02X", spc700i_cpu.x); break;
-		case CPUINFO_STR_REGISTER + SPC700_Y:			sprintf(info->s, "Y:%02X", spc700i_cpu.y); break;
+		case CPUINFO_STR_REGISTER + SPC700_A:			sprintf(info->s, "A:%02X", cpustate->a); break;
+		case CPUINFO_STR_REGISTER + SPC700_X:			sprintf(info->s, "X:%02X", cpustate->x); break;
+		case CPUINFO_STR_REGISTER + SPC700_Y:			sprintf(info->s, "Y:%02X", cpustate->y); break;
 	}
 }
 
