@@ -195,6 +195,8 @@ static UINT16* scsp_regs;
 static UINT16* sound_ram;
 
 int stv_enable_slave_sh2;
+/*VDP2 stuff*/
+extern int get_vblank_duration(running_machine *machine);
 /*SMPC stuff*/
 static UINT8 NMI_reset;
 static void system_reset(void);
@@ -1332,9 +1334,9 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		stv_irq.sound_req =  (((stv_scu[40] & 0x0040)>>6) ^ 1);
 		stv_irq.smpc =       (((stv_scu[40] & 0x0080)>>7)); //NOTE: SCU bug
 		stv_irq.pad =        (((stv_scu[40] & 0x0100)>>8) ^ 1);
-		stv_irq.dma_end[0] = (((stv_scu[40] & 0x0200)>>9) ^ 1);
+		stv_irq.dma_end[2] = (((stv_scu[40] & 0x0200)>>9) ^ 1);
 		stv_irq.dma_end[1] = (((stv_scu[40] & 0x0400)>>10) ^ 1);
-		stv_irq.dma_end[2] = (((stv_scu[40] & 0x0800)>>11) ^ 1);
+		stv_irq.dma_end[0] = (((stv_scu[40] & 0x0800)>>11) ^ 1);
 		stv_irq.dma_ill =    (((stv_scu[40] & 0x1000)>>12) ^ 1);
 		stv_irq.vdp1_end =   (((stv_scu[40] & 0x2000)>>13) ^ 1);
 		stv_irq.abus =       (((stv_scu[40] & 0x8000)>>15) ^ 1);
@@ -1379,9 +1381,9 @@ static WRITE32_HANDLER( stv_scu_w32 )
 		stv_irq.sound_req =  ((stv_scu[41] & 0x0040)>>6);
 		stv_irq.smpc =       ((stv_scu[41] & 0x0080)>>7);
 		stv_irq.pad =        ((stv_scu[41] & 0x0100)>>8);
-		stv_irq.dma_end[0] = ((stv_scu[41] & 0x0200)>>9);
+		stv_irq.dma_end[2] = ((stv_scu[41] & 0x0200)>>9);
 		stv_irq.dma_end[1] = ((stv_scu[41] & 0x0400)>>10);
-		stv_irq.dma_end[2] = ((stv_scu[41] & 0x0800)>>11);
+		stv_irq.dma_end[0] = ((stv_scu[41] & 0x0800)>>11);
 		stv_irq.dma_ill =    ((stv_scu[41] & 0x1000)>>12);
 		stv_irq.vdp1_end =   ((stv_scu[41] & 0x2000)>>13);
 		stv_irq.abus =       ((stv_scu[41] & 0x8000)>>15);
@@ -2611,15 +2613,17 @@ static TIMER_CALLBACK( hblank_in_irq )
 //  h = video_screen_get_height(machine->primary_screen);
 //  w = video_screen_get_width(machine->primary_screen);
 
-	TIMER_0_IRQ;
 	HBLANK_IN_IRQ;
+	TIMER_0_IRQ;
 
-	if((scanline+1) < v_sync)
+	if(scanline+1 < v_sync)
 	{
-		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, h_sync), scanline+1);
+		if(stv_irq.hblank_in || stv_irq.timer_0)
+			timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, h_sync), scanline+1);
 		/*set the first Timer-1 event*/
 		cur_scan = scanline+1;
-		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, 0), 0);
+		if(stv_irq.timer_1)
+			timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, scanline+1, 0), 0);
 	}
 
 	timer_0++;
@@ -2631,7 +2635,7 @@ static TIMER_CALLBACK( timer1_irq )
 
 	TIMER_1_IRQ;
 
-	if((cur_point+1) < h_sync)
+	if((cur_point+1) < h_sync && stv_irq.timer_1)
 	{
 		timer_adjust_oneshot(t1_timer, video_screen_get_time_until_pos(machine->primary_screen, cur_scan, cur_point+1), cur_point+1);
 	}
@@ -2653,15 +2657,19 @@ static TIMER_CALLBACK( vblank_out_irq )
 static INTERRUPT_GEN( stv_interrupt )
 {
 //  scanline = 0;
-	h_sync = video_screen_get_height(device->machine->primary_screen)/2;//horz
-	v_sync = video_screen_get_width(device->machine->primary_screen)-2;//vert
+	rectangle visarea = *video_screen_get_visible_area(device->machine->primary_screen);
+
+	h_sync = visarea.max_x+1;//horz
+	v_sync = visarea.max_y+1;//vert
 
 	VBLANK_IN_IRQ;
 
 	/*Next V-Blank-OUT event*/
-	timer_adjust_oneshot(vblank_out_timer,video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), 0);
+	if(stv_irq.vblank_out)
+		timer_adjust_oneshot(vblank_out_timer,video_screen_get_time_until_pos(device->machine->primary_screen, 0, 0), 0);
 	/*Set the first Hblank-IN event*/
-	timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 0, h_sync), 0);
+	if(stv_irq.hblank_in || stv_irq.timer_0 || stv_irq.timer_1)
+		timer_adjust_oneshot(scan_timer, video_screen_get_time_until_pos(device->machine->primary_screen, 0, h_sync), 0);
 
 	/*TODO: timing of this one (related to the VDP1 speed)*/
 	/*      (NOTE: value shouldn't be at h_sync/v_sync position (will break shienryu))*/

@@ -67,6 +67,9 @@ its not displayed because its priority value is 0.Left-over?
 -scrolling is screen display wise,meaning that a scrolling value is masked with the
 screen resolution size values;
 
+-H-Blank bit is INDIPENDENT of the V-Blank bit...trying to fix enable/disable it during V-Blank period
+ causes wrong gameplay speed in Golden Axe:The Duel.
+
 -Bitmaps uses transparency pens,examples are:
 \-elandore's energy bars;
 \-mausuke's foreground(the one used on the playfield)
@@ -112,13 +115,18 @@ static UINT8*  stv_vdp2_vram_dirty_8x8x8;
 static UINT8* stv_vdp2_gfx_decode;
 
 static int stv_vdp2_render_rbg0;
-int stv_hblank,stv_vblank;
+int stv_hblank,stv_vblank,stv_odd;
 int horz_res,vert_res;
 
 UINT32* stv_vdp2_cram;
+
 static void stv_vdp2_dynamic_res_change(running_machine *machine);
 UINT8 get_vblank(running_machine *machine);
 UINT8 get_hblank(running_machine *machine);
+int   get_vblank_duration(running_machine *machine);
+//int get_hblank_duration(running_machine *machine); //<- when we know that...
+UINT8 get_odd_bit(running_machine *machine);
+
 static void refresh_palette_data(running_machine *machine);
 static int stv_vdp2_window_process(int x,int y);
 static int stv_vdp2_apply_window_on_layer(rectangle *cliprect);
@@ -5277,6 +5285,9 @@ UINT8 get_hblank(running_machine *machine)
 		return 0;
 }
 
+//int get_hblank_duration(running_machine *machine)
+//...
+
 UINT8 get_vblank(running_machine *machine)
 {
 	static int cur_v;
@@ -5284,6 +5295,43 @@ UINT8 get_vblank(running_machine *machine)
 	cur_v = video_screen_get_vpos(machine->primary_screen);
 
 	if (cur_v > visarea.max_y)
+		return 1;
+	else
+		return 0;
+}
+
+/*some vblank lines measurements (according to Charles MacDonald)*/
+int get_vblank_duration(running_machine *machine)
+{
+	if(STV_VDP2_HRES & 4)
+	{
+		switch(STV_VDP2_HRES & 1)
+		{
+			case 0: return 45; //31kHz Monitor
+			case 1: return 82; //Hi-Vision Monitor
+		}
+	}
+
+	switch(STV_VDP2_VRES & 3)
+	{
+		case 0: return 39; //263-224
+		case 1: return 23; //263-240
+		case 2: return 7; //263-256
+		case 3: return 7; //263-256
+	}
+
+	return 0;
+}
+
+UINT8 get_odd_bit(running_machine *machine)
+{
+	static int cur_v;
+	cur_v = video_screen_get_vpos(machine->primary_screen);
+
+	if(STV_VDP2_HRES & 4) //exclusive monitor mode makes this bit to be always 1
+		return 1;
+
+	if(cur_v % 2)
 		return 1;
 	else
 		return 0;
@@ -5298,25 +5346,12 @@ READ32_HANDLER ( stv_vdp2_regs_r )
 		case 0x4/4:
 		{
 			/*Screen Status Register*/
-			//rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
-
-			//stv_hblank = 0;
-			//stv_vblank = 0;
-			//h = video_screen_get_height(machine->primary_screen);
-			//w = video_screen_get_width(machine->primary_screen);
-			//cur_h = video_screen_get_hpos(machine->primary_screen);
-			//cur_v = video_screen_get_vpos(machine->primary_screen);
-
-			//popmessage("%d %d",cur_h,cur_v);
-
-			//if (cur_h > visarea.max_x)
-			stv_hblank = get_hblank(space->machine);
-			//if (cur_v > visarea.max_y)
 			stv_vblank = get_vblank(space->machine);
-			/*ODD bit*/
+			stv_hblank = get_hblank(space->machine);
+			stv_odd = get_odd_bit(space->machine);
 
-								   /*VBLANK              HBLANK            ODD         PAL    */
-			stv_vdp2_regs[offset] = (stv_vblank<<19) | (stv_hblank<<18) | (1 << 17) | (0 << 16);
+								   /*VBLANK              HBLANK            ODD               PAL    */
+			stv_vdp2_regs[offset] = (stv_vblank<<19) | (stv_hblank<<18) | (stv_odd << 17) | (0 << 16);
 			break;
 		}
 		case 0x8/4:
@@ -5400,13 +5435,17 @@ VIDEO_START( stv_vdp2 )
 /*    & height / width not yet understood (docs-wise MUST be bigger than normal visible area)*/
 static TIMER_CALLBACK( dyn_res_change )
 {
+	UINT8 vblank_period;
 	rectangle visarea = *video_screen_get_visible_area(machine->primary_screen);
 	visarea.min_x = 0;
 	visarea.max_x = horz_res-1;
 	visarea.min_y = 0;
 	visarea.max_y = vert_res-1;
 
-	video_screen_configure(machine->primary_screen, horz_res*2, vert_res+2, &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
+	vblank_period = get_vblank_duration(machine);
+//	popmessage("%d",vblank_period);
+//  hblank_period = get_hblank_duration(machine->primary_screen);
+	video_screen_configure(machine->primary_screen, horz_res*2, (vert_res+vblank_period), &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
 }
 
 static void stv_vdp2_dynamic_res_change(running_machine *machine)
