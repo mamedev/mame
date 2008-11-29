@@ -22,8 +22,9 @@ static char led_array[21];
 VIDEO_START( deshoros )
 {
 	static UINT8 i;
-	for(i=0;i<32;i++)
+	for(i=0;i<20;i++)
 		led_array[i] = 0x20;
+	led_array[20] = 0;
 }
 
 VIDEO_UPDATE( deshoros )
@@ -36,11 +37,11 @@ VIDEO_UPDATE( deshoros )
 static void update_led_array(UINT8 new_data)
 {
 	static UINT8 i;
-	/*update the data*/
-	led_array[20] = new_data;
 	/*scroll the data*/
-	for(i=0;i<21;i++)
+	for(i=0;i<19;i++)
 		led_array[i] = led_array[i+1];
+	/*update the data*/
+	led_array[19] = new_data;
 }
 
 static UINT8 bank;
