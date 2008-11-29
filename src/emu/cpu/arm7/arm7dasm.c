@@ -234,17 +234,31 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 	else if( (opcode&0x0e000000)==0 && (opcode&0x80) && (opcode&0x10) )	//bits 27-25 == 000, bit 7=1, bit 4=1
 	{
 		/* multiply or swap or half word data transfer */
-
 		if(opcode&0x60)
 		{	//bits = 6-5 != 00
-		/* half word data transfer */
-			pBuf += sprintf(pBuf, "%s%s",(opcode&0x00100000)?"LDR":"STR",pConditionCode);	//Bit 20 = 1 for Load, 0 for Store
-
-			//Signed? (if not, always unsigned half word)
-			if(opcode&0x40)
-				pBuf += sprintf(pBuf, "%s",(opcode&0x20)?"SH":"SB");	//Bit 5 = 1 for Half Word, 0 for Byte
+			/* half word data transfer */
+			if (((opcode & 0x60) == 0x40) && !(opcode & 0x100000))	// bit 20 = 0, bits 5&6 = 10 is ARMv5 LDRD
+			{
+				pBuf += sprintf(pBuf, "LDRD%s", pConditionCode);
+			}
+			else if (((opcode & 0x60) == 0x60) && !(opcode & 0x100000))	// bit 20 = 0, bits 5&6 = 11 is ARMv5 STRD  
+			{
+				pBuf += sprintf(pBuf, "STRD%s", pConditionCode);
+			}
 			else
-				pBuf += sprintf(pBuf, "H");
+			{
+				pBuf += sprintf(pBuf, "%s%s",(opcode&0x00100000)?"LDR":"STR",pConditionCode);	//Bit 20 = 1 for Load, 0 for Store
+
+				//Signed? (if not, always unsigned half word)
+				if(opcode&0x40)
+				{
+					pBuf += sprintf(pBuf, "%s",(opcode&0x20)?"SH":"SB");	//Bit 5 = 1 for Half Word, 0 for Byte
+				}
+				else
+				{
+					pBuf += sprintf(pBuf, "H");
+				}
+			}
 
 			pBuf = WritePadding( pBuf, pBuf0 );
 

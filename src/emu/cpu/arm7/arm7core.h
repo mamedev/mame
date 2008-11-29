@@ -59,36 +59,6 @@ enum
     ARM7_CPSR, ARM7_AR13, ARM7_AR14, ARM7_ASPSR, ARM7_UR13, ARM7_UR14, ARM7_USPSR
 };
 
-#define ARM7CORE_REGS                   \
-    UINT32 sArmRegister[kNumRegisters]; \
-    UINT8 pendingIrq;                   \
-    UINT8 pendingFiq;                   \
-    UINT8 pendingAbtD;                  \
-    UINT8 pendingAbtP;                  \
-    UINT8 pendingUnd;                   \
-    UINT8 pendingSwi;                   \
-    cpu_irq_callback irq_callback;		\
-    const device_config *device;		\
-    const address_space *program;
-
-
-/****************************************************************************************************
- *  VARIOUS INTERNAL STRUCS/DEFINES/ETC..
- ***************************************************************************************************/
-// Mode values come from bit 4-0 of CPSR, but we are ignoring bit 4 here, since bit 4 always = 1 for valid modes
-enum
-{
-    eARM7_MODE_USER = 0x0,      // Bit: 4-0 = 10000
-    eARM7_MODE_FIQ  = 0x1,      // Bit: 4-0 = 10001
-    eARM7_MODE_IRQ  = 0x2,      // Bit: 4-0 = 10010
-    eARM7_MODE_SVC  = 0x3,      // Bit: 4-0 = 10011
-    eARM7_MODE_ABT  = 0x7,      // Bit: 4-0 = 10111
-    eARM7_MODE_UND  = 0xb,      // Bit: 4-0 = 11011
-    eARM7_MODE_SYS  = 0xf       // Bit: 4-0 = 11111
-};
-
-#define ARM7_NUM_MODES 0x10
-
 /* There are 36 Unique - 32 bit processor registers */
 /* Each mode has 17 registers (except user & system, which have 16) */
 /* This is a list of each *unique* register */
@@ -119,6 +89,43 @@ enum
 
     kNumRegisters
 };
+
+#define ARM7CORE_REGS                   \
+    UINT32 sArmRegister[kNumRegisters]; \
+    UINT8 pendingIrq;                   \
+    UINT8 pendingFiq;                   \
+    UINT8 pendingAbtD;                  \
+    UINT8 pendingAbtP;                  \
+    UINT8 pendingUnd;                   \
+    UINT8 pendingSwi;                   \
+    INT32 iCount;			\
+    cpu_irq_callback irq_callback;		\
+    const device_config *device;		\
+    const address_space *program;
+
+
+/* CPU state struct */
+typedef struct
+{
+    ARM7CORE_REGS               // these must be included in your cpu specific register implementation
+} arm_state;
+
+/****************************************************************************************************
+ *  VARIOUS INTERNAL STRUCS/DEFINES/ETC..
+ ***************************************************************************************************/
+// Mode values come from bit 4-0 of CPSR, but we are ignoring bit 4 here, since bit 4 always = 1 for valid modes
+enum
+{
+    eARM7_MODE_USER = 0x0,      // Bit: 4-0 = 10000
+    eARM7_MODE_FIQ  = 0x1,      // Bit: 4-0 = 10001
+    eARM7_MODE_IRQ  = 0x2,      // Bit: 4-0 = 10010
+    eARM7_MODE_SVC  = 0x3,      // Bit: 4-0 = 10011
+    eARM7_MODE_ABT  = 0x7,      // Bit: 4-0 = 10111
+    eARM7_MODE_UND  = 0xb,      // Bit: 4-0 = 11011
+    eARM7_MODE_SYS  = 0xf       // Bit: 4-0 = 11111
+};
+
+#define ARM7_NUM_MODES 0x10
 
 static const int thumbCycles[256] =
 {
@@ -392,23 +399,23 @@ enum
 #define THUMB_SIGN_BITS_DIFFER(a, b) (((a)^(b)) >> 31)
 
 /* At one point I thought these needed to be cpu implementation specific, but they don't.. */
-#define GET_REGISTER(reg)       GetRegister(reg)
-#define SET_REGISTER(reg, val)  SetRegister(reg, val)
-#define ARM7_CHECKIRQ           arm7_check_irq_state()
+#define GET_REGISTER(state, reg)       GetRegister(state, reg)
+#define SET_REGISTER(state, reg, val)  SetRegister(state, reg, val)
+#define ARM7_CHECKIRQ           arm7_check_irq_state(cpustate)
 
 extern WRITE32_HANDLER((*arm7_coproc_do_callback));
 extern READ32_HANDLER((*arm7_coproc_rt_r_callback));
 extern WRITE32_HANDLER((*arm7_coproc_rt_w_callback));
-extern void (*arm7_coproc_dt_r_callback)(UINT32 insn, UINT32* prn, UINT32 (*read32)(UINT32 addr));
-extern void (*arm7_coproc_dt_w_callback)(UINT32 insn, UINT32* prn, void (*write32)(UINT32 addr, UINT32 data));
+extern void (*arm7_coproc_dt_r_callback)(arm_state *cpustate, UINT32 insn, UINT32* prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
+extern void (*arm7_coproc_dt_w_callback)(arm_state *cpustate, UINT32 insn, UINT32* prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
 
 extern UINT32 arm7_disasm(char *pBuf, UINT32 pc, UINT32 opcode);
 extern UINT32 thumb_disasm(char *pBuf, UINT32 pc, UINT16 opcode);
 
 #ifdef UNUSED_DEFINITION
-extern char *(*arm7_dasm_cop_dt_callback)(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-extern char *(*arm7_dasm_cop_rt_callback)(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
-extern char *(*arm7_dasm_cop_do_callback)(char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
+extern char *(*arm7_dasm_cop_dt_callback)(arm_state *cpustate, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
+extern char *(*arm7_dasm_cop_rt_callback)(arm_state *cpustate, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
+extern char *(*arm7_dasm_cop_do_callback)(arm_state *cpustate, char *pBuf, UINT32 opcode, char *pConditionCode, char *pBuf0);
 #endif
 
 #endif /* __ARM7CORE_H__ */

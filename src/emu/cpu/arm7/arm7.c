@@ -46,35 +46,25 @@
 static WRITE32_HANDLER(test_do_callback);
 static READ32_HANDLER(test_rt_r_callback);
 static WRITE32_HANDLER(test_rt_w_callback);
-static void test_dt_r_callback(UINT32 insn, UINT32 *prn, UINT32 (*read32)(UINT32 addr));
-static void test_dt_w_callback(UINT32 insn, UINT32 *prn, void (*write32)(UINT32 addr, UINT32 data));
+static void test_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr));
+static void test_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data));
 #endif
 
 /* Macros that can be re-defined for custom cpu implementations - The core expects these to be defined */
 /* In this case, we are using the default arm7 handlers (supplied by the core)
    - but simply changes these and define your own if needed for cpu implementation specific needs */
-#define READ8(addr)         arm7_cpu_read8(addr)
-#define WRITE8(addr,data)   arm7_cpu_write8(addr,data)
-#define READ16(addr)        arm7_cpu_read16(addr)
-#define WRITE16(addr,data)  arm7_cpu_write16(addr,data)
-#define READ32(addr)        arm7_cpu_read32(addr)
-#define WRITE32(addr,data)  arm7_cpu_write32(addr,data)
+#define READ8(addr)         arm7_cpu_read8(cpustate, addr)
+#define WRITE8(addr,data)   arm7_cpu_write8(cpustate, addr,data)
+#define READ16(addr)        arm7_cpu_read16(cpustate, addr)
+#define WRITE16(addr,data)  arm7_cpu_write16(cpustate, addr,data)
+#define READ32(addr)        arm7_cpu_read32(cpustate, addr)
+#define WRITE32(addr,data)  arm7_cpu_write32(cpustate, addr,data)
 #define PTR_READ32          &arm7_cpu_read32
 #define PTR_WRITE32         &arm7_cpu_write32
 
 /* Macros that need to be defined according to the cpu implementation specific need */
-#define ARM7REG(reg)        arm7.sArmRegister[reg]
-#define ARM7                arm7
-#define ARM7_ICOUNT         arm7_icount
-
-/* CPU Registers */
-typedef struct
-{
-    ARM7CORE_REGS               // these must be included in your cpu specific register implementation
-} ARM7_REGS;
-
-static ARM7_REGS arm7;
-static int ARM7_ICOUNT;
+#define ARM7REG(reg)        cpustate->sArmRegister[reg]
+#define ARM7_ICOUNT         cpustate->iCount
 
 /* include the arm7 core */
 #include "arm7core.c"
@@ -84,32 +74,34 @@ static int ARM7_ICOUNT;
  **************************************************************************/
 static CPU_INIT( arm7 )
 {
-    // must call core
-    arm7_core_init("arm7", device);
+	arm_state *cpustate = device->token;
 
-    ARM7.irq_callback = irqcallback;
-    ARM7.device = device;
-    ARM7.program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	// must call core
+	arm7_core_init("arm7", device);
+
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->program = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 #if TEST_COPROC_FUNCS
-    // setup co-proc callbacks example
-    arm7_coproc_do_callback = test_do_callback;
-    arm7_coproc_rt_r_callback = test_rt_r_callback;
-    arm7_coproc_rt_w_callback = test_rt_w_callback;
-    arm7_coproc_dt_r_callback = test_dt_r_callback;
-    arm7_coproc_dt_w_callback = test_dt_w_callback;
+	// setup co-proc callbacks example
+	arm7_coproc_do_callback = test_do_callback;
+	arm7_coproc_rt_r_callback = test_rt_r_callback;
+	arm7_coproc_rt_w_callback = test_rt_w_callback;
+	arm7_coproc_dt_r_callback = test_dt_r_callback;
+	arm7_coproc_dt_w_callback = test_dt_w_callback;
 #endif
 }
 
 static CPU_RESET( arm7 )
 {
-    // must call core reset
-    arm7_core_reset(device);
+	// must call core reset
+	arm7_core_reset(device);
 }
 
 static CPU_EXIT( arm7 )
 {
-    /* nothing to do here */
+	/* nothing to do here */
 }
 
 static CPU_EXECUTE( arm7 )
@@ -119,30 +111,24 @@ static CPU_EXECUTE( arm7 )
 }
 
 
-static void set_irq_line(int irqline, int state)
+static void set_irq_line(arm_state *cpustate, int irqline, int state)
 {
     // must call core
-    arm7_core_set_irq_line(irqline,state);
+    arm7_core_set_irq_line(cpustate, irqline, state);
 }
 
 static CPU_GET_CONTEXT( arm7 )
 {
-    if (dst)
-    {
-        memcpy(dst, &ARM7, sizeof(ARM7));
-    }
 }
 
 static CPU_SET_CONTEXT( arm7 )
 {
-    if (src)
-    {
-        memcpy(&ARM7, src, sizeof(ARM7));
-    }
 }
 
 static CPU_DISASSEMBLE( arm7 )
 {
+    arm_state *cpustate = device->token;
+
     if (T_IS_SET(GET_CPSR))
     {
         return thumb_disasm(buffer, pc, oprom[0] | (oprom[1] << 8)) | 2;
@@ -160,16 +146,18 @@ static CPU_DISASSEMBLE( arm7 )
 
 static CPU_SET_INFO( arm7 )
 {
+    arm_state *cpustate = device->token;
+
     switch (state)
     {
         /* --- the following bits of info are set as 64-bit signed integers --- */
 
         /* interrupt lines/exceptions */
-        case CPUINFO_INT_INPUT_STATE + ARM7_IRQ_LINE:                   set_irq_line(ARM7_IRQ_LINE, info->i); break;
-        case CPUINFO_INT_INPUT_STATE + ARM7_FIRQ_LINE:                  set_irq_line(ARM7_FIRQ_LINE, info->i); break;
-        case CPUINFO_INT_INPUT_STATE + ARM7_ABORT_EXCEPTION:            set_irq_line(ARM7_ABORT_EXCEPTION, info->i); break;
-        case CPUINFO_INT_INPUT_STATE + ARM7_ABORT_PREFETCH_EXCEPTION:   set_irq_line(ARM7_ABORT_PREFETCH_EXCEPTION, info->i); break;
-        case CPUINFO_INT_INPUT_STATE + ARM7_UNDEFINE_EXCEPTION:         set_irq_line(ARM7_UNDEFINE_EXCEPTION, info->i); break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_IRQ_LINE:                   set_irq_line(cpustate, ARM7_IRQ_LINE, info->i); break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_FIRQ_LINE:                  set_irq_line(cpustate, ARM7_FIRQ_LINE, info->i); break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_ABORT_EXCEPTION:            set_irq_line(cpustate, ARM7_ABORT_EXCEPTION, info->i); break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_ABORT_PREFETCH_EXCEPTION:   set_irq_line(cpustate, ARM7_ABORT_PREFETCH_EXCEPTION, info->i); break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_UNDEFINE_EXCEPTION:         set_irq_line(cpustate, ARM7_UNDEFINE_EXCEPTION, info->i); break;
 
         /* registers shared by all operating modes */
         case CPUINFO_INT_REGISTER + ARM7_R0:            ARM7REG( 0) = info->i;                  break;
@@ -192,7 +180,7 @@ static CPU_SET_INFO( arm7 )
 
         case CPUINFO_INT_PC:
         case CPUINFO_INT_REGISTER + ARM7_PC:            R15 = info->i;                          break;
-        case CPUINFO_INT_SP:                            SetRegister(13,info->i);                break;
+        case CPUINFO_INT_SP:                            SetRegister(cpustate, 13,info->i);                break;
 
         /* FIRQ Mode Shadowed Registers */
         case CPUINFO_INT_REGISTER + ARM7_FR8:           ARM7REG(eR8_FIQ)  = info->i;            break;
@@ -234,12 +222,14 @@ static CPU_SET_INFO( arm7 )
 
 CPU_GET_INFO( arm7 )
 {
+    arm_state *cpustate = (device != NULL) ? device->token : NULL;
+
     switch (state)
     {
         /* --- the following bits of info are returned as 64-bit signed integers --- */
 
         /* cpu implementation data */
-        case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(ARM7);                 break;
+        case CPUINFO_INT_CONTEXT_SIZE:                  info->i = sizeof(arm_state);                 break;
         case CPUINFO_INT_INPUT_LINES:                   info->i = ARM7_NUM_LINES;               break;
         case CPUINFO_INT_DEFAULT_IRQ_VECTOR:            info->i = 0;                            break;
         case CPUINFO_INT_ENDIANNESS:                    info->i = CPU_IS_LE;                    break;
@@ -261,11 +251,11 @@ CPU_GET_INFO( arm7 )
         case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:      info->i = 0;                    break;
 
         /* interrupt lines/exceptions */
-        case CPUINFO_INT_INPUT_STATE + ARM7_IRQ_LINE:                   info->i = ARM7.pendingIrq; break;
-        case CPUINFO_INT_INPUT_STATE + ARM7_FIRQ_LINE:                  info->i = ARM7.pendingFiq; break;
-        case CPUINFO_INT_INPUT_STATE + ARM7_ABORT_EXCEPTION:            info->i = ARM7.pendingAbtD; break;
-        case CPUINFO_INT_INPUT_STATE + ARM7_ABORT_PREFETCH_EXCEPTION:   info->i = ARM7.pendingAbtP; break;
-        case CPUINFO_INT_INPUT_STATE + ARM7_UNDEFINE_EXCEPTION:         info->i = ARM7.pendingUnd; break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_IRQ_LINE:                   info->i = cpustate->pendingIrq; break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_FIRQ_LINE:                  info->i = cpustate->pendingFiq; break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_ABORT_EXCEPTION:            info->i = cpustate->pendingAbtD; break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_ABORT_PREFETCH_EXCEPTION:   info->i = cpustate->pendingAbtP; break;
+        case CPUINFO_INT_INPUT_STATE + ARM7_UNDEFINE_EXCEPTION:         info->i = cpustate->pendingUnd; break;
 
         /* registers shared by all operating modes */
         case CPUINFO_INT_REGISTER + ARM7_R0:    info->i = ARM7REG( 0);                          break;
@@ -288,7 +278,7 @@ CPU_GET_INFO( arm7 )
         case CPUINFO_INT_PREVIOUSPC:            info->i = 0;    /* not implemented */           break;
         case CPUINFO_INT_PC:
         case CPUINFO_INT_REGISTER + ARM7_PC:    info->i = R15;                                  break;
-        case CPUINFO_INT_SP:                    info->i = GetRegister(13);                      break;
+        case CPUINFO_INT_SP:                    info->i = GetRegister(cpustate, 13);            break;
 
         /* FIRQ Mode Shadowed Registers */
         case CPUINFO_INT_REGISTER + ARM7_FR8:   info->i = ARM7REG(eR8_FIQ);                     break;
@@ -419,11 +409,11 @@ static WRITE32_HANDLER(test_rt_w_callback)
 {
     LOG(("test_rt_w_callback opcode=%x, data from ARM7 register=%x\n", offset, data));
 }
-static void test_dt_r_callback(UINT32 insn, UINT32 *prn, UINT32 (*read32)(UINT32 addr))
+static void test_dt_r_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, UINT32 (*read32)(arm_state *cpustate, UINT32 addr))
 {
     LOG(("test_dt_r_callback: insn = %x\n", insn));
 }
-static void test_dt_w_callback(UINT32 insn, UINT32 *prn, void (*write32)(UINT32 addr, UINT32 data))
+static void test_dt_w_callback(arm_state *cpustate, UINT32 insn, UINT32 *prn, void (*write32)(arm_state *cpustate, UINT32 addr, UINT32 data))
 {
     LOG(("test_dt_w_callback: opcode = %x\n", insn));
 }
