@@ -11,6 +11,9 @@
 #define INLINE static
 #endif
 
+#undef uint
+#define uint unsigned int
+
 /* Turn on optimizations for SNES since it doesn't hook up the interrupt lines */
 #define SPC700_OPTIMIZE_SNES 1
 
