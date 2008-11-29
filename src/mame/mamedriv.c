@@ -8191,7 +8191,7 @@ Other Sun games
 	DRIVER( spotty )	/* (c) 2001 Prince Co. */
 	DRIVER( carrera )	/* (c) 19?? BS Electronics */
 
-	/* Golden Poker / Potten's Poker hardware */
+	/* Golden Poker / Potten's Poker / Witch Card hardware */
 	DRIVER( pmpoker )	/* (c) 1981 PlayMan */
 	DRIVER( goldnpkr )	/* (c) 1981 Bonanza */
 	DRIVER( goldnpkb )	/* (c) 1981 Bonanza */
@@ -8203,8 +8203,38 @@ Other Sun games
 	DRIVER( potnpkre )	/* Bootleg */
 	DRIVER( goodluck )	/* Unknown */
 	DRIVER( royale )	/* Unknown */
+	DRIVER( royalea )	/* Unknown */
+	DRIVER( witchcrd )	/* 1991, Video Klein */
+	DRIVER( witchcda )	/* 1991, Unknown */
+	DRIVER( witchcdb )	/* 1991, Unknown */
+	DRIVER( witchcdc )	/* 1991, Unknown */
 	DRIVER( sloco93 )	/* 1993, Unknown */
 	DRIVER( sloco93a )	/* 1993, Unknown */
+	DRIVER( maverik )	/* 198?, Unknown */
+	DRIVER( brasil89 )	/* 1989, Unknown */
+	DRIVER( poker91 )	/* 1991, Unknown */
+	DRIVER( bsuerte )	/* 1990, Unknown */
+	DRIVER( bsuertea )	/* 1991, Unknown */
+	DRIVER( bsuerteb )	/* 1991, Unknown */
+	DRIVER( bsuertec )	/* 1991, Unknown */
+	DRIVER( bsuerted )	/* 1991, Unknown */
+	DRIVER( bsuertee )	/* 1991, Unknown */
+	DRIVER( bsuertef )	/* 1991, Unknown */
+	DRIVER( bsuerteg )	/* 1991, Unknown */
+	DRIVER( bsuerteh )	/* 1991, Unknown */
+	DRIVER( bsuertei )	/* 1991, Unknown */
+	DRIVER( bsuertej )	/* 1991, Unknown */
+	DRIVER( bsuertek )	/* 1991, Unknown */
+	DRIVER( bsuertel )	/* 1991, Unknown */
+	DRIVER( bsuertem )	/* 1991, Unknown */
+	DRIVER( bsuerten )	/* 1991, Unknown */
+	DRIVER( bsuerteo )	/* 1991, Unknown */
+	DRIVER( bsuertep )	/* 1991, Unknown */
+	DRIVER( bsuerteq )	/* 1991, Unknown */
+	DRIVER( bsuerter )	/* 1991, Unknown */
+	DRIVER( bsuertes )	/* 1991, Unknown */
+	DRIVER( bsuertet )	/* 1991, Unknown */
+	DRIVER( bsuerteu )	/* 1991, Unknown */
 
 	/* Cal Omega */
 	DRIVER( comg076 )	/* (c) 1981 Cal Omega Inc. */
