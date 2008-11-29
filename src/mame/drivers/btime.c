@@ -1149,7 +1149,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( zoar )
 	GFXDECODE_ENTRY( "gfx1", 0, tile8layout,     0, 8 ) /* char set #1 */
-	GFXDECODE_ENTRY( "gfx4", 0, tile16layout,    0, 8 ) /* sprites */
+	GFXDECODE_ENTRY( "gfx3", 0, tile16layout,    0, 8 ) /* sprites */
 	GFXDECODE_ENTRY( "gfx2", 0, tile16layout,    0, 8 ) /* background tiles */
 GFXDECODE_END
 
@@ -1346,7 +1346,7 @@ ROM_START( btime )
 	ROM_LOAD( "ab01.3b",      0x0800, 0x0800, CRC(25b49078) SHA1(4abdcbd4f3362c3e4463a1274731289f1a72d2e6) )
 	ROM_LOAD( "ab02.4b",      0x1000, 0x0800, CRC(b8ef56c3) SHA1(4a03bf011dc1fb2902f42587b1174b880cf06df1) )
 
-	ROM_REGION( 0x0800, "gfx3", 0 )	/* background tilemaps */
+	ROM_REGION( 0x0800, "bg_map", 0 )	/* background tilemaps */
 	ROM_LOAD( "ab03.6b",      0x0000, 0x0800, CRC(d26bc1f3) SHA1(737af6e264183a1f151f277a07cf250d6abb3fd8) )
 ROM_END
 
@@ -1374,7 +1374,7 @@ ROM_START( btime2 )
 	ROM_LOAD( "ab01.3b",      0x0800, 0x0800, CRC(25b49078) SHA1(4abdcbd4f3362c3e4463a1274731289f1a72d2e6) )
 	ROM_LOAD( "ab02.4b",      0x1000, 0x0800, CRC(b8ef56c3) SHA1(4a03bf011dc1fb2902f42587b1174b880cf06df1) )
 
-	ROM_REGION( 0x0800, "gfx3", 0 )	/* background tilemaps */
+	ROM_REGION( 0x0800, "bg_map", 0 )	/* background tilemaps */
 	ROM_LOAD( "ab03.6b",      0x0000, 0x0800, CRC(d26bc1f3) SHA1(737af6e264183a1f151f277a07cf250d6abb3fd8) )
 ROM_END
 
@@ -1402,7 +1402,7 @@ ROM_START( btimem )
 	ROM_LOAD( "ab01.3b",      0x0800, 0x0800, CRC(25b49078) SHA1(4abdcbd4f3362c3e4463a1274731289f1a72d2e6) )
 	ROM_LOAD( "ab02.4b",      0x1000, 0x0800, CRC(b8ef56c3) SHA1(4a03bf011dc1fb2902f42587b1174b880cf06df1) )
 
-	ROM_REGION( 0x0800, "gfx3", 0 )	/* background tilemaps */
+	ROM_REGION( 0x0800, "bg_map", 0 )	/* background tilemaps */
 	ROM_LOAD( "ab03.6b",      0x0000, 0x0800, CRC(d26bc1f3) SHA1(737af6e264183a1f151f277a07cf250d6abb3fd8) )
 ROM_END
 
@@ -1455,21 +1455,21 @@ ROM_START( tisland )
 	ROM_LOAD( "t-0d.k5",      0x2000, 0x1000, CRC(3d3e40b2) SHA1(90576c82500ce8eddbf4dd02e59ec4ccc3b13000) ) /* 8x8 tiles */
 
 	ROM_REGION( 0x1800, "gfx2", ROMREGION_DISPOSE ) /* bg tiles */
-	// also contains the (incomplete) bg tilemap data for 1 tilemap (0x400-0x7ff of every rom is same as gfx3 region, leftover?) */
+	// also contains the (incomplete) bg tilemap data for 1 tilemap (0x400-0x7ff of every rom is same as bg_map region, leftover?) */
 	ROM_LOAD( "t-00.b1",      0x0000, 0x0800, CRC(05eaf899) SHA1(b03a1b7d985b4d841d6bbb213a32a33e324dff89) )    /* charset #2 */
 	ROM_LOAD( "t-01.b2",      0x0800, 0x0800, CRC(f692e9e0) SHA1(e07ef20de8e9387f1096412d42d14ed5e52bbbd9) )
 	ROM_LOAD( "t-02.b4",      0x1000, 0x0800, CRC(88396cae) SHA1(47233d91e9c7b14091a0050524fa49e1bc69311d) )
 
-	ROM_REGION( 0x1000, "gfx3", 0 ) /* bg tilemap data */
-	ROM_LOAD( "t-03.b5",      0x0000, 0x1000, CRC(68df6d50) SHA1(461acc39089faac36bf8a8d279fbb6c046ae0264) )
-
-	ROM_REGION( 0x6000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x6000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "t-11.k11",     0x0000, 0x1000, CRC(779cc47c) SHA1(8921b81d460232252fd5a3c9bb2ad0befc1421da) ) /* 16x16 tiles*/
 	ROM_LOAD( "t-12.k13",     0x1000, 0x1000, CRC(c804a8aa) SHA1(f8ce1da88443416b6cd276741a600104d36c3725) )
 	ROM_LOAD( "t-0e.k6",      0x2000, 0x1000, CRC(63aa2b22) SHA1(765c405b1948191f5bdf1d8c1e7f20acb0894195) )
 	ROM_LOAD( "t-0f.k8",      0x3000, 0x1000, CRC(3eeca392) SHA1(78deceea3628aed0a57cb4208d260a91a304695a) )
 	ROM_LOAD( "t-0b.k2",      0x4000, 0x1000, CRC(ec416f20) SHA1(20852ef9753b103c5ec03d5eede778c0e25fc059) )
 	ROM_LOAD( "t-0c.k4",      0x5000, 0x1000, CRC(428513a7) SHA1(aab97ee938dc743a2941f71f827c22b9dde8aef0) )
+
+	ROM_REGION( 0x1000, "bg_map", 0 ) /* bg tilemap data */
+	ROM_LOAD( "t-03.b5",      0x0000, 0x1000, CRC(68df6d50) SHA1(461acc39089faac36bf8a8d279fbb6c046ae0264) )
 ROM_END
 
 /* There is a flyer with a screen shot for Lock'n'Chase at:
@@ -1652,13 +1652,13 @@ ROM_START( zoar )
 	ROM_LOAD( "zoar11",       0x0800, 0x0800, CRC(dcdad357) SHA1(d1569e1d38f14f5f457547e24df4f80f726c6157) )
 	ROM_LOAD( "zoar12",       0x1000, 0x0800, CRC(ed317e40) SHA1(db70889af5f233ca71acf734abfbdb74b6a393c0) )
 
-	ROM_REGION( 0x1000, "gfx3", 0 )	/* background tilemaps */
-	ROM_LOAD( "zoar13",       0x0000, 0x1000, CRC(8fefa960) SHA1(614026aa71703dd3898e470f45730e5c6934b31b) )
-
-	ROM_REGION( 0x3000, "gfx4", ROMREGION_DISPOSE )
+	ROM_REGION( 0x3000, "gfx3", ROMREGION_DISPOSE )
 	ROM_LOAD( "zoar02",       0x0000, 0x1000, CRC(d8c3c122) SHA1(841006cc84622e851df462a64696b64bb8cb62a1) )
 	ROM_LOAD( "zoar05",       0x1000, 0x1000, CRC(05dc6b09) SHA1(197c720544a090e12980513b441a2b9cf04e212f) )
 	ROM_LOAD( "zoar08",       0x2000, 0x1000, CRC(9a148551) SHA1(db92dd7552c6f76a062910f37a3fe3524fdffd38) )
+
+	ROM_REGION( 0x1000, "bg_map", 0 )	/* background tilemaps */
+	ROM_LOAD( "zoar13",       0x0000, 0x1000, CRC(8fefa960) SHA1(614026aa71703dd3898e470f45730e5c6934b31b) )
 
 	ROM_REGION( 0x0040, "proms", 0 )
 	ROM_LOAD( "z20-1l",       0x0000, 0x0020, CRC(a63f0a07) SHA1(16532d3ac0536ad4b712005fd722ee8c14d02e9b) )
