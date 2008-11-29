@@ -1081,7 +1081,7 @@ static void registers_update(debug_view *view)
 	const device_config *screen = Machine->primary_screen;
 
 	/* cannot update if no active CPU */
-	if (Machine->activecpu != NULL)
+	if (Machine->activecpu == NULL)
 		return;
 	total_cycles = cpu_get_total_cycles(Machine->activecpu);
 
