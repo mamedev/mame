@@ -860,14 +860,10 @@ static CPU_EXECUTE( m37710 )
 
 
 /* Get the current CPU context */
-static CPU_GET_CONTEXT( m37710 )
-{
-}
+static CPU_GET_CONTEXT( m37710 ) { }
 
 /* Set the current CPU context */
-static CPU_SET_CONTEXT( m37710 )
-{
-}
+static CPU_SET_CONTEXT( m37710 ) { }
 
 /* Set the Program Counter */
 static void m37710_set_pc(m37710i_cpu_struct *cpustate, unsigned val)

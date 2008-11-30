@@ -2835,13 +2835,9 @@ static CPU_EXECUTE( psxcpu )
 	return cycles - psxcpu->icount;
 }
 
-static CPU_GET_CONTEXT( psxcpu )
-{
-}
+static CPU_GET_CONTEXT( psxcpu ) { }
 
-static CPU_SET_CONTEXT( psxcpu )
-{
-}
+static CPU_SET_CONTEXT( psxcpu ) { }
 
 static void set_irq_line( psxcpu_state *psxcpu, int irqline, int state )
 {

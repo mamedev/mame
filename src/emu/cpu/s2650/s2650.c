@@ -806,13 +806,9 @@ static CPU_EXIT( s2650 )
 	/* nothing to do */
 }
 
-static CPU_GET_CONTEXT( s2650 )
-{
-}
+static CPU_GET_CONTEXT( s2650 ) { }
 
-static CPU_SET_CONTEXT( s2650 )
-{
-}
+static CPU_SET_CONTEXT( s2650 ) { }
 
 static void set_irq_line(s2650_regs *s2650c, int irqline, int state)
 {

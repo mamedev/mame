@@ -926,13 +926,9 @@ static CPU_INIT( cdp1802 )
 	state_save_register_item("cdp1802", device->tag, 0, cpustate->ef);
 }
 
-static CPU_GET_CONTEXT( cdp1802 )
-{
-}
+static CPU_GET_CONTEXT( cdp1802 ) { }
 
-static CPU_SET_CONTEXT( cdp1802 )
-{
-}
+static CPU_SET_CONTEXT( cdp1802 ) { }
 
 /**************************************************************************
  * Generic set_info

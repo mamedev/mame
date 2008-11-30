@@ -756,13 +756,9 @@ static CPU_EXECUTE( ssp1601 )
  * MAME interface
  **************************************************************************/
 
-static CPU_GET_CONTEXT( ssp1601 )
-{
-}
+static CPU_GET_CONTEXT( ssp1601 ) { }
 
-static CPU_SET_CONTEXT( ssp1601 )
-{
-}
+static CPU_SET_CONTEXT( ssp1601 ) { }
 
 static CPU_DISASSEMBLE( ssp1601 )
 {

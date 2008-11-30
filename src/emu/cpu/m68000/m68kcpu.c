@@ -572,13 +572,9 @@ static CPU_RESET( m68k )
 	m68k->run_mode = RUN_MODE_NORMAL;
 }
 
-static CPU_GET_CONTEXT( m68k )
-{
-}
+static CPU_GET_CONTEXT( m68k ) { }
 
-static CPU_SET_CONTEXT( m68k )
-{
-}
+static CPU_SET_CONTEXT( m68k ) { }
 
 static CPU_DISASSEMBLE( m68k )
 {

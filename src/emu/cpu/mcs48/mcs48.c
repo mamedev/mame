@@ -989,9 +989,7 @@ ADDRESS_MAP_END
     destination
 -------------------------------------------------*/
 
-static CPU_GET_CONTEXT( mcs48 )
-{
-}
+static CPU_GET_CONTEXT( mcs48 ) { }
 
 
 /*-------------------------------------------------
@@ -999,9 +997,7 @@ static CPU_GET_CONTEXT( mcs48 )
     from the source
 -------------------------------------------------*/
 
-static CPU_SET_CONTEXT( mcs48 )
-{
-}
+static CPU_SET_CONTEXT( mcs48 ) { }
 
 
 /*-------------------------------------------------

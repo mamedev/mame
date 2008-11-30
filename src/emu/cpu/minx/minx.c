@@ -211,14 +211,9 @@ static CPU_BURN( minx )
 }
 
 
-static CPU_SET_CONTEXT( minx )
-{
-}
+static CPU_GET_CONTEXT( minx ) { }
 
-
-static CPU_GET_CONTEXT( minx )
-{
-}
+static CPU_SET_CONTEXT( minx ) { }
 
 
 static unsigned minx_get_reg( int regnum )

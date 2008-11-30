@@ -1793,13 +1793,9 @@ static CPU_EXIT( SE3208 )
 }
 
 
-static CPU_GET_CONTEXT( SE3208 )
-{
-}
+static CPU_GET_CONTEXT( SE3208 ) { }
 
-static CPU_SET_CONTEXT( SE3208 )
-{
-}
+static CPU_SET_CONTEXT( SE3208 ) { }
 
 static void set_irq_line(se3208_state_t *se3208_state, int line,int state)
 {

@@ -1012,18 +1012,14 @@ static CPU_EXECUTE( i8x41 )
  *  Get all registers in given buffer
  ****************************************************************************/
 
-static CPU_GET_CONTEXT( i8x41 )
-{
-}
+static CPU_GET_CONTEXT( i8x41 ) { }
 
 
 /****************************************************************************
  *  Set all registers to given values
  ****************************************************************************/
 
-static CPU_SET_CONTEXT( i8x41 )
-{
-}
+static CPU_SET_CONTEXT( i8x41 ) { }
 
 /****************************************************************************
  *  Set IRQ line state

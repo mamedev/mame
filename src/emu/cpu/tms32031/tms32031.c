@@ -357,14 +357,10 @@ static void set_irq_line(tms32031_state *tms, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( tms32031 )
-{
-}
+static CPU_GET_CONTEXT( tms32031 ) { }
 
 
-static CPU_SET_CONTEXT( tms32031 )
-{
-}
+static CPU_SET_CONTEXT( tms32031 ) { }
 
 
 

@@ -284,14 +284,10 @@ static void set_irq_line(r3000_state *r3000, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( r3000 )
-{
-}
+static CPU_GET_CONTEXT( r3000 ) { }
 
 
-static CPU_SET_CONTEXT( r3000 )
-{
-}
+static CPU_SET_CONTEXT( r3000 ) { }
 
 
 

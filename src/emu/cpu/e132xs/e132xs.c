@@ -1714,13 +1714,9 @@ static CPU_EXIT( hyperstone )
 	// nothing to do
 }
 
-static CPU_GET_CONTEXT( hyperstone )
-{
-}
+static CPU_GET_CONTEXT( hyperstone ) { }
 
-static CPU_SET_CONTEXT( hyperstone )
-{
-}
+static CPU_SET_CONTEXT( hyperstone ) { }
 
 static CPU_DISASSEMBLE( hyperstone )
 {

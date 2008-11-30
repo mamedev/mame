@@ -392,14 +392,10 @@ static void set_irq_line(asap_state *asap, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( asap )
-{
-}
+static CPU_GET_CONTEXT( asap ) { }
 
 
-static CPU_SET_CONTEXT( asap )
-{
-}
+static CPU_SET_CONTEXT( asap ) { }
 
 
 

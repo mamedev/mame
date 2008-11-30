@@ -344,14 +344,9 @@ static void set_irq_line(jaguar_state *jaguar, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( jaguar )
-{
-}
+static CPU_GET_CONTEXT( jaguar ) { }
 
-
-static CPU_SET_CONTEXT( jaguar )
-{
-}
+static CPU_SET_CONTEXT( jaguar ) { }
 
 
 /***************************************************************************

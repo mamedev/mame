@@ -129,13 +129,9 @@ static CPU_EXIT( m65ce02 )
 	/* nothing to do yet */
 }
 
-static CPU_GET_CONTEXT( m65ce02 )
-{
-}
+static CPU_GET_CONTEXT( m65ce02 ) { }
 
-static CPU_SET_CONTEXT( m65ce02 )
-{
-}
+static CPU_SET_CONTEXT( m65ce02 ) { }
 
 INLINE void m65ce02_take_irq(m65ce02_Regs *cpustate)
 {

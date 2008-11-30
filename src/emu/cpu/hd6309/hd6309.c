@@ -497,16 +497,12 @@ static void check_irq_lines( m68_state_t *m68_state )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static CPU_GET_CONTEXT( hd6309 )
-{
-}
+static CPU_GET_CONTEXT( hd6309 ) { }
 
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static CPU_SET_CONTEXT( hd6309 )
-{
-}
+static CPU_SET_CONTEXT( hd6309 ) { }
 
 static STATE_POSTLOAD( hd6309_postload )
 {

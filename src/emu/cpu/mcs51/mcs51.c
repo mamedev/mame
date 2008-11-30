@@ -2414,13 +2414,9 @@ ADDRESS_MAP_END
     GENERAL CONTEXT ACCESS
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( mcs51 )
-{
-}
+static CPU_GET_CONTEXT( mcs51 ) { }
 
-static CPU_SET_CONTEXT( mcs51 )
-{
-}
+static CPU_SET_CONTEXT( mcs51 ) { }
 
 /**************************************************************************
  * Generic set_info

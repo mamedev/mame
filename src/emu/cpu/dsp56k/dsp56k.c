@@ -276,7 +276,7 @@ INLINE void invalid_instruction(UINT32 op)
 ***************************************************************************/
 static void check_irqs(void)
 {
-	logerror("Dsp56k check irqs\n");
+	//logerror("Dsp56k check irqs\n");
 }
 
 static void set_irq_line(int irqline, int state)

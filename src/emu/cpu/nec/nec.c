@@ -1047,13 +1047,9 @@ static void i_invalid(nec_state_t *nec_state)
 
 /*****************************************************************************/
 
-static CPU_GET_CONTEXT( nec )
-{
-}
+static CPU_GET_CONTEXT( nec ) { }
 
-static CPU_SET_CONTEXT( nec )
-{
-}
+static CPU_SET_CONTEXT( nec ) { }
 
 static void set_irq_line(nec_state_t *nec_state, int irqline, int state)
 {

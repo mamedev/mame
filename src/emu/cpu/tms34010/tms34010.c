@@ -704,14 +704,10 @@ static CPU_EXIT( tms34010 )
     Get all registers in given buffer
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( tms34010 )
-{
-}
+static CPU_GET_CONTEXT( tms34010 ) { }
 
 
-static CPU_GET_CONTEXT( tms34020 )
-{
-}
+static CPU_GET_CONTEXT( tms34020 ) { }
 
 
 

@@ -358,13 +358,9 @@ static void h8_check_irqs(h83xx_state *h8)
 
 // MAME interface stuff
 
-static CPU_GET_CONTEXT( h8 )
-{
-}
+static CPU_GET_CONTEXT( h8 ) { }
 
-static CPU_SET_CONTEXT( h8 )
-{
-}
+static CPU_SET_CONTEXT( h8 ) { }
 
 static CPU_SET_INFO( h8 )
 {

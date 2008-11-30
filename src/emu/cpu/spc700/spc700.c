@@ -1228,14 +1228,10 @@ CPU_EXIT( spc700 )
 
 
 /* Get the current CPU context */
-CPU_GET_CONTEXT( spc700 )
-{
-}
+CPU_GET_CONTEXT( spc700 ) { }
 
 /* Set the current CPU context */
-CPU_SET_CONTEXT( spc700 )
-{
-}
+CPU_SET_CONTEXT( spc700 ) { }
 
 /* Get the current Program Counter */
 unsigned spc700_get_pc(spc700i_cpu *cpustate)

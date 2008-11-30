@@ -242,9 +242,7 @@ static void t11_check_irqs(t11_state *cpustate)
  *
  *************************************/
 
-static CPU_GET_CONTEXT( t11 )
-{
-}
+static CPU_GET_CONTEXT( t11 ) { }
 
 
 
@@ -254,9 +252,7 @@ static CPU_GET_CONTEXT( t11 )
  *
  *************************************/
 
-static CPU_SET_CONTEXT( t11 )
-{
-}
+static CPU_SET_CONTEXT( t11 ) { }
 
 
 

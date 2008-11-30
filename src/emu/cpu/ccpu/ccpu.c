@@ -94,14 +94,10 @@ do { \
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( ccpu )
-{
-}
+static CPU_GET_CONTEXT( ccpu ) { }
 
 
-static CPU_SET_CONTEXT( ccpu )
-{
-}
+static CPU_SET_CONTEXT( ccpu ) { }
 
 
 

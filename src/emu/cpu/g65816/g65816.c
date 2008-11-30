@@ -241,14 +241,10 @@ static CPU_EXECUTE( g65816 )
 
 
 /* Get the current CPU context */
-static CPU_GET_CONTEXT( g65816 )
-{
-}
+static CPU_GET_CONTEXT( g65816 ) { }
 
 /* Set the current CPU context */
-static CPU_SET_CONTEXT( g65816 )
-{
-}
+static CPU_SET_CONTEXT( g65816 ) { }
 
 /* Get the current Program Counter */
 static unsigned g65816_get_pc(g65816i_cpu_struct *cpustate)

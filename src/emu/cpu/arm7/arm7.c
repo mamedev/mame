@@ -117,13 +117,9 @@ static void set_irq_line(arm_state *cpustate, int irqline, int state)
     arm7_core_set_irq_line(cpustate, irqline, state);
 }
 
-static CPU_GET_CONTEXT( arm7 )
-{
-}
+static CPU_GET_CONTEXT( arm7 ) { }
 
-static CPU_SET_CONTEXT( arm7 )
-{
-}
+static CPU_SET_CONTEXT( arm7 ) { }
 
 static CPU_DISASSEMBLE( arm7 )
 {

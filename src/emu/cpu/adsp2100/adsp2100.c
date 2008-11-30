@@ -548,14 +548,9 @@ static void set_irq_line(adsp2100_state *adsp, int irqline, int state)
     CONTEXT SWITCHING
 ***************************************************************************/
 
-static CPU_GET_CONTEXT( adsp21xx )
-{
-}
+static CPU_GET_CONTEXT( adsp21xx ) { }
 
-
-static CPU_SET_CONTEXT( adsp21xx )
-{
-}
+static CPU_SET_CONTEXT( adsp21xx ) { }
 
 
 

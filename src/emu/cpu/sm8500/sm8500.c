@@ -253,13 +253,9 @@ static CPU_BURN( sm8500 )
 	}
 }
 
-static CPU_SET_CONTEXT( sm8500 )
-{
-}
+static CPU_SET_CONTEXT( sm8500 ) { }
 
-static CPU_GET_CONTEXT( sm8500 )
-{
-}
+static CPU_GET_CONTEXT( sm8500 ) { }
 
 unsigned sm8500_get_reg( int regnum )
 {

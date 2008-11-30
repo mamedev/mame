@@ -1958,13 +1958,9 @@ static CPU_EXECUTE( i960 )
 	return cycles - i960->icount;
 }
 
-static CPU_GET_CONTEXT( i960 )
-{
-}
+static CPU_GET_CONTEXT( i960 ) { }
 
-static CPU_SET_CONTEXT( i960 )
-{
-}
+static CPU_SET_CONTEXT( i960 ) { }
 
 static void set_irq_line(i960_state_t *i960, int irqline, int state)
 {
