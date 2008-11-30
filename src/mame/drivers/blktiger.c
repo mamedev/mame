@@ -330,7 +330,7 @@ ROM_START( blktiger )
 	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
 ROM_END
 
-ROM_START( bktigerb )
+ROM_START( bktigrb1 )
 	ROM_REGION( 0x50000, "main", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "btiger1.f6",   0x00000, 0x08000, CRC(9d8464e8) SHA1(c847ee9a22b8b636e85427214747e6bd779023e8) )	/* CODE */
 	ROM_LOAD( "bdu-02a.6e",   0x10000, 0x10000, CRC(7bef96e8) SHA1(6d05a73d8400dead78c561b904bf6ef8311e7b91) )	/* 0+1 */
@@ -363,7 +363,7 @@ ROM_START( bktigerb )
 	ROM_LOAD( "bd04.11l",  0x0300, 0x0100, CRC(e5490b68) SHA1(40f9f92efe7dd97b49144aec02eb509834056915) )
 ROM_END
 
-ROM_START( bktigerc )
+ROM_START( bktigrb2 )
 	ROM_REGION( 0x50000, "main", 0 )	/* 64k for code + banked ROMs images */
 	ROM_LOAD( "1.bin",        0x00000, 0x08000, CRC(47e2b21e) SHA1(3f03543ace435239978a95f569ac89f6762253c0) )	/* CODE */
 	ROM_LOAD( "bdu-02a.6e",   0x10000, 0x10000, CRC(7bef96e8) SHA1(6d05a73d8400dead78c561b904bf6ef8311e7b91) )	/* 0+1 */
