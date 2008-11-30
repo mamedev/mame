@@ -44,21 +44,21 @@ static TILE_GET_INFO( sengoku_md_tile_info )
 {
 	int tile = sengokmj_mdvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(1, (tile & 0xfff) + 0x1000, color + 0x10, 0);
+	SET_TILE_INFO(2, (tile & 0xfff), color, 0);
 }
 
 static TILE_GET_INFO( sengoku_fg_tile_info )
 {
 	int tile = sengokmj_fgvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(1, (tile & 0xfff) + 0x2000, color + 0x20, 0);
+	SET_TILE_INFO(3, (tile & 0xfff), color, 0);
 }
 
 static TILE_GET_INFO( sengoku_tx_tile_info )
 {
 	int tile = sengokmj_txvram[tile_index];
 	int color = (tile >> 12) & 0x0f;
-	SET_TILE_INFO(2, (tile & 0xfff) + 0x3000, color, 0);
+	SET_TILE_INFO(4, (tile & 0xfff), color, 0);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)

@@ -277,9 +277,11 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( sengokmj )
-	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0x000, 0x40 ) /* Sprites */
-	GFXDECODE_ENTRY( "gfx2", 0, tilelayout, 0x400, 0x30 ) /* Tiles */
-	GFXDECODE_ENTRY( "gfx2", 0, charlayout, 0x700, 0x10 ) /* Text */
+	GFXDECODE_ENTRY( "spr_gfx",0, tilelayout, 0x000, 0x40 ) /* Sprites */
+	GFXDECODE_ENTRY( "bg_gfx", 0, tilelayout, 0x400, 0x10 ) /* Tiles */
+	GFXDECODE_ENTRY( "md_gfx", 0, tilelayout, 0x500, 0x10 ) /* Tiles */
+	GFXDECODE_ENTRY( "fg_gfx", 0, tilelayout, 0x600, 0x10 ) /* Tiles */
+	GFXDECODE_ENTRY( "tx_gfx", 0, charlayout, 0x700, 0x10 ) /* Text */
 GFXDECODE_END
 
 static INTERRUPT_GEN( sengokmj_interrupt )
@@ -328,12 +330,24 @@ ROM_START( sengokmj )
 	ROM_CONTINUE(             0x010000, 0x08000 )
 	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
 
-	ROM_REGION( 0x100000, "gfx1", ROMREGION_DISPOSE )
+	ROM_REGION( 0x100000, "spr_gfx", ROMREGION_DISPOSE ) /*Sprites gfx rom*/
 	ROM_LOAD( "rssengo2.72", 0x00000, 0x100000, CRC(fb215ff8) SHA1(f98c0a53ad9b97d209dd1f85c994fc17ec585bd7) )
 
-	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )
+	ROM_REGION( 0x200000, "gfx_tiles", 0 ) /*Tiles data,to be reloaded*/
 	ROM_LOAD( "rssengo0.64", 0x000000, 0x100000, CRC(36924b71) SHA1(814b2c69ab9876ccc57774e5718c05059ea23150) )
 	ROM_LOAD( "rssengo1.68", 0x100000, 0x100000, CRC(1bbd00e5) SHA1(86391323b8e0d3b7e09a5914d87fb2adc48e5af4) )
+
+	ROM_REGION( 0x080000, "bg_gfx", ROMREGION_DISPOSE )
+	ROM_COPY( "gfx_tiles" , 0x000000, 0x00000, 0x080000)
+
+	ROM_REGION( 0x080000, "md_gfx", ROMREGION_DISPOSE )
+	ROM_COPY( "gfx_tiles" , 0x080000, 0x00000, 0x080000)
+
+	ROM_REGION( 0x080000, "fg_gfx", ROMREGION_DISPOSE )
+	ROM_COPY( "gfx_tiles" , 0x100000, 0x00000, 0x080000)
+
+	ROM_REGION( 0x080000, "tx_gfx", ROMREGION_DISPOSE )
+	ROM_COPY( "gfx_tiles" , 0x180000, 0x00000, 0x080000)
 
 	ROM_REGION( 0x20000, "oki", 0 )	 /* ADPCM samples */
 	ROM_LOAD( "mah1-1-1.915", 0x00000, 0x20000, CRC(d4612e95) SHA1(937c5dbd25c89d4f4178b0bed510307020c5f40e) )
