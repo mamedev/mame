@@ -8381,6 +8381,9 @@ Other Sun games
 	DRIVER( sspac2k1 )	/* 200? unknown */
 	DRIVER( elvis )		/* 200? unknown */
 
+	/*Intel 80186 italian gambling games */
+	DRIVER( brasil )    /* 2000 unknown*/
+
 	/* Mitsubishi/Renesas M16/62A italian gambling games */
 	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */
 	DRIVER( grandprx )	/* (c) 4fun */

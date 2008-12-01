@@ -1301,6 +1301,7 @@ src/mame/drivers/bombjack.c svneol=native#text/plain
 src/mame/drivers/boogwing.c svneol=native#text/plain
 src/mame/drivers/bottom9.c svneol=native#text/plain
 src/mame/drivers/boxer.c svneol=native#text/plain
+src/mame/drivers/brasil.c svneol=native#text/plain
 src/mame/drivers/brkthru.c svneol=native#text/plain
 src/mame/drivers/bsktball.c svneol=native#text/plain
 src/mame/drivers/btime.c svneol=native#text/plain
