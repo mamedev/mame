@@ -8066,7 +8066,6 @@ Other Sun games
 
 	/* Funworld */
 	DRIVER( jollycrd )	/* (c) 1985 TAB-Austria */
-	DRIVER( jolycdae )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolyc3x3 )	/* (c) 1985 TAB-Austria */
 	DRIVER( jolyc980 )	/* (c) 2000 Spale-Soft */
 	DRIVER( jolycdev )	/* (c) 1998 TAB/Evona */
@@ -8092,9 +8091,9 @@ Other Sun games
 	DRIVER( royalcdc )	/* (c) 1991 Evona Electronic */
 	DRIVER( lluck3x3 )	/* (c) 1991 TAB-Austria */
 	DRIVER( lluck4x1 )	/* (c) 1991 TAB-Austria */
-	DRIVER( magiccrd )	/* (c) 1996 Impera */
-	DRIVER( magiccda )	/* (c) 1996 Impera */
-	DRIVER( magiccdb )	/* (c) 1996 Impera */
+	DRIVER( magicrd2 )	/* (c) 1996 Impera */
+	DRIVER( magicd2a )	/* (c) 1996 Impera */
+	DRIVER( magicd2b )	/* (c) 1996 Impera */
 	DRIVER( vegasslw )	/* (c) 1993 Funworld */
 	DRIVER( vegasfst )	/* (c) 1993 Soft Design */
 	DRIVER( vegasfte )	/* (c) 1993 Soft Design */

@@ -11,7 +11,6 @@
     Games running in this hardware:
 
     * Jolly Card (austrian),                            TAB-Austria,        1985.
-    * Jolly Card (austrian, encrypted),                 TAB-Austria,        1985.
     * Jolly Card (3x3 deal),                            TAB-Austria,        1985.
     * Jolly Card Professional 2.0,                      Spale-Soft,         2000.
     * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
@@ -153,7 +152,7 @@ VIDEO_START(funworld)
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 96, 29);
 }
 
-VIDEO_START(magiccrd)
+VIDEO_START(magicrd2)
 {
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows, 4, 8, 112, 34);
 }

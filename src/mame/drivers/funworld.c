@@ -11,7 +11,6 @@
     Games running in this hardware:
 
     * Jolly Card (austrian),                            TAB-Austria,        1985.
-    * Jolly Card (austrian, encrypted),                 TAB-Austria,        1985.
     * Jolly Card (3x3 deal),                            TAB-Austria,        1985.
     * Jolly Card Professional 2.0,                      Spale-Soft,         2000.
     * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
@@ -119,7 +118,7 @@
 
                 - All games using the blue TAB PCB with 2x HY18CV85 (electrically-erasable PLDs), use
                   complex operations for each byte nibble. See DRIVER_INIT for the final algorithm.
-                - Jolly Card (austrian, encrypted) use simple XOR with a fixed value.
+                - Saloon (french) use bitswaps to address & data in program, graphics and color PROM.
 
     - Microcontroller. Some games are using an extra microcontroller mainly for protection.
 
@@ -302,8 +301,8 @@
     $2000 - $2FFF   VideoRAM (funworld/bigdeal)
     $3000 - $3FFF   ColorRAM (funworld/bigdeal)
 
-    $4000 - $4FFF   VideoRAM (magiccrd/royalcrd)
-    $5000 - $5FFF   ColorRAM (magiccrd/royalcrd)
+    $4000 - $4FFF   VideoRAM (magicrd2/royalcrd)
+    $5000 - $5FFF   ColorRAM (magicrd2/royalcrd)
 
     $6000 - $6FFF   VideoRAM (CMC italian games)
     $7000 - $7FFF   ColorRAM (CMC italian games)
@@ -331,7 +330,7 @@
     tortufam:  0x7C  0x60  0x65  0x08  0x1E  0x08  0x1D  0x1D  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
     royalcrd:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
-    magiccrd:  0x7B  0x70  0x66  0xA8  0x24  0x08  0x22  0x22  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
+    magicrd2:  0x7B  0x70  0x66  0xA8  0x24  0x08  0x22  0x22  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
 
     monglfir:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
     soccernw:  0x7C  0x60  0x65  0xA8  0x1E  0x08  0x1D  0x1C  0x00  0x07  0x01  0x01  0x00  0x00  0x00  0x00  0x00  0x00.
@@ -970,10 +969,19 @@
     - Added Pool 10 pinout and DIP switches info.
     - Updated technical notes.
 
+    [2008/12/01]
+    - Decripted saloon's program, graphics and color PROM.
+    - Created a new memory map and machine driver for saloon.
+    - Removed set jolycdae (it's not coming from a real board).
+    - Renamed the sets magiccrd, magiccda and magiccdb, to magicrd2, magicd2a and magicd2b.
+    - Updated technical notes.
+
 
     *** TO DO ***
 
-    - Figure out the royalcdc, jokercrd and saloon encryption.
+    - Figure out the royalcdc & jokercrd encryption.
+    - Figure out the remaining PIA connections for almost all games.
+    - Fix Saloon and move it to its own driver.
     - Fix the imperfect sound in Magic Card II.
     - Reverse-engineering the boot code of Jolly Card Professional 2.0 to get the proper codes to boot.
     - Analyze the unknown writes to $2000/$4000 in some games.
@@ -999,7 +1007,7 @@ WRITE8_HANDLER( funworld_videoram_w );
 WRITE8_HANDLER( funworld_colorram_w );
 PALETTE_INIT( funworld );
 VIDEO_START( funworld );
-VIDEO_START( magiccrd );
+VIDEO_START( magicrd2 );
 VIDEO_UPDATE( funworld );
 
 
@@ -1047,7 +1055,7 @@ static ADDRESS_MAP_START( funworld_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( magiccrd_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( magicrd2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0800, 0x0803) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x0a00, 0x0a03) AM_READWRITE(pia_1_r, pia_1_w)
@@ -1090,6 +1098,34 @@ static ADDRESS_MAP_START( royalmcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5000, 0x5fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( saloon_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
+	AM_RANGE(0x0800, 0x0800) AM_READ(input_port_0_r)
+	AM_RANGE(0x0a01, 0x0a01) AM_READ(input_port_1_r)
+	AM_RANGE(0x081c, 0x081c) AM_DEVWRITE(MC6845, "crtc", mc6845_address_w)
+	AM_RANGE(0x081d, 0x081d) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_2_r)
+	AM_RANGE(0x1800, 0x1800) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
+	AM_RANGE(0x1801, 0x1801) AM_WRITE(ay8910_write_port_0_w)
+//	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* some unknown reads... maybe a DSW */
+	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x8000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+/*
+    Unknown R/W
+    -----------
+
+	0800	RW	;input?
+	081a	W	;unknown (W 0x20)
+	081b	W	;unknown (W 0x20 & 0x30)
+	0810	W	;unknown
+	0a01	RW	;input?
+	1000	RW	;input? (W 0xff & 0xfd)
+
+*/
 
 
 /*************************
@@ -1398,7 +1434,7 @@ static INPUT_PORTS_START( bigdeal )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( magiccrd )
+static INPUT_PORTS_START( magicrd2 )
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Remote") PORT_CODE(KEYCODE_Q)
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
@@ -1701,6 +1737,74 @@ static INPUT_PORTS_START( jolyjkra )
 	PORT_DIPSETTING(    0x80, "Manual Payout SW" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( saloon )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-7") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-1") PORT_CODE(KEYCODE_Q)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-2") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-3") PORT_CODE(KEYCODE_E)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-4") PORT_CODE(KEYCODE_R)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-5") PORT_CODE(KEYCODE_T)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-6") PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-7") PORT_CODE(KEYCODE_U)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("1-8") PORT_CODE(KEYCODE_I)
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-1") PORT_CODE(KEYCODE_A)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-2") PORT_CODE(KEYCODE_S)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-3") PORT_CODE(KEYCODE_D)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-4") PORT_CODE(KEYCODE_F)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-5") PORT_CODE(KEYCODE_G)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-6") PORT_CODE(KEYCODE_H)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-7") PORT_CODE(KEYCODE_J)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("2-8") PORT_CODE(KEYCODE_K)
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-1") PORT_CODE(KEYCODE_Z)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-6") PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-7") PORT_CODE(KEYCODE_M)
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_OTHER ) PORT_NAME("3-8") PORT_CODE(KEYCODE_L)
+
+	PORT_START("SW1")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
 
 /*************************
 *    Graphics Layouts    *
@@ -1813,11 +1917,11 @@ static MACHINE_DRIVER_START( funworld )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
 MACHINE_DRIVER_END
 
-static MACHINE_DRIVER_START( magiccrd )
+static MACHINE_DRIVER_START( magicrd2 )
 	MDRV_IMPORT_FROM(funworld)
 
 	MDRV_CPU_REPLACE("main", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(magiccrd_map, 0)
+	MDRV_CPU_PROGRAM_MAP(magicrd2_map, 0)
 
 	MDRV_SCREEN_MODIFY("main")
 	MDRV_SCREEN_SIZE((123+1)*4, (36+1)*8)				/* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
@@ -1825,7 +1929,7 @@ static MACHINE_DRIVER_START( magiccrd )
 	MDRV_SCREEN_VISIBLE_AREA(0*4, 98*4-1, 0*8, 32*8-1)	/* adjusted to screen for testing purposes */
 
 	MDRV_GFXDECODE(funworld)
-	MDRV_VIDEO_START(magiccrd)
+	MDRV_VIDEO_START(magicrd2)
 
 	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_SOUND_CONFIG(ay8910_intf)
@@ -1836,7 +1940,7 @@ static MACHINE_DRIVER_START( royalcrd )
 	MDRV_IMPORT_FROM(funworld)
 
 	MDRV_CPU_REPLACE("main", M65C02, MASTER_CLOCK/8)	/* 2MHz */
-	MDRV_CPU_PROGRAM_MAP(magiccrd_map, 0)
+	MDRV_CPU_PROGRAM_MAP(magicrd2_map, 0)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( cuoreuno )
@@ -1851,6 +1955,13 @@ static MACHINE_DRIVER_START( royalmcu )
 
 	MDRV_CPU_REPLACE("main", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(royalmcu_map, 0)
+MACHINE_DRIVER_END
+
+static MACHINE_DRIVER_START( saloon )
+	MDRV_IMPORT_FROM(funworld)
+
+	MDRV_CPU_REPLACE("main", M65C02, MASTER_CLOCK/8)	/* 2MHz */
+	MDRV_CPU_PROGRAM_MAP(saloon_map, 0)
 MACHINE_DRIVER_END
 
 
@@ -2257,7 +2368,7 @@ ROM_START( lluck4x1 )
 	ROM_LOAD( "n82s147.bin",    0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
 ROM_END
 
-ROM_START( magiccrd )	/* Impera */
+ROM_START( magicrd2 )	/* Impera */
 	ROM_REGION( 0x18000, "main", 0 )
     ROM_LOAD( "magicard.004", 0x0000, 0x8000,  CRC(f6e948b8) SHA1(7d5983015a508ab135ccbf69b7f3c526c229e3ef) ) /* only last 16kbyte visible? */
 	ROM_LOAD( "magicard.01",  0x8000, 0x10000, CRC(c94767d4) SHA1(171ac946bdf2575f9e4a31e534a8e641597af519) ) /* 1st and 2nd half identical */
@@ -2273,7 +2384,7 @@ ROM_START( magiccrd )	/* Impera */
 	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )
 ROM_END
 
-ROM_START( magiccda )	/* for green TAB or Impera boards */
+ROM_START( magicd2a )	/* for green TAB or Impera boards */
 	ROM_REGION( 0x10000, "main", 0 )
     ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
 //    ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
@@ -2289,7 +2400,7 @@ ROM_START( magiccda )	/* for green TAB or Impera boards */
 	ROM_LOAD( "gal16v8uni.bin", 0x0000, 0x0117, CRC(b81d7e0a) SHA1(7fef0b2bcea931a830d38ae0f1102434cf281d2d) )
 ROM_END
 
-ROM_START( magiccdb )	/* for blue TAB board (encrypted)*/
+ROM_START( magicd2b )	/* for blue TAB board (encrypted)*/
 	ROM_REGION( 0x10000, "main", 0 )
 //    ROM_LOAD( "mc2prgv1.bin", 0x8000, 0x8000,  CRC(7f759b70) SHA1(23a1a6e8eda57c4a90c51a970302f9a7bf590083) )
     ROM_LOAD( "mc2prgv2.bin", 0x8000, 0x8000,  CRC(b0ed6b40) SHA1(7167e67608f1b0b1cd956c838dacc1310861cb4a) )
@@ -2489,29 +2600,6 @@ static DRIVER_INIT( tabblue )
 	pia_config(1, &pia1_intf);
 }
 
-static DRIVER_INIT( jolycdae )
-{
-	/* Decrypting roms... */
-
-	int x;
-	UINT8 *srcp = memory_region( machine, "main" );
-	UINT8 *srcg = memory_region( machine, "gfx1" );
-
-	for (x=0x8000;x<0x18000;x++)
-	{
-		srcp[x] = srcp[x] ^ 0x56;	/* simple XOR with 0x56 */
-	}
-
-	for (x=0x0000;x<0x20000;x++)
-	{
-		srcg[x] = srcg[x] ^ 0x56;	/* simple XOR with 0x56 */
-	}
-
-	/* Initializing PIAs... */
-	pia_config(0, &pia0_intf);
-	pia_config(1, &pia1_intf);
-}
-
 static DRIVER_INIT( jolyc980 )
 {
 /************************************************************************************************
@@ -2538,7 +2626,7 @@ static DRIVER_INIT( jolyc980 )
 	pia_config(1, &pia1_intf);
 }
 
-static DRIVER_INIT( magiccda )
+static DRIVER_INIT( magicd2a )
 /*****************************************************************
 
   For a serie of Mexican Rockwell's 65c02
@@ -2562,8 +2650,8 @@ static DRIVER_INIT( magiccda )
 	pia_config(1, &pia1_intf);
 }
 
-static DRIVER_INIT( magiccdb )
-/*** same as blue TAB PCB, with the magiccda patch ***/
+static DRIVER_INIT( magicd2b )
+/*** same as blue TAB PCB, with the magicd2a patch ***/
 {
 	int x, na, nb, nad, nbd;
 	UINT8 *src = memory_region( machine, "gfx1" );
@@ -2607,6 +2695,114 @@ static DRIVER_INIT( soccernw )
 	pia_config(1, &pia1_intf);
 }
 
+static DRIVER_INIT( saloon )
+/*************************************************
+
+    LEOPARDO 5 Hardware
+    -------------------
+
+    Special thanks to Andreas Naive, that
+    figured out the address encryption.
+
+    Program:
+    Low 8 bits of address are scrambled.
+    Also the values have bits 0 & 2 bitswapped.
+
+    GFX:
+    Low 11 bits of address are scrambled.
+
+    Color:
+    Still trying....
+
+
+*************************************************/
+{
+	UINT8 *rom = memory_region(machine, "main");
+	int size = memory_region_length(machine, "main");
+	int start = 0x8000;
+
+	UINT8 *gfxrom = memory_region(machine, "gfx1");
+	int sizeg = memory_region_length(machine, "gfx1");
+	int startg = 0;
+
+	UINT8 *prom = memory_region(machine, "proms");
+	int sizep = memory_region_length(machine, "proms");
+	int startp = 0;
+
+	UINT8 *buffer;
+	int i, a;
+
+    /*****************************
+    *   Program ROM decryption   * 
+    *****************************/
+
+	/* data lines swap: 76543210 -> 76543012 */
+
+	for (i = start; i < size; i++)
+	{
+		rom[i] = BITSWAP8(rom[i], 7, 6, 5, 4, 3, 0, 1, 2);
+	}
+
+	buffer = malloc_or_die(size);
+	memcpy(buffer, rom, size);
+
+
+	/* address lines swap: fedcba9876543210 -> fedcba9820134567 */
+
+	for (i = start; i < size; i++)
+	{
+		a = ((i & 0xff00) | BITSWAP8(i & 0xff, 2, 0, 1, 3, 4, 5, 6, 7));
+		rom[a] = buffer[i];
+	}
+
+	free(buffer);
+
+
+    /******************************
+    *   Graphics ROM decryption   * 
+    ******************************/
+
+	buffer = malloc_or_die(sizeg);
+	memcpy(buffer, gfxrom, sizeg);
+
+	/* address lines swap: fedcba9876543210 -> fedcb67584a39012 */
+
+	for (i = startg; i < sizeg; i++)
+	{
+		a = BITSWAP16(i, 15, 14, 13, 12, 11, 6, 7, 5, 8, 4, 10, 3, 9, 0, 1, 2);
+		gfxrom[a] = buffer[i];
+	}
+
+	free(buffer);
+
+
+    /****************************
+    *   Color PROM decryption   * 
+    ****************************/
+
+	/* data lines swap: 76543210 -> 23546710 */
+
+	for (i = startp; i < sizep; i++)
+	{
+		prom[i] = BITSWAP8(prom[i], 2, 3, 5, 4, 6, 7, 1, 0);
+	}
+
+	buffer = malloc_or_die(sizep);
+	memcpy(buffer, prom, sizep);
+
+
+	/* address lines swap: fedcba9876543210 -> fedcba9487652013 */
+
+	for (i = startp; i < sizep; i++)
+	{
+		a = BITSWAP16(i, 15, 14, 13, 12, 11, 10, 9, 4, 8, 7, 6, 5, 2, 0, 1, 3);
+		prom[a] = buffer[i];
+	}
+
+	free(buffer);
+
+}
+
 
 /*************************
 *      Game Drivers      *
@@ -2614,7 +2810,6 @@ static DRIVER_INIT( soccernw )
 
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT             COMPANY            FULLNAME                                          FLAGS  */
 GAME( 1985, jollycrd, 0,        funworld, funworld, funworld, ROT0, "TAB-Austria",     "Jolly Card (austrian)",                           0 )
-GAME( 1985, jolycdae, jollycrd, funworld, funworld, jolycdae, ROT0, "TAB-Austria",     "Jolly Card (austrian, encrypted)",                0 )
 GAME( 1985, jolyc3x3, jollycrd, funworld, funworld, funworld, ROT0, "TAB-Austria",     "Jolly Card (3x3 deal)",                           0 )
 GAME( 2000, jolyc980, jollycrd, cuoreuno, jolyc980, jolyc980, ROT0, "Spale-Soft",      "Jolly Card Professional 2.0",                     0 )
 GAME( 1998, jolycdev, jollycrd, funworld, funworld, funworld, ROT0, "TAB/Evona",       "Jolly Card (Evona Electronic)",                   0 )
@@ -2640,9 +2835,9 @@ GAME( 1991, royalcdb, royalcrd, royalcrd, royalcrd, funworld, ROT0, "TAB-Austria
 GAME( 1991, royalcdc, royalcrd, royalcrd, royalcrd, funworld, ROT0, "Evona Electronic","Royal Card (slovak, encrypted)",                  GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 1991, lluck3x3, royalcrd, cuoreuno, royalcrd, funworld, ROT0, "TAB-Austria",     "Lucky Lady (3x3 deal)",                           0 )
 GAME( 1991, lluck4x1, royalcrd, royalcrd, royalcrd, funworld, ROT0, "TAB-Austria",     "Lucky Lady (4x1 aces)",                           0 )
-GAME( 1996, magiccrd, 0,        magiccrd, magiccrd, funworld, ROT0, "Impera",          "Magic Card II (bulgarian)",                       GAME_IMPERFECT_SOUND )
-GAME( 1996, magiccda, magiccrd, magiccrd, magiccrd, magiccda, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       GAME_NOT_WORKING )
-GAME( 1996, magiccdb, magiccrd, magiccrd, magiccrd, magiccdb, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       GAME_NOT_WORKING )
+GAME( 1996, magicrd2, 0,        magicrd2, magicrd2, funworld, ROT0, "Impera",          "Magic Card II (bulgarian)",                       GAME_IMPERFECT_SOUND )
+GAME( 1996, magicd2a, magicrd2, magicrd2, magicrd2, magicd2a, ROT0, "Impera",          "Magic Card II (green TAB or Impera board)",       GAME_NOT_WORKING )
+GAME( 1996, magicd2b, magicrd2, magicrd2, magicrd2, magicd2b, ROT0, "Impera",          "Magic Card II (blue TAB board, encrypted)",       GAME_NOT_WORKING )
 GAME( 1993, vegasslw, 0,        funworld, funworld, funworld, ROT0, "Funworld",        "Royal Vegas Joker Card (slow deal)",              0 )
 GAME( 1993, vegasfst, vegasslw, funworld, funworld, funworld, ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal)",              0 )
 GAME( 1993, vegasfte, vegasslw, funworld, funworld, funworld, ROT0, "Soft Design",     "Royal Vegas Joker Card (fast deal, english gfx)", 0 )
@@ -2651,4 +2846,4 @@ GAME( 198?, jolyjkra, jolyjokr, funworld, jolyjkra, funworld, ROT0, "Impera",   
 GAME( 1993, jokercrd, 0,        funworld, funworld, funworld, ROT0, "Vesely Svet",     "Joker Card (Ver.A267BC, encrypted)",              GAME_WRONG_COLORS | GAME_NOT_WORKING )
 GAME( 199?, mongolnw, 0,        royalmcu, royalcrd, funworld, ROT0, "bootleg",         "Mongolfier New (italian)",                        GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 199?, soccernw, 0,        royalcrd, royalcrd, soccernw, ROT0, "bootleg",         "Soccer New (italian)",                            GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 198?, saloon,   0,        funworld, funworld, funworld, ROT0, "Unknown",         "Saloon (french, encrypted)",                      GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 198?, saloon,   0,        saloon,   saloon,   saloon,   ROT0, "Unknown",         "Saloon (french, encrypted)",                      GAME_NO_SOUND | GAME_WRONG_COLORS | GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
