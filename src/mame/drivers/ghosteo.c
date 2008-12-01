@@ -450,16 +450,16 @@ static VIDEO_UPDATE( bballoon )
 					color = (videoram[count] >> 16) & 0xffff;
 
 					b = (color & 0x001f) << 3;
-					g = (color & 0x07e0) >> 2;
-					r = (color & 0xf800) >> 6;
+					g = (color & 0x07e0) >> 3;
+					r = (color & 0xf800) >> 8;
 					if(((x*2)+1)<cliprect->max_x && y<cliprect->max_y)
 					*BITMAP_ADDR32(bitmap, y, x*2+1) = b | (g<<8) | (r<<16);
 
 					color = videoram[count] & 0xffff;
 
 					b = (color & 0x001f) << 3;
-					g = (color & 0x07e0) >> 2;
-					r = (color & 0xf800) >> 6;
+					g = (color & 0x07e0) >> 3;
+					r = (color & 0xf800) >> 8;
 					if(((x*2)+0)<cliprect->max_x && y<cliprect->max_y)
 					*BITMAP_ADDR32(bitmap, y, x*2+0) = b | (g<<8) | (r<<16);
 

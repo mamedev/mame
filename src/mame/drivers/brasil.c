@@ -55,7 +55,7 @@ VIDEO_UPDATE(brasil)
 
 	for(y=0;y<200;y++)
 	{
-		for(x=0;x<800;x++)
+		for(x=0;x<400;x++)
 		{
 			UINT32 color;
 			UINT32 b;
@@ -65,10 +65,28 @@ VIDEO_UPDATE(brasil)
 			color = (blit_ram[count]) & 0xffff;
 
 			b = (color & 0x001f) << 3;
-			g = (color & 0x07e0) >> 2;
-			r = (color & 0xf800) >> 6;
-			if(x<cliprect->max_x && y<cliprect->max_y)
-			*BITMAP_ADDR32(bitmap, y, x) = b | (g<<8) | (r<<16);
+			g = (color & 0x07e0) >> 3;
+			r = (color & 0xf800) >> 8;
+			if(x<cliprect->max_x && ((y*2)+0)<cliprect->max_y)
+				*BITMAP_ADDR32(bitmap, (y*2)+0, x) = b | (g<<8) | (r<<16);
+
+			count++;
+		}
+
+		for(x=0;x<400;x++)
+		{
+			UINT32 color;
+			UINT32 b;
+			UINT32 g;
+			UINT32 r;
+
+			color = (blit_ram[count]) & 0xffff;
+
+			b = (color & 0x001f) << 3;
+			g = (color & 0x07e0) >> 3;
+			r = (color & 0xf800) >> 8;
+			if(x<cliprect->max_x && ((y*2)+1)<cliprect->max_y)
+				*BITMAP_ADDR32(bitmap, (y*2)+1, x) = b | (g<<8) | (r<<16);
 
 			count++;
 		}
@@ -232,8 +250,8 @@ static MACHINE_DRIVER_START( brasil )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 //	MDRV_SCREEN_SIZE(64*8, 32*8)
 //	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
-	MDRV_SCREEN_SIZE(512, 512)
-	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 160-1)
+	MDRV_SCREEN_SIZE(800, 512)
+	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
 
 	MDRV_PALETTE_LENGTH(0x200)
 
