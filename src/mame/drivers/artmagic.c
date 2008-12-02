@@ -716,6 +716,14 @@ static MACHINE_DRIVER_START( artmagic )
 
 	MDRV_SOUND_ADD("oki", OKIM6295, MASTER_CLOCK_40MHz/3/10)
 	MDRV_SOUND_CONFIG(okim6295_interface_pin7low)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
+MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( cheesech )
+	MDRV_IMPORT_FROM(artmagic)
+
+	MDRV_SOUND_MODIFY("oki")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
@@ -728,6 +736,9 @@ static MACHINE_DRIVER_START( stonebal )
 
 	MDRV_CPU_MODIFY("tms")
 	MDRV_CPU_PROGRAM_MAP(stonebal_tms_map,0)
+
+	MDRV_SOUND_MODIFY("oki")
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_DRIVER_END
 
 
@@ -907,6 +918,6 @@ static DRIVER_INIT( stonebal )
  *************************************/
 
 GAME( 1993, ultennis, 0,        artmagic, ultennis, ultennis, ROT0, "Art & Magic", "Ultimate Tennis",		 0 )
-GAME( 1994, cheesech, 0,        artmagic, cheesech, cheesech, ROT0, "Art & Magic", "Cheese Chase",			 0 )
+GAME( 1994, cheesech, 0,        cheesech, cheesech, cheesech, ROT0, "Art & Magic", "Cheese Chase",			 0 )
 GAME( 1994, stonebal, 0,        stonebal, stonebal, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", 0 )
 GAME( 1994, stoneba2, stonebal, stonebal, stoneba2, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", 0 )
