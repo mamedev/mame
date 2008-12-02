@@ -61,8 +61,28 @@ static const int index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
 /* lookup table for the precomputed difference */
 static int diff_lookup[49*16];
 
-/* volume lookup table */
-static UINT32 volume_table[16];
+/* volume lookup table. The manual lists only 9 steps, ~3dB per step. Given the dB values,
+   that seems to map to a 5-bit volume control. What happens for steps after the 9th is not
+	known, we arbitrarily assign a "1" to all those steps. */
+static int volume_table[16] =
+{
+	0x20,	//   0 dB
+	0x16,	//  -3.2 dB
+	0x10,	//  -6.0 dB
+	0x0b,	//  -9.2 dB
+	0x08,	// -12.0 dB
+	0x06,	// -14.5 dB
+	0x04,	// -18.0 dB
+	0x03,	// -20.5 dB
+	0x02,	// -24.0 dB
+	0x01,	// unknown
+	0x01,	// unknown
+	0x01,	// unknown
+	0x01,	// unknown
+	0x01,	// unknown
+	0x01,	// unknown
+	0x01,	// unknown
+};
 
 /* tables computed? */
 static int tables_computed = 0;
@@ -107,18 +127,6 @@ static void compute_tables(void)
 				 stepval/4 * nbl2bit[nib][3] +
 				 stepval/8);
 		}
-	}
-
-	/* generate the OKI6295 volume table */
-	for (step = 0; step < 16; step++)
-	{
-		double out = 256.0;
-		int vol = step;
-
-		/* 3dB per step */
-		while (vol-- > 0)
-			out /= 1.412537545;	/* = 10 ^ (3/20) = 3dB */
-		volume_table[step] = (UINT32)out;
 	}
 
 	tables_computed = 1;
@@ -168,8 +176,8 @@ INT16 clock_adpcm(struct adpcm_state *state, UINT8 nibble)
 	else if (state->step < 0)
 		state->step = 0;
 
-	/* return the signal scaled up to 32767 */
-	return state->signal << 4;
+	/* return the signal */
+	return state->signal;
 }
 
 
@@ -196,7 +204,8 @@ static void generate_adpcm(struct okim6295 *chip, struct ADPCMVoice *voice, INT1
 			int nibble = base[sample / 2] >> (((sample & 1) << 2) ^ 4);
 
 			/* output to the buffer, scaling by the volume */
-			*buffer++ = clock_adpcm(&voice->adpcm, nibble) * voice->volume / 256;
+			/* signal in range -2048..2047, volume in range 2..32 => signal * volume / 2 in range -32768..32767 */
+			*buffer++ = clock_adpcm(&voice->adpcm, nibble) * voice->volume / 2;
 			samples--;
 
 			/* next! */
@@ -334,7 +343,7 @@ static SND_START( okim6295 )
 	for (voice = 0; voice < OKIM6295_VOICES; voice++)
 	{
 		/* initialize the rest of the structure */
-		info->voice[voice].volume = 255;
+		info->voice[voice].volume = 0;
 		reset_adpcm(&info->voice[voice].adpcm);
 	}
 
@@ -439,6 +448,11 @@ static void okim6295_data_w(int num, int data)
 		int temp = data >> 4, i, start, stop;
 		unsigned char *base;
 
+
+		/* the manual explicitly says that it's not possible to start multiple voices at the same time */
+		if (temp != 1 && temp != 2 && temp != 4 && temp != 8)
+			popmessage("OKI6295 start %x contact MAMEDEV", temp);
+
 		/* update the stream */
 		stream_update(info->stream);
 
@@ -467,6 +481,10 @@ static void okim6295_data_w(int num, int data)
 						/* also reset the ADPCM parameters */
 						reset_adpcm(&voice->adpcm);
 						voice->volume = volume_table[data & 0x0f];
+
+						/* the manual only lists 9 volume steps */
+						if ((data & 0x0f) >= 9)
+							popmessage("OKI6295 volume %x contact MAMEDEV", data & 0x0f);
 					}
 					else
 					{
