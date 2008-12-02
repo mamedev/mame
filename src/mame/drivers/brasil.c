@@ -1,40 +1,23 @@
-/* bra$il */
+/*************************************************************************************************
 
-/*
+New Magic Card (c) 19?? New High Video?
+
+driver by David Haywood & Angelo Salese
+
+Notes:
+-"New Magic Card" is almost certainly an earlier revision of the "Bra$il / Fashion" sets,
+ with colour mapped bitmaps instead of RGB565 etc..For sure is "pre-2002" because in-game displays
+ "Maximum credit = 10.000 Italian Lire" on title screen.
 
 TODO:
--understand how the blitter deletes some background parts and understand how the status registers works;
--finish input ports;
--add the sound chip into MAME (OkiM6376),it's already in AGEMAME so it should be easy to merge it.
+-understand how the blitter deletes some background parts in Bra$il / Fashion and understand how
+ the status registers really works;
+-inputs are grossly mapped;
+-add the sound chip into MAME (OkiM6376),it's an alternative version of the more common OkiM6295.
+-NVRAM emulation?
+-I don't really know if the manufacturer is really New High Video,I've got that name from f205v.
 
-==================================================================================
-
-CPUs
-N80C186XL25 (main)(u1)
-1x ispLSI2032-80LJ (u13)(not dumped)
-1x ispLSI1032E-70LJ (u18)(not dumped)
-1x M6376 (sound)(u17)
-1x oscillator 40.000MHz
-
-ROMs
-1x MX27C4000 (u16)
-2x M27C801 (u7,u8)
-
-Note
-
-1x 28x2 edge connector (cn1)
-1x 5 legs connector (cn2)
-1x 8 legs connector (cn3)
-1x trimmer (volume)
-1x pushbutton (k1)
-1x battery (b1)
-
-
-cpu is 80186 based (with extras), see
-http://media.digikey.com/pdf/Data%20Sheets/Intel%20PDFs/80C186XL,%2080C188XL.pdf
-
-*/
-
+*************************************************************************************************/
 
 #include "driver.h"
 
@@ -51,7 +34,7 @@ VIDEO_UPDATE(brasil)
 
 	count = (0/2);
 
-	for(y=0;y<200;y++)
+	for(y=0;y<150;y++)
 	{
 		for(x=0;x<400;x++)
 		{
@@ -65,7 +48,7 @@ VIDEO_UPDATE(brasil)
 			b = (color & 0x001f) << 3;
 			g = (color & 0x07e0) >> 3;
 			r = (color & 0xf800) >> 8;
-			if(x<cliprect->max_x && ((y*2)+0)<cliprect->max_y)
+			if(x<video_screen_get_visible_area(screen)->max_x && ((y*2)+0)<video_screen_get_visible_area(screen)->max_y)
 				*BITMAP_ADDR32(bitmap, (y*2)+0, x) = b | (g<<8) | (r<<16);
 
 			count++;
@@ -83,7 +66,7 @@ VIDEO_UPDATE(brasil)
 			b = (color & 0x001f) << 3;
 			g = (color & 0x07e0) >> 3;
 			r = (color & 0xf800) >> 8;
-			if(x<cliprect->max_x && ((y*2)+1)<cliprect->max_y)
+			if(x<video_screen_get_visible_area(screen)->max_x && ((y*2)+1)<video_screen_get_visible_area(screen)->max_y)
 				*BITMAP_ADDR32(bitmap, (y*2)+1, x) = b | (g<<8) | (r<<16);
 
 			count++;
@@ -93,11 +76,64 @@ VIDEO_UPDATE(brasil)
 	return 0;
 }
 
+VIDEO_UPDATE(vidpokr2)
+{
+	int x,y,count;
+
+	count = (0/2);
+
+	for(y=0;y<224;y+=2)
+	{
+		for(x=0;x<160;x++)
+		{
+			UINT32 color;
+
+			color = ((blit_ram[count]) & 0x00ff)>>0;
+
+			if((x*2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y+0, (x*2)+0) = screen->machine->pens[color];
+				//*BITMAP_ADDR32(bitmap, (y)+0, x*2) = (b<<(0+5)) | (g<<(8+6)) | (r<<(16+5));
+
+			color = ((blit_ram[count]) & 0xff00)>>8;
+
+			if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y+0, (x*2)+1) = screen->machine->pens[color];
+
+				//*BITMAP_ADDR32(bitmap, y, (x*2)+1) = (b<<(0+5)) | (g<<(8+6)) | (r<<(16+5));
+
+
+			count++;
+		}
+
+		for(x=0;x<160;x++)
+		{
+			UINT32 color;
+
+			color = ((blit_ram[count]) & 0x00ff)>>0;
+
+			if((x*2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y+1, (x*2)+0) = screen->machine->pens[color];
+
+			color = ((blit_ram[count]) & 0xff00)>>8;
+
+			if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y+1, (x*2)+1) = screen->machine->pens[color];
+
+			count++;
+		}
+
+	}
+
+	return 0;
+}
+
 /*Some sort of status registers,probably blitter/vblank related.*/
 static UINT16 unk_latch;
 
+/*Bra$il*/
 static READ16_HANDLER( blit_status_r )
 {
+
 	switch(offset*2)
 	{
 		case 0:
@@ -131,20 +167,95 @@ static WRITE16_HANDLER( blit_status_w )
 //	popmessage("%04x",data);
 }
 
+/* New Magic Card */
+static READ16_HANDLER( vidpokr2_blit_status_r )
+{
+	switch(offset*2)
+	{
+		case 0: return 2; //and $7
+		case 2: return 2; //and $7
+	}
+	return 0;
+}
+
+/*bankaddress might be incorrect.*/
+static WRITE16_HANDLER( vidpokr2_blit_status_w )
+{
+	static UINT32 bankaddress;
+	UINT8 *ROM = memory_region(space->machine, "user1");
+
+	bankaddress = (data & 0x07) * 0x40000;
+
+	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
+
+//	popmessage("%04x",data);
+}
+
+static WRITE16_HANDLER( paletteram_io_w )
+{
+	static int pal_offs,r,g,b,internal_pal_offs;
+
+	switch(offset*2)
+	{
+		case 0:
+			pal_offs = 0;
+			break;
+		case 2:
+			internal_pal_offs = 0;
+			break;
+		case 4:
+			switch(internal_pal_offs)
+			{
+				case 0:
+					r = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					internal_pal_offs++;
+					break;
+				case 1:
+					g = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					internal_pal_offs++;
+					break;
+				case 2:
+					b = ((data & 0x3f) << 2) | ((data & 0x30) >> 4);
+					palette_set_color(space->machine, pal_offs, MAKE_RGB(r, g, b));
+					internal_pal_offs = 0;
+					pal_offs++;
+					break;
+			}
+
+			break;
+	}
+}
+
+static UINT16 vblank_bit;
+
+static READ16_HANDLER( vidpokr2_vblank_r )
+{
+	return vblank_bit; //0x80
+}
+
+static WRITE16_HANDLER( vidpokr2_vblank_w )
+{
+	vblank_bit = data;
+}
+
+
 static UINT16 t1,t3;
 
 static READ16_HANDLER( read1_r )
 {
+//	return mame_rand(space->machine);
 	return input_port_read(space->machine, "IN0");
 }
 
 static READ16_HANDLER( read2_r )
 {
+//	return mame_rand(space->machine);
 	return input_port_read(space->machine, "IN1");
 }
 
 static READ16_HANDLER( read3_r )
 {
+//	return mame_rand(space->machine);
 	return input_port_read(space->machine, "IN2");
 }
 
@@ -174,8 +285,8 @@ static WRITE16_HANDLER( write3_w )
 static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x0ffff) AM_RAM /*irq vector area + work ram*/
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
-	AM_RANGE(0x80000, 0xcffff) AM_ROMBANK(1)
-	AM_RANGE(0xd0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
+	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
+	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( brasil_io, ADDRESS_SPACE_IO, 16 )
@@ -191,32 +302,41 @@ static ADDRESS_MAP_START( brasil_io, ADDRESS_SPACE_IO, 16 )
 //	AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( vidpokr2_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x0ffff) AM_RAM /*irq vector area + work ram*/
+	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
+	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK(1)
+	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( vidpokr2_io, ADDRESS_SPACE_IO, 16 )
+	AM_RANGE(0x0030, 0x0033) AM_READ( vidpokr2_blit_status_r )
+	AM_RANGE(0x0030, 0x0031) AM_WRITE( vidpokr2_blit_status_w )
+	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // output write?
+	AM_RANGE(0x0002, 0x0003) AM_WRITE( write2_w ) // coin counter & coin lockout
+	AM_RANGE(0x0004, 0x0005) AM_WRITE( vidpokr2_vblank_w )
+ 	AM_RANGE(0x0006, 0x0007) AM_WRITE( write3_w ) // output,probably lamps etc.
+ 	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
+	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
+	AM_RANGE(0x000c, 0x000d) AM_READ( vidpokr2_vblank_r )
+	AM_RANGE(0x000e, 0x000f) AM_READ( read3_r )
+	AM_RANGE(0x0010, 0x0015) AM_WRITE( paletteram_io_w )
+//	AM_RANGE(0x000e, 0x000f) AM_WRITE
+//	AM_RANGE(0xffa2, 0xffa3) AM_WRITE
+ADDRESS_MAP_END
+
 static INPUT_PORTS_START( brasil )
 	PORT_START("IN0")
 	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet Button") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
 	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -339,7 +459,7 @@ static INTERRUPT_GEN( vblank_irq )
 }
 
 static MACHINE_DRIVER_START( brasil )
-	MDRV_CPU_ADD("main", I80186, 25000000 )	// ?
+	MDRV_CPU_ADD("main", I80186, 20000000 )	// ?
 	MDRV_CPU_PROGRAM_MAP(brasil_map,0)
 	MDRV_CPU_IO_MAP(brasil_io,0)
 	MDRV_CPU_VBLANK_INT("main", vblank_irq)
@@ -348,8 +468,6 @@ static MACHINE_DRIVER_START( brasil )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-//	MDRV_SCREEN_SIZE(64*8, 32*8)
-//	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
 
@@ -361,21 +479,119 @@ static MACHINE_DRIVER_START( brasil )
 	//OkiM6376
 MACHINE_DRIVER_END
 
+
+static MACHINE_DRIVER_START( vidpokr2 )
+	MDRV_CPU_ADD("main", V30, 8000000 )	// ?
+	MDRV_CPU_PROGRAM_MAP(vidpokr2_map,0)
+	MDRV_CPU_IO_MAP(vidpokr2_io,0)
+	MDRV_CPU_VBLANK_INT("main", vblank_irq)
+
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MDRV_SCREEN_SIZE(400, 300)
+	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
+
+	MDRV_PALETTE_LENGTH(0x100)
+
+	MDRV_VIDEO_START(brasil)
+	MDRV_VIDEO_UPDATE(vidpokr2)
+
+	//OkiM6376
+MACHINE_DRIVER_END
+
+/*
+CPU
+
+1x NEC 9145N5-V30-D70116C-8 (main)
+1x OKI M6376 (sound)
+1x ispLSI2032-80LJ-H013J05 (main)
+1x ispLSI1032E-70LJ-E013S09 (main)
+1x ADV476KP35-9948-F112720.1 (GFX)
+1x oscillator 16.000MHz
+
+ROMs
+1x M27C2001 (ic31)
+2x M27C4001 (ic32,ic33)
+
+Note
+
+1x 28x2 edge connector (not JAMMA)
+1x 8 legs connector
+1x 3 legs jumper
+1x pushbutton
+1x battery
+1x trimmer (volume)
+
+PCB markings: "V150500 CE type 001/v0"
+PCB n. E178247
+
+*/
+
+ROM_START( newmcard )
+	ROM_REGION( 0x100000, "user1", 0 ) /* V30 Code */
+	ROM_LOAD16_BYTE( "mc32.ic4", 0x00000, 0x80000, CRC(d9817f48) SHA1(c523a8248b487081ea2e0e326dcc660b051c23c1) )
+	ROM_LOAD16_BYTE( "mc33.ic5", 0x00001, 0x80000, CRC(83a855ab) SHA1(7f9384c875b951d17caa91f8a7365edaf7f9afe1) )
+
+	ROM_REGION( 0x040000, "boot_prg", 0 ) /*copy for program code*/
+	ROM_COPY( "user1", 0x0c0000, 0x000000, 0x40000 )
+
+	ROM_REGION( 0x080000, "samples", 0 ) /* M6376 Samples */
+	ROM_LOAD( "mc33.ic5", 0x00000, 0x80000, CRC(83a855ab) SHA1(7f9384c875b951d17caa91f8a7365edaf7f9afe1) )
+ROM_END
+
+/*
+CPUs
+N80C186XL25 (main)(u1)
+1x ispLSI2032-80LJ (u13)(not dumped)
+1x ispLSI1032E-70LJ (u18)(not dumped)
+1x M6376 (sound)(u17)
+1x oscillator 40.000MHz
+
+ROMs
+1x MX27C4000 (u16)
+2x M27C801 (u7,u8)
+
+Note
+
+1x 28x2 edge connector (cn1)
+1x 5 legs connector (cn2)
+1x 8 legs connector (cn3)
+1x trimmer (volume)
+1x pushbutton (k1)
+1x battery (b1)
+
+
+cpu is 80186 based (with extras), see
+http://media.digikey.com/pdf/Data%20Sheets/Intel%20PDFs/80C186XL,%2080C188XL.pdf
+
+*/
+
 ROM_START( brasil )
 	ROM_REGION( 0x200000, "user1", 0 ) /* N80C186XL25 Code */
 	ROM_LOAD16_BYTE( "record_brasil_hrc7_vers.3.u7", 0x000000, 0x100000, CRC(627e0d58) SHA1(6ff8ba7b21e1ea5c88de3f02a057906c9a7cd808) )
 	ROM_LOAD16_BYTE( "record_brasil_hrc8_vers.3.u8", 0x000001, 0x100000, CRC(47f7ba2a) SHA1(0add7bbf771fd0bf205a05e910cb388cf052b09f) )
 
-	ROM_REGION( 0x030000, "boot_prg", 0 ) /*copy for program code*/
-	ROM_COPY( "user1", 0x1d0000, 0x000000, 0x30000 )
+	ROM_REGION( 0x040000, "boot_prg", 0 ) /*copy for program code*/
+	ROM_COPY( "user1", 0x1c0000, 0x000000, 0x40000 )
 
 	ROM_REGION( 0x080000, "samples", 0 ) /* M6376 Samples */
 	ROM_LOAD( "sound_brasil_hbr_vers.1.u16", 0x00000, 0x80000, CRC(d71a5566) SHA1(2f7aefc06e39ce211e31b15aadf6338b679e7a31) )
 ROM_END
 
-DRIVER_INIT( brasil )
-{
+ROM_START( fashion )
+	ROM_REGION( 0x200000, "user1", 0 ) /* N80C186XL25 Code */
+	ROM_LOAD16_BYTE( "fashion1-hfs7v2.14.high-video8m.u7", 0x000000, 0x100000, CRC(20411b89) SHA1(3ed6336978e5046eeef26115614cb74e3ffe134a) )
+	ROM_LOAD16_BYTE( "fashion1-hfs8v2.14.high-video8m.u8", 0x000001, 0x100000, CRC(521f34f3) SHA1(91edc90fcd895a096955ac031a42da04510df1e6) )
 
-}
+	ROM_REGION( 0x040000, "boot_prg", 0 ) /*copy for program code*/
+	ROM_COPY( "user1", 0x1c0000, 0x000000, 0x40000 )
 
-GAME( 2000, brasil,    0,        brasil,    brasil,    brasil, ROT0,  "unknown", "Bra$il", GAME_NOT_WORKING | GAME_NO_SOUND )
+	ROM_REGION( 0x080000, "samples", 0 ) /* M6376 Samples */
+	ROM_LOAD( "sound-fashion-v-1-memory4m.u16", 0x00000, 0x80000, CRC(2927c799) SHA1(f11cad096a23fee10bfdff5bf944c96e30f4a8b8) )
+ROM_END
+
+GAME( 19??, newmcard,  0,      vidpokr2,    brasil,   0, ROT0,  "New High Video?", "New Magic Card", GAME_NO_SOUND )
+GAME( 2000, brasil,    0,      brasil,      brasil,   0, ROT0,  "New High Video?", "Bra$il (Version 3)", GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 2000, fashion,   brasil, brasil,      brasil,   0, ROT0,  "New High Video?", "Fashion (Version 2.14)", GAME_NOT_WORKING | GAME_NO_SOUND )
