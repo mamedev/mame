@@ -4,6 +4,8 @@ Sega System H1
 preliminary
 
 22 Aug 2004 - Basic skeleton driver, loads some roms doesn't run the right code yet
+2 Dec 2008 - Added an hack for the SH-2,fixed some irqs and some memory maps/ram sharing.
+			 Got to the point that area 0x03e00000 on the SH-2 loads some DMA-style tables.
 
 Known Games on this Platform
 Cool Riders
@@ -51,6 +53,8 @@ SEGA CUSTOM IC :
 #include "deprecat.h"
 #include "sound/scsp.h"
 
+static UINT32* sysh1_workram_h,*h1_ioga,*framebuffer_data,*framebuffer_vram;
+
 /* video */
 
 static VIDEO_START(coolridr)
@@ -64,7 +68,68 @@ static VIDEO_UPDATE(coolridr)
 
 /* end video */
 
-static UINT32* sysh1_workram_h;
+static READ32_HANDLER(sysh1_ioga_r)
+{
+	switch(offset)
+	{
+		case 0x08/4:
+		{
+			static UINT8 vblank = 0;
+
+			vblank^=1;
+
+			return (h1_ioga[offset] & 0xfdffffff) | (vblank<<25);
+		}
+	}
+
+	return h1_ioga[offset];
+}
+
+static WRITE32_HANDLER(sysh1_ioga_w)
+{
+	COMBINE_DATA(&h1_ioga[offset]);
+}
+
+#ifdef UNUSED_FUNCTION
+static WRITE32_HANDLER( paletteram32_sysh1_w )
+{
+	int r,g,b;
+	COMBINE_DATA(&paletteram32[offset]);
+
+	b = ((paletteram32[offset] & 0x00007c00) >> 10);
+	g = ((paletteram32[offset] & 0x000003e0) >> 5);
+	r = ((paletteram32[offset] & 0x0000001f) >> 0);
+	palette_set_color_rgb(space->machine,(offset*2)+1,pal5bit(r),pal5bit(g),pal5bit(b));
+	b = ((paletteram32[offset] & 0x7c000000) >> 26);
+	g = ((paletteram32[offset] & 0x03e00000) >> 21);
+	r = ((paletteram32[offset] & 0x001f0000) >> 16);
+	palette_set_color_rgb(space->machine,offset*2,pal5bit(r),pal5bit(g),pal5bit(b));
+}
+
+static WRITE32_HANDLER( sysh1_dmac_w )
+{
+	static UINT32 src,dst,size;
+	COMBINE_DATA(&dma_data[offset]);
+
+	if(offset == 0x10/4)
+		src = dma_data[offset] & 0x7fffff0;
+	if(offset == 0x14/4)
+	{
+		dst = dma_data[offset] & 0x7fffff0;
+		if(dma_data[offset] & 0x40000000)
+		{
+			for(size=0;size<0x800;size+=4)
+			{
+				program_write_dword(dst,program_read_dword(src));
+				dst+=4;
+				src+=4;
+			}
+			popmessage("!");
+		}
+	}
+}
+#endif
+
 //UINT16* sysh1_soundram;
 
 // what's wrong:
@@ -74,19 +139,43 @@ static UINT32* sysh1_workram_h;
 
 static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM AM_SHARE(1)
-	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM // either RAM or registers, not sure
+	/*WARNING: boundaries of these two are WRONG!*/
+	AM_RANGE(0x03e00000, 0x03e0ffff) AM_RAM AM_BASE(&framebuffer_vram)/*Buffer VRAM Chains*/
+	AM_RANGE(0x03e10000, 0x03e11fff) AM_RAM AM_BASE(&framebuffer_data)/*Buffer data should go here*/
+
+	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE(3) /*Communication area RAM*/
+//	AM_RANGE(0x04000000, 0x0400001f) AM_RAM /*???*/
+	AM_RANGE(0x04000000, 0x0400ffff) AM_RAM /*dunno what it is,might be palette RAM*/
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&sysh1_workram_h)
 	AM_RANGE(0x20000000, 0x200fffff) AM_ROM AM_SHARE(1)
+
+	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolridr_submap, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_ROM AM_SHARE(2)
+
 	AM_RANGE(0x01000000, 0x0100ffff) AM_RAM
+
+	AM_RANGE(0x03008900, 0x03008903) AM_RAM /*???*/
+	AM_RANGE(0x03100400, 0x03100403) AM_RAM /*irq enable?*/
+	AM_RANGE(0x03208900, 0x03208903) AM_RAM /*???*/
+	AM_RANGE(0x03300400, 0x03300403) AM_RAM /*irq enable?*/
+
+	AM_RANGE(0x04000000, 0x0400003f) AM_READWRITE(sysh1_ioga_r,sysh1_ioga_w) AM_BASE(&h1_ioga) /*input area?*/
+	AM_RANGE(0x04200000, 0x0420003f) AM_RAM /*???*/
+
+	AM_RANGE(0x05000000, 0x05000fff) AM_RAM
 	AM_RANGE(0x05200000, 0x052001ff) AM_RAM
-	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM
+	AM_RANGE(0x05300000, 0x0530ffff) AM_RAM AM_SHARE(3) /*Communication area RAM*/
+	AM_RANGE(0x05ff0000, 0x05ffffff) AM_RAM /*???*/
 	AM_RANGE(0x06000000, 0x06000fff) AM_RAM
+	AM_RANGE(0x06100000, 0x06100fff) AM_RAM
+	AM_RANGE(0x06200000, 0x06200fff) AM_RAM
 	AM_RANGE(0x07fff000, 0x07ffffff) AM_RAM
 	AM_RANGE(0x20000000, 0x2001ffff) AM_ROM AM_SHARE(2)
+
+	AM_RANGE(0x60000000, 0x600003ff) AM_WRITENOP
 ADDRESS_MAP_END
 
 // SH-1 or SH-2 almost certainly copies the program down to here: the ROM containing the program is 32-bit wide and the 68000 is 16-bit
@@ -125,32 +214,30 @@ static GFXDECODE_START( coolridr )
 GFXDECODE_END
 
 
-// IRQs 2 & 3 are valid on SH-2
+// IRQs 4 & 6 are valid on SH-2
 static INTERRUPT_GEN( system_h1 )
 {
-	if (cpu_getiloops(device))
-		cpu_set_input_line(device, 4, HOLD_LINE);
-	else
-		cpu_set_input_line(device, 3, HOLD_LINE);
+//	if (cpu_getiloops(device))
+//		cpu_set_input_line(device, 4, HOLD_LINE);
+//	else
+//		cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
-// not sure on SH-1
+//IRQs 10,12 and 14 are valid on SH-1 instead
 static INTERRUPT_GEN( system_h1_sub )
 {
-	if (cpu_getiloops(device))
+	switch(cpu_getiloops(device))
 	{
-//      cpu_set_input_line(device, 4, HOLD_LINE);
-	}
-	else
-	{
-//      cpu_set_input_line(device, 3, HOLD_LINE);
+      	case 0:cpu_set_input_line(device, 0xa, HOLD_LINE); break;
+        case 1:cpu_set_input_line(device, 0xc, HOLD_LINE); break;
+        case 2:cpu_set_input_line(device, 0xe, HOLD_LINE); break;
 	}
 }
 
 static MACHINE_RESET ( coolridr )
 {
 
-//  cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+  	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
 }
@@ -165,19 +252,18 @@ static MACHINE_DRIVER_START( coolridr )
 
 	MDRV_CPU_ADD("sub", SH1, 8000000)	// SH7032 HD6417032F20!! ?? mhz
 	MDRV_CPU_PROGRAM_MAP(coolridr_submap,0)
-	MDRV_CPU_VBLANK_INT_HACK(system_h1_sub, 2)
+	MDRV_CPU_VBLANK_INT_HACK(system_h1_sub, 3)
 
 	MDRV_GFXDECODE(coolridr)
-
 
 	MDRV_SCREEN_ADD("main", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 64*8-1)
 
-	MDRV_PALETTE_LENGTH(0x2000)
+	MDRV_PALETTE_LENGTH(0x10000)
 	MDRV_MACHINE_RESET(coolridr)
 
 	MDRV_VIDEO_START(coolridr)
@@ -226,4 +312,15 @@ ROM_START( coolridr )
 	ROMX_LOAD( "mp17649.10",0x0000009, 0x0200000, CRC(567fbc0a) SHA1(3999c99b26f13d97ac1c58de00a44049ee7775fd), ROM_SKIP(9) )
 ROM_END
 
-GAME( 1995, coolridr,    0, coolridr,    0,    0, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND )
+/*TODO: there must be an irq line with custom vector located somewhere that writes to here...*/
+static READ32_HANDLER( coolridr_hack_r )
+{
+	return 0;
+}
+
+static DRIVER_INIT( coolridr )
+{
+	memory_install_read32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x60d88a4, 0x060d88a7, 0, 0, coolridr_hack_r );
+}
+
+GAME( 1995, coolridr,    0, coolridr,    0,    coolridr, ROT0,  "Sega", "Cool Riders",GAME_NOT_WORKING|GAME_NO_SOUND )
