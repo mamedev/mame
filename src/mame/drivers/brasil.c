@@ -34,7 +34,7 @@ VIDEO_UPDATE(brasil)
 
 	count = (0/2);
 
-	for(y=0;y<150;y++)
+	for(y=0;y<300;y++)
 	{
 		for(x=0;x<400;x++)
 		{
@@ -48,26 +48,8 @@ VIDEO_UPDATE(brasil)
 			b = (color & 0x001f) << 3;
 			g = (color & 0x07e0) >> 3;
 			r = (color & 0xf800) >> 8;
-			if(x<video_screen_get_visible_area(screen)->max_x && ((y*2)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, (y*2)+0, x) = b | (g<<8) | (r<<16);
-
-			count++;
-		}
-
-		for(x=0;x<400;x++)
-		{
-			UINT32 color;
-			UINT32 b;
-			UINT32 g;
-			UINT32 r;
-
-			color = (blit_ram[count]) & 0xffff;
-
-			b = (color & 0x001f) << 3;
-			g = (color & 0x07e0) >> 3;
-			r = (color & 0xf800) >> 8;
-			if(x<video_screen_get_visible_area(screen)->max_x && ((y*2)+1)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, (y*2)+1, x) = b | (g<<8) | (r<<16);
+			if(x<video_screen_get_visible_area(screen)->max_x && y<video_screen_get_visible_area(screen)->max_y)
+				*BITMAP_ADDR32(bitmap, y, x) = b | (g<<8) | (r<<16);
 
 			count++;
 		}
@@ -82,7 +64,7 @@ VIDEO_UPDATE(vidpokr2)
 
 	count = (0/2);
 
-	for(y=0;y<224;y+=2)
+	for(y=0;y<224;y++)
 	{
 		for(x=0;x<160;x++)
 		{
@@ -91,37 +73,15 @@ VIDEO_UPDATE(vidpokr2)
 			color = ((blit_ram[count]) & 0x00ff)>>0;
 
 			if((x*2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y+0, (x*2)+0) = screen->machine->pens[color];
-				//*BITMAP_ADDR32(bitmap, (y)+0, x*2) = (b<<(0+5)) | (g<<(8+6)) | (r<<(16+5));
+				*BITMAP_ADDR32(bitmap, y, (x*2)+0) = screen->machine->pens[color];
 
 			color = ((blit_ram[count]) & 0xff00)>>8;
 
 			if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y+0, (x*2)+1) = screen->machine->pens[color];
-
-				//*BITMAP_ADDR32(bitmap, y, (x*2)+1) = (b<<(0+5)) | (g<<(8+6)) | (r<<(16+5));
-
+				*BITMAP_ADDR32(bitmap, y, (x*2)+1) = screen->machine->pens[color];
 
 			count++;
 		}
-
-		for(x=0;x<160;x++)
-		{
-			UINT32 color;
-
-			color = ((blit_ram[count]) & 0x00ff)>>0;
-
-			if((x*2)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y+1, (x*2)+0) = screen->machine->pens[color];
-
-			color = ((blit_ram[count]) & 0xff00)>>8;
-
-			if(((x*2)+1)<video_screen_get_visible_area(screen)->max_x && ((y)+0)<video_screen_get_visible_area(screen)->max_y)
-				*BITMAP_ADDR32(bitmap, y+1, (x*2)+1) = screen->machine->pens[color];
-
-			count++;
-		}
-
 	}
 
 	return 0;
@@ -133,11 +93,10 @@ static UINT16 unk_latch;
 /*Bra$il*/
 static READ16_HANDLER( blit_status_r )
 {
-
 	switch(offset*2)
 	{
 		case 0:
-		if(input_code_pressed_once(KEYCODE_Z)) // use this to skip tests etc...
+		if(input_code_pressed_once(KEYCODE_L)) // use this to skip tests etc...
 			return 0xffdc;
 
 		return 3;
@@ -228,6 +187,7 @@ static WRITE16_HANDLER( paletteram_io_w )
 
 static UINT16 vblank_bit;
 
+/*There's a reset button located there too.*/
 static READ16_HANDLER( vidpokr2_vblank_r )
 {
 	return vblank_bit; //0x80
@@ -292,9 +252,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( brasil_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0030, 0x0033) AM_READ( blit_status_r )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE( blit_status_w )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // output write?
+	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITE( write2_w ) // coin counter & coin lockout
- 	AM_RANGE(0x0006, 0x0007) AM_WRITE( write3_w ) // output,probably lamps etc.
+ 	AM_RANGE(0x0006, 0x0007) AM_WRITE( write3_w ) // sound chip routes here
  	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ( read3_r )
@@ -312,10 +272,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( vidpokr2_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x0030, 0x0033) AM_READ( vidpokr2_blit_status_r )
 	AM_RANGE(0x0030, 0x0031) AM_WRITE( vidpokr2_blit_status_w )
-	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // output write?
+	AM_RANGE(0x0000, 0x0001) AM_WRITE( write1_w ) // lamps
 	AM_RANGE(0x0002, 0x0003) AM_WRITE( write2_w ) // coin counter & coin lockout
 	AM_RANGE(0x0004, 0x0005) AM_WRITE( vidpokr2_vblank_w )
- 	AM_RANGE(0x0006, 0x0007) AM_WRITE( write3_w ) // output,probably lamps etc.
+ 	AM_RANGE(0x0006, 0x0007) AM_WRITE( write3_w ) // sound chip routes here
  	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x000c, 0x000d) AM_READ( vidpokr2_vblank_r )
@@ -327,13 +287,11 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( brasil )
 	PORT_START("IN0")
-	PORT_DIPNAME( 0x0001, 0x0001, "IN0" )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Take Button") PORT_CODE(KEYCODE_A)
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START1 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME("Hold 2") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_NAME("Hold 4") PORT_CODE(KEYCODE_V)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Bet Button") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_NAME("Risk Button") PORT_CODE(KEYCODE_S)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME("Hold 3") PORT_CODE(KEYCODE_C)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_NAME("Hold 5") PORT_CODE(KEYCODE_B)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_NAME("Hold 1") PORT_CODE(KEYCODE_Z)
@@ -365,14 +323,12 @@ static INPUT_PORTS_START( brasil )
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_COIN3 )
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_COIN4 ) // note
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) ) //ticket
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_SERVICE( 0x0020, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) ) //hopper
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
