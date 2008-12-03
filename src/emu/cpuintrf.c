@@ -1308,11 +1308,12 @@ void cpu_reset(const device_config *device)
 
 offs_t cpu_get_physical_pc_byte(const device_config *device)
 {
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM); 
 	offs_t pc;
 
 	cpu_push_context(device);
-	pc = cpu_address_to_byte(device, ADDRESS_SPACE_PROGRAM, cpu_get_info_int(device, CPUINFO_INT_PC));
-	pc = cpu_address_physical(device, ADDRESS_SPACE_PROGRAM, TRANSLATE_FETCH, pc);
+	pc = memory_address_to_byte(space, cpu_get_info_int(device, CPUINFO_INT_PC));
+	memory_address_physical(space, TRANSLATE_FETCH, &pc);
 	cpu_pop_context();
 	return pc;
 }
@@ -1367,7 +1368,8 @@ offs_t cpu_dasm(const device_config *device, char *buffer, offs_t pc, const UINT
 	assert((result & DASMFLAG_LENGTHMASK) != 0);
 #ifdef MAME_DEBUG
 {
-	int bytes = cpu_address_to_byte(device, ADDRESS_SPACE_PROGRAM, result & DASMFLAG_LENGTHMASK);
+	const address_space *space = classheader->space[ADDRESS_SPACE_PROGRAM];
+	int bytes = memory_address_to_byte(space, result & DASMFLAG_LENGTHMASK);
 	assert(bytes >= cpu_get_min_opcode_bytes(device));
 	assert(bytes <= cpu_get_max_opcode_bytes(device));
 	(void) bytes; /* appease compiler */

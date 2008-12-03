@@ -554,6 +554,7 @@ typedef enum _cpu_type cpu_type;
 #define cputype_get_databus_width(cputype, space)	cputype_get_info_int(cputype, CPUINFO_INT_DATABUS_WIDTH + (space))
 #define cputype_get_addrbus_width(cputype, space)	cputype_get_info_int(cputype, CPUINFO_INT_ADDRBUS_WIDTH + (space))
 #define cputype_get_addrbus_shift(cputype, space)	cputype_get_info_int(cputype, CPUINFO_INT_ADDRBUS_SHIFT + (space))
+#define cputype_get_logaddr_width(cputype, space)	cputype_get_info_int(cputype, CPUINFO_INT_LOGADDR_WIDTH + (space))
 #define cputype_get_page_shift(cputype, space)		cputype_get_info_int(cputype, CPUINFO_INT_PAGE_SHIFT + (space))
 #define cputype_get_debug_register_list(cputype)	cputype_get_info_ptr(cputype, CPUINFO_PTR_DEBUG_REGISTER_LIST)
 #define cputype_get_name(cputype)					cputype_get_info_string(cputype, CPUINFO_STR_NAME)
@@ -797,75 +798,5 @@ INLINE const address_space *cpu_get_address_space(const device_config *cpu, int 
 	return classheader->space[spacenum];
 }
 
-
-/*-------------------------------------------------
-    cpu_address_to_byte - convert an address in
-    the specified address space to a byte offset
--------------------------------------------------*/
-
-INLINE offs_t cpu_address_to_byte(const device_config *cpu, int space, offs_t address)
-{
-	cpu_class_header *classheader = cpu->classtoken;
-	int shift = classheader->address_shift[space];
-	return (shift < 0) ? (address << -shift) : (address >> shift);
-}
-
-
-/*-------------------------------------------------
-    cpu_address_to_byte_end - convert an address
-    in the specified address space to a byte
-    offset specifying the last byte covered by
-    the address
--------------------------------------------------*/
-
-INLINE offs_t cpu_address_to_byte_end(const device_config *cpu, int space, offs_t address)
-{
-	cpu_class_header *classheader = cpu->classtoken;
-	int shift = classheader->address_shift[space];
-	return (shift < 0) ? ((address << -shift) | ((1 << -shift) - 1)) : (address >> shift);
-}
-
-
-/*-------------------------------------------------
-    cpu_byte_to_address - convert a byte offset
-    to an address in the specified address space
--------------------------------------------------*/
-
-INLINE offs_t cpu_byte_to_address(const device_config *cpu, int space, offs_t address)
-{
-	cpu_class_header *classheader = cpu->classtoken;
-	int shift = classheader->address_shift[space];
-	return (shift < 0) ? (address >> -shift) : (address << shift);
-}
-
-
-/*-------------------------------------------------
-    cpu_byte_to_address_end - convert a byte offset
-    to an address in the specified address space
-    specifying the last address covered by the
-    byte
--------------------------------------------------*/
-
-INLINE offs_t cpu_byte_to_address_end(const device_config *cpu, int space, offs_t address)
-{
-	cpu_class_header *classheader = cpu->classtoken;
-	int shift = classheader->address_shift[space];
-	return (shift < 0) ? (address >> -shift) : ((address << shift) | ((1 << shift) - 1));
-}
-
-
-/*-------------------------------------------------
-    cpu_address_physical - return the physical
-    address corresponding to the given logical
-    address
--------------------------------------------------*/
-
-INLINE offs_t cpu_address_physical(const device_config *cpu, int space, int intention, offs_t address)
-{
-	cpu_class_header *classheader = cpu->classtoken;
-	if (classheader->translate != NULL)
-		(*classheader->translate)(cpu, space, intention, &address);
-	return address;
-}
 
 #endif	/* __CPUINTRF_H__ */

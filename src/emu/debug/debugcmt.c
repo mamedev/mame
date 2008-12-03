@@ -310,7 +310,6 @@ UINT32 debug_comment_all_change_count(running_machine *machine)
 
 UINT32 debug_comment_get_opcode_crc32(const device_config *device, offs_t address)
 {
-	const cpu_debug_data *info = cpu_get_debug_data(device);
 	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int i;
 	UINT32 crc;
@@ -318,7 +317,7 @@ UINT32 debug_comment_get_opcode_crc32(const device_config *device, offs_t addres
 	char buff[256];
 	offs_t numbytes;
 	int maxbytes = cpu_get_max_opcode_bytes(device);
-	UINT32 addrmask = (cpu_get_debug_data(device))->space[ADDRESS_SPACE_PROGRAM].logaddrmask;
+	UINT32 addrmask = space->logaddrmask;
 
 	memset(opbuf, 0x00, sizeof(opbuf));
 	memset(argbuf, 0x00, sizeof(argbuf));
@@ -331,7 +330,7 @@ UINT32 debug_comment_get_opcode_crc32(const device_config *device, offs_t addres
 	}
 
 	numbytes = cpu_dasm(device, buff, address & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
-	numbytes = ADDR2BYTE(numbytes, info, ADDRESS_SPACE_PROGRAM);
+	numbytes = memory_address_to_byte(space, numbytes);
 
 	crc = crc32(0, argbuf, numbytes);
 

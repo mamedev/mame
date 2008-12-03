@@ -209,7 +209,10 @@ static CMDERR internal_execute_command(running_machine *machine, int execute, in
 			params = 0;
 	}
 	else
+	{
 		params = 0;
+		param[0] = NULL;
+	}
 
 	/* search the command list */
 	len = strlen(command);
@@ -260,7 +263,7 @@ static CMDERR internal_execute_command(running_machine *machine, int execute, in
 static CMDERR internal_parse_command(running_machine *machine, const char *original_command, int execute)
 {
 	char command[MAX_COMMAND_LENGTH], parens[MAX_COMMAND_LENGTH];
-	char *params[MAX_COMMAND_PARAMS];
+	char *params[MAX_COMMAND_PARAMS] = { 0 };
 	CMDERR result = CMDERR_NONE;
 	char *command_start;
 	char *p, c = 0;
@@ -328,7 +331,7 @@ static CMDERR internal_parse_command(running_machine *machine, const char *origi
 		if (isexpr && paramcount == 1)
 		{
 			UINT64 expresult;
-			EXPRERR exprerr = expression_evaluate(command_start, cpu_get_debug_data(machine->activecpu)->symtable, &debug_expression_callbacks, machine, &expresult);
+			EXPRERR exprerr = expression_evaluate(command_start, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, &expresult);
 			if (exprerr != EXPRERR_NONE)
 				return MAKE_CMDERR_EXPRESSION_ERROR(EXPRERR_ERROR_OFFSET(exprerr));
 		}

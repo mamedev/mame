@@ -63,16 +63,6 @@
 
 
 /***************************************************************************
-    MACROS
-***************************************************************************/
-
-#define ADDR2BYTE(val,info,spc) (((val) << (info)->space[spc].addr2byte_lshift) >> (info)->space[spc].addr2byte_rshift)
-#define ADDR2BYTE_MASKED(val,info,spc) (ADDR2BYTE(val,info,spc) & (info)->space[spc].logbytemask)
-#define BYTE2ADDR(val,info,spc) (((val) << (info)->space[spc].addr2byte_rshift) >> (info)->space[spc].addr2byte_lshift)
-
-
-
-/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -97,30 +87,12 @@ struct _debug_trace_info
 };
 
 
-typedef struct _debug_space_info debug_space_info;
-struct _debug_space_info
-{
-	const address_space *space;					/* pointer to the CPU's address space */
-	debug_cpu_watchpoint *wplist;				/* list of watchpoints */
-	UINT8			databytes;					/* width of the data bus, in bytes */
-	UINT8			pageshift;					/* page shift */
-	UINT8			addr2byte_lshift;			/* left shift to convert CPU address to a byte value */
-	UINT8			addr2byte_rshift;			/* right shift to convert CPU address to a byte value */
-	UINT8			physchars;					/* number of characters to use for physical addresses */
-	UINT8			logchars;					/* number of characters to use for logical addresses */
-	offs_t			physaddrmask;				/* physical address mask */
-	offs_t			logaddrmask;				/* logical address mask */
-	offs_t			physbytemask;				/* physical byte mask */
-	offs_t			logbytemask;				/* logical byte mask */
-};
-
-
 typedef struct _debug_hotspot_entry debug_hotspot_entry;
 struct _debug_hotspot_entry
 {
 	offs_t			access;						/* access address */
 	offs_t			pc;							/* PC of the access */
-	int				spacenum;					/* space where the access occurred */
+	const address_space *space;					/* space where the access occurred */
 	UINT32			count;						/* number of hits */
 };
 
@@ -131,7 +103,6 @@ struct _cpu_debug_data
 	const device_config *device;				/* CPU device object */
 	symbol_table *	symtable;					/* symbol table for expression evaluation */
 	UINT32			flags;						/* debugging flags for this CPU */
-	UINT8			endianness;					/* little or bigendian */
 	UINT8			opwidth;					/* width of an opcode */
 	offs_t			stepaddr;					/* step target address for DEBUG_FLAG_STEPPING_OVER */
 	int				stepsleft;					/* number of steps left until done */
@@ -147,12 +118,11 @@ struct _cpu_debug_data
 	UINT32			pc_history_index;			/* current history index */
 	int				hotspot_count;				/* number of hotspots */
 	int				hotspot_threshhold;			/* threshhold for the number of hits to print */
-	cpu_translate_func translate;				/* address translation routine */
 	cpu_read_func	read; 						/* memory read routine */
 	cpu_write_func	write;						/* memory write routine */
 	cpu_readop_func	readop;						/* opcode read routine */
 	debug_instruction_hook_func instrhook;		/* per-instruction callback hook */
-	debug_space_info space[ADDRESS_SPACES];		/* per-address space info */
+	debug_cpu_watchpoint *wplist[ADDRESS_SPACES]; /* watchpoint lists for each address space */
 };
 
 

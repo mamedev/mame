@@ -97,7 +97,7 @@
 void osd_init(running_machine *machine);
 
 
-void osd_wait_for_debugger(running_machine *machine, int firststop);
+void osd_wait_for_debugger(const device_config *device, int firststop);
 
 
 

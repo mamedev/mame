@@ -280,13 +280,18 @@ struct _address_space
 	direct_read_data		direct;				/* fast direct-access read info */
 	direct_update_func 		directupdate;		/* fast direct-access update callback */
 	UINT64					unmap;				/* unmapped value */
-	offs_t					addrmask;			/* global address mask */
-	offs_t					bytemask;			/* byte-converted global address mask */
+	offs_t					addrmask;			/* physical address mask */
+	offs_t					bytemask;			/* byte-converted physical address mask */
+	offs_t					logaddrmask;		/* logical address mask */
+	offs_t					logbytemask;		/* byte-converted logical address mask */
 	UINT8					spacenum;			/* address space index */
 	UINT8					endianness;			/* endianness of this space */
 	INT8					ashift;				/* address shift */
+	UINT8					pageshift;			/* page shift */
 	UINT8					abits;				/* address bits */
 	UINT8 					dbits;				/* data bits */
+	UINT8					addrchars;			/* number of characters to use for physical addresses */
+	UINT8					logaddrchars;		/* number of characters to use for logical addresses */
 	UINT8					debugger_access;	/* treat accesses as coming from the debugger */
 	UINT8					log_unmap;			/* log unmapped accesses in this space? */
 	address_table			read;				/* memory read lookup table */
@@ -935,6 +940,13 @@ UINT64 *_memory_install_device_handler64(const address_space *space, const devic
 
 
 
+/* ----- miscellaneous utilities ----- */
+
+/* return the physical address corresponding to the given logical address */
+int memory_address_physical(const address_space *space, int intention, offs_t *address);
+
+
+
 /* ----- debugger helpers ----- */
 
 /* return a string describing the handler at a particular offset */
@@ -963,6 +975,54 @@ void memory_dump(running_machine *machine, FILE *file);
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
+
+/*-------------------------------------------------
+    memory_address_to_byte - convert an address in
+    the specified address space to a byte offset
+-------------------------------------------------*/
+
+INLINE offs_t memory_address_to_byte(const address_space *space, offs_t address)
+{
+	return (space->ashift < 0) ? (address << -space->ashift) : (address >> space->ashift);
+}
+
+
+/*-------------------------------------------------
+    memory_address_to_byte_end - convert an address
+    in the specified address space to a byte
+    offset specifying the last byte covered by
+    the address
+-------------------------------------------------*/
+
+INLINE offs_t memory_address_to_byte_end(const address_space *space, offs_t address)
+{
+	return (space->ashift < 0) ? ((address << -space->ashift) | ((1 << -space->ashift) - 1)) : (address >> space->ashift);
+}
+
+
+/*-------------------------------------------------
+    memory_byte_to_address - convert a byte offset
+    to an address in the specified address space
+-------------------------------------------------*/
+
+INLINE offs_t memory_byte_to_address(const address_space *space, offs_t address)
+{
+	return (space->ashift < 0) ? (address >> -space->ashift) : (address << space->ashift);
+}
+
+
+/*-------------------------------------------------
+    memory_byte_to_address_end - convert a byte 
+    offset to an address in the specified address 
+    space specifying the last address covered by 
+    the byte
+-------------------------------------------------*/
+
+INLINE offs_t memory_byte_to_address_end(const address_space *space, offs_t address)
+{
+	return (space->ashift < 0) ? (address >> -space->ashift) : ((address << space->ashift) | ((1 << space->ashift) - 1));
+}
+
 
 /*-------------------------------------------------
     memory_read_byte/word/dword/qword - read a
