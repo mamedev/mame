@@ -4,20 +4,21 @@ Sengoku Mahjong (c) 1991 Sigma
 
 driver by Angelo Salese & Pierpaolo Prazzoli
 
-Based on the D-Con driver.
+Similar to the D-Con HW.
 
 TODO:
-- Find tilemap enable registers (needed especially when you coin up at the intro).
-- Missing NVRAM emulation. (?)
+- Find what the remaining video C.R.T. registers does;
+- Missing NVRAM emulation?
   At startup a "Warning : Data in stock is wrong check ram" message appears because of that.
+  But...there isn't any clear eeprom write bits/cs/clock writes?
 
 Notes:
 - Some strings written in the sound rom:
   "SENGOKU-MAHJONG Z80 PROGRAM ROM VERSION 1.00 WRITTEN BY K.SAEKI" at location 0x00c0-0x00ff.
   "Copyright 1990/1991 Sigma" at location 0x770-0x789.
-
 - To bypass the startup message, toggle "Reset" dip-switch or reset with F3.
-
+- If the Work RAM is not hooked-up (areas $67xx),a sound sample is played.I can't understand what it says though,
+  appears to japanese words for "RAM failed".
 
 CPU:    uPD70116C-8 (V30)
 Sound:  Z80-A
@@ -59,6 +60,7 @@ WRITE16_HANDLER( sengokmj_bgvram_w );
 WRITE16_HANDLER( sengokmj_fgvram_w );
 WRITE16_HANDLER( sengokmj_mdvram_w );
 WRITE16_HANDLER( sengokmj_txvram_w );
+WRITE16_HANDLER( sengokmj_layer_enable_w );
 VIDEO_START( sengokmj );
 VIDEO_UPDATE( sengokmj );
 
@@ -80,36 +82,23 @@ static READ16_HANDLER( mahjong_panel_r )
 
 static WRITE16_HANDLER( mahjong_panel_w )
 {
-		sengokumj_mux_data = data;
+	sengokumj_mux_data = data;
 }
 
 static WRITE16_HANDLER( sengokmj_out_w )
 {
-	static UINT8 old = 0;
-	static int coins_used = 0;
-
-	if(ACCESSING_BITS_0_7)
-	{
-		if((old & 4) == 0 && (data & 4) == 4)
-		{
-			coins_used++;
-			//mame_printf_debug("coins used = %d\n",coins_used);
-		}
-
-		old = data;
-
-	// data & 2 -> hopper related ?
-	}
+	/* ---- ---- ---x ---- J.P. Signal (?)*/
+	/* ---- ---- ---- -x-- Coin counter (done AFTER that you press start)*/
+	/* ---- ---- ---- --x- Cash enable (lockout)*/
+	/* ---- ---- ---- ---x Hopper 10 */
+	coin_lockout_w(0,~data & 2);
+	coin_lockout_w(1,~data & 2);
+	coin_counter_w(0,data & 4);
 }
 
 
 static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x003ff) AM_RAM
-	AM_RANGE(0x01000, 0x011ff) AM_RAM
-	AM_RANGE(0x01234, 0x01239) AM_NOP // ?
-	AM_RANGE(0x06000, 0x067ff) AM_RAM
-	AM_RANGE(0x07800, 0x097ff) AM_RAM
-	AM_RANGE(0x09800, 0x099ff) AM_RAM
+	AM_RANGE(0x00000, 0x09fff) AM_RAM
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(sengokmj_bgvram_w) AM_BASE(&sengokmj_bgvram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(sengokmj_fgvram_w) AM_BASE(&sengokmj_fgvram)
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(sengokmj_mdvram_w) AM_BASE(&sengokmj_mdvram)
@@ -119,19 +108,25 @@ static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
 
-
 static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x30) AM_WRITE(seibu_main_word_w)
-	AM_RANGE(0x8040, 0x804f) AM_WRITE(seibu_main_word_w)
+	AM_RANGE(0x8000, 0x800f) AM_WRITE(seibu_main_word_w)
+	/*These four appears to be video registers / C.R.T. related */
+	AM_RANGE(0x8010, 0x801b) AM_WRITENOP
+	AM_RANGE(0x801c, 0x801d) AM_WRITE(sengokmj_layer_enable_w)
+	AM_RANGE(0x801e, 0x801f) AM_WRITENOP
+	AM_RANGE(0x8020, 0x802f) AM_WRITENOP
+	AM_RANGE(0x8030, 0x803f) AM_WRITENOP
+	AM_RANGE(0x8040, 0x804f) AM_WRITENOP
+
 	AM_RANGE(0x8100, 0x8101) AM_WRITENOP // always 0
 	AM_RANGE(0x8180, 0x8181) AM_WRITE(sengokmj_out_w)
-	AM_RANGE(0x8080, 0x8081) AM_WRITENOP // ?
-	AM_RANGE(0x80c0, 0x80c1) AM_WRITENOP // ?
+	AM_RANGE(0x8080, 0x8081) AM_WRITENOP
+	AM_RANGE(0x80c0, 0x80cf) AM_WRITENOP
 	AM_RANGE(0x8140, 0x8141) AM_WRITE(mahjong_panel_w)
 	AM_RANGE(0xc000, 0xc001) AM_READ_PORT("DSW1")
 	AM_RANGE(0xc002, 0xc003) AM_READ(mahjong_panel_r)
-	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2")
+	AM_RANGE(0xc004, 0xc005) AM_READ_PORT("DSW2") //switches
 ADDRESS_MAP_END
 
 
@@ -286,7 +281,7 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sengokmj_interrupt )
 {
-	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xcb/4);
+	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xc8/4);
 }
 
 static MACHINE_DRIVER_START( sengokmj )
@@ -328,7 +323,7 @@ ROM_START( sengokmj )
 	ROM_REGION( 0x20000, "audio", 0 ) /* 64k code for sound Z80 */
 	ROM_LOAD( "mah1-2-1.013", 0x000000, 0x08000, CRC(6a4f31b8) SHA1(5e1d7ed299c1fd65c7a43faa02831220f4251733) )
 	ROM_CONTINUE(             0x010000, 0x08000 )
-	ROM_COPY( "audio", 0, 0x018000, 0x08000 )
+	ROM_COPY( "audio", 0,     0x018000, 0x08000 )
 
 	ROM_REGION( 0x100000, "spr_gfx", ROMREGION_DISPOSE ) /*Sprites gfx rom*/
 	ROM_LOAD( "rssengo2.72", 0x00000, 0x100000, CRC(fb215ff8) SHA1(f98c0a53ad9b97d209dd1f85c994fc17ec585bd7) )

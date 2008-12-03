@@ -237,7 +237,7 @@ static INTERRUPT_GEN( system_h1_sub )
 static MACHINE_RESET ( coolridr )
 {
 
-  	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+// 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
 }
