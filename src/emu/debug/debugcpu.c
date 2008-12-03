@@ -391,7 +391,7 @@ void debug_cpu_start_hook(const device_config *device, attotime endtime)
 		/* check for periodic updates */
 		if (device == global->visiblecpu && osd_ticks() > global->last_periodic_update_time + osd_ticks_per_second()/4)
 		{
-			debug_view_update_all();
+			debug_view_update_all(device->machine);
 			global->last_periodic_update_time = osd_ticks();
 		}
 
@@ -411,7 +411,7 @@ void debug_cpu_start_hook(const device_config *device, attotime endtime)
 			if ((info->flags & DEBUG_FLAG_STOP_VBLANK) != 0)
 			{
 				global->execution_state = EXECUTION_STATE_STOPPED;
-				debug_console_printf("Stopped at VBLANK\n");
+				debug_console_printf(device->machine, "Stopped at VBLANK\n");
 			}
 
 			/* check for debug keypresses */
@@ -464,7 +464,7 @@ void debug_cpu_interrupt_hook(const device_config *device, int irqline)
 	if (info != NULL && (info->flags & DEBUG_FLAG_STOP_INTERRUPT) != 0 && (info->stopirq == -1 || info->stopirq == irqline))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf("Stopped on interrupt (CPU '%s', IRQ %d)\n", device->tag, irqline);
+		debug_console_printf(device->machine, "Stopped on interrupt (CPU '%s', IRQ %d)\n", device->tag, irqline);
 		compute_debug_flags(device);
 	}
 }
@@ -484,7 +484,7 @@ void debug_cpu_exception_hook(const device_config *device, int exception)
 	if ((info->flags & DEBUG_FLAG_STOP_EXCEPTION) != 0 && (info->stopexception == -1 || info->stopexception == exception))
 	{
 		global->execution_state = EXECUTION_STATE_STOPPED;
-		debug_console_printf("Stopped on exception (CPU '%s', exception %d)\n", device->tag, exception);
+		debug_console_printf(device->machine, "Stopped on exception (CPU '%s', exception %d)\n", device->tag, exception);
 		compute_debug_flags(device);
 	}
 }
@@ -531,7 +531,7 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 			/* update every 100 steps until we are within 200 of the end */
 			else if ((info->flags & DEBUG_FLAG_STEPPING_OUT) == 0 && (info->stepsleft < 200 || info->stepsleft % 100 == 0))
 			{
-				debug_view_update_all();
+				debug_view_update_all(device->machine);
 				debugger_refresh_display(device->machine);
 			}
 		}
@@ -543,14 +543,14 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 		/* see if we hit a target time */
 		if ((info->flags & DEBUG_FLAG_STOP_TIME) != 0 && attotime_compare(timer_get_time(device->machine), info->stoptime) >= 0)
 		{
-			debug_console_printf("Stopped at time interval %.1g\n", attotime_to_double(timer_get_time(device->machine)));
+			debug_console_printf(device->machine, "Stopped at time interval %.1g\n", attotime_to_double(timer_get_time(device->machine)));
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
 		/* check the temp running breakpoint and break if we hit it */
 		else if ((info->flags & DEBUG_FLAG_STOP_PC) != 0 && info->stopaddr == curpc)
 		{
-			debug_console_printf("Stopped at temporary breakpoint %X on CPU '%s'\n", info->stopaddr, device->tag);
+			debug_console_printf(device->machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", info->stopaddr, device->tag);
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
@@ -568,8 +568,11 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 		reset_transient_flags(device->machine);
 		global->breakcpu = NULL;
 
+		/* remember the last visible CPU in the debugger */
+		global->visiblecpu = device;
+
 		/* update all views */
-		debug_view_update_all();
+		debug_view_update_all(device->machine);
 		debugger_refresh_display(device->machine);
 
 		/* wait for the debugger; during this time, disable sound output */
@@ -584,7 +587,7 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 			/* if something modified memory, update the screen */
 			if (global->memory_modified)
 			{
-				debug_disasm_update_all();
+				debug_view_update_type(device->machine, DVT_DISASSEMBLY);
 				debugger_refresh_display(device->machine);
 			}
 
@@ -663,7 +666,7 @@ void debug_cpu_halt_on_next_instruction(const device_config *device, const char 
 
 	/* output the message to the console */
 	va_start(arg, fmt);
-	debug_console_vprintf(fmt, arg);
+	debug_console_vprintf(device->machine, fmt, arg);
 	va_end(arg);
 
 	/* if we are live, stop now, otherwise note that we want to break there */
@@ -1135,7 +1138,7 @@ void debug_cpu_source_script(running_machine *machine, const char *file)
 		if (!global->source_file)
 		{
 			if (mame_get_phase(machine) == MAME_PHASE_RUNNING)
-				debug_console_printf("Cannot open command file '%s'\n", file);
+				debug_console_printf(machine, "Cannot open command file '%s'\n", file);
 			else
 				fatalerror("Cannot open command file '%s'", file);
 		}
@@ -2082,7 +2085,7 @@ static void breakpoint_check(running_machine *machine, cpu_debug_data *info, off
 
 				/* print a notification, unless the action made us go again */
 				if (global->execution_state == EXECUTION_STATE_STOPPED)
-					debug_console_printf("Stopped at breakpoint %X\n", bp->index);
+					debug_console_printf(machine, "Stopped at breakpoint %X\n", bp->index);
 				break;
 			}
 }
@@ -2202,7 +2205,7 @@ static void watchpoint_check(const address_space *space, int type, offs_t addres
 					}
 					else
 						sprintf(buffer, "Stopped at watchpoint %X reading %s from %08X (PC=%X)", wp->index, sizes[size], memory_byte_to_address(space, address), cpu_get_pc(space->cpu));
-					debug_console_printf("%s\n", buffer);
+					debug_console_printf(space->machine, "%s\n", buffer);
 					compute_debug_flags(space->cpu);
 				}
 				break;
@@ -2234,7 +2237,7 @@ static void check_hotspots(const address_space *space, offs_t address)
 		/* if the bottom of the list is over the threshhold, print it */
 		debug_hotspot_entry *spot = &info->hotspots[info->hotspot_count - 1];
 		if (spot->count > info->hotspot_threshhold)
-			debug_console_printf("Hotspot @ %s %08X (PC=%08X) hit %d times (fell off bottom)\n", space->name, spot->access, spot->pc, spot->count);
+			debug_console_printf(space->machine, "Hotspot @ %s %08X (PC=%08X) hit %d times (fell off bottom)\n", space->name, spot->access, spot->pc, spot->count);
 
 		/* move everything else down and insert this one at the top */
 		memmove(&info->hotspots[1], &info->hotspots[0], sizeof(info->hotspots[0]) * (info->hotspot_count - 1));

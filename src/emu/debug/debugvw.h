@@ -100,8 +100,46 @@ typedef void (*debug_view_osd_update_func)(debug_view *view, void *osdprivate);
 typedef struct _debug_view_xy debug_view_xy;
 struct _debug_view_xy
 {
-	INT32		x;
-	INT32		y;
+	INT32				x;
+	INT32				y;
+};
+
+
+/* a registers subview item */
+typedef struct _registers_subview_item registers_subview_item;
+struct _registers_subview_item
+{
+	registers_subview_item *next;				/* link to next item */
+	int					index;					/* index of this item */
+	const device_config *device;				/* CPU to display */
+	char  				name[1];				/* name of the subview item */
+};
+
+
+/* a disassembly subview item */
+typedef struct _disasm_subview_item disasm_subview_item;
+struct _disasm_subview_item
+{
+	disasm_subview_item *next;					/* link to next item */
+	int					index;					/* index of this item */
+	const address_space *space;					/* address space to display */
+	char  				name[1];				/* name of the subview item */
+};
+
+
+/* a memory subview item */
+typedef struct _memory_subview_item memory_subview_item;
+struct _memory_subview_item
+{
+	memory_subview_item *next;					/* link to next item */
+	int					index;					/* index of this item */
+	const address_space *space;					/* address space we reference (if any) */
+	void *				base;					/* pointer to memory base */
+	offs_t				length;					/* length of memory */
+	offs_t				offsetxor;				/* XOR to apply to offsets */
+	UINT8				endianness;				/* endianness of memory */
+	UINT8				prefsize;				/* preferred bytes per chunk */
+	char  				name[1];				/* name of the subview item */
 };
 
 
@@ -109,19 +147,8 @@ struct _debug_view_xy
 typedef struct _debug_view_char debug_view_char;
 struct _debug_view_char
 {
-	UINT8		byte;
-	UINT8		attrib;
-};
-
-
-/* description of a raw memory space */
-typedef struct _memory_view_raw memory_view_raw;
-struct _memory_view_raw
-{
-	void *		base;
-	offs_t		length;
-	offs_t		offsetxor;
-	UINT8		endianness;
+	UINT8				byte;
+	UINT8				attrib;
 };
 
 
@@ -157,13 +184,10 @@ void debug_view_begin_update(debug_view *view);
 void debug_view_end_update(debug_view *view);
 
 /* force all views to refresh */
-void debug_view_update_all(void);
+void debug_view_update_all(running_machine *machine);
 
 /* force all views of a given type to refresh */
-void debug_view_update_type(int type);
-
-/* force all disassembly views to refresh */
-void debug_disasm_update_all(void);
+void debug_view_update_type(running_machine *machine, int type);
 
 
 
@@ -217,18 +241,24 @@ void debug_view_set_cursor_visible(debug_view *view, int visible);
 
 /* ----- registers view-specific properties ----- */
 
-/* return the CPU whose registers are currently displayed */
-const device_config *registers_view_get_cpu(debug_view *view);
+/* return a linked list of subviews */
+const registers_subview_item *registers_view_get_subview_list(debug_view *view);
 
-/* specify the CPU whose registers are to be displayed */
-void registers_view_set_cpu(debug_view *view, const device_config *device);
+/* return the current subview index */
+int registers_view_get_subview(debug_view *view);
+
+/* select a new subview by index */
+void registers_view_set_subview(debug_view *view, int index);
 
 
 
 /* ----- disassembly view-specific properties ----- */
 
-/* return the address space whose disassembly is being displayed */
-const address_space *disasm_view_get_address_space(debug_view *view);
+/* return a linked list of subviews */
+const disasm_subview_item *disasm_view_get_subview_list(debug_view *view);
+
+/* return the current subview index */
+int disasm_view_get_subview(debug_view *view);
 
 /* return the expression string describing the home address */
 const char *disasm_view_get_expression(debug_view *view);
@@ -245,8 +275,8 @@ UINT32 disasm_view_get_disasm_width(debug_view *view);
 /* return the PC of the currently selected address in the view */
 offs_t disasm_view_get_selected_address(debug_view *view);
 
-/* set the address space whose disassembly is being displayed */
-void disasm_view_set_address_space(debug_view *view, const address_space *space);
+/* select a new subview by index */
+void disasm_view_set_subview(debug_view *view, int index);
 
 /* set the expression string describing the home address */
 void disasm_view_set_expression(debug_view *view, const char *expression);
@@ -267,11 +297,11 @@ void disasm_view_set_selected_address(debug_view *view, offs_t address);
 
 /* ----- memory view-specific properties ----- */
 
-/* return the address space whose memory is being displayed */
-const address_space *memory_view_get_address_space(debug_view *view);
+/* return a linked list of subviews */
+const memory_subview_item *memory_view_get_subview_list(debug_view *view);
 
-/* return a raw description of the memory being displayed */
-const memory_view_raw *memory_view_get_raw(debug_view *view);
+/* return the current subview index */
+int memory_view_get_subview(debug_view *view);
 
 /* return the expression string describing the home address */
 const char *memory_view_get_expression(debug_view *view);
@@ -291,11 +321,8 @@ UINT8 memory_view_get_ascii(debug_view *view);
 /* return TRUE if the memory view is displaying physical addresses versus logical addresses */
 UINT8 memory_view_get_physical(debug_view *view);
 
-/* set the address space whose memory is being displayed */
-void memory_view_set_address_space(debug_view *view, const address_space *space);
-
-/* provide a raw description of the memory to be displayed */
-void memory_view_set_raw(debug_view *view, const memory_view_raw *raw);
+/* select a new subview by index */
+void memory_view_set_subview(debug_view *view, int index);
 
 /* set the expression string describing the home address */
 void memory_view_set_expression(debug_view *view, const char *expression);
@@ -314,6 +341,89 @@ void memory_view_set_ascii(debug_view *view, UINT8 ascii);
 
 /* specify TRUE if the memory view should display physical addresses versus logical addresses */
 void memory_view_set_physical(debug_view *view, UINT8 physical);
+
+
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+/*-------------------------------------------------
+    registers_view_get_subview_by_index - return a
+    pointer to a registers subview by index
+-------------------------------------------------*/
+
+INLINE const registers_subview_item *registers_view_get_subview_by_index(const registers_subview_item *itemlist, int index)
+{
+	for ( ; itemlist != NULL; itemlist = itemlist->next)
+		if (itemlist->index == index)
+			return itemlist;
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    registers_view_get_current_subview - return a
+    pointer to the current subview of a 
+    registers view
+-------------------------------------------------*/
+
+INLINE const registers_subview_item *registers_view_get_current_subview(debug_view *view)
+{
+	return registers_view_get_subview_by_index(registers_view_get_subview_list(view), registers_view_get_subview(view));
+}
+
+
+/*-------------------------------------------------
+    disasm_view_get_subview_by_index - return a
+    pointer to a disasm subview by index
+-------------------------------------------------*/
+
+INLINE const disasm_subview_item *disasm_view_get_subview_by_index(const disasm_subview_item *itemlist, int index)
+{
+	for ( ; itemlist != NULL; itemlist = itemlist->next)
+		if (itemlist->index == index)
+			return itemlist;
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    disasm_view_get_current_subview - return a
+    pointer to the current subview of a 
+    disassembly view
+-------------------------------------------------*/
+
+INLINE const disasm_subview_item *disasm_view_get_current_subview(debug_view *view)
+{
+	return disasm_view_get_subview_by_index(disasm_view_get_subview_list(view), disasm_view_get_subview(view));
+}
+
+
+/*-------------------------------------------------
+    memory_view_get_subview_by_index - return a
+    pointer to a memory subview by index
+-------------------------------------------------*/
+
+INLINE const memory_subview_item *memory_view_get_subview_by_index(const memory_subview_item *itemlist, int index)
+{
+	for ( ; itemlist != NULL; itemlist = itemlist->next)
+		if (itemlist->index == index)
+			return itemlist;
+	return NULL;
+}
+
+
+/*-------------------------------------------------
+    memory_view_get_current_subview - return a
+    pointer to the current subview of a 
+    memory view
+-------------------------------------------------*/
+
+INLINE const memory_subview_item *memory_view_get_current_subview(debug_view *view)
+{
+	return memory_view_get_subview_by_index(memory_view_get_subview_list(view), memory_view_get_subview(view));
+}
 
 
 #endif

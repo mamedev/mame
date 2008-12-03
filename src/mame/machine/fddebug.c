@@ -280,9 +280,9 @@ static void execute_fdclist(running_machine *machine, int ref, int params, const
 static void execute_fdcsearch(running_machine *machine, int ref, int params, const char **param);
 
 static fd1094_possibility *try_all_possibilities(running_machine *machine, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata);
-static void tag_possibility(fd1094_possibility *possdata, UINT8 status);
+static void tag_possibility(running_machine *machine, fd1094_possibility *possdata, UINT8 status);
 
-static void perform_constrained_search(void);
+static void perform_constrained_search(running_machine *machine);
 static UINT32 find_global_key_matches(UINT32 startwith, UINT16 *output);
 static int find_constraint_sequence(UINT32 global, int quick);
 static int does_key_work_for_constraints(const UINT16 *base, UINT8 *key);
@@ -416,13 +416,13 @@ INLINE void set_constraint(fd1094_constraint *constraint, UINT32 pc, UINT16 stat
     for a given address
 -----------------------------------------------*/
 
-INLINE void print_possibilities(void)
+INLINE void print_possibilities(running_machine *machine)
 {
 	int i;
 
-	debug_console_printf("Possibilities @ %06X:\n", posslist[0].basepc);
+	debug_console_printf(machine, "Possibilities @ %06X:\n", posslist[0].basepc);
 	for (i = 0; i < posscount; i++)
-		debug_console_printf(" %c%2x: %s\n", posslist[i].iffy ? ' ' : '*', i, posslist[i].dasm);
+		debug_console_printf(machine, " %c%2x: %s\n", posslist[i].iffy ? ' ' : '*', i, posslist[i].dasm);
 }
 
 
@@ -679,8 +679,8 @@ void fd1094_regenerate_key(void)
 		(*key_changed)();
 
 	/* force all memory and disassembly views to update */
-	debug_view_update_type(DVT_MEMORY);
-	debug_disasm_update_all();
+	debug_view_update_type(Machine, DVT_MEMORY);
+	debug_view_update_type(Machine, DVT_DISASSEMBLY);
 
 	/* reset keydirty */
 	keydirty = FALSE;
@@ -730,13 +730,13 @@ static int instruction_hook(const device_config *device, offs_t curpc)
 	/* if we only ended up with one possibility, mark that one as good */
 	if (posscount == 1)
 	{
-		tag_possibility(&posslist[0], STATUS_LOCKED);
+		tag_possibility(device->machine, &posslist[0], STATUS_LOCKED);
 		fd1094_regenerate_key();
 		return 0;
 	}
 
 	/* print possibilities and break */
-	print_possibilities();
+	print_possibilities(device->machine);
 	return 1;
 }
 
@@ -748,7 +748,7 @@ static int instruction_hook(const device_config *device, offs_t curpc)
 static void execute_fdsave(running_machine *machine, int ref, int params, const char **param)
 {
 	save_overlay_file(machine);
-	debug_console_printf("File saved\n");
+	debug_console_printf(machine, "File saved\n");
 }
 
 
@@ -773,7 +773,7 @@ static void execute_fdoutput(running_machine *machine, int ref, int params, cons
 		mame_fwrite(file, keyregion, KEY_SIZE);
 		mame_fclose(file);
 	}
-	debug_console_printf("File '%s' saved\n", param[0]);
+	debug_console_printf(machine, "File '%s' saved\n", param[0]);
 }
 
 
@@ -819,7 +819,7 @@ static void execute_fdlockguess(running_machine *machine, int ref, int params, c
 	/* make sure it is within range of our recent possibilities */
 	if (num1 >= posscount)
 	{
-		debug_console_printf("Possibility of out range (%x max)\n", posscount);
+		debug_console_printf(machine, "Possibility of out range (%x max)\n", posscount);
 		return;
 	}
 
@@ -827,7 +827,7 @@ static void execute_fdlockguess(running_machine *machine, int ref, int params, c
 	memcpy(undobuff, keystatus, keystatus_words * 2);
 
 	/* tag this possibility as indicated by the ref parameter, and then regenerate the key */
-	tag_possibility(&posslist[num1], ref);
+	tag_possibility(machine, &posslist[num1], ref);
 	fd1094_regenerate_key();
 }
 
@@ -854,7 +854,7 @@ static void execute_fdeliminate(running_machine *machine, int ref, int params, c
 		/* make sure it is within range of our recent possibilities */
 		if (num1 >= posscount)
 		{
-			debug_console_printf("Possibility %x of out range (%x max)\n", (int)num1, posscount);
+			debug_console_printf(machine, "Possibility %x of out range (%x max)\n", (int)num1, posscount);
 			return;
 		}
 
@@ -879,7 +879,7 @@ static void execute_fdeliminate(running_machine *machine, int ref, int params, c
 	posscount = possdst;
 
 	/* reprint the possibilities */
-	print_possibilities();
+	print_possibilities(machine);
 }
 
 
@@ -900,7 +900,7 @@ static void execute_fdunlock(running_machine *machine, int ref, int params, cons
  	keyaddr = addr_to_keyaddr(offset / 2);
 
 	/* toggle the ignore PC status */
-	debug_console_printf("Unlocking PC %06X\n", (int)offset);
+	debug_console_printf(machine, "Unlocking PC %06X\n", (int)offset);
 
 	/* iterate over all reps and unlock them */
 	for (repnum = 0; repnum < reps; repnum++)
@@ -933,7 +933,7 @@ static void execute_fdignore(running_machine *machine, int ref, int params, cons
 	if (params == 1 && strcmp(param[0], "all") == 0)
 	{
 		ignore_all = TRUE;
-		debug_console_printf("Ignoring all unknown opcodes\n");
+		debug_console_printf(machine, "Ignoring all unknown opcodes\n");
 		return;
 	}
 	if (params != 1 || !debug_command_parameter_number(machine, param[0], &offset))
@@ -943,9 +943,9 @@ static void execute_fdignore(running_machine *machine, int ref, int params, cons
 	/* toggle the ignore PC status */
 	ignorepc[offset] = !ignorepc[offset];
 	if (ignorepc[offset])
-		debug_console_printf("Ignoring address %06X\n", (int)offset * 2);
+		debug_console_printf(machine, "Ignoring address %06X\n", (int)offset * 2);
 	else
-		debug_console_printf("No longer ignoring address %06X\n", (int)offset * 2);
+		debug_console_printf(machine, "No longer ignoring address %06X\n", (int)offset * 2);
 
 	/* if no parameter given, implicitly run as well */
 	if (params == 0)
@@ -963,7 +963,7 @@ static void execute_fdundo(running_machine *machine, int ref, int params, const 
 	/* copy the undobuffer back and regenerate the key */
 	memcpy(keystatus, undobuff, keystatus_words * 2);
 	fd1094_regenerate_key();
-	debug_console_printf("Undid last change\n");
+	debug_console_printf(machine, "Undid last change\n");
 }
 
 
@@ -993,9 +993,9 @@ static void execute_fdstatus(running_machine *machine, int ref, int params, cons
 		else
 			nomatter++;
 	}
-	debug_console_printf("%4d/%4d keys locked (%d%%)\n", locked, KEY_SIZE, locked * 100 / KEY_SIZE);
-	debug_console_printf("%4d/%4d keys guessed (%d%%)\n", guesses, KEY_SIZE, guesses * 100 / KEY_SIZE);
-	debug_console_printf("%4d/%4d keys don't matter (%d%%)\n", nomatter, KEY_SIZE, nomatter * 100 / KEY_SIZE);
+	debug_console_printf(machine, "%4d/%4d keys locked (%d%%)\n", locked, KEY_SIZE, locked * 100 / KEY_SIZE);
+	debug_console_printf(machine, "%4d/%4d keys guessed (%d%%)\n", guesses, KEY_SIZE, guesses * 100 / KEY_SIZE);
+	debug_console_printf(machine, "%4d/%4d keys don't matter (%d%%)\n", nomatter, KEY_SIZE, nomatter * 100 / KEY_SIZE);
 }
 
 
@@ -1015,12 +1015,12 @@ static void execute_fdstate(running_machine *machine, int ref, int params, const
 			return;
 		fd1094_set_state(keyregion, newstate);
 		fd1094_regenerate_key();
-		debug_view_update_type(DVT_MEMORY);
-		debug_disasm_update_all();
+		debug_view_update_type(machine, DVT_MEMORY);
+		debug_view_update_type(machine, DVT_DISASSEMBLY);
 	}
 
 	/* 0 parameters displays the current state */
-	debug_console_printf("FD1094 state = %X\n", fd1094_set_state(keyregion, -1));
+	debug_console_printf(machine, "FD1094 state = %X\n", fd1094_set_state(keyregion, -1));
 }
 
 
@@ -1061,14 +1061,14 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 	if (searchsp == 0 || searchstack[searchsp-1] != pc)
 	{
 		int pcaddr;
-		debug_console_printf("Starting new search at PC=%06X\n", pc);
+		debug_console_printf(machine, "Starting new search at PC=%06X\n", pc);
 		searchsp = 0;
 		for (pcaddr = 0; pcaddr < coderegion_words; pcaddr++)
 			keystatus[pcaddr] &= ~SEARCH_MASK;
 	}
 	else
 	{
-		debug_console_printf("Resuming search at PC=%06X\n", pc);
+		debug_console_printf(machine, "Resuming search at PC=%06X\n", pc);
 		searchsp--;
 	}
 
@@ -1085,7 +1085,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 				pc = searchstack[--searchsp];
 			if ((keystatus[pc/2] & SEARCH_MASK) != 0)
 			{
-				debug_console_printf("Search stack exhausted\n");
+				debug_console_printf(machine, "Search stack exhausted\n");
 				break;
 			}
 
@@ -1108,7 +1108,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 			length = -length;
 		if (length == 0)
 		{
-			debug_console_printf("Invalid opcode; unable to advance\n");
+			debug_console_printf(machine, "Invalid opcode; unable to advance\n");
 			break;
 		}
 
@@ -1191,7 +1191,7 @@ static void execute_fddasm(running_machine *machine, int ref, int params, const 
 	filerr = mame_fopen(SEARCHPATH_RAW, filename, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE, &file);
 	if (filerr != FILERR_NONE)
 	{
-		debug_console_printf("Unable to create file '%s'\n", filename);
+		debug_console_printf(machine, "Unable to create file '%s'\n", filename);
 		return;
 	}
 
@@ -1315,7 +1315,7 @@ static void execute_fdcset(running_machine *machine, int ref, int params, const 
 	/* validate parameters */
 	if ((pc & 1) != 0 || pc > 0xffffff)
 	{
-		debug_console_printf("Invalid PC specified (%08X)\n", (UINT32)pc);
+		debug_console_printf(machine, "Invalid PC specified (%08X)\n", (UINT32)pc);
 		return;
 	}
 
@@ -1340,7 +1340,7 @@ static void execute_fdcset(running_machine *machine, int ref, int params, const 
 	set_constraint(&constraints[cnum], pc, state, value, mask);
 
 	/* explain what we did */
-	debug_console_printf("Set new constraint at PC=%06X, state=%03X: decrypted & %04X == %04X\n",
+	debug_console_printf(machine, "Set new constraint at PC=%06X, state=%03X: decrypted & %04X == %04X\n",
 			(int)pc, (int)state, (int)mask, (int)value);
 }
 
@@ -1358,7 +1358,7 @@ static void execute_fdclist(running_machine *machine, int ref, int params, const
 	for (cnum = 0; cnum < constcount; cnum++)
 	{
 		fd1094_constraint *constraint = &constraints[cnum];
-		debug_console_printf("  PC=%06X, state=%03X: decrypted & %04X == %04X\n",
+		debug_console_printf(machine, "  PC=%06X, state=%03X: decrypted & %04X == %04X\n",
 				constraint->pc, constraint->state, constraint->mask, constraint->value);
 	}
 }
@@ -1371,8 +1371,8 @@ static void execute_fdclist(running_machine *machine, int ref, int params, const
 
 static void execute_fdcsearch(running_machine *machine, int ref, int params, const char **param)
 {
-//  debug_console_printf("Searching for possible global keys....\n");
-	perform_constrained_search();
+//  debug_console_printf(machine, "Searching for possible global keys....\n");
+	perform_constrained_search(machine);
 }
 
 
@@ -1507,7 +1507,7 @@ static fd1094_possibility *try_all_possibilities(running_machine *machine, int b
     with the specified status
 -----------------------------------------------*/
 
-static void tag_possibility(fd1094_possibility *possdata, UINT8 status)
+static void tag_possibility(running_machine *machine, fd1094_possibility *possdata, UINT8 status)
 {
 	int curfdstate = fd1094_set_state(keyregion, -1);
 	int nomatter = 0, locked = 0, guessed = 0;
@@ -1571,7 +1571,7 @@ static void tag_possibility(fd1094_possibility *possdata, UINT8 status)
 			nomatter++;
 	}
 
-	debug_console_printf("PC=%06X: locked %d, guessed %d, nochange %d\n", possdata->basepc, locked, guessed, nomatter);
+	debug_console_printf(machine, "PC=%06X: locked %d, guessed %d, nochange %d\n", possdata->basepc, locked, guessed, nomatter);
 }
 
 
@@ -1581,7 +1581,7 @@ static void tag_possibility(fd1094_possibility *possdata, UINT8 status)
     given sequence/mask pair
 -----------------------------------------------*/
 
-static void perform_constrained_search(void)
+static void perform_constrained_search(running_machine *machine)
 {
 	UINT32 global;
 
@@ -1604,7 +1604,7 @@ static void perform_constrained_search(void)
 		global = find_global_key_matches(global + 1, output);
 		if (global == 0)
 			break;
-//      debug_console_printf("Checking global key %08X (PC=%06X)....\n", global, (output[2] << 16) | output[3]);
+//      debug_console_printf(machine, "Checking global key %08X (PC=%06X)....\n", global, (output[2] << 16) | output[3]);
 
 		/* use the IRQ handler to find more possibilities */
 		numseeds = find_constraint_sequence(global, FALSE);
@@ -1612,7 +1612,7 @@ static void perform_constrained_search(void)
 		{
 			int i;
 			for (i = 0; i < numseeds; i++)
-				debug_console_printf("  Possible: global=%08X seed=%06X pc=%04X\n", global, possible_seed[i], output[3]);
+				debug_console_printf(machine, "  Possible: global=%08X seed=%06X pc=%04X\n", global, possible_seed[i], output[3]);
 		}
 	}
 }
@@ -1785,7 +1785,7 @@ static int find_constraint_sequence(UINT32 global, int quick)
 			{
 				UINT32 seedlow;
 
-//              debug_console_printf("Global %08X ... Looking for keys that generate a keyvalue of %02X at %04X\n",
+//              debug_console_printf(machine, "Global %08X ... Looking for keys that generate a keyvalue of %02X at %04X\n",
 //                      global, keyvalue, keyaddr);
 
 				/* iterate over seed possibilities */

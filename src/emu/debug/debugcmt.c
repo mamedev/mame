@@ -170,7 +170,7 @@ int debug_comment_add(const device_config *device, offs_t addr, const char *comm
 		debug_comments[cpu_num].change_count++;
 
 		/* force an update of disassembly views */
-		debug_view_update_type(DVT_DISASSEMBLY);
+		debug_view_update_type(device->machine, DVT_DISASSEMBLY);
 		return 1;
 	}
 
@@ -185,7 +185,7 @@ int debug_comment_add(const device_config *device, offs_t addr, const char *comm
 	debug_comments[cpu_num].change_count++;
 
 	/* force an update of disassembly views */
-	debug_view_update_type(DVT_DISASSEMBLY);
+	debug_view_update_type(device->machine, DVT_DISASSEMBLY);
 
 	return 1;
 }
@@ -230,7 +230,7 @@ int debug_comment_remove(const device_config *device, offs_t addr, UINT32 c_crc)
 	debug_comments[cpu_num].change_count++;
 
 	/* force an update of disassembly views */
-	debug_view_update_type(DVT_DISASSEMBLY);
+	debug_view_update_type(device->machine, DVT_DISASSEMBLY);
 
 	return 1;
 }

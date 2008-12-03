@@ -135,6 +135,7 @@ typedef struct _input_port_private input_port_private;
 typedef struct _ui_input_private ui_input_private;
 typedef struct _cheat_private cheat_private;
 typedef struct _debugcpu_private debugcpu_private;
+typedef struct _debugvw_private debugvw_private;
 
 
 /* description of the currently-running machine */
@@ -180,6 +181,7 @@ struct _running_machine
 	ui_input_private *		ui_input_data;		/* internal data from uiinput.c */
 	cheat_private *			cheat_data;			/* internal data from cheat.c */
 	debugcpu_private *		debugcpu_data;		/* internal data from debugcpu.c */
+	debugvw_private *		debugvw_data;		/* internal data from debugvw.c */
 #ifdef MESS
 	images_private *		images_data;		/* internal data from image.c */
 	ui_mess_private *		ui_mess_data;		/* internal data from uimess.c */

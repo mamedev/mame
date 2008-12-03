@@ -377,9 +377,9 @@ int debug_command_parameter_number(running_machine *machine, const char *param, 
 		return TRUE;
 
 	/* print an error pointing to the character that caused it */
-	debug_console_printf("Error in expression: %s\n", param);
-	debug_console_printf("                     %*s^", EXPRERR_ERROR_OFFSET(err), "");
-	debug_console_printf("%s\n", exprerr_to_string(err));
+	debug_console_printf(machine, "Error in expression: %s\n", param);
+	debug_console_printf(machine, "                     %*s^", EXPRERR_ERROR_OFFSET(err), "");
+	debug_console_printf(machine, "%s\n", exprerr_to_string(err));
 	return FALSE;
 }
 
@@ -400,7 +400,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 		*result = debug_cpu_get_visible_cpu(machine);
 		if (*result == NULL)
 		{
-			debug_console_printf("No valid CPU is currently selected\n");
+			debug_console_printf(machine, "No valid CPU is currently selected\n");
 			return FALSE;
 		}
 		return TRUE;
@@ -415,14 +415,14 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 	err = expression_evaluate(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, &cpunum);
 	if (err != EXPRERR_NONE)
 	{
-		debug_console_printf("Unable to find CPU '%s'\n", param);
+		debug_console_printf(machine, "Unable to find CPU '%s'\n", param);
 		return FALSE;
 	}
 
 	/* if out of range, complain */
 	if (cpunum >= ARRAY_LENGTH(machine->cpu) || machine->cpu[cpunum] == NULL)
 	{
-		debug_console_printf("Invalid CPU index %d\n", (UINT32)cpunum);
+		debug_console_printf(machine, "Invalid CPU index %d\n", (UINT32)cpunum);
 		return FALSE;
 	}
 	*result = machine->cpu[cpunum];
@@ -448,7 +448,7 @@ int debug_command_parameter_cpu_space(running_machine *machine, const char *para
 	*result = cpu_get_address_space(cpu, spacenum);
 	if (*result == NULL)
 	{
-		debug_console_printf("No %s memory space found for CPU '%s'\n", address_space_names[spacenum], cpu->tag);
+		debug_console_printf(machine, "No %s memory space found for CPU '%s'\n", address_space_names[spacenum], cpu->tag);
 		return FALSE;
 	}
 	return TRUE;
@@ -477,9 +477,9 @@ static int debug_command_parameter_expression(running_machine *machine, const ch
 		return TRUE;
 	
 	/* output an error */
-	debug_console_printf("Error in expression: %s\n", param);
-	debug_console_printf("                     %*s^", EXPRERR_ERROR_OFFSET(err), "");
-	debug_console_printf("%s\n", exprerr_to_string(err));
+	debug_console_printf(machine, "Error in expression: %s\n", param);
+	debug_console_printf(machine, "                     %*s^", EXPRERR_ERROR_OFFSET(err), "");
+	debug_console_printf(machine, "%s\n", exprerr_to_string(err));
 	return FALSE;
 }
 
@@ -503,9 +503,9 @@ static int debug_command_parameter_command(running_machine *machine, const char 
 		return TRUE;
 	
 	/* output an error */
-	debug_console_printf("Error in command: %s\n", param);
-	debug_console_printf("                  %*s^", CMDERR_ERROR_OFFSET(err), "");
-	debug_console_printf("%s\n", debug_cmderr_to_string(err));
+	debug_console_printf(machine, "Error in command: %s\n", param);
+	debug_console_printf(machine, "                  %*s^", CMDERR_ERROR_OFFSET(err), "");
+	debug_console_printf(machine, "%s\n", debug_cmderr_to_string(err));
 	return 0;
 }
 
@@ -522,9 +522,9 @@ static int debug_command_parameter_command(running_machine *machine, const char 
 static void execute_help(running_machine *machine, int ref, int params, const char *param[])
 {
 	if (params == 0)
-		debug_console_printf_wrap(80, "%s\n", debug_get_help(""));
+		debug_console_printf_wrap(machine, 80, "%s\n", debug_get_help(""));
 	else
-		debug_console_printf_wrap(80, "%s\n", debug_get_help(param[0]));
+		debug_console_printf_wrap(machine, 80, "%s\n", debug_get_help(param[0]));
 }
 
 
@@ -546,11 +546,11 @@ static void execute_print(running_machine *machine, int ref, int params, const c
 	for (i = 0; i < params; i++)
 	{
 		if ((values[i] >> 32) != 0)
-			debug_console_printf("%X%08X ", (UINT32)(values[i] >> 32), (UINT32)values[i]);
+			debug_console_printf(machine, "%X%08X ", (UINT32)(values[i] >> 32), (UINT32)values[i]);
 		else
-			debug_console_printf("%X ", (UINT32)values[i]);
+			debug_console_printf(machine, "%X ", (UINT32)values[i]);
 	}
-	debug_console_printf("\n");
+	debug_console_printf(machine, "\n");
 }
 
 
@@ -558,7 +558,7 @@ static void execute_print(running_machine *machine, int ref, int params, const c
     mini_printf - safe printf to a buffer
 -------------------------------------------------*/
 
-static int mini_printf(char *buffer, const char *format, int params, UINT64 *param)
+static int mini_printf(running_machine *machine, char *buffer, const char *format, int params, UINT64 *param)
 {
 	const char *f = format;
 	char *p = buffer;
@@ -611,7 +611,7 @@ static int mini_printf(char *buffer, const char *format, int params, UINT64 *par
 				case 'x':
 					if (params == 0)
 					{
-						debug_console_printf("Not enough parameters for format!\n");
+						debug_console_printf(machine, "Not enough parameters for format!\n");
 						return 0;
 					}
 					if ((UINT32)(*param >> 32) != 0)
@@ -627,7 +627,7 @@ static int mini_printf(char *buffer, const char *format, int params, UINT64 *par
 				case 'd':
 					if (params == 0)
 					{
-						debug_console_printf("Not enough parameters for format!\n");
+						debug_console_printf(machine, "Not enough parameters for format!\n");
 						return 0;
 					}
 					p += sprintf(p, zerofill ? "%0*d" : "%*d", width, (UINT32)*param);
@@ -664,8 +664,8 @@ static void execute_printf(running_machine *machine, int ref, int params, const 
 			return;
 
 	/* then do a printf */
-	if (mini_printf(buffer, param[0], params - 1, &values[1]))
-		debug_console_printf("%s\n", buffer);
+	if (mini_printf(machine, buffer, param[0], params - 1, &values[1]))
+		debug_console_printf(machine, "%s\n", buffer);
 }
 
 
@@ -685,7 +685,7 @@ static void execute_logerror(running_machine *machine, int ref, int params, cons
 			return;
 
 	/* then do a printf */
-	if (mini_printf(buffer, param[0], params - 1, &values[1]))
+	if (mini_printf(machine, buffer, param[0], params - 1, &values[1]))
 		logerror("%s", buffer);
 }
 
@@ -711,7 +711,7 @@ static void execute_tracelog(running_machine *machine, int ref, int params, cons
 			return;
 
 	/* then do a printf */
-	if (mini_printf(buffer, param[0], params - 1, &values[1]))
+	if (mini_printf(machine, buffer, param[0], params - 1, &values[1]))
 		fprintf(file, "%s", buffer);
 }
 
@@ -869,7 +869,7 @@ static void execute_focus(running_machine *machine, int ref, int params, const c
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 		if (machine->cpu[cpunum] != NULL && machine->cpu[cpunum] != cpu)
 			debug_cpu_ignore_cpu(machine->cpu[cpunum], 1);
-	debug_console_printf("Now focused on CPU '%s'\n", cpu->tag);
+	debug_console_printf(machine, "Now focused on CPU '%s'\n", cpu->tag);
 }
 
 
@@ -906,7 +906,7 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 		/* special message for none */
 		if (buflen == 0)
 			sprintf(&buffer[buflen], "Not currently ignoring any CPUs");
-		debug_console_printf("%s\n", buffer);
+		debug_console_printf(machine, "%s\n", buffer);
 	}
 
 	/* otherwise clear the ignore flag on all requested CPUs */
@@ -927,12 +927,12 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 						break;
 			if (cpunum == ARRAY_LENGTH(machine->cpu))
 			{
-				debug_console_printf("Can't ignore all CPUs!\n");
+				debug_console_printf(machine, "Can't ignore all CPUs!\n");
 				return;
 			}
 
 			debug_cpu_ignore_cpu(cpuwhich[paramnum], 1);
-			debug_console_printf("Now ignoring CPU '%s'\n", cpuwhich[paramnum]->tag);
+			debug_console_printf(machine, "Now ignoring CPU '%s'\n", cpuwhich[paramnum]->tag);
 		}
 	}
 }
@@ -971,7 +971,7 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 		/* special message for none */
 		if (buflen == 0)
 			buflen += sprintf(&buffer[buflen], "Not currently observing any CPUs");
-		debug_console_printf("%s\n", buffer);
+		debug_console_printf(machine, "%s\n", buffer);
 	}
 
 	/* otherwise set the ignore flag on all requested CPUs */
@@ -986,7 +986,7 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 		for (paramnum = 0; paramnum < params; paramnum++)
 		{
 			debug_cpu_ignore_cpu(cpuwhich[paramnum], 0);
-			debug_console_printf("Now observing CPU '%s'\n", cpuwhich[paramnum]->tag);
+			debug_console_printf(machine, "Now observing CPU '%s'\n", cpuwhich[paramnum]->tag);
 		}
 	}
 }
@@ -1012,13 +1012,13 @@ static void execute_comment(running_machine *machine, int ref, int params, const
 	/* make sure param 2 exists */
 	if (strlen(param[1]) == 0)
 	{
-		debug_console_printf("Error : comment text empty\n");
+		debug_console_printf(machine, "Error : comment text empty\n");
 		return;
 	}
 
 	/* Now try adding the comment */
 	debug_comment_add(cpu, address, param[1], 0x00ff0000, debug_comment_get_opcode_crc32(cpu, address));
-	debug_view_update_type(DVT_DISASSEMBLY);
+	debug_view_update_type(cpu->machine, DVT_DISASSEMBLY);
 }
 
 
@@ -1042,7 +1042,7 @@ static void execute_comment_del(running_machine *machine, int ref, int params, c
 	/* If it's a number, it must be an address */
 	/* The bankoff and cbn will be pulled from what's currently active */
 	debug_comment_remove(cpu, address, debug_comment_get_opcode_crc32(cpu, address));
-	debug_view_update_type(DVT_DISASSEMBLY);
+	debug_view_update_type(cpu->machine, DVT_DISASSEMBLY);
 }
 
 
@@ -1053,7 +1053,7 @@ static void execute_comment_del(running_machine *machine, int ref, int params, c
 static void execute_comment_save(running_machine *machine, int ref, int params, const char *param[])
 {
 	if (debug_comment_save(machine))
-		debug_console_printf("Comments successfully saved\n");
+		debug_console_printf(machine, "Comments successfully saved\n");
 }
 
 
@@ -1088,7 +1088,7 @@ static void execute_bpset(running_machine *machine, int ref, int params, const c
 
 	/* set the breakpoint */
 	bpnum = debug_cpu_breakpoint_set(cpu, address, condition, action);
-	debug_console_printf("Breakpoint %X set\n", bpnum);
+	debug_console_printf(machine, "Breakpoint %X set\n", bpnum);
 }
 
 
@@ -1114,7 +1114,7 @@ static void execute_bpclear(running_machine *machine, int ref, int params, const
 				while ((bp = cpuinfo->bplist) != NULL)
 					debug_cpu_breakpoint_clear(machine, bp->index);
 			}
-		debug_console_printf("Cleared all breakpoints\n");
+		debug_console_printf(machine, "Cleared all breakpoints\n");
 	}
 
 	/* otherwise, clear the specific one */
@@ -1124,9 +1124,9 @@ static void execute_bpclear(running_machine *machine, int ref, int params, const
 	{
 		int found = debug_cpu_breakpoint_clear(machine, bpindex);
 		if (found)
-			debug_console_printf("Breakpoint %X cleared\n", (UINT32)bpindex);
+			debug_console_printf(machine, "Breakpoint %X cleared\n", (UINT32)bpindex);
 		else
-			debug_console_printf("Invalid breakpoint number %X\n", (UINT32)bpindex);
+			debug_console_printf(machine, "Invalid breakpoint number %X\n", (UINT32)bpindex);
 	}
 }
 
@@ -1154,9 +1154,9 @@ static void execute_bpdisenable(running_machine *machine, int ref, int params, c
 					debug_cpu_breakpoint_enable(machine, bp->index, ref);
 			}
 		if (ref == 0)
-			debug_console_printf("Disabled all breakpoints\n");
+			debug_console_printf(machine, "Disabled all breakpoints\n");
 		else
-			debug_console_printf("Enabled all breakpoints\n");
+			debug_console_printf(machine, "Enabled all breakpoints\n");
 	}
 
 	/* otherwise, clear the specific one */
@@ -1166,9 +1166,9 @@ static void execute_bpdisenable(running_machine *machine, int ref, int params, c
 	{
 		int found = debug_cpu_breakpoint_enable(machine, bpindex, ref);
 		if (found)
-			debug_console_printf("Breakpoint %X %s\n", (UINT32)bpindex, ref ? "enabled" : "disabled");
+			debug_console_printf(machine, "Breakpoint %X %s\n", (UINT32)bpindex, ref ? "enabled" : "disabled");
 		else
-			debug_console_printf("Invalid breakpoint number %X\n", (UINT32)bpindex);
+			debug_console_printf(machine, "Invalid breakpoint number %X\n", (UINT32)bpindex);
 	}
 }
 
@@ -1193,7 +1193,7 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 			{
 				debug_cpu_breakpoint *bp;
 
-				debug_console_printf("CPU %d breakpoints:\n", cpunum);
+				debug_console_printf(machine, "CPU %d breakpoints:\n", cpunum);
 
 				/* loop over the breakpoints */
 				for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
@@ -1204,14 +1204,14 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 						buflen += sprintf(&buffer[buflen], " if %s", expression_original_string(bp->condition));
 					if (bp->action)
 						buflen += sprintf(&buffer[buflen], " do %s", bp->action);
-					debug_console_printf("%s\n", buffer);
+					debug_console_printf(machine, "%s\n", buffer);
 					printed++;
 				}
 			}
 		}
 
 	if (!printed)
-		debug_console_printf("No breakpoints currently installed\n");
+		debug_console_printf(machine, "No breakpoints currently installed\n");
 }
 
 
@@ -1246,7 +1246,7 @@ static void execute_wpset(running_machine *machine, int ref, int params, const c
 		type = WATCHPOINT_READWRITE;
 	else
 	{
-		debug_console_printf("Invalid watchpoint type: expected r, w, or rw\n");
+		debug_console_printf(machine, "Invalid watchpoint type: expected r, w, or rw\n");
 		return;
 	}
 
@@ -1264,7 +1264,7 @@ static void execute_wpset(running_machine *machine, int ref, int params, const c
 
 	/* set the watchpoint */
 	wpnum = debug_cpu_watchpoint_set(space, type, address, length, condition, action);
-	debug_console_printf("Watchpoint %X set\n", wpnum);
+	debug_console_printf(machine, "Watchpoint %X set\n", wpnum);
 }
 
 
@@ -1295,7 +1295,7 @@ static void execute_wpclear(running_machine *machine, int ref, int params, const
 						debug_cpu_watchpoint_clear(machine, wp->index);
 				}
 			}
-		debug_console_printf("Cleared all watchpoints\n");
+		debug_console_printf(machine, "Cleared all watchpoints\n");
 	}
 
 	/* otherwise, clear the specific one */
@@ -1305,9 +1305,9 @@ static void execute_wpclear(running_machine *machine, int ref, int params, const
 	{
 		int found = debug_cpu_watchpoint_clear(machine, wpindex);
 		if (found)
-			debug_console_printf("Watchpoint %X cleared\n", (UINT32)wpindex);
+			debug_console_printf(machine, "Watchpoint %X cleared\n", (UINT32)wpindex);
 		else
-			debug_console_printf("Invalid watchpoint number %X\n", (UINT32)wpindex);
+			debug_console_printf(machine, "Invalid watchpoint number %X\n", (UINT32)wpindex);
 	}
 }
 
@@ -1340,9 +1340,9 @@ static void execute_wpdisenable(running_machine *machine, int ref, int params, c
 				}
 			}
 		if (ref == 0)
-			debug_console_printf("Disabled all watchpoints\n");
+			debug_console_printf(machine, "Disabled all watchpoints\n");
 		else
-			debug_console_printf("Enabled all watchpoints\n");
+			debug_console_printf(machine, "Enabled all watchpoints\n");
 	}
 
 	/* otherwise, clear the specific one */
@@ -1352,9 +1352,9 @@ static void execute_wpdisenable(running_machine *machine, int ref, int params, c
 	{
 		int found = debug_cpu_watchpoint_enable(machine, wpindex, ref);
 		if (found)
-			debug_console_printf("Watchpoint %X %s\n", (UINT32)wpindex, ref ? "enabled" : "disabled");
+			debug_console_printf(machine, "Watchpoint %X %s\n", (UINT32)wpindex, ref ? "enabled" : "disabled");
 		else
-			debug_console_printf("Invalid watchpoint number %X\n", (UINT32)wpindex);
+			debug_console_printf(machine, "Invalid watchpoint number %X\n", (UINT32)wpindex);
 	}
 }
 
@@ -1383,7 +1383,7 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 					const address_space *space = cpu_get_address_space(machine->cpu[cpunum], spacenum);
 					debug_cpu_watchpoint *wp;
 
-					debug_console_printf("CPU '%s' %s space watchpoints:\n", space->cpu->tag, address_space_names[spacenum]);
+					debug_console_printf(machine, "CPU '%s' %s space watchpoints:\n", space->cpu->tag, address_space_names[spacenum]);
 
 					/* loop over the watchpoints */
 					for (wp = cpuinfo->wplist[spacenum]; wp != NULL; wp = wp->next)
@@ -1395,14 +1395,14 @@ static void execute_wplist(running_machine *machine, int ref, int params, const 
 							buflen += sprintf(&buffer[buflen], " if %s", expression_original_string(wp->condition));
 						if (wp->action)
 							buflen += sprintf(&buffer[buflen], " do %s", wp->action);
-						debug_console_printf("%s\n", buffer);
+						debug_console_printf(machine, "%s\n", buffer);
 						printed++;
 					}
 				}
 		}
 
 	if (!printed)
-		debug_console_printf("No watchpoints currently installed\n");
+		debug_console_printf(machine, "No watchpoints currently installed\n");
 }
 
 
@@ -1432,7 +1432,7 @@ static void execute_hotspot(running_machine *machine, int ref, int params, const
 				if (cpuinfo->hotspots != NULL)
 				{
 					debug_cpu_hotspot_track(cpuinfo->device, 0, 0);
-					debug_console_printf("Cleared hotspot tracking on CPU '%s'\n", machine->cpu[cpunum]->tag);
+					debug_console_printf(machine, "Cleared hotspot tracking on CPU '%s'\n", machine->cpu[cpunum]->tag);
 					cleared = TRUE;
 				}
 			}
@@ -1454,9 +1454,9 @@ static void execute_hotspot(running_machine *machine, int ref, int params, const
 
 	/* attempt to install */
 	if (debug_cpu_hotspot_track(cpu, count, threshhold))
-		debug_console_printf("Now tracking hotspots on CPU '%s' using %d slots with a threshhold of %d\n", cpu->tag, (int)count, (int)threshhold);
+		debug_console_printf(machine, "Now tracking hotspots on CPU '%s' using %d slots with a threshhold of %d\n", cpu->tag, (int)count, (int)threshhold);
 	else
-		debug_console_printf("Error setting up the hotspot tracking\n");
+		debug_console_printf(machine, "Error setting up the hotspot tracking\n");
 }
 
 
@@ -1487,7 +1487,7 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 	f = fopen(param[0], "wb");
 	if (!f)
 	{
-		debug_console_printf("Error opening file '%s'\n", param[0]);
+		debug_console_printf(machine, "Error opening file '%s'\n", param[0]);
 		return;
 	}
 
@@ -1502,7 +1502,7 @@ static void execute_save(running_machine *machine, int ref, int params, const ch
 
 	/* close the file */
 	fclose(f);
-	debug_console_printf("Data saved successfully\n");
+	debug_console_printf(machine, "Data saved successfully\n");
 }
 
 
@@ -1536,7 +1536,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 		width = memory_address_to_byte(space, 1);
 	if (width != 1 && width != 2 && width != 4 && width != 8)
 	{
-		debug_console_printf("Invalid width! (must be 1,2,4 or 8)\n");
+		debug_console_printf(machine, "Invalid width! (must be 1,2,4 or 8)\n");
 		return;
 	}
 	endoffset = memory_address_to_byte(space, offset + length - 1) & space->bytemask;
@@ -1546,7 +1546,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 	f = fopen(param[0], "w");
 	if (!f)
 	{
-		debug_console_printf("Error opening file '%s'\n", param[0]);
+		debug_console_printf(machine, "Error opening file '%s'\n", param[0]);
 		return;
 	}
 
@@ -1664,7 +1664,7 @@ static void execute_dump(running_machine *machine, int ref, int params, const ch
 
 	/* close the file */
 	fclose(f);
-	debug_console_printf("Data dumped successfully\n");
+	debug_console_printf(machine, "Data dumped successfully\n");
 }
 
 
@@ -1758,14 +1758,14 @@ static void execute_find(running_machine *machine, int ref, int params, const ch
 		if (match)
 		{
 			found++;
-			debug_console_printf("Found at %*X\n", space->logaddrchars, (UINT32)memory_byte_to_address(space, i));
+			debug_console_printf(machine, "Found at %*X\n", space->logaddrchars, (UINT32)memory_byte_to_address(space, i));
 		}
 	}
 	cpu_pop_context();
 
 	/* print something if not found */
 	if (found == 0)
-		debug_console_printf("Not found\n");
+		debug_console_printf(machine, "Not found\n");
 }
 
 
@@ -1805,7 +1805,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 	f = fopen(param[0], "w");
 	if (!f)
 	{
-		debug_console_printf("Error opening file '%s'\n", param[0]);
+		debug_console_printf(machine, "Error opening file '%s'\n", param[0]);
 		return;
 	}
 
@@ -1903,7 +1903,7 @@ static void execute_dasm(running_machine *machine, int ref, int params, const ch
 
 	/* close the file */
 	fclose(f);
-	debug_console_printf("Data dumped successfully\n");
+	debug_console_printf(machine, "Data dumped successfully\n");
 }
 
 
@@ -1944,7 +1944,7 @@ static void execute_trace_internal(running_machine *machine, int ref, int params
 		f = fopen(filename, mode);
 		if (!f)
 		{
-			debug_console_printf("Error opening file '%s'\n", param[0]);
+			debug_console_printf(machine, "Error opening file '%s'\n", param[0]);
 			return;
 		}
 	}
@@ -1952,9 +1952,9 @@ static void execute_trace_internal(running_machine *machine, int ref, int params
 	/* do it */
 	debug_cpu_trace(cpu, f, trace_over, action);
 	if (f)
-		debug_console_printf("Tracing CPU '%s' to file %s\n", cpu->tag, filename);
+		debug_console_printf(machine, "Tracing CPU '%s' to file %s\n", cpu->tag, filename);
 	else
-		debug_console_printf("Stopped tracing on CPU '%s'\n", cpu->tag);
+		debug_console_printf(machine, "Stopped tracing on CPU '%s'\n", cpu->tag);
 }
 
 
@@ -2032,7 +2032,7 @@ static void execute_history(running_machine *machine, int ref, int params, const
 
 		cpu_dasm(space->cpu, buffer, pc, opbuf, argbuf);
 
-		debug_console_printf("%0*X: %s\n", space->logaddrchars, pc, buffer);
+		debug_console_printf(machine, "%0*X: %s\n", space->logaddrchars, pc, buffer);
 	}
 	cpu_pop_context();
 }
@@ -2048,7 +2048,7 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 	if (params == 0)
 	{
 		video_save_active_screen_snapshots(machine);
-		debug_console_printf("Saved snapshot\n");
+		debug_console_printf(machine, "Saved snapshot\n");
 	}
 
 	/* otherwise, we have to open the file ourselves */
@@ -2064,7 +2064,7 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 
 		if ((screen == NULL) || !render_is_live_screen(screen))
 		{
-			debug_console_printf("Invalid screen number '%d'\n", scrnum);
+			debug_console_printf(machine, "Invalid screen number '%d'\n", scrnum);
 			return;
 		}
 
@@ -2076,13 +2076,13 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 
 		if (filerr != FILERR_NONE)
 		{
-			debug_console_printf("Error creating file '%s'\n", filename);
+			debug_console_printf(machine, "Error creating file '%s'\n", filename);
 			return;
 		}
 
 		video_screen_save_snapshot(screen->machine, screen, fp);
 		mame_fclose(fp);
-		debug_console_printf("Saved screen #%d snapshot as '%s'\n", scrnum, filename);
+		debug_console_printf(machine, "Saved screen #%d snapshot as '%s'\n", scrnum, filename);
 	}
 }
 
@@ -2124,10 +2124,10 @@ static void execute_map(running_machine *machine, int ref, int params, const cha
 		if (memory_address_physical(space, intention, &taddress))
 		{
 			const char *mapname = memory_get_handler_string(space, intention == TRANSLATE_WRITE_DEBUG, taddress);
-			debug_console_printf("%7s: %08X logical == %08X physical -> %s\n", intnames[intention & 3], (UINT32)address, memory_byte_to_address(space, taddress), mapname);
+			debug_console_printf(machine, "%7s: %08X logical == %08X physical -> %s\n", intnames[intention & 3], (UINT32)address, memory_byte_to_address(space, taddress), mapname);
 		}
 		else
-			debug_console_printf("%7s: %08X logical is unmapped\n", intnames[intention & 3], (UINT32)address);
+			debug_console_printf(machine, "%7s: %08X logical is unmapped\n", intnames[intention & 3], (UINT32)address);
 	}
 }
 
@@ -2143,7 +2143,7 @@ static void execute_memdump(running_machine *machine, int ref, int params, const
 
 	filename = (params == 0) ? "memdump.log" : param[0];
 
-	debug_console_printf("Dumping memory to %s\n", filename);
+	debug_console_printf(machine, "Dumping memory to %s\n", filename);
 
 	file = fopen(filename, "w");
 	if (file)
@@ -2179,12 +2179,12 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 	if (cpu != NULL)
 	{
 		symtable = debug_cpu_get_symtable(cpu);
-		debug_console_printf("CPU '%s' symbols:\n", cpu->tag);
+		debug_console_printf(machine, "CPU '%s' symbols:\n", cpu->tag);
 	}
 	else
 	{
 		symtable = debug_cpu_get_global_symtable(machine);
-		debug_console_printf("Global symbols:\n");
+		debug_console_printf(machine, "Global symbols:\n");
 	}
 
 	/* gather names for all symbols */
@@ -2218,14 +2218,14 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 		assert(entry != NULL);
 
 		/* only display "register" type symbols */
-		debug_console_printf("%s = ", namelist[symnum]);
+		debug_console_printf(machine, "%s = ", namelist[symnum]);
 		if ((value >> 32) != 0)
-			debug_console_printf("%X%08X", (UINT32)(value >> 32), (UINT32)value);
+			debug_console_printf(machine, "%X%08X", (UINT32)(value >> 32), (UINT32)value);
 		else
-			debug_console_printf("%X", (UINT32)value);
+			debug_console_printf(machine, "%X", (UINT32)value);
 		if (entry->info.reg.setter == NULL)
-			debug_console_printf("  (read-only)");
-		debug_console_printf("\n");
+			debug_console_printf(machine, "  (read-only)");
+		debug_console_printf(machine, "\n");
 	}
 }
 

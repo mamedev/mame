@@ -87,8 +87,8 @@ void debug_console_init(running_machine *machine)
 		return;
 
 	/* print the opening lines */
-	debug_console_printf("MAME new debugger version %s\n", build_version);
-	debug_console_printf("Currently targeting %s (%s)\n", machine->gamedrv->name, machine->gamedrv->description);
+	debug_console_printf(machine, "MAME new debugger version %s\n", build_version);
+	debug_console_printf(machine, "Currently targeting %s (%s)\n", machine->gamedrv->name, machine->gamedrv->description);
 
 	/* request callback upon exiting */
 	add_exit_callback(machine, debug_console_exit);
@@ -357,7 +357,7 @@ CMDERR debug_console_execute_command(running_machine *machine, const char *comma
 
 	/* echo if requested */
 	if (echo)
-		debug_console_printf(">%s\n", command);
+		debug_console_printf(machine, ">%s\n", command);
 
 	/* parse and execute */
 	result = internal_parse_command(machine, command, TRUE);
@@ -366,15 +366,15 @@ CMDERR debug_console_execute_command(running_machine *machine, const char *comma
 	if (result != CMDERR_NONE)
 	{
 		if (!echo)
-			debug_console_printf(">%s\n", command);
-		debug_console_printf(" %*s^\n", CMDERR_ERROR_OFFSET(result), "");
-		debug_console_printf("%s\n", debug_cmderr_to_string(result));
+			debug_console_printf(machine, ">%s\n", command);
+		debug_console_printf(machine, " %*s^\n", CMDERR_ERROR_OFFSET(result), "");
+		debug_console_printf(machine, "%s\n", debug_cmderr_to_string(result));
 	}
 
 	/* update all views */
 	if (echo)
 	{
-		debug_view_update_all();
+		debug_view_update_all(machine);
 		debugger_refresh_display(machine);
 	}
 	return result;
@@ -462,7 +462,7 @@ const char *debug_cmderr_to_string(CMDERR error)
     console
 -------------------------------------------------*/
 
-void CLIB_DECL debug_console_printf(const char *format, ...)
+void CLIB_DECL debug_console_printf(running_machine *machine, const char *format, ...)
 {
 	va_list arg;
 
@@ -473,7 +473,7 @@ void CLIB_DECL debug_console_printf(const char *format, ...)
 	text_buffer_print(console_textbuf, giant_string_buffer);
 
 	/* force an update of any console views */
-	debug_view_update_type(DVT_CONSOLE);
+	debug_view_update_type(machine, DVT_CONSOLE);
 }
 
 
@@ -483,13 +483,13 @@ void CLIB_DECL debug_console_printf(const char *format, ...)
     console
 -------------------------------------------------*/
 
-void CLIB_DECL debug_console_vprintf(const char *format, va_list args)
+void CLIB_DECL debug_console_vprintf(running_machine *machine, const char *format, va_list args)
 {
 	vsprintf(giant_string_buffer, format, args);
 	text_buffer_print(console_textbuf, giant_string_buffer);
 
 	/* force an update of any console views */
-	debug_view_update_type(DVT_CONSOLE);
+	debug_view_update_type(machine, DVT_CONSOLE);
 }
 
 
@@ -499,7 +499,7 @@ void CLIB_DECL debug_console_vprintf(const char *format, va_list args)
     console
 -------------------------------------------------*/
 
-void CLIB_DECL debug_console_printf_wrap(int wrapcol, const char *format, ...)
+void CLIB_DECL debug_console_printf_wrap(running_machine *machine, int wrapcol, const char *format, ...)
 {
 	va_list arg;
 
@@ -510,7 +510,7 @@ void CLIB_DECL debug_console_printf_wrap(int wrapcol, const char *format, ...)
 	text_buffer_print_wrap(console_textbuf, giant_string_buffer, wrapcol);
 
 	/* force an update of any console views */
-	debug_view_update_type(DVT_CONSOLE);
+	debug_view_update_type(machine, DVT_CONSOLE);
 }
 
 
@@ -536,7 +536,7 @@ void debug_errorlog_write_line(running_machine *machine, const char *line)
 		text_buffer_print(errorlog_textbuf, line);
 
 	/* force an update of any log views */
-	debug_view_update_type(DVT_LOG);
+	debug_view_update_type(machine, DVT_LOG);
 }
 
 

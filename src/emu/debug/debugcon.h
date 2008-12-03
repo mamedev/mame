@@ -86,9 +86,9 @@ void				debug_console_register_command(running_machine *machine, const char *com
 const char *		debug_cmderr_to_string(CMDERR error);
 
 /* console management */
-void CLIB_DECL		debug_console_printf(const char *format, ...) ATTR_PRINTF(1,2);
-void CLIB_DECL		debug_console_vprintf(const char *format, va_list args);
-void CLIB_DECL		debug_console_printf_wrap(int wrapcol, const char *format, ...) ATTR_PRINTF(2,3);
+void CLIB_DECL		debug_console_printf(running_machine *machine, const char *format, ...) ATTR_PRINTF(2,3);
+void CLIB_DECL		debug_console_vprintf(running_machine *machine, const char *format, va_list args);
+void CLIB_DECL		debug_console_printf_wrap(running_machine *machine, int wrapcol, const char *format, ...) ATTR_PRINTF(3,4);
 text_buffer *		debug_console_get_textbuf(void);
 
 /* errorlog management */

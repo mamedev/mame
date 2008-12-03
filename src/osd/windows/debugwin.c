@@ -156,17 +156,6 @@ struct _debugwin_info
 };
 
 
-typedef struct _memorycombo_item memorycombo_item;
-struct _memorycombo_item
-{
-	memorycombo_item *		next;
-	TCHAR					name[256];
-	const address_space *	space;
-	memory_view_raw			raw;
-	UINT8					prefsize;
-};
-
-
 //============================================================
 //  GLOBAL VARIABLES
 //============================================================
@@ -179,8 +168,6 @@ struct _memorycombo_item
 
 static debugwin_info *window_list;
 static debugwin_info *main_console;
-
-static memorycombo_item *memorycombo;
 
 static UINT8 waiting_for_debugger;
 
@@ -219,6 +206,7 @@ static void memory_process_string(debugwin_info *info, const char *string);
 static void memory_update_menu(debugwin_info *info);
 static int memory_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lparam);
 static int memory_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam);
+static void memory_update_caption(running_machine *machine, HWND wnd);
 
 static void disasm_create_window(running_machine *machine);
 static void disasm_recompute_children(debugwin_info *info);
@@ -444,14 +432,6 @@ void debugwin_destroy_windows(void)
 	// loop over windows and free them
 	while (window_list)
 		DestroyWindow(window_list->wnd);
-
-	// free the combobox info
-	while (memorycombo)
-	{
-		void *temp = memorycombo;
-		memorycombo = memorycombo->next;
-		free(temp);
-	}
 
 	main_console = NULL;
 }
@@ -1692,128 +1672,13 @@ static void log_create_window(running_machine *machine)
 
 
 //============================================================
-//  memory_determine_combo_items
-//============================================================
-
-static void memory_determine_combo_items(running_machine *machine)
-{
-	memorycombo_item **tail = &memorycombo;
-	UINT32 cpunum, spacenum;
-	const char *rgntag;
-	int itemnum;
-
-	// first add all the CPUs' address spaces
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-			for (spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
-			{
-				const address_space *space = cpu_get_address_space(machine->cpu[cpunum], spacenum);
-				if (space != NULL)
-				{
-					memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-					TCHAR *t_tag, *t_name, *t_space;
-
-					memset(ci, 0, sizeof(*ci));
-					ci->space = space;
-					ci->prefsize = MIN(space->dbits / 8, 8);
-
-					t_tag = tstring_from_utf8(space->cpu->tag);
-					t_name = tstring_from_utf8(cpu_get_name(space->cpu));
-					t_space = tstring_from_utf8(space->name);
-					_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("CPU '%s' (%s) %s memory"), t_tag, t_name, t_space);
-					free(t_space),
-					free(t_name);
-					free(t_tag);
-
-					*tail = ci;
-					tail = &ci->next;
-				}
-		}
-
-	// then add all the memory regions
-	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = memory_region_next(machine, rgntag))
-	{
-		memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-		UINT32 flags = memory_region_flags(machine, rgntag);
-		UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
-		UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
-		TCHAR *t_tag;
-
-		memset(ci, 0, sizeof(*ci));
-		ci->raw.base = memory_region(machine, rgntag);
-		ci->raw.length = memory_region_length(machine, rgntag);
-		ci->raw.offsetxor = width - 1;
-		ci->raw.endianness = little_endian ? CPU_IS_LE : CPU_IS_BE;
-		ci->prefsize = MIN(width, 8);
-
-		t_tag = tstring_from_utf8(rgntag);
-		_sntprintf(ci->name, ARRAY_LENGTH(ci->name), TEXT("Region '%s'"), t_tag);
-		free(t_tag);
-
-		*tail = ci;
-		tail = &ci->next;
-	}
-
-	// finally add all global array symbols
-	for (itemnum = 0; itemnum < 10000; itemnum++)
-	{
-		UINT32 valsize, valcount;
-		const char *name;
-		void *base;
-
-		/* stop when we run out of items */
-		name = state_save_get_indexed_item(itemnum, &base, &valsize, &valcount);
-		if (name == NULL)
-			break;
-
-		/* if this is a single-entry global, add it */
-		if (valcount > 1 && strstr(name, "/globals/"))
-		{
-			memorycombo_item *ci = malloc_or_die(sizeof(*ci));
-			TCHAR *t_name;
-
-			memset(ci, 0, sizeof(*ci));
-			ci->raw.base = base;
-			ci->raw.length = valcount * valsize;
-			ci->raw.endianness = CPU_IS_LE;
-			ci->prefsize = MIN(valsize, 8);
-
-			t_name = tstring_from_utf8(name);
-			_tcscpy(ci->name, _tcsrchr(t_name, TEXT('/')) + 1);
-			free(t_name);
-
-			*tail = ci;
-			tail = &ci->next;
-		}
-	}
-}
-
-
-//============================================================
-//  memory_update_selection
-//============================================================
-
-static void memory_update_selection(debugwin_info *info, memorycombo_item *ci)
-{
-	debug_view_begin_update(info->view[0].view);
-	if (ci->space != NULL)
-		memory_view_set_address_space(info->view[0].view, ci->space);
-	else
-		memory_view_set_raw(info->view[0].view, &ci->raw);
-	memory_view_set_bytes_per_chunk(info->view[0].view, ci->prefsize);
-	debug_view_end_update(info->view[0].view);
-	SetWindowText(info->wnd, ci->name);
-}
-
-
-//============================================================
 //  memory_create_window
 //============================================================
 
 static void memory_create_window(running_machine *machine)
 {
 	const device_config *curcpu = debug_cpu_get_visible_cpu(machine);
-	memorycombo_item *ci, *selci = NULL;
+	const memory_subview_item *subview;
 	debugwin_info *info;
 	HMENU optionsmenu;
 	int cursel = 0;
@@ -1866,27 +1731,23 @@ static void memory_create_window(running_machine *machine)
 	SendMessage(info->otherwnd[0], WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 
 	// populate the combobox
-	if (memorycombo == NULL)
-		memory_determine_combo_items(machine);
-	for (ci = memorycombo; ci != NULL; ci = ci->next)
+	for (subview = memory_view_get_subview_list(info->view[0].view); subview != NULL; subview = subview->next)
 	{
-		int item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)ci->name);
-		if (selci == NULL && ci->space != NULL && ci->space->cpu == curcpu)
-		{
+		TCHAR *t_name = tstring_from_utf8(subview->name);
+		int item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
+		free(t_name);
+		if (cursel == 0 && subview->space != NULL && subview->space->cpu == curcpu)
 			cursel = item;
-			selci = ci;
-		}
 	}
 	SendMessage(info->otherwnd[0], CB_SETCURSEL, cursel, 0);
+	memory_view_set_subview(info->view[0].view, cursel);
 
 	// set the child functions
 	info->recompute_children = memory_recompute_children;
 	info->process_string = memory_process_string;
 
-	// set the CPUnum and spacenum properties
-	if (selci == NULL)
-		selci = memorycombo;
-	memory_update_selection(info, selci);
+	// set the caption
+	memory_update_caption(machine, info->wnd);
 
 	// recompute the children once to get the maxwidth
 	memory_recompute_children(info);
@@ -1999,11 +1860,8 @@ static int memory_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 			int sel = SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
 			if (sel != CB_ERR)
 			{
-				// find the matching entry
-				memorycombo_item *ci;
-				for (ci = memorycombo; ci; ci = ci->next)
-					if (sel-- == 0)
-						memory_update_selection(info, ci);
+				memory_view_set_subview(info->view[0].view, sel);
+				memory_update_caption(info->machine, info->wnd);
 
 				// reset the focus
 				SetFocus(info->focuswnd);
@@ -2112,16 +1970,32 @@ static int memory_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 
 
 //============================================================
+//  memory_update_caption
+//============================================================
+
+static void memory_update_caption(running_machine *machine, HWND wnd)
+{
+	debugwin_info *info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
+	const memory_subview_item *subview = memory_view_get_current_subview(info->view[0].view);
+	char title[256];
+
+	sprintf(title, "Memory: %s", subview->name);
+	win_set_window_text_utf8(wnd, title);
+}
+
+
+
+//============================================================
 //  disasm_create_window
 //============================================================
 
 static void disasm_create_window(running_machine *machine)
 {
-	const address_space *selspace = NULL, *fallbackspace = NULL;
-	int selindex = 0, fallbackindex = 0;
+	const device_config *curcpu = debug_cpu_get_visible_cpu(machine);
+	const disasm_subview_item *subview;
 	debugwin_info *info;
 	HMENU optionsmenu;
-	UINT32 cpunum;
+	int cursel = 0;
 
 	// create the window
 	info = debugwin_window_create(machine, "Disassembly", NULL);
@@ -2160,46 +2034,25 @@ static void disasm_create_window(running_machine *machine)
 
 	// create a combo box
 	info->otherwnd[0] = CreateWindowEx(COMBO_BOX_STYLE_EX, TEXT("COMBOBOX"), NULL, COMBO_BOX_STYLE,
-			0, 0, 100, 100, info->wnd, NULL, GetModuleHandle(NULL), NULL);
+			0, 0, 100, 1000, info->wnd, NULL, GetModuleHandle(NULL), NULL);
 	SetWindowLongPtr(info->otherwnd[0], GWLP_USERDATA, (LONG_PTR)info);
 	SendMessage(info->otherwnd[0], WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 
 	// populate the combobox
-	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			const address_space *space = cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM);
-			if (space != NULL)
-			{
-				TCHAR *t_cpu_name = tstring_from_utf8(cpu_get_name(space->cpu));
-				TCHAR *t_cpu_tag = tstring_from_utf8(space->cpu->tag);
-				TCHAR name[100];
-				int item;
-				
-				_sntprintf(name, ARRAY_LENGTH(name), TEXT("CPU '%s' (%s)"), t_cpu_tag, t_cpu_name);
-				free(t_cpu_tag);
-				free(t_cpu_name);
-				item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)name);
-				if (space->cpu == debug_cpu_get_visible_cpu(machine))
-				{
-					selspace = space;
-					selindex = item;
-				}
-				else if (fallbackspace == NULL)
-				{
-					fallbackspace = space;
-					fallbackindex = item;
-				}
-			}
-		}
-	SendMessage(info->otherwnd[0], CB_SETCURSEL, (selspace != NULL) ? selindex : fallbackindex, 0);
+	for (subview = disasm_view_get_subview_list(info->view[0].view); subview != NULL; subview = subview->next)
+	{
+		TCHAR *t_name = tstring_from_utf8(subview->name);
+		int item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
+		free(t_name);
+		if (cursel == 0 && subview->space->cpu == curcpu)
+			cursel = item;
+	}
+	SendMessage(info->otherwnd[0], CB_SETCURSEL, cursel, 0);
+	disasm_view_set_subview(info->view[0].view, cursel);
 
 	// set the child functions
 	info->recompute_children = disasm_recompute_children;
 	info->process_string = disasm_process_string;
-
-	// set the target space
-	disasm_view_set_address_space(info->view[0].view, (selspace != NULL) ? selspace : fallbackspace);
 
 	// set the caption
 	disasm_update_caption(machine, info->wnd);
@@ -2314,18 +2167,8 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 			int sel = SendMessage((HWND)lparam, CB_GETCURSEL, 0, 0);
 			if (sel != CB_ERR)
 			{
-				// find the matching entry
-				UINT32 cpunum;
-				for (cpunum = 0; cpunum < ARRAY_LENGTH(info->machine->cpu); cpunum++)
-					if (info->machine->cpu[cpunum] != NULL)
-					{
-						const address_space *space = cpu_get_address_space(info->machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM);
-						if (space != NULL && sel-- == 0)
-						{
-							disasm_view_set_address_space(info->view[0].view, space);
-							disasm_update_caption(info->machine, info->wnd);
-						}
-					}
+				disasm_view_set_subview(info->view[0].view, sel);
+				disasm_update_caption(info->machine, info->wnd);
 
 				// reset the focus
 				SetFocus(info->focuswnd);
@@ -2356,7 +2199,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 				case ID_RUN_TO_CURSOR:
 					if (debug_view_get_cursor_visible(info->view[0].view))
 					{
-						const address_space *space = disasm_view_get_address_space(info->view[0].view);
+						const address_space *space = disasm_view_get_current_subview(info->view[0].view)->space;
 						if (debug_cpu_get_visible_cpu(info->machine) == space->cpu)
 						{
 							offs_t address = memory_byte_to_address(space, disasm_view_get_selected_address(info->view[0].view));
@@ -2369,7 +2212,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 				case ID_TOGGLE_BREAKPOINT:
 					if (debug_view_get_cursor_visible(info->view[0].view))
 					{
-						const address_space *space = disasm_view_get_address_space(info->view[0].view);
+						const address_space *space = disasm_view_get_current_subview(info->view[0].view)->space;
 						if (debug_cpu_get_visible_cpu(info->machine) == space->cpu)
 						{
 							offs_t address = memory_byte_to_address(space, disasm_view_get_selected_address(info->view[0].view));
@@ -2458,11 +2301,10 @@ static int disasm_handle_key(debugwin_info *info, WPARAM wparam, LPARAM lparam)
 static void disasm_update_caption(running_machine *machine, HWND wnd)
 {
 	debugwin_info *info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
-	const address_space *space = disasm_view_get_address_space(info->view[0].view);
-	char title[100];
-
-	// then update the caption
-	sprintf(title, "Disassembly: CPU '%s' (%s)", space->cpu->tag, cpu_get_name(space->cpu));
+	const disasm_subview_item *subview = disasm_view_get_current_subview(info->view[0].view);
+	char title[256];
+	
+	sprintf(title, "Disassembly: %s", subview->name);
 	win_set_window_text_utf8(wnd, title);
 }
 
@@ -2474,11 +2316,12 @@ static void disasm_update_caption(running_machine *machine, HWND wnd)
 
 void console_create_window(running_machine *machine)
 {
+	const registers_subview_item *regsubview;
+	const disasm_subview_item *dasmsubview;
 	debugwin_info *info;
 	int bestwidth, bestheight;
 	RECT bounds, work_bounds;
 	HMENU optionsmenu;
-	UINT32 cpunum;
 
 	// create the window
 	info = debugwin_window_create(machine, "Debug", NULL);
@@ -2528,30 +2371,30 @@ void console_create_window(running_machine *machine)
 	// loop over all CPUs and compute the sizes
 	info->minwidth = 0;
 	info->maxwidth = 0;
-	for (cpunum = MAX_CPU - 1; (INT32)cpunum >= 0; cpunum--)
-		if (machine->cpu[cpunum] != NULL)
-		{
-			const address_space *program = cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM);
-			UINT32 regchars, dischars, conchars;
-			UINT32 minwidth, maxwidth;
+	for (dasmsubview = disasm_view_get_subview_list(info->view[0].view); dasmsubview != NULL; dasmsubview = dasmsubview->next)
+		for (regsubview = registers_view_get_subview_list(info->view[1].view); regsubview != NULL; regsubview = regsubview->next)
+			if (dasmsubview->space->cpu == regsubview->device)
+			{
+				UINT32 regchars, dischars, conchars;
+				UINT32 minwidth, maxwidth;
 
-			// point all views to the new CPU number
-			disasm_view_set_address_space(info->view[0].view, program);
-			registers_view_set_cpu(info->view[1].view, program->cpu);
+				// point all views to the appropriate index
+				disasm_view_set_subview(info->view[0].view, dasmsubview->index);
+				registers_view_set_subview(info->view[1].view, regsubview->index);
 
-			// get the total width of all three children
-			dischars = debug_view_get_total_size(info->view[0].view).x;
-			regchars = debug_view_get_total_size(info->view[1].view).x;
-			conchars = debug_view_get_total_size(info->view[2].view).x;
+				// get the total width of all three children
+				dischars = debug_view_get_total_size(info->view[0].view).x;
+				regchars = debug_view_get_total_size(info->view[1].view).x;
+				conchars = debug_view_get_total_size(info->view[2].view).x;
 
-			// compute the preferred width
-			minwidth = EDGE_WIDTH + regchars * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + 100 + EDGE_WIDTH;
-			maxwidth = EDGE_WIDTH + regchars * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + ((dischars > conchars) ? dischars : conchars) * debug_font_width + vscroll_width + EDGE_WIDTH;
-			if (minwidth > info->minwidth)
-				info->minwidth = minwidth;
-			if (maxwidth > info->maxwidth)
-				info->maxwidth = maxwidth;
-		}
+				// compute the preferred width
+				minwidth = EDGE_WIDTH + regchars * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + 100 + EDGE_WIDTH;
+				maxwidth = EDGE_WIDTH + regchars * debug_font_width + vscroll_width + 2 * EDGE_WIDTH + ((dischars > conchars) ? dischars : conchars) * debug_font_width + vscroll_width + EDGE_WIDTH;
+				if (minwidth > info->minwidth)
+					info->minwidth = minwidth;
+				if (maxwidth > info->maxwidth)
+					info->maxwidth = maxwidth;
+			}
 
 	// get the work bounds
 	SystemParametersInfo(SPI_GETWORKAREA, 0, &work_bounds, 0);
@@ -2671,16 +2514,28 @@ static void console_process_string(debugwin_info *info, const char *string)
 
 static void console_set_cpu(const device_config *device)
 {
+	const registers_subview_item *regsubitem;
+	const disasm_subview_item *dasmsubitem;
 	char title[256], curtitle[256];
 
 	// first set all the views to the new cpu number
 	if (main_console->view[0].view != NULL)
-		disasm_view_set_address_space(main_console->view[0].view, cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM));
+		for (dasmsubitem = disasm_view_get_subview_list(main_console->view[0].view); dasmsubitem != NULL; dasmsubitem = dasmsubitem->next)
+			if (dasmsubitem->space->cpu == device)
+			{
+				disasm_view_set_subview(main_console->view[0].view, dasmsubitem->index);
+				break;
+			}
 	if (main_console->view[1].view != NULL)
-		registers_view_set_cpu(main_console->view[1].view, device);
+		for (regsubitem = registers_view_get_subview_list(main_console->view[1].view); regsubitem != NULL; regsubitem = regsubitem->next)
+			if (regsubitem->device == device)
+			{
+				registers_view_set_subview(main_console->view[1].view, regsubitem->index);
+				break;
+			}
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - CPU '%s' (%s)", device->machine->gamedrv->name, device->tag, cpu_get_name(device));
+	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", device->machine->gamedrv->name, regsubitem->name);
 	win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
 	if (strcmp(title, curtitle) != 0)
 		win_set_window_text_utf8(main_console->wnd, title);
