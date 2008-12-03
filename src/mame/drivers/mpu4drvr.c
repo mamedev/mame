@@ -279,22 +279,22 @@ static void update_mpu68_interrupts(running_machine *machine)
 /* Communications with 6809 board */
 /* Clock values are currently unknown, and are derived from the 68k board.*/
 
-static void m6809_acia_irq(int state)
+static void m6809_acia_irq(const device_config *device, int state)
 {
 	m68k_acia_cts = state;
-	cpu_set_input_line(Machine->cpu[0], M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
+	cpu_set_input_line(device->machine->cpu[0], M6809_IRQ_LINE, state?ASSERT_LINE:CLEAR_LINE);
 }
 
 
-static void m68k_acia_irq(int state)
+static void m68k_acia_irq(const device_config *device, int state)
 {
 	m6809_acia_cts = state;
 	m6850_irq_state = state;
-	update_mpu68_interrupts(Machine);
+	update_mpu68_interrupts(device->machine);
 }
 
 
-static const struct acia6850_interface m6809_acia_if =
+static const acia6850_interface m6809_acia_if =
 {
 	0,
 	0,
@@ -307,7 +307,7 @@ static const struct acia6850_interface m6809_acia_if =
 };
 
 
-static const struct acia6850_interface m68k_acia_if =
+static const acia6850_interface m68k_acia_if =
 {
 	0,
 	0,
@@ -333,10 +333,12 @@ static WRITE8_HANDLER( vid_o1_callback )
 
 	if (data)
 	{
-		acia_tx_clock_in(0);
-		acia_rx_clock_in(0);
-		acia_tx_clock_in(1);
-		acia_rx_clock_in(1);
+		const device_config *acia_0 = device_list_find_by_tag(space->machine->config->devicelist, ACIA6850, "acia6850_0");
+		const device_config *acia_1 = device_list_find_by_tag(space->machine->config->devicelist, ACIA6850, "acia6850_1");
+		acia_tx_clock_in(acia_0);
+		acia_rx_clock_in(acia_0);
+		acia_tx_clock_in(acia_1);
+		acia_rx_clock_in(acia_1);
 	}
 }
 
@@ -1356,8 +1358,6 @@ MACHINE_START( mpu4_vid )
 
 	/* setup communications */
 	serial_card_connected=1;
-	acia6850_config(0, &m6809_acia_if);
-	acia6850_config(1, &m68k_acia_if);
 
 	/* setup 8 mechanical meters */
 	Mechmtr_init(8);
@@ -1436,8 +1436,8 @@ static ADDRESS_MAP_START( mpu4_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc1ffff) AM_READWRITE(mpu4_vid_vidram_r, mpu4_vid_vidram_w)
 
 	/* comms with the MPU4 */
-    AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(acia6850_1_stat_lsb_r, acia6850_1_ctrl_lsb_w)
-    AM_RANGE(0xff8002, 0xff8003) AM_READWRITE(acia6850_1_data_lsb_r, acia6850_1_data_lsb_w)
+    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_stat_lsb_r, acia6850_ctrl_lsb_w)
+    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_data_lsb_r, acia6850_data_lsb_w)
 
 	AM_RANGE(0xff9000, 0xff900f) AM_READWRITE(ptm6840_1_lsb_r,ptm6840_1_lsb_w)	/* 6840PTM */
 
@@ -1448,8 +1448,8 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mpu4_6809_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07FF) AM_RAM AM_BASE(&generic_nvram) AM_SIZE(&generic_nvram_size)
 
-	AM_RANGE(0x0800, 0x0800) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
-	AM_RANGE(0x0801, 0x0801) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
+	AM_RANGE(0x0800, 0x0800) AM_DEVREADWRITE(ACIA6850, "acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE(ACIA6850, "acia6850_0", acia6850_data_r, acia6850_data_w)
 
 	AM_RANGE(0x0880, 0x0881) AM_NOP /* Could be a UART datalogger is here. */
 
@@ -1492,8 +1492,8 @@ static ADDRESS_MAP_START( vp_68k_map, ADDRESS_SPACE_PROGRAM, 16 )
 /*  AM_RANGE(0xe05000, 0xe05001) AM_READWRITE(adpcm_r, adpcm_w) */
 
 	/* comms with the MPU4 */
-    AM_RANGE(0xff8000, 0xff8001) AM_READWRITE(acia6850_1_stat_lsb_r, acia6850_1_ctrl_lsb_w)
-    AM_RANGE(0xff8002, 0xff8003) AM_READWRITE(acia6850_1_data_lsb_r, acia6850_1_data_lsb_w)
+    AM_RANGE(0xff8000, 0xff8001) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_stat_lsb_r, acia6850_ctrl_lsb_w)
+    AM_RANGE(0xff8002, 0xff8003) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_data_lsb_r, acia6850_data_lsb_w)
 
 	AM_RANGE(0xff9000, 0xff900f) AM_READ(  ptm6840_1_lsb_r)
 	AM_RANGE(0xff9000, 0xff900f) AM_WRITE( ptm6840_1_lsb_w)
@@ -1688,6 +1688,12 @@ static MACHINE_DRIVER_START( mpu4_vid )
 	MDRV_SOUND_ADD("saa", SAA1099, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "left", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "right", 1.00)
+
+	/* ACIAs */
+	MDRV_DEVICE_ADD("acia6850_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(m6809_acia_if)
+	MDRV_DEVICE_ADD("acia6850_1", ACIA6850)
+	MDRV_DEVICE_CONFIG(m68k_acia_if)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( vgpoker )

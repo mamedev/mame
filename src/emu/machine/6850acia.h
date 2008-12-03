@@ -1,7 +1,20 @@
-#ifndef ACIA6850_H
-#define ACIA6850_H
+/*********************************************************************
 
-#define MAX_ACIA 4
+	6850acia.h
+
+	6850 ACIA code
+
+*********************************************************************/
+
+#ifndef __ACIA6850_H__
+#define __ACIA6850_H__
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define ACIA6850		DEVICE_GET_INFO_NAME(acia6850)
 
 #define ACIA6850_STATUS_RDRF	0x01
 #define ACIA6850_STATUS_TDRE	0x02
@@ -12,7 +25,14 @@
 #define ACIA6850_STATUS_PE		0x40
 #define ACIA6850_STATUS_IRQ		0x80
 
-struct acia6850_interface
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef struct _acia6850_interface acia6850_interface;
+struct _acia6850_interface
 {
 	int	tx_clock;
 	int	rx_clock;
@@ -23,74 +43,35 @@ struct acia6850_interface
 	UINT8 *rts_pin;
 	UINT8 *dcd_pin;
 
-	void (*int_callback)(int state);
+	void (*int_callback)(const device_config *device, int state);
 };
 
-void acia6850_config(int which, const struct acia6850_interface *intf);
 
-void acia_tx_clock_in(int which);
-void acia_rx_clock_in(int which);
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
 
-void acia6850_set_rx_clock(int which, int clock);
-void acia6850_set_tx_clock(int which, int clock);
+DEVICE_GET_INFO( acia6850 );
 
-WRITE8_HANDLER( acia6850_0_ctrl_w );
-WRITE8_HANDLER( acia6850_1_ctrl_w );
-WRITE8_HANDLER( acia6850_2_ctrl_w );
-WRITE8_HANDLER( acia6850_3_ctrl_w );
+void acia_tx_clock_in(const device_config *device) ATTR_NONNULL;
+void acia_rx_clock_in(const device_config *device) ATTR_NONNULL;
 
-WRITE8_HANDLER( acia6850_0_data_w );
-WRITE8_HANDLER( acia6850_1_data_w );
-WRITE8_HANDLER( acia6850_2_data_w );
-WRITE8_HANDLER( acia6850_3_data_w );
+void acia6850_set_rx_clock(const device_config *device, int clock) ATTR_NONNULL;
+void acia6850_set_tx_clock(const device_config *device, int clock) ATTR_NONNULL;
 
-READ8_HANDLER( acia6850_0_stat_r );
-READ8_HANDLER( acia6850_1_stat_r );
-READ8_HANDLER( acia6850_2_stat_r );
-READ8_HANDLER( acia6850_3_stat_r );
+WRITE8_DEVICE_HANDLER( acia6850_ctrl_w );
+READ8_DEVICE_HANDLER( acia6850_stat_r );
+WRITE8_DEVICE_HANDLER( acia6850_data_w );
+READ8_DEVICE_HANDLER( acia6850_data_r );
 
-READ8_HANDLER( acia6850_0_data_r );
-READ8_HANDLER( acia6850_1_data_r );
-READ8_HANDLER( acia6850_2_data_r );
-READ8_HANDLER( acia6850_3_data_r );
+READ16_DEVICE_HANDLER( acia6850_stat_lsb_r );
+READ16_DEVICE_HANDLER( acia6850_stat_msb_r );
+READ16_DEVICE_HANDLER( acia6850_data_lsb_r );
+READ16_DEVICE_HANDLER( acia6850_data_msb_r );
 
-READ16_HANDLER( acia6850_0_stat_lsb_r );
-READ16_HANDLER( acia6850_1_stat_lsb_r );
-READ16_HANDLER( acia6850_2_stat_lsb_r );
-READ16_HANDLER( acia6850_3_stat_lsb_r );
+WRITE16_DEVICE_HANDLER( acia6850_ctrl_msb_w );
+WRITE16_DEVICE_HANDLER( acia6850_ctrl_lsb_w );
+WRITE16_DEVICE_HANDLER( acia6850_data_msb_w );
+WRITE16_DEVICE_HANDLER( acia6850_data_lsb_w );
 
-READ16_HANDLER( acia6850_0_stat_msb_r );
-READ16_HANDLER( acia6850_1_stat_msb_r );
-READ16_HANDLER( acia6850_2_stat_msb_r );
-READ16_HANDLER( acia6850_3_stat_msb_r );
-
-READ16_HANDLER( acia6850_0_data_lsb_r );
-READ16_HANDLER( acia6850_1_data_lsb_r );
-READ16_HANDLER( acia6850_2_data_lsb_r );
-READ16_HANDLER( acia6850_3_data_lsb_r );
-
-READ16_HANDLER( acia6850_0_data_msb_r );
-READ16_HANDLER( acia6850_1_data_msb_r );
-READ16_HANDLER( acia6850_2_data_msb_r );
-READ16_HANDLER( acia6850_3_data_msb_r );
-
-WRITE16_HANDLER( acia6850_0_ctrl_msb_w );
-WRITE16_HANDLER( acia6850_1_ctrl_msb_w );
-WRITE16_HANDLER( acia6850_2_ctrl_msb_w );
-WRITE16_HANDLER( acia6850_3_ctrl_msb_w );
-
-WRITE16_HANDLER( acia6850_0_ctrl_lsb_w );
-WRITE16_HANDLER( acia6850_1_ctrl_lsb_w );
-WRITE16_HANDLER( acia6850_2_ctrl_lsb_w );
-WRITE16_HANDLER( acia6850_3_ctrl_lsb_w );
-
-WRITE16_HANDLER( acia6850_0_data_msb_w );
-WRITE16_HANDLER( acia6850_1_data_msb_w );
-WRITE16_HANDLER( acia6850_2_data_msb_w );
-WRITE16_HANDLER( acia6850_3_data_msb_w );
-
-WRITE16_HANDLER( acia6850_0_data_lsb_w );
-WRITE16_HANDLER( acia6850_1_data_lsb_w );
-WRITE16_HANDLER( acia6850_2_data_lsb_w );
-WRITE16_HANDLER( acia6850_3_data_lsb_w );
-#endif
+#endif /* __ACIA6850_H__ */

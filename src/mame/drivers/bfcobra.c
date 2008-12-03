@@ -73,7 +73,6 @@
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/6850acia.h"
 #include "machine/meters.h"
 #include "cpu/z80/z80.h"
@@ -1316,10 +1315,10 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( z80_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0x23) AM_READWRITE(chipset_r, chipset_w)
-	AM_RANGE(0x24, 0x24) AM_WRITE(acia6850_0_ctrl_w)
-	AM_RANGE(0x25, 0x25) AM_WRITE(acia6850_0_data_w)
-	AM_RANGE(0x26, 0x26) AM_READ(acia6850_0_stat_r)
-	AM_RANGE(0x27, 0x27) AM_READ(acia6850_0_data_r)
+	AM_RANGE(0x24, 0x24) AM_DEVWRITE(ACIA6850, "acia6850_0", acia6850_ctrl_w)
+	AM_RANGE(0x25, 0x25) AM_DEVWRITE(ACIA6850, "acia6850_0", acia6850_data_w)
+	AM_RANGE(0x26, 0x26) AM_DEVREAD(ACIA6850, "acia6850_0", acia6850_stat_r)
+	AM_RANGE(0x27, 0x27) AM_DEVREAD(ACIA6850, "acia6850_0", acia6850_data_r)
 	AM_RANGE(0x30, 0x30) AM_READ(fdctrl_r)
 	AM_RANGE(0x31, 0x31) AM_READWRITE(fddata_r, fdctrl_w)
 	AM_RANGE(0x40, 0x40) AM_WRITE(rombank_w)
@@ -1447,10 +1446,10 @@ static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2E00, 0x2E00) AM_READ(int_latch_r)
 	AM_RANGE(0x3001, 0x3001) AM_WRITE(ay8910_write_port_0_w)
 	AM_RANGE(0x3201, 0x3201) AM_WRITE(ay8910_control_port_0_w)
-	AM_RANGE(0x3404, 0x3404) AM_READWRITE(acia6850_1_stat_r, acia6850_1_ctrl_w)
-	AM_RANGE(0x3405, 0x3405) AM_READWRITE(acia6850_1_data_r, acia6850_1_data_w)
-	AM_RANGE(0x3406, 0x3406) AM_READWRITE(acia6850_2_stat_r, acia6850_2_ctrl_w)
-	AM_RANGE(0x3407, 0x3407) AM_READWRITE(acia6850_2_data_r, acia6850_2_data_w)
+	AM_RANGE(0x3404, 0x3404) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x3405, 0x3405) AM_DEVREADWRITE(ACIA6850, "acia6850_1", acia6850_data_r, acia6850_data_w)
+	AM_RANGE(0x3406, 0x3406) AM_DEVREADWRITE(ACIA6850, "acia6850_2", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x3407, 0x3407) AM_DEVREADWRITE(ACIA6850, "acia6850_2", acia6850_data_r, acia6850_data_w)
 //  AM_RANGE(0x3408, 0x3408) AM_NOP
 //  AM_RANGE(0x340A, 0x340A) AM_NOP
 //  AM_RANGE(0x3600, 0x3600) AM_NOP
@@ -1577,21 +1576,21 @@ static void init_ram(void)
 	memset(video_ram, 0, 0x20000);
 }
 
-static void z80_acia_irq(int state)
+static void z80_acia_irq(const device_config *device, int state)
 {
 	acia_irq = state ? CLEAR_LINE : ASSERT_LINE;
-	update_irqs(Machine);
+	update_irqs(device->machine);
 }
 
-static void m6809_data_irq(int state)
+static void m6809_data_irq(const device_config *device, int state)
 {
-	cpu_set_input_line(Machine->cpu[1], M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(device->machine->cpu[1], M6809_IRQ_LINE, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /*
     What are the correct ACIA clocks ?
 */
-static const struct acia6850_interface z80_acia_if =
+static const acia6850_interface z80_acia_if =
 {
 	500000,
 	500000,
@@ -1603,7 +1602,7 @@ static const struct acia6850_interface z80_acia_if =
 	z80_acia_irq
 };
 
-static const struct acia6850_interface m6809_acia_if =
+static const acia6850_interface m6809_acia_if =
 {
 	500000,
 	500000,
@@ -1615,7 +1614,7 @@ static const struct acia6850_interface m6809_acia_if =
 	NULL
 };
 
-static const struct acia6850_interface data_acia_if =
+static const acia6850_interface data_acia_if =
 {
 	500000,
 	500000,
@@ -1673,11 +1672,6 @@ static DRIVER_INIT( bfcobra )
 
 	/* Fixed 16kB ROM region */
 	memory_set_bankptr(machine, 4, memory_region(machine, "user1"));
-
-	/* Configure the ACIAs */
-	acia6850_config(0, &z80_acia_if);
-	acia6850_config(1, &m6809_acia_if);
-	acia6850_config(2, &data_acia_if);
 
 	/* TODO: Properly sort out the data ACIA */
 	data_r = 1;
@@ -1744,6 +1738,14 @@ static MACHINE_DRIVER_START( bfcobra )
 
 	MDRV_VIDEO_START(bfcobra)
 	MDRV_VIDEO_UPDATE(bfcobra)
+
+	/* ACIAs */
+	MDRV_DEVICE_ADD("acia6850_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(z80_acia_if)
+	MDRV_DEVICE_ADD("acia6850_1", ACIA6850)
+	MDRV_DEVICE_CONFIG(m6809_acia_if)
+	MDRV_DEVICE_ADD("acia6850_2", ACIA6850)
+	MDRV_DEVICE_CONFIG(data_acia_if)
 MACHINE_DRIVER_END
 
 /***************************************************************************

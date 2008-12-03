@@ -621,8 +621,6 @@
 #include "machine/6850acia.h"
 #include "sound/ay8910.h"
 
-#include "deprecat.h"
-
 
 /* UART */
 static UINT8 tx_line;
@@ -646,14 +644,13 @@ static READ8_HANDLER( dipsw_1_r )
 	return input_port_read(space->machine, "SW1");
 }
 
-static void tx_rx_clk (int dsw2)
+static void tx_rx_clk (const device_config *device, int dsw2)
 {
 	int trx_clk;
-
-	dsw2 = input_port_read(Machine, "SW2");
+	dsw2 = input_port_read(device->machine, "SW2");
 	trx_clk = UART_CLOCK * dsw2 / 128;
-	acia6850_set_rx_clock(0, trx_clk);
-	acia6850_set_tx_clock(0, trx_clk);
+	acia6850_set_rx_clock(device, trx_clk);
+	acia6850_set_tx_clock(device, trx_clk);
 
 	return;
 }
@@ -761,8 +758,8 @@ static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0881, 0x0881) AM_DEVREADWRITE(MC6845, "crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x08c4, 0x08c7) AM_READWRITE(pia_0_r, pia_0_w)
 	AM_RANGE(0x08c8, 0x08cb) AM_READWRITE(pia_1_r, pia_1_w)
-	AM_RANGE(0x08d0, 0x08d0) AM_READWRITE(acia6850_0_stat_r, acia6850_0_ctrl_w)
-	AM_RANGE(0x08d1, 0x08d1) AM_READWRITE(acia6850_0_data_r, acia6850_0_data_w)
+	AM_RANGE(0x08d0, 0x08d0) AM_DEVREADWRITE(ACIA6850, "acia6850_0", acia6850_stat_r, acia6850_ctrl_w)
+	AM_RANGE(0x08d1, 0x08d1) AM_DEVREADWRITE(ACIA6850, "acia6850_0", acia6850_data_r, acia6850_data_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1400, 0x17ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x1800, 0x3fff) AM_ROM
@@ -1842,7 +1839,7 @@ static const pia6821_interface sys905_pia1_intf =
 *    ACIA Interface    *
 ***********************/
 
-static const struct acia6850_interface acia6850_intf =
+static const acia6850_interface acia6850_intf =
 {
 	UART_CLOCK,
 	UART_CLOCK,
@@ -1863,7 +1860,6 @@ static MACHINE_START( sys903 )
 {
 	pia_config(0, &sys903_pia0_intf);
 	pia_config(1, &sys903_pia1_intf);
-	acia6850_config(0, &acia6850_intf);
 }
 
 static MACHINE_START( sys905 )
@@ -1940,6 +1936,10 @@ static MACHINE_DRIVER_START( sys903 )
 	MDRV_SOUND_ADD("ay8912", AY8912, SND_CLOCK)	/* confirmed */
 	MDRV_SOUND_CONFIG(sys903_ay8912_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+
+	/* acia */
+	MDRV_DEVICE_ADD("acia6850_0", ACIA6850)
+	MDRV_DEVICE_CONFIG(acia6850_intf)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( sys905 )

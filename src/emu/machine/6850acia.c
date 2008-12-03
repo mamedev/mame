@@ -1,16 +1,29 @@
-/*
-    6850 ACIA
-*/
+/*********************************************************************
+
+	6850acia.c
+
+	6850 ACIA code
+
+*********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "timer.h"
 #include "6850acia.h"
+
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
 #define CR1_0	0x03
 #define CR4_2	0x1C
 #define CR6_5	0x60
 #define CR7		0x80
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 enum serial_state
 {
@@ -28,21 +41,8 @@ enum parity_type
 	EVEN
 };
 
-static const int ACIA6850_DIVIDE[3] = { 1, 16, 64 };
-
-static const int ACIA6850_WORD[8][3] =
-{
-	{ 7, EVEN, 2 },
-	{ 7, ODD,  2 },
-	{ 7, EVEN, 1 },
-	{ 7, ODD,  1 },
-	{ 8, NONE, 2 },
-	{ 8, NONE, 1 },
-	{ 8, EVEN, 1 },
-	{ 8, ODD,  1 }
-};
-
-typedef struct _acia_6850_
+typedef struct _acia6850_t acia6850_t;
+struct _acia6850_t
 {
 	UINT8	ctrl;
 	UINT8	status;
@@ -91,20 +91,68 @@ typedef struct _acia_6850_
 	emu_timer *rx_timer;
 	emu_timer *tx_timer;
 
-	void (*int_callback)(int param);
-} acia_6850;
+	void (*int_callback)(const device_config *device, int param);
+};
 
-static acia_6850 acia[MAX_ACIA];
+
+/***************************************************************************
+    LOCAL VARIABLES
+***************************************************************************/
+
+static const int ACIA6850_DIVIDE[3] = { 1, 16, 64 };
+
+static const int ACIA6850_WORD[8][3] =
+{
+	{ 7, EVEN, 2 },
+	{ 7, ODD,  2 },
+	{ 7, EVEN, 1 },
+	{ 7, ODD,  1 },
+	{ 8, NONE, 2 },
+	{ 8, NONE, 1 },
+	{ 8, EVEN, 1 },
+	{ 8, ODD,  1 }
+};
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 static TIMER_CALLBACK( receive_event );
 static TIMER_CALLBACK( transmit_event );
 
-/*
-    Reset the chip
-*/
-static void acia6850_reset(int which)
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
+
+INLINE acia6850_t *get_token(const device_config *device)
 {
-	acia_6850 *acia_p = &acia[which];
+	assert(device != NULL);
+	assert(device->type == ACIA6850);
+	return (acia6850_t *) device->token;
+}
+
+
+INLINE acia6850_interface *get_interface(const device_config *device)
+{
+	assert(device != NULL);
+	assert(device->type == ACIA6850);
+	return (acia6850_interface *) device->static_config;
+}
+
+
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
+
+/*-------------------------------------------------
+    DEVICE_RESET( acia6850 )
+-------------------------------------------------*/
+
+static DEVICE_RESET( acia6850 )
+{
+	acia6850_t *acia_p = get_token(device);
 	int cts = 0, dcd = 0;
 
 	if (acia_p->cts_pin)
@@ -135,7 +183,7 @@ static void acia6850_reset(int which)
 
 	if (acia_p->int_callback)
 	{
-		acia_p->int_callback(1);
+		acia_p->int_callback(device, 1);
 	}
 
 	if (acia_p->first_reset)
@@ -156,17 +204,16 @@ static void acia6850_reset(int which)
 	}
 }
 
-/*
-    Called by drivers
-*/
-void acia6850_config(int which, const struct acia6850_interface *intf)
-{
-	acia_6850 *acia_p = &acia[which];
 
-	if (which >= MAX_ACIA)
-	{
-		return;
-	}
+
+/*-------------------------------------------------
+    DEVICE_START( acia6850 )
+-------------------------------------------------*/
+
+static DEVICE_START( acia6850 )
+{
+	acia6850_t *acia_p = get_token(device);
+	acia6850_interface *intf = get_interface(device);
 
 	acia_p->rx_clock = intf->rx_clock;
 	acia_p->tx_clock = intf->tx_clock;
@@ -177,8 +224,8 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 	acia_p->cts_pin = intf->cts_pin;
 	acia_p->rts_pin = intf->rts_pin;
 	acia_p->dcd_pin = intf->dcd_pin;
-	acia_p->rx_timer = timer_alloc(Machine, receive_event, NULL);
-	acia_p->tx_timer = timer_alloc(Machine, transmit_event, NULL);
+	acia_p->rx_timer = timer_alloc(device->machine, receive_event, (void *) device);
+	acia_p->tx_timer = timer_alloc(device->machine, transmit_event, (void *) device);
 	acia_p->int_callback = intf->int_callback;
 	acia_p->first_reset = 1;
 	acia_p->status_read = 0;
@@ -187,38 +234,40 @@ void acia6850_config(int which, const struct acia6850_interface *intf)
 	timer_reset(acia_p->rx_timer, attotime_never);
 	timer_reset(acia_p->tx_timer, attotime_never);
 
-	state_save_register_item("acia6850", NULL, which, acia_p->ctrl);
-	state_save_register_item("acia6850", NULL, which, acia_p->status);
-	state_save_register_item("acia6850", NULL, which, acia_p->rx_clock);
-	state_save_register_item("acia6850", NULL, which, acia_p->tx_clock);
-	state_save_register_item("acia6850", NULL, which, acia_p->rx_counter);
-	state_save_register_item("acia6850", NULL, which, acia_p->tx_counter);
-	state_save_register_item("acia6850", NULL, which, acia_p->rx_shift);
-	state_save_register_item("acia6850", NULL, which, acia_p->tx_shift);
-	state_save_register_item("acia6850", NULL, which, acia_p->rdr);
-	state_save_register_item("acia6850", NULL, which, acia_p->tdr);
-	state_save_register_item("acia6850", NULL, which, acia_p->rx_bits);
-	state_save_register_item("acia6850", NULL, which, acia_p->tx_bits);
-	state_save_register_item("acia6850", NULL, which, acia_p->rx_parity);
-	state_save_register_item("acia6850", NULL, which, acia_p->tx_parity);
-	state_save_register_item("acia6850", NULL, which, acia_p->tx_int);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->ctrl);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->status);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_clock);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_clock);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_counter);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_counter);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_shift);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_shift);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->rdr);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->tdr);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_bits);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_bits);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_parity);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_parity);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_int);
 
-	state_save_register_item("acia6850", NULL, which, acia_p->divide);
-	state_save_register_item("acia6850", NULL, which, acia_p->overrun);
-	state_save_register_item("acia6850", NULL, which, acia_p->reset);
-	state_save_register_item("acia6850", NULL, which, acia_p->first_reset);
-	state_save_register_item("acia6850", NULL, which, acia_p->rts);
-	state_save_register_item("acia6850", NULL, which, acia_p->brk);
-	state_save_register_item("acia6850", NULL, which, acia_p->status_read);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->divide);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->overrun);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->reset);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->first_reset);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->rts);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->brk);
+	state_save_register_item("acia6850", device->tag, 0, acia_p->status_read);
+	return DEVICE_START_OK;
 }
 
 
-/*
-    Read Status Register
-*/
-static UINT8 acia6850_stat_r(int which)
+/*-------------------------------------------------
+    acia6850_stat_r - Read Status Register
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( acia6850_stat_r )
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 
 	acia_p->status_read = 1;
 
@@ -226,12 +275,13 @@ static UINT8 acia6850_stat_r(int which)
 }
 
 
-/*
-    Write Control Register
-*/
-static void acia6850_ctrl_w(int which, UINT8 data)
+/*-------------------------------------------------
+    acia6850_ctrl_w - Write Control Register
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( acia6850_ctrl_w )
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 
 	int wordsel;
 	int divide;
@@ -245,7 +295,7 @@ static void acia6850_ctrl_w(int which, UINT8 data)
 	if (divide == 3)
 	{
 		acia_p->reset = 1;
-		acia6850_reset(which);
+		device_reset(device);
 	}
 	else
 	{
@@ -313,20 +363,24 @@ static void acia6850_ctrl_w(int which, UINT8 data)
 		if (acia_p->rx_clock)
 		{
 			attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
-			timer_adjust_periodic(acia_p->rx_timer, rx_period, which, rx_period);
+			timer_adjust_periodic(acia_p->rx_timer, rx_period, 0, rx_period);
 		}
 		if (acia_p->tx_clock)
 		{
 			attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
-			timer_adjust_periodic(acia_p->tx_timer, tx_period, which, tx_period);
+			timer_adjust_periodic(acia_p->tx_timer, tx_period, 0, tx_period);
 		}
 	}
 }
 
 
-static void acia6850_check_interrupts(int which)
+/*-------------------------------------------------
+    acia6850_check_interrupts
+-------------------------------------------------*/
+
+static void acia6850_check_interrupts(const device_config *device)
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 
 	int irq = (acia_p->tx_int && (acia_p->status & ACIA6850_STATUS_TDRE)) ||
 		((acia_p->ctrl & 0x80) && ((acia_p->status & (ACIA6850_STATUS_RDRF|ACIA6850_STATUS_DCD)) || acia_p->overrun));
@@ -337,7 +391,7 @@ static void acia6850_check_interrupts(int which)
 
 		if (acia_p->int_callback)
 		{
-			acia_p->int_callback(0);
+			acia_p->int_callback(device, 0);
 		}
 	}
 	else
@@ -346,38 +400,40 @@ static void acia6850_check_interrupts(int which)
 
 		if (acia_p->int_callback)
 		{
-			acia_p->int_callback(1);
+			acia_p->int_callback(device, 1);
 		}
 	}
 }
 
 
-/*
-    Write transmit register
-*/
-static void acia6850_data_w(running_machine *machine, int which, UINT8 data)
+/*-------------------------------------------------
+    acia6850_data_w - Write transmit register
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER( acia6850_data_w )
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 
 	if (!acia_p->reset)
 	{
 		acia_p->tdr = data;
 		acia_p->status &= ~ACIA6850_STATUS_TDRE;
-		acia6850_check_interrupts(which);
+		acia6850_check_interrupts(device);
 	}
 	else
 	{
-		logerror("ACIA %d: Data write while in reset! (%x)\n", which, cpu_get_previouspc(machine->activecpu));
+		logerror("ACIA %p: Data write while in reset! (%x)\n", device, cpu_get_previouspc(device->machine->activecpu));
 	}
 }
 
 
-/*
-    Read character
-*/
-static UINT8 acia6850_data_r(int which)
+/*-------------------------------------------------
+    acia6850_data_r - Read character
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER( acia6850_data_r )
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 
 	acia_p->status &= ~(ACIA6850_STATUS_RDRF | ACIA6850_STATUS_IRQ | ACIA6850_STATUS_PE);
 
@@ -398,18 +454,19 @@ static UINT8 acia6850_data_r(int which)
 		acia_p->overrun = 0;
 	}
 
-	acia6850_check_interrupts(which);
+	acia6850_check_interrupts(device);
 
 	return acia_p->rdr;
 }
 
 
-/*
-    Transmit a bit
-*/
-static void tx_tick(int which)
+/*-------------------------------------------------
+    tx_tick - Transmit a bit
+-------------------------------------------------*/
+
+static void tx_tick(const device_config *device)
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 
 	if (acia_p->cts_pin && *acia_p->cts_pin)
 	{
@@ -457,7 +514,7 @@ static void tx_tick(int which)
 						acia_p->status |= ACIA6850_STATUS_TDRE;
 					}
 
-					acia6850_check_interrupts(which);
+					acia6850_check_interrupts(device);
 
 					acia_p->tx_state = DATA;
 				}
@@ -522,20 +579,26 @@ static void tx_tick(int which)
 }
 
 
-/* Called on transmit timer event */
+/*-------------------------------------------------
+    TIMER_CALLBACK( transmit_event )
+-------------------------------------------------*/
+
 static TIMER_CALLBACK( transmit_event )
 {
-	int which = param;
-	acia_6850 *acia_p = &acia[which];
-	tx_tick(which);
+	const device_config *device = ptr;
+	acia6850_t *acia_p = get_token(device);
+	tx_tick(device);
 	acia_p->tx_counter = 0;
 }
 
 
-/* As above, but using the tx pin */
-void acia_tx_clock_in(int which)
+/*-------------------------------------------------
+    acia_tx_clock_in - As above, but using the tx pin
+-------------------------------------------------*/
+
+void acia_tx_clock_in(const device_config *device)
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 
 	if (acia_p->cts_pin && *acia_p->cts_pin)
 	{
@@ -550,24 +613,25 @@ void acia_tx_clock_in(int which)
 
 	if ( acia_p->tx_counter > acia_p->divide-1)
 	{
-		tx_tick(which);
+		tx_tick(device);
 		acia_p->tx_counter = 0;
 	}
 
 }
 
 
-/*
-    Receive a bit
-*/
-static void rx_tick(int which)
+/*-------------------------------------------------
+    rx_tick - Receive a bit
+-------------------------------------------------*/
+
+static void rx_tick(const device_config *device)
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 
 	if (acia_p->dcd_pin && *acia_p->dcd_pin)
 	{
 		acia_p->status |= ACIA6850_STATUS_DCD;
-		acia6850_check_interrupts(which);
+		acia6850_check_interrupts(device);
 	}
 	else if ((acia_p->status & (ACIA6850_STATUS_DCD|ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
 	{
@@ -605,7 +669,7 @@ static void rx_tick(int which)
 					if (acia_p->status & ACIA6850_STATUS_RDRF)
 					{
 						acia_p->overrun = 1;
-						acia6850_check_interrupts(which);
+						acia6850_check_interrupts(device);
 					}
 
 					acia_p->rx_state = acia_p->parity == NONE ? STOP : PARITY;
@@ -653,7 +717,7 @@ static void rx_tick(int which)
 							//logerror("ACIA6850 #%u: RX DATA %x\n", which, acia_p->rx_shift);
 							acia_p->rdr = acia_p->rx_shift;
 							acia_p->status |= ACIA6850_STATUS_RDRF;
-							acia6850_check_interrupts(which);
+							acia6850_check_interrupts(device);
 						}
 
 						acia_p->rx_state = START;
@@ -682,7 +746,7 @@ static void rx_tick(int which)
 						//logerror("ACIA6850 #%u: RX DATA %x\n", which, acia_p->rx_shift);
 						acia_p->rdr = acia_p->rx_shift;
 						acia_p->status |= ACIA6850_STATUS_RDRF;
-						acia6850_check_interrupts(which);
+						acia6850_check_interrupts(device);
 					}
 
 					acia_p->rx_state = START;
@@ -698,25 +762,33 @@ static void rx_tick(int which)
 	}
 }
 
-/* Called on receive timer event */
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( receive_event ) - Called on
+	receive timer event
+-------------------------------------------------*/
+
 static TIMER_CALLBACK( receive_event )
 {
-	int which = param;
-	acia_6850 *acia_p = &acia[which];
-	rx_tick(which);
+	const device_config *device = ptr;
+	acia6850_t *acia_p = get_token(device);
+	rx_tick(device);
 	acia_p->rx_counter = 0;
 }
 
 
-/* As above, but using the rx pin */
-void acia_rx_clock_in(int which)
+/*-------------------------------------------------
+    acia_rx_clock_in - As above, but using the rx pin
+-------------------------------------------------*/
+
+void acia_rx_clock_in(const device_config *device)
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 
 	if (acia_p->dcd_pin && *acia_p->dcd_pin)
 	{
 		acia_p->status |= ACIA6850_STATUS_DCD;
-		acia6850_check_interrupts(which);
+		acia6850_check_interrupts(device);
 	}
 	else if ((acia_p->status & (ACIA6850_STATUS_DCD|ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
 	{
@@ -727,83 +799,88 @@ void acia_rx_clock_in(int which)
 
 	if ( acia_p->rx_counter > acia_p->divide-1)
 	{
-		rx_tick(which);
+		rx_tick(device);
 		acia_p->rx_counter = 0;
 	}
 }
 
 
-/* Set clock frequencies dynamically */
-void acia6850_set_rx_clock(int which, int clock)
+/*-------------------------------------------------
+    acia6850_set_rx_clock - Set clock frequencies
+	dynamically
+-------------------------------------------------*/
+
+void acia6850_set_rx_clock(const device_config *device, int clock)
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 	acia_p->rx_clock = clock;
 }
 
 
-void acia6850_set_tx_clock(int which, int clock)
+/*-------------------------------------------------
+    acia6850_set_tx_clock - Set clock frequencies
+	dynamically
+-------------------------------------------------*/
+
+void acia6850_set_tx_clock(const device_config *device, int clock)
 {
-	acia_6850 *acia_p = &acia[which];
+	acia6850_t *acia_p = get_token(device);
 	acia_p->tx_clock = clock;
 }
 
 
-WRITE8_HANDLER( acia6850_0_ctrl_w ) { acia6850_ctrl_w(0, data); }
-WRITE8_HANDLER( acia6850_1_ctrl_w ) { acia6850_ctrl_w(1, data); }
-WRITE8_HANDLER( acia6850_2_ctrl_w ) { acia6850_ctrl_w(2, data); }
-WRITE8_HANDLER( acia6850_3_ctrl_w ) { acia6850_ctrl_w(3, data); }
+/*-------------------------------------------------
+    DEVICE_SET_INFO( acia6850 )
+-------------------------------------------------*/
 
-WRITE8_HANDLER( acia6850_0_data_w ) { acia6850_data_w(space->machine, 0, data); }
-WRITE8_HANDLER( acia6850_1_data_w ) { acia6850_data_w(space->machine, 1, data); }
-WRITE8_HANDLER( acia6850_2_data_w ) { acia6850_data_w(space->machine, 2, data); }
-WRITE8_HANDLER( acia6850_3_data_w ) { acia6850_data_w(space->machine, 3, data); }
+static DEVICE_SET_INFO( acia6850 )
+{
+	switch (state)
+	{
+		/* no parameters to set */
+	}
+}
 
-READ8_HANDLER( acia6850_0_stat_r ) { return acia6850_stat_r(0); }
-READ8_HANDLER( acia6850_1_stat_r ) { return acia6850_stat_r(1); }
-READ8_HANDLER( acia6850_2_stat_r ) { return acia6850_stat_r(2); }
-READ8_HANDLER( acia6850_3_stat_r ) { return acia6850_stat_r(3); }
 
-READ8_HANDLER( acia6850_0_data_r ) { return acia6850_data_r(0); }
-READ8_HANDLER( acia6850_1_data_r ) { return acia6850_data_r(1); }
-READ8_HANDLER( acia6850_2_data_r ) { return acia6850_data_r(2); }
-READ8_HANDLER( acia6850_3_data_r ) { return acia6850_data_r(3); }
+/*-------------------------------------------------
+    DEVICE_GET_INFO( acia6850 )
+-------------------------------------------------*/
 
-READ16_HANDLER( acia6850_0_stat_lsb_r ) { return acia6850_stat_r(0); }
-READ16_HANDLER( acia6850_1_stat_lsb_r ) { return acia6850_stat_r(1); }
-READ16_HANDLER( acia6850_2_stat_lsb_r ) { return acia6850_stat_r(2); }
-READ16_HANDLER( acia6850_3_stat_lsb_r ) { return acia6850_stat_r(3); }
+DEVICE_GET_INFO( acia6850 )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(acia6850_t);				break;
+		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;								break;
+		case DEVINFO_INT_CLASS:							info->i = DEVICE_CLASS_PERIPHERAL;			break;
 
-READ16_HANDLER( acia6850_0_stat_msb_r ) { return acia6850_stat_r(0) << 8; }
-READ16_HANDLER( acia6850_1_stat_msb_r ) { return acia6850_stat_r(1) << 8; }
-READ16_HANDLER( acia6850_2_stat_msb_r ) { return acia6850_stat_r(2) << 8; }
-READ16_HANDLER( acia6850_3_stat_msb_r ) { return acia6850_stat_r(3) << 8; }
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case DEVINFO_FCT_SET_INFO:						info->set_info = DEVICE_SET_INFO_NAME(acia6850); break;
+		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(acia6850);	break;
+		case DEVINFO_FCT_STOP:							/* Nothing */								break;
+		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(acia6850);	break;
 
-READ16_HANDLER( acia6850_0_data_lsb_r ) { return acia6850_data_r(0); }
-READ16_HANDLER( acia6850_1_data_lsb_r ) { return acia6850_data_r(1); }
-READ16_HANDLER( acia6850_2_data_lsb_r ) { return acia6850_data_r(2); }
-READ16_HANDLER( acia6850_3_data_lsb_r ) { return acia6850_data_r(3); }
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "6850 ACIA";						break;
+		case DEVINFO_STR_FAMILY:						info->s = "6850 ACIA";						break;
+		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
+		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
+		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
+}
 
-READ16_HANDLER( acia6850_0_data_msb_r ) { return acia6850_data_r(0) << 8; }
-READ16_HANDLER( acia6850_1_data_msb_r ) { return acia6850_data_r(1) << 8; }
-READ16_HANDLER( acia6850_2_data_msb_r ) { return acia6850_data_r(2) << 8; }
-READ16_HANDLER( acia6850_3_data_msb_r ) { return acia6850_data_r(3) << 8; }
 
-WRITE16_HANDLER( acia6850_0_ctrl_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_ctrl_w(0, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_1_ctrl_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_ctrl_w(1, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_2_ctrl_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_ctrl_w(2, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_3_ctrl_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_ctrl_w(3, (data >> 8) & 0xff); }
+/* ----------------------------------------------------------------------- */
 
-WRITE16_HANDLER( acia6850_0_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(0, data & 0xff); }
-WRITE16_HANDLER( acia6850_1_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(1, data & 0xff); }
-WRITE16_HANDLER( acia6850_2_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(2, data & 0xff); }
-WRITE16_HANDLER( acia6850_3_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(3, data & 0xff); }
+READ16_DEVICE_HANDLER( acia6850_stat_lsb_r ) { return acia6850_stat_r(device, 0) << 0; }
+READ16_DEVICE_HANDLER( acia6850_stat_msb_r ) { return acia6850_stat_r(device, 0) << 8; }
 
-WRITE16_HANDLER( acia6850_0_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(space->machine, 0, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_1_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(space->machine, 1, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_2_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(space->machine, 2, (data >> 8) & 0xff); }
-WRITE16_HANDLER( acia6850_3_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(space->machine, 3, (data >> 8) & 0xff); }
+READ16_DEVICE_HANDLER( acia6850_data_lsb_r ) { return acia6850_data_r(device, 0) << 0; }
+READ16_DEVICE_HANDLER( acia6850_data_msb_r ) { return acia6850_data_r(device, 0) << 8; }
 
-WRITE16_HANDLER( acia6850_0_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(space->machine, 0, data & 0xff); }
-WRITE16_HANDLER( acia6850_1_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(space->machine, 1, data & 0xff); }
-WRITE16_HANDLER( acia6850_2_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(space->machine, 2, data & 0xff); }
-WRITE16_HANDLER( acia6850_3_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(space->machine, 3, data & 0xff); }
+WRITE16_DEVICE_HANDLER( acia6850_ctrl_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_ctrl_w(device, 0, (data >> 8) & 0xff); }
+WRITE16_DEVICE_HANDLER( acia6850_ctrl_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_ctrl_w(device, 0, (data >> 0) & 0xff); }
+
+WRITE16_DEVICE_HANDLER( acia6850_data_msb_w ) { if (ACCESSING_BITS_8_15) acia6850_data_w(device, 0, (data >> 8) & 0xff); }
+WRITE16_DEVICE_HANDLER( acia6850_data_lsb_w ) { if (ACCESSING_BITS_0_7) acia6850_data_w(device, 0, (data >> 0) & 0xff); }
