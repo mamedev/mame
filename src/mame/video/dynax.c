@@ -261,8 +261,8 @@ WRITE8_HANDLER( dynax_blit_romregion_w )
 
 WRITE8_HANDLER( dynax_blit2_romregion_w )
 {
-	if (data < ARRAY_LENGTH(gfxregions))
-		dynax_blit2_romregion = gfxregions[data];
+	if (data+1 < ARRAY_LENGTH(gfxregions))
+		dynax_blit2_romregion = gfxregions[data+1];
 	LOG(("GFX%X' ",data+2));
 }
 
