@@ -3412,6 +3412,8 @@ static void menu_select_game_custom_render(running_machine *machine, ui_menu *me
 
 	/* draw a box */
 	color = UI_FILLCOLOR;
+	if (driver != NULL && (driver->flags & (GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_IMPERFECT_COLORS | GAME_NO_SOUND | GAME_IMPERFECT_SOUND)) != 0)
+		color = UI_YELLOWCOLOR;
 	if (driver != NULL && (driver->flags & (GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION)) != 0)
 		color = UI_REDCOLOR;
 	ui_draw_outlined_box(x1, y1, x2, y2, color);
