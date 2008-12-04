@@ -501,11 +501,15 @@ static int audit_one_disk(core_options *options, const rom_entry *rom, const gam
 
 		/* found but needs a dump */
 		if (hash_data_has_info(record->exphash, HASH_INFO_NO_DUMP))
-			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD_NEEDS_REDUMP);
+			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_FOUND_NODUMP);
 
 		/* incorrect hash */
 		else if (!hash_data_is_equal(record->exphash, record->hash, 0))
 			set_status(record, AUDIT_STATUS_FOUND_INVALID, SUBSTATUS_FOUND_BAD_CHECKSUM);
+
+		/* correct hash but needs a redump */
+		else if (hash_data_has_info(record->exphash, HASH_INFO_BAD_DUMP))
+			set_status(record, AUDIT_STATUS_GOOD, SUBSTATUS_GOOD_NEEDS_REDUMP);
 
 		/* just plain good */
 		else
