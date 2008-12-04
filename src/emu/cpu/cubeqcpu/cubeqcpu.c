@@ -1902,7 +1902,7 @@ CPU_GET_INFO( cquestsnd )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestsnd);			break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;
@@ -2020,7 +2020,7 @@ CPU_GET_INFO( cquestrot )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestrot);			break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;
@@ -2138,7 +2138,7 @@ CPU_GET_INFO( cquestlin )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(cquestlin);			break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 8;							break;

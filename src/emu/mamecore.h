@@ -141,6 +141,15 @@ typedef union
 #endif
 
 
+
+/* Endianness constants */
+enum
+{
+	ENDIANNESS_LITTLE = 0,				/* emulated CPU is little endian */
+	ENDIANNESS_BIG					/* emulated CPU is big endian */
+};
+
+
 /* orientation of bitmaps */
 #define	ORIENTATION_FLIP_X				0x0001	/* mirror everything in the X direction */
 #define	ORIENTATION_FLIP_Y				0x0002	/* mirror everything in the Y direction */

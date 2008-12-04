@@ -1491,7 +1491,7 @@ static void ide_bus_master_write(const device_config *device, offs_t offset, int
 			ide->dma_last_buffer = 0;
 			ide->dma_descriptor = ide->bus_master_descriptor;
 			ide->dma_cpu = cpunum_get_active();
-			ide->dma_address_xor = (cpu_get_endianness(device->machine->activecpu) == CPU_IS_LE) ? 0 : 3;
+			ide->dma_address_xor = (cpu_get_endianness(device->machine->activecpu) == ENDIANNESS_LITTLE) ? 0 : 3;
 
 			/* if we're going live, start the pending read/write */
 			if (ide->dma_active)

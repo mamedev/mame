@@ -1178,7 +1178,7 @@ static UINT32 normalize_flags_for_cpu(running_machine *machine, UINT32 startflag
 
 		/* set the endianness */
 		startflags &= ~ROMREGION_ENDIANMASK;
-		if (cputype_get_endianness(cputype) == CPU_IS_LE)
+		if (cputype_get_endianness(cputype) == ENDIANNESS_LITTLE)
 			startflags |= ROMREGION_LE;
 		else
 			startflags |= ROMREGION_BE;

@@ -2514,7 +2514,7 @@ static void console_process_string(debugwin_info *info, const char *string)
 
 static void console_set_cpu(const device_config *device)
 {
-	const registers_subview_item *regsubitem;
+	const registers_subview_item *regsubitem = NULL;
 	const disasm_subview_item *dasmsubitem;
 	char title[256], curtitle[256];
 
@@ -2535,10 +2535,13 @@ static void console_set_cpu(const device_config *device)
 			}
 
 	// then update the caption
-	snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", device->machine->gamedrv->name, regsubitem->name);
-	win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
-	if (strcmp(title, curtitle) != 0)
-		win_set_window_text_utf8(main_console->wnd, title);
+	if (regsubitem != NULL)
+	{
+		snprintf(title, ARRAY_LENGTH(title), "Debug: %s - %s", device->machine->gamedrv->name, regsubitem->name);
+		win_get_window_text_utf8(main_console->wnd, curtitle, ARRAY_LENGTH(curtitle));
+		if (strcmp(title, curtitle) != 0)
+			win_set_window_text_utf8(main_console->wnd, title);
+	}
 }
 
 

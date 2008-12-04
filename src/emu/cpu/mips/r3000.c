@@ -1186,7 +1186,7 @@ static CPU_GET_INFO( r3000 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(r3000_state);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 6;									break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;									break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;									break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;									break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;									break;
@@ -1320,7 +1320,7 @@ CPU_GET_INFO( r3000be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
@@ -1339,7 +1339,7 @@ CPU_GET_INFO( r3000le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;
@@ -1358,7 +1358,7 @@ CPU_GET_INFO( r3041be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000be);			break;
@@ -1377,7 +1377,7 @@ CPU_GET_INFO( r3041le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;							break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(r3000le);			break;

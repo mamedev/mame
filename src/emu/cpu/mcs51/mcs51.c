@@ -2473,7 +2473,7 @@ static CPU_GET_INFO( mcs51 )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(mcs51_state_t);				break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;								break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;						break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;						break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;								break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 12;								break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;								break;

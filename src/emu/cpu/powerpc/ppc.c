@@ -1823,7 +1823,7 @@ static CPU_GET_INFO( ppc )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(ppc);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
@@ -1957,7 +1957,7 @@ CPU_GET_INFO( ppc403 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_LINES:					info->i = 8;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_REGISTER + PPC_EXIER:			info->i = EXIER;						break;
 		case CPUINFO_INT_REGISTER + PPC_EXISR:			info->i = EXISR;						break;
 
@@ -1985,7 +1985,7 @@ CPU_GET_INFO( ppc603 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
@@ -2036,7 +2036,7 @@ CPU_GET_INFO( ppc602 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_REGISTER + PPC_IBR:			info->i = ppc.ibr;						break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
@@ -2084,7 +2084,7 @@ CPU_GET_INFO( mpc8240 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
@@ -2129,7 +2129,7 @@ CPU_GET_INFO( ppc601 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
@@ -2174,7 +2174,7 @@ CPU_GET_INFO( ppc604 )
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case CPUINFO_INT_INPUT_LINES:					info->i = 5;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 64;					break;
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;

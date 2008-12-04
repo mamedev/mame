@@ -1312,7 +1312,7 @@ UINT16 debug_read_word(const address_space *space, offs_t address, int apply_tra
 		UINT8 byte1 = debug_read_byte(space, address + 1, apply_translation);
 
 		/* based on the endianness, the result is assembled differently */
-		if (space->endianness == CPU_IS_LE)
+		if (space->endianness == ENDIANNESS_LITTLE)
 			result = byte0 | (byte1 << 8);
 		else
 			result = byte1 | (byte0 << 8);
@@ -1367,7 +1367,7 @@ UINT32 debug_read_dword(const address_space *space, offs_t address, int apply_tr
 		UINT16 word1 = debug_read_word(space, address + 2, apply_translation);
 
 		/* based on the endianness, the result is assembled differently */
-		if (space->endianness == CPU_IS_LE)
+		if (space->endianness == ENDIANNESS_LITTLE)
 			result = word0 | (word1 << 16);
 		else
 			result = word1 | (word0 << 16);
@@ -1422,7 +1422,7 @@ UINT64 debug_read_qword(const address_space *space, offs_t address, int apply_tr
 		UINT32 dword1 = debug_read_dword(space, address + 4, apply_translation);
 
 		/* based on the endianness, the result is assembled differently */
-		if (space->endianness == CPU_IS_LE)
+		if (space->endianness == ENDIANNESS_LITTLE)
 			result = dword0 | ((UINT64)dword1 << 32);
 		else
 			result = dword1 | ((UINT64)dword0 << 32);
@@ -1506,7 +1506,7 @@ void debug_write_word(const address_space *space, offs_t address, UINT16 data, i
 	/* if this is a misaligned write, or if there are no word writers, just read two bytes */
 	if ((address & 1) != 0)
 	{
-		if (space->endianness == CPU_IS_LE)
+		if (space->endianness == ENDIANNESS_LITTLE)
 		{
 			debug_write_byte(space, address + 0, data >> 0, apply_translation);
 			debug_write_byte(space, address + 1, data >> 8, apply_translation);
@@ -1560,7 +1560,7 @@ void debug_write_dword(const address_space *space, offs_t address, UINT32 data, 
 	/* if this is a misaligned write, or if there are no dword writers, just read two words */
 	if ((address & 3) != 0)
 	{
-		if (space->endianness == CPU_IS_LE)
+		if (space->endianness == ENDIANNESS_LITTLE)
 		{
 			debug_write_word(space, address + 0, data >> 0, apply_translation);
 			debug_write_word(space, address + 2, data >> 16, apply_translation);
@@ -1614,7 +1614,7 @@ void debug_write_qword(const address_space *space, offs_t address, UINT64 data, 
 	/* if this is a misaligned write, or if there are no qword writers, just read two dwords */
 	if ((address & 7) != 0)
 	{
-		if (space->endianness == CPU_IS_LE)
+		if (space->endianness == ENDIANNESS_LITTLE)
 		{
 			debug_write_dword(space, address + 0, data >> 0, apply_translation);
 			debug_write_dword(space, address + 4, data >> 32, apply_translation);
@@ -1682,7 +1682,7 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 		UINT64 r0 = debug_read_opcode(space, address + 0, halfsize, arg);
 		UINT64 r1 = debug_read_opcode(space, address + halfsize, halfsize, arg);
 
-		if (space->endianness == CPU_IS_LE)
+		if (space->endianness == ENDIANNESS_LITTLE)
 			return r0 | (r1 << (8 * halfsize));
 		else
 			return r1 | (r0 << (8 * halfsize));
@@ -1702,7 +1702,7 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 
 		/* dump opcodes in bytes from a word-sized bus */
 		case 21:
-			address ^= (space->endianness == CPU_IS_LE) ? BYTE_XOR_LE(0) : BYTE_XOR_BE(0);
+			address ^= (space->endianness == ENDIANNESS_LITTLE) ? BYTE_XOR_LE(0) : BYTE_XOR_BE(0);
 			break;
 
 		/* dump opcodes in words from a word-sized bus */
@@ -1711,12 +1711,12 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 
 		/* dump opcodes in bytes from a dword-sized bus */
 		case 41:
-			address ^= (space->endianness == CPU_IS_LE) ? BYTE4_XOR_LE(0) : BYTE4_XOR_BE(0);
+			address ^= (space->endianness == ENDIANNESS_LITTLE) ? BYTE4_XOR_LE(0) : BYTE4_XOR_BE(0);
 			break;
 
 		/* dump opcodes in words from a dword-sized bus */
 		case 42:
-			address ^= (space->endianness == CPU_IS_LE) ? WORD_XOR_LE(0) : WORD_XOR_BE(0);
+			address ^= (space->endianness == ENDIANNESS_LITTLE) ? WORD_XOR_LE(0) : WORD_XOR_BE(0);
 			break;
 
 		/* dump opcodes in dwords from a dword-sized bus */
@@ -1725,17 +1725,17 @@ UINT64 debug_read_opcode(const address_space *space, offs_t address, int size, i
 
 		/* dump opcodes in bytes from a qword-sized bus */
 		case 81:
-			address ^= (space->endianness == CPU_IS_LE) ? BYTE8_XOR_LE(0) : BYTE8_XOR_BE(0);
+			address ^= (space->endianness == ENDIANNESS_LITTLE) ? BYTE8_XOR_LE(0) : BYTE8_XOR_BE(0);
 			break;
 
 		/* dump opcodes in words from a qword-sized bus */
 		case 82:
-			address ^= (space->endianness == CPU_IS_LE) ? WORD2_XOR_LE(0) : WORD2_XOR_BE(0);
+			address ^= (space->endianness == ENDIANNESS_LITTLE) ? WORD2_XOR_LE(0) : WORD2_XOR_BE(0);
 			break;
 
 		/* dump opcodes in dwords from a qword-sized bus */
 		case 84:
-			address ^= (space->endianness == CPU_IS_LE) ? DWORD_XOR_LE(0) : DWORD_XOR_BE(0);
+			address ^= (space->endianness == ENDIANNESS_LITTLE) ? DWORD_XOR_LE(0) : DWORD_XOR_BE(0);
 			break;
 
 		/* dump opcodes in qwords from a qword-sized bus */
@@ -2161,7 +2161,7 @@ static void watchpoint_check(const address_space *space, int type, offs_t addres
 			mem_mask >>= 8;
 		}
 
-		if (space->endianness == CPU_IS_LE)
+		if (space->endianness == ENDIANNESS_LITTLE)
 			address += address_offset;
 		else
 			address += bus_size - size - address_offset;
@@ -2408,7 +2408,7 @@ static UINT64 expression_read_program_direct(const address_space *space, int opc
 			r1 = expression_read_program_direct(space, opcode | 2, address + halfsize, halfsize);
 
 			/* assemble based on the target endianness */
-			if (space->endianness == CPU_IS_LE)
+			if (space->endianness == ENDIANNESS_LITTLE)
 				result = r0 | (r1 << (8 * halfsize));
 			else
 				result = r1 | (r0 << (8 * halfsize));
@@ -2429,7 +2429,7 @@ static UINT64 expression_read_program_direct(const address_space *space, int opc
 			/* if we have a valid base, return the appropriate byte */
 			if (base != NULL)
 			{
-				if (space->endianness == CPU_IS_LE)
+				if (space->endianness == ENDIANNESS_LITTLE)
 					result = base[BYTE8_XOR_LE(address) & lowmask];
 				else
 					result = base[BYTE8_XOR_BE(address) & lowmask];
@@ -2611,7 +2611,7 @@ static void expression_write_program_direct(const address_space *space, int opco
 
 			/* break apart based on the target endianness */
 			halfmask = ~(UINT64)0 >> (64 - 8 * halfsize);
-			if (space->endianness == CPU_IS_LE)
+			if (space->endianness == ENDIANNESS_LITTLE)
 			{
 				r0 = data & halfmask;
 				r1 = (data >> (8 * halfsize)) & halfmask;
@@ -2642,7 +2642,7 @@ static void expression_write_program_direct(const address_space *space, int opco
 			/* if we have a valid base, write the appropriate byte */
 			if (base != NULL)
 			{
-				if (space->endianness == CPU_IS_LE)
+				if (space->endianness == ENDIANNESS_LITTLE)
 					base[BYTE8_XOR_LE(address) & lowmask] = data;
 				else
 					base[BYTE8_XOR_BE(address) & lowmask] = data;

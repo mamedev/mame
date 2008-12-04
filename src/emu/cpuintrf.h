@@ -77,7 +77,7 @@ enum
 	CPUINFO_INT_INPUT_LINES,							/* R/O: number of input lines */
 	CPUINFO_INT_OUTPUT_LINES,							/* R/O: number of output lines */
 	CPUINFO_INT_DEFAULT_IRQ_VECTOR,						/* R/O: default IRQ vector */
-	CPUINFO_INT_ENDIANNESS,								/* R/O: either CPU_IS_BE or CPU_IS_LE */
+	CPUINFO_INT_ENDIANNESS,								/* R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE */
 	CPUINFO_INT_CLOCK_MULTIPLIER,						/* R/O: internal clock multiplier */
 	CPUINFO_INT_CLOCK_DIVIDER,							/* R/O: internal clock divider */
 	CPUINFO_INT_MIN_INSTRUCTION_BYTES,					/* R/O: minimum bytes per instruction */
@@ -164,14 +164,6 @@ enum
 	/* This value is passed to activecpu_get_reg to retrieve the current
      * stack pointer value. */
 	REG_SP = CPUINFO_INT_SP - CPUINFO_INT_REGISTER
-};
-
-
-/* Endianness constants */
-enum
-{
-	CPU_IS_LE = 0,				/* emulated CPU is little endian */
-	CPU_IS_BE					/* emulated CPU is big endian */
 };
 
 

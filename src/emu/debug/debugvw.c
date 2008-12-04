@@ -2441,7 +2441,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 		subview->base = memory_region(machine, rgntag);
 		subview->length = memory_region_length(machine, rgntag);
 		subview->offsetxor = memory_region_length(machine, rgntag);
-		subview->endianness = little_endian ? CPU_IS_LE : CPU_IS_BE;
+		subview->endianness = little_endian ? ENDIANNESS_LITTLE : ENDIANNESS_BIG;
 		subview->prefsize = MIN(width, 8);
 		strcpy(subview->name, astring_c(tempstring));
 		
@@ -2479,9 +2479,9 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 			subview->length = valcount * valsize;
 			subview->offsetxor = 0;
 #ifdef LSB_FIRST
-			subview->endianness = CPU_IS_LE;
+			subview->endianness = ENDIANNESS_LITTLE;
 #else
-			subview->endianness = CPU_IS_BE;
+			subview->endianness = ENDIANNESS_BIG;
 #endif
 			subview->prefsize = MIN(valsize, 8);
 			strcpy(subview->name, astring_c(tempstring));
@@ -3004,7 +3004,7 @@ static UINT64 memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t of
 	if (size > 1)
 	{
 		size /= 2;
-		if (memdata->desc->endianness == CPU_IS_LE)
+		if (memdata->desc->endianness == ENDIANNESS_LITTLE)
 			return memory_view_read(memdata, size, offs + 0 * size) | ((UINT64)memory_view_read(memdata, size, offs + 1 * size) << (size * 8));
 		else
 			return memory_view_read(memdata, size, offs + 1 * size) | ((UINT64)memory_view_read(memdata, size, offs + 0 * size) << (size * 8));
@@ -3046,7 +3046,7 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 	if (size > 1)
 	{
 		size /= 2;
-		if (memdata->desc->endianness == CPU_IS_LE)
+		if (memdata->desc->endianness == ENDIANNESS_LITTLE)
 		{
 			memory_view_write(memdata, size, offs + 0 * size, data);
 			memory_view_write(memdata, size, offs + 1 * size, data >> (8 * size));

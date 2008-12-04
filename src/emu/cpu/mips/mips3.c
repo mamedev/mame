@@ -2170,7 +2170,7 @@ CPU_GET_INFO( r4600be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4600be);				break;
@@ -2188,7 +2188,7 @@ CPU_GET_INFO( r4600le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4600le);				break;
@@ -2228,7 +2228,7 @@ CPU_GET_INFO( r4650be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4650be);				break;
@@ -2246,7 +2246,7 @@ CPU_GET_INFO( r4650le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4650le);				break;
@@ -2286,7 +2286,7 @@ CPU_GET_INFO( r4700be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4700be);				break;
@@ -2305,7 +2305,7 @@ CPU_GET_INFO( r4700le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r4700le);				break;
@@ -2345,7 +2345,7 @@ CPU_GET_INFO( r5000be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r5000be);				break;
@@ -2363,7 +2363,7 @@ CPU_GET_INFO( r5000le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(r5000le);				break;
@@ -2403,7 +2403,7 @@ CPU_GET_INFO( qed5271be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(qed5271be);			break;
@@ -2421,7 +2421,7 @@ CPU_GET_INFO( qed5271le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(qed5271le);			break;
@@ -2461,7 +2461,7 @@ CPU_GET_INFO( rm7000be )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rm7000be);				break;
@@ -2479,7 +2479,7 @@ CPU_GET_INFO( rm7000le )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_LE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(rm7000le);				break;

@@ -1511,7 +1511,7 @@ static void memory_init_spaces(running_machine *machine)
 					space->machine = machine;
 					space->cpu = machine->cpu[cpunum];
 					space->name = address_space_names[spacenum];
-					space->accessors = memory_accessors[accessorindex][(endianness == CPU_IS_LE) ? 0 : 1];
+					space->accessors = memory_accessors[accessorindex][(endianness == ENDIANNESS_LITTLE) ? 0 : 1];
 					space->addrmask = 0xffffffffUL >> (32 - abits);
 					space->bytemask = (ashift < 0) ? ((space->addrmask << -ashift) | ((1 << -ashift) - 1)) : (space->addrmask >> ashift);
 					space->logaddrmask = 0xffffffffUL >> (32 - logbits);
@@ -2492,7 +2492,7 @@ static void table_compute_subhandler(handler_data **table, UINT8 entry, read_or_
 	assert_always(hdata->subunits > 0, "table_compute_subhandler called with no bytes specified in mask");
 
 	/* then fill in the shifts based on the endianness */
-	if (spaceendian == CPU_IS_LE)
+	if (spaceendian == ENDIANNESS_LITTLE)
 	{
 		UINT8 *unitshift = &hdata->subshift[0];
 		for (unitnum = 0; unitnum < maxunits; unitnum++)

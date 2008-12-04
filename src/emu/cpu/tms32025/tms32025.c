@@ -2324,7 +2324,7 @@ CPU_GET_INFO( tms32025 )
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(R);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 6;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = CPU_IS_BE;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;

@@ -2154,7 +2154,7 @@ CPU_GET_INFO( i960 )
 	case CPUINFO_STR_NAME:					strcpy(info->s, "i960KB");							break;
 	case CPUINFO_STR_CORE_FILE:				strcpy(info->s, __FILE__);							break;
 	case CPUINFO_STR_FLAGS:					strcpy(info->s, i960_get_strflags(i960));			break;
-	case CPUINFO_INT_ENDIANNESS:			info->i = CPU_IS_LE;								break;
+	case CPUINFO_INT_ENDIANNESS:			info->i = ENDIANNESS_LITTLE;								break;
 	case CPUINFO_INT_INPUT_LINES:			info->i = 4;										break;
 	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:	info->i = -1;										break;
 	case CPUINFO_INT_CLOCK_MULTIPLIER:		info->i = 1;										break;
