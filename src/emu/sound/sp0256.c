@@ -33,7 +33,6 @@
 
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "sp0256.h"
@@ -1206,7 +1205,7 @@ static SND_START( sp0256 )
     /* -------------------------------------------------------------------- */
     /*  Setup the ROM.                                                      */
     /* -------------------------------------------------------------------- */
-	sp->rom = memory_region(Machine, tag);
+	sp->rom = memory_region(device->machine, tag);
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 
 	return sp;
@@ -1214,14 +1213,12 @@ static SND_START( sp0256 )
 
 static SND_STOP( sp0256 )
 {
-	struct sp0256 *sp = token;
+	struct sp0256 *sp = device->token;
 	free( sp->scratch );
 }
 
-static SND_RESET( sp0256 )
+static void sp0256_reset(struct sp0256 *sp)
 {
-	struct sp0256 *sp = token;
-
 	/* ---------------------------------------------------------------- */
 	/*  Reset the FIFO and SP0256.                                      */
 	/* ---------------------------------------------------------------- */
@@ -1241,6 +1238,11 @@ static SND_RESET( sp0256 )
 	sp->silent   = 1;
 	if( sp->drq ) sp->drq(ASSERT_LINE);
 	SET_SBY(ASSERT_LINE)
+}
+
+static SND_RESET( sp0256 )
+{
+	sp0256_reset(device->token);
 }
 
 WRITE8_HANDLER( sp0256_ALD_w )
@@ -1314,7 +1316,7 @@ WRITE16_HANDLER( spb640_w )
 		if (data & 0x400)
 		{
 			sp->fifo_head = sp->fifo_tail = sp->fifo_bitp = 0;
-			SND_RESET_NAME( sp0256 )(sp);
+			sp0256_reset(sp);
 			return;
 		}
 

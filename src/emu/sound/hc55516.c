@@ -110,7 +110,8 @@ static SND_START( mc3418 )
 
 static SND_RESET( hc55516 )
 {
-	((struct hc55516_data *)token)->last_clock_state = 0;
+	struct hc55516_data *chip = device->token;
+	chip->last_clock_state = 0;
 }
 
 

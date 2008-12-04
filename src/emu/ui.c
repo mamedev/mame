@@ -1010,7 +1010,7 @@ astring *game_info_astring(running_machine *machine, astring *string)
 	for (sndnum = 0; sndnum < MAX_SOUND && machine->config->sound[sndnum].type != SOUND_DUMMY; sndnum += count)
 	{
 		sound_type type = machine->config->sound[sndnum].type;
-		int clock = sndnum_clock(sndnum);
+		int clock = machine->config->sound[sndnum].clock;
 
 		/* append the Sound: string */
 		if (sndnum == 0)
@@ -1019,13 +1019,13 @@ astring *game_info_astring(running_machine *machine, astring *string)
 		/* count how many identical sound chips we have */
 		for (count = 1; sndnum + count < MAX_SOUND; count++)
 			if (machine->config->sound[sndnum + count].type != type ||
-		        sndnum_clock(sndnum + count) != clock)
+		        machine->config->sound[sndnum + count].clock != clock)
 		    	break;
 
-		/* if more than one, prepend a #x in front of the CPU name */
+		/* if more than one, prepend a #x in front of the SND name */
 		if (count > 1)
 			astring_catprintf(string, "%d" UTF8_MULTIPLY, count);
-		astring_catc(string, sndnum_name(sndnum));
+		astring_catc(string, sndtype_get_name(type));
 
 		/* display clock in kHz or MHz */
 		if (clock >= 1000000)

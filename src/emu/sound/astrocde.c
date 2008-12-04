@@ -196,10 +196,8 @@ static void astrocade_update(void *param, stream_sample_t **inputs, stream_sampl
  *
  *************************************/
 
-static SND_RESET( astrocade )
+static void astrocade_reset(struct astrocade_info *chip)
 {
-	struct astrocade_info *chip = token;
-
 	memset(chip->reg, 0, sizeof(chip->reg));
 
 	chip->master_count = 0;
@@ -218,6 +216,10 @@ static SND_RESET( astrocade )
 	chip->c_state = 0;
 }
 
+SND_RESET( astrocade )
+{
+	astrocade_reset(device->token);
+}
 
 
 /*************************************
@@ -273,7 +275,7 @@ static SND_START( astrocade )
 	chip->stream = stream_create(0, 1, clock, chip, astrocade_update);
 
 	/* reset state */
-	SND_RESET_NAME( astrocade )(chip);
+	astrocade_reset(chip);
 	astrocade_state_save_register(chip, tag);
 
 	return chip;

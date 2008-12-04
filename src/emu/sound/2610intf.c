@@ -152,11 +152,11 @@ static SND_START( ym2610 )
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, tag));
-	pcmsizea = memory_region_length(Machine, tag);
+	pcmbufa  = (void *)(memory_region(device->machine, tag));
+	pcmsizea = memory_region_length(device->machine, tag);
 	astring_printf(name, "%s.deltat", tag);
-	pcmbufb  = (void *)(memory_region(Machine, astring_c(name)));
-	pcmsizeb = memory_region_length(Machine, astring_c(name));
+	pcmbufb  = (void *)(memory_region(device->machine, astring_c(name)));
+	pcmsizeb = memory_region_length(device->machine, astring_c(name));
 	astring_free(name);
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
@@ -169,7 +169,7 @@ static SND_START( ym2610 )
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 
-	state_save_register_postload(Machine, ym2610_intf_postload, info);
+	state_save_register_postload(device->machine, ym2610_intf_postload, info);
 
 	if (info->chip)
 		return info;
@@ -218,11 +218,11 @@ static SND_START( ym2610b )
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(Machine, tag));
-	pcmsizea = memory_region_length(Machine, tag);
+	pcmbufa  = (void *)(memory_region(device->machine, tag));
+	pcmsizea = memory_region_length(device->machine, tag);
 	astring_printf(name, "%s.deltat", tag);
-	pcmbufb  = (void *)(memory_region(Machine, astring_c(name)));
-	pcmsizeb = memory_region_length(Machine, astring_c(name));
+	pcmbufb  = (void *)(memory_region(device->machine, astring_c(name)));
+	pcmsizeb = memory_region_length(device->machine, astring_c(name));
 	astring_free(name);
 	if (pcmbufb == NULL || pcmsizeb == 0)
 	{
@@ -244,14 +244,14 @@ static SND_START( ym2610b )
 
 static SND_STOP( ym2610 )
 {
-	struct ym2610_info *info = token;
+	struct ym2610_info *info = device->token;
 	ym2610_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
 static SND_RESET( ym2610 )
 {
-	struct ym2610_info *info = token;
+	struct ym2610_info *info = device->token;
 	ym2610_reset_chip(info->chip);
 }
 

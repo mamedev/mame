@@ -187,24 +187,24 @@ enum
 ***************************************************************************/
 
 #define SND_GET_INFO_NAME(name)		snd_get_info_##name
-#define SND_GET_INFO(name)			void SND_GET_INFO_NAME(name)(void *token, UINT32 state, sndinfo *info)
-#define SND_GET_INFO_CALL(name)		SND_GET_INFO_NAME(name)(token, state, info)
+#define SND_GET_INFO(name)			void SND_GET_INFO_NAME(name)(const device_config *device, UINT32 state, sndinfo *info)
+#define SND_GET_INFO_CALL(name)		SND_GET_INFO_NAME(name)(device, state, info)
 
 #define SND_SET_INFO_NAME(name)		snd_set_info_##name
-#define SND_SET_INFO(name)			void SND_SET_INFO_NAME(name)(void *token, UINT32 state, sndinfo *info)
-#define SND_SET_INFO_CALL(name)		SND_SET_INFO_NAME(name)(token, state, info)
+#define SND_SET_INFO(name)			void SND_SET_INFO_NAME(name)(const device_config *device, UINT32 state, sndinfo *info)
+#define SND_SET_INFO_CALL(name)		SND_SET_INFO_NAME(name)(device, state, info)
 
 #define SND_START_NAME(name)		snd_start_##name
-#define SND_START(name)				void *SND_START_NAME(name)(const char *tag, int sndindex, int clock, const void *config)
-#define SND_START_CALL(name)		SND_START_NAME(name)(tag, sndindex, clock, config)
+#define SND_START(name)				void *SND_START_NAME(name)(const device_config *device, const char *tag, int sndindex, int clock, const void *config)
+#define SND_START_CALL(name)		SND_START_NAME(name)(device, tag, sndindex, clock, config)
 
 #define SND_STOP_NAME(name)			snd_stop_##name
-#define SND_STOP(name)				void SND_STOP_NAME(name)(void *token)
-#define SND_STOP_CALL(name)			SND_STOP_NAME(name)(token)
+#define SND_STOP(name)				void SND_STOP_NAME(name)(const device_config *device)
+#define SND_STOP_CALL(name)			SND_STOP_NAME(name)(device)
 
 #define SND_RESET_NAME(name)		snd_reset_##name
-#define SND_RESET(name)				void SND_RESET_NAME(name)(void *token)
-#define SND_RESET_CALL(name)		SND_RESET_NAME(name)(token)
+#define SND_RESET(name)				void SND_RESET_NAME(name)(const device_config *device)
+#define SND_RESET_CALL(name)		SND_RESET_NAME(name)(device)
 
 
 
@@ -212,7 +212,18 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
+/* forward declaration of this union */
 typedef union _sndinfo sndinfo;
+
+/* define the various callback functions */
+typedef void (*snd_get_info_func)(const device_config *device, UINT32 state, sndinfo *info);
+typedef void (*snd_set_info_func)(const device_config *device, UINT32 state, sndinfo *info);
+typedef void *(*snd_start_func)(const device_config *device, const char *tag, int sndindex, int clock, const void *config);
+typedef void (*snd_stop_func)(const device_config *device);
+typedef void (*snd_reset_func)(const device_config *device);
+
+
+/* sndinfo union used to pass data to/from the get_info/set_info functions */
 union _sndinfo
 {
 	INT64	i;											/* generic integers */
@@ -220,12 +231,25 @@ union _sndinfo
 	genf *  f;											/* generic function pointers */
 	const char *s;										/* generic strings */
 
-	void	(*set_info)(void *token, UINT32 state, sndinfo *info);
-	void *	(*start)(const char *tag, int index, int clock, const void *config);/* SNDINFO_PTR_START */
-	void	(*stop)(void *token);						/* SNDINFO_PTR_STOP */
-	void	(*reset)(void *token);						/* SNDINFO_PTR_RESET */
+	snd_set_info_func	set_info;						/* SNDINFO_PTR_SET_INFO */
+	snd_start_func		start;							/* SNDINFO_PTR_START */
+	snd_stop_func		stop;							/* SNDINFO_PTR_STOP */
+	snd_reset_func		reset;							/* SNDINFO_PTR_RESET */
 };
 
+typedef struct _snd_class_header snd_class_header;
+struct _snd_class_header
+{
+	int						index;					/* index of this SND */
+	sound_type				sndtype; 				/* type index of this SND */
+
+	/* table of core functions */
+	snd_get_info_func	get_info;
+	snd_set_info_func	set_info;
+	snd_start_func		start;
+	snd_stop_func		stop;
+	snd_reset_func		reset;
+};
 
 
 /***************************************************************************
@@ -243,11 +267,11 @@ void sndnum_set_info_int(int sndnum, UINT32 state, INT64 data);
 void sndnum_set_info_ptr(int sndnum, UINT32 state, void *data);
 void sndnum_set_info_fct(int sndnum, UINT32 state, genf *data);
 
-#define sndnum_name(sndnum)						sndnum_get_info_string(sndnum, SNDINFO_STR_NAME)
-#define sndnum_core_family(sndnum)				sndnum_get_info_string(sndnum, SNDINFO_STR_CORE_FAMILY)
-#define sndnum_core_version(sndnum)				sndnum_get_info_string(sndnum, SNDINFO_STR_CORE_VERSION)
-#define sndnum_core_file(sndnum)				sndnum_get_info_string(sndnum, SNDINFO_STR_CORE_FILE)
-#define sndnum_core_credits(sndnum)				sndnum_get_info_string(sndnum, SNDINFO_STR_CORE_CREDITS)
+#define sndnum_get_name(sndnum)					sndnum_get_info_string(sndnum, SNDINFO_STR_NAME)
+#define sndnum_get_core_family(sndnum)			sndnum_get_info_string(sndnum, SNDINFO_STR_CORE_FAMILY)
+#define sndnum_get_core_version(sndnum)			sndnum_get_info_string(sndnum, SNDINFO_STR_CORE_VERSION)
+#define sndnum_get_core_file(sndnum)			sndnum_get_info_string(sndnum, SNDINFO_STR_CORE_FILE)
+#define sndnum_get_core_credits(sndnum)			sndnum_get_info_string(sndnum, SNDINFO_STR_CORE_CREDITS)
 
 /* misc accessors */
 void sndnum_reset(int sndnum);
@@ -271,11 +295,11 @@ void sndti_set_info_int(sound_type sndtype, int sndindex, UINT32 state, INT64 da
 void sndti_set_info_ptr(sound_type sndtype, int sndindex, UINT32 state, void *data);
 void sndti_set_info_fct(sound_type sndtype, int sndindex, UINT32 state, genf *data);
 
-#define sndti_name(sndtype, sndindex)			sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_NAME)
-#define sndti_core_family(sndtype, sndindex)	sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_FAMILY)
-#define sndti_core_version(sndtype, sndindex)	sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_VERSION)
-#define sndti_core_file(sndtype, sndindex)		sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_FILE)
-#define sndti_core_credits(sndtype, sndindex)	sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_CREDITS)
+#define sndti_get_name(sndtype, sndindex)			sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_NAME)
+#define sndti_get_core_family(sndtype, sndindex)	sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_FAMILY)
+#define sndti_get_core_version(sndtype, sndindex)	sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_VERSION)
+#define sndti_get_core_file(sndtype, sndindex)		sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_FILE)
+#define sndti_get_core_credits(sndtype, sndindex)	sndti_get_info_string(sndtype, sndindex, SNDINFO_STR_CORE_CREDITS)
 
 /* misc accessors */
 void sndti_reset(sound_type sndtype, int sndindex);
@@ -297,11 +321,11 @@ void *sndtype_get_info_ptr(sound_type sndtype, UINT32 state);
 genf *sndtype_get_info_fct(sound_type sndtype, UINT32 state);
 const char *sndtype_get_info_string(sound_type sndtype, UINT32 state);
 
-#define sndtype_name(sndtype)					sndtype_get_info_string(sndtype, SNDINFO_STR_NAME)
-#define sndtype_core_family(sndtype)			sndtype_get_info_string(sndtype, SNDINFO_STR_CORE_FAMILY)
-#define sndtype_core_version(sndtype)			sndtype_get_info_string(sndtype, SNDINFO_STR_CORE_VERSION)
-#define sndtype_core_file(sndtype)				sndtype_get_info_string(sndtype, SNDINFO_STR_CORE_FILE)
-#define sndtype_core_credits(sndtype)			sndtype_get_info_string(sndtype, SNDINFO_STR_CORE_CREDITS)
+#define sndtype_get_name(sndtype)					sndtype_get_info_string(sndtype, SNDINFO_STR_NAME)
+#define sndtype_get_core_family(sndtype)			sndtype_get_info_string(sndtype, SNDINFO_STR_CORE_FAMILY)
+#define sndtype_get_core_version(sndtype)			sndtype_get_info_string(sndtype, SNDINFO_STR_CORE_VERSION)
+#define sndtype_get_core_file(sndtype)				sndtype_get_info_string(sndtype, SNDINFO_STR_CORE_FILE)
+#define sndtype_get_core_credits(sndtype)			sndtype_get_info_string(sndtype, SNDINFO_STR_CORE_CREDITS)
 
 
 

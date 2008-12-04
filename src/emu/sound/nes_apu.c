@@ -47,7 +47,6 @@
 #include "sndintrf.h"
 #include "cpuexec.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "nes_apu.h"
 #include "cpu/m6502/m6502.h"
 
@@ -681,9 +680,9 @@ static SND_START( nesapu )
 	memset(info, 0, sizeof(*info));
 
 	/* Initialize global variables */
-	info->samps_per_sync = rate / ATTOSECONDS_TO_HZ(video_screen_get_frame_period(Machine->primary_screen).attoseconds);
+	info->samps_per_sync = rate / ATTOSECONDS_TO_HZ(video_screen_get_frame_period(device->machine->primary_screen).attoseconds);
 	info->buffer_size = info->samps_per_sync;
-	info->real_rate = info->samps_per_sync * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(Machine->primary_screen).attoseconds);
+	info->real_rate = info->samps_per_sync * ATTOSECONDS_TO_HZ(video_screen_get_frame_period(device->machine->primary_screen).attoseconds);
 	info->apu_incsize = (float) (clock / (float) info->real_rate);
 
 	/* Use initializer calls */
@@ -695,7 +694,7 @@ static SND_START( nesapu )
 	info->buffer_size+=info->samps_per_sync;
 
 	/* Initialize individual chips */
-	(info->APU.dpcm).memory = cputag_get_address_space(Machine, intf->cpu_tag, ADDRESS_SPACE_PROGRAM);
+	(info->APU.dpcm).memory = cputag_get_address_space(device->machine, intf->cpu_tag, ADDRESS_SPACE_PROGRAM);
 
 	info->stream = stream_create(0, 1, rate, info, nes_psg_update_sound);
 

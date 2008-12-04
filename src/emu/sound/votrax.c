@@ -108,10 +108,10 @@ static SND_START( votrax )
 	memset(votrax, 0, sizeof(*votrax));
 
 	votrax->samples = readsamples(VotraxTable,"votrax");
-    votrax->frequency = 8000;
-    votrax->volume = 230;
+	votrax->frequency = 8000;
+	votrax->volume = 230;
 
-    votrax->channel = stream_create(0, 1, Machine->sample_rate, votrax, votrax_update_sound);
+	votrax->channel = stream_create(0, 1, device->machine->sample_rate, votrax, votrax_update_sound);
 
 	votrax->sample = NULL;
 	votrax->step = 0;

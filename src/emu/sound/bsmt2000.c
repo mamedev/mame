@@ -14,7 +14,6 @@
 #include <math.h>
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "bsmt2000.h"
 
@@ -86,8 +85,7 @@ struct _bsmt2000_chip
 ***************************************************************************/
 
 /* core implementation */
-static SND_START( bsmt2000 );
-static SND_RESET( bsmt2000 );
+static void bsmt2000_reset(bsmt2000_chip *chip);
 static void bsmt2000_update(void *param, stream_sample_t **inputs, stream_sample_t **buffer, int length);
 
 /* read/write access */
@@ -121,8 +119,8 @@ static SND_START( bsmt2000 )
 	chip->clock = clock;
 
 	/* initialize the regions */
-	chip->region_base = (INT8 *)memory_region(Machine, tag);
-	chip->total_banks = memory_region_length(Machine, tag) / 0x10000;
+	chip->region_base = (INT8 *)memory_region(device->machine, tag);
+	chip->total_banks = memory_region_length(device->machine, tag) / 0x10000;
 
 	/* register chip-wide data for save states */
 	state_save_register_item("bsmt2000", tag, 0, chip->last_register);
@@ -148,7 +146,7 @@ static SND_START( bsmt2000 )
 	}
 
 	/* reset the chip -- this also configures the default mode */
-	SND_RESET_NAME( bsmt2000 )(chip);
+	bsmt2000_reset(chip);
 	return chip;
 }
 
@@ -157,9 +155,8 @@ static SND_START( bsmt2000 )
     SND_RESET( bsmt2000 ) - chip reset callback
 -------------------------------------------------*/
 
-static SND_RESET( bsmt2000 )
+static void bsmt2000_reset(bsmt2000_chip *chip)
 {
-	bsmt2000_chip *chip = token;
 	int voicenum;
 
 	/* reset all the voice data */
@@ -173,6 +170,11 @@ static SND_RESET( bsmt2000 )
 
 	/* recompute the mode */
 	set_mode(chip);
+}
+
+static SND_RESET( bsmt2000 )
+{
+	bsmt2000_reset(device->token);
 }
 
 

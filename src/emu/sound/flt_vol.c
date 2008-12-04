@@ -1,6 +1,5 @@
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "flt_vol.h"
 
 
@@ -31,7 +30,7 @@ static SND_START( filter_volume )
 	memset(info, 0, sizeof(*info));
 
 	info->gain = 0x100;
-	info->stream = stream_create(1, 1, Machine->sample_rate, info, filter_volume_update);
+	info->stream = stream_create(1, 1, device->machine->sample_rate, info, filter_volume_update);
 
 	return info;
 }

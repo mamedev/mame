@@ -110,13 +110,13 @@ static SND_START( ym3812 )
 
 static SND_STOP( ym3812 )
 {
-	struct ym3812_info *info = token;
+	struct ym3812_info *info = device->token;
 	ym3812_shutdown(info->chip);
 }
 
 static SND_RESET( ym3812 )
 {
-	struct ym3812_info *info = token;
+	struct ym3812_info *info = device->token;
 	ym3812_reset_chip(info->chip);
 }
 
@@ -278,13 +278,13 @@ static SND_START( ym3526 )
 
 static SND_STOP( ym3526 )
 {
-	struct ym3526_info *info = token;
+	struct ym3526_info *info = device->token;
 	ym3526_shutdown(info->chip);
 }
 
 static SND_RESET( ym3526 )
 {
-	struct ym3526_info *info = token;
+	struct ym3526_info *info = device->token;
 	ym3526_reset_chip(info->chip);
 }
 
@@ -470,8 +470,8 @@ static SND_START( y8950 )
 
 	/* ADPCM ROM data */
 	y8950_set_delta_t_memory(info->chip,
-		(void *)(memory_region(Machine, tag)),
-			memory_region_length(Machine, tag) );
+		(void *)(memory_region(device->machine, tag)),
+			memory_region_length(device->machine, tag) );
 
 	info->stream = stream_create(0,1,rate,info,y8950_stream_update);
 
@@ -492,13 +492,13 @@ static SND_START( y8950 )
 
 static SND_STOP( y8950 )
 {
-	struct y8950_info *info = token;
+	struct y8950_info *info = device->token;
 	y8950_shutdown(info->chip);
 }
 
 static SND_RESET( y8950 )
 {
-	struct y8950_info *info = token;
+	struct y8950_info *info = device->token;
 	y8950_reset_chip(info->chip);
 }
 

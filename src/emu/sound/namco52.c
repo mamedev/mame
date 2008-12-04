@@ -46,7 +46,6 @@ Jan 12, 2005.  The 555 is probably an external playback frequency.
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "filter.h"
 #include "namco52.h"
@@ -70,7 +69,7 @@ struct namco_52xx
 	filter2_context n52_lp_filter;
 };
 
-static SND_RESET( namco_52xx );
+static void namco_52xx_reset(struct namco_52xx *chip);
 
 
 static void namco_52xx_stream_update_one(void *param, stream_sample_t **inputs, stream_sample_t **_buffer, int length)
@@ -100,7 +99,7 @@ static void namco_52xx_stream_update_one(void *param, stream_sample_t **inputs, 
 			/* sample done */
 			memset(&buffer[i], 0, (length - i) * sizeof(INT16));
 			i = length;
-			SND_RESET_NAME( namco_52xx )(chip);
+			namco_52xx_reset(chip);
 		}
 		else
 		{
@@ -120,14 +119,17 @@ static void namco_52xx_stream_update_one(void *param, stream_sample_t **inputs, 
 	}
 }
 
-
-static SND_RESET( namco_52xx )
+static void namco_52xx_reset(struct namco_52xx *chip)
 {
-	struct namco_52xx *chip = token;
 	chip->n52_pb_cycle = chip->n52_start = chip->n52_end = chip->n52_length = chip->n52_pos = 0;
 
 	filter2_reset(&chip->n52_hp_filter);
 	filter2_reset(&chip->n52_lp_filter);
+}
+
+static SND_RESET( namco_52xx )
+{
+	namco_52xx_reset(device->token);
 }
 
 static SND_START( namco_52xx )
@@ -139,8 +141,8 @@ static SND_START( namco_52xx )
 	memset(chip, 0, sizeof(*chip));
 
 	chip->intf = config;
-	chip->rom     = memory_region(Machine, tag);
-	chip->rom_len = memory_region_length(Machine, tag);
+	chip->rom     = memory_region(device->machine, tag);
+	chip->rom_len = memory_region_length(device->machine, tag);
 
 	if (chip->intf->play_rate == 0)
 	{
@@ -157,7 +159,7 @@ static SND_START( namco_52xx )
 
 	chip->stream = stream_create(0, 1, rate, chip, namco_52xx_stream_update_one);
 
-	SND_RESET_NAME( namco_52xx )(chip);
+	namco_52xx_reset(chip);
 
 	state_save_register_item("namco52xx", tag, 0, chip->n52_pb_cycle);
 	state_save_register_item("namco52xx", tag, 0, chip->n52_step);

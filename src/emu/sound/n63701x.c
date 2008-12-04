@@ -14,7 +14,6 @@ silence compression: '00 nn' must be replaced by nn+1 times '80'.
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "n63701x.h"
 
@@ -107,7 +106,7 @@ static SND_START( namco_63701x )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	chip->rom = memory_region(Machine, tag);
+	chip->rom = memory_region(device->machine, tag);
 
 	chip->stream = stream_create(0, 2, clock/1000, chip, namco_63701x_update);
 

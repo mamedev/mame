@@ -59,7 +59,6 @@
 
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "cpuintrf.h"
 #include "ymf278b.h"
@@ -655,12 +654,12 @@ static void ymf278b_data_port_C_w(int num, UINT8 data)
 	ymf278b_C_w(chip, chip->port_C, data);
 }
 
-static void ymf278b_init(YMF278BChip *chip, UINT8 *rom, void (*cb)(running_machine *, int), int clock)
+static void ymf278b_init(running_machine *machine, YMF278BChip *chip, UINT8 *rom, void (*cb)(running_machine *, int), int clock)
 {
 	chip->rom = rom;
 	chip->irq_callback = cb;
-	chip->timer_a = timer_alloc(Machine, ymf278b_timer_a_tick, chip);
-	chip->timer_b = timer_alloc(Machine, ymf278b_timer_b_tick, chip);
+	chip->timer_a = timer_alloc(machine, ymf278b_timer_a_tick, chip);
+	chip->timer_b = timer_alloc(machine, ymf278b_timer_b_tick, chip);
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = clock;
 
@@ -680,7 +679,7 @@ static SND_START( ymf278b )
 
 	intf = (config != NULL) ? config : &defintrf;
 
-	ymf278b_init(chip, memory_region(Machine, tag), intf->irq_callback, clock);
+	ymf278b_init(device->machine, chip, memory_region(device->machine, tag), intf->irq_callback, clock);
 	chip->stream = stream_create(0, 2, clock/768, chip, ymf278b_pcm_update);
 
 	// Volume table, 1 = -0.375dB, 8 = -3dB, 256 = -96dB

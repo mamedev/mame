@@ -1757,7 +1757,7 @@ static SND_START( ymf271 )
 
 	intf = (config != NULL) ? config : &defintrf;
 
-	ymf271_init(chip, memory_region(Machine, tag), intf->irq_callback, intf->ext_read, intf->ext_write);
+	ymf271_init(chip, memory_region(device->machine, tag), intf->irq_callback, intf->ext_read, intf->ext_write);
 	chip->stream = stream_create(0, 2, clock/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)
@@ -1801,7 +1801,7 @@ WRITE8_HANDLER( ymf271_1_w )
 static SND_RESET( ymf271 )
 {
 	int i;
-	YMF271Chip *chip = (YMF271Chip*)token;
+	YMF271Chip *chip = device->token;
 
 	for (i = 0; i < 48; i++)
 	{

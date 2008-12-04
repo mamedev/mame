@@ -846,12 +846,12 @@ static SND_START( ym2149 )
 
 static SND_STOP( ay8910 )
 {
-	ay8910_stop_ym(token);
+	ay8910_stop_ym(device->token);
 }
 
 static SND_RESET( ay8910 )
 {
-	ay8910_reset_ym(token);
+	ay8910_reset_ym(device->token);
 }
 
 static SND_SET_INFO( ay8910 )

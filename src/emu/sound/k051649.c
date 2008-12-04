@@ -151,7 +151,7 @@ static SND_START( k051649 )
 
 static SND_RESET( k051649 )
 {
-	struct k051649_info *info = token;
+	struct k051649_info *info = device->token;
 	k051649_sound_channel *voice = info->channel_list;
 	int i;
 

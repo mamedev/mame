@@ -541,7 +541,7 @@ static SND_START( samples )
 
 	/* read audio samples */
 	if (intf->samplenames)
-		info->samples = readsamples(intf->samplenames,Machine->gamedrv->name);
+		info->samples = readsamples(intf->samplenames,device->machine->gamedrv->name);
 
 	/* allocate channels */
 	info->numchannels = intf->channels;
@@ -549,7 +549,7 @@ static SND_START( samples )
 	info->channel = auto_malloc(sizeof(*info->channel) * info->numchannels);
 	for (i = 0; i < info->numchannels; i++)
 	{
-	    info->channel[i].stream = stream_create(0, 1, Machine->sample_rate, &info->channel[i], sample_update_sound);
+	    info->channel[i].stream = stream_create(0, 1, device->machine->sample_rate, &info->channel[i], sample_update_sound);
 
 		info->channel[i].source = NULL;
 		info->channel[i].source_num = -1;
@@ -566,7 +566,7 @@ static SND_START( samples )
         state_save_register_item("samples", tag, i, info->channel[i].loop);
         state_save_register_item("samples", tag, i, info->channel[i].paused);
 	}
-	state_save_register_postload(Machine, samples_postload, info);
+	state_save_register_postload(device->machine, samples_postload, info);
 
 	/* initialize any custom handlers */
 	if (intf->start)

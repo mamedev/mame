@@ -230,7 +230,6 @@ and off as it normally does during speech). Once START has gone low-high-low, th
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "s14001a.h"
 
 typedef struct
@@ -575,9 +574,9 @@ static SND_START( s14001a )
 		chip->filtervals[i] = SILENCE;
 	}
 
-	chip->SpeechRom = memory_region(Machine, tag);
+	chip->SpeechRom = memory_region(device->machine, tag);
 
-	chip->stream = stream_create(0, 1, clock ? clock : Machine->sample_rate, chip, s14001a_pcm_update);
+	chip->stream = stream_create(0, 1, clock ? clock : device->machine->sample_rate, chip, s14001a_pcm_update);
 
 	return chip;
 }

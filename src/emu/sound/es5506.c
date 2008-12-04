@@ -820,7 +820,7 @@ static void es5506_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 ***********************************************************************************************/
 
-static void *es5506_start_common(sound_type sndtype, const char *tag, int sndindex, int clock, const void *config)
+static void *es5506_start_common(const device_config *device, const char *tag, int sndindex, int clock, const void *config, sound_type sndtype)
 {
 	const es5506_interface *intf = config;
 	struct ES5506Chip *chip;
@@ -842,10 +842,10 @@ static void *es5506_start_common(sound_type sndtype, const char *tag, int sndind
 	chip->stream = stream_create(0, 2, clock / (16*32), chip, es5506_update);
 
 	/* initialize the regions */
-	chip->region_base[0] = intf->region0 ? (UINT16 *)memory_region(Machine, intf->region0) : NULL;
-	chip->region_base[1] = intf->region1 ? (UINT16 *)memory_region(Machine, intf->region1) : NULL;
-	chip->region_base[2] = intf->region2 ? (UINT16 *)memory_region(Machine, intf->region2) : NULL;
-	chip->region_base[3] = intf->region3 ? (UINT16 *)memory_region(Machine, intf->region3) : NULL;
+	chip->region_base[0] = intf->region0 ? (UINT16 *)memory_region(device->machine, intf->region0) : NULL;
+	chip->region_base[1] = intf->region1 ? (UINT16 *)memory_region(device->machine, intf->region1) : NULL;
+	chip->region_base[2] = intf->region2 ? (UINT16 *)memory_region(device->machine, intf->region2) : NULL;
+	chip->region_base[3] = intf->region3 ? (UINT16 *)memory_region(device->machine, intf->region3) : NULL;
 
 	/* initialize the rest of the structure */
 	chip->master_clock = clock;
@@ -874,7 +874,7 @@ static void *es5506_start_common(sound_type sndtype, const char *tag, int sndind
 
 static SND_START( es5506 )
 {
-	return es5506_start_common(SOUND_ES5506, tag, sndindex, clock, config);
+	return es5506_start_common(device, tag, sndindex, clock, config, SOUND_ES5506);
 }
 
 
@@ -1511,7 +1511,7 @@ static SND_START( es5505 )
 	es5506intf.irq_callback = intf->irq_callback;
 	es5506intf.read_port = intf->read_port;
 
-	return es5506_start_common(SOUND_ES5505, tag, sndindex, clock, &es5506intf);
+	return es5506_start_common(device, tag, sndindex, clock, &es5506intf, SOUND_ES5505);
 }
 
 

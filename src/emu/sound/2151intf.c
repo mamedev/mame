@@ -8,7 +8,6 @@
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "fm.h"
 #include "2151intf.h"
 #include "ym2151.h"
@@ -55,7 +54,7 @@ static SND_START( ym2151 )
 
 	info->chip = ym2151_init(tag,clock,rate);
 
-	state_save_register_postload(Machine, ym2151intf_postload, info);
+	state_save_register_postload(device->machine, ym2151intf_postload, info);
 
 	if (info->chip != 0)
 	{
@@ -69,13 +68,13 @@ static SND_START( ym2151 )
 
 static SND_STOP( ym2151 )
 {
-	struct ym2151_info *info = token;
+	struct ym2151_info *info = device->token;
 	ym2151_shutdown(info->chip);
 }
 
 static SND_RESET( ym2151 )
 {
-	struct ym2151_info *info = token;
+	struct ym2151_info *info = device->token;
 	ym2151_reset_chip(info->chip);
 }
 

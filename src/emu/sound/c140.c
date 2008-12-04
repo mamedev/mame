@@ -45,7 +45,6 @@ Unmapped registers:
 
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "c140.h"
 
@@ -469,7 +468,7 @@ static SND_START( c140 )
 
 	info->stream = stream_create(0,2,info->sample_rate,info,update_stereo);
 
-	info->pRom=memory_region(Machine, tag);
+	info->pRom=memory_region(device->machine, tag);
 
 	/* make decompress pcm table */		//2000.06.26 CAB
 	{

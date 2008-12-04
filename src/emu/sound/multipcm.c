@@ -33,7 +33,6 @@
 
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "multipcm.h"
 
@@ -494,7 +493,7 @@ static SND_START( multipcm )
 
 	ptChip=(struct _MultiPCM *)auto_malloc(sizeof(struct _MultiPCM));
 
-	ptChip->ROM=(INT8 *)memory_region(Machine, tag);
+	ptChip->ROM=(INT8 *)memory_region(device->machine, tag);
 	ptChip->Rate=(float) clock / MULTIPCM_CLOCKDIV;
 
 	ptChip->stream = stream_create(0, 2, ptChip->Rate, ptChip, MultiPCM_update);

@@ -664,7 +664,7 @@ static SND_START( k054539 )
 
 	k054539_init_chip(tag, info, clock, sndindex);
 
-	state_save_register_postload(Machine, reset_zones, info);
+	state_save_register_postload(device->machine, reset_zones, info);
 	return info;
 }
 

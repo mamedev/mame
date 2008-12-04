@@ -33,7 +33,6 @@
 
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "qsound.h"
 
@@ -101,8 +100,8 @@ static SND_START( qsound )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	chip->sample_rom = (QSOUND_SRC_SAMPLE *)memory_region(Machine, tag);
-	chip->sample_rom_length = memory_region_length(Machine, tag);
+	chip->sample_rom = (QSOUND_SRC_SAMPLE *)memory_region(device->machine, tag);
+	chip->sample_rom_length = memory_region_length(device->machine, tag);
 
 	memset(chip->channel, 0, sizeof(chip->channel));
 
@@ -155,7 +154,7 @@ static SND_START( qsound )
 
 static SND_STOP( qsound )
 {
-	struct qsound_info *chip = token;
+	struct qsound_info *chip = device->token;
 	if (chip->fpRawDataR)
 	{
 		fclose(chip->fpRawDataR);

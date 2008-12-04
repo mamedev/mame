@@ -265,9 +265,8 @@ static void msm5232_gate_update(MSM5232 *chip)
 }
 
 
-static SND_RESET( msm5232 )
+static void msm5232_reset(MSM5232 *chip)
 {
-	MSM5232 *chip = token;
 	int i;
 
 	for (i=0; i<8; i++)
@@ -294,6 +293,11 @@ static SND_RESET( msm5232 )
 	msm5232_gate_update(chip);
 }
 
+static SND_RESET( msm5232 )
+{
+	msm5232_reset(device->token);
+}
+
 static void msm5232_init(MSM5232 *chip, const msm5232_interface *intf, int clock, int rate)
 {
 	int j;
@@ -315,7 +319,7 @@ static void msm5232_init(MSM5232 *chip, const msm5232_interface *intf, int clock
 		memset(&chip->voi[j],0,sizeof(VOICE));
 		msm5232_init_voice(chip,j);
 	}
-	SND_RESET_NAME( msm5232 )( chip );
+	msm5232_reset( chip );
 }
 
 static void msm5232_shutdown(void *chip)
@@ -791,7 +795,7 @@ static SND_START( msm5232 )
 
 static SND_STOP( msm5232 )
 {
-	msm5232_shutdown(token);
+	msm5232_shutdown(device->token);
 }
 
 WRITE8_HANDLER ( msm5232_0_w )

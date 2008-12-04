@@ -261,7 +261,7 @@ static SND_START( discrete )
 	if (clock)
 		info->sample_rate = clock;
 	else
-		info->sample_rate = Machine->sample_rate;
+		info->sample_rate = device->machine->sample_rate;
 	info->sample_time = 1.0 / info->sample_rate;
 	info->neg_sample_time = - info->sample_time;
 
@@ -332,7 +332,7 @@ static SND_START( discrete )
 
 static SND_STOP( discrete )
 {
-	discrete_info *info = token;
+	discrete_info *info = device->token;
 	int log_num;
 
 #if (DISCRETE_PROFILING)
@@ -392,7 +392,7 @@ static SND_STOP( discrete )
 
 static SND_RESET( discrete )
 {
-	discrete_info *info = token;
+	discrete_info *info = device->token;
 	int nodenum;
 
 	discrete_current_context = info;

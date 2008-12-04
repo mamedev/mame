@@ -644,7 +644,7 @@ static SND_START( ymz280b )
 
 	/* initialize the rest of the structure */
 	chip->master_clock = (double)clock / 384.0;
-	chip->region_base = memory_region(Machine, tag);
+	chip->region_base = memory_region(device->machine, tag);
 	chip->irq_callback = intf->irq_callback;
 
 	/* create the stream */
@@ -691,7 +691,7 @@ static SND_START( ymz280b )
 		}
 	}
 
-	state_save_register_postload(Machine, YMZ280B_state_save_update_step, chip);
+	state_save_register_postload(device->machine, YMZ280B_state_save_update_step, chip);
 
 #if MAKE_WAVS
 	chip->wavresample = wav_open("resamp.wav", INTERNAL_SAMPLE_RATE, 2);

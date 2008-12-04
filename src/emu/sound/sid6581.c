@@ -53,7 +53,7 @@ static void *sid_start(const char *tag, int sndindex, int clock, const void *con
 
 static SND_RESET( sid )
 {
-	SID6581 *sid = (SID6581 *) token;
+	SID6581 *sid = device->token;
 	sidEmuReset(sid);
 }
 

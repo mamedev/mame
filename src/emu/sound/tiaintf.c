@@ -35,7 +35,7 @@ static SND_START( tia )
 
 static SND_STOP( tia )
 {
-	struct tia_info *info = (struct tia_info*)token;
+	struct tia_info *info = device->token;
 	tia_sound_free(info->chip);
 }
 

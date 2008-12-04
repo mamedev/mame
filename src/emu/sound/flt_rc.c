@@ -88,7 +88,7 @@ static SND_START( filter_rc )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->stream = stream_create(1, 1, Machine->sample_rate, info, filter_rc_update);
+	info->stream = stream_create(1, 1, device->machine->sample_rate, info, filter_rc_update);
 	if (conf)
 		set_RC_info(info, conf->type, conf->R1, conf->R2, conf->R3, conf->C);
 	else

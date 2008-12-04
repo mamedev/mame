@@ -84,7 +84,7 @@ static SND_START( tms5110 )
 	/* initialize a stream */
 	info->stream = stream_create(0, 1, clock / 80, info, tms5110_update);
 
-	if (memory_region(Machine, tag) == NULL)
+	if (memory_region(device->machine, tag) == NULL)
 	{
 	    if (info->intf->M0_callback==NULL)
 	    {
@@ -158,14 +158,14 @@ static SND_START( m58817 )
 
 static SND_STOP( tms5110 )
 {
-	struct tms5110_info *info = token;
+	struct tms5110_info *info = device->token;
 	tms5110_destroy(info->chip);
 }
 
 
 static SND_RESET( tms5110 )
 {
-	struct tms5110_info *info = token;
+	struct tms5110_info *info = device->token;
 	tms5110_reset_chip(info->chip);
 }
 

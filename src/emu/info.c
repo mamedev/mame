@@ -590,7 +590,7 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 			fprintf(out, "\t\t<chip");
 			fprintf(out, " type=\"audio\"");
 			fprintf(out, " tag=\"%s\"", xml_normalize_string(config->sound[chipnum].tag));
-			fprintf(out, " name=\"%s\"", xml_normalize_string(sndtype_name(config->sound[chipnum].type)));
+			fprintf(out, " name=\"%s\"", xml_normalize_string(sndtype_get_name(config->sound[chipnum].type)));
 			if (config->sound[chipnum].clock != 0)
 				fprintf(out, " clock=\"%d\"", config->sound[chipnum].clock);
 			fprintf(out, "/>\n");

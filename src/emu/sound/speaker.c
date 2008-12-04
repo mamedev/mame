@@ -9,7 +9,6 @@
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "speaker.h"
 
 static const INT16 default_levels[2] = {0,32767};
@@ -40,7 +39,7 @@ static SND_START( speaker )
 {
 	struct speaker *sp = auto_malloc(sizeof(*sp));
 
-	sp->channel = stream_create(0, 1, Machine->sample_rate, sp, speaker_sound_update);
+	sp->channel = stream_create(0, 1, device->machine->sample_rate, sp, speaker_sound_update);
 	sp->num_levels = 2;
 	sp->levels = default_levels;
 	sp->level = 0;

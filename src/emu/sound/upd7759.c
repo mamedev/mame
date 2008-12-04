@@ -552,9 +552,8 @@ static TIMER_CALLBACK( upd7759_slave_update )
 
 *************************************************************/
 
-static SND_RESET( upd7759 )
+static void upd7759_reset(struct upd7759_chip *chip)
 {
-	struct upd7759_chip *chip = token;
 	chip->pos                = 0;
 	chip->fifo_in            = 0;
 	chip->drq                = 0;
@@ -578,6 +577,12 @@ static SND_RESET( upd7759 )
 	/* turn off any timer */
 	if (chip->timer)
 		timer_adjust_oneshot(chip->timer, attotime_never, 0);
+}
+
+
+static SND_RESET( upd7759 )
+{
+	upd7759_reset(device->token);
 }
 
 
@@ -643,7 +648,7 @@ static SND_START( upd7759 )
 	chip->state = STATE_IDLE;
 
 	/* compute the ROM base or allocate a timer */
-	chip->rom = chip->rombase = memory_region(Machine, tag);
+	chip->rom = chip->rombase = memory_region(device->machine, tag);
 	if (chip->rom == NULL)
 		chip->timer = timer_alloc(Machine, upd7759_slave_update, chip);
 
@@ -655,7 +660,7 @@ static SND_START( upd7759 )
 	chip->start = 1;
 
 	/* toggle the reset line to finish the reset */
-	SND_RESET_NAME( upd7759 )(chip);
+	upd7759_reset(chip);
 
 	register_for_save(chip, tag);
 
@@ -682,7 +687,7 @@ void upd7759_reset_w(int which, UINT8 data)
 
 	/* on the falling edge, reset everything */
 	if (oldreset && !chip->reset)
-		SND_RESET_NAME( upd7759 )(chip);
+		upd7759_reset(chip);
 }
 
 void upd7759_start_w(int which, UINT8 data)

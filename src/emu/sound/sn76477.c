@@ -30,7 +30,6 @@
 #include <math.h>		/* for pow() */
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "wavwrite.h"
 #include "sn76477.h"
 
@@ -2405,7 +2404,7 @@ static SND_START( sn76477 )
 
 	sn->tag = tag;
 
-	sn->channel = stream_create(0, 1, Machine->sample_rate, sn, SN76477_update);
+	sn->channel = stream_create(0, 1, device->machine->sample_rate, sn, SN76477_update);
 
 	if (clock > 0)
 	{
@@ -2413,7 +2412,7 @@ static SND_START( sn76477 )
 	}
 	else
 	{
-		sn->sample_rate = Machine->sample_rate;
+		sn->sample_rate = device->machine->sample_rate;
 	}
 
 	intialize_noise(sn);
@@ -2464,7 +2463,7 @@ static SND_START( sn76477 )
 
 static SND_STOP( sn76477 )
 {
-	struct SN76477 *sn = (struct SN76477 *)token;
+	struct SN76477 *sn = device->token;
 
 	if (LOG_WAV)
 		close_wav_file(sn);

@@ -15,7 +15,6 @@
 #include <math.h>
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "es8712.h"
 
@@ -222,7 +221,7 @@ static SND_START( es8712 )
 	chip->repeat = 0;
 
 	chip->bank_offset = 0;
-	chip->region_base = memory_region(Machine, tag);
+	chip->region_base = memory_region(device->machine, tag);
 
 	/* generate the name and create the stream */
 	chip->stream = stream_create(0, 1, clock, chip, es8712_update);
@@ -246,7 +245,7 @@ static SND_START( es8712 )
 
 static SND_RESET( es8712 )
 {
-	struct es8712 *chip = token;
+	struct es8712 *chip = device->token;
 
 	if (chip->playing)
 	{

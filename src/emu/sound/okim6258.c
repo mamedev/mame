@@ -12,7 +12,6 @@
 #include <math.h>
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "okim6258.h"
 
@@ -219,7 +218,7 @@ static SND_START( okim6258 )
 
 static SND_RESET( okim6258 )
 {
-	struct okim6258 *info = token;
+	struct okim6258 *info = device->token;
 
 	stream_update(info->stream);
 

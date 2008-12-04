@@ -24,7 +24,6 @@
 #include <math.h>
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "okim6295.h"
 
@@ -332,7 +331,7 @@ static SND_START( okim6295 )
 
 	info->command = -1;
 	info->bank_offset = 0;
-	info->region_base = memory_region(Machine, (intf->rgnoverride != NULL) ? intf->rgnoverride : tag);
+	info->region_base = memory_region(device->machine, (intf->rgnoverride != NULL) ? intf->rgnoverride : tag);
 
 	info->master_clock = clock;
 
@@ -363,7 +362,7 @@ static SND_START( okim6295 )
 
 static SND_RESET( okim6295 )
 {
-	struct okim6295 *info = token;
+	struct okim6295 *info = device->token;
 	int i;
 
 	stream_update(info->stream);

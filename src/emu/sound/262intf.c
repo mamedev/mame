@@ -98,14 +98,14 @@ static SND_START( ymf262 )
 
 static SND_STOP( ymf262 )
 {
-	struct ymf262_info *info = token;
+	struct ymf262_info *info = device->token;
 	ymf262_shutdown(info->chip);
 }
 
 /* reset */
 static SND_RESET( ymf262 )
 {
-	struct ymf262_info *info = token;
+	struct ymf262_info *info = device->token;
 	ymf262_reset_chip(info->chip);
 }
 

@@ -97,13 +97,13 @@ static SND_START( ym2413 )
 
 static SND_STOP( ym2413 )
 {
-	struct ym2413_info *info = token;
+	struct ym2413_info *info = device->token;
 	ym2413_shutdown(info->chip);
 }
 
 static SND_RESET( ym2413 )
 {
-	struct ym2413_info *info = token;
+	struct ym2413_info *info = device->token;
 	ym2413_reset_chip(info->chip);
 }
 

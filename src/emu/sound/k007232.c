@@ -24,7 +24,6 @@ added external port callback, and functions to set the volume of the channels
 
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "k007232.h"
 #include <math.h>
@@ -307,9 +306,9 @@ static SND_START( k007232 )
 
 	/* Set up the chips */
 
-	info->pcmbuf[0] = (unsigned char *)memory_region(Machine, tag);
-	info->pcmbuf[1] = (unsigned char *)memory_region(Machine, tag);
-	info->pcmlimit  = (unsigned int)memory_region_length(Machine, tag);
+	info->pcmbuf[0] = (unsigned char *)memory_region(device->machine, tag);
+	info->pcmbuf[1] = (unsigned char *)memory_region(device->machine, tag);
+	info->pcmlimit  = (unsigned int)memory_region_length(device->machine, tag);
 
 	info->clock = clock;
 

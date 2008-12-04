@@ -137,7 +137,7 @@ static SND_START( ym2203 )
 	/* Initialize FM emurator */
 	info->chip = ym2203_init(info,tag,clock,rate,timer_handler,IRQHandler,&psgintf);
 
-	state_save_register_postload(Machine, ym2203_intf_postload, info);
+	state_save_register_postload(device->machine, ym2203_intf_postload, info);
 
 	if (info->chip)
 		return info;
@@ -149,14 +149,14 @@ static SND_START( ym2203 )
 
 static SND_STOP( ym2203 )
 {
-	struct ym2203_info *info = token;
+	struct ym2203_info *info = device->token;
 	ym2203_shutdown(info->chip);
 	ay8910_stop_ym(info->psg);
 }
 
 static SND_RESET( ym2203 )
 {
-	struct ym2203_info *info = token;
+	struct ym2203_info *info = device->token;
 	ym2203_reset_chip(info->chip);
 }
 

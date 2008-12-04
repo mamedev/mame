@@ -15,7 +15,6 @@
 
 #include <math.h>
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "c352.h"
 
@@ -542,8 +541,8 @@ static SND_START( c352 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->c352_rom_samples = memory_region(Machine, tag);
-	info->c352_rom_length = memory_region_length(Machine, tag);
+	info->c352_rom_samples = memory_region(device->machine, tag);
+	info->c352_rom_length = memory_region_length(device->machine, tag);
 
 	info->sample_rate_base = clock / 192;
 
