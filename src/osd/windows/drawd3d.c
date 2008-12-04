@@ -2146,20 +2146,11 @@ INLINE void copyline_yuy16_to_uyvy(UINT16 *dst, const UINT16 *src, int width, co
 	else
 	{
 		if (borderpix)
-		{
-			UINT16 srcpix = *src;
-			*dst++ = (srcpix >> 8) | (srcpix << 8);
-		}
+			*dst++ = *src;
 		for (x = 0; x < width; x++)
-		{
-			UINT16 srcpix = *src++;
-			*dst++ = (srcpix >> 8) | (srcpix << 8);
-		}
+			*dst++ = *src++;
 		if (borderpix)
-		{
-			UINT16 srcpix = *--src;
-			*dst++ = (srcpix >> 8) | (srcpix << 8);
-		}
+			*dst++ = *--src;
 	}
 }
 
