@@ -112,7 +112,7 @@ static VIDEO_UPDATE( cubeqst )
     */
 
 	/* Bit 3 selects LD/#GRAPHICS */
-	fillbitmap(bitmap, colormap[255], cliprect);
+	bitmap_fill(bitmap, cliprect, colormap[255]);
 
 	cpu_push_context(screen->machine->cpu[LINE_CPU]);
 

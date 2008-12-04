@@ -206,7 +206,7 @@ static int check_collision(s2636_t *s2636, int spriteno1, int spriteno2, const r
 
 	/* TODO: does not check shadow sprites yet */
 
-	fillbitmap(s2636->collision_bitmap, 0, cliprect);
+	bitmap_fill(s2636->collision_bitmap, cliprect, 0);
 
 	if ((attr1[0x0a] != 0xff) && (attr2[0x0a] != 0xff))
 	{
@@ -269,7 +269,7 @@ bitmap_t *s2636_update(s2636_t *s2636, const rectangle *cliprect)
 	UINT8 collision = 0;
 	int spriteno;
 
-	fillbitmap(s2636->bitmap, 0, cliprect);
+	bitmap_fill(s2636->bitmap, cliprect, 0);
 
 	for (spriteno = 0; spriteno < 4; spriteno++)
 	{

@@ -764,7 +764,7 @@ static void testdrawscreen(const running_machine *machine,bitmap_t *bitmap,const
 	rs=state_ta.renderselect;
 	c=pvrta_regs[ISP_BACKGND_T];
 	c=memory_read_dword(space,0x05000000+((c&0xfffff8)>>1)+(3+3)*4);
-	fillbitmap(bitmap,c,cliprect);
+	bitmap_fill(bitmap,cliprect,c);
 #if 0
 	stride=pvrta_regs[FB_W_LINESTRIDE] << 3;
 	c=pvrta_regs[ISP_BACKGND_T];
@@ -1066,7 +1066,7 @@ static int useframebuffer=1;
 	if ((useframebuffer) && !state_ta.start_render_received)
 	{
 		if (pvrta_regs[VO_CONTROL] & (1 << 3))
-			fillbitmap(bitmap,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF,cliprect);
+			bitmap_fill(bitmap,cliprect,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF);
 		else
 			testdrawscreenframebuffer(bitmap,cliprect);
 		return 0;
@@ -1077,7 +1077,7 @@ static int useframebuffer=1;
 		useframebuffer=0;
 		testdrawscreen(screen->machine,bitmap,cliprect);
 		if (pvrta_regs[VO_CONTROL] & (1 << 3))
-			fillbitmap(bitmap,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF,cliprect);
+			bitmap_fill(bitmap,cliprect,pvrta_regs[VO_BORDER_COL] & 0xFFFFFF);
 		state_ta.start_render_received=0;
 		state_ta.renderselect= -1;
 		dc_sysctrl_regs[SB_ISTNRM] |= IST_EOR_TSP;	// TSP end of render

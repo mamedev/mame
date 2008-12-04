@@ -407,7 +407,7 @@ void atarimo_init(running_machine *machine, int map, const atarimo_desc *desc)
 
 	/* allocate the temp bitmap */
 	mo->bitmap        = auto_bitmap_alloc(video_screen_get_width(machine->primary_screen), video_screen_get_height(machine->primary_screen), BITMAP_FORMAT_INDEXED16);
-	fillbitmap(mo->bitmap, desc->transpen, NULL);
+	bitmap_fill(mo->bitmap, NULL, desc->transpen);
 
 	/* allocate the spriteram */
 	mo->spriteram = auto_malloc(sizeof(mo->spriteram[0]) * mo->spriteramsize);

@@ -507,8 +507,8 @@ static void rshark_draw_sprites(running_machine *machine, bitmap_t *bitmap, cons
 
 VIDEO_UPDATE( lastday )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
@@ -521,8 +521,8 @@ VIDEO_UPDATE( lastday )
 
 VIDEO_UPDATE( gulfstrm )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
@@ -534,8 +534,8 @@ VIDEO_UPDATE( gulfstrm )
 
 VIDEO_UPDATE( pollux )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
@@ -547,8 +547,8 @@ VIDEO_UPDATE( pollux )
 
 VIDEO_UPDATE( flytiger )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	if (flytiger_pri)
 	{
@@ -569,8 +569,8 @@ VIDEO_UPDATE( flytiger )
 
 VIDEO_UPDATE( bluehawk )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 2);
@@ -583,7 +583,7 @@ VIDEO_UPDATE( bluehawk )
 
 VIDEO_UPDATE( primella )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	if (tx_pri) tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
@@ -594,8 +594,8 @@ VIDEO_UPDATE( primella )
 
 VIDEO_UPDATE( rshark )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 1);
 	tilemap_draw(bitmap, cliprect, bg2_tilemap, 0, (rshark_pri ? 2 : 1));
@@ -608,8 +608,8 @@ VIDEO_UPDATE( rshark )
 
 VIDEO_UPDATE( popbingo )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 1);
 

@@ -274,7 +274,7 @@ VIDEO_UPDATE( bwing )
 		tilemap_draw(bitmap, cliprect, bgmap, 0, 0);
 	}
 	else
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	// draw low priority sprites
 	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram, 0);

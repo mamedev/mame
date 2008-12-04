@@ -148,7 +148,7 @@ VIDEO_UPDATE( playch10 )
 				/* render the ppu */
 				ppu2c0x_render( 0, bitmap, 0, 0, 0, 0 );
 			else
-				fillbitmap(bitmap, 0, cliprect);
+				bitmap_fill(bitmap, cliprect, 0);
 		}
 		else
 		{
@@ -157,7 +157,7 @@ VIDEO_UPDATE( playch10 )
 			if ( !pc10_sdcs )
 				tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 			else
-				fillbitmap(bitmap, 0, cliprect);
+				bitmap_fill(bitmap, cliprect, 0);
 		}
 	}
 	else	/* Single Monitor version */

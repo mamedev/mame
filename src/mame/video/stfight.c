@@ -297,9 +297,9 @@ VIDEO_UPDATE( stfight )
 {
 	set_pens(screen->machine->colortable);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
-	fillbitmap(bitmap,0,cliprect);	/* in case bg_tilemap is disabled */
+	bitmap_fill(bitmap,cliprect,0);	/* in case bg_tilemap is disabled */
     tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 

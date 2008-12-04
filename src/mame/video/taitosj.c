@@ -337,7 +337,7 @@ static int check_sprite_sprite_bitpattern(running_machine *machine,
 	}
 
 	/* draw the sprites into seperate bitmaps and check overlapping region */
-	fillbitmap(sprite_layer_collbitmap1, TRANSPARENT_PEN, NULL);
+	bitmap_fill(sprite_layer_collbitmap1, NULL, TRANSPARENT_PEN);
 	drawgfx(sprite_sprite_collbitmap1, get_sprite_gfx_element(machine, which1),
 			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs1 + 3] & 0x3f,
 			0,
@@ -346,7 +346,7 @@ static int check_sprite_sprite_bitpattern(running_machine *machine,
 			sx1, sy1,
 			0, TRANSPARENCY_PEN, 0);
 
-	fillbitmap(sprite_sprite_collbitmap2, TRANSPARENT_PEN, NULL);
+	bitmap_fill(sprite_sprite_collbitmap2, NULL, TRANSPARENT_PEN);
 	drawgfx(sprite_sprite_collbitmap2, get_sprite_gfx_element(machine, which2),
 			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs2 + 3] & 0x3f,
 			0,
@@ -493,7 +493,7 @@ static int check_sprite_layer_bitpattern(running_machine *machine, int which, re
 	int flip_y = (taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 2] & 0x02) ^ GLOBAL_FLIP_Y;
 
 	/* draw sprite into a bitmap and check if layers collide */
-	fillbitmap(sprite_layer_collbitmap1, TRANSPARENT_PEN, NULL);
+	bitmap_fill(sprite_layer_collbitmap1, NULL, TRANSPARENT_PEN);
 	drawgfx(sprite_layer_collbitmap1, get_sprite_gfx_element(machine, which),
 			taitosj_spriteram[SPRITE_RAM_PAGE_OFFSET + offs + 3] & 0x3f,
 			0,
@@ -579,9 +579,9 @@ static void draw_layers(running_machine *machine)
 {
 	offs_t offs;
 
-	fillbitmap(taitosj_layer_bitmap[0], TRANSPARENT_PEN, NULL);
-	fillbitmap(taitosj_layer_bitmap[1], TRANSPARENT_PEN, NULL);
-	fillbitmap(taitosj_layer_bitmap[2], TRANSPARENT_PEN, NULL);
+	bitmap_fill(taitosj_layer_bitmap[0], NULL, TRANSPARENT_PEN);
+	bitmap_fill(taitosj_layer_bitmap[1], NULL, TRANSPARENT_PEN);
+	bitmap_fill(taitosj_layer_bitmap[2], NULL, TRANSPARENT_PEN);
 
 	for (offs = 0; offs < 0x0400; offs++)
 	{
@@ -773,7 +773,7 @@ static void copy_layers(running_machine *machine, bitmap_t *bitmap, const rectan
 	int i = 0;
 
 	/* fill the screen with the background color */
-	fillbitmap(bitmap, 8 * (taitosj_colorbank[1] & 0x07), cliprect);
+	bitmap_fill(bitmap, cliprect, 8 * (taitosj_colorbank[1] & 0x07));
 
 	for (i = 0; i < 4; i++)
 	{

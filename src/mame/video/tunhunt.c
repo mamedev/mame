@@ -269,7 +269,7 @@ static void draw_box(bitmap_t *bitmap, const rectangle *cliprect)
 {
 /*
     This is unnecessarily slow, but the box priorities aren't completely understood,
-    yet.  Once understood, this function should be converted to use fillbitmap with
+    yet.  Once understood, this function should be converted to use bitmap_fill with
     rectangular chunks instead of BITMAP_ADDR.
 
     Tunnels:

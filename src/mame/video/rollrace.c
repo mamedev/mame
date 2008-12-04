@@ -67,7 +67,7 @@ VIDEO_UPDATE( rollrace )
 	const UINT8 *mem = memory_region(screen->machine, "user1");
 
 	/* fill in background colour*/
-	fillbitmap(bitmap,ra_bkgpen,cliprect);
+	bitmap_fill(bitmap,cliprect,ra_bkgpen);
 
 	/* draw road */
 	for (offs = videoram_size - 1;offs >= 0;offs--)

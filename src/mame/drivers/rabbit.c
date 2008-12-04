@@ -224,7 +224,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	UINT32 *source = (rabbit_spriteram+ (todraw*2))-2;
 	UINT32 *finish = rabbit_spriteram;
 
-//  fillbitmap(rabbit_sprite_bitmap, 0x0, &rabbit_sprite_clip); // sloooow
+//  bitmap_fill(rabbit_sprite_bitmap, &rabbit_sprite_clip, 0x0); // sloooow
 
 	while( source>=finish )
 	{
@@ -411,7 +411,7 @@ static VIDEO_UPDATE(rabbit)
 {
 	int prilevel;
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 //  popmessage("%08x %08x", rabbit_viewregs0[0], rabbit_viewregs0[1]);
 //  popmessage("%08x %08x %08x %08x %08x %08x", rabbit_tilemap_regs[0][0],rabbit_tilemap_regs[0][1],rabbit_tilemap_regs[0][2],rabbit_tilemap_regs[0][3],rabbit_tilemap_regs[0][4],rabbit_tilemap_regs[0][5]);
@@ -1152,7 +1152,7 @@ static VIDEO_UPDATE( tmmjprd )
 
 //  popmessage("%08x %08x %08x %08x %08x", rabbit_viewregs10[0],rabbit_viewregs10[1],rabbit_viewregs10[2],rabbit_viewregs10[3],rabbit_viewregs10[4]);
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	tilemap_draw(bitmap,cliprect,rabbit_tilemap[3],0,0);
 	tilemap_draw(bitmap,cliprect,rabbit_tilemap[1],0,0); //same as 3?
 	tilemap_draw(bitmap,cliprect,rabbit_tilemap[2],0,0);

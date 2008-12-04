@@ -81,7 +81,7 @@ VIDEO_UPDATE( bottom9 )
 	K052109_tilemap_update();
 
 	/* note: FIX layer is not used */
-	fillbitmap(bitmap,layer_colorbase[1],cliprect);
+	bitmap_fill(bitmap,cliprect,layer_colorbase[1]);
 //  if (bottom9_video_enable)
 	{
 		K051960_sprites_draw(bitmap,cliprect,1,1);

@@ -442,7 +442,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 VIDEO_UPDATE( psychic5 )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	if (psychic5_bg_status & 1)	/* Backgound enable */
 		draw_background(screen->machine, bitmap, cliprect);
 	if (!(title_screen & 1))
@@ -456,7 +456,7 @@ VIDEO_UPDATE( bombsa )
 	if (psychic5_bg_status & 1)	/* Backgound enable */
 		tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	else
-		fillbitmap(bitmap, screen->machine->pens[0x0ff], cliprect);
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[0x0ff]);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 	return 0;

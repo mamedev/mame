@@ -72,9 +72,6 @@ enum
     MACROS
 ***************************************************************************/
 
-/* map old fillbitmap to new shared bitmap_fill code */
-#define fillbitmap(dest, pen, clip) bitmap_fill(dest, clip, pen)
-
 /* these macros describe gfx_layouts in terms of fractions of a region */
 /* they can be used for total, planeoffset, xoffset, yoffset */
 #define RGN_FRAC(num,den)		(0x80000000 | (((num) & 0x0f) << 27) | (((den) & 0x0f) << 23))

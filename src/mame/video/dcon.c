@@ -269,7 +269,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( dcon )
 {
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	/* Setup the tilemaps */
 	tilemap_set_scrollx( background_layer,0, dcon_scroll_ram[0] );
@@ -282,7 +282,7 @@ VIDEO_UPDATE( dcon )
 	if ((dcon_enable&1)!=1)
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	else
-		fillbitmap(bitmap,15,cliprect); /* Should always be black, not pen 15 */
+		bitmap_fill(bitmap,cliprect,15); /* Should always be black, not pen 15 */
 
 	tilemap_draw(bitmap,cliprect,midground_layer,0,1);
 	tilemap_draw(bitmap,cliprect,foreground_layer,0,2);
@@ -296,7 +296,7 @@ VIDEO_UPDATE( sdgndmps )
 {
 	static int last_gfx_bank=0;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	/* Gfx banking */
 	if (last_gfx_bank!=dcon_gfx_bank_select)
@@ -318,7 +318,7 @@ VIDEO_UPDATE( sdgndmps )
 	if ((dcon_enable&1)!=1)
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	else
-		fillbitmap(bitmap,15,cliprect); /* Should always be black, not pen 15 */
+		bitmap_fill(bitmap,cliprect,15); /* Should always be black, not pen 15 */
 
 	tilemap_draw(bitmap,cliprect,midground_layer,0,1);
 	tilemap_draw(bitmap,cliprect,foreground_layer,0,2);

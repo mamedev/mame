@@ -19,7 +19,7 @@ VIDEO_UPDATE( destroyr )
 	int i;
 	int j;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	/* draw major objects */
 

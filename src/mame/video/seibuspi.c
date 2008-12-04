@@ -624,7 +624,7 @@ VIDEO_UPDATE( spi )
 	}
 
 	if( layer_enable & 0x1 )
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 
 	if (!(layer_enable & 0x1))
 		combine_tilemap(screen->machine, bitmap, cliprect, back_layer, spi_scrollram[0] & 0xffff, (spi_scrollram[0] >> 16) & 0xffff, 1, back_rowscroll);

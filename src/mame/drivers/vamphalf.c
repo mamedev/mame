@@ -418,7 +418,7 @@ static void draw_sprites(const device_config *screen, bitmap_t *bitmap)
 
 static VIDEO_UPDATE( common )
 {
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 	draw_sprites(screen, bitmap);
 	return 0;
 }

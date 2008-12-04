@@ -563,8 +563,8 @@ static void drgnbowl_draw_sprites(running_machine *machine, bitmap_t *bitmap, co
 
 VIDEO_UPDATE( gaiden )
 {
-	fillbitmap(priority_bitmap, 0, cliprect);
-	fillbitmap(bitmap, 0x200, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
+	bitmap_fill(bitmap, cliprect, 0x200);
 
 	tilemap_draw(bitmap, cliprect, background, 0, 1);
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);
@@ -576,11 +576,11 @@ VIDEO_UPDATE( gaiden )
 
 VIDEO_UPDATE( raiga )
 {
-	fillbitmap(priority_bitmap,    0, cliprect);
+	bitmap_fill(priority_bitmap,    cliprect, 0);
 
-	fillbitmap(tile_bitmap_bg, 0x200, cliprect);
-	fillbitmap(tile_bitmap_fg,     0, cliprect);
-	fillbitmap(sprite_bitmap,      0, cliprect);
+	bitmap_fill(tile_bitmap_bg, cliprect, 0x200);
+	bitmap_fill(tile_bitmap_fg,     cliprect, 0);
+	bitmap_fill(sprite_bitmap,      cliprect, 0);
 
 	/* draw tilemaps into a 16-bit bitmap */
 	tilemap_draw(tile_bitmap_bg, cliprect,background, 0, 1);
@@ -600,7 +600,7 @@ VIDEO_UPDATE( raiga )
 
 VIDEO_UPDATE( drgnbowl )
 {
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, background, 0, 1);
 	tilemap_draw(bitmap, cliprect, foreground, 0, 2);

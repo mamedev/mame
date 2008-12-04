@@ -93,9 +93,9 @@ VIDEO_UPDATE( ajax )
 {
 	K052109_tilemap_update();
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[2],0,1);
 	if (ajax_priority)
 	{

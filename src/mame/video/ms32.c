@@ -485,11 +485,11 @@ VIDEO_UPDATE( ms32 )
 	tilemap_set_scrolly(ms32_bg_tilemap, 0, scrolly);
 
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	/* TODO: 0 is correct for gametngk, but break f1superb scrolling grid (text at
        top and bottom of the screen becomes black on black) */
-	fillbitmap(bitmap,0,cliprect);	/* bg color */
+	bitmap_fill(bitmap,cliprect,0);	/* bg color */
 
 
 	/* priority hack, we really need to figure out what priority ram is I think */

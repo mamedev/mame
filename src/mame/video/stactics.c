@@ -240,7 +240,7 @@ static void draw_background(stactics_state *state, bitmap_t *bitmap, const recta
 {
 	int y;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	/* for every row */
 	for (y = 0; y < 0x100; y++)

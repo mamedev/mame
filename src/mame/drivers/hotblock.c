@@ -126,7 +126,7 @@ static VIDEO_UPDATE(hotblock)
 	int i;
 	static const int xxx=320,yyy=204;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), 0);
+	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
 
 	for (i=0;i<256;i++)
 	{

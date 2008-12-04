@@ -376,12 +376,12 @@ static VIDEO_UPDATE(jchan)
 	UINT16 pixdata1;
 	UINT16 pixdata2;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	VIDEO_UPDATE_CALL(jchan_view2);
 
-	fillbitmap(sprite_bitmap_1, 0x0000, cliprect);
-	fillbitmap(sprite_bitmap_2, 0x0000, cliprect);
+	bitmap_fill(sprite_bitmap_1, cliprect, 0x0000);
+	bitmap_fill(sprite_bitmap_2, cliprect, 0x0000);
 
 	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, jchan_sprite_ram32_1, 0x4000, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), jchan_sprite_regs32_1 );
 	skns_draw_sprites(screen->machine, sprite_bitmap_2, cliprect, jchan_sprite_ram32_2, 0x4000, memory_region(screen->machine,"gfx2"), memory_region_length (screen->machine, "gfx2"), jchan_sprite_regs32_2 );

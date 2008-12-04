@@ -596,7 +596,7 @@ VIDEO_UPDATE( taitob )
 {
   if ((video_control & 0x20) == 0)
   {
-    fillbitmap(bitmap,0,cliprect);
+    bitmap_fill(bitmap,cliprect,0);
     return 0;
   }
 
@@ -627,7 +627,7 @@ VIDEO_UPDATE( taitob )
 VIDEO_EOF( taitob )
 {
   if (~video_control & 0x01)
-    fillbitmap(framebuffer[framebuffer_page],0,video_screen_get_visible_area(machine->primary_screen));
+    bitmap_fill(framebuffer[framebuffer_page],video_screen_get_visible_area(machine->primary_screen),0);
 
   if (~video_control & 0x80)
     framebuffer_page ^= 1;

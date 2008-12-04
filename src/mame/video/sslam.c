@@ -165,7 +165,7 @@ VIDEO_UPDATE(sslam)
 {
 	if(!(sslam_regs[6] & 1))
 	{
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 
@@ -203,7 +203,7 @@ VIDEO_UPDATE(powerbls)
 {
 	if(!(sslam_regs[6] & 1))
 	{
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 

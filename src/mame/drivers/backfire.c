@@ -181,8 +181,8 @@ static VIDEO_UPDATE(backfire)
 	if (screen == left_screen)
 	{
 
-		fillbitmap(priority_bitmap,0,NULL);
-		fillbitmap(bitmap,0x100,cliprect);
+		bitmap_fill(priority_bitmap,NULL,0);
+		bitmap_fill(bitmap,cliprect,0x100);
 
 		if (backfire_left_priority[0] == 0)
 		{
@@ -201,8 +201,8 @@ static VIDEO_UPDATE(backfire)
 	}
 	else if (screen == right_screen)
 	{
-		fillbitmap(priority_bitmap,0,NULL);
-		fillbitmap(bitmap,0x500,cliprect);
+		bitmap_fill(priority_bitmap,NULL,0);
+		bitmap_fill(bitmap,cliprect,0x500);
 
 		if (backfire_right_priority[0] == 0)
 		{

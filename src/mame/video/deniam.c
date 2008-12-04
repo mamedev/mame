@@ -390,7 +390,7 @@ VIDEO_UPDATE( deniam )
 	tilemap_set_scrollx(fg_tilemap,0,fg_scrollx & 0x1ff);
 	tilemap_set_scrolly(fg_tilemap,0,fg_scrolly & 0x0ff);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);

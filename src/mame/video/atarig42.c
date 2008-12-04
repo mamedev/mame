@@ -228,7 +228,7 @@ void atarig42_scanline_update(const device_config *screen, int scanline)
 VIDEO_UPDATE( atarig42 )
 {
 	/* draw the playfield */
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 1, 1);
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 2, 2);

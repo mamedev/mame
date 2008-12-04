@@ -358,9 +358,9 @@ VIDEO_UPDATE( namcos86 )
 	set_scroll(2);
 	set_scroll(3);
 
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
-	fillbitmap(bitmap,screen->machine->gfx[0]->color_base + 8*backcolor+7,cliprect);
+	bitmap_fill(bitmap,cliprect,screen->machine->gfx[0]->color_base + 8*backcolor+7);
 
 	for (layer = 0;layer < 8;layer++)
 	{

@@ -520,7 +520,7 @@ VIDEO_UPDATE( combasc )
 	tilemap_set_scrolly(bg_tilemap[0],0,K007121_ctrlram[0][0x02]);
 	tilemap_set_scrolly(bg_tilemap[1],0,K007121_ctrlram[1][0x02]);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if (priority == 0)
 	{
@@ -561,11 +561,11 @@ VIDEO_UPDATE( combasc )
 
 		clip = *cliprect;
 		clip.max_x = clip.min_x + 7;
-		fillbitmap(bitmap,0,&clip);
+		bitmap_fill(bitmap,&clip,0);
 
 		clip = *cliprect;
 		clip.min_x = clip.max_x - 7;
-		fillbitmap(bitmap,0,&clip);
+		bitmap_fill(bitmap,&clip,0);
 	}
 	return 0;
 }

@@ -974,7 +974,7 @@ VIDEO_UPDATE( megasys1 )
 		}
 	}
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	flag = TILEMAP_DRAW_OPAQUE;
 	primask = 0;
@@ -1000,7 +1000,7 @@ VIDEO_UPDATE( megasys1 )
 				if (flag != 0)
 				{
 					flag = 0;
-					fillbitmap(bitmap,0,cliprect);
+					bitmap_fill(bitmap,cliprect,0);
 				}
 
 				if (megasys1_sprite_flag & 0x100)	/* sprites are split */

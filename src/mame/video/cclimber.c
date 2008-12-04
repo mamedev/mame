@@ -626,7 +626,7 @@ static void swimmer_draw_sprites(bitmap_t *bitmap, gfx_element **gfx, const rect
 
 VIDEO_UPDATE( cclimber )
 {
-	fillbitmap(bitmap, CCLIMBER_BG_PEN, cliprect);
+	bitmap_fill(bitmap, cliprect, CCLIMBER_BG_PEN);
 	draw_playfield(bitmap, cliprect);
 
 	/* draw the "big sprite" under the regular sprites */
@@ -693,10 +693,10 @@ VIDEO_UPDATE( swimmer )
 			rectangle split_rect_right = { 0x100 - SWIMMER_BG_SPLIT, 0xff, 0, 0xff };
 
 			sect_rect(&split_rect_left, cliprect);
-			fillbitmap(bitmap, SWIMMER_SIDE_BG_PEN, &split_rect_left);
+			bitmap_fill(bitmap, &split_rect_left, SWIMMER_SIDE_BG_PEN);
 
 			sect_rect(&split_rect_right, cliprect);
-			fillbitmap(bitmap, CCLIMBER_BG_PEN, &split_rect_right);
+			bitmap_fill(bitmap, &split_rect_right, CCLIMBER_BG_PEN);
 		}
 		else
 		{
@@ -704,14 +704,14 @@ VIDEO_UPDATE( swimmer )
 			rectangle split_rect_right = { SWIMMER_BG_SPLIT, 0xff, 0, 0xff };
 
 			sect_rect(&split_rect_left, cliprect);
-			fillbitmap(bitmap, CCLIMBER_BG_PEN, &split_rect_left);
+			bitmap_fill(bitmap, &split_rect_left, CCLIMBER_BG_PEN);
 
 			sect_rect(&split_rect_right, cliprect);
-			fillbitmap(bitmap, SWIMMER_SIDE_BG_PEN, &split_rect_right);
+			bitmap_fill(bitmap, &split_rect_right, SWIMMER_SIDE_BG_PEN);
 		}
 	}
 	else
-		fillbitmap(bitmap, CCLIMBER_BG_PEN, cliprect);
+		bitmap_fill(bitmap, cliprect, CCLIMBER_BG_PEN);
 
 	draw_playfield(bitmap, cliprect);
 
@@ -739,7 +739,7 @@ VIDEO_UPDATE( toprollr )
 	scroll_area_clip.min_x = 4*8;
 	scroll_area_clip.max_x = 29*8-1;
 
-	fillbitmap(bitmap, CCLIMBER_BG_PEN, cliprect);
+	bitmap_fill(bitmap, cliprect, CCLIMBER_BG_PEN);
 
 	tilemap_set_scrollx(toproller_bg_tilemap, 0, toprollr_bg_videoram[0]);
 	tilemap_set_flip(toproller_bg_tilemap, (CCLIMBER_FLIP_X ? TILEMAP_FLIPX : 0) |

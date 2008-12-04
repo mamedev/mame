@@ -470,10 +470,10 @@ static VIDEO_UPDATE( marinedt )
 {
 	int sx, sy;
 
-	fillbitmap(tile, 0, NULL);
+	bitmap_fill(tile, NULL, 0);
 	tilemap_draw(tile, cliprect, tx_tilemap, 0, 0);
 
-	fillbitmap(obj1, 0, NULL);
+	bitmap_fill(obj1, NULL, 0);
 	drawgfx(obj1, screen->machine->gfx[1],
 			OBJ_CODE(marinedt_obj1_a),
 			OBJ_COLOR(marinedt_obj1_a),
@@ -481,7 +481,7 @@ static VIDEO_UPDATE( marinedt )
 			0, 0,
 			NULL, TRANSPARENCY_PEN, 0);
 
-	fillbitmap(obj2, 0, NULL);
+	bitmap_fill(obj2, NULL, 0);
 	drawgfx(obj2, screen->machine->gfx[2],
 			OBJ_CODE(marinedt_obj2_a),
 			OBJ_COLOR(marinedt_obj2_a),
@@ -489,7 +489,7 @@ static VIDEO_UPDATE( marinedt )
 			0, 0,
 			NULL, TRANSPARENCY_PEN, 0);
 
-	fillbitmap(bitmap, 0, NULL);
+	bitmap_fill(bitmap, NULL, 0);
 
 	if (marinedt_pd & 0x02)
 		copybitmap_trans(bitmap, obj2, 0, 0, OBJ_X(marinedt_obj2_x), OBJ_Y(marinedt_obj2_y), cliprect, 0);

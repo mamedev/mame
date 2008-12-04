@@ -928,7 +928,7 @@ VIDEO_RESET( neogeo )
 VIDEO_UPDATE( neogeo )
 {
 	/* fill with background color first */
-	fillbitmap(bitmap, pens[0x0fff], cliprect);
+	bitmap_fill(bitmap, cliprect, pens[0x0fff]);
 
 	draw_sprites(bitmap, cliprect->min_y);
 

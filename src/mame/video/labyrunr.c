@@ -175,8 +175,8 @@ VIDEO_UPDATE( labyrunr )
 
 	set_pens(screen->machine->colortable);
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if(~K007121_ctrlram[0][3] & 0x20)
 	{

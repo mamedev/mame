@@ -245,7 +245,7 @@ VIDEO_UPDATE( buggychl )
 	if (sky_on)
 		draw_sky(bitmap, cliprect);
 	else
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 
 	/* decode modified characters */
 	for (code = 0;code < 256;code++)

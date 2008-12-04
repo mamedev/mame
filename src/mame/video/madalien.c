@@ -264,7 +264,7 @@ static VIDEO_UPDATE( madalien )
 	// mode 3 - transition from A to B
 	int scroll_mode = *madalien_scroll & 3;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	draw_edges(bitmap, cliprect, flip, scroll_mode);
 	draw_foreground(screen->machine, bitmap, cliprect, flip);
 

@@ -83,7 +83,7 @@ static WRITE16_HANDLER( snowbros_flipscreen_w )
 static VIDEO_UPDATE( snowbros )
 {
 	/* This clears & redraws the entire screen each pass */
-	fillbitmap(bitmap,0xf0,cliprect);
+	bitmap_fill(bitmap,cliprect,0xf0);
 	pandora_update(screen->machine,bitmap,cliprect);
 	return 0;
 }

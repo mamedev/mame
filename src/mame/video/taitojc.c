@@ -254,7 +254,7 @@ VIDEO_UPDATE( taitojc )
     }
     */
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	for (i=(0xc00/4)-2; i >= 0; i-=2)
 	{
@@ -642,6 +642,6 @@ void taitojc_clear_frame(running_machine *machine)
 	cliprect.max_x = video_screen_get_width(machine->primary_screen) - 1;
 	cliprect.max_y = video_screen_get_height(machine->primary_screen) - 1;
 
-	fillbitmap(framebuffer, 0, &cliprect);
-	fillbitmap(zbuffer, 0xffff, &cliprect);
+	bitmap_fill(framebuffer, &cliprect, 0);
+	bitmap_fill(zbuffer, &cliprect, 0xffff);
 }

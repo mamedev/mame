@@ -1244,12 +1244,12 @@ VIDEO_UPDATE( captaven )
 	tilemap_set_enable(pf2_tilemap,pf2_enable);
 	tilemap_set_enable(pf3_tilemap,pf3_enable);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 	if ((deco32_pri&1)==0) {
 		if (pf3_enable)
 			tilemap_draw(bitmap,cliprect,pf3_tilemap,TILEMAP_DRAW_OPAQUE,0);
 		else
-			fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 		if (deco32_raster_display_position)
 			tilemap_raster_draw(bitmap,cliprect,0,1);
@@ -1263,7 +1263,7 @@ VIDEO_UPDATE( captaven )
 				tilemap_draw(bitmap,cliprect,pf2_tilemap,0,0);
 		}
 		else
-			fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 		tilemap_draw(bitmap,cliprect,pf3_tilemap,0,1);
 	}
@@ -1314,7 +1314,7 @@ VIDEO_UPDATE( dragngun )
 	tilemap_set_enable(pf4_tilemap, deco32_pf34_control[5]&0x8000);
 
 	if ((deco32_pf34_control[5]&0x8000)==0)
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,0);
@@ -1400,8 +1400,8 @@ VIDEO_UPDATE( fghthist )
 
 	/* Draw screen */
 	deco16_clear_sprite_priority_bitmap();
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,screen->machine->pens[0x000],cliprect); // Palette index not confirmed
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x000]); // Palette index not confirmed
 	tilemap_draw(bitmap,cliprect,pf4_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,pf3_tilemap,0,4);
 	tilemap_draw(bitmap,cliprect,pf2_tilemap,0,16);
@@ -1591,12 +1591,12 @@ VIDEO_UPDATE( nslasher )
 	if (deco32_ace_ram_dirty)
 		updateAceRam(screen->machine);
 
-	fillbitmap(sprite0_mix_bitmap,0,cliprect);
-	fillbitmap(sprite1_mix_bitmap,0,cliprect);
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(tilemap_alpha_bitmap,0,cliprect);
+	bitmap_fill(sprite0_mix_bitmap,cliprect,0);
+	bitmap_fill(sprite1_mix_bitmap,cliprect,0);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(tilemap_alpha_bitmap,cliprect,0);
 	if ((deco32_pf34_control[5]&0x8000)==0)
-		fillbitmap(bitmap,screen->machine->pens[0x200],cliprect);
+		bitmap_fill(bitmap,cliprect,screen->machine->pens[0x200]);
 
 	/* Draw sprites to temporary bitmaps, saving alpha & priority info for later mixing */
 	nslasher_draw_sprites(screen->machine,sprite0_mix_bitmap,cliprect,buffered_spriteram32,3);
@@ -1604,7 +1604,7 @@ VIDEO_UPDATE( nslasher )
 
 	/* Render alpha-blended tilemap to seperate buffer for proper mixing */
 	if (alphaTilemap)
-		fillbitmap(tilemap_alpha_bitmap,0,cliprect);
+		bitmap_fill(tilemap_alpha_bitmap,cliprect,0);
 
 	/* Draw playfields & sprites */
 	if (deco32_pri&2)

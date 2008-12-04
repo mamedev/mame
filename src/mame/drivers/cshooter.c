@@ -145,7 +145,7 @@ static VIDEO_START(cshooter)
 
 static VIDEO_UPDATE(cshooter)
 {
-	fillbitmap(bitmap, 0/*get_black_pen(screen->screen->machine)*/, cliprect);
+	bitmap_fill(bitmap, cliprect, 0/*get_black_pen(screen->screen->machine)*/);
 	tilemap_mark_all_tiles_dirty(cshooter_txtilemap);
 
 	//sprites

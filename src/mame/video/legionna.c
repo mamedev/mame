@@ -344,7 +344,7 @@ VIDEO_UPDATE( legionna )
 	tilemap_set_scrolly( foreground_layer, 0, legionna_scrollram16[5] );
 
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);	/* wrong color? */
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));	/* wrong color? */
 
 	/* legionna_layer_disable is a guess based on 'stage 1' screen in heatbrl  */
 
@@ -377,7 +377,7 @@ VIDEO_UPDATE( godzilla )
 	tilemap_set_scrollx( foreground_layer, 0, legionna_scrollram16[4] );
 	tilemap_set_scrolly( foreground_layer, 0, legionna_scrollram16[5] );
 
-	fillbitmap(bitmap,0x0200,cliprect);
+	bitmap_fill(bitmap,cliprect,0x0200);
 
 	if (!(legionna_layer_disable&0x0001))
 	{
@@ -421,7 +421,7 @@ VIDEO_UPDATE( sdgndmrb )
   	tilemap_set_scrollx( text_layer, 0,  legionna_scrollram16[6] );
   	tilemap_set_scrolly( text_layer, 0,  legionna_scrollram16[7] );
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if(!(sdgndmrb_pri_n & 1))
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);

@@ -419,7 +419,7 @@ static void erase_sprites(running_machine* const machine, bitmap_t* const bitmap
 	// if sprite overdraw is disabled, clear the sprite framebuffer
 	// if sprite overdraw is enabled, only clear palettes 0-B and F, and leave C-E on screen
 	if (!sprite_overdraw_enabled)
-		fillbitmap(sp_bitmap, 15, cliprect);
+		bitmap_fill(sp_bitmap, cliprect, 15);
 	else
 	{
 		int x,y;
@@ -460,7 +460,7 @@ VIDEO_UPDATE( ninjakd2 )
 	update_sprites(screen->machine);
 	sprites_updated = 1;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -476,7 +476,7 @@ VIDEO_UPDATE( robokid )
 	update_sprites(screen->machine);
 	sprites_updated = 1;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
 
@@ -496,7 +496,7 @@ VIDEO_UPDATE( omegaf )
 	update_sprites(screen->machine);
 	sprites_updated = 1;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
 

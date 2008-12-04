@@ -104,7 +104,7 @@ WRITE16_HANDLER( glass_blitter_w )
 					}
 				}
 			} else {
-				fillbitmap(screen_bitmap, 0, 0);
+				bitmap_fill(screen_bitmap, 0, 0);
 			}
 		}
 	}
@@ -202,7 +202,7 @@ VIDEO_UPDATE( glass )
 	tilemap_set_scrollx(pant[1], 0, glass_vregs[3]);
 
 	/* draw layers + sprites */
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	copybitmap(bitmap,screen_bitmap,0,0,0x18,0x24,cliprect);
 	tilemap_draw(bitmap,cliprect,pant[1],0,0);
 	tilemap_draw(bitmap,cliprect,pant[0],0,0);

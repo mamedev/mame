@@ -400,7 +400,7 @@ static VIDEO_UPDATE( jalmah )
 	tilemap_set_scrolly( sc3_tilemap_2, 0, jm_scrollram[7] & 0x1ff);
 	tilemap_set_scrolly( sc3_tilemap_3, 0, jm_scrollram[7] & 0x3ff);
 
-    fillbitmap(bitmap, screen->machine->pens[0x10f], cliprect);//selectable by a ram address?
+    bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10f]);//selectable by a ram address?
 
 	for(cur_prin=0;cur_prin<4;cur_prin++)
 	{
@@ -421,7 +421,7 @@ static VIDEO_UPDATE( urashima )
 	tilemap_set_scrolly( sc0_tilemap_0, 0, jm_scrollram[4]);
 	tilemap_set_scrolly( sc3_tilemap_0, 0, jm_scrollram[7]);
 
-	fillbitmap(bitmap, screen->machine->pens[0x1ff], cliprect);//selectable by a ram address?
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x1ff]);//selectable by a ram address?
 	if(jm_vregs[0] & 1) { tilemap_draw(bitmap,cliprect,sc0_tilemap_0,0,0); }
  	if(jm_vregs[3] & 1) { tilemap_draw(bitmap,cliprect,sc3_tilemap_0,0,0); }
 	return 0;

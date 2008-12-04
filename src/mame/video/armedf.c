@@ -327,7 +327,7 @@ VIDEO_UPDATE( armedf )
 	}
 
 
-	fillbitmap( bitmap, 0xff, cliprect );
+	bitmap_fill( bitmap, cliprect , 0xff);
 	if (armedf_vreg & 0x0800) tilemap_draw( bitmap, cliprect, bg_tilemap, 0, 0);
 	/*if( armedf_vreg & 0x0800 )
     {
@@ -335,7 +335,7 @@ VIDEO_UPDATE( armedf )
     }
     else
     {
-        fillbitmap( bitmap, get_black_pen(screen->machine)&0x0f, cliprect );
+        bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine)&0x0f);
     }*/
 
 	if ((mcu_mode&0x0030)==0x0030) tilemap_draw( bitmap, cliprect, armedf_tx_tilemap, 0, 0);

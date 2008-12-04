@@ -107,7 +107,7 @@ static VIDEO_UPDATE(jingbell)
 			int x,y,z, tmap, ystart = 0;
 			rectangle myclip;
 
-			fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+			bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 			memcpy(&myclip,cliprect,sizeof(myclip));
 
@@ -137,7 +137,7 @@ static VIDEO_UPDATE(jingbell)
 		}
 		else				tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	}
-	else					fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	else					bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);

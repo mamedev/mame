@@ -242,13 +242,13 @@ if (input_code_pressed(KEYCODE_Z))
 }
 #endif
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if (layers_ctrl&1)
 		for (i = 0; i <= 1; i++)
 			tilemap_draw(bitmap, cliprect, tilemap_0, i, i);
 	else
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 
 	if (layers_ctrl&2)
 		for (i = 0; i <= 1; i++)

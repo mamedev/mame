@@ -317,8 +317,8 @@ VIDEO_UPDATE( gcpinbal )
 		tilemap_set_scrolly(gcpinbal_tilemap[i], 0, gcpinbal_scrolly[i]);
 	}
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	layer[0] = 0;
 	layer[1] = 1;

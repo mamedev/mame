@@ -77,7 +77,7 @@ static VIDEO_UPDATE(taitowlf)
 	UINT32 *cga = cga_ram;
 	int index = 0;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	for (j=0; j < 25; j++)
 	{

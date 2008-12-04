@@ -271,7 +271,7 @@ static VIDEO_START( trvmadns )
 
 static VIDEO_UPDATE( trvmadns )
 {
-	fillbitmap(bitmap,0xd,cliprect);
+	bitmap_fill(bitmap,cliprect,0xd);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 

@@ -131,14 +131,14 @@ VIDEO_UPDATE( warriorb )
 	layer[2] = 2;
 
 	/* Clear priority bitmap */
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	/* chip 0 does tilemaps on the left, chip 1 does the ones on the right */
 	// draw bottom layer
 	nodraw  = TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,screen_number,layer[0],TILEMAP_DRAW_OPAQUE,0);	/* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
-	if(nodraw) fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	if(nodraw) bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	// draw middle layer
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,screen_number,layer[1],0,1);

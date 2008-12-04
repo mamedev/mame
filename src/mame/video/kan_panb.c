@@ -12,7 +12,7 @@ VIDEO_UPDATE( honeydol )
 
 	/* not standard snowbros video */
 
-	fillbitmap(bitmap,0xf0,cliprect);
+	bitmap_fill(bitmap,cliprect,0xf0);
 
 	for (offs = 0x0000/2;offs < 0x2000/2;offs += 8)
 	{
@@ -98,7 +98,7 @@ VIDEO_UPDATE( twinadv )
 
 	/* not standard snowbros video */
 
-	fillbitmap(bitmap,0xf0,cliprect);
+	bitmap_fill(bitmap,cliprect,0xf0);
 
 	for (offs = 0x0000/2;offs < 0x2000/2;offs += 8)
 	{
@@ -148,7 +148,7 @@ VIDEO_UPDATE( wintbob )
 {
 	int offs;
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{
@@ -216,7 +216,7 @@ VIDEO_UPDATE( snowbro3 )
 
 	/* This clears & redraws the entire screen each pass */
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	for (offs = 0;offs < spriteram_size/2;offs += 8)
 	{

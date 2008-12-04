@@ -66,7 +66,7 @@ static WRITE16_HANDLER(blitter_9b8000_w)
 
 	if(of==0)
 	{
-		fillbitmap(tmpbitmap,get_black_pen(space->machine),0);
+		bitmap_fill(tmpbitmap,NULL,get_black_pen(space->machine));
 		return;
 	}
 

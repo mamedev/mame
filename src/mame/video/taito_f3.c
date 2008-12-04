@@ -3304,7 +3304,7 @@ VIDEO_UPDATE( f3 )
 		sy_fix[4]=-sy_fix[4];
 	}
 
-	fillbitmap(pri_alp_bitmap,0,cliprect);
+	bitmap_fill(pri_alp_bitmap,cliprect,0);
 
 	/* sprites */
 	if (sprite_lag==0)

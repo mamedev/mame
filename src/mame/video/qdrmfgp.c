@@ -59,7 +59,7 @@ VIDEO_START( qdrmfgp2 )
 
 VIDEO_UPDATE( qdrmfgp )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	K056832_tilemap_draw(screen->machine, bitmap,cliprect, 3, 0, 1);
 	K056832_tilemap_draw(screen->machine, bitmap,cliprect, 2, 0, 2);

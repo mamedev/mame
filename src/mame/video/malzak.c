@@ -74,7 +74,7 @@ VIDEO_UPDATE( malzak )
 	bitmap_t *s2636_0_bitmap;
 	bitmap_t *s2636_1_bitmap;
 
-	fillbitmap(bitmap,0,0);
+	bitmap_fill(bitmap,0,0);
 
 	// SAA 5050 - Teletext character generator
 	for (sy = 24; sy >= 0; sy--)

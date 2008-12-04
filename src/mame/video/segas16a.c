@@ -41,12 +41,12 @@ VIDEO_UPDATE( system16a )
 	/* if no drawing is happening, fill with black and get out */
 	if (!segaic16_display_enable)
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 
 	/* reset priorities */
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	/* draw background opaquely first, not setting any priorities */
 	segaic16_tilemap_draw(screen->machine, 0, bitmap, cliprect, SEGAIC16_TILEMAP_BACKGROUND, 0 | TILEMAP_DRAW_OPAQUE, 0x00);

@@ -510,7 +510,7 @@ VIDEO_UPDATE( m72 )
 {
 	if (video_off)
 	{
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 
@@ -535,7 +535,7 @@ VIDEO_UPDATE( majtitle )
 
 	if (video_off)
 	{
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 

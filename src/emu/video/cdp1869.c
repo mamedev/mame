@@ -664,7 +664,7 @@ void cdp1869_update(const device_config *device, bitmap_t *bitmap, const rectang
 	}
 
 	sect_rect(&outer, cliprect);
-	fillbitmap(bitmap, device->machine->pens[cdp1869->bkg], &outer);
+	bitmap_fill(bitmap, &outer, device->machine->pens[cdp1869->bkg]);
 
 	if (!cdp1869->dispoff)
 	{

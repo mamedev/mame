@@ -832,7 +832,7 @@ void deco16_print_debug_info(bitmap_t *bitmap)
 void deco16_clear_sprite_priority_bitmap(void)
 {
 	if (sprite_priority_bitmap)
-		fillbitmap(sprite_priority_bitmap,0,NULL);
+		bitmap_fill(sprite_priority_bitmap,NULL,0);
 }
 
 /* A special pdrawgfx z-buffered sprite renderer that is needed to properly draw multiple sprite sources with alpha */

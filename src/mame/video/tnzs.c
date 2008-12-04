@@ -197,7 +197,7 @@ VIDEO_UPDATE( tnzs )
 
 
 	/* Fill the background */
-	fillbitmap(bitmap, 0x1f0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0x1f0);
 
 	/* Redraw the background tiles (c400-c5ff) */
 	draw_background(screen->machine, bitmap, cliprect, tnzs_objram + 0x400);

@@ -171,7 +171,7 @@ static VIDEO_UPDATE(murogem)
 	int xx,yy,count;
 	count = 0x000;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	for (yy=0;yy<32;yy++)
 	{

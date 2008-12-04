@@ -1233,7 +1233,7 @@ VIDEO_UPDATE( valtric )
 	if (argus_bg_status & 1)	/* Backgound enable */
 		valtric_draw_mosaic(screen, bitmap, cliprect);
 	else
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	valtric_draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);
 	return 0;
@@ -1246,7 +1246,7 @@ VIDEO_UPDATE( butasan )
 	if (argus_bg_status & 1)	/* Backgound enable */
 		tilemap_draw(bitmap, cliprect, bg0_tilemap, 0, 0);
 	else
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	if (butasan_bg1_status & 1) tilemap_draw(bitmap, cliprect, bg1_tilemap, 0, 0);
 	butasan_draw_sprites(screen->machine, bitmap, cliprect);
 	tilemap_draw(bitmap, cliprect, tx_tilemap,  0, 0);

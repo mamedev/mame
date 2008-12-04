@@ -536,7 +536,7 @@ VIDEO_UPDATE( system1 )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	return 0;
 }
 
@@ -677,7 +677,7 @@ VIDEO_UPDATE( choplifter )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 
 
 #ifdef MAME_DEBUG
@@ -808,7 +808,7 @@ VIDEO_UPDATE( wbml )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	return 0;
 }
 
@@ -878,7 +878,7 @@ VIDEO_UPDATE( ufosensi )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	return 0;
 }
 
@@ -899,7 +899,7 @@ VIDEO_UPDATE( blockgal )
 
 	/* even if screen is off, sprites must still be drawn to update the collision table */
 	if (system1_video_mode & 0x10)  /* screen off */
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 
 	blockgal_kludgeoffset = 0;
 	return 0;

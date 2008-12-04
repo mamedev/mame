@@ -540,7 +540,7 @@ VIDEO_UPDATE( superpac )
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE | TILEMAP_DRAW_ALL_CATEGORIES,0);
 
-	fillbitmap(sprite_bitmap,15,cliprect);
+	bitmap_fill(sprite_bitmap,cliprect,15);
 	mappy_draw_sprites(screen->machine,sprite_bitmap,cliprect,0,0,15);
 	copybitmap_trans(bitmap,sprite_bitmap,0,0,0,0,cliprect,15);
 

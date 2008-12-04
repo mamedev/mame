@@ -1392,7 +1392,7 @@ VIDEO_UPDATE(segac2_new)
 {
 	if (!segac2_enable_display)
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), NULL);
+		bitmap_fill(bitmap, NULL, get_black_pen(screen->machine));
 		return 0;
 	}
 

@@ -457,7 +457,7 @@ static void splndrbt_copy_bg(running_machine *machine, bitmap_t *dst_bitmap, con
 
 VIDEO_UPDATE( equites )
 {
-	fillbitmap(bitmap, bgcolor, cliprect);
+	bitmap_fill(bitmap, cliprect, bgcolor);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
@@ -470,7 +470,7 @@ VIDEO_UPDATE( equites )
 
 VIDEO_UPDATE( splndrbt )
 {
-	fillbitmap(bitmap, bgcolor, cliprect);
+	bitmap_fill(bitmap, cliprect, bgcolor);
 
 	splndrbt_copy_bg(screen->machine, bitmap, cliprect);
 

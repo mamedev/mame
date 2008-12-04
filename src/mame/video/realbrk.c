@@ -297,8 +297,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 				// buffer the tile and rotate it into bitmap
 				if( rot )
 				{
-					fillbitmap( tmpbitmap0, 0, &spritetile_clip );
-					fillbitmap( tmpbitmap1, 0, &spritetile_clip );
+					bitmap_fill( tmpbitmap0, &spritetile_clip , 0);
+					bitmap_fill( tmpbitmap1, &spritetile_clip , 0);
 					drawgfxzoom(	tmpbitmap0,machine->gfx[gfx],
 									code++,
 									color,
@@ -516,11 +516,11 @@ if ( input_code_pressed(KEYCODE_Z) )
 
 	if (disable_video)
 	{
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 	else
-		fillbitmap(bitmap,realbrk_vregs[0xc/2] & 0x7fff,cliprect);
+		bitmap_fill(bitmap,cliprect,realbrk_vregs[0xc/2] & 0x7fff);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,0);
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,0);
@@ -584,11 +584,11 @@ if ( input_code_pressed(KEYCODE_Z) )
 
 	if (disable_video)
 	{
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 	else
-		fillbitmap(bitmap,realbrk_vregs[0xc/2] & 0x7fff,cliprect);
+		bitmap_fill(bitmap,cliprect,realbrk_vregs[0xc/2] & 0x7fff);
 
 
 

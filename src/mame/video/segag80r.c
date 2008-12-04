@@ -747,7 +747,7 @@ static void draw_background_page_scroll(bitmap_t *bitmap, const rectangle *clipr
 	/* if disabled, draw nothing */
 	if (!bg_enable)
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 		return;
 	}
 
@@ -787,7 +787,7 @@ static void draw_background_full_scroll(bitmap_t *bitmap, const rectangle *clipr
 	/* if disabled, draw nothing */
 	if (!bg_enable)
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 		return;
 	}
 

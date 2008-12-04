@@ -405,8 +405,8 @@ static VIDEO_START(varia)
 
 static VIDEO_UPDATE(varia)
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_set_scrollx(vmetal_mid2tilemap,0, vmetal_videoregs[0x06a/2]-64 /*+ vmetal_videoregs[0x066/2]*/);
 	tilemap_set_scrollx(vmetal_mid1tilemap,0, vmetal_videoregs[0x07a/2]-64 /*+ vmetal_videoregs[0x076/2]*/);

@@ -45,7 +45,7 @@ static VIDEO_UPDATE( istellar )
 	int charx, chary;
 
 	/* clear */
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	/* DEBUG */
 	/*

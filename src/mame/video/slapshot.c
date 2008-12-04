@@ -578,8 +578,8 @@ VIDEO_UPDATE( slapshot )
 	spritepri[2] = TC0360PRI_regs[7] & 0x0f;
 	spritepri[3] = TC0360PRI_regs[7] >> 4;
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,0);
 
 #ifdef MAME_DEBUG
 	if (dislayer[layer[0]]==0)

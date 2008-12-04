@@ -392,7 +392,7 @@ VIDEO_UPDATE( galivan )
 	tilemap_set_scrolly(bg_tilemap,0,scrolly[0] + 256 * (scrolly[1] & 0x07));
 
 	if (layers & 0x40)
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	else
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 
@@ -416,7 +416,7 @@ VIDEO_UPDATE( ninjemak )
 	tilemap_set_scrolly(bg_tilemap,0,scrolly[0] + 256 * (scrolly[1] & 0xff));
 
 	if (ninjemak_dispdisable)
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	else
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 

@@ -260,7 +260,7 @@ VIDEO_UPDATE( cloud9 )
 	int x, y, offs;
 
 	/* draw the sprites */
-	fillbitmap(spritebitmap, 0x00, cliprect);
+	bitmap_fill(spritebitmap, cliprect, 0x00);
 	for (offs = 0; offs < 0x20; offs++)
 		if (spriteaddr[offs + 0x00] != 0)
 		{

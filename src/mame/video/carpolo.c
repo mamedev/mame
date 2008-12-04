@@ -373,8 +373,8 @@ static int check_sprite_sprite_collision(running_machine *machine,
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
-		fillbitmap(sprite_sprite_collision_bitmap1, 0, 0);
-		fillbitmap(sprite_sprite_collision_bitmap2, 0, 0);
+		bitmap_fill(sprite_sprite_collision_bitmap1, 0, 0);
+		bitmap_fill(sprite_sprite_collision_bitmap2, 0, 0);
 
 		drawgfx(sprite_sprite_collision_bitmap1,machine->gfx[0],
 				code1,0,
@@ -428,8 +428,8 @@ static int check_sprite_left_goal_collision(running_machine *machine, int x1, in
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
-		fillbitmap(sprite_goal_collision_bitmap1, 0, 0);
-		fillbitmap(sprite_goal_collision_bitmap2, 0, 0);
+		bitmap_fill(sprite_goal_collision_bitmap1, 0, 0);
+		bitmap_fill(sprite_goal_collision_bitmap2, 0, 0);
 
 		drawgfx(sprite_goal_collision_bitmap1,machine->gfx[0],
 				code1,0,
@@ -487,8 +487,8 @@ static int check_sprite_right_goal_collision(running_machine *machine, int x1, i
 
 		normalize_coordinates(&x1, &y1, &x2, &y2);
 
-		fillbitmap(sprite_goal_collision_bitmap1, 0, 0);
-		fillbitmap(sprite_goal_collision_bitmap2, 0, 0);
+		bitmap_fill(sprite_goal_collision_bitmap1, 0, 0);
+		bitmap_fill(sprite_goal_collision_bitmap2, 0, 0);
 
 		drawgfx(sprite_goal_collision_bitmap1,machine->gfx[0],
 				code1,0,

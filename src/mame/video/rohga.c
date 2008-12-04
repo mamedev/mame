@@ -444,8 +444,8 @@ static void update_rohga(running_machine *machine, bitmap_t *bitmap, const recta
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields */
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,machine->pens[768],cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,machine->pens[768]);
 
 	switch (deco16_priority&3)
 	{
@@ -501,7 +501,7 @@ VIDEO_UPDATE( wizdfire )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
-	fillbitmap(bitmap,screen->machine->pens[512],cliprect);
+	bitmap_fill(bitmap,cliprect,screen->machine->pens[512]);
 
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 	wizdfire_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,4,3);
@@ -530,8 +530,8 @@ VIDEO_UPDATE( nitrobal )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields - Palette of 2nd playfield chip visible if playfields turned off */
-	fillbitmap(bitmap,screen->machine->pens[512],cliprect);
-	fillbitmap(priority_bitmap,0,NULL);
+	bitmap_fill(bitmap,cliprect,screen->machine->pens[512]);
+	bitmap_fill(priority_bitmap,NULL,0);
 	deco16_clear_sprite_priority_bitmap();
 
 	/* pf3 and pf4 are combined into a single 8bpp bitmap */

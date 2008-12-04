@@ -887,7 +887,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 VIDEO_UPDATE( seta_no_layers )
 {
 	set_pens(screen->machine);
-	fillbitmap(bitmap,0x1f0,cliprect);
+	bitmap_fill(bitmap,cliprect,0x1f0);
 	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }
@@ -977,7 +977,7 @@ if (input_code_pressed(KEYCODE_Z))
 }
 #endif
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	if (order & 1)	// swap the layers?
 	{

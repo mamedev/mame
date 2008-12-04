@@ -43,7 +43,7 @@ static VIDEO_UPDATE( esh )
 	int charx, chary;
 
 	/* clear */
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	/* Draw tiles */
 	for (charx = 0; charx < 32; charx++)

@@ -353,7 +353,7 @@ static VIDEO_UPDATE( meritm )
 		popmessage("Layer 1 %sabled",layer1_enabled ? "en" : "dis");
 	}
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	if ( layer0_enabled )
 	{

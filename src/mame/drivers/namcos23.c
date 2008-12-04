@@ -873,8 +873,8 @@ DrawPoly( bitmap_t *bitmap, const UINT32 *pSource, int n, int bNew )
 
 static VIDEO_UPDATE( ss23 )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	tilemap_mark_all_tiles_dirty(bgtilemap);
 	tilemap_draw( bitmap, cliprect, bgtilemap, 0/*flags*/, 0/*priority*/ ); /* opaque */
@@ -886,7 +886,7 @@ static VIDEO_UPDATE( ss23 )
 
 	pSource = pSource + pSource[code];
 
-	fillbitmap( bitmap, 0, 0 );
+	bitmap_fill( bitmap, 0 , 0);
 	for(;;)
 	{
 		UINT32 opcode = *pSource++;

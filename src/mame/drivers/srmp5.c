@@ -69,7 +69,7 @@ static VIDEO_UPDATE( srmp5 )
 	UINT8 *pixels=(UINT8 *)tileram;
 	const rectangle *visarea = video_screen_get_visible_area(screen);
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	while((sprite_list[SUBLIST_OFFSET]&SPRITE_LIST_END_MARKER)==0 && sprite_list<sprite_list_end)
 	{

@@ -950,7 +950,7 @@ static void kaneko16_render_sprites(running_machine *machine, bitmap_t *bitmap, 
 	}
 	else
 	{
-		fillbitmap(sprites_bitmap,0,cliprect);
+		bitmap_fill(sprites_bitmap,cliprect,0);
 		kaneko16_draw_sprites(machine,bitmap,cliprect);
 	}
 }
@@ -978,19 +978,19 @@ static void kaneko16_render_15bpp_bitmap(running_machine *machine, bitmap_t *bit
 static void kaneko16_fill_bitmap(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if(kaneko16_sprite_type == 1)
-		fillbitmap(bitmap,0x7f00,cliprect);
+		bitmap_fill(bitmap,cliprect,0x7f00);
 	else
 		/* Fill the bitmap with pen 0. This is wrong, but will work most of
            the times. To do it right, each pixel should be drawn with pen 0
            of the bottomost tile that covers it (which is pretty tricky to do) */
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 }
 
 static VIDEO_UPDATE( common )
 {
 	int i;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	kaneko16_prepare_first_tilemap_chip(screen->machine, bitmap, cliprect);
 	kaneko16_prepare_second_tilemap_chip(screen->machine, bitmap, cliprect);

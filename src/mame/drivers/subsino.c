@@ -68,7 +68,7 @@ static VIDEO_START( subsino )
 
 static VIDEO_UPDATE( subsino )
 {
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 	tilemap_draw(bitmap,cliprect, tmap, 0, 0);
 	return 0;
 }

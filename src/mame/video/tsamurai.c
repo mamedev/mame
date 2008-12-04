@@ -216,7 +216,7 @@ VIDEO_UPDATE( tsamurai )
         Note that the background color register isn't well understood
         (screenshots would be helpful)
     */
-	fillbitmap(bitmap,bgcolor,cliprect);
+	bitmap_fill(bitmap,cliprect,bgcolor);
 	tilemap_draw(bitmap,cliprect,background,0,0);
 	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,foreground,0,0);

@@ -707,7 +707,7 @@ VIDEO_UPDATE( mbmj8688 )
 		copybitmap(bitmap, mjsikaku_tmpbitmap, 0, 0, 0, scrolly - 256, cliprect);
 	}
 	else
-		fillbitmap(bitmap, 0, 0);
+		bitmap_fill(bitmap, 0, 0);
 
 	return 0;
 }

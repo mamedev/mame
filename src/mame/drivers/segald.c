@@ -80,7 +80,7 @@ static void astron_draw_sprites(bitmap_t *bitmap, const rectangle *cliprect)
 
 static VIDEO_UPDATE( astron )
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	astron_draw_characters(screen->machine, bitmap, cliprect);
 	astron_draw_sprites(bitmap, cliprect);

@@ -156,8 +156,8 @@ static VIDEO_UPDATE(dblewing)
 	flip_screen_set( deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
-	fillbitmap(bitmap,0,cliprect); /* not Confirmed */
-	fillbitmap(priority_bitmap,0,NULL);
+	bitmap_fill(bitmap,cliprect,0); /* not Confirmed */
+	bitmap_fill(priority_bitmap,NULL,0);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,4);

@@ -276,7 +276,7 @@ VIDEO_UPDATE( wolfpack )
 																		  color < 0xb8 ? color + 0x48 : 0xff,
 																		  color < 0xb8 ? color + 0x48 : 0xff));
 
-	fillbitmap(bitmap, wolfpack_video_invert, cliprect);
+	bitmap_fill(bitmap, cliprect, wolfpack_video_invert);
 
 	for (i = 0; i < 8; i++)
 		for (j = 0; j < 32; j++)
@@ -313,7 +313,7 @@ VIDEO_EOF( wolfpack )
 	rect.max_x = helper->width - 1;
 	rect.max_y = helper->height - 1;
 
-	fillbitmap(helper, 0, &rect);
+	bitmap_fill(helper, &rect, 0);
 
 	draw_ship(machine, helper, &rect);
 

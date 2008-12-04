@@ -1241,7 +1241,7 @@ static void hng64_drawtilemap1( bitmap_t *bitmap, const rectangle *cliprect )
 
 VIDEO_UPDATE( hng64 )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), 0);
+	bitmap_fill(bitmap, 0, get_black_pen(screen->machine));
 
 	// Debug
 //  for (int iii = 0; iii < 0x0f; iii++)

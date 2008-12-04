@@ -318,7 +318,7 @@ VIDEO_UPDATE( taitol )
 
 	if (cur_ctrl & 0x20)	/* display enable */
 	{
-		fillbitmap(priority_bitmap,0,cliprect);
+		bitmap_fill(priority_bitmap,cliprect,0);
 
 		tilemap_draw(bitmap,cliprect,bg19_tilemap,0,0);
 
@@ -331,7 +331,7 @@ VIDEO_UPDATE( taitol )
 		tilemap_draw(bitmap,cliprect,ch1a_tilemap,0,0);
 	}
 	else
-		fillbitmap(bitmap,screen->machine->pens[0],cliprect);
+		bitmap_fill(bitmap,cliprect,screen->machine->pens[0]);
 	return 0;
 }
 

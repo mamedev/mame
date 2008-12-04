@@ -1084,7 +1084,7 @@ VIDEO_UPDATE ( wecleman )
 
 	get_sprite_info(screen->machine);
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	/* Draw the road (lines which have priority 0x02) */
 	if (video_on) wecleman_draw_road(screen->machine, bitmap, cliprect, 0x02);
@@ -1145,7 +1145,7 @@ VIDEO_UPDATE( hotchase )
 
 	get_sprite_info(screen->machine);
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	/* Draw the background */
 	if (video_on) K051316_zoom_draw_0(bitmap,cliprect, 0, 0);

@@ -81,7 +81,7 @@ static UINT16 *textram;
 static VIDEO_UPDATE( drill )
 {
 	int i;
-	fillbitmap(bitmap,0,NULL);
+	bitmap_fill(bitmap,NULL,0);
 
 	for (i=0; i<256; i++)
 	{

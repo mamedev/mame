@@ -296,7 +296,7 @@ static VIDEO_UPDATE( tmaster )
 
 
 	if (layers_ctrl & 1)	copybitmap			(bitmap,tmaster_bitmap[0][(tmaster_regs[0x02/2]>>8)&1],0,0,0,0,cliprect);
-	else					fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	else					bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (layers_ctrl & 2)	copybitmap_trans	(bitmap,tmaster_bitmap[1][(tmaster_regs[0x02/2]>>9)&1],0,0,0,0,cliprect,0xff);
 

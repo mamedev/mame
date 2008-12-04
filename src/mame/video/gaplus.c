@@ -321,7 +321,7 @@ VIDEO_UPDATE( gaplus )
 	/* flip screen control is embedded in RAM */
 	flip_screen_set(gaplus_spriteram[0x1f7f-0x800] & 1);
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	starfield_render(screen->machine, bitmap);
 

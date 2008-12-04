@@ -274,7 +274,7 @@ static VIDEO_START( hangplt )
 
 static VIDEO_UPDATE( hangplt )
 {
-	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	if (strcmp(screen->tag, "left") == 0)
 	{

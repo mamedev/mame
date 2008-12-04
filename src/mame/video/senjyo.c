@@ -174,7 +174,7 @@ static void draw_bgbitmap(running_machine *machine, bitmap_t *bitmap,const recta
 
 
 	if (senjyo_bgstripes == 0xff)	/* off */
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	else
 	{
 		pen = 0;

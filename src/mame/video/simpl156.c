@@ -113,11 +113,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( simpl156 )
 {
-	fillbitmap(priority_bitmap,0,NULL);
+	bitmap_fill(priority_bitmap,NULL,0);
 
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
-	fillbitmap(bitmap,256,cliprect);
+	bitmap_fill(bitmap,cliprect,256);
 
 	deco16_tilemap_2_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,4);

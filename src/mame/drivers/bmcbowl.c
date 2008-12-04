@@ -132,7 +132,7 @@ static VIDEO_UPDATE( bmcbowl )
 */
 
 	int x,y,z,pixdat;
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	z=0;
 	for (y=0;y<230;y++)

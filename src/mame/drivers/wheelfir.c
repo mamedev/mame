@@ -302,7 +302,7 @@ static VIDEO_UPDATE(wheelfir)
     copybitmap(bitmap, wheelfir_tmp_bitmap[2], 0, 0, 0, 0, cliprect);
     //copybitmap_trans(bitmap, wheelfir_tmp_bitmap[1], 0, 0, 0, 0, cliprect, 0);
     copybitmap_trans(bitmap, wheelfir_tmp_bitmap[0], 0, 0, 0, 0, cliprect, 0);
-    fillbitmap(wheelfir_tmp_bitmap[0], 0,video_screen_get_visible_area(screen));
+    bitmap_fill(wheelfir_tmp_bitmap[0], video_screen_get_visible_area(screen),0);
 
     if ( input_code_pressed(KEYCODE_R) )
     {
@@ -605,7 +605,7 @@ static TIMER_CALLBACK( scanline_timer_callback )
 static VIDEO_EOF( wheelfir )
 {
 	scanline_counter = -1;
-	fillbitmap(wheelfir_tmp_bitmap[0], 0,video_screen_get_visible_area(machine->primary_screen));
+	bitmap_fill(wheelfir_tmp_bitmap[0], video_screen_get_visible_area(machine->primary_screen),0);
 
 	timer_adjust_oneshot(frame_timer,  attotime_zero, 0);
 	timer_adjust_oneshot(scanline_timer,  attotime_zero, 0);

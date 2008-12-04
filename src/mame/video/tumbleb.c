@@ -748,7 +748,7 @@ VIDEO_UPDATE( fncywld )
 
 VIDEO_UPDATE( jumppop )
 {
-//  fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+//  bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	tilemap_set_scrollx( pf1_tilemap,0, jumppop_control[2]-0x3a0 );
 	tilemap_set_scrolly( pf1_tilemap,0, jumppop_control[3] );

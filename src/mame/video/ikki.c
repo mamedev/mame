@@ -70,7 +70,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	int y;
 	offs_t offs;
 
-	fillbitmap(sprite_bitmap, punch_through_pen, cliprect);
+	bitmap_fill(sprite_bitmap, cliprect, punch_through_pen);
 
 	for (offs = 0; offs < 0x800; offs += 4)
 	{

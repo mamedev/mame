@@ -240,8 +240,8 @@ VIDEO_UPDATE( groundfx )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,0,cliprect);	/* wrong color? */
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[0],TILEMAP_DRAW_OPAQUE,0);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[1],0,0);

@@ -402,8 +402,8 @@ VIDEO_UPDATE( cninja )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields */
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,512,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,512);
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 	deco16_tilemap_3_draw(bitmap,cliprect,0,2);
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER1,2);
@@ -419,8 +419,8 @@ VIDEO_UPDATE( edrandy )
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,0);
 	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 	if (deco16_raster_display_position)
 		raster_pf3_draw(bitmap,cliprect,0,2);
@@ -451,8 +451,8 @@ VIDEO_UPDATE( robocop2 )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields */
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,0x200,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,0x200);
 	if ((deco16_priority&4)==0)
 		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 
@@ -487,7 +487,7 @@ VIDEO_UPDATE( mutantf )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields */
-	fillbitmap(bitmap,0x400,cliprect); /* Confirmed */
+	bitmap_fill(bitmap,cliprect,0x400); /* Confirmed */
 
 	/* There is no priority prom on this board, but there is a
     priority control word, the only values used in game appear
@@ -511,14 +511,14 @@ VIDEO_UPDATE( mutantf )
         then when two alpha blended shadows overlapped then they would be 25%
         transparent against the background, rather than 50% */
 	if (deco16_priority&1) {
-		fillbitmap(priority_bitmap,0,cliprect);
+		bitmap_fill(priority_bitmap,cliprect,0);
 		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
-		fillbitmap(priority_bitmap,0,cliprect);
+		bitmap_fill(priority_bitmap,cliprect,0);
 		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
 	} else {
-		fillbitmap(priority_bitmap,0,cliprect);
+		bitmap_fill(priority_bitmap,cliprect,0);
 		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16_2,4);
-		fillbitmap(priority_bitmap,0,cliprect);
+		bitmap_fill(priority_bitmap,cliprect,0);
 		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
 	}
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);

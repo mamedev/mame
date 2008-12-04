@@ -740,13 +740,13 @@ static void gfxset_update_bitmap(running_machine *machine, ui_gfx_state *state, 
 
 					/* otherwise, fill with transparency */
 					else
-						fillbitmap(state->bitmap, 0, &cellbounds);
+						bitmap_fill(state->bitmap, &cellbounds, 0);
 				}
 			}
 
 			/* otherwise, fill with transparency */
 			else
-				fillbitmap(state->bitmap, 0, &cellbounds);
+				bitmap_fill(state->bitmap, &cellbounds, 0);
 		}
 
 		/* reset the texture to force an update */

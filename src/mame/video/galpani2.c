@@ -163,8 +163,8 @@ if (input_code_pressed(KEYCODE_Z))
 	if (msk != 0) layers_ctrl &= msk;	}
 #endif
 
-	fillbitmap(bitmap,0,cliprect);
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if (layers_ctrl & 0x1)
 	{

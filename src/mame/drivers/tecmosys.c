@@ -582,13 +582,13 @@ ADDRESS_MAP_END
 static VIDEO_START(deroon)
 {
 	sprite_bitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
-	fillbitmap(sprite_bitmap, 0x4000, NULL);
+	bitmap_fill(sprite_bitmap, NULL, 0x4000);
 
 	tmp_tilemap_composebitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
 	tmp_tilemap_renderbitmap = auto_bitmap_alloc(320,240,BITMAP_FORMAT_INDEXED16);
 
-	fillbitmap(tmp_tilemap_composebitmap, 0x0000, NULL);
-	fillbitmap(tmp_tilemap_renderbitmap, 0x0000, NULL);
+	bitmap_fill(tmp_tilemap_composebitmap, NULL, 0x0000);
+	bitmap_fill(tmp_tilemap_renderbitmap, NULL, 0x0000);
 
 
 	txt_tilemap = tilemap_create(get_tile_info,tilemap_scan_rows,8,8,32*2,32*2);
@@ -611,7 +611,7 @@ static void tecmosys_render_sprites_to_bitmap(running_machine *machine, bitmap_t
 	int i;
 
 	/* render sprites (with priority information) to temp bitmap */
-	fillbitmap(sprite_bitmap, 0x0000, NULL);
+	bitmap_fill(sprite_bitmap, NULL, 0x0000);
 	/* there are multiple spritelists in here, to allow for buffering */
 	for (i=(tecmosys_spritelist*0x4000)/2;i<((tecmosys_spritelist+1)*0x4000)/2;i+=8)
 	{
@@ -795,7 +795,7 @@ static void tecmosys_do_final_mix(running_machine *machine, bitmap_t* bitmap)
 static VIDEO_UPDATE(deroon)
 {
 
-	fillbitmap(bitmap,screen->machine->pens[0x4000],cliprect);
+	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x4000]);
 
 
 	tilemap_set_scrolly( bg0tilemap, 0, tecmosys_c80000regs[1]+16);
@@ -807,21 +807,21 @@ static VIDEO_UPDATE(deroon)
 	tilemap_set_scrolly( bg2tilemap, 0, tecmosys_b00000regs[1]+17);
 	tilemap_set_scrollx( bg2tilemap, 0, tecmosys_b00000regs[0]+106);
 
-	fillbitmap(tmp_tilemap_composebitmap,0,cliprect);
+	bitmap_fill(tmp_tilemap_composebitmap,cliprect,0);
 
-	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	bitmap_fill(tmp_tilemap_renderbitmap,cliprect,0);
 	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg0tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(0x0000);
 
-	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	bitmap_fill(tmp_tilemap_renderbitmap,cliprect,0);
 	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg1tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(0x4000);
 
-	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	bitmap_fill(tmp_tilemap_renderbitmap,cliprect,0);
 	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,bg2tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(0x8000);
 
-	fillbitmap(tmp_tilemap_renderbitmap,0,cliprect);
+	bitmap_fill(tmp_tilemap_renderbitmap,cliprect,0);
 	tilemap_draw(tmp_tilemap_renderbitmap,cliprect,txt_tilemap,0,0);
 	tecmosys_tilemap_copy_to_compose(0xc000);
 

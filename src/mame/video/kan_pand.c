@@ -156,7 +156,7 @@ void pandora_eof(running_machine *machine)
 	assert(pandora_spriteram != NULL);
 
 	// the games can disable the clearing of the sprite bitmap, to leave sprite trails
-	if (pandora_clear_bitmap) fillbitmap(pandora_sprites_bitmap,0,video_screen_get_visible_area(machine->primary_screen));
+	if (pandora_clear_bitmap) bitmap_fill(pandora_sprites_bitmap,video_screen_get_visible_area(machine->primary_screen),0);
 
 	pandora_draw(machine, pandora_sprites_bitmap, video_screen_get_visible_area(machine->primary_screen));
 }

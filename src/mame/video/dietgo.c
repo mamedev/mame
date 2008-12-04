@@ -83,7 +83,7 @@ VIDEO_UPDATE(dietgo)
 	flip_screen_set( deco16_pf12_control[0]&0x80 );
 	deco16_pf12_update(deco16_pf1_rowscroll,deco16_pf2_rowscroll);
 
-	fillbitmap(bitmap,256,cliprect); /* not verified */
+	bitmap_fill(bitmap,cliprect,256); /* not verified */
 
 	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 	deco16_tilemap_1_draw(bitmap,cliprect,0,0);

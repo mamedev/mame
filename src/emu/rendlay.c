@@ -823,7 +823,7 @@ static void layout_element_draw_led7seg(bitmap_t *dest, const rectangle *bounds,
 
 	/* allocate a temporary bitmap for drawing */
 	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32);
-	fillbitmap(tempbitmap, MAKE_ARGB(0xff,0x00,0x00,0x00), NULL);
+	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff,0x00,0x00,0x00));
 
 	/* top bar */
 	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 0)) ? onpen : offpen);
@@ -879,7 +879,7 @@ static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds
 
 	/* allocate a temporary bitmap for drawing */
 	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32);
-	fillbitmap(tempbitmap, MAKE_ARGB(0xff, 0x00, 0x00, 0x00), NULL);
+	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top bar */
 	draw_segment_horizontal(tempbitmap,
@@ -985,7 +985,7 @@ static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *boun
 
 	/* allocate a temporary bitmap for drawing, adding some extra space for the tail */
 	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight + segwidth, BITMAP_FORMAT_ARGB32);
-	fillbitmap(tempbitmap, MAKE_ARGB(0xff, 0x00, 0x00, 0x00), NULL);
+	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top bar */
 	draw_segment_horizontal(tempbitmap,
@@ -1100,7 +1100,7 @@ static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds
 
 	/* allocate a temporary bitmap for drawing */
 	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight, BITMAP_FORMAT_ARGB32);
-	fillbitmap(tempbitmap, MAKE_ARGB(0xff, 0x00, 0x00, 0x00), NULL);
+	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top-left bar */
 	draw_segment_horizontal_caps(tempbitmap,
@@ -1216,7 +1216,7 @@ static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *boun
 
 	/* allocate a temporary bitmap for drawing */
 	tempbitmap = bitmap_alloc(bmwidth + skewwidth, bmheight + segwidth, BITMAP_FORMAT_ARGB32);
-	fillbitmap(tempbitmap, MAKE_ARGB(0xff, 0x00, 0x00, 0x00), NULL);
+	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top-left bar */
 	draw_segment_horizontal_caps(tempbitmap,
@@ -1900,7 +1900,7 @@ static bitmap_t *load_component_bitmap(const char *dirname, const char *file, co
 
 		/* draw some stripes in the bitmap */
 		bitmap = bitmap_alloc(100, 100, BITMAP_FORMAT_ARGB32);
-		fillbitmap(bitmap, 0, NULL);
+		bitmap_fill(bitmap, NULL, 0);
 		for (step = 0; step < 100; step += 25)
 			for (line = 0; line < 100; line++)
 				*BITMAP_ADDR32(bitmap, (step + line) % 100, line % 100) = MAKE_ARGB(0xff,0xff,0xff,0xff);

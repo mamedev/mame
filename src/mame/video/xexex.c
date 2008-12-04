@@ -112,7 +112,7 @@ VIDEO_UPDATE( xexex )
 	K054338_update_all_shadows(screen->machine);
 	K054338_fill_backcolor(screen->machine, bitmap, 0);
 
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	for (plane=0; plane<4; plane++)
 	{

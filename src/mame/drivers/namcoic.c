@@ -420,7 +420,7 @@ namcos2_draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle
 	int loop;
 	if( pri==0 )
 	{
-		fillbitmap( priority_bitmap, 0, cliprect );
+		bitmap_fill( priority_bitmap, cliprect , 0);
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -535,7 +535,7 @@ namcos2_draw_sprites_metalhawk(running_machine *machine, bitmap_t *bitmap, const
 	int loop;
 	if( pri==0 )
 	{
-		fillbitmap( priority_bitmap, 0, cliprect );
+		bitmap_fill( priority_bitmap, cliprect , 0);
 	}
 	for( loop=0; loop < 128; loop++ )
 	{
@@ -953,7 +953,7 @@ namco_obj_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *clip
 //  int offs = spriteram16[0x18000/2]; /* end-of-sprite-list */
 	if( pri==0 )
 	{
-		fillbitmap( priority_bitmap, 0, cliprect );
+		bitmap_fill( priority_bitmap, cliprect , 0);
 	}
 //  if( offs==0 )
 	{ /* boot */

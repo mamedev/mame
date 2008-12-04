@@ -127,7 +127,7 @@ VIDEO_START( gomoku )
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
 	/* make background bitmap */
-	fillbitmap(gomoku_bg_bitmap, 0x20, 0);
+	bitmap_fill(gomoku_bg_bitmap, 0, 0x20);
 
 	// board
 	for (y = 0; y < 256; y++)
@@ -228,7 +228,7 @@ VIDEO_UPDATE( gomoku )
 	}
 	else
 	{
-		fillbitmap(bitmap, 0x20, 0);
+		bitmap_fill(bitmap, 0, 0x20);
 	}
 
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);

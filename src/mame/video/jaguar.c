@@ -838,7 +838,7 @@ VIDEO_UPDATE( cojag )
 	/* if not enabled, just blank */
 	if (!(gpu_regs[VMODE] & 1))
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 		return 0;
 	}
 

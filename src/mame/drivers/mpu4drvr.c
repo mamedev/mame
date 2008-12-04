@@ -450,7 +450,7 @@ static VIDEO_UPDATE( mpu4_vid )
 
 	int x,y,count = 0;
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	for (i = 0; i < 0x1000; i++)
 	{

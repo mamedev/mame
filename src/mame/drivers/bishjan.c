@@ -108,7 +108,7 @@ if (input_code_pressed(KEYCODE_Z))
 	tilemap_set_scrollx( tmap1, 0, scroll1_x);	tilemap_set_scrolly( tmap1, 0, scroll1_y );
 	tilemap_set_scrollx( tmap2, 0, scroll2_x);	tilemap_set_scrolly( tmap2, 0, scroll2_y );
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, tmap1, 0, 0);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, tmap2, 0, 0);

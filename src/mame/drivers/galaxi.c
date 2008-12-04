@@ -143,7 +143,7 @@ static VIDEO_UPDATE(galaxi)
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, bg1_tmap,  TILEMAP_DRAW_OPAQUE, 0);
-	else					fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	else					bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, bg2_tmap,  0, 0);
 	if (layers_ctrl & 4)	tilemap_draw(bitmap,cliprect, bg3_tmap,  0, 0);
 	if (layers_ctrl & 8)	tilemap_draw(bitmap,cliprect, bg4_tmap,  0, 0);

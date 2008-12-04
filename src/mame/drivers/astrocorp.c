@@ -79,11 +79,11 @@ static VIDEO_UPDATE(astrocorp)
 {
 	if (astrocorp_screen_enable & 1)
 	{
-		fillbitmap(bitmap,screen->machine->pens[0xff],cliprect);
+		bitmap_fill(bitmap,cliprect,screen->machine->pens[0xff]);
 		draw_sprites(screen->machine,bitmap,cliprect);
 	}
 	else
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	return 0;
 }

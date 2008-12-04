@@ -369,7 +369,7 @@ VIDEO_UPDATE(macrossp)
 	int layers[3],layerpri[3];
 
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	layers[0] = 0;
 	layerpri[0] = (macrossp_scra_videoregs[0] & 0x0000c000) >> 14;

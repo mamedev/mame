@@ -346,16 +346,16 @@ void atarirle_init(running_machine *machine, int map, const atarirle_desc *desc)
 
 	mo->vram[0][0] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 	mo->vram[0][1] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-	fillbitmap(mo->vram[0][0], 0, NULL);
-	fillbitmap(mo->vram[0][1], 0, NULL);
+	bitmap_fill(mo->vram[0][0], NULL, 0);
+	bitmap_fill(mo->vram[0][1], NULL, 0);
 
 	/* allocate alternate bitmaps if needed */
 	if (mo->vrammask.mask != 0)
 	{
 		mo->vram[1][0] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
 		mo->vram[1][1] = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16);
-		fillbitmap(mo->vram[1][0], 0, NULL);
-		fillbitmap(mo->vram[1][1], 0, NULL);
+		bitmap_fill(mo->vram[1][0], NULL, 0);
+		bitmap_fill(mo->vram[1][1], NULL, 0);
 	}
 
 	mo->partial_scanline = -1;
@@ -411,9 +411,9 @@ void atarirle_control_w(running_machine *machine, int map, UINT8 bits)
 //logerror("  partial erase %d-%d (frame %d)\n", cliprect.min_y, cliprect.max_y, (oldbits & ATARIRLE_CONTROL_FRAME) >> 2);
 
 		/* erase the bitmap */
-		fillbitmap(mo->vram[0][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2], 0, &cliprect);
+		bitmap_fill(mo->vram[0][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2], &cliprect, 0);
 		if (mo->vrammask.mask != 0)
-			fillbitmap(mo->vram[1][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2], 0, &cliprect);
+			bitmap_fill(mo->vram[1][(oldbits & ATARIRLE_CONTROL_FRAME) >> 2], &cliprect, 0);
 	}
 
 	/* update the bits */
@@ -473,9 +473,9 @@ VIDEO_EOF( atarirle )
 //logerror("  partial erase %d-%d (frame %d)\n", cliprect.min_y, cliprect.max_y, (mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2);
 
 			/* erase the bitmap */
-			fillbitmap(mo->vram[0][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2], 0, &cliprect);
+			bitmap_fill(mo->vram[0][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2], &cliprect, 0);
 			if (mo->vrammask.mask != 0)
-				fillbitmap(mo->vram[1][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2], 0, &cliprect);
+				bitmap_fill(mo->vram[1][(mo->control_bits & ATARIRLE_CONTROL_FRAME) >> 2], &cliprect, 0);
 		}
 
 		/* reset the partial scanline to -1 so we can detect full updates */

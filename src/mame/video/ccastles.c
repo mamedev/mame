@@ -280,7 +280,7 @@ VIDEO_UPDATE( ccastles )
 	int x, y, offs;
 
 	/* draw the sprites */
-	fillbitmap(spritebitmap, 0x0f, cliprect);
+	bitmap_fill(spritebitmap, cliprect, 0x0f);
 	for (offs = 0; offs < 320/2; offs += 4)
 	{
 		int x = spriteaddr[offs+3];

@@ -68,7 +68,7 @@ static VIDEO_UPDATE(intrscti)
 	int y,x;
 	int count;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	count = 0;
 	for (y=0;y<64;y++)

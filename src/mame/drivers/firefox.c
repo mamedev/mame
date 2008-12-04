@@ -168,7 +168,7 @@ static VIDEO_UPDATE( firefox )
 	int sprite;
 	int gfxtop = video_screen_get_visible_area(screen)->min_y;
 
-	fillbitmap( bitmap, palette_get_color(screen->machine, 256), cliprect );
+	bitmap_fill( bitmap, cliprect, palette_get_color(screen->machine, 256) );
 
 	for( sprite = 0; sprite < 32; sprite++ )
 	{

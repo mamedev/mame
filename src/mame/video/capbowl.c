@@ -175,7 +175,7 @@ VIDEO_UPDATE( capbowl )
 	/* if we're blanked, just fill with black */
 	if (state.blanked)
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 

@@ -1052,11 +1052,11 @@ VIDEO_UPDATE(skns)
 		}
 	}
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(tilemap_bitmap_lower, 0, NULL);
-	fillbitmap(tilemap_bitmapflags_lower, 0, NULL);
-	fillbitmap(tilemap_bitmap_higher, 0, NULL);
-	fillbitmap(tilemap_bitmapflags_higher, 0, NULL);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(tilemap_bitmap_lower, NULL, 0);
+	bitmap_fill(tilemap_bitmapflags_lower, NULL, 0);
+	bitmap_fill(tilemap_bitmap_higher, NULL, 0);
+	bitmap_fill(tilemap_bitmapflags_higher, NULL, 0);
 
 	{
 		int supernova_pri_a;
@@ -1221,7 +1221,7 @@ VIDEO_UPDATE(skns)
 		}
 	}
 
-	fillbitmap(sprite_bitmap, 0x0000, cliprect);
+	bitmap_fill(sprite_bitmap, cliprect, 0x0000);
 	skns_draw_sprites(screen->machine, sprite_bitmap, cliprect, spriteram32, spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), skns_spc_regs );
 
 

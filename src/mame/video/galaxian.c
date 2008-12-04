@@ -972,7 +972,7 @@ static int flip_and_clip(rectangle *draw, int xstart, int xend, const rectangle 
 void galaxian_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* erase the background to black first */
-	fillbitmap(bitmap, RGB_BLACK, cliprect);
+	bitmap_fill(bitmap, cliprect, RGB_BLACK);
 
 	/* update the star origin to the current frame */
 	stars_update_origin(machine);
@@ -1003,12 +1003,12 @@ void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const r
 		draw = *cliprect;
 		draw.max_x = MIN(draw.max_x, (128-8) * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
-			fillbitmap(bitmap, RGB_BLACK, &draw);
+			bitmap_fill(bitmap, &draw, RGB_BLACK);
 
 		draw = *cliprect;
 		draw.min_x = MAX(draw.min_x, (128-8) * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
-			fillbitmap(bitmap, MAKE_RGB(0,0,0x47), &draw);
+			bitmap_fill(bitmap, &draw, MAKE_RGB(0,0,0x47));
 	}
 	else
 	{
@@ -1017,12 +1017,12 @@ void frogger_draw_background(running_machine *machine, bitmap_t *bitmap, const r
 		draw = *cliprect;
 		draw.max_x = MIN(draw.max_x, (128+8) * GALAXIAN_XSCALE - 1);
 		if (draw.min_x <= draw.max_x)
-			fillbitmap(bitmap, MAKE_RGB(0,0,0x47), &draw);
+			bitmap_fill(bitmap, &draw, MAKE_RGB(0,0,0x47));
 
 		draw = *cliprect;
 		draw.min_x = MAX(draw.min_x, (128+8) * GALAXIAN_XSCALE);
 		if (draw.min_x <= draw.max_x)
-			fillbitmap(bitmap, RGB_BLACK, &draw);
+			bitmap_fill(bitmap, &draw, RGB_BLACK);
 	}
 
 }
@@ -1054,7 +1054,7 @@ void amidar_draw_background(running_machine *machine, bitmap_t *bitmap, const re
 			UINT8 red = ((~prom[x] & 0x02) && background_red) ? 0x7c : 0x00;
 			UINT8 green = ((~prom[x] & 0x02) && background_green) ? 0x3c : 0x00;
 			UINT8 blue = ((~prom[x] & 0x01) && background_blue) ? 0x47 : 0x00;
-			fillbitmap(bitmap, MAKE_RGB(red, green, blue), &draw);
+			bitmap_fill(bitmap, &draw, MAKE_RGB(red, green, blue));
 		}
 }
 
@@ -1068,14 +1068,14 @@ void turtles_draw_background(running_machine *machine, bitmap_t *bitmap, const r
             GREEN - 470 ohm resistor
             BLUE  - 390 ohm resistor
     */
-	fillbitmap(bitmap, MAKE_RGB(background_red * 0x55, background_green * 0x47, background_blue * 0x55), cliprect);
+	bitmap_fill(bitmap, cliprect, MAKE_RGB(background_red * 0x55, background_green * 0x47, background_blue * 0x55));
 }
 
 
 void scramble_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* blue background - 390 ohm resistor */
-	fillbitmap(bitmap, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, cliprect);
+	bitmap_fill(bitmap, cliprect, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK);
 
 	/* update the star origin to the current frame */
 	stars_update_origin(machine);
@@ -1104,7 +1104,7 @@ void scramble_draw_background(running_machine *machine, bitmap_t *bitmap, const 
 void jumpbug_draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* blue background - 390 ohm resistor */
-	fillbitmap(bitmap, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK, cliprect);
+	bitmap_fill(bitmap, cliprect, background_enable ? MAKE_RGB(0,0,0x56) : RGB_BLACK);
 
 	/* update the star origin to the current frame */
 	stars_update_origin(machine);

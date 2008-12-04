@@ -151,7 +151,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( shadfrce )
 {
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if(shadfrce_video_enable)
 	{
@@ -162,7 +162,7 @@ VIDEO_UPDATE( shadfrce )
 	}
 	else
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	}
 
 	return 0;

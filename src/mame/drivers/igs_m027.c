@@ -143,7 +143,7 @@ static VIDEO_START(igs_majhong)
 static VIDEO_UPDATE(igs_majhong)
 {
 	//??????????
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	//??????
 	tilemap_draw(bitmap,cliprect,igs_bg_tilemap,0,0);

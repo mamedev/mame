@@ -369,7 +369,7 @@ VIDEO_UPDATE( firetrk )
 	tilemap_set_scrolly(tilemap1, 0, *firetrk_scroll_y);
 	tilemap_set_scrolly(tilemap2, 0, *firetrk_scroll_y);
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	tilemap_draw(bitmap, &playfield_window, tilemap1, 0, 0);
 	firetrk_draw_car(screen->machine->gfx, bitmap, &playfield_window, 0, firetrk_flash);
 	firetrk_draw_car(screen->machine->gfx, bitmap, &playfield_window, 1, firetrk_flash);
@@ -380,11 +380,11 @@ VIDEO_UPDATE( firetrk )
 	{
 		tilemap_draw(helper1, &playfield_window, tilemap2, 0, 0);
 
-		fillbitmap(helper2, 0xff, &playfield_window);
+		bitmap_fill(helper2, &playfield_window, 0xff);
 		firetrk_draw_car(screen->machine->gfx, helper2, &playfield_window, 0, FALSE);
 		check_collision(0);
 
-		fillbitmap(helper2, 0xff, &playfield_window);
+		bitmap_fill(helper2, &playfield_window, 0xff);
 		firetrk_draw_car(screen->machine->gfx, helper2, &playfield_window, 1, FALSE);
 		check_collision(1);
 
@@ -403,7 +403,7 @@ VIDEO_UPDATE( superbug )
 	tilemap_set_scrolly(tilemap1, 0, *firetrk_scroll_y);
 	tilemap_set_scrolly(tilemap2, 0, *firetrk_scroll_y);
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	tilemap_draw(bitmap, &playfield_window, tilemap1, 0, 0);
 	superbug_draw_car(screen->machine->gfx, bitmap, &playfield_window, firetrk_flash);
 	draw_text(screen->machine->gfx, bitmap, cliprect, firetrk_alpha_num_ram + 0x00, 296, 0x10, 0x10);
@@ -413,7 +413,7 @@ VIDEO_UPDATE( superbug )
 	{
 		tilemap_draw(helper1, &playfield_window, tilemap2, 0, 0);
 
-		fillbitmap(helper2, 0xff, &playfield_window);
+		bitmap_fill(helper2, &playfield_window, 0xff);
 		superbug_draw_car(screen->machine->gfx, helper2, &playfield_window, FALSE);
 		check_collision(0);
 
@@ -432,7 +432,7 @@ VIDEO_UPDATE( montecar )
 	tilemap_set_scrolly(tilemap1, 0, *firetrk_scroll_y);
 	tilemap_set_scrolly(tilemap2, 0, *firetrk_scroll_y);
 
-	fillbitmap(bitmap, 0x2c, cliprect);
+	bitmap_fill(bitmap, cliprect, 0x2c);
 	tilemap_draw(bitmap, &playfield_window, tilemap1, 0, 0);
 	montecar_draw_car(screen->machine->gfx, bitmap, &playfield_window, 0, FALSE);
 	montecar_draw_car(screen->machine->gfx, bitmap, &playfield_window, 1, FALSE);
@@ -443,11 +443,11 @@ VIDEO_UPDATE( montecar )
 	{
 		tilemap_draw(helper1, &playfield_window, tilemap2, 0, 0);
 
-		fillbitmap(helper2, 0xff, &playfield_window);
+		bitmap_fill(helper2, &playfield_window, 0xff);
 		montecar_draw_car(screen->machine->gfx, helper2, &playfield_window, 0, TRUE);
 		check_collision(0);
 
-		fillbitmap(helper2, 0xff, &playfield_window);
+		bitmap_fill(helper2, &playfield_window, 0xff);
 		montecar_draw_car(screen->machine->gfx, helper2, &playfield_window, 1, TRUE);
 		check_collision(1);
 	}

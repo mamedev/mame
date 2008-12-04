@@ -145,7 +145,7 @@ VIDEO_UPDATE( gradius3 )
 
 	K052109_tilemap_update();
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 	if (gradius3_priority == 0)
 	{
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[1],TILEMAP_DRAW_OPAQUE,2);

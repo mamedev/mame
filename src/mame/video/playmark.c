@@ -412,7 +412,7 @@ static void draw_bitmap(bitmap_t *bitmap, const rectangle *cliprect)
 
 VIDEO_UPDATE( bigtwin )
 {
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,0);
 	if (bg_enable)
@@ -424,7 +424,7 @@ VIDEO_UPDATE( bigtwin )
 
 VIDEO_UPDATE( excelsr )
 {
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
 	if (bg_enable)
@@ -450,7 +450,7 @@ VIDEO_UPDATE( wbeachvl )
 		tilemap_set_scrollx(fg_tilemap,0,fgscrollx);
 	}
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,1);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,2);
@@ -461,7 +461,7 @@ VIDEO_UPDATE( wbeachvl )
 
 VIDEO_UPDATE( hrdtimes )
 {
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	// video enabled
 	if(playmark_scroll[6] & 1)
@@ -472,6 +472,6 @@ VIDEO_UPDATE( hrdtimes )
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 	}
 	else
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	return 0;
 }

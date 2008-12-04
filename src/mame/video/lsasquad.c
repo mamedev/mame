@@ -202,7 +202,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( lsasquad )
 {
-	fillbitmap(bitmap,511,cliprect);
+	bitmap_fill(bitmap,cliprect,511);
 
 	draw_layer(screen->machine,bitmap,cliprect,lsasquad_scrollram + 0x000);
 	draw_layer(screen->machine,bitmap,cliprect,lsasquad_scrollram + 0x080);
@@ -214,7 +214,7 @@ VIDEO_UPDATE( lsasquad )
 
 VIDEO_UPDATE( daikaiju )
 {
-	fillbitmap(bitmap,511,cliprect);
+	bitmap_fill(bitmap,cliprect,511);
 	drawbg(screen->machine,bitmap,cliprect,0); // bottom
 	draw_sprites(screen->machine,bitmap,cliprect);
 	drawbg(screen->machine,bitmap,cliprect,1);	// top = pallete $d ?

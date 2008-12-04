@@ -363,7 +363,7 @@ VIDEO_UPDATE( liberatr )
 	pen_t pens[NUM_PENS];
 	get_pens(pens);
 
-	fillbitmap(bitmap, RGB_BLACK, cliprect);
+	bitmap_fill(bitmap, cliprect, RGB_BLACK);
 	liberatr_draw_planet(bitmap, pens);
 	liberatr_draw_bitmap(bitmap, pens);
 

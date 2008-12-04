@@ -383,7 +383,7 @@ static void draw_lasso(bitmap_t *bitmap, const rectangle *cliprect)
 VIDEO_UPDATE( lasso )
 {
 	palette_set_color(screen->machine, 0, get_color(*lasso_back_color));
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_lasso(bitmap, cliprect);
@@ -395,7 +395,7 @@ VIDEO_UPDATE( lasso )
 VIDEO_UPDATE( chameleo )
 {
 	palette_set_color(screen->machine, 0, get_color(*lasso_back_color));
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect, 0);
@@ -415,7 +415,7 @@ VIDEO_UPDATE( wwjgtin )
 	if (wwjgtin_track_enable)
 		tilemap_draw(bitmap, cliprect, track_tilemap, 0, 0);
 	else
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	draw_sprites(screen->machine, bitmap, cliprect, 1);	// reverse order
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);

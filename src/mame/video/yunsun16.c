@@ -212,7 +212,7 @@ VIDEO_UPDATE( yunsun16 )
 
 //  popmessage("%04X", *yunsun16_priority);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if((*yunsun16_priority & 0x0c) == 4)
 	{

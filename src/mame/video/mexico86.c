@@ -32,7 +32,7 @@ VIDEO_UPDATE( mexico86 )
 	/* and sprites) are stored in the same memory region, and information on */
 	/* the background character columns is stored inthe area dd00-dd3f */
 
-	fillbitmap(bitmap,255,cliprect);
+	bitmap_fill(bitmap,cliprect,255);
 
 	sx = 0;
 /* the score display seems to be outside of the main objectram. */
@@ -109,7 +109,7 @@ VIDEO_UPDATE( kikikai )
 	int goffs,code,color,y;
 	int tx, ty;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	sx = 0;
 	for (offs=0; offs<mexico86_objectram_size; offs+=4)
 	{

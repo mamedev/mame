@@ -94,7 +94,7 @@ static WRITE8_HANDLER( sbw_videoram_w )
 
 static VIDEO_UPDATE(sbowling)
 {
-	fillbitmap(bitmap,0x18,cliprect);
+	bitmap_fill(bitmap,cliprect,0x18);
 	tilemap_draw(bitmap,cliprect,sb_tilemap,0,0);
 	copybitmap_trans(bitmap,tmpbitmap,0,0,0,0,cliprect, color_prom_address);
 	return 0;

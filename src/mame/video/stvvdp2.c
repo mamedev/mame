@@ -4913,7 +4913,7 @@ static void stv_vdp2_draw_rotation_screen(running_machine *machine, bitmap_t *bi
 		if ( (stv_rbg_cache_data.is_cache_dirty & iRP) ||
 			memcmp(&stv_rbg_cache_data.layer_data[iRP-1],&stv2_current_tilemap,sizeof(stv2_current_tilemap)) != 0 )
 		{
-			fillbitmap( stv_vdp2_roz_bitmap[iRP-1], get_black_pen(machine), &roz_clip_rect );
+			bitmap_fill( stv_vdp2_roz_bitmap[iRP-1], &roz_clip_rect , get_black_pen(machine));
 			stv_vdp2_check_tilemap(machine, stv_vdp2_roz_bitmap[iRP-1], &roz_clip_rect);
 			// prepare cache data
 			stv_rbg_cache_data.watch_vdp2_vram_writes |= iRP;
@@ -5064,7 +5064,7 @@ static void stv_vdp2_draw_back(running_machine *machine, bitmap_t *bitmap, const
 	UINT16 data;
 
 	if(!(STV_VDP2_BDCLMD & 1))
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(machine));
 	else
 	{
 		#if DEBUG_MODE

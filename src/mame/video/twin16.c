@@ -436,7 +436,7 @@ VIDEO_START( fround )
 
 VIDEO_UPDATE( twin16 )
 {
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 	draw_layer( bitmap,1 );
 
 	if (twin16_custom_video)

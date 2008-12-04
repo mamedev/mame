@@ -197,9 +197,9 @@ VIDEO_UPDATE( othldrby )
 		}
 	}
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	for (layer = 0;layer < 3;layer++)
 		tilemap_draw(bitmap,cliprect,bg_tilemap[layer],0,0);

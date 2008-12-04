@@ -129,7 +129,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 {
 	int offs;
 
-	fillbitmap(priority_bitmap,1,NULL);
+	bitmap_fill(priority_bitmap,NULL,1);
 
 	for (offs = spriteram_size - 4;offs >= 0;offs -= 4)
 	{

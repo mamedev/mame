@@ -421,7 +421,7 @@ VIDEO_EOF( redclash )
 
 VIDEO_UPDATE( redclash )
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	redclash_draw_stars(bitmap, cliprect, 0x60, 0, 0x00, 0xff);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	draw_bullets(bitmap, cliprect);

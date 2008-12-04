@@ -182,7 +182,7 @@ static VIDEO_UPDATE(galpani3)
 	UINT16 pixdata1;
 	const pen_t *paldata = screen->machine->pens;
 
-	fillbitmap(bitmap, 0x0000, cliprect);
+	bitmap_fill(bitmap, cliprect, 0x0000);
 
 	{
 		int drawy, drawx;
@@ -324,7 +324,7 @@ static VIDEO_UPDATE(galpani3)
 		}
 	}
 
-	fillbitmap(sprite_bitmap_1, 0x0000, cliprect);
+	bitmap_fill(sprite_bitmap_1, cliprect, 0x0000);
 
 	skns_draw_sprites(screen->machine, sprite_bitmap_1, cliprect, galpani3_spriteram32, spriteram_size, memory_region(screen->machine,"gfx1"), memory_region_length (screen->machine, "gfx1"), galpani3_spc_regs );
 

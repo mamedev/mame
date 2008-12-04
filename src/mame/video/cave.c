@@ -857,7 +857,7 @@ static void cave_sprite_check(const device_config *screen, const rectangle *clip
 				if (clip->min_y == visarea->min_y)
 				{
 					if(!(sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						fillbitmap(sprite_zbuf,0,visarea);
+						bitmap_fill(sprite_zbuf,visarea,0);
 				}
 				break;
 
@@ -866,7 +866,7 @@ static void cave_sprite_check(const device_config *screen, const rectangle *clip
 				if (clip->min_y == visarea->min_y)
 				{
 					if(!(sprite_zbuf_baseval += MAX_SPRITE_NUM))
-						fillbitmap(sprite_zbuf,0,visarea);
+						bitmap_fill(sprite_zbuf,visarea,0);
 				}
 				break;
 
@@ -1548,7 +1548,7 @@ VIDEO_UPDATE( cave )
 
 	cave_sprite_check(screen, cliprect);
 
-	fillbitmap(bitmap,background_color,cliprect);
+	bitmap_fill(bitmap,cliprect,background_color);
 
 	/*
         Tiles and sprites are ordered by priority (0 back, 3 front) with

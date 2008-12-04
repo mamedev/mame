@@ -310,7 +310,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( fastfred )
 {
-	fillbitmap(bitmap, *fastfred_background_color, cliprect);
+	bitmap_fill(bitmap, cliprect, *fastfred_background_color);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 

@@ -209,7 +209,7 @@ static VIDEO_START(mlanding)
 
 static VIDEO_UPDATE(mlanding)
 {
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	updateChars(screen->machine);
 

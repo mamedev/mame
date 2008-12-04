@@ -218,7 +218,7 @@ static int debug_viewer(bitmap_t *bitmap,const rectangle *cliprect)
 		if (w <= 0)		w = 0;
 		if (w > 1024)	w = 1024;
 
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 
 		draw_sprite(bitmap, cliprect, 0,0, w,h, 0,0, 0, a);
 
@@ -249,7 +249,7 @@ static VIDEO_UPDATE(igs_180)
 		return 0;
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,bg_tilemap,TILEMAP_DRAW_OPAQUE,0);
-	else					fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	else					bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (layers_ctrl & 4)	draw_sprites(screen->machine,bitmap,cliprect);
 

@@ -375,7 +375,7 @@ VIDEO_START( seta2_offset )
 VIDEO_UPDATE( seta2 )
 {
 	/* Black or pen 0? */
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	if (seta2_vregs[0x30/2] & 1)	return 0;		// BLANK SCREEN
 

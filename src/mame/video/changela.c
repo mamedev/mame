@@ -663,10 +663,10 @@ static TIMER_CALLBACK( changela_scanline_callback )
 
 	/* clear the current scanline first */
 	rectangle rect = { 0, 255, sy, sy };
-	fillbitmap(river_bitmap, 0x00, &rect);
-	fillbitmap(obj0_bitmap, 0x00, &rect);
-	fillbitmap(tree0_bitmap, 0x00, &rect);
-	fillbitmap(tree1_bitmap, 0x00, &rect);
+	bitmap_fill(river_bitmap, &rect, 0x00);
+	bitmap_fill(obj0_bitmap, &rect, 0x00);
+	bitmap_fill(tree0_bitmap, &rect, 0x00);
+	bitmap_fill(tree1_bitmap, &rect, 0x00);
 
 	draw_river(machine, river_bitmap, sy);
 	draw_obj0(machine, obj0_bitmap, sy);

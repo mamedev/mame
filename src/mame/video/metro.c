@@ -914,8 +914,8 @@ VIDEO_UPDATE( metro )
 	metro_sprite_yoffs	=	metro_videoregs[0x04/2] - video_screen_get_height(screen) / 2;
 
 	/* The background color is selected by a register */
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,((metro_videoregs[0x12/2] & 0x0fff)) + 0x1000,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,((metro_videoregs[0x12/2] & 0x0fff)) + 0x1000);
 
 	/*  Screen Control Register:
 
@@ -957,7 +957,7 @@ if (input_code_pressed(KEYCODE_Z))
 	if (input_code_pressed(KEYCODE_E))	msk |= 4;
 	if (input_code_pressed(KEYCODE_A))	msk |= 8;
 	if (msk != 0)
-	{	fillbitmap(bitmap,0,cliprect);
+	{	bitmap_fill(bitmap,cliprect,0);
 		layers_ctrl &= msk;	}
 
 	popmessage("l %x-%x-%x r %04x %04x %04x",

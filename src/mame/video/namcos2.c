@@ -346,7 +346,7 @@ VIDEO_UPDATE( namcos2_default )
 	int pri;
 
 	UpdatePalette(screen->machine);
-	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 	ApplyClip( &clip, cliprect );
 
 	/* HACK: enable ROZ layer only if it has priority > 0 */
@@ -383,7 +383,7 @@ VIDEO_UPDATE( finallap )
 	int pri;
 
 	UpdatePalette(screen->machine);
-	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -420,7 +420,7 @@ VIDEO_UPDATE( luckywld )
 	int pri;
 
 	UpdatePalette(screen->machine);
-	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )
@@ -453,7 +453,7 @@ VIDEO_UPDATE( sgunner )
 	int pri;
 
 	UpdatePalette(screen->machine);
-	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<8; pri++ )
@@ -479,7 +479,7 @@ VIDEO_UPDATE( metlhawk )
 	int pri;
 
 	UpdatePalette(screen->machine);
-	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 	ApplyClip( &clip, cliprect );
 
 	for( pri=0; pri<16; pri++ )

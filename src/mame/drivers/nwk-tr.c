@@ -517,7 +517,7 @@ void K001604_draw_back_layer(int chip, bitmap_t *bitmap, const rectangle *clipre
 {
 	int layer;
 	int num_layers;
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	num_layers = K001604_layer_size ? 2 : 1;
 
@@ -720,7 +720,7 @@ static VIDEO_UPDATE( nwktr )
 {
 	const device_config *voodoo = device_list_find_by_tag(screen->machine->config->devicelist, VOODOO_GRAPHICS, "voodoo");
 
-	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	voodoo_update(voodoo, bitmap, cliprect);
 

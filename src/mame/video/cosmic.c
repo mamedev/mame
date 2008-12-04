@@ -545,7 +545,7 @@ static void nomnlnd_draw_background(const device_config *screen, bitmap_t *bitma
 
 VIDEO_UPDATE( cosmicg )
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
 	return 0;
 }
@@ -553,7 +553,7 @@ VIDEO_UPDATE( cosmicg )
 
 VIDEO_UPDATE( panic )
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 1);
 	return 0;
@@ -562,7 +562,7 @@ VIDEO_UPDATE( panic )
 
 VIDEO_UPDATE( cosmica )
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	cosmica_draw_starfield(screen, bitmap, cliprect);
 	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x0f, 0);
@@ -572,7 +572,7 @@ VIDEO_UPDATE( cosmica )
 
 VIDEO_UPDATE( magspot )
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 	return 0;
@@ -581,7 +581,7 @@ VIDEO_UPDATE( magspot )
 
 VIDEO_UPDATE( devzone )
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	if (background_enable)
 		devzone_draw_grid(screen->machine, bitmap, cliprect);
@@ -597,7 +597,7 @@ VIDEO_UPDATE( nomnlnd )
 	/* according to the video summation logic on pg4, the trees and river
        have the highest priority */
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	draw_bitmap(screen->machine, bitmap, cliprect);
 	draw_sprites(screen->machine, bitmap, cliprect, 0x07, 0);
 

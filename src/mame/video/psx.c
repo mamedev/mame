@@ -307,7 +307,7 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 
 	if( m_b_debugclear )
 	{
-		fillbitmap( debugmesh, 0x0000, NULL );
+		bitmap_fill( debugmesh, NULL , 0x0000);
 		m_b_debugclear = 0;
 	}
 
@@ -815,7 +815,7 @@ VIDEO_UPDATE( psx )
 	if( ( m_n_gpustatus & ( 1 << 0x17 ) ) != 0 )
 	{
 		/* todo: only draw to necessary area */
-		fillbitmap( bitmap, 0, cliprect );
+		bitmap_fill( bitmap, cliprect , 0);
 	}
 	else
 	{

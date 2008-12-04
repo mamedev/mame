@@ -534,7 +534,7 @@ WRITE16_HANDLER( gsx_videoram3_w )
 
 VIDEO_UPDATE(gstriker)
 {
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	// Sandwitched screen/sprite0/score/sprite1. Surely wrong, probably
 	//  needs sprite orthogonality

@@ -2745,7 +2745,7 @@ VIDEO_UPDATE( cps1 )
 	{
 		// CPS1 games use pen 0xbff as background color; this is used in 3wonders,
 		// mtwins (explosion during attract), mercs (intermission).
-		fillbitmap(bitmap,0xbff,cliprect);
+		bitmap_fill(bitmap,cliprect,0xbff);
 	}
 	else
 	{
@@ -2754,7 +2754,7 @@ VIDEO_UPDATE( cps1 )
 		// Maybe Capcom changed the background handling due to the problems that
 		// it caused on several monitors (because the background extended into the
 		// blanking area instead of going black, causing the monitor to clip).
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	}
 
 	cps1_render_stars(screen, bitmap,cliprect);
@@ -2764,7 +2764,7 @@ VIDEO_UPDATE( cps1 )
 	l1 = (layercontrol >> 0x08) & 03;
 	l2 = (layercontrol >> 0x0a) & 03;
 	l3 = (layercontrol >> 0x0c) & 03;
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if (cps_version == 1)
 	{

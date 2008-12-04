@@ -164,8 +164,8 @@ VIDEO_UPDATE(boogwing)
 
 	/* Draw playfields */
 	deco16_clear_sprite_priority_bitmap();
-	fillbitmap(bitmap,screen->machine->pens[0x400],cliprect); /* pen not confirmed */
-	fillbitmap(priority_bitmap,0,NULL);
+	bitmap_fill(bitmap,cliprect,screen->machine->pens[0x400]); /* pen not confirmed */
+	bitmap_fill(priority_bitmap,NULL,0);
 
 	// bit&0x8 is definitely some kind of palette effect
 	// bit&0x4 combines playfields

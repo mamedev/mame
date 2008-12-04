@@ -189,7 +189,7 @@ static void draw_bullets(bitmap_t *bitmap, const rectangle *cliprect)
 		if (rect.max_y > cliprect->max_y)
 			rect.max_y = cliprect->max_y;
 
-		fillbitmap(bitmap, (i << 1) | 0x01, &rect);
+		bitmap_fill(bitmap, &rect, (i << 1) | 0x01);
 	}
 }
 
@@ -219,8 +219,8 @@ VIDEO_EOF( tank8 )
 
 	tilemap_draw(helper1, visarea, tank8_tilemap, 0, 0);
 
-	fillbitmap(helper2, 8, visarea);
-	fillbitmap(helper3, 8, visarea);
+	bitmap_fill(helper2, visarea, 8);
+	bitmap_fill(helper3, visarea, 8);
 
 	draw_sprites(machine, helper2, visarea);
 	draw_bullets(helper3, visarea);

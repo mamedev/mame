@@ -294,8 +294,8 @@ VIDEO_EOF( mermaid )
 
 		// check collision sprite - background
 
-		fillbitmap(helper,0,&rect);
-		fillbitmap(helper2,0,&rect);
+		bitmap_fill(helper,&rect,0);
+		bitmap_fill(helper2,&rect,0);
 
 		tilemap_draw(helper, &rect, bg_tilemap, 0, 0);
 
@@ -306,8 +306,8 @@ VIDEO_EOF( mermaid )
 
 		// check collision sprite - foreground
 
-		fillbitmap(helper,0,&rect);
-		fillbitmap(helper2,0,&rect);
+		bitmap_fill(helper,&rect,0);
+		bitmap_fill(helper2,&rect,0);
 
 		tilemap_draw(helper, &rect, fg_tilemap, 0, 0);
 
@@ -318,8 +318,8 @@ VIDEO_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		fillbitmap(helper,0,&rect);
-		fillbitmap(helper2,0,&rect);
+		bitmap_fill(helper,&rect,0);
+		bitmap_fill(helper2,&rect,0);
 
 		for (offs2 = spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
@@ -408,8 +408,8 @@ VIDEO_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		fillbitmap(helper,0,&rect);
-		fillbitmap(helper2,0,&rect);
+		bitmap_fill(helper,&rect,0);
+		bitmap_fill(helper2,&rect,0);
 
 		for (offs2 = spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)
@@ -498,8 +498,8 @@ VIDEO_EOF( mermaid )
 
 		// check collision sprite - sprite
 
-		fillbitmap(helper,0,&rect);
-		fillbitmap(helper2,0,&rect);
+		bitmap_fill(helper,&rect,0);
+		bitmap_fill(helper2,&rect,0);
 
 		for (offs2 = spriteram_size - 4; offs2 >= 0; offs2 -= 4)
 			if (offs != offs2)

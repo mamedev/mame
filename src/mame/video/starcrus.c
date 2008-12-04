@@ -197,8 +197,8 @@ static int collision_check_s1s2(running_machine *machine)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(ship1_vid,0,&clip);
-    fillbitmap(ship2_vid,0,&clip);
+    bitmap_fill(ship1_vid,&clip,0);
+    bitmap_fill(ship2_vid,&clip,0);
 
 	/* origin is with respect to ship1 */
 
@@ -255,8 +255,8 @@ static int collision_check_p1p2(running_machine *machine)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(proj1_vid,0,&clip);
-    fillbitmap(proj2_vid,0,&clip);
+    bitmap_fill(proj1_vid,&clip,0);
+    bitmap_fill(proj2_vid,&clip,0);
 
 	/* origin is with respect to proj1 */
 
@@ -319,9 +319,9 @@ static int collision_check_s1p1p2(running_machine *machine)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(ship1_vid,0,&clip);
-    fillbitmap(proj1_vid,0,&clip);
-    fillbitmap(proj2_vid,0,&clip);
+    bitmap_fill(ship1_vid,&clip,0);
+    bitmap_fill(proj1_vid,&clip,0);
+    bitmap_fill(proj2_vid,&clip,0);
 
 	/* origin is with respect to ship1 */
 
@@ -401,9 +401,9 @@ static int collision_check_s2p1p2(running_machine *machine)
     clip.min_y=0;
     clip.max_y=15;
 
-    fillbitmap(ship2_vid,0,&clip);
-    fillbitmap(proj1_vid,0,&clip);
-    fillbitmap(proj2_vid,0,&clip);
+    bitmap_fill(ship2_vid,&clip,0);
+    bitmap_fill(proj1_vid,&clip,0);
+    bitmap_fill(proj2_vid,&clip,0);
 
 	/* origin is with respect to ship2 */
 
@@ -467,7 +467,7 @@ static int collision_check_s2p1p2(running_machine *machine)
 
 VIDEO_UPDATE( starcrus )
 {
-    fillbitmap(bitmap,0,cliprect);
+    bitmap_fill(bitmap,cliprect,0);
 
 	/* Draw ship 1 */
     drawgfx(bitmap,

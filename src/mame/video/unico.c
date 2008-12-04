@@ -358,8 +358,8 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 #endif
 
 	/* The background color is the first of the last palette */
-	fillbitmap(bitmap,0x1f00,cliprect);
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0x1f00);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,2);
@@ -397,8 +397,8 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 #endif
 
 	/* The background color is the first of the last palette */
-	fillbitmap(bitmap,0x1f00,cliprect);
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0x1f00);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,tilemap_0,0,1);
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,tilemap_1,0,2);

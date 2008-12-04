@@ -98,7 +98,7 @@ VIDEO_UPDATE( magmax )
 
 	/* copy the background graphics */
 	if (*magmax_vreg & 0x40)		/* background disable */
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 	else
 	{
 		int v;
@@ -107,7 +107,7 @@ VIDEO_UPDATE( magmax )
 		UINT32 scroll_v = (*magmax_scroll_y) & 0xff;
 
 		/*clear background-over-sprites bitmap*/
-		fillbitmap(tmpbitmap, 0, NULL);
+		bitmap_fill(tmpbitmap, NULL, 0);
 
 		for (v = 2*8; v < 30*8; v++) /*only for visible area*/
 		{

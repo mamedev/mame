@@ -152,7 +152,7 @@ VIDEO_UPDATE( momoko )
 		}
 	}
 	else
-	fillbitmap(bitmap, 256, cliprect);
+	bitmap_fill(bitmap, cliprect, 256);
 
 
 /* draw sprites (momoko) */

@@ -1100,7 +1100,7 @@ static int debug_viewer(running_machine *machine, bitmap_t *bitmap,const rectang
 		dynax_blit_palettes = (c & 0xf) * 0x111;
 		dynax_blit_palbank  = (c >>  4) & 1;
 
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 		memset(dynax_pixmap[0][0],0,sizeof(UINT8)*0x100*0x100);
 		if (layer_layout != LAYOUT_MJDIALQ2)
 			memset(dynax_pixmap[0][1],0,sizeof(UINT8)*0x100*0x100);
@@ -1126,10 +1126,8 @@ VIDEO_UPDATE( hanamai )
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
-	fillbitmap(
-		bitmap,
-		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
-		cliprect);
+	bitmap_fill(bitmap, cliprect,
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256);
 
 	/* bit 4 = display enable? */
 	if (!(hanamai_priority & 0x10)) return 0;
@@ -1162,10 +1160,8 @@ VIDEO_UPDATE( hnoridur )
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
-	fillbitmap(
-		bitmap,
-		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 0x0f) * 256,
-		cliprect);
+	bitmap_fill(bitmap, cliprect,
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 0x0f) * 256);
 
 	pri = hanamai_priority >> 4;
 
@@ -1197,10 +1193,8 @@ VIDEO_UPDATE( sprtmtch )
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
-	fillbitmap(
-		bitmap,
-		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
-		cliprect);
+	bitmap_fill(bitmap, cliprect,
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256);
 
 	if (layers_ctrl & 1)	hanamai_copylayer( bitmap, cliprect, 0 );
 	if (layers_ctrl & 2)	hanamai_copylayer( bitmap, cliprect, 1 );
@@ -1218,10 +1212,8 @@ VIDEO_UPDATE( jantouki )
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
-	fillbitmap(
-		bitmap,
-		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
-		cliprect);
+	bitmap_fill(bitmap, cliprect,
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256);
 
 	if (screen == top_screen)
 	{
@@ -1249,10 +1241,8 @@ VIDEO_UPDATE( mjdialq2 )
 	if (debug_viewer(screen->machine,bitmap,cliprect))	return 0;
 	layers_ctrl &= debug_mask();
 
-	fillbitmap(
-		bitmap,
-		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256,
-		cliprect);
+	bitmap_fill(bitmap, cliprect,
+		(dynax_blit_backpen & 0xff) + (dynax_blit_palbank & 1) * 256);
 
 	if (layers_ctrl & 1)	mjdialq2_copylayer( bitmap, cliprect, 0 );
 	if (layers_ctrl & 2)	mjdialq2_copylayer( bitmap, cliprect, 1 );
@@ -1275,7 +1265,7 @@ VIDEO_UPDATE(htengoku)
 	// format and let VIDEO_UPDATE(ddenlovr) do the final compositing (priorities + palettes)
 	for (layer = 0; layer < 4; layer++)
 	{
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 		hanamai_copylayer( bitmap, cliprect, layer );
 
 		for (y=0; y < 256; y++)

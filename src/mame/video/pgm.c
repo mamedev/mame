@@ -322,7 +322,7 @@ VIDEO_UPDATE( pgm )
 {
 	int y;
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	pgm_sprite_source = pgm_spritebufferram;
 	draw_sprites(screen->machine, 1, bitmap);

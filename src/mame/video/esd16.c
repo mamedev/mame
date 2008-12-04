@@ -325,7 +325,7 @@ VIDEO_UPDATE( esd16 )
 {
 	int layers_ctrl = -1;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_set_scrollx(esdtilemap_0, 0, esd16_scroll_0[0]);
 	tilemap_set_scrolly(esdtilemap_0, 0, esd16_scroll_0[1]);
@@ -343,7 +343,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect,esdtilemap_0,0,0);
-	else					fillbitmap(bitmap,0,cliprect);
+	else					bitmap_fill(bitmap,cliprect,0);
 
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect,esdtilemap_1,0,1);
 
@@ -356,7 +356,7 @@ VIDEO_UPDATE( hedpanic )
 {
 	int layers_ctrl = -1;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 
 #ifdef MAME_DEBUG
@@ -385,7 +385,7 @@ if ( input_code_pressed(KEYCODE_Z) )
 	}
 	else
 	{
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	}
 
 

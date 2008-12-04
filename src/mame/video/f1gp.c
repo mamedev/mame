@@ -350,7 +350,7 @@ VIDEO_UPDATE( f1gp )
 
 
 
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	K053936_0_zoom_draw(bitmap,cliprect,roz_tilemap,0,0);
 
@@ -401,7 +401,7 @@ VIDEO_UPDATE( f1gpb )
 
 	tilemap_set_scrolly(fg_tilemap,0,f1gpb_fgregs[0] + 8);
 
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	tilemap_draw_roz(bitmap, cliprect, roz_tilemap,
 		startx << 13, starty << 13,
@@ -492,7 +492,7 @@ static void f1gp2_draw_sprites(running_machine *machine,bitmap_t *bitmap,const r
 VIDEO_UPDATE( f1gp2 )
 {
 	if (gfxctrl & 4)	/* blank screen */
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 	else
 	{
 		switch (gfxctrl & 3)

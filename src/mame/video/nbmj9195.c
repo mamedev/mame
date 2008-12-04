@@ -516,7 +516,7 @@ VIDEO_UPDATE( nbmj9195 )
 		// nbmj9195 1layer
 		copyscrollbitmap(bitmap, nbmj9195_tmpbitmap[0], SCANLINE_MAX, nbmj9195_scrollx_raster[0], 1, &scrolly[0], cliprect);
 	else
-		fillbitmap(bitmap, 0x0ff, 0);
+		bitmap_fill(bitmap, 0, 0x0ff);
 
 	if (nbmj9195_dispflag[1])
 	{

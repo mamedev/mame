@@ -162,8 +162,8 @@ VIDEO_UPDATE( simpsons )
 
 	sortlayers(layer,layerpri);
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,16 * bg_colorbase,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,16 * bg_colorbase);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[0]],0,1);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[1]],0,2);
 	tilemap_draw(bitmap,cliprect,K052109_tilemap[layer[2]],0,4);

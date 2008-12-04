@@ -178,7 +178,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	/* if we're disabled, don't draw */
 	if (!back_enable)
 	{
-		fillbitmap(bitmap,get_black_pen(machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(machine));
 		return;
 	}
 

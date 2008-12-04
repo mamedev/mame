@@ -1269,22 +1269,22 @@ static void dambustr_draw_bullets(bitmap_t *bitmap, int offs, int x, int y, cons
 static void galaxold_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	/* plain black background */
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 }
 
 static void scramble_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	if (background_enable)
-		fillbitmap(bitmap,BACKGROUND_COLOR_BASE,cliprect);
+		bitmap_fill(bitmap,cliprect,BACKGROUND_COLOR_BASE);
 	else
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 }
 
 static void turtles_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int color = (background_blue << 2) | (background_green << 1) | background_red;
 
-	fillbitmap(bitmap,BACKGROUND_COLOR_BASE + color,cliprect);
+	bitmap_fill(bitmap,cliprect,BACKGROUND_COLOR_BASE + color);
 }
 
 static void stratgyx_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
@@ -1338,7 +1338,7 @@ static void minefld_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
 	}
 	else
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 }
 
 static void rescue_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
@@ -1356,7 +1356,7 @@ static void rescue_draw_background(bitmap_t *bitmap, const rectangle *cliprect)
 		plot_box(bitmap, 248, 0, 16, 256, BACKGROUND_COLOR_BASE);
 	}
 	else
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 }
 
 static void mariner_draw_background(bitmap_t *bitmap, const rectangle *cliprect)

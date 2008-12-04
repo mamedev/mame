@@ -280,7 +280,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 	set_background_palette(machine, (*popeye_palettebank & 0x08) >> 3);
 
 	if (popeye_background_pos[1] == 0)	/* no background */
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 	else
 	{
 		/* copy the background graphics */

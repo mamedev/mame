@@ -319,7 +319,7 @@ static VIDEO_UPDATE( jollyjgr )
 {
 	int offs;
 
-	fillbitmap(bitmap,32,cliprect);
+	bitmap_fill(bitmap,cliprect,32);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 

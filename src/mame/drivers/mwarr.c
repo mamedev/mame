@@ -399,7 +399,7 @@ static VIDEO_UPDATE( mwarr )
 {
 	int i;
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if(vidattrram[6] & 1)
 	{

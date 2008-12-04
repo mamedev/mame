@@ -195,7 +195,7 @@ static void mcr68_update_sprites(running_machine *machine, bitmap_t *bitmap, con
 	sprite_clip.max_x -= mcr68_sprite_clip;
 	sect_rect(&sprite_clip, cliprect);
 
-	fillbitmap(priority_bitmap,1,&sprite_clip);
+	bitmap_fill(priority_bitmap,&sprite_clip,1);
 
 	/* loop over sprite RAM */
 	for (offs = spriteram_size / 2 - 4;offs >= 0;offs -= 4)
@@ -241,7 +241,7 @@ static void zwackery_update_sprites(running_machine *machine, bitmap_t *bitmap, 
 {
 	int offs;
 
-	fillbitmap(priority_bitmap,1,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,1);
 
 	/* loop over sprite RAM */
 	for (offs = spriteram_size / 2 - 4;offs >= 0;offs -= 4)

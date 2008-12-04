@@ -212,7 +212,7 @@ VIDEO_UPDATE( circusc )
 	for (i = 10;i < 32;i++)
 		tilemap_set_scrolly(bg_tilemap,i,*circusc_scroll);
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,1,0);
 	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);

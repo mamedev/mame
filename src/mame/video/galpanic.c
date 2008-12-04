@@ -123,7 +123,7 @@ VIDEO_UPDATE( comad )
 
 //  if(galpanic_clear_sprites)
 	{
-		fillbitmap(sprites_bitmap,0,cliprect);
+		bitmap_fill(sprites_bitmap,cliprect,0);
 		comad_draw_sprites(screen->machine,bitmap,cliprect);
 	}
 //  else

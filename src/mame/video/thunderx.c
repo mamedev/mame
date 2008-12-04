@@ -70,10 +70,10 @@ VIDEO_UPDATE( scontra )
 {
 	K052109_tilemap_update();
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	/* The background color is always from layer 1 - but it's always black anyway */
-//  fillbitmap(bitmap,16 * layer_colorbase[1],cliprect);
+//  bitmap_fill(bitmap,cliprect,16 * layer_colorbase[1]);
 	if (scontra_priority)
 	{
 		tilemap_draw(bitmap,cliprect,K052109_tilemap[2],TILEMAP_DRAW_OPAQUE,1);

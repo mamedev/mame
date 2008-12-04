@@ -227,7 +227,7 @@ static VIDEO_UPDATE( m2 )
 	}
 	else
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 	}
 	return 0;
 }

@@ -54,7 +54,7 @@ VIDEO_START( blockhl )
 
 VIDEO_UPDATE( blockhl )
 {
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	K052109_tilemap_update();
 

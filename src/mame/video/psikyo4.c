@@ -130,12 +130,12 @@ VIDEO_UPDATE( psikyo4 )
 
 	if (screen == left_screen)
 	{
-		fillbitmap(bitmap, 0x1000, cliprect);
+		bitmap_fill(bitmap, cliprect, 0x1000);
 		draw_sprites(screen->machine, bitmap, cliprect, 0x0000);
 	}
 	if (screen == right_screen)
 	{
-		fillbitmap(bitmap, 0x1001, cliprect);
+		bitmap_fill(bitmap, cliprect, 0x1001);
 		draw_sprites(screen->machine, bitmap, cliprect, 0x2000);
 	}
 	return 0;

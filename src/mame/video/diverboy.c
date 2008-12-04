@@ -47,7 +47,7 @@ static void draw_sprites(running_machine* machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE(diverboy)
 {
-//  fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+//  bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;
 }

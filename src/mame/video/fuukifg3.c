@@ -367,8 +367,8 @@ VIDEO_UPDATE( fuuki32 )
 	tilemap_set_scrolly(tilemap_3, 0, layer2_scrolly);
 
 	/* The bg colour is the last pen i.e. 0x1fff */
-	fillbitmap(bitmap,(0x800*4)-1,cliprect);
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,(0x800*4)-1);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	fuuki32_draw_layer(bitmap,cliprect, tm_back,   0, 1);
 	fuuki32_draw_layer(bitmap,cliprect, tm_middle, 0, 2);

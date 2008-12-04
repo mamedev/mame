@@ -35,7 +35,7 @@ static int cardline_video;
 static VIDEO_UPDATE( cardline )
 {
 	int x,y;
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 	for(y=0;y<32;y++)
 	{
 		for(x=0;x<64;x++)

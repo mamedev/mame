@@ -227,7 +227,7 @@ static VIDEO_START( jetwave )
 
 static VIDEO_UPDATE( jetwave )
 {
-	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	K001604_tile_update(screen->machine, 0);
 	K001005_draw(bitmap, cliprect);
@@ -275,7 +275,7 @@ static VIDEO_START( zr107 )
 
 static VIDEO_UPDATE( zr107 )
 {
-	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
 
 	K056832_set_LayerOffset(0, -29, -27);
 	K056832_set_LayerOffset(1, -29, -27);

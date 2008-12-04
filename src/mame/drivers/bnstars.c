@@ -493,11 +493,11 @@ static VIDEO_UPDATE(bnstars)
 	const device_config *left_screen  = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "left");
 	const device_config *right_screen = device_list_find_by_tag(screen->machine->config->devicelist, VIDEO_SCREEN, "right");
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	if (screen==left_screen)
 	{
-		fillbitmap(bitmap,0,cliprect);	/* bg color */
+		bitmap_fill(bitmap,cliprect,0);	/* bg color */
 
 
 		tilemap_set_scrollx(ms32_bg_tilemap[0], 0, ms32_bg0_scroll[0x00/4] + ms32_bg0_scroll[0x08/4] + 0x10 );
@@ -515,7 +515,7 @@ static VIDEO_UPDATE(bnstars)
 	}
 	else if (screen == right_screen)
 	{
-		fillbitmap(bitmap,0x8000+0,cliprect);	/* bg color */
+		bitmap_fill(bitmap,cliprect,0x8000+0);	/* bg color */
 
 
 		tilemap_set_scrollx(ms32_bg_tilemap[1], 0, ms32_bg1_scroll[0x00/4] + ms32_bg1_scroll[0x08/4] + 0x10 );

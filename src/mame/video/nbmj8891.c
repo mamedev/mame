@@ -566,7 +566,7 @@ VIDEO_UPDATE( nbmj8891 )
 			copyscrollbitmap(bitmap, nbmj8891_tmpbitmap0, 0, 0, 1, &scrolly, cliprect);
 	}
 	else
-		fillbitmap(bitmap, 0xff, 0);
+		bitmap_fill(bitmap, 0, 0xff);
 
 	return 0;
 }

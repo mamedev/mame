@@ -264,7 +264,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( pow )
 {
-	fillbitmap(bitmap, 0x7ff, cliprect);
+	bitmap_fill(bitmap, cliprect, 0x7ff);
 
 	/* This appears to be the correct priority order */
 	draw_sprites(screen->machine, bitmap, cliprect, 2);

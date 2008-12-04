@@ -87,7 +87,7 @@ static VIDEO_UPDATE( lgp )
 	palette_set_color(screen->machine, 0, MAKE_ARGB(0,0,0,0));
 
 	/* clear */
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	/* Draw tiles */
 	for (charx = 0; charx < 32; charx++)

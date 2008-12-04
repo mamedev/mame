@@ -152,7 +152,7 @@ static void create_bitmap(int player)
 		{
 			/* allocate a blank bitmap to start with */
 			global.bitmap[player] = bitmap_alloc(CROSSHAIR_RAW_SIZE, CROSSHAIR_RAW_SIZE, BITMAP_FORMAT_ARGB32);
-			fillbitmap(global.bitmap[player], MAKE_ARGB(0x00,0xff,0xff,0xff), NULL);
+			bitmap_fill(global.bitmap[player], NULL, MAKE_ARGB(0x00,0xff,0xff,0xff));
 
 			/* extract the raw source data to it */
 			for (y = 0; y < CROSSHAIR_RAW_SIZE / 2; y++)

@@ -1060,7 +1060,7 @@ static void sys18_vh_screenrefresh_helper( void ){
 VIDEO_UPDATE( system16 ){
 	if (!sys16_refreshenable)
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 		return 0;
 	}
 
@@ -1068,7 +1068,7 @@ VIDEO_UPDATE( system16 ){
 	update_page();
 	sys16_vh_refresh_helper(); /* set scroll registers */
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0x00 );
 	if(sys16_bg_priority_mode) tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0x00 );
@@ -1092,7 +1092,7 @@ VIDEO_UPDATE( system18old ){
 	if (!sys16_refreshenable)
 	{
 		/* should it REALLY not clear the bitmap? ddcrew vdp gfx look ugly if i don't do it like this */
-		fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 		return 0;
 	}
 
@@ -1100,11 +1100,11 @@ VIDEO_UPDATE( system18old ){
 	update_page();
 	sys18_vh_screenrefresh_helper(); /* set scroll registers */
 
-	fillbitmap(priority_bitmap,0,NULL);
+	bitmap_fill(priority_bitmap,NULL,0);
 	if(sys18_bg2_active)
 		tilemap_draw( bitmap,cliprect, background2, 0, 0 );
 	else
-		fillbitmap(bitmap,0,cliprect);
+		bitmap_fill(bitmap,cliprect,0);
 
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE, 0 );
 	tilemap_draw( bitmap,cliprect, background, TILEMAP_DRAW_OPAQUE | 1, 0 );	//??

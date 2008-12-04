@@ -885,7 +885,7 @@ static VIDEO_START(cps3)
 	renderbuffer_clip.min_y = 0;
 	renderbuffer_clip.max_y = 224-1;
 
-	fillbitmap(renderbuffer_bitmap,0x3f,&renderbuffer_clip);
+	bitmap_fill(renderbuffer_bitmap,&renderbuffer_clip,0x3f);
 
 }
 
@@ -1031,7 +1031,7 @@ static VIDEO_UPDATE(cps3)
 	renderbuffer_clip.min_y = 0;
 	renderbuffer_clip.max_y = ((224*fszx)>>16)-1;
 
-	fillbitmap(renderbuffer_bitmap,0,&renderbuffer_clip);
+	bitmap_fill(renderbuffer_bitmap,&renderbuffer_clip,0);
 
 	/* Sprites */
 	{

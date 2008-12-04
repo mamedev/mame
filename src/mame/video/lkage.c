@@ -195,7 +195,7 @@ VIDEO_UPDATE( lkage )
 	tilemap_set_scrollx(bg_tilemap,0,lkage_scroll[4]);
 	tilemap_set_scrolly(bg_tilemap,0,lkage_scroll[5]);
 
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 	if ((lkage_vreg[2] & 0xf0) == 0xf0)
 	{
 		tilemap_draw( bitmap,cliprect,bg_tilemap,0,1 );

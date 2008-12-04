@@ -141,7 +141,7 @@ static VIDEO_UPDATE(dderby)
 	int x,y,count;
 	const gfx_element *gfx = screen->machine->gfx[0];
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	count=0;
 	for (y=0;y<32;y++)

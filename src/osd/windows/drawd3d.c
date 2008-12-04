@@ -508,7 +508,7 @@ static int drawd3d_window_init(win_window_info *window)
 	d3d->vector_bitmap = render_load_png(NULL, "vector.png", NULL, NULL);
 	if (d3d->vector_bitmap != NULL)
 	{
-		fillbitmap(d3d->vector_bitmap, MAKE_ARGB(0xff,0xff,0xff,0xff), NULL);
+		bitmap_fill(d3d->vector_bitmap, NULL, MAKE_ARGB(0xff,0xff,0xff,0xff));
 		d3d->vector_bitmap = render_load_png(NULL, "vector.png", d3d->vector_bitmap, NULL);
 	}
 

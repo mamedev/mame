@@ -159,7 +159,7 @@ VIDEO_UPDATE( aeroboto )
 		if (star_color < 0xd0) { star_color = 0xd0; sky_color = 0; }
 		star_color += 2;
 
-		fillbitmap(bitmap, sky_color, cliprect);
+		bitmap_fill(bitmap, cliprect, sky_color);
 
 		// actual scroll speed is unknown but it can be adjusted by changing the SCROLL_SPEED constant
 		sx += (char)(*aeroboto_starx - ox);
@@ -191,7 +191,7 @@ VIDEO_UPDATE( aeroboto )
 	{
 		sx = ox = *aeroboto_starx;
 		sy = oy = *aeroboto_stary;
-		fillbitmap(bitmap, sky_color, cliprect);
+		bitmap_fill(bitmap, cliprect, sky_color);
 	}
 
 	for (y = 0;y < 64; y++)

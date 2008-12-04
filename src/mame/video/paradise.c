@@ -243,7 +243,7 @@ if (input_code_pressed(KEYCODE_Z))
 }
 #endif
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (!(paradise_priority & 4))	/* Screen blanking */
 		return 0;
@@ -273,7 +273,7 @@ if (input_code_pressed(KEYCODE_Z))
 /* no pix layer, no tilemap_0, different priority bits */
 VIDEO_UPDATE( torus )
 {
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	if (!(paradise_priority & 2))	/* Screen blanking */
 		return 0;
@@ -303,7 +303,7 @@ VIDEO_UPDATE( torus )
 /* I don't know how the priority bits work on this one */
 VIDEO_UPDATE( madball )
 {
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	tilemap_draw(bitmap,cliprect, tilemap_0, 0,0);
 	tilemap_draw(bitmap,cliprect, tilemap_1, 0,0);
 	tilemap_draw(bitmap,cliprect, tilemap_2, 0,0);

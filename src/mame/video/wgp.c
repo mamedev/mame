@@ -691,7 +691,7 @@ VIDEO_UPDATE( wgp )
 
 	TC0100SCN_tilemap_update(screen->machine);
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	layer[0] = 0;
 	layer[1] = 1;

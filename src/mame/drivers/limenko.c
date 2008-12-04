@@ -113,8 +113,8 @@ static WRITE32_HANDLER( spriteram_buffer_w )
 	clip.min_y = 0;
 	clip.max_y = 239;
 
-	fillbitmap(sprites_bitmap_pri,0,&clip);
-	fillbitmap(sprites_bitmap,0,&clip);
+	bitmap_fill(sprites_bitmap_pri,&clip,0);
+	bitmap_fill(sprites_bitmap,&clip,0);
 
 	// toggle spriterams location in the memory map
 	spriteram_bit ^= 1;
@@ -449,7 +449,7 @@ static VIDEO_UPDATE( limenko )
 {
 	// limenko_videoreg[4] ???? It always has this value: 0xffeffff8 (2 signed bytes? values: -17 and -8 ?)
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_set_enable(bg_tilemap, limenko_videoreg[0] & 4);
 	tilemap_set_enable(md_tilemap, limenko_videoreg[0] & 2);

@@ -248,7 +248,7 @@ VIDEO_UPDATE( pitnrun )
 	}
 #endif
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	if(!(pitnrun_ha&4))
 		tilemap_draw(bitmap,cliprect,bg, 0,0);

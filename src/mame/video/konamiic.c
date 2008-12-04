@@ -6469,7 +6469,7 @@ static int K056832_update_linemap(running_machine *machine, bitmap_t *bitmap, in
 			// *really ugly but it minimizes alteration to tilemap.c
 			memset (&zerorect, 0, sizeof(rectangle));	// zero dimension
 			tilemap_draw(bitmap, &zerorect, tmap, 0, 0);	// dummy call to reset tile_dirty_map
-			fillbitmap(xprmap, 0, 0);						// reset pixel transparency_bitmap;
+			bitmap_fill(xprmap, 0, 0);						// reset pixel transparency_bitmap;
 			memset(xprdata, TILEMAP_PIXEL_LAYER0, 0x800);	// reset tile transparency_data;
 		}
 		else

@@ -647,7 +647,7 @@ VIDEO_UPDATE( decocass )
 	}
 #endif
 
-	fillbitmap( bitmap, 0, cliprect );
+	bitmap_fill( bitmap, cliprect , 0);
 
 	decode_modified(screen->machine, decocass_fgvideoram, 0x20 );
 

@@ -99,9 +99,9 @@ static VIDEO_UPDATE(quizpun2)
 #endif
 
 	if (layers_ctrl & 1)	tilemap_draw(bitmap,cliprect, bg_tmap,  TILEMAP_DRAW_OPAQUE, 0);
-	else					fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	else					bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
-fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	if (layers_ctrl & 2)	tilemap_draw(bitmap,cliprect, fg_tmap, 0, 0);
 
 	return 0;

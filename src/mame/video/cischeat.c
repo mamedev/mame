@@ -1167,7 +1167,7 @@ VIDEO_UPDATE( bigrun )
 	cischeat_tmap_SET_SCROLL(1)
 	cischeat_tmap_SET_SCROLL(2)
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	for (i = 7; i >= 4; i--)
 	{											/* bitmap, road, min_priority, max_priority, transparency */
@@ -1220,7 +1220,7 @@ VIDEO_UPDATE( cischeat )
 	cischeat_tmap_SET_SCROLL(1)
 	cischeat_tmap_SET_SCROLL(2)
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 										/* bitmap, road, priority, transparency */
 	if (megasys1_active_layers & 0x10)	cischeat_draw_road(screen->machine,bitmap,cliprect,0,7,5,TRANSPARENCY_NONE);
@@ -1228,7 +1228,7 @@ VIDEO_UPDATE( cischeat )
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
-//  else fillbitmap(bitmap,0,cliprect);
+//  else bitmap_fill(bitmap,cliprect,0);
 	cischeat_tmap_DRAW(1)
 
 	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,15,3);
@@ -1276,7 +1276,7 @@ VIDEO_UPDATE( f1gpstar )
 	cischeat_tmap_SET_SCROLL(1)
 	cischeat_tmap_SET_SCROLL(2)
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 /*  1: clouds 5, grad 7, road 0     2: clouds 5, grad 7, road 0, tunnel roof 0 */
 
@@ -1286,7 +1286,7 @@ VIDEO_UPDATE( f1gpstar )
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
-//  else fillbitmap(bitmap,0,cliprect);
+//  else bitmap_fill(bitmap,cliprect,0);
 	cischeat_tmap_DRAW(1)
 
 	/* road 1!! 0!! */					/* bitmap, road, min_priority, max_priority, transparency */
@@ -1359,11 +1359,11 @@ if ( input_code_pressed(KEYCODE_Z) || input_code_pressed(KEYCODE_X) )
 //  cischeat_tmap_SET_SCROLL(1)
 	cischeat_tmap_SET_SCROLL(2)
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	flag = 0;
 	cischeat_tmap_DRAW(0)
-//  else fillbitmap(bitmap,0,cliprect);
+//  else bitmap_fill(bitmap,cliprect,0);
 //  cischeat_tmap_DRAW(1)
 	if (megasys1_active_layers & 0x08)	cischeat_draw_sprites(screen->machine,bitmap,cliprect,0,15);
 	cischeat_tmap_DRAW(2)

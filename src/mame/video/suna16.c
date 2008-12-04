@@ -219,7 +219,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 VIDEO_UPDATE( suna16 )
 {
 	/* Suna Quiz indicates the background is the last pen */
-	fillbitmap(bitmap,0xff,cliprect);
+	bitmap_fill(bitmap,cliprect,0xff);
 	draw_sprites(screen->machine, bitmap, cliprect, spriteram16, 0);
 	return 0;
 }
@@ -238,7 +238,7 @@ if (input_code_pressed(KEYCODE_Z))
 #endif
 
 	/* Suna Quiz indicates the background is the last pen */
-	fillbitmap(bitmap,0xff,cliprect);
+	bitmap_fill(bitmap,cliprect,0xff);
 	if (layers_ctrl & 1)	draw_sprites(screen->machine, bitmap, cliprect, spriteram16,   0);
 	if (layers_ctrl & 2)	draw_sprites(screen->machine, bitmap, cliprect, spriteram16_2, 1);
 	return 0;

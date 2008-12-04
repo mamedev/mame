@@ -308,7 +308,7 @@ VIDEO_UPDATE( bosco )
 		fg_clip.min_x = 28*8;
 	}
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_stars(bitmap,cliprect);
 
 	tilemap_draw(bitmap,&bg_clip,bg_tilemap,0,0);

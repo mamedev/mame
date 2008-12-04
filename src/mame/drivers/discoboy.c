@@ -137,7 +137,7 @@ static VIDEO_UPDATE( discoboy )
 		palette_set_color(screen->machine, (i/2)+0x400, MAKE_RGB(r, g, b));
 	}
 
-	fillbitmap(bitmap, 0x3ff, cliprect);
+	bitmap_fill(bitmap, cliprect, 0x3ff);
 
 	for (y=0;y<32;y++)
 	{

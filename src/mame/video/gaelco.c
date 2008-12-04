@@ -195,8 +195,8 @@ VIDEO_UPDATE( maniacsq )
 	tilemap_set_scrolly(pant[1], 0, gaelco_vregs[2]);
 	tilemap_set_scrollx(pant[1], 0, gaelco_vregs[3]);
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap( bitmap, 0, cliprect );
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill( bitmap, cliprect , 0);
 
 	tilemap_draw(bitmap,cliprect,pant[1],3,0);
 	tilemap_draw(bitmap,cliprect,pant[0],3,0);
@@ -222,8 +222,8 @@ VIDEO_UPDATE( bigkarnk )
 	tilemap_set_scrolly(pant[1], 0, gaelco_vregs[2]);
 	tilemap_set_scrollx(pant[1], 0, gaelco_vregs[3]);
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap( bitmap, 0, cliprect );
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill( bitmap, cliprect , 0);
 
 	tilemap_draw(bitmap,cliprect,pant[1],TILEMAP_DRAW_LAYER1 | 3,0);
 	tilemap_draw(bitmap,cliprect,pant[0],TILEMAP_DRAW_LAYER1 | 3,0);

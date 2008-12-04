@@ -431,7 +431,7 @@ VIDEO_UPDATE( model3 )
 			debug_layer_disable ^= 0x10;
 	}
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	if (!(debug_layer_disable & 0x8))
 		draw_layer(bitmap, cliprect, 3, (model3_layer_enable >> 3) & 0x1);
@@ -442,8 +442,8 @@ VIDEO_UPDATE( model3 )
 	if( !(debug_layer_disable & 0x10) )
 	{
 //      if(real3d_display_list) {
-//          fillbitmap(zbuffer, 0, cliprect);
-//          fillbitmap(bitmap3d, 0x8000, cliprect);
+//          bitmap_fill(zbuffer, cliprect, 0);
+//          bitmap_fill(bitmap3d, cliprect, 0x8000);
 //          real3d_traverse_display_list();
 //      }
 		copybitmap_trans(bitmap, bitmap3d, 0, 0, 0, 0, cliprect, 0x8000);
@@ -820,8 +820,8 @@ void real3d_display_list_end(void)
 		};
 	}
 	texture_fifo_pos = 0;
-	fillbitmap(zbuffer, 0, NULL);
-	fillbitmap(bitmap3d, 0x8000, NULL);
+	bitmap_fill(zbuffer, NULL, 0);
+	bitmap_fill(bitmap3d, NULL, 0x8000);
 	real3d_traverse_display_list();
 //  real3d_display_list = 1;
 }

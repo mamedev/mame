@@ -148,7 +148,7 @@ VIDEO_UPDATE( namcofl )
 	handle_mcu(screen->machine);
 	namcofl_install_palette(screen->machine);
 
-	fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
+	bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 
 	for( pri=0; pri<16; pri++ )
 	{

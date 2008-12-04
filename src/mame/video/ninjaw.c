@@ -181,7 +181,7 @@ VIDEO_UPDATE( ninjaw )
 	nodraw  = TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,screen_number,layer[0],TILEMAP_DRAW_OPAQUE,0);	/* left */
 
 	/* Ensure screen blanked even when bottom layers not drawn due to disable bit */
-	if (nodraw) fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	if (nodraw) bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	/* Sprites can be under/over the layer below text layer */
 	draw_sprites(screen->machine,bitmap,cliprect,1,xoffs,8); // draw sprites with priority 1 which are under the mid layer

@@ -363,7 +363,7 @@ VIDEO_UPDATE( ladybug )
 	int offs;
 
 	// clear the bg bitmap
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	for (offs = 0; offs < 32; offs++)
 	{
@@ -406,7 +406,7 @@ VIDEO_UPDATE( sraider )
 	}
 
 	// clear the bg bitmap
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 	// draw the stars
 	if (flip_screen_get())

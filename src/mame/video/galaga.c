@@ -581,7 +581,7 @@ static void draw_stars(bitmap_t *bitmap, const rectangle *cliprect )
 
 VIDEO_UPDATE( galaga )
 {
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_stars(bitmap,cliprect);
 	draw_sprites(screen->machine,bitmap,cliprect);
 	tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);

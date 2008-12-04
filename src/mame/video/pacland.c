@@ -203,7 +203,7 @@ VIDEO_START( pacland )
 	int color;
 
 	fg_bitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
-	fillbitmap(fg_bitmap, 0xffff, NULL);
+	bitmap_fill(fg_bitmap, NULL, 0xffff);
 
 	bg_tilemap = tilemap_create(get_bg_tile_info,tilemap_scan_rows,8,8,64,32);
 	fg_tilemap = tilemap_create(get_fg_tile_info,tilemap_scan_rows,8,8,64,32);
@@ -385,7 +385,7 @@ VIDEO_UPDATE( pacland )
 	/* draw high priority sprite pixels, setting priority bitmap to non-zero
        wherever there is a high-priority pixel; note that we draw to the bitmap
        which is safe because the bg_tilemap draw will overwrite everything */
-	fillbitmap(priority_bitmap, 0x00, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0x00);
 	draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	/* draw background */

@@ -204,7 +204,7 @@ static void gpworld_draw_sprites(running_machine *machine, bitmap_t *bitmap, con
 
 static VIDEO_UPDATE( gpworld )
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	gpworld_draw_tiles(screen->machine, bitmap, cliprect);
 	gpworld_draw_sprites(screen->machine, bitmap, cliprect);

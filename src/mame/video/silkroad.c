@@ -153,7 +153,7 @@ VIDEO_START(silkroad)
 
 VIDEO_UPDATE(silkroad)
 {
-	fillbitmap(bitmap,0x7c0,cliprect);
+	bitmap_fill(bitmap,cliprect,0x7c0);
 
 	tilemap_set_scrollx( fg_tilemap, 0, ((silkroad_regs[0] & 0xffff0000) >> 16) );
 	tilemap_set_scrolly( fg_tilemap, 0, (silkroad_regs[0] & 0x0000ffff) >> 0 );

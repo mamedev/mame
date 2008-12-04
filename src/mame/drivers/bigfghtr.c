@@ -256,7 +256,7 @@ static VIDEO_UPDATE( bigfghtr )
 	}
 	else
 	{
-		fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
+		bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 	}
 
 	if( sprite_enable ) draw_sprites(screen->machine, bitmap, cliprect, 2 );

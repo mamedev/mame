@@ -1579,7 +1579,7 @@ static void DrawCharacterLayer(running_machine *machine, bitmap_t *bitmap, const
 		cgsomethingisdirty = 0;
 	}
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 	tilemap_set_scrollx( bgtilemap,0, (dx-0x35c)&0x3ff );
 	tilemap_set_scrolly( bgtilemap,0, dy&0x3ff );
 	tilemap_set_palette_offset( bgtilemap, mixer.palBase*256 );
@@ -2275,7 +2275,7 @@ VIDEO_UPDATE( namcos22s )
 	UINT32 bgColor;
 	UpdateVideoMixer();
 	bgColor = (mixer.rBackColor<<16)|(mixer.gBackColor<<8)|mixer.bBackColor;
-   fillbitmap( bitmap, bgColor, cliprect );
+   bitmap_fill( bitmap, cliprect , bgColor);
    UpdatePaletteS(screen->machine);
    DrawCharacterLayer(screen->machine, bitmap, cliprect );
 	DrawPolygons( bitmap );
@@ -2324,7 +2324,7 @@ VIDEO_UPDATE( namcos22s )
 VIDEO_UPDATE( namcos22 )
 {
 	UpdateVideoMixer();
-   fillbitmap( bitmap, get_black_pen(screen->machine), cliprect );
+   bitmap_fill( bitmap, cliprect , get_black_pen(screen->machine));
 	UpdatePalette(screen->machine);
 	DrawCharacterLayer(screen->machine, bitmap, cliprect );
    DrawPolygons( bitmap );

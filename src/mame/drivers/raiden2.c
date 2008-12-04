@@ -537,7 +537,7 @@ static VIDEO_UPDATE ( raiden2 )
 #endif
 #endif
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	if (!input_code_pressed(KEYCODE_Q))
 		tilemap_draw(bitmap, cliprect, background_layer, 0, 0);

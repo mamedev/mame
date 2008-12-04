@@ -81,7 +81,7 @@ VIDEO_UPDATE(funybubl)
 
 	offs = 0;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 
 	/* tilemap .. convert it .. banking makes it slightly more annoying but still easy */

@@ -281,7 +281,7 @@ VIDEO_UPDATE( pastelg )
 				*BITMAP_ADDR16(bitmap, y, x) = pastelg_videoram[(y * width) + x];
 	}
 	else
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 
 	return 0;
 }

@@ -493,11 +493,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap_bg, bitmap_t
 
 VIDEO_UPDATE( tecmo16 )
 {
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
-	fillbitmap(tile_bitmap_bg, 0x300, cliprect);
-	fillbitmap(tile_bitmap_fg,     0, cliprect);
-	fillbitmap(sprite_bitmap,      0, cliprect);
+	bitmap_fill(tile_bitmap_bg, cliprect, 0x300);
+	bitmap_fill(tile_bitmap_fg,     cliprect, 0);
+	bitmap_fill(sprite_bitmap,      cliprect, 0);
 
 	/* draw tilemaps into a 16-bit bitmap */
 	tilemap_draw(tile_bitmap_bg, cliprect,bg_tilemap, 0, 1);

@@ -125,7 +125,7 @@ VIDEO_START( sengokmj )
 
 VIDEO_UPDATE( sengokmj )
 {
-	fillbitmap(bitmap, screen->machine->pens[0x7ff], cliprect); //black pen
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x7ff]); //black pen
 
 	if(!(sengokmj_layer_en & 1))
 		tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);

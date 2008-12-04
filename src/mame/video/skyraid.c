@@ -67,7 +67,7 @@ static void draw_terrain(running_machine *machine, bitmap_t* bitmap, const recta
 			r.max_y = y + 1;
 			r.max_x = x + 31 - count;
 
-			fillbitmap(bitmap, color, &r);
+			bitmap_fill(bitmap, &r, color);
 
 			x += 32 - count;
 		}
@@ -141,7 +141,7 @@ static void draw_trapezoid(running_machine *machine, bitmap_t* dst, bitmap_t* sr
 
 VIDEO_UPDATE( skyraid )
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	draw_terrain(screen->machine, helper, cliprect);
 	draw_sprites(screen->machine, helper, cliprect);

@@ -346,7 +346,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 		rect.max_y = ypos + 2 * BGHEIGHT - 1;
 	}
 
-	fillbitmap(bitmap, machine->gfx[image]->color_base + 3, &rect);
+	bitmap_fill(bitmap, &rect, machine->gfx[image]->color_base + 3);
 }
 
 
@@ -361,7 +361,7 @@ VIDEO_UPDATE( m52 )
 {
 	int offs;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	if (!(bgcontrol & 0x20))
 	{

@@ -192,7 +192,7 @@ static void mcr3_update_sprites(running_machine *machine, bitmap_t *bitmap, cons
 {
 	int offs;
 
-	fillbitmap(priority_bitmap, 1, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 1);
 
 	/* loop over sprite RAM */
 	for (offs = spriteram_size - 4; offs >= 0; offs -= 4)

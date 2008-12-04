@@ -202,8 +202,8 @@ VIDEO_UPDATE( mcatadv )
 {
 	int i;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	if(mcatadv_scroll[2] != palette_bank1) {
 		palette_bank1 = mcatadv_scroll[2];

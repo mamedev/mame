@@ -30,7 +30,7 @@ VIDEO_UPDATE( bublbobl )
 	/* the background character columns is stored in the area dd00-dd3f */
 
 	/* This clears & redraws the entire screen each pass */
-	fillbitmap(bitmap,255,cliprect);
+	bitmap_fill(bitmap,cliprect,255);
 
 	if (!bublbobl_video_enable) return 0;
 

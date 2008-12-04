@@ -364,7 +364,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 	/* if not enabled, fill the background with black */
 	else
-		fillbitmap(bitmap, get_black_pen(machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(machine));
 }
 
 

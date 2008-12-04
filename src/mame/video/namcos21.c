@@ -181,7 +181,7 @@ VIDEO_UPDATE( namcos21 )
 	int pivot = 3;
 	int pri;
 	update_palette(screen->machine);
-	fillbitmap( bitmap, 0xff, cliprect );
+	bitmap_fill( bitmap, cliprect , 0xff);
 
 	if( namcos2_gametype != NAMCOS21_WINRUN91 )
 	{ /* draw low priority 2d sprites */

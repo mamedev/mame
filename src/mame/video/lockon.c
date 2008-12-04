@@ -957,7 +957,7 @@ VIDEO_UPDATE( lockon )
 	/* If screen output is disabled, fill with black */
 	if ( !BIT(lockon_ctrl_reg, 7) )
 	{
-		fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+		bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 		return 0;
 	}
 

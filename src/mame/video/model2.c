@@ -2735,8 +2735,8 @@ VIDEO_UPDATE(model2)
 	logerror("--- frame ---\n");
 
 	sys24_tile_update(screen->machine);
-	fillbitmap(bitmap, screen->machine->pens[0], cliprect);
-	fillbitmap(sys24_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, screen->machine->pens[0]);
+	bitmap_fill(sys24_bitmap, cliprect, 0);
 
 	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 7, 0, 0);
 	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 6, 0, 0);
@@ -2754,7 +2754,7 @@ VIDEO_UPDATE(model2)
 	/* have the rasterizer output the frame */
 	model2_3d_frame_end( bitmap, cliprect );
 
-	fillbitmap(sys24_bitmap, 0, cliprect);
+	bitmap_fill(sys24_bitmap, cliprect, 0);
 	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 3, 0, 0);
 	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 2, 0, 0);
 	sys24_tile_draw(screen->machine, sys24_bitmap, cliprect, 1, 0, 0);

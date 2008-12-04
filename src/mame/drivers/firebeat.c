@@ -476,7 +476,7 @@ static VIDEO_UPDATE(firebeat)
 	else
 		chip = 1;
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	if (mame_stricmp(screen->machine->gamedrv->name, "popn7") == 0)
 	{

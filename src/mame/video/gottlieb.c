@@ -220,7 +220,7 @@ VIDEO_UPDATE( gottlieb )
 	if (!background_priority)
 		tilemap_draw(bitmap, cliprect, bg_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	else
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 
 	/* draw the sprites */
 	draw_sprites(screen->machine, bitmap, cliprect);

@@ -141,7 +141,7 @@ VIDEO_UPDATE( darkmist)
 	tilemap_set_scrollx(fgtilemap, 0, DM_GETSCROLL(0xa));
 	tilemap_set_scrolly(fgtilemap, 0, DM_GETSCROLL(0xe));
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	if(darkmist_hw & DISPLAY_BG)
 		tilemap_draw(bitmap,cliprect,bgtilemap, 0,0);

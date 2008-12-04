@@ -484,9 +484,9 @@ VIDEO_UPDATE( galastrm )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	fillbitmap(bitmap, 0, cliprect);
-	fillbitmap(priority_bitmap, 0, &clip);
-	fillbitmap(tmpbitmaps, 0, &clip);
+	bitmap_fill(bitmap, cliprect, 0);
+	bitmap_fill(priority_bitmap, &clip, 0);
+	bitmap_fill(tmpbitmaps, &clip, 0);
 
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[0],0,0);
 	TC0100SCN_tilemap_draw(screen->machine,bitmap,cliprect,0,pivlayer[1],0,0);
@@ -527,10 +527,10 @@ VIDEO_UPDATE( galastrm )
 	draw_sprites(screen->machine,tmpbitmaps,&clip,primasks,1);
 
 	copybitmap_trans(bitmap,polybitmap,0,0, 0,0,cliprect,0);
-	fillbitmap(polybitmap, 0, &clip);
+	bitmap_fill(polybitmap, &clip, 0);
 	tc0610_rotate_draw(screen->machine,polybitmap,tmpbitmaps,cliprect);
 
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 	draw_sprites(screen->machine,bitmap,cliprect,primasks,0);
 
 	if (!input_code_pressed(KEYCODE_B)) TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);
@@ -573,10 +573,10 @@ VIDEO_UPDATE( galastrm )
 	draw_sprites(screen->machine,tmpbitmaps,&clip,primasks,1);
 
 	copybitmap_trans(bitmap,polybitmap,0,0, 0,0,cliprect,0);
-	fillbitmap(polybitmap, 0, &clip);
+	bitmap_fill(polybitmap, &clip, 0);
 	tc0610_rotate_draw(screen->machine,polybitmap,tmpbitmaps,cliprect);
 
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 	draw_sprites(screen->machine,bitmap,cliprect,primasks,0);
 
 	TC0480SCP_tilemap_draw(bitmap,cliprect,layer[4],0,0);

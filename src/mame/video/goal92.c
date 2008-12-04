@@ -162,7 +162,7 @@ VIDEO_UPDATE( goal92 )
 		tilemap_set_scrolly(foreground_layer, 0, goal92_scrollram16[3] + 8);
 	}
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 
 	tilemap_draw(bitmap,cliprect,background_layer,0,0);
 	draw_sprites(screen->machine,bitmap,cliprect,2);

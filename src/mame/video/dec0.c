@@ -450,7 +450,7 @@ VIDEO_UPDATE( birdtry )
 
 	/* This game doesn't have the extra playfield chip on the game board, but
     the palette does show through. */
-	fillbitmap(bitmap,screen->machine->pens[768],cliprect);
+	bitmap_fill(bitmap,cliprect,screen->machine->pens[768]);
 	dec0_pf2_draw(bitmap,cliprect,0);
 	draw_sprites(screen->machine,bitmap,cliprect,0x00,0x00);
 	dec0_pf1_draw(bitmap,cliprect,0);

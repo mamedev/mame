@@ -121,7 +121,7 @@ VIDEO_UPDATE( spbactn )
 {
 	int offs, sx, sy;
 
-	fillbitmap(tile_bitmap_fg, 0, cliprect);
+	bitmap_fill(tile_bitmap_fg, cliprect, 0);
 
 	/* draw table bg gfx */
 	for (sx = sy = offs = 0; offs < 0x4000 / 2; offs++)

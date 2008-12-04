@@ -517,8 +517,8 @@ VIDEO_UPDATE( tetrisp2 )
 	flipscreen = (tetrisp2_systemregs[0x00] & 0x02);
 
 	/* Black background color */
-	fillbitmap(bitmap, 0, cliprect);
-	fillbitmap(priority_bitmap, 0, NULL);
+	bitmap_fill(bitmap, cliprect, 0);
+	bitmap_fill(priority_bitmap, NULL, 0);
 
 	/* Flip Screen */
 	if (flipscreen != flipscreen_old)
@@ -601,8 +601,8 @@ VIDEO_UPDATE( rockntread )
 	flipscreen = (tetrisp2_systemregs[0x00] & 0x02);
 
 	/* Black background color */
-	fillbitmap(bitmap, 0, cliprect);
-	fillbitmap(priority_bitmap, 0, NULL);
+	bitmap_fill(bitmap, cliprect, 0);
+	bitmap_fill(priority_bitmap, NULL, 0);
 
 	/* Flip Screen */
 	if (flipscreen != flipscreen_old)
@@ -696,8 +696,8 @@ VIDEO_UPDATE( rocknms )
 		tilemap_set_scrollx(tilemap_sub_rot, 0, rocknms_sub_rotregs[ 0 ] + 0x400);
 		tilemap_set_scrolly(tilemap_sub_rot, 0, rocknms_sub_rotregs[ 2 ] + 0x400);
 
-		fillbitmap(bitmap, screen->machine->pens[0x0000], cliprect);
-		fillbitmap(priority_bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[0x0000]);
+		bitmap_fill(priority_bitmap, cliprect, 0);
 
 		asc_pri = scr_pri = rot_pri = 0;
 
@@ -749,8 +749,8 @@ VIDEO_UPDATE( rocknms )
 		tilemap_set_scrolly(tilemap_rot, 0, tetrisp2_rotregs[ 2 ] + 0x400);
 
 		/* Black background color */
-		fillbitmap(bitmap, screen->machine->pens[0x0000], cliprect);
-		fillbitmap(priority_bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[0x0000]);
+		bitmap_fill(priority_bitmap, cliprect, 0);
 
 		asc_pri = scr_pri = rot_pri = 0;
 

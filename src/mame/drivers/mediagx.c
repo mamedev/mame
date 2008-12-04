@@ -319,7 +319,7 @@ static void draw_cga(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 static VIDEO_UPDATE(mediagx)
 {
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	draw_framebuffer(screen->machine, bitmap, cliprect);
 

@@ -389,7 +389,7 @@ VIDEO_UPDATE( mcr )
 	tilemap_set_flip(bg_tilemap, mcr_cocktail_flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 
 	/* draw the background */
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0x00);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 1, 0x10);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 2, 0x20);

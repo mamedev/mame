@@ -233,8 +233,8 @@ VIDEO_UPDATE( inufuku )
 {
 	int i;
 
-	fillbitmap(bitmap, get_black_pen(screen->machine), cliprect);
-	fillbitmap(priority_bitmap, 0, NULL);
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+	bitmap_fill(priority_bitmap, NULL, 0);
 
 	if (inufuku_bg_raster) {
 		tilemap_set_scroll_rows(inufuku_bg_tilemap, 512);

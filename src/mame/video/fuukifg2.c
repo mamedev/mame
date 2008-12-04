@@ -341,8 +341,8 @@ VIDEO_UPDATE( fuuki16 )
 //  fuuki16_draw_layer(bitmap,cliprect, tm_back,  TILEMAP_DRAW_OPAQUE, 0);
 
 	/* Actually, bg colour is simply the last pen i.e. 0x1fff -pjp */
-	fillbitmap(bitmap,(0x800*4)-1,cliprect);
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,(0x800*4)-1);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	fuuki16_draw_layer(bitmap,cliprect, tm_back,   0, 1);
 	fuuki16_draw_layer(bitmap,cliprect, tm_middle, 0, 2);

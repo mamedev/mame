@@ -725,9 +725,9 @@ VIDEO_UPDATE( namcona1 )
 			roz_dirty = 0;
 		}
 
-		fillbitmap( priority_bitmap,0,cliprect );
+		bitmap_fill( priority_bitmap,cliprect ,0);
 
-		fillbitmap( bitmap, 0xff, cliprect ); /* background color? */
+		bitmap_fill( bitmap, cliprect , 0xff); /* background color? */
 
 		for( priority = 0; priority<8; priority++ )
 		{

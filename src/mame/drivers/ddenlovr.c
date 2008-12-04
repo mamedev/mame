@@ -1242,7 +1242,7 @@ VIDEO_UPDATE(ddenlovr)
 	if (input_code_pressed_once(KEYCODE_F)) { base++; while ((gfx[base] & 0xf0) != 0x30) base++; }
 #endif
 
-	fillbitmap(bitmap,ddenlovr_bgcolor,cliprect);
+	bitmap_fill(bitmap,cliprect,ddenlovr_bgcolor);
 
 #ifdef MAME_DEBUG
 	if (input_code_pressed(KEYCODE_Z))

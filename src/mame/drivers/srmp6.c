@@ -178,7 +178,7 @@ static VIDEO_UPDATE(srmp6)
 		UINT16 b;
 	} temp;
 
-	fillbitmap(bitmap,0,cliprect);
+	bitmap_fill(bitmap,cliprect,0);
 
 #if 0
 	/* debug */

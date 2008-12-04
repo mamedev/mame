@@ -165,7 +165,7 @@ VIDEO_UPDATE( cheekyms )
 	tilemap_mark_all_tiles_dirty(ALL_TILEMAPS);
 	tilemap_set_flip(ALL_TILEMAPS, flip ? TILEMAP_FLIPX | TILEMAP_FLIPY : 0);
 
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	/* sprites go under the playfield */
 	draw_sprites(screen->machine->gfx, bitmap, cliprect, flip);

@@ -227,7 +227,7 @@ VIDEO_UPDATE( superchs )
 	layer[3] = (priority &0x000f) >>  0;	/* tells us which is top */
 	layer[4] = 4;   /* text layer always over bg layers */
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	/* We have to assume 2nd to bottom layer is always underneath
        sprites as pdrawgfx cannot yet cope with more than 4 layers */

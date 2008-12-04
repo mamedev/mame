@@ -302,7 +302,7 @@ int voodoo_update(const device_config *device, bitmap_t *bitmap, const rectangle
 	/* if we are blank, just fill with black */
 	if (v->type <= VOODOO_2 && FBIINIT1_SOFTWARE_BLANK(v->reg[fbiInit1].u))
 	{
-		fillbitmap(bitmap, 0, cliprect);
+		bitmap_fill(bitmap, cliprect, 0);
 		return changed;
 	}
 

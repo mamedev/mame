@@ -35,7 +35,7 @@ static VIDEO_UPDATE( missb2 )
 	/* and sprites) are stored in the same memory region, and information on */
 	/* the background character columns is stored in the area dd00-dd3f */
 
-	fillbitmap(bitmap,255,cliprect);
+	bitmap_fill(bitmap,cliprect,255);
 
 	if (!bublbobl_video_enable) return 0;
 

@@ -115,8 +115,8 @@ extern UINT16 *K056832_videoram;
 
 VIDEO_UPDATE(lethalen)
 {
-	fillbitmap(bitmap, 7168, cliprect);
-	fillbitmap(priority_bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 7168);
+	bitmap_fill(priority_bitmap, cliprect, 0);
 
 	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 3, 0, 1);
 	K056832_tilemap_draw(screen->machine, bitmap, cliprect, 2, 0, 2);

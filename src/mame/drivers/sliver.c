@@ -288,7 +288,7 @@ static void blit_gfx(running_machine *machine)
 
 static WRITE16_HANDLER( fifo_clear_w )
 {
-		fillbitmap(sliver_bitmap_fg, 0,0);
+		bitmap_fill(sliver_bitmap_fg, 0,0);
 		fptr=0;
 		tmp_counter=0;
 }
@@ -310,7 +310,7 @@ static void render_jpeg(running_machine *machine)
 	int addr=jpeg_addr;
 	UINT8 *rom;
 
-	fillbitmap(sliver_bitmap_bg, 0,0);
+	bitmap_fill(sliver_bitmap_bg, 0,0);
 	if(jpeg_addr<0)
 	{
 		return;

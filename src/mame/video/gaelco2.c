@@ -456,7 +456,7 @@ VIDEO_UPDATE( gaelco2 )
 	}
 
 	/* draw screen */
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	tilemap_draw(bitmap, cliprect, pant[1], 0, 0);
 	tilemap_draw(bitmap, cliprect, pant[0], 0, 0);
@@ -488,7 +488,7 @@ VIDEO_UPDATE( gaelco2_dual )
 	}
 
 	/* draw screen */
-	fillbitmap(bitmap, 0, cliprect);
+	bitmap_fill(bitmap, cliprect, 0);
 
 	if (screen == right_screen)
 	{

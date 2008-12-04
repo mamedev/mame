@@ -65,7 +65,7 @@ VIDEO_UPDATE( boxer )
 	int i;
 	int j;
 
-	fillbitmap(bitmap, 1, cliprect);
+	bitmap_fill(bitmap, cliprect, 1);
 
 	for (i = 0; i < 16; i++)
 	{

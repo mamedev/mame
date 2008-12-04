@@ -233,7 +233,7 @@ VIDEO_UPDATE( bloodbro )
 	tilemap_set_scrollx(fg_tilemap,0,bloodbro_scroll[0x12]);
 	tilemap_set_scrolly(fg_tilemap,0,bloodbro_scroll[0x13]);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
@@ -249,7 +249,7 @@ VIDEO_UPDATE( weststry )
 //  tilemap_set_scrollx(fg_tilemap,0,bloodbro_scroll[0x12]);
 //  tilemap_set_scrolly(fg_tilemap,0,bloodbro_scroll[0x13]);
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);
@@ -266,7 +266,7 @@ VIDEO_UPDATE( skysmash )
 	tilemap_set_scrollx(fg_tilemap,0,bloodbro_scroll[0x0a]);
 	tilemap_set_scrolly(fg_tilemap,0,bloodbro_scroll[0x0b]);	/* ? */
 
-	fillbitmap(priority_bitmap,0,cliprect);
+	bitmap_fill(priority_bitmap,cliprect,0);
 
 	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
 	tilemap_draw(bitmap,cliprect,fg_tilemap,0,1);

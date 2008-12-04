@@ -425,8 +425,8 @@ VIDEO_UPDATE( undrfire )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,0,cliprect);	/* wrong color? */
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a
@@ -569,8 +569,8 @@ VIDEO_UPDATE( cbombers )
 	pivlayer[1] = pivlayer[0]^1;
 	pivlayer[2] = 2;
 
-	fillbitmap(priority_bitmap,0,cliprect);
-	fillbitmap(bitmap,0,cliprect);	/* wrong color? */
+	bitmap_fill(priority_bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,0);	/* wrong color? */
 
 
 /* The "PIV" chip seems to be a renamed TC0100SCN. It has a

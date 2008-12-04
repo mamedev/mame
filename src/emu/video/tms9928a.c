@@ -401,7 +401,7 @@ VIDEO_UPDATE( tms9928a )
     palette_set_color(screen->machine, 0, (TMS9928A_palette[BackColour] & MAKE_ARGB(0,255,255,255)) | (oldcolor & MAKE_ARGB(255,0,0,0)));
 
 	if (! (tms.Regs[1] & 0x40))
-		fillbitmap(bitmap, screen->machine->pens[BackColour], cliprect);
+		bitmap_fill(bitmap, cliprect, screen->machine->pens[BackColour]);
 	else
 	{
 		(*ModeHandlers[TMS_MODE])(screen->machine, tms.tmpbmp, cliprect);
@@ -413,15 +413,15 @@ VIDEO_UPDATE( tms9928a )
 			/* set borders */
 			rt.min_x = 0; rt.max_x = LEFT_BORDER+256+RIGHT_BORDER-1;
 			rt.min_y = 0; rt.max_y = TOP_BORDER-1;
-			fillbitmap (bitmap, BackColour, &rt);
+			bitmap_fill (bitmap, &rt, BackColour);
 			rt.min_y = TOP_BORDER+192; rt.max_y = TOP_BORDER+192+BOTTOM_BORDER-1;
-			fillbitmap (bitmap, BackColour, &rt);
+			bitmap_fill (bitmap, &rt, BackColour);
 
 			rt.min_y = TOP_BORDER; rt.max_y = TOP_BORDER+192-1;
 			rt.min_x = 0; rt.max_x = LEFT_BORDER-1;
-			fillbitmap (bitmap, BackColour, &rt);
+			bitmap_fill (bitmap, &rt, BackColour);
 			rt.min_x = LEFT_BORDER+256; rt.max_x = LEFT_BORDER+256+RIGHT_BORDER-1;
-			fillbitmap (bitmap, BackColour, &rt);
+			bitmap_fill (bitmap, &rt, BackColour);
 	    }
 		if (TMS_SPRITES_ENABLED)
 			draw_sprites(screen->machine, bitmap, cliprect);
@@ -461,10 +461,10 @@ static void draw_mode1 (running_machine *machine, bitmap_t *bitmap, const rectan
 	/* colours at sides must be reset */
 	rt.min_y = 0; rt.max_y = 191;
 	rt.min_x = 0; rt.max_x = 7;
-	fillbitmap (bitmap, bg, &rt);
+	bitmap_fill (bitmap, &rt, bg);
 	rt.min_y = 0; rt.max_y = 191;
 	rt.min_x = 248; rt.max_x = 255;
-	fillbitmap (bitmap, bg, &rt);
+	bitmap_fill (bitmap, &rt, bg);
 
     name = 0;
     for (y=0;y<24;y++) {
@@ -494,10 +494,10 @@ static void draw_mode12 (running_machine *machine, bitmap_t *bitmap, const recta
 	/* colours at sides must be reset */
 	rt.min_y = 0; rt.max_y = 191;
 	rt.min_x = 0; rt.max_x = 7;
-	fillbitmap (bitmap, bg, &rt);
+	bitmap_fill (bitmap, &rt, bg);
 	rt.min_y = 0; rt.max_y = 191;
 	rt.min_x = 248; rt.max_x = 255;
-	fillbitmap (bitmap, bg, &rt);
+	bitmap_fill (bitmap, &rt, bg);
 
     name = 0;
     for (y=0;y<24;y++) {

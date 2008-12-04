@@ -102,7 +102,7 @@ VIDEO_START( lemmings )
 	sprite_triple_buffer_1 = (UINT16*)auto_malloc(0x800);
 
 	tilemap_set_transparent_pen(vram_tilemap,0);
-	fillbitmap(bitmap0,0x100,0);
+	bitmap_fill(bitmap0,0,0x100);
 }
 
 VIDEO_EOF( lemmings )
@@ -177,7 +177,7 @@ VIDEO_UPDATE( lemmings )
 		}
 	}
 
-	fillbitmap(bitmap,get_black_pen(screen->machine),cliprect);
+	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	draw_sprites(screen->machine,bitmap,cliprect,sprite_triple_buffer_1,1,0x0000);
 
 	/* Pixel layer can be windowed in hardware (two player mode) */
