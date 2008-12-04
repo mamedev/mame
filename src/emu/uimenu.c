@@ -275,7 +275,7 @@ static void menu_cheat_populate(running_machine *machine, ui_menu *menu);
 static void menu_memory_card(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 static void menu_memory_card_populate(running_machine *machine, ui_menu *menu, int cardnum);
 static void menu_sliders(running_machine *machine, ui_menu *menu, void *parameter, void *state);
-static void menu_sliders_populate(running_machine *machine, ui_menu *menu);
+static void menu_sliders_populate(running_machine *machine, ui_menu *menu, int menuless_mode);
 static void menu_sliders_custom_render(running_machine *machine, ui_menu *menu, void *state, void *selectedref, float top, float bottom, float x1, float y1, float x2, float y2);
 static void menu_video_targets(running_machine *machine, ui_menu *menu, void *parameter, void *state);
 static void menu_video_targets_populate(running_machine *machine, ui_menu *menu);
@@ -1346,10 +1346,20 @@ UINT32 ui_menu_ui_handler(running_machine *machine, UINT32 state)
 
 UINT32 ui_slider_ui_handler(running_machine *machine, UINT32 state)
 {
-	/* if we have no menus stacked up, start with the sliders menu */
-	if (menu_stack == NULL)
-		ui_menu_stack_push(ui_menu_alloc(machine, menu_sliders, machine));
-	return ui_menu_ui_handler(machine, state);
+	UINT32 result;
+	
+	/* if this is the first call, push the sliders menu */
+	if (state)
+		ui_menu_stack_push(ui_menu_alloc(machine, menu_sliders, (void *)1));
+
+	/* handle standard menus */
+	result = ui_menu_ui_handler(machine, state);
+	
+	/* if we are cancelled, pop the sliders menu */
+	if (result == UI_HANDLER_CANCEL)
+		ui_menu_stack_pop(machine);
+	
+	return (menu_stack != NULL && menu_stack->handler == menu_sliders && menu_stack->parameter != NULL) ? 0 : UI_HANDLER_CANCEL;
 }
 
 
@@ -2641,16 +2651,19 @@ static void menu_memory_card_populate(running_machine *machine, ui_menu *menu, i
 
 static void menu_sliders(running_machine *machine, ui_menu *menu, void *parameter, void *state)
 {
+	int menuless_mode = (parameter != NULL);
 	const ui_menu_event *event;
 	UINT8 *hidden = state;
 
 	/* if no state, allocate some */
 	if (hidden == NULL)
 		hidden = ui_menu_alloc_state(menu, sizeof(*hidden), NULL);
+	if (menuless_mode)
+		*hidden = TRUE;
 
 	/* if the menu isn't built, populate now */
 	if (!ui_menu_populated(menu))
-		menu_sliders_populate(machine, menu);
+		menu_sliders_populate(machine, menu, menuless_mode);
 
 	/* process the menu */
 	event = ui_menu_process(machine, menu, UI_MENU_PROCESS_LR_REPEAT | (*hidden ? UI_MENU_PROCESS_CUSTOM_ONLY : 0));
@@ -2667,9 +2680,12 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 			{
 				/* toggle visibility */
 				case IPT_UI_ON_SCREEN_DISPLAY:
-					*hidden = !*hidden;
+					if (menuless_mode)
+						ui_menu_stack_pop(machine);
+					else
+						*hidden = !*hidden;
 					break;
-
+				
 				/* decrease value */
 				case IPT_UI_LEFT:
 					if (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT))
@@ -2743,7 +2759,7 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
     menu
 -------------------------------------------------*/
 
-static void menu_sliders_populate(running_machine *machine, ui_menu *menu)
+static void menu_sliders_populate(running_machine *machine, ui_menu *menu, int menuless_mode)
 {
 	astring *tempstring = astring_alloc();
 	const slider_state *curslider;
@@ -2758,6 +2774,9 @@ static void menu_sliders_populate(running_machine *machine, ui_menu *menu)
 		if (curval < curslider->maxval)
 			flags |= MENU_FLAG_RIGHT_ARROW;
 		ui_menu_item_append(menu, curslider->description, astring_c(tempstring), flags, (void *)curslider);
+		
+		if (menuless_mode)
+			break;
 	}
 
 	ui_menu_set_custom_render(menu, menu_sliders_custom_render, 0.0f, 2.0f * ui_get_line_height());
