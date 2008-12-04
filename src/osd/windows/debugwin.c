@@ -1401,9 +1401,10 @@ static LRESULT CALLBACK debugwin_view_proc(HWND wnd, UINT message, WPARAM wparam
 		{
 			if (debug_view_get_cursor_supported(info->view))
 			{
+				debug_view_xy topleft = debug_view_get_visible_position(info->view);
 				debug_view_xy newpos;
-				newpos.x = GET_X_LPARAM(lparam) / debug_font_width;
-				newpos.y = GET_Y_LPARAM(lparam) / debug_font_height;
+				newpos.x = topleft.x + GET_X_LPARAM(lparam) / debug_font_width;
+				newpos.y = topleft.y + GET_Y_LPARAM(lparam) / debug_font_height;
 				debug_view_set_cursor_position(info->view, newpos);
 				SetFocus(wnd);
 			}

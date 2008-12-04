@@ -6399,7 +6399,7 @@ GAME( 1988, tetris2,  tetris,   system16b,      tetris,   generic_5704,  ROT0,  
 GAME( 1988, tetris1,  tetris,   system16b,      tetris,   generic_5358,  ROT0,   "Sega",           "Tetris (set 1, Japan, System 16B, FD1094 317-0091)", 0 )
 GAME( 1987, timescan, 0,        timescan,       timescan, generic_5358,  ROT270, "Sega",           "Time Scanner (set 2, System 16B)", 0 )
 GAME( 1994, toryumon, 0,        system16b,      toryumon, generic_5797,  ROT0,   "Sega",           "Toryumon", 0 )
-GAME( 1989, tturf,    0,        system16b_8751, tturf,    tturf_5704,    ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan, 8751 317-0104)", 0)
+GAME( 1989, tturf,    0,        system16b_8751, tturf,    tturf_5704,    ROT0,   "Sega / Sunsoft", "Tough Turf (set 2, Japan, 8751 317-0104)", GAME_NO_SOUND /* due to missing ROM only */)
 GAME( 1989, tturfu,   tturf,    system16b_8751, tturf,    tturf_5358,    ROT0,   "Sega / Sunsoft", "Tough Turf (set 1, US, 8751 317-0099)", 0)
 GAME( 1988, wb3,      0,        system16b_8751, wb3,      wb3_5704,      ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 5, World, System 16B, 8751 317-0098)", 0 )
 GAME( 1988, wb34,     wb3,      system16b,      wb3,      generic_5704,  ROT0,   "Sega / Westone", "Wonder Boy III - Monster Lair (set 4, Japan, System 16B, FD1094 317-0087)", 0 )
