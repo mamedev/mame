@@ -6769,6 +6769,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Gaelco 3D games */
 	DRIVER( speedup )	/* (c) 1996 - Ref ??? */
 	DRIVER( surfplnt )	/* (c) 1997 - Ref 971223 */
+	DRIVER( surfpl40 )	/* (c) 1997 - Ref 970514 */
 	DRIVER( radikalb )	/* (c) 1998 - Ref ??? */
 
 	/*
