@@ -3973,6 +3973,9 @@ static time_t playback_init(running_machine *machine)
 	if (memcmp(machine->gamedrv->name, header + 0x14, strlen(machine->gamedrv->name) + 1) != 0)
 		fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", header + 0x14, machine->gamedrv->name);
 
+	/* enable compression */
+	mame_fcompress(portdata->playback_file, TRUE);
+
 	return basetime;
 }
 
@@ -4044,7 +4047,8 @@ static void playback_port(const input_port_config *port)
 	{
 		analog_field_state *analog;
 
-		/* read the digital value */
+		/* read the default value and the digital state */
+		port->state->defvalue = playback_read_uint32(port->machine);
 		port->state->digital = playback_read_uint32(port->machine);
 
 		/* loop over analog ports and save their data */
@@ -4168,6 +4172,9 @@ static void record_init(running_machine *machine)
 
 	/* write it */
 	mame_fwrite(portdata->record_file, header, sizeof(header));
+
+	/* enable compression */
+	mame_fcompress(portdata->record_file, TRUE);
 }
 
 
@@ -4228,7 +4235,8 @@ static void record_port(const input_port_config *port)
 	{
 		analog_field_state *analog;
 
-		/* store the digital value */
+		/* store the default value and digital state */
+		record_write_uint32(port->machine, port->state->defvalue);
 		record_write_uint32(port->machine, port->state->digital);
 
 		/* loop over analog ports and save their data */

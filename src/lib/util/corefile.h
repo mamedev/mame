@@ -55,6 +55,9 @@ file_error core_fopen_ram_copy(const void *data, size_t length, UINT32 openflags
 /* close an open file */
 void core_fclose(core_file *file);
 
+/* enable/disable streaming file compression via zlib */
+file_error core_fcompress(core_file *file, int compress);
+
 
 
 /* ----- file positioning ----- */

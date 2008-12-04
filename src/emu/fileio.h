@@ -98,6 +98,9 @@ file_error mame_fopen_ram(const void *data, UINT32 length, UINT32 openflags, mam
 /* close an open file */
 void mame_fclose(mame_file *file);
 
+/* enable/disable streaming file compression via zlib */
+file_error mame_fcompress(mame_file *file, int compress);
+
 
 
 /* ----- file positioning ----- */
@@ -168,6 +171,7 @@ const char *mame_file_full_name(mame_file *file);
 
 /* return a hash string for the file with the given functions */
 const char *mame_fhash(mame_file *file, UINT32 functions);
+
 
 
 #endif	/* __FILEIO_H__ */
