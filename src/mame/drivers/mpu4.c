@@ -434,6 +434,7 @@ static MACHINE_RESET( mpu4 )
 		memory_configure_bank(machine, 1, 0, 8, &rom[0x01000], 0x10000);
 
 		memory_set_bank(machine, 1,0);
+		cpu_reset(machine->cpu[0]);
 	}
 
 }
