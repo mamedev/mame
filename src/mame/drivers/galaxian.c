@@ -2290,6 +2290,7 @@ static void common_init(
 	galaxian_extend_tile_info_func extend_tile_info,
 	galaxian_extend_sprite_info_func extend_sprite_info)
 {
+	irq_enabled = 0;
 	irq_line = INPUT_LINE_NMI;
 	galaxian_frogger_adjust = FALSE;
 	galaxian_sfx_tilemap = FALSE;
