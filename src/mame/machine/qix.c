@@ -425,7 +425,8 @@ static WRITE8_HANDLER( qixmcu_coinctrl_w )
 {
 	qix_state *state = space->machine->driver_data;
 
-	if (!(data & 0x04))
+	/* if (!(data & 0x04)) */
+	if (data & 0x04)
 	{
 		cpu_set_input_line(space->machine->cpu[3], M68705_IRQ_LINE, ASSERT_LINE);
 		/* temporarily boost the interleave to sync things up */

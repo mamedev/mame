@@ -388,7 +388,7 @@ static void adpcm_int(running_machine *machine, int cpunum)
 		msm_toggle^=1;
 		if (msm_toggle==0)
 		{
-			cpu_set_input_line_and_vector(machine->cpu[cpunum], 0, HOLD_LINE, 0x38);
+			cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0x38);
 		}
 	}
 }
