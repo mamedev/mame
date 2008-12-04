@@ -1,9 +1,10 @@
 /*
 
- TSI S14001A emulator v1.31b
+ TSI S14001A emulator v1.31c
  By Jonathan Gevaryahu ("Lord Nightmare") with help from Kevin Horton ("kevtris")
  MAME conversion and integration by R. Belmont
  Clock Frequency control updated by Zsolt Vasvari
+ Other fixes by AtariAce
 
  Copyright Jonathan Gevaryahu.
 
@@ -20,11 +21,12 @@
  Added a somewhat better, but still not perfect, filtering system - LN
  1.31 fix a minor bug with the dac range. wolfpack clips again, and I'm almost sure its an encoding error on the original speech - LN (0.125u9)
  1.31a Add chip pinout and other notes - LN (0.128u4)
- 1.31b slight update to notes to clarify input bus stuff, mostly finish the state map in the comments - LN (0.128u5)
+ 1.31b slight update to notes to clarify input bus stuff, mostly finish the state map in the comments - LN
+ 1.31c remove usage of deprecat.h - AtariAce (0.128u5)
 
  TODO:
  * increase accuracy of internal S14001A 'filter' for both driven and undriven cycles (its not terribly inaccurate for undriven cycles, but the dc sliding of driven cycles is not emulated)
- * add option for and attach Frank P.'s emulation of the Analog external filter from the vsu-1000 using the discrete core.
+ * add option for and attach Frank P.'s emulation of the Analog external filter from the vsu-1000 using the discrete core. (with the direction of independent sound core and analog stuff, this should actually be attached in the main berzerk/frenzy driver and not here)
 */
 
 /* Chip Pinout:
