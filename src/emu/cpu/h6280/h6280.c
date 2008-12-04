@@ -206,6 +206,7 @@ static CPU_RESET( h6280 )
 	h6280.irq_callback = save_irqcallback;
 	h6280.device = device;
 	h6280.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	h6280.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
 	/* set I and B flags */
 	P = _fI | _fB;
