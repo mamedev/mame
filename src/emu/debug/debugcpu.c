@@ -691,9 +691,6 @@ void debug_cpu_ignore_cpu(const device_config *device, int ignore)
 	debugcpu_private *global = device->machine->debugcpu_data;
 	cpu_debug_data *info = cpu_get_debug_data(device);
 
-	if (!global->within_instruction_hook)
-		return;
-
 	if (ignore)
 		info->flags &= ~DEBUG_FLAG_OBSERVING;
 	else
@@ -712,10 +709,8 @@ void debug_cpu_ignore_cpu(const device_config *device, int ignore)
 void debug_cpu_single_step(running_machine *machine, int numsteps)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	cpu_debug_data *info = cpu_get_debug_data(global->livecpu);
+	cpu_debug_data *info = cpu_get_debug_data(global->visiblecpu);
 
-	if (!global->within_instruction_hook)
-		return;
 	assert(info != NULL);
 
 	info->stepsleft = numsteps;
@@ -734,10 +729,8 @@ void debug_cpu_single_step(running_machine *machine, int numsteps)
 void debug_cpu_single_step_over(running_machine *machine, int numsteps)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	cpu_debug_data *info = cpu_get_debug_data(global->livecpu);
+	cpu_debug_data *info = cpu_get_debug_data(global->visiblecpu);
 
-	if (!global->within_instruction_hook)
-		return;
 	assert(info != NULL);
 
 	info->stepsleft = numsteps;
@@ -755,10 +748,8 @@ void debug_cpu_single_step_over(running_machine *machine, int numsteps)
 void debug_cpu_single_step_out(running_machine *machine)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	cpu_debug_data *info = cpu_get_debug_data(global->livecpu);
+	cpu_debug_data *info = cpu_get_debug_data(global->visiblecpu);
 
-	if (!global->within_instruction_hook)
-		return;
 	assert(info != NULL);
 
 	info->stepsleft = 100;
@@ -776,10 +767,8 @@ void debug_cpu_single_step_out(running_machine *machine)
 void debug_cpu_go(running_machine *machine, offs_t targetpc)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	cpu_debug_data *info = cpu_get_debug_data(global->livecpu);
+	cpu_debug_data *info = cpu_get_debug_data(global->visiblecpu);
 
-	if (!global->within_instruction_hook)
-		return;
 	assert(info != NULL);
 
 	info->stopaddr = targetpc;
@@ -796,10 +785,8 @@ void debug_cpu_go(running_machine *machine, offs_t targetpc)
 void debug_cpu_go_vblank(running_machine *machine)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	cpu_debug_data *info = cpu_get_debug_data(global->livecpu);
+	cpu_debug_data *info = cpu_get_debug_data(global->visiblecpu);
 
-	if (!global->within_instruction_hook)
-		return;
 	assert(info != NULL);
 
 	global->vblank_occurred = FALSE;
@@ -816,10 +803,8 @@ void debug_cpu_go_vblank(running_machine *machine)
 void debug_cpu_go_interrupt(running_machine *machine, int irqline)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	cpu_debug_data *info = cpu_get_debug_data(global->livecpu);
+	cpu_debug_data *info = cpu_get_debug_data(global->visiblecpu);
 
-	if (!global->within_instruction_hook)
-		return;
 	assert(info != NULL);
 
 	info->stopirq = irqline;
@@ -836,10 +821,8 @@ void debug_cpu_go_interrupt(running_machine *machine, int irqline)
 void debug_cpu_go_exception(running_machine *machine, int exception)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	cpu_debug_data *info = cpu_get_debug_data(global->livecpu);
+	cpu_debug_data *info = cpu_get_debug_data(global->visiblecpu);
 
-	if (!global->within_instruction_hook)
-		return;
 	assert(info != NULL);
 
 	info->stopexception = exception;
@@ -856,10 +839,8 @@ void debug_cpu_go_exception(running_machine *machine, int exception)
 void debug_cpu_go_milliseconds(running_machine *machine, UINT64 milliseconds)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	cpu_debug_data *info = cpu_get_debug_data(global->livecpu);
+	cpu_debug_data *info = cpu_get_debug_data(global->visiblecpu);
 
-	if (!global->within_instruction_hook)
-		return;
 	assert(info != NULL);
 
 	info->stoptime = attotime_add(timer_get_time(machine), ATTOTIME_IN_MSEC(milliseconds));
@@ -876,10 +857,8 @@ void debug_cpu_go_milliseconds(running_machine *machine, UINT64 milliseconds)
 void debug_cpu_next_cpu(running_machine *machine)
 {
 	debugcpu_private *global = machine->debugcpu_data;
-	cpu_debug_data *info = cpu_get_debug_data(global->livecpu);
+	cpu_debug_data *info = cpu_get_debug_data(global->visiblecpu);
 
-	if (!global->within_instruction_hook)
-		return;
 	assert(info != NULL);
 
 	info->flags |= DEBUG_FLAG_STOP_CONTEXT;

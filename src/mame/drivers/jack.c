@@ -66,7 +66,7 @@ static READ8_HANDLER( timer_r )
 {
 	/* wrong! there should be no need for timer_rate, the same function */
 	/* should work for both games */
-	return cpu_get_total_cycles(space->cpu) / timer_rate;
+	return cputag_get_total_cycles(space->machine, "audio") / timer_rate;
 }
 
 

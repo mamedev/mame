@@ -315,7 +315,7 @@ static READ8_HANDLER( nemesis_portA_r )
    bit 7:     unused by this software version. Bubble Memory version uses this bit.
 */
 
-	int res = (cpu_get_total_cycles(space->cpu) / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
+	int res = (cputag_get_total_cycles(space->machine, "audio") / 1024) & 0x2f; // this should be 0x0f, but it doesn't work
 
 	res |= 0xd0;
 

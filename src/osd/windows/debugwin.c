@@ -430,8 +430,12 @@ void debugwin_init_windows(void)
 void debugwin_destroy_windows(void)
 {
 	// loop over windows and free them
-	while (window_list)
+	while (window_list != NULL)
+	{
+		// clear the view list because they will be freed by the core 
+		memset(window_list->view, 0, sizeof(window_list->view));
 		DestroyWindow(window_list->wnd);
+	}
 
 	main_console = NULL;
 }
@@ -447,7 +451,7 @@ void debugwin_show(int type)
 	debugwin_info *info;
 
 	// loop over windows and show/hide them
-	for (info = window_list; info; info = info->next)
+	for (info = window_list; info != NULL; info = info->next)
 		ShowWindow(info->wnd, type);
 }
 
@@ -471,7 +475,7 @@ void debugwin_update_during_game(running_machine *machine)
 			debug_cpu_halt_on_next_instruction(debug_cpu_get_visible_cpu(machine), "User-initiated break\n");
 
 			// if we were focused on some window's edit box, reset it to default
-			for (info = window_list; info; info = info->next)
+			for (info = window_list; info != NULL; info = info->next)
 				if (focuswnd == info->editwnd)
 				{
 					SendMessage(focuswnd, WM_SETTEXT, (WPARAM)0, (LPARAM)info->edit_defstr);
@@ -538,23 +542,20 @@ cleanup:
 
 static void debugwin_window_free(debugwin_info *info)
 {
-	debugwin_info *prev, *curr;
+	debugwin_info **scanptr;
 	int viewnum;
 
 	// first unlink us from the list
-	for (curr = window_list, prev = NULL; curr; prev = curr, curr = curr->next)
-		if (curr == info)
+	for (scanptr = &window_list; *scanptr != NULL; scanptr = &(*scanptr)->next)
+		if (*scanptr == info)
 		{
-			if (prev)
-				prev->next = curr->next;
-			else
-				window_list = curr->next;
+			*scanptr = info->next;
 			break;
 		}
 
 	// free any views
-	for (viewnum = 0; viewnum < MAX_VIEWS; viewnum++)
-		if (info->view[viewnum].view)
+	for (viewnum = 0; viewnum < ARRAY_LENGTH(info->view); viewnum++)
+		if (info->view[viewnum].view != NULL)
 		{
 			debug_view_free(info->view[viewnum].view);
 			info->view[viewnum].view = NULL;
@@ -2809,6 +2810,6 @@ static void smart_show_all(BOOL show)
 	debugwin_info *info;
 	if (!show)
 		SetForegroundWindow(win_window_list->hwnd);
-	for (info = window_list; info; info = info->next)
+	for (info = window_list; info != NULL; info = info->next)
 		smart_show_window(info->wnd, show);
 }

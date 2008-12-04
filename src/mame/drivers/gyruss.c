@@ -96,7 +96,7 @@ static const int gyruss_timer[10] =
 
 static READ8_HANDLER( gyruss_portA_r )
 {
-	return gyruss_timer[(cpu_get_total_cycles(space->cpu)/1024) % 10];
+	return gyruss_timer[(cputag_get_total_cycles(space->machine, "audio") / 1024) % 10];
 }
 
 

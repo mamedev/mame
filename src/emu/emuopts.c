@@ -132,14 +132,14 @@ const options_entry mame_core_options[] =
 
 	/* input autoenable options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE INPUT AUTOMATIC ENABLE OPTIONS" },
-	{ "paddle_device;paddle",        "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a paddle control is present" },
-	{ "adstick_device;adstick",      "keyboard",  0,                 "enable (keyboard|mouse|joystick) if an analog joystick control is present" },
-	{ "pedal_device;pedal",          "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a pedal control is present" },
-	{ "dial_device;dial",            "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a dial control is present" },
-	{ "trackball_device;trackball",  "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a trackball control is present" },
-	{ "lightgun_device",             "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a lightgun control is present" },
-	{ "positional_device",           "keyboard",  0,                 "enable (keyboard|mouse|joystick) if a positional control is present" },
-	{ "mouse_device",                "mouse",     0,                 "enable (keyboard|mouse|joystick) if a mouse control is present" },
+	{ "paddle_device;paddle",        "keyboard",  0,                 "enable (none|keyboard|mouse|lightgun|joystick) if a paddle control is present" },
+	{ "adstick_device;adstick",      "keyboard",  0,                 "enable (none|keyboard|mouse|lightgun|joystick) if an analog joystick control is present" },
+	{ "pedal_device;pedal",          "keyboard",  0,                 "enable (none|keyboard|mouse|lightgun|joystick) if a pedal control is present" },
+	{ "dial_device;dial",            "keyboard",  0,                 "enable (none|keyboard|mouse|lightgun|joystick) if a dial control is present" },
+	{ "trackball_device;trackball",  "keyboard",  0,                 "enable (none|keyboard|mouse|lightgun|joystick) if a trackball control is present" },
+	{ "lightgun_device",             "keyboard",  0,                 "enable (none|keyboard|mouse|lightgun|joystick) if a lightgun control is present" },
+	{ "positional_device",           "keyboard",  0,                 "enable (none|keyboard|mouse|lightgun|joystick) if a positional control is present" },
+	{ "mouse_device",                "mouse",     0,                 "enable (none|keyboard|mouse|lightgun|joystick) if a mouse control is present" },
 
 	/* debugging options */
 	{ NULL,                          NULL,        OPTION_HEADER,     "CORE DEBUGGING OPTIONS" },

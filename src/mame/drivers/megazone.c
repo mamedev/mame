@@ -46,7 +46,7 @@ static READ8_HANDLER( megazone_portA_r )
 	/* (divide by (1024/2), and not 1024, because the CPU cycle counter is */
 	/* incremented every other state change of the clock) */
 
-	clock = cpu_get_total_cycles(space->cpu) * 7159/12288;	/* = (14318/8)/(18432/6) */
+	clock = cputag_get_total_cycles(space->machine, "audio") * 7159/12288;	/* = (14318/8)/(18432/6) */
 	timer = (clock / (1024/2)) & 0x0f;
 
 	/* low three bits come from the 8039 */
