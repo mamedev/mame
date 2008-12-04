@@ -956,8 +956,8 @@ static CPU_EXECUTE( adsp21xx )
 				/* 00000000 00000000 00000000  NOP */
 				break;
 			case 0x01:
-				/* 00000000 0xxxxxxx xxxxxxxx  dst = IO(x) */
-				/* 00000000 1xxxxxxx xxxxxxxx  IO(x) = dst */
+				/* 00000001 0xxxxxxx xxxxxxxx  dst = IO(x) */
+				/* 00000001 1xxxxxxx xxxxxxxx  IO(x) = dst */
 				/* ADSP-218x only */
 				if (adsp->chip_type >= CHIP_TYPE_ADSP2181)
 				{
