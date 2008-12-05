@@ -15,7 +15,8 @@
     MACROS
 ***************************************************************************/
 
-#define CIA6526			DEVICE_GET_INFO_NAME(cia6526)
+#define CIA6526R1		DEVICE_GET_INFO_NAME(cia6526r1)
+#define CIA6526R2		DEVICE_GET_INFO_NAME(cia6526r1)
 #define CIA8520			DEVICE_GET_INFO_NAME(cia8520)
 
 
@@ -43,7 +44,8 @@ struct _cia6526_interface
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-DEVICE_GET_INFO(cia6526);
+DEVICE_GET_INFO(cia6526r1);
+DEVICE_GET_INFO(cia6526r2);
 DEVICE_GET_INFO(cia8520);
 
 /* configuration */

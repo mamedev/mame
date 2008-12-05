@@ -111,7 +111,7 @@ static TIMER_CALLBACK( cia_clock_tod_callback );
 INLINE cia_state *get_token(const device_config *device)
 {
 	assert(device != NULL);
-	assert((device->type == CIA6526) || (device->type == CIA8520));
+	assert((device->type == CIA6526R1) || (device->type == CIA6526R2) || (device->type == CIA8520));
 	return (cia_state *) device->token;
 }
 
@@ -119,7 +119,7 @@ INLINE cia_state *get_token(const device_config *device)
 INLINE const cia6526_interface *get_interface(const device_config *device)
 {
 	assert(device != NULL);
-	assert((device->type == CIA6526) || (device->type == CIA8520));
+	assert((device->type == CIA6526R1) || (device->type == CIA6526R2) || (device->type == CIA8520));
 	return (cia6526_interface *) device->static_config;
 }
 
@@ -496,7 +496,7 @@ void cia_clock_tod(const device_config *device)
 
 	if (cia->tod_running)
 	{
-		if (device->type == CIA6526)
+		if ((device->type == CIA6526R1) || (device->type == CIA6526R2))
 		{
 			/* The 6526 split the value into hours, minutes, seconds and
 			 * subseconds */
@@ -837,10 +837,10 @@ static DEVICE_SET_INFO( cia6526 )
 
 
 /*-------------------------------------------------
-    DEVICE_GET_INFO( cia6526 )
+    DEVICE_GET_INFO( cia6526r1 )
 -------------------------------------------------*/
 
-DEVICE_GET_INFO(cia6526)
+DEVICE_GET_INFO(cia6526r1)
 {
 	switch (state)
 	{
@@ -856,11 +856,26 @@ DEVICE_GET_INFO(cia6526)
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(cia);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							info->s = "6526 CIA";						break;
+		case DEVINFO_STR_NAME:							info->s = "6526 CIA rev1";					break;
 		case DEVINFO_STR_FAMILY:						info->s = "6526 CIA";						break;
 		case DEVINFO_STR_VERSION:						info->s = "1.0";							break;
 		case DEVINFO_STR_SOURCE_FILE:					info->s = __FILE__;							break;
 		case DEVINFO_STR_CREDITS:						/* Nothing */								break;
+	}
+}
+
+
+/*-------------------------------------------------
+    DEVICE_GET_INFO( cia8520 )
+-------------------------------------------------*/
+
+DEVICE_GET_INFO(cia6526r2)
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:							info->s = "6526 CIA rev2";					break;
+		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }
 
@@ -875,6 +890,6 @@ DEVICE_GET_INFO(cia8520)
 	{
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							info->s = "8520 CIA";						break;
-		default:	DEVICE_GET_INFO_CALL(cia6526);	break;
+		default:	DEVICE_GET_INFO_CALL(cia6526r1);	break;
 	}
 }
