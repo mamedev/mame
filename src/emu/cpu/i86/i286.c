@@ -252,7 +252,6 @@ static CPU_DISASSEMBLE( i80286 )
 
 static CPU_INIT( i80286 )
 {
-	static const char type[] = "80286";
 	state_save_register_device_item_array(device, 0, I.regs.w);
 	state_save_register_device_item(device, 0, I.amask);
 	state_save_register_device_item(device, 0, I.pc);

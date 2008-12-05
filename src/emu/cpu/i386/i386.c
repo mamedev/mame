@@ -499,7 +499,6 @@ static CPU_INIT( i386 )
 	static const int regs8[8] = {AL,CL,DL,BL,AH,CH,DH,BH};
 	static const int regs16[8] = {AX,CX,DX,BX,SP,BP,SI,DI};
 	static const int regs32[8] = {EAX,ECX,EDX,EBX,ESP,EBP,ESI,EDI};
-	static const char state_type[] = "I386";
 
 	build_cycle_table();
 

@@ -94,7 +94,6 @@ static struct i80x86_timing timing;
 /***************************************************************************/
 static void i8086_state_register(const device_config *device)
 {
-	static const char type[] = "I8086";
 	state_save_register_device_item_array(device, 0, I.regs.w);
 	state_save_register_device_item(device, 0, I.pc);
 	state_save_register_device_item(device, 0, I.prevpc);
