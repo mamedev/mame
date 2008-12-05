@@ -13,7 +13,7 @@ HNZVC
 
 */
 
-#define OP_HANDLER(_name) INLINE void _name (m68_state_t *m68_state)
+#define OP_HANDLER(_name) INLINE void _name (m6800_state *cpustate)
 
 //OP_HANDLER( illegal )
 OP_HANDLER( illegal )
@@ -65,7 +65,7 @@ OP_HANDLER( tap )
 {
 	CC=A;
 	ONE_MORE_INSN();
-	CHECK_IRQ_LINES(m68_state); /* HJB 990417 */
+	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 }
 
 /* $07 TPA inherent ----- */
@@ -117,7 +117,7 @@ OP_HANDLER( cli )
 {
 	CLI;
 	ONE_MORE_INSN();
-	CHECK_IRQ_LINES(m68_state); /* HJB 990417 */
+	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 }
 
 /* $0f SEI */
@@ -125,7 +125,7 @@ OP_HANDLER( sei )
 {
 	SEI;
 	ONE_MORE_INSN();
-	CHECK_IRQ_LINES(m68_state); /* HJB 990417 */
+	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 }
 
 /* $10 SBA inherent -**** */
@@ -206,7 +206,7 @@ OP_HANDLER( daa )
 OP_HANDLER( slp )
 {
 	/* wait for next IRQ (same as waiting of wai) */
-	m68_state->wai_state |= M6800_SLP;
+	cpustate->wai_state |= M6800_SLP;
 	EAT_CYCLES;
 }
 #endif
@@ -358,13 +358,13 @@ OP_HANDLER( ins )
 /* $32 PULA inherent ----- */
 OP_HANDLER( pula )
 {
-	PULLBYTE(m68_state->d.b.h);
+	PULLBYTE(cpustate->d.b.h);
 }
 
 /* $33 PULB inherent ----- */
 OP_HANDLER( pulb )
 {
-	PULLBYTE(m68_state->d.b.l);
+	PULLBYTE(cpustate->d.b.l);
 }
 
 /* $34 DES inherent ----- */
@@ -382,13 +382,13 @@ OP_HANDLER( txs )
 /* $36 PSHA inherent ----- */
 OP_HANDLER( psha )
 {
-	PUSHBYTE(m68_state->d.b.h);
+	PUSHBYTE(cpustate->d.b.h);
 }
 
 /* $37 PSHB inherent ----- */
 OP_HANDLER( pshb )
 {
-	PUSHBYTE(m68_state->d.b.l);
+	PUSHBYTE(cpustate->d.b.l);
 }
 
 /* $38 PULX inherent ----- */
@@ -417,7 +417,7 @@ OP_HANDLER( rti )
 	PULLBYTE(A);
 	PULLWORD(pX);
 	PULLWORD(pPC);
-	CHECK_IRQ_LINES(m68_state); /* HJB 990417 */
+	CHECK_IRQ_LINES(cpustate); /* HJB 990417 */
 }
 
 /* $3c PSHX inherent ----- */
@@ -443,14 +443,14 @@ OP_HANDLER( wai )
      * WAI stacks the entire machine state on the
      * hardware stack, then waits for an interrupt.
      */
-	m68_state->wai_state |= M6800_WAI;
+	cpustate->wai_state |= M6800_WAI;
 	PUSHWORD(pPC);
 	PUSHWORD(pX);
 	PUSHBYTE(A);
 	PUSHBYTE(B);
 	PUSHBYTE(CC);
-	CHECK_IRQ_LINES(m68_state);
-	if (m68_state->wai_state & M6800_WAI) EAT_CYCLES;
+	CHECK_IRQ_LINES(cpustate);
+	if (cpustate->wai_state & M6800_WAI) EAT_CYCLES;
 }
 
 /* $3f SWI absolute indirect ----- */
@@ -462,7 +462,7 @@ OP_HANDLER( swi )
 	PUSHBYTE(B);
     PUSHBYTE(CC);
     SEI;
-	PCD = RM16(m68_state, 0xfffa);
+	PCD = RM16(cpustate, 0xfffa);
 }
 
 /* $40 NEGA inherent ?**** */
@@ -1092,7 +1092,7 @@ OP_HANDLER( bsr )
 /* $8e LDS immediate -**0- */
 OP_HANDLER( lds_im )
 {
-	IMMWORD(m68_state->s);
+	IMMWORD(cpustate->s);
 	CLR_NZV;
 	SET_NZ16(S);
 }
@@ -1103,7 +1103,7 @@ OP_HANDLER( sts_im )
 	CLR_NZV;
 	SET_NZ16(S);
 	IMM16;
-	WM16(m68_state, EAD,&m68_state->s);
+	WM16(cpustate, EAD,&cpustate->s);
 }
 
 /* $90 SUBA direct ?**** */
@@ -1258,7 +1258,7 @@ OP_HANDLER( jsr_di )
 /* $9e LDS direct -**0- */
 OP_HANDLER( lds_di )
 {
-	DIRWORD(m68_state->s);
+	DIRWORD(cpustate->s);
 	CLR_NZV;
 	SET_NZ16(S);
 }
@@ -1269,7 +1269,7 @@ OP_HANDLER( sts_di )
 	CLR_NZV;
 	SET_NZ16(S);
 	DIRECT;
-	WM16(m68_state, EAD,&m68_state->s);
+	WM16(cpustate, EAD,&cpustate->s);
 }
 
 /* $a0 SUBA indexed ?**** */
@@ -1432,7 +1432,7 @@ OP_HANDLER( jsr_ix )
 /* $ae LDS indexed -**0- */
 OP_HANDLER( lds_ix )
 {
-	IDXWORD(m68_state->s);
+	IDXWORD(cpustate->s);
 	CLR_NZV;
 	SET_NZ16(S);
 }
@@ -1443,7 +1443,7 @@ OP_HANDLER( sts_ix )
 	CLR_NZV;
 	SET_NZ16(S);
 	INDEXED;
-	WM16(m68_state, EAD,&m68_state->s);
+	WM16(cpustate, EAD,&cpustate->s);
 }
 
 /* $b0 SUBA extended ?**** */
@@ -1608,7 +1608,7 @@ OP_HANDLER( jsr_ex )
 /* $be LDS extended -**0- */
 OP_HANDLER( lds_ex )
 {
-	EXTWORD(m68_state->s);
+	EXTWORD(cpustate->s);
 	CLR_NZV;
 	SET_NZ16(S);
 }
@@ -1619,7 +1619,7 @@ OP_HANDLER( sts_ex )
 	CLR_NZV;
 	SET_NZ16(S);
 	EXTENDED;
-	WM16(m68_state, EAD,&m68_state->s);
+	WM16(cpustate, EAD,&cpustate->s);
 }
 
 /* $c0 SUBB immediate ?**** */
@@ -1752,7 +1752,7 @@ OP_HANDLER( addb_im )
 /* $CC LDD immediate -**0- */
 OP_HANDLER( ldd_im )
 {
-	IMMWORD(m68_state->d);
+	IMMWORD(cpustate->d);
 	CLR_NZV;
 	SET_NZ16(D);
 }
@@ -1764,13 +1764,13 @@ OP_HANDLER( std_im )
 	IMM16;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(m68_state, EAD,&m68_state->d);
+	WM16(cpustate, EAD,&cpustate->d);
 }
 
 /* $ce LDX immediate -**0- */
 OP_HANDLER( ldx_im )
 {
-	IMMWORD(m68_state->x);
+	IMMWORD(cpustate->x);
 	CLR_NZV;
 	SET_NZ16(X);
 }
@@ -1781,7 +1781,7 @@ OP_HANDLER( stx_im )
 	CLR_NZV;
 	SET_NZ16(X);
 	IMM16;
-	WM16(m68_state, EAD,&m68_state->x);
+	WM16(cpustate, EAD,&cpustate->x);
 }
 
 /* $d0 SUBB direct ?**** */
@@ -1913,7 +1913,7 @@ OP_HANDLER( addb_di )
 /* $dc LDD direct -**0- */
 OP_HANDLER( ldd_di )
 {
-	DIRWORD(m68_state->d);
+	DIRWORD(cpustate->d);
 	CLR_NZV;
 	SET_NZ16(D);
 }
@@ -1924,13 +1924,13 @@ OP_HANDLER( std_di )
 	DIRECT;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(m68_state, EAD,&m68_state->d);
+	WM16(cpustate, EAD,&cpustate->d);
 }
 
 /* $de LDX direct -**0- */
 OP_HANDLER( ldx_di )
 {
-	DIRWORD(m68_state->x);
+	DIRWORD(cpustate->x);
 	CLR_NZV;
 	SET_NZ16(X);
 }
@@ -1941,7 +1941,7 @@ OP_HANDLER( stx_di )
 	CLR_NZV;
 	SET_NZ16(X);
 	DIRECT;
-	WM16(m68_state, EAD,&m68_state->x);
+	WM16(cpustate, EAD,&cpustate->x);
 }
 
 /* $e0 SUBB indexed ?**** */
@@ -2073,7 +2073,7 @@ OP_HANDLER( addb_ix )
 /* $ec LDD indexed -**0- */
 OP_HANDLER( ldd_ix )
 {
-	IDXWORD(m68_state->d);
+	IDXWORD(cpustate->d);
 	CLR_NZV;
 	SET_NZ16(D);
 }
@@ -2096,13 +2096,13 @@ OP_HANDLER( std_ix )
 	INDEXED;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(m68_state, EAD,&m68_state->d);
+	WM16(cpustate, EAD,&cpustate->d);
 }
 
 /* $ee LDX indexed -**0- */
 OP_HANDLER( ldx_ix )
 {
-	IDXWORD(m68_state->x);
+	IDXWORD(cpustate->x);
 	CLR_NZV;
 	SET_NZ16(X);
 }
@@ -2113,7 +2113,7 @@ OP_HANDLER( stx_ix )
 	CLR_NZV;
 	SET_NZ16(X);
 	INDEXED;
-	WM16(m68_state, EAD,&m68_state->x);
+	WM16(cpustate, EAD,&cpustate->x);
 }
 
 /* $f0 SUBB extended ?**** */
@@ -2245,7 +2245,7 @@ OP_HANDLER( addb_ex )
 /* $fc LDD extended -**0- */
 OP_HANDLER( ldd_ex )
 {
-	EXTWORD(m68_state->d);
+	EXTWORD(cpustate->d);
 	CLR_NZV;
 	SET_NZ16(D);
 }
@@ -2269,13 +2269,13 @@ OP_HANDLER( std_ex )
 	EXTENDED;
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(m68_state, EAD,&m68_state->d);
+	WM16(cpustate, EAD,&cpustate->d);
 }
 
 /* $fe LDX extended -**0- */
 OP_HANDLER( ldx_ex )
 {
-	EXTWORD(m68_state->x);
+	EXTWORD(cpustate->x);
 	CLR_NZV;
 	SET_NZ16(X);
 }
@@ -2286,5 +2286,5 @@ OP_HANDLER( stx_ex )
 	CLR_NZV;
 	SET_NZ16(X);
 	EXTENDED;
-	WM16(m68_state, EAD,&m68_state->x);
+	WM16(cpustate, EAD,&cpustate->x);
 }
