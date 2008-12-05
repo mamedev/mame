@@ -26,6 +26,7 @@
 #include "driver.h"
 #include "deprecat.h"
 #include "includes/amiga.h"
+#include "machine/6526cia.h"
 
 
 
@@ -286,6 +287,28 @@ static const custom_sound_interface amiga_custom_interface =
  *
  *************************************/
 
+static const cia6526_interface cia_0_intf =
+{
+	amiga_cia_0_irq,										/* irq_func */
+	AMIGA_68000_NTSC_CLOCK / 10,							/* clock */
+	0,														/* tod_clock */
+	{
+		{ NULL, upscope_cia_0_porta_w },					/* port A */
+		{ upscope_cia_0_portb_r, upscope_cia_0_portb_w }	/* port B */
+	}
+};
+
+static const cia6526_interface cia_1_intf =
+{
+	amiga_cia_1_irq,										/* irq_func */
+	AMIGA_68000_NTSC_CLOCK / 10,							/* clock */
+	0,														/* tod_clock */
+	{
+		{ upscope_cia_1_porta_r, upscope_cia_1_porta_w, },	/* port A */
+		{ NULL, NULL }										/* port B */
+	}
+};
+
 static MACHINE_DRIVER_START( upscope )
 
 	/* basic machine hardware */
@@ -320,6 +343,12 @@ static MACHINE_DRIVER_START( upscope )
 	MDRV_SOUND_ROUTE(1, "left", 0.50)
 	MDRV_SOUND_ROUTE(2, "left", 0.50)
 	MDRV_SOUND_ROUTE(3, "right", 0.50)
+
+	/* cia */
+	MDRV_DEVICE_ADD("cia_0", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_0_intf)
+	MDRV_DEVICE_ADD("cia_1", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_1_intf)
 MACHINE_DRIVER_END
 
 
@@ -365,10 +394,6 @@ static DRIVER_INIT( upscope )
 	static const amiga_machine_interface upscope_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
-		NULL, upscope_cia_0_portb_r,
-		upscope_cia_0_porta_w, upscope_cia_0_portb_w,
-		upscope_cia_1_porta_r, NULL,
-		upscope_cia_1_porta_w, NULL,
 		NULL, NULL, NULL,
 		NULL, NULL, NULL,
 		NULL, upscope_reset,

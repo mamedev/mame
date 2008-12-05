@@ -49,6 +49,7 @@
 #include "sound/custom.h"
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
+#include "machine/6526cia.h"
 
 static WRITE32_HANDLER( aga_overlay_w )
 {
@@ -219,6 +220,29 @@ static const custom_sound_interface amiga_custom_interface =
 };
 
 
+
+static const cia6526_interface cia_0_intf =
+{
+	amiga_cia_0_irq,									/* irq_func */
+	AMIGA_68EC020_PAL_CLOCK / 10,						/* clock */
+	0,													/* tod_clock */
+	{
+		{ cd32_cia_0_porta_r, cd32_cia_0_porta_w },		/* port A */
+		{ cd32_cia_0_portb_r, cd32_cia_0_portb_w }		/* port B */
+	}
+};
+
+static const cia6526_interface cia_1_intf =
+{
+	amiga_cia_1_irq,									/* irq_func */
+	AMIGA_68EC020_PAL_CLOCK / 10,						/* clock */
+	0,													/* tod_clock */
+	{
+		{ NULL, NULL },									/* port A */
+		{ NULL, NULL }									/* port B */
+	}
+};
+
 static MACHINE_DRIVER_START( cd32 )
 
 	/* basic machine hardware */
@@ -257,6 +281,12 @@ static MACHINE_DRIVER_START( cd32 )
     MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "left", 0.50 )
 	MDRV_SOUND_ROUTE( 1, "right", 0.50 )
+
+	/* cia */
+	MDRV_DEVICE_ADD("cia_0", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_0_intf)
+	MDRV_DEVICE_ADD("cia_1", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_1_intf)
 MACHINE_DRIVER_END
 
 
@@ -322,10 +352,6 @@ static DRIVER_INIT( cd32 )
 	static const amiga_machine_interface cubocd32_intf =
 	{
 		AGA_CHIP_RAM_MASK,
-		cd32_cia_0_porta_r, cd32_cia_0_portb_r,
-		cd32_cia_0_porta_w, cd32_cia_0_portb_w,
-		NULL, NULL,
-		NULL, NULL,
 		NULL, NULL, NULL,
 		NULL, NULL, NULL,
 		NULL, NULL,

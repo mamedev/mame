@@ -51,6 +51,7 @@
 #include "deprecat.h"
 #include "sound/custom.h"
 #include "includes/amiga.h"
+#include "machine/6526cia.h"
 
 
 
@@ -280,6 +281,28 @@ static const custom_sound_interface amiga_custom_interface =
  *
  *************************************/
 
+static const cia6526_interface cia_0_intf =
+{
+	amiga_cia_0_irq,										/* irq_func */
+	AMIGA_68000_NTSC_CLOCK,									/* clock */
+	0,														/* tod_clock */
+	{
+		{ arcadia_cia_0_porta_r, arcadia_cia_0_porta_w },	/* port A */
+		{ arcadia_cia_0_portb_r, arcadia_cia_0_portb_w }	/* port B */
+	}
+};
+
+static const cia6526_interface cia_1_intf =
+{
+	amiga_cia_1_irq,										/* irq_func */
+	AMIGA_68000_NTSC_CLOCK / 10,							/* clock */
+	0,														/* tod_clock */
+	{
+		{ NULL, NULL },										/* port A */
+		{ NULL, NULL }										/* port B */
+	}
+};
+
 static MACHINE_DRIVER_START( arcadia )
 
 	/* basic machine hardware */
@@ -313,6 +336,12 @@ static MACHINE_DRIVER_START( arcadia )
 	MDRV_SOUND_ROUTE(1, "right", 0.50)
 	MDRV_SOUND_ROUTE(2, "right", 0.50)
 	MDRV_SOUND_ROUTE(3, "left", 0.50)
+
+	/* cia */
+	MDRV_DEVICE_ADD("cia_0", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_0_intf)
+	MDRV_DEVICE_ADD("cia_1", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_1_intf)
 MACHINE_DRIVER_END
 
 
@@ -654,10 +683,6 @@ static void arcadia_init(running_machine *machine)
 	static const amiga_machine_interface arcadia_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
-		arcadia_cia_0_porta_r, arcadia_cia_0_portb_r,
-		arcadia_cia_0_porta_w, arcadia_cia_0_portb_w,
-		NULL, NULL,
-		NULL, NULL,
 		NULL, NULL, NULL,
 		NULL, NULL, NULL,
 		NULL,  arcadia_reset_coins,

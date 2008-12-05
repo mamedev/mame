@@ -7,20 +7,26 @@
 
 **********************************************************************/
 
-#ifndef _6526CIA_H_
-#define _6526CIA_H_
+#ifndef __6526CIA_H__
+#define __6526CIA_H__
 
-typedef enum
-{
-	CIA6526,
-	CIA8520
-} cia_type_t;
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
+
+#define CIA6526			DEVICE_GET_INFO_NAME(cia6526)
+#define CIA8520			DEVICE_GET_INFO_NAME(cia8520)
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
 typedef struct _cia6526_interface cia6526_interface;
 struct _cia6526_interface
 {
-	cia_type_t type;
-	void (*irq_func)(running_machine *machine, int state);
+	void (*irq_func)(const device_config *device, int state);
 	int clock;
 	int tod_clock;
 
@@ -31,29 +37,28 @@ struct _cia6526_interface
 	} port[2];
 };
 
-/* configuration and reset */
-void cia_config(running_machine *machine, int which, const cia6526_interface *intf);
-void cia_reset(void);
-void cia_set_port_mask_value(int which, int port, int data);
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+DEVICE_GET_INFO(cia6526);
+DEVICE_GET_INFO(cia8520);
+
+/* configuration */
+void cia_set_port_mask_value(const device_config *device, int port, int data);
 
 /* reading and writing */
-UINT8 cia_read(running_machine *machine, int which, offs_t offset);
-void cia_write(running_machine *machine, int which, offs_t offset, UINT8 data);
-void cia_clock_tod(running_machine *machine, int which);
-void cia_issue_index(running_machine *machine, int which);
-void cia_set_input_cnt(running_machine *machine, int which, int data);
-void cia_set_input_sp(int which, int data);
+READ8_DEVICE_HANDLER( cia_r );
+WRITE8_DEVICE_HANDLER( cia_w );
+void cia_clock_tod(const device_config *device);
+void cia_issue_index(const device_config *device);
+void cia_set_input_cnt(const device_config *device, int data);
+void cia_set_input_sp(const device_config *device, int data);
 
 /* accessors */
-UINT8 cia_get_output_a(int which);
-UINT8 cia_get_output_b(int which);
-int cia_get_irq(int which);
+UINT8 cia_get_output_a(const device_config *device);
+UINT8 cia_get_output_b(const device_config *device);
+int cia_get_irq(const device_config *device);
 
-/* standard handlers */
-READ8_HANDLER( cia_0_r );
-READ8_HANDLER( cia_1_r );
-
-WRITE8_HANDLER( cia_0_w );
-WRITE8_HANDLER( cia_1_w );
-
-#endif /* _6526CIA_H_ */
+#endif /* __6526CIA_H__ */

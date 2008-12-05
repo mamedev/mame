@@ -25,6 +25,7 @@
 #include "deprecat.h"
 #include "includes/amiga.h"
 #include "machine/laserdsc.h"
+#include "machine/6526cia.h"
 
 
 static const device_config *laserdisc;
@@ -387,6 +388,28 @@ static const custom_sound_interface amiga_custom_interface =
  *
  *************************************/
 
+static const cia6526_interface cia_0_intf =
+{
+	amiga_cia_0_irq,								/* irq_func */
+	AMIGA_68000_NTSC_CLOCK / 10,					/* clock */
+	0,												/* tod_clock */
+	{
+		{ alg_cia_0_porta_r, alg_cia_0_porta_w },	/* port A */
+		{ alg_cia_0_portb_r, alg_cia_0_portb_w }	/* port B */
+	}
+};
+
+static const cia6526_interface cia_1_intf =
+{
+	amiga_cia_1_irq,								/* irq_func */
+	0,												/* clock */
+	0,												/* tod_clock */
+	{
+		{ alg_cia_1_porta_r, alg_cia_1_porta_w, },	/* port A */
+		{ NULL, NULL }								/* port B */
+	}
+};
+
 static MACHINE_DRIVER_START( alg_r1 )
 
 	/* basic machine hardware */
@@ -426,6 +449,12 @@ static MACHINE_DRIVER_START( alg_r1 )
 	MDRV_SOUND_CONFIG(laserdisc_custom_interface)
 	MDRV_SOUND_ROUTE(0, "left", 1.0)
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
+
+	/* cia */
+	MDRV_DEVICE_ADD("cia_0", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_0_intf)
+	MDRV_DEVICE_ADD("cia_1", CIA8520)
+	MDRV_DEVICE_CONFIG(cia_1_intf)
 MACHINE_DRIVER_END
 
 
@@ -644,10 +673,6 @@ static void alg_init(running_machine *machine)
 	static const amiga_machine_interface alg_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
-		alg_cia_0_porta_r, alg_cia_0_portb_r,
-		alg_cia_0_porta_w, alg_cia_0_portb_w,
-		alg_cia_1_porta_r, NULL,
-		alg_cia_1_porta_w, NULL,
 		NULL, NULL, alg_potgo_w,
 		NULL, NULL, serial_w,
 

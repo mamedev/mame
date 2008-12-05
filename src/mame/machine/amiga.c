@@ -33,9 +33,6 @@
  *
  *************************************/
 
-/* 715909 Hz for NTSC, 709379 for PAL */
-#define O2_CLOCK					(cpu_get_clock(machine->cpu[0]) / 10)
-
 /* How many CPU cycles we delay until we fire a pending interrupt */
 #define AMIGA_IRQ_DELAY_CYCLES		24
 
@@ -175,8 +172,6 @@ const char *const amiga_custom_names[0x100] =
 
 static void custom_reset(void);
 static void autoconfig_reset(void);
-static void amiga_cia_0_irq(running_machine *machine, int state);
-static void amiga_cia_1_irq(running_machine *machine, int state);
 static TIMER_CALLBACK( amiga_irq_proc );
 static TIMER_CALLBACK( amiga_blitter_proc );
 static TIMER_CALLBACK( scanline_callback );
@@ -260,8 +255,6 @@ static void amiga_chip_ram32_w(offs_t offset, UINT16 data)
 
 void amiga_machine_config(running_machine *machine, const amiga_machine_interface *intf)
 {
-	cia6526_interface cia_intf[2];
-
 	amiga_intf = intf;
 
 	/* setup chipmem handlers */
@@ -276,28 +269,6 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 		amiga_chip_ram_w = amiga_chip_ram16_w;
 	}
 
-	/* set up CIA interfaces */
-	memset(&cia_intf, 0, sizeof(cia_intf));
-	cia_intf[0].type = CIA8520;
-	cia_intf[0].clock = O2_CLOCK;
-	cia_intf[0].tod_clock = 0;
-	cia_intf[0].irq_func = amiga_cia_0_irq;
-	cia_intf[0].port[0].read = intf->cia_0_portA_r;
-	cia_intf[0].port[0].write = intf->cia_0_portA_w;
-	cia_intf[0].port[1].read = intf->cia_0_portB_r;
-	cia_intf[0].port[1].write = intf->cia_0_portB_w;
-	cia_config(machine, 0, &cia_intf[0]);
-
-	cia_intf[1].type = CIA8520;
-	cia_intf[1].clock = O2_CLOCK;
-	cia_intf[1].tod_clock = 0;
-	cia_intf[1].irq_func = amiga_cia_1_irq;
-	cia_intf[1].port[0].read = intf->cia_1_portA_r;
-	cia_intf[1].port[0].write = intf->cia_1_portA_w;
-	cia_intf[1].port[1].read = intf->cia_1_portB_r;
-	cia_intf[1].port[1].write = intf->cia_1_portB_w;
-	cia_config(machine, 1, &cia_intf[1]);
-
 	/* setup the timers */
 	amiga_irq_timer = timer_alloc(machine, amiga_irq_proc, NULL);
 	amiga_blitter_timer = timer_alloc(machine, amiga_blitter_proc, NULL);
@@ -311,7 +282,6 @@ static void amiga_m68k_reset(const device_config *device)
 	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(space->cpu));
 
 	/* Initialize the various chips */
-	cia_reset();
 	custom_reset();
 	autoconfig_reset();
 
@@ -355,6 +325,8 @@ MACHINE_RESET( amiga )
 static TIMER_CALLBACK( scanline_callback )
 {
 	int scanline = param;
+	const device_config *cia_0 = device_list_find_by_tag(machine->config->devicelist, CIA8520, "cia_0");
+	const device_config *cia_1 = device_list_find_by_tag(machine->config->devicelist, CIA8520, "cia_1");
 
 	/* on the first scanline, we do some extra bookkeeping */
 	if (scanline == 0)
@@ -363,7 +335,7 @@ static TIMER_CALLBACK( scanline_callback )
 		amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, 0x8000 | INTENA_VERTB, 0xffff);
 
 		/* clock the first CIA TOD */
-		cia_clock_tod(machine, 0);
+		cia_clock_tod(cia_0);
 
 		/* call the system-specific callback */
 		if (amiga_intf->scanline0_callback != NULL)
@@ -371,7 +343,7 @@ static TIMER_CALLBACK( scanline_callback )
 	}
 
 	/* on every scanline, clock the second CIA TOD */
-	cia_clock_tod(machine, 1);
+	cia_clock_tod(cia_1);
 
 	/* render up to this scanline */
 	if (!video_screen_update_partial(machine->primary_screen, scanline))
@@ -1047,24 +1019,25 @@ static void blitter_setup(void)
 READ16_HANDLER( amiga_cia_r )
 {
 	UINT8 data;
-	int shift, which;
+	int shift;
+	const device_config *cia;
 
 	/* offsets 0000-07ff reference CIA B, and are accessed via the MSB */
 	if ((offset & 0x0800) == 0)
 	{
-		which = 1;
+		cia = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_1");
 		shift = 8;
 	}
 
 	/* offsets 0800-0fff reference CIA A, and are accessed via the LSB */
 	else
 	{
-		which = 0;
+		cia = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_0");
 		shift = 0;
 	}
 
 	/* handle the reads */
-	data = cia_read(space->machine, which, offset >> 7);
+	data = cia_r(cia, offset >> 7);
 
 	if (LOG_CIA)
 		logerror("%06x:cia_%c_read(%03x) = %04x & %04x\n", safe_cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data << shift, mem_mask);
@@ -1082,7 +1055,7 @@ READ16_HANDLER( amiga_cia_r )
 
 WRITE16_HANDLER( amiga_cia_w )
 {
-	int which;
+	const device_config *cia;
 
 	if (LOG_CIA)
 		logerror("%06x:cia_%c_write(%03x) = %04x & %04x\n", safe_cpu_get_pc(space->cpu), 'A' + ((~offset & 0x0800) >> 11), offset * 2, data, mem_mask);
@@ -1092,7 +1065,7 @@ WRITE16_HANDLER( amiga_cia_w )
 	{
 		if (!ACCESSING_BITS_8_15)
 			return;
-		which = 1;
+		cia = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_1");
 		data >>= 8;
 	}
 
@@ -1101,12 +1074,12 @@ WRITE16_HANDLER( amiga_cia_w )
 	{
 		if (!ACCESSING_BITS_0_7)
 			return;
-		which = 0;
+		cia = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_0");
 		data &= 0xff;
 	}
 
 	/* handle the writes */
-	cia_write(space->machine, which, offset >> 7, (UINT8) data);
+	cia_w(cia, offset >> 7, (UINT8) data);
 }
 
 
@@ -1117,15 +1090,15 @@ WRITE16_HANDLER( amiga_cia_w )
  *
  *************************************/
 
-static void amiga_cia_0_irq(running_machine *machine, int state)
+void amiga_cia_0_irq(const device_config *device, int state)
 {
-	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
+	amiga_custom_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_PORTS, 0xffff);
 }
 
 
-static void amiga_cia_1_irq(running_machine *machine, int state)
+void amiga_cia_1_irq(const device_config *device, int state)
 {
-	amiga_custom_w(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
+	amiga_custom_w(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), REG_INTREQ, (state ? 0x8000 : 0x0000) | INTENA_EXTER, 0xffff);
 }
 
 
@@ -1276,6 +1249,8 @@ static TIMER_CALLBACK( finish_serial_write )
 
 WRITE16_HANDLER( amiga_custom_w )
 {
+	const device_config *cia_0;
+	const device_config *cia_1;
 	UINT16 temp;
 	offset &= 0xff;
 
@@ -1422,12 +1397,14 @@ WRITE16_HANDLER( amiga_custom_w )
 				CUSTOM_REG(REG_SERDATR) &= ~0x8000;
 
 			data = (data & 0x8000) ? (CUSTOM_REG(offset) | (data & 0x7fff)) : (CUSTOM_REG(offset) & ~(data & 0x7fff));
-			if ( cia_get_irq( 0 ) ) data |= INTENA_PORTS;
-			if ( cia_get_irq( 1 ) )	data |= INTENA_EXTER;
+			cia_0 = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_0");
+			cia_1 = device_list_find_by_tag(space->machine->config->devicelist, CIA8520, "cia_1");
+			if ( cia_get_irq( cia_0 ) ) data |= INTENA_PORTS;
+			if ( cia_get_irq( cia_1 ) )	data |= INTENA_EXTER;
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're generating irq's, delay a bit */
-				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( Machine->activecpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
+				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( space->machine->cpu[0], AMIGA_IRQ_DELAY_CYCLES ), 0);
 			else /* if we're clearing irq's, process right away */
 				update_irqs(space->machine);
 			break;

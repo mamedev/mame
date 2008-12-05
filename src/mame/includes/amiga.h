@@ -309,16 +309,6 @@ struct _amiga_machine_interface
 {
 	UINT32 chip_ram_mask;
 
-	UINT8 (*cia_0_portA_r)(void);
-	UINT8 (*cia_0_portB_r)(void);
-	void (*cia_0_portA_w)(UINT8 data);
-	void (*cia_0_portB_w)(UINT8 data);
-
-	UINT8 (*cia_1_portA_r)(void);
-	UINT8 (*cia_1_portB_r)(void);
-	void (*cia_1_portA_w)(UINT8 data);
-	void (*cia_1_portB_w)(UINT8 data);
-
 	UINT16 (*joy0dat_r)(void);
 	UINT16 (*joy1dat_r)(void);
 	void (*potgo_w)(UINT16 data);
@@ -392,6 +382,9 @@ attotime amiga_get_serial_char_period(void);
 void amiga_add_autoconfig(const amiga_autoconfig_device *device);
 READ16_HANDLER( amiga_autoconfig_r );
 WRITE16_HANDLER( amiga_autoconfig_w );
+
+void amiga_cia_0_irq(const device_config *device, int state);
+void amiga_cia_1_irq(const device_config *device, int state);
 
 const amiga_machine_interface *amiga_get_interface(void);
 
