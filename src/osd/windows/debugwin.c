@@ -1683,7 +1683,7 @@ static void memory_create_window(running_machine *machine)
 	const memory_subview_item *subview;
 	debugwin_info *info;
 	HMENU optionsmenu;
-	int cursel = 0;
+	int cursel = -1;
 
 	// create the window
 	info = debugwin_window_create(machine, "Memory", NULL);
@@ -1738,9 +1738,10 @@ static void memory_create_window(running_machine *machine)
 		TCHAR *t_name = tstring_from_utf8(subview->name);
 		int item = SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
 		free(t_name);
-		if (cursel == 0 && subview->space != NULL && subview->space->cpu == curcpu)
+		if (cursel == -1 && subview->space != NULL && subview->space->cpu == curcpu)
 			cursel = item;
 	}
+	if (cursel == -1) cursel = 0;
 	SendMessage(info->otherwnd[0], CB_SETCURSEL, cursel, 0);
 	memory_view_set_subview(info->view[0].view, cursel);
 

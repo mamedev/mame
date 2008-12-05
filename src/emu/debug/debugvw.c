@@ -2413,6 +2413,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 					subview->next = NULL;
 					subview->index = curindex++;
 					subview->space = space;
+					subview->endianness = space->endianness;
 					subview->prefsize = space->dbits / 8;
 					strcpy(subview->name, astring_c(tempstring));
 					
@@ -2440,7 +2441,11 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 		subview->index = curindex++;
 		subview->base = memory_region(machine, rgntag);
 		subview->length = memory_region_length(machine, rgntag);
-		subview->offsetxor = memory_region_length(machine, rgntag);
+#ifdef LSB_FIRST
+		subview->offsetxor = width - 1;
+#else
+		subview->offsetxor = 0;
+#endif
 		subview->endianness = little_endian ? ENDIANNESS_LITTLE : ENDIANNESS_BIG;
 		subview->prefsize = MIN(width, 8);
 		strcpy(subview->name, astring_c(tempstring));
@@ -2530,9 +2535,9 @@ static int memory_view_alloc(debug_view *view)
 	memdata->desc = view->machine->debugvw_data->memory_subviews;
 
 	/* start out with 16 bytes in a single column and ASCII displayed */
-	memdata->chunks_per_row = 16;
-	memdata->bytes_per_chunk = 1;
-	memdata->bytes_per_row = 16;
+	memdata->bytes_per_chunk = memdata->desc->prefsize;
+	memdata->chunks_per_row = 16 / memdata->desc->prefsize;
+	memdata->bytes_per_row = memdata->bytes_per_chunk * memdata->chunks_per_row;
 	memdata->ascii_view = TRUE;
 
 	return TRUE;
@@ -2888,6 +2893,9 @@ static int memory_view_needs_recompute(debug_view *view)
 	if (debug_view_expression_changed_value(view, &memdata->expression, (space != NULL) ? space->cpu : NULL))
 	{
 		recompute = TRUE;
+		view->topleft.y = (memdata->expression.result - memdata->byte_offset) / memdata->bytes_per_row;
+		view->topleft.y = MAX(view->topleft.y, 0);
+		view->topleft.y = MIN(view->topleft.y, view->total.y - 1);
 		memory_view_set_cursor_pos(view, memdata->expression.result, memdata->bytes_per_chunk * 8 - 4);
 	}
 
@@ -3261,16 +3269,20 @@ void memory_view_set_bytes_per_chunk(debug_view *view, UINT8 chunkbytes)
 
 	if (chunkbytes != memdata->bytes_per_chunk)
 	{
+		int endianness = memdata->desc->endianness;
 		offs_t address;
 		UINT8 shift;
 		
 		debug_view_begin_update(view);
 		memory_view_get_cursor_pos(view, &address, &shift);
+		address += (shift / 8) ^ ((endianness == ENDIANNESS_LITTLE) ? 0 : (memdata->bytes_per_chunk - 1));
+		shift %= 8;
+		
 		memdata->bytes_per_chunk = chunkbytes;
 		memdata->chunks_per_row = memdata->bytes_per_row / chunkbytes;
 		view->recompute = view->update_pending = TRUE;
-		address += shift / 8;
-		shift = (shift % 8) + 8 * (address % memdata->bytes_per_chunk);
+
+		shift += 8 * ((address % memdata->bytes_per_chunk) ^ ((endianness == ENDIANNESS_LITTLE) ? 0 : (memdata->bytes_per_chunk - 1)));
 		address -= address % memdata->bytes_per_chunk;
 		memory_view_set_cursor_pos(view, address, shift);
 		debug_view_end_update(view);

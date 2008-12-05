@@ -3775,8 +3775,8 @@ UINT64 memory_read_qword_masked_8le(const address_space *space, offs_t address, 
 
 UINT64 memory_read_qword_8be(const address_space *space, offs_t address)
 {
-	UINT64 result = (UINT64)memory_read_dword_8le(space, address + 0) << 32;
-	return result | ((UINT64)memory_read_dword_8le(space, address + 4) << 0);
+	UINT64 result = (UINT64)memory_read_dword_8be(space, address + 0) << 32;
+	return result | ((UINT64)memory_read_dword_8be(space, address + 4) << 0);
 }
 
 UINT64 memory_read_qword_masked_8be(const address_space *space, offs_t address, UINT64 mask)
@@ -3957,8 +3957,8 @@ UINT64 memory_read_qword_masked_16le(const address_space *space, offs_t address,
 
 UINT64 memory_read_qword_16be(const address_space *space, offs_t address)
 {
-	UINT64 result = (UINT64)memory_read_dword_16le(space, address + 0) << 32;
-	return result | ((UINT64)memory_read_dword_16le(space, address + 4) << 0);
+	UINT64 result = (UINT64)memory_read_dword_16be(space, address + 0) << 32;
+	return result | ((UINT64)memory_read_dword_16be(space, address + 4) << 0);
 }
 
 UINT64 memory_read_qword_masked_16be(const address_space *space, offs_t address, UINT64 mask)
@@ -4133,8 +4133,8 @@ UINT64 memory_read_qword_masked_32le(const address_space *space, offs_t address,
 
 UINT64 memory_read_qword_32be(const address_space *space, offs_t address)
 {
-	UINT64 result = (UINT64)memory_read_dword_32le(space, address + 0) << 32;
-	return result | ((UINT64)memory_read_dword_32le(space, address + 4) << 0);
+	UINT64 result = (UINT64)memory_read_dword_32be(space, address + 0) << 32;
+	return result | ((UINT64)memory_read_dword_32be(space, address + 4) << 0);
 }
 
 UINT64 memory_read_qword_masked_32be(const address_space *space, offs_t address, UINT64 mask)

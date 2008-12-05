@@ -761,22 +761,22 @@ int mame_is_paused(running_machine *machine)
 UINT8 *memory_region_alloc(running_machine *machine, const char *name, UINT32 length, UINT32 flags)
 {
 	mame_private *mame = machine->mame_data;
-	region_info *info;
+	region_info **infoptr, *info;
 
-    /* make sure we don't have a region of the same name */
-    for (info = mame->regions; info != NULL; info = info->next)
-    	if (astring_cmpc(info->name, name) == 0)
+    /* make sure we don't have a region of the same name; also find the end of the list */
+    for (infoptr = &mame->regions; *infoptr != NULL; infoptr = &(*infoptr)->next)
+    	if (astring_cmpc((*infoptr)->name, name) == 0)
     		fatalerror("memory_region_alloc called with duplicate region name \"%s\"\n", name);
 
 	/* allocate the region */
 	info = malloc_or_die(sizeof(*info) + length);
-	info->next = mame->regions;
+	info->next = NULL;
 	info->name = astring_dupc(name);
 	info->length = length;
 	info->flags = flags;
 
 	/* hook us into the list */
-	mame->regions = info;
+	*infoptr = info;
 	return info->base;
 }
 
@@ -795,14 +795,14 @@ void memory_region_free(running_machine *machine, const char *name)
 	for (infoptr = &mame->regions; *infoptr != NULL; infoptr = &(*infoptr)->next)
 		if (astring_cmpc((*infoptr)->name, name) == 0)
 		{
-			region_info *deleteme = *infoptr;
+			region_info *info = *infoptr;
 
 			/* remove us from the list */
-			*infoptr = deleteme->next;
+			*infoptr = info->next;
 
 			/* free the region */
-			astring_free(deleteme->name);
-			free(deleteme);
+			astring_free(info->name);
+			free(info);
 			break;
 		}
 }
@@ -1596,12 +1596,14 @@ static void init_machine(running_machine *machine)
 		(*machine->config->video_start)(machine);
 
 	/* free memory regions allocated with REGIONFLAG_DISPOSE (typically gfx roms) */
-	for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = nextrgntag)
-	{
-		nextrgntag = memory_region_next(machine, rgntag);
-		if (memory_region_flags(machine, rgntag) & ROMREGION_DISPOSE)
-			memory_region_free(machine, rgntag);
-	}
+	/* but not if the debugger is enabled (so we can look at the data) */
+	if (!options_get_bool(mame_options(), OPTION_DEBUG))
+		for (rgntag = memory_region_next(machine, NULL); rgntag != NULL; rgntag = nextrgntag)
+		{
+			nextrgntag = memory_region_next(machine, rgntag);
+			if (memory_region_flags(machine, rgntag) & ROMREGION_DISPOSE)
+				memory_region_free(machine, rgntag);
+		}
 
 	/* initialize miscellaneous systems */
 	saveload_init(machine);
