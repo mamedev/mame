@@ -24,7 +24,6 @@
 **********************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "includes/amiga.h"
 #include "machine/6526cia.h"
 
@@ -81,19 +80,19 @@ static void upscope_reset(void)
  *
  *************************************/
 
-static void upscope_cia_0_porta_w(UINT8 data)
+static void upscope_cia_0_porta_w(const device_config *device, UINT8 data)
 {
 	/* switch banks as appropriate */
-	memory_set_bank(Machine, 1, data & 1);
+	memory_set_bank(device->machine, 1, data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
+		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
+		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
 }
 
 
@@ -113,12 +112,12 @@ static void upscope_cia_0_porta_w(UINT8 data)
  *
  *************************************/
 
-static void upscope_cia_0_portb_w(UINT8 data)
+static void upscope_cia_0_portb_w(const device_config *device, UINT8 data)
 {
 	parallel_data = data;
 }
 
-static UINT8 upscope_cia_0_portb_r(void)
+static UINT8 upscope_cia_0_portb_r(const device_config *device)
 {
 	return nvram_data_latch;
 }
@@ -140,12 +139,12 @@ static UINT8 upscope_cia_0_portb_r(void)
  *
  *************************************/
 
-static UINT8 upscope_cia_1_porta_r(void)
+static UINT8 upscope_cia_1_porta_r(const device_config *device)
 {
 	return 0xf8 | (prev_cia1_porta & 0x07);
 }
 
-static void upscope_cia_1_porta_w(UINT8 data)
+static void upscope_cia_1_porta_w(const device_config *device, UINT8 data)
 {
 	/* on a low transition of POUT, we latch stuff for the NVRAM */
 	if ((prev_cia1_porta & 2) && !(data & 2))
@@ -211,7 +210,7 @@ static void upscope_cia_1_porta_w(UINT8 data)
 		if (data & 4)
 		{
 			if (LOG_IO) logerror("Internal register (%d) read\n", nvram_address_latch);
-			nvram_data_latch = (nvram_address_latch == 0) ? input_port_read(Machine, "IO0") : 0xff;
+			nvram_data_latch = (nvram_address_latch == 0) ? input_port_read(device->machine, "IO0") : 0xff;
 		}
 
 		/* if SEL == 0, we read NVRAM */

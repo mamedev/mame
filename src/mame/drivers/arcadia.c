@@ -48,7 +48,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/custom.h"
 #include "includes/amiga.h"
 #include "machine/6526cia.h"
@@ -93,24 +92,24 @@ static WRITE16_HANDLER( arcadia_multibios_change_game )
  *
  *************************************/
 
-static UINT8 arcadia_cia_0_porta_r(void)
+static UINT8 arcadia_cia_0_porta_r(const device_config *device)
 {
-	return input_port_read(Machine, "CIA0PORTA");
+	return input_port_read(device->machine, "CIA0PORTA");
 }
 
-static void arcadia_cia_0_porta_w(UINT8 data)
+static void arcadia_cia_0_porta_w(const device_config *device, UINT8 data)
 {
 	/* switch banks as appropriate */
-	memory_set_bank(Machine, 1, data & 1);
+	memory_set_bank(device->machine, 1, data & 1);
 
 	/* swap the write handlers between ROM and bank 1 based on the bit */
 	if ((data & 1) == 0)
 		/* overlay disabled, map RAM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
+		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_BANK1);
 
 	else
 		/* overlay enabled, map Amiga system ROM on 0x000000 */
-		memory_install_write16_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
+		memory_install_write16_handler(cpu_get_address_space(device->machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, SMH_UNMAP);
 
 	/* bit 2 = Power Led on Amiga */
 	set_led_status(0, (data & 2) ? 0 : 1);
@@ -133,12 +132,12 @@ static void arcadia_cia_0_porta_w(UINT8 data)
  *
  *************************************/
 
-static UINT8 arcadia_cia_0_portb_r(void)
+static UINT8 arcadia_cia_0_portb_r(const device_config *device)
 {
-	return input_port_read(Machine, "CIA0PORTB");
+	return input_port_read(device->machine, "CIA0PORTB");
 }
 
-static void arcadia_cia_0_portb_w(UINT8 data)
+static void arcadia_cia_0_portb_w(const device_config *device, UINT8 data)
 {
 	/* writing a 0 in the low bit clears one of the coins */
 	if ((data & 1) == 0)

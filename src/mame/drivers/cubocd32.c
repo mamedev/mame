@@ -45,7 +45,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/custom.h"
 #include "includes/amiga.h"
 #include "includes/cubocd32.h"
@@ -85,12 +84,12 @@ static WRITE32_HANDLER( aga_overlay_w )
  *
  *************************************/
 
-static UINT8 cd32_cia_0_porta_r(void)
+static UINT8 cd32_cia_0_porta_r(const device_config *device)
 {
-	return input_port_read(Machine, "CIA0PORTA");
+	return input_port_read(device->machine, "CIA0PORTA");
 }
 
-static void cd32_cia_0_porta_w(UINT8 data)
+static void cd32_cia_0_porta_w(const device_config *device, UINT8 data)
 {
 	/* bit 1 = cd audio mute */
 	sndti_set_output_gain(SOUND_CDDA, 0, 0, ( data & 1 ) ? 0.0 : 1.0 );
@@ -114,17 +113,17 @@ static void cd32_cia_0_porta_w(UINT8 data)
  *
  *************************************/
 
-static UINT8 cd32_cia_0_portb_r(void)
+static UINT8 cd32_cia_0_portb_r(const device_config *device)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_r\n", cpu_get_pc(Machine->activecpu));
+	logerror("%06x:CIA0_portb_r\n", cpu_get_pc(device->machine->activecpu));
 	return 0xff;
 }
 
-static void cd32_cia_0_portb_w(UINT8 data)
+static void cd32_cia_0_portb_w(const device_config *device, UINT8 data)
 {
 	/* parallel port */
-	logerror("%06x:CIA0_portb_w(%02x)\n", cpu_get_pc(Machine->activecpu), data);
+	logerror("%06x:CIA0_portb_w(%02x)\n", cpu_get_pc(device->machine->activecpu), data);
 }
 
 static ADDRESS_MAP_START( cd32_map, ADDRESS_SPACE_PROGRAM, 32 )

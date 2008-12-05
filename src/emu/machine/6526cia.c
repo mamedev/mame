@@ -58,8 +58,8 @@ struct _cia_port
 	UINT8		latch;
 	UINT8		in;
 	UINT8		out;
-	UINT8		(*read)(void);
-	void		(*write)(UINT8);
+	UINT8		(*read)(const device_config *);
+	void		(*write)(const device_config *, UINT8);
 	UINT8		mask_value; /* in READ operation the value can be forced by a extern electric circuit */
 };
 
@@ -612,7 +612,7 @@ READ8_DEVICE_HANDLER( cia_r )
 		case CIA_PRA:
 		case CIA_PRB:
 			port = &cia->port[offset & 1];
-			data = port->read ? (*port->read)() : 0;
+			data = port->read ? (*port->read)(device) : 0;
 			data = ((data & ~port->ddr) | (port->latch & port->ddr)) & port->mask_value;
 			port->in = data;
 
@@ -727,8 +727,8 @@ WRITE8_DEVICE_HANDLER( cia_w )
 			port = &cia->port[offset & 1];
 			port->latch = data;
 			port->out = (data & port->ddr) | (port->in & ~port->ddr);
-			if (port->write)
-				(*port->write)(port->out);
+			if (port->write != NULL)
+				(*port->write)(device, port->out);
 			break;
 
 		/* port A/B direction */

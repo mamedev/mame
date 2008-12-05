@@ -32,8 +32,9 @@ struct _cia6526_interface
 
 	struct
 	{
-		UINT8	(*read)(void);
-		void	(*write)(UINT8);
+
+		UINT8	(*read)(const device_config *);
+		void	(*write)(const device_config *, UINT8);
 	} port[2];
 };
 
