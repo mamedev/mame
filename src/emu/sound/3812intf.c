@@ -91,7 +91,7 @@ static SND_START( ym3812 )
 	info->intf = config ? config : &dummy;
 
 	/* stream system initialize */
-	info->chip = ym3812_init(tag,clock,rate);
+	info->chip = ym3812_init(device,clock,rate);
 	if (!info->chip)
 		return NULL;
 
@@ -260,7 +260,7 @@ static SND_START( ym3526 )
 	info->intf = config ? config : &dummy;
 
 	/* stream system initialize */
-	info->chip = ym3526_init(tag,clock,rate);
+	info->chip = ym3526_init(device,clock,rate);
 	if (!info->chip)
 		return NULL;
 
@@ -464,14 +464,12 @@ static SND_START( y8950 )
 	info->index = sndindex;
 
 	/* stream system initialize */
-	info->chip = y8950_init(tag,clock,rate);
+	info->chip = y8950_init(device,clock,rate);
 	if (!info->chip)
 		return NULL;
 
 	/* ADPCM ROM data */
-	y8950_set_delta_t_memory(info->chip,
-		(void *)(memory_region(device->machine, tag)),
-			memory_region_length(device->machine, tag) );
+	y8950_set_delta_t_memory(info->chip, device->region, device->regionbytes);
 
 	info->stream = stream_create(0,1,rate,info,y8950_stream_update);
 

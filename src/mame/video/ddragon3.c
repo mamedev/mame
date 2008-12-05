@@ -86,12 +86,12 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( ddragon3 )
 {
-    state_save_register_global(ddragon3_vreg);
-    state_save_register_global(ddragon3_bg_scrollx);
-    state_save_register_global(ddragon3_bg_scrolly);
-    state_save_register_global(ddragon3_fg_scrollx);
-    state_save_register_global(ddragon3_fg_scrolly);
-    state_save_register_global(ddragon3_bg_tilebase);
+    state_save_register_global(machine, ddragon3_vreg);
+    state_save_register_global(machine, ddragon3_bg_scrollx);
+    state_save_register_global(machine, ddragon3_bg_scrolly);
+    state_save_register_global(machine, ddragon3_fg_scrollx);
+    state_save_register_global(machine, ddragon3_fg_scrolly);
+    state_save_register_global(machine, ddragon3_bg_tilebase);
 
     bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		 16, 16, 32, 32);

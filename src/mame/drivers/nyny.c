@@ -237,10 +237,10 @@ static MACHINE_START( nyny )
 	pia_config(2, &pia_2_intf);
 
 	/* setup for save states */
-	state_save_register_global(flipscreen);
-	state_save_register_global(star_enable);
-	state_save_register_global(star_delay_counter);
-	state_save_register_global(star_shift_reg);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, star_enable);
+	state_save_register_global(machine, star_delay_counter);
+	state_save_register_global(machine, star_shift_reg);
 }
 
 

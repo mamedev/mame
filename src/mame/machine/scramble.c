@@ -365,7 +365,7 @@ DRIVER_INIT( cavelon )
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2000, 0x2000, 0, 0, SMH_NOP);	/* ??? */
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x3800, 0x3801, 0, 0, SMH_NOP);  /* looks suspicously like
                                                                an AY8910, but not sure */
-	state_save_register_global(cavelon_bank);
+	state_save_register_global(machine, cavelon_bank);
 }
 
 

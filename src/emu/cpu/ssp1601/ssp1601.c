@@ -504,17 +504,17 @@ static CPU_INIT( ssp1601 )
 {
 	ssp1601_state_t *ssp1601_state = device->token;
 
-	state_save_register_item(CHIP_NAME, device->tag, 0, rX);
-	state_save_register_item(CHIP_NAME, device->tag, 0, rY);
-	state_save_register_item(CHIP_NAME, device->tag, 0, rA32);
-	state_save_register_item(CHIP_NAME, device->tag, 0, rST);
-	state_save_register_item(CHIP_NAME, device->tag, 0, rSTACK);
-	state_save_register_item(CHIP_NAME, device->tag, 0, rPC);
-	state_save_register_item(CHIP_NAME, device->tag, 0, rP.d);
-	state_save_register_item(CHIP_NAME, device->tag, 0, PPC);
-	state_save_register_item_array(CHIP_NAME, device->tag, 0, ssp1601_state->stack);
-	state_save_register_item_array(CHIP_NAME, device->tag, 0, ssp1601_state->r);
-	state_save_register_item_array(CHIP_NAME, device->tag, 0, ssp1601_state->RAM);
+	state_save_register_device_item(device, 0, rX);
+	state_save_register_device_item(device, 0, rY);
+	state_save_register_device_item(device, 0, rA32);
+	state_save_register_device_item(device, 0, rST);
+	state_save_register_device_item(device, 0, rSTACK);
+	state_save_register_device_item(device, 0, rPC);
+	state_save_register_device_item(device, 0, rP.d);
+	state_save_register_device_item(device, 0, PPC);
+	state_save_register_device_item_array(device, 0, ssp1601_state->stack);
+	state_save_register_device_item_array(device, 0, ssp1601_state->r);
+	state_save_register_device_item_array(device, 0, ssp1601_state->RAM);
 
 	/* clear the state */
 	memset(ssp1601_state, 0, sizeof(ssp1601_state_t));

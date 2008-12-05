@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "driver.h"
+#include "cpuintrf.h"
 
 
 
@@ -93,7 +94,7 @@ device_config *device_list_add(device_config **listheadptr, device_type type, co
 	/* find the end of the list, and ensure no duplicates along the way */
 	for (devptr = listheadptr; *devptr != NULL; devptr = &(*devptr)->next)
 		if (type == (*devptr)->type && strcmp(tag, (*devptr)->tag) == 0)
-			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", devtype_name(type), tag);
+			fatalerror("Attempted to add duplicate device: type=%s tag=%s\n", devtype_get_name(type), tag);
 
 	/* get the size of the inline config */
 	configlen = (UINT32)devtype_get_info_int(type, DEVINFO_INT_INLINE_CONFIG_BYTES);
@@ -164,7 +165,7 @@ void device_list_remove(device_config **listheadptr, device_type type, const cha
 		if (type == (*devptr)->type && strcmp(tag, (*devptr)->tag) == 0)
 			break;
 	if (*devptr == NULL)
-		fatalerror("Attempted to remove non-existant device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("Attempted to remove non-existant device: type=%s tag=%s\n", devtype_get_name(type), tag);
 
 	/* remove the device from the list */
 	device = *devptr;
@@ -515,7 +516,7 @@ void device_list_start(running_machine *machine)
 		/* get the size of the token data */
 		tokenlen = (UINT32)devtype_get_info_int(device->type, DEVINFO_INT_TOKEN_BYTES);
 		if (tokenlen == 0)
-			fatalerror("Device %s specifies a 0 token length!\n", devtype_name(device->type));
+			fatalerror("Device %s specifies a 0 token length!\n", devtype_get_name(device->type));
 
 		/* allocate memory for the token */
 		device->token = malloc_or_die(tokenlen);
@@ -626,7 +627,7 @@ void devtag_reset(running_machine *machine, device_type type, const char *tag)
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_reset failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_reset failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	device_reset(device);
 }
 
@@ -651,7 +652,7 @@ void *devtag_get_token(running_machine *machine, device_type type, const char *t
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_get_token failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_get_token failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	return device->token;
 }
 
@@ -671,7 +672,7 @@ const device_config *devtag_get_device(running_machine *machine, device_type typ
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_get_device failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_get_device failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	return device;
 }
 
@@ -692,7 +693,7 @@ const void *devtag_get_static_config(running_machine *machine, device_type type,
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_get_static_config failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_get_static_config failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	return device->static_config;
 }
 
@@ -713,7 +714,7 @@ const void *devtag_get_inline_config(running_machine *machine, device_type type,
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_get_inline_config failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_get_inline_config failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	return device->inline_config;
 }
 
@@ -750,7 +751,7 @@ INT64 devtag_get_info_int(running_machine *machine, device_type type, const char
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_get_info_int failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_get_info_int failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	return device_get_info_int(device, state);
 }
 
@@ -786,7 +787,7 @@ void *devtag_get_info_ptr(running_machine *machine, device_type type, const char
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_get_info_ptr failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_get_info_ptr failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	return device_get_info_ptr(device, state);
 }
 
@@ -822,7 +823,7 @@ genf *devtag_get_info_fct(running_machine *machine, device_type type, const char
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("device_get_info_fct failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("device_get_info_fct failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	return device_get_info_fct(device, state);
 }
 
@@ -858,7 +859,7 @@ const char *devtag_get_info_string(running_machine *machine, device_type type, c
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("device_get_info_string failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("device_get_info_string failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	return device_get_info_string(device, state);
 }
 
@@ -900,7 +901,7 @@ const char *devtype_get_info_string(device_type type, UINT32 state)
 
 	assert(type != NULL);
 	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
-
+	
 	/* retrieve the value */
 	info.s = get_temp_string_buffer();
 	(*type)(NULL, state, &info);
@@ -944,7 +945,7 @@ void devtag_set_info_int(running_machine *machine, device_type type, const char 
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_set_info_int failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_set_info_int failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	device_set_info_int(device, state, data);
 }
 
@@ -980,7 +981,7 @@ void devtag_set_info_ptr(running_machine *machine, device_type type, const char 
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_set_info_ptr failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_set_info_ptr failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	device_set_info_ptr(device, state, data);
 }
 
@@ -1016,6 +1017,6 @@ void devtag_set_info_fct(running_machine *machine, device_type type, const char 
 
 	device = device_list_find_by_tag(machine->config->devicelist, type, tag);
 	if (device == NULL)
-		fatalerror("devtag_set_info_fct failed to find device: type=%s tag=%s\n", devtype_name(type), tag);
+		fatalerror("devtag_set_info_fct failed to find device: type=%s tag=%s\n", devtype_get_name(type), tag);
 	device_set_info_fct(device, state, data);
 }

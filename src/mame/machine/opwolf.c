@@ -722,21 +722,21 @@ void opwolf_cchip_init(running_machine *machine)
 {
 	cchip_ram=auto_malloc(0x400 * 8);
 
-	state_save_register_global(current_bank);
-	state_save_register_global(current_cmd);
-	state_save_register_global(cchip_last_7a);
-	state_save_register_global(cchip_last_04);
-	state_save_register_global(cchip_last_05);
-	state_save_register_global(c588);
-	state_save_register_global(c589);
-	state_save_register_global(c58a);
-	state_save_register_global(cchip_coins[0]);
-	state_save_register_global(cchip_coins[1]);
-	state_save_register_global(cchip_coins_for_credit[0]);
-	state_save_register_global(cchip_credits_for_coin[0]);
-	state_save_register_global(cchip_coins_for_credit[1]);
-	state_save_register_global(cchip_credits_for_coin[1]);
-	state_save_register_global_pointer(cchip_ram, 0x400 * 8);
+	state_save_register_global(machine, current_bank);
+	state_save_register_global(machine, current_cmd);
+	state_save_register_global(machine, cchip_last_7a);
+	state_save_register_global(machine, cchip_last_04);
+	state_save_register_global(machine, cchip_last_05);
+	state_save_register_global(machine, c588);
+	state_save_register_global(machine, c589);
+	state_save_register_global(machine, c58a);
+	state_save_register_global(machine, cchip_coins[0]);
+	state_save_register_global(machine, cchip_coins[1]);
+	state_save_register_global(machine, cchip_coins_for_credit[0]);
+	state_save_register_global(machine, cchip_credits_for_coin[0]);
+	state_save_register_global(machine, cchip_coins_for_credit[1]);
+	state_save_register_global(machine, cchip_credits_for_coin[1]);
+	state_save_register_global_pointer(machine, cchip_ram, 0x400 * 8);
 
 	current_bank=0;
 	current_cmd=0;

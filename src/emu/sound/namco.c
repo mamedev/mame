@@ -106,9 +106,8 @@ static void update_namco_waveform(struct namco_sound *chip, int offset, UINT8 da
 
 
 /* build the decoded waveform table */
-static int build_decoded_waveform(struct namco_sound *chip, const char *region)
+static int build_decoded_waveform(struct namco_sound *chip, UINT8 *rgnbase)
 {
-	UINT8 *rgnbase = memory_region(Machine, region);
 	INT16 *p;
 	int size;
 	int offset;
@@ -383,7 +382,7 @@ static SND_START( namco )
 	logerror("Namco: freq fractional bits = %d: internal freq = %d, output freq = %d\n", chip->f_fracbits, chip->namco_clock, chip->sample_rate);
 
 	/* build the waveform table */
-	if (build_decoded_waveform(chip, tag))
+	if (build_decoded_waveform(chip, device->region))
 		return NULL;
 
 	/* get stream channels */
@@ -396,9 +395,9 @@ static SND_START( namco )
 	chip->sound_enable = 1;
 
 	/* register with the save state system */
-	state_save_register_item("namco", tag, 0, chip->num_voices);
-	state_save_register_item("namco", tag, 0, chip->sound_enable);
-	state_save_register_item_pointer("namco", tag, 0, chip->waveform[0],
+	state_save_register_device_item(device, 0, chip->num_voices);
+	state_save_register_device_item(device, 0, chip->sound_enable);
+	state_save_register_device_item_pointer(device, 0, chip->waveform[0],
 										 MAX_VOLUME * 32 * 8 * (1+chip->wave_size));
 
 	/* reset all the voices */
@@ -417,15 +416,15 @@ static SND_START( namco )
 		voice->noise_hold = 0;
 
 		/* register with the save state system */
-		state_save_register_item("namco", tag, voicenum, voice->frequency);
-		state_save_register_item("namco", tag, voicenum, voice->counter);
-		state_save_register_item_array("namco", tag, voicenum, voice->volume);
-		state_save_register_item("namco", tag, voicenum, voice->noise_sw);
-		state_save_register_item("namco", tag, voicenum, voice->noise_state);
-		state_save_register_item("namco", tag, voicenum, voice->noise_seed);
-		state_save_register_item("namco", tag, voicenum, voice->noise_hold);
-		state_save_register_item("namco", tag, voicenum, voice->noise_counter);
-		state_save_register_item("namco", tag, voicenum, voice->waveform_select);
+		state_save_register_device_item(device, voicenum, voice->frequency);
+		state_save_register_device_item(device, voicenum, voice->counter);
+		state_save_register_device_item_array(device, voicenum, voice->volume);
+		state_save_register_device_item(device, voicenum, voice->noise_sw);
+		state_save_register_device_item(device, voicenum, voice->noise_state);
+		state_save_register_device_item(device, voicenum, voice->noise_seed);
+		state_save_register_device_item(device, voicenum, voice->noise_hold);
+		state_save_register_device_item(device, voicenum, voice->noise_counter);
+		state_save_register_device_item(device, voicenum, voice->waveform_select);
 	}
 
 	return chip;

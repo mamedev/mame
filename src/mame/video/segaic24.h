@@ -27,7 +27,7 @@ WRITE32_HANDLER(sys24_char32_w);
 
 // Sprites
 //  System24
-void sys24_sprite_vh_start(void);
+void sys24_sprite_vh_start(running_machine *machine);
 void sys24_sprite_draw(bitmap_t *bitmap, const rectangle *cliprect, const int *spri);
 
 WRITE16_HANDLER (sys24_sprite_w);
@@ -35,7 +35,7 @@ READ16_HANDLER (sys24_sprite_r);
 
 // Programmable mixers
 //  System24
-void sys24_mixer_vh_start(void);
+void sys24_mixer_vh_start(running_machine *machine);
 int sys24_mixer_get_reg(int reg);
 
 WRITE16_HANDLER (sys24_mixer_w);

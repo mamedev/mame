@@ -571,7 +571,7 @@ static MACHINE_RESET( taitoh )
 
 static MACHINE_START( taitoh )
 {
-	state_save_register_global(banknum);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, taitoh_postload, NULL);
 }
 

@@ -26,18 +26,18 @@ static UINT8 portC_out,ddrC;
 
 MACHINE_START( arkanoid )
 {
-	state_save_register_global(arkanoid_paddle_select);
-	state_save_register_global(z80write);
-	state_save_register_global(fromz80);
-	state_save_register_global(m68705write);
-	state_save_register_global(toz80);
+	state_save_register_global(machine, arkanoid_paddle_select);
+	state_save_register_global(machine, z80write);
+	state_save_register_global(machine, fromz80);
+	state_save_register_global(machine, m68705write);
+	state_save_register_global(machine, toz80);
 
-	state_save_register_global(portA_in);
-	state_save_register_global(portA_out);
-	state_save_register_global(ddrA);
+	state_save_register_global(machine, portA_in);
+	state_save_register_global(machine, portA_out);
+	state_save_register_global(machine, ddrA);
 
-	state_save_register_global(portC_out);
-	state_save_register_global(ddrC);
+	state_save_register_global(machine, portC_out);
+	state_save_register_global(machine, ddrC);
 }
 
 MACHINE_RESET( arkanoid )

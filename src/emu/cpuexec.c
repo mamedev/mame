@@ -167,6 +167,12 @@ INLINE void suspend_until_trigger(const device_config *device, int trigger, int 
     each CPU
 -------------------------------------------------*/
 
+static DEVICE_GET_INFO( cpuclass )
+{
+	cpu_class_data *classdata = device->classtoken;
+	(*classdata->header.get_info)(device, state, (cpuinfo *)info);
+}
+
 const device_config *cpuexec_create_cpu_device(const cpu_config *config)
 {
 	device_config *device;
@@ -175,7 +181,7 @@ const device_config *cpuexec_create_cpu_device(const cpu_config *config)
 	device = malloc_or_die(sizeof(*device) + strlen(config->tag));
 	memset(device, 0, sizeof(*device));
 	strcpy(device->tag, config->tag);
-	device->type = (device_type)config->type;
+	device->type = DEVICE_GET_INFO_NAME(cpuclass);
 	device->class = DEVICE_CLASS_CPU_CHIP;
 	device->inline_config = (void *)config;
 	device->static_config = config->reset_param;
@@ -245,9 +251,9 @@ void cpuexec_init(running_machine *machine)
 
 			/* initialize this CPU */
 			state_save_push_tag(cpunum + 1);
-			num_regs = state_save_get_reg_count();
+			num_regs = state_save_get_reg_count(machine);
 			cpu_init(device, cpunum, classdata->clock, standard_irq_callback);
-			num_regs = state_save_get_reg_count() - num_regs;
+			num_regs = state_save_get_reg_count(machine) - num_regs;
 			state_save_pop_tag();
 
 			/* fetch post-initialization data */
@@ -917,7 +923,7 @@ void cpu_set_input_line_and_vector(const device_config *device, int line, int st
 	/* catch errors where people use PULSE_LINE for CPUs that don't support it */
 	if (state == PULSE_LINE && line != INPUT_LINE_NMI && line != INPUT_LINE_RESET)
 	{
-		switch ((cpu_type)device->type)
+		switch (classdata->header.cputype)
 		{
 			case CPU_Z80:
 			case CPU_Z180:
@@ -1341,7 +1347,7 @@ static TIMER_CALLBACK( empty_event_queue )
 			{
 				case PULSE_LINE:
 					/* temporary: PULSE_LINE only makes sense for NMI lines on Z80 */
-					assert((cpu_type)device->type != CPU_Z80 || param == INPUT_LINE_NMI);
+					assert(classdata->header.cputype != CPU_Z80 || param == INPUT_LINE_NMI);
 					cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, ASSERT_LINE);
 					cpu_set_info_int(device, CPUINFO_INT_INPUT_STATE + param, CLEAR_LINE);
 					break;
@@ -1418,26 +1424,26 @@ static void register_save_states(const device_config *device)
 	cpu_class_data *classdata = device->classtoken;
 	int line;
 
-	state_save_register_item("cpu", device->tag, 0, classdata->suspend);
-	state_save_register_item("cpu", device->tag, 0, classdata->nextsuspend);
-	state_save_register_item("cpu", device->tag, 0, classdata->eatcycles);
-	state_save_register_item("cpu", device->tag, 0, classdata->nexteatcycles);
-	state_save_register_item("cpu", device->tag, 0, classdata->trigger);
+	state_save_register_device_item(device, 0, classdata->suspend);
+	state_save_register_device_item(device, 0, classdata->nextsuspend);
+	state_save_register_device_item(device, 0, classdata->eatcycles);
+	state_save_register_device_item(device, 0, classdata->nexteatcycles);
+	state_save_register_device_item(device, 0, classdata->trigger);
 
-	state_save_register_item("cpu", device->tag, 0, classdata->iloops);
+	state_save_register_device_item(device, 0, classdata->iloops);
 
-	state_save_register_item("cpu", device->tag, 0, classdata->totalcycles);
-	state_save_register_item("cpu", device->tag, 0, classdata->localtime.seconds);
-	state_save_register_item("cpu", device->tag, 0, classdata->localtime.attoseconds);
-	state_save_register_item("cpu", device->tag, 0, classdata->clock);
-	state_save_register_item("cpu", device->tag, 0, classdata->clockscale);
+	state_save_register_device_item(device, 0, classdata->totalcycles);
+	state_save_register_device_item(device, 0, classdata->localtime.seconds);
+	state_save_register_device_item(device, 0, classdata->localtime.attoseconds);
+	state_save_register_device_item(device, 0, classdata->clock);
+	state_save_register_device_item(device, 0, classdata->clockscale);
 
 	for (line = 0; line < ARRAY_LENGTH(classdata->input); line++)
 	{
 		cpu_input_data *inputline = &classdata->input[line];
-		state_save_register_item("cpu", device->tag, line, inputline->vector);
-		state_save_register_item("cpu", device->tag, line, inputline->curvector);
-		state_save_register_item("cpu", device->tag, line, inputline->curstate);
+		state_save_register_device_item(device, line, inputline->vector);
+		state_save_register_device_item(device, line, inputline->curvector);
+		state_save_register_device_item(device, line, inputline->curstate);
 	}
 }
 

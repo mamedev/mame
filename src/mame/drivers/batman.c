@@ -55,7 +55,7 @@ static MACHINE_RESET( batman )
 	atarigen_scanline_timer_reset(machine->primary_screen, batman_scanline_update, 8);
 	atarijsa_reset();
 	atarigen_init_save_state(machine);
-	state_save_register_global(latch_data);
+	state_save_register_global(machine, latch_data);
 
 }
 

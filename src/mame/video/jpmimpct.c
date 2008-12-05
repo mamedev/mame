@@ -141,9 +141,9 @@ VIDEO_START( jpmimpct )
 {
 	memset(&bt477, 0, sizeof(bt477));
 
-	state_save_register_global(bt477.address);
-	state_save_register_global(bt477.addr_cnt);
-	state_save_register_global(bt477.pixmask);
-	state_save_register_global(bt477.command);
-	state_save_register_global(bt477.color);
+	state_save_register_global(machine, bt477.address);
+	state_save_register_global(machine, bt477.addr_cnt);
+	state_save_register_global(machine, bt477.pixmask);
+	state_save_register_global(machine, bt477.command);
+	state_save_register_global(machine, bt477.color);
 }

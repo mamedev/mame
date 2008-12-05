@@ -510,7 +510,7 @@ static DRIVER_INIT( aliens )
 	konami_rom_deinterleave_2("gfx1");
 	konami_rom_deinterleave_2("gfx2");
 
-	state_save_register_global(palette_selected);
+	state_save_register_global(machine, palette_selected);
 }
 
 

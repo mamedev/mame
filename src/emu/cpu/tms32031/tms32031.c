@@ -387,15 +387,15 @@ static CPU_INIT( tms32031 )
 		tms->iack_w = configdata->iack_w;
 	}
 
-	state_save_register_item("tms32031", device->tag, 0, tms->pc);
+	state_save_register_device_item(device, 0, tms->pc);
 	for (i = 0; i < 36; i++)
-		state_save_register_generic("tms32031", device->tag, i, "reg", tms->r[i].i8, UINT8, 8);
-	state_save_register_item("tms32031", device->tag, 0, tms->bkmask);
-	state_save_register_item("tms32031", device->tag, 0, tms->irq_state);
-	state_save_register_item("tms32031", device->tag, 0, tms->delayed);
-	state_save_register_item("tms32031", device->tag, 0, tms->irq_pending);
-	state_save_register_item("tms32031", device->tag, 0, tms->mcu_mode);
-	state_save_register_item("tms32031", device->tag, 0, tms->is_idling);
+		state_save_register_generic(device->machine, "tms32031", device->tag, i, "reg", tms->r[i].i8, UINT8, 8);
+	state_save_register_device_item(device, 0, tms->bkmask);
+	state_save_register_device_item(device, 0, tms->irq_state);
+	state_save_register_device_item(device, 0, tms->delayed);
+	state_save_register_device_item(device, 0, tms->irq_pending);
+	state_save_register_device_item(device, 0, tms->mcu_mode);
+	state_save_register_device_item(device, 0, tms->is_idling);
 }
 
 static CPU_RESET( tms32031 )

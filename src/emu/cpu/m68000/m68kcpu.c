@@ -515,23 +515,23 @@ static CPU_INIT( m68k )
 	}
 
 	/* Note, D covers A because the dar array is common, REG_A=REG_D+8 */
-	state_save_register_item_array("m68k", device->tag, 0, REG_D);
-	state_save_register_item("m68k", device->tag, 0, REG_PPC);
-	state_save_register_item("m68k", device->tag, 0, REG_PC);
-	state_save_register_item("m68k", device->tag, 0, REG_USP);
-	state_save_register_item("m68k", device->tag, 0, REG_ISP);
-	state_save_register_item("m68k", device->tag, 0, REG_MSP);
-	state_save_register_item("m68k", device->tag, 0, m68k->vbr);
-	state_save_register_item("m68k", device->tag, 0, m68k->sfc);
-	state_save_register_item("m68k", device->tag, 0, m68k->dfc);
-	state_save_register_item("m68k", device->tag, 0, m68k->cacr);
-	state_save_register_item("m68k", device->tag, 0, m68k->caar);
-	state_save_register_item("m68k", device->tag, 0, m68k->save_sr);
-	state_save_register_item("m68k", device->tag, 0, m68k->int_level);
-	state_save_register_item("m68k", device->tag, 0, m68k->save_stopped);
-	state_save_register_item("m68k", device->tag, 0, m68k->save_halted);
-	state_save_register_item("m68k", device->tag, 0, m68k->pref_addr);
-	state_save_register_item("m68k", device->tag, 0, m68k->pref_data);
+	state_save_register_device_item_array(device, 0, REG_D);
+	state_save_register_device_item(device, 0, REG_PPC);
+	state_save_register_device_item(device, 0, REG_PC);
+	state_save_register_device_item(device, 0, REG_USP);
+	state_save_register_device_item(device, 0, REG_ISP);
+	state_save_register_device_item(device, 0, REG_MSP);
+	state_save_register_device_item(device, 0, m68k->vbr);
+	state_save_register_device_item(device, 0, m68k->sfc);
+	state_save_register_device_item(device, 0, m68k->dfc);
+	state_save_register_device_item(device, 0, m68k->cacr);
+	state_save_register_device_item(device, 0, m68k->caar);
+	state_save_register_device_item(device, 0, m68k->save_sr);
+	state_save_register_device_item(device, 0, m68k->int_level);
+	state_save_register_device_item(device, 0, m68k->save_stopped);
+	state_save_register_device_item(device, 0, m68k->save_halted);
+	state_save_register_device_item(device, 0, m68k->pref_addr);
+	state_save_register_device_item(device, 0, m68k->pref_data);
 	state_save_register_presave(device->machine, m68k_presave, m68k);
 	state_save_register_postload(device->machine, m68k_postload, m68k);
 }

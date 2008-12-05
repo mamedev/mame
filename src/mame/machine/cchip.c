@@ -65,8 +65,8 @@ static const UINT8 superman_code[40] =
 
 MACHINE_RESET( cchip1 )
 {
-	state_save_register_global(current_bank);
-	state_save_register_global(cc_port);
+	state_save_register_global(machine, current_bank);
+	state_save_register_global(machine, cc_port);
 }
 
 /*************************************

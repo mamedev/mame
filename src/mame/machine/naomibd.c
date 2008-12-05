@@ -148,10 +148,10 @@ static void init_save_state(const device_config *device)
 	state_save_register_postload(device->machine, naomibd_postload, v);
 
 	/* register states */
-	state_save_register_item("naomibd", device->tag, 0, v->rom_offset);
-	state_save_register_item("naomibd", device->tag, 0, v->rom_offset_flags);
-	state_save_register_item("naomibd", device->tag, 0, v->dma_count);
-	state_save_register_item("naomibd", device->tag, 0, v->dma_offset);
+	state_save_register_device_item(device, 0, v->rom_offset);
+	state_save_register_device_item(device, 0, v->rom_offset_flags);
+	state_save_register_device_item(device, 0, v->dma_count);
+	state_save_register_device_item(device, 0, v->dma_offset);
 }
 
 

@@ -164,20 +164,20 @@ static TILE_GET_INFO( pacman_get_tile_info )
 
 ***************************************************************************/
 
-static void init_save_state(void)
+static void init_save_state(running_machine *machine)
 {
-	state_save_register_global(charbank);
-	state_save_register_global(spritebank);
-	state_save_register_global(palettebank);
-	state_save_register_global(colortablebank);
-	state_save_register_global(flipscreen);
-	state_save_register_global(bgpriority);
+	state_save_register_global(machine, charbank);
+	state_save_register_global(machine, spritebank);
+	state_save_register_global(machine, palettebank);
+	state_save_register_global(machine, colortablebank);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, bgpriority);
 }
 
 
 VIDEO_START( pacman )
 {
-	init_save_state();
+	init_save_state(machine);
 
 	charbank = 0;
 	spritebank = 0;
@@ -301,7 +301,7 @@ VIDEO_UPDATE( pacman )
 
 VIDEO_START( pengo )
 {
-	init_save_state();
+	init_save_state(machine);
 
 	charbank = 0;
 	spritebank = 0;
@@ -377,7 +377,7 @@ static TILE_GET_INFO( s2650_get_tile_info )
 
 VIDEO_START( s2650games )
 {
-	init_save_state();
+	init_save_state(machine);
 
 	charbank = 0;
 	spritebank = 0;
@@ -550,7 +550,7 @@ static void jrpacman_mark_tile_dirty( int offset )
 ***************************************************************************/
 VIDEO_START( jrpacman )
 {
-	init_save_state();
+	init_save_state(machine);
 
 	charbank = 0;
 	spritebank = 0;

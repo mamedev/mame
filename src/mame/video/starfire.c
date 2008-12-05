@@ -31,10 +31,10 @@ static UINT16 starfire_colors[NUM_PENS];
 VIDEO_START( starfire )
 {
 	/* register for state saving */
-	state_save_register_global(starfire_vidctrl);
-	state_save_register_global(starfire_vidctrl1);
-	state_save_register_global(starfire_color);
-	state_save_register_global_array(starfire_colors);
+	state_save_register_global(machine, starfire_vidctrl);
+	state_save_register_global(machine, starfire_vidctrl1);
+	state_save_register_global(machine, starfire_color);
+	state_save_register_global_array(machine, starfire_colors);
 }
 
 

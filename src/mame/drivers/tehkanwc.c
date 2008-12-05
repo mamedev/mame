@@ -212,11 +212,11 @@ static WRITE8_HANDLER( msm_reset_w )
 	msm5205_reset_w(0,data ? 0 : 1);
 }
 
-static void tehkanwc_adpcm_int(running_machine *machine, int data)
+static void tehkanwc_adpcm_int(const device_config *device)
 {
 	static int toggle;
 
-	UINT8 *SAMPLES = memory_region(machine, "adpcm");
+	UINT8 *SAMPLES = memory_region(device->machine, "adpcm");
 	int msm_data = SAMPLES[msm_data_offs & 0x7fff];
 
 	if (toggle == 0)

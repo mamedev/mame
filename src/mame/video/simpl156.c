@@ -143,12 +143,12 @@ VIDEO_START( simpl156 )
 	paletteram16 =  auto_malloc(0x1000);
 
 	/* and register the allocated ram so that save states still work */
-	state_save_register_global_pointer(deco16_pf1_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf2_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf1_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf2_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf12_control, 0x10/2);
-	state_save_register_global_pointer(paletteram16, 0x1000/2);
+	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf2_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf1_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf2_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf12_control, 0x10/2);
+	state_save_register_global_pointer(machine, paletteram16, 0x1000/2);
 
 	deco16_1_video_init(machine);
 

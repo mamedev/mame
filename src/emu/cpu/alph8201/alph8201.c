@@ -669,27 +669,27 @@ static CPU_INIT( ALPHA8201 )
 	R.device = device;
 	R.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item_array("ALPHA8201", device->tag, 0, R.RAM);
-	state_save_register_item("ALPHA8201", device->tag, 0, R.PREVPC);
-	state_save_register_item("ALPHA8201", device->tag, 0, PC);
-	state_save_register_item("ALPHA8201", device->tag, 0, regPTR);
-	state_save_register_item("ALPHA8201", device->tag, 0, ZF);
-	state_save_register_item("ALPHA8201", device->tag, 0, CF);
-	state_save_register_item("ALPHA8201", device->tag, 0, R.mb);
+	state_save_register_device_item_array(device, 0, R.RAM);
+	state_save_register_device_item(device, 0, R.PREVPC);
+	state_save_register_device_item(device, 0, PC);
+	state_save_register_device_item(device, 0, regPTR);
+	state_save_register_device_item(device, 0, ZF);
+	state_save_register_device_item(device, 0, CF);
+	state_save_register_device_item(device, 0, R.mb);
 #if HANDLE_HALT_LINE
-	state_save_register_item("ALPHA8201", device->tag, 0, R.halt);
+	state_save_register_device_item(device, 0, R.halt);
 #endif
-	state_save_register_item("ALPHA8201", device->tag, 0, IX0);
-	state_save_register_item("ALPHA8201", device->tag, 0, IX1);
-	state_save_register_item("ALPHA8201", device->tag, 0, IX2);
-	state_save_register_item("ALPHA8201", device->tag, 0, LP0);
-	state_save_register_item("ALPHA8201", device->tag, 0, LP1);
-	state_save_register_item("ALPHA8201", device->tag, 0, LP2);
-	state_save_register_item("ALPHA8201", device->tag, 0, R.A);
-	state_save_register_item("ALPHA8201", device->tag, 0, R.B);
-	state_save_register_item("ALPHA8201", device->tag, 0, R.retptr);
-	state_save_register_item("ALPHA8201", device->tag, 0, R.savec);
-	state_save_register_item("ALPHA8201", device->tag, 0, R.savez);
+	state_save_register_device_item(device, 0, IX0);
+	state_save_register_device_item(device, 0, IX1);
+	state_save_register_device_item(device, 0, IX2);
+	state_save_register_device_item(device, 0, LP0);
+	state_save_register_device_item(device, 0, LP1);
+	state_save_register_device_item(device, 0, LP2);
+	state_save_register_device_item(device, 0, R.A);
+	state_save_register_device_item(device, 0, R.B);
+	state_save_register_device_item(device, 0, R.retptr);
+	state_save_register_device_item(device, 0, R.savec);
+	state_save_register_device_item(device, 0, R.savez);
 }
 /****************************************************************************
  * Reset registers to their initial values

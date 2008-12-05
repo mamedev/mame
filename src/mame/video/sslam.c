@@ -150,7 +150,7 @@ VIDEO_START(sslam)
 	tilemap_set_transparent_pen(sslam_tx_tilemap,0);
 
 	sprites_x_offset = 0;
-	state_save_register_global(sprites_x_offset);
+	state_save_register_global(machine, sprites_x_offset);
 }
 
 VIDEO_START(powerbls)
@@ -158,7 +158,7 @@ VIDEO_START(powerbls)
 	sslam_bg_tilemap = tilemap_create(get_powerbls_bg_tile_info,tilemap_scan_rows,8,8,64,64);
 
 	sprites_x_offset = -21;
-	state_save_register_global(sprites_x_offset);
+	state_save_register_global(machine, sprites_x_offset);
 }
 
 VIDEO_UPDATE(sslam)

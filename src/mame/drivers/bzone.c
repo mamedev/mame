@@ -230,18 +230,18 @@ UINT8 rb_input_select;
 
 static MACHINE_START( bzone )
 {
-	state_save_register_global(analog_data);
-	mb_register_states();
-	atari_vg_register_states();
+	state_save_register_global(machine, analog_data);
+	mb_register_states(machine);
+	atari_vg_register_states(machine);
 }
 
 
 static MACHINE_START( redbaron )
 {
-	state_save_register_global(analog_data);
-	state_save_register_global(rb_input_select);
-	mb_register_states();
-	atari_vg_register_states();
+	state_save_register_global(machine, analog_data);
+	state_save_register_global(machine, rb_input_select);
+	mb_register_states(machine);
+	atari_vg_register_states(machine);
 }
 
 

@@ -81,20 +81,20 @@ static const UINT32 tile_offset[32*32] = {
 /********************************************
     state saving setup
  ********************************************/
-void decocass_video_state_save_init(void)
+void decocass_video_state_save_init(running_machine *machine)
 {
-	state_save_register_global(watchdog_count);
-	state_save_register_global(watchdog_flip);
-	state_save_register_global(color_missiles);
-	state_save_register_global(color_center_bot);
-	state_save_register_global(mode_set);
-	state_save_register_global(back_h_shift);
-	state_save_register_global(back_vl_shift);
-	state_save_register_global(back_vr_shift);
-	state_save_register_global(part_h_shift);
-	state_save_register_global(part_v_shift);
-	state_save_register_global(center_h_shift_space);
-	state_save_register_global(center_v_shift);
+	state_save_register_global(machine, watchdog_count);
+	state_save_register_global(machine, watchdog_flip);
+	state_save_register_global(machine, color_missiles);
+	state_save_register_global(machine, color_center_bot);
+	state_save_register_global(machine, mode_set);
+	state_save_register_global(machine, back_h_shift);
+	state_save_register_global(machine, back_vl_shift);
+	state_save_register_global(machine, back_vr_shift);
+	state_save_register_global(machine, part_h_shift);
+	state_save_register_global(machine, part_v_shift);
+	state_save_register_global(machine, center_h_shift_space);
+	state_save_register_global(machine, center_v_shift);
 }
 
 /********************************************

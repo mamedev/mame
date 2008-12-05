@@ -863,8 +863,8 @@ static MACHINE_START( mystwarr )
 
 	mw_irq_control = 0;
 
-	state_save_register_global(mw_irq_control);
-	state_save_register_global(cur_sound_region);
+	state_save_register_global(machine, mw_irq_control);
+	state_save_register_global(machine, cur_sound_region);
 	state_save_register_postload(machine, mystwarr_postload, NULL);
 }
 

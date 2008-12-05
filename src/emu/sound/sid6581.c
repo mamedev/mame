@@ -30,10 +30,10 @@ static void sid_update(void *token,stream_sample_t **inputs, stream_sample_t **_
 
 
 
-static void *sid_start(const char *tag, int sndindex, int clock, const void *config, SIDTYPE sidtype)
+static void *sid_start(const device_config *device, int clock, SIDTYPE sidtype)
 {
 	SID6581 *sid;
-	const sid6581_interface *iface = (const sid6581_interface*) config;
+	const sid6581_interface *iface = (const sid6581_interface*) device->static_config;
 
 	sid = (SID6581 *) auto_malloc(sizeof(*sid));
 	memset(sid, 0, sizeof(*sid));
@@ -61,14 +61,14 @@ static SND_RESET( sid )
 
 static SND_START( sid6581 )
 {
-	return sid_start(tag, sndindex, clock, config, MOS6581);
+	return sid_start(device, clock, MOS6581);
 }
 
 
 
 static SND_START( sid8580 )
 {
-	return sid_start(tag, sndindex, clock, config, MOS8580);
+	return sid_start(device, clock, MOS8580);
 }
 
 

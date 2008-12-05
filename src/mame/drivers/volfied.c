@@ -233,7 +233,7 @@ static const ym2203_interface ym2203_config =
 
 static DRIVER_INIT( volfied )
 {
-	volfied_cchip_init();
+	volfied_cchip_init(machine);
 }
 
 static MACHINE_DRIVER_START( volfied )

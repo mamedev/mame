@@ -167,9 +167,9 @@ static int adpcm_status;
 /* Read/Write Handlers */
 
 
-static void idsoccer_adpcm_int(running_machine *machine, int chip)
+static void idsoccer_adpcm_int(const device_config *device)
 {
-	if (adpcm_pos >= memory_region_length(machine, "adpcm"))
+	if (adpcm_pos >= memory_region_length(device->machine, "adpcm"))
 	{
 		adpcm_idle = 1;
 		msm5205_reset_w(0, 1);
@@ -181,7 +181,7 @@ static void idsoccer_adpcm_int(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(machine, "adpcm")[adpcm_pos++];
+		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos++];
 		msm5205_data_w(0, adpcm_data >> 4);
 	}
 }

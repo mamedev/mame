@@ -241,7 +241,7 @@ static STATE_POSTLOAD( slapshot_postload )
 static MACHINE_START( slapshot )
 {
 	banknum = -1;
-	state_save_register_global(banknum);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, slapshot_postload, NULL);
 }
 

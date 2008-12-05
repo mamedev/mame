@@ -247,7 +247,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static void goal92_adpcm_int(running_machine *machine, int data)
+static void goal92_adpcm_int(const device_config *device)
 {
 	static int toggle = 0;
 
@@ -256,7 +256,7 @@ static void goal92_adpcm_int(running_machine *machine, int data)
 
 	toggle ^= 1;
 	if(toggle)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =

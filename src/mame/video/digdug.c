@@ -158,10 +158,10 @@ VIDEO_START( digdug )
 	spriteram_2 = digdug_posram + 0x380;
 	spriteram_3 = digdug_flpram + 0x380;
 
-	state_save_register_global(bg_select);
-	state_save_register_global(tx_color_mode);
-	state_save_register_global(bg_disable);
-	state_save_register_global(bg_color_bank);
+	state_save_register_global(machine, bg_select);
+	state_save_register_global(machine, tx_color_mode);
+	state_save_register_global(machine, bg_disable);
+	state_save_register_global(machine, bg_color_bank);
 }
 
 

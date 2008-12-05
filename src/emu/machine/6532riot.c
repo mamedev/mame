@@ -449,21 +449,21 @@ static DEVICE_START( riot6532 )
 	riot->timer = timer_alloc(device->machine, timer_end_callback, (void *)device);
 
 	/* register for save states */
-	state_save_register_item("riot6532", device->tag, 0, riot->port[0].in);
-	state_save_register_item("riot6532", device->tag, 0, riot->port[0].out);
-	state_save_register_item("riot6532", device->tag, 0, riot->port[0].ddr);
-	state_save_register_item("riot6532", device->tag, 0, riot->port[1].in);
-	state_save_register_item("riot6532", device->tag, 0, riot->port[1].out);
-	state_save_register_item("riot6532", device->tag, 0, riot->port[1].ddr);
+	state_save_register_device_item(device, 0, riot->port[0].in);
+	state_save_register_device_item(device, 0, riot->port[0].out);
+	state_save_register_device_item(device, 0, riot->port[0].ddr);
+	state_save_register_device_item(device, 0, riot->port[1].in);
+	state_save_register_device_item(device, 0, riot->port[1].out);
+	state_save_register_device_item(device, 0, riot->port[1].ddr);
 
-	state_save_register_item("riot6532", device->tag, 0, riot->irqstate);
-	state_save_register_item("riot6532", device->tag, 0, riot->irqenable);
+	state_save_register_device_item(device, 0, riot->irqstate);
+	state_save_register_device_item(device, 0, riot->irqenable);
 
-	state_save_register_item("riot6532", device->tag, 0, riot->pa7dir);
-	state_save_register_item("riot6532", device->tag, 0, riot->pa7prev);
+	state_save_register_device_item(device, 0, riot->pa7dir);
+	state_save_register_device_item(device, 0, riot->pa7prev);
 
-	state_save_register_item("riot6532", device->tag, 0, riot->timershift);
-	state_save_register_item("riot6532", device->tag, 0, riot->timerstate);
+	state_save_register_device_item(device, 0, riot->timershift);
+	state_save_register_device_item(device, 0, riot->timerstate);
 
 	return DEVICE_START_OK;
 }

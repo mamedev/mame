@@ -189,9 +189,9 @@ static MACHINE_START( safarir )
 	ram_2 = auto_malloc(ram_size);
 
 	/* setup for save states */
-	state_save_register_global_pointer(ram_1, ram_size);
-	state_save_register_global_pointer(ram_2, ram_size);
-	state_save_register_global(ram_bank);
+	state_save_register_global_pointer(machine, ram_1, ram_size);
+	state_save_register_global_pointer(machine, ram_2, ram_size);
+	state_save_register_global(machine, ram_bank);
 }
 
 

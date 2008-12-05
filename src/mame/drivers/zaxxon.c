@@ -389,9 +389,9 @@ static WRITE8_HANDLER( int_enable_w )
 static MACHINE_START( zaxxon )
 {
 	/* register for save states */
-	state_save_register_global(int_enabled);
-	state_save_register_global_array(coin_status);
-	state_save_register_global_array(coin_enable);
+	state_save_register_global(machine, int_enabled);
+	state_save_register_global_array(machine, coin_status);
+	state_save_register_global_array(machine, coin_enable);
 }
 
 
@@ -1513,8 +1513,8 @@ static DRIVER_INIT( razmataz )
 	memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0xe03c, 0xe03c, 0, 0x1f00, sega_usb_status_r, sega_usb_data_w);
 
 	/* additional state saving */
-	state_save_register_global_array(razmataz_dial_pos);
-	state_save_register_global(razmataz_counter);
+	state_save_register_global_array(machine, razmataz_dial_pos);
+	state_save_register_global(machine, razmataz_counter);
 }
 
 

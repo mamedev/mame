@@ -164,15 +164,15 @@ static void okim6258_update(void *param, stream_sample_t **inputs, stream_sample
 
 ***********************************************************************************************/
 
-static void okim6258_state_save_register(struct okim6258 *info, const char *tag)
+static void okim6258_state_save_register(struct okim6258 *info, const device_config *device)
 {
-	state_save_register_item("OKIM6258", tag, 0, info->status);
-	state_save_register_item("OKIM6258", tag, 0, info->master_clock);
-	state_save_register_item("OKIM6258", tag, 0, info->divider);
-	state_save_register_item("OKIM6258", tag, 0, info->data_in);
-	state_save_register_item("OKIM6258", tag, 0, info->nibble_shift);
-	state_save_register_item("OKIM6258", tag, 0, info->signal);
-	state_save_register_item("OKIM6258", tag, 0, info->step);
+	state_save_register_device_item(device, 0, info->status);
+	state_save_register_device_item(device, 0, info->master_clock);
+	state_save_register_device_item(device, 0, info->divider);
+	state_save_register_device_item(device, 0, info->data_in);
+	state_save_register_device_item(device, 0, info->nibble_shift);
+	state_save_register_device_item(device, 0, info->signal);
+	state_save_register_device_item(device, 0, info->step);
 }
 
 
@@ -204,7 +204,7 @@ static SND_START( okim6258 )
 	info->signal = -2;
 	info->step = 0;
 
-	okim6258_state_save_register(info, tag);
+	okim6258_state_save_register(info, device);
 
 	return info;
 }

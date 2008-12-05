@@ -279,9 +279,9 @@ static MACHINE_START( r2dtank )
 	pia_config(1, &pia_audio_intf);
 
 	/* setup for save states */
-	state_save_register_global(flipscreen);
-	state_save_register_global(ttl74123_output);
-	state_save_register_global(AY8910_selected);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, ttl74123_output);
+	state_save_register_global(machine, AY8910_selected);
 }
 
 

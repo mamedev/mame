@@ -119,30 +119,30 @@ static SND_START( bsmt2000 )
 	chip->clock = clock;
 
 	/* initialize the regions */
-	chip->region_base = (INT8 *)memory_region(device->machine, tag);
-	chip->total_banks = memory_region_length(device->machine, tag) / 0x10000;
+	chip->region_base = (INT8 *)device->region;
+	chip->total_banks = device->regionbytes / 0x10000;
 
 	/* register chip-wide data for save states */
-	state_save_register_item("bsmt2000", tag, 0, chip->last_register);
-	state_save_register_item("bsmt2000", tag, 0, chip->stereo);
-	state_save_register_item("bsmt2000", tag, 0, chip->voices);
-	state_save_register_item("bsmt2000", tag, 0, chip->adpcm);
-	state_save_register_item("bsmt2000", tag, 0, chip->adpcm_current);
-	state_save_register_item("bsmt2000", tag, 0, chip->adpcm_delta_n);
+	state_save_register_device_item(device, 0, chip->last_register);
+	state_save_register_device_item(device, 0, chip->stereo);
+	state_save_register_device_item(device, 0, chip->voices);
+	state_save_register_device_item(device, 0, chip->adpcm);
+	state_save_register_device_item(device, 0, chip->adpcm_current);
+	state_save_register_device_item(device, 0, chip->adpcm_delta_n);
 
 	/* register voice-specific data for save states */
 	for (voicenum = 0; voicenum < MAX_VOICES; voicenum++)
 	{
 		bsmt2000_voice *voice = &chip->voice[voicenum];
 
-		state_save_register_item("bsmt2000", tag, voicenum, voice->pos);
-		state_save_register_item("bsmt2000", tag, voicenum, voice->rate);
-		state_save_register_item("bsmt2000", tag, voicenum, voice->loopend);
-		state_save_register_item("bsmt2000", tag, voicenum, voice->loopstart);
-		state_save_register_item("bsmt2000", tag, voicenum, voice->bank);
-		state_save_register_item("bsmt2000", tag, voicenum, voice->leftvol);
-		state_save_register_item("bsmt2000", tag, voicenum, voice->rightvol);
-		state_save_register_item("bsmt2000", tag, voicenum, voice->fraction);
+		state_save_register_device_item(device, voicenum, voice->pos);
+		state_save_register_device_item(device, voicenum, voice->rate);
+		state_save_register_device_item(device, voicenum, voice->loopend);
+		state_save_register_device_item(device, voicenum, voice->loopstart);
+		state_save_register_device_item(device, voicenum, voice->bank);
+		state_save_register_device_item(device, voicenum, voice->leftvol);
+		state_save_register_device_item(device, voicenum, voice->rightvol);
+		state_save_register_device_item(device, voicenum, voice->fraction);
 	}
 
 	/* reset the chip -- this also configures the default mode */

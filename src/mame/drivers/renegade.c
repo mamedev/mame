@@ -250,12 +250,12 @@ static STATE_POSTLOAD( renegade_postload )
 
 static MACHINE_START( renegade )
 {
-	state_save_register_global_array(mcu_buffer);
-	state_save_register_global(mcu_input_size);
-	state_save_register_global(mcu_output_byte);
-	state_save_register_global(mcu_key);
+	state_save_register_global_array(machine, mcu_buffer);
+	state_save_register_global(machine, mcu_input_size);
+	state_save_register_global(machine, mcu_output_byte);
+	state_save_register_global(machine, mcu_key);
 
-	state_save_register_global(bank);
+	state_save_register_global(machine, bank);
 	state_save_register_postload(machine, renegade_postload, NULL);
 }
 

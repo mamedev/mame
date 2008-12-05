@@ -852,7 +852,7 @@ static void *victory_sh_start(int clock, const custom_sound_interface *config)
 {
 	pia_config(1, &victory_pia_e5_intf);
 
-	state_save_register_global(victory_sound_response_ack_clk);
+	state_save_register_global(Machine, victory_sound_response_ack_clk);
 
 	return venture_common_sh_start(clock, config, TRUE);
 }

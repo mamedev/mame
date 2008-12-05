@@ -151,8 +151,8 @@ ADDRESS_MAP_END
 
 static SOUND_START( redalert_audio )
 {
-	state_save_register_global(ay8910_latch_1);
-	state_save_register_global(ay8910_latch_2);
+	state_save_register_global(machine, ay8910_latch_1);
+	state_save_register_global(machine, ay8910_latch_2);
 }
 
 
@@ -380,8 +380,8 @@ static SOUND_START( demoneye )
 {
 	pia_config(0, &demoneye_pia_intf);
 
-	state_save_register_global(ay8910_latch_1);
-	state_save_register_global(ay8910_latch_2);
+	state_save_register_global(machine, ay8910_latch_1);
+	state_save_register_global(machine, ay8910_latch_2);
 }
 
 

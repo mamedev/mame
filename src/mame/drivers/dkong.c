@@ -396,8 +396,8 @@ static MACHINE_START( dkong2b )
 
 	state->hardware_type = HARDWARE_TKG04;
 
-	state_save_register_global(state->decrypt_counter);
-	state_save_register_global(state->dma_latch);
+	state_save_register_global(machine, state->decrypt_counter);
+	state_save_register_global(machine, state->dma_latch);
 
 }
 
@@ -417,7 +417,7 @@ static MACHINE_START( s2650 )
 
 	state->hunchloopback = 0;
 
-	state_save_register_global(state->hunchloopback);
+	state_save_register_global(machine, state->hunchloopback);
 
 	if (strcmp(game_name,"herbiedk") == 0) state->protect_type = DK2650_HERBIEDK;
 	else if (strcmp(game_name,"hunchbkd") == 0) state->protect_type = DK2650_HUNCHBKD;

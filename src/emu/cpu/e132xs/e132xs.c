@@ -1529,15 +1529,15 @@ static void hyperstone_init(const device_config *device, int index, int clock, c
 {
 	hyperstone_state *cpustate = device->token;
 	
-	state_save_register_item_array("E132XS", device->tag, 0, cpustate->global_regs);
-	state_save_register_item_array("E132XS", device->tag, 0, cpustate->local_regs);
-	state_save_register_item("E132XS", device->tag, 0, cpustate->ppc);
-	state_save_register_item("E132XS", device->tag, 0, cpustate->trap_entry);
-	state_save_register_item("E132XS", device->tag, 0, cpustate->delay.delay_pc);
-	state_save_register_item("E132XS", device->tag, 0, cpustate->instruction_length);
-	state_save_register_item("E132XS", device->tag, 0, cpustate->intblock);
-	state_save_register_item("E132XS", device->tag, 0, cpustate->delay.delay_cmd);
-	state_save_register_item("E132XS", device->tag, 0, cpustate->tr_clocks_per_tick);
+	state_save_register_device_item_array(device, 0, cpustate->global_regs);
+	state_save_register_device_item_array(device, 0, cpustate->local_regs);
+	state_save_register_device_item(device, 0, cpustate->ppc);
+	state_save_register_device_item(device, 0, cpustate->trap_entry);
+	state_save_register_device_item(device, 0, cpustate->delay.delay_pc);
+	state_save_register_device_item(device, 0, cpustate->instruction_length);
+	state_save_register_device_item(device, 0, cpustate->intblock);
+	state_save_register_device_item(device, 0, cpustate->delay.delay_cmd);
+	state_save_register_device_item(device, 0, cpustate->tr_clocks_per_tick);
 
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;

@@ -224,8 +224,8 @@ MACHINE_DRIVER_END
 
 static SOUND_START( astrob )
 {
-	state_save_register_global_array(sound_state);
-	state_save_register_global(sound_rate);
+	state_save_register_global_array(machine, sound_state);
+	state_save_register_global(machine, sound_rate);
 }
 
 
@@ -464,11 +464,11 @@ MACHINE_DRIVER_END
 
 static SOUND_START( 005 )
 {
-	state_save_register_global_array(sound_state);
-	state_save_register_global(sound_addr);
-	state_save_register_global(sound_data);
-	state_save_register_global(square_state);
-	state_save_register_global(square_count);
+	state_save_register_global_array(machine, sound_state);
+	state_save_register_global(machine, sound_addr);
+	state_save_register_global(machine, sound_data);
+	state_save_register_global(machine, square_state);
+	state_save_register_global(machine, square_count);
 }
 
 
@@ -681,7 +681,7 @@ MACHINE_DRIVER_END
 
 static SOUND_START( spaceod )
 {
-	state_save_register_global_array(sound_state);
+	state_save_register_global_array(machine, sound_state);
 }
 
 
@@ -862,10 +862,10 @@ MACHINE_DRIVER_END
 
 static SOUND_START( monsterb )
 {
-	state_save_register_global_array(sound_state);
-	state_save_register_global(sound_addr);
-	state_save_register_global(n7751_command);
-	state_save_register_global(n7751_busy);
+	state_save_register_global_array(machine, sound_state);
+	state_save_register_global(machine, sound_addr);
+	state_save_register_global(machine, n7751_command);
+	state_save_register_global(machine, n7751_busy);
 }
 
 

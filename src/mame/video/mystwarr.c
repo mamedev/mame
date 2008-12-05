@@ -159,8 +159,8 @@ static TILE_GET_INFO( get_gai_936_tile_info )
 
 VIDEO_START(gaiapols)
 {
-	K055555_vh_start();
-	K054338_vh_start();
+	K055555_vh_start(machine);
+	K054338_vh_start(machine);
 
 	gametype = 0;
 
@@ -201,8 +201,8 @@ static TILE_GET_INFO( get_ult_936_tile_info )
 
 VIDEO_START(dadandrn)
 {
-	K055555_vh_start();
-	K054338_vh_start();
+	K055555_vh_start(machine);
+	K054338_vh_start(machine);
 
 	gametype = 1;
 
@@ -232,8 +232,8 @@ VIDEO_START(dadandrn)
 
 VIDEO_START(mystwarr)
 {
-	K055555_vh_start();
-	K054338_vh_start();
+	K055555_vh_start(machine);
+	K054338_vh_start(machine);
 
 	gametype = 0;
 
@@ -261,9 +261,9 @@ VIDEO_START(metamrph)
 
 	gametype = 0;
 
-	K055555_vh_start();
-	K054338_vh_start();
-	K053250_vh_start(1, &rgn_250);
+	K055555_vh_start(machine);
+	K054338_vh_start(machine);
+	K053250_vh_start(machine, 1, &rgn_250);
 
 	mystwarr_save_orig_tiles(machine);
 
@@ -288,8 +288,8 @@ VIDEO_START(viostorm)
 {
 	gametype = 0;
 
-	K055555_vh_start();
-	K054338_vh_start();
+	K055555_vh_start(machine);
+	K054338_vh_start(machine);
 
 	mystwarr_save_orig_tiles(machine);
 
@@ -311,8 +311,8 @@ VIDEO_START(martchmp)
 {
 	gametype = 0;
 
-	K055555_vh_start();
-	K054338_vh_start();
+	K055555_vh_start(machine);
+	K054338_vh_start(machine);
 
 	mystwarr_save_orig_tiles(machine);
 

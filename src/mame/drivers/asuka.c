@@ -262,7 +262,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 
 
 
-static void asuka_msm5205_vck(running_machine *machine, int chip)
+static void asuka_msm5205_vck(const device_config *device)
 {
 	if (adpcm_data != -1)
 	{
@@ -271,7 +271,7 @@ static void asuka_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(machine, "ym")[adpcm_pos];
+		adpcm_data = memory_region(device->machine, "ym")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(0, adpcm_data >> 4);
 	}
@@ -301,7 +301,7 @@ static MACHINE_START( asuka )
     memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "audio"), 0);
 	memory_configure_bank(machine, 1, 1, 3, memory_region(machine, "audio") + 0x10000, 0x04000);
 
-	state_save_register_global(adpcm_pos);
+	state_save_register_global(machine, adpcm_pos);
 }
 
 static MACHINE_RESET( asuka )

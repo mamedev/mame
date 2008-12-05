@@ -1,4 +1,5 @@
 #include "driver.h"
+#include "deprecat.h"
 #include "eeprom.h"
 
 #define VERBOSE 0
@@ -146,17 +147,17 @@ void eeprom_init(const eeprom_interface *interface)
 	if (intf->cmd_unlock) locked = 1;
 	else locked = 0;
 
-	state_save_register_global_array(eeprom_data);
-	state_save_register_global_array(serial_buffer);
-	state_save_register_global(clock_line);
-	state_save_register_global(reset_line);
-	state_save_register_global(locked);
-	state_save_register_global(serial_count);
-	state_save_register_global(latch);
-	state_save_register_global(reset_delay);
-	state_save_register_global(eeprom_clock_count);
-	state_save_register_global(eeprom_data_bits);
-	state_save_register_global(eeprom_read_address);
+	state_save_register_global_array(Machine, eeprom_data);
+	state_save_register_global_array(Machine, serial_buffer);
+	state_save_register_global(Machine, clock_line);
+	state_save_register_global(Machine, reset_line);
+	state_save_register_global(Machine, locked);
+	state_save_register_global(Machine, serial_count);
+	state_save_register_global(Machine, latch);
+	state_save_register_global(Machine, reset_delay);
+	state_save_register_global(Machine, eeprom_clock_count);
+	state_save_register_global(Machine, eeprom_data_bits);
+	state_save_register_global(Machine, eeprom_read_address);
 }
 
 static void eeprom_write(int bit)

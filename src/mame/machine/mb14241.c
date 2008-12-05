@@ -43,8 +43,8 @@ static UINT8 mb14241_shift_result_r(int num)
 READ8_HANDLER( mb14241_0_shift_result_r ) { return mb14241_shift_result_r(0); }
 
 
-void mb14241_init(int num)
+void mb14241_init(running_machine *machine,int num)
 {
-	state_save_register_item("mb14241", NULL, num, chips[num].shift_data);
-	state_save_register_item("mb14241", NULL, num, chips[num].shift_count);
+	state_save_register_item(machine, "mb14241", NULL, num, chips[num].shift_data);
+	state_save_register_item(machine, "mb14241", NULL, num, chips[num].shift_count);
 }

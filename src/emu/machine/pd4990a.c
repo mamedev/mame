@@ -31,6 +31,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "machine/pd4990a.h"
 
 
@@ -342,27 +343,27 @@ void pd4990a_init(void)
 	clock_line = 0;
 	command_line =0;
 
-	state_save_register_item("pd4990a", NULL, 0, pd4990a.seconds);
-	state_save_register_item("pd4990a", NULL, 0, pd4990a.minutes);
-	state_save_register_item("pd4990a", NULL, 0, pd4990a.hours);
-	state_save_register_item("pd4990a", NULL, 0, pd4990a.days);
-	state_save_register_item("pd4990a", NULL, 0, pd4990a.month);
-	state_save_register_item("pd4990a", NULL, 0, pd4990a.year);
-	state_save_register_item("pd4990a", NULL, 0, pd4990a.weekday);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, pd4990a.seconds);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, pd4990a.minutes);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, pd4990a.hours);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, pd4990a.days);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, pd4990a.month);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, pd4990a.year);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, pd4990a.weekday);
 
-	state_save_register_item("pd4990a", NULL, 0, shiftlo);
-	state_save_register_item("pd4990a", NULL, 0, shifthi);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, shiftlo);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, shifthi);
 
-	state_save_register_item("pd4990a", NULL, 0, retraces);
-	state_save_register_item("pd4990a", NULL, 0, testwaits);
-	state_save_register_item("pd4990a", NULL, 0, maxwaits);
-	state_save_register_item("pd4990a", NULL, 0, testbit);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, retraces);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, testwaits);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, maxwaits);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, testbit);
 
-	state_save_register_item("pd4990a", NULL, 0, outputbit);
-	state_save_register_item("pd4990a", NULL, 0, bitno);
-	state_save_register_item("pd4990a", NULL, 0, reading);
-	state_save_register_item("pd4990a", NULL, 0, writting);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, outputbit);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, bitno);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, reading);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, writting);
 
-	state_save_register_item("pd4990a", NULL, 0, clock_line);
-	state_save_register_item("pd4990a", NULL, 0, command_line);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, clock_line);
+	state_save_register_item(Machine, "pd4990a", NULL, 0, command_line);
 }

@@ -513,7 +513,7 @@ static void AICA_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((float) n)/log((float) 2))
 
-static void AICA_Init(const char *tag, struct _AICA *AICA, const aica_interface *intf, int sndindex)
+static void AICA_Init(const device_config *device, struct _AICA *AICA, const aica_interface *intf, int sndindex)
 {
 	int i;
 
@@ -534,11 +534,11 @@ static void AICA_Init(const char *tag, struct _AICA *AICA, const aica_interface 
 			AICA->Master=0;
 		}
 
-		AICA->AICARAM = memory_region(Machine, tag);
+		AICA->AICARAM = device->region;
 		if (AICA->AICARAM)
 		{
 			AICA->AICARAM += intf->roffset;
-			AICA->AICARAM_LENGTH = memory_region_length(Machine, tag);
+			AICA->AICARAM_LENGTH = device->regionbytes;
 			AICA->RAM_MASK = AICA->AICARAM_LENGTH-1;
 			AICA->RAM_MASK16 = AICA->RAM_MASK & 0x7ffffe;
 			AICA->DSP.AICARAM = (UINT16 *)AICA->AICARAM;
@@ -1296,7 +1296,7 @@ static SND_START( aica )
 	intf = config;
 
 	// init the emulation
-	AICA_Init(tag, AICA, intf, sndindex);
+	AICA_Init(device, AICA, intf, sndindex);
 
 	// set up the IRQ callbacks
 	{

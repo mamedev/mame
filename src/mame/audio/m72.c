@@ -108,8 +108,8 @@ MACHINE_RESET( m72_sound )
 {
 	setvector_callback(machine, NULL, VECTOR_INIT);
 
-	state_save_register_global(irqvector);
-	state_save_register_global(sample_addr);
+	state_save_register_global(machine, irqvector);
+	state_save_register_global(machine, sample_addr);
 }
 
 void m72_ym2151_irq_handler(running_machine *machine, int irq)

@@ -164,9 +164,9 @@ VIDEO_START( gottlieb )
 	tilemap_set_scrolldx(bg_tilemap, 0, 318 - 256);
 
 	/* save some state */
-	state_save_register_global(background_priority);
-	state_save_register_global(spritebank);
-	state_save_register_global(transparent0);
+	state_save_register_global(machine, background_priority);
+	state_save_register_global(machine, spritebank);
+	state_save_register_global(machine, transparent0);
 }
 
 

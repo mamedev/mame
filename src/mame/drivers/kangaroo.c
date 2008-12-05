@@ -179,7 +179,7 @@ static UINT8 kangaroo_clock;
 static MACHINE_START( kangaroo )
 {
 	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "gfx1"), 0x2000);
-	state_save_register_global(kangaroo_clock);
+	state_save_register_global(machine, kangaroo_clock);
 }
 
 

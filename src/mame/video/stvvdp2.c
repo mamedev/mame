@@ -5412,9 +5412,9 @@ static int stv_vdp2_start (running_machine *machine)
 	stv_rbg_cache_data.is_cache_dirty = 3;
 	memset( &stv_vdp2_layer_data_placement, 0, sizeof(stv_vdp2_layer_data_placement));
 
-	state_save_register_global_pointer(stv_vdp2_regs, 0x040000/4);
-	state_save_register_global_pointer(stv_vdp2_vram, 0x100000/4);
-	state_save_register_global_pointer(stv_vdp2_cram, 0x080000/4);
+	state_save_register_global_pointer(machine, stv_vdp2_regs, 0x040000/4);
+	state_save_register_global_pointer(machine, stv_vdp2_vram, 0x100000/4);
+	state_save_register_global_pointer(machine, stv_vdp2_cram, 0x080000/4);
 	state_save_register_postload(machine, stv_vdp2_state_save_postload, NULL);
 
 	return 0;

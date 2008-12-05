@@ -852,54 +852,54 @@ static TIMER_CALLBACK( dcs_reset )
  *
  *************************************/
 
-static void dcs_register_state(void)
+static void dcs_register_state(running_machine *machine)
 {
-	state_save_register_global_array(sdrc.reg);
-	state_save_register_global(sdrc.seed);
+	state_save_register_global_array(machine, sdrc.reg);
+	state_save_register_global(machine, sdrc.seed);
 
-	state_save_register_global_array(dsio.reg);
-	state_save_register_global(dsio.start_on_next_write);
-	state_save_register_global(dsio.channelbits);
+	state_save_register_global_array(machine, dsio.reg);
+	state_save_register_global(machine, dsio.start_on_next_write);
+	state_save_register_global(machine, dsio.channelbits);
 
-	state_save_register_global(dcs.channels);
-	state_save_register_global(dcs.size);
-	state_save_register_global(dcs.incs);
-	state_save_register_global(dcs.ireg);
-	state_save_register_global(dcs.ireg_base);
-	state_save_register_global_array(dcs.control_regs);
+	state_save_register_global(machine, dcs.channels);
+	state_save_register_global(machine, dcs.size);
+	state_save_register_global(machine, dcs.incs);
+	state_save_register_global(machine, dcs.ireg);
+	state_save_register_global(machine, dcs.ireg_base);
+	state_save_register_global_array(machine, dcs.control_regs);
 
-	state_save_register_global(dcs.sounddata_bank);
+	state_save_register_global(machine, dcs.sounddata_bank);
 
-	state_save_register_global(dcs.auto_ack);
-	state_save_register_global(dcs.latch_control);
-	state_save_register_global(dcs.input_data);
-	state_save_register_global(dcs.output_data);
-	state_save_register_global(dcs.output_control);
-	state_save_register_global(dcs.output_control_cycles);
-	state_save_register_global(dcs.last_output_full);
-	state_save_register_global(dcs.last_input_empty);
-	state_save_register_global(dcs.progflags);
+	state_save_register_global(machine, dcs.auto_ack);
+	state_save_register_global(machine, dcs.latch_control);
+	state_save_register_global(machine, dcs.input_data);
+	state_save_register_global(machine, dcs.output_data);
+	state_save_register_global(machine, dcs.output_control);
+	state_save_register_global(machine, dcs.output_control_cycles);
+	state_save_register_global(machine, dcs.last_output_full);
+	state_save_register_global(machine, dcs.last_input_empty);
+	state_save_register_global(machine, dcs.progflags);
 
-	state_save_register_global(dcs.timer_enable);
-	state_save_register_global(dcs.timer_ignore);
-	state_save_register_global(dcs.timer_start_cycles);
-	state_save_register_global(dcs.timer_start_count);
-	state_save_register_global(dcs.timer_scale);
-	state_save_register_global(dcs.timer_period);
-	state_save_register_global(dcs.timers_fired);
+	state_save_register_global(machine, dcs.timer_enable);
+	state_save_register_global(machine, dcs.timer_ignore);
+	state_save_register_global(machine, dcs.timer_start_cycles);
+	state_save_register_global(machine, dcs.timer_start_count);
+	state_save_register_global(machine, dcs.timer_scale);
+	state_save_register_global(machine, dcs.timer_period);
+	state_save_register_global(machine, dcs.timers_fired);
 
-	state_save_register_global(transfer.dcs_state);
-	state_save_register_global(transfer.state);
-	state_save_register_global(transfer.start);
-	state_save_register_global(transfer.stop);
-	state_save_register_global(transfer.type);
-	state_save_register_global(transfer.temp);
-	state_save_register_global(transfer.writes_left);
-	state_save_register_global(transfer.sum);
-	state_save_register_global(transfer.fifo_entries);
+	state_save_register_global(machine, transfer.dcs_state);
+	state_save_register_global(machine, transfer.state);
+	state_save_register_global(machine, transfer.start);
+	state_save_register_global(machine, transfer.stop);
+	state_save_register_global(machine, transfer.type);
+	state_save_register_global(machine, transfer.temp);
+	state_save_register_global(machine, transfer.writes_left);
+	state_save_register_global(machine, transfer.sum);
+	state_save_register_global(machine, transfer.fifo_entries);
 
 	if (dcs_sram != NULL)
-		state_save_register_global_pointer(dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
+		state_save_register_global_pointer(machine, dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
 
 	if (dcs.rev == 2)
 		state_save_register_postload(Machine, sdrc_postload, NULL);
@@ -938,7 +938,7 @@ void dcs_init(running_machine *machine)
 	dcs.auto_ack = TRUE;
 
 	/* register for save states */
-	dcs_register_state();
+	dcs_register_state(Machine);
 
 	/* reset the system */
 	dcs_reset(Machine, NULL, 0);
@@ -1015,7 +1015,7 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 		transfer.watchdog = timer_alloc(machine, transfer_watchdog_callback, NULL);
 
 	/* register for save states */
-	dcs_register_state();
+	dcs_register_state(machine);
 
 	/* reset the system */
 	dcs_reset(machine, NULL, 0);

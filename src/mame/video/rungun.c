@@ -107,7 +107,7 @@ VIDEO_START(rng)
 
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 
-	state_save_register_global_array(ttl_vram);
+	state_save_register_global_array(machine, ttl_vram);
 
 	sprite_colorbase = 0x20;
 }

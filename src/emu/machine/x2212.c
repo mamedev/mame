@@ -99,10 +99,10 @@ static DEVICE_START(x2212)
 		c->default_data = memory_region( device->machine, config->data );
 	}
 
-	state_save_register_item_pointer( "x2212", device->tag, 0, c->sram, SIZE_DATA );
-	state_save_register_item_pointer( "x2212", device->tag, 0, c->e2prom, SIZE_DATA );
-	state_save_register_item( "x2212", device->tag, 0, c->store );
-	state_save_register_item( "x2212", device->tag, 0, c->array_recall );
+	state_save_register_device_item_pointer( device, 0, c->sram, SIZE_DATA );
+	state_save_register_device_item_pointer( device, 0, c->e2prom, SIZE_DATA );
+	state_save_register_device_item( device, 0, c->store );
+	state_save_register_device_item( device, 0, c->array_recall );
 
 	return DEVICE_START_OK;
 }

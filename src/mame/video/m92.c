@@ -275,8 +275,8 @@ VIDEO_START( m92 )
 		tilemap_set_transmask(layer->tmap, 2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 		tilemap_set_transmask(layer->wide_tmap, 2, 0x0001, (laynum == 2) ? 0xfffe : 0xffff);
 
-		state_save_register_item("layer", NULL, laynum, layer->vram_base);
-		state_save_register_item_array("layer", NULL, laynum, layer->control);
+		state_save_register_item(machine, "layer", NULL, laynum, layer->vram_base);
+		state_save_register_item_array(machine, "layer", NULL, laynum, layer->control);
 	}
 
 	paletteram16 = auto_malloc(0x1000);
@@ -284,14 +284,14 @@ VIDEO_START( m92 )
 	memset(spriteram16,0,0x800);
 	memset(buffered_spriteram16,0,0x800);
 
-	state_save_register_global_array(pf_master_control);
+	state_save_register_global_array(machine, pf_master_control);
 
-	state_save_register_global(m92_sprite_list);
-	state_save_register_global(m92_raster_irq_position);
-	state_save_register_global(m92_sprite_buffer_busy);
-	state_save_register_global(m92_palette_bank);
+	state_save_register_global(machine, m92_sprite_list);
+	state_save_register_global(machine, m92_raster_irq_position);
+	state_save_register_global(machine, m92_sprite_buffer_busy);
+	state_save_register_global(machine, m92_palette_bank);
 
-	state_save_register_global_pointer(paletteram16, 0x1000);
+	state_save_register_global_pointer(machine, paletteram16, 0x1000);
 }
 
 /*****************************************************************************/

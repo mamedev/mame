@@ -1019,11 +1019,11 @@ static MACHINE_START( djmain )
 	if (ide != NULL && ide_user_password != NULL)
 		ide_set_user_password(ide, ide_user_password);
 
-	state_save_register_global(sndram_bank);
-	state_save_register_global_pointer(region, 0x80000 * 32);
-	state_save_register_global(pending_vb_int);
-	state_save_register_global(v_ctrl);
-	state_save_register_global_array(obj_regs);
+	state_save_register_global(machine, sndram_bank);
+	state_save_register_global_pointer(machine, region, 0x80000 * 32);
+	state_save_register_global(machine, pending_vb_int);
+	state_save_register_global(machine, v_ctrl);
+	state_save_register_global_array(machine, obj_regs);
 
 	state_save_register_postload(machine, djmain_postload, NULL);
 }

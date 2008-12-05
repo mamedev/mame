@@ -108,8 +108,8 @@ static VIDEO_START( crgolf )
 	crgolf_videoram_b = auto_malloc(VIDEORAM_SIZE);
 
 	/* register for save states */
-	state_save_register_global_pointer(crgolf_videoram_a, VIDEORAM_SIZE);
-	state_save_register_global_pointer(crgolf_videoram_b, VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, crgolf_videoram_a, VIDEORAM_SIZE);
+	state_save_register_global_pointer(machine, crgolf_videoram_b, VIDEORAM_SIZE);
 }
 
 

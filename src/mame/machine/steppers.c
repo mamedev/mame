@@ -630,14 +630,14 @@ void stepper_config(int which, const stepper_interface *intf)
 		break;
 	}
 
-	state_save_register_item("stepper", NULL, which, step[which].index_start);
-	state_save_register_item("stepper", NULL, which, step[which].index_end);
-	state_save_register_item("stepper", NULL, which, step[which].index_patt);
-	state_save_register_item("stepper", NULL, which, step[which].pattern);
-	state_save_register_item("stepper", NULL, which, step[which].old_pattern);
-	state_save_register_item("stepper", NULL, which, step[which].step_pos);
-	state_save_register_item("stepper", NULL, which, step[which].max_steps);
-	state_save_register_item("stepper", NULL, which, step[which].type);
+	state_save_register_item(Machine, "stepper", NULL, which, step[which].index_start);
+	state_save_register_item(Machine, "stepper", NULL, which, step[which].index_end);
+	state_save_register_item(Machine, "stepper", NULL, which, step[which].index_patt);
+	state_save_register_item(Machine, "stepper", NULL, which, step[which].pattern);
+	state_save_register_item(Machine, "stepper", NULL, which, step[which].old_pattern);
+	state_save_register_item(Machine, "stepper", NULL, which, step[which].step_pos);
+	state_save_register_item(Machine, "stepper", NULL, which, step[which].max_steps);
+	state_save_register_item(Machine, "stepper", NULL, which, step[which].type);
 }
 
 ///////////////////////////////////////////////////////////////////////////

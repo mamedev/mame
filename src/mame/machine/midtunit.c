@@ -49,16 +49,16 @@ static UINT8 	jdredd_prot_max;
  *
  *************************************/
 
-static void register_state_saving(void)
+static void register_state_saving(running_machine *machine)
 {
-	state_save_register_global(cmos_write_enable);
-	state_save_register_global(fake_sound_state);
-	state_save_register_global(mk_prot_index);
-	state_save_register_global(mk2_prot_data);
-	state_save_register_global_array(nbajam_prot_queue);
-	state_save_register_global(nbajam_prot_index);
-	state_save_register_global(jdredd_prot_index);
-	state_save_register_global(jdredd_prot_max);
+	state_save_register_global(machine, cmos_write_enable);
+	state_save_register_global(machine, fake_sound_state);
+	state_save_register_global(machine, mk_prot_index);
+	state_save_register_global(machine, mk2_prot_data);
+	state_save_register_global_array(machine, nbajam_prot_queue);
+	state_save_register_global(machine, nbajam_prot_index);
+	state_save_register_global(machine, jdredd_prot_index);
+	state_save_register_global(machine, jdredd_prot_max);
 }
 
 
@@ -401,7 +401,7 @@ static void init_tunit_generic(running_machine *machine, int sound)
 	int i;
 
 	/* register for state saving */
-	register_state_saving();
+	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
 	base = memory_region(machine, "gfx1");

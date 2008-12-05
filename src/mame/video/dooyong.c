@@ -650,9 +650,9 @@ VIDEO_START( lastday )
 	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(bgscroll8);
-	state_save_register_global_array(fgscroll8);
-	state_save_register_global(sprites_disabled);
+	state_save_register_global_array(machine, bgscroll8);
+	state_save_register_global_array(machine, fgscroll8);
+	state_save_register_global(machine, sprites_disabled);
 }
 
 VIDEO_START( gulfstrm )
@@ -687,8 +687,8 @@ VIDEO_START( gulfstrm )
 	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(bgscroll8);
-	state_save_register_global_array(fgscroll8);
+	state_save_register_global_array(machine, bgscroll8);
+	state_save_register_global_array(machine, fgscroll8);
 }
 
 VIDEO_START( pollux )
@@ -720,8 +720,8 @@ VIDEO_START( pollux )
 	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(bgscroll8);
-	state_save_register_global_array(fgscroll8);
+	state_save_register_global_array(machine, bgscroll8);
+	state_save_register_global_array(machine, fgscroll8);
 }
 
 VIDEO_START( bluehawk )
@@ -759,9 +759,9 @@ VIDEO_START( bluehawk )
 	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(bgscroll8);
-	state_save_register_global_array(fgscroll8);
-	state_save_register_global_array(fg2scroll8);
+	state_save_register_global_array(machine, bgscroll8);
+	state_save_register_global_array(machine, fgscroll8);
+	state_save_register_global_array(machine, fg2scroll8);
 }
 
 VIDEO_START( flytiger )
@@ -794,9 +794,9 @@ VIDEO_START( flytiger )
 	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(bgscroll8);
-	state_save_register_global_array(fgscroll8);
-	state_save_register_global(flytiger_pri);
+	state_save_register_global_array(machine, bgscroll8);
+	state_save_register_global_array(machine, fgscroll8);
+	state_save_register_global(machine, flytiger_pri);
 }
 
 VIDEO_START( primella )
@@ -828,9 +828,9 @@ VIDEO_START( primella )
 	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(bgscroll8);
-	state_save_register_global_array(fgscroll8);
-	state_save_register_global(tx_pri);
+	state_save_register_global_array(machine, bgscroll8);
+	state_save_register_global_array(machine, fgscroll8);
+	state_save_register_global(machine, tx_pri);
 }
 
 VIDEO_START( rshark )
@@ -870,11 +870,11 @@ VIDEO_START( rshark )
 	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(bgscroll8);
-	state_save_register_global_array(bg2scroll8);
-	state_save_register_global_array(fgscroll8);
-	state_save_register_global_array(fg2scroll8);
-	state_save_register_global(rshark_pri);
+	state_save_register_global_array(machine, bgscroll8);
+	state_save_register_global_array(machine, bg2scroll8);
+	state_save_register_global_array(machine, fgscroll8);
+	state_save_register_global_array(machine, fg2scroll8);
+	state_save_register_global(machine, rshark_pri);
 }
 
 VIDEO_START( popbingo )
@@ -894,11 +894,11 @@ VIDEO_START( popbingo )
 	memset(fg2scroll8, 0, 0x10);
 
 	/* Register for save/restore */
-	state_save_register_global_array(bgscroll8);
-	state_save_register_global_array(bg2scroll8);	// Not used atm
-	state_save_register_global_array(fgscroll8);	// Not used atm
-	state_save_register_global_array(fg2scroll8);	// Not used atm
-	state_save_register_global(rshark_pri);
+	state_save_register_global_array(machine, bgscroll8);
+	state_save_register_global_array(machine, bg2scroll8);	// Not used atm
+	state_save_register_global_array(machine, fgscroll8);	// Not used atm
+	state_save_register_global_array(machine, fg2scroll8);	// Not used atm
+	state_save_register_global(machine, rshark_pri);
 }
 
 

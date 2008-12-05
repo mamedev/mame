@@ -48,7 +48,7 @@ VIDEO_START(moo)
 	alpha_enabled = 0;
 
 	K053251_vh_start(machine);
-	K054338_vh_start();
+	K054338_vh_start(machine);
 
 	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, moo_tile_callback, 0);
 

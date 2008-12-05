@@ -49,10 +49,10 @@ static VIDEO_START( qix )
 	state->videoram = auto_malloc(256 * 256);
 
 	/* set up save states */
-	state_save_register_global_pointer(state->videoram, 256 * 256);
-	state_save_register_global(state->flip);
-	state_save_register_global(state->palette_bank);
-	state_save_register_global(state->leds);
+	state_save_register_global_pointer(machine, state->videoram, 256 * 256);
+	state_save_register_global(machine, state->flip);
+	state_save_register_global(machine, state->palette_bank);
+	state_save_register_global(machine, state->leds);
 }
 
 

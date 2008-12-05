@@ -354,10 +354,10 @@ static MACHINE_START( konamigq )
 	psx_dma_install_read_handler(5, scsi_dma_read);
 	psx_dma_install_write_handler(5, scsi_dma_write);
 
-	state_save_register_global_pointer(m_p_n_pcmram, 0x380000);
-	state_save_register_global_array(sndto000);
-	state_save_register_global_array(sndtor3k);
-	state_save_register_global_array(sector_buffer);
+	state_save_register_global_pointer(machine, m_p_n_pcmram, 0x380000);
+	state_save_register_global_array(machine, sndto000);
+	state_save_register_global_array(machine, sndtor3k);
+	state_save_register_global_array(machine, sector_buffer);
 }
 
 static MACHINE_RESET( konamigq )

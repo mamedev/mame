@@ -176,7 +176,7 @@ void tms5110_set_variant(void *chip, int variant)
 	tms->variant = variant;
 }
 
-void *tms5110_create(const char *tag, int variant)
+void *tms5110_create(const device_config *device, int variant)
 {
 	struct tms5110 *tms;
 
@@ -185,45 +185,45 @@ void *tms5110_create(const char *tag, int variant)
 
 	tms5110_set_variant(tms, variant);
 
-	state_save_register_item_array("tms5110", tag, 0, tms->fifo);
-	state_save_register_item("tms5110", tag, 0, tms->fifo_head);
-	state_save_register_item("tms5110", tag, 0, tms->fifo_tail);
-	state_save_register_item("tms5110", tag, 0, tms->fifo_count);
+	state_save_register_device_item_array(device, 0, tms->fifo);
+	state_save_register_device_item(device, 0, tms->fifo_head);
+	state_save_register_device_item(device, 0, tms->fifo_tail);
+	state_save_register_device_item(device, 0, tms->fifo_count);
 
-	state_save_register_item("tms5110", tag, 0, tms->PDC);
-	state_save_register_item("tms5110", tag, 0, tms->CTL_pins);
-	state_save_register_item("tms5110", tag, 0, tms->speaking_now);
-	state_save_register_item("tms5110", tag, 0, tms->speak_delay_frames);
-	state_save_register_item("tms5110", tag, 0, tms->talk_status);
+	state_save_register_device_item(device, 0, tms->PDC);
+	state_save_register_device_item(device, 0, tms->CTL_pins);
+	state_save_register_device_item(device, 0, tms->speaking_now);
+	state_save_register_device_item(device, 0, tms->speak_delay_frames);
+	state_save_register_device_item(device, 0, tms->talk_status);
 
-	state_save_register_item("tms5110", tag, 0, tms->old_energy);
-	state_save_register_item("tms5110", tag, 0, tms->old_pitch);
-	state_save_register_item_array("tms5110", tag, 0, tms->old_k);
+	state_save_register_device_item(device, 0, tms->old_energy);
+	state_save_register_device_item(device, 0, tms->old_pitch);
+	state_save_register_device_item_array(device, 0, tms->old_k);
 
-	state_save_register_item("tms5110", tag, 0, tms->new_energy);
-	state_save_register_item("tms5110", tag, 0, tms->new_pitch);
-	state_save_register_item_array("tms5110", tag, 0, tms->new_k);
+	state_save_register_device_item(device, 0, tms->new_energy);
+	state_save_register_device_item(device, 0, tms->new_pitch);
+	state_save_register_device_item_array(device, 0, tms->new_k);
 
-	state_save_register_item("tms5110", tag, 0, tms->current_energy);
-	state_save_register_item("tms5110", tag, 0, tms->current_pitch);
-	state_save_register_item_array("tms5110", tag, 0, tms->current_k);
+	state_save_register_device_item(device, 0, tms->current_energy);
+	state_save_register_device_item(device, 0, tms->current_pitch);
+	state_save_register_device_item_array(device, 0, tms->current_k);
 
-	state_save_register_item("tms5110", tag, 0, tms->target_energy);
-	state_save_register_item("tms5110", tag, 0, tms->target_pitch);
-	state_save_register_item_array("tms5110", tag, 0, tms->target_k);
+	state_save_register_device_item(device, 0, tms->target_energy);
+	state_save_register_device_item(device, 0, tms->target_pitch);
+	state_save_register_device_item_array(device, 0, tms->target_k);
 
-	state_save_register_item("tms5110", tag, 0, tms->interp_count);
-	state_save_register_item("tms5110", tag, 0, tms->sample_count);
-	state_save_register_item("tms5110", tag, 0, tms->pitch_count);
+	state_save_register_device_item(device, 0, tms->interp_count);
+	state_save_register_device_item(device, 0, tms->sample_count);
+	state_save_register_device_item(device, 0, tms->pitch_count);
 
-	state_save_register_item("tms5110", tag, 0, tms->next_is_address);
-	state_save_register_item("tms5110", tag, 0, tms->address);
-	state_save_register_item("tms5110", tag, 0, tms->schedule_dummy_read);
-	state_save_register_item("tms5110", tag, 0, tms->addr_bit);
+	state_save_register_device_item(device, 0, tms->next_is_address);
+	state_save_register_device_item(device, 0, tms->address);
+	state_save_register_device_item(device, 0, tms->schedule_dummy_read);
+	state_save_register_device_item(device, 0, tms->addr_bit);
 
-	state_save_register_item_array("tms5110", tag, 0, tms->x);
+	state_save_register_device_item_array(device, 0, tms->x);
 
-	state_save_register_item("tms5110", tag, 0, tms->RNG);
+	state_save_register_device_item(device, 0, tms->RNG);
 
 	return tms;
 }

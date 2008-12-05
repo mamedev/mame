@@ -175,8 +175,8 @@ void sys24_tile_vh_start(running_machine *machine, UINT16 tile_mask)
 
 	machine->gfx[sys24_char_gfx_index]->total_colors = machine->config->total_colors / 16;
 
-	state_save_register_global_pointer(sys24_tile_ram, 0x10000/2);
-	state_save_register_global_pointer(sys24_char_ram, 0x80000/2);
+	state_save_register_global_pointer(machine, sys24_tile_ram, 0x10000/2);
+	state_save_register_global_pointer(machine, sys24_char_ram, 0x80000/2);
 	state_save_register_postload(machine, sys24_tile_dirtyall, NULL);
 }
 
@@ -635,11 +635,11 @@ WRITE32_HANDLER(sys24_char32_w)
 
 static UINT16 *sys24_sprite_ram;
 
-void sys24_sprite_vh_start(void)
+void sys24_sprite_vh_start(running_machine *machine)
 {
 	sys24_sprite_ram = auto_malloc(0x40000);
 
-	state_save_register_global_pointer(sys24_sprite_ram, 0x40000/2);
+	state_save_register_global_pointer(machine, sys24_sprite_ram, 0x40000/2);
 	//  kc = 0;
 }
 
@@ -877,10 +877,10 @@ READ16_HANDLER(sys24_sprite_r)
 
 static UINT16 sys24_mixer_reg[0x10];
 
-void sys24_mixer_vh_start(void)
+void sys24_mixer_vh_start(running_machine *machine)
 {
 	memset(sys24_mixer_reg, 0, sizeof(sys24_mixer_reg));
-	state_save_register_global_array(sys24_mixer_reg);
+	state_save_register_global_array(machine, sys24_mixer_reg);
 }
 
 WRITE16_HANDLER (sys24_mixer_w)

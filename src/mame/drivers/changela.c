@@ -556,27 +556,27 @@ ROM_END
 
 static DRIVER_INIT(changela)
 {
-	state_save_register_global(portA_in);
-	state_save_register_global(portA_out);
-	state_save_register_global(ddrA);
-	state_save_register_global(portB_out);
-	state_save_register_global(ddrB);
-	state_save_register_global(portC_in);
-	state_save_register_global(portC_out);
-	state_save_register_global(ddrC);
+	state_save_register_global(machine, portA_in);
+	state_save_register_global(machine, portA_out);
+	state_save_register_global(machine, ddrA);
+	state_save_register_global(machine, portB_out);
+	state_save_register_global(machine, ddrB);
+	state_save_register_global(machine, portC_in);
+	state_save_register_global(machine, portC_out);
+	state_save_register_global(machine, ddrC);
 
-	state_save_register_global(mcu_out);
-	state_save_register_global(mcu_in);
-	state_save_register_global(mcu_PC1);
-	state_save_register_global(mcu_PC0);
+	state_save_register_global(machine, mcu_out);
+	state_save_register_global(machine, mcu_in);
+	state_save_register_global(machine, mcu_PC1);
+	state_save_register_global(machine, mcu_PC0);
 
-	state_save_register_global(changela_tree0_col);
-	state_save_register_global(changela_tree1_col);
-	state_save_register_global(changela_left_bank_col);
-	state_save_register_global(changela_right_bank_col);
-	state_save_register_global(changela_boat_shore_col);
-	state_save_register_global(changela_collision_reset);
-	state_save_register_global(changela_tree_collision_reset);
+	state_save_register_global(machine, changela_tree0_col);
+	state_save_register_global(machine, changela_tree1_col);
+	state_save_register_global(machine, changela_left_bank_col);
+	state_save_register_global(machine, changela_right_bank_col);
+	state_save_register_global(machine, changela_boat_shore_col);
+	state_save_register_global(machine, changela_collision_reset);
+	state_save_register_global(machine, changela_tree_collision_reset);
 }
 
 GAME( 1983, changela, 0, changela, changela, changela, ROT180, "Taito Corporation", "Change Lanes", GAME_SUPPORTS_SAVE )

@@ -220,7 +220,7 @@ static WRITE8_HANDLER( firetrap_sound_bankselect_w )
 
 static int msm5205next;
 
-static void firetrap_adpcm_int (running_machine *machine, int data)
+static void firetrap_adpcm_int (const device_config *device)
 {
 	static int toggle=0;
 
@@ -229,7 +229,7 @@ static void firetrap_adpcm_int (running_machine *machine, int data)
 
 	toggle ^= 1;
 	if (firetrap_irq_enable && toggle)
-		cpu_set_input_line (machine->cpu[1], M6502_IRQ_LINE, HOLD_LINE);
+		cpu_set_input_line (device->machine->cpu[1], M6502_IRQ_LINE, HOLD_LINE);
 }
 
 static WRITE8_HANDLER( firetrap_adpcm_data_w )

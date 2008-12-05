@@ -299,8 +299,8 @@ static SOUND_START( gottlieb1 )
 	score_sample = 7;
 	random_offset = 0;
 
-	state_save_register_global_array(votrax_queue);
-	state_save_register_global(votrax_queuepos);
+	state_save_register_global_array(machine, votrax_queue);
+	state_save_register_global(machine, votrax_queuepos);
 }
 
 
@@ -552,11 +552,11 @@ static SOUND_START( gottlieb2 )
 	nmi_timer_adjust();
 
 	/* register for save states */
-	state_save_register_global(nmi_rate);
-	state_save_register_global(nmi_state);
-	state_save_register_global(speech_control);
-	state_save_register_global(sp0250_drq);
-	state_save_register_global(last_command);
+	state_save_register_global(machine, nmi_rate);
+	state_save_register_global(machine, nmi_state);
+	state_save_register_global(machine, speech_control);
+	state_save_register_global(machine, sp0250_drq);
+	state_save_register_global(machine, last_command);
 }
 
 

@@ -149,9 +149,9 @@ VIDEO_START( tiamc1 )
 	tiamc1_bg_vshift = 0;
 	tiamc1_bg_hshift = 0;
 
-	state_save_register_global(tiamc1_layers_ctrl);
-	state_save_register_global(tiamc1_bg_vshift);
-	state_save_register_global(tiamc1_bg_hshift);
+	state_save_register_global(machine, tiamc1_layers_ctrl);
+	state_save_register_global(machine, tiamc1_bg_vshift);
+	state_save_register_global(machine, tiamc1_bg_hshift);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

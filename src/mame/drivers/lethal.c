@@ -583,7 +583,7 @@ static const k054539_interface k054539_config =
 
 static MACHINE_START( lethalen )
 {
-	state_save_register_global(cur_control2);
+	state_save_register_global(machine, cur_control2);
 }
 
 static MACHINE_RESET( lethalen )

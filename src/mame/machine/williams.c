@@ -366,7 +366,7 @@ static MACHINE_RESET( williams_common )
 	scan240_timer = timer_alloc(machine, williams_count240_callback, NULL);
 	timer_adjust_oneshot(scan240_timer, video_screen_get_time_until_pos(machine->primary_screen, 240, 0), 0);
 
-	state_save_register_global(vram_bank);
+	state_save_register_global(machine, vram_bank);
 }
 
 
@@ -463,7 +463,7 @@ MACHINE_RESET( williams2 )
 	scan254_timer = timer_alloc(machine, williams2_endscreen_callback, NULL);
 	timer_adjust_oneshot(scan254_timer, video_screen_get_time_until_pos(machine->primary_screen, 254, 0), 0);
 
-	state_save_register_global(vram_bank);
+	state_save_register_global(machine, vram_bank);
 	state_save_register_postload(machine, williams2_postload, NULL);
 }
 
@@ -827,7 +827,7 @@ MACHINE_RESET( blaster )
 	memory_configure_bank(machine, 2, 0, 1, williams_videoram + 0x4000, 0);
 	memory_configure_bank(machine, 2, 1, 16, memory_region(machine, "main") + 0x10000, 0x0000);
 
-	state_save_register_global(blaster_bank);
+	state_save_register_global(machine, blaster_bank);
 }
 
 
@@ -942,7 +942,7 @@ MACHINE_RESET( joust2 )
 	/* standard init */
 	MACHINE_RESET_CALL(williams2);
 	pia_set_input_ca1(3, 1);
-	state_save_register_global(joust2_current_sound_data);
+	state_save_register_global(machine, joust2_current_sound_data);
 }
 
 

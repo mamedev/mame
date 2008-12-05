@@ -4,14 +4,14 @@
 
 ***************************************************************************/
 
-#include "state.h"
 #include "scsidev.h"
 #include "cdrom.h"
 #include "sound/cdda.h"
+#include "state.h"
 #ifdef MESS
 #include "devices/chd_cd.h"
-#include "deprecat.h"
 #endif
+#include "deprecat.h"
 #include "scsicd.h"
 
 typedef struct
@@ -683,13 +683,13 @@ static void scsicd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	our_this->cur_subblock = 0;
 	our_this->play_err_flag = 0;
 
-	state_save_register_item( "scsicd", diskregion, 0, our_this->lba );
-	state_save_register_item( "scsicd", diskregion, 0, our_this->blocks );
-	state_save_register_item( "scsicd", diskregion, 0, our_this->last_lba );
-	state_save_register_item( "scsicd", diskregion, 0, our_this->bytes_per_sector );
-	state_save_register_item( "scsicd", diskregion, 0, our_this->num_subblocks );
-	state_save_register_item( "scsicd", diskregion, 0, our_this->cur_subblock );
-	state_save_register_item( "scsicd", diskregion, 0, our_this->play_err_flag );
+	state_save_register_item( Machine, "scsicd", diskregion, 0, our_this->lba );
+	state_save_register_item( Machine, "scsicd", diskregion, 0, our_this->blocks );
+	state_save_register_item( Machine, "scsicd", diskregion, 0, our_this->last_lba );
+	state_save_register_item( Machine, "scsicd", diskregion, 0, our_this->bytes_per_sector );
+	state_save_register_item( Machine, "scsicd", diskregion, 0, our_this->num_subblocks );
+	state_save_register_item( Machine, "scsicd", diskregion, 0, our_this->cur_subblock );
+	state_save_register_item( Machine, "scsicd", diskregion, 0, our_this->play_err_flag );
 
 #ifdef MESS
 	/* TODO: get rid of this ifdef MESS section */

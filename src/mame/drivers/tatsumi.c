@@ -1219,7 +1219,7 @@ static DRIVER_INIT( apache3 )
 	tatsumi_rom_clut0 = memory_region(machine, "gfx2")+ 0x100000 - 0x800;
 	tatsumi_rom_clut1 = memory_region(machine, "gfx3")+ 0x100000 - 0x800;
 
-	tatsumi_reset();
+	tatsumi_reset(machine);
 }
 
 static DRIVER_INIT( roundup5 )
@@ -1244,7 +1244,7 @@ static DRIVER_INIT( roundup5 )
 	tatsumi_rom_clut0 = memory_region(machine, "gfx2")+ 0xc0000 - 0x800;
 	tatsumi_rom_clut1 = memory_region(machine, "gfx3")+ 0xc0000 - 0x800;
 
-	tatsumi_reset();
+	tatsumi_reset(machine);
 }
 
 static DRIVER_INIT( cyclwarr )
@@ -1278,7 +1278,7 @@ static DRIVER_INIT( cyclwarr )
 	tatsumi_rom_clut0 = memory_region(machine, "gfx2") + len1 - 0x1000;
 	tatsumi_rom_clut1 = memory_region(machine, "gfx3") + len2 - 0x1000;
 
-	tatsumi_reset();
+	tatsumi_reset(machine);
 }
 
 /***************************************************************************/

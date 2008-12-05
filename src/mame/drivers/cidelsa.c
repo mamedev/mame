@@ -555,7 +555,7 @@ static MACHINE_START( cidelsa )
 
 	/* register for state saving */
 
-	state_save_register_global(state->cdp1802_mode);
+	state_save_register_global(machine, state->cdp1802_mode);
 }
 
 static MACHINE_START( draco )
@@ -571,8 +571,8 @@ static MACHINE_START( draco )
 
 	/* register for state saving */
 
-	state_save_register_global(state->draco_sound);
-	state_save_register_global(state->draco_ay_latch);
+	state_save_register_global(machine, state->draco_sound);
+	state_save_register_global(machine, state->draco_ay_latch);
 }
 
 /* Machine Reset */

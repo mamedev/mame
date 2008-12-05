@@ -64,8 +64,8 @@ VIDEO_START( gng )
 	tilemap_set_transmask(bg_tilemap,1,0x41,0xbe); /* split type 1 has pens 0 and 6 transparent in front half */
 
 	/* register to save state */
-	state_save_register_global_array(scrollx);
-	state_save_register_global_array(scrolly);
+	state_save_register_global_array(machine, scrollx);
+	state_save_register_global_array(machine, scrolly);
 }
 
 

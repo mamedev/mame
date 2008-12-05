@@ -60,16 +60,16 @@ static VIDEO_START(backfire)
 	deco16_pf34_control = auto_malloc(0x10);
 
 	/* and register the allocated ram so that save states still work */
-	state_save_register_global_pointer(deco16_pf1_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf2_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf3_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf4_data, 0x2000/2);
-	state_save_register_global_pointer(deco16_pf1_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf2_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf3_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf4_rowscroll, 0x800/2);
-	state_save_register_global_pointer(deco16_pf12_control, 0x10/2);
-	state_save_register_global_pointer(deco16_pf34_control, 0x10/2);
+	state_save_register_global_pointer(machine, deco16_pf1_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf2_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf3_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf4_data, 0x2000/2);
+	state_save_register_global_pointer(machine, deco16_pf1_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf2_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf3_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf4_rowscroll, 0x800/2);
+	state_save_register_global_pointer(machine, deco16_pf12_control, 0x10/2);
+	state_save_register_global_pointer(machine, deco16_pf34_control, 0x10/2);
 
 	deco16_2_video_init(machine, 0);
 

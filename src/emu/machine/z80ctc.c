@@ -494,15 +494,15 @@ static DEVICE_START( z80ctc )
 	ctc->channel[3].zc = NULL;
 
 	/* register for save states */
-    state_save_register_item("z80ctc", device->tag, 0, ctc->vector);
+    state_save_register_device_item(device, 0, ctc->vector);
     for (ch = 0; ch < 4; ch++)
     {
 		ctc_channel *channel = &ctc->channel[ch];
-	    state_save_register_item("z80ctc", device->tag, ch, channel->mode);
-	    state_save_register_item("z80ctc", device->tag, ch, channel->tconst);
-	    state_save_register_item("z80ctc", device->tag, ch, channel->down);
-	    state_save_register_item("z80ctc", device->tag, ch, channel->extclk);
-	    state_save_register_item("z80ctc", device->tag, ch, channel->int_state);
+	    state_save_register_device_item(device, ch, channel->mode);
+	    state_save_register_device_item(device, ch, channel->tconst);
+	    state_save_register_device_item(device, ch, channel->down);
+	    state_save_register_device_item(device, ch, channel->extclk);
+	    state_save_register_device_item(device, ch, channel->int_state);
 	}
 
 	astring_free(tempstring);

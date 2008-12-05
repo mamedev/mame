@@ -139,9 +139,9 @@ void genesis_irq2_interrupt(running_machine *machine, int state)
 
 MACHINE_START( genesis )
 {
-	state_save_register_global(irq2_int);
-	state_save_register_global(scanline_int);
-	state_save_register_global(vblank_int);
+	state_save_register_global(machine, irq2_int);
+	state_save_register_global(machine, scanline_int);
+	state_save_register_global(machine, vblank_int);
 }
 
 

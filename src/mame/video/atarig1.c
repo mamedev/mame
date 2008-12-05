@@ -131,10 +131,10 @@ VIDEO_START( atarig1 )
 	playfield_yscroll = 0;
 
 	/* state saving */
-	state_save_register_global(current_control);
-	state_save_register_global(playfield_tile_bank);
-	state_save_register_global(playfield_xscroll);
-	state_save_register_global(playfield_yscroll);
+	state_save_register_global(machine, current_control);
+	state_save_register_global(machine, playfield_tile_bank);
+	state_save_register_global(machine, playfield_xscroll);
+	state_save_register_global(machine, playfield_yscroll);
 }
 
 

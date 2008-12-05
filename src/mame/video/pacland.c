@@ -224,9 +224,9 @@ VIDEO_START( pacland )
 	spriteram_2 = spriteram + 0x800;
 	spriteram_3 = spriteram_2 + 0x800;
 
-	state_save_register_global(palette_bank);
-	state_save_register_global(scroll0);
-	state_save_register_global(scroll1);
+	state_save_register_global(machine, palette_bank);
+	state_save_register_global(machine, scroll0);
+	state_save_register_global(machine, scroll1);
 }
 
 

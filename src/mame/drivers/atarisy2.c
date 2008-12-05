@@ -245,14 +245,14 @@ static DIRECT_UPDATE_HANDLER( atarisy2_direct_handler )
 
 static MACHINE_START( atarisy2 )
 {
-	state_save_register_global(interrupt_enable);
-	state_save_register_global(tms5220_data);
-	state_save_register_global(tms5220_data_strobe);
-	state_save_register_global(which_adc);
-	state_save_register_global(p2portwr_state);
-	state_save_register_global(p2portrd_state);
+	state_save_register_global(machine, interrupt_enable);
+	state_save_register_global(machine, tms5220_data);
+	state_save_register_global(machine, tms5220_data_strobe);
+	state_save_register_global(machine, which_adc);
+	state_save_register_global(machine, p2portwr_state);
+	state_save_register_global(machine, p2portrd_state);
 	state_save_register_postload(machine, bankselect_postload, NULL);
-	state_save_register_global(sound_reset_state);
+	state_save_register_global(machine, sound_reset_state);
 }
 
 

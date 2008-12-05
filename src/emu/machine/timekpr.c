@@ -321,16 +321,16 @@ static DEVICE_START(timekeeper)
 		}
 	}
 
-	state_save_register_item( "timekeeper", device->tag, 0, c->control );
-	state_save_register_item( "timekeeper", device->tag, 0, c->seconds );
-	state_save_register_item( "timekeeper", device->tag, 0, c->minutes );
-	state_save_register_item( "timekeeper", device->tag, 0, c->hours );
-	state_save_register_item( "timekeeper", device->tag, 0, c->day );
-	state_save_register_item( "timekeeper", device->tag, 0, c->date );
-	state_save_register_item( "timekeeper", device->tag, 0, c->month );
-	state_save_register_item( "timekeeper", device->tag, 0, c->year );
-	state_save_register_item( "timekeeper", device->tag, 0, c->century );
-	state_save_register_item_pointer( "timekeeper", device->tag, 0, c->data, c->size );
+	state_save_register_device_item( device, 0, c->control );
+	state_save_register_device_item( device, 0, c->seconds );
+	state_save_register_device_item( device, 0, c->minutes );
+	state_save_register_device_item( device, 0, c->hours );
+	state_save_register_device_item( device, 0, c->day );
+	state_save_register_device_item( device, 0, c->date );
+	state_save_register_device_item( device, 0, c->month );
+	state_save_register_device_item( device, 0, c->year );
+	state_save_register_device_item( device, 0, c->century );
+	state_save_register_device_item_pointer( device, 0, c->data, c->size );
 
 	timer = timer_alloc( device->machine, timekeeper_tick, c );
 	duration = ATTOTIME_IN_SEC(1);

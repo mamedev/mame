@@ -2505,28 +2505,28 @@ static MACHINE_START( stv )
 	SCSP_set_ram_base(0, sound_ram);
 
 	// save states
-	state_save_register_global_pointer(smpc_ram, 0x80);
-	state_save_register_global_pointer(stv_scu, 0x100/4);
-	state_save_register_global_pointer(scsp_regs, 0x1000/2);
-//  state_save_register_global(stv_vblank);
-//  state_save_register_global(stv_hblank);
-	state_save_register_global(stv_enable_slave_sh2);
-	state_save_register_global(NMI_reset);
-	state_save_register_global(en_68k);
-	state_save_register_global(timer_0);
-	state_save_register_global(timer_1);
-//  state_save_register_global(scanline);
-	state_save_register_global(IOSEL1);
-	state_save_register_global(IOSEL2);
-	state_save_register_global(EXLE1);
-	state_save_register_global(EXLE2);
-	state_save_register_global(PDR1);
-	state_save_register_global(PDR2);
-	state_save_register_global(port_sel);
-	state_save_register_global(mux_data);
-	state_save_register_global(scsp_last_line);
+	state_save_register_global_pointer(machine, smpc_ram, 0x80);
+	state_save_register_global_pointer(machine, stv_scu, 0x100/4);
+	state_save_register_global_pointer(machine, scsp_regs, 0x1000/2);
+//  state_save_register_global(machine, stv_vblank);
+//  state_save_register_global(machine, stv_hblank);
+	state_save_register_global(machine, stv_enable_slave_sh2);
+	state_save_register_global(machine, NMI_reset);
+	state_save_register_global(machine, en_68k);
+	state_save_register_global(machine, timer_0);
+	state_save_register_global(machine, timer_1);
+//  state_save_register_global(machine, scanline);
+	state_save_register_global(machine, IOSEL1);
+	state_save_register_global(machine, IOSEL2);
+	state_save_register_global(machine, EXLE1);
+	state_save_register_global(machine, EXLE2);
+	state_save_register_global(machine, PDR1);
+	state_save_register_global(machine, PDR2);
+	state_save_register_global(machine, port_sel);
+	state_save_register_global(machine, mux_data);
+	state_save_register_global(machine, scsp_last_line);
 
-	stv_register_protection_savestates(); // machine/stvprot.c
+	stv_register_protection_savestates(machine); // machine/stvprot.c
 
 	add_exit_callback(machine, stvcd_exit);
 }

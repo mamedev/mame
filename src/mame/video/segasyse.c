@@ -123,14 +123,14 @@ static void vdp_start(running_machine *machine, UINT8 chip)
 
 	/* Save State Stuff (based on video/taitoic.c) */
 
-	state_save_register_item_pointer("VDP", NULL, chip, segae_vdp_vram[chip], 0x8000);
-	state_save_register_item_pointer("VDP", NULL, chip, vdp_cram[chip], 0x20);
-	state_save_register_item_pointer("VDP", NULL, chip, segae_vdp_regs[chip], 0x20);
-	state_save_register_item("VDP", NULL, chip, vdp_cmdpart[chip]);
-	state_save_register_item("VDP", NULL, chip, vdp_command[chip]);
-	state_save_register_item("VDP", NULL, chip, vdp_accessmode[chip]);
-	state_save_register_item("VDP", NULL, chip, vdp_accessaddr[chip]);
-	state_save_register_item("VDP", NULL, chip, segae_vdp_vrambank[chip]);
+	state_save_register_item_pointer(machine, "VDP", NULL, chip, segae_vdp_vram[chip], 0x8000);
+	state_save_register_item_pointer(machine, "VDP", NULL, chip, vdp_cram[chip], 0x20);
+	state_save_register_item_pointer(machine, "VDP", NULL, chip, segae_vdp_regs[chip], 0x20);
+	state_save_register_item(machine, "VDP", NULL, chip, vdp_cmdpart[chip]);
+	state_save_register_item(machine, "VDP", NULL, chip, vdp_command[chip]);
+	state_save_register_item(machine, "VDP", NULL, chip, vdp_accessmode[chip]);
+	state_save_register_item(machine, "VDP", NULL, chip, vdp_accessaddr[chip]);
+	state_save_register_item(machine, "VDP", NULL, chip, segae_vdp_vrambank[chip]);
 }
 
 /*******************************************************************************

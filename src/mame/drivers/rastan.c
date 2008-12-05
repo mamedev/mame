@@ -186,7 +186,7 @@ static WRITE8_HANDLER( rastan_bankswitch_w )
 }
 
 
-static void rastan_msm5205_vck(running_machine *machine, int chip)
+static void rastan_msm5205_vck(const device_config *device)
 {
 	if (adpcm_data != -1)
 	{
@@ -195,7 +195,7 @@ static void rastan_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(machine, "adpcm")[adpcm_pos];
+		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(0, adpcm_data >> 4);
 	}

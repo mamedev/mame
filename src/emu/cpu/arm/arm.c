@@ -511,10 +511,10 @@ static CPU_INIT( arm )
 	arm.device = device;
 	arm.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item_array("arm", device->tag, 0, arm.sArmRegister);
-	state_save_register_item_array("arm", device->tag, 0, arm.coproRegister);
-	state_save_register_item("arm", device->tag, 0, arm.pendingIrq);
-	state_save_register_item("arm", device->tag, 0, arm.pendingFiq);
+	state_save_register_device_item_array(device, 0, arm.sArmRegister);
+	state_save_register_device_item_array(device, 0, arm.coproRegister);
+	state_save_register_device_item(device, 0, arm.pendingIrq);
+	state_save_register_device_item(device, 0, arm.pendingFiq);
 }
 
 /***************************************************************************/

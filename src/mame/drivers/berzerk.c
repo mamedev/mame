@@ -274,11 +274,11 @@ static MACHINE_START( berzerk )
 	create_nmi_timer(machine);
 
 	/* register for state saving */
-	state_save_register_global(magicram_control);
-	state_save_register_global(last_shift_data);
-	state_save_register_global(intercept);
-	state_save_register_global(irq_enabled);
-	state_save_register_global(nmi_enabled);
+	state_save_register_global(machine, magicram_control);
+	state_save_register_global(machine, last_shift_data);
+	state_save_register_global(machine, intercept);
+	state_save_register_global(machine, irq_enabled);
+	state_save_register_global(machine, nmi_enabled);
 }
 
 

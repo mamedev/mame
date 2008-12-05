@@ -109,12 +109,12 @@ static SND_START( dmadac )
 	info->channel = stream_create(0, 1, DEFAULT_SAMPLE_RATE, info, dmadac_update);
 
 	/* register with the save state system */
-	state_save_register_item("dmadac", tag, 0, info->bufin);
-	state_save_register_item("dmadac", tag, 0, info->bufout);
-	state_save_register_item("dmadac", tag, 0, info->volume);
-	state_save_register_item("dmadac", tag, 0, info->enabled);
-	state_save_register_item("dmadac", tag, 0, info->frequency);
-	state_save_register_item_pointer("dmadac", tag, 0, info->buffer, BUFFER_SIZE);
+	state_save_register_device_item(device, 0, info->bufin);
+	state_save_register_device_item(device, 0, info->bufout);
+	state_save_register_device_item(device, 0, info->volume);
+	state_save_register_device_item(device, 0, info->enabled);
+	state_save_register_device_item(device, 0, info->frequency);
+	state_save_register_device_item_pointer(device, 0, info->buffer, BUFFER_SIZE);
 
 	return info;
 }

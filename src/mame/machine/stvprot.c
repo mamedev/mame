@@ -510,10 +510,10 @@ void install_decathlt_protection(running_machine *machine)
 //  memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x27FFFF0, 0x27FFFFF, 0, 0, decathlt_prot_r, decathlt_prot_w);
 }
 
-void stv_register_protection_savestates(void)
+void stv_register_protection_savestates(running_machine *machine)
 {
-	state_save_register_global_array(a_bus);
-	state_save_register_global(ctrl_index);
-	state_save_register_global(internal_counter);
-	state_save_register_global(char_offset);
+	state_save_register_global_array(machine, a_bus);
+	state_save_register_global(machine, ctrl_index);
+	state_save_register_global(machine, internal_counter);
+	state_save_register_global(machine, char_offset);
 }

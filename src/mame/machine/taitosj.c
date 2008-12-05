@@ -29,17 +29,17 @@ MACHINE_START( taitosj )
 	memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "main") + 0x6000, 0);
 	memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "main") + 0x10000, 0);
 
-	state_save_register_global(fromz80);
-	state_save_register_global(toz80);
-	state_save_register_global(zaccept);
-	state_save_register_global(zready);
-	state_save_register_global(busreq);
+	state_save_register_global(machine, fromz80);
+	state_save_register_global(machine, toz80);
+	state_save_register_global(machine, zaccept);
+	state_save_register_global(machine, zready);
+	state_save_register_global(machine, busreq);
 
-	state_save_register_global(portA_in);
-	state_save_register_global(portA_out);
-	state_save_register_global(address);
-	state_save_register_global(spacecr_prot_value);
-	state_save_register_global(protection_value);
+	state_save_register_global(machine, portA_in);
+	state_save_register_global(machine, portA_out);
+	state_save_register_global(machine, address);
+	state_save_register_global(machine, spacecr_prot_value);
+	state_save_register_global(machine, protection_value);
 }
 
 MACHINE_RESET( taitosj )

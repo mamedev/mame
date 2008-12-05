@@ -221,18 +221,18 @@ static VIDEO_START( taitob_core )
 	tilemap_set_scrolldx(tx_tilemap,0,24*8);
 
 
-	state_save_register_global_array(bg_rambank);
-	state_save_register_global_array(fg_rambank);
-	state_save_register_global(tx_rambank);
+	state_save_register_global_array(machine, bg_rambank);
+	state_save_register_global_array(machine, fg_rambank);
+	state_save_register_global(machine, tx_rambank);
 
-	state_save_register_global_array(pixel_scroll);
-	state_save_register_global(framebuffer_page);
+	state_save_register_global_array(machine, pixel_scroll);
+	state_save_register_global(machine, framebuffer_page);
 
-	state_save_register_global(video_control);
-	state_save_register_global_array(TC0180VCU_ctrl);
+	state_save_register_global(machine, video_control);
+	state_save_register_global_array(machine, TC0180VCU_ctrl);
 
-	state_save_register_global_bitmap(framebuffer[0]);
-	state_save_register_global_bitmap(framebuffer[1]);
+	state_save_register_global_bitmap(machine, framebuffer[0]);
+	state_save_register_global_bitmap(machine, framebuffer[1]);
 }
 
 VIDEO_START( taitob_color_order0 )
@@ -281,7 +281,7 @@ VIDEO_START( hitice )
 
   pixel_bitmap = auto_bitmap_alloc(1024,512,video_screen_get_format(machine->primary_screen));
 
-  state_save_register_global_bitmap(pixel_bitmap);
+  state_save_register_global_bitmap(machine, pixel_bitmap);
 }
 
 VIDEO_RESET( hitice )

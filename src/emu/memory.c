@@ -1725,7 +1725,7 @@ static void memory_init_populate(running_machine *machine)
 					{
 						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->read_devtype, entry->read_devtag);
 						if (object == NULL)
-							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->read_devtype), entry->read_devtag);
+							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_get_name(entry->read_devtype), entry->read_devtag);
 					}
 					space_map_range_private(space, ROW_READ, bits, entry->read_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, rhandler.generic, object, entry->read_name);
 				}
@@ -1739,7 +1739,7 @@ static void memory_init_populate(running_machine *machine)
 					{
 						object = (void *)device_list_find_by_tag(machine->config->devicelist, entry->write_devtype, entry->write_devtag);
 						if (object == NULL)
-							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_name(entry->write_devtype), entry->write_devtag);
+							fatalerror("Unidentified object in memory map: type=%s tag=%s\n", devtype_get_name(entry->write_devtype), entry->write_devtag);
 					}
 					space_map_range_private(space, ROW_WRITE, bits, entry->write_mask, entry->addrstart, entry->addrend, entry->addrmask, entry->addrmirror, whandler.generic, object, entry->write_name);
 				}
@@ -2332,8 +2332,8 @@ static void bank_assign_static(int banknum, const address_space *space, read_or_
 	if (!bank->used)
 	{
 		/* if we're allowed to, wire up state saving for the entry */
-		if (state_save_registration_allowed())
-			state_save_register_item("memory", NULL, banknum, bank->curentry);
+		if (state_save_registration_allowed(space->machine))
+			state_save_register_item(space->machine, "memory", NULL, banknum, bank->curentry);
 
 		/* fill in information about the bank */
 		bank->used = TRUE;
@@ -2891,7 +2891,7 @@ static void *block_allocate(const address_space *space, offs_t bytestart, offs_t
 		char name[256];
 
 		sprintf(name, "%08x-%08x", bytestart, byteend);
-		state_save_register_memory("memory", space->cpu->tag, space->spacenum, name, memory, bytes_per_element, (UINT32)(byteend - bytestart + 1) / bytes_per_element);
+		state_save_register_memory(space->machine, "memory", space->cpu->tag, space->spacenum, name, memory, bytes_per_element, (UINT32)(byteend - bytestart + 1) / bytes_per_element);
 	}
 
 	/* fill in the tracking block */

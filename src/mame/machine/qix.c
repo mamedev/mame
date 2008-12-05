@@ -239,8 +239,8 @@ MACHINE_START( qixmcu )
 	pia_config(5, &qix_pia_5_intf);
 
 	/* set up save states */
-	state_save_register_global_array(state->_68705_port_in);
-	state_save_register_global(state->coinctrl);
+	state_save_register_global_array(machine, state->_68705_port_in);
+	state_save_register_global(machine, state->coinctrl);
 }
 
 MACHINE_START( slither )

@@ -249,8 +249,8 @@ static WRITE8_HANDLER( laserdisc_command_w );
 static MACHINE_START( gottlieb )
 {
 	/* register for save states */
-	state_save_register_global(joystick_select);
-	state_save_register_global_array(track);
+	state_save_register_global(machine, joystick_select);
+	state_save_register_global_array(machine, track);
 
 	/* see if we have a laserdisc */
 	laserdisc = device_list_first(machine->config->devicelist, LASERDISC);
@@ -270,20 +270,20 @@ static MACHINE_START( gottlieb )
 		laserdisc_status = 0x38;
 
 		/* more save state registration */
-		state_save_register_global(laserdisc_select);
-		state_save_register_global(laserdisc_status);
-		state_save_register_global(laserdisc_philips_code);
+		state_save_register_global(machine, laserdisc_select);
+		state_save_register_global(machine, laserdisc_status);
+		state_save_register_global(machine, laserdisc_philips_code);
 
-		state_save_register_global_pointer(laserdisc_audio_buffer, AUDIORAM_SIZE);
-		state_save_register_global(laserdisc_audio_address);
-		state_save_register_global_array(laserdisc_last_samples);
-		state_save_register_global(laserdisc_last_time.seconds);
-		state_save_register_global(laserdisc_last_time.attoseconds);
-		state_save_register_global(laserdisc_last_clock.seconds);
-		state_save_register_global(laserdisc_last_clock.attoseconds);
-		state_save_register_global(laserdisc_zero_seen);
-		state_save_register_global(laserdisc_audio_bits);
-		state_save_register_global(laserdisc_audio_bit_count);
+		state_save_register_global_pointer(machine, laserdisc_audio_buffer, AUDIORAM_SIZE);
+		state_save_register_global(machine, laserdisc_audio_address);
+		state_save_register_global_array(machine, laserdisc_last_samples);
+		state_save_register_global(machine, laserdisc_last_time.seconds);
+		state_save_register_global(machine, laserdisc_last_time.attoseconds);
+		state_save_register_global(machine, laserdisc_last_clock.seconds);
+		state_save_register_global(machine, laserdisc_last_clock.attoseconds);
+		state_save_register_global(machine, laserdisc_zero_seen);
+		state_save_register_global(machine, laserdisc_audio_bits);
+		state_save_register_global(machine, laserdisc_audio_bit_count);
 	}
 }
 

@@ -400,7 +400,7 @@ DRIVER_INIT( 4in1 )
 
 	_4in1_bank_w(space, 0, 0); /* set the initial CPU bank */
 
-	state_save_register_global(_4in1_bank);
+	state_save_register_global(machine, _4in1_bank);
 }
 
 INTERRUPT_GEN( hunchbks_vh_interrupt )

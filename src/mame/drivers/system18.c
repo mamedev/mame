@@ -168,13 +168,13 @@ static WRITE8_HANDLER( shdancbl_msm5205_data_w )
 	sample_buffer = data;
 }
 
-static void shdancbl_msm5205_callback(running_machine *machine, int data)
+static void shdancbl_msm5205_callback(const device_config *device)
 {
 	msm5205_data_w(0, sample_buffer & 0x0F);
 	sample_buffer >>= 4;
 	sample_select ^= 1;
 	if(sample_select == 0)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface shdancbl_msm5205_interface =

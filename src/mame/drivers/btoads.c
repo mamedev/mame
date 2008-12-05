@@ -42,11 +42,11 @@ static UINT8 sound_int_state;
 
 static MACHINE_START( btoads )
 {
-	state_save_register_global(main_to_sound_data);
-	state_save_register_global(main_to_sound_ready);
-	state_save_register_global(sound_to_main_data);
-	state_save_register_global(sound_to_main_ready);
-	state_save_register_global(sound_int_state);
+	state_save_register_global(machine, main_to_sound_data);
+	state_save_register_global(machine, main_to_sound_ready);
+	state_save_register_global(machine, sound_to_main_data);
+	state_save_register_global(machine, sound_to_main_ready);
+	state_save_register_global(machine, sound_int_state);
 }
 
 

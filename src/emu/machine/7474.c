@@ -38,6 +38,7 @@
 *****************************************************************************/
 
 #include "driver.h"
+#include "deprecat.h"
 #include "7474.h"
 
 
@@ -161,13 +162,13 @@ void TTL7474_config(int which, const struct TTL7474_interface *intf)
     chip->last_output = -1;
     chip->last_output_comp = -1;
 
-    state_save_register_item("ttl7474", NULL, which, chip->clear);
-    state_save_register_item("ttl7474", NULL, which, chip->preset);
-    state_save_register_item("ttl7474", NULL, which, chip->clock);
-    state_save_register_item("ttl7474", NULL, which, chip->d);
-    state_save_register_item("ttl7474", NULL, which, chip->output);
-    state_save_register_item("ttl7474", NULL, which, chip->output_comp);
-    state_save_register_item("ttl7474", NULL, which, chip->last_clock);
-    state_save_register_item("ttl7474", NULL, which, chip->last_output);
-    state_save_register_item("ttl7474", NULL, which, chip->last_output_comp);
+    state_save_register_item(Machine, "ttl7474", NULL, which, chip->clear);
+    state_save_register_item(Machine, "ttl7474", NULL, which, chip->preset);
+    state_save_register_item(Machine, "ttl7474", NULL, which, chip->clock);
+    state_save_register_item(Machine, "ttl7474", NULL, which, chip->d);
+    state_save_register_item(Machine, "ttl7474", NULL, which, chip->output);
+    state_save_register_item(Machine, "ttl7474", NULL, which, chip->output_comp);
+    state_save_register_item(Machine, "ttl7474", NULL, which, chip->last_clock);
+    state_save_register_item(Machine, "ttl7474", NULL, which, chip->last_output);
+    state_save_register_item(Machine, "ttl7474", NULL, which, chip->last_output_comp);
 }

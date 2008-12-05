@@ -26,7 +26,7 @@
 struct tms5110_info
 {
 	const tms5110_interface *intf;
-	const char *tag;
+	const UINT8 *table;
 	sound_stream *stream;
 	void *chip;
 	INT32 speech_rom_bitnum;
@@ -39,14 +39,13 @@ static void tms5110_update(void *param, stream_sample_t **inputs, stream_sample_
 static int speech_rom_read_bit(void)
 {
 	struct tms5110_info *info = sndti_token(SOUND_TMS5110, 0);
-	const UINT8 *table = memory_region(Machine, info->tag);
 
 	int r;
 
 	if (info->speech_rom_bitnum<0)
 		r = 0;
 	else
-		r = (table[info->speech_rom_bitnum >> 3] >> (0x07 - (info->speech_rom_bitnum & 0x07))) & 1;
+		r = (info->table[info->speech_rom_bitnum >> 3] >> (0x07 - (info->speech_rom_bitnum & 0x07))) & 1;
 
 	info->speech_rom_bitnum++;
 
@@ -74,9 +73,9 @@ static SND_START( tms5110 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 	info->intf = config ? config : &dummy;
-	info->tag = tag;
+	info->table = device->region;
 
-	info->chip = tms5110_create(tag, TMS5110_IS_5110A);
+	info->chip = tms5110_create(device, TMS5110_IS_5110A);
 	if (!info->chip)
 		return NULL;
 	sndintrf_register_token(info);
@@ -84,7 +83,7 @@ static SND_START( tms5110 )
 	/* initialize a stream */
 	info->stream = stream_create(0, 1, clock / 80, info, tms5110_update);
 
-	if (memory_region(device->machine, tag) == NULL)
+	if (info->table == NULL)
 	{
 	    if (info->intf->M0_callback==NULL)
 	    {

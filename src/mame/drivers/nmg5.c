@@ -968,9 +968,9 @@ static const ym3812_interface ym3812_intf =
 
 static MACHINE_START( nmg5 )
 {
-	state_save_register_global(gfx_bank);
-	state_save_register_global(priority_reg);
-	state_save_register_global(input_data);
+	state_save_register_global(machine, gfx_bank);
+	state_save_register_global(machine, priority_reg);
+	state_save_register_global(machine, input_data);
 }
 
 static MACHINE_RESET( nmg5 )

@@ -73,7 +73,7 @@ VIDEO_START( bombjack )
 
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 
-	state_save_register_global(background_image);
+	state_save_register_global(machine, background_image);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

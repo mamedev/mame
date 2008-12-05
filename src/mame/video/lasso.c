@@ -183,7 +183,7 @@ VIDEO_START( lasso )
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 
 	/* register for saving */
-	state_save_register_global(gfxbank);
+	state_save_register_global(machine, gfxbank);
 }
 
 VIDEO_START( wwjgtin )
@@ -195,8 +195,8 @@ VIDEO_START( wwjgtin )
 	tilemap_set_transparent_pen(bg_tilemap, 0);
 
 	/* register for saving */
-	state_save_register_global(gfxbank);
-	state_save_register_global(wwjgtin_track_enable);
+	state_save_register_global(machine, gfxbank);
+	state_save_register_global(machine, wwjgtin_track_enable);
 }
 
 VIDEO_START( pinbo )
@@ -205,7 +205,7 @@ VIDEO_START( pinbo )
 	bg_tilemap = tilemap_create(pinbo_get_bg_tile_info, tilemap_scan_rows, 8, 8,32,32);
 
 	/* register for saving */
-	state_save_register_global(gfxbank);
+	state_save_register_global(machine, gfxbank);
 }
 
 

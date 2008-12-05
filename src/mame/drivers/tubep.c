@@ -339,12 +339,12 @@ logerror("scanline=%3i scrgetvpos(0)=%3i\n",scanline,video_screen_get_vpos(machi
  *
  *************************************/
 
-static void tubep_setup_save_state(void)
+static void tubep_setup_save_state(running_machine *machine)
 {
 	/* Set up save state */
-	state_save_register_global(sound_latch);
-	state_save_register_global(ls74);
-	state_save_register_global(ls377);
+	state_save_register_global(machine, sound_latch);
+	state_save_register_global(machine, ls74);
+	state_save_register_global(machine, ls377);
 }
 
 
@@ -354,7 +354,7 @@ static MACHINE_START( tubep )
 	/* Create interrupt timer */
 	interrupt_timer = timer_alloc(machine, tubep_scanline_callback, NULL);
 
-	tubep_setup_save_state();
+	tubep_setup_save_state(machine);
 }
 
 
@@ -518,7 +518,7 @@ static MACHINE_START( rjammer )
 	/* Create interrupt timer */
 	interrupt_timer = timer_alloc(machine, rjammer_scanline_callback, NULL);
 
-	tubep_setup_save_state();
+	tubep_setup_save_state(machine);
 }
 
 static MACHINE_RESET( rjammer )
@@ -564,14 +564,14 @@ static WRITE8_HANDLER( rjammer_voice_frequency_select_w )
 }
 
 
-static void rjammer_adpcm_vck (running_machine *machine, int data)
+static void rjammer_adpcm_vck (const device_config *device)
 {
 	ls74 = (ls74+1) & 1;
 
 	if (ls74==1)
 	{
 		msm5205_data_w(0, (ls377>>0) & 15 );
-		cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE );
+		cpu_set_input_line(device->machine->cpu[2], 0, ASSERT_LINE );
 	}
 	else
 	{

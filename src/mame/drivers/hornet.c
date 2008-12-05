@@ -457,9 +457,9 @@ static int K037122_vh_start(running_machine *machine, int chip)
 
 	machine->gfx[K037122_gfx_index[chip]]->total_colors = machine->config->total_colors / 16;
 
-	state_save_register_item_pointer("K037122", NULL, chip, K037122_reg[chip], 0x400/sizeof(K037122_reg[chip][0]));
-	state_save_register_item_pointer("K037122", NULL, chip, K037122_char_ram[chip], 0x200000/sizeof(K037122_char_ram[chip][0]));
-	state_save_register_item_pointer("K037122", NULL, chip, K037122_tile_ram[chip], 0x20000/sizeof(K037122_tile_ram[chip][0]));
+	state_save_register_item_pointer(machine, "K037122", NULL, chip, K037122_reg[chip], 0x400/sizeof(K037122_reg[chip][0]));
+	state_save_register_item_pointer(machine, "K037122", NULL, chip, K037122_char_ram[chip], 0x200000/sizeof(K037122_char_ram[chip][0]));
+	state_save_register_item_pointer(machine, "K037122", NULL, chip, K037122_tile_ram[chip], 0x20000/sizeof(K037122_tile_ram[chip][0]));
 	state_save_register_postload(machine, K037122_postload, (void *)(FPTR)chip);
 
 	return 0;
@@ -1016,10 +1016,10 @@ static MACHINE_START( hornet )
 	cpu_set_info_ptr(machine->cpu[0], CPUINFO_PTR_PPC_FASTRAM_BASE, workram);
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_PPC_FASTRAM_READONLY, 0);
 
-	state_save_register_global(led_reg0);
-	state_save_register_global(led_reg1);
-	state_save_register_global_pointer(jvs_sdata, 1024);
-	state_save_register_global(jvs_sdata_ptr);
+	state_save_register_global(machine, led_reg0);
+	state_save_register_global(machine, led_reg1);
+	state_save_register_global_pointer(machine, jvs_sdata, 1024);
+	state_save_register_global(machine, jvs_sdata_ptr);
 }
 
 static MACHINE_RESET( hornet )

@@ -88,20 +88,20 @@ UINT32 *deco32_prot_ram;
 
 /***************************************************************************/
 
-void decoprot_reset(void)
+void decoprot_reset(running_machine *machine)
 {
 	deco16_xor=0;
 	deco16_mask=0xffff;
 	decoprot_last_write=decoprot_last_write_val=0;
 	decoprot_buffer_ram_selected=0;
 
-	state_save_register_global(deco16_xor);
-	state_save_register_global(deco16_mask);
-	state_save_register_global(decoprot_last_write);
-	state_save_register_global(decoprot_last_write_val);
-	state_save_register_global(decoprot_buffer_ram_selected);
-	state_save_register_global_array(decoprot_buffer_ram);
-	state_save_register_global_array(decoprot_buffer_ram2);
+	state_save_register_global(machine, deco16_xor);
+	state_save_register_global(machine, deco16_mask);
+	state_save_register_global(machine, decoprot_last_write);
+	state_save_register_global(machine, decoprot_last_write_val);
+	state_save_register_global(machine, decoprot_buffer_ram_selected);
+	state_save_register_global_array(machine, decoprot_buffer_ram);
+	state_save_register_global_array(machine, decoprot_buffer_ram2);
 }
 
 /***************************************************************************/

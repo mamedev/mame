@@ -45,9 +45,9 @@ static WRITE8_HANDLER( nmi_enable_w )
 
 static int pcm_adr;
 
-static void pcm_w(running_machine *machine, int irq)
+static void pcm_w(const device_config *device)
 {
-	UINT8 *PCM = memory_region(machine, "adpcm");
+	UINT8 *PCM = memory_region(device->machine, "adpcm");
 
 	int data = PCM[pcm_adr / 2];
 
@@ -68,7 +68,7 @@ static void pcm_w(running_machine *machine, int irq)
 static WRITE8_HANDLER( pcm_set_w )
 {
 	pcm_adr = ((data & 0x3f) << 9);
-	pcm_w(space->machine, 0);
+	pcm_w(space->cpu /* wrong -- should be msm device */);
 }
 
 /****************************************************************************/

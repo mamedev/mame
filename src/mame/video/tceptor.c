@@ -433,11 +433,11 @@ VIDEO_START( tceptor )
 	bg1_tilemap = tilemap_create(get_bg1_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 	bg2_tilemap = tilemap_create(get_bg2_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 
-	state_save_register_global_pointer(tceptor_sprite_ram_buffered, 0x200 / 2);
-	state_save_register_global(bg1_scroll_x);
-	state_save_register_global(bg1_scroll_y);
-	state_save_register_global(bg2_scroll_x);
-	state_save_register_global(bg2_scroll_y);
+	state_save_register_global_pointer(machine, tceptor_sprite_ram_buffered, 0x200 / 2);
+	state_save_register_global(machine, bg1_scroll_x);
+	state_save_register_global(machine, bg1_scroll_y);
+	state_save_register_global(machine, bg2_scroll_x);
+	state_save_register_global(machine, bg2_scroll_y);
 }
 
 

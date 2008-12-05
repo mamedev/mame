@@ -292,13 +292,13 @@ static void start_sound_chips(running_machine *machine)
 
 		/* start the chip, tagging all its streams */
 		VPRINTF(("sndnum = %d -- sound_type = %d\n", sndnum, msound->type));
-		num_regs = state_save_get_reg_count();
+		num_regs = state_save_get_reg_count(machine);
 		streams_set_tag(machine, info);
 		if (sndintrf_init_sound(sndnum, msound->tag, msound->type, msound->clock, msound->config) != 0)
 			fatalerror("Sound chip #%d (%s) failed to initialize!", sndnum, sndnum_get_name(sndnum));
 
 		/* if no state registered for saving, we can't save */
-		num_regs = state_save_get_reg_count() - num_regs;
+		num_regs = state_save_get_reg_count(machine) - num_regs;
 		if (num_regs == 0)
 		{
 			logerror("Sound chip #%d (%s) did not register any state to save!\n", sndnum, sndnum_get_name(sndnum));

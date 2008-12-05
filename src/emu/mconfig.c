@@ -271,7 +271,7 @@ static void machine_config_detokenize(machine_config *config, const machine_conf
 				tag = TOKEN_GET_STRING(tokens);
 				device = (device_config *)device_list_find_by_tag(config->devicelist, devtype, device_build_tag(tempstring, tagprefix, tag));
 				if (device == NULL)
-					fatalerror("Unable to find device: type=%s tag=%s\n", devtype_name(devtype), astring_c(tempstring));
+					fatalerror("Unable to find device: type=%s tag=%s\n", devtype_get_name(devtype), astring_c(tempstring));
 				break;
 
 			case MCONFIG_TOKEN_DEVICE_CONFIG:

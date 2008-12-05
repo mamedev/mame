@@ -12,6 +12,7 @@
 */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
 #include "targ.h"
@@ -151,10 +152,10 @@ static void common_audio_start(int freq)
 	sample_set_volume(3, 0);
 	sample_start_raw(3, sine_wave, 32, 1000, 1);
 
-	state_save_register_global(port_1_last);
-	state_save_register_global(port_2_last);
-	state_save_register_global(tone_freq);
-	state_save_register_global(tone_active);
+	state_save_register_global(Machine, port_1_last);
+	state_save_register_global(Machine, port_2_last);
+	state_save_register_global(Machine, tone_freq);
+	state_save_register_global(Machine, tone_active);
 }
 
 
@@ -170,7 +171,7 @@ static void targ_audio_start(void)
 
 	tone_pointer = 0;
 
-	state_save_register_global(tone_pointer);
+	state_save_register_global(Machine, tone_pointer);
 }
 
 

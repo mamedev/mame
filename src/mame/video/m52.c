@@ -162,11 +162,11 @@ VIDEO_START( m52 )
 	tilemap_set_scrolldy(bg_tilemap, 16, 16);
 	tilemap_set_scroll_rows(bg_tilemap, 4); /* only lines 192-256 scroll */
 
-	state_save_register_global(bg1xpos);
-	state_save_register_global(bg1ypos);
-	state_save_register_global(bg2xpos);
-	state_save_register_global(bg2ypos);
-	state_save_register_global(bgcontrol);
+	state_save_register_global(machine, bg1xpos);
+	state_save_register_global(machine, bg1ypos);
+	state_save_register_global(machine, bg2xpos);
+	state_save_register_global(machine, bg2ypos);
+	state_save_register_global(machine, bgcontrol);
 }
 
 

@@ -48,7 +48,7 @@ void PC080SN_tilemap_draw_special(bitmap_t *bitmap,const rectangle *cliprect,int
 
 /***************************************************************************/
 
-void PC090OJ_vh_start(int gfxnum,int x_offset,int y_offset,int use_buffer);
+void PC090OJ_vh_start(running_machine *machine,int gfxnum,int x_offset,int y_offset,int use_buffer);
 
 READ16_HANDLER( PC090OJ_word_0_r );
 WRITE16_HANDLER( PC090OJ_word_0_w );
@@ -125,14 +125,14 @@ int TC0100SCN_bottomlayer(int chip);
 
 /***************************************************************************/
 
-void TC0280GRD_vh_start(int gfxnum);
+void TC0280GRD_vh_start(running_machine *machine, int gfxnum);
 READ16_HANDLER ( TC0280GRD_word_r );
 WRITE16_HANDLER( TC0280GRD_word_w );
 WRITE16_HANDLER( TC0280GRD_ctrl_word_w );
 void TC0280GRD_tilemap_update(int base_color);
 void TC0280GRD_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,int yoffset,UINT32 priority);
 
-void TC0430GRW_vh_start(int gfxnum);
+void TC0430GRW_vh_start(running_machine *machine, int gfxnum);
 READ16_HANDLER ( TC0430GRW_word_r );
 WRITE16_HANDLER( TC0430GRW_word_w );
 WRITE16_HANDLER( TC0430GRW_ctrl_word_w );
@@ -174,7 +174,7 @@ extern int TC0480SCP_pri_reg;
 
 READ16_HANDLER( TC0150ROD_word_r );
 WRITE16_HANDLER( TC0150ROD_word_w );
-void TC0150ROD_vh_start(void);
+void TC0150ROD_vh_start(running_machine *machine);
 void TC0150ROD_draw(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,int y_offs,int palette_offs,int type,int road_trans,UINT32 low_priority,UINT32 high_priority);
 
 
@@ -193,7 +193,7 @@ WRITE16_HANDLER( TC0110PCR_step1_word_2_w );	/* 3rd chip */
 WRITE16_HANDLER( TC0110PCR_step1_rbswap_word_w );	/* swaps red and blue components */
 WRITE16_HANDLER( TC0110PCR_step1_4bpg_word_w );	/* only 4 bits per color gun */
 
-void TC0360PRI_vh_start(void);	/* must be called to ensure regs saved in state.c */
+void TC0360PRI_vh_start(running_machine *machine);	/* must be called to ensure regs saved in state.c */
 WRITE8_HANDLER( TC0360PRI_w );
 WRITE16_HANDLER( TC0360PRI_halfword_w );
 WRITE16_HANDLER( TC0360PRI_halfword_swap_w );

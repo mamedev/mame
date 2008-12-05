@@ -66,7 +66,7 @@ discrete_info *discrete_current_context = NULL;
  *
  *************************************/
 
-static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const char *tag);
+static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const device_config *device);
 static void find_input_nodes(discrete_info *info, discrete_sound_block *block_list);
 static void setup_output_nodes(discrete_info *info);
 static void setup_disc_logs(discrete_info *info);
@@ -308,7 +308,7 @@ static SND_START( discrete )
 	memset(info->indexed_node, 0, DISCRETE_MAX_NODES * sizeof(info->indexed_node[0]));
 
 	/* initialize the node data */
-	init_nodes(info, intf, tag);
+	init_nodes(info, intf, device);
 
 	/* now go back and find pointers to all input nodes */
 	find_input_nodes(info, intf);
@@ -518,7 +518,7 @@ static void discrete_stream_update(void *param, stream_sample_t **inputs, stream
  *
  *************************************/
 
-static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const char *tag)
+static void init_nodes(discrete_info *info, discrete_sound_block *block_list, const device_config *device)
 {
 	int nodenum;
 
@@ -627,7 +627,7 @@ static void init_nodes(discrete_info *info, discrete_sound_block *block_list, co
 		}
 
 		/* and register save state */
-		state_save_register_item_array("discrete", tag, nodenum, node->output);
+		state_save_register_device_item_array(device, nodenum, node->output);
 	}
 
 	/* if no outputs, give an error */

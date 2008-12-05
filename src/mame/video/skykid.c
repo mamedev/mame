@@ -120,11 +120,11 @@ VIDEO_START( skykid )
 	spriteram_2 = spriteram + 0x0800;
 	spriteram_3 = spriteram_2 + 0x0800;
 
-	state_save_register_global(priority);
-	state_save_register_global(scroll_x);
-	state_save_register_global(scroll_y);
+	state_save_register_global(machine, priority);
+	state_save_register_global(machine, scroll_x);
+	state_save_register_global(machine, scroll_y);
 	//FIXME: flip_screen
-	//state_save_register_global(flip_screen_x_get());
+	//state_save_register_global(machine, flip_screen_x_get());
 }
 
 

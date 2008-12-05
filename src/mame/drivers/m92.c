@@ -231,9 +231,9 @@ static STATE_POSTLOAD( m92_postload )
 
 static MACHINE_START( m92 )
 {
-	state_save_register_global(irqvector);
-	state_save_register_global(sound_status);
-	state_save_register_global(bankaddress);
+	state_save_register_global(machine, irqvector);
+	state_save_register_global(machine, sound_status);
+	state_save_register_global(machine, bankaddress);
 	state_save_register_postload(machine, m92_postload, NULL);
 
 	scanline_timer = timer_alloc(machine, m92_scanline_interrupt, NULL);

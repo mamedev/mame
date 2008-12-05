@@ -818,10 +818,10 @@ VIDEO_START( cojag )
 
 	pen_table = auto_malloc(65536 * sizeof(pen_t));
 
-	state_save_register_global_pointer(pen_table, 65536);
-	state_save_register_global_array(blitter_regs);
-	state_save_register_global_array(gpu_regs);
-	state_save_register_global(cpu_irq_state);
+	state_save_register_global_pointer(machine, pen_table, 65536);
+	state_save_register_global_array(machine, blitter_regs);
+	state_save_register_global_array(machine, gpu_regs);
+	state_save_register_global(machine, cpu_irq_state);
 	state_save_register_postload(machine, cojag_postload, NULL);
 }
 

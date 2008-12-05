@@ -41,13 +41,13 @@ VIDEO_START( changela )
 	changela_scanline_timer = timer_alloc(machine, changela_scanline_callback, NULL);
 	timer_adjust_oneshot(changela_scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 30, 0), 30);
 
-	state_save_register_global(slopeROM_bank);
-	state_save_register_global(tree_en);
-	state_save_register_global(horizon);
-	state_save_register_global(mem_dev_selected);
+	state_save_register_global(machine, slopeROM_bank);
+	state_save_register_global(machine, tree_en);
+	state_save_register_global(machine, horizon);
+	state_save_register_global(machine, mem_dev_selected);
 
-	state_save_register_global_pointer(memory_devices, 4*0x800);
-	state_save_register_global_pointer(tree_ram, 2*0x20);
+	state_save_register_global_pointer(machine, memory_devices, 4*0x800);
+	state_save_register_global_pointer(machine, tree_ram, 2*0x20);
 }
 
 /**************************************************************************

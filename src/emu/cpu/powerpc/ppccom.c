@@ -218,36 +218,36 @@ void ppccom_init(powerpc_state *ppc, powerpc_flavor flavor, UINT8 cap, int tb_di
 	}
 
 	/* register for save states */
-	state_save_register_item("ppc", device->tag, 0, ppc->pc);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->r);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->f);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->cr);
-	state_save_register_item("ppc", device->tag, 0, ppc->xerso);
-	state_save_register_item("ppc", device->tag, 0, ppc->fpscr);
-	state_save_register_item("ppc", device->tag, 0, ppc->msr);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->sr);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->spr);
-	state_save_register_item_array("ppc", device->tag, 0, ppc->dcr);
+	state_save_register_device_item(device, 0, ppc->pc);
+	state_save_register_device_item_array(device, 0, ppc->r);
+	state_save_register_device_item_array(device, 0, ppc->f);
+	state_save_register_device_item_array(device, 0, ppc->cr);
+	state_save_register_device_item(device, 0, ppc->xerso);
+	state_save_register_device_item(device, 0, ppc->fpscr);
+	state_save_register_device_item(device, 0, ppc->msr);
+	state_save_register_device_item_array(device, 0, ppc->sr);
+	state_save_register_device_item_array(device, 0, ppc->spr);
+	state_save_register_device_item_array(device, 0, ppc->dcr);
 	if (cap & PPCCAP_4XX)
 	{
-		state_save_register_item_array("ppc", device->tag, 0, ppc->spu.regs);
-		state_save_register_item("ppc", device->tag, 0, ppc->spu.txbuf);
-		state_save_register_item("ppc", device->tag, 0, ppc->spu.rxbuf);
-		state_save_register_item_array("ppc", device->tag, 0, ppc->spu.rxbuffer);
-		state_save_register_item("ppc", device->tag, 0, ppc->spu.rxin);
-		state_save_register_item("ppc", device->tag, 0, ppc->spu.rxout);
-		state_save_register_item("ppc", device->tag, 0, ppc->pit_reload);
-		state_save_register_item("ppc", device->tag, 0, ppc->irqstate);
+		state_save_register_device_item_array(device, 0, ppc->spu.regs);
+		state_save_register_device_item(device, 0, ppc->spu.txbuf);
+		state_save_register_device_item(device, 0, ppc->spu.rxbuf);
+		state_save_register_device_item_array(device, 0, ppc->spu.rxbuffer);
+		state_save_register_device_item(device, 0, ppc->spu.rxin);
+		state_save_register_device_item(device, 0, ppc->spu.rxout);
+		state_save_register_device_item(device, 0, ppc->pit_reload);
+		state_save_register_device_item(device, 0, ppc->irqstate);
 	}
 	if (cap & PPCCAP_603_MMU)
 	{
-		state_save_register_item("ppc", device->tag, 0, ppc->mmu603_cmp);
-		state_save_register_item_array("ppc", device->tag, 0, ppc->mmu603_hash);
-		state_save_register_item_array("ppc", device->tag, 0, ppc->mmu603_r);
+		state_save_register_device_item(device, 0, ppc->mmu603_cmp);
+		state_save_register_device_item_array(device, 0, ppc->mmu603_hash);
+		state_save_register_device_item_array(device, 0, ppc->mmu603_r);
 	}
-	state_save_register_item("ppc", device->tag, 0, ppc->irq_pending);
-	state_save_register_item("ppc", device->tag, 0, ppc->tb_zero_cycles);
-	state_save_register_item("ppc", device->tag, 0, ppc->dec_zero_cycles);
+	state_save_register_device_item(device, 0, ppc->irq_pending);
+	state_save_register_device_item(device, 0, ppc->tb_zero_cycles);
+	state_save_register_device_item(device, 0, ppc->dec_zero_cycles);
 }
 
 

@@ -147,11 +147,11 @@ static DEVICE_START(at28c16)
 	}
 
 	/* create the name for save states */
-	state_save_register_item_pointer( "at28c16", device->tag, 0, c->data, SIZE_DATA );
-	state_save_register_item_pointer( "at28c16", device->tag, 0, c->id, SIZE_ID );
-	state_save_register_item( "at28c16", device->tag, 0, c->a9_12v );
-	state_save_register_item( "at28c16", device->tag, 0, c->oe_12v );
-	state_save_register_item( "at28c16", device->tag, 0, c->last_write );
+	state_save_register_device_item_pointer( device, 0, c->data, SIZE_DATA );
+	state_save_register_device_item_pointer( device, 0, c->id, SIZE_ID );
+	state_save_register_device_item( device, 0, c->a9_12v );
+	state_save_register_device_item( device, 0, c->oe_12v );
+	state_save_register_device_item( device, 0, c->last_write );
 
 	return DEVICE_START_OK;
 }

@@ -141,7 +141,7 @@ static SND_START( ym2608 )
 
 	info->intf = intf;
 	/* FIXME: Force to use simgle output */
-	info->psg = ay8910_start_ym(SOUND_YM2608, tag, clock, &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(SOUND_YM2608, device, clock, &intf->ay8910_intf);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -151,11 +151,11 @@ static SND_START( ym2608 )
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2608_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(device->machine, tag));
-	pcmsizea = memory_region_length(device->machine, tag);
+	pcmbufa  = device->region;
+	pcmsizea = device->regionbytes;
 
 	/* initialize YM2608 */
-	info->chip = ym2608_init(info,tag,clock,rate,
+	info->chip = ym2608_init(info,device,clock,rate,
 		           pcmbufa,pcmsizea,
 		           timer_handler,IRQHandler,&psgintf);
 

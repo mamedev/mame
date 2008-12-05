@@ -177,10 +177,11 @@ static WRITE8_HANDLER( tbowl_adpcm_vol_w )
 	msm5205_set_volume(offset & 1, (data & 0x7f) * 100 / 0x7f);
 }
 
-static void tbowl_adpcm_int(running_machine *machine, int num)
+static void tbowl_adpcm_int(const device_config *device)
 {
+	int num = (strcmp(device->tag, "msm1") == 0) ? 0 : 1;
 	if (adpcm_pos[num] >= adpcm_end[num] ||
-				adpcm_pos[num] >= memory_region_length(machine, "adpcm")/2)
+				adpcm_pos[num] >= memory_region_length(device->machine, "adpcm")/2)
 		msm5205_reset_w(num,1);
 	else if (adpcm_data[num] != -1)
 	{
@@ -189,7 +190,7 @@ static void tbowl_adpcm_int(running_machine *machine, int num)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(machine, "adpcm") + 0x10000 * num;
+		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * num;
 
 		adpcm_data[num] = ROM[adpcm_pos[num]++];
 		msm5205_data_w(num,adpcm_data[num] >> 4);

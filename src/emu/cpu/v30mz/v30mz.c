@@ -926,26 +926,24 @@ static CPU_DISASSEMBLE( nec )
 
 static void nec_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int type)
 {
-	static const char *const names[]={"V20","V30","V33","V30MZ"};
+	state_save_register_device_item_array(device, 0, I.regs.w);
+	state_save_register_device_item_array(device, 0, I.sregs);
 
-	state_save_register_item_array(names[type], device->tag, 0, I.regs.w);
-	state_save_register_item_array(names[type], device->tag, 0, I.sregs);
-
-	state_save_register_item(names[type], device->tag, 0, I.ip);
-	state_save_register_item(names[type], device->tag, 0, I.TF);
-	state_save_register_item(names[type], device->tag, 0, I.IF);
-	state_save_register_item(names[type], device->tag, 0, I.DF);
-	state_save_register_item(names[type], device->tag, 0, I.MF);
-	state_save_register_item(names[type], device->tag, 0, I.SignVal);
-	state_save_register_item(names[type], device->tag, 0, I.int_vector);
-	state_save_register_item(names[type], device->tag, 0, I.pending_irq);
-	state_save_register_item(names[type], device->tag, 0, I.nmi_state);
-	state_save_register_item(names[type], device->tag, 0, I.irq_state);
-	state_save_register_item(names[type], device->tag, 0, I.AuxVal);
-	state_save_register_item(names[type], device->tag, 0, I.OverVal);
-	state_save_register_item(names[type], device->tag, 0, I.ZeroVal);
-	state_save_register_item(names[type], device->tag, 0, I.CarryVal);
-	state_save_register_item(names[type], device->tag, 0, I.ParityVal);
+	state_save_register_device_item(device, 0, I.ip);
+	state_save_register_device_item(device, 0, I.TF);
+	state_save_register_device_item(device, 0, I.IF);
+	state_save_register_device_item(device, 0, I.DF);
+	state_save_register_device_item(device, 0, I.MF);
+	state_save_register_device_item(device, 0, I.SignVal);
+	state_save_register_device_item(device, 0, I.int_vector);
+	state_save_register_device_item(device, 0, I.pending_irq);
+	state_save_register_device_item(device, 0, I.nmi_state);
+	state_save_register_device_item(device, 0, I.irq_state);
+	state_save_register_device_item(device, 0, I.AuxVal);
+	state_save_register_device_item(device, 0, I.OverVal);
+	state_save_register_device_item(device, 0, I.ZeroVal);
+	state_save_register_device_item(device, 0, I.CarryVal);
+	state_save_register_device_item(device, 0, I.ParityVal);
 
 	I.irq_callback = irqcallback;
 	I.device = device;

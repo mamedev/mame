@@ -83,8 +83,8 @@ VIDEO_START( arkanoid )
 	bg_tilemap = tilemap_create(get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	state_save_register_global(gfxbank);
-	state_save_register_global(palettebank);
+	state_save_register_global(machine, gfxbank);
+	state_save_register_global(machine, palettebank);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

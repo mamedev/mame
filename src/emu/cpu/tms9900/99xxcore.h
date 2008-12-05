@@ -1207,76 +1207,76 @@ static void set_flag1(int val);
 
 static void register_for_save_state(const device_config *device)
 {
-	state_save_register_item("tms99xx", device->tag, 0, I.WP);
-	state_save_register_item("tms99xx", device->tag, 0, I.PC);
-	state_save_register_item("tms99xx", device->tag, 0, I.STATUS);
-	state_save_register_item("tms99xx", device->tag, 0, I.interrupt_pending);
+	state_save_register_device_item(device, 0, I.WP);
+	state_save_register_device_item(device, 0, I.PC);
+	state_save_register_device_item(device, 0, I.STATUS);
+	state_save_register_device_item(device, 0, I.interrupt_pending);
 
 #if ! ((TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID))
-	state_save_register_item("tms99xx", device->tag, 0, I.load_state);
+	state_save_register_device_item(device, 0, I.load_state);
 #endif
 
 #if (TMS99XX_MODEL == TI990_10_ID) || (TMS99XX_MODEL == TMS9900_ID) || (TMS99XX_MODEL == TMS9980_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.irq_level);
-	state_save_register_item("tms99xx", device->tag, 0, I.irq_state);
+	state_save_register_device_item(device, 0, I.irq_level);
+	state_save_register_device_item(device, 0, I.irq_state);
 #elif (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.irq_level);
-	state_save_register_item("tms99xx", device->tag, 0, I.int_state);
-	state_save_register_item("tms99xx", device->tag, 0, I.int_latch);
+	state_save_register_device_item(device, 0, I.irq_level);
+	state_save_register_device_item(device, 0, I.int_state);
+	state_save_register_device_item(device, 0, I.int_latch);
 #endif
 
-	state_save_register_item("tms99xx", device->tag, 0, I.IDLE);
+	state_save_register_device_item(device, 0, I.IDLE);
 
 #if HAS_MAPPING
-	state_save_register_item("tms99xx", device->tag, 0, I.mapping_on);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].L);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].B);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].limit);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[0].bias);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].L);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].B);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].limit);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[1].bias);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].L);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].B);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].limit);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.map_files[2].bias);
-	state_save_register_item("tms99xx", device->tag, 0, I.cur_map);
-	state_save_register_item("tms99xx", device->tag, 0, I.cur_src_map);
-	state_save_register_item("tms99xx", device->tag, 0, I.cur_dst_map);
+	state_save_register_device_item(device, 0, I.mapping_on);
+	state_save_register_device_item_array(device, 0, I.map_files[0].L);
+	state_save_register_device_item_array(device, 0, I.map_files[0].B);
+	state_save_register_device_item_array(device, 0, I.map_files[0].limit);
+	state_save_register_device_item_array(device, 0, I.map_files[0].bias);
+	state_save_register_device_item_array(device, 0, I.map_files[1].L);
+	state_save_register_device_item_array(device, 0, I.map_files[1].B);
+	state_save_register_device_item_array(device, 0, I.map_files[1].limit);
+	state_save_register_device_item_array(device, 0, I.map_files[1].bias);
+	state_save_register_device_item_array(device, 0, I.map_files[2].L);
+	state_save_register_device_item_array(device, 0, I.map_files[2].B);
+	state_save_register_device_item_array(device, 0, I.map_files[2].limit);
+	state_save_register_device_item_array(device, 0, I.map_files[2].bias);
+	state_save_register_device_item(device, 0, I.cur_map);
+	state_save_register_device_item(device, 0, I.cur_src_map);
+	state_save_register_device_item(device, 0, I.cur_dst_map);
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.reset_maperr);
-	state_save_register_item("tms99xx", device->tag, 0, I.mapper_address_latch);
-	state_save_register_item("tms99xx", device->tag, 0, I.mapper_cru_read_register);
-	state_save_register_item("tms99xx", device->tag, 0, I.diaglat);
-	state_save_register_item_array("tms99xx", device->tag, 0, I.latch_control);
+	state_save_register_device_item(device, 0, I.reset_maperr);
+	state_save_register_device_item(device, 0, I.mapper_address_latch);
+	state_save_register_device_item(device, 0, I.mapper_cru_read_register);
+	state_save_register_device_item(device, 0, I.diaglat);
+	state_save_register_device_item_array(device, 0, I.latch_control);
 #endif
 #endif
 
 #if (TMS99XX_MODEL == TI990_10_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.error_interrupt_register);
+	state_save_register_device_item(device, 0, I.error_interrupt_register);
 #endif
 
 #if (TMS99XX_MODEL == TMS9985_ID) || (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item_array("tms99xx", device->tag, 0, I.RAM);
+	state_save_register_device_item_array(device, 0, I.RAM);
 #endif
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID) || (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.decrementer_enabled);
-	state_save_register_item("tms99xx", device->tag, 0, I.decrementer_interval);
-	state_save_register_item("tms99xx", device->tag, 0, I.decrementer_count);
+	state_save_register_device_item(device, 0, I.decrementer_enabled);
+	state_save_register_device_item(device, 0, I.decrementer_interval);
+	state_save_register_device_item(device, 0, I.decrementer_count);
 #endif
 
 #if (TMS99XX_MODEL == TMS9995_ID)
-	state_save_register_item("tms99xx", device->tag, 0, I.flag);
-	state_save_register_item("tms99xx", device->tag, 0, I.MID_flag);
-	state_save_register_item("tms99xx", device->tag, 0, I.memory_wait_states_byte);
-	state_save_register_item("tms99xx", device->tag, 0, I.memory_wait_states_word);
-	state_save_register_item("tms99xx", device->tag, 0, I.is_mp9537);
+	state_save_register_device_item(device, 0, I.flag);
+	state_save_register_device_item(device, 0, I.MID_flag);
+	state_save_register_device_item(device, 0, I.memory_wait_states_byte);
+	state_save_register_device_item(device, 0, I.memory_wait_states_word);
+	state_save_register_device_item(device, 0, I.is_mp9537);
 #endif
 
-	state_save_register_item("tms99xx", device->tag, 0, I.disable_interrupt_recognition);
+	state_save_register_device_item(device, 0, I.disable_interrupt_recognition);
 }
 
 

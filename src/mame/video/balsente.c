@@ -46,8 +46,8 @@ VIDEO_START( balsente )
 	sprite_mask = memory_region_length(machine, "gfx1") - 1;
 
 	/* register for saving */
-	state_save_register_global_pointer(local_videoram, 256 * 256);
-	state_save_register_global(palettebank_vis);
+	state_save_register_global_pointer(machine, local_videoram, 256 * 256);
+	state_save_register_global(machine, palettebank_vis);
 }
 
 

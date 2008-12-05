@@ -80,11 +80,11 @@ VIDEO_START( midvunit )
 	poly = poly_alloc(4000, sizeof(poly_extra_data), POLYFLAG_ALLOW_QUADS);
 	add_exit_callback(machine, midvunit_exit);
 
-	state_save_register_global_array(video_regs);
-	state_save_register_global_array(dma_data);
-	state_save_register_global(dma_data_index);
-	state_save_register_global(page_control);
-	state_save_register_global(video_changed);
+	state_save_register_global_array(machine, video_regs);
+	state_save_register_global_array(machine, dma_data);
+	state_save_register_global(machine, dma_data_index);
+	state_save_register_global(machine, page_control);
+	state_save_register_global(machine, video_changed);
 }
 
 

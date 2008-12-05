@@ -514,10 +514,10 @@ static ADDRESS_MAP_START( darius_sound2_writemem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-static void darius_adpcm_int (running_machine *machine, int data)
+static void darius_adpcm_int (const device_config *device)
 {
 	if (nmi_enable)
-		cpu_set_input_line(machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[3], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static const msm5205_interface msm5205_config =
@@ -1199,12 +1199,12 @@ static MACHINE_START( darius )
 	adpcm_command = 0;
 	nmi_enable = 0;
 
-	state_save_register_global(cpua_ctrl);
+	state_save_register_global(machine, cpua_ctrl);
 
 	// (there are other sound vars that may need saving too) //
-	state_save_register_global(banknum);
-	state_save_register_global(adpcm_command);
-	state_save_register_global(nmi_enable);
+	state_save_register_global(machine, banknum);
+	state_save_register_global(machine, adpcm_command);
+	state_save_register_global(machine, nmi_enable);
 	state_save_register_postload(machine, darius_postload, NULL);
 }
 

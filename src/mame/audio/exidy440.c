@@ -138,8 +138,8 @@ static void *exidy440_sh_start(int clock, const custom_sound_interface *config)
 	/* reset the system */
 	exidy440_sound_command = 0;
 	exidy440_sound_command_ack = 1;
-	state_save_register_global(exidy440_sound_command);
-	state_save_register_global(exidy440_sound_command_ack);
+	state_save_register_global(Machine, exidy440_sound_command);
+	state_save_register_global(Machine, exidy440_sound_command_ack);
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -151,9 +151,9 @@ static void *exidy440_sh_start(int clock, const custom_sound_interface *config)
 	m6844_interrupt = 0x00;
 	m6844_chain = 0x00;
 
-	state_save_register_global(m6844_priority);
-	state_save_register_global(m6844_interrupt);
-	state_save_register_global(m6844_chain);
+	state_save_register_global(Machine, m6844_priority);
+	state_save_register_global(Machine, m6844_interrupt);
+	state_save_register_global(Machine, m6844_chain);
 
 	channel_frequency[0] = clock;   /* channels 0 and 1 are run by FCLK */
 	channel_frequency[1] = clock;

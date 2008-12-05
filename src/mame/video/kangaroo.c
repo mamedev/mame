@@ -25,7 +25,7 @@ VIDEO_START( kangaroo )
 {
 	/* video RAM is accessed 32 bits at a time (two planes, 4bpp each, 4 pixels) */
 	videoram32 = auto_malloc(256 * 64 * 4);
-	state_save_register_global_pointer(videoram32, 256 * 64);
+	state_save_register_global_pointer(machine, videoram32, 256 * 64);
 }
 
 

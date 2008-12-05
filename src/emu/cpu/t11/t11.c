@@ -277,19 +277,19 @@ static CPU_INIT( t11 )
 	cpustate->device = device;
 	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item("t11", device->tag, 0, cpustate->ppc.w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->reg[0].w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->reg[1].w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->reg[2].w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->reg[3].w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->reg[4].w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->reg[5].w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->reg[6].w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->reg[7].w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->psw.w.l);
-	state_save_register_item("t11", device->tag, 0, cpustate->initial_pc);
-	state_save_register_item("t11", device->tag, 0, cpustate->wait_state);
-	state_save_register_item("t11", device->tag, 0, cpustate->irq_state);
+	state_save_register_device_item(device, 0, cpustate->ppc.w.l);
+	state_save_register_device_item(device, 0, cpustate->reg[0].w.l);
+	state_save_register_device_item(device, 0, cpustate->reg[1].w.l);
+	state_save_register_device_item(device, 0, cpustate->reg[2].w.l);
+	state_save_register_device_item(device, 0, cpustate->reg[3].w.l);
+	state_save_register_device_item(device, 0, cpustate->reg[4].w.l);
+	state_save_register_device_item(device, 0, cpustate->reg[5].w.l);
+	state_save_register_device_item(device, 0, cpustate->reg[6].w.l);
+	state_save_register_device_item(device, 0, cpustate->reg[7].w.l);
+	state_save_register_device_item(device, 0, cpustate->psw.w.l);
+	state_save_register_device_item(device, 0, cpustate->initial_pc);
+	state_save_register_device_item(device, 0, cpustate->wait_state);
+	state_save_register_device_item(device, 0, cpustate->irq_state);
 }
 
 

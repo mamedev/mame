@@ -107,15 +107,15 @@ static TILEMAP_MAPPER( majtitle_scan_rows )
 
 ***************************************************************************/
 
-static void register_savestate(void)
+static void register_savestate(running_machine *machine)
 {
-	state_save_register_global(m72_raster_irq_position);
-	state_save_register_global(video_off);
-	state_save_register_global(scrollx1);
-	state_save_register_global(scrolly1);
-	state_save_register_global(scrollx2);
-	state_save_register_global(scrolly2);
-	state_save_register_global_pointer(m72_spriteram, spriteram_size);
+	state_save_register_global(machine, m72_raster_irq_position);
+	state_save_register_global(machine, video_off);
+	state_save_register_global(machine, scrollx1);
+	state_save_register_global(machine, scrolly1);
+	state_save_register_global(machine, scrollx2);
+	state_save_register_global(machine, scrolly2);
+	state_save_register_global_pointer(machine, m72_spriteram, spriteram_size);
 }
 
 
@@ -143,7 +143,7 @@ VIDEO_START( m72 )
 	tilemap_set_scrolldx(bg_tilemap,0,0);
 	tilemap_set_scrolldy(bg_tilemap,-128,16);
 
-	register_savestate();
+	register_savestate(machine);
 }
 
 VIDEO_START( rtype2 )
@@ -169,7 +169,7 @@ VIDEO_START( rtype2 )
 	tilemap_set_scrolldx(bg_tilemap,4,0);
 	tilemap_set_scrolldy(bg_tilemap,-128,16);
 
-	register_savestate();
+	register_savestate(machine);
 }
 
 VIDEO_START( poundfor )
@@ -208,7 +208,7 @@ VIDEO_START( majtitle )
 	tilemap_set_scrolldx(bg_tilemap,4,0);
 	tilemap_set_scrolldy(bg_tilemap,-128,16);
 
-	register_savestate();
+	register_savestate(machine);
 }
 
 VIDEO_START( hharry )
@@ -234,7 +234,7 @@ VIDEO_START( hharry )
 	tilemap_set_scrolldx(bg_tilemap,6,0);
 	tilemap_set_scrolldy(bg_tilemap,-128,16);
 
-	register_savestate();
+	register_savestate(machine);
 }
 
 

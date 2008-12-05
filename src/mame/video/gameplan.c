@@ -305,11 +305,11 @@ static VIDEO_START( common )
 	create_via_0_timer(machine, state);
 
 	/* register for save states */
-	state_save_register_global_pointer(state->videoram, state->videoram_size);
-	state_save_register_global(state->video_x);
-	state_save_register_global(state->video_y);
-	state_save_register_global(state->video_command);
-	state_save_register_global(state->video_data);
+	state_save_register_global_pointer(machine, state->videoram, state->videoram_size);
+	state_save_register_global(machine, state->video_x);
+	state_save_register_global(machine, state->video_y);
+	state_save_register_global(machine, state->video_command);
+	state_save_register_global(machine, state->video_data);
 }
 
 

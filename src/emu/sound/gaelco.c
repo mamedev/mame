@@ -243,7 +243,7 @@ WRITE16_HANDLER( gaelcosnd_w )
                         CG-1V/GAE1 Init
   ============================================================================*/
 
-static void *gaelcosnd_start(sound_type sndtype, const char *tag, int sndindex, int clock, const void *config)
+static void *gaelcosnd_start(sound_type sndtype, const device_config *device, int clock, const void *config)
 {
 	int j, vol;
 	const gaelcosnd_interface *intf = config;
@@ -259,9 +259,9 @@ static void *gaelcosnd_start(sound_type sndtype, const char *tag, int sndindex, 
 		info->banks[j] = intf->banks[j];
 	}
 	info->stream = stream_create(0, 2, 8000, info, gaelco_update);
-	info->snd_data = (UINT8 *)memory_region(Machine, intf->gfxregion);
+	info->snd_data = (UINT8 *)memory_region(device->machine, intf->gfxregion);
 	if (info->snd_data == NULL)
-		info->snd_data = (UINT8 *)memory_region(Machine, tag);
+		info->snd_data = device->region;
 
 	/* init volume table */
 	for (vol = 0; vol < VOLUME_LEVELS; vol++){
@@ -278,12 +278,12 @@ static void *gaelcosnd_start(sound_type sndtype, const char *tag, int sndindex, 
 
 static SND_START( gaelco_gae1 )
 {
-	return gaelcosnd_start(SOUND_GAELCO_GAE1, tag, sndindex, clock, config);
+	return gaelcosnd_start(SOUND_GAELCO_GAE1, device, clock, config);
 }
 
 static SND_START( gaelco_cg1v )
 {
-	return gaelcosnd_start(SOUND_GAELCO_CG1V, tag, sndindex, clock, config);
+	return gaelcosnd_start(SOUND_GAELCO_CG1V, device, clock, config);
 }
 
 

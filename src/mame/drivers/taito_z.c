@@ -1516,14 +1516,14 @@ static MACHINE_START( taitoz )
 	dblaxle_int6 = 0;
 	ioc220_port = 0;
 
-	state_save_register_global(cpua_ctrl);
+	state_save_register_global(machine, cpua_ctrl);
 
 	/* these are specific to various games: we ought to split the inits */
-	state_save_register_global(sci_int6);
-	state_save_register_global(dblaxle_int6);
-	state_save_register_global(ioc220_port);
+	state_save_register_global(machine, sci_int6);
+	state_save_register_global(machine, dblaxle_int6);
+	state_save_register_global(machine, ioc220_port);
 
-	state_save_register_global(banknum);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, taitoz_postload, NULL);
 }
 
@@ -4781,7 +4781,7 @@ static DRIVER_INIT( bshark )
 	eep_latch = 0;
 	state_save_register_postload(machine, bshark_postload, NULL);
 
-	state_save_register_global(eep_latch);
+	state_save_register_global(machine, eep_latch);
 }
 
 

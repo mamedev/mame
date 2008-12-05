@@ -190,8 +190,8 @@ static MACHINE_RESET( irem )
 {
 	m10_state *state = machine->driver_data;
 
-	state_save_register_global(state->bottomline);
-	state_save_register_global(state->flip);
+	state_save_register_global(machine, state->bottomline);
+	state_save_register_global(machine, state->flip);
 }
 
 /*************************************

@@ -57,8 +57,8 @@ static WRITE8_HANDLER( irq_enable_w )
 static MACHINE_START( tutankhm )
 {
 	memory_configure_bank(machine, 1, 0, 16, memory_region(machine, "main") + 0x10000, 0x1000);
-	state_save_register_global(irq_toggle);
-	state_save_register_global(irq_enable);
+	state_save_register_global(machine, irq_toggle);
+	state_save_register_global(machine, irq_enable);
 }
 
 

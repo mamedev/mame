@@ -1501,9 +1501,9 @@ static void mcr_common_init(running_machine *machine, int sound_board)
 {
 	mcr_sound_init(machine, sound_board);
 
-	state_save_register_global(input_mux);
-	state_save_register_global(latched_input);
-	state_save_register_global(last_op4);
+	state_save_register_global(machine, input_mux);
+	state_save_register_global(machine, latched_input);
+	state_save_register_global(machine, last_op4);
 }
 
 
@@ -1531,11 +1531,11 @@ static DRIVER_INIT( maxrpm )
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x05, 0x05, 0, 0, maxrpm_op5_w);
 	memory_install_write8_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO), 0x06, 0x06, 0, 0, maxrpm_op6_w);
 
-	state_save_register_global(maxrpm_adc_control);
-	state_save_register_global(maxrpm_adc_select);
-	state_save_register_global(maxrpm_last_shift);
-	state_save_register_global(maxrpm_p1_shift);
-	state_save_register_global(maxrpm_p2_shift);
+	state_save_register_global(machine, maxrpm_adc_control);
+	state_save_register_global(machine, maxrpm_adc_select);
+	state_save_register_global(machine, maxrpm_last_shift);
+	state_save_register_global(machine, maxrpm_p1_shift);
+	state_save_register_global(machine, maxrpm_p2_shift);
 }
 
 

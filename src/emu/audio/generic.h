@@ -24,7 +24,7 @@
 
 ***************************************************************************/
 
-int generic_sound_init(void);
+int generic_sound_init(running_machine *machine);
 
 /* latch readers */
 READ8_HANDLER( soundlatch_r );

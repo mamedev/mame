@@ -73,7 +73,7 @@ VIDEO_START( magmax )
 	UINT8 * prom14D = memory_region(machine, "user2");
 
 	/* Set up save state */
-	state_save_register_global(flipscreen);
+	state_save_register_global(machine, flipscreen);
 
 	prom_tab = auto_malloc(256 * sizeof(UINT32));
 

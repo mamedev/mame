@@ -738,7 +738,7 @@ static MACHINE_RESET(model1)
 {
 	memory_set_bankptr(machine, 1, memory_region(machine, "main") + 0x1000000);
 	irq_init(machine);
-	model1_tgp_reset(!strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwara"));
+	model1_tgp_reset(machine, !strcmp(machine->gamedrv->name, "swa") || !strcmp(machine->gamedrv->name, "wingwar") || !strcmp(machine->gamedrv->name, "wingwara"));
 	if (!strcmp(machine->gamedrv->name, "swa"))
 	{
 		model1_sound_irq = 0;

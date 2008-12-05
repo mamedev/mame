@@ -512,13 +512,13 @@ static void arm7_core_init(const char *cpuname, const device_config *device)
 {
     arm_state *cpustate = device->token;
 
-    state_save_register_item_array(cpuname, device->tag, 0, cpustate->sArmRegister);
-    state_save_register_item(cpuname, device->tag, 0, cpustate->pendingIrq);
-    state_save_register_item(cpuname, device->tag, 0, cpustate->pendingFiq);
-    state_save_register_item(cpuname, device->tag, 0, cpustate->pendingAbtD);
-    state_save_register_item(cpuname, device->tag, 0, cpustate->pendingAbtP);
-    state_save_register_item(cpuname, device->tag, 0, cpustate->pendingUnd);
-    state_save_register_item(cpuname, device->tag, 0, cpustate->pendingSwi);
+    state_save_register_device_item_array(device, 0, cpustate->sArmRegister);
+    state_save_register_device_item(device, 0, cpustate->pendingIrq);
+    state_save_register_device_item(device, 0, cpustate->pendingFiq);
+    state_save_register_device_item(device, 0, cpustate->pendingAbtD);
+    state_save_register_device_item(device, 0, cpustate->pendingAbtP);
+    state_save_register_device_item(device, 0, cpustate->pendingUnd);
+    state_save_register_device_item(device, 0, cpustate->pendingSwi);
 }
 
 // CPU RESET

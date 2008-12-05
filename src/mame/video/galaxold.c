@@ -458,22 +458,22 @@ PALETTE_INIT( turtles )
 
 ***************************************************************************/
 
-static void state_save_register(void)
+static void state_save_register(running_machine *machine)
 {
-	state_save_register_global_array(gfxbank);
-	state_save_register_global(flipscreen_x);
-	state_save_register_global(flipscreen_y);
+	state_save_register_global_array(machine, gfxbank);
+	state_save_register_global(machine, flipscreen_x);
+	state_save_register_global(machine, flipscreen_y);
 
-	state_save_register_global(galaxold_stars_on);
-	state_save_register_global(stars_scrollpos);
-	state_save_register_global(stars_blink_state);
+	state_save_register_global(machine, galaxold_stars_on);
+	state_save_register_global(machine, stars_scrollpos);
+	state_save_register_global(machine, stars_blink_state);
 
-	state_save_register_global(darkplnt_bullet_color);
+	state_save_register_global(machine, darkplnt_bullet_color);
 
-	state_save_register_global(background_enable);
-	state_save_register_global(background_red);
-	state_save_register_global(background_green);
-	state_save_register_global(background_blue);
+	state_save_register_global(machine, background_enable);
+	state_save_register_global(machine, background_red);
+	state_save_register_global(machine, background_green);
+	state_save_register_global(machine, background_blue);
 }
 
 static void video_start_common(running_machine *machine, tilemap_mapper_func get_memory_offset)
@@ -510,7 +510,7 @@ static void video_start_common(running_machine *machine, tilemap_mapper_func get
 
 	color_mask = (machine->gfx[0]->color_granularity == 4) ? 7 : 3;
 
-	state_save_register();
+	state_save_register(machine);
 }
 
 VIDEO_START( galaxold_plain )
@@ -720,8 +720,8 @@ VIDEO_START( rockclim )
 	modify_charcode = mooncrst_modify_charcode;
 	modify_spritecode = rockclim_modify_spritecode;
 	rockclim_v = rockclim_h = 0;
-	state_save_register_global(rockclim_v);
-	state_save_register_global(rockclim_h);
+	state_save_register_global(machine, rockclim_v);
+	state_save_register_global(machine, rockclim_h);
 }
 
 static TILE_GET_INFO( drivfrcg_get_tile_info )
@@ -772,7 +772,7 @@ VIDEO_START( drivfrcg )
 
 	color_mask = 0xff;
 
-	state_save_register();
+	state_save_register(machine);
 }
 
 VIDEO_START( ad2083 )
@@ -810,7 +810,7 @@ VIDEO_START( ad2083 )
 
 	color_mask = 7;
 
-	state_save_register();
+	state_save_register(machine);
 }
 
 UINT8 *racknrol_tiles_bank;
@@ -868,7 +868,7 @@ VIDEO_START( racknrol )
 
 	color_mask = 0xff;
 
-	state_save_register();
+	state_save_register(machine);
 }
 
 VIDEO_START( bongo )

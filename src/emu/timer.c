@@ -300,8 +300,8 @@ void timer_init(running_machine *machine)
 
 	/* register with the save state system */
 	state_save_push_tag(0);
-	state_save_register_item("timer", NULL, 0, global->basetime.seconds);
-	state_save_register_item("timer", NULL, 0, global->basetime.attoseconds);
+	state_save_register_item(machine, "timer", NULL, 0, global->basetime.seconds);
+	state_save_register_item(machine, "timer", NULL, 0, global->basetime.attoseconds);
 	state_save_register_postload(machine, timer_postload, NULL);
 	state_save_pop_tag();
 
@@ -527,14 +527,14 @@ static void timer_register_save(emu_timer *timer)
 
 	/* use different instances to differentiate the bits */
 	state_save_push_tag(0);
-	state_save_register_item("timer", timer->func, count, timer->param);
-	state_save_register_item("timer", timer->func, count, timer->enabled);
-	state_save_register_item("timer", timer->func, count, timer->period.seconds);
-	state_save_register_item("timer", timer->func, count, timer->period.attoseconds);
-	state_save_register_item("timer", timer->func, count, timer->start.seconds);
-	state_save_register_item("timer", timer->func, count, timer->start.attoseconds);
-	state_save_register_item("timer", timer->func, count, timer->expire.seconds);
-	state_save_register_item("timer", timer->func, count, timer->expire.attoseconds);
+	state_save_register_item(timer->machine, "timer", timer->func, count, timer->param);
+	state_save_register_item(timer->machine, "timer", timer->func, count, timer->enabled);
+	state_save_register_item(timer->machine, "timer", timer->func, count, timer->period.seconds);
+	state_save_register_item(timer->machine, "timer", timer->func, count, timer->period.attoseconds);
+	state_save_register_item(timer->machine, "timer", timer->func, count, timer->start.seconds);
+	state_save_register_item(timer->machine, "timer", timer->func, count, timer->start.attoseconds);
+	state_save_register_item(timer->machine, "timer", timer->func, count, timer->expire.seconds);
+	state_save_register_item(timer->machine, "timer", timer->func, count, timer->expire.attoseconds);
 	state_save_pop_tag();
 }
 
@@ -1189,7 +1189,7 @@ static DEVICE_START( timer )
 			state->start_delay = attotime_zero;
 
 			/* register for state saves */
-			state_save_register_item("timer_device", device->tag, 0, state->param);
+			state_save_register_device_item(device, 0, state->param);
 
 			/* allocate the backing timer */
 			param = (void *)device;
@@ -1217,11 +1217,11 @@ static DEVICE_START( timer )
 				state->start_delay = attotime_zero;
 
 			/* register for state saves */
-			state_save_register_item("timer_device", device->tag, 0, state->start_delay.seconds);
-			state_save_register_item("timer_device", device->tag, 0, state->start_delay.attoseconds);
-			state_save_register_item("timer_device", device->tag, 0, state->period.seconds);
-			state_save_register_item("timer_device", device->tag, 0, state->period.attoseconds);
-			state_save_register_item("timer_device", device->tag, 0, state->param);
+			state_save_register_device_item(device, 0, state->start_delay.seconds);
+			state_save_register_device_item(device, 0, state->start_delay.attoseconds);
+			state_save_register_device_item(device, 0, state->period.seconds);
+			state_save_register_device_item(device, 0, state->period.attoseconds);
+			state_save_register_device_item(device, 0, state->param);
 
 			/* allocate the backing timer */
 			param = (void *)device;
@@ -1248,7 +1248,7 @@ static DEVICE_START( timer )
 			state->first_time = TRUE;
 
 			/* register for state saves */
-			state_save_register_item("timer_device", device->tag, 0, state->first_time);
+			state_save_register_device_item(device, 0, state->first_time);
 
 			/* fire it as soon as the emulation starts */
 			timer_adjust_oneshot(state->timer, attotime_zero, 0);

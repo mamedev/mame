@@ -78,10 +78,10 @@ static TILE_GET_INFO( get_pf2_tile_info )
 
 /******************************************************************************/
 
-static void register_savestate(void)
+static void register_savestate(running_machine *machine)
 {
-	state_save_register_global_array(actfancr_control_1);
-	state_save_register_global_array(actfancr_control_2);
+	state_save_register_global_array(machine, actfancr_control_1);
+	state_save_register_global_array(machine, actfancr_control_2);
 }
 
 VIDEO_START( actfancr )
@@ -92,7 +92,7 @@ VIDEO_START( actfancr )
 
 	tilemap_set_transparent_pen(pf2_tilemap,0);
 
-	register_savestate();
+	register_savestate(machine);
 }
 
 VIDEO_START( triothep )
@@ -104,7 +104,7 @@ VIDEO_START( triothep )
 
 	pf1_alt_tilemap=NULL;
 
-	register_savestate();
+	register_savestate(machine);
 }
 
 /******************************************************************************/

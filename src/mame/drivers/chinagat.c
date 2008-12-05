@@ -257,7 +257,7 @@ static READ8_HANDLER( saiyugb1_m5205_irq_r )
 	}
 	return 0;
 }
-static void saiyugb1_m5205_irq_w(running_machine *machine, int num)
+static void saiyugb1_m5205_irq_w(const device_config *device)
 {
 	adpcm_sound_irq = 1;
 }

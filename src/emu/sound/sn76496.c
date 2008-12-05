@@ -314,7 +314,7 @@ static int SN76496_init(struct SN76496 *R,int clock)
 }
 
 
-static void *generic_start(const char *tag, int clock, int feedbackmask, int noisetaps, int noiseinvert)
+static void *generic_start(const device_config *device, int clock, int feedbackmask, int noisetaps, int noiseinvert)
 {
 	struct SN76496 *chip;
 
@@ -329,14 +329,14 @@ static void *generic_start(const char *tag, int clock, int feedbackmask, int noi
 	chip->WhitenoiseTaps = noisetaps;
 	chip->WhitenoiseInvert = noiseinvert;
 
-	state_save_register_item_array("sn76496", tag, 0, chip->Register);
-	state_save_register_item("sn76496", tag, 0, chip->LastRegister);
-	state_save_register_item_array("sn76496", tag, 0, chip->Volume);
-	state_save_register_item("sn76496", tag, 0, chip->RNG);
-	state_save_register_item("sn76496", tag, 0, chip->NoiseMode);
-	state_save_register_item_array("sn76496", tag, 0, chip->Period);
-	state_save_register_item_array("sn76496", tag, 0, chip->Count);
-	state_save_register_item_array("sn76496", tag, 0, chip->Output);
+	state_save_register_device_item_array(device, 0, chip->Register);
+	state_save_register_device_item(device, 0, chip->LastRegister);
+	state_save_register_device_item_array(device, 0, chip->Volume);
+	state_save_register_device_item(device, 0, chip->RNG);
+	state_save_register_device_item(device, 0, chip->NoiseMode);
+	state_save_register_device_item_array(device, 0, chip->Period);
+	state_save_register_device_item_array(device, 0, chip->Count);
+	state_save_register_device_item_array(device, 0, chip->Output);
 
 	return chip;
 
@@ -345,32 +345,32 @@ static void *generic_start(const char *tag, int clock, int feedbackmask, int noi
 
 static SND_START( sn76489 )
 {
-	return generic_start(tag, clock, 0x4000, 0x03, TRUE);
+	return generic_start(device, clock, 0x4000, 0x03, TRUE);
 }
 
 static SND_START( sn76489a )
 {
-	return generic_start(tag, clock, 0x8000, 0x06, FALSE);
+	return generic_start(device, clock, 0x8000, 0x06, FALSE);
 }
 
 static SND_START( sn76494 )
 {
-	return generic_start(tag, clock, 0x8000, 0x06, FALSE);
+	return generic_start(device, clock, 0x8000, 0x06, FALSE);
 }
 
 static SND_START( sn76496 )
 {
-	return generic_start(tag, clock, 0x8000, 0x06, FALSE);
+	return generic_start(device, clock, 0x8000, 0x06, FALSE);
 }
 
 static SND_START( gamegear )
 {
-	return generic_start(tag, clock, 0x8000, 0x09, FALSE);
+	return generic_start(device, clock, 0x8000, 0x09, FALSE);
 }
 
 static SND_START( smsiii )
 {
-	return generic_start(tag, clock, 0x8000, 0x09, FALSE);
+	return generic_start(device, clock, 0x8000, 0x09, FALSE);
 }
 
 

@@ -1629,8 +1629,8 @@ namco_road_init(running_machine *machine, int gfxbank )
 					ROAD_TILE_SIZE,ROAD_TILE_SIZE,
 					ROAD_COLS,ROAD_ROWS);
 
-					state_save_register_global_pointer(mpRoadDirty, ROAD_TILE_COUNT_MAX);
-					state_save_register_global_pointer(mpRoadRAM,   0x20000 / 2);
+					state_save_register_global_pointer(machine, mpRoadDirty, ROAD_TILE_COUNT_MAX);
+					state_save_register_global_pointer(machine, mpRoadRAM,   0x20000 / 2);
 					state_save_register_postload(machine, RoadMarkAllDirty, NULL);
 
 		}

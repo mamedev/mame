@@ -224,11 +224,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_START( wwfwfest )
 {
-    state_save_register_global(wwfwfest_pri);
-    state_save_register_global(wwfwfest_bg0_scrollx);
-    state_save_register_global(wwfwfest_bg0_scrolly);
-    state_save_register_global(wwfwfest_bg1_scrollx);
-    state_save_register_global(wwfwfest_bg1_scrolly);
+    state_save_register_global(machine, wwfwfest_pri);
+    state_save_register_global(machine, wwfwfest_bg0_scrollx);
+    state_save_register_global(machine, wwfwfest_bg0_scrolly);
+    state_save_register_global(machine, wwfwfest_bg1_scrollx);
+    state_save_register_global(machine, wwfwfest_bg1_scrolly);
 
 	fg0_tilemap = tilemap_create(get_fg0_tile_info,tilemap_scan_rows, 8, 8,64,32);
 	bg1_tilemap = tilemap_create(get_bg1_tile_info,tilemap_scan_rows, 16, 16,32,32);

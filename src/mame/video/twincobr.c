@@ -132,25 +132,25 @@ VIDEO_START( toaplan0 )
 	twincobr_display_on = 0;
 	twincobr_display(twincobr_display_on);
 
-	state_save_register_global_pointer(twincobr_txvideoram16, twincobr_txvideoram_size);
-	state_save_register_global_pointer(twincobr_fgvideoram16, twincobr_fgvideoram_size);
-	state_save_register_global_pointer(twincobr_bgvideoram16, twincobr_bgvideoram_size);
-	state_save_register_global(txoffs);
-	state_save_register_global(fgoffs);
-	state_save_register_global(bgoffs);
-	state_save_register_global(scroll_x);
-	state_save_register_global(scroll_y);
-	state_save_register_global(txscrollx);
-	state_save_register_global(fgscrollx);
-	state_save_register_global(bgscrollx);
-	state_save_register_global(txscrolly);
-	state_save_register_global(fgscrolly);
-	state_save_register_global(bgscrolly);
-	state_save_register_global(twincobr_display_on);
-	state_save_register_global(twincobr_fg_rom_bank);
-	state_save_register_global(twincobr_bg_ram_bank);
-	state_save_register_global(twincobr_flip_screen);
-	state_save_register_global(wardner_sprite_hack);
+	state_save_register_global_pointer(machine, twincobr_txvideoram16, twincobr_txvideoram_size);
+	state_save_register_global_pointer(machine, twincobr_fgvideoram16, twincobr_fgvideoram_size);
+	state_save_register_global_pointer(machine, twincobr_bgvideoram16, twincobr_bgvideoram_size);
+	state_save_register_global(machine, txoffs);
+	state_save_register_global(machine, fgoffs);
+	state_save_register_global(machine, bgoffs);
+	state_save_register_global(machine, scroll_x);
+	state_save_register_global(machine, scroll_y);
+	state_save_register_global(machine, txscrollx);
+	state_save_register_global(machine, fgscrollx);
+	state_save_register_global(machine, bgscrollx);
+	state_save_register_global(machine, txscrolly);
+	state_save_register_global(machine, fgscrolly);
+	state_save_register_global(machine, bgscrolly);
+	state_save_register_global(machine, twincobr_display_on);
+	state_save_register_global(machine, twincobr_fg_rom_bank);
+	state_save_register_global(machine, twincobr_bg_ram_bank);
+	state_save_register_global(machine, twincobr_flip_screen);
+	state_save_register_global(machine, wardner_sprite_hack);
 	state_save_register_postload(machine, twincobr_restore_screen, NULL);
 }
 

@@ -82,18 +82,18 @@ static WRITE8_HANDLER( jsa3_io_w );
  *
  *************************************/
 
-static void init_save_state(void)
+static void init_save_state(running_machine *machine)
 {
-	state_save_register_global(speech_data);
-	state_save_register_global(last_ctl);
+	state_save_register_global(machine, speech_data);
+	state_save_register_global(machine, last_ctl);
 
-	state_save_register_global(oki6295_bank_base);
+	state_save_register_global(machine, oki6295_bank_base);
 
-	state_save_register_global(overall_volume);
-	state_save_register_global(pokey_volume);
-	state_save_register_global(ym2151_volume);
-	state_save_register_global(tms5220_volume);
-	state_save_register_global(oki6295_volume);
+	state_save_register_global(machine, overall_volume);
+	state_save_register_global(machine, pokey_volume);
+	state_save_register_global(machine, ym2151_volume);
+	state_save_register_global(machine, tms5220_volume);
+	state_save_register_global(machine, oki6295_volume);
 }
 
 
@@ -147,7 +147,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	if (has_pokey)
 		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[cpu_num], ADDRESS_SPACE_PROGRAM), 0x2c00, 0x2c0f, 0, 0, pokey1_r, pokey1_w);
 
-	init_save_state();
+	init_save_state(machine);
 	atarijsa_reset();
 
 	/* initialize JSA III ADPCM */

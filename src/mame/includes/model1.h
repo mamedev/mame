@@ -20,7 +20,7 @@ WRITE16_HANDLER( model1_vr_tgp_ram_w );
 ADDRESS_MAP_EXTERN( model1_vr_tgp_map, 32 );
 
 void model1_vr_tgp_reset( void );
-void model1_tgp_reset(int swa);
+void model1_tgp_reset(running_machine *machine, int swa);
 
 
 /*----------- defined in video/model1.c -----------*/

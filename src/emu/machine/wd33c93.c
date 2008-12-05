@@ -800,7 +800,7 @@ extern void wd33c93_init( const struct WD33C93interface *interface )
 
 	scsi_data.temp_input = auto_malloc( TEMP_INPUT_LEN );
 
-//  state_save_register_item_array("wd33c93", NULL, 0, scsi_data);
+//  state_save_register_item_array(Machine, "wd33c93", NULL, 0, scsi_data);
 }
 
 extern void wd33c93_exit( const struct WD33C93interface *interface )

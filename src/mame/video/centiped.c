@@ -92,8 +92,8 @@ VIDEO_START( centiped )
 
 	centiped_flipscreen = 0;
 
-	state_save_register_global(centiped_flipscreen);
-	state_save_register_global(bullsdrt_sprites_bank);
+	state_save_register_global(machine, centiped_flipscreen);
+	state_save_register_global(machine, bullsdrt_sprites_bank);
 }
 
 
@@ -113,7 +113,7 @@ VIDEO_START( milliped )
 
 	centiped_flipscreen = 0;
 
-	state_save_register_global(centiped_flipscreen);
+	state_save_register_global(machine, centiped_flipscreen);
 }
 
 

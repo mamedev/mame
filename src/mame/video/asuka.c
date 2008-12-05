@@ -8,7 +8,7 @@
 
 static void asuka_core_video_start(running_machine *machine, int x_offs,int buffering)
 {
-	PC090OJ_vh_start(0,0,8,buffering);	/* gfxset, x offset, y offset, buffering */
+	PC090OJ_vh_start(machine,0,0,8,buffering);	/* gfxset, x offset, y offset, buffering */
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0);
 	TC0110PCR_vh_start(machine);
 }

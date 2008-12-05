@@ -452,9 +452,9 @@ static TIMER_DEVICE_CALLBACK( generate_interrupt )
 
 static MACHINE_START( centiped )
 {
-	state_save_register_global_array(oldpos);
-	state_save_register_global_array(sign);
-	state_save_register_global(dsw_select);
+	state_save_register_global_array(machine, oldpos);
+	state_save_register_global_array(machine, sign);
+	state_save_register_global(machine, dsw_select);
 }
 
 

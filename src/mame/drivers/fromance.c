@@ -164,7 +164,7 @@ static WRITE8_HANDLER( fromance_adpcm_w )
 }
 
 
-static void fromance_adpcm_int(running_machine *machine, int irq)
+static void fromance_adpcm_int(const device_config *device)
 {
 	/* skip if we're reset */
 	if (!fromance_adpcm_reset)
@@ -180,7 +180,7 @@ static void fromance_adpcm_int(running_machine *machine, int irq)
 
 	/* generate an NMI if we're out of data */
 	if (!fromance_vclk_left)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

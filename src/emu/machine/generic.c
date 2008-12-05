@@ -72,9 +72,9 @@ void generic_machine_init(running_machine *machine)
 	}
 
 	/* register coin save state */
-	state_save_register_item_array("coin", NULL, 0, coin_count);
-	state_save_register_item_array("coin", NULL, 0, coinlockedout);
-	state_save_register_item_array("coin", NULL, 0, lastcoin);
+	state_save_register_item_array(machine, "coin", NULL, 0, coin_count);
+	state_save_register_item_array(machine, "coin", NULL, 0, coinlockedout);
+	state_save_register_item_array(machine, "coin", NULL, 0, lastcoin);
 
 	/* reset NVRAM size and pointers */
 	generic_nvram_size = 0;
@@ -87,7 +87,7 @@ void generic_machine_init(running_machine *machine)
 
 	/* register a reset callback and save state for interrupt enable */
 	add_reset_callback(machine, interrupt_reset);
-	state_save_register_item_array("cpu", NULL, 0, interrupt_enable);
+	state_save_register_item_array(machine, "cpu", NULL, 0, interrupt_enable);
 
 	/* register for configuration */
 	config_register(machine, "counters", counters_load, counters_save);
@@ -95,7 +95,7 @@ void generic_machine_init(running_machine *machine)
 	/* for memory cards, request save state and an exit callback */
 	if (machine->config->memcard_handler != NULL)
 	{
-		state_save_register_global(memcard_inserted);
+		state_save_register_global(machine, memcard_inserted);
 		add_exit_callback(machine, memcard_eject);
 	}
 }

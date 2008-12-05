@@ -324,12 +324,12 @@ static MACHINE_RESET( konamigv )
 	/* also hook up CDDA audio to the CD-ROM drive */
 	cdda_set_cdrom(0, am53cf96_get_device(SCSI_ID_4));
 
-	state_save_register_global_array(sector_buffer);
-	state_save_register_global(flash_address);
-	state_save_register_global_array(trackball_prev);
-	state_save_register_global_array(trackball_data);
-	state_save_register_global_array(btc_trackball_prev);
-	state_save_register_global_array(btc_trackball_data);
+	state_save_register_global_array(machine, sector_buffer);
+	state_save_register_global(machine, flash_address);
+	state_save_register_global_array(machine, trackball_prev);
+	state_save_register_global_array(machine, trackball_data);
+	state_save_register_global_array(machine, btc_trackball_prev);
+	state_save_register_global_array(machine, btc_trackball_data);
 }
 
 static const psx_spu_interface konamigv_psxspu_interface =

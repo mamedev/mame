@@ -112,13 +112,13 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 		TC0110PCR_vh_start(machine);
 
 	if (has_TC0280GRD())
-		TC0280GRD_vh_start(TC0280GRD_GFX_NUM);
+		TC0280GRD_vh_start(machine, TC0280GRD_GFX_NUM);
 
 	if (has_TC0430GRW())
-		TC0430GRW_vh_start(TC0430GRW_GFX_NUM);
+		TC0430GRW_vh_start(machine, TC0430GRW_GFX_NUM);
 
 	if (has_TC0360PRI())
-		TC0360PRI_vh_start();	/* Purely for save-state purposes */
+		TC0360PRI_vh_start(machine);	/* Purely for save-state purposes */
 
 	for (i = 0; i < 8; i ++)
 	{
@@ -131,14 +131,14 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 
 	f2_game = 0;	/* means NOT footchmp */
 
-	state_save_register_global(f2_hide_pixels);
-	state_save_register_global(f2_sprite_type);
-	state_save_register_global_array(spritebank);
-	state_save_register_global(koshien_spritebank);
-	state_save_register_global(sprites_disabled);
-	state_save_register_global(sprites_active_area);
-	state_save_register_global_pointer(spriteram_delayed, spriteram_size/2);
-	state_save_register_global_pointer(spriteram_buffered, spriteram_size/2);
+	state_save_register_global(machine, f2_hide_pixels);
+	state_save_register_global(machine, f2_sprite_type);
+	state_save_register_global_array(machine, spritebank);
+	state_save_register_global(machine, koshien_spritebank);
+	state_save_register_global(machine, sprites_disabled);
+	state_save_register_global(machine, sprites_active_area);
+	state_save_register_global_pointer(machine, spriteram_delayed, spriteram_size/2);
+	state_save_register_global_pointer(machine, spriteram_buffered, spriteram_size/2);
 }
 
 

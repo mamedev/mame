@@ -205,9 +205,9 @@ static DEVICE_START( ttl74123 )
 	chip->clear = chip->intf->clear;
 
 	/* register for state saving */
-	state_save_register_item("ttl74123", device->tag, 0, chip->a);
-	state_save_register_item("ttl74123", device->tag, 0, chip->b);
-	state_save_register_item("ttl74123", device->tag, 0, chip->clear);
+	state_save_register_device_item(device, 0, chip->a);
+	state_save_register_device_item(device, 0, chip->b);
+	state_save_register_device_item(device, 0, chip->clear);
 
 	return DEVICE_START_OK;
 }

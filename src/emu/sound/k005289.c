@@ -171,7 +171,7 @@ static SND_START( k005289 )
 	if (make_mixer_table(info, 2))
 		return NULL;
 
-	info->sound_prom = memory_region(device->machine, tag);
+	info->sound_prom = device->region;
 
 	/* reset all the voices */
 	voice[0].frequency = 0;

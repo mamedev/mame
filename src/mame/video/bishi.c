@@ -27,8 +27,8 @@ VIDEO_START(bishi)
 {
 	assert(video_screen_get_format(machine->primary_screen) == BITMAP_FORMAT_RGB32);
 
-	K055555_vh_start();
-	K054338_vh_start();
+	K055555_vh_start(machine);
+	K054338_vh_start(machine);
 
 	K056832_vh_start(machine, "gfx1", K056832_BPP_8, 1, NULL, bishi_tile_callback, 0);
 

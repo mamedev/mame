@@ -823,12 +823,12 @@ void slapstic_init(running_machine *machine, int chip)
 				  machine->config->cpu[0].type == CPU_M68010);
 
 	/* save state */
-	state_save_register_item("slapstic", NULL, 0, state);
-	state_save_register_item("slapstic", NULL, 0, current_bank);
-	state_save_register_item("slapstic", NULL, 0, alt_bank);
-	state_save_register_item("slapstic", NULL, 0, bit_bank);
-	state_save_register_item("slapstic", NULL, 0, add_bank);
-	state_save_register_item("slapstic", NULL, 0, bit_xor);
+	state_save_register_item(machine, "slapstic", NULL, 0, state);
+	state_save_register_item(machine, "slapstic", NULL, 0, current_bank);
+	state_save_register_item(machine, "slapstic", NULL, 0, alt_bank);
+	state_save_register_item(machine, "slapstic", NULL, 0, bit_bank);
+	state_save_register_item(machine, "slapstic", NULL, 0, add_bank);
+	state_save_register_item(machine, "slapstic", NULL, 0, bit_xor);
 }
 
 

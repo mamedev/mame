@@ -3699,7 +3699,7 @@ static STATE_POSTLOAD( f2_postload )
 
 static MACHINE_START( f2 )
 {
-	state_save_register_global(banknum);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, f2_postload, NULL);
 }
 
@@ -5811,8 +5811,8 @@ static STATE_POSTLOAD( driveout_postload )
 
 static DRIVER_INIT( driveout )
 {
-	state_save_register_global(driveout_sound_latch);
-	state_save_register_global(oki_bank);
+	state_save_register_global(machine, driveout_sound_latch);
+	state_save_register_global(machine, oki_bank);
 	state_save_register_postload(machine, driveout_postload, NULL);
 }
 

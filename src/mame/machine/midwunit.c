@@ -40,14 +40,14 @@ static void midxunit_dcs_output_full(int state);
  *
  *************************************/
 
-static void register_state_saving(void)
+static void register_state_saving(running_machine *machine)
 {
-	state_save_register_global(cmos_write_enable);
-	state_save_register_global_array(iodata);
-	state_save_register_global_array(ioshuffle);
-	state_save_register_global(midxunit_analog_port);
-	state_save_register_global_array(uart);
-	state_save_register_global(security_bits);
+	state_save_register_global(machine, cmos_write_enable);
+	state_save_register_global_array(machine, iodata);
+	state_save_register_global_array(machine, ioshuffle);
+	state_save_register_global(machine, midxunit_analog_port);
+	state_save_register_global_array(machine, uart);
+	state_save_register_global(machine, security_bits);
 }
 
 
@@ -379,7 +379,7 @@ static void init_wunit_generic(running_machine *machine)
 	int i, j, len;
 
 	/* register for state saving */
-	register_state_saving();
+	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
 	midyunit_gfx_rom = base = memory_region(Machine, "gfx1");
@@ -585,7 +585,7 @@ DRIVER_INIT( revx )
 	int i, j, len;
 
 	/* register for state saving */
-	register_state_saving();
+	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
 	midyunit_gfx_rom = base = memory_region(machine, "gfx1");

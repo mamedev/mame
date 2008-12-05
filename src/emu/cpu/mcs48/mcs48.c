@@ -716,25 +716,25 @@ static void mcs48_init(const device_config *device, int index, int clock, cpu_ir
 	/* ensure that regptr is valid before get_info gets called */
 	update_regptr(cpustate);
 
-	state_save_register_item("mcs48", device->tag, 0, cpustate->prevpc.w.l);
-	state_save_register_item("mcs48", device->tag, 0, PC);
-	state_save_register_item("mcs48", device->tag, 0, A);
-	state_save_register_item("mcs48", device->tag, 0, PSW);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->p1);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->p2);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->f1);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->ea);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->timer);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->prescaler);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->t1_history);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->irq_state);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->irq_in_progress);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->timer_overflow);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->timer_flag);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->tirq_enabled);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->xirq_enabled);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->timecount_enabled);
-	state_save_register_item("mcs48", device->tag, 0, cpustate->a11);
+	state_save_register_device_item(device, 0, cpustate->prevpc.w.l);
+	state_save_register_device_item(device, 0, PC);
+	state_save_register_device_item(device, 0, A);
+	state_save_register_device_item(device, 0, PSW);
+	state_save_register_device_item(device, 0, cpustate->p1);
+	state_save_register_device_item(device, 0, cpustate->p2);
+	state_save_register_device_item(device, 0, cpustate->f1);
+	state_save_register_device_item(device, 0, cpustate->ea);
+	state_save_register_device_item(device, 0, cpustate->timer);
+	state_save_register_device_item(device, 0, cpustate->prescaler);
+	state_save_register_device_item(device, 0, cpustate->t1_history);
+	state_save_register_device_item(device, 0, cpustate->irq_state);
+	state_save_register_device_item(device, 0, cpustate->irq_in_progress);
+	state_save_register_device_item(device, 0, cpustate->timer_overflow);
+	state_save_register_device_item(device, 0, cpustate->timer_flag);
+	state_save_register_device_item(device, 0, cpustate->tirq_enabled);
+	state_save_register_device_item(device, 0, cpustate->xirq_enabled);
+	state_save_register_device_item(device, 0, cpustate->timecount_enabled);
+	state_save_register_device_item(device, 0, cpustate->a11);
 }
 
 

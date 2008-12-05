@@ -148,8 +148,8 @@ void palette_init(running_machine *machine)
 		numcolors = palette_get_num_colors(machine->palette);
 		palette->save_pen = auto_malloc(sizeof(*palette->save_pen) * numcolors);
 		palette->save_bright = auto_malloc(sizeof(*palette->save_bright) * numcolors);
-		state_save_register_global_pointer(palette->save_pen, numcolors);
-		state_save_register_global_pointer(palette->save_bright, numcolors);
+		state_save_register_global_pointer(machine, palette->save_pen, numcolors);
+		state_save_register_global_pointer(machine, palette->save_bright, numcolors);
 		state_save_register_presave(machine, palette_presave, palette);
 		state_save_register_postload(machine, palette_postload, palette);
 	}
@@ -342,13 +342,13 @@ colortable_t *colortable_alloc(running_machine *machine, UINT32 palettesize)
 	ctable->raw = auto_malloc(ctable->entries * sizeof(*ctable->raw));
 	for (index = 0; index < ctable->entries; index++)
 		ctable->raw[index] = index % ctable->palentries;
-	state_save_register_global_pointer(ctable->raw, ctable->entries);
+	state_save_register_global_pointer(machine, ctable->raw, ctable->entries);
 
 	/* allocate the palette */
 	ctable->palette = auto_malloc(ctable->palentries * sizeof(*ctable->palette));
 	for (index = 0; index < ctable->palentries; index++)
 		ctable->palette[index] = MAKE_ARGB(0x80,0xff,0xff,0xff);
-	state_save_register_global_pointer(ctable->palette, ctable->palentries);
+	state_save_register_global_pointer(machine, ctable->palette, ctable->palentries);
 
 	return ctable;
 }

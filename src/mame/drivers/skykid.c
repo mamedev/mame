@@ -108,7 +108,7 @@ static MACHINE_START( skykid )
 	/* configure the banks */
 	memory_configure_bank(machine, 1, 0, 2, memory_region(machine, "main") + 0x10000, 0x2000);
 
-	state_save_register_global(inputport_selected);
+	state_save_register_global(machine, inputport_selected);
 }
 
 

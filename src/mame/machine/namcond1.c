@@ -20,8 +20,8 @@ UINT8 namcond1_gfxbank;
 
 MACHINE_START( namcond1 )
 {
-	state_save_register_global(namcond1_h8_irq5_enabled);
-	state_save_register_global(namcond1_gfxbank);
+	state_save_register_global(machine, namcond1_h8_irq5_enabled);
+	state_save_register_global(machine, namcond1_gfxbank);
 }
 
 MACHINE_RESET( namcond1 )

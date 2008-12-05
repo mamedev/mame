@@ -1095,30 +1095,28 @@ static void nec_init(const device_config *device, int index, int clock, cpu_irq_
 	const nec_config *config = device->static_config ? device->static_config : &default_config;
 	nec_state_t *nec_state = device->token;
 
-	static const char *const names[]={"V20","V30","V33"};
-
 	nec_state->config = config;
 
 
-	state_save_register_item_array(names[type], device->tag, 0, nec_state->regs.w);
-	state_save_register_item_array(names[type], device->tag, 0, nec_state->sregs);
+	state_save_register_device_item_array(device, 0, nec_state->regs.w);
+	state_save_register_device_item_array(device, 0, nec_state->sregs);
 
-	state_save_register_item(names[type], device->tag, 0, nec_state->ip);
-	state_save_register_item(names[type], device->tag, 0, nec_state->TF);
-	state_save_register_item(names[type], device->tag, 0, nec_state->IF);
-	state_save_register_item(names[type], device->tag, 0, nec_state->DF);
-	state_save_register_item(names[type], device->tag, 0, nec_state->MF);
-	state_save_register_item(names[type], device->tag, 0, nec_state->SignVal);
-	state_save_register_item(names[type], device->tag, 0, nec_state->int_vector);
-	state_save_register_item(names[type], device->tag, 0, nec_state->pending_irq);
-	state_save_register_item(names[type], device->tag, 0, nec_state->nmi_state);
-	state_save_register_item(names[type], device->tag, 0, nec_state->irq_state);
-	state_save_register_item(names[type], device->tag, 0, nec_state->poll_state);
-	state_save_register_item(names[type], device->tag, 0, nec_state->AuxVal);
-	state_save_register_item(names[type], device->tag, 0, nec_state->OverVal);
-	state_save_register_item(names[type], device->tag, 0, nec_state->ZeroVal);
-	state_save_register_item(names[type], device->tag, 0, nec_state->CarryVal);
-	state_save_register_item(names[type], device->tag, 0, nec_state->ParityVal);
+	state_save_register_device_item(device, 0, nec_state->ip);
+	state_save_register_device_item(device, 0, nec_state->TF);
+	state_save_register_device_item(device, 0, nec_state->IF);
+	state_save_register_device_item(device, 0, nec_state->DF);
+	state_save_register_device_item(device, 0, nec_state->MF);
+	state_save_register_device_item(device, 0, nec_state->SignVal);
+	state_save_register_device_item(device, 0, nec_state->int_vector);
+	state_save_register_device_item(device, 0, nec_state->pending_irq);
+	state_save_register_device_item(device, 0, nec_state->nmi_state);
+	state_save_register_device_item(device, 0, nec_state->irq_state);
+	state_save_register_device_item(device, 0, nec_state->poll_state);
+	state_save_register_device_item(device, 0, nec_state->AuxVal);
+	state_save_register_device_item(device, 0, nec_state->OverVal);
+	state_save_register_device_item(device, 0, nec_state->ZeroVal);
+	state_save_register_device_item(device, 0, nec_state->CarryVal);
+	state_save_register_device_item(device, 0, nec_state->ParityVal);
 
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;

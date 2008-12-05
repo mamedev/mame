@@ -144,8 +144,8 @@ static void _gxcommoninitnosprites(running_machine *machine)
 {
 	int i;
 
-	K054338_vh_start();
-	K055555_vh_start();
+	K054338_vh_start(machine);
+	K055555_vh_start(machine);
 
 	konamigx_mixer_init(machine, 0);
 
@@ -154,7 +154,7 @@ static void _gxcommoninitnosprites(running_machine *machine)
 		gx_tilebanks[i] = gx_oldbanks[i] = 0;
 	}
 
-	state_save_register_global_array(gx_tilebanks);
+	state_save_register_global_array(machine, gx_tilebanks);
 
 	gx_tilemode = 0;
 

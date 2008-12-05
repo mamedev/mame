@@ -43,7 +43,7 @@ WRITE16_HANDLER( rainbow_cchip_ram_w );
 
 /*----------- defined in machine/volfied.c -----------*/
 
-void volfied_cchip_init(void);
+void volfied_cchip_init(running_machine *machine);
 READ16_HANDLER( volfied_cchip_ctrl_r );
 READ16_HANDLER( volfied_cchip_ram_r );
 WRITE16_HANDLER( volfied_cchip_ctrl_w );

@@ -370,27 +370,27 @@ VIDEO_START( tubep )
 	spritemap = auto_malloc(256*256*2);
 
 	/* Set up save state */
-	state_save_register_global(romD_addr);
-	state_save_register_global(romEF_addr);
-	state_save_register_global(E16_add_b);
-	state_save_register_global(HINV);
-	state_save_register_global(VINV);
-	state_save_register_global(XSize);
-	state_save_register_global(YSize);
-	state_save_register_global(mark_1);
-	state_save_register_global(mark_2);
-	state_save_register_global(colorram_addr_hi);
-	state_save_register_global(ls273_g6);
-	state_save_register_global(ls273_j6);
-	state_save_register_global(romHI_addr_mid);
-	state_save_register_global(romHI_addr_msb);
-	state_save_register_global(DISP);
-	state_save_register_global(background_romsel);
-	state_save_register_global(color_A4);
-	state_save_register_global(ls175_b7);
-	state_save_register_global(ls175_e8);
-	state_save_register_global(ls377_data);
-	state_save_register_global(page);
+	state_save_register_global(machine, romD_addr);
+	state_save_register_global(machine, romEF_addr);
+	state_save_register_global(machine, E16_add_b);
+	state_save_register_global(machine, HINV);
+	state_save_register_global(machine, VINV);
+	state_save_register_global(machine, XSize);
+	state_save_register_global(machine, YSize);
+	state_save_register_global(machine, mark_1);
+	state_save_register_global(machine, mark_2);
+	state_save_register_global(machine, colorram_addr_hi);
+	state_save_register_global(machine, ls273_g6);
+	state_save_register_global(machine, ls273_j6);
+	state_save_register_global(machine, romHI_addr_mid);
+	state_save_register_global(machine, romHI_addr_msb);
+	state_save_register_global(machine, DISP);
+	state_save_register_global(machine, background_romsel);
+	state_save_register_global(machine, color_A4);
+	state_save_register_global(machine, ls175_b7);
+	state_save_register_global(machine, ls175_e8);
+	state_save_register_global(machine, ls377_data);
+	state_save_register_global(machine, page);
 }
 
 

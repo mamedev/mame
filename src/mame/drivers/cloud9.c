@@ -204,8 +204,8 @@ static MACHINE_START( cloud9 )
 	generic_nvram = auto_malloc(generic_nvram_size);
 
 	/* setup for save states */
-	state_save_register_global(irq_state);
-	state_save_register_global_pointer(generic_nvram, generic_nvram_size);
+	state_save_register_global(machine, irq_state);
+	state_save_register_global_pointer(machine, generic_nvram, generic_nvram_size);
 }
 
 

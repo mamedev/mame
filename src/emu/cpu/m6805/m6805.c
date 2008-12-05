@@ -419,13 +419,13 @@ static void Interrupt(void)
 
 static void state_register(const char *type, const device_config *device)
 {
-	state_save_register_item(type, device->tag, 0, A);
-	state_save_register_item(type, device->tag, 0, PC);
-	state_save_register_item(type, device->tag, 0, S);
-	state_save_register_item(type, device->tag, 0, X);
-	state_save_register_item(type, device->tag, 0, CC);
-	state_save_register_item(type, device->tag, 0, m6805.pending_interrupts);
-	state_save_register_item_array(type, device->tag, 0, m6805.irq_state);
+	state_save_register_device_item(device, 0, A);
+	state_save_register_device_item(device, 0, PC);
+	state_save_register_device_item(device, 0, S);
+	state_save_register_device_item(device, 0, X);
+	state_save_register_device_item(device, 0, CC);
+	state_save_register_device_item(device, 0, m6805.pending_interrupts);
+	state_save_register_device_item_array(device, 0, m6805.irq_state);
 }
 
 static CPU_INIT( m6805 )

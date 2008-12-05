@@ -189,11 +189,11 @@ static INPUT_CHANGED( service_switch )
 static MACHINE_START( g80v )
 {
 	/* register for save states */
-	state_save_register_global_array(mult_data);
-	state_save_register_global(mult_result);
-	state_save_register_global(spinner_select);
-	state_save_register_global(spinner_sign);
-	state_save_register_global(spinner_count);
+	state_save_register_global_array(machine, mult_data);
+	state_save_register_global(machine, mult_result);
+	state_save_register_global(machine, spinner_select);
+	state_save_register_global(machine, spinner_sign);
+	state_save_register_global(machine, spinner_count);
 }
 
 

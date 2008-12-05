@@ -202,8 +202,8 @@ static WRITE16_HANDLER( amazon_protection_w )
 static MACHINE_START( amazon )
 {
 	/* set up for save */
-	state_save_register_global(mAmazonProtCmd);
-	state_save_register_global_array(mAmazonProtReg);
+	state_save_register_global(machine, mAmazonProtCmd);
+	state_save_register_global_array(machine, mAmazonProtReg);
 }
 
 static ADDRESS_MAP_START( terracre_readmem, ADDRESS_SPACE_PROGRAM, 16 )

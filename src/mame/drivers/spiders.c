@@ -376,11 +376,11 @@ static MACHINE_START( spiders )
 	pia_config(4, &pia_4_intf);
 
 	/* setup for save states */
-	state_save_register_global(flipscreen);
-	state_save_register_global(gfx_rom_address);
-	state_save_register_global(gfx_rom_ctrl_mode);
-	state_save_register_global(gfx_rom_ctrl_latch);
-	state_save_register_global(gfx_rom_ctrl_data);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, gfx_rom_address);
+	state_save_register_global(machine, gfx_rom_ctrl_mode);
+	state_save_register_global(machine, gfx_rom_ctrl_latch);
+	state_save_register_global(machine, gfx_rom_ctrl_data);
 }
 
 

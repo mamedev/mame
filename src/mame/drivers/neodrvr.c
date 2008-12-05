@@ -7546,7 +7546,7 @@ static DRIVER_INIT( jockeygp )
 
 	/* install some extra RAM */
 	extra_ram = auto_malloc(0x2000);
-	state_save_register_global_pointer(extra_ram, 0x2000 / 2);
+	state_save_register_global_pointer(machine, extra_ram, 0x2000 / 2);
 
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, SMH_BANK8, SMH_BANK8);
 	memory_set_bankptr(machine, NEOGEO_BANK_EXTRA_RAM, extra_ram);
@@ -7563,7 +7563,7 @@ static DRIVER_INIT( vliner )
 
 	/* install some extra RAM */
 	extra_ram = auto_malloc(0x2000);
-	state_save_register_global_pointer(extra_ram, 0x2000 / 2);
+	state_save_register_global_pointer(machine, extra_ram, 0x2000 / 2);
 
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x201fff, 0, 0, SMH_BANK8, SMH_BANK8);
 	memory_set_bankptr(machine, NEOGEO_BANK_EXTRA_RAM, extra_ram);

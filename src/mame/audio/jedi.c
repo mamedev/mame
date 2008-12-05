@@ -25,9 +25,9 @@ static SOUND_START( jedi )
 	jedi_state *state = machine->driver_data;
 
 	/* set up save state */
-	state_save_register_global(state->audio_latch);
-	state_save_register_global(state->audio_ack_latch);
-	state_save_register_global(state->speech_strobe_state);
+	state_save_register_global(machine, state->audio_latch);
+	state_save_register_global(machine, state->audio_ack_latch);
+	state_save_register_global(machine, state->speech_strobe_state);
 }
 
 

@@ -199,11 +199,11 @@ VIDEO_START( phoenix )
 	tilemap_set_scrolldy(fg_tilemap, 0, (VTOTAL - VBSTART));
 	tilemap_set_scrolldy(bg_tilemap, 0, (VTOTAL - VBSTART));
 
-	state_save_register_global_pointer(videoram_pg[0], 0x1000);
-	state_save_register_global_pointer(videoram_pg[1], 0x1000);
-	state_save_register_global(videoram_pg_index);
-	state_save_register_global(palette_bank);
-	state_save_register_global(cocktail_mode);
+	state_save_register_global_pointer(machine, videoram_pg[0], 0x1000);
+	state_save_register_global_pointer(machine, videoram_pg[1], 0x1000);
+	state_save_register_global(machine, videoram_pg_index);
+	state_save_register_global(machine, palette_bank);
+	state_save_register_global(machine, cocktail_mode);
 
 	/* some more candidates */
 	pleiads_protection_question = 0;
@@ -213,11 +213,11 @@ VIDEO_START( phoenix )
 	survival_input_latches[0] = 0;
 	survival_input_latches[1] = 0;
 
-	state_save_register_global(pleiads_protection_question);
-	state_save_register_global(survival_protection_value);
-	state_save_register_global(survival_sid_value);
-	state_save_register_global(survival_input_readc);
-	state_save_register_global_array(survival_input_latches);
+	state_save_register_global(machine, pleiads_protection_question);
+	state_save_register_global(machine, survival_protection_value);
+	state_save_register_global(machine, survival_sid_value);
+	state_save_register_global(machine, survival_input_readc);
+	state_save_register_global_array(machine, survival_input_latches);
 
 }
 

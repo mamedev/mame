@@ -171,7 +171,7 @@ static const UINT8 skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS] =
 
 /* core implementation */
 static void video_exit(running_machine *machine);
-static void init_buffered_spriteram(void);
+static void init_buffered_spriteram(running_machine *machine);
 
 /* graphics decoding */
 static void allocate_graphics(running_machine *machine, const gfx_decode_entry *gfxdecodeinfo);
@@ -331,7 +331,7 @@ void video_init(running_machine *machine)
 
 	/* create spriteram buffers if necessary */
 	if (machine->config->video_attributes & VIDEO_BUFFERS_SPRITERAM)
-		init_buffered_spriteram();
+		init_buffered_spriteram(machine);
 
 	/* convert the gfx ROMs into character sets. This is done BEFORE calling the driver's */
 	/* palette_init() routine because it might need to check the machine->gfx[] data */
@@ -434,7 +434,7 @@ static void video_exit(running_machine *machine)
     double-buffered spriteram
 -------------------------------------------------*/
 
-static void init_buffered_spriteram(void)
+static void init_buffered_spriteram(running_machine *machine)
 {
 	assert_always(spriteram_size != 0, "Video buffers spriteram but spriteram_size is 0");
 
@@ -442,7 +442,7 @@ static void init_buffered_spriteram(void)
 	buffered_spriteram = auto_malloc(spriteram_size);
 
 	/* register for saving it */
-	state_save_register_global_pointer(buffered_spriteram, spriteram_size);
+	state_save_register_global_pointer(machine, buffered_spriteram, spriteram_size);
 
 	/* do the same for the secon back buffer, if present */
 	if (spriteram_2_size)
@@ -451,7 +451,7 @@ static void init_buffered_spriteram(void)
 		buffered_spriteram_2 = auto_malloc(spriteram_2_size);
 
 		/* register for saving it */
-		state_save_register_global_pointer(buffered_spriteram_2, spriteram_2_size);
+		state_save_register_global_pointer(machine, buffered_spriteram_2, spriteram_2_size);
 	}
 
 	/* make 16-bit and 32-bit pointer variants */
@@ -1247,22 +1247,22 @@ static DEVICE_START( video_screen )
 	if (screen->machine->config->video_attributes & VIDEO_UPDATE_SCANLINE)
 		timer_adjust_oneshot(state->scanline_timer, video_screen_get_time_until_pos(screen, 0, 0), 0);
 
-	state_save_register_item("video_screen", screen->tag, 0, state->width);
-	state_save_register_item("video_screen", screen->tag, 0, state->height);
-	state_save_register_item("video_screen", screen->tag, 0, state->visarea.min_x);
-	state_save_register_item("video_screen", screen->tag, 0, state->visarea.min_y);
-	state_save_register_item("video_screen", screen->tag, 0, state->visarea.max_x);
-	state_save_register_item("video_screen", screen->tag, 0, state->visarea.max_y);
-	state_save_register_item("video_screen", screen->tag, 0, state->last_partial_scan);
-	state_save_register_item("video_screen", screen->tag, 0, state->frame_period);
-	state_save_register_item("video_screen", screen->tag, 0, state->scantime);
-	state_save_register_item("video_screen", screen->tag, 0, state->pixeltime);
-	state_save_register_item("video_screen", screen->tag, 0, state->vblank_period);
-	state_save_register_item("video_screen", screen->tag, 0, state->vblank_start_time.seconds);
-	state_save_register_item("video_screen", screen->tag, 0, state->vblank_start_time.attoseconds);
-	state_save_register_item("video_screen", screen->tag, 0, state->vblank_end_time.seconds);
-	state_save_register_item("video_screen", screen->tag, 0, state->vblank_end_time.attoseconds);
-	state_save_register_item("video_screen", screen->tag, 0, state->frame_number);
+	state_save_register_device_item(screen, 0, state->width);
+	state_save_register_device_item(screen, 0, state->height);
+	state_save_register_device_item(screen, 0, state->visarea.min_x);
+	state_save_register_device_item(screen, 0, state->visarea.min_y);
+	state_save_register_device_item(screen, 0, state->visarea.max_x);
+	state_save_register_device_item(screen, 0, state->visarea.max_y);
+	state_save_register_device_item(screen, 0, state->last_partial_scan);
+	state_save_register_device_item(screen, 0, state->frame_period);
+	state_save_register_device_item(screen, 0, state->scantime);
+	state_save_register_device_item(screen, 0, state->pixeltime);
+	state_save_register_device_item(screen, 0, state->vblank_period);
+	state_save_register_device_item(screen, 0, state->vblank_start_time.seconds);
+	state_save_register_device_item(screen, 0, state->vblank_start_time.attoseconds);
+	state_save_register_device_item(screen, 0, state->vblank_end_time.seconds);
+	state_save_register_device_item(screen, 0, state->vblank_end_time.attoseconds);
+	state_save_register_device_item(screen, 0, state->frame_number);
 	state_save_register_postload(device->machine, video_screen_postload, (void *)device);
 
 	return DEVICE_START_OK;

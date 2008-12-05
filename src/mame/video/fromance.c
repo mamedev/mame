@@ -94,20 +94,20 @@ static void init_common(running_machine *machine)
 	scrolly_ofs = 0x10;
 
 	/* state save */
-	state_save_register_global(selected_videoram);
-	state_save_register_global_pointer(local_videoram[0], 0x1000 * 3);
-	state_save_register_global_pointer(local_videoram[1], 0x1000 * 3);
-	state_save_register_global(selected_paletteram);
-	state_save_register_global_array(scrollx);
-	state_save_register_global_array(scrolly);
-	state_save_register_global(gfxreg);
-	state_save_register_global(flipscreen);
-	state_save_register_global(flipscreen_old);
-	state_save_register_global(scrollx_ofs);
-	state_save_register_global(scrolly_ofs);
-	state_save_register_global(crtc_register);
-	state_save_register_global_array(crtc_data);
-	state_save_register_global_pointer(local_paletteram, 0x800 * 2);
+	state_save_register_global(machine, selected_videoram);
+	state_save_register_global_pointer(machine, local_videoram[0], 0x1000 * 3);
+	state_save_register_global_pointer(machine, local_videoram[1], 0x1000 * 3);
+	state_save_register_global(machine, selected_paletteram);
+	state_save_register_global_array(machine, scrollx);
+	state_save_register_global_array(machine, scrolly);
+	state_save_register_global(machine, gfxreg);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, flipscreen_old);
+	state_save_register_global(machine, scrollx_ofs);
+	state_save_register_global(machine, scrolly_ofs);
+	state_save_register_global(machine, crtc_register);
+	state_save_register_global_array(machine, crtc_data);
+	state_save_register_global_pointer(machine, local_paletteram, 0x800 * 2);
 }
 
 VIDEO_START( fromance )

@@ -1007,7 +1007,7 @@ VIDEO_START( dragngun )
 	deco32_pf2_colourbank=deco32_pf4_colourbank=0;
 
 	alpha_set_level(0x80);
-	state_save_register_global(dragngun_sprite_ctrl);
+	state_save_register_global(machine, dragngun_sprite_ctrl);
 	has_ace_ram=0;
 }
 
@@ -1031,7 +1031,7 @@ VIDEO_START( lockload )
 	deco32_pf2_colourbank=deco32_pf4_colourbank=0;
 
 	alpha_set_level(0x80);
-	state_save_register_global(dragngun_sprite_ctrl);
+	state_save_register_global(machine, dragngun_sprite_ctrl);
 	has_ace_ram=0;
 }
 
@@ -1060,7 +1060,7 @@ VIDEO_START( nslasher )
 	deco32_raster_display_list=0;
 	deco32_pf2_colourbank=16;
 	deco32_pf4_colourbank=16;
-	state_save_register_global(deco32_pri);
+	state_save_register_global(machine, deco32_pri);
 	alpha_set_level(0x80);
 	has_ace_ram=1;
 }

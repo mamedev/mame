@@ -106,7 +106,7 @@ void fatfury2_install_protection(running_machine *machine)
 	/* 0x2xxxxx range. There are several checks all around the code. */
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x200000, 0x2fffff, 0, 0, fatfury2_protection_16_r, fatfury2_protection_16_w);
 
-	state_save_register_global(fatfury2_prot_data);
+	state_save_register_global(machine, fatfury2_prot_data);
 }
 
 
@@ -400,7 +400,7 @@ void neogeo_reset_rng(void)
 
 static void sma_install_random_read_handler(running_machine *machine, int addr1, int addr2)
 {
-	state_save_register_global(neogeo_rng);
+	state_save_register_global(machine, neogeo_rng);
 
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), addr1, addr1 + 1, 0, 0, sma_random_r);
 	memory_install_read16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), addr2, addr2 + 1, 0, 0, sma_random_r);
@@ -522,7 +522,7 @@ static WRITE16_HANDLER( pvc_prot_w )
 void install_pvc_protection( running_machine *machine )
 {
 	pvc_cartridge_ram = auto_malloc(0x2000);
-	state_save_register_global_pointer(pvc_cartridge_ram, 0x2000 / 2);
+	state_save_register_global_pointer(machine, pvc_cartridge_ram, 0x2000 / 2);
 
 	memory_install_readwrite16_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x2fe000, 0x2fffff, 0, 0, pvc_prot_r, pvc_prot_w);
 }

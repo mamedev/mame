@@ -86,7 +86,7 @@ struct x1_010_info
 	int	rate;								// Output sampling rate (Hz)
 	sound_stream *	stream;					// Stream handle
 	int	address;							// address eor data
-	const char *region;						// region name
+	const UINT8 *region;					// region name
 	int	sound_enable;						// sound output enable/disable
 	UINT8	reg[0x2000];				// X1-010 Register & wave form area
 	UINT8	HI_WORD_BUF[0x2000];			// X1-010 16bit access ram check avoidance work
@@ -111,7 +111,7 @@ static void seta_update( void *param, stream_sample_t **inputs, stream_sample_t 
 	register INT8	*start, *end, data;
 	register UINT8	*env;
 	register UINT32	smp_offs, smp_step, env_offs, env_step, delta;
-	UINT8 *snd1 = memory_region(Machine, info->region);
+	const UINT8 *snd1 = info->region;
 
 	// mixer buffer zero clear
 	memset( buffer[0], 0, length*sizeof(*buffer[0]) );
@@ -201,7 +201,7 @@ static SND_START( x1_010 )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->region		= tag;
+	info->region		= device->region;
 	info->base_clock	= clock;
 	info->rate			= clock / 1024;
 	info->address		= intf->adr;

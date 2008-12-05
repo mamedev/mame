@@ -396,7 +396,7 @@ static WRITE8_HANDLER( nanajign_palette_w )
 static int msm5205next;
 static int resetkludge;
 
-static void adpcm_int(running_machine *machine, int data)
+static void adpcm_int(const device_config *device)
 {
 	static int toggle;
 
@@ -407,10 +407,10 @@ static void adpcm_int(running_machine *machine, int data)
 	if (toggle)
 	{
 		if (resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 	}
 }
-static void adpcm_int_cpu1(running_machine *machine, int data)
+static void adpcm_int_cpu1(const device_config *device)
 {
 	static int toggle;
 
@@ -421,7 +421,7 @@ static void adpcm_int_cpu1(running_machine *machine, int data)
 	if (toggle)
 	{
 		if (resetkludge)	// don't know what's wrong, but NMIs when the 5205 is reset make the game crash
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);	// cpu1
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);	// cpu1
 	}
 }
 

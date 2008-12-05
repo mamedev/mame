@@ -2127,14 +2127,14 @@ int stv_vdp1_start ( running_machine *machine )
 	stv_vdp1_user_cliprect.min_y = stv_vdp1_user_cliprect.max_y = 0;
 
 	// save state
-	state_save_register_global_pointer(stv_vdp1_regs, 0x040000/4);
-	state_save_register_global_pointer(stv_vdp1_vram, 0x100000/4);
-	state_save_register_global(stv_vdp1_fbcr_accessed);
-	state_save_register_global(stv_vdp1_current_display_framebuffer);
-	state_save_register_global(stv_vdp1_current_draw_framebuffer);
-	state_save_register_global(stv_vdp1_clear_framebuffer_on_next_frame);
-	state_save_register_global(stvvdp1_local_x);
-	state_save_register_global(stvvdp1_local_y);
+	state_save_register_global_pointer(machine, stv_vdp1_regs, 0x040000/4);
+	state_save_register_global_pointer(machine, stv_vdp1_vram, 0x100000/4);
+	state_save_register_global(machine, stv_vdp1_fbcr_accessed);
+	state_save_register_global(machine, stv_vdp1_current_display_framebuffer);
+	state_save_register_global(machine, stv_vdp1_current_draw_framebuffer);
+	state_save_register_global(machine, stv_vdp1_clear_framebuffer_on_next_frame);
+	state_save_register_global(machine, stvvdp1_local_x);
+	state_save_register_global(machine, stvvdp1_local_y);
 	state_save_register_postload(machine, stv_vdp1_state_save_postload, NULL);
 	return 0;
 }

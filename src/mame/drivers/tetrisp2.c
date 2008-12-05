@@ -1154,11 +1154,11 @@ static void init_rockn_timer(running_machine *machine)
 	timer_pulse(machine, ATTOTIME_IN_MSEC(32), NULL, 0, rockn_timer_level1_callback);
 	rockn_timer_l4 = timer_alloc(machine, rockn_timer_level4_callback, NULL);
 
-	state_save_register_global_array(tetrisp2_systemregs);
-	state_save_register_global_array(rocknms_sub_systemregs);
-	state_save_register_global(rockn_protectdata);
-	state_save_register_global(rockn_adpcmbank);
-	state_save_register_global(rockn_soundvolume);
+	state_save_register_global_array(machine, tetrisp2_systemregs);
+	state_save_register_global_array(machine, rocknms_sub_systemregs);
+	state_save_register_global(machine, rockn_protectdata);
+	state_save_register_global(machine, rockn_adpcmbank);
+	state_save_register_global(machine, rockn_soundvolume);
 }
 
 static DRIVER_INIT( rockn )

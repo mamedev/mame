@@ -1375,7 +1375,7 @@ static void mcr68_common_init(running_machine *machine, int sound_board, int cli
 	mcr68_sprite_clip = clip;
 	mcr68_sprite_xoffset = xoffset;
 
-	state_save_register_global(control_word);
+	state_save_register_global(machine, control_word);
 }
 
 
@@ -1456,7 +1456,7 @@ static DRIVER_INIT( pigskin )
 	/* Pigskin doesn't care too much about this value; currently taken from Tri-Sports */
 	mcr68_timing_factor = attotime_make(0, HZ_TO_ATTOSECONDS(cpu_get_clock(machine->cpu[0]) / 10) * 115);
 
-	state_save_register_global_array(protection_data);
+	state_save_register_global_array(machine, protection_data);
 }
 
 

@@ -795,8 +795,8 @@ static void atari_machine_start(running_machine *machine, int type, const pia682
 #endif /* MESS */
 
 	/* save states */
-	state_save_register_global_pointer(((UINT8 *) &antic.r), sizeof(antic.r));
-	state_save_register_global_pointer(((UINT8 *) &antic.w), sizeof(antic.w));
+	state_save_register_global_pointer(machine, ((UINT8 *) &antic.r), sizeof(antic.r));
+	state_save_register_global_pointer(machine, ((UINT8 *) &antic.w), sizeof(antic.w));
 }
 
 

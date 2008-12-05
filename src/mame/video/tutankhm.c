@@ -69,9 +69,9 @@ static void get_pens(pen_t *pens)
 
 VIDEO_START( tutankhm )
 {
-	state_save_register_global_array(junofrst_blitterdata);
-	state_save_register_global(tutankhm_flip_screen_x);
-	state_save_register_global(tutankhm_flip_screen_y);
+	state_save_register_global_array(machine, junofrst_blitterdata);
+	state_save_register_global(machine, tutankhm_flip_screen_x);
+	state_save_register_global(machine, tutankhm_flip_screen_y);
 }
 
 

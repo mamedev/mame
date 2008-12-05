@@ -1643,46 +1643,46 @@ void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0,
 
 void atarigen_init_save_state(running_machine *machine)
 {
-	state_save_register_global(atarigen_scanline_int_state);
-	state_save_register_global(atarigen_sound_int_state);
-	state_save_register_global(atarigen_video_int_state);
+	state_save_register_global(machine, atarigen_scanline_int_state);
+	state_save_register_global(machine, atarigen_sound_int_state);
+	state_save_register_global(machine, atarigen_video_int_state);
 
-	state_save_register_global(atarigen_cpu_to_sound_ready);
-	state_save_register_global(atarigen_sound_to_cpu_ready);
+	state_save_register_global(machine, atarigen_cpu_to_sound_ready);
+	state_save_register_global(machine, atarigen_sound_to_cpu_ready);
 
-	state_save_register_global(atarivc_state.latch1);				/* latch #1 value (-1 means disabled) */
-	state_save_register_global(atarivc_state.latch2);				/* latch #2 value (-1 means disabled) */
-	state_save_register_global(atarivc_state.rowscroll_enable);		/* true if row-scrolling is enabled */
-	state_save_register_global(atarivc_state.palette_bank);			/* which palette bank is enabled */
-	state_save_register_global(atarivc_state.pf0_xscroll);			/* playfield 1 xscroll */
-	state_save_register_global(atarivc_state.pf0_xscroll_raw);		/* playfield 1 xscroll raw value */
-	state_save_register_global(atarivc_state.pf0_yscroll);			/* playfield 1 yscroll */
-	state_save_register_global(atarivc_state.pf1_xscroll);			/* playfield 2 xscroll */
-	state_save_register_global(atarivc_state.pf1_xscroll_raw);		/* playfield 2 xscroll raw value */
-	state_save_register_global(atarivc_state.pf1_yscroll);			/* playfield 2 yscroll */
-	state_save_register_global(atarivc_state.mo_xscroll);			/* sprite xscroll */
-	state_save_register_global(atarivc_state.mo_yscroll);			/* sprite xscroll */
+	state_save_register_global(machine, atarivc_state.latch1);				/* latch #1 value (-1 means disabled) */
+	state_save_register_global(machine, atarivc_state.latch2);				/* latch #2 value (-1 means disabled) */
+	state_save_register_global(machine, atarivc_state.rowscroll_enable);		/* true if row-scrolling is enabled */
+	state_save_register_global(machine, atarivc_state.palette_bank);			/* which palette bank is enabled */
+	state_save_register_global(machine, atarivc_state.pf0_xscroll);			/* playfield 1 xscroll */
+	state_save_register_global(machine, atarivc_state.pf0_xscroll_raw);		/* playfield 1 xscroll raw value */
+	state_save_register_global(machine, atarivc_state.pf0_yscroll);			/* playfield 1 yscroll */
+	state_save_register_global(machine, atarivc_state.pf1_xscroll);			/* playfield 2 xscroll */
+	state_save_register_global(machine, atarivc_state.pf1_xscroll_raw);		/* playfield 2 xscroll raw value */
+	state_save_register_global(machine, atarivc_state.pf1_yscroll);			/* playfield 2 yscroll */
+	state_save_register_global(machine, atarivc_state.mo_xscroll);			/* sprite xscroll */
+	state_save_register_global(machine, atarivc_state.mo_yscroll);			/* sprite xscroll */
 
-	state_save_register_global(eeprom_unlocked);
+	state_save_register_global(machine, eeprom_unlocked);
 
-	state_save_register_global(atarigen_slapstic_num);
-	state_save_register_global(atarigen_slapstic_bank);
-	state_save_register_global(atarigen_slapstic_last_pc);
-	state_save_register_global(atarigen_slapstic_last_address);
+	state_save_register_global(machine, atarigen_slapstic_num);
+	state_save_register_global(machine, atarigen_slapstic_bank);
+	state_save_register_global(machine, atarigen_slapstic_last_pc);
+	state_save_register_global(machine, atarigen_slapstic_last_address);
 
-	state_save_register_global(sound_cpu_num);
-	state_save_register_global(atarigen_cpu_to_sound);
-	state_save_register_global(atarigen_sound_to_cpu);
-	state_save_register_global(timed_int);
-	state_save_register_global(ym2151_int);
+	state_save_register_global(machine, sound_cpu_num);
+	state_save_register_global(machine, atarigen_cpu_to_sound);
+	state_save_register_global(machine, atarigen_sound_to_cpu);
+	state_save_register_global(machine, timed_int);
+	state_save_register_global(machine, ym2151_int);
 
-	state_save_register_global(scanlines_per_callback);
+	state_save_register_global(machine, scanlines_per_callback);
 
-	state_save_register_global(actual_vc_latch0);
-	state_save_register_global(actual_vc_latch1);
+	state_save_register_global(machine, actual_vc_latch0);
+	state_save_register_global(machine, actual_vc_latch1);
 
-	state_save_register_global(playfield_latch);
-	state_save_register_global(playfield2_latch);
+	state_save_register_global(machine, playfield_latch);
+	state_save_register_global(machine, playfield2_latch);
 
 	/* need a postload to reset the state */
 	state_save_register_postload(machine, slapstic_postload, NULL);

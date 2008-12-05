@@ -54,15 +54,15 @@ VIDEO_START( btoads )
 	vram_fg_draw = (UINT8 *)btoads_vram_fg0;
 	vram_fg_display = (UINT8 *)btoads_vram_fg1;
 
-	state_save_register_global(xscroll0);
-	state_save_register_global(xscroll1);
-	state_save_register_global(yscroll0);
-	state_save_register_global(yscroll1);
-	state_save_register_global(screen_control);
+	state_save_register_global(machine, xscroll0);
+	state_save_register_global(machine, xscroll1);
+	state_save_register_global(machine, yscroll0);
+	state_save_register_global(machine, yscroll1);
+	state_save_register_global(machine, screen_control);
 
-	state_save_register_global(sprite_source_offs);
-	state_save_register_global(sprite_dest_offs);
-	state_save_register_global(misc_control);
+	state_save_register_global(machine, sprite_source_offs);
+	state_save_register_global(machine, sprite_dest_offs);
+	state_save_register_global(machine, misc_control);
 }
 
 

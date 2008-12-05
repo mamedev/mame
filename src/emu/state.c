@@ -57,30 +57,48 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _ss_entry ss_entry;
-struct _ss_entry
+typedef struct _state_entry state_entry;
+struct _state_entry
 {
-	ss_entry *		next;				/* pointer to next entry */
-	void *			data;				/* pointer to the memory to save/restore */
-	astring *		name;				/* full name */
-	UINT8			typesize;			/* size of the raw data type */
-	UINT32			typecount;			/* number of items */
-	int				tag;				/* saving tag */
-	UINT32			offset;				/* offset within the final structure */
+	state_entry *		next;				/* pointer to next entry */
+	running_machine *	machine;			/* pointer back to the owning machine */
+	void *				data;				/* pointer to the memory to save/restore */
+	astring *			name;				/* full name */
+	UINT8				typesize;			/* size of the raw data type */
+	UINT32				typecount;			/* number of items */
+	int					tag;				/* saving tag */
+	UINT32				offset;				/* offset within the final structure */
 };
 
 
-typedef struct _ss_func ss_func;
-struct _ss_func
+typedef struct _state_callback state_callback;
+struct _state_callback
 {
-	ss_func *		next;				/* pointer to next entry */
+	state_callback *	next;				/* pointer to next entry */
+	running_machine *	machine;			/* pointer back to the owning machine */
+	void *				param;				/* function parameter */
+	int					tag;				/* saving tag */
 	union
 	{
-		state_presave_func presave;		/* presave callback */
-		state_postload_func postload;	/* postload callback */
-	} func;								/* function pointers */
-	void *			param;				/* function parameter */
-	int				tag;				/* saving tag */
+		state_presave_func presave;			/* presave callback */
+		state_postload_func postload;		/* postload callback */
+	} func;									/* function pointers */
+};
+
+
+/* In mame.h: typedef struct _state_private state_private; */
+struct _state_private
+{
+	UINT8				reg_allowed;		/* are registrations allowed? */
+	int					illegal_regs;		/* number of illegal registrations */
+
+	state_entry *		entrylist;			/* list of live entries */
+	state_callback *	prefunclist;		/* presave function list */
+	state_callback *	postfunclist;		/* postsave function list */
+	
+	UINT8 *				ioarray;			/* array where we accumulate all the data */
+	UINT32				ioarraysize;		/* size of the array */
+	mame_file *			iofile;				/* file currently in use */
 };
 
 
@@ -89,19 +107,10 @@ struct _ss_func
     GLOBAL VARIABLES
 ***************************************************************************/
 
-static int ss_illegal_regs;
-static ss_entry *ss_registry;
-static ss_func *ss_prefunc_reg;
-static ss_func *ss_postfunc_reg;
-
+/* this stuff goes away when CPU cores are fully pointer-ized */
 static int ss_tag_stack[TAG_STACK_SIZE];
 static int ss_tag_stack_index;
 static int ss_current_tag;
-static UINT8 ss_registration_allowed;
-
-static UINT8 *ss_dump_array;
-static mame_file *ss_dump_file;
-static UINT32 ss_dump_size;
 
 #ifdef MESS
 static const char ss_magic_num[8] = { 'M', 'E', 'S', 'S', 'S', 'A', 'V', 'E' };
@@ -134,10 +143,27 @@ static void (*const ss_conv[])(UINT8 *, UINT32) = { 0, 0, ss_c2, 0, ss_c4, 0, 0,
 
 void state_init(running_machine *machine)
 {
-	ss_illegal_regs = 0;
-	ss_current_tag = 0;
-	ss_tag_stack_index = 0;
-	ss_registration_allowed = FALSE;
+	machine->state_data = auto_malloc(sizeof(*machine->state_data));
+	memset(machine->state_data, 0, sizeof(*machine->state_data));
+}
+
+
+/*-------------------------------------------------
+    state_save_get_reg_count - return the number 
+    of total registrations so far
+-------------------------------------------------*/
+
+int state_save_get_reg_count(running_machine *machine)
+{
+	state_private *global = machine->state_data;
+	state_entry *entry;
+	int count = 0;
+
+	/* iterate over entries with matching tags */
+	for (entry = global->entrylist; entry != NULL; entry = entry->next)
+		count++;
+
+	return count;
 }
 
 
@@ -173,25 +199,6 @@ void state_save_pop_tag(void)
 }
 
 
-/*-------------------------------------------------
-    state_save_get_reg_count - count the number of
-    registered entries on the current tag
--------------------------------------------------*/
-
-int state_save_get_reg_count(void)
-{
-	ss_entry *entry;
-	int count = 0;
-
-	/* iterate over entries with matching tags */
-	for (entry = ss_registry; entry; entry = entry->next)
-		if (entry->tag == ss_current_tag)
-			count++;
-
-	return count;
-}
-
-
 
 /***************************************************************************
     REGISTRATION HANDLING
@@ -202,10 +209,12 @@ int state_save_get_reg_count(void)
     registrations to happen
 -------------------------------------------------*/
 
-void state_save_allow_registration(int allowed)
+void state_save_allow_registration(running_machine *machine, int allowed)
 {
 	/* allow/deny registration */
-	ss_registration_allowed = allowed;
+	machine->state_data->reg_allowed = allowed;
+	if (!allowed)
+		state_save_dump_registry(machine);
 }
 
 
@@ -214,9 +223,9 @@ void state_save_allow_registration(int allowed)
     whether or not registrations are allowed
 -------------------------------------------------*/
 
-int state_save_registration_allowed(void)
+int state_save_registration_allowed(running_machine *machine)
 {
-	return ss_registration_allowed;
+	return machine->state_data->reg_allowed;
 }
 
 
@@ -225,20 +234,21 @@ int state_save_registration_allowed(void)
     array of data in memory
 -------------------------------------------------*/
 
-void state_save_register_memory(const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
+void state_save_register_memory(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, void *val, UINT32 valsize, UINT32 valcount)
 {
-	ss_entry **entry, *next;
+	state_private *global = machine->state_data;
+	state_entry **entryptr, *next;
 	astring *totalname;
 
 	assert(valsize == 1 || valsize == 2 || valsize == 4 || valsize == 8);
 
 	/* check for invalid timing */
-	if (!ss_registration_allowed)
+	if (!global->reg_allowed)
 	{
 		logerror("Attempt to register save state entry after state registration is closed! module %s tag %s name %s\n",module, tag, name);
 		if (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
 			fatalerror("Attempt to register save state entry after state registration is closed! module %s tag %s name %s\n", module, tag, name);
-		ss_illegal_regs++;
+		global->illegal_regs++;
 		return;
 	}
 
@@ -250,31 +260,32 @@ void state_save_register_memory(const char *module, const char *tag, UINT32 inde
 		astring_printf(totalname, "%X/%s/%X/%s", ss_current_tag, module, index, name);
 
 	/* look for duplicates and an entry to insert in front of */
-	for (entry = &ss_registry; *entry; entry = &(*entry)->next)
+	for (entryptr = &global->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next)
 	{
 		/* stop if the next guy's string is greater than ours */
-		int cmpval = astring_cmp((*entry)->name, totalname);
+		int cmpval = astring_cmp((*entryptr)->name, totalname);
 		if (cmpval > 0)
 			break;
 
 		/* error if we are equal */
-		if ((*entry)->tag == ss_current_tag && cmpval == 0)
+		if ((*entryptr)->tag == ss_current_tag && cmpval == 0)
 			fatalerror("Duplicate save state registration entry (%d, %s)", ss_current_tag, astring_c(totalname));
 	}
 
 	/* didn't find one; allocate a new one */
-	next = *entry;
-	*entry = malloc_or_die(sizeof(**entry));
-	memset(*entry, 0, sizeof(**entry));
+	next = *entryptr;
+	*entryptr = malloc_or_die(sizeof(**entryptr));
+	memset(*entryptr, 0, sizeof(**entryptr));
 
 	/* fill in the rest */
-	(*entry)->next      = next;
-	(*entry)->data      = val;
-	(*entry)->name      = totalname;
-	(*entry)->typesize  = valsize;
-	(*entry)->typecount = valcount;
-	(*entry)->tag       = ss_current_tag;
-	restrack_register_object(OBJTYPE_STATEREG, *entry, 0, __FILE__, __LINE__);
+	(*entryptr)->next      = next;
+	(*entryptr)->machine   = machine;
+	(*entryptr)->data      = val;
+	(*entryptr)->name      = totalname;
+	(*entryptr)->typesize  = valsize;
+	(*entryptr)->typecount = valcount;
+	(*entryptr)->tag       = ss_current_tag;
+	restrack_register_object(OBJTYPE_STATEREG, *entryptr, 0, __FILE__, __LINE__);
 }
 
 
@@ -283,9 +294,9 @@ void state_save_register_memory(const char *module, const char *tag, UINT32 inde
     bitmap to be saved
 -------------------------------------------------*/
 
-void state_save_register_bitmap(const char *module, const char *tag, UINT32 index, const char *name, bitmap_t *val)
+void state_save_register_bitmap(running_machine *machine, const char *module, const char *tag, UINT32 index, const char *name, bitmap_t *val)
 {
-	state_save_register_memory(module, tag, index, name, val->base, val->bpp / 8, val->rowpixels * val->height);
+	state_save_register_memory(machine, module, tag, index, name, val->base, val->bpp / 8, val->rowpixels * val->height);
 }
 
 
@@ -301,26 +312,28 @@ void state_save_register_bitmap(const char *module, const char *tag, UINT32 inde
 
 void state_save_register_presave(running_machine *machine, state_presave_func func, void *param)
 {
-	ss_func **cur;
+	state_private *global = machine->state_data;
+	state_callback **cbptr;
 
 	/* check for invalid timing */
-	if (!ss_registration_allowed)
+	if (!global->reg_allowed)
 		fatalerror("Attempt to register callback function after state registration is closed!");
 
 	/* scan for duplicates and push through to the end */
-	for (cur = &ss_prefunc_reg; *cur; cur = &(*cur)->next)
-		if ((*cur)->func.presave == func && (*cur)->param == param && (*cur)->tag == ss_current_tag)
+	for (cbptr = &global->prefunclist; *cbptr != NULL; cbptr = &(*cbptr)->next)
+		if ((*cbptr)->func.presave == func && (*cbptr)->param == param && (*cbptr)->tag == ss_current_tag)
 			fatalerror("Duplicate save state function (%d, %p, %p)", ss_current_tag, param, func);
 
 	/* allocate a new entry */
-	*cur = malloc_or_die(sizeof(ss_func));
+	*cbptr = malloc_or_die(sizeof(state_callback));
 
 	/* fill it in */
-	(*cur)->next         = NULL;
-	(*cur)->func.presave = func;
-	(*cur)->param        = param;
-	(*cur)->tag          = ss_current_tag;
-	restrack_register_object(OBJTYPE_STATEREG, *cur, 1, __FILE__, __LINE__);
+	(*cbptr)->next         = NULL;
+	(*cbptr)->machine      = machine;
+	(*cbptr)->func.presave = func;
+	(*cbptr)->param        = param;
+	(*cbptr)->tag          = ss_current_tag;
+	restrack_register_object(OBJTYPE_STATEREG, *cbptr, 1, __FILE__, __LINE__);
 }
 
 
@@ -331,26 +344,28 @@ void state_save_register_presave(running_machine *machine, state_presave_func fu
 
 void state_save_register_postload(running_machine *machine, state_postload_func func, void *param)
 {
-	ss_func **cur;
+	state_private *global = machine->state_data;
+	state_callback **cbptr;
 
 	/* check for invalid timing */
-	if (!ss_registration_allowed)
+	if (!global->reg_allowed)
 		fatalerror("Attempt to register callback function after state registration is closed!");
 
 	/* scan for duplicates and push through to the end */
-	for (cur = &ss_postfunc_reg; *cur; cur = &(*cur)->next)
-		if ((*cur)->func.postload == func && (*cur)->param == param && (*cur)->tag == ss_current_tag)
+	for (cbptr = &global->postfunclist; *cbptr != NULL; cbptr = &(*cbptr)->next)
+		if ((*cbptr)->func.postload == func && (*cbptr)->param == param && (*cbptr)->tag == ss_current_tag)
 			fatalerror("Duplicate save state function (%d, %p, %p)", ss_current_tag, param, func);
 
 	/* allocate a new entry */
-	*cur = malloc_or_die(sizeof(ss_func));
+	*cbptr = malloc_or_die(sizeof(state_callback));
 
 	/* fill it in */
-	(*cur)->next          = NULL;
-	(*cur)->func.postload = func;
-	(*cur)->param         = param;
-	(*cur)->tag           = ss_current_tag;
-	restrack_register_object(OBJTYPE_STATEREG, *cur, 2, __FILE__, __LINE__);
+	(*cbptr)->next          = NULL;
+	(*cbptr)->machine       = machine;
+	(*cbptr)->func.postload = func;
+	(*cbptr)->param         = param;
+	(*cbptr)->tag           = ss_current_tag;
+	restrack_register_object(OBJTYPE_STATEREG, *cbptr, 2, __FILE__, __LINE__);
 }
 
 
@@ -364,28 +379,21 @@ void state_save_register_postload(running_machine *machine, state_postload_func 
     to the current resource tag
 -------------------------------------------------*/
 
-static void func_free(ss_func **root, void *ptr)
+static void func_free(state_callback **rootptr, void *ptr)
 {
-	ss_func **func;
+	state_callback **cbptr;
 
 	/* iterate over the function list */
-	for (func = root; *func; )
-	{
-		/* if this entry matches, free it */
-		if (*func == ptr)
+	for (cbptr = rootptr; *cbptr != NULL; cbptr = &(*cbptr)->next)
+		if (*cbptr == ptr)
 		{
-			ss_func *func_to_free = *func;
+			state_callback *cb = *cbptr;
 
 			/* de-link us from the list and free our memory */
-			*func = (*func)->next;
-			free(func_to_free);
+			*cbptr = (*cbptr)->next;
+			free(cb);
 			break;
 		}
-
-		/* otherwise, advance */
-		else
-			func = &(*func)->next;
-	}
 }
 
 
@@ -397,43 +405,45 @@ static void func_free(ss_func **root, void *ptr)
 
 void state_destructor(void *ptr, size_t size)
 {
+	state_private *global = NULL;
+
 	/* size of 0 means an entry */
 	if (size == 0)
 	{
-		ss_entry **entry;
+		state_entry **entryptr;
 
 		/* iterate over entries */
-		for (entry = &ss_registry; *entry; )
-		{
-			/* if this entry matches, free it */
-			if (*entry == ptr)
+		global = ((state_entry *)ptr)->machine->state_data;
+		for (entryptr = &global->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next)
+			if (*entryptr == ptr)
 			{
-				ss_entry *entry_to_free = *entry;
+				state_entry *entry = *entryptr;
 
 				/* de-link us from the list and free our memory */
-				*entry = (*entry)->next;
-				astring_free(entry_to_free->name);
-				free(entry_to_free);
+				*entryptr = (*entryptr)->next;
+				astring_free(entry->name);
+				free(entry);
 				break;
 			}
-
-			/* if not a match, move on */
-			else
-				entry = &(*entry)->next;
-		}
 	}
 
 	/* size of 1 means a pre function */
 	else if (size == 1)
-		func_free(&ss_prefunc_reg, ptr);
+	{
+		global = ((state_callback *)ptr)->machine->state_data;
+		func_free(&global->prefunclist, ptr);
+	}
 
 	/* size of 2 means a post function */
 	else if (size == 2)
-		func_free(&ss_postfunc_reg, ptr);
+	{
+		global = ((state_callback *)ptr)->machine->state_data;
+		func_free(&global->postfunclist, ptr);
+	}
 
 	/* if we're clear of all registrations, reset the invalid counter */
-	if (ss_registry == NULL && ss_prefunc_reg == NULL && ss_postfunc_reg == NULL)
-		ss_illegal_regs = 0;
+	if (global != NULL && global->entrylist == NULL && global->prefunclist == NULL && global->postfunclist == NULL)
+		global->illegal_regs = 0;
 }
 
 
@@ -494,16 +504,16 @@ static void ss_c8(UINT8 *data, UINT32 size)
     size and offsets of each individual item
 -------------------------------------------------*/
 
-static int compute_size_and_offsets(void)
+static int compute_size_and_offsets(state_private *global)
 {
-	ss_entry *entry;
+	state_entry *entry;
 	int total_size;
 
 	/* start with the header size */
 	total_size = 0x18;
 
 	/* iterate over entries */
-	for (entry = ss_registry; entry; entry = entry->next)
+	for (entry = global->entrylist; entry; entry = entry->next)
 	{
 		/* note the offset and accumulate a total size */
 		entry->offset = total_size;
@@ -520,13 +530,14 @@ static int compute_size_and_offsets(void)
     is a CRC over the structure of the data
 -------------------------------------------------*/
 
-static UINT32 get_signature(void)
+static UINT32 get_signature(running_machine *machine)
 {
-	ss_entry *entry;
+	state_private *global = machine->state_data;
+	state_entry *entry;
 	UINT32 crc = 0;
 
 	/* iterate over entries */
-	for (entry = ss_registry; entry; entry = entry->next)
+	for (entry = global->entrylist; entry; entry = entry->next)
 	{
 		UINT32 temp[2];
 
@@ -601,14 +612,14 @@ static int validate_header(const UINT8 *header, const char *gamename, UINT32 sig
     a valid save state
 -------------------------------------------------*/
 
-int state_save_check_file(mame_file *file, const char *gamename, int validate_signature, void (CLIB_DECL *errormsg)(const char *fmt, ...))
+int state_save_check_file(running_machine *machine, mame_file *file, const char *gamename, void (CLIB_DECL *errormsg)(const char *fmt, ...))
 {
 	UINT32 signature = 0;
 	UINT8 header[0x18];
 
 	/* if we want to validate the signature, compute it */
-	if (validate_signature)
-		signature = get_signature();
+	if (machine != NULL)
+		signature = get_signature(machine);
 
 	/* seek to the beginning and read the header */
 	mame_fseek(file, 0, SEEK_SET);
@@ -634,21 +645,23 @@ int state_save_check_file(mame_file *file, const char *gamename, int validate_si
     saving
 -------------------------------------------------*/
 
-int state_save_save_begin(mame_file *file)
+int state_save_save_begin(running_machine *machine, mame_file *file)
 {
+	state_private *global = machine->state_data;
+
 	/* if we have illegal registrations, return an error */
-	if (ss_illegal_regs > 0)
+	if (global->illegal_regs > 0)
 		return 1;
 
 	LOG(("Beginning save\n"));
-	ss_dump_file = file;
+	global->iofile = file;
 
 	/* compute the total dump size and the offsets of each element */
-	ss_dump_size = compute_size_and_offsets();
-	LOG(("   total size %u\n", ss_dump_size));
+	global->ioarraysize = compute_size_and_offsets(global);
+	LOG(("   total size %u\n", global->ioarraysize));
 
 	/* allocate memory for the array */
-	ss_dump_array = malloc_or_die(ss_dump_size);
+	global->ioarray = malloc_or_die(global->ioarraysize);
 	return 0;
 }
 
@@ -660,8 +673,9 @@ int state_save_save_begin(mame_file *file)
 
 void state_save_save_continue(running_machine *machine)
 {
-	ss_entry *entry;
-	ss_func *func;
+	state_private *global = machine->state_data;
+	state_entry *entry;
+	state_callback *func;
 	int count = 0;
 
 	LOG(("Saving tag %d\n", ss_current_tag));
@@ -670,7 +684,7 @@ void state_save_save_continue(running_machine *machine)
 	LOG(("  calling pre-save functions\n"));
 
 	/* iterate over the list of functions */
-	for (func = ss_prefunc_reg; func; func = func->next)
+	for (func = global->prefunclist; func != NULL; func = func->next)
 		if (func->tag == ss_current_tag)
 		{
 			count++;
@@ -682,10 +696,10 @@ void state_save_save_continue(running_machine *machine)
 	LOG(("  copying data\n"));
 
 	/* iterate over entries with matching tags */
-	for (entry = ss_registry; entry; entry = entry->next)
+	for (entry = global->entrylist; entry != NULL; entry = entry->next)
 		if (entry->tag == ss_current_tag)
 		{
-			memcpy(ss_dump_array + entry->offset, entry->data, entry->typesize * entry->typecount);
+			memcpy(global->ioarray + entry->offset, entry->data, entry->typesize * entry->typecount);
 			LOG(("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
 		}
 }
@@ -698,6 +712,7 @@ void state_save_save_continue(running_machine *machine)
 
 void state_save_save_finish(running_machine *machine)
 {
+	state_private *global = machine->state_data;
 	UINT32 signature;
 	UINT8 flags = 0;
 
@@ -709,24 +724,24 @@ void state_save_save_finish(running_machine *machine)
 #endif
 
 	/* build up the header */
-	memcpy(ss_dump_array, ss_magic_num, 8);
-	ss_dump_array[8] = SAVE_VERSION;
-	ss_dump_array[9] = flags;
-	memset(ss_dump_array+0xa, 0, 10);
-	strcpy((char *)ss_dump_array+0xa, machine->gamedrv->name);
+	memcpy(global->ioarray, ss_magic_num, 8);
+	global->ioarray[8] = SAVE_VERSION;
+	global->ioarray[9] = flags;
+	memset(global->ioarray+0xa, 0, 10);
+	strcpy((char *)global->ioarray+0xa, machine->gamedrv->name);
 
 	/* copy in the signature */
-	signature = get_signature();
-	*(UINT32 *)&ss_dump_array[0x14] = LITTLE_ENDIANIZE_INT32(signature);
+	signature = get_signature(machine);
+	*(UINT32 *)&global->ioarray[0x14] = LITTLE_ENDIANIZE_INT32(signature);
 
 	/* write the file */
-	mame_fwrite(ss_dump_file, ss_dump_array, ss_dump_size);
+	mame_fwrite(global->iofile, global->ioarray, global->ioarraysize);
 
 	/* free memory and reset the global states */
-	free(ss_dump_array);
-	ss_dump_array = NULL;
-	ss_dump_size = 0;
-	ss_dump_file = NULL;
+	free(global->ioarray);
+	global->ioarray = NULL;
+	global->ioarraysize = 0;
+	global->iofile = NULL;
 }
 
 
@@ -740,28 +755,30 @@ void state_save_save_finish(running_machine *machine)
     of loading the state
 -------------------------------------------------*/
 
-int state_save_load_begin(mame_file *file)
+int state_save_load_begin(running_machine *machine, mame_file *file)
 {
+	state_private *global = machine->state_data;
+
 	LOG(("Beginning load\n"));
 
 	/* read the file into memory */
-	ss_dump_size = mame_fsize(file);
-	ss_dump_array = malloc_or_die(ss_dump_size);
-	ss_dump_file = file;
-	mame_fread(ss_dump_file, ss_dump_array, ss_dump_size);
+	global->ioarraysize = mame_fsize(file);
+	global->ioarray = malloc_or_die(global->ioarraysize);
+	global->iofile = file;
+	mame_fread(global->iofile, global->ioarray, global->ioarraysize);
 
 	/* verify the header and report an error if it doesn't match */
-	if (validate_header(ss_dump_array, NULL, get_signature(), popmessage, "Error: "))
+	if (validate_header(global->ioarray, NULL, get_signature(machine), popmessage, "Error: "))
 	{
-		free(ss_dump_array);
-		ss_dump_array = NULL;
-		ss_dump_size = 0;
-		ss_dump_file = NULL;
+		free(global->ioarray);
+		global->ioarray = NULL;
+		global->ioarraysize = 0;
+		global->iofile = NULL;
 		return 1;
 	}
 
 	/* compute the total size and offset of all the entries */
-	compute_size_and_offsets();
+	compute_size_and_offsets(global);
 	return 0;
 }
 
@@ -773,26 +790,27 @@ int state_save_load_begin(mame_file *file)
 
 void state_save_load_continue(running_machine *machine)
 {
-	ss_entry *entry;
-	ss_func *func;
+	state_private *global = machine->state_data;
+	state_entry *entry;
+	state_callback *func;
 	int need_convert;
 	int count = 0;
 
 	/* first determine whether or not we need to convert the endianness of the data */
 #ifdef LSB_FIRST
-	need_convert = (ss_dump_array[9] & SS_MSB_FIRST) != 0;
+	need_convert = (global->ioarray[9] & SS_MSB_FIRST) != 0;
 #else
-	need_convert = (ss_dump_array[9] & SS_MSB_FIRST) == 0;
+	need_convert = (global->ioarray[9] & SS_MSB_FIRST) == 0;
 #endif
 
 	LOG(("Loading tag %d\n", ss_current_tag));
 	LOG(("  copying data\n"));
 
 	/* iterate over entries with matching tags */
-	for (entry = ss_registry; entry; entry = entry->next)
+	for (entry = global->entrylist; entry != NULL; entry = entry->next)
 		if (entry->tag == ss_current_tag)
 		{
-			memcpy(entry->data, ss_dump_array + entry->offset, entry->typesize * entry->typecount);
+			memcpy(entry->data, global->ioarray + entry->offset, entry->typesize * entry->typecount);
 			if (need_convert && ss_conv[entry->typesize])
 				(*ss_conv[entry->typesize])(entry->data, entry->typecount);
 			LOG(("    %s: %x..%x\n", astring_c(entry->name), entry->offset, entry->offset + entry->typesize * entry->typecount - 1));
@@ -800,7 +818,7 @@ void state_save_load_continue(running_machine *machine)
 
 	/* call the post-load functions */
 	LOG(("  calling post-load functions\n"));
-	for (func = ss_postfunc_reg; func; func = func->next)
+	for (func = global->postfunclist; func != NULL; func = func->next)
 		if (func->tag == ss_current_tag)
 		{
 			count++;
@@ -815,15 +833,17 @@ void state_save_load_continue(running_machine *machine)
     of loading the state
 -------------------------------------------------*/
 
-void state_save_load_finish(void)
+void state_save_load_finish(running_machine *machine)
 {
+	state_private *global = machine->state_data;
+
 	LOG(("Finishing load\n"));
 
 	/* free memory and reset the global states */
-	free(ss_dump_array);
-	ss_dump_array = NULL;
-	ss_dump_size = 0;
-	ss_dump_file = NULL;
+	free(global->ioarray);
+	global->ioarray = NULL;
+	global->ioarraysize = 0;
+	global->iofile = NULL;
 }
 
 
@@ -837,11 +857,12 @@ void state_save_load_finish(void)
     with the given index
 -------------------------------------------------*/
 
-const char *state_save_get_indexed_item(int index, void **base, UINT32 *valsize, UINT32 *valcount)
+const char *state_save_get_indexed_item(running_machine *machine, int index, void **base, UINT32 *valsize, UINT32 *valcount)
 {
-	ss_entry *ss;
+	state_private *global = machine->state_data;
+	state_entry *ss;
 
-	for (ss = ss_registry; ss != NULL; ss = ss->next)
+	for (ss = global->entrylist; ss != NULL; ss = ss->next)
 		if (index-- == 0)
 		{
 			if (base != NULL)
@@ -862,11 +883,12 @@ const char *state_save_get_indexed_item(int index, void **base, UINT32 *valsize,
     to the logfile
 -------------------------------------------------*/
 
-void state_save_dump_registry(void)
+void state_save_dump_registry(running_machine *machine)
 {
-	ss_entry *entry;
+	state_private *global = machine->state_data;
+	state_entry *entry;
 
-	for (entry = ss_registry; entry; entry=entry->next)
+	for (entry = global->entrylist; entry; entry=entry->next)
 		LOG(("%s: %d x %d\n", astring_c(entry->name), entry->typesize, entry->typecount));
 }
 

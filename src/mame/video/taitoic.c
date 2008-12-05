@@ -821,8 +821,8 @@ void PC080SN_vh_start(running_machine *machine,int chips,int gfxnum,int x_offset
 		PC080SN_bgscroll_ram[i][1] = PC080SN_ram[i] + 0xc000 /2;
 		memset(PC080SN_ram[i],0,PC080SN_RAM_SIZE);
 
-		state_save_register_item_pointer("PC080SN", NULL, i, PC080SN_ram[i], PC080SN_RAM_SIZE/2);
-		state_save_register_item_array("PC080SN", NULL, i, PC080SN_ctrl[i]);
+		state_save_register_item_pointer(machine, "PC080SN", NULL, i, PC080SN_ram[i], PC080SN_RAM_SIZE/2);
+		state_save_register_item_array(machine, "PC080SN", NULL, i, PC080SN_ctrl[i]);
 		state_save_register_postload(machine, PC080SN_restore_scroll, (void *)(FPTR)i);
 
 		/* use the given gfx set for bg tiles */
@@ -1220,7 +1220,7 @@ static int PC090OJ_xoffs,PC090OJ_yoffs;
 
 
 
-void PC090OJ_vh_start(int gfxnum,int x_offset,int y_offset,int use_buffer)
+void PC090OJ_vh_start(running_machine *machine,int gfxnum,int x_offset,int y_offset,int use_buffer)
 {
 	/* use the given gfx set */
 	PC090OJ_gfxnum = gfxnum;
@@ -1236,9 +1236,9 @@ void PC090OJ_vh_start(int gfxnum,int x_offset,int y_offset,int use_buffer)
 	memset(PC090OJ_ram,0,PC090OJ_RAM_SIZE);
 	memset(PC090OJ_ram_buffered,0,PC090OJ_RAM_SIZE);
 
-	state_save_register_global_pointer(PC090OJ_ram, PC090OJ_RAM_SIZE/2);
-	state_save_register_global_pointer(PC090OJ_ram_buffered, PC090OJ_RAM_SIZE/2);
-	state_save_register_global(PC090OJ_ctrl);
+	state_save_register_global_pointer(machine, PC090OJ_ram, PC090OJ_RAM_SIZE/2);
+	state_save_register_global_pointer(machine, PC090OJ_ram_buffered, PC090OJ_RAM_SIZE/2);
+	state_save_register_global(machine, PC090OJ_ctrl);
 }
 
 READ16_HANDLER( PC090OJ_word_0_r )	// in case we find a game using 2...
@@ -1557,8 +1557,8 @@ void TC0080VCO_vh_start(running_machine *machine, int gfxnum,int has_fg0,int bg_
 	tilemap_set_scrolldy(TC0080VCO_tilemap[0],TC0080VCO_bg_yoffs,TC0080VCO_bg_flip_yoffs);
 	tilemap_set_scrolldy(TC0080VCO_tilemap[1],TC0080VCO_bg_yoffs,TC0080VCO_bg_flip_yoffs);
 
-	state_save_register_global_pointer(TC0080VCO_ram, TC0080VCO_RAM_SIZE/2);
-	state_save_register_global(TC0080VCO_has_tx);
+	state_save_register_global_pointer(machine, TC0080VCO_ram, TC0080VCO_RAM_SIZE/2);
+	state_save_register_global(machine, TC0080VCO_has_tx);
 
 	/* Perform extra initialisations for text layer */
 	{
@@ -2334,9 +2334,9 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 		memset(TC0100SCN_ram[i],0,TC0100SCN_RAM_SIZE);
 
 		{
-			state_save_register_item_pointer("TC0100SCN", NULL, i, TC0100SCN_ram[i], TC0100SCN_RAM_SIZE/2);
-			state_save_register_item_array("TC0100SCN", NULL, i, TC0100SCN_ctrl[i]);
-			state_save_register_item("TC0100SCN", NULL, i, TC0100SCN_dblwidth[i]);
+			state_save_register_item_pointer(machine, "TC0100SCN", NULL, i, TC0100SCN_ram[i], TC0100SCN_RAM_SIZE/2);
+			state_save_register_item_array(machine, "TC0100SCN", NULL, i, TC0100SCN_ctrl[i]);
+			state_save_register_item(machine, "TC0100SCN", NULL, i, TC0100SCN_dblwidth[i]);
 		}
 
 		state_save_register_postload(machine, TC0100SCN_postload, (void *)(FPTR)i);
@@ -2419,7 +2419,7 @@ void TC0100SCN_vh_start(running_machine *machine, int chips,int gfxnum,int x_off
 	}
 
 	TC0100SCN_gfxbank= 0;	/* Mjnquest uniquely banks tiles */
-	state_save_register_global(TC0100SCN_gfxbank);
+	state_save_register_global(machine, TC0100SCN_gfxbank);
 
 	TC0100SCN_bg_tilemask = 0xffff;	/* Mjnquest has 0x7fff tilemask */
 
@@ -2797,22 +2797,22 @@ static TILE_GET_INFO( TC0280GRD_get_tile_info )
 }
 
 
-void TC0280GRD_vh_start(int gfxnum)
+void TC0280GRD_vh_start(running_machine *machine, int gfxnum)
 {
 	TC0280GRD_ram = auto_malloc(TC0280GRD_RAM_SIZE);
 	TC0280GRD_tilemap = tilemap_create(TC0280GRD_get_tile_info,tilemap_scan_rows,8,8,64,64);
 
-	state_save_register_global_pointer(TC0280GRD_ram, TC0280GRD_RAM_SIZE/2);
-	state_save_register_global_array(TC0280GRD_ctrl);
+	state_save_register_global_pointer(machine, TC0280GRD_ram, TC0280GRD_RAM_SIZE/2);
+	state_save_register_global_array(machine, TC0280GRD_ctrl);
 
 	tilemap_set_transparent_pen(TC0280GRD_tilemap,0);
 
 	TC0280GRD_gfxnum = gfxnum;
 }
 
-void TC0430GRW_vh_start(int gfxnum)
+void TC0430GRW_vh_start(running_machine *machine, int gfxnum)
 {
-	TC0280GRD_vh_start(gfxnum);
+	TC0280GRD_vh_start(machine, gfxnum);
 }
 
 READ16_HANDLER( TC0280GRD_word_r )
@@ -2902,9 +2902,9 @@ void TC0430GRW_zoom_draw(bitmap_t *bitmap,const rectangle *cliprect,int xoffset,
 
 UINT8 TC0360PRI_regs[16];
 
-void TC0360PRI_vh_start(void)
+void TC0360PRI_vh_start(running_machine *machine)
 {
-	state_save_register_global_array(TC0360PRI_regs);
+	state_save_register_global_array(machine, TC0360PRI_regs);
 }
 
 WRITE8_HANDLER( TC0360PRI_w )
@@ -3205,9 +3205,9 @@ void TC0480SCP_vh_start(running_machine *machine, int gfxnum,int pixels,int x_of
 		TC0480SCP_dirty_chars();
 		memset(TC0480SCP_ram,0,TC0480SCP_RAM_SIZE);
 
-		state_save_register_global_pointer(TC0480SCP_ram, TC0480SCP_RAM_SIZE/2);
-		state_save_register_global_array(TC0480SCP_ctrl);
-		state_save_register_global(TC0480SCP_dblwidth);
+		state_save_register_global_pointer(machine, TC0480SCP_ram, TC0480SCP_RAM_SIZE/2);
+		state_save_register_global_array(machine, TC0480SCP_ctrl);
+		state_save_register_global(machine, TC0480SCP_dblwidth);
 		state_save_register_postload(machine, TC0480SCP_postload, NULL);
 
 		/* find first empty slot to decode gfx */
@@ -3945,11 +3945,11 @@ WRITE16_HANDLER( TC0150ROD_word_w )
 	COMBINE_DATA(&TC0150ROD_ram[offset]);
 }
 
-void TC0150ROD_vh_start(void)
+void TC0150ROD_vh_start(running_machine *machine)
 {
 	TC0150ROD_ram = auto_malloc(TC0150ROD_RAM_SIZE);
 
-	state_save_register_global_pointer(TC0150ROD_ram, TC0150ROD_RAM_SIZE/2);
+	state_save_register_global_pointer(machine, TC0150ROD_ram, TC0150ROD_RAM_SIZE/2);
 }
 
 
@@ -4746,7 +4746,7 @@ void TC0110PCR_vh_start(running_machine *machine)
 {
 	TC0110PCR_ram[0] = auto_malloc(TC0110PCR_RAM_SIZE * sizeof(*TC0110PCR_ram[0]));
 
-	state_save_register_global_pointer(TC0110PCR_ram[0], TC0110PCR_RAM_SIZE);
+	state_save_register_global_pointer(machine, TC0110PCR_ram[0], TC0110PCR_RAM_SIZE);
 	state_save_register_postload(machine, TC0110PCR_restore_colors, (void *)0);
 
 	TC0110PCR_type = 0;	/* default, xBBBBBGGGGGRRRRR */
@@ -4756,7 +4756,7 @@ void TC0110PCR_1_vh_start(running_machine *machine)
 {
 	TC0110PCR_ram[1] = auto_malloc(TC0110PCR_RAM_SIZE * sizeof(*TC0110PCR_ram[1]));
 
-	state_save_register_global_pointer(TC0110PCR_ram[1], TC0110PCR_RAM_SIZE);
+	state_save_register_global_pointer(machine, TC0110PCR_ram[1], TC0110PCR_RAM_SIZE);
 	state_save_register_postload(machine, TC0110PCR_restore_colors, (void *)1);
 }
 
@@ -4764,7 +4764,7 @@ void TC0110PCR_2_vh_start(running_machine *machine)
 {
 	TC0110PCR_ram[2] = auto_malloc(TC0110PCR_RAM_SIZE * sizeof(*TC0110PCR_ram[2]));
 
-	state_save_register_global_pointer(TC0110PCR_ram[2], TC0110PCR_RAM_SIZE);
+	state_save_register_global_pointer(machine, TC0110PCR_ram[2], TC0110PCR_RAM_SIZE);
 	state_save_register_postload(machine, TC0110PCR_restore_colors, (void *)2);
 }
 

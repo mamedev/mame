@@ -508,7 +508,7 @@ static void SCSP_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((double)(n))/log(2.0))
 
-static void SCSP_Init(const char *tag, struct _SCSP *SCSP, const scsp_interface *intf, int sndindex)
+static void SCSP_Init(const device_config *device, struct _SCSP *SCSP, const scsp_interface *intf, int sndindex)
 {
 	int i;
 
@@ -529,10 +529,10 @@ static void SCSP_Init(const char *tag, struct _SCSP *SCSP, const scsp_interface 
 			SCSP->Master=0;
 		}
 
-		SCSP->SCSPRAM = memory_region(Machine, tag);
+		SCSP->SCSPRAM = device->region;
 		if (SCSP->SCSPRAM)
 		{
-			SCSP->SCSPRAM_LENGTH = memory_region_length(Machine, tag);
+			SCSP->SCSPRAM_LENGTH = device->regionbytes;
 			SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
 			SCSP->DSP.SCSPRAM_LENGTH = SCSP->SCSPRAM_LENGTH/2;
 			SCSP->SCSPRAM += intf->roffset;
@@ -1233,7 +1233,7 @@ static SND_START( scsp )
 	intf = config;
 
 	// init the emulation
-	SCSP_Init(tag, SCSP, intf, sndindex);
+	SCSP_Init(device, SCSP, intf, sndindex);
 
 	// set up the IRQ callbacks
 	{

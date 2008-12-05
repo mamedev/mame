@@ -87,11 +87,11 @@ static VIDEO_START( common )
 	memset(&dma_state, 0, sizeof(dma_state));
 
 	/* register for state saving */
-	state_save_register_global(autoerase_enable);
-	state_save_register_global_pointer(local_videoram, 0x80000/sizeof(local_videoram[0]));
-	state_save_register_global_pointer(midyunit_cmos_ram, (0x2000 * 4)/sizeof(midyunit_cmos_ram[0]));
-	state_save_register_global(videobank_select);
-	state_save_register_global_array(dma_register);
+	state_save_register_global(machine, autoerase_enable);
+	state_save_register_global_pointer(machine, local_videoram, 0x80000/sizeof(local_videoram[0]));
+	state_save_register_global_pointer(machine, midyunit_cmos_ram, (0x2000 * 4)/sizeof(midyunit_cmos_ram[0]));
+	state_save_register_global(machine, videobank_select);
+	state_save_register_global_array(machine, dma_register);
 }
 
 

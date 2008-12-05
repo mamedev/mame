@@ -273,7 +273,7 @@ const z80sio_interface nflfoot_sio_intf =
 
 MACHINE_START( mcr )
 {
-	state_save_register_global(mcr_cocktail_flip);
+	state_save_register_global(machine, mcr_cocktail_flip);
 }
 
 
@@ -311,21 +311,21 @@ MACHINE_START( mcr68 )
 
 		m6840->timer = timer_alloc(machine, counter_fired_callback, NULL);
 
-		state_save_register_item("m6840", NULL, i, m6840->control);
-		state_save_register_item("m6840", NULL, i, m6840->latch);
-		state_save_register_item("m6840", NULL, i, m6840->count);
-		state_save_register_item("m6840", NULL, i, m6840->timer_active);
+		state_save_register_item(machine, "m6840", NULL, i, m6840->control);
+		state_save_register_item(machine, "m6840", NULL, i, m6840->latch);
+		state_save_register_item(machine, "m6840", NULL, i, m6840->count);
+		state_save_register_item(machine, "m6840", NULL, i, m6840->timer_active);
 	}
 
-	state_save_register_global(m6840_status);
-	state_save_register_global(m6840_status_read_since_int);
-	state_save_register_global(m6840_msb_buffer);
-	state_save_register_global(m6840_lsb_buffer);
-	state_save_register_global(m6840_irq_state);
-	state_save_register_global(v493_irq_state);
-	state_save_register_global(zwackery_sound_data);
+	state_save_register_global(machine, m6840_status);
+	state_save_register_global(machine, m6840_status_read_since_int);
+	state_save_register_global(machine, m6840_msb_buffer);
+	state_save_register_global(machine, m6840_lsb_buffer);
+	state_save_register_global(machine, m6840_irq_state);
+	state_save_register_global(machine, v493_irq_state);
+	state_save_register_global(machine, zwackery_sound_data);
 
-	state_save_register_global(mcr_cocktail_flip);
+	state_save_register_global(machine, mcr_cocktail_flip);
 }
 
 

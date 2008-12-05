@@ -112,7 +112,6 @@ typedef struct
 	write8_space_func ext_mem_write;
 	void (*irq_callback)(running_machine *, int);
 
-	const char *tag;
 	UINT32 clock;
 	sound_stream * stream;
 } YMF271Chip;
@@ -1653,82 +1652,82 @@ static void init_tables(void)
 	mix = auto_malloc(48000*2*sizeof(*mix));
 }
 
-static void init_state(YMF271Chip *chip)
+static void init_state(YMF271Chip *chip, const device_config *device)
 {
 	int i;
 
 	for (i = 0; i < ARRAY_LENGTH(chip->slots); i++)
 	{
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].extout);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].lfoFreq);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].pms);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ams);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].detune);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].multiple);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].tl);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].keyscale);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ar);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].decay1rate);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].decay2rate);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].decay1lvl);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].relrate);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].fns);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].block);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].feedback);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].waveform);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].accon);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].algorithm);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ch0_level);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ch1_level);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ch2_level);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].ch3_level);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].startaddr);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].loopaddr);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].endaddr);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].fs);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].srcnote);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].srcb);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].step);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].stepptr);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].active);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].bits);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].volume);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_state);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_attack_step);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_decay1_step);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_decay2_step);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].env_release_step);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].feedback_modulation0);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].feedback_modulation1);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].lfo_phase);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].lfo_step);
-		state_save_register_item("ymf271", chip->tag, i, chip->slots[i].lfo_amplitude);
+		state_save_register_device_item(device, i, chip->slots[i].extout);
+		state_save_register_device_item(device, i, chip->slots[i].lfoFreq);
+		state_save_register_device_item(device, i, chip->slots[i].pms);
+		state_save_register_device_item(device, i, chip->slots[i].ams);
+		state_save_register_device_item(device, i, chip->slots[i].detune);
+		state_save_register_device_item(device, i, chip->slots[i].multiple);
+		state_save_register_device_item(device, i, chip->slots[i].tl);
+		state_save_register_device_item(device, i, chip->slots[i].keyscale);
+		state_save_register_device_item(device, i, chip->slots[i].ar);
+		state_save_register_device_item(device, i, chip->slots[i].decay1rate);
+		state_save_register_device_item(device, i, chip->slots[i].decay2rate);
+		state_save_register_device_item(device, i, chip->slots[i].decay1lvl);
+		state_save_register_device_item(device, i, chip->slots[i].relrate);
+		state_save_register_device_item(device, i, chip->slots[i].fns);
+		state_save_register_device_item(device, i, chip->slots[i].block);
+		state_save_register_device_item(device, i, chip->slots[i].feedback);
+		state_save_register_device_item(device, i, chip->slots[i].waveform);
+		state_save_register_device_item(device, i, chip->slots[i].accon);
+		state_save_register_device_item(device, i, chip->slots[i].algorithm);
+		state_save_register_device_item(device, i, chip->slots[i].ch0_level);
+		state_save_register_device_item(device, i, chip->slots[i].ch1_level);
+		state_save_register_device_item(device, i, chip->slots[i].ch2_level);
+		state_save_register_device_item(device, i, chip->slots[i].ch3_level);
+		state_save_register_device_item(device, i, chip->slots[i].startaddr);
+		state_save_register_device_item(device, i, chip->slots[i].loopaddr);
+		state_save_register_device_item(device, i, chip->slots[i].endaddr);
+		state_save_register_device_item(device, i, chip->slots[i].fs);
+		state_save_register_device_item(device, i, chip->slots[i].srcnote);
+		state_save_register_device_item(device, i, chip->slots[i].srcb);
+		state_save_register_device_item(device, i, chip->slots[i].step);
+		state_save_register_device_item(device, i, chip->slots[i].stepptr);
+		state_save_register_device_item(device, i, chip->slots[i].active);
+		state_save_register_device_item(device, i, chip->slots[i].bits);
+		state_save_register_device_item(device, i, chip->slots[i].volume);
+		state_save_register_device_item(device, i, chip->slots[i].env_state);
+		state_save_register_device_item(device, i, chip->slots[i].env_attack_step);
+		state_save_register_device_item(device, i, chip->slots[i].env_decay1_step);
+		state_save_register_device_item(device, i, chip->slots[i].env_decay2_step);
+		state_save_register_device_item(device, i, chip->slots[i].env_release_step);
+		state_save_register_device_item(device, i, chip->slots[i].feedback_modulation0);
+		state_save_register_device_item(device, i, chip->slots[i].feedback_modulation1);
+		state_save_register_device_item(device, i, chip->slots[i].lfo_phase);
+		state_save_register_device_item(device, i, chip->slots[i].lfo_step);
+		state_save_register_device_item(device, i, chip->slots[i].lfo_amplitude);
 	}
 
 	for (i = 0; i < sizeof(chip->groups) / sizeof(chip->groups[0]); i++)
 	{
-		state_save_register_item("ymf271", chip->tag, i, chip->groups[i].sync);
-		state_save_register_item("ymf271", chip->tag, i, chip->groups[i].pfm);
+		state_save_register_device_item(device, i, chip->groups[i].sync);
+		state_save_register_device_item(device, i, chip->groups[i].pfm);
 	}
 
-	state_save_register_item("ymf271", chip->tag, 0, chip->timerA);
-	state_save_register_item("ymf271", chip->tag, 0, chip->timerB);
-	state_save_register_item("ymf271", chip->tag, 0, chip->timerAVal);
-	state_save_register_item("ymf271", chip->tag, 0, chip->timerBVal);
-	state_save_register_item("ymf271", chip->tag, 0, chip->irqstate);
-	state_save_register_item("ymf271", chip->tag, 0, chip->status);
-	state_save_register_item("ymf271", chip->tag, 0, chip->enable);
-	state_save_register_item("ymf271", chip->tag, 0, chip->reg0);
-	state_save_register_item("ymf271", chip->tag, 0, chip->reg1);
-	state_save_register_item("ymf271", chip->tag, 0, chip->reg2);
-	state_save_register_item("ymf271", chip->tag, 0, chip->reg3);
-	state_save_register_item("ymf271", chip->tag, 0, chip->pcmreg);
-	state_save_register_item("ymf271", chip->tag, 0, chip->timerreg);
-	state_save_register_item("ymf271", chip->tag, 0, chip->ext_address);
-	state_save_register_item("ymf271", chip->tag, 0, chip->ext_read);
+	state_save_register_device_item(device, 0, chip->timerA);
+	state_save_register_device_item(device, 0, chip->timerB);
+	state_save_register_device_item(device, 0, chip->timerAVal);
+	state_save_register_device_item(device, 0, chip->timerBVal);
+	state_save_register_device_item(device, 0, chip->irqstate);
+	state_save_register_device_item(device, 0, chip->status);
+	state_save_register_device_item(device, 0, chip->enable);
+	state_save_register_device_item(device, 0, chip->reg0);
+	state_save_register_device_item(device, 0, chip->reg1);
+	state_save_register_device_item(device, 0, chip->reg2);
+	state_save_register_device_item(device, 0, chip->reg3);
+	state_save_register_device_item(device, 0, chip->pcmreg);
+	state_save_register_device_item(device, 0, chip->timerreg);
+	state_save_register_device_item(device, 0, chip->ext_address);
+	state_save_register_device_item(device, 0, chip->ext_read);
 }
 
-static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_space_func ext_read, write8_space_func ext_write)
+static void ymf271_init(const device_config *device, YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine *,int), read8_space_func ext_read, write8_space_func ext_write)
 {
 	chip->timA = timer_alloc(Machine, ymf271_timer_a_tick, chip);
 	chip->timB = timer_alloc(Machine, ymf271_timer_b_tick, chip);
@@ -1740,7 +1739,7 @@ static void ymf271_init(YMF271Chip *chip, UINT8 *rom, void (*cb)(running_machine
 	chip->ext_mem_write = ext_write;
 
 	init_tables();
-	init_state(chip);
+	init_state(chip, device);
 }
 
 static SND_START( ymf271 )
@@ -1752,12 +1751,11 @@ static SND_START( ymf271 )
 
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
-	chip->tag = tag;
 	chip->clock = clock;
 
 	intf = (config != NULL) ? config : &defintrf;
 
-	ymf271_init(chip, memory_region(device->machine, tag), intf->irq_callback, intf->ext_read, intf->ext_write);
+	ymf271_init(device, chip, device->region, intf->irq_callback, intf->ext_read, intf->ext_write);
 	chip->stream = stream_create(0, 2, clock/384, chip, ymf271_update);
 
 	for (i = 0; i < 256; i++)

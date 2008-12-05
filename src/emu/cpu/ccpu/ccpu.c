@@ -137,25 +137,25 @@ static CPU_INIT( ccpu )
 	cpustate->data = memory_find_address_space(device, ADDRESS_SPACE_DATA);
 	cpustate->io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item("ccpu", device->tag, 0, cpustate->PC);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->A);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->B);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->I);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->J);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->P);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->X);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->Y);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->T);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->a0flag);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->ncflag);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->cmpacc);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->cmpval);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->miflag);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->nextmiflag);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->nextnextmiflag);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->drflag);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->waiting);
-	state_save_register_item("ccpu", device->tag, 0, cpustate->watchdog);
+	state_save_register_device_item(device, 0, cpustate->PC);
+	state_save_register_device_item(device, 0, cpustate->A);
+	state_save_register_device_item(device, 0, cpustate->B);
+	state_save_register_device_item(device, 0, cpustate->I);
+	state_save_register_device_item(device, 0, cpustate->J);
+	state_save_register_device_item(device, 0, cpustate->P);
+	state_save_register_device_item(device, 0, cpustate->X);
+	state_save_register_device_item(device, 0, cpustate->Y);
+	state_save_register_device_item(device, 0, cpustate->T);
+	state_save_register_device_item(device, 0, cpustate->a0flag);
+	state_save_register_device_item(device, 0, cpustate->ncflag);
+	state_save_register_device_item(device, 0, cpustate->cmpacc);
+	state_save_register_device_item(device, 0, cpustate->cmpval);
+	state_save_register_device_item(device, 0, cpustate->miflag);
+	state_save_register_device_item(device, 0, cpustate->nextmiflag);
+	state_save_register_device_item(device, 0, cpustate->nextnextmiflag);
+	state_save_register_device_item(device, 0, cpustate->drflag);
+	state_save_register_device_item(device, 0, cpustate->waiting);
+	state_save_register_device_item(device, 0, cpustate->watchdog);
 }
 
 

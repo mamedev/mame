@@ -2103,7 +2103,7 @@ void decrypt_ms32_bg(running_machine *machine, int addr_xor,int data_xor, const 
 
 static void configure_banks(running_machine *machine)
 {
-	state_save_register_global(to_main);
+	state_save_register_global(machine, to_main);
 	memory_configure_bank(machine, 4, 0, 16, memory_region(machine, "audio") + 0x14000, 0x4000);
 	memory_configure_bank(machine, 5, 0, 16, memory_region(machine, "audio") + 0x14000, 0x4000);
 }

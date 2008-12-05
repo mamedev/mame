@@ -90,7 +90,7 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 	memory_set_bankptr(space->machine,  1, memory_region(space->machine, "z80") + ((data) & 0x03) * 0x4000 + 0x10000 );
 }
 
-static void ml_msm5205_vck(running_machine *machine, int chip)
+static void ml_msm5205_vck(const device_config *device)
 {
 	if (adpcm_data != -1)
 	{
@@ -99,7 +99,7 @@ static void ml_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data = memory_region(machine, "adpcm")[adpcm_pos];
+		adpcm_data = memory_region(device->machine, "adpcm")[adpcm_pos];
 		adpcm_pos = (adpcm_pos + 1) & 0xffff;
 		msm5205_data_w(0, adpcm_data >> 4);
 	}

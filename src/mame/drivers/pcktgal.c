@@ -51,7 +51,7 @@ static WRITE8_HANDLER( pcktgal_sound_w )
 
 static int msm5205next;
 
-static void pcktgal_adpcm_int(running_machine *machine, int data)
+static void pcktgal_adpcm_int(const device_config *device)
 {
 	static int toggle;
 
@@ -60,7 +60,7 @@ static void pcktgal_adpcm_int(running_machine *machine, int data)
 
 	toggle = 1 - toggle;
 	if (toggle)
-		cpu_set_input_line(machine->cpu[1],M6502_IRQ_LINE,HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[1],M6502_IRQ_LINE,HOLD_LINE);
 }
 
 static WRITE8_HANDLER( pcktgal_adpcm_data_w )

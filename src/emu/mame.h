@@ -127,6 +127,7 @@ typedef void (*output_callback_func)(void *param, const char *format, va_list ar
 /* forward type declarations */
 typedef struct _mame_private mame_private;
 typedef struct _timer_private timer_private;
+typedef struct _state_private state_private;
 typedef struct _memory_private memory_private;
 typedef struct _palette_private palette_private;
 typedef struct _streams_private streams_private;
@@ -173,6 +174,7 @@ struct _running_machine
 	/* internal core information */
 	mame_private *			mame_data;			/* internal data from mame.c */
 	timer_private *			timer_data;			/* internal data from timer.c */
+	state_private *			state_data;			/* internal data from state.c */
 	memory_private *		memory_data;		/* internal data from memory.c */
 	palette_private *		palette_data;		/* internal data from palette.c */
 	streams_private *		streams_data;		/* internal data from streams.c */

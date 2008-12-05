@@ -561,19 +561,19 @@ static MACHINE_START( vegas )
 	cpu_set_info_int(machine->cpu[0], CPUINFO_INT_MIPS3_FASTRAM_READONLY, 1);
 
 	/* register for save states */
-	state_save_register_global(nile_irq_state);
-	state_save_register_global(ide_irq_state);
-	state_save_register_global_array(pci_bridge_regs);
-	state_save_register_global_array(pci_ide_regs);
-	state_save_register_global_array(pci_3dfx_regs);
-	state_save_register_global(vblank_state);
-	state_save_register_global_array(sio_data);
-	state_save_register_global(sio_irq_clear);
-	state_save_register_global(sio_irq_enable);
-	state_save_register_global(sio_irq_state);
-	state_save_register_global(sio_led_state);
-	state_save_register_global(pending_analog_read);
-	state_save_register_global(cmos_unlocked);
+	state_save_register_global(machine, nile_irq_state);
+	state_save_register_global(machine, ide_irq_state);
+	state_save_register_global_array(machine, pci_bridge_regs);
+	state_save_register_global_array(machine, pci_ide_regs);
+	state_save_register_global_array(machine, pci_3dfx_regs);
+	state_save_register_global(machine, vblank_state);
+	state_save_register_global_array(machine, sio_data);
+	state_save_register_global(machine, sio_irq_clear);
+	state_save_register_global(machine, sio_irq_enable);
+	state_save_register_global(machine, sio_irq_state);
+	state_save_register_global(machine, sio_led_state);
+	state_save_register_global(machine, pending_analog_read);
+	state_save_register_global(machine, cmos_unlocked);
 	state_save_register_postload(machine, vegas_postload, NULL);
 }
 

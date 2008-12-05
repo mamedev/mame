@@ -201,5 +201,5 @@ MACHINE_RESET( acitya )
 	memory_configure_bank(machine, 1, 0, 4, &RAM[0x10000], 0x4000);
 	memory_set_bank(machine, 1, 3);
 
-	state_save_register_global(counter);
+	state_save_register_global(machine, counter);
 }

@@ -213,11 +213,11 @@ static void ds1204_init(const UINT8* key, const UINT8* nvram)
 	if (nvram)
 		memcpy(ds1204.nvram, nvram, sizeof(ds1204.nvram));
 
-	state_save_register_item("ds1204", NULL, 0, ds1204.state);
-	state_save_register_item("ds1204", NULL, 0, ds1204.read_ptr);
-	state_save_register_item("ds1204", NULL, 0, ds1204.last_clk);
-	state_save_register_item("ds1204", NULL, 0, ds1204.out_bit);
-	state_save_register_item_array("ds1204", NULL, 0, ds1204.command);
+	state_save_register_item(Machine, "ds1204", NULL, 0, ds1204.state);
+	state_save_register_item(Machine, "ds1204", NULL, 0, ds1204.read_ptr);
+	state_save_register_item(Machine, "ds1204", NULL, 0, ds1204.last_clk);
+	state_save_register_item(Machine, "ds1204", NULL, 0, ds1204.out_bit);
+	state_save_register_item_array(Machine, "ds1204", NULL, 0, ds1204.command);
 };
 
 /*************************************
@@ -332,11 +332,11 @@ static VIDEO_START( meritm )
 	v9938_init (machine, 1, machine->primary_screen, vdp1_bitmap, MODEL_V9938, 0x20000, meritm_vdp1_interrupt);
 	v9938_reset(1);
 
-	state_save_register_global(meritm_vint);
-	state_save_register_global(meritm_interrupt_vdp0_state);
-	state_save_register_global(meritm_interrupt_vdp1_state);
-	state_save_register_global_bitmap(vdp0_bitmap);
-	state_save_register_global_bitmap(vdp1_bitmap);
+	state_save_register_global(machine, meritm_vint);
+	state_save_register_global(machine, meritm_interrupt_vdp0_state);
+	state_save_register_global(machine, meritm_interrupt_vdp1_state);
+	state_save_register_global_bitmap(machine, vdp0_bitmap);
+	state_save_register_global_bitmap(machine, vdp1_bitmap);
 
 }
 
@@ -851,14 +851,14 @@ static MACHINE_START(meritm_crt250)
 	meritm_bank = 0xff;
 	meritm_crt250_switch_banks();
 	MACHINE_START_CALL(merit_common);
-	state_save_register_global(meritm_bank);
+	state_save_register_global(machine, meritm_bank);
 
 };
 
 static MACHINE_START(meritm_crt250_questions)
 {
 	MACHINE_START_CALL(meritm_crt250);
-	state_save_register_global(questions_loword_address);
+	state_save_register_global(machine, questions_loword_address);
 };
 
 static MACHINE_START(meritm_crt260)
@@ -874,9 +874,9 @@ static MACHINE_START(meritm_crt260)
 	MACHINE_START_CALL(merit_common);
 	pc16552d_init(0, UART_CLK, NULL, pc16650d_tx_callback);
 	microtouch_init(meritm_microtouch_tx_callback, meritm_touch_coord_transform);
-	state_save_register_global(meritm_bank);
-	state_save_register_global(meritm_psd_a15);
-	state_save_register_global_pointer(meritm_ram, 0x8000);
+	state_save_register_global(machine, meritm_bank);
+	state_save_register_global(machine, meritm_psd_a15);
+	state_save_register_global_pointer(machine, meritm_ram, 0x8000);
 };
 
 static NVRAM_HANDLER(meritm_crt260)

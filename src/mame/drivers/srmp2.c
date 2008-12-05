@@ -235,9 +235,9 @@ static WRITE8_HANDLER( srmp3_adpcm_code_w )
 }
 
 
-static void srmp2_adpcm_int(running_machine *machine, int num)
+static void srmp2_adpcm_int(const device_config *device)
 {
-	UINT8 *ROM = memory_region(machine, "adpcm");
+	UINT8 *ROM = memory_region(device->machine, "adpcm");
 
 	if (srmp2_adpcm_sptr)
 	{

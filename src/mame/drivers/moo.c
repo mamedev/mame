@@ -556,8 +556,8 @@ INPUT_PORTS_END
 
 static MACHINE_START( moo )
 {
-	state_save_register_global(cur_control2);
-	state_save_register_global_array(protram);
+	state_save_register_global(machine, cur_control2);
+	state_save_register_global_array(machine, protram);
 }
 
 static MACHINE_RESET( moo )

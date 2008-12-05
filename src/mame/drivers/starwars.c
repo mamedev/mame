@@ -540,9 +540,9 @@ static DRIVER_INIT( esb )
 	memory_set_bank(machine, 2, 0);
 
 	/* additional globals for state saving */
-	state_save_register_global(slapstic_current_bank);
-	state_save_register_global(slapstic_last_pc);
-	state_save_register_global(slapstic_last_address);
+	state_save_register_global(machine, slapstic_current_bank);
+	state_save_register_global(machine, slapstic_last_pc);
+	state_save_register_global(machine, slapstic_last_address);
 }
 
 

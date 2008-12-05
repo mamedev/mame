@@ -848,21 +848,21 @@ static CPU_INIT( i8x41 )
 	upi41_state->subtype = 8041;
 	upi41_state->ram_mask = I8X41_intRAM_MASK;
 
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->ppc);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->pc);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->timer);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->prescaler);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->subtype);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->a);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->psw);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->state);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->enable);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->control);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->dbbi);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->dbbo);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->p1);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->p2);
-	state_save_register_item("i8x41", device->tag, 0, upi41_state->p2_hs);
+	state_save_register_device_item(device, 0, upi41_state->ppc);
+	state_save_register_device_item(device, 0, upi41_state->pc);
+	state_save_register_device_item(device, 0, upi41_state->timer);
+	state_save_register_device_item(device, 0, upi41_state->prescaler);
+	state_save_register_device_item(device, 0, upi41_state->subtype);
+	state_save_register_device_item(device, 0, upi41_state->a);
+	state_save_register_device_item(device, 0, upi41_state->psw);
+	state_save_register_device_item(device, 0, upi41_state->state);
+	state_save_register_device_item(device, 0, upi41_state->enable);
+	state_save_register_device_item(device, 0, upi41_state->control);
+	state_save_register_device_item(device, 0, upi41_state->dbbi);
+	state_save_register_device_item(device, 0, upi41_state->dbbo);
+	state_save_register_device_item(device, 0, upi41_state->p1);
+	state_save_register_device_item(device, 0, upi41_state->p2);
+	state_save_register_device_item(device, 0, upi41_state->p2_hs);
 }
 
 static CPU_INIT( i8042 )

@@ -19,7 +19,7 @@
 typedef struct _msm5205_interface msm5205_interface;
 struct _msm5205_interface
 {
-	void (*vclk_callback)(running_machine *, int);   /* VCLK callback              */
+	void (*vclk_callback)(const device_config *);   /* VCLK callback              */
 	int select;       /* prescaler / bit width selector        */
 };
 

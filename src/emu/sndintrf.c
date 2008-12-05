@@ -41,7 +41,7 @@ struct _sndintrf_data
 	snd_class_header	intf;	 		/* copy of the interface data */
 	sound_type		sndtype; 		/* type index of this sound chip */
 	sound_type		aliastype;		/* aliased type index of this sound chip */
-	device_config	device;			/* dummy device for now */
+	device_config *	device;			/* dummy device for now */
 	const char *	tag; 			/* tag this sound chip */
 	int				index; 			/* index of this sound chip */
 	int				clock; 			/* clock for this sound chip */
@@ -574,13 +574,26 @@ void sndintrf_init(running_machine *machine)
     particular sndnum
 -------------------------------------------------*/
 
+static DEVICE_GET_INFO( sndclass )
+{
+	sndintrf_data *snddata = device->classtoken;
+	(*snddata->intf.get_info)(device, state, (sndinfo *)info);
+}
+
 int sndintrf_init_sound(int sndnum, const char *tag, sound_type sndtype, int clock, const void *config)
 {
 	sndintrf_data *info = &sound[sndnum];
 	int index;
 
-	memset(&info->device, 0, sizeof(info->device));
-	info->device.machine = Machine;
+	info->device = auto_malloc(sizeof(*info->device) + strlen(tag));
+	memset(info->device, 0, sizeof(*info->device) + strlen(tag));
+	info->device->type = DEVICE_GET_INFO_NAME(sndclass);
+	info->device->machine = Machine;
+	strcpy(info->device->tag, tag);
+	info->device->static_config = config;
+	info->device->region = memory_region(info->device->machine, info->device->tag);
+	info->device->regionbytes = memory_region_length(info->device->machine, info->device->tag);
+	info->device->classtoken = info;
 
 	/* fill in the type and interface */
 	info->intf = snd_type_header[sndtype];
@@ -603,12 +616,12 @@ int sndintrf_init_sound(int sndnum, const char *tag, sound_type sndtype, int clo
 
 	/* start the chip, tagging all its streams */
 	current_sound_start = &sound[sndnum];
-	info->device.token = (*info->intf.start)(&info->device, info->tag, index, clock, config);
+	info->device->token = (*info->intf.start)(info->device, clock, config, info->index);
 	current_sound_start = NULL;
-	VPRINTF(("  token = %p\n", info->device.token));
+	VPRINTF(("  token = %p\n", info->device->token));
 
 	/* if that failed, die */
-	if (!info->device.token)
+	if (info->device->token == NULL)
 		return 1;
 
 	return 0;
@@ -624,7 +637,7 @@ void sndintrf_exit_sound(int sndnum)
 {
 	/* stop the chip */
 	if (sound[sndnum].intf.stop)
-		(*sound[sndnum].intf.stop)(&sound[sndnum].device);
+		(*sound[sndnum].intf.stop)(sound[sndnum].device);
 }
 
 
@@ -641,7 +654,7 @@ void sndintrf_exit_sound(int sndnum)
 void sndintrf_register_token(void *token)
 {
 	if (current_sound_start)
-		current_sound_start->device.token = token;
+		current_sound_start->device->token = token;
 }
 
 
@@ -713,7 +726,7 @@ INT64 sndnum_get_info_int(int sndnum, UINT32 state)
 
 	VERIFY_SNDNUM(sndnum_get_info_int);
 	info.i = 0;
-	(*sound[sndnum].intf.get_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.i;
 }
 
@@ -723,7 +736,7 @@ void *sndnum_get_info_ptr(int sndnum, UINT32 state)
 
 	VERIFY_SNDNUM(sndnum_get_info_ptr);
 	info.p = NULL;
-	(*sound[sndnum].intf.get_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.p;
 }
 
@@ -733,7 +746,7 @@ genf *sndnum_get_info_fct(int sndnum, UINT32 state)
 
 	VERIFY_SNDNUM(sndnum_get_info_fct);
 	info.f = NULL;
-	(*sound[sndnum].intf.get_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.f;
 }
 
@@ -743,7 +756,7 @@ const char *sndnum_get_info_string(int sndnum, UINT32 state)
 
 	VERIFY_SNDNUM(sndnum_get_info_string);
 	info.s = NULL;
-	(*sound[sndnum].intf.get_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.s;
 }
 
@@ -757,7 +770,7 @@ void sndnum_set_info_int(int sndnum, UINT32 state, INT64 data)
 	sndinfo info;
 	VERIFY_SNDNUM(sndnum_set_info_int);
 	info.i = data;
-	(*sound[sndnum].intf.set_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.set_info)(sound[sndnum].device, state, &info);
 }
 
 void sndnum_set_info_ptr(int sndnum, UINT32 state, void *data)
@@ -765,7 +778,7 @@ void sndnum_set_info_ptr(int sndnum, UINT32 state, void *data)
 	sndinfo info;
 	VERIFY_SNDNUM(sndnum_set_info_ptr);
 	info.p = data;
-	(*sound[sndnum].intf.set_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.set_info)(sound[sndnum].device, state, &info);
 }
 
 void sndnum_set_info_fct(int sndnum, UINT32 state, genf *data)
@@ -773,7 +786,7 @@ void sndnum_set_info_fct(int sndnum, UINT32 state, genf *data)
 	sndinfo info;
 	VERIFY_SNDNUM(sndnum_set_info_ptr);
 	info.f = data;
-	(*sound[sndnum].intf.set_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.set_info)(sound[sndnum].device, state, &info);
 }
 
 
@@ -785,7 +798,7 @@ void sndnum_reset(int sndnum)
 {
 	VERIFY_SNDNUM(sndnum_reset);
 	if (sound[sndnum].intf.reset)
-		(*sound[sndnum].intf.reset)(&sound[sndnum].device);
+		(*sound[sndnum].intf.reset)(sound[sndnum].device);
 }
 
 int sndnum_clock(int sndnum)
@@ -797,7 +810,7 @@ int sndnum_clock(int sndnum)
 void *sndnum_token(int sndnum)
 {
 	VERIFY_SNDNUM(sndnum_token);
-	return sound[sndnum].device.token;
+	return sound[sndnum].device->token;
 }
 
 
@@ -818,7 +831,7 @@ INT64 sndti_get_info_int(sound_type sndtype, int sndindex, UINT32 state)
 	VERIFY_SNDTI(sndti_get_info_int);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
 	info.i = 0;
-	(*sound[sndnum].intf.get_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.i;
 }
 
@@ -830,7 +843,7 @@ void *sndti_get_info_ptr(sound_type sndtype, int sndindex, UINT32 state)
 	VERIFY_SNDTI(sndti_get_info_ptr);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
 	info.p = NULL;
-	(*sound[sndnum].intf.get_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.p;
 }
 
@@ -842,7 +855,7 @@ genf *sndti_get_info_fct(sound_type sndtype, int sndindex, UINT32 state)
 	VERIFY_SNDTI(sndti_get_info_fct);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
 	info.f = NULL;
-	(*sound[sndnum].intf.get_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.f;
 }
 
@@ -854,7 +867,7 @@ const char *sndti_get_info_string(sound_type sndtype, int sndindex, UINT32 state
 	VERIFY_SNDTI(sndti_get_info_string);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
 	info.s = NULL;
-	(*sound[sndnum].intf.get_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.get_info)(sound[sndnum].device, state, &info);
 	return info.s;
 }
 
@@ -871,7 +884,7 @@ void sndti_set_info_int(sound_type sndtype, int sndindex, UINT32 state, INT64 da
 	VERIFY_SNDTI(sndti_set_info_int);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
 	info.i = data;
-	(*sound[sndnum].intf.set_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.set_info)(sound[sndnum].device, state, &info);
 }
 
 void sndti_set_info_ptr(sound_type sndtype, int sndindex, UINT32 state, void *data)
@@ -882,7 +895,7 @@ void sndti_set_info_ptr(sound_type sndtype, int sndindex, UINT32 state, void *da
 	VERIFY_SNDTI(sndti_set_info_ptr);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
 	info.p = data;
-	(*sound[sndnum].intf.set_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.set_info)(sound[sndnum].device, state, &info);
 }
 
 void sndti_set_info_fct(sound_type sndtype, int sndindex, UINT32 state, genf *data)
@@ -893,7 +906,7 @@ void sndti_set_info_fct(sound_type sndtype, int sndindex, UINT32 state, genf *da
 	VERIFY_SNDTI(sndti_set_info_ptr);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
 	info.f = data;
-	(*sound[sndnum].intf.set_info)(&sound[sndnum].device, state, &info);
+	(*sound[sndnum].intf.set_info)(sound[sndnum].device, state, &info);
 }
 
 
@@ -908,7 +921,7 @@ void sndti_reset(sound_type sndtype, int sndindex)
 	VERIFY_SNDTI(sndti_reset);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
 	if (sound[sndnum].intf.reset)
-		(*sound[sndnum].intf.reset)(&sound[sndnum].device);
+		(*sound[sndnum].intf.reset)(sound[sndnum].device);
 }
 
 int sndti_clock(sound_type sndtype, int sndindex)
@@ -924,7 +937,7 @@ void *sndti_token(sound_type sndtype, int sndindex)
 	int sndnum;
 	VERIFY_SNDTI(sndti_token);
 	sndnum = sound_matrix[sndtype][sndindex] - 1;
-	return sound[sndnum].device.token;
+	return sound[sndnum].device->token;
 }
 
 

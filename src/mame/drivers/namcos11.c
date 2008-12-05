@@ -842,7 +842,7 @@ static DRIVER_INIT( namcos11 )
 					m_n_bankoffset = 0;
 					memory_install_write32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f080000, 0x1f080003, 0, 0, bankswitch_rom64_upper_w );
 					memory_install_readwrite32_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1fa10020, 0x1fa1002f, 0, 0, SMH_NOP, bankswitch_rom64_w );
-					state_save_register_global( m_n_bankoffset );
+					state_save_register_global(machine,  m_n_bankoffset );
 				}
 			}
 			else
@@ -860,7 +860,7 @@ static DRIVER_INIT( namcos11 )
 		memory_install_read32_handler (cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f780000, 0x1f78000f, 0, 0, lightgun_r );
 	}
 
-	state_save_register_global( m_n_oldcoin );
+	state_save_register_global(machine,  m_n_oldcoin );
 }
 
 static MACHINE_RESET( namcos11 )

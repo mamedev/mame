@@ -33,7 +33,7 @@ static UINT8 latch_read[4];
     register for save states
 -------------------------------------------------*/
 
-int generic_sound_init(void)
+int generic_sound_init(running_machine *machine)
 {
 	/* reset latches */
 	latch_clear_value = 0;
@@ -41,8 +41,8 @@ int generic_sound_init(void)
 	memset(latch_read, 0, sizeof(latch_read));
 
 	/* register globals with the save state system */
-	state_save_register_global_array(latched_value);
-	state_save_register_global_array(latch_read);
+	state_save_register_global_array(machine, latched_value);
+	state_save_register_global_array(machine, latch_read);
 
 	return 0;
 }

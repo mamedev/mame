@@ -738,39 +738,39 @@ static void psx_gpu_init( running_machine *machine )
 	}
 
 	// icky!!!
-	state_save_register_memory( "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
+	state_save_register_memory( machine, "globals", NULL, 0, "m_packet", (UINT8 *)&m_packet, 1, sizeof( m_packet ) );
 
-	state_save_register_global_pointer( m_p_vram, m_n_vram_size );
-	state_save_register_global( m_n_gpu_buffer_offset );
-	state_save_register_global( m_n_vramx );
-	state_save_register_global( m_n_vramy );
-	state_save_register_global( m_n_twy );
-	state_save_register_global( m_n_twx );
-	state_save_register_global( m_n_tww );
-	state_save_register_global( m_n_drawarea_x1 );
-	state_save_register_global( m_n_drawarea_y1 );
-	state_save_register_global( m_n_drawarea_x2 );
-	state_save_register_global( m_n_drawarea_y2 );
-	state_save_register_global( m_n_horiz_disstart );
-	state_save_register_global( m_n_horiz_disend );
-	state_save_register_global( m_n_vert_disstart );
-	state_save_register_global( m_n_vert_disend );
-	state_save_register_global( m_b_reverseflag );
-	state_save_register_global( m_n_drawoffset_x );
-	state_save_register_global( m_n_drawoffset_y );
-	state_save_register_global( m_n_displaystartx );
-	state_save_register_global( m_n_displaystarty );
-	state_save_register_global( m_n_gpustatus );
-	state_save_register_global( m_n_gpuinfo );
-	state_save_register_global( m_n_lightgun_x );
-	state_save_register_global( m_n_lightgun_y );
-	state_save_register_global( psxgpu.n_tx );
-	state_save_register_global( psxgpu.n_ty );
-	state_save_register_global( psxgpu.n_abr );
-	state_save_register_global( psxgpu.n_tp );
-	state_save_register_global( psxgpu.n_ix );
-	state_save_register_global( psxgpu.n_iy );
-	state_save_register_global( psxgpu.n_ti );
+	state_save_register_global_pointer(machine,  m_p_vram, m_n_vram_size );
+	state_save_register_global(machine,  m_n_gpu_buffer_offset );
+	state_save_register_global(machine,  m_n_vramx );
+	state_save_register_global(machine,  m_n_vramy );
+	state_save_register_global(machine,  m_n_twy );
+	state_save_register_global(machine,  m_n_twx );
+	state_save_register_global(machine,  m_n_tww );
+	state_save_register_global(machine,  m_n_drawarea_x1 );
+	state_save_register_global(machine,  m_n_drawarea_y1 );
+	state_save_register_global(machine,  m_n_drawarea_x2 );
+	state_save_register_global(machine,  m_n_drawarea_y2 );
+	state_save_register_global(machine,  m_n_horiz_disstart );
+	state_save_register_global(machine,  m_n_horiz_disend );
+	state_save_register_global(machine,  m_n_vert_disstart );
+	state_save_register_global(machine,  m_n_vert_disend );
+	state_save_register_global(machine,  m_b_reverseflag );
+	state_save_register_global(machine,  m_n_drawoffset_x );
+	state_save_register_global(machine,  m_n_drawoffset_y );
+	state_save_register_global(machine,  m_n_displaystartx );
+	state_save_register_global(machine,  m_n_displaystarty );
+	state_save_register_global(machine,  m_n_gpustatus );
+	state_save_register_global(machine,  m_n_gpuinfo );
+	state_save_register_global(machine,  m_n_lightgun_x );
+	state_save_register_global(machine,  m_n_lightgun_y );
+	state_save_register_global(machine,  psxgpu.n_tx );
+	state_save_register_global(machine,  psxgpu.n_ty );
+	state_save_register_global(machine,  psxgpu.n_abr );
+	state_save_register_global(machine,  psxgpu.n_tp );
+	state_save_register_global(machine,  psxgpu.n_ix );
+	state_save_register_global(machine,  psxgpu.n_iy );
+	state_save_register_global(machine,  psxgpu.n_ti );
 
 	state_save_register_postload( machine, updatevisiblearea, NULL );
 }

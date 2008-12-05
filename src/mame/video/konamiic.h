@@ -16,7 +16,7 @@ void K007121_sprites_draw(int chip,bitmap_t *bitmap,gfx_element **gfxs, colortab
 						  int global_x_offset,int bank_base, UINT32 pri_mask);
 
 
-void K007342_vh_start(int gfx_index, void (*callback)(int layer,int bank,int *code,int *color,int *flags));
+void K007342_vh_start(running_machine *machine, int gfx_index, void (*callback)(int layer,int bank,int *code,int *color,int *flags));
 READ8_HANDLER( K007342_r );
 WRITE8_HANDLER( K007342_w );
 READ8_HANDLER( K007342_scroll_r );
@@ -313,7 +313,7 @@ WRITE32_HANDLER( K056832_b_long_w );
 #define K056832_BPP_4dj	4
 #define K056832_BPP_8LE	5
 
-void K055555_vh_start(void); // "PCU2"
+void K055555_vh_start(running_machine *machine); // "PCU2"
 void K055555_write_reg(UINT8 regnum, UINT8 regdat);
 WRITE16_HANDLER( K055555_word_w );
 WRITE32_HANDLER( K055555_long_w );
@@ -386,7 +386,7 @@ int K055555_get_palette_index(int idx);
 #define K55_INP_SUB3		0x80
 
 /* K054338 mixer/alpha blender */
-void K054338_vh_start(void);
+void K054338_vh_start(running_machine *machine);
 WRITE16_HANDLER( K054338_word_w ); // "CLCT" registers
 WRITE32_HANDLER( K054338_long_w );
 int K054338_read_register(int reg);
@@ -411,7 +411,7 @@ void K054338_export_config(int **shdRGB);
 #define K338_CTL_WAILSL		0x10
 #define K338_CTL_CLIPSL		0x20
 
-void K053250_vh_start(int chips, const char **region);
+void K053250_vh_start(running_machine *machine, int chips, const char **region);
 WRITE16_HANDLER( K053250_0_w );
 READ16_HANDLER( K053250_0_r );
 WRITE16_HANDLER( K053250_0_ram_w );

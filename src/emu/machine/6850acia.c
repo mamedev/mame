@@ -234,29 +234,29 @@ static DEVICE_START( acia6850 )
 	timer_reset(acia_p->rx_timer, attotime_never);
 	timer_reset(acia_p->tx_timer, attotime_never);
 
-	state_save_register_item("acia6850", device->tag, 0, acia_p->ctrl);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->status);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_clock);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_clock);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_counter);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_counter);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_shift);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_shift);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->rdr);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->tdr);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_bits);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_bits);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->rx_parity);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_parity);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->tx_int);
+	state_save_register_device_item(device, 0, acia_p->ctrl);
+	state_save_register_device_item(device, 0, acia_p->status);
+	state_save_register_device_item(device, 0, acia_p->rx_clock);
+	state_save_register_device_item(device, 0, acia_p->tx_clock);
+	state_save_register_device_item(device, 0, acia_p->rx_counter);
+	state_save_register_device_item(device, 0, acia_p->tx_counter);
+	state_save_register_device_item(device, 0, acia_p->rx_shift);
+	state_save_register_device_item(device, 0, acia_p->tx_shift);
+	state_save_register_device_item(device, 0, acia_p->rdr);
+	state_save_register_device_item(device, 0, acia_p->tdr);
+	state_save_register_device_item(device, 0, acia_p->rx_bits);
+	state_save_register_device_item(device, 0, acia_p->tx_bits);
+	state_save_register_device_item(device, 0, acia_p->rx_parity);
+	state_save_register_device_item(device, 0, acia_p->tx_parity);
+	state_save_register_device_item(device, 0, acia_p->tx_int);
 
-	state_save_register_item("acia6850", device->tag, 0, acia_p->divide);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->overrun);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->reset);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->first_reset);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->rts);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->brk);
-	state_save_register_item("acia6850", device->tag, 0, acia_p->status_read);
+	state_save_register_device_item(device, 0, acia_p->divide);
+	state_save_register_device_item(device, 0, acia_p->overrun);
+	state_save_register_device_item(device, 0, acia_p->reset);
+	state_save_register_device_item(device, 0, acia_p->first_reset);
+	state_save_register_device_item(device, 0, acia_p->rts);
+	state_save_register_device_item(device, 0, acia_p->brk);
+	state_save_register_device_item(device, 0, acia_p->status_read);
 	return DEVICE_START_OK;
 }
 

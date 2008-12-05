@@ -64,11 +64,11 @@ static MACHINE_START(merit)
 	question_address = 0;
 	ram_palette = auto_malloc(RAM_PALETTE_SIZE);
 
-	state_save_register_global_pointer(ram_palette, RAM_PALETTE_SIZE);
-	state_save_register_global(lscnblk);
-	state_save_register_global(extra_video_bank_bit);
-	state_save_register_global(question_address);
-	state_save_register_global(decryption_key);
+	state_save_register_global_pointer(machine, ram_palette, RAM_PALETTE_SIZE);
+	state_save_register_global(machine, lscnblk);
+	state_save_register_global(machine, extra_video_bank_bit);
+	state_save_register_global(machine, question_address);
+	state_save_register_global(machine, decryption_key);
 }
 
 

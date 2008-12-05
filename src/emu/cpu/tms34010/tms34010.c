@@ -633,17 +633,17 @@ static CPU_INIT( tms34010 )
 	/* allocate the shiftreg */
 	tms->shiftreg = auto_malloc(SHIFTREG_SIZE);
 
-	state_save_register_item("tms34010", device->tag, 0, tms->pc);
-	state_save_register_item("tms34010", device->tag, 0, tms->st);
-	state_save_register_item("tms34010", device->tag, 0, tms->reset_deferred);
-	state_save_register_item_pointer("tms34010", device->tag, 0, tms->shiftreg, SHIFTREG_SIZE / 2);
-	state_save_register_item_array("tms34010", device->tag, 0, tms->IOregs);
-	state_save_register_item("tms34010", device->tag, 0, tms->convsp);
-	state_save_register_item("tms34010", device->tag, 0, tms->convdp);
-	state_save_register_item("tms34010", device->tag, 0, tms->convmp);
-	state_save_register_item("tms34010", device->tag, 0, tms->pixelshift);
-	state_save_register_item("tms34010", device->tag, 0, tms->gfxcycles);
-	state_save_register_item_pointer("tms34010", device->tag, 0, (&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
+	state_save_register_device_item(device, 0, tms->pc);
+	state_save_register_device_item(device, 0, tms->st);
+	state_save_register_device_item(device, 0, tms->reset_deferred);
+	state_save_register_device_item_pointer(device, 0, tms->shiftreg, SHIFTREG_SIZE / 2);
+	state_save_register_device_item_array(device, 0, tms->IOregs);
+	state_save_register_device_item(device, 0, tms->convsp);
+	state_save_register_device_item(device, 0, tms->convdp);
+	state_save_register_device_item(device, 0, tms->convmp);
+	state_save_register_device_item(device, 0, tms->pixelshift);
+	state_save_register_device_item(device, 0, tms->gfxcycles);
+	state_save_register_device_item_pointer(device, 0, (&tms->regs[0].reg), ARRAY_LENGTH(tms->regs));
 	state_save_register_postload(device->machine, tms34010_state_postload, tms);
 }
 
@@ -1107,12 +1107,16 @@ VIDEO_UPDATE( tms340x0 )
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(screen->machine->cpu); cpunum++)
 	{
 		const device_config *cpudevice = screen->machine->cpu[cpunum];
-		if (cpudevice != NULL && (cpudevice->type == (device_type)CPU_TMS34010 || cpudevice->type == (device_type)CPU_TMS34020))
+		if (cpudevice != NULL)
 		{
-			tms = cpudevice->token;
-			if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == screen)
-				break;
-			tms = NULL;
+			const cpu_class_header *classdata = cpudevice->classtoken;
+			if (classdata->cputype == CPU_TMS34010 || classdata->cputype == CPU_TMS34020)
+			{
+				tms = cpudevice->token;
+				if (tms->config != NULL && tms->config->scanline_callback != NULL && tms->screen == screen)
+					break;
+				tms = NULL;
+			}
 		}
 	}
 	if (tms == NULL)

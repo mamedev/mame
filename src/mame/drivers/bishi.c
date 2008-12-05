@@ -99,8 +99,8 @@ static UINT16 cur_control, cur_control2;
 
 static MACHINE_START( bishi )
 {
-	state_save_register_global(cur_control);
-	state_save_register_global(cur_control2);
+	state_save_register_global(machine, cur_control);
+	state_save_register_global(machine, cur_control2);
 }
 
 

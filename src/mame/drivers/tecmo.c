@@ -97,10 +97,10 @@ static WRITE8_HANDLER( tecmo_adpcm_vol_w )
 {
 	msm5205_set_volume(0,(data & 0x0f) * 100 / 15);
 }
-static void tecmo_adpcm_int(running_machine *machine, int num)
+static void tecmo_adpcm_int(const device_config *device)
 {
 	if (adpcm_pos >= adpcm_end ||
-				adpcm_pos >= memory_region_length(machine, "adpcm"))
+				adpcm_pos >= memory_region_length(device->machine, "adpcm"))
 		msm5205_reset_w(0,1);
 	else if (adpcm_data != -1)
 	{
@@ -109,7 +109,7 @@ static void tecmo_adpcm_int(running_machine *machine, int num)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(machine, "adpcm");
+		UINT8 *ROM = memory_region(device->machine, "adpcm");
 
 		adpcm_data = ROM[adpcm_pos++];
 		msm5205_data_w(0,adpcm_data >> 4);

@@ -1677,19 +1677,19 @@ static DRIVER_INIT( bfcobra )
 	data_r = 1;
 
 	/* Finish this */
-	state_save_register_global(z80_m6809_line);
-	state_save_register_global(m6809_z80_line);
-	state_save_register_global(data_r);
-	state_save_register_global(data_t);
-	state_save_register_global(h_scroll);
-	state_save_register_global(v_scroll);
-	state_save_register_global(flip_8);
-	state_save_register_global(flip_22);
-	state_save_register_global(z80_int);
-	state_save_register_global(z80_inten);
-	state_save_register_global_array(bank);
-	state_save_register_global_pointer(work_ram, 0xc0000);
-	state_save_register_global_pointer(video_ram, 0x20000);
+	state_save_register_global(machine, z80_m6809_line);
+	state_save_register_global(machine, m6809_z80_line);
+	state_save_register_global(machine, data_r);
+	state_save_register_global(machine, data_t);
+	state_save_register_global(machine, h_scroll);
+	state_save_register_global(machine, v_scroll);
+	state_save_register_global(machine, flip_8);
+	state_save_register_global(machine, flip_22);
+	state_save_register_global(machine, z80_int);
+	state_save_register_global(machine, z80_inten);
+	state_save_register_global_array(machine, bank);
+	state_save_register_global_pointer(machine, work_ram, 0xc0000);
+	state_save_register_global_pointer(machine, video_ram, 0x20000);
 }
 
 /* TODO */

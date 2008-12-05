@@ -108,7 +108,6 @@
 typedef struct
 {
 	sound_stream * stream;			/* our stream */
-	int index;
 	void (*external)(int, int, short *);/* callback to generate external samples */
 	double vco_zero_freq;			/* frequency of VCO at 0.0V */
 	double filter_zero_freq;		/* frequency of filter at 0.0V */
@@ -132,6 +131,7 @@ typedef struct
 
 	double inv_sample_rate;
 	int sample_rate;
+	int index;
 
 	INT16 *mixer_buffer;
 	INT16 *external_buffer;
@@ -338,18 +338,18 @@ static SND_START( cem3394 )
 	chip->mixer_buffer = auto_malloc(chip->sample_rate * sizeof(INT16));
 	chip->external_buffer = auto_malloc(chip->sample_rate * sizeof(INT16));
 
-	state_save_register_item_array("cem3394", tag, 0, chip->values);
-	state_save_register_item("cem3394", tag, 0, chip->wave_select);
-	state_save_register_item("cem3394", tag, 0, chip->volume);
-	state_save_register_item("cem3394", tag, 0, chip->mixer_internal);
-	state_save_register_item("cem3394", tag, 0, chip->mixer_external);
-	state_save_register_item("cem3394", tag, 0, chip->position);
-	state_save_register_item("cem3394", tag, 0, chip->step);
-	state_save_register_item("cem3394", tag, 0, chip->filter_position);
-	state_save_register_item("cem3394", tag, 0, chip->filter_step);
-	state_save_register_item("cem3394", tag, 0, chip->modulation_depth);
-	state_save_register_item("cem3394", tag, 0, chip->last_ext);
-	state_save_register_item("cem3394", tag, 0, chip->pulse_width);
+	state_save_register_device_item_array(device, 0, chip->values);
+	state_save_register_device_item(device, 0, chip->wave_select);
+	state_save_register_device_item(device, 0, chip->volume);
+	state_save_register_device_item(device, 0, chip->mixer_internal);
+	state_save_register_device_item(device, 0, chip->mixer_external);
+	state_save_register_device_item(device, 0, chip->position);
+	state_save_register_device_item(device, 0, chip->step);
+	state_save_register_device_item(device, 0, chip->filter_position);
+	state_save_register_device_item(device, 0, chip->filter_step);
+	state_save_register_device_item(device, 0, chip->modulation_depth);
+	state_save_register_device_item(device, 0, chip->last_ext);
+	state_save_register_device_item(device, 0, chip->pulse_width);
 
 	return chip;
 }

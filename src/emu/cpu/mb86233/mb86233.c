@@ -139,7 +139,7 @@ static CPU_INIT( mb86233 )
 	mb86233.BRAM = &mb86233.RAM[0x200];
 	mb86233.Tables = (UINT32*) memory_region(device->machine, _config->tablergn);
 
-	state_save_register_global_pointer(mb86233.RAM,2 * 0x200 * sizeof(UINT32));
+	state_save_register_global_pointer(device->machine, mb86233.RAM,2 * 0x200 * sizeof(UINT32));
 }
 
 static CPU_RESET( mb86233 )

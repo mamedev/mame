@@ -121,9 +121,9 @@ static UINT8		sound_banks;		/* number of sound banks */
 
 static MACHINE_START( segac2 )
 {
-	state_save_register_global_array(misc_io_data);
-	state_save_register_global(prot_write_buf);
-	state_save_register_global(prot_read_buf);
+	state_save_register_global_array(machine, misc_io_data);
+	state_save_register_global(machine, prot_write_buf);
+	state_save_register_global(machine, prot_read_buf);
 
 //  MACHINE_START_CALL(genesis);
 }

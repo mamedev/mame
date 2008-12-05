@@ -238,8 +238,8 @@ static SND_START( iremga20 )
 	memset(chip, 0, sizeof(*chip));
 
 	/* Initialize our chip structure */
-	chip->rom = memory_region(device->machine, tag);
-	chip->rom_size = memory_region_length(device->machine, tag);
+	chip->rom = device->region;
+	chip->rom_size = device->regionbytes;
 
 	iremga20_reset(chip);
 
@@ -248,18 +248,18 @@ static SND_START( iremga20 )
 
 	chip->stream = stream_create( 0, 2, clock/4, chip, IremGA20_update );
 
-	state_save_register_item_array("irem_ga20", tag, sndindex, chip->regs);
+	state_save_register_device_item_array(device, sndindex, chip->regs);
 	for (i = 0; i < 4; i++)
 	{
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].rate);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].size);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].start);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].pos);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].end);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].volume);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].pan);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].effect);
-		state_save_register_item("irem_ga20", tag, i, chip->channel[i].play);
+		state_save_register_device_item(device, i, chip->channel[i].rate);
+		state_save_register_device_item(device, i, chip->channel[i].size);
+		state_save_register_device_item(device, i, chip->channel[i].start);
+		state_save_register_device_item(device, i, chip->channel[i].pos);
+		state_save_register_device_item(device, i, chip->channel[i].end);
+		state_save_register_device_item(device, i, chip->channel[i].volume);
+		state_save_register_device_item(device, i, chip->channel[i].pan);
+		state_save_register_device_item(device, i, chip->channel[i].effect);
+		state_save_register_device_item(device, i, chip->channel[i].play);
 	}
 
 	return chip;

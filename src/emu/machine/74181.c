@@ -39,9 +39,9 @@ void TTL74181_config(running_machine *machine, int which, void *intf)
 
 	c->dirty = 1;
 
-	state_save_register_item_array("TTL74181", NULL, which, c->inputs);
-	state_save_register_item_array("TTL74181", NULL, which, c->outputs);
-	state_save_register_item      ("TTL74181", NULL, which, c->dirty);
+	state_save_register_item_array(machine, "TTL74181", NULL, which, c->inputs);
+	state_save_register_item_array(machine, "TTL74181", NULL, which, c->outputs);
+	state_save_register_item      (machine, "TTL74181", NULL, which, c->dirty);
 }
 
 

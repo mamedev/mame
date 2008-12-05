@@ -73,7 +73,7 @@ VIDEO_UPDATE( circusc );
 
 static MACHINE_START( circusc )
 {
-	state_save_register_global(sn_latch);
+	state_save_register_global(machine, sn_latch);
 }
 
 static MACHINE_RESET( circusc )

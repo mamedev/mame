@@ -58,13 +58,13 @@ static UINT32 *midvplus_misc;
 
 static MACHINE_START( midvunit )
 {
-	state_save_register_global(cmos_protected);
-	state_save_register_global(control_data);
-	state_save_register_global(adc_data);
-	state_save_register_global(adc_shift);
-	state_save_register_global(last_port0);
-	state_save_register_global(shifter_state);
-	state_save_register_global(timer_rate);
+	state_save_register_global(machine, cmos_protected);
+	state_save_register_global(machine, control_data);
+	state_save_register_global(machine, adc_data);
+	state_save_register_global(machine, adc_shift);
+	state_save_register_global(machine, last_port0);
+	state_save_register_global(machine, shifter_state);
+	state_save_register_global(machine, timer_rate);
 }
 
 

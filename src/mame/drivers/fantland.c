@@ -334,7 +334,7 @@ static WRITE8_HANDLER( borntofi_msm5205_w )
 	}
 }
 
-static void borntofi_adpcm_int(running_machine *machine, int voice)
+static void borntofi_adpcm_int(const device_config *device, int voice)
 {
 	UINT8 *rom;
 	size_t   len;
@@ -343,8 +343,8 @@ static void borntofi_adpcm_int(running_machine *machine, int voice)
 	if (!borntofi_adpcm[voice].playing)
 		return;
 
-	rom = memory_region( machine, "adpcm" );
-	len = memory_region_length( machine, "adpcm" ) * 2;
+	rom = memory_region( device->machine, "adpcm" );
+	len = memory_region_length( device->machine, "adpcm" ) * 2;
 
 	start = borntofi_adpcm[voice].addr[0] + borntofi_adpcm[voice].nibble;
 	stop  = borntofi_adpcm[voice].addr[1];
@@ -366,6 +366,12 @@ static void borntofi_adpcm_int(running_machine *machine, int voice)
 		borntofi_adpcm[voice].nibble++;
 	}
 }
+
+static void borntofi_adpcm_int_0(const device_config *device) { borntofi_adpcm_int(device, 0); } 
+static void borntofi_adpcm_int_1(const device_config *device) { borntofi_adpcm_int(device, 1); } 
+static void borntofi_adpcm_int_2(const device_config *device) { borntofi_adpcm_int(device, 2); } 
+static void borntofi_adpcm_int_3(const device_config *device) { borntofi_adpcm_int(device, 3); } 
+
 
 static ADDRESS_MAP_START( borntofi_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x003ff ) AM_RAM
@@ -894,9 +900,24 @@ MACHINE_DRIVER_END
 
 
 // OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
-static const msm5205_interface msm5205_config =
+static const msm5205_interface msm5205_config_0 =
 {
-	borntofi_adpcm_int,	/* IRQ handler */
+	borntofi_adpcm_int_0,	/* IRQ handler */
+	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
+};
+static const msm5205_interface msm5205_config_1 =
+{
+	borntofi_adpcm_int_1,	/* IRQ handler */
+	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
+};
+static const msm5205_interface msm5205_config_2 =
+{
+	borntofi_adpcm_int_2,	/* IRQ handler */
+	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
+};
+static const msm5205_interface msm5205_config_3 =
+{
+	borntofi_adpcm_int_3,	/* IRQ handler */
 	MSM5205_S48_4B		/* 8 kHz, 4 Bits  */
 };
 
@@ -937,10 +958,10 @@ static MACHINE_DRIVER_START( borntofi )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("msm1", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("msm2", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("msm3", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("msm4", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm1", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_0) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm2", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_1) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm3", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_2) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ADD("msm4", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_3) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
 

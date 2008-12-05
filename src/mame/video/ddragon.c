@@ -114,8 +114,8 @@ VIDEO_START( ddragon )
 	tilemap_set_scrolldy(fg_tilemap, -8, -8);
 	tilemap_set_scrolldy(bg_tilemap, -8, -8);
 
-	state_save_register_global(ddragon_scrollx_hi);
-	state_save_register_global(ddragon_scrolly_hi);
+	state_save_register_global(machine, ddragon_scrollx_hi);
+	state_save_register_global(machine, ddragon_scrolly_hi);
 }
 
 VIDEO_START( chinagat )
@@ -127,8 +127,8 @@ VIDEO_START( chinagat )
 	tilemap_set_scrolldy(fg_tilemap, -8, -8);
 	tilemap_set_scrolldy(bg_tilemap, -8, -8);
 
-	state_save_register_global(ddragon_scrollx_hi);
-	state_save_register_global(ddragon_scrolly_hi);
+	state_save_register_global(machine, ddragon_scrollx_hi);
+	state_save_register_global(machine, ddragon_scrolly_hi);
 }
 
 

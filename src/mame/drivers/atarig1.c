@@ -57,7 +57,7 @@ static void update_interrupts(running_machine *machine)
 
 static MACHINE_START( atarig1 )
 {
-	state_save_register_global(which_input);
+	state_save_register_global(machine, which_input);
 }
 
 
@@ -950,8 +950,8 @@ static void init_g1_common(running_machine *machine, offs_t slapstic_base, int s
 	if (slapstic == -1)
 	{
 		pitfighb_cheap_slapstic_init(machine);
-		state_save_register_global(bslapstic_bank);
-		state_save_register_global(bslapstic_primed);
+		state_save_register_global(machine, bslapstic_bank);
+		state_save_register_global(machine, bslapstic_primed);
 		state_save_register_postload(machine, pitfighb_state_postload, NULL);
 	}
 	else if (slapstic != 0)

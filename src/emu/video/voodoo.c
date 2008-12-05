@@ -622,115 +622,115 @@ static void init_save_state(const device_config *device)
 	state_save_register_postload(device->machine, voodoo_postload, v);
 
 	/* register states: core */
-	state_save_register_item("voodoo", device->tag, 0, v->extra_cycles);
-	state_save_register_item_pointer("voodoo", device->tag, 0, (&v->reg[0].u), ARRAY_LENGTH(v->reg));
-	state_save_register_item("voodoo", device->tag, 0, v->alt_regmap);
+	state_save_register_device_item(device, 0, v->extra_cycles);
+	state_save_register_device_item_pointer(device, 0, (&v->reg[0].u), ARRAY_LENGTH(v->reg));
+	state_save_register_device_item(device, 0, v->alt_regmap);
 
 	/* register states: pci */
-	state_save_register_item("voodoo", device->tag, 0, v->pci.fifo.in);
-	state_save_register_item("voodoo", device->tag, 0, v->pci.fifo.out);
-	state_save_register_item("voodoo", device->tag, 0, v->pci.init_enable);
-	state_save_register_item("voodoo", device->tag, 0, v->pci.stall_state);
-	state_save_register_item("voodoo", device->tag, 0, v->pci.op_pending);
-	state_save_register_item("voodoo", device->tag, 0, v->pci.op_end_time.seconds);
-	state_save_register_item("voodoo", device->tag, 0, v->pci.op_end_time.attoseconds);
-	state_save_register_item_array("voodoo", device->tag, 0, v->pci.fifo_mem);
+	state_save_register_device_item(device, 0, v->pci.fifo.in);
+	state_save_register_device_item(device, 0, v->pci.fifo.out);
+	state_save_register_device_item(device, 0, v->pci.init_enable);
+	state_save_register_device_item(device, 0, v->pci.stall_state);
+	state_save_register_device_item(device, 0, v->pci.op_pending);
+	state_save_register_device_item(device, 0, v->pci.op_end_time.seconds);
+	state_save_register_device_item(device, 0, v->pci.op_end_time.attoseconds);
+	state_save_register_device_item_array(device, 0, v->pci.fifo_mem);
 
 	/* register states: dac */
-	state_save_register_item_array("voodoo", device->tag, 0, v->dac.reg);
-	state_save_register_item("voodoo", device->tag, 0, v->dac.read_result);
+	state_save_register_device_item_array(device, 0, v->dac.reg);
+	state_save_register_device_item(device, 0, v->dac.read_result);
 
 	/* register states: fbi */
-	state_save_register_item_pointer("voodoo", device->tag, 0, v->fbi.ram, v->fbi.mask + 1);
-	state_save_register_item_array("voodoo", device->tag, 0, v->fbi.rgboffs);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.auxoffs);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.frontbuf);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.backbuf);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.swaps_pending);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.video_changed);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.yorigin);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.lfb_base);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.lfb_stride);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.width);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.height);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.xoffs);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.yoffs);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.vsyncscan);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.rowpixels);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.vblank);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.vblank_count);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.vblank_swap_pending);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.vblank_swap);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.vblank_dont_swap);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.cheating_allowed);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.sign);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.ax);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.ay);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.bx);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.by);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.cx);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.cy);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.startr);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.startg);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.startb);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.starta);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.startz);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.startw);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.drdx);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dgdx);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dbdx);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dadx);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dzdx);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dwdx);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.drdy);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dgdy);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dbdy);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dady);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dzdy);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.dwdy);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.lfb_stats.pixels_in);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.lfb_stats.pixels_out);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.lfb_stats.chroma_fail);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.lfb_stats.zfunc_fail);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.lfb_stats.afunc_fail);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.lfb_stats.clip_fail);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.lfb_stats.stipple_count);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.sverts);
+	state_save_register_device_item_pointer(device, 0, v->fbi.ram, v->fbi.mask + 1);
+	state_save_register_device_item_array(device, 0, v->fbi.rgboffs);
+	state_save_register_device_item(device, 0, v->fbi.auxoffs);
+	state_save_register_device_item(device, 0, v->fbi.frontbuf);
+	state_save_register_device_item(device, 0, v->fbi.backbuf);
+	state_save_register_device_item(device, 0, v->fbi.swaps_pending);
+	state_save_register_device_item(device, 0, v->fbi.video_changed);
+	state_save_register_device_item(device, 0, v->fbi.yorigin);
+	state_save_register_device_item(device, 0, v->fbi.lfb_base);
+	state_save_register_device_item(device, 0, v->fbi.lfb_stride);
+	state_save_register_device_item(device, 0, v->fbi.width);
+	state_save_register_device_item(device, 0, v->fbi.height);
+	state_save_register_device_item(device, 0, v->fbi.xoffs);
+	state_save_register_device_item(device, 0, v->fbi.yoffs);
+	state_save_register_device_item(device, 0, v->fbi.vsyncscan);
+	state_save_register_device_item(device, 0, v->fbi.rowpixels);
+	state_save_register_device_item(device, 0, v->fbi.vblank);
+	state_save_register_device_item(device, 0, v->fbi.vblank_count);
+	state_save_register_device_item(device, 0, v->fbi.vblank_swap_pending);
+	state_save_register_device_item(device, 0, v->fbi.vblank_swap);
+	state_save_register_device_item(device, 0, v->fbi.vblank_dont_swap);
+	state_save_register_device_item(device, 0, v->fbi.cheating_allowed);
+	state_save_register_device_item(device, 0, v->fbi.sign);
+	state_save_register_device_item(device, 0, v->fbi.ax);
+	state_save_register_device_item(device, 0, v->fbi.ay);
+	state_save_register_device_item(device, 0, v->fbi.bx);
+	state_save_register_device_item(device, 0, v->fbi.by);
+	state_save_register_device_item(device, 0, v->fbi.cx);
+	state_save_register_device_item(device, 0, v->fbi.cy);
+	state_save_register_device_item(device, 0, v->fbi.startr);
+	state_save_register_device_item(device, 0, v->fbi.startg);
+	state_save_register_device_item(device, 0, v->fbi.startb);
+	state_save_register_device_item(device, 0, v->fbi.starta);
+	state_save_register_device_item(device, 0, v->fbi.startz);
+	state_save_register_device_item(device, 0, v->fbi.startw);
+	state_save_register_device_item(device, 0, v->fbi.drdx);
+	state_save_register_device_item(device, 0, v->fbi.dgdx);
+	state_save_register_device_item(device, 0, v->fbi.dbdx);
+	state_save_register_device_item(device, 0, v->fbi.dadx);
+	state_save_register_device_item(device, 0, v->fbi.dzdx);
+	state_save_register_device_item(device, 0, v->fbi.dwdx);
+	state_save_register_device_item(device, 0, v->fbi.drdy);
+	state_save_register_device_item(device, 0, v->fbi.dgdy);
+	state_save_register_device_item(device, 0, v->fbi.dbdy);
+	state_save_register_device_item(device, 0, v->fbi.dady);
+	state_save_register_device_item(device, 0, v->fbi.dzdy);
+	state_save_register_device_item(device, 0, v->fbi.dwdy);
+	state_save_register_device_item(device, 0, v->fbi.lfb_stats.pixels_in);
+	state_save_register_device_item(device, 0, v->fbi.lfb_stats.pixels_out);
+	state_save_register_device_item(device, 0, v->fbi.lfb_stats.chroma_fail);
+	state_save_register_device_item(device, 0, v->fbi.lfb_stats.zfunc_fail);
+	state_save_register_device_item(device, 0, v->fbi.lfb_stats.afunc_fail);
+	state_save_register_device_item(device, 0, v->fbi.lfb_stats.clip_fail);
+	state_save_register_device_item(device, 0, v->fbi.lfb_stats.stipple_count);
+	state_save_register_device_item(device, 0, v->fbi.sverts);
 	for (index = 0; index < ARRAY_LENGTH(v->fbi.svert); index++)
 	{
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].x);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].y);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].a);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].r);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].g);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].b);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].z);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].wb);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].w0);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].s0);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].t0);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].w1);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].s1);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.svert[index].t1);
+		state_save_register_device_item(device, index, v->fbi.svert[index].x);
+		state_save_register_device_item(device, index, v->fbi.svert[index].y);
+		state_save_register_device_item(device, index, v->fbi.svert[index].a);
+		state_save_register_device_item(device, index, v->fbi.svert[index].r);
+		state_save_register_device_item(device, index, v->fbi.svert[index].g);
+		state_save_register_device_item(device, index, v->fbi.svert[index].b);
+		state_save_register_device_item(device, index, v->fbi.svert[index].z);
+		state_save_register_device_item(device, index, v->fbi.svert[index].wb);
+		state_save_register_device_item(device, index, v->fbi.svert[index].w0);
+		state_save_register_device_item(device, index, v->fbi.svert[index].s0);
+		state_save_register_device_item(device, index, v->fbi.svert[index].t0);
+		state_save_register_device_item(device, index, v->fbi.svert[index].w1);
+		state_save_register_device_item(device, index, v->fbi.svert[index].s1);
+		state_save_register_device_item(device, index, v->fbi.svert[index].t1);
 	}
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.fifo.size);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.fifo.in);
-	state_save_register_item("voodoo", device->tag, 0, v->fbi.fifo.out);
+	state_save_register_device_item(device, 0, v->fbi.fifo.size);
+	state_save_register_device_item(device, 0, v->fbi.fifo.in);
+	state_save_register_device_item(device, 0, v->fbi.fifo.out);
 	for (index = 0; index < ARRAY_LENGTH(v->fbi.cmdfifo); index++)
 	{
-		state_save_register_item("voodoo", device->tag, index, v->fbi.cmdfifo[index].enable);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.cmdfifo[index].count_holes);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.cmdfifo[index].base);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.cmdfifo[index].end);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.cmdfifo[index].rdptr);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.cmdfifo[index].amin);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.cmdfifo[index].amax);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.cmdfifo[index].depth);
-		state_save_register_item("voodoo", device->tag, index, v->fbi.cmdfifo[index].holes);
+		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].enable);
+		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].count_holes);
+		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].base);
+		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].end);
+		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].rdptr);
+		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].amin);
+		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].amax);
+		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].depth);
+		state_save_register_device_item(device, index, v->fbi.cmdfifo[index].holes);
 	}
-	state_save_register_item_array("voodoo", device->tag, 0, v->fbi.fogblend);
-	state_save_register_item_array("voodoo", device->tag, 0, v->fbi.fogdelta);
-	state_save_register_item_array("voodoo", device->tag, 0, v->fbi.clut);
+	state_save_register_device_item_array(device, 0, v->fbi.fogblend);
+	state_save_register_device_item_array(device, 0, v->fbi.fogdelta);
+	state_save_register_device_item_array(device, 0, v->fbi.clut);
 
 	/* register states: tmu */
 	for (index = 0; index < ARRAY_LENGTH(v->tmu); index++)
@@ -739,39 +739,39 @@ static void init_save_state(const device_config *device)
 		if (tmu->ram == NULL)
 			continue;
 		if (tmu->ram != v->fbi.ram)
-			state_save_register_item_pointer("voodoo", device->tag, index, tmu->ram, tmu->mask + 1);
-		state_save_register_item("voodoo", device->tag, index, tmu->starts);
-		state_save_register_item("voodoo", device->tag, index, tmu->startt);
-		state_save_register_item("voodoo", device->tag, index, tmu->startw);
-		state_save_register_item("voodoo", device->tag, index, tmu->dsdx);
-		state_save_register_item("voodoo", device->tag, index, tmu->dtdx);
-		state_save_register_item("voodoo", device->tag, index, tmu->dwdx);
-		state_save_register_item("voodoo", device->tag, index, tmu->dsdy);
-		state_save_register_item("voodoo", device->tag, index, tmu->dtdy);
-		state_save_register_item("voodoo", device->tag, index, tmu->dwdy);
+			state_save_register_device_item_pointer(device, index, tmu->ram, tmu->mask + 1);
+		state_save_register_device_item(device, index, tmu->starts);
+		state_save_register_device_item(device, index, tmu->startt);
+		state_save_register_device_item(device, index, tmu->startw);
+		state_save_register_device_item(device, index, tmu->dsdx);
+		state_save_register_device_item(device, index, tmu->dtdx);
+		state_save_register_device_item(device, index, tmu->dwdx);
+		state_save_register_device_item(device, index, tmu->dsdy);
+		state_save_register_device_item(device, index, tmu->dtdy);
+		state_save_register_device_item(device, index, tmu->dwdy);
 		for (subindex = 0; subindex < ARRAY_LENGTH(tmu->ncc); subindex++)
 		{
-			state_save_register_item_array("voodoo", device->tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ir);
-			state_save_register_item_array("voodoo", device->tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ig);
-			state_save_register_item_array("voodoo", device->tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ib);
-			state_save_register_item_array("voodoo", device->tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qr);
-			state_save_register_item_array("voodoo", device->tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qg);
-			state_save_register_item_array("voodoo", device->tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qb);
-			state_save_register_item_array("voodoo", device->tag, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].y);
+			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ir);
+			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ig);
+			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].ib);
+			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qr);
+			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qg);
+			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].qb);
+			state_save_register_device_item_array(device, index * ARRAY_LENGTH(tmu->ncc) + subindex, tmu->ncc[subindex].y);
 		}
 	}
 
 	/* register states: banshee */
 	if (v->type >= VOODOO_BANSHEE)
 	{
-		state_save_register_item_array("voodoo", device->tag, 0, v->banshee.io);
-		state_save_register_item_array("voodoo", device->tag, 0, v->banshee.agp);
-		state_save_register_item_array("voodoo", device->tag, 0, v->banshee.vga);
-		state_save_register_item_array("voodoo", device->tag, 0, v->banshee.crtc);
-		state_save_register_item_array("voodoo", device->tag, 0, v->banshee.seq);
-		state_save_register_item_array("voodoo", device->tag, 0, v->banshee.gc);
-		state_save_register_item_array("voodoo", device->tag, 0, v->banshee.att);
-		state_save_register_item("voodoo", device->tag, 0, v->banshee.attff);
+		state_save_register_device_item_array(device, 0, v->banshee.io);
+		state_save_register_device_item_array(device, 0, v->banshee.agp);
+		state_save_register_device_item_array(device, 0, v->banshee.vga);
+		state_save_register_device_item_array(device, 0, v->banshee.crtc);
+		state_save_register_device_item_array(device, 0, v->banshee.seq);
+		state_save_register_device_item_array(device, 0, v->banshee.gc);
+		state_save_register_device_item_array(device, 0, v->banshee.att);
+		state_save_register_device_item(device, 0, v->banshee.attff);
 	}
 }
 

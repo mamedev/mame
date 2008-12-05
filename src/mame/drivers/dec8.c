@@ -396,13 +396,13 @@ static WRITE8_HANDLER( oscar_sound_w )
 	cpu_set_input_line(space->machine->cpu[2],INPUT_LINE_NMI,PULSE_LINE);
 }
 
-static void csilver_adpcm_int(running_machine *machine, int data)
+static void csilver_adpcm_int(const device_config *device)
 {
 	static int toggle =0;
 
 	toggle ^= 1;
 	if (toggle)
-		cpu_set_input_line(machine->cpu[2],M6502_IRQ_LINE,HOLD_LINE);
+		cpu_set_input_line(device->machine->cpu[2],M6502_IRQ_LINE,HOLD_LINE);
 
 	msm5205_data_w (0,msm5205next>>4);
 	msm5205next<<=4;

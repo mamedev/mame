@@ -92,10 +92,10 @@ static MACHINE_START( magmax )
 	interrupt_timer = timer_alloc(machine, scanline_callback, NULL);
 
 	/* Set up save state */
-	state_save_register_global(sound_latch);
-	state_save_register_global(LS74_clr);
-	state_save_register_global(LS74_q);
-	state_save_register_global(gain_control);
+	state_save_register_global(machine, sound_latch);
+	state_save_register_global(machine, LS74_clr);
+	state_save_register_global(machine, LS74_q);
+	state_save_register_global(machine, gain_control);
 }
 
 static MACHINE_RESET( magmax )

@@ -245,16 +245,16 @@ static SND_START( es5503 )
 
 	for (osc = 0; osc < 32; osc++)
 	{
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].freq);
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].wtsize);
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].control);
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].vol);
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].data);
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].wavetblpointer);
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].wavetblsize);
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].resolution);
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].accumulator);
-		state_save_register_item("es5503", tag, osc, chip->oscillators[osc].irqpend);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].freq);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].wtsize);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].control);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].vol);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].data);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].wavetblpointer);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].wavetblsize);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].resolution);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].accumulator);
+		state_save_register_device_item(device, osc, chip->oscillators[osc].irqpend);
 
 		chip->oscillators[osc].data = 0x80;
 		chip->oscillators[osc].irqpend = 0;

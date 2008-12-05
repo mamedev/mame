@@ -425,7 +425,7 @@ static STATE_POSTLOAD( xmen_postload )
 
 static MACHINE_START( xmen )
 {
-	state_save_register_global(sound_curbank);
+	state_save_register_global(machine, sound_curbank);
 	state_save_register_postload(machine, xmen_postload, NULL);
 }
 

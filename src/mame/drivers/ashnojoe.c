@@ -322,7 +322,7 @@ static const ym2203_interface ym2203_config =
 	ym2203_irq_handler
 };
 
-static void ashnojoe_vclk_cb(running_machine *machine, int data)
+static void ashnojoe_vclk_cb(const device_config *device)
 {
 	if (msm5205_vclk_toggle == 0)
 	{
@@ -331,7 +331,7 @@ static void ashnojoe_vclk_cb(running_machine *machine, int data)
 	else
 	{
 		msm5205_data_w(0, adpcm_byte & 0xf);
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 	}
 
 	msm5205_vclk_toggle ^= 1;

@@ -143,7 +143,7 @@ static WRITE8_HANDLER( splash_adpcm_data_w ){
 	adpcm_data = data;
 }
 
-static void splash_msm5205_int(running_machine *machine, int data)
+static void splash_msm5205_int(const device_config *device)
 {
 	msm5205_data_w(0,adpcm_data >> 4);
 	adpcm_data = (adpcm_data << 4) & 0xf0;

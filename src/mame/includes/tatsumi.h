@@ -40,7 +40,7 @@ extern UINT8 *apache3_z80_ram;
 extern UINT16 tatsumi_control_word;
 extern UINT16 apache3_a0000[16];
 
-void tatsumi_reset(void);
+void tatsumi_reset(running_machine *machine);
 
 /*----------- defined in video/tatsumi.c -----------*/
 

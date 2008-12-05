@@ -312,8 +312,8 @@ static DRIVER_INIT(ssingles)
 	ssingles_colorram=auto_malloc(VMEM_SIZE);
 	memset(ssingles_videoram,0,VMEM_SIZE);
 	memset(ssingles_colorram,0,VMEM_SIZE);
-	state_save_register_global_pointer(ssingles_videoram, VMEM_SIZE);
-	state_save_register_global_pointer(ssingles_colorram, VMEM_SIZE);
+	state_save_register_global_pointer(machine, ssingles_videoram, VMEM_SIZE);
+	state_save_register_global_pointer(machine, ssingles_colorram, VMEM_SIZE);
 }
 
 GAME ( 1983, ssingles, 0, ssingles, ssingles, ssingles, ROT90, "Ent. Ent. Ltd", "Swinging Singles", GAME_SUPPORTS_SAVE | GAME_WRONG_COLORS | GAME_IMPERFECT_SOUND )

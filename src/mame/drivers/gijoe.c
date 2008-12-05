@@ -205,7 +205,7 @@ static void sound_nmi(running_machine *machine)
 
 static MACHINE_START( gijoe )
 {
-	state_save_register_global(cur_control2);
+	state_save_register_global(machine, cur_control2);
 
 	dmadelay_timer = timer_alloc(machine, dmaend_callback, NULL);
 }

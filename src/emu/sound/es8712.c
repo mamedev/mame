@@ -182,21 +182,21 @@ static void es8712_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 ***********************************************************************************************/
 
-static void es8712_state_save_register(struct es8712 *chip, const char *tag)
+static void es8712_state_save_register(struct es8712 *chip, const device_config *device)
 {
-	state_save_register_item("es8712", tag, 0, chip->bank_offset);
+	state_save_register_device_item(device, 0, chip->bank_offset);
 
-	state_save_register_item("es8712", tag, 0, chip->playing);
-	state_save_register_item("es8712", tag, 0, chip->sample);
-	state_save_register_item("es8712", tag, 0, chip->count);
-	state_save_register_item("es8712", tag, 0, chip->signal);
-	state_save_register_item("es8712", tag, 0, chip->step);
+	state_save_register_device_item(device, 0, chip->playing);
+	state_save_register_device_item(device, 0, chip->sample);
+	state_save_register_device_item(device, 0, chip->count);
+	state_save_register_device_item(device, 0, chip->signal);
+	state_save_register_device_item(device, 0, chip->step);
 
-	state_save_register_item("es8712", tag, 0, chip->base_offset);
+	state_save_register_device_item(device, 0, chip->base_offset);
 
-	state_save_register_item("es8712", tag, 0, chip->start);
-	state_save_register_item("es8712", tag, 0, chip->end);
-	state_save_register_item("es8712", tag, 0, chip->repeat);
+	state_save_register_device_item(device, 0, chip->start);
+	state_save_register_device_item(device, 0, chip->end);
+	state_save_register_device_item(device, 0, chip->repeat);
 }
 
 
@@ -221,7 +221,7 @@ static SND_START( es8712 )
 	chip->repeat = 0;
 
 	chip->bank_offset = 0;
-	chip->region_base = memory_region(device->machine, tag);
+	chip->region_base = device->region;
 
 	/* generate the name and create the stream */
 	chip->stream = stream_create(0, 1, clock, chip, es8712_update);
@@ -229,7 +229,7 @@ static SND_START( es8712 )
 	/* initialize the rest of the structure */
 	chip->signal = -2;
 
-	es8712_state_save_register(chip, tag);
+	es8712_state_save_register(chip, device);
 
 	/* success */
 	return chip;

@@ -89,7 +89,7 @@ VIDEO_START( victory )
 	micro.timer = timer_alloc(machine, NULL, NULL);
 
 	/* register for state saving */
-	state_save_register_global_array(victory_paletteram);
+	state_save_register_global_array(machine, victory_paletteram);
 }
 
 

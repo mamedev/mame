@@ -120,18 +120,18 @@ void microtouch_init(void (*tx_cb)(UINT8 data),
 	microtouch.timer = timer_alloc(Machine, microtouch_timer_callback, NULL);
 	timer_adjust_periodic(microtouch.timer, ATTOTIME_IN_HZ(167*5), 0, ATTOTIME_IN_HZ(167*5));
 
-	state_save_register_item("microtouch", NULL, 0, microtouch.reset_done);
-	state_save_register_item("microtouch", NULL, 0, microtouch.format_tablet);
-	state_save_register_item("microtouch", NULL, 0, microtouch.mode_inactive);
-	state_save_register_item("microtouch", NULL, 0, microtouch.mode_stream);
-	state_save_register_item("microtouch", NULL, 0, microtouch.last_touch_state);
-	state_save_register_item("microtouch", NULL, 0, microtouch.last_x);
-	state_save_register_item("microtouch", NULL, 0, microtouch.last_y);
-	state_save_register_item_array("microtouch", NULL, 0, microtouch.rx_buffer);
-	state_save_register_item("microtouch", NULL, 0, microtouch.rx_buffer_ptr);
-	state_save_register_item_array("microtouch", NULL, 0, microtouch.tx_buffer);
-	state_save_register_item("microtouch", NULL, 0, microtouch.tx_buffer_num);
-	state_save_register_item("microtouch", NULL, 0, microtouch.tx_buffer_ptr);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.reset_done);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.format_tablet);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.mode_inactive);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.mode_stream);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.last_touch_state);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.last_x);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.last_y);
+	state_save_register_item_array(Machine, "microtouch", NULL, 0, microtouch.rx_buffer);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.rx_buffer_ptr);
+	state_save_register_item_array(Machine, "microtouch", NULL, 0, microtouch.tx_buffer);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.tx_buffer_num);
+	state_save_register_item(Machine, "microtouch", NULL, 0, microtouch.tx_buffer_ptr);
 
 };
 

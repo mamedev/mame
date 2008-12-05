@@ -50,7 +50,7 @@ static SND_START( tms5220 )
 	memset(info, 0, sizeof(*info));
 	info->intf = config ? config : &dummy;
 
-	info->chip = tms5220_create(tag);
+	info->chip = tms5220_create(device);
 	if (!info->chip)
 		return NULL;
 	sndintrf_register_token(info);

@@ -924,14 +924,14 @@ static void atapi_init(running_machine *machine)
 
 	atapi_data = auto_malloc( ATAPI_DATA_SIZE );
 
-	state_save_register_global_pointer( atapi_regs, ATAPI_REG_MAX );
-	state_save_register_global_pointer( atapi_data, ATAPI_DATA_SIZE / 2 );
-	state_save_register_global( atapi_data_ptr );
-	state_save_register_global( atapi_data_len );
-	state_save_register_global( atapi_xferlen );
-	state_save_register_global( atapi_xferbase );
-	state_save_register_global( atapi_cdata_wait );
-	state_save_register_global( atapi_xfermod );
+	state_save_register_global_pointer(machine,  atapi_regs, ATAPI_REG_MAX );
+	state_save_register_global_pointer(machine,  atapi_data, ATAPI_DATA_SIZE / 2 );
+	state_save_register_global(machine,  atapi_data_ptr );
+	state_save_register_global(machine,  atapi_data_len );
+	state_save_register_global(machine,  atapi_xferlen );
+	state_save_register_global(machine,  atapi_xferbase );
+	state_save_register_global(machine,  atapi_cdata_wait );
+	state_save_register_global(machine,  atapi_xfermod );
 }
 
 static WRITE32_HANDLER( atapi_reset_w )
@@ -1377,8 +1377,8 @@ static void flash_init( running_machine *machine )
 		i++;
 	}
 
-	state_save_register_global( flash_bank );
-	state_save_register_global( control );
+	state_save_register_global(machine,  flash_bank );
+	state_save_register_global(machine,  control );
 }
 
 static double analogue_inputs_callback( int input )
@@ -1501,15 +1501,15 @@ static DRIVER_INIT( konami573 )
 		m_p_timer_root[i] = timer_alloc(machine, root_finished, NULL);
 	}
 
-	state_save_register_global( m_n_security_control );
+	state_save_register_global(machine,  m_n_security_control );
 
 	security_cart_init( machine, 0, "user2", "user9" );
 	security_cart_init( machine, 1, "user8", "user10" );
 
-	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_count );
-	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_mode );
-	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_target );
-	state_save_register_item_array( "KSYS573", NULL, 0, m_p_n_root_start );
+	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_count );
+	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_mode );
+	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_target );
+	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_start );
 
 	adc083x_init( 0, ADC0834, analogue_inputs_callback );
 	flash_init(machine);
@@ -1789,7 +1789,7 @@ static void gx700pwfbf_init( running_machine *machine, void (*output_callback_fu
 
 	memory_install_readwrite32_handler( cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
 
-	state_save_register_global_array( gx700pwbf_output_data );
+	state_save_register_global_array(machine,  gx700pwbf_output_data );
 }
 
 /*
@@ -1974,7 +1974,7 @@ static DRIVER_INIT( ddr )
 
 	gx700pwfbf_init( machine, gn845pwbb_output_callback );
 
-	state_save_register_global( stage_mask );
+	state_save_register_global(machine,  stage_mask );
 }
 
 /*
@@ -2328,8 +2328,8 @@ static void gx894pwbba_init( running_machine *machine, void (*output_callback_fu
 
 	ds2401_init( 2, ds2401_xid ); /* todo: load this from roms */
 
-	state_save_register_global_array( gx894pwbba_output_data );
-	state_save_register_global_pointer( gx894_ram, gx894_ram_size / 4 );
+	state_save_register_global_array(machine,  gx894pwbba_output_data );
+	state_save_register_global_pointer(machine,  gx894_ram, gx894_ram_size / 4 );
 }
 
 /* ddr digital */
@@ -2712,10 +2712,10 @@ static DRIVER_INIT( salarymc )
 	security_bit6_write = salarymc_lamp_rst_write;
 	security_bit5_write = salarymc_lamp_clk_write;
 
-	state_save_register_global( salarymc_lamp_bits );
-	state_save_register_global( salarymc_lamp_shift );
-	state_save_register_global( salarymc_lamp_data );
-	state_save_register_global( salarymc_lamp_clk );
+	state_save_register_global(machine,  salarymc_lamp_bits );
+	state_save_register_global(machine,  salarymc_lamp_shift );
+	state_save_register_global(machine,  salarymc_lamp_data );
+	state_save_register_global(machine,  salarymc_lamp_clk );
 }
 
 static const timekeeper_config timekeeper_intf =

@@ -88,7 +88,7 @@ void tms34061_start(running_machine *machine, const struct tms34061_interface *i
 	tms34061.vram = auto_malloc(tms34061.intf.vramsize + 256 * 2);
 	memset(tms34061.vram, 0, tms34061.intf.vramsize + 256 * 2);
 	/* not really a save state, just there for debugging purposes */
-	state_save_register_global_pointer(tms34061.vram, tms34061.intf.vramsize);
+	state_save_register_global_pointer(machine, tms34061.vram, tms34061.intf.vramsize);
 
 	/* allocate memory for latch RAM */
 	tms34061.latchram = auto_malloc(tms34061.intf.vramsize + 256 * 2);

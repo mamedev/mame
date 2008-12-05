@@ -82,7 +82,7 @@ VIDEO_START( polygonet )
 
 	tilemap_set_transparent_pen(ttl_tilemap, 0);
 
-	state_save_register_global_array(ttl_vram);
+	state_save_register_global_array(machine, ttl_vram);
 }
 
 VIDEO_UPDATE( polygonet )

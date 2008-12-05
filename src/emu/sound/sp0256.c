@@ -1205,7 +1205,7 @@ static SND_START( sp0256 )
     /* -------------------------------------------------------------------- */
     /*  Setup the ROM.                                                      */
     /* -------------------------------------------------------------------- */
-	sp->rom = memory_region(device->machine, tag);
+	sp->rom = device->region;
 	sp0256_bitrevbuff(sp->rom, 0, 0xffff);
 
 	return sp;

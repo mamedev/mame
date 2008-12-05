@@ -114,19 +114,19 @@ void adc083x_init( int chip, int type, double (*input_callback)(int input) )
 		break;
 	}
 
-	state_save_register_item( "adc083x", NULL, chip, c->CS );
-	state_save_register_item( "adc083x", NULL, chip, c->CLK );
-	state_save_register_item( "adc083x", NULL, chip, c->DI );
-	state_save_register_item( "adc083x", NULL, chip, c->SE );
-	state_save_register_item( "adc083x", NULL, chip, c->SARS );
-	state_save_register_item( "adc083x", NULL, chip, c->DO );
-	state_save_register_item( "adc083x", NULL, chip, c->SGL );
-	state_save_register_item( "adc083x", NULL, chip, c->ODD );
-	state_save_register_item( "adc083x", NULL, chip, c->SEL1 );
-	state_save_register_item( "adc083x", NULL, chip, c->SEL0 );
-	state_save_register_item( "adc083x", NULL, chip, c->state );
-	state_save_register_item( "adc083x", NULL, chip, c->bit );
-	state_save_register_item( "adc083x", NULL, chip, c->output );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->CS );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->CLK );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->DI );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->SE );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->SARS );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->DO );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->SGL );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->ODD );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->SEL1 );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->SEL0 );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->state );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->bit );
+	state_save_register_item( Machine, "adc083x", NULL, chip, c->output );
 }
 
 void adc083x_cs_write( int chip, int cs )

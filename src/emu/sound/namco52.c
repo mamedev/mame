@@ -141,8 +141,8 @@ static SND_START( namco_52xx )
 	memset(chip, 0, sizeof(*chip));
 
 	chip->intf = config;
-	chip->rom     = memory_region(device->machine, tag);
-	chip->rom_len = memory_region_length(device->machine, tag);
+	chip->rom     = device->region;
+	chip->rom_len = device->regionbytes;
 
 	if (chip->intf->play_rate == 0)
 	{
@@ -161,12 +161,12 @@ static SND_START( namco_52xx )
 
 	namco_52xx_reset(chip);
 
-	state_save_register_item("namco52xx", tag, 0, chip->n52_pb_cycle);
-	state_save_register_item("namco52xx", tag, 0, chip->n52_step);
-	state_save_register_item("namco52xx", tag, 0, chip->n52_start);
-	state_save_register_item("namco52xx", tag, 0, chip->n52_end);
-	state_save_register_item("namco52xx", tag, 0, chip->n52_length);
-	state_save_register_item("namco52xx", tag, 0, chip->n52_pos);
+	state_save_register_device_item(device, 0, chip->n52_pb_cycle);
+	state_save_register_device_item(device, 0, chip->n52_step);
+	state_save_register_device_item(device, 0, chip->n52_start);
+	state_save_register_device_item(device, 0, chip->n52_end);
+	state_save_register_device_item(device, 0, chip->n52_length);
+	state_save_register_device_item(device, 0, chip->n52_pos);
 
 	return chip;
 }

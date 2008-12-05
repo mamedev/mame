@@ -306,9 +306,9 @@ static SND_START( k007232 )
 
 	/* Set up the chips */
 
-	info->pcmbuf[0] = (unsigned char *)memory_region(device->machine, tag);
-	info->pcmbuf[1] = (unsigned char *)memory_region(device->machine, tag);
-	info->pcmlimit  = (unsigned int)memory_region_length(device->machine, tag);
+	info->pcmbuf[0] = device->region;
+	info->pcmbuf[1] = device->region;
+	info->pcmlimit  = device->regionbytes;
 
 	info->clock = clock;
 

@@ -1599,23 +1599,23 @@ static void mips_state_register( const char *type, const device_config *device )
 {
 	psxcpu_state *psxcpu = device->token;
 
-	state_save_register_item( type, device->tag, 0, psxcpu->op );
-	state_save_register_item( type, device->tag, 0, psxcpu->pc );
-	state_save_register_item( type, device->tag, 0, psxcpu->delayv );
-	state_save_register_item( type, device->tag, 0, psxcpu->delayr );
-	state_save_register_item( type, device->tag, 0, psxcpu->hi );
-	state_save_register_item( type, device->tag, 0, psxcpu->lo );
-	state_save_register_item( type, device->tag, 0, psxcpu->biu );
-	state_save_register_item_array( type, device->tag, 0, psxcpu->r );
-	state_save_register_item_array( type, device->tag, 0, psxcpu->cp0r );
-	state_save_register_item_array( type, device->tag, 0, psxcpu->cp2cr );
-	state_save_register_item_array( type, device->tag, 0, psxcpu->cp2dr );
-	state_save_register_item_array( type, device->tag, 0, psxcpu->icacheTag );
-	state_save_register_item_array( type, device->tag, 0, psxcpu->icache );
-	state_save_register_item_array( type, device->tag, 0, psxcpu->dcache );
-	state_save_register_item( type, device->tag, 0, psxcpu->multiplier_operation );
-	state_save_register_item( type, device->tag, 0, psxcpu->multiplier_operand1 );
-	state_save_register_item( type, device->tag, 0, psxcpu->multiplier_operand2 );
+	state_save_register_device_item( device, 0, psxcpu->op );
+	state_save_register_device_item( device, 0, psxcpu->pc );
+	state_save_register_device_item( device, 0, psxcpu->delayv );
+	state_save_register_device_item( device, 0, psxcpu->delayr );
+	state_save_register_device_item( device, 0, psxcpu->hi );
+	state_save_register_device_item( device, 0, psxcpu->lo );
+	state_save_register_device_item( device, 0, psxcpu->biu );
+	state_save_register_device_item_array( device, 0, psxcpu->r );
+	state_save_register_device_item_array( device, 0, psxcpu->cp0r );
+	state_save_register_device_item_array( device, 0, psxcpu->cp2cr );
+	state_save_register_device_item_array( device, 0, psxcpu->cp2dr );
+	state_save_register_device_item_array( device, 0, psxcpu->icacheTag );
+	state_save_register_device_item_array( device, 0, psxcpu->icache );
+	state_save_register_device_item_array( device, 0, psxcpu->dcache );
+	state_save_register_device_item( device, 0, psxcpu->multiplier_operation );
+	state_save_register_device_item( device, 0, psxcpu->multiplier_operand1 );
+	state_save_register_device_item( device, 0, psxcpu->multiplier_operand2 );
 	state_save_register_postload( device->machine, mips_postload, psxcpu );
 }
 

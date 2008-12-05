@@ -121,19 +121,19 @@ void i2cmem_init( int chip, int slave_address, int page_size, int data_size, uns
 	c->data = data;
 	c->page = page;
 
-	state_save_register_item( "i2cmem", NULL, chip, c->scl );
-	state_save_register_item( "i2cmem", NULL, chip, c->sdaw );
-	state_save_register_item( "i2cmem", NULL, chip, c->e0 );
-	state_save_register_item( "i2cmem", NULL, chip, c->e1 );
-	state_save_register_item( "i2cmem", NULL, chip, c->e2 );
-	state_save_register_item( "i2cmem", NULL, chip, c->wc );
-	state_save_register_item( "i2cmem", NULL, chip, c->sdar );
-	state_save_register_item( "i2cmem", NULL, chip, c->state );
-	state_save_register_item( "i2cmem", NULL, chip, c->bits );
-	state_save_register_item( "i2cmem", NULL, chip, c->shift );
-	state_save_register_item( "i2cmem", NULL, chip, c->devsel );
-	state_save_register_item( "i2cmem", NULL, chip, c->byteaddr );
-	state_save_register_item_pointer( "i2cmem", NULL, chip, c->data, c->data_size );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->scl );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->sdaw );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->e0 );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->e1 );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->e2 );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->wc );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->sdar );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->state );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->bits );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->shift );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->devsel );
+	state_save_register_item( Machine, "i2cmem", NULL, chip, c->byteaddr );
+	state_save_register_item_pointer( Machine, "i2cmem", NULL, chip, c->data, c->data_size );
 }
 
 static int select_device( struct i2cmem_chip *c )

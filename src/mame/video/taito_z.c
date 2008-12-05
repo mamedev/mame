@@ -20,7 +20,7 @@ static void taitoz_core_vh_start(running_machine *machine, int x_offs)
 		TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0);
 
 	if (has_TC0150ROD())
-		TC0150ROD_vh_start();
+		TC0150ROD_vh_start(machine);
 
 	if (has_TC0110PCR())
 		TC0110PCR_vh_start(machine);

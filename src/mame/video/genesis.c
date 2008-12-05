@@ -175,29 +175,29 @@ static void start_genesis_vdp(const device_config *screen)
 	vdp_address = 0;
 
 	/* Save State Stuff */
-	state_save_register_global_array(genesis_vdp_regs);
-	state_save_register_global_pointer(vdp_vram, 0x10000);
-	state_save_register_global_pointer(vdp_vsram, 0x80);
-	state_save_register_global_array(genesis_bg_pal_lookup);
-	state_save_register_global_array(genesis_sp_pal_lookup);
-	state_save_register_global(display_enable);
-	state_save_register_global(vdp_scrollabase);
-	state_save_register_global(vdp_scrollbbase);
-	state_save_register_global(vdp_windowbase);
-	state_save_register_global(vdp_spritebase);
-	state_save_register_global(vdp_hscrollbase);
-	state_save_register_global(vdp_hscrollmask);
-	state_save_register_global(vdp_hscrollsize);
-	state_save_register_global(vdp_vscrollmode);
-	state_save_register_global(vdp_cmdpart);
-	state_save_register_global(vdp_code);
-	state_save_register_global(vdp_address);
-	state_save_register_global(vdp_dmafill);
-	state_save_register_global(scrollheight);
-	state_save_register_global(scrollwidth);
-	state_save_register_global(bgcol);
-	state_save_register_global(window_down);
-	state_save_register_global(window_vpos);
+	state_save_register_global_array(screen->machine, genesis_vdp_regs);
+	state_save_register_global_pointer(screen->machine, vdp_vram, 0x10000);
+	state_save_register_global_pointer(screen->machine, vdp_vsram, 0x80);
+	state_save_register_global_array(screen->machine, genesis_bg_pal_lookup);
+	state_save_register_global_array(screen->machine, genesis_sp_pal_lookup);
+	state_save_register_global(screen->machine, display_enable);
+	state_save_register_global(screen->machine, vdp_scrollabase);
+	state_save_register_global(screen->machine, vdp_scrollbbase);
+	state_save_register_global(screen->machine, vdp_windowbase);
+	state_save_register_global(screen->machine, vdp_spritebase);
+	state_save_register_global(screen->machine, vdp_hscrollbase);
+	state_save_register_global(screen->machine, vdp_hscrollmask);
+	state_save_register_global(screen->machine, vdp_hscrollsize);
+	state_save_register_global(screen->machine, vdp_vscrollmode);
+	state_save_register_global(screen->machine, vdp_cmdpart);
+	state_save_register_global(screen->machine, vdp_code);
+	state_save_register_global(screen->machine, vdp_address);
+	state_save_register_global(screen->machine, vdp_dmafill);
+	state_save_register_global(screen->machine, scrollheight);
+	state_save_register_global(screen->machine, scrollwidth);
+	state_save_register_global(screen->machine, bgcol);
+	state_save_register_global(screen->machine, window_down);
+	state_save_register_global(screen->machine, window_vpos);
 }
 
 VIDEO_START(genesis)

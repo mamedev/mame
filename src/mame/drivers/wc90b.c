@@ -362,7 +362,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static void adpcm_int(running_machine *machine, int data)
+static void adpcm_int(const device_config *device)
 {
 	static int toggle = 0;
 
@@ -371,7 +371,7 @@ static void adpcm_int(running_machine *machine, int data)
 
 	toggle ^= 1;
 	if(toggle)
-		cpu_set_input_line(machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, PULSE_LINE);
 
 }
 

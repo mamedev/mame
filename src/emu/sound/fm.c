@@ -1847,43 +1847,43 @@ INLINE void CSMKeyControll(UINT8 type, FM_CH *CH)
 
 #ifdef __STATE_H__
 /* FM channel save , internal state only */
-static void FMsave_state_channel(const char *name,const char *tag,FM_CH *CH,int num_ch)
+static void FMsave_state_channel(const device_config *device,FM_CH *CH,int num_ch)
 {
 	int slot , ch;
 
 	for(ch=0;ch<num_ch;ch++,CH++)
 	{
 		/* channel */
-		state_save_register_item_array(name, tag, ch, CH->op1_out);
-		state_save_register_item(name, tag, ch, CH->fc);
+		state_save_register_device_item_array(device, ch, CH->op1_out);
+		state_save_register_device_item(device, ch, CH->fc);
 		/* slots */
 		for(slot=0;slot<4;slot++)
 		{
 			FM_SLOT *SLOT = &CH->SLOT[slot];
-			state_save_register_item(name, tag, ch * 4 + slot, SLOT->phase);
-			state_save_register_item(name, tag, ch * 4 + slot, SLOT->state);
-			state_save_register_item(name, tag, ch * 4 + slot, SLOT->volume);
+			state_save_register_device_item(device, ch * 4 + slot, SLOT->phase);
+			state_save_register_device_item(device, ch * 4 + slot, SLOT->state);
+			state_save_register_device_item(device, ch * 4 + slot, SLOT->volume);
 		}
 	}
 }
 
-static void FMsave_state_st(const char *state_name,const char *tag,FM_ST *ST)
+static void FMsave_state_st(const device_config *device,FM_ST *ST)
 {
 #if FM_BUSY_FLAG_SUPPORT
-	state_save_register_item(state_name, tag, 0, ST->busy_expiry_time.seconds );
-	state_save_register_item(state_name, tag, 0, ST->busy_expiry_time.attoseconds );
+	state_save_register_device_item(device, 0, ST->busy_expiry_time.seconds );
+	state_save_register_device_item(device, 0, ST->busy_expiry_time.attoseconds );
 #endif
-	state_save_register_item(state_name, tag, 0, ST->address );
-	state_save_register_item(state_name, tag, 0, ST->irq     );
-	state_save_register_item(state_name, tag, 0, ST->irqmask );
-	state_save_register_item(state_name, tag, 0, ST->status  );
-	state_save_register_item(state_name, tag, 0, ST->mode    );
-	state_save_register_item(state_name, tag, 0, ST->prescaler_sel );
-	state_save_register_item(state_name, tag, 0, ST->fn_h );
-	state_save_register_item(state_name, tag, 0, ST->TA   );
-	state_save_register_item(state_name, tag, 0, ST->TAC  );
-	state_save_register_item(state_name, tag, 0, ST->TB  );
-	state_save_register_item(state_name, tag, 0, ST->TBC  );
+	state_save_register_device_item(device, 0, ST->address );
+	state_save_register_device_item(device, 0, ST->irq     );
+	state_save_register_device_item(device, 0, ST->irqmask );
+	state_save_register_device_item(device, 0, ST->status  );
+	state_save_register_device_item(device, 0, ST->mode    );
+	state_save_register_device_item(device, 0, ST->prescaler_sel );
+	state_save_register_device_item(device, 0, ST->fn_h );
+	state_save_register_device_item(device, 0, ST->TA   );
+	state_save_register_device_item(device, 0, ST->TAC  );
+	state_save_register_device_item(device, 0, ST->TB  );
+	state_save_register_device_item(device, 0, ST->TBC  );
 }
 #endif /* _STATE_H */
 
@@ -2402,15 +2402,15 @@ void ym2203_postload(void *chip)
 	}
 }
 
-static void YM2203_save_state(YM2203 *F2203, const char *tag)
+static void YM2203_save_state(YM2203 *F2203, const device_config *device)
 {
-	state_save_register_item_array("ym2203", tag, 0, F2203->REGS);
-	FMsave_state_st("ym2203",tag,&F2203->OPN.ST);
-	FMsave_state_channel("ym2203",tag,F2203->CH,3);
+	state_save_register_device_item_array(device, 0, F2203->REGS);
+	FMsave_state_st(device,&F2203->OPN.ST);
+	FMsave_state_channel(device,F2203->CH,3);
 	/* 3slots */
-	state_save_register_item_array ("ym2203", tag, 0, F2203->OPN.SL3.fc);
-	state_save_register_item  ("ym2203", tag, 0, F2203->OPN.SL3.fn_h);
-	state_save_register_item_array  ("ym2203", tag, 0, F2203->OPN.SL3.kcode);
+	state_save_register_device_item_array (device, 0, F2203->OPN.SL3.fc);
+	state_save_register_device_item  (device, 0, F2203->OPN.SL3.fn_h);
+	state_save_register_device_item_array  (device, 0, F2203->OPN.SL3.kcode);
 }
 #endif /* _STATE_H */
 
@@ -2419,7 +2419,7 @@ static void YM2203_save_state(YM2203 *F2203, const char *tag)
    'clock' is the chip clock in Hz
    'rate' is sampling rate
 */
-void * ym2203_init(void *param, const char *tag, int clock, int rate,
+void * ym2203_init(void *param, const device_config *device, int clock, int rate,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
 	YM2203 *F2203;
@@ -2448,7 +2448,7 @@ void * ym2203_init(void *param, const char *tag, int clock, int rate,
 	ym2203_reset_chip(F2203);
 
 #ifdef __STATE_H__
-	YM2203_save_state(F2203, tag);
+	YM2203_save_state(F2203, device);
 #endif
 	return F2203;
 }
@@ -2813,19 +2813,19 @@ static void FM_ADPCMAWrite(YM2610 *F2610,int r,int v)
 
 #ifdef __STATE_H__
 /* FM channel save , internal state only */
-static void FMsave_state_adpcma(const char *name,const char *tag,ADPCM_CH *adpcm)
+static void FMsave_state_adpcma(const device_config *device,ADPCM_CH *adpcm)
 {
 	int ch;
 
 	for(ch=0;ch<6;ch++,adpcm++)
 	{
-		state_save_register_item(name, tag, ch, adpcm->flag);
-		state_save_register_item(name, tag, ch, adpcm->now_data);
-		state_save_register_item(name, tag, ch, adpcm->now_addr);
-		state_save_register_item(name, tag, ch, adpcm->now_step);
-		state_save_register_item(name, tag, ch, adpcm->adpcm_acc);
-		state_save_register_item(name, tag, ch, adpcm->adpcm_step);
-		state_save_register_item(name, tag, ch, adpcm->adpcm_out);
+		state_save_register_device_item(device, ch, adpcm->flag);
+		state_save_register_device_item(device, ch, adpcm->now_data);
+		state_save_register_device_item(device, ch, adpcm->now_addr);
+		state_save_register_device_item(device, ch, adpcm->now_step);
+		state_save_register_device_item(device, ch, adpcm->adpcm_acc);
+		state_save_register_device_item(device, ch, adpcm->adpcm_step);
+		state_save_register_device_item(device, ch, adpcm->adpcm_out);
 	}
 }
 #endif /* _STATE_H */
@@ -3612,21 +3612,21 @@ void ym2608_postload(void *chip)
 	}
 }
 
-static void YM2608_save_state(YM2608 *F2608, const char *tag)
+static void YM2608_save_state(YM2608 *F2608, const device_config *device)
 {
-	state_save_register_item_array("ym2608", tag, 0, F2608->REGS);
-	FMsave_state_st("ym2608",tag,&F2608->OPN.ST);
-	FMsave_state_channel("ym2608",tag,F2608->CH,6);
+	state_save_register_device_item_array(device, 0, F2608->REGS);
+	FMsave_state_st(device,&F2608->OPN.ST);
+	FMsave_state_channel(device,F2608->CH,6);
 	/* 3slots */
-	state_save_register_item_array("ym2608", tag, 0, F2608->OPN.SL3.fc);
-	state_save_register_item("ym2608", tag, 0, F2608->OPN.SL3.fn_h);
-	state_save_register_item_array("ym2608", tag, 0, F2608->OPN.SL3.kcode);
+	state_save_register_device_item_array(device, 0, F2608->OPN.SL3.fc);
+	state_save_register_device_item(device, 0, F2608->OPN.SL3.fn_h);
+	state_save_register_device_item_array(device, 0, F2608->OPN.SL3.kcode);
 	/* address register1 */
-	state_save_register_item("ym2608", tag, 0, F2608->addr_A1);
+	state_save_register_device_item(device, 0, F2608->addr_A1);
 	/* rythm(ADPCMA) */
-	FMsave_state_adpcma("ym2608",tag,F2608->adpcm);
+	FMsave_state_adpcma(device,F2608->adpcm);
 	/* Delta-T ADPCM unit */
-	YM_DELTAT_savestate("ym2608",tag,&F2608->deltaT);
+	YM_DELTAT_savestate(device,&F2608->deltaT);
 }
 #endif /* _STATE_H */
 
@@ -3641,7 +3641,7 @@ static void YM2608_deltat_status_reset(void *chip, UINT8 changebits)
 	FM_STATUS_RESET(&(F2608->OPN.ST), changebits);
 }
 /* YM2608(OPNA) */
-void * ym2608_init(void *param, const char *tag, int clock, int rate,
+void * ym2608_init(void *param, const device_config *device, int clock, int rate,
                void *pcmrom,int pcmsize,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 {
@@ -3693,7 +3693,7 @@ void * ym2608_init(void *param, const char *tag, int clock, int rate,
 	Init_ADPCMATable();
 
 #ifdef __STATE_H__
-	YM2608_save_state(F2608, tag);
+	YM2608_save_state(F2608, device);
 #endif
 	return F2608;
 }
@@ -4295,23 +4295,23 @@ void ym2610_postload(void *chip)
 	}
 }
 
-static void YM2610_save_state(YM2610 *F2610, const char *tag)
+static void YM2610_save_state(YM2610 *F2610, const device_config *device)
 {
-	state_save_register_item_array("ym2610", tag, 0, F2610->REGS);
-	FMsave_state_st("ym2610",tag,&F2610->OPN.ST);
-	FMsave_state_channel("ym2610",tag,F2610->CH,6);
+	state_save_register_device_item_array(device, 0, F2610->REGS);
+	FMsave_state_st(device,&F2610->OPN.ST);
+	FMsave_state_channel(device,F2610->CH,6);
 	/* 3slots */
-	state_save_register_item_array("ym2610", tag, 0, F2610->OPN.SL3.fc);
-	state_save_register_item("ym2610", tag, 0, F2610->OPN.SL3.fn_h);
-	state_save_register_item_array("ym2610", tag, 0, F2610->OPN.SL3.kcode);
+	state_save_register_device_item_array(device, 0, F2610->OPN.SL3.fc);
+	state_save_register_device_item(device, 0, F2610->OPN.SL3.fn_h);
+	state_save_register_device_item_array(device, 0, F2610->OPN.SL3.kcode);
 	/* address register1 */
-	state_save_register_item("ym2610", tag, 0, F2610->addr_A1);
+	state_save_register_device_item(device, 0, F2610->addr_A1);
 
-	state_save_register_item("ym2610", tag, 0, F2610->adpcm_arrivedEndAddress);
+	state_save_register_device_item(device, 0, F2610->adpcm_arrivedEndAddress);
 	/* rythm(ADPCMA) */
-	FMsave_state_adpcma("ym2610",tag,F2610->adpcm);
+	FMsave_state_adpcma(device,F2610->adpcm);
 	/* Delta-T ADPCM unit */
-	YM_DELTAT_savestate("ym2610",tag,&F2610->deltaT);
+	YM_DELTAT_savestate(device,&F2610->deltaT);
 }
 #endif /* _STATE_H */
 
@@ -4326,7 +4326,7 @@ static void YM2610_deltat_status_reset(void *chip, UINT8 changebits)
 	F2610->adpcm_arrivedEndAddress &= (~changebits);
 }
 
-void *ym2610_init(void *param, const char *tag, int clock, int rate,
+void *ym2610_init(void *param, const device_config *device, int clock, int rate,
                void *pcmroma,int pcmsizea,void *pcmromb,int pcmsizeb,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler, const ssg_callbacks *ssg)
 
@@ -4371,7 +4371,7 @@ void *ym2610_init(void *param, const char *tag, int clock, int rate,
 
 	Init_ADPCMATable();
 #ifdef __STATE_H__
-	YM2610_save_state(F2610, tag);
+	YM2610_save_state(F2610, device);
 #endif
 	return F2610;
 }
@@ -4778,22 +4778,22 @@ void ym2612_postload(void *chip)
 	}
 }
 
-static void YM2612_save_state(YM2612 *F2612, const char *tag)
+static void YM2612_save_state(YM2612 *F2612, const device_config *device)
 {
-	state_save_register_item_array("ym2612", tag, 0, F2612->REGS);
-	FMsave_state_st("ym2612",tag,&F2612->OPN.ST);
-	FMsave_state_channel("ym2612",tag,F2612->CH,6);
+	state_save_register_device_item_array(device, 0, F2612->REGS);
+	FMsave_state_st(device,&F2612->OPN.ST);
+	FMsave_state_channel(device,F2612->CH,6);
 	/* 3slots */
-	state_save_register_item_array("ym2612", tag, 0, F2612->OPN.SL3.fc);
-	state_save_register_item("ym2612", tag, 0, F2612->OPN.SL3.fn_h);
-	state_save_register_item_array("ym2612", tag, 0, F2612->OPN.SL3.kcode);
+	state_save_register_device_item_array(device, 0, F2612->OPN.SL3.fc);
+	state_save_register_device_item(device, 0, F2612->OPN.SL3.fn_h);
+	state_save_register_device_item_array(device, 0, F2612->OPN.SL3.kcode);
 	/* address register1 */
-	state_save_register_item("ym2612", tag, 0, F2612->addr_A1);
+	state_save_register_device_item(device, 0, F2612->addr_A1);
 }
 #endif /* _STATE_H */
 
 /* initialize YM2612 emulator(s) */
-void * ym2612_init(void *param, const char *tag, int clock, int rate,
+void * ym2612_init(void *param, const device_config *device, int clock, int rate,
                FM_TIMERHANDLER timer_handler,FM_IRQHANDLER IRQHandler)
 {
 	YM2612 *F2612;
@@ -4823,7 +4823,7 @@ void * ym2612_init(void *param, const char *tag, int clock, int rate,
 	ym2612_reset_chip(F2612);
 
 #ifdef __STATE_H__
-	YM2612_save_state(F2612, tag);
+	YM2612_save_state(F2612, device);
 #endif
 	return F2612;
 }

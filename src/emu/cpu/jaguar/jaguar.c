@@ -422,10 +422,10 @@ static void init_common(int isdsp, const device_config *device, cpu_irq_callback
 	if (configdata != NULL)
 		jaguar->cpu_interrupt = configdata->cpu_int_callback;
 
-	state_save_register_item_array("jaguar", device->tag, 0, jaguar->r);
-	state_save_register_item_array("jaguar", device->tag, 0, jaguar->a);
-	state_save_register_item_array("jaguar", device->tag, 0, jaguar->ctrl);
-	state_save_register_item("jaguar", device->tag, 0, jaguar->ppc);
+	state_save_register_device_item_array(device, 0, jaguar->r);
+	state_save_register_device_item_array(device, 0, jaguar->a);
+	state_save_register_device_item_array(device, 0, jaguar->ctrl);
+	state_save_register_device_item(device, 0, jaguar->ppc);
 	state_save_register_postload(device->machine, jaguar_postload, (void *)device);
 }
 

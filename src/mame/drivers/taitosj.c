@@ -2712,11 +2712,11 @@ static void reset_common(running_machine *machine)
 
 static void init_common(running_machine *machine)
 {
-	state_save_register_global(sndnmi_disable);
-	state_save_register_global(input_port_4_f0);
-	state_save_register_global_array(kikstart_gears);
-	state_save_register_global(dac_out);
-	state_save_register_global(dac_vol);
+	state_save_register_global(machine, sndnmi_disable);
+	state_save_register_global(machine, input_port_4_f0);
+	state_save_register_global_array(machine, kikstart_gears);
+	state_save_register_global(machine, dac_out);
+	state_save_register_global(machine, dac_vol);
 
 	add_reset_callback(machine, reset_common);
 }

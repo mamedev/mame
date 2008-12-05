@@ -135,10 +135,10 @@ void intelflash_init(int chip, int type, void *data)
 	c->timer = timer_alloc(Machine, erase_finished, c);
 	c->flash_memory = data;
 
-	state_save_register_item( "intelfsh", NULL, chip, c->status );
-	state_save_register_item( "intelfsh", NULL, chip, c->flash_mode );
-	state_save_register_item( "intelfsh", NULL, chip, c->flash_master_lock );
-	state_save_register_memory( "intelfsh", NULL, chip, "flash_memory", c->flash_memory, c->bits/8, c->size / (c->bits/8) );
+	state_save_register_item( Machine, "intelfsh", NULL, chip, c->status );
+	state_save_register_item( Machine, "intelfsh", NULL, chip, c->flash_mode );
+	state_save_register_item( Machine, "intelfsh", NULL, chip, c->flash_master_lock );
+	state_save_register_memory( Machine, "intelfsh", NULL, chip, "flash_memory", c->flash_memory, c->bits/8, c->size / (c->bits/8) );
 }
 
 UINT32 intelflash_read(int chip, UINT32 address)

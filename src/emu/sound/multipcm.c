@@ -493,7 +493,7 @@ static SND_START( multipcm )
 
 	ptChip=(struct _MultiPCM *)auto_malloc(sizeof(struct _MultiPCM));
 
-	ptChip->ROM=(INT8 *)memory_region(device->machine, tag);
+	ptChip->ROM=(INT8 *)device->region;
 	ptChip->Rate=(float) clock / MULTIPCM_CLOCKDIV;
 
 	ptChip->stream = stream_create(0, 2, ptChip->Rate, ptChip, MultiPCM_update);
@@ -599,39 +599,39 @@ static SND_START( multipcm )
 		ptChip->Samples[i].AM=ptSample[11];
 	}
 
-	state_save_register_item("multipcm", tag, 0, ptChip->CurSlot);
-	state_save_register_item("multipcm", tag, 0, ptChip->Address);
-	state_save_register_item("multipcm", tag, 0, ptChip->BankL);
-	state_save_register_item("multipcm", tag, 0, ptChip->BankR);
+	state_save_register_device_item(device, 0, ptChip->CurSlot);
+	state_save_register_device_item(device, 0, ptChip->Address);
+	state_save_register_device_item(device, 0, ptChip->BankL);
+	state_save_register_device_item(device, 0, ptChip->BankR);
 
 	for(i=0;i<28;++i)
 	{
 		ptChip->Slots[i].Num=i;
 		ptChip->Slots[i].Playing=0;
 
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Num);
-		state_save_register_item_array("multipcm", tag, i, ptChip->Slots[i].Regs);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Playing);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Base);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].offset);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].step);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Pan);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].TL);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].DstTL);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].TLStep);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].Prev);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.volume);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.state);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.step);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.AR);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.D1R);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.D2R);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.RR);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].EG.DL);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].PLFO.phase);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].PLFO.phase_step);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].ALFO.phase);
-		state_save_register_item("multipcm", tag, i, ptChip->Slots[i].ALFO.phase_step);
+		state_save_register_device_item(device, i, ptChip->Slots[i].Num);
+		state_save_register_device_item_array(device, i, ptChip->Slots[i].Regs);
+		state_save_register_device_item(device, i, ptChip->Slots[i].Playing);
+		state_save_register_device_item(device, i, ptChip->Slots[i].Base);
+		state_save_register_device_item(device, i, ptChip->Slots[i].offset);
+		state_save_register_device_item(device, i, ptChip->Slots[i].step);
+		state_save_register_device_item(device, i, ptChip->Slots[i].Pan);
+		state_save_register_device_item(device, i, ptChip->Slots[i].TL);
+		state_save_register_device_item(device, i, ptChip->Slots[i].DstTL);
+		state_save_register_device_item(device, i, ptChip->Slots[i].TLStep);
+		state_save_register_device_item(device, i, ptChip->Slots[i].Prev);
+		state_save_register_device_item(device, i, ptChip->Slots[i].EG.volume);
+		state_save_register_device_item(device, i, ptChip->Slots[i].EG.state);
+		state_save_register_device_item(device, i, ptChip->Slots[i].EG.step);
+		state_save_register_device_item(device, i, ptChip->Slots[i].EG.AR);
+		state_save_register_device_item(device, i, ptChip->Slots[i].EG.D1R);
+		state_save_register_device_item(device, i, ptChip->Slots[i].EG.D2R);
+		state_save_register_device_item(device, i, ptChip->Slots[i].EG.RR);
+		state_save_register_device_item(device, i, ptChip->Slots[i].EG.DL);
+		state_save_register_device_item(device, i, ptChip->Slots[i].PLFO.phase);
+		state_save_register_device_item(device, i, ptChip->Slots[i].PLFO.phase_step);
+		state_save_register_device_item(device, i, ptChip->Slots[i].ALFO.phase);
+		state_save_register_device_item(device, i, ptChip->Slots[i].ALFO.phase_step);
 	}
 
 	LFO_Init();

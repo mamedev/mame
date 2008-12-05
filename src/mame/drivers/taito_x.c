@@ -987,7 +987,7 @@ static STATE_POSTLOAD( taitox_postload )
 static MACHINE_START( taitox )
 {
 	banknum = -1;
-	state_save_register_global(banknum);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, taitox_postload, NULL);
 }
 

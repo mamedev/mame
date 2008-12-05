@@ -36,5 +36,5 @@ void mb3773_init( void )
 {
 	watchdog_timer = timer_alloc(Machine, watchdog_timeout, NULL);
 	reset_timer();
-	state_save_register_global( ck );
+	state_save_register_global(Machine,  ck );
 }

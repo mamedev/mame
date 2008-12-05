@@ -1063,26 +1063,26 @@ static device_start_err common_start( const device_config *device, int device_ty
 		timer_adjust_oneshot(timer->updatetimer, attotime_never, timerno);
 
 		/* set up state save values */
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->clockin);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->control);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->status);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->lowcount);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->latch);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->count);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->value);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->wmsb);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->rmsb);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->output);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->gate);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->latched_count);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->latched_status);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->null_count);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->phase);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->cycles_to_output);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->last_updated.seconds);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->last_updated.attoseconds);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->programmed);
-		state_save_register_item(device_tags[device_type], device->tag, timerno, timer->clock);
+		state_save_register_device_item(device, timerno, timer->clockin);
+		state_save_register_device_item(device, timerno, timer->control);
+		state_save_register_device_item(device, timerno, timer->status);
+		state_save_register_device_item(device, timerno, timer->lowcount);
+		state_save_register_device_item(device, timerno, timer->latch);
+		state_save_register_device_item(device, timerno, timer->count);
+		state_save_register_device_item(device, timerno, timer->value);
+		state_save_register_device_item(device, timerno, timer->wmsb);
+		state_save_register_device_item(device, timerno, timer->rmsb);
+		state_save_register_device_item(device, timerno, timer->output);
+		state_save_register_device_item(device, timerno, timer->gate);
+		state_save_register_device_item(device, timerno, timer->latched_count);
+		state_save_register_device_item(device, timerno, timer->latched_status);
+		state_save_register_device_item(device, timerno, timer->null_count);
+		state_save_register_device_item(device, timerno, timer->phase);
+		state_save_register_device_item(device, timerno, timer->cycles_to_output);
+		state_save_register_device_item(device, timerno, timer->last_updated.seconds);
+		state_save_register_device_item(device, timerno, timer->last_updated.attoseconds);
+		state_save_register_device_item(device, timerno, timer->programmed);
+		state_save_register_device_item(device, timerno, timer->clock);
 	}
 
 	return DEVICE_START_OK;

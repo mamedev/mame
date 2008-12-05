@@ -1913,7 +1913,7 @@ WRITE16_HANDLER( model1_tgp_copro_ram_w )
 	}
 }
 
-void model1_tgp_reset(int swa)
+void model1_tgp_reset(running_machine *machine, int swa)
 {
 	ram_adr = 0;
 	ram_data = auto_malloc(0x10000*4);
@@ -1935,22 +1935,22 @@ void model1_tgp_reset(int swa)
 	model1_swa = swa;
 	next_fn();
 
-	state_save_register_global_pointer(ram_data, 0x10000);
-	state_save_register_global(ram_adr);
-	state_save_register_global(ram_scanadr);
-	state_save_register_global_array(ram_latch);
-	state_save_register_global(fifoout_rpos);
-	state_save_register_global(fifoout_wpos);
-	state_save_register_global_array(fifoout_data);
-	state_save_register_global(fifoin_rpos);
-	state_save_register_global(fifoin_wpos);
-	state_save_register_global_array(fifoin_data);
-	state_save_register_global_array(cmat);
-	state_save_register_global_2d_array(mat_stack);
-	state_save_register_global_2d_array(mat_vector);
-	state_save_register_global(mat_stack_pos);
-	state_save_register_global(acc);
-	state_save_register_global(list_length);
+	state_save_register_global_pointer(machine, ram_data, 0x10000);
+	state_save_register_global(machine, ram_adr);
+	state_save_register_global(machine, ram_scanadr);
+	state_save_register_global_array(machine, ram_latch);
+	state_save_register_global(machine, fifoout_rpos);
+	state_save_register_global(machine, fifoout_wpos);
+	state_save_register_global_array(machine, fifoout_data);
+	state_save_register_global(machine, fifoin_rpos);
+	state_save_register_global(machine, fifoin_wpos);
+	state_save_register_global_array(machine, fifoin_data);
+	state_save_register_global_array(machine, cmat);
+	state_save_register_global_2d_array(machine, mat_stack);
+	state_save_register_global_2d_array(machine, mat_vector);
+	state_save_register_global(machine, mat_stack_pos);
+	state_save_register_global(machine, acc);
+	state_save_register_global(machine, list_length);
 }
 
 /*********************************** Virtua Racing ***********************************/

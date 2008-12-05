@@ -1270,7 +1270,7 @@ static DRIVER_INIT( quizf1 )
 	bankaddress = 0;
 	set_m90_bank(machine);
 
-	state_save_register_global(bankaddress);
+	state_save_register_global(machine, bankaddress);
 	state_save_register_postload(machine, quizf1_postload, NULL);
 }
 

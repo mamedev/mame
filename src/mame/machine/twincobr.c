@@ -336,14 +336,14 @@ MACHINE_RESET( twincobr )
 }
 void twincobr_driver_savestate(running_machine *machine)
 {
-	state_save_register_global(toaplan_main_cpu);
-	state_save_register_global(twincobr_intenable);
-	state_save_register_global(twincobr_dsp_on);
-	state_save_register_global(dsp_addr_w);
-	state_save_register_global(main_ram_seg);
-	state_save_register_global(twincobr_dsp_BIO);
-	state_save_register_global(dsp_execute);
-	state_save_register_global(fsharkbt_8741);
+	state_save_register_global(machine, toaplan_main_cpu);
+	state_save_register_global(machine, twincobr_intenable);
+	state_save_register_global(machine, twincobr_dsp_on);
+	state_save_register_global(machine, dsp_addr_w);
+	state_save_register_global(machine, main_ram_seg);
+	state_save_register_global(machine, twincobr_dsp_BIO);
+	state_save_register_global(machine, dsp_execute);
+	state_save_register_global(machine, fsharkbt_8741);
 	state_save_register_postload(machine, twincobr_restore_dsp, NULL);
 }
 
@@ -360,14 +360,14 @@ MACHINE_RESET( wardner )
 }
 void wardner_driver_savestate(running_machine *machine)
 {
-	state_save_register_global(toaplan_main_cpu);
-	state_save_register_global(twincobr_intenable);
-	state_save_register_global(twincobr_dsp_on);
-	state_save_register_global(dsp_addr_w);
-	state_save_register_global(main_ram_seg);
-	state_save_register_global(twincobr_dsp_BIO);
-	state_save_register_global(dsp_execute);
-	state_save_register_global(wardner_membank);
+	state_save_register_global(machine, toaplan_main_cpu);
+	state_save_register_global(machine, twincobr_intenable);
+	state_save_register_global(machine, twincobr_dsp_on);
+	state_save_register_global(machine, dsp_addr_w);
+	state_save_register_global(machine, main_ram_seg);
+	state_save_register_global(machine, twincobr_dsp_BIO);
+	state_save_register_global(machine, dsp_execute);
+	state_save_register_global(machine, wardner_membank);
 	state_save_register_postload(machine, wardner_restore_bank, NULL);	/* Restore the Main CPU bank */
 	state_save_register_postload(machine, twincobr_restore_dsp, NULL);
 }

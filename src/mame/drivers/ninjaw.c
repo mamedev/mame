@@ -934,8 +934,8 @@ static MACHINE_START( ninjaw )
 	banknum = -1;
 	memset(ninjaw_pandata, 0, sizeof(ninjaw_pandata));
 
-	state_save_register_global(cpua_ctrl);
-	state_save_register_global(banknum);
+	state_save_register_global(machine, cpua_ctrl);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, ninjaw_postload, NULL);
 }
 

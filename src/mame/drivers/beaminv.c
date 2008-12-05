@@ -116,7 +116,7 @@ static MACHINE_START( beaminv )
 	create_interrupt_timer(machine);
 
 	/* setup for save states */
-	state_save_register_global(controller_select);
+	state_save_register_global(machine, controller_select);
 }
 
 

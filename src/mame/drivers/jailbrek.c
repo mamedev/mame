@@ -244,8 +244,8 @@ GFXDECODE_END
 
 static MACHINE_START( jailbrek )
 {
-	state_save_register_global(irq_enable);
-	state_save_register_global(nmi_enable);
+	state_save_register_global(machine, irq_enable);
+	state_save_register_global(machine, nmi_enable);
 }
 
 static MACHINE_DRIVER_START( jailbrek )

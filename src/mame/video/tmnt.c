@@ -254,10 +254,10 @@ VIDEO_START( lgtnfght )	/* also tmnt2, ssriders */
 
 	dim_c = dim_v = lastdim = lasten = 0;
 
-	state_save_register_global(dim_c);
-	state_save_register_global(dim_v);
-	state_save_register_global(lastdim);
-	state_save_register_global(lasten);
+	state_save_register_global(machine, dim_c);
+	state_save_register_global(machine, dim_v);
+	state_save_register_global(machine, lastdim);
+	state_save_register_global(machine, lasten);
 }
 
 VIDEO_START( sunsetbl )

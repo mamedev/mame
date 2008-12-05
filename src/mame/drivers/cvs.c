@@ -500,13 +500,13 @@ MACHINE_START( cvs )
 	start_393hz_timer(machine);
 
 	/* register state save */
-	state_save_register_global_pointer(cvs_color_ram, 0x400);
-	state_save_register_global_pointer(cvs_palette_ram, 0x10);
-	state_save_register_global_pointer(cvs_character_ram, 3 * 0x800);
-	state_save_register_global(character_banking_mode);
-	state_save_register_global(character_ram_page_start);
-	state_save_register_global(speech_rom_bit_address);
-	state_save_register_global(cvs_393hz_clock);
+	state_save_register_global_pointer(machine, cvs_color_ram, 0x400);
+	state_save_register_global_pointer(machine, cvs_palette_ram, 0x10);
+	state_save_register_global_pointer(machine, cvs_character_ram, 3 * 0x800);
+	state_save_register_global(machine, character_banking_mode);
+	state_save_register_global(machine, character_ram_page_start);
+	state_save_register_global(machine, speech_rom_bit_address);
+	state_save_register_global(machine, cvs_393hz_clock);
 }
 
 

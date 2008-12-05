@@ -180,12 +180,12 @@ VIDEO_START( cloak )
 
 	set_current_bitmap_videoram_pointer();
 
-	state_save_register_global(bitmap_videoram_address_x);
-	state_save_register_global(bitmap_videoram_address_y);
-	state_save_register_global(bitmap_videoram_selected);
-	state_save_register_global_pointer(bitmap_videoram1, 256*256);
-	state_save_register_global_pointer(bitmap_videoram2, 256*256);
-	state_save_register_global_pointer(palette_ram, NUM_PENS);
+	state_save_register_global(machine, bitmap_videoram_address_x);
+	state_save_register_global(machine, bitmap_videoram_address_y);
+	state_save_register_global(machine, bitmap_videoram_selected);
+	state_save_register_global_pointer(machine, bitmap_videoram1, 256*256);
+	state_save_register_global_pointer(machine, bitmap_videoram2, 256*256);
+	state_save_register_global_pointer(machine, palette_ram, NUM_PENS);
 	state_save_register_postload(machine, cloak_postload, NULL);
 }
 

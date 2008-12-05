@@ -224,10 +224,10 @@ MACHINE_RESET( vertigo )
 	irq4_time = timer_get_time(machine);
 	irq_state = 7;
 
-	state_save_register_global(irq_state);
-	state_save_register_global(adc_result);
-	state_save_register_global(irq4_time.seconds);
-	state_save_register_global(irq4_time.attoseconds);
+	state_save_register_global(machine, irq_state);
+	state_save_register_global(machine, adc_result);
+	state_save_register_global(machine, irq4_time.seconds);
+	state_save_register_global(machine, irq4_time.attoseconds);
 }
 
 

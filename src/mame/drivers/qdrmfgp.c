@@ -620,9 +620,9 @@ static const k054539_interface k054539_config =
 
 static MACHINE_START( qdrmfgp )
 {
-	state_save_register_global(control);
-	state_save_register_global(qdrmfgp_pal);
-	state_save_register_global(gp2_irq_control);
+	state_save_register_global(machine, control);
+	state_save_register_global(machine, qdrmfgp_pal);
+	state_save_register_global(machine, gp2_irq_control);
 }
 
 static MACHINE_RESET( qdrmfgp )

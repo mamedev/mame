@@ -114,11 +114,11 @@ VIDEO_START( dcheese )
 	blitter_timer = timer_alloc(machine, blitter_scanline_callback, NULL);
 
 	/* register for saving */
-	state_save_register_global_array(blitter_color);
-	state_save_register_global_array(blitter_xparam);
-	state_save_register_global_array(blitter_yparam);
-	state_save_register_global_array(blitter_vidparam);
-	state_save_register_global_bitmap(dstbitmap);
+	state_save_register_global_array(machine, blitter_color);
+	state_save_register_global_array(machine, blitter_xparam);
+	state_save_register_global_array(machine, blitter_yparam);
+	state_save_register_global_array(machine, blitter_vidparam);
+	state_save_register_global_bitmap(machine, dstbitmap);
 }
 
 

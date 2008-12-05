@@ -103,7 +103,7 @@ VIDEO_START( m90 )
 	tilemap_set_transparent_pen(pf1_layer,0);
 	tilemap_set_transparent_pen(pf1_wide_layer,0);
 
-	state_save_register_global_array(m90_video_control_data);
+	state_save_register_global_array(machine, m90_video_control_data);
 }
 
 VIDEO_START( bomblord )
@@ -118,7 +118,7 @@ VIDEO_START( bomblord )
 	tilemap_set_transparent_pen(pf1_layer,0);
 	tilemap_set_transparent_pen(pf1_wide_layer,0);
 
-	state_save_register_global_array(m90_video_control_data);
+	state_save_register_global_array(machine, m90_video_control_data);
 }
 
 VIDEO_START( dynablsb )
@@ -131,7 +131,7 @@ VIDEO_START( dynablsb )
 	tilemap_set_transparent_pen(pf2_layer,0);
 	tilemap_set_transparent_pen(pf2_wide_layer,0);
 
-	state_save_register_global_array(m90_video_control_data);
+	state_save_register_global_array(machine, m90_video_control_data);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)

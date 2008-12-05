@@ -433,7 +433,7 @@ static TIMER_CALLBACK( k054539_irq )
 		info->intf->irq(machine);
 }
 
-static void k054539_init_chip(const char *tag, struct k054539_info *info, int clock, int sndindex)
+static void k054539_init_chip(const device_config *device, struct k054539_info *info, int clock)
 {
 	int i;
 
@@ -447,8 +447,13 @@ static void k054539_init_chip(const char *tag, struct k054539_info *info, int cl
 	info->cur_ptr = 0;
 	memset(info->ram, 0, 0x4000*2+clock/50*2);
 
-	info->rom = memory_region(Machine, (info->intf->rgnoverride != NULL) ? info->intf->rgnoverride : tag);
-	info->rom_size = memory_region_length(Machine, (info->intf->rgnoverride != NULL) ? info->intf->rgnoverride : tag);
+	info->rom = device->region;
+	info->rom_size = device->regionbytes;
+	if (info->intf->rgnoverride != NULL)
+	{
+		info->rom = memory_region(device->machine, info->intf->rgnoverride);
+		info->rom_size = memory_region_length(device->machine, info->intf->rgnoverride);
+	}
 	info->rom_mask = 0xffffffffU;
 	for(i=0; i<32; i++)
 		if((1U<<i) >= info->rom_size) {
@@ -464,9 +469,9 @@ static void k054539_init_chip(const char *tag, struct k054539_info *info, int cl
 
 	info->stream = stream_create(0, 2, clock, info, k054539_update);
 
-	state_save_register_item_array("K054539", tag, 0, info->regs);
-	state_save_register_item_pointer("K054539", tag, 0, info->ram,  0x4000);
-	state_save_register_item("K054539", tag, 0, info->cur_ptr);
+	state_save_register_device_item_array(device, 0, info->regs);
+	state_save_register_device_item_pointer(device, 0, info->ram,  0x4000);
+	state_save_register_device_item(device, 0, info->cur_ptr);
 }
 
 static void k054539_w(int chip, offs_t offset, UINT8 data) //*
@@ -662,7 +667,7 @@ static SND_START( k054539 )
 	for(i=0; i<0xf; i++)
 		info->pantab[i] = sqrt(i) / sqrt(0xe);
 
-	k054539_init_chip(tag, info, clock, sndindex);
+	k054539_init_chip(device, info, clock);
 
 	state_save_register_postload(device->machine, reset_zones, info);
 	return info;

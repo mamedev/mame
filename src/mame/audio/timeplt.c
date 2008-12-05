@@ -31,7 +31,7 @@ static UINT8 timeplt_last_irq_state;
 static SOUND_START( timeplt )
 {
 	timeplt_last_irq_state = 0;
-	state_save_register_global(timeplt_last_irq_state);
+	state_save_register_global(machine, timeplt_last_irq_state);
 }
 
 

@@ -147,23 +147,23 @@ static void m6502_common_init(const device_config *device, int index, int clock,
 	cpustate->rdmem_id = default_rdmem_id;
 	cpustate->wrmem_id = default_wdmem_id;
 
-	state_save_register_item(type, device->tag, 0, cpustate->pc.w.l);
-	state_save_register_item(type, device->tag, 0, cpustate->sp.w.l);
-	state_save_register_item(type, device->tag, 0, cpustate->p);
-	state_save_register_item(type, device->tag, 0, cpustate->a);
-	state_save_register_item(type, device->tag, 0, cpustate->x);
-	state_save_register_item(type, device->tag, 0, cpustate->y);
-	state_save_register_item(type, device->tag, 0, cpustate->pending_irq);
-	state_save_register_item(type, device->tag, 0, cpustate->after_cli);
-	state_save_register_item(type, device->tag, 0, cpustate->nmi_state);
-	state_save_register_item(type, device->tag, 0, cpustate->irq_state);
-	state_save_register_item(type, device->tag, 0, cpustate->so_state);
+	state_save_register_device_item(device, 0, cpustate->pc.w.l);
+	state_save_register_device_item(device, 0, cpustate->sp.w.l);
+	state_save_register_device_item(device, 0, cpustate->p);
+	state_save_register_device_item(device, 0, cpustate->a);
+	state_save_register_device_item(device, 0, cpustate->x);
+	state_save_register_device_item(device, 0, cpustate->y);
+	state_save_register_device_item(device, 0, cpustate->pending_irq);
+	state_save_register_device_item(device, 0, cpustate->after_cli);
+	state_save_register_device_item(device, 0, cpustate->nmi_state);
+	state_save_register_device_item(device, 0, cpustate->irq_state);
+	state_save_register_device_item(device, 0, cpustate->so_state);
 
 #if (HAS_M6510) || (HAS_M6510T) || (HAS_M8502) || (HAS_M7501)
 	if (subtype == SUBTYPE_6510)
 	{
-		state_save_register_item(type, device->tag, 0, cpustate->port);
-		state_save_register_item(type, device->tag, 0, cpustate->ddr);
+		state_save_register_device_item(device, 0, cpustate->port);
+		state_save_register_device_item(device, 0, cpustate->ddr);
 	}
 #endif
 }

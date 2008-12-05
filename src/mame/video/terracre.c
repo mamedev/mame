@@ -192,8 +192,8 @@ VIDEO_START( amazon )
 	tilemap_set_transparent_pen(foreground,0xf);
 
 	/* register for saving */
-	state_save_register_global(xscroll);
-	state_save_register_global(yscroll);
+	state_save_register_global(machine, xscroll);
+	state_save_register_global(machine, yscroll);
 }
 
 VIDEO_UPDATE( amazon )

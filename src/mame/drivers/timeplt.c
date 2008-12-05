@@ -64,7 +64,7 @@ static UINT8 nmi_enable;
 
 static MACHINE_START( timeplt )
 {
-	state_save_register_global(nmi_enable);
+	state_save_register_global(machine, nmi_enable);
 }
 
 

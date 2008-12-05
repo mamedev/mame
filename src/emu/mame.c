@@ -1515,7 +1515,7 @@ static void init_machine(running_machine *machine)
 	input_init(machine);
 	output_init(machine);
 	state_init(machine);
-	state_save_allow_registration(TRUE);
+	state_save_allow_registration(machine, TRUE);
 	drawgfx_init(machine);
 	palette_init(machine);
 	render_init(machine);
@@ -1525,7 +1525,7 @@ static void init_machine(running_machine *machine)
 #endif /* MESS */
 	generic_machine_init(machine);
 	generic_video_init(machine);
-	generic_sound_init();
+	generic_sound_init(machine);
 	mame->rand_seed = 0x9d14abd7;
 
 	/* initialize the timers and allocate a soft_reset timer */
@@ -1631,7 +1631,7 @@ static TIMER_CALLBACK( soft_reset )
 	begin_resource_tracking();
 
 	/* allow save state registrations during the reset */
-	state_save_allow_registration(TRUE);
+	state_save_allow_registration(machine, TRUE);
 
 	/* call all registered reset callbacks */
 	for (cb = machine->mame_data->reset_callback_list; cb; cb = cb->next)
@@ -1646,7 +1646,7 @@ static TIMER_CALLBACK( soft_reset )
 		(*machine->config->video_reset)(machine);
 
 	/* disallow save state registrations starting here */
-	state_save_allow_registration(FALSE);
+	state_save_allow_registration(machine, FALSE);
 
 	/* now we're running */
 	mame->current_phase = MAME_PHASE_RUNNING;
@@ -1731,7 +1731,7 @@ static void handle_save(running_machine *machine)
 		int cpunum;
 
 		/* write the save state */
-		if (state_save_save_begin(file) != 0)
+		if (state_save_save_begin(machine, file) != 0)
 		{
 			popmessage("Error: Unable to save state due to illegal registrations. See error.log for details.");
 			mame_fclose(file);
@@ -1814,7 +1814,7 @@ static void handle_load(running_machine *machine)
 	if (filerr == FILERR_NONE)
 	{
 		/* start loading */
-		if (state_save_load_begin(file) == 0)
+		if (state_save_load_begin(machine, file) == 0)
 		{
 			int cpunum;
 
@@ -1838,7 +1838,7 @@ static void handle_load(running_machine *machine)
 				}
 
 			/* finish and close */
-			state_save_load_finish();
+			state_save_load_finish(machine);
 			popmessage("State successfully loaded.");
 		}
 		else

@@ -119,16 +119,16 @@ static void generic_init(running_machine *machine, void (*callback)(UINT8, UINT8
     current_pitch = 0x10000;
 
     /* register for save states */
-    state_save_register_global(sound_control);
-    state_save_register_global(current_shift);
-    state_save_register_global(last_shift);
-    state_save_register_global(last_shift2);
-    state_save_register_global(current_pitch);
-    state_save_register_global(last_frame);
-    state_save_register_global_array(sound_fifo);
-    state_save_register_global(sound_fifo_in);
-    state_save_register_global(sound_fifo_out);
-    state_save_register_global(last_portb_write);
+    state_save_register_global(machine, sound_control);
+    state_save_register_global(machine, current_shift);
+    state_save_register_global(machine, last_shift);
+    state_save_register_global(machine, last_shift2);
+    state_save_register_global(machine, current_pitch);
+    state_save_register_global(machine, last_frame);
+    state_save_register_global_array(machine, sound_fifo);
+    state_save_register_global(machine, sound_fifo_in);
+    state_save_register_global(machine, sound_fifo_out);
+    state_save_register_global(machine, last_portb_write);
 }
 
 

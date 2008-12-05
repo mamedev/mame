@@ -214,11 +214,11 @@ static VIDEO_START(cidelsa)
 
 	/* register for state saving */
 
-	state_save_register_global(state->cdp1869_prd);
-	state_save_register_global(state->cdp1869_pcb);
-	state_save_register_global_pointer(state->pageram, CIDELSA_PAGERAM_SIZE);
-	state_save_register_global_pointer(state->pcbram, CIDELSA_CHARRAM_SIZE);
-	state_save_register_global_pointer(state->charram, CIDELSA_CHARRAM_SIZE);
+	state_save_register_global(machine, state->cdp1869_prd);
+	state_save_register_global(machine, state->cdp1869_pcb);
+	state_save_register_global_pointer(machine, state->pageram, CIDELSA_PAGERAM_SIZE);
+	state_save_register_global_pointer(machine, state->pcbram, CIDELSA_CHARRAM_SIZE);
+	state_save_register_global_pointer(machine, state->charram, CIDELSA_CHARRAM_SIZE);
 }
 
 static VIDEO_START(draco)
@@ -237,11 +237,11 @@ static VIDEO_START(draco)
 
 	/* register for state saving */
 
-	state_save_register_global(state->cdp1869_prd);
-	state_save_register_global(state->cdp1869_pcb);
-	state_save_register_global_pointer(state->pageram, DRACO_PAGERAM_SIZE);
-	state_save_register_global_pointer(state->pcbram, CIDELSA_CHARRAM_SIZE);
-	state_save_register_global_pointer(state->charram, CIDELSA_CHARRAM_SIZE);
+	state_save_register_global(machine, state->cdp1869_prd);
+	state_save_register_global(machine, state->cdp1869_pcb);
+	state_save_register_global_pointer(machine, state->pageram, DRACO_PAGERAM_SIZE);
+	state_save_register_global_pointer(machine, state->pcbram, CIDELSA_CHARRAM_SIZE);
+	state_save_register_global_pointer(machine, state->charram, CIDELSA_CHARRAM_SIZE);
 }
 
 /* Video Update */

@@ -450,10 +450,10 @@ VIDEO_START( galaga )
 	spriteram_3 = galaga_ram3 + 0x380;
 
 
-	state_save_register_global_array(galaga_starcontrol);
-	state_save_register_global(stars_scrollx);
-	state_save_register_global(stars_scrolly);
-	state_save_register_global(galaga_gfxbank);
+	state_save_register_global_array(machine, galaga_starcontrol);
+	state_save_register_global(machine, stars_scrollx);
+	state_save_register_global(machine, stars_scrolly);
+	state_save_register_global(machine, galaga_gfxbank);
 }
 
 

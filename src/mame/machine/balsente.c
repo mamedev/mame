@@ -197,46 +197,46 @@ MACHINE_RESET( balsente )
 	/* register for saving */
 	for (i = 0; i < 3; i++)
 	{
-		state_save_register_item("8253counter", NULL, i, counter[i].timer_active);
-		state_save_register_item("8253counter", NULL, i, counter[i].initial);
-		state_save_register_item("8253counter", NULL, i, counter[i].count);
-		state_save_register_item("8253counter", NULL, i, counter[i].gate);
-		state_save_register_item("8253counter", NULL, i, counter[i].out);
-		state_save_register_item("8253counter", NULL, i, counter[i].mode);
-		state_save_register_item("8253counter", NULL, i, counter[i].readbyte);
-		state_save_register_item("8253counter", NULL, i, counter[i].writebyte);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].timer_active);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].initial);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].count);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].gate);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].out);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].mode);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].readbyte);
+		state_save_register_item(machine, "8253counter", NULL, i, counter[i].writebyte);
 	}
 
-	state_save_register_global(counter_control);
-	state_save_register_global(counter_0_ff);
-	state_save_register_global(counter_0_timer_active);
+	state_save_register_global(machine, counter_control);
+	state_save_register_global(machine, counter_0_ff);
+	state_save_register_global(machine, counter_0_timer_active);
 
-	state_save_register_global_array(analog_input_data);
-	state_save_register_global(adc_value);
+	state_save_register_global_array(machine, analog_input_data);
+	state_save_register_global(machine, adc_value);
 
-	state_save_register_global(dac_value);
-	state_save_register_global(dac_register);
-	state_save_register_global(chip_select);
+	state_save_register_global(machine, dac_value);
+	state_save_register_global(machine, dac_register);
+	state_save_register_global(machine, chip_select);
 
-	state_save_register_global(m6850_status);
-	state_save_register_global(m6850_control);
-	state_save_register_global(m6850_input);
-	state_save_register_global(m6850_output);
-	state_save_register_global(m6850_data_ready);
+	state_save_register_global(machine, m6850_status);
+	state_save_register_global(machine, m6850_control);
+	state_save_register_global(machine, m6850_input);
+	state_save_register_global(machine, m6850_output);
+	state_save_register_global(machine, m6850_data_ready);
 
-	state_save_register_global(m6850_sound_status);
-	state_save_register_global(m6850_sound_control);
-	state_save_register_global(m6850_sound_input);
-	state_save_register_global(m6850_sound_output);
+	state_save_register_global(machine, m6850_sound_status);
+	state_save_register_global(machine, m6850_sound_control);
+	state_save_register_global(machine, m6850_sound_input);
+	state_save_register_global(machine, m6850_sound_output);
 
-	state_save_register_global_array(noise_position);
+	state_save_register_global_array(machine, noise_position);
 
-	state_save_register_global(nstocker_bits);
-	state_save_register_global(spiker_expand_color);
-	state_save_register_global(spiker_expand_bgcolor);
-	state_save_register_global(spiker_expand_bits);
-	state_save_register_global(grudge_steering_result);
-	state_save_register_global_array(grudge_last_steering);
+	state_save_register_global(machine, nstocker_bits);
+	state_save_register_global(machine, spiker_expand_color);
+	state_save_register_global(machine, spiker_expand_bgcolor);
+	state_save_register_global(machine, spiker_expand_bits);
+	state_save_register_global(machine, grudge_steering_result);
+	state_save_register_global_array(machine, grudge_last_steering);
 }
 
 

@@ -85,7 +85,7 @@ static SND_START( segapcm )
 	spcm = auto_malloc(sizeof(*spcm));
 	memset(spcm, 0, sizeof(*spcm));
 
-	spcm->rom = (const UINT8 *)memory_region(device->machine, tag);
+	spcm->rom = (const UINT8 *)device->region;
 	spcm->ram = auto_malloc(0x800);
 
 	memset(spcm->ram, 0xff, 0x800);
@@ -95,7 +95,7 @@ static SND_START( segapcm )
 	if(!mask)
 		mask = BANK_MASK7>>16;
 
-	len = memory_region_length(device->machine, tag);
+	len = device->regionbytes;
 	for(rom_mask = 1; rom_mask < len; rom_mask *= 2);
 	rom_mask--;
 
@@ -103,8 +103,8 @@ static SND_START( segapcm )
 
 	spcm->stream = stream_create(0, 2, clock / 128, spcm, SEGAPCM_update);
 
-	state_save_register_item_array("segapcm", tag, 0, spcm->low);
-	state_save_register_item_pointer("segapcm", tag, 0, spcm->ram, 0x800);
+	state_save_register_device_item_array(device, 0, spcm->low);
+	state_save_register_device_item_pointer(device, 0, spcm->ram, 0x800);
 
 	return spcm;
 }

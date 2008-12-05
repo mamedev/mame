@@ -112,7 +112,7 @@ static UINT8 latch;
 
 static MACHINE_START( bombjack )
 {
-	state_save_register_global(latch);
+	state_save_register_global(machine, latch);
 }
 
 

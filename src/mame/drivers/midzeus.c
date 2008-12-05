@@ -80,12 +80,12 @@ static MACHINE_START( midzeus )
 	gun_timer[0] = timer_alloc(machine, invasn_gun_callback, NULL);
 	gun_timer[1] = timer_alloc(machine, invasn_gun_callback, NULL);
 
-	state_save_register_global(gun_control);
-	state_save_register_global(gun_irq_state);
-	state_save_register_global_array(gun_x);
-	state_save_register_global_array(gun_y);
-	state_save_register_global(crusnexo_leds_select);
-	state_save_register_global(keypad_select);
+	state_save_register_global(machine, gun_control);
+	state_save_register_global(machine, gun_irq_state);
+	state_save_register_global_array(machine, gun_x);
+	state_save_register_global_array(machine, gun_y);
+	state_save_register_global(machine, crusnexo_leds_select);
+	state_save_register_global(machine, keypad_select);
 }
 
 

@@ -103,10 +103,10 @@ static MACHINE_START( dcheese )
 {
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
-	state_save_register_global_array(irq_state);
-	state_save_register_global(soundlatch_full);
-	state_save_register_global(sound_control);
-	state_save_register_global(sound_msb_latch);
+	state_save_register_global_array(machine, irq_state);
+	state_save_register_global(machine, soundlatch_full);
+	state_save_register_global(machine, sound_control);
+	state_save_register_global(machine, sound_msb_latch);
 }
 
 

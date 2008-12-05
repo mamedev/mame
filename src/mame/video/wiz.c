@@ -37,11 +37,11 @@ static int palette_bank;
 
 VIDEO_START( wiz )
 {
-	state_save_register_global_array(char_bank);
-	state_save_register_global_array(palbank);
-	state_save_register_global(flipx);
-	state_save_register_global(flipy);
-	state_save_register_global(bgpen);
+	state_save_register_global_array(machine, char_bank);
+	state_save_register_global_array(machine, palbank);
+	state_save_register_global(machine, flipx);
+	state_save_register_global(machine, flipy);
+	state_save_register_global(machine, bgpen);
 }
 
 /***************************************************************************

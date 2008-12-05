@@ -306,10 +306,10 @@ ADDRESS_MAP_END
 
 static MACHINE_START( opwolf )
 {
-	state_save_register_global_array(adpcm_b);
-	state_save_register_global_array(adpcm_c);
-	state_save_register_global_array(adpcm_pos);
-	state_save_register_global_array(adpcm_end);
+	state_save_register_global_array(machine, adpcm_b);
+	state_save_register_global_array(machine, adpcm_c);
+	state_save_register_global_array(machine, adpcm_pos);
+	state_save_register_global_array(machine, adpcm_end);
 }
 
 static MACHINE_RESET( opwolf )
@@ -324,8 +324,9 @@ static MACHINE_RESET( opwolf )
 	msm5205_reset_w(1, 1);
 }
 
-static void opwolf_msm5205_vck(running_machine *machine, int chip)
+static void opwolf_msm5205_vck(const device_config *device)
 {
+	int chip = (strcmp(device->tag, "msm1") == 0) ? 0 : 1;
 	if (adpcm_data[chip] != -1)
 	{
 		msm5205_data_w(chip, adpcm_data[chip] & 0x0f);
@@ -335,7 +336,7 @@ static void opwolf_msm5205_vck(running_machine *machine, int chip)
 	}
 	else
 	{
-		adpcm_data[chip] = memory_region(machine, "adpcm")[adpcm_pos[chip]];
+		adpcm_data[chip] = memory_region(device->machine, "adpcm")[adpcm_pos[chip]];
 		adpcm_pos[chip] = (adpcm_pos[chip] + 1) & 0x7ffff;
 		msm5205_data_w(chip, adpcm_data[chip] >> 4);
 	}

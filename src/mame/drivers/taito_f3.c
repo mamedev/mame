@@ -401,7 +401,7 @@ static NVRAM_HANDLER( taito_f3 )
 
 static MACHINE_START(f3)
 {
-	state_save_register_global_array(coin_word);
+	state_save_register_global_array(machine, coin_word);
 }
 
 static MACHINE_DRIVER_START( f3 )

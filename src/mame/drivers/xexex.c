@@ -617,8 +617,8 @@ static STATE_POSTLOAD( xexex_postload )
 
 static MACHINE_START( xexex )
 {
-	state_save_register_global(cur_control2);
-	state_save_register_global(cur_sound_region);
+	state_save_register_global(machine, cur_control2);
+	state_save_register_global(machine, cur_sound_region);
 	state_save_register_postload(machine, xexex_postload, NULL);
 
 	resume_trigger = 1000;

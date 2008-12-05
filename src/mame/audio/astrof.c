@@ -35,11 +35,11 @@ static UINT8 astrof_bosskill_playing;
 MACHINE_START( astrof_audio )
 {
 	/* setup for save states */
-	state_save_register_global(port_1_last);
-	state_save_register_global(port_2_last);
-	state_save_register_global(astrof_start_explosion);
-	state_save_register_global(astrof_death_playing);
-	state_save_register_global(astrof_bosskill_playing);
+	state_save_register_global(machine, port_1_last);
+	state_save_register_global(machine, port_2_last);
+	state_save_register_global(machine, astrof_start_explosion);
+	state_save_register_global(machine, astrof_death_playing);
+	state_save_register_global(machine, astrof_bosskill_playing);
 }
 
 

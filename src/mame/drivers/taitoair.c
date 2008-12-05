@@ -364,7 +364,7 @@ static MACHINE_START( taitoair )
 	dsp_HOLD_signal = ASSERT_LINE;
 	banknum = -1;
 
-	state_save_register_global(banknum);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, taitoair_postload, NULL);
 }
 

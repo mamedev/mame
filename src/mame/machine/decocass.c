@@ -1608,36 +1608,36 @@ static STATE_POSTLOAD( decocass_state_save_postload )
 void decocass_machine_state_save_init(running_machine *machine)
 {
 	state_save_register_postload(machine, decocass_state_save_postload, NULL);
-	state_save_register_global(tape_dir);
-	state_save_register_global(tape_speed);
-	state_save_register_global(tape_time0.seconds);
-	state_save_register_global(tape_time0.attoseconds);
-	state_save_register_global(firsttime);
-	state_save_register_global(tape_present);
-	state_save_register_global(tape_blocks);
-	state_save_register_global(tape_length);
-	state_save_register_global(tape_bot_eot);
-	state_save_register_global(crc16_lsb);
-	state_save_register_global(crc16_msb);
-	state_save_register_global_array(tape_crc16_lsb);
-	state_save_register_global_array(tape_crc16_msb);
-	state_save_register_global(decocass_reset);
-	state_save_register_global(i8041_p1);
-	state_save_register_global(i8041_p2);
-	state_save_register_global(de0091_enable);
-	state_save_register_global(type1_inmap);
-	state_save_register_global(type1_outmap);
-	state_save_register_global(type2_d2_latch);
-	state_save_register_global(type2_xx_latch);
-	state_save_register_global(type2_promaddr);
-	state_save_register_global(type3_ctrs);
-	state_save_register_global(type3_d0_latch);
-	state_save_register_global(type3_pal_19);
-	state_save_register_global(type3_swap);
-	state_save_register_global(type4_ctrs);
-	state_save_register_global(type4_latch);
-	state_save_register_global(type5_latch);
-	state_save_register_global(decocass_sound_ack);
+	state_save_register_global(machine, tape_dir);
+	state_save_register_global(machine, tape_speed);
+	state_save_register_global(machine, tape_time0.seconds);
+	state_save_register_global(machine, tape_time0.attoseconds);
+	state_save_register_global(machine, firsttime);
+	state_save_register_global(machine, tape_present);
+	state_save_register_global(machine, tape_blocks);
+	state_save_register_global(machine, tape_length);
+	state_save_register_global(machine, tape_bot_eot);
+	state_save_register_global(machine, crc16_lsb);
+	state_save_register_global(machine, crc16_msb);
+	state_save_register_global_array(machine, tape_crc16_lsb);
+	state_save_register_global_array(machine, tape_crc16_msb);
+	state_save_register_global(machine, decocass_reset);
+	state_save_register_global(machine, i8041_p1);
+	state_save_register_global(machine, i8041_p2);
+	state_save_register_global(machine, de0091_enable);
+	state_save_register_global(machine, type1_inmap);
+	state_save_register_global(machine, type1_outmap);
+	state_save_register_global(machine, type2_d2_latch);
+	state_save_register_global(machine, type2_xx_latch);
+	state_save_register_global(machine, type2_promaddr);
+	state_save_register_global(machine, type3_ctrs);
+	state_save_register_global(machine, type3_d0_latch);
+	state_save_register_global(machine, type3_pal_19);
+	state_save_register_global(machine, type3_swap);
+	state_save_register_global(machine, type4_ctrs);
+	state_save_register_global(machine, type4_latch);
+	state_save_register_global(machine, type5_latch);
+	state_save_register_global(machine, decocass_sound_ack);
 }
 
 /***************************************************************************

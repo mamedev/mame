@@ -947,8 +947,8 @@ static MACHINE_RESET( wgp )
 
 static MACHINE_START( wgp )
 {
-	state_save_register_global(cpua_ctrl);
-	state_save_register_global(banknum);
+	state_save_register_global(machine, cpua_ctrl);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, wgp_postload, NULL);
 }
 

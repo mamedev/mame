@@ -105,7 +105,7 @@ static WRITE8_HANDLER( ojankohs_msm5205_w )
 	ojankohs_vclk_left = 2;
 }
 
-static void ojankohs_adpcm_int(running_machine *machine, int irq)
+static void ojankohs_adpcm_int(const device_config *device)
 {
 	/* skip if we're reset */
 	if (!ojankohs_adpcm_reset)
@@ -120,7 +120,7 @@ static void ojankohs_adpcm_int(running_machine *machine, int irq)
 
 	/* generate an NMI if we're out of data */
 	if (!ojankohs_vclk_left)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( ojankoc_ctrl_w )

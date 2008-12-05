@@ -22,8 +22,8 @@ static UINT8 port1, port2;
 
 static SOUND_START( irem_audio )
 {
-	state_save_register_global(port1);
-	state_save_register_global(port2);
+	state_save_register_global(machine, port1);
+	state_save_register_global(machine, port2);
 }
 
 
@@ -173,9 +173,9 @@ static WRITE8_HANDLER( m62_adpcm_w )
  *
  *************************************/
 
-static void adpcm_int(running_machine *machine, int data)
+static void adpcm_int(const device_config *device)
 {
-	cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+	cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
 	if (sndti_exists(SOUND_MSM5205, 1))

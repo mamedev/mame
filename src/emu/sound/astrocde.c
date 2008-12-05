@@ -228,26 +228,24 @@ SND_RESET( astrocade )
  *
  *************************************/
 
-static void astrocade_state_save_register(struct astrocade_info *chip, const char *tag)
+static void astrocade_state_save_register(struct astrocade_info *chip, const device_config *device)
 {
-	state_save_register_item_array("globals", tag, 0, chip->reg);
+	state_save_register_device_item_array(device, 0, chip->reg);
 
-	state_save_register_item_array("astrocade", tag, 0, chip->reg);
+	state_save_register_device_item(device, 0, chip->master_count);
+	state_save_register_device_item(device, 0, chip->vibrato_clock);
 
-	state_save_register_item("astrocade", tag, 0, chip->master_count);
-	state_save_register_item("astrocade", tag, 0, chip->vibrato_clock);
+	state_save_register_device_item(device, 0, chip->noise_clock);
+	state_save_register_device_item(device, 0, chip->noise_state);
 
-	state_save_register_item("astrocade", tag, 0, chip->noise_clock);
-	state_save_register_item("astrocade", tag, 0, chip->noise_state);
+	state_save_register_device_item(device, 0, chip->a_count);
+	state_save_register_device_item(device, 0, chip->a_state);
 
-	state_save_register_item("astrocade", tag, 0, chip->a_count);
-	state_save_register_item("astrocade", tag, 0, chip->a_state);
+	state_save_register_device_item(device, 0, chip->b_count);
+	state_save_register_device_item(device, 0, chip->b_state);
 
-	state_save_register_item("astrocade", tag, 0, chip->b_count);
-	state_save_register_item("astrocade", tag, 0, chip->b_state);
-
-	state_save_register_item("astrocade", tag, 0, chip->c_count);
-	state_save_register_item("astrocade", tag, 0, chip->c_state);
+	state_save_register_device_item(device, 0, chip->c_count);
+	state_save_register_device_item(device, 0, chip->c_state);
 }
 
 
@@ -276,7 +274,7 @@ static SND_START( astrocade )
 
 	/* reset state */
 	astrocade_reset(chip);
-	astrocade_state_save_register(chip, tag);
+	astrocade_state_save_register(chip, device);
 
 	return chip;
 }

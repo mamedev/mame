@@ -875,12 +875,12 @@ static int validate_cpu(int drivnum, const machine_config *config, const input_p
 				/* make sure all devices exist */
 				if (entry->read_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->read_devtype, entry->read_devtag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(entry->read_devtype), entry->read_devtag);
+					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_get_name(entry->read_devtype), entry->read_devtag);
 					error = TRUE;
 				}
 				if (entry->write_devtype != NULL && device_list_find_by_tag(config->devicelist, entry->write_devtype, entry->write_devtag) == NULL)
 				{
-					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_name(entry->write_devtype), entry->write_devtag);
+					mame_printf_error("%s: %s CPU %d space %d memory map entry references nonexistant device type %s, tag %s\n", driver->source_file, driver->name, cpunum, spacenum, devtype_get_name(entry->write_devtype), entry->write_devtag);
 					error = TRUE;
 				}
 

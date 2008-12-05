@@ -576,7 +576,7 @@ static SND_START( s14001a )
 		chip->filtervals[i] = SILENCE;
 	}
 
-	chip->SpeechRom = memory_region(device->machine, tag);
+	chip->SpeechRom = device->region;
 
 	chip->stream = stream_create(0, 1, clock ? clock : device->machine->sample_rate, chip, s14001a_pcm_update);
 

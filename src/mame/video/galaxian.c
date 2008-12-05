@@ -285,7 +285,7 @@ static UINT8 gfxbank[5];
  *
  *************************************/
 
-static void state_save_register(void);
+static void state_save_register(running_machine *machine);
 static TILE_GET_INFO( bg_get_tile_info );
 
 static void sprites_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *spritebase);
@@ -471,25 +471,25 @@ VIDEO_START( galaxian )
 	stars_init();
 
 	/* register for save states */
-	state_save_register();
+	state_save_register(machine);
 }
 
 
-static void state_save_register(void)
+static void state_save_register(running_machine *machine)
 {
-	state_save_register_global(flipscreen_x);
-	state_save_register_global(flipscreen_y);
-	state_save_register_global(background_enable);
-	state_save_register_global(background_red);
-	state_save_register_global(background_green);
-	state_save_register_global(background_blue);
+	state_save_register_global(machine, flipscreen_x);
+	state_save_register_global(machine, flipscreen_y);
+	state_save_register_global(machine, background_enable);
+	state_save_register_global(machine, background_red);
+	state_save_register_global(machine, background_green);
+	state_save_register_global(machine, background_blue);
 
-	state_save_register_global_array(gfxbank);
+	state_save_register_global_array(machine, gfxbank);
 
-	state_save_register_global(stars_enabled);
-	state_save_register_global(star_rng_origin);
-	state_save_register_global(star_rng_origin_frame);
-	state_save_register_global(stars_blink_state);
+	state_save_register_global(machine, stars_enabled);
+	state_save_register_global(machine, star_rng_origin);
+	state_save_register_global(machine, star_rng_origin_frame);
+	state_save_register_global(machine, stars_blink_state);
 }
 
 

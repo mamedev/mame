@@ -28,7 +28,7 @@ static UINT8 irq_enable;
 
 static MACHINE_START( pooyan )
 {
-	state_save_register_global(irq_enable);
+	state_save_register_global(machine, irq_enable);
 }
 
 

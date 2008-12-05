@@ -60,6 +60,7 @@ enum
 		DEVINFO_INT_INLINE_CONFIG_BYTES,				/* R/O: bytes to allocate for the inline configuration */
 		DEVINFO_INT_CLASS,								/* R/O: the device's class */
 
+	DEVINFO_INT_CLASS_SPECIFIC = 0x04000,				/* R/W: device-specific values start here */
 	DEVINFO_INT_DEVICE_SPECIFIC = 0x08000,				/* R/W: device-specific values start here */
 	DEVINFO_INT_LAST = 0x0ffff,
 
@@ -69,6 +70,7 @@ enum
 		DEVINFO_PTR_ROM_REGION = DEVINFO_PTR_FIRST,		/* R/O: pointer to device-specific ROM region */
 		DEVINFO_PTR_MACHINE_CONFIG,						/* R/O: pointer to device-specific machine config */
 
+	DEVINFO_PTR_CLASS_SPECIFIC = 0x14000,				/* R/W: device-specific values start here */
 	DEVINFO_PTR_DEVICE_SPECIFIC = 0x18000,				/* R/W: device-specific values start here */
 	DEVINFO_PTR_LAST = 0x1ffff,
 
@@ -82,6 +84,7 @@ enum
 		DEVINFO_FCT_VALIDITY_CHECK,						/* R/O: device_validity_check_func */
 		DEVINFO_FCT_NVRAM,								/* R/O: device_nvram_func */
 
+	DEVINFO_FCT_CLASS_SPECIFIC = 0x24000,				/* R/W: device-specific values start here */
 	DEVINFO_FCT_DEVICE_SPECIFIC = 0x28000,				/* R/W: device-specific values start here */
 	DEVINFO_FCT_LAST = 0x2ffff,
 
@@ -94,6 +97,7 @@ enum
 		DEVINFO_STR_SOURCE_FILE,						/* R/O: file containing the device implementation */
 		DEVINFO_STR_CREDITS,							/* R/O: credits for the device implementation */
 
+	DEVINFO_STR_CLASS_SPECIFIC = 0x34000,				/* R/W: device-specific values start here */
 	DEVINFO_STR_DEVICE_SPECIFIC = 0x38000,				/* R/W: device-specific values start here */
 	DEVINFO_STR_LAST = 0x3ffff
 };
@@ -341,12 +345,19 @@ void devtag_set_info_fct(running_machine *machine, device_type type, const char 
     INLINE FUNCTIONS
 ***************************************************************************/
 
+/* return common strings based on device instances */
+INLINE const char *device_get_name(const device_config *device)			{ return device_get_info_string(device, DEVINFO_STR_NAME); }
+INLINE const char *device_get_family(const device_config *device) 		{ return device_get_info_string(device, DEVINFO_STR_FAMILY); }
+INLINE const char *device_get_version(const device_config *device) 		{ return device_get_info_string(device, DEVINFO_STR_VERSION); }
+INLINE const char *device_get_source_file(const device_config *device)	{ return device_get_info_string(device, DEVINFO_STR_SOURCE_FILE); }
+INLINE const char *device_get_credits(const device_config *device) 		{ return device_get_info_string(device, DEVINFO_STR_CREDITS); }
+
 /* return common strings based on device types */
-INLINE const char *devtype_name(device_type devtype)		{ return devtype_get_info_string(devtype, DEVINFO_STR_NAME); }
-INLINE const char *devtype_family(device_type devtype) 		{ return devtype_get_info_string(devtype, DEVINFO_STR_FAMILY); }
-INLINE const char *devtype_version(device_type devtype) 	{ return devtype_get_info_string(devtype, DEVINFO_STR_VERSION); }
-INLINE const char *devtype_source_file(device_type devtype) { return devtype_get_info_string(devtype, DEVINFO_STR_SOURCE_FILE); }
-INLINE const char *devtype_credits(device_type devtype) 	{ return devtype_get_info_string(devtype, DEVINFO_STR_CREDITS); }
+INLINE const char *devtype_get_name(device_type devtype)		{ return devtype_get_info_string(devtype, DEVINFO_STR_NAME); }
+INLINE const char *devtype_get_family(device_type devtype) 		{ return devtype_get_info_string(devtype, DEVINFO_STR_FAMILY); }
+INLINE const char *devtype_get_version(device_type devtype) 	{ return devtype_get_info_string(devtype, DEVINFO_STR_VERSION); }
+INLINE const char *devtype_get_source_file(device_type devtype) { return devtype_get_info_string(devtype, DEVINFO_STR_SOURCE_FILE); }
+INLINE const char *devtype_get_credits(device_type devtype) 	{ return devtype_get_info_string(devtype, DEVINFO_STR_CREDITS); }
 
 
 #endif	/* __DEVINTRF_H__ */

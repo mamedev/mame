@@ -1116,7 +1116,7 @@ static DRIVER_INIT( decocass )
 	/* Call the state save setup code in machine/decocass.c */
 	decocass_machine_state_save_init(machine);
 	/* and in video/decocass.c, too */
-	decocass_video_state_save_init();
+	decocass_video_state_save_init(machine);
 }
 
 static DRIVER_INIT( decocrom )

@@ -374,16 +374,16 @@ static DEVICE_START( dma8257 )
 	dma8257->timer = timer_alloc(device->machine, dma8257_timerproc, (void *) device);
 	dma8257->msbflip_timer = timer_alloc(device->machine, dma8257_msbflip_timerproc, (void *) device);
 
-	state_save_register_item_array("dma8257", device->tag, 0, dma8257->address);
-	state_save_register_item_array("dma8257", device->tag, 0, dma8257->count);
-	state_save_register_item_array("dma8257", device->tag, 0, dma8257->rwmode);
-	state_save_register_item_array("dma8257", device->tag, 0, dma8257->registers);
+	state_save_register_device_item_array(device, 0, dma8257->address);
+	state_save_register_device_item_array(device, 0, dma8257->count);
+	state_save_register_device_item_array(device, 0, dma8257->rwmode);
+	state_save_register_device_item_array(device, 0, dma8257->registers);
 
-	state_save_register_item("dma8257", device->tag, 0, dma8257->mode);
-	state_save_register_item("dma8257", device->tag, 0, dma8257->rr);
-	state_save_register_item("dma8257", device->tag, 0, dma8257->msb);
-	state_save_register_item("dma8257", device->tag, 0, dma8257->drq);
-	state_save_register_item("dma8257", device->tag, 0, dma8257->status);
+	state_save_register_device_item(device, 0, dma8257->mode);
+	state_save_register_device_item(device, 0, dma8257->rr);
+	state_save_register_device_item(device, 0, dma8257->msb);
+	state_save_register_device_item(device, 0, dma8257->drq);
+	state_save_register_device_item(device, 0, dma8257->status);
 
 	return DEVICE_START_OK;
 }

@@ -152,32 +152,38 @@ typedef enum _sound_type sound_type;
 enum
 {
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	SNDINFO_INT_FIRST = 0x00000,
+	SNDINFO_INT_FIRST = DEVINFO_INT_FIRST,
 
-	SNDINFO_INT_ALIAS = SNDINFO_INT_FIRST,				/* R/O: alias to sound type for (type,index) identification */
+		SNDINFO_INT_ALIAS = DEVINFO_INT_CLASS_SPECIFIC,		/* R/O: alias to sound type for (type,index) identification */
 
-	SNDINFO_INT_CORE_SPECIFIC = 0x08000,				/* R/W: core-specific values start here */
+	SNDINFO_INT_CORE_SPECIFIC = DEVINFO_INT_DEVICE_SPECIFIC, /* R/W: core-specific values start here */
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	SNDINFO_PTR_FIRST = 0x10000,
+	SNDINFO_PTR_FIRST = DEVINFO_PTR_FIRST,
 
-	SNDINFO_PTR_SET_INFO = SNDINFO_PTR_FIRST,			/* R/O: void (*set_info)(void *token, UINT32 state, sndinfo *info) */
-	SNDINFO_PTR_START,									/* R/O: void *(*start)(int index, int clock, const void *config) */
-	SNDINFO_PTR_STOP,									/* R/O: void (*stop)(void *token) */
-	SNDINFO_PTR_RESET,									/* R/O: void (*reset)(void *token) */
+	SNDINFO_PTR_CORE_SPECIFIC = DEVINFO_PTR_DEVICE_SPECIFIC, /* R/W: core-specific values start here */
 
-	SNDINFO_PTR_CORE_SPECIFIC = 0x18000,				/* R/W: core-specific values start here */
+	/* --- the following bits of info are returned as pointers to functions --- */
+	SNDINFO_FCT_FIRST = DEVINFO_FCT_FIRST,
+
+		SNDINFO_PTR_STOP = DEVINFO_FCT_STOP,				/* R/O: void (*stop)(const device_config *device) */
+		SNDINFO_PTR_RESET = DEVINFO_FCT_RESET,				/* R/O: void (*reset)(const device_config *device) */
+
+		SNDINFO_PTR_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, sndinfo *info) */
+		SNDINFO_PTR_START,									/* R/O: void *(*start)(const device_config *device, int clock, const void *config, int sndindex) */
+
+	SNDINFO_FCT_CORE_SPECIFIC = DEVINFO_FCT_DEVICE_SPECIFIC, /* R/W: core-specific values start here */
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	SNDINFO_STR_FIRST = 0x20000,
+	SNDINFO_STR_FIRST = DEVINFO_STR_FIRST,
 
-	SNDINFO_STR_NAME = SNDINFO_STR_FIRST,				/* R/O: name of the sound chip */
-	SNDINFO_STR_CORE_FAMILY,							/* R/O: family of the sound chip */
-	SNDINFO_STR_CORE_VERSION,							/* R/O: version of the sound core */
-	SNDINFO_STR_CORE_FILE,								/* R/O: file containing the sound core */
-	SNDINFO_STR_CORE_CREDITS,							/* R/O: credits for the sound core */
+		SNDINFO_STR_NAME = DEVINFO_STR_NAME,				/* R/O: name of the sound chip */
+		SNDINFO_STR_CORE_FAMILY = DEVINFO_STR_FAMILY,		/* R/O: family of the sound chip */
+		SNDINFO_STR_CORE_VERSION = DEVINFO_STR_VERSION,		/* R/O: version of the sound core */
+		SNDINFO_STR_CORE_FILE = DEVINFO_STR_SOURCE_FILE,	/* R/O: file containing the sound core */
+		SNDINFO_STR_CORE_CREDITS = DEVINFO_STR_CREDITS,		/* R/O: credits for the sound core */
 
-	SNDINFO_STR_CORE_SPECIFIC = 0x28000					/* R/W: core-specific values start here */
+	SNDINFO_STR_CORE_SPECIFIC = DEVINFO_STR_DEVICE_SPECIFIC	/* R/W: core-specific values start here */
 };
 
 
@@ -195,8 +201,8 @@ enum
 #define SND_SET_INFO_CALL(name)		SND_SET_INFO_NAME(name)(device, state, info)
 
 #define SND_START_NAME(name)		snd_start_##name
-#define SND_START(name)				void *SND_START_NAME(name)(const device_config *device, const char *tag, int sndindex, int clock, const void *config)
-#define SND_START_CALL(name)		SND_START_NAME(name)(device, tag, sndindex, clock, config)
+#define SND_START(name)				void *SND_START_NAME(name)(const device_config *device, int clock, const void *config, int sndindex)
+#define SND_START_CALL(name)		SND_START_NAME(name)(device, clock, config, sndindex)
 
 #define SND_STOP_NAME(name)			snd_stop_##name
 #define SND_STOP(name)				void SND_STOP_NAME(name)(const device_config *device)
@@ -218,7 +224,7 @@ typedef union _sndinfo sndinfo;
 /* define the various callback functions */
 typedef void (*snd_get_info_func)(const device_config *device, UINT32 state, sndinfo *info);
 typedef void (*snd_set_info_func)(const device_config *device, UINT32 state, sndinfo *info);
-typedef void *(*snd_start_func)(const device_config *device, const char *tag, int sndindex, int clock, const void *config);
+typedef void *(*snd_start_func)(const device_config *device, int clock, const void *config, int sndindex);
 typedef void (*snd_stop_func)(const device_config *device);
 typedef void (*snd_reset_func)(const device_config *device);
 

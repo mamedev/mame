@@ -63,7 +63,7 @@ static MACHINE_RESET( klaxp )
 static MACHINE_RESET( eprom )
 {
 	MACHINE_RESET_CALL(klaxp);
-	state_save_register_global_pointer(sync_data, 2);
+	state_save_register_global_pointer(machine, sync_data, 2);
 }
 
 

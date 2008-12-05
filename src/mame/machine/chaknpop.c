@@ -156,9 +156,9 @@ WRITE8_HANDLER( chaknpop_mcu_portC_w )
 
 DRIVER_INIT( chaknpop )
 {
-	state_save_register_global(mcu_seed);
-	state_save_register_global(mcu_result);
-	state_save_register_global(mcu_select);
+	state_save_register_global(machine, mcu_seed);
+	state_save_register_global(machine, mcu_result);
+	state_save_register_global(machine, mcu_select);
 }
 
 MACHINE_RESET( chaknpop )

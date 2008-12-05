@@ -173,7 +173,7 @@ static VIDEO_START( astrof )
 {
 	/* allocate the color RAM -- half the size of the video RAM as A0 is not connected */
 	astrof_colorram = auto_malloc(astrof_videoram_size / 2);
-	state_save_register_global_pointer(astrof_colorram, astrof_videoram_size / 2);
+	state_save_register_global_pointer(machine, astrof_colorram, astrof_videoram_size / 2);
 }
 
 
@@ -426,10 +426,10 @@ static MACHINE_START( astrof )
 	astrof_set_video_control_2(0xff);
 
 	/* register for state saving */
-	state_save_register_global(red_on);
-	state_save_register_global(flipscreen);
-	state_save_register_global(screen_off);
-	state_save_register_global(astrof_palette_bank);
+	state_save_register_global(machine, red_on);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, screen_off);
+	state_save_register_global(machine, astrof_palette_bank);
 
 	MACHINE_START_CALL(astrof_audio);
 }
@@ -438,7 +438,7 @@ static MACHINE_START( astrof )
 static MACHINE_START( abattle )
 {
 	/* register for state saving */
-	state_save_register_global(abattle_count);
+	state_save_register_global(machine, abattle_count);
 
 	MACHINE_START_CALL(astrof);
 }
@@ -453,9 +453,9 @@ static MACHINE_START( spfghmk2 )
 	red_on = FALSE;
 
 	/* register for state saving */
-	state_save_register_global(flipscreen);
-	state_save_register_global(screen_off);
-	state_save_register_global(astrof_palette_bank);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, screen_off);
+	state_save_register_global(machine, astrof_palette_bank);
 }
 
 
@@ -465,9 +465,9 @@ static MACHINE_START( tomahawk )
 	tomahawk_set_video_control_2(0xff);
 
 	/* register for state saving */
-	state_save_register_global(red_on);
-	state_save_register_global(flipscreen);
-	state_save_register_global(screen_off);
+	state_save_register_global(machine, red_on);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, screen_off);
 }
 
 

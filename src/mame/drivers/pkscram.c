@@ -280,8 +280,8 @@ static MACHINE_RESET( pkscramble)
 	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, interrupt_scanline, 0), interrupt_scanline);
 
-	state_save_register_global(out);
-	state_save_register_global(interrupt_line_active);
+	state_save_register_global(machine, out);
+	state_save_register_global(machine, interrupt_line_active);
 }
 
 static MACHINE_DRIVER_START( pkscramble )

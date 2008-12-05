@@ -177,15 +177,15 @@ static MACHINE_RESET( jpmimpct )
 	touch_cnt = 0;
 
 //  duart_1.IVR=0x0f;
-	state_save_register_global(tms_irq);
-	state_save_register_global(duart_1_irq);
-	state_save_register_global(touch_cnt);
-	state_save_register_global_array(touch_data);
+	state_save_register_global(machine, tms_irq);
+	state_save_register_global(machine, duart_1_irq);
+	state_save_register_global(machine, touch_cnt);
+	state_save_register_global_array(machine, touch_data);
 
 	/* TODO! */
-	state_save_register_global(duart_1.ISR);
-	state_save_register_global(duart_1.IMR);
-	state_save_register_global(duart_1.CT);
+	state_save_register_global(machine, duart_1.ISR);
+	state_save_register_global(machine, duart_1.IMR);
+	state_save_register_global(machine, duart_1.CT);
 }
 
 

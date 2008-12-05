@@ -207,14 +207,14 @@ static MACHINE_RESET( common )
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* Save state support */
-	state_save_register_global(sound_data);
-	state_save_register_global(sound_status);
-	state_save_register_global_array(analog_ports);
-	state_save_register_global(framenum);
-	state_save_register_global(adsp_ireg);
-	state_save_register_global(adsp_ireg_base);
-	state_save_register_global(adsp_incs);
-	state_save_register_global(adsp_size);
+	state_save_register_global(machine, sound_data);
+	state_save_register_global(machine, sound_status);
+	state_save_register_global_array(machine, analog_ports);
+	state_save_register_global(machine, framenum);
+	state_save_register_global(machine, adsp_ireg);
+	state_save_register_global(machine, adsp_ireg_base);
+	state_save_register_global(machine, adsp_incs);
+	state_save_register_global(machine, adsp_size);
 }
 
 
@@ -222,7 +222,7 @@ static MACHINE_RESET( gaelco3d )
 {
 	MACHINE_RESET_CALL( common );
 	tms_offset_xor = 0;
-	state_save_register_global(tms_offset_xor);
+	state_save_register_global(machine, tms_offset_xor);
 }
 
 
@@ -230,7 +230,7 @@ static MACHINE_RESET( gaelco3d2 )
 {
 	MACHINE_RESET_CALL( common );
 	tms_offset_xor = BYTE_XOR_BE(0);
-	state_save_register_global(tms_offset_xor);
+	state_save_register_global(machine, tms_offset_xor);
 }
 
 

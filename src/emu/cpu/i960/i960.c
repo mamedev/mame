@@ -2060,16 +2060,16 @@ static CPU_INIT( i960 )
 	i960->device = device;
 	i960->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	state_save_register_item("i960", device->tag, 0, i960->PIP);
-	state_save_register_item("i960", device->tag, 0, i960->SAT);
-	state_save_register_item("i960", device->tag, 0, i960->PRCB);
-	state_save_register_item("i960", device->tag, 0, i960->PC);
-	state_save_register_item("i960", device->tag, 0, i960->AC);
-	state_save_register_item("i960", device->tag, 0, i960->ICR);
-	state_save_register_item_array("i960", device->tag, 0, i960->r);
- 	state_save_register_item_array("i960", device->tag, 0, i960->fp);
-	state_save_register_item_2d_array("i960", device->tag, 0, i960->rcache);
-	state_save_register_item_array("i960", device->tag, 0, i960->rcache_frame_addr);
+	state_save_register_device_item(device, 0, i960->PIP);
+	state_save_register_device_item(device, 0, i960->SAT);
+	state_save_register_device_item(device, 0, i960->PRCB);
+	state_save_register_device_item(device, 0, i960->PC);
+	state_save_register_device_item(device, 0, i960->AC);
+	state_save_register_device_item(device, 0, i960->ICR);
+	state_save_register_device_item_array(device, 0, i960->r);
+ 	state_save_register_device_item_array(device, 0, i960->fp);
+	state_save_register_device_item_2d_array(device, 0, i960->rcache);
+	state_save_register_device_item_array(device, 0, i960->rcache_frame_addr);
 }
 
 static CPU_DISASSEMBLE( i960  )

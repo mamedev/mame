@@ -212,21 +212,21 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
     TMS9928A_reset ();
     tms.LimitSprites = 1;
 
-	state_save_register_item("tms9928a", NULL, 0, tms.Regs[0]);
-	state_save_register_item("tms9928a", NULL, 0, tms.Regs[1]);
-	state_save_register_item("tms9928a", NULL, 0, tms.Regs[2]);
-	state_save_register_item("tms9928a", NULL, 0, tms.Regs[3]);
-	state_save_register_item("tms9928a", NULL, 0, tms.Regs[4]);
-	state_save_register_item("tms9928a", NULL, 0, tms.Regs[5]);
-	state_save_register_item("tms9928a", NULL, 0, tms.Regs[6]);
-	state_save_register_item("tms9928a", NULL, 0, tms.Regs[7]);
-	state_save_register_item("tms9928a", NULL, 0, tms.StatusReg);
-	state_save_register_item("tms9928a", NULL, 0, tms.ReadAhead);
-	state_save_register_item("tms9928a", NULL, 0, tms.FirstByte);
-	state_save_register_item("tms9928a", NULL, 0, tms.latch);
-	state_save_register_item("tms9928a", NULL, 0, tms.Addr);
-	state_save_register_item("tms9928a", NULL, 0, tms.INT);
-	state_save_register_item_pointer("tms9928a", NULL, 0, tms.vMem, intf->vram);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[0]);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[1]);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[2]);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[3]);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[4]);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[5]);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[6]);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[7]);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.StatusReg);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.ReadAhead);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.FirstByte);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.latch);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Addr);
+	state_save_register_item(machine, "tms9928a", NULL, 0, tms.INT);
+	state_save_register_item_pointer(machine, "tms9928a", NULL, 0, tms.vMem, intf->vram);
 }
 
 const rectangle *TMS9928A_get_visarea (void)

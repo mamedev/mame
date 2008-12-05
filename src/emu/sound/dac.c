@@ -111,7 +111,7 @@ static SND_START( dac )
 	info->channel = stream_create(0,1,clock ? clock : DEFAULT_SAMPLE_RATE,info,DAC_update);
 	info->output = 0;
 
-	state_save_register_item("dac", tag, 0, info->output);
+	state_save_register_device_item(device, 0, info->output);
 
 	return info;
 }

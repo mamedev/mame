@@ -884,19 +884,19 @@ VIDEO_START( neogeo )
 	auto_animation_frame_counter = 0;
 
 	/* register for state saving */
-	state_save_register_global_pointer(palettes[0], NUM_PENS);
-	state_save_register_global_pointer(palettes[1], NUM_PENS);
-	state_save_register_global_pointer(neogeo_videoram, 0x20000/2);
-	state_save_register_global(videoram_read_buffer);
-	state_save_register_global(videoram_modulo);
-	state_save_register_global(videoram_offset);
-	state_save_register_global(fixed_layer_source);
-	state_save_register_global(screen_dark);
-	state_save_register_global(palette_bank);
-	state_save_register_global(auto_animation_speed);
-	state_save_register_global(auto_animation_disabled);
-	state_save_register_global(auto_animation_counter);
-	state_save_register_global(auto_animation_frame_counter);
+	state_save_register_global_pointer(machine, palettes[0], NUM_PENS);
+	state_save_register_global_pointer(machine, palettes[1], NUM_PENS);
+	state_save_register_global_pointer(machine, neogeo_videoram, 0x20000/2);
+	state_save_register_global(machine, videoram_read_buffer);
+	state_save_register_global(machine, videoram_modulo);
+	state_save_register_global(machine, videoram_offset);
+	state_save_register_global(machine, fixed_layer_source);
+	state_save_register_global(machine, screen_dark);
+	state_save_register_global(machine, palette_bank);
+	state_save_register_global(machine, auto_animation_speed);
+	state_save_register_global(machine, auto_animation_disabled);
+	state_save_register_global(machine, auto_animation_counter);
+	state_save_register_global(machine, auto_animation_frame_counter);
 
 	state_save_register_postload(machine, regenerate_pens, NULL);
 

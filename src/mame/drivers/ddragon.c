@@ -185,10 +185,10 @@ static MACHINE_START( ddragon )
 	snd_cpu = mame_find_cpu_index(machine, "sound");
 
 	/* register for save states */
-	state_save_register_global(dd_sub_cpu_busy);
-	state_save_register_global_array(adpcm_pos);
-	state_save_register_global_array(adpcm_end);
-	state_save_register_global_array(adpcm_idle);
+	state_save_register_global(machine, dd_sub_cpu_busy);
+	state_save_register_global_array(machine, adpcm_pos);
+	state_save_register_global_array(machine, adpcm_end);
+	state_save_register_global_array(machine, adpcm_idle);
 }
 
 
@@ -463,8 +463,9 @@ static WRITE8_HANDLER( dd_adpcm_w )
 }
 
 
-static void dd_adpcm_int(running_machine *machine, int chip)
+static void dd_adpcm_int(const device_config *device)
 {
+	int chip = (strcmp(device->tag, "adpcm1") == 0) ? 0 : 1;
 	if (adpcm_pos[chip] >= adpcm_end[chip] || adpcm_pos[chip] >= 0x10000)
 	{
 		adpcm_idle[chip] = 1;
@@ -477,7 +478,7 @@ static void dd_adpcm_int(running_machine *machine, int chip)
 	}
 	else
 	{
-		UINT8 *ROM = memory_region(machine, "adpcm") + 0x10000 * chip;
+		UINT8 *ROM = memory_region(device->machine, "adpcm") + 0x10000 * chip;
 
 		adpcm_data[chip] = ROM[adpcm_pos[chip]++];
 		msm5205_data_w(chip,adpcm_data[chip] >> 4);

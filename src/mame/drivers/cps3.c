@@ -849,14 +849,14 @@ static VIDEO_START(cps3)
 	cps3_ss_ram_is_dirty = 1;
 	memset(cps3_ss_ram, 0x00, 0x10000);
 	memset(cps3_ss_ram_dirty, 1, 0x400);
-	state_save_register_global_pointer(cps3_ss_ram, 0x10000/4);
+	state_save_register_global_pointer(machine, cps3_ss_ram, 0x10000/4);
 
 	cps3_char_ram = auto_malloc(0x800000);
 	cps3_char_ram_dirty = auto_malloc(0x800000/256);
 	cps3_char_ram_is_dirty = 1;
 	memset(cps3_char_ram, 0x00, 0x800000);
 	memset(cps3_char_ram_dirty, 1, 0x8000);
-	state_save_register_global_pointer(cps3_char_ram, 0x800000 /4);
+	state_save_register_global_pointer(machine, cps3_char_ram, 0x800000 /4);
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[0] = allocgfx(&cps3_tiles8x8_layout);

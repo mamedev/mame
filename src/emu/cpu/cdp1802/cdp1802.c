@@ -906,24 +906,24 @@ static CPU_INIT( cdp1802 )
 
 	/* register for state saving */
 
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->p);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->x);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->d);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->b);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->t);
-	state_save_register_item_array("cdp1802", device->tag, 0, cpustate->r);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->df);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->ie);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->q);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->n);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->i);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->state);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->prevmode);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->mode);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->irq);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->dmain);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->dmaout);
-	state_save_register_item("cdp1802", device->tag, 0, cpustate->ef);
+	state_save_register_device_item(device, 0, cpustate->p);
+	state_save_register_device_item(device, 0, cpustate->x);
+	state_save_register_device_item(device, 0, cpustate->d);
+	state_save_register_device_item(device, 0, cpustate->b);
+	state_save_register_device_item(device, 0, cpustate->t);
+	state_save_register_device_item_array(device, 0, cpustate->r);
+	state_save_register_device_item(device, 0, cpustate->df);
+	state_save_register_device_item(device, 0, cpustate->ie);
+	state_save_register_device_item(device, 0, cpustate->q);
+	state_save_register_device_item(device, 0, cpustate->n);
+	state_save_register_device_item(device, 0, cpustate->i);
+	state_save_register_device_item(device, 0, cpustate->state);
+	state_save_register_device_item(device, 0, cpustate->prevmode);
+	state_save_register_device_item(device, 0, cpustate->mode);
+	state_save_register_device_item(device, 0, cpustate->irq);
+	state_save_register_device_item(device, 0, cpustate->dmain);
+	state_save_register_device_item(device, 0, cpustate->dmaout);
+	state_save_register_device_item(device, 0, cpustate->ef);
 }
 
 static CPU_GET_CONTEXT( cdp1802 ) { }

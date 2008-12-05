@@ -820,7 +820,7 @@ static void es5506_update(void *param, stream_sample_t **inputs, stream_sample_t
 
 ***********************************************************************************************/
 
-static void *es5506_start_common(const device_config *device, const char *tag, int sndindex, int clock, const void *config, sound_type sndtype)
+static void *es5506_start_common(const device_config *device, int sndindex, int clock, const void *config, sound_type sndtype)
 {
 	const es5506_interface *intf = config;
 	struct ES5506Chip *chip;
@@ -874,7 +874,7 @@ static void *es5506_start_common(const device_config *device, const char *tag, i
 
 static SND_START( es5506 )
 {
-	return es5506_start_common(device, tag, sndindex, clock, config, SOUND_ES5506);
+	return es5506_start_common(device, sndindex, clock, config, SOUND_ES5506);
 }
 
 
@@ -1511,7 +1511,7 @@ static SND_START( es5505 )
 	es5506intf.irq_callback = intf->irq_callback;
 	es5506intf.read_port = intf->read_port;
 
-	return es5506_start_common(device, tag, sndindex, clock, &es5506intf, SOUND_ES5505);
+	return es5506_start_common(device, sndindex, clock, &es5506intf, SOUND_ES5505);
 }
 
 

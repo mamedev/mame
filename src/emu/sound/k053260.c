@@ -212,8 +212,13 @@ static SND_START( k053260 )
 	ic->intf = (config != NULL) ? config : &defintrf;
 
 	ic->mode = 0;
-	ic->rom = memory_region(device->machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag);
-	ic->rom_size = memory_region_length(device->machine, (ic->intf->rgnoverride != NULL) ? ic->intf->rgnoverride : tag) - 1;
+	ic->rom = device->region;
+	ic->rom_size = device->regionbytes;
+	if (ic->intf->rgnoverride != NULL)
+	{
+		ic->rom = memory_region(device->machine, ic->intf->rgnoverride);
+		ic->rom_size = memory_region_length(device->machine, ic->intf->rgnoverride);
+	}
 
 	k053260_reset( ic );
 

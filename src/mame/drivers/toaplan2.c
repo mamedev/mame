@@ -347,38 +347,38 @@ static MACHINE_RESET( bgaregga )
 	MACHINE_RESET_CALL(toaplan2);
 }
 
-static void register_state_save(void)
+static void register_state_save(running_machine *machine)
 {
-	state_save_register_global(mcu_data);
-	state_save_register_global(video_status);
-	state_save_register_global(old_p1_paddle_h);
-	state_save_register_global(old_p2_paddle_h);
-	state_save_register_global(current_bank);
-	state_save_register_global(raizing_Z80_busreq);
+	state_save_register_global(machine, mcu_data);
+	state_save_register_global(machine, video_status);
+	state_save_register_global(machine, old_p1_paddle_h);
+	state_save_register_global(machine, old_p2_paddle_h);
+	state_save_register_global(machine, current_bank);
+	state_save_register_global(machine, raizing_Z80_busreq);
 }
 
 static DRIVER_INIT( T2_Z80 )		/* init_t2_Z80(); */
 {
 	toaplan2_sub_cpu = CPU_2_Z80;
-	register_state_save();
+	register_state_save(machine);
 }
 
 static DRIVER_INIT( T2_Z180 )
 {
 	toaplan2_sub_cpu = CPU_2_HD647180;
-	register_state_save();
+	register_state_save(machine);
 }
 
 static DRIVER_INIT( T2_V25 )
 {
 	toaplan2_sub_cpu = CPU_2_V25;
-	register_state_save();
+	register_state_save(machine);
 }
 
 static DRIVER_INIT( T2_noZ80 )
 {
 	toaplan2_sub_cpu = CPU_2_NONE;
-	register_state_save();
+	register_state_save(machine);
 }
 
 static DRIVER_INIT( fixeight )
@@ -391,7 +391,7 @@ static DRIVER_INIT( fixeight )
 	#endif
 
 	toaplan2_sub_cpu = CPU_2_V25;
-	register_state_save();
+	register_state_save(machine);
 }
 
 static DRIVER_INIT( fixeighb )
@@ -400,7 +400,7 @@ static DRIVER_INIT( fixeighb )
 	memory_set_bankptr(machine, 1, &bgdata[0x40000]); /* $80000 - $fffff */
 
 	toaplan2_sub_cpu = CPU_2_NONE;
-	register_state_save();
+	register_state_save(machine);
 }
 
 static DRIVER_INIT( pipibibi )
@@ -482,14 +482,14 @@ static DRIVER_INIT( pipibibi )
 	}
 
 	toaplan2_sub_cpu = CPU_2_Z80;
-	register_state_save();
+	register_state_save(machine);
 }
 
 static DRIVER_INIT( batrider )
 {
 	raizing_sndirq_line = 4;
 	toaplan2_sub_cpu = CPU_2_Z80;
-	register_state_save();
+	register_state_save(machine);
 }
 
 static DRIVER_INIT( bbakraid )
@@ -497,7 +497,7 @@ static DRIVER_INIT( bbakraid )
 	bbakraid_unlimited_ver = 0;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
-	register_state_save();
+	register_state_save(machine);
 }
 
 static DRIVER_INIT( bbakradu )
@@ -505,7 +505,7 @@ static DRIVER_INIT( bbakradu )
 	bbakraid_unlimited_ver = 1;
 	raizing_sndirq_line = 2;
 	toaplan2_sub_cpu = CPU_2_Z80;
-	register_state_save();
+	register_state_save(machine);
 }
 
 

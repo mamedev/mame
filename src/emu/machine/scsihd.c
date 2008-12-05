@@ -10,8 +10,8 @@
 
 #ifdef MESS
 #include "devices/harddriv.h"
-#include "deprecat.h"
 #endif
+#include "deprecat.h"
 #include "scsihd.h"
 
 typedef struct
@@ -230,8 +230,8 @@ static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskr
 	our_this->lba = 0;
 	our_this->blocks = 0;
 
-	state_save_register_item( "scsihd", diskregion, 0, our_this->lba );
-	state_save_register_item( "scsihd", diskregion, 0, our_this->blocks );
+	state_save_register_item( Machine, "scsihd", diskregion, 0, our_this->lba );
+	state_save_register_item( Machine, "scsihd", diskregion, 0, our_this->blocks );
 
 #ifdef MESS
 	/* TODO: get rid of this ifdef MESS section */

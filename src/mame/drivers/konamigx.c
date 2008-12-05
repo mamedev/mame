@@ -3232,9 +3232,9 @@ ROM_END
 
 static MACHINE_START( konamigx )
 {
-	state_save_register_global(konamigx_wrport1_1);
-	state_save_register_global_array(sndto020);
-	state_save_register_global_array(sndto000);
+	state_save_register_global(machine, konamigx_wrport1_1);
+	state_save_register_global_array(machine, sndto020);
+	state_save_register_global_array(machine, sndto000);
 }
 
 static MACHINE_RESET(konamigx)

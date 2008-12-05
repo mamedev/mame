@@ -497,16 +497,16 @@ SOUND_START( phoenix)
 	memset(&c25_state, 0, sizeof(c25_state));
 	memset(&noise_state, 0, sizeof(noise_state));
 
-	state_save_register_global(sound_latch_a);
-	state_save_register_global(c24_state.counter);
-	state_save_register_global(c24_state.level);
-	state_save_register_global(c25_state.counter);
-	state_save_register_global(c25_state.level);
-	state_save_register_global(noise_state.counter);
-	state_save_register_global(noise_state.polybit);
-	state_save_register_global(noise_state.polyoffs);
-	state_save_register_global(noise_state.lowpass_counter);
-	state_save_register_global(noise_state.lowpass_polybit);
+	state_save_register_global(machine, sound_latch_a);
+	state_save_register_global(machine, c24_state.counter);
+	state_save_register_global(machine, c24_state.level);
+	state_save_register_global(machine, c25_state.counter);
+	state_save_register_global(machine, c25_state.level);
+	state_save_register_global(machine, noise_state.counter);
+	state_save_register_global(machine, noise_state.polybit);
+	state_save_register_global(machine, noise_state.polyoffs);
+	state_save_register_global(machine, noise_state.lowpass_counter);
+	state_save_register_global(machine, noise_state.lowpass_polybit);
 
 }
 
@@ -544,7 +544,7 @@ void *phoenix_sh_start(int clock, const custom_sound_interface *config)
 
 	channel = stream_create(0, 1, Machine->sample_rate, 0, phoenix_sound_update);
 
-	state_save_register_global_pointer(poly18, (1ul << (18-5)) );
+	state_save_register_global_pointer(Machine, poly18, (1ul << (18-5)) );
 
 	/* a dummy token */
 	return auto_malloc(1);

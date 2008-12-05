@@ -140,7 +140,7 @@ static MACHINE_RESET( tiamc1 )
 
 	tiamc1_bankswitch_w(space, 0, 0);
 
-	state_save_register_global_pointer(video_ram, 0x3040);
+	state_save_register_global_pointer(machine, video_ram, 0x3040);
 }
 
 static WRITE8_HANDLER( tiamc1_control_w )

@@ -931,13 +931,13 @@ static VIDEO_START( dkong_base )
 	state->sprite_bank = 0;
 	state->vidhw = -1;
 
-	state_save_register_global(state->gfx_bank);
-	state_save_register_global(state->palette_bank);
-	state_save_register_global(state->sprite_bank);
-	state_save_register_global(state->grid_on);
+	state_save_register_global(machine, state->gfx_bank);
+	state_save_register_global(machine, state->palette_bank);
+	state_save_register_global(machine, state->sprite_bank);
+	state_save_register_global(machine, state->grid_on);
 
-	state_save_register_global(state->grid_col);
-	state_save_register_global(state->flip);
+	state_save_register_global(machine, state->grid_col);
+	state_save_register_global(machine, state->flip);
 }
 
 VIDEO_START( dkong )

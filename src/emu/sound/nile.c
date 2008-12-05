@@ -223,7 +223,7 @@ static SND_START( nile )
 	info = auto_malloc(sizeof(*info));
 	memset(info, 0, sizeof(*info));
 
-	info->sound_ram = (UINT8 *)memory_region(device->machine, tag);
+	info->sound_ram = device->region;
 
 	info->stream = stream_create(0, 2, 44100, info, nile_update);
 

@@ -697,7 +697,7 @@ static STATE_POSTLOAD( warriorb_postload )
 
 static MACHINE_START( warriorb )
 {
-	state_save_register_global(banknum);
+	state_save_register_global(machine, banknum);
 	state_save_register_postload(machine, warriorb_postload, NULL);
 }
 

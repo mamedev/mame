@@ -70,7 +70,7 @@ VIDEO_START( renegade )
 	tilemap_set_transparent_pen(fg_tilemap, 0);
 	tilemap_set_scrolldx(bg_tilemap, 256, 0);
 
-	state_save_register_global(renegade_scrollx);
+	state_save_register_global(machine, renegade_scrollx);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)

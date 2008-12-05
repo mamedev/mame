@@ -71,81 +71,95 @@ enum
 enum
 {
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	CPUINFO_INT_FIRST = 0x00000,
+	CPUINFO_INT_FIRST = DEVINFO_INT_FIRST,
 
-	CPUINFO_INT_CONTEXT_SIZE = CPUINFO_INT_FIRST,		/* R/O: size of CPU context in bytes */
-	CPUINFO_INT_INPUT_LINES,							/* R/O: number of input lines */
-	CPUINFO_INT_OUTPUT_LINES,							/* R/O: number of output lines */
-	CPUINFO_INT_DEFAULT_IRQ_VECTOR,						/* R/O: default IRQ vector */
-	CPUINFO_INT_ENDIANNESS,								/* R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE */
-	CPUINFO_INT_CLOCK_MULTIPLIER,						/* R/O: internal clock multiplier */
-	CPUINFO_INT_CLOCK_DIVIDER,							/* R/O: internal clock divider */
-	CPUINFO_INT_MIN_INSTRUCTION_BYTES,					/* R/O: minimum bytes per instruction */
-	CPUINFO_INT_MAX_INSTRUCTION_BYTES,					/* R/O: maximum bytes per instruction */
-	CPUINFO_INT_MIN_CYCLES,								/* R/O: minimum cycles for a single instruction */
-	CPUINFO_INT_MAX_CYCLES,								/* R/O: maximum cycles for a single instruction */
+		/* direct map to device data */
+		CPUINFO_INT_CONTEXT_SIZE = DEVINFO_INT_TOKEN_BYTES,		/* R/O: size of CPU context in bytes */
 
-	CPUINFO_INT_DATABUS_WIDTH,							/* R/O: data bus size for each address space (8,16,32,64) */
-	CPUINFO_INT_DATABUS_WIDTH_LAST = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACES - 1,
-	CPUINFO_INT_ADDRBUS_WIDTH,							/* R/O: address bus size for each address space (12-32) */
-	CPUINFO_INT_ADDRBUS_WIDTH_LAST = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACES - 1,
-	CPUINFO_INT_ADDRBUS_SHIFT,							/* R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1) */
-	CPUINFO_INT_ADDRBUS_SHIFT_LAST = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACES - 1,
-	CPUINFO_INT_LOGADDR_WIDTH,							/* R/O: address bus size for logical accesses in each space (0=same as physical) */
-	CPUINFO_INT_LOGADDR_WIDTH_LAST = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACES - 1,
-	CPUINFO_INT_PAGE_SHIFT,								/* R/O: size of a page log 2 (i.e., 12=4096), or 0 if paging not supported */
-	CPUINFO_INT_PAGE_SHIFT_LAST = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACES - 1,
+		/* CPU-specific additions */
+		CPUINFO_INT_INPUT_LINES = DEVINFO_INT_CLASS_SPECIFIC,	/* R/O: number of input lines */
+		CPUINFO_INT_OUTPUT_LINES,							/* R/O: number of output lines */
+		CPUINFO_INT_DEFAULT_IRQ_VECTOR,						/* R/O: default IRQ vector */
+		CPUINFO_INT_ENDIANNESS,								/* R/O: either ENDIANNESS_BIG or ENDIANNESS_LITTLE */
+		CPUINFO_INT_CLOCK_MULTIPLIER,						/* R/O: internal clock multiplier */
+		CPUINFO_INT_CLOCK_DIVIDER,							/* R/O: internal clock divider */
+		CPUINFO_INT_MIN_INSTRUCTION_BYTES,					/* R/O: minimum bytes per instruction */
+		CPUINFO_INT_MAX_INSTRUCTION_BYTES,					/* R/O: maximum bytes per instruction */
+		CPUINFO_INT_MIN_CYCLES,								/* R/O: minimum cycles for a single instruction */
+		CPUINFO_INT_MAX_CYCLES,								/* R/O: maximum cycles for a single instruction */
 
-	CPUINFO_INT_SP,										/* R/W: the current stack pointer value */
-	CPUINFO_INT_PC,										/* R/W: the current PC value */
-	CPUINFO_INT_PREVIOUSPC,								/* R/W: the previous PC value */
-	CPUINFO_INT_INPUT_STATE,							/* R/W: states for each input line */
-	CPUINFO_INT_INPUT_STATE_LAST = CPUINFO_INT_INPUT_STATE + MAX_INPUT_LINES - 1,
-	CPUINFO_INT_OUTPUT_STATE,							/* R/W: states for each output line */
-	CPUINFO_INT_OUTPUT_STATE_LAST = CPUINFO_INT_OUTPUT_STATE + MAX_OUTPUT_LINES - 1,
-	CPUINFO_INT_REGISTER,								/* R/W: values of up to MAX_REGs registers */
-	CPUINFO_INT_REGISTER_LAST = CPUINFO_INT_REGISTER + MAX_REGS - 1,
+		CPUINFO_INT_DATABUS_WIDTH,							/* R/O: data bus size for each address space (8,16,32,64) */
+		CPUINFO_INT_DATABUS_WIDTH_LAST = CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACES - 1,
+		CPUINFO_INT_ADDRBUS_WIDTH,							/* R/O: address bus size for each address space (12-32) */
+		CPUINFO_INT_ADDRBUS_WIDTH_LAST = CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACES - 1,
+		CPUINFO_INT_ADDRBUS_SHIFT,							/* R/O: shift applied to addresses each address space (+3 means >>3, -1 means <<1) */
+		CPUINFO_INT_ADDRBUS_SHIFT_LAST = CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACES - 1,
+		CPUINFO_INT_LOGADDR_WIDTH,							/* R/O: address bus size for logical accesses in each space (0=same as physical) */
+		CPUINFO_INT_LOGADDR_WIDTH_LAST = CPUINFO_INT_LOGADDR_WIDTH + ADDRESS_SPACES - 1,
+		CPUINFO_INT_PAGE_SHIFT,								/* R/O: size of a page log 2 (i.e., 12=4096), or 0 if paging not supported */
+		CPUINFO_INT_PAGE_SHIFT_LAST = CPUINFO_INT_PAGE_SHIFT + ADDRESS_SPACES - 1,
 
-	CPUINFO_INT_CPU_SPECIFIC = 0x08000,					/* R/W: CPU-specific values start here */
+		CPUINFO_INT_SP,										/* R/W: the current stack pointer value */
+		CPUINFO_INT_PC,										/* R/W: the current PC value */
+		CPUINFO_INT_PREVIOUSPC,								/* R/W: the previous PC value */
+		CPUINFO_INT_INPUT_STATE,							/* R/W: states for each input line */
+		CPUINFO_INT_INPUT_STATE_LAST = CPUINFO_INT_INPUT_STATE + MAX_INPUT_LINES - 1,
+		CPUINFO_INT_OUTPUT_STATE,							/* R/W: states for each output line */
+		CPUINFO_INT_OUTPUT_STATE_LAST = CPUINFO_INT_OUTPUT_STATE + MAX_OUTPUT_LINES - 1,
+		CPUINFO_INT_REGISTER,								/* R/W: values of up to MAX_REGs registers */
+		CPUINFO_INT_REGISTER_LAST = CPUINFO_INT_REGISTER + MAX_REGS - 1,
+
+	CPUINFO_INT_CPU_SPECIFIC = 0x08000,						/* R/W: CPU-specific values start here */
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
-	CPUINFO_PTR_FIRST = 0x10000,
+	CPUINFO_PTR_FIRST = DEVINFO_PTR_FIRST,
 
-	CPUINFO_PTR_SET_INFO = CPUINFO_PTR_FIRST,			/* R/O: void (*set_info)(UINT32 state, INT64 data, void *ptr) */
-	CPUINFO_PTR_GET_CONTEXT,							/* R/O: void (*get_context)(void *buffer) */
-	CPUINFO_PTR_SET_CONTEXT,							/* R/O: void (*set_context)(void *buffer) */
-	CPUINFO_PTR_INIT,									/* R/O: void (*init)(int index, int clock, int (*irqcallback)(const device_config *device, int)) */
-	CPUINFO_PTR_RESET,									/* R/O: void (*reset)(void) */
-	CPUINFO_PTR_EXIT,									/* R/O: void (*exit)(void) */
-	CPUINFO_PTR_EXECUTE,								/* R/O: int (*execute)(int cycles) */
-	CPUINFO_PTR_BURN,									/* R/O: void (*burn)(int cycles) */
-	CPUINFO_PTR_DISASSEMBLE,							/* R/O: offs_t (*disassemble)(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) */
-	CPUINFO_PTR_TRANSLATE,								/* R/O: int (*translate)(int space, int intention, offs_t *address) */
-	CPUINFO_PTR_READ,									/* R/O: int (*read)(int space, UINT32 offset, int size, UINT64 *value) */
-	CPUINFO_PTR_WRITE,									/* R/O: int (*write)(int space, UINT32 offset, int size, UINT64 value) */
-	CPUINFO_PTR_READOP,									/* R/O: int (*readop)(UINT32 offset, int size, UINT64 *value) */
-	CPUINFO_PTR_DEBUG_INIT,								/* R/O: void (*debug_init)(void) */
-	CPUINFO_PTR_INSTRUCTION_COUNTER,					/* R/O: int *icount */
-	CPUINFO_PTR_INTERNAL_MEMORY_MAP,					/* R/O: const addrmap_token *map */
-	CPUINFO_PTR_INTERNAL_MEMORY_MAP_LAST = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
-	CPUINFO_PTR_DEBUG_REGISTER_LIST,					/* R/O: int *list: list of registers for the debugger */
-	CPUINFO_PTR_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const void *config) */
+		/* CPU-specific additions */
+		CPUINFO_PTR_INSTRUCTION_COUNTER = DEVINFO_PTR_CLASS_SPECIFIC,
+															/* R/O: int *icount */
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP,					/* R/O: const addrmap_token *map */
+		CPUINFO_PTR_INTERNAL_MEMORY_MAP_LAST = CPUINFO_PTR_INTERNAL_MEMORY_MAP + ADDRESS_SPACES - 1,
+		CPUINFO_PTR_DEBUG_REGISTER_LIST,					/* R/O: int *list: list of registers for the debugger */
 
-	CPUINFO_PTR_CPU_SPECIFIC = 0x18000,					/* R/W: CPU-specific values start here */
+	CPUINFO_PTR_CPU_SPECIFIC = DEVINFO_PTR_DEVICE_SPECIFIC,	/* R/W: CPU-specific values start here */
+
+	/* --- the following bits of info are returned as pointers to functions --- */
+	CPUINFO_FCT_FIRST = DEVINFO_FCT_FIRST,
+
+		/* CPU-specific additions */
+		CPUINFO_PTR_RESET = DEVINFO_FCT_RESET,				/* R/O: void (*reset)(const device_config *device) */
+		CPUINFO_PTR_EXIT = DEVINFO_FCT_STOP,				/* R/O: void (*exit)(const device_config *device) */
+
+		CPUINFO_PTR_SET_INFO = DEVINFO_FCT_CLASS_SPECIFIC,	/* R/O: void (*set_info)(const device_config *device, UINT32 state, INT64 data, void *ptr) */
+		CPUINFO_PTR_GET_CONTEXT,							/* R/O: void (*get_context)(void *buffer) */
+		CPUINFO_PTR_SET_CONTEXT,							/* R/O: void (*set_context)(void *buffer) */
+		CPUINFO_PTR_INIT,									/* R/O: void (*init)(const device_config *device, int index, int clock, int (*irqcallback)(const device_config *device, int)) */
+		CPUINFO_PTR_EXECUTE,								/* R/O: int (*execute)(const device_config *device, int cycles) */
+		CPUINFO_PTR_BURN,									/* R/O: void (*burn)(const device_config *device, int cycles) */
+		CPUINFO_PTR_DISASSEMBLE,							/* R/O: offs_t (*disassemble)(const device_config *device, char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) */
+		CPUINFO_PTR_TRANSLATE,								/* R/O: int (*translate)(const device_config *device, int space, int intention, offs_t *address) */
+		CPUINFO_PTR_READ,									/* R/O: int (*read)(const device_config *device, int space, UINT32 offset, int size, UINT64 *value) */
+		CPUINFO_PTR_WRITE,									/* R/O: int (*write)(const device_config *device, int space, UINT32 offset, int size, UINT64 value) */
+		CPUINFO_PTR_READOP,									/* R/O: int (*readop)(const device_config *device, UINT32 offset, int size, UINT64 *value) */
+		CPUINFO_PTR_DEBUG_INIT,								/* R/O: void (*debug_init)(const device_config *device) */
+		CPUINFO_PTR_VALIDITY_CHECK,							/* R/O: int (*validity_check)(const game_driver *driver, const void *config) */
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	CPUINFO_STR_FIRST = 0x20000,
+	CPUINFO_STR_FIRST = DEVINFO_STR_FIRST,
 
-	CPUINFO_STR_NAME = CPUINFO_STR_FIRST,				/* R/O: name of the CPU */
-	CPUINFO_STR_CORE_FAMILY,							/* R/O: family of the CPU */
-	CPUINFO_STR_CORE_VERSION,							/* R/O: version of the CPU core */
-	CPUINFO_STR_CORE_FILE,								/* R/O: file containing the CPU core */
-	CPUINFO_STR_CORE_CREDITS,							/* R/O: credits for the CPU core */
-	CPUINFO_STR_FLAGS,									/* R/O: string representation of the main flags value */
-	CPUINFO_STR_REGISTER,								/* R/O: string representation of up to MAX_REGs registers */
-	CPUINFO_STR_REGISTER_LAST = CPUINFO_STR_REGISTER + MAX_REGS - 1,
+		/* direct map to device data */
+		CPUINFO_STR_NAME = DEVINFO_STR_NAME,				/* R/O: name of the CPU */
+		CPUINFO_STR_CORE_FAMILY = DEVINFO_STR_FAMILY,		/* R/O: family of the CPU */
+		CPUINFO_STR_CORE_VERSION = DEVINFO_STR_VERSION,		/* R/O: version of the CPU core */
+		CPUINFO_STR_CORE_FILE = DEVINFO_STR_SOURCE_FILE,	/* R/O: file containing the CPU core */
+		CPUINFO_STR_CORE_CREDITS = DEVINFO_STR_CREDITS,		/* R/O: credits for the CPU core */
 
-	CPUINFO_STR_CPU_SPECIFIC = 0x28000					/* R/W: CPU-specific values start here */
+		/* CPU-specific additions */
+		CPUINFO_STR_FLAGS = DEVINFO_STR_CLASS_SPECIFIC,		/* R/O: string representation of the main flags value */
+		CPUINFO_STR_REGISTER,								/* R/O: string representation of up to MAX_REGs registers */
+		CPUINFO_STR_REGISTER_LAST = CPUINFO_STR_REGISTER + MAX_REGS - 1,
+
+	CPUINFO_STR_CPU_SPECIFIC = DEVINFO_STR_DEVICE_SPECIFIC	/* R/W: CPU-specific values start here */
 };
 
 

@@ -525,15 +525,15 @@ static DEVICE_START( smc91c9x )
 	smc->irq_handler = config->interrupt;
 
 	/* register ide states */
-	state_save_register_item_array("smc91c9x", device->tag, 0, smc->reg);
-	state_save_register_item_array("smc91c9x", device->tag, 0, smc->regmask);
-	state_save_register_item("smc91c9x", device->tag, 0, smc->irq_state);
-	state_save_register_item("smc91c9x", device->tag, 0, smc->alloc_count);
-	state_save_register_item("smc91c9x", device->tag, 0, smc->fifo_count);
-	state_save_register_item_array("smc91c9x", device->tag, 0, smc->rx);
-	state_save_register_item_array("smc91c9x", device->tag, 0, smc->tx);
-	state_save_register_item("smc91c9x", device->tag, 0, smc->sent);
-	state_save_register_item("smc91c9x", device->tag, 0, smc->recd);
+	state_save_register_device_item_array(device, 0, smc->reg);
+	state_save_register_device_item_array(device, 0, smc->regmask);
+	state_save_register_device_item(device, 0, smc->irq_state);
+	state_save_register_device_item(device, 0, smc->alloc_count);
+	state_save_register_device_item(device, 0, smc->fifo_count);
+	state_save_register_device_item_array(device, 0, smc->rx);
+	state_save_register_device_item_array(device, 0, smc->tx);
+	state_save_register_device_item(device, 0, smc->sent);
+	state_save_register_device_item(device, 0, smc->recd);
 
 	return DEVICE_START_OK;
 }

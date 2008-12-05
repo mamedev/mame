@@ -90,9 +90,9 @@ static UINT8 result;
 
 static MACHINE_START( lvpoker )
 {
-	state_save_register_global(payout);
-	state_save_register_global(pulse);
-	state_save_register_global(result);
+	state_save_register_global(machine, payout);
+	state_save_register_global(machine, pulse);
+	state_save_register_global(machine, result);
 }
 
 static MACHINE_RESET( lvpoker )

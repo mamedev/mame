@@ -161,7 +161,7 @@ static WRITE8_HANDLER( ninjakun_cpu2_io_A002_w )
 static MACHINE_START( ninjakun )
 {
 	/* Save State Stuff */
-	state_save_register_global(ninjakun_io_a002_ctrl);
+	state_save_register_global(machine, ninjakun_io_a002_ctrl);
 }
 
 

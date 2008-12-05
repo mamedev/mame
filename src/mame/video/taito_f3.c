@@ -700,8 +700,8 @@ VIDEO_START( f3 )
 	memset(spriteram32_buffered,0,spriteram_size);
 	memset(spriteram32,0,spriteram_size);
 
-	state_save_register_global_array(f3_control_0);
-	state_save_register_global_array(f3_control_1);
+	state_save_register_global_array(machine, f3_control_0);
+	state_save_register_global_array(machine, f3_control_1);
 
 	for (tile = 0;tile < 256;tile++)
 		vram_dirty[tile]=1;

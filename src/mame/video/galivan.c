@@ -192,11 +192,11 @@ VIDEO_START( galivan )
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
 	/* register for saving */
-	state_save_register_global_array(scrollx);
-	state_save_register_global_array(scrolly);
-	state_save_register_global(flipscreen);
-	state_save_register_global(write_layers);
-	state_save_register_global(layers);
+	state_save_register_global_array(machine, scrollx);
+	state_save_register_global_array(machine, scrolly);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, write_layers);
+	state_save_register_global(machine, layers);
 }
 
 VIDEO_START( ninjemak )
@@ -211,10 +211,10 @@ VIDEO_START( ninjemak )
 	tilemap_set_transparent_pen(tx_tilemap,15);
 
 	/* register for saving */
-	state_save_register_global_array(scrollx);
-	state_save_register_global_array(scrolly);
-	state_save_register_global(flipscreen);
-	state_save_register_global(ninjemak_dispdisable);
+	state_save_register_global_array(machine, scrollx);
+	state_save_register_global_array(machine, scrolly);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, ninjemak_dispdisable);
 }
 
 

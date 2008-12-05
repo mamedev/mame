@@ -125,8 +125,8 @@ static MACHINE_RESET( m72 )
 
 	MACHINE_RESET_CALL(m72_sound);
 
-	state_save_register_global(mcu_sample_addr);
-	state_save_register_global(mcu_snd_cmd_latch);
+	state_save_register_global(machine, mcu_sample_addr);
+	state_save_register_global(machine, mcu_snd_cmd_latch);
 
 	timer_adjust_oneshot(scanline_timer, video_screen_get_time_until_pos(machine->primary_screen, 0, 0), 0);
 	timer_call_after_resynch(machine,  NULL, 0, synch_callback);

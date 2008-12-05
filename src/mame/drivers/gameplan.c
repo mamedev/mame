@@ -211,7 +211,7 @@ static MACHINE_START( gameplan )
 	via_config(2, &via_2_interface);
 
 	/* register for save states */
-	state_save_register_global(state->current_port);
+	state_save_register_global(machine, state->current_port);
 }
 
 

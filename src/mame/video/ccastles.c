@@ -55,10 +55,10 @@ VIDEO_START( ccastles )
 	spritebitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* register for savestates */
-	state_save_register_global_array(video_control);
-	state_save_register_global_array(bitmode_addr);
-	state_save_register_global(hscroll);
-	state_save_register_global(vscroll);
+	state_save_register_global_array(machine, video_control);
+	state_save_register_global_array(machine, bitmode_addr);
+	state_save_register_global(machine, hscroll);
+	state_save_register_global(machine, vscroll);
 }
 
 

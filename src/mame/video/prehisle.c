@@ -107,7 +107,7 @@ VIDEO_START( prehisle )
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 
 	/* register for saving */
-	state_save_register_global(invert_controls);
+	state_save_register_global(machine, invert_controls);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int foreground )

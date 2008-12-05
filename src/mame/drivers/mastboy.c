@@ -633,14 +633,14 @@ static WRITE8_HANDLER( mastboy_msm5205_data_w )
 	mastboy_m5205_next = data;
 }
 
-static void mastboy_adpcm_int(running_machine *machine, int data)
+static void mastboy_adpcm_int(const device_config *device)
 {
 	msm5205_data_w (0,mastboy_m5205_next);
 	mastboy_m5205_next>>=4;
 
 	mastboy_m5205_part ^= 1;
 	if(!mastboy_m5205_part)
-		cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 

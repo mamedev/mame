@@ -142,7 +142,7 @@ static SND_START( ym2610 )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610, tag, clock, &generic_ay8910);
+	info->psg = ay8910_start_ym(SOUND_YM2610, device, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -152,9 +152,9 @@ static SND_START( ym2610 )
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(device->machine, tag));
-	pcmsizea = memory_region_length(device->machine, tag);
-	astring_printf(name, "%s.deltat", tag);
+	pcmbufa  = device->region;
+	pcmsizea = device->regionbytes;
+	astring_printf(name, "%s.deltat", device->tag);
 	pcmbufb  = (void *)(memory_region(device->machine, astring_c(name)));
 	pcmsizeb = memory_region_length(device->machine, astring_c(name));
 	astring_free(name);
@@ -165,7 +165,7 @@ static SND_START( ym2610 )
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,tag,clock,rate,
+	info->chip = ym2610_init(info,device,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 
@@ -208,7 +208,7 @@ static SND_START( ym2610b )
 	memset(info, 0, sizeof(*info));
 
 	info->intf = intf;
-	info->psg = ay8910_start_ym(SOUND_YM2610B, tag, clock, &generic_ay8910);
+	info->psg = ay8910_start_ym(SOUND_YM2610B, device, clock, &generic_ay8910);
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
@@ -218,9 +218,9 @@ static SND_START( ym2610b )
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);
 	/* setup adpcm buffers */
-	pcmbufa  = (void *)(memory_region(device->machine, tag));
-	pcmsizea = memory_region_length(device->machine, tag);
-	astring_printf(name, "%s.deltat", tag);
+	pcmbufa  = device->region;
+	pcmsizea = device->regionbytes;
+	astring_printf(name, "%s.deltat", device->tag);
 	pcmbufb  = (void *)(memory_region(device->machine, astring_c(name)));
 	pcmsizeb = memory_region_length(device->machine, astring_c(name));
 	astring_free(name);
@@ -231,7 +231,7 @@ static SND_START( ym2610b )
 	}
 
 	/**** initialize YM2610 ****/
-	info->chip = ym2610_init(info,tag,clock,rate,
+	info->chip = ym2610_init(info,device,clock,rate,
 		           pcmbufa,pcmsizea,pcmbufb,pcmsizeb,
 		           timer_handler,IRQHandler,&psgintf);
 	if (info->chip)

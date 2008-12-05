@@ -223,7 +223,7 @@ void fd1094_driver_init(running_machine *machine, void (*set_decrypted)(running_
 		fd1094_init_debugging(machine, "main", "user1", "user2", key_changed);
 	}
 
-	state_save_register_global(fd1094_selected_state);
-	state_save_register_global(fd1094_state);
+	state_save_register_global(machine, fd1094_selected_state);
+	state_save_register_global(machine, fd1094_state);
 	state_save_register_postload(machine, fd1094_postload, NULL);
 }

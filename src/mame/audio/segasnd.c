@@ -685,11 +685,11 @@ static void *usb_start(int clock, const custom_sound_interface *config)
 	configure_filter(&usb.final_filter, 100e3, 4.7e-6);
 
 	/* register for save states */
-	state_save_register_item("usb", NULL, 0, usb.in_latch);
-	state_save_register_item("usb", NULL, 0, usb.out_latch);
-	state_save_register_item("usb", NULL, 0, usb.last_p2_value);
-	state_save_register_item("usb", NULL, 0, usb.work_ram_bank);
-	state_save_register_item("usb", NULL, 0, usb.t1_clock);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.in_latch);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.out_latch);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.last_p2_value);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.work_ram_bank);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.t1_clock);
 
 	for (tgroup = 0; tgroup < 3; tgroup++)
 	{
@@ -697,36 +697,36 @@ static void *usb_start(int clock, const custom_sound_interface *config)
 		for (tchan = 0; tchan < 3; tchan++)
 		{
 			timer8253_channel *channel = &group->chan[tchan];
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->holding);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->latchmode);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->latchtoggle);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->clockmode);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->bcdmode);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->output);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->lastgate);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->gate);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->subcount);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->count);
-			state_save_register_item("usb", NULL, tgroup * 3 + tchan, channel->remain);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->holding);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->latchmode);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->latchtoggle);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->clockmode);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->bcdmode);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->output);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->lastgate);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->gate);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->subcount);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->count);
+			state_save_register_item(Machine, "usb", NULL, tgroup * 3 + tchan, channel->remain);
 		}
-		state_save_register_item_array("usb", NULL, tgroup, group->env);
-		state_save_register_item("usb", NULL, tgroup, group->chan_filter[0].capval);
-		state_save_register_item("usb", NULL, tgroup, group->chan_filter[1].capval);
-		state_save_register_item("usb", NULL, tgroup, group->gate1.capval);
-		state_save_register_item("usb", NULL, tgroup, group->gate2.capval);
-		state_save_register_item("usb", NULL, tgroup, group->config);
+		state_save_register_item_array(Machine, "usb", NULL, tgroup, group->env);
+		state_save_register_item(Machine, "usb", NULL, tgroup, group->chan_filter[0].capval);
+		state_save_register_item(Machine, "usb", NULL, tgroup, group->chan_filter[1].capval);
+		state_save_register_item(Machine, "usb", NULL, tgroup, group->gate1.capval);
+		state_save_register_item(Machine, "usb", NULL, tgroup, group->gate2.capval);
+		state_save_register_item(Machine, "usb", NULL, tgroup, group->config);
 	}
 
-	state_save_register_item_array("usb", NULL, 0, usb.timer_mode);
-	state_save_register_item("usb", NULL, 0, usb.noise_shift);
-	state_save_register_item("usb", NULL, 0, usb.noise_state);
-	state_save_register_item("usb", NULL, 0, usb.noise_subcount);
-	state_save_register_item("usb", NULL, 0, usb.final_filter.capval);
-	state_save_register_item("usb", NULL, 0, usb.noise_filters[0].capval);
-	state_save_register_item("usb", NULL, 0, usb.noise_filters[1].capval);
-	state_save_register_item("usb", NULL, 0, usb.noise_filters[2].capval);
-	state_save_register_item("usb", NULL, 0, usb.noise_filters[3].capval);
-	state_save_register_item("usb", NULL, 0, usb.noise_filters[4].capval);
+	state_save_register_item_array(Machine, "usb", NULL, 0, usb.timer_mode);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.noise_shift);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.noise_state);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.noise_subcount);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.final_filter.capval);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.noise_filters[0].capval);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.noise_filters[1].capval);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.noise_filters[2].capval);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.noise_filters[3].capval);
+	state_save_register_item(Machine, "usb", NULL, 0, usb.noise_filters[4].capval);
 
 	return usb.stream;
 }

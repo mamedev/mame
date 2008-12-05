@@ -41,8 +41,8 @@ VIDEO_START( xexex )
 	cur_alpha = 0;
 
 	K053251_vh_start(machine);
-	K054338_vh_start();
-	K053250_vh_start(1, &region);
+	K054338_vh_start(machine);
+	K053250_vh_start(machine, 1, &region);
 
 	K056832_vh_start(machine, "gfx1", K056832_BPP_4, 1, NULL, xexex_tile_callback, 0);
 	K053247_vh_start(machine, "gfx2", -48, 32, NORMAL_PLANE_ORDER, xexex_sprite_callback);

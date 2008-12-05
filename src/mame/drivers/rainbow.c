@@ -811,7 +811,7 @@ static DRIVER_INIT( jumping )
 	for (i = 0;i < len;i++)
 		rom[i] ^= 0xff;
 
-	state_save_register_global(jumping_latch);
+	state_save_register_global(machine, jumping_latch);
 }
 
 

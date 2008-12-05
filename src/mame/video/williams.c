@@ -168,16 +168,16 @@ static int blitter_core(const address_space *space, int sstart, int dstart, int 
  *
  *************************************/
 
-static void state_save_register(void)
+static void state_save_register(running_machine *machine)
 {
-	state_save_register_global(williams_blitter_window_enable);
-	state_save_register_global(williams_cocktail);
-	state_save_register_global_array(blitterram);
-	state_save_register_global(blitter_remap_index);
-	state_save_register_global(blaster_color0);
-	state_save_register_global(blaster_video_control);
-	state_save_register_global(tilemap_xscroll);
-	state_save_register_global(williams2_fg_color);
+	state_save_register_global(machine, williams_blitter_window_enable);
+	state_save_register_global(machine, williams_cocktail);
+	state_save_register_global_array(machine, blitterram);
+	state_save_register_global(machine, blitter_remap_index);
+	state_save_register_global(machine, blaster_color0);
+	state_save_register_global(machine, blaster_video_control);
+	state_save_register_global(machine, tilemap_xscroll);
+	state_save_register_global(machine, williams2_fg_color);
 }
 
 
@@ -185,7 +185,7 @@ VIDEO_START( williams )
 {
 	blitter_init(williams_blitter_config, NULL);
 	create_palette_lookup();
-	state_save_register();
+	state_save_register(machine);
 }
 
 
@@ -193,7 +193,7 @@ VIDEO_START( blaster )
 {
 	blitter_init(williams_blitter_config, memory_region(machine, "proms"));
 	create_palette_lookup();
-	state_save_register();
+	state_save_register(machine);
 }
 
 
@@ -203,13 +203,13 @@ VIDEO_START( williams2 )
 
 	/* allocate paletteram */
 	paletteram = auto_malloc(0x400 * 2);
-	state_save_register_global_pointer(paletteram, 0x400 * 2);
+	state_save_register_global_pointer(machine, paletteram, 0x400 * 2);
 
 	/* create the tilemap */
 	bg_tilemap = tilemap_create(get_tile_info, tilemap_scan_cols,  24,16, 128,16);
 	tilemap_set_scrolldx(bg_tilemap, 2, 0);
 
-	state_save_register();
+	state_save_register(machine);
 }
 
 

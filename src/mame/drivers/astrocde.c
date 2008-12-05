@@ -138,11 +138,11 @@ static UINT8 profpac_bank;
 
 static MACHINE_START( astrocde )
 {
-	state_save_register_global(port_1_last);
-	state_save_register_global(port_2_last);
-	state_save_register_global(ram_write_enable);
-	state_save_register_global(input_select);
-	state_save_register_global(profpac_bank);
+	state_save_register_global(machine, port_1_last);
+	state_save_register_global(machine, port_2_last);
+	state_save_register_global(machine, ram_write_enable);
+	state_save_register_global(machine, input_select);
+	state_save_register_global(machine, profpac_bank);
 
 	port_1_last = port_2_last = 0xff;
 }

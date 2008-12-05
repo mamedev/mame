@@ -1121,7 +1121,7 @@ static SOUND_START( lucky74 )
 	lucky74_adpcm_busy_line = 0x01;	/* free and ready */
 }
 
-static void lucky74_adpcm_int(running_machine *machine, int num)
+static void lucky74_adpcm_int(const device_config *device)
 {
 	if (lucky74_adpcm_reg[05] == 0x01)	/* register 0x05 (bit 0 activated), trigger the sample */
 	{
@@ -1143,7 +1143,7 @@ static void lucky74_adpcm_int(running_machine *machine, int num)
 		if (lucky74_adpcm_data == -1)
 		{
 			/* transferring 1st nibble */
-			lucky74_adpcm_data = memory_region(machine, "adpcm")[lucky74_adpcm_pos];
+			lucky74_adpcm_data = memory_region(device->machine, "adpcm")[lucky74_adpcm_pos];
 			lucky74_adpcm_pos = (lucky74_adpcm_pos + 1) & 0xffff;
 			msm5205_data_w(0, lucky74_adpcm_data >> 4);
 

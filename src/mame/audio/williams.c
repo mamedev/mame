@@ -290,8 +290,8 @@ void williams_cvsd_init(int pianum)
 	pia_set_input_ca1(williams_pianum, 1);
 
 	/* register for save states */
-	state_save_register_global(williams_sound_int_state);
-	state_save_register_global(audio_talkback);
+	state_save_register_global(sound_cpu->machine, williams_sound_int_state);
+	state_save_register_global(sound_cpu->machine, audio_talkback);
 }
 
 
@@ -333,9 +333,9 @@ void williams_narc_init(void)
 	memory_set_bankptr(sound_cpu->machine, 8, &ROM[0x10000 + 0x4000 + 0x8000 + 0x10000 + 0x20000 * 3]);
 
 	/* register for save states */
-	state_save_register_global(williams_sound_int_state);
-	state_save_register_global(audio_talkback);
-	state_save_register_global(audio_sync);
+	state_save_register_global(sound_cpu->machine, williams_sound_int_state);
+	state_save_register_global(sound_cpu->machine, audio_talkback);
+	state_save_register_global(sound_cpu->machine, audio_sync);
 }
 
 
@@ -372,8 +372,8 @@ void williams_adpcm_init(void)
 	memcpy(ROM + 0x020000, ROM + 0x060000, 0x20000);
 
 	/* register for save states */
-	state_save_register_global(williams_sound_int_state);
-	state_save_register_global(audio_talkback);
+	state_save_register_global(sound_cpu->machine, williams_sound_int_state);
+	state_save_register_global(sound_cpu->machine, audio_talkback);
 }
 
 

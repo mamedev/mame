@@ -72,7 +72,7 @@ static READ16_HANDLER( pip16_r )
 
 static int msm5205next;
 
-static void toki_adpcm_int (running_machine *machine, int data)
+static void toki_adpcm_int (const device_config *device)
 {
 	static int toggle=0;
 
@@ -81,7 +81,7 @@ static void toki_adpcm_int (running_machine *machine, int data)
 
 	toggle ^= 1;
 	if (toggle)
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
+		cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static WRITE8_HANDLER( toki_adpcm_control_w )

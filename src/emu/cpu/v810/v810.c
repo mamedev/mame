@@ -957,10 +957,10 @@ static CPU_INIT( v810 )
 	v810.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 	v810.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
 
-	state_save_register_item_array("v810", device->tag, 0, v810.reg);
-	state_save_register_item("v810", device->tag, 0, v810.irq_line);
-	state_save_register_item("v810", device->tag, 0, v810.nmi_line);
-	state_save_register_item("v810", device->tag, 0, v810.PPC);
+	state_save_register_device_item_array(device, 0, v810.reg);
+	state_save_register_device_item(device, 0, v810.irq_line);
+	state_save_register_device_item(device, 0, v810.nmi_line);
+	state_save_register_device_item(device, 0, v810.PPC);
 
 }
 

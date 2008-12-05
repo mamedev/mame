@@ -61,8 +61,8 @@ NVRAM_HANDLER( atari_vg )
 		memset(earom,0,EAROM_SIZE);
 }
 
-void atari_vg_register_states(void)
+void atari_vg_register_states(running_machine *machine)
 {
-	state_save_register_global(earom_offset);
-	state_save_register_global(earom_data);
+	state_save_register_global(machine, earom_offset);
+	state_save_register_global(machine, earom_data);
 }

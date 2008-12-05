@@ -4,6 +4,7 @@
  */
 
 #include "driver.h"
+#include "deprecat.h"
 #include "cr589.h"
 
 typedef struct
@@ -115,9 +116,9 @@ static void cr589_alloc_instance( SCSIInstance *scsiInstance, const char *diskre
 	our_this->download = 0;
 	memcpy( &our_this->buffer[ identity_offset ], "MATSHITACD-ROM CR-589   GS0N", 28 );
 
-	state_save_register_item( "cr589", diskregion, 0, our_this->download );
-	state_save_register_item_array( "cr589", diskregion, 0, our_this->buffer );
-	state_save_register_item( "cr589", diskregion, 0, our_this->bufferOffset );
+	state_save_register_item( Machine,  "cr589", diskregion, 0, our_this->download );
+	state_save_register_item_array( Machine,  "cr589", diskregion, 0, our_this->buffer );
+	state_save_register_item( Machine,  "cr589", diskregion, 0, our_this->bufferOffset );
 }
 
 static int cr589_dispatch( int operation, void *file, INT64 intparm, void *ptrparm )

@@ -123,21 +123,21 @@ void zs01_init( int chip, UINT8 *data, zs01_write_handler write, zs01_read_handl
 	c->write = write;
 	c->read = read;
 
-	state_save_register_item( "zs01", NULL, chip, c->cs );
-	state_save_register_item( "zs01", NULL, chip, c->rst );
-	state_save_register_item( "zs01", NULL, chip, c->scl );
-	state_save_register_item( "zs01", NULL, chip, c->sdaw );
-	state_save_register_item( "zs01", NULL, chip, c->sdar );
-	state_save_register_item( "zs01", NULL, chip, c->state );
-	state_save_register_item( "zs01", NULL, chip, c->shift );
-	state_save_register_item( "zs01", NULL, chip, c->bit );
-	state_save_register_item( "zs01", NULL, chip, c->byte );
-	state_save_register_item_array( "zs01", NULL, chip, c->write_buffer );
-	state_save_register_item_array( "zs01", NULL, chip, c->read_buffer );
-	state_save_register_item_array( "zs01", NULL, chip, c->response_key );
-	state_save_register_item_pointer( "zs01", NULL, chip, c->response_to_reset, SIZE_RESPONSE_TO_RESET );
-	state_save_register_item_pointer( "zs01", NULL, chip, c->command_key, SIZE_KEY );
-	state_save_register_item_pointer( "zs01", NULL, chip, c->data_key, SIZE_DATA );
+	state_save_register_item( Machine, "zs01", NULL, chip, c->cs );
+	state_save_register_item( Machine, "zs01", NULL, chip, c->rst );
+	state_save_register_item( Machine, "zs01", NULL, chip, c->scl );
+	state_save_register_item( Machine, "zs01", NULL, chip, c->sdaw );
+	state_save_register_item( Machine, "zs01", NULL, chip, c->sdar );
+	state_save_register_item( Machine, "zs01", NULL, chip, c->state );
+	state_save_register_item( Machine, "zs01", NULL, chip, c->shift );
+	state_save_register_item( Machine, "zs01", NULL, chip, c->bit );
+	state_save_register_item( Machine, "zs01", NULL, chip, c->byte );
+	state_save_register_item_array( Machine, "zs01", NULL, chip, c->write_buffer );
+	state_save_register_item_array( Machine, "zs01", NULL, chip, c->read_buffer );
+	state_save_register_item_array( Machine, "zs01", NULL, chip, c->response_key );
+	state_save_register_item_pointer( Machine, "zs01", NULL, chip, c->response_to_reset, SIZE_RESPONSE_TO_RESET );
+	state_save_register_item_pointer( Machine, "zs01", NULL, chip, c->command_key, SIZE_KEY );
+	state_save_register_item_pointer( Machine, "zs01", NULL, chip, c->data_key, SIZE_DATA );
 }
 
 void zs01_rst_write( int chip, int rst )

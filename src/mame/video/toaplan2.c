@@ -491,46 +491,46 @@ static void toaplan2_vh_start(int controller)
 	}
 }
 
-static void register_state_save(int vrams)
+static void register_state_save(running_machine *machine, int vrams)
 {
-	state_save_register_global_array(toaplan2_scroll_reg);
-	state_save_register_global_array(toaplan2_voffs);
-	state_save_register_global_array(bg_scrollx);
-	state_save_register_global_array(bg_scrolly);
-	state_save_register_global_array(fg_scrollx);
-	state_save_register_global_array(fg_scrolly);
-	state_save_register_global_array(top_scrollx);
-	state_save_register_global_array(top_scrolly);
-	state_save_register_global_array(sprite_scrollx);
-	state_save_register_global_array(sprite_scrolly);
-	state_save_register_global_array(batrider_object_bank);
+	state_save_register_global_array(machine, toaplan2_scroll_reg);
+	state_save_register_global_array(machine, toaplan2_voffs);
+	state_save_register_global_array(machine, bg_scrollx);
+	state_save_register_global_array(machine, bg_scrolly);
+	state_save_register_global_array(machine, fg_scrollx);
+	state_save_register_global_array(machine, fg_scrolly);
+	state_save_register_global_array(machine, top_scrollx);
+	state_save_register_global_array(machine, top_scrolly);
+	state_save_register_global_array(machine, sprite_scrollx);
+	state_save_register_global_array(machine, sprite_scrolly);
+	state_save_register_global_array(machine, batrider_object_bank);
 
-	state_save_register_global_array(bg_flip);
-	state_save_register_global_array(fg_flip);
-	state_save_register_global_array(top_flip);
-	state_save_register_global_array(sprite_flip);
-	state_save_register_global(tx_flip);
+	state_save_register_global_array(machine, bg_flip);
+	state_save_register_global_array(machine, fg_flip);
+	state_save_register_global_array(machine, top_flip);
+	state_save_register_global_array(machine, sprite_flip);
+	state_save_register_global(machine, tx_flip);
 
-	state_save_register_global_2d_array(sprite_priority);
-	state_save_register_global_2d_array(top_tile_priority);
-	state_save_register_global_2d_array(fg_tile_priority);
-	state_save_register_global_2d_array(bg_tile_priority);
+	state_save_register_global_2d_array(machine, sprite_priority);
+	state_save_register_global_2d_array(machine, top_tile_priority);
+	state_save_register_global_2d_array(machine, fg_tile_priority);
+	state_save_register_global_2d_array(machine, bg_tile_priority);
 
 	switch (vrams)
 	{
 	case 2:
-		state_save_register_global_pointer(spriteram16_new[1], TOAPLAN2_SPRITERAM_SIZE/2);
-		state_save_register_global_pointer(spriteram16_now[1], TOAPLAN2_SPRITERAM_SIZE/2);
-		state_save_register_global_pointer(topvideoram16[1], TOAPLAN2_TOP_VRAM_SIZE/2);
-		state_save_register_global_pointer(fgvideoram16[1], TOAPLAN2_FG_VRAM_SIZE/2);
-		state_save_register_global_pointer(bgvideoram16[1], TOAPLAN2_BG_VRAM_SIZE/2);
+		state_save_register_global_pointer(machine, spriteram16_new[1], TOAPLAN2_SPRITERAM_SIZE/2);
+		state_save_register_global_pointer(machine, spriteram16_now[1], TOAPLAN2_SPRITERAM_SIZE/2);
+		state_save_register_global_pointer(machine, topvideoram16[1], TOAPLAN2_TOP_VRAM_SIZE/2);
+		state_save_register_global_pointer(machine, fgvideoram16[1], TOAPLAN2_FG_VRAM_SIZE/2);
+		state_save_register_global_pointer(machine, bgvideoram16[1], TOAPLAN2_BG_VRAM_SIZE/2);
 		/* fall through */
 	case 1:
-		state_save_register_global_pointer(spriteram16_new[0], TOAPLAN2_SPRITERAM_SIZE/2);
-		state_save_register_global_pointer(spriteram16_now[0], TOAPLAN2_SPRITERAM_SIZE/2);
-		state_save_register_global_pointer(topvideoram16[0], TOAPLAN2_TOP_VRAM_SIZE/2);
-		state_save_register_global_pointer(fgvideoram16[0], TOAPLAN2_FG_VRAM_SIZE/2);
-		state_save_register_global_pointer(bgvideoram16[0], TOAPLAN2_BG_VRAM_SIZE/2);
+		state_save_register_global_pointer(machine, spriteram16_new[0], TOAPLAN2_SPRITERAM_SIZE/2);
+		state_save_register_global_pointer(machine, spriteram16_now[0], TOAPLAN2_SPRITERAM_SIZE/2);
+		state_save_register_global_pointer(machine, topvideoram16[0], TOAPLAN2_TOP_VRAM_SIZE/2);
+		state_save_register_global_pointer(machine, fgvideoram16[0], TOAPLAN2_FG_VRAM_SIZE/2);
+		state_save_register_global_pointer(machine, bgvideoram16[0], TOAPLAN2_BG_VRAM_SIZE/2);
 		/* fall through */
 	default:
 		break;
@@ -542,7 +542,7 @@ VIDEO_START( toaplan2_0 )
 {
 	defaultOffsets();
 	toaplan2_vh_start(0);
-	register_state_save(1);
+	register_state_save(machine,1);
 }
 
 VIDEO_START( toaplan2_1 )
@@ -550,7 +550,7 @@ VIDEO_START( toaplan2_1 )
 	toaplan2_vh_start(0);
 	toaplan2_vh_start(1);
 	defaultOffsets();
-	register_state_save(2);
+	register_state_save(machine,2);
 }
 
 VIDEO_START( truxton2_0 )
@@ -577,7 +577,7 @@ VIDEO_START( truxton2_0 )
 		tilemap_set_scrolldx(tx_tilemap, 0x1d4 +1, 0x2a);
 	}
 
-	register_state_save(1);
+	register_state_save(machine,1);
 }
 
 VIDEO_START( bgaregga_0 )
@@ -586,14 +586,14 @@ VIDEO_START( bgaregga_0 )
 	truxton2_create_tilemaps_0();
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 	defaultOffsets();
-	register_state_save(1);
+	register_state_save(machine,1);
 }
 
 VIDEO_START( batrider_0 )
 {
 	raizing_tx_gfxram16 = auto_malloc(RAIZING_TX_GFXRAM_SIZE);
 	memset(raizing_tx_gfxram16,0,RAIZING_TX_GFXRAM_SIZE);
-	state_save_register_global_pointer(raizing_tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
+	state_save_register_global_pointer(machine, raizing_tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
 
 	toaplan2_vram_alloc(0);
 	spriteram16_n[0] = spriteram16_new[0];
@@ -602,7 +602,7 @@ VIDEO_START( batrider_0 )
 
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 	defaultOffsets();
-	register_state_save(1);
+	register_state_save(machine,1);
 }
 
 

@@ -3207,7 +3207,7 @@ static DRIVER_INIT( fghthist )
 	deco56_decrypt_gfx(machine, "gfx1");
 	deco74_decrypt_gfx(machine, "gfx2");
 
-	decoprot_reset();
+	decoprot_reset(machine);
 }
 
 static DRIVER_INIT( lockload )

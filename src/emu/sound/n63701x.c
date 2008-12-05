@@ -106,7 +106,7 @@ static SND_START( namco_63701x )
 	chip = auto_malloc(sizeof(*chip));
 	memset(chip, 0, sizeof(*chip));
 
-	chip->rom = memory_region(device->machine, tag);
+	chip->rom = device->region;
 
 	chip->stream = stream_create(0, 2, clock/1000, chip, namco_63701x_update);
 

@@ -547,16 +547,16 @@ static DEVICE_START( z80pio )
 	z80pio->rdyr[1] = intf->rdyB;
 
 	/* register for save states */
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->vector);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->mode);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->enable);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->mask);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->dir);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->rdy);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->in);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->out);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->strobe);
-	state_save_register_item_array("z80pio", device->tag, 0, z80pio->int_state);
+	state_save_register_device_item_array(device, 0, z80pio->vector);
+	state_save_register_device_item_array(device, 0, z80pio->mode);
+	state_save_register_device_item_array(device, 0, z80pio->enable);
+	state_save_register_device_item_array(device, 0, z80pio->mask);
+	state_save_register_device_item_array(device, 0, z80pio->dir);
+	state_save_register_device_item_array(device, 0, z80pio->rdy);
+	state_save_register_device_item_array(device, 0, z80pio->in);
+	state_save_register_device_item_array(device, 0, z80pio->out);
+	state_save_register_device_item_array(device, 0, z80pio->strobe);
+	state_save_register_device_item_array(device, 0, z80pio->int_state);
 
 	return DEVICE_START_OK;
 }

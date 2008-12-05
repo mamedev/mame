@@ -945,19 +945,19 @@ static DRIVER_INIT( sslam )
 	sslam_melody = 0;
 	sslam_bar = 0;
 
-	state_save_register_global(sslam_track);
-	state_save_register_global(sslam_melody);
-	state_save_register_global(sslam_bar);
-	state_save_register_global(sslam_snd_bank);
+	state_save_register_global(machine, sslam_track);
+	state_save_register_global(machine, sslam_melody);
+	state_save_register_global(machine, sslam_bar);
+	state_save_register_global(machine, sslam_snd_bank);
 
 	music_timer = timer_alloc(machine, music_playback, NULL);
 }
 
 static DRIVER_INIT( powerbls )
 {
-	state_save_register_global(playmark_oki_control);
-	state_save_register_global(playmark_oki_command);
-	state_save_register_global(playmark_oki_bank);
+	state_save_register_global(machine, playmark_oki_control);
+	state_save_register_global(machine, playmark_oki_command);
+	state_save_register_global(machine, playmark_oki_bank);
 }
 
 

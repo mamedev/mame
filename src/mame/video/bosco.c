@@ -151,10 +151,10 @@ VIDEO_START( bosco )
 	bosco_radary = bosco_radarx + 0x0800;
 
 
-	state_save_register_global(stars_scrollx);
-	state_save_register_global(stars_scrolly);
-	state_save_register_global(bosco_starcontrol);
-	state_save_register_global_array(bosco_starblink);
+	state_save_register_global(machine, stars_scrollx);
+	state_save_register_global(machine, stars_scrolly);
+	state_save_register_global(machine, bosco_starcontrol);
+	state_save_register_global_array(machine, bosco_starblink);
 }
 
 

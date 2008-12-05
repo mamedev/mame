@@ -189,9 +189,9 @@ VIDEO_START( popper )
 
 	tilemap_clip = *video_screen_get_visible_area(machine->primary_screen);
 
-	state_save_register_global(popper_flipscreen);
-//  state_save_register_global(popper_e002);
-	state_save_register_global(popper_gfx_bank);
+	state_save_register_global(machine, popper_flipscreen);
+//  state_save_register_global(machine, popper_e002);
+	state_save_register_global(machine, popper_gfx_bank);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)

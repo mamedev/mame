@@ -91,15 +91,15 @@ VIDEO_START( gaelco3d )
 
 	/* save states */
 
-	state_save_register_global_pointer(palette, 32768);
-	state_save_register_global_pointer(polydata_buffer, MAX_POLYDATA);
-	state_save_register_global(polydata_count);
+	state_save_register_global_pointer(machine, palette, 32768);
+	state_save_register_global_pointer(machine, polydata_buffer, MAX_POLYDATA);
+	state_save_register_global(machine, polydata_count);
 
-	state_save_register_global(polygons);
-	state_save_register_global(lastscan);
+	state_save_register_global(machine, polygons);
+	state_save_register_global(machine, lastscan);
 
-	state_save_register_bitmap("video", NULL, 0, "screenbits", screenbits);
-	state_save_register_bitmap("video", NULL, 0, "zbuffer", zbuffer);
+	state_save_register_global_bitmap(machine, screenbits);
+	state_save_register_global_bitmap(machine, zbuffer);
 }
 
 

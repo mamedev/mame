@@ -484,13 +484,13 @@ READ16_HANDLER( volfied_cchip_ram_r )
  *
  *************************************/
 
-void volfied_cchip_init(void)
+void volfied_cchip_init(running_machine *machine)
 {
 	cchip_ram=auto_malloc(0x400 * 8);
 
-	state_save_register_global(current_bank);
-	state_save_register_global(current_cmd);
-	state_save_register_global(current_flag);
-	state_save_register_global(cc_port);
-	state_save_register_global_pointer(cchip_ram, 0x400 * 8);
+	state_save_register_global(machine, current_bank);
+	state_save_register_global(machine, current_cmd);
+	state_save_register_global(machine, current_flag);
+	state_save_register_global(machine, cc_port);
+	state_save_register_global_pointer(machine, cchip_ram, 0x400 * 8);
 }

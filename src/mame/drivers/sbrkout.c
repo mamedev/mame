@@ -88,9 +88,9 @@ static MACHINE_START( sbrkout )
 	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	pot_timer = timer_alloc(machine, pot_trigger_callback, NULL);
 
-	state_save_register_global(sync2_value);
-	state_save_register_global_array(pot_mask);
-	state_save_register_global_array(pot_trigger);
+	state_save_register_global(machine, sync2_value);
+	state_save_register_global_array(machine, pot_mask);
+	state_save_register_global_array(machine, pot_trigger);
 }
 
 

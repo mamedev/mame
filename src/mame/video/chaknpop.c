@@ -194,13 +194,13 @@ VIDEO_START( chaknpop )
 	set_vram_bank(machine);
 	tx_tilemap_mark_all_dirty();
 
-	state_save_register_global(gfxmode);
-	state_save_register_global_pointer(vram1, 0x2000);
-	state_save_register_global_pointer(vram2, 0x2000);
-	state_save_register_global_pointer(vram3, 0x2000);
-	state_save_register_global_pointer(vram4, 0x2000);
-	state_save_register_global(flip_x);
-	state_save_register_global(flip_y);
+	state_save_register_global(machine, gfxmode);
+	state_save_register_global_pointer(machine, vram1, 0x2000);
+	state_save_register_global_pointer(machine, vram2, 0x2000);
+	state_save_register_global_pointer(machine, vram3, 0x2000);
+	state_save_register_global_pointer(machine, vram4, 0x2000);
+	state_save_register_global(machine, flip_x);
+	state_save_register_global(machine, flip_y);
 
 	state_save_register_postload(machine, chaknpop_postload, NULL);
 }

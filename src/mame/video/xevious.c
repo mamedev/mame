@@ -234,7 +234,7 @@ VIDEO_START( xevious )
 	spriteram_3 = xevious_sr2 + 0x780;
 	spriteram   = xevious_sr3 + 0x780;
 
-	state_save_register_global_array(xevious_bs);
+	state_save_register_global_array(machine, xevious_bs);
 }
 
 

@@ -13,17 +13,17 @@ UINT8 *apache3_z80_ram;
 
 /******************************************************************************/
 
-void tatsumi_reset(void)
+void tatsumi_reset(running_machine *machine)
 {
 	tatsumi_last_irq=0;
 	tatsumi_last_control=0;
 	tatsumi_control_word=0;
 	apache3_adc=0;
 
-	state_save_register_global(tatsumi_last_irq);
-	state_save_register_global(tatsumi_last_control);
-	state_save_register_global(tatsumi_control_word);
-	state_save_register_global(apache3_adc);
+	state_save_register_global(machine, tatsumi_last_irq);
+	state_save_register_global(machine, tatsumi_last_control);
+	state_save_register_global(machine, tatsumi_control_word);
+	state_save_register_global(machine, apache3_adc);
 }
 
 /******************************************************************************/

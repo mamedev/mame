@@ -244,24 +244,24 @@ VIDEO_START( segag80r )
 	}
 
 	/* register for save states */
-	state_save_register_global_pointer(paletteram, 0x80);
+	state_save_register_global_pointer(machine, paletteram, 0x80);
 
-	state_save_register_global(video_control);
-	state_save_register_global(video_flip);
-	state_save_register_global(vblank_latch);
+	state_save_register_global(machine, video_control);
+	state_save_register_global(machine, video_flip);
+	state_save_register_global(machine, vblank_latch);
 
-	state_save_register_global(spaceod_hcounter);
-	state_save_register_global(spaceod_vcounter);
-	state_save_register_global(spaceod_fixed_color);
-	state_save_register_global(spaceod_bg_control);
-	state_save_register_global(spaceod_bg_detect);
+	state_save_register_global(machine, spaceod_hcounter);
+	state_save_register_global(machine, spaceod_vcounter);
+	state_save_register_global(machine, spaceod_fixed_color);
+	state_save_register_global(machine, spaceod_bg_control);
+	state_save_register_global(machine, spaceod_bg_detect);
 
-	state_save_register_global(bg_enable);
-	state_save_register_global(bg_char_bank);
-	state_save_register_global(bg_scrollx);
-	state_save_register_global(bg_scrolly);
+	state_save_register_global(machine, bg_enable);
+	state_save_register_global(machine, bg_char_bank);
+	state_save_register_global(machine, bg_scrollx);
+	state_save_register_global(machine, bg_scrolly);
 
-	state_save_register_global(pignewt_bg_color_offset);
+	state_save_register_global(machine, pignewt_bg_color_offset);
 }
 
 

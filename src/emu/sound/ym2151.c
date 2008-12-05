@@ -1390,7 +1390,7 @@ STATE_POSTLOAD( ym2151_postload )
 		set_connect(&YM2151_chip->oper[j*4], j, YM2151_chip->connect[j]);
 }
 
-static void ym2151_state_save_register( YM2151 *chip, const char *tag )
+static void ym2151_state_save_register( YM2151 *chip, const device_config *device )
 {
 	int j;
 
@@ -1401,98 +1401,98 @@ static void ym2151_state_save_register( YM2151 *chip, const char *tag )
 
 		op = &chip->oper[(j&7)*4+(j>>3)];
 
-		state_save_register_item("ym2151", tag, j, op->phase);
-		state_save_register_item("ym2151", tag, j, op->freq);
-		state_save_register_item("ym2151", tag, j, op->dt1);
-		state_save_register_item("ym2151", tag, j, op->mul);
-		state_save_register_item("ym2151", tag, j, op->dt1_i);
-		state_save_register_item("ym2151", tag, j, op->dt2);
+		state_save_register_device_item(device, j, op->phase);
+		state_save_register_device_item(device, j, op->freq);
+		state_save_register_device_item(device, j, op->dt1);
+		state_save_register_device_item(device, j, op->mul);
+		state_save_register_device_item(device, j, op->dt1_i);
+		state_save_register_device_item(device, j, op->dt2);
 		/* operators connection is saved in chip data block */
-		state_save_register_item("ym2151", tag, j, op->mem_value);
+		state_save_register_device_item(device, j, op->mem_value);
 
-		state_save_register_item("ym2151", tag, j, op->fb_shift);
-		state_save_register_item("ym2151", tag, j, op->fb_out_curr);
-		state_save_register_item("ym2151", tag, j, op->fb_out_prev);
-		state_save_register_item("ym2151", tag, j, op->kc);
-		state_save_register_item("ym2151", tag, j, op->kc_i);
-		state_save_register_item("ym2151", tag, j, op->pms);
-		state_save_register_item("ym2151", tag, j, op->ams);
-		state_save_register_item("ym2151", tag, j, op->AMmask);
+		state_save_register_device_item(device, j, op->fb_shift);
+		state_save_register_device_item(device, j, op->fb_out_curr);
+		state_save_register_device_item(device, j, op->fb_out_prev);
+		state_save_register_device_item(device, j, op->kc);
+		state_save_register_device_item(device, j, op->kc_i);
+		state_save_register_device_item(device, j, op->pms);
+		state_save_register_device_item(device, j, op->ams);
+		state_save_register_device_item(device, j, op->AMmask);
 
-		state_save_register_item("ym2151", tag, j, op->state);
-		state_save_register_item("ym2151", tag, j, op->eg_sh_ar);
-		state_save_register_item("ym2151", tag, j, op->eg_sel_ar);
-		state_save_register_item("ym2151", tag, j, op->tl);
-		state_save_register_item("ym2151", tag, j, op->volume);
-		state_save_register_item("ym2151", tag, j, op->eg_sh_d1r);
-		state_save_register_item("ym2151", tag, j, op->eg_sel_d1r);
-		state_save_register_item("ym2151", tag, j, op->d1l);
-		state_save_register_item("ym2151", tag, j, op->eg_sh_d2r);
-		state_save_register_item("ym2151", tag, j, op->eg_sel_d2r);
-		state_save_register_item("ym2151", tag, j, op->eg_sh_rr);
-		state_save_register_item("ym2151", tag, j, op->eg_sel_rr);
+		state_save_register_device_item(device, j, op->state);
+		state_save_register_device_item(device, j, op->eg_sh_ar);
+		state_save_register_device_item(device, j, op->eg_sel_ar);
+		state_save_register_device_item(device, j, op->tl);
+		state_save_register_device_item(device, j, op->volume);
+		state_save_register_device_item(device, j, op->eg_sh_d1r);
+		state_save_register_device_item(device, j, op->eg_sel_d1r);
+		state_save_register_device_item(device, j, op->d1l);
+		state_save_register_device_item(device, j, op->eg_sh_d2r);
+		state_save_register_device_item(device, j, op->eg_sel_d2r);
+		state_save_register_device_item(device, j, op->eg_sh_rr);
+		state_save_register_device_item(device, j, op->eg_sel_rr);
 
-		state_save_register_item("ym2151", tag, j, op->key);
-		state_save_register_item("ym2151", tag, j, op->ks);
-		state_save_register_item("ym2151", tag, j, op->ar);
-		state_save_register_item("ym2151", tag, j, op->d1r);
-		state_save_register_item("ym2151", tag, j, op->d2r);
-		state_save_register_item("ym2151", tag, j, op->rr);
+		state_save_register_device_item(device, j, op->key);
+		state_save_register_device_item(device, j, op->ks);
+		state_save_register_device_item(device, j, op->ar);
+		state_save_register_device_item(device, j, op->d1r);
+		state_save_register_device_item(device, j, op->d2r);
+		state_save_register_device_item(device, j, op->rr);
 
-		state_save_register_item("ym2151", tag, j, op->reserved0);
-		state_save_register_item("ym2151", tag, j, op->reserved1);
+		state_save_register_device_item(device, j, op->reserved0);
+		state_save_register_device_item(device, j, op->reserved1);
 	}
 
-	state_save_register_item_array("ym2151", tag, 0, chip->pan);
+	state_save_register_device_item_array(device, 0, chip->pan);
 
-	state_save_register_item("ym2151", tag, 0, chip->eg_cnt);
-	state_save_register_item("ym2151", tag, 0, chip->eg_timer);
-	state_save_register_item("ym2151", tag, 0, chip->eg_timer_add);
-	state_save_register_item("ym2151", tag, 0, chip->eg_timer_overflow);
+	state_save_register_device_item(device, 0, chip->eg_cnt);
+	state_save_register_device_item(device, 0, chip->eg_timer);
+	state_save_register_device_item(device, 0, chip->eg_timer_add);
+	state_save_register_device_item(device, 0, chip->eg_timer_overflow);
 
-	state_save_register_item("ym2151", tag, 0, chip->lfo_phase);
-	state_save_register_item("ym2151", tag, 0, chip->lfo_timer);
-	state_save_register_item("ym2151", tag, 0, chip->lfo_timer_add);
-	state_save_register_item("ym2151", tag, 0, chip->lfo_overflow);
-	state_save_register_item("ym2151", tag, 0, chip->lfo_counter);
-	state_save_register_item("ym2151", tag, 0, chip->lfo_counter_add);
-	state_save_register_item("ym2151", tag, 0, chip->lfo_wsel);
-	state_save_register_item("ym2151", tag, 0, chip->amd);
-	state_save_register_item("ym2151", tag, 0, chip->pmd);
-	state_save_register_item("ym2151", tag, 0, chip->lfa);
-	state_save_register_item("ym2151", tag, 0, chip->lfp);
+	state_save_register_device_item(device, 0, chip->lfo_phase);
+	state_save_register_device_item(device, 0, chip->lfo_timer);
+	state_save_register_device_item(device, 0, chip->lfo_timer_add);
+	state_save_register_device_item(device, 0, chip->lfo_overflow);
+	state_save_register_device_item(device, 0, chip->lfo_counter);
+	state_save_register_device_item(device, 0, chip->lfo_counter_add);
+	state_save_register_device_item(device, 0, chip->lfo_wsel);
+	state_save_register_device_item(device, 0, chip->amd);
+	state_save_register_device_item(device, 0, chip->pmd);
+	state_save_register_device_item(device, 0, chip->lfa);
+	state_save_register_device_item(device, 0, chip->lfp);
 
-	state_save_register_item("ym2151", tag, 0, chip->test);
-	state_save_register_item("ym2151", tag, 0, chip->ct);
+	state_save_register_device_item(device, 0, chip->test);
+	state_save_register_device_item(device, 0, chip->ct);
 
-	state_save_register_item("ym2151", tag, 0, chip->noise);
-	state_save_register_item("ym2151", tag, 0, chip->noise_rng);
-	state_save_register_item("ym2151", tag, 0, chip->noise_p);
-	state_save_register_item("ym2151", tag, 0, chip->noise_f);
+	state_save_register_device_item(device, 0, chip->noise);
+	state_save_register_device_item(device, 0, chip->noise_rng);
+	state_save_register_device_item(device, 0, chip->noise_p);
+	state_save_register_device_item(device, 0, chip->noise_f);
 
-	state_save_register_item("ym2151", tag, 0, chip->csm_req);
-	state_save_register_item("ym2151", tag, 0, chip->irq_enable);
-	state_save_register_item("ym2151", tag, 0, chip->status);
+	state_save_register_device_item(device, 0, chip->csm_req);
+	state_save_register_device_item(device, 0, chip->irq_enable);
+	state_save_register_device_item(device, 0, chip->status);
 
-	state_save_register_item("ym2151", tag, 0, chip->timer_A_index);
-	state_save_register_item("ym2151", tag, 0, chip->timer_B_index);
-	state_save_register_item("ym2151", tag, 0, chip->timer_A_index_old);
-	state_save_register_item("ym2151", tag, 0, chip->timer_B_index_old);
+	state_save_register_device_item(device, 0, chip->timer_A_index);
+	state_save_register_device_item(device, 0, chip->timer_B_index);
+	state_save_register_device_item(device, 0, chip->timer_A_index_old);
+	state_save_register_device_item(device, 0, chip->timer_B_index_old);
 
 #ifdef USE_MAME_TIMERS
-	state_save_register_item("ym2151", tag, 0, chip->irqlinestate);
+	state_save_register_device_item(device, 0, chip->irqlinestate);
 #endif
 
-	state_save_register_item_array("ym2151", tag, 0, chip->connect);
+	state_save_register_device_item_array(device, 0, chip->connect);
 
-	state_save_register_postload(Machine, ym2151_postload, chip);
+	state_save_register_postload(device->machine, ym2151_postload, chip);
 }
 #else
 STATE_POSTLOAD( ym2151_postload )
 {
 }
 
-static void ym2151_state_save_register( YM2151 *chip, const char *tag )
+static void ym2151_state_save_register( YM2151 *chip, const device_config *device )
 {
 }
 #endif
@@ -1505,7 +1505,7 @@ static void ym2151_state_save_register( YM2151 *chip, const char *tag )
 *   'clock' is the chip clock in Hz
 *   'rate' is sampling rate
 */
-void * ym2151_init(const char *tag, int clock, int rate)
+void * ym2151_init(const device_config *device, int clock, int rate)
 {
 	YM2151 *PSG;
 
@@ -1515,7 +1515,7 @@ void * ym2151_init(const char *tag, int clock, int rate)
 
 	memset(PSG, 0, sizeof(YM2151));
 
-	ym2151_state_save_register( PSG, tag );
+	ym2151_state_save_register( PSG, device );
 
 	init_tables();
 

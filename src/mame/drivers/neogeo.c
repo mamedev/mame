@@ -970,25 +970,25 @@ static MACHINE_START( neogeo )
 	irq3_pending = 1;
 
 	/* register state save */
-	state_save_register_global(display_position_interrupt_control);
-	state_save_register_global(display_counter);
-	state_save_register_global(vblank_interrupt_pending);
-	state_save_register_global(display_position_interrupt_pending);
-	state_save_register_global(irq3_pending);
-	state_save_register_global(audio_result);
-	state_save_register_global(controller_select);
-	state_save_register_global(main_cpu_bank_address);
-	state_save_register_global(main_cpu_vector_table_source);
-	state_save_register_global_array(audio_cpu_banks);
-	state_save_register_global(audio_cpu_rom_source);
-	state_save_register_global(audio_cpu_rom_source_last);
-	state_save_register_global(save_ram_unlocked);
-	state_save_register_global_pointer(memcard_data, 0x800);
-	state_save_register_global(output_data);
-	state_save_register_global(output_latch);
-	state_save_register_global(el_value);
-	state_save_register_global(led1_value);
-	state_save_register_global(led2_value);
+	state_save_register_global(machine, display_position_interrupt_control);
+	state_save_register_global(machine, display_counter);
+	state_save_register_global(machine, vblank_interrupt_pending);
+	state_save_register_global(machine, display_position_interrupt_pending);
+	state_save_register_global(machine, irq3_pending);
+	state_save_register_global(machine, audio_result);
+	state_save_register_global(machine, controller_select);
+	state_save_register_global(machine, main_cpu_bank_address);
+	state_save_register_global(machine, main_cpu_vector_table_source);
+	state_save_register_global_array(machine, audio_cpu_banks);
+	state_save_register_global(machine, audio_cpu_rom_source);
+	state_save_register_global(machine, audio_cpu_rom_source_last);
+	state_save_register_global(machine, save_ram_unlocked);
+	state_save_register_global_pointer(machine, memcard_data, 0x800);
+	state_save_register_global(machine, output_data);
+	state_save_register_global(machine, output_latch);
+	state_save_register_global(machine, el_value);
+	state_save_register_global(machine, led1_value);
+	state_save_register_global(machine, led2_value);
 
 	state_save_register_postload(machine, neogeo_postload, NULL);
 }

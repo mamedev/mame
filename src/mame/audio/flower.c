@@ -182,8 +182,8 @@ void * flower_sh_start(int clock, const custom_sound_interface *config)
 	sound_enable = 1;
 
 	/* save globals */
-	state_save_register_item("flower_custom", NULL, 0, num_voices);
-	state_save_register_item("flower_custom", NULL, 0, sound_enable);
+	state_save_register_item(Machine, "flower_custom", NULL, 0, num_voices);
+	state_save_register_item(Machine, "flower_custom", NULL, 0, sound_enable);
 
 	/* reset all the voices */
 	for (i = 0; i < num_voices; i++)
@@ -195,12 +195,12 @@ void * flower_sh_start(int clock, const custom_sound_interface *config)
 		voice->counter = 0;
 		voice->rom_offset = 0;
 
-		state_save_register_item("flower_custom", NULL, i+1, voice->frequency);
-		state_save_register_item("flower_custom", NULL, i+1, voice->counter);
-		state_save_register_item("flower_custom", NULL, i+1, voice->volume);
-		state_save_register_item("flower_custom", NULL, i+1, voice->oneshot);
-		state_save_register_item("flower_custom", NULL, i+1, voice->oneshotplaying);
-		state_save_register_item("flower_custom", NULL, i+1, voice->rom_offset);
+		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->frequency);
+		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->counter);
+		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->volume);
+		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->oneshot);
+		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->oneshotplaying);
+		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->rom_offset);
 	}
 
 	return auto_malloc(1);

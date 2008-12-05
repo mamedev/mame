@@ -488,11 +488,11 @@ static MACHINE_START( missile )
 	schedule_next_irq(machine, -32);
 
 	/* setup for save states */
-	state_save_register_global(irq_state);
-	state_save_register_global(ctrld);
-	state_save_register_global(flipscreen);
-	state_save_register_global(madsel_delay);
-	state_save_register_global(madsel_lastpc);
+	state_save_register_global(machine, irq_state);
+	state_save_register_global(machine, ctrld);
+	state_save_register_global(machine, flipscreen);
+	state_save_register_global(machine, madsel_delay);
+	state_save_register_global(machine, madsel_lastpc);
 }
 
 

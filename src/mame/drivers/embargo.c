@@ -140,9 +140,9 @@ static WRITE8_HANDLER( input_select_w )
 static MACHINE_START( embargo )
 {
 	/* register for state saving */
-	state_save_register_global(dial_enable_1);
-	state_save_register_global(dial_enable_2);
-	state_save_register_global(input_select);
+	state_save_register_global(machine, dial_enable_1);
+	state_save_register_global(machine, dial_enable_2);
+	state_save_register_global(machine, input_select);
 }
 
 

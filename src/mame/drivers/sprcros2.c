@@ -287,8 +287,8 @@ static INTERRUPT_GEN( sprcros2_s_interrupt )
 
 static MACHINE_START( sprcros2 )
 {
-	state_save_register_global(sprcros2_m_port7);
-	state_save_register_global(sprcros2_s_port3);
+	state_save_register_global(machine, sprcros2_m_port7);
+	state_save_register_global(machine, sprcros2_s_port3);
 }
 
 static MACHINE_DRIVER_START( sprcros2 )

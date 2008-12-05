@@ -487,12 +487,12 @@ static STATE_POSTLOAD( ygv608_postload )
 
 static void ygv608_register_state_save(running_machine *machine)
 {
-	state_save_register_item_array("ygv608", NULL, 0, ygv608.ports.b);
-	state_save_register_item_array("ygv608", NULL, 0, ygv608.regs.b);
-	state_save_register_item_array("ygv608", NULL, 0, ygv608.pattern_name_table);
-	state_save_register_item_array("ygv608", NULL, 0, ygv608.sprite_attribute_table.b);
-	state_save_register_item_2d_array("ygv608", NULL, 0, ygv608.scroll_data_table);
-	state_save_register_item_2d_array("ygv608", NULL, 0, ygv608.colour_palette);
+	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.ports.b);
+	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.regs.b);
+	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.pattern_name_table);
+	state_save_register_item_array(machine, "ygv608", NULL, 0, ygv608.sprite_attribute_table.b);
+	state_save_register_item_2d_array(machine, "ygv608", NULL, 0, ygv608.scroll_data_table);
+	state_save_register_item_2d_array(machine, "ygv608", NULL, 0, ygv608.colour_palette);
 
 	state_save_register_postload(machine, ygv608_postload, NULL);
 }

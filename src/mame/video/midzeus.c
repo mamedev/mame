@@ -263,19 +263,19 @@ VIDEO_START( midzeus )
 	zeus_renderbase = waveram[1];
 
 	/* state saving */
-	state_save_register_global_array(zeus_fifo);
-	state_save_register_global(zeus_fifo_words);
-	state_save_register_global_2d_array(zeus_matrix);
-	state_save_register_global_array(zeus_point);
-	state_save_register_global_array(zeus_light);
-	state_save_register_global(zeus_palbase);
-	state_save_register_global(zeus_objdata);
-	state_save_register_global(zeus_cliprect.min_x);
-	state_save_register_global(zeus_cliprect.max_x);
-	state_save_register_global(zeus_cliprect.min_y);
-	state_save_register_global(zeus_cliprect.max_y);
-	state_save_register_global_pointer(waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
-	state_save_register_global_pointer(waveram[1], WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8 / sizeof(waveram[1][0]));
+	state_save_register_global_array(machine, zeus_fifo);
+	state_save_register_global(machine, zeus_fifo_words);
+	state_save_register_global_2d_array(machine, zeus_matrix);
+	state_save_register_global_array(machine, zeus_point);
+	state_save_register_global_array(machine, zeus_light);
+	state_save_register_global(machine, zeus_palbase);
+	state_save_register_global(machine, zeus_objdata);
+	state_save_register_global(machine, zeus_cliprect.min_x);
+	state_save_register_global(machine, zeus_cliprect.max_x);
+	state_save_register_global(machine, zeus_cliprect.min_y);
+	state_save_register_global(machine, zeus_cliprect.max_y);
+	state_save_register_global_pointer(machine, waveram[0], WAVERAM0_WIDTH * WAVERAM0_HEIGHT * 8 / sizeof(waveram[0][0]));
+	state_save_register_global_pointer(machine, waveram[1], WAVERAM1_WIDTH * WAVERAM1_HEIGHT * 8 / sizeof(waveram[1][0]));
 }
 
 

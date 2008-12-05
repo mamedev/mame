@@ -295,8 +295,8 @@ void generic_video_init(running_machine *machine)
 	spriteram_3_size = 0;
 	tmpbitmap = NULL;
 	flip_screen_x = flip_screen_y = 0;
-	state_save_register_item("video", NULL, 0, flip_screen_x);
-	state_save_register_item("video", NULL, 0, flip_screen_y);
+	state_save_register_item(machine, "video", NULL, 0, flip_screen_x);
+	state_save_register_item(machine, "video", NULL, 0, flip_screen_y);
 }
 
 
@@ -316,7 +316,7 @@ VIDEO_START( generic_bitmapped )
 	tmpbitmap = video_screen_auto_bitmap_alloc(machine->primary_screen);
 
 	/* ensure the contents of the bitmap are saved */
-	state_save_register_bitmap("video", NULL, 0, "tmpbitmap", tmpbitmap);
+	state_save_register_bitmap(machine, "video", NULL, 0, "tmpbitmap", tmpbitmap);
 }
 
 

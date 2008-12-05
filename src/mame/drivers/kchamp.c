@@ -380,7 +380,7 @@ static INTERRUPT_GEN( kc_interrupt ) {
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static void msmint( running_machine *machine, int data ) {
+static void msmint(const device_config *device) {
 
 	static int counter = 0;
 
@@ -393,7 +393,7 @@ static void msmint( running_machine *machine, int data ) {
 
 	if ( !( counter ^= 1 ) ) {
 		if ( sound_nmi_enable ) {
-			cpu_set_input_line(machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
+			cpu_set_input_line(device->machine->cpu[1], INPUT_LINE_NMI, PULSE_LINE );
 		}
 	}
 }

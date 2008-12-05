@@ -399,15 +399,15 @@ static void galaxian_sh_start(void)
 
 	timer_pulse(Machine, video_screen_get_frame_period(Machine->primary_screen), NULL, 0, galaxian_sh_update);
 
-	state_save_register_global(freq);
-	state_save_register_global(noise_enable);
-	state_save_register_global(noisevolume);
-	state_save_register_global(last_port2);
-	state_save_register_global(pitch);
-	state_save_register_global(vol);
-	state_save_register_global(counter);
-	state_save_register_global(countdown);
-	state_save_register_global_array(lfobit);
+	state_save_register_global(Machine, freq);
+	state_save_register_global(Machine, noise_enable);
+	state_save_register_global(Machine, noisevolume);
+	state_save_register_global(Machine, last_port2);
+	state_save_register_global(Machine, pitch);
+	state_save_register_global(Machine, vol);
+	state_save_register_global(Machine, counter);
+	state_save_register_global(Machine, countdown);
+	state_save_register_global_array(Machine, lfobit);
 }
 
 

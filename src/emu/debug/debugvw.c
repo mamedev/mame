@@ -2458,7 +2458,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 		void *base;
 
 		/* stop when we run out of items */
-		name = state_save_get_indexed_item(itemnum, &base, &valsize, &valcount);
+		name = state_save_get_indexed_item(machine, itemnum, &base, &valsize, &valcount);
 		if (name == NULL)
 			break;
 

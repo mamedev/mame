@@ -171,20 +171,20 @@ static void generate_serial_data(running_machine *machine, int upper)
  *
  *************************************/
 
-static void serial_register_state(void)
+static void serial_register_state(running_machine *machine)
 {
-	state_save_register_global_array(serial.data);
-	state_save_register_global(serial.buffer);
-	state_save_register_global(serial.index);
-	state_save_register_global(serial.status);
-	state_save_register_global(serial.bits);
-	state_save_register_global(serial.ormask);
+	state_save_register_global_array(machine, serial.data);
+	state_save_register_global(machine, serial.buffer);
+	state_save_register_global(machine, serial.index);
+	state_save_register_global(machine, serial.status);
+	state_save_register_global(machine, serial.bits);
+	state_save_register_global(machine, serial.ormask);
 }
 
 
 void midway_serial_pic_init(running_machine *machine, int upper)
 {
-	serial_register_state();
+	serial_register_state(machine);
 	generate_serial_data(machine, upper);
 }
 
@@ -256,29 +256,29 @@ static TIMER_CALLBACK( reset_timer )
 }
 
 
-static void pic_register_state(void)
+static void pic_register_state(running_machine *machine)
 {
-	state_save_register_global(pic.latch);
-	state_save_register_global(pic.latch_expire_time.seconds);
-	state_save_register_global(pic.latch_expire_time.attoseconds);
-	state_save_register_global(pic.state);
-	state_save_register_global(pic.index);
-	state_save_register_global(pic.total);
-	state_save_register_global(pic.nvram_addr);
-	state_save_register_global_array(pic.buffer);
-	state_save_register_global_array(pic.nvram);
-	state_save_register_global_array(pic.default_nvram);
-	state_save_register_global_array(pic.time_buf);
-	state_save_register_global(pic.time_index);
-	state_save_register_global(pic.time_just_written);
-	state_save_register_global(pic.yearoffs);
+	state_save_register_global(machine, pic.latch);
+	state_save_register_global(machine, pic.latch_expire_time.seconds);
+	state_save_register_global(machine, pic.latch_expire_time.attoseconds);
+	state_save_register_global(machine, pic.state);
+	state_save_register_global(machine, pic.index);
+	state_save_register_global(machine, pic.total);
+	state_save_register_global(machine, pic.nvram_addr);
+	state_save_register_global_array(machine, pic.buffer);
+	state_save_register_global_array(machine, pic.nvram);
+	state_save_register_global_array(machine, pic.default_nvram);
+	state_save_register_global_array(machine, pic.time_buf);
+	state_save_register_global(machine, pic.time_index);
+	state_save_register_global(machine, pic.time_just_written);
+	state_save_register_global(machine, pic.yearoffs);
 }
 
 
 void midway_serial_pic2_init(running_machine *machine, int upper, int yearoffs)
 {
-	serial_register_state();
-	pic_register_state();
+	serial_register_state(machine);
+	pic_register_state(machine);
 
 	pic.yearoffs = yearoffs;
 	pic.time_just_written = 0;
@@ -566,19 +566,19 @@ static void update_ioasic_irq(running_machine *machine);
 static void cage_irq_handler(running_machine *machine, int state);
 
 
-static void ioasic_register_state(void)
+static void ioasic_register_state(running_machine *machine)
 {
-	state_save_register_global_array(ioasic.reg);
-	state_save_register_global(ioasic.shuffle_active);
-	state_save_register_global(ioasic.irq_state);
-	state_save_register_global(ioasic.sound_irq_state);
-	state_save_register_global(ioasic.auto_ack);
-	state_save_register_global(ioasic.force_fifo_full);
-	state_save_register_global_array(ioasic.fifo);
-	state_save_register_global(ioasic.fifo_in);
-	state_save_register_global(ioasic.fifo_out);
-	state_save_register_global(ioasic.fifo_bytes);
-	state_save_register_global(ioasic.fifo_force_buffer_empty_pc);
+	state_save_register_global_array(machine, ioasic.reg);
+	state_save_register_global(machine, ioasic.shuffle_active);
+	state_save_register_global(machine, ioasic.irq_state);
+	state_save_register_global(machine, ioasic.sound_irq_state);
+	state_save_register_global(machine, ioasic.auto_ack);
+	state_save_register_global(machine, ioasic.force_fifo_full);
+	state_save_register_global_array(machine, ioasic.fifo);
+	state_save_register_global(machine, ioasic.fifo_in);
+	state_save_register_global(machine, ioasic.fifo_out);
+	state_save_register_global(machine, ioasic.fifo_bytes);
+	state_save_register_global(machine, ioasic.fifo_force_buffer_empty_pc);
 }
 
 
@@ -597,7 +597,7 @@ void midway_ioasic_init(running_machine *machine, int shuffle, int upper, int ye
 		{ 0x1,0x2,0x3,0x0,0x4,0x5,0x6,0x7,0xa,0xb,0x8,0x9,0xc,0xd,0xe,0xf },	/* Hyperdrive */
 	};
 
-	ioasic_register_state();
+	ioasic_register_state(machine);
 
 	/* do we have a DCS2 sound chip connected? (most likely) */
 	ioasic.has_dcs = (mame_find_cpu_index(machine, "dcs2") != -1 || mame_find_cpu_index(machine, "dsio") != -1 || mame_find_cpu_index(machine, "denver") != -1);

@@ -288,25 +288,25 @@ static void okim6295_update(void *param, stream_sample_t **inputs, stream_sample
 
 ***********************************************************************************************/
 
-static void adpcm_state_save_register(struct ADPCMVoice *voice, const char *tag, int index)
+static void adpcm_state_save_register(struct ADPCMVoice *voice, const device_config *device, int index)
 {
-	state_save_register_item("okim6295", tag, index, voice->playing);
-	state_save_register_item("okim6295", tag, index, voice->sample);
-	state_save_register_item("okim6295", tag, index, voice->count);
-	state_save_register_item("okim6295", tag, index, voice->adpcm.signal);
-	state_save_register_item("okim6295", tag, index, voice->adpcm.step);
-	state_save_register_item("okim6295", tag, index, voice->volume);
-	state_save_register_item("okim6295", tag, index, voice->base_offset);
+	state_save_register_device_item(device, index, voice->playing);
+	state_save_register_device_item(device, index, voice->sample);
+	state_save_register_device_item(device, index, voice->count);
+	state_save_register_device_item(device, index, voice->adpcm.signal);
+	state_save_register_device_item(device, index, voice->adpcm.step);
+	state_save_register_device_item(device, index, voice->volume);
+	state_save_register_device_item(device, index, voice->base_offset);
 }
 
-static void okim6295_state_save_register(struct okim6295 *info, const char *tag)
+static void okim6295_state_save_register(struct okim6295 *info, const device_config *device)
 {
 	int j;
 
-	state_save_register_item("okim6295", tag, 0, info->command);
-	state_save_register_item("okim6295", tag, 0, info->bank_offset);
+	state_save_register_device_item(device, 0, info->command);
+	state_save_register_device_item(device, 0, info->bank_offset);
 	for (j = 0; j < OKIM6295_VOICES; j++)
-		adpcm_state_save_register(&info->voice[j], tag, j);
+		adpcm_state_save_register(&info->voice[j], device, j);
 }
 
 
@@ -331,7 +331,9 @@ static SND_START( okim6295 )
 
 	info->command = -1;
 	info->bank_offset = 0;
-	info->region_base = memory_region(device->machine, (intf->rgnoverride != NULL) ? intf->rgnoverride : tag);
+	info->region_base = device->region;
+	if (intf->rgnoverride != NULL)
+		info->region_base = memory_region(device->machine, intf->rgnoverride);
 
 	info->master_clock = clock;
 
@@ -346,7 +348,7 @@ static SND_START( okim6295 )
 		reset_adpcm(&info->voice[voice].adpcm);
 	}
 
-	okim6295_state_save_register(info, tag);
+	okim6295_state_save_register(info, device);
 
 	/* success */
 	return info;

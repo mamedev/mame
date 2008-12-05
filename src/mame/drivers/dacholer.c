@@ -379,7 +379,7 @@ static INTERRUPT_GEN( sound_irq )
 	}
 }
 
-static void adpcm_int(running_machine *machine, int cpunum)
+static void adpcm_int(const device_config *device)
 {
 	if(snd_interrupt_enable == 1 || (snd_interrupt_enable ==0 && msm_toggle==1))
 	{
@@ -388,7 +388,7 @@ static void adpcm_int(running_machine *machine, int cpunum)
 		msm_toggle^=1;
 		if (msm_toggle==0)
 		{
-			cpu_set_input_line_and_vector(machine->cpu[1], 0, HOLD_LINE, 0x38);
+			cpu_set_input_line_and_vector(device->machine->cpu[1], 0, HOLD_LINE, 0x38);
 		}
 	}
 }
