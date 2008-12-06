@@ -81,7 +81,6 @@ struct 	_m65ce02_Regs {
 	m6502_write_indexed_func wrmem_id;					/* writemem callback for indexed instructions */
 };
 
-static void *token;
 /***************************************************************
  * include the opcode macros, functions and tables
  ***************************************************************/
