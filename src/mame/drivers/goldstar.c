@@ -217,6 +217,8 @@ static INPUT_PORTS_START( goldstar )
 INPUT_PORTS_END
 
 
+
+
 static const gfx_layout charlayout =
 {
 	8,8,    /* 8*8 characters */
@@ -224,6 +226,18 @@ static const gfx_layout charlayout =
 	3,      /* 3 bits per pixel */
 	{ 2, 4, 6 }, /* the bitplanes are packed in one byte */
 	{ 0*8+0, 0*8+1, 1*8+0, 1*8+1, 2*8+0, 2*8+1, 3*8+0, 3*8+1 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8   /* every char takes 32 consecutive bytes */
+};
+
+
+static const gfx_layout charlayout_chry10 =
+{
+	8,8,    /* 8*8 characters */
+	RGN_FRAC(1,1),    /* 4096 characters */
+	3,      /* 3 bits per pixel */
+	{ 2, 4, 6 }, /* the bitplanes are packed in one byte */
+	{ 3*8+0, 3*8+1, 2*8+0, 2*8+1, 1*8+0, 1*8+1, 0*8+0, 0*8+1 },
 	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
 	32*8   /* every char takes 32 consecutive bytes */
 };
@@ -257,6 +271,22 @@ static const gfx_layout tilelayoutbl =
 	128*8   /* every char takes 128 consecutive bytes */
 };
 
+static const gfx_layout tilelayout_chry10 =
+{
+	8,32,    /* 8*32 characters */
+	256,    /* 256 tiles */
+	4,      /* 4 bits per pixel */
+	{ 0, 2, 4, 6 },
+	{ 3*8+0, 3*8+1, 2*8+0, 2*8+1, 1*8+0, 1*8+1, 0*8+0, 0*8+1 },
+	{ 0*8, 4*8, 8*8, 12*8, 16*8, 20*8, 24*8, 28*8,
+			32*8, 36*8, 40*8, 44*8, 48*8, 52*8, 56*8, 60*8,
+			64*8, 68*8, 72*8, 76*8, 80*8, 84*8, 88*8, 92*8,
+			96*8, 100*8, 104*8, 108*8, 112*8, 116*8, 120*8, 124*8 },
+	128*8   /* every char takes 128 consecutive bytes */
+};
+
+
+
 
 static GFXDECODE_START( goldstar )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
@@ -269,6 +299,11 @@ GFXDECODE_END
 static GFXDECODE_START( ml )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,   0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0x18000, tilelayout, 128,  8 )
+GFXDECODE_END
+
+static GFXDECODE_START( chry10 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout_chry10,   0, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, tilelayout_chry10, 128,  8 )
 GFXDECODE_END
 
 
@@ -390,6 +425,42 @@ MACHINE_DRIVER_END
 
 
 
+static MACHINE_DRIVER_START( chry10 )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", Z80, 3579545)//(4000000?)
+	MDRV_CPU_PROGRAM_MAP(map,0)
+	MDRV_CPU_IO_MAP(readport,0)
+	MDRV_CPU_VBLANK_INT("main", irq0_line_hold)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+//  MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(chry10)
+	MDRV_PALETTE_LENGTH(256)
+	MDRV_NVRAM_HANDLER(goldstar)
+
+	MDRV_VIDEO_START(goldstar)
+	MDRV_VIDEO_UPDATE(goldstar)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")//set up a standard mono speaker called 'mono'
+	MDRV_SOUND_ADD("ay", AY8910,1500000)//1 AY8910, at clock 150000Hz
+	MDRV_SOUND_CONFIG(ay8910_config)//read extra data from interface
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)//all sound goes to the 'mono' speaker, at 0.50 X maximum
+
+	MDRV_SOUND_ADD("oki", OKIM6295, 1056000)//clock
+	MDRV_SOUND_CONFIG(okim6295_interface_pin7high) // clock frequency & pin 7 not verified //"oki"
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)//all sound goes to the 'mono' speaker, at 1.0 X maximum
+MACHINE_DRIVER_END
+
+
+
 /***************************************************************************
 
   Game driver(s)
@@ -425,6 +496,137 @@ ROM_START( goldstbl )
 	ROM_LOAD( "gs1-snd.bin",  0x0000, 0x20000, CRC(9d58960f) SHA1(c68edf95743e146398aabf6b9617d18e1f9bf25b) )
 ROM_END
 
+/*
+
+Cherry I Gold
+
+Anno	1998
+Produttore
+N.revisione	W4BON (rev.1)
+
+
+CPU
+
+1x TMPZ84C00AP-6 (u12)(main)
+2x D8255AC-2 (u45,u46) (missing)
+1x D71055C (u40) (missing)
+1x YM2149 (u39)
+1x SN76489AN (u38)
+1x oscillator 12.0C45
+
+ROMs
+
+1x I27256 (u3)
+1x I27C010 (u1)
+1x PROM N82S147AN (u2)
+1x M27C512 (u20)
+1x GAL20V8 (pl1)(read protected)
+1x PALCE20V8H (pl2)(read protected)
+1x ispLSI1024-60LJ (pl3)(read protected)
+3x PALCE16V8H (pl4,pl6,pl7)(read protected)
+1x PEEL22CV10 (pl5)(read protected)
+Note
+
+1x 36x2 edge connector
+1x 10x2 edge connector
+2x trimmer (volume)
+5x 8x2 switches dip (sw1-5)
+1x push lever (TS)
+
+
+Cherry Gold  (Cherry 10)
+
+Anno	1997
+Produttore
+N.revisione	W4BON (rev.1)
+
+CPU
+
+1x TMPZ84C00AP-6 (u12)(main)
+2x D8255AC-2 (u45,u46)
+1x D71055C (u40)
+1x WF19054 (u39)(equivalent to AY-3-8910)
+1x SN76489AN (u38)
+1x PIC16F84 (on a small daughterboard)(read protected)
+1x oscillator 12.000
+
+ROMs
+
+1x TMS27C256 (u3)
+1x TMS27C010 (u1)
+1x PROM N82S147AN (u2)
+1x M27C512 (u20)
+2x PALCE20V8H (pl1,pl2)(read protected)
+1x ispLSI1024-60LJ (pl3)(read protected)
+3x PALCE16V8H (pl4,pl6,pl7)(read protected)
+1x GAL22V10B (pl5)(read protected)
+
+Note
+
+1x 36x2 edge connector
+1x 10x2 edge connector
+2x trimmer (volume)
+5x 8x2 switches dip (sw1-5)
+1x push lever (TS)
+
+*/
+
+ROM_START( chry10 )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "ver.1h2.u20",  0x0000, 0x10000, CRC(85bbde06) SHA1(f44d335feb4697b195e9fc7e5aeaabf099e21ed8) )
+
+	ROM_REGION( 0x10000, "pic", 0 )
+	ROM_LOAD( "pic16f84.bad.dump",    0x00000, 0x014f4, BAD_DUMP CRC(876ff1ed) SHA1(fcd6892e2b8371030af15e4d8c9f4a351ce0551c) )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "27c010.u1",      0x00000, 0x20000, CRC(05515cf8) SHA1(366dd44ae93bdc4cf456f97f38edac83441cbc89) )
+
+	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "1.u3",      0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
+
+	ROM_REGION( 0x0200, "prom", ROMREGION_DISPOSE )
+	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
+
+	ROM_REGION( 0x02e5, "palgal", ROMREGION_DISPOSE )
+	ROM_LOAD( "palce20v8h.pl1.bad.dump",    0x00000, 0x0157, BAD_DUMP CRC(f0c6d78c) SHA1(03ff589711179950209c405192bd41a032c6c6d6) )
+	ROM_LOAD( "palce20v8h.pl2.bad.dump",    0x00000, 0x0157, BAD_DUMP CRC(f0c6d78c) SHA1(03ff589711179950209c405192bd41a032c6c6d6) )
+	ROM_LOAD( "palce16v8h.pl4.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "gal22v10b.pl5.bad.dump",     0x00000, 0x02e5, BAD_DUMP CRC(996854bc) SHA1(647d2f49b739f7ca55c0b85290b6a21256834fd8) )
+	ROM_LOAD( "palce16v8h.pl6.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(7e3d99d8) SHA1(983e10eba11e4aeab5103ae644a8e6181d9b27a9) )
+	ROM_LOAD( "palce16v8h.pl7.bad.dump",    0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+
+	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
+	/* no oki on this pcb .. */
+ROM_END
+
+
+
+ROM_START( chryigld )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "ol-v9.u20",  0x00000, 0x10000, CRC(b61c0695) SHA1(63c44b20fd7f76bdb33331273d2610e8cfd31add) )
+
+	ROM_REGION( 0x20000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "ol-la.u1",      0x00000, 0x20000, CRC(c3c912f1) SHA1(a2131f092ae1971f79a11d6a18b031cd98529320) )
+
+	ROM_REGION( 0x08000, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "1.u3",      0x00000, 0x08000, CRC(32b46e5c) SHA1(49e59589188324e15ec2b8157839423faea9833f) )
+
+	ROM_REGION( 0x0200, "prom", ROMREGION_DISPOSE )
+	ROM_LOAD( "82s147.u2",      0x00000, 0x0200, CRC(5c8f2b8f) SHA1(67d2121e75813dd85d83858c5fc5ec6ad9cc2a7d) )
+
+	ROM_REGION( 0x02dd, "palgal", ROMREGION_DISPOSE )
+	ROM_LOAD( "gal20v8.pl1.bad.dump",    0x00000, 0x0157, BAD_DUMP CRC(bf885908) SHA1(6cac1022172ee0c178fd3b9c187b1ffb4742898f) )
+	ROM_LOAD( "palce20v8h.pl2.bad.dump", 0x00000, 0x0157, BAD_DUMP CRC(f0c6d78c) SHA1(03ff589711179950209c405192bd41a032c6c6d6) )
+	ROM_LOAD( "palce16v8h.pl4.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+	ROM_LOAD( "peel22cv10a.pl5.bad.dump",0x00000, 0x02dd, BAD_DUMP CRC(8e6075d9) SHA1(f2c1b6497a4d9e873d36b89771c135a2cd91d05f) )
+	ROM_LOAD( "palce16v8h.pl6.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(7e3d99d8) SHA1(983e10eba11e4aeab5103ae644a8e6181d9b27a9) )
+	ROM_LOAD( "palce16v8h.pl7.bad.dump", 0x00000, 0x0117, BAD_DUMP CRC(c89d2f52) SHA1(f9d52d9c42ef95b7b85bbf6d09888ebdeac11fd3) )
+
+	ROM_REGION( 0x20000, "oki", ROMREGION_ERASE00 )
+	/* no oki on this pcb .. */
+ROM_END
+
+
 
 ROM_START( moonlght )
 	ROM_REGION( 0x20000, "main", 0 )
@@ -444,20 +646,53 @@ ROM_END
 static DRIVER_INIT(goldstar)
 {
 	int A;
-	UINT8 *RAM = memory_region(machine, "main");
-
+	UINT8 *ROM = memory_region(machine, "main");
 
 	for (A = 0;A < 0x10000;A++)
 	{
 		if ((A & 0x30) == 0)
-			RAM[A] ^= 0x82;
+			ROM[A] ^= 0x82;
 		else
-			RAM[A] ^= 0xcc;
+			ROM[A] ^= 0xcc;
 	}
 }
 
+static DRIVER_INIT( chry10 )
+{
+	int A;
+	UINT8 *ROM = memory_region(machine, "main");
+	UINT8 *buffer;
+	buffer = malloc(0x10000);
+
+	// there is more to this..
+	for (A = 0;A < 0x10000;A++)
+	{
+		buffer[A^0x800] = ROM[A];
+	}
+
+	memcpy(ROM,buffer,0x10000);
+	free(buffer);
+
+	#if 0
+	{
+		FILE *fp;
+		char filename[256];
+		sprintf(filename,"decrypted_%s", machine->gamedrv->name);
+		fp=fopen(filename, "w+b");
+		if (fp)
+		{
+			fwrite(ROM, 0x10000, 1, fp);
+			fclose(fp);
+		}
+	}
+	#endif
+
+	// these are scrambled, 0x800 should go at 0x000, data seems swapped too
+}
 
 
 GAME( 199?, goldstar, 0,        goldstar, goldstar, goldstar, ROT0, "IGS", "Golden Star", 0 )
 GAME( 199?, goldstbl, goldstar, goldstbl, goldstar, 0,        ROT0, "IGS", "Golden Star (Blue version)", 0 )
-GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "unknown", "Moon Light", 0 )
+GAME( 199?, moonlght, goldstar, moonlght, goldstar, 0,        ROT0, "bootleg", "Moon Light (bootleg of Golden Star)", 0 )
+GAME( 199?, chry10,  goldstar,  chry10,  goldstar, chry10,  ROT0, "bootleg", "Cherry 10 (bootleg of Golden Star)", GAME_NOT_WORKING )
+GAME( 199?, chryigld, goldstar, chry10,  goldstar, chry10,  ROT0, "bootleg", "Cherry I Gold (bootleg of Golden Star)", GAME_NOT_WORKING )
