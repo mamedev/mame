@@ -207,6 +207,7 @@ static const struct x_offset game_offsets[] =
 	{ "triplfun", {  0,  0 }, { -1, -1 } },	// correct (test mode) flip screen not supported?
 	{ "wrofaero", {  0,  0 }, {  0,  0 } },	// unknown
 	{ "jjsquawk", {  1,  1 }, { -1, -1 } },	// correct (test mode)
+	{ "jjsquawb", {  1,  1 }, { -1, -1 } },	// correct (test mode)
 	{ "kamenrid", {  0,  0 }, { -2, -2 } },	// correct (map, banpresto logo)
 	{ "extdwnhl", {  0,  0 }, { -2, -2 } },	// correct (test grid, background images)
 	{ "sokonuke", {  0,  0 }, { -2, -2 } },	// correct (game selection, test grid)
