@@ -29,65 +29,65 @@
     MACROS
 ***************************************************************************/
 
-#define SET_V_16(a,b,r)		dsp32.vflags = (((a) ^ (b) ^ (r) ^ ((r) >> 1)) << 8)
-#define SET_NZC_16(r)		dsp32.nzcflags = ((r) << 8)
-#define SET_NZCV_16(a,b,r)	SET_NZC_16(r); SET_V_16(a,b,r)
-#define SET_NZ00_16(r)		dsp32.nzcflags = (((r) << 8) & 0xffffff); dsp32.vflags = 0
+#define SET_V_16(cs,a,b,r)		(cs)->vflags = (((a) ^ (b) ^ (r) ^ ((r) >> 1)) << 8)
+#define SET_NZC_16(cs,r)		(cs)->nzcflags = ((r) << 8)
+#define SET_NZCV_16(cs,a,b,r)	SET_NZC_16(cs,r); SET_V_16(cs,a,b,r)
+#define SET_NZ00_16(cs,r)		(cs)->nzcflags = (((r) << 8) & 0xffffff); (cs)->vflags = 0
 
-#define SET_V_24(a,b,r)		dsp32.vflags = ((a) ^ (b) ^ (r) ^ ((r) >> 1))
-#define SET_NZC_24(r)		dsp32.nzcflags = (r)
-#define SET_NZCV_24(a,b,r)	SET_NZC_24(r); SET_V_24(a,b,r)
-#define SET_NZ00_24(r)		dsp32.nzcflags = ((r) & 0xffffff); dsp32.vflags = 0
+#define SET_V_24(cs,a,b,r)		(cs)->vflags = ((a) ^ (b) ^ (r) ^ ((r) >> 1))
+#define SET_NZC_24(cs,r)		(cs)->nzcflags = (r)
+#define SET_NZCV_24(cs,a,b,r)	SET_NZC_24(cs,r); SET_V_24(cs,a,b,r)
+#define SET_NZ00_24(cs,r)		(cs)->nzcflags = ((r) & 0xffffff); (cs)->vflags = 0
 
-#define TRUNCATE24(a)		((a) & 0xffffff)
-#define EXTEND16_TO_24(a)	TRUNCATE24((INT32)(INT16)(a))
-#define REG16(a)			((UINT16)dsp32.r[a])
-#define REG24(a)			(dsp32.r[a])
+#define TRUNCATE24(a)			((a) & 0xffffff)
+#define EXTEND16_TO_24(a)		TRUNCATE24((INT32)(INT16)(a))
+#define REG16(cs,a)				((UINT16)(cs)->r[a])
+#define REG24(cs,a)				((cs)->r[a])
 
-#define WRITEABLE_REGS		(0x6f3efffe)
+#define WRITEABLE_REGS			(0x6f3efffe)
 #if ASSUME_WRITEABLE
-#define IS_WRITEABLE(r) 	(1)
+#define IS_WRITEABLE(r) 		(1)
 #else
-#define IS_WRITEABLE(r)		(WRITEABLE_REGS & (1 << (r)))
+#define IS_WRITEABLE(r)			(WRITEABLE_REGS & (1 << (r)))
 #endif
 
 #if ASSUME_UNCONDITIONAL_CAU
-#define CONDITION_IS_TRUE	(1)
+#define CONDITION_IS_TRUE(cs)	(1)
 #else
-#define CONDITION_IS_TRUE	(!(OP & 0x400) || (condition((OP >> 12) & 15)))
+#define CONDITION_IS_TRUE(cs)	(!(op & 0x400) || (condition(cs, (op >> 12) & 15)))
 #endif
 
 #if EMULATE_MEMORY_LATENCY
-#define WWORD_DEFERRED(a,v)	do { int bufidx = dsp32.mbuf_index & 3; dsp32.mbufaddr[bufidx] = -(a); dsp32.mbufdata[bufidx] = (v); } while (0)
-#define WLONG_DEFERRED(a,v)	do { int bufidx = dsp32.mbuf_index & 3; dsp32.mbufaddr[bufidx] = (a); dsp32.mbufdata[bufidx] = (v); } while (0)
-#define PROCESS_DEFERRED_MEMORY() 									\
-	if (dsp32.mbufaddr[++dsp32.mbuf_index & 3] != 1) 				\
-	{																\
-		int bufidx = dsp32.mbuf_index & 3;							\
-		if (dsp32.mbufaddr[bufidx] >= 0)							\
-			WLONG(dsp32.mbufaddr[bufidx], dsp32.mbufdata[bufidx]);	\
-		else														\
-			WWORD(-dsp32.mbufaddr[bufidx], dsp32.mbufdata[bufidx]);	\
-		dsp32.mbufaddr[bufidx] = 1;									\
+#define WWORD_DEFERRED(cs,a,v)	do { int bufidx = (cs)->mbuf_index & 3; (cs)->mbufaddr[bufidx] = -(a); (cs)->mbufdata[bufidx] = (v); } while (0)
+#define WLONG_DEFERRED(cs,a,v)	do { int bufidx = (cs)->mbuf_index & 3; (cs)->mbufaddr[bufidx] = (a); (cs)->mbufdata[bufidx] = (v); } while (0)
+#define PROCESS_DEFERRED_MEMORY(cs) 									\
+	if ((cs)->mbufaddr[++(cs)->mbuf_index & 3] != 1) 					\
+	{																	\
+		int bufidx = (cs)->mbuf_index & 3;								\
+		if ((cs)->mbufaddr[bufidx] >= 0)								\
+			WLONG(cs, (cs)->mbufaddr[bufidx], (cs)->mbufdata[bufidx]);	\
+		else															\
+			WWORD(cs, -(cs)->mbufaddr[bufidx], (cs)->mbufdata[bufidx]);	\
+		(cs)->mbufaddr[bufidx] = 1;										\
 	}
 #else
-#define WWORD_DEFERRED(a,v)	WWORD(a,v)
-#define WLONG_DEFERRED(a,v)	WLONG(a,v)
-#define PROCESS_DEFERRED_MEMORY()
+#define WWORD_DEFERRED(cs,a,v)	WWORD(cs,a,v)
+#define WLONG_DEFERRED(cs,a,v)	WLONG(cs,a,v)
+#define PROCESS_DEFERRED_MEMORY(cs)
 #endif
 
 #if EMULATE_MULTIPLIER_LATENCY
-#define DEFERRED_MULTIPLIER(x)	dau_get_amult(x)
+#define DEFERRED_MULTIPLIER(cs,x)	dau_get_amult(cs, x)
 #else
-#define DEFERRED_MULTIPLIER(x)	dsp32.a[x]
+#define DEFERRED_MULTIPLIER(cs,x)	(cs)->a[x]
 #endif
 
 #if EMULATE_AFLAGS_LATENCY
-#define DEFERRED_NZFLAGS		dau_get_anzflags()
-#define DEFERRED_VUFLAGS		dau_get_avuflags()
+#define DEFERRED_NZFLAGS(cs)	dau_get_anzflags(cs)
+#define DEFERRED_VUFLAGS(cs)	dau_get_avuflags(cs)
 #else
-#define DEFERRED_NZFLAGS		dsp32.NZflags
-#define DEFERRED_VUFLAGS		dsp32.VUflags
+#define DEFERRED_NZFLAGS(cs)	(cs)->NZflags
+#define DEFERRED_VUFLAGS(cs)	(cs)->VUflags
 #endif
 
 
@@ -96,7 +96,7 @@
     FORWARD DECLARATIONS
 ***************************************************************************/
 
-extern void (*const dsp32ops[])(void);
+extern void (*const dsp32ops[])(dsp32_state *cpustate, UINT32 op);
 
 
 
@@ -116,26 +116,28 @@ typedef union int_double
     IMPLEMENTATION
 ***************************************************************************/
 
-static void illegal(void)
+static void illegal(dsp32_state *cpustate, UINT32 op)
 {
 }
 
 
-static void unimplemented(void)
+static void unimplemented(dsp32_state *cpustate, UINT32 op)
 {
-    fatalerror("Unimplemented op @ %06X: %08X (dis=%02X, tbl=%03X)", dsp32.PC - 4, OP, OP >> 25, OP >> 21);
+    fatalerror("Unimplemented op @ %06X: %08X (dis=%02X, tbl=%03X)", cpustate->PC - 4, op, op >> 25, op >> 21);
 }
 
 
-INLINE void execute_one(void)
+INLINE void execute_one(dsp32_state *cpustate)
 {
-	PROCESS_DEFERRED_MEMORY();
-	debugger_instruction_hook(dsp32.device, dsp32.PC);
-	OP = ROPCODE(dsp32.PC);
-	dsp32_icount -= 4;	/* 4 clocks per cycle */
-	dsp32.PC += 4;
-	if (OP)
-		(*dsp32ops[OP >> 21])();
+	UINT32 op;
+	
+	PROCESS_DEFERRED_MEMORY(cpustate);
+	debugger_instruction_hook(cpustate->device, cpustate->PC);
+	op = ROPCODE(cpustate, cpustate->PC);
+	cpustate->icount -= 4;	/* 4 clocks per cycle */
+	cpustate->PC += 4;
+	if (op)
+		(*dsp32ops[op >> 21])(cpustate, op);
 }
 
 
@@ -144,135 +146,135 @@ INLINE void execute_one(void)
     CAU HELPERS
 ***************************************************************************/
 
-static UINT32 cau_read_pi_special(UINT8 i)
+static UINT32 cau_read_pi_special(dsp32_state *cpustate, UINT8 i)
 {
 	switch (i)
 	{
-		case 4:		return dsp32.ibuf;
-		case 5:		return dsp32.obuf;
-		case 6:		update_pcr(dsp32.pcr & ~PCR_PDFs); return dsp32.pdr;
-		case 14:	return dsp32.piop;
-		case 20:	return dsp32.pdr2;
-		case 22:	update_pcr(dsp32.pcr & ~PCR_PIFs); return dsp32.pir;
-		case 30:	return dsp32.pcw;
+		case 4:		return cpustate->ibuf;
+		case 5:		return cpustate->obuf;
+		case 6:		update_pcr(cpustate, cpustate->pcr & ~PCR_PDFs); return cpustate->pdr;
+		case 14:	return cpustate->piop;
+		case 20:	return cpustate->pdr2;
+		case 22:	update_pcr(cpustate, cpustate->pcr & ~PCR_PIFs); return cpustate->pir;
+		case 30:	return cpustate->pcw;
 		default:	fprintf(stderr, "Unimplemented CAU PI read = %X\n", i);
 	}
 	return 0;
 }
 
 
-static void cau_write_pi_special(UINT8 i, UINT32 val)
+static void cau_write_pi_special(dsp32_state *cpustate, UINT8 i, UINT32 val)
 {
 	switch (i)
 	{
-		case 4:		dsp32.ibuf = val;	break;
-		case 5:		dsp32.obuf = val;	break;
-		case 6:		dsp32.pdr = val; update_pcr(dsp32.pcr | PCR_PDFs); break;
-		case 14:	dsp32.piop = val;	break;
-		case 20:	dsp32.pdr2 = val; 	break;
-		case 22:	dsp32.pir = val; update_pcr(dsp32.pcr | PCR_PIFs); break;
-		case 30:	dsp32.pcw = val; 	break;
+		case 4:		cpustate->ibuf = val;	break;
+		case 5:		cpustate->obuf = val;	break;
+		case 6:		cpustate->pdr = val; update_pcr(cpustate, cpustate->pcr | PCR_PDFs); break;
+		case 14:	cpustate->piop = val;	break;
+		case 20:	cpustate->pdr2 = val; 	break;
+		case 22:	cpustate->pir = val; update_pcr(cpustate, cpustate->pcr | PCR_PIFs); break;
+		case 30:	cpustate->pcw = val; 	break;
 		default:	fprintf(stderr, "Unimplemented CAU PI write = %X\n", i);
 	}
 }
 
 
-INLINE UINT8 cau_read_pi_1byte(int pi)
+INLINE UINT8 cau_read_pi_1byte(dsp32_state *cpustate, int pi)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		UINT32 result = RBYTE(dsp32.r[p]);
-		dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i]);
+		UINT32 result = RBYTE(cpustate, cpustate->r[p]);
+		cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
 		return result;
 	}
 	else
-		return cau_read_pi_special(i);
+		return cau_read_pi_special(cpustate, i);
 }
 
 
-INLINE UINT16 cau_read_pi_2byte(int pi)
+INLINE UINT16 cau_read_pi_2byte(dsp32_state *cpustate, int pi)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		UINT32 result = RWORD(dsp32.r[p]);
+		UINT32 result = RWORD(cpustate, cpustate->r[p]);
 		if (i < 22 || i > 23)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i] * 2);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i] * 2);
 		return result;
 	}
 	else
-		return cau_read_pi_special(i);
+		return cau_read_pi_special(cpustate, i);
 }
 
 
-INLINE UINT32 cau_read_pi_4byte(int pi)
+INLINE UINT32 cau_read_pi_4byte(dsp32_state *cpustate, int pi)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		UINT32 result = RLONG(dsp32.r[p]);
+		UINT32 result = RLONG(cpustate, cpustate->r[p]);
 		if (i < 22 || i > 23)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i] * 4);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i] * 4);
 		return result;
 	}
 	else
-		return cau_read_pi_special(i);
+		return cau_read_pi_special(cpustate, i);
 }
 
 
-INLINE void cau_write_pi_1byte(int pi, UINT8 val)
+INLINE void cau_write_pi_1byte(dsp32_state *cpustate, int pi, UINT8 val)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		WBYTE(dsp32.r[p], val);
-		dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i]);
+		WBYTE(cpustate, cpustate->r[p], val);
+		cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
 	}
 	else
-		cau_write_pi_special(i, val);
+		cau_write_pi_special(cpustate, i, val);
 }
 
 
-INLINE void cau_write_pi_2byte(int pi, UINT16 val)
+INLINE void cau_write_pi_2byte(dsp32_state *cpustate, int pi, UINT16 val)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		WWORD(dsp32.r[p], val);
+		WWORD(cpustate, cpustate->r[p], val);
 		if (i < 22 || i > 23)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i] * 2);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i] * 2);
 	}
 	else
-		cau_write_pi_special(i, val);
+		cau_write_pi_special(cpustate, i, val);
 }
 
 
-INLINE void cau_write_pi_4byte(int pi, UINT32 val)
+INLINE void cau_write_pi_4byte(dsp32_state *cpustate, int pi, UINT32 val)
 {
 	int p = (pi >> 5) & 0x1f;
 	int i = (pi >> 0) & 0x1f;
 	if (p)
 	{
-		WLONG(dsp32.r[p], (INT32)(val << 8) >> 8);
+		WLONG(cpustate, cpustate->r[p], (INT32)(val << 8) >> 8);
 		if (i < 22 || i > 23)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i] * 4);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i] * 4);
 	}
 	else
-		cau_write_pi_special(i, val);
+		cau_write_pi_special(cpustate, i, val);
 }
 
 
@@ -281,41 +283,41 @@ INLINE void cau_write_pi_4byte(int pi, UINT32 val)
     DAU HELPERS
 ***************************************************************************/
 
-INLINE double dau_get_amult(int aidx)
+INLINE double dau_get_amult(dsp32_state *cpustate, int aidx)
 {
-	int bufidx = (dsp32.abuf_index - 1) & 3;
-	double val = dsp32.a[aidx];
-	while (dsp32_icount >= dsp32.abufcycle[bufidx] - 2 * 4)
+	int bufidx = (cpustate->abuf_index - 1) & 3;
+	double val = cpustate->a[aidx];
+	while (cpustate->icount >= cpustate->abufcycle[bufidx] - 2 * 4)
 	{
-		if (dsp32.abufreg[bufidx] == aidx)
-			val = dsp32.abuf[bufidx];
+		if (cpustate->abufreg[bufidx] == aidx)
+			val = cpustate->abuf[bufidx];
 		bufidx = (bufidx - 1) & 3;
 	}
 	return val;
 }
 
 
-INLINE double dau_get_anzflags(void)
+INLINE double dau_get_anzflags(dsp32_state *cpustate)
 {
-	int bufidx = (dsp32.abuf_index - 1) & 3;
-	double nzflags = dsp32.NZflags;
-	while (dsp32_icount >= dsp32.abufcycle[bufidx] - 3 * 4)
+	int bufidx = (cpustate->abuf_index - 1) & 3;
+	double nzflags = cpustate->NZflags;
+	while (cpustate->icount >= cpustate->abufcycle[bufidx] - 3 * 4)
 	{
-		nzflags = dsp32.abufNZflags[bufidx];
+		nzflags = cpustate->abufNZflags[bufidx];
 		bufidx = (bufidx - 1) & 3;
 	}
 	return nzflags;
 }
 
 
-INLINE UINT8 dau_get_avuflags(void)
+INLINE UINT8 dau_get_avuflags(dsp32_state *cpustate)
 {
 #if (!IGNORE_DAU_UV_FLAGS)
-	int bufidx = (dsp32.abuf_index - 1) & 3;
-	UINT8 vuflags = dsp32.VUflags;
-	while (dsp32_icount >= dsp32.abufcycle[bufidx] - 3 * 4)
+	int bufidx = (cpustate->abuf_index - 1) & 3;
+	UINT8 vuflags = cpustate->VUflags;
+	while (cpustate->icount >= cpustate->abufcycle[bufidx] - 3 * 4)
 	{
-		vuflags = dsp32.abufVUflags[bufidx];
+		vuflags = cpustate->abufVUflags[bufidx];
 		bufidx = (bufidx - 1) & 3;
 	}
 	return vuflags;
@@ -325,52 +327,52 @@ INLINE UINT8 dau_get_avuflags(void)
 }
 
 
-INLINE void remember_last_dau(int aidx)
+INLINE void remember_last_dau(dsp32_state *cpustate, int aidx)
 {
 #if (EMULATE_MULTIPLIER_LATENCY || EMULATE_AFLAGS_LATENCY)
-	int bufidx = dsp32.abuf_index++ & 3;
-	dsp32.abuf[bufidx] = dsp32.a[aidx];
-	dsp32.abufreg[bufidx] = aidx;
-	dsp32.abufNZflags[bufidx] = dsp32.NZflags;
+	int bufidx = cpustate->abuf_index++ & 3;
+	cpustate->abuf[bufidx] = cpustate->a[aidx];
+	cpustate->abufreg[bufidx] = aidx;
+	cpustate->abufNZflags[bufidx] = cpustate->NZflags;
 #if (!IGNORE_DAU_UV_FLAGS)
-	dsp32.abufVUflags[bufidx] = dsp32.VUflags;
+	cpustate->abufVUflags[bufidx] = cpustate->VUflags;
 #endif
-	dsp32.abufcycle[bufidx] = dsp32_icount;
+	cpustate->abufcycle[bufidx] = cpustate->icount;
 #endif
 }
 
 
-INLINE void dau_set_val_noflags(int aidx, double res)
+INLINE void dau_set_val_noflags(dsp32_state *cpustate, int aidx, double res)
 {
-	remember_last_dau(aidx);
-	dsp32.a[aidx] = res;
+	remember_last_dau(cpustate, aidx);
+	cpustate->a[aidx] = res;
 }
 
 
-INLINE void dau_set_val_flags(int aidx, double res)
+INLINE void dau_set_val_flags(dsp32_state *cpustate, int aidx, double res)
 {
-	remember_last_dau(aidx);
+	remember_last_dau(cpustate, aidx);
 #if (!IGNORE_DAU_UV_FLAGS)
 {
 	double absres = (res < 0) ? -res : res;
-	dsp32.VUflags = 0;
+	cpustate->VUflags = 0;
 	if (absres < 5.87747e-39)
 	{
 		if (absres != 0)
-			dsp32.VUflags = UFLAGBIT;
+			cpustate->VUflags = UFLAGBIT;
 		res = 0.0;
 	}
 	else if (absres > 3.40282e38)
 	{
-		dsp32.VUflags = VFLAGBIT;
+		cpustate->VUflags = VFLAGBIT;
 //      debugger_break(Machine);
 //      fprintf(stderr, "Result = %g\n", absres);
 		res = (res < 0) ? -3.40282e38 : 3.40282e38;
 	}
 }
 #endif
-	dsp32.NZflags = res;
-	dsp32.a[aidx] = res;
+	cpustate->NZflags = res;
+	cpustate->a[aidx] = res;
 }
 
 
@@ -423,14 +425,14 @@ INLINE UINT32 double_to_dsp(double val)
 }
 
 
-static double dau_read_pi_special(int i)
+static double dau_read_pi_special(dsp32_state *cpustate, int i)
 {
     fatalerror("Unimplemented dau_read_pi_special(%d)", i);
 	return 0;
 }
 
 
-static void dau_write_pi_special(int i, double val)
+static void dau_write_pi_special(dsp32_state *cpustate, int i, double val)
 {
     fatalerror("Unimplemented dau_write_pi_special(%d)", i);
 }
@@ -438,7 +440,7 @@ static void dau_write_pi_special(int i, double val)
 
 static int lastp;
 
-INLINE double dau_read_pi_double_1st(int pi, int multiplier)
+INLINE double dau_read_pi_double_1st(dsp32_state *cpustate, int pi, int multiplier)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -446,21 +448,21 @@ INLINE double dau_read_pi_double_1st(int pi, int multiplier)
 	lastp = p;
 	if (p)
 	{
-		UINT32 result = RLONG(dsp32.r[p]);
+		UINT32 result = RLONG(cpustate, cpustate->r[p]);
 		if (i < 6)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16] * 4);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
 		return dsp_to_double(result);
 	}
 	else if (i < 4)
-		return multiplier ? DEFERRED_MULTIPLIER(i) : dsp32.a[i];
+		return multiplier ? DEFERRED_MULTIPLIER(cpustate, i) : cpustate->a[i];
 	else
-		return dau_read_pi_special(i);
+		return dau_read_pi_special(cpustate, i);
 }
 
 
-INLINE double dau_read_pi_double_2nd(int pi, int multiplier, double xval)
+INLINE double dau_read_pi_double_2nd(dsp32_state *cpustate, int pi, int multiplier, double xval)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -470,21 +472,21 @@ INLINE double dau_read_pi_double_2nd(int pi, int multiplier, double xval)
 	if (p)
 	{
 		UINT32 result;
-		result = RLONG(dsp32.r[p]);
+		result = RLONG(cpustate, cpustate->r[p]);
 		if (i < 6)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16] * 4);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
 		return dsp_to_double(result);
 	}
 	else if (i < 4)
-		return multiplier ? DEFERRED_MULTIPLIER(i) : dsp32.a[i];
+		return multiplier ? DEFERRED_MULTIPLIER(cpustate, i) : cpustate->a[i];
 	else
-		return dau_read_pi_special(i);
+		return dau_read_pi_special(cpustate, i);
 }
 
 
-INLINE UINT32 dau_read_pi_4bytes(int pi)
+INLINE UINT32 dau_read_pi_4bytes(dsp32_state *cpustate, int pi)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -492,21 +494,21 @@ INLINE UINT32 dau_read_pi_4bytes(int pi)
 	lastp = p;
 	if (p)
 	{
-		UINT32 result = RLONG(dsp32.r[p]);
+		UINT32 result = RLONG(cpustate, cpustate->r[p]);
 		if (i < 6)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16] * 4);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
 		return result;
 	}
 	else if (i < 4)
-		return double_to_dsp(dsp32.a[i]);
+		return double_to_dsp(cpustate->a[i]);
 	else
-		return dau_read_pi_special(i);
+		return dau_read_pi_special(cpustate, i);
 }
 
 
-INLINE UINT16 dau_read_pi_2bytes(int pi)
+INLINE UINT16 dau_read_pi_2bytes(dsp32_state *cpustate, int pi)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -514,21 +516,21 @@ INLINE UINT16 dau_read_pi_2bytes(int pi)
 	lastp = p;
 	if (p)
 	{
-		UINT32 result = RWORD(dsp32.r[p]);
+		UINT32 result = RWORD(cpustate, cpustate->r[p]);
 		if (i < 6)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16] * 2);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 2);
 		return result;
 	}
 	else if (i < 4)
-		return double_to_dsp(dsp32.a[i]);
+		return double_to_dsp(cpustate->a[i]);
 	else
-		return dau_read_pi_special(i);
+		return dau_read_pi_special(cpustate, i);
 }
 
 
-INLINE void dau_write_pi_double(int pi, double val)
+INLINE void dau_write_pi_double(dsp32_state *cpustate, int pi, double val)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -536,20 +538,20 @@ INLINE void dau_write_pi_double(int pi, double val)
 	if (p == 15) p = lastp;		/* P=15 means Z inherits from Y, Y inherits from X */
 	if (p)
 	{
-		WLONG_DEFERRED(dsp32.r[p], double_to_dsp(val));
+		WLONG_DEFERRED(cpustate, cpustate->r[p], double_to_dsp(val));
 		if (i < 6)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16] * 4);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
 	}
 	else if (i < 4)
-		dau_set_val_noflags(i, val);
+		dau_set_val_noflags(cpustate, i, val);
 	else
-		dau_write_pi_special(i, val);
+		dau_write_pi_special(cpustate, i, val);
 }
 
 
-INLINE void dau_write_pi_4bytes(int pi, UINT32 val)
+INLINE void dau_write_pi_4bytes(dsp32_state *cpustate, int pi, UINT32 val)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -558,20 +560,20 @@ INLINE void dau_write_pi_4bytes(int pi, UINT32 val)
 	if (p)
 	{
 		lastp = p;
-		WLONG_DEFERRED(dsp32.r[p], val);
+		WLONG_DEFERRED(cpustate, cpustate->r[p], val);
 		if (i < 6)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16] * 4);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 4);
 	}
 	else if (i < 4)
-		dau_set_val_noflags(i, dsp_to_double(val));
+		dau_set_val_noflags(cpustate, i, dsp_to_double(val));
 	else
-		dau_write_pi_special(i, val);
+		dau_write_pi_special(cpustate, i, val);
 }
 
 
-INLINE void dau_write_pi_2bytes(int pi, UINT16 val)
+INLINE void dau_write_pi_2bytes(dsp32_state *cpustate, int pi, UINT16 val)
 {
 	int p = (pi >> 3) & 15;
 	int i = (pi >> 0) & 7;
@@ -580,16 +582,16 @@ INLINE void dau_write_pi_2bytes(int pi, UINT16 val)
 	if (p)
 	{
 		lastp = p;
-		WWORD_DEFERRED(dsp32.r[p], val);
+		WWORD_DEFERRED(cpustate, cpustate->r[p], val);
 		if (i < 6)
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16]);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16]);
 		else
-			dsp32.r[p] = TRUNCATE24(dsp32.r[p] + dsp32.r[i+16] * 2);
+			cpustate->r[p] = TRUNCATE24(cpustate->r[p] + cpustate->r[i+16] * 2);
 	}
 	else if (i < 4)
-		dau_set_val_noflags(i, dsp_to_double(val << 16));
+		dau_set_val_noflags(cpustate, i, dsp_to_double(val << 16));
 	else
-		dau_write_pi_special(i, val);
+		dau_write_pi_special(cpustate, i, val);
 }
 
 
@@ -599,7 +601,7 @@ INLINE void dau_write_pi_2bytes(int pi, UINT16 val)
 ***************************************************************************/
 
 #if (!ASSUME_UNCONDITIONAL_CAU)
-static int condition(int cond)
+static int condition(dsp32_state *cpustate, int cond)
 {
 	switch (cond)
 	{
@@ -637,25 +639,25 @@ static int condition(int cond)
 			return (cFLAG | zFLAG);
 
 		case 16:
-			return !(DEFERRED_VUFLAGS & UFLAGBIT);
+			return !(DEFERRED_VUFLAGS(cpustate) & UFLAGBIT);
 		case 17:
-			return (DEFERRED_VUFLAGS & UFLAGBIT);
+			return (DEFERRED_VUFLAGS(cpustate) & UFLAGBIT);
 		case 18:
-			return !(DEFERRED_NZFLAGS < 0);
+			return !(DEFERRED_NZFLAGS(cpustate) < 0);
 		case 19:
-			return (DEFERRED_NZFLAGS < 0);
+			return (DEFERRED_NZFLAGS(cpustate) < 0);
 		case 20:
-			return !(DEFERRED_NZFLAGS == 0);
+			return !(DEFERRED_NZFLAGS(cpustate) == 0);
 		case 21:
-			return (DEFERRED_NZFLAGS == 0);
+			return (DEFERRED_NZFLAGS(cpustate) == 0);
 		case 22:
-			return !(DEFERRED_VUFLAGS & VFLAGBIT);
+			return !(DEFERRED_VUFLAGS(cpustate) & VFLAGBIT);
 		case 23:
-			return (DEFERRED_VUFLAGS & VFLAGBIT);
+			return (DEFERRED_VUFLAGS(cpustate) & VFLAGBIT);
 		case 24:
-			return !(DEFERRED_NZFLAGS <= 0);
+			return !(DEFERRED_NZFLAGS(cpustate) <= 0);
 		case 25:
-			return (DEFERRED_NZFLAGS <= 0);
+			return (DEFERRED_NZFLAGS(cpustate) <= 0);
 
 		case 32:	/* !ibf */
 		case 33:	/* ibf */
@@ -685,437 +687,407 @@ static int condition(int cond)
     CAU BRANCH INSTRUCTION IMPLEMENTATION
 ***************************************************************************/
 
-static void nop(void)
+static void nop(dsp32_state *cpustate, UINT32 op)
 {
-	UINT32 op = OP;
 	if (op == 0)
 		return;
-	execute_one();
-	dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+	execute_one(cpustate);
+	cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 }
 
 
-static void goto_t(void)
+static void goto_t(dsp32_state *cpustate, UINT32 op)
 {
-	UINT32 op = OP;
-	execute_one();
-	dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+	execute_one(cpustate);
+	cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 }
 
 
-static void goto_pl(void)
+static void goto_pl(dsp32_state *cpustate, UINT32 op)
 {
 	if (!nFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_mi(void)
+static void goto_mi(dsp32_state *cpustate, UINT32 op)
 {
 	if (nFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ne(void)
+static void goto_ne(dsp32_state *cpustate, UINT32 op)
 {
 	if (!zFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_eq(void)
+static void goto_eq(dsp32_state *cpustate, UINT32 op)
 {
 	if (zFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_vc(void)
+static void goto_vc(dsp32_state *cpustate, UINT32 op)
 {
 	if (!vFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_vs(void)
+static void goto_vs(dsp32_state *cpustate, UINT32 op)
 {
 	if (vFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_cc(void)
+static void goto_cc(dsp32_state *cpustate, UINT32 op)
 {
 	if (!cFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_cs(void)
+static void goto_cs(dsp32_state *cpustate, UINT32 op)
 {
 	if (cFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ge(void)
+static void goto_ge(dsp32_state *cpustate, UINT32 op)
 {
 	if (!(nFLAG ^ vFLAG))
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_lt(void)
+static void goto_lt(dsp32_state *cpustate, UINT32 op)
 {
 	if (nFLAG ^ vFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_gt(void)
+static void goto_gt(dsp32_state *cpustate, UINT32 op)
 {
 	if (!(zFLAG | (nFLAG ^ vFLAG)))
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_le(void)
+static void goto_le(dsp32_state *cpustate, UINT32 op)
 {
 	if (zFLAG | (nFLAG ^ vFLAG))
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_hi(void)
+static void goto_hi(dsp32_state *cpustate, UINT32 op)
 {
 	if (!cFLAG && !zFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ls(void)
+static void goto_ls(dsp32_state *cpustate, UINT32 op)
 {
 	if (cFLAG || zFLAG)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_auc(void)
+static void goto_auc(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(DEFERRED_VUFLAGS & UFLAGBIT))
+	if (!(DEFERRED_VUFLAGS(cpustate) & UFLAGBIT))
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_aus(void)
+static void goto_aus(dsp32_state *cpustate, UINT32 op)
 {
-	if (DEFERRED_VUFLAGS & UFLAGBIT)
+	if (DEFERRED_VUFLAGS(cpustate) & UFLAGBIT)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_age(void)
+static void goto_age(dsp32_state *cpustate, UINT32 op)
 {
-	if (DEFERRED_NZFLAGS >= 0)
+	if (DEFERRED_NZFLAGS(cpustate) >= 0)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_alt(void)
+static void goto_alt(dsp32_state *cpustate, UINT32 op)
 {
-	if (DEFERRED_NZFLAGS < 0)
+	if (DEFERRED_NZFLAGS(cpustate) < 0)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ane(void)
+static void goto_ane(dsp32_state *cpustate, UINT32 op)
 {
-	if (DEFERRED_NZFLAGS != 0)
+	if (DEFERRED_NZFLAGS(cpustate) != 0)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_aeq(void)
+static void goto_aeq(dsp32_state *cpustate, UINT32 op)
 {
-	if (DEFERRED_NZFLAGS == 0)
+	if (DEFERRED_NZFLAGS(cpustate) == 0)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_avc(void)
+static void goto_avc(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(DEFERRED_VUFLAGS & VFLAGBIT))
+	if (!(DEFERRED_VUFLAGS(cpustate) & VFLAGBIT))
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_avs(void)
+static void goto_avs(dsp32_state *cpustate, UINT32 op)
 {
-	if (DEFERRED_VUFLAGS & VFLAGBIT)
+	if (DEFERRED_VUFLAGS(cpustate) & VFLAGBIT)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_agt(void)
+static void goto_agt(dsp32_state *cpustate, UINT32 op)
 {
-	if (DEFERRED_NZFLAGS > 0)
+	if (DEFERRED_NZFLAGS(cpustate) > 0)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ale(void)
+static void goto_ale(dsp32_state *cpustate, UINT32 op)
 {
-	if (DEFERRED_NZFLAGS <= 0)
+	if (DEFERRED_NZFLAGS(cpustate) <= 0)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void goto_ibe(void)
+static void goto_ibe(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_ibf(void)
+static void goto_ibf(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_obf(void)
+static void goto_obf(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_obe(void)
+static void goto_obe(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_pde(void)
+static void goto_pde(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_pdf(void)
+static void goto_pdf(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_pie(void)
+static void goto_pie(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_pif(void)
+static void goto_pif(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_syc(void)
+static void goto_syc(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_sys(void)
+static void goto_sys(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_fbc(void)
+static void goto_fbc(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_fbs(void)
+static void goto_fbs(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_irq1lo(void)
+static void goto_irq1lo(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_irq1hi(void)
+static void goto_irq1hi(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_irq2lo(void)
+static void goto_irq2lo(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void goto_irq2hi(void)
+static void goto_irq2hi(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void dec_goto(void)
+static void dec_goto(dsp32_state *cpustate, UINT32 op)
 {
-	int hr = (OP >> 21) & 0x1f;
-	int old = (INT16)dsp32.r[hr];
-	dsp32.r[hr] = EXTEND16_TO_24(dsp32.r[hr] - 1);
+	int hr = (op >> 21) & 0x1f;
+	int old = (INT16)cpustate->r[hr];
+	cpustate->r[hr] = EXTEND16_TO_24(cpustate->r[hr] - 1);
 	if (old >= 0)
 	{
-		UINT32 op = OP;
-		execute_one();
-		dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		execute_one(cpustate);
+		cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 	}
 }
 
 
-static void call(void)
+static void call(dsp32_state *cpustate, UINT32 op)
 {
-	UINT32 op = OP;
 	int mr = (op >> 21) & 0x1f;
 	if (IS_WRITEABLE(mr))
-		dsp32.r[mr] = dsp32.PC + 4;
-	execute_one();
-	dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (INT16)op);
+		cpustate->r[mr] = cpustate->PC + 4;
+	execute_one(cpustate);
+	cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (INT16)op);
 }
 
 
-static void goto24(void)
+static void goto24(dsp32_state *cpustate, UINT32 op)
 {
-	UINT32 op = OP;
-	execute_one();
-	dsp32.PC = TRUNCATE24(REG24((op >> 16) & 0x1f) + (op & 0xffff) + ((op >> 5) & 0xff0000));
+	execute_one(cpustate);
+	cpustate->PC = TRUNCATE24(REG24(cpustate, (op >> 16) & 0x1f) + (op & 0xffff) + ((op >> 5) & 0xff0000));
 }
 
 
-static void call24(void)
+static void call24(dsp32_state *cpustate, UINT32 op)
 {
-	UINT32 op = OP;
 	int mr = (op >> 16) & 0x1f;
 	if (IS_WRITEABLE(mr))
-		dsp32.r[mr] = dsp32.PC + 4;
-	execute_one();
-	dsp32.PC = (op & 0xffff) + ((op >> 5) & 0xff0000);
+		cpustate->r[mr] = cpustate->PC + 4;
+	execute_one(cpustate);
+	cpustate->PC = (op & 0xffff) + ((op >> 5) & 0xff0000);
 }
 
 
-static void do_i(void)
+static void do_i(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void do_r(void)
+static void do_r(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
@@ -1124,336 +1096,336 @@ static void do_r(void)
     CAU 16-BIT ARITHMETIC IMPLEMENTATION
 ***************************************************************************/
 
-static void add_si(void)
+static void add_si(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 21) & 0x1f;
-	int hrval = REG16((OP >> 16) & 0x1f);
-	int res = hrval + (UINT16)OP;
+	int dr = (op >> 21) & 0x1f;
+	int hrval = REG16(cpustate, (op >> 16) & 0x1f);
+	int res = hrval + (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	SET_NZCV_16(hrval, OP, res);
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	SET_NZCV_16(cpustate, hrval, op, res);
 }
 
 
-static void add_ss(void)
+static void add_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG16((OP >> 0) & 0x1f) : REG16(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
 		int res = s2rval + s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(s1rval, s2rval, res);
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(cpustate, s1rval, s2rval, res);
 	}
 }
 
 
-static void mul2_s(void)
+static void mul2_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
 		int res = s1rval * 2;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(s1rval, 0, res);
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(cpustate, s1rval, 0, res);
 	}
 }
 
 
-static void subr_ss(void)
+static void subr_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG16((OP >> 0) & 0x1f) : REG16(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
 		int res = s1rval - s2rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(s1rval, s2rval, res);
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(cpustate, s1rval, s2rval, res);
 	}
 }
 
 
-static void addr_ss(void)
+static void addr_ss(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void sub_ss(void)
+static void sub_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG16((OP >> 0) & 0x1f) : REG16(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
 		int res = s2rval - s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(s1rval, s2rval, res);
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(cpustate, s1rval, s2rval, res);
 	}
 }
 
 
-static void neg_s(void)
+static void neg_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
 		int res = -s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		SET_NZCV_16(s1rval, 0, res);
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		SET_NZCV_16(cpustate, s1rval, 0, res);
 	}
 }
 
 
-static void andc_ss(void)
+static void andc_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG16((OP >> 0) & 0x1f) : REG16(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
 		int res = s2rval & ~s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		SET_NZ00_16(res);
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		SET_NZ00_16(cpustate, res);
 	}
 }
 
 
-static void cmp_ss(void)
+static void cmp_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int drval = REG16((OP >> 16) & 0x1f);
-		int s1rval = REG16((OP >> 5) & 0x1f);
+		int drval = REG16(cpustate, (op >> 16) & 0x1f);
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
 		int res = drval - s1rval;
-		SET_NZCV_16(drval, s1rval, res);
+		SET_NZCV_16(cpustate, drval, s1rval, res);
 	}
 }
 
 
-static void xor_ss(void)
+static void xor_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG16((OP >> 0) & 0x1f) : REG16(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
 		int res = s2rval ^ s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		SET_NZ00_16(res);
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		SET_NZ00_16(cpustate, res);
 	}
 }
 
 
-static void rcr_s(void)
+static void rcr_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
-		int res = ((dsp32.nzcflags >> 9) & 0x8000) | (s1rval >> 1);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int res = ((cpustate->nzcflags >> 9) & 0x8000) | (s1rval >> 1);
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		dsp32.nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
-		dsp32.vflags = 0;
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		cpustate->nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
+		cpustate->vflags = 0;
 	}
 }
 
 
-static void or_ss(void)
+static void or_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG16((OP >> 0) & 0x1f) : REG16(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
 		int res = s2rval | s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		SET_NZ00_16(res);
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		SET_NZ00_16(cpustate, res);
 	}
 }
 
 
-static void rcl_s(void)
+static void rcl_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
-		int res = ((dsp32.nzcflags >> 24) & 0x0001) | (s1rval << 1);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int res = ((cpustate->nzcflags >> 24) & 0x0001) | (s1rval << 1);
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		dsp32.nzcflags = ((res & 0xffff) << 8) | ((s1rval & 0x8000) << 9);
-		dsp32.vflags = 0;
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		cpustate->nzcflags = ((res & 0xffff) << 8) | ((s1rval & 0x8000) << 9);
+		cpustate->vflags = 0;
 	}
 }
 
 
-static void shr_s(void)
+static void shr_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
 		int res = s1rval >> 1;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		dsp32.nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
-		dsp32.vflags = 0;
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		cpustate->nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
+		cpustate->vflags = 0;
 	}
 }
 
 
-static void div2_s(void)
+static void div2_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
 		int res = (s1rval & 0x8000) | (s1rval >> 1);
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		dsp32.nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
-		dsp32.vflags = 0;
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		cpustate->nzcflags = ((res & 0xffff) << 8) | ((s1rval & 1) << 24);
+		cpustate->vflags = 0;
 	}
 }
 
 
-static void and_ss(void)
+static void and_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG16((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG16((OP >> 0) & 0x1f) : REG16(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG16(cpustate, (op >> 0) & 0x1f) : REG16(cpustate, dr);
 		int res = s2rval & s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		SET_NZ00_16(res);
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		SET_NZ00_16(cpustate, res);
 	}
 }
 
 
-static void test_ss(void)
+static void test_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int drval = REG16((OP >> 16) & 0x1f);
-		int s1rval = REG16((OP >> 5) & 0x1f);
+		int drval = REG16(cpustate, (op >> 16) & 0x1f);
+		int s1rval = REG16(cpustate, (op >> 5) & 0x1f);
 		int res = drval & s1rval;
-		SET_NZ00_16(res);
+		SET_NZ00_16(cpustate, res);
 	}
 }
 
 
-static void add_di(void)
+static void add_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG16(dr);
-	int res = drval + (UINT16)OP;
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG16(cpustate, dr);
+	int res = drval + (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	SET_NZCV_16(drval, OP, res);
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	SET_NZCV_16(cpustate, drval, op, res);
 }
 
 
-static void subr_di(void)
+static void subr_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG16(dr);
-	int res = (UINT16)OP - drval;
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG16(cpustate, dr);
+	int res = (UINT16)op - drval;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	SET_NZCV_16(drval, OP, res);
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	SET_NZCV_16(cpustate, drval, op, res);
 }
 
 
-static void addr_di(void)
+static void addr_di(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void sub_di(void)
+static void sub_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG16(dr);
-	int res = drval - (UINT16)OP;
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG16(cpustate, dr);
+	int res = drval - (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	SET_NZCV_16(drval, OP, res);
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	SET_NZCV_16(cpustate, drval, op, res);
 }
 
 
-static void andc_di(void)
+static void andc_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG16(dr);
-	int res = drval & ~(UINT16)OP;
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG16(cpustate, dr);
+	int res = drval & ~(UINT16)op;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	SET_NZ00_16(res);
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	SET_NZ00_16(cpustate, res);
 }
 
 
-static void cmp_di(void)
+static void cmp_di(dsp32_state *cpustate, UINT32 op)
 {
-	int drval = REG16((OP >> 16) & 0x1f);
-	int res = drval - (UINT16)OP;
-	SET_NZCV_16(drval, OP, res);
+	int drval = REG16(cpustate, (op >> 16) & 0x1f);
+	int res = drval - (UINT16)op;
+	SET_NZCV_16(cpustate, drval, op, res);
 }
 
 
-static void xor_di(void)
+static void xor_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG16(dr);
-	int res = drval ^ (UINT16)OP;
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG16(cpustate, dr);
+	int res = drval ^ (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	SET_NZ00_16(res);
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	SET_NZ00_16(cpustate, res);
 }
 
 
-static void or_di(void)
+static void or_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG16(dr);
-	int res = drval | (UINT16)OP;
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG16(cpustate, dr);
+	int res = drval | (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	SET_NZ00_16(res);
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	SET_NZ00_16(cpustate, res);
 }
 
 
-static void and_di(void)
+static void and_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG16(dr);
-	int res = drval & (UINT16)OP;
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG16(cpustate, dr);
+	int res = drval & (UINT16)op;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	SET_NZ00_16(res);
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	SET_NZ00_16(cpustate, res);
 }
 
 
-static void test_di(void)
+static void test_di(dsp32_state *cpustate, UINT32 op)
 {
-	int drval = REG16((OP >> 16) & 0x1f);
-	int res = drval & (UINT16)OP;
-	SET_NZ00_16(res);
+	int drval = REG16(cpustate, (op >> 16) & 0x1f);
+	int res = drval & (UINT16)op;
+	SET_NZ00_16(cpustate, res);
 }
 
 
@@ -1462,336 +1434,336 @@ static void test_di(void)
     CAU 24-BIT ARITHMETIC IMPLEMENTATION
 ***************************************************************************/
 
-static void adde_si(void)
+static void adde_si(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 21) & 0x1f;
-	int hrval = REG24((OP >> 16) & 0x1f);
-	int res = hrval + EXTEND16_TO_24(OP);
+	int dr = (op >> 21) & 0x1f;
+	int hrval = REG24(cpustate, (op >> 16) & 0x1f);
+	int res = hrval + EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = TRUNCATE24(res);
-	SET_NZCV_24(hrval, OP << 8, res);
+		cpustate->r[dr] = TRUNCATE24(res);
+	SET_NZCV_24(cpustate, hrval, op << 8, res);
 }
 
 
-static void adde_ss(void)
+static void adde_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG24((OP >> 0) & 0x1f) : REG24(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
 		int res = s2rval + s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(s1rval, s2rval, res);
+			cpustate->r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(cpustate, s1rval, s2rval, res);
 	}
 }
 
 
-static void mul2e_s(void)
+static void mul2e_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
 		int res = s1rval * 2;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(s1rval, 0, res);
+			cpustate->r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(cpustate, s1rval, 0, res);
 	}
 }
 
 
-static void subre_ss(void)
+static void subre_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG24((OP >> 0) & 0x1f) : REG24(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
 		int res = s1rval - s2rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(s1rval, s2rval, res);
+			cpustate->r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(cpustate, s1rval, s2rval, res);
 	}
 }
 
 
-static void addre_ss(void)
+static void addre_ss(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void sube_ss(void)
+static void sube_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG24((OP >> 0) & 0x1f) : REG24(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
 		int res = s2rval - s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(s1rval, s2rval, res);
+			cpustate->r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(cpustate, s1rval, s2rval, res);
 	}
 }
 
 
-static void nege_s(void)
+static void nege_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
 		int res = -s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = TRUNCATE24(res);
-		SET_NZCV_24(s1rval, 0, res);
+			cpustate->r[dr] = TRUNCATE24(res);
+		SET_NZCV_24(cpustate, s1rval, 0, res);
 	}
 }
 
 
-static void andce_ss(void)
+static void andce_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG24((OP >> 0) & 0x1f) : REG24(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
 		int res = s2rval & ~s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = res;
-		SET_NZ00_24(res);
+			cpustate->r[dr] = res;
+		SET_NZ00_24(cpustate, res);
 	}
 }
 
 
-static void cmpe_ss(void)
+static void cmpe_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int drval = REG24((OP >> 16) & 0x1f);
-		int s1rval = REG24((OP >> 5) & 0x1f);
+		int drval = REG24(cpustate, (op >> 16) & 0x1f);
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
 		int res = drval - s1rval;
-		SET_NZCV_24(drval, s1rval, res);
+		SET_NZCV_24(cpustate, drval, s1rval, res);
 	}
 }
 
 
-static void xore_ss(void)
+static void xore_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG24((OP >> 0) & 0x1f) : REG24(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
 		int res = s2rval ^ s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = res;
-		SET_NZ00_24(res);
+			cpustate->r[dr] = res;
+		SET_NZ00_24(cpustate, res);
 	}
 }
 
 
-static void rcre_s(void)
+static void rcre_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
-		int res = ((dsp32.nzcflags >> 1) & 0x800000) | (s1rval >> 1);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int res = ((cpustate->nzcflags >> 1) & 0x800000) | (s1rval >> 1);
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = TRUNCATE24(res);
-		dsp32.nzcflags = res | ((s1rval & 1) << 24);
-		dsp32.vflags = 0;
+			cpustate->r[dr] = TRUNCATE24(res);
+		cpustate->nzcflags = res | ((s1rval & 1) << 24);
+		cpustate->vflags = 0;
 	}
 }
 
 
-static void ore_ss(void)
+static void ore_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG24((OP >> 0) & 0x1f) : REG24(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
 		int res = s2rval | s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = res;
-		SET_NZ00_24(res);
+			cpustate->r[dr] = res;
+		SET_NZ00_24(cpustate, res);
 	}
 }
 
 
-static void rcle_s(void)
+static void rcle_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
-		int res = ((dsp32.nzcflags >> 24) & 0x000001) | (s1rval << 1);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int res = ((cpustate->nzcflags >> 24) & 0x000001) | (s1rval << 1);
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = TRUNCATE24(res);
-		dsp32.nzcflags = res | ((s1rval & 0x800000) << 1);
-		dsp32.vflags = 0;
+			cpustate->r[dr] = TRUNCATE24(res);
+		cpustate->nzcflags = res | ((s1rval & 0x800000) << 1);
+		cpustate->vflags = 0;
 	}
 }
 
 
-static void shre_s(void)
+static void shre_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
 		int res = s1rval >> 1;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = res;
-		dsp32.nzcflags = res | ((s1rval & 1) << 24);
-		dsp32.vflags = 0;
+			cpustate->r[dr] = res;
+		cpustate->nzcflags = res | ((s1rval & 1) << 24);
+		cpustate->vflags = 0;
 	}
 }
 
 
-static void div2e_s(void)
+static void div2e_s(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
 		int res = (s1rval & 0x800000) | (s1rval >> 1);
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = TRUNCATE24(res);
-		dsp32.nzcflags = res | ((s1rval & 1) << 24);
-		dsp32.vflags = 0;
+			cpustate->r[dr] = TRUNCATE24(res);
+		cpustate->nzcflags = res | ((s1rval & 1) << 24);
+		cpustate->vflags = 0;
 	}
 }
 
 
-static void ande_ss(void)
+static void ande_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		int s1rval = REG24((OP >> 5) & 0x1f);
-		int s2rval = (OP & 0x800) ? REG24((OP >> 0) & 0x1f) : REG24(dr);
+		int dr = (op >> 16) & 0x1f;
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
+		int s2rval = (op & 0x800) ? REG24(cpustate, (op >> 0) & 0x1f) : REG24(cpustate, dr);
 		int res = s2rval & s1rval;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = res;
-		SET_NZ00_24(res);
+			cpustate->r[dr] = res;
+		SET_NZ00_24(cpustate, res);
 	}
 }
 
 
-static void teste_ss(void)
+static void teste_ss(dsp32_state *cpustate, UINT32 op)
 {
-	if (CONDITION_IS_TRUE)
+	if (CONDITION_IS_TRUE(cpustate))
 	{
-		int drval = REG24((OP >> 16) & 0x1f);
-		int s1rval = REG24((OP >> 5) & 0x1f);
+		int drval = REG24(cpustate, (op >> 16) & 0x1f);
+		int s1rval = REG24(cpustate, (op >> 5) & 0x1f);
 		int res = drval & s1rval;
-		SET_NZ00_24(res);
+		SET_NZ00_24(cpustate, res);
 	}
 }
 
 
-static void adde_di(void)
+static void adde_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG24(dr);
-	int res = drval + EXTEND16_TO_24(OP);
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG24(cpustate, dr);
+	int res = drval + EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = TRUNCATE24(res);
-	SET_NZCV_24(drval, OP << 8, res);
+		cpustate->r[dr] = TRUNCATE24(res);
+	SET_NZCV_24(cpustate, drval, op << 8, res);
 }
 
 
-static void subre_di(void)
+static void subre_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG24(dr);
-	int res = EXTEND16_TO_24(OP) - drval;
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG24(cpustate, dr);
+	int res = EXTEND16_TO_24(op) - drval;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = TRUNCATE24(res);
-	SET_NZCV_24(drval, OP << 8, res);
+		cpustate->r[dr] = TRUNCATE24(res);
+	SET_NZCV_24(cpustate, drval, op << 8, res);
 }
 
 
-static void addre_di(void)
+static void addre_di(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void sube_di(void)
+static void sube_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG24(dr);
-	int res = drval - EXTEND16_TO_24(OP);
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG24(cpustate, dr);
+	int res = drval - EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = TRUNCATE24(res);
-	SET_NZCV_24(drval, OP << 8, res);
+		cpustate->r[dr] = TRUNCATE24(res);
+	SET_NZCV_24(cpustate, drval, op << 8, res);
 }
 
 
-static void andce_di(void)
+static void andce_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG24(dr);
-	int res = drval & ~EXTEND16_TO_24(OP);
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG24(cpustate, dr);
+	int res = drval & ~EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = res;
-	SET_NZ00_24(res);
+		cpustate->r[dr] = res;
+	SET_NZ00_24(cpustate, res);
 }
 
 
-static void cmpe_di(void)
+static void cmpe_di(dsp32_state *cpustate, UINT32 op)
 {
-	int drval = REG24((OP >> 16) & 0x1f);
-	int res = drval - EXTEND16_TO_24(OP);
-	SET_NZCV_24(drval, OP << 8, res);
+	int drval = REG24(cpustate, (op >> 16) & 0x1f);
+	int res = drval - EXTEND16_TO_24(op);
+	SET_NZCV_24(cpustate, drval, op << 8, res);
 }
 
 
-static void xore_di(void)
+static void xore_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG24(dr);
-	int res = drval ^ EXTEND16_TO_24(OP);
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG24(cpustate, dr);
+	int res = drval ^ EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = res;
-	SET_NZ00_24(res);
+		cpustate->r[dr] = res;
+	SET_NZ00_24(cpustate, res);
 }
 
 
-static void ore_di(void)
+static void ore_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG24(dr);
-	int res = drval | EXTEND16_TO_24(OP);
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG24(cpustate, dr);
+	int res = drval | EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = res;
-	SET_NZ00_24(res);
+		cpustate->r[dr] = res;
+	SET_NZ00_24(cpustate, res);
 }
 
 
-static void ande_di(void)
+static void ande_di(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	int drval = REG24(dr);
-	int res = drval & EXTEND16_TO_24(OP);
+	int dr = (op >> 16) & 0x1f;
+	int drval = REG24(cpustate, dr);
+	int res = drval & EXTEND16_TO_24(op);
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = res;
-	SET_NZ00_24(res);
+		cpustate->r[dr] = res;
+	SET_NZ00_24(cpustate, res);
 }
 
 
-static void teste_di(void)
+static void teste_di(dsp32_state *cpustate, UINT32 op)
 {
-	int drval = REG24((OP >> 16) & 0x1f);
-	int res = drval & EXTEND16_TO_24(OP);
-	SET_NZ00_24(res);
+	int drval = REG24(cpustate, (op >> 16) & 0x1f);
+	int res = drval & EXTEND16_TO_24(op);
+	SET_NZ00_24(cpustate, res);
 }
 
 
@@ -1800,180 +1772,180 @@ static void teste_di(void)
     CAU LOAD/STORE IMPLEMENTATION
 ***************************************************************************/
 
-static void load_hi(void)
+static void load_hi(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	UINT32 res = RBYTE(EXTEND16_TO_24(OP));
+	int dr = (op >> 16) & 0x1f;
+	UINT32 res = RBYTE(cpustate, EXTEND16_TO_24(op));
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	dsp32.nzcflags = res << 8;
-	dsp32.vflags = 0;
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	cpustate->nzcflags = res << 8;
+	cpustate->vflags = 0;
 }
 
 
-static void load_li(void)
+static void load_li(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	UINT32 res = RBYTE(EXTEND16_TO_24(OP));
+	int dr = (op >> 16) & 0x1f;
+	UINT32 res = RBYTE(cpustate, EXTEND16_TO_24(op));
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = res;
-	dsp32.nzcflags = res << 8;
-	dsp32.vflags = 0;
+		cpustate->r[dr] = res;
+	cpustate->nzcflags = res << 8;
+	cpustate->vflags = 0;
 }
 
 
-static void load_i(void)
+static void load_i(dsp32_state *cpustate, UINT32 op)
 {
-	UINT32 res = RWORD(EXTEND16_TO_24(OP));
-	int dr = (OP >> 16) & 0x1f;
+	UINT32 res = RWORD(cpustate, EXTEND16_TO_24(op));
+	int dr = (op >> 16) & 0x1f;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = EXTEND16_TO_24(res);
-	dsp32.nzcflags = res << 8;
-	dsp32.vflags = 0;
+		cpustate->r[dr] = EXTEND16_TO_24(res);
+	cpustate->nzcflags = res << 8;
+	cpustate->vflags = 0;
 }
 
 
-static void load_ei(void)
+static void load_ei(dsp32_state *cpustate, UINT32 op)
 {
-	UINT32 res = TRUNCATE24(RLONG(EXTEND16_TO_24(OP)));
-	int dr = (OP >> 16) & 0x1f;
+	UINT32 res = TRUNCATE24(RLONG(cpustate, EXTEND16_TO_24(op)));
+	int dr = (op >> 16) & 0x1f;
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = res;
-	dsp32.nzcflags = res;
-	dsp32.vflags = 0;
+		cpustate->r[dr] = res;
+	cpustate->nzcflags = res;
+	cpustate->vflags = 0;
 }
 
 
-static void store_hi(void)
+static void store_hi(dsp32_state *cpustate, UINT32 op)
 {
-	WBYTE(EXTEND16_TO_24(OP), dsp32.r[(OP >> 16) & 0x1f] >> 8);
+	WBYTE(cpustate, EXTEND16_TO_24(op), cpustate->r[(op >> 16) & 0x1f] >> 8);
 }
 
 
-static void store_li(void)
+static void store_li(dsp32_state *cpustate, UINT32 op)
 {
-	WBYTE(EXTEND16_TO_24(OP), dsp32.r[(OP >> 16) & 0x1f]);
+	WBYTE(cpustate, EXTEND16_TO_24(op), cpustate->r[(op >> 16) & 0x1f]);
 }
 
 
-static void store_i(void)
+static void store_i(dsp32_state *cpustate, UINT32 op)
 {
-	WWORD(EXTEND16_TO_24(OP), REG16((OP >> 16) & 0x1f));
+	WWORD(cpustate, EXTEND16_TO_24(op), REG16(cpustate, (op >> 16) & 0x1f));
 }
 
 
-static void store_ei(void)
+static void store_ei(dsp32_state *cpustate, UINT32 op)
 {
-	WLONG(EXTEND16_TO_24(OP), (INT32)(REG24((OP >> 16) & 0x1f) << 8) >> 8);
+	WLONG(cpustate, EXTEND16_TO_24(op), (INT32)(REG24(cpustate, (op >> 16) & 0x1f) << 8) >> 8);
 }
 
 
-static void load_hr(void)
+static void load_hr(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(OP & 0x400))
+	if (!(op & 0x400))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		UINT32 res = cau_read_pi_1byte(OP) << 8;
+		int dr = (op >> 16) & 0x1f;
+		UINT32 res = cau_read_pi_1byte(cpustate, op) << 8;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		dsp32.nzcflags = res << 8;
-		dsp32.vflags = 0;
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		cpustate->nzcflags = res << 8;
+		cpustate->vflags = 0;
 	}
 	else
-		unimplemented();
+		unimplemented(cpustate, op);
 }
 
 
-static void load_lr(void)
+static void load_lr(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(OP & 0x400))
+	if (!(op & 0x400))
 	{
-		int dr = (OP >> 16) & 0x1f;
-		UINT32 res = cau_read_pi_1byte(OP);
+		int dr = (op >> 16) & 0x1f;
+		UINT32 res = cau_read_pi_1byte(cpustate, op);
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = res;
-		dsp32.nzcflags = res << 8;
-		dsp32.vflags = 0;
+			cpustate->r[dr] = res;
+		cpustate->nzcflags = res << 8;
+		cpustate->vflags = 0;
 	}
 	else
-		unimplemented();
+		unimplemented(cpustate, op);
 }
 
 
-static void load_r(void)
+static void load_r(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(OP & 0x400))
+	if (!(op & 0x400))
 	{
-		UINT32 res = cau_read_pi_2byte(OP);
-		int dr = (OP >> 16) & 0x1f;
+		UINT32 res = cau_read_pi_2byte(cpustate, op);
+		int dr = (op >> 16) & 0x1f;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = EXTEND16_TO_24(res);
-		dsp32.nzcflags = res << 8;
-		dsp32.vflags = 0;
+			cpustate->r[dr] = EXTEND16_TO_24(res);
+		cpustate->nzcflags = res << 8;
+		cpustate->vflags = 0;
 	}
 	else
-		unimplemented();
+		unimplemented(cpustate, op);
 }
 
 
-static void load_er(void)
+static void load_er(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(OP & 0x400))
+	if (!(op & 0x400))
 	{
-		UINT32 res = TRUNCATE24(cau_read_pi_4byte(OP));
-		int dr = (OP >> 16) & 0x1f;
+		UINT32 res = TRUNCATE24(cau_read_pi_4byte(cpustate, op));
+		int dr = (op >> 16) & 0x1f;
 		if (IS_WRITEABLE(dr))
-			dsp32.r[dr] = res;
-		dsp32.nzcflags = res;
-		dsp32.vflags = 0;
+			cpustate->r[dr] = res;
+		cpustate->nzcflags = res;
+		cpustate->vflags = 0;
 	}
 	else
-		unimplemented();
+		unimplemented(cpustate, op);
 }
 
 
-static void store_hr(void)
+static void store_hr(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(OP & 0x400))
-		cau_write_pi_1byte(OP, dsp32.r[(OP >> 16) & 0x1f] >> 8);
+	if (!(op & 0x400))
+		cau_write_pi_1byte(cpustate, op, cpustate->r[(op >> 16) & 0x1f] >> 8);
 	else
-		unimplemented();
+		unimplemented(cpustate, op);
 }
 
 
-static void store_lr(void)
+static void store_lr(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(OP & 0x400))
-		cau_write_pi_1byte(OP, dsp32.r[(OP >> 16) & 0x1f]);
+	if (!(op & 0x400))
+		cau_write_pi_1byte(cpustate, op, cpustate->r[(op >> 16) & 0x1f]);
 	else
-		unimplemented();
+		unimplemented(cpustate, op);
 }
 
 
-static void store_r(void)
+static void store_r(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(OP & 0x400))
-		cau_write_pi_2byte(OP, REG16((OP >> 16) & 0x1f));
+	if (!(op & 0x400))
+		cau_write_pi_2byte(cpustate, op, REG16(cpustate, (op >> 16) & 0x1f));
 	else
-		unimplemented();
+		unimplemented(cpustate, op);
 }
 
 
-static void store_er(void)
+static void store_er(dsp32_state *cpustate, UINT32 op)
 {
-	if (!(OP & 0x400))
-		cau_write_pi_4byte(OP, REG24((OP >> 16) & 0x1f));
+	if (!(op & 0x400))
+		cau_write_pi_4byte(cpustate, op, REG24(cpustate, (op >> 16) & 0x1f));
 	else
-		unimplemented();
+		unimplemented(cpustate, op);
 }
 
 
-static void load24(void)
+static void load24(dsp32_state *cpustate, UINT32 op)
 {
-	int dr = (OP >> 16) & 0x1f;
-	UINT32 res = (OP & 0xffff) + ((OP >> 5) & 0xff0000);
+	int dr = (op >> 16) & 0x1f;
+	UINT32 res = (op & 0xffff) + ((op >> 5) & 0xff0000);
 	if (IS_WRITEABLE(dr))
-		dsp32.r[dr] = res;
+		cpustate->r[dr] = res;
 }
 
 
@@ -1982,149 +1954,149 @@ static void load24(void)
     DAU FORM 1 IMPLEMENTATION
 ***************************************************************************/
 
-static void d1_aMpp(void)
+static void d1_aMpp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
-	double res = yval + DEFERRED_MULTIPLIER((OP >> 26) & 7) * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double res = yval + DEFERRED_MULTIPLIER(cpustate, (op >> 26) & 7) * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d1_aMpm(void)
+static void d1_aMpm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
-	double res = yval - DEFERRED_MULTIPLIER((OP >> 26) & 7) * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double res = yval - DEFERRED_MULTIPLIER(cpustate, (op >> 26) & 7) * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d1_aMmp(void)
+static void d1_aMmp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
-	double res = -yval + DEFERRED_MULTIPLIER((OP >> 26) & 7) * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double res = -yval + DEFERRED_MULTIPLIER(cpustate, (op >> 26) & 7) * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d1_aMmm(void)
+static void d1_aMmm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
-	double res = -yval - DEFERRED_MULTIPLIER((OP >> 26) & 7) * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
+	double res = -yval - DEFERRED_MULTIPLIER(cpustate, (op >> 26) & 7) * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d1_0px(void)
+static void d1_0px(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = yval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 	(void)xval;
 }
 
 
-static void d1_0mx(void)
+static void d1_0mx(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = -yval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 	(void)xval;
 }
 
 
-static void d1_1pp(void)
+static void d1_1pp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = yval + xval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d1_1pm(void)
+static void d1_1pm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = yval - xval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d1_1mp(void)
+static void d1_1mp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = -yval + xval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d1_1mm(void)
+static void d1_1mm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = -yval - xval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d1_aMppr(void)
+static void d1_aMppr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d1_aMpmr(void)
+static void d1_aMpmr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d1_aMmpr(void)
+static void d1_aMmpr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d1_aMmmr(void)
+static void d1_aMmmr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
@@ -2133,75 +2105,75 @@ static void d1_aMmmr(void)
     DAU FORM 2 IMPLEMENTATION
 ***************************************************************************/
 
-static void d2_aMpp(void)
+static void d2_aMpp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 1, xval);
-	double res = dsp32.a[(OP >> 26) & 7] + yval * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
+	double res = cpustate->a[(op >> 26) & 7] + yval * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, yval);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, yval);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d2_aMpm(void)
+static void d2_aMpm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 1, xval);
-	double res = dsp32.a[(OP >> 26) & 7] - yval * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
+	double res = cpustate->a[(op >> 26) & 7] - yval * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, yval);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, yval);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d2_aMmp(void)
+static void d2_aMmp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 1, xval);
-	double res = -dsp32.a[(OP >> 26) & 7] + yval * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
+	double res = -cpustate->a[(op >> 26) & 7] + yval * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, yval);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, yval);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d2_aMmm(void)
+static void d2_aMmm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 1, xval);
-	double res = -dsp32.a[(OP >> 26) & 7] - yval * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
+	double res = -cpustate->a[(op >> 26) & 7] - yval * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, yval);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, yval);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d2_aMppr(void)
+static void d2_aMppr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d2_aMpmr(void)
+static void d2_aMpmr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d2_aMmpr(void)
+static void d2_aMmpr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d2_aMmmr(void)
+static void d2_aMmmr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
@@ -2210,75 +2182,75 @@ static void d2_aMmmr(void)
     DAU FORM 3 IMPLEMENTATION
 ***************************************************************************/
 
-static void d3_aMpp(void)
+static void d3_aMpp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 1, xval);
-	double res = dsp32.a[(OP >> 26) & 7] + yval * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
+	double res = cpustate->a[(op >> 26) & 7] + yval * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d3_aMpm(void)
+static void d3_aMpm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 1, xval);
-	double res = dsp32.a[(OP >> 26) & 7] - yval * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
+	double res = cpustate->a[(op >> 26) & 7] - yval * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d3_aMmp(void)
+static void d3_aMmp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 1, xval);
-	double res = -dsp32.a[(OP >> 26) & 7] + yval * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
+	double res = -cpustate->a[(op >> 26) & 7] + yval * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d3_aMmm(void)
+static void d3_aMmm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 1, xval);
-	double res = -dsp32.a[(OP >> 26) & 7] - yval * xval;
-	int zpi = (OP >> 0) & 0x7f;
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 1, xval);
+	double res = -cpustate->a[(op >> 26) & 7] - yval * xval;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d3_aMppr(void)
+static void d3_aMppr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d3_aMpmr(void)
+static void d3_aMpmr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d3_aMmpr(void)
+static void d3_aMmpr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d3_aMmmr(void)
+static void d3_aMmmr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
@@ -2287,75 +2259,75 @@ static void d3_aMmmr(void)
     DAU FORM 4 IMPLEMENTATION
 ***************************************************************************/
 
-static void d4_pp(void)
+static void d4_pp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = yval + xval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, yval);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, yval);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d4_pm(void)
+static void d4_pm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = yval - xval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, yval);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, yval);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d4_mp(void)
+static void d4_mp(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = -yval + xval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, yval);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, yval);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d4_mm(void)
+static void d4_mm(dsp32_state *cpustate, UINT32 op)
 {
-	double xval = dau_read_pi_double_1st(OP >> 14, 1);
-	double yval = dau_read_pi_double_2nd(OP >> 7, 0, xval);
+	double xval = dau_read_pi_double_1st(cpustate, op >> 14, 1);
+	double yval = dau_read_pi_double_2nd(cpustate, op >> 7, 0, xval);
 	double res = -yval - xval;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, yval);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, yval);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d4_ppr(void)
+static void d4_ppr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d4_pmr(void)
+static void d4_pmr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d4_mpr(void)
+static void d4_mpr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d4_mmr(void)
+static void d4_mmr(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
@@ -2364,137 +2336,137 @@ static void d4_mmr(void)
     DAU FORM 5 IMPLEMENTATION
 ***************************************************************************/
 
-static void d5_ic(void)
+static void d5_ic(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d5_oc(void)
+static void d5_oc(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d5_float(void)
+static void d5_float(dsp32_state *cpustate, UINT32 op)
 {
-	double res = (double)(INT16)dau_read_pi_2bytes(OP >> 7);
-	int zpi = (OP >> 0) & 0x7f;
+	double res = (double)(INT16)dau_read_pi_2bytes(cpustate, op >> 7);
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d5_int(void)
+static void d5_int(dsp32_state *cpustate, UINT32 op)
 {
-	double val = dau_read_pi_double_1st(OP >> 7, 0);
-	int zpi = (OP >> 0) & 0x7f;
+	double val = dau_read_pi_double_1st(cpustate, op >> 7, 0);
+	int zpi = (op >> 0) & 0x7f;
 	INT16 res;
-	if (!(dsp32.DAUC & 0x10)) val = floor(val + 0.5);
+	if (!(cpustate->DAUC & 0x10)) val = floor(val + 0.5);
 	else val = ceil(val - 0.5);
 	res = (INT16)val;
 	if (zpi != 7)
-		dau_write_pi_2bytes(zpi, res);
-	dau_set_val_noflags((OP >> 21) & 3, dsp_to_double(res << 16));
+		dau_write_pi_2bytes(cpustate, zpi, res);
+	dau_set_val_noflags(cpustate, (op >> 21) & 3, dsp_to_double(res << 16));
 }
 
 
-static void d5_round(void)
+static void d5_round(dsp32_state *cpustate, UINT32 op)
 {
-	double res = (double)(float)dau_read_pi_double_1st(OP >> 7, 0);
-	int zpi = (OP >> 0) & 0x7f;
+	double res = (double)(float)dau_read_pi_double_1st(cpustate, op >> 7, 0);
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d5_ifalt(void)
+static void d5_ifalt(dsp32_state *cpustate, UINT32 op)
 {
-	int ar = (OP >> 21) & 3;
-	double res = dsp32.a[ar];
-	int zpi = (OP >> 0) & 0x7f;
+	int ar = (op >> 21) & 3;
+	double res = cpustate->a[ar];
+	int zpi = (op >> 0) & 0x7f;
 	if (NFLAG)
-		res = dau_read_pi_double_1st(OP >> 7, 0);
+		res = dau_read_pi_double_1st(cpustate, op >> 7, 0);
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_noflags(ar, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_noflags(cpustate, ar, res);
 }
 
 
-static void d5_ifaeq(void)
+static void d5_ifaeq(dsp32_state *cpustate, UINT32 op)
 {
-	int ar = (OP >> 21) & 3;
-	double res = dsp32.a[ar];
-	int zpi = (OP >> 0) & 0x7f;
+	int ar = (op >> 21) & 3;
+	double res = cpustate->a[ar];
+	int zpi = (op >> 0) & 0x7f;
 	if (ZFLAG)
-		res = dau_read_pi_double_1st(OP >> 7, 0);
+		res = dau_read_pi_double_1st(cpustate, op >> 7, 0);
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_noflags(ar, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_noflags(cpustate, ar, res);
 }
 
 
-static void d5_ifagt(void)
+static void d5_ifagt(dsp32_state *cpustate, UINT32 op)
 {
-	int ar = (OP >> 21) & 3;
-	double res = dsp32.a[ar];
-	int zpi = (OP >> 0) & 0x7f;
+	int ar = (op >> 21) & 3;
+	double res = cpustate->a[ar];
+	int zpi = (op >> 0) & 0x7f;
 	if (!NFLAG && !ZFLAG)
-		res = dau_read_pi_double_1st(OP >> 7, 0);
+		res = dau_read_pi_double_1st(cpustate, op >> 7, 0);
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_noflags(ar, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_noflags(cpustate, ar, res);
 }
 
 
-static void d5_float24(void)
+static void d5_float24(dsp32_state *cpustate, UINT32 op)
 {
-	double res = (double)((INT32)(dau_read_pi_4bytes(OP >> 7) << 8) >> 8);
-	int zpi = (OP >> 0) & 0x7f;
+	double res = (double)((INT32)(dau_read_pi_4bytes(cpustate, op >> 7) << 8) >> 8);
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_double(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, res);
+		dau_write_pi_double(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, res);
 }
 
 
-static void d5_int24(void)
+static void d5_int24(dsp32_state *cpustate, UINT32 op)
 {
-	double val = dau_read_pi_double_1st(OP >> 7, 0);
-	int zpi = (OP >> 0) & 0x7f;
+	double val = dau_read_pi_double_1st(cpustate, op >> 7, 0);
+	int zpi = (op >> 0) & 0x7f;
 	INT32 res;
-	if (!(dsp32.DAUC & 0x10)) val = floor(val + 0.5);
+	if (!(cpustate->DAUC & 0x10)) val = floor(val + 0.5);
 	else val = ceil(val - 0.5);
 	res = (INT32)val;
 	if (res > 0x7fffff) res = 0x7fffff;
 	else if (res < -0x800000) res = -0x800000;
 	if (zpi != 7)
-		dau_write_pi_4bytes(zpi, (INT32)(res << 8) >> 8);
-	dau_set_val_noflags((OP >> 21) & 3, dsp_to_double(res << 8));
+		dau_write_pi_4bytes(cpustate, zpi, (INT32)(res << 8) >> 8);
+	dau_set_val_noflags(cpustate, (op >> 21) & 3, dsp_to_double(res << 8));
 }
 
 
-static void d5_ieee(void)
+static void d5_ieee(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d5_dsp(void)
+static void d5_dsp(dsp32_state *cpustate, UINT32 op)
 {
-	unimplemented();
+	unimplemented(cpustate, op);
 }
 
 
-static void d5_seed(void)
+static void d5_seed(dsp32_state *cpustate, UINT32 op)
 {
-	UINT32 val = dau_read_pi_4bytes(OP >> 7);
+	UINT32 val = dau_read_pi_4bytes(cpustate, op >> 7);
 	INT32 res = val ^ 0x7fffffff;
-	int zpi = (OP >> 0) & 0x7f;
+	int zpi = (op >> 0) & 0x7f;
 	if (zpi != 7)
-		dau_write_pi_4bytes(zpi, res);
-	dau_set_val_flags((OP >> 21) & 3, dsp_to_double((INT32)res));
+		dau_write_pi_4bytes(cpustate, zpi, res);
+	dau_set_val_flags(cpustate, (op >> 21) & 3, dsp_to_double((INT32)res));
 }
 
 
@@ -2503,7 +2475,7 @@ static void d5_seed(void)
     FUNCTION TABLE
 ***************************************************************************/
 
-void (*const dsp32ops[])(void) =
+void (*const dsp32ops[])(dsp32_state *cpustate, UINT32 op) =
 {
 	nop,		goto_t,		goto_pl,	goto_mi,	goto_ne,	goto_eq,	goto_vc,	goto_vs,	/* 00 */
 	goto_cc,	goto_cs,	goto_ge,	goto_lt,	goto_gt,	goto_le,	goto_hi,	goto_ls,
@@ -2799,69 +2771,69 @@ void (*const dsp32ops[])(void) =
 
     Most common OPs in Race Drivin':
 
-301681217 - OP   0 - nop
-164890391 - OP 4A1 - adde_si
-99210113 - OP 661 - load24
-86010010 - OP  F7 - load_er
-61148739 - OP 4D4 - sube_di
-52693763 - OP 180 - d1_0px
-41525754 - OP  FF - store_er
-35033321 - OP 380 - d3_aMpp
-31621151 - OP 4C0 - adde_ss
-28076244 - OP 660 - load24
-19190505 - OP 4C1 - mul2e_s
-13270852 - OP  F5 - load_r
-12535169 - OP 1A4 - d1_1pm
-12265141 - OP 4C4 - sube_ss
-10748211 - OP 4CD - div2e_s
-10493660 - OP  FD - store_r
- 9721263 - OP 189
- 9415685 - OP 3C8
- 9294148 - OP 3D5
- 8887846 - OP 1A1
- 8788648 - OP 381
- 8185239 - OP 300
- 7241256 - OP 383
- 6877349 - OP 4A3
- 6832295 - OP 181
- 6601270 - OP 3E8
- 6562483 - OP 4A4
- 6553514 - OP 3C9
- 6270430 - OP 280
- 6041485 - OP 1A0
- 5299529 - OP 304
- 5110926 - OP 382
- 4922253 - OP 363
- 4603670 - OP 4D7
- 4164327 - OP 4AE
- 3980085 - OP 3EC
- 3599198 - OP 3CC
- 3543878 - OP 3D0
- 3489158 - OP   4
- 3463235 - OP 321
- 3335995 - OP 3F9
- 3001546 - OP 4CE
- 2882940 - OP 129
- 2882940 - OP 1A5
- 2882940 - OP 342
- 2841981 - OP 360
- 2663417 - OP  FB
- 2059640 - OP 3ED
- 1867166 - OP 1A8
- 1830789 - OP 305
- 1753312 - OP 301
- 1726866 - OP   5
- 1594991 - OP  12
- 1571286 - OP  19
- 1507644 - OP  A2
- 1418846 - OP 3CD
- 1273134 - OP  F3
- 1177914 - OP 4C7
- 1175720 - OP 188
- 1091848 - OP 3E9
- 1088206 - OP 6FF
- 1088204 - OP 4CA
- 1012639 - OP 101
-  939617 - OP 4C5
+301681217 - op   0 - nop
+164890391 - op 4A1 - adde_si
+99210113 - op 661 - load24
+86010010 - op  F7 - load_er
+61148739 - op 4D4 - sube_di
+52693763 - op 180 - d1_0px
+41525754 - op  FF - store_er
+35033321 - op 380 - d3_aMpp
+31621151 - op 4C0 - adde_ss
+28076244 - op 660 - load24
+19190505 - op 4C1 - mul2e_s
+13270852 - op  F5 - load_r
+12535169 - op 1A4 - d1_1pm
+12265141 - op 4C4 - sube_ss
+10748211 - op 4CD - div2e_s
+10493660 - op  FD - store_r
+ 9721263 - op 189
+ 9415685 - op 3C8
+ 9294148 - op 3D5
+ 8887846 - op 1A1
+ 8788648 - op 381
+ 8185239 - op 300
+ 7241256 - op 383
+ 6877349 - op 4A3
+ 6832295 - op 181
+ 6601270 - op 3E8
+ 6562483 - op 4A4
+ 6553514 - op 3C9
+ 6270430 - op 280
+ 6041485 - op 1A0
+ 5299529 - op 304
+ 5110926 - op 382
+ 4922253 - op 363
+ 4603670 - op 4D7
+ 4164327 - op 4AE
+ 3980085 - op 3EC
+ 3599198 - op 3CC
+ 3543878 - op 3D0
+ 3489158 - op   4
+ 3463235 - op 321
+ 3335995 - op 3F9
+ 3001546 - op 4CE
+ 2882940 - op 129
+ 2882940 - op 1A5
+ 2882940 - op 342
+ 2841981 - op 360
+ 2663417 - op  FB
+ 2059640 - op 3ED
+ 1867166 - op 1A8
+ 1830789 - op 305
+ 1753312 - op 301
+ 1726866 - op   5
+ 1594991 - op  12
+ 1571286 - op  19
+ 1507644 - op  A2
+ 1418846 - op 3CD
+ 1273134 - op  F3
+ 1177914 - op 4C7
+ 1175720 - op 188
+ 1091848 - op 3E9
+ 1088206 - op 6FF
+ 1088204 - op 4CA
+ 1012639 - op 101
+  939617 - op 4C5
 
 */

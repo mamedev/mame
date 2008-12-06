@@ -148,7 +148,7 @@ void asic65_reset(running_machine *machine, int state)
 	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* rom-based means reset and clear states */
-	if (asic65.type == ASIC65_ROMBASED)
+	if (asic65.cpu != NULL)
 		cpu_set_input_line(asic65.cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* otherwise, do it manually */
@@ -185,7 +185,8 @@ static TIMER_CALLBACK( m68k_asic65_deferred_w )
 	asic65.tfull = 1;
 	asic65.cmd = param >> 16;
 	asic65.tdata = param;
-	cpu_set_input_line(asic65.cpu, 0, ASSERT_LINE);
+	if (asic65.cpu != NULL)
+		cpu_set_input_line(asic65.cpu, 0, ASSERT_LINE);
 }
 
 
@@ -482,7 +483,8 @@ static WRITE16_HANDLER( asic65_68k_w )
 static READ16_HANDLER( asic65_68k_r )
 {
 	asic65.tfull = 0;
-	cpu_set_input_line(asic65.cpu, 0, CLEAR_LINE);
+	if (asic65.cpu != NULL)
+		cpu_set_input_line(asic65.cpu, 0, CLEAR_LINE);
 	return asic65.tdata;
 }
 
