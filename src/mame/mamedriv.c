@@ -8373,20 +8373,25 @@ Other Sun games
 	DRIVER( mnumber )	/* (c) 200? M.M. - B.R.L. */
 
 	/* H8/3337 italian gambling games */
-	DRIVER( ntcash )	/* 1999 unknown */
+	DRIVER( ntcash )	/* (c) 1999 unknown */
 	DRIVER( wizard )	/* (c) 1999 A.A. */
-	DRIVER( laser2k1 )	/* 2001 unknown */
-	DRIVER( mdrink )	/* 2001 unknown */
-	DRIVER( te0144 )	/* 2001 unknown */
-	DRIVER( cmagica )	/* 200? unknown */
-	DRIVER( millsun )	/* 200? unknown */
-	DRIVER( sspac2k1 )	/* 200? unknown */
-	DRIVER( elvis )		/* 200? unknown */
+	DRIVER( laser2k1 )	/* (c) 2001 unknown */
+	DRIVER( mdrink )	/* (c) 2001 unknown */
+	DRIVER( te0144 )	/* (c) 2001 unknown */
+	DRIVER( cmagica )	/* (c) 200? unknown */
+	DRIVER( millsun )	/* (c) 200? unknown */
+	DRIVER( sspac2k1 )	/* (c) 200? unknown */
+	DRIVER( elvis )		/* (c) 200? unknown */
 
-	/*Intel 8086-based italian gambling games */
-	DRIVER( newmcard )  /* 19?? unknown */
-	DRIVER( brasil )    /* 2000 unknown */
-	DRIVER( fashion )   /* 2000 unknown */
+	/* Intel 8086-based italian gambling games */
+	DRIVER( newmcard )  /* (c) 19?? unknown */
+	DRIVER( brasil )    /* (c) 2000 unknown */
+	DRIVER( fashion )   /* (c) 2000 unknown */
+
+	/* M68k based italian gambling games */
+	DRIVER( ilpag )     /* (c) 19?? unknown */
+	DRIVER( mil4000 )   /* (c) 2000 Sure Milano */
+	DRIVER( mil4000a )  /* (c) 2000 Sure Milano */
 
 	/* Mitsubishi/Renesas M16/62A italian gambling games */
 	DRIVER( ejollyx5 )	/* (c) 200? Solar Games */

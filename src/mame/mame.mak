@@ -1595,6 +1595,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/hexa.o $(VIDEO)/hexa.o \
 	$(DRIVERS)/homedata.o $(VIDEO)/homedata.o \
 	$(DRIVERS)/hotblock.o \
+	$(DRIVERS)/ilpag.o \
 	$(DRIVERS)/imolagp.o \
 	$(DRIVERS)/intrscti.o \
 	$(DRIVERS)/istellar.o \
@@ -1621,6 +1622,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
 	$(DRIVERS)/micro3d.o \
 	$(DRIVERS)/midas.o \
+	$(DRIVERS)/mil4000.o \
 	$(DRIVERS)/miniboy7.o \
 	$(DRIVERS)/mirage.o \
 	$(DRIVERS)/mirax.o \
