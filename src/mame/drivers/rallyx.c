@@ -1211,6 +1211,36 @@ ROM_START( cottong )
 	ROM_LOAD( "10a.bpr",      0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) /* video timing (not used) */
 ROM_END
 
+ROM_START( locoboot )
+	ROM_REGION( 0x10000, "main", 0 )
+	ROM_LOAD( "g.116",           0x0000, 0x1000, CRC(1248799c) SHA1(b0e513bb7ca6266f9182a91c2a30adc4b414a7ad) )
+	ROM_LOAD( "g.117",           0x1000, 0x1000, CRC(5b5b5753) SHA1(22f7fa0968843b52aa6eac743e5447502c86b10f) )
+	ROM_LOAD( "g.118",           0x2000, 0x1000, CRC(6bc269e1) SHA1(22d2c97e597fb7e6ae9074c8f921c902b879efe8) )
+	ROM_LOAD( "g.119",           0x3000, 0x1000, CRC(3feb762e) SHA1(94ee68549752fac3c67582d968d3f5e3f1380eef) )
+
+	/* no other roms were present in this set,
+	   but it appears to work best with the cottong roms,
+	   and the program roms appear to be a hack of that
+	*/
+
+	ROM_REGION( 0x10000, "tpsound", 0 )
+	ROM_LOAD( "c7",           0x0000, 0x1000, CRC(3d83f6d3) SHA1(e10ed6b6ce7280697c1bc9dbe6c6e6018e1d8be4) )
+	ROM_LOAD( "c8",           0x1000, 0x1000, CRC(323e1937) SHA1(75499d6c8a9032fac090a13cd4f36bd350f52dab) )
+
+	ROM_REGION( 0x2000, "gfx1", ROMREGION_DISPOSE )
+	ROM_LOAD( "c5",           0x0000, 0x1000, CRC(992d079c) SHA1(b5acd30f2e8700cc4cd852b190bd1f4163b137e8) )
+	ROM_LOAD( "c6",           0x1000, 0x1000, CRC(0149ef46) SHA1(58f684a9b7b9410236b3c54ea6c0fa9853a078c5) )
+
+	ROM_REGION( 0x0100, "gfx2", ROMREGION_DISPOSE )
+	ROM_LOAD( "5.bpr",        0x0000, 0x0100, CRC(21fb583f) SHA1(b8c65fbdd5d8b70bf51341cd60fc2efeaab8bb82) ) /* dots */
+
+	ROM_REGION( 0x0160, "proms", 0 )
+	ROM_LOAD( "2.bpr",        0x0000, 0x0020, CRC(26f42e6f) SHA1(f51578216a5d588c4d0143ce7a23d695a15a3914) ) /* palette */
+	ROM_LOAD( "3.bpr",        0x0020, 0x0100, CRC(4aecc0c8) SHA1(3c1086a598d84b4bcb277556b716fd18c76c4364) ) /* loookup table */
+	ROM_LOAD( "7a.bpr",       0x0120, 0x0020, CRC(48c8f094) SHA1(61592209720fddc8991751edf08b6950388af42e) ) /* video layout (not used) */
+	ROM_LOAD( "10a.bpr",      0x0140, 0x0020, CRC(b8861096) SHA1(26fad384ed7a1a1e0ba719b5578e2dbb09334a25) ) /* video timing (not used) */
+ROM_END
+
 ROM_START( commsega )
 	ROM_REGION( 0x10000, "main", 0 )
 	ROM_LOAD( "csega1",       0x0000, 0x1000, CRC(92de3405) SHA1(81ef4274b13f92d6274a0a037d7dc77ba0f67a1b) )
@@ -1248,4 +1278,5 @@ GAME( 1981, tactcan2, tactcian, tactcian, tactcian, 0, ROT90, "[Konami] (Sega li
 GAME( 1982, locomotn, 0,        locomotn, locomotn, 0, ROT90, "Konami (Centuri license)", "Loco-Motion", 0 )
 GAME( 1982, gutangtn, locomotn, locomotn, locomotn, 0, ROT90, "Konami (Sega license)", "Guttang Gottong", 0 )
 GAME( 1982, cottong,  locomotn, locomotn, locomotn, 0, ROT90, "bootleg", "Cotocoto Cottong", 0 )
+GAME( 1982, locoboot, locomotn, locomotn, locomotn, 0, ROT90, "bootleg", "Loco-Motion (bootleg)", 0 )
 GAME( 1983, commsega, 0,        commsega, commsega, 0, ROT90, "Sega", "Commando (Sega)", GAME_IMPERFECT_SOUND )
