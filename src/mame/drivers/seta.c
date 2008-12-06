@@ -2058,6 +2058,34 @@ static ADDRESS_MAP_START( wrofaero_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf00000, 0xf00001) AM_WRITE(SMH_NOP						)	// ? Sound  IRQ Ack
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( jjsquawb_writemem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x1fffff) AM_WRITE(SMH_ROM						)	// ROM (up to 2MB)
+	AM_RANGE(0x200000, 0x20ffff) AM_WRITE(SMH_RAM) AM_BASE(&seta_workram		)	// RAM (pointer for zombraid crosshair hack)
+	AM_RANGE(0x210000, 0x21ffff) AM_WRITE(SMH_RAM						)	// RAM (gundhara)
+	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(SMH_RAM						)	// RAM (wrofaero only?)
+	AM_RANGE(0x500000, 0x500005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
+	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(SMH_RAM						)	// RZ: (rezon,jjsquawk)
+	AM_RANGE(0x70b400, 0x70bfff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
+	AM_RANGE(0x701000, 0x70ffff) AM_WRITE(SMH_RAM						)	//
+	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
+	AM_RANGE(0x804000, 0x80ffff) AM_WRITE(SMH_RAM						)	// (jjsquawk)
+	AM_RANGE(0x880000, 0x883fff) AM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2	)	// VRAM 2
+	AM_RANGE(0x884000, 0x88ffff) AM_WRITE(SMH_RAM						)	// (jjsquawk)
+	AM_RANGE(0x900000, 0x900005) AM_WRITE(SMH_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM 0&1 Ctrl
+	AM_RANGE(0x980000, 0x980005) AM_WRITE(SMH_RAM) AM_BASE(&seta_vctrl_2		)	// VRAM 2&3 Ctrl
+	AM_RANGE(0xa0a000, 0xa0a607) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16		)	// RZ: Sprites Y
+	AM_RANGE(0xa80000, 0xa80001) AM_WRITE(SMH_RAM						)	// ? 0x4000
+	AM_RANGE(0xb0c000, 0xb0ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2		)	// RZ: Sprites Code + X + Attr
+	AM_RANGE(0xc00000, 0xc03fff) AM_WRITE(seta_sound_word_w				)	// Sound
+#if __uPD71054_TIMER
+	AM_RANGE(0xd00000, 0xd00007) AM_WRITE(timer_regs_w					)	// ?
+#else
+	AM_RANGE(0xd00000, 0xd00007) AM_WRITE(SMH_NOP						)	// ?
+#endif
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE(SMH_NOP						)	// ? VBlank IRQ Ack
+	AM_RANGE(0xf00000, 0xf00001) AM_WRITE(SMH_NOP						)	// ? Sound  IRQ Ack
+ADDRESS_MAP_END
+
 /***************************************************************************
         orbs
 ***************************************************************************/
@@ -7422,6 +7450,37 @@ static MACHINE_DRIVER_START( jjsquawk )
 	MDRV_SOUND_ROUTE(1, "right", 1.0)
 MACHINE_DRIVER_END
 
+static MACHINE_DRIVER_START( jjsquawb )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("main", M68000, 16000000)	/* 16 MHz */
+	MDRV_CPU_PROGRAM_MAP(wrofaero_readmem,jjsquawb_writemem)
+	MDRV_CPU_VBLANK_INT_HACK(seta_interrupt_1_and_2,SETA_INTERRUPTS_NUM)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("main", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
+
+	MDRV_GFXDECODE(jjsquawk)
+	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+
+	MDRV_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
+	MDRV_VIDEO_START(seta_2_layers)
+	MDRV_VIDEO_UPDATE(seta)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("left", "right")
+
+	MDRV_SOUND_ADD("x1", X1_010, 16000000)	/* 16 MHz */
+	MDRV_SOUND_CONFIG(seta_sound_intf)
+	MDRV_SOUND_ROUTE(0, "left", 1.0)
+	MDRV_SOUND_ROUTE(1, "right", 1.0)
+MACHINE_DRIVER_END
+
 /***************************************************************************
                 (Kamen) Masked Riders Club Battle Race
 ***************************************************************************/
@@ -8942,6 +9001,31 @@ ROM_START( jjsquawk )
 	ROM_LOAD( "jj-rom6.040", 0x080000, 0x080000, CRC(9df1e478) SHA1(f41b55821187b417ad09e4a1f439c01a107d2674) )
 ROM_END
 
+ROM_START( jjsquawb )
+	ROM_REGION( 0x200000, "main", 0 )		/* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "3", 0x000000, 0x080000, CRC(afd5bd07) SHA1(eee231f596ce5cb9bbf41c7c9e18c11a399d7dfd) )
+	ROM_LOAD16_WORD_SWAP( "2", 0x100000, 0x080000, CRC(740a7366) SHA1(2539f9a9b4fed1a1e2c354d144b8d455ed4bc144) )
+
+	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
+	ROM_LOAD( "jj-rom9",  0x000000, 0x080000, CRC(27441cd3) SHA1(5867fc30c158e07f2d36ecab97b1d304383e6f35) )
+	ROM_LOAD( "jj-rom10", 0x080000, 0x080000, CRC(ca2b42c4) SHA1(9b99b6618fe44a6c29a255e89dab72a0a56214df) )
+	ROM_LOAD( "jj-rom7",  0x100000, 0x080000, CRC(62c45658) SHA1(82b1ea138e8f4b4ade7e44b31843aa2023c9dd71) )
+	ROM_LOAD( "jj-rom8",  0x180000, 0x080000, CRC(2690c57b) SHA1(b880ded7715dffe12c4fea7ad7cb9c5133b73250) )
+
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 1 */
+	ROM_LOAD       ( "jj-rom11",    0x000000, 0x080000, CRC(98b9f4b4) SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) )
+	ROM_LOAD       ( "jj-rom12",    0x080000, 0x080000, CRC(d4aa916c) SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) )
+	ROM_LOAD16_BYTE( "jj-rom3.040", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) )
+
+	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 2 */
+	ROM_LOAD       ( "jj-rom14",    0x000000, 0x080000, CRC(274bbb48) SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) )
+	ROM_LOAD       ( "jj-rom13",    0x080000, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) )
+	ROM_LOAD16_BYTE( "jj-rom4.040", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
+
+	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
+	ROM_LOAD( "1", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* jj-rom5.040 + jj-rom6.040 from parent*/
+ROM_END
+
 ROM_START( kamenrid )
 	ROM_REGION( 0x080000, "main", 0 )		/* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "fj001003.25", 0x000000, 0x080000, CRC(9b65d1b9) SHA1(a9183f817dbd1721cbb1a9049ca2bfc6acdf9f4a) )
@@ -9573,6 +9657,7 @@ GAME( 1992, zingzip,  0,        zingzip,  zingzip,  0,        ROT270, "Allumer +
 GAME( 1993, atehate,  0,        atehate,  atehate,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 GAME( 1993, daioh,    0,        daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh", 0 )
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", 0 )
+GAME( 1993, jjsquawb, jjsquawk, jjsquawb, jjsquawk, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_NOT_WORKING )
 GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, 0,        ROT0,   "Toei / Banpresto",       "Masked Riders Club Battle Race", 0 )
 GAME( 1993, madshark, 0,        madshark, madshark, 0,        ROT270, "Allumer",                "Mad Shark", 0 )
 GAME( 1993, msgundam, 0,        msgundam, msgundam, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
