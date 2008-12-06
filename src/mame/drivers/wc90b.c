@@ -468,7 +468,7 @@ ROM_END
 ROM_START( wc90b2 )
 	ROM_REGION( 0x20000, "main", 0 )
 	ROM_LOAD( "3.bin",        0x00000, 0x10000, CRC(1e6e94c9) SHA1(1731e3e3b5d17ba676a7e42638d7206212a0080d) )
-	ROM_LOAD( "a03.bin",      0x10000, 0x10000, CRC(f54ff17a) SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) )
+	ROM_LOAD( "a03.bin",      0x10000, 0x10000, BAD_DUMP SHA1(a19850fc28a5a0da20795a5cc6b56d9c16554bce) ) /* for now roms from parent */
 
 	ROM_REGION( 0x20000, "sub", 0 )  /* Second CPU */
 	ROM_LOAD( "a04.bin",      0x00000, 0x10000, CRC(3d535e2f) SHA1(f1e1878b5a8316e770c74a1e1f29a7a81a4e5dfe) )	/* c000-ffff is not used */
@@ -479,16 +479,20 @@ ROM_START( wc90b2 )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
-	ROM_LOAD( "a06.bin",      0x000000, 0x04000, CRC(3b5387b7) SHA1(b839b4eafe8bf6f9e841e19fee1bdb64a66f3448) )
-	ROM_LOAD( "a08.bin",      0x004000, 0x04000, CRC(c622a5a3) SHA1(468c8c24af1f6f244228b66df04cb0ea81c1875e) )
-	ROM_LOAD( "a10.bin",      0x008000, 0x04000, CRC(0923d9f6) SHA1(4b10ee3fc17bb63cda51b2a978d066b6a140a551) )
-	ROM_LOAD( "a20.bin",      0x00c000, 0x04000, CRC(b8dec83e) SHA1(fe617ddccdd0dbd05ca09a1507074aa14b529322) )
+//	ROM_LOAD( "18.bin",       0x000000, 0x04000, CRC(0c054481) SHA1(eebab099a4db5fbf13522ecd67bfa741e16e40d4) ) /* maybe bad dump: double size */
+//	ROM_LOAD( "19.bin",       0x004000, 0x04000, CRC(ebb3eb48) SHA1(9cb133e02004bc04a9d7016b8cf5f6865e3ccf26) ) /* maybe bad dump: double size */
+//	ROM_LOAD( "20.bin",       0x008000, 0x04000, CRC(c0232af8) SHA1(5bbab00403a47feae153e179c04212021036b8a7) ) /* maybe bad dump: double size */
+//	ROM_LOAD( "21.bin",       0x00c000, 0x04000, CRC(a36e17fb) SHA1(45e4df4b4a22658f6dad21853e87fae734698fbd) ) /* maybe bad dump: double size */
+	ROM_LOAD( "a06.bin",      0x000000, 0x04000, BAD_DUMP SHA1(b839b4eafe8bf6f9e841e19fee1bdb64a66f3448) ) /* roms from parent */
+	ROM_LOAD( "a08.bin",      0x004000, 0x04000, BAD_DUMP SHA1(468c8c24af1f6f244228b66df04cb0ea81c1875e) ) /* roms from parent */
+	ROM_LOAD( "a10.bin",      0x008000, 0x04000, BAD_DUMP SHA1(4b10ee3fc17bb63cda51b2a978d066b6a140a551) ) /* roms from parent */
+	ROM_LOAD( "a20.bin",      0x00c000, 0x04000, BAD_DUMP SHA1(fe617ddccdd0dbd05ca09a1507074aa14b529322) ) /* roms from parent */
 
 	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "a07.bin",      0x000000, 0x20000, CRC(38c31817) SHA1(cb24ed8702d62066366924c033c07ffc78bd1fad) )
-	ROM_LOAD( "a09.bin",      0x020000, 0x20000, CRC(32e39e29) SHA1(44f22ed6c983541c7fea5857ba0456aaa87b36d1) )
-	ROM_LOAD( "a11.bin",      0x040000, 0x20000, CRC(5ccec796) SHA1(2cc191a4267819eb31962726e2ed4567c825c39e) )
-	ROM_LOAD( "a21.bin",      0x060000, 0x20000, CRC(0c54a091) SHA1(3eecb285b5a7bbc310c87492516d7ffb2841aa3b) )
+	ROM_LOAD( "a07.bin",      0x000000, 0x20000, BAD_DUMP SHA1(cb24ed8702d62066366924c033c07ffc78bd1fad) ) /* for now roms from parent */
+	ROM_LOAD( "a09.bin",      0x020000, 0x20000, BAD_DUMP SHA1(44f22ed6c983541c7fea5857ba0456aaa87b36d1) ) /* for now roms from parent */
+	ROM_LOAD( "a11.bin",      0x040000, 0x20000, BAD_DUMP SHA1(2cc191a4267819eb31962726e2ed4567c825c39e) ) /* for now roms from parent */
+	ROM_LOAD( "a21.bin",      0x060000, 0x20000, BAD_DUMP SHA1(3eecb285b5a7bbc310c87492516d7ffb2841aa3b) ) /* for now roms from parent */
 
 	ROM_REGION( 0x080000, "gfx3", ROMREGION_DISPOSE | ROMREGION_INVERT )
 	ROM_LOAD( "146_a12.bin",  0x000000, 0x10000, CRC(d5a60096) SHA1(a8e351a4b020b4fc2b2cb7d3f0fdfb43fc44d7d9) )
