@@ -707,11 +707,11 @@ static void reset_reset(running_machine *machine)
 	prev_resetcontrol = resetcontrol;
 }
 
-static void resetcontrol_w(UINT8 data)
+static void resetcontrol_w(const address_space *space, UINT8 data)
 {
 	resetcontrol = data;
-	logerror("Reset control %02x (%d:%x)\n", resetcontrol, cpunum_get_active(), cpu_get_pc(Machine->activecpu));
-	reset_reset(Machine);
+	logerror("Reset control %02x ('%s':%x)\n", resetcontrol, space->cpu, cpu_get_pc(space->cpu));
+	reset_reset(space->machine);
 }
 
 

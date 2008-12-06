@@ -610,7 +610,7 @@ WRITE8_HANDLER( namcos1_cpu_control_w )
 
 WRITE8_HANDLER( namcos1_watchdog_w )
 {
-	wdog |= 1 << (cpunum_get_active());
+	wdog |= 1 << cpu_get_index(space->cpu);
 	if (wdog == 7 || !namcos1_reset)
 	{
 		wdog = 0;
@@ -748,7 +748,7 @@ WRITE8_HANDLER( namcos1_bankswitch_w )
 {
 //  logerror("cpu %s: namcos1_bankswitch_w offset %04x data %02x\n", space->cpu->tag, offset, data);
 
-	namcos1_bankswitch(space->machine, cpunum_get_active(), offset, data);
+	namcos1_bankswitch(space->machine, (space->cpu == space->machine->cpu[0]) ? 0 : 1, offset, data);
 }
 
 /* Sub cpu set start bank port */

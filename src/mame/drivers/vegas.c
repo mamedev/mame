@@ -2230,6 +2230,7 @@ static MACHINE_DRIVER_START( vegascore )
 	MDRV_NVRAM_HANDLER(timekeeper_save)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MDRV_IDE_BUS_MASTER_SPACE("main", PROGRAM)
 
 	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
 

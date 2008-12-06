@@ -67,8 +67,8 @@ void hdsnd_init(running_machine *machine)
 
 static void update_68k_interrupts(running_machine *machine)
 {
-	cpu_set_input_line(machine->cpu[hdcpu_sound], 1, mainflag ? ASSERT_LINE : CLEAR_LINE);
-	cpu_set_input_line(machine->cpu[hdcpu_sound], 3, irq68k   ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(hdcpu_sound, 1, mainflag ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(hdcpu_sound, 3, irq68k   ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -110,8 +110,8 @@ WRITE16_HANDLER( hd68k_snd_data_w )
 
 WRITE16_HANDLER( hd68k_snd_reset_w )
 {
-	cpu_set_input_line(space->machine->cpu[hdcpu_sound], INPUT_LINE_RESET, ASSERT_LINE);
-	cpu_set_input_line(space->machine->cpu[hdcpu_sound], INPUT_LINE_RESET, CLEAR_LINE);
+	cpu_set_input_line(hdcpu_sound, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(hdcpu_sound, INPUT_LINE_RESET, CLEAR_LINE);
 	mainflag = soundflag = 0;
 	update_68k_interrupts(space->machine);
 	logerror("%06X:Reset sound\n", cpu_get_previouspc(space->cpu));
@@ -213,8 +213,8 @@ WRITE16_HANDLER( hdsnd68k_latches_w )
 
 		case 4:	/* RES320 */
 			logerror("%06X:RES320=%d\n", cpu_get_previouspc(space->cpu), data);
-			if (hdcpu_sounddsp != -1)
-				cpu_set_input_line(space->machine->cpu[hdcpu_sounddsp], INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
+			if (hdcpu_sounddsp != NULL)
+				cpu_set_input_line(hdcpu_sounddsp, INPUT_LINE_HALT, data ? CLEAR_LINE : ASSERT_LINE);
 			break;
 
 		case 7:	/* LED */
@@ -257,7 +257,7 @@ WRITE16_HANDLER( hdsnd68k_320ram_w )
 
 READ16_HANDLER( hdsnd68k_320ports_r )
 {
-	const address_space *iospace = cpu_get_address_space(space->machine->cpu[hdcpu_sounddsp], ADDRESS_SPACE_IO);
+	const address_space *iospace = cpu_get_address_space(hdcpu_sounddsp, ADDRESS_SPACE_IO);
 	UINT16 result;
 	cpu_push_context(iospace->cpu);
 	result = memory_read_word(iospace, (offset & 7) << 1);
@@ -268,8 +268,8 @@ READ16_HANDLER( hdsnd68k_320ports_r )
 
 WRITE16_HANDLER( hdsnd68k_320ports_w )
 {
-	const address_space *iospace = cpu_get_address_space(space->machine->cpu[hdcpu_sounddsp], ADDRESS_SPACE_IO);
-	cpu_push_context(iospace->machine->cpu[hdcpu_sounddsp]);
+	const address_space *iospace = cpu_get_address_space(hdcpu_sounddsp, ADDRESS_SPACE_IO);
+	cpu_push_context(hdcpu_sounddsp);
 	memory_write_word(iospace, (offset & 7) << 1, data);
 	cpu_pop_context();
 }

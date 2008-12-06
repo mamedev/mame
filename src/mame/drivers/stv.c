@@ -487,11 +487,11 @@ static UINT8 stv_SMPC_r8 (running_machine *machine, int offset)
 	return return_data;
 }
 
-static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
+static void stv_SMPC_w8 (const address_space *space, int offset, UINT8 data)
 {
 	mame_system_time systime;
 
-	mame_get_base_datetime(machine, &systime);
+	mame_get_base_datetime(space->machine, &systime);
 
 //  if(LOG_SMPC) logerror ("8-bit SMPC Write to Offset %02x with Data %02x\n", offset, data);
 	smpc_ram[offset] = data;
@@ -523,13 +523,13 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 		if(!(smpc_ram[0x77] & 0x10))
 		{
 			if(LOG_SMPC) logerror("SMPC: M68k on\n");
-			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
 			en_68k = 1;
 		}
 		else
 		{
 			if(LOG_SMPC) logerror("SMPC: M68k off\n");
-			cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
+			cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, ASSERT_LINE);
 			en_68k = 0;
 		}
 		//if(LOG_SMPC) logerror("SMPC: ram [0x77] = %02x\n",smpc_ram[0x77]);
@@ -558,7 +558,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 		if(EXLE1 || EXLE2)
 		{
 			//if(LOG_SMPC) logerror ("Interrupt: PAD irq at scanline %04x, Vector 0x48 Level 0x08\n",scanline);
-			cpu_set_input_line_and_vector(machine->cpu[0], 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
+			cpu_set_input_line_and_vector(space->machine->cpu[0], 8, (stv_irq.pad) ? HOLD_LINE : CLEAR_LINE, 0x48);
 		}
 	}
 
@@ -576,21 +576,21 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				smpc_ram[0x5f]=0x02;
 				#if USE_SLAVE
 				stv_enable_slave_sh2 = 1;
-				cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 				#endif
 				break;
 			case 0x03:
 				if(LOG_SMPC) logerror ("SMPC: Slave OFF\n");
 				smpc_ram[0x5f]=0x03;
 				stv_enable_slave_sh2 = 0;
-				cpuexec_trigger(machine, 1000);
-				cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+				cpuexec_trigger(space->machine, 1000);
+				cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 				break;
 			case 0x06:
 				if(LOG_SMPC) logerror ("SMPC: Sound ON\n");
 				/* wrong? */
 				smpc_ram[0x5f]=0x06;
-				cpu_set_input_line(machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
+				cpu_set_input_line(space->machine->cpu[2], INPUT_LINE_RESET, CLEAR_LINE);
 				break;
 			case 0x07:
 				if(LOG_SMPC) logerror ("SMPC: Sound OFF\n");
@@ -602,24 +602,24 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 			case 0x0d:
 				if(LOG_SMPC) logerror ("SMPC: System Reset\n");
 				smpc_ram[0x5f]=0x0d;
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 				system_reset();
 				break;
 			case 0x0e:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 352\n");
 				smpc_ram[0x5f]=0x0e;
-				cpu_set_clock(machine->cpu[0], MASTER_CLOCK_352/2);
-				cpu_set_clock(machine->cpu[1], MASTER_CLOCK_352/2);
-				cpu_set_clock(machine->cpu[2], MASTER_CLOCK_352/5);
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				cpu_set_clock(space->machine->cpu[0], MASTER_CLOCK_352/2);
+				cpu_set_clock(space->machine->cpu[1], MASTER_CLOCK_352/2);
+				cpu_set_clock(space->machine->cpu[2], MASTER_CLOCK_352/5);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			case 0x0f:
 				if(LOG_SMPC) logerror ("SMPC: Change Clock to 320\n");
 				smpc_ram[0x5f]=0x0f;
-				cpu_set_clock(machine->cpu[0], MASTER_CLOCK_320/2);
-				cpu_set_clock(machine->cpu[1], MASTER_CLOCK_320/2);
-				cpu_set_clock(machine->cpu[2], MASTER_CLOCK_320/5);
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
+				cpu_set_clock(space->machine->cpu[0], MASTER_CLOCK_320/2);
+				cpu_set_clock(space->machine->cpu[1], MASTER_CLOCK_320/2);
+				cpu_set_clock(space->machine->cpu[2], MASTER_CLOCK_320/5);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE); // ff said this causes nmi, should we set a timer then nmi?
 				break;
 			/*"Interrupt Back"*/
 			case 0x10:
@@ -636,7 +636,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 
 				smpc_ram[0x31]=0x00;  //?
 
-				//smpc_ram[0x33]=input_port_read(machine, "FAKE");
+				//smpc_ram[0x33]=input_port_read(space->machine, "FAKE");
 
 				smpc_ram[0x35]=0x00;
 				smpc_ram[0x37]=0x00;
@@ -665,7 +665,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				/*System Manager(SMPC) irq*/
 				{
 					//if(LOG_SMPC) logerror ("Interrupt: System Manager (SMPC) at scanline %04x, Vector 0x47 Level 0x08\n",scanline);
-					cpu_set_input_line_and_vector(machine->cpu[0], 8, (stv_irq.smpc) ? HOLD_LINE : CLEAR_LINE, 0x47);
+					cpu_set_input_line_and_vector(space->machine->cpu[0], 8, (stv_irq.smpc) ? HOLD_LINE : CLEAR_LINE, 0x47);
 				}
 			break;
 			/* RTC write*/
@@ -689,7 +689,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				if(LOG_SMPC) logerror ("SMPC: NMI request\n");
 				smpc_ram[0x5f]=0x18;
 				/*NMI is unconditionally requested?*/
-				cpu_set_input_line(machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
+				cpu_set_input_line(space->machine->cpu[0], INPUT_LINE_NMI, PULSE_LINE);
 				break;
 			case 0x19:
 				if(LOG_SMPC) logerror ("SMPC: NMI Enable\n");
@@ -704,7 +704,7 @@ static void stv_SMPC_w8 (running_machine *machine, int offset, UINT8 data)
 				smpc_ram[0x21] = (0x80) | ((NMI_reset & 1) << 6);
 				break;
 			default:
-				if(LOG_SMPC) logerror ("cpu #%d (PC=%08X) SMPC: undocumented Command %02x\n", cpunum_get_active(), cpu_get_pc(machine->activecpu), data);
+				if(LOG_SMPC) logerror ("cpu '%s' (PC=%08X) SMPC: undocumented Command %02x\n", space->cpu->tag, cpu_get_pc(space->cpu), data);
 		}
 
 		// we've processed the command, clear status flag
@@ -746,7 +746,7 @@ static WRITE32_HANDLER ( stv_SMPC_w32 )
 
 	offset += byte;
 
-	stv_SMPC_w8(space->machine, offset,writedata);
+	stv_SMPC_w8(space, offset,writedata);
 }
 
 /*

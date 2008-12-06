@@ -321,8 +321,8 @@ struct _dcs_state
 	UINT16 		progflags;
 	void		(*output_full_cb)(int);
 	void		(*input_empty_cb)(int);
-	UINT16		(*fifo_data_r)(void);
-	UINT16		(*fifo_status_r)(void);
+	UINT16		(*fifo_data_r)(const device_config *device);
+	UINT16		(*fifo_status_r)(const device_config *device);
 
 	/* timers */
 	UINT8		timer_enable;
@@ -1471,7 +1471,7 @@ void dcs_set_io_callbacks(void (*output_full_cb)(int), void (*input_empty_cb)(in
 }
 
 
-void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(void), UINT16 (*fifo_status_r)(void))
+void dcs_set_fifo_callbacks(UINT16 (*fifo_data_r)(const device_config *device), UINT16 (*fifo_status_r)(const device_config *device))
 {
 	dcs.fifo_data_r = fifo_data_r;
 	dcs.fifo_status_r = fifo_status_r;
@@ -1513,7 +1513,7 @@ static READ16_HANDLER( latch_status_r )
 	if (IS_OUTPUT_EMPTY())
 		result |= 0x40;
 	if (dcs.fifo_status_r != NULL && (!transfer.hle_enabled || transfer.state == 0))
-		result |= (*dcs.fifo_status_r)() & 0x38;
+		result |= (*dcs.fifo_status_r)(NULL) & 0x38;
 	if (transfer.hle_enabled && transfer.state != 0)
 		result |= 0x08;
 	return result;
@@ -1523,7 +1523,7 @@ static READ16_HANDLER( latch_status_r )
 static READ16_HANDLER( fifo_input_r )
 {
 	if (dcs.fifo_data_r)
-		return (*dcs.fifo_data_r)();
+		return (*dcs.fifo_data_r)(NULL);
 	else
 		return 0xffff;
 }
@@ -2068,7 +2068,7 @@ void dcs_fifo_notify(int count, int max)
 	if (transfer.state != 5 || transfer.fifo_entries == transfer.writes_left || transfer.fifo_entries >= 256)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(Machine, (*dcs.fifo_data_r)());
+			preprocess_write(Machine, (*dcs.fifo_data_r)(NULL));
 	}
 }
 
@@ -2080,7 +2080,7 @@ static TIMER_CALLBACK( transfer_watchdog_callback )
 	if (transfer.fifo_entries && starting_writes_left == transfer.writes_left)
 	{
 		for ( ; transfer.fifo_entries; transfer.fifo_entries--)
-			preprocess_write(machine, (*dcs.fifo_data_r)());
+			preprocess_write(machine, (*dcs.fifo_data_r)(NULL));
 	}
 	timer_adjust_oneshot(transfer.watchdog, ATTOTIME_IN_MSEC(1), transfer.writes_left);
 }

@@ -26,14 +26,14 @@ WRITE16_HANDLER( system24temp_sys16_shared_ram_w )
 
 static UINT8  (*system24temp_sys16_io_io_r)(running_machine *machine, int port);
 static void   (*system24temp_sys16_io_io_w)(running_machine *machine, int port, UINT8 data);
-static void   (*system24temp_sys16_io_cnt_w)(UINT8 data);
+static void   (*system24temp_sys16_io_cnt_w)(const address_space *space, UINT8 data);
 static READ16_HANDLER ((*system24temp_sys16_io_iod_r));
 static WRITE16_HANDLER((*system24temp_sys16_io_iod_w));
 static UINT8 system24temp_sys16_io_cnt, system24temp_sys16_io_dir;
 
 void system24temp_sys16_io_set_callbacks(UINT8 (*io_r)(running_machine *machine, int port),
 							  void  (*io_w)(running_machine *machine, int port, UINT8 data),
-							  void  (*cnt_w)(UINT8 data),
+							  void  (*cnt_w)(const address_space *space, UINT8 data),
 							  READ16_HANDLER ((*iod_r)),
 							  WRITE16_HANDLER((*iod_w)))
 {
@@ -94,7 +94,7 @@ WRITE16_HANDLER( system24temp_sys16_io_w )
 			case 0xe:
 				system24temp_sys16_io_cnt = data;
 				if(system24temp_sys16_io_cnt_w)
-					system24temp_sys16_io_cnt_w(data & 7);
+					system24temp_sys16_io_cnt_w(space, data & 7);
 				break;
 			case 0xf:
 				system24temp_sys16_io_dir = data;

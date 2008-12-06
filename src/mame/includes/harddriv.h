@@ -8,14 +8,14 @@
 
 /*----------- defined in machine/harddriv.c -----------*/
 
-extern INT8 hdcpu_main;
-extern INT8 hdcpu_gsp;
-extern INT8 hdcpu_msp;
-extern INT8 hdcpu_adsp;
-extern INT8 hdcpu_sound;
-extern INT8 hdcpu_sounddsp;
-extern INT8 hdcpu_jsa;
-extern INT8 hdcpu_dsp32;
+extern const device_config *hdcpu_main;
+extern const device_config *hdcpu_gsp;
+extern const device_config *hdcpu_msp;
+extern const device_config *hdcpu_adsp;
+extern const device_config *hdcpu_sound;
+extern const device_config *hdcpu_sounddsp;
+extern const device_config *hdcpu_jsa;
+extern const device_config *hdcpu_dsp32;
 
 extern UINT8 hd34010_host_access;
 extern UINT8 hddsk_pio_access;

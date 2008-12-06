@@ -125,7 +125,6 @@ static void sp_dma(int direction)
 {
 	UINT8 *src, *dst;
 	int i, c;
-	//int cpu = cpunum_get_active();
 
 	if (sp_dma_length == 0)
 	{

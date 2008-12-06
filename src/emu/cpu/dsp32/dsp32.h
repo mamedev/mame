@@ -81,7 +81,7 @@ struct _dsp32_config
 
 extern CPU_GET_INFO( dsp32c );
 
-extern void dsp32c_pio_w(int cpunum, int reg, int data);
-extern int dsp32c_pio_r(int cpunum, int reg);
+extern void dsp32c_pio_w(const device_config *device, int reg, int data);
+extern int dsp32c_pio_r(const device_config *device, int reg);
 
 #endif /* __DSP32_H__ */

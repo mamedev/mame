@@ -70,7 +70,7 @@ struct ioasic_state
 	UINT32	reg[16];
 	UINT8	has_dcs;
 	UINT8	has_cage;
-	UINT8	dcs_cpu;
+	const device_config *dcs_cpu;
 	UINT8	shuffle_type;
 	UINT8	shuffle_active;
 	const UINT8 *	shuffle_map;
@@ -558,8 +558,8 @@ enum
 	IOASIC_INTCTL		/* f: interrupt control */
 };
 
-static UINT16 ioasic_fifo_r(void);
-static UINT16 ioasic_fifo_status_r(void);
+static UINT16 ioasic_fifo_r(const device_config *device);
+static UINT16 ioasic_fifo_status_r(const device_config *device);
 static void ioasic_input_empty(int state);
 static void ioasic_output_full(int state);
 static void update_ioasic_irq(running_machine *machine);
@@ -600,13 +600,13 @@ void midway_ioasic_init(running_machine *machine, int shuffle, int upper, int ye
 	ioasic_register_state(machine);
 
 	/* do we have a DCS2 sound chip connected? (most likely) */
-	ioasic.has_dcs = (mame_find_cpu_index(machine, "dcs2") != -1 || mame_find_cpu_index(machine, "dsio") != -1 || mame_find_cpu_index(machine, "denver") != -1);
-	ioasic.has_cage = (mame_find_cpu_index(machine, "cage") != -1);
-	ioasic.dcs_cpu = mame_find_cpu_index(machine, "dcs2");
-	if (ioasic.dcs_cpu == (UINT8)-1)
-		ioasic.dcs_cpu = mame_find_cpu_index(machine, "dsio");
-	if (ioasic.dcs_cpu == (UINT8)-1)
-		ioasic.dcs_cpu = mame_find_cpu_index(machine, "denver");
+	ioasic.has_dcs = (cputag_get_cpu(machine, "dcs2") != NULL || cputag_get_cpu(machine, "dsio") != NULL || cputag_get_cpu(machine, "denver") != NULL);
+	ioasic.has_cage = (cputag_get_cpu(machine, "cage") != NULL);
+	ioasic.dcs_cpu = cputag_get_cpu(machine, "dcs2");
+	if (ioasic.dcs_cpu == NULL)
+		ioasic.dcs_cpu = cputag_get_cpu(machine, "dsio");
+	if (ioasic.dcs_cpu == NULL)
+		ioasic.dcs_cpu = cputag_get_cpu(machine, "denver");
 	ioasic.shuffle_type = shuffle;
 	ioasic.shuffle_map = &shuffle_maps[shuffle][0];
 	ioasic.auto_ack = 0;
@@ -659,7 +659,7 @@ void midway_ioasic_reset(running_machine *machine)
 
 static void update_ioasic_irq(running_machine *machine)
 {
-	UINT16 fifo_state = ioasic_fifo_status_r();
+	UINT16 fifo_state = ioasic_fifo_status_r(NULL);
 	UINT16 irqbits = 0x2000;
 	UINT8 new_state;
 
@@ -724,7 +724,7 @@ static void ioasic_output_full(int state)
  *
  *************************************/
 
-static UINT16 ioasic_fifo_r(void)
+static UINT16 ioasic_fifo_r(const device_config *device)
 {
 	UINT16 result = 0;
 
@@ -759,7 +759,7 @@ static UINT16 ioasic_fifo_r(void)
 }
 
 
-static UINT16 ioasic_fifo_status_r(void)
+static UINT16 ioasic_fifo_status_r(const device_config *device)
 {
 	UINT16 result = 0;
 
@@ -773,9 +773,9 @@ static UINT16 ioasic_fifo_status_r(void)
 	/* kludge alert: if we're reading this from the DCS CPU itself, and we recently cleared */
 	/* the FIFO, and we're within 16 instructions of the read that cleared the FIFO, make */
 	/* sure the FIFO clear bit is set */
-	if (ioasic.fifo_force_buffer_empty_pc && cpunum_get_active() == ioasic.dcs_cpu)
+	if (ioasic.fifo_force_buffer_empty_pc && device == ioasic.dcs_cpu)
 	{
-		offs_t currpc = safe_cpu_get_pc(Machine->activecpu);
+		offs_t currpc = safe_cpu_get_pc(device);
 		if (currpc >= ioasic.fifo_force_buffer_empty_pc && currpc < ioasic.fifo_force_buffer_empty_pc + 0x10)
 		{
 			ioasic.fifo_force_buffer_empty_pc = 0;
@@ -896,7 +896,7 @@ READ32_HANDLER( midway_ioasic_r )
 			if (ioasic.has_dcs)
 			{
 				result |= ((dcs_control_r() >> 4) ^ 0x40) & 0x00c0;
-				result |= ioasic_fifo_status_r() & 0x0038;
+				result |= ioasic_fifo_status_r(space->cpu) & 0x0038;
 				result |= dcs_data2_r() & 0xff00;
 			}
 			else if (ioasic.has_cage)

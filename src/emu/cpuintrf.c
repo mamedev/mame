@@ -1105,17 +1105,6 @@ void cpu_pop_context(void)
 
 
 /*-------------------------------------------------
-    cpunum_get_active - return the index of the
-    active CPU (deprecated soon)
--------------------------------------------------*/
-
-int cpunum_get_active(void)
-{
-	return (Machine->activecpu == NULL) ? -1 : cpu_get_index(Machine->activecpu);
-}
-
-
-/*-------------------------------------------------
     cpu_get_index_slow - find a CPU in the machine
     by searching
 -------------------------------------------------*/

@@ -696,9 +696,6 @@ void cpu_push_context(const device_config *cpu);
 /* restore the previously saved context */
 void cpu_pop_context(void);
 
-/* return the index of the active CPU (deprecated soon) */
-int cpunum_get_active(void);
-
 /* find a CPU in the machine by searching */
 int cpu_get_index_slow(const device_config *cpu);
 

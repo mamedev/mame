@@ -27,6 +27,8 @@ struct _ide_config
 	void 	(*interrupt)(const device_config *device, int state);
 	const char *master;		/* name of master region (defaults to device tag) */
 	const char *slave;		/* name of slave region (defaults to NULL) */
+	const char *bmcpu;		/* name of bus master CPU */
+	UINT32 bmspace;			/* address space of bus master transfer */
 };
 
 
@@ -42,6 +44,10 @@ struct _ide_config
 #define MDRV_IDE_CONTROLLER_REGIONS(_master, _slave) \
 	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, master, _master) \
 	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, master, _slave)
+
+#define MDRV_IDE_BUS_MASTER_SPACE(_cpu, _space) \
+	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, bmcpu, _cpu) \
+	MDRV_DEVICE_CONFIG_DATA32(ide_config, bmspace, ADDRESS_SPACE_##_space)
 
 #define MDRV_IDE_CONTROLLER_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag, IDE_CONTROLLER)

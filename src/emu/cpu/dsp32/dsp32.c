@@ -544,12 +544,12 @@ INLINE void dma_store(void)
 }
 
 
-void dsp32c_pio_w(int cpunum, int reg, int data)
+void dsp32c_pio_w(const device_config *device, int reg, int data)
 {
 	UINT16 mask;
 	UINT8 mode;
 
-	cpu_push_context(Machine->cpu[cpunum]);
+	cpu_push_context(device);
 
 	/* look up register and mask */
 	mode = ((dsp32.pcr >> 8) & 2) | ((dsp32.pcr >> 1) & 1);
@@ -626,12 +626,12 @@ void dsp32c_pio_w(int cpunum, int reg, int data)
     PARALLEL INTERFACE READS
 ***************************************************************************/
 
-int dsp32c_pio_r(int cpunum, int reg)
+int dsp32c_pio_r(const device_config *device, int reg)
 {
 	UINT16 mask, result = 0xffff;
 	UINT8 mode, shift = 0;
 
-	cpu_push_context(Machine->cpu[cpunum]);
+	cpu_push_context(device);
 
 	/* look up register and mask */
 	mode = ((dsp32.pcr >> 8) & 2) | ((dsp32.pcr >> 1) & 1);
