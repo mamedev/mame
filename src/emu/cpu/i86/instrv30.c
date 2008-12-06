@@ -301,7 +301,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 		break;
 
 	case 0x1D:							/* 0F 1D C6 - SET1 si,cl */
-		/* logerror("PC=%06x : Set1 ",cpu_get_pc(machine->activecpu)-2); */
+		/* logerror("PC=%06x : Set1 ",I.pc-2); */
 		ModRM = FETCH;
 		if (ModRM >= 0xc0)
 		{
@@ -477,7 +477,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          *
          * Clocks:   16
          */
-		logerror("PC=%06x : MOVSPA\n", cpu_get_pc(machine->activecpu) - 2);
+		logerror("PC=%06x : MOVSPA\n", I.pc - 2);
 		nec_ICount -= 16;
 		break;
 	case 0x26:							/* 0F 22 59 - cmp4s */
@@ -567,7 +567,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          * tmp &= 0xffff;
          * PutbackRMWord(ModRM,tmp);
          */
-		logerror("PC=%06x : ROL4 %02x\n", cpu_get_pc(machine->activecpu) - 3, ModRM);
+		logerror("PC=%06x : ROL4 %02x\n", I.pc - 3, ModRM);
 		break;
 
 	case 0x2A:							/* 0F 2a c2 - ROR4 bh */
@@ -612,7 +612,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          * tmp = tmp2 | (tmp>>4);
          * PutbackRMWord(ModRM,tmp);
          */
-		logerror("PC=%06x : ROR4 %02x\n", cpu_get_pc(machine->activecpu) - 3, ModRM);
+		logerror("PC=%06x : ROR4 %02x\n", I.pc - 3, ModRM);
 		break;
 
 	case 0x2D:							/* 0Fh 2Dh <1111 1RRR> */
@@ -677,13 +677,13 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          * Flags Affected:   None
          */
 		ModRM = FETCH;
-		logerror("PC=%06x : BRKCS %02x\n", cpu_get_pc(machine->activecpu) - 3, ModRM);
+		logerror("PC=%06x : BRKCS %02x\n", I.pc - 3, ModRM);
 		nec_ICount -= 15;				/* checked ! */
 		break;
 
 	case 0x31:							/* 0F 31 [mod:reg:r/m] - INS reg8,reg8 or INS reg8,imm4 */
 		ModRM = FETCH;
-		logerror("PC=%06x : INS ", cpu_get_pc(machine->activecpu) - 2);
+		logerror("PC=%06x : INS ", I.pc - 2);
 		if (ModRM >= 0xc0)
 		{
 			tmp = I.regs.b[Mod_RM.RM.b[ModRM]];
@@ -739,7 +739,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
 
     case 0x33:                          /* 0F 33 [mod:reg:r/m] - EXT reg8,reg8 or EXT reg8,imm4 */
 		ModRM = FETCH;
-		logerror("PC=%06x : EXT ", cpu_get_pc(machine->activecpu) - 2);
+		logerror("PC=%06x : EXT ", I.pc - 2);
 		if (ModRM >= 0xc0)
 		{
 			tmp = I.regs.b[Mod_RM.RM.b[ModRM]];
@@ -823,7 +823,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          *
          * Clocks:   12
          */
-		logerror("PC=%06x : RETRBI\n", cpu_get_pc(machine->activecpu) - 2);
+		logerror("PC=%06x : RETRBI\n", I.pc - 2);
 		nec_ICount -= 12;
 		break;
 
@@ -856,7 +856,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          */
 		ModRM = FETCH;
 
-		logerror("PC=%06x : TSCSW %02x\n", cpu_get_pc(machine->activecpu) - 3, ModRM);
+		logerror("PC=%06x : TSCSW %02x\n", I.pc - 3, ModRM);
 		nec_ICount -= 11;
 		break;
 
@@ -889,7 +889,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          * Clocks:   11
          */
 		ModRM = FETCH;
-		logerror("PC=%06x : MOVSPB %02x\n", cpu_get_pc(machine->activecpu) - 3, ModRM);
+		logerror("PC=%06x : MOVSPB %02x\n", I.pc - 3, ModRM);
 		nec_ICount -= 11;
 		break;
 
@@ -917,7 +917,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          *
          * Clocks:   N/A
          */
-		logerror("PC=%06x : STOP\n", cpu_get_pc(machine->activecpu) - 2);
+		logerror("PC=%06x : STOP\n", I.pc - 2);
 		nec_ICount -= 2;				/* of course this is crap */
 		break;
 
@@ -990,7 +990,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          */
 
 		ModRM = FETCH;
-		logerror("PC=%06x : BRKXA %02x\n", cpu_get_pc(machine->activecpu) - 3, ModRM);
+		logerror("PC=%06x : BRKXA %02x\n", I.pc - 3, ModRM);
 		nec_ICount -= 12;
 		break;
 
@@ -1027,7 +1027,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          * Clocks:   12
          */
 		ModRM = FETCH;
-		logerror("PC=%06x : RETXA %02x\n", cpu_get_pc(machine->activecpu) - 3, ModRM);
+		logerror("PC=%06x : RETXA %02x\n", I.pc - 3, ModRM);
 		nec_ICount -= 12;
 		break;
 
@@ -1058,7 +1058,7 @@ static void PREFIXV30(_0fpre) (void)	/* Opcode 0x0f */
          */
 		ModRM = FETCH;
 		nec_ICount -= 38;
-		logerror("PC=%06x : BRKEM %02x\n", cpu_get_pc(machine->activecpu) - 3, ModRM);
+		logerror("PC=%06x : BRKEM %02x\n", I.pc - 3, ModRM);
 		PREFIXV30(_interrupt) (ModRM, 1);
 		break;
 	}
@@ -1099,7 +1099,7 @@ static void PREFIXV30(_brkn) (void)		/* Opcode 0x63 BRKN -  Break to Native Mode
 	unsigned int_vector;
 
 	int_vector = FETCH;
-	logerror("PC=%06x : BRKN %02x\n", cpu_get_pc(machine->activecpu) - 2, int_vector);
+	logerror("PC=%06x : BRKN %02x\n", I.pc - 2, int_vector);
 }
 
 static void PREFIXV30(repc) (int flagval)
@@ -1269,7 +1269,7 @@ static void PREFIXV30(_setalc) (void)	/* Opcode 0xd6 */
      */
 	I.regs.b[AL] = (CF) ? 0xff : 0x00;
 	nec_ICount -= 3;					// V30
-	logerror("PC=%06x : SETALC\n", cpu_get_pc(machine->activecpu) - 1);
+	logerror("PC=%06x : SETALC\n", I.pc - 1);
 }
 
 #if 0
@@ -1306,6 +1306,6 @@ static void PREFIXV30(_brks) (void)		/* Opcode 0xf1 - Break to Security Mode */
 	unsigned int_vector;
 
 	int_vector = FETCH;
-	logerror("PC=%06x : BRKS %02x\n", cpu_get_pc(machine->activecpu) - 2, int_vector);
+	logerror("PC=%06x : BRKS %02x\n", I.pc - 2, int_vector);
 }
 #endif

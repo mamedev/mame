@@ -696,7 +696,7 @@ static void execute_logerror(running_machine *machine, int ref, int params, cons
 
 static void execute_tracelog(running_machine *machine, int ref, int params, const char *param[])
 {
-	FILE *file = cpu_get_debug_data(machine->activecpu)->trace.file;
+	FILE *file = cpu_get_debug_data(debug_cpu_get_visible_cpu(machine))->trace.file;
 	UINT64 values[MAX_COMMAND_PARAMS];
 	char buffer[1024];
 	int i;

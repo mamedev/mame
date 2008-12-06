@@ -768,7 +768,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), seqhead->physpc) != NULL)
+		if (memory_get_write_ptr(mips3->program, seqhead->physpc) != NULL)
 			generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 		/* label this instruction, if it may be jumped to locally */
@@ -816,8 +816,8 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 
 static void cfunc_get_cycles(void *param)
 {
-	UINT64 *dest = param;
-	*dest = cpu_get_total_cycles(Machine->activecpu);
+	mips3_state *mips3 = param;
+	mips3->impstate->numcycles = cpu_get_total_cycles(mips3->device);
 }
 
 
@@ -2754,7 +2754,7 @@ static int generate_set_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 		case COP0_Count:
 			generate_update_cycles(block, compiler, IMM(desc->pc), !in_delay_slot);	// <subtract cycles>
 			UML_MOV(block, CPR032(COP0_Count), IREG(0));							// mov     [Count],i0
-			UML_CALLC(block, cfunc_get_cycles, &mips3->impstate->numcycles);		// callc   cfunc_get_cycles,&mips3->impstate->numcycles
+			UML_CALLC(block, cfunc_get_cycles, mips3);								// callc   cfunc_get_cycles,mips3
 			UML_DAND(block, IREG(0), IREG(0), IMM(0xffffffff));						// and     i0,i0,0xffffffff
 			UML_DADD(block, IREG(0), IREG(0), IREG(0));								// dadd    i0,i0,i0
 			UML_DSUB(block, MEM(&mips3->count_zero_time), MEM(&mips3->impstate->numcycles), IREG(0));
@@ -2806,7 +2806,7 @@ static int generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 	{
 		case COP0_Count:
 			generate_update_cycles(block, compiler, IMM(desc->pc), FALSE);			// <subtract cycles>
-			UML_CALLC(block, cfunc_get_cycles, &mips3->impstate->numcycles);		// callc   cfunc_get_cycles,&mips3->impstate->numcycles
+			UML_CALLC(block, cfunc_get_cycles, mips3);								// callc   cfunc_get_cycles,mips3
 			UML_DSUB(block, IREG(0), MEM(&mips3->impstate->numcycles), MEM(&mips3->count_zero_time));
 																					// dsub    i0,[numcycles],[count_zero_time]
 			UML_DSHR(block, IREG(0), IREG(0), IMM(1));								// dshr    i0,i0,1
@@ -2815,7 +2815,7 @@ static int generate_get_cop0_reg(drcuml_block *block, compiler_state *compiler, 
 
 		case COP0_Random:
 			generate_update_cycles(block, compiler, IMM(desc->pc), FALSE);			// <subtract cycles>
-			UML_CALLC(block, cfunc_get_cycles, &mips3->impstate->numcycles);		// callc   cfunc_get_cycles,&mips3->impstate->numcycles
+			UML_CALLC(block, cfunc_get_cycles, mips3);								// callc   cfunc_get_cycles,mips3
 			UML_DSUB(block, IREG(0), MEM(&mips3->impstate->numcycles), MEM(&mips3->count_zero_time));
 																					// dsub    i0,[numcycles],[count_zero_time]
 			UML_AND(block, IREG(1), CPR032(COP0_Wired), IMM(0x3f));					// and     i1,[Wired],0x3f

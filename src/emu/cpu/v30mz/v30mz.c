@@ -43,6 +43,8 @@
 #include "debugger.h"
 #include "deprecat.h"
 
+#define PC(n)		(((n)->sregs[CS]<<4)+(n)->ip)
+
 typedef UINT8 BOOLEAN;
 typedef UINT8 BYTE;
 typedef UINT16 WORD;
@@ -245,13 +247,13 @@ OP( 0x0f, i_pre_nec  ) { UINT32 ModRM, tmp, tmp2;
 		case 0x26 :	CMP4S; break;
 		case 0x28 : ModRM = FETCH; tmp = GetRMByte(ModRM); tmp <<= 4; tmp |= I.regs.b[AL] & 0xf; I.regs.b[AL] = (I.regs.b[AL] & 0xf0) | ((tmp>>8)&0xf); tmp &= 0xff; PutbackRMByte(ModRM,tmp); CLKM(9,15); break;
 		case 0x2a : ModRM = FETCH; tmp = GetRMByte(ModRM); tmp2 = (I.regs.b[AL] & 0xf)<<4; I.regs.b[AL] = (I.regs.b[AL] & 0xf0) | (tmp&0xf); tmp = tmp2 | (tmp>>4);	PutbackRMByte(ModRM,tmp); CLKM(13,19); break;
-		case 0x31 : ModRM = FETCH; ModRM=0; logerror("%06x: Unimplemented bitfield INS\n",cpu_get_pc(Machine->activecpu)); break;
-		case 0x33 : ModRM = FETCH; ModRM=0; logerror("%06x: Unimplemented bitfield EXT\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0x31 : ModRM = FETCH; ModRM=0; logerror("%06x: Unimplemented bitfield INS\n",PC(&I)); break;
+		case 0x33 : ModRM = FETCH; ModRM=0; logerror("%06x: Unimplemented bitfield EXT\n",PC(&I)); break;
 		case 0x92 : CLK(2); break; /* V25/35 FINT */
-		case 0xe0 : ModRM = FETCH; ModRM=0; logerror("%06x: V33 unimplemented BRKXA (break to expansion address)\n",cpu_get_pc(Machine->activecpu)); break;
-		case 0xf0 : ModRM = FETCH; ModRM=0; logerror("%06x: V33 unimplemented RETXA (return from expansion address)\n",cpu_get_pc(Machine->activecpu)); break;
-		case 0xff : ModRM = FETCH; ModRM=0; logerror("%06x: unimplemented BRKEM (break to 8080 emulation mode)\n",cpu_get_pc(Machine->activecpu)); break;
-		default:    logerror("%06x: Unknown V20 instruction\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0xe0 : ModRM = FETCH; ModRM=0; logerror("%06x: V33 unimplemented BRKXA (break to expansion address)\n",PC(&I)); break;
+		case 0xf0 : ModRM = FETCH; ModRM=0; logerror("%06x: V33 unimplemented RETXA (return from expansion address)\n",PC(&I)); break;
+		case 0xff : ModRM = FETCH; ModRM=0; logerror("%06x: unimplemented BRKEM (break to 8080 emulation mode)\n",PC(&I)); break;
+		default:    logerror("%06x: Unknown V20 instruction\n",PC(&I)); break;
 	}
 }
 
@@ -381,7 +383,7 @@ OP( 0x62, i_chkind  ) {
 	} else {
 		CLK(13);
 	}
-	logerror("%06x: bound %04x high %04x low %04x tmp\n",cpu_get_pc(Machine->activecpu),high,low,tmp);
+	logerror("%06x: bound %04x high %04x low %04x tmp\n",PC(&I),high,low,tmp);
 }
 OP( 0x64, i_repnc  ) { 	UINT32 next = FETCHOP;	UINT16 c = I.regs.w[CW];
     switch(next) { /* Segments */
@@ -406,7 +408,7 @@ OP( 0x64, i_repnc  ) { 	UINT32 next = FETCHOP;	UINT16 c = I.regs.w[CW];
 	    case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && !CF); I.regs.w[CW]=c; break;
 	    case 0xae:	CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && !CF); I.regs.w[CW]=c; break;
 	    case 0xaf:	CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && !CF); I.regs.w[CW]=c; break;
-		default:	logerror("%06x: REPNC invalid\n",cpu_get_pc(Machine->activecpu));	nec_instruction[next]();
+		default:	logerror("%06x: REPNC invalid\n",PC(&I));	nec_instruction[next]();
     }
 	seg_prefix=FALSE;
 }
@@ -434,7 +436,7 @@ OP( 0x65, i_repc  ) { 	UINT32 next = FETCHOP;	UINT16 c = I.regs.w[CW];
 	    case 0xad:  CLK(2); if (c) do { i_lodsw(); c--; } while (c>0 && CF);	I.regs.w[CW]=c;	break;
 	    case 0xae:	CLK(2); if (c) do { i_scasb(); c--; } while (c>0 && CF);	I.regs.w[CW]=c; break;
 	    case 0xaf:	CLK(2); if (c) do { i_scasw(); c--; } while (c>0 && CF);	I.regs.w[CW]=c; break;
-		default:	logerror("%06x: REPC invalid\n",cpu_get_pc(Machine->activecpu));	nec_instruction[next]();
+		default:	logerror("%06x: REPC invalid\n",PC(&I));	nec_instruction[next]();
     }
 	seg_prefix=FALSE;
 }
@@ -538,7 +540,7 @@ OP( 0x8e, i_mov_sregw ) { UINT16 src; GetModRM; src = GetRMWord(ModRM); CLKM(2,3
 		case 0x08: I.sregs[CS] = src; break; /* mov cs,ew */
 	    case 0x10: I.sregs[SS] = src; break; /* mov ss,ew */
 	    case 0x18: I.sregs[DS] = src; break; /* mov ds,ew */
-		default:   logerror("%06x: Mov Sreg - Invalid register\n",cpu_get_pc(Machine->activecpu));
+		default:   logerror("%06x: Mov Sreg - Invalid register\n",PC(&I));
     }
 	I.no_interrupt=1;
 }
@@ -559,7 +561,7 @@ OP( 0x97, i_xchg_axdi ) { XchgAWReg(IY); CLK(3); }
 OP( 0x98, i_cbw       ) { I.regs.b[AH] = (I.regs.b[AL] & 0x80) ? 0xff : 0;		CLK(1);	}
 OP( 0x99, i_cwd       ) { I.regs.w[DW] = (I.regs.b[AH] & 0x80) ? 0xffff : 0;	CLK(1);	}
 OP( 0x9a, i_call_far  ) { UINT32 tmp, tmp2;	FETCHWORD(tmp); FETCHWORD(tmp2); PUSH(I.sregs[CS]); PUSH(I.ip); I.ip = (WORD)tmp; I.sregs[CS] = (WORD)tmp2; CLK(10); }
-OP( 0x9b, i_wait      ) { logerror("%06x: Hardware POLL\n",cpu_get_pc(Machine->activecpu)); }
+OP( 0x9b, i_wait      ) { logerror("%06x: Hardware POLL\n",PC(&I)); }
 OP( 0x9c, i_pushf     ) { PUSH( CompressFlags() ); CLK(2); }
 OP( 0x9d, i_popf      ) { UINT32 tmp; POP(tmp); ExpandFlags(tmp); CLK(3); if (I.TF) nec_trap(); }
 OP( 0x9e, i_sahf      ) { UINT32 tmp = (CompressFlags() & 0xff00) | (I.regs.b[AH] & 0xd5); ExpandFlags(tmp); CLK(4); }
@@ -613,7 +615,7 @@ OP( 0xc0, i_rotshft_bd8 ) {
 		case 0x18: do { RORC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
 		case 0x20: SHL_BYTE(c); break;
 		case 0x28: SHR_BYTE(c); break;
-		case 0x30: logerror("%06x: Undefined opcode 0xc0 0x30 (SHLA)\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0x30: logerror("%06x: Undefined opcode 0xc0 0x30 (SHLA)\n",PC(&I)); break;
 		case 0x38: SHRA_BYTE(c); break;
 	}
 }
@@ -630,7 +632,7 @@ OP( 0xc1, i_rotshft_wd8 ) {
 		case 0x18: do { RORC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
 		case 0x20: SHL_WORD(c); break;
 		case 0x28: SHR_WORD(c); break;
-		case 0x30: logerror("%06x: Undefined opcode 0xc1 0x30 (SHLA)\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0x30: logerror("%06x: Undefined opcode 0xc1 0x30 (SHLA)\n",PC(&I)); break;
 		case 0x38: SHRA_WORD(c); break;
 	}
 }
@@ -680,7 +682,7 @@ OP( 0xd0, i_rotshft_b ) {
 		case 0x18: RORC_BYTE; PutbackRMByte(ModRM,(BYTE)dst); I.OverVal = (src^dst)&0x80; break;
 		case 0x20: SHL_BYTE(1); I.OverVal = (src^dst)&0x80; break;
 		case 0x28: SHR_BYTE(1); I.OverVal = (src^dst)&0x80; break;
-		case 0x30: logerror("%06x: Undefined opcode 0xd0 0x30 (SHLA)\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0x30: logerror("%06x: Undefined opcode 0xd0 0x30 (SHLA)\n",PC(&I)); break;
 		case 0x38: SHRA_BYTE(1); I.OverVal = 0; break;
 	}
 }
@@ -695,7 +697,7 @@ OP( 0xd1, i_rotshft_w ) {
 		case 0x18: RORC_WORD; PutbackRMWord(ModRM,(WORD)dst); I.OverVal = (src^dst)&0x8000; break;
 		case 0x20: SHL_WORD(1); I.OverVal = (src^dst)&0x8000;  break;
 		case 0x28: SHR_WORD(1); I.OverVal = (src^dst)&0x8000;  break;
-		case 0x30: logerror("%06x: Undefined opcode 0xd1 0x30 (SHLA)\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0x30: logerror("%06x: Undefined opcode 0xd1 0x30 (SHLA)\n",PC(&I)); break;
 		case 0x38: SHRA_WORD(1); I.OverVal = 0; break;
 	}
 }
@@ -711,7 +713,7 @@ OP( 0xd2, i_rotshft_bcl ) {
 		case 0x18: do { RORC_BYTE; c--; } while (c>0); PutbackRMByte(ModRM,(BYTE)dst); break;
 		case 0x20: SHL_BYTE(c); break;
 		case 0x28: SHR_BYTE(c); break;
-		case 0x30: logerror("%06x: Undefined opcode 0xd2 0x30 (SHLA)\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0x30: logerror("%06x: Undefined opcode 0xd2 0x30 (SHLA)\n",PC(&I)); break;
 		case 0x38: SHRA_BYTE(c); break;
 	}
 }
@@ -727,16 +729,16 @@ OP( 0xd3, i_rotshft_wcl ) {
 		case 0x18: do { RORC_WORD; c--; } while (c>0); PutbackRMWord(ModRM,(WORD)dst); break;
 		case 0x20: SHL_WORD(c); break;
 		case 0x28: SHR_WORD(c); break;
-		case 0x30: logerror("%06x: Undefined opcode 0xd3 0x30 (SHLA)\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0x30: logerror("%06x: Undefined opcode 0xd3 0x30 (SHLA)\n",PC(&I)); break;
 		case 0x38: SHRA_WORD(c); break;
 	}
 }
 
 OP( 0xd4, i_aam    ) { UINT32 mult=FETCH; mult=0; I.regs.b[AH] = I.regs.b[AL] / 10; I.regs.b[AL] %= 10; SetSZPF_Word(I.regs.w[AW]); CLK(17); }
 OP( 0xd5, i_aad    ) { UINT32 mult=FETCH; mult=0; I.regs.b[AL] = I.regs.b[AH] * 10 + I.regs.b[AL]; I.regs.b[AH] = 0; SetSZPF_Byte(I.regs.b[AL]); CLK(5); }
-OP( 0xd6, i_setalc ) { I.regs.b[AL] = (CF)?0xff:0x00; CLK(3); logerror("%06x: Undefined opcode (SETALC)\n",cpu_get_pc(Machine->activecpu)); }
+OP( 0xd6, i_setalc ) { I.regs.b[AL] = (CF)?0xff:0x00; CLK(3); logerror("%06x: Undefined opcode (SETALC)\n",PC(&I)); }
 OP( 0xd7, i_trans  ) { UINT32 dest = (I.regs.w[BW]+I.regs.b[AL])&0xffff; I.regs.b[AL] = GetMemB(DS, dest); CLK(5); }
-OP( 0xd8, i_fpo    ) { GetModRM; CLK(1);	logerror("%06x: Unimplemented floating point control %04x\n",cpu_get_pc(Machine->activecpu),ModRM); }
+OP( 0xd8, i_fpo    ) { GetModRM; CLK(1);	logerror("%06x: Unimplemented floating point control %04x\n",PC(&I),ModRM); }
 
 OP( 0xe0, i_loopne ) { INT8 disp = (INT8)FETCH; I.regs.w[CW]--; if (!ZF && I.regs.w[CW]) { I.ip = (WORD)(I.ip+disp); CLK(6); } else CLK(3); }
 OP( 0xe1, i_loope  ) { INT8 disp = (INT8)FETCH; I.regs.w[CW]--; if ( ZF && I.regs.w[CW]) { I.ip = (WORD)(I.ip+disp); CLK(6); } else CLK(3); }
@@ -759,7 +761,7 @@ OP( 0xed, i_inaxdx   ) { UINT32 port = I.regs.w[DW];	I.regs.b[AL] = read_port(po
 OP( 0xee, i_outdxal  ) { write_port(I.regs.w[DW], I.regs.b[AL]); CLK(6);	}
 OP( 0xef, i_outdxax  ) { UINT32 port = I.regs.w[DW];	write_port(port, I.regs.b[AL]);	write_port(port+1, I.regs.b[AH]); CLK(6); }
 
-OP( 0xf0, i_lock     ) { logerror("%06x: Warning - BUSLOCK\n",cpu_get_pc(Machine->activecpu)); I.no_interrupt=1; CLK(1); }
+OP( 0xf0, i_lock     ) { logerror("%06x: Warning - BUSLOCK\n",PC(&I)); I.no_interrupt=1; CLK(1); }
 OP( 0xf2, i_repne    ) { UINT32 next = FETCHOP; UINT16 c = I.regs.w[CW];
     switch(next) { /* Segments */
 	    case 0x26:	seg_prefix=TRUE;	prefix_base=I.sregs[ES]<<4;	next = FETCHOP;	CLK(2); break;
@@ -783,7 +785,7 @@ OP( 0xf2, i_repne    ) { UINT32 next = FETCHOP; UINT16 c = I.regs.w[CW];
 	    case 0xad:  CLK(3); if (c) do { i_lodsw(); c--; } while (c>0);	I.regs.w[CW]=c;	break;
 	    case 0xae:	CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && ZF==0);	I.regs.w[CW]=c; break;
 	    case 0xaf:	CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && ZF==0);	I.regs.w[CW]=c; break;
-		default:	logerror("%06x: REPNE invalid\n",cpu_get_pc(Machine->activecpu));	nec_instruction[next]();
+		default:	logerror("%06x: REPNE invalid\n",PC(&I));	nec_instruction[next]();
     }
 	seg_prefix=FALSE;
 }
@@ -810,17 +812,17 @@ OP( 0xf3, i_repe     ) { UINT32 next = FETCHOP; UINT16 c = I.regs.w[CW];
 	    case 0xad:  CLK(3); if (c) do { i_lodsw(); c--; } while (c>0);	I.regs.w[CW]=c;	break;
 	    case 0xae:	CLK(3); if (c) do { i_scasb(); c--; } while (c>0 && ZF==1);	I.regs.w[CW]=c; break;
 	    case 0xaf:	CLK(3); if (c) do { i_scasw(); c--; } while (c>0 && ZF==1);	I.regs.w[CW]=c; break;
-		default:	logerror("%06x: REPE invalid\n",cpu_get_pc(Machine->activecpu)); nec_instruction[next]();
+		default:	logerror("%06x: REPE invalid\n",PC(&I)); nec_instruction[next]();
     }
 	seg_prefix=FALSE;
 }
-OP( 0xf4, i_hlt ) { logerror("%06x: HALT\n",cpu_get_pc(Machine->activecpu)); nec_ICount=0; }
+OP( 0xf4, i_hlt ) { logerror("%06x: HALT\n",PC(&I)); nec_ICount=0; }
 OP( 0xf5, i_cmc ) { I.CarryVal = !CF; CLK(4); }
 OP( 0xf6, i_f6pre ) { UINT32 tmp; UINT32 uresult,uresult2; INT32 result,result2;
 	GetModRM; tmp = GetRMByte(ModRM);
     switch (ModRM & 0x38) {
 		case 0x00: tmp &= FETCH; I.CarryVal = I.OverVal = 0; SetSZPF_Byte(tmp); CLKM(1,2); break; /* TEST */
-		case 0x08: logerror("%06x: Undefined opcode 0xf6 0x08\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0x08: logerror("%06x: Undefined opcode 0xf6 0x08\n",PC(&I)); break;
  		case 0x10: PutbackRMByte(ModRM,~tmp); CLKM(1,3); break; /* NOT */
 		case 0x18: I.CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Byte(tmp); PutbackRMByte(ModRM,tmp&0xff); CLKM(1,3); break; /* NEG */
 		case 0x20: uresult = I.regs.b[AL]*tmp; I.regs.w[AW]=(WORD)uresult; I.CarryVal=I.OverVal=(I.regs.b[AH]!=0); CLKM(3,4); break; /* MULU */
@@ -834,7 +836,7 @@ OP( 0xf7, i_f7pre   ) { UINT32 tmp,tmp2; UINT32 uresult,uresult2; INT32 result,r
 	GetModRM; tmp = GetRMWord(ModRM);
     switch (ModRM & 0x38) {
 		case 0x00: FETCHWORD(tmp2); tmp &= tmp2; I.CarryVal = I.OverVal = 0; SetSZPF_Word(tmp); CLKM(1,2); break; /* TEST */
-		case 0x08: logerror("%06x: Undefined opcode 0xf7 0x08\n",cpu_get_pc(Machine->activecpu)); break;
+		case 0x08: logerror("%06x: Undefined opcode 0xf7 0x08\n",PC(&I)); break;
  		case 0x10: PutbackRMWord(ModRM,~tmp); CLKM(1,3); break; /* NOT */
 		case 0x18: I.CarryVal=(tmp!=0); tmp=(~tmp)+1; SetSZPF_Word(tmp); PutbackRMWord(ModRM,tmp&0xffff); CLKM(1,3); break; /* NEG */
 		case 0x20: uresult = I.regs.w[AW]*tmp; I.regs.w[AW]=uresult&0xffff; I.regs.w[DW]=((UINT32)uresult)>>16; I.CarryVal=I.OverVal=(I.regs.w[DW]!=0); CLKM(3,4); break; /* MULU */
@@ -854,7 +856,7 @@ OP( 0xfe, i_fepre ) { UINT32 tmp, tmp1; GetModRM; tmp=GetRMByte(ModRM);
     switch(ModRM & 0x38) {
     	case 0x00: tmp1 = tmp+1; I.OverVal = (tmp==0x7f); SetAF(tmp1,tmp,1); SetSZPF_Byte(tmp1); PutbackRMByte(ModRM,(BYTE)tmp1); CLKM(1,3); break; /* INC */
 		case 0x08: tmp1 = tmp-1; I.OverVal = (tmp==0x80); SetAF(tmp1,tmp,1); SetSZPF_Byte(tmp1); PutbackRMByte(ModRM,(BYTE)tmp1); CLKM(1,3); break; /* DEC */
-		default:   logerror("%06x: FE Pre with unimplemented mod\n",cpu_get_pc(Machine->activecpu));
+		default:   logerror("%06x: FE Pre with unimplemented mod\n",PC(&I));
 	}
 }
 OP( 0xff, i_ffpre ) { UINT32 tmp, tmp1; GetModRM; tmp=GetRMWord(ModRM);
@@ -866,14 +868,14 @@ OP( 0xff, i_ffpre ) { UINT32 tmp, tmp1; GetModRM; tmp=GetRMWord(ModRM);
 		case 0x20: I.ip = tmp; CLKM(4,5); break; /* JMP */
 		case 0x28: I.ip = tmp; I.sregs[CS] = GetnextRMWord; CLK(10); break; /* JMP FAR */
 		case 0x30: PUSH(tmp); CLK(1); break;
-		default:   logerror("%06x: FF Pre with unimplemented mod\n",cpu_get_pc(Machine->activecpu));
+		default:   logerror("%06x: FF Pre with unimplemented mod\n",PC(&I));
 	}
 }
 
 static void i_invalid(void)
 {
 	nec_ICount-=10;
-	logerror("%06x: Invalid Opcode\n",cpu_get_pc(Machine->activecpu));
+	logerror("%06x: Invalid Opcode\n",PC(&I));
 }
 
 /*****************************************************************************/

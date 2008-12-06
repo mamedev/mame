@@ -574,7 +574,7 @@ UINT8 h8_3007_itu_read8(h83xx_state *h8, UINT8 reg)
 
 void h8_3007_itu_write8(h83xx_state *h8, UINT8 reg, UINT8 val)
 {
-	//logerror("%06x: h8/3007 reg %02x = %02x\n",cpu_get_pc(machine->activecpu),reg,val);
+	//logerror("%06x: h8/3007 reg %02x = %02x\n",h8->pc,reg,val);
 	h8->per_regs[reg] = val;
 	switch(reg)
 	{
@@ -746,7 +746,7 @@ UINT8 h8_3007_register1_read8(h83xx_state *h8, UINT32 address)
 		case 0xfee018:	return h8->per_regs[0xF8];	// IPRA
 	}
 
-	logerror("cpu '%s' (PC=%08X): unmapped I/O(1) byte read from %08X\n",h8->device->tag,cpu_get_pc(h8->device->machine->activecpu),address);
+	logerror("cpu '%s' (PC=%08X): unmapped I/O(1) byte read from %08X\n",h8->device->tag,h8->pc,address);
 	return 0;
 }
 
@@ -758,7 +758,7 @@ void h8_3007_register1_write8(h83xx_state *h8, UINT32 address, UINT8 val)
 		case 0xfee016:	h8_ISR_w(h8, val);	  	return;	// ISR
 		case 0xfee018:	h8->per_regs[0xF8] = val;	return;	// IPRA
 	}
-	logerror("cpu '%s' (PC=%08X): unmapped I/O(1) byte write to %08X = %02X\n",h8->device->tag,cpu_get_pc(h8->device->machine->activecpu),address,val);
+	logerror("cpu '%s' (PC=%08X): unmapped I/O(1) byte write to %08X = %02X\n",h8->device->tag,h8->pc,address,val);
 }
 
 void h8_3007_itu_init(h83xx_state *h8)

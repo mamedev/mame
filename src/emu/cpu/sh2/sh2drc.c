@@ -962,7 +962,7 @@ static void code_compile_block(drcuml_state *drcuml, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), seqhead->physpc) != NULL)
+		if (memory_get_write_ptr(sh2->program, seqhead->physpc) != NULL)
 			generate_checksum_block(block, &compiler, seqhead, seqlast);
 
 		/* label this instruction, if it may be jumped to locally */

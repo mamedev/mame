@@ -9,13 +9,13 @@
 #define OP(nn) INLINE void deco16_##nn(m6502_Regs *cpustate)
 
 #define DECO16_BRK									\
-	logerror("%04x: BRK\n",cpu_get_pc(Machine->activecpu));					\
-	RDOPARG();									\
-	PUSH(PCH);									\
-	PUSH(PCL);									\
+	logerror("%04x: BRK\n",PCW);					\
+	RDOPARG();										\
+	PUSH(PCH);										\
+	PUSH(PCL);										\
 	PUSH(P | F_B);									\
 	P = (P | F_I);									\
-	PCL = RDMEM(DECO16_IRQ_VEC+1); 							\
+	PCL = RDMEM(DECO16_IRQ_VEC+1); 					\
 	PCH = RDMEM(DECO16_IRQ_VEC);
 
 
@@ -88,7 +88,7 @@ OP(23) {
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
-		logerror("%04x: OP23 %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+		logerror("%04x: OP23 %02x\n",PCW,tmp);
 }
 OP(43) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(63) {
@@ -98,7 +98,7 @@ OP(63) {
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
-		logerror("%04x: OP63 %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+		logerror("%04x: OP63 %02x\n",PCW,tmp);
 }
 OP(83) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(a3) {
@@ -108,7 +108,7 @@ OP(a3) {
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
-		logerror("%04x: OPA3 %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+		logerror("%04x: OPA3 %02x\n",PCW,tmp);
 }
 OP(c3) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(e3) { RD_DUM; ILL; } 								/* 2 ILL */
@@ -116,7 +116,7 @@ OP(e3) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(13) { int tmp; cpustate->icount -= 1; RD_IMM;
 
 	if (DECO16_VERBOSE)
-		logerror("%04x: OP13 %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+		logerror("%04x: OP13 %02x\n",PCW,tmp);
 
 //bank select control?
 
@@ -190,13 +190,13 @@ OP(67) {
 	int tmp; RD_IMM;
 	cpustate->a=memory_read_byte_8le(cpustate->io,0);
 
-//  logerror("%04x: VBL (0x67)\n",cpu_get_pc(Machine->activecpu));
+//  logerror("%04x: VBL (0x67)\n",PCW);
 
 // really - wait for status?
 
 } /*  */
 OP(87) { int tmp; cpustate->icount -= 1; RD_IMM;
-	logerror("%04x: OP87 %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+	logerror("%04x: OP87 %02x\n",PCW,tmp);
 
 	  			} /*  */
 OP(a7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB2 ZPG ?? */
@@ -267,12 +267,12 @@ OP(f7) { RD_DUM; ILL; }									/* 2 ILL / 5 SMB7 ZPG ?? */
 #define deco16_fa m65c02_fa								/* 4 PLX */
 
 OP(0b) { int tmp; cpustate->icount -= 1; RD_IMM;
-	logerror("%04x: OP0B %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+	logerror("%04x: OP0B %02x\n",PCW,tmp);
 
 	  			}
 OP(2b) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(4b) { int tmp; cpustate->icount -= 1; RD_IMM;
-	logerror("%04x: OP4B %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+	logerror("%04x: OP4B %02x\n",PCW,tmp);
 
 //  cpustate->a=memory_read_byte_8le(cpustate->io,0);
 
@@ -300,7 +300,7 @@ OP(bb) {
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
-		logerror("%04x: OPBB %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+		logerror("%04x: OPBB %02x\n",PCW,tmp);
 }
 OP(db) { RD_DUM; ILL; } 								/* 2 ILL */
 OP(fb) { RD_DUM; ILL; } 								/* 2 ILL */
@@ -364,7 +364,7 @@ OP(2f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR2 ZPG ?? */
 OP(4f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR4 ZPG ?? */
 OP(6f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR6 ZPG ?? */
 OP(8f) { int tmp; cpustate->icount -= 1; RD_IMM;
-	logerror("%04x: BANK (8F) %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+	logerror("%04x: BANK (8F) %02x\n",PCW,tmp);
 
 	memory_write_byte_8le(cpustate->io,0,tmp);
 
@@ -383,7 +383,7 @@ OP(3f) {
 	RD_IMM;
 
 	if (DECO16_VERBOSE)
-		logerror("%04x: OP3F %02x\n",cpu_get_pc(Machine->activecpu),tmp);
+		logerror("%04x: OP3F %02x\n",PCW,tmp);
 }
 OP(5f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR5 ZPG ?? */
 OP(7f) { RD_DUM; ILL; }									/* 2 ILL / 5 BBR7 ZPG ?? */
