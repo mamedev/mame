@@ -954,7 +954,6 @@ $(MAMEOBJ)/meadows.a: \
 	$(DRIVERS)/meadows.o $(AUDIO)/meadows.o $(VIDEO)/meadows.o \
 
 $(MAMEOBJ)/merit.a: \
-	$(DRIVERS)/couple.o \
 	$(DRIVERS)/merit.o \
 	$(DRIVERS)/meritm.o \
 
