@@ -9006,20 +9006,20 @@ ROM_START( jjsquawb )
 	ROM_LOAD16_WORD_SWAP( "2", 0x100000, 0x080000, CRC(740a7366) SHA1(2539f9a9b4fed1a1e2c354d144b8d455ed4bc144) )
 
 	ROM_REGION( 0x200000, "gfx1", ROMREGION_DISPOSE )	/* Sprites */
-	ROM_LOAD( "jj-rom9",  0x000000, 0x080000, CRC(27441cd3) SHA1(5867fc30c158e07f2d36ecab97b1d304383e6f35) )
-	ROM_LOAD( "jj-rom10", 0x080000, 0x080000, CRC(ca2b42c4) SHA1(9b99b6618fe44a6c29a255e89dab72a0a56214df) )
-	ROM_LOAD( "jj-rom7",  0x100000, 0x080000, CRC(62c45658) SHA1(82b1ea138e8f4b4ade7e44b31843aa2023c9dd71) )
-	ROM_LOAD( "jj-rom8",  0x180000, 0x080000, CRC(2690c57b) SHA1(b880ded7715dffe12c4fea7ad7cb9c5133b73250) )
+	ROM_LOAD( "jj-rom9",  0x000000, 0x080000, BAD_DUMP SHA1(5867fc30c158e07f2d36ecab97b1d304383e6f35) ) /* not dumped; PCB uses 4 (or 6?) Flash ROMs; for now roms from parent*/
+	ROM_LOAD( "jj-rom10", 0x080000, 0x080000, BAD_DUMP SHA1(9b99b6618fe44a6c29a255e89dab72a0a56214df) ) /* not dumped: roms from parent */
+	ROM_LOAD( "jj-rom7",  0x100000, 0x080000, BAD_DUMP SHA1(82b1ea138e8f4b4ade7e44b31843aa2023c9dd71) ) /* not dumped: roms from parent */
+	ROM_LOAD( "jj-rom8",  0x180000, 0x080000, BAD_DUMP SHA1(b880ded7715dffe12c4fea7ad7cb9c5133b73250) ) /* not dumped: roms from parent */
 
 	ROM_REGION( 0x200000, "gfx2", ROMREGION_DISPOSE )	/* Layer 1 */
-	ROM_LOAD       ( "jj-rom11",    0x000000, 0x080000, CRC(98b9f4b4) SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) )
-	ROM_LOAD       ( "jj-rom12",    0x080000, 0x080000, CRC(d4aa916c) SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) )
-	ROM_LOAD16_BYTE( "jj-rom3.040", 0x100000, 0x080000, CRC(a5a35caf) SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) )
+	ROM_LOAD       ( "jj-rom11",    0x000000, 0x080000, BAD_DUMP SHA1(de96708aebb428ddc413c3649caaec80c0c155bd) ) /* not dumped: roms from parent */
+	ROM_LOAD       ( "jj-rom12",    0x080000, 0x080000, BAD_DUMP SHA1(d619d20c33f16ab06b529fc1717ad9b703acbabf) ) /* not dumped: roms from parent */
+	ROM_LOAD16_BYTE( "jj-rom3.040", 0x100000, 0x080000, BAD_DUMP SHA1(da4bdb7f0b319f8ff972a552d0134a73e5ac1b87) ) /* not dumped: roms from parent */
 
 	ROM_REGION( 0x200000, "gfx3", ROMREGION_DISPOSE )	/* Layer 2 */
-	ROM_LOAD       ( "jj-rom14",    0x000000, 0x080000, CRC(274bbb48) SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) )
-	ROM_LOAD       ( "jj-rom13",    0x080000, 0x080000, CRC(51e29871) SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) )
-	ROM_LOAD16_BYTE( "jj-rom4.040", 0x100000, 0x080000, CRC(a235488e) SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) )
+	ROM_LOAD       ( "jj-rom14",    0x000000, 0x080000, BAD_DUMP SHA1(b8db632a9bbb7232d0b1debd67b3b453fd4989e6) ) /* not dumped: roms from parent */
+	ROM_LOAD       ( "jj-rom13",    0x080000, 0x080000, BAD_DUMP SHA1(9d33283bd9a3f57602a55cfc9fafa49edd0be8c5) ) /* not dumped: roms from parent */
+	ROM_LOAD16_BYTE( "jj-rom4.040", 0x100000, 0x080000, BAD_DUMP SHA1(a45d02a4451defbef7fbdab15671955fab8ed76b) ) /* not dumped: roms from parent */
 
 	ROM_REGION( 0x100000, "x1", 0 )	/* Samples */
 	ROM_LOAD( "1", 0x000000, 0x100000, CRC(181a55b8) SHA1(6fa404f85bad93cc15e80feb61d19bed84602b82) ) /* jj-rom5.040 + jj-rom6.040 from parent*/
