@@ -465,17 +465,17 @@ static DEVICE_START( z80ctc )
 	const z80ctc_interface *intf = device->static_config;
 	astring *tempstring = astring_alloc();
 	z80ctc *ctc = get_safe_token(device);
-	int cpunum = -1;
+	const device_config *cpu = NULL;
 	int ch;
 
 	if (intf->cpu != NULL)
 	{
-		cpunum = mame_find_cpu_index(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
-		if (cpunum == -1)
+		cpu = cputag_get_cpu(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
+		if (cpu == NULL)
 			fatalerror("Z80CTC:Unable to find CPU %s\n", device_inherit_tag(tempstring, device->tag, intf->cpu));
 	}
-	if (cpunum != -1)
-		ctc->clock = device->machine->config->cpu[cpunum].clock;
+	if (cpu != NULL)
+		ctc->clock = cpu_get_clock(cpu);
 	else
 		ctc->clock = intf->baseclock;
 	ctc->period16 = attotime_mul(ATTOTIME_IN_HZ(ctc->clock), 16);

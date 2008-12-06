@@ -261,7 +261,7 @@ static MACHINE_RESET( atarisy2 )
 	atarigen_eeprom_reset();
 	slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
-	atarigen_sound_io_reset(1);
+	atarigen_sound_io_reset(machine->cpu[1]);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 64);
 	memory_set_direct_update_handler(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), atarisy2_direct_handler);
 
@@ -629,7 +629,7 @@ static WRITE8_HANDLER( sound_reset_w )
 		return;
 
 	/* a large number of signals are reset when this happens */
-	atarigen_sound_io_reset(1);
+	atarigen_sound_io_reset(space->machine->cpu[1]);
 	sndti_reset(SOUND_YM2151, 0);
 	mixer_w(space, 0, 0);
 	tms5220_data = 0;

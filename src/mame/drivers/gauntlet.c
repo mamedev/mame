@@ -173,7 +173,7 @@ static MACHINE_RESET( gauntlet )
 	atarigen_slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
-	atarigen_sound_io_reset(1);
+	atarigen_sound_io_reset(machine->cpu[1]);
 }
 
 

@@ -537,9 +537,9 @@ static MACHINE_START( vegas )
 	timer[3] = timer_alloc(machine, nile_timer_callback, NULL);
 
 	/* identify our sound board */
-	if (mame_find_cpu_index(machine, "dsio") != -1)
+	if (cputag_get_cpu(machine, "dsio") != NULL)
 		dcs_idma_cs = 6;
-	else if (mame_find_cpu_index(machine, "denver") != -1)
+	else if (cputag_get_cpu(machine, "denver") != NULL)
 		dcs_idma_cs = 7;
 	else
 		dcs_idma_cs = 0;
@@ -586,7 +586,7 @@ static MACHINE_RESET( vegas )
 	memset(pci_3dfx_regs, 0, sizeof(pci_3dfx_regs));
 
 	/* reset the DCS system if we have one */
-	if (mame_find_cpu_index(machine, "dcs2") != -1 || mame_find_cpu_index(machine, "dsio") != -1 || mame_find_cpu_index(machine, "denver") != -1)
+	if (cputag_get_cpu(machine, "dcs2") != NULL || cputag_get_cpu(machine, "dsio") != NULL || cputag_get_cpu(machine, "denver") != NULL)
 	{
 		dcs_reset_w(1);
 		dcs_reset_w(0);

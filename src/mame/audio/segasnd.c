@@ -82,7 +82,7 @@ typedef struct _usb_state usb_state;
 struct _usb_state
 {
 	sound_stream *		stream;				/* output stream */
-	UINT8				cpunum;				/* CPU index of the 8035 */
+	const device_config *cpu;				/* CPU index of the 8035 */
 	UINT8				in_latch;			/* input latch */
 	UINT8				out_latch;			/* output latch */
 	UINT8				last_p2_value;		/* current P2 output value */
@@ -314,7 +314,7 @@ static TIMER_CALLBACK( increment_t1_clock )
 void sega_usb_reset(UINT8 t1_clock_mask)
 {
 	/* halt the USB CPU at reset time */
-	cpu_set_input_line(Machine->cpu[usb.cpunum], INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(usb.cpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* start the clock timer */
 	timer_pulse(Machine, attotime_mul(ATTOTIME_IN_HZ(USB_2MHZ_CLOCK), 256), NULL, 0, increment_t1_clock);
@@ -346,7 +346,7 @@ static TIMER_CALLBACK( delayed_usb_data_w )
 	int data = param;
 
 	/* look for rising/falling edges of bit 7 to control the RESET line */
-	cpu_set_input_line(machine->cpu[usb.cpunum], INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(usb.cpu, INPUT_LINE_RESET, (data & 0x80) ? ASSERT_LINE : CLEAR_LINE);
 
 	/* if the CLEAR line is set, the low 7 bits of the input are ignored */
 	if ((usb.last_p2_value & 0x40) == 0)
@@ -646,8 +646,8 @@ static void *usb_start(int clock, const custom_sound_interface *config)
 	int tchan, tgroup;
 
 	/* find the CPU we are associated with */
-	usb.cpunum = mame_find_cpu_index(Machine, "usb");
-	assert(usb.cpunum != (UINT8)-1);
+	usb.cpu = cputag_get_cpu(Machine, "usb");
+	assert(usb.cpu != NULL);
 
 	/* allocate work RAM */
 	usb.work_ram = auto_malloc(0x400);

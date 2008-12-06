@@ -102,7 +102,7 @@ static void hangon_generic_init(void)
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	cpu_suspend(machine->cpu[mame_find_cpu_index(machine, "mcu")], SUSPEND_REASON_DISABLE, 1);
+	cputag_suspend(machine, "mcu", SUSPEND_REASON_DISABLE, 1);
 }
 
 

@@ -31,7 +31,7 @@ static struct _asic65_t
 	UINT8  	last_bank;
 
 	/* ROM-based interface states */
-	UINT8	cpunum;
+	const device_config *cpu;
 	UINT8	tfull;
 	UINT8 	_68full;
 	UINT8 	cmd;
@@ -132,7 +132,7 @@ void asic65_config(running_machine *machine, int asictype)
 	asic65.type = asictype;
 	asic65.yorigin = 0x1800;
 	if (asic65.type == ASIC65_ROMBASED)
-		asic65.cpunum = mame_find_cpu_index(machine, "asic65");
+		asic65.cpu = cputag_get_cpu(machine, "asic65");
 }
 
 
@@ -149,12 +149,12 @@ void asic65_reset(running_machine *machine, int state)
 
 	/* rom-based means reset and clear states */
 	if (asic65.type == ASIC65_ROMBASED)
-		cpu_set_input_line(machine->cpu[asic65.cpunum], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+		cpu_set_input_line(asic65.cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 
 	/* otherwise, do it manually */
 	else
 	{
-		cpu_suspend(machine->cpu[mame_find_cpu_index(machine, "asic65")], SUSPEND_REASON_DISABLE, 1);
+		cputag_suspend(machine, "asic65", SUSPEND_REASON_DISABLE, 1);
 
 		/* if reset is being signalled, clear everything */
 		if (state && !asic65.reset_state)
@@ -185,7 +185,7 @@ static TIMER_CALLBACK( m68k_asic65_deferred_w )
 	asic65.tfull = 1;
 	asic65.cmd = param >> 16;
 	asic65.tdata = param;
-	cpu_set_input_line(machine->cpu[asic65.cpunum], 0, ASSERT_LINE);
+	cpu_set_input_line(asic65.cpu, 0, ASSERT_LINE);
 }
 
 
@@ -482,7 +482,7 @@ static WRITE16_HANDLER( asic65_68k_w )
 static READ16_HANDLER( asic65_68k_r )
 {
 	asic65.tfull = 0;
-	cpu_set_input_line(space->machine->cpu[asic65.cpunum], 0, CLEAR_LINE);
+	cpu_set_input_line(asic65.cpu, 0, CLEAR_LINE);
 	return asic65.tdata;
 }
 

@@ -321,20 +321,20 @@ static READ8_HANDLER( m72_snd_cpu_sample_r )
 
 INLINE DRIVER_INIT( loht_mcu )
 {
-	int cpunum = mame_find_cpu_index(machine, "main");
-	int sndnum = mame_find_cpu_index(machine, "sound");
+	const device_config *cpu = cputag_get_cpu(machine, "main");
+	const device_config *sndcpu = cputag_get_cpu(machine, "sound");
 
 	protection_ram = auto_malloc(0x10000);
-	memory_install_read16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
+	memory_install_read16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), 0xb0000, 0xbffff, 0, 0, SMH_BANK1);
+	memory_install_write16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM), 0xb0000, 0xb0fff, 0, 0, m72_main_mcu_w);
 	memory_set_bankptr(machine, 1, protection_ram);
 
-	//memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
-	memory_install_write16_handler(cpu_get_address_space(machine->cpu[cpunum], ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
+	//memory_install_write16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, loht_sample_trigger_w);
+	memory_install_write16_handler(cpu_get_address_space(cpu, ADDRESS_SPACE_IO), 0xc0, 0xc1, 0, 0, m72_main_mcu_sound_w);
 
 	/* sound cpu */
-	memory_install_write8_handler(cpu_get_address_space(machine->cpu[sndnum], ADDRESS_SPACE_IO), 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
-	memory_install_read8_handler (cpu_get_address_space(machine->cpu[sndnum], ADDRESS_SPACE_IO), 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
+	memory_install_write8_handler(cpu_get_address_space(sndcpu, ADDRESS_SPACE_IO), 0x82, 0x82, 0xff, 0, m72_snd_cpu_sample_w);
+	memory_install_read8_handler (cpu_get_address_space(sndcpu, ADDRESS_SPACE_IO), 0x84, 0x84, 0xff, 0, m72_snd_cpu_sample_r);
 
 #if 0
 	/* running the mcu at twice the speed, the following

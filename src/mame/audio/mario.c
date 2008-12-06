@@ -256,7 +256,7 @@ static void set_ea(const address_space *space, int ea)
 static SOUND_START( mario )
 {
 	mario_state	*state = machine->driver_data;
-	int audiocpu = mame_find_cpu_index(machine, "audio");
+	const device_config *audiocpu = cputag_get_cpu(machine, "audio");
 #if USE_8039
 	UINT8 *SND = memory_region(machine, "audio");
 
@@ -264,10 +264,10 @@ static SOUND_START( mario )
 #endif
 
 	state->eabank = 0;
-	if (audiocpu != -1 && machine->config->cpu[audiocpu].type != CPU_Z80)
+	if (audiocpu != NULL && ((const cpu_class_header *)audiocpu->classtoken)->cputype != CPU_Z80)
 	{
 		state->eabank = 1;
-		memory_install_read8_handler(cpu_get_address_space(machine->cpu[audiocpu], ADDRESS_SPACE_PROGRAM), 0x000, 0x7ff, 0, 0, SMH_BANK1);
+		memory_install_read8_handler(cpu_get_address_space(audiocpu, ADDRESS_SPACE_PROGRAM), 0x000, 0x7ff, 0, 0, SMH_BANK1);
 		memory_configure_bank(machine, 1, 0, 1, memory_region(machine, "audio"), 0);
 	    memory_configure_bank(machine, 1, 1, 1, memory_region(machine, "audio") + 0x1000, 0x800);
 	}

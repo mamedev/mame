@@ -279,7 +279,7 @@ WRITE8_HANDLER( seibu_adpcm_ctl_2_w )
 
 /***************************************************************************/
 
-static int sound_cpu;
+static const device_config *sound_cpu;
 
 enum
 {
@@ -318,9 +318,9 @@ static void update_irq_lines(running_machine *machine, int param)
 	}
 
 	if ((irq1 & irq2) == 0xff)	/* no IRQs pending */
-		cpu_set_input_line(machine->cpu[sound_cpu],0,CLEAR_LINE);
+		cpu_set_input_line(sound_cpu,0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpu_set_input_line_and_vector(machine->cpu[sound_cpu],0,ASSERT_LINE,irq1 & irq2);
+		cpu_set_input_line_and_vector(sound_cpu,0,ASSERT_LINE,irq1 & irq2);
 }
 
 WRITE8_HANDLER( seibu_irq_clear_w )
@@ -360,7 +360,7 @@ MACHINE_RESET( seibu_sound )
 	int romlength = memory_region_length(machine, "audio");
 	UINT8 *rom = memory_region(machine, "audio");
 
-	sound_cpu=mame_find_cpu_index(machine, "audio");
+	sound_cpu=cputag_get_cpu(machine, "audio");
 	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
 		memory_configure_bank(machine, 1, 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);

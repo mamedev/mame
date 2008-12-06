@@ -48,7 +48,7 @@
 struct _ldplayer_data
 {
 	/* low-level emulation data */
-	int					cpunum;					/* CPU index of the 8049 */
+	const device_config *cpu;					/* CPU index of the 8049 */
 	const device_config *tracktimer;			/* timer device */
 	vp931_data_ready_func data_ready_cb; 		/* data ready callback */
 
@@ -230,7 +230,7 @@ static void vp931_init(laserdisc_state *ld)
 	player->data_ready_cb = cbsave;
 
 	/* find our devices */
-	player->cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "vp931"));
+	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "vp931"));
 	player->tracktimer = devtag_get_device(ld->device->machine, TIMER, device_build_tag(tempstring, ld->device->tag, "tracktimer"));
 	timer_device_set_ptr(player->tracktimer, ld);
 	astring_free(tempstring);
@@ -350,7 +350,7 @@ static TIMER_CALLBACK( vbi_data_fetch )
 	/* at the start of each line, signal an interrupt and use a timer to turn it off */
 	if (which == 0)
 	{
-		cpu_set_input_line(machine->cpu[player->cpunum], MCS48_INPUT_IRQ, ASSERT_LINE);
+		cpu_set_input_line(player->cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
 		timer_set(machine, ATTOTIME_IN_NSEC(5580), ld, 0, irq_off);
 	}
 
@@ -406,7 +406,7 @@ static TIMER_CALLBACK( deferred_data_w )
 static TIMER_CALLBACK( irq_off )
 {
 	laserdisc_state *ld = ptr;
-	cpu_set_input_line(machine->cpu[ld->player->cpunum], MCS48_INPUT_IRQ, CLEAR_LINE);
+	cpu_set_input_line(ld->player->cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
 }
 
 

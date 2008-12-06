@@ -77,7 +77,7 @@ static offs_t					atarigen_slapstic_last_address;
 static offs_t					atarigen_slapstic_base;
 static offs_t					atarigen_slapstic_mirror;
 
-static UINT8 					sound_cpu_num;
+static const device_config *	sound_cpu;
 static UINT8 					atarigen_cpu_to_sound;
 static UINT8 					atarigen_sound_to_cpu;
 static UINT8 					timed_int;
@@ -617,10 +617,10 @@ READ16_HANDLER( atarigen_slapstic_r )
     atarigen_sound_io_reset: Resets the state of the sound I/O.
 ---------------------------------------------------------------*/
 
-void atarigen_sound_io_reset(int cpu_num)
+void atarigen_sound_io_reset(const device_config *device)
 {
 	/* remember which CPU is the sound CPU */
-	sound_cpu_num = cpu_num;
+	sound_cpu = device;
 
 	/* reset the internal interrupts states */
 	timed_int = ym2151_int = 0;
@@ -770,7 +770,7 @@ WRITE8_HANDLER( atarigen_6502_sound_w )
 READ8_HANDLER( atarigen_6502_sound_r )
 {
 	atarigen_cpu_to_sound_ready = 0;
-	cpu_set_input_line(space->machine->cpu[sound_cpu_num], INPUT_LINE_NMI, CLEAR_LINE);
+	cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, CLEAR_LINE);
 	return atarigen_cpu_to_sound;
 }
 
@@ -785,9 +785,9 @@ READ8_HANDLER( atarigen_6502_sound_r )
 static void update_6502_irq(running_machine *machine)
 {
 	if (timed_int || ym2151_int)
-		cpu_set_input_line(machine->cpu[sound_cpu_num], M6502_IRQ_LINE, ASSERT_LINE);
+		cpu_set_input_line(sound_cpu, M6502_IRQ_LINE, ASSERT_LINE);
 	else
-		cpu_set_input_line(machine->cpu[sound_cpu_num], M6502_IRQ_LINE, CLEAR_LINE);
+		cpu_set_input_line(sound_cpu, M6502_IRQ_LINE, CLEAR_LINE);
 }
 
 
@@ -798,13 +798,13 @@ static void update_6502_irq(running_machine *machine)
 
 static TIMER_CALLBACK( delayed_sound_reset )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[sound_cpu_num], ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* unhalt and reset the sound CPU */
 	if (param == 0)
 	{
-		cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_HALT, CLEAR_LINE);
-		cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(sound_cpu, INPUT_LINE_HALT, CLEAR_LINE);
+		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, PULSE_LINE);
 	}
 
 	/* reset the sound write state */
@@ -831,7 +831,7 @@ static TIMER_CALLBACK( delayed_sound_w )
 	/* set up the states and signal an NMI to the sound CPU */
 	atarigen_cpu_to_sound = param;
 	atarigen_cpu_to_sound_ready = 1;
-	cpu_set_input_line(machine->cpu[sound_cpu_num], INPUT_LINE_NMI, ASSERT_LINE);
+	cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, ASSERT_LINE);
 
 	/* allocate a high frequency timer until a response is generated */
 	/* the main CPU is *very* sensistive to the timing of the response */
@@ -1670,7 +1670,6 @@ void atarigen_init_save_state(running_machine *machine)
 	state_save_register_global(machine, atarigen_slapstic_last_pc);
 	state_save_register_global(machine, atarigen_slapstic_last_address);
 
-	state_save_register_global(machine, sound_cpu_num);
 	state_save_register_global(machine, atarigen_cpu_to_sound);
 	state_save_register_global(machine, atarigen_sound_to_cpu);
 	state_save_register_global(machine, timed_int);

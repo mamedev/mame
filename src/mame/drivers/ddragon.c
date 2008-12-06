@@ -100,7 +100,8 @@ static emu_timer *scanline_timer;
 
 /* private globals */
 static UINT8 dd_sub_cpu_busy;
-static UINT8 sprite_irq, sound_irq, ym_irq, snd_cpu;
+static UINT8 sprite_irq, sound_irq, ym_irq;
+static const device_config *snd_cpu;
 static UINT32 adpcm_pos[2], adpcm_end[2];
 static UINT8 adpcm_idle[2];
 static int adpcm_data[2];
@@ -182,7 +183,7 @@ static MACHINE_START( ddragon )
 	scanline_timer = timer_alloc(machine, ddragon_scanline_callback, NULL);
 
 	/* determine the sound CPU index */
-	snd_cpu = mame_find_cpu_index(machine, "sound");
+	snd_cpu = cputag_get_cpu(machine, "sound");
 
 	/* register for save states */
 	state_save_register_global(machine, dd_sub_cpu_busy);
@@ -331,7 +332,7 @@ static WRITE8_HANDLER( ddragon_interrupt_w )
 
 		case 3: /* 380e - SND irq */
 			soundlatch_w(space, 0, data);
-			cpu_set_input_line(space->machine->cpu[snd_cpu], sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
+			cpu_set_input_line(snd_cpu, sound_irq, (sound_irq == INPUT_LINE_NMI) ? PULSE_LINE : HOLD_LINE);
 			break;
 
 		case 4: /* 380f - ? */
@@ -355,7 +356,7 @@ static WRITE8_HANDLER( ddragon2_sub_irq_w )
 
 static void irq_handler(running_machine *machine, int irq)
 {
-	cpu_set_input_line(machine->cpu[snd_cpu], ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
+	cpu_set_input_line(snd_cpu, ym_irq , irq ? ASSERT_LINE : CLEAR_LINE );
 }
 
 

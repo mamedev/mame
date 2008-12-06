@@ -34,7 +34,7 @@
  *
  *************************************/
 
-static int cage_cpu;
+static const device_config *cage_cpu;
 static attotime cage_cpu_h1_clock_period;
 
 static UINT8 cpu_to_cage_ready;
@@ -161,8 +161,8 @@ void cage_init(running_machine *machine, offs_t speedup)
 	memory_set_bankptr(machine, 10, memory_region(machine, "cageboot"));
 	memory_set_bankptr(machine, 11, memory_region(machine, "cage"));
 
-	cage_cpu = mame_find_cpu_index(machine, "cage");
-	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpu_get_clock(machine->cpu[cage_cpu]));
+	cage_cpu = cputag_get_cpu(machine, "cage");
+	cage_cpu_clock_period = ATTOTIME_IN_HZ(cpu_get_clock(cage_cpu));
 	cage_cpu_h1_clock_period = attotime_mul(cage_cpu_clock_period, 2);
 
 	dma_timer = timer_alloc(machine, dma_timer_callback, NULL);
@@ -170,7 +170,7 @@ void cage_init(running_machine *machine, offs_t speedup)
 	timer[1] = timer_alloc(machine, cage_timer_callback, NULL);
 
 	if (speedup)
-		speedup_ram = memory_install_write32_handler(cpu_get_address_space(machine->cpu[cage_cpu], ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
+		speedup_ram = memory_install_write32_handler(cpu_get_address_space(cage_cpu, ADDRESS_SPACE_PROGRAM), speedup, speedup, 0, 0, speedup_w);
 
 	state_save_register_global(machine, cpu_to_cage_ready);
 	state_save_register_global(machine, cage_to_cpu_ready);
@@ -194,7 +194,7 @@ void cage_reset_w(int state)
 {
 	if (state)
 		cage_control_w(Machine, 0);
-	cpu_set_input_line(Machine->cpu[cage_cpu], INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(cage_cpu, INPUT_LINE_RESET, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 
@@ -223,7 +223,7 @@ static TIMER_CALLBACK( dma_timer_callback )
 	tms32031_io_regs[DMA_SOURCE_ADDR] = param;
 
 	/* set the interrupt */
-	cpu_set_input_line(machine->cpu[cage_cpu], TMS32031_DINT, ASSERT_LINE);
+	cpu_set_input_line(cage_cpu, TMS32031_DINT, ASSERT_LINE);
 	dma_enabled = 0;
 }
 
@@ -292,7 +292,7 @@ static TIMER_CALLBACK( cage_timer_callback )
 	int which = param;
 
 	/* set the interrupt */
-	cpu_set_input_line(machine->cpu[cage_cpu], TMS32031_TINT0 + which, ASSERT_LINE);
+	cpu_set_input_line(cage_cpu, TMS32031_TINT0 + which, ASSERT_LINE);
 	cage_timer_enabled[which] = 0;
 	update_timer(which);
 }
@@ -461,12 +461,12 @@ static void update_control_lines(running_machine *machine)
 	}
 
 	/* set the IOF input lines */
-	cpu_push_context(machine->cpu[cage_cpu]);
-	val = cpu_get_reg(machine->activecpu, TMS32031_IOF);
+	cpu_push_context(cage_cpu);
+	val = cpu_get_reg(cage_cpu, TMS32031_IOF);
 	val &= ~0x88;
 	if (cpu_to_cage_ready) val |= 0x08;
 	if (cage_to_cpu_ready) val |= 0x80;
-	cpu_set_reg(machine->activecpu, TMS32031_IOF, val);
+	cpu_set_reg(cage_cpu, TMS32031_IOF, val);
 	cpu_pop_context();
 }
 
@@ -477,7 +477,7 @@ static READ32_HANDLER( cage_from_main_r )
 		logerror("%06X:CAGE read command = %04X\n", cpu_get_pc(space->cpu), cage_from_main);
 	cpu_to_cage_ready = 0;
 	update_control_lines(space->machine);
-	cpu_set_input_line(space->machine->cpu[cage_cpu], TMS32031_IRQ0, CLEAR_LINE);
+	cpu_set_input_line(cage_cpu, TMS32031_IRQ0, CLEAR_LINE);
 	return cage_from_main;
 }
 
@@ -525,7 +525,7 @@ static TIMER_CALLBACK( deferred_cage_w )
 	cage_from_main = param;
 	cpu_to_cage_ready = 1;
 	update_control_lines(machine);
-	cpu_set_input_line(machine->cpu[cage_cpu], TMS32031_IRQ0, ASSERT_LINE);
+	cpu_set_input_line(cage_cpu, TMS32031_IRQ0, ASSERT_LINE);
 }
 
 
@@ -557,7 +557,7 @@ void cage_control_w(running_machine *machine, UINT16 data)
 	/* CPU is reset if both control lines are 0 */
 	if (!(cage_control & 3))
 	{
-		cpu_set_input_line(machine->cpu[cage_cpu], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(cage_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 
 		dma_enabled = 0;
 		dma_timer_enabled = 0;
@@ -574,7 +574,7 @@ void cage_control_w(running_machine *machine, UINT16 data)
 		cage_to_cpu_ready = 0;
 	}
 	else
-		cpu_set_input_line(machine->cpu[cage_cpu], INPUT_LINE_RESET, CLEAR_LINE);
+		cpu_set_input_line(cage_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 
 	/* update the control state */
 	update_control_lines(machine);

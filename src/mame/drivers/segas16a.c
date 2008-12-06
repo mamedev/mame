@@ -230,7 +230,7 @@ static void system16a_generic_init(running_machine *machine)
 
 static TIMER_CALLBACK( suspend_i8751 )
 {
-	cpu_suspend(machine->cpu[mame_find_cpu_index(machine, "mcu")], SUSPEND_REASON_DISABLE, 1);
+	cputag_suspend(machine, "mcu", SUSPEND_REASON_DISABLE, 1);
 }
 
 

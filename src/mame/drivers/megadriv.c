@@ -98,8 +98,8 @@ static int megadrive_irq6_pending = 0;
 static int megadrive_irq4_pending = 0;
 
 /* 32x! */
-static int _32x_master_cpu_number;
-static int _32x_slave_cpu_number;
+static const device_config *_32x_master_cpu;
+static const device_config *_32x_slave_cpu;
 static int _32x_is_connected;
 
 static int sh2_are_running;
@@ -132,12 +132,12 @@ static UINT16 *_32x_display_dram, *_32x_access_dram;
 static UINT16* _32x_palette;
 static UINT16* _32x_palette_lookup;
 /* SegaCD! */
-static int _segacd_68k_cpu_number;
+static const device_config *_segacd_68k_cpu;
 /* SVP (virtua racing) */
-static int _svp_cpu_number;
+static const device_config *_svp_cpu;
 
 
-static int _genesis_snd_z80_cpu_number;
+static const device_config *_genesis_snd_z80_cpu;
 
 int segac2_bg_pal_lookup[4];
 int segac2_sp_pal_lookup[4];
@@ -2734,8 +2734,8 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 
 		if (data & 0x02)
 		{
-			cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number], INPUT_LINE_RESET, CLEAR_LINE);
-			cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(_32x_master_cpu, INPUT_LINE_RESET, CLEAR_LINE);
+			cpu_set_input_line(_32x_slave_cpu, INPUT_LINE_RESET, CLEAR_LINE);
 		}
 
 		if (data & 0x01)
@@ -2805,12 +2805,12 @@ static WRITE16_HANDLER( _32x_68k_a15102_w )
 
 		if (data&0x1)
 		{
-			if (sh2_master_cmdint_enable) cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (sh2_master_cmdint_enable) cpu_set_input_line(_32x_master_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 		}
 
 		if (data&0x2)
 		{
-			if (sh2_slave_cmdint_enable) cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number],SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			if (sh2_slave_cmdint_enable) cpu_set_input_line(_32x_slave_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
 		}
 	}
 }
@@ -3228,40 +3228,40 @@ static WRITE16_HANDLER( _32x_sh2_common_4002_w )
 // VRES (md reset button interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4014_w ){cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4014_w ){cpu_set_input_line(_32x_master_cpu,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 4016
 // VINT (vertical interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4016_w ){cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4016_w ){cpu_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 4018
 // HINT (horizontal interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4018_w ){ cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4018_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4018_w ){ cpu_set_input_line(_32x_master_cpu,SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_4018_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_HINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401A
 // HINT (control register interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_401a_w ){ cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_401a_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_401a_w ){ cpu_set_input_line(_32x_master_cpu,SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_401a_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_CINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401C
 // PINT (PWM timer interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_401c_w ){ cpu_set_input_line(space->machine->cpu[_32x_master_cpu_number],SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_401c_w ) { cpu_set_input_line(space->machine->cpu[_32x_slave_cpu_number], SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_401c_w ){ cpu_set_input_line(_32x_master_cpu,SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_slave_401c_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
 // SH2 side 401E
@@ -5925,8 +5925,8 @@ static TIMER_CALLBACK( scanline_timer_callback )
 			// 32x interrupt!
 			if (_32x_is_connected)
 			{
-				if (sh2_master_vint_enable) cpu_set_input_line(machine->cpu[_32x_master_cpu_number],SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
-				if (sh2_slave_vint_enable) cpu_set_input_line(machine->cpu[_32x_slave_cpu_number],SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+				if (sh2_master_vint_enable) cpu_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+				if (sh2_slave_vint_enable) cpu_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
 			}
 
 		}
@@ -6094,20 +6094,20 @@ MACHINE_RESET( megadriv )
 
 
 	/* if any of these extra CPUs exist, pause them until we actually turn them on */
-	if (_32x_master_cpu_number != -1)
+	if (_32x_master_cpu != NULL)
 	{
-		cpu_set_input_line(machine->cpu[_32x_master_cpu_number], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(_32x_master_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	if (_32x_slave_cpu_number != -1)
+	if (_32x_slave_cpu != NULL)
 	{
-		cpu_set_input_line(machine->cpu[_32x_slave_cpu_number], INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(_32x_slave_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	}
 
-	if (_segacd_68k_cpu_number != -1 )
+	if (_segacd_68k_cpu != NULL )
 	{
-		cpu_set_input_line(machine->cpu[_segacd_68k_cpu_number], INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(machine->cpu[_segacd_68k_cpu_number], INPUT_LINE_HALT, ASSERT_LINE);
+		cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+		cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
 	}
 
 }
@@ -6429,10 +6429,10 @@ static int megadriv_tas_callback(const device_config *device)
 static void megadriv_init_common(running_machine *machine)
 {
 	/* Look to see if this system has the standard Sound Z80 */
-	_genesis_snd_z80_cpu_number = mame_find_cpu_index(machine, "genesis_snd_z80");
-	if (_genesis_snd_z80_cpu_number != -1)
+	_genesis_snd_z80_cpu = cputag_get_cpu(machine, "genesis_snd_z80");
+	if (_genesis_snd_z80_cpu != NULL)
 	{
-		printf("GENESIS Sound Z80 cpu found %d\n", _genesis_snd_z80_cpu_number );
+		printf("GENESIS Sound Z80 cpu found %d\n", cpu_get_index(_genesis_snd_z80_cpu) );
 		genesis_has_z80 = 1;
 	}
 	else
@@ -6441,20 +6441,20 @@ static void megadriv_init_common(running_machine *machine)
 	}
 
 	/* Look to see if this system has the 32x Master SH2 */
-	_32x_master_cpu_number = mame_find_cpu_index(machine, "32x_master_sh2");
-	if (_32x_master_cpu_number != -1)
+	_32x_master_cpu = cputag_get_cpu(machine, "32x_master_sh2");
+	if (_32x_master_cpu != NULL)
 	{
-		printf("32x MASTER SH2 cpu found %d\n", _32x_master_cpu_number );
+		printf("32x MASTER SH2 cpu found %d\n", cpu_get_index(_32x_master_cpu) );
 	}
 
 	/* Look to see if this system has the 32x Slave SH2 */
-	_32x_slave_cpu_number = mame_find_cpu_index(machine, "32x_slave_sh2");
-	if (_32x_slave_cpu_number != -1)
+	_32x_slave_cpu = cputag_get_cpu(machine, "32x_slave_sh2");
+	if (_32x_slave_cpu != NULL)
 	{
-		printf("32x SLAVE SH2 cpu found %d\n", _32x_slave_cpu_number );
+		printf("32x SLAVE SH2 cpu found %d\n", cpu_get_index(_32x_slave_cpu) );
 	}
 
-	if ((_32x_master_cpu_number != -1) && (_32x_slave_cpu_number != -1))
+	if ((_32x_master_cpu != NULL) && (_32x_slave_cpu != NULL))
 	{
 		_32x_is_connected = 1;
 	}
@@ -6463,16 +6463,16 @@ static void megadriv_init_common(running_machine *machine)
 		_32x_is_connected = 0;
 	}
 
-	_segacd_68k_cpu_number = mame_find_cpu_index(machine, "segacd_68k");
-	if (_segacd_68k_cpu_number != -1)
+	_segacd_68k_cpu = cputag_get_cpu(machine, "segacd_68k");
+	if (_segacd_68k_cpu != NULL)
 	{
-		printf("Sega CD secondary 68k cpu found %d\n", _segacd_68k_cpu_number );
+		printf("Sega CD secondary 68k cpu found %d\n", cpu_get_index(_segacd_68k_cpu) );
 	}
 
-	_svp_cpu_number = mame_find_cpu_index(machine, "svp");
-	if (_svp_cpu_number != -1)
+	_svp_cpu = cputag_get_cpu(machine, "svp");
+	if (_svp_cpu != NULL)
 	{
-		printf("SVP (cpu) found %d\n", _svp_cpu_number );
+		printf("SVP (cpu) found %d\n", cpu_get_index(_svp_cpu) );
 	}
 
 
@@ -6524,7 +6524,7 @@ static void megadriv_init_common(running_machine *machine)
 	}
 
 	/* if we have an SVP cpu then do some extra initilization for it */
-	if (_svp_cpu_number != -1)
+	if (_svp_cpu != NULL)
 	{
 		svp_init(machine);
 	}

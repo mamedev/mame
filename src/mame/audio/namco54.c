@@ -110,24 +110,25 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( namco_54xx_irq_clear )
 {
-	cpu_set_input_line(machine->cpu[param], 0, CLEAR_LINE);
+	const device_config *device = ptr;
+	cpu_set_input_line(device, 0, CLEAR_LINE);
 }
 
 void namco_54xx_write(UINT8 data)
 {
-	int cpunum = mame_find_cpu_index(Machine, CPUTAG_54XX);
+	const device_config *device = cputag_get_cpu(Machine, CPUTAG_54XX);
 
-	if (cpunum == -1)
+	if (device == NULL)
 		return;
 
 	timer_call_after_resynch(Machine, NULL, data, namco_54xx_latch_callback);
 
-	cpu_set_input_line(Machine->cpu[cpunum], 0, ASSERT_LINE);
+	cpu_set_input_line(device, 0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	timer_set(Machine, ATTOTIME_IN_USEC(21), NULL, cpunum, namco_54xx_irq_clear);
+	timer_set(Machine, ATTOTIME_IN_USEC(21), (void *)device, 0, namco_54xx_irq_clear);
 }

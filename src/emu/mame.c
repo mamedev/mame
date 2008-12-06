@@ -1255,23 +1255,6 @@ static void logfile_callback(running_machine *machine, const char *buffer)
 
 
 /*-------------------------------------------------
-    mame_find_cpu_index - return the index of the
-    given CPU, or -1 if not found
--------------------------------------------------*/
-
-int mame_find_cpu_index(running_machine *machine, const char *tag)
-{
-	int cpunum;
-
-	for (cpunum = 0; cpunum < MAX_CPU; cpunum++)
-		if (machine->config->cpu[cpunum].tag && strcmp(machine->config->cpu[cpunum].tag, tag) == 0)
-			return cpunum;
-
-	return -1;
-}
-
-
-/*-------------------------------------------------
     mame_rand - standardized random numbers
 -------------------------------------------------*/
 

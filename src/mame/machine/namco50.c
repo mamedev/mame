@@ -254,68 +254,69 @@ ADDRESS_MAP_END
 
 static TIMER_CALLBACK( namco_50xx_irq_clear )
 {
-	cpu_set_input_line(machine->cpu[param], 0, CLEAR_LINE);
+	const device_config *cpu = ptr;
+	cpu_set_input_line(cpu, 0, CLEAR_LINE);
 }
 
-static void namco_50xx_irq_set(running_machine *machine, int cpunum)
+static void namco_50xx_irq_set(const device_config *cpu)
 {
-	cpu_set_input_line(machine->cpu[cpunum], 0, ASSERT_LINE);
+	cpu_set_input_line(cpu, 0, ASSERT_LINE);
 
 	// The execution time of one instruction is ~4us, so we must make sure to
 	// give the cpu time to poll the /IRQ input before we clear it.
 	// The input clock to the 06XX interface chip is 64H, that is
 	// 18432000/6/64 = 48kHz, so it makes sense for the irq line to be
 	// asserted for one clock cycle ~= 21us.
-	timer_set(machine, ATTOTIME_IN_USEC(21), NULL, cpunum, namco_50xx_irq_clear);
+	timer_set(cpu->machine, ATTOTIME_IN_USEC(21), (void *)cpu, 0, namco_50xx_irq_clear);
 }
 
 void namco_50xx_write(running_machine *machine, UINT8 data)
 {
-	int cpunum = mame_find_cpu_index(machine, CPUTAG_50XX);
+	const device_config *cpu = cputag_get_cpu(machine, CPUTAG_50XX);
 
-	if (cpunum == -1)
+	if (cpu == NULL)
 		return;
 
 	timer_call_after_resynch(machine, NULL, data, namco_50xx_latch_callback);
 
-	namco_50xx_irq_set(machine, cpunum);
+	namco_50xx_irq_set(cpu);
 }
 
 void namco_50xx_2_write(running_machine *machine, UINT8 data)
 {
-	int cpunum = mame_find_cpu_index(machine, CPUTAG_50XX_2);
+	const device_config *cpu = cputag_get_cpu(machine, CPUTAG_50XX_2);
 
-	if (cpunum == -1)
+	if (cpu == NULL)
 		return;
 
 	timer_call_after_resynch(machine, NULL, data, namco_50xx_2_latch_callback);
 
-	namco_50xx_irq_set(machine, cpunum);
+	namco_50xx_irq_set(cpu);
 }
 
 
 void namco_50xx_read_request(running_machine *machine)
 {
-	int cpunum = mame_find_cpu_index(machine, CPUTAG_50XX);
+	const device_config *cpu = cputag_get_cpu(machine, CPUTAG_50XX);
 
-	if (cpunum == -1)
+	if (cpu == NULL)
 		return;
 
 	timer_call_after_resynch(machine, NULL, 0, namco_50xx_readrequest_callback);
 
-	namco_50xx_irq_set(machine, cpunum);
+	namco_50xx_irq_set(cpu);
 }
 
 void namco_50xx_2_read_request(running_machine *machine)
 {
-	int cpunum = mame_find_cpu_index(machine, CPUTAG_50XX_2);
+	const device_config *cpu = cputag_get_cpu(machine, CPUTAG_50XX_2);
 
-	if (cpunum == -1)
+	if (cpu == NULL)
 		return;
 
 	timer_call_after_resynch(machine, NULL, 0, namco_50xx_2_readrequest_callback);
 
-	namco_50xx_irq_set(machine, cpunum);
+	namco_50xx_irq_set(cpu);
 }
 
 

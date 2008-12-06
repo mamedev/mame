@@ -166,7 +166,7 @@ static int irqstate;
 
 static TIMER_CALLBACK( setirq_callback )
 {
-	int cpunum;
+	const device_config *cpu;
 
 	switch(param)
 	{
@@ -191,15 +191,15 @@ static TIMER_CALLBACK( setirq_callback )
 			break;
 	}
 
-	cpunum = mame_find_cpu_index(machine, CPUTAG_T5182);
+	cpu = cputag_get_cpu(machine, CPUTAG_T5182);
 
-	if (cpunum == -1)
+	if (cpu == NULL)
 		return;
 
 	if (irqstate == 0)	/* no IRQs pending */
-		cpu_set_input_line(machine->cpu[cpunum],0,CLEAR_LINE);
+		cpu_set_input_line(cpu,0,CLEAR_LINE);
 	else	/* IRQ pending */
-		cpu_set_input_line(machine->cpu[cpunum],0,ASSERT_LINE);
+		cpu_set_input_line(cpu,0,ASSERT_LINE);
 }
 
 

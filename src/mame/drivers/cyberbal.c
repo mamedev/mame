@@ -47,7 +47,7 @@ static MACHINE_RESET( cyberbal )
 	atarigen_slapstic_reset();
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, cyberbal_scanline_update, 8);
-	atarigen_sound_io_reset(1);
+	atarigen_sound_io_reset(machine->cpu[1]);
 
 	cyberbal_sound_reset(machine);
 

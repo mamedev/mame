@@ -49,7 +49,7 @@ static UINT8 *bank_source_data;
 static UINT8 speech_data;
 static UINT8 last_ctl;
 
-static int cpu_num;
+static const device_config *jsacpu;
 static const char *test_port;
 static UINT16 test_mask;
 
@@ -110,8 +110,8 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 	UINT8 *rgn;
 
 	/* copy in the parameters */
-	cpu_num = mame_find_cpu_index(machine, "jsa");
-	assert_always(cpu_num != -1, "Could not find JSA CPU!");
+	jsacpu = cputag_get_cpu(machine, "jsa");
+	assert_always(jsacpu != NULL, "Could not find JSA CPU!");
 	test_port = testport;
 	test_mask = testmask;
 
@@ -145,7 +145,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 
 	/* install POKEY memory handlers */
 	if (has_pokey)
-		memory_install_readwrite8_handler(cpu_get_address_space(machine->cpu[cpu_num], ADDRESS_SPACE_PROGRAM), 0x2c00, 0x2c0f, 0, 0, pokey1_r, pokey1_w);
+		memory_install_readwrite8_handler(cpu_get_address_space(jsacpu, ADDRESS_SPACE_PROGRAM), 0x2c00, 0x2c0f, 0, 0, pokey1_r, pokey1_w);
 
 	init_save_state(machine);
 	atarijsa_reset();
@@ -178,7 +178,7 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 void atarijsa_reset(void)
 {
 	/* reset the sound I/O system */
-	atarigen_sound_io_reset(cpu_num);
+	atarigen_sound_io_reset(jsacpu);
 
 	/* reset the static states */
 	speech_data = 0;

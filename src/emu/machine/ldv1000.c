@@ -53,7 +53,7 @@
 struct _ldplayer_data
 {
 	/* low-level emulation data */
-	int					cpunum;					/* CPU index of the Z80 */
+	const device_config *cpu;					/* CPU index of the Z80 */
 	const device_config *ctc;					/* CTC device */
 	const device_config *multitimer;			/* multi-jump timer device */
 
@@ -247,7 +247,7 @@ static void ldv1000_init(laserdisc_state *ld)
 	memset(player, 0, sizeof(*player));
 
 	/* find our devices */
-	player->cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "ldv1000"));
+	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "ldv1000"));
 	player->ctc = devtag_get_device(ld->device->machine, Z80CTC, device_build_tag(tempstring, ld->device->tag, "ldvctc"));
 	player->multitimer = devtag_get_device(ld->device->machine, TIMER, device_build_tag(tempstring, ld->device->tag, "multitimer"));
 	timer_device_set_ptr(player->multitimer, ld);
@@ -437,7 +437,7 @@ static TIMER_DEVICE_CALLBACK( multijump_timer )
 static void ctc_interrupt(const device_config *device, int state)
 {
 	laserdisc_state *ld = find_ldv1000(device->machine);
-	cpu_set_input_line(device->machine->cpu[ld->player->cpunum], 0, state ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(ld->player->cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

@@ -360,9 +360,6 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver);
 /* standardized random number generator */
 UINT32 mame_rand(running_machine *machine);
 
-/* return the index of the given CPU, or -1 if not found */
-int mame_find_cpu_index(running_machine *machine, const char *tag);
-
 /* retrieve the base system time */
 void mame_get_base_datetime(running_machine *machine, mame_system_time *systime);
 

@@ -171,14 +171,14 @@ static WRITE8_HANDLER( champbas_mcu_switch_w )
 
 static WRITE8_HANDLER( champbas_mcu_halt_w )
 {
-	int cpunum = mame_find_cpu_index(space->machine, CPUTAG_MCU);
+	const device_config *cpu = cputag_get_cpu(space->machine, CPUTAG_MCU);
 
 	// MCU not present/not used in champbas
-	if (cpunum == -1)
+	if (cpu == NULL)
 		return;
 
 	data &= 1;
-	cpu_set_input_line(space->machine->cpu[cpunum], INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
+	cpu_set_input_line(cpu, INPUT_LINE_HALT, data ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

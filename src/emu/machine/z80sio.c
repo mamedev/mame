@@ -786,17 +786,17 @@ static DEVICE_START( z80sio )
 	const z80sio_interface *intf = device->static_config;
 	astring *tempstring = astring_alloc();
 	z80sio *sio = get_safe_token(device);
+	const device_config *cpu = NULL;
 	void *ptr = (void *)device;
-	int cpunum = -1;
 
 	if (intf->cpu != NULL)
 	{
-		cpunum = mame_find_cpu_index(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
-		if (cpunum == -1)
+		cpu = cputag_get_cpu(device->machine, device_inherit_tag(tempstring, device->tag, intf->cpu));
+		if (cpu == NULL)
 			fatalerror("Z80SIO:Unable to find CPU %s\n", device_inherit_tag(tempstring, device->tag, intf->cpu));
 	}
-	if (cpunum != -1)
-		sio->clock = device->machine->config->cpu[cpunum].clock;
+	if (cpu != NULL)
+		sio->clock = cpu_get_clock(cpu);
 	else
 		sio->clock = intf->baseclock;
 

@@ -145,7 +145,7 @@ static MACHINE_RESET( badlands )
 	atarigen_interrupt_reset(update_interrupts);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update, 32);
 
-	atarigen_sound_io_reset(1);
+	atarigen_sound_io_reset(machine->cpu[1]);
 	memcpy(bank_base, &bank_source_data[0x0000], 0x1000);
 }
 
@@ -628,7 +628,7 @@ static MACHINE_RESET( badlandb )
 	atarigen_interrupt_reset(update_interrupts_bootleg);
 	atarigen_scanline_timer_reset(machine->primary_screen, scanline_update_bootleg, 32);
 
-//  atarigen_sound_io_reset(1);
+//  atarigen_sound_io_reset(machine->cpu[1]);
 //  memcpy(bank_base, &bank_source_data[0x0000], 0x1000);
 }
 

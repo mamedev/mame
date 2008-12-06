@@ -86,7 +86,7 @@ struct _pioneer_pia
 typedef struct _simutrek_data simutrek_data;
 struct _simutrek_data
 {
-	int					cpunum;					/* CPU index of the 8748 */
+	const device_config *cpu;					/* 8748 CPU device */
 	UINT8				audio_squelch;			/* audio squelch value */
 	UINT8				data;					/* parallel data for simutrek */
 	UINT8				data_ready;				/* ready flag for simutrek data */
@@ -107,7 +107,7 @@ struct _ldplayer_data
 	attotime			firstbittime;			/* time of first bit in command */
 
 	/* low-level emulation data */
-	int					cpunum;					/* CPU index of the 8049 */
+	const device_config *cpu;					/* 8049 CPU device */
 	attotime			slowtrg;				/* time of the last SLOW TRG */
 	pioneer_pia			pia;					/* PIA state */
 	UINT8				vsync;					/* live VSYNC state */
@@ -272,7 +272,7 @@ INLINE void update_video_squelch(laserdisc_state *ld)
 INLINE void update_audio_squelch(laserdisc_state *ld)
 {
 	ldplayer_data *player = ld->player;
-	if (player->simutrek.cpunum == -1)
+	if (player->simutrek.cpu == NULL)
 		ldcore_set_audio_squelch(ld, (player->port1 & 0x40) || !(player->pia.portb & 0x01), (player->port1 & 0x40) || !(player->pia.portb & 0x02));
 	else
 		ldcore_set_audio_squelch(ld, player->simutrek.audio_squelch, player->simutrek.audio_squelch);
@@ -360,11 +360,11 @@ static void pr8210_init(laserdisc_state *ld)
 	player->slowtrg = curtime;
 
 	/* find our CPU */
-	player->cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "pr8210"));
+	player->cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "pr8210"));
 	astring_free(tempstring);
 
 	/* we don't have the Simutrek player overrides */
-	player->simutrek.cpunum = -1;
+	player->simutrek.cpu = NULL;
 	player->simutrek.audio_squelch = FALSE;
 }
 
@@ -798,7 +798,7 @@ static WRITE8_HANDLER( pr8210_port1_w )
 	if (!(data & 0x01) && (prev & 0x01))
 	{
 		/* special override for the Simutrek, which takes over control of this is some situations */
-		if (player->simutrek.cpunum == -1 || !player->simutrek.controlthis)
+		if (player->simutrek.cpu == NULL || !player->simutrek.controlthis)
 		{
 			if (LOG_SIMUTREK)
 				printf("%3d:JUMP TRG\n", video_screen_get_vpos(ld->screen));
@@ -857,7 +857,8 @@ static WRITE8_HANDLER( pr8210_port2_w )
 		player->slowtrg = timer_get_time(space->machine);
 
 	/* bit 6 when low triggers an IRQ on the MCU */
-	cpu_set_input_line(space->machine->cpu[player->cpunum], MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
+	if (player->cpu != NULL)
+		cpu_set_input_line(player->cpu, MCS48_INPUT_IRQ, (data & 0x40) ? CLEAR_LINE : ASSERT_LINE);
 
 	/* standby LED is set accordingl to bit 4 */
 	output_set_value("pr8210_standby", (data & 0x10) != 0);
@@ -1095,7 +1096,7 @@ static void simutrek_init(laserdisc_state *ld)
 	player->simutrek.data_ready = 1;
 
 	/* find the Simutrek CPU */
-	player->simutrek.cpunum = mame_find_cpu_index(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "simutrek"));
+	player->simutrek.cpu = cputag_get_cpu(ld->device->machine, device_build_tag(tempstring, ld->device->tag, "simutrek"));
 	astring_free(tempstring);
 }
 
@@ -1109,7 +1110,7 @@ static TIMER_CALLBACK( irq_off )
 {
 	laserdisc_state *ld = ptr;
 	ldplayer_data *player = ld->player;
-	cpu_set_input_line(ld->device->machine->cpu[player->simutrek.cpunum], MCS48_INPUT_IRQ, CLEAR_LINE);
+	cpu_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, CLEAR_LINE);
 	if (LOG_SIMUTREK)
 		printf("%3d:**** Simutrek IRQ clear\n", video_screen_get_vpos(ld->screen));
 }
@@ -1132,7 +1133,7 @@ static void simutrek_vsync(laserdisc_state *ld, const vbi_metadata *vbi, int fie
 	{
 		if (LOG_SIMUTREK)
 			printf("%3d:VSYNC IRQ\n", video_screen_get_vpos(ld->screen));
-		cpu_set_input_line(ld->device->machine->cpu[player->simutrek.cpunum], MCS48_INPUT_IRQ, ASSERT_LINE);
+		cpu_set_input_line(player->simutrek.cpu, MCS48_INPUT_IRQ, ASSERT_LINE);
 		timer_set(ld->device->machine, video_screen_get_scan_period(ld->screen), ld, 0, irq_off);
 	}
 }
