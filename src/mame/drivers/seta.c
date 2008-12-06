@@ -9656,7 +9656,7 @@ GAME( 1992, zingzip,  0,        zingzip,  zingzip,  0,        ROT270, "Allumer +
 GAME( 1993, atehate,  0,        atehate,  atehate,  0,        ROT0,   "Athena",                 "Athena no Hatena ?", 0 )
 GAME( 1993, daioh,    0,        daioh,    daioh,    0,        ROT270, "Athena",                 "Daioh", 0 )
 GAME( 1993, jjsquawk, 0,        jjsquawk, jjsquawk, 0,        ROT0,   "Athena / Able",          "J. J. Squawkers", 0 )
-GAME( 1993, jjsquawb, jjsquawk, jjsquawb, jjsquawk, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", GAME_NOT_WORKING )
+GAME( 1993, jjsquawb, jjsquawk, jjsquawb, jjsquawk, 0,        ROT0,   "bootleg",                "J. J. Squawkers (bootleg)", 0 )
 GAME( 1993, kamenrid, 0,        kamenrid, kamenrid, 0,        ROT0,   "Toei / Banpresto",       "Masked Riders Club Battle Race", 0 )
 GAME( 1993, madshark, 0,        madshark, madshark, 0,        ROT270, "Allumer",                "Mad Shark", 0 )
 GAME( 1993, msgundam, 0,        msgundam, msgundam, 0,        ROT0,   "Banpresto",              "Mobile Suit Gundam", 0 )
