@@ -521,7 +521,7 @@ void cpu_resume(const device_config *device, int reason)
 
 
 /*-------------------------------------------------
-    cpu_is_executing - return TRUE if the given 
+    cpu_is_executing - return TRUE if the given
     CPU is within its execute function
 -------------------------------------------------*/
 
@@ -611,7 +611,7 @@ void cpu_set_clockscale(const device_config *device, double clockscale)
 
 
 /*-------------------------------------------------
-    cpu_clocks_to_attotime - converts a number of 
+    cpu_clocks_to_attotime - converts a number of
     clock ticks to an attotime
 -------------------------------------------------*/
 
@@ -626,7 +626,7 @@ attotime cpu_clocks_to_attotime(const device_config *device, UINT32 clocks)
 
 
 /*-------------------------------------------------
-    cpu_attotime_to_clocks - converts a duration 
+    cpu_attotime_to_clocks - converts a duration
     as attotime to CPU clock ticks
 -------------------------------------------------*/
 
@@ -832,7 +832,7 @@ void cpuexec_trigger(running_machine *machine, int trigger)
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu) && machine->cpu[cpunum] != NULL; cpunum++)
 	{
 		cpu_class_data *classdata = machine->cpu[cpunum]->classtoken;
-		
+
 		/* if we're executing, for an immediate abort */
 		if (classdata->executing)
 			cpu_abort_timeslice(machine->cpu[cpunum]);

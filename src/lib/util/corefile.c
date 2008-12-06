@@ -223,29 +223,29 @@ void core_fclose(core_file *file)
 
 
 /*-------------------------------------------------
-    core_fcompress - enable/disable streaming file 
+    core_fcompress - enable/disable streaming file
     compression via zlib
 -------------------------------------------------*/
 
 file_error core_fcompress(core_file *file, int compress)
 {
 	file_error result = FILERR_NONE;
-	
+
 	/* can only do this for read-only and write-only cases */
 	if ((file->openflags & OPEN_FLAG_WRITE) != 0 && (file->openflags & OPEN_FLAG_READ) != 0)
 		return FILERR_INVALID_ACCESS;
-	
+
 	/* if we have been compressing, flush and free the data */
 	if (file->zdata != NULL && !compress)
 	{
 		int zerr = Z_OK;
-		
+
 		/* flush any remaining data if we are writing */
 		while ((file->openflags & OPEN_FLAG_WRITE) != 0 && zerr != Z_STREAM_END)
 		{
 			UINT32 actualdata;
 			file_error filerr;
-		
+
 			/* deflate some more */
 			zerr = deflate(&file->zdata->stream, Z_FINISH);
 			if (zerr != Z_STREAM_END && zerr != Z_OK)
@@ -265,29 +265,29 @@ file_error core_fcompress(core_file *file, int compress)
 				file->zdata->stream.avail_out = sizeof(file->zdata->buffer);
 			}
 		}
-		
+
 		/* end the appropriate operation */
 		if ((file->openflags & OPEN_FLAG_WRITE) != 0)
 			deflateEnd(&file->zdata->stream);
 		else
 			inflateEnd(&file->zdata->stream);
-		
+
 		/* free memory */
 		free(file->zdata);
 		file->zdata = NULL;
 	}
-	
+
 	/* if we are just starting to compress, allocate a new buffer */
 	if (file->zdata == NULL && compress)
 	{
 		int zerr;
-		
+
 		/* allocate memory */
 		file->zdata = malloc(sizeof(*file->zdata));
 		if (file->zdata == NULL)
 			return FILERR_OUT_OF_MEMORY;
 		memset(file->zdata, 0, sizeof(file->zdata));
-		
+
 		/* initialize the stream and compressor */
 		if ((file->openflags & OPEN_FLAG_WRITE) != 0)
 		{
@@ -297,7 +297,7 @@ file_error core_fcompress(core_file *file, int compress)
 		}
 		else
 			zerr = inflateInit(&file->zdata->stream);
-		
+
 		/* on error, return an error */
 		if (zerr != Z_OK)
 		{
@@ -305,7 +305,7 @@ file_error core_fcompress(core_file *file, int compress)
 			file->zdata = NULL;
 			return FILERR_OUT_OF_MEMORY;
 		}
-		
+
 		/* flush buffers */
 		file->bufferbytes = 0;
 
@@ -313,7 +313,7 @@ file_error core_fcompress(core_file *file, int compress)
 		file->zdata->realoffset = file->offset;
 		file->zdata->nextoffset = file->offset;
 	}
-	
+
 	return result;
 }
 
@@ -330,7 +330,7 @@ file_error core_fcompress(core_file *file, int compress)
 int core_fseek(core_file *file, INT64 offset, int whence)
 {
 	int err = 0;
-	
+
 	/* error if compressing */
 	if (file->zdata != NULL)
 		return 1;
@@ -883,11 +883,11 @@ static file_error osd_or_zlib_read(core_file *file, void *buffer, UINT64 offset,
 	/* if no compression, just pass through */
 	if (file->zdata == NULL)
 		return osd_read(file->file, buffer, offset, length, actual);
-	
+
 	/* if the offset doesn't match the next offset, fail */
 	if (offset != file->zdata->nextoffset)
 		return FILERR_INVALID_ACCESS;
-	
+
 	/* set up the destination */
 	file->zdata->stream.next_out = buffer;
 	file->zdata->stream.avail_out = length;
@@ -896,7 +896,7 @@ static file_error osd_or_zlib_read(core_file *file, void *buffer, UINT64 offset,
 		file_error filerr;
 		UINT32 actualdata;
 		int zerr = Z_OK;
-		
+
 		/* if we didn't make progress, report an error or the end */
 		if (file->zdata->stream.avail_in != 0)
 			zerr = inflate(&file->zdata->stream, Z_SYNC_FLUSH);
@@ -906,7 +906,7 @@ static file_error osd_or_zlib_read(core_file *file, void *buffer, UINT64 offset,
 			file->zdata->nextoffset += *actual;
 			return (zerr == Z_STREAM_END) ? FILERR_NONE : FILERR_INVALID_DATA;
 		}
-		
+
 		/* fetch more data if needed */
 		if (file->zdata->stream.avail_in == 0)
 		{
@@ -922,7 +922,7 @@ static file_error osd_or_zlib_read(core_file *file, void *buffer, UINT64 offset,
 	/* we read everything */
 	*actual = length;
 	file->zdata->nextoffset += *actual;
-	return FILERR_NONE;		
+	return FILERR_NONE;
 }
 
 
@@ -936,11 +936,11 @@ static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 
 	/* if no compression, just pass through */
 	if (file->zdata == NULL)
 		return osd_write(file->file, buffer, offset, length, actual);
-	
+
 	/* if the offset doesn't match the next offset, fail */
 	if (offset != file->zdata->nextoffset)
 		return FILERR_INVALID_ACCESS;
-	
+
 	/* set up the source */
 	file->zdata->stream.next_in = (void *)buffer;
 	file->zdata->stream.avail_in = length;
@@ -949,7 +949,7 @@ static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 
 		file_error filerr;
 		UINT32 actualdata;
 		int zerr;
-		
+
 		/* if we didn't make progress, report an error or the end */
 		zerr = deflate(&file->zdata->stream, Z_NO_FLUSH);
 		if (zerr != Z_OK)
@@ -958,7 +958,7 @@ static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 
 			file->zdata->nextoffset += *actual;
 			return FILERR_INVALID_DATA;
 		}
-		
+
 		/* write more data if we are full up */
 		if (file->zdata->stream.avail_out == 0)
 		{
@@ -974,7 +974,7 @@ static file_error osd_or_zlib_write(core_file *file, const void *buffer, UINT64 
 	/* we read everything */
 	*actual = length;
 	file->zdata->nextoffset += *actual;
-	return FILERR_NONE;		
+	return FILERR_NONE;
 }
 
 

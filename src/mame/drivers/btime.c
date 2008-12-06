@@ -178,7 +178,7 @@ static WRITE8_HANDLER( tisland_w )
 	else if (offset == 0x4003)                     audio_command_w(space,0,data);
 	else if (offset == 0x4004)                     bnj_scroll1_w(space,0,data);
 	else if (offset == 0x4005)					   bnj_scroll2_w(space,0,data);
-//	else if (offset == 0x8000)                     btime_video_control_w(space,0,data);
+//  else if (offset == 0x8000)                     btime_video_control_w(space,0,data);
 	else logerror("CPU '%s' PC %04x: warning - write %02x to unmapped memory address %04x\n",space->cpu->tag,cpu_get_pc(space->cpu),data,offset);
 
 
@@ -1789,9 +1789,9 @@ static DRIVER_INIT( tisland )
 	UINT8 *rom = memory_region(machine, "main");
 
 	/* At location 0xa2b6 there's a strange RLA followed by a BPL that reads from an
-	unmapped area that causes the game to fail in several circumstances.On the Cassette
-	version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
-	wrong going on in the encryption scheme.*/
+    unmapped area that causes the game to fail in several circumstances.On the Cassette
+    version the RLA (33) is in reality a BIT (24),so I'm guessing that there's something
+    wrong going on in the encryption scheme.*/
 	memset(&rom[0xa2b6],0x24,1);
 
 	init_rom1(machine);

@@ -21,8 +21,8 @@ author (Karl Stenerud) at karl@higashiyama-unet.ocn.ne.jp.
 
 Changes:
     1.00 (2008-11-27):
-	    R. Belmont
-	    - Reworked for modern MAME
+        R. Belmont
+        - Reworked for modern MAME
 
     0.94 (2007-06-14):
             Zsolt Vasvari

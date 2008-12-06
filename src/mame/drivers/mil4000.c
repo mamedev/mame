@@ -181,14 +181,14 @@ static WRITE16_HANDLER( sc3_vram_w )
 /*end of video stuff*/
 
 /*
-	--x- ---- ---- ---- Coin Counter
-	---- ---- -x-- ---- Prize
-	---- ---- --x- ---- Start
-	---- ---- ---x ---- Hold 5
-	---- ---- ---- x--- Hold 4
-	---- ---- ---- -x-- Hold 3
-	---- ---- ---- --x- Hold 2
-	---- ---- ---- ---x Hold 1
+    --x- ---- ---- ---- Coin Counter
+    ---- ---- -x-- ---- Prize
+    ---- ---- --x- ---- Start
+    ---- ---- ---x ---- Hold 5
+    ---- ---- ---- x--- Hold 4
+    ---- ---- ---- -x-- Hold 3
+    ---- ---- ---- --x- Hold 2
+    ---- ---- ---- ---x Hold 1
 */
 static WRITE16_HANDLER( output_w )
 {
@@ -197,7 +197,7 @@ static WRITE16_HANDLER( output_w )
 	for(i=0;i<3;i++)
 		coin_counter_w(i,data & 0x2000);
 
-//	popmessage("%04x\n",data);
+//  popmessage("%04x\n",data);
 }
 
 static ADDRESS_MAP_START( mil4000_map, ADDRESS_SPACE_PROGRAM, 16 )

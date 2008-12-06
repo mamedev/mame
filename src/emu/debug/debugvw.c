@@ -347,7 +347,7 @@ void debug_view_init(running_machine *machine)
 
 	/* register for some manual cleanup */
 	add_exit_callback(machine, debug_view_exit);
-	
+
 	/* build a list of disassembly and memory subviews */
 	global->registers_subviews = registers_view_enumerate_subviews(machine);
 	global->disasm_subviews = disasm_view_enumerate_subviews(machine);
@@ -383,7 +383,7 @@ debug_view *debug_view_alloc(running_machine *machine, int type, debug_view_osd_
 {
 	debugvw_private *global = machine->debugvw_data;
 	debug_view *view;
-	
+
 	assert(type >= 0 && type < ARRAY_LENGTH(callback_table));
 
 	/* allocate memory for the view */
@@ -614,7 +614,7 @@ debug_view_xy debug_view_get_total_size(debug_view *view)
 
 
 /*-------------------------------------------------
-    debug_view_get_visible_size - return the 
+    debug_view_get_visible_size - return the
     visible size in rows and columns
 -------------------------------------------------*/
 
@@ -627,8 +627,8 @@ debug_view_xy debug_view_get_visible_size(debug_view *view)
 
 
 /*-------------------------------------------------
-    debug_view_get_visible_position - return the 
-    top left position of the visible area in rows 
+    debug_view_get_visible_position - return the
+    top left position of the visible area in rows
     and columns
 -------------------------------------------------*/
 
@@ -641,7 +641,7 @@ debug_view_xy debug_view_get_visible_position(debug_view *view)
 
 
 /*-------------------------------------------------
-    debug_view_set_visible_size - set the visible 
+    debug_view_set_visible_size - set the visible
     size in rows and columns
 -------------------------------------------------*/
 
@@ -660,8 +660,8 @@ void debug_view_set_visible_size(debug_view *view, debug_view_xy size)
 
 
 /*-------------------------------------------------
-    debug_view_set_visible_position - set the 
-    top left position of the visible area in rows 
+    debug_view_set_visible_position - set the
+    top left position of the visible area in rows
     and columns
 -------------------------------------------------*/
 
@@ -767,7 +767,7 @@ void debug_view_set_cursor_visible(debug_view *view, int visible)
 ***************************************************************************/
 
 /*-------------------------------------------------
-    debug_view_expression_alloc - allocate data 
+    debug_view_expression_alloc - allocate data
     for an expression
 -------------------------------------------------*/
 
@@ -778,7 +778,7 @@ static void debug_view_expression_alloc(debug_view_expression *expression)
 
 
 /*-------------------------------------------------
-    debug_view_expression_free - free data 
+    debug_view_expression_free - free data
     allocated for an expression
 -------------------------------------------------*/
 
@@ -792,7 +792,7 @@ static void debug_view_expression_free(debug_view_expression *expression)
 
 
 /*-------------------------------------------------
-    debug_view_expression_set - set a new 
+    debug_view_expression_set - set a new
     expression string
 -------------------------------------------------*/
 
@@ -804,7 +804,7 @@ static void debug_view_expression_set(debug_view_expression *expression, const c
 
 
 /*-------------------------------------------------
-    debug_view_expression_changed_value - update an 
+    debug_view_expression_changed_value - update an
     expression and return TRUE if its value has
     changed
 -------------------------------------------------*/
@@ -813,7 +813,7 @@ static int debug_view_expression_changed_value(debug_view *view, debug_view_expr
 {
 	int changed = expression->dirty;
 	EXPRERR exprerr;
-	
+
 	/* if dirty, re-evaluate */
 	if (expression->dirty)
 	{
@@ -831,7 +831,7 @@ static int debug_view_expression_changed_value(debug_view *view, debug_view_expr
 			expression->parsed = expr;
 		}
 	}
-	
+
 	/* if we have a parsed expression, evalute it */
 	if (expression->parsed != NULL)
 	{
@@ -841,7 +841,7 @@ static int debug_view_expression_changed_value(debug_view *view, debug_view_expr
 		exprerr = expression_execute(expression->parsed, &expression->result);
 		changed |= (expression->result != oldresult);
 	}
-	
+
 	/* expression no longer dirty by definition */
 	expression->dirty = FALSE;
 	return changed;
@@ -854,7 +854,7 @@ static int debug_view_expression_changed_value(debug_view *view, debug_view_expr
 ***************************************************************************/
 
 /*-------------------------------------------------
-    console_view_alloc - allocate memory for the 
+    console_view_alloc - allocate memory for the
     console view
 -------------------------------------------------*/
 
@@ -865,7 +865,7 @@ static int console_view_alloc(debug_view *view)
 
 
 /*-------------------------------------------------
-    log_view_alloc - allocate memory for the log 
+    log_view_alloc - allocate memory for the log
     view
 -------------------------------------------------*/
 
@@ -876,7 +876,7 @@ static int log_view_alloc(debug_view *view)
 
 
 /*-------------------------------------------------
-    textbuf_view_alloc - allocate memory for a 
+    textbuf_view_alloc - allocate memory for a
     text buffer-based view
 -------------------------------------------------*/
 
@@ -985,7 +985,7 @@ static void textbuf_view_update(debug_view *view)
 
 
 /*-------------------------------------------------
-    textbuf_view_notify - handle notification of 
+    textbuf_view_notify - handle notification of
     updates to visible area
 -------------------------------------------------*/
 
@@ -997,7 +997,7 @@ static void textbuf_view_notify(debug_view *view, view_notification type)
 	{
 		/* if the bottom line is visible, just track the bottom */
 		textdata->at_bottom = (view->total.y >= view->topleft.y && view->total.y <= view->topleft.y + view->visible.y);
-		
+
 		/* otherwise, track the seqence number of the top line */
 		if (!textdata->at_bottom)
 			textdata->topseq = text_buffer_line_index_to_seqnum(textdata->textbuf, view->topleft.y);
@@ -1023,29 +1023,29 @@ static const registers_subview_item *registers_view_enumerate_subviews(running_m
 	int curindex = 0;
 	int cpunum;
 
-	/* iterate over CPUs with program address spaces */	
+	/* iterate over CPUs with program address spaces */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 		if (machine->cpu[cpunum] != NULL)
 		{
 			const device_config *device = machine->cpu[cpunum];
 			registers_subview_item *subview;
-			
+
 			/* determine the string and allocate a subview large enough */
 			astring_printf(tempstring, "CPU '%s' (%s)", device->tag, cpu_get_name(device));
 			subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
 			memset(subview, 0, sizeof(*subview));
-			
+
 			/* populate the subview */
 			subview->next = NULL;
 			subview->index = curindex++;
 			subview->device = device;
 			strcpy(subview->name, astring_c(tempstring));
-			
+
 			/* add to the list */
 			*tailptr = subview;
 			tailptr = &subview->next;
 		}
-	
+
 	/* free the temporary string */
 	astring_free(tempstring);
 	return head;
@@ -1070,7 +1070,7 @@ static int registers_view_alloc(debug_view *view)
 	if (regdata == NULL)
 		return FALSE;
 	memset(regdata, 0, sizeof(*regdata));
-	
+
 	/* default to the first subview */
 	regdata->device = view->machine->debugvw_data->registers_subviews->device;
 
@@ -1165,7 +1165,7 @@ static void registers_view_recompute(debug_view *view)
 	debug_view_registers *regdata = view->extra_data;
 	int regnum, maxtaglen, maxvallen;
 	const int *list;
-	
+
 	/* if no CPU, reset to the first one */
 	if (regdata->device == NULL)
 		regdata->device = view->machine->cpu[0];
@@ -1388,7 +1388,7 @@ static void registers_view_update(debug_view *view)
 
 
 /*-------------------------------------------------
-    registers_view_get_subview_list - return a 
+    registers_view_get_subview_list - return a
     linked list of subviews
 -------------------------------------------------*/
 
@@ -1409,11 +1409,11 @@ int registers_view_get_subview(debug_view *view)
 	debug_view_registers *regdata = view->extra_data;
 	const registers_subview_item *subview;
 	int index = 0;
-	
+
 	assert(view->type == DVT_REGISTERS);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
-	
+
 	for (subview = view->machine->debugvw_data->registers_subviews; subview != NULL; subview = subview->next)
 	{
 		if (subview->device == regdata->device)
@@ -1425,7 +1425,7 @@ int registers_view_get_subview(debug_view *view)
 
 
 /*-------------------------------------------------
-    registers_view_set_subview - select a new 
+    registers_view_set_subview - select a new
     subview by index
 -------------------------------------------------*/
 
@@ -1433,7 +1433,7 @@ void registers_view_set_subview(debug_view *view, int index)
 {
 	const registers_subview_item *subview = registers_view_get_subview_by_index(view->machine->debugvw_data->registers_subviews, index);
 	debug_view_registers *regdata = view->extra_data;
-	
+
 	assert(view->type == DVT_REGISTERS);
 	assert(subview != NULL);
 	if (subview == NULL)
@@ -1468,7 +1468,7 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 	int curindex = 0;
 	int cpunum;
 
-	/* iterate over CPUs with program address spaces */	
+	/* iterate over CPUs with program address spaces */
 	for (cpunum = 0; cpunum < ARRAY_LENGTH(machine->cpu); cpunum++)
 		if (machine->cpu[cpunum] != NULL)
 		{
@@ -1476,24 +1476,24 @@ static const disasm_subview_item *disasm_view_enumerate_subviews(running_machine
 			if (space != NULL)
 			{
 				disasm_subview_item *subview;
-				
+
 				/* determine the string and allocate a subview large enough */
 				astring_printf(tempstring, "CPU '%s' (%s)", space->cpu->tag, cpu_get_name(space->cpu));
 				subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
 				memset(subview, 0, sizeof(*subview));
-				
+
 				/* populate the subview */
 				subview->next = NULL;
 				subview->index = curindex++;
 				subview->space = space;
 				strcpy(subview->name, astring_c(tempstring));
-				
+
 				/* add to the list */
 				*tailptr = subview;
 				tailptr = &subview->next;
 			}
 		}
-	
+
 	/* free the temporary string */
 	astring_free(tempstring);
 	return head;
@@ -1520,7 +1520,7 @@ static int disasm_view_alloc(debug_view *view)
 	if (dasmdata == NULL)
 		return FALSE;
 	memset(dasmdata, 0, sizeof(*dasmdata));
-	
+
 	/* default to the first subview */
 	dasmdata->space = view->machine->debugvw_data->disasm_subviews->space;
 
@@ -1571,7 +1571,7 @@ static void disasm_view_free(debug_view *view)
 
 
 /*-------------------------------------------------
-    disasm_view_notify - handle notification of 
+    disasm_view_notify - handle notification of
     updates to cursor changes
 -------------------------------------------------*/
 
@@ -1642,7 +1642,7 @@ static void disasm_view_char(debug_view *view, int chval)
 			view->cursor.y = view->total.y - 1;
 			break;
 	}
-	
+
 	/* send a cursor changed notification */
 	if (view->cursor.y != origcursor.y)
 	{
@@ -1655,8 +1655,8 @@ static void disasm_view_char(debug_view *view, int chval)
 
 
 /*-------------------------------------------------
-    disasm_view_find_pc_backwards - back up the 
-    specified numberof instructions from the given 
+    disasm_view_find_pc_backwards - back up the
+    specified numberof instructions from the given
     PC
 -------------------------------------------------*/
 
@@ -1701,7 +1701,7 @@ static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t t
 		{
 			offs_t scanpcbyte = memory_address_to_byte(space, scanpc);
 			offs_t physpcbyte = scanpcbyte;
-			
+
 			/* get the disassembly, but only if mapped */
 			instlen = 1;
 			if (memory_address_physical(space, TRANSLATE_FETCH, &physpcbyte))
@@ -1734,7 +1734,7 @@ static offs_t disasm_view_find_pc_backwards(const address_space *space, offs_t t
 
 
 /*-------------------------------------------------
-    disasm_view_generate_bytes - generate the 
+    disasm_view_generate_bytes - generate the
     opcode byte values
 -------------------------------------------------*/
 
@@ -1933,7 +1933,7 @@ static void disasm_view_update(debug_view *view)
 	offs_t pc, pcbyte;
 	EXPRERR exprerr;
 	UINT32 row;
-	
+
 	/* no space, do nothing */
 	if (space == NULL)
 		return;
@@ -1958,7 +1958,7 @@ static void disasm_view_update(debug_view *view)
 				expression_free(dasmdata->expression.parsed);
 			dasmdata->expression.parsed = expr;
 		}
-		
+
 		/* always recompute if the expression is dirty */
 		view->recompute = TRUE;
 	}
@@ -2122,7 +2122,7 @@ recompute:
 
 
 /*-------------------------------------------------
-    disasm_view_get_subview_list - return a linked 
+    disasm_view_get_subview_list - return a linked
     list of subviews
 -------------------------------------------------*/
 
@@ -2143,11 +2143,11 @@ int disasm_view_get_subview(debug_view *view)
 	debug_view_disasm *dasmdata = view->extra_data;
 	const disasm_subview_item *subview;
 	int index = 0;
-	
+
 	assert(view->type == DVT_DISASSEMBLY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
-	
+
 	for (subview = view->machine->debugvw_data->disasm_subviews; subview != NULL; subview = subview->next)
 	{
 		if (subview->space == dasmdata->space)
@@ -2159,7 +2159,7 @@ int disasm_view_get_subview(debug_view *view)
 
 
 /*-------------------------------------------------
-    disasm_view_get_expression - return the 
+    disasm_view_get_expression - return the
     expression string describing the home address
 -------------------------------------------------*/
 
@@ -2174,7 +2174,7 @@ const char *disasm_view_get_expression(debug_view *view)
 
 
 /*-------------------------------------------------
-    disasm_view_get_right_column - return the 
+    disasm_view_get_right_column - return the
     contents of the right column
 -------------------------------------------------*/
 
@@ -2189,8 +2189,8 @@ disasm_right_column disasm_view_get_right_column(debug_view *view)
 
 
 /*-------------------------------------------------
-    disasm_view_get_backward_steps - return the 
-    number of instructions displayed before the 
+    disasm_view_get_backward_steps - return the
+    number of instructions displayed before the
     home address
 -------------------------------------------------*/
 
@@ -2205,8 +2205,8 @@ UINT32 disasm_view_get_backward_steps(debug_view *view)
 
 
 /*-------------------------------------------------
-    disasm_view_get_disasm_width - return the 
-    width in characters of the main disassembly 
+    disasm_view_get_disasm_width - return the
+    width in characters of the main disassembly
     section
 -------------------------------------------------*/
 
@@ -2221,8 +2221,8 @@ UINT32 disasm_view_get_disasm_width(debug_view *view)
 
 
 /*-------------------------------------------------
-    disasm_view_get_selected_address - return the 
-    PC of the currently selected address in the 
+    disasm_view_get_selected_address - return the
+    PC of the currently selected address in the
     view
 -------------------------------------------------*/
 
@@ -2245,7 +2245,7 @@ void disasm_view_set_subview(debug_view *view, int index)
 {
 	const disasm_subview_item *subview = disasm_view_get_subview_by_index(view->machine->debugvw_data->disasm_subviews, index);
 	debug_view_disasm *dasmdata = view->extra_data;
-	
+
 	assert(view->type == DVT_DISASSEMBLY);
 	assert(subview != NULL);
 	if (subview == NULL)
@@ -2266,7 +2266,7 @@ void disasm_view_set_subview(debug_view *view, int index)
 
 
 /*-------------------------------------------------
-    disasm_view_set_expression - set the 
+    disasm_view_set_expression - set the
     expression string describing the home address
 -------------------------------------------------*/
 
@@ -2285,14 +2285,14 @@ void disasm_view_set_expression(debug_view *view, const char *expression)
 
 
 /*-------------------------------------------------
-    disasm_view_set_right_column - set the 
+    disasm_view_set_right_column - set the
     contents of the right column
 -------------------------------------------------*/
 
 void disasm_view_set_right_column(debug_view *view, disasm_right_column contents)
 {
 	debug_view_disasm *dasmdata = view->extra_data;
-	
+
 	assert(view->type == DVT_DISASSEMBLY);
 	assert(contents == DASM_RIGHTCOL_RAW || contents == DASM_RIGHTCOL_ENCRYPTED || contents == DASM_RIGHTCOL_COMMENTS);
 
@@ -2307,8 +2307,8 @@ void disasm_view_set_right_column(debug_view *view, disasm_right_column contents
 
 
 /*-------------------------------------------------
-    disasm_view_set_backward_steps - set the 
-    number of instructions displayed before the 
+    disasm_view_set_backward_steps - set the
+    number of instructions displayed before the
     home address
 -------------------------------------------------*/
 
@@ -2329,8 +2329,8 @@ void disasm_view_set_backward_steps(debug_view *view, UINT32 steps)
 
 
 /*-------------------------------------------------
-    disasm_view_set_disasm_width - set the 
-    width in characters of the main disassembly 
+    disasm_view_set_disasm_width - set the
+    width in characters of the main disassembly
     section
 -------------------------------------------------*/
 
@@ -2351,8 +2351,8 @@ void disasm_view_set_disasm_width(debug_view *view, UINT32 width)
 
 
 /*-------------------------------------------------
-    disasm_view_set_selected_address - set the 
-    PC of the currently selected address in the 
+    disasm_view_set_selected_address - set the
+    PC of the currently selected address in the
     view
 -------------------------------------------------*/
 
@@ -2403,12 +2403,12 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 				if (space != NULL)
 				{
 					memory_subview_item *subview;
-					
+
 					/* determine the string and allocate a subview large enough */
 					astring_printf(tempstring, "CPU '%s' (%s) %s memory", space->cpu->tag, cpu_get_name(space->cpu), space->name);
 					subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
 					memset(subview, 0, sizeof(*subview));
-				
+
 					/* populate the subview */
 					subview->next = NULL;
 					subview->index = curindex++;
@@ -2416,7 +2416,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 					subview->endianness = space->endianness;
 					subview->prefsize = space->dbits / 8;
 					strcpy(subview->name, astring_c(tempstring));
-					
+
 					/* add to the list */
 					*tailptr = subview;
 					tailptr = &subview->next;
@@ -2430,12 +2430,12 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 		UINT8 little_endian = ((flags & ROMREGION_ENDIANMASK) == ROMREGION_LE);
 		UINT8 width = 1 << ((flags & ROMREGION_WIDTHMASK) >> 8);
 		memory_subview_item *subview;
-		
+
 		/* determine the string and allocate a subview large enough */
 		astring_printf(tempstring, "Region '%s'", rgntag);
 		subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
 		memset(subview, 0, sizeof(*subview));
-	
+
 		/* populate the subview */
 		subview->next = NULL;
 		subview->index = curindex++;
@@ -2449,7 +2449,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 		subview->endianness = little_endian ? ENDIANNESS_LITTLE : ENDIANNESS_BIG;
 		subview->prefsize = MIN(width, 8);
 		strcpy(subview->name, astring_c(tempstring));
-		
+
 		/* add to the list */
 		*tailptr = subview;
 		tailptr = &subview->next;
@@ -2476,7 +2476,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 			astring_printf(tempstring, "%s", strrchr(name, '/') + 1);
 			subview = auto_malloc(sizeof(*subview) + astring_len(tempstring));
 			memset(subview, 0, sizeof(*subview));
-		
+
 			/* populate the subview */
 			subview->next = NULL;
 			subview->index = curindex++;
@@ -2490,13 +2490,13 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 #endif
 			subview->prefsize = MIN(valsize, 8);
 			strcpy(subview->name, astring_c(tempstring));
-			
+
 			/* add to the list */
 			*tailptr = subview;
 			tailptr = &subview->next;
 		}
 	}
-	
+
 	/* free the temporary string */
 	astring_free(tempstring);
 	return head;
@@ -2511,7 +2511,7 @@ static const memory_subview_item *memory_view_enumerate_subviews(running_machine
 static int memory_view_alloc(debug_view *view)
 {
 	debug_view_memory *memdata;
-	
+
 	/* fail if no available subviews */
 	if (view->machine->debugvw_data->memory_subviews == NULL)
 		return FALSE;
@@ -2530,7 +2530,7 @@ static int memory_view_alloc(debug_view *view)
 
 	/* we support cursors */
 	view->supports_cursor = TRUE;
-	
+
 	/* default to the first subview */
 	memdata->desc = view->machine->debugvw_data->memory_subviews;
 
@@ -2564,7 +2564,7 @@ static void memory_view_free(debug_view *view)
 
 
 /*-------------------------------------------------
-    memory_view_notify - handle notification of 
+    memory_view_notify - handle notification of
     updates to cursor changes
 -------------------------------------------------*/
 
@@ -2574,7 +2574,7 @@ static void memory_view_notify(debug_view *view, view_notification type)
 	{
 		offs_t address;
 		UINT8 shift;
-		
+
 		/* normalize the cursor */
 		memory_view_get_cursor_pos(view, &address, &shift);
 		memory_view_set_cursor_pos(view, address, shift);
@@ -2593,7 +2593,7 @@ static void memory_view_update(debug_view *view)
 	const address_space *space = memdata->desc->space;
 	const memory_view_pos *posdata;
 	UINT32 row;
-	
+
 	/* if we need to recompute, do it now */
 	if (memory_view_needs_recompute(view))
 		memory_view_recompute(view);
@@ -2614,7 +2614,7 @@ static void memory_view_update(debug_view *view)
 		UINT32 effrow = view->topleft.y + row;
 		debug_view_char *dest;
 		int ch, chunknum;
-		
+
 		/* reset the line of data; section 1 is normal, others are ancillary, cursor is selected */
 		dest = destmin;
 		for (ch = 0; ch < view->visible.x; ch++, dest++)
@@ -2636,14 +2636,14 @@ static void memory_view_update(debug_view *view)
 			offs_t addrbyte = memdata->byte_offset + effrow * memdata->bytes_per_row;
 			offs_t address = (space != NULL) ? memory_byte_to_address(space, addrbyte) : addrbyte;
 			char addrtext[20];
-			
+
 			/* generate the address */
 			sprintf(addrtext, memdata->addrformat, address);
 			dest = destrow + memdata->section[0].pos + 1;
 			for (ch = 0; addrtext[ch] != 0 && ch < memdata->section[0].width - 1; ch++, dest++)
 				if (dest >= destmin && dest < destmax)
 					dest->byte = addrtext[ch];
-			
+
 			/* generate the data */
 			for (chunknum = 0; chunknum < memdata->chunks_per_row; chunknum++)
 			{
@@ -2659,7 +2659,7 @@ static void memory_view_update(debug_view *view)
 							dest->byte = "0123456789ABCDEF"[(chunkdata >> shift) & 0x0f];
 					}
 			}
-			
+
 			/* generate the ASCII data */
 			if (memdata->section[2].width > 0)
 			{
@@ -2753,7 +2753,7 @@ static void memory_view_char(debug_view *view, int chval)
 			if (address >= memdata->byte_offset + memdata->bytes_per_chunk)
 				address -= memdata->bytes_per_chunk;
 			break;
-		
+
 		case DCH_CTRLRIGHT:
 			if (address <= memdata->maxaddr - memdata->bytes_per_chunk)
 				address += memdata->bytes_per_chunk;
@@ -2768,11 +2768,11 @@ static void memory_view_char(debug_view *view, int chval)
 			data |= (UINT64)(hexchar - hexvals) << shift;
 			memory_view_write(memdata, memdata->bytes_per_chunk, address, data);
 			/* fall through... */
-		
+
 		case DCH_RIGHT:
 			if (shift == 0 && address != memdata->maxaddr)
 			{
-				shift = memdata->bytes_per_chunk * 8 - 4; 
+				shift = memdata->bytes_per_chunk * 8 - 4;
 				address += memdata->bytes_per_chunk;
 			}
 			else
@@ -2782,7 +2782,7 @@ static void memory_view_char(debug_view *view, int chval)
 		case DCH_LEFT:
 			if (shift == memdata->bytes_per_chunk * 8 - 4 && address != memdata->byte_offset)
 			{
-				shift = 0; 
+				shift = 0;
 				address -= memdata->bytes_per_chunk;
 			}
 			else
@@ -2810,7 +2810,7 @@ static void memory_view_recompute(debug_view *view)
 	offs_t cursoraddr;
 	UINT8 cursorshift;
 	int addrchars;
-	
+
 	/* get the current cursor position */
 	memory_view_get_cursor_pos(view, &cursoraddr, &cursorshift);
 
@@ -2825,7 +2825,7 @@ static void memory_view_recompute(debug_view *view)
 		memdata->maxaddr = memdata->desc->length - 1;
 		addrchars = sprintf(memdata->addrformat, "%X", memdata->maxaddr);
 	}
-	
+
 	/* generate an 8-byte aligned format for the address */
 	if (!memdata->reverse_view)
 		sprintf(memdata->addrformat, "%*s%%0%dX", 8 - addrchars, "", addrchars);
@@ -2843,11 +2843,11 @@ static void memory_view_recompute(debug_view *view)
 		}
 		memdata->chunks_per_row = MAX(1, memdata->chunks_per_row);
 	}
-	
+
 	/* recompute the byte offset based on the most recent expression result */
 	memdata->bytes_per_row = memdata->bytes_per_chunk * memdata->chunks_per_row;
 	memdata->byte_offset = memdata->expression.result % memdata->bytes_per_row;
-	
+
 	/* compute the section widths */
 	memdata->section[0].width = 1 + 8 + 1;
 	memdata->section[1].width = 1 + 3 * memdata->bytes_per_row + 1;
@@ -2868,7 +2868,7 @@ static void memory_view_recompute(debug_view *view)
 		memdata->section[0].pos = memdata->section[1].pos + memdata->section[1].width;
 		view->total.x = memdata->section[0].pos + memdata->section[0].width;
 	}
-	
+
 	/* derive total sizes from that */
 	view->total.y = (memdata->maxaddr - memdata->byte_offset + memdata->bytes_per_row - 1) / memdata->bytes_per_row;
 
@@ -2879,7 +2879,7 @@ static void memory_view_recompute(debug_view *view)
 
 /*-------------------------------------------------
     memory_view_needs_recompute - determine if
-    anything has changed that requires a 
+    anything has changed that requires a
     recomputation
 -------------------------------------------------*/
 
@@ -2888,7 +2888,7 @@ static int memory_view_needs_recompute(debug_view *view)
 	debug_view_memory *memdata = view->extra_data;
 	const address_space *space = memdata->desc->space;
 	int recompute = view->recompute;
-	
+
 	/* handle expression changes */
 	if (debug_view_expression_changed_value(view, &memdata->expression, (space != NULL) ? space->cpu : NULL))
 	{
@@ -2925,15 +2925,15 @@ static void memory_view_get_cursor_pos(debug_view *view, offs_t *address, UINT8 
 		xposition = 0;
 	else if (xposition >= posdata->spacing * memdata->chunks_per_row)
 		xposition = posdata->spacing * memdata->chunks_per_row - 1;
-	
+
 	/* compute chunk number and offset within that chunk */
 	chunknum = xposition / posdata->spacing;
 	chunkoffs = xposition % posdata->spacing;
-	
+
 	/* reverse the chunknum if we're reversed */
 	if (memdata->reverse_view)
 		chunknum = memdata->chunks_per_row - 1 - chunknum;
-		
+
 	/* compute the address and shift */
 	*address += chunknum * memdata->bytes_per_chunk;
 	*shift = posdata->shift[chunkoffs] & 0x7f;
@@ -2960,16 +2960,16 @@ static void memory_view_set_cursor_pos(debug_view *view, offs_t address, UINT8 s
 	/* compute the Y coordinate and chunk index */
 	view->cursor.y = address / memdata->bytes_per_row;
 	chunknum = (address % memdata->bytes_per_row) / memdata->bytes_per_chunk;
-	
+
 	/* reverse the chunknum if we're reversed */
 	if (memdata->reverse_view)
 		chunknum = memdata->chunks_per_row - 1 - chunknum;
-	
+
 	/* scan within the chunk to find the shift */
 	for (view->cursor.x = 0; view->cursor.x < posdata->spacing; view->cursor.x++)
 		if (posdata->shift[view->cursor.x] == shift)
 			break;
-		
+
 	/* add in the chunk offset and shift to the right of divider1 */
 	view->cursor.x += memdata->section[1].pos + 1 + posdata->spacing * chunknum;
 
@@ -3007,7 +3007,7 @@ static UINT64 memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t of
 		cpu_pop_context();
 		return result;
 	}
-	
+
 	/* if larger than a byte, reduce by half and recurse */
 	if (size > 1)
 	{
@@ -3017,7 +3017,7 @@ static UINT64 memory_view_read(debug_view_memory *memdata, UINT8 size, offs_t of
 		else
 			return memory_view_read(memdata, size, offs + 1 * size) | ((UINT64)memory_view_read(memdata, size, offs + 0 * size) << (size * 8));
 	}
-	
+
 	/* all 0xff if out of bounds */
 	offs ^= memdata->desc->offsetxor;
 	if (offs >= memdata->desc->length)
@@ -3037,7 +3037,7 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 	if (memdata->desc->space != NULL)
 	{
 		const address_space *space = memdata->desc->space;
-		
+
 		cpu_push_context(space->cpu);
 		switch (size)
 		{
@@ -3085,7 +3085,7 @@ static void memory_view_write(debug_view_memory *memdata, UINT8 size, offs_t off
 
 
 /*-------------------------------------------------
-    memory_view_get_subview_list - return a linked 
+    memory_view_get_subview_list - return a linked
     list of subviews
 -------------------------------------------------*/
 
@@ -3104,17 +3104,17 @@ const memory_subview_item *memory_view_get_subview_list(debug_view *view)
 int memory_view_get_subview(debug_view *view)
 {
 	debug_view_memory *memdata = view->extra_data;
-	
+
 	assert(view->type == DVT_MEMORY);
 	debug_view_begin_update(view);
 	debug_view_end_update(view);
-	
+
 	return memdata->desc->index;
 }
 
 
 /*-------------------------------------------------
-    memory_view_get_expression - return the 
+    memory_view_get_expression - return the
     expression string describing the home address
 -------------------------------------------------*/
 
@@ -3129,7 +3129,7 @@ const char *memory_view_get_expression(debug_view *view)
 
 
 /*-------------------------------------------------
-    memory_view_get_bytes_per_chunk - return the 
+    memory_view_get_bytes_per_chunk - return the
     currently displayed bytes per chunk
 -------------------------------------------------*/
 
@@ -3144,7 +3144,7 @@ UINT8 memory_view_get_bytes_per_chunk(debug_view *view)
 
 
 /*-------------------------------------------------
-    memory_view_get_chunks_per_row - return the 
+    memory_view_get_chunks_per_row - return the
     number of chunks displayed across a row
 -------------------------------------------------*/
 
@@ -3159,7 +3159,7 @@ UINT32 memory_view_get_chunks_per_row(debug_view *view)
 
 
 /*-------------------------------------------------
-    memory_view_get_reverse - return TRUE if the 
+    memory_view_get_reverse - return TRUE if the
     memory view is displayed reverse
 -------------------------------------------------*/
 
@@ -3174,8 +3174,8 @@ UINT8 memory_view_get_reverse(debug_view *view)
 
 
 /*-------------------------------------------------
-    memory_view_get_ascii - return TRUE if the 
-    memory view is displaying an ASCII 
+    memory_view_get_ascii - return TRUE if the
+    memory view is displaying an ASCII
     representation
 -------------------------------------------------*/
 
@@ -3190,8 +3190,8 @@ UINT8 memory_view_get_ascii(debug_view *view)
 
 
 /*-------------------------------------------------
-    memory_view_get_physical - return TRUE if the 
-    memory view is displaying physical addresses 
+    memory_view_get_physical - return TRUE if the
+    memory view is displaying physical addresses
     versus logical addresses
 -------------------------------------------------*/
 
@@ -3214,7 +3214,7 @@ void memory_view_set_subview(debug_view *view, int index)
 {
 	const memory_subview_item *subview = memory_view_get_subview_by_index(view->machine->debugvw_data->memory_subviews, index);
 	debug_view_memory *memdata = view->extra_data;
-	
+
 	assert(view->type == DVT_MEMORY);
 	assert(subview != NULL);
 	if (subview == NULL)
@@ -3237,7 +3237,7 @@ void memory_view_set_subview(debug_view *view, int index)
 
 
 /*-------------------------------------------------
-    memory_view_set_expression - set the 
+    memory_view_set_expression - set the
     expression string describing the home address
 -------------------------------------------------*/
 
@@ -3256,7 +3256,7 @@ void memory_view_set_expression(debug_view *view, const char *expression)
 
 
 /*-------------------------------------------------
-    memory_view_set_bytes_per_chunk - specify the 
+    memory_view_set_bytes_per_chunk - specify the
     number of bytes displayed per chunk
 -------------------------------------------------*/
 
@@ -3272,12 +3272,12 @@ void memory_view_set_bytes_per_chunk(debug_view *view, UINT8 chunkbytes)
 		int endianness = memdata->desc->endianness;
 		offs_t address;
 		UINT8 shift;
-		
+
 		debug_view_begin_update(view);
 		memory_view_get_cursor_pos(view, &address, &shift);
 		address += (shift / 8) ^ ((endianness == ENDIANNESS_LITTLE) ? 0 : (memdata->bytes_per_chunk - 1));
 		shift %= 8;
-		
+
 		memdata->bytes_per_chunk = chunkbytes;
 		memdata->chunks_per_row = memdata->bytes_per_row / chunkbytes;
 		view->recompute = view->update_pending = TRUE;
@@ -3291,7 +3291,7 @@ void memory_view_set_bytes_per_chunk(debug_view *view, UINT8 chunkbytes)
 
 
 /*-------------------------------------------------
-    memory_view_set_chunks_per_row - specify the 
+    memory_view_set_chunks_per_row - specify the
     number of chunks displayed across a row
 -------------------------------------------------*/
 
@@ -3306,7 +3306,7 @@ void memory_view_set_chunks_per_row(debug_view *view, UINT32 rowchunks)
 	{
 		offs_t address;
 		UINT8 shift;
-		
+
 		debug_view_begin_update(view);
 		memory_view_get_cursor_pos(view, &address, &shift);
 		memdata->chunks_per_row = rowchunks;
@@ -3318,7 +3318,7 @@ void memory_view_set_chunks_per_row(debug_view *view, UINT32 rowchunks)
 
 
 /*-------------------------------------------------
-    memory_view_set_reverse - specify TRUE if the 
+    memory_view_set_reverse - specify TRUE if the
     memory view is displayed reverse
 -------------------------------------------------*/
 
@@ -3332,7 +3332,7 @@ void memory_view_set_reverse(debug_view *view, UINT8 reverse)
 	{
 		offs_t address;
 		UINT8 shift;
-		
+
 		debug_view_begin_update(view);
 		memory_view_get_cursor_pos(view, &address, &shift);
 		memdata->reverse_view = reverse;
@@ -3344,8 +3344,8 @@ void memory_view_set_reverse(debug_view *view, UINT8 reverse)
 
 
 /*-------------------------------------------------
-    memory_view_set_ascii - specify TRUE if the 
-    memory view should display an ASCII 
+    memory_view_set_ascii - specify TRUE if the
+    memory view should display an ASCII
     representation
 -------------------------------------------------*/
 
@@ -3359,7 +3359,7 @@ void memory_view_set_ascii(debug_view *view, UINT8 ascii)
 	{
 		offs_t address;
 		UINT8 shift;
-		
+
 		debug_view_begin_update(view);
 		memory_view_get_cursor_pos(view, &address, &shift);
 		memdata->ascii_view = ascii;
@@ -3371,8 +3371,8 @@ void memory_view_set_ascii(debug_view *view, UINT8 ascii)
 
 
 /*-------------------------------------------------
-    memory_view_set_physical - specify TRUE if the 
-    memory view should display physical addresses 
+    memory_view_set_physical - specify TRUE if the
+    memory view should display physical addresses
     versus logical addresses
 -------------------------------------------------*/
 

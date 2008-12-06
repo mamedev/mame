@@ -364,7 +364,7 @@ INLINE const registers_subview_item *registers_view_get_subview_by_index(const r
 
 /*-------------------------------------------------
     registers_view_get_current_subview - return a
-    pointer to the current subview of a 
+    pointer to the current subview of a
     registers view
 -------------------------------------------------*/
 
@@ -390,7 +390,7 @@ INLINE const disasm_subview_item *disasm_view_get_subview_by_index(const disasm_
 
 /*-------------------------------------------------
     disasm_view_get_current_subview - return a
-    pointer to the current subview of a 
+    pointer to the current subview of a
     disassembly view
 -------------------------------------------------*/
 
@@ -416,7 +416,7 @@ INLINE const memory_subview_item *memory_view_get_subview_by_index(const memory_
 
 /*-------------------------------------------------
     memory_view_get_current_subview - return a
-    pointer to the current subview of a 
+    pointer to the current subview of a
     memory view
 -------------------------------------------------*/
 

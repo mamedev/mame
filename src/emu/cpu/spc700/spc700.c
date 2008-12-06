@@ -1160,7 +1160,7 @@ INLINE void SET_FLAG_I(spc700i_cpu *cpustate, uint value)
 			CLK(BCLK);														\
 			PUSH_16(cpustate, REG_PC);												\
 			JUMP(cpustate, read_16_NORM(0xffc0 + ((15-NUM)<<1)))
-			     	
+
 /* Test and Clear Bits */
 #define OP_TCLR1(BCLK, MODE)												\
 			CLK(BCLK);														\
@@ -1604,14 +1604,14 @@ CPU_GET_INFO( spc700 )
 {
 	spc700i_cpu *cpustate = (device != NULL) ? device->token : NULL;
 	uint p = 0;
-	
+
 	if (device != NULL)
-	{	
+	{
 		p = ((cpustate->flag_n & 0x80)			|
 					((cpustate->flag_v & 0x80) >> 1)	|
 					cpustate->flag_p>>3				|
 					cpustate->flag_b					|
-					(cpustate->flag_h & HFLAG_SET)	|		  
+					(cpustate->flag_h & HFLAG_SET)	|
 					cpustate->flag_i					|
 					((!cpustate->flag_z) << 1)		|
 					((cpustate->flag_c >> 8)&1));

@@ -1012,9 +1012,9 @@ INLINE offs_t memory_byte_to_address(const address_space *space, offs_t address)
 
 
 /*-------------------------------------------------
-    memory_byte_to_address_end - convert a byte 
-    offset to an address in the specified address 
-    space specifying the last address covered by 
+    memory_byte_to_address_end - convert a byte
+    offset to an address in the specified address
+    space specifying the last address covered by
     the byte
 -------------------------------------------------*/
 

@@ -241,7 +241,7 @@ UINT32 arm7_disasm( char *pBuf, UINT32 pc, UINT32 opcode )
 			{
 				pBuf += sprintf(pBuf, "LDRD%s", pConditionCode);
 			}
-			else if (((opcode & 0x60) == 0x60) && !(opcode & 0x100000))	// bit 20 = 0, bits 5&6 = 11 is ARMv5 STRD  
+			else if (((opcode & 0x60) == 0x60) && !(opcode & 0x100000))	// bit 20 = 0, bits 5&6 = 11 is ARMv5 STRD
 			{
 				pBuf += sprintf(pBuf, "STRD%s", pConditionCode);
 			}

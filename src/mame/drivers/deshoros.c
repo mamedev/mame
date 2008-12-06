@@ -70,7 +70,7 @@ static READ8_HANDLER( io_r )
 		case 0x0a: return io_ram[offset]; //"buzzer" 0 read
 		case 0x0b: return io_ram[offset]; //"buzzer" 1 read
 	}
-//	printf("R -> [%02x]\n",offset);
+//  printf("R -> [%02x]\n",offset);
 
 	return io_ram[offset];
 }
@@ -83,12 +83,12 @@ static WRITE8_HANDLER( io_w )
 		case 0x02: update_led_array(data);              return;
 		case 0x05: coin_lockout_w(0,io_ram[offset] & 1);return;
 		case 0x06: /*Printer IRQ enable*/    		    return;
-//		case 0x0a: "buzzer" 0 write
-//		case 0x0b: "buzzer" 1 write
+//      case 0x0a: "buzzer" 0 write
+//      case 0x0b: "buzzer" 1 write
 		case 0x0c: answer_bankswitch(space->machine,data&0x03); return; //data & 0x10 enabled too,dunno if it is worth to shift the data...
 	}
 	io_ram[offset] = data;
-//	printf("%02x -> [%02x]\n",data,offset);
+//  printf("%02x -> [%02x]\n",data,offset);
 }
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )

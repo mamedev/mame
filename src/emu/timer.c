@@ -160,13 +160,13 @@ INLINE emu_timer *timer_new(running_machine *machine)
 		timer_logtimers(machine);
 		fatalerror("Out of timers!");
 	}
-	
+
 	/* pull an entry from the free list */
 	timer = global->freelist;
 	global->freelist = timer->next;
 	if (global->freelist == NULL)
 		global->freelist_tail = NULL;
-	
+
 	/* set up the machine */
 	timer->machine = machine;
 	return timer;
@@ -288,7 +288,7 @@ void timer_init(running_machine *machine)
 {
 	timer_private *global;
 	int i;
-	
+
 	/* allocate global data */
 	global = machine->timer_data = auto_malloc(sizeof(*global));
 	memset(global, 0, sizeof(*global));

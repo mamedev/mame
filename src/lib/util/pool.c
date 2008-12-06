@@ -147,7 +147,7 @@ object_pool *pool_alloc(void (*fail)(const char *message))
 
 	/* set the failure handler */
 	pool->fail = fail;
-	
+
 	/* register the built-in types */
 	pool_type_register(pool, OBJTYPE_MEMORY, "Memory", memory_destruct);
 
@@ -196,7 +196,7 @@ void pool_type_register(object_pool *pool, object_type type, const char *friendl
 void pool_clear(object_pool *pool)
 {
 	object_entry *entry, *next;
-	
+
 	/* iterate over all entries in the global list and free them */
 	for (entry = pool->globallist; entry != NULL; entry = next)
 	{
@@ -211,7 +211,7 @@ void pool_clear(object_pool *pool)
 		entry->globalnext = entry->globalprev = NULL;
 		pool->freelist = entry;
 	}
-	
+
 	/* zap the hashtable */
 	memset(pool->hashtable, 0, sizeof(pool->hashtable));
 }
@@ -320,7 +320,7 @@ void *pool_object_add_file_line(object_pool *pool, object_type _type, void *obje
 	entry->globalprev = NULL;
 	entry->globalnext = pool->globallist;
 	pool->globallist = entry;
-	
+
 	/* hook up to the appropriate hash table */
 	entry->next = pool->hashtable[hashnum];
 	pool->hashtable[hashnum] = entry;
@@ -428,7 +428,7 @@ int pool_iterate_next(object_pool_iterator *iter, void **objectptr, size_t *size
 		iter->last = iter->pool->globallist;
 	else
 		iter->last = iter->last->globalnext;
-		
+
 	/* stop when we get one */
 	if (iter->last != NULL)
 	{

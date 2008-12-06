@@ -12,7 +12,7 @@
         - Only memory to memory is tested!
 
     TODO:
-		- refactor according to new memory system
+        - refactor according to new memory system
         - implement interrupt support (not used in dkong3 and mario)
         - implement missing features
         - implement more asserts

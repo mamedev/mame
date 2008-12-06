@@ -366,11 +366,11 @@ static void global_set(void *globalref, void *ref, UINT64 value)
 int debug_command_parameter_number(running_machine *machine, const char *param, UINT64 *result)
 {
 	EXPRERR err;
-	
+
 	/* NULL parameter does nothing and returns no error */
 	if (param == NULL)
 		return TRUE;
-	
+
 	/* evaluate the expression; success if no error */
 	err = expression_evaluate(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, result);
 	if (err == EXPRERR_NONE)
@@ -393,7 +393,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 {
 	UINT64 cpunum;
 	EXPRERR err;
-	
+
 	/* if no parameter, use the visible CPU */
 	if (param == NULL)
 	{
@@ -431,7 +431,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 
 
 /*-------------------------------------------------
-    debug_command_parameter_cpu_space - validates 
+    debug_command_parameter_cpu_space - validates
     a parameter as a cpu and retrieves the given
     address space
 -------------------------------------------------*/
@@ -439,7 +439,7 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, con
 int debug_command_parameter_cpu_space(running_machine *machine, const char *param, int spacenum, const address_space **result)
 {
 	const device_config *cpu;
-	
+
 	/* first do the standard CPU thing */
 	if (!debug_command_parameter_cpu(machine, param, &cpu))
 		return FALSE;
@@ -463,19 +463,19 @@ int debug_command_parameter_cpu_space(running_machine *machine, const char *para
 static int debug_command_parameter_expression(running_machine *machine, const char *param, parsed_expression **result)
 {
 	EXPRERR err;
-	
+
 	/* NULL parameter does nothing and returns no error */
 	if (param == NULL)
 	{
 		*result = NULL;
 		return TRUE;
 	}
-	
+
 	/* parse the expression; success if no error */
 	err = expression_parse(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, result);
 	if (err == EXPRERR_NONE)
 		return TRUE;
-	
+
 	/* output an error */
 	debug_console_printf(machine, "Error in expression: %s\n", param);
 	debug_console_printf(machine, "                     %*s^", EXPRERR_ERROR_OFFSET(err), "");
@@ -492,16 +492,16 @@ static int debug_command_parameter_expression(running_machine *machine, const ch
 static int debug_command_parameter_command(running_machine *machine, const char *param)
 {
 	CMDERR err;
-	
+
 	/* NULL parameter does nothing and returns no error */
 	if (param == NULL)
 		return TRUE;
-	
+
 	/* validate the comment; success if no error */
 	err = debug_console_validate_command(machine, param);
 	if (err == CMDERR_NONE)
 		return TRUE;
-	
+
 	/* output an error */
 	debug_console_printf(machine, "Error in command: %s\n", param);
 	debug_console_printf(machine, "                  %*s^", CMDERR_ERROR_OFFSET(err), "");
@@ -1034,7 +1034,7 @@ static void execute_comment_del(running_machine *machine, int ref, int params, c
 	/* param 1 can either be a command or the address for the comment */
 	if (!debug_command_parameter_number(machine, param[0], &address))
 		return;
-	
+
 	/* CPU parameter is implicit */
 	if (!debug_command_parameter_cpu(machine, NULL, &cpu))
 		return;

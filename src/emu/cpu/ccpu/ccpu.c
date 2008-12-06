@@ -39,7 +39,7 @@ struct _ccpu_state
 
 	UINT8				waiting;
 	UINT8				watchdog;
-	
+
 	int					icount;
 
 	const device_config *device;

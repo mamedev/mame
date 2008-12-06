@@ -901,7 +901,7 @@ const char *devtype_get_info_string(device_type type, UINT32 state)
 
 	assert(type != NULL);
 	assert(state >= DEVINFO_STR_FIRST && state <= DEVINFO_STR_LAST);
-	
+
 	/* retrieve the value */
 	info.s = get_temp_string_buffer();
 	(*type)(NULL, state, &info);

@@ -1239,7 +1239,7 @@ static void Interrupt(void)
 	I.IREQ &= ~I.ISRV; // remove serviced IRQ flag
 	RIM_IEN = (I.ISRV==IM_TRAP) ? I.IM & IM_IEN : 0; // latch general interrupt enable bit on TRAP or NMI
 //ZT
-	//I.IM &= ~IM_IEN;		/* remove general interrupt enable bit */
+	//I.IM &= ~IM_IEN;      /* remove general interrupt enable bit */
 
 	if( I.ISRV == IM_INTR )
 	{

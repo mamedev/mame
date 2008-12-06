@@ -1051,7 +1051,7 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
     	if ((insn & 0x60) == 0x40)	// LDRD
 	{
 		SET_REGISTER(cpustate, rd, READ32(rnv));
-		SET_REGISTER(cpustate, rd+1, READ32(rnv+4));		
+		SET_REGISTER(cpustate, rd+1, READ32(rnv+4));
                 R15 += 4;
 	}
     	else if ((insn & 0x60) == 0x60)	// STRD
@@ -1059,7 +1059,7 @@ static void HandleHalfWordDT(arm_state *cpustate, UINT32 insn)
 		WRITE32(rnv, GET_REGISTER(cpustate, rd));
 		WRITE32(rnv+4, GET_REGISTER(cpustate, rd+1));
                 R15 += 4;
-	}		   
+	}
 	else
 	{
 	        // WRITE16(rnv, rd == eR15 ? R15 + 8 : GET_REGISTER(cpustate, rd));

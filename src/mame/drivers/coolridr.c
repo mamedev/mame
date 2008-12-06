@@ -5,7 +5,7 @@ preliminary
 
 22 Aug 2004 - Basic skeleton driver, loads some roms doesn't run the right code yet
 2 Dec 2008 - Added an hack for the SH-2,fixed some irqs and some memory maps/ram sharing.
-			 Got to the point that area 0x03e00000 on the SH-2 loads some DMA-style tables.
+             Got to the point that area 0x03e00000 on the SH-2 loads some DMA-style tables.
 
 Known Games on this Platform
 Cool Riders
@@ -144,7 +144,7 @@ static ADDRESS_MAP_START( system_h1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03e10000, 0x03e11fff) AM_RAM AM_BASE(&framebuffer_data)/*Buffer data should go here*/
 
 	AM_RANGE(0x03f00000, 0x03f0ffff) AM_RAM AM_SHARE(3) /*Communication area RAM*/
-//	AM_RANGE(0x04000000, 0x0400001f) AM_RAM /*???*/
+//  AM_RANGE(0x04000000, 0x0400001f) AM_RAM /*???*/
 	AM_RANGE(0x04000000, 0x0400ffff) AM_RAM /*dunno what it is,might be palette RAM*/
 	AM_RANGE(0x06000000, 0x060fffff) AM_RAM AM_BASE(&sysh1_workram_h)
 	AM_RANGE(0x20000000, 0x200fffff) AM_ROM AM_SHARE(1)
@@ -217,10 +217,10 @@ GFXDECODE_END
 // IRQs 4 & 6 are valid on SH-2
 static INTERRUPT_GEN( system_h1 )
 {
-//	if (cpu_getiloops(device))
-//		cpu_set_input_line(device, 4, HOLD_LINE);
-//	else
-//		cpu_set_input_line(device, 6, HOLD_LINE);
+//  if (cpu_getiloops(device))
+//      cpu_set_input_line(device, 4, HOLD_LINE);
+//  else
+//      cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
 //IRQs 10,12 and 14 are valid on SH-1 instead
@@ -237,7 +237,7 @@ static INTERRUPT_GEN( system_h1_sub )
 static MACHINE_RESET ( coolridr )
 {
 
-// 	cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
+//  cpu_set_input_line(machine->cpu[0], INPUT_LINE_HALT, ASSERT_LINE);
 	cpu_set_input_line(machine->cpu[1], INPUT_LINE_HALT, ASSERT_LINE);
 
 }

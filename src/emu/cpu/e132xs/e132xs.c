@@ -1528,7 +1528,7 @@ static void set_irq_line(hyperstone_state *cpustate, int irqline, int state)
 static void hyperstone_init(const device_config *device, int index, int clock, cpu_irq_callback irqcallback, int scale_mask)
 {
 	hyperstone_state *cpustate = device->token;
-	
+
 	state_save_register_device_item_array(device, 0, cpustate->global_regs);
 	state_save_register_device_item_array(device, 0, cpustate->local_regs);
 	state_save_register_device_item(device, 0, cpustate->ppc);

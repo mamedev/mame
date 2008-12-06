@@ -1347,18 +1347,18 @@ UINT32 ui_menu_ui_handler(running_machine *machine, UINT32 state)
 UINT32 ui_slider_ui_handler(running_machine *machine, UINT32 state)
 {
 	UINT32 result;
-	
+
 	/* if this is the first call, push the sliders menu */
 	if (state)
 		ui_menu_stack_push(ui_menu_alloc(machine, menu_sliders, (void *)1));
 
 	/* handle standard menus */
 	result = ui_menu_ui_handler(machine, state);
-	
+
 	/* if we are cancelled, pop the sliders menu */
 	if (result == UI_HANDLER_CANCEL)
 		ui_menu_stack_pop(machine);
-	
+
 	return (menu_stack != NULL && menu_stack->handler == menu_sliders && menu_stack->parameter != NULL) ? 0 : UI_HANDLER_CANCEL;
 }
 
@@ -2685,7 +2685,7 @@ static void menu_sliders(running_machine *machine, ui_menu *menu, void *paramete
 					else
 						*hidden = !*hidden;
 					break;
-				
+
 				/* decrease value */
 				case IPT_UI_LEFT:
 					if (input_code_pressed(KEYCODE_LALT) || input_code_pressed(KEYCODE_RALT))
@@ -2774,7 +2774,7 @@ static void menu_sliders_populate(running_machine *machine, ui_menu *menu, int m
 		if (curval < curslider->maxval)
 			flags |= MENU_FLAG_RIGHT_ARROW;
 		ui_menu_item_append(menu, curslider->description, astring_c(tempstring), flags, (void *)curslider);
-		
+
 		if (menuless_mode)
 			break;
 	}

@@ -151,12 +151,12 @@ screened : 8623961202 CPU020
 Etched   : (8623963202)
 
 
-label		loc.	Device		Filename
+label       loc.    Device      Filename
 --------------------------------------------------------
-GLC1-MST-PRG0E	6B	27c4001		PRG0E
-GLC1-MST-PRG1E	10B	27c4001		PRG1E
-GLC1-MST-PRG2E	14B	27c4001		PRG2E
-GLC1-MST-PRG3E	18B	27c4001		PRG3E
+GLC1-MST-PRG0E  6B  27c4001     PRG0E
+GLC1-MST-PRG1E  10B 27c4001     PRG1E
+GLC1-MST-PRG2E  14B 27c4001     PRG2E
+GLC1-MST-PRG3E  18B 27c4001     PRG3E
 
 **************************************************************************************************
 SLAVE CPU PCB
@@ -167,12 +167,12 @@ screened : 8623961202 CPU020
 Etched   : (8623963202)
 
 
-label		loc.	Device		Filename
+label       loc.    Device      Filename
 --------------------------------------------------------
-GLC-SLV-PRG0	6B	27c010A		PRG0.bin
-GLC-SLV-PRG1	10B	27c010A		PRG1.bin
-GLC-SLV-PRG2	14B	27c010A		PRG2.bin
-GLC-SLV-PRG3	18B	27c010A		PRG3.bin
+GLC-SLV-PRG0    6B  27c010A     PRG0.bin
+GLC-SLV-PRG1    10B 27c010A     PRG1.bin
+GLC-SLV-PRG2    14B 27c010A     PRG2.bin
+GLC-SLV-PRG3    18B 27c010A     PRG3.bin
 
 **************************************************************************************************
 DSP PCB
@@ -184,11 +184,11 @@ screened : 8623961703 DSP
 Etched   : (8623963703) TSK-A
 
 
-label		loc.	Device		Filename
+label       loc.    Device      Filename
 --------------------------------------------------------
-GLC1-DSP-PTOH	2F	27c040		PTOH.BIN
-GLC1-DSP-PTOU	2K	27c040		PTOU.BIN
-GLC1-DSP-PTOL	2N	27c040		PTOL.BIN
+GLC1-DSP-PTOH   2F  27c040      PTOH.BIN
+GLC1-DSP-PTOU   2K  27c040      PTOU.BIN
+GLC1-DSP-PTOL   2N  27c040      PTOL.BIN
 
 **************************************************************************************************
 OBJ PCB
@@ -199,12 +199,12 @@ screened : 8623962002
 Etched   : (8623964002)
 
 
-label		loc.	Device		Filename
+label       loc.    Device      Filename
 --------------------------------------------------------
-GLC1-OBJ-OBJ0	9T	27c040		OBJ0.BIN
-GLC1-OBJ-OBJ2	9W	27c4000		OBJ2.BIN
-GLC1-OBJ-OBJ1	9Y	27c040		OBJ1.BIN
-GLC1-OBJ-OBJ3	9Z	27c4000		OBJ0.BIN
+GLC1-OBJ-OBJ0   9T  27c040      OBJ0.BIN
+GLC1-OBJ-OBJ2   9W  27c4000     OBJ2.BIN
+GLC1-OBJ-OBJ1   9Y  27c040      OBJ1.BIN
+GLC1-OBJ-OBJ3   9Z  27c4000     OBJ0.BIN
 
 **************************************************************************************************
 PSN PCB
@@ -216,11 +216,11 @@ screened : V1079603
 Etched   : (V1079703)
 
 
-label		loc.	Device		Filename
+label       loc.    Device      Filename
 --------------------------------------------------------
-GLC-PSN-VOL	IC100	27c010A		VOL.bin
-GLC-PSN-PRG0B	IC22	27c010A		PRG0B.bin
-GLC-PSN-PRG0B	IC23	27c010A		PRG1B.bin
+GLC-PSN-VOL IC100   27c010A     VOL.bin
+GLC-PSN-PRG0B   IC22    27c010A     PRG0B.bin
+GLC-PSN-PRG0B   IC23    27c010A     PRG1B.bin
 
 
 PCB markings:
@@ -231,10 +231,10 @@ Etched   : (V107970701) TSK-A
 RS PCB
 **************************************************************************************************
 
-label		loc.	Device		Filename
+label       loc.    Device      Filename
 --------------------------------------------------------
-GLC-RS-PRGLB	18B	27c010		PRGLB.BIN
-GLC-RS-PRGUB	19B	27c010		PRGUB.BIN
+GLC-RS-PRGLB    18B 27c010      PRGLB.BIN
+GLC-RS-PRGUB    19B 27c010      PRGUB.BIN
 
 **************************************************************************************************
 SOUND PCB
@@ -246,18 +246,18 @@ screened : V107965101
 Etched   : (V107975101)
 
 
-label		loc.	Device		Filename
+label       loc.    Device      Filename
 --------------------------------------------------------
-GLC1-SND-VOI0	13A	27c040		VOI0.BIN
-GLC1-SND-VOI2	13C	27c040		VOI2.BIN
-GLC1-SND-VOI8	10G	27c040		VOI8.BIN
-GLC1-SND-VOI9	11/12G	27c040		VOI9.BIN
-GLC1-SND-VOI10	13G	27c040		VOI10.BIN
-GLC1-SND-VOI11	14G	27c040		VOI11.BIN
+GLC1-SND-VOI0   13A 27c040      VOI0.BIN
+GLC1-SND-VOI2   13C 27c040      VOI2.BIN
+GLC1-SND-VOI8   10G 27c040      VOI8.BIN
+GLC1-SND-VOI9   11/12G  27c040      VOI9.BIN
+GLC1-SND-VOI10  13G 27c040      VOI10.BIN
+GLC1-SND-VOI11  14G 27c040      VOI11.BIN
 
-GLC1-SND-PRG0	1H	27c1000		PRG0.BIN
-GLC1-SND-PRG1	2H	27c1000		PRG1.BIN
-GLC1-SND-DATA1	4/5H	27c1000		DATA1.BIN
+GLC1-SND-PRG0   1H  27c1000     PRG0.BIN
+GLC1-SND-PRG1   2H  27c1000     PRG1.BIN
+GLC1-SND-DATA1  4/5H    27c1000     DATA1.BIN
 
 
 */

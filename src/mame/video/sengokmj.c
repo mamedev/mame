@@ -140,6 +140,6 @@ VIDEO_UPDATE( sengokmj )
 	if(!(sengokmj_layer_en & 8))
 		tilemap_draw(bitmap,cliprect,tx_tilemap,0,0);
 
-//	popmessage("%04x",sengokmj_layer_en);
+//  popmessage("%04x",sengokmj_layer_en);
 	return 0;
 }

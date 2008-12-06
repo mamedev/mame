@@ -957,7 +957,7 @@ static CPU_INIT( m37710 )
 
 	cpustate->source = 0;
 	cpustate->destination = 0;
-	
+
 	for (i = 0; i < 8; i++)
 		cpustate->timers[i] = timer_alloc(device->machine, m37710_timer_cb, cpustate);
 

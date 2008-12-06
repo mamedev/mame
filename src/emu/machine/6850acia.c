@@ -1,8 +1,8 @@
 /*********************************************************************
 
-	6850acia.c
+    6850acia.c
 
-	6850 ACIA code
+    6850 ACIA code
 
 *********************************************************************/
 
@@ -765,7 +765,7 @@ static void rx_tick(const device_config *device)
 
 /*-------------------------------------------------
     TIMER_CALLBACK( receive_event ) - Called on
-	receive timer event
+    receive timer event
 -------------------------------------------------*/
 
 static TIMER_CALLBACK( receive_event )
@@ -807,7 +807,7 @@ void acia_rx_clock_in(const device_config *device)
 
 /*-------------------------------------------------
     acia6850_set_rx_clock - Set clock frequencies
-	dynamically
+    dynamically
 -------------------------------------------------*/
 
 void acia6850_set_rx_clock(const device_config *device, int clock)
@@ -819,7 +819,7 @@ void acia6850_set_rx_clock(const device_config *device, int clock)
 
 /*-------------------------------------------------
     acia6850_set_tx_clock - Set clock frequencies
-	dynamically
+    dynamically
 -------------------------------------------------*/
 
 void acia6850_set_tx_clock(const device_config *device, int clock)

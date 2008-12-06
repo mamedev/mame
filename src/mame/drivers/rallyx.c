@@ -1219,9 +1219,9 @@ ROM_START( locoboot )
 	ROM_LOAD( "g.119",           0x3000, 0x1000, CRC(3feb762e) SHA1(94ee68549752fac3c67582d968d3f5e3f1380eef) )
 
 	/* no other roms were present in this set,
-	   but it appears to work best with the cottong roms,
-	   and the program roms appear to be a hack of that
-	*/
+       but it appears to work best with the cottong roms,
+       and the program roms appear to be a hack of that
+    */
 
 	ROM_REGION( 0x10000, "tpsound", 0 )
 	ROM_LOAD( "c7",           0x0000, 0x1000, CRC(3d83f6d3) SHA1(e10ed6b6ce7280697c1bc9dbe6c6e6018e1d8be4) )

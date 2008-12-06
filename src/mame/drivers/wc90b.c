@@ -479,10 +479,10 @@ ROM_START( wc90b2 )
 	ROM_CONTINUE(             0x10000, 0x8000 ) /* banked at 8000-bfff */
 
 	ROM_REGION( 0x010000, "gfx1", ROMREGION_DISPOSE )
-//	ROM_LOAD( "18.bin",       0x000000, 0x04000, CRC(0c054481) SHA1(eebab099a4db5fbf13522ecd67bfa741e16e40d4) ) /* maybe bad dump: double size */
-//	ROM_LOAD( "19.bin",       0x004000, 0x04000, CRC(ebb3eb48) SHA1(9cb133e02004bc04a9d7016b8cf5f6865e3ccf26) ) /* maybe bad dump: double size */
-//	ROM_LOAD( "20.bin",       0x008000, 0x04000, CRC(c0232af8) SHA1(5bbab00403a47feae153e179c04212021036b8a7) ) /* maybe bad dump: double size */
-//	ROM_LOAD( "21.bin",       0x00c000, 0x04000, CRC(a36e17fb) SHA1(45e4df4b4a22658f6dad21853e87fae734698fbd) ) /* maybe bad dump: double size */
+//  ROM_LOAD( "18.bin",       0x000000, 0x04000, CRC(0c054481) SHA1(eebab099a4db5fbf13522ecd67bfa741e16e40d4) ) /* maybe bad dump: double size */
+//  ROM_LOAD( "19.bin",       0x004000, 0x04000, CRC(ebb3eb48) SHA1(9cb133e02004bc04a9d7016b8cf5f6865e3ccf26) ) /* maybe bad dump: double size */
+//  ROM_LOAD( "20.bin",       0x008000, 0x04000, CRC(c0232af8) SHA1(5bbab00403a47feae153e179c04212021036b8a7) ) /* maybe bad dump: double size */
+//  ROM_LOAD( "21.bin",       0x00c000, 0x04000, CRC(a36e17fb) SHA1(45e4df4b4a22658f6dad21853e87fae734698fbd) ) /* maybe bad dump: double size */
 	ROM_LOAD( "a06.bin",      0x000000, 0x04000, BAD_DUMP SHA1(b839b4eafe8bf6f9e841e19fee1bdb64a66f3448) ) /* roms from parent */
 	ROM_LOAD( "a08.bin",      0x004000, 0x04000, BAD_DUMP SHA1(468c8c24af1f6f244228b66df04cb0ea81c1875e) ) /* roms from parent */
 	ROM_LOAD( "a10.bin",      0x008000, 0x04000, BAD_DUMP SHA1(4b10ee3fc17bb63cda51b2a978d066b6a140a551) ) /* roms from parent */

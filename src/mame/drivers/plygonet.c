@@ -43,7 +43,7 @@
     440000-47ffff = PSVR
     480000-4bffff = IO
     4c0000-4fffff = SYS
-    500000-53ffff = DSP			    
+    500000-53ffff = DSP
     540000-57ffff = FIX
     580000-5bffff = OP1
     5c0000-5fffff = UNUSED
@@ -72,8 +72,8 @@
 
     500000-503fff = HCOM     - 16kB common RAM
     504000-504fff = CONTROL  - DSP/Host Control
-			        D10? = COMBNK - Switch between 68k and DSP access to common RAM
-			        D08? = RESN   - Reset DSP
+                    D10? = COMBNK - Switch between 68k and DSP access to common RAM
+                    D08? = RESN   - Reset DSP
     506000-506fff = HEN      - DSP/Host interface
 
 */

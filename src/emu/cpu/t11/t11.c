@@ -368,7 +368,7 @@ static CPU_EXECUTE( t11 )
 	do
 	{
 		UINT16 op;
-		
+
 		cpustate->ppc = cpustate->reg[7];	/* copy PC to previous PC */
 
 		debugger_instruction_hook(device, cpustate->PCD);
@@ -424,7 +424,7 @@ static CPU_SET_INFO( t11 )
 CPU_GET_INFO( t11 )
 {
 	t11_state *cpustate = (device != NULL) ? device->token : NULL;
-	
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */

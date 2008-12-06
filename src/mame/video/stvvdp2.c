@@ -5443,7 +5443,7 @@ static TIMER_CALLBACK( dyn_res_change )
 	visarea.max_y = vert_res-1;
 
 	vblank_period = get_vblank_duration(machine);
-//	popmessage("%d",vblank_period);
+//  popmessage("%d",vblank_period);
 //  hblank_period = get_hblank_duration(machine->primary_screen);
 	video_screen_configure(machine->primary_screen, horz_res*2, (vert_res+vblank_period), &visarea, video_screen_get_frame_period(machine->primary_screen).attoseconds );
 }

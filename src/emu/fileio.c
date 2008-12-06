@@ -385,7 +385,7 @@ void mame_fclose(mame_file *file)
 
 
 /*-------------------------------------------------
-    mame_fcompress - enable/disable streaming file 
+    mame_fcompress - enable/disable streaming file
     compression via zlib
 -------------------------------------------------*/
 

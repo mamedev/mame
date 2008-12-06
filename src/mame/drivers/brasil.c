@@ -123,7 +123,7 @@ static WRITE16_HANDLER( blit_status_w )
 
 	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 
-//	popmessage("%04x",data);
+//  popmessage("%04x",data);
 }
 
 /* New Magic Card */
@@ -147,7 +147,7 @@ static WRITE16_HANDLER( vidpokr2_blit_status_w )
 
 	memory_set_bankptr(space->machine, 1, &ROM[bankaddress]);
 
-//	popmessage("%04x",data);
+//  popmessage("%04x",data);
 }
 
 static WRITE16_HANDLER( paletteram_io_w )
@@ -203,26 +203,26 @@ static UINT16 t1,t3;
 
 static READ16_HANDLER( read1_r )
 {
-//	return mame_rand(space->machine);
+//  return mame_rand(space->machine);
 	return input_port_read(space->machine, "IN0");
 }
 
 static READ16_HANDLER( read2_r )
 {
-//	return mame_rand(space->machine);
+//  return mame_rand(space->machine);
 	return input_port_read(space->machine, "IN1");
 }
 
 static READ16_HANDLER( read3_r )
 {
-//	return mame_rand(space->machine);
+//  return mame_rand(space->machine);
 	return input_port_read(space->machine, "IN2");
 }
 
 static WRITE16_HANDLER( write1_w )
 {
 	t1 = data;
-//	popmessage("%04x %04x",t1,t3);
+//  popmessage("%04x %04x",t1,t3);
 }
 
 static WRITE16_HANDLER( write2_w )
@@ -239,7 +239,7 @@ static WRITE16_HANDLER( write2_w )
 static WRITE16_HANDLER( write3_w )
 {
 	t3 = data;
-//	popmessage("%04x %04x",t1,t3);
+//  popmessage("%04x %04x",t1,t3);
 }
 
 static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -258,8 +258,8 @@ static ADDRESS_MAP_START( brasil_io, ADDRESS_SPACE_IO, 16 )
  	AM_RANGE(0x0008, 0x0009) AM_READ( read1_r )
 	AM_RANGE(0x000a, 0x000b) AM_READ( read2_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ( read3_r )
-//	AM_RANGE(0x000e, 0x000f) AM_WRITE
-//	AM_RANGE(0xffa2, 0xffa3) AM_WRITE
+//  AM_RANGE(0x000e, 0x000f) AM_WRITE
+//  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vidpokr2_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -281,8 +281,8 @@ static ADDRESS_MAP_START( vidpokr2_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x000c, 0x000d) AM_READ( vidpokr2_vblank_r )
 	AM_RANGE(0x000e, 0x000f) AM_READ( read3_r )
 	AM_RANGE(0x0010, 0x0015) AM_WRITE( paletteram_io_w )
-//	AM_RANGE(0x000e, 0x000f) AM_WRITE
-//	AM_RANGE(0xffa2, 0xffa3) AM_WRITE
+//  AM_RANGE(0x000e, 0x000f) AM_WRITE
+//  AM_RANGE(0xffa2, 0xffa3) AM_WRITE
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( brasil )

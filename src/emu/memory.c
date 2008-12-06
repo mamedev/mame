@@ -1501,7 +1501,7 @@ static void memory_init_spaces(running_machine *machine)
 					int endianness = cputype_get_endianness(cputype);
 					int accessorindex = (dbits == 8) ? 0 : (dbits == 16) ? 1 : (dbits == 32) ? 2 : 3;
 					int entrynum;
-					
+
 					/* if logbits is 0, revert to abits */
 					if (logbits == 0)
 						logbits = abits;

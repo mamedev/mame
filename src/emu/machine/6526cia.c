@@ -296,7 +296,7 @@ static int is_timer_active(emu_timer *timer)
 
 /*-------------------------------------------------
     cia_timer_update - updates the count and
-	emu_timer for a given CIA timer
+    emu_timer for a given CIA timer
 -------------------------------------------------*/
 
 static void cia_timer_update(cia_timer *timer, INT32 new_count)
@@ -499,7 +499,7 @@ void cia_clock_tod(const device_config *device)
 		if ((device->type == CIA6526R1) || (device->type == CIA6526R2))
 		{
 			/* The 6526 split the value into hours, minutes, seconds and
-			 * subseconds */
+             * subseconds */
 			cia6526_increment(cia);
 		}
 		else if (device->type == CIA8520)

@@ -181,7 +181,7 @@
     take your credits, the 3 witches start to roll their own numbers like a
     slot machine. There is an attempt for each winning hand. the bonus ends when
     you win a prize, or when all attempts are done.
-	
+
 
     * Super Loco 93
 
@@ -221,7 +221,7 @@
     The rest is similar to Witch Card, but with 3 big numbers instead of
     witches. Once you lose or take your credits, the big numbers start to
     run 'alla' slot game, giving 1 attempt by each time you won a double-up
-	hand.
+    hand.
 
     - Settings:
 
@@ -632,7 +632,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 	int attr = colorram[tile_index];
 	int code = ((attr & 1) << 8) | videoram[tile_index];
-	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */ 
+	int bank = (attr & 0x02) >> 1;	/* bit 1 switch the gfx banks */
  	int color = (attr & 0x3c) >> 2;	/* bits 2-3-4-5 for color */
 
 	SET_TILE_INFO(bank, code, color, 0);
@@ -669,7 +669,7 @@ static PALETTE_INIT( goldnpkr )
 		int bit0, bit1, bit2, r, g, b, inten, intenmin, intenmax;
 
 		intenmin = 0xe0;
-//		intenmin = 0xc2;	/* 2.5 Volts (75.757575% of the whole range) */
+//      intenmin = 0xc2;    /* 2.5 Volts (75.757575% of the whole range) */
 		intenmax = 0xff;	/* 3.3 Volts (the whole range) */
 
 		/* intensity component */
@@ -766,7 +766,7 @@ static READ8_HANDLER( goldnpkr_mux_port_r )
 static READ8_HANDLER( pottnpkr_mux_port_r )
 {
 	UINT8 pa_0_4 = 0xff, pa_7;	/* Temporary place holder for bits 0 to 4 & 7 */
-	
+
 	switch( mux_data & 0xf0 )		/* bits 4-7 */
 	{
 		case 0x10: return input_port_read(space->machine, "IN0-0");
@@ -776,7 +776,7 @@ static READ8_HANDLER( pottnpkr_mux_port_r )
 	}
 
 	pa_7 = (pia0_PA_data >> 7) & 1;	/* To do: bit PA5 to pin CB1 */
-//	popmessage ("mux_port_r: %x ",((pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7))) ; /* Equates PA6 to PA7 */
+//  popmessage ("mux_port_r: %x ",((pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7))) ; /* Equates PA6 to PA7 */
 
 	return ( (pa_0_4 & 0x3f) | (pa_7 << 6) | (pa_7 << 7) ) ;
 }
@@ -834,7 +834,7 @@ static WRITE8_HANDLER( lamps_a_w )
 	output_set_lamp_value(3, 1 - ((data >> 3) & 1));	/* Lamp 3 */
 	output_set_lamp_value(4, 1 - ((data >> 4) & 1));	/* Lamp 4 */
 
-//	popmessage("written : %02X", data);
+//  popmessage("written : %02X", data);
 	coin_counter_w(0, data & 0x40);	/* counter1 */
 	coin_counter_w(1, data & 0x80);	/* counter2 */
 	coin_counter_w(2, data & 0x20);	/* counter3 */
@@ -901,7 +901,7 @@ static ADDRESS_MAP_START( witchcrd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("SW2")
-//	AM_RANGE(0x2108, 0x210b) AM_NOP	/* unknown 40-pin device */
+//  AM_RANGE(0x2108, 0x210b) AM_NOP /* unknown 40-pin device */
 	AM_RANGE(0x4000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
@@ -2157,9 +2157,9 @@ static const discrete_dac_r1_ladder dac_goldnpkr_ladder =
 
 	CAP_U(1.7)							/* filtering cap tied to ground */
 
-//	12,									/* voltage Bias resistor is tied to */
-//	RES_K(330),							/* additional resistor tied to vBias */
-//	0,									/* resistor tied to ground */
+//  12,                                 /* voltage Bias resistor is tied to */
+//  RES_K(330),                         /* additional resistor tied to vBias */
+//  0,                                  /* resistor tied to ground */
 };
 
 static DISCRETE_SOUND_START( goldnpkr )
@@ -2714,9 +2714,9 @@ ROM_END
 
 /*
     checksum routine at $5f3e
-	protect $4000+ & $7ff9.
-	(see cmp at $5f6b)
-	balanced at $7ff8.
+    protect $4000+ & $7ff9.
+    (see cmp at $5f6b)
+    balanced at $7ff8.
 */
 ROM_START( maverik )
 	ROM_REGION( 0x10000, "main", 0 )	/* maverik: Maverik (ind arg, fixed, changed logo) */
@@ -2773,9 +2773,9 @@ ROM_END
 /******************************* bsuerte sets **************************/
 /*
     checksum routine at $5827
-	protect $4000+ & $7ff9.
-	(see cmp at $584a)
-	balanced at $7ff8.
+    protect $4000+ & $7ff9.
+    (see cmp at $584a)
+    balanced at $7ff8.
 */
 ROM_START( bsuerte )
 	ROM_REGION( 0x10000, "main", 0 )	/* bs_chica.256: good BS set... (checksum) */
@@ -3169,19 +3169,19 @@ static DRIVER_INIT( pottnpkr )
 }
 
 /*
-	Golden Poker H/W sets:
+    Golden Poker H/W sets:
 
     newname    oldname    gameplay  music      settings    testmode
-	===================================================================
+    ===================================================================
     pmpoker    pmpoker    fast      minimal    hack        matrix/grill
     goldnpkr   goldnpkr   fast      y.doodle   excellent   matrix/grill
     goldnpkb   goldnpkb   normal    minimal    normal      matrix/grill
 
 
-	Potten's Poker H/W sets:
+    Potten's Poker H/W sets:
 
     newname    oldname    gameplay  music      settings    testmode
-	===================================================================
+    ===================================================================
     pottnpkr   goldnpkc   fast      y.doodle   normal      only grid
     potnpkra   jokerpkr   normal    normal     normal      only skill
     potnpkrb   pottnpkb   slow      y.doodle   normal      only grid
@@ -3190,10 +3190,10 @@ static DRIVER_INIT( pottnpkr )
     potnpkre   --------   slow      y.doodle   normal      matrix/grill
 
 
-	Witch Card H/W sets:
+    Witch Card H/W sets:
 
     newname    oldname    gameplay  music      settings    testmode
-	===================================================================
+    ===================================================================
     bsuerte    --------   normal    minimal    only 1-10   matrix/grill
     bsuertea   --------   normal    minimal    only 1-10   matrix/grill
     goodluck   --------   fast      y.doodle   normal      matrix/grill
@@ -3209,10 +3209,10 @@ static DRIVER_INIT( royale )
 {
     /* $60bb, NOPing the ORA #$F0 (after read the PIA1 port B */
 
-//	UINT8 *ROM = memory_region(machine, "main");
+//  UINT8 *ROM = memory_region(machine, "main");
 
-//	ROM[0x60bb] = 0xea;
-//	ROM[0x60bc] = 0xea;
+//  ROM[0x60bb] = 0xea;
+//  ROM[0x60bc] = 0xea;
 
 	pia_config(0, &pottnpkr_pia0_intf);
 	pia_config(1, &pottnpkr_pia1_intf);

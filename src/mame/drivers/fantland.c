@@ -367,10 +367,10 @@ static void borntofi_adpcm_int(const device_config *device, int voice)
 	}
 }
 
-static void borntofi_adpcm_int_0(const device_config *device) { borntofi_adpcm_int(device, 0); } 
-static void borntofi_adpcm_int_1(const device_config *device) { borntofi_adpcm_int(device, 1); } 
-static void borntofi_adpcm_int_2(const device_config *device) { borntofi_adpcm_int(device, 2); } 
-static void borntofi_adpcm_int_3(const device_config *device) { borntofi_adpcm_int(device, 3); } 
+static void borntofi_adpcm_int_0(const device_config *device) { borntofi_adpcm_int(device, 0); }
+static void borntofi_adpcm_int_1(const device_config *device) { borntofi_adpcm_int(device, 1); }
+static void borntofi_adpcm_int_2(const device_config *device) { borntofi_adpcm_int(device, 2); }
+static void borntofi_adpcm_int_3(const device_config *device) { borntofi_adpcm_int(device, 3); }
 
 
 static ADDRESS_MAP_START( borntofi_sound_map, ADDRESS_SPACE_PROGRAM, 8 )

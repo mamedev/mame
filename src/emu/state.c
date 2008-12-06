@@ -95,7 +95,7 @@ struct _state_private
 	state_entry *		entrylist;			/* list of live entries */
 	state_callback *	prefunclist;		/* presave function list */
 	state_callback *	postfunclist;		/* postsave function list */
-	
+
 	UINT8 *				ioarray;			/* array where we accumulate all the data */
 	UINT32				ioarraysize;		/* size of the array */
 	mame_file *			iofile;				/* file currently in use */
@@ -149,7 +149,7 @@ void state_init(running_machine *machine)
 
 
 /*-------------------------------------------------
-    state_save_get_reg_count - return the number 
+    state_save_get_reg_count - return the number
     of total registrations so far
 -------------------------------------------------*/
 

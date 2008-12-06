@@ -57,11 +57,11 @@ VIDEO_START(ilpag)
 VIDEO_UPDATE(ilpag)
 {
 	int x,y;
-//	static int counter = 0;
+//  static int counter = 0;
 	int count;
 
 	UINT8 *blit_rom = memory_region(screen->machine, "blit_data");
-//	printf("counter %04x\n", counter);
+//  printf("counter %04x\n", counter);
 
 	blit_rom = blit_buffer;
 
@@ -81,7 +81,7 @@ VIDEO_UPDATE(ilpag)
 			count++;
 		}
 	}
-//	counter++;
+//  counter++;
 
 	return 0;
 }
@@ -140,7 +140,7 @@ static WRITE16_HANDLER( blit_copy_w )
 	blit_dst_ypos = ((blit_dst_ram_loword[0] & 0xff00)>>8)*2;
 	//                                          ff00 = ypos?
 
-//	blit_dst_xpos|= (blit_dst_ram_hiword[0] & 0xffff)<<16;
+//  blit_dst_xpos|= (blit_dst_ram_hiword[0] & 0xffff)<<16;
 
 	y_size = 8;// blit_romaddr[0] & 0x00ff;
 	x_size = 14;//blit_romaddr[0] & 0xff00 >> 8;
@@ -204,8 +204,8 @@ static ADDRESS_MAP_START( ilpag_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x1fffff) AM_ROM AM_REGION("blit_data", 0)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 
-//	AM_RANGE(0x800000, 0x800001) AM_READ(unk_latch_1_r)
-//	AM_RANGE(0x880000, 0x880001) AM_READ(unk_latch_2_r)
+//  AM_RANGE(0x800000, 0x800001) AM_READ(unk_latch_1_r)
+//  AM_RANGE(0x880000, 0x880001) AM_READ(unk_latch_2_r)
 
 	AM_RANGE(0x225000, 0x225fff) AM_RAM // NVRAM?
 	AM_RANGE(0x900000, 0x900005) AM_WRITE( paletteram_io_w )
@@ -218,9 +218,9 @@ static ADDRESS_MAP_START( ilpag_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x9e0000, 0x9e0001) AM_READ(blitter_status_r)
 
 	AM_RANGE(0xc00180, 0xc00181) AM_READ_PORT("IN2")
-//	AM_RANGE(0xc00200, 0xc00201) AM_WRITE(unk_latch_1_w)
+//  AM_RANGE(0xc00200, 0xc00201) AM_WRITE(unk_latch_1_w)
 	AM_RANGE(0xc00380, 0xc00381) AM_READ_PORT("IN3")
-//	AM_RANGE(0xc002d0, 0xc002d1) AM_WRITE(unk_latch_2_w)
+//  AM_RANGE(0xc002d0, 0xc002d1) AM_WRITE(unk_latch_2_w)
 ADDRESS_MAP_END
 
 

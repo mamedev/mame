@@ -500,9 +500,9 @@ ROM_END
 
 Cherry I Gold
 
-Anno	1998
+Anno    1998
 Produttore
-N.revisione	W4BON (rev.1)
+N.revisione W4BON (rev.1)
 
 
 CPU
@@ -536,9 +536,9 @@ Note
 
 Cherry Gold  (Cherry 10)
 
-Anno	1997
+Anno    1997
 Produttore
-N.revisione	W4BON (rev.1)
+N.revisione W4BON (rev.1)
 
 CPU
 

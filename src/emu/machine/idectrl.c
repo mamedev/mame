@@ -1675,7 +1675,7 @@ static DEVICE_START( ide_controller )
 	assert(device->inline_config != NULL);
 	assert(device->machine != NULL);
 	assert(device->machine->config != NULL);
-	
+
 	/* store a pointer back to the device */
 	ide->device = device;
 

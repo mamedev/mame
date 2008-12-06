@@ -432,7 +432,7 @@ void debugwin_destroy_windows(void)
 	// loop over windows and free them
 	while (window_list != NULL)
 	{
-		// clear the view list because they will be freed by the core 
+		// clear the view list because they will be freed by the core
 		memset(window_list->view, 0, sizeof(window_list->view));
 		DestroyWindow(window_list->wnd);
 	}
@@ -1005,7 +1005,7 @@ static void debugwin_view_update(debug_view *view, void *osdprivate)
 	debug_view_xy totalsize, visiblesize, topleft;
 	int show_vscroll, show_hscroll;
 	SCROLLINFO scrollinfo;
-	
+
 	assert(info->view == view);
 
 	// get the view window bounds
@@ -2222,7 +2222,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 							cpu_debug_data *cpuinfo = cpu_get_debug_data(space->cpu);
 							debug_cpu_breakpoint *bp;
 							INT32 bpindex = -1;
-							
+
 							/* first find an existing breakpoint at this address */
 							for (bp = cpuinfo->bplist; bp != NULL; bp = bp->next)
 								if (address == bp->address)
@@ -2230,7 +2230,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 									bpindex = bp->index;
 									break;
 								}
-							
+
 							/* if it doesn't exist, add a new one */
 							if (bpindex == -1)
 								sprintf(command, "bpset %X", address);
@@ -2306,7 +2306,7 @@ static void disasm_update_caption(running_machine *machine, HWND wnd)
 	debugwin_info *info = (debugwin_info *)(FPTR)GetWindowLongPtr(wnd, GWLP_USERDATA);
 	const disasm_subview_item *subview = disasm_view_get_current_subview(info->view[0].view);
 	char title[256];
-	
+
 	sprintf(title, "Disassembly: %s", subview->name);
 	win_set_window_text_utf8(wnd, title);
 }

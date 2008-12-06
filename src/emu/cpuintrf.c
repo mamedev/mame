@@ -1297,7 +1297,7 @@ void cpu_reset(const device_config *device)
 
 offs_t cpu_get_physical_pc_byte(const device_config *device)
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM); 
+	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	offs_t pc;
 
 	cpu_push_context(device);

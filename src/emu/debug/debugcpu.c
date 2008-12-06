@@ -1887,7 +1887,7 @@ static void perform_trace(cpu_debug_data *info)
 	if (count <= 1)
 	{
 		const address_space *space = cpu_get_address_space(info->device, ADDRESS_SPACE_PROGRAM);
-		
+
 		/* if we just finished looping, indicate as much */
 		if (info->trace.loops != 0)
 			fprintf(info->trace.file, "\n   (loops for %d instructions)\n\n", info->trace.loops);

@@ -1108,7 +1108,7 @@ static ADDRESS_MAP_START( saloon_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_READ(input_port_2_r)
 	AM_RANGE(0x1800, 0x1800) AM_READWRITE(ay8910_read_port_0_r, ay8910_control_port_0_w)
 	AM_RANGE(0x1801, 0x1801) AM_WRITE(ay8910_write_port_0_w)
-//	AM_RANGE(0x2000, 0x2000) AM_READNOP	/* some unknown reads... maybe a DSW */
+//  AM_RANGE(0x2000, 0x2000) AM_READNOP /* some unknown reads... maybe a DSW */
 	AM_RANGE(0x6000, 0x6fff) AM_RAM_WRITE(funworld_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x7000, 0x7fff) AM_RAM_WRITE(funworld_colorram_w) AM_BASE(&colorram)
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1118,12 +1118,12 @@ ADDRESS_MAP_END
     Unknown R/W
     -----------
 
-	0800	RW	;input?
-	081a	W	;unknown (W 0x20)
-	081b	W	;unknown (W 0x20 & 0x30)
-	0810	W	;unknown
-	0a01	RW	;input?
-	1000	RW	;input? (W 0xff & 0xfd)
+    0800    RW  ;input?
+    081a    W   ;unknown (W 0x20)
+    081b    W   ;unknown (W 0x20 & 0x30)
+    0810    W   ;unknown
+    0a01    RW  ;input?
+    1000    RW  ;input? (W 0xff & 0xfd)
 
 */
 
@@ -2733,7 +2733,7 @@ static DRIVER_INIT( saloon )
 	int i, a;
 
     /*****************************
-    *   Program ROM decryption   * 
+    *   Program ROM decryption   *
     *****************************/
 
 	/* data lines swap: 76543210 -> 76543012 */
@@ -2759,7 +2759,7 @@ static DRIVER_INIT( saloon )
 
 
     /******************************
-    *   Graphics ROM decryption   * 
+    *   Graphics ROM decryption   *
     ******************************/
 
 	buffer = malloc_or_die(sizeg);
@@ -2777,7 +2777,7 @@ static DRIVER_INIT( saloon )
 
 
     /****************************
-    *   Color PROM decryption   * 
+    *   Color PROM decryption   *
     ****************************/
 
 	/* data lines swap: 76543210 -> 23546710 */
