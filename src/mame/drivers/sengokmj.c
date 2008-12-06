@@ -4,13 +4,13 @@ Sengoku Mahjong (c) 1991 Sigma
 
 driver by Angelo Salese & Pierpaolo Prazzoli
 
-Similar to the D-Con HW.
+Uses the same Seibu custom chips of the D-Con HW.
 
 TODO:
 - Find what the remaining video C.R.T. registers does;
-- Missing NVRAM emulation?
-  At startup a "Warning : Data in stock is wrong check ram" message appears because of that.
-  But...there isn't any clear eeprom write bits/cs/clock writes?
+- Fix sprites bugs at a start of a play;
+- Check NVRAM boudaries;
+- How the "SW Service Mode" (press F2 during gameplay) really works (inputs etc)? Nothing mapped works with it...
 
 Notes:
 - Some strings written in the sound rom:
@@ -19,6 +19,8 @@ Notes:
 - To bypass the startup message, toggle "Reset" dip-switch or reset with F3.
 - If the Work RAM is not hooked-up (areas $67xx),a sound sample is played.I can't understand what it says though,
   appears to japanese words for "RAM failed".
+- Playing with the debugger I've found this -> http://img444.imageshack.us/img444/2980/0000ti3.png (notice the "credit" at
+  the bottom). Maybe a non-BET version exists? Or there's a jumper setting?
 
 CPU:    uPD70116C-8 (V30)
 Sound:  Z80-A
@@ -98,7 +100,8 @@ static WRITE16_HANDLER( sengokmj_out_w )
 
 
 static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x09fff) AM_RAM
+	AM_RANGE(0x00000, 0x07fff) AM_RAM
+	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(&generic_nvram16) AM_SIZE(&generic_nvram_size)
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(sengokmj_bgvram_w) AM_BASE(&sengokmj_bgvram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(sengokmj_fgvram_w) AM_BASE(&sengokmj_fgvram)
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(sengokmj_mdvram_w) AM_BASE(&sengokmj_mdvram)
@@ -111,7 +114,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sengokmj_io_map, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x8000, 0x800f) AM_WRITE(seibu_main_word_w)
-	/*These four appears to be video registers / C.R.T. related */
+	/*Areas from 8010-804f appears to be video registers / C.R.T. related,probably usual Seibu customness.*/
 	AM_RANGE(0x8010, 0x801b) AM_WRITENOP
 	AM_RANGE(0x801c, 0x801d) AM_WRITE(sengokmj_layer_enable_w)
 	AM_RANGE(0x801e, 0x801f) AM_WRITENOP
@@ -223,7 +226,7 @@ static INPUT_PORTS_START( sengokmj )
 	PORT_DIPNAME( 0x0001, 0x0001, "Door" )
 	PORT_DIPSETTING(	  0x0001, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
-	PORT_SERVICE_NO_TOGGLE( 0x0002, IP_ACTIVE_LOW )
+	PORT_SERVICE( 0x0002, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x0004, 0x0004, "Opt. 1st" )
 	PORT_DIPSETTING(	  0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(	  0x0000, DEF_STR( On ) )
@@ -295,6 +298,7 @@ static MACHINE_DRIVER_START( sengokmj )
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
 	MDRV_MACHINE_RESET(seibu_sound)
+	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("main", RASTER)
@@ -351,4 +355,5 @@ ROM_START( sengokmj )
 	ROM_LOAD( "rs006.89", 0x000, 0x200, CRC(96f7646e) SHA1(400a831b83d6ac4d2a46ef95b97b1ee237099e44) ) /* Priority */
 ROM_END
 
-GAME( 1991, sengokmj, 0, sengokmj, sengokmj, 0, ROT0, "Sigma", "Sengoku Mahjong (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1991, sengokmj, 0, sengokmj, sengokmj, 0, ROT0, "Sigma", "Sengoku Mahjong [BET] (Japan)", GAME_IMPERFECT_GRAPHICS )
+/*Non-Bet Version?*/
