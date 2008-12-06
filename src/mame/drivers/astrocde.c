@@ -1722,7 +1722,6 @@ static DRIVER_INIT( robby )
 
 static DRIVER_INIT( profpac )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	const address_space *iospace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 
 	astrocade_video_config = AC_SOUND_PRESENT;
@@ -1737,7 +1736,6 @@ static DRIVER_INIT( profpac )
 
 static DRIVER_INIT( demndrgn )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	const address_space *iospace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 
 	astrocade_video_config = 0x00;
@@ -1754,7 +1752,6 @@ static DRIVER_INIT( demndrgn )
 
 static DRIVER_INIT( tenpindx )
 {
-	const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	const address_space *iospace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_IO);
 
 	astrocade_video_config = 0x00;
