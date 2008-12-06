@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h"
 #include "cpu/z80/z80.h"
 #include "video/konamiic.h"
@@ -14,7 +13,7 @@
 
 
 static MACHINE_RESET( 88games );
-static void k88games_banking( int lines );
+static void k88games_banking( const device_config *device, int lines );
 
 static UINT8 *ram;
 static UINT8 *banked_rom;
@@ -469,12 +468,12 @@ ROM_END
 
 
 
-static void k88games_banking( int lines )
+static void k88games_banking( const device_config *device, int lines )
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs;
 
-logerror("%04x: bank select %02x\n",cpu_get_pc(Machine->activecpu),lines);
+logerror("%04x: bank select %02x\n",cpu_get_pc(device),lines);
 
 	/* bits 0-2 select ROM bank for 0000-1fff */
 	/* bit 3: when 1, palette RAM at 1000-1fff */
@@ -511,7 +510,7 @@ logerror("%04x: bank select %02x\n",cpu_get_pc(Machine->activecpu),lines);
 
 static MACHINE_RESET( 88games )
 {
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)k88games_banking);
+	konami_configure_set_lines(machine->cpu[0], k88games_banking);
 	paletteram = &memory_region(machine, "main")[0x20000];
 }
 

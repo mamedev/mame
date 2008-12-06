@@ -9,7 +9,6 @@ K052591 emulation by Eddie Edwards
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -17,7 +16,7 @@ K052591 emulation by Eddie Edwards
 
 static MACHINE_RESET( scontra );
 static MACHINE_RESET( thunderx );
-static void thunderx_banking(int lines);
+static void thunderx_banking(const device_config *device, int lines);
 
 extern int scontra_priority;
 VIDEO_START( scontra );
@@ -1020,16 +1019,16 @@ ROM_END
 
 /***************************************************************************/
 
-static void thunderx_banking( int lines )
+static void thunderx_banking( const device_config *device, int lines )
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs;
 
 //  logerror("thunderx %04x: bank select %02x\n", cpu_get_pc(machine->activecpu), lines );
 
 	offs = 0x10000 + (((lines & 0x0f) ^ 0x08) * 0x2000);
 	if (offs >= 0x28000) offs -= 0x20000;
-	memory_set_bankptr(Machine,  1, &RAM[offs] );
+	memory_set_bankptr(device->machine,  1, &RAM[offs] );
 }
 
 static MACHINE_RESET( scontra )
@@ -1043,7 +1042,7 @@ static MACHINE_RESET( thunderx )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)thunderx_banking);
+	konami_configure_set_lines(machine->cpu[0], thunderx_banking);
 	memory_set_bankptr(machine,  1, &RAM[0x10000] ); /* init the default bank */
 
 	paletteram = &RAM[0x28000];

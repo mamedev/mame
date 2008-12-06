@@ -12,7 +12,6 @@ Dip locations verified with manual (US)
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -21,7 +20,7 @@ Dip locations verified with manual (US)
 
 /* prototypes */
 static MACHINE_RESET( crimfght );
-static void crimfght_banking( int lines );
+static void crimfght_banking( const device_config *device, int lines );
 
 VIDEO_START( crimfght );
 VIDEO_UPDATE( crimfght );
@@ -415,32 +414,32 @@ ROM_END
 
 ***************************************************************************/
 
-static void crimfght_banking( int lines )
+static void crimfght_banking( const device_config *device, int lines )
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0;
 
 	/* bit 5 = select work RAM or palette */
 	if (lines & 0x20)
 	{
-		memory_install_readwrite8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK3, paletteram_xBBBBBGGGGGRRRRR_be_w);
-		memory_set_bankptr(Machine, 3, paletteram);
+		memory_install_readwrite8_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK3, paletteram_xBBBBBGGGGGRRRRR_be_w);
+		memory_set_bankptr(device->machine, 3, paletteram);
 	}
 	else
-		memory_install_readwrite8_handler(cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK1, SMH_BANK1);								/* RAM */
+		memory_install_readwrite8_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), 0x0000, 0x03ff, 0, 0, SMH_BANK1, SMH_BANK1);								/* RAM */
 
 	/* bit 6 = enable char ROM reading through the video RAM */
 	K052109_set_RMRD_line((lines & 0x40) ? ASSERT_LINE : CLEAR_LINE);
 
 	offs = 0x10000 + ((lines & 0x0f) * 0x2000);
-	memory_set_bankptr(Machine, 2, &RAM[offs]);
+	memory_set_bankptr(device->machine, 2, &RAM[offs]);
 }
 
 static MACHINE_RESET( crimfght )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)crimfght_banking);
+	konami_configure_set_lines(machine->cpu[0], crimfght_banking);
 
 	/* init the default bank */
 	memory_set_bankptr(machine,  2, &RAM[0x10000] );

@@ -9,14 +9,13 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
 
 /* prototypes */
 static MACHINE_RESET( surpratk );
-static void surpratk_banking( int lines );
+static void surpratk_banking( const device_config *device, int lines );
 VIDEO_START( surpratk );
 VIDEO_UPDATE( surpratk );
 
@@ -325,21 +324,21 @@ ROM_END
 
 ***************************************************************************/
 
-static void surpratk_banking(int lines)
+static void surpratk_banking(const device_config *device, int lines)
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0;
 
-logerror("%04x: setlines %02x\n",cpu_get_pc(Machine->activecpu),lines);
+logerror("%04x: setlines %02x\n",cpu_get_pc(device),lines);
 
 	offs = 0x10000 + ((lines & 0x1f) * 0x2000);
 	if (offs >= 0x48000) offs -= 0x40000;
-	memory_set_bankptr(Machine, 1,&RAM[offs]);
+	memory_set_bankptr(device->machine, 1,&RAM[offs]);
 }
 
 static MACHINE_RESET( surpratk )
 {
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)surpratk_banking);
+	konami_configure_set_lines(machine->cpu[0], surpratk_banking);
 
 	paletteram = &memory_region(machine, "main")[0x48000];
 }

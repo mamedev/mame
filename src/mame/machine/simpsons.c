@@ -4,7 +4,6 @@
 #include "machine/eeprom.h"
 #include "sound/k053260.h"
 #include "includes/simpsons.h"
-#include "deprecat.h"
 
 int simpsons_firq_enabled;
 
@@ -115,16 +114,16 @@ READ8_HANDLER( simpsons_sound_r )
 
 ***************************************************************************/
 
-static void simpsons_banking( int lines )
+static void simpsons_banking( const device_config *device, int lines )
 {
-	memory_set_bank(Machine, 1, lines & 0x3f);
+	memory_set_bank(device->machine, 1, lines & 0x3f);
 }
 
 MACHINE_RESET( simpsons )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)simpsons_banking);
+	konami_configure_set_lines(machine->cpu[0], simpsons_banking);
 
 	paletteram = &RAM[0x88000];
 	simpsons_xtraram = &RAM[0x89000];

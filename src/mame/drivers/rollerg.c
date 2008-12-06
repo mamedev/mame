@@ -7,7 +7,6 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "machine/eeprom.h"
@@ -16,7 +15,7 @@ driver by Nicola Salmoria
 
 /* prototypes */
 static MACHINE_RESET( rollerg );
-static void rollerg_banking( int lines );
+static void rollerg_banking( const device_config *device, int lines );
 
 VIDEO_START( rollerg );
 VIDEO_UPDATE( rollerg );
@@ -330,20 +329,20 @@ ROM_END
 
 ***************************************************************************/
 
-static void rollerg_banking( int lines )
+static void rollerg_banking( const device_config *device, int lines )
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0;
 
 
 	offs = 0x10000 + ((lines & 0x07) * 0x4000);
 	if (offs >= 0x28000) offs -= 0x20000;
-	memory_set_bankptr(Machine, 1,&RAM[offs]);
+	memory_set_bankptr(device->machine, 1,&RAM[offs]);
 }
 
 static MACHINE_RESET( rollerg )
 {
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)rollerg_banking);
+	konami_configure_set_lines(machine->cpu[0], rollerg_banking);
 
 	readzoomroms = 0;
 }

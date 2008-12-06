@@ -13,23 +13,23 @@ HNZVC
 */
 
 #ifdef NEW
-static void illegal( void )
+static void illegal( konami_state *cpustate )
 #else
-INLINE void illegal( void )
+INLINE void illegal( konami_state *cpustate )
 #endif
 {
 	logerror("KONAMI: illegal opcode at %04x\n",PC);
 }
 
 /* $00 NEG direct ?**** */
-INLINE void neg_di( void )
+INLINE void neg_di( konami_state *cpustate )
 {
 	UINT16 r,t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = -t;
 	CLR_NZVC;
 	SET_FLAGS8(0,t,r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $01 ILLEGAL */
@@ -37,123 +37,123 @@ INLINE void neg_di( void )
 /* $02 ILLEGAL */
 
 /* $03 COM direct -**01 */
-INLINE void com_di( void )
+INLINE void com_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	t = ~t;
 	CLR_NZV;
 	SET_NZ8(t);
 	SEC;
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $04 LSR direct -0*-* */
-INLINE void lsr_di( void )
+INLINE void lsr_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	CLR_NZC;
 	CC |= (t & CC_C);
 	t >>= 1;
 	SET_Z8(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $05 ILLEGAL */
 
 /* $06 ROR direct -**-* */
-INLINE void ror_di( void )
+INLINE void ror_di( konami_state *cpustate )
 {
 	UINT8 t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r= (CC & CC_C) << 7;
 	CLR_NZC;
 	CC |= (t & CC_C);
 	r |= t>>1;
 	SET_NZ8(r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $07 ASR direct ?**-* */
-INLINE void asr_di( void )
+INLINE void asr_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	CLR_NZC;
 	CC |= (t & CC_C);
 	t = (t & 0x80) | (t >> 1);
 	SET_NZ8(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $08 ASL direct ?**** */
-INLINE void asl_di( void )
+INLINE void asl_di( konami_state *cpustate )
 {
 	UINT16 t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = t << 1;
 	CLR_NZVC;
 	SET_FLAGS8(t,t,r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $09 ROL direct -**** */
-INLINE void rol_di( void )
+INLINE void rol_di( konami_state *cpustate )
 {
 	UINT16 t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = (CC & CC_C) | (t << 1);
 	CLR_NZVC;
 	SET_FLAGS8(t,t,r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $0A DEC direct -***- */
-INLINE void dec_di( void )
+INLINE void dec_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	--t;
 	CLR_NZV;
 	SET_FLAGS8D(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $0B ILLEGAL */
 
 /* $OC INC direct -***- */
-INLINE void inc_di( void )
+INLINE void inc_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	++t;
 	CLR_NZV;
 	SET_FLAGS8I(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $OD TST direct -**0- */
-INLINE void tst_di( void )
+INLINE void tst_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	CLR_NZV;
 	SET_NZ8(t);
 }
 
 /* $0E JMP direct ----- */
-INLINE void jmp_di( void )
+INLINE void jmp_di( konami_state *cpustate )
 {
-    DIRECT;
+    DIRECT(cpustate);
 	PCD=EAD;
 }
 
 /* $0F CLR direct -0100 */
-INLINE void clr_di( void )
+INLINE void clr_di( konami_state *cpustate )
 {
-	DIRECT;
-	WM(EAD,0);
+	DIRECT(cpustate);
+	WM(cpustate, EAD,0);
 	CLR_NZVC;
 	SEZ;
 }
@@ -163,23 +163,23 @@ INLINE void clr_di( void )
 /* $11 FLAG */
 
 /* $12 NOP inherent ----- */
-INLINE void nop( void )
+INLINE void nop( konami_state *cpustate )
 {
 	;
 }
 
 /* $13 SYNC inherent ----- */
-INLINE void sync( void )
+INLINE void sync( konami_state *cpustate )
 {
 	/* SYNC stops processing instructions until an interrupt request happens. */
 	/* This doesn't require the corresponding interrupt to be enabled: if it */
 	/* is disabled, execution continues with the next instruction. */
-	konami.int_state |= KONAMI_SYNC;
-	CHECK_IRQ_LINES;
-	/* if KONAMI_SYNC has not been cleared by CHECK_IRQ_LINES,
+	cpustate->int_state |= KONAMI_SYNC;
+	check_irq_lines(cpustate);
+	/* if KONAMI_SYNC has not been cleared by check_irq_lines,
      * stop execution until the interrupt lines change. */
-	if( (konami.int_state & KONAMI_SYNC) && konami_ICount > 0 )
-		konami_ICount = 0;
+	if( (cpustate->int_state & KONAMI_SYNC) && cpustate->icount > 0 )
+		cpustate->icount = 0;
 }
 
 /* $14 ILLEGAL */
@@ -187,21 +187,21 @@ INLINE void sync( void )
 /* $15 ILLEGAL */
 
 /* $16 LBRA relative ----- */
-INLINE void lbra( void )
+INLINE void lbra( konami_state *cpustate )
 {
-	IMMWORD(ea);
+	IMMWORD(cpustate, cpustate->ea);
 	PC += EA;
 
 	/* EHC 980508 speed up busy loop */
-	if( EA == 0xfffd && konami_ICount > 0 )
-		konami_ICount = 0;
+	if( EA == 0xfffd && cpustate->icount > 0 )
+		cpustate->icount = 0;
 }
 
 /* $17 LBSR relative ----- */
-INLINE void lbsr( void )
+INLINE void lbsr( konami_state *cpustate )
 {
-	IMMWORD(ea);
-	PUSHWORD(pPC);
+	IMMWORD(cpustate, cpustate->ea);
+	PUSHWORD(cpustate, pPC);
 	PC += EA;
 }
 
@@ -209,7 +209,7 @@ INLINE void lbsr( void )
 
 #if 1
 /* $19 DAA inherent (A) -**0* */
-INLINE void daa( void )
+INLINE void daa( konami_state *cpustate )
 {
 	UINT8 msn, lsn;
 	UINT16 t, cf = 0;
@@ -224,7 +224,7 @@ INLINE void daa( void )
 }
 #else
 /* $19 DAA inherent (A) -**0* */
-INLINE void daa( void )
+INLINE void daa( konami_state *cpustate )
 {
 	UINT16 t;
 	t = A;
@@ -238,27 +238,27 @@ INLINE void daa( void )
 #endif
 
 /* $1A ORCC immediate ##### */
-INLINE void orcc( void )
+INLINE void orcc( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	CC |= t;
-	CHECK_IRQ_LINES;
+	check_irq_lines(cpustate);
 }
 
 /* $1B ILLEGAL */
 
 /* $1C ANDCC immediate ##### */
-INLINE void andcc( void )
+INLINE void andcc( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	CC &= t;
-	CHECK_IRQ_LINES;
+	check_irq_lines(cpustate);
 }
 
 /* $1D SEX inherent -**0- */
-INLINE void sex( void )
+INLINE void sex( konami_state *cpustate )
 {
 	UINT16 t;
 	t = SIGNED(B);
@@ -269,12 +269,12 @@ INLINE void sex( void )
 }
 
 /* $1E EXG inherent ----- */
-INLINE void exg( void )
+INLINE void exg( konami_state *cpustate )
 {
 	UINT16 t1 = 0, t2 = 0;
 	UINT8 tb;
 
-	IMMBYTE(tb);
+	IMMBYTE(cpustate, tb);
 
 	GETREG( t1, tb >> 4 );
 	GETREG( t2, tb & 0x0f );
@@ -284,211 +284,211 @@ INLINE void exg( void )
 }
 
 /* $1F TFR inherent ----- */
-INLINE void tfr( void )
+INLINE void tfr( konami_state *cpustate )
 {
 	UINT8 tb;
 	UINT16 t = 0;
 
-	IMMBYTE(tb);
+	IMMBYTE(cpustate, tb);
 
 	GETREG( t, tb & 0x0f );
 	SETREG( t, ( tb >> 4 ) & 0x07 );
 }
 
 /* $20 BRA relative ----- */
-INLINE void bra( void )
+INLINE void bra( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	PC += SIGNED(t);
 	/* JB 970823 - speed up busy loops */
-	if( t == 0xfe && konami_ICount > 0 )
-		konami_ICount = 0;
+	if( t == 0xfe && cpustate->icount > 0 )
+		cpustate->icount = 0;
 }
 
 /* $21 BRN relative ----- */
-INLINE void brn( void )
+INLINE void brn( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 }
 
 /* $1021 LBRN relative ----- */
-INLINE void lbrn( void )
+INLINE void lbrn( konami_state *cpustate )
 {
-	IMMWORD(ea);
+	IMMWORD(cpustate, cpustate->ea);
 }
 
 /* $22 BHI relative ----- */
-INLINE void bhi( void )
+INLINE void bhi( konami_state *cpustate )
 {
-	BRANCH( !(CC & (CC_Z|CC_C)) );
+	BRANCH(cpustate, !(CC & (CC_Z|CC_C)) );
 }
 
 /* $1022 LBHI relative ----- */
-INLINE void lbhi( void )
+INLINE void lbhi( konami_state *cpustate )
 {
-	LBRANCH( !(CC & (CC_Z|CC_C)) );
+	LBRANCH(cpustate, !(CC & (CC_Z|CC_C)) );
 }
 
 /* $23 BLS relative ----- */
-INLINE void bls( void )
+INLINE void bls( konami_state *cpustate )
 {
-	BRANCH( (CC & (CC_Z|CC_C)) );
+	BRANCH(cpustate, (CC & (CC_Z|CC_C)) );
 }
 
 /* $1023 LBLS relative ----- */
-INLINE void lbls( void )
+INLINE void lbls( konami_state *cpustate )
 {
-	LBRANCH( (CC&(CC_Z|CC_C)) );
+	LBRANCH(cpustate, (CC&(CC_Z|CC_C)) );
 }
 
 /* $24 BCC relative ----- */
-INLINE void bcc( void )
+INLINE void bcc( konami_state *cpustate )
 {
-	BRANCH( !(CC&CC_C) );
+	BRANCH(cpustate, !(CC&CC_C) );
 }
 
 /* $1024 LBCC relative ----- */
-INLINE void lbcc( void )
+INLINE void lbcc( konami_state *cpustate )
 {
-	LBRANCH( !(CC&CC_C) );
+	LBRANCH(cpustate, !(CC&CC_C) );
 }
 
 /* $25 BCS relative ----- */
-INLINE void bcs( void )
+INLINE void bcs( konami_state *cpustate )
 {
-	BRANCH( (CC&CC_C) );
+	BRANCH(cpustate, (CC&CC_C) );
 }
 
 /* $1025 LBCS relative ----- */
-INLINE void lbcs( void )
+INLINE void lbcs( konami_state *cpustate )
 {
-	LBRANCH( (CC&CC_C) );
+	LBRANCH(cpustate, (CC&CC_C) );
 }
 
 /* $26 BNE relative ----- */
-INLINE void bne( void )
+INLINE void bne( konami_state *cpustate )
 {
-	BRANCH( !(CC&CC_Z) );
+	BRANCH(cpustate, !(CC&CC_Z) );
 }
 
 /* $1026 LBNE relative ----- */
-INLINE void lbne( void )
+INLINE void lbne( konami_state *cpustate )
 {
-	LBRANCH( !(CC&CC_Z) );
+	LBRANCH(cpustate, !(CC&CC_Z) );
 }
 
 /* $27 BEQ relative ----- */
-INLINE void beq( void )
+INLINE void beq( konami_state *cpustate )
 {
-	BRANCH( (CC&CC_Z) );
+	BRANCH(cpustate, (CC&CC_Z) );
 }
 
 /* $1027 LBEQ relative ----- */
-INLINE void lbeq( void )
+INLINE void lbeq( konami_state *cpustate )
 {
-	LBRANCH( (CC&CC_Z) );
+	LBRANCH(cpustate, (CC&CC_Z) );
 }
 
 /* $28 BVC relative ----- */
-INLINE void bvc( void )
+INLINE void bvc( konami_state *cpustate )
 {
-	BRANCH( !(CC&CC_V) );
+	BRANCH(cpustate, !(CC&CC_V) );
 }
 
 /* $1028 LBVC relative ----- */
-INLINE void lbvc( void )
+INLINE void lbvc( konami_state *cpustate )
 {
-	LBRANCH( !(CC&CC_V) );
+	LBRANCH(cpustate, !(CC&CC_V) );
 }
 
 /* $29 BVS relative ----- */
-INLINE void bvs( void )
+INLINE void bvs( konami_state *cpustate )
 {
-	BRANCH( (CC&CC_V) );
+	BRANCH(cpustate, (CC&CC_V) );
 }
 
 /* $1029 LBVS relative ----- */
-INLINE void lbvs( void )
+INLINE void lbvs( konami_state *cpustate )
 {
-	LBRANCH( (CC&CC_V) );
+	LBRANCH(cpustate, (CC&CC_V) );
 }
 
 /* $2A BPL relative ----- */
-INLINE void bpl( void )
+INLINE void bpl( konami_state *cpustate )
 {
-	BRANCH( !(CC&CC_N) );
+	BRANCH(cpustate, !(CC&CC_N) );
 }
 
 /* $102A LBPL relative ----- */
-INLINE void lbpl( void )
+INLINE void lbpl( konami_state *cpustate )
 {
-	LBRANCH( !(CC&CC_N) );
+	LBRANCH(cpustate, !(CC&CC_N) );
 }
 
 /* $2B BMI relative ----- */
-INLINE void bmi( void )
+INLINE void bmi( konami_state *cpustate )
 {
-	BRANCH( (CC&CC_N) );
+	BRANCH(cpustate, (CC&CC_N) );
 }
 
 /* $102B LBMI relative ----- */
-INLINE void lbmi( void )
+INLINE void lbmi( konami_state *cpustate )
 {
-	LBRANCH( (CC&CC_N) );
+	LBRANCH(cpustate, (CC&CC_N) );
 }
 
 /* $2C BGE relative ----- */
-INLINE void bge( void )
+INLINE void bge( konami_state *cpustate )
 {
-	BRANCH( !NXORV );
+	BRANCH(cpustate, !NXORV );
 }
 
 /* $102C LBGE relative ----- */
-INLINE void lbge( void )
+INLINE void lbge( konami_state *cpustate )
 {
-	LBRANCH( !NXORV );
+	LBRANCH(cpustate, !NXORV );
 }
 
 /* $2D BLT relative ----- */
-INLINE void blt( void )
+INLINE void blt( konami_state *cpustate )
 {
-	BRANCH( NXORV );
+	BRANCH(cpustate, NXORV );
 }
 
 /* $102D LBLT relative ----- */
-INLINE void lblt( void )
+INLINE void lblt( konami_state *cpustate )
 {
-	LBRANCH( NXORV );
+	LBRANCH(cpustate, NXORV );
 }
 
 /* $2E BGT relative ----- */
-INLINE void bgt( void )
+INLINE void bgt( konami_state *cpustate )
 {
-	BRANCH( !(NXORV || (CC&CC_Z)) );
+	BRANCH(cpustate, !(NXORV || (CC&CC_Z)) );
 }
 
 /* $102E LBGT relative ----- */
-INLINE void lbgt( void )
+INLINE void lbgt( konami_state *cpustate )
 {
-	LBRANCH( !(NXORV || (CC&CC_Z)) );
+	LBRANCH(cpustate, !(NXORV || (CC&CC_Z)) );
 }
 
 /* $2F BLE relative ----- */
-INLINE void ble( void )
+INLINE void ble( konami_state *cpustate )
 {
-	BRANCH( (NXORV || (CC&CC_Z)) );
+	BRANCH(cpustate, (NXORV || (CC&CC_Z)) );
 }
 
 /* $102F LBLE relative ----- */
-INLINE void lble( void )
+INLINE void lble( konami_state *cpustate )
 {
-	LBRANCH( (NXORV || (CC&CC_Z)) );
+	LBRANCH(cpustate, (NXORV || (CC&CC_Z)) );
 }
 
 /* $30 LEAX indexed --*-- */
-INLINE void leax( void )
+INLINE void leax( konami_state *cpustate )
 {
 	X = EA;
 	CLR_Z;
@@ -496,7 +496,7 @@ INLINE void leax( void )
 }
 
 /* $31 LEAY indexed --*-- */
-INLINE void leay( void )
+INLINE void leay( konami_state *cpustate )
 {
 	Y = EA;
 	CLR_Z;
@@ -504,121 +504,121 @@ INLINE void leay( void )
 }
 
 /* $32 LEAS indexed ----- */
-INLINE void leas( void )
+INLINE void leas( konami_state *cpustate )
 {
 	S = EA;
-	konami.int_state |= KONAMI_LDS;
+	cpustate->int_state |= KONAMI_LDS;
 }
 
 /* $33 LEAU indexed ----- */
-INLINE void leau( void )
+INLINE void leau( konami_state *cpustate )
 {
 	U = EA;
 }
 
 /* $34 PSHS inherent ----- */
-INLINE void pshs( void )
+INLINE void pshs( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
-	if( t&0x80 ) { PUSHWORD(pPC); konami_ICount -= 2; }
-	if( t&0x40 ) { PUSHWORD(pU);  konami_ICount -= 2; }
-	if( t&0x20 ) { PUSHWORD(pY);  konami_ICount -= 2; }
-	if( t&0x10 ) { PUSHWORD(pX);  konami_ICount -= 2; }
-	if( t&0x08 ) { PUSHBYTE(DP);  konami_ICount -= 1; }
-	if( t&0x04 ) { PUSHBYTE(B);   konami_ICount -= 1; }
-	if( t&0x02 ) { PUSHBYTE(A);   konami_ICount -= 1; }
-	if( t&0x01 ) { PUSHBYTE(CC);  konami_ICount -= 1; }
+	IMMBYTE(cpustate, t);
+	if( t&0x80 ) { PUSHWORD(cpustate, pPC); cpustate->icount -= 2; }
+	if( t&0x40 ) { PUSHWORD(cpustate, pU);  cpustate->icount -= 2; }
+	if( t&0x20 ) { PUSHWORD(cpustate, pY);  cpustate->icount -= 2; }
+	if( t&0x10 ) { PUSHWORD(cpustate, pX);  cpustate->icount -= 2; }
+	if( t&0x08 ) { PUSHBYTE(cpustate, DP);  cpustate->icount -= 1; }
+	if( t&0x04 ) { PUSHBYTE(cpustate, B);   cpustate->icount -= 1; }
+	if( t&0x02 ) { PUSHBYTE(cpustate, A);   cpustate->icount -= 1; }
+	if( t&0x01 ) { PUSHBYTE(cpustate, CC);  cpustate->icount -= 1; }
 }
 
 /* 35 PULS inherent ----- */
-INLINE void puls( void )
+INLINE void puls( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
-	if( t&0x01 ) { PULLBYTE(CC); konami_ICount -= 1; }
-	if( t&0x02 ) { PULLBYTE(A);  konami_ICount -= 1; }
-	if( t&0x04 ) { PULLBYTE(B);  konami_ICount -= 1; }
-	if( t&0x08 ) { PULLBYTE(DP); konami_ICount -= 1; }
-	if( t&0x10 ) { PULLWORD(XD); konami_ICount -= 2; }
-	if( t&0x20 ) { PULLWORD(YD); konami_ICount -= 2; }
-	if( t&0x40 ) { PULLWORD(UD); konami_ICount -= 2; }
-	if( t&0x80 ) { PULLWORD(PCD); konami_ICount -= 2; }
+	IMMBYTE(cpustate, t);
+	if( t&0x01 ) { PULLBYTE(cpustate, CC); cpustate->icount -= 1; }
+	if( t&0x02 ) { PULLBYTE(cpustate, A);  cpustate->icount -= 1; }
+	if( t&0x04 ) { PULLBYTE(cpustate, B);  cpustate->icount -= 1; }
+	if( t&0x08 ) { PULLBYTE(cpustate, DP); cpustate->icount -= 1; }
+	if( t&0x10 ) { PULLWORD(cpustate, XD); cpustate->icount -= 2; }
+	if( t&0x20 ) { PULLWORD(cpustate, YD); cpustate->icount -= 2; }
+	if( t&0x40 ) { PULLWORD(cpustate, UD); cpustate->icount -= 2; }
+	if( t&0x80 ) { PULLWORD(cpustate, PCD); cpustate->icount -= 2; }
 
 	/* check after all PULLs */
-	if( t&0x01 ) { CHECK_IRQ_LINES; }
+	if( t&0x01 ) { check_irq_lines(cpustate); }
 }
 
 /* $36 PSHU inherent ----- */
-INLINE void pshu( void )
+INLINE void pshu( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
-	if( t&0x80 ) { PSHUWORD(pPC); konami_ICount -= 2; }
-	if( t&0x40 ) { PSHUWORD(pS);  konami_ICount -= 2; }
-	if( t&0x20 ) { PSHUWORD(pY);  konami_ICount -= 2; }
-	if( t&0x10 ) { PSHUWORD(pX);  konami_ICount -= 2; }
-	if( t&0x08 ) { PSHUBYTE(DP);  konami_ICount -= 1; }
-	if( t&0x04 ) { PSHUBYTE(B);   konami_ICount -= 1; }
-	if( t&0x02 ) { PSHUBYTE(A);   konami_ICount -= 1; }
-	if( t&0x01 ) { PSHUBYTE(CC);  konami_ICount -= 1; }
+	IMMBYTE(cpustate, t);
+	if( t&0x80 ) { PSHUWORD(cpustate, pPC); cpustate->icount -= 2; }
+	if( t&0x40 ) { PSHUWORD(cpustate, pS);  cpustate->icount -= 2; }
+	if( t&0x20 ) { PSHUWORD(cpustate, pY);  cpustate->icount -= 2; }
+	if( t&0x10 ) { PSHUWORD(cpustate, pX);  cpustate->icount -= 2; }
+	if( t&0x08 ) { PSHUBYTE(cpustate, DP);  cpustate->icount -= 1; }
+	if( t&0x04 ) { PSHUBYTE(cpustate, B);   cpustate->icount -= 1; }
+	if( t&0x02 ) { PSHUBYTE(cpustate, A);   cpustate->icount -= 1; }
+	if( t&0x01 ) { PSHUBYTE(cpustate, CC);  cpustate->icount -= 1; }
 }
 
 /* 37 PULU inherent ----- */
-INLINE void pulu( void )
+INLINE void pulu( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
-	if( t&0x01 ) { PULUBYTE(CC); konami_ICount -= 1; }
-	if( t&0x02 ) { PULUBYTE(A);  konami_ICount -= 1; }
-	if( t&0x04 ) { PULUBYTE(B);  konami_ICount -= 1; }
-	if( t&0x08 ) { PULUBYTE(DP); konami_ICount -= 1; }
-	if( t&0x10 ) { PULUWORD(XD); konami_ICount -= 2; }
-	if( t&0x20 ) { PULUWORD(YD); konami_ICount -= 2; }
-	if( t&0x40 ) { PULUWORD(SD); konami_ICount -= 2; }
-	if( t&0x80 ) { PULUWORD(PCD); konami_ICount -= 2; }
+	IMMBYTE(cpustate, t);
+	if( t&0x01 ) { PULUBYTE(cpustate, CC); cpustate->icount -= 1; }
+	if( t&0x02 ) { PULUBYTE(cpustate, A);  cpustate->icount -= 1; }
+	if( t&0x04 ) { PULUBYTE(cpustate, B);  cpustate->icount -= 1; }
+	if( t&0x08 ) { PULUBYTE(cpustate, DP); cpustate->icount -= 1; }
+	if( t&0x10 ) { PULUWORD(cpustate, XD); cpustate->icount -= 2; }
+	if( t&0x20 ) { PULUWORD(cpustate, YD); cpustate->icount -= 2; }
+	if( t&0x40 ) { PULUWORD(cpustate, SD); cpustate->icount -= 2; }
+	if( t&0x80 ) { PULUWORD(cpustate, PCD); cpustate->icount -= 2; }
 
 	/* check after all PULLs */
-	if( t&0x01 ) { CHECK_IRQ_LINES; }
+	if( t&0x01 ) { check_irq_lines(cpustate); }
 }
 
 /* $38 ILLEGAL */
 
 /* $39 RTS inherent ----- */
-INLINE void rts( void )
+INLINE void rts( konami_state *cpustate )
 {
-	PULLWORD(PCD);
+	PULLWORD(cpustate, PCD);
 }
 
 /* $3A ABX inherent ----- */
-INLINE void abx( void )
+INLINE void abx( konami_state *cpustate )
 {
 	X += B;
 }
 
 /* $3B RTI inherent ##### */
-INLINE void rti( void )
+INLINE void rti( konami_state *cpustate )
 {
-	PULLBYTE(CC);
+	PULLBYTE(cpustate, CC);
 	if( CC & CC_E ) /* entire state saved? */
 	{
-        konami_ICount -= 9;
-		PULLBYTE(A);
-		PULLBYTE(B);
-		PULLBYTE(DP);
-		PULLWORD(XD);
-		PULLWORD(YD);
-		PULLWORD(UD);
+        cpustate->icount -= 9;
+		PULLBYTE(cpustate, A);
+		PULLBYTE(cpustate, B);
+		PULLBYTE(cpustate, DP);
+		PULLWORD(cpustate, XD);
+		PULLWORD(cpustate, YD);
+		PULLWORD(cpustate, UD);
 	}
-	PULLWORD(PCD);
-	CHECK_IRQ_LINES;
+	PULLWORD(cpustate, PCD);
+	check_irq_lines(cpustate);
 }
 
 /* $3C CWAI inherent ----1 */
-INLINE void cwai( void )
+INLINE void cwai( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	CC &= t;
 	/*
      * CWAI stacks the entire machine state on the hardware stack,
@@ -626,22 +626,22 @@ INLINE void cwai( void )
      * later, the state is *not* saved again after CWAI.
      */
 	CC |= CC_E; 		/* HJB 990225: save entire state */
-	PUSHWORD(pPC);
-	PUSHWORD(pU);
-	PUSHWORD(pY);
-	PUSHWORD(pX);
-	PUSHBYTE(DP);
-	PUSHBYTE(B);
-	PUSHBYTE(A);
-	PUSHBYTE(CC);
-	konami.int_state |= KONAMI_CWAI;
-	CHECK_IRQ_LINES;
-	if( (konami.int_state & KONAMI_CWAI) && konami_ICount > 0 )
-		konami_ICount = 0;
+	PUSHWORD(cpustate, pPC);
+	PUSHWORD(cpustate, pU);
+	PUSHWORD(cpustate, pY);
+	PUSHWORD(cpustate, pX);
+	PUSHBYTE(cpustate, DP);
+	PUSHBYTE(cpustate, B);
+	PUSHBYTE(cpustate, A);
+	PUSHBYTE(cpustate, CC);
+	cpustate->int_state |= KONAMI_CWAI;
+	check_irq_lines(cpustate);
+	if( (cpustate->int_state & KONAMI_CWAI) && cpustate->icount > 0 )
+		cpustate->icount = 0;
 }
 
 /* $3D MUL inherent --*-@ */
-INLINE void mul( void )
+INLINE void mul( konami_state *cpustate )
 {
 	UINT16 t;
 	t = A * B;
@@ -652,53 +652,53 @@ INLINE void mul( void )
 /* $3E ILLEGAL */
 
 /* $3F SWI (SWI2 SWI3) absolute indirect ----- */
-INLINE void swi( void )
+INLINE void swi( konami_state *cpustate )
 {
 	CC |= CC_E; 			/* HJB 980225: save entire state */
-	PUSHWORD(pPC);
-	PUSHWORD(pU);
-	PUSHWORD(pY);
-	PUSHWORD(pX);
-	PUSHBYTE(DP);
-	PUSHBYTE(B);
-	PUSHBYTE(A);
-	PUSHBYTE(CC);
+	PUSHWORD(cpustate, pPC);
+	PUSHWORD(cpustate, pU);
+	PUSHWORD(cpustate, pY);
+	PUSHWORD(cpustate, pX);
+	PUSHBYTE(cpustate, DP);
+	PUSHBYTE(cpustate, B);
+	PUSHBYTE(cpustate, A);
+	PUSHBYTE(cpustate, CC);
 	CC |= CC_IF | CC_II;	/* inhibit FIRQ and IRQ */
-	PCD=RM16(0xfffa);
+	PCD=RM16(cpustate, 0xfffa);
 }
 
 /* $103F SWI2 absolute indirect ----- */
-INLINE void swi2( void )
+INLINE void swi2( konami_state *cpustate )
 {
 	CC |= CC_E; 			/* HJB 980225: save entire state */
-	PUSHWORD(pPC);
-	PUSHWORD(pU);
-	PUSHWORD(pY);
-	PUSHWORD(pX);
-	PUSHBYTE(DP);
-	PUSHBYTE(B);
-	PUSHBYTE(A);
-    PUSHBYTE(CC);
-	PCD=RM16(0xfff4);
+	PUSHWORD(cpustate, pPC);
+	PUSHWORD(cpustate, pU);
+	PUSHWORD(cpustate, pY);
+	PUSHWORD(cpustate, pX);
+	PUSHBYTE(cpustate, DP);
+	PUSHBYTE(cpustate, B);
+	PUSHBYTE(cpustate, A);
+    PUSHBYTE(cpustate, CC);
+	PCD=RM16(cpustate, 0xfff4);
 }
 
 /* $113F SWI3 absolute indirect ----- */
-INLINE void swi3( void )
+INLINE void swi3( konami_state *cpustate )
 {
 	CC |= CC_E; 			/* HJB 980225: save entire state */
-	PUSHWORD(pPC);
-	PUSHWORD(pU);
-	PUSHWORD(pY);
-	PUSHWORD(pX);
-	PUSHBYTE(DP);
-	PUSHBYTE(B);
-	PUSHBYTE(A);
-    PUSHBYTE(CC);
-	PCD=RM16(0xfff2);
+	PUSHWORD(cpustate, pPC);
+	PUSHWORD(cpustate, pU);
+	PUSHWORD(cpustate, pY);
+	PUSHWORD(cpustate, pX);
+	PUSHBYTE(cpustate, DP);
+	PUSHBYTE(cpustate, B);
+	PUSHBYTE(cpustate, A);
+    PUSHBYTE(cpustate, CC);
+	PCD=RM16(cpustate, 0xfff2);
 }
 
 /* $40 NEGA inherent ?**** */
-INLINE void nega( void )
+INLINE void nega( konami_state *cpustate )
 {
 	UINT16 r;
 	r = -A;
@@ -712,7 +712,7 @@ INLINE void nega( void )
 /* $42 ILLEGAL */
 
 /* $43 COMA inherent -**01 */
-INLINE void coma( void )
+INLINE void coma( konami_state *cpustate )
 {
 	A = ~A;
 	CLR_NZV;
@@ -721,7 +721,7 @@ INLINE void coma( void )
 }
 
 /* $44 LSRA inherent -0*-* */
-INLINE void lsra( void )
+INLINE void lsra( konami_state *cpustate )
 {
 	CLR_NZC;
 	CC |= (A & CC_C);
@@ -732,7 +732,7 @@ INLINE void lsra( void )
 /* $45 ILLEGAL */
 
 /* $46 RORA inherent -**-* */
-INLINE void rora( void )
+INLINE void rora( konami_state *cpustate )
 {
 	UINT8 r;
 	r = (CC & CC_C) << 7;
@@ -744,7 +744,7 @@ INLINE void rora( void )
 }
 
 /* $47 ASRA inherent ?**-* */
-INLINE void asra( void )
+INLINE void asra( konami_state *cpustate )
 {
 	CLR_NZC;
 	CC |= (A & CC_C);
@@ -753,7 +753,7 @@ INLINE void asra( void )
 }
 
 /* $48 ASLA inherent ?**** */
-INLINE void asla( void )
+INLINE void asla( konami_state *cpustate )
 {
 	UINT16 r;
 	r = A << 1;
@@ -763,7 +763,7 @@ INLINE void asla( void )
 }
 
 /* $49 ROLA inherent -**** */
-INLINE void rola( void )
+INLINE void rola( konami_state *cpustate )
 {
 	UINT16 t,r;
 	t = A;
@@ -773,7 +773,7 @@ INLINE void rola( void )
 }
 
 /* $4A DECA inherent -***- */
-INLINE void deca( void )
+INLINE void deca( konami_state *cpustate )
 {
 	--A;
 	CLR_NZV;
@@ -783,7 +783,7 @@ INLINE void deca( void )
 /* $4B ILLEGAL */
 
 /* $4C INCA inherent -***- */
-INLINE void inca( void )
+INLINE void inca( konami_state *cpustate )
 {
 	++A;
 	CLR_NZV;
@@ -791,7 +791,7 @@ INLINE void inca( void )
 }
 
 /* $4D TSTA inherent -**0- */
-INLINE void tsta( void )
+INLINE void tsta( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(A);
@@ -800,14 +800,14 @@ INLINE void tsta( void )
 /* $4E ILLEGAL */
 
 /* $4F CLRA inherent -0100 */
-INLINE void clra( void )
+INLINE void clra( konami_state *cpustate )
 {
 	A = 0;
 	CLR_NZVC; SEZ;
 }
 
 /* $50 NEGB inherent ?**** */
-INLINE void negb( void )
+INLINE void negb( konami_state *cpustate )
 {
 	UINT16 r;
 	r = -B;
@@ -821,7 +821,7 @@ INLINE void negb( void )
 /* $52 ILLEGAL */
 
 /* $53 COMB inherent -**01 */
-INLINE void comb( void )
+INLINE void comb( konami_state *cpustate )
 {
 	B = ~B;
 	CLR_NZV;
@@ -830,7 +830,7 @@ INLINE void comb( void )
 }
 
 /* $54 LSRB inherent -0*-* */
-INLINE void lsrb( void )
+INLINE void lsrb( konami_state *cpustate )
 {
 	CLR_NZC;
 	CC |= (B & CC_C);
@@ -841,7 +841,7 @@ INLINE void lsrb( void )
 /* $55 ILLEGAL */
 
 /* $56 RORB inherent -**-* */
-INLINE void rorb( void )
+INLINE void rorb( konami_state *cpustate )
 {
 	UINT8 r;
 	r = (CC & CC_C) << 7;
@@ -853,7 +853,7 @@ INLINE void rorb( void )
 }
 
 /* $57 ASRB inherent ?**-* */
-INLINE void asrb( void )
+INLINE void asrb( konami_state *cpustate )
 {
 	CLR_NZC;
 	CC |= (B & CC_C);
@@ -862,7 +862,7 @@ INLINE void asrb( void )
 }
 
 /* $58 ASLB inherent ?**** */
-INLINE void aslb( void )
+INLINE void aslb( konami_state *cpustate )
 {
 	UINT16 r;
 	r = B << 1;
@@ -872,7 +872,7 @@ INLINE void aslb( void )
 }
 
 /* $59 ROLB inherent -**** */
-INLINE void rolb( void )
+INLINE void rolb( konami_state *cpustate )
 {
 	UINT16 t,r;
 	t = B;
@@ -884,7 +884,7 @@ INLINE void rolb( void )
 }
 
 /* $5A DECB inherent -***- */
-INLINE void decb( void )
+INLINE void decb( konami_state *cpustate )
 {
 	--B;
 	CLR_NZV;
@@ -894,7 +894,7 @@ INLINE void decb( void )
 /* $5B ILLEGAL */
 
 /* $5C INCB inherent -***- */
-INLINE void incb( void )
+INLINE void incb( konami_state *cpustate )
 {
 	++B;
 	CLR_NZV;
@@ -902,7 +902,7 @@ INLINE void incb( void )
 }
 
 /* $5D TSTB inherent -**0- */
-INLINE void tstb( void )
+INLINE void tstb( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(B);
@@ -911,21 +911,21 @@ INLINE void tstb( void )
 /* $5E ILLEGAL */
 
 /* $5F CLRB inherent -0100 */
-INLINE void clrb( void )
+INLINE void clrb( konami_state *cpustate )
 {
 	B = 0;
 	CLR_NZVC; SEZ;
 }
 
 /* $60 NEG indexed ?**** */
-INLINE void neg_ix( void )
+INLINE void neg_ix( konami_state *cpustate )
 {
 	UINT16 r,t;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = -t;
 	CLR_NZVC;
 	SET_FLAGS8(0,t,r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $61 ILLEGAL */
@@ -933,125 +933,125 @@ INLINE void neg_ix( void )
 /* $62 ILLEGAL */
 
 /* $63 COM indexed -**01 */
-INLINE void com_ix( void )
+INLINE void com_ix( konami_state *cpustate )
 {
 	UINT8 t;
-	t = ~RM(EAD);
+	t = ~RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(t);
 	SEC;
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $64 LSR indexed -0*-* */
-INLINE void lsr_ix( void )
+INLINE void lsr_ix( konami_state *cpustate )
 {
 	UINT8 t;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	CLR_NZC;
 	CC |= (t & CC_C);
 	t>>=1; SET_Z8(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $65 ILLEGAL */
 
 /* $66 ROR indexed -**-* */
-INLINE void ror_ix( void )
+INLINE void ror_ix( konami_state *cpustate )
 {
 	UINT8 t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = (CC & CC_C) << 7;
 	CLR_NZC;
 	CC |= (t & CC_C);
 	r |= t>>1; SET_NZ8(r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $67 ASR indexed ?**-* */
-INLINE void asr_ix( void )
+INLINE void asr_ix( konami_state *cpustate )
 {
 	UINT8 t;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	CLR_NZC;
 	CC |= (t & CC_C);
 	t=(t&0x80)|(t>>1);
 	SET_NZ8(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $68 ASL indexed ?**** */
-INLINE void asl_ix( void )
+INLINE void asl_ix( konami_state *cpustate )
 {
 	UINT16 t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = t << 1;
 	CLR_NZVC;
 	SET_FLAGS8(t,t,r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $69 ROL indexed -**** */
-INLINE void rol_ix( void )
+INLINE void rol_ix( konami_state *cpustate )
 {
 	UINT16 t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = CC & CC_C;
 	r |= t << 1;
 	CLR_NZVC;
 	SET_FLAGS8(t,t,r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $6A DEC indexed -***- */
-INLINE void dec_ix( void )
+INLINE void dec_ix( konami_state *cpustate )
 {
 	UINT8 t;
-	t = RM(EAD) - 1;
+	t = RM(cpustate, EAD) - 1;
 	CLR_NZV; SET_FLAGS8D(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $6B ILLEGAL */
 
 /* $6C INC indexed -***- */
-INLINE void inc_ix( void )
+INLINE void inc_ix( konami_state *cpustate )
 {
 	UINT8 t;
-	t = RM(EAD) + 1;
+	t = RM(cpustate, EAD) + 1;
 	CLR_NZV; SET_FLAGS8I(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $6D TST indexed -**0- */
-INLINE void tst_ix( void )
+INLINE void tst_ix( konami_state *cpustate )
 {
 	UINT8 t;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(t);
 }
 
 /* $6E JMP indexed ----- */
-INLINE void jmp_ix( void )
+INLINE void jmp_ix( konami_state *cpustate )
 {
 	PCD=EAD;
 }
 
 /* $6F CLR indexed -0100 */
-INLINE void clr_ix( void )
+INLINE void clr_ix( konami_state *cpustate )
 {
-	WM(EAD,0);
+	WM(cpustate, EAD,0);
 	CLR_NZVC; SEZ;
 }
 
 /* $70 NEG extended ?**** */
-INLINE void neg_ex( void )
+INLINE void neg_ex( konami_state *cpustate )
 {
 	UINT16 r,t;
-	EXTBYTE(t); r=-t;
+	EXTBYTE(cpustate, t); r=-t;
 	CLR_NZVC; SET_FLAGS8(0,t,r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $71 ILLEGAL */
@@ -1059,110 +1059,110 @@ INLINE void neg_ex( void )
 /* $72 ILLEGAL */
 
 /* $73 COM extended -**01 */
-INLINE void com_ex( void )
+INLINE void com_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t); t = ~t;
+	EXTBYTE(cpustate, t); t = ~t;
 	CLR_NZV; SET_NZ8(t); SEC;
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $74 LSR extended -0*-* */
-INLINE void lsr_ex( void )
+INLINE void lsr_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t); CLR_NZC; CC |= (t & CC_C);
+	EXTBYTE(cpustate, t); CLR_NZC; CC |= (t & CC_C);
 	t>>=1; SET_Z8(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $75 ILLEGAL */
 
 /* $76 ROR extended -**-* */
-INLINE void ror_ex( void )
+INLINE void ror_ex( konami_state *cpustate )
 {
 	UINT8 t,r;
-	EXTBYTE(t); r=(CC & CC_C) << 7;
+	EXTBYTE(cpustate, t); r=(CC & CC_C) << 7;
 	CLR_NZC; CC |= (t & CC_C);
 	r |= t>>1; SET_NZ8(r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $77 ASR extended ?**-* */
-INLINE void asr_ex( void )
+INLINE void asr_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t); CLR_NZC; CC |= (t & CC_C);
+	EXTBYTE(cpustate, t); CLR_NZC; CC |= (t & CC_C);
 	t=(t&0x80)|(t>>1);
 	SET_NZ8(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $78 ASL extended ?**** */
-INLINE void asl_ex( void )
+INLINE void asl_ex( konami_state *cpustate )
 {
 	UINT16 t,r;
-	EXTBYTE(t); r=t<<1;
+	EXTBYTE(cpustate, t); r=t<<1;
 	CLR_NZVC; SET_FLAGS8(t,t,r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $79 ROL extended -**** */
-INLINE void rol_ex( void )
+INLINE void rol_ex( konami_state *cpustate )
 {
 	UINT16 t,r;
-	EXTBYTE(t); r = (CC & CC_C) | (t << 1);
+	EXTBYTE(cpustate, t); r = (CC & CC_C) | (t << 1);
 	CLR_NZVC; SET_FLAGS8(t,t,r);
-	WM(EAD,r);
+	WM(cpustate, EAD,r);
 }
 
 /* $7A DEC extended -***- */
-INLINE void dec_ex( void )
+INLINE void dec_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t); --t;
+	EXTBYTE(cpustate, t); --t;
 	CLR_NZV; SET_FLAGS8D(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $7B ILLEGAL */
 
 /* $7C INC extended -***- */
-INLINE void inc_ex( void )
+INLINE void inc_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t); ++t;
+	EXTBYTE(cpustate, t); ++t;
 	CLR_NZV; SET_FLAGS8I(t);
-	WM(EAD,t);
+	WM(cpustate, EAD,t);
 }
 
 /* $7D TST extended -**0- */
-INLINE void tst_ex( void )
+INLINE void tst_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t); CLR_NZV; SET_NZ8(t);
+	EXTBYTE(cpustate, t); CLR_NZV; SET_NZ8(t);
 }
 
 /* $7E JMP extended ----- */
-INLINE void jmp_ex( void )
+INLINE void jmp_ex( konami_state *cpustate )
 {
-	EXTENDED;
+	EXTENDED(cpustate);
 	PCD=EAD;
 }
 
 /* $7F CLR extended -0100 */
-INLINE void clr_ex( void )
+INLINE void clr_ex( konami_state *cpustate )
 {
-	EXTENDED;
-	WM(EAD,0);
+	EXTENDED(cpustate);
+	WM(cpustate, EAD,0);
 	CLR_NZVC; SEZ;
 }
 
 /* $80 SUBA immediate ?**** */
-INLINE void suba_im( void )
+INLINE void suba_im( konami_state *cpustate )
 {
 	UINT16 t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
@@ -1170,20 +1170,20 @@ INLINE void suba_im( void )
 }
 
 /* $81 CMPA immediate ?**** */
-INLINE void cmpa_im( void )
+INLINE void cmpa_im( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
 }
 
 /* $82 SBCA immediate ?**** */
-INLINE void sbca_im( void )
+INLINE void sbca_im( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
@@ -1191,11 +1191,11 @@ INLINE void sbca_im( void )
 }
 
 /* $83 SUBD (CMPD CMPU) immediate -**** */
-INLINE void subd_im( void )
+INLINE void subd_im( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	IMMWORD(b);
+	IMMWORD(cpustate, b);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1204,11 +1204,11 @@ INLINE void subd_im( void )
 }
 
 /* $1083 CMPD immediate -**** */
-INLINE void cmpd_im( void )
+INLINE void cmpd_im( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	IMMWORD(b);
+	IMMWORD(cpustate, b);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1216,11 +1216,11 @@ INLINE void cmpd_im( void )
 }
 
 /* $1183 CMPU immediate -**** */
-INLINE void cmpu_im( void )
+INLINE void cmpu_im( konami_state *cpustate )
 {
 	UINT32 r, d;
 	PAIR b;
-	IMMWORD(b);
+	IMMWORD(cpustate, b);
 	d = U;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1228,58 +1228,58 @@ INLINE void cmpu_im( void )
 }
 
 /* $84 ANDA immediate -**0- */
-INLINE void anda_im( void )
+INLINE void anda_im( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	A &= t;
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $85 BITA immediate -**0- */
-INLINE void bita_im( void )
+INLINE void bita_im( konami_state *cpustate )
 {
 	UINT8 t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = A & t;
 	CLR_NZV;
 	SET_NZ8(r);
 }
 
 /* $86 LDA immediate -**0- */
-INLINE void lda_im( void )
+INLINE void lda_im( konami_state *cpustate )
 {
-	IMMBYTE(A);
+	IMMBYTE(cpustate, A);
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* is this a legal instruction? */
 /* $87 STA immediate -**0- */
-INLINE void sta_im( void )
+INLINE void sta_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(A);
-	IMM8;
-	WM(EAD,A);
+	IMM8(cpustate);
+	WM(cpustate, EAD,A);
 }
 
 /* $88 EORA immediate -**0- */
-INLINE void eora_im( void )
+INLINE void eora_im( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	A ^= t;
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $89 ADCA immediate ***** */
-INLINE void adca_im( void )
+INLINE void adca_im( konami_state *cpustate )
 {
 	UINT16 t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = A + t + (CC & CC_C);
 	CLR_HNZVC;
 	SET_FLAGS8(A,t,r);
@@ -1288,20 +1288,20 @@ INLINE void adca_im( void )
 }
 
 /* $8A ORA immediate -**0- */
-INLINE void ora_im( void )
+INLINE void ora_im( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	A |= t;
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $8B ADDA immediate ***** */
-INLINE void adda_im( void )
+INLINE void adda_im( konami_state *cpustate )
 {
 	UINT16 t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = A + t;
 	CLR_HNZVC;
 	SET_FLAGS8(A,t,r);
@@ -1310,11 +1310,11 @@ INLINE void adda_im( void )
 }
 
 /* $8C CMPX (CMPY CMPS) immediate -**** */
-INLINE void cmpx_im( void )
+INLINE void cmpx_im( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	IMMWORD(b);
+	IMMWORD(cpustate, b);
 	d = X;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1322,11 +1322,11 @@ INLINE void cmpx_im( void )
 }
 
 /* $108C CMPY immediate -**** */
-INLINE void cmpy_im( void )
+INLINE void cmpy_im( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	IMMWORD(b);
+	IMMWORD(cpustate, b);
 	d = Y;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1334,11 +1334,11 @@ INLINE void cmpy_im( void )
 }
 
 /* $118C CMPS immediate -**** */
-INLINE void cmps_im( void )
+INLINE void cmps_im( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	IMMWORD(b);
+	IMMWORD(cpustate, b);
 	d = S;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1346,55 +1346,55 @@ INLINE void cmps_im( void )
 }
 
 /* $8D BSR ----- */
-INLINE void bsr( void )
+INLINE void bsr( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
-	PUSHWORD(pPC);
+	IMMBYTE(cpustate, t);
+	PUSHWORD(cpustate, pPC);
 	PC += SIGNED(t);
 }
 
 /* $8E LDX (LDY) immediate -**0- */
-INLINE void ldx_im( void )
+INLINE void ldx_im( konami_state *cpustate )
 {
-	IMMWORD(pX);
+	IMMWORD(cpustate, pX);
 	CLR_NZV;
 	SET_NZ16(X);
 }
 
 /* $108E LDY immediate -**0- */
-INLINE void ldy_im( void )
+INLINE void ldy_im( konami_state *cpustate )
 {
-	IMMWORD(pY);
+	IMMWORD(cpustate, pY);
 	CLR_NZV;
 	SET_NZ16(Y);
 }
 
 /* is this a legal instruction? */
 /* $8F STX (STY) immediate -**0- */
-INLINE void stx_im( void )
+INLINE void stx_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(X);
-	IMM16;
-	WM16(EAD,&pX);
+	IMM16(cpustate);
+	WM16(cpustate, EAD,&pX);
 }
 
 /* is this a legal instruction? */
 /* $108F STY immediate -**0- */
-INLINE void sty_im( void )
+INLINE void sty_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(Y);
-	IMM16;
-	WM16(EAD,&pY);
+	IMM16(cpustate);
+	WM16(cpustate, EAD,&pY);
 }
 
 /* $90 SUBA direct ?**** */
-INLINE void suba_di( void )
+INLINE void suba_di( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
@@ -1402,20 +1402,20 @@ INLINE void suba_di( void )
 }
 
 /* $91 CMPA direct ?**** */
-INLINE void cmpa_di( void )
+INLINE void cmpa_di( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
 }
 
 /* $92 SBCA direct ?**** */
-INLINE void sbca_di( void )
+INLINE void sbca_di( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
@@ -1423,11 +1423,11 @@ INLINE void sbca_di( void )
 }
 
 /* $93 SUBD (CMPD CMPU) direct -**** */
-INLINE void subd_di( void )
+INLINE void subd_di( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	DIRWORD(b);
+	DIRWORD(cpustate, b);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1436,11 +1436,11 @@ INLINE void subd_di( void )
 }
 
 /* $1093 CMPD direct -**** */
-INLINE void cmpd_di( void )
+INLINE void cmpd_di( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	DIRWORD(b);
+	DIRWORD(cpustate, b);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1448,11 +1448,11 @@ INLINE void cmpd_di( void )
 }
 
 /* $1193 CMPU direct -**** */
-INLINE void cmpu_di( void )
+INLINE void cmpu_di( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	DIRWORD(b);
+	DIRWORD(cpustate, b);
 	d = U;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1460,57 +1460,57 @@ INLINE void cmpu_di( void )
 }
 
 /* $94 ANDA direct -**0- */
-INLINE void anda_di( void )
+INLINE void anda_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	A &= t;
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $95 BITA direct -**0- */
-INLINE void bita_di( void )
+INLINE void bita_di( konami_state *cpustate )
 {
 	UINT8 t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = A & t;
 	CLR_NZV;
 	SET_NZ8(r);
 }
 
 /* $96 LDA direct -**0- */
-INLINE void lda_di( void )
+INLINE void lda_di( konami_state *cpustate )
 {
-	DIRBYTE(A);
+	DIRBYTE(cpustate, A);
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $97 STA direct -**0- */
-INLINE void sta_di( void )
+INLINE void sta_di( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(A);
-	DIRECT;
-	WM(EAD,A);
+	DIRECT(cpustate);
+	WM(cpustate, EAD,A);
 }
 
 /* $98 EORA direct -**0- */
-INLINE void eora_di( void )
+INLINE void eora_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	A ^= t;
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $99 ADCA direct ***** */
-INLINE void adca_di( void )
+INLINE void adca_di( konami_state *cpustate )
 {
 	UINT16 t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = A + t + (CC & CC_C);
 	CLR_HNZVC;
 	SET_FLAGS8(A,t,r);
@@ -1519,20 +1519,20 @@ INLINE void adca_di( void )
 }
 
 /* $9A ORA direct -**0- */
-INLINE void ora_di( void )
+INLINE void ora_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	A |= t;
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $9B ADDA direct ***** */
-INLINE void adda_di( void )
+INLINE void adda_di( konami_state *cpustate )
 {
 	UINT16 t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = A + t;
 	CLR_HNZVC;
 	SET_FLAGS8(A,t,r);
@@ -1541,11 +1541,11 @@ INLINE void adda_di( void )
 }
 
 /* $9C CMPX (CMPY CMPS) direct -**** */
-INLINE void cmpx_di( void )
+INLINE void cmpx_di( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	DIRWORD(b);
+	DIRWORD(cpustate, b);
 	d = X;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1553,11 +1553,11 @@ INLINE void cmpx_di( void )
 }
 
 /* $109C CMPY direct -**** */
-INLINE void cmpy_di( void )
+INLINE void cmpy_di( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	DIRWORD(b);
+	DIRWORD(cpustate, b);
 	d = Y;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1565,11 +1565,11 @@ INLINE void cmpy_di( void )
 }
 
 /* $119C CMPS direct -**** */
-INLINE void cmps_di( void )
+INLINE void cmps_di( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	DIRWORD(b);
+	DIRWORD(cpustate, b);
 	d = S;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1577,52 +1577,52 @@ INLINE void cmps_di( void )
 }
 
 /* $9D JSR direct ----- */
-INLINE void jsr_di( void )
+INLINE void jsr_di( konami_state *cpustate )
 {
-	DIRECT;
-	PUSHWORD(pPC);
+	DIRECT(cpustate);
+	PUSHWORD(cpustate, pPC);
 	PCD=EAD;
 }
 
 /* $9E LDX (LDY) direct -**0- */
-INLINE void ldx_di( void )
+INLINE void ldx_di( konami_state *cpustate )
 {
-	DIRWORD(pX);
+	DIRWORD(cpustate, pX);
 	CLR_NZV;
 	SET_NZ16(X);
 }
 
 /* $109E LDY direct -**0- */
-INLINE void ldy_di( void )
+INLINE void ldy_di( konami_state *cpustate )
 {
-	DIRWORD(pY);
+	DIRWORD(cpustate, pY);
 	CLR_NZV;
 	SET_NZ16(Y);
 }
 
 /* $9F STX (STY) direct -**0- */
-INLINE void stx_di( void )
+INLINE void stx_di( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(X);
-	DIRECT;
-	WM16(EAD,&pX);
+	DIRECT(cpustate);
+	WM16(cpustate, EAD,&pX);
 }
 
 /* $109F STY direct -**0- */
-INLINE void sty_di( void )
+INLINE void sty_di( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(Y);
-	DIRECT;
-	WM16(EAD,&pY);
+	DIRECT(cpustate);
+	WM16(cpustate, EAD,&pY);
 }
 
 /* $a0 SUBA indexed ?**** */
-INLINE void suba_ix( void )
+INLINE void suba_ix( konami_state *cpustate )
 {
 	UINT16 t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = A - t;
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
@@ -1630,20 +1630,20 @@ INLINE void suba_ix( void )
 }
 
 /* $a1 CMPA indexed ?**** */
-INLINE void cmpa_ix( void )
+INLINE void cmpa_ix( konami_state *cpustate )
 {
 	UINT16 t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = A - t;
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
 }
 
 /* $a2 SBCA indexed ?**** */
-INLINE void sbca_ix( void )
+INLINE void sbca_ix( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
@@ -1651,11 +1651,11 @@ INLINE void sbca_ix( void )
 }
 
 /* $a3 SUBD (CMPD CMPU) indexed -**** */
-INLINE void subd_ix( void )
+INLINE void subd_ix( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	b.d=RM16(EAD);
+	b.d=RM16(cpustate, EAD);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1664,11 +1664,11 @@ INLINE void subd_ix( void )
 }
 
 /* $10a3 CMPD indexed -**** */
-INLINE void cmpd_ix( void )
+INLINE void cmpd_ix( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	b.d=RM16(EAD);
+	b.d=RM16(cpustate, EAD);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1676,62 +1676,62 @@ INLINE void cmpd_ix( void )
 }
 
 /* $11a3 CMPU indexed -**** */
-INLINE void cmpu_ix( void )
+INLINE void cmpu_ix( konami_state *cpustate )
 {
 	UINT32 r;
 	PAIR b;
-	b.d=RM16(EAD);
+	b.d=RM16(cpustate, EAD);
 	r = U - b.d;
 	CLR_NZVC;
 	SET_FLAGS16(U,b.d,r);
 }
 
 /* $a4 ANDA indexed -**0- */
-INLINE void anda_ix( void )
+INLINE void anda_ix( konami_state *cpustate )
 {
-	A &= RM(EAD);
+	A &= RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $a5 BITA indexed -**0- */
-INLINE void bita_ix( void )
+INLINE void bita_ix( konami_state *cpustate )
 {
 	UINT8 r;
-	r = A & RM(EAD);
+	r = A & RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(r);
 }
 
 /* $a6 LDA indexed -**0- */
-INLINE void lda_ix( void )
+INLINE void lda_ix( konami_state *cpustate )
 {
-	A = RM(EAD);
+	A = RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $a7 STA indexed -**0- */
-INLINE void sta_ix( void )
+INLINE void sta_ix( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(A);
-	WM(EAD,A);
+	WM(cpustate, EAD,A);
 }
 
 /* $a8 EORA indexed -**0- */
-INLINE void eora_ix( void )
+INLINE void eora_ix( konami_state *cpustate )
 {
-	A ^= RM(EAD);
+	A ^= RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $a9 ADCA indexed ***** */
-INLINE void adca_ix( void )
+INLINE void adca_ix( konami_state *cpustate )
 {
 	UINT16 t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = A + t + (CC & CC_C);
 	CLR_HNZVC;
 	SET_FLAGS8(A,t,r);
@@ -1740,18 +1740,18 @@ INLINE void adca_ix( void )
 }
 
 /* $aA ORA indexed -**0- */
-INLINE void ora_ix( void )
+INLINE void ora_ix( konami_state *cpustate )
 {
-	A |= RM(EAD);
+	A |= RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $aB ADDA indexed ***** */
-INLINE void adda_ix( void )
+INLINE void adda_ix( konami_state *cpustate )
 {
 	UINT16 t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = A + t;
 	CLR_HNZVC;
 	SET_FLAGS8(A,t,r);
@@ -1760,11 +1760,11 @@ INLINE void adda_ix( void )
 }
 
 /* $aC CMPX (CMPY CMPS) indexed -**** */
-INLINE void cmpx_ix( void )
+INLINE void cmpx_ix( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	b.d=RM16(EAD);
+	b.d=RM16(cpustate, EAD);
 	d = X;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1772,11 +1772,11 @@ INLINE void cmpx_ix( void )
 }
 
 /* $10aC CMPY indexed -**** */
-INLINE void cmpy_ix( void )
+INLINE void cmpy_ix( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	b.d=RM16(EAD);
+	b.d=RM16(cpustate, EAD);
 	d = Y;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1784,11 +1784,11 @@ INLINE void cmpy_ix( void )
 }
 
 /* $11aC CMPS indexed -**** */
-INLINE void cmps_ix( void )
+INLINE void cmps_ix( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	b.d=RM16(EAD);
+	b.d=RM16(cpustate, EAD);
 	d = S;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1796,49 +1796,49 @@ INLINE void cmps_ix( void )
 }
 
 /* $aD JSR indexed ----- */
-INLINE void jsr_ix( void )
+INLINE void jsr_ix( konami_state *cpustate )
 {
-	PUSHWORD(pPC);
+	PUSHWORD(cpustate, pPC);
 	PCD=EAD;
 }
 
 /* $aE LDX (LDY) indexed -**0- */
-INLINE void ldx_ix( void )
+INLINE void ldx_ix( konami_state *cpustate )
 {
-	X=RM16(EAD);
+	X=RM16(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ16(X);
 }
 
 /* $10aE LDY indexed -**0- */
-INLINE void ldy_ix( void )
+INLINE void ldy_ix( konami_state *cpustate )
 {
-	Y=RM16(EAD);
+	Y=RM16(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ16(Y);
 }
 
 /* $aF STX (STY) indexed -**0- */
-INLINE void stx_ix( void )
+INLINE void stx_ix( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(X);
-	WM16(EAD,&pX);
+	WM16(cpustate, EAD,&pX);
 }
 
 /* $10aF STY indexed -**0- */
-INLINE void sty_ix( void )
+INLINE void sty_ix( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(Y);
-	WM16(EAD,&pY);
+	WM16(cpustate, EAD,&pY);
 }
 
 /* $b0 SUBA extended ?**** */
-INLINE void suba_ex( void )
+INLINE void suba_ex( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
@@ -1846,20 +1846,20 @@ INLINE void suba_ex( void )
 }
 
 /* $b1 CMPA extended ?**** */
-INLINE void cmpa_ex( void )
+INLINE void cmpa_ex( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = A - t;
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
 }
 
 /* $b2 SBCA extended ?**** */
-INLINE void sbca_ex( void )
+INLINE void sbca_ex( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = A - t - (CC & CC_C);
 	CLR_NZVC;
 	SET_FLAGS8(A,t,r);
@@ -1867,11 +1867,11 @@ INLINE void sbca_ex( void )
 }
 
 /* $b3 SUBD (CMPD CMPU) extended -**** */
-INLINE void subd_ex( void )
+INLINE void subd_ex( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	EXTWORD(b);
+	EXTWORD(cpustate, b);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1880,11 +1880,11 @@ INLINE void subd_ex( void )
 }
 
 /* $10b3 CMPD extended -**** */
-INLINE void cmpd_ex( void )
+INLINE void cmpd_ex( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	EXTWORD(b);
+	EXTWORD(cpustate, b);
 	d = D;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1892,11 +1892,11 @@ INLINE void cmpd_ex( void )
 }
 
 /* $11b3 CMPU extended -**** */
-INLINE void cmpu_ex( void )
+INLINE void cmpu_ex( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	EXTWORD(b);
+	EXTWORD(cpustate, b);
 	d = U;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1904,56 +1904,56 @@ INLINE void cmpu_ex( void )
 }
 
 /* $b4 ANDA extended -**0- */
-INLINE void anda_ex( void )
+INLINE void anda_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	A &= t;
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $b5 BITA extended -**0- */
-INLINE void bita_ex( void )
+INLINE void bita_ex( konami_state *cpustate )
 {
 	UINT8 t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = A & t;
 	CLR_NZV; SET_NZ8(r);
 }
 
 /* $b6 LDA extended -**0- */
-INLINE void lda_ex( void )
+INLINE void lda_ex( konami_state *cpustate )
 {
-	EXTBYTE(A);
+	EXTBYTE(cpustate, A);
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $b7 STA extended -**0- */
-INLINE void sta_ex( void )
+INLINE void sta_ex( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(A);
-	EXTENDED;
-	WM(EAD,A);
+	EXTENDED(cpustate);
+	WM(cpustate, EAD,A);
 }
 
 /* $b8 EORA extended -**0- */
-INLINE void eora_ex( void )
+INLINE void eora_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	A ^= t;
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $b9 ADCA extended ***** */
-INLINE void adca_ex( void )
+INLINE void adca_ex( konami_state *cpustate )
 {
 	UINT16 t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = A + t + (CC & CC_C);
 	CLR_HNZVC;
 	SET_FLAGS8(A,t,r);
@@ -1962,20 +1962,20 @@ INLINE void adca_ex( void )
 }
 
 /* $bA ORA extended -**0- */
-INLINE void ora_ex( void )
+INLINE void ora_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	A |= t;
 	CLR_NZV;
 	SET_NZ8(A);
 }
 
 /* $bB ADDA extended ***** */
-INLINE void adda_ex( void )
+INLINE void adda_ex( konami_state *cpustate )
 {
 	UINT16 t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = A + t;
 	CLR_HNZVC;
 	SET_FLAGS8(A,t,r);
@@ -1984,11 +1984,11 @@ INLINE void adda_ex( void )
 }
 
 /* $bC CMPX (CMPY CMPS) extended -**** */
-INLINE void cmpx_ex( void )
+INLINE void cmpx_ex( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	EXTWORD(b);
+	EXTWORD(cpustate, b);
 	d = X;
 	r = d - b.d;
 	CLR_NZVC;
@@ -1996,11 +1996,11 @@ INLINE void cmpx_ex( void )
 }
 
 /* $10bC CMPY extended -**** */
-INLINE void cmpy_ex( void )
+INLINE void cmpy_ex( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	EXTWORD(b);
+	EXTWORD(cpustate, b);
 	d = Y;
 	r = d - b.d;
 	CLR_NZVC;
@@ -2008,11 +2008,11 @@ INLINE void cmpy_ex( void )
 }
 
 /* $11bC CMPS extended -**** */
-INLINE void cmps_ex( void )
+INLINE void cmps_ex( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	EXTWORD(b);
+	EXTWORD(cpustate, b);
 	d = S;
 	r = d - b.d;
 	CLR_NZVC;
@@ -2020,52 +2020,52 @@ INLINE void cmps_ex( void )
 }
 
 /* $bD JSR extended ----- */
-INLINE void jsr_ex( void )
+INLINE void jsr_ex( konami_state *cpustate )
 {
-	EXTENDED;
-	PUSHWORD(pPC);
+	EXTENDED(cpustate);
+	PUSHWORD(cpustate, pPC);
 	PCD=EAD;
 }
 
 /* $bE LDX (LDY) extended -**0- */
-INLINE void ldx_ex( void )
+INLINE void ldx_ex( konami_state *cpustate )
 {
-	EXTWORD(pX);
+	EXTWORD(cpustate, pX);
 	CLR_NZV;
 	SET_NZ16(X);
 }
 
 /* $10bE LDY extended -**0- */
-INLINE void ldy_ex( void )
+INLINE void ldy_ex( konami_state *cpustate )
 {
-	EXTWORD(pY);
+	EXTWORD(cpustate, pY);
 	CLR_NZV;
 	SET_NZ16(Y);
 }
 
 /* $bF STX (STY) extended -**0- */
-INLINE void stx_ex( void )
+INLINE void stx_ex( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(X);
-	EXTENDED;
-	WM16(EAD,&pX);
+	EXTENDED(cpustate);
+	WM16(cpustate, EAD,&pX);
 }
 
 /* $10bF STY extended -**0- */
-INLINE void sty_ex( void )
+INLINE void sty_ex( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(Y);
-	EXTENDED;
-	WM16(EAD,&pY);
+	EXTENDED(cpustate);
+	WM16(cpustate, EAD,&pY);
 }
 
 /* $c0 SUBB immediate ?**** */
-INLINE void subb_im( void )
+INLINE void subb_im( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
@@ -2073,19 +2073,19 @@ INLINE void subb_im( void )
 }
 
 /* $c1 CMPB immediate ?**** */
-INLINE void cmpb_im( void )
+INLINE void cmpb_im( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC; SET_FLAGS8(B,t,r);
 }
 
 /* $c2 SBCB immediate ?**** */
-INLINE void sbcb_im( void )
+INLINE void sbcb_im( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
@@ -2093,11 +2093,11 @@ INLINE void sbcb_im( void )
 }
 
 /* $c3 ADDD immediate -**** */
-INLINE void addd_im( void )
+INLINE void addd_im( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	IMMWORD(b);
+	IMMWORD(cpustate, b);
 	d = D;
 	r = d + b.d;
 	CLR_NZVC;
@@ -2106,58 +2106,58 @@ INLINE void addd_im( void )
 }
 
 /* $c4 ANDB immediate -**0- */
-INLINE void andb_im( void )
+INLINE void andb_im( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	B &= t;
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $c5 BITB immediate -**0- */
-INLINE void bitb_im( void )
+INLINE void bitb_im( konami_state *cpustate )
 {
 	UINT8 t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = B & t;
 	CLR_NZV;
 	SET_NZ8(r);
 }
 
 /* $c6 LDB immediate -**0- */
-INLINE void ldb_im( void )
+INLINE void ldb_im( konami_state *cpustate )
 {
-	IMMBYTE(B);
+	IMMBYTE(cpustate, B);
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* is this a legal instruction? */
 /* $c7 STB immediate -**0- */
-INLINE void stb_im( void )
+INLINE void stb_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(B);
-	IMM8;
-	WM(EAD,B);
+	IMM8(cpustate);
+	WM(cpustate, EAD,B);
 }
 
 /* $c8 EORB immediate -**0- */
-INLINE void eorb_im( void )
+INLINE void eorb_im( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	B ^= t;
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $c9 ADCB immediate ***** */
-INLINE void adcb_im( void )
+INLINE void adcb_im( konami_state *cpustate )
 {
 	UINT16 t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = B + t + (CC & CC_C);
 	CLR_HNZVC;
 	SET_FLAGS8(B,t,r);
@@ -2166,20 +2166,20 @@ INLINE void adcb_im( void )
 }
 
 /* $cA ORB immediate -**0- */
-INLINE void orb_im( void )
+INLINE void orb_im( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	B |= t;
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $cB ADDB immediate ***** */
-INLINE void addb_im( void )
+INLINE void addb_im( konami_state *cpustate )
 {
 	UINT16 t,r;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 	r = B + t;
 	CLR_HNZVC;
 	SET_FLAGS8(B,t,r);
@@ -2188,65 +2188,65 @@ INLINE void addb_im( void )
 }
 
 /* $cC LDD immediate -**0- */
-INLINE void ldd_im( void )
+INLINE void ldd_im( konami_state *cpustate )
 {
-	IMMWORD(pD);
+	IMMWORD(cpustate, pD);
 	CLR_NZV;
 	SET_NZ16(D);
 }
 
 /* is this a legal instruction? */
 /* $cD STD immediate -**0- */
-INLINE void std_im( void )
+INLINE void std_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(D);
-    IMM16;
-	WM16(EAD,&pD);
+    IMM16(cpustate);
+	WM16(cpustate, EAD,&pD);
 }
 
 /* $cE LDU (LDS) immediate -**0- */
-INLINE void ldu_im( void )
+INLINE void ldu_im( konami_state *cpustate )
 {
-	IMMWORD(pU);
+	IMMWORD(cpustate, pU);
 	CLR_NZV;
 	SET_NZ16(U);
 }
 
 /* $10cE LDS immediate -**0- */
-INLINE void lds_im( void )
+INLINE void lds_im( konami_state *cpustate )
 {
-	IMMWORD(pS);
+	IMMWORD(cpustate, pS);
 	CLR_NZV;
 	SET_NZ16(S);
-	konami.int_state |= KONAMI_LDS;
+	cpustate->int_state |= KONAMI_LDS;
 }
 
 /* is this a legal instruction? */
 /* $cF STU (STS) immediate -**0- */
-INLINE void stu_im( void )
+INLINE void stu_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(U);
-    IMM16;
-	WM16(EAD,&pU);
+    IMM16(cpustate);
+	WM16(cpustate, EAD,&pU);
 }
 
 /* is this a legal instruction? */
 /* $10cF STS immediate -**0- */
-INLINE void sts_im( void )
+INLINE void sts_im( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(S);
-    IMM16;
-	WM16(EAD,&pS);
+    IMM16(cpustate);
+	WM16(cpustate, EAD,&pS);
 }
 
 /* $d0 SUBB direct ?**** */
-INLINE void subb_di( void )
+INLINE void subb_di( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
@@ -2254,20 +2254,20 @@ INLINE void subb_di( void )
 }
 
 /* $d1 CMPB direct ?**** */
-INLINE void cmpb_di( void )
+INLINE void cmpb_di( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
 }
 
 /* $d2 SBCB direct ?**** */
-INLINE void sbcb_di( void )
+INLINE void sbcb_di( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
@@ -2275,11 +2275,11 @@ INLINE void sbcb_di( void )
 }
 
 /* $d3 ADDD direct -**** */
-INLINE void addd_di( void )
+INLINE void addd_di( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	DIRWORD(b);
+	DIRWORD(cpustate, b);
 	d = D;
 	r = d + b.d;
 	CLR_NZVC;
@@ -2288,57 +2288,57 @@ INLINE void addd_di( void )
 }
 
 /* $d4 ANDB direct -**0- */
-INLINE void andb_di( void )
+INLINE void andb_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	B &= t;
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $d5 BITB direct -**0- */
-INLINE void bitb_di( void )
+INLINE void bitb_di( konami_state *cpustate )
 {
 	UINT8 t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = B & t;
 	CLR_NZV;
 	SET_NZ8(r);
 }
 
 /* $d6 LDB direct -**0- */
-INLINE void ldb_di( void )
+INLINE void ldb_di( konami_state *cpustate )
 {
-	DIRBYTE(B);
+	DIRBYTE(cpustate, B);
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $d7 STB direct -**0- */
-INLINE void stb_di( void )
+INLINE void stb_di( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(B);
-	DIRECT;
-	WM(EAD,B);
+	DIRECT(cpustate);
+	WM(cpustate, EAD,B);
 }
 
 /* $d8 EORB direct -**0- */
-INLINE void eorb_di( void )
+INLINE void eorb_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	B ^= t;
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $d9 ADCB direct ***** */
-INLINE void adcb_di( void )
+INLINE void adcb_di( konami_state *cpustate )
 {
 	UINT16 t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = B + t + (CC & CC_C);
 	CLR_HNZVC;
 	SET_FLAGS8(B,t,r);
@@ -2347,20 +2347,20 @@ INLINE void adcb_di( void )
 }
 
 /* $dA ORB direct -**0- */
-INLINE void orb_di( void )
+INLINE void orb_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	B |= t;
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $dB ADDB direct ***** */
-INLINE void addb_di( void )
+INLINE void addb_di( konami_state *cpustate )
 {
 	UINT16 t,r;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 	r = B + t;
 	CLR_HNZVC;
 	SET_FLAGS8(B,t,r);
@@ -2369,62 +2369,62 @@ INLINE void addb_di( void )
 }
 
 /* $dC LDD direct -**0- */
-INLINE void ldd_di( void )
+INLINE void ldd_di( konami_state *cpustate )
 {
-	DIRWORD(pD);
+	DIRWORD(cpustate, pD);
 	CLR_NZV;
 	SET_NZ16(D);
 }
 
 /* $dD STD direct -**0- */
-INLINE void std_di( void )
+INLINE void std_di( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(D);
-    DIRECT;
-	WM16(EAD,&pD);
+    DIRECT(cpustate);
+	WM16(cpustate, EAD,&pD);
 }
 
 /* $dE LDU (LDS) direct -**0- */
-INLINE void ldu_di( void )
+INLINE void ldu_di( konami_state *cpustate )
 {
-	DIRWORD(pU);
+	DIRWORD(cpustate, pU);
 	CLR_NZV;
 	SET_NZ16(U);
 }
 
 /* $10dE LDS direct -**0- */
-INLINE void lds_di( void )
+INLINE void lds_di( konami_state *cpustate )
 {
-	DIRWORD(pS);
+	DIRWORD(cpustate, pS);
 	CLR_NZV;
 	SET_NZ16(S);
-	konami.int_state |= KONAMI_LDS;
+	cpustate->int_state |= KONAMI_LDS;
 }
 
 /* $dF STU (STS) direct -**0- */
-INLINE void stu_di( void )
+INLINE void stu_di( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(U);
-	DIRECT;
-	WM16(EAD,&pU);
+	DIRECT(cpustate);
+	WM16(cpustate, EAD,&pU);
 }
 
 /* $10dF STS direct -**0- */
-INLINE void sts_di( void )
+INLINE void sts_di( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(S);
-	DIRECT;
-	WM16(EAD,&pS);
+	DIRECT(cpustate);
+	WM16(cpustate, EAD,&pS);
 }
 
 /* $e0 SUBB indexed ?**** */
-INLINE void subb_ix( void )
+INLINE void subb_ix( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = B - t;
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
@@ -2432,20 +2432,20 @@ INLINE void subb_ix( void )
 }
 
 /* $e1 CMPB indexed ?**** */
-INLINE void cmpb_ix( void )
+INLINE void cmpb_ix( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = B - t;
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
 }
 
 /* $e2 SBCB indexed ?**** */
-INLINE void sbcb_ix( void )
+INLINE void sbcb_ix( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
@@ -2453,11 +2453,11 @@ INLINE void sbcb_ix( void )
 }
 
 /* $e3 ADDD indexed -**** */
-INLINE void addd_ix( void )
+INLINE void addd_ix( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	b.d=RM16(EAD);
+	b.d=RM16(cpustate, EAD);
 	d = D;
 	r = d + b.d;
 	CLR_NZVC;
@@ -2466,51 +2466,51 @@ INLINE void addd_ix( void )
 }
 
 /* $e4 ANDB indexed -**0- */
-INLINE void andb_ix( void )
+INLINE void andb_ix( konami_state *cpustate )
 {
-	B &= RM(EAD);
+	B &= RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $e5 BITB indexed -**0- */
-INLINE void bitb_ix( void )
+INLINE void bitb_ix( konami_state *cpustate )
 {
 	UINT8 r;
-	r = B & RM(EAD);
+	r = B & RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(r);
 }
 
 /* $e6 LDB indexed -**0- */
-INLINE void ldb_ix( void )
+INLINE void ldb_ix( konami_state *cpustate )
 {
-	B = RM(EAD);
+	B = RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $e7 STB indexed -**0- */
-INLINE void stb_ix( void )
+INLINE void stb_ix( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(B);
-	WM(EAD,B);
+	WM(cpustate, EAD,B);
 }
 
 /* $e8 EORB indexed -**0- */
-INLINE void eorb_ix( void )
+INLINE void eorb_ix( konami_state *cpustate )
 {
-	B ^= RM(EAD);
+	B ^= RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $e9 ADCB indexed ***** */
-INLINE void adcb_ix( void )
+INLINE void adcb_ix( konami_state *cpustate )
 {
 	UINT16 t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = B + t + (CC & CC_C);
 	CLR_HNZVC;
 	SET_FLAGS8(B,t,r);
@@ -2519,18 +2519,18 @@ INLINE void adcb_ix( void )
 }
 
 /* $eA ORB indexed -**0- */
-INLINE void orb_ix( void )
+INLINE void orb_ix( konami_state *cpustate )
 {
-	B |= RM(EAD);
+	B |= RM(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $eb ADDB indexed ***** */
-INLINE void addb_ix( void )
+INLINE void addb_ix( konami_state *cpustate )
 {
 	UINT16 t,r;
-	t = RM(EAD);
+	t = RM(cpustate, EAD);
 	r = B + t;
 	CLR_HNZVC;
 	SET_FLAGS8(B,t,r);
@@ -2539,58 +2539,58 @@ INLINE void addb_ix( void )
 }
 
 /* $ec LDD indexed -**0- */
-INLINE void ldd_ix( void )
+INLINE void ldd_ix( konami_state *cpustate )
 {
-	D=RM16(EAD);
+	D=RM16(cpustate, EAD);
 	CLR_NZV; SET_NZ16(D);
 }
 
 /* $eD STD indexed -**0- */
-INLINE void std_ix( void )
+INLINE void std_ix( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(D);
-	WM16(EAD,&pD);
+	WM16(cpustate, EAD,&pD);
 }
 
 /* $eE LDU (LDS) indexed -**0- */
-INLINE void ldu_ix( void )
+INLINE void ldu_ix( konami_state *cpustate )
 {
-	U=RM16(EAD);
+	U=RM16(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ16(U);
 }
 
 /* $10eE LDS indexed -**0- */
-INLINE void lds_ix( void )
+INLINE void lds_ix( konami_state *cpustate )
 {
-	S=RM16(EAD);
+	S=RM16(cpustate, EAD);
 	CLR_NZV;
 	SET_NZ16(S);
-	konami.int_state |= KONAMI_LDS;
+	cpustate->int_state |= KONAMI_LDS;
 }
 
 /* $eF STU (STS) indexed -**0- */
-INLINE void stu_ix( void )
+INLINE void stu_ix( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(U);
-	WM16(EAD,&pU);
+	WM16(cpustate, EAD,&pU);
 }
 
 /* $10eF STS indexed -**0- */
-INLINE void sts_ix( void )
+INLINE void sts_ix( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(S);
-	WM16(EAD,&pS);
+	WM16(cpustate, EAD,&pS);
 }
 
 /* $f0 SUBB extended ?**** */
-INLINE void subb_ex( void )
+INLINE void subb_ex( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
@@ -2598,20 +2598,20 @@ INLINE void subb_ex( void )
 }
 
 /* $f1 CMPB extended ?**** */
-INLINE void cmpb_ex( void )
+INLINE void cmpb_ex( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = B - t;
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
 }
 
 /* $f2 SBCB extended ?**** */
-INLINE void sbcb_ex( void )
+INLINE void sbcb_ex( konami_state *cpustate )
 {
 	UINT16	  t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = B - t - (CC & CC_C);
 	CLR_NZVC;
 	SET_FLAGS8(B,t,r);
@@ -2619,11 +2619,11 @@ INLINE void sbcb_ex( void )
 }
 
 /* $f3 ADDD extended -**** */
-INLINE void addd_ex( void )
+INLINE void addd_ex( konami_state *cpustate )
 {
 	UINT32 r,d;
 	PAIR b;
-	EXTWORD(b);
+	EXTWORD(cpustate, b);
 	d = D;
 	r = d + b.d;
 	CLR_NZVC;
@@ -2632,57 +2632,57 @@ INLINE void addd_ex( void )
 }
 
 /* $f4 ANDB extended -**0- */
-INLINE void andb_ex( void )
+INLINE void andb_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	B &= t;
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $f5 BITB extended -**0- */
-INLINE void bitb_ex( void )
+INLINE void bitb_ex( konami_state *cpustate )
 {
 	UINT8 t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = B & t;
 	CLR_NZV;
 	SET_NZ8(r);
 }
 
 /* $f6 LDB extended -**0- */
-INLINE void ldb_ex( void )
+INLINE void ldb_ex( konami_state *cpustate )
 {
-	EXTBYTE(B);
+	EXTBYTE(cpustate, B);
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $f7 STB extended -**0- */
-INLINE void stb_ex( void )
+INLINE void stb_ex( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ8(B);
-	EXTENDED;
-	WM(EAD,B);
+	EXTENDED(cpustate);
+	WM(cpustate, EAD,B);
 }
 
 /* $f8 EORB extended -**0- */
-INLINE void eorb_ex( void )
+INLINE void eorb_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	B ^= t;
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $f9 ADCB extended ***** */
-INLINE void adcb_ex( void )
+INLINE void adcb_ex( konami_state *cpustate )
 {
 	UINT16 t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = B + t + (CC & CC_C);
 	CLR_HNZVC;
 	SET_FLAGS8(B,t,r);
@@ -2691,20 +2691,20 @@ INLINE void adcb_ex( void )
 }
 
 /* $fA ORB extended -**0- */
-INLINE void orb_ex( void )
+INLINE void orb_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	B |= t;
 	CLR_NZV;
 	SET_NZ8(B);
 }
 
 /* $fB ADDB extended ***** */
-INLINE void addb_ex( void )
+INLINE void addb_ex( konami_state *cpustate )
 {
 	UINT16 t,r;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 	r = B + t;
 	CLR_HNZVC;
 	SET_FLAGS8(B,t,r);
@@ -2713,161 +2713,161 @@ INLINE void addb_ex( void )
 }
 
 /* $fC LDD extended -**0- */
-INLINE void ldd_ex( void )
+INLINE void ldd_ex( konami_state *cpustate )
 {
-	EXTWORD(pD);
+	EXTWORD(cpustate, pD);
 	CLR_NZV;
 	SET_NZ16(D);
 }
 
 /* $fD STD extended -**0- */
-INLINE void std_ex( void )
+INLINE void std_ex( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(D);
-    EXTENDED;
-	WM16(EAD,&pD);
+    EXTENDED(cpustate);
+	WM16(cpustate, EAD,&pD);
 }
 
 /* $fE LDU (LDS) extended -**0- */
-INLINE void ldu_ex( void )
+INLINE void ldu_ex( konami_state *cpustate )
 {
-	EXTWORD(pU);
+	EXTWORD(cpustate, pU);
 	CLR_NZV;
 	SET_NZ16(U);
 }
 
 /* $10fE LDS extended -**0- */
-INLINE void lds_ex( void )
+INLINE void lds_ex( konami_state *cpustate )
 {
-	EXTWORD(pS);
+	EXTWORD(cpustate, pS);
 	CLR_NZV;
 	SET_NZ16(S);
-	konami.int_state |= KONAMI_LDS;
+	cpustate->int_state |= KONAMI_LDS;
 }
 
 /* $fF STU (STS) extended -**0- */
-INLINE void stu_ex( void )
+INLINE void stu_ex( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(U);
-	EXTENDED;
-	WM16(EAD,&pU);
+	EXTENDED(cpustate);
+	WM16(cpustate, EAD,&pU);
 }
 
 /* $10fF STS extended -**0- */
-INLINE void sts_ex( void )
+INLINE void sts_ex( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(S);
-	EXTENDED;
-	WM16(EAD,&pS);
+	EXTENDED(cpustate);
+	WM16(cpustate, EAD,&pS);
 }
 
-INLINE void setline_im( void )
+INLINE void setline_im( konami_state *cpustate )
 {
 	UINT8 t;
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 
-	if ( konami.setlines_callback )
-		(*konami.setlines_callback)( t );
+	if ( cpustate->setlines_callback )
+		(*cpustate->setlines_callback)( cpustate->device, t );
 }
 
-INLINE void setline_ix( void )
+INLINE void setline_ix( konami_state *cpustate )
 {
 	UINT8 t;
-	t = RM(EA);
+	t = RM(cpustate, EA);
 
-	if ( konami.setlines_callback )
-		(*konami.setlines_callback)( t );
+	if ( cpustate->setlines_callback )
+		(*cpustate->setlines_callback)( cpustate->device, t );
 }
 
-INLINE void setline_di( void )
+INLINE void setline_di( konami_state *cpustate )
 {
 	UINT8 t;
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 
-	if ( konami.setlines_callback )
-		(*konami.setlines_callback)( t );
+	if ( cpustate->setlines_callback )
+		(*cpustate->setlines_callback)( cpustate->device, t );
 }
 
-INLINE void setline_ex( void )
+INLINE void setline_ex( konami_state *cpustate )
 {
 	UINT8 t;
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 
-	if ( konami.setlines_callback )
-		(*konami.setlines_callback)( t );
+	if ( cpustate->setlines_callback )
+		(*cpustate->setlines_callback)( cpustate->device, t );
 }
 
-INLINE void bmove( void )
+INLINE void bmove( konami_state *cpustate )
 {
 	UINT8	t;
 
 	while( U != 0 ) {
-		t = RM(Y);
-		WM(X,t);
+		t = RM(cpustate, Y);
+		WM(cpustate, X,t);
 		Y++;
 		X++;
 		U--;
-		konami_ICount -= 2;
+		cpustate->icount -= 2;
 	}
 }
 
-INLINE void move( void )
+INLINE void move( konami_state *cpustate )
 {
 	UINT8	t;
 
-	t = RM(Y);
-	WM(X,t);
+	t = RM(cpustate, Y);
+	WM(cpustate, X,t);
 	Y++;
 	X++;
 	U--;
 }
 
 /* CLRD inherent -0100 */
-INLINE void clrd( void )
+INLINE void clrd( konami_state *cpustate )
 {
 	D = 0;
 	CLR_NZVC; SEZ;
 }
 
 /* CLRW indexed -0100 */
-INLINE void clrw_ix( void )
+INLINE void clrw_ix( konami_state *cpustate )
 {
 	PAIR t;
 	t.d = 0;
-	WM16(EAD,&t);
+	WM16(cpustate, EAD,&t);
 	CLR_NZVC; SEZ;
 }
 
 /* CLRW direct -0100 */
-INLINE void clrw_di( void )
+INLINE void clrw_di( konami_state *cpustate )
 {
 	PAIR t;
 	t.d = 0;
-	DIRECT;
-	WM16(EAD,&t);
+	DIRECT(cpustate);
+	WM16(cpustate, EAD,&t);
 	CLR_NZVC;
 	SEZ;
 }
 
 /* CLRW extended -0100 */
-INLINE void clrw_ex( void )
+INLINE void clrw_ex( konami_state *cpustate )
 {
 	PAIR t;
 	t.d = 0;
-	EXTENDED;
-	WM16(EAD,&t);
+	EXTENDED(cpustate);
+	WM16(cpustate, EAD,&t);
 	CLR_NZVC; SEZ;
 }
 
 /* LSRD immediate -0*-* */
-INLINE void lsrd( void )
+INLINE void lsrd( konami_state *cpustate )
 {
 	UINT8 t;
 
-	IMMBYTE( t );
+	IMMBYTE(cpustate,  t );
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -2878,12 +2878,12 @@ INLINE void lsrd( void )
 }
 
 /* RORD immediate -**-* */
-INLINE void rord( void )
+INLINE void rord( konami_state *cpustate )
 {
 	UINT16 r;
 	UINT8  t;
 
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 
 	while ( t-- ) {
 		r = (CC & CC_C) << 15;
@@ -2896,11 +2896,11 @@ INLINE void rord( void )
 }
 
 /* ASRD immediate ?**-* */
-INLINE void asrd( void )
+INLINE void asrd( konami_state *cpustate )
 {
 	UINT8 t;
 
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -2911,12 +2911,12 @@ INLINE void asrd( void )
 }
 
 /* ASLD immediate ?**** */
-INLINE void asld( void )
+INLINE void asld( konami_state *cpustate )
 {
 	UINT32	r;
 	UINT8	t;
 
-	IMMBYTE( t );
+	IMMBYTE(cpustate,  t );
 
 	while ( t-- ) {
 		r = D << 1;
@@ -2927,12 +2927,12 @@ INLINE void asld( void )
 }
 
 /* ROLD immediate -**-* */
-INLINE void rold( void )
+INLINE void rold( konami_state *cpustate )
 {
 	UINT16 r;
 	UINT8  t;
 
-	IMMBYTE(t);
+	IMMBYTE(cpustate, t);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -2945,48 +2945,48 @@ INLINE void rold( void )
 }
 
 /* DECB,JNZ relative ----- */
-INLINE void decbjnz( void )
+INLINE void decbjnz( konami_state *cpustate )
 {
 	--B;
 	CLR_NZV;
 	SET_FLAGS8D(B);
-	BRANCH( !(CC&CC_Z) );
+	BRANCH(cpustate, !(CC&CC_Z) );
 }
 
 /* DECX,JNZ relative ----- */
-INLINE void decxjnz( void )
+INLINE void decxjnz( konami_state *cpustate )
 {
 	--X;
 	CLR_NZV;
 	SET_NZ16(X);	/* should affect V as well? */
-	BRANCH( !(CC&CC_Z) );
+	BRANCH(cpustate, !(CC&CC_Z) );
 }
 
-INLINE void bset( void )
+INLINE void bset( konami_state *cpustate )
 {
 	UINT8	t;
 
 	while( U != 0 ) {
 		t = A;
-		WM(XD,t);
+		WM(cpustate, XD,t);
 		X++;
 		U--;
-		konami_ICount -= 2;
+		cpustate->icount -= 2;
 	}
 }
 
-INLINE void bset2( void )
+INLINE void bset2( konami_state *cpustate )
 {
 	while( U != 0 ) {
-		WM16(XD,&pD);
+		WM16(cpustate, XD,&pD);
 		X += 2;
 		U--;
-		konami_ICount -= 3;
+		cpustate->icount -= 3;
 	}
 }
 
 /* LMUL inherent --*-@ */
-INLINE void lmul( void )
+INLINE void lmul( konami_state *cpustate )
 {
 	UINT32 t;
 	t = X * Y;
@@ -2996,7 +2996,7 @@ INLINE void lmul( void )
 }
 
 /* DIVX inherent --*-@ */
-INLINE void divx( void )
+INLINE void divx( konami_state *cpustate )
 {
 	UINT16 t;
 	UINT8 r;
@@ -3017,7 +3017,7 @@ INLINE void divx( void )
 }
 
 /* INCD inherent -***- */
-INLINE void incd( void )
+INLINE void incd( konami_state *cpustate )
 {
 	UINT32 r;
 	r = D + 1;
@@ -3027,42 +3027,42 @@ INLINE void incd( void )
 }
 
 /* INCW direct -***- */
-INLINE void incw_di( void )
+INLINE void incw_di( konami_state *cpustate )
 {
 	PAIR t,r;
-	DIRWORD(t);
+	DIRWORD(cpustate, t);
 	r = t;
 	++r.d;
 	CLR_NZV;
 	SET_FLAGS16(t.d, t.d, r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* INCW indexed -***- */
-INLINE void incw_ix( void )
+INLINE void incw_ix( konami_state *cpustate )
 {
 	PAIR t,r;
-	t.d=RM16(EAD);
+	t.d=RM16(cpustate, EAD);
 	r = t;
 	++r.d;
 	CLR_NZV;
 	SET_FLAGS16(t.d, t.d, r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* INCW extended -***- */
-INLINE void incw_ex( void )
+INLINE void incw_ex( konami_state *cpustate )
 {
 	PAIR t, r;
-	EXTWORD(t);
+	EXTWORD(cpustate, t);
 	r = t;
 	++r.d;
 	CLR_NZV; SET_FLAGS16(t.d,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* DECD inherent -***- */
-INLINE void decd( void )
+INLINE void decd( konami_state *cpustate )
 {
 	UINT32 r;
 	r = D - 1;
@@ -3072,252 +3072,252 @@ INLINE void decd( void )
 }
 
 /* DECW direct -***- */
-INLINE void decw_di( void )
+INLINE void decw_di( konami_state *cpustate )
 {
 	PAIR t,r;
-	DIRWORD(t);
+	DIRWORD(cpustate, t);
 	r = t;
 	--r.d;
 	CLR_NZV;
 	SET_FLAGS16(t.d, t.d, r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* DECW indexed -***- */
-INLINE void decw_ix( void )
+INLINE void decw_ix( konami_state *cpustate )
 {
 	PAIR t, r;
-	t.d=RM16(EAD);
+	t.d=RM16(cpustate, EAD);
 	r = t;
 	--r.d;
 	CLR_NZV; SET_FLAGS16(t.d, t.d, r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* DECW extended -***- */
-INLINE void decw_ex( void )
+INLINE void decw_ex( konami_state *cpustate )
 {
 	PAIR t, r;
-	EXTWORD(t);
+	EXTWORD(cpustate, t);
 	r = t;
 	--r.d;
 	CLR_NZV; SET_FLAGS16(t.d,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* TSTD inherent -**0- */
-INLINE void tstd( void )
+INLINE void tstd( konami_state *cpustate )
 {
 	CLR_NZV;
 	SET_NZ16(D);
 }
 
 /* TSTW direct -**0- */
-INLINE void tstw_di( void )
+INLINE void tstw_di( konami_state *cpustate )
 {
 	PAIR t;
 	CLR_NZV;
-	DIRWORD(t);
+	DIRWORD(cpustate, t);
 	SET_NZ16(t.d);
 }
 
 /* TSTW indexed -**0- */
-INLINE void tstw_ix( void )
+INLINE void tstw_ix( konami_state *cpustate )
 {
 	PAIR t;
 	CLR_NZV;
-	t.d=RM16(EAD);
+	t.d=RM16(cpustate, EAD);
 	SET_NZ16(t.d);
 }
 
 /* TSTW extended -**0- */
-INLINE void tstw_ex( void )
+INLINE void tstw_ex( konami_state *cpustate )
 {
 	PAIR t;
 	CLR_NZV;
-	EXTWORD(t);
+	EXTWORD(cpustate, t);
 	SET_NZ16(t.d);
 }
 
 /* LSRW direct -0*-* */
-INLINE void lsrw_di( void )
+INLINE void lsrw_di( konami_state *cpustate )
 {
 	PAIR t;
-	DIRWORD(t);
+	DIRWORD(cpustate, t);
 	CLR_NZC;
 	CC |= (t.d & CC_C);
 	t.d >>= 1;
 	SET_Z16(t.d);
-	WM16(EAD,&t);
+	WM16(cpustate, EAD,&t);
 }
 
 /* LSRW indexed -0*-* */
-INLINE void lsrw_ix( void )
+INLINE void lsrw_ix( konami_state *cpustate )
 {
 	PAIR t;
-	t.d=RM16(EAD);
+	t.d=RM16(cpustate, EAD);
 	CLR_NZC;
 	CC |= (t.d & CC_C);
 	t.d >>= 1;
 	SET_Z16(t.d);
-	WM16(EAD,&t);
+	WM16(cpustate, EAD,&t);
 }
 
 /* LSRW extended -0*-* */
-INLINE void lsrw_ex( void )
+INLINE void lsrw_ex( konami_state *cpustate )
 {
 	PAIR t;
-	EXTWORD(t);
+	EXTWORD(cpustate, t);
 	CLR_NZC;
 	CC |= (t.d & CC_C);
 	t.d >>= 1;
 	SET_Z16(t.d);
-	WM16(EAD,&t);
+	WM16(cpustate, EAD,&t);
 }
 
 /* RORW direct -**-* */
-INLINE void rorw_di( void )
+INLINE void rorw_di( konami_state *cpustate )
 {
 	PAIR t,r;
-	DIRWORD(t);
+	DIRWORD(cpustate, t);
 	r.d = (CC & CC_C) << 15;
 	CLR_NZC;
 	CC |= (t.d & CC_C);
 	r.d |= t.d>>1;
 	SET_NZ16(r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* RORW indexed -**-* */
-INLINE void rorw_ix( void )
+INLINE void rorw_ix( konami_state *cpustate )
 {
 	PAIR t,r;
-	t.d=RM16(EAD);
+	t.d=RM16(cpustate, EAD);
 	r.d = (CC & CC_C) << 15;
 	CLR_NZC;
 	CC |= (t.d & CC_C);
 	r.d |= t.d>>1;
 	SET_NZ16(r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* RORW extended -**-* */
-INLINE void rorw_ex( void )
+INLINE void rorw_ex( konami_state *cpustate )
 {
 	PAIR t,r;
-	EXTWORD(t);
+	EXTWORD(cpustate, t);
 	r.d = (CC & CC_C) << 15;
 	CLR_NZC;
 	CC |= (t.d & CC_C);
 	r.d |= t.d>>1;
 	SET_NZ16(r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* ASRW direct ?**-* */
-INLINE void asrw_di( void )
+INLINE void asrw_di( konami_state *cpustate )
 {
 	PAIR t;
-	DIRWORD(t);
+	DIRWORD(cpustate, t);
 	CLR_NZC;
 	CC |= (t.d & CC_C);
 	t.d = (t.d & 0x8000) | (t.d >> 1);
 	SET_NZ16(t.d);
-	WM16(EAD,&t);
+	WM16(cpustate, EAD,&t);
 }
 
 /* ASRW indexed ?**-* */
-INLINE void asrw_ix( void )
+INLINE void asrw_ix( konami_state *cpustate )
 {
 	PAIR t;
-	t.d=RM16(EAD);
+	t.d=RM16(cpustate, EAD);
 	CLR_NZC;
 	CC |= (t.d & CC_C);
 	t.d = (t.d & 0x8000) | (t.d >> 1);
 	SET_NZ16(t.d);
-	WM16(EAD,&t);
+	WM16(cpustate, EAD,&t);
 }
 
 /* ASRW extended ?**-* */
-INLINE void asrw_ex( void )
+INLINE void asrw_ex( konami_state *cpustate )
 {
 	PAIR t;
-	EXTWORD(t);
+	EXTWORD(cpustate, t);
 	CLR_NZC;
 	CC |= (t.d & CC_C);
 	t.d = (t.d & 0x8000) | (t.d >> 1);
 	SET_NZ16(t.d);
-	WM16(EAD,&t);
+	WM16(cpustate, EAD,&t);
 }
 
 /* ASLW direct ?**** */
-INLINE void aslw_di( void )
+INLINE void aslw_di( konami_state *cpustate )
 {
 	PAIR t,r;
-	DIRWORD(t);
+	DIRWORD(cpustate, t);
 	r.d = t.d << 1;
 	CLR_NZVC;
 	SET_FLAGS16(t.d,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* ASLW indexed ?**** */
-INLINE void aslw_ix( void )
+INLINE void aslw_ix( konami_state *cpustate )
 {
 	PAIR t,r;
-	t.d=RM16(EAD);
+	t.d=RM16(cpustate, EAD);
 	r.d = t.d << 1;
 	CLR_NZVC;
 	SET_FLAGS16(t.d,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* ASLW extended ?**** */
-INLINE void aslw_ex( void )
+INLINE void aslw_ex( konami_state *cpustate )
 {
 	PAIR t,r;
-	EXTWORD(t);
+	EXTWORD(cpustate, t);
 	r.d = t.d << 1;
 	CLR_NZVC;
 	SET_FLAGS16(t.d,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* ROLW direct -**** */
-INLINE void rolw_di( void )
+INLINE void rolw_di( konami_state *cpustate )
 {
 	PAIR t,r;
-	DIRWORD(t);
+	DIRWORD(cpustate, t);
 	r.d = (CC & CC_C) | (t.d << 1);
 	CLR_NZVC;
 	SET_FLAGS16(t.d,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* ROLW indexed -**** */
-INLINE void rolw_ix( void )
+INLINE void rolw_ix( konami_state *cpustate )
 {
 	PAIR t,r;
-	t.d=RM16(EAD);
+	t.d=RM16(cpustate, EAD);
 	r.d = (CC & CC_C) | (t.d << 1);
 	CLR_NZVC;
 	SET_FLAGS16(t.d,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* ROLW extended -**** */
-INLINE void rolw_ex( void )
+INLINE void rolw_ex( konami_state *cpustate )
 {
 	PAIR t,r;
-	EXTWORD(t);
+	EXTWORD(cpustate, t);
 	r.d = (CC & CC_C) | (t.d << 1);
 	CLR_NZVC;
 	SET_FLAGS16(t.d,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* NEGD inherent ?**** */
-INLINE void negd( void )
+INLINE void negd( konami_state *cpustate )
 {
 	UINT32 r;
 	r = -D;
@@ -3327,40 +3327,40 @@ INLINE void negd( void )
 }
 
 /* NEGW direct ?**** */
-INLINE void negw_di( void )
+INLINE void negw_di( konami_state *cpustate )
 {
 	PAIR r,t;
-	DIRWORD(t);
+	DIRWORD(cpustate, t);
 	r.d = -t.d;
 	CLR_NZVC;
 	SET_FLAGS16(0,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* NEGW indexed ?**** */
-INLINE void negw_ix( void )
+INLINE void negw_ix( konami_state *cpustate )
 {
 	PAIR r,t;
-	t.d=RM16(EAD);
+	t.d=RM16(cpustate, EAD);
 	r.d = -t.d;
 	CLR_NZVC;
 	SET_FLAGS16(0,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* NEGW extended ?**** */
-INLINE void negw_ex( void )
+INLINE void negw_ex( konami_state *cpustate )
 {
 	PAIR r,t;
-	EXTWORD(t);
+	EXTWORD(cpustate, t);
 	r.d = -t.d;
 	CLR_NZVC;
 	SET_FLAGS16(0,t.d,r.d);
-	WM16(EAD,&r);
+	WM16(cpustate, EAD,&r);
 }
 
 /* ABSA inherent ?**** */
-INLINE void absa( void )
+INLINE void absa( konami_state *cpustate )
 {
 	UINT16 r;
 	if (A & 0x80)
@@ -3373,7 +3373,7 @@ INLINE void absa( void )
 }
 
 /* ABSB inherent ?**** */
-INLINE void absb( void )
+INLINE void absb( konami_state *cpustate )
 {
 	UINT16 r;
 	if (B & 0x80)
@@ -3386,7 +3386,7 @@ INLINE void absb( void )
 }
 
 /* ABSD inherent ?**** */
-INLINE void absd( void )
+INLINE void absd( konami_state *cpustate )
 {
 	UINT32 r;
 	if (D & 0x8000)
@@ -3399,11 +3399,11 @@ INLINE void absd( void )
 }
 
 /* LSRD direct -0*-* */
-INLINE void lsrd_di( void )
+INLINE void lsrd_di( konami_state *cpustate )
 {
 	UINT8 t;
 
-	DIRBYTE( t );
+	DIRBYTE(cpustate,  t );
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -3414,12 +3414,12 @@ INLINE void lsrd_di( void )
 }
 
 /* RORD direct -**-* */
-INLINE void rord_di( void )
+INLINE void rord_di( konami_state *cpustate )
 {
 	UINT16 r;
 	UINT8  t;
 
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 
 	while ( t-- ) {
 		r = (CC & CC_C) << 15;
@@ -3432,11 +3432,11 @@ INLINE void rord_di( void )
 }
 
 /* ASRD direct ?**-* */
-INLINE void asrd_di( void )
+INLINE void asrd_di( konami_state *cpustate )
 {
 	UINT8 t;
 
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -3447,12 +3447,12 @@ INLINE void asrd_di( void )
 }
 
 /* ASLD direct ?**** */
-INLINE void asld_di( void )
+INLINE void asld_di( konami_state *cpustate )
 {
 	UINT32	r;
 	UINT8	t;
 
-	DIRBYTE( t );
+	DIRBYTE(cpustate,  t );
 
 	while ( t-- ) {
 		r = D << 1;
@@ -3463,12 +3463,12 @@ INLINE void asld_di( void )
 }
 
 /* ROLD direct -**-* */
-INLINE void rold_di( void )
+INLINE void rold_di( konami_state *cpustate )
 {
 	UINT16 r;
 	UINT8  t;
 
-	DIRBYTE(t);
+	DIRBYTE(cpustate, t);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -3481,11 +3481,11 @@ INLINE void rold_di( void )
 }
 
 /* LSRD indexed -0*-* */
-INLINE void lsrd_ix( void )
+INLINE void lsrd_ix( konami_state *cpustate )
 {
 	UINT8 t;
 
-	t=RM(EA);
+	t=RM(cpustate, EA);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -3496,12 +3496,12 @@ INLINE void lsrd_ix( void )
 }
 
 /* RORD indexed -**-* */
-INLINE void rord_ix( void )
+INLINE void rord_ix( konami_state *cpustate )
 {
 	UINT16 r;
 	UINT8  t;
 
-	t=RM(EA);
+	t=RM(cpustate, EA);
 
 	while ( t-- ) {
 		r = (CC & CC_C) << 15;
@@ -3514,11 +3514,11 @@ INLINE void rord_ix( void )
 }
 
 /* ASRD indexed ?**-* */
-INLINE void asrd_ix( void )
+INLINE void asrd_ix( konami_state *cpustate )
 {
 	UINT8 t;
 
-	t=RM(EA);
+	t=RM(cpustate, EA);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -3529,12 +3529,12 @@ INLINE void asrd_ix( void )
 }
 
 /* ASLD indexed ?**** */
-INLINE void asld_ix( void )
+INLINE void asld_ix( konami_state *cpustate )
 {
 	UINT32	r;
 	UINT8	t;
 
-	t=RM(EA);
+	t=RM(cpustate, EA);
 
 	while ( t-- ) {
 		r = D << 1;
@@ -3545,12 +3545,12 @@ INLINE void asld_ix( void )
 }
 
 /* ROLD indexed -**-* */
-INLINE void rold_ix( void )
+INLINE void rold_ix( konami_state *cpustate )
 {
 	UINT16 r;
 	UINT8  t;
 
-	t=RM(EA);
+	t=RM(cpustate, EA);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -3563,11 +3563,11 @@ INLINE void rold_ix( void )
 }
 
 /* LSRD extended -0*-* */
-INLINE void lsrd_ex( void )
+INLINE void lsrd_ex( konami_state *cpustate )
 {
 	UINT8 t;
 
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -3578,12 +3578,12 @@ INLINE void lsrd_ex( void )
 }
 
 /* RORD extended -**-* */
-INLINE void rord_ex( void )
+INLINE void rord_ex( konami_state *cpustate )
 {
 	UINT16 r;
 	UINT8  t;
 
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 
 	while ( t-- ) {
 		r = (CC & CC_C) << 15;
@@ -3596,11 +3596,11 @@ INLINE void rord_ex( void )
 }
 
 /* ASRD extended ?**-* */
-INLINE void asrd_ex( void )
+INLINE void asrd_ex( konami_state *cpustate )
 {
 	UINT8 t;
 
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -3611,12 +3611,12 @@ INLINE void asrd_ex( void )
 }
 
 /* ASLD extended ?**** */
-INLINE void asld_ex( void )
+INLINE void asld_ex( konami_state *cpustate )
 {
 	UINT32	r;
 	UINT8	t;
 
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 
 	while ( t-- ) {
 		r = D << 1;
@@ -3627,12 +3627,12 @@ INLINE void asld_ex( void )
 }
 
 /* ROLD extended -**-* */
-INLINE void rold_ex( void )
+INLINE void rold_ex( konami_state *cpustate )
 {
 	UINT16 r;
 	UINT8  t;
 
-	EXTBYTE(t);
+	EXTBYTE(cpustate, t);
 
 	while ( t-- ) {
 		CLR_NZC;
@@ -3644,9 +3644,9 @@ INLINE void rold_ex( void )
 	}
 }
 
-INLINE void opcode2( void )
+INLINE void opcode2( konami_state *cpustate )
 {
-	UINT8 ireg2 = ROP_ARG(PCD);
+	UINT8 ireg2 = ROP_ARG(cpustate, PCD);
 	PC++;
 
 	switch ( ireg2 ) {
@@ -3659,8 +3659,8 @@ INLINE void opcode2( void )
 //  case 0x06: EA=0; break; /* normal */
 	case 0x07:
 		EAD=0;
-		(*konami_extended[konami.ireg])();
-        konami_ICount -= 2;
+		(*konami_extended[cpustate->ireg])(cpustate);
+        cpustate->icount -= 2;
 		return;
 //  case 0x08: EA=0; break; /* indirect - auto increment */
 //  case 0x09: EA=0; break; /* indirect - double auto increment */
@@ -3670,9 +3670,9 @@ INLINE void opcode2( void )
 //  case 0x0d: EA=0; break; /* indirect - postword offs */
 //  case 0x0e: EA=0; break; /* indirect - normal */
 	case 0x0f:				/* indirect - extended */
-		IMMWORD(ea);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		IMMWORD(cpustate, cpustate->ea);
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 //  case 0x10: EA=0; break; /* auto increment */
 //  case 0x11: EA=0; break; /* double auto increment */
@@ -3695,32 +3695,32 @@ INLINE void opcode2( void )
     case 0x20:              /* auto increment */
 		EA=X;
 		X++;
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x21:				/* double auto increment */
 		EA=X;
 		X+=2;
-        konami_ICount-=3;
+        cpustate->icount-=3;
         break;
 	case 0x22:				/* auto decrement */
 		X--;
 		EA=X;
-        konami_ICount-=2;
+        cpustate->icount-=2;
         break;
 	case 0x23:				/* double auto decrement */
 		X-=2;
 		EA=X;
-        konami_ICount-=3;
+        cpustate->icount-=3;
 		break;
 	case 0x24:				/* postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=X+SIGNED(EA);
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x25:				/* postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=X;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0x26:				/* normal */
 		EA=X;
@@ -3729,43 +3729,43 @@ INLINE void opcode2( void )
 	case 0x28:				/* indirect - auto increment */
 		EA=X;
 		X++;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x29:				/* indirect - double auto increment */
 		EA=X;
 		X+=2;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x2a:				/* indirect - auto decrement */
 		X--;
 		EA=X;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x2b:				/* indirect - double auto decrement */
 		X-=2;
 		EA=X;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x2c:				/* indirect - postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=X+SIGNED(EA);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0x2d:				/* indirect - postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=X;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
 		break;
 	case 0x2e:				/* indirect - normal */
 		EA=X;
-		EA=RM16(EAD);
-        konami_ICount-=3;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=3;
 		break;
 //  case 0x2f: EA=0; break; /* indirect - extended */
 
@@ -3773,32 +3773,32 @@ INLINE void opcode2( void )
     case 0x30:              /* auto increment */
 		EA=Y;
 		Y++;
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x31:				/* double auto increment */
 		EA=Y;
 		Y+=2;
-        konami_ICount-=3;
+        cpustate->icount-=3;
 		break;
 	case 0x32:				/* auto decrement */
 		Y--;
 		EA=Y;
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x33:				/* double auto decrement */
 		Y-=2;
 		EA=Y;
-        konami_ICount-=3;
+        cpustate->icount-=3;
 		break;
 	case 0x34:				/* postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=Y+SIGNED(EA);
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x35:				/* postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=Y;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0x36:				/* normal */
 		EA=Y;
@@ -3807,43 +3807,43 @@ INLINE void opcode2( void )
 	case 0x38:				/* indirect - auto increment */
 		EA=Y;
 		Y++;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x39:				/* indirect - double auto increment */
 		EA=Y;
 		Y+=2;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x3a:				/* indirect - auto decrement */
 		Y--;
 		EA=Y;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x3b:				/* indirect - double auto decrement */
 		Y-=2;
 		EA=Y;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x3c:				/* indirect - postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=Y+SIGNED(EA);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0x3d:				/* indirect - postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=Y;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
 		break;
 	case 0x3e:				/* indirect - normal */
 		EA=Y;
-		EA=RM16(EAD);
-        konami_ICount-=3;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=3;
 		break;
 //  case 0x3f: EA=0; break; /* indirect - extended */
 
@@ -3868,32 +3868,32 @@ INLINE void opcode2( void )
     case 0x50:              /* auto increment */
 		EA=U;
 		U++;
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x51:				/* double auto increment */
 		EA=U;
 		U+=2;
-        konami_ICount-=3;
+        cpustate->icount-=3;
 		break;
 	case 0x52:				/* auto decrement */
 		U--;
 		EA=U;
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x53:				/* double auto decrement */
 		U-=2;
 		EA=U;
-        konami_ICount-=3;
+        cpustate->icount-=3;
 		break;
 	case 0x54:				/* postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=U+SIGNED(EA);
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x55:				/* postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=U;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0x56:				/* normal */
 		EA=U;
@@ -3902,43 +3902,43 @@ INLINE void opcode2( void )
 	case 0x58:				/* indirect - auto increment */
 		EA=U;
 		U++;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x59:				/* indirect - double auto increment */
 		EA=U;
 		U+=2;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x5a:				/* indirect - auto decrement */
 		U--;
 		EA=U;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x5b:				/* indirect - double auto decrement */
 		U-=2;
 		EA=U;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x5c:				/* indirect - postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=U+SIGNED(EA);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0x5d:				/* indirect - postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=U;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
 		break;
 	case 0x5e:				/* indirect - normal */
 		EA=U;
-		EA=RM16(EAD);
-        konami_ICount-=3;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=3;
 		break;
 //  case 0x5f: EA=0; break; /* indirect - extended */
 
@@ -3946,32 +3946,32 @@ INLINE void opcode2( void )
     case 0x60:              /* auto increment */
 		EAD=SD;
 		S++;
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x61:				/* double auto increment */
 		EAD=SD;
 		S+=2;
-        konami_ICount-=3;
+        cpustate->icount-=3;
 		break;
 	case 0x62:				/* auto decrement */
 		S--;
 		EAD=SD;
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x63:				/* double auto decrement */
 		S-=2;
 		EAD=SD;
-        konami_ICount-=3;
+        cpustate->icount-=3;
 		break;
 	case 0x64:				/* postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=S+SIGNED(EA);
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x65:				/* postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=S;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0x66:				/* normal */
 		EAD=SD;
@@ -3980,43 +3980,43 @@ INLINE void opcode2( void )
 	case 0x68:				/* indirect - auto increment */
 		EAD=SD;
 		S++;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x69:				/* indirect - double auto increment */
 		EAD=SD;
 		S+=2;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x6a:				/* indirect - auto decrement */
 		S--;
 		EAD=SD;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x6b:				/* indirect - double auto decrement */
 		S-=2;
 		EAD=SD;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x6c:				/* indirect - postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=S+SIGNED(EA);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0x6d:				/* indirect - postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=S;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
 		break;
 	case 0x6e:				/* indirect - normal */
 		EAD=SD;
-		EA=RM16(EAD);
-        konami_ICount-=3;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=3;
 		break;
 //  case 0x6f: EA=0; break; /* indirect - extended */
 
@@ -4024,32 +4024,32 @@ INLINE void opcode2( void )
     case 0x70:              /* auto increment */
 		EAD=PCD;
 		PC++;
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x71:				/* double auto increment */
 		EAD=PCD;
 		PC+=2;
-        konami_ICount-=3;
+        cpustate->icount-=3;
 		break;
 	case 0x72:				/* auto decrement */
 		PC--;
 		EAD=PCD;
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x73:				/* double auto decrement */
 		PC-=2;
 		EAD=PCD;
-        konami_ICount-=3;
+        cpustate->icount-=3;
 		break;
 	case 0x74:				/* postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=PC-1+SIGNED(EA);
-        konami_ICount-=2;
+        cpustate->icount-=2;
 		break;
 	case 0x75:				/* postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=PC-2;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0x76:				/* normal */
 		EAD=PCD;
@@ -4058,43 +4058,43 @@ INLINE void opcode2( void )
 	case 0x78:				/* indirect - auto increment */
 		EAD=PCD;
 		PC++;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x79:				/* indirect - double auto increment */
 		EAD=PCD;
 		PC+=2;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x7a:				/* indirect - auto decrement */
 		PC--;
 		EAD=PCD;
-		EA=RM16(EAD);
-        konami_ICount-=5;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=5;
 		break;
 	case 0x7b:				/* indirect - double auto decrement */
 		PC-=2;
 		EAD=PCD;
-		EA=RM16(EAD);
-        konami_ICount-=6;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=6;
 		break;
 	case 0x7c:				/* indirect - postbyte offs */
-		IMMBYTE(EA);
+		IMMBYTE(cpustate, EA);
 		EA=PC-1+SIGNED(EA);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0x7d:				/* indirect - postword offs */
-		IMMWORD(ea);
+		IMMWORD(cpustate, cpustate->ea);
 		EA+=PC-2;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
 		break;
 	case 0x7e:				/* indirect - normal */
 		EAD=PCD;
-		EA=RM16(EAD);
-        konami_ICount-=3;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=3;
 		break;
 //  case 0x7f: EA=0; break; /* indirect - extended */
 
@@ -4132,11 +4132,11 @@ INLINE void opcode2( void )
 //  case 0x9f: EA=0; break; /* indirect - ???? */
 	case 0xa0:				/* register a */
 		EA=X+SIGNED(A);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 	case 0xa1:				/* register b */
 		EA=X+SIGNED(B);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 //  case 0xa2: EA=0; break; /* ???? */
 //  case 0xa3: EA=0; break; /* ???? */
@@ -4145,17 +4145,17 @@ INLINE void opcode2( void )
 //  case 0xa6: EA=0; break; /* ???? */
 	case 0xa7:				/* register d */
 		EA=X+D;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0xa8:				/* indirect - register a */
 		EA=X+SIGNED(A);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0xa9:				/* indirect - register b */
 		EA=X+SIGNED(B);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 //  case 0xaa: EA=0; break; /* indirect - ???? */
 //  case 0xab: EA=0; break; /* indirect - ???? */
@@ -4164,16 +4164,16 @@ INLINE void opcode2( void )
 //  case 0xae: EA=0; break; /* indirect - ???? */
 	case 0xaf:				/* indirect - register d */
 		EA=X+D;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
 		break;
 	case 0xb0:				/* register a */
 		EA=Y+SIGNED(A);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 	case 0xb1:				/* register b */
 		EA=Y+SIGNED(B);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 //  case 0xb2: EA=0; break; /* ???? */
 //  case 0xb3: EA=0; break; /* ???? */
@@ -4182,17 +4182,17 @@ INLINE void opcode2( void )
 //  case 0xb6: EA=0; break; /* ???? */
 	case 0xb7:				/* register d */
 		EA=Y+D;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0xb8:				/* indirect - register a */
 		EA=Y+SIGNED(A);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0xb9:				/* indirect - register b */
 		EA=Y+SIGNED(B);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 //  case 0xba: EA=0; break; /* indirect - ???? */
 //  case 0xbb: EA=0; break; /* indirect - ???? */
@@ -4201,8 +4201,8 @@ INLINE void opcode2( void )
 //  case 0xbe: EA=0; break; /* indirect - ???? */
 	case 0xbf:				/* indirect - register d */
 		EA=Y+D;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
 		break;
 //  case 0xc0: EA=0; break; /* register a */
 //  case 0xc1: EA=0; break; /* register b */
@@ -4210,8 +4210,8 @@ INLINE void opcode2( void )
 //  case 0xc3: EA=0; break; /* ???? */
 	case 0xc4:
 		EAD=0;
-		(*konami_direct[konami.ireg])();
-        konami_ICount -= 1;
+		(*konami_direct[cpustate->ireg])(cpustate);
+        cpustate->icount -= 1;
 		return;
 //  case 0xc5: EA=0; break; /* ???? */
 //  case 0xc6: EA=0; break; /* ???? */
@@ -4221,19 +4221,19 @@ INLINE void opcode2( void )
 //  case 0xca: EA=0; break; /* indirect - ???? */
 //  case 0xcb: EA=0; break; /* indirect - ???? */
 	case 0xcc:				/* indirect - direct */
-		DIRWORD(ea);
-        konami_ICount-=4;
+		DIRWORD(cpustate, cpustate->ea);
+        cpustate->icount-=4;
 		break;
 //  case 0xcd: EA=0; break; /* indirect - ???? */
 //  case 0xce: EA=0; break; /* indirect - register d */
 //  case 0xcf: EA=0; break; /* indirect - ???? */
 	case 0xd0:				/* register a */
 		EA=U+SIGNED(A);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 	case 0xd1:				/* register b */
 		EA=U+SIGNED(B);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 //  case 0xd2: EA=0; break; /* ???? */
 //  case 0xd3: EA=0; break; /* ???? */
@@ -4242,17 +4242,17 @@ INLINE void opcode2( void )
 //  case 0xd6: EA=0; break; /* ???? */
 	case 0xd7:				/* register d */
 		EA=U+D;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0xd8:				/* indirect - register a */
 		EA=U+SIGNED(A);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0xd9:				/* indirect - register b */
 		EA=U+SIGNED(B);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 //  case 0xda: EA=0; break; /* indirect - ???? */
 //  case 0xdb: EA=0; break; /* indirect - ???? */
@@ -4261,16 +4261,16 @@ INLINE void opcode2( void )
 //  case 0xde: EA=0; break; /* indirect - ???? */
 	case 0xdf:				/* indirect - register d */
 		EA=U+D;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
         break;
 	case 0xe0:				/* register a */
 		EA=S+SIGNED(A);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 	case 0xe1:				/* register b */
 		EA=S+SIGNED(B);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 //  case 0xe2: EA=0; break; /* ???? */
 //  case 0xe3: EA=0; break; /* ???? */
@@ -4279,17 +4279,17 @@ INLINE void opcode2( void )
 //  case 0xe6: EA=0; break; /* ???? */
 	case 0xe7:				/* register d */
 		EA=S+D;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0xe8:				/* indirect - register a */
 		EA=S+SIGNED(A);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0xe9:				/* indirect - register b */
 		EA=S+SIGNED(B);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 //  case 0xea: EA=0; break; /* indirect - ???? */
 //  case 0xeb: EA=0; break; /* indirect - ???? */
@@ -4298,16 +4298,16 @@ INLINE void opcode2( void )
 //  case 0xee: EA=0; break; /* indirect - ???? */
 	case 0xef:				/* indirect - register d */
 		EA=S+D;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
 		break;
 	case 0xf0:				/* register a */
 		EA=PC+SIGNED(A);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 	case 0xf1:				/* register b */
 		EA=PC+SIGNED(B);
-        konami_ICount-=1;
+        cpustate->icount-=1;
 		break;
 //  case 0xf2: EA=0; break; /* ???? */
 //  case 0xf3: EA=0; break; /* ???? */
@@ -4316,17 +4316,17 @@ INLINE void opcode2( void )
 //  case 0xf6: EA=0; break; /* ???? */
 	case 0xf7:				/* register d */
 		EA=PC+D;
-        konami_ICount-=4;
+        cpustate->icount-=4;
 		break;
 	case 0xf8:				/* indirect - register a */
 		EA=PC+SIGNED(A);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 	case 0xf9:				/* indirect - register b */
 		EA=PC+SIGNED(B);
-		EA=RM16(EAD);
-        konami_ICount-=4;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=4;
 		break;
 //  case 0xfa: EA=0; break; /* indirect - ???? */
 //  case 0xfb: EA=0; break; /* indirect - ???? */
@@ -4335,12 +4335,12 @@ INLINE void opcode2( void )
 //  case 0xfe: EA=0; break; /* indirect - ???? */
 	case 0xff:				/* indirect - register d */
 		EA=PC+D;
-		EA=RM16(EAD);
-        konami_ICount-=7;
+		EA=RM16(cpustate, EAD);
+        cpustate->icount-=7;
 		break;
 	default:
 		logerror("KONAMI: Unknown/Invalid postbyte at PC = %04x\n", PC -1 );
         EAD = 0;
 	}
-	(*konami_indexed[konami.ireg])();
+	(*konami_indexed[cpustate->ireg])(cpustate);
 }

@@ -925,6 +925,7 @@ void cpu_set_input_line_and_vector(const device_config *device, int line, int st
 	{
 		switch (classdata->header.cputype)
 		{
+			case CPU_KONAMI:
 			case CPU_Z80:
 			case CPU_Z180:
 			case CPU_M68000:

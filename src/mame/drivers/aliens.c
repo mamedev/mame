@@ -8,7 +8,6 @@ Preliminary driver by:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/k007232.h"
@@ -16,7 +15,7 @@ Preliminary driver by:
 
 /* prototypes */
 static MACHINE_RESET( aliens );
-static void aliens_banking( int lines );
+static void aliens_banking( const device_config *device, int lines );
 
 
 VIDEO_START( aliens );
@@ -481,23 +480,23 @@ ROM_END
 
 ***************************************************************************/
 
-static void aliens_banking( int lines )
+static void aliens_banking( const device_config *device, int lines )
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0x18000;
 
 
 	if (lines & 0x10) offs -= 0x8000;
 
 	offs += (lines & 0x0f)*0x2000;
-	memory_set_bankptr(Machine,  1, &RAM[offs] );
+	memory_set_bankptr(device->machine,  1, &RAM[offs] );
 }
 
 static MACHINE_RESET( aliens )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)aliens_banking);
+	konami_configure_set_lines(machine->cpu[0], aliens_banking);
 
 	/* init the default bank */
 	memory_set_bankptr(machine,  1, &RAM[0x10000] );

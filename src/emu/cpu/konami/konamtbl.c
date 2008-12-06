@@ -1,356 +1,356 @@
-INLINE void abx(void);
-INLINE void adca_di(void);
-INLINE void adca_ex(void);
-INLINE void adca_im(void);
-INLINE void adca_ix(void);
-INLINE void adcb_di(void);
-INLINE void adcb_ex(void);
-INLINE void adcb_im(void);
-INLINE void adcb_ix(void);
-INLINE void adda_di(void);
-INLINE void adda_ex(void);
-INLINE void adda_im(void);
-INLINE void adda_ix(void);
-INLINE void addb_di(void);
-INLINE void addb_ex(void);
-INLINE void addb_im(void);
-INLINE void addb_ix(void);
-INLINE void addd_di(void);
-INLINE void addd_ex(void);
-INLINE void addd_im(void);
-INLINE void addd_ix(void);
-INLINE void anda_di(void);
-INLINE void anda_ex(void);
-INLINE void anda_im(void);
-INLINE void anda_ix(void);
-INLINE void andb_di(void);
-INLINE void andb_ex(void);
-INLINE void andb_im(void);
-INLINE void andb_ix(void);
-INLINE void andcc(void);
-INLINE void asl_di(void);
-INLINE void asl_ex(void);
-INLINE void asl_ix(void);
-INLINE void asla(void);
-INLINE void aslb(void);
-INLINE void asr_di(void);
-INLINE void asr_ex(void);
-INLINE void asr_ix(void);
-INLINE void asra(void);
-INLINE void asrb(void);
-INLINE void bcc(void);
-INLINE void bcs(void);
-INLINE void beq(void);
-INLINE void bge(void);
-INLINE void bgt(void);
-INLINE void bhi(void);
-INLINE void bita_di(void);
-INLINE void bita_ex(void);
-INLINE void bita_im(void);
-INLINE void bita_ix(void);
-INLINE void bitb_di(void);
-INLINE void bitb_ex(void);
-INLINE void bitb_im(void);
-INLINE void bitb_ix(void);
-INLINE void ble(void);
-INLINE void bls(void);
-INLINE void blt(void);
-INLINE void bmi(void);
-INLINE void bne(void);
-INLINE void bpl(void);
-INLINE void bra(void);
-INLINE void brn(void);
-INLINE void bsr(void);
-INLINE void bvc(void);
-INLINE void bvs(void);
-INLINE void clr_di(void);
-INLINE void clr_ex(void);
-INLINE void clr_ix(void);
-INLINE void clra(void);
-INLINE void clrb(void);
-INLINE void cmpa_di(void);
-INLINE void cmpa_ex(void);
-INLINE void cmpa_im(void);
-INLINE void cmpa_ix(void);
-INLINE void cmpb_di(void);
-INLINE void cmpb_ex(void);
-INLINE void cmpb_im(void);
-INLINE void cmpb_ix(void);
-INLINE void cmpd_di(void);
-INLINE void cmpd_ex(void);
-INLINE void cmpd_im(void);
-INLINE void cmpd_ix(void);
-INLINE void cmps_di(void);
-INLINE void cmps_ex(void);
-INLINE void cmps_im(void);
-INLINE void cmps_ix(void);
-INLINE void cmpu_di(void);
-INLINE void cmpu_ex(void);
-INLINE void cmpu_im(void);
-INLINE void cmpu_ix(void);
-INLINE void cmpx_di(void);
-INLINE void cmpx_ex(void);
-INLINE void cmpx_im(void);
-INLINE void cmpx_ix(void);
-INLINE void cmpy_di(void);
-INLINE void cmpy_ex(void);
-INLINE void cmpy_im(void);
-INLINE void cmpy_ix(void);
-INLINE void com_di(void);
-INLINE void com_ex(void);
-INLINE void com_ix(void);
-INLINE void coma(void);
-INLINE void comb(void);
-INLINE void cwai(void);
-INLINE void daa(void);
-INLINE void dec_di(void);
-INLINE void dec_ex(void);
-INLINE void dec_ix(void);
-INLINE void deca(void);
-INLINE void decb(void);
-INLINE void eora_di(void);
-INLINE void eora_ex(void);
-INLINE void eora_im(void);
-INLINE void eora_ix(void);
-INLINE void eorb_di(void);
-INLINE void eorb_ex(void);
-INLINE void eorb_im(void);
-INLINE void eorb_ix(void);
-INLINE void exg(void);
-INLINE void illegal(void);
-INLINE void inc_di(void);
-INLINE void inc_ex(void);
-INLINE void inc_ix(void);
-INLINE void inca(void);
-INLINE void incb(void);
-INLINE void jmp_di(void);
-INLINE void jmp_ex(void);
-INLINE void jmp_ix(void);
-INLINE void jsr_di(void);
-INLINE void jsr_ex(void);
-INLINE void jsr_ix(void);
-INLINE void lbcc(void);
-INLINE void lbcs(void);
-INLINE void lbeq(void);
-INLINE void lbge(void);
-INLINE void lbgt(void);
-INLINE void lbhi(void);
-INLINE void lble(void);
-INLINE void lbls(void);
-INLINE void lblt(void);
-INLINE void lbmi(void);
-INLINE void lbne(void);
-INLINE void lbpl(void);
-INLINE void lbra(void);
-INLINE void lbrn(void);
-INLINE void lbsr(void);
-INLINE void lbvc(void);
-INLINE void lbvs(void);
-INLINE void lda_di(void);
-INLINE void lda_ex(void);
-INLINE void lda_im(void);
-INLINE void lda_ix(void);
-INLINE void ldb_di(void);
-INLINE void ldb_ex(void);
-INLINE void ldb_im(void);
-INLINE void ldb_ix(void);
-INLINE void ldd_di(void);
-INLINE void ldd_ex(void);
-INLINE void ldd_im(void);
-INLINE void ldd_ix(void);
-INLINE void lds_di(void);
-INLINE void lds_ex(void);
-INLINE void lds_im(void);
-INLINE void lds_ix(void);
-INLINE void ldu_di(void);
-INLINE void ldu_ex(void);
-INLINE void ldu_im(void);
-INLINE void ldu_ix(void);
-INLINE void ldx_di(void);
-INLINE void ldx_ex(void);
-INLINE void ldx_im(void);
-INLINE void ldx_ix(void);
-INLINE void ldy_di(void);
-INLINE void ldy_ex(void);
-INLINE void ldy_im(void);
-INLINE void ldy_ix(void);
-INLINE void leas(void);
-INLINE void leau(void);
-INLINE void leax(void);
-INLINE void leay(void);
-INLINE void lsr_di(void);
-INLINE void lsr_ex(void);
-INLINE void lsr_ix(void);
-INLINE void lsra(void);
-INLINE void lsrb(void);
-INLINE void mul(void);
-INLINE void neg_di(void);
-INLINE void neg_ex(void);
-INLINE void neg_ix(void);
-INLINE void nega(void);
-INLINE void negb(void);
-INLINE void nop(void);
-INLINE void ora_di(void);
-INLINE void ora_ex(void);
-INLINE void ora_im(void);
-INLINE void ora_ix(void);
-INLINE void orb_di(void);
-INLINE void orb_ex(void);
-INLINE void orb_im(void);
-INLINE void orb_ix(void);
-INLINE void orcc(void);
-INLINE void pshs(void);
-INLINE void pshu(void);
-INLINE void puls(void);
-INLINE void pulu(void);
-INLINE void rol_di(void);
-INLINE void rol_ex(void);
-INLINE void rol_ix(void);
-INLINE void rola(void);
-INLINE void rolb(void);
-INLINE void ror_di(void);
-INLINE void ror_ex(void);
-INLINE void ror_ix(void);
-INLINE void rora(void);
-INLINE void rorb(void);
-INLINE void rti(void);
-INLINE void rts(void);
-INLINE void sbca_di(void);
-INLINE void sbca_ex(void);
-INLINE void sbca_im(void);
-INLINE void sbca_ix(void);
-INLINE void sbcb_di(void);
-INLINE void sbcb_ex(void);
-INLINE void sbcb_im(void);
-INLINE void sbcb_ix(void);
-INLINE void sex(void);
-INLINE void sta_di(void);
-INLINE void sta_ex(void);
-INLINE void sta_im(void);
-INLINE void sta_ix(void);
-INLINE void stb_di(void);
-INLINE void stb_ex(void);
-INLINE void stb_im(void);
-INLINE void stb_ix(void);
-INLINE void std_di(void);
-INLINE void std_ex(void);
-INLINE void std_im(void);
-INLINE void std_ix(void);
-INLINE void sts_di(void);
-INLINE void sts_ex(void);
-INLINE void sts_im(void);
-INLINE void sts_ix(void);
-INLINE void stu_di(void);
-INLINE void stu_ex(void);
-INLINE void stu_im(void);
-INLINE void stu_ix(void);
-INLINE void stx_di(void);
-INLINE void stx_ex(void);
-INLINE void stx_im(void);
-INLINE void stx_ix(void);
-INLINE void sty_di(void);
-INLINE void sty_ex(void);
-INLINE void sty_im(void);
-INLINE void sty_ix(void);
-INLINE void suba_di(void);
-INLINE void suba_ex(void);
-INLINE void suba_im(void);
-INLINE void suba_ix(void);
-INLINE void subb_di(void);
-INLINE void subb_ex(void);
-INLINE void subb_im(void);
-INLINE void subb_ix(void);
-INLINE void subd_di(void);
-INLINE void subd_ex(void);
-INLINE void subd_im(void);
-INLINE void subd_ix(void);
-INLINE void swi(void);
-INLINE void swi2(void);
-INLINE void swi3(void);
-INLINE void sync(void);
-INLINE void tfr(void);
-INLINE void tst_di(void);
-INLINE void tst_ex(void);
-INLINE void tst_ix(void);
-INLINE void tsta(void);
-INLINE void tstb(void);
+INLINE void abx(konami_state *cpustate);
+INLINE void adca_di(konami_state *cpustate);
+INLINE void adca_ex(konami_state *cpustate);
+INLINE void adca_im(konami_state *cpustate);
+INLINE void adca_ix(konami_state *cpustate);
+INLINE void adcb_di(konami_state *cpustate);
+INLINE void adcb_ex(konami_state *cpustate);
+INLINE void adcb_im(konami_state *cpustate);
+INLINE void adcb_ix(konami_state *cpustate);
+INLINE void adda_di(konami_state *cpustate);
+INLINE void adda_ex(konami_state *cpustate);
+INLINE void adda_im(konami_state *cpustate);
+INLINE void adda_ix(konami_state *cpustate);
+INLINE void addb_di(konami_state *cpustate);
+INLINE void addb_ex(konami_state *cpustate);
+INLINE void addb_im(konami_state *cpustate);
+INLINE void addb_ix(konami_state *cpustate);
+INLINE void addd_di(konami_state *cpustate);
+INLINE void addd_ex(konami_state *cpustate);
+INLINE void addd_im(konami_state *cpustate);
+INLINE void addd_ix(konami_state *cpustate);
+INLINE void anda_di(konami_state *cpustate);
+INLINE void anda_ex(konami_state *cpustate);
+INLINE void anda_im(konami_state *cpustate);
+INLINE void anda_ix(konami_state *cpustate);
+INLINE void andb_di(konami_state *cpustate);
+INLINE void andb_ex(konami_state *cpustate);
+INLINE void andb_im(konami_state *cpustate);
+INLINE void andb_ix(konami_state *cpustate);
+INLINE void andcc(konami_state *cpustate);
+INLINE void asl_di(konami_state *cpustate);
+INLINE void asl_ex(konami_state *cpustate);
+INLINE void asl_ix(konami_state *cpustate);
+INLINE void asla(konami_state *cpustate);
+INLINE void aslb(konami_state *cpustate);
+INLINE void asr_di(konami_state *cpustate);
+INLINE void asr_ex(konami_state *cpustate);
+INLINE void asr_ix(konami_state *cpustate);
+INLINE void asra(konami_state *cpustate);
+INLINE void asrb(konami_state *cpustate);
+INLINE void bcc(konami_state *cpustate);
+INLINE void bcs(konami_state *cpustate);
+INLINE void beq(konami_state *cpustate);
+INLINE void bge(konami_state *cpustate);
+INLINE void bgt(konami_state *cpustate);
+INLINE void bhi(konami_state *cpustate);
+INLINE void bita_di(konami_state *cpustate);
+INLINE void bita_ex(konami_state *cpustate);
+INLINE void bita_im(konami_state *cpustate);
+INLINE void bita_ix(konami_state *cpustate);
+INLINE void bitb_di(konami_state *cpustate);
+INLINE void bitb_ex(konami_state *cpustate);
+INLINE void bitb_im(konami_state *cpustate);
+INLINE void bitb_ix(konami_state *cpustate);
+INLINE void ble(konami_state *cpustate);
+INLINE void bls(konami_state *cpustate);
+INLINE void blt(konami_state *cpustate);
+INLINE void bmi(konami_state *cpustate);
+INLINE void bne(konami_state *cpustate);
+INLINE void bpl(konami_state *cpustate);
+INLINE void bra(konami_state *cpustate);
+INLINE void brn(konami_state *cpustate);
+INLINE void bsr(konami_state *cpustate);
+INLINE void bvc(konami_state *cpustate);
+INLINE void bvs(konami_state *cpustate);
+INLINE void clr_di(konami_state *cpustate);
+INLINE void clr_ex(konami_state *cpustate);
+INLINE void clr_ix(konami_state *cpustate);
+INLINE void clra(konami_state *cpustate);
+INLINE void clrb(konami_state *cpustate);
+INLINE void cmpa_di(konami_state *cpustate);
+INLINE void cmpa_ex(konami_state *cpustate);
+INLINE void cmpa_im(konami_state *cpustate);
+INLINE void cmpa_ix(konami_state *cpustate);
+INLINE void cmpb_di(konami_state *cpustate);
+INLINE void cmpb_ex(konami_state *cpustate);
+INLINE void cmpb_im(konami_state *cpustate);
+INLINE void cmpb_ix(konami_state *cpustate);
+INLINE void cmpd_di(konami_state *cpustate);
+INLINE void cmpd_ex(konami_state *cpustate);
+INLINE void cmpd_im(konami_state *cpustate);
+INLINE void cmpd_ix(konami_state *cpustate);
+INLINE void cmps_di(konami_state *cpustate);
+INLINE void cmps_ex(konami_state *cpustate);
+INLINE void cmps_im(konami_state *cpustate);
+INLINE void cmps_ix(konami_state *cpustate);
+INLINE void cmpu_di(konami_state *cpustate);
+INLINE void cmpu_ex(konami_state *cpustate);
+INLINE void cmpu_im(konami_state *cpustate);
+INLINE void cmpu_ix(konami_state *cpustate);
+INLINE void cmpx_di(konami_state *cpustate);
+INLINE void cmpx_ex(konami_state *cpustate);
+INLINE void cmpx_im(konami_state *cpustate);
+INLINE void cmpx_ix(konami_state *cpustate);
+INLINE void cmpy_di(konami_state *cpustate);
+INLINE void cmpy_ex(konami_state *cpustate);
+INLINE void cmpy_im(konami_state *cpustate);
+INLINE void cmpy_ix(konami_state *cpustate);
+INLINE void com_di(konami_state *cpustate);
+INLINE void com_ex(konami_state *cpustate);
+INLINE void com_ix(konami_state *cpustate);
+INLINE void coma(konami_state *cpustate);
+INLINE void comb(konami_state *cpustate);
+INLINE void cwai(konami_state *cpustate);
+INLINE void daa(konami_state *cpustate);
+INLINE void dec_di(konami_state *cpustate);
+INLINE void dec_ex(konami_state *cpustate);
+INLINE void dec_ix(konami_state *cpustate);
+INLINE void deca(konami_state *cpustate);
+INLINE void decb(konami_state *cpustate);
+INLINE void eora_di(konami_state *cpustate);
+INLINE void eora_ex(konami_state *cpustate);
+INLINE void eora_im(konami_state *cpustate);
+INLINE void eora_ix(konami_state *cpustate);
+INLINE void eorb_di(konami_state *cpustate);
+INLINE void eorb_ex(konami_state *cpustate);
+INLINE void eorb_im(konami_state *cpustate);
+INLINE void eorb_ix(konami_state *cpustate);
+INLINE void exg(konami_state *cpustate);
+INLINE void illegal(konami_state *cpustate);
+INLINE void inc_di(konami_state *cpustate);
+INLINE void inc_ex(konami_state *cpustate);
+INLINE void inc_ix(konami_state *cpustate);
+INLINE void inca(konami_state *cpustate);
+INLINE void incb(konami_state *cpustate);
+INLINE void jmp_di(konami_state *cpustate);
+INLINE void jmp_ex(konami_state *cpustate);
+INLINE void jmp_ix(konami_state *cpustate);
+INLINE void jsr_di(konami_state *cpustate);
+INLINE void jsr_ex(konami_state *cpustate);
+INLINE void jsr_ix(konami_state *cpustate);
+INLINE void lbcc(konami_state *cpustate);
+INLINE void lbcs(konami_state *cpustate);
+INLINE void lbeq(konami_state *cpustate);
+INLINE void lbge(konami_state *cpustate);
+INLINE void lbgt(konami_state *cpustate);
+INLINE void lbhi(konami_state *cpustate);
+INLINE void lble(konami_state *cpustate);
+INLINE void lbls(konami_state *cpustate);
+INLINE void lblt(konami_state *cpustate);
+INLINE void lbmi(konami_state *cpustate);
+INLINE void lbne(konami_state *cpustate);
+INLINE void lbpl(konami_state *cpustate);
+INLINE void lbra(konami_state *cpustate);
+INLINE void lbrn(konami_state *cpustate);
+INLINE void lbsr(konami_state *cpustate);
+INLINE void lbvc(konami_state *cpustate);
+INLINE void lbvs(konami_state *cpustate);
+INLINE void lda_di(konami_state *cpustate);
+INLINE void lda_ex(konami_state *cpustate);
+INLINE void lda_im(konami_state *cpustate);
+INLINE void lda_ix(konami_state *cpustate);
+INLINE void ldb_di(konami_state *cpustate);
+INLINE void ldb_ex(konami_state *cpustate);
+INLINE void ldb_im(konami_state *cpustate);
+INLINE void ldb_ix(konami_state *cpustate);
+INLINE void ldd_di(konami_state *cpustate);
+INLINE void ldd_ex(konami_state *cpustate);
+INLINE void ldd_im(konami_state *cpustate);
+INLINE void ldd_ix(konami_state *cpustate);
+INLINE void lds_di(konami_state *cpustate);
+INLINE void lds_ex(konami_state *cpustate);
+INLINE void lds_im(konami_state *cpustate);
+INLINE void lds_ix(konami_state *cpustate);
+INLINE void ldu_di(konami_state *cpustate);
+INLINE void ldu_ex(konami_state *cpustate);
+INLINE void ldu_im(konami_state *cpustate);
+INLINE void ldu_ix(konami_state *cpustate);
+INLINE void ldx_di(konami_state *cpustate);
+INLINE void ldx_ex(konami_state *cpustate);
+INLINE void ldx_im(konami_state *cpustate);
+INLINE void ldx_ix(konami_state *cpustate);
+INLINE void ldy_di(konami_state *cpustate);
+INLINE void ldy_ex(konami_state *cpustate);
+INLINE void ldy_im(konami_state *cpustate);
+INLINE void ldy_ix(konami_state *cpustate);
+INLINE void leas(konami_state *cpustate);
+INLINE void leau(konami_state *cpustate);
+INLINE void leax(konami_state *cpustate);
+INLINE void leay(konami_state *cpustate);
+INLINE void lsr_di(konami_state *cpustate);
+INLINE void lsr_ex(konami_state *cpustate);
+INLINE void lsr_ix(konami_state *cpustate);
+INLINE void lsra(konami_state *cpustate);
+INLINE void lsrb(konami_state *cpustate);
+INLINE void mul(konami_state *cpustate);
+INLINE void neg_di(konami_state *cpustate);
+INLINE void neg_ex(konami_state *cpustate);
+INLINE void neg_ix(konami_state *cpustate);
+INLINE void nega(konami_state *cpustate);
+INLINE void negb(konami_state *cpustate);
+INLINE void nop(konami_state *cpustate);
+INLINE void ora_di(konami_state *cpustate);
+INLINE void ora_ex(konami_state *cpustate);
+INLINE void ora_im(konami_state *cpustate);
+INLINE void ora_ix(konami_state *cpustate);
+INLINE void orb_di(konami_state *cpustate);
+INLINE void orb_ex(konami_state *cpustate);
+INLINE void orb_im(konami_state *cpustate);
+INLINE void orb_ix(konami_state *cpustate);
+INLINE void orcc(konami_state *cpustate);
+INLINE void pshs(konami_state *cpustate);
+INLINE void pshu(konami_state *cpustate);
+INLINE void puls(konami_state *cpustate);
+INLINE void pulu(konami_state *cpustate);
+INLINE void rol_di(konami_state *cpustate);
+INLINE void rol_ex(konami_state *cpustate);
+INLINE void rol_ix(konami_state *cpustate);
+INLINE void rola(konami_state *cpustate);
+INLINE void rolb(konami_state *cpustate);
+INLINE void ror_di(konami_state *cpustate);
+INLINE void ror_ex(konami_state *cpustate);
+INLINE void ror_ix(konami_state *cpustate);
+INLINE void rora(konami_state *cpustate);
+INLINE void rorb(konami_state *cpustate);
+INLINE void rti(konami_state *cpustate);
+INLINE void rts(konami_state *cpustate);
+INLINE void sbca_di(konami_state *cpustate);
+INLINE void sbca_ex(konami_state *cpustate);
+INLINE void sbca_im(konami_state *cpustate);
+INLINE void sbca_ix(konami_state *cpustate);
+INLINE void sbcb_di(konami_state *cpustate);
+INLINE void sbcb_ex(konami_state *cpustate);
+INLINE void sbcb_im(konami_state *cpustate);
+INLINE void sbcb_ix(konami_state *cpustate);
+INLINE void sex(konami_state *cpustate);
+INLINE void sta_di(konami_state *cpustate);
+INLINE void sta_ex(konami_state *cpustate);
+INLINE void sta_im(konami_state *cpustate);
+INLINE void sta_ix(konami_state *cpustate);
+INLINE void stb_di(konami_state *cpustate);
+INLINE void stb_ex(konami_state *cpustate);
+INLINE void stb_im(konami_state *cpustate);
+INLINE void stb_ix(konami_state *cpustate);
+INLINE void std_di(konami_state *cpustate);
+INLINE void std_ex(konami_state *cpustate);
+INLINE void std_im(konami_state *cpustate);
+INLINE void std_ix(konami_state *cpustate);
+INLINE void sts_di(konami_state *cpustate);
+INLINE void sts_ex(konami_state *cpustate);
+INLINE void sts_im(konami_state *cpustate);
+INLINE void sts_ix(konami_state *cpustate);
+INLINE void stu_di(konami_state *cpustate);
+INLINE void stu_ex(konami_state *cpustate);
+INLINE void stu_im(konami_state *cpustate);
+INLINE void stu_ix(konami_state *cpustate);
+INLINE void stx_di(konami_state *cpustate);
+INLINE void stx_ex(konami_state *cpustate);
+INLINE void stx_im(konami_state *cpustate);
+INLINE void stx_ix(konami_state *cpustate);
+INLINE void sty_di(konami_state *cpustate);
+INLINE void sty_ex(konami_state *cpustate);
+INLINE void sty_im(konami_state *cpustate);
+INLINE void sty_ix(konami_state *cpustate);
+INLINE void suba_di(konami_state *cpustate);
+INLINE void suba_ex(konami_state *cpustate);
+INLINE void suba_im(konami_state *cpustate);
+INLINE void suba_ix(konami_state *cpustate);
+INLINE void subb_di(konami_state *cpustate);
+INLINE void subb_ex(konami_state *cpustate);
+INLINE void subb_im(konami_state *cpustate);
+INLINE void subb_ix(konami_state *cpustate);
+INLINE void subd_di(konami_state *cpustate);
+INLINE void subd_ex(konami_state *cpustate);
+INLINE void subd_im(konami_state *cpustate);
+INLINE void subd_ix(konami_state *cpustate);
+INLINE void swi(konami_state *cpustate);
+INLINE void swi2(konami_state *cpustate);
+INLINE void swi3(konami_state *cpustate);
+INLINE void sync(konami_state *cpustate);
+INLINE void tfr(konami_state *cpustate);
+INLINE void tst_di(konami_state *cpustate);
+INLINE void tst_ex(konami_state *cpustate);
+INLINE void tst_ix(konami_state *cpustate);
+INLINE void tsta(konami_state *cpustate);
+INLINE void tstb(konami_state *cpustate);
 
-INLINE void clrd(void); /* 6309 */
-INLINE void clrw_ix(void); /* 6309 ? */
-INLINE void clrw_di(void); /* 6309 ? */
-INLINE void clrw_ex(void); /* 6309 ? */
-INLINE void negd(void);
-INLINE void negw_ix(void); /* 6309 ? */
-INLINE void negw_di(void); /* 6309 ? */
-INLINE void negw_ex(void); /* 6309 ? */
-INLINE void lsrd( void ); /* 6309 */
-INLINE void lsrd_di( void ); /* 6309 */
-INLINE void lsrd_ix( void ); /* 6309 */
-INLINE void lsrd_ex( void ); /* 6309 */
-INLINE void rord( void ); /* 6309 ? */
-INLINE void rord_di( void ); /* 6309 */
-INLINE void rord_ix( void ); /* 6309 */
-INLINE void rord_ex( void ); /* 6309 */
-INLINE void asrd( void ); /* 6309 ? */
-INLINE void asrd_di( void ); /* 6309 */
-INLINE void asrd_ix( void ); /* 6309 */
-INLINE void asrd_ex( void ); /* 6309 */
-INLINE void asld( void ); /* 6309 */
-INLINE void asld_di( void ); /* 6309 */
-INLINE void asld_ix( void ); /* 6309 */
-INLINE void asld_ex( void ); /* 6309 */
-INLINE void rold( void ); /* 6309 ? */
-INLINE void rold_di( void ); /* 6309 */
-INLINE void rold_ix( void ); /* 6309 */
-INLINE void rold_ex( void ); /* 6309 */
-INLINE void tstd(void);
-INLINE void tstw_di( void );
-INLINE void tstw_ix( void );
-INLINE void tstw_ex( void );
+INLINE void clrd(konami_state *cpustate); /* 6309 */
+INLINE void clrw_ix(konami_state *cpustate); /* 6309 ? */
+INLINE void clrw_di(konami_state *cpustate); /* 6309 ? */
+INLINE void clrw_ex(konami_state *cpustate); /* 6309 ? */
+INLINE void negd(konami_state *cpustate);
+INLINE void negw_ix(konami_state *cpustate); /* 6309 ? */
+INLINE void negw_di(konami_state *cpustate); /* 6309 ? */
+INLINE void negw_ex(konami_state *cpustate); /* 6309 ? */
+INLINE void lsrd(konami_state *cpustate); /* 6309 */
+INLINE void lsrd_di(konami_state *cpustate); /* 6309 */
+INLINE void lsrd_ix(konami_state *cpustate); /* 6309 */
+INLINE void lsrd_ex(konami_state *cpustate); /* 6309 */
+INLINE void rord(konami_state *cpustate); /* 6309 ? */
+INLINE void rord_di(konami_state *cpustate); /* 6309 */
+INLINE void rord_ix(konami_state *cpustate); /* 6309 */
+INLINE void rord_ex(konami_state *cpustate); /* 6309 */
+INLINE void asrd(konami_state *cpustate); /* 6309 ? */
+INLINE void asrd_di(konami_state *cpustate); /* 6309 */
+INLINE void asrd_ix(konami_state *cpustate); /* 6309 */
+INLINE void asrd_ex(konami_state *cpustate); /* 6309 */
+INLINE void asld(konami_state *cpustate); /* 6309 */
+INLINE void asld_di(konami_state *cpustate); /* 6309 */
+INLINE void asld_ix(konami_state *cpustate); /* 6309 */
+INLINE void asld_ex(konami_state *cpustate); /* 6309 */
+INLINE void rold(konami_state *cpustate); /* 6309 ? */
+INLINE void rold_di(konami_state *cpustate); /* 6309 */
+INLINE void rold_ix(konami_state *cpustate); /* 6309 */
+INLINE void rold_ex(konami_state *cpustate); /* 6309 */
+INLINE void tstd(konami_state *cpustate);
+INLINE void tstw_di(konami_state *cpustate);
+INLINE void tstw_ix(konami_state *cpustate);
+INLINE void tstw_ex(konami_state *cpustate);
 
 /* Custom opcodes */
-INLINE void setline_im( void );
-INLINE void setline_ix( void );
-INLINE void setline_di( void );
-INLINE void setline_ex( void );
-INLINE void bmove( void );
-INLINE void move( void );
-INLINE void decbjnz( void );
-INLINE void decxjnz( void );
-INLINE void bset( void );
-INLINE void bset2( void );
-INLINE void lmul(void);
-INLINE void divx( void );
-INLINE void incd( void );
-INLINE void incw_di( void );
-INLINE void incw_ix( void );
-INLINE void incw_ex( void );
-INLINE void decd( void );
-INLINE void decw_di( void );
-INLINE void decw_ix( void );
-INLINE void decw_ex( void );
-INLINE void lsrw_di( void );
-INLINE void lsrw_ix( void );
-INLINE void lsrw_ex( void );
-INLINE void rorw_di( void );
-INLINE void rorw_ix( void );
-INLINE void rorw_ex( void );
-INLINE void asrw_di( void );
-INLINE void asrw_ix( void );
-INLINE void asrw_ex( void );
-INLINE void aslw_di( void );
-INLINE void aslw_ix( void );
-INLINE void aslw_ex( void );
-INLINE void rolw_di( void );
-INLINE void rolw_ix( void );
-INLINE void rolw_ex( void );
-INLINE void absa( void );
-INLINE void absb( void );
-INLINE void absd( void );
+INLINE void setline_im(konami_state *cpustate);
+INLINE void setline_ix(konami_state *cpustate);
+INLINE void setline_di(konami_state *cpustate);
+INLINE void setline_ex(konami_state *cpustate);
+INLINE void bmove(konami_state *cpustate);
+INLINE void move(konami_state *cpustate);
+INLINE void decbjnz(konami_state *cpustate);
+INLINE void decxjnz(konami_state *cpustate);
+INLINE void bset(konami_state *cpustate);
+INLINE void bset2(konami_state *cpustate);
+INLINE void lmul(konami_state *cpustate);
+INLINE void divx(konami_state *cpustate);
+INLINE void incd(konami_state *cpustate);
+INLINE void incw_di(konami_state *cpustate);
+INLINE void incw_ix(konami_state *cpustate);
+INLINE void incw_ex(konami_state *cpustate);
+INLINE void decd(konami_state *cpustate);
+INLINE void decw_di(konami_state *cpustate);
+INLINE void decw_ix(konami_state *cpustate);
+INLINE void decw_ex(konami_state *cpustate);
+INLINE void lsrw_di(konami_state *cpustate);
+INLINE void lsrw_ix(konami_state *cpustate);
+INLINE void lsrw_ex(konami_state *cpustate);
+INLINE void rorw_di(konami_state *cpustate);
+INLINE void rorw_ix(konami_state *cpustate);
+INLINE void rorw_ex(konami_state *cpustate);
+INLINE void asrw_di(konami_state *cpustate);
+INLINE void asrw_ix(konami_state *cpustate);
+INLINE void asrw_ex(konami_state *cpustate);
+INLINE void aslw_di(konami_state *cpustate);
+INLINE void aslw_ix(konami_state *cpustate);
+INLINE void aslw_ex(konami_state *cpustate);
+INLINE void rolw_di(konami_state *cpustate);
+INLINE void rolw_ix(konami_state *cpustate);
+INLINE void rolw_ex(konami_state *cpustate);
+INLINE void absa(konami_state *cpustate);
+INLINE void absb(konami_state *cpustate);
+INLINE void absd(konami_state *cpustate);
 
-INLINE void opcode2( void );
+INLINE void opcode2(konami_state *cpustate);
 
-static void (*const konami_main[0x100])(void) = {
+static void (*const konami_main[0x100])(konami_state *cpustate) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,	/* 00 */
 	opcode2,opcode2,opcode2,opcode2,pshs   ,pshu   ,puls   ,pulu   ,
 	lda_im ,ldb_im ,opcode2,opcode2,adda_im,addb_im,opcode2,opcode2,	/* 10 */
@@ -385,7 +385,7 @@ static void (*const konami_main[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal
 };
 
-static void (*const konami_indexed[0x100])(void) = {
+static void (*const konami_indexed[0x100])(konami_state *cpustate) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,	/* 00 */
 	leax   ,leay   ,leau   ,leas   ,illegal,illegal,illegal,illegal,
 	illegal,illegal,lda_ix ,ldb_ix ,illegal,illegal,adda_ix,addb_ix,	/* 10 */
@@ -420,7 +420,7 @@ static void (*const konami_indexed[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal
 };
 
-static void (*const konami_direct[0x100])(void) = {
+static void (*const konami_direct[0x100])(konami_state *cpustate) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,	/* 00 */
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,
 	illegal,illegal,lda_di ,ldb_di ,illegal,illegal,adda_di,addb_di,	/* 10 */
@@ -455,7 +455,7 @@ static void (*const konami_direct[0x100])(void) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal
 };
 
-static void (*const konami_extended[0x100])(void) = {
+static void (*const konami_extended[0x100])(konami_state *cpustate) = {
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,	/* 00 */
 	illegal,illegal,illegal,illegal,illegal,illegal,illegal,illegal,
 	illegal,illegal,lda_ex ,ldb_ex ,illegal,illegal,adda_ex,addb_ex,	/* 10 */

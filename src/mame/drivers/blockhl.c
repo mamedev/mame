@@ -20,14 +20,13 @@ found it.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
 
 /* prototypes */
 static MACHINE_RESET( blockhl );
-static void blockhl_banking( int lines );
+static void blockhl_banking( const device_config *device, int lines );
 
 
 VIDEO_START( blockhl );
@@ -289,15 +288,15 @@ ROM_END
 
 ***************************************************************************/
 
-static void blockhl_banking( int lines )
+static void blockhl_banking( const device_config *device, int lines )
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs;
 
 	/* bits 0-1 = ROM bank */
 	rombank = lines & 0x03;
 	offs = 0x10000 + (lines & 0x03) * 0x2000;
-	memory_set_bankptr(Machine, 1,&RAM[offs]);
+	memory_set_bankptr(device->machine, 1,&RAM[offs]);
 
 	/* bits 3/4 = coin counters */
 	coin_counter_w(0,lines & 0x08);
@@ -313,14 +312,14 @@ static void blockhl_banking( int lines )
 
 	/* other bits unknown */
 
-	if ((lines & 0x84) != 0x80) logerror("%04x: setlines %02x\n",cpu_get_pc(Machine->activecpu),lines);
+	if ((lines & 0x84) != 0x80) logerror("%04x: setlines %02x\n",cpu_get_pc(device),lines);
 }
 
 static MACHINE_RESET( blockhl )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)blockhl_banking);
+	konami_configure_set_lines(machine->cpu[0], blockhl_banking);
 
 	paletteram = &RAM[0x18000];
 }

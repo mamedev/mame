@@ -7,7 +7,6 @@ driver by Nicola Salmoria
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -15,7 +14,7 @@ driver by Nicola Salmoria
 
 /* prototypes */
 static MACHINE_RESET( parodius );
-static void parodius_banking( int lines );
+static void parodius_banking( const device_config *device, int lines );
 VIDEO_START( parodius );
 VIDEO_UPDATE( parodius );
 
@@ -381,23 +380,23 @@ ROM_END
 
 ***************************************************************************/
 
-static void parodius_banking(int lines)
+static void parodius_banking(const device_config *device, int lines)
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0;
 
-	if (lines & 0xf0) logerror("%04x: setlines %02x\n",cpu_get_pc(Machine->activecpu),lines);
+	if (lines & 0xf0) logerror("%04x: setlines %02x\n",cpu_get_pc(device),lines);
 
 	offs = 0x10000 + (((lines & 0x0f)^0x0f) * 0x4000);
 	if (offs >= 0x48000) offs -= 0x40000;
-	memory_set_bankptr(Machine,  1, &RAM[offs] );
+	memory_set_bankptr(device->machine,  1, &RAM[offs] );
 }
 
 static MACHINE_RESET( parodius )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)parodius_banking);
+	konami_configure_set_lines(machine->cpu[0], parodius_banking);
 
 	paletteram = &memory_region(machine, "main")[0x48000];
 

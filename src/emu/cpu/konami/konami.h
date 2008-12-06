@@ -7,6 +7,8 @@
 
 #include "cpuintrf.h"
 
+typedef void (*konami_set_lines_func)(const device_config *device, int lines);
+
 enum
 {
 	KONAMI_PC=1, KONAMI_S, KONAMI_CC ,KONAMI_A, KONAMI_B, KONAMI_U, KONAMI_X, KONAMI_Y,
@@ -24,37 +26,12 @@ enum
 /* PUBLIC FUNCTIONS */
 CPU_GET_INFO( konami );
 
-/****************************************************************************/
-/* Read a byte from given memory location                                   */
-/****************************************************************************/
-#define KONAMI_RDMEM(Addr) ((unsigned)memory_read_byte_8be(konami.program, Addr))
-
-/****************************************************************************/
-/* Write a byte to given memory location                                    */
-/****************************************************************************/
-#define KONAMI_WRMEM(Addr,Value) (memory_write_byte_8be(konami.program, Addr,Value))
-
-/****************************************************************************/
-/* Z80_RDOP() is identical to Z80_RDMEM() except it is used for reading     */
-/* opcodes. In case of system with memory mapped I/O, this function can be  */
-/* used to greatly speed up emulation                                       */
-/****************************************************************************/
-#define KONAMI_RDOP(Addr) ((unsigned)memory_decrypted_read_byte(konami.program, Addr))
-
-/****************************************************************************/
-/* Z80_RDOP_ARG() is identical to Z80_RDOP() except it is used for reading  */
-/* opcode arguments. This difference can be used to support systems that    */
-/* use different encoding mechanisms for opcodes and opcode arguments       */
-/****************************************************************************/
-#define KONAMI_RDOP_ARG(Addr) ((unsigned)memory_raw_read_byte(konami.program, Addr))
-
-#ifndef FALSE
-#    define FALSE 0
-#endif
-#ifndef TRUE
-#    define TRUE (!FALSE)
-#endif
-
 CPU_DISASSEMBLE( konami );
+
+
+INLINE void konami_configure_set_lines(const device_config *device, konami_set_lines_func func)
+{
+	cpu_set_info_fct(device, CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)func);
+}
 
 #endif /* __KONAMI_H__ */

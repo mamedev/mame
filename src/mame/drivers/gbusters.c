@@ -8,7 +8,6 @@ Preliminary driver by:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "video/konamiic.h"
 #include "sound/2151intf.h"
@@ -16,7 +15,7 @@ Preliminary driver by:
 
 /* prototypes */
 static MACHINE_RESET( gbusters );
-static void gbusters_banking( int lines );
+static void gbusters_banking( const device_config *device, int lines );
 
 
 extern int gbusters_priority;
@@ -414,17 +413,17 @@ ROM_START( crazycop )
 ROM_END
 
 
-static void gbusters_banking( int lines )
+static void gbusters_banking( const device_config *device, int lines )
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0x10000;
 
 	/* bits 0-3 ROM bank */
 	offs += (lines & 0x0f)*0x2000;
-	memory_set_bankptr(Machine,  1, &RAM[offs] );
+	memory_set_bankptr(device->machine,  1, &RAM[offs] );
 
 	if (lines & 0xf0){
-		//logerror("%04x: (lines) write %02x\n",cpu_get_pc(machine->activecpu), lines);
+		//logerror("%04x: (lines) write %02x\n",cpu_get_pc(device), lines);
 		//popmessage("lines = %02x", lines);
 	}
 
@@ -435,7 +434,7 @@ static MACHINE_RESET( gbusters )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)gbusters_banking);
+	konami_configure_set_lines(machine->cpu[0], gbusters_banking);
 
 	/* mirror address for banked ROM */
 	memcpy(&RAM[0x18000], &RAM[0x10000], 0x08000 );

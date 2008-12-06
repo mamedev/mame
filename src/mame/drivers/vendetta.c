@@ -87,7 +87,6 @@ Notes:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 #include "cpu/konami/konami.h" /* for the callback and the firq irq definition */
 #include "machine/eeprom.h"
@@ -96,7 +95,7 @@ Notes:
 
 /* prototypes */
 static MACHINE_RESET( vendetta );
-static void vendetta_banking( int lines );
+static void vendetta_banking( const device_config *device, int lines );
 static void vendetta_video_banking( running_machine *machine, int select );
 
 VIDEO_START( vendetta );
@@ -775,21 +774,21 @@ ROM_END
 
 ***************************************************************************/
 
-static void vendetta_banking( int lines )
+static void vendetta_banking( const device_config *device, int lines )
 {
-	UINT8 *RAM = memory_region(Machine, "main");
+	UINT8 *RAM = memory_region(device->machine, "main");
 
 	if ( lines >= 0x1c )
 	{
-		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(Machine->activecpu), lines );
+		logerror("PC = %04x : Unknown bank selected %02x\n", cpu_get_pc(device), lines );
 	}
 	else
-		memory_set_bankptr(Machine,  1, &RAM[ 0x10000 + ( lines * 0x2000 ) ] );
+		memory_set_bankptr(device->machine,  1, &RAM[ 0x10000 + ( lines * 0x2000 ) ] );
 }
 
 static MACHINE_RESET( vendetta )
 {
-	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_KONAMI_SETLINES_CALLBACK, (genf *)vendetta_banking);
+	konami_configure_set_lines(machine->cpu[0], vendetta_banking);
 
 	paletteram = &memory_region(machine, "main")[0x48000];
 	irq_enabled = 0;
