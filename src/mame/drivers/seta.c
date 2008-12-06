@@ -2064,15 +2064,14 @@ static ADDRESS_MAP_START( jjsquawb_writemem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x210000, 0x21ffff) AM_WRITE(SMH_RAM						)	// RAM (gundhara)
 	AM_RANGE(0x300000, 0x30ffff) AM_WRITE(SMH_RAM						)	// RAM (wrofaero only?)
 	AM_RANGE(0x500000, 0x500005) AM_WRITE(seta_vregs_w) AM_BASE(&seta_vregs		)	// Coin Lockout + Video Registers
-	AM_RANGE(0x700000, 0x7003ff) AM_WRITE(SMH_RAM						)	// RZ: (rezon,jjsquawk)
+	AM_RANGE(0x700000, 0x70b3ff) AM_WRITE(SMH_RAM						)	// RZ: (rezon,jjsquawk)
 	AM_RANGE(0x70b400, 0x70bfff) AM_WRITE(SMH_RAM) AM_BASE(&paletteram16	) AM_SIZE(&seta_paletteram_size)	// Palette
-	AM_RANGE(0x701000, 0x70ffff) AM_WRITE(SMH_RAM						)	//
+	AM_RANGE(0x70c000, 0x70ffff) AM_WRITE(SMH_RAM						)	//
 	AM_RANGE(0x800000, 0x803fff) AM_WRITE(seta_vram_0_w) AM_BASE(&seta_vram_0	)	// VRAM 0
-	AM_RANGE(0x804000, 0x80ffff) AM_WRITE(SMH_RAM						)	// (jjsquawk)
-	AM_RANGE(0x880000, 0x883fff) AM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2	)	// VRAM 2
+	AM_RANGE(0x804000, 0x807fff) AM_WRITE(seta_vram_2_w) AM_BASE(&seta_vram_2	)	// VRAM 2
 	AM_RANGE(0x884000, 0x88ffff) AM_WRITE(SMH_RAM						)	// (jjsquawk)
-	AM_RANGE(0x900000, 0x900005) AM_WRITE(SMH_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM 0&1 Ctrl
-	AM_RANGE(0x980000, 0x980005) AM_WRITE(SMH_RAM) AM_BASE(&seta_vctrl_2		)	// VRAM 2&3 Ctrl
+	AM_RANGE(0x908000, 0x908005) AM_WRITE(SMH_RAM) AM_BASE(&seta_vctrl_0		)	// VRAM 0&1 Ctrl
+	AM_RANGE(0x909000, 0x909005) AM_WRITE(SMH_RAM) AM_BASE(&seta_vctrl_2		)	// VRAM 2&3 Ctrl
 	AM_RANGE(0xa0a000, 0xa0a607) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16		)	// RZ: Sprites Y
 	AM_RANGE(0xa80000, 0xa80001) AM_WRITE(SMH_RAM						)	// ? 0x4000
 	AM_RANGE(0xb0c000, 0xb0ffff) AM_WRITE(SMH_RAM) AM_BASE(&spriteram16_2		)	// RZ: Sprites Code + X + Attr
