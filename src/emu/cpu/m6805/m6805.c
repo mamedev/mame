@@ -45,6 +45,10 @@ enum
 /* 6805 Registers */
 typedef struct
 {
+	/* Pre-pointerafied public globals */
+	int iCount;
+	PAIR ea; 				/* effective address */
+
 	int 	subtype;		/* Which sub-type is being emulated */
 	UINT32	sp_mask;		/* Stack pointer address mask */
 	UINT32	sp_low; 		/* Stack pointer low water mark (or floor) */
@@ -62,25 +66,19 @@ typedef struct
 	int		nmi_state;
 } m6805_Regs;
 
-/* 6805 registers */
-static m6805_Regs m6805;
+#define SUBTYPE	cpustate->subtype	/* CPU Type */
+#define SP_MASK cpustate->sp_mask	/* stack pointer mask */
+#define SP_LOW	cpustate->sp_low	/* stack pointer low water mark */
+#define pPC 	cpustate->pc		/* program counter PAIR */
+#define PC		cpustate->pc.w.l	/* program counter lower word */
+#define S		cpustate->s.w.l 	/* stack pointer lower word */
+#define A		cpustate->a 		/* accumulator */
+#define X		cpustate->x 		/* index register */
+#define CC		cpustate->cc		/* condition codes */
 
-#define SUBTYPE	m6805.subtype	/* CPU Type */
-#define SP_MASK m6805.sp_mask	/* stack pointer mask */
-#define SP_LOW	m6805.sp_low	/* stack pointer low water mark */
-#define pPC 	m6805.pc		/* program counter PAIR */
-#define PC		m6805.pc.w.l	/* program counter lower word */
-#define S		m6805.s.w.l 	/* stack pointer lower word */
-#define A		m6805.a 		/* accumulator */
-#define X		m6805.x 		/* index register */
-#define CC		m6805.cc		/* condition codes */
+#define EAD cpustate->ea.d
+#define EA  cpustate->ea.w.l
 
-static PAIR ea; 		/* effective address */
-#define EAD ea.d
-#define EA  ea.w.l
-
-/* public globals */
-static int m6805_ICount=50000;
 
 /* DS -- THESE ARE RE-DEFINED IN m6805.h TO RAM, ROM or FUNCTIONS IN cpuintrf.c */
 #define RM(Addr)			M6805_RDMEM(Addr)
@@ -97,10 +95,10 @@ static int m6805_ICount=50000;
 #define IMMBYTE(b) {b = M_RDOP_ARG(PC++);}
 #define IMMWORD(w) {w.d = 0; w.b.h = M_RDOP_ARG(PC); w.b.l = M_RDOP_ARG(PC+1); PC+=2;}
 
-#define PUSHBYTE(b) wr_s_handler_b(&b)
-#define PUSHWORD(w) wr_s_handler_w(&w)
-#define PULLBYTE(b) rd_s_handler_b(&b)
-#define PULLWORD(w) rd_s_handler_w(&w)
+#define PUSHBYTE(b) wr_s_handler_b(cpustate, &b)
+#define PUSHWORD(w) wr_s_handler_w(cpustate, &w)
+#define PULLBYTE(b) rd_s_handler_b(cpustate, &b)
+#define PULLWORD(w) rd_s_handler_w(cpustate, &w)
 
 /* CC masks      H INZC
               7654 3210 */
@@ -172,12 +170,12 @@ static const UINT8 flags8d[256]= /* decrement */
 #define SIGNED(b) ((INT16)(b&0x80?b|0xff00:b))
 
 /* Macros for addressing modes */
-#define DIRECT EAD=0;IMMBYTE(ea.b.l)
+#define DIRECT EAD=0;IMMBYTE(cpustate->ea.b.l)
 #define IMM8 EA=PC++
-#define EXTENDED IMMWORD(ea)
+#define EXTENDED IMMWORD(cpustate->ea)
 #define INDEXED EA=X
-#define INDEXED1 {EAD=0; IMMBYTE(ea.b.l); EA+=X;}
-#define INDEXED2 {IMMWORD(ea); EA+=X;}
+#define INDEXED1 {EAD=0; IMMBYTE(cpustate->ea.b.l); EA+=X;}
+#define INDEXED2 {IMMWORD(cpustate->ea); EA+=X;}
 
 /* macros to set status flags */
 #if defined(SEC)
@@ -201,7 +199,7 @@ static const UINT8 flags8d[256]= /* decrement */
 #define IDX1BYTE(b) {INDEXED1;b=RM(EAD);}
 #define IDX2BYTE(b) {INDEXED2;b=RM(EAD);}
 /* Macros for branch instructions */
-#define BRANCH(f) { UINT8 t; IMMBYTE(t); if(f) { PC+=SIGNED(t); if (t==0xfe) { /* speed up busy loops */ if(m6805_ICount > 0) m6805_ICount = 0; } } }
+#define BRANCH(f) { UINT8 t; IMMBYTE(t); if(f) { PC+=SIGNED(t); if (t==0xfe) { /* speed up busy loops */ if(cpustate->iCount > 0) cpustate->iCount = 0; } } }
 
 /* what they say it is ... */
 static const unsigned char cycles1[] =
@@ -229,13 +227,13 @@ static const unsigned char cycles1[] =
 /* pre-clear a PAIR union; clearing h2 and h3 only might be faster? */
 #define CLEAR_PAIR(p)   p->d = 0
 
-INLINE void rd_s_handler_b( UINT8 *b )
+INLINE void rd_s_handler_b( m6805_Regs *cpustate, UINT8 *b )
 {
 	SP_INC;
 	*b = RM( S );
 }
 
-INLINE void rd_s_handler_w( PAIR *p )
+INLINE void rd_s_handler_w( m6805_Regs *cpustate, PAIR *p )
 {
 	CLEAR_PAIR(p);
 	SP_INC;
@@ -244,13 +242,13 @@ INLINE void rd_s_handler_w( PAIR *p )
 	p->b.l = RM( S );
 }
 
-INLINE void wr_s_handler_b( UINT8 *b )
+INLINE void wr_s_handler_b( m6805_Regs *cpustate, UINT8 *b )
 {
 	WM( S, *b );
 	SP_DEC;
 }
 
-INLINE void wr_s_handler_w( PAIR *p )
+INLINE void wr_s_handler_w( m6805_Regs *cpustate, PAIR *p )
 {
 	WM( S, p->b.l );
     SP_DEC;
@@ -258,7 +256,7 @@ INLINE void wr_s_handler_w( PAIR *p )
     SP_DEC;
 }
 
-INLINE void RM16( UINT32 Addr, PAIR *p )
+INLINE void RM16( m6805_Regs *cpustate, UINT32 Addr, PAIR *p )
 {
 	CLEAR_PAIR(p);
     p->b.h = RM(Addr);
@@ -268,7 +266,7 @@ INLINE void RM16( UINT32 Addr, PAIR *p )
 }
 
 #ifdef UNUSED_FUNCTION
-INLINE void WM16( UINT32 Addr, PAIR *p )
+INLINE void WM16( m6805_Regs *cpustate, UINT32 Addr, PAIR *p )
 {
 	WM( Addr, p->b.h );
     ++Addr;
@@ -280,65 +278,65 @@ INLINE void WM16( UINT32 Addr, PAIR *p )
 #if (HAS_M68705)
 
 /* Generate interrupt - m68705 version */
-static void m68705_Interrupt(void)
+static void m68705_Interrupt( m6805_Regs *cpustate )
 {
-	if( (m6805.pending_interrupts & ((1<<M6805_IRQ_LINE)|M68705_INT_MASK)) != 0 )
+	if( (cpustate->pending_interrupts & ((1<<M6805_IRQ_LINE)|M68705_INT_MASK)) != 0 )
 	{
 		if ( (CC & IFLAG) == 0 )
 		{
-			PUSHWORD(m6805.pc);
-			PUSHBYTE(m6805.x);
-			PUSHBYTE(m6805.a);
-			PUSHBYTE(m6805.cc);
+			PUSHWORD(cpustate->pc);
+			PUSHBYTE(cpustate->x);
+			PUSHBYTE(cpustate->a);
+			PUSHBYTE(cpustate->cc);
 			SEI;
-			if (m6805.irq_callback)
-				(*m6805.irq_callback)(m6805.device, 0);
+			if (cpustate->irq_callback)
+				(*cpustate->irq_callback)(cpustate->device, 0);
 
-			if ((m6805.pending_interrupts & (1<<M68705_IRQ_LINE)) != 0 )
+			if ((cpustate->pending_interrupts & (1<<M68705_IRQ_LINE)) != 0 )
 			{
-				m6805.pending_interrupts &= ~(1<<M68705_IRQ_LINE);
-				RM16( 0xfffa, &pPC);
+				cpustate->pending_interrupts &= ~(1<<M68705_IRQ_LINE);
+				RM16( cpustate, 0xfffa, &pPC);
 			}
-			else if((m6805.pending_interrupts&(1<<M68705_INT_TIMER))!=0)
+			else if((cpustate->pending_interrupts&(1<<M68705_INT_TIMER))!=0)
 			{
-				m6805.pending_interrupts &= ~(1<<M68705_INT_TIMER);
-				RM16( 0xfff8, &pPC);
+				cpustate->pending_interrupts &= ~(1<<M68705_INT_TIMER);
+				RM16( cpustate, 0xfff8, &pPC);
 			}
 		}
-		m6805_ICount -= 11;
+		cpustate->iCount -= 11;
 	}
 }
 #endif
 
 /* Generate interrupts */
-static void Interrupt(void)
+static void Interrupt( m6805_Regs *cpustate )
 {
 	/* the 6805 latches interrupt requests internally, so we don't clear */
 	/* pending_interrupts until the interrupt is taken, no matter what the */
 	/* external IRQ pin does. */
 
 #if (HAS_HD63705)
-	if( (m6805.pending_interrupts & (1<<HD63705_INT_NMI)) != 0)
+	if( (cpustate->pending_interrupts & (1<<HD63705_INT_NMI)) != 0)
 	{
-		PUSHWORD(m6805.pc);
-		PUSHBYTE(m6805.x);
-		PUSHBYTE(m6805.a);
-		PUSHBYTE(m6805.cc);
+		PUSHWORD(cpustate->pc);
+		PUSHBYTE(cpustate->x);
+		PUSHBYTE(cpustate->a);
+		PUSHBYTE(cpustate->cc);
         SEI;
 		/* no vectors supported, just do the callback to clear irq_state if needed */
-		if (m6805.irq_callback)
-			(*m6805.irq_callback)(m6805.device, 0);
+		if (cpustate->irq_callback)
+			(*cpustate->irq_callback)(cpustate->device, 0);
 
-		RM16( 0x1ffc, &pPC);
-		m6805.pending_interrupts &= ~(1<<HD63705_INT_NMI);
+		RM16( cpustate, 0x1ffc, &pPC);
+		cpustate->pending_interrupts &= ~(1<<HD63705_INT_NMI);
 
-		m6805_ICount -= 11;
+		cpustate->iCount -= 11;
 
 	}
-	else if( (m6805.pending_interrupts & ((1<<M6805_IRQ_LINE)|HD63705_INT_MASK)) != 0 ) {
+	else if( (cpustate->pending_interrupts & ((1<<M6805_IRQ_LINE)|HD63705_INT_MASK)) != 0 ) {
 		if ( (CC & IFLAG) == 0 ) {
 #else
-	if( (m6805.pending_interrupts & (1<<M6805_IRQ_LINE)) != 0 ) {
+	if( (cpustate->pending_interrupts & (1<<M6805_IRQ_LINE)) != 0 ) {
 		if ( (CC & IFLAG) == 0 ) {
 #endif
 	{
@@ -347,14 +345,14 @@ static void Interrupt(void)
 //      if(SUBTYPE!=SUBTYPE_HD63705)
 //#endif
 //          PC |= ~AMASK;
-		PUSHWORD(m6805.pc);
-		PUSHBYTE(m6805.x);
-		PUSHBYTE(m6805.a);
-		PUSHBYTE(m6805.cc);
+		PUSHWORD(cpustate->pc);
+		PUSHBYTE(cpustate->x);
+		PUSHBYTE(cpustate->a);
+		PUSHBYTE(cpustate->cc);
         SEI;
 		/* no vectors supported, just do the callback to clear irq_state if needed */
-		if (m6805.irq_callback)
-			(*m6805.irq_callback)(m6805.device, 0);
+		if (cpustate->irq_callback)
+			(*cpustate->irq_callback)(cpustate->device, 0);
 
 
 #if (HAS_HD63705)
@@ -363,95 +361,104 @@ static void Interrupt(void)
 			/* Need to add emulation of other interrupt sources here KW-2/4/99 */
 			/* This is just a quick patch for Namco System 2 operation         */
 
-			if((m6805.pending_interrupts&(1<<HD63705_INT_IRQ1))!=0)
+			if((cpustate->pending_interrupts&(1<<HD63705_INT_IRQ1))!=0)
 			{
-				m6805.pending_interrupts &= ~(1<<HD63705_INT_IRQ1);
-				RM16( 0x1ff8, &pPC);
+				cpustate->pending_interrupts &= ~(1<<HD63705_INT_IRQ1);
+				RM16( cpustate, 0x1ff8, &pPC);
 			}
-			else if((m6805.pending_interrupts&(1<<HD63705_INT_IRQ2))!=0)
+			else if((cpustate->pending_interrupts&(1<<HD63705_INT_IRQ2))!=0)
 			{
-				m6805.pending_interrupts &= ~(1<<HD63705_INT_IRQ2);
-				RM16( 0x1fec, &pPC);
+				cpustate->pending_interrupts &= ~(1<<HD63705_INT_IRQ2);
+				RM16( cpustate, 0x1fec, &pPC);
 			}
-			else if((m6805.pending_interrupts&(1<<HD63705_INT_ADCONV))!=0)
+			else if((cpustate->pending_interrupts&(1<<HD63705_INT_ADCONV))!=0)
 			{
-				m6805.pending_interrupts &= ~(1<<HD63705_INT_ADCONV);
-				RM16( 0x1fea, &pPC);
+				cpustate->pending_interrupts &= ~(1<<HD63705_INT_ADCONV);
+				RM16( cpustate, 0x1fea, &pPC);
 			}
-			else if((m6805.pending_interrupts&(1<<HD63705_INT_TIMER1))!=0)
+			else if((cpustate->pending_interrupts&(1<<HD63705_INT_TIMER1))!=0)
 			{
-				m6805.pending_interrupts &= ~(1<<HD63705_INT_TIMER1);
-				RM16( 0x1ff6, &pPC);
+				cpustate->pending_interrupts &= ~(1<<HD63705_INT_TIMER1);
+				RM16( cpustate, 0x1ff6, &pPC);
 			}
-			else if((m6805.pending_interrupts&(1<<HD63705_INT_TIMER2))!=0)
+			else if((cpustate->pending_interrupts&(1<<HD63705_INT_TIMER2))!=0)
 			{
-				m6805.pending_interrupts &= ~(1<<HD63705_INT_TIMER2);
-				RM16( 0x1ff4, &pPC);
+				cpustate->pending_interrupts &= ~(1<<HD63705_INT_TIMER2);
+				RM16( cpustate, 0x1ff4, &pPC);
 			}
-			else if((m6805.pending_interrupts&(1<<HD63705_INT_TIMER3))!=0)
+			else if((cpustate->pending_interrupts&(1<<HD63705_INT_TIMER3))!=0)
 			{
-				m6805.pending_interrupts &= ~(1<<HD63705_INT_TIMER3);
-				RM16( 0x1ff2, &pPC);
+				cpustate->pending_interrupts &= ~(1<<HD63705_INT_TIMER3);
+				RM16( cpustate, 0x1ff2, &pPC);
 			}
-			else if((m6805.pending_interrupts&(1<<HD63705_INT_PCI))!=0)
+			else if((cpustate->pending_interrupts&(1<<HD63705_INT_PCI))!=0)
 			{
-				m6805.pending_interrupts &= ~(1<<HD63705_INT_PCI);
-				RM16( 0x1ff0, &pPC);
+				cpustate->pending_interrupts &= ~(1<<HD63705_INT_PCI);
+				RM16( cpustate, 0x1ff0, &pPC);
 			}
-			else if((m6805.pending_interrupts&(1<<HD63705_INT_SCI))!=0)
+			else if((cpustate->pending_interrupts&(1<<HD63705_INT_SCI))!=0)
 			{
-				m6805.pending_interrupts &= ~(1<<HD63705_INT_SCI);
-				RM16( 0x1fee, &pPC);
+				cpustate->pending_interrupts &= ~(1<<HD63705_INT_SCI);
+				RM16( cpustate, 0x1fee, &pPC);
 			}
 		}
 		else
 #endif
 		{
-			RM16( 0xffff - 5, &pPC );
+			RM16( cpustate, 0xffff - 5, &pPC );
 		}
 
 		}	// CC & IFLAG
-			m6805.pending_interrupts &= ~(1<<M6805_IRQ_LINE);
+			cpustate->pending_interrupts &= ~(1<<M6805_IRQ_LINE);
 		}
-		m6805_ICount -= 11;
+		cpustate->iCount -= 11;
 	}
 }
 
-static void state_register(const char *type, const device_config *device)
+static void state_register(m6805_Regs *cpustate, const char *type, const device_config *device)
 {
 	state_save_register_device_item(device, 0, A);
 	state_save_register_device_item(device, 0, PC);
 	state_save_register_device_item(device, 0, S);
 	state_save_register_device_item(device, 0, X);
 	state_save_register_device_item(device, 0, CC);
-	state_save_register_device_item(device, 0, m6805.pending_interrupts);
-	state_save_register_device_item_array(device, 0, m6805.irq_state);
+	state_save_register_device_item(device, 0, cpustate->pending_interrupts);
+	state_save_register_device_item_array(device, 0, cpustate->irq_state);
 }
 
 static CPU_INIT( m6805 )
 {
-	state_register("m6805", device);
-	m6805.irq_callback = irqcallback;
-	m6805.device = device;
-	m6805.program = memory_find_address_space(m6805.device, ADDRESS_SPACE_PROGRAM);
+	m6805_Regs *cpustate = device->token;
+
+	state_register(cpustate, "m6805", device);
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(cpustate->device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_RESET( m6805 )
 {
-	cpu_irq_callback save_irqcallback = m6805.irq_callback;
-	memset(&m6805, 0, sizeof(m6805));
-	m6805.irq_callback = save_irqcallback;
-	m6805.device = device;
-	m6805.program = memory_find_address_space(m6805.device, ADDRESS_SPACE_PROGRAM);
+	m6805_Regs *cpustate = device->token;
+
+	cpu_irq_callback save_irqcallback = cpustate->irq_callback;
+	memset(cpustate, 0, sizeof(m6805_Regs));
+
+	cpustate->iCount=50000;		/* Used to be global */
+	cpustate->irq_callback = save_irqcallback;
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(cpustate->device, ADDRESS_SPACE_PROGRAM);
+
 	/* Force CPU sub-type and relevant masks */
-	m6805.subtype	= SUBTYPE_M6805;
+	cpustate->subtype = SUBTYPE_M6805;
 	SP_MASK = 0x07f;
 	SP_LOW	= 0x060;
+
 	/* Initial stack pointer */
 	S = SP_MASK;
+
 	/* IRQ disabled */
     SEI;
-	RM16( 0xfffe , &pPC );
+	RM16( cpustate, 0xfffe, &pPC );
 }
 
 static CPU_EXIT( m6805 )
@@ -462,35 +469,23 @@ static CPU_EXIT( m6805 )
 /****************************************************************************
  * Get all registers in given buffer
  ****************************************************************************/
-static CPU_GET_CONTEXT( m6805 )
-{
-	if( dst )
-		*(m6805_Regs*)dst = m6805;
-}
-
+static CPU_GET_CONTEXT( m6805 ) { }
 
 /****************************************************************************
  * Set all registers to given values
  ****************************************************************************/
-static CPU_SET_CONTEXT( m6805 )
-{
-	if( src )
-	{
-		m6805 = *(m6805_Regs*)src;
-		S = SP_ADJUST( S );
-	}
-}
+static CPU_SET_CONTEXT( m6805 ) { }
 
 
-static void set_irq_line(int irqline, int state)
+static void set_irq_line( m6805_Regs *cpustate,	int irqline, int state )
 {
 	/* Basic 6805 only has one IRQ line */
 	/* See HD63705 specific version     */
-	if (m6805.irq_state[0] == state) return;
+	if (cpustate->irq_state[0] == state) return;
 
-	m6805.irq_state[0] = state;
+	cpustate->irq_state[0] = state;
 	if (state != CLEAR_LINE)
-		m6805.pending_interrupts |= 1<<M6805_IRQ_LINE;
+		cpustate->pending_interrupts |= 1<<M6805_IRQ_LINE;
 }
 
 #include "6805ops.c"
@@ -500,21 +495,24 @@ static void set_irq_line(int irqline, int state)
 static CPU_EXECUTE( m6805 )
 {
 	UINT8 ireg;
-	m6805_ICount = cycles;
+	m6805_Regs *cpustate = device->token;
+
+	S = SP_ADJUST( S );		/* Taken from CPU_SET_CONTEXT when pointer'afying */
+	cpustate->iCount = cycles;
 
 	do
 	{
-		if (m6805.pending_interrupts != 0)
+		if (cpustate->pending_interrupts != 0)
 		{
 #if (HAS_M68705)
 			if (SUBTYPE==SUBTYPE_M68705)
 			{
-				m68705_Interrupt();
+				m68705_Interrupt(cpustate);
 			}
 			else
 #endif
 			{
-				Interrupt();
+				Interrupt(cpustate);
 			}
 		}
 
@@ -524,158 +522,158 @@ static CPU_EXECUTE( m6805 )
 
 		switch( ireg )
 		{
-			case 0x00: brset(0x01); break;
-			case 0x01: brclr(0x01); break;
-			case 0x02: brset(0x02); break;
-			case 0x03: brclr(0x02); break;
-			case 0x04: brset(0x04); break;
-			case 0x05: brclr(0x04); break;
-			case 0x06: brset(0x08); break;
-			case 0x07: brclr(0x08); break;
-			case 0x08: brset(0x10); break;
-			case 0x09: brclr(0x10); break;
-			case 0x0A: brset(0x20); break;
-			case 0x0B: brclr(0x20); break;
-			case 0x0C: brset(0x40); break;
-			case 0x0D: brclr(0x40); break;
-			case 0x0E: brset(0x80); break;
-			case 0x0F: brclr(0x80); break;
-			case 0x10: bset(0x01); break;
-			case 0x11: bclr(0x01); break;
-			case 0x12: bset(0x02); break;
-			case 0x13: bclr(0x02); break;
-			case 0x14: bset(0x04); break;
-			case 0x15: bclr(0x04); break;
-			case 0x16: bset(0x08); break;
-			case 0x17: bclr(0x08); break;
-			case 0x18: bset(0x10); break;
-			case 0x19: bclr(0x10); break;
-			case 0x1a: bset(0x20); break;
-			case 0x1b: bclr(0x20); break;
-			case 0x1c: bset(0x40); break;
-			case 0x1d: bclr(0x40); break;
-			case 0x1e: bset(0x80); break;
-			case 0x1f: bclr(0x80); break;
-			case 0x20: bra(); break;
-			case 0x21: brn(); break;
-			case 0x22: bhi(); break;
-			case 0x23: bls(); break;
-			case 0x24: bcc(); break;
-			case 0x25: bcs(); break;
-			case 0x26: bne(); break;
-			case 0x27: beq(); break;
-			case 0x28: bhcc(); break;
-			case 0x29: bhcs(); break;
-			case 0x2a: bpl(); break;
-			case 0x2b: bmi(); break;
-			case 0x2c: bmc(); break;
-			case 0x2d: bms(); break;
-			case 0x2e: bil(); break;
-			case 0x2f: bih(); break;
-			case 0x30: neg_di(); break;
-			case 0x31: illegal(); break;
-			case 0x32: illegal(); break;
-			case 0x33: com_di(); break;
-			case 0x34: lsr_di(); break;
-			case 0x35: illegal(); break;
-			case 0x36: ror_di(); break;
-			case 0x37: asr_di(); break;
-			case 0x38: lsl_di(); break;
-			case 0x39: rol_di(); break;
-			case 0x3a: dec_di(); break;
-			case 0x3b: illegal(); break;
-			case 0x3c: inc_di(); break;
-			case 0x3d: tst_di(); break;
-			case 0x3e: illegal(); break;
-			case 0x3f: clr_di(); break;
-			case 0x40: nega(); break;
-			case 0x41: illegal(); break;
-			case 0x42: illegal(); break;
-			case 0x43: coma(); break;
-			case 0x44: lsra(); break;
-			case 0x45: illegal(); break;
-			case 0x46: rora(); break;
-			case 0x47: asra(); break;
-			case 0x48: lsla(); break;
-			case 0x49: rola(); break;
-			case 0x4a: deca(); break;
-			case 0x4b: illegal(); break;
-			case 0x4c: inca(); break;
-			case 0x4d: tsta(); break;
-			case 0x4e: illegal(); break;
-			case 0x4f: clra(); break;
-			case 0x50: negx(); break;
-			case 0x51: illegal(); break;
-			case 0x52: illegal(); break;
-			case 0x53: comx(); break;
-			case 0x54: lsrx(); break;
-			case 0x55: illegal(); break;
-			case 0x56: rorx(); break;
-			case 0x57: asrx(); break;
-			case 0x58: aslx(); break;
-			case 0x59: rolx(); break;
-			case 0x5a: decx(); break;
-			case 0x5b: illegal(); break;
-			case 0x5c: incx(); break;
-			case 0x5d: tstx(); break;
-			case 0x5e: illegal(); break;
-			case 0x5f: clrx(); break;
-			case 0x60: neg_ix1(); break;
-			case 0x61: illegal(); break;
-			case 0x62: illegal(); break;
-			case 0x63: com_ix1(); break;
-			case 0x64: lsr_ix1(); break;
-			case 0x65: illegal(); break;
-			case 0x66: ror_ix1(); break;
-			case 0x67: asr_ix1(); break;
-			case 0x68: lsl_ix1(); break;
-			case 0x69: rol_ix1(); break;
-			case 0x6a: dec_ix1(); break;
-			case 0x6b: illegal(); break;
-			case 0x6c: inc_ix1(); break;
-			case 0x6d: tst_ix1(); break;
-			case 0x6e: illegal(); break;
-			case 0x6f: clr_ix1(); break;
-			case 0x70: neg_ix(); break;
-			case 0x71: illegal(); break;
-			case 0x72: illegal(); break;
-			case 0x73: com_ix(); break;
-			case 0x74: lsr_ix(); break;
-			case 0x75: illegal(); break;
-			case 0x76: ror_ix(); break;
-			case 0x77: asr_ix(); break;
-			case 0x78: lsl_ix(); break;
-			case 0x79: rol_ix(); break;
-			case 0x7a: dec_ix(); break;
-			case 0x7b: illegal(); break;
-			case 0x7c: inc_ix(); break;
-			case 0x7d: tst_ix(); break;
-			case 0x7e: illegal(); break;
-			case 0x7f: clr_ix(); break;
-			case 0x80: rti(); break;
-			case 0x81: rts(); break;
-			case 0x82: illegal(); break;
-			case 0x83: swi(); break;
-			case 0x84: illegal(); break;
-			case 0x85: illegal(); break;
-			case 0x86: illegal(); break;
-			case 0x87: illegal(); break;
-			case 0x88: illegal(); break;
-			case 0x89: illegal(); break;
-			case 0x8a: illegal(); break;
-			case 0x8b: illegal(); break;
-			case 0x8c: illegal(); break;
-			case 0x8d: illegal(); break;
-			case 0x8e: illegal(); break;
-			case 0x8f: illegal(); break;
-			case 0x90: illegal(); break;
-			case 0x91: illegal(); break;
-			case 0x92: illegal(); break;
-			case 0x93: illegal(); break;
-			case 0x94: illegal(); break;
-			case 0x95: illegal(); break;
-			case 0x96: illegal(); break;
-			case 0x97: tax(); break;
+			case 0x00: brset(cpustate, 0x01); break;
+			case 0x01: brclr(cpustate, 0x01); break;
+			case 0x02: brset(cpustate, 0x02); break;
+			case 0x03: brclr(cpustate, 0x02); break;
+			case 0x04: brset(cpustate, 0x04); break;
+			case 0x05: brclr(cpustate, 0x04); break;
+			case 0x06: brset(cpustate, 0x08); break;
+			case 0x07: brclr(cpustate, 0x08); break;
+			case 0x08: brset(cpustate, 0x10); break;
+			case 0x09: brclr(cpustate, 0x10); break;
+			case 0x0A: brset(cpustate, 0x20); break;
+			case 0x0B: brclr(cpustate, 0x20); break;
+			case 0x0C: brset(cpustate, 0x40); break;
+			case 0x0D: brclr(cpustate, 0x40); break;
+			case 0x0E: brset(cpustate, 0x80); break;
+			case 0x0F: brclr(cpustate, 0x80); break;
+			case 0x10: bset(cpustate, 0x01); break;
+			case 0x11: bclr(cpustate, 0x01); break;
+			case 0x12: bset(cpustate, 0x02); break;
+			case 0x13: bclr(cpustate, 0x02); break;
+			case 0x14: bset(cpustate, 0x04); break;
+			case 0x15: bclr(cpustate, 0x04); break;
+			case 0x16: bset(cpustate, 0x08); break;
+			case 0x17: bclr(cpustate, 0x08); break;
+			case 0x18: bset(cpustate, 0x10); break;
+			case 0x19: bclr(cpustate, 0x10); break;
+			case 0x1a: bset(cpustate, 0x20); break;
+			case 0x1b: bclr(cpustate, 0x20); break;
+			case 0x1c: bset(cpustate, 0x40); break;
+			case 0x1d: bclr(cpustate, 0x40); break;
+			case 0x1e: bset(cpustate, 0x80); break;
+			case 0x1f: bclr(cpustate, 0x80); break;
+			case 0x20: bra(cpustate); break;
+			case 0x21: brn(cpustate); break;
+			case 0x22: bhi(cpustate); break;
+			case 0x23: bls(cpustate); break;
+			case 0x24: bcc(cpustate); break;
+			case 0x25: bcs(cpustate); break;
+			case 0x26: bne(cpustate); break;
+			case 0x27: beq(cpustate); break;
+			case 0x28: bhcc(cpustate); break;
+			case 0x29: bhcs(cpustate); break;
+			case 0x2a: bpl(cpustate); break;
+			case 0x2b: bmi(cpustate); break;
+			case 0x2c: bmc(cpustate); break;
+			case 0x2d: bms(cpustate); break;
+			case 0x2e: bil(cpustate); break;
+			case 0x2f: bih(cpustate); break;
+			case 0x30: neg_di(cpustate); break;
+			case 0x31: illegal(cpustate); break;
+			case 0x32: illegal(cpustate); break;
+			case 0x33: com_di(cpustate); break;
+			case 0x34: lsr_di(cpustate); break;
+			case 0x35: illegal(cpustate); break;
+			case 0x36: ror_di(cpustate); break;
+			case 0x37: asr_di(cpustate); break;
+			case 0x38: lsl_di(cpustate); break;
+			case 0x39: rol_di(cpustate); break;
+			case 0x3a: dec_di(cpustate); break;
+			case 0x3b: illegal(cpustate); break;
+			case 0x3c: inc_di(cpustate); break;
+			case 0x3d: tst_di(cpustate); break;
+			case 0x3e: illegal(cpustate); break;
+			case 0x3f: clr_di(cpustate); break;
+			case 0x40: nega(cpustate); break;
+			case 0x41: illegal(cpustate); break;
+			case 0x42: illegal(cpustate); break;
+			case 0x43: coma(cpustate); break;
+			case 0x44: lsra(cpustate); break;
+			case 0x45: illegal(cpustate); break;
+			case 0x46: rora(cpustate); break;
+			case 0x47: asra(cpustate); break;
+			case 0x48: lsla(cpustate); break;
+			case 0x49: rola(cpustate); break;
+			case 0x4a: deca(cpustate); break;
+			case 0x4b: illegal(cpustate); break;
+			case 0x4c: inca(cpustate); break;
+			case 0x4d: tsta(cpustate); break;
+			case 0x4e: illegal(cpustate); break;
+			case 0x4f: clra(cpustate); break;
+			case 0x50: negx(cpustate); break;
+			case 0x51: illegal(cpustate); break;
+			case 0x52: illegal(cpustate); break;
+			case 0x53: comx(cpustate); break;
+			case 0x54: lsrx(cpustate); break;
+			case 0x55: illegal(cpustate); break;
+			case 0x56: rorx(cpustate); break;
+			case 0x57: asrx(cpustate); break;
+			case 0x58: aslx(cpustate); break;
+			case 0x59: rolx(cpustate); break;
+			case 0x5a: decx(cpustate); break;
+			case 0x5b: illegal(cpustate); break;
+			case 0x5c: incx(cpustate); break;
+			case 0x5d: tstx(cpustate); break;
+			case 0x5e: illegal(cpustate); break;
+			case 0x5f: clrx(cpustate); break;
+			case 0x60: neg_ix1(cpustate); break;
+			case 0x61: illegal(cpustate); break;
+			case 0x62: illegal(cpustate); break;
+			case 0x63: com_ix1(cpustate); break;
+			case 0x64: lsr_ix1(cpustate); break;
+			case 0x65: illegal(cpustate); break;
+			case 0x66: ror_ix1(cpustate); break;
+			case 0x67: asr_ix1(cpustate); break;
+			case 0x68: lsl_ix1(cpustate); break;
+			case 0x69: rol_ix1(cpustate); break;
+			case 0x6a: dec_ix1(cpustate); break;
+			case 0x6b: illegal(cpustate); break;
+			case 0x6c: inc_ix1(cpustate); break;
+			case 0x6d: tst_ix1(cpustate); break;
+			case 0x6e: illegal(cpustate); break;
+			case 0x6f: clr_ix1(cpustate); break;
+			case 0x70: neg_ix(cpustate); break;
+			case 0x71: illegal(cpustate); break;
+			case 0x72: illegal(cpustate); break;
+			case 0x73: com_ix(cpustate); break;
+			case 0x74: lsr_ix(cpustate); break;
+			case 0x75: illegal(cpustate); break;
+			case 0x76: ror_ix(cpustate); break;
+			case 0x77: asr_ix(cpustate); break;
+			case 0x78: lsl_ix(cpustate); break;
+			case 0x79: rol_ix(cpustate); break;
+			case 0x7a: dec_ix(cpustate); break;
+			case 0x7b: illegal(cpustate); break;
+			case 0x7c: inc_ix(cpustate); break;
+			case 0x7d: tst_ix(cpustate); break;
+			case 0x7e: illegal(cpustate); break;
+			case 0x7f: clr_ix(cpustate); break;
+			case 0x80: rti(cpustate); break;
+			case 0x81: rts(cpustate); break;
+			case 0x82: illegal(cpustate); break;
+			case 0x83: swi(cpustate); break;
+			case 0x84: illegal(cpustate); break;
+			case 0x85: illegal(cpustate); break;
+			case 0x86: illegal(cpustate); break;
+			case 0x87: illegal(cpustate); break;
+			case 0x88: illegal(cpustate); break;
+			case 0x89: illegal(cpustate); break;
+			case 0x8a: illegal(cpustate); break;
+			case 0x8b: illegal(cpustate); break;
+			case 0x8c: illegal(cpustate); break;
+			case 0x8d: illegal(cpustate); break;
+			case 0x8e: illegal(cpustate); break;
+			case 0x8f: illegal(cpustate); break;
+			case 0x90: illegal(cpustate); break;
+			case 0x91: illegal(cpustate); break;
+			case 0x92: illegal(cpustate); break;
+			case 0x93: illegal(cpustate); break;
+			case 0x94: illegal(cpustate); break;
+			case 0x95: illegal(cpustate); break;
+			case 0x96: illegal(cpustate); break;
+			case 0x97: tax(cpustate); break;
 			case 0x98: CLC; break;
 			case 0x99: SEC; break;
 #if IRQ_LEVEL_DETECT
@@ -684,111 +682,111 @@ static CPU_EXECUTE( m6805 )
 			case 0x9a: CLI; break;
 #endif
 			case 0x9b: SEI; break;
-			case 0x9c: rsp(); break;
-			case 0x9d: nop(); break;
-			case 0x9e: illegal(); break;
-			case 0x9f: txa(); break;
-			case 0xa0: suba_im(); break;
-			case 0xa1: cmpa_im(); break;
-			case 0xa2: sbca_im(); break;
-			case 0xa3: cpx_im(); break;
-			case 0xa4: anda_im(); break;
-			case 0xa5: bita_im(); break;
-			case 0xa6: lda_im(); break;
-			case 0xa7: illegal(); break;
-			case 0xa8: eora_im(); break;
-			case 0xa9: adca_im(); break;
-			case 0xaa: ora_im(); break;
-			case 0xab: adda_im(); break;
-			case 0xac: illegal(); break;
-			case 0xad: bsr(); break;
-			case 0xae: ldx_im(); break;
-			case 0xaf: illegal(); break;
-			case 0xb0: suba_di(); break;
-			case 0xb1: cmpa_di(); break;
-			case 0xb2: sbca_di(); break;
-			case 0xb3: cpx_di(); break;
-			case 0xb4: anda_di(); break;
-			case 0xb5: bita_di(); break;
-			case 0xb6: lda_di(); break;
-			case 0xb7: sta_di(); break;
-			case 0xb8: eora_di(); break;
-			case 0xb9: adca_di(); break;
-			case 0xba: ora_di(); break;
-			case 0xbb: adda_di(); break;
-			case 0xbc: jmp_di(); break;
-			case 0xbd: jsr_di(); break;
-			case 0xbe: ldx_di(); break;
-			case 0xbf: stx_di(); break;
-			case 0xc0: suba_ex(); break;
-			case 0xc1: cmpa_ex(); break;
-			case 0xc2: sbca_ex(); break;
-			case 0xc3: cpx_ex(); break;
-			case 0xc4: anda_ex(); break;
-			case 0xc5: bita_ex(); break;
-			case 0xc6: lda_ex(); break;
-			case 0xc7: sta_ex(); break;
-			case 0xc8: eora_ex(); break;
-			case 0xc9: adca_ex(); break;
-			case 0xca: ora_ex(); break;
-			case 0xcb: adda_ex(); break;
-			case 0xcc: jmp_ex(); break;
-			case 0xcd: jsr_ex(); break;
-			case 0xce: ldx_ex(); break;
-			case 0xcf: stx_ex(); break;
-			case 0xd0: suba_ix2(); break;
-			case 0xd1: cmpa_ix2(); break;
-			case 0xd2: sbca_ix2(); break;
-			case 0xd3: cpx_ix2(); break;
-			case 0xd4: anda_ix2(); break;
-			case 0xd5: bita_ix2(); break;
-			case 0xd6: lda_ix2(); break;
-			case 0xd7: sta_ix2(); break;
-			case 0xd8: eora_ix2(); break;
-			case 0xd9: adca_ix2(); break;
-			case 0xda: ora_ix2(); break;
-			case 0xdb: adda_ix2(); break;
-			case 0xdc: jmp_ix2(); break;
-			case 0xdd: jsr_ix2(); break;
-			case 0xde: ldx_ix2(); break;
-			case 0xdf: stx_ix2(); break;
-			case 0xe0: suba_ix1(); break;
-			case 0xe1: cmpa_ix1(); break;
-			case 0xe2: sbca_ix1(); break;
-			case 0xe3: cpx_ix1(); break;
-			case 0xe4: anda_ix1(); break;
-			case 0xe5: bita_ix1(); break;
-			case 0xe6: lda_ix1(); break;
-			case 0xe7: sta_ix1(); break;
-			case 0xe8: eora_ix1(); break;
-			case 0xe9: adca_ix1(); break;
-			case 0xea: ora_ix1(); break;
-			case 0xeb: adda_ix1(); break;
-			case 0xec: jmp_ix1(); break;
-			case 0xed: jsr_ix1(); break;
-			case 0xee: ldx_ix1(); break;
-			case 0xef: stx_ix1(); break;
-			case 0xf0: suba_ix(); break;
-			case 0xf1: cmpa_ix(); break;
-			case 0xf2: sbca_ix(); break;
-			case 0xf3: cpx_ix(); break;
-			case 0xf4: anda_ix(); break;
-			case 0xf5: bita_ix(); break;
-			case 0xf6: lda_ix(); break;
-			case 0xf7: sta_ix(); break;
-			case 0xf8: eora_ix(); break;
-			case 0xf9: adca_ix(); break;
-			case 0xfa: ora_ix(); break;
-			case 0xfb: adda_ix(); break;
-			case 0xfc: jmp_ix(); break;
-			case 0xfd: jsr_ix(); break;
-			case 0xfe: ldx_ix(); break;
-			case 0xff: stx_ix(); break;
+			case 0x9c: rsp(cpustate); break;
+			case 0x9d: nop(cpustate); break;
+			case 0x9e: illegal(cpustate); break;
+			case 0x9f: txa(cpustate); break;
+			case 0xa0: suba_im(cpustate); break;
+			case 0xa1: cmpa_im(cpustate); break;
+			case 0xa2: sbca_im(cpustate); break;
+			case 0xa3: cpx_im(cpustate); break;
+			case 0xa4: anda_im(cpustate); break;
+			case 0xa5: bita_im(cpustate); break;
+			case 0xa6: lda_im(cpustate); break;
+			case 0xa7: illegal(cpustate); break;
+			case 0xa8: eora_im(cpustate); break;
+			case 0xa9: adca_im(cpustate); break;
+			case 0xaa: ora_im(cpustate); break;
+			case 0xab: adda_im(cpustate); break;
+			case 0xac: illegal(cpustate); break;
+			case 0xad: bsr(cpustate); break;
+			case 0xae: ldx_im(cpustate); break;
+			case 0xaf: illegal(cpustate); break;
+			case 0xb0: suba_di(cpustate); break;
+			case 0xb1: cmpa_di(cpustate); break;
+			case 0xb2: sbca_di(cpustate); break;
+			case 0xb3: cpx_di(cpustate); break;
+			case 0xb4: anda_di(cpustate); break;
+			case 0xb5: bita_di(cpustate); break;
+			case 0xb6: lda_di(cpustate); break;
+			case 0xb7: sta_di(cpustate); break;
+			case 0xb8: eora_di(cpustate); break;
+			case 0xb9: adca_di(cpustate); break;
+			case 0xba: ora_di(cpustate); break;
+			case 0xbb: adda_di(cpustate); break;
+			case 0xbc: jmp_di(cpustate); break;
+			case 0xbd: jsr_di(cpustate); break;
+			case 0xbe: ldx_di(cpustate); break;
+			case 0xbf: stx_di(cpustate); break;
+			case 0xc0: suba_ex(cpustate); break;
+			case 0xc1: cmpa_ex(cpustate); break;
+			case 0xc2: sbca_ex(cpustate); break;
+			case 0xc3: cpx_ex(cpustate); break;
+			case 0xc4: anda_ex(cpustate); break;
+			case 0xc5: bita_ex(cpustate); break;
+			case 0xc6: lda_ex(cpustate); break;
+			case 0xc7: sta_ex(cpustate); break;
+			case 0xc8: eora_ex(cpustate); break;
+			case 0xc9: adca_ex(cpustate); break;
+			case 0xca: ora_ex(cpustate); break;
+			case 0xcb: adda_ex(cpustate); break;
+			case 0xcc: jmp_ex(cpustate); break;
+			case 0xcd: jsr_ex(cpustate); break;
+			case 0xce: ldx_ex(cpustate); break;
+			case 0xcf: stx_ex(cpustate); break;
+			case 0xd0: suba_ix2(cpustate); break;
+			case 0xd1: cmpa_ix2(cpustate); break;
+			case 0xd2: sbca_ix2(cpustate); break;
+			case 0xd3: cpx_ix2(cpustate); break;
+			case 0xd4: anda_ix2(cpustate); break;
+			case 0xd5: bita_ix2(cpustate); break;
+			case 0xd6: lda_ix2(cpustate); break;
+			case 0xd7: sta_ix2(cpustate); break;
+			case 0xd8: eora_ix2(cpustate); break;
+			case 0xd9: adca_ix2(cpustate); break;
+			case 0xda: ora_ix2(cpustate); break;
+			case 0xdb: adda_ix2(cpustate); break;
+			case 0xdc: jmp_ix2(cpustate); break;
+			case 0xdd: jsr_ix2(cpustate); break;
+			case 0xde: ldx_ix2(cpustate); break;
+			case 0xdf: stx_ix2(cpustate); break;
+			case 0xe0: suba_ix1(cpustate); break;
+			case 0xe1: cmpa_ix1(cpustate); break;
+			case 0xe2: sbca_ix1(cpustate); break;
+			case 0xe3: cpx_ix1(cpustate); break;
+			case 0xe4: anda_ix1(cpustate); break;
+			case 0xe5: bita_ix1(cpustate); break;
+			case 0xe6: lda_ix1(cpustate); break;
+			case 0xe7: sta_ix1(cpustate); break;
+			case 0xe8: eora_ix1(cpustate); break;
+			case 0xe9: adca_ix1(cpustate); break;
+			case 0xea: ora_ix1(cpustate); break;
+			case 0xeb: adda_ix1(cpustate); break;
+			case 0xec: jmp_ix1(cpustate); break;
+			case 0xed: jsr_ix1(cpustate); break;
+			case 0xee: ldx_ix1(cpustate); break;
+			case 0xef: stx_ix1(cpustate); break;
+			case 0xf0: suba_ix(cpustate); break;
+			case 0xf1: cmpa_ix(cpustate); break;
+			case 0xf2: sbca_ix(cpustate); break;
+			case 0xf3: cpx_ix(cpustate); break;
+			case 0xf4: anda_ix(cpustate); break;
+			case 0xf5: bita_ix(cpustate); break;
+			case 0xf6: lda_ix(cpustate); break;
+			case 0xf7: sta_ix(cpustate); break;
+			case 0xf8: eora_ix(cpustate); break;
+			case 0xf9: adca_ix(cpustate); break;
+			case 0xfa: ora_ix(cpustate); break;
+			case 0xfb: adda_ix(cpustate); break;
+			case 0xfc: jmp_ix(cpustate); break;
+			case 0xfd: jsr_ix(cpustate); break;
+			case 0xfe: ldx_ix(cpustate); break;
+			case 0xff: stx_ix(cpustate); break;
 		}
-		m6805_ICount -= cycles1[ireg];
-	} while( m6805_ICount > 0 );
+		cpustate->iCount -= cycles1[ireg];
+	} while( cpustate->iCount > 0 );
 
-	return cycles - m6805_ICount;
+	return cycles - cpustate->iCount;
 }
 
 /****************************************************************************
@@ -797,24 +795,27 @@ static CPU_EXECUTE( m6805 )
 #if (HAS_M68705)
 static CPU_INIT( m68705 )
 {
-	state_register("m68705", device);
-	m6805.irq_callback = irqcallback;
-	m6805.device = device;
+	m6805_Regs *cpustate = device->token;
+	state_register(cpustate, "m68705", device);
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
 }
 
 static CPU_RESET( m68705 )
 {
+	m6805_Regs *cpustate = device->token;
 	CPU_RESET_CALL(m6805);
+
 	/* Overide default 6805 type */
-	m6805.subtype = SUBTYPE_M68705;
-	RM16( 0xfffe, &m6805.pc );
+	cpustate->subtype = SUBTYPE_M68705;
+	RM16( cpustate, 0xfffe, &cpustate->pc );
 }
 
-static void m68705_set_irq_line(int irqline, int state)
+static void m68705_set_irq_line(m6805_Regs *cpustate, int irqline, int state)
 {
-	if (m6805.irq_state[irqline] == state ) return;
-	m6805.irq_state[irqline] = state;
-	if (state != CLEAR_LINE) m6805.pending_interrupts |= 1<<irqline;
+	if (cpustate->irq_state[irqline] == state ) return;
+	cpustate->irq_state[irqline] = state;
+	if (state != CLEAR_LINE) cpustate->pending_interrupts |= 1<<irqline;
 }
 
 #endif
@@ -825,38 +826,40 @@ static void m68705_set_irq_line(int irqline, int state)
 #if (HAS_HD63705)
 static CPU_INIT( hd63705 )
 {
-	state_register("hd63705", device);
-	m6805.irq_callback = irqcallback;
-	m6805.device = device;
+	m6805_Regs *cpustate = device->token;
+	state_register(cpustate, "hd63705", device);
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
 }
 
 static CPU_RESET( hd63705 )
 {
+	m6805_Regs *cpustate = device->token;
 	CPU_RESET_CALL(m6805);
 
 	/* Overide default 6805 types */
-	m6805.subtype	= SUBTYPE_HD63705;
+	cpustate->subtype = SUBTYPE_HD63705;
 	SP_MASK = 0x17f;
 	SP_LOW	= 0x100;
-	RM16( 0x1ffe, &m6805.pc );
+	RM16( cpustate, 0x1ffe, &cpustate->pc );
 	S = 0x17f;
 }
 
-static void hd63705_set_irq_line(int irqline, int state)
+static void hd63705_set_irq_line(m6805_Regs *cpustate, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
-		if (m6805.nmi_state == state) return;
+		if (cpustate->nmi_state == state) return;
 
-		m6805.nmi_state = state;
+		cpustate->nmi_state = state;
 		if (state != CLEAR_LINE)
-			m6805.pending_interrupts |= 1<<HD63705_INT_NMI;
+			cpustate->pending_interrupts |= 1<<HD63705_INT_NMI;
 	}
 	else if (irqline <= HD63705_INT_ADCONV)
 	{
-		if (m6805.irq_state[irqline] == state) return;
-		m6805.irq_state[irqline] = state;
-		if (state != CLEAR_LINE) m6805.pending_interrupts |= 1<<irqline;
+		if (cpustate->irq_state[irqline] == state) return;
+		cpustate->irq_state[irqline] = state;
+		if (state != CLEAR_LINE) cpustate->pending_interrupts |= 1<<irqline;
 	}
 }
 #endif
@@ -869,18 +872,20 @@ static void hd63705_set_irq_line(int irqline, int state)
 
 static CPU_SET_INFO( m6805 )
 {
+	m6805_Regs *cpustate = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M6805_IRQ_LINE:	set_irq_line(M6805_IRQ_LINE, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + M6805_IRQ_LINE:	set_irq_line(cpustate, M6805_IRQ_LINE, info->i); break;
 
-		case CPUINFO_INT_REGISTER + M6805_A:			A = info->i;							break;
+		case CPUINFO_INT_REGISTER + M6805_A:			A = info->i;			break;
 		case CPUINFO_INT_PC:
-		case CPUINFO_INT_REGISTER + M6805_PC:			PC = info->i; 				 			break;
+		case CPUINFO_INT_REGISTER + M6805_PC:			PC = info->i; 			break;
 		case CPUINFO_INT_SP:
-		case CPUINFO_INT_REGISTER + M6805_S:			S = SP_ADJUST(info->i);					break;
-		case CPUINFO_INT_REGISTER + M6805_X:			X = info->i;							break;
-		case CPUINFO_INT_REGISTER + M6805_CC:			CC = info->i;							break;
+		case CPUINFO_INT_REGISTER + M6805_S:			S = SP_ADJUST(info->i);	break;
+		case CPUINFO_INT_REGISTER + M6805_X:			X = info->i;			break;
+		case CPUINFO_INT_REGISTER + M6805_CC:			CC = info->i;			break;
 	}
 }
 
@@ -892,13 +897,15 @@ static CPU_SET_INFO( m6805 )
 
 CPU_GET_INFO( m6805 )
 {
+	m6805_Regs *cpustate = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6805);				break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(m6805_Regs);			break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;					break;
+		case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;				break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 4;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
@@ -916,7 +923,7 @@ CPU_GET_INFO( m6805 )
 		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 		case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + M6805_IRQ_LINE:	info->i = m6805.irq_state[M6805_IRQ_LINE]; break;
+		case CPUINFO_INT_INPUT_STATE + M6805_IRQ_LINE:	info->i = cpustate->irq_state[M6805_IRQ_LINE]; break;
 
 		case CPUINFO_INT_PREVIOUSPC:					/* not implemented */					break;
 
@@ -929,41 +936,41 @@ CPU_GET_INFO( m6805 )
 		case CPUINFO_INT_REGISTER + M6805_CC:			info->i = CC;							break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6805);			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m6805);		break;
 		case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(m6805);	break;
 		case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(m6805);	break;
 		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m6805);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6805);				break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m6805);			break;
 		case CPUINFO_PTR_EXIT:							info->exit = CPU_EXIT_NAME(m6805);				break;
-		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6805);			break;
-		case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
-		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6805);			break;
-		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &m6805_ICount;			break;
+		case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(m6805);		break;
+		case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
+		case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(m6805);break;
+		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->iCount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M6805");				break;
-		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 6805");		break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
-		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);				break;
-		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "The MAME team.");		break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "M6805");			break;
+		case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "Motorola 6805");	break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");				break;
+		case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);			break;
+		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "The MAME team.");	break;
 
 		case CPUINFO_STR_FLAGS:
 			sprintf(info->s, "%c%c%c%c%c%c%c%c",
-				m6805.cc & 0x80 ? '?':'.',
-                m6805.cc & 0x40 ? '?':'.',
-                m6805.cc & 0x20 ? '?':'.',
-                m6805.cc & 0x10 ? 'H':'.',
-                m6805.cc & 0x08 ? 'I':'.',
-                m6805.cc & 0x04 ? 'N':'.',
-                m6805.cc & 0x02 ? 'Z':'.',
-                m6805.cc & 0x01 ? 'C':'.');
+				cpustate->cc & 0x80 ? '?':'.',
+                cpustate->cc & 0x40 ? '?':'.',
+                cpustate->cc & 0x20 ? '?':'.',
+                cpustate->cc & 0x10 ? 'H':'.',
+                cpustate->cc & 0x08 ? 'I':'.',
+                cpustate->cc & 0x04 ? 'N':'.',
+                cpustate->cc & 0x02 ? 'Z':'.',
+                cpustate->cc & 0x01 ? 'C':'.');
             break;
 
-		case CPUINFO_STR_REGISTER + M6805_A:			sprintf(info->s, "A:%02X", m6805.a); break;
-		case CPUINFO_STR_REGISTER + M6805_PC:			sprintf(info->s, "PC:%04X", m6805.pc.w.l); break;
-		case CPUINFO_STR_REGISTER + M6805_S:			sprintf(info->s, "S:%02X", m6805.s.w.l); break;
-		case CPUINFO_STR_REGISTER + M6805_X:			sprintf(info->s, "X:%02X", m6805.x); break;
-		case CPUINFO_STR_REGISTER + M6805_CC:			sprintf(info->s, "CC:%02X", m6805.cc); break;
+		case CPUINFO_STR_REGISTER + M6805_A:			sprintf(info->s, "A:%02X", cpustate->a);		break;
+		case CPUINFO_STR_REGISTER + M6805_PC:			sprintf(info->s, "PC:%04X", cpustate->pc.w.l);	break;
+		case CPUINFO_STR_REGISTER + M6805_S:			sprintf(info->s, "S:%02X", cpustate->s.w.l);	break;
+		case CPUINFO_STR_REGISTER + M6805_X:			sprintf(info->s, "X:%02X", cpustate->x);		break;
+		case CPUINFO_STR_REGISTER + M6805_CC:			sprintf(info->s, "CC:%02X", cpustate->cc);		break;
 	}
 }
 
@@ -974,31 +981,35 @@ CPU_GET_INFO( m6805 )
  **************************************************************************/
 static CPU_SET_INFO( m68705 )
 {
+	m6805_Regs *cpustate = device->token;
+
 	switch(state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M68705_INT_TIMER:	m68705_set_irq_line(M68705_INT_TIMER, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M68705_INT_TIMER:	m68705_set_irq_line(cpustate, M68705_INT_TIMER, info->i); break;
 
-		default:										CPU_SET_INFO_CALL(m6805);				break;
+		default:											CPU_SET_INFO_CALL(m6805); break;
 	}
 }
 
 CPU_GET_INFO( m68705 )
 {
+	m6805_Regs *cpustate = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + M68705_INT_TIMER:	info->i = m6805.irq_state[M68705_INT_TIMER]; break;
+		case CPUINFO_INT_INPUT_STATE + M68705_INT_TIMER:	info->i = cpustate->irq_state[M68705_INT_TIMER]; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(m68705);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(m68705);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(m68705);				break;
+		case CPUINFO_PTR_SET_INFO:							info->setinfo = CPU_SET_INFO_NAME(m68705);	break;
+		case CPUINFO_PTR_INIT:								info->init = CPU_INIT_NAME(m68705);			break;
+		case CPUINFO_PTR_RESET:								info->reset = CPU_RESET_NAME(m68705);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "M68705");				break;
+		case CPUINFO_STR_NAME:								strcpy(info->s, "M68705");	break;
 
-		default:										CPU_GET_INFO_CALL(m6805);				break;
+		default:											CPU_GET_INFO_CALL(m6805);	break;
 	}
 }
 #endif
@@ -1011,51 +1022,55 @@ CPU_GET_INFO( m68705 )
 
 static CPU_SET_INFO( hd63705 )
 {
+	m6805_Regs *cpustate = device->token;
+
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_IRQ1:	hd63705_set_irq_line(HD63705_INT_IRQ1, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_IRQ2:	hd63705_set_irq_line(HD63705_INT_IRQ2, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER1:	hd63705_set_irq_line(HD63705_INT_TIMER1, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER2:	hd63705_set_irq_line(HD63705_INT_TIMER2, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER3:	hd63705_set_irq_line(HD63705_INT_TIMER3, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_PCI:		hd63705_set_irq_line(HD63705_INT_PCI, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_SCI:		hd63705_set_irq_line(HD63705_INT_SCI, info->i);	break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_ADCONV:	hd63705_set_irq_line(HD63705_INT_ADCONV, info->i); break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		hd63705_set_irq_line(INPUT_LINE_NMI, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_IRQ1:	hd63705_set_irq_line(cpustate, HD63705_INT_IRQ1, info->i);	 break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_IRQ2:	hd63705_set_irq_line(cpustate, HD63705_INT_IRQ2, info->i);	 break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER1:	hd63705_set_irq_line(cpustate, HD63705_INT_TIMER1, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER2:	hd63705_set_irq_line(cpustate, HD63705_INT_TIMER2, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER3:	hd63705_set_irq_line(cpustate, HD63705_INT_TIMER3, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_PCI:		hd63705_set_irq_line(cpustate, HD63705_INT_PCI, info->i);	 break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_SCI:		hd63705_set_irq_line(cpustate, HD63705_INT_SCI, info->i);	 break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_ADCONV:	hd63705_set_irq_line(cpustate, HD63705_INT_ADCONV, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		hd63705_set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	 break;
 
-		default:											CPU_SET_INFO_CALL(m6805);				break;
+		default:											CPU_SET_INFO_CALL(m6805);break;
 	}
 }
 
 CPU_GET_INFO( hd63705 )
 {
+	m6805_Regs *cpustate = (device != NULL) ? device->token : NULL;
+
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_IRQ1:	info->i = m6805.irq_state[HD63705_INT_IRQ1]; break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_IRQ2:	info->i = m6805.irq_state[HD63705_INT_IRQ2]; break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER1:	info->i = m6805.irq_state[HD63705_INT_TIMER1]; break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER2:	info->i = m6805.irq_state[HD63705_INT_TIMER2]; break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER3:	info->i = m6805.irq_state[HD63705_INT_TIMER3]; break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_PCI:		info->i = m6805.irq_state[HD63705_INT_PCI];	break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_SCI:		info->i = m6805.irq_state[HD63705_INT_SCI];	break;
-		case CPUINFO_INT_INPUT_STATE + HD63705_INT_ADCONV:	info->i = m6805.irq_state[HD63705_INT_ADCONV]; break;
-		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		info->i = m6805.irq_state[HD63705_INT_NMI];	break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_IRQ1:	info->i = cpustate->irq_state[HD63705_INT_IRQ1];	break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_IRQ2:	info->i = cpustate->irq_state[HD63705_INT_IRQ2];	break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER1:	info->i = cpustate->irq_state[HD63705_INT_TIMER1];	break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER2:	info->i = cpustate->irq_state[HD63705_INT_TIMER2];	break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_TIMER3:	info->i = cpustate->irq_state[HD63705_INT_TIMER3];	break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_PCI:		info->i = cpustate->irq_state[HD63705_INT_PCI];		break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_SCI:		info->i = cpustate->irq_state[HD63705_INT_SCI];		break;
+		case CPUINFO_INT_INPUT_STATE + HD63705_INT_ADCONV:	info->i = cpustate->irq_state[HD63705_INT_ADCONV];	break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		info->i = cpustate->irq_state[HD63705_INT_NMI];		break;
 
-		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
+		case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16; break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd63705);		break;
-		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd63705);				break;
-		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hd63705);			break;
+		case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hd63705);	break;
+		case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(hd63705);		break;
+		case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(hd63705);		break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63705");				break;
-		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");					break;
+		case CPUINFO_STR_NAME:							strcpy(info->s, "HD63705");	break;
+		case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");		break;
 		case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Keith Wilkins, Juergen Buchmueller"); break;
 
-		default:										CPU_GET_INFO_CALL(m6805);				break;
+		default:										CPU_GET_INFO_CALL(m6805);	break;
 	}
 }
 #endif

@@ -13,9 +13,9 @@ HNZC
 
 */
 
-#define OP_HANDLER(_name) INLINE void _name (void /*m68_state_t *m68_state*/)
+#define OP_HANDLER(_name) INLINE void _name (m6805_Regs* cpustate)
 
-#define OP_HANDLER_BIT(_name) INLINE void _name (/*m68_state_t *m68_state,*/ UINT8 bit)
+#define OP_HANDLER_BIT(_name) INLINE void _name (m6805_Regs* cpustate, UINT8 bit)
 
 OP_HANDLER( illegal )
 {
@@ -38,8 +38,8 @@ OP_HANDLER_BIT( brset )
 		if (t==0xfd)
 		{
 			/* speed up busy loops */
-			if(m6805_ICount > 0)
-				m6805_ICount = 0;
+			if(cpustate->iCount > 0)
+				cpustate->iCount = 0;
 		}
 	}
 }
@@ -60,8 +60,8 @@ OP_HANDLER_BIT( brclr )
 		if (t==0xfd)
 		{
 			/* speed up busy loops */
-			if(m6805_ICount > 0)
-				m6805_ICount = 0;
+			if(cpustate->iCount > 0)
+				cpustate->iCount = 0;
 	    }
 	}
 }
@@ -91,8 +91,8 @@ OP_HANDLER( bra )
 	if (t==0xfe)
 	{
 		/* speed up busy loops */
-		if(m6805_ICount > 0)
-			m6805_ICount = 0;
+		if(cpustate->iCount > 0)
+			cpustate->iCount = 0;
     }
 }
 
@@ -180,11 +180,11 @@ OP_HANDLER( bil )
 {
 	if(SUBTYPE==SUBTYPE_HD63705)
 	{
-		BRANCH( m6805.nmi_state!=CLEAR_LINE );
+		BRANCH( cpustate->nmi_state!=CLEAR_LINE );
 	}
 	else
 	{
-		BRANCH( m6805.irq_state[0]!=CLEAR_LINE );
+		BRANCH( cpustate->irq_state[0]!=CLEAR_LINE );
 	}
 }
 
@@ -193,11 +193,11 @@ OP_HANDLER( bih )
 {
 	if(SUBTYPE==SUBTYPE_HD63705)
 	{
-		BRANCH( m6805.nmi_state==CLEAR_LINE );
+		BRANCH( cpustate->nmi_state==CLEAR_LINE );
 	}
 	else
 	{
-		BRANCH( m6805.irq_state[0]==CLEAR_LINE );
+		BRANCH( cpustate->irq_state[0]==CLEAR_LINE );
 	}
 }
 
@@ -827,12 +827,12 @@ OP_HANDLER( rts )
 /* $83 SWI absolute indirect ---- */
 OP_HANDLER( swi )
 {
-	PUSHWORD(m6805.pc);
-	PUSHBYTE(m6805.x);
-	PUSHBYTE(m6805.a);
-	PUSHBYTE(m6805.cc);
+	PUSHWORD(cpustate->pc);
+	PUSHBYTE(cpustate->x);
+	PUSHBYTE(cpustate->a);
+	PUSHBYTE(cpustate->cc);
 	SEI;
-	if(SUBTYPE==SUBTYPE_HD63705) RM16( 0x1ffa, &pPC ); else RM16( 0xfffc, &pPC );
+	if(SUBTYPE==SUBTYPE_HD63705) RM16( cpustate, 0x1ffa, &pPC ); else RM16( cpustate, 0xfffc, &pPC );
 }
 
 /* $84 ILLEGAL */
@@ -1029,7 +1029,7 @@ OP_HANDLER( bsr )
 {
 	UINT8 t;
 	IMMBYTE(t);
-	PUSHWORD(m6805.pc);
+	PUSHWORD(cpustate->pc);
 	PC += SIGNED(t);
 }
 
@@ -1177,7 +1177,7 @@ OP_HANDLER( jmp_di )
 OP_HANDLER( jsr_di )
 {
 	DIRECT;
-	PUSHWORD(m6805.pc);
+	PUSHWORD(cpustate->pc);
 	PC = EA;
 }
 
@@ -1332,7 +1332,7 @@ OP_HANDLER( jmp_ex )
 OP_HANDLER( jsr_ex )
 {
 	EXTENDED;
-	PUSHWORD(m6805.pc);
+	PUSHWORD(cpustate->pc);
 	PC = EA;
 }
 
@@ -1487,7 +1487,7 @@ OP_HANDLER( jmp_ix2 )
 OP_HANDLER( jsr_ix2 )
 {
 	INDEXED2;
-	PUSHWORD(m6805.pc);
+	PUSHWORD(cpustate->pc);
 	PC = EA;
 }
 
@@ -1642,7 +1642,7 @@ OP_HANDLER( jmp_ix1 )
 OP_HANDLER( jsr_ix1 )
 {
 	INDEXED1;
-	PUSHWORD(m6805.pc);
+	PUSHWORD(cpustate->pc);
 	PC = EA;
 }
 
@@ -1797,7 +1797,7 @@ OP_HANDLER( jmp_ix )
 OP_HANDLER( jsr_ix )
 {
 	INDEXED;
-	PUSHWORD(m6805.pc);
+	PUSHWORD(cpustate->pc);
 	PC = EA;
 }
 
