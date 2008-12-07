@@ -74,7 +74,6 @@ TODO:
 */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "m6800.h"
 
 #define VERBOSE 0

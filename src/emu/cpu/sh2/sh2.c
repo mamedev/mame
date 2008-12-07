@@ -100,7 +100,6 @@
  *****************************************************************************/
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "sh2.h"
 #include "sh2comn.h"
 

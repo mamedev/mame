@@ -902,7 +902,7 @@ static void dcs_register_state(running_machine *machine)
 		state_save_register_global_pointer(machine, dcs_sram, 0x8000*4 / sizeof(dcs_sram[0]));
 
 	if (dcs.rev == 2)
-		state_save_register_postload(Machine, sdrc_postload, NULL);
+		state_save_register_postload(machine, sdrc_postload, NULL);
 }
 
 
@@ -923,8 +923,8 @@ void dcs_init(running_machine *machine)
 	cpu_set_info_fct(dcs.cpu, CPUINFO_PTR_ADSP2100_TIMER_HANDLER, (genf *)timer_enable_callback);
 
 	/* configure boot and sound ROMs */
-	dcs.bootrom = (UINT16 *)memory_region(Machine, "dcs");
-	dcs.bootrom_words = memory_region_length(Machine, "dcs") / 2;
+	dcs.bootrom = (UINT16 *)memory_region(machine, "dcs");
+	dcs.bootrom_words = memory_region_length(machine, "dcs") / 2;
 	dcs.sounddata = dcs.bootrom;
 	dcs.sounddata_words = dcs.bootrom_words;
 	dcs.sounddata_banks = dcs.sounddata_words / 0x1000;
@@ -938,10 +938,10 @@ void dcs_init(running_machine *machine)
 	dcs.auto_ack = TRUE;
 
 	/* register for save states */
-	dcs_register_state(Machine);
+	dcs_register_state(machine);
 
 	/* reset the system */
-	dcs_reset(Machine, NULL, 0);
+	dcs_reset(machine, NULL, 0);
 }
 
 

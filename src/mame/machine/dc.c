@@ -147,7 +147,7 @@ INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_m
 	if ((mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
 		mame_printf_verbose("Wrong mask! (PC=%x)\n", cpu_get_pc(machine->activecpu));
-//      debugger_break(Machine);
+//      debugger_break(machine);
 	}
 
 	if (mem_mask == U64(0xffffffff00000000))
@@ -171,7 +171,7 @@ INLINE int decode_reg3216_64(running_machine *machine, UINT32 offset, UINT64 mem
 	    (mem_mask != U64(0xffffffff00000000)) && (mem_mask != U64(0x00000000ffffffff)))
 	{
 		mame_printf_verbose("Wrong mask! (PC=%x)\n", cpu_get_pc(machine->activecpu));
-//      debugger_break(Machine);
+//      debugger_break(machine);
 	}
 
 	if (mem_mask & U64(0x0000ffff00000000))

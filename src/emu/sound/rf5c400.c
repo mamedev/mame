@@ -17,7 +17,6 @@
 
 #include "sndintrf.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "rf5c400.h"
 
 struct rf5c400_info
@@ -254,7 +253,7 @@ static void rf5c400_init_chip(const device_config *device, struct rf5c400_info *
 		double r;
 
 		// attack
-		r = 1.0 / (ENV_AR_SPEED * Machine->sample_rate);
+		r = 1.0 / (ENV_AR_SPEED * device->machine->sample_rate);
 		for (i = 0; i < ENV_MIN_AR; i++)
 		{
 			info->env_ar_table[i] = 1.0;
@@ -270,7 +269,7 @@ static void rf5c400_init_chip(const device_config *device, struct rf5c400_info *
 		}
 
 		// decay
-		r = -1.0 / (ENV_DR_SPEED * Machine->sample_rate);
+		r = -1.0 / (ENV_DR_SPEED * device->machine->sample_rate);
 		for (i = 0; i < ENV_MIN_DR; i++)
 		{
 			info->env_dr_table[i] = r;
@@ -286,7 +285,7 @@ static void rf5c400_init_chip(const device_config *device, struct rf5c400_info *
 		}
 
 		// release
-		r = -1.0 / (ENV_RR_SPEED * Machine->sample_rate);
+		r = -1.0 / (ENV_RR_SPEED * device->machine->sample_rate);
 		for (i = 0; i < ENV_MIN_RR; i++)
 		{
 			info->env_rr_table[i] = r;

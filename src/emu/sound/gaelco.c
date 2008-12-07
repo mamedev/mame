@@ -35,7 +35,6 @@ Registers per channel:
 
 #include "sndintrf.h"
 #include "cpuintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "gaelco.h"
 #include "wavwrite.h"

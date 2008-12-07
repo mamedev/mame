@@ -78,7 +78,6 @@
 *****************************************************************************/
 
 #include <stdarg.h>
-#include "deprecat.h"
 
 #define ARM7_DEBUG_CORE 0
 

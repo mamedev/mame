@@ -128,8 +128,8 @@ static SND_START( ym2203 )
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(Machine, timer_callback_2203_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_2203_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_2203_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_2203_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,1,rate,info,ym2203_stream_update);

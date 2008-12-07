@@ -49,7 +49,6 @@ Registers:
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "cpuintrf.h"
 #include "streams.h"
 #include "x1_010.h"

@@ -546,9 +546,9 @@ static void AICA_Init(const device_config *device, struct _AICA *AICA, const aic
 		}
 	}
 
-	AICA->timerA = timer_alloc(Machine, timerA_cb, AICA);
-	AICA->timerB = timer_alloc(Machine, timerB_cb, AICA);
-	AICA->timerC = timer_alloc(Machine, timerC_cb, AICA);
+	AICA->timerA = timer_alloc(device->machine, timerA_cb, AICA);
+	AICA->timerB = timer_alloc(device->machine, timerB_cb, AICA);
+	AICA->timerC = timer_alloc(device->machine, timerC_cb, AICA);
 
 	for(i=0;i<0x400;++i)
 	{

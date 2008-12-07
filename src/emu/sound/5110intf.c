@@ -13,7 +13,6 @@
 #include <math.h>
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "tms5110.h"
 #include "5110intf.h"

@@ -7537,14 +7537,14 @@ void K053250_vh_start(running_machine *machine, int chips, const char **region)
 
 	for(chip=0; chip<chips; chip++)
 	{
-		K053250_info.chip[chip].base = memory_region(Machine, region[chip]);
+		K053250_info.chip[chip].base = memory_region(machine, region[chip]);
 		ram = auto_malloc(0x6000);
 		K053250_info.chip[chip].ram = ram;
 		K053250_info.chip[chip].rammax = ram + 0x800;
 		K053250_info.chip[chip].buffer[0] = ram + 0x2000;
 		K053250_info.chip[chip].buffer[1] = ram + 0x2800;
 		memset(ram+0x2000, 0, 0x2000);
-		K053250_info.chip[chip].rommask = memory_region_length(Machine, region[chip]);
+		K053250_info.chip[chip].rommask = memory_region_length(machine, region[chip]);
 		K053250_info.chip[chip].page[1] = K053250_info.chip[chip].page[0] = 0;
 		K053250_info.chip[chip].offsy = K053250_info.chip[chip].offsx = 0;
 		K053250_info.chip[chip].frame = -1;

@@ -734,7 +734,7 @@ static UINT16 ioasic_fifo_r(const device_config *device)
 		/* fetch the data from the buffer and update the IOASIC state */
 		result = ioasic.fifo[ioasic.fifo_out++ % FIFO_SIZE];
 		ioasic.fifo_bytes--;
-		update_ioasic_irq(Machine);
+		update_ioasic_irq(device->machine);
 
 		if (LOG_FIFO && (ioasic.fifo_bytes < 4 || ioasic.fifo_bytes >= FIFO_SIZE - 4))
 			logerror("fifo_r(%04X): FIFO bytes = %d!\n", result, ioasic.fifo_bytes);
@@ -745,7 +745,7 @@ static UINT16 ioasic_fifo_r(const device_config *device)
 		/* main CPU is handling the I/O ASIC interrupt */
 		if (ioasic.fifo_bytes == 0 && ioasic.has_dcs)
 		{
-			ioasic.fifo_force_buffer_empty_pc = safe_cpu_get_pc(Machine->activecpu);
+			ioasic.fifo_force_buffer_empty_pc = safe_cpu_get_pc(device->machine->activecpu);
 			if (LOG_FIFO)
 				logerror("fifo_r(%04X): FIFO empty, PC = %04X\n", result, ioasic.fifo_force_buffer_empty_pc);
 		}

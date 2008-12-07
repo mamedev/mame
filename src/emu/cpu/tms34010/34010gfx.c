@@ -9,7 +9,6 @@
 
 #ifndef RECURSIVE_INCLUDE
 
-#include "deprecat.h"
 
 #define LOG_GFX_OPS 0
 #define LOGGFX(x) do { if (LOG_GFX_OPS && input_code_pressed(KEYCODE_L)) logerror x; } while (0)

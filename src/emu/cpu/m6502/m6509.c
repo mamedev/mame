@@ -38,7 +38,6 @@ addresses take place.
 */
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "m6509.h"
 
 #include "ops02.h"

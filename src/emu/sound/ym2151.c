@@ -1534,8 +1534,8 @@ void * ym2151_init(const device_config *device, int clock, int rate)
 
 #ifdef USE_MAME_TIMERS
 /* this must be done _before_ a call to ym2151_reset_chip() */
-	PSG->timer_A = timer_alloc(Machine, timer_callback_a, PSG);
-	PSG->timer_B = timer_alloc(Machine, timer_callback_b, PSG);
+	PSG->timer_A = timer_alloc(device->machine, timer_callback_a, PSG);
+	PSG->timer_B = timer_alloc(device->machine, timer_callback_b, PSG);
 #else
 	PSG->tim_A      = 0;
 	PSG->tim_B      = 0;
@@ -1547,7 +1547,7 @@ void * ym2151_init(const device_config *device, int clock, int rate)
 	{
 		cymfile = fopen("2151_.cym","wb");
 		if (cymfile)
-			timer_pulse ( Machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
+			timer_pulse ( device->machine, ATTOTIME_IN_HZ(110), NULL, 0, cymfile_callback); /*110 Hz pulse timer*/
 		else
 			logerror("Could not create file 2151_.cym\n");
 	}

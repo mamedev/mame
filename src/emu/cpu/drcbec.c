@@ -14,7 +14,6 @@
 #include "drcbeut.h"
 #include "eminline.h"
 #include "debugger.h"
-#include "deprecat.h"
 #include <math.h>
 
 #ifdef _MSC_VER

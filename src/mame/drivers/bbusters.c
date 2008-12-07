@@ -198,7 +198,6 @@ the entire size of the screen.
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2608intf.h"
 #include "sound/2610intf.h"
 

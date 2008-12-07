@@ -102,8 +102,8 @@ static SND_START( ym3812 )
 	ym3812_set_irq_handler   (info->chip, IRQHandler_3812, info);
 	ym3812_set_update_handler(info->chip, _stream_update_3812, info);
 
-	info->timer[0] = timer_alloc(Machine, timer_callback_3812_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_3812_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_3812_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_3812_1, info);
 
 	return info;
 }
@@ -270,8 +270,8 @@ static SND_START( ym3526 )
 	ym3526_set_irq_handler   (info->chip, IRQHandler_3526, info);
 	ym3526_set_update_handler(info->chip, _stream_update_3526, info);
 
-	info->timer[0] = timer_alloc(Machine, timer_callback_3526_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_3526_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_3526_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_3526_1, info);
 
 	return info;
 }
@@ -482,8 +482,8 @@ static SND_START( y8950 )
 	y8950_set_irq_handler   (info->chip, IRQHandler_8950, info);
 	y8950_set_update_handler(info->chip, _stream_update_8950, info);
 
-	info->timer[0] = timer_alloc(Machine, timer_callback_8950_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_8950_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_8950_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_8950_1, info);
 
 	return info;
 }

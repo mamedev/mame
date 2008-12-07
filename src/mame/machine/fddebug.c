@@ -438,7 +438,7 @@ INLINE int pc_is_valid(running_machine *machine, UINT32 pc, UINT32 flags)
 		return 0;
 	if (pc & 0xff000000)
 		return 0;
-	if (memory_decrypted_read_ptr(cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM), pc) == NULL)
+	if (memory_decrypted_read_ptr(cpu_get_address_space(machine->activecpu, ADDRESS_SPACE_PROGRAM), pc) == NULL)
 		return 0;
 	return 1;
 }

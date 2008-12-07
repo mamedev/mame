@@ -146,8 +146,8 @@ static SND_START( ym2610 )
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] = timer_alloc(Machine, timer_callback_0, info);
-	info->timer[1] = timer_alloc(Machine, timer_callback_1, info);
+	info->timer[0] = timer_alloc(device->machine, timer_callback_0, info);
+	info->timer[1] = timer_alloc(device->machine, timer_callback_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610_stream_update);
@@ -212,8 +212,8 @@ static SND_START( ym2610b )
 	if (!info->psg) return NULL;
 
 	/* Timer Handler set */
-	info->timer[0] =timer_alloc(Machine, timer_callback_0, info);
-	info->timer[1] =timer_alloc(Machine, timer_callback_1, info);
+	info->timer[0] =timer_alloc(device->machine, timer_callback_0, info);
+	info->timer[1] =timer_alloc(device->machine, timer_callback_1, info);
 
 	/* stream system initialize */
 	info->stream = stream_create(0,2,rate,info,ym2610b_stream_update);

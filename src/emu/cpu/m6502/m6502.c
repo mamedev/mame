@@ -30,7 +30,6 @@
 #endif
 
 #include "debugger.h"
-#include "deprecat.h"
 #include "m6502.h"
 #include "ops02.h"
 #include "ill02.h"

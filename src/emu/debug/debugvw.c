@@ -10,7 +10,6 @@
 *********************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "debugvw.h"
 #include "debugcmd.h"
 #include "debugcmt.h"

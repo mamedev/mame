@@ -382,8 +382,8 @@ static void init_wunit_generic(running_machine *machine)
 	register_state_saving(machine);
 
 	/* load the graphics ROMs -- quadruples */
-	midyunit_gfx_rom = base = memory_region(Machine, "gfx1");
-	len = memory_region_length(Machine, "gfx1");
+	midyunit_gfx_rom = base = memory_region(machine, "gfx1");
+	len = memory_region_length(machine, "gfx1");
 	for (i = 0; i < len / 0x400000; i++)
 	{
 		memcpy(midwunit_decode_memory, base, 0x400000);

@@ -1581,7 +1581,7 @@ static void generic_create_window(running_machine *machine, int type)
 	char title[256];
 
 	// create the window
-	_snprintf(title, ARRAY_LENGTH(title), "Debug: %s [%s]", Machine->gamedrv->description, Machine->gamedrv->name);
+	_snprintf(title, ARRAY_LENGTH(title), "Debug: %s [%s]", machine->gamedrv->description, machine->gamedrv->name);
 	info = debugwin_window_create(machine, title, NULL);
 	if (info == NULL || !debugwin_view_create(info, 0, type))
 		return;

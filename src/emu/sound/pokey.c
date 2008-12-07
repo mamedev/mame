@@ -648,15 +648,15 @@ static SND_START( pokey )
 	chip->clockmult = DIV_64;
 	chip->KBCODE = 0x09;		 /* Atari 800 'no key' */
 	chip->SKCTL = SK_RESET;	 /* let the RNG run after reset */
-	chip->rtimer = timer_alloc(Machine,  NULL, NULL);
+	chip->rtimer = timer_alloc(device->machine,  NULL, NULL);
 
-	chip->timer[0] = timer_alloc(Machine, pokey_timer_expire, chip);
-	chip->timer[1] = timer_alloc(Machine, pokey_timer_expire, chip);
-	chip->timer[2] = timer_alloc(Machine, pokey_timer_expire, chip);
+	chip->timer[0] = timer_alloc(device->machine, pokey_timer_expire, chip);
+	chip->timer[1] = timer_alloc(device->machine, pokey_timer_expire, chip);
+	chip->timer[2] = timer_alloc(device->machine, pokey_timer_expire, chip);
 
 	for (i=0; i<8; i++)
 	{
-		chip->ptimer[i] = timer_alloc(Machine, pokey_pot_trigger, chip);
+		chip->ptimer[i] = timer_alloc(device->machine, pokey_pot_trigger, chip);
 		chip->pot_r[i] = chip->intf.pot_r[i];
 	}
 	chip->allpot_r = chip->intf.allpot_r;

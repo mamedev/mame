@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "sndintrf.h"
-#include "deprecat.h"
 #include "sid6581.h"
 #include "sid.h"
 
@@ -38,8 +37,8 @@ static void *sid_start(const device_config *device, int clock, SIDTYPE sidtype)
 	sid = (SID6581 *) auto_malloc(sizeof(*sid));
 	memset(sid, 0, sizeof(*sid));
 
-	sid->mixer_channel = stream_create (0, 1,  Machine->sample_rate, (void *) sid, sid_update);
-	sid->PCMfreq = Machine->sample_rate;
+	sid->mixer_channel = stream_create (0, 1,  device->machine->sample_rate, (void *) sid, sid_update);
+	sid->PCMfreq = device->machine->sample_rate;
 	sid->clock = clock;
 	sid->ad_read = iface ? iface->ad_read : NULL;
 	sid->type = sidtype;

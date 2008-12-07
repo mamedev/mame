@@ -259,7 +259,7 @@ void taito_f3_soundsystem_reset(running_machine *machine)
 
 	/* reset CPU to catch any banking of startup vectors */
 	cpu_reset(cputag_get_cpu(machine, "audio"));
-	//cpu_set_input_line(Machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+	//cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
 }
 
 const es5505_interface es5505_taito_f3_config =

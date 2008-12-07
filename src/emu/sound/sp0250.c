@@ -17,7 +17,6 @@
 */
 
 #include <math.h>
-#include "deprecat.h"
 #include "sndintrf.h"
 #include "streams.h"
 #include "cpuintrf.h"
@@ -201,7 +200,7 @@ static SND_START( sp0250 )
 	sp->RNG = 1;
 	sp->drq = intf->drq_callback;
 	sp->drq(ASSERT_LINE);
-	timer_pulse(Machine, attotime_mul(ATTOTIME_IN_HZ(clock), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
+	timer_pulse(device->machine, attotime_mul(ATTOTIME_IN_HZ(clock), CLOCK_DIVIDER), sp, 0, sp0250_timer_tick);
 
 	sp->stream = stream_create(0, 1, clock / CLOCK_DIVIDER, sp, sp0250_update);
 

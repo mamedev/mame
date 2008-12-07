@@ -22,7 +22,6 @@
 
 #include "driver.h"
 #include "astring.h"
-#include "deprecat.h"
 #include <zlib.h>
 
 
@@ -246,7 +245,7 @@ void state_save_register_memory(running_machine *machine, const char *module, co
 	if (!global->reg_allowed)
 	{
 		logerror("Attempt to register save state entry after state registration is closed! module %s tag %s name %s\n",module, tag, name);
-		if (Machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
+		if (machine->gamedrv->flags & GAME_SUPPORTS_SAVE)
 			fatalerror("Attempt to register save state entry after state registration is closed! module %s tag %s name %s\n", module, tag, name);
 		global->illegal_regs++;
 		return;

@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "mips3com.h"
-#include "deprecat.h"
 #include "cpuexec.h"
 #include "mame.h"
 

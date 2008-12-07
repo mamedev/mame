@@ -299,7 +299,7 @@ static void amiga_m68k_reset(const device_config *device)
 
 MACHINE_RESET( amiga )
 {
-//  const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+//  const address_space *space = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 
 	/* set m68k reset  function */
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)amiga_m68k_reset);
@@ -1374,7 +1374,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 			/* if 'blitter-nasty' has been turned on and we have a blit pending, reschedule it */
 			if ( ( data & 0x400 ) && ( CUSTOM_REG(REG_DMACON) & 0x4000 ) )
-				timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( Machine->activecpu, BLITTER_NASTY_DELAY ), 0);
+				timer_adjust_oneshot( amiga_blitter_timer, cpu_clocks_to_attotime( space->machine->activecpu, BLITTER_NASTY_DELAY ), 0);
 
 			break;
 
@@ -1385,7 +1385,7 @@ WRITE16_HANDLER( amiga_custom_w )
 			CUSTOM_REG(offset) = data;
 
 			if ( temp & 0x8000  ) /* if we're enabling irq's, delay a bit */
-				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( Machine->activecpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
+				timer_adjust_oneshot( amiga_irq_timer, cpu_clocks_to_attotime( space->machine->activecpu, AMIGA_IRQ_DELAY_CYCLES ), 0);
 			else /* if we're disabling irq's, process right away */
 				update_irqs(space->machine);
 			break;
