@@ -216,7 +216,7 @@ static WRITE16_HANDLER( kof99_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space, bankaddress);
 }
 
 
@@ -253,7 +253,7 @@ static WRITE16_HANDLER( garou_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space, bankaddress);
 }
 
 
@@ -292,7 +292,7 @@ static WRITE16_HANDLER( garouo_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space, bankaddress);
 }
 
 
@@ -328,7 +328,7 @@ static WRITE16_HANDLER( mslug3_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space, bankaddress);
 }
 
 
@@ -360,7 +360,7 @@ static WRITE16_HANDLER( kof2000_bankswitch_w )
 
 	bankaddress = 0x100000 + bankoffset[data];
 
-	neogeo_set_main_cpu_bank_address(space->machine, bankaddress);
+	neogeo_set_main_cpu_bank_address(space, bankaddress);
 }
 
 
@@ -493,14 +493,14 @@ static void pvc_prot2( void ) // on writes to e8/e9/ea/eb
 }
 
 
-static void pvc_write_bankswitch( running_machine *machine )
+static void pvc_write_bankswitch( const address_space *space )
 {
 	UINT32 bankaddress;
 	bankaddress = ((pvc_cartridge_ram[0xff8]>>8)|(pvc_cartridge_ram[0xff9]<<8));
 	*(((UINT8 *)pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff0)) = 0xa0;
 	*(((UINT8 *)pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff1)) &= 0xfe;
 	*(((UINT8 *)pvc_cartridge_ram) + BYTE_XOR_LE(0x1ff3)) &= 0x7f;
-	neogeo_set_main_cpu_bank_address(machine, bankaddress+0x100000);
+	neogeo_set_main_cpu_bank_address(space, bankaddress+0x100000);
 }
 
 
@@ -515,7 +515,7 @@ static WRITE16_HANDLER( pvc_prot_w )
 	COMBINE_DATA( &pvc_cartridge_ram[ offset ] );
 	if (offset == 0xff0)pvc_prot1();
 	else if(offset >= 0xff4 && offset <= 0xff5)pvc_prot2();
-	else if(offset >= 0xff8)pvc_write_bankswitch(space->machine);
+	else if(offset >= 0xff8)pvc_write_bankswitch(space);
 }
 
 

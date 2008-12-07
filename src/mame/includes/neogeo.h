@@ -31,10 +31,10 @@
 /*----------- defined in drivers/neogeo.c -----------*/
 
 void neogeo_set_display_position_interrupt_control(UINT16 data);
-void neogeo_set_display_counter_msb(running_machine *machine, UINT16 data);
-void neogeo_set_display_counter_lsb(running_machine *machine, UINT16 data);
+void neogeo_set_display_counter_msb(const address_space *space, UINT16 data);
+void neogeo_set_display_counter_lsb(const address_space *space, UINT16 data);
 void neogeo_acknowledge_interrupt(running_machine *machine, UINT16 data);
-void neogeo_set_main_cpu_bank_address(running_machine *machine, UINT32 bank_address);
+void neogeo_set_main_cpu_bank_address(const address_space *space, UINT32 bank_address);
 READ16_HANDLER( neogeo_unmapped_r );
 
 

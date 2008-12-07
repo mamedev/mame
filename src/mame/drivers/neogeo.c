@@ -175,24 +175,24 @@ void neogeo_set_display_position_interrupt_control(UINT16 data)
 }
 
 
-void neogeo_set_display_counter_msb(running_machine *machine, UINT16 data)
+void neogeo_set_display_counter_msb(const address_space *space, UINT16 data)
 {
 	display_counter = (display_counter & 0x0000ffff) | ((UINT32)data << 16);
 
-	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", cpu_get_pc(machine->activecpu), display_counter);
+	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", cpu_get_pc(space->cpu), display_counter);
 }
 
 
-void neogeo_set_display_counter_lsb(running_machine *machine, UINT16 data)
+void neogeo_set_display_counter_lsb(const address_space *space, UINT16 data)
 {
 	display_counter = (display_counter & 0xffff0000) | data;
 
-	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", cpu_get_pc(machine->activecpu), display_counter);
+	if (LOG_VIDEO_SYSTEM) logerror("PC %06x: set_display_counter %08x\n", cpu_get_pc(space->cpu), display_counter);
 
 	if (display_position_interrupt_control & IRQ2CTRL_LOAD_RELATIVE)
 	{
 		if (LOG_VIDEO_SYSTEM) logerror("AUTOLOAD_RELATIVE ");
- 		adjust_display_position_interrupt_timer(machine);
+ 		adjust_display_position_interrupt_timer(space->machine);
 	}
 }
 
@@ -592,7 +592,7 @@ static CUSTOM_INPUT( get_audio_result )
 {
 	UINT32 ret = audio_result;
 
-//  if (LOG_CPU_COMM && (field->port->machine->activecpu != NULL)) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field->port->machine->activecpu), ret);
+//  if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_result_r %02x\n", cpu_get_pc(field->port->machine->cpu[0]), ret);
 
 	return ret;
 }
@@ -625,13 +625,13 @@ static void _set_main_cpu_bank_address(running_machine *machine)
 }
 
 
-void neogeo_set_main_cpu_bank_address(running_machine *machine, UINT32 bank_address)
+void neogeo_set_main_cpu_bank_address(const address_space *space, UINT32 bank_address)
 {
-	if (LOG_MAIN_CPU_BANKING) logerror("MAIN CPU PC %06x: neogeo_set_main_cpu_bank_address %06x\n", safe_cpu_get_pc(machine->activecpu), bank_address);
+	if (LOG_MAIN_CPU_BANKING) logerror("MAIN CPU PC %06x: neogeo_set_main_cpu_bank_address %06x\n", cpu_get_pc(space->cpu), bank_address);
 
 	main_cpu_bank_address = bank_address;
 
-	_set_main_cpu_bank_address(machine);
+	_set_main_cpu_bank_address(space->machine);
 }
 
 
@@ -652,22 +652,24 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 			bank_address = 0x100000;
 		}
 
-		neogeo_set_main_cpu_bank_address(space->machine, bank_address);
+		neogeo_set_main_cpu_bank_address(space, bank_address);
 	}
 }
 
 
 static void main_cpu_banking_init(running_machine *machine)
 {
+	const address_space *mainspace = cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM);
+	
 	/* create vector banks */
 	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, "mainbios"), 0);
 	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 1, 1, memory_region(machine, "main"), 0);
 
 	/* set initial main CPU bank */
 	if (memory_region_length(machine, "main") > 0x100000)
-		neogeo_set_main_cpu_bank_address(machine, 0x100000);
+		neogeo_set_main_cpu_bank_address(mainspace, 0x100000);
 	else
-		neogeo_set_main_cpu_bank_address(machine, 0x000000);
+		neogeo_set_main_cpu_bank_address(mainspace, 0x000000);
 }
 
 
@@ -687,19 +689,19 @@ static void set_audio_cpu_banking(running_machine *machine)
 }
 
 
-static void audio_cpu_bank_select(running_machine *machine, int region, UINT8 bank)
+static void audio_cpu_bank_select(const address_space *space, int region, UINT8 bank)
 {
-	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", safe_cpu_get_pc(machine->activecpu), region, bank);
+	if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: audio_cpu_bank_select: Region: %d   Bank: %02x\n", safe_cpu_get_pc(space->cpu), region, bank);
 
 	audio_cpu_banks[region] = bank;
 
-	set_audio_cpu_banking(machine);
+	set_audio_cpu_banking(space->machine);
 }
 
 
 static READ8_HANDLER( audio_cpu_bank_select_f000_f7ff_r )
 {
-	audio_cpu_bank_select(space->machine, 0, offset >> 8);
+	audio_cpu_bank_select(space, 0, offset >> 8);
 
 	return 0;
 }
@@ -707,7 +709,7 @@ static READ8_HANDLER( audio_cpu_bank_select_f000_f7ff_r )
 
 static READ8_HANDLER( audio_cpu_bank_select_e000_efff_r )
 {
-	audio_cpu_bank_select(space->machine, 1, offset >> 8);
+	audio_cpu_bank_select(space, 1, offset >> 8);
 
 	return 0;
 }
@@ -715,7 +717,7 @@ static READ8_HANDLER( audio_cpu_bank_select_e000_efff_r )
 
 static READ8_HANDLER( audio_cpu_bank_select_c000_dfff_r )
 {
-	audio_cpu_bank_select(space->machine, 2, offset >> 8);
+	audio_cpu_bank_select(space, 2, offset >> 8);
 
 	return 0;
 }
@@ -723,36 +725,36 @@ static READ8_HANDLER( audio_cpu_bank_select_c000_dfff_r )
 
 static READ8_HANDLER( audio_cpu_bank_select_8000_bfff_r )
 {
-	audio_cpu_bank_select(space->machine, 3, offset >> 8);
+	audio_cpu_bank_select(space, 3, offset >> 8);
 
 	return 0;
 }
 
 
-static void _set_audio_cpu_rom_source(running_machine *machine)
+static void _set_audio_cpu_rom_source(const address_space *space)
 {
 /*  if (!memory_region(machine, "audiobios"))   */
 		audio_cpu_rom_source = 1;
 
-	memory_set_bank(machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, audio_cpu_rom_source);
+	memory_set_bank(space->machine, NEOGEO_BANK_AUDIO_CPU_MAIN_BANK, audio_cpu_rom_source);
 
 	/* reset CPU if the source changed -- this is a guess */
 	if (audio_cpu_rom_source != audio_cpu_rom_source_last)
 	{
 		audio_cpu_rom_source_last = audio_cpu_rom_source;
 
-		cpu_set_input_line(machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
+		cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, PULSE_LINE);
 
-		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", safe_cpu_get_pc(machine->activecpu), audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
+		if (LOG_AUDIO_CPU_BANKING) logerror("Audio CPU PC %03x: selectign %s ROM\n", cpu_get_pc(space->cpu), audio_cpu_rom_source ? "CARTRIDGE" : "BIOS");
 	}
 }
 
 
-static void set_audio_cpu_rom_source(running_machine *machine, UINT8 data)
+static void set_audio_cpu_rom_source(const address_space *space, UINT8 data)
 {
 	audio_cpu_rom_source = data;
 
-	_set_audio_cpu_rom_source(machine);
+	_set_audio_cpu_rom_source(space);
 }
 
 
@@ -791,7 +793,7 @@ static void audio_cpu_banking_init(running_machine *machine)
 	set_audio_cpu_banking(machine);
 
 	audio_cpu_rom_source_last = 0;
-	set_audio_cpu_rom_source(machine, 0);
+	set_audio_cpu_rom_source(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM), 0);
 }
 
 
@@ -813,7 +815,7 @@ static WRITE16_HANDLER( system_control_w )
 		default:
 		case 0x00: neogeo_set_screen_dark(space->machine, bit); break;
 		case 0x01: set_main_cpu_vector_table_source(space->machine, bit);
-				   set_audio_cpu_rom_source(space->machine, bit); /* this is a guess */
+				   set_audio_cpu_rom_source(space, bit); /* this is a guess */
 				   break;
 		case 0x05: neogeo_set_fixed_layer_source(bit); break;
 		case 0x06: set_save_ram_unlock(bit); break;
@@ -822,7 +824,7 @@ static WRITE16_HANDLER( system_control_w )
 		case 0x02: /* unknown - HC32 middle pin 1 */
 		case 0x03: /* unknown - uPD4990 pin ? */
 		case 0x04: /* unknown - HC32 middle pin 10 */
-			logerror("PC: %x  Unmapped system control write.  Offset: %x  Data: %x\n", safe_cpu_get_pc(space->cpu), offset & 0x07, bit);
+			logerror("PC: %x  Unmapped system control write.  Offset: %x  Data: %x\n", cpu_get_pc(space->cpu), offset & 0x07, bit);
 			break;
 		}
 
@@ -943,7 +945,7 @@ static STATE_POSTLOAD( neogeo_postload )
 	_set_main_cpu_bank_address(machine);
 	_set_main_cpu_vector_table_source(machine);
 	set_audio_cpu_banking(machine);
-	_set_audio_cpu_rom_source(machine);
+	_set_audio_cpu_rom_source(cpu_get_address_space(machine->cpu[0], ADDRESS_SPACE_PROGRAM));
 	set_outputs();
 }
 

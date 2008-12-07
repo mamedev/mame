@@ -873,7 +873,7 @@ static WRITE64_HANDLER( real3d_dma_w )
 
 static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	const address_space *space = cpu_get_address_space(Machine->activecpu, ADDRESS_SPACE_PROGRAM);
+	const address_space *space = cpu_get_address_space(Machine->cpu[0], ADDRESS_SPACE_PROGRAM);
 	switch(dst >> 24)
 	{
 		case 0x88:		/* Display List End Trigger */
@@ -897,7 +897,7 @@ static void real3d_dma_callback(UINT32 src, UINT32 dst, int length, int byteswap
 		case 0x9c:		/* Unknown */
 			break;
 		default:
-			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(Machine->activecpu));
+			fatalerror("dma_callback: %08X, %08X, %d at %08X", src, dst, length, cpu_get_pc(Machine->cpu[0]));
 			break;
 	}
 }

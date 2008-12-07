@@ -165,17 +165,17 @@ static void copro_fifoin_push(const device_config *device, UINT32 data)
 static int copro_fifoout_rpos, copro_fifoout_wpos;
 static UINT32 copro_fifoout_data[COPRO_FIFOOUT_SIZE];
 static int copro_fifoout_num = 0;
-static UINT32 copro_fifoout_pop(void)
+static UINT32 copro_fifoout_pop(const address_space *space)
 {
 	UINT32 r;
 
 	if (copro_fifoout_num == 0)
 	{
 		/* Reading from empty FIFO causes the i960 to enter wait state */
-		i960_stall(Machine->activecpu);
+		i960_stall(space->cpu);
 
 		/* spin the main cpu and let the TGP catch up */
-		cpu_spinuntil_time(Machine->activecpu, ATTOTIME_IN_USEC(100));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(100));
 
 		return 0;
 	}
@@ -562,7 +562,7 @@ static WRITE32_HANDLER(copro_function_port_w)
 static READ32_HANDLER(copro_fifo_r)
 {
 	//logerror("copro_fifo_r: %08X, %08X\n", offset, mem_mask);
-	return copro_fifoout_pop();
+	return copro_fifoout_pop(space);
 }
 
 static WRITE32_HANDLER(copro_fifo_w)
@@ -900,32 +900,32 @@ static WRITE32_HANDLER(model2_irq_w)
 
 static int to_68k;
 
-static int snd_68k_ready_r(void)
+static int snd_68k_ready_r(const address_space *space)
 {
-	int sr = cpu_get_reg(Machine->cpu[1], M68K_SR);
+	int sr = cpu_get_reg(space->machine->cpu[1], M68K_SR);
 
 	if ((sr & 0x0700) > 0x0100)
 	{
-		cpu_spinuntil_time(Machine->activecpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 		return 0;	// not ready yet, interrupts disabled
 	}
 
 	return 0xff;
 }
 
-static void snd_latch_to_68k_w(running_machine *machine, int data)
+static void snd_latch_to_68k_w(const address_space *space, int data)
 {
-	while (!snd_68k_ready_r())
+	while (!snd_68k_ready_r(space))
 	{
-		cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 	}
 
 	to_68k = data;
 
-	cpu_set_input_line(machine->cpu[1], 2, HOLD_LINE);
+	cpu_set_input_line(space->machine->cpu[1], 2, HOLD_LINE);
 
 	// give the 68k time to notice
-	cpu_spinuntil_time(machine->activecpu, ATTOTIME_IN_USEC(40));
+	cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(40));
 }
 
 static READ32_HANDLER( model2_serial_r )
@@ -942,7 +942,7 @@ static WRITE32_HANDLER( model2o_serial_w )
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		snd_latch_to_68k_w(space->machine, data&0xff);
+		snd_latch_to_68k_w(space, data&0xff);
 	}
 }
 

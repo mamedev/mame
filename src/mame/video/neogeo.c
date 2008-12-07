@@ -839,8 +839,8 @@ WRITE16_HANDLER( neogeo_video_register_w )
 		case 0x01: set_videoram_data(data); break;
 		case 0x02: set_videoram_modulo(data); break;
 		case 0x03: set_video_control(space->machine, data); break;
-		case 0x04: neogeo_set_display_counter_msb(space->machine, data); break;
-		case 0x05: neogeo_set_display_counter_lsb(space->machine, data); break;
+		case 0x04: neogeo_set_display_counter_msb(space, data); break;
+		case 0x05: neogeo_set_display_counter_lsb(space, data); break;
 		case 0x06: neogeo_acknowledge_interrupt(space->machine, data); break;
 		case 0x07: break; /* unknown, see get_video_control */
 		}
