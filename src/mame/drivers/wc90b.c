@@ -489,7 +489,7 @@ ROM_START( wc90b2 )
 	ROM_LOAD( "a20.bin",      0x00c000, 0x04000, BAD_DUMP CRC(b8dec83e) SHA1(fe617ddccdd0dbd05ca09a1507074aa14b529322) ) /* roms from wc90b1 */
 
 	ROM_REGION( 0x080000, "gfx2", ROMREGION_DISPOSE )
-	ROM_LOAD( "a07.bin",      0x000000, 0x20000, BAD_DUMP CRC(d5a60096) SHA1(cb24ed8702d62066366924c033c07ffc78bd1fad) ) /* for now roms from wc90b1 */
+	ROM_LOAD( "a07.bin",      0x000000, 0x20000, BAD_DUMP CRC(38c31817) SHA1(cb24ed8702d62066366924c033c07ffc78bd1fad) ) /* for now roms from wc90b1 */
 	ROM_LOAD( "a09.bin",      0x020000, 0x20000, BAD_DUMP CRC(32e39e29) SHA1(44f22ed6c983541c7fea5857ba0456aaa87b36d1) ) /* for now roms from wc90b1 */
 	ROM_LOAD( "a11.bin",      0x040000, 0x20000, BAD_DUMP CRC(5ccec796) SHA1(2cc191a4267819eb31962726e2ed4567c825c39e) ) /* for now roms from wc90b1 */
 	ROM_LOAD( "a21.bin",      0x060000, 0x20000, BAD_DUMP CRC(0c54a091) SHA1(3eecb285b5a7bbc310c87492516d7ffb2841aa3b) ) /* for now roms from wc90b1 */
