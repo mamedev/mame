@@ -51,8 +51,8 @@ typedef struct
 
 	/* FIFO */
 	int				fifo_wait;
-	int				(*fifo_read_cb)( UINT32 *data );
-	void			(*fifo_write_cb)( UINT32 data );
+	mb86233_fifo_read_func fifo_read_cb;
+	mb86233_fifo_write_func fifo_write_cb;
 
 	/* internal RAM */
 	UINT32			*RAM;
@@ -677,7 +677,7 @@ static UINT32 GETREGS( UINT32 reg, int source )
 
 				if ( mb86233.fifo_read_cb )
 				{
-					if ( mb86233.fifo_read_cb(&fifo_data) )
+					if ( mb86233.fifo_read_cb(mb86233.device, &fifo_data) )
 					{
 						return fifo_data;
 					}
@@ -860,7 +860,7 @@ static void SETREGS( UINT32 reg, UINT32 val )
 			case 0x22: /* FOut */
 				if ( mb86233.fifo_write_cb )
 				{
-					mb86233.fifo_write_cb( val );
+					mb86233.fifo_write_cb( mb86233.device, val );
 				}
 			break;
 

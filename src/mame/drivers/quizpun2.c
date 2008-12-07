@@ -135,9 +135,9 @@ static MACHINE_RESET( quizpun2 )
 	prot.addr = 0;
 }
 
-static void log_protection( running_machine *machine, const char *warning )
+static void log_protection( const address_space *space, const char *warning )
 {
-	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", cpu_get_pc(machine->activecpu), warning,
+	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", cpu_get_pc(space->cpu), warning,
 		prot.state,
 		prot.wait_param,
 		prot.param,
@@ -174,7 +174,7 @@ static READ8_HANDLER( quizpun2_protection_r )
 					break;
 
 				default:
-					log_protection(space->machine, "unknown address");
+					log_protection(space, "unknown address");
 					ret = 0x2e59 >> ((prot.addr & 1) ? 0 : 8);	// return the address of: XOR A, RET
 			}
 			break;
@@ -187,12 +187,12 @@ static READ8_HANDLER( quizpun2_protection_r )
 		}
 
 		default:
-			log_protection(space->machine, "unknown read");
+			log_protection(space, "unknown read");
 			ret = 0x00;
 	}
 
 #if VERBOSE_PROTECTION_LOG
-	log_protection(space->machine, "info READ");
+	log_protection(space, "info READ");
 #endif
 
 	prot.addr++;
@@ -235,7 +235,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 						prot.addr = 0;
 					}
 					else
-						log_protection(space->machine, "unknown command");
+						log_protection(space, "unknown command");
 				}
 				else if (prot.cmd >= 0x00 && prot.cmd <= 0x0f )
 				{
@@ -250,7 +250,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 				else
 				{
 					prot.state = STATE_IDLE;
-					log_protection(space->machine, "unknown command");
+					log_protection(space, "unknown command");
 				}
 			}
 			else
@@ -262,7 +262,7 @@ static WRITE8_HANDLER( quizpun2_protection_w )
 	}
 
 #if VERBOSE_PROTECTION_LOG
-	log_protection(space->machine, "info WRITE");
+	log_protection(space, "info WRITE");
 #endif
 }
 

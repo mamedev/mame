@@ -91,7 +91,7 @@ static int dsp_type;
 static int copro_fifoin_rpos, copro_fifoin_wpos;
 static UINT32 copro_fifoin_data[COPRO_FIFOIN_SIZE];
 static int copro_fifoin_num = 0;
-static int copro_fifoin_pop(UINT32 *result)
+static int copro_fifoin_pop(const device_config *device, UINT32 *result)
 {
 	UINT32 r;
 
@@ -100,7 +100,7 @@ static int copro_fifoin_pop(UINT32 *result)
 		if (dsp_type == DSP_TYPE_TGP)
 			return 0;
 
-		fatalerror("Copro FIFOIN underflow (at %08X)", cpu_get_pc(Machine->activecpu));
+		fatalerror("Copro FIFOIN underflow (at %08X)", cpu_get_pc(device));
 		return 0;
 	}
 
@@ -116,13 +116,13 @@ static int copro_fifoin_pop(UINT32 *result)
 	{
 		if (copro_fifoin_num == 0)
 		{
-			cpu_push_context(Machine->cpu[2]);
+			cpu_push_context(device);
 			sharc_set_flag_input(0, ASSERT_LINE);
 			cpu_pop_context();
 		}
 		else
 		{
-			cpu_push_context(Machine->cpu[2]);
+			cpu_push_context(device);
 			sharc_set_flag_input(0, CLEAR_LINE);
 			cpu_pop_context();
 		}
@@ -133,15 +133,15 @@ static int copro_fifoin_pop(UINT32 *result)
 	return 1;
 }
 
-static void copro_fifoin_push(UINT32 data)
+static void copro_fifoin_push(const device_config *device, UINT32 data)
 {
 	if (copro_fifoin_num == COPRO_FIFOIN_SIZE)
 	{
-		fatalerror("Copro FIFOIN overflow (at %08X)", cpu_get_pc(Machine->activecpu));
+		fatalerror("Copro FIFOIN overflow (at %08X)", cpu_get_pc(device));
 		return;
 	}
 
-	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", cpu_get_pc(Machine->activecpu), data, *(float*)&data);
+	//mame_printf_debug("COPRO FIFOIN at %08X, %08X, %f\n", cpu_get_pc(device), data, *(float*)&data);
 
 	copro_fifoin_data[copro_fifoin_wpos++] = data;
 	if (copro_fifoin_wpos == COPRO_FIFOIN_SIZE)
@@ -154,7 +154,7 @@ static void copro_fifoin_push(UINT32 data)
 	// clear FIFO empty flag on SHARC
 	if (dsp_type == DSP_TYPE_SHARC)
 	{
-		cpu_push_context(Machine->cpu[2]);
+		cpu_push_context(device);
 		sharc_set_flag_input(0, CLEAR_LINE);
 		cpu_pop_context();
 	}
@@ -211,12 +211,12 @@ static UINT32 copro_fifoout_pop(void)
 	return r;
 }
 
-static void copro_fifoout_push(UINT32 data)
+static void copro_fifoout_push(const device_config *device, UINT32 data)
 {
 	//if (copro_fifoout_wpos == copro_fifoout_rpos)
 	if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 	{
-		fatalerror("Copro FIFOOUT overflow (at %08X)", cpu_get_pc(Machine->activecpu));
+		fatalerror("Copro FIFOOUT overflow (at %08X)", cpu_get_pc(device));
 		return;
 	}
 
@@ -235,19 +235,19 @@ static void copro_fifoout_push(UINT32 data)
 	{
 		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			cpu_push_context(Machine->cpu[2]);
+			cpu_push_context(device);
 			sharc_set_flag_input(1, ASSERT_LINE);
 			cpu_pop_context();
 
-			//cpu_set_input_line(Machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
+			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, ASSERT_LINE);
 		}
 		else
 		{
-			cpu_push_context(Machine->cpu[2]);
+			cpu_push_context(device);
 			sharc_set_flag_input(1, CLEAR_LINE);
 			cpu_pop_context();
 
-			//cpu_set_input_line(Machine->cpu[2], SHARC_INPUT_FLAG1, CLEAR_LINE);
+			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
 	}
 }
@@ -556,7 +556,7 @@ static WRITE32_HANDLER(copro_function_port_w)
 	d |= a << 23;
 
 	//logerror("copro_function_port_w: %08X, %08X, %08X\n", data, offset, mem_mask);
-	copro_fifoin_push(d);
+	copro_fifoin_push(space->machine->cpu[2], d);
 }
 
 static READ32_HANDLER(copro_fifo_r)
@@ -585,7 +585,7 @@ static WRITE32_HANDLER(copro_fifo_w)
 	else
 	{
 		//mame_printf_debug("copro_fifo_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
-		copro_fifoin_push(data);
+		copro_fifoin_push(space->machine->cpu[2], data);
 	}
 }
 
@@ -1747,14 +1747,14 @@ static READ32_HANDLER(copro_sharc_input_fifo_r)
 	UINT32 result;
 	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(space->cpu));
 
-	copro_fifoin_pop(&result);
+	copro_fifoin_pop(space->machine->cpu[2], &result);
 	return result;
 }
 
 static WRITE32_HANDLER(copro_sharc_output_fifo_w)
 {
 	//mame_printf_debug("SHARC FIFOOUT push %08X\n", data);
-	copro_fifoout_push(data);
+	copro_fifoout_push(space->machine->cpu[2], data);
 }
 
 static READ32_HANDLER(copro_sharc_buffer_r)

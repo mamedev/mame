@@ -612,7 +612,7 @@ static WRITE32_HANDLER( parallel_port_w )
 	}
 }
 
-static UINT32 cx5510_pci_r(int function, int reg, UINT32 mem_mask)
+static UINT32 cx5510_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
 {
 //  mame_printf_debug("CX5510: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 
@@ -624,7 +624,7 @@ static UINT32 cx5510_pci_r(int function, int reg, UINT32 mem_mask)
 	return cx5510_regs[reg/4];
 }
 
-static void cx5510_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
+static void cx5510_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 //  mame_printf_debug("CX5510: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(cx5510_regs + (reg/4));
@@ -854,7 +854,7 @@ static ADDRESS_MAP_START(mediagx_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0378, 0x037b) AM_READWRITE(parallel_port_r, parallel_port_w)
 	AM_RANGE(0x03f0, 0x03ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", fdc_r, fdc_w)
 	AM_RANGE(0x0400, 0x04ff) AM_READWRITE(ad1847_r, ad1847_w)
-	AM_RANGE(0x0cf8, 0x0cff) AM_READWRITE(pci_32le_r,				pci_32le_w)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_32le_r,	pci_32le_w)
 ADDRESS_MAP_END
 
 /*****************************************************************************/
@@ -964,6 +964,7 @@ static MACHINE_RESET(mediagx)
 	cpu_set_irq_callback(machine->cpu[0], irq_callback);
 
 	memcpy(bios_ram, rom, 0x40000);
+	cpu_reset(machine->cpu[0]);
 
 	dacl = auto_malloc(65536 * sizeof(INT16));
 	dacr = auto_malloc(65536 * sizeof(INT16));
@@ -1040,6 +1041,9 @@ static MACHINE_DRIVER_START(mediagx)
 	MDRV_MACHINE_START(mediagx)
 	MDRV_MACHINE_RESET(mediagx)
 
+	MDRV_PCI_BUS_ADD("pcibus", 0)
+	MDRV_PCI_BUS_DEVICE(18, NULL, NULL, cx5510_pci_r, cx5510_pci_w)
+
 	MDRV_DEVICE_ADD( "pit8254", PIT8254 )
 	MDRV_DEVICE_CONFIG( mediagx_pit8254_config )
 
@@ -1106,12 +1110,6 @@ static const struct kbdc8042_interface at8042 =
 	KBDC8042_AT386, set_gate_a20, keyboard_interrupt, mediagx_get_out2
 };
 
-static const struct pci_device_info cx5510 =
-{
-	cx5510_pci_r,
-	cx5510_pci_w
-};
-
 static void mediagx_set_keyb_int(int state) {
 	pic8259_set_irq_line(mediagx_devices.pic8259_1, 1, state);
 }
@@ -1122,9 +1120,6 @@ static void init_mediagx(running_machine *machine)
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT,mediagx_set_keyb_int);
 	mc146818_init(machine, MC146818_STANDARD);
-
-	pci_init();
-	pci_add_device(0, 18, &cx5510);
 
 	kbdc8042_init(&at8042);
 }

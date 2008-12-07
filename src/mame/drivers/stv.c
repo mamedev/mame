@@ -460,7 +460,7 @@ static void system_reset()
 	/*Order is surely wrong but whatever...*/
 }
 
-static UINT8 stv_SMPC_r8 (running_machine *machine, int offset)
+static UINT8 stv_SMPC_r8 (const address_space *space, int offset)
 {
 	int return_data;
 
@@ -471,7 +471,7 @@ static UINT8 stv_SMPC_r8 (running_machine *machine, int offset)
 		return_data = 0x20 ^ 0xff;
 
 	if (offset == 0x75)//PDR1 read
-		return_data = input_port_read(machine, "DSW1");
+		return_data = input_port_read(space->machine, "DSW1");
 
 	if (offset == 0x77)//PDR2 read
 		return_data=  (0xfe | eeprom_read_bit());
@@ -479,9 +479,9 @@ static UINT8 stv_SMPC_r8 (running_machine *machine, int offset)
 //  if (offset == 0x33) //country code
 //      return_data = input_port_read(machine, "FAKE");
 
-	if (cpu_get_pc(machine->activecpu)==0x060020E6) return_data = 0x10;//???
+	if (cpu_get_pc(space->cpu)==0x060020E6) return_data = 0x10;//???
 
-	//if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", space->cpu->tag, cpu_get_pc(machine->activecpu), offset, return_data);
+	//if(LOG_SMPC) logerror ("cpu %s (PC=%08X) SMPC: Read from Byte Offset %02x Returns %02x\n", space->cpu->tag, cpu_get_pc(space->cpu), offset, return_data);
 
 
 	return return_data;
@@ -721,10 +721,10 @@ static READ32_HANDLER ( stv_SMPC_r32 )
 	/* registers are all byte accesses, convert here */
 	offset = offset << 2; // multiply offset by 4
 
-	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = stv_SMPC_r8(space->machine, offset+byte) << 24; }
-	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = stv_SMPC_r8(space->machine, offset+byte) << 16; }
-	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = stv_SMPC_r8(space->machine, offset+byte) << 8;  }
-	if (ACCESSING_BITS_0_7)		{ byte = 3; readdata = stv_SMPC_r8(space->machine, offset+byte) << 0;  }
+	if (ACCESSING_BITS_24_31)	{ byte = 0; readdata = stv_SMPC_r8(space, offset+byte) << 24; }
+	if (ACCESSING_BITS_16_23)	{ byte = 1; readdata = stv_SMPC_r8(space, offset+byte) << 16; }
+	if (ACCESSING_BITS_8_15)	{ byte = 2; readdata = stv_SMPC_r8(space, offset+byte) << 8;  }
+	if (ACCESSING_BITS_0_7)		{ byte = 3; readdata = stv_SMPC_r8(space, offset+byte) << 0;  }
 
 	return readdata;
 }

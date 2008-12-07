@@ -769,7 +769,7 @@ static void vblank_assert(const device_config *device, int state)
  *
  *************************************/
 
-static UINT32 pci_bridge_r(running_machine *machine, UINT8 reg, UINT8 type)
+static UINT32 pci_bridge_r(const address_space *space, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_bridge_regs[reg];
 
@@ -785,16 +785,16 @@ static UINT32 pci_bridge_r(running_machine *machine, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
+		logerror("%08X:PCI bridge read: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_bridge_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_bridge_w(const address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, data);
 }
 
 
@@ -805,7 +805,7 @@ static void pci_bridge_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32
  *
  *************************************/
 
-static UINT32 pci_3dfx_r(running_machine *machine, UINT8 reg, UINT8 type)
+static UINT32 pci_3dfx_r(const address_space *space, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_3dfx_regs[reg];
 
@@ -821,12 +821,12 @@ static UINT32 pci_3dfx_r(running_machine *machine, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
+		logerror("%08X:PCI 3dfx read: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_3dfx_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_3dfx_w(const address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_3dfx_regs[reg] = data;
 
@@ -843,7 +843,7 @@ static void pci_3dfx_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 d
 			break;
 	}
 	if (LOG_PCI)
-		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
+		logerror("%08X:PCI 3dfx write: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, data);
 }
 
 
@@ -854,7 +854,7 @@ static void pci_3dfx_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 d
  *
  *************************************/
 
-static UINT32 pci_ide_r(running_machine *machine, UINT8 reg, UINT8 type)
+static UINT32 pci_ide_r(const address_space *space, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_ide_regs[reg];
 
@@ -870,16 +870,16 @@ static UINT32 pci_ide_r(running_machine *machine, UINT8 reg, UINT8 type)
 	}
 
 	if (LOG_PCI)
-		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, result);
+		logerror("%08X:PCI IDE read: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, result);
 	return result;
 }
 
 
-static void pci_ide_w(running_machine *machine, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_ide_w(const address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_ide_regs[reg] = data;
 	if (LOG_PCI)
-		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(machine->activecpu), reg, type, data);
+		logerror("%08X:PCI bridge write: reg %d type %d = %08X\n", cpu_get_pc(space->cpu), reg, type, data);
 }
 
 
@@ -1126,15 +1126,15 @@ static READ32_HANDLER( galileo_r )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				result = pci_bridge_r(space->machine, reg, type);
+				result = pci_bridge_r(space, reg, type);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				result = pci_3dfx_r(space->machine, reg, type);
+				result = pci_3dfx_r(space, reg, type);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				result = pci_ide_r(space->machine, reg, type);
+				result = pci_ide_r(space, reg, type);
 
 			/* anything else, just log */
 			else
@@ -1264,15 +1264,15 @@ static WRITE32_HANDLER( galileo_w )
 
 			/* unit 0 is the PCI bridge */
 			if (unit == 0 && func == 0)
-				pci_bridge_w(space->machine, reg, type, data);
+				pci_bridge_w(space, reg, type, data);
 
 			/* unit 8 is the 3dfx card */
 			else if (unit == 8 && func == 0)
-				pci_3dfx_w(space->machine, reg, type, data);
+				pci_3dfx_w(space, reg, type, data);
 
 			/* unit 9 is the IDE controller */
 			else if (unit == 9 && func == 0)
-				pci_ide_w(space->machine, reg, type, data);
+				pci_ide_w(space, reg, type, data);
 
 			/* anything else, just log */
 			else
@@ -1304,12 +1304,12 @@ static WRITE32_HANDLER( galileo_w )
  *
  *************************************/
 
-static WRITE32_DEVICE_HANDLER( seattle_voodoo_w )
+static WRITE32_HANDLER( seattle_voodoo_w )
 {
 	/* if we're not stalled, just write and get out */
 	if (!voodoo_stalled)
 	{
-		voodoo_w(device, offset, data, mem_mask);
+		voodoo_w(voodoo_device, offset, data, mem_mask);
 		return;
 	}
 
@@ -1324,8 +1324,8 @@ static WRITE32_DEVICE_HANDLER( seattle_voodoo_w )
 	cpu_stalled_mem_mask = mem_mask;
 
 	/* spin until we send the magic trigger */
-	cpu_spinuntil_trigger(device->machine->cpu[0], 45678);
-	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", cpu_get_pc(device->machine->activecpu));
+	cpu_spinuntil_trigger(space->cpu, 45678);
+	if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo (already stalled)\n", cpu_get_pc(space->cpu));
 }
 
 
@@ -1344,7 +1344,7 @@ static void voodoo_stall(const device_config *device, int stall)
 		}
 		else
 		{
-			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(device->machine->activecpu));
+			if (LOG_DMA) logerror("%08X:Stalling CPU on voodoo\n", cpu_get_pc(device->machine->cpu[0]));
 			cpu_spinuntil_trigger(device->machine->cpu[0], 45678);
 		}
 	}
@@ -1732,7 +1732,7 @@ PCI Mem  = 08000000-09FFFFFF
 static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x00000000, 0x007fffff) AM_RAM AM_BASE(&rambase)	// wg3dh only has 4MB; sfrush, blitz99 8MB
-	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREADWRITE(VOODOO_GRAPHICS, "voodoo", voodoo_r, seattle_voodoo_w)
+	AM_RANGE(0x08000000, 0x08ffffff) AM_DEVREAD(VOODOO_GRAPHICS, "voodoo", voodoo_r) AM_WRITE(seattle_voodoo_w)
 	AM_RANGE(0x0a000000, 0x0a0003ff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_controller32_r, ide_controller32_w)
 	AM_RANGE(0x0a00040c, 0x0a00040f) AM_NOP						// IDE-related, but annoying
 	AM_RANGE(0x0a000f00, 0x0a000f07) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ide_bus_master32_r, ide_bus_master32_w)

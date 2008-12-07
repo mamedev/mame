@@ -49,7 +49,7 @@ static VIDEO_UPDATE(viper)
 /*****************************************************************************/
 
 static UINT32 mpc8240_regs[256/4];
-static UINT32 mpc8240_pci_r(int function, int reg, UINT32 mem_mask)
+static UINT32 mpc8240_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
 {
 //  printf("MPC8240: PCI read %d, %02X, %08X\n", function, reg, mem_mask);
 
@@ -60,31 +60,31 @@ static UINT32 mpc8240_pci_r(int function, int reg, UINT32 mem_mask)
 	return mpc8240_regs[reg/4];
 }
 
-static void mpc8240_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
+static void mpc8240_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 //  printf("MPC8240: PCI write %d, %02X, %08X, %08X\n", function, reg, data, mem_mask);
 	COMBINE_DATA(mpc8240_regs + (reg/4));
 }
 
 
-static READ64_HANDLER( pci_config_addr_r )
+static READ64_DEVICE_HANDLER( pci_config_addr_r )
 {
-	return pci_64be_r(space, 0, U64(0x00000000ffffffff));
+	return pci_64be_r(device, 0, U64(0x00000000ffffffff));
 }
 
-static WRITE64_HANDLER( pci_config_addr_w )
+static WRITE64_DEVICE_HANDLER( pci_config_addr_w )
 {
-	pci_64be_w(space, 0, data, U64(0x00000000ffffffff));
+	pci_64be_w(device, 0, data, U64(0x00000000ffffffff));
 }
 
-static READ64_HANDLER( pci_config_data_r )
+static READ64_DEVICE_HANDLER( pci_config_data_r )
 {
-	return pci_64be_r(space, 1, U64(0xffffffff00000000)) << 32;
+	return pci_64be_r(device, 1, U64(0xffffffff00000000)) << 32;
 }
 
-static WRITE64_HANDLER( pci_config_data_w )
+static WRITE64_DEVICE_HANDLER( pci_config_data_w )
 {
-	pci_64be_w(space, 1, data >> 32, U64(0xffffffff00000000));
+	pci_64be_w(device, 1, data >> 32, U64(0xffffffff00000000));
 }
 
 
@@ -409,7 +409,7 @@ static WRITE64_HANDLER(unk1b_w)
 }
 
 static UINT32 voodoo3_pci_reg[0x100];
-static UINT32 voodoo3_pci_r(int function, int reg, UINT32 mem_mask)
+static UINT32 voodoo3_pci_r(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 mem_mask)
 {
 	switch (reg)
 	{
@@ -443,12 +443,12 @@ static UINT32 voodoo3_pci_r(int function, int reg, UINT32 mem_mask)
 		}
 
 		default:
-			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(Machine->activecpu));
+			fatalerror("voodoo3_pci_r: %08X at %08X", reg, cpu_get_pc(device->machine->cpu[0]));
 	}
 	return 0;
 }
 
-static void voodoo3_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
+static void voodoo3_pci_w(const device_config *busdevice, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask)
 {
 //  printf("voodoo3_pci_w: %08X, %08X\n", reg, data);
 
@@ -511,7 +511,7 @@ static void voodoo3_pci_w(int function, int reg, UINT32 data, UINT32 mem_mask)
 		}
 
 		default:
-			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(Machine->activecpu));
+			fatalerror("voodoo3_pci_w: %08X, %08X at %08X", data, reg, cpu_get_pc(device->machine->cpu[0]));
 	}
 }
 
@@ -556,8 +556,8 @@ static ADDRESS_MAP_START(viper_map, ADDRESS_SPACE_PROGRAM, 64)
 	AM_RANGE(0x82000000, 0x83ffffff) AM_DEVREADWRITE32(VOODOO_GRAPHICS, "voodoo", banshee_r, banshee_w, U64(0xffffffffffffffff))
 	AM_RANGE(0x84000000, 0x85ffffff) AM_DEVREADWRITE32(VOODOO_GRAPHICS, "voodoo", banshee_fb_r, banshee_fb_w, U64(0xffffffffffffffff))
 	AM_RANGE(0xfe800000, 0xfe8000ff) AM_DEVREADWRITE32(VOODOO_GRAPHICS, "voodoo", banshee_io_r, banshee_io_w, U64(0xffffffffffffffff))
-	AM_RANGE(0xfec00000, 0xfedfffff) AM_READWRITE(pci_config_addr_r, pci_config_addr_w)
-	AM_RANGE(0xfee00000, 0xfeefffff) AM_READWRITE(pci_config_data_r, pci_config_data_w)
+	AM_RANGE(0xfec00000, 0xfedfffff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_config_addr_r, pci_config_addr_w)
+	AM_RANGE(0xfee00000, 0xfeefffff) AM_DEVREADWRITE(PCI_BUS, "pcibus", pci_config_data_r, pci_config_data_w)
 	AM_RANGE(0xff300000, 0xff300fff) AM_DEVREADWRITE(IDE_CONTROLLER, "ide", ata_r, ata_w)
 	AM_RANGE(0xffe10000, 0xffe10007) AM_READ(unk1_r)
 	AM_RANGE(0xffe30000, 0xffe31fff) AM_DEVREADWRITE8(M48T58,"m48t58",timekeeper_r, timekeeper_w, U64(0xffffffffffffffff))
@@ -606,6 +606,10 @@ static MACHINE_DRIVER_START(viper)
 
 	MDRV_MACHINE_RESET(viper)
 
+	MDRV_PCI_BUS_ADD("pcibus", 0)
+	MDRV_PCI_BUS_DEVICE(0, NULL, NULL, mpc8240_pci_r, mpc8240_pci_w)
+	MDRV_PCI_BUS_DEVICE(12, VOODOO_GRAPHICS, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
+
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "main")
 
@@ -629,28 +633,13 @@ MACHINE_DRIVER_END
 
 /*****************************************************************************/
 
-static const struct pci_device_info mpc8240 =
-{
-	mpc8240_pci_r,
-	mpc8240_pci_w
-};
-
-static const struct pci_device_info voodoo3 =
-{
-	voodoo3_pci_r,
-	voodoo3_pci_w
-};
-
 static DRIVER_INIT(viper)
 {
-	pci_init();
-	pci_add_device(0, 0, &mpc8240);
-	pci_add_device(0, 12, &voodoo3);
 }
 
 static DRIVER_INIT(vipercf)
 {
-	const device_config *ide = device_list_find_by_tag(machine->config->devicelist, IDE_CONTROLLER, "ide");
+	const device_config *ide = devtag_get_device(machine, IDE_CONTROLLER, "ide");
 
 	DRIVER_INIT_CALL(viper);
 

@@ -682,18 +682,18 @@ WRITE16_HANDLER(sprcpt_flags_2_w)
 // XXX
 // write only: 4c0 4c1 500 501 502 503
 
-static UINT16 handle_io_r(running_machine *machine, int offset)
+static UINT16 handle_io_r(const address_space *space, int offset)
 {
-	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], cpu_get_pc(machine->activecpu));
+	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], cpu_get_pc(space->cpu));
 	return mainram[offset];
 }
 
-static void handle_io_w(running_machine *machine, int offset, UINT16 data, UINT16 mem_mask)
+static void handle_io_w(const address_space *space, int offset, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&mainram[offset]);
 	switch(offset) {
 	default:
-		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(machine->activecpu));
+		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
 	}
 }
 
@@ -702,7 +702,7 @@ static READ16_HANDLER(any_r)
 	c_r[offset]++;
 
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		return handle_io_r(space->machine, offset);
+		return handle_io_r(space, offset);
 
 	return mainram[offset];
 }
@@ -711,7 +711,7 @@ static WRITE16_HANDLER(any_w)
 {
 	int show = 0;
 	if(offset >= 0x400/2 && offset < 0x800/2)
-		handle_io_w(space->machine, offset, data, mem_mask);
+		handle_io_w(space, offset, data, mem_mask);
 
 	c_w[offset]++;
 	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, cpu_get_pc(space->cpu));

@@ -1047,11 +1047,11 @@ static void namco_06xx_ctrl_w(running_machine *machine, int chip,int data)
 
 
 
-READ8_HANDLER( namco_06xx_0_data_r )		{ return namco_06xx_data_r(space->machine,0,offset); }
-READ8_HANDLER( namco_06xx_1_data_r )		{ return namco_06xx_data_r(space->machine,1,offset); }
+READ8_HANDLER( namco_06xx_0_data_r )	{ return namco_06xx_data_r(space->machine,0,offset); }
+READ8_HANDLER( namco_06xx_1_data_r )	{ return namco_06xx_data_r(space->machine,1,offset); }
 WRITE8_HANDLER( namco_06xx_0_data_w )	{ namco_06xx_data_w(space->machine,0,offset,data); }
 WRITE8_HANDLER( namco_06xx_1_data_w )	{ namco_06xx_data_w(space->machine,1,offset,data); }
-READ8_HANDLER( namco_06xx_0_ctrl_r )		{ return namco_06xx_ctrl_r(space->machine,0); }
-READ8_HANDLER( namco_06xx_1_ctrl_r )		{ return namco_06xx_ctrl_r(space->machine,1); }
+READ8_HANDLER( namco_06xx_0_ctrl_r )	{ return namco_06xx_ctrl_r(space->machine,0); }
+READ8_HANDLER( namco_06xx_1_ctrl_r )	{ return namco_06xx_ctrl_r(space->machine,1); }
 WRITE8_HANDLER( namco_06xx_0_ctrl_w )	{ namco_06xx_ctrl_w(space->machine, 0,data); }
 WRITE8_HANDLER( namco_06xx_1_ctrl_w )	{ namco_06xx_ctrl_w(space->machine, 1,data); }

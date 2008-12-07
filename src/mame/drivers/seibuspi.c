@@ -695,12 +695,12 @@ static int fifoout_read_request = 0;
 
 static UINT8 sb_coin_latch = 0;
 
-static UINT8 z80_fifoout_pop(running_machine *machine)
+static UINT8 z80_fifoout_pop(const address_space *space)
 {
 	UINT8 r;
 	if (fifoout_wpos == fifoout_rpos)
 	{
-		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(machine->activecpu));
+		logerror("Sound FIFOOUT underflow at %08X\n", cpu_get_pc(space->cpu));
 	}
 	r = fifoout_data[fifoout_rpos++];
 	if(fifoout_rpos == FIFO_SIZE)
@@ -716,7 +716,7 @@ static UINT8 z80_fifoout_pop(running_machine *machine)
 	return r;
 }
 
-static void z80_fifoout_push(running_machine *machine, UINT8 data)
+static void z80_fifoout_push(const address_space *space, UINT8 data)
 {
 	fifoout_data[fifoout_wpos++] = data;
 	if (fifoout_wpos == FIFO_SIZE)
@@ -725,18 +725,18 @@ static void z80_fifoout_push(running_machine *machine, UINT8 data)
 	}
 	if(fifoout_wpos == fifoout_rpos)
 	{
-		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(machine->activecpu));
+		fatalerror("Sound FIFOOUT overflow at %08X", cpu_get_pc(space->cpu));
 	}
 
 	fifoout_read_request = 1;
 }
 
-static UINT8 z80_fifoin_pop(running_machine *machine)
+static UINT8 z80_fifoin_pop(const address_space *space)
 {
 	UINT8 r;
 	if (fifoin_wpos == fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(machine->activecpu));
+		fatalerror("Sound FIFOIN underflow at %08X", cpu_get_pc(space->cpu));
 	}
 	r = fifoin_data[fifoin_rpos++];
 	if(fifoin_rpos == FIFO_SIZE)
@@ -752,7 +752,7 @@ static UINT8 z80_fifoin_pop(running_machine *machine)
 	return r;
 }
 
-static void z80_fifoin_push(running_machine *machine, UINT8 data)
+static void z80_fifoin_push(const address_space *space, UINT8 data)
 {
 	fifoin_data[fifoin_wpos++] = data;
 	if(fifoin_wpos == FIFO_SIZE)
@@ -761,7 +761,7 @@ static void z80_fifoin_push(running_machine *machine, UINT8 data)
 	}
 	if(fifoin_wpos == fifoin_rpos)
 	{
-		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(machine->activecpu));
+		fatalerror("Sound FIFOIN overflow at %08X", cpu_get_pc(space->cpu));
 	}
 
 	fifoin_read_request = 1;
@@ -785,7 +785,7 @@ static WRITE8_HANDLER( sb_coin_w )
 
 static READ32_HANDLER( sound_fifo_r )
 {
-	UINT8 r = z80_fifoout_pop(space->machine);
+	UINT8 r = z80_fifoout_pop(space);
 
 	return r;
 }
@@ -793,7 +793,7 @@ static READ32_HANDLER( sound_fifo_r )
 static WRITE32_HANDLER( sound_fifo_w )
 {
 	if( ACCESSING_BITS_0_7 ) {
-		z80_fifoin_push(space->machine, data & 0xff);
+		z80_fifoin_push(space, data & 0xff);
 	}
 }
 
@@ -934,14 +934,14 @@ static WRITE32_HANDLER( spi_6295_1_w )
 
 static READ8_HANDLER( z80_soundfifo_r )
 {
-	UINT8 r = z80_fifoin_pop(space->machine);
+	UINT8 r = z80_fifoin_pop(space);
 
 	return r;
 }
 
 static WRITE8_HANDLER( z80_soundfifo_w )
 {
-	z80_fifoout_push(space->machine, data);
+	z80_fifoout_push(space, data);
 }
 
 static READ8_HANDLER( z80_soundfifo_status_r )

@@ -241,16 +241,17 @@ static WRITE16_DEVICE_HANDLER( ide_alt_w )
 }
 
 
-static READ16_DEVICE_HANDLER( gp2_ide_std_r )
+static READ16_HANDLER( gp2_ide_std_r )
 {
+	const device_config *device = devtag_get_device(space->machine, IDE_CONTROLLER, "ide");
 	if (offset & 0x01)
 	{
 		if (offset == 0x07)
 		{
-			switch (cpu_get_previouspc(device->machine->activecpu))
+			switch (cpu_get_previouspc(space->cpu))
 			{
 				case 0xdb4c:
-					if ((workram[0x5fa4/2] - cpu_get_reg(device->machine->activecpu, M68K_D0)) <= 0x10)
+					if ((workram[0x5fa4/2] - cpu_get_reg(space->cpu, M68K_D0)) <= 0x10)
 						gp2_irq_control = 1;
 					break;
 				case 0xdec2:
@@ -387,7 +388,7 @@ static ADDRESS_MAP_START( gp2_readmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x880000, 0x881fff) AM_READ(gp2_vram_r)			/* vram */
 	AM_RANGE(0x89f000, 0x8a0fff) AM_READ(gp2_vram_mirror_r)		/* vram (mirror) */
 	AM_RANGE(0x900000, 0x901fff) AM_READ(v_rom_r)				/* gfxrom through */
-	AM_RANGE(0xa00000, 0xa0000f) AM_DEVREAD(IDE_CONTROLLER, "ide", gp2_ide_std_r)			/* IDE control regs */
+	AM_RANGE(0xa00000, 0xa0000f) AM_READ(gp2_ide_std_r)			/* IDE control regs */
 	AM_RANGE(0xa4000c, 0xa4000f) AM_DEVREAD(IDE_CONTROLLER, "ide", ide_alt_r)				/* IDE status control reg */
 	AM_RANGE(0xc00000, 0xcbffff) AM_READ(sndram_r)				/* sound ram */
 ADDRESS_MAP_END

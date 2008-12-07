@@ -449,7 +449,7 @@ static void int_control_w(const address_space *space, int offset, UINT8 data)
 {
 	int duration;
 
-//  logerror("%06X:int_control_w(%X) = %02X\n", cpu_get_pc(machine->activecpu), offset, data);
+//  logerror("%06X:int_control_w(%X) = %02X\n", cpu_get_pc(space->cpu), offset, data);
 	switch (offset)
 	{
 		case 0:

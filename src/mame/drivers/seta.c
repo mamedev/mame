@@ -1322,7 +1322,7 @@ static struct st_chip {
 /*------------------------------
     uppdate timer
 ------------------------------*/
-static void uPD71054_update_timer( running_machine *machine, int no )
+static void uPD71054_update_timer( running_machine *machine, const device_config *cpu, int no )
 {
 	UINT16 max = uPD71054.max[no]&0xffff;
 
@@ -1332,7 +1332,7 @@ static void uPD71054_update_timer( running_machine *machine, int no )
 	} else {
 		timer_adjust_oneshot( uPD71054.timer[no], attotime_never, no);
 		logerror( "CPU #0 PC %06X: uPD71054 error, timer %d duration is 0\n",
-				cpu_get_pc(machine->activecpu), no );
+				(cpu != NULL) ? cpu_get_pc(cpu) : -1, no );
 	}
 }
 
@@ -1344,7 +1344,7 @@ static void uPD71054_update_timer( running_machine *machine, int no )
 static TIMER_CALLBACK( uPD71054_timer_callback )
 {
 	cpu_set_input_line(machine->cpu[0], 4, HOLD_LINE );
-	uPD71054_update_timer( machine, param );
+	uPD71054_update_timer( machine, NULL, param );
 }
 
 
@@ -1390,7 +1390,7 @@ static WRITE16_HANDLER( timer_regs_w )
 			uPD71054.max[offset] = (uPD71054.max[offset]&0x00ff)+(data<<8);
 		}
 		if( uPD71054.max[offset] != 0 ) {
-			uPD71054_update_timer( space->machine, offset );
+			uPD71054_update_timer( space->machine, space->cpu, offset );
 		}
 		break;
 	  case 0x0003:

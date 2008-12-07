@@ -43,11 +43,14 @@ enum
     STRUCTURES
 ***************************************************************************/
 
+typedef int (*mb86233_fifo_read_func)(const device_config *device, UINT32 *data);
+typedef void (*mb86233_fifo_write_func)(const device_config *device, UINT32 data);
+
 typedef struct _mb86233_cpu_core mb86233_cpu_core;
 struct _mb86233_cpu_core
 {
-	int			(*fifo_read_cb)( UINT32* data );
-	void		(*fifo_write_cb)( UINT32 data );
+	mb86233_fifo_read_func fifo_read_cb;
+	mb86233_fifo_write_func fifo_write_cb;
 	const char *tablergn;
 };
 

@@ -9,21 +9,64 @@
 #ifndef PCI_H
 #define PCI_H
 
-struct pci_device_info
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+typedef UINT32 (*pci_read_func)(const device_config *pcibus, const device_config *device, int function, int reg, UINT32 mem_mask);
+typedef void (*pci_write_func)(const device_config *pcibus, const device_config *device, int function, int reg, UINT32 data, UINT32 mem_mask);
+
+typedef struct _pci_device_entry pci_device_entry;
+struct _pci_device_entry
 {
-	UINT32 (*read_callback)(int function, int reg, UINT32 mem_mask);
-	void (*write_callback)(int function, int reg, UINT32 data, UINT32 mem_mask);
+	device_type			devtype;
+	const char *		devtag;
+	pci_read_func		read_callback;
+	pci_write_func		write_callback;
+};
+
+typedef struct _pci_bus_config pci_bus_config;
+struct _pci_bus_config
+{
+	UINT8				busnum;
+	pci_device_entry	device[32];
 };
 
 
-void pci_init(void);
-void pci_add_device(int bus, int device, const struct pci_device_info *devinfo);
 
-READ32_HANDLER(pci_32le_r);
-WRITE32_HANDLER(pci_32le_w);
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
 
-READ64_HANDLER(pci_64be_r);
-WRITE64_HANDLER(pci_64be_w);
+#define MDRV_PCI_BUS_ADD(_tag, _busnum) \
+	MDRV_DEVICE_ADD(_tag, PCI_BUS) \
+	MDRV_DEVICE_CONFIG_DATA32(pci_bus_config, busnum, _busnum)
+
+#define MDRV_PCI_BUS_DEVICE(_devnum, _devtype, _devtag, _configread, _configwrite) \
+	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtype, _devtype) \
+	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtag, _devtag) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, read_callback, _configread) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, write_callback, _configwrite)
+
+
+
+/***************************************************************************
+    FUNCTION PROTOTYPES
+***************************************************************************/
+
+READ32_DEVICE_HANDLER( pci_32le_r );
+WRITE32_DEVICE_HANDLER( pci_32le_w );
+
+READ64_DEVICE_HANDLER( pci_64be_r );
+WRITE64_DEVICE_HANDLER( pci_64be_w );
+
+
+/* ----- device interface ----- */
+
+/* device get info callback */
+#define PCI_BUS DEVICE_GET_INFO_NAME(pci_bus)
+DEVICE_GET_INFO( pci_bus );
 
 #endif /* PCI_H */
 
