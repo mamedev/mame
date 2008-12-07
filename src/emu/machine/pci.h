@@ -44,8 +44,8 @@ struct _pci_bus_config
 	MDRV_DEVICE_CONFIG_DATA32(pci_bus_config, busnum, _busnum)
 
 #define MDRV_PCI_BUS_DEVICE(_devnum, _devtype, _devtag, _configread, _configwrite) \
-	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtype, _devtype) \
-	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtag, _devtag) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtype, _devtype) \
+	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, devtag, _devtag) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, read_callback, _configread) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, write_callback, _configwrite)
 
