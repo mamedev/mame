@@ -10,6 +10,44 @@
 #include "thunderj.h"
 
 
+int eprom_screen_intensity;
+int eprom_video_disable;
+
+
+/*************************************
+ *
+ *  Palette
+ *
+ *************************************/
+
+static void update_palette(running_machine *machine)
+{
+	int color;
+
+	for (color = 0; color < 0x800; ++color)
+	{
+		int i, r, g, b;
+		UINT16 const data = paletteram16[color];
+
+		/* FIXME this is only a very crude approximation of the palette output.
+		 * The circuit involves a dozen transistors and probably has an output
+		 * which is quite different from this.
+		 * This is, however, good enough to match the video and description
+		 * of MAMETesters bug #02677.
+		 */
+		i = (((data >> 12) & 15) + 1) * (4 - eprom_screen_intensity);
+		if (i < 0)
+			i = 0;
+
+		r = ((data >> 8) & 15) * i / 4;
+		g = ((data >> 4) & 15) * i / 4;
+		b = ((data >> 0) & 15) * i / 4;
+
+		palette_set_color_rgb(machine, color, r, g, b);
+	}
+}
+
+
 
 /*************************************
  *
@@ -102,6 +140,12 @@ VIDEO_START( eprom )
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
+
+	/* global brightess (not used by klax and guts) */
+	eprom_screen_intensity = 0;
+
+	/* video disabled (not used?) */
+	eprom_video_disable = 0;
 }
 
 
@@ -153,6 +197,12 @@ VIDEO_START( guts )
 	/* initialize the alphanumerics */
 	atarigen_alpha_tilemap = tilemap_create(get_alpha_tile_info, tilemap_scan_rows,  8,8, 64,32);
 	tilemap_set_transparent_pen(atarigen_alpha_tilemap, 0);
+
+	/* global brightess (not used by guts) */
+	eprom_screen_intensity = 0;
+
+	/* video disable (not used by guts) */
+	eprom_video_disable = 0;
 }
 
 
@@ -190,6 +240,14 @@ VIDEO_UPDATE( eprom )
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
+
+	if (eprom_video_disable)
+	{
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		return 0;
+	}
+
+	update_palette(screen->machine);
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);
@@ -336,6 +394,14 @@ VIDEO_UPDATE( guts )
 	atarimo_rect_list rectlist;
 	bitmap_t *mobitmap;
 	int x, y, r;
+
+	if (eprom_video_disable)
+	{
+		bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+		return 0;
+	}
+
+	update_palette(screen->machine);
 
 	/* draw the playfield */
 	tilemap_draw(bitmap, cliprect, atarigen_playfield_tilemap, 0, 0);

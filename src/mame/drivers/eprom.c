@@ -12,6 +12,10 @@
     Known bugs:
         * none at this time
 
+    TODO:
+        * the RGB generator visible in the schematics is not properly modeled.
+
+
 ****************************************************************************
 
     Memory map (TBA)
@@ -106,13 +110,19 @@ static READ16_HANDLER( adc_r )
 
 static WRITE16_HANDLER( eprom_latch_w )
 {
-	/* reset extra CPU */
 	if (ACCESSING_BITS_0_7)
 	{
+		/* bit 0: reset extra CPU */
 		if (data & 1)
 			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, CLEAR_LINE);
 		else
 			cpu_set_input_line(space->machine->cpu[1], INPUT_LINE_RESET, ASSERT_LINE);
+
+		/* bits 1-4: screen intensity */
+		eprom_screen_intensity = (data & 0x1e) >> 1;
+
+		/* bit 5: video disable */
+		eprom_video_disable = (data & 0x20);
 	}
 }
 
@@ -164,7 +174,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x360010, 0x360011) AM_WRITE(eprom_latch_w)
 	AM_RANGE(0x360020, 0x360021) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE(atarigen_sound_w)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM AM_BASE(&paletteram16)
 	AM_RANGE(0x3f0000, 0x3f1fff) AM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0x3f2000, 0x3f3fff) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
 	AM_RANGE(0x3f4000, 0x3f4f7f) AM_WRITE(atarigen_alpha_w) AM_BASE(&atarigen_alpha)
@@ -189,7 +199,7 @@ static ADDRESS_MAP_START( guts_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x360010, 0x360011) AM_WRITE(eprom_latch_w)
 	AM_RANGE(0x360020, 0x360021) AM_WRITE(atarigen_sound_reset_w)
 	AM_RANGE(0x360030, 0x360031) AM_WRITE(atarigen_sound_w)
-	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM_WRITE(paletteram16_IIIIRRRRGGGGBBBB_word_w) AM_BASE(&paletteram16)
+	AM_RANGE(0x3e0000, 0x3e0fff) AM_RAM AM_BASE(&paletteram16)
 	AM_RANGE(0xff0000, 0xff1fff) AM_WRITE(atarigen_playfield_upper_w) AM_BASE(&atarigen_playfield_upper)
 	AM_RANGE(0xff8000, 0xff9fff) AM_WRITE(atarigen_playfield_w) AM_BASE(&atarigen_playfield)
 	AM_RANGE(0xffa000, 0xffbfff) AM_WRITE(atarimo_0_spriteram_w) AM_BASE(&atarimo_0_spriteram)
