@@ -3,14 +3,6 @@ typedef enum { AW, CW, DW, BW, SP, BP, IX, IY } WREGS;
 
 #define NEC_NMI_INT_VECTOR 2
 
-/* Cpu types, steps of 8 to help the cycle count calculation */
-#define V30MZ 24
-
-#ifndef FALSE
-#define FALSE 0
-#define TRUE 1
-#endif
-
 #ifdef LSB_FIRST
 typedef enum { AL,AH,CL,CH,DL,DH,BL,BH,SPL,SPH,BPL,BPH,IXL,IXH,IYL,IYH } BREGS;
 #else
@@ -19,25 +11,25 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 /* parameter x = result, y = source 1, z = source 2 */
 
-#define SetTF(x)		(I.TF = (x))
-#define SetIF(x)		(I.IF = (x))
-#define SetDF(x)		(I.DF = (x))
-#define SetMD(x)		(I.MF = (x))	/* OB [19.07.99] Mode Flag V30 */
+#define SetTF(x)		(cpustate->TF = (x))
+#define SetIF(x)		(cpustate->IF = (x))
+#define SetDF(x)		(cpustate->DF = (x))
+#define SetMD(x)		(cpustate->MF = (x))	/* OB [19.07.99] Mode Flag V30 */
 
-#define SetCFB(x)		(I.CarryVal = (x) & 0x100)
-#define SetCFW(x)		(I.CarryVal = (x) & 0x10000)
-#define SetAF(x,y,z)	(I.AuxVal = ((x) ^ ((y) ^ (z))) & 0x10)
-#define SetSF(x)		(I.SignVal = (x))
-#define SetZF(x)		(I.ZeroVal = (x))
-#define SetPF(x)		(I.ParityVal = (x))
+#define SetCFB(x)		(cpustate->CarryVal = (x) & 0x100)
+#define SetCFW(x)		(cpustate->CarryVal = (x) & 0x10000)
+#define SetAF(x,y,z)	(cpustate->AuxVal = ((x) ^ ((y) ^ (z))) & 0x10)
+#define SetSF(x)		(cpustate->SignVal = (x))
+#define SetZF(x)		(cpustate->ZeroVal = (x))
+#define SetPF(x)		(cpustate->ParityVal = (x))
 
-#define SetSZPF_Byte(x) (I.SignVal=I.ZeroVal=I.ParityVal=(INT8)(x))
-#define SetSZPF_Word(x) (I.SignVal=I.ZeroVal=I.ParityVal=(INT16)(x))
+#define SetSZPF_Byte(x) (cpustate->SignVal=cpustate->ZeroVal=cpustate->ParityVal=(INT8)(x))
+#define SetSZPF_Word(x) (cpustate->SignVal=cpustate->ZeroVal=cpustate->ParityVal=(INT16)(x))
 
-#define SetOFW_Add(x,y,z)	(I.OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x8000)
-#define SetOFB_Add(x,y,z)	(I.OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x80)
-#define SetOFW_Sub(x,y,z)	(I.OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x8000)
-#define SetOFB_Sub(x,y,z)	(I.OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x80)
+#define SetOFW_Add(x,y,z)	(cpustate->OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x8000)
+#define SetOFB_Add(x,y,z)	(cpustate->OverVal = ((x) ^ (y)) & ((x) ^ (z)) & 0x80)
+#define SetOFW_Sub(x,y,z)	(cpustate->OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x8000)
+#define SetOFB_Sub(x,y,z)	(cpustate->OverVal = ((z) ^ (y)) & ((z) ^ (x)) & 0x80)
 
 #define ADDB { UINT32 res=dst+src; SetCFB(res); SetOFB_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
 #define ADDW { UINT32 res=dst+src; SetCFW(res); SetOFW_Add(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
@@ -45,53 +37,53 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 #define SUBB { UINT32 res=dst-src; SetCFB(res); SetOFB_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Byte(res); dst=(BYTE)res; }
 #define SUBW { UINT32 res=dst-src; SetCFW(res); SetOFW_Sub(res,src,dst); SetAF(res,src,dst); SetSZPF_Word(res); dst=(WORD)res; }
 
-#define ORB dst|=src; I.CarryVal=I.OverVal=I.AuxVal=0; SetSZPF_Byte(dst)
-#define ORW dst|=src; I.CarryVal=I.OverVal=I.AuxVal=0; SetSZPF_Word(dst)
+#define ORB dst|=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Byte(dst)
+#define ORW dst|=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Word(dst)
 
-#define ANDB dst&=src; I.CarryVal=I.OverVal=I.AuxVal=0; SetSZPF_Byte(dst)
-#define ANDW dst&=src; I.CarryVal=I.OverVal=I.AuxVal=0; SetSZPF_Word(dst)
+#define ANDB dst&=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Byte(dst)
+#define ANDW dst&=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Word(dst)
 
-#define XORB dst^=src; I.CarryVal=I.OverVal=I.AuxVal=0; SetSZPF_Byte(dst)
-#define XORW dst^=src; I.CarryVal=I.OverVal=I.AuxVal=0; SetSZPF_Word(dst)
+#define XORB dst^=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Byte(dst)
+#define XORW dst^=src; cpustate->CarryVal=cpustate->OverVal=cpustate->AuxVal=0; SetSZPF_Word(dst)
 
-#define CF		(I.CarryVal!=0)
-#define SF		(I.SignVal<0)
-#define ZF		(I.ZeroVal==0)
-#define PF		parity_table[(BYTE)I.ParityVal]
-#define AF		(I.AuxVal!=0)
-#define OF		(I.OverVal!=0)
-#define MD		(I.MF!=0)
+#define CF		(cpustate->CarryVal!=0)
+#define SF		(cpustate->SignVal<0)
+#define ZF		(cpustate->ZeroVal==0)
+#define PF		parity_table[(BYTE)cpustate->ParityVal]
+#define AF		(cpustate->AuxVal!=0)
+#define OF		(cpustate->OverVal!=0)
+#define MD		(cpustate->MF!=0)
 
 /************************************************************************/
 
-#define SegBase(Seg) (I.sregs[Seg] << 4)
+#define SegBase(Seg) (cpustate->sregs[Seg] << 4)
 
-#define DefaultBase(Seg) ((seg_prefix && (Seg==DS || Seg==SS)) ? prefix_base : I.sregs[Seg] << 4)
+#define DefaultBase(Seg) ((cpustate->seg_prefix && (Seg==DS || Seg==SS)) ? cpustate->prefix_base : cpustate->sregs[Seg] << 4)
 
-#define GetMemB(Seg,Off) ((UINT8)memory_read_byte_8le(I.program, (DefaultBase(Seg)+(Off))))
-#define GetMemW(Seg,Off) ((UINT16) memory_read_byte_8le(I.program, (DefaultBase(Seg)+(Off))) + (memory_read_byte_8le(I.program, (DefaultBase(Seg)+((Off)+1)))<<8) )
+#define GetMemB(Seg,Off) ((UINT8)memory_read_byte_8le(cpustate->program, (DefaultBase(Seg)+(Off))))
+#define GetMemW(Seg,Off) ((UINT16) memory_read_byte_8le(cpustate->program, (DefaultBase(Seg)+(Off))) + (memory_read_byte_8le(cpustate->program, (DefaultBase(Seg)+((Off)+1)))<<8) )
 
-#define PutMemB(Seg,Off,x) { memory_write_byte_8le(I.program, (DefaultBase(Seg)+(Off)),(x)); }
+#define PutMemB(Seg,Off,x) { memory_write_byte_8le(cpustate->program, (DefaultBase(Seg)+(Off)),(x)); }
 #define PutMemW(Seg,Off,x) { PutMemB(Seg,Off,(x)&0xff); PutMemB(Seg,(Off)+1,(BYTE)((x)>>8)); }
 
 /* Todo:  Remove these later - plus readword could overflow */
-#define ReadByte(ea) ((BYTE)memory_read_byte_8le(I.program, (ea)))
-#define ReadWord(ea) (memory_read_byte_8le(I.program, (ea))+(memory_read_byte_8le(I.program, ((ea)+1))<<8))
-#define WriteByte(ea,val) { memory_write_byte_8le(I.program, (ea),val); }
-#define WriteWord(ea,val) { memory_write_byte_8le(I.program, (ea),(BYTE)(val)); memory_write_byte_8le(I.program, ((ea)+1),(val)>>8); }
+#define ReadByte(ea) ((BYTE)memory_read_byte_8le(cpustate->program, (ea)))
+#define ReadWord(ea) (memory_read_byte_8le(cpustate->program, (ea))+(memory_read_byte_8le(cpustate->program, ((ea)+1))<<8))
+#define WriteByte(ea,val) { memory_write_byte_8le(cpustate->program, (ea),val); }
+#define WriteWord(ea,val) { memory_write_byte_8le(cpustate->program, (ea),(BYTE)(val)); memory_write_byte_8le(cpustate->program, ((ea)+1),(val)>>8); }
 
-#define read_port(port) memory_read_byte_8le(I.io, port)
-#define write_port(port,val) memory_write_byte_8le(I.io, port,val)
+#define read_port(port) memory_read_byte_8le(cpustate->io, port)
+#define write_port(port,val) memory_write_byte_8le(cpustate->io, port,val)
 
-#define FETCH (memory_raw_read_byte(I.program, (I.sregs[CS]<<4)+I.ip++))
-#define FETCHOP (memory_decrypted_read_byte(I.program, (I.sregs[CS]<<4)+I.ip++))
-#define FETCHWORD(var) { var=memory_raw_read_byte(I.program, (((I.sregs[CS]<<4)+I.ip)))+(memory_raw_read_byte(I.program, (((I.sregs[CS]<<4)+I.ip+1)))<<8); I.ip+=2; }
-#define PUSH(val) { I.regs.w[SP]-=2; WriteWord((((I.sregs[SS]<<4)+I.regs.w[SP])),val); }
-#define POP(var) { var = ReadWord((((I.sregs[SS]<<4)+I.regs.w[SP]))); I.regs.w[SP]+=2; }
-#define PEEK(addr) ((BYTE)memory_raw_read_byte(I.program, addr))
-#define PEEKOP(addr) ((BYTE)memory_decrypted_read_byte(I.program, addr))
+#define FETCH (memory_raw_read_byte(cpustate->program, (cpustate->sregs[CS]<<4)+cpustate->ip++))
+#define FETCHOP (memory_decrypted_read_byte(cpustate->program, (cpustate->sregs[CS]<<4)+cpustate->ip++))
+#define FETCHWORD(var) { var=memory_raw_read_byte(cpustate->program, (((cpustate->sregs[CS]<<4)+cpustate->ip)))+(memory_raw_read_byte(cpustate->program, (((cpustate->sregs[CS]<<4)+cpustate->ip+1)))<<8); cpustate->ip+=2; }
+#define PUSH(val) { cpustate->regs.w[SP]-=2; WriteWord((((cpustate->sregs[SS]<<4)+cpustate->regs.w[SP])),val); }
+#define POP(var) { var = ReadWord((((cpustate->sregs[SS]<<4)+cpustate->regs.w[SP]))); cpustate->regs.w[SP]+=2; }
+#define PEEK(addr) ((BYTE)memory_raw_read_byte(cpustate->program, addr))
+#define PEEKOP(addr) ((BYTE)memory_decrypted_read_byte(cpustate->program, addr))
 
-#define GetModRM UINT32 ModRM=memory_raw_read_byte(I.program, (I.sregs[CS]<<4)+I.ip++)
+#define GetModRM UINT32 ModRM=memory_raw_read_byte(cpustate->program, (cpustate->sregs[CS]<<4)+cpustate->ip++)
 
 /* Cycle count macros:
     CLK  - cycle count is the same on all processors
@@ -105,103 +97,102 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
     Extra cycles for PUSH'ing or POP'ing registers to odd addresses is not emulated.
 */
 
-#define CLK(v30mz) { nec_ICount-=v30mz; }
-#define CLKM(v30mz,v30mzm) { nec_ICount-=( ModRM >=0xc0 )?v30mz:v30mzm; }
+#define CLK(v30mz) { cpustate->icount-=v30mz; }
+#define CLKM(v30mz,v30mzm) { cpustate->icount-=( ModRM >=0xc0 )?v30mz:v30mzm; }
 
 /************************************************************************/
 #define CompressFlags() (WORD)(CF | (PF << 2) | (AF << 4) | (ZF << 6) \
-				| (SF << 7) | (I.TF << 8) | (I.IF << 9) \
-				| (I.DF << 10) | (OF << 11)| (MD << 15))
+				| (SF << 7) | (cpustate->TF << 8) | (cpustate->IF << 9) \
+				| (cpustate->DF << 10) | (OF << 11)| (MD << 15))
 
 #define ExpandFlags(f) \
 { \
-	I.CarryVal = (f) & 1; \
-	I.ParityVal = !((f) & 4); \
-	I.AuxVal = (f) & 16; \
-	I.ZeroVal = !((f) & 64); \
-	I.SignVal = (f) & 128 ? -1 : 0; \
-	I.TF = ((f) & 256) == 256; \
-	I.IF = ((f) & 512) == 512; \
-	I.DF = ((f) & 1024) == 1024; \
-	I.OverVal = (f) & 2048; \
-	I.MF = ((f) & 0x8000) == 0x8000; \
+	cpustate->CarryVal = (f) & 1; \
+	cpustate->ParityVal = !((f) & 4); \
+	cpustate->AuxVal = (f) & 16; \
+	cpustate->ZeroVal = !((f) & 64); \
+	cpustate->SignVal = (f) & 128 ? -1 : 0; \
+	cpustate->TF = ((f) & 256) == 256; \
+	cpustate->IF = ((f) & 512) == 512; \
+	cpustate->DF = ((f) & 1024) == 1024; \
+	cpustate->OverVal = (f) & 2048; \
+	cpustate->MF = ((f) & 0x8000) == 0x8000; \
 }
 
 #define IncWordReg(Reg) 					\
-	unsigned tmp = (unsigned)I.regs.w[Reg]; \
+	unsigned tmp = (unsigned)cpustate->regs.w[Reg]; \
 	unsigned tmp1 = tmp+1;					\
-	I.OverVal = (tmp == 0x7fff); 			\
+	cpustate->OverVal = (tmp == 0x7fff); 			\
 	SetAF(tmp1,tmp,1);						\
 	SetSZPF_Word(tmp1); 					\
-	I.regs.w[Reg]=tmp1
+	cpustate->regs.w[Reg]=tmp1
 
 #define DecWordReg(Reg) 					\
-	unsigned tmp = (unsigned)I.regs.w[Reg]; \
+	unsigned tmp = (unsigned)cpustate->regs.w[Reg]; \
     unsigned tmp1 = tmp-1; 					\
-	I.OverVal = (tmp == 0x8000); 			\
+	cpustate->OverVal = (tmp == 0x8000); 			\
     SetAF(tmp1,tmp,1); 						\
     SetSZPF_Word(tmp1); 					\
-	I.regs.w[Reg]=tmp1
+	cpustate->regs.w[Reg]=tmp1
 
 #define JMP(flag)							\
 	int tmp = (int)((INT8)FETCH);			\
 	if (flag)								\
 	{										\
-		static const UINT8 table[3]={3,10,10}; 	\
-		I.ip = (WORD)(I.ip+tmp);			\
-		nec_ICount-=table[chip_type/8];		\
+		cpustate->ip = (WORD)(cpustate->ip+tmp);			\
+		cpustate->icount-=10;		\
 		return;								\
 	}
 
 #define ADJ4(param1,param2)					\
-	if (AF || ((I.regs.b[AL] & 0xf) > 9))	\
+	if (AF || ((cpustate->regs.b[AL] & 0xf) > 9))	\
 	{										\
 		UINT16 tmp;							\
-		tmp = I.regs.b[AL] + param1;		\
-		I.regs.b[AL] = tmp;					\
-		I.AuxVal = 1;						\
-		I.CarryVal |= tmp & 0x100;			\
+		tmp = cpustate->regs.b[AL] + param1;		\
+		cpustate->regs.b[AL] = tmp;					\
+		cpustate->AuxVal = 1;						\
+		cpustate->CarryVal |= tmp & 0x100;			\
 	}										\
-	if (CF || (I.regs.b[AL]>0x9f))			\
+	if (CF || (cpustate->regs.b[AL]>0x9f))			\
 	{										\
-		I.regs.b[AL] += param2;				\
-		I.CarryVal = 1;						\
+		cpustate->regs.b[AL] += param2;				\
+		cpustate->CarryVal = 1;						\
 	}										\
-	SetSZPF_Byte(I.regs.b[AL])
+	SetSZPF_Byte(cpustate->regs.b[AL])
 
 #define ADJB(param1,param2)					\
-	if (AF || ((I.regs.b[AL] & 0xf) > 9))	\
+	if (AF || ((cpustate->regs.b[AL] & 0xf) > 9))	\
     {										\
-		I.regs.b[AL] += param1;				\
-		I.regs.b[AH] += param2;				\
-		I.AuxVal = 1;						\
-		I.CarryVal = 1;						\
+		cpustate->regs.b[AL] += param1;				\
+		cpustate->regs.b[AH] += param2;				\
+		cpustate->AuxVal = 1;						\
+		cpustate->CarryVal = 1;						\
     }										\
 	else									\
 	{										\
-		I.AuxVal = 0;						\
-		I.CarryVal = 0;						\
+		cpustate->AuxVal = 0;						\
+		cpustate->CarryVal = 0;						\
     }										\
-	I.regs.b[AL] &= 0x0F
+	cpustate->regs.b[AL] &= 0x0F
 
 #define BITOP_BYTE							\
 	ModRM = FETCH;							\
 	if (ModRM >= 0xc0) {					\
-		tmp=I.regs.b[Mod_RM.RM.b[ModRM]];	\
+		tmp=cpustate->regs.b[Mod_RM.RM.b[ModRM]];	\
 	}										\
 	else {									\
-		(*GetEA[ModRM])();					\
-		tmp=ReadByte(EA);					\
+		(*GetEA[ModRM])(cpustate);					\
+		tmp=ReadByte(cpustate->ea);					\
     }
 
 #define BITOP_WORD							\
 	ModRM = FETCH;							\
 	if (ModRM >= 0xc0) {					\
-		tmp=I.regs.w[Mod_RM.RM.w[ModRM]];	\
+		tmp=cpustate->regs.w[Mod_RM.RM.w[ModRM]];	\
 	}										\
 	else {									\
-		(*GetEA[ModRM])();					\
-		tmp=ReadWord(EA);					\
+		(*GetEA[ModRM])(cpustate);					\
+		tmp=ReadWord(cpustate->ea);					\
     }
 
 #define BIT_NOT								\
@@ -212,144 +203,141 @@ typedef enum { AH,AL,CH,CL,DH,DL,BH,BL,SPH,SPL,BPH,BPL,IXH,IXL,IYH,IYL } BREGS;
 
 #define XchgAWReg(Reg) 						\
     WORD tmp; 								\
-	tmp = I.regs.w[Reg]; 					\
-	I.regs.w[Reg] = I.regs.w[AW]; 			\
-	I.regs.w[AW] = tmp
+	tmp = cpustate->regs.w[Reg]; 					\
+	cpustate->regs.w[Reg] = cpustate->regs.w[AW]; 			\
+	cpustate->regs.w[AW] = tmp
 
-#define ROL_BYTE I.CarryVal = dst & 0x80; dst = (dst << 1)+CF
-#define ROL_WORD I.CarryVal = dst & 0x8000; dst = (dst << 1)+CF
-#define ROR_BYTE I.CarryVal = dst & 0x1; dst = (dst >> 1)+(CF<<7)
-#define ROR_WORD I.CarryVal = dst & 0x1; dst = (dst >> 1)+(CF<<15)
+#define ROL_BYTE cpustate->CarryVal = dst & 0x80; dst = (dst << 1)+CF
+#define ROL_WORD cpustate->CarryVal = dst & 0x8000; dst = (dst << 1)+CF
+#define ROR_BYTE cpustate->CarryVal = dst & 0x1; dst = (dst >> 1)+(CF<<7)
+#define ROR_WORD cpustate->CarryVal = dst & 0x1; dst = (dst >> 1)+(CF<<15)
 #define ROLC_BYTE dst = (dst << 1) + CF; SetCFB(dst)
 #define ROLC_WORD dst = (dst << 1) + CF; SetCFW(dst)
-#define RORC_BYTE dst = (CF<<8)+dst; I.CarryVal = dst & 0x01; dst >>= 1
-#define RORC_WORD dst = (CF<<16)+dst; I.CarryVal = dst & 0x01; dst >>= 1
-#define SHL_BYTE(c) nec_ICount-=c; dst <<= c;	SetCFB(dst); SetSZPF_Byte(dst);	PutbackRMByte(ModRM,(BYTE)dst)
-#define SHL_WORD(c) nec_ICount-=c; dst <<= c;	SetCFW(dst); SetSZPF_Word(dst);	PutbackRMWord(ModRM,(WORD)dst)
-#define SHR_BYTE(c) nec_ICount-=c; dst >>= c-1; I.CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
-#define SHR_WORD(c) nec_ICount-=c; dst >>= c-1; I.CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
-#define SHRA_BYTE(c) nec_ICount-=c; dst = ((INT8)dst) >> (c-1);	I.CarryVal = dst & 0x1;	dst = ((INT8)((BYTE)dst)) >> 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
-#define SHRA_WORD(c) nec_ICount-=c; dst = ((INT16)dst) >> (c-1);	I.CarryVal = dst & 0x1;	dst = ((INT16)((WORD)dst)) >> 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
+#define RORC_BYTE dst = (CF<<8)+dst; cpustate->CarryVal = dst & 0x01; dst >>= 1
+#define RORC_WORD dst = (CF<<16)+dst; cpustate->CarryVal = dst & 0x01; dst >>= 1
+#define SHL_BYTE(c) cpustate->icount-=c; dst <<= c;	SetCFB(dst); SetSZPF_Byte(dst);	PutbackRMByte(ModRM,(BYTE)dst)
+#define SHL_WORD(c) cpustate->icount-=c; dst <<= c;	SetCFW(dst); SetSZPF_Word(dst);	PutbackRMWord(ModRM,(WORD)dst)
+#define SHR_BYTE(c) cpustate->icount-=c; dst >>= c-1; cpustate->CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
+#define SHR_WORD(c) cpustate->icount-=c; dst >>= c-1; cpustate->CarryVal = dst & 0x1; dst >>= 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
+#define SHRA_BYTE(c) cpustate->icount-=c; dst = ((INT8)dst) >> (c-1);	cpustate->CarryVal = dst & 0x1;	dst = ((INT8)((BYTE)dst)) >> 1; SetSZPF_Byte(dst); PutbackRMByte(ModRM,(BYTE)dst)
+#define SHRA_WORD(c) cpustate->icount-=c; dst = ((INT16)dst) >> (c-1);	cpustate->CarryVal = dst & 0x1;	dst = ((INT16)((WORD)dst)) >> 1; SetSZPF_Word(dst); PutbackRMWord(ModRM,(WORD)dst)
 
 #define DIVUB												\
-	uresult = I.regs.w[AW];									\
+	uresult = cpustate->regs.w[AW];									\
 	uresult2 = uresult % tmp;								\
 	if ((uresult /= tmp) > 0xff) {							\
-		nec_interrupt(0,0); break;							\
+		nec_interrupt(cpustate,0,0); break;							\
 	} else {												\
-		I.regs.b[AL] = uresult;								\
-		I.regs.b[AH] = uresult2;							\
+		cpustate->regs.b[AL] = uresult;								\
+		cpustate->regs.b[AH] = uresult2;							\
 	}
 
 #define DIVB												\
-	result = (INT16)I.regs.w[AW];							\
+	result = (INT16)cpustate->regs.w[AW];							\
 	result2 = result % (INT16)((INT8)tmp);					\
 	if ((result /= (INT16)((INT8)tmp)) > 0xff) {			\
-		nec_interrupt(0,0); break;							\
+		nec_interrupt(cpustate,0,0); break;							\
 	} else {												\
-		I.regs.b[AL] = result;								\
-		I.regs.b[AH] = result2;								\
+		cpustate->regs.b[AL] = result;								\
+		cpustate->regs.b[AH] = result2;								\
 	}
 
 #define DIVUW												\
-	uresult = (((UINT32)I.regs.w[DW]) << 16) | I.regs.w[AW];\
+	uresult = (((UINT32)cpustate->regs.w[DW]) << 16) | cpustate->regs.w[AW];\
 	uresult2 = uresult % tmp;								\
 	if ((uresult /= tmp) > 0xffff) {						\
-		nec_interrupt(0,0); break;							\
+		nec_interrupt(cpustate,0,0); break;							\
 	} else {												\
-		I.regs.w[AW]=uresult;								\
-		I.regs.w[DW]=uresult2;								\
+		cpustate->regs.w[AW]=uresult;								\
+		cpustate->regs.w[DW]=uresult2;								\
 	}
 
 #define DIVW												\
-	result = ((UINT32)I.regs.w[DW] << 16) + I.regs.w[AW];	\
+	result = ((UINT32)cpustate->regs.w[DW] << 16) + cpustate->regs.w[AW];	\
 	result2 = result % (INT32)((INT16)tmp);					\
 	if ((result /= (INT32)((INT16)tmp)) > 0xffff) {			\
-		nec_interrupt(0,0); break;							\
+		nec_interrupt(cpustate,0,0); break;							\
 	} else {												\
-		I.regs.w[AW]=result;								\
-		I.regs.w[DW]=result2;								\
+		cpustate->regs.w[AW]=result;								\
+		cpustate->regs.w[DW]=result2;								\
 	}
 
 #define ADD4S {												\
 	int i,v1,v2,result;										\
-	int count = (I.regs.b[CL]+1)/2;							\
-	unsigned di = I.regs.w[IY];								\
-	unsigned si = I.regs.w[IX];								\
-	static const UINT8 table[3]={18,19,19};	 					\
-	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",PC(&I));	\
-	I.ZeroVal = I.CarryVal = 0;								\
+	int count = (cpustate->regs.b[CL]+1)/2;							\
+	unsigned di = cpustate->regs.w[IY];								\
+	unsigned si = cpustate->regs.w[IX];								\
+	if (cpustate->seg_prefix) logerror("%06x: Warning: seg_prefix defined for add4s\n",PC(cpustate));	\
+	cpustate->ZeroVal = cpustate->CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
-		nec_ICount-=table[chip_type/8];						\
+		cpustate->icount-=19;						\
 		tmp = GetMemB(DS, si);								\
 		tmp2 = GetMemB(ES, di);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
 		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
-		result = v1+v2+I.CarryVal;							\
-		I.CarryVal = result > 99 ? 1 : 0;					\
+		result = v1+v2+cpustate->CarryVal;							\
+		cpustate->CarryVal = result > 99 ? 1 : 0;					\
 		result = result % 100;								\
 		v1 = ((result/10)<<4) | (result % 10);				\
 		PutMemB(ES, di,v1);									\
-		if (v1) I.ZeroVal = 1;								\
+		if (v1) cpustate->ZeroVal = 1;								\
 		si++;												\
 		di++;												\
 	}														\
 }
 
 #define SUB4S {												\
-	int count = (I.regs.b[CL]+1)/2;							\
+	int count = (cpustate->regs.b[CL]+1)/2;							\
 	int i,v1,v2,result;										\
-    unsigned di = I.regs.w[IY];								\
-	unsigned si = I.regs.w[IX];								\
-	static const UINT8 table[3]={18,19,19};	 					\
-	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",PC(&I));	\
-	I.ZeroVal = I.CarryVal = 0;								\
+    unsigned di = cpustate->regs.w[IY];								\
+	unsigned si = cpustate->regs.w[IX];								\
+	if (cpustate->seg_prefix) logerror("%06x: Warning: seg_prefix defined for sub4s\n",PC(cpustate));	\
+	cpustate->ZeroVal = cpustate->CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
-		nec_ICount-=table[chip_type/8];						\
+		cpustate->icount-=19;						\
 		tmp = GetMemB(ES, di);								\
 		tmp2 = GetMemB(DS, si);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
 		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
-		if (v1 < (v2+I.CarryVal)) {							\
+		if (v1 < (v2+cpustate->CarryVal)) {							\
 			v1+=100;										\
-			result = v1-(v2+I.CarryVal);					\
-			I.CarryVal = 1;									\
+			result = v1-(v2+cpustate->CarryVal);					\
+			cpustate->CarryVal = 1;									\
 		} else {											\
-			result = v1-(v2+I.CarryVal);					\
-			I.CarryVal = 0;									\
+			result = v1-(v2+cpustate->CarryVal);					\
+			cpustate->CarryVal = 0;									\
 		}													\
 		v1 = ((result/10)<<4) | (result % 10);				\
 		PutMemB(ES, di,v1);									\
-		if (v1) I.ZeroVal = 1;								\
+		if (v1) cpustate->ZeroVal = 1;								\
 		si++;												\
 		di++;												\
 	}														\
 }
 
 #define CMP4S {												\
-	int count = (I.regs.b[CL]+1)/2;							\
+	int count = (cpustate->regs.b[CL]+1)/2;							\
 	int i,v1,v2,result;										\
-    unsigned di = I.regs.w[IY];								\
-	unsigned si = I.regs.w[IX];								\
-	static const UINT8 table[3]={14,19,19};						\
-	if (seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",PC(&I));	\
-	I.ZeroVal = I.CarryVal = 0;								\
+    unsigned di = cpustate->regs.w[IY];								\
+	unsigned si = cpustate->regs.w[IX];								\
+	if (cpustate->seg_prefix) logerror("%06x: Warning: seg_prefix defined for cmp4s\n",PC(cpustate));	\
+	cpustate->ZeroVal = cpustate->CarryVal = 0;								\
 	for (i=0;i<count;i++) {									\
-		nec_ICount-=table[chip_type/8];						\
+		cpustate->icount-=19;						\
 		tmp = GetMemB(ES, di);								\
 		tmp2 = GetMemB(DS, si);								\
 		v1 = (tmp>>4)*10 + (tmp&0xf);						\
 		v2 = (tmp2>>4)*10 + (tmp2&0xf);						\
-		if (v1 < (v2+I.CarryVal)) {							\
+		if (v1 < (v2+cpustate->CarryVal)) {							\
 			v1+=100;										\
-			result = v1-(v2+I.CarryVal);					\
-			I.CarryVal = 1;									\
+			result = v1-(v2+cpustate->CarryVal);					\
+			cpustate->CarryVal = 1;									\
 		} else {											\
-			result = v1-(v2+I.CarryVal);					\
-			I.CarryVal = 0;									\
+			result = v1-(v2+cpustate->CarryVal);					\
+			cpustate->CarryVal = 0;									\
 		}													\
 		v1 = ((result/10)<<4) | (result % 10);				\
-		if (v1) I.ZeroVal = 1;								\
+		if (v1) cpustate->ZeroVal = 1;								\
 		si++;												\
 		di++;												\
 	}														\
