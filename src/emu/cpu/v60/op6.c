@@ -3,94 +3,39 @@
     FULLY TRUSTED
 */
 
-static UINT32 opTB(int reg) /* TRUSTED */
+static UINT32 opTB(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	if (v60.reg[reg] == 0)
+	if (cpustate->reg[reg] == 0)
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBGT(int reg) /* TRUSTED */
+static UINT32 opDBGT(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	NORMALIZEFLAGS();
-	if ((v60.reg[reg] != 0) && !((_S ^ _OV) | _Z))
+	NORMALIZEFLAGS(cpustate);
+	if ((cpustate->reg[reg] != 0) && !((cpustate->_S ^ cpustate->_OV) | cpustate->_Z))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBLE(int reg) /* TRUSTED */
+static UINT32 opDBLE(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	NORMALIZEFLAGS();
-	if ((v60.reg[reg] != 0) && ((_S ^ _OV) | _Z))
+	NORMALIZEFLAGS(cpustate);
+	if ((cpustate->reg[reg] != 0) && ((cpustate->_S ^ cpustate->_OV) | cpustate->_Z))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
-		return 0;
-	}
-
-	return 4;
-}
-
-
-static UINT32 opDBGE(int reg) /* TRUSTED */
-{
-	v60.reg[reg]--;
-
-	NORMALIZEFLAGS();
-	if ((v60.reg[reg] != 0) && !(_S ^ _OV))
-	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
-		return 0;
-	}
-
-	return 4;
-}
-
-static UINT32 opDBLT(int reg) /* TRUSTED */
-{
-	v60.reg[reg]--;
-
-	NORMALIZEFLAGS();
-	if ((v60.reg[reg] != 0) && (_S ^ _OV))
-	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
-		return 0;
-	}
-
-	return 4;
-}
-
-static UINT32 opDBH(int reg) /* TRUSTED */
-{
-	v60.reg[reg]--;
-
-	if ((v60.reg[reg] != 0) && !(_CY | _Z))
-	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
-		return 0;
-	}
-
-	return 4;
-}
-
-static UINT32 opDBNH(int reg) /* TRUSTED */
-{
-	v60.reg[reg]--;
-
-	if ((v60.reg[reg] != 0) && (_CY | _Z))
-	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
@@ -98,124 +43,179 @@ static UINT32 opDBNH(int reg) /* TRUSTED */
 }
 
 
-static UINT32 opDBL(int reg) /* TRUSTED */
+static UINT32 opDBGE(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	if ((v60.reg[reg] != 0) && (_CY))
+	NORMALIZEFLAGS(cpustate);
+	if ((cpustate->reg[reg] != 0) && !(cpustate->_S ^ cpustate->_OV))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBNL(int reg) /* TRUSTED */
+static UINT32 opDBLT(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	if ((v60.reg[reg] != 0) && !(_CY))
+	NORMALIZEFLAGS(cpustate);
+	if ((cpustate->reg[reg] != 0) && (cpustate->_S ^ cpustate->_OV))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBE(int reg) /* TRUSTED */
+static UINT32 opDBH(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	if ((v60.reg[reg] != 0) && (_Z))
+	if ((cpustate->reg[reg] != 0) && !(cpustate->_CY | cpustate->_Z))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBNE(int reg) /* TRUSTED */
+static UINT32 opDBNH(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	if ((v60.reg[reg] != 0) && !(_Z))
+	if ((cpustate->reg[reg] != 0) && (cpustate->_CY | cpustate->_Z))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBV(int reg) /* TRUSTED */
-{
-	v60.reg[reg]--;
 
-	if ((v60.reg[reg] != 0) && (_OV))
+static UINT32 opDBL(v60_state *cpustate, int reg) /* TRUSTED */
+{
+	cpustate->reg[reg]--;
+
+	if ((cpustate->reg[reg] != 0) && (cpustate->_CY))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBNV(int reg) /* TRUSTED */
+static UINT32 opDBNL(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	if ((v60.reg[reg] != 0) && !(_OV))
+	if ((cpustate->reg[reg] != 0) && !(cpustate->_CY))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBN(int reg) /* TRUSTED */
+static UINT32 opDBE(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	if ((v60.reg[reg] != 0) && (_S))
+	if ((cpustate->reg[reg] != 0) && (cpustate->_Z))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBP(int reg) /* TRUSTED */
+static UINT32 opDBNE(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	if ((v60.reg[reg] != 0) && !(_S))
+	if ((cpustate->reg[reg] != 0) && !(cpustate->_Z))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 opDBR(int reg) /* TRUSTED */
+static UINT32 opDBV(v60_state *cpustate, int reg) /* TRUSTED */
 {
-	v60.reg[reg]--;
+	cpustate->reg[reg]--;
 
-	if (v60.reg[reg] != 0)
+	if ((cpustate->reg[reg] != 0) && (cpustate->_OV))
 	{
-		PC += (INT16)OpRead16(v60.program,PC + 2);
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
 		return 0;
 	}
 
 	return 4;
 }
 
-static UINT32 (*const OpC6Table[8])(int reg) = /* TRUSTED */
+static UINT32 opDBNV(v60_state *cpustate, int reg) /* TRUSTED */
+{
+	cpustate->reg[reg]--;
+
+	if ((cpustate->reg[reg] != 0) && !(cpustate->_OV))
+	{
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
+		return 0;
+	}
+
+	return 4;
+}
+
+static UINT32 opDBN(v60_state *cpustate, int reg) /* TRUSTED */
+{
+	cpustate->reg[reg]--;
+
+	if ((cpustate->reg[reg] != 0) && (cpustate->_S))
+	{
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
+		return 0;
+	}
+
+	return 4;
+}
+
+static UINT32 opDBP(v60_state *cpustate, int reg) /* TRUSTED */
+{
+	cpustate->reg[reg]--;
+
+	if ((cpustate->reg[reg] != 0) && !(cpustate->_S))
+	{
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
+		return 0;
+	}
+
+	return 4;
+}
+
+static UINT32 opDBR(v60_state *cpustate, int reg) /* TRUSTED */
+{
+	cpustate->reg[reg]--;
+
+	if (cpustate->reg[reg] != 0)
+	{
+		cpustate->PC += (INT16)OpRead16(cpustate->program, cpustate->PC + 2);
+		return 0;
+	}
+
+	return 4;
+}
+
+static UINT32 (*const OpC6Table[8])(v60_state *, int reg) = /* TRUSTED */
 {
 	opDBV,
 	opDBL,
@@ -227,7 +227,7 @@ static UINT32 (*const OpC6Table[8])(int reg) = /* TRUSTED */
 	opDBLE
 };
 
-static UINT32 (*const OpC7Table[8])(int reg) = /* TRUSTED */
+static UINT32 (*const OpC7Table[8])(v60_state *, int reg) = /* TRUSTED */
 {
 	opDBNV,
 	opDBNL,
@@ -240,15 +240,15 @@ static UINT32 (*const OpC7Table[8])(int reg) = /* TRUSTED */
 };
 
 
-static UINT32 opC6(void) /* TRUSTED */
+static UINT32 opC6(v60_state *cpustate) /* TRUSTED */
 {
-	UINT8 appb=OpRead8(v60.program,PC + 1);
-	return OpC6Table[appb>>5](appb&0x1f);
+	UINT8 appb = OpRead8(cpustate->program, cpustate->PC + 1);
+	return OpC6Table[appb >> 5](cpustate, appb & 0x1f);
 }
 
-static UINT32 opC7(void) /* TRUSTED */
+static UINT32 opC7(v60_state *cpustate) /* TRUSTED */
 {
-	UINT8 appb=OpRead8(v60.program,PC + 1);
-	return OpC7Table[appb>>5](appb&0x1f);
+	UINT8 appb = OpRead8(cpustate->program, cpustate->PC + 1);
+	return OpC7Table[appb >> 5](cpustate, appb & 0x1f);
 }
 

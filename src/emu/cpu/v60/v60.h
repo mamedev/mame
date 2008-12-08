@@ -79,7 +79,7 @@ enum
 };
 
 extern const char *const v60_reg_names[];
-void v60_stall(void);
+void v60_stall(const device_config *device);
 
 #if HAS_V60
 CPU_GET_INFO( v60 );

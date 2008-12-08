@@ -88,13 +88,13 @@ static UINT8 OpRead8_16(const address_space *space, offs_t address)
 
 static UINT16 OpRead16_16(const address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE_XOR_LE(address+1)) << 8);
+	return memory_decrypted_read_byte(space, BYTE_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE_XOR_LE(address + 1)) << 8);
 }
 
 static UINT32 OpRead32_16(const address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE_XOR_LE(address+1)) << 8) |
-			(memory_decrypted_read_byte(space, BYTE_XOR_LE(address+2)) << 16) | (memory_decrypted_read_byte(space, BYTE_XOR_LE(address+3)) << 24);
+	return memory_decrypted_read_byte(space, BYTE_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE_XOR_LE(address + 1)) << 8) |
+			(memory_decrypted_read_byte(space, BYTE_XOR_LE(address + 2)) << 16) | (memory_decrypted_read_byte(space, BYTE_XOR_LE(address + 3)) << 24);
 }
 
 
@@ -175,13 +175,13 @@ static UINT8 OpRead8_32(const address_space *space, offs_t address)
 
 static UINT16 OpRead16_32(const address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE4_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE4_XOR_LE(address+1)) << 8);
+	return memory_decrypted_read_byte(space, BYTE4_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE4_XOR_LE(address + 1)) << 8);
 }
 
 static UINT32 OpRead32_32(const address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE4_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE4_XOR_LE(address+1)) << 8) |
-			(memory_decrypted_read_byte(space, BYTE4_XOR_LE(address+2)) << 16) | (memory_decrypted_read_byte(space, BYTE4_XOR_LE(address+3)) << 24);
+	return memory_decrypted_read_byte(space, BYTE4_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE4_XOR_LE(address + 1)) << 8) |
+			(memory_decrypted_read_byte(space, BYTE4_XOR_LE(address + 2)) << 16) | (memory_decrypted_read_byte(space, BYTE4_XOR_LE(address + 3)) << 24);
 }
 
 
@@ -210,19 +210,19 @@ static const struct cpu_info v70_i =
 /* Macro shorthands for I/O functions */
 /**************************************/
 
-#define MemRead8    v60.info.mr8
-#define MemWrite8   v60.info.mw8
-#define MemRead16   v60.info.mr16
-#define MemWrite16  v60.info.mw16
-#define MemRead32   v60.info.mr32
-#define MemWrite32  v60.info.mw32
+#define MemRead8    cpustate->info.mr8
+#define MemWrite8   cpustate->info.mw8
+#define MemRead16   cpustate->info.mr16
+#define MemWrite16  cpustate->info.mw16
+#define MemRead32   cpustate->info.mr32
+#define MemWrite32  cpustate->info.mw32
 
 #if defined(LSB_FIRST) && !defined(ALIGN_INTS)
-#define OpRead8(s,a)	(memory_decrypted_read_byte(s,a))
-#define OpRead16(s,a)	(memory_decrypted_read_word(s,a))
-#define OpRead32(s,a)	(memory_decrypted_read_dword(s,a))
+#define OpRead8(s, a)	(memory_decrypted_read_byte(s, a))
+#define OpRead16(s, a)	(memory_decrypted_read_word(s, a))
+#define OpRead32(s, a)	(memory_decrypted_read_dword(s, a))
 #else
-#define OpRead8     v60.info.or8
-#define OpRead16    v60.info.or16
-#define OpRead32    v60.info.or32
+#define OpRead8     cpustate->info.or8
+#define OpRead16    cpustate->info.or16
+#define OpRead32    cpustate->info.or32
 #endif

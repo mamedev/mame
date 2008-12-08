@@ -2,692 +2,692 @@
 // AM2 Functions (for ReadAMAddress)
 // *********************************
 
-static UINT32 am2Register(void)
+static UINT32 am2Register(v60_state *cpustate)
 {
-	amFlag = 1;
-	amOut = modVal&0x1F;
+	cpustate->amflag = 1;
+	cpustate->amout = cpustate->modval & 0x1F;
 	return 1;
 }
 
-static UINT32 am2RegisterIndirect(void)
+static UINT32 am2RegisterIndirect(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
 	return 1;
 }
 
-static UINT32 bam2RegisterIndirect(void)
+static UINT32 bam2RegisterIndirect(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F];
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
+	cpustate->bamoffset = 0;
 	return 1;
 }
 
-static UINT32 am2RegisterIndirectIndexed(void)
+static UINT32 am2RegisterIndirectIndexed(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = v60.reg[modVal2&0x1F] + v60.reg[modVal&0x1F];
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = v60.reg[modVal2&0x1F] + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = v60.reg[modVal2&0x1F] + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = v60.reg[modVal2&0x1F] + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 2;
 }
 
-static UINT32 bam2RegisterIndirectIndexed(void)
+static UINT32 bam2RegisterIndirectIndexed(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal2&0x1F];
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F];
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 	return 2;
 }
 
-static UINT32 am2Autoincrement(void)
+static UINT32 am2Autoincrement(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		v60.reg[modVal&0x1F] += 1;
+		cpustate->reg[cpustate->modval & 0x1F] += 1;
 		break;
 	case 1:
-		v60.reg[modVal&0x1F] += 2;
+		cpustate->reg[cpustate->modval & 0x1F] += 2;
 		break;
 	case 2:
-		v60.reg[modVal&0x1F] += 4;
+		cpustate->reg[cpustate->modval & 0x1F] += 4;
 		break;
 	case 3:
-		v60.reg[modVal&0x1F] += 8;
+		cpustate->reg[cpustate->modval & 0x1F] += 8;
 		break;
 	}
 
 	return 1;
 }
 
-static UINT32 bam2Autoincrement(void)
+static UINT32 bam2Autoincrement(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F];
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
+	cpustate->bamoffset = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 10:
-		v60.reg[modVal&0x1F]+=1;
+		cpustate->reg[cpustate->modval & 0x1F] +=1;
 		break;
 	case 11:
-		v60.reg[modVal&0x1F]+=4;
+		cpustate->reg[cpustate->modval & 0x1F] +=4;
 		break;
 	default:
-		fatalerror("CPU - AM2 - 7 (t0 PC=%x)", PC);
+		fatalerror("CPU - AM2 - 7 (t0 cpustate->PC=%x)", cpustate->PC);
 		break;
 	}
 
 	return 1;
 }
 
-static UINT32 am2Autodecrement(void)
+static UINT32 am2Autodecrement(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		v60.reg[modVal&0x1F] -= 1;
+		cpustate->reg[cpustate->modval & 0x1F] -= 1;
 		break;
 	case 1:
-		v60.reg[modVal&0x1F] -= 2;
+		cpustate->reg[cpustate->modval & 0x1F] -= 2;
 		break;
 	case 2:
-		v60.reg[modVal&0x1F] -= 4;
+		cpustate->reg[cpustate->modval & 0x1F] -= 4;
 		break;
 	case 3:
-		v60.reg[modVal&0x1F] -= 8;
+		cpustate->reg[cpustate->modval & 0x1F] -= 8;
 		break;
 	}
 
-	amOut = v60.reg[modVal&0x1F];
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
 	return 1;
 }
 
-static UINT32 bam2Autodecrement(void)
+static UINT32 bam2Autodecrement(v60_state *cpustate)
 {
-	amFlag = 0;
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->bamoffset = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 10:
-		v60.reg[modVal&0x1F]-=1;
+		cpustate->reg[cpustate->modval & 0x1F]-=1;
 		break;
 	case 11:
-		v60.reg[modVal&0x1F]-=4;
+		cpustate->reg[cpustate->modval & 0x1F]-=4;
 		break;
 	default:
-		fatalerror("CPU - BAM2 - 7 (PC=%06x)", PC);
+		fatalerror("CPU - BAM2 - 7 (cpustate->PC=%06x)", cpustate->PC);
 		break;
 	}
 
-	amOut = v60.reg[modVal&0x1F];
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
 	return 1;
 }
 
 
-static UINT32 am2Displacement8(void)
+static UINT32 am2Displacement8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1);
 
 	return 2;
 }
 
-static UINT32 bam2Displacement8(void)
+static UINT32 bam2Displacement8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F];
-	bamOffset = (INT8)OpRead8(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
+	cpustate->bamoffset = (INT8)OpRead8(cpustate->program, cpustate->modadd + 1);
 
 	return 2;
 }
 
-static UINT32 am2Displacement16(void)
+static UINT32 am2Displacement16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1);
 
 	return 3;
 }
 
-static UINT32 bam2Displacement16(void)
+static UINT32 bam2Displacement16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F];
-	bamOffset = (INT16)OpRead16(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
+	cpustate->bamoffset = (INT16)OpRead16(cpustate->program, cpustate->modadd + 1);
 
 	return 3;
 }
 
-static UINT32 am2Displacement32(void)
+static UINT32 am2Displacement32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 1);
 
 	return 5;
 }
 
-static UINT32 bam2Displacement32(void)
+static UINT32 bam2Displacement32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal&0x1F];
-	bamOffset = OpRead32(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval & 0x1F];
+	cpustate->bamoffset = OpRead32(cpustate->program, cpustate->modadd + 1);
 
 	return 5;
 }
 
-static UINT32 am2DisplacementIndexed8(void)
+static UINT32 am2DisplacementIndexed8(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F];
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 bam2DisplacementIndexed8(void)
+static UINT32 bam2DisplacementIndexed8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2);
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2);
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 3;
 }
 
-static UINT32 am2DisplacementIndexed16(void)
+static UINT32 am2DisplacementIndexed16(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F];
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 bam2DisplacementIndexed16(void)
+static UINT32 bam2DisplacementIndexed16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2);
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2);
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 4;
 }
 
-static UINT32 am2DisplacementIndexed32(void)
+static UINT32 am2DisplacementIndexed32(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F];
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2DisplacementIndexed32(void)
+static UINT32 bam2DisplacementIndexed32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2);
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2);
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2PCDisplacement8(void)
+static UINT32 am2PCDisplacement8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = PC + (INT8)OpRead8(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1);
 
 	return 2;
 }
 
-static UINT32 bam2PCDisplacement8(void)
+static UINT32 bam2PCDisplacement8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = PC;
-	bamOffset = (INT8)OpRead8(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->PC;
+	cpustate->bamoffset = (INT8)OpRead8(cpustate->program, cpustate->modadd + 1);
 
 	return 2;
 }
 
-static UINT32 am2PCDisplacement16(void)
+static UINT32 am2PCDisplacement16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = PC + (INT16)OpRead16(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1);
 
 	return 3;
 }
 
-static UINT32 bam2PCDisplacement16(void)
+static UINT32 bam2PCDisplacement16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = PC;
-	bamOffset = (INT16)OpRead16(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->PC;
+	cpustate->bamoffset = (INT16)OpRead16(cpustate->program, cpustate->modadd + 1);
 
 	return 3;
 }
 
-static UINT32 am2PCDisplacement32(void)
+static UINT32 am2PCDisplacement32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = PC + OpRead32(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 1);
 
 	return 5;
 }
 
-static UINT32 bam2PCDisplacement32(void)
+static UINT32 bam2PCDisplacement32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = PC;
-	bamOffset = OpRead32(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->PC;
+	cpustate->bamoffset = OpRead32(cpustate->program, cpustate->modadd + 1);
 
 	return 5;
 }
 
 
-static UINT32 am2PCDisplacementIndexed8(void)
+static UINT32 am2PCDisplacementIndexed8(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = PC + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F];
+		cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = PC + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = PC + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = PC + (INT8)OpRead8(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 bam2PCDisplacementIndexed8(void)
+static UINT32 bam2PCDisplacementIndexed8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = PC + (INT8)OpRead8(v60.program,modAdd+2);
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2);
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 3;
 }
 
-static UINT32 am2PCDisplacementIndexed16(void)
+static UINT32 am2PCDisplacementIndexed16(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = PC + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F];
+		cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = PC + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = PC + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = PC + (INT16)OpRead16(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 bam2PCDisplacementIndexed16(void)
+static UINT32 bam2PCDisplacementIndexed16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = PC + (INT16)OpRead16(v60.program,modAdd+2);
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2);
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 4;
 }
 
-static UINT32 am2PCDisplacementIndexed32(void)
+static UINT32 am2PCDisplacementIndexed32(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = PC + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F];
+		cpustate->amout = cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = PC + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = PC + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = PC + OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2PCDisplacementIndexed32(void)
+static UINT32 bam2PCDisplacementIndexed32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = PC + OpRead32(v60.program,modAdd+2);
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2);
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2DisplacementIndirect8(void)
+static UINT32 am2DisplacementIndirect8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1));
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1));
 
 	return 2;
 }
 
-static UINT32 bam2DisplacementIndirect8(void)
+static UINT32 bam2DisplacementIndirect8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1));
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = 0;
 	return 2;
 }
 
-static UINT32 am2DisplacementIndirect16(void)
+static UINT32 am2DisplacementIndirect16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1));
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1));
 
 	return 3;
 }
 
-static UINT32 bam2DisplacementIndirect16(void)
+static UINT32 bam2DisplacementIndirect16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1));
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = 0;
 	return 3;
 }
 
-static UINT32 am2DisplacementIndirect32(void)
+static UINT32 am2DisplacementIndirect32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1));
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 1));
 
 	return 5;
 }
 
-static UINT32 bam2DisplacementIndirect32(void)
+static UINT32 bam2DisplacementIndirect32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1));
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = 0;
 
 	return 5;
 }
 
-static UINT32 am2DisplacementIndirectIndexed8(void)
+static UINT32 am2DisplacementIndirectIndexed8(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F];
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 bam2DisplacementIndirectIndexed8(void)
+static UINT32 bam2DisplacementIndirectIndexed8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT8)OpRead8(v60.program,modAdd+2));
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2));
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 3;
 }
 
-static UINT32 am2DisplacementIndirectIndexed16(void)
+static UINT32 am2DisplacementIndirectIndexed16(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F];
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 4;
 }
 
-static UINT32 bam2DisplacementIndirectIndexed16(void)
+static UINT32 bam2DisplacementIndirectIndexed16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + (INT16)OpRead16(v60.program,modAdd+2));
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2));
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 4;
 }
 
-static UINT32 am2DisplacementIndirectIndexed32(void)
+static UINT32 am2DisplacementIndirectIndexed32(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F];
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2DisplacementIndirectIndexed32(void)
+static UINT32 bam2DisplacementIndirectIndexed32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal2&0x1F] + OpRead32(v60.program,modAdd+2));
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval2 & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 2));
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2PCDisplacementIndirect8(void)
+static UINT32 am2PCDisplacementIndirect8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1));
-
-	return 2;
-}
-
-static UINT32 bam2PCDisplacementIndirect8(void)
-{
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1));
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1));
 
 	return 2;
 }
 
-static UINT32 am2PCDisplacementIndirect16(void)
+static UINT32 bam2PCDisplacementIndirect8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1));
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = 0;
+
+	return 2;
+}
+
+static UINT32 am2PCDisplacementIndirect16(v60_state *cpustate)
+{
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1));
 
 	return 3;
 }
 
-static UINT32 bam2PCDisplacementIndirect16(void)
+static UINT32 bam2PCDisplacementIndirect16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1));
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = 0;
 
 	return 3;
 }
 
-static UINT32 am2PCDisplacementIndirect32(void)
+static UINT32 am2PCDisplacementIndirect32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1));
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 1));
 
 	return 5;
 }
 
-static UINT32 bam2PCDisplacementIndirect32(void)
+static UINT32 bam2PCDisplacementIndirect32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1));
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = 0;
 
 	return 5;
 }
 
-static UINT32 am2PCDisplacementIndirectIndexed8(void)
+static UINT32 am2PCDisplacementIndirectIndexed8(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F];
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 3;
 }
 
-static UINT32 bam2PCDisplacementIndirectIndexed8(void)
+static UINT32 bam2PCDisplacementIndirectIndexed8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+2));
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2));
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 3;
 }
 
-static UINT32 am2PCDisplacementIndirectIndexed16(void)
+static UINT32 am2PCDisplacementIndirectIndexed16(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F];
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
@@ -695,337 +695,337 @@ static UINT32 am2PCDisplacementIndirectIndexed16(void)
 }
 
 
-static UINT32 bam2PCDisplacementIndirectIndexed16(void)
+static UINT32 bam2PCDisplacementIndirectIndexed16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+2));
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 2));
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 4;
 }
 
 
-static UINT32 am2PCDisplacementIndirectIndexed32(void)
+static UINT32 am2PCDisplacementIndirectIndexed32(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F];
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = MemRead32(cpustate->program, cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2PCDisplacementIndirectIndexed32(void)
+static UINT32 bam2PCDisplacementIndirectIndexed32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+2));
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 2));
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2DoubleDisplacement8(void)
+static UINT32 am2DoubleDisplacement8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1)) + (INT8)OpRead8(v60.program,modAdd+2);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2);
 
 	return 3;
 }
 
-static UINT32 bam2DoubleDisplacement8(void)
+static UINT32 bam2DoubleDisplacement8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT8)OpRead8(v60.program,modAdd+1));
-	bamOffset = (INT8)OpRead8(v60.program,modAdd+2);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = (INT8)OpRead8(cpustate->program, cpustate->modadd + 2);
 
 	return 3;
 }
 
-static UINT32 am2DoubleDisplacement16(void)
+static UINT32 am2DoubleDisplacement16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1)) + (INT16)OpRead16(v60.program,modAdd+3);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate->program, cpustate->modadd + 3);
 
 	return 5;
 }
 
-static UINT32 bam2DoubleDisplacement16(void)
+static UINT32 bam2DoubleDisplacement16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + (INT16)OpRead16(v60.program,modAdd+1));
-	bamOffset = (INT8)OpRead8(v60.program,modAdd+3);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = (INT8)OpRead8(cpustate->program, cpustate->modadd + 3);
 
 	return 5;
 }
 
-static UINT32 am2DoubleDisplacement32(void)
+static UINT32 am2DoubleDisplacement32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1)) + OpRead32(v60.program,modAdd+5);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 1)) + OpRead32(cpustate->program, cpustate->modadd + 5);
 
 	return 9;
 }
 
-static UINT32 bam2DoubleDisplacement32(void)
+static UINT32 bam2DoubleDisplacement32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,v60.reg[modVal&0x1F] + OpRead32(v60.program,modAdd+1));
-	bamOffset = OpRead32(v60.program,modAdd+5);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->reg[cpustate->modval & 0x1F] + OpRead32(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = OpRead32(cpustate->program, cpustate->modadd + 5);
 
 	return 9;
 }
 
 
-static UINT32 am2PCDoubleDisplacement8(void)
+static UINT32 am2PCDoubleDisplacement8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1)) + (INT8)OpRead8(v60.program,modAdd+2);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1)) + (INT8)OpRead8(cpustate->program, cpustate->modadd + 2);
 
 	return 3;
 }
 
-static UINT32 bam2PCDoubleDisplacement8(void)
+static UINT32 bam2PCDoubleDisplacement8(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT8)OpRead8(v60.program,modAdd+1));
-	bamOffset = (INT8)OpRead8(v60.program,modAdd+2);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT8)OpRead8(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = (INT8)OpRead8(cpustate->program, cpustate->modadd + 2);
 
 	return 3;
 }
 
-static UINT32 am2PCDoubleDisplacement16(void)
+static UINT32 am2PCDoubleDisplacement16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1)) + (INT16)OpRead16(v60.program,modAdd+3);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1)) + (INT16)OpRead16(cpustate->program, cpustate->modadd + 3);
 
 	return 5;
 }
 
-static UINT32 bam2PCDoubleDisplacement16(void)
+static UINT32 bam2PCDoubleDisplacement16(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + (INT16)OpRead16(v60.program,modAdd+1));
-	bamOffset = (INT8)OpRead8(v60.program,modAdd+3);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + (INT16)OpRead16(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = (INT8)OpRead8(cpustate->program, cpustate->modadd + 3);
 
 	return 5;
 }
 
-static UINT32 am2PCDoubleDisplacement32(void)
+static UINT32 am2PCDoubleDisplacement32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1)) + OpRead32(v60.program,modAdd+5);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 1)) + OpRead32(cpustate->program, cpustate->modadd + 5);
 
 	return 9;
 }
 
-static UINT32 bam2PCDoubleDisplacement32(void)
+static UINT32 bam2PCDoubleDisplacement32(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,PC + OpRead32(v60.program,modAdd+1));
-	bamOffset = OpRead32(v60.program,modAdd+5);
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, cpustate->PC + OpRead32(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = OpRead32(cpustate->program, cpustate->modadd + 5);
 
 	return 9;
 }
 
-static UINT32 am2DirectAddress(void)
+static UINT32 am2DirectAddress(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = OpRead32(v60.program,modAdd+1);
+	cpustate->amflag = 0;
+	cpustate->amout = OpRead32(cpustate->program, cpustate->modadd + 1);
 
 	return 5;
 }
 
-static UINT32 bam2DirectAddress(void)
+static UINT32 bam2DirectAddress(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = OpRead32(v60.program,modAdd+1);
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = OpRead32(cpustate->program, cpustate->modadd + 1);
+	cpustate->bamoffset = 0;
 
 	return 5;
 }
 
-static UINT32 am2DirectAddressIndexed(void)
+static UINT32 am2DirectAddressIndexed(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F];
+		cpustate->amout = OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = OpRead32(v60.program,modAdd+2) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = OpRead32(cpustate->program, cpustate->modadd + 2) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2DirectAddressIndexed(void)
+static UINT32 bam2DirectAddressIndexed(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = OpRead32(v60.program,modAdd+2);
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = OpRead32(cpustate->program, cpustate->modadd + 2);
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2DirectAddressDeferred(void)
+static UINT32 am2DirectAddressDeferred(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,OpRead32(v60.program,modAdd+1));
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, OpRead32(cpustate->program, cpustate->modadd + 1));
 
 	return 5;
 }
 
-static UINT32 bam2DirectAddressDeferred(void)
+static UINT32 bam2DirectAddressDeferred(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,OpRead32(v60.program,modAdd+1));
-	bamOffset = 0;
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, OpRead32(cpustate->program, cpustate->modadd + 1));
+	cpustate->bamoffset = 0;
 
 	return 5;
 }
 
-static UINT32 am2DirectAddressDeferredIndexed(void)
+static UINT32 am2DirectAddressDeferredIndexed(v60_state *cpustate)
 {
-	amFlag = 0;
+	cpustate->amflag = 0;
 
-	switch (modDim)
+	switch (cpustate->moddim)
 	{
 	case 0:
-		amOut = MemRead32(v60.program,OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F];
+		cpustate->amout = MemRead32(cpustate->program, OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F];
 		break;
 	case 1:
-		amOut = MemRead32(v60.program,OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 2;
+		cpustate->amout = MemRead32(cpustate->program, OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 2;
 		break;
 	case 2:
-		amOut = MemRead32(v60.program,OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 4;
+		cpustate->amout = MemRead32(cpustate->program, OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 4;
 		break;
 	case 3:
-		amOut = MemRead32(v60.program,OpRead32(v60.program,modAdd+2)) + v60.reg[modVal&0x1F] * 8;
+		cpustate->amout = MemRead32(cpustate->program, OpRead32(cpustate->program, cpustate->modadd + 2)) + cpustate->reg[cpustate->modval & 0x1F] * 8;
 		break;
 	}
 
 	return 6;
 }
 
-static UINT32 bam2DirectAddressDeferredIndexed(void)
+static UINT32 bam2DirectAddressDeferredIndexed(v60_state *cpustate)
 {
-	amFlag = 0;
-	amOut = MemRead32(v60.program,OpRead32(v60.program,modAdd+2));
-	bamOffset = v60.reg[modVal&0x1F];
+	cpustate->amflag = 0;
+	cpustate->amout = MemRead32(cpustate->program, OpRead32(cpustate->program, cpustate->modadd + 2));
+	cpustate->bamoffset = cpustate->reg[cpustate->modval & 0x1F];
 
 	return 6;
 }
 
-static UINT32 am2Immediate(void)
+static UINT32 am2Immediate(v60_state *cpustate)
 {
 	// ignore LDPR
-	return am1Immediate();
+	return am1Immediate(cpustate);
 }
 
-static UINT32 am2ImmediateQuick(void)
+static UINT32 am2ImmediateQuick(v60_state *cpustate)
 {
 	// ignore LDPR
-	return am1ImmediateQuick();
+	return am1ImmediateQuick(cpustate);
 }
 
 
 // AM2 Tables (for ReadAMAddress)
 // ******************************
 
-static UINT32 am2Error1(void)
+static UINT32 am2Error1(v60_state *cpustate)
 {
-	fatalerror("CPU - AM2 - 1 (PC=%06x)", PC);
+	fatalerror("CPU - AM2 - 1 (cpustate->PC=%06x)", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 am2Error2(void)
+static UINT32 am2Error2(v60_state *cpustate)
 {
-	fatalerror("CPU - AM2 - 2 (PC=%06x)", PC);
-	return 0; /* never reached, fatalerror won't return */
-}
-
-#ifdef UNUSED_FUNCTION
-static UINT32 am2Error3(void)
-{
-	fatalerror("CPU - AM2 - 3 (PC=%06x)", PC);
-	return 0; /* never reached, fatalerror won't return */
-}
-#endif
-
-static UINT32 am2Error4(void)
-{
-	fatalerror("CPU - AM2 - 4 (PC=%06x)", PC);
-	return 0; /* never reached, fatalerror won't return */
-}
-
-static UINT32 am2Error5(void)
-{
-	fatalerror("CPU - AM2 - 5 (PC=%06x)", PC);
-	return 0; /* never reached, fatalerror won't return */
-}
-
-static UINT32 bam2Error1(void)
-{
-	fatalerror("CPU - BAM2 - 1 (PC=%06x)", PC);
-	return 0; /* never reached, fatalerror won't return */
-}
-
-static UINT32 bam2Error2(void)
-{
-	fatalerror("CPU - BAM2 - 2 (PC=%06x)", PC);
+	fatalerror("CPU - AM2 - 2 (cpustate->PC=%06x)", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 #ifdef UNUSED_FUNCTION
-static UINT32 bam2Error3(void)
+static UINT32 am2Error3(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 3 (PC=%06x)", PC);
+	fatalerror("CPU - AM2 - 3 (cpustate->PC=%06x)", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 #endif
 
-static UINT32 bam2Error4(void)
+static UINT32 am2Error4(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 4 (PC=%06x)", PC);
+	fatalerror("CPU - AM2 - 4 (cpustate->PC=%06x)", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 bam2Error5(void)
+static UINT32 am2Error5(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 5 (PC=%06x)", PC);
+	fatalerror("CPU - AM2 - 5 (cpustate->PC=%06x)", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
-static UINT32 bam2Error6(void)
+static UINT32 bam2Error1(v60_state *cpustate)
 {
-	fatalerror("CPU - BAM2 - 6 (PC=%06x)", PC);
+	fatalerror("CPU - BAM2 - 1 (cpustate->PC=%06x)", cpustate->PC);
+	return 0; /* never reached, fatalerror won't return */
+}
+
+static UINT32 bam2Error2(v60_state *cpustate)
+{
+	fatalerror("CPU - BAM2 - 2 (cpustate->PC=%06x)", cpustate->PC);
+	return 0; /* never reached, fatalerror won't return */
+}
+
+#ifdef UNUSED_FUNCTION
+static UINT32 bam2Error3(v60_state *cpustate)
+{
+	fatalerror("CPU - BAM2 - 3 (cpustate->PC=%06x)", cpustate->PC);
+	return 0; /* never reached, fatalerror won't return */
+}
+#endif
+
+static UINT32 bam2Error4(v60_state *cpustate)
+{
+	fatalerror("CPU - BAM2 - 4 (cpustate->PC=%06x)", cpustate->PC);
+	return 0; /* never reached, fatalerror won't return */
+}
+
+static UINT32 bam2Error5(v60_state *cpustate)
+{
+	fatalerror("CPU - BAM2 - 5 (cpustate->PC=%06x)", cpustate->PC);
+	return 0; /* never reached, fatalerror won't return */
+}
+
+static UINT32 bam2Error6(v60_state *cpustate)
+{
+	fatalerror("CPU - BAM2 - 6 (cpustate->PC=%06x)", cpustate->PC);
 	return 0; /* never reached, fatalerror won't return */
 }
 
 
-static UINT32 (*const AMTable2_G7a[16])(void) =
+static UINT32 (*const AMTable2_G7a[16])(v60_state *) =
 {
 	am2PCDisplacementIndexed8,
 	am2PCDisplacementIndexed16,
@@ -1045,7 +1045,7 @@ static UINT32 (*const AMTable2_G7a[16])(void) =
 	am2Error5
 };
 
-static UINT32 (*const BAMTable2_G7a[16])(void) =
+static UINT32 (*const BAMTable2_G7a[16])(v60_state *) =
 {
 	bam2PCDisplacementIndexed8,
 	bam2PCDisplacementIndexed16,
@@ -1065,23 +1065,23 @@ static UINT32 (*const BAMTable2_G7a[16])(void) =
 	bam2Error5
 };
 
-static UINT32 am2Group7a(void)
+static UINT32 am2Group7a(v60_state *cpustate)
 {
-	if (!(modVal2&0x10))
-		return am2Error4();
+	if (!(cpustate->modval2 & 0x10))
+		return am2Error4(cpustate);
 
-	return AMTable2_G7a[modVal2&0xF]();
+	return AMTable2_G7a[cpustate->modval2 & 0xF](cpustate);
 }
 
-static UINT32 bam2Group7a(void)
+static UINT32 bam2Group7a(v60_state *cpustate)
 {
-	if (!(modVal2&0x10))
-		return bam2Error4();
+	if (!(cpustate->modval2 & 0x10))
+		return bam2Error4(cpustate);
 
-	return BAMTable2_G7a[modVal2&0xF]();
+	return BAMTable2_G7a[cpustate->modval2 & 0xF](cpustate);
 }
 
-static UINT32 (*const AMTable2_G7[32])(void) =
+static UINT32 (*const AMTable2_G7[32])(v60_state *) =
 {
 	am2ImmediateQuick,
 	am2ImmediateQuick,
@@ -1117,7 +1117,7 @@ static UINT32 (*const AMTable2_G7[32])(void) =
 	am2Error2
 };
 
-static UINT32 (*const BAMTable2_G7[32])(void) =
+static UINT32 (*const BAMTable2_G7[32])(v60_state *) =
 {
 	bam2Error6,
 	bam2Error6,
@@ -1153,7 +1153,7 @@ static UINT32 (*const BAMTable2_G7[32])(void) =
 	bam2Error2
 };
 
-static UINT32 (*const AMTable2_G6[8])(void) =
+static UINT32 (*const AMTable2_G6[8])(v60_state *) =
 {
 	am2DisplacementIndexed8,
 	am2DisplacementIndexed16,
@@ -1165,7 +1165,7 @@ static UINT32 (*const AMTable2_G6[8])(void) =
 	am2Group7a
 };
 
-static UINT32 (*const BAMTable2_G6[8])(void) =
+static UINT32 (*const BAMTable2_G6[8])(v60_state *) =
 {
 	bam2DisplacementIndexed8,
 	bam2DisplacementIndexed16,
@@ -1180,28 +1180,28 @@ static UINT32 (*const BAMTable2_G6[8])(void) =
 
 
 
-static UINT32 am2Group6(void)
+static UINT32 am2Group6(v60_state *cpustate)
 {
-	modVal2=OpRead8(v60.program,modAdd+1);
-	return AMTable2_G6[modVal2>>5]();
+	cpustate->modval2 = OpRead8(cpustate->program, cpustate->modadd + 1);
+	return AMTable2_G6[cpustate->modval2 >> 5](cpustate);
 }
-static UINT32 bam2Group6(void)
+static UINT32 bam2Group6(v60_state *cpustate)
 {
-	modVal2=OpRead8(v60.program,modAdd+1);
-	return BAMTable2_G6[modVal2>>5]();
-}
-
-static UINT32 am2Group7(void)
-{
-	return AMTable2_G7[modVal&0x1F]();
-}
-static UINT32 bam2Group7(void)
-{
-	return BAMTable2_G7[modVal&0x1F]();
+	cpustate->modval2 = OpRead8(cpustate->program, cpustate->modadd + 1);
+	return BAMTable2_G6[cpustate->modval2 >> 5](cpustate);
 }
 
+static UINT32 am2Group7(v60_state *cpustate)
+{
+	return AMTable2_G7[cpustate->modval & 0x1F](cpustate);
+}
+static UINT32 bam2Group7(v60_state *cpustate)
+{
+	return BAMTable2_G7[cpustate->modval & 0x1F](cpustate);
+}
 
-static UINT32 (*const AMTable2[2][8])(void) =
+
+static UINT32 (*const AMTable2[2][8])(v60_state *) =
 {
 	{
 		am2Displacement8,
@@ -1226,7 +1226,7 @@ static UINT32 (*const AMTable2[2][8])(void) =
 	}
 };
 
-static UINT32 (*const BAMTable2[2][8])(void) =
+static UINT32 (*const BAMTable2[2][8])(v60_state *) =
 {
 	{
 		bam2Displacement8,

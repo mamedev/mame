@@ -1,639 +1,639 @@
-static UINT32 opINCB(void) /* TRUSTED */
+static UINT32 opINCB(v60_state *cpustate) /* TRUSTED */
 {
 	UINT8 appb;
-	modAdd=PC+1;
-	modDim=0;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 0;
 
-	amLength1=ReadAMAddress();
+	cpustate->amlength1 = ReadAMAddress(cpustate);
 
-	if (amFlag)
-		appb=(UINT8)v60.reg[amOut];
+	if (cpustate->amflag)
+		appb = (UINT8)cpustate->reg[cpustate->amout];
 	else
-		appb=MemRead8(v60.program, amOut);
+		appb = MemRead8(cpustate->program, cpustate->amout);
 
 	ADDB(appb, 1);
 
-	if (amFlag)
-		SETREG8(v60.reg[amOut], appb);
+	if (cpustate->amflag)
+		SETREG8(cpustate->reg[cpustate->amout], appb);
 	else
-		MemWrite8(v60.program, amOut, appb);
+		MemWrite8(cpustate->program, cpustate->amout, appb);
 
-	return amLength1+1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opINCH(void) /* TRUSTED */
+static UINT32 opINCH(v60_state *cpustate) /* TRUSTED */
 {
 	UINT16 apph;
-	modAdd=PC+1;
-	modDim=1;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 1;
 
-	amLength1=ReadAMAddress();
+	cpustate->amlength1 = ReadAMAddress(cpustate);
 
-	if (amFlag)
-		apph=(UINT16)v60.reg[amOut];
+	if (cpustate->amflag)
+		apph = (UINT16)cpustate->reg[cpustate->amout];
 	else
-		apph=MemRead16(v60.program, amOut);
+		apph = MemRead16(cpustate->program, cpustate->amout);
 
 	ADDW(apph, 1);
 
-	if (amFlag)
-		SETREG16(v60.reg[amOut], apph);
+	if (cpustate->amflag)
+		SETREG16(cpustate->reg[cpustate->amout], apph);
 	else
-		MemWrite16(v60.program, amOut, apph);
+		MemWrite16(cpustate->program, cpustate->amout, apph);
 
-	return amLength1+1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opINCW(void) /* TRUSTED */
+static UINT32 opINCW(v60_state *cpustate) /* TRUSTED */
 {
 	UINT32 appw;
-	modAdd=PC+1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
-	amLength1=ReadAMAddress();
+	cpustate->amlength1 = ReadAMAddress(cpustate);
 
-	if (amFlag)
-		appw=v60.reg[amOut];
+	if (cpustate->amflag)
+		appw = cpustate->reg[cpustate->amout];
 	else
-		appw=MemRead32(v60.program,amOut);
+		appw = MemRead32(cpustate->program, cpustate->amout);
 
 	ADDL(appw, 1);
 
-	if (amFlag)
-		v60.reg[amOut]=appw;
+	if (cpustate->amflag)
+		cpustate->reg[cpustate->amout] = appw;
 	else
-		MemWrite32(v60.program, amOut,appw);
+		MemWrite32(cpustate->program, cpustate->amout, appw);
 
-	return amLength1+1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opDECB(void) /* TRUSTED */
+static UINT32 opDECB(v60_state *cpustate) /* TRUSTED */
 {
 	UINT8 appb;
-	modAdd=PC+1;
-	modDim=0;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 0;
 
-	amLength1=ReadAMAddress();
+	cpustate->amlength1 = ReadAMAddress(cpustate);
 
-	if (amFlag)
-		appb=(UINT8)v60.reg[amOut];
+	if (cpustate->amflag)
+		appb = (UINT8)cpustate->reg[cpustate->amout];
 	else
-		appb=MemRead8(v60.program, amOut);
+		appb = MemRead8(cpustate->program, cpustate->amout);
 
 	SUBB(appb, 1);
 
-	if (amFlag)
-		SETREG8(v60.reg[amOut], appb);
+	if (cpustate->amflag)
+		SETREG8(cpustate->reg[cpustate->amout], appb);
 	else
-		MemWrite8(v60.program, amOut, appb);
+		MemWrite8(cpustate->program, cpustate->amout, appb);
 
-	return amLength1+1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opDECH(void) /* TRUSTED */
+static UINT32 opDECH(v60_state *cpustate) /* TRUSTED */
 {
 	UINT16 apph;
-	modAdd=PC+1;
-	modDim=1;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 1;
 
-	amLength1=ReadAMAddress();
+	cpustate->amlength1 = ReadAMAddress(cpustate);
 
-	if (amFlag)
-		apph=(UINT16)v60.reg[amOut];
+	if (cpustate->amflag)
+		apph = (UINT16)cpustate->reg[cpustate->amout];
 	else
-		apph=MemRead16(v60.program, amOut);
+		apph = MemRead16(cpustate->program, cpustate->amout);
 
 	SUBW(apph, 1);
 
-	if (amFlag)
-		SETREG16(v60.reg[amOut], apph);
+	if (cpustate->amflag)
+		SETREG16(cpustate->reg[cpustate->amout], apph);
 	else
-		MemWrite16(v60.program, amOut, apph);
+		MemWrite16(cpustate->program, cpustate->amout, apph);
 
-	return amLength1+1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opDECW(void) /* TRUSTED */
+static UINT32 opDECW(v60_state *cpustate) /* TRUSTED */
 {
 	UINT32 appw;
-	modAdd=PC+1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
-	amLength1=ReadAMAddress();
+	cpustate->amlength1 = ReadAMAddress(cpustate);
 
-	if (amFlag)
-		appw=v60.reg[amOut];
+	if (cpustate->amflag)
+		appw = cpustate->reg[cpustate->amout];
 	else
-		appw=MemRead32(v60.program,amOut);
+		appw = MemRead32(cpustate->program, cpustate->amout);
 
 	SUBL(appw, 1);
 
-	if (amFlag)
-		v60.reg[amOut]=appw;
+	if (cpustate->amflag)
+		cpustate->reg[cpustate->amout] = appw;
 	else
-		MemWrite32(v60.program, amOut,appw);
+		MemWrite32(cpustate->program, cpustate->amout, appw);
 
-	return amLength1+1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opJMP(void) /* TRUSTED */
+static UINT32 opJMP(v60_state *cpustate) /* TRUSTED */
 {
-	modAdd=PC+1;
-	modDim=0;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 0;
 
 	// Read the address of the operand
-	ReadAMAddress();
+	ReadAMAddress(cpustate);
 
 	// It cannot be a register!!
-	assert(amFlag==0);
+	assert(cpustate->amflag == 0);
 
 	// Jump there
-	PC=amOut;
+	cpustate->PC = cpustate->amout;
 
 	return 0;
 }
 
-static UINT32 opJSR(void) /* TRUSTED */
+static UINT32 opJSR(v60_state *cpustate) /* TRUSTED */
 {
-	modAdd=PC + 1;
-	modDim=0;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 0;
 
 	// Read the address of the operand
-	amLength1=ReadAMAddress();
+	cpustate->amlength1 = ReadAMAddress(cpustate);
 
 	// It cannot be a register!!
-	assert(amFlag==0);
+	assert(cpustate->amflag == 0);
 
 	// Save NextPC into the stack
-	SP -= 4;
-	MemWrite32(v60.program, SP, PC + amLength1 + 1);
+	cpustate->SP -= 4;
+	MemWrite32(cpustate->program, cpustate->SP, cpustate->PC + cpustate->amlength1 + 1);
 
 	// Jump there
-	PC=amOut;
+	cpustate->PC = cpustate->amout;
 
 	return 0;
 }
 
-static UINT32 opPREPARE(void)	/* somewhat TRUSTED */
+static UINT32 opPREPARE(v60_state *cpustate)	/* somewhat TRUSTED */
 {
-	modAdd=PC+1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
 	// Read the operand
-	amLength1=ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
 	// step 1: save frame pointer on the stack
-	SP -= 4;
-	MemWrite32(v60.program, SP, FP);
+	cpustate->SP -= 4;
+	MemWrite32(cpustate->program, cpustate->SP, cpustate->FP);
 
-	// step 2: FP = new SP
-	FP = SP;
+	// step 2: cpustate->FP = new cpustate->SP
+	cpustate->FP = cpustate->SP;
 
-	// step 3: SP -= operand
-	SP -= amOut;
+	// step 3: cpustate->SP -= operand
+	cpustate->SP -= cpustate->amout;
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opRET(void) /* TRUSTED */
+static UINT32 opRET(v60_state *cpustate) /* TRUSTED */
 {
-	modAdd=PC + 1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
 	// Read the operand
-	ReadAM();
+	ReadAM(cpustate);
 
 	// Read return address from stack
-	PC=MemRead32(v60.program,SP);
-	SP+=4;
+	cpustate->PC = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->SP +=4;
 
-	// Restore AP from stack
-	AP=MemRead32(v60.program,SP);
-	SP+=4;
+	// Restore cpustate->AP from stack
+	cpustate->AP = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->SP +=4;
 
 	// Skip stack frame
-	SP += amOut;
+	cpustate->SP += cpustate->amout;
 
 	return 0;
 }
 
-static UINT32 opTRAP(void)
+static UINT32 opTRAP(v60_state *cpustate)
 {
 	UINT32 oldPSW;
 
-	modAdd=PC + 1;
-	modDim=0;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 0;
 
 	// Read the operand
-	amLength1=ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
 	// Normalize the flags
-	NORMALIZEFLAGS();
+	NORMALIZEFLAGS(cpustate);
 
-	switch ((amOut >> 4) & 0xF)
+	switch ((cpustate->amout >> 4) & 0xF)
 	{
 	case 0:
-		if (!_OV) return amLength1+1;
+		if (!cpustate->_OV) return cpustate->amlength1 + 1;
 		else break;
 	case 1:
-		if (_OV) return amLength1+1;
+		if (cpustate->_OV) return cpustate->amlength1 + 1;
 		else break;
 	case 2:
-		if (!_CY) return amLength1+1;
+		if (!cpustate->_CY) return cpustate->amlength1 + 1;
 		else break;
 	case 3:
-		if (_CY) return amLength1+1;
+		if (cpustate->_CY) return cpustate->amlength1 + 1;
 		else break;
 	case 4:
-		if (!_Z) return amLength1+1;
+		if (!cpustate->_Z) return cpustate->amlength1 + 1;
 		else break;
 	case 5:
-		if (_Z) return amLength1+1;
+		if (cpustate->_Z) return cpustate->amlength1 + 1;
 		else break;
 	case 6:
-		if (!(_CY | _Z)) return amLength1+1;
+		if (!(cpustate->_CY | cpustate->_Z)) return cpustate->amlength1 + 1;
 		else break;
 	case 7:
-		if ((_CY | _Z)) return amLength1+1;
+		if ((cpustate->_CY | cpustate->_Z)) return cpustate->amlength1 + 1;
 		else break;
 	case 8:
-		if (!_S) return amLength1+1;
+		if (!cpustate->_S) return cpustate->amlength1 + 1;
 		else break;
 	case 9:
-		if (_S) return amLength1+1;
+		if (cpustate->_S) return cpustate->amlength1 + 1;
 		else break;
 	case 10:
 		break;
 	case 11:
-		return amLength1+1;
+		return cpustate->amlength1 + 1;
 	case 12:
-		if (!(_S^_OV)) return amLength1+1;
+		if (!(cpustate->_S^cpustate->_OV)) return cpustate->amlength1 + 1;
 		else break;
 	case 13:
-		if ((_S^_OV)) return amLength1+1;
+		if ((cpustate->_S^cpustate->_OV)) return cpustate->amlength1 + 1;
 		else break;
 	case 14:
-		if (!((_S^_OV)|_Z)) return amLength1+1;
+		if (!((cpustate->_S^cpustate->_OV)|cpustate->_Z)) return cpustate->amlength1 + 1;
 		else break;
 	case 15:
-		if (((_S^_OV)|_Z)) return amLength1+1;
+		if (((cpustate->_S^cpustate->_OV)|cpustate->_Z)) return cpustate->amlength1 + 1;
 		else break;
 	}
 
-	oldPSW = v60_update_psw_for_exception(0, 0);
+	oldPSW = v60_update_psw_for_exception(cpustate, 0, 0);
 
 	// Issue the software trap with interrupts
-	SP -= 4;
-	MemWrite32(v60.program, SP, EXCEPTION_CODE_AND_SIZE(0x3000 + 0x100 * (amOut&0xF), 4));
+	cpustate->SP -= 4;
+	MemWrite32(cpustate->program, cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x3000 + 0x100 * (cpustate->amout & 0xF), 4));
 
-	SP -= 4;
-	MemWrite32(v60.program, SP, oldPSW);
+	cpustate->SP -= 4;
+	MemWrite32(cpustate->program, cpustate->SP, oldPSW);
 
-	SP -= 4;
-	MemWrite32(v60.program, SP, PC + amLength1 + 1);
+	cpustate->SP -= 4;
+	MemWrite32(cpustate->program, cpustate->SP, cpustate->PC + cpustate->amlength1 + 1);
 
-	PC = GETINTVECT(48 + (amOut&0xF));
+	cpustate->PC = GETINTVECT(cpustate, 48 + (cpustate->amout & 0xF));
 
 	return 0;
 }
 
-static UINT32 opRETIU(void) /* TRUSTED */
+static UINT32 opRETIU(v60_state *cpustate) /* TRUSTED */
 {
 	UINT32 newPSW;
-	modAdd=PC + 1;
-	modDim=1;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 1;
 
 	// Read the operand
-	ReadAM();
+	ReadAM(cpustate);
 
-	// Restore PC and PSW from stack
-	PC = MemRead32(v60.program,SP);
-	SP += 4;
+	// Restore cpustate->PC and cpustate->PSW from stack
+	cpustate->PC = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->SP += 4;
 
-	newPSW = MemRead32(v60.program,SP);
-	SP += 4;
+	newPSW = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->SP += 4;
 
 	// Destroy stack frame
-	SP += amOut;
+	cpustate->SP += cpustate->amout;
 
-	v60WritePSW(newPSW);
+	v60WritePSW(cpustate, newPSW);
 
 	return 0;
 }
 
-static UINT32 opRETIS(void)
+static UINT32 opRETIS(v60_state *cpustate)
 {
 	UINT32 newPSW;
 
-	modAdd=PC + 1;
-	modDim=1;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 1;
 
 	// Read the operand
-	ReadAM();
+	ReadAM(cpustate);
 
-	// Restore PC and PSW from stack
-	PC = MemRead32(v60.program,SP);
-	SP += 4;
+	// Restore cpustate->PC and cpustate->PSW from stack
+	cpustate->PC = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->SP += 4;
 
-	newPSW = MemRead32(v60.program,SP);
-	SP += 4;
+	newPSW = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->SP += 4;
 
 	// Destroy stack frame
-	SP += amOut;
+	cpustate->SP += cpustate->amout;
 
-	v60WritePSW(newPSW);
+	v60WritePSW(cpustate, newPSW);
 
 	return 0;
 }
 
-static UINT32 opSTTASK(void)
+static UINT32 opSTTASK(v60_state *cpustate)
 {
 	int i;
 	UINT32 adr;
 
-	modAdd=PC + 1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
-	amLength1 = ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
-	adr = TR;
+	adr = cpustate->TR;
 
-	v60WritePSW(v60ReadPSW() | 0x10000000);
-	v60SaveStack();
+	v60WritePSW(cpustate, v60ReadPSW(cpustate) | 0x10000000);
+	v60SaveStack(cpustate);
 
-	MemWrite32(v60.program, adr, TKCW);
+	MemWrite32(cpustate->program, adr, cpustate->TKCW);
 	adr += 4;
-	if(SYCW & 0x100) {
-		MemWrite32(v60.program, adr, L0SP);
+	if(cpustate->SYCW & 0x100) {
+		MemWrite32(cpustate->program, adr, cpustate->L0SP);
 		adr += 4;
 	}
-	if(SYCW & 0x200) {
-		MemWrite32(v60.program, adr, L1SP);
+	if(cpustate->SYCW & 0x200) {
+		MemWrite32(cpustate->program, adr, cpustate->L1SP);
 		adr += 4;
 	}
-	if(SYCW & 0x400) {
-		MemWrite32(v60.program, adr, L2SP);
+	if(cpustate->SYCW & 0x400) {
+		MemWrite32(cpustate->program, adr, cpustate->L2SP);
 		adr += 4;
 	}
-	if(SYCW & 0x800) {
-		MemWrite32(v60.program, adr, L3SP);
+	if(cpustate->SYCW & 0x800) {
+		MemWrite32(cpustate->program, adr, cpustate->L3SP);
 		adr += 4;
 	}
 
 	// 31 registers supported, _not_ 32
-	for(i=0; i<31; i++)
-		if(amOut & (1<<i)) {
-			MemWrite32(v60.program, adr, v60.reg[i]);
+	for(i = 0; i < 31; i++)
+		if(cpustate->amout & (1 << i)) {
+			MemWrite32(cpustate->program, adr, cpustate->reg[i]);
 			adr += 4;
 		}
 
 	// #### Ignore the virtual addressing crap.
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opGETPSW(void)
+static UINT32 opGETPSW(v60_state *cpustate)
 {
-	modAdd=PC + 1;
-	modDim=2;
-	modWriteValW=v60ReadPSW();
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
+	cpustate->modwritevalw = v60ReadPSW(cpustate);
 
-	// Write PSW to the operand
-	amLength1=WriteAM();
+	// Write cpustate->PSW to the operand
+	cpustate->amlength1 = WriteAM(cpustate);
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opTASI(void)
+static UINT32 opTASI(v60_state *cpustate)
 {
 	UINT8 appb;
-	modAdd=PC + 1;
-	modDim=0;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 0;
 
 	// Load the address of the operand
-	amLength1=ReadAMAddress();
+	cpustate->amlength1 = ReadAMAddress(cpustate);
 
 	// Load UINT8 from the address
-	if (amFlag)
-		appb=(UINT8)v60.reg[amOut&0x1F];
+	if (cpustate->amflag)
+		appb = (UINT8)cpustate->reg[cpustate->amout & 0x1F];
 	else
-		appb=MemRead8(v60.program, amOut);
+		appb = MemRead8(cpustate->program, cpustate->amout);
 
-	// Set the flags for SUB appb,FF
+	// Set the flags for SUB appb, FF
 	SUBB(appb, 0xff);
 
 	// Write FF in the operand
-	if (amFlag)
-		SETREG8(v60.reg[amOut&0x1F], 0xFF);
+	if (cpustate->amflag)
+		SETREG8(cpustate->reg[cpustate->amout & 0x1F], 0xFF);
 	else
-		MemWrite8(v60.program, amOut,0xFF);
+		MemWrite8(cpustate->program, cpustate->amout, 0xFF);
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opCLRTLB(void)
+static UINT32 opCLRTLB(v60_state *cpustate)
 {
-	modAdd=PC+1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
 	// Read the operand
-	amLength1=ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
 	// @@@ TLB not yet emulated
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opPOPM(void)
+static UINT32 opPOPM(v60_state *cpustate)
 {
 	int i;
 
-	modAdd=PC+1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
 	// Read the bit register list
-	amLength1=ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
-	for (i=0;i<31;i++)
-		if (amOut & (1<<i))
+	for (i = 0;i < 31;i++)
+		if (cpustate->amout & (1 << i))
 		{
-			v60.reg[i] = MemRead32(v60.program,SP);
-			SP += 4;
+			cpustate->reg[i] = MemRead32(cpustate->program, cpustate->SP);
+			cpustate->SP += 4;
 		}
 
-	if (amOut & (1<<31))
+	if (cpustate->amout & (1 << 31))
 	{
-		v60WritePSW((v60ReadPSW() & 0xffff0000) | MemRead16(v60.program, SP));
-		SP += 4;
+		v60WritePSW(cpustate, (v60ReadPSW(cpustate) & 0xffff0000) | MemRead16(cpustate->program, cpustate->SP));
+		cpustate->SP += 4;
 	}
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opPUSHM(void)
+static UINT32 opPUSHM(v60_state *cpustate)
 {
 	int i;
 
-	modAdd=PC+1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
 	// Read the bit register list
-	amLength1=ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
-	if (amOut & (1<<31))
+	if (cpustate->amout & (1 << 31))
 	{
-		SP -= 4;
-		MemWrite32(v60.program, SP,v60ReadPSW());
+		cpustate->SP -= 4;
+		MemWrite32(cpustate->program, cpustate->SP, v60ReadPSW(cpustate));
 	}
 
-	for (i=0;i<31;i++)
-		if (amOut & (1<<(30-i)))
+	for (i = 0;i < 31;i++)
+		if (cpustate->amout & (1 << (30 - i)))
 		{
-			SP -= 4;
-			MemWrite32(v60.program, SP,v60.reg[(30-i)]);
+			cpustate->SP -= 4;
+			MemWrite32(cpustate->program, cpustate->SP, cpustate->reg[(30 - i)]);
 		}
 
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opTESTB(void) /* TRUSTED */
+static UINT32 opTESTB(v60_state *cpustate) /* TRUSTED */
 {
-	modAdd=PC+1;
-	modDim=0;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 0;
 
 	// Read the operand
-	amLength1=ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
-	_Z = (amOut == 0);
-	_S = ((amOut & 0x80) != 0);
-	_CY = 0;
-	_OV = 0;
+	cpustate->_Z = (cpustate->amout == 0);
+	cpustate->_S = ((cpustate->amout & 0x80) != 0);
+	cpustate->_CY = 0;
+	cpustate->_OV = 0;
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opTESTH(void) /* TRUSTED */
+static UINT32 opTESTH(v60_state *cpustate) /* TRUSTED */
 {
-	modAdd=PC+1;
-	modDim=1;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 1;
 
 	// Read the operand
-	amLength1=ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
-	_Z = (amOut == 0);
-	_S = ((amOut & 0x8000) != 0);
-	_CY = 0;
-	_OV = 0;
+	cpustate->_Z = (cpustate->amout == 0);
+	cpustate->_S = ((cpustate->amout & 0x8000) != 0);
+	cpustate->_CY = 0;
+	cpustate->_OV = 0;
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opTESTW(void) /* TRUSTED */
+static UINT32 opTESTW(v60_state *cpustate) /* TRUSTED */
 {
-	modAdd=PC+1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
 	// Read the operand
-	amLength1=ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
-	_Z = (amOut == 0);
-	_S = ((amOut & 0x80000000) != 0);
-	_CY = 0;
-	_OV = 0;
+	cpustate->_Z = (cpustate->amout == 0);
+	cpustate->_S = ((cpustate->amout & 0x80000000) != 0);
+	cpustate->_CY = 0;
+	cpustate->_OV = 0;
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opPUSH(void)
+static UINT32 opPUSH(v60_state *cpustate)
 {
-	modAdd=PC+1;
-	modDim=2;
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
 
-	amLength1=ReadAM();
+	cpustate->amlength1 = ReadAM(cpustate);
 
-	SP-=4;
-	MemWrite32(v60.program, SP,amOut);
+	cpustate->SP-=4;
+	MemWrite32(cpustate->program, cpustate->SP, cpustate->amout);
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
-static UINT32 opPOP(void)
+static UINT32 opPOP(v60_state *cpustate)
 {
-	modAdd=PC+1;
-	modDim=2;
-	modWriteValW=MemRead32(v60.program,SP);
-	SP+=4;
-	amLength1=WriteAM();
+	cpustate->modadd = cpustate->PC + 1;
+	cpustate->moddim = 2;
+	cpustate->modwritevalw = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->SP +=4;
+	cpustate->amlength1 = WriteAM(cpustate);
 
-	return amLength1 + 1;
+	return cpustate->amlength1 + 1;
 }
 
 
-static UINT32 opINCB_0(void) { modM=0; return opINCB(); }
-static UINT32 opINCB_1(void) { modM=1; return opINCB(); }
-static UINT32 opINCH_0(void) { modM=0; return opINCH(); }
-static UINT32 opINCH_1(void) { modM=1; return opINCH(); }
-static UINT32 opINCW_0(void) { modM=0; return opINCW(); }
-static UINT32 opINCW_1(void) { modM=1; return opINCW(); }
+static UINT32 opINCB_0(v60_state *cpustate) { cpustate->modm = 0; return opINCB(cpustate); }
+static UINT32 opINCB_1(v60_state *cpustate) { cpustate->modm = 1; return opINCB(cpustate); }
+static UINT32 opINCH_0(v60_state *cpustate) { cpustate->modm = 0; return opINCH(cpustate); }
+static UINT32 opINCH_1(v60_state *cpustate) { cpustate->modm = 1; return opINCH(cpustate); }
+static UINT32 opINCW_0(v60_state *cpustate) { cpustate->modm = 0; return opINCW(cpustate); }
+static UINT32 opINCW_1(v60_state *cpustate) { cpustate->modm = 1; return opINCW(cpustate); }
 
-static UINT32 opDECB_0(void) { modM=0; return opDECB(); }
-static UINT32 opDECB_1(void) { modM=1; return opDECB(); }
-static UINT32 opDECH_0(void) { modM=0; return opDECH(); }
-static UINT32 opDECH_1(void) { modM=1; return opDECH(); }
-static UINT32 opDECW_0(void) { modM=0; return opDECW(); }
-static UINT32 opDECW_1(void) { modM=1; return opDECW(); }
+static UINT32 opDECB_0(v60_state *cpustate) { cpustate->modm = 0; return opDECB(cpustate); }
+static UINT32 opDECB_1(v60_state *cpustate) { cpustate->modm = 1; return opDECB(cpustate); }
+static UINT32 opDECH_0(v60_state *cpustate) { cpustate->modm = 0; return opDECH(cpustate); }
+static UINT32 opDECH_1(v60_state *cpustate) { cpustate->modm = 1; return opDECH(cpustate); }
+static UINT32 opDECW_0(v60_state *cpustate) { cpustate->modm = 0; return opDECW(cpustate); }
+static UINT32 opDECW_1(v60_state *cpustate) { cpustate->modm = 1; return opDECW(cpustate); }
 
-static UINT32 opJMP_0(void) { modM=0; return opJMP(); }
-static UINT32 opJMP_1(void) { modM=1; return opJMP(); }
+static UINT32 opJMP_0(v60_state *cpustate) { cpustate->modm = 0; return opJMP(cpustate); }
+static UINT32 opJMP_1(v60_state *cpustate) { cpustate->modm = 1; return opJMP(cpustate); }
 
-static UINT32 opJSR_0(void) { modM=0; return opJSR(); }
-static UINT32 opJSR_1(void) { modM=1; return opJSR(); }
+static UINT32 opJSR_0(v60_state *cpustate) { cpustate->modm = 0; return opJSR(cpustate); }
+static UINT32 opJSR_1(v60_state *cpustate) { cpustate->modm = 1; return opJSR(cpustate); }
 
-static UINT32 opPREPARE_0(void) { modM=0; return opPREPARE(); }
-static UINT32 opPREPARE_1(void) { modM=1; return opPREPARE(); }
+static UINT32 opPREPARE_0(v60_state *cpustate) { cpustate->modm = 0; return opPREPARE(cpustate); }
+static UINT32 opPREPARE_1(v60_state *cpustate) { cpustate->modm = 1; return opPREPARE(cpustate); }
 
-static UINT32 opRET_0(void) { modM=0; return opRET(); }
-static UINT32 opRET_1(void) { modM=1; return opRET(); }
+static UINT32 opRET_0(v60_state *cpustate) { cpustate->modm = 0; return opRET(cpustate); }
+static UINT32 opRET_1(v60_state *cpustate) { cpustate->modm = 1; return opRET(cpustate); }
 
-static UINT32 opTRAP_0(void) { modM=0; return opTRAP(); }
-static UINT32 opTRAP_1(void) { modM=1; return opTRAP(); }
+static UINT32 opTRAP_0(v60_state *cpustate) { cpustate->modm = 0; return opTRAP(cpustate); }
+static UINT32 opTRAP_1(v60_state *cpustate) { cpustate->modm = 1; return opTRAP(cpustate); }
 
-static UINT32 opRETIU_0(void) { modM=0; return opRETIU(); }
-static UINT32 opRETIU_1(void) { modM=1; return opRETIU(); }
+static UINT32 opRETIU_0(v60_state *cpustate) { cpustate->modm = 0; return opRETIU(cpustate); }
+static UINT32 opRETIU_1(v60_state *cpustate) { cpustate->modm = 1; return opRETIU(cpustate); }
 
-static UINT32 opRETIS_0(void) { modM=0; return opRETIS(); }
-static UINT32 opRETIS_1(void) { modM=1; return opRETIS(); }
+static UINT32 opRETIS_0(v60_state *cpustate) { cpustate->modm = 0; return opRETIS(cpustate); }
+static UINT32 opRETIS_1(v60_state *cpustate) { cpustate->modm = 1; return opRETIS(cpustate); }
 
-static UINT32 opGETPSW_0(void) { modM=0; return opGETPSW(); }
-static UINT32 opGETPSW_1(void) { modM=1; return opGETPSW(); }
+static UINT32 opGETPSW_0(v60_state *cpustate) { cpustate->modm = 0; return opGETPSW(cpustate); }
+static UINT32 opGETPSW_1(v60_state *cpustate) { cpustate->modm = 1; return opGETPSW(cpustate); }
 
-static UINT32 opTASI_0(void) { modM=0; return opTASI(); }
-static UINT32 opTASI_1(void) { modM=1; return opTASI(); }
+static UINT32 opTASI_0(v60_state *cpustate) { cpustate->modm = 0; return opTASI(cpustate); }
+static UINT32 opTASI_1(v60_state *cpustate) { cpustate->modm = 1; return opTASI(cpustate); }
 
-static UINT32 opCLRTLB_0(void) { modM=0; return opCLRTLB(); }
-static UINT32 opCLRTLB_1(void) { modM=1; return opCLRTLB(); }
+static UINT32 opCLRTLB_0(v60_state *cpustate) { cpustate->modm = 0; return opCLRTLB(cpustate); }
+static UINT32 opCLRTLB_1(v60_state *cpustate) { cpustate->modm = 1; return opCLRTLB(cpustate); }
 
-static UINT32 opPOPM_0(void) { modM=0; return opPOPM(); }
-static UINT32 opPOPM_1(void) { modM=1; return opPOPM(); }
+static UINT32 opPOPM_0(v60_state *cpustate) { cpustate->modm = 0; return opPOPM(cpustate); }
+static UINT32 opPOPM_1(v60_state *cpustate) { cpustate->modm = 1; return opPOPM(cpustate); }
 
-static UINT32 opPUSHM_0(void) { modM=0; return opPUSHM(); }
-static UINT32 opPUSHM_1(void) { modM=1; return opPUSHM(); }
+static UINT32 opPUSHM_0(v60_state *cpustate) { cpustate->modm = 0; return opPUSHM(cpustate); }
+static UINT32 opPUSHM_1(v60_state *cpustate) { cpustate->modm = 1; return opPUSHM(cpustate); }
 
-static UINT32 opTESTB_0(void) { modM=0; return opTESTB(); }
-static UINT32 opTESTB_1(void) { modM=1; return opTESTB(); }
+static UINT32 opTESTB_0(v60_state *cpustate) { cpustate->modm = 0; return opTESTB(cpustate); }
+static UINT32 opTESTB_1(v60_state *cpustate) { cpustate->modm = 1; return opTESTB(cpustate); }
 
-static UINT32 opTESTH_0(void) { modM=0; return opTESTH(); }
-static UINT32 opTESTH_1(void) { modM=1; return opTESTH(); }
+static UINT32 opTESTH_0(v60_state *cpustate) { cpustate->modm = 0; return opTESTH(cpustate); }
+static UINT32 opTESTH_1(v60_state *cpustate) { cpustate->modm = 1; return opTESTH(cpustate); }
 
-static UINT32 opTESTW_0(void) { modM=0; return opTESTW(); }
-static UINT32 opTESTW_1(void) { modM=1; return opTESTW(); }
+static UINT32 opTESTW_0(v60_state *cpustate) { cpustate->modm = 0; return opTESTW(cpustate); }
+static UINT32 opTESTW_1(v60_state *cpustate) { cpustate->modm = 1; return opTESTW(cpustate); }
 
-static UINT32 opPUSH_0(void) { modM=0; return opPUSH(); }
-static UINT32 opPUSH_1(void) { modM=1; return opPUSH(); }
+static UINT32 opPUSH_0(v60_state *cpustate) { cpustate->modm = 0; return opPUSH(cpustate); }
+static UINT32 opPUSH_1(v60_state *cpustate) { cpustate->modm = 1; return opPUSH(cpustate); }
 
-static UINT32 opPOP_0(void) { modM=0; return opPOP(); }
-static UINT32 opPOP_1(void) { modM=1; return opPOP(); }
+static UINT32 opPOP_0(v60_state *cpustate) { cpustate->modm = 0; return opPOP(cpustate); }
+static UINT32 opPOP_1(v60_state *cpustate) { cpustate->modm = 1; return opPOP(cpustate); }
 
-static UINT32 opSTTASK_0(void) { modM=0; return opSTTASK(); }
-static UINT32 opSTTASK_1(void) { modM=1; return opSTTASK(); }
+static UINT32 opSTTASK_0(v60_state *cpustate) { cpustate->modm = 0; return opSTTASK(cpustate); }
+static UINT32 opSTTASK_1(v60_state *cpustate) { cpustate->modm = 1; return opSTTASK(cpustate); }

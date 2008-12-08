@@ -3,83 +3,83 @@
  *  HALT: must add log
  */
 
-static UINT32 opBRK(void)
+static UINT32 opBRK(v60_state *cpustate)
 {
 /*
-    UINT32 oldPSW = v60_update_psw_for_exception(0, 0);
+    UINT32 oldPSW = v60_update_psw_for_exception(cpustate, 0, 0);
 
-    SP -=4;
-    MemWrite32(v60.program, SP, EXCEPTION_CODE_AND_SIZE(0x0d00, 4));
-    SP -=4;
-    MemWrite32(v60.program, SP, oldPSW);
-    SP -=4;
-    MemWrite32(v60.program, SP, PC + 1);
-    PC = GETINTVECT(13);
+    cpustate->SP -=4;
+    MemWrite32(cpustate->program, cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x0d00, 4));
+    cpustate->SP -=4;
+    MemWrite32(cpustate->program, cpustate->SP, oldPSW);
+    cpustate->SP -=4;
+    MemWrite32(cpustate->program, cpustate->SP, cpustate->PC + 1);
+    cpustate->PC = GETINTVECT(cpustate, 13);
 */
-	logerror("Skipping BRK opcode! PC=%x", PC);
+	logerror("Skipping BRK opcode! cpustate->PC=%x", cpustate->PC);
 
 	return 1;
 }
 
-static UINT32 opBRKV(void)
+static UINT32 opBRKV(v60_state *cpustate)
 {
-	UINT32 oldPSW = v60_update_psw_for_exception(0, 0);
+	UINT32 oldPSW = v60_update_psw_for_exception(cpustate, 0, 0);
 
-	SP -=4;
-	MemWrite32(v60.program, SP, PC);
-	SP -=4;
-	MemWrite32(v60.program, SP, EXCEPTION_CODE_AND_SIZE(0x1501, 4));
-	SP -=4;
-	MemWrite32(v60.program, SP, oldPSW);
-	SP -=4;
-	MemWrite32(v60.program, SP, PC + 1);
-	PC = GETINTVECT(21);
+	cpustate->SP -=4;
+	MemWrite32(cpustate->program, cpustate->SP, cpustate->PC);
+	cpustate->SP -=4;
+	MemWrite32(cpustate->program, cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x1501, 4));
+	cpustate->SP -=4;
+	MemWrite32(cpustate->program, cpustate->SP, oldPSW);
+	cpustate->SP -=4;
+	MemWrite32(cpustate->program, cpustate->SP, cpustate->PC + 1);
+	cpustate->PC = GETINTVECT(cpustate, 21);
 
 	return 0;
 }
 
-static UINT32 opCLRTLBA(void)
+static UINT32 opCLRTLBA(v60_state *cpustate)
 {
 	// @@@ TLB not yet supported
-	logerror("Skipping CLRTLBA opcode! PC=%x\n", PC);
+	logerror("Skipping CLRTLBA opcode! cpustate->PC=%x\n", cpustate->PC);
 	return 1;
 }
 
-static UINT32 opDISPOSE(void)
+static UINT32 opDISPOSE(v60_state *cpustate)
 {
-	SP = FP;
-	FP = MemRead32(v60.program,SP);
-	SP +=4;
+	cpustate->SP = cpustate->FP;
+	cpustate->FP = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->SP +=4;
 
 	return 1;
 }
 
-static UINT32 opHALT(void)
+static UINT32 opHALT(v60_state *cpustate)
 {
 	// @@@ It should wait for an interrupt to occur
 	//logerror("HALT found: skipping");
 	return 1;
 }
 
-static UINT32 opNOP(void) /* TRUSTED */
+static UINT32 opNOP(v60_state *cpustate) /* TRUSTED */
 {
 	return 1;
 }
 
-static UINT32 opRSR(void)
+static UINT32 opRSR(v60_state *cpustate)
 {
-	PC = MemRead32(v60.program,SP);
-	SP +=4;
+	cpustate->PC = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->SP +=4;
 
 	return 0;
 }
 
-static UINT32 opTRAPFL(void)
+static UINT32 opTRAPFL(v60_state *cpustate)
 {
-	if ((TKCW & 0x1F0) & ((v60ReadPSW() & 0x1F00) >> 4))
+	if ((cpustate->TKCW & 0x1F0) & ((v60ReadPSW(cpustate) & 0x1F00) >> 4))
 	{
 		// @@@ FPU exception
-		fatalerror("Hit TRAPFL! PC=%x", PC);
+		fatalerror("Hit TRAPFL! cpustate->PC=%x", cpustate->PC);
 	}
 
 	return 1;

@@ -1,29 +1,11 @@
 
-// NOTE for bit string/field addressing
+// NOTE for bit string / field addressing
 // ************************************
-// modDim must be passed as 10 for bit string instructions,
+// cpustate->moddim must be passed as 10 for bit string instructions,
 // and as 11 for bit field instructions
 
 
 
-// Output variables for ReadAMAddress()
-static UINT8 amFlag;
-static UINT32 amOut;
-static UINT32 bamOffset;
-
-// Appo temp var
-static UINT32 amLength1,amLength2;
-
-
-// Global vars used by AM functions
-static UINT32 modAdd;
-static UINT8 modM;
-static UINT8 modVal;
-static UINT8 modVal2;
-static UINT8 modWriteValB;
-static UINT16 modWriteValH;
-static UINT32 modWriteValW;
-static UINT8 modDim;
 
 // Addressing mode functions and tables
 #include "am1.c" // ReadAM
@@ -32,71 +14,71 @@ static UINT8 modDim;
 
 /*
   Input:
-  modAdd
-    modDim
+  cpustate->modadd
+    cpustate->moddim
 
   Output:
-    amOut
+    cpustate->amout
     amLength
 */
 
-static UINT32 ReadAM(void)
+static UINT32 ReadAM(v60_state *cpustate)
 {
-	modM=modM?1:0;
-	modVal=OpRead8(v60.program,modAdd);
-	return AMTable1[modM][modVal>>5]();
+	cpustate->modm = cpustate->modm?1:0;
+	cpustate->modval = OpRead8(cpustate->program, cpustate->modadd);
+	return AMTable1[cpustate->modm][cpustate->modval >> 5](cpustate);
 }
 
-static UINT32 BitReadAM(void)
+static UINT32 BitReadAM(v60_state *cpustate)
 {
-	modM=modM?1:0;
-	modVal=OpRead8(v60.program,modAdd);
-	return BAMTable1[modM][modVal>>5]();
+	cpustate->modm = cpustate->modm?1:0;
+	cpustate->modval = OpRead8(cpustate->program, cpustate->modadd);
+	return BAMTable1[cpustate->modm][cpustate->modval >> 5](cpustate);
 }
 
 
 
 /*
   Input:
-  modAdd
-    modDim
+  cpustate->modadd
+    cpustate->moddim
 
   Output:
-    amOut
-    amFlag
+    cpustate->amout
+    cpustate->amflag
     amLength
 */
 
-static UINT32 ReadAMAddress(void)
+static UINT32 ReadAMAddress(v60_state *cpustate)
 {
-	modM=modM?1:0;
-	modVal=OpRead8(v60.program,modAdd);
-	return AMTable2[modM][modVal>>5]();
+	cpustate->modm = cpustate->modm?1:0;
+	cpustate->modval = OpRead8(cpustate->program, cpustate->modadd);
+	return AMTable2[cpustate->modm][cpustate->modval >> 5](cpustate);
 }
 
-static UINT32 BitReadAMAddress(void)
+static UINT32 BitReadAMAddress(v60_state *cpustate)
 {
-	modM=modM?1:0;
-	modVal=OpRead8(v60.program,modAdd);
-	return BAMTable2[modM][modVal>>5]();
+	cpustate->modm = cpustate->modm?1:0;
+	cpustate->modval = OpRead8(cpustate->program, cpustate->modadd);
+	return BAMTable2[cpustate->modm][cpustate->modval >> 5](cpustate);
 }
 
 /*
   Input:
-  modAdd
-    modDim
-    modWriteValB/H/W
+  cpustate->modadd
+    cpustate->moddim
+    cpustate->modwritevalb / H/W
 
   Output:
-    amOut
+    cpustate->amout
     amLength
 */
 
-static UINT32 WriteAM(void)
+static UINT32 WriteAM(v60_state *cpustate)
 {
-	modM=modM?1:0;
-	modVal=OpRead8(v60.program,modAdd);
-	return AMTable3[modM][modVal>>5]();
+	cpustate->modm = cpustate->modm?1:0;
+	cpustate->modval = OpRead8(cpustate->program, cpustate->modadd);
+	return AMTable3[cpustate->modm][cpustate->modval >> 5](cpustate);
 }
 
 
