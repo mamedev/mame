@@ -1503,8 +1503,8 @@ static void init_megadri6_io(running_machine *machine)
 }
 
 /* pointers to our io data read/write functions */
-UINT8 (*megadrive_io_read_data_port_ptr)(int offset);
-void (*megadrive_io_write_data_port_ptr)(int offset, UINT16 data);
+UINT8 (*megadrive_io_read_data_port_ptr)(running_machine *machine, int offset);
+void (*megadrive_io_write_data_port_ptr)(running_machine *machine, int offset, UINT16 data);
 
 INPUT_PORTS_START( megadri6 )
 	PORT_START("PAD1")		/* Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
@@ -1817,7 +1817,7 @@ static void megadrive_init_io(running_machine *machine)
 }
 
 /************* 6 button version **************************/
-static UINT8 megadrive_io_read_data_port_6button(int portnum)
+static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int portnum)
 {
 	UINT8 retdata;
 
@@ -1890,7 +1890,7 @@ static UINT8 megadrive_io_read_data_port_6button(int portnum)
 }
 /************* end 6 button version ********************************************/
 
-static UINT8 megadrive_io_read_data_port_3button(int portnum)
+static UINT8 megadrive_io_read_data_port_3button(running_machine *machine, int portnum)
 {
 	UINT8 retdata;
 
@@ -2056,7 +2056,7 @@ static READ16_HANDLER( megadriv_68k_io_read )
 		case 0x2:
 		case 0x3:
 //          retdata = megadrive_io_read_data_port(offset-1);
-			retdata = megadrive_io_read_data_port_ptr(offset-1);
+			retdata = megadrive_io_read_data_port_ptr(space->machine, offset-1);
 			break;
 
 		case 0x4:
@@ -2085,7 +2085,7 @@ static READ16_HANDLER( megadriv_68k_io_read )
 }
 
 
-static void megadrive_io_write_data_port_3button(int portnum, UINT16 data)
+static void megadrive_io_write_data_port_3button(running_machine *machine, int portnum, UINT16 data)
 {
 	megadrive_io_data_regs[portnum] = data;
 	//mame_printf_debug("Writing IO Data Register #%d data %04x\n",portnum,data);
@@ -2095,7 +2095,7 @@ static void megadrive_io_write_data_port_3button(int portnum, UINT16 data)
 
 /******************************6 button version*****************************/
 
-static void megadrive_io_write_data_port_6button(int portnum, UINT16 data)
+static void megadrive_io_write_data_port_6button(running_machine *machine, int portnum, UINT16 data)
 {
 	if (megadrive_io_ctrl_regs[portnum]&0x40)
 	{
@@ -2114,23 +2114,23 @@ static void megadrive_io_write_data_port_6button(int portnum, UINT16 data)
 
 /***************************end 6 button version ****************************/
 
-static void megadrive_io_write_ctrl_port(int portnum, UINT16 data)
+static void megadrive_io_write_ctrl_port(running_machine *machine, int portnum, UINT16 data)
 {
 	megadrive_io_ctrl_regs[portnum] = data;
 //  mame_printf_debug("Setting IO Control Register #%d data %04x\n",portnum,data);
 }
 
-static void megadrive_io_write_tx_port(int portnum, UINT16 data)
+static void megadrive_io_write_tx_port(running_machine *machine, int portnum, UINT16 data)
 {
 	megadrive_io_tx_regs[portnum] = data;
 }
 
-static void megadrive_io_write_rx_port(int portnum, UINT16 data)
+static void megadrive_io_write_rx_port(running_machine *machine, int portnum, UINT16 data)
 {
 
 }
 
-static void megadrive_io_write_sctrl_port(int portnum, UINT16 data)
+static void megadrive_io_write_sctrl_port(running_machine *machine, int portnum, UINT16 data)
 {
 
 }
@@ -2154,30 +2154,30 @@ static WRITE16_HANDLER( megadriv_68k_io_write )
 		case 0x2:
 		case 0x3:
 //          megadrive_io_write_data_port(offset-1,data);
-			megadrive_io_write_data_port_ptr(offset-1,data);
+			megadrive_io_write_data_port_ptr(space->machine, offset-1,data);
 			break;
 
 		case 0x4:
 		case 0x5:
 		case 0x6:
-			megadrive_io_write_ctrl_port(offset-4,data);
+			megadrive_io_write_ctrl_port(space->machine,offset-4,data);
 			break;
 
 		/* Serial I/O Registers */
 
-		case 0x7: megadrive_io_write_tx_port(0,data); break;
-		case 0x8: megadrive_io_write_rx_port(0,data); break;
-		case 0x9: megadrive_io_write_sctrl_port(0,data); break;
+		case 0x7: megadrive_io_write_tx_port(space->machine,0,data); break;
+		case 0x8: megadrive_io_write_rx_port(space->machine,0,data); break;
+		case 0x9: megadrive_io_write_sctrl_port(space->machine,0,data); break;
 
 
-		case 0xa: megadrive_io_write_tx_port(1,data); break;
-		case 0xb: megadrive_io_write_rx_port(1,data); break;
-		case 0xc: megadrive_io_write_sctrl_port(1,data); break;
+		case 0xa: megadrive_io_write_tx_port(space->machine,1,data); break;
+		case 0xb: megadrive_io_write_rx_port(space->machine,1,data); break;
+		case 0xc: megadrive_io_write_sctrl_port(space->machine,1,data); break;
 			break;
 
-		case 0xd: megadrive_io_write_tx_port(2,data); break;
-		case 0xe: megadrive_io_write_rx_port(2,data); break;
-		case 0xf: megadrive_io_write_sctrl_port(2,data); break;
+		case 0xd: megadrive_io_write_tx_port(space->machine,2,data); break;
+		case 0xe: megadrive_io_write_rx_port(space->machine,2,data); break;
+		case 0xf: megadrive_io_write_sctrl_port(space->machine,2,data); break;
 			break;
 	}
 
@@ -3911,13 +3911,13 @@ static UINT16 vdp_get_word_from_68k_mem_svp(UINT32 source)
 }
 
 /* emulate testmode plug */
-static UINT8 megadrive_io_read_data_port_svp(int portnum)
+static UINT8 megadrive_io_read_data_port_svp(running_machine *machine, int portnum)
 {
 	if (portnum == 0 && input_port_read_safe(Machine, "MEMORY_TEST", 0x00))
 	{
 		return (megadrive_io_data_regs[0] & 0xc0);
 	}
-	return megadrive_io_read_data_port_3button(portnum);
+	return megadrive_io_read_data_port_3button(machine, portnum);
 }
 
 
@@ -6821,6 +6821,7 @@ ROM_START( g_virrea )
 	ROM_LOAD( "g_virrea.bin", 0x000000, 0x200000, CRC(5a943df9) SHA1(2c08ea556c79d48e88ff5202944c161ae1b41c63) )
 ROM_END
 
+#ifndef MESS
 GAME( 1994, 32x_bios,    0,        genesis_32x,        megadriv,    _32x,    ROT0,   "Sega", "32X Bios", GAME_NOT_WORKING )
 GAME( 1994, segacd,      0,        genesis_scd,        megadriv,    megadriv,ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U)", GAME_NOT_WORKING )
 GAME( 1994, 32x_scd,     0,        genesis_32x_scd,    megadriv,    _32x,    ROT0,   "Sega", "Sega-CD Model 2 BIOS V2.11 (U) (with 32X)", GAME_NOT_WORKING )
@@ -6828,5 +6829,6 @@ GAME( 1994, g_virr,      0,        megdsvp,            megadriv,   megadriv, ROT
 GAME( 1994, g_virrj ,    g_virr,   megdsvp,            megadriv,   megadrij, ROT0,   "Sega", "Virtua Racing (J) [!]", 0 )
 GAME( 1994, g_virre ,    g_virr,   megdsvppal,         megadriv,   megadrie, ROT0,   "Sega", "Virtua Racing (E) [!]", 0 )
 GAME( 1994, g_virrea,    g_virr,   megdsvppal,         megadriv,   megadrie, ROT0,   "Sega", "Virtua Racing (E) [a1]", 0 )
+#endif
 
 #endif
