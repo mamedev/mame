@@ -22,10 +22,10 @@ typedef struct {
 	SHARC_BOOT_MODE boot_mode;
 } sharc_config;
 
-extern void sharc_set_flag_input(int flag_num, int state);
+extern void sharc_set_flag_input(const device_config *device, int flag_num, int state);
 
-extern void sharc_external_iop_write(UINT32 address, UINT32 data);
-extern void sharc_external_dma_write(UINT32 address, UINT64 data);
+extern void sharc_external_iop_write(const device_config *device, UINT32 address, UINT32 data);
+extern void sharc_external_dma_write(const device_config *device, UINT32 address, UINT64 data);
 
 #if (HAS_ADSP21062)
 CPU_GET_INFO( adsp21062 );

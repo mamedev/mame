@@ -317,24 +317,18 @@ READ32_HANDLER( K001005_r )
 				if (K001005_fifo_read_ptr < 0x3ff)
 				{
 					//cpu_set_input_line(space->machine->cpu[2], SHARC_INPUT_FLAG1, CLEAR_LINE);
-					cpu_push_context(space->machine->cpu[2]);
-					sharc_set_flag_input(1, CLEAR_LINE);
-					cpu_pop_context();
+					sharc_set_flag_input(space->machine->cpu[2], 1, CLEAR_LINE);
 				}
 				else
 				{
 					//cpu_set_input_line(space->machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
-					cpu_push_context(space->machine->cpu[2]);
-					sharc_set_flag_input(1, ASSERT_LINE);
-					cpu_pop_context();
+					sharc_set_flag_input(space->machine->cpu[2], 1, ASSERT_LINE);
 				}
 			}
 			else
 			{
 				//cpu_set_input_line(space->machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
-				cpu_push_context(space->machine->cpu[2]);
-				sharc_set_flag_input(1, ASSERT_LINE);
-				cpu_pop_context();
+				sharc_set_flag_input(space->machine->cpu[2], 1, ASSERT_LINE);
 			}
 
 			K001005_fifo_read_ptr++;
@@ -376,24 +370,18 @@ WRITE32_HANDLER( K001005_w )
 				if (K001005_fifo_write_ptr < 0x400)
 				{
 					//cpu_set_input_line(space->machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
-					cpu_push_context(space->machine->cpu[2]);
-					sharc_set_flag_input(1, ASSERT_LINE);
-					cpu_pop_context();
+					sharc_set_flag_input(space->machine->cpu[2], 1, ASSERT_LINE);
 				}
 				else
 				{
 					//cpu_set_input_line(space->machine->cpu[2], SHARC_INPUT_FLAG1, CLEAR_LINE);
-					cpu_push_context(space->machine->cpu[2]);
-					sharc_set_flag_input(1, CLEAR_LINE);
-					cpu_pop_context();
+					sharc_set_flag_input(space->machine->cpu[2], 1, CLEAR_LINE);
 				}
 			}
 			else
 			{
 				//cpu_set_input_line(space->machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
-				cpu_push_context(space->machine->cpu[2]);
-				sharc_set_flag_input(1, ASSERT_LINE);
-				cpu_pop_context();
+				sharc_set_flag_input(space->machine->cpu[2], 1, ASSERT_LINE);
 			}
 
 	    //  mame_printf_debug("K001005 FIFO write: %08X at %08X\n", data, cpu_get_pc(space->cpu));
@@ -1059,9 +1047,7 @@ VIDEO_UPDATE( gticlub )
 	draw_7segment_led(bitmap, 9, 3, gticlub_led_reg1);
 
 	//cpu_set_input_line(screen->machine->cpu[2], SHARC_INPUT_FLAG1, ASSERT_LINE);
-	cpu_push_context(screen->machine->cpu[2]);
-	sharc_set_flag_input(1, ASSERT_LINE);
-	cpu_pop_context();
+	sharc_set_flag_input(screen->machine->cpu[2], 1, ASSERT_LINE);
 	return 0;
 }
 

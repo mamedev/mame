@@ -116,15 +116,11 @@ static int copro_fifoin_pop(const device_config *device, UINT32 *result)
 	{
 		if (copro_fifoin_num == 0)
 		{
-			cpu_push_context(device);
-			sharc_set_flag_input(0, ASSERT_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(device, 0, ASSERT_LINE);
 		}
 		else
 		{
-			cpu_push_context(device);
-			sharc_set_flag_input(0, CLEAR_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(device, 0, CLEAR_LINE);
 		}
 	}
 
@@ -154,9 +150,7 @@ static void copro_fifoin_push(const device_config *device, UINT32 data)
 	// clear FIFO empty flag on SHARC
 	if (dsp_type == DSP_TYPE_SHARC)
 	{
-		cpu_push_context(device);
-		sharc_set_flag_input(0, CLEAR_LINE);
-		cpu_pop_context();
+		sharc_set_flag_input(device, 0, CLEAR_LINE);
 	}
 }
 
@@ -196,15 +190,11 @@ static UINT32 copro_fifoout_pop(const address_space *space)
 	{
 		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			cpu_push_context(Machine->cpu[2]);
-			sharc_set_flag_input(1, ASSERT_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(space->machine->cpu[2], 1, ASSERT_LINE);
 		}
 		else
 		{
-			cpu_push_context(Machine->cpu[2]);
-			sharc_set_flag_input(1, CLEAR_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(space->machine->cpu[2], 1, CLEAR_LINE);
 		}
 	}
 
@@ -235,17 +225,13 @@ static void copro_fifoout_push(const device_config *device, UINT32 data)
 	{
 		if (copro_fifoout_num == COPRO_FIFOOUT_SIZE)
 		{
-			cpu_push_context(device);
-			sharc_set_flag_input(1, ASSERT_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(device, 1, ASSERT_LINE);
 
 			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, ASSERT_LINE);
 		}
 		else
 		{
-			cpu_push_context(device);
-			sharc_set_flag_input(1, CLEAR_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(device, 1, CLEAR_LINE);
 
 			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, CLEAR_LINE);
 		}
@@ -571,9 +557,7 @@ static WRITE32_HANDLER(copro_fifo_w)
 	{
 		if (dsp_type == DSP_TYPE_SHARC)
 		{
-			cpu_push_context(space->machine->cpu[2]);
-			sharc_external_dma_write(model2_coprocnt, data & 0xffff);
-			cpu_pop_context();
+			sharc_external_dma_write(space->machine->cpu[2], model2_coprocnt, data & 0xffff);
 		}
 		else if (dsp_type == DSP_TYPE_TGP)
 		{
@@ -598,9 +582,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 		(strcmp(space->machine->gamedrv->name, "vstriker" ) == 0) ||
 		(strcmp(space->machine->gamedrv->name, "gunblade" ) == 0))
 	{
-		cpu_push_context(space->machine->cpu[2]);
-		sharc_external_iop_write(offset, data);
-		cpu_pop_context();
+		sharc_external_iop_write(space->machine->cpu[2], offset, data);
 	}
 	else
 	{
@@ -611,9 +593,7 @@ static WRITE32_HANDLER(copro_sharc_iop_w)
 		else
 		{
 			iop_data |= (data & 0xffff) << 16;
-			cpu_push_context(space->machine->cpu[2]);
-			sharc_external_iop_write(offset, iop_data);
-			cpu_pop_context();
+			sharc_external_iop_write(space->machine->cpu[2], offset, iop_data);
 		}
 		iop_write_num++;
 	}
@@ -688,9 +668,7 @@ static WRITE32_HANDLER(geo_sharc_fifo_w)
 {
     if (model2_geoctl & 0x80000000)
     {
-        cpu_push_context(space->machine->cpu[3]);
-        sharc_external_dma_write(model2_geocnt, data & 0xffff);
-        cpu_pop_context();
+        sharc_external_dma_write(space->machine->cpu[3], model2_geocnt, data & 0xffff);
 
         model2_geocnt++;
     }
@@ -706,9 +684,7 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
 {
     if ((strcmp(space->machine->gamedrv->name, "schamp" ) == 0))
     {
-        cpu_push_context(space->machine->cpu[3]);
-        sharc_external_iop_write(offset, data);
-        cpu_pop_context();
+        sharc_external_iop_write(space->machine->cpu[3], offset, data);
     }
     else
     {
@@ -719,9 +695,7 @@ static WRITE32_HANDLER(geo_sharc_iop_w)
         else
         {
             geo_iop_data |= (data & 0xffff) << 16;
-            cpu_push_context(space->machine->cpu[3]);
-            sharc_external_iop_write(offset, geo_iop_data);
-            cpu_pop_context();
+            sharc_external_iop_write(space->machine->cpu[3], offset, geo_iop_data);
         }
         geo_iop_write_num++;
     }
@@ -1744,7 +1718,7 @@ static const scsp_interface scsp_config =
 
 static READ32_HANDLER(copro_sharc_input_fifo_r)
 {
-	UINT32 result;
+	UINT32 result = 0;
 	//mame_printf_debug("SHARC FIFOIN pop at %08X\n", cpu_get_pc(space->cpu));
 
 	copro_fifoin_pop(space->machine->cpu[2], &result);

@@ -225,9 +225,7 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 		case CGBOARD_TYPE_GTICLUB:
 		{
 			//cpu_set_input_line(machine->cpu[2], SHARC_INPUT_FLAG0, ASSERT_LINE);
-			cpu_push_context(space->machine->cpu[2]);
-			sharc_set_flag_input(0, ASSERT_LINE);
-			cpu_pop_context();
+			sharc_set_flag_input(space->machine->cpu[2], 0, ASSERT_LINE);
 
 			if (offset == 1)
 			{
@@ -246,9 +244,7 @@ static void dsp_comm_sharc_w(const address_space *space, int board, int offset, 
 
 				if (data & 0x01 || data & 0x10)
 				{
-					cpu_push_context(space->machine->cpu[board == 0 ? 2 : 3]);
-					sharc_set_flag_input(1, ASSERT_LINE);
-					cpu_pop_context();
+					sharc_set_flag_input(space->machine->cpu[board == 0 ? 2 : 3], 1, ASSERT_LINE);
 				}
 
 				if (texture_bank[board] != -1)
@@ -359,28 +355,20 @@ static UINT32 nwk_fifo_r(int board)
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_half_full_r)
 	{
-		cpu_push_context(Machine->cpu[cpu]);
-		sharc_set_flag_input(1, CLEAR_LINE);
-		cpu_pop_context();
+		sharc_set_flag_input(Machine->cpu[cpu], 1, CLEAR_LINE);
 	}
 	else
 	{
-		cpu_push_context(Machine->cpu[cpu]);
-		sharc_set_flag_input(1, ASSERT_LINE);
-		cpu_pop_context();
+		sharc_set_flag_input(Machine->cpu[cpu], 1, ASSERT_LINE);
 	}
 
 	if (nwk_fifo_read_ptr[board] < nwk_fifo_full)
 	{
-		cpu_push_context(Machine->cpu[cpu]);
-		sharc_set_flag_input(2, ASSERT_LINE);
-		cpu_pop_context();
+		sharc_set_flag_input(Machine->cpu[cpu], 2, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_push_context(Machine->cpu[cpu]);
-		sharc_set_flag_input(2, CLEAR_LINE);
-		cpu_pop_context();
+		sharc_set_flag_input(Machine->cpu[cpu], 2, CLEAR_LINE);
 	}
 
 	data = nwk_fifo[board][nwk_fifo_read_ptr[board]];
@@ -396,20 +384,14 @@ static void nwk_fifo_w(int board, UINT32 data)
 
 	if (nwk_fifo_write_ptr[board] < nwk_fifo_half_full_w)
 	{
-		cpu_push_context(Machine->cpu[cpu]);
-		sharc_set_flag_input(1, ASSERT_LINE);
-		cpu_pop_context();
+		sharc_set_flag_input(Machine->cpu[cpu], 1, ASSERT_LINE);
 	}
 	else
 	{
-		cpu_push_context(Machine->cpu[cpu]);
-		sharc_set_flag_input(1, CLEAR_LINE);
-		cpu_pop_context();
+		sharc_set_flag_input(Machine->cpu[cpu], 1, CLEAR_LINE);
 	}
 
-	cpu_push_context(Machine->cpu[cpu]);
-	sharc_set_flag_input(2, ASSERT_LINE);
-	cpu_pop_context();
+	sharc_set_flag_input(Machine->cpu[cpu], 2, ASSERT_LINE);
 
 	nwk_fifo[board][nwk_fifo_write_ptr[board]] = data;
 	nwk_fifo_write_ptr[board]++;

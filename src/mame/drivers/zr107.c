@@ -237,9 +237,7 @@ static VIDEO_UPDATE( jetwave )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	cpu_push_context(screen->machine->cpu[2]);
-	sharc_set_flag_input(1, ASSERT_LINE);
-	cpu_pop_context();
+	sharc_set_flag_input(screen->machine->cpu[2], 1, ASSERT_LINE);
 	return 0;
 }
 
@@ -293,9 +291,7 @@ static VIDEO_UPDATE( zr107 )
 	draw_7segment_led(bitmap, 3, 3, led_reg0);
 	draw_7segment_led(bitmap, 9, 3, led_reg1);
 
-	cpu_push_context(screen->machine->cpu[2]);
-	sharc_set_flag_input(1, ASSERT_LINE);
-	cpu_pop_context();
+	sharc_set_flag_input(screen->machine->cpu[2], 1, ASSERT_LINE);
 	return 0;
 }
 
