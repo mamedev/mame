@@ -7,6 +7,14 @@
 #include "debugger.h"
 #include "v810.h"
 
+#define I5(x) (((x)&0x1f)|(((x)&0x10)?0xffffffe0:0))
+#define UI5(x) ((x)&0x1f)
+#define I16(x) (((x)&0xffff)|(((x)&0x8000)?0xffff0000:0))
+#define UI16(x) ((x)&0xffff)
+#define D16(x) (((x)&0xffff)|(((x)&0x8000)?0xffff0000:0))
+#define D26(x,y) ((y)|((x&0x3ff)<<16 )|((x&0x200)?0xfc000000:0))
+#define D9(x) ((x&0x1ff)|((x&0x100)?0xfffffe00:0))
+
 static const char *const dRegs[]=
 {
 "R0","R1","R2","SP","R4",
