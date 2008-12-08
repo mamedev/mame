@@ -4,9 +4,11 @@
 
 *************************************************************************/
 
+#include "sound/samples.h"
+
 /*----------- defined in audio/meadows.c -----------*/
 
-void meadows_sh_start(void);
+SAMPLES_START( meadows_sh_start );
 void meadows_sh_dac_w(int data);
 void meadows_sh_update(running_machine *machine);
 extern UINT8 meadows_0c00;

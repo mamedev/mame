@@ -161,13 +161,15 @@ static const samples_interface spacewar_samples_interface =
 
 static void spacewar_sound_w(UINT8 sound_val, UINT8 bits_changed)
 {
+	running_machine *machine = Machine;
+
 	/* Explosion - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x01))
-		sample_start(0, (mame_rand(Machine) & 1) ? 0 : 6, 0);
+		sample_start(0, (mame_rand(machine) & 1) ? 0 : 6, 0);
 
 	/* Fire sound - rising edge */
 	if (SOUNDVAL_RISING_EDGE(0x02))
-		sample_start(1, (mame_rand(Machine) & 1) ? 1 : 7, 0);
+		sample_start(1, (mame_rand(machine) & 1) ? 1 : 7, 0);
 
 	/* Player 1 thrust - 0=on, 1=off */
 	if (SOUNDVAL_FALLING_EDGE(0x04))
@@ -833,7 +835,8 @@ static const samples_interface starcas_samples_interface =
 
 static void starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
 {
-    UINT32 target_pitch;
+	running_machine *machine = Machine;
+	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -873,14 +876,14 @@ static void starcas_sound_w(UINT8 sound_val, UINT8 bits_changed)
         target_pitch = 0x5800 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (video_screen_get_frame_number(Machine->primary_screen) > last_frame)
+        if (video_screen_get_frame_number(machine->primary_screen) > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 225;
             if (current_pitch < target_pitch)
                 current_pitch += 150;
             sample_set_freq(4, current_pitch);
-            last_frame = video_screen_get_frame_number(Machine->primary_screen);
+            last_frame = video_screen_get_frame_number(machine->primary_screen);
         }
 
 		/* remember the previous value */
@@ -945,7 +948,8 @@ static const samples_interface solarq_samples_interface =
 
 static void solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
 {
-    static float target_volume, current_volume;
+	running_machine *machine = Machine;
+	static float target_volume, current_volume;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -976,7 +980,7 @@ static void solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
 			target_volume = 0;
 
 		/* ramp the thrust volume */
-        if (sample_playing(2) && video_screen_get_frame_number(Machine->primary_screen) > last_frame)
+        if (sample_playing(2) && video_screen_get_frame_number(machine->primary_screen) > last_frame)
         {
             if (current_volume > target_volume)
                 current_volume -= 0.078f;
@@ -986,7 +990,7 @@ static void solarq_sound_w(UINT8 sound_val, UINT8 bits_changed)
                 sample_set_volume(2, current_volume);
             else
                 sample_stop(2);
-            last_frame = video_screen_get_frame_number(Machine->primary_screen);
+            last_frame = video_screen_get_frame_number(machine->primary_screen);
         }
 
 		/* fire - falling edge */
@@ -1213,7 +1217,8 @@ static const samples_interface wotw_samples_interface =
 
 static void wotw_sound_w(UINT8 sound_val, UINT8 bits_changed)
 {
-    UINT32 target_pitch;
+	running_machine *machine = Machine;
+	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -1253,14 +1258,14 @@ static void wotw_sound_w(UINT8 sound_val, UINT8 bits_changed)
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (video_screen_get_frame_number(Machine->primary_screen) > last_frame)
+        if (video_screen_get_frame_number(machine->primary_screen) > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(4, current_pitch);
-            last_frame = video_screen_get_frame_number(Machine->primary_screen);
+            last_frame = video_screen_get_frame_number(machine->primary_screen);
         }
 
 		/* remember the previous value */
@@ -1325,7 +1330,8 @@ static const samples_interface wotwc_samples_interface =
 
 static void wotwc_sound_w(UINT8 sound_val, UINT8 bits_changed)
 {
-    UINT32 target_pitch;
+	running_machine *machine = Machine;
+	UINT32 target_pitch;
 
 	/* on the rising edge of bit 0x10, clock bit 0x80 into the shift register */
 	if (SOUNDVAL_RISING_EDGE(0x10))
@@ -1365,14 +1371,14 @@ static void wotwc_sound_w(UINT8 sound_val, UINT8 bits_changed)
         target_pitch = 0x10000 + (target_pitch << 12);
 
         /* once per frame slide the pitch toward the target */
-        if (video_screen_get_frame_number(Machine->primary_screen) > last_frame)
+        if (video_screen_get_frame_number(machine->primary_screen) > last_frame)
         {
             if (current_pitch > target_pitch)
                 current_pitch -= 300;
             if (current_pitch < target_pitch)
                 current_pitch += 200;
             sample_set_freq(4, current_pitch);
-            last_frame = video_screen_get_frame_number(Machine->primary_screen);
+            last_frame = video_screen_get_frame_number(machine->primary_screen);
         }
 
 		/* remember the previous value */
@@ -1424,12 +1430,14 @@ static TIMER_CALLBACK( synced_sound_w )
 
 static void demon_sound_w(UINT8 sound_val, UINT8 bits_changed)
 {
+	running_machine *machine = Machine;
+
 	/* all inputs are inverted */
 	sound_val = ~sound_val;
 
 	/* watch for a 0->1 edge on bit 4 ("shift in") to clock in the new data */
 	if ((bits_changed & 0x10) && (sound_val & 0x10))
-		timer_call_after_resynch(Machine, NULL, sound_val & 0x0f, synced_sound_w);
+		timer_call_after_resynch(machine, NULL, sound_val & 0x0f, synced_sound_w);
 }
 
 

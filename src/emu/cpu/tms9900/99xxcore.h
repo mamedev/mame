@@ -87,7 +87,6 @@ Other references can be found on spies.com:
 
 #include "debugger.h"
 #include "cpuexec.h"
-#include "deprecat.h"
 #include "tms9900.h"
 
 
@@ -1869,7 +1868,7 @@ static void tms99xx_set_irq_line(int irqline, int state)
 					{	/* decrement, then interrupt if reach 0 */
 						if ((-- I.decrementer_count) == 0)
 						{
-							decrementer_callback(Machine, NULL, 0);
+							decrementer_callback(I.device->machine, NULL, 0);
 							I.decrementer_count = I.decrementer_interval;	/* reload */
 						}
 					}

@@ -272,15 +272,19 @@ PALETTE_INIT( psx )
 #if defined( MAME_DEBUG )
 
 #define DEBUG_COORDS ( 10 )
-static bitmap_t *debugmesh;
-static int m_b_debugclear;
-static int m_b_debugmesh;
-static int m_n_debugskip;
-static int m_b_debugtexture;
-static int m_n_debuginterleave;
-static int m_n_debugcoord;
-static int m_n_debugcoordx[ DEBUG_COORDS ];
-static int m_n_debugcoordy[ DEBUG_COORDS ];
+static struct
+{
+	running_machine *machine;
+	bitmap_t *mesh;
+	int b_clear;
+	int b_mesh;
+	int n_skip;
+	int b_texture;
+	int n_interleave;
+	int n_coord;
+	int n_coordx[ DEBUG_COORDS ];
+	int n_coordy[ DEBUG_COORDS ];
+} m_debug;
 
 #define DEBUG_MAX ( 512 )
 
@@ -289,29 +293,31 @@ static void DebugMeshInit( running_machine *machine )
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	m_b_debugmesh = 0;
-	m_b_debugtexture = 0;
-	m_n_debuginterleave = -1;
-	m_b_debugclear = 1;
-	m_n_debugcoord = 0;
-	m_n_debugskip = 0;
-	debugmesh = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	m_debug.b_mesh = 0;
+	m_debug.b_texture = 0;
+	m_debug.n_interleave = -1;
+	m_debug.b_clear = 1;
+	m_debug.n_coord = 0;
+	m_debug.n_skip = 0;
+	m_debug.mesh = auto_bitmap_alloc(width, height, BITMAP_FORMAT_INDEXED16 );
+	m_debug.machine = machine;
 }
 
-static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
+static void DebugMesh( int n_coordx, int n_coordy )
 {
+	running_machine *machine = m_debug.machine;
 	int n_coord;
 	int n_colour;
 	int width = video_screen_get_width(machine->primary_screen);
 	int height = video_screen_get_height(machine->primary_screen);
 
-	if( m_b_debugclear )
+	if( m_debug.b_clear )
 	{
-		bitmap_fill( debugmesh, NULL , 0x0000);
-		m_b_debugclear = 0;
+		bitmap_fill( m_debug.mesh, NULL , 0x0000);
+		m_debug.b_clear = 0;
 	}
 
-	if( m_n_debugcoord < DEBUG_COORDS )
+	if( m_debug.n_coord < DEBUG_COORDS )
 	{
 		n_coordx += m_n_displaystartx;
 		n_coordy += m_n_displaystarty;
@@ -323,25 +329,25 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 		n_coordy /= DEBUG_MAX - 1;
 		n_coordy += 256;
 
-		m_n_debugcoordx[ m_n_debugcoord ] = n_coordx;
-		m_n_debugcoordy[ m_n_debugcoord ] = n_coordy;
-		m_n_debugcoord++;
+		m_debug.n_coordx[ m_debug.n_coord ] = n_coordx;
+		m_debug.n_coordy[ m_debug.n_coord ] = n_coordy;
+		m_debug.n_coord++;
 	}
 
 	n_colour = 0x1f;
-	for( n_coord = 0; n_coord < m_n_debugcoord; n_coord++ )
+	for( n_coord = 0; n_coord < m_debug.n_coord; n_coord++ )
 	{
-		if( n_coordx != m_n_debugcoordx[ n_coord ] ||
-			n_coordy != m_n_debugcoordy[ n_coord ] )
+		if( n_coordx != m_debug.n_coordx[ n_coord ] ||
+			n_coordy != m_debug.n_coordy[ n_coord ] )
 		{
 			break;
 		}
 	}
-	if( n_coord == m_n_debugcoord && m_n_debugcoord > 1 )
+	if( n_coord == m_debug.n_coord && m_debug.n_coord > 1 )
 	{
 		n_colour = 0xffff;
 	}
-	for( n_coord = 0; n_coord < m_n_debugcoord; n_coord++ )
+	for( n_coord = 0; n_coord < m_debug.n_coord; n_coord++ )
 	{
 		PAIR n_x;
 		PAIR n_y;
@@ -355,7 +361,7 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 		INT32 n_dx;
 		INT32 n_dy;
 
-		n_xstart = m_n_debugcoordx[ n_coord ];
+		n_xstart = m_debug.n_coordx[ n_coord ];
 		n_xend = n_coordx;
 		if( n_xend > n_xstart )
 		{
@@ -366,7 +372,7 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 			n_xlen = n_xstart - n_xend;
 		}
 
-		n_ystart = m_n_debugcoordy[ n_coord ];
+		n_ystart = m_debug.n_coordy[ n_coord ];
 		n_yend = n_coordy;
 		if( n_yend > n_ystart )
 		{
@@ -403,8 +409,8 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 				(INT16)n_x.w.h <= width - 1 &&
 				(INT16)n_y.w.h <= height - 1 )
 			{
-				if( *BITMAP_ADDR16(debugmesh, n_y.w.h, n_x.w.h) != 0xffff )
-					*BITMAP_ADDR16(debugmesh, n_y.w.h, n_x.w.h) = n_colour;
+				if( *BITMAP_ADDR16(m_debug.mesh, n_y.w.h, n_x.w.h) != 0xffff )
+					*BITMAP_ADDR16(m_debug.mesh, n_y.w.h, n_x.w.h) = n_colour;
 			}
 			n_x.d += n_dx;
 			n_y.d += n_dy;
@@ -415,18 +421,18 @@ static void DebugMesh( running_machine *machine, int n_coordx, int n_coordy )
 
 static void DebugMeshEnd( void )
 {
-	m_n_debugcoord = 0;
+	m_debug.n_coord = 0;
 }
 
 static void DebugCheckKeys( running_machine *machine )
 {
 	if( input_code_pressed_once( KEYCODE_M ) )
-		m_b_debugmesh = !m_b_debugmesh;
+		m_debug.b_mesh = !m_debug.b_mesh;
 
 	if( input_code_pressed_once( KEYCODE_V ) )
-		m_b_debugtexture = !m_b_debugtexture;
+		m_debug.b_texture = !m_debug.b_texture;
 
-	if( m_b_debugmesh || m_b_debugtexture )
+	if( m_debug.b_mesh || m_debug.b_texture )
 	{
 		int width = video_screen_get_width(machine->primary_screen);
 		int height = video_screen_get_height(machine->primary_screen);
@@ -437,28 +443,28 @@ static void DebugCheckKeys( running_machine *machine )
 
 	if( input_code_pressed_once( KEYCODE_I ) )
 	{
-		if( m_b_debugtexture )
+		if( m_debug.b_texture )
 		{
-			m_n_debuginterleave++;
+			m_debug.n_interleave++;
 
-			if( m_n_debuginterleave == 2 )
-				m_n_debuginterleave = -1;
+			if( m_debug.n_interleave == 2 )
+				m_debug.n_interleave = -1;
 
-			if( m_n_debuginterleave == -1 )
+			if( m_debug.n_interleave == -1 )
 				popmessage( "interleave off" );
-			else if( m_n_debuginterleave == 0 )
+			else if( m_debug.n_interleave == 0 )
 				popmessage( "4 bit interleave" );
-			else if( m_n_debuginterleave == 1 )
+			else if( m_debug.n_interleave == 1 )
 				popmessage( "8 bit interleave" );
 		}
 		else
 		{
-			m_n_debugskip++;
+			m_debug.n_skip++;
 
-			if( m_n_debugskip > 15 )
-				m_n_debugskip = 0;
+			if( m_debug.n_skip > 15 )
+				m_debug.n_skip = 0;
 
-			popmessage( "debug skip %d", m_n_debugskip );
+			popmessage( "debug skip %d", m_debug.n_skip );
 		}
 	}
 
@@ -496,19 +502,19 @@ static void DebugCheckKeys( running_machine *machine )
 
 static int DebugMeshDisplay( bitmap_t *bitmap, const rectangle *cliprect )
 {
-	if( m_b_debugmesh )
+	if( m_debug.mesh )
 	{
-		copybitmap( bitmap, debugmesh, 0, 0, 0, 0, cliprect );
+		copybitmap( bitmap, m_debug.mesh, 0, 0, 0, 0, cliprect );
 	}
-	m_b_debugclear = 1;
-	return m_b_debugmesh;
+	m_debug.b_clear = 1;
+	return m_debug.b_mesh;
 }
 
 static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 {
 	UINT32 n_y;
 
-	if( m_b_debugtexture )
+	if( m_debug.b_texture )
 	{
 		int width = video_screen_get_width(machine->primary_screen);
 		int height = video_screen_get_height(machine->primary_screen);
@@ -522,12 +528,12 @@ static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 
 			for( n_x = 0; n_x < width; n_x++ )
 			{
-				if( m_n_debuginterleave == 0 )
+				if( m_debug.n_interleave == 0 )
 				{
 					n_xi = ( n_x & ~0x3c ) + ( ( n_y << 2 ) & 0x3c );
 					n_yi = ( n_y & ~0xf ) + ( ( n_x >> 2 ) & 0xf );
 				}
-				else if( m_n_debuginterleave == 1 )
+				else if( m_debug.n_interleave == 1 )
 				{
 					n_xi = ( n_x & ~0x78 ) + ( ( n_x << 3 ) & 0x40 ) + ( ( n_y << 3 ) & 0x38 );
 					n_yi = ( n_y & ~0x7 ) + ( ( n_x >> 4 ) & 0x7 );
@@ -542,7 +548,7 @@ static int DebugTextureDisplay( running_machine *machine, bitmap_t *bitmap )
 			draw_scanline16( bitmap, 0, n_y, width, p_n_interleave, machine->pens, -1 );
 		}
 	}
-	return m_b_debugtexture;
+	return m_debug.b_texture;
 }
 
 #endif
@@ -1484,13 +1490,13 @@ static void FlatPolygon( int n_points )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 1 )
+	if( m_debug.n_skip == 1 )
 	{
 		return;
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( Machine, COORD_X( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( COORD_X( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -1657,13 +1663,13 @@ static void FlatTexturedPolygon( int n_points )
 	UINT32 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 2 )
+	if( m_debug.n_skip == 2 )
 	{
 		return;
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( Machine, COORD_X( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( COORD_X( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -1876,13 +1882,13 @@ static void GouraudPolygon( int n_points )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 3 )
+	if( m_debug.n_skip == 3 )
 	{
 		return;
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( Machine, COORD_X( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( COORD_X( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -2107,13 +2113,13 @@ static void GouraudTexturedPolygon( int n_points )
 	UINT32 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 4 )
+	if( m_debug.n_skip == 4 )
 	{
 		return;
 	}
 	for( n_point = 0; n_point < n_points; n_point++ )
 	{
-		DebugMesh( Machine, COORD_X( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
+		DebugMesh( COORD_X( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudTexturedPolygon.vertex[ n_point ].n_coord ) + m_n_drawoffset_y );
 	}
 	DebugMeshEnd();
 #endif
@@ -2367,12 +2373,12 @@ static void MonochromeLine( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 5 )
+	if( m_debug.n_skip == 5 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.MonochromeLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -2473,12 +2479,12 @@ static void GouraudLine( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 6 )
+	if( m_debug.n_skip == 6 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 0 ].n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.GouraudLine.vertex[ 1 ].n_coord ) + m_n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -2572,14 +2578,14 @@ static void FrameBufferRectangleDraw( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 7 )
+	if( m_debug.n_skip == 7 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + SIZE_H( m_packet.FlatRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2634,14 +2640,14 @@ static void FlatRectangle( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 8 )
+	if( m_debug.n_skip == 8 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatRectangle.n_size ), COORD_Y( m_packet.FlatRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2699,14 +2705,14 @@ static void FlatRectangle8x8( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 9 )
+	if( m_debug.n_skip == 9 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
+	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
+	DebugMesh( COORD_X( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_x + 8, COORD_Y( m_packet.FlatRectangle8x8.n_coord ) + m_n_drawoffset_y + 8 );
 	DebugMeshEnd();
 #endif
 
@@ -2764,14 +2770,14 @@ static void FlatRectangle16x16( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 10 )
+	if( m_debug.n_skip == 10 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
-	DebugMesh( Machine, COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
+	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
+	DebugMesh( COORD_X( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_x + 16, COORD_Y( m_packet.FlatRectangle16x16.n_coord ) + m_n_drawoffset_y + 16 );
 	DebugMeshEnd();
 #endif
 
@@ -2840,14 +2846,14 @@ static void FlatTexturedRectangle( void )
 	UINT16 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 11 )
+	if( m_debug.n_skip == 11 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
-	DebugMesh( Machine, COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
+	DebugMesh( COORD_X( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_x + SIZE_W( m_packet.FlatTexturedRectangle.n_size ), COORD_Y( m_packet.FlatTexturedRectangle.n_coord ) + m_n_drawoffset_y + SIZE_H( m_packet.FlatTexturedRectangle.n_size ) );
 	DebugMeshEnd();
 #endif
 
@@ -2938,14 +2944,14 @@ static void Sprite8x8( void )
 	UINT16 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 12 )
+	if( m_debug.n_skip == 12 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( COORD_X( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite8x8.n_coord ) + m_n_drawoffset_y + 7 );
 	DebugMeshEnd();
 #endif
 
@@ -3036,14 +3042,14 @@ static void Sprite16x16( void )
 	UINT16 n_bgr;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 13 )
+	if( m_debug.n_skip == 13 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
-	DebugMesh( Machine, COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
+	DebugMesh( COORD_X( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_x + 7, COORD_Y( m_packet.Sprite16x16.n_coord ) + m_n_drawoffset_y + 7 );
 	DebugMeshEnd();
 #endif
 
@@ -3109,11 +3115,11 @@ static void Dot( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 14 )
+	if( m_debug.n_skip == 14 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_y );
+	DebugMesh( COORD_X( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_x, COORD_Y( m_packet.Dot.vertex.n_coord ) + m_n_drawoffset_y );
 	DebugMeshEnd();
 #endif
 
@@ -3147,14 +3153,14 @@ static void MoveImage( void )
 	UINT16 *p_vram;
 
 #if defined( MAME_DEBUG )
-	if( m_n_debugskip == 15 )
+	if( m_debug.n_skip == 15 )
 	{
 		return;
 	}
-	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
-	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
-	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
-	DebugMesh( Machine, COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
+	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
+	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) );
+	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
+	DebugMesh( COORD_X( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_W( m_packet.MoveImage.n_size ), COORD_Y( m_packet.MoveImage.vertex[ 1 ].n_coord ) + SIZE_H( m_packet.MoveImage.n_size ) );
 	DebugMeshEnd();
 #endif
 

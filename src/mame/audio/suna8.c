@@ -7,7 +7,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/samples.h"
 #include "includes/suna8.h"
 
@@ -35,10 +34,11 @@ WRITE8_HANDLER( suna8_samples_number_w )
 	sample = data & 0xf;
 }
 
-void suna8_sh_start(void)
+SAMPLES_START( suna8_sh_start )
 {
-	int i, len = memory_region_length(Machine, "samples");
-	UINT8 *ROM = memory_region(Machine, "samples");
+	running_machine *machine = device->machine;
+	int i, len = memory_region_length(machine, "samples");
+	UINT8 *ROM = memory_region(machine, "samples");
 
 	samplebuf = auto_malloc(len * sizeof(samplebuf[0]));
 

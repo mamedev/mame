@@ -34,6 +34,7 @@ static struct uPD4701_chip uPD4701[ UPD4701_MAXCHIP ];
 
 void uPD4701_init( int chip )
 {
+	running_machine *machine = Machine;
 	struct uPD4701_chip *c;
 
 	if( chip < 0 || chip >= UPD4701_MAXCHIP )
@@ -59,20 +60,20 @@ void uPD4701_init( int chip )
 	c->latchswitches = 0;
 	c->cf = 1;
 
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->cs );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->xy );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->ul );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->resetx );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->resety );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->latchx );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->latchy );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->startx );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->starty );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->x );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->y );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->switches );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->latchswitches );
-	state_save_register_item( Machine, "uPD4701", NULL, chip, c->cf );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->cs );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->xy );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->ul );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->resetx );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->resety );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->latchx );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->latchy );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->startx );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->starty );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->x );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->y );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->switches );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->latchswitches );
+	state_save_register_item( machine, "uPD4701", NULL, chip, c->cf );
 }
 
 void uPD4701_ul_w( int chip, int ul )

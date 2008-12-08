@@ -40,7 +40,7 @@ static	UINT8 latched_0c03 = 0;
 /************************************/
 /* Sound handler start              */
 /************************************/
-void meadows_sh_start(void)
+SAMPLES_START( meadows_sh_start )
 {
 	meadows_0c00 = meadows_0c01 = meadows_0c02 = meadows_0c03 = 0;
 	meadows_dac = 0;

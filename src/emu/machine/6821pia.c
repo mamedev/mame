@@ -116,9 +116,10 @@ static pia6821 pias[MAX_PIA];
 
 void pia_config(int which, const pia6821_interface *intf)
 {
+	running_machine *machine = Machine;
 	pia6821 *p;
 
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call pia_config at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call pia_config at init time!");
 	assert_always((which >= 0) && (which < MAX_PIA), "pia_config called on an invalid PIA!");
 	assert_always(intf, "pia_config called with an invalid interface!");
 
@@ -127,38 +128,38 @@ void pia_config(int which, const pia6821_interface *intf)
 
 	p->intf = intf;
 
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_a);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_ca1);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_ca2);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->out_a);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->out_ca2);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->port_a_z_mask);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->ddr_a);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->ctl_a);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->irq_a1);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->irq_a2);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->irq_a_state);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_b);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_cb1);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_cb2);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->out_b);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->out_cb2);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->last_out_cb2_z);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->ddr_b);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->ctl_b);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->irq_b1);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->irq_b2);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->irq_b_state);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_a_pushed);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->out_a_needs_pulled);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_ca1_pushed);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_ca2_pushed);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->out_ca2_needs_pulled);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_b_pushed);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->out_b_needs_pulled);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_cb1_pushed);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->in_cb2_pushed);
-	state_save_register_item(Machine, "6821pia", NULL, which, p->out_cb2_needs_pulled);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_a);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_ca1);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_ca2);
+	state_save_register_item(machine, "6821pia", NULL, which, p->out_a);
+	state_save_register_item(machine, "6821pia", NULL, which, p->out_ca2);
+	state_save_register_item(machine, "6821pia", NULL, which, p->port_a_z_mask);
+	state_save_register_item(machine, "6821pia", NULL, which, p->ddr_a);
+	state_save_register_item(machine, "6821pia", NULL, which, p->ctl_a);
+	state_save_register_item(machine, "6821pia", NULL, which, p->irq_a1);
+	state_save_register_item(machine, "6821pia", NULL, which, p->irq_a2);
+	state_save_register_item(machine, "6821pia", NULL, which, p->irq_a_state);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_b);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_cb1);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_cb2);
+	state_save_register_item(machine, "6821pia", NULL, which, p->out_b);
+	state_save_register_item(machine, "6821pia", NULL, which, p->out_cb2);
+	state_save_register_item(machine, "6821pia", NULL, which, p->last_out_cb2_z);
+	state_save_register_item(machine, "6821pia", NULL, which, p->ddr_b);
+	state_save_register_item(machine, "6821pia", NULL, which, p->ctl_b);
+	state_save_register_item(machine, "6821pia", NULL, which, p->irq_b1);
+	state_save_register_item(machine, "6821pia", NULL, which, p->irq_b2);
+	state_save_register_item(machine, "6821pia", NULL, which, p->irq_b_state);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_a_pushed);
+	state_save_register_item(machine, "6821pia", NULL, which, p->out_a_needs_pulled);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_ca1_pushed);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_ca2_pushed);
+	state_save_register_item(machine, "6821pia", NULL, which, p->out_ca2_needs_pulled);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_b_pushed);
+	state_save_register_item(machine, "6821pia", NULL, which, p->out_b_needs_pulled);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_cb1_pushed);
+	state_save_register_item(machine, "6821pia", NULL, which, p->in_cb2_pushed);
+	state_save_register_item(machine, "6821pia", NULL, which, p->out_cb2_needs_pulled);
 }
 
 

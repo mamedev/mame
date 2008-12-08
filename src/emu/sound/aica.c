@@ -646,7 +646,7 @@ static void AICA_Init(const device_config *device, struct _AICA *AICA, const aic
 		AICA->Slots[i].mslc=0;
 	}
 
-	AICALFO_Init();
+	AICALFO_Init(device->machine);
 	AICA->buffertmpl=(signed int*) auto_malloc(44100*sizeof(signed int));
 	AICA->buffertmpr=(signed int*) auto_malloc(44100*sizeof(signed int));
 	memset(AICA->buffertmpl,0,44100*sizeof(signed int));

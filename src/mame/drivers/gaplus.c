@@ -206,22 +206,22 @@ static void unpack_gfx(running_machine *machine);
 static DRIVER_INIT( 56_58 )
 {
 	unpack_gfx(machine);
-	namcoio_init(0, NAMCOIO_56XX, &intf0);
-	namcoio_init(1, NAMCOIO_58XX, &intf1);
+	namcoio_init(machine, 0, NAMCOIO_56XX, &intf0);
+	namcoio_init(machine, 1, NAMCOIO_58XX, &intf1);
 }
 
 static DRIVER_INIT( 56_58l )
 {
 	unpack_gfx(machine);
-	namcoio_init(0, NAMCOIO_56XX, &intf0_lamps);
-	namcoio_init(1, NAMCOIO_58XX, &intf1);
+	namcoio_init(machine, 0, NAMCOIO_56XX, &intf0_lamps);
+	namcoio_init(machine, 1, NAMCOIO_58XX, &intf1);
 }
 
 static DRIVER_INIT( 58_56 )
 {
 	unpack_gfx(machine);
-	namcoio_init(0, NAMCOIO_58XX, &intf0);
-	namcoio_init(1, NAMCOIO_56XX, &intf1);
+	namcoio_init(machine, 0, NAMCOIO_58XX, &intf0);
+	namcoio_init(machine, 1, NAMCOIO_56XX, &intf1);
 }
 
 

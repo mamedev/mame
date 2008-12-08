@@ -627,7 +627,7 @@ void rockola_set_music_clock(double clock_time)
 	tone_clock = 0;
 }
 
-void *rockola_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( rockola_sh_start )
 {
 	// adjusted
 	rockola_set_music_freq(43000);

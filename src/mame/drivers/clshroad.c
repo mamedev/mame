@@ -36,7 +36,7 @@ VIDEO_START( clshroad );
 VIDEO_UPDATE( clshroad );
 
 extern UINT8 *wiping_soundregs;
-void *wiping_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( wiping_sh_start );
 WRITE8_HANDLER( wiping_sound_w );
 
 

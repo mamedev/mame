@@ -6,7 +6,7 @@ extern UINT8 *flower_soundregs1,*flower_soundregs2;
 
 WRITE8_HANDLER( flower_sound1_w );
 WRITE8_HANDLER( flower_sound2_w );
-void *flower_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( flower_sh_start );
 
 
 /*----------- defined in video/flower.c -----------*/

@@ -455,8 +455,9 @@ WRITE8_HANDLER( pleiads_sound_control_c_w )
 	sound_latch_c = data;
 }
 
-static void *common_sh_start(const custom_sound_interface *config, const char *name)
+static void *common_sh_start(const device_config *device, const custom_sound_interface *config, const char *name)
 {
+	running_machine *machine = device->machine;
 	int i, j;
 	UINT32 shiftreg;
 
@@ -477,13 +478,13 @@ static void *common_sh_start(const custom_sound_interface *config, const char *n
 		poly18[i] = bits;
 	}
 
-	channel = stream_create(0, 1, Machine->sample_rate, NULL, pleiads_sound_update);
+	channel = stream_create(0, 1, machine->sample_rate, NULL, pleiads_sound_update);
 
 	/* just a dummy alloc to make the caller happy */
 	return auto_malloc(1);
 }
 
-void *pleiads_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( pleiads_sh_start )
 {
 	/* The real values are _unknown_!
      * I took the ones from Naughty Boy / Pop Flamer
@@ -541,10 +542,10 @@ void *pleiads_sh_start(int clock, const custom_sound_interface *config)
       freq = 1.44 / ((100000+2*1000) * 0.01e-6) = approx. 1412 Hz */
 	noise_freq = 1412;	/* higher noise rate than popflame/naughtyb??? */
 
-	return common_sh_start(config, "Custom (Pleiads)");
+	return common_sh_start(device, config, "Custom (Pleiads)");
 }
 
-void *naughtyb_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( naughtyb_sh_start )
 {
 	/* charge 10u??? through 330K (R??) -> 3.3s */
 	pa5_charge_time = 3.3;
@@ -598,10 +599,10 @@ void *naughtyb_sh_start(int clock, const custom_sound_interface *config)
       freq = 1.44 / ((200000+2*1000) * 0.01e-6) = approx. 713 Hz */
 	noise_freq = 713;
 
-	return common_sh_start(config, "Custom (Naughty Boy)");
+	return common_sh_start(device, config, "Custom (Naughty Boy)");
 }
 
-void *popflame_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( popflame_sh_start )
 {
 	/* charge 10u (C63 in Pop Flamer) through 330K -> 3.3s */
 	pa5_charge_time = 3.3;
@@ -655,5 +656,5 @@ void *popflame_sh_start(int clock, const custom_sound_interface *config)
       freq = 1.44 / ((200000+2*1000) * 0.01e-6) = approx. 713 Hz */
 	noise_freq = 713;
 
-	return common_sh_start(config, "Custom (Pop Flamer)");
+	return common_sh_start(device, config, "Custom (Pop Flamer)");
 }

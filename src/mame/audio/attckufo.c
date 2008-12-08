@@ -208,7 +208,7 @@ static void attckufo_update (void *param,stream_sample_t **inputs, stream_sample
 /************************************/
 
 
-void *attckufo_custom_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( attckufo_custom_start )
 {
 	int i;
 

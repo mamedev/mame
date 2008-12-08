@@ -7,7 +7,7 @@ extern UINT8 *gomoku_soundregs2;
 
 WRITE8_HANDLER( gomoku_sound1_w );
 WRITE8_HANDLER( gomoku_sound2_w );
-void *gomoku_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( gomoku_sh_start );
 
 
 /*----------- defined in video/gomoku.c -----------*/

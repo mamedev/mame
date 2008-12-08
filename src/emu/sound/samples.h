@@ -21,8 +21,10 @@ struct _samples_interface
 {
     int         channels;   /* number of discrete audio channels needed */
     const char *const *samplenames;
-    void        (*start)(void);
+    void        (*start)(const device_config *device);
 };
+
+#define SAMPLES_START(name) void name(const device_config *device)
 
 
 void sample_start_n(int num,int channel,int samplenum,int loop);

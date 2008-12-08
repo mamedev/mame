@@ -1100,13 +1100,13 @@ skip_first_cc_set:
 
 typedef struct {
 	UINT8 m;
-	void (*visible_16)(UINT16*, int);
-	void (*visible_16s)(UINT16*, int);
-	void (*border_16)(UINT16*);
-	void (*border_16s)(UINT16*);
+	void (*visible_16)(const pen_t *, UINT16*, int);
+	void (*visible_16s)(const pen_t *, UINT16*, int);
+	void (*border_16)(const pen_t *, UINT16*);
+	void (*border_16s)(const pen_t *, UINT16*);
 	void (*sprites)(int, UINT8*);
-	void (*draw_sprite_16)(UINT16*, UINT8*);
-	void (*draw_sprite_16s)(UINT16*, UINT8*);
+	void (*draw_sprite_16)(const pen_t *, UINT16*, UINT8*);
+	void (*draw_sprite_16s)(const pen_t *, UINT16*, UINT8*);
 } V9938_MODE;
 
 static const V9938_MODE modes[] = {
@@ -1214,6 +1214,7 @@ static void v9938_set_mode (void)
 
 static void v9938_refresh_16 (bitmap_t *bmp, int line)
 	{
+	const pen_t *pens = Machine->pens;
 	int i, double_lines;
 	UINT8 col[256];
 	UINT16 *ln, *ln2 = NULL;
@@ -1240,29 +1241,29 @@ static void v9938_refresh_16 (bitmap_t *bmp, int line)
 	if ( !(vdp->contReg[1] & 0x40) || (vdp->statReg[2] & 0x40) )
 		{
 		if (vdp->size == RENDER_HIGH)
-			modes[vdp->mode].border_16 (ln);
+			modes[vdp->mode].border_16 (pens, ln);
 		else
-			modes[vdp->mode].border_16s (ln);
+			modes[vdp->mode].border_16s (pens, ln);
 		}
 	else
 		{
 		i = (line - vdp->offset_y) & 255;
 		if (vdp->size == RENDER_HIGH)
 			{
-			modes[vdp->mode].visible_16 (ln, i);
+			modes[vdp->mode].visible_16 (pens, ln, i);
 			if (modes[vdp->mode].sprites)
 				{
 				modes[vdp->mode].sprites (i, col);
-				modes[vdp->mode].draw_sprite_16 (ln, col);
+				modes[vdp->mode].draw_sprite_16 (pens, ln, col);
 				}
 			}
 		else
 			{
-			modes[vdp->mode].visible_16s (ln, i);
+			modes[vdp->mode].visible_16s (pens, ln, i);
 			if (modes[vdp->mode].sprites)
 				{
 				modes[vdp->mode].sprites (i, col);
-				modes[vdp->mode].draw_sprite_16s (ln, col);
+				modes[vdp->mode].draw_sprite_16s (pens, ln, col);
 				}
 			}
 		}

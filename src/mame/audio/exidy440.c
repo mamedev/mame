@@ -8,7 +8,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "exidy440.h"
 
@@ -113,12 +112,12 @@ static const int channel_bits[4] =
 /* function prototypes */
 static void channel_update(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int length);
 static void m6844_finished(int ch);
-static void play_cvsd(int ch);
+static void play_cvsd(running_machine *machine, int ch);
 static void stop_cvsd(int ch);
 
 static void reset_sound_cache(void);
 static INT16 *add_to_sound_cache(UINT8 *input, int address, int length, int bits, int frequency);
-static INT16 *find_or_add_to_sound_cache(int address, int length, int bits, int frequency);
+static INT16 *find_or_add_to_sound_cache(running_machine *machine, int address, int length, int bits, int frequency);
 
 static void decode_and_filter_cvsd(UINT8 *data, int bytes, int maskbits, int frequency, INT16 *dest);
 static void fir_filter(INT32 *input, INT16 *output, int count);
@@ -131,15 +130,16 @@ static void fir_filter(INT32 *input, INT16 *output, int count);
  *
  *************************************/
 
-static void *exidy440_sh_start(int clock, const custom_sound_interface *config)
+static CUSTOM_START( exidy440_sh_start )
 {
+	running_machine *machine = device->machine;
 	int i, length;
 
 	/* reset the system */
 	exidy440_sound_command = 0;
 	exidy440_sound_command_ack = 1;
-	state_save_register_global(Machine, exidy440_sound_command);
-	state_save_register_global(Machine, exidy440_sound_command_ack);
+	state_save_register_global(machine, exidy440_sound_command);
+	state_save_register_global(machine, exidy440_sound_command_ack);
 
 	/* reset the 6844 */
 	for (i = 0; i < 4; i++)
@@ -151,9 +151,9 @@ static void *exidy440_sh_start(int clock, const custom_sound_interface *config)
 	m6844_interrupt = 0x00;
 	m6844_chain = 0x00;
 
-	state_save_register_global(Machine, m6844_priority);
-	state_save_register_global(Machine, m6844_interrupt);
-	state_save_register_global(Machine, m6844_chain);
+	state_save_register_global(machine, m6844_priority);
+	state_save_register_global(machine, m6844_interrupt);
+	state_save_register_global(machine, m6844_chain);
 
 	channel_frequency[0] = clock;   /* channels 0 and 1 are run by FCLK */
 	channel_frequency[1] = clock;
@@ -164,7 +164,7 @@ static void *exidy440_sh_start(int clock, const custom_sound_interface *config)
 	stream = stream_create(0, 2, clock, NULL, channel_update);
 
 	/* allocate the sample cache */
-	length = memory_region_length(Machine, "cvsd") * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
+	length = memory_region_length(machine, "cvsd") * 16 + MAX_CACHE_ENTRIES * sizeof(sound_cache_entry);
 	sound_cache = auto_malloc(length);
 
 	/* determine the hard end of the cache and reset */
@@ -189,7 +189,7 @@ static void *exidy440_sh_start(int clock, const custom_sound_interface *config)
  *
  *************************************/
 
-static void exidy440_sh_stop(void *token)
+static CUSTOM_STOP( exidy440_sh_stop )
 {
 	if (SOUND_LOG && debuglog)
 		fclose(debuglog);
@@ -574,7 +574,7 @@ static WRITE8_HANDLER( m6844_w )
 					m6844_channel[i].start_counter = m6844_channel[i].counter;
 
 					/* generate and play the sample */
-					play_cvsd(i);
+					play_cvsd(space->machine, i);
 				}
 
 				/* if we're going inactive... */
@@ -645,7 +645,7 @@ static INT16 *add_to_sound_cache(UINT8 *input, int address, int length, int bits
 }
 
 
-static INT16 *find_or_add_to_sound_cache(int address, int length, int bits, int frequency)
+static INT16 *find_or_add_to_sound_cache(running_machine *machine, int address, int length, int bits, int frequency)
 {
 	sound_cache_entry *current;
 
@@ -653,7 +653,7 @@ static INT16 *find_or_add_to_sound_cache(int address, int length, int bits, int 
 		if (current->address == address && current->length == length && current->bits == bits && current->frequency == frequency)
 			return current->data;
 
-	return add_to_sound_cache(&memory_region(Machine, "cvsd")[address], address, length, bits, frequency);
+	return add_to_sound_cache(&memory_region(machine, "cvsd")[address], address, length, bits, frequency);
 }
 
 
@@ -664,7 +664,7 @@ static INT16 *find_or_add_to_sound_cache(int address, int length, int bits, int 
  *
  *************************************/
 
-static void play_cvsd(int ch)
+static void play_cvsd(running_machine *machine, int ch)
 {
 	sound_channel_data *channel = &sound_channel[ch];
 	int address = m6844_channel[ch].address;
@@ -682,7 +682,7 @@ static void play_cvsd(int ch)
 		address += 0x18000;
 
 	/* compute the base address in the converted samples array */
-	base = find_or_add_to_sound_cache(address, length, channel_bits[ch], channel_frequency[ch]);
+	base = find_or_add_to_sound_cache(machine, address, length, channel_bits[ch], channel_frequency[ch]);
 	if (!base)
 		return;
 

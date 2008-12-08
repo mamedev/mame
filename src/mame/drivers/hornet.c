@@ -1183,6 +1183,7 @@ static void jamma_jvs_w(UINT8 data)
 
 static int jvs_encode_data(UINT8 *in, int length)
 {
+	running_machine *machine = Machine;
 	int inptr = 0;
 	int sum = 0;
 
@@ -1192,19 +1193,19 @@ static int jvs_encode_data(UINT8 *in, int length)
 		if (b == 0xe0)
 		{
 			sum += 0xd0 + 0xdf;
-			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xd0);
-			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xdf);
+			ppc4xx_spu_receive_byte(machine->cpu[0], 0xd0);
+			ppc4xx_spu_receive_byte(machine->cpu[0], 0xdf);
 		}
 		else if (b == 0xd0)
 		{
 			sum += 0xd0 + 0xcf;
-			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xd0);
-			ppc4xx_spu_receive_byte(Machine->cpu[0], 0xcf);
+			ppc4xx_spu_receive_byte(machine->cpu[0], 0xd0);
+			ppc4xx_spu_receive_byte(machine->cpu[0], 0xcf);
 		}
 		else
 		{
 			sum += b;
-			ppc4xx_spu_receive_byte(Machine->cpu[0], b);
+			ppc4xx_spu_receive_byte(machine->cpu[0], b);
 		}
 	}
 	return sum;
@@ -1234,6 +1235,7 @@ static int jvs_decode_data(UINT8 *in, UINT8 *out, int length)
 
 static void jamma_jvs_cmd_exec(void)
 {
+	running_machine *machine = Machine;
 	UINT8 sync, node, byte_num;
 	UINT8 data[1024], rdata[1024];
 	int length;
@@ -1293,11 +1295,11 @@ static void jamma_jvs_cmd_exec(void)
 
 	// write jvs return data
 	sum = 0x00 + (rdata_ptr+1);
-	ppc4xx_spu_receive_byte(Machine->cpu[0], 0xe0);			// sync
-	ppc4xx_spu_receive_byte(Machine->cpu[0], 0x00);			// node
-	ppc4xx_spu_receive_byte(Machine->cpu[0], rdata_ptr+1);	// num of bytes
+	ppc4xx_spu_receive_byte(machine->cpu[0], 0xe0);			// sync
+	ppc4xx_spu_receive_byte(machine->cpu[0], 0x00);			// node
+	ppc4xx_spu_receive_byte(machine->cpu[0], rdata_ptr+1);	// num of bytes
 	sum += jvs_encode_data(rdata, rdata_ptr);
-	ppc4xx_spu_receive_byte(Machine->cpu[0], sum - 1);		// checksum
+	ppc4xx_spu_receive_byte(machine->cpu[0], sum - 1);		// checksum
 
 	jvs_sdata_ptr = 0;
 }
@@ -1323,7 +1325,7 @@ static DRIVER_INIT(hornet)
 	set_cgboard_texture_bank(0, 5, memory_region(machine, "user5"));
 
 	K056800_init(machine, sound_irq_callback);
-	K033906_init();
+	K033906_init(machine);
 
 	led_reg0 = led_reg1 = 0x7f;
 
@@ -1337,7 +1339,7 @@ static DRIVER_INIT(hornet_2board)
 	set_cgboard_texture_bank(1, 6, memory_region(machine, "user5"));
 
 	K056800_init(machine, sound_irq_callback);
-	K033906_init();
+	K033906_init(machine);
 
 	led_reg0 = led_reg1 = 0x7f;
 

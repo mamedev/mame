@@ -1778,20 +1778,20 @@ INPUT_PORTS_END
 /* xxx_BUTTONs are used with player = 0, 1, 2, 3 so we need to return 0 for the missing 4th I/O port  */
 static const char *const padnames[] = { "PAD1", "PAD2", "IN0", "UNK" };
 
-#define MODE_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0800) >> 11)
-#define Z_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0400) >> 10)
-#define Y_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0200) >> 9 )
-#define X_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0100) >> 8 )
+#define MODE_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0800) >> 11)
+#define Z_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0400) >> 10)
+#define Y_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0200) >> 9 )
+#define X_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0100) >> 8 )
 
-#define START_BUTTON(player) ((input_port_read_safe(Machine, padnames[player], 0) & 0x0080) >> 7 )
-#define C_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0040) >> 6 )
-#define B_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0020) >> 5 )
-#define A_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0010) >> 4 )
-#define RIGHT_BUTTON(player) ((input_port_read_safe(Machine, padnames[player], 0) & 0x0008) >> 3 )
-#define LEFT_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0004) >> 2 )
-#define DOWN_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0002) >> 1 )
-#define UP_BUTTON(player)	 ((input_port_read_safe(Machine, padnames[player], 0) & 0x0001) >> 0 )
-#define MD_RESET_BUTTON		 ((input_port_read_safe(Machine, "RESET", 0x00) & 0x01) >> 0 )
+#define START_BUTTON(machine,player) ((input_port_read_safe(machine, padnames[player], 0) & 0x0080) >> 7 )
+#define C_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0040) >> 6 )
+#define B_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0020) >> 5 )
+#define A_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0010) >> 4 )
+#define RIGHT_BUTTON(machine,player) ((input_port_read_safe(machine, padnames[player], 0) & 0x0008) >> 3 )
+#define LEFT_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0004) >> 2 )
+#define DOWN_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0002) >> 1 )
+#define UP_BUTTON(machine,player)	 ((input_port_read_safe(machine, padnames[player], 0) & 0x0001) >> 0 )
+#define MD_RESET_BUTTON(machine)		 ((input_port_read_safe(machine, "RESET", 0x00) & 0x01) >> 0 )
 
 UINT8 megadrive_io_data_regs[3];
 UINT8 megadrive_io_ctrl_regs[3];
@@ -1827,23 +1827,23 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int p
 		{
 			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
 			          (1 <<6) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(C_BUTTON(portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(B_BUTTON(portnum)<<4)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(MODE_BUTTON(portnum)<<3)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(X_BUTTON(portnum)<<2)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(Y_BUTTON(portnum)<<1)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(Z_BUTTON(portnum)<<0));
+			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(C_BUTTON(machine,portnum)<<5)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(B_BUTTON(machine,portnum)<<4)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(MODE_BUTTON(machine,portnum)<<3)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(X_BUTTON(machine,portnum)<<2)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(Y_BUTTON(machine,portnum)<<1)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(Z_BUTTON(machine,portnum)<<0));
 		}
 		else
 		{
 			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
 			          (1 << 6) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(C_BUTTON(portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(B_BUTTON(portnum)<<4)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(RIGHT_BUTTON(portnum)<<3)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(LEFT_BUTTON(portnum)<<2)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(portnum)<<1)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(portnum)<<0));
+			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(C_BUTTON(machine,portnum)<<5)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(B_BUTTON(machine,portnum)<<4)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(RIGHT_BUTTON(machine,portnum)<<3)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(LEFT_BUTTON(machine,portnum)<<2)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(machine,portnum)<<1)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(machine,portnum)<<0));
 		}
 	}
 	else
@@ -1852,8 +1852,8 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int p
 		{
 			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
 			          ( 0<<6 ) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(portnum)<<4)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(machine,portnum)<<5)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(machine,portnum)<<4)) |
 			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(0<<3)) |
 			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(0<<2)) |
 			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(0<<1)) |
@@ -1863,8 +1863,8 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int p
 		{
 			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
 			          ( 0<<6 ) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(portnum)<<4)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(machine,portnum)<<5)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(machine,portnum)<<4)) |
 			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(1<<3)) |
 			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(1<<2)) |
 			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(1<<1)) |
@@ -1874,12 +1874,12 @@ static UINT8 megadrive_io_read_data_port_6button(running_machine *machine, int p
 		{
 			retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
 			          ( 0<<6 ) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(portnum)<<5)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(portnum)<<4)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(machine,portnum)<<5)) |
+			          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(machine,portnum)<<4)) |
 			          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(0<<3)) |
 			          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(0<<2)) |
-			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(portnum)<<1)) |
-	                  ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(portnum)<<0));
+			          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(machine,portnum)<<1)) |
+	                  ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(machine,portnum)<<0));
 		}
 	}
 
@@ -1899,23 +1899,23 @@ static UINT8 megadrive_io_read_data_port_3button(running_machine *machine, int p
 	{
 		retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
 		          ((megadrive_io_ctrl_regs[portnum]&0x40)?(megadrive_io_data_regs[portnum]&0x40):(0x40)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(C_BUTTON(portnum)<<5)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(B_BUTTON(portnum)<<4)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(RIGHT_BUTTON(portnum)<<3)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(LEFT_BUTTON(portnum)<<2)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(portnum)<<1)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(portnum)<<0));
+		          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(C_BUTTON(machine,portnum)<<5)) |
+		          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(B_BUTTON(machine,portnum)<<4)) |
+		          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(RIGHT_BUTTON(machine,portnum)<<3)) |
+		          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(LEFT_BUTTON(machine,portnum)<<2)) |
+		          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(machine,portnum)<<1)) |
+		          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(machine,portnum)<<0));
 	}
 	else
 	{
 		retdata = ( megadrive_io_data_regs[portnum] & 0x80) |
 		          ((megadrive_io_ctrl_regs[portnum]&0x40)?(megadrive_io_data_regs[portnum]&0x40):(0x40)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(portnum)<<5)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(portnum)<<4)) |
+		          ((megadrive_io_ctrl_regs[portnum]&0x20)?(megadrive_io_data_regs[portnum]&0x20):(START_BUTTON(machine,portnum)<<5)) |
+		          ((megadrive_io_ctrl_regs[portnum]&0x10)?(megadrive_io_data_regs[portnum]&0x10):(A_BUTTON(machine,portnum)<<4)) |
 		          ((megadrive_io_ctrl_regs[portnum]&0x08)?(megadrive_io_data_regs[portnum]&0x08):(0<<3)) |
 		          ((megadrive_io_ctrl_regs[portnum]&0x04)?(megadrive_io_data_regs[portnum]&0x04):(0<<2)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(portnum)<<1)) |
-		          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(portnum)<<0));
+		          ((megadrive_io_ctrl_regs[portnum]&0x02)?(megadrive_io_data_regs[portnum]&0x02):(DOWN_BUTTON(machine,portnum)<<1)) |
+		          ((megadrive_io_ctrl_regs[portnum]&0x01)?(megadrive_io_data_regs[portnum]&0x01):(UP_BUTTON(machine,portnum)<<0));
 	}
 
 	return retdata;
@@ -1924,15 +1924,16 @@ static UINT8 megadrive_io_read_data_port_3button(running_machine *machine, int p
 /* used by megatech bios, the test mode accesses the joypad/stick inputs like this */
 UINT8 megatech_bios_port_cc_dc_r(int offset, int ctrl)
 {
+	running_machine *machine = Machine;
 	UINT8 retdata;
 
 	if (ctrl==0x55)
 	{
 			retdata = (1<<0) |
 					  (1<<1) |
-					  (A_BUTTON(1)<<2) |
+					  (A_BUTTON(machine,1)<<2) |
 					  (1<<3) |
-					  (A_BUTTON(0)<<4) |
+					  (A_BUTTON(machine,0)<<4) |
 					  (1<<5) |
 					  (1<<6) |
 					  (1<<7);
@@ -1941,21 +1942,21 @@ UINT8 megatech_bios_port_cc_dc_r(int offset, int ctrl)
 	{
 		if (offset==0)
 		{
-			retdata = (UP_BUTTON(0)<<0) |
-					  (DOWN_BUTTON(0)<<1) |
-					  (LEFT_BUTTON(0)<<2) |
-					  (RIGHT_BUTTON(0)<<3) |
-					  (B_BUTTON(0)<<4) |
-					  (C_BUTTON(0)<<5) |
-					  (UP_BUTTON(1)<<6) |
-					  (DOWN_BUTTON(1)<<7);
+			retdata = (UP_BUTTON(machine,0)<<0) |
+					  (DOWN_BUTTON(machine,0)<<1) |
+					  (LEFT_BUTTON(machine,0)<<2) |
+					  (RIGHT_BUTTON(machine,0)<<3) |
+					  (B_BUTTON(machine,0)<<4) |
+					  (C_BUTTON(machine,0)<<5) |
+					  (UP_BUTTON(machine,1)<<6) |
+					  (DOWN_BUTTON(machine,1)<<7);
 		}
 		else
 		{
-			retdata = (LEFT_BUTTON(1)<<0) |
-					  (RIGHT_BUTTON(1)<<1) |
-					  (B_BUTTON(1)<<2) |
-					  (C_BUTTON(1)<<3) |
+			retdata = (LEFT_BUTTON(machine,1)<<0) |
+					  (RIGHT_BUTTON(machine,1)<<1) |
+					  (B_BUTTON(machine,1)<<2) |
+					  (C_BUTTON(machine,1)<<3) |
 					  (1<<4) |
 					  (1<<5) |
 					  (1<<6) |
@@ -1970,26 +1971,28 @@ UINT8 megatech_bios_port_cc_dc_r(int offset, int ctrl)
 /* the SMS inputs should be more complex, like the megadrive ones */
 READ8_HANDLER (megatech_sms_ioport_dc_r)
 {
-	return (DOWN_BUTTON(1)  << 7) |
-		   (UP_BUTTON(1)    << 6) |
-		   (B_BUTTON(0)     << 5) | // TR-A
-		   (A_BUTTON(0)     << 4) | // TL-A
-		   (RIGHT_BUTTON(0) << 3) |
-		   (LEFT_BUTTON(0)  << 2) |
-		   (DOWN_BUTTON(0)  << 1) |
-		   (UP_BUTTON(0)    << 0);
+	running_machine *machine = space->machine;
+	return (DOWN_BUTTON(machine,1)  << 7) |
+		   (UP_BUTTON(machine,1)    << 6) |
+		   (B_BUTTON(machine,0)     << 5) | // TR-A
+		   (A_BUTTON(machine,0)     << 4) | // TL-A
+		   (RIGHT_BUTTON(machine,0) << 3) |
+		   (LEFT_BUTTON(machine,0)  << 2) |
+		   (DOWN_BUTTON(machine,0)  << 1) |
+		   (UP_BUTTON(machine,0)    << 0);
 }
 
 READ8_HANDLER (megatech_sms_ioport_dd_r)
 {
+	running_machine *machine = space->machine;
 	return (0               << 7) | // TH-B
 		   (0               << 6) | // TH-A
 		   (0               << 5) | // unused
 		   (1               << 4) | // RESET button
-		   (B_BUTTON(1)     << 3) | // TR-B
-		   (A_BUTTON(1)     << 2) | // TL-B
-		   (RIGHT_BUTTON(1) << 1) |
-		   (LEFT_BUTTON(1)  << 0);
+		   (B_BUTTON(machine,1)     << 3) | // TR-B
+		   (A_BUTTON(machine,1)     << 2) | // TL-B
+		   (RIGHT_BUTTON(machine,1) << 1) |
+		   (LEFT_BUTTON(machine,1)  << 0);
 }
 
 static UINT8 megadrive_io_read_ctrl_port(int portnum)
@@ -6142,7 +6145,7 @@ VIDEO_EOF(megadriv)
 	megadrive_imode_odd_frame^=1;
 //  cpu_set_input_line(machine->cpu[1],0,CLEAR_LINE); // if the z80 interrupt hasn't happened by now, clear it..
 
-	if (MD_RESET_BUTTON)  cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
+	if (MD_RESET_BUTTON(machine))  cpu_set_input_line(machine->cpu[0], INPUT_LINE_RESET, PULSE_LINE);
 
 /*
 int megadrive_total_scanlines = 262;

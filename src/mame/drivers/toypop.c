@@ -108,16 +108,16 @@ static const struct namcoio_interface intf2 =
 
 static DRIVER_INIT( 58c_56_56 )
 {
-	namcoio_init(0, NAMCOIO_58XX, &intf0_coin);
-	namcoio_init(1, NAMCOIO_56XX, &intf1);
-	namcoio_init(2, NAMCOIO_56XX, &intf2);
+	namcoio_init(machine, 0, NAMCOIO_58XX, &intf0_coin);
+	namcoio_init(machine, 1, NAMCOIO_56XX, &intf1);
+	namcoio_init(machine, 2, NAMCOIO_56XX, &intf2);
 }
 
 static DRIVER_INIT( 58_56_56 )
 {
-	namcoio_init(0, NAMCOIO_58XX, &intf0);
-	namcoio_init(1, NAMCOIO_56XX, &intf1);
-	namcoio_init(2, NAMCOIO_56XX, &intf2);
+	namcoio_init(machine, 0, NAMCOIO_58XX, &intf0);
+	namcoio_init(machine, 1, NAMCOIO_56XX, &intf1);
+	namcoio_init(machine, 2, NAMCOIO_56XX, &intf2);
 }
 
 

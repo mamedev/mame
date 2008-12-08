@@ -620,7 +620,6 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/11/06
 
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taitoipt.h"
 #include "cpu/i8x41/i8x41.h"
 #include "sound/2203intf.h"
@@ -639,14 +638,15 @@ UINT8 *tnzs_vdcram, *tnzs_scrollram, *tnzs_objctrl, *tnzs_bg_flag;
 static INT16 *sampledata[MAX_SAMPLES];
 static int samplesize[MAX_SAMPLES];
 
-static void kageki_init_samples(void)
+static SAMPLES_START( kageki_init_samples )
 {
+	running_machine *machine = device->machine;
 	UINT8 *scan, *src;
 	INT16 *dest;
 	int start, size;
 	int i, n;
 
-	src = memory_region(Machine, "samples") + 0x0090;
+	src = memory_region(machine, "samples") + 0x0090;
 	for (i = 0; i < MAX_SAMPLES; i++)
 	{
 		start = (src[(i * 2) + 1] * 256) + src[(i * 2)];

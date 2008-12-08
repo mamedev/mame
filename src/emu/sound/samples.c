@@ -570,7 +570,7 @@ static SND_START( samples )
 
 	/* initialize any custom handlers */
 	if (intf->start)
-		(*intf->start)();
+		(*intf->start)(device);
 
 	return info;
 }

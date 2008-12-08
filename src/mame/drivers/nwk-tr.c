@@ -1159,7 +1159,7 @@ static DRIVER_INIT(nwktr)
 	led_reg0 = led_reg1 = 0x7f;
 
 	K056800_init(machine, sound_irq_callback);
-	K033906_init();
+	K033906_init(machine);
 
 //  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_TX_HANDLER, (genf *)jamma_jvs_w);
 //  cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_SPU_RX_HANDLER, (genf *)jamma_jvs_r);

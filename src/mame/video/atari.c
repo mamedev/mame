@@ -1188,7 +1188,7 @@ static TIMER_CALLBACK( antic_scanline_render )
 	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(machine), (antic.cmd & 0x0f), antic.modelines));
 
-    (*antic_renderer)(video);
+    (*antic_renderer)(space, video);
 
     /* if player/missile graphics is enabled */
     if( antic.scanline < 256 && (antic.w.dmactl & (DMA_PLAYER|DMA_MISSILE)) )

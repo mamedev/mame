@@ -120,8 +120,8 @@ Dip locations verified for:
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 
-extern void fghtbskt_sh_start(void);
-extern WRITE8_HANDLER( fghtbskt_samples_w );
+SAMPLES_START( fghtbskt_sh_start );
+WRITE8_HANDLER( fghtbskt_samples_w );
 
 static UINT8 *m63_videoram2, *m63_scrollram;
 static int pal_bank, fg_flag, sy_offset;

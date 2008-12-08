@@ -134,10 +134,11 @@ VIDEO_UPDATE( superqix );
 /* pbillian sample playback */
 static INT16 *samplebuf;
 
-static void pbillian_sh_start(void)
+static SAMPLES_START( pbillian_sh_start )
 {
-	UINT8 *src = memory_region(Machine, "samples");
-	int i, len = memory_region_length(Machine, "samples");
+	running_machine *machine = device->machine;
+	UINT8 *src = memory_region(machine, "samples");
+	int i, len = memory_region_length(machine, "samples");
 
 	/* convert 8-bit unsigned samples to 8-bit signed */
 	samplebuf = auto_malloc(len * 2);

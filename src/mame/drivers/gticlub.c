@@ -1188,7 +1188,7 @@ static DRIVER_INIT(hangplt)
 	gticlub_led_reg0 = gticlub_led_reg1 = 0x7f;
 
 	K056800_init(machine, sound_irq_callback);
-	K033906_init();
+	K033906_init(machine);
 
 	adc1038_init(machine);
 }

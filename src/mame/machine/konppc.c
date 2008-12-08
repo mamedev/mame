@@ -42,6 +42,7 @@ static UINT32 *nwk_ram[MAX_CG_BOARDS];
 
 void init_konami_cgboard(int num_boards, int type)
 {
+	running_machine *machine = Machine;
 	int i;
 	num_cgboards = num_boards;
 
@@ -62,20 +63,20 @@ void init_konami_cgboard(int num_boards, int type)
 		nwk_fifo[i] = auto_malloc(sizeof(UINT32) * 0x800);
 		nwk_ram[i] = auto_malloc(sizeof(UINT32) * 0x2000);
 
-		state_save_register_item_array(Machine, "konppc", NULL, i, dsp_comm_ppc[i]);
-		state_save_register_item_array(Machine, "konppc", NULL, i, dsp_comm_sharc[i]);
-		state_save_register_item(Machine, "konppc", NULL, i, dsp_shared_ram_bank[i]);
-		state_save_register_item_pointer(Machine, "konppc", NULL, i, dsp_shared_ram[i], DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]));
-		state_save_register_item(Machine, "konppc", NULL, i, dsp_state[i]);
-		state_save_register_item(Machine, "konppc", NULL, i, texture_bank[i]);
-		state_save_register_item(Machine, "konppc", NULL, i, pci_bridge_enable[i]);
-		state_save_register_item(Machine, "konppc", NULL, i, nwk_device_sel[i]);
-		state_save_register_item(Machine, "konppc", NULL, i, nwk_fifo_read_ptr[i]);
-		state_save_register_item(Machine, "konppc", NULL, i, nwk_fifo_write_ptr[i]);
-		state_save_register_item_pointer(Machine, "konppc", NULL, i, nwk_fifo[i], 0x800);
-		state_save_register_item_pointer(Machine, "konppc", NULL, i, nwk_ram[i], 0x2000);
+		state_save_register_item_array(machine, "konppc", NULL, i, dsp_comm_ppc[i]);
+		state_save_register_item_array(machine, "konppc", NULL, i, dsp_comm_sharc[i]);
+		state_save_register_item(machine, "konppc", NULL, i, dsp_shared_ram_bank[i]);
+		state_save_register_item_pointer(machine, "konppc", NULL, i, dsp_shared_ram[i], DSP_BANK_SIZE * 2 / sizeof(dsp_shared_ram[i][0]));
+		state_save_register_item(machine, "konppc", NULL, i, dsp_state[i]);
+		state_save_register_item(machine, "konppc", NULL, i, texture_bank[i]);
+		state_save_register_item(machine, "konppc", NULL, i, pci_bridge_enable[i]);
+		state_save_register_item(machine, "konppc", NULL, i, nwk_device_sel[i]);
+		state_save_register_item(machine, "konppc", NULL, i, nwk_fifo_read_ptr[i]);
+		state_save_register_item(machine, "konppc", NULL, i, nwk_fifo_write_ptr[i]);
+		state_save_register_item_pointer(machine, "konppc", NULL, i, nwk_fifo[i], 0x800);
+		state_save_register_item_pointer(machine, "konppc", NULL, i, nwk_ram[i], 0x2000);
 	}
-	state_save_register_item(Machine, "konppc", NULL, 0, cgboard_id);
+	state_save_register_item(machine, "konppc", NULL, 0, cgboard_id);
 	cgboard_type = type;
 
 	if (type == CGBOARD_TYPE_NWKTR)
@@ -407,15 +408,15 @@ static void nwk_fifo_w(int board, UINT32 data)
 static UINT32 *K033906_reg[MAX_K033906_CHIPS];
 static UINT32 *K033906_ram[MAX_K033906_CHIPS];
 
-void K033906_init(void)
+void K033906_init(running_machine *machine)
 {
 	int i;
 	for (i=0; i < MAX_K033906_CHIPS; i++)
 	{
 		K033906_reg[i] = auto_malloc(sizeof(UINT32) * 256);
 		K033906_ram[i] = auto_malloc(sizeof(UINT32) * 32768);
-		state_save_register_item_pointer(Machine, "K033906", NULL, i, K033906_reg[i], 256);
-		state_save_register_item_pointer(Machine, "K033906", NULL, i, K033906_ram[i], 32768);
+		state_save_register_item_pointer(machine, "K033906", NULL, i, K033906_reg[i], 256);
+		state_save_register_item_pointer(machine, "K033906", NULL, i, K033906_ram[i], 32768);
 	}
 }
 

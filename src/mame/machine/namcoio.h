@@ -45,7 +45,7 @@ WRITE8_HANDLER( namco_06xx_1_ctrl_w );
 
 READ8_HANDLER( namcoio_r );
 WRITE8_HANDLER( namcoio_w );
-void namcoio_init(int chipnum, int type, const struct namcoio_interface *intf);
+void namcoio_init(running_machine *machine, int chipnum, int type, const struct namcoio_interface *intf);
 void namcoio_set_reset_line(int chipnum, int state);
 void namcoio_set_irq_line(running_machine *machine, int chipnum, int state);
 

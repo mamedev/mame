@@ -5,7 +5,6 @@ Fighting Basketball PCM unsigned 8 bit mono samples
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/samples.h"
 
 static INT16 *samplebuf;
@@ -16,10 +15,11 @@ WRITE8_HANDLER( fghtbskt_samples_w )
 		sample_start_raw(0, samplebuf + ((data & 0xf0) << 8), 0x2000, 8000, 0);
 }
 
-void fghtbskt_sh_start(void)
+SAMPLES_START( fghtbskt_sh_start )
 {
-	int i, len = memory_region_length(Machine, "samples");
-	UINT8 *ROM = memory_region(Machine, "samples");
+	running_machine *machine = device->machine;
+	int i, len = memory_region_length(machine, "samples");
+	UINT8 *ROM = memory_region(machine, "samples");
 
 	samplebuf = auto_malloc(len * 2);
 

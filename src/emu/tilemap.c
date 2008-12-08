@@ -293,6 +293,7 @@ void tilemap_init(running_machine *machine)
 
 tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func mapper, int tilewidth, int tileheight, int cols, int rows)
 {
+	running_machine *machine = Machine;
 	tilemap *tmap;
 	int group;
 
@@ -345,22 +346,22 @@ tilemap *tilemap_create(tile_get_info_func tile_get_info, tilemap_mapper_func ma
 	tilemap_tailptr = &tmap->next;
 
 	/* save relevant state */
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->enable);
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->attributes);
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->palette_offset);
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->pen_data_offset);
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->scrollrows);
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->scrollcols);
-	state_save_register_item_pointer(Machine, "tilemap", NULL, tilemap_instance, tmap->rowscroll, rows * tileheight);
-	state_save_register_item_pointer(Machine, "tilemap", NULL, tilemap_instance, tmap->colscroll, cols * tilewidth);
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->dx);
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->dx_flipped);
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->dy);
-	state_save_register_item(Machine, "tilemap", NULL, tilemap_instance, tmap->dy_flipped);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->enable);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->attributes);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->palette_offset);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->pen_data_offset);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->scrollrows);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->scrollcols);
+	state_save_register_item_pointer(machine, "tilemap", NULL, tilemap_instance, tmap->rowscroll, rows * tileheight);
+	state_save_register_item_pointer(machine, "tilemap", NULL, tilemap_instance, tmap->colscroll, cols * tilewidth);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->dx);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->dx_flipped);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->dy);
+	state_save_register_item(machine, "tilemap", NULL, tilemap_instance, tmap->dy_flipped);
 	tilemap_instance++;
 
 	/* reset everything after a load */
-	state_save_register_postload(Machine, tilemap_postload, tmap);
+	state_save_register_postload(machine, tilemap_postload, tmap);
 	return tmap;
 }
 

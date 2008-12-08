@@ -1,5 +1,4 @@
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/samples.h"
 #include "includes/senjyo.h"
 
@@ -71,9 +70,10 @@ static TIMER_CALLBACK( senjyo_sh_update )
 }
 
 
-void senjyo_sh_start(void)
+SAMPLES_START( senjyo_sh_start )
 {
-    int i;
+	running_machine *machine = device->machine;
+	int i;
 
 	_single = (INT16 *)auto_malloc(SINGLE_LENGTH*2);
 
@@ -84,5 +84,5 @@ void senjyo_sh_start(void)
 	sample_set_volume(0,0);
 	sample_start_raw(0,_single,SINGLE_LENGTH,single_rate,1);
 
-	timer_pulse(Machine, video_screen_get_frame_period(Machine->primary_screen), NULL, 0, senjyo_sh_update);
+	timer_pulse(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, senjyo_sh_update);
 }

@@ -43,7 +43,7 @@ PALETTE_INIT( wiping );
 VIDEO_UPDATE( wiping );
 
 extern UINT8 *wiping_soundregs;
-void *wiping_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( wiping_sh_start );
 WRITE8_HANDLER( wiping_sound_w );
 
 

@@ -1,8 +1,10 @@
+#include "sound/samples.h"
+
 /*----------- defined in audio/suna8.c -----------*/
 
 WRITE8_HANDLER( suna8_play_samples_w );
 WRITE8_HANDLER( suna8_samples_number_w );
-void suna8_sh_start(void);
+SAMPLES_START( suna8_sh_start );
 
 
 /*----------- defined in video/suna8.c -----------*/

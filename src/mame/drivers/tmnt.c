@@ -281,10 +281,11 @@ static WRITE8_HANDLER( tmnt_sres_w )
 }
 
 
-static void tmnt_decode_sample(void)
+static SAMPLES_START( tmnt_decode_sample )
 {
+	running_machine *machine = device->machine;
 	int i;
-	UINT8 *source = memory_region(Machine, "title");
+	UINT8 *source = memory_region(machine, "title");
 
 	sampledata = auto_malloc(0x40000*sizeof(sampledata[0]));
 

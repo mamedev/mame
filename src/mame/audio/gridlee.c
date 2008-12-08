@@ -7,7 +7,6 @@
 #include "driver.h"
 #include "streams.h"
 #include "gridlee.h"
-#include "deprecat.h"
 #include "sound/custom.h"
 #include "sound/samples.h"
 
@@ -64,12 +63,14 @@ static void gridlee_stream_update(void *param, stream_sample_t **inputs, stream_
  *
  *************************************/
 
-void *gridlee_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( gridlee_sh_start )
 {
-	/* allocate the stream */
-	gridlee_stream = stream_create(0, 1, Machine->sample_rate, NULL, gridlee_stream_update);
+	running_machine *machine = device->machine;
 
-	freq_to_step = (double)(1 << 24) / (double)Machine->sample_rate;
+	/* allocate the stream */
+	gridlee_stream = stream_create(0, 1, machine->sample_rate, NULL, gridlee_stream_update);
+
+	freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
 
 	return auto_malloc(1);
 }

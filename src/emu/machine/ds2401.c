@@ -141,6 +141,7 @@ static TIMER_CALLBACK( ds2401_tick )
 
 void ds2401_init( int which, const UINT8 *data )
 {
+	running_machine *machine = Machine;
 	struct ds2401_chip *c = &ds2401[ which ];
 
 	c->state = STATE_IDLE;
@@ -156,15 +157,15 @@ void ds2401_init( int which, const UINT8 *data )
 	c->t_pdh = ATTOTIME_IN_USEC( 15 );
 	c->t_pdl = ATTOTIME_IN_USEC( 60 );
 
-	state_save_register_item(Machine,  "ds2401", NULL, which, c->state );
-	state_save_register_item(Machine,  "ds2401", NULL, which, c->bit );
-	state_save_register_item(Machine,  "ds2401", NULL, which, c->byte );
-	state_save_register_item(Machine,  "ds2401", NULL, which, c->shift );
-	state_save_register_item(Machine,  "ds2401", NULL, which, c->rx );
-	state_save_register_item(Machine,  "ds2401", NULL, which, c->tx );
+	state_save_register_item(machine,  "ds2401", NULL, which, c->state );
+	state_save_register_item(machine,  "ds2401", NULL, which, c->bit );
+	state_save_register_item(machine,  "ds2401", NULL, which, c->byte );
+	state_save_register_item(machine,  "ds2401", NULL, which, c->shift );
+	state_save_register_item(machine,  "ds2401", NULL, which, c->rx );
+	state_save_register_item(machine,  "ds2401", NULL, which, c->tx );
 
-	c->timer = timer_alloc(Machine, ds2401_tick , NULL);
-	c->reset_timer = timer_alloc(Machine, ds2401_reset , NULL);
+	c->timer = timer_alloc(machine, ds2401_tick , NULL);
+	c->reset_timer = timer_alloc(machine, ds2401_reset , NULL);
 }
 
 void ds2401_write( int which, int data )

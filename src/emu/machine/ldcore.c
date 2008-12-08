@@ -145,7 +145,7 @@ struct _sound_token
 static TIMER_CALLBACK( perform_player_update );
 static void read_track_data(laserdisc_state *ld);
 static void process_track_data(const device_config *device);
-static void *custom_start(int clock, const custom_sound_interface *config);
+static CUSTOM_START( custom_start );
 static void custom_stream_callback(void *param, stream_sample_t **inputs, stream_sample_t **outputs, int samples);
 static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void configuration_save(running_machine *machine, int config_type, xml_data_node *parentnode);
@@ -943,7 +943,7 @@ static void process_track_data(const device_config *device)
     for laserdiscs
 -------------------------------------------------*/
 
-static void *custom_start(int clock, const custom_sound_interface *config)
+static CUSTOM_START( custom_start )
 {
 	sound_token *token = auto_malloc(sizeof(*token));
 	token->stream = stream_create(0, 2, 48000, token, custom_stream_callback);

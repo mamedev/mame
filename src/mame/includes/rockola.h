@@ -28,7 +28,7 @@ extern WRITE8_HANDLER( vanguard_speech_w );
 extern WRITE8_HANDLER( fantasy_sound_w );
 extern WRITE8_HANDLER( fantasy_speech_w );
 
-void *rockola_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( rockola_sh_start );
 void rockola_set_music_clock(double clock_time);
 void rockola_set_music_freq(int freq);
 int rockola_music0_playing(void);

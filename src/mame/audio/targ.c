@@ -12,7 +12,6 @@
 */
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/samples.h"
 #include "sound/dac.h"
 #include "targ.h"
@@ -142,7 +141,7 @@ static const char *const sample_names[] =
 };
 
 
-static void common_audio_start(int freq)
+static void common_audio_start(running_machine *machine, int freq)
 {
 	max_freq = freq;
 
@@ -152,26 +151,28 @@ static void common_audio_start(int freq)
 	sample_set_volume(3, 0);
 	sample_start_raw(3, sine_wave, 32, 1000, 1);
 
-	state_save_register_global(Machine, port_1_last);
-	state_save_register_global(Machine, port_2_last);
-	state_save_register_global(Machine, tone_freq);
-	state_save_register_global(Machine, tone_active);
+	state_save_register_global(machine, port_1_last);
+	state_save_register_global(machine, port_2_last);
+	state_save_register_global(machine, tone_freq);
+	state_save_register_global(machine, tone_active);
 }
 
 
-static void spectar_audio_start(void)
+static SAMPLES_START( spectar_audio_start )
 {
-	common_audio_start(SPECTAR_MAXFREQ);
+	running_machine *machine = device->machine;
+	common_audio_start(machine, SPECTAR_MAXFREQ);
 }
 
 
-static void targ_audio_start(void)
+static SAMPLES_START( targ_audio_start )
 {
-	common_audio_start(TARG_MAXFREQ);
+	running_machine *machine = device->machine;
+	common_audio_start(machine, TARG_MAXFREQ);
 
 	tone_pointer = 0;
 
-	state_save_register_global(Machine, tone_pointer);
+	state_save_register_global(machine, tone_pointer);
 }
 
 

@@ -24,7 +24,7 @@ DISCRETE_SOUND_EXTERN( phoenix );
 WRITE8_HANDLER( phoenix_sound_control_a_w );
 WRITE8_HANDLER( phoenix_sound_control_b_w );
 
-void *phoenix_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( phoenix_sh_start );
 
 /*----------- defined in audio/pleiads.c -----------*/
 
@@ -32,9 +32,9 @@ WRITE8_HANDLER( pleiads_sound_control_a_w );
 WRITE8_HANDLER( pleiads_sound_control_b_w );
 WRITE8_HANDLER( pleiads_sound_control_c_w );
 
-void *pleiads_sh_start(int clock, const custom_sound_interface *config);
-void *naughtyb_sh_start(int clock, const custom_sound_interface *config);
-void *popflame_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( pleiads_sh_start );
+CUSTOM_START( naughtyb_sh_start );
+CUSTOM_START( popflame_sh_start );
 
 /*----------- defined in video/naughtyb.c -----------*/
 

@@ -350,7 +350,8 @@ void streams_update(running_machine *machine)
 
 sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *param, stream_update_func callback)
 {
-	streams_private *strdata = Machine->streams_data;
+	running_machine *machine = Machine;
+	streams_private *strdata = machine->streams_data;
 	int inputnum, outputnum;
 	sound_stream *stream;
 	char statetag[30];
@@ -362,7 +363,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	VPRINTF(("stream_create(%d, %d, %d) => %p\n", inputs, outputs, sample_rate, stream));
 
 	/* fill in the data */
-	stream->machine = Machine;
+	stream->machine = machine;
 	stream->tag = strdata->current_tag;
 	stream->index = strdata->stream_index++;
 	stream->sample_rate = sample_rate;
@@ -373,8 +374,8 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 
 	/* create a unique tag for saving */
 	sprintf(statetag, "%d", stream->index);
-	state_save_register_item(Machine, "stream", statetag, 0, stream->sample_rate);
-	state_save_register_postload(Machine, stream_postload, stream);
+	state_save_register_item(machine, "stream", statetag, 0, stream->sample_rate);
+	state_save_register_postload(machine, stream_postload, stream);
 
 	/* allocate space for the inputs */
 	if (inputs > 0)
@@ -390,7 +391,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	{
 		stream->input[inputnum].owner = stream;
 		stream->input[inputnum].gain = 0x100;
-		state_save_register_item(Machine, "stream", statetag, inputnum, stream->input[inputnum].gain);
+		state_save_register_item(machine, "stream", statetag, inputnum, stream->input[inputnum].gain);
 	}
 
 	/* allocate space for the outputs */
@@ -407,7 +408,7 @@ sound_stream *stream_create(int inputs, int outputs, int sample_rate, void *para
 	{
 		stream->output[outputnum].owner = stream;
 		stream->output[outputnum].gain = 0x100;
-		state_save_register_item(Machine, "stream", statetag, outputnum, stream->output[outputnum].gain);
+		state_save_register_item(machine, "stream", statetag, outputnum, stream->output[outputnum].gain);
 	}
 
 	/* hook us into the master stream list */

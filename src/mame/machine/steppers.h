@@ -42,7 +42,7 @@ struct _stepper_interface
 
 extern const stepper_interface starpoint_interface_48step;
 
-void stepper_config(int which, const stepper_interface *intf);
+void stepper_config(running_machine *machine, int which, const stepper_interface *intf);
 
 void stepper_reset_position(int id);		/* reset a motor to position 0 */
 

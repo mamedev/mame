@@ -121,7 +121,6 @@ TODO:
 ******************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "sound/2203intf.h"
 #include "sound/samples.h"
 #include "machine/mc8123.h"
@@ -201,12 +200,11 @@ static WRITE8_HANDLER( ninjakd2_soundreset_w )
 
 
 
-static void ninjakd2_init_samples(void)
+static SAMPLES_START( ninjakd2_init_samples )
 {
-	const UINT8* const rom = memory_region(Machine, "samples");
-
-	const int length = memory_region_length(Machine, "samples");
-
+	running_machine *machine = device->machine;
+	const UINT8* const rom = memory_region(machine, "samples");
+	const int length = memory_region_length(machine, "samples");
 	INT16* const sampledata = auto_malloc(length * sizeof(sampledata[0]));
 
 	int i;

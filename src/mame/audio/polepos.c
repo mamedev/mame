@@ -100,7 +100,7 @@ static void engine_sound_update(void *param, stream_sample_t **inputs, stream_sa
 /************************************/
 /* Sound handler start              */
 /************************************/
-void *polepos_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( polepos_sh_start )
 {
 	stream = stream_create(0, 1, OUTPUT_RATE, NULL, engine_sound_update);
 	sample_msb = sample_lsb = 0;
@@ -122,7 +122,7 @@ void *polepos_sh_start(int clock, const custom_sound_interface *config)
 /************************************/
 /* Sound handler reset              */
 /************************************/
-void polepos_sh_reset(void *token)
+CUSTOM_RESET( polepos_sh_reset )
 {
 	int loop;
 	for (loop = 0; loop < 3; loop++) filter2_reset(&filter_engine[loop]);

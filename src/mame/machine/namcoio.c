@@ -133,7 +133,6 @@ TODO:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "machine/namcoio.h"
 #include "machine/namco50.h"
 #include "sound/namco52.h"
@@ -795,24 +794,23 @@ void namcoio_set_irq_line(running_machine *machine, int chipnum, int state)
 	}
 }
 
-static void namcoio_state_save(int chipnum)
+static void namcoio_state_save(running_machine *machine, int chipnum)
 {
-
-	state_save_register_item_pointer(Machine, "namcoio", NULL, chipnum, ((UINT8 *) (&namcoio_ram[chipnum * 16])), 16);
-	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].reset);
-	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].lastcoins);
-	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].lastbuttons);
-	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].credits);
-	state_save_register_item_array(Machine, "namcoio", NULL, chipnum, io[chipnum].coins);
-	state_save_register_item_array(Machine, "namcoio", NULL, chipnum, io[chipnum].coins_per_cred);
-	state_save_register_item_array(Machine, "namcoio", NULL, chipnum, io[chipnum].creds_per_coin);
-	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].in_count);
-	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].mode);
-	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].coincred_mode);
-	state_save_register_item(Machine, "namcoio", NULL, chipnum, io[chipnum].remap_joy);
+	state_save_register_item_pointer(machine, "namcoio", NULL, chipnum, ((UINT8 *) (&namcoio_ram[chipnum * 16])), 16);
+	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].reset);
+	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].lastcoins);
+	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].lastbuttons);
+	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].credits);
+	state_save_register_item_array(machine, "namcoio", NULL, chipnum, io[chipnum].coins);
+	state_save_register_item_array(machine, "namcoio", NULL, chipnum, io[chipnum].coins_per_cred);
+	state_save_register_item_array(machine, "namcoio", NULL, chipnum, io[chipnum].creds_per_coin);
+	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].in_count);
+	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].mode);
+	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].coincred_mode);
+	state_save_register_item(machine, "namcoio", NULL, chipnum, io[chipnum].remap_joy);
 }
 
-void namcoio_init(int chipnum, int type, const struct namcoio_interface *intf)
+void namcoio_init(running_machine *machine, int chipnum, int type, const struct namcoio_interface *intf)
 {
 	if (chipnum < MAX_NAMCOIO)
 	{
@@ -823,7 +821,7 @@ void namcoio_init(int chipnum, int type, const struct namcoio_interface *intf)
 		io[chipnum].in[3] = (intf && intf->in[3]) ? intf->in[3] : nop_r;
 		io[chipnum].out[0] = (intf && intf->out[0]) ? intf->out[0] : nop_w;
 		io[chipnum].out[1] = (intf && intf->out[1]) ? intf->out[1] : nop_w;
-		namcoio_state_save(chipnum);
+		namcoio_state_save(machine, chipnum);
 		namcoio_set_reset_line(chipnum,PULSE_LINE);
 	}
 }
@@ -848,11 +846,11 @@ static TIMER_CALLBACK( nmi_generate )
 
 static UINT8 customio_command[MAX_06XX];
 
-static void namco_06xx_state_save(int chipnum)
+static void namco_06xx_state_save(running_machine *machine, int chipnum)
 {
 
-		//state_save_register_item(Machine, "namcoio06xx", NULL, chipnum, nmi_cpu[chipnum]);
-		state_save_register_item(Machine, "namcoio06xx", NULL, chipnum, customio_command[chipnum]);
+	//state_save_register_item(machine, "namcoio06xx", NULL, chipnum, nmi_cpu[chipnum]);
+	state_save_register_item(machine, "namcoio06xx", NULL, chipnum, customio_command[chipnum]);
 }
 
 
@@ -864,13 +862,13 @@ void namco_06xx_init(running_machine *machine, int chipnum, int cpu,
 {
 	if (chipnum < MAX_06XX)
 	{
-		namcoio_init(4*chipnum + 0, type0, intf0);
-		namcoio_init(4*chipnum + 1, type1, intf1);
-		namcoio_init(4*chipnum + 2, type2, intf2);
-		namcoio_init(4*chipnum + 3, type3, intf3);
+		namcoio_init(machine, 4*chipnum + 0, type0, intf0);
+		namcoio_init(machine, 4*chipnum + 1, type1, intf1);
+		namcoio_init(machine, 4*chipnum + 2, type2, intf2);
+		namcoio_init(machine, 4*chipnum + 3, type3, intf3);
 		nmi_cpu[chipnum] = cpu;
 		nmi_timer[chipnum] = timer_alloc(machine, nmi_generate, NULL);
-		namco_06xx_state_save(chipnum);
+		namco_06xx_state_save(machine, chipnum);
 	}
 }
 

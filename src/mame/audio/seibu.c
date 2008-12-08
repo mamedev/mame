@@ -33,7 +33,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
@@ -169,8 +168,9 @@ static void seibu_adpcm_callback(void *param, stream_sample_t **inputs, stream_s
 	}
 }
 
-static void *seibu_adpcm_start(int clock, const custom_sound_interface *config)
+static CUSTOM_START( seibu_adpcm_start )
 {
+	running_machine *machine = device->machine;
 	int i;
 
 	for (i = 0; i < 2; i++)
@@ -180,14 +180,14 @@ static void *seibu_adpcm_start(int clock, const custom_sound_interface *config)
 			state->allocated = 1;
 			state->playing = 0;
 			state->stream = stream_create(0, 1, clock, state, seibu_adpcm_callback);
-			state->base = memory_region(Machine, "adpcm");
+			state->base = memory_region(machine, "adpcm");
 			reset_adpcm(&state->adpcm);
 			return state;
 		}
 	return NULL;
 }
 
-static void seibu_adpcm_stop(void *token)
+static CUSTOM_STOP( seibu_adpcm_stop )
 {
 	struct seibu_adpcm_state *state = token;
 	state->allocated = 0;

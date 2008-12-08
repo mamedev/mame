@@ -24,8 +24,8 @@
 
 /*----------- defined in audio/exidy.c -----------*/
 
-void *exidy_sh6840_sh_start(int clock, const custom_sound_interface *config);
-void exidy_sh6840_sh_reset(void *token);
+CUSTOM_START( exidy_sh6840_sh_start );
+CUSTOM_RESET( exidy_sh6840_sh_reset );
 
 WRITE8_HANDLER( exidy_sh6840_w );
 WRITE8_HANDLER( exidy_sfxctrl_w );

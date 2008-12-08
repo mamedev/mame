@@ -520,8 +520,9 @@ WRITE8_HANDLER( phoenix_sound_control_b_w )
 	mm6221aa_tune_w(0, data >> 6);
 }
 
-void *phoenix_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( phoenix_sh_start )
 {
+	running_machine *machine = device->machine;
 	int i, j;
 	UINT32 shiftreg;
 
@@ -542,9 +543,9 @@ void *phoenix_sh_start(int clock, const custom_sound_interface *config)
 		poly18[i] = bits;
 	}
 
-	channel = stream_create(0, 1, Machine->sample_rate, 0, phoenix_sound_update);
+	channel = stream_create(0, 1, machine->sample_rate, 0, phoenix_sound_update);
 
-	state_save_register_global_pointer(Machine, poly18, (1ul << (18-5)) );
+	state_save_register_global_pointer(machine, poly18, (1ul << (18-5)) );
 
 	/* a dummy token */
 	return auto_malloc(1);

@@ -225,13 +225,14 @@ static void scsihd_write_data( SCSIInstance *scsiInstance, UINT8 *data, int data
 
 static void scsihd_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
+	running_machine *machine = Machine;
 	SCSIHd *our_this = SCSIThis( &SCSIClassHARDDISK, scsiInstance );
 
 	our_this->lba = 0;
 	our_this->blocks = 0;
 
-	state_save_register_item( Machine, "scsihd", diskregion, 0, our_this->lba );
-	state_save_register_item( Machine, "scsihd", diskregion, 0, our_this->blocks );
+	state_save_register_item( machine, "scsihd", diskregion, 0, our_this->lba );
+	state_save_register_item( machine, "scsihd", diskregion, 0, our_this->blocks );
 
 #ifdef MESS
 	/* TODO: get rid of this ifdef MESS section */

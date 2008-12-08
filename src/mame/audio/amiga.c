@@ -262,8 +262,9 @@ static void amiga_stream_update(void *param, stream_sample_t **inputs, stream_sa
  *
  *************************************/
 
-void *amiga_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( amiga_sh_start )
 {
+	running_machine *machine = device->machine;
 	int i;
 
 	/* allocate a new audio state */
@@ -272,7 +273,7 @@ void *amiga_sh_start(int clock, const custom_sound_interface *config)
 	for (i = 0; i < 4; i++)
 	{
 		audio_state->channel[i].index = i;
-		audio_state->channel[i].irq_timer = timer_alloc(Machine, signal_irq, NULL);
+		audio_state->channel[i].irq_timer = timer_alloc(machine, signal_irq, NULL);
 	}
 
 	/* create the stream */

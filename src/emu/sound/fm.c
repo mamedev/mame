@@ -895,7 +895,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 {
 	if( COMPARE_TIMES(ST->busy_expiry_time, UNDEFINED_TIME) != 0 )
 	{
-		if (COMPARE_TIMES(ST->busy_expiry_time, FM_GET_TIME_NOW()) > 0)
+		if (COMPARE_TIMES(ST->busy_expiry_time, FM_GET_TIME_NOW(Machine)) > 0)
 			return ST->status | 0x80;	/* with busy */
 		/* expire */
 		FM_BUSY_CLEAR(ST);
@@ -905,7 +905,7 @@ INLINE UINT8 FM_STATUS_FLAG(FM_ST *ST)
 INLINE void FM_BUSY_SET(FM_ST *ST,int busyclock )
 {
 	TIME_TYPE expiry_period = MULTIPLY_TIME_BY_INT(ATTOTIME_IN_HZ(ST->clock), busyclock * ST->timer_prescaler);
-	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(), expiry_period);
+	ST->busy_expiry_time = ADD_TIMES(FM_GET_TIME_NOW(Machine), expiry_period);
 }
 #else
 #define FM_STATUS_FLAG(ST) ((ST)->status)

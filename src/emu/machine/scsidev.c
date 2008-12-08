@@ -100,11 +100,12 @@ static int scsidev_get_command( SCSIInstance *scsiInstance, void **command )
 
 static void scsidev_alloc_instance( SCSIInstance *scsiInstance, const char *diskregion )
 {
+	running_machine *machine = Machine;
 	SCSIDev *our_this = SCSIThis( &SCSIClassDevice, scsiInstance );
 
-	state_save_register_item_array( Machine, "scsidev", diskregion, 0, our_this->command );
-	state_save_register_item( Machine, "scsidev", diskregion, 0, our_this->commandLength );
-	state_save_register_item( Machine, "scsidev", diskregion, 0, our_this->phase );
+	state_save_register_item_array( machine, "scsidev", diskregion, 0, our_this->command );
+	state_save_register_item( machine, "scsidev", diskregion, 0, our_this->commandLength );
+	state_save_register_item( machine, "scsidev", diskregion, 0, our_this->phase );
 }
 
 static int scsidev_dispatch( int operation, void *file, INT64 intparm, void *ptrparm )

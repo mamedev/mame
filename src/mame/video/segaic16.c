@@ -2652,6 +2652,7 @@ static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite
 
 void segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
 {
+	running_machine *machine = Machine;
 	struct sprite_info *info = &sprites[which];
 	int i, buffer = 0;
 
@@ -2727,13 +2728,13 @@ void segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
 	if (buffer)
 		info->buffer = auto_malloc(info->ramsize);
 
-	state_save_register_item(Machine, "segaic16_sp", NULL, which, info->flip);
-	state_save_register_item(Machine, "segaic16_sp", NULL, which, info->shadow);
-	state_save_register_item_array(Machine, "segaic16_sp", NULL, which, info->bank);
-	state_save_register_item(Machine, "segaic16_sp", NULL, which, info->colorbase);
-	state_save_register_item(Machine, "segaic16_sp", NULL, which, info->xoffs);
+	state_save_register_item(machine, "segaic16_sp", NULL, which, info->flip);
+	state_save_register_item(machine, "segaic16_sp", NULL, which, info->shadow);
+	state_save_register_item_array(machine, "segaic16_sp", NULL, which, info->bank);
+	state_save_register_item(machine, "segaic16_sp", NULL, which, info->colorbase);
+	state_save_register_item(machine, "segaic16_sp", NULL, which, info->xoffs);
 	if (buffer)
-		state_save_register_item_pointer(Machine, "segaic16_sp", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
+		state_save_register_item_pointer(machine, "segaic16_sp", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
 }
 
 
@@ -3465,6 +3466,7 @@ WRITE16_HANDLER( segaic16_road_control_0_w )
 
 void segaic16_rotate_init(int which, int type, int colorbase)
 {
+	running_machine *machine = Machine;
 	struct rotate_info *info = &rotate[which];
 
 	/* reset the tilemap info */
@@ -3498,8 +3500,8 @@ void segaic16_rotate_init(int which, int type, int colorbase)
 	/* allocate a buffer for swapping */
 	info->buffer = auto_malloc(info->ramsize);
 
-	state_save_register_item(Machine, "segaic16_rot", NULL, which, info->colorbase);
-	state_save_register_item_pointer(Machine, "segaic16_rot", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
+	state_save_register_item(machine, "segaic16_rot", NULL, which, info->colorbase);
+	state_save_register_item_pointer(machine, "segaic16_rot", NULL, which, ((UINT8 *) info->buffer), info->ramsize);
 }
 
 

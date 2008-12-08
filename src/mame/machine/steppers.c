@@ -16,7 +16,7 @@
 
 #include "driver.h"
 #include "steppers.h"
-#include "deprecat.h"
+
 /* local prototypes */
 
 static void update_optic(int which);
@@ -602,10 +602,9 @@ const stepper_interface starpoint_interface_48step =
 };
 
 ///////////////////////////////////////////////////////////////////////////
-void stepper_config(int which, const stepper_interface *intf)
+void stepper_config(running_machine *machine, int which, const stepper_interface *intf)
 {
-
-	assert_always(mame_get_phase(Machine) == MAME_PHASE_INIT, "Can only call stepper_config at init time!");
+	assert_always(mame_get_phase(machine) == MAME_PHASE_INIT, "Can only call stepper_config at init time!");
 	assert_always((which >= 0) && (which < MAX_STEPPERS), "stepper_config called on an invalid stepper motor!");
 	assert_always(intf, "stepper_config called with an invalid interface!");
 
@@ -630,14 +629,14 @@ void stepper_config(int which, const stepper_interface *intf)
 		break;
 	}
 
-	state_save_register_item(Machine, "stepper", NULL, which, step[which].index_start);
-	state_save_register_item(Machine, "stepper", NULL, which, step[which].index_end);
-	state_save_register_item(Machine, "stepper", NULL, which, step[which].index_patt);
-	state_save_register_item(Machine, "stepper", NULL, which, step[which].pattern);
-	state_save_register_item(Machine, "stepper", NULL, which, step[which].old_pattern);
-	state_save_register_item(Machine, "stepper", NULL, which, step[which].step_pos);
-	state_save_register_item(Machine, "stepper", NULL, which, step[which].max_steps);
-	state_save_register_item(Machine, "stepper", NULL, which, step[which].type);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].index_start);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].index_end);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].index_patt);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].pattern);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].old_pattern);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].step_pos);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].max_steps);
+	state_save_register_item(machine, "stepper", NULL, which, step[which].type);
 }
 
 ///////////////////////////////////////////////////////////////////////////

@@ -1265,10 +1265,10 @@ static MACHINE_START( mpu4mod2 )
 	Mechmtr_init(8);
 
 	/* setup 4 reels */
-	stepper_config(0, &barcrest_reel_interface);
-	stepper_config(1, &barcrest_reel_interface);
-	stepper_config(2, &barcrest_reel_interface);
-	stepper_config(3, &barcrest_reel_interface);
+	stepper_config(machine, 0, &barcrest_reel_interface);
+	stepper_config(machine, 1, &barcrest_reel_interface);
+	stepper_config(machine, 2, &barcrest_reel_interface);
+	stepper_config(machine, 3, &barcrest_reel_interface);
 
 	/* setup the standard oki MSC1937 display */
 	ROC10937_init(0, MSC1937,0);

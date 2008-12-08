@@ -1,3 +1,4 @@
+#include "sound/samples.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/z80pio.h"
 #include "machine/z80ctc.h"
@@ -8,7 +9,7 @@ extern const z80_daisy_chain senjyo_daisy_chain[];
 extern const z80pio_interface senjyo_pio_intf;
 extern const z80ctc_interface senjyo_ctc_intf;
 
-void senjyo_sh_start(void);
+SAMPLES_START( senjyo_sh_start );
 WRITE8_HANDLER( senjyo_volume_w );
 
 

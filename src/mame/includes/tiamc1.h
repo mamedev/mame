@@ -2,7 +2,7 @@
 
 /*----------- defined in audio/tiamc1.c -----------*/
 
-extern void *tiamc1_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( tiamc1_sh_start );
 WRITE8_HANDLER( tiamc1_timer0_w );
 WRITE8_HANDLER( tiamc1_timer1_w );
 WRITE8_HANDLER( tiamc1_timer1_gate_w );

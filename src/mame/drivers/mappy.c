@@ -650,38 +650,38 @@ static const struct namcoio_interface intf1_interleave =
 
 static DRIVER_INIT( 56_56 )
 {
-	namcoio_init(0, NAMCOIO_56XX, &intf0);
-	namcoio_init(1, NAMCOIO_56XX, &intf1);
+	namcoio_init(machine, 0, NAMCOIO_56XX, &intf0);
+	namcoio_init(machine, 1, NAMCOIO_56XX, &intf1);
 }
 
 static DRIVER_INIT( 58_56i )
 {
-	namcoio_init(0, NAMCOIO_58XX, &intf0);
-	namcoio_init(1, NAMCOIO_56XX, &intf1_interleave);
+	namcoio_init(machine, 0, NAMCOIO_58XX, &intf0);
+	namcoio_init(machine, 1, NAMCOIO_56XX, &intf1_interleave);
 }
 
 static DRIVER_INIT( 56out_56 )
 {
-	namcoio_init(0, NAMCOIO_56XX, &intf0_lamps);
-	namcoio_init(1, NAMCOIO_56XX, &intf1);
+	namcoio_init(machine, 0, NAMCOIO_56XX, &intf0_lamps);
+	namcoio_init(machine, 1, NAMCOIO_56XX, &intf1);
 }
 
 static DRIVER_INIT( 56out_59 )
 {
-	namcoio_init(0, NAMCOIO_56XX, &intf0_lamps);
-	namcoio_init(1, NAMCOIO_59XX, &intf1);
+	namcoio_init(machine, 0, NAMCOIO_56XX, &intf0_lamps);
+	namcoio_init(machine, 1, NAMCOIO_59XX, &intf1);
 }
 
 static DRIVER_INIT( 58_58 )
 {
-	namcoio_init(0, NAMCOIO_58XX, &intf0);
-	namcoio_init(1, NAMCOIO_58XX, &intf1);
+	namcoio_init(machine, 0, NAMCOIO_58XX, &intf0);
+	namcoio_init(machine, 1, NAMCOIO_58XX, &intf1);
 }
 
 static DRIVER_INIT( 58_56 )
 {
-	namcoio_init(0, NAMCOIO_58XX, &intf0);
-	namcoio_init(1, NAMCOIO_56XX, &intf1);
+	namcoio_init(machine, 0, NAMCOIO_58XX, &intf0);
+	namcoio_init(machine, 1, NAMCOIO_56XX, &intf1);
 }
 
 /***************************************************************************/

@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "includes/flower.h"
 
@@ -155,8 +154,9 @@ static void flower_update_mono(void *param, stream_sample_t **inputs, stream_sam
 
 
 
-void * flower_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( flower_sh_start )
 {
+	running_machine *machine = device->machine;
 	sound_channel *voice;
 	int i;
 
@@ -175,15 +175,15 @@ void * flower_sh_start(int clock, const custom_sound_interface *config)
 	num_voices = 8;
 	last_channel = channel_list + num_voices;
 
-	sound_rom1 = memory_region(Machine, "sound1");
-	sound_rom2 = memory_region(Machine, "sound2");
+	sound_rom1 = memory_region(machine, "sound1");
+	sound_rom2 = memory_region(machine, "sound2");
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	sound_enable = 1;
 
 	/* save globals */
-	state_save_register_item(Machine, "flower_custom", NULL, 0, num_voices);
-	state_save_register_item(Machine, "flower_custom", NULL, 0, sound_enable);
+	state_save_register_item(machine, "flower_custom", NULL, 0, num_voices);
+	state_save_register_item(machine, "flower_custom", NULL, 0, sound_enable);
 
 	/* reset all the voices */
 	for (i = 0; i < num_voices; i++)
@@ -195,12 +195,12 @@ void * flower_sh_start(int clock, const custom_sound_interface *config)
 		voice->counter = 0;
 		voice->rom_offset = 0;
 
-		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->frequency);
-		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->counter);
-		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->volume);
-		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->oneshot);
-		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->oneshotplaying);
-		state_save_register_item(Machine, "flower_custom", NULL, i+1, voice->rom_offset);
+		state_save_register_item(machine, "flower_custom", NULL, i+1, voice->frequency);
+		state_save_register_item(machine, "flower_custom", NULL, i+1, voice->counter);
+		state_save_register_item(machine, "flower_custom", NULL, i+1, voice->volume);
+		state_save_register_item(machine, "flower_custom", NULL, i+1, voice->oneshot);
+		state_save_register_item(machine, "flower_custom", NULL, i+1, voice->oneshotplaying);
+		state_save_register_item(machine, "flower_custom", NULL, i+1, voice->rom_offset);
 	}
 
 	return auto_malloc(1);

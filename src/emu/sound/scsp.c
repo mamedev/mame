@@ -638,7 +638,7 @@ static void SCSP_Init(const device_config *device, struct _SCSP *SCSP, const scs
 		SCSP->Slots[i].base=NULL;
 	}
 
-	LFO_Init();
+	LFO_Init(device->machine);
 	SCSP->buffertmpl=(signed int*) auto_malloc(44100*sizeof(signed int));
 	SCSP->buffertmpr=(signed int*) auto_malloc(44100*sizeof(signed int));
 	memset(SCSP->buffertmpl,0,44100*sizeof(signed int));

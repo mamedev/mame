@@ -17,7 +17,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 
 
 
@@ -580,7 +579,7 @@ static DEVICE_GET_INFO( sndclass )
 	(*snddata->intf.get_info)(device, state, (sndinfo *)info);
 }
 
-int sndintrf_init_sound(int sndnum, const char *tag, sound_type sndtype, int clock, const void *config)
+int sndintrf_init_sound(running_machine *machine, int sndnum, const char *tag, sound_type sndtype, int clock, const void *config)
 {
 	sndintrf_data *info = &sound[sndnum];
 	int index;
@@ -588,7 +587,7 @@ int sndintrf_init_sound(int sndnum, const char *tag, sound_type sndtype, int clo
 	info->device = auto_malloc(sizeof(*info->device) + strlen(tag));
 	memset(info->device, 0, sizeof(*info->device) + strlen(tag));
 	info->device->type = DEVICE_GET_INFO_NAME(sndclass);
-	info->device->machine = Machine;
+	info->device->machine = machine;
 	strcpy(info->device->tag, tag);
 	info->device->static_config = config;
 	info->device->region = memory_region(info->device->machine, info->device->tag);

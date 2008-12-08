@@ -24,20 +24,20 @@
 
 
 #define V9938_BORDER_FUNC(name) 	\
-	static void FNAME (name) (PEN_TYPE *ln)
+	static void FNAME (name) (const pen_t *pens, PEN_TYPE *ln)
 
 #define V9938_MODE_FUNC(name) 		\
-	static void FNAME (name) (PEN_TYPE *ln, int line)
+	static void FNAME (name) (const pen_t *pens, PEN_TYPE *ln, int line)
 
 #define V9938_SPRITE_FUNC(name)		\
-	static void FNAME (name) (PEN_TYPE *ln, UINT8 *col)
+	static void FNAME (name) (const pen_t *pens, PEN_TYPE *ln, UINT8 *col)
 
 V9938_BORDER_FUNC (default_border)
     {
     PEN_TYPE pen;
 	int	i;
 
-    pen = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
+    pen = pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
 	i = V9938_WIDTH;
 	while (i--) *ln++ = pen;
 
@@ -49,7 +49,7 @@ V9938_BORDER_FUNC (graphic7_border)
 	PEN_TYPE pen;
 	int i;
 
-	pen = Machine->pens[vdp->pal_ind256[vdp->contReg[7]]];
+	pen = pens[vdp->pal_ind256[vdp->contReg[7]]];
 	i = V9938_WIDTH;
 	while (i--) *ln++ = pen;
 
@@ -63,12 +63,12 @@ V9938_BORDER_FUNC (graphic5_border)
 #if (V9938_WIDTH > 512)
 	PEN_TYPE pen1;
 
-	pen1 = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x03)]];
-	pen0 = Machine->pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
+	pen1 = pens[vdp->pal_ind16[(vdp->contReg[7]&0x03)]];
+	pen0 = pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
 	i = (V9938_WIDTH) / 2;
 	while (i--) { *ln++ = pen0; *ln++ = pen1; }
 #else
-	pen0 = Machine->pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
+	pen0 = pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
 	i = V9938_WIDTH;
 	while (i--) *ln++ = pen0;
 #endif
@@ -84,12 +84,12 @@ V9938_MODE_FUNC (mode_text1)
 	patterntbl = vdp->vram + (vdp->contReg[4] << 11);
 	nametbl = vdp->vram + (vdp->contReg[2] << 10);
 
-    fg = Machine->pens[vdp->pal_ind16[vdp->contReg[7] >> 4]];
-    bg = Machine->pens[vdp->pal_ind16[vdp->contReg[7] & 15]];
+    fg = pens[vdp->pal_ind16[vdp->contReg[7] >> 4]];
+    bg = pens[vdp->pal_ind16[vdp->contReg[7] & 15]];
 
 	name = (line/8)*40;
 
-	pen = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
+	pen = pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
 
 	xxx = vdp->offset_x + 8;
 #if (V9938_WIDTH > 512)
@@ -137,15 +137,15 @@ V9938_MODE_FUNC (mode_text2)
 	nametbl = vdp->vram + ((vdp->contReg[2] & 0xfc) << 10);
 	patternmask = ((vdp->contReg[2] & 3) << 10) | 0x3ff; /* seems correct */
 
-    fg = Machine->pens[vdp->pal_ind16[vdp->contReg[7] >> 4]];
-    bg = Machine->pens[vdp->pal_ind16[vdp->contReg[7] & 15]];
-    fg0 = Machine->pens[vdp->pal_ind16[vdp->contReg[12] >> 4]];
-    bg0 = Machine->pens[vdp->pal_ind16[vdp->contReg[12] & 15]];
+    fg = pens[vdp->pal_ind16[vdp->contReg[7] >> 4]];
+    bg = pens[vdp->pal_ind16[vdp->contReg[7] & 15]];
+    fg0 = pens[vdp->pal_ind16[vdp->contReg[12] >> 4]];
+    bg0 = pens[vdp->pal_ind16[vdp->contReg[12] & 15]];
 
 	name = (line/8)*80;
 
 	xxx = vdp->offset_x + 8;
-	pen = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
+	pen = pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
 #if (V9938_WIDTH > 512)
 	xxx *= 2;
 #endif
@@ -219,7 +219,7 @@ V9938_MODE_FUNC (mode_multi)
 	line2 = (line - vdp->contReg[23]) & 255;
 	name = (line2/8)*32;
 
-	pen_bg = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
+	pen_bg = pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
 #if (V9938_WIDTH < 512)
 	xx = vdp->offset_x;
 #else
@@ -230,7 +230,7 @@ V9938_MODE_FUNC (mode_multi)
 	for (x=0;x<32;x++)
 		{
 		colour = patterntbl[(nametbl[name] * 8) + ((line2/4)&7)];
-		pen = Machine->pens[vdp->pal_ind16[colour>>4]];
+		pen = pens[vdp->pal_ind16[colour>>4]];
 		/* eight pixels */
 		*ln++ = pen;
 		*ln++ = pen;
@@ -242,7 +242,7 @@ V9938_MODE_FUNC (mode_multi)
 		*ln++ = pen;
 		*ln++ = pen;
 #endif
-		pen = Machine->pens[vdp->pal_ind16[colour&15]];
+		pen = pens[vdp->pal_ind16[colour&15]];
 		/* eight pixels */
 		*ln++ = pen;
 		*ln++ = pen;
@@ -279,7 +279,7 @@ V9938_MODE_FUNC (mode_graphic1)
 
 	name = (line2/8)*32;
 
-	pen = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
+	pen = pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
 #if (V9938_WIDTH < 512)
 	xxx = vdp->offset_x;
 #else
@@ -291,8 +291,8 @@ V9938_MODE_FUNC (mode_graphic1)
 		{
 		charcode = nametbl[name];
 		colour = colourtbl[charcode/8];
-		fg = Machine->pens[vdp->pal_ind16[colour>>4]];
-		bg = Machine->pens[vdp->pal_ind16[colour&15]];
+		fg = pens[vdp->pal_ind16[colour>>4]];
+		bg = pens[vdp->pal_ind16[colour&15]];
 		pattern = patterntbl[charcode * 8 + (line2 & 7)];
 
 		for (xx=0;xx<8;xx++)
@@ -331,7 +331,7 @@ V9938_MODE_FUNC (mode_graphic23)
 	line2 = (line + vdp->contReg[23]) & 255;
 	name = (line2/8)*32;
 
-	pen = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
+	pen = pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
 #if (V9938_WIDTH < 512)
 	xxx = vdp->offset_x;
 #else
@@ -344,8 +344,8 @@ V9938_MODE_FUNC (mode_graphic23)
 		charcode = nametbl[name] + (line2&0xc0)*4;
 		colour = colourtbl[(charcode&colourmask)*8+(line2&7)];
 		pattern = patterntbl[(charcode&patternmask)*8+(line2&7)];
-        fg = Machine->pens[vdp->pal_ind16[colour>>4]];
-        bg = Machine->pens[vdp->pal_ind16[colour&15]];
+        fg = pens[vdp->pal_ind16[colour>>4]];
+        bg = pens[vdp->pal_ind16[colour&15]];
 		for (xx=0;xx<8;xx++)
 			{
 			*ln++ = (pattern & 0x80) ? fg : bg;
@@ -379,7 +379,7 @@ V9938_MODE_FUNC (mode_graphic4)
 	if ( (vdp->contReg[2] & 0x20) && (V9938_SECOND_FIELD) )
 		nametbl += 0x8000;
 
-	pen_bg = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
+	pen_bg = pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
 #if (V9938_WIDTH < 512)
 	xx = vdp->offset_x;
 #else
@@ -390,12 +390,12 @@ V9938_MODE_FUNC (mode_graphic4)
 	for (x=0;x<128;x++)
 		{
 		colour = *nametbl++;
-        pen = Machine->pens[vdp->pal_ind16[colour>>4]];
+        pen = pens[vdp->pal_ind16[colour>>4]];
 		*ln++ = pen;
 #if (V9938_WIDTH > 512)
 		*ln++ = pen;
 #endif
-        pen = Machine->pens[vdp->pal_ind16[colour&15]];
+        pen = pens[vdp->pal_ind16[colour&15]];
 		*ln++ = pen;
 #if (V9938_WIDTH > 512)
 		*ln++ = pen;
@@ -428,8 +428,8 @@ V9938_MODE_FUNC (mode_graphic5)
 		nametbl += 0x8000;
 
 #if (V9938_WIDTH > 512)
-	pen_bg1[0] = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x03)]];
-	pen_bg0[0] = Machine->pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
+	pen_bg1[0] = pens[vdp->pal_ind16[(vdp->contReg[7]&0x03)]];
+	pen_bg0[0] = pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
 
 	xx = vdp->offset_x;
 	while (xx--) { *ln++ = pen_bg0[0]; *ln++ = pen_bg1[0]; }
@@ -438,8 +438,8 @@ V9938_MODE_FUNC (mode_graphic5)
 
     for (;x<4;x++)
 		{
-		pen_bg0[x] = Machine->pens[vdp->pal_ind16[x]];
-		pen_bg1[x] = Machine->pens[vdp->pal_ind16[x]];
+		pen_bg0[x] = pens[vdp->pal_ind16[x]];
+		pen_bg1[x] = pens[vdp->pal_ind16[x]];
 		}
 
 	for (x=0;x<128;x++)
@@ -452,17 +452,17 @@ V9938_MODE_FUNC (mode_graphic5)
        	*ln++ = pen_bg1[(colour&3)];
 		}
 
-	pen_bg1[0] = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x03)]];
-	pen_bg0[0] = Machine->pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
+	pen_bg1[0] = pens[vdp->pal_ind16[(vdp->contReg[7]&0x03)]];
+	pen_bg0[0] = pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
 	xx = 16 - vdp->offset_x;
 	while (xx--) { *ln++ = pen_bg0[0]; *ln++ = pen_bg1[0]; }
 #else
-	pen_bg0[0] = Machine->pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
+	pen_bg0[0] = pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
 
 	x = (vdp->contReg[8] & 0x20) ? 0 : 1;
 
     for (;x<4;x++)
-		pen_bg0[x] = Machine->pens[vdp->pal_ind16[x]];
+		pen_bg0[x] = pens[vdp->pal_ind16[x]];
 
 	xx = vdp->offset_x;
 	while (xx--) *ln++ = pen_bg0[0];
@@ -474,7 +474,7 @@ V9938_MODE_FUNC (mode_graphic5)
         *ln++ = pen_bg0[(colour>>2)&3];
 		}
 
-	pen_bg0[0] = Machine->pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
+	pen_bg0[0] = pens[vdp->pal_ind16[((vdp->contReg[7]>>2)&0x03)]];
 	xx = 16 - vdp->offset_x;
 	while (xx--) *ln++ = pen_bg0[0];
 #endif
@@ -498,7 +498,7 @@ V9938_MODE_FUNC (mode_graphic6)
    	if ( (vdp->contReg[2] & 0x20) && (V9938_SECOND_FIELD) )
         nametbl += 0x10000;
 
-	pen_bg = Machine->pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
+	pen_bg = pens[vdp->pal_ind16[(vdp->contReg[7]&0x0f)]];
 #if (V9938_WIDTH < 512)
 	xx = vdp->offset_x;
 #else
@@ -512,14 +512,14 @@ V9938_MODE_FUNC (mode_graphic6)
 			{
 			nametbl++;
 			colour = vdp->vram[((nametbl&1) << 16) | (nametbl>>1)];
-        	fg0 = Machine->pens[vdp->pal_ind16[colour>>4]];
+        	fg0 = pens[vdp->pal_ind16[colour>>4]];
 #if (V9938_WIDTH < 512)
 			*ln++ = fg0; *ln++ = fg0;
 			*ln++ = fg0; *ln++ = fg0;
 			*ln++ = fg0; *ln++ = fg0;
 			*ln++ = fg0; *ln++ = fg0;
 #else
-        	fg1 = Machine->pens[vdp->pal_ind16[colour&15]];
+        	fg1 = pens[vdp->pal_ind16[colour&15]];
 			*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 			*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
 			*ln++ = fg0; *ln++ = fg1; *ln++ = fg0; *ln++ = fg1;
@@ -533,9 +533,9 @@ V9938_MODE_FUNC (mode_graphic6)
 		for (x=0;x<256;x++)
 			{
 			colour = vdp->vram[((nametbl&1) << 16) | (nametbl>>1)];
-        	*ln++ = Machine->pens[vdp->pal_ind16[colour>>4]];
+        	*ln++ = pens[vdp->pal_ind16[colour>>4]];
 #if (V9938_WIDTH > 512)
-        	*ln++ = Machine->pens[vdp->pal_ind16[colour&15]];
+        	*ln++ = pens[vdp->pal_ind16[colour&15]];
 #endif
 			nametbl++;
         	}
@@ -563,7 +563,7 @@ V9938_MODE_FUNC (mode_graphic7)
    	if ( (vdp->contReg[2] & 0x20) && (V9938_SECOND_FIELD) )
 		nametbl += 0x10000;
 
-	pen_bg = Machine->pens[vdp->pal_ind256[vdp->contReg[7]]];
+	pen_bg = pens[vdp->pal_ind256[vdp->contReg[7]]];
 #if (V9938_WIDTH < 512)
 	xx = vdp->offset_x;
 #else
@@ -577,7 +577,7 @@ V9938_MODE_FUNC (mode_graphic7)
 			{
 			nametbl++;
 			colour = vdp->vram[((nametbl&1) << 16) | (nametbl>>1)];
-			pen = Machine->pens[vdp->pal_ind256[colour]];
+			pen = pens[vdp->pal_ind256[colour]];
 			*ln++ = pen; *ln++ = pen;
 			*ln++ = pen; *ln++ = pen;
 			*ln++ = pen; *ln++ = pen;
@@ -596,7 +596,7 @@ V9938_MODE_FUNC (mode_graphic7)
   		for (x=0;x<256;x++)
         	{
 			colour = vdp->vram[((nametbl&1) << 16) | (nametbl>>1)];
-			pen = Machine->pens[vdp->pal_ind256[colour]];
+			pen = pens[vdp->pal_ind256[colour]];
 			*ln++ = pen;
 #if (V9938_WIDTH > 512)
 		 	*ln++ = pen;
@@ -618,8 +618,8 @@ V9938_MODE_FUNC (mode_unknown)
 	PEN_TYPE fg, bg;
 	int x;
 
-    fg = Machine->pens[vdp->pal_ind16[vdp->contReg[7] >> 4]];
-    bg = Machine->pens[vdp->pal_ind16[vdp->contReg[7] & 15]];
+    fg = pens[vdp->pal_ind16[vdp->contReg[7] >> 4]];
+    bg = pens[vdp->pal_ind16[vdp->contReg[7] & 15]];
 
 #if (V9938_WIDTH < 512)
 	x = vdp->offset_x;
@@ -656,9 +656,9 @@ V9938_SPRITE_FUNC (default_draw_sprite)
 		{
 		if (col[i] & 0x80)
 			{
-			*ln++ = Machine->pens[vdp->pal_ind16[col[i]&0x0f]];
+			*ln++ = pens[vdp->pal_ind16[col[i]&0x0f]];
 #if (V9938_WIDTH > 512)
-			*ln++ = Machine->pens[vdp->pal_ind16[col[i]&0x0f]];
+			*ln++ = pens[vdp->pal_ind16[col[i]&0x0f]];
 #endif
 			}
 		else
@@ -682,9 +682,9 @@ V9938_SPRITE_FUNC (graphic5_draw_sprite)
 		{
 		if (col[i] & 0x80)
 			{
-			*ln++ = Machine->pens[vdp->pal_ind16[(col[i]>>2)&0x03]];
+			*ln++ = pens[vdp->pal_ind16[(col[i]>>2)&0x03]];
 #if (V9938_WIDTH > 512)
-			*ln++ = Machine->pens[vdp->pal_ind16[col[i]&0x03]];
+			*ln++ = pens[vdp->pal_ind16[col[i]&0x03]];
 #endif
 			}
 		else
@@ -714,9 +714,9 @@ V9938_SPRITE_FUNC (graphic7_draw_sprite)
 		{
 		if (col[i] & 0x80)
 			{
-			*ln++ = Machine->pens[g7_ind16[col[i]&0x0f]];
+			*ln++ = pens[g7_ind16[col[i]&0x0f]];
 #if (V9938_WIDTH > 512)
-			*ln++ = Machine->pens[g7_ind16[col[i]&0x0f]];
+			*ln++ = pens[g7_ind16[col[i]&0x0f]];
 #endif
 			}
 		else

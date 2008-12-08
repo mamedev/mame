@@ -56,13 +56,13 @@ WRITE8_HANDLER( tx1_pit8253_w );
 
 WRITE8_HANDLER( bb_ym1_a_w );
 WRITE8_HANDLER( bb_ym1_b_w );
-void *buggyboy_sh_start(int clock, const custom_sound_interface *config);
-void buggyboy_sh_reset(void *token);
+CUSTOM_START( buggyboy_sh_start );
+CUSTOM_RESET( buggyboy_sh_reset );
 
 WRITE8_HANDLER( tx1_ay8910_a_w );
 WRITE8_HANDLER( tx1_ay8910_b_w );
-void *tx1_sh_start(int clock, const custom_sound_interface *config);
-void tx1_sh_reset(void *token);
+CUSTOM_START( tx1_sh_start );
+CUSTOM_RESET( tx1_sh_reset );
 
 
 /*----------- defined in video/tx1.c -----------*/

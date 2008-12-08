@@ -1,6 +1,5 @@
 #include "driver.h"
 #include "streams.h"
-#include "deprecat.h"
 #include "sound/samples.h"
 #include "includes/galaxian.h"
 
@@ -182,8 +181,9 @@ WRITE8_HANDLER( galaxian_shoot_enable_w )
 }
 
 
-static void galaxian_sh_start(void)
+static SAMPLES_START( galaxian_sh_start )
 {
+	running_machine *machine = device->machine;
 	int i, j, sweep, charge, countdown, generator, bit1, bit2;
 
 	freq = MAXFREQ;
@@ -197,7 +197,7 @@ static void galaxian_sh_start(void)
 	noisewave = auto_malloc(NOISE_LENGTH * sizeof(INT16));
 
 #define SHOOT_SEC 2
-	shoot_rate = Machine->sample_rate;
+	shoot_rate = machine->sample_rate;
 	shoot_length = SHOOT_SEC * shoot_rate;
 	shootwave = auto_malloc(shoot_length * sizeof(INT16));
 
@@ -392,22 +392,22 @@ static void galaxian_sh_start(void)
 	sample_set_volume(CHANNEL_LFO+2,0);
 	sample_start_raw(CHANNEL_LFO+2,backgroundwave,ARRAY_LENGTH(backgroundwave),1000,1);
 
-	noisetimer = timer_alloc(Machine, noise_timer_cb, NULL);
+	noisetimer = timer_alloc(machine, noise_timer_cb, NULL);
 	timer_adjust_periodic(noisetimer, ATTOTIME_IN_NSEC((155000+22000)/100*693*22), 0, ATTOTIME_IN_NSEC((155000+22000)/100*693*22));
 
-	lfotimer = timer_alloc(Machine, lfo_timer_cb, NULL);
+	lfotimer = timer_alloc(machine, lfo_timer_cb, NULL);
 
-	timer_pulse(Machine, video_screen_get_frame_period(Machine->primary_screen), NULL, 0, galaxian_sh_update);
+	timer_pulse(machine, video_screen_get_frame_period(machine->primary_screen), NULL, 0, galaxian_sh_update);
 
-	state_save_register_global(Machine, freq);
-	state_save_register_global(Machine, noise_enable);
-	state_save_register_global(Machine, noisevolume);
-	state_save_register_global(Machine, last_port2);
-	state_save_register_global(Machine, pitch);
-	state_save_register_global(Machine, vol);
-	state_save_register_global(Machine, counter);
-	state_save_register_global(Machine, countdown);
-	state_save_register_global_array(Machine, lfobit);
+	state_save_register_global(machine, freq);
+	state_save_register_global(machine, noise_enable);
+	state_save_register_global(machine, noisevolume);
+	state_save_register_global(machine, last_port2);
+	state_save_register_global(machine, pitch);
+	state_save_register_global(machine, vol);
+	state_save_register_global(machine, counter);
+	state_save_register_global(machine, countdown);
+	state_save_register_global_array(machine, lfobit);
 }
 
 

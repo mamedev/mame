@@ -130,6 +130,7 @@ NVRAM_HANDLER( 93C66B )
 
 void eeprom_init(const eeprom_interface *interface)
 {
+	running_machine *machine = Machine;
 	intf = interface;
 
 	if ((1 << intf->address_bits) * intf->data_bits / 8 > MEMORY_SIZE)
@@ -147,17 +148,17 @@ void eeprom_init(const eeprom_interface *interface)
 	if (intf->cmd_unlock) locked = 1;
 	else locked = 0;
 
-	state_save_register_global_array(Machine, eeprom_data);
-	state_save_register_global_array(Machine, serial_buffer);
-	state_save_register_global(Machine, clock_line);
-	state_save_register_global(Machine, reset_line);
-	state_save_register_global(Machine, locked);
-	state_save_register_global(Machine, serial_count);
-	state_save_register_global(Machine, latch);
-	state_save_register_global(Machine, reset_delay);
-	state_save_register_global(Machine, eeprom_clock_count);
-	state_save_register_global(Machine, eeprom_data_bits);
-	state_save_register_global(Machine, eeprom_read_address);
+	state_save_register_global_array(machine, eeprom_data);
+	state_save_register_global_array(machine, serial_buffer);
+	state_save_register_global(machine, clock_line);
+	state_save_register_global(machine, reset_line);
+	state_save_register_global(machine, locked);
+	state_save_register_global(machine, serial_count);
+	state_save_register_global(machine, latch);
+	state_save_register_global(machine, reset_delay);
+	state_save_register_global(machine, eeprom_clock_count);
+	state_save_register_global(machine, eeprom_data_bits);
+	state_save_register_global(machine, eeprom_read_address);
 }
 
 static void eeprom_write(int bit)

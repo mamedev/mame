@@ -27,7 +27,6 @@
 
 #include <math.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "includes/snes.h"
 
@@ -1135,12 +1134,13 @@ static TIMER_CALLBACK( snes_spc_timer  )
 	}
 }
 
-void *snes_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( snes_sh_start )
 {
+	running_machine *machine = device->machine;
 	UINT8 ii;
 
 	/* put IPL image at the top of RAM */
-	memcpy(snes_ipl_region, memory_region(Machine, "user5"), 64);
+	memcpy(snes_ipl_region, memory_region(machine, "user5"), 64);
 
 	/* default to ROM visible */
 	spc_ram[0xf1] = 0x80;
@@ -1155,13 +1155,13 @@ void *snes_sh_start(int clock, const custom_sound_interface *config)
 	channel = stream_create( 0, 2, 32000, NULL, snes_sh_update );
 
 	/* Initialize the timers */
-	timers[0].timer = timer_alloc(Machine, snes_spc_timer , NULL);
+	timers[0].timer = timer_alloc(machine, snes_spc_timer , NULL);
 	timer_adjust_periodic( timers[0].timer, ATTOTIME_IN_HZ(8000), 0, ATTOTIME_IN_HZ(8000) );
 	timer_enable( timers[0].timer, 0 );
-	timers[1].timer = timer_alloc(Machine, snes_spc_timer , NULL);
+	timers[1].timer = timer_alloc(machine, snes_spc_timer , NULL);
 	timer_adjust_periodic( timers[1].timer, ATTOTIME_IN_HZ(8000), 1, ATTOTIME_IN_HZ(8000) );
 	timer_enable( timers[1].timer, 0 );
-	timers[2].timer = timer_alloc(Machine, snes_spc_timer , NULL);
+	timers[2].timer = timer_alloc(machine, snes_spc_timer , NULL);
 	timer_adjust_periodic( timers[2].timer, ATTOTIME_IN_HZ(64000), 2, ATTOTIME_IN_HZ(64000) );
 	timer_enable( timers[2].timer, 0 );
 

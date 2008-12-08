@@ -8,7 +8,7 @@
 
 /*----------- defined in audio/cps3.c -----------*/
 
-void *cps3_sh_start(int clock, const custom_sound_interface *config);
+CUSTOM_START( cps3_sh_start );
 
 WRITE32_HANDLER( cps3_sound_w );
 READ32_HANDLER( cps3_sound_r );

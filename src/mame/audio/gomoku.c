@@ -7,7 +7,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "includes/gomoku.h"
 
@@ -163,8 +162,9 @@ static void gomoku_update_mono(void *param, stream_sample_t **inputs, stream_sam
 
 
 
-void *gomoku_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( gomoku_sh_start )
 {
+	running_machine *machine = device->machine;
 	sound_channel *voice;
 	int ch;
 
@@ -183,7 +183,7 @@ void *gomoku_sh_start(int clock, const custom_sound_interface *config)
 	num_voices = MAX_VOICES;
 	last_channel = channel_list + num_voices;
 
-	sound_rom = memory_region(Machine, "gomoku");
+	sound_rom = memory_region(machine, "gomoku");
 
 	/* start with sound enabled, many games don't have a sound enable register */
 	sound_enable = 1;

@@ -133,7 +133,7 @@ static void leland_update(void *param, stream_sample_t **inputs, stream_sample_t
 }
 
 
-void *leland_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( leland_sh_start )
 {
 	/* reset globals */
 	dac_buffer[0] = dac_buffer[1] = NULL;
@@ -503,15 +503,16 @@ static void leland_80186_extern_update(void *param, stream_sample_t **inputs, st
 static TIMER_CALLBACK( internal_timer_int );
 static TIMER_CALLBACK( dma_timer_callback );
 
-void *leland_80186_sh_start(int clock, const custom_sound_interface *config)
+void *common_sh_start(int clock, const custom_sound_interface *config)
 {
-	const address_space *dmaspace = cputag_get_address_space(Machine, "audio", ADDRESS_SPACE_PROGRAM);
+	running_machine *machine = Machine;
+	const address_space *dmaspace = cputag_get_address_space(machine, "audio", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* determine which sound hardware is installed */
 	has_ym2151 = 0;
 	for (i = 0; i < MAX_SOUND; i++)
-		if (Machine->config->sound[i].type == SOUND_YM2151)
+		if (machine->config->sound[i].type == SOUND_YM2151)
 			has_ym2151 = 1;
 
 	/* allocate separate streams for the DMA and non-DMA DACs */
@@ -521,35 +522,36 @@ void *leland_80186_sh_start(int clock, const custom_sound_interface *config)
 	/* if we have a 2151, install an externally driven DAC stream */
 	if (has_ym2151)
 	{
-		ext_base = memory_region(Machine, "dac");
+		ext_base = memory_region(machine, "dac");
 		extern_stream = stream_create(0, 1, OUTPUT_RATE, NULL, leland_80186_extern_update);
 	}
 
-	/* by default, we're not redline racer */
-	is_redline = 0;
-
 	/* create timers here so they stick around */
-	i80186.timer[0].int_timer = timer_alloc(Machine, internal_timer_int, NULL);
-	i80186.timer[1].int_timer = timer_alloc(Machine, internal_timer_int, NULL);
-	i80186.timer[2].int_timer = timer_alloc(Machine, internal_timer_int, NULL);
-	i80186.timer[0].time_timer = timer_alloc(Machine, NULL, NULL);
-	i80186.timer[1].time_timer = timer_alloc(Machine, NULL, NULL);
-	i80186.timer[2].time_timer = timer_alloc(Machine, NULL, NULL);
-	i80186.dma[0].finish_timer = timer_alloc(Machine, dma_timer_callback, NULL);
-	i80186.dma[1].finish_timer = timer_alloc(Machine, dma_timer_callback, NULL);
+	i80186.timer[0].int_timer = timer_alloc(machine, internal_timer_int, NULL);
+	i80186.timer[1].int_timer = timer_alloc(machine, internal_timer_int, NULL);
+	i80186.timer[2].int_timer = timer_alloc(machine, internal_timer_int, NULL);
+	i80186.timer[0].time_timer = timer_alloc(machine, NULL, NULL);
+	i80186.timer[1].time_timer = timer_alloc(machine, NULL, NULL);
+	i80186.timer[2].time_timer = timer_alloc(machine, NULL, NULL);
+	i80186.dma[0].finish_timer = timer_alloc(machine, dma_timer_callback, NULL);
+	i80186.dma[1].finish_timer = timer_alloc(machine, dma_timer_callback, NULL);
 
 	for (i = 0; i < 9; i++)
-		counter[i].timer = timer_alloc(Machine, NULL, NULL);
+		counter[i].timer = timer_alloc(machine, NULL, NULL);
 
 	return auto_malloc(1);
 }
 
-
-void *redline_80186_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( leland_80186_sh_start )
 {
-	void *result = leland_80186_sh_start(clock, config);
+	is_redline = 0;
+	return common_sh_start(clock, config);
+}
+
+CUSTOM_START( redline_80186_sh_start )
+{
 	is_redline = 1;
-	return result;
+	return common_sh_start(clock, config);
 }
 
 
@@ -647,7 +649,7 @@ static IRQ_CALLBACK(int_callback)
 }
 
 
-static void update_interrupt_state(void)
+static void update_interrupt_state(running_machine *machine)
 {
 	int i, j, new_vector = 0;
 
@@ -726,9 +728,9 @@ generate_int:
 	/* generate the appropriate interrupt */
 	i80186.intr.poll_status = 0x8000 | new_vector;
 	if (!i80186.intr.pending)
-		cpu_set_input_line(Machine->cpu[2], 0, ASSERT_LINE);
+		cpu_set_input_line(machine->cpu[2], 0, ASSERT_LINE);
 	i80186.intr.pending = 1;
-	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time(Machine)), new_vector);
+	if (LOG_INTERRUPTS) logerror("(%f) **** Requesting interrupt vector %02X\n", attotime_to_double(timer_get_time(machine)), new_vector);
 }
 
 
@@ -813,7 +815,7 @@ static TIMER_CALLBACK( internal_timer_int )
 	if (t->control & 0x2000)
 	{
 		i80186.intr.status |= 0x01 << which;
-		update_interrupt_state();
+		update_interrupt_state(machine);
 		if (LOG_TIMER) logerror("  Generating timer interrupt\n");
 	}
 
@@ -1011,7 +1013,7 @@ static TIMER_CALLBACK( dma_timer_callback )
 	{
 		if (LOG_DMA) logerror("DMA%d timer callback - requesting interrupt: count = %04X, source = %04X\n", which, d->count, d->source);
 		i80186.intr.request |= 0x04 << which;
-		update_interrupt_state();
+		update_interrupt_state(machine);
 	}
 }
 
@@ -1281,7 +1283,7 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 		case 0x22/2:
 			if (LOG_PORTS) logerror("%05X:80186 EOI = %04X & %04X\n", cpu_get_pc(space->cpu), data, mem_mask);
 			handle_eoi(space->machine, 0x8000);
-			update_interrupt_state();
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x24/2:
@@ -1301,32 +1303,32 @@ static WRITE16_HANDLER( i80186_internal_port_w )
 			i80186.intr.ext[1] = (i80186.intr.ext[1] & ~0x08) | ((data >> 2) & 0x08);
 			i80186.intr.ext[2] = (i80186.intr.ext[2] & ~0x08) | ((data >> 3) & 0x08);
 			i80186.intr.ext[3] = (i80186.intr.ext[3] & ~0x08) | ((data >> 4) & 0x08);
-			update_interrupt_state();
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x2a/2:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt priority mask = %04X & %04X\n", cpu_get_pc(space->cpu), data, mem_mask);
 			i80186.intr.priority_mask = data & 0x0007;
-			update_interrupt_state();
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x2c/2:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt in-service = %04X & %04X\n", cpu_get_pc(space->cpu), data, mem_mask);
 			i80186.intr.in_service = data & 0x00ff;
-			update_interrupt_state();
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x2e/2:
 			if (LOG_PORTS) logerror("%05X:80186 interrupt request = %04X & %04X\n", cpu_get_pc(space->cpu), data, mem_mask);
 			i80186.intr.request = (i80186.intr.request & ~0x00c0) | (data & 0x00c0);
-			update_interrupt_state();
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x30/2:
 			if (LOG_PORTS) logerror("%05X:WARNING - wrote to 80186 interrupt status = %04X & %04X\n", cpu_get_pc(space->cpu), data, mem_mask);
 			i80186.intr.status = (i80186.intr.status & ~0x8000) | (data & 0x8000);
 			i80186.intr.status = (i80186.intr.status & ~0x0007) | (data & 0x0007);
-			update_interrupt_state();
+			update_interrupt_state(space->machine);
 			break;
 
 		case 0x32/2:
@@ -1695,7 +1697,7 @@ WRITE8_HANDLER( leland_80186_control_w )
 	if ((diff & 0x80) && (data & 0x80))
 		leland_80186_reset();
 
-	update_interrupt_state();
+	update_interrupt_state(space->machine);
 }
 
 

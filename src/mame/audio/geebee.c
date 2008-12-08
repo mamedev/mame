@@ -9,7 +9,6 @@
 
 #include <math.h>
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "sound/custom.h"
 #include "includes/warpwarp.h"
@@ -113,8 +112,9 @@ static void geebee_sound_update(void *param, stream_sample_t **inputs, stream_sa
     }
 }
 
-void *geebee_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( geebee_sh_start )
 {
+	running_machine *machine = device->machine;
 	int i;
 
 	decay = (UINT16 *)auto_malloc(32768 * sizeof(INT16));
@@ -126,6 +126,6 @@ void *geebee_sh_start(int clock, const custom_sound_interface *config)
 	channel = stream_create(0, 1, 18432000 / 3 / 2 / 384, NULL, geebee_sound_update);
 	vcount = 0;
 
-	volume_timer = timer_alloc(Machine, volume_decay, NULL);
+	volume_timer = timer_alloc(machine, volume_decay, NULL);
     return auto_malloc(1);
 }

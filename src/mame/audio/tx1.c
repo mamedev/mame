@@ -270,16 +270,17 @@ static void tx1_stream_update(void *param, stream_sample_t **inputs, stream_samp
 }
 
 
-void *tx1_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( tx1_sh_start )
 {
+	running_machine *machine = device->machine;
 	static const int r0[4] = { 390e3, 180e3, 180e3, 180e3 };
 	static const int r1[3] = { 180e3, 390e3, 56e3 };
 	static const int r2[3] = { 390e3, 390e3, 180e3 };
 
 
 	/* Allocate the stream */
-	stream = stream_create(0, 2, Machine->sample_rate, NULL, tx1_stream_update);
-	freq_to_step = (double)(1 << TX1_FRAC) / (double)Machine->sample_rate;
+	stream = stream_create(0, 2, machine->sample_rate, NULL, tx1_stream_update);
+	freq_to_step = (double)(1 << TX1_FRAC) / (double)machine->sample_rate;
 
 	/* Compute the engine resistor weights */
 	compute_resistor_weights(0,	10000, -1.0,
@@ -290,7 +291,7 @@ void *tx1_sh_start(int clock, const custom_sound_interface *config)
 	return auto_malloc(1);
 }
 
-void tx1_sh_reset(void *token)
+CUSTOM_RESET( tx1_sh_reset )
 {
 	step0 = step1 = step2 = 0;
 }
@@ -491,8 +492,9 @@ static void buggyboy_stream_update(void *param, stream_sample_t **inputs, stream
 	}
 }
 
-void *buggyboy_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( buggyboy_sh_start )
 {
+	running_machine *machine = device->machine;
 	static const int resistors[4] = { 330000, 220000, 330000, 220000 };
 	double aweights[4];
 	int i;
@@ -510,13 +512,13 @@ void *buggyboy_sh_start(int clock, const custom_sound_interface *config)
 		buggyboy_eng_voltages[i] = combine_4_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
-	stream = stream_create(0, 2, Machine->sample_rate, NULL, buggyboy_stream_update);
-	freq_to_step = (double)(1 << 24) / (double)Machine->sample_rate;
+	stream = stream_create(0, 2, machine->sample_rate, NULL, buggyboy_stream_update);
+	freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
 
 	return auto_malloc(1);
 }
 
-void buggyboy_sh_reset(void *token)
+CUSTOM_RESET( buggyboy_sh_reset )
 {
 	step0 = step1 = 0;
 

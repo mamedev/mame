@@ -32,7 +32,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "streams.h"
 #include "includes/tiamc1.h"
 
@@ -281,8 +280,9 @@ static void tiamc1_sound_update(void *param, stream_sample_t **inputs, stream_sa
 	}
 }
 
-void *tiamc1_sh_start(int clock, const custom_sound_interface *config)
+CUSTOM_START( tiamc1_sh_start )
 {
+	running_machine *machine = device->machine;
 	int i, j;
 
 	timer8253_reset(&timer0);
@@ -296,19 +296,19 @@ void *tiamc1_sh_start(int clock, const custom_sound_interface *config)
 		struct timer8253struct *t = (i ? &timer1 : &timer0);
 
 		for (j = 0; j < 3; j++) {
-			state_save_register_item(Machine, "channel", NULL, i * 3 + j, t->channel[j].count);
-			state_save_register_item(Machine, "channel", NULL, i * 3 + j, t->channel[j].cnval);
-			state_save_register_item(Machine, "channel", NULL, i * 3 + j, t->channel[j].bcdMode);
-			state_save_register_item(Machine, "channel", NULL, i * 3 + j, t->channel[j].cntMode);
-			state_save_register_item(Machine, "channel", NULL, i * 3 + j, t->channel[j].valMode);
-			state_save_register_item(Machine, "channel", NULL, i * 3 + j, t->channel[j].gate);
-			state_save_register_item(Machine, "channel", NULL, i * 3 + j, t->channel[j].output);
-			state_save_register_item(Machine, "channel", NULL, i * 3 + j, t->channel[j].loadCnt);
-			state_save_register_item(Machine, "channel", NULL, i * 3 + j, t->channel[j].enable);
+			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].count);
+			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].cnval);
+			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].bcdMode);
+			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].cntMode);
+			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].valMode);
+			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].gate);
+			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].output);
+			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].loadCnt);
+			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].enable);
 		}
 	}
 
-	state_save_register_global(Machine, timer1_divider);
+	state_save_register_global(machine, timer1_divider);
 
 	return channel;
 }

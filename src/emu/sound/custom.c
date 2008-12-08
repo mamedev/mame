@@ -21,7 +21,7 @@ static SND_START( custom )
 	info->intf = config;
 	if (info->intf->start)
 	{
-		info->token = (*info->intf->start)(clock, config);
+		info->token = (*info->intf->start)(device, clock, config);
 		if (!info->token)
 			return NULL;
 	}
