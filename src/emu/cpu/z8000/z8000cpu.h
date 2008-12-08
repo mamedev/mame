@@ -21,38 +21,61 @@
  *
  *****************************************************************************/
 
-/* pointers to the registers inside the Z8000_Regs struct Z */
-#define RB(n)   (*pRB[n])
-#define RW(n)   (*pRW[n])
-#define RL(n)   (*pRL[n])
-#define RQ(n)   (*pRQ[n])
+/**************************************************************************
+ * This is the register file layout:
+ *
+ * BYTE        WORD         LONG           QUAD
+ * msb   lsb       bits           bits           bits
+ * RH0 - RL0   R 0 15- 0    RR 0  31-16    RQ 0  63-48
+ * RH1 - RL1   R 1 15- 0          15- 0          47-32
+ * RH2 - RL2   R 2 15- 0    RR 2  31-16          31-16
+ * RH3 - RL3   R 3 15- 0          15- 0          15- 0
+ * RH4 - RL4   R 4 15- 0    RR 4  31-16    RQ 4  63-48
+ * RH5 - RL5   R 5 15- 0          15- 0          47-32
+ * RH6 - RL6   R 6 15- 0    RR 6  31-16          31-16
+ * RH7 - RL7   R 7 15- 0          15- 0          15- 0
+ *             R 8 15- 0    RR 8  31-16    RQ 8  63-48
+ *             R 9 15- 0          15- 0          47-32
+ *             R10 15- 0    RR10  31-16          31-16
+ *             R11 15- 0          15- 0          15- 0
+ *             R12 15- 0    RR12  31-16    RQ12  63-48
+ *             R13 15- 0          15- 0          47-32
+ *             R14 15- 0    RR14  31-16          31-16
+ *             R15 15- 0          15- 0          15- 0
+ *
+ * Note that for LSB_FIRST machines we have the case that the RR registers
+ * use the lower numbered R registers in the higher bit positions.
+ * And also the RQ registers use the lower numbered RR registers in the
+ * higher bit positions.
+ * That's the reason for the ordering in the following pointer table.
+ **************************************************************************/
+#ifdef LSB_FIRST
+#define RB(n)   regs.B[((((n) & 7) << 1) | (((n) & 8) >> 3)) ^ 7]
+#define RW(n)   regs.W[(n) ^ 3]
+#define RL(n)   regs.L[((n) >> 1) ^ 1]
+#define RQ(n)   regs.Q[((n) >> 2)]
+#else
+#define RB(n)   regs.B[(((n) & 7) << 1) | (((n) & 8) >> 3)]
+#define RW(n)   regs.W[(n)]
+#define RL(n)   regs.L[((n) >> 1)]
+#define RQ(n)   regs.Q[((n) >> 2)]
+#endif
 
 /* the register used as stack pointer */
 #define SP      15
 
-/* programm status */
-#define PPC     Z.ppc
-#define PC		Z.pc
-#define PSAP    Z.psap
-#define FCW     Z.fcw
-#define REFRESH Z.refresh
-#define NSP 	Z.nsp
-#define IRQ_REQ Z.irq_req
-#define IRQ_SRV Z.irq_srv
-#define IRQ_VEC Z.irq_vec
+/* these vectors are based on cpustate->psap */
+#define RST 	(cpustate->psap + 0x0000)	/* start up cpustate->fcw and cpustate->pc */
+#define EPU 	(cpustate->psap + 0x0004)	/* extension processor unit? trap */
+#define TRAP	(cpustate->psap + 0x0008)	/* privilege violation trap */
+#define SYSCALL (cpustate->psap + 0x000c)	/* system call SC */
+#define SEGTRAP (cpustate->psap + 0x0010)	/* segment trap */
+#define NMI 	(cpustate->psap + 0x0014)	/* non maskable interrupt */
+#define NVI 	(cpustate->psap + 0x0018)	/* non vectored interrupt */
+#define VI		(cpustate->psap + 0x001c)	/* vectored interrupt */
+#define VEC00	(cpustate->psap + 0x001e)	/* vector n cpustate->pc value */
 
-/* these vectors are based on PSAP */
-#define RST 	(Z.psap + 0x0000)	/* start up FCW and PC */
-#define EPU 	(Z.psap + 0x0004)	/* extension processor unit? trap */
-#define TRAP	(Z.psap + 0x0008)	/* privilege violation trap */
-#define SYSCALL (Z.psap + 0x000c)	/* system call SC */
-#define SEGTRAP (Z.psap + 0x0010)	/* segment trap */
-#define NMI 	(Z.psap + 0x0014)	/* non maskable interrupt */
-#define NVI 	(Z.psap + 0x0018)	/* non vectored interrupt */
-#define VI		(Z.psap + 0x001c)	/* vectored interrupt */
-#define VEC00	(Z.psap + 0x001e)	/* vector n PC value */
-
-/* bits of the FCW */
+/* bits of the cpustate->fcw */
 #define F_SEG	0x8000				/* segmented mode (Z8001 only) */
 #define F_S_N	0x4000				/* system / normal mode */
 #define F_EPU	0x2000				/* extension processor unit? */
@@ -70,7 +93,7 @@
 #define F_1 	0x0002				/* unused */
 #define F_0 	0x0001				/* unused */
 
-/* opcode word numbers in Z.op[] array */
+/* opcode word numbers in cpustate->op[] array */
 #define OP0 	0
 #define OP1     1
 #define OP2     2
@@ -88,42 +111,42 @@
 #define S32 0x80000000
 
 /* get a single flag bit 0/1 */
-#define GET_C       ((FCW >> 7) & 1)
-#define GET_Z		((FCW >> 6) & 1)
-#define GET_S		((FCW >> 5) & 1)
-#define GET_PV		((FCW >> 4) & 1)
-#define GET_DA		((FCW >> 3) & 1)
-#define GET_H		((FCW >> 2) & 1)
+#define GET_C       ((cpustate->fcw >> 7) & 1)
+#define GET_Z		((cpustate->fcw >> 6) & 1)
+#define GET_S		((cpustate->fcw >> 5) & 1)
+#define GET_PV		((cpustate->fcw >> 4) & 1)
+#define GET_DA		((cpustate->fcw >> 3) & 1)
+#define GET_H		((cpustate->fcw >> 2) & 1)
 
 /* clear a single flag bit */
-#define CLR_C       FCW &= ~F_C
-#define CLR_Z		FCW &= ~F_Z
-#define CLR_S		FCW &= ~F_S
-#define CLR_P		FCW &= ~F_PV
-#define CLR_V		FCW &= ~F_PV
-#define CLR_DA		FCW &= ~F_DA
-#define CLR_H		FCW &= ~F_H
+#define CLR_C       cpustate->fcw &= ~F_C
+#define CLR_Z		cpustate->fcw &= ~F_Z
+#define CLR_S		cpustate->fcw &= ~F_S
+#define CLR_P		cpustate->fcw &= ~F_PV
+#define CLR_V		cpustate->fcw &= ~F_PV
+#define CLR_DA		cpustate->fcw &= ~F_DA
+#define CLR_H		cpustate->fcw &= ~F_H
 
 /* clear a flag bit combination */
-#define CLR_CZS     FCW &= ~(F_C|F_Z|F_S)
-#define CLR_CZSP	FCW &= ~(F_C|F_Z|F_S|F_PV)
-#define CLR_CZSV	FCW &= ~(F_C|F_Z|F_S|F_PV)
-#define CLR_CZSVH	FCW &= ~(F_C|F_Z|F_S|F_PV|F_H)
-#define CLR_ZS		FCW &= ~(F_Z|F_S)
-#define CLR_ZSV 	FCW &= ~(F_Z|F_S|F_PV)
-#define CLR_ZSP 	FCW &= ~(F_Z|F_S|F_PV)
+#define CLR_CZS     cpustate->fcw &= ~(F_C|F_Z|F_S)
+#define CLR_CZSP	cpustate->fcw &= ~(F_C|F_Z|F_S|F_PV)
+#define CLR_CZSV	cpustate->fcw &= ~(F_C|F_Z|F_S|F_PV)
+#define CLR_CZSVH	cpustate->fcw &= ~(F_C|F_Z|F_S|F_PV|F_H)
+#define CLR_ZS		cpustate->fcw &= ~(F_Z|F_S)
+#define CLR_ZSV 	cpustate->fcw &= ~(F_Z|F_S|F_PV)
+#define CLR_ZSP 	cpustate->fcw &= ~(F_Z|F_S|F_PV)
 
 /* set a single flag bit */
-#define SET_C       FCW |= F_C
-#define SET_Z		FCW |= F_Z
-#define SET_S		FCW |= F_S
-#define SET_P		FCW |= F_PV
-#define SET_V		FCW |= F_PV
-#define SET_DA		FCW |= F_DA
-#define SET_H		FCW |= F_H
+#define SET_C       cpustate->fcw |= F_C
+#define SET_Z		cpustate->fcw |= F_Z
+#define SET_S		cpustate->fcw |= F_S
+#define SET_P		cpustate->fcw |= F_PV
+#define SET_V		cpustate->fcw |= F_PV
+#define SET_DA		cpustate->fcw |= F_DA
+#define SET_H		cpustate->fcw |= F_H
 
 /* set a flag bit combination */
-#define SET_SC      FCW |= F_C | F_S
+#define SET_SC      cpustate->fcw |= F_C | F_S
 
 /* check condition codes */
 #define CC0 (0) 						/* always false */
@@ -147,41 +170,41 @@
 /* get data from the opcode words */
 /* o is the opcode word offset    */
 /* s is a nibble shift factor     */
-#define GET_BIT(o)      UINT16 bit = 1 << (Z.op[o] & 15)
-#define GET_CCC(o,s)	UINT8 cc = (Z.op[o] >> (s)) & 15
+#define GET_BIT(o)      UINT16 bit = 1 << (cpustate->op[o] & 15)
+#define GET_CCC(o,s)	UINT8 cc = (cpustate->op[o] >> (s)) & 15
 
-#define GET_DST(o,s)	UINT8 dst = (Z.op[o] >> (s)) & 15
-#define GET_SRC(o,s)	UINT8 src = (Z.op[o] >> (s)) & 15
-#define GET_IDX(o,s)	UINT8 idx = (Z.op[o] >> (s)) & 15
-#define GET_CNT(o,s)	INT8 cnt = (Z.op[o] >> (s)) & 15
-#define GET_IMM4(o,s)	UINT8 imm4 = (Z.op[o] >> (s)) & 15
+#define GET_DST(o,s)	UINT8 dst = (cpustate->op[o] >> (s)) & 15
+#define GET_SRC(o,s)	UINT8 src = (cpustate->op[o] >> (s)) & 15
+#define GET_IDX(o,s)	UINT8 idx = (cpustate->op[o] >> (s)) & 15
+#define GET_CNT(o,s)	INT8 cnt = (cpustate->op[o] >> (s)) & 15
+#define GET_IMM4(o,s)	UINT8 imm4 = (cpustate->op[o] >> (s)) & 15
 
-#define GET_I4M1(o,s)	UINT8 i4p1 = ((Z.op[o] >> (s)) & 15) + 1
-#define GET_IMM1(o,s)	UINT8 imm1 = (Z.op[o] >> (s)) & 2
-#define GET_IMM2(o,s)	UINT8 imm2 = (Z.op[o] >> (s)) & 3
-#define GET_IMM3(o,s)	UINT8 imm3 = (Z.op[o] >> (s)) & 7
+#define GET_I4M1(o,s)	UINT8 i4p1 = ((cpustate->op[o] >> (s)) & 15) + 1
+#define GET_IMM1(o,s)	UINT8 imm1 = (cpustate->op[o] >> (s)) & 2
+#define GET_IMM2(o,s)	UINT8 imm2 = (cpustate->op[o] >> (s)) & 3
+#define GET_IMM3(o,s)	UINT8 imm3 = (cpustate->op[o] >> (s)) & 7
 
-#define GET_IMM8(o) 	UINT8 imm8 = (UINT8)Z.op[o]
+#define GET_IMM8(o) 	UINT8 imm8 = (UINT8)cpustate->op[o]
 
-#define GET_IMM16(o)	UINT16 imm16 = Z.op[o]
-#define GET_IMM32		UINT32 imm32 = Z.op[2] + (Z.op[1] << 16)
-#define GET_DSP7		UINT8 dsp7 = Z.op[0] & 127
-#define GET_DSP8		INT8 dsp8 = (INT8)Z.op[0]
-#define GET_DSP16		UINT16 dsp16 = PC + (INT16)Z.op[1]
-#define GET_ADDR(o) 	UINT16 addr = (UINT16)Z.op[o]
+#define GET_IMM16(o)	UINT16 imm16 = cpustate->op[o]
+#define GET_IMM32		UINT32 imm32 = cpustate->op[2] + (cpustate->op[1] << 16)
+#define GET_DSP7		UINT8 dsp7 = cpustate->op[0] & 127
+#define GET_DSP8		INT8 dsp8 = (INT8)cpustate->op[0]
+#define GET_DSP16		UINT16 dsp16 = cpustate->pc + (INT16)cpustate->op[1]
+#define GET_ADDR(o) 	UINT16 addr = (UINT16)cpustate->op[o]
 
 /* structure for the opcode definition table */
 typedef struct {
 	int 	beg, end, step;
 	int 	size, cycles;
-	void	(*opcode)(void);
+	void	(*opcode)(z8000_state *cpustate);
 	const char	*dasm;
     UINT32 dasmflags;
 }	Z8000_init;
 
 /* structure for the opcode execution table / disassembler */
 typedef struct {
-    void    (*opcode)(void);
+    void    (*opcode)(z8000_state *cpustate);
     int     cycles;
 	int 	size;
     const char    *dasm;
@@ -191,6 +214,6 @@ typedef struct {
 /* opcode execution table */
 extern Z8000_exec *z8000_exec;
 
-extern CPU_INIT( z8000 );
-extern void z8000_deinit(void);
+extern void z8000_init_tables(void);
+extern void z8000_deinit_tables(void);
 

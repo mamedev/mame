@@ -535,20 +535,11 @@ static const Z8000_init table[] = {
 {0, 	0,	   0,	0,	0,0,									 0},
 };
 
-CPU_INIT( z8000 )
+void z8000_init_tables(void)
 {
-    int i;
 	const Z8000_init *init;
-
-	Z.irq_callback = irqcallback;
-	Z.device = device;
-	Z.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
-	Z.io = memory_find_address_space(device, ADDRESS_SPACE_IO);
-
-	/* already initialized? */
-	if( z8000_exec )
-		return;
-
+	int i;
+	
 	/* allocate the opcode execution and disassembler array */
 	z8000_exec = (Z8000_exec *)malloc(0x10000 * sizeof(Z8000_exec));
 	if( !z8000_exec )
@@ -589,7 +580,7 @@ CPU_INIT( z8000 )
 	}
 }
 
-void z8000_deinit(void)
+void z8000_deinit_tables(void)
 {
 	if( !z8000_exec )
 		return;
