@@ -770,7 +770,6 @@ static TIMER_CALLBACK(m6800_rx_tick)
 					// start bit found
 					cpustate->rxbits++;
 				}
-				cpu_pop_context();
 				break;
 
 			case M6800_SERIAL_STOP:
