@@ -153,74 +153,74 @@ static const UINT8 *cc[6] = { cc_op, cc_cb, cc_ed, cc_xy, cc_xycb, cc_ex };
 #define Z180_TABLE_dd	 Z180_TABLE_xy
 #define Z180_TABLE_fd	 Z180_TABLE_xy
 
-static void take_interrupt(int irqline);
+static void take_interrupt(z180_state *cpustate, int irqline);
 
 #define PROTOTYPES(tablename,prefix) \
-	INLINE void prefix##_00(void); INLINE void prefix##_01(void); INLINE void prefix##_02(void); INLINE void prefix##_03(void); \
-	INLINE void prefix##_04(void); INLINE void prefix##_05(void); INLINE void prefix##_06(void); INLINE void prefix##_07(void); \
-	INLINE void prefix##_08(void); INLINE void prefix##_09(void); INLINE void prefix##_0a(void); INLINE void prefix##_0b(void); \
-	INLINE void prefix##_0c(void); INLINE void prefix##_0d(void); INLINE void prefix##_0e(void); INLINE void prefix##_0f(void); \
-	INLINE void prefix##_10(void); INLINE void prefix##_11(void); INLINE void prefix##_12(void); INLINE void prefix##_13(void); \
-	INLINE void prefix##_14(void); INLINE void prefix##_15(void); INLINE void prefix##_16(void); INLINE void prefix##_17(void); \
-	INLINE void prefix##_18(void); INLINE void prefix##_19(void); INLINE void prefix##_1a(void); INLINE void prefix##_1b(void); \
-	INLINE void prefix##_1c(void); INLINE void prefix##_1d(void); INLINE void prefix##_1e(void); INLINE void prefix##_1f(void); \
-	INLINE void prefix##_20(void); INLINE void prefix##_21(void); INLINE void prefix##_22(void); INLINE void prefix##_23(void); \
-	INLINE void prefix##_24(void); INLINE void prefix##_25(void); INLINE void prefix##_26(void); INLINE void prefix##_27(void); \
-	INLINE void prefix##_28(void); INLINE void prefix##_29(void); INLINE void prefix##_2a(void); INLINE void prefix##_2b(void); \
-	INLINE void prefix##_2c(void); INLINE void prefix##_2d(void); INLINE void prefix##_2e(void); INLINE void prefix##_2f(void); \
-	INLINE void prefix##_30(void); INLINE void prefix##_31(void); INLINE void prefix##_32(void); INLINE void prefix##_33(void); \
-	INLINE void prefix##_34(void); INLINE void prefix##_35(void); INLINE void prefix##_36(void); INLINE void prefix##_37(void); \
-	INLINE void prefix##_38(void); INLINE void prefix##_39(void); INLINE void prefix##_3a(void); INLINE void prefix##_3b(void); \
-	INLINE void prefix##_3c(void); INLINE void prefix##_3d(void); INLINE void prefix##_3e(void); INLINE void prefix##_3f(void); \
-	INLINE void prefix##_40(void); INLINE void prefix##_41(void); INLINE void prefix##_42(void); INLINE void prefix##_43(void); \
-	INLINE void prefix##_44(void); INLINE void prefix##_45(void); INLINE void prefix##_46(void); INLINE void prefix##_47(void); \
-	INLINE void prefix##_48(void); INLINE void prefix##_49(void); INLINE void prefix##_4a(void); INLINE void prefix##_4b(void); \
-	INLINE void prefix##_4c(void); INLINE void prefix##_4d(void); INLINE void prefix##_4e(void); INLINE void prefix##_4f(void); \
-	INLINE void prefix##_50(void); INLINE void prefix##_51(void); INLINE void prefix##_52(void); INLINE void prefix##_53(void); \
-	INLINE void prefix##_54(void); INLINE void prefix##_55(void); INLINE void prefix##_56(void); INLINE void prefix##_57(void); \
-	INLINE void prefix##_58(void); INLINE void prefix##_59(void); INLINE void prefix##_5a(void); INLINE void prefix##_5b(void); \
-	INLINE void prefix##_5c(void); INLINE void prefix##_5d(void); INLINE void prefix##_5e(void); INLINE void prefix##_5f(void); \
-	INLINE void prefix##_60(void); INLINE void prefix##_61(void); INLINE void prefix##_62(void); INLINE void prefix##_63(void); \
-	INLINE void prefix##_64(void); INLINE void prefix##_65(void); INLINE void prefix##_66(void); INLINE void prefix##_67(void); \
-	INLINE void prefix##_68(void); INLINE void prefix##_69(void); INLINE void prefix##_6a(void); INLINE void prefix##_6b(void); \
-	INLINE void prefix##_6c(void); INLINE void prefix##_6d(void); INLINE void prefix##_6e(void); INLINE void prefix##_6f(void); \
-	INLINE void prefix##_70(void); INLINE void prefix##_71(void); INLINE void prefix##_72(void); INLINE void prefix##_73(void); \
-	INLINE void prefix##_74(void); INLINE void prefix##_75(void); INLINE void prefix##_76(void); INLINE void prefix##_77(void); \
-	INLINE void prefix##_78(void); INLINE void prefix##_79(void); INLINE void prefix##_7a(void); INLINE void prefix##_7b(void); \
-	INLINE void prefix##_7c(void); INLINE void prefix##_7d(void); INLINE void prefix##_7e(void); INLINE void prefix##_7f(void); \
-	INLINE void prefix##_80(void); INLINE void prefix##_81(void); INLINE void prefix##_82(void); INLINE void prefix##_83(void); \
-	INLINE void prefix##_84(void); INLINE void prefix##_85(void); INLINE void prefix##_86(void); INLINE void prefix##_87(void); \
-	INLINE void prefix##_88(void); INLINE void prefix##_89(void); INLINE void prefix##_8a(void); INLINE void prefix##_8b(void); \
-	INLINE void prefix##_8c(void); INLINE void prefix##_8d(void); INLINE void prefix##_8e(void); INLINE void prefix##_8f(void); \
-	INLINE void prefix##_90(void); INLINE void prefix##_91(void); INLINE void prefix##_92(void); INLINE void prefix##_93(void); \
-	INLINE void prefix##_94(void); INLINE void prefix##_95(void); INLINE void prefix##_96(void); INLINE void prefix##_97(void); \
-	INLINE void prefix##_98(void); INLINE void prefix##_99(void); INLINE void prefix##_9a(void); INLINE void prefix##_9b(void); \
-	INLINE void prefix##_9c(void); INLINE void prefix##_9d(void); INLINE void prefix##_9e(void); INLINE void prefix##_9f(void); \
-	INLINE void prefix##_a0(void); INLINE void prefix##_a1(void); INLINE void prefix##_a2(void); INLINE void prefix##_a3(void); \
-	INLINE void prefix##_a4(void); INLINE void prefix##_a5(void); INLINE void prefix##_a6(void); INLINE void prefix##_a7(void); \
-	INLINE void prefix##_a8(void); INLINE void prefix##_a9(void); INLINE void prefix##_aa(void); INLINE void prefix##_ab(void); \
-	INLINE void prefix##_ac(void); INLINE void prefix##_ad(void); INLINE void prefix##_ae(void); INLINE void prefix##_af(void); \
-	INLINE void prefix##_b0(void); INLINE void prefix##_b1(void); INLINE void prefix##_b2(void); INLINE void prefix##_b3(void); \
-	INLINE void prefix##_b4(void); INLINE void prefix##_b5(void); INLINE void prefix##_b6(void); INLINE void prefix##_b7(void); \
-	INLINE void prefix##_b8(void); INLINE void prefix##_b9(void); INLINE void prefix##_ba(void); INLINE void prefix##_bb(void); \
-	INLINE void prefix##_bc(void); INLINE void prefix##_bd(void); INLINE void prefix##_be(void); INLINE void prefix##_bf(void); \
-	INLINE void prefix##_c0(void); INLINE void prefix##_c1(void); INLINE void prefix##_c2(void); INLINE void prefix##_c3(void); \
-	INLINE void prefix##_c4(void); INLINE void prefix##_c5(void); INLINE void prefix##_c6(void); INLINE void prefix##_c7(void); \
-	INLINE void prefix##_c8(void); INLINE void prefix##_c9(void); INLINE void prefix##_ca(void); INLINE void prefix##_cb(void); \
-	INLINE void prefix##_cc(void); INLINE void prefix##_cd(void); INLINE void prefix##_ce(void); INLINE void prefix##_cf(void); \
-	INLINE void prefix##_d0(void); INLINE void prefix##_d1(void); INLINE void prefix##_d2(void); INLINE void prefix##_d3(void); \
-	INLINE void prefix##_d4(void); INLINE void prefix##_d5(void); INLINE void prefix##_d6(void); INLINE void prefix##_d7(void); \
-	INLINE void prefix##_d8(void); INLINE void prefix##_d9(void); INLINE void prefix##_da(void); INLINE void prefix##_db(void); \
-	INLINE void prefix##_dc(void); INLINE void prefix##_dd(void); INLINE void prefix##_de(void); INLINE void prefix##_df(void); \
-	INLINE void prefix##_e0(void); INLINE void prefix##_e1(void); INLINE void prefix##_e2(void); INLINE void prefix##_e3(void); \
-	INLINE void prefix##_e4(void); INLINE void prefix##_e5(void); INLINE void prefix##_e6(void); INLINE void prefix##_e7(void); \
-	INLINE void prefix##_e8(void); INLINE void prefix##_e9(void); INLINE void prefix##_ea(void); INLINE void prefix##_eb(void); \
-	INLINE void prefix##_ec(void); INLINE void prefix##_ed(void); INLINE void prefix##_ee(void); INLINE void prefix##_ef(void); \
-	INLINE void prefix##_f0(void); INLINE void prefix##_f1(void); INLINE void prefix##_f2(void); INLINE void prefix##_f3(void); \
-	INLINE void prefix##_f4(void); INLINE void prefix##_f5(void); INLINE void prefix##_f6(void); INLINE void prefix##_f7(void); \
-	INLINE void prefix##_f8(void); INLINE void prefix##_f9(void); INLINE void prefix##_fa(void); INLINE void prefix##_fb(void); \
-	INLINE void prefix##_fc(void); INLINE void prefix##_fd(void); INLINE void prefix##_fe(void); INLINE void prefix##_ff(void); \
-static void (*const tablename[0x100])(void) = {	\
+	INLINE void prefix##_00(z180_state *cpustate); INLINE void prefix##_01(z180_state *cpustate); INLINE void prefix##_02(z180_state *cpustate); INLINE void prefix##_03(z180_state *cpustate); \
+	INLINE void prefix##_04(z180_state *cpustate); INLINE void prefix##_05(z180_state *cpustate); INLINE void prefix##_06(z180_state *cpustate); INLINE void prefix##_07(z180_state *cpustate); \
+	INLINE void prefix##_08(z180_state *cpustate); INLINE void prefix##_09(z180_state *cpustate); INLINE void prefix##_0a(z180_state *cpustate); INLINE void prefix##_0b(z180_state *cpustate); \
+	INLINE void prefix##_0c(z180_state *cpustate); INLINE void prefix##_0d(z180_state *cpustate); INLINE void prefix##_0e(z180_state *cpustate); INLINE void prefix##_0f(z180_state *cpustate); \
+	INLINE void prefix##_10(z180_state *cpustate); INLINE void prefix##_11(z180_state *cpustate); INLINE void prefix##_12(z180_state *cpustate); INLINE void prefix##_13(z180_state *cpustate); \
+	INLINE void prefix##_14(z180_state *cpustate); INLINE void prefix##_15(z180_state *cpustate); INLINE void prefix##_16(z180_state *cpustate); INLINE void prefix##_17(z180_state *cpustate); \
+	INLINE void prefix##_18(z180_state *cpustate); INLINE void prefix##_19(z180_state *cpustate); INLINE void prefix##_1a(z180_state *cpustate); INLINE void prefix##_1b(z180_state *cpustate); \
+	INLINE void prefix##_1c(z180_state *cpustate); INLINE void prefix##_1d(z180_state *cpustate); INLINE void prefix##_1e(z180_state *cpustate); INLINE void prefix##_1f(z180_state *cpustate); \
+	INLINE void prefix##_20(z180_state *cpustate); INLINE void prefix##_21(z180_state *cpustate); INLINE void prefix##_22(z180_state *cpustate); INLINE void prefix##_23(z180_state *cpustate); \
+	INLINE void prefix##_24(z180_state *cpustate); INLINE void prefix##_25(z180_state *cpustate); INLINE void prefix##_26(z180_state *cpustate); INLINE void prefix##_27(z180_state *cpustate); \
+	INLINE void prefix##_28(z180_state *cpustate); INLINE void prefix##_29(z180_state *cpustate); INLINE void prefix##_2a(z180_state *cpustate); INLINE void prefix##_2b(z180_state *cpustate); \
+	INLINE void prefix##_2c(z180_state *cpustate); INLINE void prefix##_2d(z180_state *cpustate); INLINE void prefix##_2e(z180_state *cpustate); INLINE void prefix##_2f(z180_state *cpustate); \
+	INLINE void prefix##_30(z180_state *cpustate); INLINE void prefix##_31(z180_state *cpustate); INLINE void prefix##_32(z180_state *cpustate); INLINE void prefix##_33(z180_state *cpustate); \
+	INLINE void prefix##_34(z180_state *cpustate); INLINE void prefix##_35(z180_state *cpustate); INLINE void prefix##_36(z180_state *cpustate); INLINE void prefix##_37(z180_state *cpustate); \
+	INLINE void prefix##_38(z180_state *cpustate); INLINE void prefix##_39(z180_state *cpustate); INLINE void prefix##_3a(z180_state *cpustate); INLINE void prefix##_3b(z180_state *cpustate); \
+	INLINE void prefix##_3c(z180_state *cpustate); INLINE void prefix##_3d(z180_state *cpustate); INLINE void prefix##_3e(z180_state *cpustate); INLINE void prefix##_3f(z180_state *cpustate); \
+	INLINE void prefix##_40(z180_state *cpustate); INLINE void prefix##_41(z180_state *cpustate); INLINE void prefix##_42(z180_state *cpustate); INLINE void prefix##_43(z180_state *cpustate); \
+	INLINE void prefix##_44(z180_state *cpustate); INLINE void prefix##_45(z180_state *cpustate); INLINE void prefix##_46(z180_state *cpustate); INLINE void prefix##_47(z180_state *cpustate); \
+	INLINE void prefix##_48(z180_state *cpustate); INLINE void prefix##_49(z180_state *cpustate); INLINE void prefix##_4a(z180_state *cpustate); INLINE void prefix##_4b(z180_state *cpustate); \
+	INLINE void prefix##_4c(z180_state *cpustate); INLINE void prefix##_4d(z180_state *cpustate); INLINE void prefix##_4e(z180_state *cpustate); INLINE void prefix##_4f(z180_state *cpustate); \
+	INLINE void prefix##_50(z180_state *cpustate); INLINE void prefix##_51(z180_state *cpustate); INLINE void prefix##_52(z180_state *cpustate); INLINE void prefix##_53(z180_state *cpustate); \
+	INLINE void prefix##_54(z180_state *cpustate); INLINE void prefix##_55(z180_state *cpustate); INLINE void prefix##_56(z180_state *cpustate); INLINE void prefix##_57(z180_state *cpustate); \
+	INLINE void prefix##_58(z180_state *cpustate); INLINE void prefix##_59(z180_state *cpustate); INLINE void prefix##_5a(z180_state *cpustate); INLINE void prefix##_5b(z180_state *cpustate); \
+	INLINE void prefix##_5c(z180_state *cpustate); INLINE void prefix##_5d(z180_state *cpustate); INLINE void prefix##_5e(z180_state *cpustate); INLINE void prefix##_5f(z180_state *cpustate); \
+	INLINE void prefix##_60(z180_state *cpustate); INLINE void prefix##_61(z180_state *cpustate); INLINE void prefix##_62(z180_state *cpustate); INLINE void prefix##_63(z180_state *cpustate); \
+	INLINE void prefix##_64(z180_state *cpustate); INLINE void prefix##_65(z180_state *cpustate); INLINE void prefix##_66(z180_state *cpustate); INLINE void prefix##_67(z180_state *cpustate); \
+	INLINE void prefix##_68(z180_state *cpustate); INLINE void prefix##_69(z180_state *cpustate); INLINE void prefix##_6a(z180_state *cpustate); INLINE void prefix##_6b(z180_state *cpustate); \
+	INLINE void prefix##_6c(z180_state *cpustate); INLINE void prefix##_6d(z180_state *cpustate); INLINE void prefix##_6e(z180_state *cpustate); INLINE void prefix##_6f(z180_state *cpustate); \
+	INLINE void prefix##_70(z180_state *cpustate); INLINE void prefix##_71(z180_state *cpustate); INLINE void prefix##_72(z180_state *cpustate); INLINE void prefix##_73(z180_state *cpustate); \
+	INLINE void prefix##_74(z180_state *cpustate); INLINE void prefix##_75(z180_state *cpustate); INLINE void prefix##_76(z180_state *cpustate); INLINE void prefix##_77(z180_state *cpustate); \
+	INLINE void prefix##_78(z180_state *cpustate); INLINE void prefix##_79(z180_state *cpustate); INLINE void prefix##_7a(z180_state *cpustate); INLINE void prefix##_7b(z180_state *cpustate); \
+	INLINE void prefix##_7c(z180_state *cpustate); INLINE void prefix##_7d(z180_state *cpustate); INLINE void prefix##_7e(z180_state *cpustate); INLINE void prefix##_7f(z180_state *cpustate); \
+	INLINE void prefix##_80(z180_state *cpustate); INLINE void prefix##_81(z180_state *cpustate); INLINE void prefix##_82(z180_state *cpustate); INLINE void prefix##_83(z180_state *cpustate); \
+	INLINE void prefix##_84(z180_state *cpustate); INLINE void prefix##_85(z180_state *cpustate); INLINE void prefix##_86(z180_state *cpustate); INLINE void prefix##_87(z180_state *cpustate); \
+	INLINE void prefix##_88(z180_state *cpustate); INLINE void prefix##_89(z180_state *cpustate); INLINE void prefix##_8a(z180_state *cpustate); INLINE void prefix##_8b(z180_state *cpustate); \
+	INLINE void prefix##_8c(z180_state *cpustate); INLINE void prefix##_8d(z180_state *cpustate); INLINE void prefix##_8e(z180_state *cpustate); INLINE void prefix##_8f(z180_state *cpustate); \
+	INLINE void prefix##_90(z180_state *cpustate); INLINE void prefix##_91(z180_state *cpustate); INLINE void prefix##_92(z180_state *cpustate); INLINE void prefix##_93(z180_state *cpustate); \
+	INLINE void prefix##_94(z180_state *cpustate); INLINE void prefix##_95(z180_state *cpustate); INLINE void prefix##_96(z180_state *cpustate); INLINE void prefix##_97(z180_state *cpustate); \
+	INLINE void prefix##_98(z180_state *cpustate); INLINE void prefix##_99(z180_state *cpustate); INLINE void prefix##_9a(z180_state *cpustate); INLINE void prefix##_9b(z180_state *cpustate); \
+	INLINE void prefix##_9c(z180_state *cpustate); INLINE void prefix##_9d(z180_state *cpustate); INLINE void prefix##_9e(z180_state *cpustate); INLINE void prefix##_9f(z180_state *cpustate); \
+	INLINE void prefix##_a0(z180_state *cpustate); INLINE void prefix##_a1(z180_state *cpustate); INLINE void prefix##_a2(z180_state *cpustate); INLINE void prefix##_a3(z180_state *cpustate); \
+	INLINE void prefix##_a4(z180_state *cpustate); INLINE void prefix##_a5(z180_state *cpustate); INLINE void prefix##_a6(z180_state *cpustate); INLINE void prefix##_a7(z180_state *cpustate); \
+	INLINE void prefix##_a8(z180_state *cpustate); INLINE void prefix##_a9(z180_state *cpustate); INLINE void prefix##_aa(z180_state *cpustate); INLINE void prefix##_ab(z180_state *cpustate); \
+	INLINE void prefix##_ac(z180_state *cpustate); INLINE void prefix##_ad(z180_state *cpustate); INLINE void prefix##_ae(z180_state *cpustate); INLINE void prefix##_af(z180_state *cpustate); \
+	INLINE void prefix##_b0(z180_state *cpustate); INLINE void prefix##_b1(z180_state *cpustate); INLINE void prefix##_b2(z180_state *cpustate); INLINE void prefix##_b3(z180_state *cpustate); \
+	INLINE void prefix##_b4(z180_state *cpustate); INLINE void prefix##_b5(z180_state *cpustate); INLINE void prefix##_b6(z180_state *cpustate); INLINE void prefix##_b7(z180_state *cpustate); \
+	INLINE void prefix##_b8(z180_state *cpustate); INLINE void prefix##_b9(z180_state *cpustate); INLINE void prefix##_ba(z180_state *cpustate); INLINE void prefix##_bb(z180_state *cpustate); \
+	INLINE void prefix##_bc(z180_state *cpustate); INLINE void prefix##_bd(z180_state *cpustate); INLINE void prefix##_be(z180_state *cpustate); INLINE void prefix##_bf(z180_state *cpustate); \
+	INLINE void prefix##_c0(z180_state *cpustate); INLINE void prefix##_c1(z180_state *cpustate); INLINE void prefix##_c2(z180_state *cpustate); INLINE void prefix##_c3(z180_state *cpustate); \
+	INLINE void prefix##_c4(z180_state *cpustate); INLINE void prefix##_c5(z180_state *cpustate); INLINE void prefix##_c6(z180_state *cpustate); INLINE void prefix##_c7(z180_state *cpustate); \
+	INLINE void prefix##_c8(z180_state *cpustate); INLINE void prefix##_c9(z180_state *cpustate); INLINE void prefix##_ca(z180_state *cpustate); INLINE void prefix##_cb(z180_state *cpustate); \
+	INLINE void prefix##_cc(z180_state *cpustate); INLINE void prefix##_cd(z180_state *cpustate); INLINE void prefix##_ce(z180_state *cpustate); INLINE void prefix##_cf(z180_state *cpustate); \
+	INLINE void prefix##_d0(z180_state *cpustate); INLINE void prefix##_d1(z180_state *cpustate); INLINE void prefix##_d2(z180_state *cpustate); INLINE void prefix##_d3(z180_state *cpustate); \
+	INLINE void prefix##_d4(z180_state *cpustate); INLINE void prefix##_d5(z180_state *cpustate); INLINE void prefix##_d6(z180_state *cpustate); INLINE void prefix##_d7(z180_state *cpustate); \
+	INLINE void prefix##_d8(z180_state *cpustate); INLINE void prefix##_d9(z180_state *cpustate); INLINE void prefix##_da(z180_state *cpustate); INLINE void prefix##_db(z180_state *cpustate); \
+	INLINE void prefix##_dc(z180_state *cpustate); INLINE void prefix##_dd(z180_state *cpustate); INLINE void prefix##_de(z180_state *cpustate); INLINE void prefix##_df(z180_state *cpustate); \
+	INLINE void prefix##_e0(z180_state *cpustate); INLINE void prefix##_e1(z180_state *cpustate); INLINE void prefix##_e2(z180_state *cpustate); INLINE void prefix##_e3(z180_state *cpustate); \
+	INLINE void prefix##_e4(z180_state *cpustate); INLINE void prefix##_e5(z180_state *cpustate); INLINE void prefix##_e6(z180_state *cpustate); INLINE void prefix##_e7(z180_state *cpustate); \
+	INLINE void prefix##_e8(z180_state *cpustate); INLINE void prefix##_e9(z180_state *cpustate); INLINE void prefix##_ea(z180_state *cpustate); INLINE void prefix##_eb(z180_state *cpustate); \
+	INLINE void prefix##_ec(z180_state *cpustate); INLINE void prefix##_ed(z180_state *cpustate); INLINE void prefix##_ee(z180_state *cpustate); INLINE void prefix##_ef(z180_state *cpustate); \
+	INLINE void prefix##_f0(z180_state *cpustate); INLINE void prefix##_f1(z180_state *cpustate); INLINE void prefix##_f2(z180_state *cpustate); INLINE void prefix##_f3(z180_state *cpustate); \
+	INLINE void prefix##_f4(z180_state *cpustate); INLINE void prefix##_f5(z180_state *cpustate); INLINE void prefix##_f6(z180_state *cpustate); INLINE void prefix##_f7(z180_state *cpustate); \
+	INLINE void prefix##_f8(z180_state *cpustate); INLINE void prefix##_f9(z180_state *cpustate); INLINE void prefix##_fa(z180_state *cpustate); INLINE void prefix##_fb(z180_state *cpustate); \
+	INLINE void prefix##_fc(z180_state *cpustate); INLINE void prefix##_fd(z180_state *cpustate); INLINE void prefix##_fe(z180_state *cpustate); INLINE void prefix##_ff(z180_state *cpustate); \
+static void (*const tablename[0x100])(z180_state *cpustate) = {	\
 	prefix##_00,prefix##_01,prefix##_02,prefix##_03,prefix##_04,prefix##_05,prefix##_06,prefix##_07, \
 	prefix##_08,prefix##_09,prefix##_0a,prefix##_0b,prefix##_0c,prefix##_0d,prefix##_0e,prefix##_0f, \
 	prefix##_10,prefix##_11,prefix##_12,prefix##_13,prefix##_14,prefix##_15,prefix##_16,prefix##_17, \
@@ -265,12 +265,12 @@ PROTOTYPES(Z180xycb,xycb);
 /***************************************************************
  * define an opcode function
  ***************************************************************/
-#define OP(prefix,opcode)  INLINE void prefix##_##opcode(void)
+#define OP(prefix,opcode)  INLINE void prefix##_##opcode(z180_state *cpustate)
 
 /***************************************************************
  * adjust cycle count by n T-states
  ***************************************************************/
-#define CC(prefix,opcode) z180_icount -= cc[Z180_TABLE_##prefix][opcode]
+#define CC(prefix,opcode) cpustate->icount -= cc[Z180_TABLE_##prefix][opcode]
 
 /***************************************************************
  * execute an opcode
@@ -279,7 +279,7 @@ PROTOTYPES(Z180xycb,xycb);
 {                                                               \
     unsigned op = opcode;                                       \
     CC(prefix,op);                                              \
-    (*Z180##prefix[op])();                                      \
+    (*Z180##prefix[op])(cpustate);                              \
 }
 
 #if BIG_SWITCH
@@ -289,70 +289,70 @@ PROTOTYPES(Z180xycb,xycb);
     CC(prefix,op);                                              \
     switch(op)                                                  \
     {                                                           \
-    case 0x00:prefix##_##00();break; case 0x01:prefix##_##01();break; case 0x02:prefix##_##02();break; case 0x03:prefix##_##03();break; \
-    case 0x04:prefix##_##04();break; case 0x05:prefix##_##05();break; case 0x06:prefix##_##06();break; case 0x07:prefix##_##07();break; \
-    case 0x08:prefix##_##08();break; case 0x09:prefix##_##09();break; case 0x0a:prefix##_##0a();break; case 0x0b:prefix##_##0b();break; \
-    case 0x0c:prefix##_##0c();break; case 0x0d:prefix##_##0d();break; case 0x0e:prefix##_##0e();break; case 0x0f:prefix##_##0f();break; \
-    case 0x10:prefix##_##10();break; case 0x11:prefix##_##11();break; case 0x12:prefix##_##12();break; case 0x13:prefix##_##13();break; \
-    case 0x14:prefix##_##14();break; case 0x15:prefix##_##15();break; case 0x16:prefix##_##16();break; case 0x17:prefix##_##17();break; \
-    case 0x18:prefix##_##18();break; case 0x19:prefix##_##19();break; case 0x1a:prefix##_##1a();break; case 0x1b:prefix##_##1b();break; \
-    case 0x1c:prefix##_##1c();break; case 0x1d:prefix##_##1d();break; case 0x1e:prefix##_##1e();break; case 0x1f:prefix##_##1f();break; \
-    case 0x20:prefix##_##20();break; case 0x21:prefix##_##21();break; case 0x22:prefix##_##22();break; case 0x23:prefix##_##23();break; \
-    case 0x24:prefix##_##24();break; case 0x25:prefix##_##25();break; case 0x26:prefix##_##26();break; case 0x27:prefix##_##27();break; \
-    case 0x28:prefix##_##28();break; case 0x29:prefix##_##29();break; case 0x2a:prefix##_##2a();break; case 0x2b:prefix##_##2b();break; \
-    case 0x2c:prefix##_##2c();break; case 0x2d:prefix##_##2d();break; case 0x2e:prefix##_##2e();break; case 0x2f:prefix##_##2f();break; \
-    case 0x30:prefix##_##30();break; case 0x31:prefix##_##31();break; case 0x32:prefix##_##32();break; case 0x33:prefix##_##33();break; \
-    case 0x34:prefix##_##34();break; case 0x35:prefix##_##35();break; case 0x36:prefix##_##36();break; case 0x37:prefix##_##37();break; \
-    case 0x38:prefix##_##38();break; case 0x39:prefix##_##39();break; case 0x3a:prefix##_##3a();break; case 0x3b:prefix##_##3b();break; \
-    case 0x3c:prefix##_##3c();break; case 0x3d:prefix##_##3d();break; case 0x3e:prefix##_##3e();break; case 0x3f:prefix##_##3f();break; \
-    case 0x40:prefix##_##40();break; case 0x41:prefix##_##41();break; case 0x42:prefix##_##42();break; case 0x43:prefix##_##43();break; \
-    case 0x44:prefix##_##44();break; case 0x45:prefix##_##45();break; case 0x46:prefix##_##46();break; case 0x47:prefix##_##47();break; \
-    case 0x48:prefix##_##48();break; case 0x49:prefix##_##49();break; case 0x4a:prefix##_##4a();break; case 0x4b:prefix##_##4b();break; \
-    case 0x4c:prefix##_##4c();break; case 0x4d:prefix##_##4d();break; case 0x4e:prefix##_##4e();break; case 0x4f:prefix##_##4f();break; \
-    case 0x50:prefix##_##50();break; case 0x51:prefix##_##51();break; case 0x52:prefix##_##52();break; case 0x53:prefix##_##53();break; \
-    case 0x54:prefix##_##54();break; case 0x55:prefix##_##55();break; case 0x56:prefix##_##56();break; case 0x57:prefix##_##57();break; \
-    case 0x58:prefix##_##58();break; case 0x59:prefix##_##59();break; case 0x5a:prefix##_##5a();break; case 0x5b:prefix##_##5b();break; \
-    case 0x5c:prefix##_##5c();break; case 0x5d:prefix##_##5d();break; case 0x5e:prefix##_##5e();break; case 0x5f:prefix##_##5f();break; \
-    case 0x60:prefix##_##60();break; case 0x61:prefix##_##61();break; case 0x62:prefix##_##62();break; case 0x63:prefix##_##63();break; \
-    case 0x64:prefix##_##64();break; case 0x65:prefix##_##65();break; case 0x66:prefix##_##66();break; case 0x67:prefix##_##67();break; \
-    case 0x68:prefix##_##68();break; case 0x69:prefix##_##69();break; case 0x6a:prefix##_##6a();break; case 0x6b:prefix##_##6b();break; \
-    case 0x6c:prefix##_##6c();break; case 0x6d:prefix##_##6d();break; case 0x6e:prefix##_##6e();break; case 0x6f:prefix##_##6f();break; \
-    case 0x70:prefix##_##70();break; case 0x71:prefix##_##71();break; case 0x72:prefix##_##72();break; case 0x73:prefix##_##73();break; \
-    case 0x74:prefix##_##74();break; case 0x75:prefix##_##75();break; case 0x76:prefix##_##76();break; case 0x77:prefix##_##77();break; \
-    case 0x78:prefix##_##78();break; case 0x79:prefix##_##79();break; case 0x7a:prefix##_##7a();break; case 0x7b:prefix##_##7b();break; \
-    case 0x7c:prefix##_##7c();break; case 0x7d:prefix##_##7d();break; case 0x7e:prefix##_##7e();break; case 0x7f:prefix##_##7f();break; \
-    case 0x80:prefix##_##80();break; case 0x81:prefix##_##81();break; case 0x82:prefix##_##82();break; case 0x83:prefix##_##83();break; \
-    case 0x84:prefix##_##84();break; case 0x85:prefix##_##85();break; case 0x86:prefix##_##86();break; case 0x87:prefix##_##87();break; \
-    case 0x88:prefix##_##88();break; case 0x89:prefix##_##89();break; case 0x8a:prefix##_##8a();break; case 0x8b:prefix##_##8b();break; \
-    case 0x8c:prefix##_##8c();break; case 0x8d:prefix##_##8d();break; case 0x8e:prefix##_##8e();break; case 0x8f:prefix##_##8f();break; \
-    case 0x90:prefix##_##90();break; case 0x91:prefix##_##91();break; case 0x92:prefix##_##92();break; case 0x93:prefix##_##93();break; \
-    case 0x94:prefix##_##94();break; case 0x95:prefix##_##95();break; case 0x96:prefix##_##96();break; case 0x97:prefix##_##97();break; \
-    case 0x98:prefix##_##98();break; case 0x99:prefix##_##99();break; case 0x9a:prefix##_##9a();break; case 0x9b:prefix##_##9b();break; \
-    case 0x9c:prefix##_##9c();break; case 0x9d:prefix##_##9d();break; case 0x9e:prefix##_##9e();break; case 0x9f:prefix##_##9f();break; \
-    case 0xa0:prefix##_##a0();break; case 0xa1:prefix##_##a1();break; case 0xa2:prefix##_##a2();break; case 0xa3:prefix##_##a3();break; \
-    case 0xa4:prefix##_##a4();break; case 0xa5:prefix##_##a5();break; case 0xa6:prefix##_##a6();break; case 0xa7:prefix##_##a7();break; \
-    case 0xa8:prefix##_##a8();break; case 0xa9:prefix##_##a9();break; case 0xaa:prefix##_##aa();break; case 0xab:prefix##_##ab();break; \
-    case 0xac:prefix##_##ac();break; case 0xad:prefix##_##ad();break; case 0xae:prefix##_##ae();break; case 0xaf:prefix##_##af();break; \
-    case 0xb0:prefix##_##b0();break; case 0xb1:prefix##_##b1();break; case 0xb2:prefix##_##b2();break; case 0xb3:prefix##_##b3();break; \
-    case 0xb4:prefix##_##b4();break; case 0xb5:prefix##_##b5();break; case 0xb6:prefix##_##b6();break; case 0xb7:prefix##_##b7();break; \
-    case 0xb8:prefix##_##b8();break; case 0xb9:prefix##_##b9();break; case 0xba:prefix##_##ba();break; case 0xbb:prefix##_##bb();break; \
-    case 0xbc:prefix##_##bc();break; case 0xbd:prefix##_##bd();break; case 0xbe:prefix##_##be();break; case 0xbf:prefix##_##bf();break; \
-    case 0xc0:prefix##_##c0();break; case 0xc1:prefix##_##c1();break; case 0xc2:prefix##_##c2();break; case 0xc3:prefix##_##c3();break; \
-    case 0xc4:prefix##_##c4();break; case 0xc5:prefix##_##c5();break; case 0xc6:prefix##_##c6();break; case 0xc7:prefix##_##c7();break; \
-    case 0xc8:prefix##_##c8();break; case 0xc9:prefix##_##c9();break; case 0xca:prefix##_##ca();break; case 0xcb:prefix##_##cb();break; \
-    case 0xcc:prefix##_##cc();break; case 0xcd:prefix##_##cd();break; case 0xce:prefix##_##ce();break; case 0xcf:prefix##_##cf();break; \
-    case 0xd0:prefix##_##d0();break; case 0xd1:prefix##_##d1();break; case 0xd2:prefix##_##d2();break; case 0xd3:prefix##_##d3();break; \
-    case 0xd4:prefix##_##d4();break; case 0xd5:prefix##_##d5();break; case 0xd6:prefix##_##d6();break; case 0xd7:prefix##_##d7();break; \
-    case 0xd8:prefix##_##d8();break; case 0xd9:prefix##_##d9();break; case 0xda:prefix##_##da();break; case 0xdb:prefix##_##db();break; \
-    case 0xdc:prefix##_##dc();break; case 0xdd:prefix##_##dd();break; case 0xde:prefix##_##de();break; case 0xdf:prefix##_##df();break; \
-    case 0xe0:prefix##_##e0();break; case 0xe1:prefix##_##e1();break; case 0xe2:prefix##_##e2();break; case 0xe3:prefix##_##e3();break; \
-    case 0xe4:prefix##_##e4();break; case 0xe5:prefix##_##e5();break; case 0xe6:prefix##_##e6();break; case 0xe7:prefix##_##e7();break; \
-    case 0xe8:prefix##_##e8();break; case 0xe9:prefix##_##e9();break; case 0xea:prefix##_##ea();break; case 0xeb:prefix##_##eb();break; \
-    case 0xec:prefix##_##ec();break; case 0xed:prefix##_##ed();break; case 0xee:prefix##_##ee();break; case 0xef:prefix##_##ef();break; \
-    case 0xf0:prefix##_##f0();break; case 0xf1:prefix##_##f1();break; case 0xf2:prefix##_##f2();break; case 0xf3:prefix##_##f3();break; \
-    case 0xf4:prefix##_##f4();break; case 0xf5:prefix##_##f5();break; case 0xf6:prefix##_##f6();break; case 0xf7:prefix##_##f7();break; \
-    case 0xf8:prefix##_##f8();break; case 0xf9:prefix##_##f9();break; case 0xfa:prefix##_##fa();break; case 0xfb:prefix##_##fb();break; \
-    case 0xfc:prefix##_##fc();break; case 0xfd:prefix##_##fd();break; case 0xfe:prefix##_##fe();break; case 0xff:prefix##_##ff();break; \
+    case 0x00:prefix##_##00(cpustate);break; case 0x01:prefix##_##01(cpustate);break; case 0x02:prefix##_##02(cpustate);break; case 0x03:prefix##_##03(cpustate);break; \
+    case 0x04:prefix##_##04(cpustate);break; case 0x05:prefix##_##05(cpustate);break; case 0x06:prefix##_##06(cpustate);break; case 0x07:prefix##_##07(cpustate);break; \
+    case 0x08:prefix##_##08(cpustate);break; case 0x09:prefix##_##09(cpustate);break; case 0x0a:prefix##_##0a(cpustate);break; case 0x0b:prefix##_##0b(cpustate);break; \
+    case 0x0c:prefix##_##0c(cpustate);break; case 0x0d:prefix##_##0d(cpustate);break; case 0x0e:prefix##_##0e(cpustate);break; case 0x0f:prefix##_##0f(cpustate);break; \
+    case 0x10:prefix##_##10(cpustate);break; case 0x11:prefix##_##11(cpustate);break; case 0x12:prefix##_##12(cpustate);break; case 0x13:prefix##_##13(cpustate);break; \
+    case 0x14:prefix##_##14(cpustate);break; case 0x15:prefix##_##15(cpustate);break; case 0x16:prefix##_##16(cpustate);break; case 0x17:prefix##_##17(cpustate);break; \
+    case 0x18:prefix##_##18(cpustate);break; case 0x19:prefix##_##19(cpustate);break; case 0x1a:prefix##_##1a(cpustate);break; case 0x1b:prefix##_##1b(cpustate);break; \
+    case 0x1c:prefix##_##1c(cpustate);break; case 0x1d:prefix##_##1d(cpustate);break; case 0x1e:prefix##_##1e(cpustate);break; case 0x1f:prefix##_##1f(cpustate);break; \
+    case 0x20:prefix##_##20(cpustate);break; case 0x21:prefix##_##21(cpustate);break; case 0x22:prefix##_##22(cpustate);break; case 0x23:prefix##_##23(cpustate);break; \
+    case 0x24:prefix##_##24(cpustate);break; case 0x25:prefix##_##25(cpustate);break; case 0x26:prefix##_##26(cpustate);break; case 0x27:prefix##_##27(cpustate);break; \
+    case 0x28:prefix##_##28(cpustate);break; case 0x29:prefix##_##29(cpustate);break; case 0x2a:prefix##_##2a(cpustate);break; case 0x2b:prefix##_##2b(cpustate);break; \
+    case 0x2c:prefix##_##2c(cpustate);break; case 0x2d:prefix##_##2d(cpustate);break; case 0x2e:prefix##_##2e(cpustate);break; case 0x2f:prefix##_##2f(cpustate);break; \
+    case 0x30:prefix##_##30(cpustate);break; case 0x31:prefix##_##31(cpustate);break; case 0x32:prefix##_##32(cpustate);break; case 0x33:prefix##_##33(cpustate);break; \
+    case 0x34:prefix##_##34(cpustate);break; case 0x35:prefix##_##35(cpustate);break; case 0x36:prefix##_##36(cpustate);break; case 0x37:prefix##_##37(cpustate);break; \
+    case 0x38:prefix##_##38(cpustate);break; case 0x39:prefix##_##39(cpustate);break; case 0x3a:prefix##_##3a(cpustate);break; case 0x3b:prefix##_##3b(cpustate);break; \
+    case 0x3c:prefix##_##3c(cpustate);break; case 0x3d:prefix##_##3d(cpustate);break; case 0x3e:prefix##_##3e(cpustate);break; case 0x3f:prefix##_##3f(cpustate);break; \
+    case 0x40:prefix##_##40(cpustate);break; case 0x41:prefix##_##41(cpustate);break; case 0x42:prefix##_##42(cpustate);break; case 0x43:prefix##_##43(cpustate);break; \
+    case 0x44:prefix##_##44(cpustate);break; case 0x45:prefix##_##45(cpustate);break; case 0x46:prefix##_##46(cpustate);break; case 0x47:prefix##_##47(cpustate);break; \
+    case 0x48:prefix##_##48(cpustate);break; case 0x49:prefix##_##49(cpustate);break; case 0x4a:prefix##_##4a(cpustate);break; case 0x4b:prefix##_##4b(cpustate);break; \
+    case 0x4c:prefix##_##4c(cpustate);break; case 0x4d:prefix##_##4d(cpustate);break; case 0x4e:prefix##_##4e(cpustate);break; case 0x4f:prefix##_##4f(cpustate);break; \
+    case 0x50:prefix##_##50(cpustate);break; case 0x51:prefix##_##51(cpustate);break; case 0x52:prefix##_##52(cpustate);break; case 0x53:prefix##_##53(cpustate);break; \
+    case 0x54:prefix##_##54(cpustate);break; case 0x55:prefix##_##55(cpustate);break; case 0x56:prefix##_##56(cpustate);break; case 0x57:prefix##_##57(cpustate);break; \
+    case 0x58:prefix##_##58(cpustate);break; case 0x59:prefix##_##59(cpustate);break; case 0x5a:prefix##_##5a(cpustate);break; case 0x5b:prefix##_##5b(cpustate);break; \
+    case 0x5c:prefix##_##5c(cpustate);break; case 0x5d:prefix##_##5d(cpustate);break; case 0x5e:prefix##_##5e(cpustate);break; case 0x5f:prefix##_##5f(cpustate);break; \
+    case 0x60:prefix##_##60(cpustate);break; case 0x61:prefix##_##61(cpustate);break; case 0x62:prefix##_##62(cpustate);break; case 0x63:prefix##_##63(cpustate);break; \
+    case 0x64:prefix##_##64(cpustate);break; case 0x65:prefix##_##65(cpustate);break; case 0x66:prefix##_##66(cpustate);break; case 0x67:prefix##_##67(cpustate);break; \
+    case 0x68:prefix##_##68(cpustate);break; case 0x69:prefix##_##69(cpustate);break; case 0x6a:prefix##_##6a(cpustate);break; case 0x6b:prefix##_##6b(cpustate);break; \
+    case 0x6c:prefix##_##6c(cpustate);break; case 0x6d:prefix##_##6d(cpustate);break; case 0x6e:prefix##_##6e(cpustate);break; case 0x6f:prefix##_##6f(cpustate);break; \
+    case 0x70:prefix##_##70(cpustate);break; case 0x71:prefix##_##71(cpustate);break; case 0x72:prefix##_##72(cpustate);break; case 0x73:prefix##_##73(cpustate);break; \
+    case 0x74:prefix##_##74(cpustate);break; case 0x75:prefix##_##75(cpustate);break; case 0x76:prefix##_##76(cpustate);break; case 0x77:prefix##_##77(cpustate);break; \
+    case 0x78:prefix##_##78(cpustate);break; case 0x79:prefix##_##79(cpustate);break; case 0x7a:prefix##_##7a(cpustate);break; case 0x7b:prefix##_##7b(cpustate);break; \
+    case 0x7c:prefix##_##7c(cpustate);break; case 0x7d:prefix##_##7d(cpustate);break; case 0x7e:prefix##_##7e(cpustate);break; case 0x7f:prefix##_##7f(cpustate);break; \
+    case 0x80:prefix##_##80(cpustate);break; case 0x81:prefix##_##81(cpustate);break; case 0x82:prefix##_##82(cpustate);break; case 0x83:prefix##_##83(cpustate);break; \
+    case 0x84:prefix##_##84(cpustate);break; case 0x85:prefix##_##85(cpustate);break; case 0x86:prefix##_##86(cpustate);break; case 0x87:prefix##_##87(cpustate);break; \
+    case 0x88:prefix##_##88(cpustate);break; case 0x89:prefix##_##89(cpustate);break; case 0x8a:prefix##_##8a(cpustate);break; case 0x8b:prefix##_##8b(cpustate);break; \
+    case 0x8c:prefix##_##8c(cpustate);break; case 0x8d:prefix##_##8d(cpustate);break; case 0x8e:prefix##_##8e(cpustate);break; case 0x8f:prefix##_##8f(cpustate);break; \
+    case 0x90:prefix##_##90(cpustate);break; case 0x91:prefix##_##91(cpustate);break; case 0x92:prefix##_##92(cpustate);break; case 0x93:prefix##_##93(cpustate);break; \
+    case 0x94:prefix##_##94(cpustate);break; case 0x95:prefix##_##95(cpustate);break; case 0x96:prefix##_##96(cpustate);break; case 0x97:prefix##_##97(cpustate);break; \
+    case 0x98:prefix##_##98(cpustate);break; case 0x99:prefix##_##99(cpustate);break; case 0x9a:prefix##_##9a(cpustate);break; case 0x9b:prefix##_##9b(cpustate);break; \
+    case 0x9c:prefix##_##9c(cpustate);break; case 0x9d:prefix##_##9d(cpustate);break; case 0x9e:prefix##_##9e(cpustate);break; case 0x9f:prefix##_##9f(cpustate);break; \
+    case 0xa0:prefix##_##a0(cpustate);break; case 0xa1:prefix##_##a1(cpustate);break; case 0xa2:prefix##_##a2(cpustate);break; case 0xa3:prefix##_##a3(cpustate);break; \
+    case 0xa4:prefix##_##a4(cpustate);break; case 0xa5:prefix##_##a5(cpustate);break; case 0xa6:prefix##_##a6(cpustate);break; case 0xa7:prefix##_##a7(cpustate);break; \
+    case 0xa8:prefix##_##a8(cpustate);break; case 0xa9:prefix##_##a9(cpustate);break; case 0xaa:prefix##_##aa(cpustate);break; case 0xab:prefix##_##ab(cpustate);break; \
+    case 0xac:prefix##_##ac(cpustate);break; case 0xad:prefix##_##ad(cpustate);break; case 0xae:prefix##_##ae(cpustate);break; case 0xaf:prefix##_##af(cpustate);break; \
+    case 0xb0:prefix##_##b0(cpustate);break; case 0xb1:prefix##_##b1(cpustate);break; case 0xb2:prefix##_##b2(cpustate);break; case 0xb3:prefix##_##b3(cpustate);break; \
+    case 0xb4:prefix##_##b4(cpustate);break; case 0xb5:prefix##_##b5(cpustate);break; case 0xb6:prefix##_##b6(cpustate);break; case 0xb7:prefix##_##b7(cpustate);break; \
+    case 0xb8:prefix##_##b8(cpustate);break; case 0xb9:prefix##_##b9(cpustate);break; case 0xba:prefix##_##ba(cpustate);break; case 0xbb:prefix##_##bb(cpustate);break; \
+    case 0xbc:prefix##_##bc(cpustate);break; case 0xbd:prefix##_##bd(cpustate);break; case 0xbe:prefix##_##be(cpustate);break; case 0xbf:prefix##_##bf(cpustate);break; \
+    case 0xc0:prefix##_##c0(cpustate);break; case 0xc1:prefix##_##c1(cpustate);break; case 0xc2:prefix##_##c2(cpustate);break; case 0xc3:prefix##_##c3(cpustate);break; \
+    case 0xc4:prefix##_##c4(cpustate);break; case 0xc5:prefix##_##c5(cpustate);break; case 0xc6:prefix##_##c6(cpustate);break; case 0xc7:prefix##_##c7(cpustate);break; \
+    case 0xc8:prefix##_##c8(cpustate);break; case 0xc9:prefix##_##c9(cpustate);break; case 0xca:prefix##_##ca(cpustate);break; case 0xcb:prefix##_##cb(cpustate);break; \
+    case 0xcc:prefix##_##cc(cpustate);break; case 0xcd:prefix##_##cd(cpustate);break; case 0xce:prefix##_##ce(cpustate);break; case 0xcf:prefix##_##cf(cpustate);break; \
+    case 0xd0:prefix##_##d0(cpustate);break; case 0xd1:prefix##_##d1(cpustate);break; case 0xd2:prefix##_##d2(cpustate);break; case 0xd3:prefix##_##d3(cpustate);break; \
+    case 0xd4:prefix##_##d4(cpustate);break; case 0xd5:prefix##_##d5(cpustate);break; case 0xd6:prefix##_##d6(cpustate);break; case 0xd7:prefix##_##d7(cpustate);break; \
+    case 0xd8:prefix##_##d8(cpustate);break; case 0xd9:prefix##_##d9(cpustate);break; case 0xda:prefix##_##da(cpustate);break; case 0xdb:prefix##_##db(cpustate);break; \
+    case 0xdc:prefix##_##dc(cpustate);break; case 0xdd:prefix##_##dd(cpustate);break; case 0xde:prefix##_##de(cpustate);break; case 0xdf:prefix##_##df(cpustate);break; \
+    case 0xe0:prefix##_##e0(cpustate);break; case 0xe1:prefix##_##e1(cpustate);break; case 0xe2:prefix##_##e2(cpustate);break; case 0xe3:prefix##_##e3(cpustate);break; \
+    case 0xe4:prefix##_##e4(cpustate);break; case 0xe5:prefix##_##e5(cpustate);break; case 0xe6:prefix##_##e6(cpustate);break; case 0xe7:prefix##_##e7(cpustate);break; \
+    case 0xe8:prefix##_##e8(cpustate);break; case 0xe9:prefix##_##e9(cpustate);break; case 0xea:prefix##_##ea(cpustate);break; case 0xeb:prefix##_##eb(cpustate);break; \
+    case 0xec:prefix##_##ec(cpustate);break; case 0xed:prefix##_##ed(cpustate);break; case 0xee:prefix##_##ee(cpustate);break; case 0xef:prefix##_##ef(cpustate);break; \
+    case 0xf0:prefix##_##f0(cpustate);break; case 0xf1:prefix##_##f1(cpustate);break; case 0xf2:prefix##_##f2(cpustate);break; case 0xf3:prefix##_##f3(cpustate);break; \
+    case 0xf4:prefix##_##f4(cpustate);break; case 0xf5:prefix##_##f5(cpustate);break; case 0xf6:prefix##_##f6(cpustate);break; case 0xf7:prefix##_##f7(cpustate);break; \
+    case 0xf8:prefix##_##f8(cpustate);break; case 0xf9:prefix##_##f9(cpustate);break; case 0xfa:prefix##_##fa(cpustate);break; case 0xfb:prefix##_##fb(cpustate);break; \
+    case 0xfc:prefix##_##fc(cpustate);break; case 0xfd:prefix##_##fd(cpustate);break; case 0xfe:prefix##_##fe(cpustate);break; case 0xff:prefix##_##ff(cpustate);break; \
     }                                                                                                                                   \
 }
 #else
