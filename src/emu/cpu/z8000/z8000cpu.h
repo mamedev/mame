@@ -193,6 +193,8 @@
 #define GET_DSP16		UINT16 dsp16 = cpustate->pc + (INT16)cpustate->op[1]
 #define GET_ADDR(o) 	UINT16 addr = (UINT16)cpustate->op[o]
 
+typedef struct _z8000_state z8000_state;
+
 /* structure for the opcode definition table */
 typedef struct {
 	int 	beg, end, step;

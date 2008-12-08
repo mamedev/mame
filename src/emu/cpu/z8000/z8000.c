@@ -61,7 +61,7 @@ union _z8000_reg_file
     UINT64  Q[4];  /* RQ0,RQ4,..RQ12 */
 };
 
-typedef struct _z8000_state z8000_state;
+/* In z8000cpu.h: typedef struct _z8000_state z8000_state; */
 struct _z8000_state
 {
     UINT16  op[4];      /* opcodes/data of current instruction */
