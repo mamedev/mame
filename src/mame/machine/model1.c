@@ -6,6 +6,7 @@
 #include "deprecat.h"
 #include "debugger.h"
 #include "cpu/mb86233/mb86233.h"
+#include "cpu/v60/v60.h"
 #include "includes/model1.h"
 
 enum {FIFO_SIZE = 256};
@@ -2028,8 +2029,7 @@ static UINT32 copro_fifoout_pop(const address_space *space)
 	if (copro_fifoout_num == 0)
 	{
 		// Reading from empty FIFO causes the v60 to enter wait state
-		extern void v60_stall(void);
-		v60_stall();
+		v60_stall(space->machine->cpu[0]);
 
 		timer_call_after_resynch(space->machine, NULL, 0, NULL);
 
