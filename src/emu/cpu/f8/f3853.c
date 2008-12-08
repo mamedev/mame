@@ -73,7 +73,7 @@ static TIMER_CALLBACK( f3853_timer_callback )
 }
 
 
-void f3853_init(const f3853_config *config)
+void f3853_init(running_machine *machine, const f3853_config *config)
 {
 	UINT8 reg=0xfe;
 	int i;
@@ -91,7 +91,7 @@ void f3853_init(const f3853_config *config)
 
 	f3853.priority_line=FALSE;
 	f3853.external_interrupt_line=TRUE;
-	f3853.timer = timer_alloc(f3853_timer_callback, NULL);
+	f3853.timer = timer_alloc(machine, f3853_timer_callback, NULL);
 }
 
 CPU_RESET( f3853 )
