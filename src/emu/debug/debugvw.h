@@ -183,6 +183,9 @@ void debug_view_begin_update(debug_view *view);
 /* complete a sequence of changes so that only one update occurs */
 void debug_view_end_update(debug_view *view);
 
+/* flush any pending updates to the OSD layer */
+void debug_view_flush_updates(running_machine *machine);
+
 /* force all views to refresh */
 void debug_view_update_all(running_machine *machine);
 

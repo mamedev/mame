@@ -1417,6 +1417,7 @@ static LRESULT CALLBACK debugwin_view_proc(HWND wnd, UINT message, WPARAM wparam
 			debug_view_xy topleft = debug_view_get_visible_position(info->view);
 			topleft.x = debugwin_view_process_scroll(info, LOWORD(wparam), (HWND)lparam);
 			debug_view_set_visible_position(info->view, topleft);
+			debug_view_flush_updates(info->owner->machine);
 			break;
 		}
 
@@ -1426,6 +1427,7 @@ static LRESULT CALLBACK debugwin_view_proc(HWND wnd, UINT message, WPARAM wparam
 			debug_view_xy topleft = debug_view_get_visible_position(info->view);
 			topleft.y = debugwin_view_process_scroll(info, LOWORD(wparam), (HWND)lparam);
 			debug_view_set_visible_position(info->view, topleft);
+			debug_view_flush_updates(info->owner->machine);
 			break;
 		}
 

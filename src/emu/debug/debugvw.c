@@ -111,6 +111,7 @@ struct _debug_view
 	UINT8				recompute;				/* does this view require a recomputation? */
 	UINT8				update_level;			/* update level; updates when this hits 0 */
 	UINT8				update_pending;			/* true if there is a pending update */
+	UINT8				osd_update_pending;		/* true if there is a pending update */
 	debug_view_char *	viewdata;				/* current array of view data */
 	int					viewdata_size;			/* number of elements of the viewdata array */
 };
@@ -489,8 +490,9 @@ void debug_view_end_update(debug_view *view)
 		{
 			int size;
 
-			/* no longer pending */
+			/* no longer pending, but flag for the OSD */
 			view->update_pending = FALSE;
+			view->osd_update_pending = TRUE;
 
 			/* resize the viewdata if needed */
 			size = view->visible.x * view->visible.y;
@@ -503,15 +505,37 @@ void debug_view_end_update(debug_view *view)
 			/* update the view */
 			if (view->cb.update != NULL)
 				(*view->cb.update)(view);
-
-			/* update the owner */
-			if (view->osdupdate != NULL)
-				(*view->osdupdate)(view, view->osdprivate);
 		}
 	}
 
 	/* decrement the level */
 	view->update_level--;
+}
+
+
+/*-------------------------------------------------
+    debug_view_flush_updates - force all updates
+    to notify the OSD
+-------------------------------------------------*/
+
+void debug_view_flush_updates(running_machine *machine)
+{
+	debugvw_private *global = machine->debugvw_data;
+	debug_view *view;
+
+	/* skip if we're not ready yet */
+	if (global == NULL)
+		return;
+
+	/* loop over each view and force an update */
+	for (view = global->viewlist; view != NULL; view = view->next)
+		if (view->osd_update_pending)
+		{
+			/* update the owner */
+			if (view->osdupdate != NULL)
+				(*view->osdupdate)(view, view->osdprivate);
+			view->osd_update_pending = FALSE;
+		}
 }
 
 

@@ -392,6 +392,7 @@ void debug_cpu_start_hook(const device_config *device, attotime endtime)
 		if (device == global->visiblecpu && osd_ticks() > global->last_periodic_update_time + osd_ticks_per_second()/4)
 		{
 			debug_view_update_all(device->machine);
+			debug_view_flush_updates(device->machine);
 			global->last_periodic_update_time = osd_ticks();
 		}
 
@@ -532,6 +533,7 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 			else if ((info->flags & DEBUG_FLAG_STEPPING_OUT) == 0 && (info->stepsleft < 200 || info->stepsleft % 100 == 0))
 			{
 				debug_view_update_all(device->machine);
+				debug_view_flush_updates(device->machine);
 				debugger_refresh_display(device->machine);
 			}
 		}
@@ -579,6 +581,9 @@ void debug_cpu_instruction_hook(const device_config *device, offs_t curpc)
 		sound_mute(TRUE);
 		while (global->execution_state == EXECUTION_STATE_STOPPED)
 		{
+			/* flush any pending updates before waiting again */
+			debug_view_flush_updates(device->machine);
+
 			/* clear the memory modified flag and wait */
 			global->memory_modified = FALSE;
 			osd_wait_for_debugger(device, firststop);
