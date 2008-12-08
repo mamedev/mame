@@ -15,14 +15,17 @@
 #define LOG 0
 #define LOG_EXTRA 0
 
-static void execute_instruction_64kw(void);
-static void execute_instruction_8kw(void);
-static void pulse_reset(void);
+static void execute_instruction_64kw(const device_config *device);
+static void execute_instruction_8kw(const device_config *device);
+static void pulse_reset(const device_config *device);
 
 
 /* TX-0 Registers */
-typedef struct
+typedef struct _tx0_state tx0_state;
+struct _tx0_state
 {
+	const tx0_reset_param_t *iface;
+
 	/* processor registers */
 	int mbr;		/* memory buffer register (18 bits) */
 	int ac;			/* accumulator (18 bits) */
@@ -59,38 +62,27 @@ typedef struct
 	int address_mask;		/* address mask */
 	int ir_mask;			/* IR mask */
 
-	/* 8 standard I/O handlers:
-        0: cpy (8kW only)
-        1: r1l
-        2: dis
-        3: r3l
-        4: prt
-        5: reserved
-        6: p6h
-        7: p7h */
-	void (*io_handlers[8])(void);
-	/* select instruction handler */
-	void (*sel_handler)(void);
-	/* called when reset line is pulsed: IO devices should reset */
-	void (*io_reset_callback)(void);
+	int icount;
 
 	const device_config *device;
 	const address_space *program;
-}
-tx0_Regs;
+};
+
+
+#define READ_TX0_18BIT(A) ((signed)memory_read_dword_32be(cpustate->program, (A)<<2))
+#define WRITE_TX0_18BIT(A,V) (memory_write_dword_32be(cpustate->program, (A)<<2,(V)))
+
 
 #define io_handler_rim 3
 
-static tx0_Regs tx0;
-
-#define PC		tx0.pc
-#define IR		tx0.ir
-#define MBR		tx0.mbr
-#define MAR		tx0.mar
-#define AC		tx0.ac
-#define LR		tx0.lr
-#define XR		tx0.xr
-#define PF		tx0.pf
+#define PC		cpustate->pc
+#define IR		cpustate->ir
+#define MBR		cpustate->mbr
+#define MAR		cpustate->mar
+#define AC		cpustate->ac
+#define LR		cpustate->lr
+#define XR		cpustate->xr
+#define PF		cpustate->pf
 
 #define ADDRESS_MASK_64KW	0177777
 #define ADDRESS_MASK_8KW	0017777
@@ -98,29 +90,26 @@ static tx0_Regs tx0;
 #define INCREMENT_PC_64KW	(PC = (PC+1) & ADDRESS_MASK_64KW)
 #define INCREMENT_PC_8KW	(PC = (PC+1) & ADDRESS_MASK_8KW)
 
-/* public globals */
-static signed int tx0_ICount;
 
-
-static int tx0_read(offs_t address)
+static int tx0_read(tx0_state *cpustate, offs_t address)
 {
-	if ((address >= 16) || (tx0.gbl_cm_sel) || ((tx0.cm_sel >> address) & 1))
+	if ((address >= 16) || (cpustate->gbl_cm_sel) || ((cpustate->cm_sel >> address) & 1))
 		/* core memory (CM) */
 		return READ_TX0_18BIT(address);
-	else if ((tx0.lr_sel >> address) & 1)
+	else if ((cpustate->lr_sel >> address) & 1)
 		/* live register (LR) */
 		return LR;
 	else
 		/* toggle switch storage (TSS) */
-		return tx0.tss[address];
+		return cpustate->tss[address];
 }
 
-static void tx0_write(offs_t address, int data)
+static void tx0_write(tx0_state *cpustate, offs_t address, int data)
 {
-	if ((address >= 16) || (tx0.gbl_cm_sel) || ((tx0.cm_sel >> address) & 1))
+	if ((address >= 16) || (cpustate->gbl_cm_sel) || ((cpustate->cm_sel >> address) & 1))
 		/* core memory (CM) */
 		WRITE_TX0_18BIT(address, data);
-	else if ((tx0.lr_sel >> address) & 1)
+	else if ((cpustate->lr_sel >> address) & 1)
 		/* live register (LR) */
 		LR = data;
 	else
@@ -131,23 +120,16 @@ static void tx0_write(offs_t address, int data)
 
 static void tx0_init_common(int is_64kw, const device_config *device, int index, int clock, cpu_irq_callback irqcallback)
 {
-	int i;
-	tx0_reset_param_t *param = (tx0_reset_param_t *) device->static_config;
+	tx0_state *cpustate = device->token;
 
 	/* clean-up */
-	memset (&tx0, 0, sizeof (tx0));
+	cpustate->iface = device->static_config;
 
-	/* set up params and callbacks */
-	for (i=0; i<8; i++)
-		tx0.io_handlers[i] = (param) ? param->io_handlers[i] : NULL;
-	tx0.sel_handler = (param) ? param->sel_handler : NULL;
-	tx0.io_reset_callback = (param) ? param->io_reset_callback : NULL;
+	cpustate->address_mask = is_64kw ? ADDRESS_MASK_64KW : ADDRESS_MASK_8KW;
+	cpustate->ir_mask = is_64kw ? 03 : 037;
 
-	tx0.address_mask = is_64kw ? ADDRESS_MASK_64KW : ADDRESS_MASK_8KW;
-	tx0.ir_mask = is_64kw ? 03 : 037;
-
-	tx0.device = device;
-	tx0.program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
+	cpustate->device = device;
+	cpustate->program = memory_find_address_space(device, ADDRESS_SPACE_PROGRAM);
 }
 
 static CPU_INIT( tx0_64kw )
@@ -162,78 +144,78 @@ static CPU_INIT( tx0_8kw)
 
 static CPU_RESET( tx0 )
 {
-	/* reset CPU flip-flops */
-	pulse_reset();
+	tx0_state *cpustate = device->token;
 
-	tx0.gbl_cm_sel = 1;	/* HACK */
+	/* reset CPU flip-flops */
+	pulse_reset(device);
+
+	cpustate->gbl_cm_sel = 1;	/* HACK */
 }
 
 static CPU_GET_CONTEXT( tx0 )
 {
-	if (dst)
-		*(tx0_Regs *) dst = tx0;
 }
 
 static CPU_SET_CONTEXT( tx0 )
 {
-	if (src)
-		tx0 = *(tx0_Regs *) src;
 }
 
 
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( tx0_64kw )
 {
-	tx0_ICount = cycles;
+	tx0_state *cpustate = device->token;
+
+	cpustate->icount = cycles;
 
 	do
 	{
 		debugger_instruction_hook(device, PC);
 
 
-		if (tx0.ioh && tx0.ios)
+		if (cpustate->ioh && cpustate->ios)
 		{
-			tx0.ioh = 0;
-			tx0.ios = 0;
+			cpustate->ioh = 0;
+			cpustate->ios = 0;
 		}
 
 
-		if ((! tx0.run) && (! tx0.rim))
-			tx0_ICount = 0;	/* if processor is stopped, just burn cycles */
-		else if (tx0.rim)
+		if ((! cpustate->run) && (! cpustate->rim))
+			cpustate->icount = 0;	/* if processor is stopped, just burn cycles */
+		else if (cpustate->rim)
 		{
-			switch (tx0.rim_step)
+			switch (cpustate->rim_step)
 			{
 			case 0:
 				/* read first word as instruction */
 				AC = 0;
-				if (tx0.io_handlers[io_handler_rim])
-					(*tx0.io_handlers[io_handler_rim])();	/* data will be transferred to AC */
-				tx0.rim_step = 1;
+				if (cpustate->iface->io_handlers[io_handler_rim])
+					(*cpustate->iface->io_handlers[io_handler_rim])(device);	/* data will be transferred to AC */
+				cpustate->rim_step = 1;
 				break;
 
 			case 1:
-				if (! tx0.ios)
+				if (! cpustate->ios)
 				{	/* transfer incomplete: wait some more */
-					tx0_ICount = 0;
+					cpustate->icount = 0;
 				}
 				else
 				{	/* data transfer complete */
-					tx0.ios = 0;
+					cpustate->ios = 0;
 
 					MBR = AC;
 					IR = MBR >> 16;		/* basic opcode */
 					if ((IR == 2) || (IR == 1)) 	/* trn or add instruction? */
 					{
 						PC = MBR & ADDRESS_MASK_64KW;
-						tx0.rim = 0;	/* exit read-in mode */
-						tx0.run = (IR == 2) ? 1 : 0;	/* stop if add instruction */
-						tx0.rim_step = 0;
+						cpustate->rim = 0;	/* exit read-in mode */
+						cpustate->run = (IR == 2) ? 1 : 0;	/* stop if add instruction */
+						cpustate->rim_step = 0;
 					}
 					else if ((IR == 0) || (IR == 3))	/* sto or opr instruction? */
 					{
 						MAR = MBR & ADDRESS_MASK_64KW;
-						tx0.rim_step = 2;
+						cpustate->rim_step = 2;
 					}
 				}
 				break;
@@ -241,107 +223,109 @@ static CPU_EXECUTE( tx0_64kw )
 			case 2:
 				/* read second word as data */
 				AC = 0;
-				if (tx0.io_handlers[io_handler_rim])
-					(*tx0.io_handlers[io_handler_rim])();	/* data will be transferred to AC */
-				tx0.rim_step = 3;
+				if (cpustate->iface->io_handlers[io_handler_rim])
+					(*cpustate->iface->io_handlers[io_handler_rim])(device);	/* data will be transferred to AC */
+				cpustate->rim_step = 3;
 				break;
 
 			case 3:
-				if (! tx0.ios)
+				if (! cpustate->ios)
 				{	/* transfer incomplete: wait some more */
-					tx0_ICount = 0;
+					cpustate->icount = 0;
 				}
 				else
 				{	/* data transfer complete */
-					tx0.ios = 0;
+					cpustate->ios = 0;
 
-					tx0_write(MAR, MBR = AC);
+					tx0_write(cpustate, MAR, MBR = AC);
 
-					tx0.rim_step = 0;
+					cpustate->rim_step = 0;
 				}
 				break;
 			}
 		}
 		else
 		{
-			if (tx0.cycle == 0)
+			if (cpustate->cycle == 0)
 			{	/* fetch new instruction */
-				MBR = tx0_read(MAR = PC);
+				MBR = tx0_read(cpustate, MAR = PC);
 				INCREMENT_PC_64KW;
 				IR = MBR >> 16;		/* basic opcode */
 				MAR = MBR & ADDRESS_MASK_64KW;
 			}
 
-			if (! tx0.ioh)
+			if (! cpustate->ioh)
 			{
-				if ((tx0.stop_cyc0 && (tx0.cycle == 0))
-					|| (tx0.stop_cyc1 && (tx0.cycle == 1)))
-					tx0.run = 0;
+				if ((cpustate->stop_cyc0 && (cpustate->cycle == 0))
+					|| (cpustate->stop_cyc1 && (cpustate->cycle == 1)))
+					cpustate->run = 0;
 
-				execute_instruction_64kw();	/* execute instruction */
+				execute_instruction_64kw(device);	/* execute instruction */
 			}
 
-			tx0_ICount --;
+			cpustate->icount --;
 		}
 	}
-	while (tx0_ICount > 0);
+	while (cpustate->icount > 0);
 
-	return cycles - tx0_ICount;
+	return cycles - cpustate->icount;
 }
 
 /* execute instructions on this CPU until icount expires */
 static CPU_EXECUTE( tx0_8kw )
 {
-	tx0_ICount = cycles;
+	tx0_state *cpustate = device->token;
+
+	cpustate->icount = cycles;
 
 	do
 	{
 		debugger_instruction_hook(device, PC);
 
 
-		if (tx0.ioh && tx0.ios)
+		if (cpustate->ioh && cpustate->ios)
 		{
-			tx0.ioh = 0;
-			tx0.ios = 0;
+			cpustate->ioh = 0;
+			cpustate->ios = 0;
 		}
 
 
-		if ((! tx0.run) && (! tx0.rim))
-			tx0_ICount = 0;	/* if processor is stopped, just burn cycles */
-		else if (tx0.rim)
+		if ((! cpustate->run) && (! cpustate->rim))
+			cpustate->icount = 0;	/* if processor is stopped, just burn cycles */
+		else if (cpustate->rim)
 		{
-			switch (tx0.rim_step)
+			switch (cpustate->rim_step)
 			{
 			case 0:
 				/* read first word as instruction */
 				AC = 0;
-				if (tx0.io_handlers[io_handler_rim])
-					(*tx0.io_handlers[io_handler_rim])();	/* data will be transferred to AC */
-				tx0.rim_step = 1;
+				if (cpustate->iface->io_handlers[io_handler_rim])
+					(*cpustate->iface->io_handlers[io_handler_rim])(device);	/* data will be transferred to AC */
+				cpustate->rim_step = 1;
 				break;
 
 			case 1:
-				if (! tx0.ios)
+				if (! cpustate->ios)
 				{	/* transfer incomplete: wait some more */
-					tx0_ICount = 0;
+					cpustate->icount = 0;
 				}
 				else
 				{	/* data transfer complete */
-					tx0.ios = 0;
+					cpustate->ios = 0;
 
 					MBR = AC;
 					IR = MBR >> 13;		/* basic opcode */
 					if ((IR == 16) || (IR == 8)) 	/* trn or add instruction? */
 					{
 						PC = MBR & ADDRESS_MASK_8KW;
-						tx0.rim = 0;	/* exit read-in mode */
-						tx0.run = (IR == 16) ? 1 : 0;	/* stop if add instruction */
-						tx0.rim_step = 0;
+						cpustate->rim = 0;	/* exit read-in mode */
+						cpustate->run = (IR == 16) ? 1 : 0;	/* stop if add instruction */
+						cpustate->rim_step = 0;
 					}
 					else if ((IR == 0) || (IR == 24))	/* sto or opr instruction? */
 					{
 						MAR = MBR & ADDRESS_MASK_8KW;
-						tx0.rim_step = 2;
+						cpustate->rim_step = 2;
 					}
 				}
 				break;
@@ -349,72 +333,74 @@ static CPU_EXECUTE( tx0_8kw )
 			case 2:
 				/* read second word as data */
 				AC = 0;
-				if (tx0.io_handlers[io_handler_rim])
-					(*tx0.io_handlers[io_handler_rim])();	/* data will be transferred to AC */
-				tx0.rim_step = 3;
+				if (cpustate->iface->io_handlers[io_handler_rim])
+					(*cpustate->iface->io_handlers[io_handler_rim])(device);	/* data will be transferred to AC */
+				cpustate->rim_step = 3;
 				break;
 
 			case 3:
-				if (! tx0.ios)
+				if (! cpustate->ios)
 				{	/* transfer incomplete: wait some more */
-					tx0_ICount = 0;
+					cpustate->icount = 0;
 				}
 				else
 				{	/* data transfer complete */
-					tx0.ios = 0;
+					cpustate->ios = 0;
 
-					tx0_write(MAR, MBR = AC);
+					tx0_write(cpustate, MAR, MBR = AC);
 
-					tx0.rim_step = 0;
+					cpustate->rim_step = 0;
 				}
 				break;
 			}
 		}
 		else
 		{
-			if (tx0.cycle == 0)
+			if (cpustate->cycle == 0)
 			{	/* fetch new instruction */
-				MBR = tx0_read(MAR = PC);
+				MBR = tx0_read(cpustate, MAR = PC);
 				INCREMENT_PC_8KW;
 				IR = MBR >> 13;		/* basic opcode */
 				MAR = MBR & ADDRESS_MASK_8KW;
 			}
 
-			if (! tx0.ioh)
+			if (! cpustate->ioh)
 			{
-				if ((tx0.stop_cyc0 && (tx0.cycle == 0))
-					|| (tx0.stop_cyc1 && (tx0.cycle == 1)))
-					tx0.run = 0;
+				if ((cpustate->stop_cyc0 && (cpustate->cycle == 0))
+					|| (cpustate->stop_cyc1 && (cpustate->cycle == 1)))
+					cpustate->run = 0;
 
-				execute_instruction_8kw();	/* execute instruction */
+				execute_instruction_8kw(device);	/* execute instruction */
 			}
 
-			tx0_ICount -= 1;
+			cpustate->icount -= 1;
 		}
 	}
-	while (tx0_ICount > 0);
+	while (cpustate->icount > 0);
 
-	return cycles - tx0_ICount;
+	return cycles - cpustate->icount;
 }
 
 
 static CPU_SET_INFO( tx0 )
 {
+	tx0_state *cpustate = device->token;
+
 	switch (state)
 	{
 	/* --- the following bits of info are set as 64-bit signed integers --- */
-	case CPUINFO_INT_SP:						(void) info->i;	/* no SP */					break;
+	case CPUINFO_INT_SP:						(void) info->i;	/* no SP */							break;
 	case CPUINFO_INT_PC:
-	case CPUINFO_INT_REGISTER + TX0_PC:			PC = info->i & tx0.address_mask;			break;
-	case CPUINFO_INT_REGISTER + TX0_IR:			IR = info->i & tx0.ir_mask; /* weird idea */break;
-	case CPUINFO_INT_REGISTER + TX0_MBR:		MBR = info->i & 0777777;					break;
-	case CPUINFO_INT_REGISTER + TX0_MAR:		MAR = info->i & tx0.address_mask;			break;
-	case CPUINFO_INT_REGISTER + TX0_AC:			AC = info->i & 0777777;						break;
-	case CPUINFO_INT_REGISTER + TX0_LR:			LR = info->i & 0777777;						break;
-	case CPUINFO_INT_REGISTER + TX0_XR:			XR = info->i & 0037777;						break;
-	case CPUINFO_INT_REGISTER + TX0_PF:			PF = info->i & 077;							break;
-	case CPUINFO_INT_REGISTER + TX0_TBR:		tx0.tbr = info->i & 0777777;				break;
-	case CPUINFO_INT_REGISTER + TX0_TAC:		tx0.tac = info->i & 0777777;				break;
+	case CPUINFO_INT_REGISTER + TX0_PC:			PC = info->i & cpustate->address_mask;				break;
+	case CPUINFO_INT_REGISTER + TX0_IR:			IR = info->i & cpustate->ir_mask; /* weird idea */	break;
+	case CPUINFO_INT_REGISTER + TX0_MBR:		MBR = info->i & 0777777;							break;
+	case CPUINFO_INT_REGISTER + TX0_MAR:		MAR = info->i & cpustate->address_mask;				break;
+	case CPUINFO_INT_REGISTER + TX0_AC:			AC = info->i & 0777777;								break;
+	case CPUINFO_INT_REGISTER + TX0_LR:			LR = info->i & 0777777;								break;
+	case CPUINFO_INT_REGISTER + TX0_XR:			XR = info->i & 0037777;								break;
+	case CPUINFO_INT_REGISTER + TX0_PF:			PF = info->i & 077;									break;
+	case CPUINFO_INT_REGISTER + TX0_TBR:		cpustate->tbr = info->i & 0777777;					break;
+	case CPUINFO_INT_REGISTER + TX0_TAC:		cpustate->tac = info->i & 0777777;					break;
 	case CPUINFO_INT_REGISTER + TX0_TSS00:
 	case CPUINFO_INT_REGISTER + TX0_TSS01:
 	case CPUINFO_INT_REGISTER + TX0_TSS02:
@@ -430,63 +416,65 @@ static CPU_SET_INFO( tx0 )
 	case CPUINFO_INT_REGISTER + TX0_TSS14:
 	case CPUINFO_INT_REGISTER + TX0_TSS15:
 	case CPUINFO_INT_REGISTER + TX0_TSS16:
-	case CPUINFO_INT_REGISTER + TX0_TSS17:		tx0.tss[state-(CPUINFO_INT_REGISTER + TX0_TSS00)] = info->i & 0777777;	break;
-	case CPUINFO_INT_REGISTER + TX0_CM_SEL:		tx0.cm_sel = info->i & 0177777;				break;
-	case CPUINFO_INT_REGISTER + TX0_LR_SEL:		tx0.lr_sel = info->i & 0177777;				break;
-	case CPUINFO_INT_REGISTER + TX0_GBL_CM_SEL:	tx0.gbl_cm_sel = info->i ? 1 : 0;			break;
-	case CPUINFO_INT_REGISTER + TX0_STOP_CYC0:	tx0.stop_cyc0 = info->i ? 1 : 0;			break;
-	case CPUINFO_INT_REGISTER + TX0_STOP_CYC1:	tx0.stop_cyc1 = info->i ? 1 : 0;			break;
-	case CPUINFO_INT_REGISTER + TX0_RUN:		tx0.run = info->i ? 1 : 0;					break;
-	case CPUINFO_INT_REGISTER + TX0_RIM:		tx0.rim = info->i ? 1 : 0;					break;
+	case CPUINFO_INT_REGISTER + TX0_TSS17:		cpustate->tss[state-(CPUINFO_INT_REGISTER + TX0_TSS00)] = info->i & 0777777;	break;
+	case CPUINFO_INT_REGISTER + TX0_CM_SEL:		cpustate->cm_sel = info->i & 0177777;				break;
+	case CPUINFO_INT_REGISTER + TX0_LR_SEL:		cpustate->lr_sel = info->i & 0177777;				break;
+	case CPUINFO_INT_REGISTER + TX0_GBL_CM_SEL:	cpustate->gbl_cm_sel = info->i ? 1 : 0;				break;
+	case CPUINFO_INT_REGISTER + TX0_STOP_CYC0:	cpustate->stop_cyc0 = info->i ? 1 : 0;				break;
+	case CPUINFO_INT_REGISTER + TX0_STOP_CYC1:	cpustate->stop_cyc1 = info->i ? 1 : 0;				break;
+	case CPUINFO_INT_REGISTER + TX0_RUN:		cpustate->run = info->i ? 1 : 0;					break;
+	case CPUINFO_INT_REGISTER + TX0_RIM:		cpustate->rim = info->i ? 1 : 0;					break;
 	case CPUINFO_INT_REGISTER + TX0_CYCLE:		if (LOG) logerror("tx0_set_reg to cycle counter ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + TX0_IOH:		if (LOG) logerror("tx0_set_reg to ioh flip-flop ignored\n");/* no way!*/ break;
 	case CPUINFO_INT_REGISTER + TX0_IOS:		if (LOG) logerror("tx0_set_reg to ios flip-flop ignored\n");/* no way!*/ break;
-	case CPUINFO_INT_REGISTER + TX0_RESET:		pulse_reset();							break;
-	case CPUINFO_INT_REGISTER + TX0_IO_COMPLETE:tx0.ios = 1;							break;
+	case CPUINFO_INT_REGISTER + TX0_RESET:		pulse_reset(device);								break;
+	case CPUINFO_INT_REGISTER + TX0_IO_COMPLETE:cpustate->ios = 1;									break;
 	}
 }
 
 
 CPU_GET_INFO( tx0_64kw )
 {
+	tx0_state *cpustate = ( device != NULL ) ? device->token : NULL;
+
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tx0);					break;
-	case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
-	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
-	case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;	/*don't care*/	break;
-	case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-	case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
-	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;							break;
-	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-	case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-	case CPUINFO_INT_MAX_CYCLES:					info->i = 3;							break;
+	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tx0_state);					break;
+	case CPUINFO_INT_INPUT_LINES:					info->i = 0;									break;
+	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;									break;
+	case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;	/*don't care*/		break;
+	case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;									break;
+	case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;									break;
+	case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 4;									break;
+	case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;									break;
+	case CPUINFO_INT_MIN_CYCLES:					info->i = 1;									break;
+	case CPUINFO_INT_MAX_CYCLES:					info->i = 3;									break;
 
-	case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -2;					break;
-	case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;					break;
-	case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;					break;
-	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;					break;
+	case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;							break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;							break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_PROGRAM: info->i = -2;							break;
+	case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_DATA:	info->i = 0;							break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_DATA: 	info->i = 0;							break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_DATA: 	info->i = 0;							break;
+	case CPUINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 0;							break;
+	case CPUINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO: 		info->i = 0;							break;
+	case CPUINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO: 		info->i = 0;							break;
 
-	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */				break;
-	case CPUINFO_INT_PC:							info->i = PC;							break;
-	case CPUINFO_INT_PREVIOUSPC:					info->i = 0;	/* TODO??? */			break;
+	case CPUINFO_INT_SP:							info->i = 0;	/* no SP */						break;
+	case CPUINFO_INT_PC:							info->i = PC;									break;
+	case CPUINFO_INT_PREVIOUSPC:					info->i = 0;	/* TODO??? */					break;
 
-	case CPUINFO_INT_REGISTER + TX0_PC:				info->i = PC;							break;
-	case CPUINFO_INT_REGISTER + TX0_IR:				info->i = IR;							break;
-	case CPUINFO_INT_REGISTER + TX0_MBR:			info->i = MBR;							break;
-	case CPUINFO_INT_REGISTER + TX0_MAR:			info->i = MAR;							break;
-	case CPUINFO_INT_REGISTER + TX0_AC:				info->i = AC;							break;
-	case CPUINFO_INT_REGISTER + TX0_LR:				info->i = LR;							break;
-	case CPUINFO_INT_REGISTER + TX0_XR:				info->i = XR;							break;
-	case CPUINFO_INT_REGISTER + TX0_PF:				info->i = PF;							break;
-	case CPUINFO_INT_REGISTER + TX0_TBR:			info->i = tx0.tbr;						break;
-	case CPUINFO_INT_REGISTER + TX0_TAC:			info->i = tx0.tac;						break;
+	case CPUINFO_INT_REGISTER + TX0_PC:				info->i = PC;									break;
+	case CPUINFO_INT_REGISTER + TX0_IR:				info->i = IR;									break;
+	case CPUINFO_INT_REGISTER + TX0_MBR:			info->i = MBR;									break;
+	case CPUINFO_INT_REGISTER + TX0_MAR:			info->i = MAR;									break;
+	case CPUINFO_INT_REGISTER + TX0_AC:				info->i = AC;									break;
+	case CPUINFO_INT_REGISTER + TX0_LR:				info->i = LR;									break;
+	case CPUINFO_INT_REGISTER + TX0_XR:				info->i = XR;									break;
+	case CPUINFO_INT_REGISTER + TX0_PF:				info->i = PF;									break;
+	case CPUINFO_INT_REGISTER + TX0_TBR:			info->i = cpustate->tbr;						break;
+	case CPUINFO_INT_REGISTER + TX0_TAC:			info->i = cpustate->tac;						break;
 	case CPUINFO_INT_REGISTER + TX0_TSS00:
 	case CPUINFO_INT_REGISTER + TX0_TSS01:
 	case CPUINFO_INT_REGISTER + TX0_TSS02:
@@ -502,48 +490,48 @@ CPU_GET_INFO( tx0_64kw )
 	case CPUINFO_INT_REGISTER + TX0_TSS14:
 	case CPUINFO_INT_REGISTER + TX0_TSS15:
 	case CPUINFO_INT_REGISTER + TX0_TSS16:
-	case CPUINFO_INT_REGISTER + TX0_TSS17:			info->i = tx0.tss[state-(CPUINFO_INT_REGISTER + TX0_TSS00)]; break;
-	case CPUINFO_INT_REGISTER + TX0_CM_SEL:			info->i = tx0.cm_sel;					break;
-	case CPUINFO_INT_REGISTER + TX0_LR_SEL:			info->i = tx0.lr_sel;					break;
-	case CPUINFO_INT_REGISTER + TX0_GBL_CM_SEL:		info->i = tx0.gbl_cm_sel;				break;
-	case CPUINFO_INT_REGISTER + TX0_STOP_CYC0:		info->i = tx0.stop_cyc0;				break;
-	case CPUINFO_INT_REGISTER + TX0_STOP_CYC1:		info->i = tx0.stop_cyc1;				break;
-	case CPUINFO_INT_REGISTER + TX0_RUN:			info->i = tx0.run;						break;
-	case CPUINFO_INT_REGISTER + TX0_RIM:			info->i = tx0.rim;						break;
-	case CPUINFO_INT_REGISTER + TX0_CYCLE:			info->i = tx0.cycle;					break;
-	case CPUINFO_INT_REGISTER + TX0_IOH:			info->i = tx0.ioh;						break;
-	case CPUINFO_INT_REGISTER + TX0_IOS:			info->i = tx0.ios;						break;
+	case CPUINFO_INT_REGISTER + TX0_TSS17:			info->i = cpustate->tss[state-(CPUINFO_INT_REGISTER + TX0_TSS00)]; break;
+	case CPUINFO_INT_REGISTER + TX0_CM_SEL:			info->i = cpustate->cm_sel;						break;
+	case CPUINFO_INT_REGISTER + TX0_LR_SEL:			info->i = cpustate->lr_sel;						break;
+	case CPUINFO_INT_REGISTER + TX0_GBL_CM_SEL:		info->i = cpustate->gbl_cm_sel;					break;
+	case CPUINFO_INT_REGISTER + TX0_STOP_CYC0:		info->i = cpustate->stop_cyc0;					break;
+	case CPUINFO_INT_REGISTER + TX0_STOP_CYC1:		info->i = cpustate->stop_cyc1;					break;
+	case CPUINFO_INT_REGISTER + TX0_RUN:			info->i = cpustate->run;						break;
+	case CPUINFO_INT_REGISTER + TX0_RIM:			info->i = cpustate->rim;						break;
+	case CPUINFO_INT_REGISTER + TX0_CYCLE:			info->i = cpustate->cycle;						break;
+	case CPUINFO_INT_REGISTER + TX0_IOH:			info->i = cpustate->ioh;						break;
+	case CPUINFO_INT_REGISTER + TX0_IOS:			info->i = cpustate->ios;						break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tx0);			break;
 	case CPUINFO_PTR_GET_CONTEXT:					info->getcontext = CPU_GET_CONTEXT_NAME(tx0);		break;
 	case CPUINFO_PTR_SET_CONTEXT:					info->setcontext = CPU_SET_CONTEXT_NAME(tx0);		break;
-	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tx0_64kw);	break;
-	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tx0);		break;
-	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tx0_64kw);	break;
-	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
+	case CPUINFO_PTR_INIT:							info->init = CPU_INIT_NAME(tx0_64kw);			break;
+	case CPUINFO_PTR_RESET:							info->reset = CPU_RESET_NAME(tx0);				break;
+	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tx0_64kw);		break;
+	case CPUINFO_PTR_BURN:							info->burn = NULL;								break;
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tx0_64kw);		break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tx0_ICount;				break;
+	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;						break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
-	case CPUINFO_STR_NAME: 							strcpy(info->s, "TX-0");	break;
-	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "TX-0");	break;
-	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");	break;
-	case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);	break;
-	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Raphael Nabet");	break;
+	case CPUINFO_STR_NAME: 							strcpy(info->s, "TX-0");						break;
+	case CPUINFO_STR_CORE_FAMILY:					strcpy(info->s, "TX-0");						break;
+	case CPUINFO_STR_CORE_VERSION:					strcpy(info->s, "1.0");							break;
+	case CPUINFO_STR_CORE_FILE:						strcpy(info->s, __FILE__);						break;
+	case CPUINFO_STR_CORE_CREDITS:					strcpy(info->s, "Raphael Nabet");				break;
 
-    case CPUINFO_STR_FLAGS:							strcpy(info->s, "");	break;
+    case CPUINFO_STR_FLAGS:							strcpy(info->s, "");							break;
 
-	case CPUINFO_STR_REGISTER + TX0_PC:				sprintf(info->s, "PC:0%06o", PC); break;
-	case CPUINFO_STR_REGISTER + TX0_IR:				sprintf(info->s, "IR:0%02o", IR); break;
-	case CPUINFO_STR_REGISTER + TX0_MBR:			sprintf(info->s, "MBR:0%06o", MBR); break;
-	case CPUINFO_STR_REGISTER + TX0_MAR:			sprintf(info->s, "MAR:0%06o", MAR); break;
-	case CPUINFO_STR_REGISTER + TX0_AC:				sprintf(info->s, "AC:0%06o", AC); break;
-	case CPUINFO_STR_REGISTER + TX0_LR:				sprintf(info->s, "LR:0%06o", LR); break;
-	case CPUINFO_STR_REGISTER + TX0_XR:				sprintf(info->s, "XR:0%05o", XR); break;
-	case CPUINFO_STR_REGISTER + TX0_PF:				sprintf(info->s, "PF:0%02o", PF); break;							break;
-	case CPUINFO_STR_REGISTER + TX0_TBR:			sprintf(info->s, "TBR:0%06o", tx0.tbr); break;
-	case CPUINFO_STR_REGISTER + TX0_TAC:			sprintf(info->s, "TAC:0%06o", tx0.tac); break;
+	case CPUINFO_STR_REGISTER + TX0_PC:				sprintf(info->s, "PC:0%06o", PC);				break;
+	case CPUINFO_STR_REGISTER + TX0_IR:				sprintf(info->s, "IR:0%02o", IR);				break;
+	case CPUINFO_STR_REGISTER + TX0_MBR:			sprintf(info->s, "MBR:0%06o", MBR);				break;
+	case CPUINFO_STR_REGISTER + TX0_MAR:			sprintf(info->s, "MAR:0%06o", MAR);				break;
+	case CPUINFO_STR_REGISTER + TX0_AC:				sprintf(info->s, "AC:0%06o", AC);				break;
+	case CPUINFO_STR_REGISTER + TX0_LR:				sprintf(info->s, "LR:0%06o", LR);				break;
+	case CPUINFO_STR_REGISTER + TX0_XR:				sprintf(info->s, "XR:0%05o", XR);				break;
+	case CPUINFO_STR_REGISTER + TX0_PF:				sprintf(info->s, "PF:0%02o", PF);				break;
+	case CPUINFO_STR_REGISTER + TX0_TBR:			sprintf(info->s, "TBR:0%06o", cpustate->tbr);	break;
+	case CPUINFO_STR_REGISTER + TX0_TAC:			sprintf(info->s, "TAC:0%06o", cpustate->tac);	break;
 	case CPUINFO_STR_REGISTER + TX0_TSS00:
 	case CPUINFO_STR_REGISTER + TX0_TSS01:
 	case CPUINFO_STR_REGISTER + TX0_TSS02:
@@ -559,26 +547,28 @@ CPU_GET_INFO( tx0_64kw )
 	case CPUINFO_STR_REGISTER + TX0_TSS14:
 	case CPUINFO_STR_REGISTER + TX0_TSS15:
 	case CPUINFO_STR_REGISTER + TX0_TSS16:
-	case CPUINFO_STR_REGISTER + TX0_TSS17:			sprintf(info->s, "TSS%02o:0%06o", state-(CPUINFO_STR_REGISTER + TX0_TSS00), tx0.tss[state-(CPUINFO_STR_REGISTER + TX0_TSS00)]); break;
-	case CPUINFO_STR_REGISTER + TX0_CM_SEL:			sprintf(info->s, "CMSEL:0%06o", tx0.cm_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_LR_SEL:			sprintf(info->s, "LRSEL:0%06o", tx0.lr_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_GBL_CM_SEL:		sprintf(info->s, "GBLCMSEL:%X", tx0.gbl_cm_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_STOP_CYC0:		sprintf(info->s, "STOPCYC0:%X", tx0.stop_cyc0); break;
-	case CPUINFO_STR_REGISTER + TX0_STOP_CYC1:		sprintf(info->s, "STOPCYC1:%X", tx0.stop_cyc1); break;
-	case CPUINFO_STR_REGISTER + TX0_RUN:			sprintf(info->s, "RUN:%X", tx0.run); break;
-	case CPUINFO_STR_REGISTER + TX0_RIM:			sprintf(info->s, "RIM:%X", tx0.rim); break;
-	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s, "CYCLE:%X", tx0.cycle); break;
-	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s, "IOH:%X", tx0.ioh); break;
-	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s, "IOS:%X", tx0.ios); break;
+	case CPUINFO_STR_REGISTER + TX0_TSS17:			sprintf(info->s, "TSS%02o:0%06o", state-(CPUINFO_STR_REGISTER + TX0_TSS00), cpustate->tss[state-(CPUINFO_STR_REGISTER + TX0_TSS00)]); break;
+	case CPUINFO_STR_REGISTER + TX0_CM_SEL:			sprintf(info->s, "CMSEL:0%06o", cpustate->cm_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_LR_SEL:			sprintf(info->s, "LRSEL:0%06o", cpustate->lr_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_GBL_CM_SEL:		sprintf(info->s, "GBLCMSEL:%X", cpustate->gbl_cm_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_STOP_CYC0:		sprintf(info->s, "STOPCYC0:%X", cpustate->stop_cyc0); break;
+	case CPUINFO_STR_REGISTER + TX0_STOP_CYC1:		sprintf(info->s, "STOPCYC1:%X", cpustate->stop_cyc1); break;
+	case CPUINFO_STR_REGISTER + TX0_RUN:			sprintf(info->s, "RUN:%X", cpustate->run); break;
+	case CPUINFO_STR_REGISTER + TX0_RIM:			sprintf(info->s, "RIM:%X", cpustate->rim); break;
+	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s, "CYCLE:%X", cpustate->cycle); break;
+	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s, "IOH:%X", cpustate->ioh); break;
+	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s, "IOS:%X", cpustate->ios); break;
 	}
 }
 
 CPU_GET_INFO( tx0_8kw )
 {
+	tx0_state *cpustate = ( device != NULL ) ? device->token : NULL;
+
 	switch (state)
 	{
 	/* --- the following bits of info are returned as 64-bit signed integers --- */
-	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tx0);					break;
+	case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(tx0_state);					break;
 	case CPUINFO_INT_INPUT_LINES:					info->i = 0;							break;
 	case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 	case CPUINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_BIG;	/*don't care*/	break;
@@ -611,8 +601,8 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_INT_REGISTER + TX0_LR:				info->i = LR;							break;
 	case CPUINFO_INT_REGISTER + TX0_XR:				info->i = XR;							break;
 	case CPUINFO_INT_REGISTER + TX0_PF:				info->i = PF;							break;
-	case CPUINFO_INT_REGISTER + TX0_TBR:			info->i = tx0.tbr;						break;
-	case CPUINFO_INT_REGISTER + TX0_TAC:			info->i = tx0.tac;						break;
+	case CPUINFO_INT_REGISTER + TX0_TBR:			info->i = cpustate->tbr;						break;
+	case CPUINFO_INT_REGISTER + TX0_TAC:			info->i = cpustate->tac;						break;
 	case CPUINFO_INT_REGISTER + TX0_TSS00:
 	case CPUINFO_INT_REGISTER + TX0_TSS01:
 	case CPUINFO_INT_REGISTER + TX0_TSS02:
@@ -628,17 +618,17 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_INT_REGISTER + TX0_TSS14:
 	case CPUINFO_INT_REGISTER + TX0_TSS15:
 	case CPUINFO_INT_REGISTER + TX0_TSS16:
-	case CPUINFO_INT_REGISTER + TX0_TSS17:			info->i = tx0.tss[state-(CPUINFO_INT_REGISTER + TX0_TSS00)]; break;
-	case CPUINFO_INT_REGISTER + TX0_CM_SEL:			info->i = tx0.cm_sel;					break;
-	case CPUINFO_INT_REGISTER + TX0_LR_SEL:			info->i = tx0.lr_sel;					break;
-	case CPUINFO_INT_REGISTER + TX0_GBL_CM_SEL:		info->i = tx0.gbl_cm_sel;				break;
-	case CPUINFO_INT_REGISTER + TX0_STOP_CYC0:		info->i = tx0.stop_cyc0;				break;
-	case CPUINFO_INT_REGISTER + TX0_STOP_CYC1:		info->i = tx0.stop_cyc1;				break;
-	case CPUINFO_INT_REGISTER + TX0_RUN:			info->i = tx0.run;						break;
-	case CPUINFO_INT_REGISTER + TX0_RIM:			info->i = tx0.rim;						break;
-	case CPUINFO_INT_REGISTER + TX0_CYCLE:			info->i = tx0.cycle;					break;
-	case CPUINFO_INT_REGISTER + TX0_IOH:			info->i = tx0.ioh;						break;
-	case CPUINFO_INT_REGISTER + TX0_IOS:			info->i = tx0.ios;						break;
+	case CPUINFO_INT_REGISTER + TX0_TSS17:			info->i = cpustate->tss[state-(CPUINFO_INT_REGISTER + TX0_TSS00)]; break;
+	case CPUINFO_INT_REGISTER + TX0_CM_SEL:			info->i = cpustate->cm_sel;					break;
+	case CPUINFO_INT_REGISTER + TX0_LR_SEL:			info->i = cpustate->lr_sel;					break;
+	case CPUINFO_INT_REGISTER + TX0_GBL_CM_SEL:		info->i = cpustate->gbl_cm_sel;				break;
+	case CPUINFO_INT_REGISTER + TX0_STOP_CYC0:		info->i = cpustate->stop_cyc0;				break;
+	case CPUINFO_INT_REGISTER + TX0_STOP_CYC1:		info->i = cpustate->stop_cyc1;				break;
+	case CPUINFO_INT_REGISTER + TX0_RUN:			info->i = cpustate->run;						break;
+	case CPUINFO_INT_REGISTER + TX0_RIM:			info->i = cpustate->rim;						break;
+	case CPUINFO_INT_REGISTER + TX0_CYCLE:			info->i = cpustate->cycle;					break;
+	case CPUINFO_INT_REGISTER + TX0_IOH:			info->i = cpustate->ioh;						break;
+	case CPUINFO_INT_REGISTER + TX0_IOS:			info->i = cpustate->ios;						break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
 	case CPUINFO_PTR_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(tx0);			break;
@@ -649,7 +639,7 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_PTR_EXECUTE:						info->execute = CPU_EXECUTE_NAME(tx0_8kw);	break;
 	case CPUINFO_PTR_BURN:							info->burn = NULL;						break;
 	case CPUINFO_PTR_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(tx0_8kw);		break;
-	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &tx0_ICount;				break;
+	case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &cpustate->icount;				break;
 
 	/* --- the following bits of info are returned as NULL-terminated strings --- */
 	case CPUINFO_STR_NAME: 							strcpy(info->s, "TX-0");	break;
@@ -668,8 +658,8 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_STR_REGISTER + TX0_LR:				sprintf(info->s, "LR:0%06o", LR); break;
 	case CPUINFO_STR_REGISTER + TX0_XR:				sprintf(info->s, "XR:0%05o", XR); break;
 	case CPUINFO_STR_REGISTER + TX0_PF:				sprintf(info->s, "PF:0%02o", PF); break;							break;
-	case CPUINFO_STR_REGISTER + TX0_TBR:			sprintf(info->s, "TBR:0%06o", tx0.tbr); break;
-	case CPUINFO_STR_REGISTER + TX0_TAC:			sprintf(info->s, "TAC:0%06o", tx0.tac); break;
+	case CPUINFO_STR_REGISTER + TX0_TBR:			sprintf(info->s, "TBR:0%06o", cpustate->tbr); break;
+	case CPUINFO_STR_REGISTER + TX0_TAC:			sprintf(info->s, "TAC:0%06o", cpustate->tac); break;
 	case CPUINFO_STR_REGISTER + TX0_TSS00:
 	case CPUINFO_STR_REGISTER + TX0_TSS01:
 	case CPUINFO_STR_REGISTER + TX0_TSS02:
@@ -685,27 +675,29 @@ CPU_GET_INFO( tx0_8kw )
 	case CPUINFO_STR_REGISTER + TX0_TSS14:
 	case CPUINFO_STR_REGISTER + TX0_TSS15:
 	case CPUINFO_STR_REGISTER + TX0_TSS16:
-	case CPUINFO_STR_REGISTER + TX0_TSS17:			sprintf(info->s, "TSS%02o:0%06o", state-(CPUINFO_STR_REGISTER + TX0_TSS00), tx0.tss[state-(CPUINFO_STR_REGISTER + TX0_TSS00)]); break;
-	case CPUINFO_STR_REGISTER + TX0_CM_SEL:			sprintf(info->s, "CMSEL:0%06o", tx0.cm_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_LR_SEL:			sprintf(info->s, "LRSEL:0%06o", tx0.lr_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_GBL_CM_SEL:		sprintf(info->s, "GBLCMSEL:%X", tx0.gbl_cm_sel); break;
-	case CPUINFO_STR_REGISTER + TX0_STOP_CYC0:		sprintf(info->s, "STOPCYC0:%X", tx0.stop_cyc0); break;
-	case CPUINFO_STR_REGISTER + TX0_STOP_CYC1:		sprintf(info->s, "STOPCYC1:%X", tx0.stop_cyc1); break;
-	case CPUINFO_STR_REGISTER + TX0_RUN:			sprintf(info->s, "RUN:%X", tx0.run); break;
-	case CPUINFO_STR_REGISTER + TX0_RIM:			sprintf(info->s, "RIM:%X", tx0.rim); break;
-	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s, "CYCLE:%X", tx0.cycle); break;
-	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s, "IOH:%X", tx0.ioh); break;
-	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s, "IOS:%X", tx0.ios); break;
+	case CPUINFO_STR_REGISTER + TX0_TSS17:			sprintf(info->s, "TSS%02o:0%06o", state-(CPUINFO_STR_REGISTER + TX0_TSS00), cpustate->tss[state-(CPUINFO_STR_REGISTER + TX0_TSS00)]); break;
+	case CPUINFO_STR_REGISTER + TX0_CM_SEL:			sprintf(info->s, "CMSEL:0%06o", cpustate->cm_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_LR_SEL:			sprintf(info->s, "LRSEL:0%06o", cpustate->lr_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_GBL_CM_SEL:		sprintf(info->s, "GBLCMSEL:%X", cpustate->gbl_cm_sel); break;
+	case CPUINFO_STR_REGISTER + TX0_STOP_CYC0:		sprintf(info->s, "STOPCYC0:%X", cpustate->stop_cyc0); break;
+	case CPUINFO_STR_REGISTER + TX0_STOP_CYC1:		sprintf(info->s, "STOPCYC1:%X", cpustate->stop_cyc1); break;
+	case CPUINFO_STR_REGISTER + TX0_RUN:			sprintf(info->s, "RUN:%X", cpustate->run); break;
+	case CPUINFO_STR_REGISTER + TX0_RIM:			sprintf(info->s, "RIM:%X", cpustate->rim); break;
+	case CPUINFO_STR_REGISTER + TX0_CYCLE:			sprintf(info->s, "CYCLE:%X", cpustate->cycle); break;
+	case CPUINFO_STR_REGISTER + TX0_IOH:			sprintf(info->s, "IOH:%X", cpustate->ioh); break;
+	case CPUINFO_STR_REGISTER + TX0_IOS:			sprintf(info->s, "IOS:%X", cpustate->ios); break;
 	}
 }
 
 
 /* execute one instruction */
-static void execute_instruction_64kw(void)
+static void execute_instruction_64kw(const device_config *device)
 {
-	if (! tx0.cycle)
+	tx0_state *cpustate = device->token;
+
+	if (! cpustate->cycle)
 	{
-		tx0.cycle = 1;	/* most frequent case */
+		cpustate->cycle = 1;	/* most frequent case */
 		switch (IR)
 		{
 		case 0:			/* STOre */
@@ -716,7 +708,7 @@ static void execute_instruction_64kw(void)
 			if (AC & 0400000)
 			{
 				PC = MAR & ADDRESS_MASK_64KW;
-				tx0.cycle = 0;	/* instruction only takes one cycle if branch
+				cpustate->cycle = 0;	/* instruction only takes one cycle if branch
                                     is taken */
 			}
 			break;
@@ -733,7 +725,7 @@ static void execute_instruction_64kw(void)
 			if (((MAR & 0030000) >> 12) == 1)
 				/* (0.8) IOS In-Out Stop = Stop machine so that an In-Out command
                     (specified by digits 6 7 8 of MAR) may be executed */
-				tx0.ioh = 1;
+				cpustate->ioh = 1;
 
 			if (((MAR & 0007000) >> 9) != 0)
 			{
@@ -767,24 +759,24 @@ static void execute_instruction_64kw(void)
 				/* (5 is undefined) */
 				int index = (MAR & 0007000) >> 9;
 
-				if (tx0.io_handlers[index])
-					(*tx0.io_handlers[index])();
-				tx0.ioh = 1;
+				if (cpustate->iface->io_handlers[index])
+					(*cpustate->iface->io_handlers[index])(device);
+				cpustate->ioh = 1;
 			}
 			break;
 		}
 	}
 	else
 	{
-		tx0.cycle = 0;	/* always true */
+		cpustate->cycle = 0;	/* always true */
 		switch (IR)
 		{
 		case 0:			/* STOre */
-			tx0_write(MAR, (MBR = AC));
+			tx0_write(cpustate, MAR, (MBR = AC));
 			break;
 
 		case 1:			/* ADD */
-			MBR = tx0_read(MAR);
+			MBR = tx0_read(cpustate, MAR);
 
 			AC = AC + MBR;
 			AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
@@ -872,14 +864,14 @@ static void execute_instruction_64kw(void)
 
 			if (((MAR & 0030000) >> 12) == 3)
 				/* (1.8) Hlt = Halt the computer */
-				tx0.run = 0;
+				cpustate->run = 0;
 
 			break;
 		}
 	}
 }
 
-static void indexed_address_eval(void)
+static void indexed_address_eval(tx0_state *cpustate)
 {
 	MAR = MAR + XR;
 	MAR = (MAR + (MAR >> 14)) & 0037777;	/* propagate carry around */
@@ -890,11 +882,13 @@ static void indexed_address_eval(void)
 }
 
 /* execute one instruction */
-static void execute_instruction_8kw(void)
+static void execute_instruction_8kw(const device_config *device)
 {
-	if (! tx0.cycle)
+	tx0_state *cpustate = device->token;
+
+	if (! cpustate->cycle)
 	{
-		tx0.cycle = 1;	/* most frequent case */
+		cpustate->cycle = 1;	/* most frequent case */
 		switch (IR)
 		{
 		case 0:		/* STOre */
@@ -918,7 +912,7 @@ static void execute_instruction_8kw(void)
 			if (AC & 0400000)
 			{
 				PC = MAR & 0017777;
-				tx0.cycle = 0;	/* instruction only takes one cycle if branch
+				cpustate->cycle = 0;	/* instruction only takes one cycle if branch
                                     is taken */
 			}
 			break;
@@ -927,7 +921,7 @@ static void execute_instruction_8kw(void)
 			if ((AC == 0000000) || (AC == 0777777))
 			{
 				PC = MAR & 0017777;
-				tx0.cycle = 0;	/* instruction only takes one cycle if branch
+				cpustate->cycle = 0;	/* instruction only takes one cycle if branch
                                     is taken */
 			}
 			break;
@@ -935,7 +929,7 @@ static void execute_instruction_8kw(void)
 		case 18:	/* Transfer and Set indeX */
 			XR = PC;
 			PC = MAR & 0017777;
-			tx0.cycle = 0;	/* instruction only takes one cycle if branch
+			cpustate->cycle = 0;	/* instruction only takes one cycle if branch
                                 is taken */
 			break;
 
@@ -947,16 +941,16 @@ static void execute_instruction_8kw(void)
 				else
 					XR--;
 				PC = MAR & 0017777;
-				tx0.cycle = 0;	/* instruction only takes one cycle if branch
+				cpustate->cycle = 0;	/* instruction only takes one cycle if branch
                                     is taken */
 			}
 			break;
 
 		case 21:	/* TRansfer indeXed */
-			indexed_address_eval();
+			indexed_address_eval(cpustate);
 		case 20:	/* TRAnsfer */
 			PC = MAR & 0017777;
-			tx0.cycle = 0;	/* instruction only takes one cycle if branch
+			cpustate->cycle = 0;	/* instruction only takes one cycle if branch
                                 is taken */
 			break;
 
@@ -964,7 +958,7 @@ static void execute_instruction_8kw(void)
 			/*if (...)
             {
                 PC = MAR & 0017777;
-                tx0.cycle = 0;*/	/* instruction only takes one cycle if branch
+                cpustate->cycle = 0;*/	/* instruction only takes one cycle if branch
                                     is taken */
 			/*}*/
 			break;
@@ -984,8 +978,8 @@ static void execute_instruction_8kw(void)
 					AC = 0;
 
 				/* (IOS???) SEL = SELect */
-				if (tx0.sel_handler)
-					(*tx0.sel_handler)();
+				if (cpustate->iface->sel_handler)
+					(*cpustate->iface->sel_handler)(device);
 			}
 			else
 			{	/* Normal operate class instruction */
@@ -1035,9 +1029,9 @@ static void execute_instruction_8kw(void)
 					/* (5 is undefined) */
 					int index = (MAR & 0007000) >> 9;
 
-					if (tx0.io_handlers[index])
-						(*tx0.io_handlers[index])();
-					tx0.ioh = 1;
+					if (cpustate->iface->io_handlers[index])
+						(*cpustate->iface->io_handlers[index])(device);
+					cpustate->ioh = 1;
 				}
 
 				if (((IR & 001) == 00) && ((MAR & 010000) == 010000))
@@ -1053,34 +1047,34 @@ static void execute_instruction_8kw(void)
 	}
 	else
 	{
-		if (((IR != 2) && (IR != 3)) || (tx0.cycle == 2))
-			tx0.cycle = 0;
+		if (((IR != 2) && (IR != 3)) || (cpustate->cycle == 2))
+			cpustate->cycle = 0;
 		else
-			tx0.cycle = 2;	/* SXA and ADO have an extra cycle 2 */
+			cpustate->cycle = 2;	/* SXA and ADO have an extra cycle 2 */
 		switch (IR)
 		{
 		case 1:		/* STore indeXed */
-			indexed_address_eval();
+			indexed_address_eval(cpustate);
 		case 0:		/* STOre */
-			tx0_write(MAR, (MBR = AC));
+			tx0_write(cpustate, MAR, (MBR = AC));
 			break;
 
 		case 2:		/* Store indeX in Address */
-			if (tx0.cycle)
+			if (cpustate->cycle)
 			{	/* cycle 1 */
-				MBR = tx0_read(MAR);
+				MBR = tx0_read(cpustate, MAR);
 				MBR = (MBR & 0760000) | (XR & 0017777);
 			}
 			else
 			{	/* cycle 2 */
-				tx0_write(MAR, MBR);
+				tx0_write(cpustate, MAR, MBR);
 			}
 			break;
 
 		case 3:		/* ADd One */
-			if (tx0.cycle)
+			if (cpustate->cycle)
 			{	/* cycle 1 */
-				AC = tx0_read(MAR) + 1;
+				AC = tx0_read(cpustate, MAR) + 1;
 
 				#if 0
 					AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
@@ -1093,24 +1087,24 @@ static void execute_instruction_8kw(void)
 			}
 			else
 			{	/* cycle 2 */
-				tx0_write(MAR, (MBR = AC));
+				tx0_write(cpustate, MAR, (MBR = AC));
 			}
 			break;
 
 		case 5:		/* Store Lr indeXed */
-			indexed_address_eval();
+			indexed_address_eval(cpustate);
 		case 4:		/* Store LR */
-			tx0_write(MAR, (MBR = LR));
+			tx0_write(cpustate, MAR, (MBR = LR));
 			break;
 
 		case 6:		/* STore Zero */
-			tx0_write(MAR, (MBR = 0));
+			tx0_write(cpustate, MAR, (MBR = 0));
 			break;
 
 		case 9:		/* ADd indeXed */
-			indexed_address_eval();
+			indexed_address_eval(cpustate);
 		case 8:		/* ADD */
-			MBR = tx0_read(MAR);
+			MBR = tx0_read(cpustate, MAR);
 
 			AC = AC + MBR;
 			AC = (AC + (AC >> 18)) & 0777777;	/* propagate carry around */
@@ -1120,12 +1114,12 @@ static void execute_instruction_8kw(void)
 			break;
 
 		case 10:	/* LoaD indeX */
-			MBR = tx0_read(MAR);
+			MBR = tx0_read(cpustate, MAR);
 			XR = (MBR & 0017777) | ((MBR >> 4) & 0020000);
 			break;
 
 		case 11:	/* AUgment indeX */
-			MBR = tx0_read(MAR);
+			MBR = tx0_read(cpustate, MAR);
 
 			XR = XR + ((MBR & 0017777) | ((MBR >> 4) & 0020000));
 			XR = (XR + (XR >> 14)) & 0037777;	/* propagate carry around */
@@ -1135,15 +1129,15 @@ static void execute_instruction_8kw(void)
 			break;
 
 		case 13:	/* Load Lr indeXed */
-			indexed_address_eval();
+			indexed_address_eval(cpustate);
 		case 12:	/* Load LR */
-			LR = MBR = tx0_read(MAR);
+			LR = MBR = tx0_read(cpustate, MAR);
 			break;
 
 		case 15:	/* Load Ac indeXed */
-			indexed_address_eval();
+			indexed_address_eval(cpustate);
 		case 14:	/* LoaD Ac */
-			AC = MBR = tx0_read(MAR);
+			AC = MBR = tx0_read(cpustate, MAR);
 			break;
 
 		case 16:	/* TRansfer on Negative */
@@ -1178,11 +1172,11 @@ static void execute_instruction_8kw(void)
 
 				if (((IR & 001) == 00) && ((MAR & 017000) == 001000))
 					/* (1.1) TAC = transfer TAC into ac (inclusive or) */
-					AC |= tx0.tac;
+					AC |= cpustate->tac;
 
 				if (((IR & 001) == 00) && ((MAR & 017000) == 002000))
 					/* (1.2) TBR = transfer TBR into mbr (inclusive or) */
-					MBR |= tx0.tbr;
+					MBR |= cpustate->tbr;
 
 				if (((IR & 001) == 00) && ((MAR & 017000) == 006000))
 					/* (1.2) RPF = Read Program Flag register into mbr (inclusive or) */
@@ -1278,7 +1272,7 @@ static void execute_instruction_8kw(void)
 
 				if (((IR & 001) == 01) && ((MAR & 017000) == 010000))
 					/* (1.8) HLT = HaLT the computer and sound chime */
-					tx0.run = 0;
+					cpustate->run = 0;
 			}
 			break;
 
@@ -1294,8 +1288,10 @@ static void execute_instruction_8kw(void)
     reset most registers and flip-flops, and initialize a few emulator state
     variables.
 */
-static void pulse_reset(void)
+static void pulse_reset(const device_config *device)
 {
+	tx0_state *cpustate = device->token;
+
 	/* processor registers */
 	PC = 0;			/* ??? */
 	IR = 0;			/* ??? */
@@ -1305,14 +1301,14 @@ static void pulse_reset(void)
 	/*LR = 0;*/		/* ??? */
 
 	/* processor state flip-flops */
-	tx0.run = 0;		/* ??? */
-	tx0.rim = 0;		/* ??? */
-	tx0.ioh = 0;		/* ??? */
-	tx0.ios = 0;		/* ??? */
+	cpustate->run = 0;		/* ??? */
+	cpustate->rim = 0;		/* ??? */
+	cpustate->ioh = 0;		/* ??? */
+	cpustate->ios = 0;		/* ??? */
 
-	tx0.rim_step = 0;
+	cpustate->rim_step = 0;
 
 	/* now, we kindly ask IO devices to reset, too */
-	if (tx0.io_reset_callback)
-		(*tx0.io_reset_callback)();
+	if (cpustate->iface->io_reset_callback)
+		(*cpustate->iface->io_reset_callback)(device);
 }

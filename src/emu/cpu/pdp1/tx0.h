@@ -36,19 +36,16 @@ struct _tx0_reset_param_t
         5: reserved (for unimplemented typ instruction?)
         6: p6h
         7: p7h */
-	void (*io_handlers[8])(void);
+	void (*io_handlers[8])(const device_config *device);
 	/* select instruction handler */
-	void (*sel_handler)(void);
+	void (*sel_handler)(const device_config *device);
 	/* callback called when reset line is pulsed: IO devices should reset */
-	void (*io_reset_callback)(void);
+	void (*io_reset_callback)(const device_config *device);
 };
 
 /* PUBLIC FUNCTIONS */
 CPU_GET_INFO( tx0_64kw );
 CPU_GET_INFO( tx0_8kw );
-
-#define READ_TX0_18BIT(A) ((signed)memory_read_dword_32be(tx0.program, (A)<<2))
-#define WRITE_TX0_18BIT(A,V) (memory_write_dword_32be(tx0.program, (A)<<2,(V)))
 
 CPU_DISASSEMBLE( tx0_64kw );
 CPU_DISASSEMBLE( tx0_8kw );
