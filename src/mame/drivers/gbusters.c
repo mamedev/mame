@@ -15,7 +15,7 @@ Preliminary driver by:
 
 /* prototypes */
 static MACHINE_RESET( gbusters );
-static void gbusters_banking( const device_config *device, int lines );
+static KONAMI_SETLINES_CALLBACK( gbusters_banking );
 
 
 extern int gbusters_priority;
@@ -413,7 +413,7 @@ ROM_START( crazycop )
 ROM_END
 
 
-static void gbusters_banking( const device_config *device, int lines )
+static KONAMI_SETLINES_CALLBACK( gbusters_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0x10000;

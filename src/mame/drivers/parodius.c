@@ -14,7 +14,7 @@ driver by Nicola Salmoria
 
 /* prototypes */
 static MACHINE_RESET( parodius );
-static void parodius_banking( const device_config *device, int lines );
+static KONAMI_SETLINES_CALLBACK( parodius_banking );
 VIDEO_START( parodius );
 VIDEO_UPDATE( parodius );
 
@@ -380,7 +380,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void parodius_banking(const device_config *device, int lines)
+static KONAMI_SETLINES_CALLBACK( parodius_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0;

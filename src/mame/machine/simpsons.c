@@ -114,7 +114,7 @@ READ8_HANDLER( simpsons_sound_r )
 
 ***************************************************************************/
 
-static void simpsons_banking( const device_config *device, int lines )
+static KONAMI_SETLINES_CALLBACK( simpsons_banking )
 {
 	memory_set_bank(device->machine, 1, lines & 0x3f);
 }

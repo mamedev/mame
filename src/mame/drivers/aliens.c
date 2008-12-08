@@ -15,7 +15,7 @@ Preliminary driver by:
 
 /* prototypes */
 static MACHINE_RESET( aliens );
-static void aliens_banking( const device_config *device, int lines );
+static KONAMI_SETLINES_CALLBACK( aliens_banking );
 
 
 VIDEO_START( aliens );
@@ -480,7 +480,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void aliens_banking( const device_config *device, int lines )
+static KONAMI_SETLINES_CALLBACK( aliens_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0x18000;

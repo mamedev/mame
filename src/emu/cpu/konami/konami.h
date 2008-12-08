@@ -20,6 +20,8 @@ enum
 	CPUINFO_PTR_KONAMI_SETLINES_CALLBACK = CPUINFO_PTR_CPU_SPECIFIC
 };
 
+#define KONAMI_SETLINES_CALLBACK(name) void name(const device_config *device, int lines)
+
 #define KONAMI_IRQ_LINE	0	/* IRQ line number */
 #define KONAMI_FIRQ_LINE 1   /* FIRQ line number */
 

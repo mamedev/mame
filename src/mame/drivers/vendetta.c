@@ -95,7 +95,7 @@ Notes:
 
 /* prototypes */
 static MACHINE_RESET( vendetta );
-static void vendetta_banking( const device_config *device, int lines );
+static KONAMI_SETLINES_CALLBACK( vendetta_banking );
 static void vendetta_video_banking( running_machine *machine, int select );
 
 VIDEO_START( vendetta );
@@ -774,7 +774,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void vendetta_banking( const device_config *device, int lines )
+static KONAMI_SETLINES_CALLBACK( vendetta_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 

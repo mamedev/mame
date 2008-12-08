@@ -20,7 +20,7 @@ Dip locations verified with manual (US)
 
 /* prototypes */
 static MACHINE_RESET( crimfght );
-static void crimfght_banking( const device_config *device, int lines );
+static KONAMI_SETLINES_CALLBACK( crimfght_banking );
 
 VIDEO_START( crimfght );
 VIDEO_UPDATE( crimfght );
@@ -414,7 +414,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void crimfght_banking( const device_config *device, int lines )
+static KONAMI_SETLINES_CALLBACK( crimfght_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0;

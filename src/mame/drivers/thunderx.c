@@ -16,7 +16,7 @@ K052591 emulation by Eddie Edwards
 
 static MACHINE_RESET( scontra );
 static MACHINE_RESET( thunderx );
-static void thunderx_banking(const device_config *device, int lines);
+static KONAMI_SETLINES_CALLBACK( thunderx_banking );
 
 extern int scontra_priority;
 VIDEO_START( scontra );
@@ -1019,7 +1019,7 @@ ROM_END
 
 /***************************************************************************/
 
-static void thunderx_banking( const device_config *device, int lines )
+static KONAMI_SETLINES_CALLBACK( thunderx_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs;

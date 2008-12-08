@@ -13,7 +13,7 @@
 
 
 static MACHINE_RESET( 88games );
-static void k88games_banking( const device_config *device, int lines );
+static KONAMI_SETLINES_CALLBACK( k88games_banking );
 
 static UINT8 *ram;
 static UINT8 *banked_rom;
@@ -468,7 +468,7 @@ ROM_END
 
 
 
-static void k88games_banking( const device_config *device, int lines )
+static KONAMI_SETLINES_CALLBACK( k88games_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs;

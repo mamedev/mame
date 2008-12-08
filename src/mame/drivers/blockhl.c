@@ -26,7 +26,7 @@ found it.
 
 /* prototypes */
 static MACHINE_RESET( blockhl );
-static void blockhl_banking( const device_config *device, int lines );
+static KONAMI_SETLINES_CALLBACK( blockhl_banking );
 
 
 VIDEO_START( blockhl );
@@ -288,7 +288,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void blockhl_banking( const device_config *device, int lines )
+static KONAMI_SETLINES_CALLBACK( blockhl_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs;

@@ -15,7 +15,7 @@ driver by Nicola Salmoria
 
 /* prototypes */
 static MACHINE_RESET( rollerg );
-static void rollerg_banking( const device_config *device, int lines );
+static KONAMI_SETLINES_CALLBACK( rollerg_banking );
 
 VIDEO_START( rollerg );
 VIDEO_UPDATE( rollerg );
@@ -329,7 +329,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void rollerg_banking( const device_config *device, int lines )
+static KONAMI_SETLINES_CALLBACK( rollerg_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0;

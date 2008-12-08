@@ -15,7 +15,7 @@ driver by Nicola Salmoria
 
 /* prototypes */
 static MACHINE_RESET( surpratk );
-static void surpratk_banking( const device_config *device, int lines );
+static KONAMI_SETLINES_CALLBACK( surpratk_banking );
 VIDEO_START( surpratk );
 VIDEO_UPDATE( surpratk );
 
@@ -324,7 +324,7 @@ ROM_END
 
 ***************************************************************************/
 
-static void surpratk_banking(const device_config *device, int lines)
+static KONAMI_SETLINES_CALLBACK( surpratk_banking )
 {
 	UINT8 *RAM = memory_region(device->machine, "main");
 	int offs = 0;
