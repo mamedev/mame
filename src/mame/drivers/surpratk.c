@@ -345,8 +345,8 @@ static MACHINE_RESET( surpratk )
 
 static DRIVER_INIT( surpratk )
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_2("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_2(machine, "gfx2");
 }
 
 

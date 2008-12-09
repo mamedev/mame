@@ -326,7 +326,7 @@ ROM_END
 
 static DRIVER_INIT( ultraman )
 {
-	konami_rom_deinterleave_2("gfx1");
+	konami_rom_deinterleave_2(machine, "gfx1");
 }
 
 

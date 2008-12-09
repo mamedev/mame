@@ -506,8 +506,8 @@ static MACHINE_RESET( aliens )
 
 static DRIVER_INIT( aliens )
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_2("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_2(machine, "gfx2");
 
 	state_save_register_global(machine, palette_selected);
 }

@@ -14,15 +14,15 @@ static int road_palbank;
 
 static void taitoz_core_vh_start(running_machine *machine, int x_offs)
 {
-	if (has_TC0480SCP())	/* it's Dblaxle, a tc0480scp game */
+	if (has_TC0480SCP(machine))	/* it's Dblaxle, a tc0480scp game */
 		TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,x_offs,0x21,0x08,4,0,0,0,0);
 	else	/* it's a tc0100scn game */
 		TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,0,0,0,0,0,0);
 
-	if (has_TC0150ROD())
+	if (has_TC0150ROD(machine))
 		TC0150ROD_vh_start(machine);
 
-	if (has_TC0110PCR())
+	if (TC0110PCR_mask(machine) & 1)
 		TC0110PCR_vh_start(machine);
 }
 

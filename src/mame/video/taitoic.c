@@ -533,7 +533,6 @@ Newer version of the I/O chip ?
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "taitoic.h"
 
 #define TOPSPEED_ROAD_COLORS
@@ -578,11 +577,12 @@ INLINE void taitoic_drawscanline(
 /* Note: various assumptions are made in these routines, typically that
    only CPU#0 is of interest. If in doubt, check the routine. */
 
-static int has_write_handler(int cpunum, write16_space_func handler)
+static int has_write_handler(running_machine *machine, int cpunum, write16_space_func handler)
 {
-	if (Machine->cpu[cpunum] != NULL)
+	const device_config *cpu = machine->cpu[cpunum];
+	if (cpu != NULL)
 	{
-		const address_space *space = cpu_get_address_space(Machine->cpu[cpunum], ADDRESS_SPACE_PROGRAM);
+		const address_space *space = cpu_get_address_space(cpu, ADDRESS_SPACE_PROGRAM);
 		const address_map_entry *entry;
 
 		if (space != NULL && space->map != NULL)
@@ -594,84 +594,62 @@ static int has_write_handler(int cpunum, write16_space_func handler)
 	return 0;
 }
 
-int number_of_TC0100SCN(void)
+int TC0100SCN_count(running_machine *machine)
 {
-	int has_chip[3] = {0,0,0};
-
-	/* scan the memory handlers and see how many TC0100SCN are used */
-	if (has_write_handler(0, TC0100SCN_word_0_w) ||
-		has_write_handler(0, TC0100SCN_dual_screen_w) ||
-		has_write_handler(0, TC0100SCN_triple_screen_w))
-		has_chip[0] = 1;
-
-	if (has_write_handler(0, TC0100SCN_word_1_w))
-		has_chip[1] = 1;
-
-	if (has_write_handler(0, TC0100SCN_word_2_w))
-		has_chip[2] = 1;
-
+	int mask = (has_write_handler(machine, 0, TC0100SCN_word_0_w) ||
+		has_write_handler(machine, 0, TC0100SCN_dual_screen_w) ||
+		has_write_handler(machine, 0, TC0100SCN_triple_screen_w)) ? 1 : 0;
+	mask |= has_write_handler(machine, 0, TC0100SCN_word_1_w) << 1;
+	mask |= has_write_handler(machine, 0, TC0100SCN_word_2_w) << 2;
+	
 	/* Catch illegal configurations */
 	/* TODO: we should give an appropriate warning */
-
-	if (!has_chip[0] && (has_chip[1] || has_chip[2]))
-		return -1;
-
-	if (!has_chip[1] && has_chip[2])
-		return -1;
-
-	return (has_chip[0] + has_chip[1] + has_chip[2]);
+	assert_always(mask == 0 || mask == 1 || mask == 3 || mask == 7, "Invalid TC0110PCR configuration");
+	return BIT(mask,0) + BIT(mask,1) + BIT(mask,2);
 }
 
 
-int has_TC0110PCR(void)
+int TC0110PCR_mask(running_machine *machine)
 {
-	return	has_write_handler(0, TC0110PCR_word_w) ||
-			has_write_handler(0, TC0110PCR_step1_word_w) ||
-			has_write_handler(0, TC0110PCR_step1_rbswap_word_w) ||
-			has_write_handler(0, TC0110PCR_step1_4bpg_word_w);
+	int mask = (has_write_handler(machine, 0, TC0110PCR_word_w) ||
+			has_write_handler(machine, 0, TC0110PCR_step1_word_w) ||
+			has_write_handler(machine, 0, TC0110PCR_step1_rbswap_word_w) ||
+			has_write_handler(machine, 0, TC0110PCR_step1_4bpg_word_w)) ? 1 : 0;
+	mask |= has_write_handler(machine, 0, TC0110PCR_step1_word_1_w) << 1;
+	mask |= has_write_handler(machine, 0, TC0110PCR_step1_word_2_w) << 2;
+	return mask;
 }
 
-int has_second_TC0110PCR(void)
+int has_TC0150ROD(running_machine *machine)
 {
-	return	has_write_handler(0, TC0110PCR_step1_word_1_w);
-}
-
-int has_third_TC0110PCR(void)
-{
-	return	has_write_handler(0, TC0110PCR_step1_word_2_w);
-}
-
-
-int has_TC0150ROD(void)
-{
-	return	has_write_handler(0, TC0150ROD_word_w) ||
-			has_write_handler(1, TC0150ROD_word_w) ||
-			has_write_handler(2, TC0150ROD_word_w);
+	return	has_write_handler(machine, 0, TC0150ROD_word_w) ||
+			has_write_handler(machine, 1, TC0150ROD_word_w) ||
+			has_write_handler(machine, 2, TC0150ROD_word_w);
 }
 
 
-int has_TC0280GRD(void)
+int has_TC0280GRD(running_machine *machine)
 {
-	return	has_write_handler(0, TC0280GRD_word_w);
+	return	has_write_handler(machine, 0, TC0280GRD_word_w);
 }
 
 
-int has_TC0360PRI(void)
+int has_TC0360PRI(running_machine *machine)
 {
-	return	has_write_handler(0, TC0360PRI_halfword_w) ||
-			has_write_handler(0, TC0360PRI_halfword_swap_w);
+	return	has_write_handler(machine, 0, TC0360PRI_halfword_w) ||
+			has_write_handler(machine, 0, TC0360PRI_halfword_swap_w);
 }
 
 
-int has_TC0430GRW(void)
+int has_TC0430GRW(running_machine *machine)
 {
-	return	has_write_handler(0, TC0430GRW_word_w);
+	return	has_write_handler(machine, 0, TC0430GRW_word_w);
 }
 
 
-int has_TC0480SCP(void)
+int has_TC0480SCP(running_machine *machine)
 {
-	return	has_write_handler(0, TC0480SCP_word_w);
+	return	has_write_handler(machine, 0, TC0480SCP_word_w);
 }
 
 

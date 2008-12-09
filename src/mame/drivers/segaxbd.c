@@ -207,7 +207,7 @@ static void xboard_reset(const device_config *device)
 static MACHINE_RESET( xboard )
 {
 	fd1094_machine_init(machine->cpu[0]);
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset(machine, 0);
 
 	/* hook the RESET line, which resets CPU #1 */
 	cpu_set_info_fct(machine->cpu[0], CPUINFO_PTR_M68K_RESET_CALLBACK, (genf *)xboard_reset);

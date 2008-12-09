@@ -638,9 +638,9 @@ static DRIVER_INIT( xexex )
 		xexex_strip0x1a = 1;
 	}
 
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_4("gfx2");
-	K053250_unpack_pixels("gfx3");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_4(machine, "gfx2");
+	K053250_unpack_pixels(machine, "gfx3");
 }
 
 GAME( 1991, xexex,  0,     xexex, xexex, xexex, ROT0, "Konami", "Xexex (ver EAA)", 0 )

@@ -171,34 +171,34 @@ VIDEO_UPDATE(boogwing)
 	// bit&0x4 combines playfields
 	if ((deco16_priority&0x7)==0x5)
 	{
-		deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_34_combine_draw(bitmap,cliprect,0,32);
+		deco16_tilemap_2_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+		deco16_tilemap_34_combine_draw(screen,bitmap,cliprect,0,32);
 	}
 	else if ((deco16_priority&0x7)==0x1 || (deco16_priority&0x7)==0x2)
 	{
-		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_2_draw(bitmap,cliprect,0,8);
-		deco16_tilemap_3_draw(bitmap,cliprect,0,32);
+		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,8);
+		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,32);
 	}
 	else if ((deco16_priority&0x7)==0x3)
 	{
-		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_2_draw(bitmap,cliprect,0,8);
+		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,8);
 
 		// This mode uses playfield 3 to shadow sprites & playfield 2 (instead of
 		// regular alpha-blending, the destination is inverted).  Not yet implemented.
-//      deco16_tilemap_3_draw(bitmap,cliprect,TILEMAP_DRAW_ALPHA,32);
+//      deco16_tilemap_3_draw(screen,bitmap,cliprect,TILEMAP_DRAW_ALPHA,32);
 	}
 	else
 	{
-		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-		deco16_tilemap_3_draw(bitmap,cliprect,0,8);
-		deco16_tilemap_2_draw(bitmap,cliprect,0,32);
+		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,8);
+		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,32);
 	}
 
 	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram16, 3);
 	draw_sprites(screen->machine, bitmap, cliprect, buffered_spriteram16_2, 4);
 
-	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
+	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;
 }

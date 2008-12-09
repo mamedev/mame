@@ -186,14 +186,14 @@ static VIDEO_UPDATE(backfire)
 
 		if (backfire_left_priority[0] == 0)
 		{
-			deco16_tilemap_3_draw(bitmap,cliprect,0,1);
-			deco16_tilemap_1_draw(bitmap,cliprect,0,2);
+			deco16_tilemap_3_draw(screen,bitmap,cliprect,0,1);
+			deco16_tilemap_1_draw(screen,bitmap,cliprect,0,2);
 			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_1,3);
 		}
 		else if (backfire_left_priority[0] == 2)
 		{
-			deco16_tilemap_1_draw(bitmap,cliprect,0,2);
-			deco16_tilemap_3_draw(bitmap,cliprect,0,4);
+			deco16_tilemap_1_draw(screen,bitmap,cliprect,0,2);
+			deco16_tilemap_3_draw(screen,bitmap,cliprect,0,4);
 			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_1,3);
 		}
 		else
@@ -206,14 +206,14 @@ static VIDEO_UPDATE(backfire)
 
 		if (backfire_right_priority[0] == 0)
 		{
-			deco16_tilemap_4_draw(bitmap,cliprect,0,1);
-			deco16_tilemap_2_draw(bitmap,cliprect,0,2);
+			deco16_tilemap_4_draw(screen,bitmap,cliprect,0,1);
+			deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
 			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_2,4);
 		}
 		else if (backfire_right_priority[0] == 2)
 		{
-			deco16_tilemap_2_draw(bitmap,cliprect,0,2);
-			deco16_tilemap_4_draw(bitmap,cliprect,0,4);
+			deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
+			deco16_tilemap_4_draw(screen,bitmap,cliprect,0,4);
 			draw_sprites(screen->machine,bitmap,cliprect,backfire_spriteram32_2,4);
 		}
 		else

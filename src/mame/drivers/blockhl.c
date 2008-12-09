@@ -327,8 +327,8 @@ static MACHINE_RESET( blockhl )
 
 static DRIVER_INIT( blockhl )
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_2("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_2(machine, "gfx2");
 }
 
 

@@ -85,8 +85,8 @@ VIDEO_UPDATE(dietgo)
 
 	bitmap_fill(bitmap,cliprect,256); /* not verified */
 
-	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
+	deco16_tilemap_2_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 
 	draw_sprites(screen->machine,bitmap,cliprect);
 	return 0;

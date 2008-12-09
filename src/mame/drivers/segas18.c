@@ -198,7 +198,7 @@ static TIMER_CALLBACK( boost_interleave )
 static MACHINE_RESET( system18 )
 {
 	segaic16_memory_mapper_reset(machine);
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset(machine, 0);
 	fd1094_machine_init(machine->cpu[0]);
 
 	/* if we are running with a real live 8751, we need to boost the interleave at startup */
@@ -284,8 +284,8 @@ static WRITE16_HANDLER( io_chip_w )
 		/* miscellaneous output */
 		case 0x06/2:
 			system18_set_grayscale(space->machine, ~data & 0x40);
-			segaic16_tilemap_set_flip(0, data & 0x20);
-			segaic16_sprites_set_flip(0, data & 0x20);
+			segaic16_tilemap_set_flip(space->machine, 0, data & 0x20);
+			segaic16_sprites_set_flip(space->machine, 0, data & 0x20);
 /* These are correct according to cgfm's docs, but mwalker and ddcrew both
    enable the lockout and never turn it off
             coin_lockout_w(1, data & 0x08);
@@ -301,8 +301,8 @@ static WRITE16_HANDLER( io_chip_w )
 				int i;
 				for (i = 0; i < 4; i++)
 				{
-					segaic16_tilemap_set_bank(0, 0 + i, (data & 0xf) * 4 + i);
-					segaic16_tilemap_set_bank(0, 4 + i, ((data >> 4) & 0xf) * 4 + i);
+					segaic16_tilemap_set_bank(space->machine, 0, 0 + i, (data & 0xf) * 4 + i);
+					segaic16_tilemap_set_bank(space->machine, 0, 4 + i, ((data >> 4) & 0xf) * 4 + i);
 				}
 			}
 			break;
@@ -394,7 +394,7 @@ static WRITE16_HANDLER( rom_5987_bank_w )
 		int maxbanks = space->machine->gfx[0]->total_elements / 1024;
 		if (data >= maxbanks)
 			data %= maxbanks;
-		segaic16_tilemap_set_bank(0, offset, data);
+		segaic16_tilemap_set_bank(space->machine, 0, offset, data);
 	}
 
 	/* sprite banking */
@@ -403,8 +403,8 @@ static WRITE16_HANDLER( rom_5987_bank_w )
 		int maxbanks = memory_region_length(space->machine, "gfx2") / 0x40000;
 		if (data >= maxbanks)
 			data = 255;
-		segaic16_sprites_set_bank(0, (offset - 8) * 2 + 0, data * 2 + 0);
-		segaic16_sprites_set_bank(0, (offset - 8) * 2 + 1, data * 2 + 1);
+		segaic16_sprites_set_bank(space->machine, 0, (offset - 8) * 2 + 0, data * 2 + 0);
+		segaic16_sprites_set_bank(space->machine, 0, (offset - 8) * 2 + 1, data * 2 + 1);
 	}
 }
 

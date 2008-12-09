@@ -140,7 +140,6 @@ Rowscroll style:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "deco16ic.h"
 #include "ui.h"
 
@@ -902,11 +901,11 @@ void deco16_pdrawgfx(running_machine *machine,
 
 /*****************************************************************************************/
 
-void deco16_tilemap_1_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16_tilemap_1_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	if (use_custom_pf1)
 	{
-		custom_tilemap_draw(Machine, bitmap,pf1_tilemap_8x8,pf1_tilemap_16x16,0,0,pf1_rowscroll_ptr,deco16_pf12_control[1], deco16_pf12_control[2], deco16_pf12_control[5]&0xff, deco16_pf12_control[6]&0xff, 0, 0, deco16_pf1_trans_mask, flags, priority);
+		custom_tilemap_draw(screen->machine, bitmap,pf1_tilemap_8x8,pf1_tilemap_16x16,0,0,pf1_rowscroll_ptr,deco16_pf12_control[1], deco16_pf12_control[2], deco16_pf12_control[5]&0xff, deco16_pf12_control[6]&0xff, 0, 0, deco16_pf1_trans_mask, flags, priority);
 	}
 	else
 	{
@@ -915,11 +914,11 @@ void deco16_tilemap_1_draw(bitmap_t *bitmap, const rectangle *cliprect, int flag
 	}
 }
 
-void deco16_tilemap_2_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16_tilemap_2_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
 	if (use_custom_pf2)
 	{
-		custom_tilemap_draw(Machine, bitmap,pf2_tilemap_8x8,pf2_tilemap_16x16,0,0,pf2_rowscroll_ptr,deco16_pf12_control[3], deco16_pf12_control[4], deco16_pf12_control[5]>>8, deco16_pf12_control[6]>>8, 0, 0, deco16_pf2_trans_mask, flags, priority);
+		custom_tilemap_draw(screen->machine, bitmap,pf2_tilemap_8x8,pf2_tilemap_16x16,0,0,pf2_rowscroll_ptr,deco16_pf12_control[3], deco16_pf12_control[4], deco16_pf12_control[5]>>8, deco16_pf12_control[6]>>8, 0, 0, deco16_pf2_trans_mask, flags, priority);
 	}
 	else
 	{
@@ -928,24 +927,24 @@ void deco16_tilemap_2_draw(bitmap_t *bitmap, const rectangle *cliprect, int flag
 	}
 }
 
-void deco16_tilemap_3_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16_tilemap_3_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
-	if (use_custom_pf3) custom_tilemap_draw(Machine, bitmap,0,pf3_tilemap_16x16,0,0,pf3_rowscroll_ptr,deco16_pf34_control[1], deco16_pf34_control[2], deco16_pf34_control[5]&0xff, deco16_pf34_control[6]&0xff, 0, 0, deco16_pf3_trans_mask, flags, priority);
+	if (use_custom_pf3) custom_tilemap_draw(screen->machine, bitmap,0,pf3_tilemap_16x16,0,0,pf3_rowscroll_ptr,deco16_pf34_control[1], deco16_pf34_control[2], deco16_pf34_control[5]&0xff, deco16_pf34_control[6]&0xff, 0, 0, deco16_pf3_trans_mask, flags, priority);
 	else if (pf3_tilemap_16x16) tilemap_draw(bitmap,cliprect,pf3_tilemap_16x16,flags,priority);
 }
 
-void deco16_tilemap_4_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16_tilemap_4_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
-	if (use_custom_pf4) custom_tilemap_draw(Machine, bitmap,0,pf4_tilemap_16x16,0,0,pf4_rowscroll_ptr,deco16_pf34_control[3], deco16_pf34_control[4], deco16_pf34_control[5]>>8, deco16_pf34_control[6]>>8, 0, 0, deco16_pf4_trans_mask, flags, priority);
+	if (use_custom_pf4) custom_tilemap_draw(screen->machine, bitmap,0,pf4_tilemap_16x16,0,0,pf4_rowscroll_ptr,deco16_pf34_control[3], deco16_pf34_control[4], deco16_pf34_control[5]>>8, deco16_pf34_control[6]>>8, 0, 0, deco16_pf4_trans_mask, flags, priority);
 	else if (pf4_tilemap_16x16) tilemap_draw(bitmap,cliprect,pf4_tilemap_16x16,flags,priority);
 }
 
 /*****************************************************************************************/
 
 // Combines the output of two 4BPP tilemaps into an 8BPP tilemap
-void deco16_tilemap_34_combine_draw(bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
+void deco16_tilemap_34_combine_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int flags, UINT32 priority)
 {
-	custom_tilemap_draw(Machine, bitmap,0,pf3_tilemap_16x16,0,pf4_tilemap_16x16,pf3_rowscroll_ptr,deco16_pf34_control[1], deco16_pf34_control[2], deco16_pf34_control[5]&0xff, deco16_pf34_control[6]&0xff, 0xf, 4, 0xff, flags, priority);
+	custom_tilemap_draw(screen->machine, bitmap,0,pf3_tilemap_16x16,0,pf4_tilemap_16x16,pf3_rowscroll_ptr,deco16_pf34_control[1], deco16_pf34_control[2], deco16_pf34_control[5]&0xff, deco16_pf34_control[6]&0xff, 0xf, 4, 0xff, flags, priority);
 }
 
 /*****************************************************************************************/

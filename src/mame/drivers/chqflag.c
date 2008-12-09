@@ -458,7 +458,7 @@ static DRIVER_INIT( chqflag )
 {
 	UINT8 *RAM = memory_region(machine, "main");
 
-	konami_rom_deinterleave_2("gfx1");
+	konami_rom_deinterleave_2(machine, "gfx1");
 	paletteram = &RAM[0x58000];
 }
 

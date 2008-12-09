@@ -12,15 +12,13 @@ extern UINT16	*TC0080VCO_spriteram;
 extern UINT16	*TC0080VCO_scroll_ram;
 extern int	TC0080VCO_flipscreen;
 
-int number_of_TC0100SCN(void);
-int has_TC0110PCR(void);
-int has_second_TC0110PCR(void);
-int has_third_TC0110PCR(void);
-int has_TC0150ROD(void);
-int has_TC0280GRD(void);
-int has_TC0360PRI(void);
-int has_TC0430GRW(void);
-int has_TC0480SCP(void);
+int TC0100SCN_count(running_machine *machine);
+int TC0110PCR_mask(running_machine *machine);
+int has_TC0150ROD(running_machine *machine);
+int has_TC0280GRD(running_machine *machine);
+int has_TC0360PRI(running_machine *machine);
+int has_TC0430GRW(running_machine *machine);
+int has_TC0480SCP(running_machine *machine);
 
 
 /***************************************************************************/

@@ -33,12 +33,12 @@ WRITE16_HANDLER( segaic16_paletteram_w );
 #define SEGAIC16_TILEMAP_TEXT		2
 
 void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int numbanks);
-void segaic16_tilemap_reset(int which);
-void segaic16_tilemap_draw(running_machine *machine, int which, bitmap_t *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark);
-void segaic16_tilemap_set_bank(int which, int banknum, int offset);
-void segaic16_tilemap_set_flip(int which, int flip);
-void segaic16_tilemap_set_rowscroll(int which, int enable);
-void segaic16_tilemap_set_colscroll(int which, int enable);
+void segaic16_tilemap_reset(running_machine *machine, int which);
+void segaic16_tilemap_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark);
+void segaic16_tilemap_set_bank(running_machine *machine, int which, int banknum, int offset);
+void segaic16_tilemap_set_flip(running_machine *machine, int which, int flip);
+void segaic16_tilemap_set_rowscroll(running_machine *machine, int which, int enable);
+void segaic16_tilemap_set_colscroll(running_machine *machine, int which, int enable);
 
 WRITE16_HANDLER( segaic16_tileram_0_w );
 WRITE16_HANDLER( segaic16_textram_0_w );
@@ -55,11 +55,11 @@ WRITE16_HANDLER( segaic16_textram_0_w );
 #define SEGAIC16_SPRITES_YBOARD		6
 #define SEGAIC16_SPRITES_YBOARD_16B	7
 
-void segaic16_sprites_init(int which, int type, int colorbase, int xoffs);
-void segaic16_sprites_draw(int which, bitmap_t *bitmap, const rectangle *cliprect);
-void segaic16_sprites_set_bank(int which, int banknum, int offset);
-void segaic16_sprites_set_flip(int which, int flip);
-void segaic16_sprites_set_shadow(int which, int shadow);
+void segaic16_sprites_init(running_machine *machine, int which, int type, int colorbase, int xoffs);
+void segaic16_sprites_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which);
+void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum, int offset);
+void segaic16_sprites_set_flip(running_machine *machine, int which, int flip);
+void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow);
 WRITE16_HANDLER( segaic16_sprites_draw_0_w );
 WRITE16_HANDLER( segaic16_sprites_draw_1_w );
 
@@ -74,7 +74,7 @@ WRITE16_HANDLER( segaic16_sprites_draw_1_w );
 #define SEGAIC16_ROAD_BACKGROUND	0
 #define SEGAIC16_ROAD_FOREGROUND	1
 
-void segaic16_road_init(int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);
+void segaic16_road_init(running_machine *machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs);
 void segaic16_road_draw(int which, bitmap_t *bitmap, const rectangle *cliprect, int priority);
 READ16_HANDLER( segaic16_road_control_0_r );
 WRITE16_HANDLER( segaic16_road_control_0_w );
@@ -84,6 +84,6 @@ WRITE16_HANDLER( segaic16_road_control_0_w );
 
 #define SEGAIC16_ROTATE_YBOARD		0
 
-void segaic16_rotate_init(int which, int type, int colorbase);
+void segaic16_rotate_init(running_machine *machine, int which, int type, int colorbase);
 void segaic16_rotate_draw(int which, bitmap_t *bitmap, const rectangle *cliprect, bitmap_t *srcbitmap);
 READ16_HANDLER( segaic16_rotate_control_0_r );

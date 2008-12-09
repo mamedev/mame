@@ -57,33 +57,10 @@ puzznici note
 #include "sound/2203intf.h"
 #include "sound/2610intf.h"
 #include "sound/msm5205.h"
-
-VIDEO_EOF( taitol );
-VIDEO_START( taitol );
-VIDEO_UPDATE( taitol );
-
-void taitol_chardef14_m(int offset);
-void taitol_chardef15_m(int offset);
-void taitol_chardef16_m(int offset);
-void taitol_chardef17_m(int offset);
-void taitol_chardef1c_m(int offset);
-void taitol_chardef1d_m(int offset);
-void taitol_chardef1e_m(int offset);
-void taitol_chardef1f_m(int offset);
-void taitol_bg18_m(int offset);
-void taitol_bg19_m(int offset);
-void taitol_char1a_m(int offset);
-void taitol_obj1b_m(int offset);
-
-WRITE8_HANDLER( taitol_control_w );
-READ8_HANDLER( taitol_control_r );
-WRITE8_HANDLER( horshoes_bankg_w );
-WRITE8_HANDLER( taitol_bankc_w );
-READ8_HANDLER( taitol_bankc_r );
+#include "includes/taito_l.h"
 
 
-
-static void (*const rambank_modify_notifiers[12])(int) =
+static void (*const rambank_modify_notifiers[12])(running_machine *, int) =
 {
 	taitol_chardef14_m,	// 14
 	taitol_chardef15_m,	// 15
@@ -101,7 +78,7 @@ static void (*const rambank_modify_notifiers[12])(int) =
 	taitol_chardef1f_m,	// 1f
 };
 
-static void (*current_notifier[4])(int);
+static void (*current_notifier[4])(running_machine *, int);
 static UINT8 *current_base[4];
 
 static int cur_rombank, cur_rombank2, cur_rambank[4];
@@ -133,7 +110,7 @@ static int mcu_pos = 0, mcu_reply_len = 0;
 static int last_data_adr, last_data;
 static int cur_bank = 0;
 
-static void palette_notifier(int addr)
+static void palette_notifier(running_machine *machine, int addr)
 {
 	UINT8 *p = palette_ram + (addr & ~1);
 	UINT8 byte0 = *p++;
@@ -143,12 +120,12 @@ static void palette_notifier(int addr)
 
 	if(addr > 0x200)
 	{
-logerror("Large palette ? %03x (%04x)\n", addr, cpu_get_pc(Machine->activecpu));
+logerror("Large palette ? %03x (%04x)\n", addr, cpu_get_pc(machine->activecpu));
 	}
 	else
 	{
 		//      r = g = b = ((addr & 0x1e) != 0)*255;
-		palette_set_color_rgb(Machine, addr/2, pal4bit(byte0), pal4bit(byte0 >> 4), pal4bit(byte1));
+		palette_set_color_rgb(machine, addr/2, pal4bit(byte0), pal4bit(byte0 >> 4), pal4bit(byte1));
 	}
 }
 
@@ -429,7 +406,7 @@ static WRITE8_HANDLER( bank0_w )
 	{
 		current_base[0][offset] = data;
 		if(current_notifier[0])
-			current_notifier[0](offset);
+			current_notifier[0](space->machine, offset);
 	}
 }
 
@@ -439,7 +416,7 @@ static WRITE8_HANDLER( bank1_w )
 	{
 		current_base[1][offset] = data;
 		if(current_notifier[1])
-			current_notifier[1](offset);
+			current_notifier[1](space->machine, offset);
 	}
 }
 
@@ -449,7 +426,7 @@ static WRITE8_HANDLER( bank2_w )
 	{
 		current_base[2][offset] = data;
 		if(current_notifier[2])
-			current_notifier[2](offset);
+			current_notifier[2](space->machine, offset);
 	}
 }
 
@@ -459,7 +436,7 @@ static WRITE8_HANDLER( bank3_w )
 	{
 		current_base[3][offset] = data;
 		if(current_notifier[3])
-			current_notifier[3](offset);
+			current_notifier[3](space->machine, offset);
 	}
 }
 

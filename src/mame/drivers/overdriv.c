@@ -490,7 +490,7 @@ ROM_END
 
 static DRIVER_INIT( overdriv )
 {
-	konami_rom_deinterleave_4("gfx1");
+	konami_rom_deinterleave_4(machine, "gfx1");
 }
 
 

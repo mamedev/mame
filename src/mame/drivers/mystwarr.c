@@ -2173,7 +2173,7 @@ ROM_END
 
 static DRIVER_INIT(metamrph)
 {
-	K053250_unpack_pixels("gfx3");
+	K053250_unpack_pixels(machine, "gfx3");
 }
 
 

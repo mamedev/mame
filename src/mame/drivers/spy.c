@@ -638,17 +638,17 @@ ROM_END
 
 
 
-static void gfx_untangle(void)
+static void gfx_untangle(running_machine *machine)
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_2("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_2(machine, "gfx2");
 }
 
 static DRIVER_INIT( spy )
 {
 	paletteram = &memory_region(machine, "main")[0x28000];
 	pmcram =     &memory_region(machine, "main")[0x28800];
-	gfx_untangle();
+	gfx_untangle(machine);
 }
 
 

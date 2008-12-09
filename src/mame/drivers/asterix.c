@@ -354,8 +354,8 @@ ROM_END
 
 static DRIVER_INIT( asterix )
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_2("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_2(machine, "gfx2");
 
 #if 0
 	*(UINT16 *)(memory_region(machine, "main") + 0x07f34) = 0x602a;

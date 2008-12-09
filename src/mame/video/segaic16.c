@@ -351,7 +351,6 @@ Quick review of the system16 hardware:
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "segaic16.h"
 #include "video/resnet.h"
 
@@ -407,7 +406,7 @@ struct tilemap_info
 	tilemap *textmap;						/* a single text tilemap */
 	struct tilemap_callback_info tilemap_info[16];	/* callback info for 16 tilemap pages */
 	struct tilemap_callback_info textmap_info;		/* callback info for a single textmap page */
-	void			(*reset)(struct tilemap_info *info);/* reset callback */
+	void			(*reset)(running_machine *machine, struct tilemap_info *info);/* reset callback */
 	void			(*draw_layer)(running_machine *machine, struct tilemap_info *info, bitmap_t *bitmap, const rectangle *cliprect, int which, int flags, int priority);
 	UINT16 *		textram;						/* pointer to textram pointer */
 	UINT16 *		tileram;						/* pointer to tileram pointer */
@@ -1186,10 +1185,10 @@ static TIMER_CALLBACK( segaic16_tilemap_16b_latch_values )
 }
 
 
-static void segaic16_tilemap_16b_reset(struct tilemap_info *info)
+static void segaic16_tilemap_16b_reset(running_machine *machine, struct tilemap_info *info)
 {
 	/* set a timer to latch values on scanline 261 */
-	timer_set(Machine, video_screen_get_time_until_pos(Machine->primary_screen, 261, 0), NULL, info->index, segaic16_tilemap_16b_latch_values);
+	timer_set(machine, video_screen_get_time_until_pos(machine->primary_screen, 261, 0), NULL, info->index, segaic16_tilemap_16b_latch_values);
 }
 
 
@@ -1307,8 +1306,9 @@ void segaic16_tilemap_init(int which, int type, int colorbase, int xoffs, int nu
  *
  *************************************/
 
-void segaic16_tilemap_draw(running_machine *machine, int which, bitmap_t *bitmap, const rectangle *cliprect, int map, int priority, int priority_mark)
+void segaic16_tilemap_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which, int map, int priority, int priority_mark)
 {
+	running_machine *machine = screen->machine;
 	struct tilemap_info *info = &bg_tilemap[which];
 
 	/* text layer is a special common case */
@@ -1328,12 +1328,12 @@ void segaic16_tilemap_draw(running_machine *machine, int which, bitmap_t *bitmap
  *
  *************************************/
 
-void segaic16_tilemap_reset(int which)
+void segaic16_tilemap_reset(running_machine *machine, int which)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
 	if (info->reset)
-		(*info->reset)(info);
+		(*info->reset)(machine, info);
 }
 
 
@@ -1344,13 +1344,14 @@ void segaic16_tilemap_reset(int which)
  *
  *************************************/
 
-void segaic16_tilemap_set_bank(int which, int banknum, int offset)
+void segaic16_tilemap_set_bank(running_machine *machine, int which, int banknum, int offset)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
 	if (info->bank[banknum] != offset)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		const device_config *screen = machine->primary_screen;
+		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->bank[banknum] = offset;
 		tilemap_mark_all_tiles_dirty(NULL);
 	}
@@ -1364,7 +1365,7 @@ void segaic16_tilemap_set_bank(int which, int banknum, int offset)
  *
  *************************************/
 
-void segaic16_tilemap_set_flip(int which, int flip)
+void segaic16_tilemap_set_flip(running_machine *machine, int which, int flip)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 	int pagenum;
@@ -1372,7 +1373,8 @@ void segaic16_tilemap_set_flip(int which, int flip)
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		const device_config *screen = machine->primary_screen;
+		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->flip = flip;
 		tilemap_set_flip(info->textmap, flip ? (TILEMAP_FLIPX | TILEMAP_FLIPY) : 0);
 		for (pagenum = 0; pagenum < info->numpages; pagenum++)
@@ -1388,14 +1390,15 @@ void segaic16_tilemap_set_flip(int which, int flip)
  *
  *************************************/
 
-void segaic16_tilemap_set_rowscroll(int which, int enable)
+void segaic16_tilemap_set_rowscroll(running_machine *machine, int which, int enable)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
 	enable = (enable != 0);
 	if (info->rowscroll != enable)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		const device_config *screen = machine->primary_screen;
+		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->rowscroll = enable;
 	}
 }
@@ -1408,14 +1411,15 @@ void segaic16_tilemap_set_rowscroll(int which, int enable)
  *
  *************************************/
 
-void segaic16_tilemap_set_colscroll(int which, int enable)
+void segaic16_tilemap_set_colscroll(running_machine *machine, int which, int enable)
 {
 	struct tilemap_info *info = &bg_tilemap[which];
 
 	enable = (enable != 0);
 	if (info->colscroll != enable)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		const device_config *screen = machine->primary_screen;
+		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->colscroll = enable;
 	}
 }
@@ -2650,9 +2654,8 @@ static void segaic16_sprites_yboard_draw(running_machine *machine, struct sprite
  *
  *************************************/
 
-void segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
+void segaic16_sprites_init(running_machine *machine, int which, int type, int colorbase, int xoffs)
 {
-	running_machine *machine = Machine;
 	struct sprite_info *info = &sprites[which];
 	int i, buffer = 0;
 
@@ -2745,10 +2748,10 @@ void segaic16_sprites_init(int which, int type, int colorbase, int xoffs)
  *
  *************************************/
 
-void segaic16_sprites_draw(int which, bitmap_t *bitmap, const rectangle *cliprect)
+void segaic16_sprites_draw(const device_config *screen, bitmap_t *bitmap, const rectangle *cliprect, int which)
 {
 	struct sprite_info *info = &sprites[which];
-	(*info->draw)(Machine, info, bitmap, cliprect);
+	(*info->draw)(screen->machine, info, bitmap, cliprect);
 }
 
 
@@ -2759,13 +2762,14 @@ void segaic16_sprites_draw(int which, bitmap_t *bitmap, const rectangle *cliprec
  *
  *************************************/
 
-void segaic16_sprites_set_bank(int which, int banknum, int offset)
+void segaic16_sprites_set_bank(running_machine *machine, int which, int banknum, int offset)
 {
 	struct sprite_info *info = &sprites[which];
 
 	if (info->bank[banknum] != offset)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		const device_config *screen = machine->primary_screen;
+		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->bank[banknum] = offset;
 	}
 }
@@ -2778,14 +2782,15 @@ void segaic16_sprites_set_bank(int which, int banknum, int offset)
  *
  *************************************/
 
-void segaic16_sprites_set_flip(int which, int flip)
+void segaic16_sprites_set_flip(running_machine *machine, int which, int flip)
 {
 	struct sprite_info *info = &sprites[which];
 
 	flip = (flip != 0);
 	if (info->flip != flip)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		const device_config *screen = machine->primary_screen;
+		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->flip = flip;
 	}
 }
@@ -2798,14 +2803,15 @@ void segaic16_sprites_set_flip(int which, int flip)
  *
  *************************************/
 
-void segaic16_sprites_set_shadow(int which, int shadow)
+void segaic16_sprites_set_shadow(running_machine *machine, int which, int shadow)
 {
 	struct sprite_info *info = &sprites[which];
 
 	shadow = (shadow != 0);
 	if (info->shadow != shadow)
 	{
-		video_screen_update_partial(Machine->primary_screen, video_screen_get_vpos(Machine->primary_screen));
+		const device_config *screen = machine->primary_screen;
+		video_screen_update_partial(screen, video_screen_get_vpos(screen));
 		info->shadow = shadow;
 	}
 }
@@ -3358,7 +3364,7 @@ static void segaic16_road_outrun_draw(struct road_info *info, bitmap_t *bitmap, 
  *
  *************************************/
 
-void segaic16_road_init(int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs)
+void segaic16_road_init(running_machine *machine, int which, int type, int colorbase1, int colorbase2, int colorbase3, int xoffs)
 {
 	struct road_info *info = &road[which];
 
@@ -3388,14 +3394,14 @@ void segaic16_road_init(int which, int type, int colorbase1, int colorbase2, int
 		case SEGAIC16_ROAD_HANGON:
 		case SEGAIC16_ROAD_SHARRIER:
 			info->draw = segaic16_road_hangon_draw;
-			segaic16_road_hangon_decode(Machine, info);
+			segaic16_road_hangon_decode(machine, info);
 			break;
 
 		case SEGAIC16_ROAD_OUTRUN:
 		case SEGAIC16_ROAD_XBOARD:
 			info->buffer = auto_malloc(0x1000);
 			info->draw = segaic16_road_outrun_draw;
-			segaic16_road_outrun_decode(Machine, info);
+			segaic16_road_outrun_decode(machine, info);
 			break;
 
 		default:
@@ -3464,9 +3470,8 @@ WRITE16_HANDLER( segaic16_road_control_0_w )
  *
  *************************************/
 
-void segaic16_rotate_init(int which, int type, int colorbase)
+void segaic16_rotate_init(running_machine *machine, int which, int type, int colorbase)
 {
-	running_machine *machine = Machine;
 	struct rotate_info *info = &rotate[which];
 
 	/* reset the tilemap info */

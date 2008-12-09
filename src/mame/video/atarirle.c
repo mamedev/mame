@@ -19,7 +19,6 @@
 ***************************************************************************/
 
 #include "driver.h"
-//#include "deprecat.h"
 #include "atarirle.h"
 
 

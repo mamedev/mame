@@ -462,7 +462,7 @@ static DRIVER_INIT( dbz )
 {
 	UINT16 *ROM;
 
-	konami_rom_deinterleave_2("gfx1");
+	konami_rom_deinterleave_2(machine, "gfx1");
 
 	ROM = (UINT16 *)memory_region(machine, "main");
 
@@ -483,7 +483,7 @@ static DRIVER_INIT( dbz )
 
 static DRIVER_INIT( dbz2 )
 {
-	konami_rom_deinterleave_2("gfx1");
+	konami_rom_deinterleave_2(machine, "gfx1");
 }
 
 GAME( 1993, dbz,  0, dbz, dbz,  dbz,  ROT0, "Banpresto", "Dragonball Z", GAME_IMPERFECT_GRAPHICS )

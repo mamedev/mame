@@ -116,7 +116,7 @@ static TIMER_CALLBACK( suspend_i8751 )
 static MACHINE_RESET( hangon )
 {
 	/* reset misc components */
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset(machine, 0);
 
 	/* if we have a fake i8751 handler, disable the actual 8751 */
 	if (i8751_vblank_hook != NULL)
@@ -277,9 +277,9 @@ static WRITE8_DEVICE_HANDLER( video_lamps_w )
 	/* D2 : LAMP1 */
 	/* D1 : COIN2 */
 	/* D0 : COIN1 */
-	segaic16_tilemap_set_flip(0, data & 0x80);
-	segaic16_sprites_set_flip(0, data & 0x80);
-	segaic16_sprites_set_shadow(0, ~data & 0x40);
+	segaic16_tilemap_set_flip(device->machine, 0, data & 0x80);
+	segaic16_sprites_set_flip(device->machine, 0, data & 0x80);
+	segaic16_sprites_set_shadow(device->machine, 0, ~data & 0x40);
 	segaic16_set_display_enable(device->machine, data & 0x10);
 	set_led_status(1, data & 0x08);
 	set_led_status(0, data & 0x04);
@@ -300,8 +300,8 @@ static WRITE8_DEVICE_HANDLER( tilemap_sound_w )
 	/* D1 : SCONT0 - Tilemap origin bit 0 */
 	/* D0 : MUTE (1= audio on, 0= audio off) */
 	cpu_set_input_line(device->machine->cpu[2], INPUT_LINE_NMI, (data & 0x80) ? CLEAR_LINE : ASSERT_LINE);
-	segaic16_tilemap_set_colscroll(0, ~data & 0x04);
-	segaic16_tilemap_set_rowscroll(0, ~data & 0x02);
+	segaic16_tilemap_set_colscroll(device->machine, 0, ~data & 0x04);
+	segaic16_tilemap_set_rowscroll(device->machine, 0, ~data & 0x02);
 	sound_global_enable(data & 0x01);
 }
 

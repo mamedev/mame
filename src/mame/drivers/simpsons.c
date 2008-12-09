@@ -533,8 +533,8 @@ ROM_END
 
 static DRIVER_INIT( simpsons )
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_4("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_4(machine, "gfx2");
 }
 
 // the region warning, if one exists, is shown after the high-score screen in attract mode

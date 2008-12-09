@@ -1096,7 +1096,7 @@ static MACHINE_RESET( system16b )
 	segaic16_memory_mapper_reset(machine);
 	if (i8751_initial_config != NULL)
 		segaic16_memory_mapper_config(machine, i8751_initial_config);
-	segaic16_tilemap_reset(0);
+	segaic16_tilemap_reset(machine, 0);
 
 	fd1094_machine_init(machine->cpu[0]);
 
@@ -1106,7 +1106,7 @@ static MACHINE_RESET( system16b )
 
 	/* configure sprite banks */
 	for (i = 0; i < 16; i++)
-		segaic16_sprites_set_bank(0, i, (rom_board == ROM_BOARD_171_5358 || rom_board == ROM_BOARD_171_5358_SMALL) ? alternate_banklist[i] : default_banklist[i]);
+		segaic16_sprites_set_bank(machine, 0, i, (rom_board == ROM_BOARD_171_5358 || rom_board == ROM_BOARD_171_5358_SMALL) ? alternate_banklist[i] : default_banklist[i]);
 }
 
 
@@ -1165,8 +1165,8 @@ static WRITE16_HANDLER( standard_io_w )
                 D1 : (Output to coin counter 2?)
                 D0 : Output to coin counter 1
             */
-			segaic16_tilemap_set_flip(0, data & 0x40);
-			segaic16_sprites_set_flip(0, data & 0x40);
+			segaic16_tilemap_set_flip(space->machine, 0, data & 0x40);
+			segaic16_sprites_set_flip(space->machine, 0, data & 0x40);
 			if (!disable_screen_blanking)
 				segaic16_set_display_enable(space->machine, data & 0x20);
 			set_led_status(1, data & 0x08);
@@ -1207,7 +1207,7 @@ static WRITE16_HANDLER( misc_io_w )
 static WRITE16_HANDLER( rom_5704_bank_w )
 {
 	if (ACCESSING_BITS_0_7)
-		segaic16_tilemap_set_bank(0, offset & 1, data & 7);
+		segaic16_tilemap_set_bank(space->machine, 0, offset & 1, data & 7);
 }
 
 
@@ -1245,7 +1245,7 @@ static WRITE16_HANDLER( rom_5797_bank_math_w )
 
 		case 0x2000/2:
 			if (ACCESSING_BITS_0_7)
-				segaic16_tilemap_set_bank(0, offset & 1, data & 7);
+				segaic16_tilemap_set_bank(space->machine, 0, offset & 1, data & 7);
 			break;
 	}
 }

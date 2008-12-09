@@ -1150,7 +1150,6 @@ Registers (word-wise):
 ***************************************************************************/
 
 #include "driver.h"
-#include "deprecat.h"
 #include "video/konamiic.h"
 
 #define VERBOSE 0
@@ -1185,25 +1184,25 @@ static void shuffle(UINT16 *buf,int len)
 
 
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
-void konami_rom_deinterleave_2(const char *mem_region)
+void konami_rom_deinterleave_2(running_machine *machine, const char *mem_region)
 {
-	shuffle((UINT16 *)memory_region(Machine, mem_region),memory_region_length(Machine, mem_region)/2);
+	shuffle((UINT16 *)memory_region(machine, mem_region),memory_region_length(machine, mem_region)/2);
 }
 
 /* hacked version of rom_deinterleave_2_half for Lethal Enforcers */
-void konami_rom_deinterleave_2_half(const char *mem_region)
+void konami_rom_deinterleave_2_half(running_machine *machine, const char *mem_region)
 {
-	UINT8 *rgn = memory_region(Machine, mem_region);
+	UINT8 *rgn = memory_region(machine, mem_region);
 
-	shuffle((UINT16 *)rgn,memory_region_length(Machine, mem_region)/4);
-	shuffle((UINT16 *)(rgn+memory_region_length(Machine, mem_region)/2),memory_region_length(Machine, mem_region)/4);
+	shuffle((UINT16 *)rgn,memory_region_length(machine, mem_region)/4);
+	shuffle((UINT16 *)(rgn+memory_region_length(machine, mem_region)/2),memory_region_length(machine, mem_region)/4);
 }
 
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
-void konami_rom_deinterleave_4(const char *mem_region)
+void konami_rom_deinterleave_4(running_machine *machine, const char *mem_region)
 {
-	konami_rom_deinterleave_2(mem_region);
-	konami_rom_deinterleave_2(mem_region);
+	konami_rom_deinterleave_2(machine, mem_region);
+	konami_rom_deinterleave_2(machine, mem_region);
 }
 
 
@@ -7509,13 +7508,13 @@ void K053250_dma(running_machine *machine, int chip, int limiter)
 }
 
 // Pixel data of the K053250 is nibble packed. It's preferable to be unpacked into byte format.
-void K053250_unpack_pixels(const char *region)
+void K053250_unpack_pixels(running_machine *machine, const char *region)
 {
 	UINT8 *src_ptr, *dst_ptr;
 	int hi_nibble, lo_nibble, offset;
 
-	dst_ptr = src_ptr = memory_region(Machine, region);
-	offset = memory_region_length(Machine, region) / 2 - 1;
+	dst_ptr = src_ptr = memory_region(machine, region);
+	offset = memory_region_length(machine, region) / 2 - 1;
 
 	do
 	{

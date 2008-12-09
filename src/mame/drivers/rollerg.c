@@ -349,7 +349,7 @@ static MACHINE_RESET( rollerg )
 
 static DRIVER_INIT( rollerg )
 {
-	konami_rom_deinterleave_2("gfx1");
+	konami_rom_deinterleave_2(machine, "gfx1");
 }
 
 

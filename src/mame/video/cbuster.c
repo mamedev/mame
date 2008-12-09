@@ -143,19 +143,19 @@ VIDEO_UPDATE( twocrude )
 	deco16_pf34_update(deco16_pf3_rowscroll,deco16_pf4_rowscroll);
 
 	/* Draw playfields & sprites */
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 	draw_sprites(screen->machine,bitmap,cliprect,0);
 
 	if (twocrude_pri) {
-		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
-		deco16_tilemap_3_draw(bitmap,cliprect,0,0);
+		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
+		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,0);
 	}
 	else {
-		deco16_tilemap_3_draw(bitmap,cliprect,0,0);
-		deco16_tilemap_2_draw(bitmap,cliprect,0,0);
+		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,0);
+		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
 	}
 
 	draw_sprites(screen->machine,bitmap,cliprect,1);
-	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
+	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;
 }

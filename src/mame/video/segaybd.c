@@ -35,11 +35,11 @@ VIDEO_START( yboard )
 	yboard_bitmap = auto_bitmap_alloc(512, 512, BITMAP_FORMAT_INDEXED16);
 
 	/* initialize the sprites */
-	segaic16_sprites_init(0, SEGAIC16_SPRITES_YBOARD_16B, 0x800, 0);
-	segaic16_sprites_init(1, SEGAIC16_SPRITES_YBOARD, 0x1000, 0);
+	segaic16_sprites_init(machine, 0, SEGAIC16_SPRITES_YBOARD_16B, 0x800, 0);
+	segaic16_sprites_init(machine, 1, SEGAIC16_SPRITES_YBOARD, 0x1000, 0);
 
 	/* initialize the rotation layer */
-	segaic16_rotate_init(0, SEGAIC16_ROTATE_YBOARD, 0x000);
+	segaic16_rotate_init(machine, 0, SEGAIC16_ROTATE_YBOARD, 0x000);
 }
 
 
@@ -64,12 +64,12 @@ VIDEO_UPDATE( yboard )
 	/* draw the yboard sprites */
 	yboard_clip.min_x = yboard_clip.min_y = 0;
 	yboard_clip.max_x = yboard_clip.max_y = 511;
-	segaic16_sprites_draw(1, yboard_bitmap, &yboard_clip);
+	segaic16_sprites_draw(screen, yboard_bitmap, &yboard_clip, 1);
 
 	/* apply rotation */
 	segaic16_rotate_draw(0, bitmap, cliprect, yboard_bitmap);
 
 	/* draw the 16B sprites */
-	segaic16_sprites_draw(0, bitmap, cliprect);
+	segaic16_sprites_draw(screen, bitmap, cliprect, 0);
 	return 0;
 }

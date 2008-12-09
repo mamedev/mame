@@ -518,8 +518,8 @@ static MACHINE_RESET( 88games )
 
 static DRIVER_INIT( 88games )
 {
-	konami_rom_deinterleave_2("gfx1");
-	konami_rom_deinterleave_2("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx1");
+	konami_rom_deinterleave_2(machine, "gfx2");
 }
 
 

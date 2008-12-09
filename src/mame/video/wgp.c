@@ -55,7 +55,7 @@ static void wgp_core_vh_start(running_machine *machine, int x_offs,int y_offs,in
 
 	TC0100SCN_vh_start(machine,1,TC0100SCN_GFX_NUM,x_offs,y_offs,0,0,0,0,0);
 
-	if (has_TC0110PCR())
+	if (TC0110PCR_mask(machine) & 1)
 		TC0110PCR_vh_start(machine);
 
 	wgp_piv_xoffs = piv_xoffs;

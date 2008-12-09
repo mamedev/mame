@@ -1,8 +1,8 @@
 /* helper function to join two 16-bit ROMs and form a 32-bit data stream */
-void konami_rom_deinterleave_2(const char *mem_region);
-void konami_rom_deinterleave_2_half(const char *mem_region);
+void konami_rom_deinterleave_2(running_machine *machine, const char *mem_region);
+void konami_rom_deinterleave_2_half(running_machine *machine, const char *mem_region);
 /* helper function to join four 16-bit ROMs and form a 64-bit data stream */
-void konami_rom_deinterleave_4(const char *mem_region);
+void konami_rom_deinterleave_4(running_machine *machine, const char *mem_region);
 
 
 #define MAX_K007121 2
@@ -429,7 +429,7 @@ READ16_HANDLER( K053250_1_rom_r );
 
 void K053250_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int chip, int colorbase, int flags, int pri);
 void K053250_set_LayerOffset(int chip, int offsx, int offsy);
-void K053250_unpack_pixels(const char *region);
+void K053250_unpack_pixels(running_machine *machine, const char *region);
 void K053250_dma(running_machine *machine, int chip, int limiter);
 
 

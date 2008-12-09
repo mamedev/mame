@@ -404,12 +404,12 @@ VIDEO_UPDATE( cninja )
 	/* Draw playfields */
 	bitmap_fill(priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,512);
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
-	deco16_tilemap_3_draw(bitmap,cliprect,0,2);
-	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER1,2);
-	deco16_tilemap_2_draw(bitmap,cliprect,TILEMAP_DRAW_LAYER0,4);
+	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
+	deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
+	deco16_tilemap_2_draw(screen,bitmap,cliprect,TILEMAP_DRAW_LAYER1,2);
+	deco16_tilemap_2_draw(screen,bitmap,cliprect,TILEMAP_DRAW_LAYER0,4);
 	cninja_draw_sprites(screen->machine,bitmap,cliprect);
-	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
+	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;
 }
 
@@ -421,14 +421,14 @@ VIDEO_UPDATE( edrandy )
 
 	bitmap_fill(priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0);
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
+	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 	if (deco16_raster_display_position)
 		raster_pf3_draw(bitmap,cliprect,0,2);
 	else
-		deco16_tilemap_3_draw(bitmap,cliprect,0,2);
-	deco16_tilemap_2_draw(bitmap,cliprect,0,4);
+		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
+	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,4);
 	cninja_draw_sprites(screen->machine,bitmap,cliprect);
-	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
+	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;
 }
 
@@ -454,29 +454,29 @@ VIDEO_UPDATE( robocop2 )
 	bitmap_fill(priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x200);
 	if ((deco16_priority&4)==0)
-		deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
+		deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,1);
 
 	/* Switchable priority */
 	switch (deco16_priority&0x8) {
 		case 8:
-			deco16_tilemap_2_draw(bitmap,cliprect,0,2);
+			deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
 			if (deco16_raster_display_position)
 				raster_pf3_draw(bitmap,cliprect,0,4);
 			else
-				deco16_tilemap_3_draw(bitmap,cliprect,0,4);
+				deco16_tilemap_3_draw(screen,bitmap,cliprect,0,4);
 			break;
 		default:
 		case 0:
 			if (deco16_raster_display_position)
 				raster_pf3_draw(bitmap,cliprect,0,2);
 			else
-				deco16_tilemap_3_draw(bitmap,cliprect,0,2);
-			deco16_tilemap_2_draw(bitmap,cliprect,0,4);
+				deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
+			deco16_tilemap_2_draw(screen,bitmap,cliprect,0,4);
 			break;
 	}
 
 	robocop2_draw_sprites(screen->machine,bitmap,cliprect);
-	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
+	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;
 }
 
@@ -500,9 +500,9 @@ VIDEO_UPDATE( mutantf )
     The other bits may control alpha blend on the 2nd sprite chip, or
     layer order.
     */
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
-	deco16_tilemap_2_draw(bitmap,cliprect,0,0);
-	deco16_tilemap_3_draw(bitmap,cliprect,0,0);
+	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+	deco16_tilemap_2_draw(screen,bitmap,cliprect,0,0);
+	deco16_tilemap_3_draw(screen,bitmap,cliprect,0,0);
 
 	/* We need to abuse the priority bitmap a little by clearing it before
         drawing each sprite layer.  This is because there is no priority
@@ -521,6 +521,6 @@ VIDEO_UPDATE( mutantf )
 		bitmap_fill(priority_bitmap,cliprect,0);
 		mutantf_draw_sprites(screen->machine,bitmap,cliprect,buffered_spriteram16,3);
 	}
-	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
+	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;
 }

@@ -93,11 +93,11 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 	spriteram_buffered = auto_malloc(spriteram_size);
 	spritelist = auto_malloc(0x400 * sizeof(*spritelist));
 
-	chips = number_of_TC0100SCN();
+	chips = TC0100SCN_count(machine);
 
 	assert_always(chips >= 0, "erroneous TC0100SCN configuratiom");
 
-	if (has_TC0480SCP())	/* it's a tc0480scp game */
+	if (has_TC0480SCP(machine))	/* it's a tc0480scp game */
 	{
 		TC0480SCP_vh_start(machine,TC0480SCP_GFX_NUM,f2_hide_pixels,f2_tilemap_xoffs,
 		   f2_tilemap_yoffs,f2_text_xoffs,0,-1,0,f2_tilemap_col_base);
@@ -108,16 +108,16 @@ static void taitof2_core_vh_start (running_machine *machine, int sprite_type,int
 			flip_xoffs,flip_yoffs,flip_text_x_offs,flip_text_yoffs,TC0100SCN_SINGLE_VDU);
 	}
 
-	if (has_TC0110PCR())
+	if (TC0110PCR_mask(machine) & 1)
 		TC0110PCR_vh_start(machine);
 
-	if (has_TC0280GRD())
+	if (has_TC0280GRD(machine))
 		TC0280GRD_vh_start(machine, TC0280GRD_GFX_NUM);
 
-	if (has_TC0430GRW())
+	if (has_TC0430GRW(machine))
 		TC0430GRW_vh_start(machine, TC0430GRW_GFX_NUM);
 
-	if (has_TC0360PRI())
+	if (has_TC0360PRI(machine))
 		TC0360PRI_vh_start(machine);	/* Purely for save-state purposes */
 
 	for (i = 0; i < 8; i ++)
@@ -1122,12 +1122,12 @@ VIDEO_UPDATE( taitof2_pri )
 
 
 
-static void draw_roz_layer(bitmap_t *bitmap,const rectangle *cliprect,UINT32 priority)
+static void draw_roz_layer(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect,UINT32 priority)
 {
-	if (has_TC0280GRD())
+	if (has_TC0280GRD(machine))
 		TC0280GRD_zoom_draw(bitmap,cliprect,f2_pivot_xdisp,f2_pivot_ydisp,priority);
 
-	if (has_TC0430GRW())
+	if (has_TC0430GRW(machine))
 		TC0430GRW_zoom_draw(bitmap,cliprect,f2_pivot_xdisp,f2_pivot_ydisp,priority);
 }
 
@@ -1142,10 +1142,10 @@ VIDEO_UPDATE( taitof2_pri_roz )
 
 	taitof2_handle_sprite_buffering();
 
-	if (has_TC0280GRD())
+	if (has_TC0280GRD(screen->machine))
 		TC0280GRD_tilemap_update(roz_base_color);
 
-	if (has_TC0430GRW())
+	if (has_TC0430GRW(screen->machine))
 		TC0430GRW_tilemap_update(roz_base_color);
 
 	TC0100SCN_tilemap_update(screen->machine);
@@ -1176,7 +1176,7 @@ VIDEO_UPDATE( taitof2_pri_roz )
 	{
 		if (rozpri==i)
 		{
-			draw_roz_layer(bitmap,cliprect,1 << drawn);
+			draw_roz_layer(screen->machine,bitmap,cliprect,1 << drawn);
 			f2_tilepri[drawn]=i;
 			drawn++;
 		}

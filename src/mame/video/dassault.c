@@ -174,24 +174,24 @@ VIDEO_UPDATE( dassault )
 	deco16_clear_sprite_priority_bitmap();
 	bitmap_fill(priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,screen->machine->pens[3072]);
-	deco16_tilemap_4_draw(bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
+	deco16_tilemap_4_draw(screen,bitmap,cliprect,TILEMAP_DRAW_OPAQUE,0);
 
 	/* The middle playfields can be swapped priority-wise */
 	if ((deco16_priority&3)==0) {
-		deco16_tilemap_2_draw(bitmap,cliprect,0,2);
-		deco16_tilemap_3_draw(bitmap,cliprect,0,16);
+		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,2);
+		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,16);
 	} else if ((deco16_priority&3)==1) {
-		deco16_tilemap_3_draw(bitmap,cliprect,0,2);
-		deco16_tilemap_2_draw(bitmap,cliprect,0,64);
+		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
+		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,64);
 	} else if ((deco16_priority&3)==3) {
-		deco16_tilemap_3_draw(bitmap,cliprect,0,2);
-		deco16_tilemap_2_draw(bitmap,cliprect,0,16);
+		deco16_tilemap_3_draw(screen,bitmap,cliprect,0,2);
+		deco16_tilemap_2_draw(screen,bitmap,cliprect,0,16);
 	} else {
 		/* Unused */
 	}
 
 	/* Draw sprites - two sprite generators, with selectable priority */
 	draw_sprites(screen->machine,bitmap,cliprect,deco16_priority);
-	deco16_tilemap_1_draw(bitmap,cliprect,0,0);
+	deco16_tilemap_1_draw(screen,bitmap,cliprect,0,0);
 	return 0;
 }

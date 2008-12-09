@@ -520,7 +520,7 @@ ROM_END
 
 static DRIVER_INIT( gradius3 )
 {
-	konami_rom_deinterleave_2("gfx2");
+	konami_rom_deinterleave_2(machine, "gfx2");
 }
 
 
